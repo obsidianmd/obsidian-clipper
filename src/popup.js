@@ -2,19 +2,38 @@ import TurndownService from 'turndown';
 import { gfm, tables, strikethrough } from 'turndown-plugin-gfm';
 import { Readability } from '@mozilla/readability';
 
+document.addEventListener('DOMContentLoaded', function() {
+  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+    const url = tabs[0].url;
+    chrome.tabs.sendMessage(tabs[0].id, {action: "getPageContent"}, function(response) {
+      if (response && response.content) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(response.content, 'text/html');
+        const { title: rawTitle } = new Readability(doc).parse();
+        const title = rawTitle.replace(/"/g, "'");
+        const fileName = getFileName(title);
+
+        // Prepopulate the textarea with the file name
+        document.getElementById('fileNameField').value = fileName;
+      }
+    });
+  });
+});
+
 document.getElementById('clipButton').addEventListener('click', function() {
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     chrome.tabs.sendMessage(tabs[0].id, {action: "getPageContent"}, function(response) {
       if (response && response.content) {
         chrome.storage.sync.get(['vaultName', 'folderName', 'tags'], (data) => {
-          processContent(response.content, tabs[0].url, data.vaultName, data.folderName, data.tags);
+          const fileName = document.getElementById('fileNameField').value;  // Use the edited filename
+          processContent(response.content, tabs[0].url, data.vaultName, data.folderName, data.tags, fileName);
         });
       }
     });
   });
 });
 
-function processContent(content, url, vaultName = "", folderName = "Clippings/", tags = "clippings") {
+function processContent(content, url, vaultName = "", folderName = "Clippings/", tags = "clippings", fileName) {
   const parser = new DOMParser();
   const doc = parser.parseFromString(content, 'text/html');
 
@@ -29,11 +48,6 @@ function processContent(content, url, vaultName = "", folderName = "Clippings/",
   });
 
   const { title: rawTitle, byline, content: readableContent } = new Readability(doc).parse();
-
-  // Replace double quotes with single quotes in the title, to prevent breaking YAML
-  const title = rawTitle.replace(/"/g, "'");
-
-  const fileName = getFileName(title);
 
   const turndownService = new TurndownService({
     headingStyle: 'atx',
@@ -68,7 +82,7 @@ function processContent(content, url, vaultName = "", folderName = "Clippings/",
     '---\n'
     + 'category: "[[Clippings]]"\n'
     + 'author: ' + authorBrackets + '\n'
-    + 'title: "' + title + '"\n'
+    + 'title: "' + rawTitle.replace(/"/g, "'") + '"\n'
     + 'source: ' + url + '\n'
     + 'created: "[[' + today + ']]"\n'
     + 'published: ' + published + '\n' 
