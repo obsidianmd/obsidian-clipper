@@ -11,6 +11,10 @@
   --interactive-accent-hover: var(--color-accent-2);
 
   --input-height: 30px;
+
+  --text-normal: var(--color-base-100);
+  --text-muted: var(--color-base-70);
+  --text-faint: var(--color-base-50);
 }
 
 @media (prefers-color-scheme: light) {
@@ -55,15 +59,11 @@
     --color-base-100: #222222;
 
     --background-primary: white;
-    --text-normal: black;
-    --text-muted: #666;
-    --text-on-accent: white;
   }
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-
     --color-accent-hsl:
         var(--accent-h),
         var(--accent-s),
@@ -103,10 +103,8 @@
     --color-base-100: #dadada;
 
     --background-primary: #222;
-    --background-modifier-border:;
-    --text-normal: white;
-    --text-muted: #999;
-    --text-on-accent: white;
+    --interactive-accent: var(--color-accent);
+    --interactive-accent-hover: var(--color-accent-1);
   }
 }
 
@@ -115,24 +113,45 @@
   font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei Light", sans-serif;
 }
 
+html {
+  font-size: 16px;
+}
+
 body {
-  width: 250px;
   padding: 10px;
   margin: 0;
   background-color: var(--background-primary);
+  color: var(--text-normal);
 }
 
+input[type="text"],
 textarea {
   background: var(--background-primary);
   border: 1px solid var(--background-modifier-border);
   color: var(--text-normal);
   font-family: inherit;
-  padding: 4px 4px;
+  padding: 4px;
   border-radius: 4px;
   outline: none;
   width: 100%;
-  margin-bottom: 6px;
+  margin: 0;
   resize: vertical;
+}
+
+input[type="text"] {
+  height: var(--input-height);
+}
+
+a.text-muted,
+.text-muted {
+  color: var(--text-muted);
+}
+
+label {
+  display: block;
+  margin: 16px 0 8px;
+  font-size: 14px;
+  color: var(--text-muted);
 }
 
 button {
@@ -149,4 +168,16 @@ button {
 }
 button:hover {
   background-color: var(--interactive-accent-hover);
+}
+
+.clipper {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#settings {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 0 4%;
 }

@@ -33,6 +33,10 @@ document.getElementById('clipButton').addEventListener('click', function() {
   });
 });
 
+document.getElementById('openSettings').addEventListener('click', function() {
+  chrome.runtime.openOptionsPage();
+});
+
 function processContent(content, url, vaultName = "", folderName = "Clippings/", tags = "clippings", fileName) {
   const parser = new DOMParser();
   const doc = parser.parseFromString(content, 'text/html');
@@ -122,8 +126,10 @@ function getMetaContent(doc, attr, value) {
 function saveToObsidian(fileContent, fileName, folder, vault) {
   const vaultParam = vault ? `&vault=${encodeURIComponent(vault)}` : '';
   const obsidianUrl = `obsidian://new?file=${encodeURIComponent(folder + fileName)}&content=${encodeURIComponent(fileContent)}${vaultParam}`;
-  
+
   chrome.tabs.create({ url: obsidianUrl }, function(tab) {
-    setTimeout(() => chrome.tabs.remove(tab.id), 500);
+    setTimeout(() => {
+      chrome.tabs.remove(tab.id);
+    }, 1000);
   });
 }

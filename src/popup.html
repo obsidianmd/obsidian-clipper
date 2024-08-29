@@ -3,11 +3,17 @@
 <head>
   <title>Obsidian Web Clipper</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+        width: 250px;
+    }
+  </style>
 </head>
 <body>
-  <div>
+  <div class="clipper">
     <textarea id="fileNameField" rows="2"></textarea>
     <button id="clipButton">Clip in Obsidian</button>
+    <a href="#" id="openSettings" class="text-muted">Settings</a>
   </div>
   <script type="module" src="popup.js"></script>
 </body>
