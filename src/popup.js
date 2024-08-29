@@ -1,4 +1,5 @@
 import TurndownService from 'turndown';
+import { gfm, tables, strikethrough } from 'turndown-plugin-gfm';
 import { Readability } from '@mozilla/readability';
 
 document.getElementById('clipButton').addEventListener('click', function() {
@@ -38,6 +39,8 @@ function processContent(content, url, vaultName = "", folderName = "Clippings/",
     codeBlockStyle: 'fenced',
     emDelimiter: '*',
   });
+
+  turndownService.use(gfm);
 
   const markdownBody = turndownService.turndown(readableContent);
 
