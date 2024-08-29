@@ -17,17 +17,29 @@ function processContent(content, url, vaultName = "", folderName = "Clippings/",
   const parser = new DOMParser();
   const doc = parser.parseFromString(content, 'text/html');
 
+  // Convert relative image URLs to absolute URLs
+  const baseUrl = new URL(url);
+  const images = doc.querySelectorAll('img');
+  images.forEach(img => {
+    const src = img.getAttribute('src');
+    if (src && !src.startsWith('http')) {
+      img.setAttribute('src', new URL(src, baseUrl).href);
+    }
+  });
+
   const { title, byline, content: readableContent } = new Readability(doc).parse();
 
   const fileName = getFileName(title);
 
-  const markdownBody = new TurndownService({
+  const turndownService = new TurndownService({
     headingStyle: 'atx',
     hr: '---',
     bulletListMarker: '-',
     codeBlockStyle: 'fenced',
     emDelimiter: '*',
-  }).turndown(readableContent);
+  });
+
+  const markdownBody = turndownService.turndown(readableContent);
 
   const today = convertDate(new Date());
 
@@ -92,7 +104,5 @@ function saveToObsidian(fileContent, fileName, folder, vault) {
   const obsidianUrl = `obsidian://new?file=${encodeURIComponent(folder + fileName)}&content=${encodeURIComponent(fileContent)}${vaultParam}`;
   
   chrome.tabs.create({ url: obsidianUrl }, function(tab) {
-    // You might want to close this tab after a short delay
-    // setTimeout(() => chrome.tabs.remove(tab.id), 500);
   });
 }
