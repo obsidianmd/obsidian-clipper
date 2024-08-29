@@ -5,33 +5,17 @@ document.getElementById('clipButton').addEventListener('click', function() {
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     chrome.tabs.sendMessage(tabs[0].id, {action: "getPageContent"}, function(response) {
       if (response && response.content) {
-        processContent(response.content, tabs[0].url);
+        chrome.storage.sync.get(['vaultName', 'folderName', 'tags'], (data) => {
+          processContent(response.content, tabs[0].url, data.vaultName, data.folderName, data.tags);
+        });
       }
     });
   });
 });
 
-function processContent(content, url) {
+function processContent(content, url, vaultName = "", folderName = "Clippings/", tags = "clippings") {
   const parser = new DOMParser();
   const doc = parser.parseFromString(content, 'text/html');
-
-  /* Optional vault name */
-  const vault = "";
-
-  /* Optional folder name such as "Clippings/" */
-  const folder = "Clippings/";
-
-  /* Optional tags  */
-  let tags = "clippings";
-
-  /* Parse the site's meta keywords content into tags, if present */
-  if (doc.querySelector('meta[name="keywords" i]')) {
-    var keywords = doc.querySelector('meta[name="keywords" i]').getAttribute('content').split(',');
-    keywords.forEach(function(keyword) {
-      let tag = ' ' + keyword.split(' ').join('');
-      tags += tag;
-    });
-  }
 
   const { title, byline, content: readableContent } = new Readability(doc).parse();
 
@@ -47,13 +31,10 @@ function processContent(content, url) {
 
   const today = convertDate(new Date());
 
-  // Fetch byline, meta author, property author, or site name
   var author = byline || getMetaContent(doc, "name", "author") || getMetaContent(doc, "property", "author") || getMetaContent(doc, "property", "og:site_name");
 
-  // Check if there's an author and add brackets
   var authorBrackets = author ? `"[[${author}]]"` : "";
 
-  /* Try to get published date */
   var timeElement = doc.querySelector("time");
   var publishedDate = timeElement ? timeElement.getAttribute("datetime") : "";
   var published = '';
@@ -65,7 +46,6 @@ function processContent(content, url) {
     published = `"[[${year}-${month}-${day}]]"`;
   }
 
-  /* YAML front matter as tags render cleaner with special chars  */
   const fileContent = 
     '---\n'
     + 'category: "[[Clippings]]"\n'
@@ -79,13 +59,13 @@ function processContent(content, url) {
     + '---\n\n'
     + markdownBody;
 
-  saveToObsidian(fileContent, fileName, folder, vault);
+  saveToObsidian(fileContent, fileName, folderName, vaultName);
 }
 
 function getFileName(fileName) {
   var userAgent = window.navigator.userAgent,
-      platform = window.navigator.platform,
-      windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'];
+    platform = window.navigator.platform,
+    windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'];
 
   if (windowsPlatforms.indexOf(platform) !== -1) {
     fileName = fileName.replace(':', '').replace(/[/\\?%*|"<>]/g, '-');

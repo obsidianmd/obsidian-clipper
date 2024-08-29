@@ -5,6 +5,7 @@ module.exports = {
   mode: 'development', // or 'production'
   entry: {
     popup: './src/popup.js',
+    settings: './src/settings.js',
     content: './src/content.js',
     background: './src/background.js'
   },
@@ -27,6 +28,16 @@ module.exports = {
       }
     ]
   },
+  plugins: [
+    new CopyPlugin({
+      patterns: [
+        { from: "src/manifest.json", to: "manifest.json" },
+        { from: "src/popup.html", to: "popup.html" },
+        { from: "src/settings.html", to: "settings.html" },
+        { from: "src/icons", to: "icons" }
+      ],
+    }),
+  ],
   devServer: {
     hot: true,
   }

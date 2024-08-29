@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Obsidian Clipper Settings</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        label { display: block; margin-top: 10px; }
+        input[type="text"] { width: 100%; padding: 5px; margin-top: 5px; }
+        button { margin-top: 20px; padding: 10px 15px; }
+    </style>
+</head>
+<body>
+    <h1>Obsidian Clipper Settings</h1>
+    <form id="settingsForm">
+        <label for="vaultName">Vault Name:</label>
+        <input type="text" id="vaultName" name="vaultName" />
+
+        <label for="folderName">Folder:</label>
+        <input type="text" id="folderName" name="folderName" />
+
+        <label for="tags">Tags:</label>
+        <input type="text" id="tags" name="tags" />
+
+        <button type="submit">Save Settings</button>
+    </form>
+
+    <script src="settings.js"></script>
+</body>
+</html>
