@@ -118,7 +118,7 @@ html {
 }
 
 body {
-  padding: 10px;
+  padding: 8px;
   margin: 0;
   background-color: var(--background-primary);
   color: var(--text-normal);
@@ -138,6 +138,29 @@ textarea {
   resize: vertical;
 }
 
+textarea:hover,
+input:hover {
+  border-color: var(--background-modifier-border-hover);
+  transition:
+    box-shadow .15s ease-in-out,
+    border .15s ease-in-out;
+}
+textarea:active,
+textarea:focus,
+textarea:focus-visible,
+input:active,
+input:focus {
+  border-color: var(--background-modifier-border-focus);
+  box-shadow: 0 0 0 2px var(--background-modifier-border-focus);
+  transition:
+    box-shadow .15s ease-in-out,
+    border .15s ease-in-out;
+}
+
+input::placeholder {
+  color: var(--text-faint);
+}
+
 input[type="text"] {
   height: var(--input-height);
 }
@@ -149,9 +172,9 @@ a.text-muted,
 
 label {
   display: block;
-  margin: 16px 0 8px;
+  margin: 8px 0 8px;
+  font-weight: 600;
   font-size: 14px;
-  color: var(--text-muted);
 }
 
 button {
@@ -174,10 +197,18 @@ button:hover {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  padding: 2px;
 }
 
 #settings {
   max-width: 600px;
   margin: 40px auto;
   padding: 0 4%;
+}
+
+.settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 24px;
 }
