@@ -5,6 +5,13 @@ import { Readability } from '@mozilla/readability';
 document.addEventListener('DOMContentLoaded', function() {
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     const url = tabs[0].url;
+
+    // Check if the page is a chrome-extension page or any other non-clippable page
+    if (url.startsWith('chrome-extension://') || url.startsWith('chrome://') || url.startsWith('about:') || url.startsWith('file://')) {
+      showError('This page cannot be clipped.');
+      return;
+    }
+
     chrome.tabs.sendMessage(tabs[0].id, {action: "getPageContent"}, function(response) {
       if (response && response.content) {
         const parser = new DOMParser();
@@ -15,6 +22,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Prepopulate the textarea with the file name
         document.getElementById('fileNameField').value = fileName;
+      } else {
+        showError('Unable to retrieve page content. Try reloading the page.');
       }
     });
   });
@@ -28,6 +37,8 @@ document.getElementById('clipButton').addEventListener('click', function() {
           const fileName = document.getElementById('fileNameField').value;  // Use the edited filename
           processContent(response.content, tabs[0].url, data.vaultName, data.folderName, data.tags, fileName);
         });
+      } else {
+        showError('Unable to retrieve page content.');
       }
     });
   });
@@ -36,6 +47,15 @@ document.getElementById('clipButton').addEventListener('click', function() {
 document.getElementById('openSettings').addEventListener('click', function() {
   chrome.runtime.openOptionsPage();
 });
+
+function showError(message) {
+  const errorMessage = document.getElementById('errorMessage');
+  const clipper = document.querySelector('.clipper');
+
+  errorMessage.textContent = message;
+  errorMessage.style.display = 'block';  // Show the error message
+  clipper.style.display = 'none';        // Hide the clipper section
+}
 
 function processContent(content, url, vaultName = "", folderName = "Clippings/", tags = "clippings", fileName) {
   const parser = new DOMParser();
@@ -126,10 +146,8 @@ function getMetaContent(doc, attr, value) {
 function saveToObsidian(fileContent, fileName, folder, vault) {
   const vaultParam = vault ? `&vault=${encodeURIComponent(vault)}` : '';
   const obsidianUrl = `obsidian://new?file=${encodeURIComponent(folder + fileName)}&content=${encodeURIComponent(fileContent)}${vaultParam}`;
-
+  
   chrome.tabs.create({ url: obsidianUrl }, function(tab) {
-    setTimeout(() => {
-      chrome.tabs.remove(tab.id);
-    }, 1000);
+    setTimeout(() => chrome.tabs.remove(tab.id), 500);
   });
 }
