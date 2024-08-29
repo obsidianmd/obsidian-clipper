@@ -28,7 +28,10 @@ function processContent(content, url, vaultName = "", folderName = "Clippings/",
     }
   });
 
-  const { title, byline, content: readableContent } = new Readability(doc).parse();
+  const { title: rawTitle, byline, content: readableContent } = new Readability(doc).parse();
+
+  // Replace double quotes with single quotes in the title, to prevent breaking YAML
+  const title = rawTitle.replace(/"/g, "'");
 
   const fileName = getFileName(title);
 
@@ -71,7 +74,7 @@ function processContent(content, url, vaultName = "", folderName = "Clippings/",
     + 'published: ' + published + '\n' 
     + 'topics: \n'
     + 'tags: [' + tags + ']\n'
-    + '---\n\n'
+    + '---\n'
     + markdownBody;
 
   saveToObsidian(fileContent, fileName, folderName, vaultName);
@@ -107,5 +110,6 @@ function saveToObsidian(fileContent, fileName, folder, vault) {
   const obsidianUrl = `obsidian://new?file=${encodeURIComponent(folder + fileName)}&content=${encodeURIComponent(fileContent)}${vaultParam}`;
   
   chrome.tabs.create({ url: obsidianUrl }, function(tab) {
+    setTimeout(() => chrome.tabs.remove(tab.id), 500);
   });
 }
