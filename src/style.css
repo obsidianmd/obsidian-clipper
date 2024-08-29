@@ -192,6 +192,12 @@ button {
 button:hover {
   background-color: var(--interactive-accent-hover);
 }
+button:active,
+button:focus {
+  box-shadow: 0 0 0 2px var(--background-modifier-border-focus);
+  transition:
+    box-shadow .15s ease-in-out;
+}
 
 .clipper {
   display: flex;

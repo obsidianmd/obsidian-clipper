@@ -5,14 +5,15 @@
   <link rel="stylesheet" href="style.css">
   <style>
     body {
-        width: 250px;
+        width: 300px;
     }
   </style>
 </head>
 <body>
   <p id="errorMessage" style="text-align: center; display: none;"></p>
   <div class="clipper">
-    <textarea id="fileNameField" rows="2"></textarea>
+    <input id="fileNameField" type="text" />
+    <textarea id="contentField" rows="3"></textarea>
     <button id="clipButton">Clip in Obsidian</button>
     <a href="#" id="openSettings" class="text-muted">Settings</a>
   </div>
