@@ -1,0 +1,102 @@
+:root {
+  --accent-h: 258;
+  --accent-s: 88%;
+  --accent-l: 66%;
+
+  --interactive-accent: var(--color-accent-1);
+  --interactive-accent-hover: var(--color-accent-2);
+
+  --input-height: 30px;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+
+    --color-accent-hsl:
+        var(--accent-h),
+        var(--accent-s),
+        var(--accent-l);
+
+    --color-accent:
+      hsl(
+        var(--accent-h),
+        var(--accent-s),
+        var(--accent-l));
+
+    --color-accent-1:
+      hsl(
+        calc(var(--accent-h) - 1),
+        calc(var(--accent-s) * 1.01),
+        calc(var(--accent-l) * 1.075));
+
+    --color-accent-2:
+      hsl(
+        calc(var(--accent-h) - 3),
+        calc(var(--accent-s) * 1.02),
+        calc(var(--accent-l) * 1.15));
+
+    --background-primary: white;
+    --text-normal: black;
+    --text-muted: #666;
+    --text-on-accent: white;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+
+    --color-accent-hsl:
+        var(--accent-h),
+        var(--accent-s),
+        var(--accent-l);
+
+    --color-accent:
+      hsl(
+        var(--accent-h),
+        var(--accent-s),
+        var(--accent-l));
+
+    --color-accent-1:
+      hsl(
+        calc(var(--accent-h) - 3),
+        calc(var(--accent-s) * 1.02),
+        calc(var(--accent-l) * 1.15));
+
+    --color-accent-2:
+      hsl(
+        calc(var(--accent-h) - 5),
+        calc(var(--accent-s) * 1.05),
+        calc(var(--accent-l) * 1.29));
+
+    --background-primary: #222;
+    --text-normal: white;
+    --text-muted: #999;
+    --text-on-accent: white;
+  }
+}
+
+* {
+  font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei Light", sans-serif;
+}
+
+body {
+  width: 250px;
+  padding: 8px;
+  margin: 0;
+  background-color: var(--background-primary);
+}
+button {
+  width: 100%;
+  background-color: var(--interactive-accent);
+  border-radius: 4px;
+  color: white;
+  height: var(--input-height);
+  user-select: none;
+  font-weight: 400;
+  padding: 4px 12px;
+  outline: none;
+  border: none;
+}
+button:hover {
+  background-color: var(--interactive-accent-hover);
+}

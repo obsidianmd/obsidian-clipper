@@ -34,6 +34,7 @@ module.exports = {
         { from: "src/manifest.json", to: "manifest.json" },
         { from: "src/popup.html", to: "popup.html" },
         { from: "src/settings.html", to: "settings.html" },
+        { from: "src/style.css", to: "style.css" },
         { from: "src/icons", to: "icons" }
       ],
     }),
