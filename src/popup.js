@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
       const option = document.createElement('option');
       option.value = '';
-      option.textContent = 'No vaults available';
+      option.textContent = 'Save to my open vault';
       vaultDropdown.appendChild(option);
     }
   });
