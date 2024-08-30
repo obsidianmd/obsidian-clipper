@@ -51,6 +51,9 @@ module.exports = {
 			filename: 'style.css'
 		})
 	],
+	resolve: {
+		extensions: ['.js']
+	},
 	devServer: {
 		hot: true,
 	}

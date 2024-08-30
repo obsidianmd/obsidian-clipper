@@ -1,3 +1,5 @@
+import { createIcons, Trash2 } from 'lucide';
+
 document.addEventListener('DOMContentLoaded', () => {
 	const vaultInput = document.getElementById('vault-input');
 	const vaultList = document.getElementById('vault-list');
@@ -112,12 +114,21 @@ document.addEventListener('DOMContentLoaded', () => {
 		fieldDiv.innerHTML = `
 					<input type="text" class="field-name" value="${name}" placeholder="Field name">
 					<input type="text" class="field-value" value="${value}" placeholder="Field value">
-					<button type="button" class="remove-field-btn">Remove</button>
+					<button type="button" class="remove-field-btn clickable-icon" aria-label="Remove field">
+						<i data-lucide="trash-2"></i>
+					</button>
 				`;
 		templateFields.appendChild(fieldDiv);
 
 		fieldDiv.querySelector('.remove-field-btn').addEventListener('click', () => {
 			templateFields.removeChild(fieldDiv);
+		});
+
+		// Initialize Lucide icon
+		createIcons({
+			icons: {
+				Trash2
+			}
 		});
 	}
 
@@ -218,4 +229,11 @@ document.addEventListener('DOMContentLoaded', () => {
 	resetDefaultBtn.textContent = 'Reset default template';
 	resetDefaultBtn.addEventListener('click', resetDefaultTemplate);
 	document.querySelector('.settings-section').appendChild(resetDefaultBtn);
+
+	// Initialize all Lucide icons
+	createIcons({
+		icons: {
+			Trash2
+		}
+	});
 });
