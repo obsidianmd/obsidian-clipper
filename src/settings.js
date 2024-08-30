@@ -11,7 +11,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const templateSelect = document.getElementById('templateSelect');
     const newTemplateBtn = document.getElementById('newTemplateBtn');
-    const editTemplateBtn = document.getElementById('editTemplateBtn');
     const deleteTemplateBtn = document.getElementById('deleteTemplateBtn');
     const templateEditor = document.getElementById('templateEditor');
     const templateEditorTitle = document.getElementById('templateEditorTitle');
@@ -25,17 +24,13 @@ document.addEventListener('DOMContentLoaded', () => {
     let editingTemplateIndex = -1;
 
     // Load saved settings or use default values
-    chrome.storage.sync.get(['vaults', 'folderName', 'tags', 'templates'], (data) => {
+    chrome.storage.sync.get(['vaults', 'folderName', 'tags'], (data) => {
         vaults = data.vaults || [];
         folderNameInput.value = data.folderName || defaultFolderName;
         tagsInput.value = data.tags || defaultTags;
         updateVaultList();
-        
-        templates = data.templates || [];
-        
-        // Ensure Default template is always present
-        if (!templates.some(t => t.name === 'Default')) {
-            templates.unshift({
+        templates = data.templates || [
+            {
                 name: 'Default',
                 fields: [
                     { name: 'category', value: '"[[Clippings]]"' },
@@ -47,9 +42,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     { name: 'topics', value: '' },
                     { name: 'tags', value: '' }
                 ]
-            });
-        }
-        
+            }
+        ];
         updateTemplateSelect();
     });
 
@@ -79,9 +73,10 @@ document.addEventListener('DOMContentLoaded', () => {
         templateName.value = '';
         templateFields.innerHTML = '';
         templateEditor.style.display = 'block';
+        templateSelect.selectedIndex = 0;
     });
 
-    editTemplateBtn.addEventListener('click', () => {
+    templateSelect.addEventListener('change', () => {
         const selectedIndex = templateSelect.selectedIndex - 1;
         if (selectedIndex >= 0) {
             editingTemplateIndex = selectedIndex;
@@ -91,15 +86,22 @@ document.addEventListener('DOMContentLoaded', () => {
             templateFields.innerHTML = '';
             template.fields.forEach(field => addFieldToEditor(field.name, field.value));
             templateEditor.style.display = 'block';
+        } else {
+            templateEditor.style.display = 'none';
         }
     });
 
     deleteTemplateBtn.addEventListener('click', () => {
         const selectedIndex = templateSelect.selectedIndex - 1;
         if (selectedIndex >= 0) {
-            templates.splice(selectedIndex, 1);
-            updateTemplateSelect();
-            saveSettings();
+            if (templates[selectedIndex].name === 'Default') {
+                alert("The Default template cannot be deleted.");
+            } else {
+                templates.splice(selectedIndex, 1);
+                updateTemplateSelect();
+                saveSettings();
+                templateEditor.style.display = 'none';
+            }
         }
     });
 
@@ -133,7 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateTemplateSelect() {
         templateSelect.innerHTML = '<option value="">Select a template</option>';
-        templates.forEach(template => {
+        templates.forEach((template, index) => {
             const option = document.createElement('option');
             option.value = template.name;
             option.textContent = template.name;
@@ -141,6 +143,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (template.name === 'Default') {
                 option.selected = true;
+                // Show the Default template in the editor when the page loads
+                editingTemplateIndex = index;
+                templateEditorTitle.textContent = 'Edit Template';
+                templateName.value = template.name;
+                templateFields.innerHTML = '';
+                template.fields.forEach(field => addFieldToEditor(field.name, field.value));
+                templateEditor.style.display = 'block';
             }
         });
 
@@ -174,7 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
             removeButton.addEventListener('click', () => {
                 vaults.splice(index, 1);
                 updateVaultList();
-                saveSettings(); // Auto-save after removing a vault
+                saveSettings();
             });
 
             li.appendChild(removeButton);
