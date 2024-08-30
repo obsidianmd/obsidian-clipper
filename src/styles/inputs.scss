@@ -1,0 +1,69 @@
+textarea {
+	resize: vertical;
+}
+select,
+input[type="text"],
+textarea {
+	background: var(--background-primary);
+	border: 1px solid var(--background-modifier-border);
+	color: var(--text-normal);
+	font-family: inherit;
+	padding: 4px;
+	border-radius: 4px;
+	outline: none;
+	width: 100%;
+	margin: 0;
+
+	&:hover {
+		border-color: var(--background-modifier-border-hover);
+		transition:
+			box-shadow .15s ease-in-out,
+			border .15s ease-in-out;
+	}
+	&:active,
+	&:focus,
+	&:focus-visible {
+		border-color: var(--background-modifier-border-focus);
+		box-shadow: 0 0 0 2px var(--background-modifier-border-focus);
+		transition:
+			box-shadow .15s ease-in-out,
+			border .15s ease-in-out;
+	}
+}
+
+input::placeholder {
+	color: var(--text-faint);
+}
+
+input[type="text"] {
+	height: var(--input-height);
+}
+
+label {
+	display: block;
+	margin: 8px 0 8px;
+	font-weight: 600;
+	font-size: 14px;
+}
+
+button {
+	width: 100%;
+	background-color: var(--interactive-accent);
+	border-radius: 4px;
+	color: white;
+	height: var(--input-height);
+	user-select: none;
+	font-weight: 500;
+	padding: 4px 12px;
+	outline: none;
+	border: none;
+	&:hover {
+		background-color: var(--interactive-accent-hover);
+	}
+	&:active,
+	&:focus {
+		box-shadow: 0 0 0 2px var(--background-modifier-border-focus);
+		transition:
+		box-shadow .15s ease-in-out;
+	}
+}

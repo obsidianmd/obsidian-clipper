@@ -1,0 +1,26 @@
+@import 'styles/_variables';
+
+* {
+	box-sizing: border-box;
+	font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei Light", sans-serif;
+}
+
+html {
+	font-size: 16px;
+}
+
+body {
+	padding: 8px;
+	margin: 0;
+	background-color: var(--background-primary);
+	color: var(--text-normal);
+}
+
+@import 'styles/inputs';
+@import 'styles/settings';
+@import 'styles/popup';
+
+a.text-muted,
+.text-muted {
+	color: var(--text-muted);
+}

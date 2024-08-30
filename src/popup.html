@@ -1,26 +1,26 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Obsidian Web Clipper</title>
-  <link rel="stylesheet" href="style.css">
-  <style>
-    body {
-        width: 300px;
-    }
-  </style>
+	<title>Obsidian Web Clipper</title>
+	<link rel="stylesheet" href="style.css">
+	<style>
+		body {
+				width: 300px;
+		}
+	</style>
 </head>
 <body>
-  <p id="error-message" style="text-align: center; display: none;"></p>
-  <div class="clipper">
-    <input id="file-name-field" type="text" />
-    <select id="template-select">
-      <option value="">Select a template</option>
-    </select>
-    <textarea id="content-field" rows="3"></textarea>
-    <select id="vault-dropdown"></select>
-    <button id="clip-button">Save in Obsidian</button>
-    <a href="#" id="open-settings" class="text-muted">Settings</a>
-  </div>
-  <script type="module" src="popup.js"></script>
+	<p id="error-message" style="text-align: center; display: none;"></p>
+	<div class="clipper">
+		<input id="file-name-field" type="text" />
+		<select id="template-select">
+			<option value="">Select a template</option>
+		</select>
+		<textarea id="content-field" rows="3"></textarea>
+		<select id="vault-dropdown"></select>
+		<button id="clip-button">Save in Obsidian</button>
+		<a href="#" id="open-settings" class="text-muted">Settings</a>
+	</div>
+	<script type="module" src="popup.js"></script>
 </body>
 </html>

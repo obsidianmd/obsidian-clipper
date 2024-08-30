@@ -1,0 +1,36 @@
+# top-most EditorConfig file
+root = true
+
+[*]
+charset = utf-8
+insert_final_newline = true
+indent_style = tab
+indent_size = 4
+tab_width = 4
+ij_smart_tabs = true
+
+[{*.js, *.jsx}]
+ij_javascript_spaces_within_imports = true
+ij_javascript_spaces_within_object_literal_braces = true
+ij_javascript_use_chained_calls_group_indents = true
+ij_javascript_import_sort_members = true
+ij_javascript_import_sort_module_name = true
+ij_javascript_import_prefer_absolute_path = true
+ij_javascript_else_on_new_line = true
+ij_javascript_use_double_quotes = false
+ij_javascript_force_quote_style = true
+ij_javascript_force_semicolon_style = true
+
+
+[{*.ts, *.tsx}]
+ij_typescript_spaces_within_imports = true
+ij_typescript_spaces_within_object_literal_braces = true
+ij_typescript_use_chained_calls_group_indents = true
+ij_typescript_import_sort_members = true
+ij_typescript_import_sort_module_name = true
+ij_typescript_import_prefer_absolute_path = true
+ij_typescript_else_on_new_line = true
+ij_continuation_indent_size = 4
+ij_typescript_use_double_quotes = false
+ij_typescript_force_quote_style = true
+ij_typescript_force_semicolon_style = true
