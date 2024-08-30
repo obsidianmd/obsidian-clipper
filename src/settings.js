@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
 				{ name: 'author', value: '{{authorLink}}' },
 				{ name: 'published', value: '{{published}}' },
 				{ name: 'created', value: '{{today}}' },
+				{ name: 'description', value: '{{description}}' },
 				{ name: 'tags', value: '{{tags}}' }
 			],
 			urlPatterns: [] // Add this new property

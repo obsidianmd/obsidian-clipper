@@ -111,10 +111,11 @@ function initializePageContent(content) {
 	const fileName = getFileName(currentTitle);
 	document.getElementById('file-name-field').value = fileName;
 
-	const author = byline || getMetaContent(doc, "name", "author") || getMetaContent(doc, "property", "author") || getMetaContent(doc, "property", "og:site_name");
+	const author = byline || getMetaContent(doc, "name", "author") || getMetaContent(doc, "property", "author") || getMetaContent(doc, "name", "twitter:creator") || getMetaContent(doc, "property", "og:site_name");
 	const authorBrackets = author ? `"[[${author}]]"` : "";
 
 	const description = getMetaContent(doc, "name", "description") || getMetaContent(doc, "property", "description") || getMetaContent(doc, "property", "og:description");
+	const image = getMetaContent(doc, "property", "og:image") || getMetaContent(doc, "name", "twitter:image");
 
 	const timeElement = doc.querySelector("time");
 	const publishedDate = timeElement ? timeElement.getAttribute("datetime") : "";
@@ -127,6 +128,8 @@ function initializePageContent(content) {
 		'{{authorLink}}': authorBrackets,
 		'{{today}}': convertDate(new Date()),
 		'{{description}}': description,
+		'{{domain}}': currentUrl.split('://')[1].split('/')[0],
+		'{{image}}': image,
 		'{{tags}}': ''
 	};
 
