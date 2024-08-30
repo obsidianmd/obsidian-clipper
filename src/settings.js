@@ -146,44 +146,8 @@ document.addEventListener('DOMContentLoaded', () => {
 		templateName.value = template ? template.name : '';
 		templateFields.innerHTML = '';
 
-		// Function to create or update an input field
-		function createOrUpdateField(id, labelText, value, type = 'input') {
-			let field = document.getElementById(id);
-			let label = document.querySelector(`label[for="${id}"]`);
-
-			if (!field) {
-				if (!label) {
-					label = document.createElement('label');
-					label.htmlFor = id;
-					label.textContent = labelText;
-					templateEditor.insertBefore(label, templateFields);
-				}
-
-				if (type === 'input') {
-					field = document.createElement('input');
-					field.type = 'text';
-				} else if (type === 'textarea') {
-					field = document.createElement('textarea');
-				}
-				field.id = id;
-				templateEditor.insertBefore(field, templateFields);
-			}
-
-			field.value = value;
-			return field;
-		}
-
-		createOrUpdateField('template-folder-name', 'Folder name', template ? template.folderName : 'Clippings/');
-
-		const existingPropertiesLabel = templateEditor.querySelector('#properties-label');
-		if (existingPropertiesLabel) {
-			existingPropertiesLabel.remove();
-		}
-
-		const propertiesLabel = document.createElement('h4');
-		propertiesLabel.id = 'properties-label';
-		propertiesLabel.textContent = 'Properties';
-		templateEditor.insertBefore(propertiesLabel, templateFields);
+		const folderNameInput = document.getElementById('template-folder-name');
+		folderNameInput.value = template ? template.folderName : 'Clippings/';
 
 		if (template) {
 			template.fields.forEach(field => addFieldToEditor(field.name, field.value));
@@ -191,12 +155,8 @@ document.addEventListener('DOMContentLoaded', () => {
 			addFieldToEditor();
 		}
 
-		const addFieldBtn = document.getElementById('add-field-btn');
-		const urlPatternsTextarea = createOrUpdateField('url-patterns', 'URL patterns (one per line)', 
-			template && template.urlPatterns ? template.urlPatterns.join('\n') : '', 'textarea');
-		urlPatternsTextarea.placeholder = 'https://example.com/';
-		templateEditor.insertBefore(urlPatternsTextarea, addFieldBtn.nextSibling);
-		templateEditor.insertBefore(document.querySelector('label[for="url-patterns"]'), urlPatternsTextarea);
+		const urlPatternsTextarea = document.getElementById('url-patterns');
+		urlPatternsTextarea.value = template && template.urlPatterns ? template.urlPatterns.join('\n') : '';
 
 		document.getElementById('template-editor').style.display = 'block';
 

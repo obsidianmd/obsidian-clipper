@@ -35,9 +35,24 @@
 						<h2 id="template-editor-title">Edit template</h2>
 						<form id="template-settings-form">
 							<div id="template-editor">
-								<input type="text" id="template-name" placeholder="Template name" />
+								<div class="setting-item">
+									<label for="template-name">Template name</label>
+									<input type="text" id="template-name" placeholder="Template name" />
+								</div>
+								<div class="setting-item">
+									<label for="template-folder-name">Folder name</label>
+									<div class="setting-item-description">The folder where the note will be saved.</div>
+									<input type="text" id="template-folder-name" placeholder="Clippings/" />
+								</div>
+								<div class="setting-item">
+									<label for="url-patterns">URL patterns</label>
+									<div class="setting-item-description">Which URLs will trigger this template. One per line.</div>
+									<textarea id="url-patterns" placeholder="https://example.com/"></textarea>
+								</div>
+								<h4>Properties</h4>
 								<div id="template-fields"></div>
 								<button type="button" id="add-field-btn">Add property</button>
+								
 								<button type="button" id="save-template-btn">Save template</button>
 							</div>
 						</form>

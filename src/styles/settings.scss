@@ -13,6 +13,12 @@
 	height: 100%;
 }
 
+.setting-item-description {
+	color: var(--text-muted);
+	font-size: 0.8rem;
+	margin: 4px 0 8px;
+}
+
 .sidebar {
 	background-color: var(--background-secondary);
 	width: 25%;
