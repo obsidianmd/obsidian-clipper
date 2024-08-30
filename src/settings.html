@@ -46,12 +46,13 @@
 								</div>
 								<div class="setting-item">
 									<label for="url-patterns">URL patterns</label>
-									<div class="setting-item-description">Which URLs will trigger this template. One per line.</div>
+									<div class="setting-item-description">Optional list of domains will trigger this template. One per line.</div>
 									<textarea id="url-patterns" placeholder="https://example.com/"></textarea>
 								</div>
-								<h4>Properties</h4>
+								<label>Properties</label>
+								<div class="setting-item-description">Frontmatter properties that will be added to the note. You can use variables to automatically pre-fill data from the page.</div>
 								<div id="template-fields"></div>
-								<button type="button" id="add-field-btn">Add property</button>
+								<div class="metadata-add-button"><a id="add-field-btn">+ Add property</a></div>
 								
 								<button type="button" id="save-template-btn">Save template</button>
 							</div>
