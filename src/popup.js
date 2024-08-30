@@ -22,6 +22,20 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
+  const templateSelect = document.getElementById('templateSelect');
+
+  // Load templates from storage and populate dropdown
+  chrome.storage.sync.get(['templates'], (data) => {
+    if (data.templates && data.templates.length > 0) {
+      data.templates.forEach(template => {
+        const option = document.createElement('option');
+        option.value = template.name;
+        option.textContent = template.name;
+        templateSelect.appendChild(option);
+      });
+    }
+  });
+
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     const url = tabs[0].url;
 
@@ -50,10 +64,12 @@ document.getElementById('clipButton').addEventListener('click', function() {
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     chrome.tabs.sendMessage(tabs[0].id, {action: "getPageContent"}, function(response) {
       if (response && response.content) {
-        chrome.storage.sync.get(['folderName', 'tags'], (data) => {
+        chrome.storage.sync.get(['folderName', 'tags', 'templates'], (data) => {
           const fileName = document.getElementById('fileNameField').value;
           const selectedVault = document.getElementById('vaultDropdown').value;
-          processContent(response.content, tabs[0].url, selectedVault, data.folderName, data.tags, fileName);
+          const selectedTemplate = document.getElementById('templateSelect').value;
+          const template = data.templates.find(t => t.name === selectedTemplate) || data.templates[0];
+          processContent(response.content, tabs[0].url, selectedVault, data.folderName, data.tags, fileName, template);
         });
       } else {
         showError('Unable to retrieve page content. Try reloading the page.');
@@ -75,7 +91,7 @@ function showError(message) {
   clipper.style.display = 'none';
 }
 
-function processContent(content, url, vaultName = "", folderName = "Clippings/", tags = "clippings", fileName) {
+function processContent(content, url, vaultName = "", folderName = "Clippings/", tags = "clippings", fileName, template) {
   const parser = new DOMParser();
   const doc = parser.parseFromString(content, 'text/html');
 
@@ -135,18 +151,18 @@ function processContent(content, url, vaultName = "", folderName = "Clippings/",
     published = `"[[${year}-${month}-${day}]]"`;
   }
 
-  const fileContent = 
-    '---\n'
-    + 'category: "[[Clippings]]"\n'
-    + 'author: ' + authorBrackets + '\n'
-    + 'title: "' + rawTitle.replace(/"/g, "'") + '"\n'
-    + 'source: ' + url + '\n'
-    + 'created: "[[' + today + ']]"\n'
-    + 'published: ' + published + '\n' 
-    + 'topics: \n'
-    + 'tags: [' + tags + ']\n'
-    + '---\n'
-    + markdownBody;
+  const frontmatter = template.fields.reduce((acc, field) => {
+    let value = field.value;
+    if (field.name === 'title') value = `"${rawTitle.replace(/"/g, "'")}"`;
+    if (field.name === 'source') value = url;
+    if (field.name === 'created') value = `"[[${today}]]"`;
+    if (field.name === 'author') value = authorBrackets;
+    if (field.name === 'published') value = published;
+    if (field.name === 'tags') value = `[${tags}]`;
+    return acc + `${field.name}: ${value}\n`;
+  }, '---\n') + '---\n';
+
+  const fileContent = frontmatter + markdownBody;
 
   saveToObsidian(fileContent, fileName, folderName, vaultName);
 }

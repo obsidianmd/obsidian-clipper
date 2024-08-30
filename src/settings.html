@@ -28,6 +28,25 @@
               <input type="text" id="tags" name="tags" />
             </div>
           </div>
+
+          <div class="settings-section">
+            <h3>Templates</h3>
+            <select id="templateSelect">
+              <option value="">Select a template</option>
+            </select>
+            <button type="button" id="newTemplateBtn">New Template</button>
+            <button type="button" id="editTemplateBtn">Edit Template</button>
+            <button type="button" id="deleteTemplateBtn">Delete Template</button>
+          </div>
+
+          <div id="templateEditor" style="display: none;">
+            <h3 id="templateEditorTitle">New Template</h3>
+            <input type="text" id="templateName" placeholder="Template Name" />
+            <div id="templateFields"></div>
+            <button type="button" id="addFieldBtn">Add Field</button>
+            <button type="button" id="saveTemplateBtn">Save Template</button>
+            <button type="button" id="cancelTemplateBtn">Cancel</button>
+          </div>
       </form>
     </div>
 
