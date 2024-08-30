@@ -173,6 +173,9 @@ document.addEventListener('DOMContentLoaded', () => {
 		urlPatternsTextarea.placeholder = 'https://example.com/';
 		templateEditor.insertBefore(urlPatternsTextarea, addFieldBtn.nextSibling);
 		templateEditor.insertBefore(document.querySelector('label[for="url-patterns"]'), urlPatternsTextarea);
+		
+		// Make sure the template editor is visible
+		document.getElementById('template-editor').style.display = 'block';
 	}
 
 	function addFieldToEditor(name = '', value = '') {
@@ -294,4 +297,37 @@ document.addEventListener('DOMContentLoaded', () => {
 			Trash2
 		}
 	});
+
+	// Add this function to handle sidebar navigation
+	function initializeSidebar() {
+		const sidebarItems = document.querySelectorAll('.sidebar li');
+		const sections = document.querySelectorAll('.settings-section');
+
+		sidebarItems.forEach(item => {
+			item.addEventListener('click', () => {
+				const sectionId = item.dataset.section;
+				
+				// Update active states
+				sidebarItems.forEach(i => i.classList.remove('active'));
+				item.classList.add('active');
+				
+				sections.forEach(section => {
+					section.classList.remove('active');
+					if (section.id === `${sectionId}-section`) {
+						section.classList.add('active');
+					}
+				});
+			});
+		});
+	}
+
+	// Call this function after loading settings
+	function initializeSettings() {
+		loadGeneralSettings();
+		loadTemplates();
+		initializeSidebar();
+	}
+
+	// Replace the separate loadGeneralSettings() and loadTemplates() calls with:
+	initializeSettings();
 });

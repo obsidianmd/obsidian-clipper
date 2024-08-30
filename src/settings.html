@@ -8,32 +8,46 @@
 </head>
 <body>
 		<div id="settings">
-			<h2>Obsidian Clipper</h2>
 			
-			<form id="general-settings-form" class="settings-section">
-				<h3>General Settings</h3>
-				<div>
-					<label for="vault-name">Vault(s)</label>
-					<input type="text" id="vault-input" placeholder="Press enter to add a vault" />
-					<ul id="vault-list"></ul>
+			<div class="settings-container">
+				<div class="sidebar">
+					<ul>
+						<li data-section="general" class="active">General</li>
+						<li data-section="templates">Templates</li>
+					</ul>
 				</div>
-			</form>
+				
+				<div class="content">
+					<div id="general-section" class="settings-section active">
+						<h2>General settings</h2>
+						<form id="general-settings-form">
+							<div>
+								<label for="vault-name">Vault(s)</label>
+								<input type="text" id="vault-input" placeholder="Press enter to add a vault" />
+								<ul id="vault-list"></ul>
+							</div>
+						</form>
+					</div>
 
-			<form id="template-settings-form" class="settings-section">
-				<h3>Templates</h3>
-				<ul id="template-list"></ul>
-				<button type="button" id="new-template-btn">New template</button>
-				<button type="button" id="delete-template-btn">Delete template</button>
+					<div id="templates-section" class="settings-section">
+						<h2>Templates</h2>
+						<form id="template-settings-form">
+							<ul id="template-list"></ul>
+							<button type="button" id="new-template-btn">New template</button>
+							<button type="button" id="delete-template-btn">Delete template</button>
 
-				<div id="template-editor">
-					<h3 id="template-editor-title">Edit template</h3>
-					<input type="text" id="template-name" placeholder="Template name" />
-					<div id="template-fields"></div>
-					<button type="button" id="add-field-btn">Add property</button>
-					<button type="button" id="save-template-btn">Save template</button>
-					<button type="button" id="cancel-template-btn">Cancel</button>
+							<div id="template-editor">
+								<h3 id="template-editor-title">Edit template</h3>
+								<input type="text" id="template-name" placeholder="Template name" />
+								<div id="template-fields"></div>
+								<button type="button" id="add-field-btn">Add property</button>
+								<button type="button" id="save-template-btn">Save template</button>
+								<button type="button" id="cancel-template-btn">Cancel</button>
+							</div>
+						</form>
+					</div>
 				</div>
-			</form>
+			</div>
 		</div>
 
 		<script src="settings.js"></script>

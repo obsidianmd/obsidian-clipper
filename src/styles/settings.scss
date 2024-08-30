@@ -1,15 +1,65 @@
-
 #settings {
-	max-width: 900px;
-	margin: 40px auto;
-	padding: 0 4%;
+	margin: 0 auto;
+	padding: 0;
+	height: 100vh;
+
+	h2 {
+		margin-top: 0;
+	}
+}
+
+.settings-container {
+	display: flex;
+	height: 100%;
+}
+
+.sidebar {
+	background-color: var(--background-secondary);
+	width: 25%;
+	max-width: 300px;
+	flex-shrink: 0;
+	border-inline-end: 1px solid var(--background-modifier-border);
+	padding: 24px 16px;
+
+	ul {
+		font-size: 0.857rem;
+		list-style-type: none;
+		padding: 0;
+		margin: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+
+		li {
+			cursor: pointer;
+			padding: 6px;
+			border-radius: 4px;
+
+			&:hover {
+				background-color: var(--background-modifier-hover);
+			}
+			&.active {
+				background-color: var(--interactive-accent);
+				color: var(--text-on-accent);
+			}
+		}
+	}
+}
+
+.content {
+	flex-grow: 1;
 }
 
 .settings-section {
-	display: flex;
+	display: none;
 	flex-direction: column;
 	gap: 8px;
-	margin-bottom: 24px;
+	max-width: 600px;
+	margin: 24px 4% 24px 4%;
+
+	&.active {
+		display: flex;
+	}
 }
 
 #template-fields {
