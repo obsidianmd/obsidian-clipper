@@ -4,7 +4,6 @@ document.addEventListener('DOMContentLoaded', () => {
 	const vaultInput = document.getElementById('vault-input');
 	const vaultList = document.getElementById('vault-list');
 	const newTemplateBtn = document.getElementById('new-template-btn');
-	const deleteTemplateBtn = document.getElementById('delete-template-btn');
 	const templateEditor = document.getElementById('template-editor');
 	const templateEditorTitle = document.getElementById('template-editor-title');
 	const templateName = document.getElementById('template-name');
@@ -98,18 +97,47 @@ document.addEventListener('DOMContentLoaded', () => {
 		templateList.innerHTML = '';
 		templates.forEach((template, index) => {
 			const li = document.createElement('li');
-			li.textContent = template.name;
+			li.innerHTML = `
+				<span>${template.name}</span>
+				<button type="button" class="delete-template-btn clickable-icon" aria-label="Delete template">
+					<i data-lucide="trash-2"></i>
+				</button>
+			`;
 			li.dataset.index = index;
 			if (index === 0) {
 				li.classList.add('active');
+				li.querySelector('.delete-template-btn').style.display = 'none';
 			}
-			li.addEventListener('click', () => {
-				document.querySelectorAll('#template-list li').forEach(item => item.classList.remove('active'));
-				li.classList.add('active');
-				showTemplateEditor(template);
+			li.addEventListener('click', (e) => {
+				if (!e.target.closest('.delete-template-btn')) {
+					document.querySelectorAll('#template-list li').forEach(item => item.classList.remove('active'));
+					li.classList.add('active');
+					showTemplateEditor(template);
+				}
+			});
+			li.querySelector('.delete-template-btn').addEventListener('click', (e) => {
+				e.stopPropagation();
+				deleteTemplate(index);
 			});
 			templateList.appendChild(li);
 		});
+		createIcons({
+			icons: {
+				Trash2
+			}
+		});
+	}
+
+	function deleteTemplate(index) {
+		if (index > 0) {
+			if (confirm(`Are you sure you want to delete the template "${templates[index].name}"?`)) {
+				templates.splice(index, 1);
+				saveTemplateSettings();
+				showTemplateEditor(templates[0]);
+			}
+		} else {
+			alert("You cannot delete the Default template.");
+		}
 	}
 
 	function showTemplateEditor(template) {
@@ -260,16 +288,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 			saveTemplateSettings();
 			showTemplateEditor(newTemplate);
-		}
-	});
-
-	deleteTemplateBtn.addEventListener('click', () => {
-		if (editingTemplateIndex > 0) {
-			templates.splice(editingTemplateIndex, 1);
-			saveTemplateSettings();
-			showTemplateEditor(templates[0]);
-		} else {
-			alert("You cannot delete the Default template.");
 		}
 	});
 

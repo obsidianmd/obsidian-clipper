@@ -106,6 +106,9 @@
 		cursor: pointer;
 		padding: 6px;
 		border-radius: 4px;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
 
 		&:hover {
 			background-color: var(--background-modifier-hover);
@@ -113,6 +116,20 @@
 		&.active {
 			background-color: var(--background-modifier-hover);
 			color: var(--text-normal);
+		}
+
+		.delete-template-btn {
+			background: none;
+			border: none;
+			cursor: pointer;
+			padding: 2px;
+			color: var(--text-muted);
+			opacity: 0.7;
+			transition: opacity 0.2s ease;
+
+			&:hover {
+				opacity: 1;
+			}
 		}
 	}
 }
