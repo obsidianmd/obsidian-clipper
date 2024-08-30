@@ -24,3 +24,24 @@
 		gap: 4px;
 	}
 }
+
+#template-list {
+	list-style-type: none;
+	padding: 0;
+	margin: 0 0 1rem 0;
+
+	li {
+		cursor: pointer;
+		padding: 0.5rem;
+		margin-bottom: 0.25rem;
+		border-radius: 4px;
+
+		&:hover {
+			background-color: var(--background-modifier-hover);
+		}
+		&.active {
+			background-color: var(--interactive-accent);
+			color: var(--text-on-accent);
+		}
+	}
+}

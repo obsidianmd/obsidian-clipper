@@ -4,7 +4,6 @@ document.addEventListener('DOMContentLoaded', () => {
 	const vaultInput = document.getElementById('vault-input');
 	const vaultList = document.getElementById('vault-list');
 	const folderNameInput = document.getElementById('folder-name');
-	const tagsInput = document.getElementById('tags');
 	const templateSelect = document.getElementById('template-select');
 	const newTemplateBtn = document.getElementById('new-template-btn');
 	const deleteTemplateBtn = document.getElementById('delete-template-btn');
@@ -30,7 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
 				{ name: 'published', value: '{{published}}' },
 				{ name: 'created', value: '{{today}}' },
 				{ name: 'description', value: '{{description}}' },
-				{ name: 'tags', value: '{{tags}}' }
+				{ name: 'tags', value: 'clippings' }
 			],
 			urlPatterns: []
 		};
@@ -43,21 +42,27 @@ document.addEventListener('DOMContentLoaded', () => {
 				templates.push(createDefaultTemplate());
 				chrome.storage.sync.set({ templates });
 			}
-			updateTemplateSelect();
+			updateTemplateList();
 			showTemplateEditor(templates[0]);
 		});
 	}
 
-	function updateTemplateSelect() {
-		templateSelect.innerHTML = '';
+	function updateTemplateList() {
+		const templateList = document.getElementById('template-list');
+		templateList.innerHTML = '';
 		templates.forEach((template, index) => {
-			const option = document.createElement('option');
-			option.value = template.name;
-			option.textContent = template.name;
-			templateSelect.appendChild(option);
+			const li = document.createElement('li');
+			li.textContent = template.name;
+			li.dataset.index = index;
 			if (index === 0) {
-				option.selected = true;
+				li.classList.add('active');
 			}
+			li.addEventListener('click', () => {
+				document.querySelectorAll('#template-list li').forEach(item => item.classList.remove('active'));
+				li.classList.add('active');
+				showTemplateEditor(template);
+			});
+			templateList.appendChild(li);
 		});
 	}
 
@@ -143,10 +148,12 @@ document.addEventListener('DOMContentLoaded', () => {
 		});
 	}
 
-	templateSelect.addEventListener('change', () => {
-		const selectedTemplate = templates.find(t => t.name === templateSelect.value);
-		if (selectedTemplate) {
-			showTemplateEditor(selectedTemplate);
+	document.getElementById('template-list').addEventListener('click', (event) => {
+		if (event.target.tagName === 'LI') {
+			const selectedTemplate = templates[event.target.dataset.index];
+			if (selectedTemplate) {
+				showTemplateEditor(selectedTemplate);
+			}
 		}
 	});
 
@@ -184,7 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
 				templates[editingTemplateIndex] = newTemplate;
 			}
 
-			updateTemplateSelect();
+			updateTemplateList();
 			chrome.storage.sync.set({ templates }, () => {
 				console.log('Template saved');
 				showTemplateEditor(newTemplate);
@@ -195,7 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	deleteTemplateBtn.addEventListener('click', () => {
 		if (editingTemplateIndex > 0) {
 			templates.splice(editingTemplateIndex, 1);
-			updateTemplateSelect();
+			updateTemplateList();
 			showTemplateEditor(templates[0]);
 			chrome.storage.sync.set({ templates }, () => {
 				console.log('Template deleted');
@@ -205,17 +212,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 	});
 
-	// Load initial data
-	chrome.storage.sync.get(['vaults', 'folderName', 'tags'], (data) => {
-		const vaults = data.vaults || [];
-		folderNameInput.value = data.folderName || 'Clippings/';
-		tagsInput.value = data.tags || 'clippings';
-		vaults.forEach(vault => {
-			const li = document.createElement('li');
-			li.textContent = vault;
-			vaultList.appendChild(li);
-		});
-	});
 
 	loadTemplates();
 
@@ -230,7 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 		chrome.storage.sync.set({ templates }, () => {
 			console.log('Default template reset');
-			updateTemplateSelect();
+			updateTemplateList();
 			showTemplateEditor(defaultTemplate);
 		});
 	}

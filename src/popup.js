@@ -129,8 +129,7 @@ function initializePageContent(content) {
 		'{{today}}': convertDate(new Date()),
 		'{{description}}': description,
 		'{{domain}}': currentUrl.split('://')[1].split('/')[0],
-		'{{image}}': image,
-		'{{tags}}': ''
+		'{{image}}': image
 	};
 
 	updateTemplateFieldsWithVariables();
@@ -214,7 +213,7 @@ document.getElementById('clip-button').addEventListener('click', function() {
 	chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
 		chrome.tabs.sendMessage(tabs[0].id, {action: "getPageContent"}, function(response) {
 			if (response && response.content) {
-				chrome.storage.sync.get(['folderName', 'tags', 'templates'], (data) => {
+				chrome.storage.sync.get(['folderName', 'templates'], (data) => {
 					const fileName = document.getElementById('file-name-field').value;
 					const selectedVault = document.getElementById('vault-dropdown').value;
 					const selectedTemplate = document.getElementById('template-select').value;
