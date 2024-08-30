@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
 				{ name: 'description', value: '{{description}}' },
 				{ name: 'tags', value: '{{tags}}' }
 			],
-			urlPatterns: [] // Add this new property
+			urlPatterns: []
 		};
 	}
 
@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		editingTemplateIndex = template ? templates.findIndex(t => t.name === template.name) : -1;
 		templateEditorTitle.textContent = template ? 'Edit template' : 'New template';
 		templateName.value = template ? template.name : '';
-		templateFields.innerHTML = ''; // Clear existing fields
+		templateFields.innerHTML = '';
 
 		// Function to create or update an input field
 		function createOrUpdateField(id, labelText, value, type = 'input') {
@@ -129,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	});
 
 	newTemplateBtn.addEventListener('click', () => {
-		showTemplateEditor(null); // Pass null to indicate a new template
+		showTemplateEditor(null);
 		document.getElementById('template-editor').style.display = 'block';
 	});
 
