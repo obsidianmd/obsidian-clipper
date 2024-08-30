@@ -12,8 +12,15 @@
 	margin-bottom: 24px;
 }
 
-.template-fields {
+#template-fields {
 	display: flex;
 	flex-direction: column;
-	gap: 4px;
+	gap: 8px;
+	margin: 8px 0;
+	
+	.template-field {
+		display: flex;
+		flex-direction: row;
+		gap: 4px;
+	}
 }
