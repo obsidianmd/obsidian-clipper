@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	newTemplateBtn.addEventListener('click', () => {
 		editingTemplateIndex = -1;
-		templateEditorTitle.textContent = 'New Template';
+		templateEditorTitle.textContent = 'New template';
 		templateName.value = '';
 		templateFields.innerHTML = '';
 		addFieldToEditor();
@@ -107,23 +107,35 @@ document.addEventListener('DOMContentLoaded', () => {
 	saveTemplateBtn.addEventListener('click', () => {
 		const name = templateName.value.trim();
 		if (name) {
-			const fields = Array.from(templateFields.children).filter(field => field.querySelector('.field-name')).map(field => ({
-				name: field.querySelector('.field-name').value.trim(),
-				value: field.querySelector('.field-value').value.trim()
-				})).filter(field => field.name);
+			const fields = Array.from(templateFields.children)
+				.filter(field => field.querySelector('.field-name'))
+				.map(field => ({
+					name: field.querySelector('.field-name').value.trim(),
+					value: field.querySelector('.field-value').value.trim()
+				}))
+				.filter(field => field.name);
 
-			const urlPatterns = document.getElementById('url-patterns').value.split('\n').map(pattern => pattern.trim()).filter(pattern => pattern !== '');
+			let urlPatterns = [];
+			const urlPatternsTextarea = document.getElementById('url-patterns');
+			if (urlPatternsTextarea) {
+				urlPatterns = urlPatternsTextarea.value
+					.split('\n')
+					.map(pattern => pattern.trim())
+					.filter(pattern => pattern !== '');
+			}
+
+			const newTemplate = { name, fields, urlPatterns };
 
 			if (editingTemplateIndex === -1) {
-				templates.push({ name, fields, urlPatterns });
+				templates.push(newTemplate);
 			} else {
-				templates[editingTemplateIndex] = { name, fields, urlPatterns };
+				templates[editingTemplateIndex] = newTemplate;
 			}
 
 			updateTemplateSelect();
 			chrome.storage.sync.set({ templates }, () => {
 				console.log('Template saved');
-				showTemplateEditor(templates.find(t => t.name === name));
+				showTemplateEditor(newTemplate);
 			});
 		}
 	});
