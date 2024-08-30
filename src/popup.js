@@ -4,6 +4,7 @@ import { Readability } from '@mozilla/readability';
 
 document.addEventListener('DOMContentLoaded', function() {
   const vaultDropdown = document.getElementById('vaultDropdown');
+  const templateSelect = document.getElementById('templateSelect');
   
   // Load vaults from storage and populate dropdown
   chrome.storage.sync.get(['vaults'], (data) => {
@@ -22,17 +23,29 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  const templateSelect = document.getElementById('templateSelect');
-
   // Load templates from storage and populate dropdown
   chrome.storage.sync.get(['templates'], (data) => {
+    templateSelect.innerHTML = ''; // Clear existing options
+    
     if (data.templates && data.templates.length > 0) {
       data.templates.forEach(template => {
         const option = document.createElement('option');
         option.value = template.name;
         option.textContent = template.name;
         templateSelect.appendChild(option);
+        
+        // Select the Default template
+        if (template.name === 'Default') {
+          option.selected = true;
+        }
       });
+    } else {
+      // If no templates are found, add the Default template
+      const defaultOption = document.createElement('option');
+      defaultOption.value = 'Default';
+      defaultOption.textContent = 'Default';
+      defaultOption.selected = true;
+      templateSelect.appendChild(defaultOption);
     }
   });
 
@@ -148,14 +161,14 @@ function processContent(content, url, vaultName = "", folderName = "Clippings/",
     var year = date.getFullYear();
     var month = (date.getMonth() + 1).toString().padStart(2, '0');
     var day = date.getDate().toString().padStart(2, '0');
-    published = `"[[${year}-${month}-${day}]]"`;
+    published = `"${year}-${month}-${day}"`;
   }
 
   const frontmatter = template.fields.reduce((acc, field) => {
     let value = field.value;
     if (field.name === 'title') value = `"${rawTitle.replace(/"/g, "'")}"`;
     if (field.name === 'source') value = url;
-    if (field.name === 'created') value = `"[[${today}]]"`;
+    if (field.name === 'created') value = `"${today}"`;
     if (field.name === 'author') value = authorBrackets;
     if (field.name === 'published') value = published;
     if (field.name === 'tags') value = `[${tags}]`;

@@ -25,13 +25,17 @@ document.addEventListener('DOMContentLoaded', () => {
     let editingTemplateIndex = -1;
 
     // Load saved settings or use default values
-    chrome.storage.sync.get(['vaults', 'folderName', 'tags'], (data) => {
+    chrome.storage.sync.get(['vaults', 'folderName', 'tags', 'templates'], (data) => {
         vaults = data.vaults || [];
         folderNameInput.value = data.folderName || defaultFolderName;
         tagsInput.value = data.tags || defaultTags;
         updateVaultList();
-        templates = data.templates || [
-            {
+        
+        templates = data.templates || [];
+        
+        // Ensure Default template is always present
+        if (!templates.some(t => t.name === 'Default')) {
+            templates.unshift({
                 name: 'Default',
                 fields: [
                     { name: 'category', value: '"[[Clippings]]"' },
@@ -43,8 +47,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     { name: 'topics', value: '' },
                     { name: 'tags', value: '' }
                 ]
-            }
-        ];
+            });
+        }
+        
         updateTemplateSelect();
     });
 
@@ -133,7 +138,15 @@ document.addEventListener('DOMContentLoaded', () => {
             option.value = template.name;
             option.textContent = template.name;
             templateSelect.appendChild(option);
+
+            if (template.name === 'Default') {
+                option.selected = true;
+            }
         });
+
+        if (!templates.some(t => t.name === 'Default') && templateSelect.options.length > 1) {
+            templateSelect.options[1].selected = true;
+        }
     }
 
     function addFieldToEditor(name = '', value = '') {
