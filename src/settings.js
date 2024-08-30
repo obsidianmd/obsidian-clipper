@@ -27,7 +27,8 @@ document.addEventListener('DOMContentLoaded', () => {
 				{ name: 'published', value: '{{published}}' },
 				{ name: 'created', value: '{{today}}' },
 				{ name: 'tags', value: '{{tags}}' }
-			]
+			],
+			urlPatterns: [] // Add this new property
 		};
 	}
 
@@ -62,6 +63,11 @@ document.addEventListener('DOMContentLoaded', () => {
 		templateName.value = template.name;
 		templateFields.innerHTML = '';
 		template.fields.forEach(field => addFieldToEditor(field.name, field.value));
+		const urlPatternsTextarea = document.createElement('textarea');
+		urlPatternsTextarea.id = 'url-patterns';
+		urlPatternsTextarea.placeholder = 'Enter URL patterns, one per line';
+		urlPatternsTextarea.value = (template.urlPatterns || []).join('\n');
+		templateFields.appendChild(urlPatternsTextarea);
 	}
 
 	function addFieldToEditor(name = '', value = '') {
@@ -100,15 +106,17 @@ document.addEventListener('DOMContentLoaded', () => {
 	saveTemplateBtn.addEventListener('click', () => {
 		const name = templateName.value.trim();
 		if (name) {
-			const fields = Array.from(templateFields.children).map(field => ({
+			const fields = Array.from(templateFields.children).filter(field => field.querySelector('.field-name')).map(field => ({
 				name: field.querySelector('.field-name').value.trim(),
 				value: field.querySelector('.field-value').value.trim()
-			})).filter(field => field.name);
+				})).filter(field => field.name);
+
+			const urlPatterns = document.getElementById('url-patterns').value.split('\n').map(pattern => pattern.trim()).filter(pattern => pattern !== '');
 
 			if (editingTemplateIndex === -1) {
-				templates.push({ name, fields });
+				templates.push({ name, fields, urlPatterns });
 			} else {
-				templates[editingTemplateIndex] = { name, fields };
+				templates[editingTemplateIndex] = { name, fields, urlPatterns };
 			}
 
 			updateTemplateSelect();

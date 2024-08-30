@@ -6,6 +6,13 @@ let currentUrl = '';
 let currentTitle = '';
 let currentVariables = {};
 
+// Add this function at the beginning of the file
+function findMatchingTemplate(url, templates) {
+	return templates.find(template => 
+		template.urlPatterns && template.urlPatterns.some(pattern => url.startsWith(pattern))
+	);
+}
+
 document.addEventListener('DOMContentLoaded', function() {
 	const vaultDropdown = document.getElementById('vault-dropdown');
 	const templateSelect = document.getElementById('template-select');
@@ -73,12 +80,24 @@ document.addEventListener('DOMContentLoaded', function() {
 			return;
 		}
 
-		chrome.tabs.sendMessage(tabs[0].id, {action: "getPageContent"}, function(response) {
-			if (response && response.content) {
-				initializePageContent(response.content);
-			} else {
-				showError('Unable to retrieve page content. Try reloading the page.');
+		// Load templates and find matching template
+		chrome.storage.sync.get(['templates'], (data) => {
+			const templates = data.templates || [];
+			const matchingTemplate = findMatchingTemplate(currentUrl, templates);
+			
+			if (matchingTemplate) {
+				const templateSelect = document.getElementById('template-select');
+				templateSelect.value = matchingTemplate.name;
+				updateTemplateFields(matchingTemplate);
 			}
+
+			chrome.tabs.sendMessage(tabs[0].id, {action: "getPageContent"}, function(response) {
+				if (response && response.content) {
+					initializePageContent(response.content);
+				} else {
+					showError('Unable to retrieve page content. Try reloading the page.');
+				}
+			});
 		});
 	});
 });
@@ -95,6 +114,8 @@ function initializePageContent(content) {
 	const author = byline || getMetaContent(doc, "name", "author") || getMetaContent(doc, "property", "author") || getMetaContent(doc, "property", "og:site_name");
 	const authorBrackets = author ? `"[[${author}]]"` : "";
 
+	const description = getMetaContent(doc, "name", "description") || getMetaContent(doc, "property", "description") || getMetaContent(doc, "property", "og:description");
+
 	const timeElement = doc.querySelector("time");
 	const publishedDate = timeElement ? timeElement.getAttribute("datetime") : "";
 	const published = publishedDate && publishedDate.trim() !== "" ? `${convertDate(new Date(publishedDate))}` : "";
@@ -105,6 +126,7 @@ function initializePageContent(content) {
 		'{{published}}': published,
 		'{{authorLink}}': authorBrackets,
 		'{{today}}': convertDate(new Date()),
+		'{{description}}': description,
 		'{{tags}}': ''
 	};
 
@@ -220,7 +242,7 @@ document.getElementById('open-settings').addEventListener('click', function() {
 });
 
 function showError(message) {
-	const errorMessage = document.getElementById('error-message');
+	const errorMessage = document.querySelector('.error-message');
 	const clipper = document.querySelector('.clipper');
 
 	errorMessage.textContent = message;
