@@ -3,8 +3,6 @@ import { createIcons, Trash2 } from 'lucide';
 document.addEventListener('DOMContentLoaded', () => {
 	const vaultInput = document.getElementById('vault-input');
 	const vaultList = document.getElementById('vault-list');
-	const folderNameInput = document.getElementById('folder-name');
-	const templateSelect = document.getElementById('template-select');
 	const newTemplateBtn = document.getElementById('new-template-btn');
 	const deleteTemplateBtn = document.getElementById('delete-template-btn');
 	const templateEditor = document.getElementById('template-editor');
@@ -154,7 +152,6 @@ document.addEventListener('DOMContentLoaded', () => {
 			existingPropertiesLabel.remove();
 		}
 
-		// Add "Properties" label
 		const propertiesLabel = document.createElement('h4');
 		propertiesLabel.id = 'properties-label';
 		propertiesLabel.textContent = 'Properties';
@@ -172,8 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		urlPatternsTextarea.placeholder = 'https://example.com/';
 		templateEditor.insertBefore(urlPatternsTextarea, addFieldBtn.nextSibling);
 		templateEditor.insertBefore(document.querySelector('label[for="url-patterns"]'), urlPatternsTextarea);
-		
-		// Make sure the template editor is visible
+
 		document.getElementById('template-editor').style.display = 'block';
 
 		// Update the active state of the template list items
@@ -185,7 +181,6 @@ document.addEventListener('DOMContentLoaded', () => {
 			}
 		});
 
-		// Make sure the templates section is visible
 		document.getElementById('templates-section').classList.add('active');
 		document.getElementById('general-section').classList.remove('active');
 		document.querySelector('.sidebar li[data-section="general"]').classList.remove('active');
@@ -278,11 +273,9 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 	});
 
-	// Initialize
 	loadGeneralSettings();
 	loadTemplates();
 
-	// Add this function to reset the Default template
 	function resetDefaultTemplate() {
 		const defaultTemplate = createDefaultTemplate();
 		const index = templates.findIndex(t => t.name === 'Default');
@@ -311,7 +304,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 	});
 
-	// Add this function to handle sidebar navigation
 	function initializeSidebar() {
 		const sidebarItems = document.querySelectorAll('.sidebar li[data-section]');
 		const sections = document.querySelectorAll('.settings-section');
@@ -334,13 +326,11 @@ document.addEventListener('DOMContentLoaded', () => {
 		});
 	}
 
-	// Call this function after loading settings
 	function initializeSettings() {
 		loadGeneralSettings();
 		loadTemplates();
 		initializeSidebar();
 	}
 
-	// Replace the separate loadGeneralSettings() and loadTemplates() calls with:
 	initializeSettings();
 });
