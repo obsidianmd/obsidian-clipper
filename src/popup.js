@@ -231,7 +231,7 @@ document.getElementById('clip-button').addEventListener('click', function() {
 					}, '---\n') + '---\n';
 
 					const fileContent = frontmatter + markdownBody;
-					saveToObsidian(fileContent, fileName, data.folderName, selectedVault);
+					saveToObsidian(fileContent, fileName, template.folderName, selectedVault);
 				});
 			} else {
 				showError('Unable to retrieve page content. Try reloading the page.');

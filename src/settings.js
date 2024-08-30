@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	function createDefaultTemplate() {
 		return {
 			name: 'Default',
+			folderName: 'Clippings/',
 			fields: [
 				{ name: 'title', value: '{{title}}' },
 				{ name: 'source', value: '{{url}}' },
@@ -62,37 +63,57 @@ document.addEventListener('DOMContentLoaded', () => {
 		editingTemplateIndex = template ? templates.findIndex(t => t.name === template.name) : -1;
 		templateEditorTitle.textContent = template ? 'Edit template' : 'New template';
 		templateName.value = template ? template.name : '';
-		templateFields.innerHTML = '';
-		
+		templateFields.innerHTML = ''; // Clear existing fields
+
+		// Function to create or update an input field
+		function createOrUpdateField(id, labelText, value, type = 'input') {
+			let field = document.getElementById(id);
+			let label = document.querySelector(`label[for="${id}"]`);
+
+			if (!field) {
+				if (!label) {
+					label = document.createElement('label');
+					label.htmlFor = id;
+					label.textContent = labelText;
+					templateEditor.insertBefore(label, templateFields);
+				}
+
+				if (type === 'input') {
+					field = document.createElement('input');
+					field.type = 'text';
+				} else if (type === 'textarea') {
+					field = document.createElement('textarea');
+				}
+				field.id = id;
+				templateEditor.insertBefore(field, templateFields);
+			}
+
+			field.value = value;
+			return field;
+		}
+
+		// Create or update folder name input
+		createOrUpdateField('template-folder-name', 'Folder name', template ? template.folderName : 'Clippings/');
+
+		// Create or update URL patterns textarea
+		const urlPatternsTextarea = createOrUpdateField('url-patterns', 'URL patterns one per line', 
+			template && template.urlPatterns ? template.urlPatterns.join('\n') : '', 'textarea');
+		urlPatternsTextarea.placeholder = 'https://example.com/';
+
 		if (template) {
 			template.fields.forEach(field => addFieldToEditor(field.name, field.value));
 		} else {
 			addFieldToEditor(); // Add an empty field for new templates
 		}
-
-		// Update or create URL patterns textarea
-		let urlPatternsTextarea = document.getElementById('url-patterns');
-		if (!urlPatternsTextarea) {
-			const urlPatternsLabel = document.createElement('label');
-			urlPatternsLabel.htmlFor = 'url-patterns';
-			urlPatternsLabel.textContent = 'URL patterns (one per line)';
-			templateEditor.insertBefore(urlPatternsLabel, addFieldBtn);
-
-			urlPatternsTextarea = document.createElement('textarea');
-			urlPatternsTextarea.id = 'url-patterns';
-			urlPatternsTextarea.placeholder = 'https://example.com';
-			templateEditor.insertBefore(urlPatternsTextarea, addFieldBtn);
-		}
-		urlPatternsTextarea.value = template && template.urlPatterns ? template.urlPatterns.join('\n') : '';
 	}
 
 	function addFieldToEditor(name = '', value = '') {
 		const fieldDiv = document.createElement('div');
 		fieldDiv.innerHTML = `
-				<input type="text" class="field-name" value="${name}" placeholder="Field name">
-				<input type="text" class="field-value" value="${value}" placeholder="Field value">
-				<button type="button" class="remove-field-btn">Remove</button>
-			`;
+					<input type="text" class="field-name" value="${name}" placeholder="Field name">
+					<input type="text" class="field-value" value="${value}" placeholder="Field value">
+					<button type="button" class="remove-field-btn">Remove</button>
+				`;
 		templateFields.appendChild(fieldDiv);
 
 		fieldDiv.querySelector('.remove-field-btn').addEventListener('click', () => {
@@ -118,6 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	saveTemplateBtn.addEventListener('click', () => {
 		const name = templateName.value.trim();
+		const folderName = document.getElementById('template-folder-name').value.trim();
 		if (name) {
 			const fields = Array.from(templateFields.children)
 				.filter(field => field.querySelector('.field-name'))
@@ -132,7 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
 				.map(pattern => pattern.trim())
 				.filter(pattern => pattern !== '');
 
-			const newTemplate = { name, fields, urlPatterns };
+			const newTemplate = { name, folderName, fields, urlPatterns };
 
 			if (editingTemplateIndex === -1) {
 				templates.push(newTemplate);
