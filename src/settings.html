@@ -13,8 +13,11 @@
 				<div class="sidebar">
 					<ul>
 						<li data-section="general" class="active">General</li>
-						<li data-section="templates">Templates</li>
+						<li class="sidebar-heading">Templates</li>
 					</ul>
+					<ul id="template-list"></ul>
+					<button type="button" id="new-template-btn">New template</button>
+					<button type="button" id="delete-template-btn">Delete template</button>
 				</div>
 				
 				<div class="content">
@@ -30,19 +33,13 @@
 					</div>
 
 					<div id="templates-section" class="settings-section">
-						<h2>Templates</h2>
+						<h2 id="template-editor-title">Edit template</h2>
 						<form id="template-settings-form">
-							<ul id="template-list"></ul>
-							<button type="button" id="new-template-btn">New template</button>
-							<button type="button" id="delete-template-btn">Delete template</button>
-
 							<div id="template-editor">
-								<h3 id="template-editor-title">Edit template</h3>
 								<input type="text" id="template-name" placeholder="Template name" />
 								<div id="template-fields"></div>
 								<button type="button" id="add-field-btn">Add property</button>
 								<button type="button" id="save-template-btn">Save template</button>
-								<button type="button" id="cancel-template-btn">Cancel</button>
 							</div>
 						</form>
 					</div>

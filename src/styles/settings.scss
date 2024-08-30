@@ -44,6 +44,25 @@
 			}
 		}
 	}
+
+	.sidebar-heading {
+		font-weight: 500;
+		margin-top: 16px;
+		pointer-events: none;
+		color: var(--text-faint);
+		font-size: 0.8rem;
+	}
+
+	#template-list {
+		margin-top: 8px;
+		margin-bottom: 16px;
+	}
+
+	#new-template-btn,
+	#delete-template-btn {
+		width: 100%;
+		margin-bottom: 8px;
+	}
 }
 
 .content {
@@ -78,20 +97,22 @@
 #template-list {
 	list-style-type: none;
 	padding: 0;
-	margin: 0 0 1rem 0;
+	margin: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
 
 	li {
 		cursor: pointer;
-		padding: 0.5rem;
-		margin-bottom: 0.25rem;
+		padding: 6px;
 		border-radius: 4px;
 
 		&:hover {
 			background-color: var(--background-modifier-hover);
 		}
 		&.active {
-			background-color: var(--interactive-accent);
-			color: var(--text-on-accent);
+			background-color: var(--background-modifier-hover);
+			color: var(--text-normal);
 		}
 	}
 }

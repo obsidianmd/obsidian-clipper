@@ -13,7 +13,6 @@ document.addEventListener('DOMContentLoaded', () => {
 	const templateFields = document.getElementById('template-fields');
 	const addFieldBtn = document.getElementById('add-field-btn');
 	const saveTemplateBtn = document.getElementById('save-template-btn');
-	const cancelTemplateBtn = document.getElementById('cancel-template-btn');
 
 	let templates = [];
 	let editingTemplateIndex = -1;
@@ -176,6 +175,20 @@ document.addEventListener('DOMContentLoaded', () => {
 		
 		// Make sure the template editor is visible
 		document.getElementById('template-editor').style.display = 'block';
+
+		// Update the active state of the template list items
+		const templateListItems = document.querySelectorAll('#template-list li');
+		templateListItems.forEach(item => {
+			item.classList.remove('active');
+			if (parseInt(item.dataset.index) === editingTemplateIndex) {
+				item.classList.add('active');
+			}
+		});
+
+		// Make sure the templates section is visible
+		document.getElementById('templates-section').classList.add('active');
+		document.getElementById('general-section').classList.remove('active');
+		document.querySelector('.sidebar li[data-section="general"]').classList.remove('active');
 	}
 
 	function addFieldToEditor(name = '', value = '') {
@@ -300,7 +313,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	// Add this function to handle sidebar navigation
 	function initializeSidebar() {
-		const sidebarItems = document.querySelectorAll('.sidebar li');
+		const sidebarItems = document.querySelectorAll('.sidebar li[data-section]');
 		const sections = document.querySelectorAll('.settings-section');
 
 		sidebarItems.forEach(item => {
