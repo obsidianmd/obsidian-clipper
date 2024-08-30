@@ -2,9 +2,14 @@ import TurndownService from 'turndown';
 import { gfm, tables, strikethrough } from 'turndown-plugin-gfm';
 import { Readability } from '@mozilla/readability';
 
+let currentUrl = '';
+let currentTitle = '';
+let currentVariables = {};
+
 document.addEventListener('DOMContentLoaded', function() {
 	const vaultDropdown = document.getElementById('vault-dropdown');
 	const templateSelect = document.getElementById('template-select');
+	const templateFields = document.querySelector('.metadata-properties');
 	
 	// Load vaults from storage and populate dropdown
 	chrome.storage.sync.get(['vaults'], (data) => {
@@ -39,6 +44,7 @@ document.addEventListener('DOMContentLoaded', function() {
 					option.selected = true;
 				}
 			});
+			updateTemplateFields(data.templates[0]);
 		} else {
 			// If no templates are found, add the Default template
 			const defaultOption = document.createElement('option');
@@ -49,23 +55,27 @@ document.addEventListener('DOMContentLoaded', function() {
 		}
 	});
 
-	chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-		const url = tabs[0].url;
+	// Add event listener for template selection change
+	templateSelect.addEventListener('change', function() {
+		chrome.storage.sync.get(['templates'], (data) => {
+			const selectedTemplate = data.templates.find(t => t.name === this.value);
+			if (selectedTemplate) {
+				updateTemplateFields(selectedTemplate);
+			}
+		});
+	});
 
-		if (url.startsWith('chrome-extension://') || url.startsWith('chrome://') || url.startsWith('about:') || url.startsWith('file://')) {
+	chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+		currentUrl = tabs[0].url;
+
+		if (currentUrl.startsWith('chrome-extension://') || currentUrl.startsWith('chrome://') || currentUrl.startsWith('about:') || currentUrl.startsWith('file://')) {
 			showError('This page cannot be clipped.');
 			return;
 		}
 
 		chrome.tabs.sendMessage(tabs[0].id, {action: "getPageContent"}, function(response) {
 			if (response && response.content) {
-				const parser = new DOMParser();
-				const doc = parser.parseFromString(response.content, 'text/html');
-				const { title: rawTitle } = new Readability(doc).parse();
-				const title = rawTitle.replace(/"/g, "'");
-				const fileName = getFileName(title);
-
-				document.getElementById('file-name-field').value = fileName;
+				initializePageContent(response.content);
 			} else {
 				showError('Unable to retrieve page content. Try reloading the page.');
 			}
@@ -73,38 +83,65 @@ document.addEventListener('DOMContentLoaded', function() {
 	});
 });
 
-document.getElementById('clip-button').addEventListener('click', function() {
-	chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-		chrome.tabs.sendMessage(tabs[0].id, {action: "getPageContent"}, function(response) {
-			if (response && response.content) {
-				chrome.storage.sync.get(['folderName', 'tags', 'templates'], (data) => {
-					const fileName = document.getElementById('file-name-field').value;
-					const selectedVault = document.getElementById('vault-dropdown').value;
-					const selectedTemplate = document.getElementById('template-select').value;
-					const template = data.templates.find(t => t.name === selectedTemplate) || data.templates[0];
-					processContent(response.content, tabs[0].url, selectedVault, data.folderName, data.tags, fileName, template);
-				});
-			} else {
-				showError('Unable to retrieve page content. Try reloading the page.');
-			}
-		});
-	});
-});
+function initializePageContent(content) {
+	const parser = new DOMParser();
+	const doc = parser.parseFromString(content, 'text/html');
+	const { title: rawTitle, byline, content: readableContent } = new Readability(doc).parse();
+	
+	currentTitle = rawTitle.replace(/"/g, "'");
+	const fileName = getFileName(currentTitle);
+	document.getElementById('file-name-field').value = fileName;
 
-document.getElementById('open-settings').addEventListener('click', function() {
-	chrome.runtime.openOptionsPage();
-});
+	const author = byline || getMetaContent(doc, "name", "author") || getMetaContent(doc, "property", "author") || getMetaContent(doc, "property", "og:site_name");
+	const authorBrackets = author ? `"[[${author}]]"` : "";
 
-function showError(message) {
-	const errorMessage = document.getElementById('error-message');
-	const clipper = document.querySelector('.clipper');
+	const timeElement = doc.querySelector("time");
+	const publishedDate = timeElement ? timeElement.getAttribute("datetime") : "";
+	const published = publishedDate && publishedDate.trim() !== "" ? `${convertDate(new Date(publishedDate))}` : "";
 
-	errorMessage.textContent = message;
-	errorMessage.style.display = 'block';
-	clipper.style.display = 'none';
+	currentVariables = {
+		'{{title}}': currentTitle,
+		'{{url}}': currentUrl,
+		'{{published}}': published,
+		'{{authorLink}}': authorBrackets,
+		'{{today}}': convertDate(new Date()),
+		'{{tags}}': ''
+	};
+
+	updateTemplateFieldsWithVariables();
 }
 
-function processContent(content, url, vaultName = "", folderName = "Clippings/", tags = "clippings", fileName, template) {
+function updateTemplateFields(template) {
+	const templateFields = document.querySelector('.metadata-properties');
+	templateFields.innerHTML = '';
+
+	template.fields.forEach(field => {
+		const fieldDiv = document.createElement('div');
+		fieldDiv.className = 'metadata-property';
+		fieldDiv.innerHTML = `
+			<label for="${field.name}">${field.name}</label>
+			<input id="${field.name}" type="text" value="${field.value}" />
+		`;
+		templateFields.appendChild(fieldDiv);
+	});
+
+	updateTemplateFieldsWithVariables();
+}
+
+function updateTemplateFieldsWithVariables() {
+	const templateFields = document.querySelector('.metadata-properties');
+	const inputs = templateFields.querySelectorAll('input');
+
+	inputs.forEach(input => {
+		let value = input.value;
+		Object.keys(currentVariables).forEach(variable => {
+			value = value.replace(new RegExp(variable, 'g'), currentVariables[variable]);
+		});
+		input.value = value;
+	});
+}
+
+function createMarkdownContent(content, url) {
 	const parser = new DOMParser();
 	const doc = parser.parseFromString(content, 'text/html');
 
@@ -117,7 +154,7 @@ function processContent(content, url, vaultName = "", folderName = "Clippings/",
 		}
 	});
 
-	const { title: rawTitle, byline, content: readableContent } = new Readability(doc).parse();
+	const { content: readableContent } = new Readability(doc).parse();
 
 	const turndownService = new TurndownService({
 		headingStyle: 'atx',
@@ -145,48 +182,50 @@ function processContent(content, url, vaultName = "", folderName = "Clippings/",
 		}
 	});
 
-	const markdownBody = turndownService.turndown(readableContent);
+	return turndownService.turndown(readableContent);
+}
 
-	const today = convertDate(new Date());
+document.getElementById('clip-button').addEventListener('click', function() {
+	chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+		chrome.tabs.sendMessage(tabs[0].id, {action: "getPageContent"}, function(response) {
+			if (response && response.content) {
+				chrome.storage.sync.get(['folderName', 'tags', 'templates'], (data) => {
+					const fileName = document.getElementById('file-name-field').value;
+					const selectedVault = document.getElementById('vault-dropdown').value;
+					const selectedTemplate = document.getElementById('template-select').value;
+					const template = data.templates.find(t => t.name === selectedTemplate) || data.templates[0];
+					
+					const markdownBody = createMarkdownContent(response.content, tabs[0].url);
+					
+					const frontmatter = template.fields.reduce((acc, field) => {
+						let value = field.value;
+						Object.keys(currentVariables).forEach(variable => {
+							value = value.replace(new RegExp(variable, 'g'), currentVariables[variable]);
+						});
+						return acc + `${field.name}: ${value}\n`;
+					}, '---\n') + '---\n';
 
-	var author = byline || getMetaContent(doc, "name", "author") || getMetaContent(doc, "property", "author") || getMetaContent(doc, "property", "og:site_name");
-
-	var authorBrackets = author ? `"[[${author}]]"` : "";
-
-	var timeElement = doc.querySelector("time");
-	var publishedDate = timeElement ? timeElement.getAttribute("datetime") : "";
-	var published = '';
-	if (publishedDate && publishedDate.trim() !== "") {
-		var date = new Date(publishedDate);
-		var year = date.getFullYear();
-		var month = (date.getMonth() + 1).toString().padStart(2, '0');
-		var day = date.getDate().toString().padStart(2, '0');
-		published = `"${year}-${month}-${day}"`;
-	}
-
-	const variables = {
-		'{{title}}': rawTitle.replace(/"/g, "'"),
-		'{{url}}': url,
-		'{{published}}': published,
-		'{{authorLink}}': authorBrackets,
-		'{{today}}': today,
-		'{{tags}}': tags
-	};
-
-	const frontmatter = template.fields.reduce((acc, field) => {
-		let value = field.value;
-		
-		// Replace variables in the field value
-		Object.keys(variables).forEach(variable => {
-			value = value.replace(new RegExp(variable, 'g'), variables[variable]);
+					const fileContent = frontmatter + markdownBody;
+					saveToObsidian(fileContent, fileName, data.folderName, selectedVault);
+				});
+			} else {
+				showError('Unable to retrieve page content. Try reloading the page.');
+			}
 		});
+	});
+});
 
-		return acc + `${field.name}: ${value}\n`;
-	}, '---\n') + '---\n';
+document.getElementById('open-settings').addEventListener('click', function() {
+	chrome.runtime.openOptionsPage();
+});
 
-	const fileContent = frontmatter + markdownBody;
+function showError(message) {
+	const errorMessage = document.getElementById('error-message');
+	const clipper = document.querySelector('.clipper');
 
-	saveToObsidian(fileContent, fileName, folderName, vaultName);
+	errorMessage.textContent = message;
+	errorMessage.style.display = 'block';
+	clipper.style.display = 'none';
 }
 
 function getFileName(fileName) {

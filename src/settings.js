@@ -25,7 +25,6 @@ document.addEventListener('DOMContentLoaded', () => {
 				{ name: 'source', value: '{{url}}' },
 				{ name: 'author', value: '{{authorLink}}' },
 				{ name: 'published', value: '{{published}}' },
-				
 				{ name: 'created', value: '{{today}}' },
 				{ name: 'tags', value: '{{tags}}' }
 			]
