@@ -1,14 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
-	// Default values
-	const defaultFolderName = "Clippings/";
-	const defaultTags = "clippings";
-
 	const vaultInput = document.getElementById('vault-input');
 	const vaultList = document.getElementById('vault-list');
 	const folderNameInput = document.getElementById('folder-name');
 	const tagsInput = document.getElementById('tags');
-	let vaults = [];
-
 	const templateSelect = document.getElementById('template-select');
 	const newTemplateBtn = document.getElementById('new-template-btn');
 	const deleteTemplateBtn = document.getElementById('delete-template-btn');
@@ -23,86 +17,81 @@ document.addEventListener('DOMContentLoaded', () => {
 	let templates = [];
 	let editingTemplateIndex = -1;
 
-	// Load saved settings or use default values
-	chrome.storage.sync.get(['vaults', 'folderName', 'tags', 'templates'], (data) => {
-		vaults = data.vaults || [];
-		folderNameInput.value = data.folderName || defaultFolderName;
-		tagsInput.value = data.tags || defaultTags;
-		updateVaultList();
-		templates = data.templates || [
-			{
-				name: 'Default',
-				fields: [
-					{ name: 'category', value: '"[[Clippings]]"' },
-					{ name: 'title', value: '{{title}}' },
-					{ name: 'author', value: '{{authorLink}}' },
-					{ name: 'source', value: '{{url}}' },
-					{ name: 'created', value: '{{today}}' },
-					{ name: 'published', value: '{{published}}' },
-					{ name: 'topics', value: '' },
-					{ name: 'tags', value: '{{tags}}' }
-				]
-			}
-		];
-		updateTemplateSelect();
-	});
+	function createDefaultTemplate() {
+		return {
+			name: 'Default',
+			fields: [
+				{ name: 'title', value: '{{title}}' },
+				{ name: 'source', value: '{{url}}' },
+				{ name: 'author', value: '{{authorLink}}' },
+				{ name: 'published', value: '{{published}}' },
+				
+				{ name: 'created', value: '{{today}}' },
+				{ name: 'tags', value: '{{tags}}' }
+			]
+		};
+	}
 
-	// Add vault name on Enter key press
-	vaultInput.addEventListener('keypress', (e) => {
-		if (e.key === 'Enter') {
-			e.preventDefault();
-			const vaultName = vaultInput.value.trim();
-			if (vaultName && !vaults.includes(vaultName)) {
-				vaults.push(vaultName);
-				updateVaultList();
-				vaultInput.value = ''; // Clear the input field
-				saveSettings(); // Auto-save after adding a vault
+	function loadTemplates() {
+		chrome.storage.sync.get(['templates'], (data) => {
+			templates = data.templates || [];
+			if (templates.length === 0) {
+				templates.push(createDefaultTemplate());
+				chrome.storage.sync.set({ templates });
 			}
+			updateTemplateSelect();
+			showTemplateEditor(templates[0]);
+		});
+	}
+
+	function updateTemplateSelect() {
+		templateSelect.innerHTML = '';
+		templates.forEach((template, index) => {
+			const option = document.createElement('option');
+			option.value = template.name;
+			option.textContent = template.name;
+			templateSelect.appendChild(option);
+			if (index === 0) {
+				option.selected = true;
+			}
+		});
+	}
+
+	function showTemplateEditor(template) {
+		editingTemplateIndex = templates.findIndex(t => t.name === template.name);
+		templateEditorTitle.textContent = 'Edit template';
+		templateName.value = template.name;
+		templateFields.innerHTML = '';
+		template.fields.forEach(field => addFieldToEditor(field.name, field.value));
+	}
+
+	function addFieldToEditor(name = '', value = '') {
+		const fieldDiv = document.createElement('div');
+		fieldDiv.innerHTML = `
+			<input type="text" class="field-name" value="${name}" placeholder="Field name">
+			<input type="text" class="field-value" value="${value}" placeholder="Field value">
+			<button type="button" class="remove-field-btn">Remove</button>
+		`;
+		templateFields.appendChild(fieldDiv);
+
+		fieldDiv.querySelector('.remove-field-btn').addEventListener('click', () => {
+			templateFields.removeChild(fieldDiv);
+		});
+	}
+
+	templateSelect.addEventListener('change', () => {
+		const selectedTemplate = templates.find(t => t.name === templateSelect.value);
+		if (selectedTemplate) {
+			showTemplateEditor(selectedTemplate);
 		}
 	});
-
-	// Auto-save on folder name change
-	folderNameInput.addEventListener('input', saveSettings);
-
-	// Auto-save on tags change
-	tagsInput.addEventListener('input', saveSettings);
 
 	newTemplateBtn.addEventListener('click', () => {
 		editingTemplateIndex = -1;
 		templateEditorTitle.textContent = 'New Template';
 		templateName.value = '';
 		templateFields.innerHTML = '';
-		templateEditor.style.display = 'block';
-		templateSelect.selectedIndex = 0;
-	});
-
-	templateSelect.addEventListener('change', () => {
-		const selectedIndex = templateSelect.selectedIndex - 1;
-		if (selectedIndex >= 0) {
-			editingTemplateIndex = selectedIndex;
-			const template = templates[selectedIndex];
-			templateEditorTitle.textContent = 'Edit template';
-			templateName.value = template.name;
-			templateFields.innerHTML = '';
-			template.fields.forEach(field => addFieldToEditor(field.name, field.value));
-			templateEditor.style.display = 'block';
-		} else {
-			templateEditor.style.display = 'none';
-		}
-	});
-
-	deleteTemplateBtn.addEventListener('click', () => {
-		const selectedIndex = templateSelect.selectedIndex - 1;
-		if (selectedIndex >= 0) {
-			if (templates[selectedIndex].name === 'Default') {
-				alert("The Default template cannot be deleted.");
-			} else {
-				templates.splice(selectedIndex, 1);
-				updateTemplateSelect();
-				saveSettings();
-				templateEditor.style.display = 'none';
-			}
-		}
+		addFieldToEditor();
 	});
 
 	addFieldBtn.addEventListener('click', () => {
@@ -124,84 +113,59 @@ document.addEventListener('DOMContentLoaded', () => {
 			}
 
 			updateTemplateSelect();
-			saveSettings();
-			templateEditor.style.display = 'none';
+			chrome.storage.sync.set({ templates }, () => {
+				console.log('Template saved');
+				showTemplateEditor(templates.find(t => t.name === name));
+			});
 		}
 	});
 
-	cancelTemplateBtn.addEventListener('click', () => {
-		templateEditor.style.display = 'none';
+	deleteTemplateBtn.addEventListener('click', () => {
+		if (editingTemplateIndex > 0) {
+			templates.splice(editingTemplateIndex, 1);
+			updateTemplateSelect();
+			showTemplateEditor(templates[0]);
+			chrome.storage.sync.set({ templates }, () => {
+				console.log('Template deleted');
+			});
+		} else {
+			alert("You cannot delete the Default template.");
+		}
 	});
 
-	function updateTemplateSelect() {
-		templateSelect.innerHTML = '<option value="">Select a template</option>';
-		templates.forEach((template, index) => {
-			const option = document.createElement('option');
-			option.value = template.name;
-			option.textContent = template.name;
-			templateSelect.appendChild(option);
-
-			if (template.name === 'Default') {
-				option.selected = true;
-				// Show the Default template in the editor when the page loads
-				editingTemplateIndex = index;
-				templateEditorTitle.textContent = 'Edit template';
-				templateName.value = template.name;
-				templateFields.innerHTML = '';
-				console.log('Default template fields:', template.fields); // Debug log
-				template.fields.forEach(field => {
-					console.log(`Adding field: ${field.name} = ${field.value}`); // Debug log
-					addFieldToEditor(field.name, field.value);
-				});
-				templateEditor.style.display = 'block';
-			}
-		});
-
-		if (!templates.some(t => t.name === 'Default') && templateSelect.options.length > 1) {
-			templateSelect.options[1].selected = true;
-		}
-	}
-
-	function addFieldToEditor(name = '', value = '') {
-		const fieldDiv = document.createElement('div');
-		fieldDiv.className = 'template-field';
-		fieldDiv.innerHTML = `
-			<input type="text" class="field-name" placeholder="Field name" value="${name}" />
-			<input type="text" class="field-value" placeholder="Field value" value="${value}" />
-			<button type="button" class="remove-field">Remove</button>
-		`;
-		fieldDiv.querySelector('.remove-field').addEventListener('click', () => {
-			templateFields.removeChild(fieldDiv);
-		});
-		templateFields.appendChild(fieldDiv);
-	}
-
-	function updateVaultList() {
-		vaultList.innerHTML = '';
-		vaults.forEach((vault, index) => {
+	// Load initial data
+	chrome.storage.sync.get(['vaults', 'folderName', 'tags'], (data) => {
+		const vaults = data.vaults || [];
+		folderNameInput.value = data.folderName || 'Clippings/';
+		tagsInput.value = data.tags || 'clippings';
+		vaults.forEach(vault => {
 			const li = document.createElement('li');
 			li.textContent = vault;
-
-			const removeButton = document.createElement('button');
-			removeButton.textContent = 'Remove';
-			removeButton.style.marginLeft = '10px';
-			removeButton.addEventListener('click', () => {
-				vaults.splice(index, 1);
-				updateVaultList();
-				saveSettings();
-			});
-
-			li.appendChild(removeButton);
 			vaultList.appendChild(li);
 		});
-	}
+	});
 
-	function saveSettings() {
-		const folderName = folderNameInput.value;
-		const tags = tagsInput.value;
+	loadTemplates();
 
-		chrome.storage.sync.set({ vaults, folderName, tags, templates }, () => {
-			console.log('Settings saved automatically.');
+	// Add this function to reset the Default template
+	function resetDefaultTemplate() {
+		const defaultTemplate = createDefaultTemplate();
+		const index = templates.findIndex(t => t.name === 'Default');
+		if (index !== -1) {
+			templates[index] = defaultTemplate;
+		} else {
+			templates.unshift(defaultTemplate);
+		}
+		chrome.storage.sync.set({ templates }, () => {
+			console.log('Default template reset');
+			updateTemplateSelect();
+			showTemplateEditor(defaultTemplate);
 		});
 	}
+
+	// Add a button in the HTML to reset the Default template
+	const resetDefaultBtn = document.createElement('button');
+	resetDefaultBtn.textContent = 'Reset default template';
+	resetDefaultBtn.addEventListener('click', resetDefaultTemplate);
+	document.querySelector('.settings-section').appendChild(resetDefaultBtn);
 });
