@@ -3,22 +3,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const defaultFolderName = "Clippings/";
     const defaultTags = "clippings";
 
-    const vaultInput = document.getElementById('vaultInput');
-    const vaultList = document.getElementById('vaultList');
-    const folderNameInput = document.getElementById('folderName');
+    const vaultInput = document.getElementById('vault-input');
+    const vaultList = document.getElementById('vault-list');
+    const folderNameInput = document.getElementById('folder-name');
     const tagsInput = document.getElementById('tags');
     let vaults = [];
 
-    const templateSelect = document.getElementById('templateSelect');
-    const newTemplateBtn = document.getElementById('newTemplateBtn');
-    const deleteTemplateBtn = document.getElementById('deleteTemplateBtn');
-    const templateEditor = document.getElementById('templateEditor');
-    const templateEditorTitle = document.getElementById('templateEditorTitle');
-    const templateName = document.getElementById('templateName');
-    const templateFields = document.getElementById('templateFields');
-    const addFieldBtn = document.getElementById('addFieldBtn');
-    const saveTemplateBtn = document.getElementById('saveTemplateBtn');
-    const cancelTemplateBtn = document.getElementById('cancelTemplateBtn');
+    const templateSelect = document.getElementById('template-select');
+    const newTemplateBtn = document.getElementById('new-template-btn');
+    const deleteTemplateBtn = document.getElementById('delete-template-btn');
+    const templateEditor = document.getElementById('template-editor');
+    const templateEditorTitle = document.getElementById('template-editor-title');
+    const templateName = document.getElementById('template-name');
+    const templateFields = document.getElementById('template-fields');
+    const addFieldBtn = document.getElementById('add-field-btn');
+    const saveTemplateBtn = document.getElementById('save-template-btn');
+    const cancelTemplateBtn = document.getElementById('cancel-template-btn');
 
     let templates = [];
     let editingTemplateIndex = -1;

@@ -3,8 +3,8 @@ import { gfm, tables, strikethrough } from 'turndown-plugin-gfm';
 import { Readability } from '@mozilla/readability';
 
 document.addEventListener('DOMContentLoaded', function() {
-  const vaultDropdown = document.getElementById('vaultDropdown');
-  const templateSelect = document.getElementById('templateSelect');
+  const vaultDropdown = document.getElementById('vault-dropdown');
+  const templateSelect = document.getElementById('template-select');
   
   // Load vaults from storage and populate dropdown
   chrome.storage.sync.get(['vaults'], (data) => {
@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const title = rawTitle.replace(/"/g, "'");
         const fileName = getFileName(title);
 
-        document.getElementById('fileNameField').value = fileName;
+        document.getElementById('file-name-field').value = fileName;
       } else {
         showError('Unable to retrieve page content. Try reloading the page.');
       }
@@ -73,14 +73,14 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
-document.getElementById('clipButton').addEventListener('click', function() {
+document.getElementById('clip-button').addEventListener('click', function() {
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     chrome.tabs.sendMessage(tabs[0].id, {action: "getPageContent"}, function(response) {
       if (response && response.content) {
         chrome.storage.sync.get(['folderName', 'tags', 'templates'], (data) => {
-          const fileName = document.getElementById('fileNameField').value;
-          const selectedVault = document.getElementById('vaultDropdown').value;
-          const selectedTemplate = document.getElementById('templateSelect').value;
+          const fileName = document.getElementById('file-name-field').value;
+          const selectedVault = document.getElementById('vault-dropdown').value;
+          const selectedTemplate = document.getElementById('template-select').value;
           const template = data.templates.find(t => t.name === selectedTemplate) || data.templates[0];
           processContent(response.content, tabs[0].url, selectedVault, data.folderName, data.tags, fileName, template);
         });
@@ -91,12 +91,12 @@ document.getElementById('clipButton').addEventListener('click', function() {
   });
 });
 
-document.getElementById('openSettings').addEventListener('click', function() {
+document.getElementById('open-settings').addEventListener('click', function() {
   chrome.runtime.openOptionsPage();
 });
 
 function showError(message) {
-  const errorMessage = document.getElementById('errorMessage');
+  const errorMessage = document.getElementById('error-message');
   const clipper = document.querySelector('.clipper');
 
   errorMessage.textContent = message;
