@@ -59,25 +59,40 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	function showTemplateEditor(template) {
-		editingTemplateIndex = templates.findIndex(t => t.name === template.name);
-		templateEditorTitle.textContent = 'Edit template';
-		templateName.value = template.name;
+		editingTemplateIndex = template ? templates.findIndex(t => t.name === template.name) : -1;
+		templateEditorTitle.textContent = template ? 'Edit template' : 'New template';
+		templateName.value = template ? template.name : '';
 		templateFields.innerHTML = '';
-		template.fields.forEach(field => addFieldToEditor(field.name, field.value));
-		const urlPatternsTextarea = document.createElement('textarea');
-		urlPatternsTextarea.id = 'url-patterns';
-		urlPatternsTextarea.placeholder = 'Enter URL patterns, one per line';
-		urlPatternsTextarea.value = (template.urlPatterns || []).join('\n');
-		templateFields.appendChild(urlPatternsTextarea);
+		
+		if (template) {
+			template.fields.forEach(field => addFieldToEditor(field.name, field.value));
+		} else {
+			addFieldToEditor(); // Add an empty field for new templates
+		}
+
+		// Update or create URL patterns textarea
+		let urlPatternsTextarea = document.getElementById('url-patterns');
+		if (!urlPatternsTextarea) {
+			const urlPatternsLabel = document.createElement('label');
+			urlPatternsLabel.htmlFor = 'url-patterns';
+			urlPatternsLabel.textContent = 'URL patterns (one per line)';
+			templateEditor.insertBefore(urlPatternsLabel, addFieldBtn);
+
+			urlPatternsTextarea = document.createElement('textarea');
+			urlPatternsTextarea.id = 'url-patterns';
+			urlPatternsTextarea.placeholder = 'https://example.com';
+			templateEditor.insertBefore(urlPatternsTextarea, addFieldBtn);
+		}
+		urlPatternsTextarea.value = template && template.urlPatterns ? template.urlPatterns.join('\n') : '';
 	}
 
 	function addFieldToEditor(name = '', value = '') {
 		const fieldDiv = document.createElement('div');
 		fieldDiv.innerHTML = `
-			<input type="text" class="field-name" value="${name}" placeholder="Field name">
-			<input type="text" class="field-value" value="${value}" placeholder="Field value">
-			<button type="button" class="remove-field-btn">Remove</button>
-		`;
+				<input type="text" class="field-name" value="${name}" placeholder="Field name">
+				<input type="text" class="field-value" value="${value}" placeholder="Field value">
+				<button type="button" class="remove-field-btn">Remove</button>
+			`;
 		templateFields.appendChild(fieldDiv);
 
 		fieldDiv.querySelector('.remove-field-btn').addEventListener('click', () => {
@@ -93,11 +108,8 @@ document.addEventListener('DOMContentLoaded', () => {
 	});
 
 	newTemplateBtn.addEventListener('click', () => {
-		editingTemplateIndex = -1;
-		templateEditorTitle.textContent = 'New template';
-		templateName.value = '';
-		templateFields.innerHTML = '';
-		addFieldToEditor();
+		showTemplateEditor(null); // Pass null to indicate a new template
+		document.getElementById('template-editor').style.display = 'block';
 	});
 
 	addFieldBtn.addEventListener('click', () => {
@@ -115,14 +127,10 @@ document.addEventListener('DOMContentLoaded', () => {
 				}))
 				.filter(field => field.name);
 
-			let urlPatterns = [];
-			const urlPatternsTextarea = document.getElementById('url-patterns');
-			if (urlPatternsTextarea) {
-				urlPatterns = urlPatternsTextarea.value
-					.split('\n')
-					.map(pattern => pattern.trim())
-					.filter(pattern => pattern !== '');
-			}
+			const urlPatterns = document.getElementById('url-patterns').value
+				.split('\n')
+				.map(pattern => pattern.trim())
+				.filter(pattern => pattern !== '');
 
 			const newTemplate = { name, fields, urlPatterns };
 
