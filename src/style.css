@@ -124,6 +124,7 @@ body {
   color: var(--text-normal);
 }
 
+select,
 input[type="text"],
 textarea {
   background: var(--background-primary);
@@ -135,6 +136,8 @@ textarea {
   outline: none;
   width: 100%;
   margin: 0;
+}
+textarea {
   resize: vertical;
 }
 

@@ -3,10 +3,28 @@ import { gfm, tables, strikethrough } from 'turndown-plugin-gfm';
 import { Readability } from '@mozilla/readability';
 
 document.addEventListener('DOMContentLoaded', function() {
+  const vaultDropdown = document.getElementById('vaultDropdown');
+  
+  // Load vaults from storage and populate dropdown
+  chrome.storage.sync.get(['vaults'], (data) => {
+    if (data.vaults && data.vaults.length > 0) {
+      data.vaults.forEach(vault => {
+        const option = document.createElement('option');
+        option.value = vault;
+        option.textContent = vault;
+        vaultDropdown.appendChild(option);
+      });
+    } else {
+      const option = document.createElement('option');
+      option.value = '';
+      option.textContent = 'No vaults available';
+      vaultDropdown.appendChild(option);
+    }
+  });
+
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     const url = tabs[0].url;
 
-    // Check if the page is a chrome-extension page or any other non-clippable page
     if (url.startsWith('chrome-extension://') || url.startsWith('chrome://') || url.startsWith('about:') || url.startsWith('file://')) {
       showError('This page cannot be clipped.');
       return;
@@ -20,7 +38,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const title = rawTitle.replace(/"/g, "'");
         const fileName = getFileName(title);
 
-        // Prepopulate the textarea with the file name
         document.getElementById('fileNameField').value = fileName;
       } else {
         showError('Unable to retrieve page content. Try reloading the page.');
@@ -33,12 +50,13 @@ document.getElementById('clipButton').addEventListener('click', function() {
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     chrome.tabs.sendMessage(tabs[0].id, {action: "getPageContent"}, function(response) {
       if (response && response.content) {
-        chrome.storage.sync.get(['vaultName', 'folderName', 'tags'], (data) => {
-          const fileName = document.getElementById('fileNameField').value;  // Use the edited filename
-          processContent(response.content, tabs[0].url, data.vaultName, data.folderName, data.tags, fileName);
+        chrome.storage.sync.get(['folderName', 'tags'], (data) => {
+          const fileName = document.getElementById('fileNameField').value;
+          const selectedVault = document.getElementById('vaultDropdown').value;
+          processContent(response.content, tabs[0].url, selectedVault, data.folderName, data.tags, fileName);
         });
       } else {
-        showError('Unable to retrieve page content.');
+        showError('Unable to retrieve page content. Try reloading the page.');
       }
     });
   });
@@ -53,15 +71,14 @@ function showError(message) {
   const clipper = document.querySelector('.clipper');
 
   errorMessage.textContent = message;
-  errorMessage.style.display = 'block';  // Show the error message
-  clipper.style.display = 'none';        // Hide the clipper section
+  errorMessage.style.display = 'block';
+  clipper.style.display = 'none';
 }
 
 function processContent(content, url, vaultName = "", folderName = "Clippings/", tags = "clippings", fileName) {
   const parser = new DOMParser();
   const doc = parser.parseFromString(content, 'text/html');
 
-  // Convert relative image URLs to absolute URLs
   const baseUrl = new URL(url);
   const images = doc.querySelectorAll('img');
   images.forEach(img => {
@@ -82,6 +99,22 @@ function processContent(content, url, vaultName = "", folderName = "Clippings/",
   });
 
   turndownService.use(gfm);
+
+  // Custom rule to handle bullet lists without extra spaces
+  turndownService.addRule('listItem', {
+    filter: 'li',
+    replacement: function (content, node, options) {
+      content = content.trim();
+      let prefix = options.bulletListMarker + ' ';
+      let parent = node.parentNode;
+      if (parent.nodeName === 'OL') {
+        let start = parent.getAttribute('start');
+        let index = Array.prototype.indexOf.call(parent.children, node) + 1;
+        prefix = (start ? Number(start) + index - 1 : index) + '. ';
+      }
+      return prefix + content + '\n';
+    }
+  });
 
   const markdownBody = turndownService.turndown(readableContent);
 
