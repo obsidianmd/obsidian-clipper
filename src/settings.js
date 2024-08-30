@@ -94,19 +94,31 @@ document.addEventListener('DOMContentLoaded', () => {
 			return field;
 		}
 
-		// Create or update folder name input
 		createOrUpdateField('template-folder-name', 'Folder name', template ? template.folderName : 'Clippings/');
 
-		// Create or update URL patterns textarea
-		const urlPatternsTextarea = createOrUpdateField('url-patterns', 'URL patterns one per line', 
-			template && template.urlPatterns ? template.urlPatterns.join('\n') : '', 'textarea');
-		urlPatternsTextarea.placeholder = 'https://example.com/';
+		const existingPropertiesLabel = templateEditor.querySelector('#properties-label');
+		if (existingPropertiesLabel) {
+			existingPropertiesLabel.remove();
+		}
+
+		// Add "Properties" label
+		const propertiesLabel = document.createElement('h4');
+		propertiesLabel.id = 'properties-label';
+		propertiesLabel.textContent = 'Properties';
+		templateEditor.insertBefore(propertiesLabel, templateFields);
 
 		if (template) {
 			template.fields.forEach(field => addFieldToEditor(field.name, field.value));
 		} else {
-			addFieldToEditor(); // Add an empty field for new templates
+			addFieldToEditor();
 		}
+
+		const addFieldBtn = document.getElementById('add-field-btn');
+		const urlPatternsTextarea = createOrUpdateField('url-patterns', 'URL patterns (one per line)', 
+			template && template.urlPatterns ? template.urlPatterns.join('\n') : '', 'textarea');
+		urlPatternsTextarea.placeholder = 'https://example.com/';
+		templateEditor.insertBefore(urlPatternsTextarea, addFieldBtn.nextSibling);
+		templateEditor.insertBefore(document.querySelector('label[for="url-patterns"]'), urlPatternsTextarea);
 	}
 
 	function addFieldToEditor(name = '', value = '') {
@@ -124,7 +136,6 @@ document.addEventListener('DOMContentLoaded', () => {
 			templateFields.removeChild(fieldDiv);
 		});
 
-		// Initialize Lucide icon
 		createIcons({
 			icons: {
 				Trash2
