@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	let templates = [];
 	let editingTemplateIndex = -1;
+	let vaults = [];
 
 	function createDefaultTemplate() {
 		return {
@@ -34,6 +35,54 @@ document.addEventListener('DOMContentLoaded', () => {
 			urlPatterns: []
 		};
 	}
+
+	function loadGeneralSettings() {
+		chrome.storage.sync.get(['vaults'], (data) => {
+			vaults = data.vaults || [];
+			updateVaultList();
+		});
+	}
+
+	function updateVaultList() {
+		vaultList.innerHTML = '';
+		vaults.forEach((vault, index) => {
+			const li = document.createElement('li');
+			li.textContent = vault;
+			li.dataset.index = index;
+			const removeBtn = document.createElement('button');
+			removeBtn.textContent = 'Remove';
+			removeBtn.addEventListener('click', () => removeVault(index));
+			li.appendChild(removeBtn);
+			vaultList.appendChild(li);
+		});
+	}
+
+	function addVault(vault) {
+		if (vault && !vaults.includes(vault)) {
+			vaults.push(vault);
+			saveGeneralSettings();
+		}
+	}
+
+	function removeVault(index) {
+		vaults.splice(index, 1);
+		saveGeneralSettings();
+	}
+
+	function saveGeneralSettings() {
+		chrome.storage.sync.set({ vaults }, () => {
+			console.log('General settings saved');
+			updateVaultList();
+		});
+	}
+
+	vaultInput.addEventListener('keypress', (e) => {
+		if (e.key === 'Enter') {
+			e.preventDefault();
+			addVault(vaultInput.value.trim());
+			vaultInput.value = '';
+		}
+	});
 
 	function loadTemplates() {
 		chrome.storage.sync.get(['templates'], (data) => {
@@ -166,6 +215,13 @@ document.addEventListener('DOMContentLoaded', () => {
 		addFieldToEditor();
 	});
 
+	function saveTemplateSettings() {
+		chrome.storage.sync.set({ templates }, () => {
+			console.log('Template settings saved');
+			updateTemplateList();
+		});
+	}
+
 	saveTemplateBtn.addEventListener('click', () => {
 		const name = templateName.value.trim();
 		const folderName = document.getElementById('template-folder-name').value.trim();
@@ -191,28 +247,23 @@ document.addEventListener('DOMContentLoaded', () => {
 				templates[editingTemplateIndex] = newTemplate;
 			}
 
-			updateTemplateList();
-			chrome.storage.sync.set({ templates }, () => {
-				console.log('Template saved');
-				showTemplateEditor(newTemplate);
-			});
+			saveTemplateSettings();
+			showTemplateEditor(newTemplate);
 		}
 	});
 
 	deleteTemplateBtn.addEventListener('click', () => {
 		if (editingTemplateIndex > 0) {
 			templates.splice(editingTemplateIndex, 1);
-			updateTemplateList();
+			saveTemplateSettings();
 			showTemplateEditor(templates[0]);
-			chrome.storage.sync.set({ templates }, () => {
-				console.log('Template deleted');
-			});
 		} else {
 			alert("You cannot delete the Default template.");
 		}
 	});
 
-
+	// Initialize
+	loadGeneralSettings();
 	loadTemplates();
 
 	// Add this function to reset the Default template
