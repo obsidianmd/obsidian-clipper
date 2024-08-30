@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	let editingTemplateIndex = -1;
 
 	// Load saved settings or use default values
-	chrome.storage.sync.get(['vaults', 'folderName', 'tags'], (data) => {
+	chrome.storage.sync.get(['vaults', 'folderName', 'tags', 'templates'], (data) => {
 		vaults = data.vaults || [];
 		folderNameInput.value = data.folderName || defaultFolderName;
 		tagsInput.value = data.tags || defaultTags;
@@ -34,13 +34,13 @@ document.addEventListener('DOMContentLoaded', () => {
 				name: 'Default',
 				fields: [
 					{ name: 'category', value: '"[[Clippings]]"' },
-					{ name: 'author', value: '' },
-					{ name: 'title', value: '' },
-					{ name: 'source', value: '' },
-					{ name: 'created', value: '' },
-					{ name: 'published', value: '' },
+					{ name: 'title', value: '{{title}}' },
+					{ name: 'author', value: '{{authorLink}}' },
+					{ name: 'source', value: '{{url}}' },
+					{ name: 'created', value: '{{today}}' },
+					{ name: 'published', value: '{{published}}' },
 					{ name: 'topics', value: '' },
-					{ name: 'tags', value: '' }
+					{ name: 'tags', value: '{{tags}}' }
 				]
 			}
 		];
@@ -148,7 +148,11 @@ document.addEventListener('DOMContentLoaded', () => {
 				templateEditorTitle.textContent = 'Edit template';
 				templateName.value = template.name;
 				templateFields.innerHTML = '';
-				template.fields.forEach(field => addFieldToEditor(field.name, field.value));
+				console.log('Default template fields:', template.fields); // Debug log
+				template.fields.forEach(field => {
+					console.log(`Adding field: ${field.name} = ${field.value}`); // Debug log
+					addFieldToEditor(field.name, field.value);
+				});
 				templateEditor.style.display = 'block';
 			}
 		});

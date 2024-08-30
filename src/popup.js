@@ -164,14 +164,23 @@ function processContent(content, url, vaultName = "", folderName = "Clippings/",
 		published = `"${year}-${month}-${day}"`;
 	}
 
+	const variables = {
+		'{{title}}': rawTitle.replace(/"/g, "'"),
+		'{{url}}': url,
+		'{{published}}': published,
+		'{{authorLink}}': authorBrackets,
+		'{{today}}': today,
+		'{{tags}}': tags
+	};
+
 	const frontmatter = template.fields.reduce((acc, field) => {
 		let value = field.value;
-		if (field.name === 'title') value = `"${rawTitle.replace(/"/g, "'")}"`;
-		if (field.name === 'source') value = url;
-		if (field.name === 'created') value = `"${today}"`;
-		if (field.name === 'author') value = authorBrackets;
-		if (field.name === 'published') value = published;
-		if (field.name === 'tags') value = `[${tags}]`;
+		
+		// Replace variables in the field value
+		Object.keys(variables).forEach(variable => {
+			value = value.replace(new RegExp(variable, 'g'), variables[variable]);
+		});
+
 		return acc + `${field.name}: ${value}\n`;
 	}, '---\n') + '---\n';
 
