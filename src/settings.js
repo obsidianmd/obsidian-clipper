@@ -1,68 +1,170 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Default values
-    const defaultFolderName = "Clippings/";
-    const defaultTags = "clippings";
+	const vaultInput = document.getElementById('vault-input');
+	const vaultList = document.getElementById('vault-list');
+	const folderNameInput = document.getElementById('folder-name');
+	const tagsInput = document.getElementById('tags');
+	const templateSelect = document.getElementById('template-select');
+	const newTemplateBtn = document.getElementById('new-template-btn');
+	const deleteTemplateBtn = document.getElementById('delete-template-btn');
+	const templateEditor = document.getElementById('template-editor');
+	const templateEditorTitle = document.getElementById('template-editor-title');
+	const templateName = document.getElementById('template-name');
+	const templateFields = document.getElementById('template-fields');
+	const addFieldBtn = document.getElementById('add-field-btn');
+	const saveTemplateBtn = document.getElementById('save-template-btn');
+	const cancelTemplateBtn = document.getElementById('cancel-template-btn');
 
-    const vaultInput = document.getElementById('vaultInput');
-    const vaultList = document.getElementById('vaultList');
-    const folderNameInput = document.getElementById('folderName');
-    const tagsInput = document.getElementById('tags');
-    let vaults = [];
+	let templates = [];
+	let editingTemplateIndex = -1;
 
-    // Load saved settings or use default values
-    chrome.storage.sync.get(['vaults', 'folderName', 'tags'], (data) => {
-        vaults = data.vaults || [];
-        folderNameInput.value = data.folderName || defaultFolderName;
-        tagsInput.value = data.tags || defaultTags;
-        updateVaultList();
-    });
+	function createDefaultTemplate() {
+		return {
+			name: 'Default',
+			fields: [
+				{ name: 'title', value: '{{title}}' },
+				{ name: 'source', value: '{{url}}' },
+				{ name: 'author', value: '{{authorLink}}' },
+				{ name: 'published', value: '{{published}}' },
+				{ name: 'created', value: '{{today}}' },
+				{ name: 'tags', value: '{{tags}}' }
+			]
+		};
+	}
 
-    // Add vault name on Enter key press
-    vaultInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            const vaultName = vaultInput.value.trim();
-            if (vaultName && !vaults.includes(vaultName)) {
-                vaults.push(vaultName);
-                updateVaultList();
-                vaultInput.value = ''; // Clear the input field
-                saveSettings(); // Auto-save after adding a vault
-            }
-        }
-    });
+	function loadTemplates() {
+		chrome.storage.sync.get(['templates'], (data) => {
+			templates = data.templates || [];
+			if (templates.length === 0) {
+				templates.push(createDefaultTemplate());
+				chrome.storage.sync.set({ templates });
+			}
+			updateTemplateSelect();
+			showTemplateEditor(templates[0]);
+		});
+	}
 
-    // Auto-save on folder name change
-    folderNameInput.addEventListener('input', saveSettings);
+	function updateTemplateSelect() {
+		templateSelect.innerHTML = '';
+		templates.forEach((template, index) => {
+			const option = document.createElement('option');
+			option.value = template.name;
+			option.textContent = template.name;
+			templateSelect.appendChild(option);
+			if (index === 0) {
+				option.selected = true;
+			}
+		});
+	}
 
-    // Auto-save on tags change
-    tagsInput.addEventListener('input', saveSettings);
+	function showTemplateEditor(template) {
+		editingTemplateIndex = templates.findIndex(t => t.name === template.name);
+		templateEditorTitle.textContent = 'Edit template';
+		templateName.value = template.name;
+		templateFields.innerHTML = '';
+		template.fields.forEach(field => addFieldToEditor(field.name, field.value));
+	}
 
-    function updateVaultList() {
-        vaultList.innerHTML = '';
-        vaults.forEach((vault, index) => {
-            const li = document.createElement('li');
-            li.textContent = vault;
+	function addFieldToEditor(name = '', value = '') {
+		const fieldDiv = document.createElement('div');
+		fieldDiv.innerHTML = `
+			<input type="text" class="field-name" value="${name}" placeholder="Field name">
+			<input type="text" class="field-value" value="${value}" placeholder="Field value">
+			<button type="button" class="remove-field-btn">Remove</button>
+		`;
+		templateFields.appendChild(fieldDiv);
 
-            const removeButton = document.createElement('button');
-            removeButton.textContent = 'Remove';
-            removeButton.style.marginLeft = '10px';
-            removeButton.addEventListener('click', () => {
-                vaults.splice(index, 1);
-                updateVaultList();
-                saveSettings(); // Auto-save after removing a vault
-            });
+		fieldDiv.querySelector('.remove-field-btn').addEventListener('click', () => {
+			templateFields.removeChild(fieldDiv);
+		});
+	}
 
-            li.appendChild(removeButton);
-            vaultList.appendChild(li);
-        });
-    }
+	templateSelect.addEventListener('change', () => {
+		const selectedTemplate = templates.find(t => t.name === templateSelect.value);
+		if (selectedTemplate) {
+			showTemplateEditor(selectedTemplate);
+		}
+	});
 
-    function saveSettings() {
-        const folderName = folderNameInput.value;
-        const tags = tagsInput.value;
+	newTemplateBtn.addEventListener('click', () => {
+		editingTemplateIndex = -1;
+		templateEditorTitle.textContent = 'New Template';
+		templateName.value = '';
+		templateFields.innerHTML = '';
+		addFieldToEditor();
+	});
 
-        chrome.storage.sync.set({ vaults, folderName, tags }, () => {
-            console.log('Settings saved automatically.');
-        });
-    }
+	addFieldBtn.addEventListener('click', () => {
+		addFieldToEditor();
+	});
+
+	saveTemplateBtn.addEventListener('click', () => {
+		const name = templateName.value.trim();
+		if (name) {
+			const fields = Array.from(templateFields.children).map(field => ({
+				name: field.querySelector('.field-name').value.trim(),
+				value: field.querySelector('.field-value').value.trim()
+			})).filter(field => field.name);
+
+			if (editingTemplateIndex === -1) {
+				templates.push({ name, fields });
+			} else {
+				templates[editingTemplateIndex] = { name, fields };
+			}
+
+			updateTemplateSelect();
+			chrome.storage.sync.set({ templates }, () => {
+				console.log('Template saved');
+				showTemplateEditor(templates.find(t => t.name === name));
+			});
+		}
+	});
+
+	deleteTemplateBtn.addEventListener('click', () => {
+		if (editingTemplateIndex > 0) {
+			templates.splice(editingTemplateIndex, 1);
+			updateTemplateSelect();
+			showTemplateEditor(templates[0]);
+			chrome.storage.sync.set({ templates }, () => {
+				console.log('Template deleted');
+			});
+		} else {
+			alert("You cannot delete the Default template.");
+		}
+	});
+
+	// Load initial data
+	chrome.storage.sync.get(['vaults', 'folderName', 'tags'], (data) => {
+		const vaults = data.vaults || [];
+		folderNameInput.value = data.folderName || 'Clippings/';
+		tagsInput.value = data.tags || 'clippings';
+		vaults.forEach(vault => {
+			const li = document.createElement('li');
+			li.textContent = vault;
+			vaultList.appendChild(li);
+		});
+	});
+
+	loadTemplates();
+
+	// Add this function to reset the Default template
+	function resetDefaultTemplate() {
+		const defaultTemplate = createDefaultTemplate();
+		const index = templates.findIndex(t => t.name === 'Default');
+		if (index !== -1) {
+			templates[index] = defaultTemplate;
+		} else {
+			templates.unshift(defaultTemplate);
+		}
+		chrome.storage.sync.set({ templates }, () => {
+			console.log('Default template reset');
+			updateTemplateSelect();
+			showTemplateEditor(defaultTemplate);
+		});
+	}
+
+	// Add a button in the HTML to reset the Default template
+	const resetDefaultBtn = document.createElement('button');
+	resetDefaultBtn.textContent = 'Reset default template';
+	resetDefaultBtn.addEventListener('click', resetDefaultTemplate);
+	document.querySelector('.settings-section').appendChild(resetDefaultBtn);
 });

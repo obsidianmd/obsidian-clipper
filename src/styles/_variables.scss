@@ -1,0 +1,109 @@
+:root {
+	--accent-h: 258;
+	--accent-s: 88%;
+	--accent-l: 66%;
+
+	--background-modifier-border: var(--color-base-30);
+	--background-modifier-border-hover: var(--color-base-35);
+	--background-modifier-border-focus: var(--color-base-40);
+
+	--interactive-accent: var(--color-accent-1);
+	--interactive-accent-hover: var(--color-accent-2);
+
+	--input-height: 30px;
+
+	--text-normal: var(--color-base-100);
+	--text-muted: var(--color-base-70);
+	--text-faint: var(--color-base-50);
+}
+
+@media (prefers-color-scheme: light) {
+	:root {
+
+		--color-accent-hsl:
+				var(--accent-h),
+				var(--accent-s),
+				var(--accent-l);
+
+		--color-accent:
+			hsl(
+				var(--accent-h),
+				var(--accent-s),
+				var(--accent-l));
+
+		--color-accent-1:
+			hsl(
+				calc(var(--accent-h) - 1),
+				calc(var(--accent-s) * 1.01),
+				calc(var(--accent-l) * 1.075));
+
+		--color-accent-2:
+			hsl(
+				calc(var(--accent-h) - 3),
+				calc(var(--accent-s) * 1.02),
+				calc(var(--accent-l) * 1.15));
+
+		--color-base-00: #ffffff;
+		--color-base-05: #fcfcfc;
+		--color-base-10: #fafafa;
+		--color-base-20: #f6f6f6;
+		--color-base-25: #e3e3e3;
+
+		--color-base-30: #e0e0e0;
+		--color-base-35: #d4d4d4;
+		--color-base-40: #bdbdbd;
+
+		--color-base-50: #ababab;
+		--color-base-60: #707070;
+		--color-base-70: #5c5c5c;
+		--color-base-100: #222222;
+
+		--background-primary: white;
+	}
+}
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--color-accent-hsl:
+				var(--accent-h),
+				var(--accent-s),
+				var(--accent-l);
+
+		--color-accent:
+			hsl(
+				var(--accent-h),
+				var(--accent-s),
+				var(--accent-l));
+
+		--color-accent-1:
+			hsl(
+				calc(var(--accent-h) - 3),
+				calc(var(--accent-s) * 1.02),
+				calc(var(--accent-l) * 1.15));
+
+		--color-accent-2:
+			hsl(
+				calc(var(--accent-h) - 5),
+				calc(var(--accent-s) * 1.05),
+				calc(var(--accent-l) * 1.29));
+
+		--color-base-00: #1e1e1e;
+		--color-base-05: #212121;
+		--color-base-10: #242424;
+		--color-base-20: #262626;
+		--color-base-25: #2a2a2a;
+
+		--color-base-30: #363636;
+		--color-base-35: #3f3f3f;
+		--color-base-40: #555555;
+
+		--color-base-50: #666666;
+		--color-base-60: #999999;
+		--color-base-70: #b3b3b3;
+		--color-base-100: #dadada;
+
+		--background-primary: #222;
+		--interactive-accent: var(--color-accent);
+		--interactive-accent-hover: var(--color-accent-1);
+	}
+}

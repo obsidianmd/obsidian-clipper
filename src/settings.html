@@ -1,36 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Obsidian Clipper Settings</title>
-    <link rel="stylesheet" href="style.css">
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Obsidian Clipper Settings</title>
+		<link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="settings">
-      <h2>Obsidian Clipper</h2>
-      <form id="settings-form">
-          
-          <div class="settings-section">
-            <div>
-              <label for="vaultName">Vault(s)</label>
-              <input type="text" id="vaultInput" placeholder="Press enter to add a vault" />
-              <ul id="vaultList"></ul>
-            </div>
+		<div id="settings">
+			<h2>Obsidian Clipper</h2>
+			<form id="settings-form">
+					
+					<div class="settings-section">
+						<div>
+							<label for="vault-name">Vault(s)</label>
+							<input type="text" id="vault-input" placeholder="Press enter to add a vault" />
+							<ul id="vault-list"></ul>
+						</div>
 
-            <div>
-              <label for="folderName">Folder</label>
-              <input type="text" id="folderName" name="folderName" />
-            </div>
+						<div>
+							<label for="folder-name">Folder</label>
+							<input type="text" id="folder-name" name="folder-name" />
+						</div>
 
-            <div>
-              <label for="tags">Tags</label>
-              <input type="text" id="tags" name="tags" />
-            </div>
-          </div>
-      </form>
-    </div>
+						<div>
+							<label for="tags">Tags</label>
+							<input type="text" id="tags" name="tags" />
+						</div>
+					</div>
 
-    <script src="settings.js"></script>
+					<div class="settings-section">
+						<h3>Templates</h3>
+						<select id="template-select">
+							<option value="">Select a template</option>
+						</select>
+						<button type="button" id="new-template-btn">New template</button>
+						<button type="button" id="delete-template-btn">Delete template</button>
+					</div>
+
+					<div id="template-editor">
+						<h3 id="template-editor-title">Edit template</h3>
+						<input type="text" id="template-name" placeholder="Template name" />
+						<div id="template-fields"></div>
+						<button type="button" id="add-field-btn">Add property</button>
+						<button type="button" id="save-template-btn">Save template</button>
+						<button type="button" id="cancel-template-btn">Cancel</button>
+					</div>
+			</form>
+		</div>
+
+		<script src="settings.js"></script>
 </body>
 </html>
