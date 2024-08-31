@@ -173,6 +173,8 @@ document.addEventListener('DOMContentLoaded', () => {
 		const behaviorSelect = document.getElementById('template-behavior');
 		const specificNoteContainer = document.getElementById('specific-note-container');
 		const dailyNoteFormatContainer = document.getElementById('daily-note-format-container');
+		const propertiesContainer = document.getElementById('properties-container');
+		const propertiesWarning = document.getElementById('properties-warning');
 		
 		behaviorSelect.value = template ? (template.behavior || 'create') : 'create';
 		document.getElementById('specific-note-name').value = template ? (template.specificNoteName || '') : '';
@@ -186,6 +188,14 @@ document.addEventListener('DOMContentLoaded', () => {
 			const selectedBehavior = behaviorSelect.value;
 			specificNoteContainer.style.display = selectedBehavior === 'append-specific' ? 'block' : 'none';
 			dailyNoteFormatContainer.style.display = selectedBehavior === 'append-daily' ? 'block' : 'none';
+			
+			if (selectedBehavior === 'append-specific' || selectedBehavior === 'append-daily') {
+				propertiesContainer.style.display = 'none';
+				propertiesWarning.style.display = 'block';
+			} else {
+				propertiesContainer.style.display = 'block';
+				propertiesWarning.style.display = 'none';
+			}
 		}
 
 		if (template) {

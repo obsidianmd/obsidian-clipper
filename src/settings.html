@@ -42,11 +42,6 @@
 									<input type="text" id="template-name" placeholder="Template name" />
 								</div>
 								<div class="setting-item">
-									<label for="template-folder-name">File location</label>
-									<div class="setting-item-description">The folder or path where clipped notes will be saved.</div>
-									<input type="text" id="template-folder-name" placeholder="Clippings/" />
-								</div>
-								<div class="setting-item">
 									<label for="template-behavior">Behavior</label>
 									<select id="template-behavior">
 										<option value="create">Create new note</option>
@@ -56,6 +51,7 @@
 								</div>
 								<div class="setting-item" id="specific-note-container" style="display: none;">
 									<label for="specific-note-name">Note to append to</label>
+									<div class="setting-item-description">The name of the note to append to.</div>
 									<input type="text" id="specific-note-name" placeholder="Note name" />
 								</div>
 								<div class="setting-item" id="daily-note-format-container" style="display: none;">
@@ -64,14 +60,25 @@
 									<input type="text" id="daily-note-format" placeholder="YYYY-MM-DD" value="YYYY-MM-DD" />
 								</div>
 								<div class="setting-item">
+									<label for="template-folder-name">Note location</label>
+									<div class="setting-item-description">The folder or path of the note.</div>
+									<input type="text" id="template-folder-name" placeholder="Clippings/" />
+								</div>
+								<div class="setting-item">
 									<label for="url-patterns">URL patterns</label>
 									<div class="setting-item-description">Optional list of domains that will trigger this template. One per line.</div>
 									<textarea id="url-patterns" placeholder="https://example.com/" rows="2"></textarea>
 								</div>
-								<label>Properties</label>
-								<div class="setting-item-description">Properties to add to the top of the clipped note. You can use variables to automatically pre-populate data from the page.</div>
-								<div id="template-fields"></div>
-								<div class="metadata-add-button"><a id="add-field-btn">+ Add property</a></div>
+								<div id="properties-warning" style="display: none;">
+									<label>Properties</label>
+									<div class="setting-item-description">Properties are not available when appending to an existing note.</div>
+								</div>
+								<div id="properties-container">
+									<label>Properties</label>
+									<div class="setting-item-description">Properties to add to the top of the clipped note. You can use variables to automatically pre-populate data from the page.</div>
+									<div id="template-fields"></div>
+									<div class="metadata-add-button"><a id="add-field-btn">+ Add property</a></div>
+								</div>
 							</div>
 						</form>
 					</div>
