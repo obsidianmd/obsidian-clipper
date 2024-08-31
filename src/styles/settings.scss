@@ -2,6 +2,7 @@
 	margin: 0 auto;
 	padding: 0;
 	height: 100vh;
+	overflow: hidden;
 
 	h2 {
 		margin-top: 0;
@@ -16,7 +17,8 @@
 .setting-item-description {
 	color: var(--text-muted);
 	font-size: 0.8rem;
-	margin: 4px 0 8px;
+	margin: 4px 0 12px;
+	line-height: 1.3;
 }
 
 .metadata-add-button {
@@ -30,11 +32,12 @@
 .sidebar {
 	background-color: var(--background-secondary);
 	width: 25%;
+	overflow: scroll;
 	min-width: 200px;
 	max-width: 300px;
 	flex-shrink: 0;
 	border-inline-end: 1px solid var(--background-modifier-border);
-	padding: 24px 16px;
+	padding: 0 16px 24px 16px;
 
 	ul {
 		font-size: 0.857rem;
@@ -82,6 +85,7 @@
 
 .content {
 	flex-grow: 1;
+	overflow: scroll;
 }
 
 .settings-section {

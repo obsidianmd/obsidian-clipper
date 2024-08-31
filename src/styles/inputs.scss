@@ -31,6 +31,7 @@ textarea {
 	}
 }
 
+textarea::placeholder,
 input::placeholder {
 	color: var(--text-faint);
 }
@@ -41,7 +42,7 @@ input[type="text"] {
 
 label {
 	display: block;
-	margin: 16px 0 6px;
+	margin: 20px 0 6px;
 	font-weight: 600;
 	font-size: 0.875rem;
 }

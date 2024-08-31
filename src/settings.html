@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="height: 100%; overflow: hidden;">
 <head>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>Obsidian Clipper Settings</title>
 		<link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body style="height: 100%; overflow: hidden;">
 		<div id="settings">
 			
 			<div class="settings-container">
@@ -25,7 +25,8 @@
 						<h2>General settings</h2>
 						<form id="general-settings-form">
 								<div>
-									<label for="vault-name">Vault(s)</label>
+									<label for="vault-name">Vaults</label>
+									<div class="setting-item-description">By default, clipped notes are saved to the currently open vault. You can add vaults here if you want the option to save to different vaults. Vault names must match exactly what is shown in the Obsidian vault list.</div>
 									<input type="text" id="vault-input" placeholder="Press enter to add a vault" />
 									<ul id="vault-list"></ul>
 								</div>
@@ -42,7 +43,7 @@
 								</div>
 								<div class="setting-item">
 									<label for="template-folder-name">File location</label>
-									<div class="setting-item-description">The folder where the note will be saved.</div>
+									<div class="setting-item-description">Folder or path where the clipped note will be saved.</div>
 									<input type="text" id="template-folder-name" placeholder="Clippings/" />
 								</div>
 								<div class="setting-item">
@@ -51,7 +52,7 @@
 									<textarea id="url-patterns" placeholder="https://example.com/" rows="2"></textarea>
 								</div>
 								<label>Properties</label>
-								<div class="setting-item-description">Frontmatter properties that will be added to the note. You can use variables to automatically pre-fill data from the page.</div>
+								<div class="setting-item-description">Properties that will be added at the top of the clipped note. You can use variables to automatically pre-fill data from the page.</div>
 								<div id="template-fields"></div>
 								<div class="metadata-add-button"><a id="add-field-btn">+ Add property</a></div>
 							</div>
