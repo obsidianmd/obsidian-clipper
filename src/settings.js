@@ -103,9 +103,12 @@ document.addEventListener('DOMContentLoaded', () => {
 			}
 			li.addEventListener('click', (e) => {
 				if (!e.target.closest('.delete-template-btn')) {
+					document.querySelectorAll('.sidebar li[data-section]').forEach(item => item.classList.remove('active'));
 					document.querySelectorAll('#template-list li').forEach(item => item.classList.remove('active'));
 					li.classList.add('active');
 					showTemplateEditor(template);
+					document.getElementById('templates-section').classList.add('active');
+					document.getElementById('general-section').classList.remove('active');
 				}
 			});
 			li.querySelector('.delete-template-btn').addEventListener('click', (e) => {
@@ -153,17 +156,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		document.getElementById('template-editor').style.display = 'block';
 
-		const templateListItems = document.querySelectorAll('#template-list li');
-		templateListItems.forEach(item => {
-			item.classList.remove('active');
-			if (parseInt(item.dataset.index) === editingTemplateIndex) {
-				item.classList.add('active');
+		// Update sidebar state
+		document.querySelectorAll('.sidebar li[data-section]').forEach(item => item.classList.remove('active'));
+		document.querySelectorAll('#template-list li').forEach(item => item.classList.remove('active'));
+		if (editingTemplateIndex !== -1) {
+			const activeTemplateItem = document.querySelector(`#template-list li[data-index="${editingTemplateIndex}"]`);
+			if (activeTemplateItem) {
+				activeTemplateItem.classList.add('active');
 			}
-		});
+		}
 
 		document.getElementById('templates-section').classList.add('active');
 		document.getElementById('general-section').classList.remove('active');
-		document.querySelector('.sidebar li[data-section="general"]').classList.remove('active');
 	}
 
 	function addFieldToEditor(name = '', value = '') {
@@ -291,6 +295,14 @@ document.addEventListener('DOMContentLoaded', () => {
 				sidebarItems.forEach(i => i.classList.remove('active'));
 				item.classList.add('active');
 				
+				document.querySelectorAll('#template-list li').forEach(templateItem => templateItem.classList.remove('active'));
+				
+				document.getElementById('template-editor').style.display = 'none';
+				
+				// Reset editing template index
+				editingTemplateIndex = -1;
+				
+				// Show appropriate section
 				sections.forEach(section => {
 					section.classList.remove('active');
 					if (section.id === `${sectionId}-section`) {
@@ -299,6 +311,13 @@ document.addEventListener('DOMContentLoaded', () => {
 				});
 			});
 		});
+	}
+
+	function handleGeneralClick() {
+		const templateListItems = document.querySelectorAll('#template-list li');
+		templateListItems.forEach(item => item.classList.remove('active'));
+		editingTemplateIndex = -1; // Reset the editing template index
+		document.getElementById('template-editor').style.display = 'none'; // Hide the template editor
 	}
 
 	function initializeSettings() {

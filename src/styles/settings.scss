@@ -40,13 +40,13 @@
 			cursor: pointer;
 			padding: 6px;
 			border-radius: 4px;
+			user-select: none;
 
 			&:hover {
 				background-color: var(--background-modifier-hover);
 			}
 			&.active {
-				background-color: var(--interactive-accent);
-				color: var(--text-on-accent);
+				background-color: var(--background-modifier-hover);
 			}
 		}
 	}
