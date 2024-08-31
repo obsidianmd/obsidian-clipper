@@ -170,6 +170,24 @@ document.addEventListener('DOMContentLoaded', () => {
 		const folderNameInput = document.getElementById('template-folder-name');
 		folderNameInput.value = template ? template.folderName : 'Clippings/';
 
+		const behaviorSelect = document.getElementById('template-behavior');
+		const specificNoteContainer = document.getElementById('specific-note-container');
+		const dailyNoteFormatContainer = document.getElementById('daily-note-format-container');
+		
+		behaviorSelect.value = template ? (template.behavior || 'create') : 'create';
+		document.getElementById('specific-note-name').value = template ? (template.specificNoteName || '') : '';
+		document.getElementById('daily-note-format').value = template ? (template.dailyNoteFormat || 'YYYY-MM-DD') : 'YYYY-MM-DD';
+
+		updateBehaviorFields();
+
+		behaviorSelect.addEventListener('change', updateBehaviorFields);
+
+		function updateBehaviorFields() {
+			const selectedBehavior = behaviorSelect.value;
+			specificNoteContainer.style.display = selectedBehavior === 'append-specific' ? 'block' : 'none';
+			dailyNoteFormatContainer.style.display = selectedBehavior === 'append-daily' ? 'block' : 'none';
+		}
+
 		if (template) {
 			template.fields.forEach(field => addFieldToEditor(field.name, field.value));
 		} else {
@@ -276,7 +294,19 @@ document.addEventListener('DOMContentLoaded', () => {
 				.map(pattern => pattern.trim())
 				.filter(pattern => pattern !== '') : [];
 	
-			const newTemplate = { name, folderName, fields, urlPatterns };
+			const behavior = document.getElementById('template-behavior').value;
+			const specificNoteName = document.getElementById('specific-note-name').value.trim();
+			const dailyNoteFormat = document.getElementById('daily-note-format').value.trim();
+
+			const newTemplate = { 
+				name, 
+				folderName, 
+				fields, 
+				urlPatterns,
+				behavior,
+				specificNoteName,
+				dailyNoteFormat
+			};
 	
 			if (editingTemplateIndex === -1) {
 				templates.push(newTemplate);

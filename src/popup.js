@@ -273,10 +273,30 @@ function getMetaContent(doc, attr, value) {
 }
 
 function saveToObsidian(fileContent, fileName, folder, vault) {
-	const vaultParam = vault ? `&vault=${encodeURIComponent(vault)}` : '';
-	const obsidianUrl = `obsidian://new?file=${encodeURIComponent(folder + fileName)}&content=${encodeURIComponent(fileContent)}${vaultParam}`;
-	
-	chrome.tabs.create({ url: obsidianUrl }, function(tab) {
-		setTimeout(() => chrome.tabs.remove(tab.id), 500);
+	chrome.storage.sync.get(['templates'], (data) => {
+		const selectedTemplate = document.getElementById('template-select').value;
+		const template = data.templates.find(t => t.name === selectedTemplate) || data.templates[0];
+
+		let obsidianUrl = `obsidian://new?file=${encodeURIComponent(folder + fileName)}`;
+
+		if (template.behavior === 'append-specific' || template.behavior === 'append-daily') {
+			let appendFileName;
+			if (template.behavior === 'append-specific') {
+				appendFileName = template.specificNoteName;
+			} else {
+				const moment = window.moment;
+				appendFileName = moment().format(template.dailyNoteFormat);
+			}
+			obsidianUrl = `obsidian://new?file=${encodeURIComponent(folder + appendFileName)}&append=true`;
+		}
+
+		obsidianUrl += `&content=${encodeURIComponent(fileContent)}`;
+
+		const vaultParam = vault ? `&vault=${encodeURIComponent(vault)}` : '';
+		obsidianUrl += vaultParam;
+
+		chrome.tabs.create({ url: obsidianUrl }, function(tab) {
+			setTimeout(() => chrome.tabs.remove(tab.id), 500);
+		});
 	});
 }

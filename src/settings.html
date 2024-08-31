@@ -47,6 +47,22 @@
 									<input type="text" id="template-folder-name" placeholder="Clippings/" />
 								</div>
 								<div class="setting-item">
+									<label for="template-behavior">Behavior</label>
+									<select id="template-behavior">
+										<option value="create">Create new note</option>
+										<option value="append-specific">Append to specific note</option>
+										<option value="append-daily">Append to daily note</option>
+									</select>
+								</div>
+								<div class="setting-item" id="specific-note-container" style="display: none;">
+									<label for="specific-note-name">Note to append to</label>
+									<input type="text" id="specific-note-name" placeholder="Note name" />
+								</div>
+								<div class="setting-item" id="daily-note-format-container" style="display: none;">
+									<label for="daily-note-format">Daily note format</label>
+									<input type="text" id="daily-note-format" placeholder="YYYY-MM-DD" value="YYYY-MM-DD" />
+								</div>
+								<div class="setting-item">
 									<label for="url-patterns">URL patterns</label>
 									<div class="setting-item-description">Optional list of domains that will trigger this template. One per line.</div>
 									<textarea id="url-patterns" placeholder="https://example.com/" rows="2"></textarea>
