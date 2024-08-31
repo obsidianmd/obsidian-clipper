@@ -20,6 +20,7 @@
 	},
 	"dependencies": {
 		"@mozilla/readability": "^0.5.0",
+		"dayjs": "^1.11.13",
 		"lucide": "^0.359.0",
 		"turndown": "^7.2.0",
 		"turndown-plugin-gfm": "^1.0.2"

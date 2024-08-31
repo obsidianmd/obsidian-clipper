@@ -1,6 +1,7 @@
 import TurndownService from 'turndown';
 import { gfm, tables, strikethrough } from 'turndown-plugin-gfm';
 import { Readability } from '@mozilla/readability';
+import dayjs from 'dayjs';
 
 let currentUrl = '';
 let currentTitle = '';
@@ -16,7 +17,7 @@ function findMatchingTemplate(url, templates) {
 document.addEventListener('DOMContentLoaded', function() {
 	const vaultDropdown = document.getElementById('vault-dropdown');
 	const templateSelect = document.getElementById('template-select');
-	const templateFields = document.querySelector('.metadata-properties');
+	const templateProperties = document.querySelector('.metadata-properties');
 	const vaultContainer = document.getElementById('vault-container');
 	const templateContainer = document.getElementById('template-container');
 	
@@ -49,10 +50,10 @@ document.addEventListener('DOMContentLoaded', function() {
 				}
 			});
 			templateContainer.style.display = 'block';
-			updateTemplateFields(data.templates[0]);
+			updateTemplateProperties(data.templates[0]);
 		} else {
 			// If only Default template exists, use it without showing the dropdown
-			updateTemplateFields(data.templates[0]);
+			updateTemplateProperties(data.templates[0]);
 		}
 	});
 
@@ -61,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		chrome.storage.sync.get(['templates'], (data) => {
 			const selectedTemplate = data.templates.find(t => t.name === this.value);
 			if (selectedTemplate) {
-				updateTemplateFields(selectedTemplate);
+				updateTemplateProperties(selectedTemplate);
 				templateContainer.style.display = 'block'; // Show template select if multiple templates exist
 			}
 		});
@@ -83,7 +84,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			if (matchingTemplate) {
 				const templateSelect = document.getElementById('template-select');
 				templateSelect.value = matchingTemplate.name;
-				updateTemplateFields(matchingTemplate);
+				updateTemplateProperties(matchingTemplate);
 			}
 
 			chrome.tabs.sendMessage(tabs[0].id, {action: "getPageContent"}, function(response) {
@@ -127,29 +128,29 @@ function initializePageContent(content) {
 		'{{image}}': image
 	};
 
-	updateTemplateFieldsWithVariables();
+	updateTemplatePropertiesWithVariables();
 }
 
-function updateTemplateFields(template) {
-	const templateFields = document.querySelector('.metadata-properties');
-	templateFields.innerHTML = '';
+function updateTemplateProperties(template) {
+	const templateProperties = document.querySelector('.metadata-properties');
+	templateProperties.innerHTML = '';
 
-	template.fields.forEach(field => {
-		const fieldDiv = document.createElement('div');
-		fieldDiv.className = 'metadata-property';
-		fieldDiv.innerHTML = `
-			<label for="${field.name}">${field.name}</label>
-			<input id="${field.name}" type="text" value="${field.value}" />
+	template.properties.forEach(property => {
+		const propertyDiv = document.createElement('div');
+		propertyDiv.className = 'metadata-property';
+		propertyDiv.innerHTML = `
+			<label for="${property.name}">${property.name}</label>
+			<input id="${property.name}" type="text" value="${property.value}" />
 		`;
-		templateFields.appendChild(fieldDiv);
+		templateProperties.appendChild(propertyDiv);
 	});
 
-	updateTemplateFieldsWithVariables();
+	updateTemplatePropertiesWithVariables();
 }
 
-function updateTemplateFieldsWithVariables() {
-	const templateFields = document.querySelector('.metadata-properties');
-	const inputs = templateFields.querySelectorAll('input');
+function updateTemplatePropertiesWithVariables() {
+	const templateProperties = document.querySelector('.metadata-properties');
+	const inputs = templateProperties.querySelectorAll('input');
 
 	inputs.forEach(input => {
 		let value = input.value;
@@ -201,7 +202,12 @@ function createMarkdownContent(content, url) {
 		}
 	});
 
-	return turndownService.turndown(readableContent);
+	let markdown = turndownService.turndown(readableContent);
+
+	// Add a heading with the page title at the top of the content
+	markdown = `# ${currentTitle}\n\n${markdown}`;
+
+	return markdown;
 }
 
 document.getElementById('clip-button').addEventListener('click', function() {
@@ -216,16 +222,21 @@ document.getElementById('clip-button').addEventListener('click', function() {
 					
 					const markdownBody = createMarkdownContent(response.content, tabs[0].url);
 					
-					const frontmatter = template.fields.reduce((acc, field) => {
-						let value = field.value;
-						Object.keys(currentVariables).forEach(variable => {
-							value = value.replace(new RegExp(variable, 'g'), currentVariables[variable]);
-						});
-						return acc + `${field.name}: ${value}\n`;
-					}, '---\n') + '---\n';
+					let fileContent;
+					if (template.behavior === 'create') {
+						const frontmatter = template.properties.reduce((acc, property) => {
+							let value = property.value;
+							Object.keys(currentVariables).forEach(variable => {
+								value = value.replace(new RegExp(variable, 'g'), currentVariables[variable]);
+							});
+							return acc + `${property.name}: ${value}\n`;
+						}, '---\n') + '---\n';
+						fileContent = frontmatter + markdownBody;
+					} else {
+						fileContent = markdownBody;
+					}
 
-					const fileContent = frontmatter + markdownBody;
-					saveToObsidian(fileContent, fileName, template.folderName, selectedVault);
+					saveToObsidian(fileContent, fileName, template.folderName, selectedVault, template.behavior, template.specificNoteName, template.dailyNoteFormat);
 				});
 			} else {
 				showError('Unable to retrieve page content. Try reloading the page.');
@@ -233,6 +244,35 @@ document.getElementById('clip-button').addEventListener('click', function() {
 		});
 	});
 });
+
+function saveToObsidian(fileContent, fileName, folder, vault, behavior, specificNoteName, dailyNoteFormat) {
+	let obsidianUrl;
+	let content = fileContent;
+
+	if (behavior === 'append-specific' || behavior === 'append-daily') {
+		let appendFileName;
+		if (behavior === 'append-specific') {
+			appendFileName = specificNoteName;
+		} else {
+			appendFileName = dayjs().format(dailyNoteFormat);
+		}
+		obsidianUrl = `obsidian://new?file=${encodeURIComponent(folder + appendFileName)}&append=true`;
+		
+		// Add newlines at the beginning to separate from existing content
+		content = '\n\n' + content;
+	} else {
+		obsidianUrl = `obsidian://new?file=${encodeURIComponent(folder + fileName)}`;
+	}
+
+	obsidianUrl += `&content=${encodeURIComponent(content)}`;
+
+	const vaultParam = vault ? `&vault=${encodeURIComponent(vault)}` : '';
+	obsidianUrl += vaultParam;
+
+	chrome.tabs.create({ url: obsidianUrl }, function(tab) {
+		setTimeout(() => chrome.tabs.remove(tab.id), 500);
+	});
+}
 
 document.getElementById('open-settings').addEventListener('click', function() {
 	chrome.runtime.openOptionsPage();
@@ -261,22 +301,10 @@ function getFileName(fileName) {
 }
 
 function convertDate(date) {
-	var yyyy = date.getFullYear().toString();
-	var mm = (date.getMonth()+1).toString().padStart(2, '0');
-	var dd = date.getDate().toString().padStart(2, '0');
-	return `${yyyy}-${mm}-${dd}`;
+	return dayjs(date).format('YYYY-MM-DD');
 }
 
 function getMetaContent(doc, attr, value) {
 	var element = doc.querySelector(`meta[${attr}='${value}']`);
 	return element ? element.getAttribute("content").trim() : "";
-}
-
-function saveToObsidian(fileContent, fileName, folder, vault) {
-	const vaultParam = vault ? `&vault=${encodeURIComponent(vault)}` : '';
-	const obsidianUrl = `obsidian://new?file=${encodeURIComponent(folder + fileName)}&content=${encodeURIComponent(fileContent)}${vaultParam}`;
-	
-	chrome.tabs.create({ url: obsidianUrl }, function(tab) {
-		setTimeout(() => chrome.tabs.remove(tab.id), 500);
-	});
 }
