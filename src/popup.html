@@ -13,14 +13,18 @@
 	<p class="error-message" style="text-align: center; display: none;"></p>
 	<div class="clipper">
 		<input id="file-name-field" type="text" />
-		<select id="template-select">
-			<option value="">Select a template</option>
-		</select>
+		<div id="template-container" style="display: none;">
+			<select id="template-select">
+				<option value="">Select a template</option>
+			</select>
+		</div>
 		<div class="metadata-properties"></div>
-		<select id="vault-dropdown"></select>
+		<div id="vault-container" style="display: none;">
+			<select id="vault-dropdown"></select>
+		</div>
 		<button id="clip-button">Save in Obsidian</button>
-		<a href="#" id="open-settings" class="text-muted">Settings</a>
 	</div>
+	<a href="#" id="open-settings" class="text-muted">Settings</a>
 	<script type="module" src="popup.js"></script>
 </body>
 </html>

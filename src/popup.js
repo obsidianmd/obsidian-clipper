@@ -17,6 +17,8 @@ document.addEventListener('DOMContentLoaded', function() {
 	const vaultDropdown = document.getElementById('vault-dropdown');
 	const templateSelect = document.getElementById('template-select');
 	const templateFields = document.querySelector('.metadata-properties');
+	const vaultContainer = document.getElementById('vault-container');
+	const templateContainer = document.getElementById('template-container');
 	
 	// Load vaults from storage and populate dropdown
 	chrome.storage.sync.get(['vaults'], (data) => {
@@ -27,11 +29,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				option.textContent = vault;
 				vaultDropdown.appendChild(option);
 			});
-		} else {
-			const option = document.createElement('option');
-			option.value = '';
-			option.textContent = 'Save to my open vault';
-			vaultDropdown.appendChild(option);
+			vaultContainer.style.display = 'block'; // Show vault dropdown if custom vaults exist
 		}
 	});
 
@@ -39,26 +37,22 @@ document.addEventListener('DOMContentLoaded', function() {
 	chrome.storage.sync.get(['templates'], (data) => {
 		templateSelect.innerHTML = ''; // Clear existing options
 		
-		if (data.templates && data.templates.length > 0) {
+		if (data.templates && data.templates.length > 1) {
 			data.templates.forEach(template => {
 				const option = document.createElement('option');
 				option.value = template.name;
 				option.textContent = template.name;
 				templateSelect.appendChild(option);
-				
-				// Select the Default template
+
 				if (template.name === 'Default') {
 					option.selected = true;
 				}
 			});
+			templateContainer.style.display = 'block';
 			updateTemplateFields(data.templates[0]);
 		} else {
-			// If no templates are found, add the Default template
-			const defaultOption = document.createElement('option');
-			defaultOption.value = 'Default';
-			defaultOption.textContent = 'Default';
-			defaultOption.selected = true;
-			templateSelect.appendChild(defaultOption);
+			// If only Default template exists, use it without showing the dropdown
+			updateTemplateFields(data.templates[0]);
 		}
 	});
 
@@ -68,6 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			const selectedTemplate = data.templates.find(t => t.name === this.value);
 			if (selectedTemplate) {
 				updateTemplateFields(selectedTemplate);
+				templateContainer.style.display = 'block'; // Show template select if multiple templates exist
 			}
 		});
 	});

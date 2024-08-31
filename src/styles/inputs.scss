@@ -1,6 +1,9 @@
 textarea {
 	resize: vertical;
 }
+select {
+	user-select: none;
+}
 select,
 input[type="text"],
 textarea {
