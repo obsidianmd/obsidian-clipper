@@ -7,8 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
 	const templateEditor = document.getElementById('template-editor');
 	const templateEditorTitle = document.getElementById('template-editor-title');
 	const templateName = document.getElementById('template-name');
-	const templateFields = document.getElementById('template-fields');
-	const addFieldBtn = document.getElementById('add-field-btn');
+	const templateProperties = document.getElementById('template-properties');
+	const addPropertyBtn = document.getElementById('add-property-btn');
 
 	let templates = [];
 	let editingTemplateIndex = -1;
@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		return {
 			name: 'Default',
 			folderName: 'Clippings/',
-			fields: [
+			properties: [
 				{ name: 'title', value: '{{title}}' },
 				{ name: 'source', value: '{{url}}' },
 				{ name: 'author', value: '{{authorLink}}' },
@@ -155,7 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		editingTemplateIndex = -1;
 		templateEditorTitle.textContent = 'New template';
 		templateName.value = '';
-		templateFields.innerHTML = '';
+		templateProperties.innerHTML = '';
 		document.getElementById('template-folder-name').value = 'Clippings/';
 		document.getElementById('url-patterns').value = '';
 		document.getElementById('template-editor').style.display = 'none';
@@ -165,7 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		editingTemplateIndex = template ? templates.findIndex(t => t.name === template.name) : -1;
 		templateEditorTitle.textContent = template ? 'Edit template' : 'New template';
 		templateName.value = template ? template.name : '';
-		templateFields.innerHTML = '';
+		templateProperties.innerHTML = '';
 
 		const folderNameInput = document.getElementById('template-folder-name');
 		folderNameInput.value = template ? template.folderName : 'Clippings/';
@@ -198,10 +198,11 @@ document.addEventListener('DOMContentLoaded', () => {
 			}
 		}
 
-		if (template) {
-			template.fields.forEach(field => addFieldToEditor(field.name, field.value));
+		if (template && Array.isArray(template.properties)) {
+			template.properties.forEach(property => addPropertyToEditor(property.name, property.value));
 		} else {
-			addFieldToEditor();
+			// If there are no properties or it's a new template, add a default property
+			addPropertyToEditor('title', '{{title}}');
 		}
 
 		const urlPatternsTextarea = document.getElementById('url-patterns');
@@ -223,19 +224,19 @@ document.addEventListener('DOMContentLoaded', () => {
 		document.getElementById('general-section').classList.remove('active');
 	}
 
-	function addFieldToEditor(name = '', value = '') {
-		const fieldDiv = document.createElement('div');
-		fieldDiv.innerHTML = `
-				<input type="text" class="field-name" value="${name}" placeholder="Field name">
-				<input type="text" class="field-value" value="${value}" placeholder="Field value">
-				<button type="button" class="remove-field-btn clickable-icon" aria-label="Remove field">
+	function addPropertyToEditor(name = '', value = '') {
+		const propertyDiv = document.createElement('div');
+		propertyDiv.innerHTML = `
+				<input type="text" class="property-name" value="${name}" placeholder="Property name">
+				<input type="text" class="property-value" value="${value}" placeholder="Property value">
+				<button type="button" class="remove-property-btn clickable-icon" aria-label="Remove property">
 					<i data-lucide="trash-2"></i>
 				</button>
 			`;
-		templateFields.appendChild(fieldDiv);
+		templateProperties.appendChild(propertyDiv);
 
-		fieldDiv.querySelector('.remove-field-btn').addEventListener('click', () => {
-			templateFields.removeChild(fieldDiv);
+		propertyDiv.querySelector('.remove-property-btn').addEventListener('click', () => {
+			templateProperties.removeChild(propertyDiv);
 		});
 
 		createIcons({
@@ -268,19 +269,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		templateForm.addEventListener('input', autoSave);
 
-		templateFields.addEventListener('click', (event) => {
-			if (event.target.classList.contains('remove-field-btn') || event.target.closest('.remove-field-btn')) {
+		templateProperties.addEventListener('click', (event) => {
+			if (event.target.classList.contains('remove-property-btn') || event.target.closest('.remove-property-btn')) {
 				autoSave();
 			}
 		});
 
-		if (addFieldBtn) {
-			addFieldBtn.addEventListener('click', () => {
-				addFieldToEditor();
+		if (addPropertyBtn) {
+			addPropertyBtn.addEventListener('click', () => {
+				addPropertyToEditor();
 				autoSave();
 			});
 		} else {
-			console.error('Add field button not found');
+			console.error('Add property button not found');
 		}
 	}
 
@@ -290,13 +291,13 @@ document.addEventListener('DOMContentLoaded', () => {
 		const folderName = folderNameInput ? folderNameInput.value.trim() : '';
 		
 		if (name) {
-			const fields = Array.from(templateFields.children)
-				.filter(field => field.querySelector('.field-name'))
-				.map(field => ({
-					name: field.querySelector('.field-name').value.trim(),
-					value: field.querySelector('.field-value').value.trim()
+			const properties = Array.from(templateProperties.children)
+				.filter(property => property.querySelector('.property-name'))
+				.map(property => ({
+					name: property.querySelector('.property-name').value.trim(),
+					value: property.querySelector('.property-value').value.trim()
 				}))
-				.filter(field => field.name);
+				.filter(property => property.name);
 	
 			const urlPatternsTextarea = document.getElementById('url-patterns');
 			const urlPatterns = urlPatternsTextarea ? urlPatternsTextarea.value
@@ -315,7 +316,7 @@ document.addEventListener('DOMContentLoaded', () => {
 				dailyNoteFormat,
 				folderName, 
 				urlPatterns,
-				fields
+				properties
 			};
 	
 			if (editingTemplateIndex === -1) {

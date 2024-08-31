@@ -17,7 +17,7 @@ function findMatchingTemplate(url, templates) {
 document.addEventListener('DOMContentLoaded', function() {
 	const vaultDropdown = document.getElementById('vault-dropdown');
 	const templateSelect = document.getElementById('template-select');
-	const templateFields = document.querySelector('.metadata-properties');
+	const templateProperties = document.querySelector('.metadata-properties');
 	const vaultContainer = document.getElementById('vault-container');
 	const templateContainer = document.getElementById('template-container');
 	
@@ -50,10 +50,10 @@ document.addEventListener('DOMContentLoaded', function() {
 				}
 			});
 			templateContainer.style.display = 'block';
-			updateTemplateFields(data.templates[0]);
+			updateTemplateProperties(data.templates[0]);
 		} else {
 			// If only Default template exists, use it without showing the dropdown
-			updateTemplateFields(data.templates[0]);
+			updateTemplateProperties(data.templates[0]);
 		}
 	});
 
@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		chrome.storage.sync.get(['templates'], (data) => {
 			const selectedTemplate = data.templates.find(t => t.name === this.value);
 			if (selectedTemplate) {
-				updateTemplateFields(selectedTemplate);
+				updateTemplateProperties(selectedTemplate);
 				templateContainer.style.display = 'block'; // Show template select if multiple templates exist
 			}
 		});
@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			if (matchingTemplate) {
 				const templateSelect = document.getElementById('template-select');
 				templateSelect.value = matchingTemplate.name;
-				updateTemplateFields(matchingTemplate);
+				updateTemplateProperties(matchingTemplate);
 			}
 
 			chrome.tabs.sendMessage(tabs[0].id, {action: "getPageContent"}, function(response) {
@@ -128,29 +128,29 @@ function initializePageContent(content) {
 		'{{image}}': image
 	};
 
-	updateTemplateFieldsWithVariables();
+	updateTemplatePropertiesWithVariables();
 }
 
-function updateTemplateFields(template) {
-	const templateFields = document.querySelector('.metadata-properties');
-	templateFields.innerHTML = '';
+function updateTemplateProperties(template) {
+	const templateProperties = document.querySelector('.metadata-properties');
+	templateProperties.innerHTML = '';
 
-	template.fields.forEach(field => {
-		const fieldDiv = document.createElement('div');
-		fieldDiv.className = 'metadata-property';
-		fieldDiv.innerHTML = `
-			<label for="${field.name}">${field.name}</label>
-			<input id="${field.name}" type="text" value="${field.value}" />
+	template.properties.forEach(property => {
+		const propertyDiv = document.createElement('div');
+		propertyDiv.className = 'metadata-property';
+		propertyDiv.innerHTML = `
+			<label for="${property.name}">${property.name}</label>
+			<input id="${property.name}" type="text" value="${property.value}" />
 		`;
-		templateFields.appendChild(fieldDiv);
+		templateProperties.appendChild(propertyDiv);
 	});
 
-	updateTemplateFieldsWithVariables();
+	updateTemplatePropertiesWithVariables();
 }
 
-function updateTemplateFieldsWithVariables() {
-	const templateFields = document.querySelector('.metadata-properties');
-	const inputs = templateFields.querySelectorAll('input');
+function updateTemplatePropertiesWithVariables() {
+	const templateProperties = document.querySelector('.metadata-properties');
+	const inputs = templateProperties.querySelectorAll('input');
 
 	inputs.forEach(input => {
 		let value = input.value;
@@ -224,12 +224,12 @@ document.getElementById('clip-button').addEventListener('click', function() {
 					
 					let fileContent;
 					if (template.behavior === 'create') {
-						const frontmatter = template.fields.reduce((acc, field) => {
-							let value = field.value;
+						const frontmatter = template.properties.reduce((acc, property) => {
+							let value = property.value;
 							Object.keys(currentVariables).forEach(variable => {
 								value = value.replace(new RegExp(variable, 'g'), currentVariables[variable]);
 							});
-							return acc + `${field.name}: ${value}\n`;
+							return acc + `${property.name}: ${value}\n`;
 						}, '---\n') + '---\n';
 						fileContent = frontmatter + markdownBody;
 					} else {
