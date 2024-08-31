@@ -1,6 +1,7 @@
 import TurndownService from 'turndown';
 import { gfm, tables, strikethrough } from 'turndown-plugin-gfm';
 import { Readability } from '@mozilla/readability';
+import dayjs from 'dayjs';
 
 let currentUrl = '';
 let currentTitle = '';
@@ -261,10 +262,7 @@ function getFileName(fileName) {
 }
 
 function convertDate(date) {
-	var yyyy = date.getFullYear().toString();
-	var mm = (date.getMonth()+1).toString().padStart(2, '0');
-	var dd = date.getDate().toString().padStart(2, '0');
-	return `${yyyy}-${mm}-${dd}`;
+	return dayjs(date).format('YYYY-MM-DD');
 }
 
 function getMetaContent(doc, attr, value) {
@@ -284,8 +282,7 @@ function saveToObsidian(fileContent, fileName, folder, vault) {
 			if (template.behavior === 'append-specific') {
 				appendFileName = template.specificNoteName;
 			} else {
-				const moment = window.moment;
-				appendFileName = moment().format(template.dailyNoteFormat);
+				appendFileName = dayjs().format(template.dailyNoteFormat);
 			}
 			obsidianUrl = `obsidian://new?file=${encodeURIComponent(folder + appendFileName)}&append=true`;
 		}

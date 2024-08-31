@@ -29,7 +29,7 @@
 	"content_scripts": [
 		{
 			"matches": ["<all_urls>"],
-			"js": ["content.js"]
+			"js": ["dayjs.min.js", "popup.js", "content.js"]
 		}
 	]
 }
