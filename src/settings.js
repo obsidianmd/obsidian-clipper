@@ -111,10 +111,13 @@ document.addEventListener('DOMContentLoaded', () => {
 					document.getElementById('general-section').classList.remove('active');
 				}
 			});
-			li.querySelector('.delete-template-btn').addEventListener('click', (e) => {
-				e.stopPropagation();
-				deleteTemplate(index);
-			});
+			const deleteBtn = li.querySelector('.delete-template-btn');
+			if (deleteBtn) {
+				deleteBtn.addEventListener('click', (e) => {
+					e.stopPropagation();
+					deleteTemplate(index);
+				});
+			}
 			templateList.appendChild(li);
 		});
 		createIcons({
@@ -128,12 +131,34 @@ document.addEventListener('DOMContentLoaded', () => {
 		if (index > 0) {
 			if (confirm(`Are you sure you want to delete the template "${templates[index].name}"?`)) {
 				templates.splice(index, 1);
+
+				if (editingTemplateIndex === index) {
+					if (templates.length > 0) {
+						const newIndex = Math.max(0, index - 1);
+						showTemplateEditor(templates[newIndex]);
+					} else {
+						clearTemplateEditor();
+					}
+				} else if (editingTemplateIndex > index) {
+					editingTemplateIndex--;
+				}
+				
 				saveTemplateSettings();
-				showTemplateEditor(templates[0]);
+				updateTemplateList();
 			}
 		} else {
 			alert("You cannot delete the Default template.");
 		}
+	}
+
+	function clearTemplateEditor() {
+		editingTemplateIndex = -1;
+		templateEditorTitle.textContent = 'New template';
+		templateName.value = '';
+		templateFields.innerHTML = '';
+		document.getElementById('template-folder-name').value = 'Clippings/';
+		document.getElementById('url-patterns').value = '';
+		document.getElementById('template-editor').style.display = 'none';
 	}
 
 	function showTemplateEditor(template) {
@@ -215,14 +240,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		templateForm.addEventListener('input', autoSave);
 
-		// Add event listener for removing fields
 		templateFields.addEventListener('click', (event) => {
 			if (event.target.classList.contains('remove-field-btn') || event.target.closest('.remove-field-btn')) {
 				autoSave();
 			}
 		});
 
-		// Move the addFieldBtn event listener here
 		if (addFieldBtn) {
 			addFieldBtn.addEventListener('click', () => {
 				addFieldToEditor();
@@ -291,18 +314,11 @@ document.addEventListener('DOMContentLoaded', () => {
 		sidebarItems.forEach(item => {
 			item.addEventListener('click', () => {
 				const sectionId = item.dataset.section;
-				
 				sidebarItems.forEach(i => i.classList.remove('active'));
 				item.classList.add('active');
-				
 				document.querySelectorAll('#template-list li').forEach(templateItem => templateItem.classList.remove('active'));
-				
 				document.getElementById('template-editor').style.display = 'none';
-				
-				// Reset editing template index
 				editingTemplateIndex = -1;
-				
-				// Show appropriate section
 				sections.forEach(section => {
 					section.classList.remove('active');
 					if (section.id === `${sectionId}-section`) {
@@ -311,13 +327,6 @@ document.addEventListener('DOMContentLoaded', () => {
 				});
 			});
 		});
-	}
-
-	function handleGeneralClick() {
-		const templateListItems = document.querySelectorAll('#template-list li');
-		templateListItems.forEach(item => item.classList.remove('active'));
-		editingTemplateIndex = -1; // Reset the editing template index
-		document.getElementById('template-editor').style.display = 'none'; // Hide the template editor
 	}
 
 	function initializeSettings() {

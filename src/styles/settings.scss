@@ -19,9 +19,18 @@
 	margin: 4px 0 8px;
 }
 
+.metadata-add-button {
+	padding-bottom: 24px;
+	font-weight: 500;
+	color: var(--text-muted);
+	font-size: 0.875rem;
+	cursor: pointer;
+}
+
 .sidebar {
 	background-color: var(--background-secondary);
 	width: 25%;
+	min-width: 200px;
 	max-width: 300px;
 	flex-shrink: 0;
 	border-inline-end: 1px solid var(--background-modifier-border);
