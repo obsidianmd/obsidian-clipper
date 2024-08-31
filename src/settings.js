@@ -310,12 +310,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 			const newTemplate = { 
 				name, 
-				folderName, 
-				fields, 
-				urlPatterns,
 				behavior,
 				specificNoteName,
-				dailyNoteFormat
+				dailyNoteFormat,
+				folderName, 
+				urlPatterns,
+				fields
 			};
 	
 			if (editingTemplateIndex === -1) {
