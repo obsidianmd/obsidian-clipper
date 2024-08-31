@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
 	const templateName = document.getElementById('template-name');
 	const templateFields = document.getElementById('template-fields');
 	const addFieldBtn = document.getElementById('add-field-btn');
-	const saveTemplateBtn = document.getElementById('save-template-btn');
 
 	let templates = [];
 	let editingTemplateIndex = -1;
@@ -72,14 +71,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		});
 	}
 
-	vaultInput.addEventListener('keypress', (e) => {
-		if (e.key === 'Enter') {
-			e.preventDefault();
-			addVault(vaultInput.value.trim());
-			vaultInput.value = '';
-		}
-	});
-
 	function loadTemplates() {
 		chrome.storage.sync.get(['templates'], (data) => {
 			templates = data.templates || [];
@@ -104,8 +95,10 @@ document.addEventListener('DOMContentLoaded', () => {
 				</button>
 			`;
 			li.dataset.index = index;
-			if (index === 0) {
+			if (index === editingTemplateIndex) {
 				li.classList.add('active');
+			}
+			if (index === 0) {
 				li.querySelector('.delete-template-btn').style.display = 'none';
 			}
 			li.addEventListener('click', (e) => {
@@ -160,7 +153,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		document.getElementById('template-editor').style.display = 'block';
 
-		// Update the active state of the template list items
 		const templateListItems = document.querySelectorAll('#template-list li');
 		templateListItems.forEach(item => {
 			item.classList.remove('active');
@@ -177,12 +169,12 @@ document.addEventListener('DOMContentLoaded', () => {
 	function addFieldToEditor(name = '', value = '') {
 		const fieldDiv = document.createElement('div');
 		fieldDiv.innerHTML = `
-					<input type="text" class="field-name" value="${name}" placeholder="Field name">
-					<input type="text" class="field-value" value="${value}" placeholder="Field value">
-					<button type="button" class="remove-field-btn clickable-icon" aria-label="Remove field">
-						<i data-lucide="trash-2"></i>
-					</button>
-				`;
+				<input type="text" class="field-name" value="${name}" placeholder="Field name">
+				<input type="text" class="field-value" value="${value}" placeholder="Field value">
+				<button type="button" class="remove-field-btn clickable-icon" aria-label="Remove field">
+					<i data-lucide="trash-2"></i>
+				</button>
+			`;
 		templateFields.appendChild(fieldDiv);
 
 		fieldDiv.querySelector('.remove-field-btn').addEventListener('click', () => {
@@ -196,34 +188,52 @@ document.addEventListener('DOMContentLoaded', () => {
 		});
 	}
 
-	document.getElementById('template-list').addEventListener('click', (event) => {
-		if (event.target.tagName === 'LI') {
-			const selectedTemplate = templates[event.target.dataset.index];
-			if (selectedTemplate) {
-				showTemplateEditor(selectedTemplate);
-			}
+	function initializeAutoSave() {
+		const templateForm = document.getElementById('template-settings-form');
+		if (!templateForm) {
+			console.error('Template form not found');
+			return;
 		}
-	});
 
-	newTemplateBtn.addEventListener('click', () => {
-		showTemplateEditor(null);
-		document.getElementById('template-editor').style.display = 'block';
-	});
+		const debounce = (func, delay) => {
+			let debounceTimer;
+			return function() {
+				const context = this;
+				const args = arguments;
+				clearTimeout(debounceTimer);
+				debounceTimer = setTimeout(() => func.apply(context, args), delay);
+			}
+		};
 
-	addFieldBtn.addEventListener('click', () => {
-		addFieldToEditor();
-	});
+		const autoSave = debounce(() => {
+			saveTemplateSettings();
+		}, 500);
 
-	function saveTemplateSettings() {
-		chrome.storage.sync.set({ templates }, () => {
-			console.log('Template settings saved');
-			updateTemplateList();
+		templateForm.addEventListener('input', autoSave);
+
+		// Add event listener for removing fields
+		templateFields.addEventListener('click', (event) => {
+			if (event.target.classList.contains('remove-field-btn') || event.target.closest('.remove-field-btn')) {
+				autoSave();
+			}
 		});
+
+		// Move the addFieldBtn event listener here
+		if (addFieldBtn) {
+			addFieldBtn.addEventListener('click', () => {
+				addFieldToEditor();
+				autoSave();
+			});
+		} else {
+			console.error('Add field button not found');
+		}
 	}
 
-	saveTemplateBtn.addEventListener('click', () => {
+	function saveTemplateSettings() {
 		const name = templateName.value.trim();
-		const folderName = document.getElementById('template-folder-name').value.trim();
+		const folderNameInput = document.getElementById('template-folder-name');
+		const folderName = folderNameInput ? folderNameInput.value.trim() : '';
+		
 		if (name) {
 			const fields = Array.from(templateFields.children)
 				.filter(field => field.querySelector('.field-name'))
@@ -232,27 +242,28 @@ document.addEventListener('DOMContentLoaded', () => {
 					value: field.querySelector('.field-value').value.trim()
 				}))
 				.filter(field => field.name);
-
-			const urlPatterns = document.getElementById('url-patterns').value
+	
+			const urlPatternsTextarea = document.getElementById('url-patterns');
+			const urlPatterns = urlPatternsTextarea ? urlPatternsTextarea.value
 				.split('\n')
 				.map(pattern => pattern.trim())
-				.filter(pattern => pattern !== '');
-
+				.filter(pattern => pattern !== '') : [];
+	
 			const newTemplate = { name, folderName, fields, urlPatterns };
-
+	
 			if (editingTemplateIndex === -1) {
 				templates.push(newTemplate);
+				editingTemplateIndex = templates.length - 1;
 			} else {
 				templates[editingTemplateIndex] = newTemplate;
 			}
-
-			saveTemplateSettings();
-			showTemplateEditor(newTemplate);
+	
+			chrome.storage.sync.set({ templates }, () => {
+				console.log('Template settings auto-saved');
+				updateTemplateList();
+			});
 		}
-	});
-
-	loadGeneralSettings();
-	loadTemplates();
+	}
 
 	function resetDefaultTemplate() {
 		const defaultTemplate = createDefaultTemplate();
@@ -269,19 +280,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		});
 	}
 
-	// Add a button in the HTML to reset the Default template
-	const resetDefaultBtn = document.createElement('button');
-	resetDefaultBtn.textContent = 'Reset default template';
-	resetDefaultBtn.addEventListener('click', resetDefaultTemplate);
-	document.querySelector('.settings-section').appendChild(resetDefaultBtn);
-
-	// Initialize all Lucide icons
-	createIcons({
-		icons: {
-			Trash2
-		}
-	});
-
 	function initializeSidebar() {
 		const sidebarItems = document.querySelectorAll('.sidebar li[data-section]');
 		const sections = document.querySelectorAll('.settings-section');
@@ -290,7 +288,6 @@ document.addEventListener('DOMContentLoaded', () => {
 			item.addEventListener('click', () => {
 				const sectionId = item.dataset.section;
 				
-				// Update active states
 				sidebarItems.forEach(i => i.classList.remove('active'));
 				item.classList.add('active');
 				
@@ -308,6 +305,62 @@ document.addEventListener('DOMContentLoaded', () => {
 		loadGeneralSettings();
 		loadTemplates();
 		initializeSidebar();
+		initializeAutoSave();
+
+		const settingsSection = document.querySelector('.settings-section');
+		if (settingsSection) {
+			const resetDefaultBtn = document.createElement('button');
+			resetDefaultBtn.textContent = 'Reset default template';
+			resetDefaultBtn.addEventListener('click', resetDefaultTemplate);
+			settingsSection.appendChild(resetDefaultBtn);
+		} else {
+			console.error('Settings section not found');
+		}
+
+		createIcons({
+			icons: {
+				Trash2
+			}
+		});
+	}
+
+	// Event Listeners
+	if (vaultInput) {
+		vaultInput.addEventListener('keypress', (e) => {
+			if (e.key === 'Enter') {
+				e.preventDefault();
+				addVault(vaultInput.value.trim());
+				vaultInput.value = '';
+			}
+		});
+	} else {
+		console.error('Vault input not found');
+	}
+
+	const templateList = document.getElementById('template-list');
+	if (templateList) {
+		templateList.addEventListener('click', (event) => {
+			if (event.target.tagName === 'LI') {
+				const selectedTemplate = templates[event.target.dataset.index];
+				if (selectedTemplate) {
+					showTemplateEditor(selectedTemplate);
+				}
+			}
+		});
+	} else {
+		console.error('Template list not found');
+	}
+
+	if (newTemplateBtn) {
+		newTemplateBtn.addEventListener('click', () => {
+			showTemplateEditor(null);
+			const templateEditor = document.getElementById('template-editor');
+			if (templateEditor) {
+				templateEditor.style.display = 'block';
+			}
+		});
+	} else {
+		console.error('New template button not found');
 	}
 
 	initializeSettings();
