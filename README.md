@@ -1,6 +1,6 @@
 WIP. Turning the [Obsidian web clipper bookmarklet](https://stephango.com/obsidian-web-clipper) into a proper Chrome extension.
 
-To get it running locally:
+### Run the extension locally
 
 - `npm install`
 - `npm run dev`
