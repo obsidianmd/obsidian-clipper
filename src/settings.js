@@ -167,6 +167,13 @@ document.addEventListener('DOMContentLoaded', () => {
 		templateName.value = template ? template.name : '';
 		templateProperties.innerHTML = '';
 
+		const resetDefaultTemplateBtn = document.getElementById('reset-default-template-btn');
+		if (template && template.name === 'Default') {
+			resetDefaultTemplateBtn.style.display = 'inline-block';
+		} else {
+			resetDefaultTemplateBtn.style.display = 'none';
+		}
+
 		const folderNameInput = document.getElementById('template-folder-name');
 		folderNameInput.value = template ? template.folderName : 'Clippings/';
 
@@ -376,15 +383,8 @@ document.addEventListener('DOMContentLoaded', () => {
 		initializeSidebar();
 		initializeAutoSave();
 
-		const settingsSection = document.querySelector('.settings-section');
-		if (settingsSection) {
-			const resetDefaultBtn = document.createElement('button');
-			resetDefaultBtn.textContent = 'Reset default template';
-			resetDefaultBtn.addEventListener('click', resetDefaultTemplate);
-			settingsSection.appendChild(resetDefaultBtn);
-		} else {
-			console.error('Settings section not found');
-		}
+		const resetDefaultTemplateBtn = document.getElementById('reset-default-template-btn');
+		resetDefaultTemplateBtn.addEventListener('click', resetDefaultTemplate);
 
 		createIcons({
 			icons: {

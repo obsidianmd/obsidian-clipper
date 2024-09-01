@@ -17,7 +17,7 @@
 						<li class="sidebar-heading">Templates</li>
 					</ul>
 					<ul id="template-list"></ul>
-					<button type="button" id="new-template-btn">New template</button>
+					<button type="button" id="new-template-btn" class="mod-cta">New template</button>
 				</div>
 				
 				<div class="content">
@@ -34,13 +34,18 @@
 					</div>
 
 					<div id="templates-section" class="settings-section">
-						<h2 id="template-editor-title">Edit template</h2>
+						<div class="settings-section-header">
+							<h2 id="template-editor-title">Edit template</h2>
+							<div class="settings-section-actions">
+								<button id="reset-default-template-btn" style="display: none;">Reset</button>
+							</div>
+						</div>
 						<form id="template-settings-form">
 							<div id="template-editor">
 								<div class="setting-item">
 									<label for="template-name">Template name</label>
 									<input type="text" id="template-name" placeholder="Template name" />
-								</div>
+									</div>
 								<div class="setting-item">
 									<label for="template-behavior">Behavior</label>
 									<select id="template-behavior">

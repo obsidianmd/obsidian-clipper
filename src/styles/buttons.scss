@@ -1,0 +1,30 @@
+button {
+	cursor: pointer;
+	width: 100%;
+	background-color: var(--background-primary);
+	border-radius: 4px;
+	box-shadow: 0 0 0 1px var(--background-modifier-border);
+	height: var(--input-height);
+	user-select: none;
+	font-weight: 500;
+	padding: 4px 12px;
+	outline: none;
+	border: none;
+	&:hover {
+		background-color: var(--background-secondary);
+	}
+	&:active,
+	&:focus {
+		box-shadow: 0 0 0 2px var(--background-modifier-border-focus);
+		transition:
+		box-shadow .15s ease-in-out;
+	}
+	&.mod-cta {
+		background-color: var(--interactive-accent);
+		box-shadow: none;
+		color: var(--text-on-accent);
+		&:hover {
+			background-color: var(--interactive-accent-hover);
+		}
+	}
+}
