@@ -46,7 +46,11 @@ document.addEventListener('DOMContentLoaded', () => {
 			li.dataset.index = index;
 			const removeBtn = document.createElement('button');
 			removeBtn.textContent = 'Remove';
-			removeBtn.addEventListener('click', () => removeVault(index));
+			removeBtn.classList.add('remove-vault-btn');
+			removeBtn.addEventListener('click', (e) => {
+				e.stopPropagation();
+				removeVault(index);
+			});
 			li.appendChild(removeBtn);
 			vaultList.appendChild(li);
 		});
@@ -62,6 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	function removeVault(index) {
 		vaults.splice(index, 1);
 		saveGeneralSettings();
+		updateVaultList();
 	}
 
 	function saveGeneralSettings() {
