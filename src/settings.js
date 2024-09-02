@@ -212,9 +212,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		if (template && Array.isArray(template.properties)) {
 			template.properties.forEach(property => addPropertyToEditor(property.name, property.value));
-		} else {
-			// If there are no properties or it's a new template, add a default property
-			addPropertyToEditor('title', '{{title}}');
 		}
 
 		const urlPatternsTextarea = document.getElementById('url-patterns');
