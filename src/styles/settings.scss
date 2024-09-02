@@ -26,12 +26,17 @@
 	}
 }
 
-
 .settings-section-header {
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
+}
+
+.settings-section-actions {
+	display: flex;
+	flex-direction: row;
+	gap: 8px;
 }
 
 .setting-item-description {

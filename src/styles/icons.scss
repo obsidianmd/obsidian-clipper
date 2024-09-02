@@ -9,6 +9,7 @@ button.clickable-icon {
 	align-self: center;
 	align-items: center;
 	justify-content: center;
+	box-shadow: none;
 	svg {
 		width: 16px;
 		height: 16px;
@@ -17,5 +18,6 @@ button.clickable-icon {
 		color: var(--text-muted);
 		background-color: var(--background-modifier-hover);
 		opacity: 1;
+		box-shadow: none;
 	}
 }

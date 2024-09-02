@@ -400,6 +400,12 @@ document.addEventListener('DOMContentLoaded', () => {
 		const resetDefaultTemplateBtn = document.getElementById('reset-default-template-btn');
 		resetDefaultTemplateBtn.addEventListener('click', resetDefaultTemplate);
 
+		const exportTemplateBtn = document.getElementById('export-template-btn');
+		exportTemplateBtn.addEventListener('click', exportTemplate);
+
+		const importTemplateBtn = document.getElementById('import-template-btn');
+		importTemplateBtn.addEventListener('click', importTemplate);
+
 		createIcons({
 			icons: {
 				Trash2
@@ -407,7 +413,97 @@ document.addEventListener('DOMContentLoaded', () => {
 		});
 	}
 
-	// Event Listeners
+	function exportTemplate() {
+		if (editingTemplateIndex === -1) {
+			alert('Please select a template to export.');
+			return;
+		}
+
+		const template = templates[editingTemplateIndex];
+		const fileName = `${template.name}.obsidian-clipper.json`;
+
+		// Create a new object with the desired order of keys
+		const orderedTemplate = {
+			name: template.name,
+			behavior: template.behavior,
+			fileNameFormat: template.fileNameFormat,
+			folderName: template.folderName,
+			noteContentFormat: template.noteContentFormat,
+			properties: template.properties,
+			urlPatterns: template.urlPatterns,
+			// Add any other fields from the template object
+		};
+
+		const jsonContent = JSON.stringify(orderedTemplate, null, 2);
+
+		const blob = new Blob([jsonContent], { type: 'application/json' });
+		const url = URL.createObjectURL(blob);
+
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = fileName;
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+		URL.revokeObjectURL(url);
+	}
+
+	function importTemplate() {
+		const input = document.createElement('input');
+		input.type = 'file';
+		input.accept = '.json';
+
+		input.onchange = (event) => {
+			const file = event.target.files[0];
+			if (file) {
+				const reader = new FileReader();
+				reader.onload = (e) => {
+					try {
+						const importedTemplate = JSON.parse(e.target.result);
+						if (validateImportedTemplate(importedTemplate)) {
+							// Check if a template with the same name already exists
+							const existingIndex = templates.findIndex(t => t.name === importedTemplate.name);
+							if (existingIndex !== -1) {
+								if (confirm(`A template named "${importedTemplate.name}" already exists. Do you want to replace it?`)) {
+									templates[existingIndex] = importedTemplate;
+								} else {
+									// Append a number to the template name to make it unique
+									let newName = importedTemplate.name;
+									let counter = 1;
+									while (templates.some(t => t.name === newName)) {
+										newName = `${importedTemplate.name} (${counter})`;
+										counter++;
+									}
+									importedTemplate.name = newName;
+									templates.push(importedTemplate);
+								}
+							} else {
+								templates.push(importedTemplate);
+							}
+							saveTemplateSettings();
+							updateTemplateList();
+							showTemplateEditor(importedTemplate);
+							alert('Template imported successfully!');
+						} else {
+							alert('Invalid template file. Please check the file format and try again.');
+						}
+					} catch (error) {
+						console.error('Error parsing imported template:', error);
+						alert('Error importing template. Please check the file and try again.');
+					}
+				};
+				reader.readAsText(file);
+			}
+		};
+
+		input.click();
+	}
+
+	function validateImportedTemplate(template) {
+		const requiredFields = ['name', 'behavior', 'folderName', 'properties', 'noteContentFormat'];
+		return requiredFields.every(field => template.hasOwnProperty(field));
+	}
+
 	if (vaultInput) {
 		vaultInput.addEventListener('keypress', (e) => {
 			if (e.key === 'Enter') {
