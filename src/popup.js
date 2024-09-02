@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 			chrome.tabs.sendMessage(tabs[0].id, {action: "getPageContent"}, function(response) {
 				if (response && response.content) {
-					initializePageContent(response.content);
+					initializePageContent(response.content, response.selectedHtml);
 				} else {
 					showError('Unable to retrieve page content. Try reloading the page.');
 				}
@@ -97,10 +97,10 @@ document.addEventListener('DOMContentLoaded', function() {
 	});
 });
 
-function initializePageContent(content) {
+function initializePageContent(content, selectedHtml) {
 	const parser = new DOMParser();
 	const doc = parser.parseFromString(content, 'text/html');
-	const { title: rawTitle, byline, content: readableContent } = new Readability(doc).parse();
+	const { title: rawTitle, byline } = new Readability(doc).parse();
 	
 	currentTitle = rawTitle.replace(/"/g, "'");
 	const fileName = getFileName(currentTitle);
@@ -116,7 +116,7 @@ function initializePageContent(content) {
 	const publishedDate = timeElement ? timeElement.getAttribute("datetime") : "";
 	const published = publishedDate && publishedDate.trim() !== "" ? `${convertDate(new Date(publishedDate))}` : "";
 
-	const markdownBody = createMarkdownContent(content, currentUrl);
+	const markdownBody = createMarkdownContent(content, currentUrl, selectedHtml);
 
 	currentVariables = {
 		'{{title}}': currentTitle,
@@ -212,7 +212,7 @@ function updateNoteContentField() {
 	});
 }
 
-function createMarkdownContent(content, url) {
+function createMarkdownContent(content, url, selectedHtml) {
 	const parser = new DOMParser();
 	const doc = parser.parseFromString(content, 'text/html');
 
@@ -225,11 +225,31 @@ function createMarkdownContent(content, url) {
 		}
 	}
 
-	// Handle relative URLs for both images and links
-	doc.querySelectorAll('img').forEach(img => makeUrlAbsolute(img, 'src'));
-	doc.querySelectorAll('a').forEach(link => makeUrlAbsolute(link, 'href'));
+	let markdownContent;
 
-	const { content: readableContent } = new Readability(doc).parse();
+	if (selectedHtml) {
+		// If there's selected HTML, use it directly
+		const tempDiv = document.createElement('div');
+		tempDiv.innerHTML = selectedHtml;
+		
+		// Handle relative URLs for both images and links in the selection
+		tempDiv.querySelectorAll('img').forEach(img => makeUrlAbsolute(img, 'src'));
+		tempDiv.querySelectorAll('a').forEach(link => makeUrlAbsolute(link, 'href'));
+		
+		markdownContent = tempDiv.innerHTML;
+	} else {
+		// If no selection, use Readability
+		const { content: readableContent } = new Readability(doc).parse();
+		
+		const tempDiv = document.createElement('div');
+		tempDiv.innerHTML = readableContent;
+		
+		// Handle relative URLs for both images and links in the full content
+		tempDiv.querySelectorAll('img').forEach(img => makeUrlAbsolute(img, 'src'));
+		tempDiv.querySelectorAll('a').forEach(link => makeUrlAbsolute(link, 'href'));
+		
+		markdownContent = tempDiv.innerHTML;
+	}
 
 	const turndownService = new TurndownService({
 		headingStyle: 'atx',
@@ -257,7 +277,7 @@ function createMarkdownContent(content, url) {
 		}
 	});
 
-	let markdown = turndownService.turndown(readableContent);
+	let markdown = turndownService.turndown(markdownContent);
 
 	// Remove the title from the beginning of the content if it exists
 	const titleMatch = markdown.match(/^# .+\n+/);
@@ -276,6 +296,9 @@ document.getElementById('clip-button').addEventListener('click', function() {
 					const selectedVault = document.getElementById('vault-dropdown').value;
 					const selectedTemplate = document.getElementById('template-select').value;
 					const template = data.templates.find(t => t.name === selectedTemplate) || data.templates[0];
+					
+					// Initialize popup content with the selected HTML
+					initializePageContent(response.content, response.selectedHtml);
 					
 					// Use the current value of the textarea instead of regenerating the content
 					const noteContent = document.getElementById('note-content-field').value;
