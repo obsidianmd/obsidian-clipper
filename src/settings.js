@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			behavior: 'create',
 			fileNameFormat: '{{title}}',
 			folderName: 'Clippings/',
+			noteContentFormat: '{{content}}',
 			properties: [
 				{ name: 'title', value: '{{title}}' },
 				{ name: 'source', value: '{{url}}' },
@@ -196,6 +197,9 @@ document.addEventListener('DOMContentLoaded', () => {
 		document.getElementById('daily-note-format').value = template ? (template.dailyNoteFormat || 'YYYY-MM-DD') : 'YYYY-MM-DD';
 		document.getElementById('file-name-format').value = template ? (template.fileNameFormat || '{{title}}') : '{{title}}';
 
+		const noteContentFormat = document.getElementById('note-content-format');
+		noteContentFormat.value = template ? (template.noteContentFormat || '{{content}}') : '{{content}}';
+
 		updateBehaviorFields();
 
 		behaviorSelect.addEventListener('change', updateBehaviorFields);
@@ -322,6 +326,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			const specificNoteName = document.getElementById('specific-note-name').value.trim();
 			const dailyNoteFormat = document.getElementById('daily-note-format').value.trim();
 			const fileNameFormat = document.getElementById('file-name-format').value.trim();
+			const noteContentFormat = document.getElementById('note-content-format').value.trim();
 
 			const newTemplate = { 
 				name, 
@@ -331,7 +336,8 @@ document.addEventListener('DOMContentLoaded', () => {
 				fileNameFormat,
 				folderName, 
 				urlPatterns,
-				properties
+				properties,
+				noteContentFormat
 			};
 	
 			if (editingTemplateIndex === -1) {

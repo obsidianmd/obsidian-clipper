@@ -117,6 +117,8 @@ function initializePageContent(content) {
 	const publishedDate = timeElement ? timeElement.getAttribute("datetime") : "";
 	const published = publishedDate && publishedDate.trim() !== "" ? `${convertDate(new Date(publishedDate))}` : "";
 
+	const markdownBody = createMarkdownContent(content, currentUrl);
+
 	currentVariables = {
 		'{{title}}': currentTitle,
 		'{{url}}': currentUrl,
@@ -125,11 +127,13 @@ function initializePageContent(content) {
 		'{{today}}': convertDate(new Date()),
 		'{{description}}': description,
 		'{{domain}}': currentUrl.split('://')[1].split('/')[0],
-		'{{image}}': image
+		'{{image}}': image,
+		'{{content}}': markdownBody
 	};
 
 	updateTemplatePropertiesWithVariables();
 	updateFileNameField();
+	updateNoteContentField();
 }
 
 function updateTemplateProperties(template) {
@@ -148,6 +152,7 @@ function updateTemplateProperties(template) {
 
 	updateTemplatePropertiesWithVariables();
 	updateFileNameField();
+	updateNoteContentField();
 }
 
 function updateTemplatePropertiesWithVariables() {
@@ -174,6 +179,27 @@ function updateFileNameField() {
 				fileName = fileName.replace(new RegExp(variable, 'g'), currentVariables[variable]);
 			});
 			document.getElementById('file-name-field').value = getFileName(fileName);
+		}
+	});
+}
+
+function updateNoteContentField() {
+	chrome.storage.sync.get(['templates'], (data) => {
+		const selectedTemplateName = document.getElementById('template-select').value;
+		const selectedTemplate = data.templates.find(t => t.name === selectedTemplateName) || data.templates[0];
+		
+		const noteContentField = document.getElementById('note-content-field');
+		if (noteContentField && selectedTemplate && selectedTemplate.noteContentFormat) {
+			let content = selectedTemplate.noteContentFormat;
+			Object.keys(currentVariables).forEach(variable => {
+				content = content.replace(new RegExp(variable, 'g'), currentVariables[variable]);
+			});
+			noteContentField.value = content;
+			
+			// Add event listener for content changes
+			noteContentField.addEventListener('input', function() {
+				currentVariables['{{content}}'] = this.value;
+			});
 		}
 	});
 }
@@ -221,10 +247,13 @@ function createMarkdownContent(content, url) {
 
 	let markdown = turndownService.turndown(readableContent);
 
-	// Add a heading with the page title at the top of the content
-	markdown = `# ${currentTitle}\n\n${markdown}`;
+	// Remove the title from the beginning of the content if it exists
+	const titleMatch = markdown.match(/^# .+\n+/);
+	if (titleMatch) {
+		markdown = markdown.slice(titleMatch[0].length);
+	}
 
-	return markdown;
+	return markdown.trim();
 }
 
 document.getElementById('clip-button').addEventListener('click', function() {
@@ -236,7 +265,8 @@ document.getElementById('clip-button').addEventListener('click', function() {
 					const selectedTemplate = document.getElementById('template-select').value;
 					const template = data.templates.find(t => t.name === selectedTemplate) || data.templates[0];
 					
-					const markdownBody = createMarkdownContent(response.content, tabs[0].url);
+					// Use the current value of the textarea instead of regenerating the content
+					const noteContent = document.getElementById('note-content-field').value;
 					
 					let fileContent;
 					let fileName;
@@ -248,10 +278,11 @@ document.getElementById('clip-button').addEventListener('click', function() {
 							});
 							return acc + `${property.name}: ${value}\n`;
 						}, '---\n') + '---\n';
-						fileContent = frontmatter + markdownBody;
+						
+						fileContent = frontmatter + noteContent;
 						fileName = document.getElementById('file-name-field').value;
 					} else {
-						fileContent = markdownBody;
+						fileContent = noteContent;
 						fileName = ''; // Not used for append behaviors
 					}
 

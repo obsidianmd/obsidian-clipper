@@ -14,6 +14,19 @@
 	height: 100%;
 }
 
+.settings-section {
+	display: none;
+	flex-direction: column;
+	gap: 8px;
+	max-width: 600px;
+	margin: 24px 4% 72px 4%;
+
+	&.active {
+		display: flex;
+	}
+}
+
+
 .settings-section-header {
 	display: flex;
 	flex-direction: row;
@@ -29,7 +42,7 @@
 }
 
 .metadata-add-button {
-	padding-bottom: 24px;
+	margin-bottom: 8px;
 	font-weight: 500;
 	color: var(--text-muted);
 	font-size: 0.875rem;
@@ -93,18 +106,6 @@
 .content {
 	flex-grow: 1;
 	overflow: scroll;
-}
-
-.settings-section {
-	display: none;
-	flex-direction: column;
-	gap: 8px;
-	max-width: 600px;
-	margin: 24px 4% 24px 4%;
-
-	&.active {
-		display: flex;
-	}
 }
 
 #template-properties {
