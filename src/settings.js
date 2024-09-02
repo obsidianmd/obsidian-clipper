@@ -17,6 +17,8 @@ document.addEventListener('DOMContentLoaded', () => {
 	function createDefaultTemplate() {
 		return {
 			name: 'Default',
+			behavior: 'create',
+			fileNameFormat: '{{title}}',
 			folderName: 'Clippings/',
 			properties: [
 				{ name: 'title', value: '{{title}}' },
@@ -185,12 +187,14 @@ document.addEventListener('DOMContentLoaded', () => {
 		const behaviorSelect = document.getElementById('template-behavior');
 		const specificNoteContainer = document.getElementById('specific-note-container');
 		const dailyNoteFormatContainer = document.getElementById('daily-note-format-container');
+		const fileNameFormatContainer = document.getElementById('file-name-format-container');
 		const propertiesContainer = document.getElementById('properties-container');
 		const propertiesWarning = document.getElementById('properties-warning');
 		
 		behaviorSelect.value = template ? (template.behavior || 'create') : 'create';
 		document.getElementById('specific-note-name').value = template ? (template.specificNoteName || '') : '';
 		document.getElementById('daily-note-format').value = template ? (template.dailyNoteFormat || 'YYYY-MM-DD') : 'YYYY-MM-DD';
+		document.getElementById('file-name-format').value = template ? (template.fileNameFormat || '{{title}}') : '{{title}}';
 
 		updateBehaviorFields();
 
@@ -200,6 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			const selectedBehavior = behaviorSelect.value;
 			specificNoteContainer.style.display = selectedBehavior === 'append-specific' ? 'block' : 'none';
 			dailyNoteFormatContainer.style.display = selectedBehavior === 'append-daily' ? 'block' : 'none';
+			fileNameFormatContainer.style.display = selectedBehavior === 'create' ? 'block' : 'none';
 			
 			if (selectedBehavior === 'append-specific' || selectedBehavior === 'append-daily') {
 				propertiesContainer.style.display = 'none';
@@ -219,7 +224,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		document.getElementById('template-editor').style.display = 'block';
 
-		// Update sidebar state
 		document.querySelectorAll('.sidebar li[data-section]').forEach(item => item.classList.remove('active'));
 		document.querySelectorAll('#template-list li').forEach(item => item.classList.remove('active'));
 		if (editingTemplateIndex !== -1) {
@@ -317,12 +321,14 @@ document.addEventListener('DOMContentLoaded', () => {
 			const behavior = document.getElementById('template-behavior').value;
 			const specificNoteName = document.getElementById('specific-note-name').value.trim();
 			const dailyNoteFormat = document.getElementById('daily-note-format').value.trim();
+			const fileNameFormat = document.getElementById('file-name-format').value.trim();
 
 			const newTemplate = { 
 				name, 
 				behavior,
 				specificNoteName,
 				dailyNoteFormat,
+				fileNameFormat,
 				folderName, 
 				urlPatterns,
 				properties

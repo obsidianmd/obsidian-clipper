@@ -129,6 +129,7 @@ function initializePageContent(content) {
 	};
 
 	updateTemplatePropertiesWithVariables();
+	updateFileNameField();
 }
 
 function updateTemplateProperties(template) {
@@ -146,6 +147,7 @@ function updateTemplateProperties(template) {
 	});
 
 	updateTemplatePropertiesWithVariables();
+	updateFileNameField();
 }
 
 function updateTemplatePropertiesWithVariables() {
@@ -158,6 +160,21 @@ function updateTemplatePropertiesWithVariables() {
 			value = value.replace(new RegExp(variable, 'g'), currentVariables[variable]);
 		});
 		input.value = value;
+	});
+}
+
+function updateFileNameField() {
+	chrome.storage.sync.get(['templates'], (data) => {
+		const selectedTemplateName = document.getElementById('template-select').value;
+		const selectedTemplate = data.templates.find(t => t.name === selectedTemplateName) || data.templates[0];
+		
+		if (selectedTemplate.behavior === 'create' && selectedTemplate.fileNameFormat) {
+			let fileName = selectedTemplate.fileNameFormat;
+			Object.keys(currentVariables).forEach(variable => {
+				fileName = fileName.replace(new RegExp(variable, 'g'), currentVariables[variable]);
+			});
+			document.getElementById('file-name-field').value = getFileName(fileName);
+		}
 	});
 }
 
@@ -214,8 +231,7 @@ document.getElementById('clip-button').addEventListener('click', function() {
 	chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
 		chrome.tabs.sendMessage(tabs[0].id, {action: "getPageContent"}, function(response) {
 			if (response && response.content) {
-				chrome.storage.sync.get(['folderName', 'templates'], (data) => {
-					const fileName = document.getElementById('file-name-field').value;
+				chrome.storage.sync.get(['templates'], (data) => {
 					const selectedVault = document.getElementById('vault-dropdown').value;
 					const selectedTemplate = document.getElementById('template-select').value;
 					const template = data.templates.find(t => t.name === selectedTemplate) || data.templates[0];
@@ -223,6 +239,7 @@ document.getElementById('clip-button').addEventListener('click', function() {
 					const markdownBody = createMarkdownContent(response.content, tabs[0].url);
 					
 					let fileContent;
+					let fileName;
 					if (template.behavior === 'create') {
 						const frontmatter = template.properties.reduce((acc, property) => {
 							let value = property.value;
@@ -232,8 +249,10 @@ document.getElementById('clip-button').addEventListener('click', function() {
 							return acc + `${property.name}: ${value}\n`;
 						}, '---\n') + '---\n';
 						fileContent = frontmatter + markdownBody;
+						fileName = document.getElementById('file-name-field').value;
 					} else {
 						fileContent = markdownBody;
+						fileName = ''; // Not used for append behaviors
 					}
 
 					saveToObsidian(fileContent, fileName, template.folderName, selectedVault, template.behavior, template.specificNoteName, template.dailyNoteFormat);

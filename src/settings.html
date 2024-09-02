@@ -54,6 +54,11 @@
 										<option value="append-daily">Add to daily note</option>
 									</select>
 								</div>
+								<div class="setting-item" id="file-name-format-container" style="display: none;">
+									<label for="file-name-format">Note name</label>
+									<div class="setting-item-description">Format for the file name when creating a new note. You can use variables like {{title}}, {{today}}, {{published}}, etc.</div>
+									<input type="text" id="file-name-format" placeholder="{{title}}" />
+								</div>
 								<div class="setting-item" id="specific-note-container" style="display: none;">
 									<label for="specific-note-name">Note to add to</label>
 									<div class="setting-item-description">The name of the note to add to.</div>
