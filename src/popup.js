@@ -7,7 +7,6 @@ let currentUrl = '';
 let currentTitle = '';
 let currentVariables = {};
 
-// Add this function at the beginning of the file
 function findMatchingTemplate(url, templates) {
 	return templates.find(template => 
 		template.urlPatterns && template.urlPatterns.some(pattern => url.startsWith(pattern))
@@ -30,13 +29,13 @@ document.addEventListener('DOMContentLoaded', function() {
 				option.textContent = vault;
 				vaultDropdown.appendChild(option);
 			});
-			vaultContainer.style.display = 'block'; // Show vault dropdown if custom vaults exist
+			vaultContainer.style.display = 'block';
 		}
 	});
 
 	// Load templates from storage and populate dropdown
 	chrome.storage.sync.get(['templates'], (data) => {
-		templateSelect.innerHTML = ''; // Clear existing options
+		templateSelect.innerHTML = '';
 		
 		if (data.templates && data.templates.length > 1) {
 			data.templates.forEach(template => {
@@ -63,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			const selectedTemplate = data.templates.find(t => t.name === this.value);
 			if (selectedTemplate) {
 				updateTemplateProperties(selectedTemplate);
-				templateContainer.style.display = 'block'; // Show template select if multiple templates exist
+				templateContainer.style.display = 'block';
 			}
 		});
 	});
@@ -292,7 +291,7 @@ document.getElementById('clip-button').addEventListener('click', function() {
 						fileName = document.getElementById('file-name-field').value;
 					} else {
 						fileContent = noteContent;
-						fileName = ''; // Not used for append behaviors
+						fileName = '';
 					}
 
 					saveToObsidian(fileContent, fileName, template.folderName, selectedVault, template.behavior, template.specificNoteName, template.dailyNoteFormat);
