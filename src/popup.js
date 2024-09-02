@@ -153,6 +153,15 @@ function updateTemplateProperties(template) {
 	updateTemplatePropertiesWithVariables();
 	updateFileNameField();
 	updateNoteContentField();
+
+	const folderNameField = document.getElementById('folder-name-field');
+	if (folderNameField) {
+		let folderName = template.folderName;
+		Object.keys(currentVariables).forEach(variable => {
+			folderName = folderName.replace(new RegExp(variable, 'g'), currentVariables[variable]);
+		});
+		folderNameField.value = folderName;
+	}
 }
 
 function updateTemplatePropertiesWithVariables() {
@@ -295,9 +304,19 @@ document.getElementById('clip-button').addEventListener('click', function() {
 	});
 });
 
-function saveToObsidian(fileContent, fileName, folder, vault, behavior, specificNoteName, dailyNoteFormat) {
+function saveToObsidian(fileContent, fileName, folderName, vault, behavior, specificNoteName, dailyNoteFormat) {
 	let obsidianUrl;
 	let content = fileContent;
+
+	// Process variables in folderName
+	Object.keys(currentVariables).forEach(variable => {
+		folderName = folderName.replace(new RegExp(variable, 'g'), currentVariables[variable]);
+	});
+
+	// Ensure folderName ends with a slash
+	if (folderName && !folderName.endsWith('/')) {
+		folderName += '/';
+	}
 
 	if (behavior === 'append-specific' || behavior === 'append-daily') {
 		let appendFileName;
@@ -306,12 +325,12 @@ function saveToObsidian(fileContent, fileName, folder, vault, behavior, specific
 		} else {
 			appendFileName = dayjs().format(dailyNoteFormat);
 		}
-		obsidianUrl = `obsidian://new?file=${encodeURIComponent(folder + appendFileName)}&append=true`;
+		obsidianUrl = `obsidian://new?file=${encodeURIComponent(folderName + appendFileName)}&append=true`;
 		
 		// Add newlines at the beginning to separate from existing content
 		content = '\n\n' + content;
 	} else {
-		obsidianUrl = `obsidian://new?file=${encodeURIComponent(folder + fileName)}`;
+		obsidianUrl = `obsidian://new?file=${encodeURIComponent(folderName + fileName)}`;
 	}
 
 	obsidianUrl += `&content=${encodeURIComponent(content)}`;
