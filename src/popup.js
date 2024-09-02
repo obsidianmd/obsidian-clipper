@@ -1,5 +1,5 @@
 import TurndownService from 'turndown';
-import { gfm, tables, strikethrough } from 'turndown-plugin-gfm';
+import { gfm } from 'turndown-plugin-gfm';
 import { Readability } from '@mozilla/readability';
 import dayjs from 'dayjs';
 
@@ -16,7 +16,6 @@ function findMatchingTemplate(url, templates) {
 document.addEventListener('DOMContentLoaded', function() {
 	const vaultDropdown = document.getElementById('vault-dropdown');
 	const templateSelect = document.getElementById('template-select');
-	const templateProperties = document.querySelector('.metadata-properties');
 	const vaultContainer = document.getElementById('vault-container');
 	const templateContainer = document.getElementById('template-container');
 	
@@ -385,14 +384,12 @@ function showError(message) {
 }
 
 function getFileName(noteName) {
-	var userAgent = window.navigator.userAgent,
-		platform = window.navigator.platform,
-		windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'];
-
-	if (windowsPlatforms.indexOf(platform) !== -1) {
+	const isWindows = navigator.userAgentData?.platform === 'Windows' || 
+		/Win/.test(navigator.platform);
+	if (isWindows) {
 		noteName = noteName.replace(':', '').replace(/[/\\?%*|"<>]/g, '-');
 	} else {
-		noteName = noteName.replace(':', '').replace(/\//g, '-').replace(/\\/g, '-');
+		noteName = noteName.replace(':', '').replace(/[/\\]/g, '-');
 	}
 	return noteName;
 }

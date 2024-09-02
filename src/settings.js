@@ -4,7 +4,6 @@ document.addEventListener('DOMContentLoaded', () => {
 	const vaultInput = document.getElementById('vault-input');
 	const vaultList = document.getElementById('vault-list');
 	const newTemplateBtn = document.getElementById('new-template-btn');
-	const templateEditor = document.getElementById('template-editor');
 	const templateEditorTitle = document.getElementById('template-editor-title');
 	const templateName = document.getElementById('template-name');
 	const templateProperties = document.getElementById('template-properties');
