@@ -217,13 +217,17 @@ function createMarkdownContent(content, url) {
 	const doc = parser.parseFromString(content, 'text/html');
 
 	const baseUrl = new URL(url);
-	const images = doc.querySelectorAll('img');
-	images.forEach(img => {
-		const src = img.getAttribute('src');
-		if (src && !src.startsWith('http')) {
-			img.setAttribute('src', new URL(src, baseUrl).href);
+
+	function makeUrlAbsolute(element, attributeName) {
+		const attributeValue = element.getAttribute(attributeName);
+		if (attributeValue && !attributeValue.startsWith('http') && !attributeValue.startsWith('data:') && !attributeValue.startsWith('#') && !attributeValue.startsWith('mailto:')) {
+			element.setAttribute(attributeName, new URL(attributeValue, baseUrl).href);
 		}
-	});
+	}
+
+	// Handle relative URLs for both images and links
+	doc.querySelectorAll('img').forEach(img => makeUrlAbsolute(img, 'src'));
+	doc.querySelectorAll('a').forEach(link => makeUrlAbsolute(link, 'href'));
 
 	const { content: readableContent } = new Readability(doc).parse();
 
