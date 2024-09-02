@@ -103,8 +103,8 @@ function initializePageContent(content, selectedHtml) {
 	const { title: rawTitle, byline, excerpt, lang } = new Readability(doc).parse();
 	
 	currentTitle = rawTitle.replace(/"/g, "'");
-	const fileName = getFileName(currentTitle);
-	document.getElementById('file-name-field').value = fileName;
+	const noteName = getFileName(currentTitle);
+	document.getElementById('note-name-field').value = noteName;
 
 	const author = byline || getMetaContent(doc, "name", "author") || getMetaContent(doc, "property", "author") || getMetaContent(doc, "name", "twitter:creator") || getMetaContent(doc, "property", "og:site_name");
 	const authorBrackets = author ? `"[[${author}]]"` : "";
@@ -155,13 +155,13 @@ function updateTemplateProperties(template) {
 	updateFileNameField();
 	updateNoteContentField();
 
-	const folderNameField = document.getElementById('folder-name-field');
-	if (folderNameField) {
-		let folderName = template.folderName;
+	const pathField = document.getElementById('path-name-field');
+	if (pathField) {
+		let path = template.path;
 		Object.keys(currentVariables).forEach(variable => {
-			folderName = folderName.replace(new RegExp(variable, 'g'), currentVariables[variable]);
+			path = path.replace(new RegExp(variable, 'g'), currentVariables[variable]);
 		});
-		folderNameField.value = folderName;
+		pathField.value = path;
 	}
 }
 
@@ -183,12 +183,12 @@ function updateFileNameField() {
 		const selectedTemplateName = document.getElementById('template-select').value;
 		const selectedTemplate = data.templates.find(t => t.name === selectedTemplateName) || data.templates[0];
 		
-		if (selectedTemplate.behavior === 'create' && selectedTemplate.fileNameFormat) {
-			let fileName = selectedTemplate.fileNameFormat;
+		if (selectedTemplate.behavior === 'create' && selectedTemplate.noteNameFormat) {
+			let noteName = selectedTemplate.noteNameFormat;
 			Object.keys(currentVariables).forEach(variable => {
-				fileName = fileName.replace(new RegExp(variable, 'g'), currentVariables[variable]);
+				noteName = noteName.replace(new RegExp(variable, 'g'), currentVariables[variable]);
 			});
-			document.getElementById('file-name-field').value = getFileName(fileName);
+			document.getElementById('note-name-field').value = getFileName(noteName);
 		}
 	});
 }
@@ -306,7 +306,7 @@ document.getElementById('clip-button').addEventListener('click', function() {
 					const noteContent = document.getElementById('note-content-field').value;
 					
 					let fileContent;
-					let fileName;
+					let noteName;
 					if (template.behavior === 'create') {
 						const frontmatter = template.properties.reduce((acc, property) => {
 							let value = property.value;
@@ -317,13 +317,13 @@ document.getElementById('clip-button').addEventListener('click', function() {
 						}, '---\n') + '---\n';
 						
 						fileContent = frontmatter + noteContent;
-						fileName = document.getElementById('file-name-field').value;
+						noteName = document.getElementById('note-name-field').value;
 					} else {
 						fileContent = noteContent;
-						fileName = '';
+						noteName = '';
 					}
 
-					saveToObsidian(fileContent, fileName, template.folderName, selectedVault, template.behavior, template.specificNoteName, template.dailyNoteFormat);
+					saveToObsidian(fileContent, noteName, template.path, selectedVault, template.behavior, template.specificNoteName, template.dailyNoteFormat);
 				});
 			} else {
 				showError('Unable to retrieve page content. Try reloading the page.');
@@ -332,18 +332,18 @@ document.getElementById('clip-button').addEventListener('click', function() {
 	});
 });
 
-function saveToObsidian(fileContent, fileName, folderName, vault, behavior, specificNoteName, dailyNoteFormat) {
+function saveToObsidian(fileContent, noteName, path, vault, behavior, specificNoteName, dailyNoteFormat) {
 	let obsidianUrl;
 	let content = fileContent;
 
-	// Process variables in folderName
+	// Process variables in path
 	Object.keys(currentVariables).forEach(variable => {
-		folderName = folderName.replace(new RegExp(variable, 'g'), currentVariables[variable]);
+		path = path.replace(new RegExp(variable, 'g'), currentVariables[variable]);
 	});
 
-	// Ensure folderName ends with a slash
-	if (folderName && !folderName.endsWith('/')) {
-		folderName += '/';
+	// Ensure path ends with a slash
+	if (path && !path.endsWith('/')) {
+		path += '/';
 	}
 
 	if (behavior === 'append-specific' || behavior === 'append-daily') {
@@ -353,12 +353,12 @@ function saveToObsidian(fileContent, fileName, folderName, vault, behavior, spec
 		} else {
 			appendFileName = dayjs().format(dailyNoteFormat);
 		}
-		obsidianUrl = `obsidian://new?file=${encodeURIComponent(folderName + appendFileName)}&append=true`;
+		obsidianUrl = `obsidian://new?file=${encodeURIComponent(path + appendFileName)}&append=true`;
 		
 		// Add newlines at the beginning to separate from existing content
 		content = '\n\n' + content;
 	} else {
-		obsidianUrl = `obsidian://new?file=${encodeURIComponent(folderName + fileName)}`;
+		obsidianUrl = `obsidian://new?file=${encodeURIComponent(path + noteName)}`;
 	}
 
 	obsidianUrl += `&content=${encodeURIComponent(content)}`;
@@ -384,17 +384,17 @@ function showError(message) {
 	clipper.style.display = 'none';
 }
 
-function getFileName(fileName) {
+function getFileName(noteName) {
 	var userAgent = window.navigator.userAgent,
 		platform = window.navigator.platform,
 		windowsPlatforms = ['Win32', 'Win64', 'Windows', 'WinCE'];
 
 	if (windowsPlatforms.indexOf(platform) !== -1) {
-		fileName = fileName.replace(':', '').replace(/[/\\?%*|"<>]/g, '-');
+		noteName = noteName.replace(':', '').replace(/[/\\?%*|"<>]/g, '-');
 	} else {
-		fileName = fileName.replace(':', '').replace(/\//g, '-').replace(/\\/g, '-');
+		noteName = noteName.replace(':', '').replace(/\//g, '-').replace(/\\/g, '-');
 	}
-	return fileName;
+	return noteName;
 }
 
 function convertDate(date) {

@@ -18,8 +18,8 @@ document.addEventListener('DOMContentLoaded', () => {
 		return {
 			name: 'Default',
 			behavior: 'create',
-			fileNameFormat: '{{title}}',
-			folderName: 'Clippings/',
+			noteNameFormat: '{{title}}',
+			path: 'Clippings/',
 			noteContentFormat: '{{content}}',
 			properties: [
 				{ name: 'title', value: '{{title}}' },
@@ -164,7 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		templateEditorTitle.textContent = 'New template';
 		templateName.value = '';
 		templateProperties.innerHTML = '';
-		document.getElementById('template-folder-name').value = 'Clippings/';
+		document.getElementById('template-path-name').value = 'Clippings/';
 		document.getElementById('url-patterns').value = '';
 		document.getElementById('template-editor').style.display = 'none';
 	}
@@ -182,20 +182,20 @@ document.addEventListener('DOMContentLoaded', () => {
 			resetDefaultTemplateBtn.style.display = 'none';
 		}
 
-		const folderNameInput = document.getElementById('template-folder-name');
-		folderNameInput.value = template ? template.folderName : 'Clippings/';
+		const pathInput = document.getElementById('template-path-name');
+		pathInput.value = template ? template.path : 'Clippings/';
 
 		const behaviorSelect = document.getElementById('template-behavior');
 		const specificNoteContainer = document.getElementById('specific-note-container');
 		const dailyNoteFormatContainer = document.getElementById('daily-note-format-container');
-		const fileNameFormatContainer = document.getElementById('file-name-format-container');
+		const noteNameFormatContainer = document.getElementById('note-name-format-container');
 		const propertiesContainer = document.getElementById('properties-container');
 		const propertiesWarning = document.getElementById('properties-warning');
 		
 		behaviorSelect.value = template ? (template.behavior || 'create') : 'create';
 		document.getElementById('specific-note-name').value = template ? (template.specificNoteName || '') : '';
 		document.getElementById('daily-note-format').value = template ? (template.dailyNoteFormat || 'YYYY-MM-DD') : 'YYYY-MM-DD';
-		document.getElementById('file-name-format').value = template ? (template.fileNameFormat || '{{title}}') : '{{title}}';
+		document.getElementById('note-name-format').value = template ? (template.noteNameFormat || '{{title}}') : '{{title}}';
 
 		const noteContentFormat = document.getElementById('note-content-format');
 		noteContentFormat.value = template ? (template.noteContentFormat || '{{content}}') : '{{content}}';
@@ -208,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			const selectedBehavior = behaviorSelect.value;
 			specificNoteContainer.style.display = selectedBehavior === 'append-specific' ? 'block' : 'none';
 			dailyNoteFormatContainer.style.display = selectedBehavior === 'append-daily' ? 'block' : 'none';
-			fileNameFormatContainer.style.display = selectedBehavior === 'create' ? 'block' : 'none';
+			noteNameFormatContainer.style.display = selectedBehavior === 'create' ? 'block' : 'none';
 			
 			if (selectedBehavior === 'append-specific' || selectedBehavior === 'append-daily') {
 				propertiesContainer.style.display = 'none';
@@ -304,8 +304,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	function saveTemplateSettings() {
 		const name = templateName.value.trim();
-		const folderNameInput = document.getElementById('template-folder-name');
-		const folderName = folderNameInput ? folderNameInput.value.trim() : '';
+		const pathInput = document.getElementById('template-path-name');
+		const path = pathInput ? pathInput.value.trim() : '';
 		
 		if (name) {
 			const properties = Array.from(templateProperties.children)
@@ -325,7 +325,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			const behavior = document.getElementById('template-behavior').value;
 			const specificNoteName = document.getElementById('specific-note-name').value.trim();
 			const dailyNoteFormat = document.getElementById('daily-note-format').value.trim();
-			const fileNameFormat = document.getElementById('file-name-format').value.trim();
+			const noteNameFormat = document.getElementById('note-name-format').value.trim();
 			const noteContentFormat = document.getElementById('note-content-format').value.trim();
 
 			const newTemplate = { 
@@ -333,8 +333,8 @@ document.addEventListener('DOMContentLoaded', () => {
 				behavior,
 				specificNoteName,
 				dailyNoteFormat,
-				fileNameFormat,
-				folderName, 
+				noteNameFormat,
+				path, 
 				urlPatterns,
 				properties,
 				noteContentFormat
@@ -420,14 +420,14 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 
 		const template = templates[editingTemplateIndex];
-		const fileName = `${template.name}.obsidian-clipper.json`;
+		const noteName = `${template.name}.obsidian-clipper.json`;
 
 		// Create a new object with the desired order of keys
 		const orderedTemplate = {
 			name: template.name,
 			behavior: template.behavior,
-			fileNameFormat: template.fileNameFormat,
-			folderName: template.folderName,
+			noteNameFormat: template.noteNameFormat,
+			path: template.path,
 			noteContentFormat: template.noteContentFormat,
 			properties: template.properties,
 			urlPatterns: template.urlPatterns,
@@ -441,7 +441,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		const a = document.createElement('a');
 		a.href = url;
-		a.download = fileName;
+		a.download = noteName;
 		document.body.appendChild(a);
 		a.click();
 		document.body.removeChild(a);
@@ -500,7 +500,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	function validateImportedTemplate(template) {
-		const requiredFields = ['name', 'behavior', 'folderName', 'properties', 'noteContentFormat'];
+		const requiredFields = ['name', 'behavior', 'path', 'properties', 'noteContentFormat'];
 		return requiredFields.every(field => template.hasOwnProperty(field));
 	}
 
