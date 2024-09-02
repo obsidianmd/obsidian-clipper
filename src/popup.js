@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function initializePageContent(content, selectedHtml) {
 	const parser = new DOMParser();
 	const doc = parser.parseFromString(content, 'text/html');
-	const { title: rawTitle, byline } = new Readability(doc).parse();
+	const { title: rawTitle, byline, excerpt, lang } = new Readability(doc).parse();
 	
 	currentTitle = rawTitle.replace(/"/g, "'");
 	const fileName = getFileName(currentTitle);
@@ -109,8 +109,9 @@ function initializePageContent(content, selectedHtml) {
 	const author = byline || getMetaContent(doc, "name", "author") || getMetaContent(doc, "property", "author") || getMetaContent(doc, "name", "twitter:creator") || getMetaContent(doc, "property", "og:site_name");
 	const authorBrackets = author ? `"[[${author}]]"` : "";
 
-	const description = getMetaContent(doc, "name", "description") || getMetaContent(doc, "property", "description") || getMetaContent(doc, "property", "og:description");
+	const description = excerpt || getMetaContent(doc, "name", "description") || getMetaContent(doc, "property", "description") || getMetaContent(doc, "property", "og:description");
 	const image = getMetaContent(doc, "property", "og:image") || getMetaContent(doc, "name", "twitter:image");
+	const language = lang;
 
 	const timeElement = doc.querySelector("time");
 	const publishedDate = timeElement ? timeElement.getAttribute("datetime") : "";
@@ -127,6 +128,7 @@ function initializePageContent(content, selectedHtml) {
 		'{{description}}': description,
 		'{{domain}}': currentUrl.split('://')[1].split('/')[0],
 		'{{image}}': image,
+		'{{language}}': language,
 		'{{content}}': markdownBody
 	};
 
