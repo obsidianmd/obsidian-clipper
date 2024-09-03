@@ -583,7 +583,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		const templateId = e.target.dataset.id;
 		e.dataTransfer.setData('text/plain', templateId);
 		e.target.classList.add('dragging');
-		debugLog('Drag started', { templateId });
 	}
 
 	function handleDragOver(e) {
@@ -612,11 +611,8 @@ document.addEventListener('DOMContentLoaded', () => {
 		const items = Array.from(list.children);
 		const toIndex = items.indexOf(e.target.closest('[draggable]'));
 		
-		debugLog('Drop event', { draggedTemplateId, listId: list.id, toIndex });
-
 		if (list.id === 'template-list') {
 			const fromIndex = templates.findIndex(t => t.id === draggedTemplateId);
-			debugLog('Template indices', { fromIndex, toIndex });
 			
 			if (fromIndex !== -1 && fromIndex !== toIndex) {
 				const updatedTemplates = [...templates];
@@ -624,7 +620,6 @@ document.addEventListener('DOMContentLoaded', () => {
 				updatedTemplates.splice(toIndex, 0, movedTemplate);
 				templates = updatedTemplates;
 				
-				debugLog('Templates after move', JSON.parse(JSON.stringify(templates)));
 				try {
 					await saveTemplateSettings();
 					updateTemplateList();
@@ -671,10 +666,6 @@ document.addEventListener('DOMContentLoaded', () => {
 				showTemplateEditor(templates[editingTemplateIndex]);
 				break;
 		}
-	}
-
-	function debugLog(message, data) {
-		console.log(`DEBUG: ${message}`, data);
 	}
 
 	if (vaultInput) {
