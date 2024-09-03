@@ -223,7 +223,25 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	function showTemplateEditor(template) {
-		editingTemplateIndex = template ? templates.findIndex(t => t.id === template.id) : -1;
+		if (template) {
+			editingTemplateIndex = templates.findIndex(t => t.id === template.id);
+		} else {
+
+			const newTemplate = {
+				id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+				name: 'New template',
+				behavior: 'create',
+				noteNameFormat: '{{title}}',
+				path: 'Clippings/',
+				noteContentFormat: '{{content}}',
+				properties: [],
+				urlPatterns: []
+			};
+			templates.push(newTemplate);
+			editingTemplateIndex = templates.length - 1;
+			template = newTemplate;
+		}
+
 		templateEditorTitle.textContent = template ? 'Edit template' : 'New template';
 		templateName.value = template ? template.name : '';
 		templateProperties.innerHTML = '';
@@ -285,6 +303,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		document.getElementById('templates-section').classList.add('active');
 		document.getElementById('general-section').classList.remove('active');
+
+		updateTemplateFromForm();
+		saveTemplateSettings().then(() => {
+			updateTemplateList();
+
+			if (!template.id) {
+				const templateNameField = document.getElementById('template-name');
+				if (templateNameField) {
+					templateNameField.focus();
+					templateNameField.select();
+				}
+			}
+		}).catch(error => {
+			console.error('Failed to save new template:', error);
+		});
 	}
 
 	function addPropertyToEditor(name = '', value = '', type = 'text', id = null) {
@@ -766,10 +799,6 @@ document.addEventListener('DOMContentLoaded', () => {
 	if (newTemplateBtn) {
 		newTemplateBtn.addEventListener('click', () => {
 			showTemplateEditor(null);
-			const templateEditor = document.getElementById('template-editor');
-			if (templateEditor) {
-				templateEditor.style.display = 'block';
-			}
 		});
 	}
 
