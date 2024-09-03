@@ -21,13 +21,13 @@ document.addEventListener('DOMContentLoaded', () => {
 			path: 'Clippings/',
 			noteContentFormat: '{{content}}',
 			properties: [
-				{ name: 'title', value: '{{title}}' },
-				{ name: 'source', value: '{{url}}' },
-				{ name: 'author', value: '{{authorLink}}' },
-				{ name: 'published', value: '{{published}}' },
-				{ name: 'created', value: '{{today}}' },
-				{ name: 'description', value: '{{description}}' },
-				{ name: 'tags', value: 'clippings' }
+				{ name: 'title', value: '{{title}}', type: 'text' },
+				{ name: 'source', value: '{{url}}', type: 'text' },
+				{ name: 'author', value: '{{authorLink}}', type: 'text' },
+				{ name: 'published', value: '{{published}}', type: 'date' },
+				{ name: 'created', value: '{{today}}', type: 'date' },
+				{ name: 'description', value: '{{description}}', type: 'text' },
+				{ name: 'tags', value: 'clippings', type: 'multitext' }
 			],
 			urlPatterns: []
 		};
@@ -219,7 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 
 		if (template && Array.isArray(template.properties)) {
-			template.properties.forEach(property => addPropertyToEditor(property.name, property.value));
+			template.properties.forEach(property => addPropertyToEditor(property.name, property.value, property.type));
 		}
 
 		const urlPatternsTextarea = document.getElementById('url-patterns');
@@ -240,11 +240,19 @@ document.addEventListener('DOMContentLoaded', () => {
 		document.getElementById('general-section').classList.remove('active');
 	}
 
-	function addPropertyToEditor(name = '', value = '') {
+	function addPropertyToEditor(name = '', value = '', type = 'text') {
 		const propertyDiv = document.createElement('div');
 		propertyDiv.innerHTML = `
 				<input type="text" class="property-name" value="${name}" placeholder="Property name">
 				<input type="text" class="property-value" value="${value}" placeholder="Property value">
+				<select class="property-type">
+					<option value="text" ${type === 'text' ? 'selected' : ''}>Text</option>
+					<option value="multitext" ${type === 'multitext' ? 'selected' : ''}>List</option>
+					<option value="number" ${type === 'number' ? 'selected' : ''}>Number</option>
+					<option value="checkbox" ${type === 'checkbox' ? 'selected' : ''}>Checkbox</option>
+					<option value="date" ${type === 'date' ? 'selected' : ''}>Date</option>
+					<option value="datetime" ${type === 'datetime' ? 'selected' : ''}>Date & time</option>
+				</select>
 				<button type="button" class="remove-property-btn clickable-icon" aria-label="Remove property">
 					<i data-lucide="trash-2"></i>
 				</button>
@@ -311,7 +319,8 @@ document.addEventListener('DOMContentLoaded', () => {
 				.filter(property => property.querySelector('.property-name'))
 				.map(property => ({
 					name: property.querySelector('.property-name').value.trim(),
-					value: property.querySelector('.property-value').value.trim()
+					value: property.querySelector('.property-value').value.trim(),
+					type: property.querySelector('.property-type').value
 				}))
 				.filter(property => property.name);
 	
@@ -500,7 +509,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	function validateImportedTemplate(template) {
 		const requiredFields = ['name', 'behavior', 'path', 'properties', 'noteContentFormat'];
-		return requiredFields.every(field => template.hasOwnProperty(field));
+		const validTypes = ['text', 'multitext', 'number', 'checkbox', 'date', 'datetime'];
+		return requiredFields.every(field => template.hasOwnProperty(field)) &&
+			Array.isArray(template.properties) &&
+			template.properties.every(prop => 
+				prop.hasOwnProperty('name') && 
+				prop.hasOwnProperty('value') && 
+				prop.hasOwnProperty('type') &&
+				validTypes.includes(prop.type)
+			);
 	}
 
 	if (vaultInput) {

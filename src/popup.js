@@ -370,7 +370,33 @@ async function generateFrontmatter(properties) {
 		});
 		// Handle custom selectors
 		value = await replaceSelectorsWithContent(value);
-		frontmatter += `${property.name}: ${value}\n`;
+
+		frontmatter += `${property.name}:`;
+
+		// Format the value based on the property type
+		switch (property.type) {
+			case 'multitext':
+				frontmatter += '\n';
+				const items = value.split(',').map(item => item.trim());
+				items.forEach(item => {
+					frontmatter += `  - ${item}\n`;
+				});
+				break;
+			case 'number':
+				frontmatter += ` ${parseFloat(value) || 0}\n`;
+				break;
+			case 'checkbox':
+				frontmatter += ` ${value.toLowerCase() === 'true' || value === '1'}\n`;
+				break;
+			case 'date':
+				frontmatter += ` "${dayjs(value).format('YYYY-MM-DD')}"\n`;
+				break;
+			case 'datetime':
+				frontmatter += ` "${dayjs(value).format('YYYY-MM-DD HH:mm:ss')}"\n`;
+				break;
+			default: // Text
+				frontmatter += ` "${value}"\n`;
+		}
 	}
 	frontmatter += '---\n\n';
 	return frontmatter;
