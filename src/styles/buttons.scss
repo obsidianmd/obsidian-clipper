@@ -1,6 +1,7 @@
 button {
 	cursor: pointer;
 	width: 100%;
+	color: var(--text-normal);
 	background-color: var(--background-primary);
 	border-radius: 4px;
 	box-shadow: 0 0 0 1px var(--background-modifier-border);
