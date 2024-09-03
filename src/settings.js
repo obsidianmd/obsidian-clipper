@@ -152,6 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
 					</button>
 				`;
 				li.dataset.id = template.id;
+				li.dataset.index = index;
 				li.draggable = true;
 				li.addEventListener('dragstart', handleDragStart);
 				li.addEventListener('dragover', handleDragOver);
@@ -168,6 +169,9 @@ document.addEventListener('DOMContentLoaded', () => {
 						e.stopPropagation();
 						deleteTemplate(template.id);
 					});
+				}
+				if (index === editingTemplateIndex) {
+					li.classList.add('active');
 				}
 				templateList.appendChild(li);
 			} else {
@@ -365,82 +369,80 @@ document.addEventListener('DOMContentLoaded', () => {
 			}
 		};
 
-		const autoSave = debounce(() => {
+		const autoSave = debounce(async () => {
 			if (!isReordering) {
-				saveTemplateSettings();
+				try {
+					await saveTemplateSettings();
+					updateTemplateList();
+					console.log('Auto-save completed');
+				} catch (error) {
+					console.error('Auto-save failed:', error);
+				}
 			}
 		}, 500);
 
-		templateForm.addEventListener('input', autoSave);
+		templateForm.addEventListener('input', (event) => {
+			if (editingTemplateIndex !== -1) {
+				updateTemplateFromForm();
+				autoSave();
+			}
+		});
 
 		templateProperties.addEventListener('click', (event) => {
 			if (event.target.classList.contains('remove-property-btn') || event.target.closest('.remove-property-btn')) {
-				autoSave();
+				if (editingTemplateIndex !== -1) {
+					updateTemplateFromForm();
+					autoSave();
+				}
 			}
 		});
 
 		if (addPropertyBtn) {
 			addPropertyBtn.addEventListener('click', () => {
 				addPropertyToEditor();
-				autoSave();
+				if (editingTemplateIndex !== -1) {
+					updateTemplateFromForm();
+					autoSave();
+				}
 			});
 		} else {
 			console.error('Add property button not found');
 		}
 	}
 
-	function saveTemplateSettings() {
-		const name = templateName.value.trim();
-		const pathInput = document.getElementById('template-path-name');
-		const path = pathInput ? pathInput.value.trim() : '';
-		
-		if (name) {
-			const properties = Array.from(templateProperties.children)
-				.filter(property => property.querySelector('.property-name'))
-				.map(property => ({
-					name: property.querySelector('.property-name').value.trim(),
-					value: property.querySelector('.property-value').value.trim(),
-					type: property.querySelector('.property-type').value
-				}))
-				.filter(property => property.name);
-	
-			const urlPatternsTextarea = document.getElementById('url-patterns');
-			const urlPatterns = urlPatternsTextarea ? urlPatternsTextarea.value
-				.split('\n')
-				.map(pattern => pattern.trim())
-				.filter(pattern => pattern !== '') : [];
-	
-			const behavior = document.getElementById('template-behavior').value;
-			const specificNoteName = document.getElementById('specific-note-name').value.trim();
-			const dailyNoteFormat = document.getElementById('daily-note-format').value.trim();
-			const noteNameFormat = document.getElementById('note-name-format').value.trim();
-			const noteContentFormat = document.getElementById('note-content-format').value.trim();
+	function updateTemplateFromForm() {
+		if (editingTemplateIndex === -1) return;
 
-			const newTemplate = { 
-				id: editingTemplateIndex === -1 ? Date.now().toString() + Math.random().toString(36).substr(2, 9) : templates[editingTemplateIndex].id,
-				name, 
-				behavior,
-				specificNoteName,
-				dailyNoteFormat,
-				noteNameFormat,
-				path, 
-				urlPatterns,
-				properties,
-				noteContentFormat
-			};
-	
-			if (editingTemplateIndex === -1) {
-				templates.push(newTemplate);
-				editingTemplateIndex = templates.length - 1;
-			} else {
-				templates[editingTemplateIndex] = newTemplate;
-			}
-	
+		const template = templates[editingTemplateIndex];
+		template.name = document.getElementById('template-name').value;
+		template.behavior = document.getElementById('template-behavior').value;
+		template.path = document.getElementById('template-path-name').value;
+		template.noteNameFormat = document.getElementById('note-name-format').value;
+		template.specificNoteName = document.getElementById('specific-note-name').value;
+		template.dailyNoteFormat = document.getElementById('daily-note-format').value;
+		template.noteContentFormat = document.getElementById('note-content-format').value;
+
+		template.properties = Array.from(document.querySelectorAll('#template-properties .property-editor')).map(prop => ({
+			name: prop.querySelector('.property-name').value,
+			value: prop.querySelector('.property-value').value,
+			type: prop.querySelector('.property-select .property-selected').getAttribute('data-value')
+		}));
+
+		template.urlPatterns = document.getElementById('url-patterns').value.split('\n').filter(Boolean);
+	}
+
+	function saveTemplateSettings() {
+		return new Promise((resolve, reject) => {
 			chrome.storage.sync.set({ templates }, () => {
-				console.log('Template settings saved');
-				updateTemplateList();
+				if (chrome.runtime.lastError) {
+					console.error('Error saving templates:', chrome.runtime.lastError);
+					reject(chrome.runtime.lastError);
+				} else {
+					console.log('Template settings saved');
+					resolve();
+				}
 			});
-		}
+		});
 	}
 
 	function initializeSidebar() {
@@ -602,7 +604,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 	}
 
-	function handleDrop(e) {
+	async function handleDrop(e) {
 		e.preventDefault();
 		isReordering = true;
 		const draggedTemplateId = e.dataTransfer.getData('text/plain');
@@ -617,21 +619,18 @@ document.addEventListener('DOMContentLoaded', () => {
 			debugLog('Template indices', { fromIndex, toIndex });
 			
 			if (fromIndex !== -1 && fromIndex !== toIndex) {
-				// Create a copy of the templates array
 				const updatedTemplates = [...templates];
-				
-				// Remove the template from its original position and store it
 				const [movedTemplate] = updatedTemplates.splice(fromIndex, 1);
-				
-				// Insert the template at the new position
 				updatedTemplates.splice(toIndex, 0, movedTemplate);
-				
-				// Update the templates array
 				templates = updatedTemplates;
 				
 				debugLog('Templates after move', JSON.parse(JSON.stringify(templates)));
-				saveTemplateSettings();
-				updateTemplateList();
+				try {
+					await saveTemplateSettings();
+					updateTemplateList();
+				} catch (error) {
+					console.error('Failed to save template settings:', error);
+				}
 			}
 		} else if (list.id === 'template-properties') {
 			const template = templates[editingTemplateIndex];
