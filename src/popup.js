@@ -6,6 +6,7 @@ import dayjs from 'dayjs';
 let currentUrl = '';
 let currentTitle = '';
 let currentVariables = {};
+let currentTemplate = null;
 
 function findMatchingTemplate(url, templates) {
 	return templates.find(template => 
@@ -19,8 +20,6 @@ document.addEventListener('DOMContentLoaded', function() {
 	const vaultContainer = document.getElementById('vault-container');
 	const templateContainer = document.getElementById('template-container');
 	
-	let currentTemplate = null;
-
 	// Load templates from storage and populate dropdown
 	chrome.storage.sync.get(['templates'], (data) => {
 		if (!data.templates || data.templates.length === 0) {
@@ -72,10 +71,13 @@ document.addEventListener('DOMContentLoaded', function() {
 			const matchingTemplate = findMatchingTemplate(currentUrl, templates);
 			
 			if (matchingTemplate) {
-				const templateSelect = document.getElementById('template-select');
-				templateSelect.value = matchingTemplate.name;
-				updateTemplateProperties(matchingTemplate);
+				currentTemplate = matchingTemplate;
+				templateSelect.value = currentTemplate.name;
+			} else {
+				currentTemplate = templates[0]; // Use the first template as default
 			}
+
+			updateTemplateProperties(currentTemplate);
 
 			chrome.tabs.sendMessage(tabs[0].id, {action: "getPageContent"}, function(response) {
 				if (response && response.content) {
@@ -129,8 +131,8 @@ async function initializePageContent(content, selectedHtml, extractedContent) {
 	});
 
 	await updateTemplatePropertiesWithVariables();
-	updateFileNameField();
-	updateNoteContentField();
+	await updateFileNameField(currentTemplate);
+	await updateNoteContentField(currentTemplate);
 }
 
 async function updateTemplateProperties(template) {
@@ -153,9 +155,9 @@ async function updateTemplateProperties(template) {
 	}
 
 	await updateTemplatePropertiesWithVariables();
-	updateFileNameField(template);
-	updatePathField(template);
-	updateNoteContentField(template);
+	await updateFileNameField(template);
+	await updatePathField(template);
+	await updateNoteContentField(template);
 }
 
 async function updateTemplatePropertiesWithVariables() {
