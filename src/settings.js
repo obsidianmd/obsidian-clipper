@@ -14,6 +14,7 @@ const icons = {
 createIcons({ icons });
 
 let isReordering = false;
+let draggedElement = null;
 
 document.addEventListener('DOMContentLoaded', () => {
 	const vaultInput = document.getElementById('vault-input');
@@ -120,7 +121,6 @@ document.addEventListener('DOMContentLoaded', () => {
 			// Remove any null or undefined templates
 			templates = templates.filter(template => template != null);
 
-			// Ensure all templates have an ID
 			templates = templates.map(template => {
 				if (!template.id) {
 					template.id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
@@ -132,14 +132,12 @@ document.addEventListener('DOMContentLoaded', () => {
 				templates.push(createDefaultTemplate());
 			}
 
-			// Save the templates with ensured IDs
 			chrome.storage.sync.set({ templates }, () => {
-				console.log('Templates with IDs saved');
 				updateTemplateList();
 				if (templates.length > 0) {
 					showTemplateEditor(templates[0]);
 				} else {
-					console.error('No templates available after processing');
+					console.error('No templates available.');
 				}
 			});
 		});
@@ -267,7 +265,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 
 		if (template && Array.isArray(template.properties)) {
-			template.properties.forEach(property => addPropertyToEditor(property.name, property.value, property.type));
+			template.properties.forEach(property => addPropertyToEditor(property.name, property.value, property.type, property.id));
 		}
 
 		const urlPatternsTextarea = document.getElementById('url-patterns');
@@ -288,7 +286,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		document.getElementById('general-section').classList.remove('active');
 	}
 
-	function addPropertyToEditor(name = '', value = '', type = 'text') {
+	function addPropertyToEditor(name = '', value = '', type = 'text', id = null) {
 		const propertyDiv = document.createElement('div');
 		propertyDiv.className = 'property-editor';
 		propertyDiv.draggable = true;
@@ -315,7 +313,7 @@ document.addEventListener('DOMContentLoaded', () => {
 				<i data-lucide="trash-2"></i>
 			</button>
 		`;
-		propertyDiv.dataset.id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
+		propertyDiv.dataset.id = id || Date.now().toString() + Math.random().toString(36).substr(2, 9);
 		templateProperties.appendChild(propertyDiv);
 
 		const propertySelect = propertyDiv.querySelector('.property-select');
@@ -431,7 +429,9 @@ document.addEventListener('DOMContentLoaded', () => {
 		template.dailyNoteFormat = document.getElementById('daily-note-format').value;
 		template.noteContentFormat = document.getElementById('note-content-format').value;
 
+		// Update this part to maintain the order of properties
 		template.properties = Array.from(document.querySelectorAll('#template-properties .property-editor')).map(prop => ({
+			id: prop.dataset.id,
 			name: prop.querySelector('.property-name').value,
 			value: prop.querySelector('.property-value').value,
 			type: prop.querySelector('.property-select .property-selected').getAttribute('data-value')
@@ -481,6 +481,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		loadTemplates();
 		initializeSidebar();
 		initializeAutoSave();
+		initializeDragAndDrop();
 
 		const exportTemplateBtn = document.getElementById('export-template-btn');
 		exportTemplateBtn.addEventListener('click', exportTemplate);
@@ -596,102 +597,120 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	function handleDragStart(e) {
-		const templateId = e.target.dataset.id;
-		e.dataTransfer.setData('text/plain', templateId);
-		e.target.classList.add('dragging');
+		draggedElement = e.target;
+		e.dataTransfer.effectAllowed = 'move';
+		e.dataTransfer.setData('text/plain', e.target.dataset.id);
+		setTimeout(() => {
+			e.target.classList.add('dragging');
+		}, 0);
 	}
 
 	function handleDragOver(e) {
 		e.preventDefault();
-		const draggingElement = document.querySelector('.dragging');
-		if (draggingElement && e.target.closest('[draggable]') && e.target.closest('[draggable]') !== draggingElement) {
-			const container = e.target.closest('ul, #template-properties');
-			const children = Array.from(container.children);
-			const draggedOverItem = e.target.closest('[draggable]');
-			const draggedOverIndex = children.indexOf(draggedOverItem);
-			const draggingIndex = children.indexOf(draggingElement);
-			
-			if (draggedOverIndex < draggingIndex) {
-				container.insertBefore(draggingElement, draggedOverItem);
+		e.dataTransfer.dropEffect = 'move';
+		const closestDraggable = e.target.closest('[draggable]');
+		if (closestDraggable && closestDraggable !== draggedElement) {
+			const rect = closestDraggable.getBoundingClientRect();
+			const midY = rect.top + rect.height / 2;
+			if (e.clientY < midY) {
+				closestDraggable.parentNode.insertBefore(draggedElement, closestDraggable);
 			} else {
-				container.insertBefore(draggingElement, draggedOverItem.nextSibling);
+				closestDraggable.parentNode.insertBefore(draggedElement, closestDraggable.nextSibling);
 			}
 		}
 	}
 
-	async function handleDrop(e) {
+	function handleDrop(e) {
 		e.preventDefault();
-		isReordering = true;
 		const draggedItemId = e.dataTransfer.getData('text/plain');
 		const list = e.target.closest('ul, #template-properties');
-		const items = Array.from(list.children);
-		const toIndex = items.indexOf(e.target.closest('[draggable]'));
 		
-		if (list.id === 'template-list') {
-			const fromIndex = templates.findIndex(t => t.id === draggedItemId);
+		if (list) {
+			const items = Array.from(list.children);
+			const newIndex = items.indexOf(draggedElement);
 			
-			if (fromIndex !== -1 && fromIndex !== toIndex) {
-				templates = moveItem(templates, fromIndex, toIndex);
-				try {
-					await saveTemplateSettings();
-					updateTemplateList();
-				} catch (error) {
-					console.error('Failed to save template settings:', error);
-				}
-			}
-		} else if (list.id === 'template-properties') {
-			const template = templates[editingTemplateIndex];
-			const fromIndex = template.properties.findIndex(p => p.id === draggedItemId);
-			if (fromIndex !== -1 && fromIndex !== toIndex) {
-				template.properties = moveItem(template.properties, fromIndex, toIndex);
-				try {
-					await saveTemplateSettings();
-					showTemplateEditor(template);
-				} catch (error) {
-					console.error('Failed to save template settings:', error);
-				}
-			}
-		} else if (list.id === 'vault-list') {
-			const fromIndex = parseInt(e.target.closest('[draggable]').dataset.index);
-			if (fromIndex !== toIndex) {
-				vaults = moveItem(vaults, fromIndex, toIndex);
-				try {
-					await saveGeneralSettings();
-					updateVaultList();
-				} catch (error) {
-					console.error('Failed to save general settings:', error);
-				}
+			if (list.id === 'template-list') {
+				handleTemplateReorder(draggedItemId, newIndex);
+			} else if (list.id === 'template-properties') {
+				handlePropertyReorder(draggedItemId, newIndex);
+			} else if (list.id === 'vault-list') {
+				handleVaultReorder(newIndex);
 			}
 		}
 		
-		updateUI(list.id);
-		isReordering = false;
+		draggedElement.classList.remove('dragging');
+		draggedElement = null;
 	}
 
 	function handleDragEnd(e) {
 		e.target.classList.remove('dragging');
+		draggedElement = null;
 	}
 
+	async function handleTemplateReorder(draggedItemId, newIndex) {
+		const oldIndex = templates.findIndex(t => t.id === draggedItemId);
+		if (oldIndex !== -1 && oldIndex !== newIndex) {
+			templates = moveItem(templates, oldIndex, newIndex);
+			try {
+				await saveTemplateSettings();
+				updateTemplateList();
+			} catch (error) {
+				console.error('Failed to save template settings:', error);
+			}
+		}
+	}
+
+	async function handlePropertyReorder(draggedItemId, newIndex) {
+		const template = templates[editingTemplateIndex];
+		const oldIndex = template.properties.findIndex(p => p.id === draggedItemId);
+		if (oldIndex !== -1 && oldIndex !== newIndex) {
+			template.properties = moveItem(template.properties, oldIndex, newIndex);
+			try {
+				updateTemplateFromForm();
+				await saveTemplateSettings();
+				showTemplateEditor(template);
+			} catch (error) {
+				console.error('Failed to save template settings:', error);
+			}
+		}
+	}
+
+	async function handleVaultReorder(newIndex) {
+		const oldIndex = parseInt(draggedElement.dataset.index);
+		if (oldIndex !== newIndex) {
+			vaults = moveItem(vaults, oldIndex, newIndex);
+			try {
+				await saveGeneralSettings();
+				updateVaultList();
+			} catch (error) {
+				console.error('Failed to save general settings:', error);
+			}
+		}
+	}
+
+	// Update the existing moveItem function
 	function moveItem(array, fromIndex, toIndex) {
 		const newArray = [...array];
 		const [movedItem] = newArray.splice(fromIndex, 1);
-		const movedItemCopy = JSON.parse(JSON.stringify(movedItem));
-		newArray.splice(toIndex, 0, movedItemCopy);
+		newArray.splice(toIndex, 0, movedItem);
 		return newArray;
 	}
 
-	function updateUI(listId) {
-		switch (listId) {
-			case 'vault-list':
-				updateVaultList();
-				break;
-			case 'template-list':
-				updateTemplateList();
-				break;
-			case 'template-properties':
-				showTemplateEditor(templates[editingTemplateIndex]);
-				break;
-		}
+	function initializeDragAndDrop() {
+		const draggableLists = [
+			document.getElementById('template-list'),
+			document.getElementById('template-properties'),
+			document.getElementById('vault-list')
+		];
+
+		draggableLists.forEach(list => {
+			if (list) {
+				list.addEventListener('dragstart', handleDragStart);
+				list.addEventListener('dragover', handleDragOver);
+				list.addEventListener('drop', handleDrop);
+				list.addEventListener('dragend', handleDragEnd);
+			}
+		});
 	}
 
 	function resetDefaultTemplate() {

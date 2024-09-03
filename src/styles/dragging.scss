@@ -1,0 +1,49 @@
+.is-dragging {
+    pointer-events: none;
+    cursor: grabbing;
+}
+.property-editor, #template-list li, #vault-list li {
+	position: relative;
+	z-index: 1;
+
+	&.dragging {
+		opacity: 0.5;
+		z-index: 1000;
+		pointer-events: none;
+        cursor: grabbing !important;
+	}
+}
+
+.dragging {
+	opacity: 0.5;
+	.drag-handle {
+		cursor: grabbing;
+	}
+}
+
+.drop-placeholder {
+	border: 2px dashed var(--interactive-accent);
+	background-color: var(--background-modifier-hover);
+	margin: 4px 0;
+}
+
+.drag-handle {
+	cursor: grab;
+	opacity: 0.5;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-left: -2px;
+	margin-right: 2px;
+	svg {
+		width: 16px;
+		height: 16px;
+	}
+    &:focus, &:active {
+        cursor: grabbing !important;
+    }
+}
+
+.drag-handle:hover {
+	opacity: 1;
+}

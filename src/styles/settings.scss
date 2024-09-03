@@ -206,33 +206,6 @@
 	}
 }
 
-.drag-handle {
-	cursor: grab;
-	opacity: 0.5;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	margin-left: -2px;
-	margin-right: 2px;
-	svg {
-		width: 16px;
-		height: 16px;
-	}
-}
-
-.drag-handle:hover {
-	opacity: 1;
-}
-
-.dragging {
-	opacity: 0.25;
-	background-color: var(--background-modifier-hover);
-	cursor: grabbing;
-	.drag-handle {
-		cursor: grabbing;
-	}
-}
-
 #vault-list {
 	display: flex;
 	flex-direction: column;
