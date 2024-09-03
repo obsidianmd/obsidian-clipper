@@ -19,49 +19,41 @@ document.addEventListener('DOMContentLoaded', function() {
 	const vaultContainer = document.getElementById('vault-container');
 	const templateContainer = document.getElementById('template-container');
 	
-	// Load vaults from storage and populate dropdown
-	chrome.storage.sync.get(['vaults'], (data) => {
-		if (data.vaults && data.vaults.length > 0) {
-			data.vaults.forEach(vault => {
-				const option = document.createElement('option');
-				option.value = vault;
-				option.textContent = vault;
-				vaultDropdown.appendChild(option);
-			});
-			vaultContainer.style.display = 'block';
-		}
-	});
+	let currentTemplate = null;
 
 	// Load templates from storage and populate dropdown
 	chrome.storage.sync.get(['templates'], (data) => {
+		if (!data.templates || data.templates.length === 0) {
+			console.error('No templates found in storage');
+			return;
+		}
+
 		templateSelect.innerHTML = '';
 		
-		if (data.templates && data.templates.length > 1) {
-			data.templates.forEach(template => {
-				const option = document.createElement('option');
-				option.value = template.name;
-				option.textContent = template.name;
-				templateSelect.appendChild(option);
+		data.templates.forEach(template => {
+			const option = document.createElement('option');
+			option.value = template.name;
+			option.textContent = template.name;
+			templateSelect.appendChild(option);
+		});
 
-				if (template.name === 'Default') {
-					option.selected = true;
-				}
-			});
+		// Set the first template as the default
+		currentTemplate = data.templates[0];
+		templateSelect.value = currentTemplate.name;
+
+		if (data.templates.length > 1) {
 			templateContainer.style.display = 'block';
-			updateTemplateProperties(data.templates[0]);
-		} else {
-			// If only Default template exists, use it without showing the dropdown
-			updateTemplateProperties(data.templates[0]);
 		}
+
+		updateTemplateProperties(currentTemplate);
 	});
 
 	// Add event listener for template selection change
-	templateSelect.addEventListener('change', async function() {
-		chrome.storage.sync.get(['templates'], async (data) => {
-			const selectedTemplate = data.templates.find(t => t.name === this.value);
-			if (selectedTemplate) {
-				await updateTemplateProperties(selectedTemplate);
-				templateContainer.style.display = 'block';
+	templateSelect.addEventListener('change', function() {
+		chrome.storage.sync.get(['templates'], (data) => {
+			currentTemplate = data.templates.find(t => t.name === this.value);
+			if (currentTemplate) {
+				updateTemplateProperties(currentTemplate);
 			}
 		});
 	});
@@ -142,6 +134,11 @@ async function initializePageContent(content, selectedHtml, extractedContent) {
 }
 
 async function updateTemplateProperties(template) {
+	if (!template) {
+		console.error('Template is undefined in updateTemplateProperties');
+		return;
+	}
+
 	const templateProperties = document.querySelector('.metadata-properties');
 	templateProperties.innerHTML = '';
 
@@ -156,9 +153,9 @@ async function updateTemplateProperties(template) {
 	}
 
 	await updateTemplatePropertiesWithVariables();
-	await updateFileNameField(template);
-	await updatePathField(template);
-	await updateNoteContentField(template);
+	updateFileNameField(template);
+	updatePathField(template);
+	updateNoteContentField(template);
 }
 
 async function updateTemplatePropertiesWithVariables() {
@@ -203,6 +200,11 @@ async function replaceSelectorsWithContent(text) {
 }
 
 async function updateFileNameField(template) {
+	if (!template) {
+		console.error('Template is undefined in updateFileNameField');
+		return;
+	}
+
 	if (template.behavior === 'create' && template.noteNameFormat) {
 		let noteName = template.noteNameFormat;
 		noteName = await replaceVariablesAndSelectors(noteName);
