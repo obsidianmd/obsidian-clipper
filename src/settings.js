@@ -557,6 +557,7 @@ document.addEventListener('DOMContentLoaded', () => {
 							saveTemplateSettings();
 							updateTemplateList();
 							showTemplateEditor(importedTemplate);
+							alert('Template imported successfully!');
 						} else {
 							alert('Invalid template file. Please check the file format and try again.');
 						}
@@ -687,10 +688,9 @@ document.addEventListener('DOMContentLoaded', () => {
 		saveTemplateSettings().then(() => {
 			updateTemplateList();
 			showTemplateEditor(defaultTemplate);
-			alert('Default template has been reset.');
 		}).catch(error => {
 			console.error('Failed to reset default template:', error);
-			alert('Failed to reset default template.');
+			alert('Failed to reset default template. Please try again.');
 		});
 	}
 

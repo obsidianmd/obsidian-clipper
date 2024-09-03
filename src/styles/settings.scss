@@ -208,11 +208,12 @@
 
 .drag-handle {
 	cursor: grab;
-	margin-right: 8px;
 	opacity: 0.5;
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	margin-left: -2px;
+	margin-right: 2px;
 	svg {
 		width: 16px;
 		height: 16px;
@@ -229,5 +230,26 @@
 	cursor: grabbing;
 	.drag-handle {
 		cursor: grabbing;
+	}
+}
+
+#vault-list {
+	display: flex;
+	flex-direction: column;
+	margin: 8px 0;
+	padding: 0;
+	li {
+		display: flex;
+		flex-direction: row;
+		gap: 4px;
+		padding: 2px 0;
+		align-items: center;
+		font-size: 0.875rem;
+		font-weight: 500;
+		border-bottom: 1px solid var(--background-modifier-border);
+		button {
+			margin-left: auto;
+			width: auto;
+		}
 	}
 }
