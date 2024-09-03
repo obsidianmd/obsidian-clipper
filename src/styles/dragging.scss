@@ -1,6 +1,5 @@
-.is-dragging {
-    pointer-events: none;
-    cursor: grabbing;
+body.is-dragging {
+	cursor: grabbing !important;
 }
 .property-editor, #template-list li, #vault-list li {
 	position: relative;
@@ -10,21 +9,8 @@
 		opacity: 0.5;
 		z-index: 1000;
 		pointer-events: none;
-        cursor: grabbing !important;
+		cursor: grabbing !important;
 	}
-}
-
-.dragging {
-	opacity: 0.5;
-	.drag-handle {
-		cursor: grabbing;
-	}
-}
-
-.drop-placeholder {
-	border: 2px dashed var(--interactive-accent);
-	background-color: var(--background-modifier-hover);
-	margin: 4px 0;
 }
 
 .drag-handle {
@@ -39,11 +25,10 @@
 		width: 16px;
 		height: 16px;
 	}
-    &:focus, &:active {
-        cursor: grabbing !important;
-    }
-}
-
-.drag-handle:hover {
-	opacity: 1;
+	&:hover {
+		opacity: 1;
+	}
+	&:focus, &:active {
+		cursor: grabbing !important;
+	}
 }
