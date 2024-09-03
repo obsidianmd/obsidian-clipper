@@ -29,7 +29,7 @@ These variables are automatically generated based on the page content.
 
 #### Selector variables
 
-Selector variables all you to extract data from the page using the `selector:` prefix.  Selectors use the same syntax as CSS. For example:
+Selector variables allow you to extract data from the page using the `selector:` prefix.  Selectors use the same syntax as CSS. For example:
  
 - `{{selector:h1}}` will extract the content of the first `h1` element on the page
 - `{{selector:.author}}` will extract the content of the first `.author` element on the page
