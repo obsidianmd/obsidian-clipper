@@ -174,7 +174,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			propertyDiv.className = 'metadata-property';
 			propertyDiv.innerHTML = `
 				<label for="${property.name}">${property.name}</label>
-				<input id="${property.name}" type="text" value="${property.value}" />
+				<input id="${property.name}" type="text" value="${property.value}" data-type="${property.type}" />
 			`;
 			templateProperties.appendChild(propertyDiv);
 		}
@@ -196,6 +196,24 @@ document.addEventListener('DOMContentLoaded', function() {
 			}
 
 			value = await replaceSelectorsWithContent(value);
+
+			// Apply type-specific parsing
+			const propertyType = input.getAttribute('data-type');
+			switch (propertyType) {
+				case 'number':
+					const numericValue = value.replace(/[^\d.-]/g, '');
+					value = numericValue ? parseFloat(numericValue) : '';
+					break;
+				case 'checkbox':
+					value = value.toLowerCase() === 'true' || value === '1';
+					break;
+				case 'date':
+					value = dayjs(value).format('YYYY-MM-DD');
+					break;
+				case 'datetime':
+					value = dayjs(value).format('YYYY-MM-DD HH:mm:ss');
+					break;
+			}
 
 			input.value = value;
 		}
@@ -412,7 +430,8 @@ document.addEventListener('DOMContentLoaded', function() {
 					});
 					break;
 				case 'number':
-					frontmatter += ` ${parseFloat(value) || 0}\n`;
+					const numericValue = value.replace(/[^\d.-]/g, '');
+					frontmatter += numericValue ? ` ${parseFloat(numericValue)}\n` : '\n';
 					break;
 				case 'checkbox':
 					frontmatter += ` ${value.toLowerCase() === 'true' || value === '1'}\n`;
