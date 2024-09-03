@@ -92,13 +92,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	function loadTemplates() {
 		chrome.storage.sync.get(['templates'], (data) => {
-			templates = data.templates || [];
-			if (templates.length === 0) {
-				templates.push(createDefaultTemplate());
-				chrome.storage.sync.set({ templates });
+			
+			templates = Array.isArray(data.templates) ? data.templates : [];
+
+			// Remove any null or undefined templates
+			templates = templates.filter(template => template != null);
+
+			// Check if the Default template exists
+			const defaultTemplateIndex = templates.findIndex(t => t && t.name === 'Default');
+
+			if (defaultTemplateIndex === -1) {
+				// If it doesn't exist, add it
+				const defaultTemplate = createDefaultTemplate();
+				templates.unshift(defaultTemplate);
 			}
+
+			if (templates.length === 0) {
+				const defaultTemplate = createDefaultTemplate();
+				templates.push(defaultTemplate);
+			}
+
+			if (defaultTemplateIndex === -1 || templates.length === 1) {
+				chrome.storage.sync.set({ templates }, () => {
+				});
+			}
+
 			updateTemplateList();
-			showTemplateEditor(templates[0]);
+			if (templates.length > 0) {
+				showTemplateEditor(templates[0]);
+			} else {
+				console.error('No templates available after processing');
+			}
 		});
 	}
 
@@ -106,38 +130,42 @@ document.addEventListener('DOMContentLoaded', () => {
 		const templateList = document.getElementById('template-list');
 		templateList.innerHTML = '';
 		templates.forEach((template, index) => {
-			const li = document.createElement('li');
-			li.innerHTML = `
-				<span>${template.name}</span>
-				<button type="button" class="delete-template-btn clickable-icon" aria-label="Delete template">
-					<i data-lucide="trash-2"></i>
-				</button>
-			`;
-			li.dataset.index = index;
-			if (index === editingTemplateIndex) {
-				li.classList.add('active');
-			}
-			if (index === 0) {
-				li.querySelector('.delete-template-btn').style.display = 'none';
-			}
-			li.addEventListener('click', (e) => {
-				if (!e.target.closest('.delete-template-btn')) {
-					document.querySelectorAll('.sidebar li[data-section]').forEach(item => item.classList.remove('active'));
-					document.querySelectorAll('#template-list li').forEach(item => item.classList.remove('active'));
+			if (template && template.name) {
+				const li = document.createElement('li');
+				li.innerHTML = `
+					<span>${template.name}</span>
+					<button type="button" class="delete-template-btn clickable-icon" aria-label="Delete template">
+						<i data-lucide="trash-2"></i>
+					</button>
+				`;
+				li.dataset.index = index;
+				if (index === editingTemplateIndex) {
 					li.classList.add('active');
-					showTemplateEditor(template);
-					document.getElementById('templates-section').classList.add('active');
-					document.getElementById('general-section').classList.remove('active');
 				}
-			});
-			const deleteBtn = li.querySelector('.delete-template-btn');
-			if (deleteBtn) {
-				deleteBtn.addEventListener('click', (e) => {
-					e.stopPropagation();
-					deleteTemplate(index);
+				if (index === 0) {
+					li.querySelector('.delete-template-btn').style.display = 'none';
+				}
+				li.addEventListener('click', (e) => {
+					if (!e.target.closest('.delete-template-btn')) {
+						document.querySelectorAll('.sidebar li[data-section]').forEach(item => item.classList.remove('active'));
+						document.querySelectorAll('#template-list li').forEach(item => item.classList.remove('active'));
+						li.classList.add('active');
+						showTemplateEditor(template);
+						document.getElementById('templates-section').classList.add('active');
+						document.getElementById('general-section').classList.remove('active');
+					}
 				});
+				const deleteBtn = li.querySelector('.delete-template-btn');
+				if (deleteBtn) {
+					deleteBtn.addEventListener('click', (e) => {
+						e.stopPropagation();
+						deleteTemplate(index);
+					});
+				}
+				templateList.appendChild(li);
+			} else {
+				console.error('Invalid template at index', index, ':', template);
 			}
-			templateList.appendChild(li);
 		});
 		createIcons({ icons });
 	}
@@ -589,8 +617,6 @@ document.addEventListener('DOMContentLoaded', () => {
 				templateEditor.style.display = 'block';
 			}
 		});
-	} else {
-		console.error('New template button not found');
 	}
 
 	initializeSettings();
