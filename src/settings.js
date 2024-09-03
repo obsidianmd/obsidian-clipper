@@ -430,7 +430,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		template.dailyNoteFormat = document.getElementById('daily-note-format').value;
 		template.noteContentFormat = document.getElementById('note-content-format').value;
 
-		// Update this part to maintain the order of properties
 		template.properties = Array.from(document.querySelectorAll('#template-properties .property-editor')).map(prop => ({
 			id: prop.dataset.id,
 			name: prop.querySelector('.property-name').value,
@@ -598,11 +597,11 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	function handleDragStart(e) {
-		draggedElement = e.target;
+		draggedElement = e.target.closest('[draggable]');
 		e.dataTransfer.effectAllowed = 'move';
-		e.dataTransfer.setData('text/plain', e.target.dataset.id);
+		e.dataTransfer.setData('text/plain', draggedElement.dataset.id);
 		setTimeout(() => {
-			e.target.classList.add('dragging');
+			draggedElement.classList.add('dragging');
 		}, 0);
 	}
 
@@ -626,7 +625,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		const draggedItemId = e.dataTransfer.getData('text/plain');
 		const list = e.target.closest('ul, #template-properties');
 		
-		if (list) {
+		if (list && draggedElement) {
 			const items = Array.from(list.children);
 			const newIndex = items.indexOf(draggedElement);
 			
@@ -637,14 +636,17 @@ document.addEventListener('DOMContentLoaded', () => {
 			} else if (list.id === 'vault-list') {
 				handleVaultReorder(newIndex);
 			}
+			
+			draggedElement.classList.remove('dragging');
 		}
 		
-		draggedElement.classList.remove('dragging');
 		draggedElement = null;
 	}
 
 	function handleDragEnd(e) {
-		e.target.classList.remove('dragging');
+		if (draggedElement) {
+			draggedElement.classList.remove('dragging');
+		}
 		draggedElement = null;
 	}
 
@@ -662,17 +664,17 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	async function handlePropertyReorder(draggedItemId, newIndex) {
+		if (editingTemplateIndex === -1) return;
+
 		const template = templates[editingTemplateIndex];
-		const oldIndex = template.properties.findIndex(p => p.id === draggedItemId);
-		if (oldIndex !== -1 && oldIndex !== newIndex) {
-			template.properties = moveItem(template.properties, oldIndex, newIndex);
-			try {
-				updateTemplateFromForm();
-				await saveTemplateSettings();
-				showTemplateEditor(template);
-			} catch (error) {
-				console.error('Failed to save template settings:', error);
-			}
+		updateTemplateFromForm();
+		
+		try {
+			await saveTemplateSettings();
+			updateTemplateList();
+			showTemplateEditor(template);
+		} catch (error) {
+			console.error('Failed to save template settings:', error);
 		}
 	}
 
@@ -689,7 +691,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 	}
 
-	// Update the existing moveItem function
 	function moveItem(array, fromIndex, toIndex) {
 		const newArray = [...array];
 		const [movedItem] = newArray.splice(fromIndex, 1);
