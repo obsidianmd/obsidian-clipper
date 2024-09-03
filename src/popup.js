@@ -126,7 +126,6 @@ document.addEventListener('DOMContentLoaded', function() {
 		document.getElementById('note-name-field').value = noteName;
 
 		const author = byline || getMetaContent(doc, "name", "author") || getMetaContent(doc, "property", "author") || getMetaContent(doc, "name", "twitter:creator") || getMetaContent(doc, "property", "og:site_name");
-		const authorBrackets = author ? `"[[${author}]]"` : "";
 
 		const description = excerpt || getMetaContent(doc, "name", "description") || getMetaContent(doc, "property", "description") || getMetaContent(doc, "property", "og:description");
 		const image = getMetaContent(doc, "property", "og:image") || getMetaContent(doc, "name", "twitter:image");
@@ -142,7 +141,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			'{{title}}': currentTitle,
 			'{{url}}': currentUrl,
 			'{{published}}': published,
-			'{{authorLink}}': authorBrackets,
+			'{{author}}': author,
 			'{{today}}': convertDate(new Date()),
 			'{{description}}': description,
 			'{{domain}}': currentUrl.split('://')[1].split('/')[0],

@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			properties: [
 				{ name: 'title', value: '{{title}}', type: 'text' },
 				{ name: 'source', value: '{{url}}', type: 'text' },
-				{ name: 'author', value: '{{authorLink}}', type: 'text' },
+				{ name: 'author', value: '{{author}}', type: 'text' },
 				{ name: 'published', value: '{{published}}', type: 'date' },
 				{ name: 'created', value: '{{today}}', type: 'date' },
 				{ name: 'description', value: '{{description}}', type: 'text' },
