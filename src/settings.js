@@ -1,4 +1,4 @@
-import { createIcons, Trash2, AlignLeft, Binary, List, Calendar, Clock, SquareCheckBig } from 'lucide';
+import { createIcons, Trash2, AlignLeft, Binary, List, Calendar, Clock, SquareCheckBig, GripVertical } from 'lucide';
 
 const icons = {
 	Trash2,
@@ -7,10 +7,14 @@ const icons = {
 	List,
 	Calendar,
 	Clock,
-	SquareCheckBig
+	SquareCheckBig,
+	GripVertical
 };
 
 createIcons({ icons });
+
+let isReordering = false;
+let draggedElement = null;
 
 document.addEventListener('DOMContentLoaded', () => {
 	const vaultInput = document.getElementById('vault-input');
@@ -20,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	const templateName = document.getElementById('template-name');
 	const templateProperties = document.getElementById('template-properties');
 	const addPropertyBtn = document.getElementById('add-property-btn');
+	const resetDefaultTemplateBtn = document.getElementById('reset-default-template-btn');
 
 	let templates = [];
 	let editingTemplateIndex = -1;
@@ -27,6 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	function createDefaultTemplate() {
 		return {
+			id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
 			name: 'Default',
 			behavior: 'create',
 			noteNameFormat: '{{title}}',
@@ -56,23 +62,35 @@ document.addEventListener('DOMContentLoaded', () => {
 		vaultList.innerHTML = '';
 		vaults.forEach((vault, index) => {
 			const li = document.createElement('li');
-			li.textContent = vault;
+			li.innerHTML = `
+				<div class="drag-handle">
+					<i data-lucide="grip-vertical"></i>
+				</div>
+				<span>${vault}</span>
+				<button type="button" class="remove-vault-btn clickable-icon" aria-label="Remove vault">
+					<i data-lucide="trash-2"></i>
+				</button>
+			`;
 			li.dataset.index = index;
-			const removeBtn = document.createElement('button');
-			removeBtn.textContent = 'Remove';
-			removeBtn.classList.add('remove-vault-btn');
+			li.draggable = true;
+			li.addEventListener('dragstart', handleDragStart);
+			li.addEventListener('dragover', handleDragOver);
+			li.addEventListener('drop', handleDrop);
+			li.addEventListener('dragend', handleDragEnd);
+			const removeBtn = li.querySelector('.remove-vault-btn');
 			removeBtn.addEventListener('click', (e) => {
 				e.stopPropagation();
 				removeVault(index);
 			});
-			li.appendChild(removeBtn);
 			vaultList.appendChild(li);
 		});
+		createIcons({ icons });
 	}
 
 	function addVault(vault) {
 		if (vault && !vaults.includes(vault)) {
 			vaults.push(vault);
+			updateVaultList();
 			saveGeneralSettings();
 		}
 	}
@@ -84,45 +102,45 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	function saveGeneralSettings() {
-		chrome.storage.sync.set({ vaults }, () => {
-			console.log('General settings saved');
-			updateVaultList();
+		return new Promise((resolve, reject) => {
+			chrome.storage.sync.set({ vaults }, () => {
+				if (chrome.runtime.lastError) {
+					console.error('Error saving general settings:', chrome.runtime.lastError);
+					reject(chrome.runtime.lastError);
+				} else {
+					console.log('General settings saved');
+					resolve();
+				}
+			});
 		});
 	}
 
 	function loadTemplates() {
 		chrome.storage.sync.get(['templates'], (data) => {
-			
 			templates = Array.isArray(data.templates) ? data.templates : [];
 
 			// Remove any null or undefined templates
 			templates = templates.filter(template => template != null);
 
-			// Check if the Default template exists
-			const defaultTemplateIndex = templates.findIndex(t => t && t.name === 'Default');
-
-			if (defaultTemplateIndex === -1) {
-				// If it doesn't exist, add it
-				const defaultTemplate = createDefaultTemplate();
-				templates.unshift(defaultTemplate);
-			}
+			templates = templates.map(template => {
+				if (!template.id) {
+					template.id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
+				}
+				return template;
+			});
 
 			if (templates.length === 0) {
-				const defaultTemplate = createDefaultTemplate();
-				templates.push(defaultTemplate);
+				templates.push(createDefaultTemplate());
 			}
 
-			if (defaultTemplateIndex === -1 || templates.length === 1) {
-				chrome.storage.sync.set({ templates }, () => {
-				});
-			}
-
-			updateTemplateList();
-			if (templates.length > 0) {
-				showTemplateEditor(templates[0]);
-			} else {
-				console.error('No templates available after processing');
-			}
+			chrome.storage.sync.set({ templates }, () => {
+				updateTemplateList();
+				if (templates.length > 0) {
+					showTemplateEditor(templates[0]);
+				} else {
+					console.error('No templates available.');
+				}
+			});
 		});
 	}
 
@@ -133,34 +151,35 @@ document.addEventListener('DOMContentLoaded', () => {
 			if (template && template.name) {
 				const li = document.createElement('li');
 				li.innerHTML = `
-					<span>${template.name}</span>
+					<div class="drag-handle">
+						<i data-lucide="grip-vertical"></i>
+					</div>
+					<span class="template-name">${template.name}</span>
 					<button type="button" class="delete-template-btn clickable-icon" aria-label="Delete template">
 						<i data-lucide="trash-2"></i>
 					</button>
 				`;
+				li.dataset.id = template.id;
 				li.dataset.index = index;
-				if (index === editingTemplateIndex) {
-					li.classList.add('active');
-				}
-				if (index === 0) {
-					li.querySelector('.delete-template-btn').style.display = 'none';
-				}
+				li.draggable = true;
+				li.addEventListener('dragstart', handleDragStart);
+				li.addEventListener('dragover', handleDragOver);
+				li.addEventListener('drop', handleDrop);
+				li.addEventListener('dragend', handleDragEnd);
 				li.addEventListener('click', (e) => {
 					if (!e.target.closest('.delete-template-btn')) {
-						document.querySelectorAll('.sidebar li[data-section]').forEach(item => item.classList.remove('active'));
-						document.querySelectorAll('#template-list li').forEach(item => item.classList.remove('active'));
-						li.classList.add('active');
 						showTemplateEditor(template);
-						document.getElementById('templates-section').classList.add('active');
-						document.getElementById('general-section').classList.remove('active');
 					}
 				});
 				const deleteBtn = li.querySelector('.delete-template-btn');
 				if (deleteBtn) {
 					deleteBtn.addEventListener('click', (e) => {
 						e.stopPropagation();
-						deleteTemplate(index);
+						deleteTemplate(template.id);
 					});
+				}
+				if (index === editingTemplateIndex) {
+					li.classList.add('active');
 				}
 				templateList.appendChild(li);
 			} else {
@@ -170,8 +189,9 @@ document.addEventListener('DOMContentLoaded', () => {
 		createIcons({ icons });
 	}
 
-	function deleteTemplate(index) {
-		if (index > 0) {
+	function deleteTemplate(templateId) {
+		const index = templates.findIndex(t => t.id === templateId);
+		if (index !== -1) {
 			if (confirm(`Are you sure you want to delete the template "${templates[index].name}"?`)) {
 				templates.splice(index, 1);
 
@@ -189,8 +209,6 @@ document.addEventListener('DOMContentLoaded', () => {
 				saveTemplateSettings();
 				updateTemplateList();
 			}
-		} else {
-			alert("You cannot delete the Default template.");
 		}
 	}
 
@@ -205,17 +223,28 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	function showTemplateEditor(template) {
-		editingTemplateIndex = template ? templates.findIndex(t => t.name === template.name) : -1;
+		if (template) {
+			editingTemplateIndex = templates.findIndex(t => t.id === template.id);
+		} else {
+
+			const newTemplate = {
+				id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+				name: 'New template',
+				behavior: 'create',
+				noteNameFormat: '{{title}}',
+				path: 'Clippings/',
+				noteContentFormat: '{{content}}',
+				properties: [],
+				urlPatterns: []
+			};
+			templates.push(newTemplate);
+			editingTemplateIndex = templates.length - 1;
+			template = newTemplate;
+		}
+
 		templateEditorTitle.textContent = template ? 'Edit template' : 'New template';
 		templateName.value = template ? template.name : '';
 		templateProperties.innerHTML = '';
-
-		const resetDefaultTemplateBtn = document.getElementById('reset-default-template-btn');
-		if (template && template.name === 'Default') {
-			resetDefaultTemplateBtn.style.display = 'inline-block';
-		} else {
-			resetDefaultTemplateBtn.style.display = 'none';
-		}
 
 		const pathInput = document.getElementById('template-path-name');
 		pathInput.value = template ? template.path : 'Clippings/';
@@ -255,7 +284,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 
 		if (template && Array.isArray(template.properties)) {
-			template.properties.forEach(property => addPropertyToEditor(property.name, property.value, property.type));
+			template.properties.forEach(property => addPropertyToEditor(property.name, property.value, property.type, property.id));
 		}
 
 		const urlPatternsTextarea = document.getElementById('url-patterns');
@@ -266,7 +295,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		document.querySelectorAll('.sidebar li[data-section]').forEach(item => item.classList.remove('active'));
 		document.querySelectorAll('#template-list li').forEach(item => item.classList.remove('active'));
 		if (editingTemplateIndex !== -1) {
-			const activeTemplateItem = document.querySelector(`#template-list li[data-index="${editingTemplateIndex}"]`);
+			const activeTemplateItem = document.querySelector(`#template-list li[data-id="${templates[editingTemplateIndex].id}"]`);
 			if (activeTemplateItem) {
 				activeTemplateItem.classList.add('active');
 			}
@@ -274,12 +303,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
 		document.getElementById('templates-section').classList.add('active');
 		document.getElementById('general-section').classList.remove('active');
+
+		updateTemplateFromForm();
+		saveTemplateSettings().then(() => {
+			updateTemplateList();
+
+			if (!template.id) {
+				const templateNameField = document.getElementById('template-name');
+				if (templateNameField) {
+					templateNameField.focus();
+					templateNameField.select();
+				}
+			}
+		}).catch(error => {
+			console.error('Failed to save new template:', error);
+		});
 	}
 
-	function addPropertyToEditor(name = '', value = '', type = 'text') {
+	function addPropertyToEditor(name = '', value = '', type = 'text', id = null) {
 		const propertyDiv = document.createElement('div');
 		propertyDiv.className = 'property-editor';
+		propertyDiv.draggable = true;
 		propertyDiv.innerHTML = `
+			<div class="drag-handle">
+				<i data-lucide="grip-vertical"></i>
+			</div>
 			<div class="property-select">
 				<div class="property-selected" data-value="${type}">
 					<i data-lucide="${getIconForType(type)}"></i>
@@ -299,6 +347,7 @@ document.addEventListener('DOMContentLoaded', () => {
 				<i data-lucide="trash-2"></i>
 			</button>
 		`;
+		propertyDiv.dataset.id = id || Date.now().toString() + Math.random().toString(36).substr(2, 9);
 		templateProperties.appendChild(propertyDiv);
 
 		const propertySelect = propertyDiv.querySelector('.property-select');
@@ -314,6 +363,11 @@ document.addEventListener('DOMContentLoaded', () => {
 		propertyDiv.querySelector('.remove-property-btn').addEventListener('click', () => {
 			templateProperties.removeChild(propertyDiv);
 		});
+
+		propertyDiv.addEventListener('dragstart', handleDragStart);
+		propertyDiv.addEventListener('dragover', handleDragOver);
+		propertyDiv.addEventListener('drop', handleDrop);
+		propertyDiv.addEventListener('dragend', handleDragEnd);
 
 		updateSelectedOption(type, propertySelected);
 
@@ -356,93 +410,80 @@ document.addEventListener('DOMContentLoaded', () => {
 			}
 		};
 
-		const autoSave = debounce(() => {
-			saveTemplateSettings();
+		const autoSave = debounce(async () => {
+			if (!isReordering) {
+				try {
+					await saveTemplateSettings();
+					updateTemplateList();
+					console.log('Auto-save completed');
+				} catch (error) {
+					console.error('Auto-save failed:', error);
+				}
+			}
 		}, 500);
 
-		templateForm.addEventListener('input', autoSave);
+		templateForm.addEventListener('input', (event) => {
+			if (editingTemplateIndex !== -1) {
+				updateTemplateFromForm();
+				autoSave();
+			}
+		});
 
 		templateProperties.addEventListener('click', (event) => {
 			if (event.target.classList.contains('remove-property-btn') || event.target.closest('.remove-property-btn')) {
-				autoSave();
+				if (editingTemplateIndex !== -1) {
+					updateTemplateFromForm();
+					autoSave();
+				}
 			}
 		});
 
 		if (addPropertyBtn) {
 			addPropertyBtn.addEventListener('click', () => {
 				addPropertyToEditor();
-				autoSave();
+				if (editingTemplateIndex !== -1) {
+					updateTemplateFromForm();
+					autoSave();
+				}
 			});
 		} else {
 			console.error('Add property button not found');
 		}
 	}
 
-	function saveTemplateSettings() {
-		const name = templateName.value.trim();
-		const pathInput = document.getElementById('template-path-name');
-		const path = pathInput ? pathInput.value.trim() : '';
-		
-		if (name) {
-			const properties = Array.from(templateProperties.children)
-				.filter(property => property.querySelector('.property-name'))
-				.map(property => ({
-					name: property.querySelector('.property-name').value.trim(),
-					value: property.querySelector('.property-value').value.trim(),
-					type: property.querySelector('.property-type').value
-				}))
-				.filter(property => property.name);
-	
-			const urlPatternsTextarea = document.getElementById('url-patterns');
-			const urlPatterns = urlPatternsTextarea ? urlPatternsTextarea.value
-				.split('\n')
-				.map(pattern => pattern.trim())
-				.filter(pattern => pattern !== '') : [];
-	
-			const behavior = document.getElementById('template-behavior').value;
-			const specificNoteName = document.getElementById('specific-note-name').value.trim();
-			const dailyNoteFormat = document.getElementById('daily-note-format').value.trim();
-			const noteNameFormat = document.getElementById('note-name-format').value.trim();
-			const noteContentFormat = document.getElementById('note-content-format').value.trim();
+	function updateTemplateFromForm() {
+		if (editingTemplateIndex === -1) return;
 
-			const newTemplate = { 
-				name, 
-				behavior,
-				specificNoteName,
-				dailyNoteFormat,
-				noteNameFormat,
-				path, 
-				urlPatterns,
-				properties,
-				noteContentFormat
-			};
-	
-			if (editingTemplateIndex === -1) {
-				templates.push(newTemplate);
-				editingTemplateIndex = templates.length - 1;
-			} else {
-				templates[editingTemplateIndex] = newTemplate;
-			}
-	
-			chrome.storage.sync.set({ templates }, () => {
-				console.log('Template settings auto-saved');
-				updateTemplateList();
-			});
-		}
+		const template = templates[editingTemplateIndex];
+		template.name = document.getElementById('template-name').value;
+		template.behavior = document.getElementById('template-behavior').value;
+		template.path = document.getElementById('template-path-name').value;
+		template.noteNameFormat = document.getElementById('note-name-format').value;
+		template.specificNoteName = document.getElementById('specific-note-name').value;
+		template.dailyNoteFormat = document.getElementById('daily-note-format').value;
+		template.noteContentFormat = document.getElementById('note-content-format').value;
+
+		template.properties = Array.from(document.querySelectorAll('#template-properties .property-editor')).map(prop => ({
+			id: prop.dataset.id,
+			name: prop.querySelector('.property-name').value,
+			value: prop.querySelector('.property-value').value,
+			type: prop.querySelector('.property-select .property-selected').getAttribute('data-value')
+		}));
+
+		template.urlPatterns = document.getElementById('url-patterns').value.split('\n').filter(Boolean);
 	}
 
-	function resetDefaultTemplate() {
-		const defaultTemplate = createDefaultTemplate();
-		const index = templates.findIndex(t => t.name === 'Default');
-		if (index !== -1) {
-			templates[index] = defaultTemplate;
-		} else {
-			templates.unshift(defaultTemplate);
-		}
-		chrome.storage.sync.set({ templates }, () => {
-			console.log('Default template reset');
-			updateTemplateList();
-			showTemplateEditor(defaultTemplate);
+	function saveTemplateSettings() {
+		return new Promise((resolve, reject) => {
+			chrome.storage.sync.set({ templates }, () => {
+				if (chrome.runtime.lastError) {
+					console.error('Error saving templates:', chrome.runtime.lastError);
+					reject(chrome.runtime.lastError);
+				} else {
+					console.log('Template settings saved');
+					resolve();
+				}
+			});
 		});
 	}
 
@@ -473,15 +514,15 @@ document.addEventListener('DOMContentLoaded', () => {
 		loadTemplates();
 		initializeSidebar();
 		initializeAutoSave();
-
-		const resetDefaultTemplateBtn = document.getElementById('reset-default-template-btn');
-		resetDefaultTemplateBtn.addEventListener('click', resetDefaultTemplate);
+		initializeDragAndDrop();
 
 		const exportTemplateBtn = document.getElementById('export-template-btn');
 		exportTemplateBtn.addEventListener('click', exportTemplate);
 
 		const importTemplateBtn = document.getElementById('import-template-btn');
 		importTemplateBtn.addEventListener('click', importTemplate);
+
+		resetDefaultTemplateBtn.addEventListener('click', resetDefaultTemplate);
 
 		createIcons({ icons });
 	}
@@ -530,8 +571,13 @@ document.addEventListener('DOMContentLoaded', () => {
 				const reader = new FileReader();
 				reader.onload = (e) => {
 					try {
-						const importedTemplate = JSON.parse(e.target.result);
+						let importedTemplate = JSON.parse(e.target.result);
 						if (validateImportedTemplate(importedTemplate)) {
+							// Assign a new ID if the imported template doesn't have one
+							if (!importedTemplate.id) {
+								importedTemplate.id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
+							}
+
 							// Check if a template with the same name already exists
 							const existingIndex = templates.findIndex(t => t.name === importedTemplate.name);
 							if (existingIndex !== -1) {
@@ -583,12 +629,153 @@ document.addEventListener('DOMContentLoaded', () => {
 			);
 	}
 
+	function handleDragStart(e) {
+		draggedElement = e.target.closest('[draggable]');
+		e.dataTransfer.effectAllowed = 'move';
+		e.dataTransfer.setData('text/plain', draggedElement.dataset.id);
+		setTimeout(() => {
+			draggedElement.classList.add('dragging');
+		}, 0);
+	}
+
+	function handleDragOver(e) {
+		e.preventDefault();
+		e.dataTransfer.dropEffect = 'move';
+		const closestDraggable = e.target.closest('[draggable]');
+		if (closestDraggable && closestDraggable !== draggedElement) {
+			const rect = closestDraggable.getBoundingClientRect();
+			const midY = rect.top + rect.height / 2;
+			if (e.clientY < midY) {
+				closestDraggable.parentNode.insertBefore(draggedElement, closestDraggable);
+			} else {
+				closestDraggable.parentNode.insertBefore(draggedElement, closestDraggable.nextSibling);
+			}
+		}
+	}
+
+	function handleDrop(e) {
+		e.preventDefault();
+		const draggedItemId = e.dataTransfer.getData('text/plain');
+		const list = e.target.closest('ul, #template-properties');
+		
+		if (list && draggedElement) {
+			const items = Array.from(list.children);
+			const newIndex = items.indexOf(draggedElement);
+			
+			if (list.id === 'template-list') {
+				handleTemplateReorder(draggedItemId, newIndex);
+			} else if (list.id === 'template-properties') {
+				handlePropertyReorder(draggedItemId, newIndex);
+			} else if (list.id === 'vault-list') {
+				handleVaultReorder(newIndex);
+			}
+			
+			draggedElement.classList.remove('dragging');
+		}
+		
+		draggedElement = null;
+	}
+
+	function handleDragEnd(e) {
+		if (draggedElement) {
+			draggedElement.classList.remove('dragging');
+		}
+		draggedElement = null;
+	}
+
+	async function handleTemplateReorder(draggedItemId, newIndex) {
+		const oldIndex = templates.findIndex(t => t.id === draggedItemId);
+		if (oldIndex !== -1 && oldIndex !== newIndex) {
+			templates = moveItem(templates, oldIndex, newIndex);
+			try {
+				await saveTemplateSettings();
+				updateTemplateList();
+			} catch (error) {
+				console.error('Failed to save template settings:', error);
+			}
+		}
+	}
+
+	async function handlePropertyReorder(draggedItemId, newIndex) {
+		if (editingTemplateIndex === -1) return;
+
+		const template = templates[editingTemplateIndex];
+		updateTemplateFromForm();
+		
+		try {
+			await saveTemplateSettings();
+			updateTemplateList();
+			showTemplateEditor(template);
+		} catch (error) {
+			console.error('Failed to save template settings:', error);
+		}
+	}
+
+	async function handleVaultReorder(newIndex) {
+		const oldIndex = parseInt(draggedElement.dataset.index);
+		if (oldIndex !== newIndex) {
+			vaults = moveItem(vaults, oldIndex, newIndex);
+			try {
+				await saveGeneralSettings();
+				updateVaultList();
+			} catch (error) {
+				console.error('Failed to save general settings:', error);
+			}
+		}
+	}
+
+	function moveItem(array, fromIndex, toIndex) {
+		const newArray = [...array];
+		const [movedItem] = newArray.splice(fromIndex, 1);
+		newArray.splice(toIndex, 0, movedItem);
+		return newArray;
+	}
+
+	function initializeDragAndDrop() {
+		const draggableLists = [
+			document.getElementById('template-list'),
+			document.getElementById('template-properties'),
+			document.getElementById('vault-list')
+		];
+
+		draggableLists.forEach(list => {
+			if (list) {
+				list.addEventListener('dragstart', handleDragStart);
+				list.addEventListener('dragover', handleDragOver);
+				list.addEventListener('drop', handleDrop);
+				list.addEventListener('dragend', handleDragEnd);
+			}
+		});
+	}
+
+	function resetDefaultTemplate() {
+		const defaultTemplate = createDefaultTemplate();
+		const defaultIndex = templates.findIndex(t => t.name === 'Default');
+		
+		if (defaultIndex !== -1) {
+			templates[defaultIndex] = defaultTemplate;
+		} else {
+			templates.unshift(defaultTemplate);
+		}
+
+		saveTemplateSettings().then(() => {
+			updateTemplateList();
+			showTemplateEditor(defaultTemplate);
+		}).catch(error => {
+			console.error('Failed to reset default template:', error);
+			alert('Failed to reset default template. Please try again.');
+		});
+	}
+
 	if (vaultInput) {
 		vaultInput.addEventListener('keypress', (e) => {
 			if (e.key === 'Enter') {
 				e.preventDefault();
-				addVault(vaultInput.value.trim());
-				vaultInput.value = '';
+				const newVault = vaultInput.value.trim();
+				if (newVault) {
+					addVault(newVault);
+					vaultInput.value = '';
+				}
 			}
 		});
 	} else {
@@ -612,10 +799,6 @@ document.addEventListener('DOMContentLoaded', () => {
 	if (newTemplateBtn) {
 		newTemplateBtn.addEventListener('click', () => {
 			showTemplateEditor(null);
-			const templateEditor = document.getElementById('template-editor');
-			if (templateEditor) {
-				templateEditor.style.display = 'block';
-			}
 		});
 	}
 
