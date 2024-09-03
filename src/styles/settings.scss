@@ -149,8 +149,11 @@
 			background-color: var(--background-modifier-hover);
 			color: var(--text-normal);
 		}
-
+		.template-name {
+			flex-grow: 1;
+			margin-right: auto;		}
 		.delete-template-btn {
+			flex-shrink: 1;
 			background: none;
 			border: none;
 			cursor: pointer;
@@ -200,5 +203,31 @@
 	}
 	&:hover {
 		color: var(--text-normal);
+	}
+}
+
+.drag-handle {
+	cursor: grab;
+	margin-right: 8px;
+	opacity: 0.5;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	svg {
+		width: 16px;
+		height: 16px;
+	}
+}
+
+.drag-handle:hover {
+	opacity: 1;
+}
+
+.dragging {
+	opacity: 0.25;
+	background-color: var(--background-modifier-hover);
+	cursor: grabbing;
+	.drag-handle {
+		cursor: grabbing;
 	}
 }

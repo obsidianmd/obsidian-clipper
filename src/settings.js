@@ -1,4 +1,4 @@
-import { createIcons, Trash2, AlignLeft, Binary, List, Calendar, Clock, SquareCheckBig } from 'lucide';
+import { createIcons, Trash2, AlignLeft, Binary, List, Calendar, Clock, SquareCheckBig, GripVertical } from 'lucide';
 
 const icons = {
 	Trash2,
@@ -7,7 +7,8 @@ const icons = {
 	List,
 	Calendar,
 	Clock,
-	SquareCheckBig
+	SquareCheckBig,
+	GripVertical
 };
 
 createIcons({ icons });
@@ -56,18 +57,27 @@ document.addEventListener('DOMContentLoaded', () => {
 		vaultList.innerHTML = '';
 		vaults.forEach((vault, index) => {
 			const li = document.createElement('li');
-			li.textContent = vault;
+			li.innerHTML = `
+				<div class="drag-handle">
+					<i data-lucide="grip-vertical"></i>
+				</div>
+				<span>${vault}</span>
+				<button class="remove-vault-btn">Remove</button>
+			`;
 			li.dataset.index = index;
-			const removeBtn = document.createElement('button');
-			removeBtn.textContent = 'Remove';
-			removeBtn.classList.add('remove-vault-btn');
+			li.draggable = true;
+			li.addEventListener('dragstart', handleDragStart);
+			li.addEventListener('dragover', handleDragOver);
+			li.addEventListener('drop', handleDrop);
+			li.addEventListener('dragend', handleDragEnd);
+			const removeBtn = li.querySelector('.remove-vault-btn');
 			removeBtn.addEventListener('click', (e) => {
 				e.stopPropagation();
 				removeVault(index);
 			});
-			li.appendChild(removeBtn);
 			vaultList.appendChild(li);
 		});
+		createIcons({ icons });
 	}
 
 	function addVault(vault) {
@@ -133,12 +143,16 @@ document.addEventListener('DOMContentLoaded', () => {
 			if (template && template.name) {
 				const li = document.createElement('li');
 				li.innerHTML = `
-					<span>${template.name}</span>
+					<div class="drag-handle">
+						<i data-lucide="grip-vertical"></i>
+					</div>
+					<span class="template-name">${template.name}</span>
 					<button type="button" class="delete-template-btn clickable-icon" aria-label="Delete template">
 						<i data-lucide="trash-2"></i>
 					</button>
 				`;
 				li.dataset.index = index;
+				li.draggable = true;
 				if (index === editingTemplateIndex) {
 					li.classList.add('active');
 				}
@@ -155,6 +169,10 @@ document.addEventListener('DOMContentLoaded', () => {
 						document.getElementById('general-section').classList.remove('active');
 					}
 				});
+				li.addEventListener('dragstart', handleDragStart);
+				li.addEventListener('dragover', handleDragOver);
+				li.addEventListener('drop', handleDrop);
+				li.addEventListener('dragend', handleDragEnd);
 				const deleteBtn = li.querySelector('.delete-template-btn');
 				if (deleteBtn) {
 					deleteBtn.addEventListener('click', (e) => {
@@ -279,7 +297,11 @@ document.addEventListener('DOMContentLoaded', () => {
 	function addPropertyToEditor(name = '', value = '', type = 'text') {
 		const propertyDiv = document.createElement('div');
 		propertyDiv.className = 'property-editor';
+		propertyDiv.draggable = true;
 		propertyDiv.innerHTML = `
+			<div class="drag-handle">
+				<i data-lucide="grip-vertical"></i>
+			</div>
 			<div class="property-select">
 				<div class="property-selected" data-value="${type}">
 					<i data-lucide="${getIconForType(type)}"></i>
@@ -299,6 +321,7 @@ document.addEventListener('DOMContentLoaded', () => {
 				<i data-lucide="trash-2"></i>
 			</button>
 		`;
+		propertyDiv.dataset.index = templateProperties.children.length;
 		templateProperties.appendChild(propertyDiv);
 
 		const propertySelect = propertyDiv.querySelector('.property-select');
@@ -314,6 +337,11 @@ document.addEventListener('DOMContentLoaded', () => {
 		propertyDiv.querySelector('.remove-property-btn').addEventListener('click', () => {
 			templateProperties.removeChild(propertyDiv);
 		});
+
+		propertyDiv.addEventListener('dragstart', handleDragStart);
+		propertyDiv.addEventListener('dragover', handleDragOver);
+		propertyDiv.addEventListener('drop', handleDrop);
+		propertyDiv.addEventListener('dragend', handleDragEnd);
 
 		updateSelectedOption(type, propertySelected);
 
@@ -581,6 +609,75 @@ document.addEventListener('DOMContentLoaded', () => {
 				prop.hasOwnProperty('type') &&
 				validTypes.includes(prop.type)
 			);
+	}
+
+	function handleDragStart(e) {
+		e.dataTransfer.setData('text/plain', e.target.dataset.index);
+		e.target.classList.add('dragging');
+	}
+
+	function handleDragOver(e) {
+		e.preventDefault();
+		const draggingElement = document.querySelector('.dragging');
+		if (draggingElement && e.target.closest('[draggable]') && e.target.closest('[draggable]') !== draggingElement) {
+			const container = e.target.closest('ul, #template-properties');
+			const children = Array.from(container.children);
+			const draggedOverItem = e.target.closest('[draggable]');
+			const draggedOverIndex = children.indexOf(draggedOverItem);
+			const draggingIndex = children.indexOf(draggingElement);
+			
+			if (draggedOverIndex < draggingIndex) {
+				container.insertBefore(draggingElement, draggedOverItem);
+			} else {
+				container.insertBefore(draggingElement, draggedOverItem.nextSibling);
+			}
+		}
+	}
+
+	function handleDrop(e) {
+		e.preventDefault();
+		const fromIndex = parseInt(e.dataTransfer.getData('text/plain'));
+		const list = e.target.closest('ul, #template-properties');
+		const items = Array.from(list.children);
+		const toIndex = items.indexOf(document.querySelector('.dragging'));
+		
+		if (list.id === 'vault-list') {
+			moveItem(vaults, fromIndex, toIndex);
+			saveGeneralSettings();
+		} else if (list.id === 'template-list') {
+			moveItem(templates, fromIndex, toIndex);
+			saveTemplateSettings();
+		} else if (list.id === 'template-properties') {
+			const template = templates[editingTemplateIndex];
+			moveItem(template.properties, fromIndex, toIndex);
+			saveTemplateSettings();
+		}
+		
+		updateUI(list.id);
+	}
+
+	function handleDragEnd(e) {
+		e.target.classList.remove('dragging');
+	}
+
+	function moveItem(array, fromIndex, toIndex) {
+		if (fromIndex === toIndex) return;
+		const item = array.splice(fromIndex, 1)[0];
+		array.splice(toIndex, 0, item);
+	}
+
+	function updateUI(listId) {
+		switch (listId) {
+			case 'vault-list':
+				updateVaultList();
+				break;
+			case 'template-list':
+				updateTemplateList();
+				break;
+			case 'template-properties':
+				showTemplateEditor(templates[editingTemplateIndex]);
+				break;
+		}
 	}
 
 	if (vaultInput) {
