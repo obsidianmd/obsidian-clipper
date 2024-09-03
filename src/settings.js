@@ -13,6 +13,9 @@ const icons = {
 
 createIcons({ icons });
 
+// Add this near the top of the file, with other global variables
+let isReordering = false;
+
 document.addEventListener('DOMContentLoaded', () => {
 	const vaultInput = document.getElementById('vault-input');
 	const vaultList = document.getElementById('vault-list');
@@ -28,6 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	function createDefaultTemplate() {
 		return {
+			id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
 			name: 'Default',
 			behavior: 'create',
 			noteNameFormat: '{{title}}',
@@ -102,37 +106,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	function loadTemplates() {
 		chrome.storage.sync.get(['templates'], (data) => {
-			
 			templates = Array.isArray(data.templates) ? data.templates : [];
 
 			// Remove any null or undefined templates
 			templates = templates.filter(template => template != null);
 
-			// Check if the Default template exists
-			const defaultTemplateIndex = templates.findIndex(t => t && t.name === 'Default');
-
-			if (defaultTemplateIndex === -1) {
-				// If it doesn't exist, add it
-				const defaultTemplate = createDefaultTemplate();
-				templates.unshift(defaultTemplate);
-			}
+			// Ensure all templates have an ID
+			templates = templates.map(template => {
+				if (!template.id) {
+					template.id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
+				}
+				return template;
+			});
 
 			if (templates.length === 0) {
-				const defaultTemplate = createDefaultTemplate();
-				templates.push(defaultTemplate);
+				templates.push(createDefaultTemplate());
 			}
 
-			if (defaultTemplateIndex === -1 || templates.length === 1) {
-				chrome.storage.sync.set({ templates }, () => {
-				});
-			}
-
-			updateTemplateList();
-			if (templates.length > 0) {
-				showTemplateEditor(templates[0]);
-			} else {
-				console.error('No templates available after processing');
-			}
+			// Save the templates with ensured IDs
+			chrome.storage.sync.set({ templates }, () => {
+				console.log('Templates with IDs saved');
+				updateTemplateList();
+				if (templates.length > 0) {
+					showTemplateEditor(templates[0]);
+				} else {
+					console.error('No templates available after processing');
+				}
+			});
 		});
 	}
 
@@ -151,33 +151,22 @@ document.addEventListener('DOMContentLoaded', () => {
 						<i data-lucide="trash-2"></i>
 					</button>
 				`;
-				li.dataset.index = index;
+				li.dataset.id = template.id;
 				li.draggable = true;
-				if (index === editingTemplateIndex) {
-					li.classList.add('active');
-				}
-				if (index === 0) {
-					li.querySelector('.delete-template-btn').style.display = 'none';
-				}
-				li.addEventListener('click', (e) => {
-					if (!e.target.closest('.delete-template-btn')) {
-						document.querySelectorAll('.sidebar li[data-section]').forEach(item => item.classList.remove('active'));
-						document.querySelectorAll('#template-list li').forEach(item => item.classList.remove('active'));
-						li.classList.add('active');
-						showTemplateEditor(template);
-						document.getElementById('templates-section').classList.add('active');
-						document.getElementById('general-section').classList.remove('active');
-					}
-				});
 				li.addEventListener('dragstart', handleDragStart);
 				li.addEventListener('dragover', handleDragOver);
 				li.addEventListener('drop', handleDrop);
 				li.addEventListener('dragend', handleDragEnd);
+				li.addEventListener('click', (e) => {
+					if (!e.target.closest('.delete-template-btn')) {
+						showTemplateEditor(template);
+					}
+				});
 				const deleteBtn = li.querySelector('.delete-template-btn');
 				if (deleteBtn) {
 					deleteBtn.addEventListener('click', (e) => {
 						e.stopPropagation();
-						deleteTemplate(index);
+						deleteTemplate(template.id);
 					});
 				}
 				templateList.appendChild(li);
@@ -188,8 +177,9 @@ document.addEventListener('DOMContentLoaded', () => {
 		createIcons({ icons });
 	}
 
-	function deleteTemplate(index) {
-		if (index > 0) {
+	function deleteTemplate(templateId) {
+		const index = templates.findIndex(t => t.id === templateId);
+		if (index !== -1) {
 			if (confirm(`Are you sure you want to delete the template "${templates[index].name}"?`)) {
 				templates.splice(index, 1);
 
@@ -207,8 +197,6 @@ document.addEventListener('DOMContentLoaded', () => {
 				saveTemplateSettings();
 				updateTemplateList();
 			}
-		} else {
-			alert("You cannot delete the Default template.");
 		}
 	}
 
@@ -223,17 +211,10 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	function showTemplateEditor(template) {
-		editingTemplateIndex = template ? templates.findIndex(t => t.name === template.name) : -1;
+		editingTemplateIndex = template ? templates.findIndex(t => t.id === template.id) : -1;
 		templateEditorTitle.textContent = template ? 'Edit template' : 'New template';
 		templateName.value = template ? template.name : '';
 		templateProperties.innerHTML = '';
-
-		const resetDefaultTemplateBtn = document.getElementById('reset-default-template-btn');
-		if (template && template.name === 'Default') {
-			resetDefaultTemplateBtn.style.display = 'inline-block';
-		} else {
-			resetDefaultTemplateBtn.style.display = 'none';
-		}
 
 		const pathInput = document.getElementById('template-path-name');
 		pathInput.value = template ? template.path : 'Clippings/';
@@ -284,7 +265,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		document.querySelectorAll('.sidebar li[data-section]').forEach(item => item.classList.remove('active'));
 		document.querySelectorAll('#template-list li').forEach(item => item.classList.remove('active'));
 		if (editingTemplateIndex !== -1) {
-			const activeTemplateItem = document.querySelector(`#template-list li[data-index="${editingTemplateIndex}"]`);
+			const activeTemplateItem = document.querySelector(`#template-list li[data-id="${templates[editingTemplateIndex].id}"]`);
 			if (activeTemplateItem) {
 				activeTemplateItem.classList.add('active');
 			}
@@ -321,7 +302,7 @@ document.addEventListener('DOMContentLoaded', () => {
 				<i data-lucide="trash-2"></i>
 			</button>
 		`;
-		propertyDiv.dataset.index = templateProperties.children.length;
+		propertyDiv.dataset.id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
 		templateProperties.appendChild(propertyDiv);
 
 		const propertySelect = propertyDiv.querySelector('.property-select');
@@ -385,7 +366,9 @@ document.addEventListener('DOMContentLoaded', () => {
 		};
 
 		const autoSave = debounce(() => {
-			saveTemplateSettings();
+			if (!isReordering) {
+				saveTemplateSettings();
+			}
 		}, 500);
 
 		templateForm.addEventListener('input', autoSave);
@@ -434,6 +417,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			const noteContentFormat = document.getElementById('note-content-format').value.trim();
 
 			const newTemplate = { 
+				id: editingTemplateIndex === -1 ? Date.now().toString() + Math.random().toString(36).substr(2, 9) : templates[editingTemplateIndex].id,
 				name, 
 				behavior,
 				specificNoteName,
@@ -453,25 +437,10 @@ document.addEventListener('DOMContentLoaded', () => {
 			}
 	
 			chrome.storage.sync.set({ templates }, () => {
-				console.log('Template settings auto-saved');
+				console.log('Template settings saved');
 				updateTemplateList();
 			});
 		}
-	}
-
-	function resetDefaultTemplate() {
-		const defaultTemplate = createDefaultTemplate();
-		const index = templates.findIndex(t => t.name === 'Default');
-		if (index !== -1) {
-			templates[index] = defaultTemplate;
-		} else {
-			templates.unshift(defaultTemplate);
-		}
-		chrome.storage.sync.set({ templates }, () => {
-			console.log('Default template reset');
-			updateTemplateList();
-			showTemplateEditor(defaultTemplate);
-		});
 	}
 
 	function initializeSidebar() {
@@ -501,9 +470,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		loadTemplates();
 		initializeSidebar();
 		initializeAutoSave();
-
-		const resetDefaultTemplateBtn = document.getElementById('reset-default-template-btn');
-		resetDefaultTemplateBtn.addEventListener('click', resetDefaultTemplate);
 
 		const exportTemplateBtn = document.getElementById('export-template-btn');
 		exportTemplateBtn.addEventListener('click', exportTemplate);
@@ -612,8 +578,10 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	function handleDragStart(e) {
-		e.dataTransfer.setData('text/plain', e.target.dataset.index);
+		const templateId = e.target.dataset.id;
+		e.dataTransfer.setData('text/plain', templateId);
 		e.target.classList.add('dragging');
+		debugLog('Drag started', { templateId });
 	}
 
 	function handleDragOver(e) {
@@ -636,24 +604,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	function handleDrop(e) {
 		e.preventDefault();
-		const fromIndex = parseInt(e.dataTransfer.getData('text/plain'));
+		isReordering = true;
+		const draggedTemplateId = e.dataTransfer.getData('text/plain');
 		const list = e.target.closest('ul, #template-properties');
 		const items = Array.from(list.children);
-		const toIndex = items.indexOf(document.querySelector('.dragging'));
+		const toIndex = items.indexOf(e.target.closest('[draggable]'));
 		
-		if (list.id === 'vault-list') {
-			moveItem(vaults, fromIndex, toIndex);
-			saveGeneralSettings();
-		} else if (list.id === 'template-list') {
-			moveItem(templates, fromIndex, toIndex);
-			saveTemplateSettings();
+		debugLog('Drop event', { draggedTemplateId, listId: list.id, toIndex });
+
+		if (list.id === 'template-list') {
+			const fromIndex = templates.findIndex(t => t.id === draggedTemplateId);
+			debugLog('Template indices', { fromIndex, toIndex });
+			
+			if (fromIndex !== -1 && fromIndex !== toIndex) {
+				// Create a copy of the templates array
+				const updatedTemplates = [...templates];
+				
+				// Remove the template from its original position and store it
+				const [movedTemplate] = updatedTemplates.splice(fromIndex, 1);
+				
+				// Insert the template at the new position
+				updatedTemplates.splice(toIndex, 0, movedTemplate);
+				
+				// Update the templates array
+				templates = updatedTemplates;
+				
+				debugLog('Templates after move', JSON.parse(JSON.stringify(templates)));
+				saveTemplateSettings();
+				updateTemplateList();
+			}
 		} else if (list.id === 'template-properties') {
 			const template = templates[editingTemplateIndex];
-			moveItem(template.properties, fromIndex, toIndex);
-			saveTemplateSettings();
+			const fromIndex = template.properties.findIndex(p => p.id === draggedTemplateId);
+			if (fromIndex !== -1 && fromIndex !== toIndex) {
+				const [movedProperty] = template.properties.splice(fromIndex, 1);
+				template.properties.splice(toIndex, 0, movedProperty);
+				saveTemplateSettings();
+				showTemplateEditor(template);
+			}
 		}
 		
 		updateUI(list.id);
+		isReordering = false;
 	}
 
 	function handleDragEnd(e) {
@@ -661,9 +653,11 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	function moveItem(array, fromIndex, toIndex) {
-		if (fromIndex === toIndex) return;
-		const item = array.splice(fromIndex, 1)[0];
-		array.splice(toIndex, 0, item);
+		const newArray = [...array];
+		const [movedItem] = newArray.splice(fromIndex, 1);
+		const movedItemCopy = JSON.parse(JSON.stringify(movedItem));
+		newArray.splice(toIndex, 0, movedItemCopy);
+		return newArray;
 	}
 
 	function updateUI(listId) {
@@ -678,6 +672,10 @@ document.addEventListener('DOMContentLoaded', () => {
 				showTemplateEditor(templates[editingTemplateIndex]);
 				break;
 		}
+	}
+
+	function debugLog(message, data) {
+		console.log(`DEBUG: ${message}`, data);
 	}
 
 	if (vaultInput) {
