@@ -9,6 +9,9 @@
 		display: flex;
 		flex-direction: column;
 		gap: 2px;
+		&:empty {
+			display: none;
+		}
 		.metadata-property {
 			display: flex;
 			flex-direction: row;
