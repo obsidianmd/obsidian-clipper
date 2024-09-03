@@ -13,7 +13,6 @@ const icons = {
 
 createIcons({ icons });
 
-// Add this near the top of the file, with other global variables
 let isReordering = false;
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -24,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	const templateName = document.getElementById('template-name');
 	const templateProperties = document.getElementById('template-properties');
 	const addPropertyBtn = document.getElementById('add-property-btn');
+	const resetDefaultTemplateBtn = document.getElementById('reset-default-template-btn');
 
 	let templates = [];
 	let editingTemplateIndex = -1;
@@ -479,6 +479,8 @@ document.addEventListener('DOMContentLoaded', () => {
 		const importTemplateBtn = document.getElementById('import-template-btn');
 		importTemplateBtn.addEventListener('click', importTemplate);
 
+		resetDefaultTemplateBtn.addEventListener('click', resetDefaultTemplate);
+
 		createIcons({ icons });
 	}
 
@@ -526,8 +528,13 @@ document.addEventListener('DOMContentLoaded', () => {
 				const reader = new FileReader();
 				reader.onload = (e) => {
 					try {
-						const importedTemplate = JSON.parse(e.target.result);
+						let importedTemplate = JSON.parse(e.target.result);
 						if (validateImportedTemplate(importedTemplate)) {
+							// Assign a new ID if the imported template doesn't have one
+							if (!importedTemplate.id) {
+								importedTemplate.id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
+							}
+
 							// Check if a template with the same name already exists
 							const existingIndex = templates.findIndex(t => t.name === importedTemplate.name);
 							if (existingIndex !== -1) {
@@ -550,7 +557,6 @@ document.addEventListener('DOMContentLoaded', () => {
 							saveTemplateSettings();
 							updateTemplateList();
 							showTemplateEditor(importedTemplate);
-							alert('Template imported successfully!');
 						} else {
 							alert('Invalid template file. Please check the file format and try again.');
 						}
@@ -666,6 +672,26 @@ document.addEventListener('DOMContentLoaded', () => {
 				showTemplateEditor(templates[editingTemplateIndex]);
 				break;
 		}
+	}
+
+	function resetDefaultTemplate() {
+		const defaultTemplate = createDefaultTemplate();
+		const defaultIndex = templates.findIndex(t => t.name === 'Default');
+		
+		if (defaultIndex !== -1) {
+			templates[defaultIndex] = defaultTemplate;
+		} else {
+			templates.unshift(defaultTemplate);
+		}
+
+		saveTemplateSettings().then(() => {
+			updateTemplateList();
+			showTemplateEditor(defaultTemplate);
+			alert('Default template has been reset.');
+		}).catch(error => {
+			console.error('Failed to reset default template:', error);
+			alert('Failed to reset default template.');
+		});
 	}
 
 	if (vaultInput) {
