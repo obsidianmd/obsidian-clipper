@@ -66,7 +66,9 @@ document.addEventListener('DOMContentLoaded', () => {
 					<i data-lucide="grip-vertical"></i>
 				</div>
 				<span>${vault}</span>
-				<button class="remove-vault-btn">Remove</button>
+				<button type="button" class="remove-vault-btn clickable-icon" aria-label="Remove vault">
+					<i data-lucide="trash-2"></i>
+				</button>
 			`;
 			li.dataset.index = index;
 			li.draggable = true;
