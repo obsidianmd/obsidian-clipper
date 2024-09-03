@@ -90,6 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	function addVault(vault) {
 		if (vault && !vaults.includes(vault)) {
 			vaults.push(vault);
+			updateVaultList();
 			saveGeneralSettings();
 		}
 	}
@@ -736,8 +737,11 @@ document.addEventListener('DOMContentLoaded', () => {
 		vaultInput.addEventListener('keypress', (e) => {
 			if (e.key === 'Enter') {
 				e.preventDefault();
-				addVault(vaultInput.value.trim());
-				vaultInput.value = '';
+				const newVault = vaultInput.value.trim();
+				if (newVault) {
+					addVault(newVault);
+					vaultInput.value = '';
+				}
 			}
 		});
 	} else {
