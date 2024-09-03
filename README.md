@@ -1,8 +1,36 @@
-WIP. Turning the [Obsidian web clipper bookmarklet](https://stephango.com/obsidian-web-clipper) into a proper Chrome extension.
+Work in progress. Turning the [Obsidian web clipper bookmarklet](https://stephango.com/obsidian-web-clipper) into a proper Chrome extension.
 
-### Run the extension locally
+**Run the extension locally**
 
 - `npm install`
 - `npm run dev`
 - Go to `chrome://extensions/`
 - Click `Load unpacked` and select the `dist` folder
+
+### Template variables
+
+Template variables can be used to automatically pre-populate data from the page in a template. Variables can be used in the **note name**, **note location**, **properties**, and **note content**.
+
+#### Page variables
+
+These variables are automatically generated based on the page content.
+
+| Variable          | Description                  |
+| ----------------- | ---------------------------- |
+| `{{title}}`       | Title of the page            |
+| `{{author}}`      | Author of the page           |
+| `{{description}}` | Description or excerpt       |
+| `{{published}`    | Published date               |
+| `{{image}}`       | Social share image URL       |
+| `{{content}}`     | Article content or selection |
+| `{{today}}`       | Today's date                 |
+| `{{url}}`         | Current URL                  |
+| `{{domain}}`      | Domain                       |
+
+#### Selector variables
+
+Selector variables all you to extract data from the page using the `selector:` prefix.  Selectors use the same syntax as CSS. For example:
+ 
+- `{{selector:h1}}` will extract the content of the first `h1` element on the page
+- `{{selector:.author}}` will extract the content of the first `.author` element on the page
+- Advanced nested selectors can also be used.
