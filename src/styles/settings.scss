@@ -167,3 +167,38 @@
 		}
 	}
 }
+
+.property-select {
+	position: relative;
+	color: var(--text-muted);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	select {
+		opacity: 0;
+		width: 24px;
+		height: var(--input-height);
+		cursor: pointer;
+		z-index: 2;
+	}
+	.property-selected {
+		z-index: 1;
+		position: absolute;
+		top: 0;
+		left: 0;
+		user-select: none;
+		width: 24px;
+		height: var(--input-height);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		opacity: 0.85;
+		svg {
+			width: 16px;
+			height: 16px;
+		}
+	}
+	&:hover {
+		color: var(--text-normal);
+	}
+}

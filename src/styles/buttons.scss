@@ -29,3 +29,28 @@ button {
 		}
 	}
 }
+
+.clickable-icon,
+button.clickable-icon {
+	width: 28px;
+	height: 28px;
+	display: flex;
+	padding: 0px 4px;
+	background-color: transparent;
+	color: var(--text-muted);
+	opacity: 0.85;
+	align-self: center;
+	align-items: center;
+	justify-content: center;
+	box-shadow: none;
+	svg {
+		width: 16px;
+		height: 16px;
+	}
+	&:hover {
+		color: var(--text-muted);
+		background-color: var(--background-modifier-hover);
+		opacity: 1;
+		box-shadow: none;
+	}
+}

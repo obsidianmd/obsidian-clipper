@@ -1,4 +1,16 @@
-import { createIcons, Trash2 } from 'lucide';
+import { createIcons, Trash2, AlignLeft, Binary, List, Calendar, Clock, SquareCheckBig } from 'lucide';
+
+const icons = {
+	Trash2,
+	AlignLeft,
+	Binary,
+	List,
+	Calendar,
+	Clock,
+	SquareCheckBig
+};
+
+createIcons({ icons });
 
 document.addEventListener('DOMContentLoaded', () => {
 	const vaultInput = document.getElementById('vault-input');
@@ -127,11 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
 			}
 			templateList.appendChild(li);
 		});
-		createIcons({
-			icons: {
-				Trash2
-			}
-		});
+		createIcons({ icons });
 	}
 
 	function deleteTemplate(index) {
@@ -242,32 +250,65 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	function addPropertyToEditor(name = '', value = '', type = 'text') {
 		const propertyDiv = document.createElement('div');
+		propertyDiv.className = 'property-editor';
 		propertyDiv.innerHTML = `
-				<input type="text" class="property-name" value="${name}" placeholder="Property name">
-				<input type="text" class="property-value" value="${value}" placeholder="Property value">
+			<div class="property-select">
+				<div class="property-selected" data-value="${type}">
+					<i data-lucide="${getIconForType(type)}"></i>
+				</div>
 				<select class="property-type">
-					<option value="text" ${type === 'text' ? 'selected' : ''}>Text</option>
-					<option value="multitext" ${type === 'multitext' ? 'selected' : ''}>List</option>
-					<option value="number" ${type === 'number' ? 'selected' : ''}>Number</option>
-					<option value="checkbox" ${type === 'checkbox' ? 'selected' : ''}>Checkbox</option>
-					<option value="date" ${type === 'date' ? 'selected' : ''}>Date</option>
-					<option value="datetime" ${type === 'datetime' ? 'selected' : ''}>Date & time</option>
+					<option value="text">Text</option>
+					<option value="multitext">List</option>
+					<option value="number">Number</option>
+					<option value="checkbox">Checkbox</option>
+					<option value="date">Date</option>
+					<option value="datetime">Date & time</option>
 				</select>
-				<button type="button" class="remove-property-btn clickable-icon" aria-label="Remove property">
-					<i data-lucide="trash-2"></i>
-				</button>
-			`;
+			</div>
+			<input type="text" class="property-name" value="${name}" placeholder="Property name">
+			<input type="text" class="property-value" value="${value}" placeholder="Property value">
+			<button type="button" class="remove-property-btn clickable-icon" aria-label="Remove property">
+				<i data-lucide="trash-2"></i>
+			</button>
+		`;
 		templateProperties.appendChild(propertyDiv);
+
+		const propertySelect = propertyDiv.querySelector('.property-select');
+		const propertySelected = propertySelect.querySelector('.property-selected');
+		const hiddenSelect = propertySelect.querySelector('select');
+
+		hiddenSelect.value = type;
+
+		hiddenSelect.addEventListener('change', function() {
+			updateSelectedOption(this.value, propertySelected);
+		});
 
 		propertyDiv.querySelector('.remove-property-btn').addEventListener('click', () => {
 			templateProperties.removeChild(propertyDiv);
 		});
 
-		createIcons({
-			icons: {
-				Trash2
-			}
-		});
+		updateSelectedOption(type, propertySelected);
+
+		createIcons({ icons, root: propertyDiv });
+	}
+
+	function updateSelectedOption(value, propertySelected) {
+		const iconName = getIconForType(value);
+		propertySelected.innerHTML = `<i data-lucide="${iconName}"></i>`;
+		propertySelected.setAttribute('data-value', value);
+		createIcons({ icons, root: propertySelected });
+	}
+
+	function getIconForType(type) {
+		const iconMap = {
+			text: 'align-left',
+			multitext: 'list',
+			number: 'binary',
+			checkbox: 'square-check-big',
+			date: 'calendar',
+			datetime: 'clock'
+		};
+		return iconMap[type] || 'align-left';
 	}
 
 	function initializeAutoSave() {
@@ -414,11 +455,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		const importTemplateBtn = document.getElementById('import-template-btn');
 		importTemplateBtn.addEventListener('click', importTemplate);
 
-		createIcons({
-			icons: {
-				Trash2
-			}
-		});
+		createIcons({ icons });
 	}
 
 	function exportTemplate() {
@@ -430,7 +467,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		const template = templates[editingTemplateIndex];
 		const noteName = `${template.name}.obsidian-clipper.json`;
 
-		// Create a new object with the desired order of keys
 		const orderedTemplate = {
 			name: template.name,
 			behavior: template.behavior,
@@ -439,7 +475,6 @@ document.addEventListener('DOMContentLoaded', () => {
 			noteContentFormat: template.noteContentFormat,
 			properties: template.properties,
 			urlPatterns: template.urlPatterns,
-			// Add any other fields from the template object
 		};
 
 		const jsonContent = JSON.stringify(orderedTemplate, null, 2);
