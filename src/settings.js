@@ -100,9 +100,16 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	function saveGeneralSettings() {
-		chrome.storage.sync.set({ vaults }, () => {
-			console.log('General settings saved');
-			updateVaultList();
+		return new Promise((resolve, reject) => {
+			chrome.storage.sync.set({ vaults }, () => {
+				if (chrome.runtime.lastError) {
+					console.error('Error saving general settings:', chrome.runtime.lastError);
+					reject(chrome.runtime.lastError);
+				} else {
+					console.log('General settings saved');
+					resolve();
+				}
+			});
 		});
 	}
 
@@ -615,20 +622,16 @@ document.addEventListener('DOMContentLoaded', () => {
 	async function handleDrop(e) {
 		e.preventDefault();
 		isReordering = true;
-		const draggedTemplateId = e.dataTransfer.getData('text/plain');
+		const draggedItemId = e.dataTransfer.getData('text/plain');
 		const list = e.target.closest('ul, #template-properties');
 		const items = Array.from(list.children);
 		const toIndex = items.indexOf(e.target.closest('[draggable]'));
 		
 		if (list.id === 'template-list') {
-			const fromIndex = templates.findIndex(t => t.id === draggedTemplateId);
+			const fromIndex = templates.findIndex(t => t.id === draggedItemId);
 			
 			if (fromIndex !== -1 && fromIndex !== toIndex) {
-				const updatedTemplates = [...templates];
-				const [movedTemplate] = updatedTemplates.splice(fromIndex, 1);
-				updatedTemplates.splice(toIndex, 0, movedTemplate);
-				templates = updatedTemplates;
-				
+				templates = moveItem(templates, fromIndex, toIndex);
 				try {
 					await saveTemplateSettings();
 					updateTemplateList();
@@ -638,12 +641,26 @@ document.addEventListener('DOMContentLoaded', () => {
 			}
 		} else if (list.id === 'template-properties') {
 			const template = templates[editingTemplateIndex];
-			const fromIndex = template.properties.findIndex(p => p.id === draggedTemplateId);
+			const fromIndex = template.properties.findIndex(p => p.id === draggedItemId);
 			if (fromIndex !== -1 && fromIndex !== toIndex) {
-				const [movedProperty] = template.properties.splice(fromIndex, 1);
-				template.properties.splice(toIndex, 0, movedProperty);
-				saveTemplateSettings();
-				showTemplateEditor(template);
+				template.properties = moveItem(template.properties, fromIndex, toIndex);
+				try {
+					await saveTemplateSettings();
+					showTemplateEditor(template);
+				} catch (error) {
+					console.error('Failed to save template settings:', error);
+				}
+			}
+		} else if (list.id === 'vault-list') {
+			const fromIndex = parseInt(e.target.closest('[draggable]').dataset.index);
+			if (fromIndex !== toIndex) {
+				vaults = moveItem(vaults, fromIndex, toIndex);
+				try {
+					await saveGeneralSettings();
+					updateVaultList();
+				} catch (error) {
+					console.error('Failed to save general settings:', error);
+				}
 			}
 		}
 		
