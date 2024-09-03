@@ -145,7 +145,7 @@ async function updateTemplateProperties(template) {
 	const templateProperties = document.querySelector('.metadata-properties');
 	templateProperties.innerHTML = '';
 
-	template.properties.forEach(property => {
+	for (const property of template.properties) {
 		const propertyDiv = document.createElement('div');
 		propertyDiv.className = 'metadata-property';
 		propertyDiv.innerHTML = `
@@ -153,20 +153,12 @@ async function updateTemplateProperties(template) {
 			<input id="${property.name}" type="text" value="${property.value}" />
 		`;
 		templateProperties.appendChild(propertyDiv);
-	});
+	}
 
 	await updateTemplatePropertiesWithVariables();
-	updateFileNameField();
-	updateNoteContentField();
-
-	const pathField = document.getElementById('path-name-field');
-	if (pathField) {
-		let path = template.path;
-		Object.keys(currentVariables).forEach(variable => {
-			path = path.replace(new RegExp(variable, 'g'), currentVariables[variable]);
-		});
-		pathField.value = path;
-	}
+	await updateFileNameField(template);
+	await updatePathField(template);
+	await updateNoteContentField(template);
 }
 
 async function updateTemplatePropertiesWithVariables() {
@@ -210,39 +202,46 @@ async function replaceSelectorsWithContent(text) {
 	return text;
 }
 
-function updateFileNameField() {
-	chrome.storage.sync.get(['templates'], (data) => {
-		const selectedTemplateName = document.getElementById('template-select').value;
-		const selectedTemplate = data.templates.find(t => t.name === selectedTemplateName) || data.templates[0];
-		
-		if (selectedTemplate.behavior === 'create' && selectedTemplate.noteNameFormat) {
-			let noteName = selectedTemplate.noteNameFormat;
-			Object.keys(currentVariables).forEach(variable => {
-				noteName = noteName.replace(new RegExp(variable, 'g'), currentVariables[variable]);
-			});
-			document.getElementById('note-name-field').value = getFileName(noteName);
-		}
-	});
+async function updateFileNameField(template) {
+	if (template.behavior === 'create' && template.noteNameFormat) {
+		let noteName = template.noteNameFormat;
+		noteName = await replaceVariablesAndSelectors(noteName);
+		document.getElementById('note-name-field').value = getFileName(noteName);
+	}
 }
 
-function updateNoteContentField() {
-	chrome.storage.sync.get(['templates'], (data) => {
-		const selectedTemplateName = document.getElementById('template-select').value;
-		const selectedTemplate = data.templates.find(t => t.name === selectedTemplateName) || data.templates[0];
+async function updatePathField(template) {
+	const pathField = document.getElementById('path-name-field');
+	if (pathField) {
+		let path = template.path;
+		path = await replaceVariablesAndSelectors(path);
+		pathField.value = path;
+	}
+}
+
+async function updateNoteContentField(template) {
+	const noteContentField = document.getElementById('note-content-field');
+	if (noteContentField && template && template.noteContentFormat) {
+		let content = template.noteContentFormat;
+		content = await replaceVariablesAndSelectors(content);
+		noteContentField.value = content;
 		
-		const noteContentField = document.getElementById('note-content-field');
-		if (noteContentField && selectedTemplate && selectedTemplate.noteContentFormat) {
-			let content = selectedTemplate.noteContentFormat;
-			Object.keys(currentVariables).forEach(variable => {
-				content = content.replace(new RegExp(variable, 'g'), currentVariables[variable]);
-			});
-			noteContentField.value = content;
-			
-			noteContentField.addEventListener('input', function() {
-				currentVariables['{{content}}'] = this.value;
-			});
-		}
-	});
+		noteContentField.addEventListener('input', function() {
+			currentVariables['{{content}}'] = this.value;
+		});
+	}
+}
+
+async function replaceVariablesAndSelectors(text) {
+	// Replace variables
+	for (const [variable, replacement] of Object.entries(currentVariables)) {
+		text = text.replace(new RegExp(variable, 'g'), replacement);
+	}
+	
+	// Handle custom selectors
+	text = await replaceSelectorsWithContent(text);
+	
+	return text;
 }
 
 function createMarkdownContent(content, url, selectedHtml) {
@@ -344,13 +343,15 @@ document.getElementById('clip-button').addEventListener('click', async function(
 					if (template.behavior === 'create') {
 						const frontmatter = await generateFrontmatter(template.properties);
 						fileContent = frontmatter + noteContent;
-						noteName = document.getElementById('note-name-field').value;
+						noteName = await replaceVariablesAndSelectors(document.getElementById('note-name-field').value);
 					} else {
 						fileContent = noteContent;
 						noteName = '';
 					}
 
-					saveToObsidian(fileContent, noteName, template.path, selectedVault, template.behavior, template.specificNoteName, template.dailyNoteFormat);
+					let path = await replaceVariablesAndSelectors(template.path);
+
+					saveToObsidian(fileContent, noteName, path, selectedVault, template.behavior, template.specificNoteName, template.dailyNoteFormat);
 				});
 			} else {
 				showError('Unable to retrieve page content. Try reloading the page.');
@@ -378,11 +379,6 @@ async function generateFrontmatter(properties) {
 function saveToObsidian(fileContent, noteName, path, vault, behavior, specificNoteName, dailyNoteFormat) {
 	let obsidianUrl;
 	let content = fileContent;
-
-	// Process variables in path
-	Object.keys(currentVariables).forEach(variable => {
-		path = path.replace(new RegExp(variable, 'g'), currentVariables[variable]);
-	});
 
 	// Ensure path ends with a slash
 	if (path && !path.endsWith('/')) {
