@@ -155,6 +155,21 @@ document.addEventListener('DOMContentLoaded', function() {
 			currentVariables[`{{${key}}}`] = extractedContent[key];
 		});
 
+		// Add all meta tags to variables
+		const metaTags = doc.querySelectorAll('meta');
+		metaTags.forEach(meta => {
+			const name = meta.getAttribute('name');
+			const property = meta.getAttribute('property');
+			const content = meta.getAttribute('content');
+
+			if (name && content) {
+				currentVariables[`{{meta:name:${name}}}`] = content;
+			}
+			if (property && content) {
+				currentVariables[`{{meta:property:${property}}}`] = content;
+			}
+		});
+
 		await updateTemplatePropertiesWithVariables();
 		await updateFileNameField(currentTemplate);
 		await updateNoteContentField(currentTemplate);
