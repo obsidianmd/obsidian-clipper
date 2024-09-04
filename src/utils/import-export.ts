@@ -1,5 +1,5 @@
-import { Template, Property } from './types';
-import { templates, saveTemplateSettings, updateTemplateList, showTemplateEditor, editingTemplateIndex } from './template-manager';
+import { Template, Property } from '../types/types';
+import { templates, saveTemplateSettings, updateTemplateList, showTemplateEditor, editingTemplateIndex } from '../managers/template-manager';
 
 export function exportTemplate(): void {
 	if (editingTemplateIndex === -1) {

@@ -3,7 +3,7 @@ import { gfm } from 'turndown-plugin-gfm';
 import { Readability } from '@mozilla/readability';
 import dayjs from 'dayjs';
 
-import { Template, Property } from './types';
+import { Template, Property } from '../types/types';
 
 interface ExtractedContent {
 	[key: string]: string;

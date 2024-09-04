@@ -1,4 +1,4 @@
-import { editingTemplateIndex, setEditingTemplateIndex } from './template-manager';
+import { editingTemplateIndex, setEditingTemplateIndex } from '../managers/template-manager';
 
 export function initializeSidebar(): void {
 	const sidebarItems = document.querySelectorAll('.sidebar li[data-section]');

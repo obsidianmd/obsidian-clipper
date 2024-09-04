@@ -1,12 +1,12 @@
-import { Template } from './types';
-import { loadTemplates, updateTemplateList, showTemplateEditor, saveTemplateSettings, createDefaultTemplate, templates, getTemplates } from './template-manager';
-import { loadGeneralSettings, updateVaultList, saveGeneralSettings, addVault } from './vault-manager';
-import { initializeSidebar } from './ui-utils';
-import { initializeDragAndDrop } from './drag-and-drop';
-import { initializeAutoSave } from './auto-save';
-import { exportTemplate, importTemplate } from './import-export';
+import { Template } from '../types/types';
+import { loadTemplates, updateTemplateList, showTemplateEditor, saveTemplateSettings, createDefaultTemplate, templates, getTemplates } from '../managers/template-manager';
+import { loadGeneralSettings, updateVaultList, saveGeneralSettings, addVault } from '../managers/vault-manager';
+import { initializeSidebar } from '../utils/ui-utils';
+import { initializeDragAndDrop } from '../utils/drag-and-drop';
+import { initializeAutoSave } from '../utils/auto-save';
+import { exportTemplate, importTemplate } from '../utils/import-export';
 import { createIcons } from 'lucide';
-import { icons } from './icons';
+import { icons } from '../icons/icons';
 
 document.addEventListener('DOMContentLoaded', () => {
 	const vaultInput = document.getElementById('vault-input') as HTMLInputElement;

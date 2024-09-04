@@ -1,6 +1,6 @@
-import { Template, Property } from './types';
-import { handleDragStart, handleDragOver, handleDrop, handleDragEnd } from './drag-and-drop';
-import { initializeIcons } from './icons';
+import { Template, Property } from 'types/types';
+import { handleDragStart, handleDragOver, handleDrop, handleDragEnd } from '../utils/drag-and-drop';
+import { initializeIcons } from '../icons/icons';
 
 export let templates: Template[] = [];
 export let editingTemplateIndex = -1;
