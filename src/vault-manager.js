@@ -1,6 +1,7 @@
 import { handleDragStart, handleDragOver, handleDrop, handleDragEnd } from './drag-and-drop.js';
+import { initializeIcons } from './icons.js';
 
-let vaults = [];
+export let vaults = [];
 
 export function loadGeneralSettings() {
 	chrome.storage.sync.get(['vaults'], (data) => {
@@ -36,6 +37,8 @@ export function updateVaultList() {
 		});
 		vaultList.appendChild(li);
 	});
+
+	initializeIcons(vaultList);
 }
 
 export function addVault(vault) {
@@ -52,12 +55,20 @@ export function removeVault(index) {
 	}
 }
 
+export function getVaults() {
+	return vaults;
+}
+
 export function saveGeneralSettings() {
-	chrome.storage.sync.set({ vaults }, () => {
-		if (chrome.runtime.lastError) {
-			console.error('Error saving vaults:', chrome.runtime.lastError);
-		} else {
-			console.log('General settings saved');
-		}
+	return new Promise((resolve, reject) => {
+		chrome.storage.sync.set({ vaults }, () => {
+			if (chrome.runtime.lastError) {
+				console.error('Error saving vaults:', chrome.runtime.lastError);
+				reject(chrome.runtime.lastError);
+			} else {
+				console.log('General settings saved');
+				resolve();
+			}
+		});
 	});
 }

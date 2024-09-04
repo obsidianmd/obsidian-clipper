@@ -1,5 +1,5 @@
-import { saveTemplateSettings, updateTemplateList, getEditingTemplateIndex, getTemplates } from './template-manager.js';
-import { vaults, saveGeneralSettings, updateVaultList } from './vault-manager.js';
+import { templates, getTemplates, saveTemplateSettings, updateTemplateList, getEditingTemplateIndex } from './template-manager.js';
+import { getVaults, saveGeneralSettings, updateVaultList } from './vault-manager.js';
 
 let isReordering = false;
 let draggedElement = null;
@@ -96,7 +96,8 @@ function handlePropertyReorder(draggedItemId, newIndex) {
 		return;
 	}
 
-	const template = templates[editingTemplateIndex];
+	const currentTemplates = getTemplates();
+	const template = currentTemplates[editingTemplateIndex];
 	if (!template) {
 		console.error('Template not found');
 		return;
@@ -125,6 +126,7 @@ function handlePropertyReorder(draggedItemId, newIndex) {
 }
 
 function handleVaultReorder(newIndex) {
+	const vaults = getVaults();
 	const oldIndex = parseInt(draggedElement.dataset.index);
 	if (oldIndex !== newIndex) {
 		const [movedVault] = vaults.splice(oldIndex, 1);

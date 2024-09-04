@@ -1,16 +1,14 @@
-import { createIcons } from 'lucide';
 import { icons } from './icons.js';
+import { initializeIcons } from './icons.js';
 import { handleDragStart, handleDragOver, handleDrop, handleDragEnd } from './drag-and-drop.js';
 
-let templates = [];
+export let templates = [];
 export let editingTemplateIndex = -1;
 
-// Add this near the top of the file, where editingTemplateIndex is declared
 export function setEditingTemplateIndex(index) {
 	editingTemplateIndex = index;
 }
 
-// Make sure this function is exported
 export function getTemplates() {
 	return templates;
 }
@@ -85,7 +83,7 @@ export function updateTemplateList() {
 			console.error('Invalid template at index', index, ':', template);
 		}
 	});
-	createIcons({ icons });
+	initializeIcons(templateList);
 }
 
 export function showTemplateEditor(template) {
@@ -319,14 +317,14 @@ export function addPropertyToEditor(name = '', value = '', type = 'text', id = n
 
 	updateSelectedOption(type, propertySelected);
 
-	createIcons({ icons, root: propertyDiv });
+	initializeIcons(propertyDiv);
 }
 
 function updateSelectedOption(value, propertySelected) {
 	const iconName = getIconForType(value);
 	propertySelected.innerHTML = `<i data-lucide="${iconName}"></i>`;
 	propertySelected.setAttribute('data-value', value);
-	createIcons({ icons, root: propertySelected });
+	initializeIcons(propertySelected);
 }
 
 function getIconForType(type) {
@@ -369,7 +367,6 @@ export function updateTemplateFromForm() {
 	template.urlPatterns = document.getElementById('url-patterns').value.split('\n').filter(Boolean);
 }
 
-// Add this new function to get the current editingTemplateIndex
 export function getEditingTemplateIndex() {
 	return editingTemplateIndex;
 }
