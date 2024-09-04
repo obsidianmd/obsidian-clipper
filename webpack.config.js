@@ -6,7 +6,7 @@ module.exports = {
 	mode: 'development', // or 'production'
 	entry: {
 		popup: './src/popup.js',
-		settings: './src/settings-main.js',
+		settings: './src/settings.js',
 		content: './src/content.js',
 		background: './src/background.js',
 		styles: './src/style.scss'
