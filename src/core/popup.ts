@@ -235,7 +235,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			switch (propertyType) {
 				case 'number':
 					const numericValue = value.replace(/[^\d.-]/g, '');
-					value = numericValue ? parseFloat(numericValue).toString() : '';
+					value = numericValue ? parseFloat(numericValue).toString() : value;
 					break;
 				case 'checkbox':
 					value = (value.toLowerCase() === 'true' || value === '1').toString();
