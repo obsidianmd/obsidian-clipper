@@ -5,31 +5,44 @@ import { handleDragStart, handleDragOver, handleDrop, handleDragEnd } from './dr
 let templates = [];
 export let editingTemplateIndex = -1;
 
+// Add this near the top of the file, where editingTemplateIndex is declared
+export function setEditingTemplateIndex(index) {
+	editingTemplateIndex = index;
+}
+
+// Make sure this function is exported
+export function getTemplates() {
+	return templates;
+}
+
 export function loadTemplates() {
-	chrome.storage.sync.get(['templates'], (data) => {
-		templates = Array.isArray(data.templates) ? data.templates : [];
+	return new Promise((resolve, reject) => {
+		chrome.storage.sync.get(['templates'], (data) => {
+			templates = Array.isArray(data.templates) ? data.templates : [];
 
-		// Remove any null or undefined templates
-		templates = templates.filter(template => template != null);
+			// Remove any null or undefined templates
+			templates = templates.filter(template => template != null);
 
-		templates = templates.map(template => {
-			if (!template.id) {
-				template.id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
+			templates = templates.map(template => {
+				if (!template.id) {
+					template.id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
+				}
+				return template;
+			});
+
+			if (templates.length === 0) {
+				templates.push(createDefaultTemplate());
 			}
-			return template;
-		});
 
-		if (templates.length === 0) {
-			templates.push(createDefaultTemplate());
-		}
-
-		chrome.storage.sync.set({ templates }, () => {
-			updateTemplateList();
-			if (templates.length > 0) {
-				showTemplateEditor(templates[0]);
-			} else {
-				console.error('No templates available.');
-			}
+			chrome.storage.sync.set({ templates }, () => {
+				updateTemplateList();
+				if (templates.length > 0) {
+					showTemplateEditor(templates[0]);
+				} else {
+					console.error('No templates available.');
+				}
+				resolve();
+			});
 		});
 	});
 }
@@ -94,6 +107,11 @@ export function showTemplateEditor(template) {
 		template = newTemplate;
 	}
 
+	// Ensure properties is always an array
+	if (!Array.isArray(template.properties)) {
+		template.properties = [];
+	}
+
 	const templateEditorTitle = document.getElementById('template-editor-title');
 	const templateName = document.getElementById('template-name');
 	const templateProperties = document.getElementById('template-properties');
@@ -147,6 +165,8 @@ export function showTemplateEditor(template) {
 	urlPatternsTextarea.value = template && template.urlPatterns ? template.urlPatterns.join('\n') : '';
 
 	document.getElementById('template-editor').style.display = 'block';
+    document.getElementById('templates-section').style.display = 'block';
+	document.getElementById('general-section').style.display = 'none';
 
 	document.querySelectorAll('.sidebar li[data-section]').forEach(item => item.classList.remove('active'));
 	document.querySelectorAll('#template-list li').forEach(item => item.classList.remove('active'));
@@ -325,6 +345,11 @@ export function updateTemplateFromForm() {
 	if (editingTemplateIndex === -1) return;
 
 	const template = templates[editingTemplateIndex];
+	if (!template) {
+		console.error('Template not found');
+		return;
+	}
+
 	template.name = document.getElementById('template-name').value;
 	template.behavior = document.getElementById('template-behavior').value;
 	template.path = document.getElementById('template-path-name').value;
@@ -333,7 +358,8 @@ export function updateTemplateFromForm() {
 	template.dailyNoteFormat = document.getElementById('daily-note-format').value;
 	template.noteContentFormat = document.getElementById('note-content-format').value;
 
-	template.properties = Array.from(document.querySelectorAll('#template-properties .property-editor')).map(prop => ({
+	const propertyElements = document.querySelectorAll('#template-properties .property-editor');
+	template.properties = Array.from(propertyElements).map(prop => ({
 		id: prop.dataset.id,
 		name: prop.querySelector('.property-name').value,
 		value: prop.querySelector('.property-value').value,
@@ -341,4 +367,9 @@ export function updateTemplateFromForm() {
 	}));
 
 	template.urlPatterns = document.getElementById('url-patterns').value.split('\n').filter(Boolean);
+}
+
+// Add this new function to get the current editingTemplateIndex
+export function getEditingTemplateIndex() {
+	return editingTemplateIndex;
 }

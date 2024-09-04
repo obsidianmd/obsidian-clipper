@@ -1,3 +1,5 @@
+import { editingTemplateIndex, setEditingTemplateIndex } from './template-manager.js';
+
 export function initializeSidebar() {
 	const sidebarItems = document.querySelectorAll('.sidebar li[data-section]');
 	const sections = document.querySelectorAll('.settings-section');
@@ -9,11 +11,14 @@ export function initializeSidebar() {
 			item.classList.add('active');
 			document.querySelectorAll('#template-list li').forEach(templateItem => templateItem.classList.remove('active'));
 			document.getElementById('template-editor').style.display = 'none';
-			editingTemplateIndex = -1;
+			setEditingTemplateIndex(-1);
 			sections.forEach(section => {
-				section.classList.remove('active');
 				if (section.id === `${sectionId}-section`) {
+					section.style.display = 'block';
 					section.classList.add('active');
+				} else {
+					section.style.display = 'none';
+					section.classList.remove('active');
 				}
 			});
 		});

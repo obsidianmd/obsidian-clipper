@@ -1,4 +1,4 @@
-import { templates, saveTemplateSettings, updateTemplateList } from './template-manager.js';
+import { saveTemplateSettings, updateTemplateList, getEditingTemplateIndex, getTemplates } from './template-manager.js';
 import { vaults, saveGeneralSettings, updateVaultList } from './vault-manager.js';
 
 let isReordering = false;
@@ -76,6 +76,7 @@ export function handleDragEnd(e) {
 }
 
 function handleTemplateReorder(draggedItemId, newIndex) {
+	const templates = getTemplates();
 	const oldIndex = templates.findIndex(t => t.id === draggedItemId);
 	if (oldIndex !== -1 && oldIndex !== newIndex) {
 		const [movedTemplate] = templates.splice(oldIndex, 1);
@@ -89,11 +90,30 @@ function handleTemplateReorder(draggedItemId, newIndex) {
 }
 
 function handlePropertyReorder(draggedItemId, newIndex) {
-	if (editingTemplateIndex === -1) return;
+	const editingTemplateIndex = getEditingTemplateIndex();
+	if (editingTemplateIndex === -1) {
+		console.error('No template is currently being edited');
+		return;
+	}
 
 	const template = templates[editingTemplateIndex];
+	if (!template) {
+		console.error('Template not found');
+		return;
+	}
+
+	if (!Array.isArray(template.properties) || template.properties.length === 0) {
+		console.error('Template properties array is empty or not an array');
+		return;
+	}
+
 	const oldIndex = template.properties.findIndex(p => p.id === draggedItemId);
-	if (oldIndex !== -1 && oldIndex !== newIndex) {
+	if (oldIndex === -1) {
+		console.error('Property not found');
+		return;
+	}
+
+	if (oldIndex !== newIndex) {
 		const [movedProperty] = template.properties.splice(oldIndex, 1);
 		template.properties.splice(newIndex, 0, movedProperty);
 		saveTemplateSettings().then(() => {
