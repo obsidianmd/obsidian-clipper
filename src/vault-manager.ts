@@ -1,5 +1,5 @@
-import { handleDragStart, handleDragOver, handleDrop, handleDragEnd } from './drag-and-drop.js';
-import { initializeIcons } from './icons.js';
+import { handleDragStart, handleDragOver, handleDrop, handleDragEnd } from './drag-and-drop';
+import { initializeIcons } from './icons';
 
 export let vaults = [];
 

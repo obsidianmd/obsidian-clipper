@@ -1,16 +1,14 @@
 {
 	"compilerOptions": {
-		"allowJs": true,
-		"declaration": true,
-		"esModuleInterop": true,
-		"forceConsistentCasingInFileNames": true,
-		"isolatedModules": true,
+		"target": "es6",
 		"module": "es6",
-		"moduleResolution": "node",
+		"strict": true,
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"forceConsistentCasingInFileNames": true,
 		"outDir": "./dist",
 		"rootDir": "./src",
-		"sourceMap": true,
-		"target": "ES2020"
+		"sourceMap": true
 	},
 	"include": ["src/**/*"],
 	"exclude": ["node_modules", "dist"]

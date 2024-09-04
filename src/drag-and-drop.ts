@@ -1,5 +1,5 @@
-import { templates, getTemplates, saveTemplateSettings, updateTemplateList, getEditingTemplateIndex } from './template-manager.js';
-import { getVaults, saveGeneralSettings, updateVaultList } from './vault-manager.js';
+import { templates, getTemplates, saveTemplateSettings, updateTemplateList, getEditingTemplateIndex } from './template-manager';
+import { getVaults, saveGeneralSettings, updateVaultList } from './vault-manager';
 
 let isReordering = false;
 let draggedElement = null;

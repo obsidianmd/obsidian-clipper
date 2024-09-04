@@ -1,4 +1,4 @@
-import { templates, saveTemplateSettings, updateTemplateList, showTemplateEditor, editingTemplateIndex } from './template-manager.js';
+import { templates, saveTemplateSettings, updateTemplateList, showTemplateEditor, editingTemplateIndex } from './template-manager';
 
 export function exportTemplate() {
 	if (editingTemplateIndex === -1) {

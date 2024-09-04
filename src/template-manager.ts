@@ -1,6 +1,6 @@
-import { icons } from './icons.js';
-import { initializeIcons } from './icons.js';
-import { handleDragStart, handleDragOver, handleDrop, handleDragEnd } from './drag-and-drop.js';
+import { icons } from './icons';
+import { initializeIcons } from './icons';
+import { handleDragStart, handleDragOver, handleDrop, handleDragEnd } from './drag-and-drop';
 
 export let templates = [];
 export let editingTemplateIndex = -1;
