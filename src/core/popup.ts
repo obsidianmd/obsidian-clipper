@@ -241,10 +241,10 @@ document.addEventListener('DOMContentLoaded', function() {
 					value = (value.toLowerCase() === 'true' || value === '1').toString();
 					break;
 				case 'date':
-					value = dayjs(value).format('YYYY-MM-DD');
+					value = dayjs(value).isValid() ? dayjs(value).format('YYYY-MM-DD') : value;
 					break;
 				case 'datetime':
-					value = dayjs(value).format('YYYY-MM-DD HH:mm:ss');
+					value = dayjs(value).isValid() ? dayjs(value).format('YYYY-MM-DD HH:mm:ss') : value;
 					break;
 			}
 
