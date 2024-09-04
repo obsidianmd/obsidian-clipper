@@ -1,20 +1,19 @@
-import { saveTemplateSettings, updateTemplateList, updateTemplateFromForm, addPropertyToEditor, editingTemplateIndex } from './template-manager.js';
+import { saveTemplateSettings, updateTemplateList, updateTemplateFromForm, addPropertyToEditor, editingTemplateIndex } from './template-manager';
 
 let isReordering = false;
 
-export function initializeAutoSave() {
+export function initializeAutoSave(): void {
 	const templateForm = document.getElementById('template-settings-form');
 	if (!templateForm) {
 		console.error('Template form not found');
 		return;
 	}
 
-	const debounce = (func, delay) => {
-		let debounceTimer;
-		return function() {
+	const debounce = <T extends (...args: any[]) => any>(func: T, delay: number): ((...args: Parameters<T>) => void) => {
+		let debounceTimer: NodeJS.Timeout | null = null;
+		return function(this: any, ...args: Parameters<T>) {
 			const context = this;
-			const args = arguments;
-			clearTimeout(debounceTimer);
+			if (debounceTimer) clearTimeout(debounceTimer);
 			debounceTimer = setTimeout(() => func.apply(context, args), delay);
 		}
 	};
@@ -31,7 +30,7 @@ export function initializeAutoSave() {
 		}
 	}, 500);
 
-	templateForm.addEventListener('input', (event) => {
+	templateForm.addEventListener('input', () => {
 		if (editingTemplateIndex !== -1) {
 			updateTemplateFromForm();
 			autoSave();
@@ -39,14 +38,17 @@ export function initializeAutoSave() {
 	});
 
 	const templateProperties = document.getElementById('template-properties');
-	templateProperties.addEventListener('click', (event) => {
-		if (event.target.classList.contains('remove-property-btn') || event.target.closest('.remove-property-btn')) {
-			if (editingTemplateIndex !== -1) {
-				updateTemplateFromForm();
-				autoSave();
+	if (templateProperties) {
+		templateProperties.addEventListener('click', (event) => {
+			const target = event.target as HTMLElement;
+			if (target.classList.contains('remove-property-btn') || target.closest('.remove-property-btn')) {
+				if (editingTemplateIndex !== -1) {
+					updateTemplateFromForm();
+					autoSave();
+				}
 			}
-		}
-	});
+		});
+	}
 
 	const addPropertyBtn = document.getElementById('add-property-btn');
 	if (addPropertyBtn) {

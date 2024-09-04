@@ -1,3 +1,4 @@
+import { Template } from './types';
 import { loadTemplates, updateTemplateList, showTemplateEditor, saveTemplateSettings, createDefaultTemplate, templates, getTemplates } from './template-manager';
 import { loadGeneralSettings, updateVaultList, saveGeneralSettings, addVault } from './vault-manager';
 import { initializeSidebar } from './ui-utils';
@@ -14,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	const importTemplateBtn = document.getElementById('import-template-btn') as HTMLButtonElement;
 	const resetDefaultTemplateBtn = document.getElementById('reset-default-template-btn') as HTMLButtonElement;
 
-	function initializeSettings() {
+	function initializeSettings(): void {
 		loadGeneralSettings();
 		loadTemplates().then(() => {
 			initializeTemplateListeners();
@@ -30,15 +31,15 @@ document.addEventListener('DOMContentLoaded', () => {
 		createIcons({ icons });
 	}
 
-	function initializeTemplateListeners() {
+	function initializeTemplateListeners(): void {
 		const templateList = document.getElementById('template-list');
 		if (templateList) {
 			templateList.addEventListener('click', (event) => {
 				const target = event.target as HTMLElement;
 				const listItem = target.closest('li');
-				if (listItem) {
+				if (listItem && listItem.dataset.id) {
 					const currentTemplates = getTemplates();
-					const selectedTemplate = currentTemplates.find(t => t.id === listItem.dataset.id);
+					const selectedTemplate = currentTemplates.find((t: Template) => t.id === listItem.dataset.id);
 					if (selectedTemplate) {
 						showTemplateEditor(selectedTemplate);
 					}
@@ -73,10 +74,10 @@ document.addEventListener('DOMContentLoaded', () => {
 	initializeSettings();
 });
 
-function resetDefaultTemplate() {
+function resetDefaultTemplate(): void {
 	const defaultTemplate = createDefaultTemplate();
 	const currentTemplates = getTemplates();
-	const defaultIndex = currentTemplates.findIndex(t => t.name === 'Default');
+	const defaultIndex = currentTemplates.findIndex((t: Template) => t.name === 'Default');
 	
 	if (defaultIndex !== -1) {
 		currentTemplates[defaultIndex] = defaultTemplate;

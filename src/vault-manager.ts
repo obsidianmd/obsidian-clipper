@@ -1,17 +1,17 @@
 import { handleDragStart, handleDragOver, handleDrop, handleDragEnd } from './drag-and-drop';
 import { initializeIcons } from './icons';
 
-export let vaults = [];
+export let vaults: string[] = [];
 
-export function loadGeneralSettings() {
-	chrome.storage.sync.get(['vaults'], (data) => {
+export function loadGeneralSettings(): void {
+	chrome.storage.sync.get(['vaults'], (data: { vaults?: string[] }) => {
 		vaults = data.vaults || [];
 		updateVaultList();
 	});
 }
 
-export function updateVaultList() {
-	const vaultList = document.getElementById('vault-list');
+export function updateVaultList(): void {
+	const vaultList = document.getElementById('vault-list') as HTMLUListElement;
 	vaultList.innerHTML = '';
 	vaults.forEach((vault, index) => {
 		const li = document.createElement('li');
@@ -24,13 +24,13 @@ export function updateVaultList() {
 				<i data-lucide="trash-2"></i>
 			</button>
 		`;
-		li.dataset.index = index;
+		li.dataset.index = index.toString();
 		li.draggable = true;
 		li.addEventListener('dragstart', handleDragStart);
 		li.addEventListener('dragover', handleDragOver);
 		li.addEventListener('drop', handleDrop);
 		li.addEventListener('dragend', handleDragEnd);
-		const removeBtn = li.querySelector('.remove-vault-btn');
+		const removeBtn = li.querySelector('.remove-vault-btn') as HTMLButtonElement;
 		removeBtn.addEventListener('click', (e) => {
 			e.stopPropagation();
 			removeVault(index);
@@ -41,13 +41,13 @@ export function updateVaultList() {
 	initializeIcons(vaultList);
 }
 
-export function addVault(vault) {
+export function addVault(vault: string): void {
 	vaults.push(vault);
 	saveGeneralSettings();
 	updateVaultList();
 }
 
-export function removeVault(index) {
+export function removeVault(index: number): void {
 	if (confirm(`Are you sure you want to remove the vault "${vaults[index]}"?`)) {
 		vaults.splice(index, 1);
 		saveGeneralSettings();
@@ -55,11 +55,11 @@ export function removeVault(index) {
 	}
 }
 
-export function getVaults() {
+export function getVaults(): string[] {
 	return vaults;
 }
 
-export function saveGeneralSettings() {
+export function saveGeneralSettings(): Promise<void> {
 	return new Promise((resolve, reject) => {
 		chrome.storage.sync.set({ vaults }, () => {
 			if (chrome.runtime.lastError) {

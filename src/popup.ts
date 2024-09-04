@@ -3,24 +3,7 @@ import { gfm } from 'turndown-plugin-gfm';
 import { Readability } from '@mozilla/readability';
 import dayjs from 'dayjs';
 
-interface Template {
-	id: string;
-	name: string;
-	behavior: string;
-	noteNameFormat: string;
-	path: string;
-	noteContentFormat: string;
-	properties: Property[];
-	urlPatterns: string[];
-	specificNoteName?: string;
-	dailyNoteFormat?: string;
-}
-
-interface Property {
-	name: string;
-	value: string;
-	type: string;
-}
+import { Template, Property } from './types';
 
 interface ExtractedContent {
 	[key: string]: string;
@@ -47,13 +30,13 @@ document.addEventListener('DOMContentLoaded', function() {
 	let vaults: string[] = [];
 
 	// Load vaults from storage
-	chrome.storage.sync.get(['vaults'], (data) => {
+	chrome.storage.sync.get(['vaults'], (data: { vaults?: string[] }) => {
 		vaults = data.vaults || [];
 		updateVaultDropdown();
 	});
 
 	// Load templates from storage and populate dropdown
-	chrome.storage.sync.get(['templates'], (data) => {
+	chrome.storage.sync.get(['templates'], (data: { templates?: Template[] }) => {
 		if (!data.templates || data.templates.length === 0) {
 			console.error('No templates found in storage');
 			return;
@@ -70,13 +53,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
 		// Set the first template as the default
 		currentTemplate = data.templates[0];
-		templateSelect.value = currentTemplate.name;
+		if (currentTemplate) {
+			templateSelect.value = currentTemplate.name;
+		}
 
 		if (data.templates.length > 1) {
 			templateContainer.style.display = 'block';
 		}
 
-		updateTemplateProperties(currentTemplate);
+		if (currentTemplate) {
+			updateTemplateProperties(currentTemplate);
+		}
 	});
 
 	function updateVaultDropdown() {
@@ -99,8 +86,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	// Add event listener for template selection change
 	templateSelect.addEventListener('change', function() {
-		chrome.storage.sync.get(['templates'], (data) => {
-			currentTemplate = data.templates.find((t: Template) => t.name === this.value);
+		chrome.storage.sync.get(['templates'], (data: { templates?: Template[] }) => {
+			currentTemplate = data.templates?.find((t: Template) => t.name === this.value) || null;
 			if (currentTemplate) {
 				updateTemplateProperties(currentTemplate);
 			}
@@ -118,7 +105,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		}
 
 		// Load templates and find matching template
-		chrome.storage.sync.get(['templates'], (data) => {
+		chrome.storage.sync.get(['templates'], (data: { templates?: Template[] }) => {
 			const templates: Template[] = data.templates || [];
 			const matchingTemplate = findMatchingTemplate(currentUrl, templates);
 			
@@ -129,7 +116,9 @@ document.addEventListener('DOMContentLoaded', function() {
 				currentTemplate = templates[0]; // Use the first template as default
 			}
 
-			updateTemplateProperties(currentTemplate);
+			if (currentTemplate) {
+				updateTemplateProperties(currentTemplate);
+			}
 
 			if (tabs[0].id) {
 				chrome.tabs.sendMessage(tabs[0].id, {action: "getPageContent"}, function(response) {
@@ -146,11 +135,19 @@ document.addEventListener('DOMContentLoaded', function() {
 	async function initializePageContent(content: string, selectedHtml: string, extractedContent: ExtractedContent) {
 		const parser = new DOMParser();
 		const doc = parser.parseFromString(content, 'text/html');
-		const { title: rawTitle, byline, excerpt, lang } = new Readability(doc).parse();
+		const readabilityArticle = new Readability(doc).parse();
+		if (!readabilityArticle) {
+			console.error('Failed to parse content with Readability');
+			return;
+		}
+		const { title: rawTitle, byline, excerpt, lang } = readabilityArticle;
 		
 		currentTitle = rawTitle.replace(/"/g, "'");
 		const noteName = getFileName(currentTitle);
-		document.getElementById('note-name-field')!.value = noteName;
+		const noteNameField = document.getElementById('note-name-field') as HTMLInputElement;
+		if (noteNameField) {
+			noteNameField.value = noteName;
+		}
 
 		const author = byline || getMetaContent(doc, "name", "author") || getMetaContent(doc, "property", "author") || getMetaContent(doc, "name", "twitter:creator") || getMetaContent(doc, "property", "og:site_name");
 
@@ -198,16 +195,13 @@ document.addEventListener('DOMContentLoaded', function() {
 		});
 
 		await updateTemplatePropertiesWithVariables();
-		await updateFileNameField(currentTemplate);
-		await updateNoteContentField(currentTemplate);
+		if (currentTemplate) {
+			await updateFileNameField(currentTemplate);
+			await updateNoteContentField(currentTemplate);
+		}
 	}
 
 	async function updateTemplateProperties(template: Template) {
-		if (!template) {
-			console.error('Template is undefined in updateTemplateProperties');
-			return;
-		}
-
 		const templateProperties = document.querySelector('.metadata-properties') as HTMLElement;
 		templateProperties.innerHTML = '';
 
@@ -247,7 +241,7 @@ document.addEventListener('DOMContentLoaded', function() {
 					value = numericValue ? parseFloat(numericValue).toString() : '';
 					break;
 				case 'checkbox':
-					value = value.toLowerCase() === 'true' || value === '1';
+					value = (value.toLowerCase() === 'true' || value === '1').toString();
 					break;
 				case 'date':
 					value = dayjs(value).format('YYYY-MM-DD');
@@ -264,9 +258,13 @@ document.addEventListener('DOMContentLoaded', function() {
 	async function extractContentBySelector(selector: string): Promise<string> {
 		return new Promise((resolve) => {
 			chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-				chrome.tabs.sendMessage(tabs[0].id!, {action: "extractContent", selector: selector}, function(response) {
-					resolve(response ? response.content : '');
-				});
+				if (tabs[0].id) {
+					chrome.tabs.sendMessage(tabs[0].id, {action: "extractContent", selector: selector}, function(response) {
+						resolve(response ? response.content : '');
+					});
+				} else {
+					resolve('');
+				}
 			});
 		});
 	}
@@ -287,15 +285,13 @@ document.addEventListener('DOMContentLoaded', function() {
 	}
 
 	async function updateFileNameField(template: Template) {
-		if (!template) {
-			console.error('Template is undefined in updateFileNameField');
-			return;
-		}
-
 		if (template.behavior === 'create' && template.noteNameFormat) {
 			let noteName = template.noteNameFormat;
 			noteName = await replaceVariablesAndSelectors(noteName);
-			document.getElementById('note-name-field')!.value = getFileName(noteName);
+			const noteNameField = document.getElementById('note-name-field') as HTMLInputElement;
+			if (noteNameField) {
+				noteNameField.value = getFileName(noteName);
+			}
 		}
 	}
 
@@ -360,7 +356,12 @@ document.addEventListener('DOMContentLoaded', function() {
 			markdownContent = tempDiv.innerHTML;
 		} else {
 			// If no selection, use Readability
-			const { content: readableContent } = new Readability(doc).parse();
+			const readabilityArticle = new Readability(doc).parse();
+			if (!readabilityArticle) {
+				console.error('Failed to parse content with Readability');
+				return '';
+			}
+			const { content: readableContent } = readabilityArticle;
 			
 			const tempDiv = document.createElement('div');
 			tempDiv.innerHTML = readableContent;
@@ -385,13 +386,13 @@ document.addEventListener('DOMContentLoaded', function() {
 		// Custom rule to handle bullet lists without extra spaces
 		turndownService.addRule('listItem', {
 			filter: 'li',
-			replacement: function (content, node, options) {
+			replacement: function (content: string, node: Node, options: TurndownService.Options) {
 				content = content.trim();
 				let prefix = options.bulletListMarker + ' ';
 				let parent = node.parentNode;
-				if (parent && parent.nodeName === 'OL') {
+				if (parent instanceof HTMLOListElement) {
 					let start = parent.getAttribute('start');
-					let index = Array.prototype.indexOf.call(parent.children, node) + 1;
+					let index = Array.from(parent.children).indexOf(node as HTMLElement) + 1;
 					prefix = (start ? Number(start) + index - 1 : index) + '. ';
 				}
 				return prefix + content + '\n';
@@ -432,7 +433,7 @@ document.addEventListener('DOMContentLoaded', function() {
 						if (template.behavior === 'create') {
 							const frontmatter = await generateFrontmatter(template.properties);
 							fileContent = frontmatter + noteContent;
-							noteName = await replaceVariablesAndSelectors(document.getElementById('note-name-field')!.value);
+							noteName = await replaceVariablesAndSelectors((document.getElementById('note-name-field') as HTMLInputElement).value);
 						} else {
 							fileContent = noteContent;
 							noteName = '';
@@ -540,8 +541,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	}
 
 	function getFileName(noteName: string): string {
-		const isWindows = navigator.userAgentData?.platform === 'Windows' || 
-			/Win/.test(navigator.platform);
+		const isWindows = navigator.platform.indexOf('Win') > -1;
 		if (isWindows) {
 			noteName = noteName.replace(':', '').replace(/[/\\?%*|"<>]/g, '-');
 		} else {

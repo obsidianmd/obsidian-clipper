@@ -11,6 +11,7 @@
 		"@babel/preset-env": "^7.23.5",
 		"@types/chrome": "^0.0.270",
 		"@types/node": "^22.5.3",
+		"@types/turndown": "^5.0.5",
 		"babel-loader": "^9.1.3",
 		"copy-webpack-plugin": "^12.0.2",
 		"css-loader": "^7.1.2",
@@ -24,6 +25,7 @@
 	},
 	"dependencies": {
 		"@mozilla/readability": "^0.5.0",
+		"@types/mozilla-readability": "^0.2.1",
 		"dayjs": "^1.11.13",
 		"lucide": "^0.359.0",
 		"turndown": "^7.2.0",

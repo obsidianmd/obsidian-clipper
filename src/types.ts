@@ -7,9 +7,12 @@ export interface Template {
 	noteContentFormat: string;
 	properties: Property[];
 	urlPatterns: string[];
+	specificNoteName?: string;
+	dailyNoteFormat?: string;
 }
 
 export interface Property {
+	id: string;
 	name: string;
 	value: string;
 	type: string;
