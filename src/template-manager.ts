@@ -86,121 +86,121 @@ export function updateTemplateList(): void {
 }
 
 export function showTemplateEditor(template: Template | null): void {
-    let editingTemplate: Template;
+	let editingTemplate: Template;
 
-    if (!template) {
-        editingTemplate = {
-            id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
-            name: 'New template',
-            behavior: 'create',
-            noteNameFormat: '{{title}}',
-            path: 'Clippings/',
-            noteContentFormat: '{{content}}',
-            properties: [],
-            urlPatterns: []
-        };
-        templates.push(editingTemplate);
-        editingTemplateIndex = templates.length - 1;
-    } else {
-        editingTemplate = template;
-        editingTemplateIndex = templates.findIndex(t => t.id === editingTemplate.id);
-    }
+	if (!template) {
+		editingTemplate = {
+			id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+			name: 'New template',
+			behavior: 'create',
+			noteNameFormat: '{{title}}',
+			path: 'Clippings/',
+			noteContentFormat: '{{content}}',
+			properties: [],
+			urlPatterns: []
+		};
+		templates.push(editingTemplate);
+		editingTemplateIndex = templates.length - 1;
+	} else {
+		editingTemplate = template;
+		editingTemplateIndex = templates.findIndex(t => t.id === editingTemplate.id);
+	}
 
-    // Ensure properties is always an array
-    if (!editingTemplate.properties) {
-        editingTemplate.properties = [];
-    }
+	// Ensure properties is always an array
+	if (!editingTemplate.properties) {
+		editingTemplate.properties = [];
+	}
 
-    const templateEditorTitle = document.getElementById('template-editor-title');
-    const templateName = document.getElementById('template-name') as HTMLInputElement;
-    const templateProperties = document.getElementById('template-properties');
+	const templateEditorTitle = document.getElementById('template-editor-title');
+	const templateName = document.getElementById('template-name') as HTMLInputElement;
+	const templateProperties = document.getElementById('template-properties');
 
-    if (templateEditorTitle) templateEditorTitle.textContent = 'Edit template';
-    if (templateName) templateName.value = editingTemplate.name;
-    if (templateProperties) templateProperties.innerHTML = '';
+	if (templateEditorTitle) templateEditorTitle.textContent = 'Edit template';
+	if (templateName) templateName.value = editingTemplate.name;
+	if (templateProperties) templateProperties.innerHTML = '';
 
-    const pathInput = document.getElementById('template-path-name') as HTMLInputElement;
-    if (pathInput) pathInput.value = editingTemplate.path;
+	const pathInput = document.getElementById('template-path-name') as HTMLInputElement;
+	if (pathInput) pathInput.value = editingTemplate.path;
 
-    const behaviorSelect = document.getElementById('template-behavior') as HTMLSelectElement;
-    const specificNoteContainer = document.getElementById('specific-note-container');
-    const dailyNoteFormatContainer = document.getElementById('daily-note-format-container');
-    const noteNameFormatContainer = document.getElementById('note-name-format-container');
-    const propertiesContainer = document.getElementById('properties-container');
-    const propertiesWarning = document.getElementById('properties-warning');
-    
-    if (behaviorSelect) behaviorSelect.value = editingTemplate.behavior || 'create';
-    const specificNoteName = document.getElementById('specific-note-name') as HTMLInputElement;
-    if (specificNoteName) specificNoteName.value = editingTemplate.specificNoteName || '';
-    const dailyNoteFormat = document.getElementById('daily-note-format') as HTMLInputElement;
-    if (dailyNoteFormat) dailyNoteFormat.value = editingTemplate.dailyNoteFormat || 'YYYY-MM-DD';
-    const noteNameFormat = document.getElementById('note-name-format') as HTMLInputElement;
-    if (noteNameFormat) noteNameFormat.value = editingTemplate.noteNameFormat || '{{title}}';
+	const behaviorSelect = document.getElementById('template-behavior') as HTMLSelectElement;
+	const specificNoteContainer = document.getElementById('specific-note-container');
+	const dailyNoteFormatContainer = document.getElementById('daily-note-format-container');
+	const noteNameFormatContainer = document.getElementById('note-name-format-container');
+	const propertiesContainer = document.getElementById('properties-container');
+	const propertiesWarning = document.getElementById('properties-warning');
+	
+	if (behaviorSelect) behaviorSelect.value = editingTemplate.behavior || 'create';
+	const specificNoteName = document.getElementById('specific-note-name') as HTMLInputElement;
+	if (specificNoteName) specificNoteName.value = editingTemplate.specificNoteName || '';
+	const dailyNoteFormat = document.getElementById('daily-note-format') as HTMLInputElement;
+	if (dailyNoteFormat) dailyNoteFormat.value = editingTemplate.dailyNoteFormat || 'YYYY-MM-DD';
+	const noteNameFormat = document.getElementById('note-name-format') as HTMLInputElement;
+	if (noteNameFormat) noteNameFormat.value = editingTemplate.noteNameFormat || '{{title}}';
 
-    const noteContentFormat = document.getElementById('note-content-format') as HTMLTextAreaElement;
-    if (noteContentFormat) noteContentFormat.value = editingTemplate.noteContentFormat || '{{content}}';
+	const noteContentFormat = document.getElementById('note-content-format') as HTMLTextAreaElement;
+	if (noteContentFormat) noteContentFormat.value = editingTemplate.noteContentFormat || '{{content}}';
 
-    updateBehaviorFields();
+	updateBehaviorFields();
 
-    if (behaviorSelect) {
-        behaviorSelect.addEventListener('change', updateBehaviorFields);
-    }
+	if (behaviorSelect) {
+		behaviorSelect.addEventListener('change', updateBehaviorFields);
+	}
 
-    function updateBehaviorFields() {
-        const selectedBehavior = behaviorSelect?.value;
-        if (specificNoteContainer) specificNoteContainer.style.display = selectedBehavior === 'append-specific' ? 'block' : 'none';
-        if (dailyNoteFormatContainer) dailyNoteFormatContainer.style.display = selectedBehavior === 'append-daily' ? 'block' : 'none';
-        if (noteNameFormatContainer) noteNameFormatContainer.style.display = selectedBehavior === 'create' ? 'block' : 'none';
-        
-        if (selectedBehavior === 'append-specific' || selectedBehavior === 'append-daily') {
-            if (propertiesContainer) propertiesContainer.style.display = 'none';
-            if (propertiesWarning) propertiesWarning.style.display = 'block';
-        } else {
-            if (propertiesContainer) propertiesContainer.style.display = 'block';
-            if (propertiesWarning) propertiesWarning.style.display = 'none';
-        }
-    }
+	function updateBehaviorFields() {
+		const selectedBehavior = behaviorSelect?.value;
+		if (specificNoteContainer) specificNoteContainer.style.display = selectedBehavior === 'append-specific' ? 'block' : 'none';
+		if (dailyNoteFormatContainer) dailyNoteFormatContainer.style.display = selectedBehavior === 'append-daily' ? 'block' : 'none';
+		if (noteNameFormatContainer) noteNameFormatContainer.style.display = selectedBehavior === 'create' ? 'block' : 'none';
+		
+		if (selectedBehavior === 'append-specific' || selectedBehavior === 'append-daily') {
+			if (propertiesContainer) propertiesContainer.style.display = 'none';
+			if (propertiesWarning) propertiesWarning.style.display = 'block';
+		} else {
+			if (propertiesContainer) propertiesContainer.style.display = 'block';
+			if (propertiesWarning) propertiesWarning.style.display = 'none';
+		}
+	}
 
-    if (editingTemplate && Array.isArray(editingTemplate.properties)) {
-        editingTemplate.properties.forEach(property => addPropertyToEditor(property.name, property.value, property.type, property.id));
-    }
+	if (editingTemplate && Array.isArray(editingTemplate.properties)) {
+		editingTemplate.properties.forEach(property => addPropertyToEditor(property.name, property.value, property.type, property.id));
+	}
 
-    const urlPatternsTextarea = document.getElementById('url-patterns') as HTMLTextAreaElement;
-    if (urlPatternsTextarea) urlPatternsTextarea.value = editingTemplate && editingTemplate.urlPatterns ? editingTemplate.urlPatterns.join('\n') : '';
+	const urlPatternsTextarea = document.getElementById('url-patterns') as HTMLTextAreaElement;
+	if (urlPatternsTextarea) urlPatternsTextarea.value = editingTemplate && editingTemplate.urlPatterns ? editingTemplate.urlPatterns.join('\n') : '';
 
-    const templateEditor = document.getElementById('template-editor');
-    if (templateEditor) templateEditor.style.display = 'block';
-    const templatesSection = document.getElementById('templates-section');
-    if (templatesSection) templatesSection.style.display = 'block';
-    const generalSection = document.getElementById('general-section');
-    if (generalSection) generalSection.style.display = 'none';
+	const templateEditor = document.getElementById('template-editor');
+	if (templateEditor) templateEditor.style.display = 'block';
+	const templatesSection = document.getElementById('templates-section');
+	if (templatesSection) templatesSection.style.display = 'block';
+	const generalSection = document.getElementById('general-section');
+	if (generalSection) generalSection.style.display = 'none';
 
-    document.querySelectorAll('.sidebar li[data-section]').forEach(item => item.classList.remove('active'));
-    document.querySelectorAll('#template-list li').forEach(item => item.classList.remove('active'));
-    if (editingTemplateIndex !== -1) {
-        const activeTemplateItem = document.querySelector(`#template-list li[data-id="${templates[editingTemplateIndex].id}"]`);
-        if (activeTemplateItem) {
-            activeTemplateItem.classList.add('active');
-        }
-    }
+	document.querySelectorAll('.sidebar li[data-section]').forEach(item => item.classList.remove('active'));
+	document.querySelectorAll('#template-list li').forEach(item => item.classList.remove('active'));
+	if (editingTemplateIndex !== -1) {
+		const activeTemplateItem = document.querySelector(`#template-list li[data-id="${templates[editingTemplateIndex].id}"]`);
+		if (activeTemplateItem) {
+			activeTemplateItem.classList.add('active');
+		}
+	}
 
-    if (templatesSection) templatesSection.classList.add('active');
-    if (generalSection) generalSection.classList.remove('active');
+	if (templatesSection) templatesSection.classList.add('active');
+	if (generalSection) generalSection.classList.remove('active');
 
-    updateTemplateFromForm();
-    saveTemplateSettings().then(() => {
-        updateTemplateList();
+	updateTemplateFromForm();
+	saveTemplateSettings().then(() => {
+		updateTemplateList();
 
-        if (!editingTemplate.id) {
-            const templateNameField = document.getElementById('template-name') as HTMLInputElement;
-            if (templateNameField) {
-                templateNameField.focus();
-                templateNameField.select();
-            }
-        }
-    }).catch(error => {
-        console.error('Failed to save new template:', error);
-    });
+		if (!editingTemplate.id) {
+			const templateNameField = document.getElementById('template-name') as HTMLInputElement;
+			if (templateNameField) {
+				templateNameField.focus();
+				templateNameField.select();
+			}
+		}
+	}).catch(error => {
+		console.error('Failed to save new template:', error);
+	});
 }
 
 export function saveTemplateSettings(): Promise<void> {
@@ -413,5 +413,5 @@ export function getEditingTemplateIndex(): number {
 
 // Add this export
 export function getTemplates(): Template[] {
-    return templates;
+	return templates;
 }
