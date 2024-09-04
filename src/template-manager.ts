@@ -11,18 +11,13 @@ export function setEditingTemplateIndex(index: number): void {
 
 export function loadTemplates(): Promise<void> {
 	return new Promise((resolve) => {
-		chrome.storage.sync.get(['templates'], (data: { templates?: Template[] }) => {
-			templates = Array.isArray(data.templates) ? data.templates : [];
+		chrome.storage.sync.get(['templates'], (data) => {
+			templates = (data.templates || []).filter((template: Template) => template != null);
 
-			// Remove any null or undefined templates
-			templates = templates.filter(template => template != null);
-
-			templates = templates.map(template => {
-				if (!template.id) {
-					template.id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
-				}
-				return template;
-			});
+			templates = templates.map(template => ({
+				...template,
+				id: template.id || Date.now().toString() + Math.random().toString(36).slice(2, 11)
+			}));
 
 			if (templates.length === 0) {
 				templates.push(createDefaultTemplate());
@@ -32,8 +27,6 @@ export function loadTemplates(): Promise<void> {
 				updateTemplateList();
 				if (templates.length > 0) {
 					showTemplateEditor(templates[0]);
-				} else {
-					console.error('No templates available.');
 				}
 				resolve();
 			});
@@ -90,7 +83,7 @@ export function showTemplateEditor(template: Template | null): void {
 
 	if (!template) {
 		editingTemplate = {
-			id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+			id: Date.now().toString() + Math.random().toString(36).slice(2, 11),
 			name: 'New template',
 			behavior: 'create',
 			noteNameFormat: '{{title}}',
@@ -219,20 +212,20 @@ export function saveTemplateSettings(): Promise<void> {
 
 export function createDefaultTemplate(): Template {
 	return {
-		id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+		id: Date.now().toString() + Math.random().toString(36).slice(2, 11),
 		name: 'Default',
 		behavior: 'create',
 		noteNameFormat: '{{title}}',
 		path: 'Clippings/',
 		noteContentFormat: '{{content}}',
 		properties: [
-			{ id: Date.now().toString() + Math.random().toString(36).substr(2, 9), name: 'title', value: '{{title}}', type: 'text' },
-			{ id: Date.now().toString() + Math.random().toString(36).substr(2, 9), name: 'source', value: '{{url}}', type: 'text' },
-			{ id: Date.now().toString() + Math.random().toString(36).substr(2, 9), name: 'author', value: '{{author}}', type: 'text' },
-			{ id: Date.now().toString() + Math.random().toString(36).substr(2, 9), name: 'published', value: '{{published}}', type: 'date' },
-			{ id: Date.now().toString() + Math.random().toString(36).substr(2, 9), name: 'created', value: '{{today}}', type: 'date' },
-			{ id: Date.now().toString() + Math.random().toString(36).substr(2, 9), name: 'description', value: '{{description}}', type: 'text' },
-			{ id: Date.now().toString() + Math.random().toString(36).substr(2, 9), name: 'tags', value: 'clippings', type: 'multitext' }
+			{ id: Date.now().toString() + Math.random().toString(36).slice(2, 11), name: 'title', value: '{{title}}', type: 'text' },
+			{ id: Date.now().toString() + Math.random().toString(36).slice(2, 11), name: 'source', value: '{{url}}', type: 'text' },
+			{ id: Date.now().toString() + Math.random().toString(36).slice(2, 11), name: 'author', value: '{{author}}', type: 'text' },
+			{ id: Date.now().toString() + Math.random().toString(36).slice(2, 11), name: 'published', value: '{{published}}', type: 'date' },
+			{ id: Date.now().toString() + Math.random().toString(36).slice(2, 11), name: 'created', value: '{{today}}', type: 'date' },
+			{ id: Date.now().toString() + Math.random().toString(36).slice(2, 11), name: 'description', value: '{{description}}', type: 'text' },
+			{ id: Date.now().toString() + Math.random().toString(36).slice(2, 11), name: 'tags', value: 'clippings', type: 'multitext' }
 		],
 		urlPatterns: []
 	};
@@ -307,7 +300,7 @@ export function addPropertyToEditor(name: string = '', value: string = '', type:
 			<i data-lucide="trash-2"></i>
 		</button>
 	`;
-	propertyDiv.dataset.id = id || Date.now().toString() + Math.random().toString(36).substr(2, 9);
+	propertyDiv.dataset.id = id || Date.now().toString() + Math.random().toString(36).slice(2, 11);
 	templateProperties.appendChild(propertyDiv);
 
 	const propertySelect = propertyDiv.querySelector('.property-select');
@@ -396,7 +389,7 @@ export function updateTemplateFromForm(): void {
 		const valueInput = prop.querySelector('.property-value') as HTMLInputElement;
 		const typeSelect = prop.querySelector('.property-select .property-selected') as HTMLElement;
 		return {
-			id: (prop as HTMLElement).dataset.id || Date.now().toString() + Math.random().toString(36).substr(2, 9),
+			id: (prop as HTMLElement).dataset.id || Date.now().toString() + Math.random().toString(36).slice(2, 11),
 			name: nameInput.value,
 			value: valueInput.value,
 			type: typeSelect.getAttribute('data-value') || 'text'

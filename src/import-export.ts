@@ -40,57 +40,46 @@ export function importTemplate(): void {
 	input.accept = '.json';
 
 	input.onchange = (event: Event) => {
-		const target = event.target as HTMLInputElement;
-		const file = target.files?.[0];
-		if (file) {
-			const reader = new FileReader();
-			reader.onload = (e: ProgressEvent<FileReader>) => {
-				try {
-					const result = e.target?.result;
-					if (typeof result === 'string') {
-						let importedTemplate = JSON.parse(result) as Partial<Template>;
-						if (validateImportedTemplate(importedTemplate)) {
-							// Assign a new ID if the imported template doesn't have one
-							if (!importedTemplate.id) {
-								importedTemplate.id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
-							}
+		const file = (event.target as HTMLInputElement).files?.[0];
+		if (!file) return;
 
-							// Check if a template with the same name already exists
-							const existingIndex = templates.findIndex(t => t.name === importedTemplate.name);
-							if (existingIndex !== -1) {
-								if (confirm(`A template named "${importedTemplate.name}" already exists. Do you want to replace it?`)) {
-									templates[existingIndex] = importedTemplate as Template;
-								} else {
-									// Append a number to the template name to make it unique
-									let newName = importedTemplate.name as string;
-									let counter = 1;
-									while (templates.some(t => t.name === newName)) {
-										newName = `${importedTemplate.name} (${counter})`;
-										counter++;
-									}
-									importedTemplate.name = newName;
-									templates.push(importedTemplate as Template);
-								}
-							} else {
-								templates.push(importedTemplate as Template);
-							}
-							saveTemplateSettings();
-							updateTemplateList();
-							showTemplateEditor(importedTemplate as Template);
-							alert('Template imported successfully!');
-						} else {
-							alert('Invalid template file. Please check the file format and try again.');
-						}
-					} else {
-						throw new Error('Invalid file content');
-					}
-				} catch (error) {
-					console.error('Error parsing imported template:', error);
-					alert('Error importing template. Please check the file and try again.');
+		const reader = new FileReader();
+		reader.onload = (e: ProgressEvent<FileReader>) => {
+			try {
+				const importedTemplate = JSON.parse(e.target?.result as string) as Partial<Template>;
+				if (!validateImportedTemplate(importedTemplate)) {
+					throw new Error('Invalid template file');
 				}
-			};
-			reader.readAsText(file);
-		}
+
+				importedTemplate.id = importedTemplate.id || Date.now().toString() + Math.random().toString(36).substr(2, 9);
+
+				const existingIndex = templates.findIndex(t => t.name === importedTemplate.name);
+				if (existingIndex !== -1) {
+					if (confirm(`A template named "${importedTemplate.name}" already exists. Do you want to replace it?`)) {
+							templates[existingIndex] = importedTemplate as Template;
+					} else {
+						let newName = importedTemplate.name as string;
+						let counter = 1;
+						while (templates.some(t => t.name === newName)) {
+							newName = `${importedTemplate.name} (${counter++})`;
+						}
+						importedTemplate.name = newName;
+						templates.push(importedTemplate as Template);
+					}
+				} else {
+					templates.push(importedTemplate as Template);
+				}
+
+				saveTemplateSettings();
+				updateTemplateList();
+				showTemplateEditor(importedTemplate as Template);
+				alert('Template imported successfully!');
+			} catch (error) {
+				console.error('Error parsing imported template:', error);
+				alert('Error importing template. Please check the file and try again.');
+			}
+		};
+		reader.readAsText(file);
 	};
 
 	input.click();

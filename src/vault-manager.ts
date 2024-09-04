@@ -4,7 +4,7 @@ import { initializeIcons } from './icons';
 export let vaults: string[] = [];
 
 export function loadGeneralSettings(): void {
-	chrome.storage.sync.get(['vaults'], (data: { vaults?: string[] }) => {
+	chrome.storage.sync.get(['vaults'], (data) => {
 		vaults = data.vaults || [];
 		updateVaultList();
 	});

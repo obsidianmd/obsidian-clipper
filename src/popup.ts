@@ -145,9 +145,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		currentTitle = rawTitle.replace(/"/g, "'");
 		const noteName = getFileName(currentTitle);
 		const noteNameField = document.getElementById('note-name-field') as HTMLInputElement;
-		if (noteNameField) {
-			noteNameField.value = noteName;
-		}
+		if (noteNameField) noteNameField.value = noteName;
 
 		const author = byline || getMetaContent(doc, "name", "author") || getMetaContent(doc, "property", "author") || getMetaContent(doc, "name", "twitter:creator") || getMetaContent(doc, "property", "og:site_name");
 
@@ -156,8 +154,8 @@ document.addEventListener('DOMContentLoaded', function() {
 		const language = lang;
 
 		const timeElement = doc.querySelector("time");
-		const publishedDate = timeElement ? timeElement.getAttribute("datetime") : "";
-		const published = publishedDate && publishedDate.trim() !== "" ? `${convertDate(new Date(publishedDate))}` : "";
+		const publishedDate = timeElement?.getAttribute("datetime");
+		const published = publishedDate ? `${convertDate(new Date(publishedDate))}` : "";
 
 		const markdownBody = createMarkdownContent(content, currentUrl, selectedHtml);
 
@@ -165,23 +163,22 @@ document.addEventListener('DOMContentLoaded', function() {
 			'{{title}}': currentTitle,
 			'{{url}}': currentUrl,
 			'{{published}}': published,
-			'{{author}}': author,
+			'{{author}}': author ?? '',
 			'{{today}}': convertDate(new Date()),
-			'{{description}}': description,
-			'{{domain}}': currentUrl.split('://')[1].split('/')[0],
-			'{{image}}': image,
-			'{{language}}': language,
+			'{{description}}': description ?? '',
+			'{{domain}}': new URL(currentUrl).hostname,
+			'{{image}}': image ?? '',
+			'{{language}}': language ?? '',
 			'{{content}}': markdownBody
 		};
 
 		// Add extracted content to variables
-		Object.keys(extractedContent).forEach(key => {
-			currentVariables[`{{${key}}}`] = extractedContent[key];
-		});
+		Object.assign(currentVariables, Object.fromEntries(
+			Object.entries(extractedContent).map(([key, value]) => [`{{${key}}}`, value])
+		));
 
 		// Add all meta tags to variables
-		const metaTags = doc.querySelectorAll('meta');
-		metaTags.forEach(meta => {
+		doc.querySelectorAll('meta').forEach(meta => {
 			const name = meta.getAttribute('name');
 			const property = meta.getAttribute('property');
 			const content = meta.getAttribute('content');
