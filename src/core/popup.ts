@@ -5,6 +5,7 @@ import dayjs from 'dayjs';
 
 import { Template, Property } from '../types/types';
 import { generateFrontmatter, saveToObsidian, getFileName } from '../utils/obsidian-note-creator';
+import { createMarkdownContent, extractReadabilityContent } from '../utils/markdown-converter';
 
 interface ExtractedContent {
 	[key: string]: string;
@@ -134,9 +135,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	});
 
 	async function initializePageContent(content: string, selectedHtml: string, extractedContent: ExtractedContent) {
-		const parser = new DOMParser();
-		const doc = parser.parseFromString(content, 'text/html');
-		const readabilityArticle = new Readability(doc).parse();
+		const readabilityArticle = extractReadabilityContent(content);
 		if (!readabilityArticle) {
 			console.error('Failed to parse content with Readability');
 			return;
@@ -147,6 +146,9 @@ document.addEventListener('DOMContentLoaded', function() {
 		const noteName = getFileName(currentTitle);
 		const noteNameField = document.getElementById('note-name-field') as HTMLInputElement;
 		if (noteNameField) noteNameField.value = noteName;
+
+		const parser = new DOMParser();
+		const doc = parser.parseFromString(content, 'text/html');
 
 		const author = byline || getMetaContent(doc, "name", "author") || getMetaContent(doc, "property", "author") || getMetaContent(doc, "name", "twitter:creator") || getMetaContent(doc, "property", "og:site_name");
 
@@ -348,87 +350,6 @@ document.addEventListener('DOMContentLoaded', function() {
 		text = await replaceSelectorsWithContent(text);
 		
 		return text;
-	}
-
-	function createMarkdownContent(content: string, url: string, selectedHtml: string): string {
-		const parser = new DOMParser();
-		const doc = parser.parseFromString(content, 'text/html');
-
-		const baseUrl = new URL(url);
-
-		function makeUrlAbsolute(element: Element, attributeName: string) {
-			const attributeValue = element.getAttribute(attributeName);
-			if (attributeValue && !attributeValue.startsWith('http') && !attributeValue.startsWith('data:') && !attributeValue.startsWith('#') && !attributeValue.startsWith('mailto:')) {
-				element.setAttribute(attributeName, new URL(attributeValue, baseUrl).href);
-			}
-		}
-
-		let markdownContent: string;
-
-		if (selectedHtml) {
-			// If there's selected HTML, use it directly
-			const tempDiv = document.createElement('div');
-			tempDiv.innerHTML = selectedHtml;
-			
-			// Handle relative URLs for both images and links in the selection
-			tempDiv.querySelectorAll('img').forEach(img => makeUrlAbsolute(img, 'src'));
-			tempDiv.querySelectorAll('a').forEach(link => makeUrlAbsolute(link, 'href'));
-			
-			markdownContent = tempDiv.innerHTML;
-		} else {
-			// If no selection, use Readability
-			const readabilityArticle = new Readability(doc).parse();
-			if (!readabilityArticle) {
-				console.error('Failed to parse content with Readability');
-				return '';
-			}
-			const { content: readableContent } = readabilityArticle;
-			
-			const tempDiv = document.createElement('div');
-			tempDiv.innerHTML = readableContent;
-			
-			// Handle relative URLs for both images and links in the full content
-			tempDiv.querySelectorAll('img').forEach(img => makeUrlAbsolute(img, 'src'));
-			tempDiv.querySelectorAll('a').forEach(link => makeUrlAbsolute(link, 'href'));
-			
-			markdownContent = tempDiv.innerHTML;
-		}
-
-		const turndownService = new TurndownService({
-			headingStyle: 'atx',
-			hr: '---',
-			bulletListMarker: '-',
-			codeBlockStyle: 'fenced',
-			emDelimiter: '*',
-		});
-
-		turndownService.use(gfm);
-
-		// Custom rule to handle bullet lists without extra spaces
-		turndownService.addRule('listItem', {
-			filter: 'li',
-			replacement: function (content: string, node: Node, options: TurndownService.Options) {
-				content = content.trim();
-				let prefix = options.bulletListMarker + ' ';
-				let parent = node.parentNode;
-				if (parent instanceof HTMLOListElement) {
-					let start = parent.getAttribute('start');
-					let index = Array.from(parent.children).indexOf(node as HTMLElement) + 1;
-					prefix = (start ? Number(start) + index - 1 : index) + '. ';
-				}
-				return prefix + content + '\n';
-			}
-		});
-
-		let markdown = turndownService.turndown(markdownContent);
-
-		// Remove the title from the beginning of the content if it exists
-		const titleMatch = markdown.match(/^# .+\n+/);
-		if (titleMatch) {
-			markdown = markdown.slice(titleMatch[0].length);
-		}
-
-		return markdown.trim();
 	}
 
 	document.getElementById('clip-button')!.addEventListener('click', async function() {
