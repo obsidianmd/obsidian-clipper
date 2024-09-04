@@ -7,12 +7,9 @@
 		"dev": "tsc -w & webpack --watch"
 	},
 	"devDependencies": {
-		"@babel/core": "^7.23.5",
-		"@babel/preset-env": "^7.23.5",
 		"@types/chrome": "^0.0.270",
 		"@types/node": "^22.5.3",
 		"@types/turndown": "^5.0.5",
-		"babel-loader": "^9.1.3",
 		"copy-webpack-plugin": "^12.0.2",
 		"css-loader": "^7.1.2",
 		"mini-css-extract-plugin": "^2.9.1",
