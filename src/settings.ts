@@ -1,18 +1,18 @@
-import { loadTemplates, updateTemplateList, showTemplateEditor, saveTemplateSettings, createDefaultTemplate, templates, getTemplates } from './template-manager.js';
-import { loadGeneralSettings, updateVaultList, saveGeneralSettings, addVault } from './vault-manager.js';
-import { initializeSidebar } from './ui-utils.js';
-import { initializeDragAndDrop } from './drag-and-drop.js';
-import { initializeAutoSave } from './auto-save.js';
-import { exportTemplate, importTemplate } from './import-export.js';
+import { loadTemplates, updateTemplateList, showTemplateEditor, saveTemplateSettings, createDefaultTemplate, templates, getTemplates } from './template-manager';
+import { loadGeneralSettings, updateVaultList, saveGeneralSettings, addVault } from './vault-manager';
+import { initializeSidebar } from './ui-utils';
+import { initializeDragAndDrop } from './drag-and-drop';
+import { initializeAutoSave } from './auto-save';
+import { exportTemplate, importTemplate } from './import-export';
 import { createIcons } from 'lucide';
-import { icons } from './icons.js';
+import { icons } from './icons';
 
 document.addEventListener('DOMContentLoaded', () => {
-	const vaultInput = document.getElementById('vault-input');
-	const newTemplateBtn = document.getElementById('new-template-btn');
-	const exportTemplateBtn = document.getElementById('export-template-btn');
-	const importTemplateBtn = document.getElementById('import-template-btn');
-	const resetDefaultTemplateBtn = document.getElementById('reset-default-template-btn');
+	const vaultInput = document.getElementById('vault-input') as HTMLInputElement;
+	const newTemplateBtn = document.getElementById('new-template-btn') as HTMLButtonElement;
+	const exportTemplateBtn = document.getElementById('export-template-btn') as HTMLButtonElement;
+	const importTemplateBtn = document.getElementById('import-template-btn') as HTMLButtonElement;
+	const resetDefaultTemplateBtn = document.getElementById('reset-default-template-btn') as HTMLButtonElement;
 
 	function initializeSettings() {
 		loadGeneralSettings();
@@ -34,9 +34,11 @@ document.addEventListener('DOMContentLoaded', () => {
 		const templateList = document.getElementById('template-list');
 		if (templateList) {
 			templateList.addEventListener('click', (event) => {
-				if (event.target.closest('li')) {
+				const target = event.target as HTMLElement;
+				const listItem = target.closest('li');
+				if (listItem) {
 					const currentTemplates = getTemplates();
-					const selectedTemplate = currentTemplates.find(t => t.id === event.target.closest('li').dataset.id);
+					const selectedTemplate = currentTemplates.find(t => t.id === listItem.dataset.id);
 					if (selectedTemplate) {
 						showTemplateEditor(selectedTemplate);
 					}
