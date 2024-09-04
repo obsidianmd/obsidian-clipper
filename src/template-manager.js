@@ -1,8 +1,9 @@
 import { createIcons } from 'lucide';
 import { icons } from './icons.js';
+import { handleDragStart, handleDragOver, handleDrop, handleDragEnd } from './drag-and-drop.js';
 
 let templates = [];
-let editingTemplateIndex = -1;
+export let editingTemplateIndex = -1;
 
 export function loadTemplates() {
 	chrome.storage.sync.get(['templates'], (data) => {

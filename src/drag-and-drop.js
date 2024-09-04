@@ -1,3 +1,6 @@
+import { templates, saveTemplateSettings, updateTemplateList } from './template-manager.js';
+import { vaults, saveGeneralSettings, updateVaultList } from './vault-manager.js';
+
 let isReordering = false;
 let draggedElement = null;
 
@@ -21,7 +24,7 @@ export function initializeDragAndDrop() {
 export function handleDragStart(e) {
 	draggedElement = e.target.closest('[draggable]');
 	e.dataTransfer.effectAllowed = 'move';
-	e.dataTransfer.setData('text/plain', draggedElement.dataset.id);
+	e.dataTransfer.setData('text/plain', draggedElement.dataset.id || draggedElement.dataset.index);
 	setTimeout(() => {
 		draggedElement.classList.add('dragging');
 	}, 0);
@@ -73,16 +76,50 @@ export function handleDragEnd(e) {
 }
 
 function handleTemplateReorder(draggedItemId, newIndex) {
-	// This function should be implemented in template-manager.js
-	// and imported here if needed
+	const oldIndex = templates.findIndex(t => t.id === draggedItemId);
+	if (oldIndex !== -1 && oldIndex !== newIndex) {
+		const [movedTemplate] = templates.splice(oldIndex, 1);
+		templates.splice(newIndex, 0, movedTemplate);
+		saveTemplateSettings().then(() => {
+			updateTemplateList();
+		}).catch(error => {
+			console.error('Failed to save template settings:', error);
+		});
+	}
 }
 
 function handlePropertyReorder(draggedItemId, newIndex) {
-	// This function should be implemented in template-manager.js
-	// and imported here if needed
+	if (editingTemplateIndex === -1) return;
+
+	const template = templates[editingTemplateIndex];
+	const oldIndex = template.properties.findIndex(p => p.id === draggedItemId);
+	if (oldIndex !== -1 && oldIndex !== newIndex) {
+		const [movedProperty] = template.properties.splice(oldIndex, 1);
+		template.properties.splice(newIndex, 0, movedProperty);
+		saveTemplateSettings().then(() => {
+			updateTemplateList();
+		}).catch(error => {
+			console.error('Failed to save template settings:', error);
+		});
+	}
 }
 
 function handleVaultReorder(newIndex) {
-	// This function should be implemented in vault-manager.js
-	// and imported here if needed
+	const oldIndex = parseInt(draggedElement.dataset.index);
+	if (oldIndex !== newIndex) {
+		const [movedVault] = vaults.splice(oldIndex, 1);
+		vaults.splice(newIndex, 0, movedVault);
+		saveGeneralSettings().then(() => {
+			updateVaultList();
+		}).catch(error => {
+			console.error('Failed to save general settings:', error);
+		});
+	}
+}
+
+export function moveItem(array, fromIndex, toIndex) {
+	const newArray = [...array];
+	const [movedItem] = newArray.splice(fromIndex, 1);
+	newArray.splice(toIndex, 0, movedItem);
+	return newArray;
 }
