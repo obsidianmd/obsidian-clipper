@@ -213,6 +213,29 @@ document.addEventListener('DOMContentLoaded', function() {
 			templateProperties.appendChild(propertyDiv);
 		}
 
+		// Add event listeners to capture user edits
+		const noteNameField = document.getElementById('note-name-field') as HTMLInputElement;
+		if (noteNameField) {
+			noteNameField.addEventListener('input', function() {
+				currentVariables['{{title}}'] = this.value;
+			});
+		}
+
+		templateProperties.addEventListener('input', function(event) {
+			const target = event.target as HTMLInputElement;
+			if (target.tagName === 'INPUT') {
+				const propertyName = target.id;
+				currentVariables[`{{${propertyName}}}`] = target.value;
+			}
+		});
+
+		const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
+		if (noteContentField) {
+			noteContentField.addEventListener('input', function() {
+				currentVariables['{{content}}'] = this.value;
+			});
+		}
+
 		await updateTemplatePropertiesWithVariables();
 		await updateFileNameField(template);
 		await updatePathField(template);
@@ -417,21 +440,17 @@ document.addEventListener('DOMContentLoaded', function() {
 						const selectedTemplate = (document.getElementById('template-select') as HTMLSelectElement).value;
 						const template = data.templates.find((t: Template) => t.name === selectedTemplate) || data.templates[0];
 						
-						// Initialize popup content with the selected HTML
-						await initializePageContent(response.content, response.selectedHtml, response.extractedContent);
-						
-						// Use the current value of the textarea instead of regenerating the content
+						// Use the current values from the UI
 						let noteContent = (document.getElementById('note-content-field') as HTMLTextAreaElement).value;
+						let noteName = (document.getElementById('note-name-field') as HTMLInputElement).value;
 						
 						// Handle custom selectors in note content
 						noteContent = await replaceSelectorsWithContent(noteContent);
 
 						let fileContent: string;
-						let noteName: string;
 						if (template.behavior === 'create') {
 							const frontmatter = await generateFrontmatter(template.properties, currentVariables, replaceSelectorsWithContent);
 							fileContent = frontmatter + noteContent;
-							noteName = await replaceVariablesAndSelectors((document.getElementById('note-name-field') as HTMLInputElement).value);
 						} else {
 							fileContent = noteContent;
 							noteName = '';
