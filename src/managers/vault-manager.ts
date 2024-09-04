@@ -48,11 +48,9 @@ export function addVault(vault: string): void {
 }
 
 export function removeVault(index: number): void {
-	if (confirm(`Are you sure you want to remove the vault "${vaults[index]}"?`)) {
-		vaults.splice(index, 1);
-		saveGeneralSettings();
-		updateVaultList();
-	}
+	vaults.splice(index, 1);
+	saveGeneralSettings();
+	updateVaultList();
 }
 
 export function getVaults(): string[] {
