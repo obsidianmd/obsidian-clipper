@@ -17,3 +17,7 @@ export interface Property {
 	value: string;
 	type: string;
 }
+
+export interface ExtractedContent {
+	[key: string]: string;
+}

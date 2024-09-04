@@ -1,7 +1,11 @@
 import dayjs from 'dayjs';
 import { Template, Property } from '../types/types';
 
-export async function generateFrontmatter(properties: Property[], currentVariables: { [key: string]: string }, replaceSelectorsWithContent: (text: string) => Promise<string>): Promise<string> {
+export async function generateFrontmatter(
+	properties: Property[],
+	currentVariables: { [key: string]: string },
+	replaceSelectorsWithContent: (text: string) => Promise<string>
+): Promise<string> {
 	let frontmatter = '---\n';
 	for (const property of properties) {
 		let value = property.value;

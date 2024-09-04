@@ -6,6 +6,7 @@ import dayjs from 'dayjs';
 import { Template, Property } from '../types/types';
 import { generateFrontmatter, saveToObsidian, getFileName } from '../utils/obsidian-note-creator';
 import { createMarkdownContent, extractReadabilityContent } from '../utils/markdown-converter';
+import { extractPageContent, getMetaContent, replaceSelectorsWithContent } from '../utils/content-extractor';
 
 interface ExtractedContent {
 	[key: string]: string;
@@ -96,7 +97,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		});
 	});
 
-	chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+	chrome.tabs.query({active: true, currentWindow: true}, async function(tabs) {
 		if (tabs[0].url) {
 			currentUrl = tabs[0].url;
 		}
@@ -107,7 +108,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		}
 
 		// Load templates and find matching template
-		chrome.storage.sync.get(['templates'], (data: { templates?: Template[] }) => {
+		chrome.storage.sync.get(['templates'], async (data: { templates?: Template[] }) => {
 			const templates: Template[] = data.templates || [];
 			const matchingTemplate = findMatchingTemplate(currentUrl, templates);
 			
@@ -123,13 +124,12 @@ document.addEventListener('DOMContentLoaded', function() {
 			}
 
 			if (tabs[0].id) {
-				chrome.tabs.sendMessage(tabs[0].id, {action: "getPageContent"}, function(response) {
-					if (response && response.content) {
-						initializePageContent(response.content, response.selectedHtml, response.extractedContent);
-					} else {
-						showError('Unable to retrieve page content. Try reloading the page.');
-					}
-				});
+				const extractedData = await extractPageContent(tabs[0].id);
+				if (extractedData) {
+					initializePageContent(extractedData.content, extractedData.selectedHtml, extractedData.extractedContent);
+				} else {
+					showError('Unable to retrieve page content. Try reloading the page.');
+				}
 			}
 		});
 	});
@@ -248,13 +248,16 @@ document.addEventListener('DOMContentLoaded', function() {
 		const templateProperties = document.querySelector('.metadata-properties') as HTMLElement;
 		const inputs = Array.from(templateProperties.querySelectorAll('input'));
 
+		const tabs = await chrome.tabs.query({active: true, currentWindow: true});
+		const tabId = tabs[0].id!;
+
 		for (const input of inputs) {
 			let value = input.value;
 			for (const [variable, replacement] of Object.entries(currentVariables)) {
 				value = value.replace(new RegExp(variable, 'g'), replacement);
 			}
 
-			value = await replaceSelectorsWithContent(value);
+			value = await replaceSelectorsWithContent(tabId, value);
 
 			// Apply type-specific parsing
 			const propertyType = input.getAttribute('data-type');
@@ -278,30 +281,16 @@ document.addEventListener('DOMContentLoaded', function() {
 		}
 	}
 
-	async function extractContentBySelector(selector: string): Promise<string> {
-		return new Promise((resolve) => {
-			chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-				if (tabs[0].id) {
-					chrome.tabs.sendMessage(tabs[0].id, {action: "extractContent", selector: selector}, function(response) {
-						resolve(response ? response.content : '');
-					});
-				} else {
-					resolve('');
-				}
-			});
-		});
-	}
-
-	async function replaceSelectorsWithContent(text: string): Promise<string> {
-		const selectorRegex = /{{selector:(.*?)}}/g;
-		const matches = text.match(selectorRegex);
+	async function replaceVariablesAndSelectors(text: string): Promise<string> {
+		// Replace variables
+		for (const [variable, replacement] of Object.entries(currentVariables)) {
+			text = text.replace(new RegExp(variable, 'g'), replacement);
+		}
 		
-		if (matches) {
-			for (const match of matches) {
-				const selector = match.match(/{{selector:(.*?)}}/)![1];
-				const content = await extractContentBySelector(selector);
-				text = text.replace(match, content);
-			}
+		// Handle custom selectors
+		const tabs = await chrome.tabs.query({active: true, currentWindow: true});
+		if (tabs[0].id) {
+			text = await replaceSelectorsWithContent(tabs[0].id, text);
 		}
 		
 		return text;
@@ -340,18 +329,6 @@ document.addEventListener('DOMContentLoaded', function() {
 		}
 	}
 
-	async function replaceVariablesAndSelectors(text: string): Promise<string> {
-		// Replace variables
-		for (const [variable, replacement] of Object.entries(currentVariables)) {
-			text = text.replace(new RegExp(variable, 'g'), replacement);
-		}
-		
-		// Handle custom selectors
-		text = await replaceSelectorsWithContent(text);
-		
-		return text;
-	}
-
 	document.getElementById('clip-button')!.addEventListener('click', async function() {
 		chrome.tabs.query({active: true, currentWindow: true}, async function(tabs) {
 			chrome.tabs.sendMessage(tabs[0].id!, {action: "getPageContent"}, async function(response) {
@@ -366,11 +343,11 @@ document.addEventListener('DOMContentLoaded', function() {
 						let noteName = (document.getElementById('note-name-field') as HTMLInputElement).value;
 						
 						// Handle custom selectors in note content
-						noteContent = await replaceSelectorsWithContent(noteContent);
+						noteContent = await replaceSelectorsWithContent(tabs[0].id!, noteContent);
 
 						let fileContent: string;
 						if (template.behavior === 'create') {
-							const frontmatter = await generateFrontmatter(template.properties, currentVariables, replaceSelectorsWithContent);
+							const frontmatter = await generateFrontmatter(template.properties, currentVariables, (text: string) => replaceSelectorsWithContent(tabs[0].id!, text));
 							fileContent = frontmatter + noteContent;
 						} else {
 							fileContent = noteContent;
@@ -403,10 +380,5 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	function convertDate(date: Date): string {
 		return dayjs(date).format('YYYY-MM-DD');
-	}
-
-	function getMetaContent(doc: Document, attr: string, value: string): string {
-		var element = doc.querySelector(`meta[${attr}='${value}']`);
-		return element ? element.getAttribute("content")!.trim() : "";
 	}
 });
