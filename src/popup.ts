@@ -223,7 +223,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	async function updateTemplatePropertiesWithVariables() {
 		const templateProperties = document.querySelector('.metadata-properties') as HTMLElement;
-		const inputs = templateProperties.querySelectorAll('input');
+		const inputs = Array.from(templateProperties.querySelectorAll('input'));
 
 		for (const input of inputs) {
 			let value = input.value;

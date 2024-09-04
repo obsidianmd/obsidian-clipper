@@ -7,13 +7,17 @@ module.exports = {
 	entry: {
 		popup: './src/popup.ts',
 		settings: './src/settings.ts',
-		content: './src/content.js',
+		content: './src/content.ts',
 		background: './src/background.js',
 		styles: './src/style.scss'
 	},
 	output: {
 		path: path.resolve(__dirname, 'dist'),
-		filename: '[name].js'
+		filename: '[name].js',
+		module: true,
+	},
+	experiments: {
+		outputModule: true,
 	},
 	resolve: {
 		extensions: ['.ts', '.js']
