@@ -3,34 +3,40 @@ import { gfm } from 'turndown-plugin-gfm';
 import { Readability } from '@mozilla/readability';
 import dayjs from 'dayjs';
 
-let currentUrl = '';
-let currentTitle = '';
-let currentVariables = {};
-let currentTemplate = null;
+import { Template, Property } from './types';
 
-function findMatchingTemplate(url, templates) {
+interface ExtractedContent {
+	[key: string]: string;
+}
+
+let currentUrl: string = '';
+let currentTitle: string = '';
+let currentVariables: { [key: string]: string } = {};
+let currentTemplate: Template | null = null;
+
+function findMatchingTemplate(url: string, templates: Template[]): Template | undefined {
 	return templates.find(template => 
 		template.urlPatterns && template.urlPatterns.some(pattern => url.startsWith(pattern))
 	);
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-	const vaultDropdown = document.getElementById('vault-dropdown');
-	const templateSelect = document.getElementById('template-select');
-	const vaultContainer = document.getElementById('vault-container');
-	const templateContainer = document.getElementById('template-container');
+	const vaultDropdown = document.getElementById('vault-dropdown') as HTMLSelectElement;
+	const templateSelect = document.getElementById('template-select') as HTMLSelectElement;
+	const vaultContainer = document.getElementById('vault-container') as HTMLElement;
+	const templateContainer = document.getElementById('template-container') as HTMLElement;
 	
-	let currentTemplate = null;
-	let vaults = [];
+	let currentTemplate: Template | null = null;
+	let vaults: string[] = [];
 
 	// Load vaults from storage
-	chrome.storage.sync.get(['vaults'], (data) => {
+	chrome.storage.sync.get(['vaults'], (data: { vaults?: string[] }) => {
 		vaults = data.vaults || [];
 		updateVaultDropdown();
 	});
 
 	// Load templates from storage and populate dropdown
-	chrome.storage.sync.get(['templates'], (data) => {
+	chrome.storage.sync.get(['templates'], (data: { templates?: Template[] }) => {
 		if (!data.templates || data.templates.length === 0) {
 			console.error('No templates found in storage');
 			return;
@@ -38,7 +44,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 		templateSelect.innerHTML = '';
 		
-		data.templates.forEach(template => {
+		data.templates.forEach((template: Template) => {
 			const option = document.createElement('option');
 			option.value = template.name;
 			option.textContent = template.name;
@@ -47,13 +53,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
 		// Set the first template as the default
 		currentTemplate = data.templates[0];
-		templateSelect.value = currentTemplate.name;
+		if (currentTemplate) {
+			templateSelect.value = currentTemplate.name;
+		}
 
 		if (data.templates.length > 1) {
 			templateContainer.style.display = 'block';
 		}
 
-		updateTemplateProperties(currentTemplate);
+		if (currentTemplate) {
+			updateTemplateProperties(currentTemplate);
+		}
 	});
 
 	function updateVaultDropdown() {
@@ -76,8 +86,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	// Add event listener for template selection change
 	templateSelect.addEventListener('change', function() {
-		chrome.storage.sync.get(['templates'], (data) => {
-			currentTemplate = data.templates.find(t => t.name === this.value);
+		chrome.storage.sync.get(['templates'], (data: { templates?: Template[] }) => {
+			currentTemplate = data.templates?.find((t: Template) => t.name === this.value) || null;
 			if (currentTemplate) {
 				updateTemplateProperties(currentTemplate);
 			}
@@ -85,7 +95,9 @@ document.addEventListener('DOMContentLoaded', function() {
 	});
 
 	chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-		currentUrl = tabs[0].url;
+		if (tabs[0].url) {
+			currentUrl = tabs[0].url;
+		}
 
 		if (currentUrl.startsWith('chrome-extension://') || currentUrl.startsWith('chrome://') || currentUrl.startsWith('about:') || currentUrl.startsWith('file://')) {
 			showError('This page cannot be clipped.');
@@ -93,8 +105,8 @@ document.addEventListener('DOMContentLoaded', function() {
 		}
 
 		// Load templates and find matching template
-		chrome.storage.sync.get(['templates'], (data) => {
-			const templates = data.templates || [];
+		chrome.storage.sync.get(['templates'], (data: { templates?: Template[] }) => {
+			const templates: Template[] = data.templates || [];
 			const matchingTemplate = findMatchingTemplate(currentUrl, templates);
 			
 			if (matchingTemplate) {
@@ -104,26 +116,36 @@ document.addEventListener('DOMContentLoaded', function() {
 				currentTemplate = templates[0]; // Use the first template as default
 			}
 
-			updateTemplateProperties(currentTemplate);
+			if (currentTemplate) {
+				updateTemplateProperties(currentTemplate);
+			}
 
-			chrome.tabs.sendMessage(tabs[0].id, {action: "getPageContent"}, function(response) {
-				if (response && response.content) {
-					initializePageContent(response.content, response.selectedHtml, response.extractedContent);
-				} else {
-					showError('Unable to retrieve page content. Try reloading the page.');
-				}
-			});
+			if (tabs[0].id) {
+				chrome.tabs.sendMessage(tabs[0].id, {action: "getPageContent"}, function(response) {
+					if (response && response.content) {
+						initializePageContent(response.content, response.selectedHtml, response.extractedContent);
+					} else {
+						showError('Unable to retrieve page content. Try reloading the page.');
+					}
+				});
+			}
 		});
 	});
 
-	async function initializePageContent(content, selectedHtml, extractedContent) {
+	async function initializePageContent(content: string, selectedHtml: string, extractedContent: ExtractedContent) {
 		const parser = new DOMParser();
 		const doc = parser.parseFromString(content, 'text/html');
-		const { title: rawTitle, byline, excerpt, lang } = new Readability(doc).parse();
+		const readabilityArticle = new Readability(doc).parse();
+		if (!readabilityArticle) {
+			console.error('Failed to parse content with Readability');
+			return;
+		}
+		const { title: rawTitle, byline, excerpt, lang } = readabilityArticle;
 		
 		currentTitle = rawTitle.replace(/"/g, "'");
 		const noteName = getFileName(currentTitle);
-		document.getElementById('note-name-field').value = noteName;
+		const noteNameField = document.getElementById('note-name-field') as HTMLInputElement;
+		if (noteNameField) noteNameField.value = noteName;
 
 		const author = byline || getMetaContent(doc, "name", "author") || getMetaContent(doc, "property", "author") || getMetaContent(doc, "name", "twitter:creator") || getMetaContent(doc, "property", "og:site_name");
 
@@ -132,8 +154,8 @@ document.addEventListener('DOMContentLoaded', function() {
 		const language = lang;
 
 		const timeElement = doc.querySelector("time");
-		const publishedDate = timeElement ? timeElement.getAttribute("datetime") : "";
-		const published = publishedDate && publishedDate.trim() !== "" ? `${convertDate(new Date(publishedDate))}` : "";
+		const publishedDate = timeElement?.getAttribute("datetime");
+		const published = publishedDate ? `${convertDate(new Date(publishedDate))}` : "";
 
 		const markdownBody = createMarkdownContent(content, currentUrl, selectedHtml);
 
@@ -141,23 +163,22 @@ document.addEventListener('DOMContentLoaded', function() {
 			'{{title}}': currentTitle,
 			'{{url}}': currentUrl,
 			'{{published}}': published,
-			'{{author}}': author,
+			'{{author}}': author ?? '',
 			'{{today}}': convertDate(new Date()),
-			'{{description}}': description,
-			'{{domain}}': currentUrl.split('://')[1].split('/')[0],
-			'{{image}}': image,
-			'{{language}}': language,
+			'{{description}}': description ?? '',
+			'{{domain}}': new URL(currentUrl).hostname,
+			'{{image}}': image ?? '',
+			'{{language}}': language ?? '',
 			'{{content}}': markdownBody
 		};
 
 		// Add extracted content to variables
-		Object.keys(extractedContent).forEach(key => {
-			currentVariables[`{{${key}}}`] = extractedContent[key];
-		});
+		Object.assign(currentVariables, Object.fromEntries(
+			Object.entries(extractedContent).map(([key, value]) => [`{{${key}}}`, value])
+		));
 
 		// Add all meta tags to variables
-		const metaTags = doc.querySelectorAll('meta');
-		metaTags.forEach(meta => {
+		doc.querySelectorAll('meta').forEach(meta => {
 			const name = meta.getAttribute('name');
 			const property = meta.getAttribute('property');
 			const content = meta.getAttribute('content');
@@ -171,17 +192,14 @@ document.addEventListener('DOMContentLoaded', function() {
 		});
 
 		await updateTemplatePropertiesWithVariables();
-		await updateFileNameField(currentTemplate);
-		await updateNoteContentField(currentTemplate);
+		if (currentTemplate) {
+			await updateFileNameField(currentTemplate);
+			await updateNoteContentField(currentTemplate);
+		}
 	}
 
-	async function updateTemplateProperties(template) {
-		if (!template) {
-			console.error('Template is undefined in updateTemplateProperties');
-			return;
-		}
-
-		const templateProperties = document.querySelector('.metadata-properties');
+	async function updateTemplateProperties(template: Template) {
+		const templateProperties = document.querySelector('.metadata-properties') as HTMLElement;
 		templateProperties.innerHTML = '';
 
 		for (const property of template.properties) {
@@ -201,8 +219,8 @@ document.addEventListener('DOMContentLoaded', function() {
 	}
 
 	async function updateTemplatePropertiesWithVariables() {
-		const templateProperties = document.querySelector('.metadata-properties');
-		const inputs = templateProperties.querySelectorAll('input');
+		const templateProperties = document.querySelector('.metadata-properties') as HTMLElement;
+		const inputs = Array.from(templateProperties.querySelectorAll('input'));
 
 		for (const input of inputs) {
 			let value = input.value;
@@ -217,10 +235,10 @@ document.addEventListener('DOMContentLoaded', function() {
 			switch (propertyType) {
 				case 'number':
 					const numericValue = value.replace(/[^\d.-]/g, '');
-					value = numericValue ? parseFloat(numericValue) : '';
+					value = numericValue ? parseFloat(numericValue).toString() : '';
 					break;
 				case 'checkbox':
-					value = value.toLowerCase() === 'true' || value === '1';
+					value = (value.toLowerCase() === 'true' || value === '1').toString();
 					break;
 				case 'date':
 					value = dayjs(value).format('YYYY-MM-DD');
@@ -234,23 +252,27 @@ document.addEventListener('DOMContentLoaded', function() {
 		}
 	}
 
-	async function extractContentBySelector(selector) {
+	async function extractContentBySelector(selector: string): Promise<string> {
 		return new Promise((resolve) => {
 			chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-				chrome.tabs.sendMessage(tabs[0].id, {action: "extractContent", selector: selector}, function(response) {
-					resolve(response ? response.content : '');
-				});
+				if (tabs[0].id) {
+					chrome.tabs.sendMessage(tabs[0].id, {action: "extractContent", selector: selector}, function(response) {
+						resolve(response ? response.content : '');
+					});
+				} else {
+					resolve('');
+				}
 			});
 		});
 	}
 
-	async function replaceSelectorsWithContent(text) {
+	async function replaceSelectorsWithContent(text: string): Promise<string> {
 		const selectorRegex = /{{selector:(.*?)}}/g;
 		const matches = text.match(selectorRegex);
 		
 		if (matches) {
 			for (const match of matches) {
-				const selector = match.match(/{{selector:(.*?)}}/)[1];
+				const selector = match.match(/{{selector:(.*?)}}/)![1];
 				const content = await extractContentBySelector(selector);
 				text = text.replace(match, content);
 			}
@@ -259,21 +281,19 @@ document.addEventListener('DOMContentLoaded', function() {
 		return text;
 	}
 
-	async function updateFileNameField(template) {
-		if (!template) {
-			console.error('Template is undefined in updateFileNameField');
-			return;
-		}
-
+	async function updateFileNameField(template: Template) {
 		if (template.behavior === 'create' && template.noteNameFormat) {
 			let noteName = template.noteNameFormat;
 			noteName = await replaceVariablesAndSelectors(noteName);
-			document.getElementById('note-name-field').value = getFileName(noteName);
+			const noteNameField = document.getElementById('note-name-field') as HTMLInputElement;
+			if (noteNameField) {
+				noteNameField.value = getFileName(noteName);
+			}
 		}
 	}
 
-	async function updatePathField(template) {
-		const pathField = document.getElementById('path-name-field');
+	async function updatePathField(template: Template) {
+		const pathField = document.getElementById('path-name-field') as HTMLInputElement;
 		if (pathField) {
 			let path = template.path;
 			path = await replaceVariablesAndSelectors(path);
@@ -281,8 +301,8 @@ document.addEventListener('DOMContentLoaded', function() {
 		}
 	}
 
-	async function updateNoteContentField(template) {
-		const noteContentField = document.getElementById('note-content-field');
+	async function updateNoteContentField(template: Template) {
+		const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
 		if (noteContentField && template && template.noteContentFormat) {
 			let content = template.noteContentFormat;
 			content = await replaceVariablesAndSelectors(content);
@@ -294,7 +314,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		}
 	}
 
-	async function replaceVariablesAndSelectors(text) {
+	async function replaceVariablesAndSelectors(text: string): Promise<string> {
 		// Replace variables
 		for (const [variable, replacement] of Object.entries(currentVariables)) {
 			text = text.replace(new RegExp(variable, 'g'), replacement);
@@ -306,20 +326,20 @@ document.addEventListener('DOMContentLoaded', function() {
 		return text;
 	}
 
-	function createMarkdownContent(content, url, selectedHtml) {
+	function createMarkdownContent(content: string, url: string, selectedHtml: string): string {
 		const parser = new DOMParser();
 		const doc = parser.parseFromString(content, 'text/html');
 
 		const baseUrl = new URL(url);
 
-		function makeUrlAbsolute(element, attributeName) {
+		function makeUrlAbsolute(element: Element, attributeName: string) {
 			const attributeValue = element.getAttribute(attributeName);
 			if (attributeValue && !attributeValue.startsWith('http') && !attributeValue.startsWith('data:') && !attributeValue.startsWith('#') && !attributeValue.startsWith('mailto:')) {
 				element.setAttribute(attributeName, new URL(attributeValue, baseUrl).href);
 			}
 		}
 
-		let markdownContent;
+		let markdownContent: string;
 
 		if (selectedHtml) {
 			// If there's selected HTML, use it directly
@@ -333,7 +353,12 @@ document.addEventListener('DOMContentLoaded', function() {
 			markdownContent = tempDiv.innerHTML;
 		} else {
 			// If no selection, use Readability
-			const { content: readableContent } = new Readability(doc).parse();
+			const readabilityArticle = new Readability(doc).parse();
+			if (!readabilityArticle) {
+				console.error('Failed to parse content with Readability');
+				return '';
+			}
+			const { content: readableContent } = readabilityArticle;
 			
 			const tempDiv = document.createElement('div');
 			tempDiv.innerHTML = readableContent;
@@ -358,13 +383,13 @@ document.addEventListener('DOMContentLoaded', function() {
 		// Custom rule to handle bullet lists without extra spaces
 		turndownService.addRule('listItem', {
 			filter: 'li',
-			replacement: function (content, node, options) {
+			replacement: function (content: string, node: Node, options: TurndownService.Options) {
 				content = content.trim();
 				let prefix = options.bulletListMarker + ' ';
 				let parent = node.parentNode;
-				if (parent.nodeName === 'OL') {
+				if (parent instanceof HTMLOListElement) {
 					let start = parent.getAttribute('start');
-					let index = Array.prototype.indexOf.call(parent.children, node) + 1;
+					let index = Array.from(parent.children).indexOf(node as HTMLElement) + 1;
 					prefix = (start ? Number(start) + index - 1 : index) + '. ';
 				}
 				return prefix + content + '\n';
@@ -382,30 +407,30 @@ document.addEventListener('DOMContentLoaded', function() {
 		return markdown.trim();
 	}
 
-	document.getElementById('clip-button').addEventListener('click', async function() {
+	document.getElementById('clip-button')!.addEventListener('click', async function() {
 		chrome.tabs.query({active: true, currentWindow: true}, async function(tabs) {
-			chrome.tabs.sendMessage(tabs[0].id, {action: "getPageContent"}, async function(response) {
+			chrome.tabs.sendMessage(tabs[0].id!, {action: "getPageContent"}, async function(response) {
 				if (response && response.content) {
 					chrome.storage.sync.get(['templates'], async (data) => {
-						const selectedVault = document.getElementById('vault-dropdown').value;
-						const selectedTemplate = document.getElementById('template-select').value;
-						const template = data.templates.find(t => t.name === selectedTemplate) || data.templates[0];
+						const selectedVault = (document.getElementById('vault-dropdown') as HTMLSelectElement).value;
+						const selectedTemplate = (document.getElementById('template-select') as HTMLSelectElement).value;
+						const template = data.templates.find((t: Template) => t.name === selectedTemplate) || data.templates[0];
 						
 						// Initialize popup content with the selected HTML
 						await initializePageContent(response.content, response.selectedHtml, response.extractedContent);
 						
 						// Use the current value of the textarea instead of regenerating the content
-						let noteContent = document.getElementById('note-content-field').value;
+						let noteContent = (document.getElementById('note-content-field') as HTMLTextAreaElement).value;
 						
 						// Handle custom selectors in note content
 						noteContent = await replaceSelectorsWithContent(noteContent);
 
-						let fileContent;
-						let noteName;
+						let fileContent: string;
+						let noteName: string;
 						if (template.behavior === 'create') {
 							const frontmatter = await generateFrontmatter(template.properties);
 							fileContent = frontmatter + noteContent;
-							noteName = await replaceVariablesAndSelectors(document.getElementById('note-name-field').value);
+							noteName = await replaceVariablesAndSelectors((document.getElementById('note-name-field') as HTMLInputElement).value);
 						} else {
 							fileContent = noteContent;
 							noteName = '';
@@ -422,7 +447,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		});
 	});
 
-	async function generateFrontmatter(properties) {
+	async function generateFrontmatter(properties: Property[]): Promise<string> {
 		let frontmatter = '---\n';
 		for (const property of properties) {
 			let value = property.value;
@@ -465,8 +490,8 @@ document.addEventListener('DOMContentLoaded', function() {
 		return frontmatter;
 	}
 
-	function saveToObsidian(fileContent, noteName, path, vault, behavior, specificNoteName, dailyNoteFormat) {
-		let obsidianUrl;
+	function saveToObsidian(fileContent: string, noteName: string, path: string, vault: string, behavior: string, specificNoteName?: string, dailyNoteFormat?: string) {
+		let obsidianUrl: string;
 		let content = fileContent;
 
 		// Ensure path ends with a slash
@@ -475,11 +500,11 @@ document.addEventListener('DOMContentLoaded', function() {
 		}
 
 		if (behavior === 'append-specific' || behavior === 'append-daily') {
-			let appendFileName;
+			let appendFileName: string;
 			if (behavior === 'append-specific') {
-				appendFileName = specificNoteName;
+				appendFileName = specificNoteName!;
 			} else {
-				appendFileName = dayjs().format(dailyNoteFormat);
+				appendFileName = dayjs().format(dailyNoteFormat!);
 			}
 			obsidianUrl = `obsidian://new?file=${encodeURIComponent(path + appendFileName)}&append=true`;
 			
@@ -495,26 +520,25 @@ document.addEventListener('DOMContentLoaded', function() {
 		obsidianUrl += vaultParam;
 
 		chrome.tabs.create({ url: obsidianUrl }, function(tab) {
-			setTimeout(() => chrome.tabs.remove(tab.id), 500);
+			setTimeout(() => chrome.tabs.remove(tab!.id!), 500);
 		});
 	}
 
-	document.getElementById('open-settings').addEventListener('click', function() {
+	document.getElementById('open-settings')!.addEventListener('click', function() {
 		chrome.runtime.openOptionsPage();
 	});
 
-	function showError(message) {
-		const errorMessage = document.querySelector('.error-message');
-		const clipper = document.querySelector('.clipper');
+	function showError(message: string) {
+		const errorMessage = document.querySelector('.error-message') as HTMLElement;
+		const clipper = document.querySelector('.clipper') as HTMLElement;
 
 		errorMessage.textContent = message;
 		errorMessage.style.display = 'block';
 		clipper.style.display = 'none';
 	}
 
-	function getFileName(noteName) {
-		const isWindows = navigator.userAgentData?.platform === 'Windows' || 
-			/Win/.test(navigator.platform);
+	function getFileName(noteName: string): string {
+		const isWindows = navigator.platform.indexOf('Win') > -1;
 		if (isWindows) {
 			noteName = noteName.replace(':', '').replace(/[/\\?%*|"<>]/g, '-');
 		} else {
@@ -523,12 +547,12 @@ document.addEventListener('DOMContentLoaded', function() {
 		return noteName;
 	}
 
-	function convertDate(date) {
+	function convertDate(date: Date): string {
 		return dayjs(date).format('YYYY-MM-DD');
 	}
 
-	function getMetaContent(doc, attr, value) {
+	function getMetaContent(doc: Document, attr: string, value: string): string {
 		var element = doc.querySelector(`meta[${attr}='${value}']`);
-		return element ? element.getAttribute("content").trim() : "";
+		return element ? element.getAttribute("content")!.trim() : "";
 	}
 });

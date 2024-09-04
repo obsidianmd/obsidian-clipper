@@ -3,30 +3,31 @@ const CopyPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
-	mode: 'development', // or 'production'
+	mode: 'production',
 	entry: {
-		popup: './src/popup.js',
-		settings: './src/settings.js',
-		content: './src/content.js',
+		popup: './src/popup.ts',
+		settings: './src/settings.ts',
+		content: './src/content.ts',
 		background: './src/background.js',
 		styles: './src/style.scss'
 	},
 	output: {
 		path: path.resolve(__dirname, 'dist'),
-		filename: '[name].js'
+		filename: '[name].js',
+		module: true,
 	},
-	devtool: 'inline-source-map', // Use this or 'source-map'
+	experiments: {
+		outputModule: true,
+	},
+	resolve: {
+		extensions: ['.ts', '.js']
+	},
 	module: {
 		rules: [
 			{
-				test: /\.js$/,
+				test: /\.tsx?$/,
+				use: 'ts-loader',
 				exclude: /node_modules/,
-				use: {
-					loader: 'babel-loader',
-					options: {
-						presets: ['@babel/preset-env']
-					}
-				}
 			},
 			{
 				test: /\.scss$/,
@@ -50,11 +51,5 @@ module.exports = {
 		new MiniCssExtractPlugin({
 			filename: 'style.css'
 		})
-	],
-	resolve: {
-		extensions: ['.js']
-	},
-	devServer: {
-		hot: true,
-	}
+	]
 };

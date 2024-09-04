@@ -1,10 +1,10 @@
-import { templates, getTemplates, saveTemplateSettings, updateTemplateList, getEditingTemplateIndex } from './template-manager.js';
-import { getVaults, saveGeneralSettings, updateVaultList } from './vault-manager.js';
+import { Template, Property } from './types';
+import { templates, getTemplates, saveTemplateSettings, updateTemplateList, getEditingTemplateIndex } from './template-manager';
+import { getVaults, saveGeneralSettings, updateVaultList } from './vault-manager';
 
-let isReordering = false;
-let draggedElement = null;
+let draggedElement: HTMLElement | null = null;
 
-export function initializeDragAndDrop() {
+export function initializeDragAndDrop(): void {
 	const draggableLists = [
 		document.getElementById('template-list'),
 		document.getElementById('template-properties'),
@@ -21,34 +21,37 @@ export function initializeDragAndDrop() {
 	});
 }
 
-export function handleDragStart(e) {
-	draggedElement = e.target.closest('[draggable]');
-	e.dataTransfer.effectAllowed = 'move';
-	e.dataTransfer.setData('text/plain', draggedElement.dataset.id || draggedElement.dataset.index);
-	setTimeout(() => {
-		draggedElement.classList.add('dragging');
-	}, 0);
+export function handleDragStart(e: DragEvent): void {
+	draggedElement = (e.target as HTMLElement).closest('[draggable]');
+	if (draggedElement && e.dataTransfer) {
+		e.dataTransfer.effectAllowed = 'move';
+		e.dataTransfer.setData('text/plain', draggedElement.dataset.id || draggedElement.dataset.index || '');
+		setTimeout(() => {
+			if (draggedElement) draggedElement.classList.add('dragging');
+		}, 0);
+	}
 }
 
-export function handleDragOver(e) {
+export function handleDragOver(e: DragEvent): void {
 	e.preventDefault();
-	e.dataTransfer.dropEffect = 'move';
-	const closestDraggable = e.target.closest('[draggable]');
-	if (closestDraggable && closestDraggable !== draggedElement) {
+	if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+	const closestDraggable = (e.target as HTMLElement).closest('[draggable]');
+	if (closestDraggable && closestDraggable !== draggedElement && draggedElement) {
 		const rect = closestDraggable.getBoundingClientRect();
 		const midY = rect.top + rect.height / 2;
 		if (e.clientY < midY) {
-			closestDraggable.parentNode.insertBefore(draggedElement, closestDraggable);
+			closestDraggable.parentNode?.insertBefore(draggedElement, closestDraggable);
 		} else {
-			closestDraggable.parentNode.insertBefore(draggedElement, closestDraggable.nextSibling);
+			closestDraggable.parentNode?.insertBefore(draggedElement, closestDraggable.nextSibling);
 		}
 	}
 }
 
-export function handleDrop(e) {
+export function handleDrop(e: DragEvent): void {
 	e.preventDefault();
+	if (!e.dataTransfer) return;
 	const draggedItemId = e.dataTransfer.getData('text/plain');
-	const list = e.target.closest('ul, #template-properties');
+	const list = (e.target as HTMLElement).closest('ul, #template-properties');
 	
 	if (list && draggedElement) {
 		const items = Array.from(list.children);
@@ -68,16 +71,16 @@ export function handleDrop(e) {
 	draggedElement = null;
 }
 
-export function handleDragEnd(e) {
+export function handleDragEnd(): void {
 	if (draggedElement) {
 		draggedElement.classList.remove('dragging');
 	}
 	draggedElement = null;
 }
 
-function handleTemplateReorder(draggedItemId, newIndex) {
+function handleTemplateReorder(draggedItemId: string, newIndex: number): void {
 	const templates = getTemplates();
-	const oldIndex = templates.findIndex(t => t.id === draggedItemId);
+	const oldIndex = templates.findIndex(t => (t as Template).id === draggedItemId);
 	if (oldIndex !== -1 && oldIndex !== newIndex) {
 		const [movedTemplate] = templates.splice(oldIndex, 1);
 		templates.splice(newIndex, 0, movedTemplate);
@@ -89,7 +92,7 @@ function handleTemplateReorder(draggedItemId, newIndex) {
 	}
 }
 
-function handlePropertyReorder(draggedItemId, newIndex) {
+function handlePropertyReorder(draggedItemId: string, newIndex: number): void {
 	const editingTemplateIndex = getEditingTemplateIndex();
 	if (editingTemplateIndex === -1) {
 		console.error('No template is currently being edited');
@@ -97,7 +100,7 @@ function handlePropertyReorder(draggedItemId, newIndex) {
 	}
 
 	const currentTemplates = getTemplates();
-	const template = currentTemplates[editingTemplateIndex];
+	const template = currentTemplates[editingTemplateIndex] as Template;
 	if (!template) {
 		console.error('Template not found');
 		return;
@@ -108,7 +111,7 @@ function handlePropertyReorder(draggedItemId, newIndex) {
 		return;
 	}
 
-	const oldIndex = template.properties.findIndex(p => p.id === draggedItemId);
+	const oldIndex = template.properties.findIndex(p => (p as Property).id === draggedItemId);
 	if (oldIndex === -1) {
 		console.error('Property not found');
 		return;
@@ -125,10 +128,11 @@ function handlePropertyReorder(draggedItemId, newIndex) {
 	}
 }
 
-function handleVaultReorder(newIndex) {
+function handleVaultReorder(newIndex: number): void {
 	const vaults = getVaults();
-	const oldIndex = parseInt(draggedElement.dataset.index);
-	if (oldIndex !== newIndex) {
+	if (!draggedElement) return;
+	const oldIndex = parseInt(draggedElement.dataset.index || '-1');
+	if (oldIndex !== -1 && oldIndex !== newIndex) {
 		const [movedVault] = vaults.splice(oldIndex, 1);
 		vaults.splice(newIndex, 0, movedVault);
 		saveGeneralSettings().then(() => {
@@ -139,7 +143,7 @@ function handleVaultReorder(newIndex) {
 	}
 }
 
-export function moveItem(array, fromIndex, toIndex) {
+export function moveItem<T>(array: T[], fromIndex: number, toIndex: number): T[] {
 	const newArray = [...array];
 	const [movedItem] = newArray.splice(fromIndex, 1);
 	newArray.splice(toIndex, 0, movedItem);

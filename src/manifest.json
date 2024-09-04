@@ -20,10 +20,9 @@
 		"128": "icons/icon128.png"
 	},
 	"background": {
-		"type": "module",
 		"service_worker": "background.js"
 	},
-		"content_security_policy": {
+	"content_security_policy": {
 		"extension_pages": "script-src 'self'; object-src 'self'"
 	},
 	"content_scripts": [

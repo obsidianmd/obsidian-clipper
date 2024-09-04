@@ -1,0 +1,22 @@
+{
+	"compilerOptions": {
+		"target": "es6",
+		"module": "es6",
+		"strict": true,
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"forceConsistentCasingInFileNames": true,
+		"outDir": "./dist",
+		"rootDir": "./src",
+		"sourceMap": true,
+		"typeRoots": ["./node_modules/@types", "./"],
+		"moduleResolution": "node",
+		"types": ["chrome", "node"],
+		"lib": ["es2017", "dom"]
+	},
+	"include": [
+		"src/**/*",
+		"turndown-plugin-gfm.d.ts"
+	],
+	"exclude": ["node_modules", "dist"]
+}

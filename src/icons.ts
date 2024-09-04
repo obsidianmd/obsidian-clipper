@@ -12,6 +12,13 @@ export const icons = {
 	GripVertical
 };
 
-export function initializeIcons(root = document) {
-	createIcons({ icons, root });
+export function initializeIcons(root: HTMLElement | Document = document) {
+	createIcons({
+		icons,
+		attrs: {
+			'stroke-width': 1.5,
+			'class': 'lucide-icon'
+		},
+		nameAttr: 'data-lucide',
+	});
 }
