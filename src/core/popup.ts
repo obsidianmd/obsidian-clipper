@@ -253,10 +253,20 @@ document.addEventListener('DOMContentLoaded', function() {
 	document.getElementById('clip-button')!.addEventListener('click', async function() {
 		if (!currentTemplate) return;
 
-		const selectedVault = (document.getElementById('vault-dropdown') as HTMLSelectElement).value;
-		const noteContent = (document.getElementById('note-content-field') as HTMLTextAreaElement).value;
-		const noteName = (document.getElementById('note-name-field') as HTMLInputElement).value;
-		const path = (document.getElementById('path-name-field') as HTMLInputElement).value;
+		const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement;
+		const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
+		const noteNameField = document.getElementById('note-name-field') as HTMLInputElement;
+		const pathField = document.getElementById('path-name-field') as HTMLInputElement;
+
+		if (!vaultDropdown || !noteContentField || !noteNameField || !pathField) {
+			showError('Some required fields are missing. Please try reloading the extension.');
+			return;
+		}
+
+		const selectedVault = vaultDropdown.value;
+		const noteContent = noteContentField.value;
+		const noteName = noteNameField.value;
+		const path = pathField.value;
 
 		const properties = Array.from(document.querySelectorAll('.metadata-property input')).map(input => ({
 			name: input.id,
