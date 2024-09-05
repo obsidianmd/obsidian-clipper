@@ -3,6 +3,97 @@ import { extractReadabilityContent, createMarkdownContent } from './markdown-con
 import { sanitizeFileName } from './obsidian-note-creator';
 import dayjs from 'dayjs';
 
+type FilterFunction = (value: string) => string;
+
+const filters: { [key: string]: FilterFunction } = {
+	kebab: (str: string) => str
+		.replace(/([a-z])([A-Z])/g, '$1-$2')
+		.replace(/[\s_]+/g, '-')
+		.toLowerCase(),
+	list: (str: string) => {
+		try {
+			const arrayValue = JSON.parse(str);
+			if (Array.isArray(arrayValue)) {
+				return arrayValue.map(item => `- ${item}`).join('\n');
+			}
+		} catch (error) {
+			console.error('Error parsing JSON for list filter:', error);
+		}
+		return str;
+	},
+};
+
+function applyFilters(value: string, filterNames: string[]): string {
+	return filterNames.reduce((result, filterName) => {
+		const filter = filters[filterName];
+		return filter ? filter(result) : result;
+	}, value);
+}
+
+async function processVariable(match: string, variables: { [key: string]: string }): Promise<string> {
+	const [, variableName, filtersString] = match.match(/{{(.*?)((?:\|[a-z]+)*)?}}/) || [];
+	const value = variables[`{{${variableName}}}`] || '';
+	const filterNames = (filtersString || '').split('|').filter(Boolean);
+	return applyFilters(value, filterNames);
+}
+
+async function processSelector(tabId: number, match: string): Promise<string> {
+	const [, selector, filtersString] = match.match(/{{selector:(.*?)((?:\|[a-z]+)*)?}}/) || [];
+	const { content } = await extractContentBySelector(tabId, selector);
+	const filterNames = (filtersString || '').split('|').filter(Boolean);
+	return applyFilters(content, filterNames);
+}
+
+async function processSchema(match: string, variables: { [key: string]: string }): Promise<string> {
+	const [, schemaKey, filtersString] = match.match(/{{schema:(.*?)((?:\|[a-z]+)*)?}}/) || [];
+	let schemaValue = '';
+	
+	// Check if we're dealing with a nested array access
+	const nestedArrayMatch = schemaKey.match(/(.*?)\.\[\*\]\.(.*)/);
+	if (nestedArrayMatch) {
+		const [, arrayKey, propertyKey] = nestedArrayMatch;
+		const arrayValue = JSON.parse(variables[`{{schema:${arrayKey}}}`] || '[]');
+		if (Array.isArray(arrayValue)) {
+			schemaValue = JSON.stringify(arrayValue.map(item => item[propertyKey]));
+		}
+	} else {
+		// Try to find the exact match first
+		if (variables[`{{schema:${schemaKey}}}`]) {
+			schemaValue = variables[`{{schema:${schemaKey}}}`];
+		} else {
+			// If not found, try to find a partial match
+			const partialMatches = Object.keys(variables).filter(key => key.startsWith(`{{schema:${schemaKey}`));
+			if (partialMatches.length > 0) {
+				schemaValue = variables[partialMatches[0]];
+			}
+		}
+	}
+
+	const filterNames = (filtersString || '').split('|').filter(Boolean);
+	return applyFilters(schemaValue, filterNames);
+}
+
+export async function replaceVariables(tabId: number, text: string, variables: { [key: string]: string }): Promise<string> {
+	const regex = /{{(?:schema:)?(?:selector:)?(.*?)((?:\|[a-z]+)*)?}}/g;
+	const matches = text.match(regex);
+
+	if (matches) {
+		for (const match of matches) {
+			let replacement: string;
+			if (match.startsWith('{{selector:')) {
+				replacement = await processSelector(tabId, match);
+			} else if (match.startsWith('{{schema:')) {
+				replacement = await processSchema(match, variables);
+			} else {
+				replacement = await processVariable(match, variables);
+			}
+			text = text.replace(match, replacement);
+		}
+	}
+
+	return text;
+}
+
 export async function extractPageContent(tabId: number): Promise<{
 	content: string;
 	selectedHtml: string;
@@ -41,73 +132,6 @@ export async function extractContentBySelector(tabId: number, selector: string):
 			});
 		});
 	});
-}
-
-export async function replaceVariables(tabId: number, text: string, variables: { [key: string]: string }): Promise<string> {
-	// Replace variables
-	for (const [variable, replacement] of Object.entries(variables)) {
-		text = text.replace(new RegExp(variable.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), replacement);
-	}
-
-	// Replace selectors
-	const selectorRegex = /{{selector:(.*?)}}/g;
-	const matches = text.match(selectorRegex);
-	
-	if (matches) {
-		for (const match of matches) {
-			const selector = match.match(/{{selector:(.*?)}}/)![1];
-			const { content } = await extractContentBySelector(tabId, selector);
-			text = text.replace(match, content);
-		}
-	}
-
-	// Replace schema variables with filters
-	const schemaRegex = /{{schema:(.*?)(\|list)?}}/g;
-	const schemaMatches = text.match(schemaRegex);
-
-	if (schemaMatches) {
-		for (const match of schemaMatches) {
-			const [, schemaKey, filter] = match.match(/{{schema:(.*?)(\|list)?}}/) || [];
-			let schemaValue = '';
-			
-			// Check if we're dealing with a nested array access
-			const nestedArrayMatch = schemaKey.match(/(.*?)\.\[\*\]\.(.*)/);
-			if (nestedArrayMatch) {
-				const [, arrayKey, propertyKey] = nestedArrayMatch;
-				const arrayValue = JSON.parse(variables[`{{schema:${arrayKey}}}`] || '[]');
-				if (Array.isArray(arrayValue)) {
-					schemaValue = JSON.stringify(arrayValue.map(item => item[propertyKey]));
-				}
-			} else {
-				// Try to find the exact match first
-				if (variables[`{{schema:${schemaKey}}}`]) {
-					schemaValue = variables[`{{schema:${schemaKey}}}`];
-				} else {
-					// If not found, try to find a partial match
-					const partialMatches = Object.keys(variables).filter(key => key.startsWith(`{{schema:${schemaKey}`));
-					if (partialMatches.length > 0) {
-						schemaValue = variables[partialMatches[0]];
-					}
-				}
-			}
-			
-			// Apply filter if present
-			if (filter === '|list') {
-				try {
-					const arrayValue = JSON.parse(schemaValue);
-					if (Array.isArray(arrayValue)) {
-						schemaValue = arrayValue.map(item => `- ${item}`).join('\n');
-					}
-				} catch (error) {
-					console.error('Error parsing JSON for list filter:', error);
-				}
-			}
-
-			text = text.replace(new RegExp(match.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), schemaValue);
-		}
-	}
-
-	return text;
 }
 
 export async function initializePageContent(content: string, selectedHtml: string, extractedContent: ExtractedContent, currentUrl: string, schemaOrgData: any) {
