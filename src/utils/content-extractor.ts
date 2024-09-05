@@ -66,24 +66,36 @@ export async function replaceVariables(tabId: number, text: string, variables: {
 		}
 	}
 
-	// Replace schema variables
-	const schemaRegex = /{{schema:(.*?)}}/g;
+	// Replace schema variables with filters
+	const schemaRegex = /{{schema:(.*?)(\|list)?}}/g;
 	const schemaMatches = text.match(schemaRegex);
 
 	if (schemaMatches) {
 		console.log('Schema matches found:', schemaMatches);
 		for (const match of schemaMatches) {
-			const schemaKey = match.match(/{{schema:(.*?)}}/)![1];
+			const [, schemaKey, filter] = match.match(/{{schema:(.*?)(\|list)?}}/) || [];
 			let schemaValue = '';
 			
 			// Try to find the exact match first
-			if (variables[match]) {
-				schemaValue = variables[match];
+			if (variables[`{{schema:${schemaKey}}}`]) {
+				schemaValue = variables[`{{schema:${schemaKey}}}`];
 			} else {
 				// If not found, try to find a partial match
 				const partialMatches = Object.keys(variables).filter(key => key.startsWith(`{{schema:${schemaKey}`));
 				if (partialMatches.length > 0) {
 					schemaValue = variables[partialMatches[0]];
+				}
+			}
+			
+			// Apply filter if present
+			if (filter === '|list') {
+				try {
+					const arrayValue = JSON.parse(schemaValue);
+					if (Array.isArray(arrayValue)) {
+						schemaValue = arrayValue.map(item => `- ${item}`).join('\n');
+					}
+				} catch (error) {
+					console.error('Error parsing JSON for list filter:', error);
 				}
 			}
 			
