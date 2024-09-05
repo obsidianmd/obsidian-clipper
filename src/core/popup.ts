@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import { Template, Property } from '../types/types';
 import { generateFrontmatter, saveToObsidian, getFileName } from '../utils/obsidian-note-creator';
-import { extractPageContent, initializePageContent, replaceSelectorsWithContent } from '../utils/content-extractor';
+import { extractPageContent, initializePageContent, replaceVariables } from '../utils/content-extractor';
 
 let currentTemplate: Template | null = null;
 
@@ -141,18 +141,18 @@ document.addEventListener('DOMContentLoaded', function() {
 		const tabs = await chrome.tabs.query({active: true, currentWindow: true});
 		const tabId = tabs[0].id!;
 
+		// Ensure all necessary variables are available
+		const allVariables = {
+			...currentVariables,
+			'{{created}}': dayjs().format('YYYY-MM-DD'),
+			'{{today}}': dayjs().format('YYYY-MM-DD'),
+			// Add any other missing variables here
+		};
+
 		for (const property of template.properties) {
 			const propertyDiv = document.createElement('div');
 			propertyDiv.className = 'metadata-property';
-			let value = property.value;
-
-			// Replace variables
-			for (const [variable, replacement] of Object.entries(currentVariables)) {
-				value = value.replace(new RegExp(variable, 'g'), replacement as string);
-			}
-
-			// Handle custom selectors
-			value = await replaceSelectorsWithContent(tabId, value);
+			let value = await replaceVariables(tabId, property.value, allVariables);
 
 			propertyDiv.innerHTML = `
 				<label for="${property.name}">${property.name}</label>
@@ -163,13 +163,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 		const noteNameField = document.getElementById('note-name-field') as HTMLInputElement;
 		if (noteNameField) {
-			let formattedNoteName = template.noteNameFormat;
-			// Replace variables in note name format
-			for (const [variable, replacement] of Object.entries(currentVariables)) {
-				formattedNoteName = formattedNoteName.replace(new RegExp(variable, 'g'), replacement as string);
-			}
-			// Handle custom selectors in note name format
-			formattedNoteName = await replaceSelectorsWithContent(tabId, formattedNoteName);
+			let formattedNoteName = await replaceVariables(tabId, template.noteNameFormat, allVariables);
 			noteNameField.value = getFileName(formattedNoteName);
 		}
 
@@ -178,16 +172,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 		const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
 		if (noteContentField && template.noteContentFormat) {
-			let content = template.noteContentFormat;
-
-			// Replace variables in note content
-			for (const [variable, replacement] of Object.entries(currentVariables)) {
-				content = content.replace(new RegExp(variable, 'g'), replacement as string);
-			}
-
-			// Handle custom selectors in note content
-			content = await replaceSelectorsWithContent(tabId, content);
-
+			let content = await replaceVariables(tabId, template.noteContentFormat, allVariables);
 			noteContentField.value = content;
 		}
 	}

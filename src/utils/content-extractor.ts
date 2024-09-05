@@ -38,7 +38,13 @@ export async function extractContentBySelector(tabId: number, selector: string):
 	});
 }
 
-export async function replaceSelectorsWithContent(tabId: number, text: string): Promise<string> {
+export async function replaceVariables(tabId: number, text: string, variables: { [key: string]: string }): Promise<string> {
+	// Replace variables
+	for (const [variable, replacement] of Object.entries(variables)) {
+		text = text.replace(new RegExp(variable, 'g'), replacement);
+	}
+
+	// Replace selectors
 	const selectorRegex = /{{selector:(.*?)}}/g;
 	const matches = text.match(selectorRegex);
 	
