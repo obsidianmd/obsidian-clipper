@@ -141,18 +141,27 @@ document.addEventListener('DOMContentLoaded', function() {
 		const tabs = await chrome.tabs.query({active: true, currentWindow: true});
 		const tabId = tabs[0].id!;
 
-		// Ensure all necessary variables are available
-		const allVariables = {
-			...currentVariables,
-			'{{created}}': dayjs().format('YYYY-MM-DD'),
-			'{{today}}': dayjs().format('YYYY-MM-DD'),
-			// Add any other missing variables here
-		};
-
 		for (const property of template.properties) {
 			const propertyDiv = document.createElement('div');
 			propertyDiv.className = 'metadata-property';
-			let value = await replaceVariables(tabId, property.value, allVariables);
+			let value = await replaceVariables(tabId, property.value, currentVariables);
+
+			// Apply type-specific parsing
+			switch (property.type) {
+				case 'number':
+					const numericValue = value.replace(/[^\d.-]/g, '');
+					value = numericValue ? parseFloat(numericValue).toString() : value;
+					break;
+				case 'checkbox':
+					value = (value.toLowerCase() === 'true' || value === '1').toString();
+					break;
+				case 'date':
+					value = dayjs(value).isValid() ? dayjs(value).format('YYYY-MM-DD') : value;
+					break;
+				case 'datetime':
+					value = dayjs(value).isValid() ? dayjs(value).format('YYYY-MM-DD HH:mm:ss') : value;
+					break;
+			}
 
 			propertyDiv.innerHTML = `
 				<label for="${property.name}">${property.name}</label>
@@ -163,7 +172,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 		const noteNameField = document.getElementById('note-name-field') as HTMLInputElement;
 		if (noteNameField) {
-			let formattedNoteName = await replaceVariables(tabId, template.noteNameFormat, allVariables);
+			let formattedNoteName = await replaceVariables(tabId, template.noteNameFormat, currentVariables);
 			noteNameField.value = getFileName(formattedNoteName);
 		}
 
@@ -172,7 +181,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 		const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
 		if (noteContentField && template.noteContentFormat) {
-			let content = await replaceVariables(tabId, template.noteContentFormat, allVariables);
+			let content = await replaceVariables(tabId, template.noteContentFormat, currentVariables);
 			noteContentField.value = content;
 		}
 	}
