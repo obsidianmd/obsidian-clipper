@@ -1,6 +1,6 @@
 import { Template, Property } from 'types/types';
 import { handleDragStart, handleDragOver, handleDrop, handleDragEnd } from '../utils/drag-and-drop';
-import { initializeIcons } from '../icons/icons';
+import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
 
 export let templates: Template[] = [];
 export let editingTemplateIndex = -1;
@@ -283,7 +283,7 @@ export function addPropertyToEditor(name: string = '', value: string = '', type:
 		</div>
 		<div class="property-select">
 			<div class="property-selected" data-value="${type}">
-				<i data-lucide="${getIconForType(type)}"></i>
+				<i data-lucide="${getPropertyTypeIcon(type)}"></i>
 			</div>
 			<select class="property-type">
 				<option value="text">Text</option>
@@ -335,22 +335,10 @@ export function addPropertyToEditor(name: string = '', value: string = '', type:
 }
 
 function updateSelectedOption(value: string, propertySelected: HTMLElement): void {
-	const iconName = getIconForType(value);
+	const iconName = getPropertyTypeIcon(value);
 	propertySelected.innerHTML = `<i data-lucide="${iconName}"></i>`;
 	propertySelected.setAttribute('data-value', value);
 	initializeIcons(propertySelected);
-}
-
-function getIconForType(type: string): string {
-	const iconMap: { [key: string]: string } = {
-		text: 'align-left',
-		multitext: 'list',
-		number: 'binary',
-		checkbox: 'square-check-big',
-		date: 'calendar',
-		datetime: 'clock'
-	};
-	return iconMap[type] || 'align-left';
 }
 
 export function updateTemplateFromForm(): void {
