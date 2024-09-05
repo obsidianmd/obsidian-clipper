@@ -8,11 +8,8 @@ export async function generateFrontmatter(
 ): Promise<string> {
 	let frontmatter = '---\n';
 	for (const property of properties) {
-		let value = property.value;
-		// Replace variables
-		Object.keys(currentVariables).forEach(variable => {
-			value = value.replace(new RegExp(variable, 'g'), currentVariables[variable]);
-		});
+		let value = currentVariables[`{{${property.name}}}`] || property.value;
+		
 		// Handle custom selectors
 		value = await replaceSelectorsWithContent(value);
 
