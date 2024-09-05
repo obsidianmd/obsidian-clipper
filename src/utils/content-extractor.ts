@@ -6,10 +6,6 @@ import dayjs from 'dayjs';
 type FilterFunction = (value: string) => string;
 
 const filters: { [key: string]: FilterFunction } = {
-	kebab: (str: string) => str
-		.replace(/([a-z])([A-Z])/g, '$1-$2')
-		.replace(/[\s_]+/g, '-')
-		.toLowerCase(),
 	list: (str: string) => {
 		try {
 			const arrayValue = JSON.parse(str);
@@ -21,6 +17,22 @@ const filters: { [key: string]: FilterFunction } = {
 		}
 		return str;
 	},
+	camel: (str: string) => str
+		.replace(/(?:^\w|[A-Z]|\b\w)/g, (letter, index) => 
+			index === 0 ? letter.toLowerCase() : letter.toUpperCase()
+		)
+		.replace(/[\s_-]+/g, ''),
+	kebab: (str: string) => str
+		.replace(/([a-z])([A-Z])/g, '$1-$2')
+		.replace(/[\s_]+/g, '-')
+		.toLowerCase(),
+	pascal: (str: string) => str
+		.replace(/[\s_-]+(.)/g, (_, c) => c.toUpperCase())
+		.replace(/^(.)/, c => c.toUpperCase()),
+	snake: (str: string) => str
+		.replace(/([a-z])([A-Z])/g, '$1_$2')
+		.replace(/[\s-]+/g, '_')
+		.toLowerCase(),
 };
 
 function applyFilters(value: string, filterNames: string[]): string {
