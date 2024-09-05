@@ -117,7 +117,8 @@ export async function initializePageContent(content: string, selectedHtml: strin
 		'{{noteName}}': noteName,
 		'{{published}}': published,
 		'{{site}}': site,
-		'{{title}}': title,
+		'{{title}}': title, //todo: fix this because it's bein overwitten
+		'{{pageTitle}}': title,
 		'{{today}}': convertDate(new Date()),
 		'{{url}}': currentUrl
 	};

@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		}
 
 		if (currentTemplate) {
-			updateTemplateFields(currentTemplate, {});
+			initializeTemplateFields(currentTemplate, {});
 		}
 	});
 
@@ -87,8 +87,7 @@ document.addEventListener('DOMContentLoaded', function() {
 					if (extractedData) {
 						const initializedContent = await initializePageContent(extractedData.content, extractedData.selectedHtml, extractedData.extractedContent, tabs[0].url!);
 						if (initializedContent) {
-							await updateTemplateFields(currentTemplate, initializedContent.currentVariables);
-							populateFields(initializedContent, currentTemplate);
+							await initializeTemplateFields(currentTemplate, initializedContent.currentVariables, initializedContent.noteName);
 						} else {
 							showError('Unable to initialize page content.');
 						}
@@ -124,8 +123,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				if (extractedData) {
 					const initializedContent = await initializePageContent(extractedData.content, extractedData.selectedHtml, extractedData.extractedContent, currentUrl);
 					if (initializedContent && currentTemplate) {
-						await updateTemplateFields(currentTemplate, initializedContent.currentVariables);
-						populateFields(initializedContent, currentTemplate);
+						await initializeTemplateFields(currentTemplate, initializedContent.currentVariables, initializedContent.noteName);
 					} else {
 						showError('Unable to initialize page content.');
 					}
@@ -136,7 +134,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		});
 	});
 
-	async function updateTemplateFields(template: Template, currentVariables: { [key: string]: string }) {
+	async function initializeTemplateFields(template: Template, currentVariables: { [key: string]: string }, noteName?: string) {
 		const templateProperties = document.querySelector('.metadata-properties') as HTMLElement;
 		templateProperties.innerHTML = '';
 
@@ -163,37 +161,20 @@ document.addEventListener('DOMContentLoaded', function() {
 			templateProperties.appendChild(propertyDiv);
 		}
 
-		await updateFileNameField(template);
-		await updatePathField(template);
-		await updateNoteContentField(template);
-	}
-
-	async function populateFields(initializedContent: any, template: Template) {
-		const { noteName, currentVariables } = initializedContent;
-
 		const noteNameField = document.getElementById('note-name-field') as HTMLInputElement;
-		if (noteNameField) noteNameField.value = noteName;
-
-		const templateProperties = document.querySelector('.metadata-properties') as HTMLElement;
-		const inputs = Array.from(templateProperties.querySelectorAll('input'));
-
-		const tabs = await chrome.tabs.query({active: true, currentWindow: true});
-		const tabId = tabs[0].id!;
-
-		for (const input of inputs) {
-			const propertyName = input.id;
-			let value = template.properties.find(p => p.name === propertyName)?.value || '';
-
-			// Replace variables
+		if (noteNameField) {
+			let formattedNoteName = template.noteNameFormat;
+			// Replace variables in note name format
 			for (const [variable, replacement] of Object.entries(currentVariables)) {
-				value = value.replace(new RegExp(variable, 'g'), replacement as string);
+				formattedNoteName = formattedNoteName.replace(new RegExp(variable, 'g'), replacement as string);
 			}
-
-			// Handle custom selectors
-			value = await replaceSelectorsWithContent(tabId, value);
-
-			input.value = applyPropertyTypeFormatting(value, input.getAttribute('data-type'));
+			// Handle custom selectors in note name format
+			formattedNoteName = await replaceSelectorsWithContent(tabId, formattedNoteName);
+			noteNameField.value = getFileName(formattedNoteName);
 		}
+
+		const pathField = document.getElementById('path-name-field') as HTMLInputElement;
+		if (pathField) pathField.value = template.path;
 
 		const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
 		if (noteContentField && template.noteContentFormat) {
@@ -208,45 +189,6 @@ document.addEventListener('DOMContentLoaded', function() {
 			content = await replaceSelectorsWithContent(tabId, content);
 
 			noteContentField.value = content;
-		}
-	}
-
-	function applyPropertyTypeFormatting(value: string, propertyType: string | null): string {
-		switch (propertyType) {
-			case 'number':
-				const numericValue = value.replace(/[^\d.-]/g, '');
-				return numericValue ? parseFloat(numericValue).toString() : value;
-			case 'checkbox':
-				return (value.toLowerCase() === 'true' || value === '1').toString();
-			case 'date':
-				return dayjs(value).isValid() ? dayjs(value).format('YYYY-MM-DD') : value;
-			case 'datetime':
-				return dayjs(value).isValid() ? dayjs(value).format('YYYY-MM-DD HH:mm:ss') : value;
-			default:
-				return value;
-		}
-	}
-
-	async function updateFileNameField(template: Template) {
-		if (template.behavior === 'create' && template.noteNameFormat) {
-			const noteNameField = document.getElementById('note-name-field') as HTMLInputElement;
-			if (noteNameField) {
-				noteNameField.value = getFileName(template.noteNameFormat);
-			}
-		}
-	}
-
-	async function updatePathField(template: Template) {
-		const pathField = document.getElementById('path-name-field') as HTMLInputElement;
-		if (pathField) {
-			pathField.value = template.path;
-		}
-	}
-
-	async function updateNoteContentField(template: Template) {
-		const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
-		if (noteContentField && template && template.noteContentFormat) {
-			noteContentField.value = template.noteContentFormat;
 		}
 	}
 
