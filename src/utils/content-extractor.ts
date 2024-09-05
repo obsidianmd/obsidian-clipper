@@ -44,10 +44,9 @@ export async function extractContentBySelector(tabId: number, selector: string):
 }
 
 export async function replaceVariables(tabId: number, text: string, variables: { [key: string]: string }): Promise<string> {
-
 	// Replace variables
 	for (const [variable, replacement] of Object.entries(variables)) {
-		text = text.replace(new RegExp(variable, 'g'), replacement);
+		text = text.replace(new RegExp(variable.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), replacement);
 	}
 
 	// Replace selectors
@@ -89,7 +88,7 @@ export async function replaceVariables(tabId: number, text: string, variables: {
 			}
 			
 			console.log(`Replacing ${match} with ${schemaValue}`);
-			text = text.replace(match, schemaValue);
+			text = text.replace(new RegExp(match.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), schemaValue);
 		}
 	}
 
@@ -192,7 +191,7 @@ export async function initializePageContent(content: string, selectedHtml: strin
 
 	console.log('Schema.org data:', schemaOrgData);
 
-	console.log('Variables:', currentVariables);
+	console.log('Available variables:', currentVariables);
 
 	return {
 		noteName,
@@ -206,16 +205,26 @@ function convertDate(date: Date): string {
 
 function addSchemaOrgDataToVariables(schemaData: any, variables: { [key: string]: string }, prefix: string = '') {
 	if (Array.isArray(schemaData)) {
-		// If it's an array, use the first item
-		addSchemaOrgDataToVariables(schemaData[0], variables, prefix);
+		// Add the entire array as a JSON string
+		const variableKey = `{{schema:${prefix.slice(0, -1)}}}`;
+		variables[variableKey] = JSON.stringify(schemaData);
+
+		// If there's only one item, add it without an index
+		if (schemaData.length === 1) {
+			addSchemaOrgDataToVariables(schemaData[0], variables, prefix);
+		} else {
+			// If there's more than one item, add them with indices
+			schemaData.forEach((item, index) => {
+				addSchemaOrgDataToVariables(item, variables, `${prefix}[${index}].`);
+			});
+		}
 	} else if (typeof schemaData === 'object' && schemaData !== null) {
 		Object.entries(schemaData).forEach(([key, value]) => {
 			if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
 				const variableKey = `{{schema:${prefix}${key}}}`;
 				variables[variableKey] = String(value);
 			} else if (Array.isArray(value)) {
-				// If the value is an array, use the first item
-				addSchemaOrgDataToVariables(value[0], variables, `${prefix}${key}.`);
+				addSchemaOrgDataToVariables(value, variables, `${prefix}${key}.`);
 			} else if (typeof value === 'object' && value !== null) {
 				addSchemaOrgDataToVariables(value, variables, `${prefix}${key}.`);
 			}
