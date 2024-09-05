@@ -1,3 +1,13 @@
 svg.lucide-icon {
 	stroke-width: 1.75px;
 }
+.metadata-property-icon {
+	padding: 0 0 0 4px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	svg {
+		width: 16px;
+		height: 16px;
+	}
+}

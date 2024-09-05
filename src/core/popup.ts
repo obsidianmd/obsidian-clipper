@@ -2,6 +2,7 @@ import dayjs from 'dayjs';
 import { Template, Property } from '../types/types';
 import { generateFrontmatter, saveToObsidian, sanitizeFileName } from '../utils/obsidian-note-creator';
 import { extractPageContent, initializePageContent, replaceVariables } from '../utils/content-extractor';
+import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
 
 let currentTemplate: Template | null = null;
 
@@ -164,6 +165,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			}
 
 			propertyDiv.innerHTML = `
+				<span class="metadata-property-icon"><i data-lucide="${getPropertyTypeIcon(property.type)}"></i></span>
 				<label for="${property.name}">${property.name}</label>
 				<input id="${property.name}" type="text" value="${value}" data-type="${property.type}" />
 			`;
@@ -184,6 +186,8 @@ document.addEventListener('DOMContentLoaded', function() {
 			let content = await replaceVariables(tabId, template.noteContentFormat, currentVariables);
 			noteContentField.value = content;
 		}
+
+		initializeIcons();
 	}
 
 	document.getElementById('clip-button')!.addEventListener('click', async function() {
