@@ -47,11 +47,21 @@
 }
 
 .metadata-add-button {
-	margin-bottom: 8px;
+	padding: 2px 0 8px;
+	margin-left: -2px;
 	font-weight: 500;
 	color: var(--text-muted);
 	font-size: 0.875rem;
-	cursor: pointer;
+	user-select: none;
+	white-space: nowrap;
+	a {
+		cursor: pointer;
+		border-radius: 4px;
+		padding: 6px 8px;
+		&:hover {
+			background-color: var(--background-modifier-hover);
+		}
+	}
 }
 
 .sidebar {
@@ -118,7 +128,9 @@
 	flex-direction: column;
 	gap: 8px;
 	margin: 12px 0;
-	
+	&:empty {
+		display: none;
+	}
 	> div {
 		display: flex;
 		flex-direction: row;
