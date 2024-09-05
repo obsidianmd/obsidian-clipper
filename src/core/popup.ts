@@ -6,9 +6,9 @@ import { extractPageContent, initializePageContent, replaceSelectorsWithContent 
 let currentTemplate: Template | null = null;
 
 function findMatchingTemplate(url: string, templates: Template[]): Template | undefined {
-    return templates.find(template => 
-        template.urlPatterns && template.urlPatterns.some(pattern => url.startsWith(pattern))
-    );
+	return templates.find(template => 
+		template.urlPatterns && template.urlPatterns.some(pattern => url.startsWith(pattern))
+	);
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -77,11 +77,25 @@ document.addEventListener('DOMContentLoaded', function() {
 	});
 
 	// Template selection change
-	templateDropdown.addEventListener('change', function() {
-		chrome.storage.sync.get(['templates'], (data: { templates?: Template[] }) => {
+	templateDropdown.addEventListener('change', async function() {
+		chrome.storage.sync.get(['templates'], async (data: { templates?: Template[] }) => {
 			currentTemplate = data.templates?.find((t: Template) => t.name === this.value) || null;
 			if (currentTemplate) {
-				updateTemplateFields(currentTemplate, {});
+				const tabs = await chrome.tabs.query({active: true, currentWindow: true});
+				if (tabs[0].id) {
+					const extractedData = await extractPageContent(tabs[0].id);
+					if (extractedData) {
+						const initializedContent = await initializePageContent(extractedData.content, extractedData.selectedHtml, extractedData.extractedContent, tabs[0].url!);
+						if (initializedContent) {
+							await updateTemplateFields(currentTemplate, initializedContent.currentVariables);
+							populateFields(initializedContent, currentTemplate);
+						} else {
+							showError('Unable to initialize page content.');
+						}
+					} else {
+						showError('Unable to retrieve page content. Try reloading the page.');
+					}
+				}
 			}
 		});
 	});
@@ -100,6 +114,11 @@ document.addEventListener('DOMContentLoaded', function() {
 			const templates: Template[] = data.templates || [];
 			currentTemplate = findMatchingTemplate(currentUrl, templates) || templates[0];
 
+			// Update the template dropdown to reflect the matched template
+			if (currentTemplate) {
+				templateDropdown.value = currentTemplate.name;
+			}
+
 			if (tabs[0].id) {
 				const extractedData = await extractPageContent(tabs[0].id);
 				if (extractedData) {
@@ -107,6 +126,8 @@ document.addEventListener('DOMContentLoaded', function() {
 					if (initializedContent && currentTemplate) {
 						await updateTemplateFields(currentTemplate, initializedContent.currentVariables);
 						populateFields(initializedContent, currentTemplate);
+					} else {
+						showError('Unable to initialize page content.');
 					}
 				} else {
 					showError('Unable to retrieve page content. Try reloading the page.');
