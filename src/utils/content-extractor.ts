@@ -24,8 +24,10 @@ export async function extractPageContent(tabId: number): Promise<{
 }
 
 export function getMetaContent(doc: Document, attr: string, value: string): string {
-	const element = doc.querySelector(`meta[${attr}='${value}']`);
-	return element ? element.getAttribute("content")!.trim() : "";
+	const selector = `meta[${attr}]`;
+	const element = Array.from(doc.querySelectorAll(selector))
+		.find(el => el.getAttribute(attr)?.toLowerCase() === value.toLowerCase());
+	return element ? element.getAttribute("content")?.trim() ?? "" : "";
 }
 
 export async function extractContentBySelector(tabId: number, selector: string): Promise<string> {
@@ -57,37 +59,67 @@ export async function initializePageContent(content: string, selectedHtml: strin
 		console.error('Failed to parse content with Readability');
 		return null;
 	}
-	const { title: rawTitle, byline, excerpt, lang } = readabilityArticle;
-	
-	const currentTitle = rawTitle.replace(/"/g, "'");
-	const noteName = getFileName(currentTitle);
 
 	const parser = new DOMParser();
 	const doc = parser.parseFromString(content, 'text/html');
 
-	const author = byline || getMetaContent(doc, "name", "author") || getMetaContent(doc, "property", "author") || getMetaContent(doc, "name", "twitter:creator") || getMetaContent(doc, "property", "og:site_name");
+	// Define preset variables with fallbacks
+	const title =
+		getMetaContent(doc, "property", "og:title")
+		|| getMetaContent(doc, "name", "twitter:title")
+		|| doc.querySelector('title')?.textContent?.trim() || '';
 
-	const description = excerpt || getMetaContent(doc, "name", "description") || getMetaContent(doc, "property", "description") || getMetaContent(doc, "property", "og:description");
-	const image = getMetaContent(doc, "property", "og:image") || getMetaContent(doc, "name", "twitter:image");
-	const language = lang;
+	const noteName = getFileName(title);
+
+	const author =
+		getMetaContent(doc, "name", "author")
+		|| getMetaContent(doc, "property", "author")
+		|| getMetaContent(doc, "name", "twitter:creator")
+		|| getMetaContent(doc, "property", "og:site_name")
+		|| getMetaContent(doc, "name", "application-name")
+		|| getMetaContent(doc, "name", "copyright")
+		|| '';
+
+	const description =
+		getMetaContent(doc, "name", "description")
+		|| getMetaContent(doc, "property", "description")
+		|| getMetaContent(doc, "property", "og:description")
+		|| getMetaContent(doc, "name", "twitter:description")
+		|| '';
+
+	const domain = new URL(currentUrl).hostname.replace(/^www\./, '');
+
+	const image =
+		getMetaContent(doc, "property", "og:image")
+		|| getMetaContent(doc, "name", "twitter:image")
+		|| '';
 
 	const timeElement = doc.querySelector("time");
-	const publishedDate = timeElement?.getAttribute("datetime");
+	const publishedDate = 
+		getMetaContent(doc, "property", "article:published_time")
+		|| timeElement?.getAttribute("datetime");
 	const published = publishedDate ? `${convertDate(new Date(publishedDate))}` : "";
+
+	const site =
+		getMetaContent(doc, "property", "og:site_name")
+		|| getMetaContent(doc, "name", "application-name")
+		|| getMetaContent(doc, "name", "copyright")
+		|| '';
 
 	const markdownBody = createMarkdownContent(content, currentUrl, selectedHtml);
 
 	const currentVariables: { [key: string]: string } = {
-		'{{title}}': currentTitle,
-		'{{url}}': currentUrl,
+		'{{author}}': author,
+		'{{content}}': markdownBody,
+		'{{description}}': description,
+		'{{domain}}': domain,
+		'{{image}}': image,
+		'{{noteName}}': noteName,
 		'{{published}}': published,
-		'{{author}}': author ?? '',
+		'{{site}}': site,
+		'{{title}}': title,
 		'{{today}}': convertDate(new Date()),
-		'{{description}}': description ?? '',
-		'{{domain}}': new URL(currentUrl).hostname,
-		'{{image}}': image ?? '',
-		'{{language}}': language ?? '',
-		'{{content}}': markdownBody
+		'{{url}}': currentUrl
 	};
 
 	// Add extracted content to variables
@@ -110,7 +142,6 @@ export async function initializePageContent(content: string, selectedHtml: strin
 	});
 
 	return {
-		currentTitle,
 		noteName,
 		currentVariables
 	};

@@ -169,7 +169,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	}
 
 	async function populateFields(initializedContent: any, template: Template) {
-		const { currentTitle, noteName, currentVariables } = initializedContent;
+		const { noteName, currentVariables } = initializedContent;
 
 		const noteNameField = document.getElementById('note-name-field') as HTMLInputElement;
 		if (noteNameField) noteNameField.value = noteName;
@@ -296,9 +296,5 @@ document.addEventListener('DOMContentLoaded', function() {
 		errorMessage.textContent = message;
 		errorMessage.style.display = 'block';
 		clipper.style.display = 'none';
-	}
-
-	function convertDate(date: Date): string {
-		return dayjs(date).format('YYYY-MM-DD');
 	}
 });
