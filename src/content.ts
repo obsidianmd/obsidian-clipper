@@ -18,11 +18,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 			selectedHtml = div.innerHTML;
 		}
 
-		const extractedContent: { [key: string]: string } = {
-			title: document.title,
-			url: window.location.href,
-			// Add more default extractions here
-		};
+		const extractedContent: { [key: string]: string } = {};
 
 		const schemaOrgData = extractSchemaOrgData();
 

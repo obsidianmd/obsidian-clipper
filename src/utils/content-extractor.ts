@@ -124,7 +124,8 @@ export async function initializePageContent(content: string, selectedHtml: strin
 	const title =
 		getMetaContent(doc, "property", "og:title")
 		|| getMetaContent(doc, "name", "twitter:title")
-		|| doc.querySelector('title')?.textContent?.trim() || '';
+		|| doc.querySelector('title')?.textContent?.trim()
+		|| '';
 
 	const noteName = sanitizeFileName(title);
 
@@ -171,11 +172,10 @@ export async function initializePageContent(content: string, selectedHtml: strin
 		'{{description}}': description,
 		'{{domain}}': domain,
 		'{{image}}': image,
-		'{{noteName}}': noteName,
 		'{{published}}': published,
 		'{{site}}': site,
-		'{{title}}': title, //todo: fix this because it's bein overwitten
-		'{{pageTitle}}': title,
+		'{{title}}': title,
+		'{{noteName}}': noteName,
 		'{{today}}': convertDate(new Date()),
 		'{{url}}': currentUrl
 	};
