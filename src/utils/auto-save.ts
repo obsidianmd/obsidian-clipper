@@ -48,6 +48,16 @@ export function initializeAutoSave(): void {
 				}
 			}
 		});
+
+		templateProperties.addEventListener('change', (event) => {
+			const target = event.target as HTMLElement;
+			if (target.classList.contains('property-type')) {
+				if (editingTemplateIndex !== -1) {
+					updateTemplateFromForm();
+					autoSave();
+				}
+			}
+		});
 	}
 
 	const addPropertyBtn = document.getElementById('add-property-btn');
