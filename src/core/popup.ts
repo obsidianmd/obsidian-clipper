@@ -1,16 +1,7 @@
-import TurndownService from 'turndown';
-import { gfm } from 'turndown-plugin-gfm';
-import { Readability } from '@mozilla/readability';
 import dayjs from 'dayjs';
-
 import { Template, Property } from '../types/types';
 import { generateFrontmatter, saveToObsidian, getFileName } from '../utils/obsidian-note-creator';
-import { createMarkdownContent, extractReadabilityContent } from '../utils/markdown-converter';
-import { extractPageContent, getMetaContent, replaceSelectorsWithContent, initializePageContent } from '../utils/content-extractor';
-
-interface ExtractedContent {
-	[key: string]: string;
-}
+import { extractPageContent, replaceSelectorsWithContent, initializePageContent } from '../utils/content-extractor';
 
 let currentUrl: string = '';
 let currentTitle: string = '';
