@@ -1,6 +1,6 @@
 import { ExtractedContent } from '../types/types';
 import { extractReadabilityContent, createMarkdownContent } from './markdown-converter';
-import { getFileName } from './obsidian-note-creator';
+import { sanitizeFileName } from './obsidian-note-creator';
 import dayjs from 'dayjs';
 
 export async function extractPageContent(tabId: number): Promise<{
@@ -75,7 +75,7 @@ export async function initializePageContent(content: string, selectedHtml: strin
 		|| getMetaContent(doc, "name", "twitter:title")
 		|| doc.querySelector('title')?.textContent?.trim() || '';
 
-	const noteName = getFileName(title);
+	const noteName = sanitizeFileName(title);
 
 	const author =
 		getMetaContent(doc, "name", "author")

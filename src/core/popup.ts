@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 import { Template, Property } from '../types/types';
-import { generateFrontmatter, saveToObsidian, getFileName } from '../utils/obsidian-note-creator';
+import { generateFrontmatter, saveToObsidian, sanitizeFileName } from '../utils/obsidian-note-creator';
 import { extractPageContent, initializePageContent, replaceVariables } from '../utils/content-extractor';
 
 let currentTemplate: Template | null = null;
@@ -173,7 +173,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		const noteNameField = document.getElementById('note-name-field') as HTMLInputElement;
 		if (noteNameField) {
 			let formattedNoteName = await replaceVariables(tabId, template.noteNameFormat, currentVariables);
-			noteNameField.value = getFileName(formattedNoteName);
+			noteNameField.value = sanitizeFileName(formattedNoteName);
 		}
 
 		const pathField = document.getElementById('path-name-field') as HTMLInputElement;

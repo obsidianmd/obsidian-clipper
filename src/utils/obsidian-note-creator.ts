@@ -68,12 +68,12 @@ export function saveToObsidian(fileContent: string, noteName: string, path: stri
 	});
 }
 
-export function getFileName(noteName: string): string {
+export function sanitizeFileName(fileName: string): string {
 	const isWindows = navigator.platform.indexOf('Win') > -1;
 	if (isWindows) {
-		noteName = noteName.replace(':', '').replace(/[/\\?%*|"<>]/g, '-');
+		fileName = fileName.replace(':', '').replace(/[/\\?%*|"<>]/g, '-');
 	} else {
-		noteName = noteName.replace(':', '').replace(/[/\\]/g, '-');
+		fileName = fileName.replace(':', '').replace(/[/\\]/g, '-');
 	}
-	return noteName;
+	return fileName;
 }
