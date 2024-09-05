@@ -24,49 +24,18 @@ function findMatchingTemplate(url: string, templates: Template[]): Template | un
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-	const vaultDropdown = document.getElementById('vault-dropdown') as HTMLSelectElement;
-	const templateSelect = document.getElementById('template-select') as HTMLSelectElement;
 	const vaultContainer = document.getElementById('vault-container') as HTMLElement;
+	const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement;
 	const templateContainer = document.getElementById('template-container') as HTMLElement;
-	
-	let currentTemplate: Template | null = null;
-	let vaults: string[] = [];
+	const templateDropdown = document.getElementById('template-select') as HTMLSelectElement;
 
-	// Load vaults from storage
+	let vaults: string[] = [];
+	let currentTemplate: Template | null = null;
+
+	// Load vaults from storage and populate dropdown
 	chrome.storage.sync.get(['vaults'], (data: { vaults?: string[] }) => {
 		vaults = data.vaults || [];
 		updateVaultDropdown();
-	});
-
-	// Load templates from storage and populate dropdown
-	chrome.storage.sync.get(['templates'], (data: { templates?: Template[] }) => {
-		if (!data.templates || data.templates.length === 0) {
-			console.error('No templates found in storage');
-			return;
-		}
-
-		templateSelect.innerHTML = '';
-		
-		data.templates.forEach((template: Template) => {
-			const option = document.createElement('option');
-			option.value = template.name;
-			option.textContent = template.name;
-			templateSelect.appendChild(option);
-		});
-
-		// Set the first template as the default
-		currentTemplate = data.templates[0];
-		if (currentTemplate) {
-			templateSelect.value = currentTemplate.name;
-		}
-
-		if (data.templates.length > 1) {
-			templateContainer.style.display = 'block';
-		}
-
-		if (currentTemplate) {
-			updateTemplateProperties(currentTemplate);
-		}
 	});
 
 	function updateVaultDropdown() {
@@ -79,16 +48,49 @@ document.addEventListener('DOMContentLoaded', function() {
 			vaultDropdown.appendChild(option);
 		});
 
+		// Only show vault selector if one is defined
 		if (vaults.length > 0) {
 			vaultContainer.style.display = 'block';
-			vaultDropdown.value = vaults[0]; // Set first vault as default
+			vaultDropdown.value = vaults[0];
 		} else {
 			vaultContainer.style.display = 'none';
 		}
 	}
 
-	// Add event listener for template selection change
-	templateSelect.addEventListener('change', function() {
+	// Load templates from storage and populate dropdown
+	chrome.storage.sync.get(['templates'], (data: { templates?: Template[] }) => {
+		if (!data.templates || data.templates.length === 0) {
+			console.error('No templates found in storage');
+			return;
+		}
+
+		templateDropdown.innerHTML = '';
+		
+		data.templates.forEach((template: Template) => {
+			const option = document.createElement('option');
+			option.value = template.name;
+			option.textContent = template.name;
+			templateDropdown.appendChild(option);
+		});
+
+		// Set the first template as the default
+		currentTemplate = data.templates[0];
+		if (currentTemplate) {
+			templateDropdown.value = currentTemplate.name;
+		}
+
+		// Only show template selector if there are multiple templates
+		if (data.templates.length > 1) {
+			templateContainer.style.display = 'block';
+		}
+
+		if (currentTemplate) {
+			updateTemplateProperties(currentTemplate);
+		}
+	});
+
+	// Template selection change
+	templateDropdown.addEventListener('change', function() {
 		chrome.storage.sync.get(['templates'], (data: { templates?: Template[] }) => {
 			currentTemplate = data.templates?.find((t: Template) => t.name === this.value) || null;
 			if (currentTemplate) {
@@ -97,6 +99,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		});
 	});
 
+	// Match template based on URL
 	chrome.tabs.query({active: true, currentWindow: true}, async function(tabs) {
 		if (tabs[0].url) {
 			currentUrl = tabs[0].url;
@@ -114,7 +117,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			
 			if (matchingTemplate) {
 				currentTemplate = matchingTemplate;
-				templateSelect.value = currentTemplate.name;
+				templateDropdown.value = currentTemplate.name;
 			} else {
 				currentTemplate = templates[0]; // Use the first template as default
 			}
