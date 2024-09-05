@@ -182,9 +182,13 @@ document.addEventListener('DOMContentLoaded', function() {
 		if (pathField) pathField.value = template.path;
 
 		const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
-		if (noteContentField && template.noteContentFormat) {
-			let content = await replaceVariables(tabId, template.noteContentFormat, currentVariables);
-			noteContentField.value = content;
+		if (noteContentField) {
+			if (template.noteContentFormat) {
+				let content = await replaceVariables(tabId, template.noteContentFormat, currentVariables);
+				noteContentField.value = content;
+			} else {
+				noteContentField.value = '';
+			}
 		}
 
 		initializeIcons();
