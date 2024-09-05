@@ -32,10 +32,10 @@ export async function generateFrontmatter(
 				frontmatter += ` ${value.toLowerCase() === 'true' || value === '1'}\n`;
 				break;
 			case 'date':
-				frontmatter += ` "${dayjs(value).format('YYYY-MM-DD')}"\n`;
+				frontmatter += ` "${value}"\n`;
 				break;
 			case 'datetime':
-				frontmatter += ` "${dayjs(value).format('YYYY-MM-DD HH:mm:ss')}"\n`;
+				frontmatter += ` "${value}"\n`;
 				break;
 			default: // Text
 				frontmatter += ` "${value}"\n`;
