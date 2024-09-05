@@ -132,7 +132,7 @@ export function showTemplateEditor(template: Template | null): void {
 	if (noteNameFormat) noteNameFormat.value = editingTemplate.noteNameFormat || '{{title}}';
 
 	const noteContentFormat = document.getElementById('note-content-format') as HTMLTextAreaElement;
-	if (noteContentFormat) noteContentFormat.value = editingTemplate.noteContentFormat || '{{content}}';
+	if (noteContentFormat) noteContentFormat.value = editingTemplate.noteContentFormat || '';
 
 	updateBehaviorFields();
 
