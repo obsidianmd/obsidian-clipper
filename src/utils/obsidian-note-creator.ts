@@ -1,44 +1,33 @@
 import dayjs from 'dayjs';
 import { Template, Property } from '../types/types';
 
-export async function generateFrontmatter(
-	properties: Property[],
-	currentVariables: { [key: string]: string },
-	replaceSelectorsWithContent: (text: string) => Promise<string>
-): Promise<string> {
+export async function generateFrontmatter(properties: Property[]): Promise<string> {
 	let frontmatter = '---\n';
 	for (const property of properties) {
-		let value = currentVariables[`{{${property.name}}}`] || property.value;
-		
-		// Handle custom selectors
-		value = await replaceSelectorsWithContent(value);
-
 		frontmatter += `${property.name}:`;
 
 		// Format the value based on the property type
 		switch (property.type) {
 			case 'multitext':
 				frontmatter += '\n';
-				const items = value.split(',').map(item => item.trim());
+				const items = property.value.split(',').map(item => item.trim());
 				items.forEach(item => {
 					frontmatter += `  - ${item}\n`;
 				});
 				break;
 			case 'number':
-				const numericValue = value.replace(/[^\d.-]/g, '');
+				const numericValue = property.value.replace(/[^\d.-]/g, '');
 				frontmatter += numericValue ? ` ${parseFloat(numericValue)}\n` : '\n';
 				break;
 			case 'checkbox':
-				frontmatter += ` ${value.toLowerCase() === 'true' || value === '1'}\n`;
+				frontmatter += ` ${property.value.toLowerCase() === 'true' || property.value === '1'}\n`;
 				break;
 			case 'date':
-				frontmatter += ` "${value}"\n`;
-				break;
 			case 'datetime':
-				frontmatter += ` "${value}"\n`;
+				frontmatter += ` "${property.value}"\n`;
 				break;
 			default: // Text
-				frontmatter += ` "${value}"\n`;
+				frontmatter += ` "${property.value}"\n`;
 		}
 	}
 	frontmatter += '---\n\n';
