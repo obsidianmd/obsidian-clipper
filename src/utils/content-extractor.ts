@@ -71,19 +71,28 @@ export async function replaceVariables(tabId: number, text: string, variables: {
 	const schemaMatches = text.match(schemaRegex);
 
 	if (schemaMatches) {
-		console.log('Schema matches found:', schemaMatches);
 		for (const match of schemaMatches) {
 			const [, schemaKey, filter] = match.match(/{{schema:(.*?)(\|list)?}}/) || [];
 			let schemaValue = '';
 			
-			// Try to find the exact match first
-			if (variables[`{{schema:${schemaKey}}}`]) {
-				schemaValue = variables[`{{schema:${schemaKey}}}`];
+			// Check if we're dealing with a nested array access
+			const nestedArrayMatch = schemaKey.match(/(.*?)\.\[\*\]\.(.*)/);
+			if (nestedArrayMatch) {
+				const [, arrayKey, propertyKey] = nestedArrayMatch;
+				const arrayValue = JSON.parse(variables[`{{schema:${arrayKey}}}`] || '[]');
+				if (Array.isArray(arrayValue)) {
+					schemaValue = JSON.stringify(arrayValue.map(item => item[propertyKey]));
+				}
 			} else {
-				// If not found, try to find a partial match
-				const partialMatches = Object.keys(variables).filter(key => key.startsWith(`{{schema:${schemaKey}`));
-				if (partialMatches.length > 0) {
-					schemaValue = variables[partialMatches[0]];
+				// Try to find the exact match first
+				if (variables[`{{schema:${schemaKey}}}`]) {
+					schemaValue = variables[`{{schema:${schemaKey}}}`];
+				} else {
+					// If not found, try to find a partial match
+					const partialMatches = Object.keys(variables).filter(key => key.startsWith(`{{schema:${schemaKey}`));
+					if (partialMatches.length > 0) {
+						schemaValue = variables[partialMatches[0]];
+					}
 				}
 			}
 			
@@ -98,8 +107,7 @@ export async function replaceVariables(tabId: number, text: string, variables: {
 					console.error('Error parsing JSON for list filter:', error);
 				}
 			}
-			
-			console.log(`Replacing ${match} with ${schemaValue}`);
+
 			text = text.replace(new RegExp(match.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), schemaValue);
 		}
 	}
@@ -200,8 +208,6 @@ export async function initializePageContent(content: string, selectedHtml: strin
 	if (schemaOrgData) {
 		addSchemaOrgDataToVariables(schemaOrgData, currentVariables);
 	}
-
-	console.log('Schema.org data:', schemaOrgData);
 
 	console.log('Available variables:', currentVariables);
 
