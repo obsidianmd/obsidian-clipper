@@ -1,6 +1,7 @@
 import { Template, Property } from 'types/types';
 import { handleDragStart, handleDragOver, handleDrop, handleDragEnd } from '../utils/drag-and-drop';
 import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
+import { escapeValue, unescapeValue } from '../utils/string-utils';
 
 export let templates: Template[] = [];
 export let editingTemplateIndex = -1;
@@ -295,7 +296,7 @@ export function addPropertyToEditor(name: string = '', value: string = '', type:
 			</select>
 		</div>
 		<input type="text" class="property-name" value="${name}" placeholder="Property name">
-		<input type="text" class="property-value" value="${value}" placeholder="Property value">
+		<input type="text" class="property-value" value="${escapeHtml(unescapeValue(value))}" placeholder="Property value">
 		<button type="button" class="remove-property-btn clickable-icon" aria-label="Remove property">
 			<i data-lucide="trash-2"></i>
 		</button>
@@ -379,7 +380,7 @@ export function updateTemplateFromForm(): void {
 		return {
 			id: (prop as HTMLElement).dataset.id || Date.now().toString() + Math.random().toString(36).slice(2, 11),
 			name: nameInput.value,
-			value: valueInput.value,
+			value: escapeValue(valueInput.value),
 			type: typeSelect.getAttribute('data-value') || 'text'
 		};
 	});
@@ -395,4 +396,14 @@ export function getEditingTemplateIndex(): number {
 // Add this export
 export function getTemplates(): Template[] {
 	return templates;
+}
+
+// Add this helper function at the end of the file
+function escapeHtml(unsafe: string): string {
+	return unsafe
+		.replace(/&/g, "&amp;")
+		.replace(/</g, "&lt;")
+		.replace(/>/g, "&gt;")
+		.replace(/"/g, "&quot;")
+		.replace(/'/g, "&#039;");
 }
