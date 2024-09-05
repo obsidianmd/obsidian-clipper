@@ -7,6 +7,7 @@ export async function extractPageContent(tabId: number): Promise<{
 	content: string;
 	selectedHtml: string;
 	extractedContent: ExtractedContent;
+	schemaOrgData: any;
 } | null> {
 	return new Promise((resolve) => {
 		chrome.tabs.sendMessage(tabId, { action: "getPageContent" }, function(response) {
@@ -14,7 +15,8 @@ export async function extractPageContent(tabId: number): Promise<{
 				resolve({
 					content: response.content,
 					selectedHtml: response.selectedHtml,
-					extractedContent: response.extractedContent
+					extractedContent: response.extractedContent,
+					schemaOrgData: response.schemaOrgData
 				});
 			} else {
 				resolve(null);
@@ -30,10 +32,13 @@ export function getMetaContent(doc: Document, attr: string, value: string): stri
 	return element ? element.getAttribute("content")?.trim() ?? "" : "";
 }
 
-export async function extractContentBySelector(tabId: number, selector: string): Promise<string> {
+export async function extractContentBySelector(tabId: number, selector: string): Promise<{ content: string; schemaOrgData: any }> {
 	return new Promise((resolve) => {
 		chrome.tabs.sendMessage(tabId, { action: "extractContent", selector: selector }, function(response) {
-			resolve(response ? response.content : '');
+			resolve({
+				content: response ? response.content : '',
+				schemaOrgData: response ? response.schemaOrgData : null
+			});
 		});
 	});
 }
@@ -41,7 +46,7 @@ export async function extractContentBySelector(tabId: number, selector: string):
 export async function replaceVariables(tabId: number, text: string, variables: { [key: string]: string }): Promise<string> {
 	// Replace variables
 	for (const [variable, replacement] of Object.entries(variables)) {
-		text = text.replace(new RegExp(variable, 'g'), replacement);
+		text = text.replace(new RegExp(variable.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), replacement);
 	}
 
 	// Replace selectors
@@ -51,15 +56,61 @@ export async function replaceVariables(tabId: number, text: string, variables: {
 	if (matches) {
 		for (const match of matches) {
 			const selector = match.match(/{{selector:(.*?)}}/)![1];
-			const content = await extractContentBySelector(tabId, selector);
+			const { content } = await extractContentBySelector(tabId, selector);
 			text = text.replace(match, content);
 		}
 	}
-	
+
+	// Replace schema variables with filters
+	const schemaRegex = /{{schema:(.*?)(\|list)?}}/g;
+	const schemaMatches = text.match(schemaRegex);
+
+	if (schemaMatches) {
+		for (const match of schemaMatches) {
+			const [, schemaKey, filter] = match.match(/{{schema:(.*?)(\|list)?}}/) || [];
+			let schemaValue = '';
+			
+			// Check if we're dealing with a nested array access
+			const nestedArrayMatch = schemaKey.match(/(.*?)\.\[\*\]\.(.*)/);
+			if (nestedArrayMatch) {
+				const [, arrayKey, propertyKey] = nestedArrayMatch;
+				const arrayValue = JSON.parse(variables[`{{schema:${arrayKey}}}`] || '[]');
+				if (Array.isArray(arrayValue)) {
+					schemaValue = JSON.stringify(arrayValue.map(item => item[propertyKey]));
+				}
+			} else {
+				// Try to find the exact match first
+				if (variables[`{{schema:${schemaKey}}}`]) {
+					schemaValue = variables[`{{schema:${schemaKey}}}`];
+				} else {
+					// If not found, try to find a partial match
+					const partialMatches = Object.keys(variables).filter(key => key.startsWith(`{{schema:${schemaKey}`));
+					if (partialMatches.length > 0) {
+						schemaValue = variables[partialMatches[0]];
+					}
+				}
+			}
+			
+			// Apply filter if present
+			if (filter === '|list') {
+				try {
+					const arrayValue = JSON.parse(schemaValue);
+					if (Array.isArray(arrayValue)) {
+						schemaValue = arrayValue.map(item => `- ${item}`).join('\n');
+					}
+				} catch (error) {
+					console.error('Error parsing JSON for list filter:', error);
+				}
+			}
+
+			text = text.replace(new RegExp(match.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), schemaValue);
+		}
+	}
+
 	return text;
 }
 
-export async function initializePageContent(content: string, selectedHtml: string, extractedContent: ExtractedContent, currentUrl: string) {
+export async function initializePageContent(content: string, selectedHtml: string, extractedContent: ExtractedContent, currentUrl: string, schemaOrgData: any) {
 	const readabilityArticle = extractReadabilityContent(content);
 	if (!readabilityArticle) {
 		console.error('Failed to parse content with Readability');
@@ -148,6 +199,13 @@ export async function initializePageContent(content: string, selectedHtml: strin
 		}
 	});
 
+	// Add schema.org data to variables
+	if (schemaOrgData) {
+		addSchemaOrgDataToVariables(schemaOrgData, currentVariables);
+	}
+
+	console.log('Available variables:', currentVariables);
+
 	return {
 		noteName,
 		currentVariables
@@ -156,4 +214,33 @@ export async function initializePageContent(content: string, selectedHtml: strin
 
 function convertDate(date: Date): string {
 	return dayjs(date).format('YYYY-MM-DD');
+}
+
+function addSchemaOrgDataToVariables(schemaData: any, variables: { [key: string]: string }, prefix: string = '') {
+	if (Array.isArray(schemaData)) {
+		// Add the entire array as a JSON string
+		const variableKey = `{{schema:${prefix.slice(0, -1)}}}`;
+		variables[variableKey] = JSON.stringify(schemaData);
+
+		// If there's only one item, add it without an index
+		if (schemaData.length === 1) {
+			addSchemaOrgDataToVariables(schemaData[0], variables, prefix);
+		} else {
+			// If there's more than one item, add them with indices
+			schemaData.forEach((item, index) => {
+				addSchemaOrgDataToVariables(item, variables, `${prefix}[${index}].`);
+			});
+		}
+	} else if (typeof schemaData === 'object' && schemaData !== null) {
+		Object.entries(schemaData).forEach(([key, value]) => {
+			if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+				const variableKey = `{{schema:${prefix}${key}}}`;
+				variables[variableKey] = String(value);
+			} else if (Array.isArray(value)) {
+				addSchemaOrgDataToVariables(value, variables, `${prefix}${key}.`);
+			} else if (typeof value === 'object' && value !== null) {
+				addSchemaOrgDataToVariables(value, variables, `${prefix}${key}.`);
+			}
+		});
+	}
 }

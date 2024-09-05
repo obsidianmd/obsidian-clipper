@@ -31,6 +31,21 @@ These variables are automatically generated based on the page content.
 
 Selector variables allow you to extract data from the page using the `selector:` prefix.  Selectors use the same syntax as CSS. For example:
  
-- `{{selector:h1}}` will extract the content of the first `h1` element on the page
-- `{{selector:.author}}` will extract the content of the first `.author` element on the page
+- `{{selector:h1}}` returns text content of the first `h1` element on the page.
+- `{{selector:.author}}` returns text content of the first `.author` element on the page
 - Advanced nested selectors can also be used.
+
+#### Schema.org variables
+
+Schema variables allow you to extract data from [schema.org](https://schema.org/) JSON-LD on the page.
+
+- `{{schema:key}}` returns the value of the key from the schema.
+- `{{schema:parent.child}}` returns the value of a nested property.
+- `{{schema:arrayKey}}` returns the first item in an array.
+- `{{schema:arrayKey[index].property}}` returns the item at the specified index in an array.
+- `{{schema:arrayKey.[*].property}}` returns a specific property from all items in an array.
+
+### Filters
+
+- `{{schema:key|list}}` converts an array to a bullet list.
+- `{{schema:arrayKey.[*].property|list}}` returns a specific property from all items in an array and converts it to a bullet list.

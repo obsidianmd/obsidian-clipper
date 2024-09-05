@@ -2,6 +2,7 @@ interface ContentResponse {
 	content: string;
 	selectedHtml: string;
 	extractedContent: { [key: string]: string };
+	schemaOrgData: any;
 }
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
@@ -23,10 +24,13 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 			// Add more default extractions here
 		};
 
+		const schemaOrgData = extractSchemaOrgData();
+
 		const response: ContentResponse = {
 			content: document.documentElement.outerHTML,
 			selectedHtml: selectedHtml,
-			extractedContent: extractedContent
+			extractedContent: extractedContent,
+			schemaOrgData: schemaOrgData
 		};
 
 		sendResponse(response);
@@ -40,4 +44,20 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 function extractContentBySelector(selector: string): string {
 	const element = document.querySelector(selector);
 	return element ? element.textContent?.trim() || '' : '';
+}
+
+function extractSchemaOrgData(): any {
+	const schemaScripts = document.querySelectorAll('script[type="application/ld+json"]');
+	const schemaData: any[] = [];
+
+	schemaScripts.forEach(script => {
+		try {
+			const jsonData = JSON.parse(script.textContent || '');
+			schemaData.push(jsonData);
+		} catch (error) {
+			console.error('Error parsing schema.org data:', error);
+		}
+	});
+
+	return schemaData;
 }

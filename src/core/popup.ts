@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				if (tabs[0].id) {
 					const extractedData = await extractPageContent(tabs[0].id);
 					if (extractedData) {
-						const initializedContent = await initializePageContent(extractedData.content, extractedData.selectedHtml, extractedData.extractedContent, tabs[0].url!);
+						const initializedContent = await initializePageContent(extractedData.content, extractedData.selectedHtml, extractedData.extractedContent, tabs[0].url!, extractedData.schemaOrgData);
 						if (initializedContent) {
 							await initializeTemplateFields(currentTemplate, initializedContent.currentVariables, initializedContent.noteName);
 						} else {
@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			if (tabs[0].id) {
 				const extractedData = await extractPageContent(tabs[0].id);
 				if (extractedData) {
-					const initializedContent = await initializePageContent(extractedData.content, extractedData.selectedHtml, extractedData.extractedContent, currentUrl);
+					const initializedContent = await initializePageContent(extractedData.content, extractedData.selectedHtml, extractedData.extractedContent, currentUrl, extractedData.schemaOrgData);
 					if (initializedContent && currentTemplate) {
 						await initializeTemplateFields(currentTemplate, initializedContent.currentVariables, initializedContent.noteName);
 					} else {
