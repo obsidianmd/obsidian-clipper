@@ -56,13 +56,8 @@ export async function replaceVariables(tabId: number, text: string, variables: {
 	if (matches) {
 		for (const match of matches) {
 			const selector = match.match(/{{selector:(.*?)}}/)![1];
-			const { content, schemaOrgData } = await extractContentBySelector(tabId, selector);
+			const { content } = await extractContentBySelector(tabId, selector);
 			text = text.replace(match, content);
-			
-			// Add schema.org data to variables
-			if (schemaOrgData) {
-				addSchemaOrgDataToVariables(schemaOrgData, variables);
-			}
 		}
 	}
 
