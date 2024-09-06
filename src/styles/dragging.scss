@@ -32,3 +32,35 @@ body.is-dragging {
 		cursor: grabbing !important;
 	}
 }
+
+.template-drop-zone {
+	position: fixed;
+	width: 100vw;
+	height: 100vh;
+	top: 0;
+	left: 0;
+	user-select: none;
+	display: none;
+	align-items: center;
+	text-align: center;
+	justify-content: center;
+	font-size: 1.5rem;
+	font-weight: 600;
+	z-index: 100;
+	color: var(--text-accent);
+	p {
+		padding: 4rem;
+		width: calc(100vw - 2rem);
+		height: calc(100vh - 2rem);
+		border-radius: 1rem;
+		border: 2px dashed hsla(var(--color-accent-hsl), .5);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	&.drag-over {
+		display: flex;
+		background-color: rgba(var(--mono-rgb-0), .95);
+	}
+}

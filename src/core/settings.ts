@@ -8,6 +8,7 @@ import { exportTemplate, importTemplate } from '../utils/import-export';
 import { createIcons } from 'lucide';
 import { icons } from '../icons/icons';
 import { resetUnsavedChanges } from '../managers/template-manager';
+import { initializeDropZone } from '../utils/import-export';
 
 document.addEventListener('DOMContentLoaded', () => {
 	const vaultInput = document.getElementById('vault-input') as HTMLInputElement;
@@ -24,6 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		initializeSidebar();
 		initializeAutoSave();
 		initializeDragAndDrop();
+		initializeDropZone();
 
 		exportTemplateBtn.addEventListener('click', exportTemplate);
 		importTemplateBtn.addEventListener('click', importTemplate);

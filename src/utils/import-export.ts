@@ -89,7 +89,6 @@ export function importTemplate(): void {
 				saveTemplateSettings();
 				updateTemplateList();
 				showTemplateEditor(importedTemplate as Template);
-				alert('Template imported successfully!');
 			} catch (error) {
 				console.error('Error parsing imported template:', error);
 				alert('Error importing template. Please check the file and try again.');
@@ -112,4 +111,142 @@ function validateImportedTemplate(template: Partial<Template>): boolean {
 			prop.hasOwnProperty('type') &&
 			validTypes.includes(prop.type)
 		);
+}
+
+export function initializeDropZone(): void {
+	const dropZone = document.getElementById('template-drop-zone');
+	const body = document.body;
+
+	if (!dropZone) {
+		console.error('Drop zone not found');
+		return;
+	}
+
+	let dragCounter = 0;
+
+	body.addEventListener('dragenter', handleDragEnter, false);
+	body.addEventListener('dragleave', handleDragLeave, false);
+	body.addEventListener('dragover', handleDragOver, false);
+	body.addEventListener('drop', handleDrop, false);
+
+	function handleDragEnter(e: DragEvent): void {
+		e.preventDefault();
+		e.stopPropagation();
+		dragCounter++;
+		if (isFileDrag(e)) {
+			dropZone?.classList.add('drag-over');
+		}
+	}
+
+	function handleDragLeave(e: DragEvent): void {
+		e.preventDefault();
+		e.stopPropagation();
+		dragCounter--;
+		if (dragCounter === 0) {
+			dropZone?.classList.remove('drag-over');
+		}
+	}
+
+	function handleDragOver(e: DragEvent): void {
+		e.preventDefault();
+		e.stopPropagation();
+	}
+
+	function handleDrop(e: DragEvent): void {
+		e.preventDefault();
+		e.stopPropagation();
+		dropZone?.classList.remove('drag-over');
+		dragCounter = 0;
+		
+		if (isFileDrag(e)) {
+			const files = e.dataTransfer?.files;
+			if (files && files.length) {
+				handleFiles(files);
+			}
+		}
+	}
+
+	function isFileDrag(e: DragEvent): boolean {
+		if (e.dataTransfer?.types) {
+			for (let i = 0; i < e.dataTransfer.types.length; i++) {
+				if (e.dataTransfer.types[i] === "Files") {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+}
+
+function preventDefaults(e: Event): void {
+	e.preventDefault();
+	e.stopPropagation();
+}
+
+function highlight(e: Event): void {
+	const dropZone = document.getElementById('template-drop-zone');
+	dropZone?.classList.add('drag-over');
+}
+
+function unhighlight(e: Event): void {
+	const dropZone = document.getElementById('template-drop-zone');
+	dropZone?.classList.remove('drag-over');
+}
+
+function handleDrop(e: DragEvent): void {
+	const dt = e.dataTransfer;
+	const files = dt?.files;
+
+	if (files && files.length) {
+		handleFiles(files);
+	}
+}
+
+function handleFiles(files: FileList): void {
+	Array.from(files).forEach(importTemplateFile);
+}
+
+function importTemplateFile(file: File): void {
+	const reader = new FileReader();
+	reader.onload = (e: ProgressEvent<FileReader>) => {
+		try {
+			const importedTemplate = JSON.parse(e.target?.result as string) as Partial<Template>;
+			if (!validateImportedTemplate(importedTemplate)) {
+				throw new Error('Invalid template file');
+			}
+
+			importedTemplate.id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
+			
+			// Assign new IDs to properties
+			importedTemplate.properties = importedTemplate.properties?.map(prop => ({
+				...prop,
+				id: Date.now().toString() + Math.random().toString(36).substr(2, 9)
+			}));
+
+			const existingIndex = templates.findIndex(t => t.name === importedTemplate.name);
+			if (existingIndex !== -1) {
+				if (confirm(`A template named "${importedTemplate.name}" already exists. Do you want to replace it?`)) {
+						templates[existingIndex] = importedTemplate as Template;
+				} else {
+					let newName = importedTemplate.name as string;
+					let counter = 1;
+					while (templates.some(t => t.name === newName)) {
+						newName = `${importedTemplate.name} (${counter++})`;
+					}
+					importedTemplate.name = newName;
+					templates.push(importedTemplate as Template);
+				}
+			} else {
+				templates.push(importedTemplate as Template);
+			}
+
+			saveTemplateSettings();
+			updateTemplateList();
+			showTemplateEditor(importedTemplate as Template);
+		} catch (error) {
+			console.error('Error parsing imported template:', error);
+			alert('Error importing template. Please check the file and try again.');
+		}
+	};
+	reader.readAsText(file);
 }
