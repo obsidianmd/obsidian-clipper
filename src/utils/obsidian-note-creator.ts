@@ -66,8 +66,18 @@ export function saveToObsidian(fileContent: string, noteName: string, path: stri
 	const vaultParam = vault ? `&vault=${encodeURIComponent(vault)}` : '';
 	obsidianUrl += vaultParam;
 
-	chrome.tabs.create({ url: obsidianUrl }, function(tab) {
-		setTimeout(() => chrome.tabs.remove(tab!.id!), 500);
+	chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+		const currentTab = tabs[0];
+		if (currentTab && currentTab.id) {
+			chrome.tabs.update(currentTab.id, { url: obsidianUrl }, function(tab) {
+				chrome.notifications.create({
+					type: 'basic',
+					iconUrl: 'icon.png',
+					title: 'Obsidian Clipper',
+					message: 'If prompted, select "Always allow" to open Obsidian automatically in the future.'
+				});
+			});
+		}
 	});
 }
 
