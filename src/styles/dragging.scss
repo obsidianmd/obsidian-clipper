@@ -16,17 +16,6 @@ body.is-dragging {
 .property-editor {
 	display: flex;
 	align-items: center;
-
-	.drag-handle {
-		cursor: grab;
-		&:active {
-			cursor: grabbing;
-		}
-	}
-
-	&[draggable="true"] {
-		cursor: grabbing;
-	}
 }
 
 .drag-handle {
