@@ -47,27 +47,35 @@ export const filters: { [key: string]: FilterFunction } = {
 			return str;
 		}
 
+		console.log('Slice filter raw param:', param);
+
 		const [start, end] = param.split(',').map(p => p.trim()).map(p => {
 			if (p === '') return undefined;
+			// Remove any surrounding quotes
+			p = p.replace(/^["']|["']$/g, '');
 			const num = parseInt(p, 10);
 			return isNaN(num) ? undefined : num;
 		});
 		
-		// Check if the string is a valid JSON array
-		if (str.startsWith('[') && str.endsWith(']')) {
-			try {
-				const value = JSON.parse(str);
-				if (Array.isArray(value)) {
-					const slicedArray = value.slice(start, end);
-					return JSON.stringify(slicedArray);
-				}
-			} catch (error) {
-				console.error('Error parsing JSON in slice filter:', error);
-			}
+		console.log('Parsed slice parameters:', start, end);
+
+		let value;
+		try {
+			value = JSON.parse(str);
+		} catch (error) {
+			console.error('Error parsing JSON in slice filter:', error);
+			value = str;
 		}
 
-		// If it's not a JSON array or parsing failed, treat it as a regular string
-		return str.slice(start, end);
+		if (Array.isArray(value)) {
+			const slicedArray = value.slice(start, end);
+			console.log('Slice filter input array:', value);
+			console.log('Slice filter params:', start, end);
+			console.log('Slice filter output array:', slicedArray);
+			return JSON.stringify(slicedArray);
+		} else {
+			return str.slice(start, end);
+		}
 	},
 	split: (str: string, param?: string): string => {
 		console.log('Split filter input:', str);
@@ -81,7 +89,7 @@ export const filters: { [key: string]: FilterFunction } = {
 		// Remove quotes from the param if present
 		param = param.replace(/^["']|["']$/g, '');
 
-		// Split the string, preserving the protocol
+		// Simple split operation
 		const result = str.split(param);
 
 		console.log('Split filter output:', result);
@@ -100,12 +108,22 @@ export function applyFilters(value: string, filterNames: string[]): string {
 		console.log(`Applying filter: ${filterName}`);
 		console.log('Input to filter:', result);
 
-		const [name, param] = filterName.split(':');
+		const colonIndex = filterName.indexOf(':');
+		const name = colonIndex !== -1 ? filterName.slice(0, colonIndex) : filterName;
+		let param = colonIndex !== -1 ? filterName.slice(colonIndex + 1) : undefined;
+
+		// Remove any surrounding quotes from the entire param string
+		if (param) {
+			param = param.replace(/^["']|["']$/g, '');
+		}
+
+		console.log(`Filter name: ${name}, param: ${param}`);
+
 		const filter = filters[name];
 		if (filter) {
 			const output = filter(result, param);
-			console.log('Filter output:', output);
-			return Array.isArray(output) ? JSON.stringify(output) : output;
+			console.log(`Filter ${name} output:`, output);
+			return output;
 		}
 		return result;
 	}, processedValue);
