@@ -21,6 +21,7 @@ export function initializeAutoSave(): void {
 	const autoSave = debounce(async () => {
 		if (!isReordering) {
 			try {
+				updateTemplateFromForm();
 				await saveTemplateSettings();
 				updateTemplateList();
 				console.log('Auto-save completed');
@@ -73,5 +74,3 @@ export function initializeAutoSave(): void {
 		console.error('Add property button not found');
 	}
 }
-
-// ... (other auto-save related functions)

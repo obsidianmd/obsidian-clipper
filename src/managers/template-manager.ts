@@ -2,9 +2,14 @@ import { Template, Property } from 'types/types';
 import { handleDragStart, handleDragOver, handleDrop, handleDragEnd } from '../utils/drag-and-drop';
 import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
 import { escapeValue, unescapeValue } from '../utils/string-utils';
+import { compressToUTF16, decompressFromUTF16 } from 'lz-string';
 
 export let templates: Template[] = [];
 export let editingTemplateIndex = -1;
+
+const STORAGE_KEY_PREFIX = 'template_';
+const TEMPLATE_LIST_KEY = 'template_list';
+const CHUNK_SIZE = 8000; // slightly less than 8KB to account for overhead
 
 export function setEditingTemplateIndex(index: number): void {
 	editingTemplateIndex = index;
@@ -12,25 +17,40 @@ export function setEditingTemplateIndex(index: number): void {
 
 export function loadTemplates(): Promise<void> {
 	return new Promise((resolve) => {
-		chrome.storage.sync.get(['templates'], (data) => {
-			templates = (data.templates || []).filter((template: Template) => template != null);
+		chrome.storage.local.get(TEMPLATE_LIST_KEY, async (data) => {
+			const templateIds = data[TEMPLATE_LIST_KEY] || [];
+			templates = [];
 
-			templates = templates.map(template => ({
-				...template,
-				id: template.id || Date.now().toString() + Math.random().toString(36).slice(2, 11)
-			}));
+			for (const id of templateIds) {
+				const template = await loadTemplate(id);
+				if (template) {
+					templates.push(template);
+				}
+			}
 
 			if (templates.length === 0) {
 				templates.push(createDefaultTemplate());
 			}
 
-			chrome.storage.sync.set({ templates }, () => {
-				updateTemplateList();
-				if (templates.length > 0) {
-					showTemplateEditor(templates[0]);
-				}
-				resolve();
-			});
+			updateTemplateList();
+			if (templates.length > 0) {
+				showTemplateEditor(templates[0]);
+			}
+			resolve();
+		});
+	});
+}
+
+async function loadTemplate(id: string): Promise<Template | null> {
+	return new Promise((resolve) => {
+		chrome.storage.local.get(STORAGE_KEY_PREFIX + id, (data) => {
+			const compressedChunks = data[STORAGE_KEY_PREFIX + id];
+			if (compressedChunks) {
+				const decompressedData = decompressFromUTF16(compressedChunks.join(''));
+				resolve(JSON.parse(decompressedData));
+			} else {
+				resolve(null);
+			}
 		});
 	});
 }
@@ -198,17 +218,31 @@ export function showTemplateEditor(template: Template | null): void {
 }
 
 export function saveTemplateSettings(): Promise<void> {
-	return new Promise((resolve, reject) => {
-		chrome.storage.sync.set({ templates }, () => {
-			if (chrome.runtime.lastError) {
-				console.error('Error saving templates:', chrome.runtime.lastError);
-				reject(chrome.runtime.lastError);
-			} else {
-				console.log('Template settings saved');
-				resolve();
+	return new Promise(async (resolve, reject) => {
+		try {
+			const templateIds = templates.map(t => t.id);
+			await chrome.storage.local.set({ [TEMPLATE_LIST_KEY]: templateIds });
+
+			for (const template of templates) {
+				await saveTemplate(template);
 			}
-		});
+
+			console.log('Template settings saved');
+			resolve();
+		} catch (error) {
+			console.error('Error saving templates:', error);
+			reject(error);
+		}
 	});
+}
+
+async function saveTemplate(template: Template): Promise<void> {
+	const compressedData = compressToUTF16(JSON.stringify(template));
+	const chunks = [];
+	for (let i = 0; i < compressedData.length; i += CHUNK_SIZE) {
+		chunks.push(compressedData.slice(i, i + CHUNK_SIZE));
+	}
+	await chrome.storage.local.set({ [STORAGE_KEY_PREFIX + template.id]: chunks });
 }
 
 export function createDefaultTemplate(): Template {
