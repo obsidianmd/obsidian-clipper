@@ -62,6 +62,7 @@ Schema variables allow you to extract data from [schema.org](https://schema.org/
 - `slice` extracts a portion of a string or array.
 	- For strings: `"hello"|slice:1,4` returns `"ell"`.
 	- For arrays: `["a","b","c","d"]|slice:1,3` returns `["b","c"]`.
-	- Negative indices can be used to count from the end: `"hello"|slice:-3` returns `"llo"`.
 	- If only one parameter is provided, it slices from that index to the end: `"hello"|slice:2` returns `"llo"`.
-	- The second parameter is exclusive: `"hello"|slice:1,4` includes characters at indices 1, 2, and 3.
+	- Negative indices count from the end: `"hello"|slice:-3` returns `"llo"`.
+    - The second parameter is exclusive: `"hello"|slice:1,4` includes characters at indices 1, 2, and 3.
+	- Using a negative second parameter excludes elements from the end: `"hello"|slice:0,-2` returns `"hel"`.
