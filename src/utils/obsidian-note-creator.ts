@@ -6,13 +6,16 @@ export async function generateFrontmatter(properties: Property[]): Promise<strin
 	for (const property of properties) {
 		frontmatter += `${property.name}:`;
 
-		// Format the value based on the property type
 		switch (property.type) {
 			case 'multitext':
 				frontmatter += '\n';
 				const items = property.value.split(',').map(item => item.trim());
 				items.forEach(item => {
-					frontmatter += `  - ${item}\n`;
+					if (item.includes('[[') && item.includes(']]')) {
+						frontmatter += `  - "${item}"\n`;
+					} else {
+						frontmatter += `  - ${item}\n`;
+					}
 				});
 				break;
 			case 'number':
