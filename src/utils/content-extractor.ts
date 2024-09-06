@@ -5,10 +5,13 @@ import { applyFilters } from './filters';
 import dayjs from 'dayjs';
 
 async function processVariable(match: string, variables: { [key: string]: string }): Promise<string> {
-	const [, variableName, filtersString] = match.match(/{{(.*?)((?:\|[a-z]+)*)?}}/) || [];
+	const [, fullVariableName] = match.match(/{{(.*?)}}/) || [];
+	const [variableName, ...filterParts] = fullVariableName.split('|');
+	const filtersString = filterParts.join('|');
 	const value = variables[`{{${variableName}}}`] || '';
-	const filterNames = (filtersString || '').split('|').filter(Boolean);
-	return applyFilters(value, filterNames);
+	const filterNames = filtersString.split('|').filter(Boolean);
+	const result = applyFilters(value, filterNames);
+	return result;
 }
 
 async function processSelector(tabId: number, match: string): Promise<string> {

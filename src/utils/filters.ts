@@ -47,35 +47,30 @@ export const filters: { [key: string]: FilterFunction } = {
 			return str;
 		}
 
-		const [start, end] = param.split(',').map(p => parseInt(p.trim(), 10));
-		if (isNaN(start)) {
+		const [start, end] = param.split(',').map(p => p.trim()).map(p => p === '' ? undefined : parseInt(p, 10));
+		if (start === undefined || (start !== undefined && isNaN(start))) {
 			console.error('Invalid start parameter for slice filter');
 			return str;
 		}
-
-		let arrayValue;
-		try {
-			arrayValue = JSON.parse(str);
-		} catch (error) {
-			arrayValue = str;
+		// Check if the string is a valid JSON array
+		if (str.startsWith('[') && str.endsWith(']')) {
+			try {
+				const value = JSON.parse(str);
+				if (Array.isArray(value)) {
+					const result = JSON.stringify(value.slice(start, end));
+					return result;
+				}
+			} catch (error) {
+			}
 		}
 
-		let result;
-		if (Array.isArray(arrayValue)) {
-			result = JSON.stringify(arrayValue.slice(start, isNaN(end) ? undefined : end));
-		} else if (typeof arrayValue === 'string') {
-			result = arrayValue.slice(start, isNaN(end) ? undefined : end);
-		} else {
-			result = str;
-		}
+		// If it's not a JSON array or parsing failed, treat it as a regular string
+		const result = str.slice(start, end);
 		return result;
 	},
 };
 
 export function applyFilters(value: string, filterNames: string[]): string {
-	console.log('Applying filters. Initial value:', value);
-	console.log('Filters to apply:', filterNames);
-
 	// Ensure value is a string before applying filters
 	let processedValue = typeof value === 'string' ? value : JSON.stringify(value);
 
