@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	let vaults: string[] = [];
 
 	// Load vaults from storage and populate dropdown
-	chrome.storage.sync.get(['vaults'], (data: { vaults?: string[] }) => {
+	chrome.storage.local.get(['vaults'], (data: { vaults?: string[] }) => {
 		vaults = data.vaults || [];
 		updateVaultDropdown();
 	});
