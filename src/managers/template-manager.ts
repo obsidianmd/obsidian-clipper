@@ -363,18 +363,27 @@ export function addPropertyToEditor(name: string = '', value: string = '', type:
 	propertyDiv.dataset.id = id || Date.now().toString() + Math.random().toString(36).slice(2, 11);
 	templateProperties.appendChild(propertyDiv);
 
-	// Add mousedown event listener to handle draggable state
 	propertyDiv.addEventListener('mousedown', (event) => {
 		const target = event.target as HTMLElement;
 		if (!target.closest('input, select, button')) {
 			propertyDiv.setAttribute('draggable', 'true');
+			templateProperties.querySelectorAll('.property-editor').forEach((el) => {
+				if (el !== propertyDiv) {
+					el.setAttribute('draggable', 'true');
+				}
+			});
 		}
 	});
 
-	// Reset draggable state after dragging ends
-	propertyDiv.addEventListener('dragend', () => {
+	const resetDraggable = () => {
+		propertyDiv.removeAttribute('draggable');
+		templateProperties.querySelectorAll('.property-editor').forEach((el) => {
+			el.removeAttribute('draggable');
+		});
+	};
 
-	});
+	propertyDiv.addEventListener('dragend', resetDraggable);
+	propertyDiv.addEventListener('mouseup', resetDraggable);
 
 	const propertySelect = propertyDiv.querySelector('.property-select');
 	if (!propertySelect) return;

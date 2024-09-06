@@ -19,12 +19,13 @@ body.is-dragging {
 
 	.drag-handle {
 		cursor: grab;
-		padding: 5px;
-		margin-right: 5px;
-		
 		&:active {
 			cursor: grabbing;
 		}
+	}
+
+	&[draggable="true"] {
+		cursor: grabbing;
 	}
 }
 
