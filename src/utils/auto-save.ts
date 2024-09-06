@@ -1,4 +1,4 @@
-import { saveTemplateSettings, updateTemplateList, updateTemplateFromForm, addPropertyToEditor, editingTemplateIndex } from '../managers/template-manager';
+import { saveTemplateSettings, updateTemplateList, updateTemplateFromForm, addPropertyToEditor, editingTemplateIndex, resetUnsavedChanges } from '../managers/template-manager';
 
 let isReordering = false;
 
@@ -21,15 +21,17 @@ export function initializeAutoSave(): void {
 	const autoSave = debounce(async () => {
 		if (!isReordering) {
 			try {
-				updateTemplateFromForm();
-				await saveTemplateSettings();
-				updateTemplateList();
-				console.log('Auto-save completed');
+				const warnings = await saveTemplateSettings();
+				if (warnings.length > 0) {
+					updateTemplateList();
+					console.log('Auto-save completed');
+					showWarnings(warnings);
+				}
 			} catch (error) {
 				console.error('Auto-save failed:', error);
 			}
 		}
-	}, 500);
+	}, 1000); // Increased debounce time to 1 second
 
 	templateForm.addEventListener('input', () => {
 		if (editingTemplateIndex !== -1) {
@@ -73,4 +75,9 @@ export function initializeAutoSave(): void {
 	} else {
 		console.error('Add property button not found');
 	}
+}
+
+function showWarnings(warnings: string[]) {
+	// Add a toast notification for this
+	console.warn(warnings.join('\n'));
 }

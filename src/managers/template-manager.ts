@@ -3,6 +3,7 @@ import { handleDragStart, handleDragOver, handleDrop, handleDragEnd } from '../u
 import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
 import { escapeValue, unescapeValue } from '../utils/string-utils';
 import { compressToUTF16, decompressFromUTF16 } from 'lz-string';
+import { debounce } from '../utils/debounce';
 
 export let templates: Template[] = [];
 export let editingTemplateIndex = -1;
@@ -10,6 +11,10 @@ export let editingTemplateIndex = -1;
 const STORAGE_KEY_PREFIX = 'template_';
 const TEMPLATE_LIST_KEY = 'template_list';
 const CHUNK_SIZE = 8000; // slightly less than 8KB to account for overhead
+const SIZE_WARNING_THRESHOLD = 6000;
+
+let saveTimeout: NodeJS.Timeout | null = null;
+let hasUnsavedChanges = false;
 
 export function setEditingTemplateIndex(index: number): void {
 	editingTemplateIndex = index;
@@ -160,21 +165,6 @@ export function showTemplateEditor(template: Template | null): void {
 		behaviorSelect.addEventListener('change', updateBehaviorFields);
 	}
 
-	function updateBehaviorFields() {
-		const selectedBehavior = behaviorSelect?.value;
-		if (specificNoteContainer) specificNoteContainer.style.display = selectedBehavior === 'append-specific' ? 'block' : 'none';
-		if (dailyNoteFormatContainer) dailyNoteFormatContainer.style.display = selectedBehavior === 'append-daily' ? 'block' : 'none';
-		if (noteNameFormatContainer) noteNameFormatContainer.style.display = selectedBehavior === 'create' ? 'block' : 'none';
-		
-		if (selectedBehavior === 'append-specific' || selectedBehavior === 'append-daily') {
-			if (propertiesContainer) propertiesContainer.style.display = 'none';
-			if (propertiesWarning) propertiesWarning.style.display = 'block';
-		} else {
-			if (propertiesContainer) propertiesContainer.style.display = 'block';
-			if (propertiesWarning) propertiesWarning.style.display = 'none';
-		}
-	}
-
 	if (editingTemplate && Array.isArray(editingTemplate.properties)) {
 		editingTemplate.properties.forEach(property => addPropertyToEditor(property.name, property.value, property.type, property.id));
 	}
@@ -201,48 +191,87 @@ export function showTemplateEditor(template: Template | null): void {
 	if (templatesSection) templatesSection.classList.add('active');
 	if (generalSection) generalSection.classList.remove('active');
 
-	updateTemplateFromForm();
-	saveTemplateSettings().then(() => {
-		updateTemplateList();
+	updateTemplateList();
 
-		if (!editingTemplate.id) {
-			const templateNameField = document.getElementById('template-name') as HTMLInputElement;
-			if (templateNameField) {
-				templateNameField.focus();
-				templateNameField.select();
-			}
+	if (!editingTemplate.id) {
+		const templateNameField = document.getElementById('template-name') as HTMLInputElement;
+		if (templateNameField) {
+			templateNameField.focus();
+			templateNameField.select();
 		}
-	}).catch(error => {
-		console.error('Failed to save new template:', error);
-	});
+	}
+
+	// Reset the unsaved changes flag
+	resetUnsavedChanges();
+
+	if (templateName) {
+		templateName.addEventListener('input', debounce(() => {
+			if (editingTemplateIndex !== -1 && templates[editingTemplateIndex]) {
+				templates[editingTemplateIndex].name = templateName.value;
+				updateTemplateList();
+				hasUnsavedChanges = true;
+			}
+		}, 200));
+	}
 }
 
-export function saveTemplateSettings(): Promise<void> {
+export function saveTemplateSettings(): Promise<string[]> {
 	return new Promise(async (resolve, reject) => {
 		try {
-			const templateIds = templates.map(t => t.id);
-			await chrome.storage.sync.set({ [TEMPLATE_LIST_KEY]: templateIds });
-
-			for (const template of templates) {
-				await saveTemplate(template);
+			if (!hasUnsavedChanges) {
+				resolve([]);
+				return;
 			}
 
-			console.log('Template settings saved');
-			resolve();
+			const templateIds = templates.map(t => t.id);
+			const templateData: { [key: string]: any } = {
+				[TEMPLATE_LIST_KEY]: templateIds
+			};
+
+			const warnings: string[] = [];
+			const templateChunks: { [key: string]: string[] } = {};
+			for (const template of templates) {
+				const [chunks, warning] = await prepareTemplateForSave(template);
+				templateChunks[STORAGE_KEY_PREFIX + template.id] = chunks;
+				if (warning) {
+					warnings.push(warning);
+				}
+			}
+
+			// Use debounce to limit write operations
+			debouncedSave(templateChunks, warnings, resolve, reject);
 		} catch (error) {
-			console.error('Error saving templates:', error);
+			console.error('Error preparing templates for save:', error);
 			reject(error);
 		}
 	});
 }
 
-async function saveTemplate(template: Template): Promise<void> {
+const debouncedSave = debounce((templateChunks: { [key: string]: string[] }, warnings: string[], resolve: (value: string[]) => void, reject: (reason?: any) => void) => {
+	chrome.storage.sync.set(templateChunks, () => {
+		if (chrome.runtime.lastError) {
+			console.error('Error saving templates:', chrome.runtime.lastError);
+			reject(chrome.runtime.lastError);
+		} else {
+			console.log('Template settings saved');
+			hasUnsavedChanges = false;
+			resolve(warnings);
+		}
+	});
+}, 200);
+
+async function prepareTemplateForSave(template: Template): Promise<[string[], string | null]> {
 	const compressedData = compressToUTF16(JSON.stringify(template));
 	const chunks = [];
 	for (let i = 0; i < compressedData.length; i += CHUNK_SIZE) {
 		chunks.push(compressedData.slice(i, i + CHUNK_SIZE));
 	}
-	await chrome.storage.sync.set({ [STORAGE_KEY_PREFIX + template.id]: chunks });
+
+	// Check if the template size is approaching the limit
+	if (compressedData.length > SIZE_WARNING_THRESHOLD) {
+		return [chunks, `Warning: Template "${template.name}" is ${(compressedData.length / 1024).toFixed(2)}KB, which is approaching the storage limit.`];
+	}
+	return [chunks, null];
 }
 
 export function createDefaultTemplate(): Template {
@@ -385,9 +414,6 @@ export function updateTemplateFromForm(): void {
 		return;
 	}
 
-	const templateName = document.getElementById('template-name') as HTMLInputElement;
-	if (templateName) template.name = templateName.value;
-
 	const behaviorSelect = document.getElementById('template-behavior') as HTMLSelectElement;
 	if (behaviorSelect) template.behavior = behaviorSelect.value;
 
@@ -421,6 +447,12 @@ export function updateTemplateFromForm(): void {
 
 	const urlPatternsTextarea = document.getElementById('url-patterns') as HTMLTextAreaElement;
 	if (urlPatternsTextarea) template.urlPatterns = urlPatternsTextarea.value.split('\n').filter(Boolean);
+
+	hasUnsavedChanges = true;
+}
+
+export function resetUnsavedChanges(): void {
+	hasUnsavedChanges = false;
 }
 
 export function getEditingTemplateIndex(): number {
@@ -440,4 +472,28 @@ function escapeHtml(unsafe: string): string {
 		.replace(/>/g, "&gt;")
 		.replace(/"/g, "&quot;")
 		.replace(/'/g, "&#039;");
+}
+
+function updateBehaviorFields(): void {
+	const behaviorSelect = document.getElementById('template-behavior') as HTMLSelectElement;
+	const specificNoteContainer = document.getElementById('specific-note-container');
+	const dailyNoteFormatContainer = document.getElementById('daily-note-format-container');
+	const noteNameFormatContainer = document.getElementById('note-name-format-container');
+	const propertiesContainer = document.getElementById('properties-container');
+	const propertiesWarning = document.getElementById('properties-warning');
+
+	if (behaviorSelect) {
+		const selectedBehavior = behaviorSelect.value;
+		if (specificNoteContainer) specificNoteContainer.style.display = selectedBehavior === 'append-specific' ? 'block' : 'none';
+		if (dailyNoteFormatContainer) dailyNoteFormatContainer.style.display = selectedBehavior === 'append-daily' ? 'block' : 'none';
+		if (noteNameFormatContainer) noteNameFormatContainer.style.display = selectedBehavior === 'create' ? 'block' : 'none';
+		
+		if (selectedBehavior === 'append-specific' || selectedBehavior === 'append-daily') {
+			if (propertiesContainer) propertiesContainer.style.display = 'none';
+			if (propertiesWarning) propertiesWarning.style.display = 'block';
+		} else {
+			if (propertiesContainer) propertiesContainer.style.display = 'block';
+			if (propertiesWarning) propertiesWarning.style.display = 'none';
+		}
+	}
 }

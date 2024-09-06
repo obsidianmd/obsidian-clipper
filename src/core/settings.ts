@@ -7,6 +7,7 @@ import { initializeAutoSave } from '../utils/auto-save';
 import { exportTemplate, importTemplate } from '../utils/import-export';
 import { createIcons } from 'lucide';
 import { icons } from '../icons/icons';
+import { resetUnsavedChanges } from '../managers/template-manager';
 
 document.addEventListener('DOMContentLoaded', () => {
 	const vaultInput = document.getElementById('vault-input') as HTMLInputElement;
@@ -41,6 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
 					const currentTemplates = getTemplates();
 					const selectedTemplate = currentTemplates.find((t: Template) => t.id === listItem.dataset.id);
 					if (selectedTemplate) {
+						resetUnsavedChanges();
 						showTemplateEditor(selectedTemplate);
 					}
 				}
