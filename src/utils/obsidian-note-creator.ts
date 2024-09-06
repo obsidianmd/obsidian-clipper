@@ -33,7 +33,7 @@ export async function generateFrontmatter(properties: Property[]): Promise<strin
 				frontmatter += ` "${property.value}"\n`;
 		}
 	}
-	frontmatter += '---\n\n';
+	frontmatter += '---\n';
 	return frontmatter;
 }
 
