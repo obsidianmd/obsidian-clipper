@@ -21,7 +21,9 @@
 	--text-normal: var(--color-base-100);
 	--text-muted: var(--color-base-70);
 	--text-faint: var(--color-base-50);
-    --text-on-accent: white;
+	
+	--text-accent: var(--color-accent);
+	--text-on-accent: white;
 }
 
 @media (prefers-color-scheme: light) {
@@ -115,5 +117,7 @@
 
         --mono-rgb-0: 0, 0, 0;
         --mono-rgb-100: 255, 255, 255;
+
+		--text-accent: var(--color-accent-1);
     }
 }
