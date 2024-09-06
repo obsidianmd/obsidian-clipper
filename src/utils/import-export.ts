@@ -1,6 +1,15 @@
 import { Template, Property } from '../types/types';
 import { templates, saveTemplateSettings, updateTemplateList, showTemplateEditor, editingTemplateIndex } from '../managers/template-manager';
 
+const TEMPLATE_VERSION = '0.1.0';
+
+function toKebabCase(str: string): string {
+	return str
+		.replace(/([a-z])([A-Z])/g, '$1-$2')
+		.replace(/[\s_]+/g, '-')
+		.toLowerCase();
+}
+
 export function exportTemplate(): void {
 	if (editingTemplateIndex === -1) {
 		alert('Please select a template to export.');
@@ -8,15 +17,16 @@ export function exportTemplate(): void {
 	}
 
 	const template = templates[editingTemplateIndex] as Template;
-	const noteName = `${template.name}.obsidian-clipper.json`;
+	const templateFile = `${toKebabCase(template.name)}-clipper.json`;
 
-	const orderedTemplate: Partial<Template> = {
+	const orderedTemplate: Partial<Template> & { version: string } = {
+		version: TEMPLATE_VERSION,
 		name: template.name,
 		behavior: template.behavior,
 		noteNameFormat: template.noteNameFormat,
 		path: template.path,
 		noteContentFormat: template.noteContentFormat,
-		properties: template.properties,
+		properties: template.properties.map(({ name, value, type }) => ({ name, value, type })) as Property[],
 		urlPatterns: template.urlPatterns,
 	};
 
@@ -27,7 +37,7 @@ export function exportTemplate(): void {
 
 	const a = document.createElement('a');
 	a.href = url;
-	a.download = noteName;
+	a.download = templateFile;
 	document.body.appendChild(a);
 	a.click();
 	document.body.removeChild(a);
@@ -51,7 +61,13 @@ export function importTemplate(): void {
 					throw new Error('Invalid template file');
 				}
 
-				importedTemplate.id = importedTemplate.id || Date.now().toString() + Math.random().toString(36).substr(2, 9);
+				importedTemplate.id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
+				
+				// Assign new IDs to properties
+				importedTemplate.properties = importedTemplate.properties?.map(prop => ({
+					...prop,
+					id: Date.now().toString() + Math.random().toString(36).substr(2, 9)
+				}));
 
 				const existingIndex = templates.findIndex(t => t.name === importedTemplate.name);
 				if (existingIndex !== -1) {
