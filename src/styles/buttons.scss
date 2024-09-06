@@ -27,6 +27,12 @@ button {
 		&:hover {
 			background-color: var(--interactive-accent-hover);
 		}
+		&:active,
+		&:focus {
+			box-shadow: 0 0 0 2px var(--background-modifier-border-focus);
+			transition:
+				box-shadow .15s ease-in-out;
+		}
 	}
 }
 

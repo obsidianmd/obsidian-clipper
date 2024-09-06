@@ -209,6 +209,9 @@ document.addEventListener('DOMContentLoaded', function() {
 		initializeIcons();
 	}
 
+	const clipButton = document.getElementById('clip-button') as HTMLButtonElement;
+	clipButton.focus();
+
 	document.getElementById('clip-button')!.addEventListener('click', async function() {
 		if (!currentTemplate) return;
 
