@@ -9,15 +9,15 @@ Work in progress. Turning the [Obsidian web clipper bookmarklet](https://stephan
 
 ### URL patterns
 
-URL patterns allow you to automatically select the appropriate template based on the current webpage's URL. You can define multiple URL patterns for each template, separated by a new line.
+URL patterns allow you to automatically select the right template based on the current webpage's URL. You can define multiple URL patterns for each template, separated by a new line.
 
-Simple matching checks if the URL *starts with* the specified pattern.
+Simple matching checks if the current page URL *starts with* the given pattern. For example:
 
-- Example: `https://obsidian.md` will match any URL that starts with this text.
+- `https://obsidian.md` will match any URL that starts with this text.
 
-For more complex matching, you can use regular expressions. Enclose your regex pattern in forward slashes (`/`). Remember to escape special characters in regex patterns (like `.` and `/`) with a backslash (`\`).
+If you want to match more complex URL patterns, you can use regular expressions. Enclose your regex pattern in forward slashes (`/`). Remember to escape special characters in regex patterns (like `.` and `/`) with a backslash (`\`). For example:
 
-- Example: `/^https:\/\/www\.imdb\.com\/title\/tt\d+\/reference\/?$/` will match any IMDB reference page.
+- `/^https:\/\/www\.imdb\.com\/title\/tt\d+\/reference\/?$/` will match any IMDB reference page.
 
 ### Template variables
 
