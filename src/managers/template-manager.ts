@@ -337,7 +337,6 @@ export function addPropertyToEditor(name: string = '', value: string = '', type:
 
 	const propertyDiv = document.createElement('div');
 	propertyDiv.className = 'property-editor';
-	propertyDiv.draggable = true;
 	propertyDiv.innerHTML = `
 		<div class="drag-handle">
 			<i data-lucide="grip-vertical"></i>
@@ -363,6 +362,28 @@ export function addPropertyToEditor(name: string = '', value: string = '', type:
 	`;
 	propertyDiv.dataset.id = id || Date.now().toString() + Math.random().toString(36).slice(2, 11);
 	templateProperties.appendChild(propertyDiv);
+
+	propertyDiv.addEventListener('mousedown', (event) => {
+		const target = event.target as HTMLElement;
+		if (!target.closest('input, select, button')) {
+			propertyDiv.setAttribute('draggable', 'true');
+			templateProperties.querySelectorAll('.property-editor').forEach((el) => {
+				if (el !== propertyDiv) {
+					el.setAttribute('draggable', 'true');
+				}
+			});
+		}
+	});
+
+	const resetDraggable = () => {
+		propertyDiv.removeAttribute('draggable');
+		templateProperties.querySelectorAll('.property-editor').forEach((el) => {
+			el.removeAttribute('draggable');
+		});
+	};
+
+	propertyDiv.addEventListener('dragend', resetDraggable);
+	propertyDiv.addEventListener('mouseup', resetDraggable);
 
 	const propertySelect = propertyDiv.querySelector('.property-select');
 	if (!propertySelect) return;
