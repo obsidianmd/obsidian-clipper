@@ -96,6 +96,20 @@ export const filters: { [key: string]: FilterFunction } = {
 		console.log('Split filter output:', result);
 		return JSON.stringify(result);
 	},
+	join: (str: string, param?: string): string => {
+		let array;
+		try {
+			array = JSON.parse(str);
+		} catch (error) {
+			console.error('Error parsing JSON in join filter:', error);
+			return str;
+		}
+
+		if (Array.isArray(array)) {
+			return array.join(param || ',');
+		}
+		return str;
+	},
 };
 
 export function applyFilters(value: string, filterNames: string[]): string {
