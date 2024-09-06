@@ -120,6 +120,11 @@ export function showTemplateEditor(template: Template | null): void {
 		};
 		templates.push(editingTemplate);
 		editingTemplateIndex = templates.length - 1;
+		saveTemplateSettings().then(() => {
+			updateTemplateList();
+		}).catch(error => {
+			console.error('Failed to save new template:', error);
+		});
 	} else {
 		editingTemplate = template;
 		editingTemplateIndex = templates.findIndex(t => t.id === editingTemplate.id);
@@ -201,7 +206,6 @@ export function showTemplateEditor(template: Template | null): void {
 		}
 	}
 
-	// Reset the unsaved changes flag
 	resetUnsavedChanges();
 
 	if (templateName) {
@@ -213,16 +217,27 @@ export function showTemplateEditor(template: Template | null): void {
 			}
 		}, 200));
 	}
+
+	hasUnsavedChanges = true;
+}
+
+async function prepareTemplateForSave(template: Template): Promise<[string[], string | null]> {
+	const compressedData = compressToUTF16(JSON.stringify(template));
+	const chunks = [];
+	for (let i = 0; i < compressedData.length; i += CHUNK_SIZE) {
+		chunks.push(compressedData.slice(i, i + CHUNK_SIZE));
+	}
+
+	// Check if the template size is approaching the limit
+	if (compressedData.length > SIZE_WARNING_THRESHOLD) {
+		return [chunks, `Warning: Template "${template.name}" is ${(compressedData.length / 1024).toFixed(2)}KB, which is approaching the storage limit.`];
+	}
+	return [chunks, null];
 }
 
 export function saveTemplateSettings(): Promise<string[]> {
 	return new Promise(async (resolve, reject) => {
 		try {
-			if (!hasUnsavedChanges) {
-				resolve([]);
-				return;
-			}
-
 			const templateIds = templates.map(t => t.id);
 			const templateData: { [key: string]: any } = {
 				[TEMPLATE_LIST_KEY]: templateIds
@@ -238,40 +253,22 @@ export function saveTemplateSettings(): Promise<string[]> {
 				}
 			}
 
-			// Use debounce to limit write operations
-			debouncedSave(templateChunks, warnings, resolve, reject);
+			// Save template list and individual templates
+			chrome.storage.sync.set({ ...templateChunks, [TEMPLATE_LIST_KEY]: templateIds }, () => {
+				if (chrome.runtime.lastError) {
+					console.error('Error saving templates:', chrome.runtime.lastError);
+					reject(chrome.runtime.lastError);
+				} else {
+					console.log('Template settings saved');
+					hasUnsavedChanges = false;
+					resolve(warnings);
+				}
+			});
 		} catch (error) {
 			console.error('Error preparing templates for save:', error);
 			reject(error);
 		}
 	});
-}
-
-const debouncedSave = debounce((templateChunks: { [key: string]: string[] }, warnings: string[], resolve: (value: string[]) => void, reject: (reason?: any) => void) => {
-	chrome.storage.sync.set(templateChunks, () => {
-		if (chrome.runtime.lastError) {
-			console.error('Error saving templates:', chrome.runtime.lastError);
-			reject(chrome.runtime.lastError);
-		} else {
-			console.log('Template settings saved');
-			hasUnsavedChanges = false;
-			resolve(warnings);
-		}
-	});
-}, 200);
-
-async function prepareTemplateForSave(template: Template): Promise<[string[], string | null]> {
-	const compressedData = compressToUTF16(JSON.stringify(template));
-	const chunks = [];
-	for (let i = 0; i < compressedData.length; i += CHUNK_SIZE) {
-		chunks.push(compressedData.slice(i, i + CHUNK_SIZE));
-	}
-
-	// Check if the template size is approaching the limit
-	if (compressedData.length > SIZE_WARNING_THRESHOLD) {
-		return [chunks, `Warning: Template "${template.name}" is ${(compressedData.length / 1024).toFixed(2)}KB, which is approaching the storage limit.`];
-	}
-	return [chunks, null];
 }
 
 export function createDefaultTemplate(): Template {
@@ -459,12 +456,10 @@ export function getEditingTemplateIndex(): number {
 	return editingTemplateIndex;
 }
 
-// Add this export
 export function getTemplates(): Template[] {
 	return templates;
 }
 
-// Add this helper function at the end of the file
 function escapeHtml(unsafe: string): string {
 	return unsafe
 		.replace(/&/g, "&amp;")
