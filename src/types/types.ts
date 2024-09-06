@@ -6,7 +6,7 @@ export interface Template {
 	path: string;
 	noteContentFormat: string;
 	properties: Property[];
-	urlPatterns: string[];
+	urlPatterns?: string[];
 	specificNoteName?: string;
 	dailyNoteFormat?: string;
 }
