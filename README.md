@@ -29,11 +29,13 @@ These variables are automatically generated based on the page content.
 
 #### Selector variables
 
-Selector variables allow you to extract data from the page using the `selector:` prefix.  Selectors use the same syntax as CSS. For example:
- 
+Selector variables allow you to extract data from the page. The syntax for selector variables is `{{selector:cssSelector:attribute}}`, where `:attribute` is optional. If no attribute is specified, the text content of the element is returned.
+
 - `{{selector:h1}}` returns text content of the first `h1` element on the page.
-- `{{selector:.author}}` returns text content of the first `.author` element on the page
-- Advanced nested selectors can also be used.
+- `{{selector:.author}}` returns text content of the first `.author` element on the page.
+- `{{selector:img.hero:src}}` returns the `src` attribute of the first image with class `hero`.
+- `{{selector:a.main-link:href}}` returns the `href` attribute of the first anchor tag with class `main-link`.
+- Nested CSS selectors and combinators are supported if you need more specificity.
 
 #### Schema.org variables
 

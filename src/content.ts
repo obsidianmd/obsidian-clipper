@@ -31,18 +31,26 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
 		sendResponse(response);
 	} else if (request.action === "extractContent") {
-		const content = extractContentBySelector(request.selector);
+		const content = extractContentBySelector(request.selector, request.attribute);
 		sendResponse({ content: content, schemaOrgData: extractSchemaOrgData() });
 	}
 	return true;
 });
 
-function extractContentBySelector(selector: string): string | string[] {
+function extractContentBySelector(selector: string, attribute?: string): string | string[] {
 	const elements = document.querySelectorAll(selector);
 	
 	if (elements.length > 1) {
-		return Array.from(elements).map(el => el.textContent?.trim() || '');
+		return Array.from(elements).map(el => {
+			if (attribute) {
+				return el.getAttribute(attribute) || '';
+			}
+			return el.textContent?.trim() || '';
+		});
 	} else if (elements.length === 1) {
+		if (attribute) {
+			return elements[0].getAttribute(attribute) || '';
+		}
 		return elements[0].textContent?.trim() || '';
 	} else {
 		return '';

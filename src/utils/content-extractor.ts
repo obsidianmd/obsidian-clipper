@@ -15,8 +15,8 @@ async function processVariable(match: string, variables: { [key: string]: string
 }
 
 async function processSelector(tabId: number, match: string): Promise<string> {
-	const [, selector, filtersString] = match.match(/{{selector:(.*?)((?:\|[a-z]+)*)?}}/) || [];
-	const { content } = await extractContentBySelector(tabId, selector);
+	const [, selector, attribute, filtersString] = match.match(/{{selector:(.*?)(?::([a-zA-Z-]+))?((?:\|[a-z]+)*)?}}/) || [];
+	const { content } = await extractContentBySelector(tabId, selector, attribute);
 	const filterNames = (filtersString || '').split('|').filter(Boolean);
 	
 	// If content is an array, stringify it before applying filters
@@ -98,9 +98,9 @@ export function getMetaContent(doc: Document, attr: string, value: string): stri
 	return element ? element.getAttribute("content")?.trim() ?? "" : "";
 }
 
-export async function extractContentBySelector(tabId: number, selector: string): Promise<{ content: string | string[]; schemaOrgData: any }> {
+export async function extractContentBySelector(tabId: number, selector: string, attribute?: string): Promise<{ content: string | string[]; schemaOrgData: any }> {
 	return new Promise((resolve) => {
-		chrome.tabs.sendMessage(tabId, { action: "extractContent", selector: selector }, function(response) {
+		chrome.tabs.sendMessage(tabId, { action: "extractContent", selector: selector, attribute: attribute }, function(response) {
 			resolve({
 				content: response ? response.content : '',
 				schemaOrgData: response ? response.schemaOrgData : null
