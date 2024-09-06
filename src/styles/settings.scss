@@ -247,29 +247,3 @@
 		}
 	}
 }
-.template-drop-zone {
-	position: fixed;
-	width: 100vw;
-	height: 100vh;
-	top: 0;
-	left: 0;
-	user-select: none;
-	display: flex;
-	align-items: center;
-	text-align: center;
-	justify-content: center;
-	transition: all 0.3s ease;
-	font-size: 1.5rem;
-	p {
-		opacity: 0;
-	}
-	&.drag-over {
-		background-color: var(--background-primary);
-		border-color: var(--text-accent);
-		color: var(--text-normal);
-		z-index: 9999999;
-		p {
-			opacity: 1;
-		}
-	}
-}

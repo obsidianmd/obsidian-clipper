@@ -22,6 +22,7 @@ export function initializeDragAndDrop(): void {
 }
 
 export function handleDragStart(e: DragEvent): void {
+	e.stopPropagation(); // Prevent bubbling to the body
 	draggedElement = (e.target as HTMLElement).closest('[draggable]');
 	if (draggedElement && e.dataTransfer) {
 		e.dataTransfer.effectAllowed = 'move';
@@ -33,6 +34,7 @@ export function handleDragStart(e: DragEvent): void {
 }
 
 export function handleDragOver(e: DragEvent): void {
+	e.stopPropagation(); // Prevent bubbling to the body
 	e.preventDefault();
 	if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
 	const closestDraggable = (e.target as HTMLElement).closest('[draggable]');
@@ -48,6 +50,7 @@ export function handleDragOver(e: DragEvent): void {
 }
 
 export function handleDrop(e: DragEvent): void {
+	e.stopPropagation(); // Prevent bubbling to the body
 	e.preventDefault();
 	if (!e.dataTransfer) return;
 	const draggedItemId = e.dataTransfer.getData('text/plain');
