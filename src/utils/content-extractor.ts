@@ -5,12 +5,18 @@ import { applyFilters } from './filters';
 import dayjs from 'dayjs';
 
 async function processVariable(match: string, variables: { [key: string]: string }): Promise<string> {
+	console.log('processVariable input:', match);
 	const [, fullVariableName] = match.match(/{{(.*?)}}/) || [];
+	console.log('fullVariableName:', fullVariableName);
 	const [variableName, ...filterParts] = fullVariableName.split('|');
+	console.log('variableName:', variableName);
+	console.log('filterParts:', filterParts);
 	const filtersString = filterParts.join('|');
 	const value = variables[`{{${variableName}}}`] || '';
+	console.log('value:', value);
 	const filterNames = filtersString.split('|').filter(Boolean);
 	const result = applyFilters(value, filterNames);
+	console.log('processVariable output:', result);
 	return result;
 }
 
@@ -49,11 +55,17 @@ async function processSchema(match: string, variables: { [key: string]: string }
 }
 
 export async function replaceVariables(tabId: number, text: string, variables: { [key: string]: string }): Promise<string> {
+	console.log('replaceVariables input:', text);
+	console.log('Available variables:', variables);
+
 	const regex = /{{(?:schema:)?(?:selector:)?(.*?)((?:\|[a-z]+)*)?}}/g;
 	const matches = text.match(regex);
 
+	console.log('Matches found:', matches);
+
 	if (matches) {
 		for (const match of matches) {
+			console.log('Processing match:', match);
 			let replacement: string;
 			if (match.startsWith('{{selector:')) {
 				replacement = await processSelector(tabId, match);
@@ -62,10 +74,12 @@ export async function replaceVariables(tabId: number, text: string, variables: {
 			} else {
 				replacement = await processVariable(match, variables);
 			}
+			console.log('Replacement:', replacement);
 			text = text.replace(match, replacement);
 		}
 	}
 
+	console.log('replaceVariables output:', text);
 	return text;
 }
 
