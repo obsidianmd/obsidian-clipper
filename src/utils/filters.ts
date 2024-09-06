@@ -28,16 +28,16 @@ export const filters: { [key: string]: FilterFunction } = {
 		.replace(/([a-z])([A-Z])/g, '$1_$2')
 		.replace(/[\s-]+/g, '_')
 		.toLowerCase(),
-	wikilinks: (str: string) => {
+	wikilink: (str: string): string => {
 		try {
 			const arrayValue = JSON.parse(str);
 			if (Array.isArray(arrayValue)) {
 				return arrayValue.map(item => `[[${item}]]`).join(', ');
 			}
 		} catch (error) {
-			console.error('Error parsing JSON for wikilinks filter:', error);
+			console.error('wikilink error:', error);
 		}
-		return str;
+		return `[[${str}]]`;
 	},
 };
 
