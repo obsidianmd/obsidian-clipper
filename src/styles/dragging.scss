@@ -13,6 +13,21 @@ body.is-dragging {
 	}
 }
 
+.property-editor {
+	display: flex;
+	align-items: center;
+
+	.drag-handle {
+		cursor: grab;
+		padding: 5px;
+		margin-right: 5px;
+		
+		&:active {
+			cursor: grabbing;
+		}
+	}
+}
+
 .drag-handle {
 	cursor: grab;
 	opacity: 0.5;
