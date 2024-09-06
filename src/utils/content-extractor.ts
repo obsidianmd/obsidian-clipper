@@ -21,13 +21,25 @@ async function processVariable(match: string, variables: { [key: string]: string
 }
 
 async function processSelector(tabId: number, match: string): Promise<string> {
-	const [, selector, attribute, filtersString] = match.match(/{{selector:(.*?)(?::([a-zA-Z-]+))?((?:\|[a-z]+)*)?}}/) || [];
-	const { content } = await extractContentBySelector(tabId, selector, attribute);
-	const filterNames = (filtersString || '').split('|').filter(Boolean);
+	const selectorRegex = /{{selector:(.*?)(?:\|(.*?))?}}/;
+	const matches = match.match(selectorRegex);
+	if (!matches) {
+		console.error('Invalid selector format:', match);
+		return match;
+	}
+
+	const [, selector, filtersString] = matches;
+	const { content } = await extractContentBySelector(tabId, selector);
 	
-	// If content is an array, stringify it before applying filters
-	const processedContent = Array.isArray(content) ? JSON.stringify(content) : content;
-	return applyFilters(processedContent, filterNames);
+	// Convert content to string if it's an array
+	const contentString = Array.isArray(content) ? JSON.stringify(content) : content;
+	
+	if (filtersString) {
+		const filterNames = filtersString.split('|').map(f => f.trim());
+		return applyFilters(contentString, filterNames);
+	}
+	
+	return contentString;
 }
 
 async function processSchema(match: string, variables: { [key: string]: string }): Promise<string> {
@@ -58,7 +70,7 @@ export async function replaceVariables(tabId: number, text: string, variables: {
 	console.log('replaceVariables input:', text);
 	console.log('Available variables:', variables);
 
-	const regex = /{{(?:schema:)?(?:selector:)?(.*?)((?:\|[a-z]+)*)?}}/g;
+	const regex = /{{(?:schema:)?(?:selector:)?(.*?)}}/g;
 	const matches = text.match(regex);
 
 	console.log('Matches found:', matches);
@@ -112,11 +124,16 @@ export function getMetaContent(doc: Document, attr: string, value: string): stri
 	return element ? element.getAttribute("content")?.trim() ?? "" : "";
 }
 
-export async function extractContentBySelector(tabId: number, selector: string, attribute?: string): Promise<{ content: string | string[]; schemaOrgData: any }> {
+export async function extractContentBySelector(tabId: number, selector: string, attribute?: string): Promise<{ content: string; schemaOrgData: any }> {
 	return new Promise((resolve) => {
 		chrome.tabs.sendMessage(tabId, { action: "extractContent", selector: selector, attribute: attribute }, function(response) {
+			let content = response ? response.content : '';
+			// Ensure content is always a string
+			if (Array.isArray(content)) {
+				content = JSON.stringify(content);
+			}
 			resolve({
-				content: response ? response.content : '',
+				content: content,
 				schemaOrgData: response ? response.schemaOrgData : null
 			});
 		});

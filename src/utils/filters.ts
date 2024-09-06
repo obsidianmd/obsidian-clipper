@@ -51,8 +51,6 @@ export const filters: { [key: string]: FilterFunction } = {
 
 		const [start, end] = param.split(',').map(p => p.trim()).map(p => {
 			if (p === '') return undefined;
-			// Remove any surrounding quotes
-			p = p.replace(/^["']|["']$/g, '');
 			const num = parseInt(p, 10);
 			return isNaN(num) ? undefined : num;
 		});
@@ -89,8 +87,11 @@ export const filters: { [key: string]: FilterFunction } = {
 		// Remove quotes from the param if present
 		param = param.replace(/^["']|["']$/g, '');
 
-		// Simple split operation
-		const result = str.split(param);
+		// If param is a single character, use it directly
+		const separator = param.length === 1 ? param : new RegExp(param);
+
+		// Split operation
+		const result = str.split(separator);
 
 		console.log('Split filter output:', result);
 		return JSON.stringify(result);
@@ -108,23 +109,26 @@ export function applyFilters(value: string, filterNames: string[]): string {
 		console.log(`Applying filter: ${filterName}`);
 		console.log('Input to filter:', result);
 
-		const colonIndex = filterName.indexOf(':');
-		const name = colonIndex !== -1 ? filterName.slice(0, colonIndex) : filterName;
-		let param = colonIndex !== -1 ? filterName.slice(colonIndex + 1) : undefined;
+		// Match filter name and parameters, including quoted parameters and no colon
+		const filterRegex = /(\w+)(?::(.+)|"(.+)")?/;
+		const match = filterName.match(filterRegex);
 
-		// Remove any surrounding quotes from the entire param string
-		if (param) {
-			param = param.replace(/^["']|["']$/g, '');
+		if (match) {
+			const [, name, param1, param2] = match;
+			// Use param2 if param1 is undefined (case with no colon)
+			const cleanParam = (param1 || param2) ? (param1 || param2).replace(/^["']|["']$/g, '') : undefined;
+			console.log(`Filter name: ${name}, param: ${cleanParam}`);
+
+			const filter = filters[name];
+			if (filter) {
+				const output = filter(result, cleanParam);
+				console.log(`Filter ${name} output:`, output);
+				return output;
+			}
+		} else {
+			console.error(`Invalid filter format: ${filterName}`);
 		}
 
-		console.log(`Filter name: ${name}, param: ${param}`);
-
-		const filter = filters[name];
-		if (filter) {
-			const output = filter(result, param);
-			console.log(`Filter ${name} output:`, output);
-			return output;
-		}
 		return result;
 	}, processedValue);
 
