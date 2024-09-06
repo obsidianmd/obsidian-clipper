@@ -49,15 +49,15 @@ Schema variables allow you to extract data from [schema.org](https://schema.org/
 
 Filters can be added to variables with a pipe, e.g. `{{variable|filter}}`. Filters also work for variables that use the `selector` or `schema` prefix.
 
-- `wikilink` adds double brackets around strings and array items
-- `list` converts an array to a bullet list
-- `kebab` converts text to `kebab-case`
-- `pascal` converts text to `PascalCase`
-- `camel` converts text to `camelCase`
-- `snake` converts text to `snake_case`
+- `wikilink` adds double brackets around strings and array items.
+- `list` converts an array to a bullet list.
+- `kebab` converts text to `kebab-case`.
+- `pascal` converts text to `PascalCase`.
+- `camel` converts text to `camelCase`.
+- `snake` converts text to `snake_case`.
 - `slice` extracts a portion of a string or array.
-	- For strings: `"hello"|slice:1,4` returns `"ell"`
-	- For arrays: `["a","b","c","d"]|slice:1,3` returns `["b","c"]`
-	- Negative indices can be used to count from the end: `"hello"|slice:-3` returns `"llo"`
-	- If only one parameter is provided, it slices from that index to the end: `"hello"|slice:2` returns `"llo"`
-	- The second parameter is exclusive: `"hello"|slice:1,4` includes characters at indices 1, 2, and 3
+	- For strings: `"hello"|slice:1,4` returns `"ell"`.
+	- For arrays: `["a","b","c","d"]|slice:1,3` returns `["b","c"]`.
+	- Negative indices can be used to count from the end: `"hello"|slice:-3` returns `"llo"`.
+	- If only one parameter is provided, it slices from that index to the end: `"hello"|slice:2` returns `"llo"`.
+	- The second parameter is exclusive: `"hello"|slice:1,4` includes characters at indices 1, 2, and 3.
