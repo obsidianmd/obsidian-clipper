@@ -57,20 +57,12 @@ function extractSchemaOrgData(): any {
 		let jsonContent = script.textContent || '';
 		
 		try {
-			// Remove CDATA wrapper and any surrounding comments
-			jsonContent = jsonContent.replace(/\/\*\s*<!\[CDATA\[([\s\S]*?)\]\]>\s*\*\//, '$1');
-			
-			// Remove any remaining comment markers at the start or end
-			jsonContent = jsonContent.replace(/^\/\*/, '').replace(/\*\/$/, '');
-			
-			// Remove any leading/trailing whitespace and single-line comments
-			jsonContent = jsonContent.replace(/^\s*\/\/.*$/gm, '').trim();
-			
-			// Remove any trailing comment closure
-			jsonContent = jsonContent.replace(/\s*\/\*\s*$/, '');
-			
-			// Remove any leading comment closure
-			jsonContent = jsonContent.replace(/^\s*\*\/\s*/, '');
+			// Consolidated regex to clean up the JSON content
+			jsonContent = jsonContent
+				.replace(/\/\*[\s\S]*?\*\/|^\s*\/\/.*$/gm, '') // Remove multi-line and single-line comments
+				.replace(/^\s*<!\[CDATA\[([\s\S]*?)\]\]>\s*$/, '$1') // Remove CDATA wrapper
+				.replace(/^\s*(\*\/|\/\*)\s*|\s*(\*\/|\/\*)\s*$/g, '') // Remove any remaining comment markers at start or end
+				.trim();
 			
 			const jsonData = JSON.parse(jsonContent);
 			schemaData.push(jsonData);
