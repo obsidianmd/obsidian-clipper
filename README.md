@@ -7,6 +7,18 @@ Work in progress. Turning the [Obsidian web clipper bookmarklet](https://stephan
 - Go to `chrome://extensions/`
 - Click `Load unpacked` and select the `dist` folder
 
+### URL patterns
+
+URL patterns allow you to automatically select the appropriate template based on the current webpage's URL. You can define multiple URL patterns for each template, separated by a new line.
+
+Simple matching checks if the URL *starts with* the specified pattern.
+
+- Example: `https://obsidian.md` will match any URL that starts with this text.
+
+For more complex matching, you can use regular expressions. Enclose your regex pattern in forward slashes (`/`). Remember to escape special characters in regex patterns (like `.` and `/`) with a backslash (`\`).
+
+- Example: `/^https:\/\/www\.imdb\.com\/title\/tt\d+\/reference\/?$/` will match any IMDB reference page.
+
 ### Template variables
 
 Template variables can be used to automatically pre-populate data from the page in a template. Variables can be used in the **note name**, **note location**, **properties**, and **note content**.
