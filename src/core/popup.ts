@@ -86,14 +86,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			return;
 		}
 
-		templateDropdown.innerHTML = '';
-		
-		templates.forEach((template: Template) => {
-			const option = document.createElement('option');
-			option.value = template.name;
-			option.textContent = template.name;
-			templateDropdown.appendChild(option);
-		});
+		populateTemplateDropdown();
 
 		// After templates are loaded, match template based on URL
 		chrome.tabs.query({active: true, currentWindow: true}, async function(tabs) {
@@ -127,21 +120,22 @@ document.addEventListener('DOMContentLoaded', function() {
 			}
 		});
 
-		// Set the first template as the default
-		currentTemplate = templates[0];
-		if (currentTemplate) {
-			templateDropdown.value = currentTemplate.name;
-		}
-
 		// Only show template selector if there are multiple templates
 		if (templates.length > 1) {
 			templateContainer.style.display = 'block';
 		}
-
-		if (currentTemplate) {
-			initializeTemplateFields(currentTemplate, {});
-		}
 	});
+
+	function populateTemplateDropdown() {
+		templateDropdown.innerHTML = '';
+		
+		templates.forEach((template: Template) => {
+			const option = document.createElement('option');
+			option.value = template.name;
+			option.textContent = template.name;
+			templateDropdown.appendChild(option);
+		});
+	}
 
 	// Template selection change
 	templateDropdown.addEventListener('change', async function(this: HTMLSelectElement) {
@@ -222,28 +216,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
 		const currentUrl = tabs[0].url || '';
 
-		// Log URL pattern matching information to console
-		if (template.urlPatterns && template.urlPatterns.length > 0) {
-			const matchingPattern = template.urlPatterns.find(pattern => {
-				if (pattern.startsWith('/') && pattern.endsWith('/')) {
-					try {
-						const regexPattern = new RegExp(pattern.slice(1, -1));
-						return regexPattern.test(currentUrl);
-					} catch (error) {
-						console.error(`Invalid regex pattern: ${pattern}`, error);
-						return false;
+		if (Object.keys(currentVariables).length > 0) {
+			if (template.urlPatterns && template.urlPatterns.length > 0) {
+				const matchingPattern = template.urlPatterns.find(pattern => {
+					if (pattern.startsWith('/') && pattern.endsWith('/')) {
+						try {
+							const regexPattern = new RegExp(pattern.slice(1, -1));
+							return regexPattern.test(currentUrl);
+						} catch (error) {
+							console.error(`Invalid regex pattern: ${pattern}`, error);
+							return false;
+						}
+					} else {
+						return currentUrl.startsWith(pattern);
 					}
+				});
+				if (matchingPattern) {
+					console.log(`Matched URL pattern: ${matchingPattern}`);
 				} else {
-					return currentUrl.startsWith(pattern);
+					console.log('No matching URL pattern');
 				}
-			});
-			if (matchingPattern) {
-				console.log(`Matched URL pattern: ${matchingPattern}`);
 			} else {
-				console.log('No matching URL pattern');
+				console.log('No URL patterns defined for this template');
 			}
-		} else {
-			console.log('No URL patterns defined for this template');
 		}
 
 		initializeIcons();
