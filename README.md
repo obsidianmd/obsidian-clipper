@@ -29,7 +29,7 @@ These variables are automatically generated based on the page content.
 
 #### Selector variables
 
-Selector variables allow you to extract data from the page. The syntax for selector variables is `{{selector:cssSelector:attribute}}`, where `:attribute` is optional. If no attribute is specified, the text content of the element is returned.
+Selector variables allow you to extract data from elements on the page using the syntax `{{selector:cssSelector:attribute}}`, where `:attribute` is optional. If no attribute is specified, the text content of the element is returned.
 
 - `{{selector:h1}}` returns text content of the first `h1` element on the page.
 - `{{selector:.author}}` returns text content of the first `.author` element on the page.
