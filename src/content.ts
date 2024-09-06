@@ -54,11 +54,29 @@ function extractSchemaOrgData(): any {
 	const schemaData: any[] = [];
 
 	schemaScripts.forEach(script => {
+		let jsonContent = script.textContent || '';
+		
 		try {
-			const jsonData = JSON.parse(script.textContent || '');
+			// Remove CDATA wrapper and any surrounding comments
+			jsonContent = jsonContent.replace(/\/\*\s*<!\[CDATA\[([\s\S]*?)\]\]>\s*\*\//, '$1');
+			
+			// Remove any remaining comment markers at the start or end
+			jsonContent = jsonContent.replace(/^\/\*/, '').replace(/\*\/$/, '');
+			
+			// Remove any leading/trailing whitespace and single-line comments
+			jsonContent = jsonContent.replace(/^\s*\/\/.*$/gm, '').trim();
+			
+			// Remove any trailing comment closure
+			jsonContent = jsonContent.replace(/\s*\/\*\s*$/, '');
+			
+			// Remove any leading comment closure
+			jsonContent = jsonContent.replace(/^\s*\*\/\s*/, '');
+			
+			const jsonData = JSON.parse(jsonContent);
 			schemaData.push(jsonData);
 		} catch (error) {
 			console.error('Error parsing schema.org data:', error);
+			console.error('Problematic JSON content:', jsonContent);
 		}
 	});
 
