@@ -4,14 +4,10 @@ import { generateFrontmatter, saveToObsidian, sanitizeFileName } from '../utils/
 import { extractPageContent, initializePageContent, replaceVariables } from '../utils/content-extractor';
 import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
 import { unescapeValue } from '../utils/string-utils';
+import { decompressFromUTF16 } from 'lz-string';
 
 let currentTemplate: Template | null = null;
-
-function findMatchingTemplate(url: string, templates: Template[]): Template | undefined {
-	return templates.find(template => 
-		template.urlPatterns && template.urlPatterns.some(pattern => url.startsWith(pattern))
-	);
-}
+let templates: Template[] = [];
 
 document.addEventListener('DOMContentLoaded', function() {
 	const vaultContainer = document.getElementById('vault-container') as HTMLElement;
@@ -46,74 +42,56 @@ document.addEventListener('DOMContentLoaded', function() {
 		}
 	}
 
-	// Load templates from storage and populate dropdown
-	chrome.storage.sync.get(['templates'], (data: { templates?: Template[] }) => {
-		if (!data.templates || data.templates.length === 0) {
+	function findMatchingTemplate(url: string): Template | undefined {
+		return templates.find(template => 
+			template.urlPatterns && template.urlPatterns.some(pattern => url.startsWith(pattern))
+		);
+	}
+
+	// Load templates from local storage and populate dropdown
+	chrome.storage.local.get(['template_list'], async (data: { template_list?: string[] }) => {
+		const templateIds = data.template_list || [];
+		const loadedTemplates = await Promise.all(templateIds.map(id => 
+			new Promise<Template | null>(resolve => 
+				chrome.storage.local.get(`template_${id}`, data => {
+					const compressedChunks = data[`template_${id}`];
+					if (compressedChunks) {
+						const decompressedData = decompressFromUTF16(compressedChunks.join(''));
+						resolve(JSON.parse(decompressedData));
+					} else {
+						resolve(null);
+					}
+				})
+			)
+		));
+
+		templates = loadedTemplates.filter((t): t is Template => t !== null);
+
+		if (templates.length === 0) {
 			console.error('No templates found in storage');
 			return;
 		}
 
 		templateDropdown.innerHTML = '';
 		
-		data.templates.forEach((template: Template) => {
+		templates.forEach((template: Template) => {
 			const option = document.createElement('option');
 			option.value = template.name;
 			option.textContent = template.name;
 			templateDropdown.appendChild(option);
 		});
 
-		// Set the first template as the default
-		currentTemplate = data.templates[0];
-		if (currentTemplate) {
-			templateDropdown.value = currentTemplate.name;
-		}
-
-		// Only show template selector if there are multiple templates
-		if (data.templates.length > 1) {
-			templateContainer.style.display = 'block';
-		}
-
-		if (currentTemplate) {
-			initializeTemplateFields(currentTemplate, {});
-		}
-	});
-
-	// Template selection change
-	templateDropdown.addEventListener('change', async function() {
-		chrome.storage.sync.get(['templates'], async (data: { templates?: Template[] }) => {
-			currentTemplate = data.templates?.find((t: Template) => t.name === this.value) || null;
-			if (currentTemplate) {
-				const tabs = await chrome.tabs.query({active: true, currentWindow: true});
-				if (tabs[0].id) {
-					const extractedData = await extractPageContent(tabs[0].id);
-					if (extractedData) {
-						const initializedContent = await initializePageContent(extractedData.content, extractedData.selectedHtml, extractedData.extractedContent, tabs[0].url!, extractedData.schemaOrgData);
-						if (initializedContent) {
-							await initializeTemplateFields(currentTemplate, initializedContent.currentVariables, initializedContent.noteName);
-						} else {
-							showError('Unable to initialize page content.');
-						}
-					} else {
-						showError('Unable to retrieve page content. Try reloading the page.');
-					}
-				}
+		// After templates are loaded, match template based on URL
+		chrome.tabs.query({active: true, currentWindow: true}, async function(tabs) {
+			if (!tabs[0].url || tabs[0].url.startsWith('chrome-extension://') || tabs[0].url.startsWith('chrome://') || tabs[0].url.startsWith('about:') || tabs[0].url.startsWith('file://')) {
+				showError('This page cannot be clipped.');
+				return;
 			}
-		});
-	});
 
-	// Match template based on URL
-	chrome.tabs.query({active: true, currentWindow: true}, async function(tabs) {
-		if (!tabs[0].url || tabs[0].url.startsWith('chrome-extension://') || tabs[0].url.startsWith('chrome://') || tabs[0].url.startsWith('about:') || tabs[0].url.startsWith('file://')) {
-			showError('This page cannot be clipped.');
-			return;
-		}
+			const currentUrl = tabs[0].url;
 
-		const currentUrl = tabs[0].url;
-
-		// Load templates and find matching template
-		chrome.storage.sync.get(['templates'], async (data: { templates?: Template[] }) => {
-			const templates: Template[] = data.templates || [];
-			currentTemplate = findMatchingTemplate(currentUrl, templates) || templates[0];
+			// Find matching template
+			currentTemplate = findMatchingTemplate(currentUrl) || templates[0];
 
 			// Update the template dropdown to reflect the matched template
 			if (currentTemplate) {
@@ -134,6 +112,42 @@ document.addEventListener('DOMContentLoaded', function() {
 				}
 			}
 		});
+
+		// Set the first template as the default
+		currentTemplate = templates[0];
+		if (currentTemplate) {
+			templateDropdown.value = currentTemplate.name;
+		}
+
+		// Only show template selector if there are multiple templates
+		if (templates.length > 1) {
+			templateContainer.style.display = 'block';
+		}
+
+		if (currentTemplate) {
+			initializeTemplateFields(currentTemplate, {});
+		}
+	});
+
+	// Template selection change
+	templateDropdown.addEventListener('change', async function(this: HTMLSelectElement) {
+		currentTemplate = templates.find((t: Template) => t.name === this.value) || null;
+		if (currentTemplate) {
+			const tabs = await chrome.tabs.query({active: true, currentWindow: true});
+			if (tabs[0].id) {
+				const extractedData = await extractPageContent(tabs[0].id);
+				if (extractedData) {
+					const initializedContent = await initializePageContent(extractedData.content, extractedData.selectedHtml, extractedData.extractedContent, tabs[0].url!, extractedData.schemaOrgData);
+					if (initializedContent) {
+						await initializeTemplateFields(currentTemplate, initializedContent.currentVariables, initializedContent.noteName);
+					} else {
+						showError('Unable to initialize page content.');
+					}
+				} else {
+					showError('Unable to retrieve page content. Try reloading the page.');
+				}
+			}
+		}
 	});
 
 	async function initializeTemplateFields(template: Template, currentVariables: { [key: string]: string }, noteName?: string) {
