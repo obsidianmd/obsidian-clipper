@@ -47,5 +47,11 @@ Schema variables allow you to extract data from [schema.org](https://schema.org/
 
 ### Filters
 
-- `{{schema:key|list}}` converts an array to a bullet list.
-- `{{schema:arrayKey.[*].property|list}}` returns a specific property from all items in an array and converts it to a bullet list.
+Filters can be added to variables with a pipe, e.g. `{{variable|filter}}`. This works for `selector` and `schema` as well.
+
+- `wikilink` adds double brackets around strings and array items.
+- `list` converts an array to a bullet list.
+- `kebab` converts text to `kebab-case`
+- `pascal` converts text to `PascalCase`
+- `camel` converts text to `camelCase`
+- `snake` converts text to `snake_case`
