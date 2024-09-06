@@ -29,13 +29,15 @@ export const filters: { [key: string]: FilterFunction } = {
 		.replace(/[\s-]+/g, '_')
 		.toLowerCase(),
 	wikilink: (str: string): string => {
-		try {
-			const arrayValue = JSON.parse(str);
-			if (Array.isArray(arrayValue)) {
-				return arrayValue.map(item => `[[${item}]]`).join(', ');
+		if (str.startsWith('[') && str.endsWith(']')) {
+			try {
+				const arrayValue = JSON.parse(str);
+				if (Array.isArray(arrayValue)) {
+					return arrayValue.map(item => `[[${item}]]`).join(', ');
+				}
+			} catch (error) {
+				console.error('wikilink error:', error);
 			}
-		} catch (error) {
-			console.error('wikilink error:', error);
 		}
 		return `[[${str}]]`;
 	},
