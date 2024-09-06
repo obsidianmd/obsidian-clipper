@@ -48,12 +48,12 @@ document.addEventListener('DOMContentLoaded', function() {
 		);
 	}
 
-	// Load templates from local storage and populate dropdown
-	chrome.storage.local.get(['template_list'], async (data: { template_list?: string[] }) => {
+	// Load templates from sync storage and populate dropdown
+	chrome.storage.sync.get(['template_list'], async (data: { template_list?: string[] }) => {
 		const templateIds = data.template_list || [];
 		const loadedTemplates = await Promise.all(templateIds.map(id => 
 			new Promise<Template | null>(resolve => 
-				chrome.storage.local.get(`template_${id}`, data => {
+				chrome.storage.sync.get(`template_${id}`, data => {
 					const compressedChunks = data[`template_${id}`];
 					if (compressedChunks) {
 						const decompressedData = decompressFromUTF16(compressedChunks.join(''));

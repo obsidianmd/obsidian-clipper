@@ -17,7 +17,7 @@ export function setEditingTemplateIndex(index: number): void {
 
 export function loadTemplates(): Promise<void> {
 	return new Promise((resolve) => {
-		chrome.storage.local.get(TEMPLATE_LIST_KEY, async (data) => {
+		chrome.storage.sync.get(TEMPLATE_LIST_KEY, async (data) => {
 			const templateIds = data[TEMPLATE_LIST_KEY] || [];
 			templates = [];
 
@@ -43,7 +43,7 @@ export function loadTemplates(): Promise<void> {
 
 async function loadTemplate(id: string): Promise<Template | null> {
 	return new Promise((resolve) => {
-		chrome.storage.local.get(STORAGE_KEY_PREFIX + id, (data) => {
+		chrome.storage.sync.get(STORAGE_KEY_PREFIX + id, (data) => {
 			const compressedChunks = data[STORAGE_KEY_PREFIX + id];
 			if (compressedChunks) {
 				const decompressedData = decompressFromUTF16(compressedChunks.join(''));
@@ -221,7 +221,7 @@ export function saveTemplateSettings(): Promise<void> {
 	return new Promise(async (resolve, reject) => {
 		try {
 			const templateIds = templates.map(t => t.id);
-			await chrome.storage.local.set({ [TEMPLATE_LIST_KEY]: templateIds });
+			await chrome.storage.sync.set({ [TEMPLATE_LIST_KEY]: templateIds });
 
 			for (const template of templates) {
 				await saveTemplate(template);
@@ -242,7 +242,7 @@ async function saveTemplate(template: Template): Promise<void> {
 	for (let i = 0; i < compressedData.length; i += CHUNK_SIZE) {
 		chunks.push(compressedData.slice(i, i + CHUNK_SIZE));
 	}
-	await chrome.storage.local.set({ [STORAGE_KEY_PREFIX + template.id]: chunks });
+	await chrome.storage.sync.set({ [STORAGE_KEY_PREFIX + template.id]: chunks });
 }
 
 export function createDefaultTemplate(): Template {
