@@ -22,32 +22,27 @@ async function processSelector(tabId: number, match: string): Promise<string> {
 }
 
 async function processSchema(match: string, variables: { [key: string]: string }): Promise<string> {
-	const [, schemaKey, filtersString] = match.match(/{{schema:(.*?)((?:\|[a-z]+)*)?}}/) || [];
+	const [, fullSchemaKey] = match.match(/{{schema:(.*?)}}/) || [];
+	const [schemaKey, ...filterParts] = fullSchemaKey.split('|');
+	const filtersString = filterParts.join('|');
+
 	let schemaValue = '';
-	
+
 	// Check if we're dealing with a nested array access
 	const nestedArrayMatch = schemaKey.match(/(.*?)\.\[\*\]\.(.*)/);
 	if (nestedArrayMatch) {
 		const [, arrayKey, propertyKey] = nestedArrayMatch;
 		const arrayValue = JSON.parse(variables[`{{schema:${arrayKey}}}`] || '[]');
 		if (Array.isArray(arrayValue)) {
-			schemaValue = JSON.stringify(arrayValue.map(item => item[propertyKey]));
+			schemaValue = JSON.stringify(arrayValue.map(item => item[propertyKey]).filter(Boolean));
 		}
 	} else {
-		// Try to find the exact match first
-		if (variables[`{{schema:${schemaKey}}}`]) {
-			schemaValue = variables[`{{schema:${schemaKey}}}`];
-		} else {
-			// If not found, try to find a partial match
-			const partialMatches = Object.keys(variables).filter(key => key.startsWith(`{{schema:${schemaKey}`));
-			if (partialMatches.length > 0) {
-				schemaValue = variables[partialMatches[0]];
-			}
-		}
+		schemaValue = variables[`{{schema:${schemaKey}}}`] || '';
 	}
 
-	const filterNames = (filtersString || '').split('|').filter(Boolean);
-	return applyFilters(schemaValue, filterNames);
+	const filterNames = filtersString.split('|').filter(Boolean);
+	const result = applyFilters(schemaValue, filterNames);
+	return result;
 }
 
 export async function replaceVariables(tabId: number, text: string, variables: { [key: string]: string }): Promise<string> {
