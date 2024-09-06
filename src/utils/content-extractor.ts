@@ -15,7 +15,10 @@ async function processSelector(tabId: number, match: string): Promise<string> {
 	const [, selector, filtersString] = match.match(/{{selector:(.*?)((?:\|[a-z]+)*)?}}/) || [];
 	const { content } = await extractContentBySelector(tabId, selector);
 	const filterNames = (filtersString || '').split('|').filter(Boolean);
-	return applyFilters(content, filterNames);
+	
+	// If content is an array, stringify it before applying filters
+	const processedContent = Array.isArray(content) ? JSON.stringify(content) : content;
+	return applyFilters(processedContent, filterNames);
 }
 
 async function processSchema(match: string, variables: { [key: string]: string }): Promise<string> {
@@ -97,7 +100,7 @@ export function getMetaContent(doc: Document, attr: string, value: string): stri
 	return element ? element.getAttribute("content")?.trim() ?? "" : "";
 }
 
-export async function extractContentBySelector(tabId: number, selector: string): Promise<{ content: string; schemaOrgData: any }> {
+export async function extractContentBySelector(tabId: number, selector: string): Promise<{ content: string | string[]; schemaOrgData: any }> {
 	return new Promise((resolve) => {
 		chrome.tabs.sendMessage(tabId, { action: "extractContent", selector: selector }, function(response) {
 			resolve({

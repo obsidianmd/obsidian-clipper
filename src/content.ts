@@ -32,14 +32,21 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		sendResponse(response);
 	} else if (request.action === "extractContent") {
 		const content = extractContentBySelector(request.selector);
-		sendResponse({ content: content });
+		sendResponse({ content: content, schemaOrgData: extractSchemaOrgData() });
 	}
 	return true;
 });
 
-function extractContentBySelector(selector: string): string {
-	const element = document.querySelector(selector);
-	return element ? element.textContent?.trim() || '' : '';
+function extractContentBySelector(selector: string): string | string[] {
+	const elements = document.querySelectorAll(selector);
+	
+	if (elements.length > 1) {
+		return Array.from(elements).map(el => el.textContent?.trim() || '');
+	} else if (elements.length === 1) {
+		return elements[0].textContent?.trim() || '';
+	} else {
+		return '';
+	}
 }
 
 function extractSchemaOrgData(): any {
