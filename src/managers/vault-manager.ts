@@ -4,7 +4,7 @@ import { initializeIcons } from '../icons/icons';
 export let vaults: string[] = [];
 
 export function loadGeneralSettings(): void {
-	chrome.storage.local.get(['vaults'], (data) => {
+	chrome.storage.sync.get(['vaults'], (data) => {
 		vaults = data.vaults || [];
 		updateVaultList();
 	});
@@ -59,7 +59,7 @@ export function getVaults(): string[] {
 
 export function saveGeneralSettings(): Promise<void> {
 	return new Promise((resolve, reject) => {
-		chrome.storage.local.set({ vaults }, () => {
+		chrome.storage.sync.set({ vaults }, () => {
 			if (chrome.runtime.lastError) {
 				console.error('Error saving vaults:', chrome.runtime.lastError);
 				reject(chrome.runtime.lastError);
