@@ -47,7 +47,11 @@ Schema variables allow you to extract data from [schema.org](https://schema.org/
 
 ### Filters
 
-Filters can be added to variables with a pipe, e.g. `{{variable|filter}}`. Filters also work for variables that use the `selector` or `schema` prefix.
+- Filters can be added to variables with a pipe, e.g. `{{variable|filter}}`.
+- Filters also work for variables that use the `selector` or `schema` prefix.
+- Filters can be chained, e.g. `{{variable|filter1|filter2}}` and are applied in the order they are added.
+
+#### Available filters
 
 - `wikilink` adds double brackets around strings and array items.
 - `list` converts an array to a bullet list.
