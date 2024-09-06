@@ -47,15 +47,11 @@ export const filters: { [key: string]: FilterFunction } = {
 			return str;
 		}
 
-		console.log('Slice filter raw param:', param);
-
 		const [start, end] = param.split(',').map(p => p.trim()).map(p => {
 			if (p === '') return undefined;
 			const num = parseInt(p, 10);
 			return isNaN(num) ? undefined : num;
 		});
-		
-		console.log('Parsed slice parameters:', start, end);
 
 		let value;
 		try {
@@ -67,18 +63,12 @@ export const filters: { [key: string]: FilterFunction } = {
 
 		if (Array.isArray(value)) {
 			const slicedArray = value.slice(start, end);
-			console.log('Slice filter input array:', value);
-			console.log('Slice filter params:', start, end);
-			console.log('Slice filter output array:', slicedArray);
 			return JSON.stringify(slicedArray);
 		} else {
 			return str.slice(start, end);
 		}
 	},
 	split: (str: string, param?: string): string => {
-		console.log('Split filter input:', str);
-		console.log('Split filter param:', param);
-
 		if (!param) {
 			console.error('Split filter requires a separator parameter');
 			return JSON.stringify([str]);
@@ -93,7 +83,6 @@ export const filters: { [key: string]: FilterFunction } = {
 		// Split operation
 		const result = str.split(separator);
 
-		console.log('Split filter output:', result);
 		return JSON.stringify(result);
 	},
 	join: (str: string, param?: string): string => {
@@ -113,15 +102,10 @@ export const filters: { [key: string]: FilterFunction } = {
 };
 
 export function applyFilters(value: string, filterNames: string[]): string {
-	console.log('applyFilters input:', value);
-	console.log('applyFilters filterNames:', filterNames);
-
 	// Ensure value is a string before applying filters
 	let processedValue = typeof value === 'string' ? value : JSON.stringify(value);
 
 	const result = filterNames.reduce((result, filterName) => {
-		console.log(`Applying filter: ${filterName}`);
-		console.log('Input to filter:', result);
 
 		// Match filter name and parameters, including quoted parameters and no colon
 		const filterRegex = /(\w+)(?::(.+)|"(.+)")?/;
@@ -131,12 +115,10 @@ export function applyFilters(value: string, filterNames: string[]): string {
 			const [, name, param1, param2] = match;
 			// Use param2 if param1 is undefined (case with no colon)
 			const cleanParam = (param1 || param2) ? (param1 || param2).replace(/^["']|["']$/g, '') : undefined;
-			console.log(`Filter name: ${name}, param: ${cleanParam}`);
 
 			const filter = filters[name];
 			if (filter) {
 				const output = filter(result, cleanParam);
-				console.log(`Filter ${name} output:`, output);
 				return output;
 			}
 		} else {
@@ -146,6 +128,5 @@ export function applyFilters(value: string, filterNames: string[]): string {
 		return result;
 	}, processedValue);
 
-	console.log('applyFilters final output:', result);
 	return result;
 }
