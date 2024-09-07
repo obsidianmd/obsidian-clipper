@@ -37,10 +37,14 @@ export async function generateFrontmatter(properties: Property[]): Promise<strin
 				break;
 			case 'date':
 			case 'datetime':
-				frontmatter += ` "${property.value}"\n`;
+				if (property.value.trim() !== '') {
+					frontmatter += ` "${property.value}"\n`;
+				} else {
+					frontmatter += '\n';
+				}
 				break;
 			default: // Text
-				frontmatter += ` "${property.value}"\n`;
+				frontmatter += property.value.trim() !== '' ? ` "${property.value}"\n` : '\n';
 		}
 	}
 	frontmatter += '---\n';
