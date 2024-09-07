@@ -109,14 +109,25 @@ export function getMetaContent(doc: Document, attr: string, value: string): stri
 	return element ? element.getAttribute("content")?.trim() ?? "" : "";
 }
 
-export async function extractContentBySelector(tabId: number, selector: string, attribute?: string): Promise<{ content: string; schemaOrgData: any }> {
+export async function extractContentBySelector(tabId: number, selector: string): Promise<{ content: string; schemaOrgData: any }> {
 	return new Promise((resolve) => {
-		chrome.tabs.sendMessage(tabId, { action: "extractContent", selector: selector, attribute: attribute }, function(response) {
+		const attributeMatch = selector.match(/:([a-zA-Z-]+)$/);
+		let baseSelector = selector;
+		let attribute: string | undefined;
+
+		if (attributeMatch) {
+			attribute = attributeMatch[1];
+			baseSelector = selector.slice(0, -attribute.length - 1);
+		}
+
+		chrome.tabs.sendMessage(tabId, { action: "extractContent", selector: baseSelector, attribute: attribute }, function(response) {
 			let content = response ? response.content : '';
+			
 			// Ensure content is always a string
 			if (Array.isArray(content)) {
 				content = JSON.stringify(content);
 			}
+			
 			resolve({
 				content: content,
 				schemaOrgData: response ? response.schemaOrgData : null
