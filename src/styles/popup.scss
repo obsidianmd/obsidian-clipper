@@ -1,11 +1,13 @@
 .popup {
 	width: 340px;
+	min-height: 500px;
 	overflow: hidden;
 }
 .clipper {
 	display: flex;
 	flex-direction: column;
 	padding: 0;
+	height: 100vh;
 
 	#template-select {
 		border-radius: 0;
@@ -29,7 +31,7 @@
 		font-size: 16px;
 		font-weight: 600;
 		resize: none;
-		min-height: 0;
+		min-height: 2rem;
 		&:active,
 		&:focus {
 			box-shadow: none;
@@ -37,8 +39,8 @@
 	}
 
 	.metadata-properties-header {
-		padding: 0 12px 4px;
-		font-size: 14px;
+		padding: 0 12px 6px;
+		font-size: 0.875rem;
 		font-weight: 500;
 		color: var(--text-muted);
 		user-select: none;
@@ -55,6 +57,9 @@
 		max-height: 200px;
 		overflow-y: scroll;
 		&:empty {
+			display: none;
+		}
+		&.collapsed {
 			display: none;
 		}
 		.metadata-property {
@@ -103,16 +108,17 @@
 
 	#note-content-container {
 		display: flex;
-	}
-	#note-content-field {
-		border-radius: 0;
-		border: none;
-		border-top: 1px solid var(--background-modifier-border);
-		padding: 10px;
-		resize: none;
-		&:active,
-		&:focus {
-			box-shadow: none;
+		flex-grow: 1;
+		#note-content-field {
+			border-radius: 0;
+			border: none;
+			border-top: 1px solid var(--background-modifier-border);
+			padding: 10px;
+			resize: none;
+			&:active,
+			&:focus {
+				box-shadow: none;
+			}
 		}
 	}
 
