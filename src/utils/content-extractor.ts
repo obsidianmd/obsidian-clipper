@@ -150,6 +150,7 @@ export async function initializePageContent(content: string, selectedHtml: strin
 	const title =
 		getMetaContent(doc, "property", "og:title")
 		|| getMetaContent(doc, "name", "twitter:title")
+		|| getMetaContent(doc, "name", "title")
 		|| doc.querySelector('title')?.textContent?.trim()
 		|| '';
 
@@ -202,6 +203,7 @@ export async function initializePageContent(content: string, selectedHtml: strin
 		'{{site}}': site,
 		'{{title}}': title,
 		'{{noteName}}': noteName,
+		'{{date}}': convertDate(new Date()),
 		'{{today}}': convertDate(new Date()),
 		'{{url}}': currentUrl
 	};
