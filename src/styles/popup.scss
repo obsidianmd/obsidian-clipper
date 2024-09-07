@@ -33,11 +33,16 @@
 		font-weight: 500;
 		color: var(--text-muted);
 		cursor: pointer;
+		&:hover {
+			color: var(--text-normal);
+		}
 		&:active,
 		&:focus {
+			color: var(--text-normal);
 			box-shadow: none;
 		}
 	}
+
 	#note-name-field {
 		border: none;
 		border-radius: 0;
@@ -59,6 +64,9 @@
 		color: var(--text-muted);
 		user-select: none;
 		cursor: pointer;
+		&:hover {
+			color: var(--text-normal);
+		}
 	}
 
 	.metadata-properties {
