@@ -3,13 +3,8 @@
 <head>
 	<title>Obsidian Web Clipper</title>
 	<link rel="stylesheet" href="style.css">
-	<style>
-		body {
-				width: 340px;
-		}
-	</style>
 </head>
-<body>
+<body class="popup">
 	<p class="error-message" style="text-align: center; display: none;"></p>
 	<div class="clipper">
 		<div id="template-container" style="display: none;">
@@ -17,16 +12,21 @@
 				<option value="">Select a template</option>
 			</select>
 		</div>
-		<input id="note-name-field" type="text" />
+		<textarea id="note-name-field" type="text" placeholder="Note name" rows="1"></textarea>
 		<input id="path-name-field" type="text" style="display: none;"/>
+		<div class="metadata-properties-header">
+			Properties
+		</div>
 		<div class="metadata-properties"></div>
-		<div id="vault-container" style="display: none;">
-			<select id="vault-select"></select>
+			<div id="note-content-container">
+			<textarea id="note-content-field" rows="5" placeholder="Notes about this page..."></textarea>
+			</div>
+		<div class="clipper-footer">
+			<div id="vault-container" style="display: none;">
+				<select id="vault-select"></select>
+			</div>
+			<button id="clip-button" class="mod-cta">Save in Obsidian</button>
 		</div>
-		<div id="note-content-container">
-			<textarea id="note-content-field" rows="3"></textarea>
-		</div>
-		<button id="clip-button" class="mod-cta">Save in Obsidian</button>
 	</div>
 	<a href="#" id="open-settings" class="text-muted">Settings</a>
 	<script type="module" src="popup.js"></script>

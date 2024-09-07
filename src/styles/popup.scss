@@ -1,14 +1,59 @@
+.popup {
+	width: 340px;
+	overflow: hidden;
+}
 .clipper {
 	display: flex;
 	flex-direction: column;
-	gap: 8px;
-	padding: 10px;
+	padding: 0;
+
+	#template-select {
+		border-radius: 0;
+		border: none;
+		padding: 10px 8px 8px;
+		width: calc(100% - 8px);
+		margin-inline-start: 0;
+		margin-inline-end: auto;
+		font-weight: 500;
+		color: var(--text-muted);
+		cursor: pointer;
+		&:active,
+		&:focus {
+			box-shadow: none;
+		}
+	}
+	#note-name-field {
+		border: none;
+		border-radius: 0;
+		padding: 2px 12px 10px;
+		font-size: 16px;
+		font-weight: 600;
+		resize: none;
+		min-height: 0;
+		&:active,
+		&:focus {
+			box-shadow: none;
+		}
+	}
+
+	.metadata-properties-header {
+		padding: 0 12px 4px;
+		font-size: 14px;
+		font-weight: 500;
+		color: var(--text-muted);
+		user-select: none;
+		cursor: pointer;
+	}
 
 	.metadata-properties {
+		--input-height: 28px;
+		padding: 0 8px 8px;
 		margin: 0;
 		display: flex;
 		flex-direction: column;
-		gap: 2px;
+		gap: 1px;
+		max-height: 200px;
+		overflow-y: scroll;
 		&:empty {
 			display: none;
 		}
@@ -56,8 +101,29 @@
 		}
 	}
 
-	button {
-		cursor: default
+	#note-content-container {
+		display: flex;
+	}
+	#note-content-field {
+		border-radius: 0;
+		border: none;
+		border-top: 1px solid var(--background-modifier-border);
+		padding: 10px;
+		resize: none;
+		&:active,
+		&:focus {
+			box-shadow: none;
+		}
+	}
+
+	.clipper-footer {
+		width: 100%;
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+		padding: 10px;
+		border-top: 1px solid var(--background-modifier-border);
+		background-color: var(--background-primary);
 	}
 }
 
