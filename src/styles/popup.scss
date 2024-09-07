@@ -1,6 +1,9 @@
 .popup {
 	width: 340px;
 	overflow: hidden;
+	::selection {
+		background-color: var(--text-selection);
+	}
 	#open-settings {
 		z-index: 10;
 		position: fixed;

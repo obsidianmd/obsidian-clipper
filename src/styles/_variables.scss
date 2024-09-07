@@ -3,7 +3,7 @@
 	--accent-s: 88%;
 	--accent-l: 66%;
 
-    --background-primary: var(--color-base-00);
+	--background-primary: var(--color-base-00);
 	--background-primary-alt: var(--color-base-10);
 	--background-secondary: var(--color-base-20);
 
@@ -11,7 +11,7 @@
 	--background-modifier-border-hover: var(--color-base-35);
 	--background-modifier-border-focus: var(--color-base-40);
 
-    --background-modifier-hover: rgba(var(--mono-rgb-100), .075);
+	--background-modifier-hover: rgba(var(--mono-rgb-100), .075);
 
 	--interactive-accent: var(--color-accent-1);
 	--interactive-accent-hover: var(--color-accent-2);
@@ -67,8 +67,10 @@
 		--color-base-70: #5c5c5c;
 		--color-base-100: #222222;
 
-        --mono-rgb-0: 255, 255, 255;
-        --mono-rgb-100: 0, 0, 0;
+		--mono-rgb-0: 255, 255, 255;
+		--mono-rgb-100: 0, 0, 0;
+
+		--text-selection: hsla(var(--color-accent-hsl), 0.2);
 	}
 }
 
@@ -115,9 +117,10 @@
 		--interactive-accent: var(--color-accent);
 		--interactive-accent-hover: var(--color-accent-1);
 
-        --mono-rgb-0: 0, 0, 0;
-        --mono-rgb-100: 255, 255, 255;
+		--mono-rgb-0: 0, 0, 0;
+		--mono-rgb-100: 255, 255, 255;
 
 		--text-accent: var(--color-accent-1);
-    }
+		--text-selection: hsla(var(--color-accent-hsl), 0.3);
+	}
 }
