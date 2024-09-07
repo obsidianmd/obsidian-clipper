@@ -29,11 +29,14 @@ export const filters: { [key: string]: FilterFunction } = {
 		.replace(/[\s-]+/g, '_')
 		.toLowerCase(),
 	wikilink: (str: string): string => {
+		if (!str.trim()) {
+			return '';
+		}
 		if (str.startsWith('[') && str.endsWith(']')) {
 			try {
 				const arrayValue = JSON.parse(str);
 				if (Array.isArray(arrayValue)) {
-					return arrayValue.map(item => `[[${item}]]`).join(', ');
+					return arrayValue.map(item => item.trim() ? `[[${item}]]` : '').filter(Boolean).join(', ');
 				}
 			} catch (error) {
 				console.error('wikilink error:', error);
