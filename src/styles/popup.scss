@@ -4,7 +4,7 @@
 	#open-settings {
 		z-index: 10;
 		position: fixed;
-		top: 4px;
+		top: 6px;
 		right: 4px;
 		border-radius: 4px;
 		user-select: none;
@@ -19,14 +19,14 @@
 .clipper {
 	display: flex;
 	flex-direction: column;
-	padding: 0;
+	padding: 6px 0 0 0;
 	min-height: 500px;
 	height: 100vh;
 
 	#template-select {
 		border-radius: 0;
 		border: none;
-		padding: 10px 8px 8px;
+		padding: 4px 8px 4px;
 		width: calc(100% - 36px);
 		margin-inline-start: 0;
 		margin-inline-end: auto;
@@ -46,7 +46,7 @@
 	#note-name-field {
 		border: none;
 		border-radius: 0;
-		padding: 2px 12px 10px;
+		padding: 4px 30px 10px 12px;
 		font-size: 16px;
 		font-weight: 600;
 		resize: none;
