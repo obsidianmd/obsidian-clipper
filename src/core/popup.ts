@@ -185,6 +185,28 @@ document.addEventListener('DOMContentLoaded', function() {
 		}
 	});
 
+	const noteNameField = document.getElementById('note-name-field') as HTMLTextAreaElement;
+	
+	function adjustTextareaHeight(textarea: HTMLTextAreaElement) {
+		textarea.style.height = 'auto';
+		textarea.style.height = textarea.scrollHeight + 'px';
+	}
+
+	function handleNoteNameInput() {
+		noteNameField.value = sanitizeFileName(noteNameField.value);
+		adjustTextareaHeight(noteNameField);
+	}
+
+	noteNameField.addEventListener('input', handleNoteNameInput);
+	noteNameField.addEventListener('keydown', function(e) {
+		if (e.key === 'Enter' && !e.shiftKey) {
+			e.preventDefault();
+		}
+	});
+
+	// Initial height adjustment
+	adjustTextareaHeight(noteNameField);
+
 	async function initializeTemplateFields(template: Template, currentVariables: { [key: string]: string }, noteName?: string) {
 		const templateProperties = document.querySelector('.metadata-properties') as HTMLElement;
 		templateProperties.innerHTML = '';
@@ -222,10 +244,10 @@ document.addEventListener('DOMContentLoaded', function() {
 			templateProperties.appendChild(propertyDiv);
 		}
 
-		const noteNameField = document.getElementById('note-name-field') as HTMLInputElement;
 		if (noteNameField) {
 			let formattedNoteName = await replaceVariables(tabId, template.noteNameFormat, currentVariables);
 			noteNameField.value = sanitizeFileName(formattedNoteName);
+			adjustTextareaHeight(noteNameField);
 		}
 
 		const pathField = document.getElementById('path-name-field') as HTMLInputElement;
