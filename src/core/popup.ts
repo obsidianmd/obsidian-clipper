@@ -188,8 +188,8 @@ document.addEventListener('DOMContentLoaded', function() {
 	const noteNameField = document.getElementById('note-name-field') as HTMLTextAreaElement;
 	
 	function adjustTextareaHeight(textarea: HTMLTextAreaElement) {
-		textarea.style.height = 'auto';
-		textarea.style.height = textarea.scrollHeight + 'px';
+		textarea.style.minHeight = '2rem';
+		textarea.style.minHeight = textarea.scrollHeight + 'px';
 	}
 
 	function handleNoteNameInput() {
