@@ -5,6 +5,7 @@ import { extractPageContent, initializePageContent, replaceVariables } from '../
 import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
 import { unescapeValue } from '../utils/string-utils';
 import { decompressFromUTF16 } from 'lz-string';
+import { getLocalStorage, setLocalStorage } from '../utils/storage-utils';
 
 let currentTemplate: Template | null = null;
 let templates: Template[] = [];
@@ -137,6 +138,29 @@ document.addEventListener('DOMContentLoaded', function() {
 		});
 	}
 
+	function setupMetadataToggle() {
+		const metadataHeader = document.querySelector('.metadata-properties-header') as HTMLElement;
+		const metadataProperties = document.querySelector('.metadata-properties') as HTMLElement;
+		
+		if (metadataHeader && metadataProperties) {
+			metadataHeader.addEventListener('click', () => {
+				const isCollapsed = metadataProperties.classList.toggle('collapsed');
+				metadataHeader.classList.toggle('collapsed');
+				setLocalStorage('propertiesCollapsed', isCollapsed);
+			});
+
+			getLocalStorage('propertiesCollapsed').then((isCollapsed) => {
+				if (isCollapsed) {
+					metadataProperties.classList.add('collapsed');
+					metadataHeader.classList.add('collapsed');
+				} else {
+					metadataProperties.classList.remove('collapsed');
+					metadataHeader.classList.remove('collapsed');
+				}
+			});
+		}
+	}
+
 	// Template selection change
 	templateDropdown.addEventListener('change', async function(this: HTMLSelectElement) {
 		currentTemplate = templates.find((t: Template) => t.name === this.value) || null;
@@ -242,6 +266,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		}
 
 		initializeIcons();
+		setupMetadataToggle();
 	}
 
 	const clipButton = document.getElementById('clip-button') as HTMLButtonElement;
