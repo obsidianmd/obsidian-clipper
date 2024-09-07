@@ -1,6 +1,20 @@
 .popup {
 	width: 340px;
 	overflow: hidden;
+	#open-settings {
+		z-index: 10;
+		position: fixed;
+		top: 4px;
+		right: 4px;
+		border-radius: 4px;
+		user-select: none;
+		background-color: transparent;
+	}
+	.error-message {
+		margin: 0;
+		padding: 24px 12px;
+		text-align: center;
+	}
 }
 .clipper {
 	display: flex;
@@ -13,7 +27,7 @@
 		border-radius: 0;
 		border: none;
 		padding: 10px 8px 8px;
-		width: calc(100% - 8px);
+		width: calc(100% - 36px);
 		margin-inline-start: 0;
 		margin-inline-end: auto;
 		font-weight: 500;
@@ -131,10 +145,4 @@
 		border-top: 1px solid var(--background-modifier-border);
 		background-color: var(--background-primary);
 	}
-}
-
-#open-settings {
-	padding: 0 10px 10px;
-	width: 100%;
-	user-select: none;
 }

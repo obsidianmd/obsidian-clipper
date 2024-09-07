@@ -11,6 +11,9 @@ let currentTemplate: Template | null = null;
 let templates: Template[] = [];
 
 document.addEventListener('DOMContentLoaded', function() {
+	// Initialize icons immediately
+	initializeIcons();
+
 	const vaultContainer = document.getElementById('vault-container') as HTMLElement;
 	const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement;
 	const templateContainer = document.getElementById('template-container') as HTMLElement;
@@ -318,6 +321,12 @@ document.addEventListener('DOMContentLoaded', function() {
 		errorMessage.textContent = message;
 		errorMessage.style.display = 'block';
 		clipper.style.display = 'none';
+
+		// Ensure the settings icon is still visible when showing an error
+		const settingsIcon = document.getElementById('open-settings') as HTMLElement;
+		if (settingsIcon) {
+			settingsIcon.style.display = 'flex';
+		}
 	}
 });
 
