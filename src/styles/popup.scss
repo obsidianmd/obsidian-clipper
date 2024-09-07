@@ -1,12 +1,12 @@
 .popup {
 	width: 340px;
-	min-height: 500px;
 	overflow: hidden;
 }
 .clipper {
 	display: flex;
 	flex-direction: column;
 	padding: 0;
+	min-height: 500px;
 	height: 100vh;
 
 	#template-select {
