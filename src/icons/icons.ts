@@ -1,4 +1,4 @@
-import { Trash2, AlignLeft, Binary, List, Calendar, Clock, SquareCheckBig, GripVertical } from 'lucide';
+import { Trash2, AlignLeft, Binary, List, Calendar, Clock, SquareCheckBig, GripVertical, Settings } from 'lucide';
 import { createIcons } from 'lucide';
 
 export const icons = {
@@ -9,7 +9,8 @@ export const icons = {
 	Calendar,
 	Clock,
 	SquareCheckBig,
-	GripVertical
+	GripVertical,
+	Settings
 };
 
 export function initializeIcons(root: HTMLElement | Document = document) {
