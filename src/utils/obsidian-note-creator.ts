@@ -8,7 +8,6 @@ export async function generateFrontmatter(properties: Property[]): Promise<strin
 
 		switch (property.type) {
 			case 'multitext':
-				frontmatter += '\n';
 				let items: string[];
 				if (property.value.startsWith('[') && property.value.endsWith(']')) {
 					try {
@@ -19,9 +18,15 @@ export async function generateFrontmatter(properties: Property[]): Promise<strin
 				} else {
 					items = property.value.split(',').map(item => item.trim());
 				}
-				items.forEach(item => {
-					frontmatter += `  - "${item}"\n`;
-				});
+				items = items.filter(item => item !== '');
+				if (items.length > 0) {
+					frontmatter += '\n';
+					items.forEach(item => {
+						frontmatter += `  - "${item}"\n`;
+					});
+				} else {
+					frontmatter += '\n';
+				}
 				break;
 			case 'number':
 				const numericValue = property.value.replace(/[^\d.-]/g, '');
