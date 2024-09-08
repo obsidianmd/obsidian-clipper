@@ -16,7 +16,6 @@
 			</select>
 		</div>
 		<textarea id="note-name-field" type="text" placeholder="Note name" rows="1"></textarea>
-		<input id="path-name-field" type="text" style="display: none;"/>
 		<div class="metadata-properties-header">
 			Properties
 		</div>
@@ -25,9 +24,12 @@
 			<textarea id="note-content-field" rows="4" placeholder="Notes about this page..."></textarea>
 		</div>
 		<div class="clipper-footer">
-			<div id="vault-container" style="display: none;">
-				<select id="vault-select"></select>
+			<div class="vault-path-container">
+				<div id="vault-container" style="display: none;">
+					<select id="vault-select"></select>
 				</div>
+				<input id="path-name-field" type="text"/>
+			</div>
 			<button id="clip-button" class="mod-cta">Save in Obsidian</button>
 		</div>
 	</div>
