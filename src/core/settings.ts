@@ -110,7 +110,7 @@ function initializeKeyboardShortcuts() {
 			shortcutItem.className = 'shortcut-item';
 			shortcutItem.innerHTML = `
 				<span>${command.description}</span>
-				<span class="shortcut-display">${command.shortcut || 'Not set'}</span>
+				<span class="setting-hotkey">${command.shortcut || 'Not set'}</span>
 			`;
 			shortcutsList.appendChild(shortcutItem);
 		});
