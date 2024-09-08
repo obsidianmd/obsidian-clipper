@@ -9,14 +9,16 @@ export async function generateFrontmatter(properties: Property[]): Promise<strin
 		switch (property.type) {
 			case 'multitext':
 				let items: string[];
-				if (property.value.startsWith('[') && property.value.endsWith(']')) {
+				if (property.value.trim().startsWith('["') && property.value.trim().endsWith('"]')) {
 					try {
 						items = JSON.parse(property.value);
 					} catch (e) {
-						items = [property.value];
+						// If parsing fails, fall back to splitting by comma
+						items = property.value.split(',').map(item => item.trim());
 					}
 				} else {
-					items = property.value.split(',').map(item => item.trim());
+					// Split by comma, but keep wikilinks intact
+					items = property.value.split(/,(?![^\[]*\]\])/).map(item => item.trim());
 				}
 				items = items.filter(item => item !== '');
 				if (items.length > 0) {
