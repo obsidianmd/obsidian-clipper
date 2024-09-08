@@ -13,7 +13,6 @@ let templates: Template[] = [];
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 	if (request.action === "triggerQuickClip") {
-		document.body.classList.add('quick-clip');
 		handleClip().then(() => {
 			sendResponse({success: true});
 		}).catch((error) => {
@@ -75,10 +74,7 @@ async function handleClip() {
 
 	try {
 		await saveToObsidian(fileContent, noteName, path, selectedVault, currentTemplate.behavior, currentTemplate.specificNoteName, currentTemplate.dailyNoteFormat);
-		if (document.body.classList.contains('quick-clip')) {
-			// Don't close the window immediately, wait a bit to ensure the message is sent
-			setTimeout(() => window.close(), 100);
-		}
+		setTimeout(() => window.close(), 50);
 	} catch (error) {
 		console.error('Error in handleClip:', error);
 		showError('Failed to save to Obsidian. Please try again.');
@@ -87,7 +83,6 @@ async function handleClip() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-	// Initialize icons immediately
 	initializeIcons();
 
 	const vaultContainer = document.getElementById('vault-container') as HTMLElement;

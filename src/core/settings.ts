@@ -9,7 +9,7 @@ import { createIcons } from 'lucide';
 import { icons } from '../icons/icons';
 import { resetUnsavedChanges } from '../managers/template-manager';
 import { initializeDropZone } from '../utils/import-export';
-import { getCommands } from '../utils/command-utils';
+import { getCommands } from '../utils/hotkeys';
 
 document.addEventListener('DOMContentLoaded', () => {
 	const vaultInput = document.getElementById('vault-input') as HTMLInputElement;
