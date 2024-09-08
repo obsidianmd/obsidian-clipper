@@ -69,22 +69,13 @@ export function importTemplate(): void {
 					id: Date.now().toString() + Math.random().toString(36).substr(2, 9)
 				}));
 
-				const existingIndex = templates.findIndex(t => t.name === importedTemplate.name);
-				if (existingIndex !== -1) {
-					if (confirm(`A template named "${importedTemplate.name}" already exists. Do you want to replace it?`)) {
-							templates[existingIndex] = importedTemplate as Template;
-					} else {
-						let newName = importedTemplate.name as string;
-						let counter = 1;
-						while (templates.some(t => t.name === newName)) {
-							newName = `${importedTemplate.name} (${counter++})`;
-						}
-						importedTemplate.name = newName;
-						templates.push(importedTemplate as Template);
-					}
-				} else {
-					templates.push(importedTemplate as Template);
+				let newName = importedTemplate.name as string;
+				let counter = 1;
+				while (templates.some(t => t.name === newName)) {
+					newName = `${importedTemplate.name} (${counter++})`;
 				}
+				importedTemplate.name = newName;
+				templates.push(importedTemplate as Template);
 
 				saveTemplateSettings();
 				updateTemplateList();
@@ -223,22 +214,13 @@ function importTemplateFile(file: File): void {
 				id: Date.now().toString() + Math.random().toString(36).substr(2, 9)
 			}));
 
-			const existingIndex = templates.findIndex(t => t.name === importedTemplate.name);
-			if (existingIndex !== -1) {
-				if (confirm(`A template named "${importedTemplate.name}" already exists. Do you want to replace it?`)) {
-						templates[existingIndex] = importedTemplate as Template;
-				} else {
-					let newName = importedTemplate.name as string;
-					let counter = 1;
-					while (templates.some(t => t.name === newName)) {
-						newName = `${importedTemplate.name} (${counter++})`;
-					}
-					importedTemplate.name = newName;
-					templates.push(importedTemplate as Template);
-				}
-			} else {
-				templates.push(importedTemplate as Template);
+			let newName = importedTemplate.name as string;
+			let counter = 1;
+			while (templates.some(t => t.name === newName)) {
+				newName = `${importedTemplate.name} (${counter++})`;
 			}
+			importedTemplate.name = newName;
+			templates.push(importedTemplate as Template);
 
 			saveTemplateSettings();
 			updateTemplateList();
