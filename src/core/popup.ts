@@ -6,9 +6,85 @@ import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
 import { unescapeValue } from '../utils/string-utils';
 import { decompressFromUTF16 } from 'lz-string';
 import { getLocalStorage, setLocalStorage } from '../utils/storage-utils';
+import { findMatchingTemplate } from '../utils/url-pattern-match';
 
 let currentTemplate: Template | null = null;
 let templates: Template[] = [];
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+	if (request.action === "triggerQuickClip") {
+		document.body.classList.add('quick-clip');
+		handleClip().then(() => {
+			sendResponse({success: true});
+		}).catch((error) => {
+			console.error('Error in handleClip:', error);
+			sendResponse({success: false, error: error.message});
+		});
+		return true;
+	}
+});
+
+function showError(message: string) {
+	const errorMessage = document.querySelector('.error-message') as HTMLElement;
+	const clipper = document.querySelector('.clipper') as HTMLElement;
+
+	if (errorMessage && clipper) {
+		errorMessage.textContent = message;
+		errorMessage.style.display = 'block';
+		clipper.style.display = 'none';
+
+		// Ensure the settings icon is still visible when showing an error
+		const settingsIcon = document.getElementById('open-settings') as HTMLElement;
+		if (settingsIcon) {
+			settingsIcon.style.display = 'flex';
+		}
+	}
+}
+
+async function handleClip() {
+	if (!currentTemplate) return;
+
+	const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement;
+	const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
+	const noteNameField = document.getElementById('note-name-field') as HTMLInputElement;
+	const pathField = document.getElementById('path-name-field') as HTMLInputElement;
+
+	if (!vaultDropdown || !noteContentField || !noteNameField || !pathField) {
+		showError('Some required fields are missing. Please try reloading the extension.');
+		return;
+	}
+
+	const selectedVault = vaultDropdown.value;
+	const noteContent = noteContentField.value;
+	const noteName = noteNameField.value;
+	const path = pathField.value;
+
+	const properties = Array.from(document.querySelectorAll('.metadata-property input')).map(input => ({
+		name: input.id,
+		value: (input as HTMLInputElement).value,
+		type: input.getAttribute('data-type') || 'text'
+	}));
+
+	let fileContent: string;
+	if (currentTemplate.behavior === 'create') {
+		const frontmatter = await generateFrontmatter(properties as Property[]);
+		fileContent = frontmatter + noteContent;
+	} else {
+		fileContent = noteContent;
+	}
+
+	try {
+		await saveToObsidian(fileContent, noteName, path, selectedVault, currentTemplate.behavior, currentTemplate.specificNoteName, currentTemplate.dailyNoteFormat);
+		if (document.body.classList.contains('quick-clip')) {
+			// Don't close the window immediately, wait a bit to ensure the message is sent
+			setTimeout(() => window.close(), 100);
+		}
+	} catch (error) {
+		console.error('Error in handleClip:', error);
+		showError('Failed to save to Obsidian. Please try again.');
+		throw error; // Re-throw the error so it can be caught by the caller
+	}
+}
 
 document.addEventListener('DOMContentLoaded', function() {
 	// Initialize icons immediately
@@ -44,26 +120,6 @@ document.addEventListener('DOMContentLoaded', function() {
 		} else {
 			vaultContainer.style.display = 'none';
 		}
-	}
-
-	function findMatchingTemplate(url: string): Template | undefined {
-		return templates.find(template => 
-			template.urlPatterns && template.urlPatterns.some(pattern => {
-				if (pattern.startsWith('/') && pattern.endsWith('/')) {
-					// Treat as regex
-					try {
-						const regexPattern = new RegExp(pattern.slice(1, -1));
-						return regexPattern.test(url);
-					} catch (error) {
-						console.error(`Invalid regex pattern: ${pattern}`, error);
-						return false;
-					}
-				} else {
-					// Treat as string startsWith
-					return url.startsWith(pattern);
-				}
-			})
-		);
 	}
 
 	// Load templates from sync storage and populate dropdown
@@ -102,7 +158,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			const currentUrl = tabs[0].url;
 
 			// Find matching template
-			currentTemplate = findMatchingTemplate(currentUrl) || templates[0];
+			currentTemplate = findMatchingTemplate(currentUrl, templates) || templates[0];
 
 			// Update the template dropdown to reflect the matched template
 			if (currentTemplate) {
@@ -297,72 +353,18 @@ document.addEventListener('DOMContentLoaded', function() {
 	const clipButton = document.getElementById('clip-button') as HTMLButtonElement;
 	clipButton.focus();
 
-	document.getElementById('clip-button')!.addEventListener('click', async function() {
-		if (!currentTemplate) return;
-
-		const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement;
-		const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
-		const noteNameField = document.getElementById('note-name-field') as HTMLInputElement;
-		const pathField = document.getElementById('path-name-field') as HTMLInputElement;
-
-		if (!vaultDropdown || !noteContentField || !noteNameField || !pathField) {
-			showError('Some required fields are missing. Please try reloading the extension.');
-			return;
-		}
-
-		const selectedVault = vaultDropdown.value;
-		const noteContent = noteContentField.value;
-		const noteName = noteNameField.value;
-		const path = pathField.value;
-
-		const properties = Array.from(document.querySelectorAll('.metadata-property input')).map(input => ({
-			name: input.id,
-			value: (input as HTMLInputElement).value,
-			type: input.getAttribute('data-type') || 'text'
-		}));
-
-		let fileContent: string;
-		if (currentTemplate.behavior === 'create') {
-			const frontmatter = await generateFrontmatter(properties as Property[]);
-			fileContent = frontmatter + noteContent;
-		} else {
-			fileContent = noteContent;
-		}
-
-		try {
-			await saveToObsidian(fileContent, noteName, path, selectedVault, currentTemplate.behavior, currentTemplate.specificNoteName, currentTemplate.dailyNoteFormat);
-			window.close();
-		} catch (error) {
-			console.error('Error saving to Obsidian:', error);
-			showError('Failed to save to Obsidian. Please try again.');
-		}
-	});
+	document.getElementById('clip-button')!.addEventListener('click', handleClip);
 
 	document.getElementById('open-settings')!.addEventListener('click', function() {
 		chrome.runtime.openOptionsPage();
 	});
 
-	function showError(message: string) {
-		const errorMessage = document.querySelector('.error-message') as HTMLElement;
-		const clipper = document.querySelector('.clipper') as HTMLElement;
-
-		errorMessage.textContent = message;
-		errorMessage.style.display = 'block';
-		clipper.style.display = 'none';
-
-		// Ensure the settings icon is still visible when showing an error
-		const settingsIcon = document.getElementById('open-settings') as HTMLElement;
-		if (settingsIcon) {
-			settingsIcon.style.display = 'flex';
-		}
+	function escapeHtml(unsafe: string): string {
+		return unsafe
+			.replace(/&/g, "&amp;")
+			.replace(/</g, "&lt;")
+			.replace(/>/g, "&gt;")
+			.replace(/"/g, "&quot;")
+			.replace(/'/g, "&#039;");
 	}
 });
-
-function escapeHtml(unsafe: string): string {
-	return unsafe
-		.replace(/&/g, "&amp;")
-		.replace(/</g, "&lt;")
-		.replace(/>/g, "&gt;")
-		.replace(/"/g, "&quot;")
-		.replace(/'/g, "&#039;");
-}
