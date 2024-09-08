@@ -1,6 +1,13 @@
+.popup:has(.variables-panel.show) {
+	width: 500px;
+	max-height: 900px;
+	transition: width 0.1s ease-in-out;
+	overflow: hidden;
+}
 .popup {
 	width: 340px;
 	overflow: hidden;
+	transition: width 0.1s ease-in-out;
 	::selection {
 		background-color: var(--text-selection);
 	}

@@ -366,11 +366,13 @@ document.addEventListener('DOMContentLoaded', function() {
 		if (currentTemplate && Object.keys(currentVariables).length > 0) {
 			const formattedVariables = formatVariables(currentVariables);
 			variablesPanel.innerHTML = `
-				<h3>Page variables</h3>
+				<div class="variables-header">
+					<h3>Page variables</h3>
+					<span class="close-panel clickable-icon" aria-label="Close">
+						<i data-lucide="x"></i>
+					</span>
+				</div>
 				<div class="variable-list">${formattedVariables}</div>
-				<span class="close-panel clickable-icon" aria-label="Close">
-					<i data-lucide="x"></i>
-				</span>
 			`;
 			variablesPanel.classList.add('show');
 			initializeIcons();
