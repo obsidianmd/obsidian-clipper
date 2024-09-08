@@ -113,7 +113,7 @@ export function showTemplateEditor(template: Template | null): void {
 			name: 'New template',
 			behavior: 'create',
 			noteNameFormat: '{{title}}',
-			path: 'Clippings/',
+			path: 'Clippings',
 			noteContentFormat: '{{content}}',
 			properties: [],
 			urlPatterns: []
@@ -277,7 +277,7 @@ export function createDefaultTemplate(): Template {
 		name: 'Default',
 		behavior: 'create',
 		noteNameFormat: '{{title}}',
-		path: 'Clippings/',
+		path: 'Clippings',
 		noteContentFormat: '{{content}}',
 		properties: [
 			{ id: Date.now().toString() + Math.random().toString(36).slice(2, 11), name: 'title', value: '{{title}}', type: 'text' },
@@ -324,7 +324,7 @@ function clearTemplateEditor(): void {
 	if (templateName) templateName.value = '';
 	if (templateProperties) templateProperties.innerHTML = '';
 	const pathInput = document.getElementById('template-path-name') as HTMLInputElement;
-	if (pathInput) pathInput.value = 'Clippings/';
+	if (pathInput) pathInput.value = 'Clippings';
 	const urlPatternsTextarea = document.getElementById('url-patterns') as HTMLTextAreaElement;
 	if (urlPatternsTextarea) urlPatternsTextarea.value = '';
 	const templateEditor = document.getElementById('template-editor');
