@@ -10,8 +10,16 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 
 	function makeUrlAbsolute(element: Element, attributeName: string) {
 		const attributeValue = element.getAttribute(attributeName);
-		if (attributeValue && !attributeValue.startsWith('http') && !attributeValue.startsWith('data:') && !attributeValue.startsWith('#') && !attributeValue.startsWith('mailto:')) {
-			element.setAttribute(attributeName, new URL(attributeValue, baseUrl).href);
+		if (attributeValue) {
+			if (attributeValue.startsWith('chrome-extension://')) {
+				// Remove the chrome-extension:// part and everything up to the next slash
+				const path = attributeValue.split('/').slice(3).join('/');
+				const newUrl = new URL(path, baseUrl).href;
+				element.setAttribute(attributeName, newUrl);
+			} else if (!attributeValue.startsWith('http') && !attributeValue.startsWith('data:') && !attributeValue.startsWith('#') && !attributeValue.startsWith('mailto:')) {
+				const newUrl = new URL(attributeValue, baseUrl).href;
+				element.setAttribute(attributeName, newUrl);
+			}
 		}
 	}
 
