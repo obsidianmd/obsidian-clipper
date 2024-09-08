@@ -4,6 +4,7 @@ textarea {
 }
 select {
 	user-select: none;
+	cursor: pointer;
 }
 select,
 input[type="text"],
@@ -48,5 +49,5 @@ label {
 	display: block;
 	margin: 20px 0 6px;
 	font-weight: 600;
-	font-size: 0.875rem;
+	font-size: var(--font-ui-small);
 }

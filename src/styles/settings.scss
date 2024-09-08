@@ -46,7 +46,7 @@
 	align-items: center;
 	gap: 8px;
 	.setting-item-info {
-		font-size: 0.875rem;
+		font-size: var(--font-ui-small);
 		label {
 			margin: 0;
 			font-weight: 400;
@@ -56,7 +56,7 @@
 
 .setting-item-description {
 	color: var(--text-muted);
-	font-size: 0.8rem;
+	font-size: var(--font-ui-smaller);
 	margin: 4px 0 12px;
 	line-height: 1.3;
 	a {
@@ -72,7 +72,7 @@
 	margin-left: -2px;
 	font-weight: 500;
 	color: var(--text-muted);
-	font-size: 0.875rem;
+	font-size: var(--font-ui-small);
 	user-select: none;
 	white-space: nowrap;
 	a {
@@ -96,7 +96,7 @@
 	padding: 0 16px 24px 16px;
 
 	ul {
-		font-size: 0.857rem;
+		font-size: var(--font-ui-small);
 		list-style-type: none;
 		padding: 0;
 		margin: 0;
@@ -124,7 +124,7 @@
 		margin-top: 16px;
 		pointer-events: none;
 		color: var(--text-faint);
-		font-size: 0.8rem;
+		font-size: var(--font-ui-smaller);
 	}
 
 	#template-list {
@@ -260,8 +260,7 @@
 		gap: 4px;
 		padding: 2px 0;
 		align-items: center;
-		font-size: 0.875rem;
-		font-weight: 500;
+		font-size: var(--font-ui-small);
 		border-bottom: 1px solid var(--background-modifier-border);
 		button {
 			margin-left: auto;
@@ -282,12 +281,12 @@
 	padding: 12px 0;
 	border-bottom: 1px solid var(--background-modifier-border);
 	span {
-		font-size: 0.875rem;
+		font-size: var(--font-ui-small);
 	}
 	.setting-hotkey {
 		background-color: var(--background-modifier-border);
 		padding: 2px 8px;
 		border-radius: 4px;
-		font-size: 0.8rem;
+		font-size: var(--font-ui-smaller);
 	}
 }

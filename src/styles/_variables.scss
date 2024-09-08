@@ -24,6 +24,11 @@
 	
 	--text-accent: var(--color-accent);
 	--text-on-accent: white;
+
+	--font-ui-smaller: 0.8125rem;
+	--font-ui-small: 0.875rem;
+	--font-ui-medium: 1rem;
+	--font-ui-large: 1.5rem;
 }
 
 @media (prefers-color-scheme: light) {

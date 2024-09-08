@@ -71,7 +71,7 @@ body.popup.quick-clip {
 		border: none;
 		border-radius: 0;
 		padding: 4px 32px 10px 12px;
-		font-size: 16px;
+		font-size: var(--font-ui-medium);
 		font-weight: 600;
 		resize: none;
 		min-height: 2rem;
@@ -85,7 +85,7 @@ body.popup.quick-clip {
 
 	.metadata-properties-header {
 		padding: 0 12px 6px;
-		font-size: 0.875rem;
+		font-size: var(--font-ui-small);
 		font-weight: 500;
 		color: var(--text-muted);
 		user-select: none;
@@ -138,7 +138,7 @@ body.popup.quick-clip {
 				text-overflow: ellipsis;
 				font-weight: 400;
 				color: var(--text-muted);
-				font-size: 14px;
+				font-size: var(--font-ui-small);
 				user-select: none;
 				margin: 0;
 			}
