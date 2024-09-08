@@ -9,7 +9,7 @@ Work in progress. Turning the [Obsidian web clipper bookmarklet](https://stephan
 
 ### URL patterns
 
-URL patterns allow you to automatically select the right template based on the current page URL. You can define multiple URL patterns for each template, separated by a new line.
+URL patterns allow you to automatically select a template based on the current page URL. You can define multiple URL patterns for each template, separated by a new line.
 
 Simple matching checks if the current page URL *starts with* the given pattern. For example:
 
@@ -41,7 +41,7 @@ These variables are automatically generated based on the page content.
 
 #### Meta variables
 
-These variables are extracted from the meta tags in the page.
+Meta variables allow you to extract data from meta tags in the page.
 
 - `{{meta:name:name}}` returns the content of the meta name tag with the given name.
 - `{{meta:property:property}}` returns the content of the meta property tag with the given property.
