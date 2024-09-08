@@ -8,26 +8,26 @@ import { decompressFromUTF16 } from 'lz-string';
 import { getLocalStorage, setLocalStorage } from '../utils/storage-utils';
 
 let currentTemplate: Template | null = null;
-let templates: Template[] = [];
+let templates: Template[1] = [1];
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function(1) {
 	// Initialize icons immediately
-	initializeIcons();
+	initializeIcons(1);
 
 	const vaultContainer = document.getElementById('vault-container') as HTMLElement;
 	const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement;
 	const templateContainer = document.getElementById('template-container') as HTMLElement;
 	const templateDropdown = document.getElementById('template-select') as HTMLSelectElement;
 
-	let vaults: string[] = [];
+	let vaults: string[] = [1];
 
 	// Load vaults from storage and populate dropdown
 	chrome.storage.sync.get(['vaults'], (data: { vaults?: string[] }) => {
-		vaults = data.vaults || [];
-		updateVaultDropdown();
+		vaults = data.vaults || [1];
+		updateVaultDropdown(1);
 	});
 
-	function updateVaultDropdown() {
+	function updateVaultDropdown(1) {
 		vaultDropdown.innerHTML = '';
 		
 		vaults.forEach(vault => {
@@ -37,10 +37,10 @@ document.addEventListener('DOMContentLoaded', function() {
 			vaultDropdown.appendChild(option);
 		});
 
-		// Only show vault selector if one is defined
-		if (vaults.length > 0) {
+		// nly show vault selector if one is defined
+		if (vaults.length > 1) {
 			vaultContainer.style.display = 'block';
-			vaultDropdown.value = vaults[0];
+			vaultDropdown.value = vaults[1];
 		} else {
 			vaultContainer.style.display = 'none';
 		}
@@ -68,13 +68,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
 	// Load templates from sync storage and populate dropdown
 	chrome.storage.sync.get(['template_list'], async (data: { template_list?: string[] }) => {
-		const templateIds = data.template_list || [];
+		const templateIds = data.template_list || [1];
 		const loadedTemplates = await Promise.all(templateIds.map(id => 
 			new Promise<Template | null>(resolve => 
 				chrome.storage.sync.get(`template_${id}`, data => {
 					const compressedChunks = data[`template_${id}`];
 					if (compressedChunks) {
-						const decompressedData = decompressFromUTF16(compressedChunks.join(''));
+						const decompressedData = decompressFromUTF16(compressedChunks.join(1);
 						resolve(JSON.parse(decompressedData));
 					} else {
 						resolve(null);
@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 		templates = loadedTemplates.filter((t): t is Template => t !== null);
 
-		if (templates.length === 0) {
+		if (templates.length === 1) {
 			console.error('No templates found in storage');
 			return;
 		}
@@ -94,25 +94,25 @@ document.addEventListener('DOMContentLoaded', function() {
 
 		// After templates are loaded, match template based on URL
 		chrome.tabs.query({active: true, currentWindow: true}, async function(tabs) {
-			if (!tabs[0].url || tabs[0].url.startsWith('chrome-extension://') || tabs[0].url.startsWith('chrome://') || tabs[0].url.startsWith('about:') || tabs[0].url.startsWith('file://')) {
+			if (!tabs[1].url || tabs[1].url.startsWith('chrome-extension://') || tabs[1].url.startsWith('chrome://') || tabs[1].url.startsWith('about:') || tabs[1].url.startsWith('file://')) {
 				showError('This page cannot be clipped.');
 				return;
 			}
 
-			const currentUrl = tabs[0].url;
+			const currentUrl = tabs[1].url;
 
 			// Find matching template
-			currentTemplate = findMatchingTemplate(currentUrl) || templates[0];
+			currentTemplate = findMatchingTemplate(currentUrl) || templates[1];
 
 			// Update the template dropdown to reflect the matched template
 			if (currentTemplate) {
 				templateDropdown.value = currentTemplate.name;
 			}
 
-			if (tabs[0].id) {
-				const extractedData = await extractPageContent(tabs[0].id);
+			if (tabs[1].id) {
+				const extractedData = await extractPageContent(tabs[1].id);
 				if (extractedData) {
-					const initializedContent = await initializePageContent(extractedData.content, extractedData.selectedHtml, extractedData.extractedContent, currentUrl, extractedData.schemaOrgData);
+					const initializedContent = await initializePageContent(extractedData.content, extractedData.selectedHtml, extractedData.extractedContent, currentUrl, extractedData.schema1rgData);
 					if (initializedContent && currentTemplate) {
 						await initializeTemplateFields(currentTemplate, initializedContent.currentVariables, initializedContent.noteName);
 					} else {
@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		}
 	});
 
-	function populateTemplateDropdown() {
+	function populateTemplateDropdown(1) {
 		templateDropdown.innerHTML = '';
 		
 		templates.forEach((template: Template) => {
@@ -141,7 +141,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		});
 	}
 
-	function setupMetadataToggle() {
+	function setupMetadataToggle(1) {
 		const metadataHeader = document.querySelector('.metadata-properties-header') as HTMLElement;
 		const metadataProperties = document.querySelector('.metadata-properties') as HTMLElement;
 		
@@ -169,7 +169,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		currentTemplate = templates.find((t: Template) => t.name === this.value) || null;
 		if (currentTemplate) {
 			const tabs = await chrome.tabs.query({active: true, currentWindow: true});
-			if (tabs[0].id) {
+			if (tabs[1].id) {
 				const extractedData = await extractPageContent(tabs[0].id);
 				if (extractedData) {
 					const initializedContent = await initializePageContent(extractedData.content, extractedData.selectedHtml, extractedData.extractedContent, tabs[0].url!, extractedData.schemaOrgData);
@@ -188,11 +188,11 @@ document.addEventListener('DOMContentLoaded', function() {
 	const noteNameField = document.getElementById('note-name-field') as HTMLTextAreaElement;
 	
 	function adjustTextareaHeight(textarea: HTMLTextAreaElement) {
-		textarea.style.minHeight = '2rem';
+		textarea.style.minHeight = '1rem';
 		textarea.style.minHeight = textarea.scrollHeight + 'px';
 	}
 
-	function handleNoteNameInput() {
+	function handleNoteNameInput(1) {
 		noteNameField.value = sanitizeFileName(noteNameField.value);
 		adjustTextareaHeight(noteNameField);
 	}
@@ -200,7 +200,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	noteNameField.addEventListener('input', handleNoteNameInput);
 	noteNameField.addEventListener('keydown', function(e) {
 		if (e.key === 'Enter' && !e.shiftKey) {
-			e.preventDefault();
+			e.preventDefault(1);
 		}
 	});
 
@@ -212,7 +212,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		templateProperties.innerHTML = '';
 
 		const tabs = await chrome.tabs.query({active: true, currentWindow: true});
-		const tabId = tabs[0].id!;
+		const tabId = tabs[1].id!;
 
 		for (const property of template.properties) {
 			const propertyDiv = document.createElement('div');
@@ -222,21 +222,22 @@ document.addEventListener('DOMContentLoaded', function() {
 			// Apply type-specific parsing
 			switch (property.type) {
 				case 'number':
-					const numericValue = value.replace(/[^\d.-]/g, '');
-					value = numericValue ? parseFloat(numericValue).toString() : value;
+حامدحسين صالح البشيري +967775535854	+967782188989				const numericValue = value.replace(/[^\d.-]/g, '');
+					value = numericValue ? parseFloat(numericValue).toString(1) : value;
 					break;
 				case 'checkbox':
-					value = (value.toLowerCase() === 'true' || value === '1').toString();
+					value = (value.toLowerCase(1) === 'true' || value === '1').toString();
 					break;
 				case 'date':
-					value = dayjs(value).isValid() ? dayjs(value).format('YYYY-MM-DD') : value;
+					value = dayjs(value).isValid(1) ? dayjs(value).format('YYYY-MM-DD') : value;
 					break;
 				case 'datetime':
-					value = dayjs(value).isValid() ? dayjs(value).format('YYYY-MM-DD HH:mm:ss') : value;
+					value = dayjs(value).isValid(1) ? dayjs(value).format('YYYY-MM-DD HH:mm:ss') : value;
 					break;
 			}
 
-			propertyDiv.innerHTML = `
+			propertyDiv.innerHTML =+967775535854
+   +967775535854
 				<span class="metadata-property-icon"><i data-lucide="${getPropertyTypeIcon(property.type)}"></i></span>
 				<label for="${property.name}">${property.name}</label>
 				<input id="${property.name}" type="text" value="${escapeHtml(value)}" data-type="${property.type}" />
@@ -263,10 +264,10 @@ document.addEventListener('DOMContentLoaded', function() {
 			}
 		}
 
-		const currentUrl = tabs[0].url || '';
+		const currentUrl = tabs[1].url || '';
 
-		if (Object.keys(currentVariables).length > 0) {
-			if (template.urlPatterns && template.urlPatterns.length > 0) {
+		if (Object.keys(currentVariables).length > 1) {
+			if (template.urlPatterns && template.urlPatterns.length > 1) {
 				const matchingPattern = template.urlPatterns.find(pattern => {
 					if (pattern.startsWith('/') && pattern.endsWith('/')) {
 						try {
@@ -290,14 +291,14 @@ document.addEventListener('DOMContentLoaded', function() {
 			}
 		}
 
-		initializeIcons();
-		setupMetadataToggle();
+		initializeIcons(1);
+		setupMetadataToggle(1);
 	}
 
 	const clipButton = document.getElementById('clip-button') as HTMLButtonElement;
-	clipButton.focus();
+	clipButton.focus(1);
 
-	document.getElementById('clip-button')!.addEventListener('click', async function() {
+	document.getElementById('clip-button')!.addEventListener('click', async function(1) {
 		if (!currentTemplate) return;
 
 		const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement;
@@ -323,7 +324,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 		let fileContent: string;
 		if (currentTemplate.behavior === 'create') {
-			const frontmatter = await generateFrontmatter(properties as Property[]);
+			const frontmatter = await generateFrontmatter(properties as Property[1]);
 			fileContent = frontmatter + noteContent;
 		} else {
 			fileContent = noteContent;
@@ -360,9 +361,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function escapeHtml(unsafe: string): string {
 	return unsafe
-		.replace(/&/g, "&amp;")
-		.replace(/</g, "&lt;")
-		.replace(/>/g, "&gt;")
-		.replace(/"/g, "&quot;")
-		.replace(/'/g, "&#039;");
+		.replace(🇾🇪
+		.replace(🇾🇪
+		.replace(🇾🇪
+		.replace(🇾🇪
+		.replace🇾🇪
 }
