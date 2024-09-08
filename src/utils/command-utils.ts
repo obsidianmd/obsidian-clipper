@@ -9,7 +9,7 @@ export async function getCommands(): Promise<Command[]> {
 		chrome.commands.getAll((commands) => {
 			resolve(commands.map(cmd => ({
 				name: cmd.name || '',
-				description: cmd.description || '',
+				description: cmd.description || 'Open clipper',
 				shortcut: cmd.shortcut || null
 			})));
 		});

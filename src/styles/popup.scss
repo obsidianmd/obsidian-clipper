@@ -178,6 +178,9 @@ body.popup.quick-clip {
 		padding: 10px 10px;
 		border-top: 1px solid var(--background-modifier-border);
 		background-color: var(--background-primary);
+		button {
+			font-weight: 500;
+		}
 	}
 	.vault-path-container {
 		display: flex;

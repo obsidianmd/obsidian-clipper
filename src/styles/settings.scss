@@ -39,6 +39,16 @@
 	gap: 8px;
 }
 
+.setting-item.mod-horizontal {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	.setting-item-info {
+		font-size: 0.875rem;
+	}
+}
+
 .setting-item-description {
 	color: var(--text-muted);
 	font-size: 0.8rem;
