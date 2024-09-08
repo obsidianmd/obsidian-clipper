@@ -27,8 +27,8 @@
 
 	.close-panel {
 		position: fixed;
-		top: 6px;
-		right: 8px;
+		top: 4px;
+		right: 4px;
 		cursor: pointer;
 		border-radius: 4px;
 		background-color: transparent;
@@ -38,6 +38,7 @@
 		margin-top: 0;
 		border: none;
 		margin-bottom: 0;
+		user-select: none;
 	}
 
 	.variables-header {
@@ -48,14 +49,14 @@
 	.variable-list {
 		word-break: break-all;
 		overflow-y: auto;
-		padding: 2px 12px 8px;
+		padding: 8px 12px 8px;
 	}
 
 	.variable-item {
 		display: flex;
-		margin: 4px 0;
+		margin: 2px 0;
+		padding: 2px 0;
 		border-bottom: 1px solid var(--background-modifier-border);
-		padding: 4px 0;
 		&:last-child {
 			border-bottom: none;
 		}
@@ -64,17 +65,13 @@
 	.variable-key {
 		font-weight: 600;
 		color: var(--text-accent);
-		margin-right: 8px;
+		margin-right: 4px;
 		flex-shrink: 0;
 		cursor: pointer;
 		transition: color 0.2s ease;
 
 		&:hover {
 			color: var(--text-accent-hover);
-		}
-
-		&:active {
-			color: var(--text-accent-active);
 		}
 	}
 
