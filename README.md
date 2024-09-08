@@ -35,7 +35,7 @@ These variables are automatically generated based on the page content.
 | `{{published}`    | Published date               |
 | `{{image}}`       | Social share image URL       |
 | `{{content}}`     | Article content or selection |
-| `{{today}}`       | Today's date                 |
+| `{{date}}`        | Today's date                 |
 | `{{url}}`         | Current URL                  |
 | `{{domain}}`      | Domain                       |
 
