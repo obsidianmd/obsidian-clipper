@@ -30,7 +30,7 @@ a.text-muted,
 }
 
 .small {
-	font-size: 0.875rem;
+	font-size: var(--font-ui-small);
 }
 
 h2 {
@@ -38,8 +38,13 @@ h2 {
 	margin-bottom: 0.25rem;
 }
 h3 {
-	font-size: 1.25rem;
+	font-size: var(--font-ui-medium);
+	font-weight: 600;
+	margin-top: 2rem;
+	margin-bottom: 1rem;
+	border-bottom: 1px solid var(--background-modifier-border);
+	padding-bottom: 0.5rem;
 }
 h4 {
-	font-size: 1rem;
+	font-size: var(--font-ui-medium);
 }

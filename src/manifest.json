@@ -6,7 +6,8 @@
 	"permissions": [
 		"activeTab",
 		"tabs",
-		"storage"
+		"storage",
+		"commands"
 	],
 	"action": {
 		"default_popup": "popup.html"
@@ -18,7 +19,8 @@
 		"128": "icons/icon128.png"
 	},
 	"background": {
-		"service_worker": "background.js"
+		"service_worker": "background.js",
+		"type": "module"
 	},
 	"content_security_policy": {
 		"extension_pages": "script-src 'self'; object-src 'self'"
@@ -28,5 +30,21 @@
 			"matches": ["<all_urls>"],
 			"js": ["content.js"]
 		}
-	]
+	],
+	"commands": {
+		"_execute_action": {
+			"suggested_key": {
+				"default": "Ctrl+Shift+O",
+				"mac": "Command+Shift+O"
+			},
+			"description": "Open Obsidian Clipper"
+		},
+		"quick_clip": {
+			"suggested_key": {
+				"default": "Ctrl+Shift+X",
+				"mac": "Command+Shift+X"
+			},
+			"description": "Quick clip"
+		}
+	}
 }

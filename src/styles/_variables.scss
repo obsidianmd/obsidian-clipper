@@ -24,6 +24,11 @@
 	
 	--text-accent: var(--color-accent);
 	--text-on-accent: white;
+
+	--font-ui-smaller: 0.8125rem;
+	--font-ui-small: 0.875rem;
+	--font-ui-medium: 1rem;
+	--font-ui-large: 1.5rem;
 }
 
 @media (prefers-color-scheme: light) {
@@ -71,6 +76,22 @@
 		--mono-rgb-100: 0, 0, 0;
 
 		--text-selection: hsla(var(--color-accent-hsl), 0.2);
+		--input-shadow:
+			inset 0 0 0 1px rgba(0,0,0,.12),
+			0 2px 3px 0 rgba(0,0,0,.05),
+			0 1px 1.5px 0 rgba(0,0,0,.03),
+			0 1px 2px 0 rgba(0,0,0,.04),
+			0 0 0 0 transparent;
+
+		--input-shadow-hover:
+			inset 0 0 0 1px rgba(0,0,0,.17),
+			0 2px 3px 0 rgba(0,0,0,.1),
+			0 1px 1.5px 0 rgba(0,0,0,.03),
+			0 1px 2px 0 rgba(0,0,0,.04),
+			0 0 0 0 transparent;
+
+		--interactive-normal: var(--color-base-00);
+		--interactive-hover: var(--color-base-10);
 	}
 }
 
@@ -117,10 +138,27 @@
 		--interactive-accent: var(--color-accent);
 		--interactive-accent-hover: var(--color-accent-1);
 
+		--input-shadow:
+			inset 0 .5px .5px .5px rgba(255, 255, 255, 0.09),
+			0 2px 4px 0 rgba(0,0,0,.15),
+			0 1px 1.5px 0 rgba(0,0,0,.1),
+			0 1px 2px 0 rgba(0,0,0,.2),
+			0 0 0 0 transparent;
+
+		--input-shadow-hover:
+			inset 0 .5px 1px .5px rgba(255, 255, 255, 0.16),
+			0 2px 3px 0 rgba(0,0,0,.3),
+			0 1px 1.5px 0 rgba(0,0,0,.2),
+			0 1px 2px 0 rgba(0,0,0,.4),
+			0 0 0 0 transparent;
+
 		--mono-rgb-0: 0, 0, 0;
 		--mono-rgb-100: 255, 255, 255;
 
 		--text-accent: var(--color-accent-1);
 		--text-selection: hsla(var(--color-accent-hsl), 0.3);
+
+		--interactive-normal: var(--color-base-30);
+		--interactive-hover: var(--color-base-35);
 	}
 }

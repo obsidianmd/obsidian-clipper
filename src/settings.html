@@ -25,14 +25,27 @@
 						<h2>General settings</h2>
 						<form id="general-settings-form">
 								<div>
-									<label for="vault-name">Vaults</label>
+									<h3>Vaults</h3>
 									<div class="setting-item-description">By default, clipped notes are saved to the currently open vault. You can add vaults here if you want the option to save to different vaults. Vault names must exactly match the name of the Obsidian vault.</div>
 									<input type="text" id="vault-input" placeholder="Press enter to add a vault" />
 									<ul id="vault-list"></ul>
 								</div>
 								<div>
-									<label for="vault-name">Reset default template</label>
-									<button type="button" id="reset-default-template-btn" class="mod-warning">Reset</button>
+									<h3>Hotkeys</h3>
+									<div class="setting-item-description">Keyboard shortcuts give you quick access to clipper features. To change key assignments, go to <code>chrome://extensions/shortcuts</code></div>
+									<div id="keyboard-shortcuts-list"></div>
+								</div>
+								<div>
+									<h3>Advanced</h3>
+									<div class="setting-item mod-horizontal">
+										<div class="setting-item-info">
+											<label for="vault-name">Reset default template</label>
+											<div class="setting-item-description">Remove any changes you've made to the default template.</div>
+										</div>
+										<div class="setting-item-control">
+											<button type="button" id="reset-default-template-btn" class="mod-warning">Reset</button>
+										</div>
+									</div>
 								</div>
 						</form>
 					</div>
@@ -64,7 +77,7 @@
 								</div>
 								<div class="setting-item" id="note-name-format-container" style="display: none;">
 									<label for="note-name-format">Note name</label>
-									<div class="setting-item-description">Format for the file name when creating a new note. You can use variables like {{title}}, {{today}}, and {{published}} to pre-populate data from the page. <a href="https://github.com/obsidianmd/obsidian-clipper?tab=readme-ov-file#template-variables" target="_blank">Learn more</a>.</div>
+									<div class="setting-item-description">Format for the file name when creating a new note. You can use variables like {{title}}, {{date}}, and {{published}} to pre-populate data from the page. <a href="https://github.com/obsidianmd/obsidian-clipper?tab=readme-ov-file#template-variables" target="_blank">Learn more</a>.</div>
 									<input type="text" id="note-name-format" placeholder="{{title}}" />
 								</div>
 								<div class="setting-item" id="specific-note-container" style="display: none;">
@@ -84,7 +97,7 @@
 								</div>
 								<div class="setting-item">
 									<label for="url-patterns">URL patterns</label>
-									<div class="setting-item-description">Optional list of domains that will trigger this template. One per line.</div>
+									<div class="setting-item-description">Automatically pre-select this template if the page starts with a URL in this list. One per line.</div>
 									<textarea id="url-patterns" placeholder="https://example.com/" rows="2"></textarea>
 								</div>
 								<div id="properties-warning" style="display: none;">

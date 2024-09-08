@@ -7,12 +7,16 @@ button {
 	box-shadow: 0 0 0 1px var(--background-modifier-border);
 	height: var(--input-height);
 	user-select: none;
-	font-weight: 500;
 	padding: 4px 12px;
 	outline: none;
 	border: none;
+	&:not(.clickable-icon) {
+		background-color: var(--interactive-normal);
+		box-shadow: var(--input-shadow);
+	}
 	&:hover {
-		background-color: var(--background-secondary);
+		background-color: var(--interactive-hover);
+		box-shadow: var(--input-shadow-hover);
 	}
 	&:active,
 	&:focus {
@@ -22,7 +26,6 @@ button {
 	}
 	&.mod-cta {
 		background-color: var(--interactive-accent);
-		box-shadow: none;
 		color: var(--text-on-accent);
 		&:hover {
 			background-color: var(--interactive-accent-hover);

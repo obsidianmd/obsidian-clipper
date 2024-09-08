@@ -66,7 +66,7 @@
 		border: none;
 		border-radius: 0;
 		padding: 4px 32px 10px 12px;
-		font-size: 16px;
+		font-size: var(--font-ui-medium);
 		font-weight: 600;
 		resize: none;
 		min-height: 2rem;
@@ -80,7 +80,7 @@
 
 	.metadata-properties-header {
 		padding: 0 12px 6px;
-		font-size: 0.875rem;
+		font-size: var(--font-ui-small);
 		font-weight: 500;
 		color: var(--text-muted);
 		user-select: none;
@@ -133,7 +133,7 @@
 				text-overflow: ellipsis;
 				font-weight: 400;
 				color: var(--text-muted);
-				font-size: 14px;
+				font-size: var(--font-ui-small);
 				user-select: none;
 				margin: 0;
 			}
@@ -173,6 +173,9 @@
 		padding: 10px 10px;
 		border-top: 1px solid var(--background-modifier-border);
 		background-color: var(--background-primary);
+		button {
+			font-weight: 500;
+		}
 	}
 	.vault-path-container {
 		display: flex;
