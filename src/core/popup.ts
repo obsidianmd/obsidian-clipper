@@ -329,7 +329,13 @@ document.addEventListener('DOMContentLoaded', function() {
 			fileContent = noteContent;
 		}
 
-		saveToObsidian(fileContent, noteName, path, selectedVault, currentTemplate.behavior, currentTemplate.specificNoteName, currentTemplate.dailyNoteFormat);
+		try {
+			await saveToObsidian(fileContent, noteName, path, selectedVault, currentTemplate.behavior, currentTemplate.specificNoteName, currentTemplate.dailyNoteFormat);
+			window.close();
+		} catch (error) {
+			console.error('Error saving to Obsidian:', error);
+			showError('Failed to save to Obsidian. Please try again.');
+		}
 	});
 
 	document.getElementById('open-settings')!.addEventListener('click', function() {
