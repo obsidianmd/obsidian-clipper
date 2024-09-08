@@ -44,8 +44,13 @@
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
+	gap: 8px;
 	.setting-item-info {
 		font-size: 0.875rem;
+		label {
+			margin: 0;
+			font-weight: 400;
+		}
 	}
 }
 
