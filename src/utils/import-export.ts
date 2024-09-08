@@ -1,7 +1,7 @@
 import { Template, Property } from '../types/types';
 import { templates, saveTemplateSettings, updateTemplateList, showTemplateEditor, editingTemplateIndex } from '../managers/template-manager';
 
-const TEMPLATE_VERSION = '0.1.0';
+const SCHEMA_VERSION = '0.1.0';
 
 function toKebabCase(str: string): string {
 	return str
@@ -19,8 +19,8 @@ export function exportTemplate(): void {
 	const template = templates[editingTemplateIndex] as Template;
 	const templateFile = `${toKebabCase(template.name)}-clipper.json`;
 
-	const orderedTemplate: Partial<Template> & { version: string } = {
-		version: TEMPLATE_VERSION,
+	const orderedTemplate: Partial<Template> & { schemaVersion: string } = {
+		schemaVersion: SCHEMA_VERSION,
 		name: template.name,
 		behavior: template.behavior,
 		noteNameFormat: template.noteNameFormat,
