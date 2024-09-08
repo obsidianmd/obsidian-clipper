@@ -228,6 +228,12 @@
 	}
 }
 
+#general-settings-form {
+	> div {
+		margin-bottom: 3rem;
+	}
+}
+
 #vault-list {
 	display: flex;
 	flex-direction: column;
@@ -246,5 +252,27 @@
 			margin-left: auto;
 			width: auto;
 		}
+	}
+}
+
+#keyboard-shortcuts-list {
+	display: flex;
+	flex-direction: column;
+	margin-top: 8px;
+}
+.shortcut-item {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 12px 0;
+	border-bottom: 1px solid var(--background-modifier-border);
+	span {
+		font-size: 0.875rem;
+	}
+	.shortcut-display {
+		background-color: var(--background-modifier-border);
+		padding: 2px 8px;
+		border-radius: 4px;
+		font-size: 0.8rem;
 	}
 }

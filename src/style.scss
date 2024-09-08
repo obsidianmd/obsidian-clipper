@@ -38,7 +38,12 @@ h2 {
 	margin-bottom: 0.25rem;
 }
 h3 {
-	font-size: 1.25rem;
+	font-size: 1rem;
+	font-weight: 600;
+	margin-top: 2rem;
+	margin-bottom: 1rem;
+	border-bottom: 1px solid var(--background-modifier-border);
+	padding-bottom: 0.5rem;
 }
 h4 {
 	font-size: 1rem;

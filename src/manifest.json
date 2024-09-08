@@ -44,7 +44,7 @@
 				"default": "Ctrl+Shift+X",
 				"mac": "Command+Shift+X"
 			},
-			"description": "Quick clip to Obsidian"
+			"description": "Quick clip"
 		}
 	}
 }
