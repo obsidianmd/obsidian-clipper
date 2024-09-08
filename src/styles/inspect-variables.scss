@@ -3,7 +3,6 @@
 	position: fixed;
 	top: 6px;
 	right: 32px;
-	border-radius: 4px;
 	user-select: none;
 	background-color: var(--background-primary);
 }
@@ -30,7 +29,6 @@
 		top: 4px;
 		right: 4px;
 		cursor: pointer;
-		border-radius: 4px;
 		background-color: transparent;
 	}
 
@@ -50,12 +48,13 @@
 		word-break: break-all;
 		overflow-y: auto;
 		padding: 8px 12px 8px;
+		line-height: 1.3;
 	}
 
 	.variable-item {
 		display: flex;
-		margin: 2px 0;
-		padding: 2px 0;
+		flex-wrap: wrap;
+		padding: 6px 0;
 		border-bottom: 1px solid var(--background-modifier-border);
 		&:last-child {
 			border-bottom: none;
@@ -78,8 +77,9 @@
 	.variable-value {
 		color: var(--text-muted);
 		word-break: break-all;
-		white-space: nowrap;
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;  
 		overflow: hidden;
-		text-overflow: ellipsis;
 	}
 }
