@@ -3,7 +3,7 @@ Work in progress. Turning the [Obsidian web clipper bookmarklet](https://stephan
 **Run the extension locally**
 
 - `npm install`
-- `npm run dev`
+- `npm run build` (or `npm run dev` if you want to make changes to the code)
 - Go to `chrome://extensions/`
 - Click `Load unpacked` and select the `dist` folder
 
