@@ -1,7 +1,7 @@
 import { Template } from '../types/types';
 import { loadTemplates, updateTemplateList, showTemplateEditor, saveTemplateSettings, createDefaultTemplate, templates, getTemplates } from '../managers/template-manager';
 import { loadGeneralSettings, updateVaultList, saveGeneralSettings, addVault } from '../managers/vault-manager';
-import { initializeSidebar } from '../utils/ui-utils';
+import { initializeSidebar, initializeToggles } from '../utils/ui-utils';
 import { initializeDragAndDrop } from '../utils/drag-and-drop';
 import { initializeAutoSave } from '../utils/auto-save';
 import { exportTemplate, importTemplate } from '../utils/import-export';
@@ -19,7 +19,23 @@ document.addEventListener('DOMContentLoaded', () => {
 	const resetDefaultTemplateBtn = document.getElementById('reset-default-template-btn') as HTMLButtonElement;
 
 	function initializeSettings(): void {
-		loadGeneralSettings();
+		loadGeneralSettings().then((settings) => {
+			updateVaultList();
+
+			const showVariablesToggle = document.getElementById('show-variables-toggle') as HTMLInputElement;
+			if (showVariablesToggle) {
+				showVariablesToggle.checked = settings.showVariablesButton || false;
+				console.log('Initial state of showVariablesButton:', showVariablesToggle.checked);
+				
+				showVariablesToggle.addEventListener('change', () => {
+					saveGeneralSettings({ showVariablesButton: showVariablesToggle.checked });
+				});
+			}
+
+			// Initialize toggles after loading settings
+			initializeToggles();
+		});
+
 		loadTemplates().then(() => {
 			initializeTemplateListeners();
 		});
@@ -28,20 +44,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		initializeDragAndDrop();
 		initializeDropZone();
 		initializeKeyboardShortcuts();
-
-		const showVariablesToggle = document.getElementById('show-variables-toggle') as HTMLInputElement;
-		if (showVariablesToggle) {
-			showVariablesToggle.addEventListener('change', () => {
-				saveGeneralSettings({ showVariablesButton: showVariablesToggle.checked });
-			});
-		}
-
-		// Load the current setting
-		loadGeneralSettings().then((settings) => {
-			if (showVariablesToggle) {
-				showVariablesToggle.checked = settings.showVariablesButton || false;
-			}
-		});
 
 		exportTemplateBtn.addEventListener('click', exportTemplate);
 		importTemplateBtn.addEventListener('click', importTemplate);

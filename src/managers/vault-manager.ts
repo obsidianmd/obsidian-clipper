@@ -3,19 +3,38 @@ import { initializeIcons } from '../icons/icons';
 
 interface GeneralSettings {
 	showVariablesButton?: boolean;
+	vaults?: string[];
 }
 
 export let vaults: string[] = [];
 
 export async function loadGeneralSettings(): Promise<GeneralSettings> {
-	const data = await chrome.storage.sync.get('general_settings');
-	return data.general_settings || {};
+	const data = await chrome.storage.sync.get(['general_settings', 'vaults']);
+	console.log('Loaded general settings:', data.general_settings);
+	console.log('Loaded vaults:', data.vaults);
+
+	vaults = data.vaults || [];
+	
+	// Merge the general settings with vaults
+	const settings: GeneralSettings = {
+		...data.general_settings,
+		vaults: vaults
+	};
+	
+	return settings;
 }
 
 export async function saveGeneralSettings(settings?: Partial<GeneralSettings>): Promise<void> {
 	const currentSettings = await loadGeneralSettings();
 	const updatedSettings = { ...currentSettings, ...settings };
+	
+	// Save general settings
 	await chrome.storage.sync.set({ general_settings: updatedSettings });
+	
+	// Save vaults separately
+	await chrome.storage.sync.set({ vaults: updatedSettings.vaults });
+	
+	console.log('Saved general settings:', updatedSettings);
 }
 
 export function updateVaultList(): void {
@@ -49,16 +68,15 @@ export function updateVaultList(): void {
 	initializeIcons(vaultList);
 }
 
-// Update these functions to pass an empty object if no settings are provided
 export function addVault(vault: string): void {
 	vaults.push(vault);
-	saveGeneralSettings({});
+	saveGeneralSettings({ vaults: vaults });
 	updateVaultList();
 }
 
 export function removeVault(index: number): void {
 	vaults.splice(index, 1);
-	saveGeneralSettings({});
+	saveGeneralSettings({ vaults: vaults });
 	updateVaultList();
 }
 
