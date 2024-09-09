@@ -76,6 +76,7 @@ Filters allow you to modify variables in a template. Filters are applied to vari
 #### Available filters
 
 - `wikilink` adds double brackets around strings and array items.
+- `date` formats a date, [see format reference](https://day.js.org/docs/en/display/format).
 - `list` converts an array to a bullet list.
 - `kebab` converts text to `kebab-case`.
 - `pascal` converts text to `PascalCase`.

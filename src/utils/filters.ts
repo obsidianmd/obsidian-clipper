@@ -1,3 +1,5 @@
+import dayjs from 'dayjs';
+
 export type FilterFunction = (value: string, param?: string) => string;
 
 export const filters: { [key: string]: FilterFunction } = {
@@ -102,6 +104,14 @@ export const filters: { [key: string]: FilterFunction } = {
 		}
 		return str;
 	},
+	date: (str: string, format?: string): string => {
+		const date = dayjs(str);
+		if (!date.isValid()) {
+			console.error('Invalid date for date filter:', str);
+			return str;
+		}
+		return format ? date.format(format) : date.format();
+	},
 };
 
 export function applyFilters(value: string, filterNames: string[]): string {
@@ -109,14 +119,11 @@ export function applyFilters(value: string, filterNames: string[]): string {
 	let processedValue = typeof value === 'string' ? value : JSON.stringify(value);
 
 	const result = filterNames.reduce((result, filterName) => {
-
-		// Match filter name and parameters, including quoted parameters and no colon
 		const filterRegex = /(\w+)(?::(.+)|"(.+)")?/;
 		const match = filterName.match(filterRegex);
 
 		if (match) {
 			const [, name, param1, param2] = match;
-			// Use param2 if param1 is undefined (case with no colon)
 			const cleanParam = (param1 || param2) ? (param1 || param2).replace(/^["']|["']$/g, '') : undefined;
 
 			const filter = filters[name];
