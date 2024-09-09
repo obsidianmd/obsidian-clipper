@@ -7,9 +7,12 @@ import { unescapeValue } from '../utils/string-utils';
 import { decompressFromUTF16 } from 'lz-string';
 import { getLocalStorage, setLocalStorage } from '../utils/storage-utils';
 import { findMatchingTemplate } from '../utils/url-pattern-match';
+import { formatVariables } from '../utils/string-utils';
+import { loadGeneralSettings } from '../managers/general-settings';
 
 let currentTemplate: Template | null = null;
 let templates: Template[] = [];
+let currentVariables: { [key: string]: string } = {};
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 	if (request.action === "triggerQuickClip") {
@@ -82,7 +85,7 @@ async function handleClip() {
 	}
 }
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
 	initializeIcons();
 
 	const vaultContainer = document.getElementById('vault-container') as HTMLElement;
@@ -258,7 +261,8 @@ document.addEventListener('DOMContentLoaded', function() {
 	// Initial height adjustment
 	adjustTextareaHeight(noteNameField);
 
-	async function initializeTemplateFields(template: Template, currentVariables: { [key: string]: string }, noteName?: string) {
+	async function initializeTemplateFields(template: Template, variables: { [key: string]: string }, noteName?: string) {
+		currentVariables = variables;
 		const templateProperties = document.querySelector('.metadata-properties') as HTMLElement;
 		templateProperties.innerHTML = '';
 
@@ -268,7 +272,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		for (const property of template.properties) {
 			const propertyDiv = document.createElement('div');
 			propertyDiv.className = 'metadata-property';
-			let value = await replaceVariables(tabId, unescapeValue(property.value), currentVariables);
+			let value = await replaceVariables(tabId, unescapeValue(property.value), variables);
 
 			// Apply type-specific parsing
 			switch (property.type) {
@@ -296,7 +300,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		}
 
 		if (noteNameField) {
-			let formattedNoteName = await replaceVariables(tabId, template.noteNameFormat, currentVariables);
+			let formattedNoteName = await replaceVariables(tabId, template.noteNameFormat, variables);
 			noteNameField.value = sanitizeFileName(formattedNoteName);
 			adjustTextareaHeight(noteNameField);
 		}
@@ -307,7 +311,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
 		if (noteContentField) {
 			if (template.noteContentFormat) {
-				let content = await replaceVariables(tabId, template.noteContentFormat, currentVariables);
+				let content = await replaceVariables(tabId, template.noteContentFormat, variables);
 				noteContentField.value = content;
 			} else {
 				noteContentField.value = '';
@@ -316,7 +320,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 		const currentUrl = tabs[0].url || '';
 
-		if (Object.keys(currentVariables).length > 0) {
+		if (Object.keys(variables).length > 0) {
 			if (template.urlPatterns && template.urlPatterns.length > 0) {
 				const matchingPattern = template.urlPatterns.find(pattern => {
 					if (pattern.startsWith('/') && pattern.endsWith('/')) {
@@ -353,6 +357,76 @@ document.addEventListener('DOMContentLoaded', function() {
 	document.getElementById('open-settings')!.addEventListener('click', function() {
 		chrome.runtime.openOptionsPage();
 	});
+
+	const settings = await loadGeneralSettings();
+	const showMoreActionsButton = document.getElementById('show-variables') as HTMLElement;
+	const variablesPanel = document.createElement('div');
+	variablesPanel.className = 'variables-panel';
+	document.body.appendChild(variablesPanel);
+
+	if (showMoreActionsButton) {
+		showMoreActionsButton.style.display = settings.showMoreActionsButton ? 'flex' : 'none';
+		
+		showMoreActionsButton.addEventListener('click', function() {
+			if (currentTemplate && Object.keys(currentVariables).length > 0) {
+				const formattedVariables = formatVariables(currentVariables);
+				variablesPanel.innerHTML = `
+					<div class="variables-header">
+						<h3>Page variables</h3>
+						<span class="close-panel clickable-icon" aria-label="Close">
+							<i data-lucide="x"></i>
+						</span>
+					</div>
+					<div class="variable-list">${formattedVariables}</div>
+				`;
+				variablesPanel.classList.add('show');
+				initializeIcons();
+
+				// Add click event listeners to variable keys and chevrons
+				const variableItems = variablesPanel.querySelectorAll('.variable-item');
+				variableItems.forEach(item => {
+					const key = item.querySelector('.variable-key') as HTMLElement;
+					const chevron = item.querySelector('.chevron-icon') as HTMLElement;
+					const valueElement = item.querySelector('.variable-value') as HTMLElement;
+
+					if (valueElement.scrollWidth > valueElement.clientWidth) {
+						item.classList.add('has-overflow');
+					}
+
+					key.addEventListener('click', function() {
+						const variableName = this.getAttribute('data-variable');
+						if (variableName) {
+							navigator.clipboard.writeText(variableName).then(() => {
+								const originalText = this.textContent;
+								this.textContent = 'Copied!';
+								setTimeout(() => {
+									this.textContent = originalText;
+								}, 1000);
+							}).catch(err => {
+								console.error('Failed to copy text: ', err);
+							});
+						}
+					});
+
+					chevron.addEventListener('click', function() {
+						item.classList.toggle('is-collapsed');
+						const chevronIcon = this.querySelector('i');
+						if (chevronIcon) {
+							chevronIcon.setAttribute('data-lucide', item.classList.contains('is-collapsed') ? 'chevron-right' : 'chevron-down');
+							initializeIcons();
+						}
+					});
+				});
+
+				const closePanel = variablesPanel.querySelector('.close-panel') as HTMLElement;
+				closePanel.addEventListener('click', function() {
+					variablesPanel.classList.remove('show');
+				});
+			} else {
+				console.log('No variables available to display');
+			}
+		});
+	}
 
 	function escapeHtml(unsafe: string): string {
 		return unsafe

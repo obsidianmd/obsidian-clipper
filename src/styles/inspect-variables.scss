@@ -1,0 +1,125 @@
+#show-variables {
+	z-index: 100;
+	position: fixed;
+	top: 6px;
+	right: 32px;
+	user-select: none;
+	background-color: var(--background-primary);
+}
+
+.variables-panel {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background-color: var(--background-primary);
+	z-index: 100;
+	overflow-x: hidden;
+	overflow-y: hidden;
+	flex-direction: column;
+
+	&.show {
+		display: flex;
+	}
+
+	.close-panel {
+		position: fixed;
+		top: 4px;
+		right: 4px;
+		cursor: pointer;
+		background-color: transparent;
+	}
+
+	h3 {
+		margin-top: 0;
+		border: none;
+		margin-bottom: 0;
+		user-select: none;
+	}
+
+	.variables-header {
+		padding: 8px 12px 0px;
+		border-bottom: 1px solid var(--background-modifier-border);
+	}
+
+	.variable-list {
+		word-break: break-all;
+		overflow-y: auto;
+		padding: 8px 8px 8px 12px;
+		line-height: 1.3;
+		font-size: var(--font-ui-smaller);
+	}
+
+	.variable-item {
+		display: flex;
+		align-items: flex-start;
+		flex-direction: column;
+		padding: 4px 18px 4px 0;
+		gap: 2px;
+		position: relative;
+		border-bottom: 1px solid var(--background-modifier-border);
+		&:last-child {
+			border-bottom: none;
+		}
+		&.is-collapsed {
+			flex-direction: row;
+			align-items: center;
+			.variable-value {
+				white-space: nowrap;
+				margin: 0px;
+			}
+			.chevron-icon {
+				transform: rotate(0deg);
+			}
+		}
+		&.has-overflow .chevron-icon {
+			display: flex;
+		}
+	}
+
+	.variable-key {
+		font-weight: 600;
+		color: var(--text-accent);
+		margin-right: 4px;
+		flex-shrink: 0;
+		cursor: pointer;
+		transition: color 0.2s ease;
+
+		&:hover {
+			color: var(--text-accent-hover);
+		}
+	}
+
+	.chevron-icon {
+		position: absolute;
+		inset-inline-end: 0;
+		top: 0;
+		width: 16px;
+		height: 24px;
+		display: none; 
+		align-items: center;
+		cursor: pointer;
+		transition: transform 0.2s ease;
+		color: var(--text-faint);
+		transform: rotate(90deg);
+		user-select: none;
+		margin-inline-start: auto;
+		svg {
+			width: 16px;
+			height: 16px;
+		}
+		&:hover {
+			color: var(--text-accent);
+		}
+	}
+
+	.variable-value {
+		color: var(--text-muted);
+		word-break: break-all;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		margin: 0;
+	}
+}

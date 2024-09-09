@@ -1,6 +1,6 @@
 import { Template } from '../types/types';
 import { loadTemplates, updateTemplateList, showTemplateEditor, saveTemplateSettings, createDefaultTemplate, templates, getTemplates } from '../managers/template-manager';
-import { loadGeneralSettings, updateVaultList, saveGeneralSettings, addVault } from '../managers/vault-manager';
+import { initializeGeneralSettings, addVault } from '../managers/general-settings';
 import { initializeSidebar } from '../utils/ui-utils';
 import { initializeDragAndDrop } from '../utils/drag-and-drop';
 import { initializeAutoSave } from '../utils/auto-save';
@@ -9,7 +9,6 @@ import { createIcons } from 'lucide';
 import { icons } from '../icons/icons';
 import { resetUnsavedChanges } from '../managers/template-manager';
 import { initializeDropZone } from '../utils/import-export';
-import { getCommands } from '../utils/hotkeys';
 
 document.addEventListener('DOMContentLoaded', () => {
 	const vaultInput = document.getElementById('vault-input') as HTMLInputElement;
@@ -19,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
 	const resetDefaultTemplateBtn = document.getElementById('reset-default-template-btn') as HTMLButtonElement;
 
 	function initializeSettings(): void {
-		loadGeneralSettings();
+		initializeGeneralSettings();
 		loadTemplates().then(() => {
 			initializeTemplateListeners();
 		});
@@ -27,7 +26,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		initializeAutoSave();
 		initializeDragAndDrop();
 		initializeDropZone();
-		initializeKeyboardShortcuts();
 
 		exportTemplateBtn.addEventListener('click', exportTemplate);
 		importTemplateBtn.addEventListener('click', importTemplate);
@@ -97,22 +95,5 @@ function resetDefaultTemplate(): void {
 	}).catch(error => {
 		console.error('Failed to reset default template:', error);
 		alert('Failed to reset default template. Please try again.');
-	});
-}
-
-function initializeKeyboardShortcuts() {
-	const shortcutsList = document.getElementById('keyboard-shortcuts-list');
-	if (!shortcutsList) return;
-
-	getCommands().then(commands => {
-		commands.forEach(command => {
-			const shortcutItem = document.createElement('div');
-			shortcutItem.className = 'shortcut-item';
-			shortcutItem.innerHTML = `
-				<span>${command.description}</span>
-				<span class="setting-hotkey">${command.shortcut || 'Not set'}</span>
-			`;
-			shortcutsList.appendChild(shortcutItem);
-		});
 	});
 }

@@ -19,7 +19,7 @@
 	flex-direction: column;
 	gap: 8px;
 	max-width: 600px;
-	margin: 24px max(4%, 24px) 72px max(4%, 24px);
+	margin: 24px max(6%, 24px) 72px max(6%, 24px);
 
 	&.active {
 		display: flex;
@@ -44,13 +44,19 @@
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
-	gap: 8px;
+	gap: 16px;
+	border-bottom: 1px solid var(--background-modifier-border);
+	padding: 8px 0;
+	margin-bottom: 8px;
 	.setting-item-info {
 		font-size: var(--font-ui-small);
 		label {
 			margin: 0;
 			font-weight: 400;
 		}
+	}
+	&:last-child {
+		border-bottom: none;
 	}
 }
 
@@ -102,11 +108,11 @@
 		margin: 0;
 		display: flex;
 		flex-direction: column;
-		gap: 4px;
+		gap: 2px;
 
 		li {
 			cursor: pointer;
-			padding: 6px;
+			padding: 4px 6px;
 			border-radius: 4px;
 			user-select: none;
 
@@ -169,11 +175,11 @@
 	margin: 0;
 	display: flex;
 	flex-direction: column;
-	gap: 3px;
+	gap: 2px;
 
 	li {
 		cursor: pointer;
-		padding: 6px;
+		padding: 4px 6px;
 		border-radius: 4px;
 		display: flex;
 		justify-content: space-between;
@@ -284,7 +290,7 @@
 		font-size: var(--font-ui-small);
 	}
 	.setting-hotkey {
-		background-color: var(--background-modifier-border);
+		background-color: var(--background-secondary);
 		padding: 2px 8px;
 		border-radius: 4px;
 		font-size: var(--font-ui-smaller);
