@@ -27,17 +27,17 @@ Template variables can be used to automatically pre-populate data from the page 
 
 These variables are automatically generated based on the page content.
 
-| Variable          | Description                  |
-| ----------------- | ---------------------------- |
-| `{{title}}`       | Title of the page            |
-| `{{author}}`      | Author of the page           |
-| `{{description}}` | Description or excerpt       |
-| `{{published}`    | Published date               |
-| `{{image}}`       | Social share image URL       |
-| `{{content}}`     | Article content or selection |
-| `{{date}}`        | Today's date                 |
-| `{{url}}`         | Current URL                  |
-| `{{domain}}`      | Domain                       |
+| Variable          | Description                                          |
+| ----------------- | ---------------------------------------------------- |
+| `{{author}}`      | Author of the page                                   |
+| `{{content}}`     | Content of the page, or the selection if present     |
+| `{{date}}`        | Today's date                                         |
+| `{{description}}` | Description or excerpt                               |
+| `{{domain}}`      | Domain                                               |
+| `{{image}}`       | Social share image URL                               |
+| `{{published}`    | Published date                                       |
+| `{{title}}`       | Title of the page                                    |
+| `{{url}}`         | Current URL                                          |
 
 #### Meta variables
 
