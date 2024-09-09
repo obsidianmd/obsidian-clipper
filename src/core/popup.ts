@@ -353,7 +353,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 			if (template.vault) {
 				vaultDropdown.value = template.vault;
 			} else {
-				// Try to get the previously selected vault from local storage
+				// Try to get the previously selected vault
 				const lastSelectedVault = await getLocalStorage('lastSelectedVault');
 				if (lastSelectedVault && vaults.includes(lastSelectedVault)) {
 					vaultDropdown.value = lastSelectedVault;
@@ -362,7 +362,6 @@ document.addEventListener('DOMContentLoaded', async function() {
 				}
 			}
 
-			// Add event listener to save the selected vault
 			vaultDropdown.addEventListener('change', () => {
 				setLocalStorage('lastSelectedVault', vaultDropdown.value);
 			});
