@@ -14,8 +14,7 @@ export async function loadGeneralSettings(): Promise<GeneralSettings> {
 	console.log('Loaded vaults:', data.vaults);
 
 	vaults = data.vaults || [];
-	
-	// Merge the general settings with vaults
+
 	const settings: GeneralSettings = {
 		...data.general_settings,
 		vaults: vaults

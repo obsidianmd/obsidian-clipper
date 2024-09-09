@@ -1,6 +1,6 @@
 import { Template } from '../types/types';
 import { loadTemplates, updateTemplateList, showTemplateEditor, saveTemplateSettings, createDefaultTemplate, templates, getTemplates } from '../managers/template-manager';
-import { loadGeneralSettings, updateVaultList, saveGeneralSettings, addVault } from '../managers/vault-manager';
+import { loadGeneralSettings, updateVaultList, saveGeneralSettings, addVault } from '../managers/general-settings';
 import { initializeSidebar, initializeToggles } from '../utils/ui-utils';
 import { initializeDragAndDrop } from '../utils/drag-and-drop';
 import { initializeAutoSave } from '../utils/auto-save';

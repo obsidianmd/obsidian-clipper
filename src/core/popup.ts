@@ -8,7 +8,7 @@ import { decompressFromUTF16 } from 'lz-string';
 import { getLocalStorage, setLocalStorage } from '../utils/storage-utils';
 import { findMatchingTemplate } from '../utils/url-pattern-match';
 import { formatVariables } from '../utils/string-utils';
-import { loadGeneralSettings } from '../managers/vault-manager';
+import { loadGeneralSettings } from '../managers/general-settings';
 
 let currentTemplate: Template | null = null;
 let templates: Template[] = [];

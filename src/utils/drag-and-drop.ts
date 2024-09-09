@@ -1,6 +1,6 @@
 import { Template, Property } from '../types/types';
 import { templates, getTemplates, saveTemplateSettings, updateTemplateList, getEditingTemplateIndex } from '../managers/template-manager';
-import { getVaults, saveGeneralSettings, updateVaultList } from '../managers/vault-manager';
+import { getVaults, saveGeneralSettings, updateVaultList } from '../managers/general-settings';
 
 let draggedElement: HTMLElement | null = null;
 
