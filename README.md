@@ -92,6 +92,7 @@ Filters allow you to modify variables in a template. Filters are applied to vari
 - `list` converts an array to a bullet list.
 	- Optionally you can use `list:ordered` to convert to an ordered list.
 - `pascal` converts text to `PascalCase`.
+- `quote` adds a Markdown quote prefix (`> `) to each line of the input.
 - `slice` extracts a portion of a string or array.
 	- For strings: `"hello"|slice:1,4` returns `"ell"`.
 	- For arrays: `["a","b","c","d"]|slice:1,3` returns `["b","c"]`.

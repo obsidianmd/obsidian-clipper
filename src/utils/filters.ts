@@ -156,6 +156,9 @@ export const filters: { [key: string]: FilterFunction } = {
 	upper: (str: string): string => {
 		return str.toUpperCase();
 	},
+	quote: (str: string): string => {
+		return str.split('\n').map(line => `> ${line}`).join('\n');
+	},
 };
 
 export function applyFilters(value: string, filterNames: string[]): string {
