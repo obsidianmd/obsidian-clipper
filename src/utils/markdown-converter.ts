@@ -80,6 +80,36 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 		}
 	});
 
+	// Custom rule to handle YouTube embeds and tweets
+	turndownService.addRule('embedToMarkdown', {
+		filter: function (node: Node): boolean {
+			if (node instanceof HTMLIFrameElement) {
+				const src = node.getAttribute('src');
+				return !!src && (
+					!!src.match(/(?:youtube\.com|youtu\.be)/) ||
+					!!src.match(/(?:twitter\.com|x\.com)/)
+				);
+			}
+			return false;
+		},
+		replacement: function (content: string, node: Node): string {
+			if (node instanceof HTMLIFrameElement) {
+				const src = node.getAttribute('src');
+				if (src) {
+					const youtubeMatch = src.match(/(?:https?:\/\/)?(?:www\.)?(?:youtube\.com|youtu\.be)\/(?:embed\/|watch\?v=)?([a-zA-Z0-9_-]+)/);
+					if (youtubeMatch && youtubeMatch[1]) {
+						return `![](https://www.youtube.com/watch?v=${youtubeMatch[1]})`;
+					}
+					const tweetMatch = src.match(/(?:twitter\.com|x\.com)\/.*?(?:status|statuses)\/(\d+)/);
+					if (tweetMatch && tweetMatch[1]) {
+						return `![](https://x.com/i/status/${tweetMatch[1]})`;
+					}
+				}
+			}
+			return content;
+		}
+	});
+
 	let markdown = turndownService.turndown(markdownContent);
 
 	// Remove the title from the beginning of the content if it exists
