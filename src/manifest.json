@@ -1,7 +1,7 @@
 {
 	"manifest_version": 3,
 	"name": "Obsidian Clipper",
-	"version": "1.0",
+	"version": "0.1.0",
 	"description": "Clip web content and save as Markdown in Obsidian",
 	"permissions": [
 		"activeTab",
