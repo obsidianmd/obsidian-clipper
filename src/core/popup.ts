@@ -359,15 +359,15 @@ document.addEventListener('DOMContentLoaded', async function() {
 	});
 
 	const settings = await loadGeneralSettings();
-	const showVariablesButton = document.getElementById('show-variables') as HTMLElement;
+	const showMoreActionsButton = document.getElementById('show-variables') as HTMLElement;
 	const variablesPanel = document.createElement('div');
 	variablesPanel.className = 'variables-panel';
 	document.body.appendChild(variablesPanel);
 
-	if (showVariablesButton) {
-		showVariablesButton.style.display = settings.showVariablesButton ? 'flex' : 'none';
+	if (showMoreActionsButton) {
+		showMoreActionsButton.style.display = settings.showMoreActionsButton ? 'flex' : 'none';
 		
-		showVariablesButton.addEventListener('click', function() {
+		showMoreActionsButton.addEventListener('click', function() {
 			if (currentTemplate && Object.keys(currentVariables).length > 0) {
 				const formattedVariables = formatVariables(currentVariables);
 				variablesPanel.innerHTML = `

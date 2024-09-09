@@ -1,4 +1,4 @@
-import { Trash2, AlignLeft, Binary, List, Calendar, Clock, SquareCheckBig, GripVertical, Settings, Code, X, ChevronRight, ChevronDown } from 'lucide';
+import { Trash2, AlignLeft, Binary, List, Calendar, Clock, Ellipsis, SquareCheckBig, GripVertical, Settings, X, ChevronRight, ChevronDown } from 'lucide';
 import { createIcons } from 'lucide';
 
 export const icons = {
@@ -8,10 +8,10 @@ export const icons = {
 	List,
 	Calendar,
 	Clock,
+	Ellipsis,
 	SquareCheckBig,
 	GripVertical,
 	Settings,
-	Code,
 	X,
 	ChevronRight,
 	ChevronDown

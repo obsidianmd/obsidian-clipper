@@ -4,12 +4,12 @@ import { getCommands } from '../utils/hotkeys';
 import { initializeToggles } from '../utils/ui-utils';
 
 interface GeneralSettings {
-	showVariablesButton: boolean;
+	showMoreActionsButton: boolean;
 	vaults: string[];
 }
 
 export let generalSettings: GeneralSettings = {
-	showVariablesButton: false,
+	showMoreActionsButton: true,
 	vaults: []
 };
 
@@ -21,7 +21,7 @@ export async function loadGeneralSettings(): Promise<GeneralSettings> {
 	generalSettings = {
 		...data.general_settings,
 		vaults: data.vaults || [],
-		showVariablesButton: data.general_settings?.showVariablesButton || false
+		showMoreActionsButton: data.general_settings?.showMoreActionsButton || true
 	};
 	
 	return generalSettings;
@@ -31,7 +31,7 @@ export async function saveGeneralSettings(settings?: Partial<GeneralSettings>): 
 	generalSettings = { ...generalSettings, ...settings };
 	
 	await chrome.storage.sync.set({ 
-		general_settings: { showVariablesButton: generalSettings.showVariablesButton },
+		general_settings: { showMoreActionsButton: generalSettings.showMoreActionsButton },
 		vaults: generalSettings.vaults 
 	});
 	
@@ -86,19 +86,19 @@ export function removeVault(index: number): void {
 export function initializeGeneralSettings(): void {
 	loadGeneralSettings().then(() => {
 		updateVaultList();
-		initializeShowVariablesToggle();
+		initializeShowMoreActionsToggle();
 		initializeVaultInput();
 		initializeKeyboardShortcuts();
 		initializeToggles();
 	});
 }
 
-function initializeShowVariablesToggle(): void {
-	const showVariablesToggle = document.getElementById('show-variables-toggle') as HTMLInputElement;
-	if (showVariablesToggle) {
-		showVariablesToggle.checked = generalSettings.showVariablesButton;
-		showVariablesToggle.addEventListener('change', () => {
-			saveGeneralSettings({ showVariablesButton: showVariablesToggle.checked });
+function initializeShowMoreActionsToggle(): void {
+	const ShowMoreActionsToggle = document.getElementById('show-more-actions-toggle') as HTMLInputElement;
+	if (ShowMoreActionsToggle) {
+		ShowMoreActionsToggle.checked = generalSettings.showMoreActionsButton;
+		ShowMoreActionsToggle.addEventListener('change', () => {
+			saveGeneralSettings({ showMoreActionsButton: ShowMoreActionsToggle.checked });
 		});
 	}
 }
