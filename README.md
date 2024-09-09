@@ -75,7 +75,7 @@ Filters allow you to modify variables in a template. Filters are applied to vari
 
 #### Available filters
 
-- `callout` creates an Obsidian-style callout with optional parameters: `{{variable|callout:("type", "title", foldState)}}`
+- `callout` creates a [callout](https://help.obsidian.md/Editing+and+formatting/Callouts) with optional parameters: `{{variable|callout:("type", "title", foldState)}}`
 	- `type`: callout type (defaults to "info")
 	- `title`: callout title (default to empty)
 	- `foldState`: boolean to set the fold state (true for folded, false for unfolded)
