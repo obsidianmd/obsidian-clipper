@@ -64,6 +64,9 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 
 	turndownService.use(gfm);
 
+	// Keep iframes, video, and audio elements
+	turndownService.keep(['iframe', 'video', 'audio']);
+
 	// Custom rule to handle bullet lists without extra spaces
 	turndownService.addRule('listItem', {
 		filter: 'li',
@@ -80,7 +83,7 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 		}
 	});
 
-	// Custom rule to handle YouTube embeds and tweets
+	// Use Obsidian format for YouTube embeds and tweets
 	turndownService.addRule('embedToMarkdown', {
 		filter: function (node: Node): boolean {
 			if (node instanceof HTMLIFrameElement) {
