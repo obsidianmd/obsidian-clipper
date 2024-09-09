@@ -29,7 +29,6 @@ You can trigger templates based on schema.org data present on the page. Use the 
 
 - `schema:@type` will match any page that has a schema.org `@type` property.
 - `schema:@type=Recipe` will match pages where the schema.org `@type` is specifically "Recipe".
-- `schema:author.name=John Doe` will match pages where the schema.org author's name is "John Doe".
 
 Schema matching is particularly useful for selecting templates based on the type of content on the page, regardless of the specific URL structure.
 
