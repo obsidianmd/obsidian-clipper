@@ -68,9 +68,13 @@ export const filters: { [key: string]: FilterFunction } = {
 
 		if (Array.isArray(value)) {
 			const slicedArray = value.slice(start, end);
+			if (slicedArray.length === 1) {
+				return slicedArray[0].toString();
+			}
 			return JSON.stringify(slicedArray);
 		} else {
-			return str.slice(start, end);
+			const slicedString = str.slice(start, end);
+			return slicedString;
 		}
 	},
 	split: (str: string, param?: string): string => {
