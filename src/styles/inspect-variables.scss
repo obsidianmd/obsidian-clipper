@@ -53,11 +53,23 @@
 
 	.variable-item {
 		display: flex;
+		align-items: center;
 		flex-wrap: wrap;
-		padding: 6px 0;
+		padding: 0 0;
+		gap: 2px;
 		border-bottom: 1px solid var(--background-modifier-border);
 		&:last-child {
 			border-bottom: none;
+		}
+		&.is-collapsed {
+			flex-wrap: nowrap;
+			.variable-value {
+				white-space: nowrap;
+				margin: 0px;
+			}
+			.chevron-icon {
+				transform: rotate(0deg);
+			}
 		}
 	}
 
@@ -74,12 +86,30 @@
 		}
 	}
 
+	.chevron-icon {
+		width: 16px;
+		height: 24px;
+		display: flex;
+		align-items: center;
+		cursor: pointer;
+		transition: transform 0.2s ease;
+		color: var(--text-faint);
+		transform: rotate(90deg);
+		user-select: none;
+		svg {
+			width: 16px;
+			height: 16px;
+		}
+		&:hover {
+			color: var(--text-accent);
+		}
+	}
+
 	.variable-value {
 		color: var(--text-muted);
 		word-break: break-all;
-		display: -webkit-box;
-		-webkit-line-clamp: 2;
-		-webkit-box-orient: vertical;  
 		overflow: hidden;
+		text-overflow: ellipsis;
+		margin: 0 0 4px 16px;
 	}
 }

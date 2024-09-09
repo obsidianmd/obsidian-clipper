@@ -9,7 +9,10 @@ export function unescapeValue(value: string): string {
 export function formatVariables(variables: { [key: string]: string }): string {
 	return Object.entries(variables)
 		.map(([key, value]) => `
-			<div class="variable-item">
+			<div class="variable-item is-collapsed">
+			<span class="chevron-icon" aria-label="Expand">
+					<i data-lucide="chevron-right"></i>
+				</span>
 				<span class="variable-key" data-variable="${escapeHtml(key)}">${escapeHtml(key)}</span>
 				<span class="variable-value">${escapeHtml(value)}</span>
 			</div>

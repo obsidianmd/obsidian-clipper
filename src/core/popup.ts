@@ -377,14 +377,16 @@ document.addEventListener('DOMContentLoaded', function() {
 			variablesPanel.classList.add('show');
 			initializeIcons();
 
-			// Add click event listeners to variable keys
-			const variableKeys = variablesPanel.querySelectorAll('.variable-key');
-			variableKeys.forEach(key => {
-				key.addEventListener('click', function(this: HTMLElement) {
+			// Add click event listeners to variable keys and chevrons
+			const variableItems = variablesPanel.querySelectorAll('.variable-item');
+			variableItems.forEach(item => {
+				const key = item.querySelector('.variable-key') as HTMLElement;
+				const chevron = item.querySelector('.chevron-icon') as HTMLElement;
+
+				key.addEventListener('click', function() {
 					const variableName = this.getAttribute('data-variable');
 					if (variableName) {
 						navigator.clipboard.writeText(variableName).then(() => {
-							// Show a temporary "Copied!" message
 							const originalText = this.textContent;
 							this.textContent = 'Copied!';
 							setTimeout(() => {
@@ -393,6 +395,15 @@ document.addEventListener('DOMContentLoaded', function() {
 						}).catch(err => {
 							console.error('Failed to copy text: ', err);
 						});
+					}
+				});
+
+				chevron.addEventListener('click', function() {
+					item.classList.toggle('is-collapsed');
+					const chevronIcon = this.querySelector('i');
+					if (chevronIcon) {
+						chevronIcon.setAttribute('data-lucide', item.classList.contains('is-collapsed') ? 'chevron-right' : 'chevron-down');
+						initializeIcons();
 					}
 				});
 			});
