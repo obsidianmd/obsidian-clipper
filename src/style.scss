@@ -15,9 +15,11 @@ body {
 	background-color: var(--background-primary);
 	color: var(--text-normal);
 	line-height: 1.4;
+	font-size: var(--font-ui-medium);
 }
 
 @import 'styles/buttons';
+@import 'styles/toggles';
 @import 'styles/dragging';
 @import 'styles/inputs';
 @import 'styles/settings';
@@ -39,7 +41,7 @@ h2 {
 	margin-bottom: 0.25rem;
 }
 h3 {
-	font-size: var(--font-ui-medium);
+	font-size: 1rem;
 	font-weight: 600;
 	margin-top: 2rem;
 	margin-bottom: 8px;

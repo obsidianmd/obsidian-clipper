@@ -44,7 +44,7 @@
 	flex-direction: row;
 	justify-content: space-between;
 	align-items: center;
-	gap: 8px;
+	gap: 16px;
 	border-bottom: 1px solid var(--background-modifier-border);
 	padding: 8px 0;
 	margin-bottom: 8px;
@@ -290,7 +290,7 @@
 		font-size: var(--font-ui-small);
 	}
 	.setting-hotkey {
-		background-color: var(--background-modifier-border);
+		background-color: var(--background-secondary);
 		padding: 2px 8px;
 		border-radius: 4px;
 		font-size: var(--font-ui-smaller);
