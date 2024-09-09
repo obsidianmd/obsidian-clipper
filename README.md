@@ -76,9 +76,9 @@ Filters allow you to modify variables in a template. Filters are applied to vari
 #### Available filters
 
 - `callout` creates a [callout](https://help.obsidian.md/Editing+and+formatting/Callouts) with optional parameters: `{{variable|callout:("type", "title", foldState)}}`
-	- `type`: callout type (defaults to "info")
-	- `title`: callout title (default to empty)
-	- `foldState`: boolean to set the fold state (true for folded, false for unfolded)
+	- `type` is the callout type, and defaults to "info"
+	- `title` is the callout title, and defaults to empty
+	- `foldState` is a boolean to set the fold state (true for folded, false for unfolded, null for not foldable)
 - `capitalize` capitalizes the first character of the value and converts the rest to lowercase, e.g. `"hELLO wORLD"|capitalize` returns `"Hello world"`.
 - `camel` converts text to `camelCase`.
 - `date` formats a date, [see format reference](https://day.js.org/docs/en/display/format).
