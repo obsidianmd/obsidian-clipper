@@ -7,17 +7,33 @@ Work in progress. Turning the [Obsidian web clipper bookmarklet](https://stephan
 - Go to `chrome://extensions/`
 - Click `Load unpacked` and select the `dist` folder
 
-### URL patterns
+### Template triggers
 
-URL patterns allow you to automatically select a template based on the current page URL. You can define multiple URL patterns for each template, separated by a new line.
+Template triggers allow you to automatically select a template based on the current page URL or schema.org data. You can define multiple rules for each template, separated by a new line.
 
-Simple matching checks if the current page URL *starts with* the given pattern. For example:
+#### Simple URL matching
+
+Simple matching triggers a template if the current page URL *starts with* the given pattern. For example:
 
 - `https://obsidian.md` will match any URL that starts with this text.
 
-You can use regular expressions for more complex patterns. Enclose your regex pattern in forward slashes (`/`). Remember to escape special characters in regex patterns (like `.` and `/`) with a backslash (`\`). For example:
+#### Regular expression matching
+
+You can trigger templates based on more complex URL patterns using regular expressions. Enclose your regex pattern in forward slashes (`/`). Remember to escape special characters in regex patterns (like `.` and `/`) with a backslash (`\`). For example:
 
 - `/^https:\/\/www\.imdb\.com\/title\/tt\d+\/reference\/?$/` will match any IMDB reference page.
+
+#### Schema.org matching
+
+You can trigger templates based on schema.org data present on the page. Use the `schema:` prefix followed by the schema key you want to match. You can optionally specify an expected value. For example:
+
+- `schema:@type` will match any page that has a schema.org `@type` property.
+- `schema:@type=Recipe` will match pages where the schema.org `@type` is specifically "Recipe".
+- `schema:author.name=John Doe` will match pages where the schema.org author's name is "John Doe".
+
+Schema matching is particularly useful for selecting templates based on the type of content on the page, regardless of the specific URL structure.
+
+You can combine different types of patterns for a single template. The first matching pattern (whether URL-based or schema-based) will determine which template is used.
 
 ### Template variables
 

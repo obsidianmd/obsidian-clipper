@@ -6,7 +6,7 @@ import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
 import { unescapeValue } from '../utils/string-utils';
 import { decompressFromUTF16 } from 'lz-string';
 import { getLocalStorage, setLocalStorage } from '../utils/storage-utils';
-import { findMatchingTemplate } from '../utils/url-pattern-match';
+import { findMatchingTemplate, matchPattern } from '../utils/url-pattern-match';
 import { formatVariables } from '../utils/string-utils';
 import { loadGeneralSettings } from '../managers/general-settings';
 
@@ -26,7 +26,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 	}
 });
 
-function showError(message: string) {
+function showError(message: string): void {
 	const errorMessage = document.querySelector('.error-message') as HTMLElement;
 	const clipper = document.querySelector('.clipper') as HTMLElement;
 
@@ -155,25 +155,33 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 			const currentUrl = tabs[0].url;
 
-			// Find matching template
-			currentTemplate = findMatchingTemplate(currentUrl, templates) || templates[0];
-
-			// Update the template dropdown to reflect the matched template
-			if (currentTemplate) {
-				templateDropdown.value = currentTemplate.name;
-			}
-
 			if (tabs[0].id) {
-				const extractedData = await extractPageContent(tabs[0].id);
-				if (extractedData) {
-					const initializedContent = await initializePageContent(extractedData.content, extractedData.selectedHtml, extractedData.extractedContent, currentUrl, extractedData.schemaOrgData);
-					if (initializedContent && currentTemplate) {
-						await initializeTemplateFields(currentTemplate, initializedContent.currentVariables, initializedContent.noteName);
+				try {
+					const extractedData = await extractPageContent(tabs[0].id);
+					if (extractedData) {
+						const initializedContent = await initializePageContent(extractedData.content, extractedData.selectedHtml, extractedData.extractedContent, currentUrl, extractedData.schemaOrgData);
+						
+						if (initializedContent) {
+							currentTemplate = findMatchingTemplate(currentUrl, templates, extractedData.schemaOrgData) || templates[0];
+
+							if (currentTemplate) {
+								templateDropdown.value = currentTemplate.name;
+							}
+
+							await initializeTemplateFields(currentTemplate, initializedContent.currentVariables, initializedContent.noteName, extractedData.schemaOrgData);
+						} else {
+							showError('Unable to initialize page content.');
+						}
 					} else {
-						showError('Unable to initialize page content.');
+						showError('Unable to get page content. Try reloading the page.');
 					}
-				} else {
-					showError('Unable to retrieve page content. Try reloading the page.');
+				} catch (error: unknown) {
+					console.error('Error in popup initialization:', error);
+					if (error instanceof Error) {
+						showError(`An error occurred: ${error.message}`);
+					} else {
+						showError('An unexpected error occurred');
+					}
 				}
 			}
 		});
@@ -228,7 +236,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 				if (extractedData) {
 					const initializedContent = await initializePageContent(extractedData.content, extractedData.selectedHtml, extractedData.extractedContent, tabs[0].url!, extractedData.schemaOrgData);
 					if (initializedContent) {
-						await initializeTemplateFields(currentTemplate, initializedContent.currentVariables, initializedContent.noteName);
+						await initializeTemplateFields(currentTemplate, initializedContent.currentVariables, initializedContent.noteName, extractedData.schemaOrgData);
 					} else {
 						showError('Unable to initialize page content.');
 					}
@@ -261,13 +269,14 @@ document.addEventListener('DOMContentLoaded', async function() {
 	// Initial height adjustment
 	adjustTextareaHeight(noteNameField);
 
-	async function initializeTemplateFields(template: Template, variables: { [key: string]: string }, noteName?: string) {
+	async function initializeTemplateFields(template: Template, variables: { [key: string]: string }, noteName?: string, schemaOrgData?: any) {
 		currentVariables = variables;
 		const templateProperties = document.querySelector('.metadata-properties') as HTMLElement;
 		templateProperties.innerHTML = '';
 
 		const tabs = await chrome.tabs.query({active: true, currentWindow: true});
 		const tabId = tabs[0].id!;
+		const currentUrl = tabs[0].url || '';
 
 		for (const property of template.properties) {
 			const propertyDiv = document.createElement('div');
@@ -318,30 +327,16 @@ document.addEventListener('DOMContentLoaded', async function() {
 			}
 		}
 
-		const currentUrl = tabs[0].url || '';
-
 		if (Object.keys(variables).length > 0) {
-			if (template.urlPatterns && template.urlPatterns.length > 0) {
-				const matchingPattern = template.urlPatterns.find(pattern => {
-					if (pattern.startsWith('/') && pattern.endsWith('/')) {
-						try {
-							const regexPattern = new RegExp(pattern.slice(1, -1));
-							return regexPattern.test(currentUrl);
-						} catch (error) {
-							console.error(`Invalid regex pattern: ${pattern}`, error);
-							return false;
-						}
-					} else {
-						return currentUrl.startsWith(pattern);
-					}
-				});
+			if (template.triggers && template.triggers.length > 0) {
+				const matchingPattern = template.triggers.find(pattern => 
+					matchPattern(pattern, currentUrl, schemaOrgData)
+				);
 				if (matchingPattern) {
-					console.log(`Matched URL pattern: ${matchingPattern}`);
-				} else {
-					console.log('No matching URL pattern');
+					console.log(`Matched template trigger: ${matchingPattern}`);
 				}
 			} else {
-				console.log('No URL patterns defined for this template');
+				console.log('No template triggers defined for this template');
 			}
 		}
 

@@ -28,7 +28,7 @@
 						<form id="general-settings-form">
 								<div>
 									<h3>Vaults</h3>
-									<div class="setting-item-description">By default, clipped notes are saved to the currently open vault. You can add vaults here if you want the option to save to different vaults. Vault names must exactly match the name of the Obsidian vault.</div>
+									<div class="setting-item-description">By default, clipped notes are saved to the currently open vault. You can add vaults here if you want the option to save to different vaults. Vault names must exactly match the name of the Obsidian&nbsp;vault.</div>
 									<input type="text" id="vault-input" placeholder="Press enter to add a vault" />
 									<ul id="vault-list"></ul>
 								</div>
@@ -42,7 +42,7 @@
 									<div class="setting-item mod-horizontal">
 										<div class="setting-item-info">
 											<label for="vault-name">Reset default template</label>
-											<div class="setting-item-description">Remove any changes you've made to the default template.</div>
+											<div class="setting-item-description">Remove any changes you've made to the default&nbsp;template.</div>
 										</div>
 										<div class="setting-item-control">
 											<button type="button" id="reset-default-template-btn" class="mod-warning">Reset</button>
@@ -52,7 +52,7 @@
 										<div class="setting-item-info">
 											<label for="show-more-actions-toggle">Show actions button</label>
 											<div class="setting-item-description">
-												Allows you to inspect page variables from the clipper menu. Useful for seeing the variables that are available to use in templates.
+												Allows you to inspect page variables from the clipper menu. Useful for seeing the variables that are available to use in&nbsp;templates.
 											</div>
 										</div>
 										<div class="setting-item-control">
@@ -92,17 +92,17 @@
 								</div>
 								<div class="setting-item" id="note-name-format-container" style="display: none;">
 									<label for="note-name-format">Note name</label>
-									<div class="setting-item-description">Format for the file name when creating a new note. You can use variables like {{title}}, {{date}}, and {{published}} to pre-populate data from the page. <a href="https://github.com/obsidianmd/obsidian-clipper?tab=readme-ov-file#template-variables" target="_blank">Learn more</a>.</div>
+									<div class="setting-item-description">Format for the file name when creating a new note. You can use variables like {{title}}, {{date}}, and {{published}} to pre-populate data from the&nbsp;page. <a href="https://github.com/obsidianmd/obsidian-clipper?tab=readme-ov-file#template-variables" target="_blank">Learn&nbsp;more</a>.</div>
 									<input type="text" id="note-name-format" placeholder="{{title}}" />
 								</div>
 								<div class="setting-item" id="specific-note-container" style="display: none;">
 									<label for="specific-note-name">Note to add to</label>
-									<div class="setting-item-description">The name of the note to add to.</div>
+									<div class="setting-item-description">The name of the note to add&nbsp;to.</div>
 									<input type="text" id="specific-note-name" placeholder="Note name" />
 								</div>
 								<div class="setting-item" id="daily-note-format-container" style="display: none;">
 									<label for="daily-note-format">Daily note format</label>
-									<div class="setting-item-description">Make sure this is the same format as your daily note template in Obsidian settings.</div>
+									<div class="setting-item-description">Make sure this is the same format as your daily note template in Obsidian&nbsp;settings.</div>
 									<input type="text" id="daily-note-format" placeholder="YYYY-MM-DD" value="YYYY-MM-DD" />
 								</div>
 								<div class="setting-item">
@@ -112,29 +112,29 @@
 								</div>
 								<div class="setting-item">
 									<label for="template-vault">Vault</label>
-									<div class="setting-item-description">Select the default vault for this template. Go to general settings to add or remove vaults.</div>
+									<div class="setting-item-description">Select the default vault for this template. Go to general settings to add or remove&nbsp;vaults.</div>
 									<select id="template-vault">
 										<option value="">Last used</option>
 									</select>
 								</div>
 								<div class="setting-item">
-									<label for="url-patterns">URL patterns</label>
-									<div class="setting-item-description">Automatically pre-select this template if the page starts with a URL in this list. One per line.</div>
+									<label for="url-patterns">Template triggers</label>
+									<div class="setting-item-description">Define rules to automatically select this template if it matches a URL pattern or contains schema.org data. One rule per&nbsp;line.</div>
 									<textarea id="url-patterns" placeholder="https://example.com/" rows="2"></textarea>
 								</div>
 								<div id="properties-warning" style="display: none;">
 									<label>Properties</label>
-									<div class="setting-item-description">Properties are not available when adding to an existing note.</div>
+									<div class="setting-item-description">Properties are not available when adding to an existing&nbsp;note.</div>
 								</div>
 								<div id="properties-container">
 									<label>Properties</label>
-									<div class="setting-item-description">Properties to add to the top of the clipped note. Use variables to pre-populate data from the page.</div>
+									<div class="setting-item-description">Properties to add to the top of the clipped note. Use variables to pre-populate data from the&nbsp;page.</div>
 									<div id="template-properties"></div>
 									<div class="metadata-add-button"><a id="add-property-btn">+ Add property</a></div>
 								</div>
 								<div class="setting-item">
 									<label for="note-content-format">Note content</label>
-									<div class="setting-item-description">Customize the content of the note. Use variables to pre-populate data from the page.</div>
+									<div class="setting-item-description">Customize the content of the note. Use variables to pre-populate data from the&nbsp;page.</div>
 									<textarea id="note-content-format" rows="6" placeholder="{{content}}"></textarea>
 								</div>
 							</div>

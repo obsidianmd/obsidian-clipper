@@ -117,7 +117,7 @@ export function showTemplateEditor(template: Template | null): void {
 			path: 'Clippings',
 			noteContentFormat: '{{content}}',
 			properties: [],
-			urlPatterns: []
+			triggers: []
 		};
 		templates.push(editingTemplate);
 		editingTemplateIndex = templates.length - 1;
@@ -175,8 +175,8 @@ export function showTemplateEditor(template: Template | null): void {
 		editingTemplate.properties.forEach(property => addPropertyToEditor(property.name, property.value, property.type, property.id));
 	}
 
-	const urlPatternsTextarea = document.getElementById('url-patterns') as HTMLTextAreaElement;
-	if (urlPatternsTextarea) urlPatternsTextarea.value = editingTemplate && editingTemplate.urlPatterns ? editingTemplate.urlPatterns.join('\n') : '';
+	const triggersTextarea = document.getElementById('url-patterns') as HTMLTextAreaElement;
+	if (triggersTextarea) triggersTextarea.value = editingTemplate && editingTemplate.triggers ? editingTemplate.triggers.join('\n') : '';
 
 	const templateEditor = document.getElementById('template-editor');
 	if (templateEditor) templateEditor.style.display = 'block';
@@ -301,7 +301,7 @@ export function createDefaultTemplate(): Template {
 			{ id: Date.now().toString() + Math.random().toString(36).slice(2, 11), name: 'description', value: '{{description}}', type: 'text' },
 			{ id: Date.now().toString() + Math.random().toString(36).slice(2, 11), name: 'tags', value: 'clippings', type: 'multitext' }
 		],
-		urlPatterns: []
+		triggers: []
 	};
 }
 
@@ -338,8 +338,8 @@ function clearTemplateEditor(): void {
 	if (templateProperties) templateProperties.innerHTML = '';
 	const pathInput = document.getElementById('template-path-name') as HTMLInputElement;
 	if (pathInput) pathInput.value = 'Clippings';
-	const urlPatternsTextarea = document.getElementById('url-patterns') as HTMLTextAreaElement;
-	if (urlPatternsTextarea) urlPatternsTextarea.value = '';
+	const triggersTextarea = document.getElementById('url-patterns') as HTMLTextAreaElement;
+	if (triggersTextarea) triggersTextarea.value = '';
 	const templateEditor = document.getElementById('template-editor');
 	if (templateEditor) templateEditor.style.display = 'none';
 }
@@ -476,8 +476,8 @@ export function updateTemplateFromForm(): void {
 		};
 	});
 
-	const urlPatternsTextarea = document.getElementById('url-patterns') as HTMLTextAreaElement;
-	if (urlPatternsTextarea) template.urlPatterns = urlPatternsTextarea.value.split('\n').filter(Boolean);
+	const triggersTextarea = document.getElementById('url-patterns') as HTMLTextAreaElement;
+	if (triggersTextarea) template.triggers = triggersTextarea.value.split('\n').filter(Boolean);
 
 	const vaultSelect = document.getElementById('template-vault') as HTMLSelectElement;
 	if (vaultSelect) template.vault = vaultSelect.value || undefined;

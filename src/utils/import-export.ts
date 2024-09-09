@@ -27,7 +27,7 @@ export function exportTemplate(): void {
 		path: template.path,
 		noteContentFormat: template.noteContentFormat,
 		properties: template.properties.map(({ name, value, type }) => ({ name, value, type })) as Property[],
-		urlPatterns: template.urlPatterns,
+		triggers: template.triggers,
 	};
 
 	const jsonContent = JSON.stringify(orderedTemplate, null, 2);
