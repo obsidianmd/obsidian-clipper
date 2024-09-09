@@ -195,3 +195,10 @@
 		}
 	}
 }
+
+#show-variables {
+	display: none; // Hide by default
+	&.show {
+		display: flex;
+	}
+}

@@ -8,6 +8,7 @@ import { decompressFromUTF16 } from 'lz-string';
 import { getLocalStorage, setLocalStorage } from '../utils/storage-utils';
 import { findMatchingTemplate } from '../utils/url-pattern-match';
 import { formatVariables } from '../utils/string-utils';
+import { loadGeneralSettings } from '../managers/vault-manager';
 
 let currentTemplate: Template | null = null;
 let templates: Template[] = [];
@@ -84,7 +85,7 @@ async function handleClip() {
 	}
 }
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
 	initializeIcons();
 
 	const vaultContainer = document.getElementById('vault-container') as HTMLElement;
@@ -357,70 +358,75 @@ document.addEventListener('DOMContentLoaded', function() {
 		chrome.runtime.openOptionsPage();
 	});
 
+	const settings = await loadGeneralSettings();
 	const showVariablesButton = document.getElementById('show-variables') as HTMLElement;
 	const variablesPanel = document.createElement('div');
 	variablesPanel.className = 'variables-panel';
 	document.body.appendChild(variablesPanel);
 
-	showVariablesButton.addEventListener('click', function() {
-		if (currentTemplate && Object.keys(currentVariables).length > 0) {
-			const formattedVariables = formatVariables(currentVariables);
-			variablesPanel.innerHTML = `
-				<div class="variables-header">
-					<h3>Page variables</h3>
-					<span class="close-panel clickable-icon" aria-label="Close">
-						<i data-lucide="x"></i>
-					</span>
-				</div>
-				<div class="variable-list">${formattedVariables}</div>
-			`;
-			variablesPanel.classList.add('show');
-			initializeIcons();
+	if (showVariablesButton) {
+		showVariablesButton.style.display = settings.showVariablesButton ? 'flex' : 'none';
+		
+		showVariablesButton.addEventListener('click', function() {
+			if (currentTemplate && Object.keys(currentVariables).length > 0) {
+				const formattedVariables = formatVariables(currentVariables);
+				variablesPanel.innerHTML = `
+					<div class="variables-header">
+						<h3>Page variables</h3>
+						<span class="close-panel clickable-icon" aria-label="Close">
+							<i data-lucide="x"></i>
+						</span>
+					</div>
+					<div class="variable-list">${formattedVariables}</div>
+				`;
+				variablesPanel.classList.add('show');
+				initializeIcons();
 
-			// Add click event listeners to variable keys and chevrons
-			const variableItems = variablesPanel.querySelectorAll('.variable-item');
-			variableItems.forEach(item => {
-				const key = item.querySelector('.variable-key') as HTMLElement;
-				const chevron = item.querySelector('.chevron-icon') as HTMLElement;
-				const valueElement = item.querySelector('.variable-value') as HTMLElement;
+				// Add click event listeners to variable keys and chevrons
+				const variableItems = variablesPanel.querySelectorAll('.variable-item');
+				variableItems.forEach(item => {
+					const key = item.querySelector('.variable-key') as HTMLElement;
+					const chevron = item.querySelector('.chevron-icon') as HTMLElement;
+					const valueElement = item.querySelector('.variable-value') as HTMLElement;
 
-				if (valueElement.scrollWidth > valueElement.clientWidth) {
-					item.classList.add('has-overflow');
-				}
-
-				key.addEventListener('click', function() {
-					const variableName = this.getAttribute('data-variable');
-					if (variableName) {
-						navigator.clipboard.writeText(variableName).then(() => {
-							const originalText = this.textContent;
-							this.textContent = 'Copied!';
-							setTimeout(() => {
-								this.textContent = originalText;
-							}, 1000);
-						}).catch(err => {
-							console.error('Failed to copy text: ', err);
-						});
+					if (valueElement.scrollWidth > valueElement.clientWidth) {
+						item.classList.add('has-overflow');
 					}
+
+					key.addEventListener('click', function() {
+						const variableName = this.getAttribute('data-variable');
+						if (variableName) {
+							navigator.clipboard.writeText(variableName).then(() => {
+								const originalText = this.textContent;
+								this.textContent = 'Copied!';
+								setTimeout(() => {
+									this.textContent = originalText;
+								}, 1000);
+							}).catch(err => {
+								console.error('Failed to copy text: ', err);
+							});
+						}
+					});
+
+					chevron.addEventListener('click', function() {
+						item.classList.toggle('is-collapsed');
+						const chevronIcon = this.querySelector('i');
+						if (chevronIcon) {
+							chevronIcon.setAttribute('data-lucide', item.classList.contains('is-collapsed') ? 'chevron-right' : 'chevron-down');
+							initializeIcons();
+						}
+					});
 				});
 
-				chevron.addEventListener('click', function() {
-					item.classList.toggle('is-collapsed');
-					const chevronIcon = this.querySelector('i');
-					if (chevronIcon) {
-						chevronIcon.setAttribute('data-lucide', item.classList.contains('is-collapsed') ? 'chevron-right' : 'chevron-down');
-						initializeIcons();
-					}
+				const closePanel = variablesPanel.querySelector('.close-panel') as HTMLElement;
+				closePanel.addEventListener('click', function() {
+					variablesPanel.classList.remove('show');
 				});
-			});
-
-			const closePanel = variablesPanel.querySelector('.close-panel') as HTMLElement;
-			closePanel.addEventListener('click', function() {
-				variablesPanel.classList.remove('show');
-			});
-		} else {
-			console.log('No variables available to display');
-		}
-	});
+			} else {
+				console.log('No variables available to display');
+			}
+		});
+	}
 
 	function escapeHtml(unsafe: string): string {
 		return unsafe

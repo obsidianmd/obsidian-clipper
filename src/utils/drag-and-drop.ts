@@ -138,11 +138,8 @@ function handleVaultReorder(newIndex: number): void {
 	if (oldIndex !== -1 && oldIndex !== newIndex) {
 		const [movedVault] = vaults.splice(oldIndex, 1);
 		vaults.splice(newIndex, 0, movedVault);
-		saveGeneralSettings().then(() => {
-			updateVaultList();
-		}).catch(error => {
-			console.error('Failed to save general settings:', error);
-		});
+		saveGeneralSettings({});
+		updateVaultList();
 	}
 }
 

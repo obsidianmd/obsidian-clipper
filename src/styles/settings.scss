@@ -45,12 +45,18 @@
 	justify-content: space-between;
 	align-items: center;
 	gap: 8px;
+	border-bottom: 1px solid var(--background-modifier-border);
+	padding: 8px 0;
+	margin-bottom: 8px;
 	.setting-item-info {
 		font-size: var(--font-ui-small);
 		label {
 			margin: 0;
 			font-weight: 400;
 		}
+	}
+	&:last-child {
+		border-bottom: none;
 	}
 }
 

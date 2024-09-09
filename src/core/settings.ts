@@ -29,6 +29,20 @@ document.addEventListener('DOMContentLoaded', () => {
 		initializeDropZone();
 		initializeKeyboardShortcuts();
 
+		const showVariablesToggle = document.getElementById('show-variables-toggle') as HTMLInputElement;
+		if (showVariablesToggle) {
+			showVariablesToggle.addEventListener('change', () => {
+				saveGeneralSettings({ showVariablesButton: showVariablesToggle.checked });
+			});
+		}
+
+		// Load the current setting
+		loadGeneralSettings().then((settings) => {
+			if (showVariablesToggle) {
+				showVariablesToggle.checked = settings.showVariablesButton || false;
+			}
+		});
+
 		exportTemplateBtn.addEventListener('click', exportTemplate);
 		importTemplateBtn.addEventListener('click', importTemplate);
 		resetDefaultTemplateBtn.addEventListener('click', resetDefaultTemplate);
