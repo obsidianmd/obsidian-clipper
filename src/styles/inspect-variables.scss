@@ -47,22 +47,24 @@
 	.variable-list {
 		word-break: break-all;
 		overflow-y: auto;
-		padding: 8px 12px 8px;
+		padding: 8px 8px 8px 12px;
 		line-height: 1.3;
 	}
 
 	.variable-item {
 		display: flex;
-		align-items: center;
-		flex-wrap: wrap;
-		padding: 0 0;
+		align-items: flex-start;
+		flex-direction: column;
+		padding: 4px 18px 4px 0;
 		gap: 2px;
+		position: relative;
 		border-bottom: 1px solid var(--background-modifier-border);
 		&:last-child {
 			border-bottom: none;
 		}
 		&.is-collapsed {
-			flex-wrap: nowrap;
+			flex-direction: row;
+			align-items: center;
 			.variable-value {
 				white-space: nowrap;
 				margin: 0px;
@@ -87,6 +89,9 @@
 	}
 
 	.chevron-icon {
+		position: absolute;
+		inset-inline-end: 0;
+		top: 0;
 		width: 16px;
 		height: 24px;
 		display: flex;
@@ -96,6 +101,7 @@
 		color: var(--text-faint);
 		transform: rotate(90deg);
 		user-select: none;
+		margin-inline-start: auto;
 		svg {
 			width: 16px;
 			height: 16px;
@@ -110,6 +116,6 @@
 		word-break: break-all;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		margin: 0 0 4px 16px;
+		margin: 0;
 	}
 }
