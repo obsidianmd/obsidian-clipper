@@ -116,6 +116,9 @@ export const filters: { [key: string]: FilterFunction } = {
 		}
 		return format ? date.format(format) : date.format();
 	},
+	trim: (str: string): string => {
+		return str.trim();
+	},
 };
 
 export function applyFilters(value: string, filterNames: string[]): string {

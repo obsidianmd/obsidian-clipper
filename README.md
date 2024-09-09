@@ -98,3 +98,5 @@ Filters allow you to modify variables in a template. Filters are applied to vari
 	- `["a","b","c"]|join` returns `"a,b,c"`.
 	- A custom separator can be specified: `["a","b","c"]|join:" "` returns `"a b c"`.
 	- It can be useful after `split` or `slice`: `"a,b,c,d"|split:","|slice:1,3|join:" "` returns `"b c"`.
+- `trim` removes whitespace from both ends of a string.
+	- `"  hello world  "|trim` returns `"hello world"`.
