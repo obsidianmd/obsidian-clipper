@@ -352,9 +352,20 @@ document.addEventListener('DOMContentLoaded', async function() {
 		if (vaultDropdown) {
 			if (template.vault) {
 				vaultDropdown.value = template.vault;
-			} else if (vaults.length > 0) {
-				vaultDropdown.value = vaults[0];
+			} else {
+				// Try to get the previously selected vault from local storage
+				const lastSelectedVault = await getLocalStorage('lastSelectedVault');
+				if (lastSelectedVault && vaults.includes(lastSelectedVault)) {
+					vaultDropdown.value = lastSelectedVault;
+				} else if (vaults.length > 0) {
+					vaultDropdown.value = vaults[0];
+				}
 			}
+
+			// Add event listener to save the selected vault
+			vaultDropdown.addEventListener('change', () => {
+				setLocalStorage('lastSelectedVault', vaultDropdown.value);
+			});
 		}
 	}
 
