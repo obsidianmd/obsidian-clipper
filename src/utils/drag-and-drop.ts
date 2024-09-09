@@ -1,6 +1,6 @@
 import { Template, Property } from '../types/types';
 import { templates, getTemplates, saveTemplateSettings, updateTemplateList, getEditingTemplateIndex } from '../managers/template-manager';
-import { getVaults, saveGeneralSettings, updateVaultList } from '../managers/general-settings';
+import { saveGeneralSettings, updateVaultList, generalSettings } from '../managers/general-settings';
 
 let draggedElement: HTMLElement | null = null;
 
@@ -132,13 +132,12 @@ function handlePropertyReorder(draggedItemId: string, newIndex: number): void {
 }
 
 function handleVaultReorder(newIndex: number): void {
-	const vaults = getVaults();
 	if (!draggedElement) return;
 	const oldIndex = parseInt(draggedElement.dataset.index || '-1');
 	if (oldIndex !== -1 && oldIndex !== newIndex) {
-		const [movedVault] = vaults.splice(oldIndex, 1);
-		vaults.splice(newIndex, 0, movedVault);
-		saveGeneralSettings({});
+		const [movedVault] = generalSettings.vaults.splice(oldIndex, 1);
+		generalSettings.vaults.splice(newIndex, 0, movedVault);
+		saveGeneralSettings();
 		updateVaultList();
 	}
 }
