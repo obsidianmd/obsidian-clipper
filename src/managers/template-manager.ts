@@ -5,6 +5,7 @@ import { escapeValue, unescapeValue } from '../utils/string-utils';
 import { compressToUTF16, decompressFromUTF16 } from 'lz-string';
 import { debounce } from '../utils/debounce';
 import { generalSettings } from './general-settings';
+import { updateUrl } from '../core/settings';
 
 export let templates: Template[] = [];
 export let editingTemplateIndex = -1;
@@ -39,9 +40,6 @@ export function loadTemplates(): Promise<void> {
 			}
 
 			updateTemplateList();
-			if (templates.length > 0) {
-				showTemplateEditor(templates[0]);
-			}
 			resolve();
 		});
 	});
@@ -232,6 +230,8 @@ export function showTemplateEditor(template: Template | null): void {
 	}
 
 	hasUnsavedChanges = true;
+
+	updateUrl('templates', editingTemplate.id);
 }
 
 async function prepareTemplateForSave(template: Template): Promise<[string[], string | null]> {
@@ -528,4 +528,8 @@ function updateBehaviorFields(): void {
 			if (propertiesWarning) propertiesWarning.style.display = 'none';
 		}
 	}
+}
+
+export function findTemplateById(id: string): Template | undefined {
+	return templates.find(template => template.id === id);
 }

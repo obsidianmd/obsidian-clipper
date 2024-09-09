@@ -1,5 +1,5 @@
 import { Template } from '../types/types';
-import { loadTemplates, updateTemplateList, showTemplateEditor, saveTemplateSettings, createDefaultTemplate, templates, getTemplates } from '../managers/template-manager';
+import { loadTemplates, updateTemplateList, showTemplateEditor, saveTemplateSettings, createDefaultTemplate, templates, getTemplates, findTemplateById } from '../managers/template-manager';
 import { initializeGeneralSettings, addVault } from '../managers/general-settings';
 import { initializeSidebar } from '../utils/ui-utils';
 import { initializeDragAndDrop } from '../utils/drag-and-drop';
@@ -9,6 +9,14 @@ import { createIcons } from 'lucide';
 import { icons } from '../icons/icons';
 import { resetUnsavedChanges } from '../managers/template-manager';
 import { initializeDropZone } from '../utils/import-export';
+
+function updateUrl(section: string, templateId?: string): void {
+	let url = `${window.location.pathname}?section=${section}`;
+	if (templateId) {
+		url += `&template=${templateId}`;
+	}
+	window.history.pushState({}, '', url);
+}
 
 document.addEventListener('DOMContentLoaded', () => {
 	const vaultInput = document.getElementById('vault-input') as HTMLInputElement;
@@ -21,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		initializeGeneralSettings();
 		loadTemplates().then(() => {
 			initializeTemplateListeners();
+			handleUrlParameters();
 		});
 		initializeSidebar();
 		initializeAutoSave();
@@ -46,6 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
 					if (selectedTemplate) {
 						resetUnsavedChanges();
 						showTemplateEditor(selectedTemplate);
+						updateUrl('templates', selectedTemplate.id);
 					}
 				}
 			});
@@ -75,25 +85,78 @@ document.addEventListener('DOMContentLoaded', () => {
 		console.error('Vault input not found');
 	}
 
+	function handleUrlParameters(): void {
+		const urlParams = new URLSearchParams(window.location.search);
+		const section = urlParams.get('section');
+		const templateId = urlParams.get('template');
+
+		if (section === 'general') {
+			showGeneralSettings();
+		} else if (templateId) {
+			const template = findTemplateById(templateId);
+			if (template) {
+				showTemplateEditor(template);
+			} else {
+				console.error(`Template with id ${templateId} not found`);
+				showGeneralSettings();
+			}
+		} else {
+			showGeneralSettings();
+		}
+	}
+
+	function showGeneralSettings(): void {
+		const generalSection = document.getElementById('general-section');
+		const templatesSection = document.getElementById('templates-section');
+		if (generalSection) {
+			generalSection.style.display = 'block';
+			generalSection.classList.add('active');
+		}
+		if (templatesSection) {
+			templatesSection.style.display = 'none';
+			templatesSection.classList.remove('active');
+		}
+		updateUrl('general');
+
+		// Update sidebar active state
+		document.querySelectorAll('.sidebar li').forEach(item => item.classList.remove('active'));
+		const generalItem = document.querySelector('.sidebar li[data-section="general"]');
+		if (generalItem) generalItem.classList.add('active');
+	}
+
+	function resetDefaultTemplate(): void {
+		const defaultTemplate = createDefaultTemplate();
+		const currentTemplates = getTemplates();
+		const defaultIndex = currentTemplates.findIndex((t: Template) => t.name === 'Default');
+		
+		if (defaultIndex !== -1) {
+			currentTemplates[defaultIndex] = defaultTemplate;
+		} else {
+			currentTemplates.unshift(defaultTemplate);
+		}
+
+		saveTemplateSettings().then(() => {
+			updateTemplateList();
+			showTemplateEditor(defaultTemplate);
+		}).catch(error => {
+			console.error('Failed to reset default template:', error);
+			alert('Failed to reset default template. Please try again.');
+		});
+	}
+
+	function initializeSidebar(): void {
+		const sidebar = document.querySelector('.sidebar');
+		if (sidebar) {
+			sidebar.addEventListener('click', (event) => {
+				const target = event.target as HTMLElement;
+				if (target.dataset.section === 'general') {
+					showGeneralSettings();
+				}
+			});
+		}
+	}
+
 	initializeSettings();
 });
 
-function resetDefaultTemplate(): void {
-	const defaultTemplate = createDefaultTemplate();
-	const currentTemplates = getTemplates();
-	const defaultIndex = currentTemplates.findIndex((t: Template) => t.name === 'Default');
-	
-	if (defaultIndex !== -1) {
-		currentTemplates[defaultIndex] = defaultTemplate;
-	} else {
-		currentTemplates.unshift(defaultTemplate);
-	}
-
-	saveTemplateSettings().then(() => {
-		updateTemplateList();
-		showTemplateEditor(defaultTemplate);
-	}).catch(error => {
-		console.error('Failed to reset default template:', error);
-		alert('Failed to reset default template. Please try again.');
-	});
-}
+export { updateUrl };
