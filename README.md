@@ -89,6 +89,7 @@ Filters allow you to modify variables in a template. Filters are applied to vari
 	- `["a","b","c"]|last` returns `"c"`.
 	- If the input is not an array, it returns the input unchanged.
 - `list` converts an array to a bullet list.
+	- Optionally you can use `list:ordered` to convert to an ordered list.
 - `pascal` converts text to `PascalCase`.
 - `slice` extracts a portion of a string or array.
 	- For strings: `"hello"|slice:1,4` returns `"ell"`.

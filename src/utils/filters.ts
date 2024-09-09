@@ -3,11 +3,14 @@ import dayjs from 'dayjs';
 export type FilterFunction = (value: string, param?: string) => string;
 
 export const filters: { [key: string]: FilterFunction } = {
-	list: (str: string) => {
+	list: (str: string, param?: string) => {
 		try {
 			const arrayValue = JSON.parse(str);
 			if (Array.isArray(arrayValue)) {
-				return arrayValue.map(item => `- ${item}`).join('\n');
+				const isOrdered = param === 'ordered';
+				return arrayValue.map((item, index) => 
+					isOrdered ? `${index + 1}. ${item}` : `- ${item}`
+				).join('\n');
 			}
 		} catch (error) {
 			console.error('Error parsing JSON for list filter:', error);
