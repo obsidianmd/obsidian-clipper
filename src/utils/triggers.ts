@@ -29,6 +29,9 @@ function matchSchemaPattern(pattern: string, schemaOrgData: any): boolean {
 	const actualValue = getSchemaValue(schemaOrgData, schemaKey);
 	
 	if (expectedValue) {
+		if (Array.isArray(actualValue)) {
+			return actualValue.includes(expectedValue);
+		}
 		return actualValue === expectedValue;
 	} else {
 		return !!actualValue;

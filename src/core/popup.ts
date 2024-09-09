@@ -6,7 +6,7 @@ import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
 import { unescapeValue } from '../utils/string-utils';
 import { decompressFromUTF16 } from 'lz-string';
 import { getLocalStorage, setLocalStorage } from '../utils/storage-utils';
-import { findMatchingTemplate, matchPattern } from '../utils/url-pattern-match';
+import { findMatchingTemplate, matchPattern } from '../utils/triggers';
 import { formatVariables } from '../utils/string-utils';
 import { loadGeneralSettings } from '../managers/general-settings';
 
