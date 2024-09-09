@@ -75,34 +75,34 @@ Filters allow you to modify variables in a template. Filters are applied to vari
 
 #### Available filters
 
-- `wikilink` adds double brackets around strings and array items.
-- `date` formats a date, [see format reference](https://day.js.org/docs/en/display/format).
-- `list` converts an array to a bullet list.
-- `kebab` converts text to `kebab-case`.
-- `pascal` converts text to `PascalCase`.
 - `camel` converts text to `camelCase`.
-- `snake` converts text to `snake_case`.
+- `date` formats a date, [see format reference](https://day.js.org/docs/en/display/format).
+- `first` returns the first element of an array as a string.
+	- `["a","b","c"]|first` returns `"a"`.
+	- If the input is not an array, it returns the input unchanged.
+- `join` combines elements of an array into a string.
+	- `["a","b","c"]|join` returns `"a,b,c"`.
+	- A custom separator can be specified: `["a","b","c"]|join:" "` returns `"a b c"`.
+	- It can be useful after `split` or `slice`: `"a,b,c,d"|split:","|slice:1,3|join:" "` returns `"b c"`.
+- `kebab` converts text to `kebab-case`.
+- `last` returns the last element of an array as a string.
+	- `["a","b","c"]|last` returns `"c"`.
+	- If the input is not an array, it returns the input unchanged.
+- `list` converts an array to a bullet list.
+- `pascal` converts text to `PascalCase`.
 - `slice` extracts a portion of a string or array.
 	- For strings: `"hello"|slice:1,4` returns `"ell"`.
 	- For arrays: `["a","b","c","d"]|slice:1,3` returns `["b","c"]`.
 	- If only one parameter is provided, it slices from that index to the end: `"hello"|slice:2` returns `"llo"`.
 	- Negative indices count from the end: `"hello"|slice:-3` returns `"llo"`.
-    - The second parameter is exclusive: `"hello"|slice:1,4` includes characters at indices 1, 2, and 3.
+	- The second parameter is exclusive: `"hello"|slice:1,4` includes characters at indices 1, 2, and 3.
 	- Using a negative second parameter excludes elements from the end: `"hello"|slice:0,-2` returns `"hel"`.
+- `snake` converts text to `snake_case`.
 - `split` divides a string into an array of substrings.
 	- `"a,b,c"|split:","` returns `["a","b","c"]`.
 	- `"hello world"|split:" "` returns `["hello","world"]`.
 	- If no separator is provided, it splits on every character: `"hello"|split` returns `["h","e","l","l","o"]`.
 	- Regular expressions can be used as separators: `"a1b2c3"|split:[0-9]` returns `["a","b","c"]`.
-- `join` combines elements of an array into a string.
-	- `["a","b","c"]|join` returns `"a,b,c"`.
-	- A custom separator can be specified: `["a","b","c"]|join:" "` returns `"a b c"`.
-	- It can be useful after `split` or `slice`: `"a,b,c,d"|split:","|slice:1,3|join:" "` returns `"b c"`.
 - `trim` removes whitespace from both ends of a string.
 	- `"  hello world  "|trim` returns `"hello world"`.
-- `first` returns the first element of an array as a string.
-	- `["a","b","c"]|first` returns `"a"`.
-	- If the input is not an array, it returns the input unchanged.
-- `last` returns the last element of an array as a string.
-	- `["a","b","c"]|last` returns `"c"`.
-	- If the input is not an array, it returns the input unchanged.
+- `wikilink` adds double brackets around strings and array items.
