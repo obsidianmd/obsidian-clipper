@@ -200,7 +200,7 @@
 }
 
 #show-variables {
-	display: none; // Hide by default
+	display: none;
 	&.show {
 		display: flex;
 	}

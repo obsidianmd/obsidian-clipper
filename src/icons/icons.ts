@@ -23,7 +23,7 @@ export function initializeIcons(root: HTMLElement | Document = document) {
 		attrs: {
 			'stroke-width': 1.75,
 			'class': 'lucide-icon'
-			},
+		},
 		nameAttr: 'data-lucide',
 	});
 }
