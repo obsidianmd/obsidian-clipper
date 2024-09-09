@@ -24,6 +24,8 @@
 		margin: 0;
 		padding: 24px 12px;
 		text-align: center;
+		color: var(--text-muted);
+		font-size: var(--font-ui-smaller);
 	}
 	::-webkit-scrollbar{
 		width: 8px;
@@ -50,9 +52,10 @@
 	height: 100vh;
 
 	#template-select {
+		appearance: none;
 		border-radius: 0;
 		border: none;
-		padding: 4px 8px 4px;
+		padding: 4px 8px 4px 12px;
 		width: calc(100% - 36px);
 		margin-inline-start: 0;
 		margin-inline-end: auto;
