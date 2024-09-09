@@ -144,6 +144,18 @@ export const filters: { [key: string]: FilterFunction } = {
 		}
 		return str;
 	},
+	capitalize: (str: string): string => {
+		return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+	},
+	lower: (str: string): string => {
+		return str.toLowerCase();
+	},
+	title: (str: string): string => {
+		return str.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
+	},
+	upper: (str: string): string => {
+		return str.toUpperCase();
+	},
 };
 
 export function applyFilters(value: string, filterNames: string[]): string {

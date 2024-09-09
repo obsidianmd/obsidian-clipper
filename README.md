@@ -75,6 +75,7 @@ Filters allow you to modify variables in a template. Filters are applied to vari
 
 #### Available filters
 
+- `capitalize` capitalizes the first character of the value and converts the rest to lowercase, e.g. `"hELLO wORLD"|capitalize` returns `"Hello world"`.
 - `camel` converts text to `camelCase`.
 - `date` formats a date, [see format reference](https://day.js.org/docs/en/display/format).
 - `first` returns the first element of an array as a string.
@@ -104,6 +105,8 @@ Filters allow you to modify variables in a template. Filters are applied to vari
 	- `"hello world"|split:" "` returns `["hello","world"]`.
 	- If no separator is provided, it splits on every character: `"hello"|split` returns `["h","e","l","l","o"]`.
 	- Regular expressions can be used as separators: `"a1b2c3"|split:[0-9]` returns `["a","b","c"]`.
+- `title` returns a titlecased version of the value, e.g. `"hello world"|title` returns `"Hello World"`.
 - `trim` removes whitespace from both ends of a string.
 	- `"  hello world  "|trim` returns `"hello world"`.
-- `wikilink` adds double brackets around strings and array items.
+- `upper` converts a value to uppercase, e.g. `"hello world"|upper` returns `"HELLO WORLD"`.
+- `wikilink` adds double brackets around strings and array items, e.g. `"hello"|wikilink` returns `"[[hello]]"`.
