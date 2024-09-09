@@ -382,6 +382,11 @@ document.addEventListener('DOMContentLoaded', function() {
 			variableItems.forEach(item => {
 				const key = item.querySelector('.variable-key') as HTMLElement;
 				const chevron = item.querySelector('.chevron-icon') as HTMLElement;
+				const valueElement = item.querySelector('.variable-value') as HTMLElement;
+
+				if (valueElement.scrollWidth > valueElement.clientWidth) {
+					item.classList.add('has-overflow');
+				}
 
 				key.addEventListener('click', function() {
 					const variableName = this.getAttribute('data-variable');

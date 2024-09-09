@@ -73,6 +73,9 @@
 				transform: rotate(0deg);
 			}
 		}
+		&.has-overflow .chevron-icon {
+			display: flex; // Show only when has-overflow class is present
+		}
 	}
 
 	.variable-key {
@@ -94,7 +97,7 @@
 		top: 0;
 		width: 16px;
 		height: 24px;
-		display: flex;
+		display: none; 
 		align-items: center;
 		cursor: pointer;
 		transition: transform 0.2s ease;
