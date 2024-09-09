@@ -110,6 +110,23 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 		}
 	});
 
+	turndownService.addRule('highlight', {
+		filter: 'mark',
+		replacement: function(content) {
+			return '==' + content + '==';
+		}
+	});
+
+	turndownService.addRule('strikethrough', {
+		filter: (node: Node) => 
+			node.nodeName === 'DEL' || 
+			node.nodeName === 'S' || 
+			node.nodeName === 'STRIKE',
+		replacement: function(content) {
+			return '~~' + content + '~~';
+		}
+	});
+
 	let markdown = turndownService.turndown(markdownContent);
 
 	// Remove the title from the beginning of the content if it exists
