@@ -4,6 +4,7 @@ import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
 import { escapeValue, unescapeValue } from '../utils/string-utils';
 import { compressToUTF16, decompressFromUTF16 } from 'lz-string';
 import { debounce } from '../utils/debounce';
+import { generalSettings } from './general-settings';
 
 export let templates: Template[] = [];
 export let editingTemplateIndex = -1;
@@ -216,6 +217,18 @@ export function showTemplateEditor(template: Template | null): void {
 				hasUnsavedChanges = true;
 			}
 		}, 200));
+	}
+
+	const vaultSelect = document.getElementById('template-vault') as HTMLSelectElement;
+	if (vaultSelect) {
+		vaultSelect.innerHTML = '<option value="">Last used</option>';
+		generalSettings.vaults.forEach(vault => {
+			const option = document.createElement('option');
+			option.value = vault;
+			option.textContent = vault;
+			vaultSelect.appendChild(option);
+		});
+		vaultSelect.value = editingTemplate.vault || '';
 	}
 
 	hasUnsavedChanges = true;
@@ -465,6 +478,9 @@ export function updateTemplateFromForm(): void {
 
 	const urlPatternsTextarea = document.getElementById('url-patterns') as HTMLTextAreaElement;
 	if (urlPatternsTextarea) template.urlPatterns = urlPatternsTextarea.value.split('\n').filter(Boolean);
+
+	const vaultSelect = document.getElementById('template-vault') as HTMLSelectElement;
+	if (vaultSelect) template.vault = vaultSelect.value || undefined;
 
 	hasUnsavedChanges = true;
 }

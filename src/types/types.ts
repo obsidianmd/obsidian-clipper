@@ -9,6 +9,7 @@ export interface Template {
 	urlPatterns?: string[];
 	specificNoteName?: string;
 	dailyNoteFormat?: string;
+	vault?: string;
 }
 
 export interface Property {
