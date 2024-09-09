@@ -56,7 +56,7 @@ async function handleClip() {
 		return;
 	}
 
-	const selectedVault = vaultDropdown.value;
+	const selectedVault = currentTemplate.vault || vaultDropdown.value;
 	const noteContent = noteContentField.value;
 	const noteName = noteNameField.value;
 	const path = pathField.value;
@@ -347,6 +347,25 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 		initializeIcons();
 		setupMetadataToggle();
+
+		const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement;
+		if (vaultDropdown) {
+			if (template.vault) {
+				vaultDropdown.value = template.vault;
+			} else {
+				// Try to get the previously selected vault
+				const lastSelectedVault = await getLocalStorage('lastSelectedVault');
+				if (lastSelectedVault && vaults.includes(lastSelectedVault)) {
+					vaultDropdown.value = lastSelectedVault;
+				} else if (vaults.length > 0) {
+					vaultDropdown.value = vaults[0];
+				}
+			}
+
+			vaultDropdown.addEventListener('change', () => {
+				setLocalStorage('lastSelectedVault', vaultDropdown.value);
+			});
+		}
 	}
 
 	const clipButton = document.getElementById('clip-button') as HTMLButtonElement;
