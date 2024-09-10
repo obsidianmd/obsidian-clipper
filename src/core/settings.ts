@@ -1,6 +1,6 @@
 import { Template } from '../types/types';
 import { loadTemplates, createDefaultTemplate, templates, getTemplates, findTemplateById, saveTemplateSettings } from '../managers/template-manager';
-import { updateTemplateList, showTemplateEditor, resetUnsavedChanges } from '../managers/template-ui';
+import { updateTemplateList, showTemplateEditor, resetUnsavedChanges, initializeAddPropertyButton } from '../managers/template-ui';
 import { initializeGeneralSettings } from '../managers/general-settings';
 import { initializeDragAndDrop } from '../utils/drag-and-drop';
 import { initializeAutoSave } from '../utils/auto-save';
@@ -25,8 +25,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		});
 		initializeSidebar();
 		initializeAutoSave();
-		initializeDragAndDrop();
-		initializeDropZone();
 
 		exportTemplateBtn.addEventListener('click', exportTemplate);
 		importTemplateBtn.addEventListener('click', importTemplate);
@@ -138,14 +136,12 @@ document.addEventListener('DOMContentLoaded', () => {
 		});
 	}
 
-	const dropZone = document.getElementById('drop-zone');
-	if (dropZone) {
-		initializeDropZone();
-	}
-
 	const templateForm = document.getElementById('template-settings-form');
 	if (templateForm) {
 		initializeAutoSave();
+		initializeDragAndDrop();
+		initializeDropZone();
+		initializeAddPropertyButton();
 	}
 
 	initializeSettings();

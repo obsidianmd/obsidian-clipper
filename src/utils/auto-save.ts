@@ -63,19 +63,6 @@ export function initializeAutoSave(): void {
 			}
 		});
 	}
-
-	const addPropertyBtn = document.getElementById('add-property-btn');
-	if (addPropertyBtn) {
-		addPropertyBtn.addEventListener('click', () => {
-			addPropertyToEditor();
-			if (editingTemplateIndex !== -1) {
-				updateTemplateFromForm();
-				autoSave();
-			}
-		});
-	} else {
-		console.error('Add property button not found');
-	}
 }
 
 function showWarnings(warnings: string[]) {

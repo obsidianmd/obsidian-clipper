@@ -387,3 +387,20 @@ function clearTemplateEditor(): void {
 	const templateEditor = document.getElementById('template-editor');
 	if (templateEditor) templateEditor.style.display = 'none';
 }
+
+export function initializeAddPropertyButton(): void {
+	const addPropertyBtn = document.getElementById('add-property-btn');
+	if (addPropertyBtn) {
+		addPropertyBtn.removeEventListener('click', handleAddProperty);
+		addPropertyBtn.addEventListener('click', handleAddProperty);
+	} else {
+		console.error('Add property button not found');
+	}
+}
+
+function handleAddProperty(): void {
+	addPropertyToEditor();
+	if (editingTemplateIndex !== -1) {
+		updateTemplateFromForm();
+	}
+}
