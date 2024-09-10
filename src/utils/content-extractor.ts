@@ -44,12 +44,17 @@ async function processSchema(match: string, variables: { [key: string]: string }
 	let schemaValue = '';
 
 	// Check if we're dealing with a nested array access
-	const nestedArrayMatch = schemaKey.match(/(.*?)\.\[\*\]\.(.*)/);
+	const nestedArrayMatch = schemaKey.match(/(.*?)\[(\*|\d+)\](.*)/);
 	if (nestedArrayMatch) {
-		const [, arrayKey, propertyKey] = nestedArrayMatch;
+		const [, arrayKey, indexOrStar, propertyKey] = nestedArrayMatch;
 		const arrayValue = JSON.parse(variables[`{{schema:${arrayKey}}}`] || '[]');
 		if (Array.isArray(arrayValue)) {
-			schemaValue = JSON.stringify(arrayValue.map(item => item[propertyKey]).filter(Boolean));
+			if (indexOrStar === '*') {
+				schemaValue = JSON.stringify(arrayValue.map(item => getNestedProperty(item, propertyKey.slice(1))).filter(Boolean));
+			} else {
+				const index = parseInt(indexOrStar, 10);
+				schemaValue = arrayValue[index] ? getNestedProperty(arrayValue[index], propertyKey.slice(1)) : '';
+			}
 		}
 	} else {
 		schemaValue = variables[`{{schema:${schemaKey}}}`] || '';
@@ -58,6 +63,10 @@ async function processSchema(match: string, variables: { [key: string]: string }
 	const filterNames = filtersString.split('|').filter(Boolean);
 	const result = applyFilters(schemaValue, filterNames);
 	return result;
+}
+
+function getNestedProperty(obj: any, path: string): any {
+	return path.split('.').reduce((prev, curr) => prev && prev[curr], obj);
 }
 
 export async function replaceVariables(tabId: number, text: string, variables: { [key: string]: string }): Promise<string> {
@@ -247,7 +256,7 @@ function convertDate(date: Date): string {
 function addSchemaOrgDataToVariables(schemaData: any, variables: { [key: string]: string }, prefix: string = '') {
 	if (Array.isArray(schemaData)) {
 		// Add the entire array as a JSON string
-		const variableKey = `{{schema:${prefix.slice(0, -1)}}}`;
+		const variableKey = `{{schema:${prefix}}}`;
 		variables[variableKey] = JSON.stringify(schemaData);
 
 		// If there's only one item, add it without an index
@@ -256,7 +265,7 @@ function addSchemaOrgDataToVariables(schemaData: any, variables: { [key: string]
 		} else {
 			// If there's more than one item, add them with indices
 			schemaData.forEach((item, index) => {
-				addSchemaOrgDataToVariables(item, variables, `${prefix}[${index}].`);
+				addSchemaOrgDataToVariables(item, variables, `${prefix}[${index}]`);
 			});
 		}
 	} else if (typeof schemaData === 'object' && schemaData !== null) {
@@ -265,7 +274,7 @@ function addSchemaOrgDataToVariables(schemaData: any, variables: { [key: string]
 				const variableKey = `{{schema:${prefix}${key}}}`;
 				variables[variableKey] = String(value);
 			} else if (Array.isArray(value)) {
-				addSchemaOrgDataToVariables(value, variables, `${prefix}${key}.`);
+				addSchemaOrgDataToVariables(value, variables, `${prefix}${key}`);
 			} else if (typeof value === 'object' && value !== null) {
 				addSchemaOrgDataToVariables(value, variables, `${prefix}${key}.`);
 			}

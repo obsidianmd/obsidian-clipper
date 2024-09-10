@@ -79,7 +79,7 @@ Schema variables allow you to extract data from [schema.org](https://schema.org/
 - `{{schema:parent.child}}` returns the value of a nested property.
 - `{{schema:arrayKey}}` returns the first item in an array.
 - `{{schema:arrayKey[index].property}}` returns the item at the specified index in an array.
-- `{{schema:arrayKey.[*].property}}` returns a specific property from all items in an array.
+- `{{schema:arrayKey[*].property}}` returns a specific property from all items in an array.
 
 ### Filters
 
