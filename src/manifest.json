@@ -44,7 +44,8 @@
 				"default": "Ctrl+Shift+X",
 				"mac": "Command+Shift+X"
 			},
-			"description": "Quick clip"
+			"description": "Quick clip",
+			"global": false
 		}
 	}
 }

@@ -162,7 +162,7 @@ export const filters: { [key: string]: FilterFunction } = {
 	upper: (str: string): string => {
 		return str.toUpperCase();
 	},
-	quote: (str: string): string => {
+	blockquote: (str: string): string => {
 		return str.split('\n').map(line => `> ${line}`).join('\n');
 	},
 	callout: (str: string, param?: string): string => {

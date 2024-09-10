@@ -90,13 +90,14 @@ Filters allow you to modify variables in a template. Filters are applied to vari
 
 #### Available filters
 
+- `blockquote` adds a Markdown quote prefix (`> `) to each line of the input.
 - `callout` creates a [callout](https://help.obsidian.md/Editing+and+formatting/Callouts) with optional parameters: `{{variable|callout:("type", "title", foldState)}}`
 	- `type` is the callout type, and defaults to "info"
 	- `title` is the callout title, and defaults to empty
 	- `foldState` is a boolean to set the fold state (true for folded, false for unfolded, null for not foldable)
 - `capitalize` capitalizes the first character of the value and converts the rest to lowercase, e.g. `"hELLO wORLD"|capitalize` returns `"Hello world"`.
 - `camel` converts text to `camelCase`.
-- `date` formats a date, [see format reference](https://day.js.org/docs/en/display/format).
+- `date` converts a date to the specified format such as `date:"YYYY-MM-DD"`, [see reference](https://day.js.org/docs/en/display/format).
 - `first` returns the first element of an array as a string.
 	- `["a","b","c"]|first` returns `"a"`.
 	- If the input is not an array, it returns the input unchanged.
@@ -118,7 +119,6 @@ Filters allow you to modify variables in a template. Filters are applied to vari
 	- `object:values` returns an array of the object's values.
 	- Example: `{"a":1,"b":2}|object:array` returns `[["a",1],["b",2]]`.
 - `pascal` converts text to `PascalCase`.
-- `quote` adds a Markdown quote prefix (`> `) to each line of the input.
 - `slice` extracts a portion of a string or array.
 	- For strings: `"hello"|slice:1,4` returns `"ell"`.
 	- For arrays: `["a","b","c","d"]|slice:1,3` returns `["b","c"]`.
