@@ -3,16 +3,17 @@ import { Template, Property } from '../types/types';
 import { generateFrontmatter, saveToObsidian, sanitizeFileName } from '../utils/obsidian-note-creator';
 import { extractPageContent, initializePageContent, replaceVariables } from '../utils/content-extractor';
 import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
-import { unescapeValue } from '../utils/string-utils';
 import { decompressFromUTF16 } from 'lz-string';
-import { getLocalStorage, setLocalStorage } from '../utils/storage-utils';
 import { findMatchingTemplate, matchPattern } from '../utils/triggers';
-import { formatVariables } from '../utils/string-utils';
-import { loadGeneralSettings } from '../managers/general-settings';
+import { getLocalStorage, setLocalStorage, loadGeneralSettings, generalSettings, GeneralSettings } from '../utils/storage-utils';
+import { formatVariables, unescapeValue } from '../utils/string-utils';
+import { loadTemplates, createDefaultTemplate } from '../managers/template-manager';
 
 let currentTemplate: Template | null = null;
 let templates: Template[] = [];
 let currentVariables: { [key: string]: string } = {};
+
+let loadedSettings: GeneralSettings;
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 	if (request.action === "triggerQuickClip") {
@@ -41,6 +42,11 @@ function showError(message: string): void {
 			settingsIcon.style.display = 'flex';
 		}
 	}
+}
+
+function logError(message: string, error?: any): void {
+  console.error(message, error);
+  showError(message);
 }
 
 async function handleClip() {
@@ -88,20 +94,19 @@ async function handleClip() {
 document.addEventListener('DOMContentLoaded', async function() {
 	initializeIcons();
 
+	loadedSettings = await loadGeneralSettings();
+	console.log('General settings:', loadedSettings);
+
+	await loadTemplates();
+
 	const vaultContainer = document.getElementById('vault-container') as HTMLElement;
 	const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement;
 	const templateContainer = document.getElementById('template-container') as HTMLElement;
 	const templateDropdown = document.getElementById('template-select') as HTMLSelectElement;
 
-	let vaults: string[] = [];
+	updateVaultDropdown(loadedSettings.vaults);
 
-	// Load vaults from storage and populate dropdown
-	chrome.storage.sync.get(['vaults'], (data: { vaults?: string[] }) => {
-		vaults = data.vaults || [];
-		updateVaultDropdown();
-	});
-
-	function updateVaultDropdown() {
+	function updateVaultDropdown(vaults: string[]) {
 		vaultDropdown.innerHTML = '';
 		
 		vaults.forEach(vault => {
@@ -128,8 +133,19 @@ document.addEventListener('DOMContentLoaded', async function() {
 				chrome.storage.sync.get(`template_${id}`, data => {
 					const compressedChunks = data[`template_${id}`];
 					if (compressedChunks) {
-						const decompressedData = decompressFromUTF16(compressedChunks.join(''));
-						resolve(JSON.parse(decompressedData));
+						try {
+							const decompressedData = decompressFromUTF16(compressedChunks.join(''));
+							const template = JSON.parse(decompressedData);
+							if (template && Array.isArray(template.properties)) {
+								resolve(template);
+							} else {
+								console.warn(`Invalid template structure for id ${id}`);
+								resolve(null);
+							}
+						} catch (error) {
+							console.error(`Error parsing template ${id}:`, error);
+							resolve(null);
+						}
 					} else {
 						resolve(null);
 					}
@@ -140,8 +156,10 @@ document.addEventListener('DOMContentLoaded', async function() {
 		templates = loadedTemplates.filter((t): t is Template => t !== null);
 
 		if (templates.length === 0) {
-			console.error('No templates found in storage');
-			return;
+			currentTemplate = createDefaultTemplate();
+			templates = [currentTemplate];
+		} else {
+			currentTemplate = templates[0];
 		}
 
 		populateTemplateDropdown();
@@ -231,19 +249,27 @@ document.addEventListener('DOMContentLoaded', async function() {
 		currentTemplate = templates.find((t: Template) => t.name === this.value) || null;
 		if (currentTemplate) {
 			const tabs = await chrome.tabs.query({active: true, currentWindow: true});
-			if (tabs[0].id) {
-				const extractedData = await extractPageContent(tabs[0].id);
-				if (extractedData) {
-					const initializedContent = await initializePageContent(extractedData.content, extractedData.selectedHtml, extractedData.extractedContent, tabs[0].url!, extractedData.schemaOrgData);
-					if (initializedContent) {
-						await initializeTemplateFields(currentTemplate, initializedContent.currentVariables, initializedContent.noteName, extractedData.schemaOrgData);
+			if (tabs[0]?.id) {
+				try {
+					const extractedData = await extractPageContent(tabs[0].id);
+					if (extractedData) {
+						const initializedContent = await initializePageContent(extractedData.content, extractedData.selectedHtml, extractedData.extractedContent, tabs[0].url!, extractedData.schemaOrgData);
+						if (initializedContent) {
+							await initializeTemplateFields(currentTemplate, initializedContent.currentVariables, initializedContent.noteName, extractedData.schemaOrgData);
+						} else {
+							logError('Unable to initialize page content.');
+						}
 					} else {
-						showError('Unable to initialize page content.');
+						logError('Unable to retrieve page content. Try reloading the page.');
 					}
-				} else {
-					showError('Unable to retrieve page content. Try reloading the page.');
+				} catch (error) {
+					logError('Error initializing template fields:', error);
 				}
+			} else {
+				logError('No active tab found');
 			}
+		} else {
+			logError('Selected template not found');
 		}
 	});
 
@@ -269,14 +295,29 @@ document.addEventListener('DOMContentLoaded', async function() {
 	// Initial height adjustment
 	adjustTextareaHeight(noteNameField);
 
-	async function initializeTemplateFields(template: Template, variables: { [key: string]: string }, noteName?: string, schemaOrgData?: any) {
+	async function initializeTemplateFields(template: Template | null, variables: { [key: string]: string }, noteName?: string, schemaOrgData?: any) {
+		if (!template) {
+			logError('No template selected');
+			return;
+		}
+
 		currentVariables = variables;
 		const templateProperties = document.querySelector('.metadata-properties') as HTMLElement;
 		templateProperties.innerHTML = '';
 
 		const tabs = await chrome.tabs.query({active: true, currentWindow: true});
-		const tabId = tabs[0].id!;
-		const currentUrl = tabs[0].url || '';
+		const tabId = tabs[0]?.id;
+		const currentUrl = tabs[0]?.url || '';
+
+		if (!tabId) {
+			logError('No active tab found');
+			return;
+		}
+
+		if (!Array.isArray(template.properties)) {
+			logError('Template properties are not an array');
+			return;
+		}
 
 		for (const property of template.properties) {
 			const propertyDiv = document.createElement('div');
@@ -350,10 +391,10 @@ document.addEventListener('DOMContentLoaded', async function() {
 			} else {
 				// Try to get the previously selected vault
 				const lastSelectedVault = await getLocalStorage('lastSelectedVault');
-				if (lastSelectedVault && vaults.includes(lastSelectedVault)) {
+				if (lastSelectedVault && loadedSettings.vaults.includes(lastSelectedVault)) {
 					vaultDropdown.value = lastSelectedVault;
-				} else if (vaults.length > 0) {
-					vaultDropdown.value = vaults[0];
+				} else if (loadedSettings.vaults.length > 0) {
+					vaultDropdown.value = loadedSettings.vaults[0];
 				}
 			}
 
@@ -363,84 +404,92 @@ document.addEventListener('DOMContentLoaded', async function() {
 		}
 	}
 
-	const clipButton = document.getElementById('clip-button') as HTMLButtonElement;
-	clipButton.focus();
+	function initializeUI() {
+		const clipButton = document.getElementById('clip-button');
+		if (clipButton) {
+			clipButton.addEventListener('click', handleClip);
+			clipButton.focus();
+		}
 
-	document.getElementById('clip-button')!.addEventListener('click', handleClip);
+		const settingsButton = document.getElementById('open-settings');
+		if (settingsButton) {
+			settingsButton.addEventListener('click', function() {
+				chrome.runtime.openOptionsPage();
+			});
+		}
 
-	document.getElementById('open-settings')!.addEventListener('click', function() {
-		chrome.runtime.openOptionsPage();
-	});
+		const showMoreActionsButton = document.getElementById('show-variables') as HTMLElement;
+		if (showMoreActionsButton) {
+			showMoreActionsButton.style.display = loadedSettings.showMoreActionsButton ? 'flex' : 'none';
+			
+			showMoreActionsButton.addEventListener('click', function() {
+				if (currentTemplate && Object.keys(currentVariables).length > 0) {
+					const formattedVariables = formatVariables(currentVariables);
+					variablesPanel.innerHTML = `
+						<div class="variables-header">
+							<h3>Page variables</h3>
+							<span class="close-panel clickable-icon" aria-label="Close">
+								<i data-lucide="x"></i>
+							</span>
+						</div>
+						<div class="variable-list">${formattedVariables}</div>
+					`;
+					variablesPanel.classList.add('show');
+					initializeIcons();
 
-	const settings = await loadGeneralSettings();
-	const showMoreActionsButton = document.getElementById('show-variables') as HTMLElement;
+					// Add click event listeners to variable keys and chevrons
+					const variableItems = variablesPanel.querySelectorAll('.variable-item');
+					variableItems.forEach(item => {
+						const key = item.querySelector('.variable-key') as HTMLElement;
+						const chevron = item.querySelector('.chevron-icon') as HTMLElement;
+						const valueElement = item.querySelector('.variable-value') as HTMLElement;
+
+						if (valueElement.scrollWidth > valueElement.clientWidth) {
+							item.classList.add('has-overflow');
+						}
+
+						key.addEventListener('click', function() {
+							const variableName = this.getAttribute('data-variable');
+							if (variableName) {
+								navigator.clipboard.writeText(variableName).then(() => {
+									const originalText = this.textContent;
+									this.textContent = 'Copied!';
+									setTimeout(() => {
+										this.textContent = originalText;
+									}, 1000);
+								}).catch(err => {
+									console.error('Failed to copy text: ', err);
+								});
+							}
+						});
+
+						chevron.addEventListener('click', function() {
+							item.classList.toggle('is-collapsed');
+							const chevronIcon = this.querySelector('i');
+							if (chevronIcon) {
+								chevronIcon.setAttribute('data-lucide', item.classList.contains('is-collapsed') ? 'chevron-right' : 'chevron-down');
+								initializeIcons();
+							}
+						});
+					});
+
+					const closePanel = variablesPanel.querySelector('.close-panel') as HTMLElement;
+					closePanel.addEventListener('click', function() {
+						variablesPanel.classList.remove('show');
+					});
+				} else {
+					console.log('No variables available to display');
+				}
+			});
+		}
+	}
+
+	// Call this function after loading templates and settings
+	initializeUI();
+
 	const variablesPanel = document.createElement('div');
 	variablesPanel.className = 'variables-panel';
 	document.body.appendChild(variablesPanel);
-
-	if (showMoreActionsButton) {
-		showMoreActionsButton.style.display = settings.showMoreActionsButton ? 'flex' : 'none';
-		
-		showMoreActionsButton.addEventListener('click', function() {
-			if (currentTemplate && Object.keys(currentVariables).length > 0) {
-				const formattedVariables = formatVariables(currentVariables);
-				variablesPanel.innerHTML = `
-					<div class="variables-header">
-						<h3>Page variables</h3>
-						<span class="close-panel clickable-icon" aria-label="Close">
-							<i data-lucide="x"></i>
-						</span>
-					</div>
-					<div class="variable-list">${formattedVariables}</div>
-				`;
-				variablesPanel.classList.add('show');
-				initializeIcons();
-
-				// Add click event listeners to variable keys and chevrons
-				const variableItems = variablesPanel.querySelectorAll('.variable-item');
-				variableItems.forEach(item => {
-					const key = item.querySelector('.variable-key') as HTMLElement;
-					const chevron = item.querySelector('.chevron-icon') as HTMLElement;
-					const valueElement = item.querySelector('.variable-value') as HTMLElement;
-
-					if (valueElement.scrollWidth > valueElement.clientWidth) {
-						item.classList.add('has-overflow');
-					}
-
-					key.addEventListener('click', function() {
-						const variableName = this.getAttribute('data-variable');
-						if (variableName) {
-							navigator.clipboard.writeText(variableName).then(() => {
-								const originalText = this.textContent;
-								this.textContent = 'Copied!';
-								setTimeout(() => {
-									this.textContent = originalText;
-								}, 1000);
-							}).catch(err => {
-								console.error('Failed to copy text: ', err);
-							});
-						}
-					});
-
-					chevron.addEventListener('click', function() {
-						item.classList.toggle('is-collapsed');
-						const chevronIcon = this.querySelector('i');
-						if (chevronIcon) {
-							chevronIcon.setAttribute('data-lucide', item.classList.contains('is-collapsed') ? 'chevron-right' : 'chevron-down');
-							initializeIcons();
-						}
-					});
-				});
-
-				const closePanel = variablesPanel.querySelector('.close-panel') as HTMLElement;
-				closePanel.addEventListener('click', function() {
-					variablesPanel.classList.remove('show');
-				});
-			} else {
-				console.log('No variables available to display');
-			}
-		});
-	}
 
 	function escapeHtml(unsafe: string): string {
 		return unsafe

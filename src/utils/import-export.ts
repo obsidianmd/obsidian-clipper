@@ -1,5 +1,6 @@
 import { Template, Property } from '../types/types';
-import { templates, saveTemplateSettings, updateTemplateList, showTemplateEditor, editingTemplateIndex } from '../managers/template-manager';
+import { templates, saveTemplateSettings, editingTemplateIndex } from '../managers/template-manager';
+import { showTemplateEditor, updateTemplateList } from '../managers/template-ui';
 
 const SCHEMA_VERSION = '0.1.0';
 

@@ -20,7 +20,7 @@ export function formatVariables(variables: { [key: string]: string }): string {
 		.join('');
 }
 
-function escapeHtml(unsafe: string): string {
+export function escapeHtml(unsafe: string): string {
 	return unsafe
 		.replace(/&/g, "&amp;")
 		.replace(/</g, "&lt;")

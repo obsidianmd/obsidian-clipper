@@ -2,41 +2,7 @@ import { handleDragStart, handleDragOver, handleDrop, handleDragEnd } from '../u
 import { initializeIcons } from '../icons/icons';
 import { getCommands } from '../utils/hotkeys';
 import { initializeToggles } from '../utils/ui-utils';
-
-interface GeneralSettings {
-	showMoreActionsButton: boolean;
-	vaults: string[];
-}
-
-export let generalSettings: GeneralSettings = {
-	showMoreActionsButton: true,
-	vaults: []
-};
-
-export async function loadGeneralSettings(): Promise<GeneralSettings> {
-	const data = await chrome.storage.sync.get(['general_settings', 'vaults']);
-	console.log('Loaded general settings:', data.general_settings);
-	console.log('Loaded vaults:', data.vaults);
-
-	generalSettings = {
-		...data.general_settings,
-		vaults: data.vaults || [],
-		showMoreActionsButton: data.general_settings?.showMoreActionsButton || true
-	};
-	
-	return generalSettings;
-}
-
-export async function saveGeneralSettings(settings?: Partial<GeneralSettings>): Promise<void> {
-	generalSettings = { ...generalSettings, ...settings };
-	
-	await chrome.storage.sync.set({ 
-		general_settings: { showMoreActionsButton: generalSettings.showMoreActionsButton },
-		vaults: generalSettings.vaults 
-	});
-	
-	console.log('Saved general settings:', generalSettings);
-}
+import { generalSettings,loadGeneralSettings, saveGeneralSettings } from '../utils/storage-utils';
 
 export function updateVaultList(): void {
 	const vaultList = document.getElementById('vault-list') as HTMLUListElement;

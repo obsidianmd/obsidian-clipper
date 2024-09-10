@@ -1,4 +1,5 @@
-import { saveTemplateSettings, updateTemplateList, updateTemplateFromForm, addPropertyToEditor, editingTemplateIndex, resetUnsavedChanges } from '../managers/template-manager';
+import { saveTemplateSettings, editingTemplateIndex } from '../managers/template-manager';
+import { updateTemplateList, addPropertyToEditor, updateTemplateFromForm } from '../managers/template-ui';
 
 let isReordering = false;
 
@@ -61,19 +62,6 @@ export function initializeAutoSave(): void {
 				}
 			}
 		});
-	}
-
-	const addPropertyBtn = document.getElementById('add-property-btn');
-	if (addPropertyBtn) {
-		addPropertyBtn.addEventListener('click', () => {
-			addPropertyToEditor();
-			if (editingTemplateIndex !== -1) {
-				updateTemplateFromForm();
-				autoSave();
-			}
-		});
-	} else {
-		console.error('Add property button not found');
 	}
 }
 
