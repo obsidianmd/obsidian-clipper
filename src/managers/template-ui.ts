@@ -235,6 +235,7 @@ export function addPropertyToEditor(name: string = '', value: string = '', type:
 	const templateProperties = document.getElementById('template-properties');
 	if (!templateProperties) return;
 
+	const propertyId = id || Date.now().toString() + Math.random().toString(36).slice(2, 11);
 	const propertyDiv = document.createElement('div');
 	propertyDiv.className = 'property-editor';
 	propertyDiv.innerHTML = `
@@ -245,7 +246,7 @@ export function addPropertyToEditor(name: string = '', value: string = '', type:
 			<div class="property-selected" data-value="${type}">
 				<i data-lucide="${getPropertyTypeIcon(type)}"></i>
 			</div>
-			<select class="property-type">
+			<select class="property-type" id="${propertyId}-type">
 				<option value="text">Text</option>
 				<option value="multitext">List</option>
 				<option value="number">Number</option>
@@ -254,13 +255,13 @@ export function addPropertyToEditor(name: string = '', value: string = '', type:
 				<option value="datetime">Date & time</option>
 			</select>
 		</div>
-		<input type="text" class="property-name" value="${name}" placeholder="Property name">
-		<input type="text" class="property-value" value="${escapeHtml(unescapeValue(value))}" placeholder="Property value">
+		<input type="text" class="property-name" id="${propertyId}-name" value="${name}" placeholder="Property name">
+		<input type="text" class="property-value" id="${propertyId}-value" value="${escapeHtml(unescapeValue(value))}" placeholder="Property value">
 		<button type="button" class="remove-property-btn clickable-icon" aria-label="Remove property">
 			<i data-lucide="trash-2"></i>
 		</button>
 	`;
-	propertyDiv.dataset.id = id || Date.now().toString() + Math.random().toString(36).slice(2, 11);
+	propertyDiv.dataset.id = propertyId;
 	templateProperties.appendChild(propertyDiv);
 
 	propertyDiv.addEventListener('mousedown', (event) => {
