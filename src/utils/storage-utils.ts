@@ -1,4 +1,4 @@
-interface GeneralSettings {
+export interface GeneralSettings {
 	showMoreActionsButton: boolean;
 	vaults: string[];
 }
@@ -26,8 +26,6 @@ export function getLocalStorage(key: string): Promise<any> {
 
 export async function loadGeneralSettings(): Promise<GeneralSettings> {
 	const data = await chrome.storage.sync.get(['general_settings', 'vaults']);
-	console.log('Loaded general settings:', data.general_settings);
-	console.log('Loaded vaults:', data.vaults);
 
 	generalSettings = {
 		showMoreActionsButton: data.general_settings?.showMoreActionsButton ?? true,
@@ -44,6 +42,4 @@ export async function saveGeneralSettings(settings?: Partial<GeneralSettings>): 
 		general_settings: { showMoreActionsButton: generalSettings.showMoreActionsButton },
 		vaults: generalSettings.vaults 
 	});
-	
-	console.log('Saved general settings:', generalSettings);
 }
