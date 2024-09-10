@@ -112,6 +112,11 @@ Filters allow you to modify variables in a template. Filters are applied to vari
 	- Use `list:task` to convert to a task list.
 	- Use `list:numbered` to convert to a numbered list.
 	- Use `list:numbered-task` to convert to a task list with numbers.
+- `object` manipulates object data:
+	- `object:array` converts an object to an array of key-value pairs.
+	- `object:keys` returns an array of the object's keys.
+	- `object:values` returns an array of the object's values.
+	- Example: `{"a":1,"b":2}|object:array` returns `[["a",1],["b",2]]`.
 - `pascal` converts text to `PascalCase`.
 - `quote` adds a Markdown quote prefix (`> `) to each line of the input.
 - `slice` extracts a portion of a string or array.
@@ -127,6 +132,10 @@ Filters allow you to modify variables in a template. Filters are applied to vari
 	- `"hello world"|split:" "` returns `["hello","world"]`.
 	- If no separator is provided, it splits on every character: `"hello"|split` returns `["h","e","l","l","o"]`.
 	- Regular expressions can be used as separators: `"a1b2c3"|split:[0-9]` returns `["a","b","c"]`.
+- `table` converts an array or array of objects into a Markdown table:
+	- For an array of objects, it uses the object keys as headers.
+	- For an array of arrays, it creates a table with each nested array as a row.
+	- For a simple array, it creates a single-column table with "Value" as the header.
 - `title` returns a titlecased version of the value, e.g. `"hello world"|title` returns `"Hello World"`.
 - `trim` removes whitespace from both ends of a string.
 	- `"  hello world  "|trim` returns `"hello world"`.
