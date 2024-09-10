@@ -4,7 +4,7 @@ Official Obsidian browser extension. For Chrome and Brave, with support for Fire
 
 - **Customizable templates.** Create templates to automatically extract and organize metadata from web pages.
 - **Smart triggers.** Set up rules to automatically apply the right template based on the website you're clipping from.
-- **Plain text.** All your clips are saved in clean, durable, portable Markdown format — no proprietary formats, no lock-in.
+- **Plain text.** All your clips are saved in clean, durable, portable Markdown format — no proprietary formats, no lock-in, and available to you offline.
 
 ### Developers
 
