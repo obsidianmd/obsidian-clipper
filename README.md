@@ -1,4 +1,12 @@
-Work in progress. Turning the [Obsidian web clipper bookmarklet](https://stephango.com/obsidian-web-clipper) into a proper Chrome extension.
+Official Obsidian browser extension. For Chrome and Brave, with support for Firefox and Safari to come.
+
+### Features
+
+- **Customizable templates.** Create templates to automatically extract and organize metadata from web pages.
+- **Smart triggers.** Set up rules to automatically apply the right template based on the website you're clipping from.
+- **Plain text.** All your clips are saved in clean, durable, portable Markdown format — no proprietary formats, no lock-in.
+
+### Developers
 
 **Run the extension locally**
 
