@@ -99,11 +99,6 @@ export function showTemplateEditor(template: Template | null): void {
 	if (pathInput) pathInput.value = editingTemplate.path;
 
 	const behaviorSelect = document.getElementById('template-behavior') as HTMLSelectElement;
-	const specificNoteContainer = document.getElementById('specific-note-container');
-	const dailyNoteFormatContainer = document.getElementById('daily-note-format-container');
-	const noteNameFormatContainer = document.getElementById('note-name-format-container');
-	const propertiesContainer = document.getElementById('properties-container');
-	const propertiesWarning = document.getElementById('properties-warning');
 	
 	if (behaviorSelect) behaviorSelect.value = editingTemplate.behavior || 'create';
 	const specificNoteName = document.getElementById('specific-note-name') as HTMLInputElement;

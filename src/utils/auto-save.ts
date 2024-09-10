@@ -1,5 +1,5 @@
 import { saveTemplateSettings, editingTemplateIndex } from '../managers/template-manager';
-import { updateTemplateList, addPropertyToEditor, updateTemplateFromForm, resetUnsavedChanges } from '../managers/template-ui';
+import { updateTemplateList, addPropertyToEditor, updateTemplateFromForm } from '../managers/template-ui';
 
 let isReordering = false;
 

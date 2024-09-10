@@ -3,15 +3,12 @@ import { Template, Property } from '../types/types';
 import { generateFrontmatter, saveToObsidian, sanitizeFileName } from '../utils/obsidian-note-creator';
 import { extractPageContent, initializePageContent, replaceVariables } from '../utils/content-extractor';
 import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
-import { unescapeValue } from '../utils/string-utils';
 import { decompressFromUTF16 } from 'lz-string';
-import { getLocalStorage, setLocalStorage } from '../utils/storage-utils';
 import { findMatchingTemplate, matchPattern } from '../utils/triggers';
-import { formatVariables } from '../utils/string-utils';
+import { getLocalStorage, setLocalStorage } from '../utils/storage-utils';
+import { formatVariables, unescapeValue } from '../utils/string-utils';
 import { loadGeneralSettings } from '../managers/general-settings';
 import { loadTemplates, createDefaultTemplate } from '../managers/template-manager';
-import { addVault } from '../managers/general-settings';
-import { initializeAutoSave } from '../utils/auto-save';
 
 let currentTemplate: Template | null = null;
 let templates: Template[] = [];
@@ -372,24 +369,6 @@ document.addEventListener('DOMContentLoaded', async function() {
 	}
 
 	function initializeUI() {
-		const vaultInput = document.getElementById('vault-input') as HTMLInputElement;
-		if (vaultInput) {
-			vaultInput.addEventListener('keypress', (e) => {
-				if (e.key === 'Enter') {
-					e.preventDefault();
-					const newVault = vaultInput.value.trim();
-					if (newVault) {
-						addVault(newVault);
-						vaultInput.value = '';
-					}
-				}
-			});
-		}
-
-		const templateForm = document.getElementById('template-settings-form');
-		if (templateForm) {
-			initializeAutoSave();
-		}
 
 		const clipButton = document.getElementById('clip-button');
 		if (clipButton) {
