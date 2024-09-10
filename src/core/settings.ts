@@ -1,14 +1,14 @@
 import { Template } from '../types/types';
-import { loadTemplates, updateTemplateList, showTemplateEditor, saveTemplateSettings, createDefaultTemplate, templates, getTemplates, findTemplateById } from '../managers/template-manager';
+import { loadTemplates, createDefaultTemplate, templates, getTemplates, findTemplateById, saveTemplateSettings } from '../managers/template-manager';
+import { updateTemplateList, showTemplateEditor } from '../managers/template-ui';
 import { initializeGeneralSettings, addVault } from '../managers/general-settings';
 import { initializeSidebar } from '../utils/ui-utils';
 import { initializeDragAndDrop } from '../utils/drag-and-drop';
 import { initializeAutoSave } from '../utils/auto-save';
-import { exportTemplate, importTemplate } from '../utils/import-export';
+import { exportTemplate, importTemplate, initializeDropZone } from '../utils/import-export';
 import { createIcons } from 'lucide';
 import { icons } from '../icons/icons';
 import { resetUnsavedChanges } from '../managers/template-manager';
-import { initializeDropZone } from '../utils/import-export';
 
 function updateUrl(section: string, templateId?: string): void {
 	let url = `${window.location.pathname}?section=${section}`;
@@ -154,6 +154,16 @@ document.addEventListener('DOMContentLoaded', () => {
 				}
 			});
 		}
+	}
+
+	const dropZone = document.getElementById('drop-zone');
+	if (dropZone) {
+		initializeDropZone();
+	}
+
+	const templateForm = document.getElementById('template-settings-form');
+	if (templateForm) {
+		initializeAutoSave();
 	}
 
 	initializeSettings();

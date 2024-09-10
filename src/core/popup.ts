@@ -9,11 +9,9 @@ import { getLocalStorage, setLocalStorage } from '../utils/storage-utils';
 import { findMatchingTemplate, matchPattern } from '../utils/triggers';
 import { formatVariables } from '../utils/string-utils';
 import { loadGeneralSettings } from '../managers/general-settings';
-import { loadTemplates } from '../managers/template-manager';
-import { createDefaultTemplate } from '../managers/template-manager';
+import { loadTemplates, createDefaultTemplate } from '../managers/template-manager';
 import { addVault } from '../managers/general-settings';
 import { initializeAutoSave } from '../utils/auto-save';
-import { initializeDropZone } from '../utils/import-export';
 
 let currentTemplate: Template | null = null;
 let templates: Template[] = [];
@@ -391,11 +389,6 @@ document.addEventListener('DOMContentLoaded', async function() {
 		const templateForm = document.getElementById('template-settings-form');
 		if (templateForm) {
 			initializeAutoSave();
-		}
-
-		const dropZone = document.getElementById('drop-zone');
-		if (dropZone) {
-			initializeDropZone();
 		}
 
 		const clipButton = document.getElementById('clip-button');
