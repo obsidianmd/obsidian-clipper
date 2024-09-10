@@ -213,7 +213,6 @@ export async function initializePageContent(content: string, selectedHtml: strin
 		'{{title}}': title,
 		'{{noteName}}': noteName,
 		'{{date}}': convertDate(new Date()),
-		'{{today}}': convertDate(new Date()),
 		'{{url}}': currentUrl
 	};
 
