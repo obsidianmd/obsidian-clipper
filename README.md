@@ -6,9 +6,16 @@ Official Obsidian browser extension. For Chrome and Brave, with support for Fire
 - **Smart triggers.** Set up rules to automatically apply the right template based on the website you're clipping from.
 - **Plain text.** All your clips are saved in clean, durable, portable Markdown format — no proprietary formats, no lock-in, and available to you offline.
 
-### Developers
+### Getting started
 
-**Run the extension locally**
+The extension is not yet available on the Chrome Web Store as it is still in beta.
+
+### Installing manually
+
+- Go to [releases](https://github.com/obsidianmd/obsidian-clipper/releases) and download the latest version
+- Drag and drop the `.zip` in `chrome://extensions/`
+
+### Run the extension locally
 
 - `npm install`
 - `npm run build` (or `npm run dev` if you want to make changes to the code)
