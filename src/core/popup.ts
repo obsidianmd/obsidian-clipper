@@ -43,6 +43,11 @@ function showError(message: string): void {
 	}
 }
 
+function logError(message: string, error?: any): void {
+  console.error(message, error);
+  showError(message);
+}
+
 async function handleClip() {
 	if (!currentTemplate) return;
 
@@ -131,8 +136,19 @@ document.addEventListener('DOMContentLoaded', async function() {
 				chrome.storage.sync.get(`template_${id}`, data => {
 					const compressedChunks = data[`template_${id}`];
 					if (compressedChunks) {
-						const decompressedData = decompressFromUTF16(compressedChunks.join(''));
-						resolve(JSON.parse(decompressedData));
+						try {
+							const decompressedData = decompressFromUTF16(compressedChunks.join(''));
+							const template = JSON.parse(decompressedData);
+							if (template && Array.isArray(template.properties)) {
+								resolve(template);
+							} else {
+								console.warn(`Invalid template structure for id ${id}`);
+								resolve(null);
+							}
+						} catch (error) {
+							console.error(`Error parsing template ${id}:`, error);
+							resolve(null);
+						}
 					} else {
 						resolve(null);
 					}
@@ -143,8 +159,9 @@ document.addEventListener('DOMContentLoaded', async function() {
 		templates = loadedTemplates.filter((t): t is Template => t !== null);
 
 		if (templates.length === 0) {
-			console.warn('No templates found, using default template');
+			console.warn('No valid templates found, using default template');
 			currentTemplate = createDefaultTemplate();
+			templates = [currentTemplate];
 		} else {
 			currentTemplate = templates[0];
 		}
@@ -236,19 +253,27 @@ document.addEventListener('DOMContentLoaded', async function() {
 		currentTemplate = templates.find((t: Template) => t.name === this.value) || null;
 		if (currentTemplate) {
 			const tabs = await chrome.tabs.query({active: true, currentWindow: true});
-			if (tabs[0].id) {
-				const extractedData = await extractPageContent(tabs[0].id);
-				if (extractedData) {
-					const initializedContent = await initializePageContent(extractedData.content, extractedData.selectedHtml, extractedData.extractedContent, tabs[0].url!, extractedData.schemaOrgData);
-					if (initializedContent) {
-						await initializeTemplateFields(currentTemplate, initializedContent.currentVariables, initializedContent.noteName, extractedData.schemaOrgData);
+			if (tabs[0]?.id) {
+				try {
+					const extractedData = await extractPageContent(tabs[0].id);
+					if (extractedData) {
+						const initializedContent = await initializePageContent(extractedData.content, extractedData.selectedHtml, extractedData.extractedContent, tabs[0].url!, extractedData.schemaOrgData);
+						if (initializedContent) {
+							await initializeTemplateFields(currentTemplate, initializedContent.currentVariables, initializedContent.noteName, extractedData.schemaOrgData);
+						} else {
+							logError('Unable to initialize page content.');
+						}
 					} else {
-						showError('Unable to initialize page content.');
+						logError('Unable to retrieve page content. Try reloading the page.');
 					}
-				} else {
-					showError('Unable to retrieve page content. Try reloading the page.');
+				} catch (error) {
+					logError('Error initializing template fields:', error);
 				}
+			} else {
+				logError('No active tab found');
 			}
+		} else {
+			logError('Selected template not found');
 		}
 	});
 
@@ -274,14 +299,29 @@ document.addEventListener('DOMContentLoaded', async function() {
 	// Initial height adjustment
 	adjustTextareaHeight(noteNameField);
 
-	async function initializeTemplateFields(template: Template, variables: { [key: string]: string }, noteName?: string, schemaOrgData?: any) {
+	async function initializeTemplateFields(template: Template | null, variables: { [key: string]: string }, noteName?: string, schemaOrgData?: any) {
+		if (!template) {
+			logError('No template selected');
+			return;
+		}
+
 		currentVariables = variables;
 		const templateProperties = document.querySelector('.metadata-properties') as HTMLElement;
 		templateProperties.innerHTML = '';
 
 		const tabs = await chrome.tabs.query({active: true, currentWindow: true});
-		const tabId = tabs[0].id!;
-		const currentUrl = tabs[0].url || '';
+		const tabId = tabs[0]?.id;
+		const currentUrl = tabs[0]?.url || '';
+
+		if (!tabId) {
+			logError('No active tab found');
+			return;
+		}
+
+		if (!Array.isArray(template.properties)) {
+			logError('Template properties are not an array');
+			return;
+		}
 
 		for (const property of template.properties) {
 			const propertyDiv = document.createElement('div');
