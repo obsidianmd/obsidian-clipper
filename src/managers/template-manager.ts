@@ -36,7 +36,9 @@ export function loadTemplates(): Promise<void> {
 			}
 
 			if (templates.length === 0) {
-				templates.push(createDefaultTemplate());
+				const defaultTemplate = createDefaultTemplate();
+				templates.push(defaultTemplate);
+				await saveTemplateSettings();
 			}
 
 			updateTemplateList();

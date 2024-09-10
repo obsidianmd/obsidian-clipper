@@ -9,6 +9,11 @@ import { getLocalStorage, setLocalStorage } from '../utils/storage-utils';
 import { findMatchingTemplate, matchPattern } from '../utils/triggers';
 import { formatVariables } from '../utils/string-utils';
 import { loadGeneralSettings } from '../managers/general-settings';
+import { loadTemplates } from '../managers/template-manager';
+import { createDefaultTemplate } from '../managers/template-manager';
+import { addVault } from '../managers/general-settings';
+import { initializeAutoSave } from '../utils/auto-save';
+import { initializeDropZone } from '../utils/import-export';
 
 let currentTemplate: Template | null = null;
 let templates: Template[] = [];
@@ -88,6 +93,9 @@ async function handleClip() {
 document.addEventListener('DOMContentLoaded', async function() {
 	initializeIcons();
 
+	await loadTemplates();
+	await loadGeneralSettings();
+
 	const vaultContainer = document.getElementById('vault-container') as HTMLElement;
 	const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement;
 	const templateContainer = document.getElementById('template-container') as HTMLElement;
@@ -140,8 +148,10 @@ document.addEventListener('DOMContentLoaded', async function() {
 		templates = loadedTemplates.filter((t): t is Template => t !== null);
 
 		if (templates.length === 0) {
-			console.error('No templates found in storage');
-			return;
+			console.warn('No templates found, using default template');
+			currentTemplate = createDefaultTemplate();
+		} else {
+			currentTemplate = templates[0];
 		}
 
 		populateTemplateDropdown();
@@ -363,14 +373,47 @@ document.addEventListener('DOMContentLoaded', async function() {
 		}
 	}
 
-	const clipButton = document.getElementById('clip-button') as HTMLButtonElement;
-	clipButton.focus();
+	function initializeUI() {
+		const vaultInput = document.getElementById('vault-input') as HTMLInputElement;
+		if (vaultInput) {
+			vaultInput.addEventListener('keypress', (e) => {
+				if (e.key === 'Enter') {
+					e.preventDefault();
+					const newVault = vaultInput.value.trim();
+					if (newVault) {
+						addVault(newVault);
+						vaultInput.value = '';
+					}
+				}
+			});
+		}
 
-	document.getElementById('clip-button')!.addEventListener('click', handleClip);
+		const templateForm = document.getElementById('template-settings-form');
+		if (templateForm) {
+			initializeAutoSave();
+		}
 
-	document.getElementById('open-settings')!.addEventListener('click', function() {
-		chrome.runtime.openOptionsPage();
-	});
+		const dropZone = document.getElementById('drop-zone');
+		if (dropZone) {
+			initializeDropZone();
+		}
+
+		const clipButton = document.getElementById('clip-button');
+		if (clipButton) {
+			clipButton.addEventListener('click', handleClip);
+			clipButton.focus();
+		}
+
+		const settingsButton = document.getElementById('open-settings');
+		if (settingsButton) {
+			settingsButton.addEventListener('click', function() {
+				chrome.runtime.openOptionsPage();
+			});
+		}
+	}
+
+	// Call this function after loading templates and settings
+	initializeUI();
 
 	const settings = await loadGeneralSettings();
 	const showMoreActionsButton = document.getElementById('show-variables') as HTMLElement;

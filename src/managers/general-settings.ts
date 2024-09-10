@@ -19,9 +19,8 @@ export async function loadGeneralSettings(): Promise<GeneralSettings> {
 	console.log('Loaded vaults:', data.vaults);
 
 	generalSettings = {
-		...data.general_settings,
-		vaults: data.vaults || [],
-		showMoreActionsButton: data.general_settings?.showMoreActionsButton || true
+		showMoreActionsButton: data.general_settings?.showMoreActionsButton ?? true,
+		vaults: data.vaults || []
 	};
 	
 	return generalSettings;
