@@ -85,14 +85,7 @@ export function saveToObsidian(fileContent: string, noteName: string, path: stri
 	chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
 		const currentTab = tabs[0];
 		if (currentTab && currentTab.id) {
-			chrome.tabs.update(currentTab.id, { url: obsidianUrl }, function(tab) {
-				chrome.notifications.create({
-					type: 'basic',
-					iconUrl: 'icon.png',
-					title: 'Obsidian Clipper',
-					message: 'If prompted, select "Always allow" to open Obsidian automatically in the future.'
-				});
-			});
+			chrome.tabs.update(currentTab.id, { url: obsidianUrl });
 		}
 	});
 }
