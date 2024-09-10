@@ -31,7 +31,7 @@ export function exportTemplate(): void {
 		triggers: template.triggers,
 	};
 
-	const jsonContent = JSON.stringify(orderedTemplate, null, 2);
+	const jsonContent = JSON.stringify(orderedTemplate, null, '\t');
 
 	const blob = new Blob([jsonContent], { type: 'application/json' });
 	const url = URL.createObjectURL(blob);
