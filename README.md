@@ -55,7 +55,7 @@ You can combine different types of patterns for a single template. The first mat
 
 ### Template variables
 
-Template variables can be used to automatically pre-populate data from the page in a template. Variables can be used in the **note name**, **note location**, **properties**, and **note content**.
+Template variables can be used to automatically pre-populate data from the page in a template. Variables can be used in the **note name**, **note location**, **properties**, and **note content**. Use the `...` icon in the extension popup to access the current page variable for use in templates.
 
 #### Page variables
 
