@@ -1,12 +1,12 @@
 Official Obsidian browser extension. For Chrome and Brave, with support for Firefox and Safari to come.
 
-### Features
+## Features
 
 - **Customizable templates.** Create templates to automatically extract and organize metadata from web pages.
 - **Smart triggers.** Set up rules to automatically apply the right template based on the website you're clipping from.
 - **Plain text.** All your clips are saved in clean, durable, portable Markdown format — no proprietary formats, no lock-in, and available to you offline.
 
-### Getting started
+## Getting started
 
 The extension is not yet available on the Chrome Web Store as it is still in beta.
 
@@ -21,6 +21,10 @@ The extension is not yet available on the Chrome Web Store as it is still in bet
 - `npm run build` (or `npm run dev` if you want to make changes to the code)
 - Go to `chrome://extensions/`
 - Click `Load unpacked` and select the `dist` folder
+
+## Using templates
+
+Some example templates are available in the [clipper-templates repo](https://github.com/kepano/clipper-templates). 
 
 ### Template triggers
 
