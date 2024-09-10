@@ -1,7 +1,7 @@
 {
 	"name": "obsidian-clipper",
-	"version": "1.0.0",
-	"description": "Web clipper for Obsidian",
+	"version": "0.1.0",
+	"description": "Official web clipper for Obsidian.",
 	"scripts": {
 		"build": "tsc && webpack",
 		"dev": "tsc -w & webpack --watch"
