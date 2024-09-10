@@ -207,6 +207,8 @@ document.addEventListener('DOMContentLoaded', async function() {
 		// Only show template selector if there are multiple templates
 		if (templates.length > 1) {
 			templateContainer.style.display = 'block';
+		} else {
+			templateContainer.classList.add('hidden');
 		}
 	});
 

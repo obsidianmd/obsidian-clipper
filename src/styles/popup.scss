@@ -1,11 +1,11 @@
 .popup:has(.variables-panel.show) {
 	width: 500px;
-	max-height: 900px;
 	transition: width 0.1s ease-in-out;
 	overflow: hidden;
 }
 .popup {
 	width: 340px;
+	height: 500px;
 	overflow: hidden;
 	transition: width 0.1s ease-in-out;
 	::selection {
@@ -55,7 +55,7 @@
 		appearance: none;
 		border-radius: 0;
 		border: none;
-		padding: 4px 8px 4px 12px;
+		padding: 6px 8px 2px 12px;
 		width: calc(100% - 36px);
 		margin-inline-start: 0;
 		margin-inline-end: auto;
@@ -72,10 +72,13 @@
 		}
 	}
 
+	#template-container.hidden ~ #note-name-field {
+		padding: 4px 58px 10px 12px;
+	}
 	#note-name-field {
 		border: none;
 		border-radius: 0;
-		padding: 4px 32px 10px 12px;
+		padding: 6px 12px 10px 12px;
 		font-size: var(--font-ui-medium);
 		font-weight: 600;
 		resize: none;
