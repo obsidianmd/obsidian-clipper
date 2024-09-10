@@ -17,21 +17,22 @@ export function loadTemplates(): Promise<Template[]> {
 	return new Promise((resolve) => {
 		chrome.storage.sync.get(TEMPLATE_LIST_KEY, async (data) => {
 			const templateIds = data[TEMPLATE_LIST_KEY] || [];
-			templates = [];
+			const loadedTemplates: Template[] = [];
 
 			for (const id of templateIds) {
 				const template = await loadTemplate(id);
 				if (template) {
-					templates.push(template);
+					loadedTemplates.push(template);
 				}
 			}
 
-			if (templates.length === 0) {
+			if (loadedTemplates.length === 0) {
 				const defaultTemplate = createDefaultTemplate();
-				templates.push(defaultTemplate);
+				loadedTemplates.push(defaultTemplate);
 				await saveTemplateSettings();
 			}
 
+			templates = loadedTemplates;
 			resolve(templates);
 		});
 	});

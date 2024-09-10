@@ -18,7 +18,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	function initializeSettings(): void {
 		initializeGeneralSettings();
-		loadTemplates().then(() => {
+		loadTemplates().then((loadedTemplates) => {
+			updateTemplateList(loadedTemplates);
 			initializeTemplateListeners();
 			handleUrlParameters();
 		});

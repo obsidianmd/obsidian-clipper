@@ -12,12 +12,17 @@ export function resetUnsavedChanges(): void {
 	hasUnsavedChanges = false;
 }
 
-export function updateTemplateList(): void {
+export function updateTemplateList(loadedTemplates?: Template[]): void {
 	const templateList = document.getElementById('template-list');
-	if (!templateList) return;
-
+	if (!templateList) {
+		console.error('Template list element not found');
+		return;
+	}
+	
+	const templatesToUse = loadedTemplates || templates;
+	
 	templateList.innerHTML = '';
-	templates.forEach((template, index) => {
+	templatesToUse.forEach((template, index) => {
 		if (template && template.name && template.id) {
 			const li = document.createElement('li');
 			li.innerHTML = `
