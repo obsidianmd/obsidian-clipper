@@ -1,8 +1,8 @@
 {
 	"manifest_version": 3,
-	"name": "Obsidian Clipper",
+	"name": "Obsidian Web Clipper",
 	"version": "0.1.0",
-	"description": "Clip web content and save as Markdown in Obsidian",
+	"description": "Official web clipper extension for Obsidian. Clip content and save it to your Obsidian vault so you always have access to it, even offline.",
 	"permissions": [
 		"activeTab",
 		"tabs",
