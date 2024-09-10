@@ -2,8 +2,8 @@ import { Template, Property } from '../types/types';
 import { templates, editingTemplateIndex, saveTemplateSettings, getTemplates, setEditingTemplateIndex } from './template-manager';
 import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
 import { escapeValue, escapeHtml, unescapeValue } from '../utils/string-utils';
-import { generalSettings } from './general-settings';
-import { updateUrl } from '../core/settings';
+import { generalSettings } from '../utils/storage-utils';
+import { updateUrl } from '../utils/routing';
 import { handleDragStart, handleDragOver, handleDrop, handleDragEnd } from '../utils/drag-and-drop';
 
 let hasUnsavedChanges = false;

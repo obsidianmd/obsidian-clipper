@@ -1,24 +1,16 @@
 import { Template } from '../types/types';
 import { loadTemplates, createDefaultTemplate, templates, getTemplates, findTemplateById, saveTemplateSettings } from '../managers/template-manager';
 import { updateTemplateList, showTemplateEditor, resetUnsavedChanges } from '../managers/template-ui';
-import { initializeGeneralSettings, addVault } from '../managers/general-settings';
-import { initializeSidebar } from '../utils/ui-utils';
+import { initializeGeneralSettings } from '../managers/general-settings';
 import { initializeDragAndDrop } from '../utils/drag-and-drop';
 import { initializeAutoSave } from '../utils/auto-save';
 import { exportTemplate, importTemplate, initializeDropZone } from '../utils/import-export';
 import { createIcons } from 'lucide';
 import { icons } from '../icons/icons';
-
-function updateUrl(section: string, templateId?: string): void {
-	let url = `${window.location.pathname}?section=${section}`;
-	if (templateId) {
-		url += `&template=${templateId}`;
-	}
-	window.history.pushState({}, '', url);
-}
+import { showGeneralSettings } from '../managers/general-settings-ui';
+import { updateUrl } from '../utils/routing';
 
 document.addEventListener('DOMContentLoaded', () => {
-	const vaultInput = document.getElementById('vault-input') as HTMLInputElement;
 	const newTemplateBtn = document.getElementById('new-template-btn') as HTMLButtonElement;
 	const exportTemplateBtn = document.getElementById('export-template-btn') as HTMLButtonElement;
 	const importTemplateBtn = document.getElementById('import-template-btn') as HTMLButtonElement;
@@ -69,21 +61,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 	}
 
-	if (vaultInput) {
-		vaultInput.addEventListener('keypress', (e) => {
-			if (e.key === 'Enter') {
-				e.preventDefault();
-				const newVault = vaultInput.value.trim();
-				if (newVault) {
-					addVault(newVault);
-					vaultInput.value = '';
-				}
-			}
-		});
-	} else {
-		console.error('Vault input not found');
-	}
-
 	function handleUrlParameters(): void {
 		const urlParams = new URLSearchParams(window.location.search);
 		const section = urlParams.get('section');
@@ -102,25 +79,6 @@ document.addEventListener('DOMContentLoaded', () => {
 		} else {
 			showGeneralSettings();
 		}
-	}
-
-	function showGeneralSettings(): void {
-		const generalSection = document.getElementById('general-section');
-		const templatesSection = document.getElementById('templates-section');
-		if (generalSection) {
-			generalSection.style.display = 'block';
-			generalSection.classList.add('active');
-		}
-		if (templatesSection) {
-			templatesSection.style.display = 'none';
-			templatesSection.classList.remove('active');
-		}
-		updateUrl('general');
-
-		// Update sidebar active state
-		document.querySelectorAll('.sidebar li').forEach(item => item.classList.remove('active'));
-		const generalItem = document.querySelector('.sidebar li[data-section="general"]');
-		if (generalItem) generalItem.classList.add('active');
 	}
 
 	function resetDefaultTemplate(): void {
@@ -144,6 +102,8 @@ document.addEventListener('DOMContentLoaded', () => {
 	}
 
 	function initializeSidebar(): void {
+		const sidebarItems = document.querySelectorAll('.sidebar li[data-section]');
+		const sections = document.querySelectorAll('.settings-section');
 		const sidebar = document.querySelector('.sidebar');
 		if (sidebar) {
 			sidebar.addEventListener('click', (event) => {
@@ -153,6 +113,28 @@ document.addEventListener('DOMContentLoaded', () => {
 				}
 			});
 		}
+	
+		sidebarItems.forEach(item => {
+			item.addEventListener('click', () => {
+				const sectionId = (item as HTMLElement).dataset.section;
+				sidebarItems.forEach(i => i.classList.remove('active'));
+				item.classList.add('active');
+				document.querySelectorAll('#template-list li').forEach(templateItem => templateItem.classList.remove('active'));
+				const templateEditor = document.getElementById('template-editor');
+				if (templateEditor) {
+					templateEditor.style.display = 'none';
+				}
+				sections.forEach(section => {
+					if (section.id === `${sectionId}-section`) {
+						(section as HTMLElement).style.display = 'block';
+						section.classList.add('active');
+					} else {
+						(section as HTMLElement).style.display = 'none';
+						section.classList.remove('active');
+					}
+				});
+			});
+		});
 	}
 
 	const dropZone = document.getElementById('drop-zone');
@@ -167,5 +149,3 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	initializeSettings();
 });
-
-export { updateUrl };

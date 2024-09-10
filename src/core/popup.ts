@@ -7,7 +7,7 @@ import { decompressFromUTF16 } from 'lz-string';
 import { findMatchingTemplate, matchPattern } from '../utils/triggers';
 import { getLocalStorage, setLocalStorage } from '../utils/storage-utils';
 import { formatVariables, unescapeValue } from '../utils/string-utils';
-import { loadGeneralSettings } from '../managers/general-settings';
+import { loadGeneralSettings } from '../utils/storage-utils';
 import { loadTemplates, createDefaultTemplate } from '../managers/template-manager';
 
 let currentTemplate: Template | null = null;
