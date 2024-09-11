@@ -34,7 +34,7 @@ function showError(message: string): void {
 
 	if (errorMessage && clipper) {
 		errorMessage.textContent = message;
-		errorMessage.style.display = 'block';
+		errorMessage.style.display = 'flex';
 		clipper.style.display = 'none';
 
 		// Ensure the settings icon is still visible when showing an error
