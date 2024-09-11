@@ -77,8 +77,8 @@ These variables are automatically generated based on the page content.
 
 Meta variables allow you to extract data from meta tags in the page.
 
-- `{{meta:name:name}}` returns the content of the meta name tag with the given name.
-- `{{meta:property:property}}` returns the content of the meta property tag with the given property.
+- `{{meta:name}}` returns the content of the meta name tag with the given name, e.g. `{{meta:name:description}}` for the `description` meta tag.
+- `{{meta:property}}` returns the content of the meta property tag with the given property, e.g. `{{meta:property:og:title}}` for the `og:title` meta tag.
 
 #### Selector variables
 
