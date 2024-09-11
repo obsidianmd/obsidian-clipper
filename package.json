@@ -3,7 +3,9 @@
 	"version": "0.1.0",
 	"description": "Official web clipper for Obsidian.",
 	"scripts": {
-		"build": "tsc && webpack",
+		"build:chrome": "bash build.sh chrome",
+		"build:firefox": "bash build.sh firefox",
+		"build": "npm run build:chrome && npm run build:firefox",
 		"dev": "tsc -w & webpack --watch"
 	},
 	"devDependencies": {
@@ -14,7 +16,7 @@
 		"copy-webpack-plugin": "^12.0.2",
 		"css-loader": "^7.1.2",
 		"mini-css-extract-plugin": "^2.9.1",
-		"sass": "^1.77.8",
+		 "sass": "^1.77.8",
 		"sass-loader": "^16.0.1",
 		"ts-loader": "^9.5.1",
 		"typescript": "^5.5.4",

@@ -1,0 +1,35 @@
+{
+	"manifest_version": 2,
+	"name": "Obsidian Web Clipper",
+	"version": "0.2.0",
+	"description": "Official web clipper extension for Obsidian. Clip content and save it to your Obsidian vault so you always have access to it, even offline.",
+	"permissions": [
+		"activeTab",
+		"storage",
+		"https://*/*",
+		"http://*/*"
+	],
+	"browser_action": {
+		"default_popup": "popup.html",
+		"default_icon": {
+			"16": "icon16.png",
+			"48": "icon48.png",
+			"128": "icon128.png"
+		}
+	},
+	"background": {
+		"scripts": ["background.js"],
+		"persistent": false
+	},
+	"content_scripts": [
+		{
+			"matches": ["http://*/*", "https://*/*"],
+			"js": ["content.js"]
+		}
+	],
+	"icons": {
+		"16": "icon16.png",
+		"48": "icon48.png",
+		"128": "icon128.png"
+	}
+}
