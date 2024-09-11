@@ -160,6 +160,46 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 		}
 	});
 
+	// Add a new custom rule for complex link structures
+	turndownService.addRule('complexLinkStructure', {
+		filter: function (node, options) {
+			return (
+				node.nodeName === 'A' &&
+				node.childNodes.length > 1 &&
+				Array.from(node.childNodes).some(child => ['H1', 'H2', 'H3', 'H4', 'H5', 'H6'].includes(child.nodeName))
+			);
+		},
+		replacement: function (content, node, options) {
+			if (!(node instanceof HTMLElement)) return content;
+			
+			const href = node.getAttribute('href');
+			const title = node.getAttribute('title');
+			
+			// Extract the heading
+			const headingNode = node.querySelector('h1, h2, h3, h4, h5, h6');
+			const headingContent = headingNode ? turndownService.turndown(headingNode.innerHTML) : '';
+			
+			// Remove the heading from the content
+			if (headingNode) {
+				headingNode.remove();
+			}
+			
+			// Convert the remaining content
+			const remainingContent = turndownService.turndown(node.innerHTML);
+			
+			// Construct the new markdown
+			let markdown = `${headingContent}\n\n${remainingContent}\n\n`;
+			if (href) {
+				markdown += `[View original](${href})`;
+				if (title) {
+					markdown += ` "${title}"`;
+				}
+			}
+			
+			return markdown;
+		}
+	});
+
 	let markdown = turndownService.turndown(markdownContent);
 
 	// Remove the title from the beginning of the content if it exists
