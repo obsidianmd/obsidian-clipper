@@ -97,6 +97,18 @@ function handleTemplateReorder(draggedItemId: string, newIndex: number): void {
 	}
 }
 
+export function handleTemplateDrag(): void {
+	const templateSettingsForm = document.getElementById('template-settings-form');
+	if (templateSettingsForm) {
+		templateSettingsForm.addEventListener('dragover', (event) => {
+			event.preventDefault();
+		});
+		templateSettingsForm.addEventListener('drop', (event) => {
+			event.preventDefault();
+		});
+	}
+}
+
 function handlePropertyReorder(draggedItemId: string, newIndex: number): void {
 	const editingTemplateIndex = getEditingTemplateIndex();
 	if (editingTemplateIndex === -1) {

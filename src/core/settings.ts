@@ -2,7 +2,7 @@ import { Template } from '../types/types';
 import { loadTemplates, createDefaultTemplate, templates, getTemplates, findTemplateById, saveTemplateSettings } from '../managers/template-manager';
 import { updateTemplateList, showTemplateEditor, resetUnsavedChanges, initializeAddPropertyButton } from '../managers/template-ui';
 import { initializeGeneralSettings } from '../managers/general-settings';
-import { initializeDragAndDrop } from '../utils/drag-and-drop';
+import { initializeDragAndDrop, handleTemplateDrag } from '../utils/drag-and-drop';
 import { initializeAutoSave } from '../utils/auto-save';
 import { exportTemplate, importTemplate, initializeDropZone } from '../utils/import-export';
 import { createIcons } from 'lucide';
@@ -142,6 +142,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 		initializeDragAndDrop();
 		initializeDropZone();
 		initializeAddPropertyButton();
+		handleTemplateDrag();
 	}
 
 	await initializeSettings();
