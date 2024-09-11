@@ -30,6 +30,9 @@
 			"js": ["content.js"]
 		}
 	],
+	"content_security_policy": {
+		"extension_pages": "script-src 'self'; object-src 'self'"
+	},
 	"commands": {
 		"_execute_action": {
 			"suggested_key": {
