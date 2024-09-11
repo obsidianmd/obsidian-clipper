@@ -1,4 +1,4 @@
-Official Obsidian browser extension. For Chrome and Brave, with support for Firefox and Safari to come.
+Official Obsidian browser extension. Available for Chrome, Firefox, Edge, Brave, and Arc. Support for Safari to come.
 
 ## Features
 
