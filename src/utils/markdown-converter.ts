@@ -23,20 +23,25 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 		}
 	}
 
+	function processUrls(htmlContent: string): string {
+		const tempDiv = document.createElement('div');
+		tempDiv.innerHTML = htmlContent;
+		
+		// Handle relative URLs for both images and links
+		tempDiv.querySelectorAll('img').forEach(img => makeUrlAbsolute(img, 'src'));
+		tempDiv.querySelectorAll('a').forEach(link => makeUrlAbsolute(link, 'href'));
+		
+		return tempDiv.innerHTML;
+	}
+
 	let markdownContent: string;
 
 	if (selectedHtml) {
 		// If there's selected HTML, use it directly
-		const tempDiv = document.createElement('div');
-		tempDiv.innerHTML = selectedHtml;
-		
-		// Handle relative URLs for both images and links in the selection
-		tempDiv.querySelectorAll('img').forEach(img => makeUrlAbsolute(img, 'src'));
-		tempDiv.querySelectorAll('a').forEach(link => makeUrlAbsolute(link, 'href'));
-		
-		markdownContent = tempDiv.innerHTML;
+		markdownContent = processUrls(selectedHtml);
 	} else if (skipReadability) {
-		markdownContent = content;
+		// If skipping Readability, process the full content
+		markdownContent = processUrls(content);
 	} else {
 		// If no selection and not skipping Readability, use Readability
 		const readabilityArticle = new Readability(doc).parse();
@@ -44,16 +49,7 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 			console.error('Failed to parse content with Readability');
 			return '';
 		}
-		const { content: readableContent } = readabilityArticle;
-		
-		const tempDiv = document.createElement('div');
-		tempDiv.innerHTML = readableContent;
-		
-		// Handle relative URLs for both images and links in the full content
-		tempDiv.querySelectorAll('img').forEach(img => makeUrlAbsolute(img, 'src'));
-		tempDiv.querySelectorAll('a').forEach(link => makeUrlAbsolute(link, 'href'));
-		
-		markdownContent = tempDiv.innerHTML;
+		markdownContent = processUrls(readabilityArticle.content);
 	}
 
 	const turndownService = new TurndownService({
