@@ -10,7 +10,7 @@ Official Obsidian browser extension. Available for Chrome, Firefox, Edge, Brave,
 
 The extension is not yet available across the official directories as it is still in beta. Go to [releases](https://github.com/obsidianmd/obsidian-clipper/releases) and download the latest version for your browser.
 
-- **Firefox:** go to `about:debugging#/runtime/this-firefox` and click ***Load Temporary Add-on** and select the `.zip` file
+- **Firefox:** go to `about:debugging#/runtime/this-firefox` and click **Load Temporary Add-on** and select the `.zip` file
 - **Chrome:** drag and drop the `.zip` in `chrome://extensions/`
 - **Edge:** drag and drop the `.zip` in `edge://extensions/`
 - **Brave:** drag and drop the `.zip` in `brave://extensions/`
