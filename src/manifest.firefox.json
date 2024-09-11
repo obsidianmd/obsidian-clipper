@@ -5,7 +5,8 @@
 	"description": "Official web clipper extension for Obsidian. Clip content and save it to your Obsidian vault so you always have access to it, even offline.",
 	"permissions": [
 		"activeTab",
-		"storage"
+		"storage",
+		"scripting"
 	],
 	"action": {
 		"default_popup": "popup.html",
@@ -25,7 +26,8 @@
 		"128": "icons/icon128.png"
 	},
 	"background": {
-		"scripts": ["background.js"]
+		"scripts": ["background-firefox.js"],
+		"type": "module"
 	},
 	"content_scripts": [
 		{
@@ -39,17 +41,10 @@
 	"commands": {
 		"_execute_action": {
 			"suggested_key": {
-				"default": "Ctrl+Shift+O",
-				"mac": "Command+Shift+O"
+				"default": "Alt+Shift+O",
+				"mac": "Alt+Shift+O"
 			},
 			"description": "Open Obsidian Clipper"
-		},
-		"quick_clip": {
-			"suggested_key": {
-				"default": "Ctrl+Shift+X",
-				"mac": "Command+Shift+X"
-			},
-			"description": "Quick clip"
 		}
 	},
 	"host_permissions": [

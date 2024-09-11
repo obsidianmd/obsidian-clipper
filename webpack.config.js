@@ -4,6 +4,12 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const ZipPlugin = require('zip-webpack-plugin');
 const package = require('./package.json');
 
+const firefoxConfig = {
+	entry: {
+		'background-firefox': './src/background-firefox.ts',
+	},
+};
+
 module.exports = (env, argv) => {
 	const isFirefox = env.BROWSER === 'firefox';
 	const outputDir = isFirefox ? 'dist_firefox' : 'dist';
@@ -16,7 +22,8 @@ module.exports = (env, argv) => {
 			settings: './src/core/settings.ts',
 			content: './src/content.ts',
 			background: './src/background.ts',
-			styles: './src/style.scss'
+			styles: './src/style.scss',
+			...firefoxConfig.entry
 		},
 		output: {
 			path: path.resolve(__dirname, outputDir),

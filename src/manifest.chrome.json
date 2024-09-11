@@ -43,8 +43,8 @@
 		},
 		"quick_clip": {
 			"suggested_key": {
-				"default": "Ctrl+Shift+X",
-				"mac": "Command+Shift+X"
+				"default": "Alt+Shift+O",
+				"mac": "Alt+Shift+O"
 			},
 			"description": "Quick clip"
 		}
