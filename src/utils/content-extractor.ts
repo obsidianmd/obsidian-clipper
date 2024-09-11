@@ -94,6 +94,7 @@ export async function extractPageContent(tabId: number): Promise<{
 	selectedHtml: string;
 	extractedContent: ExtractedContent;
 	schemaOrgData: any;
+	fullHtml: string; // Add this new property
 } | null> {
 	return new Promise((resolve) => {
 		chrome.tabs.sendMessage(tabId, { action: "getPageContent" }, function(response) {
@@ -102,7 +103,8 @@ export async function extractPageContent(tabId: number): Promise<{
 					content: response.content,
 					selectedHtml: response.selectedHtml,
 					extractedContent: response.extractedContent,
-					schemaOrgData: response.schemaOrgData
+					schemaOrgData: response.schemaOrgData,
+					fullHtml: response.fullHtml // Add this new property
 				});
 			} else {
 				resolve(null);
@@ -145,7 +147,7 @@ export async function extractContentBySelector(tabId: number, selector: string):
 	});
 }
 
-export async function initializePageContent(content: string, selectedHtml: string, extractedContent: ExtractedContent, currentUrl: string, schemaOrgData: any) {
+export async function initializePageContent(content: string, selectedHtml: string, extractedContent: ExtractedContent, currentUrl: string, schemaOrgData: any, fullHtml: string) {
 	const readabilityArticle = extractReadabilityContent(content);
 	if (!readabilityArticle) {
 		console.error('Failed to parse content with Readability');
@@ -205,14 +207,15 @@ export async function initializePageContent(content: string, selectedHtml: strin
 	const currentVariables: { [key: string]: string } = {
 		'{{author}}': author,
 		'{{content}}': markdownBody,
+		'{{date}}': convertDate(new Date()),
 		'{{description}}': description,
 		'{{domain}}': domain,
+		'{{fullHtml}}': fullHtml,
 		'{{image}}': image,
+		'{{noteName}}': noteName,
 		'{{published}}': published,
 		'{{site}}': site,
 		'{{title}}': title,
-		'{{noteName}}': noteName,
-		'{{date}}': convertDate(new Date()),
 		'{{url}}': currentUrl
 	};
 

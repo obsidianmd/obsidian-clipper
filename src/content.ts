@@ -3,6 +3,7 @@ interface ContentResponse {
 	selectedHtml: string;
 	extractedContent: { [key: string]: string };
 	schemaOrgData: any;
+	fullHtml: string;
 }
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
@@ -26,7 +27,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 			content: document.documentElement.outerHTML,
 			selectedHtml: selectedHtml,
 			extractedContent: extractedContent,
-			schemaOrgData: schemaOrgData
+			schemaOrgData: schemaOrgData,
+			fullHtml: document.body.innerHTML
 		};
 
 		sendResponse(response);

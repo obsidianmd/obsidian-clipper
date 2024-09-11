@@ -177,7 +177,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 				try {
 					const extractedData = await extractPageContent(tabs[0].id);
 					if (extractedData) {
-						const initializedContent = await initializePageContent(extractedData.content, extractedData.selectedHtml, extractedData.extractedContent, currentUrl, extractedData.schemaOrgData);
+						const initializedContent = await initializePageContent(extractedData.content, extractedData.selectedHtml, extractedData.extractedContent, currentUrl, extractedData.schemaOrgData, extractedData.fullHtml);
 						
 						if (initializedContent) {
 							currentTemplate = findMatchingTemplate(currentUrl, templates, extractedData.schemaOrgData) || templates[0];
@@ -255,7 +255,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 				try {
 					const extractedData = await extractPageContent(tabs[0].id);
 					if (extractedData) {
-						const initializedContent = await initializePageContent(extractedData.content, extractedData.selectedHtml, extractedData.extractedContent, tabs[0].url!, extractedData.schemaOrgData);
+						const initializedContent = await initializePageContent(extractedData.content, extractedData.selectedHtml, extractedData.extractedContent, tabs[0].url!, extractedData.schemaOrgData, extractedData.fullHtml);
 						if (initializedContent) {
 							await initializeTemplateFields(currentTemplate, initializedContent.currentVariables, initializedContent.noteName, extractedData.schemaOrgData);
 						} else {
