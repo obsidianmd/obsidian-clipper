@@ -23,6 +23,7 @@ module.exports = (env, argv) => {
 			filename: '[name].js',
 			module: true,
 		},
+		devtool: 'source-map',
 		experiments: {
 			outputModule: true,
 		},
