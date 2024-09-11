@@ -156,11 +156,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 	await initializeSettings();
 });
 
-async function detectBrowser(): Promise<'chrome' | 'firefox' | 'brave' | 'other'> {
+async function detectBrowser(): Promise<'chrome' | 'firefox' | 'brave' | 'edge' | 'other'> {
 	const userAgent = navigator.userAgent.toLowerCase();
 	
 	if (userAgent.indexOf("firefox") > -1) {
 		return 'firefox';
+	} else if (userAgent.indexOf("edg/") > -1) {
+		return 'edge';
 	} else if (userAgent.indexOf("chrome") > -1) {
 		// Check for Brave
 		const nav = navigator as NavigatorExtended;
@@ -187,6 +189,9 @@ async function setShortcutInstructions() {
 				break;
 			case 'firefox':
 				instructions = 'To change key assignments, go to <code>about:addons</code>, click the gear icon, and select "Manage Extension Shortcuts".';
+				break;
+			case 'edge':
+				instructions = 'To change key assignments, go to <code>edge://extensions/shortcuts</code>';
 				break;
 			default:
 				instructions = 'To change key assignments, please refer to your browser\'s extension settings.';
