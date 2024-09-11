@@ -324,7 +324,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 		for (const property of template.properties) {
 			const propertyDiv = document.createElement('div');
 			propertyDiv.className = 'metadata-property';
-			let value = await replaceVariables(tabId, unescapeValue(property.value), variables);
+			let value = await replaceVariables(tabId, unescapeValue(property.value), variables, currentUrl);
 
 			// Apply type-specific parsing
 			switch (property.type) {
@@ -352,7 +352,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 		}
 
 		if (noteNameField) {
-			let formattedNoteName = await replaceVariables(tabId, template.noteNameFormat, variables);
+			let formattedNoteName = await replaceVariables(tabId, template.noteNameFormat, variables, currentUrl);
 			noteNameField.value = sanitizeFileName(formattedNoteName);
 			adjustTextareaHeight(noteNameField);
 		}
@@ -363,7 +363,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 		const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
 		if (noteContentField) {
 			if (template.noteContentFormat) {
-				let content = await replaceVariables(tabId, template.noteContentFormat, variables);
+				let content = await replaceVariables(tabId, template.noteContentFormat, variables, currentUrl);
 				noteContentField.value = content;
 			} else {
 				noteContentField.value = '';

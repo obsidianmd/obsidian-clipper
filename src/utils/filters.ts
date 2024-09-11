@@ -259,14 +259,18 @@ export const filters: { [key: string]: FilterFunction } = {
 			return str;
 		}
 	},
-	markdown: (str: string): string => {
-		// Use a dummy URL since createMarkdownContent requires one
-		const dummyUrl = 'https://example.com';
-		return createMarkdownContent(str, dummyUrl, '');
+	markdown: (str: string, url?: string): string => {
+		const baseUrl = url || 'about:blank';
+		try {
+			return createMarkdownContent(str, baseUrl, '');
+		} catch (error) {
+			console.error('Error in createMarkdownContent:', error);
+			return str;
+		}
 	},
 };
 
-export function applyFilters(value: string, filterNames: string[]): string {
+export function applyFilters(value: string, filterNames: string[], url?: string): string {
 	// Ensure value is a string before applying filters
 	let processedValue = typeof value === 'string' ? value : JSON.stringify(value);
 
@@ -280,7 +284,8 @@ export function applyFilters(value: string, filterNames: string[]): string {
 
 			const filter = filters[name];
 			if (filter) {
-				const output = filter(result, cleanParam);
+				// Pass the URL to the markdown filter, use cleanParam for others
+				const output = name === 'markdown' ? filter(result, url) : filter(result, cleanParam);
 				return output;
 			}
 		} else {
