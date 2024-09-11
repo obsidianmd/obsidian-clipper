@@ -94,7 +94,7 @@ export async function extractPageContent(tabId: number): Promise<{
 	selectedHtml: string;
 	extractedContent: ExtractedContent;
 	schemaOrgData: any;
-	fullHtml: string; // Add this new property
+	fullHtml: string;
 } | null> {
 	return new Promise((resolve) => {
 		chrome.tabs.sendMessage(tabId, { action: "getPageContent" }, function(response) {
@@ -104,7 +104,7 @@ export async function extractPageContent(tabId: number): Promise<{
 					selectedHtml: response.selectedHtml,
 					extractedContent: response.extractedContent,
 					schemaOrgData: response.schemaOrgData,
-					fullHtml: response.fullHtml // Add this new property
+					fullHtml: response.fullHtml
 				});
 			} else {
 				resolve(null);
