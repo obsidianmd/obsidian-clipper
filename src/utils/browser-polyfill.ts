@@ -1,5 +1,7 @@
-declare const chrome: any;
+import * as browserPolyfill from 'webextension-polyfill';
 
-const browserPolyfill = typeof browser !== 'undefined' ? browser : chrome;
+declare global {
+    const browser: typeof browserPolyfill;
+}
 
 export default browserPolyfill;

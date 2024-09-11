@@ -16,7 +16,7 @@ let currentVariables: { [key: string]: string } = {};
 
 let loadedSettings: GeneralSettings;
 
-browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
+browser.runtime.onMessage.addListener((request: any, sender: browser.Runtime.MessageSender, sendResponse: (response?: any) => void) => {
 	if (request.action === "triggerQuickClip") {
 		handleClip().then(() => {
 			sendResponse({success: true});
@@ -46,8 +46,8 @@ function showError(message: string): void {
 }
 
 function logError(message: string, error?: any): void {
-  console.error(message, error);
-  showError(message);
+	console.error(message, error);
+	showError(message);
 }
 
 async function handleClip() {
@@ -127,32 +127,24 @@ document.addEventListener('DOMContentLoaded', async function() {
 	}
 
 	// Load templates from sync storage and populate dropdown
-	browser.storage.sync.get(['template_list'], async (data: { template_list?: string[] }) => {
+	browser.storage.sync.get(['template_list']).then(async (data: { template_list?: string[] }) => {
 		const templateIds = data.template_list || [];
-		const loadedTemplates = await Promise.all(templateIds.map(id => 
-			new Promise<Template | null>(resolve => 
-				browser.storage.sync.get(`template_${id}`, data => {
-					const compressedChunks = data[`template_${id}`];
-					if (compressedChunks) {
-						try {
-							const decompressedData = decompressFromUTF16(compressedChunks.join(''));
-							const template = JSON.parse(decompressedData);
-							if (template && Array.isArray(template.properties)) {
-								resolve(template);
-							} else {
-								console.warn(`Invalid template structure for id ${id}`);
-								resolve(null);
-							}
-						} catch (error) {
-							console.error(`Error parsing template ${id}:`, error);
-							resolve(null);
-						}
-					} else {
-						resolve(null);
+		const loadedTemplates = await Promise.all(templateIds.map(async id => {
+			try {
+				const result = await browser.storage.sync.get(`template_${id}`);
+				const compressedChunks = result[`template_${id}`];
+				if (compressedChunks) {
+					const decompressedData = decompressFromUTF16(compressedChunks.join(''));
+					const template = JSON.parse(decompressedData);
+					if (template && Array.isArray(template.properties)) {
+						return template;
 					}
-				})
-			)
-		));
+				}
+			} catch (error) {
+				console.error(`Error parsing template ${id}:`, error);
+			}
+			return null;
+		}));
 
 		templates = loadedTemplates.filter((t): t is Template => t !== null);
 
@@ -166,44 +158,43 @@ document.addEventListener('DOMContentLoaded', async function() {
 		populateTemplateDropdown();
 
 		// After templates are loaded, match template based on URL
-		browser.tabs.query({active: true, currentWindow: true}, async function(tabs) {
-			if (!tabs[0].url || tabs[0].url.startsWith('chrome-extension://') || tabs[0].url.startsWith('chrome://') || tabs[0].url.startsWith('about:') || tabs[0].url.startsWith('file://')) {
-				showError('This page cannot be clipped.');
-				return;
-			}
+		const tabs = await browser.tabs.query({active: true, currentWindow: true});
+		const currentTab = tabs[0];
+		if (!currentTab.url || currentTab.url.startsWith('chrome-extension://') || currentTab.url.startsWith('chrome://') || currentTab.url.startsWith('about:') || currentTab.url.startsWith('file://')) {
+			showError('This page cannot be clipped.');
+			return;
+		}
 
-			const currentUrl = tabs[0].url;
+		const currentUrl = currentTab.url;
 
-			if (tabs[0].id) {
-				try {
-					const extractedData = await extractPageContent(tabs[0].id);
-					if (extractedData) {
-						const initializedContent = await initializePageContent(extractedData.content, extractedData.selectedHtml, extractedData.extractedContent, currentUrl, extractedData.schemaOrgData, extractedData.fullHtml);
-						
-						if (initializedContent) {
-							currentTemplate = findMatchingTemplate(currentUrl, templates, extractedData.schemaOrgData) || templates[0];
+		if (currentTab.id) {
+			try {
+				const extractedData = await extractPageContent(currentTab.id);
+				if (extractedData) {
+					const initializedContent = await initializePageContent(extractedData.content, extractedData.selectedHtml, extractedData.extractedContent, currentUrl, extractedData.schemaOrgData, extractedData.fullHtml);
+					if (initializedContent) {
+						currentTemplate = findMatchingTemplate(currentUrl, templates, extractedData.schemaOrgData) || templates[0];
 
-							if (currentTemplate) {
-								templateDropdown.value = currentTemplate.name;
-							}
-
-							await initializeTemplateFields(currentTemplate, initializedContent.currentVariables, initializedContent.noteName, extractedData.schemaOrgData);
-						} else {
-							showError('Unable to initialize page content.');
+						if (currentTemplate) {
+							templateDropdown.value = currentTemplate.name;
 						}
+
+						await initializeTemplateFields(currentTemplate, initializedContent.currentVariables, initializedContent.noteName, extractedData.schemaOrgData);
 					} else {
-						showError('Unable to get page content. Try reloading the page.');
+						showError('Unable to initialize page content.');
 					}
-				} catch (error: unknown) {
-					console.error('Error in popup initialization:', error);
-					if (error instanceof Error) {
-						showError(`An error occurred: ${error.message}`);
-					} else {
-						showError('An unexpected error occurred');
-					}
+				} else {
+					showError('Unable to get page content. Try reloading the page.');
+				}
+			} catch (error: unknown) {
+				console.error('Error in popup initialization:', error);
+				if (error instanceof Error) {
+					showError(`An error occurred: ${error.message}`);
+				} else {
+					showError('An unexpected error occurred');
 				}
 			}
-		});
+		}
 
 		// Only show template selector if there are multiple templates
 		if (templates.length > 1) {
@@ -251,27 +242,27 @@ document.addEventListener('DOMContentLoaded', async function() {
 	templateDropdown.addEventListener('change', async function(this: HTMLSelectElement) {
 		currentTemplate = templates.find((t: Template) => t.name === this.value) || null;
 		if (currentTemplate) {
-			browser.tabs.query({active: true, currentWindow: true}, async (tabs) => {
-				if (tabs[0]?.id) {
-					try {
-						const extractedData = await extractPageContent(tabs[0].id);
-						if (extractedData) {
-							const initializedContent = await initializePageContent(extractedData.content, extractedData.selectedHtml, extractedData.extractedContent, tabs[0].url!, extractedData.schemaOrgData, extractedData.fullHtml);
-							if (initializedContent) {
-								await initializeTemplateFields(currentTemplate, initializedContent.currentVariables, initializedContent.noteName, extractedData.schemaOrgData);
-							} else {
-								logError('Unable to initialize page content.');
-							}
+			const tabs = await browser.tabs.query({active: true, currentWindow: true});
+			const currentTab = tabs[0];
+			if (currentTab?.id) {
+				try {
+					const extractedData = await extractPageContent(currentTab.id);
+					if (extractedData) {
+						const initializedContent = await initializePageContent(extractedData.content, extractedData.selectedHtml, extractedData.extractedContent, currentTab.url!, extractedData.schemaOrgData, extractedData.fullHtml);
+						if (initializedContent) {
+							await initializeTemplateFields(currentTemplate, initializedContent.currentVariables, initializedContent.noteName, extractedData.schemaOrgData);
 						} else {
-							logError('Unable to retrieve page content. Try reloading the page.');
+							logError('Unable to initialize page content.');
 						}
-					} catch (error) {
-						logError('Error initializing template fields:', error);
+					} else {
+						logError('Unable to retrieve page content. Try reloading the page.');
 					}
-				} else {
-					logError('No active tab found');
+				} catch (error) {
+					logError('Error initializing template fields:', error);
 				}
-			});
+			} else {
+				logError('No active tab found');
+			}
 		} else {
 			logError('Selected template not found');
 		}
@@ -309,104 +300,105 @@ document.addEventListener('DOMContentLoaded', async function() {
 		const templateProperties = document.querySelector('.metadata-properties') as HTMLElement;
 		templateProperties.innerHTML = '';
 
-		browser.tabs.query({active: true, currentWindow: true}, async (tabs) => {
-			const tabId = tabs[0]?.id;
-			const currentUrl = tabs[0]?.url || '';
+		const tabs = await browser.tabs.query({active: true, currentWindow: true});
+		const currentTab = tabs[0];
+		const tabId = currentTab?.id;
+		const currentUrl = currentTab?.url || '';
 
-			if (!tabId) {
-				logError('No active tab found');
-				return;
+		if (!tabId) {
+			logError('No active tab found');
+			return;
+		}
+
+		if (!Array.isArray(template.properties)) {
+			logError('Template properties are not an array');
+			return;
+		}
+
+		for (const property of template.properties) {
+			const propertyDiv = document.createElement('div');
+			propertyDiv.className = 'metadata-property';
+			let value = await replaceVariables(tabId, unescapeValue(property.value), variables, currentUrl);
+
+			// Apply type-specific parsing
+			switch (property.type) {
+				case 'number':
+					const numericValue = value.replace(/[^\d.-]/g, '');
+					value = numericValue ? parseFloat(numericValue).toString() : value;
+					break;
+				case 'checkbox':
+					value = (value.toLowerCase() === 'true' || value === '1').toString();
+					break;
+				case 'date':
+					value = dayjs(value).isValid() ? dayjs(value).format('YYYY-MM-DD') : value;
+					break;
+				case 'datetime':
+					value = dayjs(value).isValid() ? dayjs(value).format('YYYY-MM-DD HH:mm:ss') : value;
+					break;
 			}
 
-			if (!Array.isArray(template.properties)) {
-				logError('Template properties are not an array');
-				return;
+			propertyDiv.innerHTML = `
+				<span class="metadata-property-icon"><i data-lucide="${getPropertyTypeIcon(property.type)}"></i></span>
+				<label for="${property.name}">${property.name}</label>
+				<input id="${property.name}" type="text" value="${escapeHtml(value)}" data-type="${property.type}" />
+			`;
+			templateProperties.appendChild(propertyDiv);
+		}
+
+		if (noteNameField) {
+			let formattedNoteName = await replaceVariables(tabId, template.noteNameFormat, variables, currentUrl);
+			noteNameField.value = sanitizeFileName(formattedNoteName);
+			adjustTextareaHeight(noteNameField);
+		}
+
+		const pathField = document.getElementById('path-name-field') as HTMLInputElement;
+		if (pathField) pathField.value = template.path;
+
+		const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
+		if (noteContentField) {
+			if (template.noteContentFormat) {
+				let content = await replaceVariables(tabId, template.noteContentFormat, variables, currentUrl);
+				noteContentField.value = content;
+			} else {
+				noteContentField.value = '';
 			}
+		}
 
-			for (const property of template.properties) {
-				const propertyDiv = document.createElement('div');
-				propertyDiv.className = 'metadata-property';
-				let value = await replaceVariables(tabId, unescapeValue(property.value), variables, currentUrl);
-
-				// Apply type-specific parsing
-				switch (property.type) {
-					case 'number':
-						const numericValue = value.replace(/[^\d.-]/g, '');
-						value = numericValue ? parseFloat(numericValue).toString() : value;
-						break;
-					case 'checkbox':
-						value = (value.toLowerCase() === 'true' || value === '1').toString();
-						break;
-					case 'date':
-						value = dayjs(value).isValid() ? dayjs(value).format('YYYY-MM-DD') : value;
-						break;
-					case 'datetime':
-						value = dayjs(value).isValid() ? dayjs(value).format('YYYY-MM-DD HH:mm:ss') : value;
-						break;
+		if (Object.keys(variables).length > 0) {
+			if (template.triggers && template.triggers.length > 0) {
+				const matchingPattern = template.triggers.find(pattern => 
+					matchPattern(pattern, currentUrl, schemaOrgData)
+				);
+				if (matchingPattern) {
+					console.log(`Matched template trigger: ${matchingPattern}`);
 				}
-
-				propertyDiv.innerHTML = `
-					<span class="metadata-property-icon"><i data-lucide="${getPropertyTypeIcon(property.type)}"></i></span>
-					<label for="${property.name}">${property.name}</label>
-					<input id="${property.name}" type="text" value="${escapeHtml(value)}" data-type="${property.type}" />
-				`;
-				templateProperties.appendChild(propertyDiv);
+			} else {
+				console.log('No template triggers defined for this template');
 			}
+		}
 
-			if (noteNameField) {
-				let formattedNoteName = await replaceVariables(tabId, template.noteNameFormat, variables, currentUrl);
-				noteNameField.value = sanitizeFileName(formattedNoteName);
-				adjustTextareaHeight(noteNameField);
-			}
+		initializeIcons();
+		setupMetadataToggle();
 
-			const pathField = document.getElementById('path-name-field') as HTMLInputElement;
-			if (pathField) pathField.value = template.path;
-
-			const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
-			if (noteContentField) {
-				if (template.noteContentFormat) {
-					let content = await replaceVariables(tabId, template.noteContentFormat, variables, currentUrl);
-					noteContentField.value = content;
-				} else {
-					noteContentField.value = '';
-				}
-			}
-
-			if (Object.keys(variables).length > 0) {
-				if (template.triggers && template.triggers.length > 0) {
-					const matchingPattern = template.triggers.find(pattern => 
-						matchPattern(pattern, currentUrl, schemaOrgData)
-					);
-					if (matchingPattern) {
-						console.log(`Matched template trigger: ${matchingPattern}`);
-					}
-				} else {
-					console.log('No template triggers defined for this template');
-				}
-			}
-
-			initializeIcons();
-			setupMetadataToggle();
-
-			const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement;
-			if (vaultDropdown) {
-				if (template.vault) {
-					vaultDropdown.value = template.vault;
-				} else {
-					// Try to get the previously selected vault
-					const lastSelectedVault = await getLocalStorage('lastSelectedVault');
+		const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement;
+		if (vaultDropdown) {
+			if (template.vault) {
+				vaultDropdown.value = template.vault;
+			} else {
+				// Try to get the previously selected vault
+				getLocalStorage('lastSelectedVault').then((lastSelectedVault) => {
 					if (lastSelectedVault && loadedSettings.vaults.includes(lastSelectedVault)) {
 						vaultDropdown.value = lastSelectedVault;
 					} else if (loadedSettings.vaults.length > 0) {
 						vaultDropdown.value = loadedSettings.vaults[0];
 					}
-				}
-
-				vaultDropdown.addEventListener('change', () => {
-					setLocalStorage('lastSelectedVault', vaultDropdown.value);
 				});
 			}
-		});
+
+			vaultDropdown.addEventListener('change', () => {
+				setLocalStorage('lastSelectedVault', vaultDropdown.value);
+			});
+		}
 	}
 
 	function initializeUI() {

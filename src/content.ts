@@ -8,7 +8,7 @@ interface ContentResponse {
 	fullHtml: string;
 }
 
-browser.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+browser.runtime.onMessage.addListener(function(request: any, sender: browser.Runtime.MessageSender, sendResponse: (response?: any) => void) {
 	if (request.action === "getPageContent") {
 		let selectedHtml = '';
 		const selection = window.getSelection();
