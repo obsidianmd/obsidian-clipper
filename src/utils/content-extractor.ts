@@ -3,6 +3,7 @@ import { extractReadabilityContent, createMarkdownContent } from './markdown-con
 import { sanitizeFileName } from './obsidian-note-creator';
 import { applyFilters } from './filters';
 import dayjs from 'dayjs';
+import browser from './browser-polyfill';
 
 async function processVariable(match: string, variables: { [key: string]: string }, currentUrl: string): Promise<string> {
 	const [, fullVariableName] = match.match(/{{(.*?)}}/) || [];
@@ -97,7 +98,7 @@ export async function extractPageContent(tabId: number): Promise<{
 	fullHtml: string;
 } | null> {
 	return new Promise((resolve) => {
-		chrome.tabs.sendMessage(tabId, { action: "getPageContent" }, function(response: any) {
+		browser.tabs.sendMessage(tabId, { action: "getPageContent" }, function(response: any) {
 			if (response && response.content) {
 				resolve({
 					content: response.content,
@@ -131,7 +132,7 @@ export async function extractContentBySelector(tabId: number, selector: string):
 			baseSelector = selector.slice(0, -attribute.length - 1);
 		}
 
-		chrome.tabs.sendMessage(tabId, { action: "extractContent", selector: baseSelector, attribute: attribute }, function(response: any) {
+		browser.tabs.sendMessage(tabId, { action: "extractContent", selector: baseSelector, attribute: attribute }, function(response: any) {
 			let content = response ? response.content : '';
 			
 			// Ensure content is always a string

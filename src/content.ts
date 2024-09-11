@@ -1,3 +1,5 @@
+import browser from './utils/browser-polyfill';
+
 interface ContentResponse {
 	content: string;
 	selectedHtml: string;
@@ -6,7 +8,7 @@ interface ContentResponse {
 	fullHtml: string;
 }
 
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+browser.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 	if (request.action === "getPageContent") {
 		let selectedHtml = '';
 		const selection = window.getSelection();

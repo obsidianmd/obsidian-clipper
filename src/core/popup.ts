@@ -8,6 +8,7 @@ import { findMatchingTemplate, matchPattern } from '../utils/triggers';
 import { getLocalStorage, setLocalStorage, loadGeneralSettings, generalSettings, GeneralSettings } from '../utils/storage-utils';
 import { formatVariables, unescapeValue } from '../utils/string-utils';
 import { loadTemplates, createDefaultTemplate } from '../managers/template-manager';
+import browser from '../utils/browser-polyfill';
 
 let currentTemplate: Template | null = null;
 let templates: Template[] = [];
@@ -15,7 +16,7 @@ let currentVariables: { [key: string]: string } = {};
 
 let loadedSettings: GeneralSettings;
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
 	if (request.action === "triggerQuickClip") {
 		handleClip().then(() => {
 			sendResponse({success: true});
@@ -126,11 +127,11 @@ document.addEventListener('DOMContentLoaded', async function() {
 	}
 
 	// Load templates from sync storage and populate dropdown
-	chrome.storage.sync.get(['template_list'], async (data: { template_list?: string[] }) => {
+	browser.storage.sync.get(['template_list'], async (data: { template_list?: string[] }) => {
 		const templateIds = data.template_list || [];
 		const loadedTemplates = await Promise.all(templateIds.map(id => 
 			new Promise<Template | null>(resolve => 
-				chrome.storage.sync.get(`template_${id}`, data => {
+				browser.storage.sync.get(`template_${id}`, data => {
 					const compressedChunks = data[`template_${id}`];
 					if (compressedChunks) {
 						try {
@@ -165,7 +166,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 		populateTemplateDropdown();
 
 		// After templates are loaded, match template based on URL
-		chrome.tabs.query({active: true, currentWindow: true}, async function(tabs) {
+		browser.tabs.query({active: true, currentWindow: true}, async function(tabs) {
 			if (!tabs[0].url || tabs[0].url.startsWith('chrome-extension://') || tabs[0].url.startsWith('chrome://') || tabs[0].url.startsWith('about:') || tabs[0].url.startsWith('file://')) {
 				showError('This page cannot be clipped.');
 				return;
@@ -250,7 +251,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 	templateDropdown.addEventListener('change', async function(this: HTMLSelectElement) {
 		currentTemplate = templates.find((t: Template) => t.name === this.value) || null;
 		if (currentTemplate) {
-			chrome.tabs.query({active: true, currentWindow: true}, async (tabs) => {
+			browser.tabs.query({active: true, currentWindow: true}, async (tabs) => {
 				if (tabs[0]?.id) {
 					try {
 						const extractedData = await extractPageContent(tabs[0].id);
@@ -308,7 +309,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 		const templateProperties = document.querySelector('.metadata-properties') as HTMLElement;
 		templateProperties.innerHTML = '';
 
-		chrome.tabs.query({active: true, currentWindow: true}, async (tabs) => {
+		browser.tabs.query({active: true, currentWindow: true}, async (tabs) => {
 			const tabId = tabs[0]?.id;
 			const currentUrl = tabs[0]?.url || '';
 
@@ -418,7 +419,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 		const settingsButton = document.getElementById('open-settings');
 		if (settingsButton) {
 			settingsButton.addEventListener('click', function() {
-				chrome.runtime.openOptionsPage();
+				browser.runtime.openOptionsPage();
 			});
 		}
 
