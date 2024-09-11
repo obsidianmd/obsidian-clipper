@@ -39,6 +39,9 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 	} else if (request.action === "extractContent") {
 		const content = extractContentBySelector(request.selector, request.attribute);
 		sendResponse({ content: content, schemaOrgData: extractSchemaOrgData() });
+	} else if (request.action === "logObsidianUri") {
+		console.log('Obsidian URI created:', request.uri);
+		sendResponse({ success: true });
 	}
 	return true;
 });
