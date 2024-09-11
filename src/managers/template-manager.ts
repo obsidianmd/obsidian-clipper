@@ -14,20 +14,19 @@ export function setEditingTemplateIndex(index: number): void {
 	editingTemplateIndex = index;
 }
 
-export function loadTemplates(): Promise<Template[]> {
-	return browser.storage.sync.get(TEMPLATE_LIST_KEY).then((data: { [key: string]: any }) => {
-		const templateIds = data[TEMPLATE_LIST_KEY] || [];
-		return Promise.all(templateIds.map(loadTemplate))
-			.then(loadedTemplates => {
-				const validTemplates = loadedTemplates.filter((t): t is Template => t !== null);
-				if (validTemplates.length === 0) {
-					const defaultTemplate = createDefaultTemplate();
-					validTemplates.push(defaultTemplate);
-					return saveTemplateSettings().then(() => validTemplates);
-				}
-				return validTemplates;
-			});
-	});
+export async function loadTemplates(): Promise<Template[]> {
+	const data = await browser.storage.sync.get(TEMPLATE_LIST_KEY);
+	const templateIds = data[TEMPLATE_LIST_KEY] || [];
+	const loadedTemplates = await Promise.all(templateIds.map(loadTemplate));
+	templates = loadedTemplates.filter((t): t is Template => t !== null);
+
+	if (templates.length === 0) {
+		const defaultTemplate = createDefaultTemplate();
+		templates.push(defaultTemplate);
+		await saveTemplateSettings();
+	}
+
+	return templates;
 }
 
 async function loadTemplate(id: string): Promise<Template | null> {

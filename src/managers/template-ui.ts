@@ -5,6 +5,7 @@ import { escapeValue, escapeHtml, unescapeValue } from '../utils/string-utils';
 import { generalSettings } from '../utils/storage-utils';
 import { updateUrl } from '../utils/routing';
 import { handleDragStart, handleDragOver, handleDrop, handleDragEnd } from '../utils/drag-and-drop';
+import browser from '../utils/browser-polyfill';
 
 let hasUnsavedChanges = false;
 

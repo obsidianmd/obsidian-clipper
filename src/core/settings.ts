@@ -9,20 +9,20 @@ import { createIcons } from 'lucide';
 import { icons } from '../icons/icons';
 import { showGeneralSettings } from '../managers/general-settings-ui';
 import { updateUrl } from '../utils/routing';
+import browser from '../utils/browser-polyfill';
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
 	const newTemplateBtn = document.getElementById('new-template-btn') as HTMLButtonElement;
 	const exportTemplateBtn = document.getElementById('export-template-btn') as HTMLButtonElement;
 	const importTemplateBtn = document.getElementById('import-template-btn') as HTMLButtonElement;
 	const resetDefaultTemplateBtn = document.getElementById('reset-default-template-btn') as HTMLButtonElement;
 
-	function initializeSettings(): void {
-		initializeGeneralSettings();
-		loadTemplates().then((loadedTemplates) => {
-			updateTemplateList(loadedTemplates);
-			initializeTemplateListeners();
-			handleUrlParameters();
-		});
+	async function initializeSettings(): Promise<void> {
+		await initializeGeneralSettings();
+		const loadedTemplates = await loadTemplates();
+		updateTemplateList(loadedTemplates);
+		initializeTemplateListeners();
+		await handleUrlParameters();
 		initializeSidebar();
 		initializeAutoSave();
 
@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
 		}
 	}
 
-	function handleUrlParameters(): void {
+	async function handleUrlParameters(): Promise<void> {
 		const urlParams = new URLSearchParams(window.location.search);
 		const section = urlParams.get('section');
 		const templateId = urlParams.get('template');
@@ -144,5 +144,5 @@ document.addEventListener('DOMContentLoaded', () => {
 		initializeAddPropertyButton();
 	}
 
-	initializeSettings();
+	await initializeSettings();
 });
