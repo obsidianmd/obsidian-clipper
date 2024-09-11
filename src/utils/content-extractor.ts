@@ -3,6 +3,7 @@ import { extractReadabilityContent, createMarkdownContent } from './markdown-con
 import { sanitizeFileName } from './obsidian-note-creator';
 import { applyFilters } from './filters';
 import dayjs from 'dayjs';
+import browser from './browser-polyfill';
 
 async function processVariable(match: string, variables: { [key: string]: string }, currentUrl: string): Promise<string> {
 	const [, fullVariableName] = match.match(/{{(.*?)}}/) || [];
@@ -96,21 +97,22 @@ export async function extractPageContent(tabId: number): Promise<{
 	schemaOrgData: any;
 	fullHtml: string;
 } | null> {
-	return new Promise((resolve) => {
-		chrome.tabs.sendMessage(tabId, { action: "getPageContent" }, function(response: any) {
-			if (response && response.content) {
-				resolve({
-					content: response.content,
-					selectedHtml: response.selectedHtml,
-					extractedContent: response.extractedContent,
-					schemaOrgData: response.schemaOrgData,
-					fullHtml: response.fullHtml
-				});
-			} else {
-				resolve(null);
-			}
-		});
-	});
+	try {
+		const response = await browser.tabs.sendMessage(tabId, { action: "getPageContent" });
+		if (response && response.content) {
+			return {
+				content: response.content,
+				selectedHtml: response.selectedHtml,
+				extractedContent: response.extractedContent,
+				schemaOrgData: response.schemaOrgData,
+				fullHtml: response.fullHtml
+			};
+		}
+		return null;
+	} catch (error) {
+		console.error('Error extracting page content:', error);
+		return null;
+	}
 }
 
 export function getMetaContent(doc: Document, attr: string, value: string): string {
@@ -121,30 +123,32 @@ export function getMetaContent(doc: Document, attr: string, value: string): stri
 }
 
 export async function extractContentBySelector(tabId: number, selector: string): Promise<{ content: string; schemaOrgData: any }> {
-	return new Promise((resolve) => {
-		const attributeMatch = selector.match(/:([a-zA-Z-]+)$/);
-		let baseSelector = selector;
-		let attribute: string | undefined;
+	const attributeMatch = selector.match(/:([a-zA-Z-]+)$/);
+	let baseSelector = selector;
+	let attribute: string | undefined;
 
-		if (attributeMatch) {
-			attribute = attributeMatch[1];
-			baseSelector = selector.slice(0, -attribute.length - 1);
+	if (attributeMatch) {
+		attribute = attributeMatch[1];
+		baseSelector = selector.slice(0, -attribute.length - 1);
+	}
+
+	try {
+		const response = await browser.tabs.sendMessage(tabId, { action: "extractContent", selector: baseSelector, attribute: attribute });
+		let content = response ? response.content : '';
+		
+		// Ensure content is always a string
+		if (Array.isArray(content)) {
+			content = JSON.stringify(content);
 		}
-
-		chrome.tabs.sendMessage(tabId, { action: "extractContent", selector: baseSelector, attribute: attribute }, function(response: any) {
-			let content = response ? response.content : '';
-			
-			// Ensure content is always a string
-			if (Array.isArray(content)) {
-				content = JSON.stringify(content);
-			}
-			
-			resolve({
-				content: content,
-				schemaOrgData: response ? response.schemaOrgData : null
-			});
-		});
-	});
+		
+		return {
+			content: content,
+			schemaOrgData: response ? response.schemaOrgData : null
+		};
+	} catch (error) {
+		console.error('Error extracting content by selector:', error);
+		return { content: '', schemaOrgData: null };
+	}
 }
 
 export async function initializePageContent(content: string, selectedHtml: string, extractedContent: ExtractedContent, currentUrl: string, schemaOrgData: any, fullHtml: string) {

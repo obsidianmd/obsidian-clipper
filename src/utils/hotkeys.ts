@@ -1,3 +1,5 @@
+import browser from './browser-polyfill';
+
 interface Command {
 	name: string;
 	description: string;
@@ -5,13 +7,10 @@ interface Command {
 }
 
 export async function getCommands(): Promise<Command[]> {
-	return new Promise((resolve) => {
-		chrome.commands.getAll((commands) => {
-			resolve(commands.map(cmd => ({
-				name: cmd.name || '',
-				description: cmd.description || 'Open clipper',
-				shortcut: cmd.shortcut || null
-			})));
-		});
-	});
+	const commands = await browser.commands.getAll();
+	return commands.map(cmd => ({
+		name: cmd.name || '',
+		description: cmd.description || 'Open clipper',
+		shortcut: cmd.shortcut || null
+	}));
 }

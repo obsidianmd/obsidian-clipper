@@ -26,6 +26,9 @@
 		text-align: center;
 		color: var(--text-muted);
 		font-size: var(--font-ui-smaller);
+		align-items: center;
+		justify-content: center;
+		height: 100%;
 	}
 	::-webkit-scrollbar{
 		width: 8px;

@@ -1,7 +1,7 @@
 {
 	"manifest_version": 3,
 	"name": "Obsidian Web Clipper",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"description": "Official web clipper extension for Obsidian. Clip content and save it to your Obsidian vault so you always have access to it, even offline.",
 	"permissions": [
 		"activeTab",
@@ -11,7 +11,10 @@
 	"action": {
 		"default_popup": "popup.html"
 	},
-	"options_page": "settings.html",
+	"options_ui": {
+		"page": "settings.html",
+		"open_in_tab": true
+	},
 	"icons": {
 		"16": "icons/icon16.png",
 		"48": "icons/icon48.png",
@@ -21,15 +24,15 @@
 		"service_worker": "background.js",
 		"type": "module"
 	},
-	"content_security_policy": {
-		"extension_pages": "script-src 'self'; object-src 'self'"
-	},
 	"content_scripts": [
 		{
-			"matches": ["<all_urls>"],
+			"matches": ["http://*/*", "https://*/*"],
 			"js": ["content.js"]
 		}
 	],
+	"content_security_policy": {
+		"extension_pages": "script-src 'self'; object-src 'self'"
+	},
 	"commands": {
 		"_execute_action": {
 			"suggested_key": {
@@ -40,11 +43,10 @@
 		},
 		"quick_clip": {
 			"suggested_key": {
-				"default": "Ctrl+Shift+X",
-				"mac": "Command+Shift+X"
+				"default": "Alt+Shift+O",
+				"mac": "Alt+Shift+O"
 			},
-			"description": "Quick clip",
-			"global": false
+			"description": "Quick clip"
 		}
 	}
 }

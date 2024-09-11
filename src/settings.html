@@ -34,7 +34,8 @@
 								</div>
 								<div>
 									<h3>Hotkeys</h3>
-									<div class="setting-item-description">Keyboard shortcuts give you quick access to clipper features. To change key assignments, go to <code>chrome://extensions/shortcuts</code></div>
+									<div class="setting-item-description shortcut-instructions">
+									</div>
 									<div id="keyboard-shortcuts-list"></div>
 								</div>
 								<div>
@@ -76,12 +77,12 @@
 						<div id="template-drop-zone" class="template-drop-zone">
 							<p>Import template</p>
 						</div>
-						<form id="template-settings-form" ondragover="event.preventDefault();" ondrop="event.preventDefault();">
+						<form id="template-settings-form">
 							<div id="template-editor">
 								<div class="setting-item">
 									<label for="template-name">Template name</label>
 									<input type="text" id="template-name" placeholder="Template name" />
-									</div>
+								</div>
 								<div class="setting-item">
 									<label for="template-behavior">Behavior</label>
 									<select id="template-behavior">

@@ -11,6 +11,7 @@ input[type="text"],
 textarea {
 	background: var(--background-primary);
 	border: 1px solid var(--background-modifier-border);
+	font-size: var(--font-ui-smaller);
 	color: var(--text-normal);
 	font-family: inherit;
 	padding: 4px 4px;

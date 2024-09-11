@@ -162,3 +162,27 @@ Filters allow you to modify variables in a template. Filters are applied to vari
 	- `"  hello world  "|trim` returns `"hello world"`.
 - `upper` converts a value to uppercase, e.g. `"hello world"|upper` returns `"HELLO WORLD"`.
 - `wikilink` adds double brackets around strings and array items, e.g. `"hello"|wikilink` returns `"[[hello]]"`.
+
+## Building the Extension
+
+To build the extension for both Chrome and Firefox:
+
+```
+npm run build
+```
+
+This will create two directories:
+- `dist/` for the Chrome version
+- `dist_firefox/` for the Firefox version
+
+### Installing in Chrome
+
+1. Open Chrome and navigate to `chrome://extensions`
+2. Enable "Developer mode"
+3. Click "Load unpacked" and select the `dist` directory
+
+### Installing in Firefox
+
+1. Open Firefox and navigate to `about:debugging#/runtime/this-firefox`
+2. Click "Load Temporary Add-on..."
+3. Navigate to the `dist_firefox` directory and select the `manifest.json` file
