@@ -2,7 +2,7 @@ import TurndownService from 'turndown';
 import { gfm } from 'turndown-plugin-gfm';
 import { Readability } from '@mozilla/readability';
 
-export function createMarkdownContent(content: string, url: string, selectedHtml: string): string {
+export function createMarkdownContent(content: string, url: string, selectedHtml: string, skipReadability: boolean = false): string {
 	const parser = new DOMParser();
 	const doc = parser.parseFromString(content, 'text/html');
 
@@ -23,35 +23,33 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 		}
 	}
 
+	function processUrls(htmlContent: string): string {
+		const tempDiv = document.createElement('div');
+		tempDiv.innerHTML = htmlContent;
+		
+		// Handle relative URLs for both images and links
+		tempDiv.querySelectorAll('img').forEach(img => makeUrlAbsolute(img, 'src'));
+		tempDiv.querySelectorAll('a').forEach(link => makeUrlAbsolute(link, 'href'));
+		
+		return tempDiv.innerHTML;
+	}
+
 	let markdownContent: string;
 
 	if (selectedHtml) {
 		// If there's selected HTML, use it directly
-		const tempDiv = document.createElement('div');
-		tempDiv.innerHTML = selectedHtml;
-		
-		// Handle relative URLs for both images and links in the selection
-		tempDiv.querySelectorAll('img').forEach(img => makeUrlAbsolute(img, 'src'));
-		tempDiv.querySelectorAll('a').forEach(link => makeUrlAbsolute(link, 'href'));
-		
-		markdownContent = tempDiv.innerHTML;
+		markdownContent = processUrls(selectedHtml);
+	} else if (skipReadability) {
+		// If skipping Readability, process the full content
+		markdownContent = processUrls(content);
 	} else {
-		// If no selection, use Readability
+		// If no selection and not skipping Readability, use Readability
 		const readabilityArticle = new Readability(doc).parse();
 		if (!readabilityArticle) {
 			console.error('Failed to parse content with Readability');
 			return '';
 		}
-		const { content: readableContent } = readabilityArticle;
-		
-		const tempDiv = document.createElement('div');
-		tempDiv.innerHTML = readableContent;
-		
-		// Handle relative URLs for both images and links in the full content
-		tempDiv.querySelectorAll('img').forEach(img => makeUrlAbsolute(img, 'src'));
-		tempDiv.querySelectorAll('a').forEach(link => makeUrlAbsolute(link, 'href'));
-		
-		markdownContent = tempDiv.innerHTML;
+		markdownContent = processUrls(readabilityArticle.content);
 	}
 
 	const turndownService = new TurndownService({
@@ -64,8 +62,23 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 
 	turndownService.use(gfm);
 
+	turndownService.remove(['style', 'script']);
+
 	// Keep iframes, video, and audio elements
 	turndownService.keep(['iframe', 'video', 'audio']);
+
+	// Custom rule to keep SVG elements
+	turndownService.addRule('keepSvg', {
+		filter: function(node: Node): boolean {
+			return node.nodeName.toLowerCase() === 'svg';
+		},
+		replacement: function(content: string, node: Node): string {
+			if (node instanceof SVGElement) {
+				return node.outerHTML;
+			}
+			return content;
+		}
+	});
 
 	// Custom rule to handle bullet lists without extra spaces
 	turndownService.addRule('listItem', {
@@ -80,6 +93,36 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 				prefix = (start ? Number(start) + index - 1 : index) + '. ';
 			}
 			return prefix + content + '\n';
+		}
+	});
+
+	// Custom rule to handle figures
+	turndownService.addRule('figure', {
+		filter: 'figure',
+		replacement: function(content, node) {
+			const figure = node as HTMLElement;
+			const img = figure.querySelector('img');
+			const figcaption = figure.querySelector('figcaption');
+			
+			if (!img) return content;
+
+			const alt = img.getAttribute('alt') || '';
+			const src = img.getAttribute('src') || '';
+			let caption = figcaption ? figcaption.textContent?.trim() || '' : '';
+
+			// Check if there's a source attribution in the caption
+			const attribution = figcaption?.querySelector('.attribution');
+			if (attribution) {
+				const sourceLink = attribution.querySelector('a');
+				if (sourceLink) {
+					const sourceText = sourceLink.textContent?.trim() || '';
+					const sourceUrl = sourceLink.getAttribute('href') || '';
+					caption = caption.replace(attribution.textContent || '', '').trim();
+					caption += ` [${sourceText}](${sourceUrl})`;
+				}
+			}
+
+			return `![${alt}](${src})\n\n${caption}`;
 		}
 	});
 
@@ -127,6 +170,46 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 			node.nodeName === 'STRIKE',
 		replacement: function(content) {
 			return '~~' + content + '~~';
+		}
+	});
+
+	// Add a new custom rule for complex link structures
+	turndownService.addRule('complexLinkStructure', {
+		filter: function (node, options) {
+			return (
+				node.nodeName === 'A' &&
+				node.childNodes.length > 1 &&
+				Array.from(node.childNodes).some(child => ['H1', 'H2', 'H3', 'H4', 'H5', 'H6'].includes(child.nodeName))
+			);
+		},
+		replacement: function (content, node, options) {
+			if (!(node instanceof HTMLElement)) return content;
+			
+			const href = node.getAttribute('href');
+			const title = node.getAttribute('title');
+			
+			// Extract the heading
+			const headingNode = node.querySelector('h1, h2, h3, h4, h5, h6');
+			const headingContent = headingNode ? turndownService.turndown(headingNode.innerHTML) : '';
+			
+			// Remove the heading from the content
+			if (headingNode) {
+				headingNode.remove();
+			}
+			
+			// Convert the remaining content
+			const remainingContent = turndownService.turndown(node.innerHTML);
+			
+			// Construct the new markdown
+			let markdown = `${headingContent}\n\n${remainingContent}\n\n`;
+			if (href) {
+				markdown += `[View original](${href})`;
+				if (title) {
+					markdown += ` "${title}"`;
+				}
+			}
+			
+			return markdown;
 		}
 	});
 

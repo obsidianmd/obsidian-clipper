@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import { createMarkdownContent } from './markdown-converter';
 
 export type FilterFunction = (value: string, param?: string) => string;
 
@@ -258,9 +259,18 @@ export const filters: { [key: string]: FilterFunction } = {
 			return str;
 		}
 	},
+	markdown: (str: string, url?: string): string => {
+		const baseUrl = url || 'about:blank';
+		try {
+			return createMarkdownContent(str, baseUrl, '', true); // Pass true to skip Readability
+		} catch (error) {
+			console.error('Error in createMarkdownContent:', error);
+			return str;
+		}
+	},
 };
 
-export function applyFilters(value: string, filterNames: string[]): string {
+export function applyFilters(value: string, filterNames: string[], url?: string): string {
 	// Ensure value is a string before applying filters
 	let processedValue = typeof value === 'string' ? value : JSON.stringify(value);
 
@@ -274,7 +284,8 @@ export function applyFilters(value: string, filterNames: string[]): string {
 
 			const filter = filters[name];
 			if (filter) {
-				const output = filter(result, cleanParam);
+				// Pass the URL to the markdown filter, use cleanParam for others
+				const output = name === 'markdown' ? filter(result, url) : filter(result, cleanParam);
 				return output;
 			}
 		} else {

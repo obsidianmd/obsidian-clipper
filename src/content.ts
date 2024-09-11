@@ -3,6 +3,7 @@ interface ContentResponse {
 	selectedHtml: string;
 	extractedContent: { [key: string]: string };
 	schemaOrgData: any;
+	fullHtml: string;
 }
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
@@ -22,11 +23,16 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
 		const schemaOrgData = extractSchemaOrgData();
 
+		const fullHtmlWithoutIndentation = document.body.innerHTML
+			.replace(/\t/g, '') // Remove tabs
+			.replace(/^[ \t]+/gm, ''); // Remove leading spaces and tabs from each line
+
 		const response: ContentResponse = {
 			content: document.documentElement.outerHTML,
 			selectedHtml: selectedHtml,
 			extractedContent: extractedContent,
-			schemaOrgData: schemaOrgData
+			schemaOrgData: schemaOrgData,
+			fullHtml: fullHtmlWithoutIndentation
 		};
 
 		sendResponse(response);

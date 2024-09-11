@@ -4,17 +4,17 @@ import { sanitizeFileName } from './obsidian-note-creator';
 import { applyFilters } from './filters';
 import dayjs from 'dayjs';
 
-async function processVariable(match: string, variables: { [key: string]: string }): Promise<string> {
+async function processVariable(match: string, variables: { [key: string]: string }, currentUrl: string): Promise<string> {
 	const [, fullVariableName] = match.match(/{{(.*?)}}/) || [];
 	const [variableName, ...filterParts] = fullVariableName.split('|');
 	const filtersString = filterParts.join('|');
 	const value = variables[`{{${variableName}}}`] || '';
 	const filterNames = filtersString.split('|').filter(Boolean);
-	const result = applyFilters(value, filterNames);
+	const result = applyFilters(value, filterNames, currentUrl);
 	return result;
 }
 
-async function processSelector(tabId: number, match: string): Promise<string> {
+async function processSelector(tabId: number, match: string, currentUrl: string): Promise<string> {
 	const selectorRegex = /{{selector:(.*?)(?:\|(.*?))?}}/;
 	const matches = match.match(selectorRegex);
 	if (!matches) {
@@ -30,13 +30,13 @@ async function processSelector(tabId: number, match: string): Promise<string> {
 	
 	if (filtersString) {
 		const filterNames = filtersString.split('|').map(f => f.trim());
-		return applyFilters(contentString, filterNames);
+		return applyFilters(contentString, filterNames, currentUrl);
 	}
 	
 	return contentString;
 }
 
-async function processSchema(match: string, variables: { [key: string]: string }): Promise<string> {
+async function processSchema(match: string, variables: { [key: string]: string }, currentUrl: string): Promise<string> {
 	const [, fullSchemaKey] = match.match(/{{schema:(.*?)}}/) || [];
 	const [schemaKey, ...filterParts] = fullSchemaKey.split('|');
 	const filtersString = filterParts.join('|');
@@ -61,7 +61,7 @@ async function processSchema(match: string, variables: { [key: string]: string }
 	}
 
 	const filterNames = filtersString.split('|').filter(Boolean);
-	const result = applyFilters(schemaValue, filterNames);
+	const result = applyFilters(schemaValue, filterNames, currentUrl);
 	return result;
 }
 
@@ -69,7 +69,7 @@ function getNestedProperty(obj: any, path: string): any {
 	return path.split('.').reduce((prev, curr) => prev && prev[curr], obj);
 }
 
-export async function replaceVariables(tabId: number, text: string, variables: { [key: string]: string }): Promise<string> {
+export async function replaceVariables(tabId: number, text: string, variables: { [key: string]: string }, currentUrl: string): Promise<string> {
 	const regex = /{{(?:schema:)?(?:selector:)?(.*?)}}/g;
 	const matches = text.match(regex);
 
@@ -77,11 +77,11 @@ export async function replaceVariables(tabId: number, text: string, variables: {
 		for (const match of matches) {
 			let replacement: string;
 			if (match.startsWith('{{selector:')) {
-				replacement = await processSelector(tabId, match);
+				replacement = await processSelector(tabId, match, currentUrl);
 			} else if (match.startsWith('{{schema:')) {
-				replacement = await processSchema(match, variables);
+				replacement = await processSchema(match, variables, currentUrl);
 			} else {
-				replacement = await processVariable(match, variables);
+				replacement = await processVariable(match, variables, currentUrl);
 			}
 			text = text.replace(match, replacement);
 		}
@@ -94,6 +94,7 @@ export async function extractPageContent(tabId: number): Promise<{
 	selectedHtml: string;
 	extractedContent: ExtractedContent;
 	schemaOrgData: any;
+	fullHtml: string;
 } | null> {
 	return new Promise((resolve) => {
 		chrome.tabs.sendMessage(tabId, { action: "getPageContent" }, function(response) {
@@ -102,7 +103,8 @@ export async function extractPageContent(tabId: number): Promise<{
 					content: response.content,
 					selectedHtml: response.selectedHtml,
 					extractedContent: response.extractedContent,
-					schemaOrgData: response.schemaOrgData
+					schemaOrgData: response.schemaOrgData,
+					fullHtml: response.fullHtml
 				});
 			} else {
 				resolve(null);
@@ -145,7 +147,7 @@ export async function extractContentBySelector(tabId: number, selector: string):
 	});
 }
 
-export async function initializePageContent(content: string, selectedHtml: string, extractedContent: ExtractedContent, currentUrl: string, schemaOrgData: any) {
+export async function initializePageContent(content: string, selectedHtml: string, extractedContent: ExtractedContent, currentUrl: string, schemaOrgData: any, fullHtml: string) {
 	const readabilityArticle = extractReadabilityContent(content);
 	if (!readabilityArticle) {
 		console.error('Failed to parse content with Readability');
@@ -205,14 +207,15 @@ export async function initializePageContent(content: string, selectedHtml: strin
 	const currentVariables: { [key: string]: string } = {
 		'{{author}}': author,
 		'{{content}}': markdownBody,
+		'{{date}}': convertDate(new Date()),
 		'{{description}}': description,
 		'{{domain}}': domain,
+		'{{fullHtml}}': fullHtml,
 		'{{image}}': image,
+		'{{noteName}}': noteName,
 		'{{published}}': published,
 		'{{site}}': site,
 		'{{title}}': title,
-		'{{noteName}}': noteName,
-		'{{date}}': convertDate(new Date()),
 		'{{url}}': currentUrl
 	};
 

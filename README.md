@@ -64,10 +64,11 @@ These variables are automatically generated based on the page content.
 | Variable          | Description                                          |
 | ----------------- | ---------------------------------------------------- |
 | `{{author}}`      | Author of the page                                   |
-| `{{content}}`     | Content of the page, or the selection if present     |
+| `{{content}}`     | Article content, or the selection if present         |
 | `{{date}}`        | Today's date                                         |
 | `{{description}}` | Description or excerpt                               |
 | `{{domain}}`      | Domain                                               |
+| `{{fullHtml}}`    | Full HTML content of the page                        |
 | `{{image}}`       | Social share image URL                               |
 | `{{published}`    | Published date                                       |
 | `{{title}}`       | Title of the page                                    |
@@ -132,6 +133,7 @@ Filters allow you to modify variables in a template. Filters are applied to vari
 	- Use `list:task` to convert to a task list.
 	- Use `list:numbered` to convert to a numbered list.
 	- Use `list:numbered-task` to convert to a task list with numbers.
+- `markdown` converts a string to an [Obsidian Flavored Markdown](https://help.obsidian.md/Editing+and+formatting/Obsidian+Flavored+Markdown) formatted string.
 - `object` manipulates object data:
 	- `object:array` converts an object to an array of key-value pairs.
 	- `object:keys` returns an array of the object's keys.
