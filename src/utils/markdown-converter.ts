@@ -62,8 +62,23 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 
 	turndownService.use(gfm);
 
+	turndownService.remove(['style', 'script']);
+
 	// Keep iframes, video, and audio elements
 	turndownService.keep(['iframe', 'video', 'audio']);
+
+	// Custom rule to keep SVG elements
+	turndownService.addRule('keepSvg', {
+		filter: function(node: Node): boolean {
+			return node.nodeName.toLowerCase() === 'svg';
+		},
+		replacement: function(content: string, node: Node): string {
+			if (node instanceof SVGElement) {
+				return node.outerHTML;
+			}
+			return content;
+		}
+	});
 
 	// Custom rule to handle bullet lists without extra spaces
 	turndownService.addRule('listItem', {
