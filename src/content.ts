@@ -23,12 +23,16 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
 		const schemaOrgData = extractSchemaOrgData();
 
+		const fullHtmlWithoutIndentation = document.body.innerHTML
+			.replace(/\t/g, '') // Remove tabs
+			.replace(/^[ \t]+/gm, ''); // Remove leading spaces and tabs from each line
+
 		const response: ContentResponse = {
 			content: document.documentElement.outerHTML,
 			selectedHtml: selectedHtml,
 			extractedContent: extractedContent,
 			schemaOrgData: schemaOrgData,
-			fullHtml: document.body.innerHTML
+			fullHtml: fullHtmlWithoutIndentation
 		};
 
 		sendResponse(response);
