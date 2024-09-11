@@ -83,6 +83,36 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 		}
 	});
 
+	// Custom rule to handle figures
+	turndownService.addRule('figure', {
+		filter: 'figure',
+		replacement: function(content, node) {
+			const figure = node as HTMLElement;
+			const img = figure.querySelector('img');
+			const figcaption = figure.querySelector('figcaption');
+			
+			if (!img) return content;
+
+			const alt = img.getAttribute('alt') || '';
+			const src = img.getAttribute('src') || '';
+			let caption = figcaption ? figcaption.textContent?.trim() || '' : '';
+
+			// Check if there's a source attribution in the caption
+			const attribution = figcaption?.querySelector('.attribution');
+			if (attribution) {
+				const sourceLink = attribution.querySelector('a');
+				if (sourceLink) {
+					const sourceText = sourceLink.textContent?.trim() || '';
+					const sourceUrl = sourceLink.getAttribute('href') || '';
+					caption = caption.replace(attribution.textContent || '', '').trim();
+					caption += ` [${sourceText}](${sourceUrl})`;
+				}
+			}
+
+			return `![${alt}](${src})\n\n${caption}`;
+		}
+	});
+
 	// Use Obsidian format for YouTube embeds and tweets
 	turndownService.addRule('embedToMarkdown', {
 		filter: function (node: Node): boolean {

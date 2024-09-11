@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import { createMarkdownContent } from './markdown-converter';
 
 export type FilterFunction = (value: string, param?: string) => string;
 
@@ -257,6 +258,11 @@ export const filters: { [key: string]: FilterFunction } = {
 			console.error('Error parsing JSON for table filter:', error);
 			return str;
 		}
+	},
+	markdown: (str: string): string => {
+		// Use a dummy URL since createMarkdownContent requires one
+		const dummyUrl = 'https://example.com';
+		return createMarkdownContent(str, dummyUrl, '');
 	},
 };
 
