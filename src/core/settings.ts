@@ -11,13 +11,6 @@ import { showGeneralSettings } from '../managers/general-settings-ui';
 import { updateUrl } from '../utils/routing';
 import browser from '../utils/browser-polyfill';
 
-// Add this type declaration
-interface NavigatorExtended extends Navigator {
-	brave?: {
-		isBrave: () => Promise<boolean>;
-	};
-}
-
 document.addEventListener('DOMContentLoaded', async () => {
 	const newTemplateBtn = document.getElementById('new-template-btn') as HTMLButtonElement;
 	const exportTemplateBtn = document.getElementById('export-template-btn') as HTMLButtonElement;
@@ -32,7 +25,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 		await handleUrlParameters();
 		initializeSidebar();
 		initializeAutoSave();
-		setShortcutInstructions(); // Add this line
 
 		exportTemplateBtn.addEventListener('click', exportTemplate);
 		importTemplateBtn.addEventListener('click', importTemplate);
@@ -155,47 +147,3 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 	await initializeSettings();
 });
-
-async function detectBrowser(): Promise<'chrome' | 'firefox' | 'brave' | 'edge' | 'other'> {
-	const userAgent = navigator.userAgent.toLowerCase();
-	
-	if (userAgent.indexOf("firefox") > -1) {
-		return 'firefox';
-	} else if (userAgent.indexOf("edg/") > -1) {
-		return 'edge';
-	} else if (userAgent.indexOf("chrome") > -1) {
-		// Check for Brave
-		const nav = navigator as NavigatorExtended;
-		if (nav.brave && await nav.brave.isBrave()) {
-			return 'brave';
-		}
-		return 'chrome';
-	} else {
-		return 'other';
-	}
-}
-
-async function setShortcutInstructions() {
-	const shortcutInstructionsElement = document.querySelector('.shortcut-instructions');
-	if (shortcutInstructionsElement) {
-		const browser = await detectBrowser();
-		let instructions = '';
-		switch (browser) {
-			case 'chrome':
-				instructions = 'To change key assignments, go to <code>chrome://extensions/shortcuts</code>';
-				break;
-			case 'brave':
-				instructions = 'To change key assignments, go to <code>brave://extensions/shortcuts</code>';
-				break;
-			case 'firefox':
-				instructions = 'To change key assignments, go to <code>about:addons</code>, click the gear icon, and select "Manage Extension Shortcuts".';
-				break;
-			case 'edge':
-				instructions = 'To change key assignments, go to <code>edge://extensions/shortcuts</code>';
-				break;
-			default:
-				instructions = 'To change key assignments, please refer to your browser\'s extension settings.';
-		}
-		shortcutInstructionsElement.innerHTML = `Keyboard shortcuts give you quick access to clipper features. ${instructions}`;
-	}
-}

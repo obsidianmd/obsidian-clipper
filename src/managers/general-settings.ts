@@ -2,7 +2,8 @@ import { handleDragStart, handleDragOver, handleDrop, handleDragEnd } from '../u
 import { initializeIcons } from '../icons/icons';
 import { getCommands } from '../utils/hotkeys';
 import { initializeToggles } from '../utils/ui-utils';
-import { generalSettings,loadGeneralSettings, saveGeneralSettings } from '../utils/storage-utils';
+import { generalSettings, loadGeneralSettings, saveGeneralSettings } from '../utils/storage-utils';
+import { detectBrowser } from '../utils/browser-detection';
 
 export function updateVaultList(): void {
 	const vaultList = document.getElementById('vault-list') as HTMLUListElement;
@@ -49,6 +50,31 @@ export function removeVault(index: number): void {
 	updateVaultList();
 }
 
+export async function setShortcutInstructions() {
+	const shortcutInstructionsElement = document.querySelector('.shortcut-instructions');
+	if (shortcutInstructionsElement) {
+		const browser = await detectBrowser();
+		let instructions = '';
+		switch (browser) {
+			case 'chrome':
+				instructions = 'To change key assignments, go to <code>chrome://extensions/shortcuts</code>';
+				break;
+			case 'brave':
+				instructions = 'To change key assignments, go to <code>brave://extensions/shortcuts</code>';
+				break;
+			case 'firefox':
+				instructions = 'To change key assignments, go to <code>about:addons</code>, click the gear icon, and select "Manage Extension Shortcuts".';
+				break;
+			case 'edge':
+				instructions = 'To change key assignments, go to <code>edge://extensions/shortcuts</code>';
+				break;
+			default:
+				instructions = 'To change key assignments, please refer to your browser\'s extension settings.';
+		}
+		shortcutInstructionsElement.innerHTML = `Keyboard shortcuts give you quick access to clipper features. ${instructions}`;
+	}
+}
+
 export function initializeGeneralSettings(): void {
 	loadGeneralSettings().then(() => {
 		updateVaultList();
@@ -56,6 +82,7 @@ export function initializeGeneralSettings(): void {
 		initializeVaultInput();
 		initializeKeyboardShortcuts();
 		initializeToggles();
+		setShortcutInstructions();
 	});
 }
 
