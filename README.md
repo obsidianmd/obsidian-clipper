@@ -64,10 +64,11 @@ These variables are automatically generated based on the page content.
 | Variable          | Description                                          |
 | ----------------- | ---------------------------------------------------- |
 | `{{author}}`      | Author of the page                                   |
-| `{{content}}`     | Content of the page, or the selection if present     |
+| `{{content}}`     | Article content, or the selection if present         |
 | `{{date}}`        | Today's date                                         |
 | `{{description}}` | Description or excerpt                               |
 | `{{domain}}`      | Domain                                               |
+| `{{fullHtml}}`    | Full HTML content of the page                        |
 | `{{image}}`       | Social share image URL                               |
 | `{{published}`    | Published date                                       |
 | `{{title}}`       | Title of the page                                    |
