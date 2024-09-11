@@ -11,7 +11,10 @@
 	"action": {
 		"default_popup": "popup.html"
 	},
-	"options_page": "settings.html",
+	"options_ui": {
+		"page": "settings.html",
+		"open_in_tab": true
+	},
 	"icons": {
 		"16": "icons/icon16.png",
 		"48": "icons/icon48.png",
@@ -20,9 +23,6 @@
 	"background": {
 		"service_worker": "background.js",
 		"type": "module"
-	},
-	"content_security_policy": {
-		"extension_pages": "script-src 'self'; object-src 'self'"
 	},
 	"content_scripts": [
 		{

@@ -1,15 +1,17 @@
 {
-	"manifest_version": 2,
+	"manifest_version": 3,
 	"name": "Obsidian Web Clipper",
 	"version": "0.2.0",
 	"description": "Official web clipper extension for Obsidian. Clip content and save it to your Obsidian vault so you always have access to it, even offline.",
 	"permissions": [
 		"activeTab",
-		"storage",
-		"https://*/*",
-		"http://*/*"
+		"storage"
 	],
-	"browser_action": {
+	"host_permissions": [
+		"http://*/*",
+		"https://*/*"
+	],
+	"action": {
 		"default_popup": "popup.html",
 		"default_icon": {
 			"16": "icons/icon16.png",
@@ -17,9 +19,12 @@
 			"128": "icons/icon128.png"
 		}
 	},
+	"options_ui": {
+		"page": "settings.html",
+		"open_in_tab": true
+	},
 	"background": {
-		"scripts": ["background.js"],
-		"persistent": false
+		"scripts": ["background.js"]
 	},
 	"content_scripts": [
 		{
@@ -31,5 +36,11 @@
 		"16": "icons/icon16.png",
 		"48": "icons/icon48.png",
 		"128": "icons/icon128.png"
+	},
+	"browser_specific_settings": {
+		"gecko": {
+			"id": "clipper@obsidian.md",
+			"strict_min_version": "109.0"
+		}
 	}
 }
