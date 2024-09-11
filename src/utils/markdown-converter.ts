@@ -2,7 +2,7 @@ import TurndownService from 'turndown';
 import { gfm } from 'turndown-plugin-gfm';
 import { Readability } from '@mozilla/readability';
 
-export function createMarkdownContent(content: string, url: string, selectedHtml: string): string {
+export function createMarkdownContent(content: string, url: string, selectedHtml: string, skipReadability: boolean = false): string {
 	const parser = new DOMParser();
 	const doc = parser.parseFromString(content, 'text/html');
 
@@ -35,8 +35,10 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 		tempDiv.querySelectorAll('a').forEach(link => makeUrlAbsolute(link, 'href'));
 		
 		markdownContent = tempDiv.innerHTML;
+	} else if (skipReadability) {
+		markdownContent = content;
 	} else {
-		// If no selection, use Readability
+		// If no selection and not skipping Readability, use Readability
 		const readabilityArticle = new Readability(doc).parse();
 		if (!readabilityArticle) {
 			console.error('Failed to parse content with Readability');
