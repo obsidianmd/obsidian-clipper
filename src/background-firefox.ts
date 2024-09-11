@@ -26,8 +26,6 @@ browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
 		browser.tabs.sendMessage(request.tabId, request).then(sendResponse);
 		return true;
 	}
-
-	// ... other message listeners ...
 });
 
 browser.action.onClicked.addListener((tab) => {
