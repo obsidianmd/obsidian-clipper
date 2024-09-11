@@ -97,7 +97,7 @@ export async function extractPageContent(tabId: number): Promise<{
 	fullHtml: string;
 } | null> {
 	return new Promise((resolve) => {
-		chrome.tabs.sendMessage(tabId, { action: "getPageContent" }, function(response) {
+		chrome.tabs.sendMessage(tabId, { action: "getPageContent" }, function(response: any) {
 			if (response && response.content) {
 				resolve({
 					content: response.content,
@@ -131,7 +131,7 @@ export async function extractContentBySelector(tabId: number, selector: string):
 			baseSelector = selector.slice(0, -attribute.length - 1);
 		}
 
-		chrome.tabs.sendMessage(tabId, { action: "extractContent", selector: baseSelector, attribute: attribute }, function(response) {
+		chrome.tabs.sendMessage(tabId, { action: "extractContent", selector: baseSelector, attribute: attribute }, function(response: any) {
 			let content = response ? response.content : '';
 			
 			// Ensure content is always a string

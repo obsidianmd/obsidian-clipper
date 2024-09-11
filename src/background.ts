@@ -17,7 +17,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 chrome.commands.onCommand.addListener((command) => {
 	if (command === 'quick_clip') {
 		chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
-			if (tabs[0].id) {
+			if (tabs[0]?.id) {
 				chrome.action.openPopup(() => {
 					// Wait for the popup to be ready
 					setTimeout(() => {

@@ -82,7 +82,7 @@ export function saveToObsidian(fileContent: string, noteName: string, path: stri
 	const vaultParam = vault ? `&vault=${encodeURIComponent(vault)}` : '';
 	obsidianUrl += vaultParam;
 
-	chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+	chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
 		const currentTab = tabs[0];
 		if (currentTab && currentTab.id) {
 			chrome.tabs.update(currentTab.id, { url: obsidianUrl });
