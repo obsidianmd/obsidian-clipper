@@ -8,19 +8,16 @@ Official Obsidian browser extension. For Chrome and Brave, with support for Fire
 
 ## Getting started
 
-The extension is not yet available on the Chrome Web Store as it is still in beta.
+The extension is not yet available across the official directories as it is still in beta.
 
 ### Installing manually
 
-- Go to [releases](https://github.com/obsidianmd/obsidian-clipper/releases) and download the latest version
-- Drag and drop the `.zip` in `chrome://extensions/`
+Go to [releases](https://github.com/obsidianmd/obsidian-clipper/releases) and download the latest version for your browser.
 
-### Run the extension locally
-
-- `npm install`
-- `npm run build` (or `npm run dev` if you want to make changes to the code)
-- Go to `chrome://extensions/`
-- Click `Load unpacked` and select the `dist` folder
+- **Firefox:** go to `about:debugging#/runtime/this-firefox` and click **Load temporary add-on** and select the `.zip` file
+- **Chrome:** drag and drop the `.zip` in `chrome://extensions/`
+- **Edge:** drag and drop the `.zip` in `edge://extensions/`
+- **Brave:** drag and drop the `.zip` in `brave://extensions/`
 
 ## Using templates
 
@@ -163,21 +160,21 @@ Filters allow you to modify variables in a template. Filters are applied to vari
 - `upper` converts a value to uppercase, e.g. `"hello world"|upper` returns `"HELLO WORLD"`.
 - `wikilink` adds double brackets around strings and array items, e.g. `"hello"|wikilink` returns `"[[hello]]"`.
 
-## Building the Extension
+## Building the extension
 
-To build the extension for both Chrome and Firefox:
+To build the extension for Chromium browsers and Firefox:
 
 ```
 npm run build
 ```
 
 This will create two directories:
-- `dist/` for the Chrome version
+- `dist/` for the Chromium version
 - `dist_firefox/` for the Firefox version
 
-### Installing in Chrome
+### Installing in Chrome, Brave, Edge, and Arc
 
-1. Open Chrome and navigate to `chrome://extensions`
+1. Open your browser and navigate to `chrome://extensions`
 2. Enable "Developer mode"
 3. Click "Load unpacked" and select the `dist` directory
 
