@@ -42,5 +42,21 @@
 			"id": "clipper@obsidian.md",
 			"strict_min_version": "109.0"
 		}
+	},
+	"commands": {
+		"_execute_action": {
+			"suggested_key": {
+				"default": "Ctrl+Shift+O",
+				"mac": "Command+Shift+O"
+			},
+			"description": "Open Obsidian Clipper"
+		},
+		"quick_clip": {
+			"suggested_key": {
+				"default": "Ctrl+Shift+X",
+				"mac": "Command+Shift+X"
+			},
+			"description": "Quick clip"
+		}
 	}
 }

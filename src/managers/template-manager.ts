@@ -1,5 +1,6 @@
 import { Template, Property } from '../types/types';
 import { compressToUTF16, decompressFromUTF16 } from 'lz-string';
+import browser from '../utils/browser-polyfill';
 
 export let templates: Template[] = [];
 export let editingTemplateIndex = -1;
@@ -14,74 +15,52 @@ export function setEditingTemplateIndex(index: number): void {
 }
 
 export function loadTemplates(): Promise<Template[]> {
-	return new Promise((resolve) => {
-		chrome.storage.sync.get(TEMPLATE_LIST_KEY, async (data) => {
-			const templateIds = data[TEMPLATE_LIST_KEY] || [];
-			const loadedTemplates: Template[] = [];
-
-			for (const id of templateIds) {
-				const template = await loadTemplate(id);
-				if (template) {
-					loadedTemplates.push(template);
+	return browser.storage.sync.get(TEMPLATE_LIST_KEY).then((data: { [key: string]: any }) => {
+		const templateIds = data[TEMPLATE_LIST_KEY] || [];
+		return Promise.all(templateIds.map(loadTemplate))
+			.then(loadedTemplates => {
+				const validTemplates = loadedTemplates.filter((t): t is Template => t !== null);
+				if (validTemplates.length === 0) {
+					const defaultTemplate = createDefaultTemplate();
+					validTemplates.push(defaultTemplate);
+					return saveTemplateSettings().then(() => validTemplates);
 				}
-			}
-
-			if (loadedTemplates.length === 0) {
-				const defaultTemplate = createDefaultTemplate();
-				loadedTemplates.push(defaultTemplate);
-				await saveTemplateSettings();
-			}
-
-			templates = loadedTemplates;
-			resolve(templates);
-		});
+				return validTemplates;
+			});
 	});
 }
 
 async function loadTemplate(id: string): Promise<Template | null> {
-	return new Promise((resolve) => {
-		chrome.storage.sync.get(STORAGE_KEY_PREFIX + id, (data) => {
-			const compressedChunks = data[STORAGE_KEY_PREFIX + id];
-			if (compressedChunks) {
-				const decompressedData = decompressFromUTF16(compressedChunks.join(''));
-				resolve(JSON.parse(decompressedData));
-			} else {
-				resolve(null);
-			}
-		});
-	});
+	const data = await browser.storage.sync.get(STORAGE_KEY_PREFIX + id);
+	const compressedChunks = data[STORAGE_KEY_PREFIX + id];
+	if (compressedChunks) {
+		const decompressedData = decompressFromUTF16(compressedChunks.join(''));
+		return JSON.parse(decompressedData);
+	}
+	return null;
 }
 
-export function saveTemplateSettings(): Promise<string[]> {
-	return new Promise(async (resolve, reject) => {
-		try {
-			const templateIds = templates.map(t => t.id);
+export async function saveTemplateSettings(): Promise<string[]> {
+	const templateIds = templates.map(t => t.id);
+	const warnings: string[] = [];
+	const templateChunks: { [key: string]: string[] } = {};
 
-			const warnings: string[] = [];
-			const templateChunks: { [key: string]: string[] } = {};
-			for (const template of templates) {
-				const [chunks, warning] = await prepareTemplateForSave(template);
-				templateChunks[STORAGE_KEY_PREFIX + template.id] = chunks;
-				if (warning) {
-					warnings.push(warning);
-				}
-			}
-
-			// Save template list and individual templates
-			chrome.storage.sync.set({ ...templateChunks, [TEMPLATE_LIST_KEY]: templateIds }, () => {
-				if (chrome.runtime.lastError) {
-					console.error('Error saving templates:', chrome.runtime.lastError);
-					reject(chrome.runtime.lastError);
-				} else {
-					console.log('Template settings saved');
-					resolve(warnings);
-				}
-			});
-		} catch (error) {
-			console.error('Error preparing templates for save:', error);
-			reject(error);
+	for (const template of templates) {
+		const [chunks, warning] = await prepareTemplateForSave(template);
+		templateChunks[STORAGE_KEY_PREFIX + template.id] = chunks;
+		if (warning) {
+			warnings.push(warning);
 		}
-	});
+	}
+
+	try {
+		await browser.storage.sync.set({ ...templateChunks, [TEMPLATE_LIST_KEY]: templateIds });
+		console.log('Template settings saved');
+		return warnings;
+	} catch (error) {
+		console.error('Error saving templates:', error);
+		throw error;
+	}
 }
 
 async function prepareTemplateForSave(template: Template): Promise<[string[], string | null]> {
