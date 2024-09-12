@@ -1,6 +1,6 @@
 .checkbox-container {
 	-webkit-app-region: no-drag;
-	cursor: var(--cursor);
+	cursor: pointer;
 	background-color: var(--background-modifier-border-hover);
 	border-radius: var(--toggle-radius);
 	display: inline-block;
