@@ -1,6 +1,7 @@
 import TurndownService from 'turndown';
 import { gfm } from 'turndown-plugin-gfm';
 import { Readability } from '@mozilla/readability';
+import { MathMLToLaTeX } from 'mathml-to-latex';
 
 export function createMarkdownContent(content: string, url: string, selectedHtml: string, skipReadability: boolean = false): string {
 	const parser = new DOMParser();
@@ -210,6 +211,28 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 			}
 			
 			return markdown;
+		}
+	});
+
+	turndownService.addRule('math', {
+		filter: (node) => {
+			return node.nodeName.toLowerCase() === 'math';
+		},
+		replacement: (content, node) => {
+			if (!(node instanceof HTMLElement)) return content;
+
+			const mathml = node.outerHTML;
+			let latex = MathMLToLaTeX.convert(mathml);
+
+			// Remove leading and trailing whitespace
+			latex = latex.trim();
+
+			// Check if it's an inline or block math element
+			if (node.getAttribute('display') === 'block') {
+				return `\n\n$$\n${latex}\n$$\n\n`;
+			} else {
+				return `$${latex}$`;
+			}
 		}
 	});
 
