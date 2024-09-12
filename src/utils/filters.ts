@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import { createMarkdownContent } from './markdown-converter';
+import { escapeRegExp } from './string-utils';
 
 export type FilterFunction = (value: string, param?: string) => string;
 
@@ -267,6 +268,28 @@ export const filters: { [key: string]: FilterFunction } = {
 			console.error('Error in createMarkdownContent:', error);
 			return str;
 		}
+	},
+	replace: (str: string, param?: string): string => {
+		if (!param) {
+			console.error('Replace filter requires parameters');
+			return str;
+		}
+
+		const parts = param.split(',').map(part => part.trim());
+		if (parts.length >= 2) {
+			const result = parts.reduce((acc, part, index, array) => {
+				if (index % 2 === 0 && index + 1 < array.length) {
+					const search = part.replace(/^["'{]|[}"']$/g, '');
+					const replace = array[index + 1].replace(/^["'{]|[}"']$/g, '');
+					const searchRegex = new RegExp(escapeRegExp(search), 'gi');
+					return acc.replace(searchRegex, replace);
+				}
+				return acc;
+			}, str);
+			return result;
+		}
+
+		return str;
 	},
 };
 

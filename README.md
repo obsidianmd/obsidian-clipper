@@ -63,7 +63,7 @@ These variables are automatically generated based on the page content.
 | `{{domain}}`      | Domain                                               |
 | `{{fullHtml}}`    | Full HTML content of the page                        |
 | `{{image}}`       | Social share image URL                               |
-| `{{published}`    | Published date                                       |
+| `{{published}}`   | Published date                                       |
 | `{{title}}`       | Title of the page                                    |
 | `{{url}}`         | Current URL                                          |
 
@@ -133,6 +133,7 @@ Filters allow you to modify variables in a template. Filters are applied to vari
 	- `object:values` returns an array of the object's values.
 	- Example: `{"a":1,"b":2}|object:array` returns `[["a",1],["b",2]]`.
 - `pascal` converts text to `PascalCase`.
+- `replace` replaces occurrences of a specified string: `"hello!"|replace:"ello!","i?"` returns `"hi?"`.
 - `slice` extracts a portion of a string or array.
 	- For strings: `"hello"|slice:1,4` returns `"ell"`.
 	- For arrays: `["a","b","c","d"]|slice:1,3` returns `["b","c"]`.
@@ -177,5 +178,5 @@ This will create two directories:
 ### Installing in Firefox
 
 1. Open Firefox and navigate to `about:debugging#/runtime/this-firefox`
-2. Click ***Load Temporary Add-on**
+2. Click **Load Temporary Add-on**
 3. Navigate to the `dist_firefox` directory and select the `manifest.json` file
