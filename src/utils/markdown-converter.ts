@@ -1,6 +1,7 @@
 import TurndownService from 'turndown';
 import { gfm } from 'turndown-plugin-gfm';
 import { Readability } from '@mozilla/readability';
+import { MathMLToLaTeX } from 'mathml-to-latex';
 
 export function createMarkdownContent(content: string, url: string, selectedHtml: string, skipReadability: boolean = false): string {
 	const parser = new DOMParser();
@@ -44,7 +45,7 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 		markdownContent = processUrls(content);
 	} else {
 		// If no selection and not skipping Readability, use Readability
-		const readabilityArticle = new Readability(doc).parse();
+		const readabilityArticle = new Readability(doc,{keepClasses:true}).parse();
 		if (!readabilityArticle) {
 			console.error('Failed to parse content with Readability');
 			return '';
@@ -64,21 +65,9 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 
 	turndownService.remove(['style', 'script']);
 
-	// Keep iframes, video, and audio elements
-	turndownService.keep(['iframe', 'video', 'audio']);
-
-	// Custom rule to keep SVG elements
-	turndownService.addRule('keepSvg', {
-		filter: function(node: Node): boolean {
-			return node.nodeName.toLowerCase() === 'svg';
-		},
-		replacement: function(content: string, node: Node): string {
-			if (node instanceof SVGElement) {
-				return node.outerHTML;
-			}
-			return content;
-		}
-	});
+	// Keep iframes, video, audio, sup, and sub elements
+	// @ts-ignore
+	turndownService.keep(['iframe', 'video', 'audio', 'sup', 'sub', 'svg', 'math']);
 
 	// Custom rule to handle bullet lists without extra spaces
 	turndownService.addRule('listItem', {
@@ -213,6 +202,65 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 		}
 	});
 
+	turndownService.addRule('math', {
+		filter: (node) => {
+			return node.nodeName.toLowerCase() === 'math' || 
+				(node instanceof Element && node.classList && 
+				(node.classList.contains('mwe-math-element') || 
+				node.classList.contains('mwe-math-fallback-image-inline') || 
+				node.classList.contains('mwe-math-fallback-image-display')));
+		},
+		replacement: (content, node) => {
+			if (!(node instanceof Element)) return content;
+
+			let latex = '';
+
+			// First, try to find LaTeX in the annotation
+			const annotation = node.querySelector('annotation[encoding="application/x-tex"]');
+			if (annotation && annotation.textContent) {
+				latex = annotation.textContent.trim();
+			} else if (node.nodeName.toLowerCase() === 'math') {
+				// If no annotation, convert MathML to LaTeX
+				latex = MathMLToLaTeX.convert(node.outerHTML);
+			} else {
+				// For other cases, look for nested math elements or images
+				const mathNode = node.querySelector('math');
+				if (mathNode) {
+					const nestedAnnotation = mathNode.querySelector('annotation[encoding="application/x-tex"]');
+					if (nestedAnnotation && nestedAnnotation.textContent) {
+						latex = nestedAnnotation.textContent.trim();
+					} else {
+						latex = MathMLToLaTeX.convert(mathNode.outerHTML);
+					}
+				} else {
+					const imgNode = node.querySelector('img');
+					if (imgNode) {
+						latex = imgNode.getAttribute('alt') || '';
+					}
+				}
+			}
+
+			// Remove leading and trailing whitespace
+			latex = latex.trim();
+
+			// Check if the math element is within a table cell
+			const isInTableCell = node.closest('td, th') !== null;
+
+			// Check if it's an inline or block math element
+			if (!isInTableCell && (
+				node.getAttribute('display') === 'block' || 
+				node.classList.contains('mwe-math-fallback-image-display') || 
+				(node.parentElement && node.parentElement.classList.contains('mwe-math-element') && 
+				node.parentElement.previousElementSibling && 
+				node.parentElement.previousElementSibling.nodeName.toLowerCase() === 'p')
+			)) {
+				return `\n\n$$$\n${latex}\n$$$\n\n`;
+			} else {
+				return `$${latex}$`;
+			}
+		}
+	});
+
 	let markdown = turndownService.turndown(markdownContent);
 
 	// Remove the title from the beginning of the content if it exists
@@ -222,11 +270,4 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 	}
 
 	return markdown.trim();
-}
-
-export function extractReadabilityContent(content: string): ReturnType<Readability['parse']> {
-	const parser = new DOMParser();
-	const doc = parser.parseFromString(content, 'text/html');
-	const reader = new Readability(doc);
-	return reader.parse();
 }
