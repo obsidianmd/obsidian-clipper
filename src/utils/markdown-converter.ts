@@ -202,6 +202,21 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 		}
 	});
 
+	function extractLatex(element: Element): string {
+		const annotation = element.querySelector('annotation[encoding="application/x-tex"]');
+		if (annotation?.textContent) {
+			return annotation.textContent.trim();
+		}
+
+		const mathNode = element.nodeName.toLowerCase() === 'math' ? element : element.querySelector('math');
+		if (mathNode) {
+			return MathMLToLaTeX.convert(mathNode.outerHTML);
+		}
+
+		const imgNode = element.querySelector('img');
+		return imgNode?.getAttribute('alt') || '';
+	}
+
 	turndownService.addRule('math', {
 		filter: (node) => {
 			return node.nodeName.toLowerCase() === 'math' || 
@@ -213,32 +228,7 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 		replacement: (content, node) => {
 			if (!(node instanceof Element)) return content;
 
-			let latex = '';
-
-			// First, try to find LaTeX in the annotation
-			const annotation = node.querySelector('annotation[encoding="application/x-tex"]');
-			if (annotation && annotation.textContent) {
-				latex = annotation.textContent.trim();
-			} else if (node.nodeName.toLowerCase() === 'math') {
-				// If no annotation, convert MathML to LaTeX
-				latex = MathMLToLaTeX.convert(node.outerHTML);
-			} else {
-				// For other cases, look for nested math elements or images
-				const mathNode = node.querySelector('math');
-				if (mathNode) {
-					const nestedAnnotation = mathNode.querySelector('annotation[encoding="application/x-tex"]');
-					if (nestedAnnotation && nestedAnnotation.textContent) {
-						latex = nestedAnnotation.textContent.trim();
-					} else {
-						latex = MathMLToLaTeX.convert(mathNode.outerHTML);
-					}
-				} else {
-					const imgNode = node.querySelector('img');
-					if (imgNode) {
-						latex = imgNode.getAttribute('alt') || '';
-					}
-				}
-			}
+			let latex = extractLatex(node);
 
 			// Remove leading and trailing whitespace
 			latex = latex.trim();
