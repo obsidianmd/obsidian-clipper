@@ -240,7 +240,7 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 				}
 			}
 
-			// Remove leading and trailing whitespace and any \displaystyle commands
+			// Remove leading and trailing whitespace
 			latex = latex.trim();
 
 			// Check if the math element is within a table cell
