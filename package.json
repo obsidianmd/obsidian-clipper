@@ -8,7 +8,7 @@
 		"build:chrome": "webpack --env BROWSER=chrome",
 		"build:firefox": "webpack --env BROWSER=firefox",
 		"build": "npm run build:chrome && npm run build:firefox",
-		"dev": "npm run dev:chrome && npm run dev:firefox"
+		"dev": "npm run dev:chrome"
 	},
 	"devDependencies": {
 		"@types/chrome": "^0.0.270",

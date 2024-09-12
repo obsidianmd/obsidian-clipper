@@ -217,10 +217,13 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 	turndownService.addRule('math', {
 		filter: (node) => {
 			return node.nodeName.toLowerCase() === 'math' || 
-            (node.classList && (node.classList.contains('mwe-math-element') || node.classList.contains('mwe-math-fallback-image-inline') || node.classList.contains('mwe-math-fallback-image-display')));
+				(node instanceof Element && node.classList && 
+				(node.classList.contains('mwe-math-element') || 
+				node.classList.contains('mwe-math-fallback-image-inline') || 
+				node.classList.contains('mwe-math-fallback-image-display')));
 		},
 		replacement: (content, node) => {
-			if (!(node instanceof HTMLElement)) return content;
+			if (!(node instanceof Element)) return content;
 
 			let latex = '';
 
@@ -230,11 +233,7 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 				latex = annotation.textContent.trim();
 			} else if (node.nodeName.toLowerCase() === 'math') {
 				// If no annotation, convert MathML to LaTeX
-				const mathml = node.outerHTML;
-				latex = MathMLToLaTeX.convert(mathml);
-			} else if (node.classList.contains('mwe-math-fallback-image-inline') || node.classList.contains('mwe-math-fallback-image-display')) {
-				// For fallback images, use the alt attribute
-				latex = node.getAttribute('alt') || '';
+				latex = MathMLToLaTeX.convert(node.outerHTML);
 			} else {
 				// For other cases, look for nested math elements or images
 				const mathNode = node.querySelector('math');
@@ -249,7 +248,7 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 					const imgNode = node.querySelector('img');
 					if (imgNode) {
 						latex = imgNode.getAttribute('alt') || '';
-						}
+					}
 				}
 			}
 
@@ -257,7 +256,8 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 			latex = latex.trim().replace(/\\displaystyle\s?/g, '');
 
 			// Check if it's an inline or block math element
-			if (node.classList.contains('mwe-math-fallback-image-display') || 
+			if (node.getAttribute('display') === 'block' || 
+				node.classList.contains('mwe-math-fallback-image-display') || 
 				(node.parentElement && node.parentElement.classList.contains('mwe-math-element') && 
 				node.parentElement.previousElementSibling && 
 				node.parentElement.previousElementSibling.nodeName.toLowerCase() === 'p')) {
