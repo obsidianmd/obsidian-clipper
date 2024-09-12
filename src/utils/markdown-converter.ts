@@ -66,7 +66,8 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 	turndownService.remove(['style', 'script']);
 
 	// Keep iframes, video, audio, sup, and sub elements
-	turndownService.keep(['iframe', 'video', 'audio', 'sup', 'sub']);
+	// @ts-ignore
+	turndownService.keep(['iframe', 'video', 'audio', 'sup', 'sub','svg']);
 
 	// Custom rule to keep SVG elements
 	turndownService.addRule('keepSvg', {
@@ -261,7 +262,7 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 				(node.parentElement && node.parentElement.classList.contains('mwe-math-element') && 
 				node.parentElement.previousElementSibling && 
 				node.parentElement.previousElementSibling.nodeName.toLowerCase() === 'p')) {
-				return `\n\n$$\n${latex}\n$$\n\n`;
+				return `\n\n$$$\n${latex}\n$$$\n\n`;
 			} else {
 				return `$${latex}$`;
 			}
