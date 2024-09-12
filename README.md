@@ -63,7 +63,7 @@ These variables are automatically generated based on the page content.
 | `{{domain}}`      | Domain                                               |
 | `{{fullHtml}}`    | Full HTML content of the page                        |
 | `{{image}}`       | Social share image URL                               |
-| `{{published}`    | Published date                                       |
+| `{{published}}`   | Published date                                       |
 | `{{title}}`       | Title of the page                                    |
 | `{{url}}`         | Current URL                                          |
 
