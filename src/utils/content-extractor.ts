@@ -1,6 +1,6 @@
 import { ExtractedContent } from '../types/types';
 import { createMarkdownContent } from './markdown-converter';
-import { sanitizeFileName } from './obsidian-note-creator';
+import { sanitizeFileName } from './string-utils';
 import { Readability } from '@mozilla/readability';
 import { applyFilters } from './filters';
 import dayjs from 'dayjs';

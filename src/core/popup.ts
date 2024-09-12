@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
 import { Template, Property } from '../types/types';
-import { generateFrontmatter, saveToObsidian, sanitizeFileName } from '../utils/obsidian-note-creator';
+import { generateFrontmatter, saveToObsidian } from '../utils/obsidian-note-creator';
+import { sanitizeFileName } from '../utils/string-utils';
 import { extractPageContent, initializePageContent, replaceVariables } from '../utils/content-extractor';
 import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
 import { decompressFromUTF16 } from 'lz-string';

@@ -1,5 +1,6 @@
 import browser from './browser-polyfill';
 import dayjs from 'dayjs';
+import { escapeDoubleQuotes, sanitizeFileName } from '../utils/string-utils';
 import { Template, Property } from '../types/types';
 
 export async function generateFrontmatter(properties: Property[]): Promise<string> {
@@ -25,7 +26,7 @@ export async function generateFrontmatter(properties: Property[]): Promise<strin
 				if (items.length > 0) {
 					frontmatter += '\n';
 					items.forEach(item => {
-						frontmatter += `  - "${item}"\n`;
+						frontmatter += `  - "${escapeDoubleQuotes(item)}"\n`;
 					});
 				} else {
 					frontmatter += '\n';
@@ -47,7 +48,7 @@ export async function generateFrontmatter(properties: Property[]): Promise<strin
 				}
 				break;
 			default: // Text
-				frontmatter += property.value.trim() !== '' ? ` "${property.value}"\n` : '\n';
+				frontmatter += property.value.trim() !== '' ? ` "${escapeDoubleQuotes(property.value)}"\n` : '\n';
 		}
 	}
 	frontmatter += '---\n';
@@ -75,7 +76,7 @@ export function saveToObsidian(fileContent: string, noteName: string, path: stri
 		// Add newlines at the beginning to separate from existing content
 		content = '\n\n' + content;
 	} else {
-		obsidianUrl = `obsidian://new?file=${encodeURIComponent(path + noteName)}`;
+		obsidianUrl = `obsidian://new?file=${encodeURIComponent(path + sanitizeFileName(noteName))}`;
 	}
 
 	obsidianUrl += `&content=${encodeURIComponent(content)}`;
@@ -89,14 +90,4 @@ export function saveToObsidian(fileContent: string, noteName: string, path: stri
 			browser.tabs.update(currentTab.id, { url: obsidianUrl });
 		}
 	});
-}
-
-export function sanitizeFileName(fileName: string): string {
-	const isWindows = navigator.platform.indexOf('Win') > -1;
-	if (isWindows) {
-		fileName = fileName.replace(':', '').replace(/[/\\?%*|"<>]/g, '-');
-	} else {
-		fileName = fileName.replace(':', '').replace(/[/\\]/g, '-');
-	}
-	return fileName;
 }
