@@ -45,7 +45,7 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 		markdownContent = processUrls(content);
 	} else {
 		// If no selection and not skipping Readability, use Readability
-		const readabilityArticle = new Readability(doc).parse();
+		const readabilityArticle = new Readability(doc,{keepClasses:true}).parse();
 		if (!readabilityArticle) {
 			console.error('Failed to parse content with Readability');
 			return '';
@@ -67,20 +67,7 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 
 	// Keep iframes, video, audio, sup, and sub elements
 	// @ts-ignore
-	turndownService.keep(['iframe', 'video', 'audio', 'sup', 'sub','svg']);
-
-	// Custom rule to keep SVG elements
-	turndownService.addRule('keepSvg', {
-		filter: function(node: Node): boolean {
-			return node.nodeName.toLowerCase() === 'svg';
-		},
-		replacement: function(content: string, node: Node): string {
-			if (node instanceof SVGElement) {
-				return node.outerHTML;
-			}
-			return content;
-		}
-	});
+	turndownService.keep(['iframe', 'video', 'audio', 'sup', 'sub', 'svg', 'math']);
 
 	// Custom rule to handle bullet lists without extra spaces
 	turndownService.addRule('listItem', {
@@ -254,7 +241,7 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 			}
 
 			// Remove leading and trailing whitespace and any \displaystyle commands
-			latex = latex.trim().replace(/\\displaystyle\s?/g, '');
+			latex = latex.trim();
 
 			// Check if the math element is within a table cell
 			const isInTableCell = node.closest('td, th') !== null;
@@ -267,7 +254,6 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 				node.parentElement.previousElementSibling && 
 				node.parentElement.previousElementSibling.nodeName.toLowerCase() === 'p')
 			)) {
-				// an extra $ is added otherwise seems to be cut
 				return `\n\n$$$\n${latex}\n$$$\n\n`;
 			} else {
 				return `$${latex}$`;
@@ -284,11 +270,4 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 	}
 
 	return markdown.trim();
-}
-
-export function extractReadabilityContent(content: string): ReturnType<Readability['parse']> {
-	const parser = new DOMParser();
-	const doc = parser.parseFromString(content, 'text/html');
-	const reader = new Readability(doc);
-	return reader.parse();
 }

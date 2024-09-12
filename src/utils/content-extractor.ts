@@ -1,9 +1,17 @@
 import { ExtractedContent } from '../types/types';
-import { extractReadabilityContent, createMarkdownContent } from './markdown-converter';
+import { createMarkdownContent } from './markdown-converter';
 import { sanitizeFileName } from './obsidian-note-creator';
+import { Readability } from '@mozilla/readability';
 import { applyFilters } from './filters';
 import dayjs from 'dayjs';
 import browser from './browser-polyfill';
+
+export function extractReadabilityContent(content: string): ReturnType<Readability['parse']> {
+	const parser = new DOMParser();
+	const doc = parser.parseFromString(content, 'text/html');
+	const reader = new Readability(doc, {keepClasses:true})
+	return reader.parse();
+}
 
 async function processVariable(match: string, variables: { [key: string]: string }, currentUrl: string): Promise<string> {
 	const [, fullVariableName] = match.match(/{{(.*?)}}/) || [];
