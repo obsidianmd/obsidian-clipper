@@ -256,12 +256,18 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 			// Remove leading and trailing whitespace and any \displaystyle commands
 			latex = latex.trim().replace(/\\displaystyle\s?/g, '');
 
+			// Check if the math element is within a table cell
+			const isInTableCell = node.closest('td, th') !== null;
+
 			// Check if it's an inline or block math element
-			if (node.getAttribute('display') === 'block' || 
+			if (!isInTableCell && (
+				node.getAttribute('display') === 'block' || 
 				node.classList.contains('mwe-math-fallback-image-display') || 
 				(node.parentElement && node.parentElement.classList.contains('mwe-math-element') && 
 				node.parentElement.previousElementSibling && 
-				node.parentElement.previousElementSibling.nodeName.toLowerCase() === 'p')) {
+				node.parentElement.previousElementSibling.nodeName.toLowerCase() === 'p')
+			)) {
+				// an extra $ is added otherwise seems to be cut
 				return `\n\n$$$\n${latex}\n$$$\n\n`;
 			} else {
 				return `$${latex}$`;
