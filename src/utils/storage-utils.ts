@@ -3,11 +3,13 @@ import browser from './browser-polyfill';
 export interface GeneralSettings {
 	showMoreActionsButton: boolean;
 	vaults: string[];
+	betaFeatures: boolean;
 }
 
 export let generalSettings: GeneralSettings = {
 	showMoreActionsButton: true,
-	vaults: []
+	vaults: [],
+	betaFeatures: false
 };
 
 export function setLocalStorage(key: string, value: any): Promise<void> {
@@ -23,7 +25,8 @@ export async function loadGeneralSettings(): Promise<GeneralSettings> {
 
 	generalSettings = {
 		showMoreActionsButton: data.general_settings?.showMoreActionsButton ?? true,
-		vaults: data.vaults || []
+		vaults: data.vaults || [],
+		betaFeatures: data.general_settings?.betaFeatures ?? false
 	};
 	
 	return generalSettings;
@@ -33,7 +36,10 @@ export async function saveGeneralSettings(settings?: Partial<GeneralSettings>): 
 	generalSettings = { ...generalSettings, ...settings };
 	
 	await browser.storage.sync.set({ 
-		general_settings: { showMoreActionsButton: generalSettings.showMoreActionsButton },
+		general_settings: {
+			showMoreActionsButton: generalSettings.showMoreActionsButton,
+			betaFeatures: generalSettings.betaFeatures
+		},
 		vaults: generalSettings.vaults 
 	});
 }
