@@ -65,8 +65,8 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 
 	turndownService.remove(['style', 'script']);
 
-	// Keep iframes, video, and audio elements
-	turndownService.keep(['iframe', 'video', 'audio']);
+	// Keep iframes, video, audio, sup, and sub elements
+	turndownService.keep(['iframe', 'video', 'audio', 'sup', 'sub']);
 
 	// Custom rule to keep SVG elements
 	turndownService.addRule('keepSvg', {
@@ -216,19 +216,51 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 
 	turndownService.addRule('math', {
 		filter: (node) => {
-			return node.nodeName.toLowerCase() === 'math';
+			return node.nodeName.toLowerCase() === 'math' || 
+            (node.classList && (node.classList.contains('mwe-math-element') || node.classList.contains('mwe-math-fallback-image-inline') || node.classList.contains('mwe-math-fallback-image-display')));
 		},
 		replacement: (content, node) => {
 			if (!(node instanceof HTMLElement)) return content;
 
-			const mathml = node.outerHTML;
-			let latex = MathMLToLaTeX.convert(mathml);
+			let latex = '';
 
-			// Remove leading and trailing whitespace
-			latex = latex.trim();
+			// First, try to find LaTeX in the annotation
+			const annotation = node.querySelector('annotation[encoding="application/x-tex"]');
+			if (annotation && annotation.textContent) {
+				latex = annotation.textContent.trim();
+			} else if (node.nodeName.toLowerCase() === 'math') {
+				// If no annotation, convert MathML to LaTeX
+				const mathml = node.outerHTML;
+				latex = MathMLToLaTeX.convert(mathml);
+			} else if (node.classList.contains('mwe-math-fallback-image-inline') || node.classList.contains('mwe-math-fallback-image-display')) {
+				// For fallback images, use the alt attribute
+				latex = node.getAttribute('alt') || '';
+			} else {
+				// For other cases, look for nested math elements or images
+				const mathNode = node.querySelector('math');
+				if (mathNode) {
+					const nestedAnnotation = mathNode.querySelector('annotation[encoding="application/x-tex"]');
+					if (nestedAnnotation && nestedAnnotation.textContent) {
+						latex = nestedAnnotation.textContent.trim();
+					} else {
+						latex = MathMLToLaTeX.convert(mathNode.outerHTML);
+					}
+				} else {
+					const imgNode = node.querySelector('img');
+					if (imgNode) {
+						latex = imgNode.getAttribute('alt') || '';
+						}
+				}
+			}
+
+			// Remove leading and trailing whitespace and any \displaystyle commands
+			latex = latex.trim().replace(/\\displaystyle\s?/g, '');
 
 			// Check if it's an inline or block math element
-			if (node.getAttribute('display') === 'block') {
+			if (node.classList.contains('mwe-math-fallback-image-display') || 
+				(node.parentElement && node.parentElement.classList.contains('mwe-math-element') && 
+				node.parentElement.previousElementSibling && 
+				node.parentElement.previousElementSibling.nodeName.toLowerCase() === 'p')) {
 				return `\n\n$$\n${latex}\n$$\n\n`;
 			} else {
 				return `$${latex}$`;
