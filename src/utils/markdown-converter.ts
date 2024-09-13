@@ -355,10 +355,10 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 	turndownService.addRule('removals', {
 		filter: function (node) {
 			if (!(node instanceof HTMLElement)) return false;
-			
 			// Wikipedia edit buttons
 			if (node.classList.contains('mw-editsection')) return true;
-
+			// Wikipedia cite backlinks
+			if (node.classList.contains('mw-cite-backlink')) return true;
 			// Standalone anchor links, e.g. GitHub readmes
 			if (node.classList.contains('anchor') && node.getAttribute('href')?.startsWith('#')) return true;
 			
@@ -366,6 +366,64 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 		},
 		replacement: function () {
 			return '';
+		}
+	});
+
+	// Update the citations rule
+	turndownService.addRule('citations', {
+		filter: (node) => {
+			return node.nodeName === 'SUP' && node.classList.contains('reference');
+		},
+		replacement: (content, node) => {
+			if (node instanceof HTMLElement) {
+				const link = node.querySelector('a');
+				if (link) {
+					const href = link.getAttribute('href');
+					if (href && href.startsWith('#cite_note-')) {
+						const id = href.replace('#cite_note-', '');
+						return `[^${id}]`;
+					}
+				}
+			}
+			return content;
+		}
+	});
+
+	// Update the reference list rule
+	turndownService.addRule('referenceList', {
+		filter: (node) => {
+			return node.nodeName === 'OL' && node.classList.contains('references');
+		},
+		replacement: (content, node) => {
+			if (node instanceof HTMLElement) {
+				const references = Array.from(node.children).map(li => {
+					const id = li.id.replace('cite_note-', '');
+					const referenceContent = turndownService.turndown(li.innerHTML);
+					return `[^${id}]: ${referenceContent.trim()}`;
+				});
+				return '\n\n' + references.join('\n\n') + '\n\n';
+			}
+			return content;
+		}
+	});
+
+	turndownService.addRule('wikiLinks', {
+		filter: (node: Node): boolean => {
+			if (node instanceof Element) {
+				const href = node.getAttribute('href');
+				return node.nodeName === 'A' && !!href && href.includes('/wiki/');
+			}
+			return false;
+		},
+		replacement: (content, node) => {
+			if (node instanceof HTMLElement) {
+				const href = node.getAttribute('href');
+				const title = node.getAttribute('title');
+				if (href && title) {
+					return `[${title}](https://en.wikipedia.org${href})`;
+				}
+			}
+			return content;
 		}
 	});
 
