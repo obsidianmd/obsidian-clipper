@@ -68,6 +68,7 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 	// Keep iframes, video, audio, sup, and sub elements
 	// @ts-ignore
 	turndownService.keep(['iframe', 'video', 'audio', 'sup', 'sub', 'svg', 'math']);
+	turndownService.remove(['button']);
 
 	// Custom rule to handle bullet lists without extra spaces
 	turndownService.addRule('listItem', {
@@ -85,7 +86,6 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 		}
 	});
 
-	// Custom rule to handle figures
 	turndownService.addRule('figure', {
 		filter: 'figure',
 		replacement: function(content, node) {
@@ -97,21 +97,29 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 
 			const alt = img.getAttribute('alt') || '';
 			const src = img.getAttribute('src') || '';
-			let caption = figcaption ? figcaption.textContent?.trim() || '' : '';
+			let caption = '';
 
-			// Check if there's a source attribution in the caption
-			const attribution = figcaption?.querySelector('.attribution');
-			if (attribution) {
-				const sourceLink = attribution.querySelector('a');
-				if (sourceLink) {
-					const sourceText = sourceLink.textContent?.trim() || '';
-					const sourceUrl = sourceLink.getAttribute('href') || '';
-					caption = caption.replace(attribution.textContent || '', '').trim();
-					caption += ` [${sourceText}](${sourceUrl})`;
-				}
+			if (figcaption) {
+				const tagSpan = figcaption.querySelector('.ltx_tag_figure');
+				const tagText = tagSpan ? tagSpan.textContent?.trim() : '';
+				const captionText = figcaption.textContent?.replace(tagText || '', '').trim() || '';
+				caption = `${tagText} ${captionText}`.trim();
 			}
 
-			return `![${alt}](${src})\n\n${caption}`;
+			// Convert math elements in the caption
+			caption = caption.replace(/<math.*?>(.*?)<\/math>/g, (match, p1) => {
+				const mathContent = extractLatex(new DOMParser().parseFromString(match, 'text/html').body.firstChild as Element);
+				return `$${mathContent}$`;
+			});
+
+			// Handle references in the caption
+			caption = caption.replace(/<a.*?>(.*?)<\/a>/g, (match, p1) => {
+				const link = new DOMParser().parseFromString(match, 'text/html').body.firstChild as HTMLAnchorElement;
+				const href = link.getAttribute('href') || '';
+				return `[${p1}](${href})`;
+			});
+
+			return `![${alt}](${src})\n\n${caption}\n\n`;
 		}
 	});
 
@@ -202,7 +210,7 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 		}
 	});
 
-	function handleArXivEquation(table: Element): string {
+	function handleNestedEquations(table: Element): string {
 		const mathElement = table.querySelector('math[alttext]');
 		if (mathElement) {
 			const alttext = mathElement.getAttribute('alttext');
@@ -220,16 +228,6 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 		return '';
 	}
 
-	function formatArXivCitation(url: string): string {
-		const match = url.match(/\/(\d+\.\d+)(v\d+)?$/);
-		if (match) {
-			const arxivId = match[1];
-			const version = match[2] || '';
-			return `[@https://arxiv.org/abs/${arxivId}${version}]`;
-		}
-		return `[@${url}]`;
-	}
-
 	turndownService.addRule('table', {
 		filter: 'table',
 		replacement: function(content: string, node: Node): string {
@@ -237,10 +235,9 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 
 			// Check if it's an ArXiv equation table
 			if (node.classList.contains('ltx_equation') || node.classList.contains('ltx_eqn_table')) {
-				return handleArXivEquation(node);
+				return handleNestedEquations(node);
 			}
 
-			// If it's not an ArXiv equation table, return the original content
 			return content;
 		}
 	});
@@ -332,17 +329,28 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 		}
 	});
 
-	// Add this new rule before calling turndownService.turndown()
-	turndownService.addRule('removeReportIssueButtons', {
+	turndownService.addRule('table', {
+		filter: 'table',
+		replacement: function(content: string, node: Node): string {
+			if (!(node instanceof HTMLElement)) return content;
+
+			// Check if it's an ArXiv equation table
+			if (node.classList.contains('ltx_equation') || node.classList.contains('ltx_eqn_table')) {
+				return handleNestedEquations(node);
+			}
+
+			return content;
+		}
+	});
+
+	turndownService.addRule('removeHiddenButtons', {
 		filter: function (node) {
 			return (
-				node.nodeName === 'BUTTON' &&
-				node instanceof HTMLElement &&
-				node.classList.contains('sr-only')
+				node.style.display === 'none'
 			);
 		},
 		replacement: function () {
-			return ''; // Replace with an empty string, effectively removing the element
+			return '';
 		}
 	});
 
