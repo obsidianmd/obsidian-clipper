@@ -202,7 +202,68 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 		}
 	});
 
+	function handleArXivEquation(table: Element): string {
+		const mathElement = table.querySelector('math[alttext]');
+		if (mathElement) {
+			const alttext = mathElement.getAttribute('alttext');
+			if (alttext) {
+				// Check if it's an inline or block equation
+				const isInline = table.classList.contains('ltx_eqn_inline');
+				return isInline ? `$${alttext.trim()}$` : `\n\n$$$\n${alttext.trim()}\n$$$\n\n`;
+			}
+		}
+		// If no math element with alttext is found, try to extract from the table content
+		const equationContent = table.textContent?.trim() || '';
+		if (equationContent) {
+			return `\n\n$$$\n${equationContent}\n$$$\n\n`;
+		}
+		return '';
+	}
+
+	function formatArXivCitation(url: string): string {
+		const match = url.match(/\/(\d+\.\d+)(v\d+)?$/);
+		if (match) {
+			const arxivId = match[1];
+			const version = match[2] || '';
+			return `[@https://arxiv.org/abs/${arxivId}${version}]`;
+		}
+		return `[@${url}]`;
+	}
+
+	turndownService.addRule('table', {
+		filter: 'table',
+		replacement: function(content: string, node: Node): string {
+			if (!(node instanceof HTMLElement)) return content;
+
+			// Check if it's an ArXiv equation table
+			if (node.classList.contains('ltx_equation') || node.classList.contains('ltx_eqn_table')) {
+				return handleArXivEquation(node);
+			}
+
+			// If it's not an ArXiv equation table, return the original content
+			return content;
+		}
+	});
+
 	function extractLatex(element: Element): string {
+		// Check if the element is a <math> element and has an alttext attribute
+		if (element.nodeName.toLowerCase() === 'math') {
+			const alttext = element.getAttribute('alttext');
+			if (alttext) {
+				return alttext.trim();
+			}
+		}
+
+		// If not, look for a nested <math> element with alttext
+		const mathElement = element.querySelector('math[alttext]');
+		if (mathElement) {
+			const alttext = mathElement.getAttribute('alttext');
+			if (alttext) {
+				return alttext.trim();
+			}
+		}
+
+		// Fallback to existing logic
 		const annotation = element.querySelector('annotation[encoding="application/x-tex"]');
 		if (annotation?.textContent) {
 			return annotation.textContent.trim();
@@ -216,6 +277,7 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 		const imgNode = element.querySelector('img');
 		return imgNode?.getAttribute('alt') || '';
 	}
+
 
 	turndownService.addRule('math', {
 		filter: (node) => {
@@ -233,11 +295,11 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 			// Remove leading and trailing whitespace
 			latex = latex.trim();
 
-			// Check if the math element is within a table cell
-			const isInTableCell = node.closest('td, th') !== null;
+			// Check if the math element is within a table
+			const isInTable = node.closest('table') !== null;
 
 			// Check if it's an inline or block math element
-			if (!isInTableCell && (
+			if (!isInTable && (
 				node.getAttribute('display') === 'block' || 
 				node.classList.contains('mwe-math-fallback-image-display') || 
 				(node.parentElement && node.parentElement.classList.contains('mwe-math-element') && 
@@ -248,6 +310,39 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 			} else {
 				return `$${latex}$`;
 			}
+		}
+	});
+
+	turndownService.addRule('arXivEnumerate', {
+		filter: (node) => {
+			return node.nodeName === 'OL' && node.classList.contains('ltx_enumerate');
+		},
+		replacement: function(content, node) {
+			if (!(node instanceof HTMLElement)) return content;
+			
+			const items = Array.from(node.children).map((item, index) => {
+				if (item instanceof HTMLElement) {
+					const itemContent = item.innerHTML.replace(/^<span class="ltx_tag ltx_tag_item">\d+\.<\/span>\s*/, '');
+					return `${index + 1}. ${turndownService.turndown(itemContent)}`;
+				}
+				return '';
+			});
+			
+			return '\n\n' + items.join('\n\n') + '\n\n';
+		}
+	});
+
+	// Add this new rule before calling turndownService.turndown()
+	turndownService.addRule('removeReportIssueButtons', {
+		filter: function (node) {
+			return (
+				node.nodeName === 'BUTTON' &&
+				node instanceof HTMLElement &&
+				node.classList.contains('sr-only')
+			);
+		},
+		replacement: function () {
+			return ''; // Replace with an empty string, effectively removing the element
 		}
 	});
 
