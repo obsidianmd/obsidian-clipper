@@ -12,16 +12,28 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 	function makeUrlAbsolute(element: Element, attributeName: string) {
 		const attributeValue = element.getAttribute(attributeName);
 		if (attributeValue) {
-			if (attributeValue.startsWith('chrome-extension://')) {
-				// Remove the chrome-extension:// part and everything up to the next slash
-				const path = attributeValue.split('/').slice(3).join('/');
-				const rootUrl = `${baseUrl.protocol}//${baseUrl.host}`;
-				const newUrl = new URL(path, rootUrl).href;
-				element.setAttribute(attributeName, newUrl);
-			} else if (!attributeValue.startsWith('http') && !attributeValue.startsWith('data:') && !attributeValue.startsWith('#') && !attributeValue.startsWith('mailto:')) {
-				// Always use the root domain as the base for relative paths
-				const rootUrl = `${baseUrl.protocol}//${baseUrl.host}`;
-				const newUrl = new URL(attributeValue, rootUrl).href;
+			const url = new URL(attributeValue, baseUrl);
+
+			if (!['http:', 'https:'].includes(url.protocol)) {
+				// Handle non-standard protocols (chrome-extension://, moz-extension://, brave://, etc.)
+				const parts = attributeValue.split('/');
+				const firstSegment = parts[2]; // The segment after the protocol
+
+				if (firstSegment.includes('.')) {
+					// If it looks like a domain, replace the non-standard protocol with 'https://'
+					const newUrl = 'https://' + attributeValue.split('://')[1];
+					element.setAttribute(attributeName, newUrl);
+				} else {
+					// If it doesn't look like a domain, remove the non-standard protocol part and use baseUrl
+					const path = parts.slice(3).join('/');
+					const newUrl = new URL(path, baseUrl).href;
+					element.setAttribute(attributeName, newUrl);
+				}
+			} else if (url.protocol === 'http:' || url.protocol === 'https:') {
+				// Already an absolute URL, no change needed
+			} else {
+				// Handle other cases (relative URLs, protocol-relative URLs)
+				const newUrl = url.href;
 				element.setAttribute(attributeName, newUrl);
 			}
 		}
