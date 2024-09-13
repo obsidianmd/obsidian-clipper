@@ -372,18 +372,25 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 	// Update the citations rule
 	turndownService.addRule('citations', {
 		filter: (node) => {
-			return node.nodeName === 'SUP' && node.classList.contains('reference');
+			return (
+				(node.nodeName === 'SUP' && node.classList.contains('reference')) ||
+				(node.nodeName === 'CITE' && node.classList.contains('ltx_cite'))
+			);
 		},
 		replacement: (content, node) => {
 			if (node instanceof HTMLElement) {
-				const link = node.querySelector('a');
-				if (link) {
+				const links = node.querySelectorAll('a');
+				const footnotes = Array.from(links).map(link => {
 					const href = link.getAttribute('href');
-					if (href && href.startsWith('#cite_note-')) {
-						const id = href.replace('#cite_note-', '');
+					if (href) {
+						const id = href.startsWith('#cite_note-') 
+							? href.replace('#cite_note-', '')
+							: href.split('#').pop()?.replace('bib.', '');
 						return `[^${id}]`;
 					}
-				}
+					return '';
+				});
+				return footnotes.join('');
 			}
 			return content;
 		}
@@ -392,12 +399,20 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 	// Update the reference list rule
 	turndownService.addRule('referenceList', {
 		filter: (node) => {
-			return node.nodeName === 'OL' && node.classList.contains('references');
+			return (
+				(node.nodeName === 'OL' && node.classList.contains('references')) ||
+				(node.nodeName === 'UL' && node.classList.contains('ltx_biblist'))
+			);
 		},
 		replacement: (content, node) => {
 			if (node instanceof HTMLElement) {
 				const references = Array.from(node.children).map(li => {
-					const id = li.id.replace('cite_note-', '');
+					let id;
+					if (li.id.startsWith('cite_note-')) {
+						id = li.id.replace('cite_note-', '');
+					} else {
+						id = li.id.replace('bib.', '');
+					}
 					const referenceContent = turndownService.turndown(li.innerHTML);
 					return `[^${id}]: ${referenceContent.trim()}`;
 				});
