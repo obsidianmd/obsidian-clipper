@@ -1,43 +1,12 @@
 import TurndownService from 'turndown';
 import { gfm } from 'turndown-plugin-gfm';
-import { Readability } from '@mozilla/readability';
 import { MathMLToLaTeX } from 'mathml-to-latex';
-import { makeUrlAbsolute } from './string-utils';
+import { processUrls } from './string-utils';
 
-export function createMarkdownContent(content: string, url: string, selectedHtml: string, skipReadability: boolean = false): string {
-	const parser = new DOMParser();
-	const doc = parser.parseFromString(content, 'text/html');
+export function createMarkdownContent(content: string, url: string) {
 
 	const baseUrl = new URL(url);
-
-	function processUrls(htmlContent: string): string {
-		const tempDiv = document.createElement('div');
-		tempDiv.innerHTML = htmlContent;
-		
-		// Handle relative URLs for both images and links
-		tempDiv.querySelectorAll('img').forEach(img => makeUrlAbsolute(img, 'src', baseUrl));
-		tempDiv.querySelectorAll('a').forEach(link => makeUrlAbsolute(link, 'href', baseUrl));
-		
-		return tempDiv.innerHTML;
-	}
-
-	let markdownContent: string;
-
-	if (selectedHtml) {
-		// If there's selected HTML, use it directly
-		markdownContent = processUrls(selectedHtml);
-	} else if (skipReadability) {
-		// If skipping Readability, process the full content
-		markdownContent = processUrls(content);
-	} else {
-		// If no selection and not skipping Readability, use Readability
-		const readabilityArticle = new Readability(doc,{keepClasses:true}).parse();
-		if (!readabilityArticle) {
-			console.error('Failed to parse content with Readability');
-			return '';
-		}
-		markdownContent = processUrls(readabilityArticle.content);
-	}
+	const markdownContent = processUrls(content, baseUrl);
 
 	const turndownService = new TurndownService({
 		headingStyle: 'atx',
@@ -341,6 +310,7 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 	turndownService.addRule('removals', {
 		filter: function (node) {
 			if (!(node instanceof HTMLElement)) return false;
+			if (node.getAttribute('encoding') === 'x-llamapun') return true;
 			// Wikipedia edit buttons
 			if (node.classList.contains('mw-editsection')) return true;
 			// Wikipedia cite backlinks

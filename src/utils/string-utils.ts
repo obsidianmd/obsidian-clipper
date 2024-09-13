@@ -80,6 +80,7 @@ export function escapeHtml(unsafe: string): string {
 		.replace(/'/g, "&#039;");
 }
 
+
 export function makeUrlAbsolute(element: Element, attributeName: string, baseUrl: URL) {
 	const attributeValue = element.getAttribute(attributeName);
 	if (attributeValue) {
@@ -119,4 +120,15 @@ export function makeUrlAbsolute(element: Element, attributeName: string, baseUrl
 			element.setAttribute(attributeName, attributeValue);
 		}
 	}
+}
+
+export function processUrls(htmlContent: string, baseUrl: URL): string {
+	const tempDiv = document.createElement('div');
+	tempDiv.innerHTML = htmlContent;
+	
+	// Handle relative URLs for both images and links
+	tempDiv.querySelectorAll('img').forEach(img => makeUrlAbsolute(img, 'src', baseUrl));
+	tempDiv.querySelectorAll('a').forEach(link => makeUrlAbsolute(link, 'href', baseUrl));
+	
+	return tempDiv.innerHTML;
 }

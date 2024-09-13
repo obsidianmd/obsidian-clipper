@@ -3,8 +3,8 @@ import { createMarkdownContent } from './markdown-converter';
 import { sanitizeFileName } from './string-utils';
 import { Readability } from '@mozilla/readability';
 import { applyFilters } from './filters';
-import dayjs from 'dayjs';
 import browser from './browser-polyfill';
+import { convertDate } from './date-utils';
 
 export function extractReadabilityContent(content: string): ReturnType<Readability['parse']> {
 	const parser = new DOMParser();
@@ -214,7 +214,15 @@ export async function initializePageContent(content: string, selectedHtml: strin
 		|| getMetaContent(doc, "name", "copyright")
 		|| '';
 
-	const markdownBody = createMarkdownContent(content, currentUrl, selectedHtml);
+
+	if (selectedHtml) {
+		// If there's selected HTML, use it directly
+		content = selectedHtml;
+	} else {
+		content = readabilityArticle.content;
+	}
+
+	const markdownBody = createMarkdownContent(content, currentUrl);
 
 	const currentVariables: { [key: string]: string } = {
 		'{{author}}': author,
@@ -261,10 +269,6 @@ export async function initializePageContent(content: string, selectedHtml: strin
 		noteName,
 		currentVariables
 	};
-}
-
-function convertDate(date: Date): string {
-	return dayjs(date).format('YYYY-MM-DD');
 }
 
 function addSchemaOrgDataToVariables(schemaData: any, variables: { [key: string]: string }, prefix: string = '') {
