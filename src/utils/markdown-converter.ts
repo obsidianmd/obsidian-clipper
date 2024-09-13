@@ -359,6 +359,9 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 			if (node.classList.contains('mw-editsection')) return true;
 			// Wikipedia cite backlinks
 			if (node.classList.contains('mw-cite-backlink')) return true;
+			// ArXiv reference numbers
+			if (node.classList.contains('ltx_role_refnum')) return true;
+			if (node.classList.contains('ltx_tag_bibitem')) return true;
 			// Standalone anchor links, e.g. GitHub readmes
 			if (node.classList.contains('anchor') && node.getAttribute('href')?.startsWith('#')) return true;
 			
@@ -383,9 +386,10 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 				const footnotes = Array.from(links).map(link => {
 					const href = link.getAttribute('href');
 					if (href) {
-						const id = href.startsWith('#cite_note-') 
+						let id = href.startsWith('#cite_note-') 
 							? href.replace('#cite_note-', '')
-							: href.split('#').pop()?.replace('bib.', '');
+							: href.split('#').pop() || '';
+						id = id.replace('bib.', '').replace('bib', '');
 						return `[^${id}]`;
 					}
 					return '';
@@ -407,12 +411,7 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 		replacement: (content, node) => {
 			if (node instanceof HTMLElement) {
 				const references = Array.from(node.children).map(li => {
-					let id;
-					if (li.id.startsWith('cite_note-')) {
-						id = li.id.replace('cite_note-', '');
-					} else {
-						id = li.id.replace('bib.', '');
-					}
+					let id = li.id.replace('cite_note-', '').replace('bib.', '').replace('bib', '');
 					const referenceContent = turndownService.turndown(li.innerHTML);
 					return `[^${id}]: ${referenceContent.trim()}`;
 				});
