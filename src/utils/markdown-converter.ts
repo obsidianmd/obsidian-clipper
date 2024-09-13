@@ -211,21 +211,18 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 	});
 
 	function handleNestedEquations(table: Element): string {
-		const mathElement = table.querySelector('math[alttext]');
-		if (mathElement) {
+		const mathElements = table.querySelectorAll('math[alttext]');
+		if (mathElements.length === 0) return '';
+
+		return Array.from(mathElements).map(mathElement => {
 			const alttext = mathElement.getAttribute('alttext');
 			if (alttext) {
 				// Check if it's an inline or block equation
-				const isInline = table.classList.contains('ltx_eqn_inline');
-				return isInline ? `$${alttext.trim()}$` : `\n\n$$$\n${alttext.trim()}\n$$$\n\n`;
+				const isInline = mathElement.closest('.ltx_eqn_inline') !== null;
+				return isInline ? `$${alttext.trim()}$` : `\n$$$\n${alttext.trim()}\n$$$`;
 			}
-		}
-		// If no math element with alttext is found, try to extract from the table content
-		const equationContent = table.textContent?.trim() || '';
-		if (equationContent) {
-			return `\n\n$$$\n${equationContent}\n$$$\n\n`;
-		}
-		return '';
+			return '';
+		}).join('\n');
 	}
 
 	turndownService.addRule('table', {
@@ -303,7 +300,7 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 				node.parentElement.previousElementSibling && 
 				node.parentElement.previousElementSibling.nodeName.toLowerCase() === 'p')
 			)) {
-				return `\n\n$$$\n${latex}\n$$$\n\n`;
+				return `\n$$$\n${latex}\n$$$\n`;
 			} else {
 				return `$${latex}$`;
 			}
@@ -343,11 +340,22 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 		}
 	});
 
-	turndownService.addRule('removeHiddenButtons', {
+	turndownService.addRule('removeHiddenElements', {
 		filter: function (node) {
 			return (
 				node.style.display === 'none'
 			);
+		},
+		replacement: function () {
+			return '';
+		}
+	});
+
+	// General removal rules for varous website elements
+	turndownService.addRule('removals', {
+		filter: function (node) {
+			// Wikipedia edit buttons
+			return node instanceof HTMLElement && node.classList.contains('mw-editsection');
 		},
 		replacement: function () {
 			return '';
