@@ -353,8 +353,8 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 			if (node.id?.startsWith('fnref:')) return true;
 			if (node.getAttribute('href')?.startsWith('#fnref:')) return true;
 			if (node.classList.contains('footnote-backref')) return true;
-			if (node.classList.contains('ref') && node.getAttribute('href')?.startsWith('#')) return true;
-			if (node.classList.contains('anchor') && node.getAttribute('href')?.startsWith('#')) return true;
+			if (node.classList.contains('ref') && (node.getAttribute('href')?.startsWith('#') || /\/#.+$/.test(node.getAttribute('href') || ''))) return true;
+			if (node.classList.contains('anchor') && (node.getAttribute('href')?.startsWith('#') || /\/#.+$/.test(node.getAttribute('href') || ''))) return true;
 			
 			return false;
 		},
