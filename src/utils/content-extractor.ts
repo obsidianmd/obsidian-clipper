@@ -6,9 +6,7 @@ import { applyFilters } from './filters';
 import browser from './browser-polyfill';
 import { convertDate } from './date-utils';
 
-export function extractReadabilityContent(content: string): ReturnType<Readability['parse']> {
-	const parser = new DOMParser();
-	const doc = parser.parseFromString(content, 'text/html');
+export function extractReadabilityContent(doc: Document): ReturnType<Readability['parse']> {
 	const reader = new Readability(doc, {keepClasses:true})
 	return reader.parse();
 }
@@ -160,14 +158,14 @@ export async function extractContentBySelector(tabId: number, selector: string):
 }
 
 export async function initializePageContent(content: string, selectedHtml: string, extractedContent: ExtractedContent, currentUrl: string, schemaOrgData: any, fullHtml: string) {
-	const readabilityArticle = extractReadabilityContent(content);
+	const parser = new DOMParser();
+	const doc = parser.parseFromString(content, 'text/html');
+
+	const readabilityArticle = extractReadabilityContent(doc);
 	if (!readabilityArticle) {
 		console.error('Failed to parse content with Readability');
 		return null;
 	}
-
-	const parser = new DOMParser();
-	const doc = parser.parseFromString(content, 'text/html');
 
 	// Define preset variables with fallbacks
 	const title =
