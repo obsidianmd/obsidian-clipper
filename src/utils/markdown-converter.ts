@@ -353,8 +353,8 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 			if (node.id?.startsWith('fnref:')) return true;
 			if (node.getAttribute('href')?.startsWith('#fnref:')) return true;
 			if (node.classList.contains('footnote-backref')) return true;
-			if (node.classList.contains('ref') && node.getAttribute('href')?.startsWith('#')) return true;
-			if (node.classList.contains('anchor') && node.getAttribute('href')?.startsWith('#')) return true;
+			if (node.classList.contains('ref') && (node.getAttribute('href')?.startsWith('#') || /\/#.+$/.test(node.getAttribute('href') || ''))) return true;
+			if (node.classList.contains('anchor') && (node.getAttribute('href')?.startsWith('#') || /\/#.+$/.test(node.getAttribute('href') || ''))) return true;
 			
 			return false;
 		},
@@ -438,26 +438,6 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 					return `[^${id}]: ${cleanedContent.trim()}`;
 				});
 				return '\n\n' + references.join('\n\n') + '\n\n';
-			}
-			return content;
-		}
-	});
-
-	turndownService.addRule('wikiLinks', {
-		filter: (node: Node): boolean => {
-			if (node instanceof Element) {
-				const href = node.getAttribute('href');
-				return node.nodeName === 'A' && !!href && href.includes('/wiki/');
-			}
-			return false;
-		},
-		replacement: (content, node) => {
-			if (node instanceof HTMLElement) {
-				const href = node.getAttribute('href');
-				const title = node.getAttribute('title');
-				if (href && title) {
-					return `[${title}](https://en.wikipedia.org${href})`;
-				}
 			}
 			return content;
 		}
