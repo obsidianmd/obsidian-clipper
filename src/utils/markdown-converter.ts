@@ -362,6 +362,8 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 			if (node.classList.contains('mw-editsection')) return true;
 			// Wikipedia cite backlinks
 			if (node.classList.contains('mw-cite-backlink')) return true;
+			// Wikipedia infoboxes as they usually have colspans
+			if (node.nodeName === 'TABLE' && node.classList.contains('infobox')) return true;
 			// ArXiv reference numbers
 			if (node.classList.contains('ltx_role_refnum')) return true;
 			if (node.classList.contains('ltx_tag_bibitem')) return true;
