@@ -2,6 +2,7 @@ import browser from './browser-polyfill';
 import dayjs from 'dayjs';
 import { escapeDoubleQuotes, sanitizeFileName } from '../utils/string-utils';
 import { Template, Property } from '../types/types';
+import { generalSettings } from './storage-utils';
 
 export async function generateFrontmatter(properties: Property[]): Promise<string> {
 	let frontmatter = '---\n';
@@ -79,15 +80,32 @@ export function saveToObsidian(fileContent: string, noteName: string, path: stri
 		obsidianUrl = `obsidian://new?file=${encodeURIComponent(path + sanitizeFileName(noteName))}`;
 	}
 
-	obsidianUrl += `&content=${encodeURIComponent(content)}`;
+	if (generalSettings.betaFeatures) {
+		// Use clipboard for content in beta mode
+		navigator.clipboard.writeText(content).then(() => {
+			obsidianUrl += `&clipboard`;
+			openObsidianUrl(obsidianUrl);
+		}).catch(err => {
+			console.error('Failed to copy content to clipboard:', err);
+			// Fallback to the URI method if clipboard fails
+			obsidianUrl += `&content=${encodeURIComponent(content)}`;
+			openObsidianUrl(obsidianUrl);
+		});
+	} else {
+		// Use the URI method
+		obsidianUrl += `&content=${encodeURIComponent(content)}`;
+		openObsidianUrl(obsidianUrl);
+	}
 
 	const vaultParam = vault ? `&vault=${encodeURIComponent(vault)}` : '';
 	obsidianUrl += vaultParam;
 
-	browser.tabs.query({active: true, currentWindow: true}).then((tabs) => {
-		const currentTab = tabs[0];
-		if (currentTab && currentTab.id) {
-			browser.tabs.update(currentTab.id, { url: obsidianUrl });
-		}
-	});
+	function openObsidianUrl(url: string): void {
+		browser.tabs.query({active: true, currentWindow: true}).then((tabs) => {
+			const currentTab = tabs[0];
+			if (currentTab && currentTab.id) {
+				browser.tabs.update(currentTab.id, { url: url });
+			}
+		});
+	}
 }

@@ -79,6 +79,7 @@ export function initializeGeneralSettings(): void {
 	loadGeneralSettings().then(() => {
 		updateVaultList();
 		initializeShowMoreActionsToggle();
+		initializeBetaFeaturesToggle();
 		initializeVaultInput();
 		initializeKeyboardShortcuts();
 		initializeToggles();
@@ -127,4 +128,14 @@ function initializeKeyboardShortcuts(): void {
 			shortcutsList.appendChild(shortcutItem);
 		});
 	});
+}
+
+function initializeBetaFeaturesToggle(): void {
+	const betaFeaturesToggle = document.getElementById('beta-features-toggle') as HTMLInputElement;
+	if (betaFeaturesToggle) {
+		betaFeaturesToggle.checked = generalSettings.betaFeatures;
+		betaFeaturesToggle.addEventListener('change', () => {
+			saveGeneralSettings({ betaFeatures: betaFeaturesToggle.checked });
+		});
+	}
 }
