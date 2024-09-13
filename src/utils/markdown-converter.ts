@@ -362,7 +362,11 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 			// ArXiv reference numbers
 			if (node.classList.contains('ltx_role_refnum')) return true;
 			if (node.classList.contains('ltx_tag_bibitem')) return true;
-			// Standalone anchor links, e.g. GitHub readmes
+			// Reference numbers
+			if (node.getAttribute('href')?.startsWith('#fnref:')) return true;
+			if (node.classList.contains('footnote-backref')) return true;
+			// Standalone anchor links
+			if (node.classList.contains('ref') && node.getAttribute('href')?.startsWith('#')) return true;
 			if (node.classList.contains('anchor') && node.getAttribute('href')?.startsWith('#')) return true;
 			
 			return false;
@@ -374,27 +378,52 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 
 	// Update the citations rule
 	turndownService.addRule('citations', {
-		filter: (node) => {
-			return (
-				(node.nodeName === 'SUP' && node.classList.contains('reference')) ||
-				(node.nodeName === 'CITE' && node.classList.contains('ltx_cite'))
-			);
+		filter: (node: Node): boolean => {
+			if (node instanceof Element) {
+				return (
+					(node.nodeName === 'SUP' && node.classList.contains('reference')) ||
+					(node.nodeName === 'CITE' && node.classList.contains('ltx_cite')) ||
+					(node.nodeName === 'SUP' && node.id.startsWith('fnref:'))
+				);
+			}
+			return false;
 		},
 		replacement: (content, node) => {
 			if (node instanceof HTMLElement) {
-				const links = node.querySelectorAll('a');
-				const footnotes = Array.from(links).map(link => {
-					const href = link.getAttribute('href');
-					if (href) {
-						let id = href.startsWith('#cite_note-') 
-							? href.replace('#cite_note-', '')
-							: href.split('#').pop() || '';
-						id = id.replace('bib.', '').replace('bib', '');
-						return `[^${id}]`;
-					}
-					return '';
-				});
-				return footnotes.join('');
+				if (node.nodeName === 'SUP' && node.classList.contains('reference')) {
+					const links = node.querySelectorAll('a');
+					const footnotes = Array.from(links).map(link => {
+						const href = link.getAttribute('href');
+						if (href) {
+							let id = href.startsWith('#cite_note-') 
+								? href.replace('#cite_note-', '')
+								: href.startsWith('#fn:')
+									? href.replace('#fn:', '')
+									: href.split('#').pop() || '';
+							id = id.replace('bib.', '').replace('bib', '');
+							return `[^${id}]`;
+						}
+						return '';
+					});
+					return footnotes.join('');
+				} else if (node.nodeName === 'CITE' && node.classList.contains('ltx_cite')) {
+					const links = node.querySelectorAll('a');
+					const footnotes = Array.from(links).map(link => {
+						const href = link.getAttribute('href');
+						if (href) {
+							let id = href.startsWith('#bib.') 
+								? href.replace('#bib.', '')
+								: href.split('#').pop() || '';
+							id = id.replace('bib.', '').replace('bib', '');
+							return `[^${id}]`;
+						}
+						return '';
+					});
+					return footnotes.join('');
+				} else if (node.nodeName === 'SUP' && node.id.startsWith('fnref:')) {
+					const id = node.id.replace('fnref:', '');
+					return `[^${id}]`;
+				}
 			}
 			return content;
 		}
@@ -402,18 +431,24 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 
 	// Update the reference list rule
 	turndownService.addRule('referenceList', {
-		filter: (node) => {
-			return (
-				(node.nodeName === 'OL' && node.classList.contains('references')) ||
-				(node.nodeName === 'UL' && node.classList.contains('ltx_biblist'))
-			);
+		filter: (node: Node): boolean => {
+			if (node instanceof HTMLElement) {
+				return (
+					(node.nodeName === 'OL' && node.classList.contains('references')) ||
+					(node.nodeName === 'UL' && node.classList.contains('ltx_biblist')) ||
+					(node.nodeName === 'OL' && node.parentElement?.classList?.contains('footnotes') === true)
+				);
+			}
+			return false;
 		},
 		replacement: (content, node) => {
 			if (node instanceof HTMLElement) {
 				const references = Array.from(node.children).map(li => {
-					let id = li.id.replace('cite_note-', '').replace('bib.', '').replace('bib', '');
+					let id = li.id.replace('cite_note-', '').replace('bib.', '').replace('bib', '').replace('fn:', '');
 					const referenceContent = turndownService.turndown(li.innerHTML);
-					return `[^${id}]: ${referenceContent.trim()}`;
+					// Remove the backlink from the footnote content
+					const cleanedContent = referenceContent.replace(/\s*↩︎$/, '');
+					return `[^${id}]: ${cleanedContent.trim()}`;
 				});
 				return '\n\n' + references.join('\n\n') + '\n\n';
 			}
