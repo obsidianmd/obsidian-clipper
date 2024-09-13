@@ -222,7 +222,7 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 				return isInline ? `$${alttext.trim()}$` : `\n$$$\n${alttext.trim()}\n$$$`;
 			}
 			return '';
-		}).join('\n');
+		}).join('\n\n');
 	}
 
 	turndownService.addRule('table', {
@@ -354,8 +354,15 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 	// General removal rules for varous website elements
 	turndownService.addRule('removals', {
 		filter: function (node) {
+			if (!(node instanceof HTMLElement)) return false;
+			
 			// Wikipedia edit buttons
-			return node instanceof HTMLElement && node.classList.contains('mw-editsection');
+			if (node.classList.contains('mw-editsection')) return true;
+
+			// Standalone anchor links, e.g. GitHub readmes
+			if (node.classList.contains('anchor') && node.getAttribute('href')?.startsWith('#')) return true;
+			
+			return false;
 		},
 		replacement: function () {
 			return '';
