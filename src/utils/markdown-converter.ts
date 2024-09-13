@@ -68,6 +68,7 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 	// Keep iframes, video, audio, sup, and sub elements
 	// @ts-ignore
 	turndownService.keep(['iframe', 'video', 'audio', 'sup', 'sub', 'svg', 'math']);
+	turndownService.remove(['button']);
 
 	// Custom rule to handle bullet lists without extra spaces
 	turndownService.addRule('listItem', {
@@ -85,7 +86,6 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 		}
 	});
 
-	// Custom rule to handle figures
 	turndownService.addRule('figure', {
 		filter: 'figure',
 		replacement: function(content, node) {
@@ -97,21 +97,29 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 
 			const alt = img.getAttribute('alt') || '';
 			const src = img.getAttribute('src') || '';
-			let caption = figcaption ? figcaption.textContent?.trim() || '' : '';
+			let caption = '';
 
-			// Check if there's a source attribution in the caption
-			const attribution = figcaption?.querySelector('.attribution');
-			if (attribution) {
-				const sourceLink = attribution.querySelector('a');
-				if (sourceLink) {
-					const sourceText = sourceLink.textContent?.trim() || '';
-					const sourceUrl = sourceLink.getAttribute('href') || '';
-					caption = caption.replace(attribution.textContent || '', '').trim();
-					caption += ` [${sourceText}](${sourceUrl})`;
-				}
+			if (figcaption) {
+				const tagSpan = figcaption.querySelector('.ltx_tag_figure');
+				const tagText = tagSpan ? tagSpan.textContent?.trim() : '';
+				const captionText = figcaption.textContent?.replace(tagText || '', '').trim() || '';
+				caption = `${tagText} ${captionText}`.trim();
 			}
 
-			return `![${alt}](${src})\n\n${caption}`;
+			// Convert math elements in the caption
+			caption = caption.replace(/<math.*?>(.*?)<\/math>/g, (match, p1) => {
+				const mathContent = extractLatex(new DOMParser().parseFromString(match, 'text/html').body.firstChild as Element);
+				return `$${mathContent}$`;
+			});
+
+			// Handle references in the caption
+			caption = caption.replace(/<a.*?>(.*?)<\/a>/g, (match, p1) => {
+				const link = new DOMParser().parseFromString(match, 'text/html').body.firstChild as HTMLAnchorElement;
+				const href = link.getAttribute('href') || '';
+				return `[${p1}](${href})`;
+			});
+
+			return `![${alt}](${src})\n\n${caption}\n\n`;
 		}
 	});
 
@@ -202,7 +210,54 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 		}
 	});
 
+	function handleNestedEquations(table: Element): string {
+		const mathElements = table.querySelectorAll('math[alttext]');
+		if (mathElements.length === 0) return '';
+
+		return Array.from(mathElements).map(mathElement => {
+			const alttext = mathElement.getAttribute('alttext');
+			if (alttext) {
+				// Check if it's an inline or block equation
+				const isInline = mathElement.closest('.ltx_eqn_inline') !== null;
+				return isInline ? `$${alttext.trim()}$` : `\n$$$\n${alttext.trim()}\n$$$`;
+			}
+			return '';
+		}).join('\n\n');
+	}
+
+	turndownService.addRule('table', {
+		filter: 'table',
+		replacement: function(content: string, node: Node): string {
+			if (!(node instanceof HTMLElement)) return content;
+
+			// Check if it's an ArXiv equation table
+			if (node.classList.contains('ltx_equation') || node.classList.contains('ltx_eqn_table')) {
+				return handleNestedEquations(node);
+			}
+
+			return content;
+		}
+	});
+
 	function extractLatex(element: Element): string {
+		// Check if the element is a <math> element and has an alttext attribute
+		if (element.nodeName.toLowerCase() === 'math') {
+			const alttext = element.getAttribute('alttext');
+			if (alttext) {
+				return alttext.trim();
+			}
+		}
+
+		// If not, look for a nested <math> element with alttext
+		const mathElement = element.querySelector('math[alttext]');
+		if (mathElement) {
+			const alttext = mathElement.getAttribute('alttext');
+			if (alttext) {
+				return alttext.trim();
+			}
+		}
+
+		// Fallback to existing logic
 		const annotation = element.querySelector('annotation[encoding="application/x-tex"]');
 		if (annotation?.textContent) {
 			return annotation.textContent.trim();
@@ -216,6 +271,7 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 		const imgNode = element.querySelector('img');
 		return imgNode?.getAttribute('alt') || '';
 	}
+
 
 	turndownService.addRule('math', {
 		filter: (node) => {
@@ -233,21 +289,83 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 			// Remove leading and trailing whitespace
 			latex = latex.trim();
 
-			// Check if the math element is within a table cell
-			const isInTableCell = node.closest('td, th') !== null;
+			// Check if the math element is within a table
+			const isInTable = node.closest('table') !== null;
 
 			// Check if it's an inline or block math element
-			if (!isInTableCell && (
+			if (!isInTable && (
 				node.getAttribute('display') === 'block' || 
 				node.classList.contains('mwe-math-fallback-image-display') || 
 				(node.parentElement && node.parentElement.classList.contains('mwe-math-element') && 
 				node.parentElement.previousElementSibling && 
 				node.parentElement.previousElementSibling.nodeName.toLowerCase() === 'p')
 			)) {
-				return `\n\n$$$\n${latex}\n$$$\n\n`;
+				return `\n$$$\n${latex}\n$$$\n`;
 			} else {
 				return `$${latex}$`;
 			}
+		}
+	});
+
+	turndownService.addRule('arXivEnumerate', {
+		filter: (node) => {
+			return node.nodeName === 'OL' && node.classList.contains('ltx_enumerate');
+		},
+		replacement: function(content, node) {
+			if (!(node instanceof HTMLElement)) return content;
+			
+			const items = Array.from(node.children).map((item, index) => {
+				if (item instanceof HTMLElement) {
+					const itemContent = item.innerHTML.replace(/^<span class="ltx_tag ltx_tag_item">\d+\.<\/span>\s*/, '');
+					return `${index + 1}. ${turndownService.turndown(itemContent)}`;
+				}
+				return '';
+			});
+			
+			return '\n\n' + items.join('\n\n') + '\n\n';
+		}
+	});
+
+	turndownService.addRule('table', {
+		filter: 'table',
+		replacement: function(content: string, node: Node): string {
+			if (!(node instanceof HTMLElement)) return content;
+
+			// Check if it's an ArXiv equation table
+			if (node.classList.contains('ltx_equation') || node.classList.contains('ltx_eqn_table')) {
+				return handleNestedEquations(node);
+			}
+
+			return content;
+		}
+	});
+
+	turndownService.addRule('removeHiddenElements', {
+		filter: function (node) {
+			return (
+				node.style.display === 'none'
+			);
+		},
+		replacement: function () {
+			return '';
+		}
+	});
+
+	// General removal rules for varous website elements
+	turndownService.addRule('removals', {
+		filter: function (node) {
+			if (!(node instanceof HTMLElement)) return false;
+			
+			// Wikipedia edit buttons
+			if (node.classList.contains('mw-editsection')) return true;
+
+			// Standalone anchor links, e.g. GitHub readmes
+			if (node.classList.contains('anchor') && node.getAttribute('href')?.startsWith('#')) return true;
+			
+			return false;
+		},
+		replacement: function () {
+			return '';
 		}
 	});
 
