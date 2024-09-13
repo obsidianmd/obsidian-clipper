@@ -2,6 +2,7 @@ import TurndownService from 'turndown';
 import { gfm } from 'turndown-plugin-gfm';
 import { Readability } from '@mozilla/readability';
 import { MathMLToLaTeX } from 'mathml-to-latex';
+import { makeUrlAbsolute } from './string-utils';
 
 export function createMarkdownContent(content: string, url: string, selectedHtml: string, skipReadability: boolean = false): string {
 	const parser = new DOMParser();
@@ -9,43 +10,13 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 
 	const baseUrl = new URL(url);
 
-	function makeUrlAbsolute(element: Element, attributeName: string) {
-		const attributeValue = element.getAttribute(attributeName);
-		if (attributeValue) {
-			const url = new URL(attributeValue, baseUrl);
-
-			if (!['http:', 'https:'].includes(url.protocol)) {
-				// Handle non-standard protocols (chrome-extension://, moz-extension://, brave://, etc.)
-				const parts = attributeValue.split('/');
-				const firstSegment = parts[2]; // The segment after the protocol
-
-				if (firstSegment.includes('.')) {
-					// If it looks like a domain, replace the non-standard protocol with the current page's protocol
-					const newUrl = `${baseUrl.protocol}//` + attributeValue.split('://')[1];
-					element.setAttribute(attributeName, newUrl);
-				} else {
-					// If it doesn't look like a domain, remove the non-standard protocol part and use baseUrl
-					const path = parts.slice(3).join('/');
-					const newUrl = new URL(path, baseUrl).href;
-					element.setAttribute(attributeName, newUrl);
-				}
-			} else if (url.protocol === 'http:' || url.protocol === 'https:') {
-				// Already an absolute URL, no change needed
-			} else {
-				// Handle other cases (relative URLs, protocol-relative URLs)
-				const newUrl = url.href;
-				element.setAttribute(attributeName, newUrl);
-			}
-		}
-	}
-
 	function processUrls(htmlContent: string): string {
 		const tempDiv = document.createElement('div');
 		tempDiv.innerHTML = htmlContent;
 		
 		// Handle relative URLs for both images and links
-		tempDiv.querySelectorAll('img').forEach(img => makeUrlAbsolute(img, 'src'));
-		tempDiv.querySelectorAll('a').forEach(link => makeUrlAbsolute(link, 'href'));
+		tempDiv.querySelectorAll('img').forEach(img => makeUrlAbsolute(img, 'src', baseUrl));
+		tempDiv.querySelectorAll('a').forEach(link => makeUrlAbsolute(link, 'href', baseUrl));
 		
 		return tempDiv.innerHTML;
 	}

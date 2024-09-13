@@ -79,3 +79,33 @@ export function escapeHtml(unsafe: string): string {
 		.replace(/"/g, "&quot;")
 		.replace(/'/g, "&#039;");
 }
+
+export function makeUrlAbsolute(element: Element, attributeName: string, baseUrl: URL) {
+	const attributeValue = element.getAttribute(attributeName);
+	if (attributeValue) {
+		const url = new URL(attributeValue, baseUrl);
+
+		if (!['http:', 'https:'].includes(url.protocol)) {
+			// Handle non-standard protocols (chrome-extension://, moz-extension://, brave://, etc.)
+			const parts = attributeValue.split('/');
+			const firstSegment = parts[2]; // The segment after the protocol
+
+			if (firstSegment.includes('.')) {
+				// If it looks like a domain, replace the non-standard protocol with the current page's protocol
+				const newUrl = `${baseUrl.protocol}//` + attributeValue.split('://')[1];
+				element.setAttribute(attributeName, newUrl);
+			} else {
+				// If it doesn't look like a domain, remove the non-standard protocol part and use baseUrl
+				const path = parts.slice(3).join('/');
+				const newUrl = new URL(path, baseUrl).href;
+				element.setAttribute(attributeName, newUrl);
+			}
+		} else if (url.protocol === 'http:' || url.protocol === 'https:') {
+			// Already an absolute URL, no change needed
+		} else {
+			// Handle other cases (relative URLs, protocol-relative URLs)
+			const newUrl = url.href;
+			element.setAttribute(attributeName, newUrl);
+		}
+	}
+}
