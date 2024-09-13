@@ -443,26 +443,6 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 		}
 	});
 
-	turndownService.addRule('wikiLinks', {
-		filter: (node: Node): boolean => {
-			if (node instanceof Element) {
-				const href = node.getAttribute('href');
-				return node.nodeName === 'A' && !!href && href.includes('/wiki/');
-			}
-			return false;
-		},
-		replacement: (content, node) => {
-			if (node instanceof HTMLElement) {
-				const href = node.getAttribute('href');
-				const title = node.getAttribute('title');
-				if (href && title) {
-					return `[${title}](https://en.wikipedia.org${href})`;
-				}
-			}
-			return content;
-		}
-	});
-
 	let markdown = turndownService.turndown(markdownContent);
 
 	// Remove the title from the beginning of the content if it exists
