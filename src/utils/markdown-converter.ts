@@ -364,13 +364,12 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 			if (node.classList.contains('mw-cite-backlink')) return true;
 			// Wikipedia infoboxes as they usually have colspans
 			if (node.nodeName === 'TABLE' && node.classList.contains('infobox')) return true;
-			// ArXiv reference numbers
+			// Reference numbers and anchor links
 			if (node.classList.contains('ltx_role_refnum')) return true;
 			if (node.classList.contains('ltx_tag_bibitem')) return true;
-			// Reference numbers
+			if (node.id?.startsWith('fnref:')) return true;
 			if (node.getAttribute('href')?.startsWith('#fnref:')) return true;
 			if (node.classList.contains('footnote-backref')) return true;
-			// Standalone anchor links
 			if (node.classList.contains('ref') && node.getAttribute('href')?.startsWith('#')) return true;
 			if (node.classList.contains('anchor') && node.getAttribute('href')?.startsWith('#')) return true;
 			
