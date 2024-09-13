@@ -15,10 +15,13 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 			if (attributeValue.startsWith('chrome-extension://')) {
 				// Remove the chrome-extension:// part and everything up to the next slash
 				const path = attributeValue.split('/').slice(3).join('/');
-				const newUrl = new URL(path, baseUrl).href;
+				const rootUrl = `${baseUrl.protocol}//${baseUrl.host}`;
+				const newUrl = new URL(path, rootUrl).href;
 				element.setAttribute(attributeName, newUrl);
 			} else if (!attributeValue.startsWith('http') && !attributeValue.startsWith('data:') && !attributeValue.startsWith('#') && !attributeValue.startsWith('mailto:')) {
-				const newUrl = new URL(attributeValue, baseUrl).href;
+				// Always use the root domain as the base for relative paths
+				const rootUrl = `${baseUrl.protocol}//${baseUrl.host}`;
+				const newUrl = new URL(attributeValue, rootUrl).href;
 				element.setAttribute(attributeName, newUrl);
 			}
 		}
