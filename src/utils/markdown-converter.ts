@@ -20,8 +20,8 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 				const firstSegment = parts[2]; // The segment after the protocol
 
 				if (firstSegment.includes('.')) {
-					// If it looks like a domain, replace the non-standard protocol with 'https://'
-					const newUrl = 'https://' + attributeValue.split('://')[1];
+					// If it looks like a domain, replace the non-standard protocol with the current page's protocol
+					const newUrl = `${baseUrl.protocol}//` + attributeValue.split('://')[1];
 					element.setAttribute(attributeName, newUrl);
 				} else {
 					// If it doesn't look like a domain, remove the non-standard protocol part and use baseUrl
