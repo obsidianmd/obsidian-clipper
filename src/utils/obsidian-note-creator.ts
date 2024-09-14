@@ -81,7 +81,7 @@ export function saveToObsidian(fileContent: string, noteName: string, path: stri
 		obsidianUrl = `obsidian://new?file=${encodeURIComponent(path + appendFileName)}&append=true`;
 		
 		// Add newlines at the beginning to separate from existing content
-		content = '\n\n' + content;
+		content = '\n' + content;
 	} else {
 		obsidianUrl = `obsidian://new?file=${encodeURIComponent(path + sanitizeFileName(noteName))}`;
 	}
