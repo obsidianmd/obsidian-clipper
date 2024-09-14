@@ -65,8 +65,13 @@ export function createMarkdownContent(content: string, url: string) {
 					const latex = extractLatex(mathElement);
 					const prevChar = string[offset - 1] || '';
 					const nextChar = string[offset + match.length] || '';
-					const leftSpace = prevChar && !/\s/.test(prevChar) ? ' ' : '';
-					const rightSpace = nextChar && !/\s/.test(nextChar) ? ' ' : '';
+
+					const isStartOfLine = offset === 0 || /\s/.test(prevChar);
+					const isEndOfLine = offset + match.length === string.length || /\s/.test(nextChar);
+
+					const leftSpace = (!isStartOfLine && !/[\s$]/.test(prevChar)) ? ' ' : '';
+					const rightSpace = (!isEndOfLine && !/[\s$]/.test(nextChar)) ? ' ' : '';
+
 					return `${leftSpace}$${latex}$${rightSpace}`;
 				});
 
@@ -264,11 +269,18 @@ export function createMarkdownContent(content: string, url: string) {
 			)) {
 				return `\n$$$\n${latex}\n$$$\n`;
 			} else {
-				// For inline math, ensure there's a space before and after
-				const prevChar = node.previousSibling?.textContent?.slice(-1) || '';
-				const nextChar = node.nextSibling?.textContent?.[0] || '';
-				const leftSpace = prevChar && !/\s/.test(prevChar) ? ' ' : '';
-				const rightSpace = nextChar && !/\s/.test(nextChar) ? ' ' : '';
+				// For inline math, ensure there's a space before and after only if needed
+				const prevNode = node.previousSibling;
+				const nextNode = node.nextSibling;
+				const prevChar = prevNode?.textContent?.slice(-1) || '';
+				const nextChar = nextNode?.textContent?.[0] || '';
+
+				const isStartOfLine = !prevNode || (prevNode.nodeType === Node.TEXT_NODE && prevNode.textContent?.trim() === '');
+				const isEndOfLine = !nextNode || (nextNode.nodeType === Node.TEXT_NODE && nextNode.textContent?.trim() === '');
+
+				const leftSpace = (!isStartOfLine && prevChar && !/[\s$]/.test(prevChar)) ? ' ' : '';
+				const rightSpace = (!isEndOfLine && nextChar && !/[\s$]/.test(nextChar)) ? ' ' : '';
+
 				return `${leftSpace}$${latex}$${rightSpace}`;
 			}
 		}
