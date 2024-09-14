@@ -64,7 +64,7 @@ These variables are automatically generated based on the page content. The main 
 | `{{image}}`         | Social share image URL                               |
 | `{{published}}`     | Published date                                       |
 | `{{title}}`         | Title of the page                                    |
-| `{{selectionHTML}}` | Unprocessed HTML for selected content                |
+| `{{selectionHtml}}` | Unprocessed HTML for selected content                |
 | `{{url}}`           | Current URL                                          |
 
 #### Meta variables
