@@ -310,22 +310,23 @@ export const filters: { [key: string]: FilterFunction } = {
 	upper: (str: string): string => {
 		return str.toUpperCase();
 	},
-	wikilink: (str: string): string => {
-		if (!str.trim()) {
-			return '';
-		}
-		if (str.startsWith('[') && str.endsWith(']')) {
-			try {
-				const arrayValue = JSON.parse(str);
-				if (Array.isArray(arrayValue)) {
-					return arrayValue.map(item => item.trim() ? `[[${item}]]` : '').filter(Boolean).join(', ');
-				}
-			} catch (error) {
-				console.error('wikilink error:', error);
+	wikilink: (str: string, alias?: string): string => {
+		try {
+			const data = JSON.parse(str);
+			
+			if (Array.isArray(data)) {
+				const result = data.map(item => alias ? `[[${item}|${alias}]]` : `[[${item}]]`);
+				return JSON.stringify(result);
+			} else if (typeof data === 'object' && data !== null) {
+				return Object.entries(data)
+					.map(([link, linkAlias]) => `[[${link}|${linkAlias}]]`).join('\n');
 			}
+		} catch (error) {
+			// If parsing fails, treat it as a single string
+			return alias ? `[[${str}|${alias}]]` : `[[${str}]]`;
 		}
-		return `[[${str}]]`;
-	}	
+		return str;
+	}
 };
 
 // Add this helper function at the end of the file

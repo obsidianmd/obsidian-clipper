@@ -175,7 +175,12 @@ Filters allow you to modify variables in a template. Filters are applied to vari
 - `trim` removes whitespace from both ends of a string.
 	- `"  hello world  "|trim` returns `"hello world"`.
 - `upper` converts a value to uppercase, e.g. `"hello world"|upper` returns `"HELLO WORLD"`.
-- `wikilink` adds double brackets around strings and array items, e.g. `"hello"|wikilink` returns `"[[hello]]"`.
+- `wikilink` converts strings, arrays, or objects into Obsidian wikilink syntax.
+	- For strings: `"page"|wikilink` returns `[[page]]`.
+	- For strings with alias: `"page"|wikilink:"alias"` returns `[[page|alias]]`.
+	- For arrays: `["page1","page2"]|wikilink` returns an array of wikilinks without aliases.
+	- For arrays with alias: `["page1","page2"]|wikilink:"alias"` returns an array of wikilinks with the same alias for all links.
+	- For objects: `{"page1": "alias1", "page2": "alias2"}|wikilink` returns wikilinks with the keys as page names and values as aliases.
 
 ## Building the extension
 
