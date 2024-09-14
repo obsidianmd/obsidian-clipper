@@ -5,11 +5,10 @@ import { Template, Property } from '../types/types';
 import { generalSettings } from './storage-utils';
 
 export async function generateFrontmatter(properties: Property[]): Promise<string> {
-	let frontmatter = '';
-	let hasContent = false;
-
+	let frontmatter = '---\n';
 	for (const property of properties) {
-		let propertyContent = '';
+		frontmatter += `${property.name}:`;
+
 		switch (property.type) {
 			case 'multitext':
 				let items: string[];
@@ -26,38 +25,35 @@ export async function generateFrontmatter(properties: Property[]): Promise<strin
 				}
 				items = items.filter(item => item !== '');
 				if (items.length > 0) {
-					propertyContent = `${property.name}:\n${items.map(item => `  - "${escapeDoubleQuotes(item)}"`).join('\n')}\n`;
-					hasContent = true;
+					frontmatter += '\n';
+					items.forEach(item => {
+						frontmatter += `  - "${escapeDoubleQuotes(item)}"\n`;
+					});
+				} else {
+					frontmatter += '\n';
 				}
 				break;
 			case 'number':
 				const numericValue = property.value.replace(/[^\d.-]/g, '');
-				if (numericValue) {
-					propertyContent = `${property.name}: ${parseFloat(numericValue)}\n`;
-					hasContent = true;
-				}
+				frontmatter += numericValue ? ` ${parseFloat(numericValue)}\n` : '\n';
 				break;
 			case 'checkbox':
-				propertyContent = `${property.name}: ${property.value.toLowerCase() === 'true' || property.value === '1'}\n`;
-				hasContent = true;
+				frontmatter += ` ${property.value.toLowerCase() === 'true' || property.value === '1'}\n`;
 				break;
 			case 'date':
 			case 'datetime':
 				if (property.value.trim() !== '') {
-					propertyContent = `${property.name}: "${property.value}"\n`;
-					hasContent = true;
+					frontmatter += ` "${property.value}"\n`;
+				} else {
+					frontmatter += '\n';
 				}
 				break;
 			default: // Text
-				if (property.value.trim() !== '') {
-					propertyContent = `${property.name}: "${escapeDoubleQuotes(property.value)}"\n`;
-					hasContent = true;
-				}
+				frontmatter += property.value.trim() !== '' ? ` "${escapeDoubleQuotes(property.value)}"\n` : '\n';
 		}
-		frontmatter += propertyContent;
 	}
-
-	return hasContent ? `---\n${frontmatter}---\n` : '';
+	frontmatter += '---\n';
+	return frontmatter;
 }
 
 export function saveToObsidian(fileContent: string, noteName: string, path: string, vault: string, behavior: string, specificNoteName?: string, dailyNoteFormat?: string): void {
