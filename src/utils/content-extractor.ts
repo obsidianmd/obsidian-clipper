@@ -233,6 +233,7 @@ export async function initializePageContent(content: string, selectedHtml: strin
 		'{{noteName}}': noteName,
 		'{{published}}': published,
 		'{{site}}': site,
+		'{{selectionHtml}}': selectedHtml,
 		'{{title}}': title,
 		'{{url}}': currentUrl
 	};
