@@ -54,7 +54,17 @@ async function processSchema(match: string, variables: { [key: string]: string }
 	const nestedArrayMatch = schemaKey.match(/(.*?)\[(\*|\d+)\](.*)/);
 	if (nestedArrayMatch) {
 		const [, arrayKey, indexOrStar, propertyKey] = nestedArrayMatch;
-		const arrayValue = JSON.parse(variables[`{{schema:${arrayKey}}}`] || '[]');
+		
+		// Handle shorthand notation for nested arrays
+		let fullArrayKey = arrayKey;
+		if (!arrayKey.includes('@')) {
+			const matchingKey = Object.keys(variables).find(key => key.includes('@') && key.endsWith(`:${arrayKey}}}`));
+			if (matchingKey) {
+				fullArrayKey = matchingKey.replace('{{schema:', '').replace('}}', '');
+			}
+		}
+
+		const arrayValue = JSON.parse(variables[`{{schema:${fullArrayKey}}}`] || '[]');
 		if (Array.isArray(arrayValue)) {
 			if (indexOrStar === '*') {
 				schemaValue = JSON.stringify(arrayValue.map(item => getNestedProperty(item, propertyKey.slice(1))).filter(Boolean));
@@ -64,7 +74,17 @@ async function processSchema(match: string, variables: { [key: string]: string }
 			}
 		}
 	} else {
-		schemaValue = variables[`{{schema:${schemaKey}}}`] || '';
+		// Shorthand handling for non-array schemas
+		if (!schemaKey.includes('@')) {
+			const matchingKey = Object.keys(variables).find(key => key.includes('@') && key.endsWith(`:${schemaKey}}}`));
+			if (matchingKey) {
+				schemaValue = variables[matchingKey];
+			}
+		}
+		// If no matching shorthand found or it's a full key, use the original logic
+		if (!schemaValue) {
+			schemaValue = variables[`{{schema:${schemaKey}}}`] || '';
+		}
 	}
 
 	const filterNames = filtersString.split('|').filter(Boolean);
