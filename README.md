@@ -146,6 +146,7 @@ Filters allow you to modify variables in a template. Filters are applied to vari
 	- Use `list:task` to convert to a task list.
 	- Use `list:numbered` to convert to a numbered list.
 	- Use `list:numbered-task` to convert to a task list with numbers.
+- `lower` converts a string to lowercase.
 - `markdown` converts a string to an [Obsidian Flavored Markdown](https://help.obsidian.md/Editing+and+formatting/Obsidian+Flavored+Markdown) formatted string.
 - `object` manipulates object data:
 	- `object:array` converts an object to an array of key-value pairs.
