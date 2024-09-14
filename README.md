@@ -175,9 +175,9 @@ Filters allow you to modify variables in a template. Filters are applied to vari
 	- `"hello world"|split:" "` returns `["hello","world"]`.
 	- If no separator is provided, it splits on every character: `"hello"|split` returns `["h","e","l","l","o"]`.
 	- Regular expressions can be used as separators: `"a1b2c3"|split:[0-9]` returns `["a","b","c"]`.
-- `stripmd` removes all Markdown formatting from a string.
+- `stripmd` removes all Markdown formatting and returns a plain text string, e.g. turning `**text**` into `text`.
 	- Turns formatted text into unformatted plain text, including bold, italic, highlights, headers, code, blockquotes, tables, task lists, and wikilinks.
-	- Entirely removes tables, footnotes, and images.
+	- Entirely removes tables, footnotes, images, and HTML elements.
 - `table` converts an array or array of objects into a Markdown table:
 	- For an array of objects, it uses the object keys as headers.
 	- For an array of arrays, it creates a table with each nested array as a row.
