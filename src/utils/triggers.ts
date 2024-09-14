@@ -23,30 +23,46 @@ export function matchPattern(pattern: string, url: string, schemaOrgData: any): 
 }
 
 function matchSchemaPattern(pattern: string, schemaOrgData: any): boolean {
-	const [, schemaKey, expectedValue] = pattern.match(/schema:(.+?)(?:=(.+))?$/) || [];
-	if (!schemaKey) return false;
-
-	const actualValue = getSchemaValue(schemaOrgData, schemaKey);
+	const [, schemaType, schemaKey, expectedValue] = pattern.match(/schema:(@\w+)?(?:\.(.+?))?(?:=(.+))?$/) || [];
 	
-	if (expectedValue) {
-		if (Array.isArray(actualValue)) {
-			return actualValue.includes(expectedValue);
+	if (!schemaType && !schemaKey) return false;
+
+	// Ensure schemaOrgData is always an array
+	const schemaArray = Array.isArray(schemaOrgData) ? schemaOrgData : [schemaOrgData];
+
+	const matchingSchemas = schemaArray.flatMap(schema => {
+		// Handle nested arrays of schemas
+		if (Array.isArray(schema)) {
+			return schema;
 		}
-		return actualValue === expectedValue;
-	} else {
-		return !!actualValue;
+		return [schema];
+	}).filter((schema: any) => {
+		if (!schemaType) return true;
+		const types = Array.isArray(schema['@type']) ? schema['@type'] : [schema['@type']];
+		return types.includes(schemaType.slice(1));
+	});
+
+	for (const schema of matchingSchemas) {
+		if (schemaKey) {
+			const actualValue = getSchemaValue(schema, schemaKey);
+			if (expectedValue) {
+				if (Array.isArray(actualValue)) {
+					if (actualValue.includes(expectedValue)) return true;
+				} else if (actualValue === expectedValue) {
+					return true;
+				}
+			} else if (actualValue !== undefined) {
+				return true;
+			}
+		} else {
+			return true; // Match if only schema type is specified and found
+		}
 	}
+
+	return false;
 }
 
 function getSchemaValue(schemaData: any, key: string): any {
-	if (Array.isArray(schemaData)) {
-		for (const item of schemaData) {
-			const value = getSchemaValue(item, key);
-			if (value !== undefined) return value;
-		}
-		return undefined;
-	}
-
 	const keys = key.split('.');
 	let result = schemaData;
 	for (const k of keys) {

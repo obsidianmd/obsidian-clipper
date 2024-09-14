@@ -39,10 +39,9 @@ You can trigger templates based on more complex URL patterns using regular expre
 
 You can trigger templates based on schema.org data present on the page. Use the `schema:` prefix followed by the schema key you want to match. You can optionally specify an expected value. For example:
 
-- `schema:@type` will match any page that has a schema.org `@type` property.
-- `schema:@type=Recipe` will match pages where the schema.org `@type` is specifically "Recipe".
-
-Schema matching is particularly useful for selecting templates based on the type of content on the page, regardless of the specific URL structure.
+- `schema:@Recipe` will match pages where the schema type is "Recipe".
+- `schema:@Recipe.name` will match pages where `@Recipe.name` is present.
+- `schema:@Recipe.name=Cookie` will match pages where `@Recipe.name` is "Cookie".
 
 You can combine different types of patterns for a single template. The first matching pattern (whether URL-based or schema-based) will determine which template is used.
 
