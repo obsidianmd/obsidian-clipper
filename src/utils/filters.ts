@@ -390,9 +390,6 @@ export const filters: { [key: string]: FilterFunction } = {
 		str = str.replace(/^\*\[[^\]]+\]:.+$/gm, '');  // abbreviations
 		str = str.replace(/\[\[([^\]|]+)\|?([^\]]*)\]\]/g, (match, p1, p2) => p2 || p1);  // wikilinks
 
-		// Remove definition lists last
-		str = str.replace(/^[^:\n]+:\s*/gm, '');
-
 		// Final cleanup
 		str = str.replace(/\n{3,}/g, '\n\n');  // Multiple newlines
 		str = str.trim();  // Trim whitespace
