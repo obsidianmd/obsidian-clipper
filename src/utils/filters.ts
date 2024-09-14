@@ -61,6 +61,17 @@ export const filters: { [key: string]: FilterFunction } = {
 		}
 		return str;
 	},
+	footnote: (str: string): string => {
+		try {
+			const array = JSON.parse(str);
+			if (Array.isArray(array)) {
+				return array.map((item, index) => `[^${index + 1}]: ${item}`).join('\n\n');
+			}
+		} catch (error) {
+			console.error('Error parsing JSON in footnote filter:', error);
+		}
+		return str;
+	},
 	join: (str: string, param?: string): string => {
 		let array;
 		try {
