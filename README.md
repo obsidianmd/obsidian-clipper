@@ -115,7 +115,9 @@ Filters allow you to modify variables in a template. Filters are applied to vari
 - `first` returns the first element of an array as a string.
 	- `["a","b","c"]|first` returns `"a"`.
 	- If the input is not an array, it returns the input unchanged.
-- `footnote` converts an array into a list of Markdown footnotes. Similar to an numbered list but formatted as `[^1]: first item` etc.
+- `footnote` converts an array or object into a list of Markdown footnotes.
+	- For arrays: `["first item","second item"]|footnote` returns: `[^1]: first item` etc.
+	- For objects: `{"First Note": "Content 1", "Second Note": "Content 2"}|footnote` returns: `[^first-note]: Content 1` etc.
 - `join` combines elements of an array into a string.
 	- `["a","b","c"]|join` returns `"a,b,c"`.
 	- A custom separator can be specified: `["a","b","c"]|join:" "` returns `"a b c"`.
