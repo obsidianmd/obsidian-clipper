@@ -52,20 +52,21 @@ Template variables can be used to automatically pre-populate data from the page 
 
 #### Page variables
 
-These variables are automatically generated based on the page content.
+These variables are automatically generated based on the page content. The main content variable is `{{content}}`, which contains the article content or the selection if there is any selected text on the page.
 
-| Variable          | Description                                          |
-| ----------------- | ---------------------------------------------------- |
-| `{{author}}`      | Author of the page                                   |
-| `{{content}}`     | Article content, or the selection if present         |
-| `{{date}}`        | Today's date                                         |
-| `{{description}}` | Description or excerpt                               |
-| `{{domain}}`      | Domain                                               |
-| `{{fullHtml}}`    | Full HTML content of the page                        |
-| `{{image}}`       | Social share image URL                               |
-| `{{published}}`   | Published date                                       |
-| `{{title}}`       | Title of the page                                    |
-| `{{url}}`         | Current URL                                          |
+| Variable            | Description                                          |
+| ------------------- | ---------------------------------------------------- |
+| `{{author}}`        | Author of the page                                   |
+| `{{content}}`       | Article content, or the selection if present         |
+| `{{date}}`          | Today's date                                         |
+| `{{description}}`   | Description or excerpt                               |
+| `{{domain}}`        | Domain                                               |
+| `{{fullHtml}}`      | Unprocessed HTML for the full page content           |
+| `{{image}}`         | Social share image URL                               |
+| `{{published}}`     | Published date                                       |
+| `{{title}}`         | Title of the page                                    |
+| `{{selectionHTML}}` | Unprocessed HTML for selected content                |
+| `{{url}}`           | Current URL                                          |
 
 #### Meta variables
 

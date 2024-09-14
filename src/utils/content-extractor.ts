@@ -3,12 +3,10 @@ import { createMarkdownContent } from './markdown-converter';
 import { sanitizeFileName } from './string-utils';
 import { Readability } from '@mozilla/readability';
 import { applyFilters } from './filters';
-import dayjs from 'dayjs';
 import browser from './browser-polyfill';
+import { convertDate } from './date-utils';
 
-export function extractReadabilityContent(content: string): ReturnType<Readability['parse']> {
-	const parser = new DOMParser();
-	const doc = parser.parseFromString(content, 'text/html');
+export function extractReadabilityContent(doc: Document): ReturnType<Readability['parse']> {
 	const reader = new Readability(doc, {keepClasses:true})
 	return reader.parse();
 }
@@ -160,14 +158,14 @@ export async function extractContentBySelector(tabId: number, selector: string):
 }
 
 export async function initializePageContent(content: string, selectedHtml: string, extractedContent: ExtractedContent, currentUrl: string, schemaOrgData: any, fullHtml: string) {
-	const readabilityArticle = extractReadabilityContent(content);
+	const parser = new DOMParser();
+	const doc = parser.parseFromString(content, 'text/html');
+
+	const readabilityArticle = extractReadabilityContent(doc);
 	if (!readabilityArticle) {
 		console.error('Failed to parse content with Readability');
 		return null;
 	}
-
-	const parser = new DOMParser();
-	const doc = parser.parseFromString(content, 'text/html');
 
 	// Define preset variables with fallbacks
 	const title =
@@ -214,7 +212,15 @@ export async function initializePageContent(content: string, selectedHtml: strin
 		|| getMetaContent(doc, "name", "copyright")
 		|| '';
 
-	const markdownBody = createMarkdownContent(content, currentUrl, selectedHtml);
+
+	if (selectedHtml) {
+		// If there's selected HTML, use it directly
+		content = selectedHtml;
+	} else {
+		content = readabilityArticle.content;
+	}
+
+	const markdownBody = createMarkdownContent(content, currentUrl);
 
 	const currentVariables: { [key: string]: string } = {
 		'{{author}}': author,
@@ -227,6 +233,7 @@ export async function initializePageContent(content: string, selectedHtml: strin
 		'{{noteName}}': noteName,
 		'{{published}}': published,
 		'{{site}}': site,
+		'{{selectionHtml}}': selectedHtml,
 		'{{title}}': title,
 		'{{url}}': currentUrl
 	};
@@ -261,10 +268,6 @@ export async function initializePageContent(content: string, selectedHtml: strin
 		noteName,
 		currentVariables
 	};
-}
-
-function convertDate(date: Date): string {
-	return dayjs(date).format('YYYY-MM-DD');
 }
 
 function addSchemaOrgDataToVariables(schemaData: any, variables: { [key: string]: string }, prefix: string = '') {

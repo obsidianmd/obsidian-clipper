@@ -1,43 +1,12 @@
 import TurndownService from 'turndown';
 import { gfm } from 'turndown-plugin-gfm';
-import { Readability } from '@mozilla/readability';
 import { MathMLToLaTeX } from 'mathml-to-latex';
-import { makeUrlAbsolute } from './string-utils';
+import { processUrls } from './string-utils';
 
-export function createMarkdownContent(content: string, url: string, selectedHtml: string, skipReadability: boolean = false): string {
-	const parser = new DOMParser();
-	const doc = parser.parseFromString(content, 'text/html');
+export function createMarkdownContent(content: string, url: string) {
 
 	const baseUrl = new URL(url);
-
-	function processUrls(htmlContent: string): string {
-		const tempDiv = document.createElement('div');
-		tempDiv.innerHTML = htmlContent;
-		
-		// Handle relative URLs for both images and links
-		tempDiv.querySelectorAll('img').forEach(img => makeUrlAbsolute(img, 'src', baseUrl));
-		tempDiv.querySelectorAll('a').forEach(link => makeUrlAbsolute(link, 'href', baseUrl));
-		
-		return tempDiv.innerHTML;
-	}
-
-	let markdownContent: string;
-
-	if (selectedHtml) {
-		// If there's selected HTML, use it directly
-		markdownContent = processUrls(selectedHtml);
-	} else if (skipReadability) {
-		// If skipping Readability, process the full content
-		markdownContent = processUrls(content);
-	} else {
-		// If no selection and not skipping Readability, use Readability
-		const readabilityArticle = new Readability(doc,{keepClasses:true}).parse();
-		if (!readabilityArticle) {
-			console.error('Failed to parse content with Readability');
-			return '';
-		}
-		markdownContent = processUrls(readabilityArticle.content);
-	}
+	const markdownContent = processUrls(content, baseUrl);
 
 	const turndownService = new TurndownService({
 		headingStyle: 'atx',
@@ -88,21 +57,34 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 			if (figcaption) {
 				const tagSpan = figcaption.querySelector('.ltx_tag_figure');
 				const tagText = tagSpan ? tagSpan.textContent?.trim() : '';
-				const captionText = figcaption.textContent?.replace(tagText || '', '').trim() || '';
-				caption = `${tagText} ${captionText}`.trim();
+				
+				// Process the caption content, including math elements
+				let captionContent = figcaption.innerHTML;
+				captionContent = captionContent.replace(/<math.*?>(.*?)<\/math>/g, (match, mathContent, offset, string) => {
+					const mathElement = new DOMParser().parseFromString(match, 'text/html').body.firstChild as Element;
+					const latex = extractLatex(mathElement);
+					const prevChar = string[offset - 1] || '';
+					const nextChar = string[offset + match.length] || '';
+
+					const isStartOfLine = offset === 0 || /\s/.test(prevChar);
+					const isEndOfLine = offset + match.length === string.length || /\s/.test(nextChar);
+
+					const leftSpace = (!isStartOfLine && !/[\s$]/.test(prevChar)) ? ' ' : '';
+					const rightSpace = (!isEndOfLine && !/[\s$]/.test(nextChar)) ? ' ' : '';
+
+					return `${leftSpace}$${latex}$${rightSpace}`;
+				});
+
+				// Convert the processed caption content to markdown
+				const captionMarkdown = turndownService.turndown(captionContent);
+				
+				// Combine tag and processed caption
+				caption = `${tagText} ${captionMarkdown}`.trim();
 			}
 
-			// Convert math elements in the caption
-			caption = caption.replace(/<math.*?>(.*?)<\/math>/g, (match, p1) => {
-				const mathContent = extractLatex(new DOMParser().parseFromString(match, 'text/html').body.firstChild as Element);
-				return `$${mathContent}$`;
-			});
-
 			// Handle references in the caption
-			caption = caption.replace(/<a.*?>(.*?)<\/a>/g, (match, p1) => {
-				const link = new DOMParser().parseFromString(match, 'text/html').body.firstChild as HTMLAnchorElement;
-				const href = link.getAttribute('href') || '';
-				return `[${p1}](${href})`;
+			caption = caption.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (match, text, href) => {
+				return `[${text}](${href})`;
 			});
 
 			return `![${alt}](${src})\n\n${caption}\n\n`;
@@ -118,6 +100,12 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 					!!src.match(/(?:youtube\.com|youtu\.be)/) ||
 					!!src.match(/(?:twitter\.com|x\.com)/)
 				);
+			} else if (node instanceof HTMLElement) {
+				if (node.tagName.toLowerCase() === 'lite-youtube') {
+					return true;
+				} else if (node.tagName.toLowerCase() === 'p') {
+					return !!node.querySelector('lite-youtube');
+				}
 			}
 			return false;
 		},
@@ -132,6 +120,20 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 					const tweetMatch = src.match(/(?:twitter\.com|x\.com)\/.*?(?:status|statuses)\/(\d+)/);
 					if (tweetMatch && tweetMatch[1]) {
 						return `![](https://x.com/i/status/${tweetMatch[1]})`;
+					}
+				}
+			} else if (node instanceof HTMLElement) {
+				let liteYoutubeElement: HTMLElement | null = null;
+				if (node.tagName.toLowerCase() === 'lite-youtube') {
+					liteYoutubeElement = node;
+				} else if (node.tagName.toLowerCase() === 'p') {
+					liteYoutubeElement = node.querySelector('lite-youtube');
+				}
+				
+				if (liteYoutubeElement) {
+					const videoId = liteYoutubeElement.getAttribute('videoid');
+					if (videoId) {
+						return `![](https://www.youtube.com/watch?v=${videoId})`;
 					}
 				}
 			}
@@ -167,7 +169,6 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 		},
 		replacement: function (content, node, options) {
 			if (!(node instanceof HTMLElement)) return content;
-			
 			const href = node.getAttribute('href');
 			const title = node.getAttribute('title');
 			
@@ -288,7 +289,19 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 			)) {
 				return `\n$$$\n${latex}\n$$$\n`;
 			} else {
-				return `$${latex}$`;
+				// For inline math, ensure there's a space before and after only if needed
+				const prevNode = node.previousSibling;
+				const nextNode = node.nextSibling;
+				const prevChar = prevNode?.textContent?.slice(-1) || '';
+				const nextChar = nextNode?.textContent?.[0] || '';
+
+				const isStartOfLine = !prevNode || (prevNode.nodeType === Node.TEXT_NODE && prevNode.textContent?.trim() === '');
+				const isEndOfLine = !nextNode || (nextNode.nodeType === Node.TEXT_NODE && nextNode.textContent?.trim() === '');
+
+				const leftSpace = (!isStartOfLine && prevChar && !/[\s$]/.test(prevChar)) ? ' ' : '';
+				const rightSpace = (!isEndOfLine && nextChar && !/[\s$]/.test(nextChar)) ? ' ' : '';
+
+				return `${leftSpace}$${latex}$${rightSpace}`;
 			}
 		}
 	});
@@ -341,6 +354,7 @@ export function createMarkdownContent(content: string, url: string, selectedHtml
 	turndownService.addRule('removals', {
 		filter: function (node) {
 			if (!(node instanceof HTMLElement)) return false;
+			if (node.getAttribute('encoding') === 'x-llamapun') return true;
 			// Wikipedia edit buttons
 			if (node.classList.contains('mw-editsection')) return true;
 			// Wikipedia cite backlinks
