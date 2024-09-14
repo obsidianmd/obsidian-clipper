@@ -130,6 +130,10 @@ Filters allow you to modify variables in a template. Filters are applied to vari
 - `footnote` converts an array or object into a list of Markdown footnotes.
 	- For arrays: `["first item","second item"]|footnote` returns: `[^1]: first item` etc.
 	- For objects: `{"First Note": "Content 1", "Second Note": "Content 2"}|footnote` returns: `[^first-note]: Content 1` etc.
+- `image` converts strings, arrays, or objects into Markdown image syntax.
+	- For strings: `"image.jpg"|image:"alt text"` returns `![alt text](image.jpg)`.
+	- For arrays: `["image1.jpg","image2.jpg"]|image:"alt text"` returns an array of Markdown image strings with the same alt text for all images.
+	- For objects: `{"image1.jpg": "Alt 1", "image2.jpg": "Alt 2"}|image` returns Markdown image strings with alt text from the object keys.
 - `join` combines elements of an array into a string.
 	- `["a","b","c"]|join` returns `"a,b,c"`.
 	- A custom separator can be specified: `["a","b","c"]|join:" "` returns `"a b c"`.

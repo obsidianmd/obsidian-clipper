@@ -79,6 +79,23 @@ export const filters: { [key: string]: FilterFunction } = {
 		}
 		return str;
 	},
+	image: (str: string, altText?: string): string => {
+		try {
+			const data = JSON.parse(str);
+			
+			if (Array.isArray(data)) {
+				const result = data.map(item => `![${altText || ''}](${escapeMarkdown(item)})`);
+				return JSON.stringify(result);
+			} else if (typeof data === 'object' && data !== null) {
+				return Object.entries(data)
+					.map(([alt, url]) => `![${escapeMarkdown(alt)}](${escapeMarkdown(String(url))})`).join('\n');
+			}
+		} catch (error) {
+			// If parsing fails, treat it as a single string
+			return `![${altText || ''}](${escapeMarkdown(str)})`;
+		}
+		return str;
+	},
 	join: (str: string, param?: string): string => {
 		let array;
 		try {
@@ -89,7 +106,8 @@ export const filters: { [key: string]: FilterFunction } = {
 		}
 
 		if (Array.isArray(array)) {
-			return array.join(param || ',');
+			const separator = param ? JSON.parse(`"${param}"`) : ',';
+			return array.join(separator);
 		}
 		return str;
 	},
@@ -307,8 +325,13 @@ export const filters: { [key: string]: FilterFunction } = {
 			}
 		}
 		return `[[${str}]]`;
-	}
+	}	
 };
+
+// Add this helper function at the end of the file
+function escapeMarkdown(str: string): string {
+	return str.replace(/([[\]])/g, '\\$1');
+}
 
 export function applyFilters(value: string, filterNames: string[], url?: string): string {
 	// Ensure value is a string before applying filters
