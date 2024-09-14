@@ -1,5 +1,7 @@
 Official Obsidian browser extension. Available for [Chrome](https://chromewebstore.google.com/detail/obsidian-web-clipper/cnjifjpddelmedmihgijeibhnjfabmlf), [Firefox](https://addons.mozilla.org/en-US/firefox/addon/web-clipper-obsidian/), Edge, Brave, and Arc. Support for Safari to come.
 
+⚠️ **Obsidian Clipper is still in beta.** Some features require Obsidian 1.7.2.
+
 ## Features
 
 - **Customizable templates.** Create templates to automatically extract and organize metadata from web pages.
