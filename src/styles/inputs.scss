@@ -5,6 +5,7 @@ textarea {
 select {
 	user-select: none;
 	cursor: pointer;
+	height: var(--input-height);
 }
 select,
 input[type="text"],
