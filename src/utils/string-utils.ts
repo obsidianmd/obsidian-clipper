@@ -2,6 +2,10 @@ export function escapeRegExp(value: string): string {
 	return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+export function escapeMarkdown(str: string): string {
+	return str.replace(/([[\]])/g, '\\$1');
+}
+
 export function escapeValue(value: string): string {
 	return value.replace(/"/g, '\\"').replace(/\n/g, '\\n');
 }

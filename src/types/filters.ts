@@ -1,0 +1,1 @@
+export type FilterFunction = (value: string, param?: string) => string;
