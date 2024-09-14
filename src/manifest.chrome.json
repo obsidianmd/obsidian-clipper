@@ -1,7 +1,7 @@
 {
 	"manifest_version": 3,
 	"name": "Obsidian Web Clipper",
-	"version": "0.3.0",
+	"version": "0.4.0",
 	"description": "Save content from the web to your Obsidian vault, in a portable, durable format that you can access even offline.",
 	"permissions": [
 		"activeTab",
