@@ -53,6 +53,12 @@ export async function generateFrontmatter(properties: Property[]): Promise<strin
 		}
 	}
 	frontmatter += '---\n';
+
+	// Check if the frontmatter is empty
+	if (frontmatter.trim() === '---\n---') {
+		return '';
+	}
+
 	return frontmatter;
 }
 
