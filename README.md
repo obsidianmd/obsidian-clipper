@@ -205,8 +205,8 @@ This will create two directories:
 ### Installing in Chrome, Brave, Edge, and Arc
 
 1. Open your browser and navigate to `chrome://extensions`
-2. Enable "Developer mode"
-3. Click "Load unpacked" and select the `dist` directory
+2. Enable **Developer mode**
+3. Click **Load unpacked** and select the `dist` directory
 
 ### Installing in Firefox
 
