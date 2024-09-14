@@ -39,10 +39,9 @@ You can trigger templates based on more complex URL patterns using regular expre
 
 You can trigger templates based on schema.org data present on the page. Use the `schema:` prefix followed by the schema key you want to match. You can optionally specify an expected value. For example:
 
-- `schema:@type` will match any page that has a schema.org `@type` property.
-- `schema:@type=Recipe` will match pages where the schema.org `@type` is specifically "Recipe".
-
-Schema matching is particularly useful for selecting templates based on the type of content on the page, regardless of the specific URL structure.
+- `schema:@Recipe` will match pages where the schema type is "Recipe".
+- `schema:@Recipe.name` will match pages where `@Recipe.name` is present.
+- `schema:@Recipe.name=Cookie` will match pages where `@Recipe.name` is "Cookie".
 
 You can combine different types of patterns for a single template. The first matching pattern (whether URL-based or schema-based) will determine which template is used.
 
@@ -89,11 +88,24 @@ Selector variables allow you to extract data from elements on the page using the
 
 Schema variables allow you to extract data from [schema.org](https://schema.org/) JSON-LD on the page.
 
-- `{{schema:key}}` returns the value of the key from the schema.
-- `{{schema:parent.child}}` returns the value of a nested property.
-- `{{schema:arrayKey}}` returns the first item in an array.
-- `{{schema:arrayKey[index].property}}` returns the item at the specified index in an array.
-- `{{schema:arrayKey[*].property}}` returns a specific property from all items in an array.
+- `{{schema:@Type:key}}` returns the value of the key from the schema.
+- `{{schema:@Type:parent.child}}` returns the value of a nested property.
+- `{{schema:@Type:arrayKey}}` returns the first item in an array.
+- `{{schema:@Type:arrayKey[index].property}}` returns the item at the specified index in an array.
+- `{{schema:@Type:arrayKey[*].property}}` returns a specific property from all items in an array.
+
+You can also use a shorthand notation without specifying the schema type:
+
+- `{{schema:author}}` will match the first `author` property found in any schema type.
+- `{{schema:name}}` will match the first `name` property found in any schema type.
+
+This shorthand is particularly useful when you don't know or don't care about the specific schema type, but you know the property name you're looking for.
+
+Nested properties and array access work as well, both with and without the schema `@Type` specified:
+
+- `{{schema:author.name}}` will find the first `author` property and then access its `name` sub-property.
+- `{{schema:author[0].name}}` will access the `name` of the first author in an array of authors.
+- `{{schema:author[*].name}}` will return an array of all author names.
 
 ### Filters
 

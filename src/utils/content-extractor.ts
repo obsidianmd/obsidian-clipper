@@ -54,7 +54,17 @@ async function processSchema(match: string, variables: { [key: string]: string }
 	const nestedArrayMatch = schemaKey.match(/(.*?)\[(\*|\d+)\](.*)/);
 	if (nestedArrayMatch) {
 		const [, arrayKey, indexOrStar, propertyKey] = nestedArrayMatch;
-		const arrayValue = JSON.parse(variables[`{{schema:${arrayKey}}}`] || '[]');
+
+		// Handle shorthand notation for nested arrays
+		let fullArrayKey = arrayKey;
+		if (!arrayKey.includes('@')) {
+			const matchingKey = Object.keys(variables).find(key => key.includes('@') && key.endsWith(`:${arrayKey}}}`));
+			if (matchingKey) {
+				fullArrayKey = matchingKey.replace('{{schema:', '').replace('}}', '');
+			}
+		}
+
+		const arrayValue = JSON.parse(variables[`{{schema:${fullArrayKey}}}`] || '[]');
 		if (Array.isArray(arrayValue)) {
 			if (indexOrStar === '*') {
 				schemaValue = JSON.stringify(arrayValue.map(item => getNestedProperty(item, propertyKey.slice(1))).filter(Boolean));
@@ -64,7 +74,17 @@ async function processSchema(match: string, variables: { [key: string]: string }
 			}
 		}
 	} else {
-		schemaValue = variables[`{{schema:${schemaKey}}}`] || '';
+		// Shorthand handling for non-array schemas
+		if (!schemaKey.includes('@')) {
+			const matchingKey = Object.keys(variables).find(key => key.includes('@') && key.endsWith(`:${schemaKey}}}`));
+			if (matchingKey) {
+				schemaValue = variables[matchingKey];
+			}
+		}
+		// If no matching shorthand found or it's a full key, use the original logic
+		if (!schemaValue) {
+			schemaValue = variables[`{{schema:${schemaKey}}}`] || '';
+		}
 	}
 
 	const filterNames = filtersString.split('|').filter(Boolean);
@@ -272,26 +292,31 @@ export async function initializePageContent(content: string, selectedHtml: strin
 
 function addSchemaOrgDataToVariables(schemaData: any, variables: { [key: string]: string }, prefix: string = '') {
 	if (Array.isArray(schemaData)) {
-		// Add the entire array as a JSON string
-		const variableKey = `{{schema:${prefix}}}`;
-		variables[variableKey] = JSON.stringify(schemaData);
-
-		// If there's only one item, add it without an index
-		if (schemaData.length === 1) {
-			addSchemaOrgDataToVariables(schemaData[0], variables, prefix);
-		} else {
-			// If there's more than one item, add them with indices
-			schemaData.forEach((item, index) => {
-				addSchemaOrgDataToVariables(item, variables, `${prefix}[${index}]`);
-			});
-		}
+		schemaData.forEach((item, index) => {
+			if (item['@type']) {
+				if (Array.isArray(item['@type'])) {
+					item['@type'].forEach((type: string) => {
+						addSchemaOrgDataToVariables(item, variables, `@${type}:`);
+					});
+				} else {
+					addSchemaOrgDataToVariables(item, variables, `@${item['@type']}:`);
+				}
+			} else {
+				addSchemaOrgDataToVariables(item, variables, `[${index}]:`);
+			}
+		});
 	} else if (typeof schemaData === 'object' && schemaData !== null) {
 		Object.entries(schemaData).forEach(([key, value]) => {
+			if (key === '@type') return; // Skip @type as it's used in the prefix
+			
+			const variableKey = `{{schema:${prefix}${key}}}`;
 			if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
-				const variableKey = `{{schema:${prefix}${key}}}`;
 				variables[variableKey] = String(value);
 			} else if (Array.isArray(value)) {
-				addSchemaOrgDataToVariables(value, variables, `${prefix}${key}`);
+				variables[variableKey] = JSON.stringify(value);
+				value.forEach((item, index) => {
+					addSchemaOrgDataToVariables(item, variables, `${prefix}${key}[${index}].`);
+				});
 			} else if (typeof value === 'object' && value !== null) {
 				addSchemaOrgDataToVariables(value, variables, `${prefix}${key}.`);
 			}
