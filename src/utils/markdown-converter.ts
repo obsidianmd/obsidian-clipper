@@ -100,6 +100,12 @@ export function createMarkdownContent(content: string, url: string) {
 					!!src.match(/(?:youtube\.com|youtu\.be)/) ||
 					!!src.match(/(?:twitter\.com|x\.com)/)
 				);
+			} else if (node instanceof HTMLElement) {
+				if (node.tagName.toLowerCase() === 'lite-youtube') {
+					return true;
+				} else if (node.tagName.toLowerCase() === 'p') {
+					return !!node.querySelector('lite-youtube');
+				}
 			}
 			return false;
 		},
@@ -114,6 +120,20 @@ export function createMarkdownContent(content: string, url: string) {
 					const tweetMatch = src.match(/(?:twitter\.com|x\.com)\/.*?(?:status|statuses)\/(\d+)/);
 					if (tweetMatch && tweetMatch[1]) {
 						return `![](https://x.com/i/status/${tweetMatch[1]})`;
+					}
+				}
+			} else if (node instanceof HTMLElement) {
+				let liteYoutubeElement: HTMLElement | null = null;
+				if (node.tagName.toLowerCase() === 'lite-youtube') {
+					liteYoutubeElement = node;
+				} else if (node.tagName.toLowerCase() === 'p') {
+					liteYoutubeElement = node.querySelector('lite-youtube');
+				}
+				
+				if (liteYoutubeElement) {
+					const videoId = liteYoutubeElement.getAttribute('videoid');
+					if (videoId) {
+						return `![](https://www.youtube.com/watch?v=${videoId})`;
 					}
 				}
 			}
