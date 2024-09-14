@@ -57,21 +57,25 @@ export function createMarkdownContent(content: string, url: string) {
 			if (figcaption) {
 				const tagSpan = figcaption.querySelector('.ltx_tag_figure');
 				const tagText = tagSpan ? tagSpan.textContent?.trim() : '';
-				const captionText = figcaption.textContent?.replace(tagText || '', '').trim() || '';
-				caption = `${tagText} ${captionText}`.trim();
+				
+				// Process the caption content, including math elements
+				let captionContent = figcaption.innerHTML;
+				captionContent = captionContent.replace(/<math.*?>(.*?)<\/math>/g, (match, mathContent) => {
+					const mathElement = new DOMParser().parseFromString(match, 'text/html').body.firstChild as Element;
+					const latex = extractLatex(mathElement);
+					return `$${latex}$`;
+				});
+
+				// Convert the processed caption content to markdown
+				const captionMarkdown = turndownService.turndown(captionContent);
+				
+				// Combine tag and processed caption
+				caption = `${tagText} ${captionMarkdown}`.trim();
 			}
 
-			// Convert math elements in the caption
-			caption = caption.replace(/<math.*?>(.*?)<\/math>/g, (match, p1) => {
-				const mathContent = extractLatex(new DOMParser().parseFromString(match, 'text/html').body.firstChild as Element);
-				return `$${mathContent}$`;
-			});
-
 			// Handle references in the caption
-			caption = caption.replace(/<a.*?>(.*?)<\/a>/g, (match, p1) => {
-				const link = new DOMParser().parseFromString(match, 'text/html').body.firstChild as HTMLAnchorElement;
-				const href = link.getAttribute('href') || '';
-				return `[${p1}](${href})`;
+			caption = caption.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (match, text, href) => {
+				return `[${text}](${href})`;
 			});
 
 			return `![${alt}](${src})\n\n${caption}\n\n`;
