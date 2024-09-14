@@ -60,10 +60,14 @@ export function createMarkdownContent(content: string, url: string) {
 				
 				// Process the caption content, including math elements
 				let captionContent = figcaption.innerHTML;
-				captionContent = captionContent.replace(/<math.*?>(.*?)<\/math>/g, (match, mathContent) => {
+				captionContent = captionContent.replace(/<math.*?>(.*?)<\/math>/g, (match, mathContent, offset, string) => {
 					const mathElement = new DOMParser().parseFromString(match, 'text/html').body.firstChild as Element;
 					const latex = extractLatex(mathElement);
-					return `$${latex}$`;
+					const prevChar = string[offset - 1] || '';
+					const nextChar = string[offset + match.length] || '';
+					const leftSpace = prevChar && !/\s/.test(prevChar) ? ' ' : '';
+					const rightSpace = nextChar && !/\s/.test(nextChar) ? ' ' : '';
+					return `${leftSpace}$${latex}$${rightSpace}`;
 				});
 
 				// Convert the processed caption content to markdown
@@ -140,7 +144,6 @@ export function createMarkdownContent(content: string, url: string) {
 		},
 		replacement: function (content, node, options) {
 			if (!(node instanceof HTMLElement)) return content;
-			
 			const href = node.getAttribute('href');
 			const title = node.getAttribute('title');
 			
@@ -261,7 +264,12 @@ export function createMarkdownContent(content: string, url: string) {
 			)) {
 				return `\n$$$\n${latex}\n$$$\n`;
 			} else {
-				return `$${latex}$`;
+				// For inline math, ensure there's a space before and after
+				const prevChar = node.previousSibling?.textContent?.slice(-1) || '';
+				const nextChar = node.nextSibling?.textContent?.[0] || '';
+				const leftSpace = prevChar && !/\s/.test(prevChar) ? ' ' : '';
+				const rightSpace = nextChar && !/\s/.test(nextChar) ? ' ' : '';
+				return `${leftSpace}$${latex}$${rightSpace}`;
 			}
 		}
 	});
