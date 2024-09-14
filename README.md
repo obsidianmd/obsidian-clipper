@@ -1,4 +1,4 @@
-Official Obsidian browser extension. Available for Chrome, Firefox, Edge, Brave, and Arc. Support for Safari to come.
+Official Obsidian browser extension. Available for [Chrome](https://chromewebstore.google.com/detail/obsidian-web-clipper/cnjifjpddelmedmihgijeibhnjfabmlf), [Firefox](https://addons.mozilla.org/en-US/firefox/addon/web-clipper-obsidian/), Edge, Brave, and Arc. Support for Safari to come.
 
 ## Features
 
@@ -8,12 +8,17 @@ Official Obsidian browser extension. Available for Chrome, Firefox, Edge, Brave,
 
 ## Getting started
 
-The extension is not yet available across the official directories as it is still in beta. Go to [releases](https://github.com/obsidianmd/obsidian-clipper/releases) and download the latest version for your browser.
+Install the extension by downloading it from the official directory for your browser:
+
+- **[Chrome Web Store](https://chromewebstore.google.com/detail/obsidian-web-clipper/cnjifjpddelmedmihgijeibhnjfabmlf)**
+- **[Firefox Add-Ons](https://addons.mozilla.org/en-US/firefox/addon/web-clipper-obsidian/)**
+
+If you want to install the extension manually, go to [releases](https://github.com/obsidianmd/obsidian-clipper/releases) and download the latest version.
 
 - **Firefox:** go to `about:debugging#/runtime/this-firefox` and click **Load Temporary Add-on** and select the `.zip` file
 - **Chrome:** drag and drop the `.zip` in `chrome://extensions/`
-- **Edge:** drag and drop the `.zip` in `edge://extensions/`
-- **Brave:** drag and drop the `.zip` in `brave://extensions/`
+- **Edge:** drag and drop the Chrome version `.zip` in `edge://extensions/`
+- **Brave:** drag and drop the Chrome version `.zip` in `brave://extensions/`
 
 ## Using templates
 
