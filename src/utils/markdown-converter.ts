@@ -350,33 +350,6 @@ export function createMarkdownContent(content: string, url: string) {
 		}
 	});
 
-	// General removal rules for varous website elements
-	turndownService.addRule('removals', {
-		filter: function (node) {
-			if (!(node instanceof HTMLElement)) return false;
-			if (node.getAttribute('encoding') === 'x-llamapun') return true;
-			// Wikipedia edit buttons
-			if (node.classList.contains('mw-editsection')) return true;
-			// Wikipedia cite backlinks
-			if (node.classList.contains('mw-cite-backlink')) return true;
-			// Wikipedia infoboxes as they usually have colspans
-			if (node.nodeName === 'TABLE' && node.classList.contains('infobox')) return true;
-			// Reference numbers and anchor links
-			if (node.classList.contains('ltx_role_refnum')) return true;
-			if (node.classList.contains('ltx_tag_bibitem')) return true;
-			if (node.id?.startsWith('fnref:')) return true;
-			if (node.getAttribute('href')?.startsWith('#fnref:')) return true;
-			if (node.classList.contains('footnote-backref')) return true;
-			if (node.classList.contains('ref') && (node.getAttribute('href')?.startsWith('#') || /\/#.+$/.test(node.getAttribute('href') || ''))) return true;
-			if (node.classList.contains('anchor') && (node.getAttribute('href')?.startsWith('#') || /\/#.+$/.test(node.getAttribute('href') || ''))) return true;
-			
-			return false;
-		},
-		replacement: function () {
-			return '';
-		}
-	});
-
 	// Update the citations rule
 	turndownService.addRule('citations', {
 		filter: (node: Node): boolean => {
@@ -454,6 +427,38 @@ export function createMarkdownContent(content: string, url: string) {
 				return '\n\n' + references.join('\n\n') + '\n\n';
 			}
 			return content;
+		}
+	});
+
+	// General removal rules for varous website elements
+	turndownService.addRule('removals', {
+		filter: function (node) {
+			if (!(node instanceof HTMLElement)) return false;
+			// Wikipedia edit buttons
+			if (node.classList.contains('mw-editsection')) return true;
+			// Wikipedia cite backlinks
+			if (node.classList.contains('mw-cite-backlink')) return true;
+			// Wikipedia infoboxes as they usually have colspans
+			if (node.nodeName === 'TABLE' && node.classList.contains('infobox')) return true;
+			// Reference numbers and anchor links
+			if (node.classList.contains('ltx_role_refnum')) return true;
+			if (node.classList.contains('ltx_tag_bibitem')) return true;
+			if (node.id?.startsWith('fnref:')) return true;
+			if (node.getAttribute('href')?.startsWith('#fnref:')) return true;
+			if (node.classList.contains('footnote-backref')) return true;
+			if (node.classList.contains('ref') && (node.getAttribute('href')?.startsWith('#') || /\/#.+$/.test(node.getAttribute('href') || ''))) return true;
+			if (node.classList.contains('anchor') && (node.getAttribute('href')?.startsWith('#') || /\/#.+$/.test(node.getAttribute('href') || ''))) return true;
+			// anchor links within headings
+			if (node.nodeName === 'A' && 
+				node.parentElement && 
+				/^H[1-6]$/.test(node.parentElement.nodeName) && 
+				node.getAttribute('href')?.split('/').pop()?.startsWith('#')) {
+				return true;
+			}
+			return false;
+		},
+		replacement: function () {
+			return '';
 		}
 	});
 
