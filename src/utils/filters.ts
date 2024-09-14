@@ -197,6 +197,23 @@ export const filters: { [key: string]: FilterFunction } = {
 	pascal: (str: string) => str
 		.replace(/[\s_-]+(.)/g, (_, c) => c.toUpperCase())
 		.replace(/^(.)/, c => c.toUpperCase()),
+	replace: (str: string, param?: string): string => {
+		if (!param) {
+			return str;
+		}
+
+		// Remove outer parentheses if present
+		param = param.replace(/^\((.*)\)$/, '$1');
+
+		// Split the param into individual replacements
+		const replacements = param.split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(p => p.trim());
+
+		return replacements.reduce((acc, replacement) => {
+			const [search, replace] = replacement.split(':').map(p => p.trim().replace(/^["']|["']$/g, ''));
+			// Use an empty string if replace is undefined or an empty string
+			return acc.split(search).join(replace || '');
+		}, str);
+	},
 	slice: (str: string, param?: string): string => {
 		if (!param) {
 			console.error('Slice filter requires parameters');
@@ -336,27 +353,6 @@ export const filters: { [key: string]: FilterFunction } = {
 	trim: (str: string): string => {
 		return str.trim();
 	},
-	replace: (str: string, param?: string): string => {
-		if (!param) {
-			console.error('Replace filter requires parameters');
-			return str;
-		}
-
-		const parts = param.split(',').map(part => part.trim());
-		if (parts.length >= 2) {
-			const result = parts.reduce((acc, part, index, array) => {
-				if (index % 2 === 0 && index + 1 < array.length) {
-					const search = part.replace(/^["'{]|[}"']$/g, '');
-					const replace = array[index + 1].replace(/^["'{]|[}"']$/g, '');
-					const searchRegex = new RegExp(escapeRegExp(search), 'gi');
-					return acc.replace(searchRegex, replace);
-				}
-				return acc;
-			}, str);
-			return result;
-		}
-		return str;
-	},
 	title: (str: string): string => {
 		return str.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
 	},
@@ -408,24 +404,18 @@ export function applyFilters(value: string, filterNames: string[], url?: string)
 	let processedValue = typeof value === 'string' ? value : JSON.stringify(value);
 
 	const result = filterNames.reduce((result, filterName) => {
-		const filterRegex = /(\w+)(?::(.+)|"(.+)")?/;
-		const match = filterName.match(filterRegex);
+		const [name, ...params] = filterName.split(':');
+		const param = params.join(':'); // Rejoin in case the param contained colons
 
-		if (match) {
-			const [, name, param1, param2] = match;
-			const cleanParam = (param1 || param2) ? (param1 || param2).replace(/^["']|["']$/g, '') : undefined;
-
-			const filter = filters[name];
-			if (filter) {
-				// Pass the URL to the markdown filter, use cleanParam for others
-				const output = name === 'markdown' ? filter(result, url) : filter(result, cleanParam);
-				return output;
-			}
+		const filter = filters[name];
+		if (filter) {
+			// Pass the URL to the markdown filter, use param for others
+			const output = name === 'markdown' ? filter(result, url) : filter(result, param);
+			return output;
 		} else {
-			console.error(`Invalid filter format: ${filterName}`);
+			console.error(`Invalid filter: ${name}`);
+			return result;
 		}
-
-		return result;
 	}, processedValue);
 
 	return result;

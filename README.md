@@ -161,7 +161,11 @@ Filters allow you to modify variables in a template. Filters are applied to vari
 	- `object:values` returns an array of the object's values.
 	- Example: `{"a":1,"b":2}|object:array` returns `[["a",1],["b",2]]`.
 - `pascal` converts text to `PascalCase`.
-- `replace` replaces occurrences of a specified string: `"hello!"|replace:"ello!","i?"` returns `"hi?"`.
+- `replace` replaces occurrences of specified strings:
+	- Simple replacement: `"hello!"|replace:",":""` removes all commas.
+	- Multiple replacements: `"hello world"|replace:("e":"a","o":"0")` returns `"hall0 w0rld"`.
+	- Replacements are applied in the order they are specified.
+	- To replace with an empty string, use `""` as the replacement value.
 - `slice` extracts a portion of a string or array.
 	- For strings: `"hello"|slice:1,4` returns `"ell"`.
 	- For arrays: `["a","b","c","d"]|slice:1,3` returns `["b","c"]`.
