@@ -54,7 +54,7 @@ async function processSchema(match: string, variables: { [key: string]: string }
 	const nestedArrayMatch = schemaKey.match(/(.*?)\[(\*|\d+)\](.*)/);
 	if (nestedArrayMatch) {
 		const [, arrayKey, indexOrStar, propertyKey] = nestedArrayMatch;
-		
+
 		// Handle shorthand notation for nested arrays
 		let fullArrayKey = arrayKey;
 		if (!arrayKey.includes('@')) {

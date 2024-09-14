@@ -89,11 +89,24 @@ Selector variables allow you to extract data from elements on the page using the
 
 Schema variables allow you to extract data from [schema.org](https://schema.org/) JSON-LD on the page.
 
-- `{{schema:key}}` returns the value of the key from the schema.
-- `{{schema:parent.child}}` returns the value of a nested property.
-- `{{schema:arrayKey}}` returns the first item in an array.
-- `{{schema:arrayKey[index].property}}` returns the item at the specified index in an array.
-- `{{schema:arrayKey[*].property}}` returns a specific property from all items in an array.
+- `{{schema:@Type:key}}` returns the value of the key from the schema.
+- `{{schema:@Type:parent.child}}` returns the value of a nested property.
+- `{{schema:@Type:arrayKey}}` returns the first item in an array.
+- `{{schema:@Type:arrayKey[index].property}}` returns the item at the specified index in an array.
+- `{{schema:@Type:arrayKey[*].property}}` returns a specific property from all items in an array.
+
+You can also use a shorthand notation without specifying the schema type:
+
+- `{{schema:author}}` will match the first `author` property found in any schema type.
+- `{{schema:name}}` will match the first `name` property found in any schema type.
+
+This shorthand is particularly useful when you don't know or don't care about the specific schema type, but you know the property name you're looking for.
+
+Nested properties and array access work as well, both with and without the schema `@Type` specified:
+
+- `{{schema:author.name}}` will find the first `author` property and then access its `name` sub-property.
+- `{{schema:author[0].name}}` will access the `name` of the first author in an array of authors.
+- `{{schema:author[*].name}}` will return an array of all author names.
 
 ### Filters
 
