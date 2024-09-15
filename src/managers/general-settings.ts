@@ -96,16 +96,45 @@ export function initializeGeneralSettings(): void {
 		initializeToggles();
 		setShortcutInstructions();
 		initializeLLMSettings();
+		initializeAutoSave();
 	});
 }
 
+function initializeAutoSave(): void {
+	const generalSettingsForm = document.getElementById('general-settings-form');
+	if (generalSettingsForm) {
+		generalSettingsForm.addEventListener('input', debounce(saveGeneralSettingsFromForm, 500));
+	}
+}
+
+function saveGeneralSettingsFromForm(): void {
+	const apiKeyInput = document.getElementById('openai-api-key') as HTMLInputElement;
+	const modelSelect = document.getElementById('openai-model') as HTMLSelectElement;
+	const showMoreActionsToggle = document.getElementById('show-more-actions-toggle') as HTMLInputElement;
+	const betaFeaturesToggle = document.getElementById('beta-features-toggle') as HTMLInputElement;
+
+	const updatedSettings = {
+		openaiApiKey: apiKeyInput.value,
+		openaiModel: modelSelect.value,
+		showMoreActionsButton: showMoreActionsToggle.checked,
+		betaFeatures: betaFeaturesToggle.checked
+	};
+
+	saveGeneralSettings(updatedSettings);
+}
+
+function debounce(func: Function, delay: number): (...args: any[]) => void {
+	let timeoutId: NodeJS.Timeout;
+	return (...args: any[]) => {
+		clearTimeout(timeoutId);
+		timeoutId = setTimeout(() => func(...args), delay);
+	};
+}
+
 function initializeShowMoreActionsToggle(): void {
-	const ShowMoreActionsToggle = document.getElementById('show-more-actions-toggle') as HTMLInputElement;
-	if (ShowMoreActionsToggle) {
-		ShowMoreActionsToggle.checked = generalSettings.showMoreActionsButton;
-		ShowMoreActionsToggle.addEventListener('change', () => {
-			saveGeneralSettings({ showMoreActionsButton: ShowMoreActionsToggle.checked });
-		});
+	const showMoreActionsToggle = document.getElementById('show-more-actions-toggle') as HTMLInputElement;
+	if (showMoreActionsToggle) {
+		showMoreActionsToggle.checked = generalSettings.showMoreActionsButton;
 	}
 }
 
@@ -150,9 +179,6 @@ function initializeBetaFeaturesToggle(): void {
 	const betaFeaturesToggle = document.getElementById('beta-features-toggle') as HTMLInputElement;
 	if (betaFeaturesToggle) {
 		betaFeaturesToggle.checked = generalSettings.betaFeatures;
-		betaFeaturesToggle.addEventListener('change', () => {
-			saveGeneralSettings({ betaFeatures: betaFeaturesToggle.checked });
-		});
 	}
 }
 

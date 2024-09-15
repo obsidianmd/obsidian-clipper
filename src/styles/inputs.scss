@@ -6,9 +6,14 @@ textarea {
 select {
 	user-select: none;
 	cursor: pointer;
+}
+select,
+input[type="password"],
+input[type="text"] {
 	height: var(--input-height);
 }
 select,
+input[type="password"],
 input[type="text"],
 textarea {
 	background: var(--background-primary);

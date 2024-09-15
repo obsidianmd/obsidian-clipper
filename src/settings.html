@@ -103,11 +103,11 @@
 								<div>
 									<h3>LLM Settings</h3>
 									<div class="setting-item">
-										<label for="openai-api-key">OpenAI API Key</label>
+										<label for="openai-api-key">OpenAI API key</label>
 										<input type="password" id="openai-api-key" placeholder="Enter your OpenAI API key">
 									</div>
 									<div class="setting-item">
-										<label for="openai-model">OpenAI Model</label>
+										<label for="openai-model">OpenAI model</label>
 										<select id="openai-model">
 											<option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
 											<option value="gpt-4">GPT-4</option>
@@ -200,6 +200,11 @@
 									<div class="setting-item-description">Properties to add to the top of the clipped note. Use variables to pre-populate data from the&nbsp;page.</div>
 									<div id="template-properties"></div>
 									<div class="metadata-add-button"><a id="add-property-btn">+ Add property</a></div>
+								</div>
+								<div class="setting-item">
+									<label for="template-prompt">LLM Prompt</label>
+									<div class="setting-item-description">Enter a prompt for the LLM to process the clipped content. Leave empty to skip LLM processing.</div>
+									<textarea id="template-prompt" rows="4" placeholder="Summarize the following content:"></textarea>
 								</div>
 								<div class="setting-item">
 									<label for="note-content-format">Note content</label>

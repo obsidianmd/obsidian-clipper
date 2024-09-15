@@ -124,6 +124,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 		await addBrowserClassToHtml();
 
 		loadedSettings = await loadGeneralSettings();
+
 		console.log('General settings:', loadedSettings);
 
 		await loadTemplates();
@@ -486,20 +487,64 @@ document.addEventListener('DOMContentLoaded', async function() {
 				});
 			}
 
+			const llmContainer = document.getElementById('llm-container');
+			const processLlmBtn = document.getElementById('process-llm-btn');
+			const llmResponseDiv = document.getElementById('llm-response');
+			const templatePromptTextarea = document.getElementById('template-prompt') as HTMLTextAreaElement;
+
 			if (template && template.prompt) {
-				try {
-					const llmResponse = await sendToLLM(template.prompt, variables.content || '');
-					console.log('LLM Response:', llmResponse);
-					
-					// For now, let's just add the LLM response to the note content
-					const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
-					if (noteContentField) {
-						noteContentField.value = `LLM Response:\n\n${llmResponse}\n\n${noteContentField.value}`;
-					}
-				} catch (error) {
-					console.error('Error getting LLM response:', error);
-					// You might want to show an error message to the user here
+				if (llmContainer) llmContainer.style.display = 'block';
+				if (templatePromptTextarea) {
+					let promptToDisplay = await replaceVariables(tabId, template.prompt, variables, currentUrl);
+					templatePromptTextarea.value = promptToDisplay;
+					templatePromptTextarea.style.display = 'block';
 				}
+				if (processLlmBtn) {
+					processLlmBtn.addEventListener('click', async () => {
+						try {
+							if (!loadedSettings.openaiApiKey) {
+								console.warn('OpenAI API key is not set. Skipping LLM processing.');
+								showError('OpenAI API key is not set. Please set it in the extension settings.');
+								return;
+							}
+
+							const contentToProcess = variables.content || ''; // Use empty string if content is undefined
+							if (currentTab?.id && currentTab.url && templatePromptTextarea) {
+								let promptToUse = templatePromptTextarea.value; // Use the current value of the textarea
+
+								console.log('Prompt to be sent to LLM:', promptToUse);
+
+								const llmResponse = await sendToLLM(promptToUse, contentToProcess);
+								console.log('LLM Response:', llmResponse);
+								
+								if (llmResponseDiv) {
+									llmResponseDiv.textContent = llmResponse;
+									llmResponseDiv.style.display = 'block';
+								}
+
+								const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
+								if (noteContentField) {
+									noteContentField.value = `${llmResponse}\n\n${noteContentField.value}`;
+								}
+							} else {
+								console.log('Skipping LLM processing: missing tab ID, URL, or prompt');
+							}
+						} catch (error) {
+							console.error('Error getting LLM response:', error);
+							if (error instanceof Error) {
+								if (error.message.includes('rate limit')) {
+									showError(`LLM Error: ${error.message} The LLM response will be skipped for now.`);
+								} else {
+									showError(`LLM Error: ${error.message}`);
+								}
+							} else {
+								showError('An unknown error occurred while processing the LLM request.');
+							}
+						}
+					});
+				}
+			} else {
+				if (llmContainer) llmContainer.style.display = 'none';
 			}
 		}
 

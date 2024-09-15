@@ -30,6 +30,11 @@
 				<textarea id="note-content-field" rows="4" placeholder="Notes about this page..."></textarea>
 			</div>
 			<div class="clipper-footer">
+				<div id="llm-container" style="display: none;">
+					<textarea id="template-prompt" class="template-prompt" rows="3" placeholder="Enter your prompt here..."></textarea>
+					<button id="process-llm-btn">Process with LLM</button>
+					<div id="llm-response" style="display: none;"></div>
+				</div>
 				<div class="vault-path-container">
 					<div id="vault-container" style="display: none;">
 						<select id="vault-select"></select>
