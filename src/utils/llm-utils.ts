@@ -5,11 +5,11 @@ import { applyFilters } from './filters';
 
 export function initializeLLMSettings(): void {
 	const apiKeyInput = document.getElementById('openai-api-key') as HTMLInputElement;
-	const modelSelect = document.getElementById('openai-model') as HTMLSelectElement;
+	const modelSelect = document.getElementById('default-model') as HTMLSelectElement;
 
 	if (apiKeyInput && modelSelect) {
 		apiKeyInput.value = generalSettings.openaiApiKey || '';
-		modelSelect.value = generalSettings.openaiModel || 'gpt-3.5-turbo';
+		modelSelect.value = generalSettings.openaiModel || 'gpt-4o-mini';
 	}
 }
 
@@ -18,7 +18,7 @@ let lastRequestTime = 0;
 
 export async function sendToLLM(userPrompt: string, content: string, promptVariables: PromptVariable[]): Promise<{ userResponse: string; promptResponses: any[] }> {
 	const apiKey = generalSettings.openaiApiKey;
-	const model = generalSettings.openaiModel || 'gpt-3.5-turbo';
+	const model = generalSettings.openaiModel || 'gpt-4o-mini';
 
 	if (!apiKey) {
 		throw new Error('OpenAI API key is not set');

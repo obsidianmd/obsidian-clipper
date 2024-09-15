@@ -109,7 +109,7 @@ function initializeAutoSave(): void {
 
 function saveGeneralSettingsFromForm(): void {
 	const apiKeyInput = document.getElementById('openai-api-key') as HTMLInputElement;
-	const modelSelect = document.getElementById('openai-model') as HTMLSelectElement;
+	const modelSelect = document.getElementById('default-model') as HTMLSelectElement;
 	const showMoreActionsToggle = document.getElementById('show-more-actions-toggle') as HTMLInputElement;
 	const betaFeaturesToggle = document.getElementById('beta-features-toggle') as HTMLInputElement;
 

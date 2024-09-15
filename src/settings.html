@@ -101,20 +101,38 @@
 									</div>
 								</div>
 								<div>
-									<h3>Models</h3>
-									<div class="setting-item">
-										<label for="openai-model">Models list</label>
-										<select id="openai-model">
-											<option value="gpt-4o-mini">GPT-4o mini</option>
-											<option value="gpt-4o">GPT-4o</option>
-											<option value="gpt-4-turbo">GPT-4 Turbo</option>
-										</select>
+									<h3>Prompting</h3>
+									<div class="setting-item mod-horizontal">
+										<div class="setting-item-info">
+											<label for="default-model">Default model</label>
+											<div class="setting-item-description">Choose the default model for generating prompt variables.</div>
+										</div>
+										<div class="setting-item-control">
+											<select id="default-model">
+												<option value="gpt-4o-mini">GPT-4o mini</option>
+												<option value="gpt-4o">GPT-4o</option>
+												<option value="gpt-4-turbo">GPT-4 Turbo</option>
+											</select>
+										</div>
 									</div>
-									<div class="setting-item">
-										<label for="openai-api-key">OpenAI API key</label>
-										<input type="password" id="openai-api-key" placeholder="Enter your OpenAI API key">
+									<div class="setting-item mod-horizontal">
+										<div class="setting-item-info">
+											<label for="openai-api-key">OpenAI API key</label>
+											<div class="setting-item-description">You can get your OpenAI API key <a href="https://platform.openai.com/api-keys" target="_blank">here</a>.</div>
+										</div>
+										<div class="setting-item-control">
+											<input type="password" id="openai-api-key" placeholder="Enter your OpenAI API key">
+										</div>
 									</div>
-									
+									<div class="setting-item mod-horizontal">
+										<div class="setting-item-info">
+											<label for="openai-api-key">Anthropic API key</label>
+											<div class="setting-item-description">You can get your Anthropic API key <a href="https://console.anthropic.com/settings/keys" target="_blank">here</a>.</div>
+										</div>
+										<div class="setting-item-control">
+											<input type="password" id="anthropic-api-key" placeholder="Enter your Anthropic API key">
+										</div>
+									</div>
 								</div>
 						</form>
 					</div>
@@ -204,14 +222,14 @@
 									<div class="metadata-add-button"><a id="add-property-btn">+ Add property</a></div>
 								</div>
 								<div class="setting-item">
-									<label for="template-prompt">LLM prompt</label>
-									<div class="setting-item-description">Enter a prompt for the LLM to process the clipped content. Leave empty to skip LLM processing.</div>
-									<textarea id="template-prompt" rows="4" placeholder="Summarize the following content:"></textarea>
-								</div>
-								<div class="setting-item">
 									<label for="note-content-format">Note content</label>
 									<div class="setting-item-description">Customize the content of the note. Use variables to pre-populate data from the&nbsp;page.</div>
 									<textarea id="note-content-format" rows="6" placeholder="{{content}}"></textarea>
+								</div>
+								<div class="setting-item">
+									<label for="template-prompt">Prompt context</label>
+									<div class="setting-item-description">The context used to generate prompt variables. By default the context is the full HTML of the page, unless you specify custom context, such as a subset of the page. Variables can be used&nbsp;here.</div>
+									<textarea id="template-prompt" rows="4" placeholder="{{fullHtml}}"></textarea>
 								</div>
 							</div>
 						</form>
