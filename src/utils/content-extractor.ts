@@ -28,15 +28,16 @@ async function processVariable(match: string, variables: { [key: string]: string
 }
 
 async function processSelector(tabId: number, match: string, currentUrl: string): Promise<string> {
-	const selectorRegex = /{{selector:(.*?)(?:\|(.*?))?}}/;
+	const selectorRegex = /{{(selector|selectorHtml):(.*?)(?:\|(.*?))?}}/;
 	const matches = match.match(selectorRegex);
 	if (!matches) {
 		console.error('Invalid selector format:', match);
 		return match;
 	}
 
-	const [, selector, filtersString] = matches;
-	const { content } = await extractContentBySelector(tabId, selector);
+	const [, selectorType, selector, filtersString] = matches;
+	const extractHtml = selectorType === 'selectorHtml';
+	const { content } = await extractContentBySelector(tabId, selector, extractHtml);
 	
 	// Convert content to string if it's an array
 	const contentString = Array.isArray(content) ? JSON.stringify(content) : content;
@@ -119,7 +120,7 @@ export async function replaceVariables(tabId: number, text: string, variables: {
 	if (matches) {
 		for (const match of matches) {
 			let replacement: string;
-			if (match.startsWith('{{selector:')) {
+			if (match.startsWith('{{selector:') || match.startsWith('{{selectorHtml:')) {
 				replacement = await processSelector(tabId, match, currentUrl);
 			} else if (match.startsWith('{{schema:')) {
 				replacement = await processSchema(match, variables, currentUrl);
@@ -186,7 +187,7 @@ export function getMetaContent(doc: Document, attr: string, value: string): stri
 	return element ? element.getAttribute("content")?.trim() ?? "" : "";
 }
 
-export async function extractContentBySelector(tabId: number, selector: string): Promise<{ content: string; schemaOrgData: any }> {
+export async function extractContentBySelector(tabId: number, selector: string, extractHtml: boolean = false): Promise<{ content: string; schemaOrgData: any }> {
 	const attributeMatch = selector.match(/:([a-zA-Z-]+)$/);
 	let baseSelector = selector;
 	let attribute: string | undefined;
@@ -197,7 +198,12 @@ export async function extractContentBySelector(tabId: number, selector: string):
 	}
 
 	try {
-		const response = await browser.tabs.sendMessage(tabId, { action: "extractContent", selector: baseSelector, attribute: attribute });
+		const response = await browser.tabs.sendMessage(tabId, { 
+			action: "extractContent", 
+			selector: baseSelector, 
+			attribute: attribute,
+			extractHtml: extractHtml
+		});
 		let content = response ? response.content : '';
 		
 		// Ensure content is always a string
