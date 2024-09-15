@@ -12,6 +12,7 @@ import { loadTemplates, createDefaultTemplate } from '../managers/template-manag
 import browser from '../utils/browser-polyfill';
 import { detectBrowser, addBrowserClassToHtml } from '../utils/browser-detection';
 import { createElementWithClass, createElementWithHTML } from '../utils/dom-utils';
+import { sendToLLM } from '../utils/llm-utils';
 
 let currentTemplate: Template | null = null;
 let templates: Template[] = [];
@@ -483,6 +484,22 @@ document.addEventListener('DOMContentLoaded', async function() {
 				vaultDropdown.addEventListener('change', () => {
 					setLocalStorage('lastSelectedVault', vaultDropdown.value);
 				});
+			}
+
+			if (template && template.prompt) {
+				try {
+					const llmResponse = await sendToLLM(template.prompt, variables.content || '');
+					console.log('LLM Response:', llmResponse);
+					
+					// For now, let's just add the LLM response to the note content
+					const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
+					if (noteContentField) {
+						noteContentField.value = `LLM Response:\n\n${llmResponse}\n\n${noteContentField.value}`;
+					}
+				} catch (error) {
+					console.error('Error getting LLM response:', error);
+					// You might want to show an error message to the user here
+				}
 			}
 		}
 

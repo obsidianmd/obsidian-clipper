@@ -5,6 +5,7 @@ import { initializeToggles } from '../utils/ui-utils';
 import { generalSettings, loadGeneralSettings, saveGeneralSettings } from '../utils/storage-utils';
 import { detectBrowser } from '../utils/browser-detection';
 import { createElementWithClass, createElementWithHTML } from '../utils/dom-utils';
+import { initializeLLMSettings } from '../utils/llm-utils';
 
 export function updateVaultList(): void {
 	const vaultList = document.getElementById('vault-list') as HTMLUListElement;
@@ -94,6 +95,7 @@ export function initializeGeneralSettings(): void {
 		initializeKeyboardShortcuts();
 		initializeToggles();
 		setShortcutInstructions();
+		initializeLLMSettings();
 	});
 }
 

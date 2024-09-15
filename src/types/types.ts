@@ -8,6 +8,7 @@ export interface Template {
 	properties: Property[];
 	triggers?: string[];
 	vault?: string;
+	prompt?: string;
 }
 
 export interface Property {
