@@ -275,22 +275,6 @@ function updateLLMResponse(response: string) {
 		llmErrorMessage.style.display = 'none';
 		llmErrorMessage.textContent = '';
 	}
-
-	const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
-	if (noteContentField) {
-		// If the response is a stringified array, parse it and format it
-		try {
-			const parsedResponse = JSON.parse(response);
-			if (Array.isArray(parsedResponse)) {
-				noteContentField.value = JSON.stringify(parsedResponse, null, 2);
-			} else {
-				noteContentField.value = response;
-			}
-		} catch {
-			// If parsing fails, it's not a JSON string, so use it as-is
-			noteContentField.value = response;
-		}
-	}
 }
 
 export function updateFieldsWithLLMResponses(promptVariables: PromptVariable[], promptResponses: any[]) {
@@ -303,18 +287,23 @@ export function updateFieldsWithLLMResponses(promptVariables: PromptVariable[], 
 					let value = response.user_response;
 					
 					if (filters) {
-						const filterNames = filters.slice(1).split('|');
+						const filterNames = filters.slice(1).split('|').filter(Boolean);
 						value = applyFilters(value, filterNames);
 					}
 					
-					// Stringify only if the value is still an object or array after applying filters
+					// Handle array or object responses
 					if (typeof value === 'object') {
-						value = JSON.stringify(value, null, 2);
+						try {
+							value = JSON.stringify(value, null, 2);
+						} catch (error) {
+							console.error('Error stringifying object:', error);
+							value = String(value);
+						}
 					}
 					
 					return value;
 				}
-				return match;
+				return match; // Return original if no match found
 			});
 		}
 	});
