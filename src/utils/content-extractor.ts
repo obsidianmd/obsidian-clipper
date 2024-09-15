@@ -94,12 +94,17 @@ async function processSchema(match: string, variables: { [key: string]: string }
 	return applyFilters(schemaValue, filtersString, currentUrl);
 }
 
+async function processPrompt(match: string, variables: { [key: string]: string }, currentUrl: string): Promise<string> {
+	// Return the original match without processing
+	return match;
+}
+
 function getNestedProperty(obj: any, path: string): any {
 	return path.split('.').reduce((prev, curr) => prev && prev[curr], obj);
 }
 
 export async function replaceVariables(tabId: number, text: string, variables: { [key: string]: string }, currentUrl: string): Promise<string> {
-	const regex = /{{(?:schema:)?(?:selector:)?(.*?)}}/g;
+	const regex = /{{(?:schema:)?(?:selector:)?(?:prompt:)?(.*?)}}/g;
 	const matches = text.match(regex);
 
 	if (matches) {
@@ -109,6 +114,8 @@ export async function replaceVariables(tabId: number, text: string, variables: {
 				replacement = await processSelector(tabId, match, currentUrl);
 			} else if (match.startsWith('{{schema:')) {
 				replacement = await processSchema(match, variables, currentUrl);
+			} else if (match.startsWith('{{prompt:')) {
+				replacement = await processPrompt(match, variables, currentUrl);
 			} else {
 				const [variableName, ...filterParts] = match.slice(2, -2).split('|');
 				let value = variables[`{{${variableName}}}`] || '';

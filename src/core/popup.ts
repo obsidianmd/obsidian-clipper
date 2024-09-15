@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { Template, Property } from '../types/types';
+import { Template, Property, PromptVariable } from '../types/types';
 import { generateFrontmatter, saveToObsidian } from '../utils/obsidian-note-creator';
 import { sanitizeFileName } from '../utils/string-utils';
 import { extractPageContent, initializePageContent, replaceVariables } from '../utils/content-extractor';
@@ -106,6 +106,67 @@ async function handleClip() {
 	fileContent = frontmatter + noteContent;
 
 	try {
+		const promptVariables: PromptVariable[] = [];
+		const promptRegex = /{{prompt:"(.*?)"}}/g;
+		let match;
+
+		// Collect all prompt variables from the entire template (including properties)
+		const templateContent = JSON.stringify(currentTemplate);
+		while ((match = promptRegex.exec(templateContent)) !== null) {
+			const prompt = match[1];
+			const key = `prompt_${promptVariables.length + 1}`;
+			promptVariables.push({ key, prompt });
+		}
+
+		if (promptVariables.length > 0 || currentTemplate.prompt) {
+			const { userResponse, promptResponses } = await sendToLLM(currentTemplate.prompt || '', noteContent, promptVariables);
+
+			// Update the note content field with the user prompt response
+			if (currentTemplate.prompt) {
+				noteContentField.value = `${userResponse}\n\n${noteContentField.value}`;
+			}
+
+			// Replace prompt variables in all fields
+			const fields = document.querySelectorAll('input, textarea');
+			fields.forEach((field) => {
+				if (field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement) {
+					let fieldContent = field.value;
+					for (const { key, prompt } of promptVariables) {
+						const response = promptResponses[key] || `[No response for: ${prompt}]`;
+						fieldContent = fieldContent.replace(`{{prompt:"${prompt}"}}`, response);
+					}
+					field.value = fieldContent;
+				}
+			});
+
+			// Update properties
+			const propertyInputs = document.querySelectorAll('.metadata-property input');
+			propertyInputs.forEach((input) => {
+				if (input instanceof HTMLInputElement) {
+					let inputValue = input.value;
+					for (const { key, prompt } of promptVariables) {
+						const response = promptResponses[key] || `[No response for: ${prompt}]`;
+						inputValue = inputValue.replace(`{{prompt:"${prompt}"}}`, response);
+					}
+					input.value = inputValue;
+				}
+			});
+		}
+
+		// Regenerate file content with updated fields
+		const updatedProperties = Array.from(document.querySelectorAll('.metadata-property input')).map(input => ({
+			name: input.id,
+			value: (input as HTMLInputElement).value,
+			type: input.getAttribute('data-type') || 'text'
+		}));
+
+		if (currentTemplate.behavior === 'create') {
+			const frontmatter = await generateFrontmatter(updatedProperties as Property[]);
+			fileContent = frontmatter + noteContentField.value;
+		} else {
+			fileContent = noteContentField.value;
+		}
+
 		await saveToObsidian(fileContent, noteName, path, selectedVault, currentTemplate.behavior);
 		setTimeout(() => window.close(), 50);
 	} catch (error) {
@@ -514,18 +575,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 								console.log('Prompt to be sent to LLM:', promptToUse);
 
-								const llmResponse = await sendToLLM(promptToUse, contentToProcess);
-								console.log('LLM Response:', llmResponse);
-								
-								if (llmResponseDiv) {
-									llmResponseDiv.textContent = llmResponse;
-									llmResponseDiv.style.display = 'block';
-								}
-
-								const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
-								if (noteContentField) {
-									noteContentField.value = `${llmResponse}\n\n${noteContentField.value}`;
-								}
+								await processLLM(promptToUse, contentToProcess);
 							} else {
 								console.log('Skipping LLM processing: missing tab ID, URL, or prompt');
 							}
@@ -689,3 +739,79 @@ document.addEventListener('DOMContentLoaded', async function() {
 		showError('Failed to initialize the extension. Please try reloading the page.');
 	}
 });
+
+// Update the existing LLM processing function
+async function processLLM(promptToUse: string, contentToProcess: string): Promise<void> {
+	try {
+	if (!loadedSettings.openaiApiKey) {
+		console.warn('OpenAI API key is not set. Skipping LLM processing.');
+		showError('OpenAI API key is not set. Please set it in the extension settings.');
+		return;
+	}
+
+	const promptVariables: PromptVariable[] = [];
+	const promptRegex = /{{prompt:"(.*?)"}}/g;
+	let match;
+
+	// Collect all prompt variables from the entire template
+	const templateContent = JSON.stringify(currentTemplate);
+	while ((match = promptRegex.exec(templateContent)) !== null) {
+		const prompt = match[1];
+		const key = `prompt_${promptVariables.length + 1}`;
+		promptVariables.push({ key, prompt });
+	}
+
+	console.log('Prompt to be sent to LLM:', promptToUse);
+
+	const { userResponse, promptResponses } = await sendToLLM(promptToUse, contentToProcess, promptVariables);
+	console.log('LLM Response:', { userResponse, promptResponses });
+
+	const llmResponseDiv = document.getElementById('llm-response');
+	if (llmResponseDiv) {
+		llmResponseDiv.textContent = userResponse;
+		llmResponseDiv.style.display = 'block';
+	}
+
+	const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
+	if (noteContentField) {
+		noteContentField.value = `${userResponse}\n\n${noteContentField.value}`;
+	}
+
+	// Replace prompt variables in all fields
+	const fields = document.querySelectorAll('input, textarea');
+	fields.forEach((field) => {
+		if (field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement) {
+			let fieldContent = field.value;
+			for (const { key, prompt } of promptVariables) {
+				const response = promptResponses[key] || `[No response for: ${prompt}]`;
+				fieldContent = fieldContent.replace(`{{prompt:"${prompt}"}}`, response);
+			}
+			field.value = fieldContent;
+		}
+	});
+
+	// Update properties
+	const propertyInputs = document.querySelectorAll('.metadata-property input');
+	propertyInputs.forEach((input) => {
+		if (input instanceof HTMLInputElement) {
+			let inputValue = input.value;
+			for (const { key, prompt } of promptVariables) {
+				const response = promptResponses[key] || `[No response for: ${prompt}]`;
+				inputValue = inputValue.replace(`{{prompt:"${prompt}"}}`, response);
+			}
+			input.value = inputValue;
+		}
+	});
+	} catch (error) {
+	console.error('Error getting LLM response:', error);
+	if (error instanceof Error) {
+		if (error.message.includes('rate limit')) {
+		showError(`LLM Error: ${error.message} The LLM response will be skipped for now.`);
+		} else {
+		showError(`LLM Error: ${error.message}`);
+		}
+	} else {
+		showError('An unknown error occurred while processing the LLM request.');
+	}
+	}
+}

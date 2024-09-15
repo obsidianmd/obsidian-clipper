@@ -13,7 +13,12 @@ export function initializeLLMSettings(): void {
 const RATE_LIMIT_RESET_TIME = 60000; // 1 minute in milliseconds
 let lastRequestTime = 0;
 
-export async function sendToLLM(prompt: string, content: string): Promise<string> {
+interface PromptVariable {
+  key: string;
+  prompt: string;
+}
+
+export async function sendToLLM(userPrompt: string, content: string, promptVariables: PromptVariable[]): Promise<{ userResponse: string; promptResponses: { [key: string]: string } }> {
 	const apiKey = generalSettings.openaiApiKey;
 	const model = generalSettings.openaiModel || 'gpt-3.5-turbo';
 
@@ -28,14 +33,17 @@ export async function sendToLLM(prompt: string, content: string): Promise<string
 	}
 
 	try {
-		const messageContent = `${prompt}\n\nContent: ${content}`;
+		const systemContent = JSON.stringify(promptVariables.reduce((acc: { [key: string]: string }, { key, prompt }) => {
+			acc[key] = prompt;
+			return acc;
+		}, {}));
 
 		const requestBody = {
 			model: model,
 			messages: [
-				{ role: 'system', content: 'You are a helpful assistant.' },
-				{ role: 'user', content: messageContent }
-			]
+					{ role: 'system', content: `You are a helpful assistant. Please respond to the following prompts in JSON format: ${systemContent}` },
+					{ role: 'user', content: `${userPrompt}\n\nContent: ${content}` }
+				]
 		};
 
 		console.log('Sending request to OpenAI API:', requestBody);
