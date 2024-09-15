@@ -14,7 +14,7 @@ export function initializeLLMSettings(): void {
 const RATE_LIMIT_RESET_TIME = 60000; // 1 minute in milliseconds
 let lastRequestTime = 0;
 
-export async function sendToLLM(userPrompt: string, content: string, promptVariables: PromptVariable[]): Promise<{ userResponse: string; promptResponses: { [key: string]: string } }> {
+export async function sendToLLM(userPrompt: string, content: string, promptVariables: PromptVariable[]): Promise<{ userResponse: string; promptResponses: any[] }> {
 	const apiKey = generalSettings.openaiApiKey;
 	const model = generalSettings.openaiModel || 'gpt-3.5-turbo';
 
@@ -72,7 +72,7 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 		const llmResponse = JSON.parse(data.choices[0].message.content);
 		return {
 			userResponse: llmResponse.user_response || '',
-			promptResponses: llmResponse.variable_responses || {}
+			promptResponses: llmResponse.variable_responses || []
 		};
 	} catch (error) {
 		console.error('Error in sendToLLM:', error);

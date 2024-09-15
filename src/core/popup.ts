@@ -108,20 +108,25 @@ function collectPromptVariables(template: Template | null): PromptVariable[] {
 	return promptVariables;
 }
 
-function updateFieldsWithLLMResponses(promptVariables: PromptVariable[], promptResponses: { [key: string]: string }) {
+function updateFieldsWithLLMResponses(promptVariables: PromptVariable[], promptResponses: any[]) {
 	const allInputs = document.querySelectorAll('input, textarea');
 	allInputs.forEach((input) => {
 		if (input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement) {
-			input.value = input.value.replace(/{{prompt:".*?"}}/g, (match) => {
-				const promptText = match.match(/{{prompt:"(.*?)"}}/)?.[1];
-				if (promptText) {
-					const variable = promptVariables.find(v => v.prompt === promptText);
-					return variable ? (promptResponses[variable.key] || match) : match;
-				}
-				return match;
+			input.value = input.value.replace(/{{prompt:"(.*?)"}}/g, (match, promptText) => {
+				const response = promptResponses.find(r => r.prompt === promptText);
+				return response ? response.user_response : match;
 			});
 		}
 	});
+
+	// Update the note content field separately
+	const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
+	if (noteContentField) {
+		noteContentField.value = noteContentField.value.replace(/{{prompt:"(.*?)"}}/g, (match, promptText) => {
+			const response = promptResponses.find(r => r.prompt === promptText);
+			return response ? response.user_response : match;
+		});
+	}
 }
 
 async function handleClip() {
