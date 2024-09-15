@@ -19,18 +19,9 @@
 				<select id="template-select">
 					<option value="">Select a template</option>
 				</select>
-			</div>
-			<textarea id="note-name-field" type="text" placeholder="Note name" rows="1"></textarea>
-			<div class="metadata-properties-header">
-				Properties
-				<i data-lucide="chevron-down"></i>
-			</div>
-			<div class="metadata-properties"></div>
-			<div id="note-content-container">
-				<textarea id="note-content-field" rows="4" placeholder="Notes about this page..."></textarea>
-			</div>
-			<div class="clipper-footer">
-				<div id="llm-container" style="display: none;">
+
+		<div class="clipper-footer">
+			<div id="llm-container" style="display: none;">
 					<textarea id="template-prompt" class="template-prompt" rows="3" placeholder="Enter your prompt here..."></textarea>
 					<button id="process-llm-btn">Process with LLM</button>
 					<div id="llm-response" style="display: none;"></div>

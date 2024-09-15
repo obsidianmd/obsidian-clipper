@@ -61,7 +61,7 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 			} else {
 				const errorData = await response.json();
 				console.error('OpenAI API error response:', errorData);
-				throw new Error(`OpenAI API error: ${response.statusText}. ${errorData.error?.message || ''}`);
+				throw new Error(`OpenAI API error: ${response.statusText} ${errorData.error?.message || ''}`);
 			}
 		}
 
@@ -148,7 +148,7 @@ export async function processLLM(
 	} catch (error) {
 		console.error('Error getting LLM response:', error);
 		if (error instanceof Error) {
-			throw new Error(`LLM Error: ${error.message}`);
+			throw new Error(`${error.message}`);
 		} else {
 			throw new Error('An unknown error occurred while processing the LLM request.');
 		}
@@ -218,8 +218,13 @@ export async function initializeLLMComponents(template: Template, variables: { [
 
 export async function handleLLMProcessing(template: Template, variables: { [key: string]: string }, tabId: number, currentUrl: string) {
 	const processLlmBtn = document.getElementById('process-llm-btn') as HTMLButtonElement;
+	const llmErrorMessage = document.getElementById('llm-error-message') as HTMLDivElement;
 	
 	try {
+		// Hide any previous error message
+		llmErrorMessage.style.display = 'none';
+		llmErrorMessage.textContent = '';
+
 		const contentToProcess = variables.content || '';
 		const templatePromptTextarea = document.getElementById('template-prompt') as HTMLTextAreaElement;
 		
@@ -256,6 +261,10 @@ export async function handleLLMProcessing(template: Template, variables: { [key:
 		processLlmBtn.textContent = 'Process with LLM';
 		processLlmBtn.classList.remove('processing');
 
+		// Display the error message
+		llmErrorMessage.textContent = error instanceof Error ? error.message : 'An unknown error occurred while processing the LLM request.';
+		llmErrorMessage.style.display = 'block';
+
 		if (error instanceof Error) {
 			throw error;
 		} else {
@@ -266,9 +275,14 @@ export async function handleLLMProcessing(template: Template, variables: { [key:
 
 function updateLLMResponse(response: string) {
 	const llmResponseDiv = document.getElementById('llm-response');
+	const llmErrorMessage = document.getElementById('llm-error-message');
 	if (llmResponseDiv) {
 		llmResponseDiv.textContent = response;
 		llmResponseDiv.style.display = 'block';
+	}
+	if (llmErrorMessage) {
+		llmErrorMessage.style.display = 'none';
+		llmErrorMessage.textContent = '';
 	}
 
 	const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;

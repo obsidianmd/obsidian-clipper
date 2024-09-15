@@ -33,4 +33,17 @@
 			cursor: not-allowed;
 		}
 	}
+	#llm-error-message {
+		border: 1px solid var(--background-modifier-border);
+		border-radius: 4px;
+		padding: 8px;
+		font-size: var(--font-ui-smaller);
+		color: var(--text-error);
+		white-space: pre-wrap;
+		word-break: break-word;
+		max-height: 150px;
+		overflow-y: auto;
+		display: none;
+		line-height: 1.2;
+	}
 }

@@ -21,6 +21,7 @@
 	--radius-s: 4px;
 	--radius-m: 8px;
 
+	--text-error: var(--color-red);
 	--text-normal: var(--color-base-100);
 	--text-muted: var(--color-base-70);
 	--text-faint: var(--color-base-50);
@@ -89,6 +90,7 @@
 		--color-base-100: #222222;
 
 		--color-orange-rgb: 236, 117, 0;
+		--color-red: #e93147;
 
 		--mono-rgb-0: 255, 255, 255;
 		--mono-rgb-100: 0, 0, 0;
@@ -159,6 +161,8 @@
 		--color-base-100: #dadada;
 		
 		--color-orange-rgb: 233, 151, 63;
+
+		--color-red: #fb464c;
 
 		--interactive-accent: var(--color-accent);
 		--interactive-accent-hover: var(--color-accent-1);
