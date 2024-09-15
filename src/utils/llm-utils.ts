@@ -1,4 +1,5 @@
 import { generalSettings } from './storage-utils';
+import { PromptVariable } from '../types/types';
 
 export function initializeLLMSettings(): void {
 	const apiKeyInput = document.getElementById('openai-api-key') as HTMLInputElement;
@@ -12,11 +13,6 @@ export function initializeLLMSettings(): void {
 
 const RATE_LIMIT_RESET_TIME = 60000; // 1 minute in milliseconds
 let lastRequestTime = 0;
-
-interface PromptVariable {
-  key: string;
-  prompt: string;
-}
 
 export async function sendToLLM(userPrompt: string, content: string, promptVariables: PromptVariable[]): Promise<{ userResponse: string; promptResponses: { [key: string]: string } }> {
 	const apiKey = generalSettings.openaiApiKey;
@@ -33,17 +29,17 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 	}
 
 	try {
-		const systemContent = JSON.stringify(promptVariables.reduce((acc: { [key: string]: string }, { key, prompt }) => {
-			acc[key] = prompt;
-			return acc;
-		}, {}));
+		const systemContent = {
+			variables: promptVariables.map(({ key, prompt }) => ({ key, prompt })),
+			instructions: "Please respond to the user prompt and each variable prompt. Format your response as a JSON object with 'user_response' for the main prompt and 'variable_responses' for the variable prompts."
+		};
 
 		const requestBody = {
 			model: model,
 			messages: [
-					{ role: 'system', content: `You are a helpful assistant. Please respond to the following prompts in JSON format: ${systemContent}` },
-					{ role: 'user', content: `${userPrompt}\n\nContent: ${content}` }
-				]
+				{ role: 'system', content: JSON.stringify(systemContent) },
+				{ role: 'user', content: `${userPrompt}\n\nContent: ${content}` }
+			]
 		};
 
 		console.log('Sending request to OpenAI API:', requestBody);
@@ -72,7 +68,12 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 		console.log('OpenAI API response:', data);
 
 		lastRequestTime = now; // Set the last request time on successful request
-		return data.choices[0].message.content;
+
+		const llmResponse = JSON.parse(data.choices[0].message.content);
+		return {
+			userResponse: llmResponse.user_response || '',
+			promptResponses: llmResponse.variable_responses || {}
+		};
 	} catch (error) {
 		console.error('Error in sendToLLM:', error);
 		throw error;

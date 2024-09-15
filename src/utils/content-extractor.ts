@@ -95,6 +95,15 @@ async function processSchema(match: string, variables: { [key: string]: string }
 }
 
 async function processPrompt(match: string, variables: { [key: string]: string }, currentUrl: string): Promise<string> {
+	const promptRegex = /{{prompt:"(.*?)"(?:\|(.*?))?}}/;
+	const matches = match.match(promptRegex);
+	if (!matches) {
+		console.error('Invalid prompt format:', match);
+		return match;
+	}
+
+	const [, promptText, context = ''] = matches;
+	
 	// Return the original match without processing
 	return match;
 }

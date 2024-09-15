@@ -113,7 +113,7 @@ async function handleClip() {
 		// Collect all prompt variables from the entire template (including properties)
 		const templateContent = JSON.stringify(currentTemplate);
 		while ((match = promptRegex.exec(templateContent)) !== null) {
-			const prompt = match[1];
+			const [, prompt] = match;
 			const key = `prompt_${promptVariables.length + 1}`;
 			promptVariables.push({ key, prompt });
 		}
@@ -140,8 +140,9 @@ async function handleClip() {
 			});
 
 			// Update properties
-			const propertyInputs = document.querySelectorAll('.metadata-property input');
-			propertyInputs.forEach((input) => {
+			const propertyInputs = document.querySelectorAll('.metadata-property');
+			propertyInputs.forEach((propertyDiv) => {
+				const input = propertyDiv.querySelector('input');
 				if (input instanceof HTMLInputElement) {
 					let inputValue = input.value;
 					for (const { key, prompt } of promptVariables) {
@@ -448,7 +449,10 @@ document.addEventListener('DOMContentLoaded', async function() {
 			}
 
 			for (const property of template.properties) {
+
 				const propertyDiv = createElementWithClass('div', 'metadata-property');
+				propertyDiv.dataset.id = property.id; // Add the property ID to the element
+
 				let value = await replaceVariables(tabId, unescapeValue(property.value), variables, currentUrl);
 
 				// Apply type-specific parsing
@@ -578,6 +582,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 								await processLLM(promptToUse, contentToProcess);
 							} else {
 								console.log('Skipping LLM processing: missing tab ID, URL, or prompt');
+								showError('Skipping LLM processing: missing tab ID, URL, or prompt');
 							}
 						} catch (error) {
 							console.error('Error getting LLM response:', error);
@@ -740,78 +745,78 @@ document.addEventListener('DOMContentLoaded', async function() {
 	}
 });
 
-// Update the existing LLM processing function
 async function processLLM(promptToUse: string, contentToProcess: string): Promise<void> {
 	try {
-	if (!loadedSettings.openaiApiKey) {
-		console.warn('OpenAI API key is not set. Skipping LLM processing.');
-		showError('OpenAI API key is not set. Please set it in the extension settings.');
-		return;
-	}
-
-	const promptVariables: PromptVariable[] = [];
-	const promptRegex = /{{prompt:"(.*?)"}}/g;
-	let match;
-
-	// Collect all prompt variables from the entire template
-	const templateContent = JSON.stringify(currentTemplate);
-	while ((match = promptRegex.exec(templateContent)) !== null) {
-		const prompt = match[1];
-		const key = `prompt_${promptVariables.length + 1}`;
-		promptVariables.push({ key, prompt });
-	}
-
-	console.log('Prompt to be sent to LLM:', promptToUse);
-
-	const { userResponse, promptResponses } = await sendToLLM(promptToUse, contentToProcess, promptVariables);
-	console.log('LLM Response:', { userResponse, promptResponses });
-
-	const llmResponseDiv = document.getElementById('llm-response');
-	if (llmResponseDiv) {
-		llmResponseDiv.textContent = userResponse;
-		llmResponseDiv.style.display = 'block';
-	}
-
-	const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
-	if (noteContentField) {
-		noteContentField.value = `${userResponse}\n\n${noteContentField.value}`;
-	}
-
-	// Replace prompt variables in all fields
-	const fields = document.querySelectorAll('input, textarea');
-	fields.forEach((field) => {
-		if (field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement) {
-			let fieldContent = field.value;
-			for (const { key, prompt } of promptVariables) {
-				const response = promptResponses[key] || `[No response for: ${prompt}]`;
-				fieldContent = fieldContent.replace(`{{prompt:"${prompt}"}}`, response);
-			}
-			field.value = fieldContent;
+		if (!loadedSettings.openaiApiKey) {
+			console.warn('OpenAI API key is not set. Skipping LLM processing.');
+			showError('OpenAI API key is not set. Please set it in the extension settings.');
+			return;
 		}
-	});
 
-	// Update properties
-	const propertyInputs = document.querySelectorAll('.metadata-property input');
-	propertyInputs.forEach((input) => {
-		if (input instanceof HTMLInputElement) {
-			let inputValue = input.value;
-			for (const { key, prompt } of promptVariables) {
-				const response = promptResponses[key] || `[No response for: ${prompt}]`;
-				inputValue = inputValue.replace(`{{prompt:"${prompt}"}}`, response);
-			}
-			input.value = inputValue;
+		const promptVariables: PromptVariable[] = [];
+		const promptRegex = /{{prompt:"(.*?)"}}/g;
+		let match;
+
+		// Collect all prompt variables from the entire template
+		const templateContent = JSON.stringify(currentTemplate);
+		while ((match = promptRegex.exec(templateContent)) !== null) {
+			const [, prompt] = match;
+			const key = `prompt_${promptVariables.length + 1}`;
+			promptVariables.push({ key, prompt });
 		}
-	});
+
+		console.log('Prompts to be sent to LLM:', { userPrompt: promptToUse, promptVariables });
+
+		const { userResponse, promptResponses } = await sendToLLM(promptToUse, contentToProcess, promptVariables);
+		console.log('LLM Response:', { userResponse, promptResponses });
+
+		const llmResponseDiv = document.getElementById('llm-response');
+		if (llmResponseDiv) {
+			llmResponseDiv.textContent = userResponse;
+			llmResponseDiv.style.display = 'block';
+		}
+
+		const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
+		if (noteContentField) {
+			noteContentField.value = `${userResponse}\n\n${noteContentField.value}`;
+		}
+
+		// Replace prompt variables in all fields
+		const fields = document.querySelectorAll('input, textarea');
+		fields.forEach((field) => {
+			if (field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement) {
+				let fieldContent = field.value;
+				for (const { key, prompt } of promptVariables) {
+					const response = promptResponses[key] || `[No response for: ${prompt}]`;
+					fieldContent = fieldContent.replace(`{{prompt:"${prompt}"}}`, response);
+				}
+				field.value = fieldContent;
+			}
+		});
+
+		// Update properties
+		const propertyInputs = document.querySelectorAll('.metadata-property');
+		propertyInputs.forEach((propertyDiv) => {
+			const input = propertyDiv.querySelector('input');
+			if (input instanceof HTMLInputElement) {
+				let inputValue = input.value;
+				for (const { key, prompt } of promptVariables) {
+					const response = promptResponses[key] || `[No response for: ${prompt}]`;
+					inputValue = inputValue.replace(`{{prompt:"${prompt}"}}`, response);
+				}
+				input.value = inputValue;
+			}
+		});
 	} catch (error) {
-	console.error('Error getting LLM response:', error);
-	if (error instanceof Error) {
-		if (error.message.includes('rate limit')) {
-		showError(`LLM Error: ${error.message} The LLM response will be skipped for now.`);
+		console.error('Error getting LLM response:', error);
+		if (error instanceof Error) {
+			if (error.message.includes('rate limit')) {
+				showError(`LLM Error: ${error.message} The LLM response will be skipped for now.`);
+			} else {
+				showError(`LLM Error: ${error.message}`);
+			}
 		} else {
-		showError(`LLM Error: ${error.message}`);
+			showError('An unknown error occurred while processing the LLM request.');
 		}
-	} else {
-		showError('An unknown error occurred while processing the LLM request.');
-	}
 	}
 }
