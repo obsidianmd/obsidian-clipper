@@ -12,7 +12,7 @@ import { loadTemplates, createDefaultTemplate } from '../managers/template-manag
 import browser from '../utils/browser-polyfill';
 import { detectBrowser, addBrowserClassToHtml } from '../utils/browser-detection';
 import { createElementWithClass, createElementWithHTML } from '../utils/dom-utils';
-import { processLLM, collectPromptVariables } from '../utils/llm-utils';
+import { initializeLLMComponents, handleLLMProcessing } from '../utils/llm-utils';
 
 let currentTemplate: Template | null = null;
 let templates: Template[] = [];
@@ -64,39 +64,6 @@ function showError(message: string): void {
 function logError(message: string, error?: any): void {
 	console.error(message, error);
 	showError(message);
-}
-
-function updateFieldsWithLLMResponses(promptVariables: PromptVariable[], promptResponses: any[]) {
-	const allInputs = document.querySelectorAll('input, textarea');
-	allInputs.forEach((input) => {
-	if (input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement) {
-		input.value = input.value.replace(/{{prompt:"(.*?)"}}/g, (match, promptText) => {
-		const response = promptResponses.find(r => r.prompt === promptText);
-		if (response) {
-			if (Array.isArray(response.user_response)) {
-				return response.user_response.join('\n- ');
-			}
-			return response.user_response || '';
-		}
-		return match;
-		});
-	}
-	});
-
-	// Update the note content field separately
-	const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
-	if (noteContentField) {
-	noteContentField.value = noteContentField.value.replace(/{{prompt:"(.*?)"}}/g, (match, promptText) => {
-		const response = promptResponses.find(r => r.prompt === promptText);
-		if (response) {
-		if (Array.isArray(response.user_response)) {
-			return response.user_response.join('\n- ');
-		}
-		return response.user_response || '';
-		}
-		return match;
-	});
-	}
 }
 
 async function handleClip() {
@@ -550,64 +517,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 				});
 			}
 
-			const llmContainer = document.getElementById('llm-container');
-			const processLlmBtn = document.getElementById('process-llm-btn');
-			const llmResponseDiv = document.getElementById('llm-response');
-			const templatePromptTextarea = document.getElementById('template-prompt') as HTMLTextAreaElement;
-
-			if (template && template.prompt) {
-				if (llmContainer) llmContainer.style.display = 'flex';
-				if (templatePromptTextarea) {
-					let promptToDisplay = await replaceVariables(tabId, template.prompt, variables, currentUrl);
-					templatePromptTextarea.value = promptToDisplay;
-					templatePromptTextarea.style.display = 'block';
-				}
-				if (processLlmBtn) {
-					processLlmBtn.addEventListener('click', async () => {
-						try {
-							const contentToProcess = variables.content || '';
-							if (currentTab?.id && currentTab.url && templatePromptTextarea) {
-								let promptToUse = templatePromptTextarea.value;
-
-								// Collect prompt variables including those from the current DOM state
-								const promptVariables = collectPromptVariables(currentTemplate);
-
-								console.log('Prompts to be sent to LLM:', { userPrompt: promptToUse, promptVariables });
-
-								await processLLM(
-									promptToUse,
-									contentToProcess,
-									promptVariables,
-									(response: string) => {
-										if (llmResponseDiv) {
-											llmResponseDiv.textContent = response;
-											llmResponseDiv.style.display = 'block';
-										}
-
-										const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
-										if (noteContentField) {
-											noteContentField.value = `${response}\n\n${noteContentField.value}`;
-										}
-									},
-									updateFieldsWithLLMResponses
-								);
-							} else {
-								console.log('Skipping LLM processing: missing tab ID, URL, or prompt');
-								showError('Skipping LLM processing: missing tab ID, URL, or prompt');
-							}
-						} catch (error) {
-							console.error('Error processing LLM:', error);
-							if (error instanceof Error) {
-								showError(error.message);
-							} else {
-								showError('An unknown error occurred while processing the LLM request.');
-							}
-						}
-					});
-				}
-			} else {
-				if (llmContainer) llmContainer.style.display = 'none';
-			}
+			await initializeLLMComponents(template, variables, tabId, currentUrl);
 
 			if (template) {
 				const replacedTemplate = await getReplacedTemplate(template, variables, tabId, currentUrl);

@@ -1,5 +1,6 @@
 import { generalSettings } from './storage-utils';
 import { PromptVariable, Template } from '../types/types';
+import { replaceVariables } from './content-extractor';
 
 export function initializeLLMSettings(): void {
 	const apiKeyInput = document.getElementById('openai-api-key') as HTMLInputElement;
@@ -192,4 +193,103 @@ export function collectPromptVariables(template: Template | null): PromptVariabl
 	});
 
 	return promptVariables;
+}
+
+export async function initializeLLMComponents(template: Template, variables: { [key: string]: string }, tabId: number, currentUrl: string) {
+	const llmContainer = document.getElementById('llm-container');
+	const processLlmBtn = document.getElementById('process-llm-btn');
+	const llmResponseDiv = document.getElementById('llm-response');
+	const templatePromptTextarea = document.getElementById('template-prompt') as HTMLTextAreaElement;
+
+	if (template && template.prompt) {
+		if (llmContainer) llmContainer.style.display = 'flex';
+		if (templatePromptTextarea) {
+			let promptToDisplay = await replaceVariables(tabId, template.prompt, variables, currentUrl);
+			templatePromptTextarea.value = promptToDisplay;
+			templatePromptTextarea.style.display = 'block';
+		}
+		if (processLlmBtn) {
+			processLlmBtn.addEventListener('click', () => handleLLMProcessing(template, variables, tabId, currentUrl));
+		}
+	} else {
+		if (llmContainer) llmContainer.style.display = 'none';
+	}
+}
+
+export async function handleLLMProcessing(template: Template, variables: { [key: string]: string }, tabId: number, currentUrl: string) {
+	try {
+		const contentToProcess = variables.content || '';
+		const templatePromptTextarea = document.getElementById('template-prompt') as HTMLTextAreaElement;
+		
+		if (tabId && currentUrl && templatePromptTextarea) {
+			let promptToUse = templatePromptTextarea.value;
+
+			const promptVariables = collectPromptVariables(template);
+
+			console.log('Prompts to be sent to LLM:', { userPrompt: promptToUse, promptVariables });
+
+			await processLLM(
+				promptToUse,
+				contentToProcess,
+				promptVariables,
+				updateLLMResponse,
+				updateFieldsWithLLMResponses
+			);
+		} else {
+			console.log('Skipping LLM processing: missing tab ID, URL, or prompt');
+			throw new Error('Skipping LLM processing: missing tab ID, URL, or prompt');
+		}
+	} catch (error) {
+		console.error('Error processing LLM:', error);
+		if (error instanceof Error) {
+			throw error;
+		} else {
+			throw new Error('An unknown error occurred while processing the LLM request.');
+		}
+	}
+}
+
+function updateLLMResponse(response: string) {
+	const llmResponseDiv = document.getElementById('llm-response');
+	if (llmResponseDiv) {
+		llmResponseDiv.textContent = response;
+		llmResponseDiv.style.display = 'block';
+	}
+
+	const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
+	if (noteContentField) {
+		noteContentField.value = `${response}\n\n${noteContentField.value}`;
+	}
+}
+
+export function updateFieldsWithLLMResponses(promptVariables: PromptVariable[], promptResponses: any[]) {
+	const allInputs = document.querySelectorAll('input, textarea');
+	allInputs.forEach((input) => {
+		if (input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement) {
+			input.value = input.value.replace(/{{prompt:"(.*?)"}}/g, (match, promptText) => {
+				const response = promptResponses.find(r => r.prompt === promptText);
+				if (response) {
+					if (Array.isArray(response.user_response)) {
+						return response.user_response.join('\n- ');
+					}
+					return response.user_response || '';
+				}
+				return match;
+			});
+		}
+	});
+
+	const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
+	if (noteContentField) {
+		noteContentField.value = noteContentField.value.replace(/{{prompt:"(.*?)"}}/g, (match, promptText) => {
+			const response = promptResponses.find(r => r.prompt === promptText);
+			if (response) {
+				if (Array.isArray(response.user_response)) {
+					return response.user_response.join('\n- ');
+				}
+				return response.user_response || '';
+			}
+			return match;
+		});
+	}
 }
