@@ -122,7 +122,7 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 			promptResponses
 		};
 	} catch (error) {
-		console.error('Error in sendToLLM:', error);
+		console.error('Error sending to LLM:', error);
 		throw error;
 	}
 }

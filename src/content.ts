@@ -34,7 +34,21 @@ browser.runtime.onMessage.addListener(function(request: any, sender: browser.Run
 
 		const schemaOrgData = extractSchemaOrgData();
 
-		const fullHtmlWithoutIndentation = document.documentElement.outerHTML
+		// Create a new DOMParser
+		const parser = new DOMParser();
+		// Parse the document's HTML
+		const doc = parser.parseFromString(document.documentElement.outerHTML, 'text/html');
+		
+		// Remove all script and style elements
+		doc.querySelectorAll('script, style').forEach(el => el.remove());
+
+		// Remove style attributes from all elements
+		doc.querySelectorAll('*').forEach(el => el.removeAttribute('style'));
+
+		// Get the modified HTML without scripts, styles, and style attributes
+		const cleanedHtml = doc.documentElement.outerHTML;
+
+		const fullHtmlWithoutIndentation = cleanedHtml
 			.replace(/\t/g, '') // Remove tabs
 			.replace(/^[ \t]+/gm, ''); // Remove leading spaces and tabs from each line
 
