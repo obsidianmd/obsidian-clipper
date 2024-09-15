@@ -783,8 +783,6 @@ async function processLLM(promptToUse: string, contentToProcess: string): Promis
 
 		const promptVariables = collectPromptVariables(currentTemplate);
 
-		console.log('Prompts to be sent to LLM:', { userPrompt: promptToUse, promptVariables });
-
 		const { userResponse, promptResponses } = await sendToLLM(promptToUse, contentToProcess, promptVariables);
 		console.log('LLM Response:', { userResponse, promptResponses });
 

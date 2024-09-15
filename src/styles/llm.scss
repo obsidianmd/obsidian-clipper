@@ -19,19 +19,17 @@
 		max-height: 150px;
 		display: none !important;
 	}
-}
-#process-llm-btn {
-	align-self: flex-start;
-}
-#llm-response {
-	background-color: var(--background-secondary);
-	border: 1px solid var(--background-modifier-border);
-	border-radius: 4px;
-	padding: 8px;
-	font-size: var(--font-ui-smaller);
-	color: var(--text-normal);
-	white-space: pre-wrap;
-	word-break: break-word;
-	max-height: 150px;
-	overflow-y: auto;
+	#llm-response {
+		background-color: var(--background-secondary);
+		border: 1px solid var(--background-modifier-border);
+		border-radius: 4px;
+		padding: 8px;
+		font-size: var(--font-ui-smaller);
+		color: var(--text-normal);
+		white-space: pre-wrap;
+		word-break: break-word;
+		max-height: 150px;
+		overflow-y: auto;
+		display: none !important;
+	}
 }

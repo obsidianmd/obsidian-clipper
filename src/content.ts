@@ -34,7 +34,7 @@ browser.runtime.onMessage.addListener(function(request: any, sender: browser.Run
 
 		const schemaOrgData = extractSchemaOrgData();
 
-		const fullHtmlWithoutIndentation = document.body.innerHTML
+		const fullHtmlWithoutIndentation = document.documentElement.outerHTML
 			.replace(/\t/g, '') // Remove tabs
 			.replace(/^[ \t]+/gm, ''); // Remove leading spaces and tabs from each line
 
