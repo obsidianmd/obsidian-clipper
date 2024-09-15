@@ -12,7 +12,7 @@ import { loadTemplates, createDefaultTemplate } from '../managers/template-manag
 import browser from '../utils/browser-polyfill';
 import { detectBrowser, addBrowserClassToHtml } from '../utils/browser-detection';
 import { createElementWithClass, createElementWithHTML } from '../utils/dom-utils';
-import { sendToLLM } from '../utils/llm-utils';
+import { processLLM, collectPromptVariables } from '../utils/llm-utils';
 
 let currentTemplate: Template | null = null;
 let templates: Template[] = [];
@@ -66,66 +66,36 @@ function logError(message: string, error?: any): void {
 	showError(message);
 }
 
-function collectPromptVariables(template: Template | null): PromptVariable[] {
-	const promptVariables: PromptVariable[] = [];
-	const promptRegex = /{{prompt:"(.*?)"}}/g;
-	let match;
-
-	// Collect prompt variables from the note content format
-	if (template?.noteContentFormat) {
-		while ((match = promptRegex.exec(template.noteContentFormat)) !== null) {
-			const [, prompt] = match;
-			const key = `prompt_${promptVariables.length + 1}`;
-			promptVariables.push({ key, prompt });
-		}
-	}
-
-	// Collect prompt variables from the properties
-	if (template?.properties) {
-		for (const property of template.properties) {
-			let propertyValue = property.value;
-			while ((match = promptRegex.exec(propertyValue)) !== null) {
-				const [, prompt] = match;
-				const key = `prompt_${promptVariables.length + 1}`;
-				promptVariables.push({ key, prompt });
-			}
-		}
-	}
-
-	// Collect prompt variables from all input fields
-	const allInputs = document.querySelectorAll('input, textarea');
-	allInputs.forEach((input) => {
-		if (input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement) {
-			let inputValue = input.value;
-			while ((match = promptRegex.exec(inputValue)) !== null) {
-				const [, prompt] = match;
-				const key = `prompt_${promptVariables.length + 1}`;
-				promptVariables.push({ key, prompt });
-			}
-		}
-	});
-
-	return promptVariables;
-}
-
 function updateFieldsWithLLMResponses(promptVariables: PromptVariable[], promptResponses: any[]) {
 	const allInputs = document.querySelectorAll('input, textarea');
 	allInputs.forEach((input) => {
-		if (input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement) {
-			input.value = input.value.replace(/{{prompt:"(.*?)"}}/g, (match, promptText) => {
-				const response = promptResponses.find(r => r.prompt === promptText);
-				return response ? response.user_response : match;
-			});
+	if (input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement) {
+		input.value = input.value.replace(/{{prompt:"(.*?)"}}/g, (match, promptText) => {
+		const response = promptResponses.find(r => r.prompt === promptText);
+		if (response) {
+			if (Array.isArray(response.user_response)) {
+				return response.user_response.join('\n- ');
+			}
+			return response.user_response || '';
 		}
+		return match;
+		});
+	}
 	});
 
 	// Update the note content field separately
 	const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
 	if (noteContentField) {
-		noteContentField.value = noteContentField.value.replace(/{{prompt:"(.*?)"}}/g, (match, promptText) => {
-			const response = promptResponses.find(r => r.prompt === promptText);
-			return response ? response.user_response : match;
-		});
+	noteContentField.value = noteContentField.value.replace(/{{prompt:"(.*?)"}}/g, (match, promptText) => {
+		const response = promptResponses.find(r => r.prompt === promptText);
+		if (response) {
+		if (Array.isArray(response.user_response)) {
+			return response.user_response.join('\n- ');
+		}
+		return response.user_response || '';
+		}
+		return match;
+	});
 	}
 }
 
@@ -595,31 +565,40 @@ document.addEventListener('DOMContentLoaded', async function() {
 				if (processLlmBtn) {
 					processLlmBtn.addEventListener('click', async () => {
 						try {
-							if (!loadedSettings.openaiApiKey) {
-								console.warn('OpenAI API key is not set. Skipping LLM processing.');
-								showError('OpenAI API key is not set. Please set it in the extension settings.');
-								return;
-							}
-
-							const contentToProcess = variables.content || ''; // Use empty string if content is undefined
+							const contentToProcess = variables.content || '';
 							if (currentTab?.id && currentTab.url && templatePromptTextarea) {
-								let promptToUse = templatePromptTextarea.value; // Use the current value of the textarea
+								let promptToUse = templatePromptTextarea.value;
 
-								console.log('Prompts to be sent to LLM:', { userPrompt: promptToUse, promptVariables: collectPromptVariables(currentTemplate) });
+								// Collect prompt variables including those from the current DOM state
+								const promptVariables = collectPromptVariables(currentTemplate);
 
-								await processLLM(promptToUse, contentToProcess);
+								console.log('Prompts to be sent to LLM:', { userPrompt: promptToUse, promptVariables });
+
+								await processLLM(
+									promptToUse,
+									contentToProcess,
+									promptVariables,
+									(response: string) => {
+										if (llmResponseDiv) {
+											llmResponseDiv.textContent = response;
+											llmResponseDiv.style.display = 'block';
+										}
+
+										const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
+										if (noteContentField) {
+											noteContentField.value = `${response}\n\n${noteContentField.value}`;
+										}
+									},
+									updateFieldsWithLLMResponses
+								);
 							} else {
 								console.log('Skipping LLM processing: missing tab ID, URL, or prompt');
 								showError('Skipping LLM processing: missing tab ID, URL, or prompt');
 							}
 						} catch (error) {
-							console.error('Error getting LLM response:', error);
+							console.error('Error processing LLM:', error);
 							if (error instanceof Error) {
-								if (error.message.includes('rate limit')) {
-									showError(`LLM Error: ${error.message} The LLM response will be skipped for now.`);
-								} else {
-									showError(`LLM Error: ${error.message}`);
-								}
+								showError(error.message);
 							} else {
 								showError('An unknown error occurred while processing the LLM request.');
 							}
@@ -811,4 +790,4 @@ async function processLLM(promptToUse: string, contentToProcess: string): Promis
 			showError('An unknown error occurred while processing the LLM request.');
 		}
 	}
-}
+});

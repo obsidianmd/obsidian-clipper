@@ -1,5 +1,5 @@
 import { generalSettings } from './storage-utils';
-import { PromptVariable } from '../types/types';
+import { PromptVariable, Template } from '../types/types';
 
 export function initializeLLMSettings(): void {
 	const apiKeyInput = document.getElementById('openai-api-key') as HTMLInputElement;
@@ -69,13 +69,127 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 
 		lastRequestTime = now; // Set the last request time on successful request
 
-		const llmResponse = JSON.parse(data.choices[0].message.content);
+		const llmResponseContent = data.choices[0].message.content;
+		console.log('Raw LLM response:', llmResponseContent);
+
+		// Remove code block markers if they exist
+		const cleanedResponse = llmResponseContent.replace(/^```json\n|\n```$/g, '');
+
+		// Try to parse the response as JSON, if it fails, return the raw response
+		let parsedResponse;
+		try {
+			parsedResponse = JSON.parse(cleanedResponse);
+		} catch (parseError) {
+			console.warn('Failed to parse LLM response as JSON. Using raw response.');
+			return {
+				userResponse: cleanedResponse,
+				promptResponses: []
+			};
+		}
+
+		const userResponse = parsedResponse.user_response || '';
+		let promptResponses: any[] = [];
+
+		if (parsedResponse.variable_responses) {
+			if (Array.isArray(parsedResponse.variable_responses)) {
+				promptResponses = parsedResponse.variable_responses.map((response: { [key: string]: any }) => ({
+					...response,
+					user_response: response.response || response.user_response
+				}));
+			} else if (typeof parsedResponse.variable_responses === 'object') {
+				promptResponses = Object.entries(parsedResponse.variable_responses).map(([key, value]) => ({
+					key,
+					prompt: promptVariables.find(v => v.key === key)?.prompt || '',
+					user_response: value
+				}));
+			}
+			promptResponses = promptResponses.map((response: { [key: string]: any }) => ({
+				...response,
+				user_response: response.user_response || response.response
+			}));
+		}
+
 		return {
-			userResponse: llmResponse.user_response || '',
-			promptResponses: llmResponse.variable_responses || []
+			userResponse,
+			promptResponses
 		};
 	} catch (error) {
 		console.error('Error in sendToLLM:', error);
 		throw error;
 	}
+}
+
+export async function processLLM(
+	promptToUse: string,
+	contentToProcess: string,
+	promptVariables: PromptVariable[],
+	updateUI: (response: string) => void,
+	updateFields: (variables: PromptVariable[], responses: any[]) => void
+): Promise<void> {
+	try {
+		if (!generalSettings.openaiApiKey) {
+			console.warn('OpenAI API key is not set. Skipping LLM processing.');
+			throw new Error('OpenAI API key is not set. Please set it in the extension settings.');
+		}
+
+		const { userResponse, promptResponses } = await sendToLLM(promptToUse, contentToProcess, promptVariables);
+		console.log('LLM Response:', { userResponse, promptResponses });
+
+		updateUI(userResponse);
+		
+		// Only update fields if promptResponses is not empty
+		if (promptResponses.length > 0) {
+			updateFields(promptVariables, promptResponses);
+		} else {
+			console.warn('No prompt responses received from LLM.');
+		}
+
+	} catch (error) {
+		console.error('Error getting LLM response:', error);
+		if (error instanceof Error) {
+			throw new Error(`LLM Error: ${error.message}`);
+		} else {
+			throw new Error('An unknown error occurred while processing the LLM request.');
+		}
+	}
+}
+
+export function collectPromptVariables(template: Template | null): PromptVariable[] {
+	const promptVariables: PromptVariable[] = [];
+	const promptRegex = /{{prompt:"(.*?)"}}/g;
+	let match;
+
+	if (template?.noteContentFormat) {
+		while ((match = promptRegex.exec(template.noteContentFormat)) !== null) {
+			const [, prompt] = match;
+			const key = `prompt_${promptVariables.length + 1}`;
+			promptVariables.push({ key, prompt });
+		}
+	}
+
+	if (template?.properties) {
+		for (const property of template.properties) {
+			let propertyValue = property.value;
+			while ((match = promptRegex.exec(propertyValue)) !== null) {
+				const [, prompt] = match;
+				const key = `prompt_${promptVariables.length + 1}`;
+				promptVariables.push({ key, prompt });
+			}
+		}
+	}
+
+	// Add this section to collect prompts from all input fields
+	const allInputs = document.querySelectorAll('input, textarea');
+	allInputs.forEach((input) => {
+		if (input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement) {
+			let inputValue = input.value;
+			while ((match = promptRegex.exec(inputValue)) !== null) {
+				const [, prompt] = match;
+				const key = `prompt_${promptVariables.length + 1}`;
+				promptVariables.push({ key, prompt });
+			}
+		}
+	});
+
+	return promptVariables;
 }
