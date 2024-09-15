@@ -66,6 +66,64 @@ function logError(message: string, error?: any): void {
 	showError(message);
 }
 
+function collectPromptVariables(template: Template | null): PromptVariable[] {
+	const promptVariables: PromptVariable[] = [];
+	const promptRegex = /{{prompt:"(.*?)"}}/g;
+	let match;
+
+	// Collect prompt variables from the note content format
+	if (template?.noteContentFormat) {
+		while ((match = promptRegex.exec(template.noteContentFormat)) !== null) {
+			const [, prompt] = match;
+			const key = `prompt_${promptVariables.length + 1}`;
+			promptVariables.push({ key, prompt });
+		}
+	}
+
+	// Collect prompt variables from the properties
+	if (template?.properties) {
+		for (const property of template.properties) {
+			let propertyValue = property.value;
+			while ((match = promptRegex.exec(propertyValue)) !== null) {
+				const [, prompt] = match;
+				const key = `prompt_${promptVariables.length + 1}`;
+				promptVariables.push({ key, prompt });
+			}
+		}
+	}
+
+	// Collect prompt variables from all input fields
+	const allInputs = document.querySelectorAll('input, textarea');
+	allInputs.forEach((input) => {
+		if (input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement) {
+			let inputValue = input.value;
+			while ((match = promptRegex.exec(inputValue)) !== null) {
+				const [, prompt] = match;
+				const key = `prompt_${promptVariables.length + 1}`;
+				promptVariables.push({ key, prompt });
+			}
+		}
+	});
+
+	return promptVariables;
+}
+
+function updateFieldsWithLLMResponses(promptVariables: PromptVariable[], promptResponses: { [key: string]: string }) {
+	const allInputs = document.querySelectorAll('input, textarea');
+	allInputs.forEach((input) => {
+		if (input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement) {
+			input.value = input.value.replace(/{{prompt:".*?"}}/g, (match) => {
+				const promptText = match.match(/{{prompt:"(.*?)"}}/)?.[1];
+				if (promptText) {
+					const variable = promptVariables.find(v => v.prompt === promptText);
+					return variable ? (promptResponses[variable.key] || match) : match;
+				}
+				return match;
+			});
+		}
+	});
+}
+
 async function handleClip() {
 	if (!currentTemplate) return;
 
@@ -106,43 +164,7 @@ async function handleClip() {
 	fileContent = frontmatter + noteContent;
 
 	try {
-		const promptVariables: PromptVariable[] = [];
-		const promptRegex = /{{prompt:"(.*?)"}}/g;
-		let match;
-
-		// Collect prompt variables from the note content format
-		if (currentTemplate?.noteContentFormat) {
-			while ((match = promptRegex.exec(currentTemplate.noteContentFormat)) !== null) {
-				const [, prompt] = match;
-				const key = `prompt_${promptVariables.length + 1}`;
-				promptVariables.push({ key, prompt });
-			}
-		}
-
-		// Collect prompt variables from the properties
-		if (currentTemplate?.properties) {
-			for (const property of currentTemplate.properties) {
-				let propertyValue = property.value;
-				while ((match = promptRegex.exec(propertyValue)) !== null) {
-					const [, prompt] = match;
-					const key = `prompt_${promptVariables.length + 1}`;
-					promptVariables.push({ key, prompt });
-				}
-			}
-		}
-
-		// Collect prompt variables from all input fields
-		const allInputs = document.querySelectorAll('input, textarea');
-		allInputs.forEach((input) => {
-			if (input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement) {
-				let inputValue = input.value;
-				while ((match = promptRegex.exec(inputValue)) !== null) {
-					const [, prompt] = match;
-					const key = `prompt_${promptVariables.length + 1}`;
-					promptVariables.push({ key, prompt });
-				}
-			}
-		});
+		const promptVariables = collectPromptVariables(currentTemplate);
 
 		if (promptVariables.length > 0 || currentTemplate.prompt) {
 			const { userResponse, promptResponses } = await sendToLLM(currentTemplate.prompt || '', noteContent, promptVariables);
@@ -152,32 +174,7 @@ async function handleClip() {
 				noteContentField.value = `${userResponse}\n\n${noteContentField.value}`;
 			}
 
-			// Replace prompt variables in all fields
-			const fields = document.querySelectorAll('input, textarea');
-			fields.forEach((field) => {
-				if (field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement) {
-					let fieldContent = field.value;
-					for (const { key, prompt } of promptVariables) {
-						const response = promptResponses[key] || `[No response for: ${prompt}]`;
-						fieldContent = fieldContent.replace(`{{prompt:"${prompt}"}}`, response);
-					}
-					field.value = fieldContent;
-				}
-			});
-
-			// Update properties
-			const propertyInputs = document.querySelectorAll('.metadata-property');
-			propertyInputs.forEach((propertyDiv) => {
-				const input = propertyDiv.querySelector('input');
-				if (input instanceof HTMLInputElement) {
-					let inputValue = input.value;
-					for (const { key, prompt } of promptVariables) {
-						const response = promptResponses[key] || `[No response for: ${prompt}]`;
-						inputValue = inputValue.replace(`{{prompt:"${prompt}"}}`, response);
-					}
-					input.value = inputValue;
-				}
-			});
+			updateFieldsWithLLMResponses(promptVariables, promptResponses);
 		}
 
 		// Regenerate file content with updated fields
@@ -603,7 +600,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 							if (currentTab?.id && currentTab.url && templatePromptTextarea) {
 								let promptToUse = templatePromptTextarea.value; // Use the current value of the textarea
 
-								console.log('Prompt to be sent to LLM:', promptToUse);
+								console.log('Prompts to be sent to LLM:', { userPrompt: promptToUse, promptVariables: collectPromptVariables(currentTemplate) });
 
 								await processLLM(promptToUse, contentToProcess);
 							} else {
@@ -779,43 +776,7 @@ async function processLLM(promptToUse: string, contentToProcess: string): Promis
 			return;
 		}
 
-		const promptVariables: PromptVariable[] = [];
-		const promptRegex = /{{prompt:"(.*?)"}}/g;
-		let match;
-
-		// Collect prompt variables from the note content format
-		if (currentTemplate?.noteContentFormat) {
-			while ((match = promptRegex.exec(currentTemplate.noteContentFormat)) !== null) {
-				const [, prompt] = match;
-				const key = `prompt_${promptVariables.length + 1}`;
-				promptVariables.push({ key, prompt });
-			}
-		}
-
-		// Collect prompt variables from the properties
-		if (currentTemplate?.properties) {
-			for (const property of currentTemplate.properties) {
-				let propertyValue = property.value;
-				while ((match = promptRegex.exec(propertyValue)) !== null) {
-					const [, prompt] = match;
-					const key = `prompt_${promptVariables.length + 1}`;
-					promptVariables.push({ key, prompt });
-				}
-			}
-		}
-
-		// Collect prompt variables from all input fields
-		const allInputs = document.querySelectorAll('input, textarea');
-		allInputs.forEach((input) => {
-			if (input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement) {
-				let inputValue = input.value;
-				while ((match = promptRegex.exec(inputValue)) !== null) {
-					const [, prompt] = match;
-					const key = `prompt_${promptVariables.length + 1}`;
-					promptVariables.push({ key, prompt });
-				}
-			}
-		});
+		const promptVariables = collectPromptVariables(currentTemplate);
 
 		console.log('Prompts to be sent to LLM:', { userPrompt: promptToUse, promptVariables });
 
@@ -830,45 +791,11 @@ async function processLLM(promptToUse: string, contentToProcess: string): Promis
 
 		const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
 		if (noteContentField) {
-			noteContentField.value = noteContentField.value.replace(/{{prompt:".*?"}}/g, (match) => {
-				const promptText = match.match(/{{prompt:"(.*?)"}}/)?.[1];
-				if (promptText) {
-					const variable = promptVariables.find(v => v.prompt === promptText);
-					return variable ? (promptResponses[variable.key] || match) : match;
-				}
-				return match;
-			});
+			noteContentField.value = `${userResponse}\n\n${noteContentField.value}`;
 		}
 
-		// Update all input fields
-		allInputs.forEach((input) => {
-			if (input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement) {
-				input.value = input.value.replace(/{{prompt:".*?"}}/g, (match) => {
-					const promptText = match.match(/{{prompt:"(.*?)"}}/)?.[1];
-					if (promptText) {
-						const variable = promptVariables.find(v => v.prompt === promptText);
-						return variable ? (promptResponses[variable.key] || match) : match;
-					}
-					return match;
-				});
-			}
-		});
+		updateFieldsWithLLMResponses(promptVariables, promptResponses);
 
-		// Update properties
-		const propertyInputs = document.querySelectorAll('.metadata-property');
-		propertyInputs.forEach((propertyDiv) => {
-			const input = propertyDiv.querySelector('input');
-			if (input instanceof HTMLInputElement) {
-				input.value = input.value.replace(/{{prompt:".*?"}}/g, (match) => {
-					const promptText = match.match(/{{prompt:"(.*?)"}}/)?.[1];
-					if (promptText) {
-						const variable = promptVariables.find(v => v.prompt === promptText);
-						return variable ? (promptResponses[variable.key] || match) : match;
-					}
-					return match;
-				});
-			}
-		});
 	} catch (error) {
 		console.error('Error getting LLM response:', error);
 		if (error instanceof Error) {
