@@ -524,7 +524,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 								const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
 								if (noteContentField) {
-									noteContentField.value = `${noteContentField.value}`;
+									noteContentField.value = `${llmResponse}\n\n${noteContentField.value}`;
 								}
 							} else {
 								console.log('Skipping LLM processing: missing tab ID, URL, or prompt');
@@ -546,6 +546,40 @@ document.addEventListener('DOMContentLoaded', async function() {
 			} else {
 				if (llmContainer) llmContainer.style.display = 'none';
 			}
+
+			if (template) {
+				const replacedTemplate = await getReplacedTemplate(template, variables, tabId, currentUrl);
+				console.log('Current template with replaced variables:', JSON.stringify(replacedTemplate, null, 2));
+			}
+		}
+
+		async function getReplacedTemplate(template: Template, variables: { [key: string]: string }, tabId: number, currentUrl: string): Promise<any> {
+			const replacedTemplate: any = {
+				schemaVersion: "0.1.0",
+				name: template.name,
+				behavior: template.behavior,
+				noteNameFormat: await replaceVariables(tabId, template.noteNameFormat, variables, currentUrl),
+				path: template.path,
+				noteContentFormat: await replaceVariables(tabId, template.noteContentFormat, variables, currentUrl),
+				properties: [],
+				triggers: template.triggers
+			};
+
+			if (template.prompt) {
+				replacedTemplate.prompt = await replaceVariables(tabId, template.prompt, variables, currentUrl);
+			}
+
+			for (const prop of template.properties) {
+				const replacedProp: Property = {
+					id: prop.id, // Include the id property
+					name: prop.name,
+					value: await replaceVariables(tabId, prop.value, variables, currentUrl),
+					type: prop.type
+				};
+				replacedTemplate.properties.push(replacedProp);
+			}
+
+			return replacedTemplate;
 		}
 
 		async function initializeUI() {
