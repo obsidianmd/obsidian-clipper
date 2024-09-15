@@ -73,17 +73,20 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 		const llmResponseContent = data.choices[0].message.content;
 		console.log('Raw LLM response:', llmResponseContent);
 
-		// Remove code block markers if they exist
-		const cleanedResponse = llmResponseContent.replace(/^```json\n|\n```$/g, '');
-
-		// Try to parse the response as JSON, if it fails, return the raw response
 		let parsedResponse;
 		try {
-			parsedResponse = JSON.parse(cleanedResponse);
+			// Check if the response is already a JSON object
+			if (typeof llmResponseContent === 'object' && llmResponseContent !== null) {
+				parsedResponse = llmResponseContent;
+			} else {
+				// Remove code block markers if they exist
+				const cleanedResponse = llmResponseContent.replace(/^```json\n|\n```$/g, '');
+				parsedResponse = JSON.parse(cleanedResponse);
+			}
 		} catch (parseError) {
 			console.warn('Failed to parse LLM response as JSON. Using raw response.');
 			return {
-				userResponse: cleanedResponse,
+				userResponse: llmResponseContent,
 				promptResponses: []
 			};
 		}
@@ -93,21 +96,24 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 
 		if (parsedResponse.variable_responses) {
 			if (Array.isArray(parsedResponse.variable_responses)) {
-				promptResponses = parsedResponse.variable_responses.map((response: { [key: string]: any }) => ({
-					...response,
-					user_response: response.response || response.user_response
-				}));
+				promptResponses = promptVariables.map((variable, index) => {
+					const response = parsedResponse.variable_responses[index];
+					return {
+						key: variable.key,
+						prompt: variable.prompt,
+						user_response: response ? response.user_response : ''
+					};
+				});
 			} else if (typeof parsedResponse.variable_responses === 'object') {
-				promptResponses = Object.entries(parsedResponse.variable_responses).map(([key, value]) => ({
-					key,
-					prompt: promptVariables.find(v => v.key === key)?.prompt || '',
-					user_response: value
-				}));
+				promptResponses = promptVariables.map(variable => {
+					const response = parsedResponse.variable_responses[variable.key];
+					return {
+						key: variable.key,
+						prompt: variable.prompt,
+						user_response: response || ''
+					};
+				});
 			}
-			promptResponses = promptResponses.map((response: { [key: string]: any }) => ({
-				...response,
-				user_response: response.user_response || response.response
-			}));
 		}
 
 		return {
@@ -156,15 +162,20 @@ export async function processLLM(
 }
 
 export function collectPromptVariables(template: Template | null): PromptVariable[] {
-	const promptVariables: PromptVariable[] = [];
+	const promptMap = new Map<string, PromptVariable>();
 	const promptRegex = /{{prompt:"(.*?)"}}/g;
 	let match;
 
+	function addPrompt(prompt: string) {
+		if (!promptMap.has(prompt)) {
+			const key = `prompt_${promptMap.size + 1}`;
+			promptMap.set(prompt, { key, prompt });
+		}
+	}
+
 	if (template?.noteContentFormat) {
 		while ((match = promptRegex.exec(template.noteContentFormat)) !== null) {
-			const [, prompt] = match;
-			const key = `prompt_${promptVariables.length + 1}`;
-			promptVariables.push({ key, prompt });
+			addPrompt(match[1]);
 		}
 	}
 
@@ -172,9 +183,7 @@ export function collectPromptVariables(template: Template | null): PromptVariabl
 		for (const property of template.properties) {
 			let propertyValue = property.value;
 			while ((match = promptRegex.exec(propertyValue)) !== null) {
-				const [, prompt] = match;
-				const key = `prompt_${promptVariables.length + 1}`;
-				promptVariables.push({ key, prompt });
+				addPrompt(match[1]);
 			}
 		}
 	}
@@ -185,14 +194,12 @@ export function collectPromptVariables(template: Template | null): PromptVariabl
 		if (input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement) {
 			let inputValue = input.value;
 			while ((match = promptRegex.exec(inputValue)) !== null) {
-				const [, prompt] = match;
-				const key = `prompt_${promptVariables.length + 1}`;
-				promptVariables.push({ key, prompt });
+				addPrompt(match[1]);
 			}
 		}
 	});
 
-	return promptVariables;
+	return Array.from(promptMap.values());
 }
 
 export async function initializeLLMComponents(template: Template, variables: { [key: string]: string }, tabId: number, currentUrl: string) {
@@ -233,7 +240,7 @@ export async function handleLLMProcessing(template: Template, variables: { [key:
 
 			const promptVariables = collectPromptVariables(template);
 
-			console.log('Prompts to be sent to LLM:', { userPrompt: promptToUse, promptVariables });
+			console.log('Unique prompts to be sent to LLM:', { userPrompt: promptToUse, promptVariables });
 
 			// Change button text and add class
 			processLlmBtn.textContent = 'Processing';
@@ -297,28 +304,28 @@ export function updateFieldsWithLLMResponses(promptVariables: PromptVariable[], 
 		if (input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement) {
 			input.value = input.value.replace(/{{prompt:"(.*?)"}}/g, (match, promptText) => {
 				const response = promptResponses.find(r => r.prompt === promptText);
-				if (response) {
+				if (response && response.user_response) {
 					if (Array.isArray(response.user_response)) {
 						return response.user_response.join('\n- ');
 					}
-					return response.user_response || '';
+					return response.user_response;
 				}
 				return match;
 			});
 		}
 	});
 
-	const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
+	/* const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
 	if (noteContentField) {
 		noteContentField.value = noteContentField.value.replace(/{{prompt:"(.*?)"}}/g, (match, promptText) => {
 			const response = promptResponses.find(r => r.prompt === promptText);
-			if (response) {
+			if (response && response.user_response) {
 				if (Array.isArray(response.user_response)) {
 					return response.user_response.join('\n- ');
 				}
-				return response.user_response || '';
+				return response.user_response;
 			}
 			return match;
 		});
-	}
+	}*/
 }
