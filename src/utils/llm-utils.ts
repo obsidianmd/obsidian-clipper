@@ -16,7 +16,7 @@ export function initializeLLMSettings(): void {
 const RATE_LIMIT_RESET_TIME = 60000; // 1 minute in milliseconds
 let lastRequestTime = 0;
 
-export async function sendToLLM(userPrompt: string, content: string, promptVariables: PromptVariable[]): Promise<{ userResponse: string; promptResponses: any[] }> {
+export async function sendToLLM(userPrompt: string, content: string, promptVariables: PromptVariable[]): Promise<{ userResponse: any; promptResponses: any[] }> {
 	const apiKey = generalSettings.openaiApiKey;
 	const model = generalSettings.openaiModel || 'gpt-4o-mini';
 
@@ -96,29 +96,18 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 		let promptResponses: any[] = [];
 
 		if (parsedResponse.variable_responses) {
-			if (Array.isArray(parsedResponse.variable_responses)) {
-				promptResponses = promptVariables.map((variable, index) => {
-					const response = parsedResponse.variable_responses[index];
-					return {
-						key: variable.key,
-						prompt: variable.prompt,
-						user_response: response ? response.user_response : ''
-					};
-				});
-			} else if (typeof parsedResponse.variable_responses === 'object') {
-				promptResponses = promptVariables.map(variable => {
-					const response = parsedResponse.variable_responses[variable.key];
-					return {
-						key: variable.key,
-						prompt: variable.prompt,
-						user_response: response || ''
-					};
-				});
-			}
+			promptResponses = promptVariables.map(variable => {
+				const response = parsedResponse.variable_responses[variable.key] || parsedResponse.variable_responses[variable.prompt];
+				return {
+					key: variable.key,
+					prompt: variable.prompt,
+					user_response: response !== undefined ? response : ''
+				};
+			});
 		}
 
 		return {
-			userResponse,
+			userResponse: promptResponses.find(r => r.key === 'prompt_1')?.user_response || userResponse,
 			promptResponses
 		};
 	} catch (error) {
@@ -143,14 +132,12 @@ export async function processLLM(
 		const { userResponse, promptResponses } = await sendToLLM(promptToUse, contentToProcess, promptVariables);
 		console.log('LLM Response:', { userResponse, promptResponses });
 
-		updateUI(userResponse);
+		// Convert userResponse to string if it's an array or object
+		const stringResponse = typeof userResponse === 'object' ? JSON.stringify(userResponse, null, 2) : userResponse;
+		updateUI(stringResponse);
 		
-		// Only update fields if promptResponses is not empty
-		if (promptResponses.length > 0) {
-			updateFields(promptVariables, promptResponses);
-		} else {
-			console.warn('No prompt responses received from LLM.');
-		}
+		// Update fields with all prompt responses
+		updateFields(promptVariables, promptResponses);
 
 	} catch (error) {
 		console.error('Error getting LLM response:', error);
@@ -291,7 +278,18 @@ function updateLLMResponse(response: string) {
 
 	const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
 	if (noteContentField) {
-		noteContentField.value = `${noteContentField.value}`;
+		// If the response is a stringified array, parse it and format it
+		try {
+			const parsedResponse = JSON.parse(response);
+			if (Array.isArray(parsedResponse)) {
+				noteContentField.value = JSON.stringify(parsedResponse, null, 2);
+			} else {
+				noteContentField.value = response;
+			}
+		} catch {
+			// If parsing fails, it's not a JSON string, so use it as-is
+			noteContentField.value = response;
+		}
 	}
 }
 
@@ -301,12 +299,19 @@ export function updateFieldsWithLLMResponses(promptVariables: PromptVariable[], 
 		if (input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement) {
 			input.value = input.value.replace(/{{prompt:"(.*?)"(\|.*?)?}}/g, (match, promptText, filters) => {
 				const response = promptResponses.find(r => r.prompt === promptText);
-				if (response && response.user_response) {
+				if (response && response.user_response !== undefined) {
 					let value = response.user_response;
+					
 					if (filters) {
 						const filterNames = filters.slice(1).split('|');
 						value = applyFilters(value, filterNames);
 					}
+					
+					// Stringify only if the value is still an object or array after applying filters
+					if (typeof value === 'object') {
+						value = JSON.stringify(value, null, 2);
+					}
+					
 					return value;
 				}
 				return match;
