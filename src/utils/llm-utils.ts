@@ -298,7 +298,7 @@ function updateLLMResponse(response: string) {
 
 	const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
 	if (noteContentField) {
-		noteContentField.value = `${response}\n\n${noteContentField.value}`;
+		noteContentField.value = `${noteContentField.value}`;
 	}
 }
 
@@ -320,20 +320,4 @@ export function updateFieldsWithLLMResponses(promptVariables: PromptVariable[], 
 			});
 		}
 	});
-
-	const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
-	if (noteContentField) {
-		noteContentField.value = noteContentField.value.replace(/{{prompt:"(.*?)"(\|.*?)?}}/g, (match, promptText, filters) => {
-			const response = promptResponses.find(r => r.prompt === promptText);
-			if (response && response.user_response) {
-				let value = response.user_response;
-				if (filters) {
-					const filterNames = filters.slice(1).split('|');
-					value = applyFilters(value, filterNames);
-				}
-				return value;
-			}
-			return match;
-		});
-	}
 }
