@@ -22,9 +22,13 @@
 
 		<div class="clipper-footer">
 			<div id="llm-container" style="display: none;">
-					<textarea id="template-prompt" class="template-prompt" rows="3" placeholder="Enter your prompt here..."></textarea>
-					<button id="process-llm-btn">Process with LLM</button>
-					<div id="llm-response" style="display: none;"></div>
+				<textarea id="prompt-context" rows="3"></textarea>
+				<button id="process-llm-btn">Process with LLM</button>
+				<div id="llm-error-message" style="display: none;"></div>
+			</div>
+			<div class="vault-path-container">
+				<div id="vault-container" style="display: none;">
+					<select id="vault-select"></select>
 				</div>
 				<div class="vault-path-container">
 					<div id="vault-container" style="display: none;">

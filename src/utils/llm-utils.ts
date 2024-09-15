@@ -206,15 +206,13 @@ export function collectPromptVariables(template: Template | null): PromptVariabl
 export async function initializeLLMComponents(template: Template, variables: { [key: string]: string }, tabId: number, currentUrl: string) {
 	const llmContainer = document.getElementById('llm-container');
 	const processLlmBtn = document.getElementById('process-llm-btn');
-	const llmResponseDiv = document.getElementById('llm-response');
-	const templatePromptTextarea = document.getElementById('template-prompt') as HTMLTextAreaElement;
+	const promptContextTextarea = document.getElementById('prompt-context') as HTMLTextAreaElement;
 
 	if (template && template.prompt) {
 		if (llmContainer) llmContainer.style.display = 'flex';
-		if (templatePromptTextarea) {
+		if (promptContextTextarea) {
 			let promptToDisplay = await replaceVariables(tabId, template.prompt, variables, currentUrl);
-			templatePromptTextarea.value = promptToDisplay;
-			templatePromptTextarea.style.display = 'block';
+			promptContextTextarea.value = promptToDisplay;
 		}
 		if (processLlmBtn) {
 			processLlmBtn.addEventListener('click', () => handleLLMProcessing(template, variables, tabId, currentUrl));
@@ -234,10 +232,10 @@ export async function handleLLMProcessing(template: Template, variables: { [key:
 		llmErrorMessage.textContent = '';
 
 		const contentToProcess = variables.content || '';
-		const templatePromptTextarea = document.getElementById('template-prompt') as HTMLTextAreaElement;
+		const promptContextTextarea = document.getElementById('prompt-context') as HTMLTextAreaElement;
 		
-		if (tabId && currentUrl && templatePromptTextarea) {
-			let promptToUse = templatePromptTextarea.value;
+		if (tabId && currentUrl && promptContextTextarea) {
+			let promptToUse = promptContextTextarea.value;
 
 			const promptVariables = collectPromptVariables(template);
 
@@ -285,12 +283,7 @@ export async function handleLLMProcessing(template: Template, variables: { [key:
 }
 
 function updateLLMResponse(response: string) {
-	const llmResponseDiv = document.getElementById('llm-response');
 	const llmErrorMessage = document.getElementById('llm-error-message');
-	if (llmResponseDiv) {
-		llmResponseDiv.textContent = response;
-		llmResponseDiv.style.display = 'block';
-	}
 	if (llmErrorMessage) {
 		llmErrorMessage.style.display = 'none';
 		llmErrorMessage.textContent = '';

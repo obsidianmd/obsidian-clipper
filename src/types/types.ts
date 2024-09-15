@@ -8,7 +8,7 @@ export interface Template {
 	properties: Property[];
 	triggers?: string[];
 	vault?: string;
-	prompt?: string;
+	prompt: string; // Changed from optional to required
 }
 
 export interface Property {
