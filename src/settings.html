@@ -101,18 +101,19 @@
 									</div>
 								</div>
 								<div>
-									<h3>LLM Settings</h3>
+									<h3>Models</h3>
 									<div class="setting-item">
-										<label for="openai-api-key">OpenAI API key</label>
-										<input type="password" id="openai-api-key" placeholder="Enter your OpenAI API key">
-									</div>
-									<div class="setting-item">
-										<label for="openai-model">OpenAI model</label>
+										<label for="openai-model">Models list</label>
 										<select id="openai-model">
 											<option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
 											<option value="gpt-4">GPT-4</option>
 										</select>
 									</div>
+									<div class="setting-item">
+										<label for="openai-api-key">OpenAI API key</label>
+										<input type="password" id="openai-api-key" placeholder="Enter your OpenAI API key">
+									</div>
+									
 								</div>
 						</form>
 					</div>
@@ -202,7 +203,7 @@
 									<div class="metadata-add-button"><a id="add-property-btn">+ Add property</a></div>
 								</div>
 								<div class="setting-item">
-									<label for="template-prompt">LLM Prompt</label>
+									<label for="template-prompt">LLM prompt</label>
 									<div class="setting-item-description">Enter a prompt for the LLM to process the clipped content. Leave empty to skip LLM processing.</div>
 									<textarea id="template-prompt" rows="4" placeholder="Summarize the following content:"></textarea>
 								</div>
