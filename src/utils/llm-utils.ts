@@ -217,6 +217,8 @@ export async function initializeLLMComponents(template: Template, variables: { [
 }
 
 export async function handleLLMProcessing(template: Template, variables: { [key: string]: string }, tabId: number, currentUrl: string) {
+	const processLlmBtn = document.getElementById('process-llm-btn') as HTMLButtonElement;
+	
 	try {
 		const contentToProcess = variables.content || '';
 		const templatePromptTextarea = document.getElementById('template-prompt') as HTMLTextAreaElement;
@@ -228,6 +230,10 @@ export async function handleLLMProcessing(template: Template, variables: { [key:
 
 			console.log('Prompts to be sent to LLM:', { userPrompt: promptToUse, promptVariables });
 
+			// Change button text and add class
+			processLlmBtn.textContent = 'Processing';
+			processLlmBtn.classList.add('processing');
+
 			await processLLM(
 				promptToUse,
 				contentToProcess,
@@ -235,12 +241,21 @@ export async function handleLLMProcessing(template: Template, variables: { [key:
 				updateLLMResponse,
 				updateFieldsWithLLMResponses
 			);
+
+			// Revert button text and remove class
+			processLlmBtn.textContent = 'Process with LLM';
+			processLlmBtn.classList.remove('processing');
 		} else {
 			console.log('Skipping LLM processing: missing tab ID, URL, or prompt');
 			throw new Error('Skipping LLM processing: missing tab ID, URL, or prompt');
 		}
 	} catch (error) {
 		console.error('Error processing LLM:', error);
+		
+		// Revert button text and remove class in case of error
+		processLlmBtn.textContent = 'Process with LLM';
+		processLlmBtn.classList.remove('processing');
+
 		if (error instanceof Error) {
 			throw error;
 		} else {

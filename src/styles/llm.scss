@@ -1,13 +1,9 @@
-.llm-response {
-    font-size: var(--font-ui-small);
-    color: var(--text-accent);
-}
-#llm-container {
-	display: flex;
-	flex-direction: column;
-	gap: 8px;
-}
 .clipper {
+	#llm-container {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+	}
 	#template-prompt {
 		padding: 8px;
 		font-size: var(--font-ui-smaller);
@@ -31,5 +27,10 @@
 		max-height: 150px;
 		overflow-y: auto;
 		display: none !important;
+	}
+	#process-llm-btn {
+		&.processing {
+			cursor: not-allowed;
+		}
 	}
 }
