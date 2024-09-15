@@ -27,4 +27,5 @@ export type FilterFunction = (value: string, param?: string) => string | any[];
 export interface PromptVariable {
 	key: string;
 	prompt: string;
+	filters?: string;
 }

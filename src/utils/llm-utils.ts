@@ -1,6 +1,7 @@
 import { generalSettings } from './storage-utils';
 import { PromptVariable, Template } from '../types/types';
 import { replaceVariables } from './content-extractor';
+import { applyFilters } from './filters';
 
 export function initializeLLMSettings(): void {
 	const apiKeyInput = document.getElementById('openai-api-key') as HTMLInputElement;
@@ -163,19 +164,19 @@ export async function processLLM(
 
 export function collectPromptVariables(template: Template | null): PromptVariable[] {
 	const promptMap = new Map<string, PromptVariable>();
-	const promptRegex = /{{prompt:"(.*?)"}}/g;
+	const promptRegex = /{{prompt:"(.*?)"(\|.*?)?}}/g;
 	let match;
 
-	function addPrompt(prompt: string) {
+	function addPrompt(prompt: string, filters: string) {
 		if (!promptMap.has(prompt)) {
 			const key = `prompt_${promptMap.size + 1}`;
-			promptMap.set(prompt, { key, prompt });
+			promptMap.set(prompt, { key, prompt, filters });
 		}
 	}
 
 	if (template?.noteContentFormat) {
 		while ((match = promptRegex.exec(template.noteContentFormat)) !== null) {
-			addPrompt(match[1]);
+			addPrompt(match[1], match[2] || '');
 		}
 	}
 
@@ -183,7 +184,7 @@ export function collectPromptVariables(template: Template | null): PromptVariabl
 		for (const property of template.properties) {
 			let propertyValue = property.value;
 			while ((match = promptRegex.exec(propertyValue)) !== null) {
-				addPrompt(match[1]);
+				addPrompt(match[1], match[2] || '');
 			}
 		}
 	}
@@ -194,7 +195,7 @@ export function collectPromptVariables(template: Template | null): PromptVariabl
 		if (input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement) {
 			let inputValue = input.value;
 			while ((match = promptRegex.exec(inputValue)) !== null) {
-				addPrompt(match[1]);
+				addPrompt(match[1], match[2] || '');
 			}
 		}
 	});
@@ -240,7 +241,10 @@ export async function handleLLMProcessing(template: Template, variables: { [key:
 
 			const promptVariables = collectPromptVariables(template);
 
-			console.log('Unique prompts to be sent to LLM:', { userPrompt: promptToUse, promptVariables });
+			console.log('Unique prompts to be sent to LLM:', { 
+				userPrompt: promptToUse, 
+				promptVariables: promptVariables.map(({ key, prompt }) => ({ key, prompt }))
+			});
 
 			// Change button text and add class
 			processLlmBtn.textContent = 'Processing';
@@ -302,30 +306,34 @@ export function updateFieldsWithLLMResponses(promptVariables: PromptVariable[], 
 	const allInputs = document.querySelectorAll('input, textarea');
 	allInputs.forEach((input) => {
 		if (input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement) {
-			input.value = input.value.replace(/{{prompt:"(.*?)"}}/g, (match, promptText) => {
+			input.value = input.value.replace(/{{prompt:"(.*?)"(\|.*?)?}}/g, (match, promptText, filters) => {
 				const response = promptResponses.find(r => r.prompt === promptText);
 				if (response && response.user_response) {
-					if (Array.isArray(response.user_response)) {
-						return response.user_response.join('\n- ');
+					let value = response.user_response;
+					if (filters) {
+						const filterNames = filters.slice(1).split('|');
+						value = applyFilters(value, filterNames);
 					}
-					return response.user_response;
+					return value;
 				}
 				return match;
 			});
 		}
 	});
 
-	/* const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
+	const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
 	if (noteContentField) {
-		noteContentField.value = noteContentField.value.replace(/{{prompt:"(.*?)"}}/g, (match, promptText) => {
+		noteContentField.value = noteContentField.value.replace(/{{prompt:"(.*?)"(\|.*?)?}}/g, (match, promptText, filters) => {
 			const response = promptResponses.find(r => r.prompt === promptText);
 			if (response && response.user_response) {
-				if (Array.isArray(response.user_response)) {
-					return response.user_response.join('\n- ');
+				let value = response.user_response;
+				if (filters) {
+					const filterNames = filters.slice(1).split('|');
+					value = applyFilters(value, filterNames);
 				}
-				return response.user_response;
+				return value;
 			}
 			return match;
 		});
-	}*/
+	}
 }
