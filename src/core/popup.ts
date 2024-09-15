@@ -122,13 +122,27 @@ async function handleClip() {
 		// Collect prompt variables from the properties
 		if (currentTemplate?.properties) {
 			for (const property of currentTemplate.properties) {
-				while ((match = promptRegex.exec(property.value)) !== null) {
+				let propertyValue = property.value;
+				while ((match = promptRegex.exec(propertyValue)) !== null) {
 					const [, prompt] = match;
 					const key = `prompt_${promptVariables.length + 1}`;
 					promptVariables.push({ key, prompt });
 				}
 			}
 		}
+
+		// Collect prompt variables from all input fields
+		const allInputs = document.querySelectorAll('input, textarea');
+		allInputs.forEach((input) => {
+			if (input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement) {
+				let inputValue = input.value;
+				while ((match = promptRegex.exec(inputValue)) !== null) {
+					const [, prompt] = match;
+					const key = `prompt_${promptVariables.length + 1}`;
+					promptVariables.push({ key, prompt });
+				}
+			}
+		});
 
 		if (promptVariables.length > 0 || currentTemplate.prompt) {
 			const { userResponse, promptResponses } = await sendToLLM(currentTemplate.prompt || '', noteContent, promptVariables);
@@ -781,13 +795,27 @@ async function processLLM(promptToUse: string, contentToProcess: string): Promis
 		// Collect prompt variables from the properties
 		if (currentTemplate?.properties) {
 			for (const property of currentTemplate.properties) {
-				while ((match = promptRegex.exec(property.value)) !== null) {
+				let propertyValue = property.value;
+				while ((match = promptRegex.exec(propertyValue)) !== null) {
 					const [, prompt] = match;
 					const key = `prompt_${promptVariables.length + 1}`;
 					promptVariables.push({ key, prompt });
 				}
 			}
 		}
+
+		// Collect prompt variables from all input fields
+		const allInputs = document.querySelectorAll('input, textarea');
+		allInputs.forEach((input) => {
+			if (input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement) {
+				let inputValue = input.value;
+				while ((match = promptRegex.exec(inputValue)) !== null) {
+					const [, prompt] = match;
+					const key = `prompt_${promptVariables.length + 1}`;
+					promptVariables.push({ key, prompt });
+				}
+			}
+		});
 
 		console.log('Prompts to be sent to LLM:', { userPrompt: promptToUse, promptVariables });
 
@@ -811,6 +839,20 @@ async function processLLM(promptToUse: string, contentToProcess: string): Promis
 				return match;
 			});
 		}
+
+		// Update all input fields
+		allInputs.forEach((input) => {
+			if (input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement) {
+				input.value = input.value.replace(/{{prompt:".*?"}}/g, (match) => {
+					const promptText = match.match(/{{prompt:"(.*?)"}}/)?.[1];
+					if (promptText) {
+						const variable = promptVariables.find(v => v.prompt === promptText);
+						return variable ? (promptResponses[variable.key] || match) : match;
+					}
+					return match;
+				});
+			}
+		});
 
 		// Update properties
 		const propertyInputs = document.querySelectorAll('.metadata-property');
