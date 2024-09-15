@@ -15,7 +15,7 @@ export let generalSettings: GeneralSettings = {
 	silentOpen: false
 	showMoreActionsButton: false,
 	openaiApiKey: '',
-	openaiModel: 'gpt-3.5-turbo'
+	openaiModel: 'gpt-4o-mini'
 };
 
 export function setLocalStorage(key: string, value: any): Promise<void> {
@@ -35,7 +35,7 @@ export async function loadGeneralSettings(): Promise<GeneralSettings> {
 		betaFeatures: data.general_settings?.betaFeatures ?? false,
 		silentOpen: data.general_settings?.silentOpen ?? false
 		openaiApiKey: data.openaiApiKey || '',
-		openaiModel: data.openaiModel || 'gpt-3.5-turbo'
+		openaiModel: data.openaiModel || 'gpt-4o-mini'
 	};
 	
 	return generalSettings;
