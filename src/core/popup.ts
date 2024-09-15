@@ -524,7 +524,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 								const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
 								if (noteContentField) {
-									noteContentField.value = `${llmResponse}\n\n${noteContentField.value}`;
+									noteContentField.value = `${noteContentField.value}`;
 								}
 							} else {
 								console.log('Skipping LLM processing: missing tab ID, URL, or prompt');
