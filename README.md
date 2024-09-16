@@ -158,7 +158,7 @@ Filters allow you to modify variables in a template. Filters are applied to vari
 	- Syntax: `map:item => item.property` or `map:item => item.nested.property` for nested properties.
 		- Example: `[{gem: "obsidian", color: "black"}, {gem: "amethyst", color: "purple"}]|map:item => item.gem` returns `["obsidian", "amethyst"]`.
 	- Parentheses are needed for object literals and complex expressions: `map:item => ({key: value})`.
-		- Example: `[{gem: "obsidian", color: "black"}, {gem: "amethyst", color: "purple"}]|map:item => ({name: item.gem, hex: item.color === "black" ? "#000" : "#800080"}})`  returns `[{name: "obsidian", hex: "#000"}, {name: "amethyst", hex: "#800080"}]`.
+		- Example: `[{gem: "obsidian", color: "black"}, {gem: "amethyst", color: "purple"}]|map:item => ({name: item.gem, hex: item.color === "black" ? "#000" : "#800080"})`  returns `[{name: "obsidian", hex: "#000"}, {name: "amethyst", hex: "#800080"}]`.
 	- Can be combined with `template` filter, e.g. `map:item => ({name: ${item.gem}, color: item.color})|template:"- ${name} is ${color}\n"`
 - `markdown` converts a string to an [Obsidian Flavored Markdown](https://help.obsidian.md/Editing+and+formatting/Obsidian+Flavored+Markdown) formatted string.
 - `object` manipulates object data:
