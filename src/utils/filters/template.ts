@@ -54,7 +54,7 @@ function replaceTemplateVariables(obj: any, template: string): string {
 		console.log('Replacing:', match);
 		const value = getNestedProperty(obj, path);
 		console.log('Replaced with:', value);
-		return value !== undefined ? value : '';
+		return value !== undefined && value !== 'undefined' ? value : '';
 	});
 
 	console.log('Result after variable replacement:', result);
@@ -81,7 +81,7 @@ function parseObjectString(str: string): any {
 		if (value.startsWith('"') && value.endsWith('"')) {
 			value = value.slice(1, -1);
 		}
-		obj[key] = value;
+		obj[key] = value === 'undefined' ? undefined : value;
 	}
 
 	return obj;
