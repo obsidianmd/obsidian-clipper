@@ -236,21 +236,39 @@ document.addEventListener('DOMContentLoaded', async function() {
 			const metadataProperties = document.querySelector('.metadata-properties') as HTMLElement;
 			
 			if (metadataHeader && metadataProperties) {
-				metadataHeader.addEventListener('click', () => {
-					const isCollapsed = metadataProperties.classList.toggle('collapsed');
-					metadataHeader.classList.toggle('collapsed');
-					setLocalStorage('propertiesCollapsed', isCollapsed);
-				});
+				metadataHeader.removeEventListener('click', toggleMetadataProperties);
+				metadataHeader.addEventListener('click', toggleMetadataProperties);
 
+				// Set initial state
 				getLocalStorage('propertiesCollapsed').then((isCollapsed) => {
-					if (isCollapsed) {
-						metadataProperties.classList.add('collapsed');
-						metadataHeader.classList.add('collapsed');
-					} else {
-						metadataProperties.classList.remove('collapsed');
-						metadataHeader.classList.remove('collapsed');
-					}
+					updateMetadataToggleState(isCollapsed);
 				});
+			}
+		}
+
+		function toggleMetadataProperties() {
+			const metadataProperties = document.querySelector('.metadata-properties') as HTMLElement;
+			const metadataHeader = document.querySelector('.metadata-properties-header') as HTMLElement;
+			
+			if (metadataProperties && metadataHeader) {
+				const isCollapsed = metadataProperties.classList.toggle('collapsed');
+				metadataHeader.classList.toggle('collapsed');
+				setLocalStorage('propertiesCollapsed', isCollapsed);
+			}
+		}
+
+		function updateMetadataToggleState(isCollapsed: boolean) {
+			const metadataProperties = document.querySelector('.metadata-properties') as HTMLElement;
+			const metadataHeader = document.querySelector('.metadata-properties-header') as HTMLElement;
+			
+			if (metadataProperties && metadataHeader) {
+				if (isCollapsed) {
+					metadataProperties.classList.add('collapsed');
+					metadataHeader.classList.add('collapsed');
+				} else {
+					metadataProperties.classList.remove('collapsed');
+					metadataHeader.classList.remove('collapsed');
+				}
 			}
 		}
 
@@ -267,6 +285,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 							const initializedContent = await initializePageContent(extractedData.content, extractedData.selectedHtml, extractedData.extractedContent, currentTab.url!, extractedData.schemaOrgData, extractedData.fullHtml);
 							if (initializedContent) {
 								await initializeTemplateFields(currentTemplate, initializedContent.currentVariables, initializedContent.noteName, extractedData.schemaOrgData);
+								setupMetadataToggle();
 							} else {
 								logError('Unable to initialize page content.');
 							}
