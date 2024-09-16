@@ -155,11 +155,11 @@ Filters allow you to modify variables in a template. Filters are applied to vari
 	- Use `list:numbered-task` to convert to a task list with numbers.
 - `lower` converts a string to lowercase.
 - `map` applies a transformation to each element of an array.
-	- Syntax: `map:item => ${item.property}` or `map:item => ${item.nested.property}` for nested properties.
-		- Example: `[{gem: "obsidian", color: "black"}, {gem: "amethyst", color: "purple"}]|map:item => ${item.gem}` returns `["obsidian", "amethyst"]`.
+	- Syntax: `map:item => item.property` or `map:item => item.nested.property` for nested properties.
+		- Example: `[{gem: "obsidian", color: "black"}, {gem: "amethyst", color: "purple"}]|map:item => item.gem` returns `["obsidian", "amethyst"]`.
 	- Parentheses are needed for object literals and complex expressions: `map:item => ({key: value})`.
-		- Example: `[{gem: "obsidian", color: "black"}, {gem: "amethyst", color: "purple"}]|map:item => ({name: ${item.gem}, hex: ${item.color === "black" ? "#000" : "#800080"}})`  returns `[{name: "obsidian", hex: "#000"}, {name: "amethyst", hex: "#800080"}]`.
-	- Can be combined with `template` filter, e.g. `map:item => ({name: ${item.gem}, color: ${item.color}})|template:"- ${name} is ${color}\n"`
+		- Example: `[{gem: "obsidian", color: "black"}, {gem: "amethyst", color: "purple"}]|map:item => ({name: item.gem, hex: item.color === "black" ? "#000" : "#800080"}})`  returns `[{name: "obsidian", hex: "#000"}, {name: "amethyst", hex: "#800080"}]`.
+	- Can be combined with `template` filter, e.g. `map:item => ({name: ${item.gem}, color: item.color})|template:"- ${name} is ${color}\n"`
 - `markdown` converts a string to an [Obsidian Flavored Markdown](https://help.obsidian.md/Editing+and+formatting/Obsidian+Flavored+Markdown) formatted string.
 - `object` manipulates object data:
 	- `object:array` converts an object to an array of key-value pairs.
