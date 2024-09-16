@@ -356,14 +356,16 @@ document.addEventListener('DOMContentLoaded', async function() {
 				propertyDiv.innerHTML = `
 					<span class="metadata-property-icon"><i data-lucide="${getPropertyTypeIcon(property.type)}"></i></span>
 					<label for="${property.name}">${property.name}</label>
-					<input id="${property.name}" type="text" value="${escapeHtml(value)}" data-type="${property.type}" />
+					<input id="${property.name}" type="text" value="${escapeHtml(value)}" data-type="${property.type}" data-template-value="${escapeHtml(property.value)}" />
 				`;
 				templateProperties.appendChild(propertyDiv);
 			}
 
+			const noteNameField = document.getElementById('note-name-field') as HTMLTextAreaElement;
 			if (noteNameField) {
 				let formattedNoteName = await replaceVariables(tabId, template.noteNameFormat, variables, currentUrl);
 				noteNameField.value = sanitizeFileName(formattedNoteName);
+				noteNameField.setAttribute('data-template-value', template.noteNameFormat);
 				adjustTextareaHeight(noteNameField);
 			}
 
@@ -371,6 +373,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 			if (pathField) {
 				let formattedPath = await replaceVariables(tabId, template.path, variables, currentUrl);
 				pathField.value = formattedPath;
+				pathField.setAttribute('data-template-value', template.path);
 			}
 
 			const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
@@ -378,8 +381,10 @@ document.addEventListener('DOMContentLoaded', async function() {
 				if (template.noteContentFormat) {
 					let content = await replaceVariables(tabId, template.noteContentFormat, variables, currentUrl);
 					noteContentField.value = content;
+					noteContentField.setAttribute('data-template-value', template.noteContentFormat);
 				} else {
 					noteContentField.value = '';
+					noteContentField.setAttribute('data-template-value', '');
 				}
 			}
 
