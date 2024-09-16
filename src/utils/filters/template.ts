@@ -7,29 +7,27 @@ export const template = (input: string | any[], param?: string): string => {
 		return typeof input === 'string' ? input : JSON.stringify(input);
 	}
 
-	let obj = input;
+	let obj: any[] = [];
 	if (typeof input === 'string') {
 		try {
 			obj = JSON.parse(input);
 			console.log('Parsed input:', obj);
 		} catch (error) {
-			console.log('Parsing failed, using input as string');
+			console.log('Parsing failed, using input as is');
+			obj = [input];
 		}
+	} else {
+		obj = input;
 	}
+
+	// Ensure obj is always an array
+	obj = Array.isArray(obj) ? obj : [obj];
 
 	console.log('Object to process:', obj);
 
-	if (Array.isArray(obj)) {
-		console.log('Processing array');
-		const result = obj.map(item => replaceTemplateVariables(item, param)).join('\n\n');
-		console.log('Array processing result:', result);
-		return result;
-	} else {
-		console.log('Processing single object');
-		const result = replaceTemplateVariables(obj, param);
-		console.log('Single object processing result:', result);
-		return result;
-	}
+	const result = obj.map(item => replaceTemplateVariables(item, param)).join('\n\n');
+	console.log('Processing result:', result);
+	return result;
 };
 
 function replaceTemplateVariables(obj: any, template: string): string {
@@ -40,7 +38,19 @@ function replaceTemplateVariables(obj: any, template: string): string {
 	template = template.replace(/^"(.*)"$/, '$1');
 	console.log('Template after quote removal:', template);
 
-	let result = template.replace(/\$\{([\w.[\]]+)\}/g, (match, path) => {
+	// If obj is a string that looks like an object, try to parse it
+	if (typeof obj === 'string') {
+		try {
+			// Remove any outer parentheses and parse
+			const objString = obj.replace(/^\(|\)$/g, '').trim();
+			obj = parseObjectString(objString);
+			console.log('Parsed object:', obj);
+		} catch (error) {
+			console.log('Failed to parse object string:', obj);
+		}
+	}
+
+	let result = template.replace(/\$\{([\w.]+)\}/g, (match, path) => {
 		console.log('Replacing:', match);
 		const value = getNestedProperty(obj, path);
 		console.log('Replaced with:', value);
@@ -60,11 +70,27 @@ function replaceTemplateVariables(obj: any, template: string): string {
 	return result.trim();
 }
 
+function parseObjectString(str: string): any {
+	const obj: any = {};
+	const regex = /(\w+):\s*("(?:\\.|[^"\\])*"|[^,}]+)/g;
+	let match;
+
+	while ((match = regex.exec(str)) !== null) {
+		let [, key, value] = match;
+		// Remove quotes from the value if it's a string
+		if (value.startsWith('"') && value.endsWith('"')) {
+			value = value.slice(1, -1);
+		}
+		obj[key] = value;
+	}
+
+	return obj;
+}
+
 function getNestedProperty(obj: any, path: string): any {
 	console.log('Getting nested property:', { obj, path });
-	const result = path.split(/[\.\[\]]/).filter(Boolean).reduce((current, key) => {
-		console.log('Current:', current, 'Key:', key);
-		return current && current[key] !== undefined ? current[key] : undefined;
+	const result = path.split('.').reduce((current, key) => {
+		return current && typeof current === 'object' ? current[key] : undefined;
 	}, obj);
 	console.log('Nested property result:', result);
 	return result;
