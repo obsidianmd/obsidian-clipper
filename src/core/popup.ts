@@ -368,7 +368,10 @@ document.addEventListener('DOMContentLoaded', async function() {
 			}
 
 			const pathField = document.getElementById('path-name-field') as HTMLInputElement;
-			if (pathField) pathField.value = template.path;
+			if (pathField) {
+				let formattedPath = await replaceVariables(tabId, template.path, variables, currentUrl);
+				pathField.value = formattedPath;
+			}
 
 			const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
 			if (noteContentField) {
