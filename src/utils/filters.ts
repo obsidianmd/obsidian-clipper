@@ -61,14 +61,8 @@ export const filters: { [key: string]: FilterFunction } = {
 	wikilink
 };
 
-<<<<<<< Updated upstream
-export function applyFilters(value: string, filterNames: string[], url?: string): string {
-	// Ensure value is a string before applying filters
-	let processedValue = typeof value === 'string' ? value : JSON.stringify(value);
-=======
 export function applyFilters(value: string | any[], filterNames: string[], url?: string): string {
-	let processedValue = value;
->>>>>>> Stashed changes
+	let processedValue = typeof value === 'string' ? value : JSON.stringify(value);
 
 	const result = filterNames.reduce((result, filterName) => {
 		const [name, ...params] = filterName.split(':');
