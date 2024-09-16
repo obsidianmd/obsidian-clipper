@@ -1,9 +1,5 @@
 export const template = (str: string, param?: string): string => {
-	console.log('template input:', str);
-	console.log('template param:', param);
-
 	if (!param) {
-		console.log('No param provided, returning input');
 		return str;
 	}
 
@@ -11,7 +7,6 @@ export const template = (str: string, param?: string): string => {
 	try {
 		obj = JSON.parse(str);
 	} catch (error) {
-		console.log('Parsing failed, using input as array of objects');
 		obj = str.split('\n').map(item => {
 			try {
 				return JSON.parse(item);
@@ -20,8 +15,6 @@ export const template = (str: string, param?: string): string => {
 			}
 		});
 	}
-
-	console.log('Parsed object:', obj);
 
 	if (Array.isArray(obj)) {
 		return obj.map(item => replaceTemplateVariables(item, param)).join('\n\n');
@@ -32,9 +25,7 @@ export const template = (str: string, param?: string): string => {
 
 function replaceTemplateVariables(obj: any, template: string): string {
 	let result = template.replace(/\$\{([\w.[\]]+)\}/g, (match, path) => {
-		console.log('Replacing:', { match, path });
 		const value = getNestedProperty(obj, path);
-		console.log('Replaced with:', value);
 		return value !== undefined ? value : '';
 	});
 
@@ -51,11 +42,8 @@ function replaceTemplateVariables(obj: any, template: string): string {
 }
 
 function getNestedProperty(obj: any, path: string): any {
-	console.log('Getting nested property:', { obj, path });
 	const result = path.split(/[\.\[\]]/).filter(Boolean).reduce((current, key) => {
-		console.log('Accessing key:', key, 'Current value:', current);
 		return current && current[key] !== undefined ? current[key] : undefined;
 	}, obj);
-	console.log('Nested property result:', result);
 	return result;
 }
