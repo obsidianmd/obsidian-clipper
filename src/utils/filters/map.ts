@@ -38,7 +38,7 @@ export const map = (str: string, param?: string): string => {
 			return result;
 		});
 
-		const finalResult = mappedArray.join('\n\n');
+		const finalResult = mappedArray.join('\n');
 		console.log('map output:', finalResult);
 		return finalResult;
 	}
