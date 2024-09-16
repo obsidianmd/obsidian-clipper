@@ -24,6 +24,8 @@ import { trim } from './filters/trim';
 import { title } from './filters/title';
 import { upper } from './filters/upper';
 import { wikilink } from './filters/wikilink';
+import { template } from './filters/template';
+import { map } from './filters/map';
 
 import { FilterFunction } from '../types/filters';
 
@@ -41,6 +43,7 @@ export const filters: { [key: string]: FilterFunction } = {
 	last,
 	list,
 	lower,
+	map,
 	markdown,
 	object,
 	pascal,
@@ -50,6 +53,7 @@ export const filters: { [key: string]: FilterFunction } = {
 	split,
 	stripmd,
 	table,
+	template,
 	trim,
 	title,
 	upper,
