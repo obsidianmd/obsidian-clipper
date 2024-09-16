@@ -62,7 +62,7 @@ export const filters: { [key: string]: FilterFunction } = {
 };
 
 export function applyFilters(value: string | any[], filterNames: string[], url?: string): string {
-	let processedValue = typeof value === 'string' ? value : JSON.stringify(value);
+	let processedValue = value;
 
 	const result = filterNames.reduce((result, filterName) => {
 		const [name, ...params] = filterName.split(':');
