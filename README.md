@@ -154,6 +154,10 @@ Filters allow you to modify variables in a template. Filters are applied to vari
 	- Use `list:numbered` to convert to a numbered list.
 	- Use `list:numbered-task` to convert to a task list with numbers.
 - `lower` converts a string to lowercase.
+- `map` applies a transformation to each element of an array.
+	- Syntax: `array|map:item => ${item}|filter1|filter2`
+	- Example: `["a","b","c"]|map:item => ${item}|upper` returns `["A","B","C"]`
+	- Can be combined with other filters: `["a","b","c"]|map:item => ${item}|upper|join:" "` returns `"A B C"`
 - `markdown` converts a string to an [Obsidian Flavored Markdown](https://help.obsidian.md/Editing+and+formatting/Obsidian+Flavored+Markdown) formatted string.
 - `object` manipulates object data:
 	- `object:array` converts an object to an array of key-value pairs.
@@ -186,6 +190,11 @@ Filters allow you to modify variables in a template. Filters are applied to vari
 	- For an array of objects, it uses the object keys as headers.
 	- For an array of arrays, it creates a table with each nested array as a row.
 	- For a simple array, it creates a single-column table with "Value" as the header.
+- `template` applies a template string to an object or array of objects.
+	- Syntax: `object|template:"Template with ${variable}"`
+	- For objects: `{"name":"John","age":30}|template:"Name: ${name}, Age: ${age}"` returns `"Name: John, Age: 30"`
+	- For arrays: `[{"name":"John"},{"name":"Jane"}]|template:"Hello, ${name}!"` returns `"Hello, John!\n\nHello, Jane!"`
+	- Can access nested properties: `{"user":{"name":"John"}}|template:"User: ${user.name}"`
 - `title` returns a titlecased version of the value, e.g. `"hello world"|title` returns `"Hello World"`.
 - `trim` removes whitespace from both ends of a string.
 	- `"  hello world  "|trim` returns `"hello world"`.
