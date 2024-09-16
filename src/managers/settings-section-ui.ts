@@ -1,5 +1,7 @@
 import { updateUrl } from '../utils/routing';
+import { generalSettings } from '../utils/storage-utils';
 
+export function showSettingsSection(): void {
 	const generalSection = document.getElementById('general-section');
 	const templatesSection = document.getElementById('templates-section');
 	if (generalSection) {
@@ -31,4 +33,20 @@ import { updateUrl } from '../utils/routing';
 	document.querySelectorAll('.sidebar li').forEach(item => item.classList.remove('active'));
 	const generalItem = document.querySelector('.sidebar li[data-section="general"]');
 	if (generalItem) generalItem.classList.add('active');
+}
+
+export function showInterpreterSettings(): void {
+	// ... existing code ...
+
+	const interpreterToggle = document.getElementById('interpreter-toggle') as HTMLInputElement;
+	const interpreterAutoRunToggle = document.getElementById('interpreter-auto-run-toggle') as HTMLInputElement;
+
+	if (interpreterToggle) {
+		interpreterToggle.checked = generalSettings.interpreterEnabled;
+	}
+	if (interpreterAutoRunToggle) {
+		interpreterAutoRunToggle.checked = generalSettings.interpreterAutoRun;
+	}
+
+	// ... rest of the function ...
 }

@@ -110,6 +110,33 @@
 						</div>
 						<form id="interpreter-settings-form">
 							<div>
+								<h3>Interpreter</h3>
+								<div class="setting-item mod-horizontal">
+									<div class="setting-item-info">
+										<label for="interpreter-toggle">Enable interpreter</label>
+										<div class="setting-item-description">
+											Allows you to use prompt variables in your templates, to fill in information using natural language such as <code>{{prompt:"a summary of the page"}}</code>. Requires an API key.
+										</div>
+									</div>
+									<div class="setting-item-control">
+										<div class="checkbox-container">
+											<input type="checkbox" id="interpreter-toggle" />
+										</div>
+									</div>
+								</div>
+								<div class="setting-item mod-horizontal">
+									<div class="setting-item-info">
+										<label for="interpreter-auto-run-toggle">Automatically run</label>
+										<div class="setting-item-description">Run prompt variables immediately if the template contains any. This will consume API credits with your model provider. Turn off if you only want to run interpreter manually.</div>
+									</div>
+									<div class="setting-item-control">
+										<div class="checkbox-container">
+											<input type="checkbox" id="interpreter-auto-run-toggle" />
+										</div>
+									</div>
+								</div>
+							</div>
+							<div>
 								<h3>Models</h3>
 								<div class="setting-item mod-horizontal">
 									<div class="setting-item-info">

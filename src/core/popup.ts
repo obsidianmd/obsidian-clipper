@@ -6,7 +6,7 @@ import { extractPageContent, initializePageContent, replaceVariables } from '../
 import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
 import { decompressFromUTF16 } from 'lz-string';
 import { findMatchingTemplate, matchPattern } from '../utils/triggers';
-import { getLocalStorage, setLocalStorage, loadGeneralSettings, generalSettings, GeneralSettings } from '../utils/storage-utils';
+import { getLocalStorage, setLocalStorage, loadSettings, generalSettings, Settings } from '../utils/storage-utils';
 import { formatVariables, unescapeValue } from '../utils/string-utils';
 import { loadTemplates, createDefaultTemplate } from '../managers/template-manager';
 import browser from '../utils/browser-polyfill';
@@ -18,7 +18,7 @@ let currentTemplate: Template | null = null;
 let templates: Template[] = [];
 let currentVariables: { [key: string]: string } = {};
 
-let loadedSettings: GeneralSettings;
+let loadedSettings: Settings;
 
 async function ensureContentScriptLoaded() {
 	const tabs = await browser.tabs.query({active: true, currentWindow: true});
@@ -150,7 +150,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 		await addBrowserClassToHtml();
 
-		loadedSettings = await loadGeneralSettings();
+		loadedSettings = await loadSettings();
 
 		console.log('General settings:', loadedSettings);
 

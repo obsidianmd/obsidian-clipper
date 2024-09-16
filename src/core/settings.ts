@@ -12,7 +12,7 @@ import {
 } from '../managers/template-manager';
 import { updateTemplateList, showTemplateEditor, resetUnsavedChanges, initializeAddPropertyButton } from '../managers/template-ui';
 import { initializeGeneralSettings } from '../managers/general-settings';
-import { showGeneralSettings } from '../managers/general-settings-ui';
+import { showSettingsSection } from '../managers/settings-section-ui';
 import { initializeInterpreterSettings, showInterpreterSettings } from '../managers/interpreter-settings';
 import { initializeDragAndDrop, handleTemplateDrag } from '../utils/drag-and-drop';
 import { initializeAutoSave } from '../utils/auto-save';
@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 		const templateId = urlParams.get('template');
 
 		if (section === 'general') {
-			showGeneralSettings();
+			showSettingsSection();
 		} else if (section === 'interpreter') {
 			showInterpreterSettings();
 		} else if (templateId) {
@@ -136,10 +136,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 				showTemplateEditor(template);
 			} else {
 				console.error(`Template with id ${templateId} not found`);
-				showGeneralSettings();
+				showSettingsSection();
 			}
 		} else {
-			showGeneralSettings();
+			showSettingsSection();
 		}
 	}
 
@@ -175,7 +175,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 			sidebar.addEventListener('click', (event) => {
 				const target = event.target as HTMLElement;
 				if (target.dataset.section === 'general') {
-					showGeneralSettings();
+					showSettingsSection();
 				} else if (target.dataset.section === 'interpreter') {
 					showInterpreterSettings();
 				}

@@ -1,5 +1,5 @@
 import { initializeToggles } from '../utils/ui-utils';
-import { generalSettings, loadGeneralSettings, saveGeneralSettings } from '../utils/storage-utils';
+import { generalSettings, loadSettings, saveSettings } from '../utils/storage-utils';
 import { updateUrl } from '../utils/routing';
 
 export function initializeInterpreterSettings(): void {
@@ -7,14 +7,18 @@ export function initializeInterpreterSettings(): void {
 	if (interpreterSettingsForm) {
 		interpreterSettingsForm.addEventListener('input', debounce(saveInterpreterSettingsFromForm, 500));
 	}
-	loadGeneralSettings().then(() => {
+	loadSettings().then(() => {
 		const apiKeyInput = document.getElementById('openai-api-key') as HTMLInputElement;
 		const anthropicApiKeyInput = document.getElementById('anthropic-api-key') as HTMLInputElement;
 		const modelSelect = document.getElementById('default-model') as HTMLSelectElement;
+		const interpreterToggle = document.getElementById('interpreter-toggle') as HTMLInputElement;
+		const interpreterAutoRunToggle = document.getElementById('interpreter-auto-run-toggle') as HTMLInputElement;
 
 		if (apiKeyInput) apiKeyInput.value = generalSettings.openaiApiKey || '';
 		if (anthropicApiKeyInput) anthropicApiKeyInput.value = generalSettings.anthropicApiKey || '';
 		if (modelSelect) modelSelect.value = generalSettings.openaiModel || 'gpt-4o-mini';
+		if (interpreterToggle) interpreterToggle.checked = generalSettings.interpreterEnabled;
+		if (interpreterAutoRunToggle) interpreterAutoRunToggle.checked = generalSettings.interpreterAutoRun;
 		initializeAutoSave();
 	});
 }
@@ -30,14 +34,18 @@ function saveInterpreterSettingsFromForm(): void {
 	const apiKeyInput = document.getElementById('openai-api-key') as HTMLInputElement;
 	const anthropicApiKeyInput = document.getElementById('anthropic-api-key') as HTMLInputElement;
 	const modelSelect = document.getElementById('default-model') as HTMLSelectElement;
+	const interpreterToggle = document.getElementById('interpreter-toggle') as HTMLInputElement;
+	const interpreterAutoRunToggle = document.getElementById('interpreter-auto-run-toggle') as HTMLInputElement;
 
 	const updatedSettings = {
 		openaiApiKey: apiKeyInput.value,
 		anthropicApiKey: anthropicApiKeyInput.value,
 		openaiModel: modelSelect.value,
+		interpreterEnabled: interpreterToggle.checked,
+		interpreterAutoRun: interpreterAutoRunToggle.checked
 	};
 
-	saveGeneralSettings(updatedSettings);
+	saveSettings(updatedSettings);
 }
 
 function debounce(func: Function, delay: number): (...args: any[]) => void {

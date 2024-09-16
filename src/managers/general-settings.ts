@@ -2,7 +2,7 @@ import { handleDragStart, handleDragOver, handleDrop, handleDragEnd } from '../u
 import { initializeIcons } from '../icons/icons';
 import { getCommands } from '../utils/hotkeys';
 import { initializeToggles } from '../utils/ui-utils';
-import { generalSettings, loadGeneralSettings, saveGeneralSettings } from '../utils/storage-utils';
+import { generalSettings, loadSettings, saveSettings } from '../utils/storage-utils';
 import { detectBrowser } from '../utils/browser-detection';
 import { createElementWithClass, createElementWithHTML } from '../utils/dom-utils';
 import { initializeLLMSettings } from '../utils/llm-utils';
@@ -47,13 +47,13 @@ export function updateVaultList(): void {
 
 export function addVault(vault: string): void {
 	generalSettings.vaults.push(vault);
-	saveGeneralSettings();
+	saveSettings();
 	updateVaultList();
 }
 
 export function removeVault(index: number): void {
 	generalSettings.vaults.splice(index, 1);
-	saveGeneralSettings();
+	saveSettings();
 	updateVaultList();
 }
 
@@ -86,7 +86,7 @@ export async function setShortcutInstructions() {
 }
 
 export function initializeGeneralSettings(): void {
-	loadGeneralSettings().then(() => {
+	loadSettings().then(() => {
 		updateVaultList();
 		initializeShowMoreActionsToggle();
 		initializeBetaFeaturesToggle();
@@ -102,11 +102,11 @@ export function initializeGeneralSettings(): void {
 function initializeAutoSave(): void {
 	const generalSettingsForm = document.getElementById('general-settings-form');
 	if (generalSettingsForm) {
-		generalSettingsForm.addEventListener('input', debounce(saveGeneralSettingsFromForm, 500));
+		generalSettingsForm.addEventListener('input', debounce(saveSettingsFromForm, 500));
 	}
 }
 
-function saveGeneralSettingsFromForm(): void {
+function saveSettingsFromForm(): void {
 	const showMoreActionsToggle = document.getElementById('show-more-actions-toggle') as HTMLInputElement;
 	const betaFeaturesToggle = document.getElementById('beta-features-toggle') as HTMLInputElement;
 
@@ -115,7 +115,7 @@ function saveGeneralSettingsFromForm(): void {
 		betaFeatures: betaFeaturesToggle.checked
 	};
 
-	saveGeneralSettings(updatedSettings);
+	saveSettings(updatedSettings);
 }
 
 function debounce(func: Function, delay: number): (...args: any[]) => void {
