@@ -348,7 +348,6 @@ document.addEventListener('DOMContentLoaded', async function() {
 		});
 
 		const noteNameField = document.getElementById('note-name-field') as HTMLTextAreaElement;
-		
 		function adjustTextareaHeight(textarea: HTMLTextAreaElement) {
 			textarea.style.minHeight = '2rem';
 			textarea.style.minHeight = textarea.scrollHeight + 'px';
@@ -424,9 +423,10 @@ document.addEventListener('DOMContentLoaded', async function() {
 				`;
 				templateProperties.appendChild(propertyDiv);
 			}
-
+			
 			if (noteNameField) {
 				let formattedNoteName = await replaceVariables(tabId, template.noteNameFormat, variables, currentUrl);
+				noteNameField.setAttribute('data-template-value', template.noteNameFormat);
 				noteNameField.value = formattedNoteName;
 				adjustTextareaHeight(noteNameField);
 			}
@@ -452,8 +452,10 @@ document.addEventListener('DOMContentLoaded', async function() {
 				if (template.noteContentFormat) {
 					let content = await replaceVariables(tabId, template.noteContentFormat, variables, currentUrl);
 					noteContentField.value = content;
+					noteContentField.setAttribute('data-template-value', template.noteContentFormat);
 				} else {
 					noteContentField.value = '';
+					noteContentField.setAttribute('data-template-value', '');
 				}
 			}
 
