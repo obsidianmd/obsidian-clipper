@@ -1,6 +1,6 @@
 import { filters } from '../filters';
 
-export const map = (str: string, param?: string): string => {
+export const map = (str: string, param?: string): string | any[] => {
 	let array;
 	try {
 		array = JSON.parse(str);
@@ -15,46 +15,38 @@ export const map = (str: string, param?: string): string => {
 			return str;
 		}
 		const [, argName, expression] = match;
+		console.log('Arrow function parsed:', { argName, expression });
 
-		const mappedArray = array.map(item => {
-			const itemStr = typeof item === 'string' ? item : JSON.stringify(item);
-
+		const mappedArray = array.map((item, index) => {
+			console.log(`Processing item ${index}:`, JSON.stringify(item, null, 2));
 			const replacedExpression = expression.replace(
 				new RegExp(`\\$\\{${argName}\\}`, 'g'),
-				itemStr
+				JSON.stringify(item)
 			);
 
 			const result = applyFiltersInExpression(replacedExpression, item);
 			return result;
 		});
 
-		const finalResult = mappedArray.join('\n');
-		return finalResult;
+		return mappedArray;  // Return the array directly, not as a string
 	}
 	return str;
 };
 
-function applyFiltersInExpression(expression: string, item: any): string {
+function applyFiltersInExpression(expression: string, item: any): any {
 	const filterRegex = /(\w+)\s*\|\s*(\w+)(?:\s*:\s*([^|]+))?/g;
-	let result = expression;
+	let result = item;
 	let match;
 
 	while ((match = filterRegex.exec(expression)) !== null) {
-		const [fullMatch, value, filterName, filterParam] = match;
+		const [fullMatch, , filterName, filterParam] = match;
 		const filter = filters[filterName];
 		if (filter) {
-			const filtered = filter(typeof item === 'string' ? item : JSON.stringify(item), filterParam);
-			result = result.replace(fullMatch, filtered);
+			result = filter(JSON.stringify(result), filterParam);
 		} else {
 			console.warn('Filter not found:', filterName);
 		}
 	}
-
-	// Remove surrounding quotes if present
-	result = result.replace(/^"(.*)"$/, '$1');
-	
-	// Replace escaped newlines with actual newlines
-	result = result.replace(/\\n/g, '\n');
 
 	return result;
 }

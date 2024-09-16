@@ -1,19 +1,17 @@
-export const template = (str: string, param?: string): string => {
+export const template = (input: string | any[], param?: string): string => {
 	if (!param) {
-		return str;
+		return typeof input === 'string' ? input : JSON.stringify(input);
 	}
 
 	let obj;
-	try {
-		obj = JSON.parse(str);
-	} catch (error) {
-		obj = str.split('\n').map(item => {
-			try {
-				return JSON.parse(item);
-			} catch (e) {
-				return item;
-			}
-		});
+	if (typeof input === 'string') {
+		try {
+			obj = JSON.parse(input);
+		} catch (error) {
+			obj = input;
+		}
+	} else {
+		obj = input;
 	}
 
 	if (Array.isArray(obj)) {
@@ -24,21 +22,21 @@ export const template = (str: string, param?: string): string => {
 };
 
 function replaceTemplateVariables(obj: any, template: string): string {
+	// Remove the outer quotes if they exist
+	template = template.replace(/^"(.*)"$/, '$1');
+
 	let result = template.replace(/\$\{([\w.[\]]+)\}/g, (match, path) => {
 		const value = getNestedProperty(obj, path);
 		return value !== undefined ? value : '';
 	});
 
+	// Replace \n with actual newlines
+	result = result.replace(/\\n/g, '\n');
+
 	// Remove any empty lines (which might be caused by undefined values)
 	result = result.split('\n').filter(line => line.trim() !== '').join('\n');
 
-	// Remove surrounding quotes if present
-	result = result.replace(/^"(.*)"$/, '$1');
-	
-	// Replace escaped newlines with actual newlines
-	result = result.replace(/\\n/g, '\n');
-
-	return result;
+	return result.trim();
 }
 
 function getNestedProperty(obj: any, path: string): any {
