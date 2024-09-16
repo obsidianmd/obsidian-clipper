@@ -354,6 +354,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 							const initializedContent = await initializePageContent(extractedData.content, extractedData.selectedHtml, extractedData.extractedContent, currentTab.url!, extractedData.schemaOrgData, extractedData.fullHtml);
 							if (initializedContent) {
 								await initializeTemplateFields(currentTemplate, initializedContent.currentVariables, initializedContent.noteName, extractedData.schemaOrgData);
+								setupMetadataToggle();
 							} else {
 								logError('Unable to initialize page content.');
 							}
