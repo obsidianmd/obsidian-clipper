@@ -12,12 +12,13 @@ import {
 } from '../managers/template-manager';
 import { updateTemplateList, showTemplateEditor, resetUnsavedChanges, initializeAddPropertyButton } from '../managers/template-ui';
 import { initializeGeneralSettings } from '../managers/general-settings';
+import { showGeneralSettings } from '../managers/general-settings-ui';
+import { initializeInterpreterSettings, showInterpreterSettings } from '../managers/interpreter-settings';
 import { initializeDragAndDrop, handleTemplateDrag } from '../utils/drag-and-drop';
 import { initializeAutoSave } from '../utils/auto-save';
 import { exportTemplate, importTemplate, initializeDropZone } from '../utils/import-export';
 import { createIcons } from 'lucide';
 import { icons } from '../icons/icons';
-import { showGeneralSettings } from '../managers/general-settings-ui';
 import { updateUrl } from '../utils/routing';
 import browser from '../utils/browser-polyfill';
 import { addBrowserClassToHtml } from '../utils/browser-detection';
@@ -35,6 +36,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 	async function initializeSettings(): Promise<void> {
 		await initializeGeneralSettings();
+		await initializeInterpreterSettings();
 		const loadedTemplates = await loadTemplates();
 		updateTemplateList(loadedTemplates);
 		initializeTemplateListeners();
@@ -126,6 +128,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 		if (section === 'general') {
 			showGeneralSettings();
+		} else if (section === 'interpreter') {
+			showInterpreterSettings();
 		} else if (templateId) {
 			const template = findTemplateById(templateId);
 			if (template) {
@@ -164,15 +168,30 @@ document.addEventListener('DOMContentLoaded', async () => {
 		const sections = document.querySelectorAll('.settings-section');
 		const sidebar = document.getElementById('sidebar');
 		const settingsContainer = document.getElementById('settings');
+		const templateList = document.getElementById('template-list');
+
 
 		if (sidebar) {
 			sidebar.addEventListener('click', (event) => {
 				const target = event.target as HTMLElement;
 				if (target.dataset.section === 'general') {
 					showGeneralSettings();
+				} else if (target.dataset.section === 'interpreter') {
+					showInterpreterSettings();
 				}
 				if (settingsContainer) {
 					settingsContainer.classList.remove('sidebar-open');
+				}
+			});
+		}
+
+		if (templateList) {
+			templateList.addEventListener('click', (event) => {
+				const target = event.target as HTMLElement;
+				const listItem = target.closest('li');
+				if (listItem && listItem.dataset.id) {
+					hideAllSections();
+					showTemplatesSection();
 				}
 			});
 		}
@@ -183,17 +202,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 				sidebarItems.forEach(i => i.classList.remove('active'));
 				item.classList.add('active');
 				document.querySelectorAll('#template-list li').forEach(templateItem => templateItem.classList.remove('active'));
-				const templateEditor = document.getElementById('template-editor');
-				if (templateEditor) {
-					templateEditor.style.display = 'none';
-				}
-				sections.forEach(section => {
-					if (section.id === `${sectionId}-section`) {
-						(section as HTMLElement).style.display = 'block';
-						section.classList.add('active');
-					} else {
-						(section as HTMLElement).style.display = 'none';
-						section.classList.remove('active');
+				hideAllSections();
+				if (sectionId) {
+					const sectionToShow = document.getElementById(`${sectionId}-section`);
+					if (sectionToShow) {
+						sectionToShow.style.display = 'block';
+						sectionToShow.classList.add('active');
 					}
 				});
 				if (settingsContainer) {
@@ -209,6 +223,26 @@ document.addEventListener('DOMContentLoaded', async () => {
 				settingsContainer.classList.toggle('sidebar-open');
 				hamburgerMenu.classList.toggle('is-active');
 			});
+		}
+	}
+
+	function hideAllSections(): void {
+		const sections = document.querySelectorAll('.settings-section');
+		sections.forEach(section => {
+			(section as HTMLElement).style.display = 'none';
+			section.classList.remove('active');
+		});
+	}
+
+	function showTemplatesSection(): void {
+		const templatesSection = document.getElementById('templates-section');
+		if (templatesSection) {
+			templatesSection.style.display = 'block';
+			templatesSection.classList.add('active');
+		}
+		const templateEditor = document.getElementById('template-editor');
+		if (templateEditor) {
+			templateEditor.style.display = 'block';
 		}
 	}
 

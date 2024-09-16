@@ -14,6 +14,7 @@
 					<ul>
 						<li class="sidebar-heading">Settings</li>
 						<li data-section="general" class="active">General</li>
+						<li data-section="interpreter">Interpreter</li>
 						<li class="sidebar-heading">Templates</li>
 					</ul>
 					<button type="button" id="new-template-btn" class="mod-cta">New template</button>
@@ -100,40 +101,48 @@
 										</div>
 									</div>
 								</div>
-								<div>
-									<h3>Prompting</h3>
-									<div class="setting-item mod-horizontal">
-										<div class="setting-item-info">
-											<label for="default-model">Default model</label>
-											<div class="setting-item-description">Choose the default model for generating prompt variables.</div>
-										</div>
-										<div class="setting-item-control">
-											<select id="default-model">
-												<option value="gpt-4o-mini">GPT-4o mini</option>
-												<option value="gpt-4o">GPT-4o</option>
-												<option value="gpt-4-turbo">GPT-4 Turbo</option>
-											</select>
-										</div>
+						</form>
+					</div>
+
+					<div id="interpreter-section" class="settings-section">
+						<div class="settings-section-header">
+							<h2>Interpreter settings</h2>
+						</div>
+						<form id="interpreter-settings-form">
+							<div>
+								<h3>Models</h3>
+								<div class="setting-item mod-horizontal">
+									<div class="setting-item-info">
+										<label for="default-model">Default model</label>
+										<div class="setting-item-description">Choose the default model for generating prompt variables.</div>
 									</div>
-									<div class="setting-item mod-horizontal">
-										<div class="setting-item-info">
-											<label for="openai-api-key">OpenAI API key</label>
-											<div class="setting-item-description">You can get your OpenAI API key <a href="https://platform.openai.com/api-keys" target="_blank">here</a>.</div>
-										</div>
-										<div class="setting-item-control">
-											<input type="password" id="openai-api-key" placeholder="Enter your OpenAI API key">
-										</div>
-									</div>
-									<div class="setting-item mod-horizontal">
-										<div class="setting-item-info">
-											<label for="openai-api-key">Anthropic API key</label>
-											<div class="setting-item-description">You can get your Anthropic API key <a href="https://console.anthropic.com/settings/keys" target="_blank">here</a>.</div>
-										</div>
-										<div class="setting-item-control">
-											<input type="password" id="anthropic-api-key" placeholder="Enter your Anthropic API key">
-										</div>
+									<div class="setting-item-control">
+										<select id="default-model">
+											<option value="gpt-4o-mini">GPT-4o mini</option>
+											<option value="gpt-4o">GPT-4o</option>
+											<option value="gpt-4-turbo">GPT-4 Turbo</option>
+										</select>
 									</div>
 								</div>
+								<div class="setting-item mod-horizontal">
+									<div class="setting-item-info">
+										<label for="openai-api-key">OpenAI API key</label>
+										<div class="setting-item-description">You can get your OpenAI API key <a href="https://platform.openai.com/api-keys" target="_blank">here</a>.</div>
+									</div>
+									<div class="setting-item-control">
+										<input type="password" id="openai-api-key" placeholder="OpenAI API key">
+									</div>
+								</div>
+								<div class="setting-item mod-horizontal">
+									<div class="setting-item-info">
+										<label for="anthropic-api-key">Anthropic API key</label>
+										<div class="setting-item-description">You can get your Anthropic API key <a href="https://console.anthropic.com/settings/keys" target="_blank">here</a>.</div>
+									</div>
+									<div class="setting-item-control">
+										<input type="password" id="anthropic-api-key" placeholder="Anthropic API key">
+									</div>
+								</div>
+							</div>
 						</form>
 					</div>
 

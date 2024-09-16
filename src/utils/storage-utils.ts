@@ -7,6 +7,7 @@ export interface GeneralSettings {
 	silentOpen: boolean;
 	openaiApiKey?: string;
 	openaiModel?: string;
+	anthropicApiKey?: string;
 }
 
 export let generalSettings: GeneralSettings = {
@@ -15,7 +16,8 @@ export let generalSettings: GeneralSettings = {
 	silentOpen: false
 	showMoreActionsButton: false,
 	openaiApiKey: '',
-	openaiModel: 'gpt-4o-mini'
+	openaiModel: 'gpt-4o-mini',
+	anthropicApiKey: ''
 };
 
 export function setLocalStorage(key: string, value: any): Promise<void> {
@@ -27,7 +29,7 @@ export function getLocalStorage(key: string): Promise<any> {
 }
 
 export async function loadGeneralSettings(): Promise<GeneralSettings> {
-	const data = await browser.storage.sync.get(['general_settings', 'vaults', 'openaiApiKey', 'openaiModel']);
+	const data = await browser.storage.sync.get(['general_settings', 'vaults', 'openaiApiKey', 'openaiModel', 'anthropicApiKey']);
 
 	generalSettings = {
 		showMoreActionsButton: data.general_settings?.showMoreActionsButton ?? true,
@@ -35,7 +37,8 @@ export async function loadGeneralSettings(): Promise<GeneralSettings> {
 		betaFeatures: data.general_settings?.betaFeatures ?? false,
 		silentOpen: data.general_settings?.silentOpen ?? false
 		openaiApiKey: data.openaiApiKey || '',
-		openaiModel: data.openaiModel || 'gpt-4o-mini'
+		openaiModel: data.openaiModel || 'gpt-4o-mini',
+		anthropicApiKey: data.anthropicApiKey || ''
 	};
 	
 	return generalSettings;
@@ -52,6 +55,7 @@ export async function saveGeneralSettings(settings?: Partial<GeneralSettings>): 
 			silentOpen: generalSettings.silentOpen
 			openaiApiKey: generalSettings.openaiApiKey,
 			openaiModel: generalSettings.openaiModel
+			anthropicApiKey: generalSettings.anthropicApiKey
 		},
 		vaults: generalSettings.vaults 
 	});
