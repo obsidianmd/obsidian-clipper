@@ -27,7 +27,8 @@ import { wikilink } from './filters/wikilink';
 import { template } from './filters/template';
 import { map } from './filters/map';
 
-import { FilterFunction } from '../types/filters';
+// Update the FilterFunction type to allow for string or any[] return type
+export type FilterFunction = (value: string, param?: string) => string | any[];
 
 export const filters: { [key: string]: FilterFunction } = {
 	blockquote,
@@ -60,9 +61,8 @@ export const filters: { [key: string]: FilterFunction } = {
 	wikilink
 };
 
-export function applyFilters(value: string, filterNames: string[], url?: string): string {
-	// Ensure value is a string before applying filters
-	let processedValue = typeof value === 'string' ? value : JSON.stringify(value);
+export function applyFilters(value: string | any[], filterNames: string[], url?: string): string {
+	let processedValue = value;
 
 	const result = filterNames.reduce((result, filterName) => {
 		const [name, ...params] = filterName.split(':');
@@ -70,8 +70,19 @@ export function applyFilters(value: string, filterNames: string[], url?: string)
 
 		const filter = filters[name];
 		if (filter) {
+			// Ensure the input to the filter is always a string
+			const stringInput = typeof result === 'string' ? result : JSON.stringify(result);
 			// Pass the URL to the markdown filter, use param for others
-			const output = name === 'markdown' ? filter(result, url) : filter(result, param);
+			const output = name === 'markdown' ? filter(stringInput, url) : filter(stringInput, param);
+			
+			// If the output is a string that looks like JSON, try to parse it
+			if (typeof output === 'string' && (output.startsWith('[') || output.startsWith('{'))) {
+				try {
+					return JSON.parse(output);
+				} catch {
+					return output;
+				}
+			}
 			return output;
 		} else {
 			console.error(`Invalid filter: ${name}`);
@@ -79,5 +90,6 @@ export function applyFilters(value: string, filterNames: string[], url?: string)
 		}
 	}, processedValue);
 
-	return result;
+	// Ensure the final result is always a string
+	return typeof result === 'string' ? result : JSON.stringify(result);
 }

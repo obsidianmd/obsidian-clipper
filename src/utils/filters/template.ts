@@ -1,49 +1,99 @@
-export const template = (str: string, param?: string): string => {
+import { debugLog } from '../debug';
+
+export const template = (input: string | any[], param?: string): string => {
+	debugLog('Template', 'Template input:', input);
+	debugLog('Template', 'Template param:', param);
+
 	if (!param) {
-		return str;
+		debugLog('Template', 'No param provided, returning input');
+		return typeof input === 'string' ? input : JSON.stringify(input);
 	}
 
-	let obj;
-	try {
-		obj = JSON.parse(str);
-	} catch (error) {
-		obj = str.split('\n').map(item => {
-			try {
-				return JSON.parse(item);
-			} catch (e) {
-				return item;
-			}
-		});
-	}
-
-	if (Array.isArray(obj)) {
-		return obj.map(item => replaceTemplateVariables(item, param)).join('\n\n');
+	let obj: any[] = [];
+	if (typeof input === 'string') {
+		try {
+			obj = JSON.parse(input);
+			debugLog('Template', 'Parsed input:', obj);
+		} catch (error) {
+			debugLog('Template', 'Parsing failed, using input as is');
+			obj = [input];
+		}
 	} else {
-		return replaceTemplateVariables(obj, param);
+		obj = input;
 	}
+
+	// Ensure obj is always an array
+	obj = Array.isArray(obj) ? obj : [obj];
+
+	debugLog('Template', 'Object to process:', obj);
+
+	const result = obj.map(item => replaceTemplateVariables(item, param)).join('\n\n');
+	debugLog('Template', 'Processing result:', result);
+	return result;
 };
 
 function replaceTemplateVariables(obj: any, template: string): string {
-	let result = template.replace(/\$\{([\w.[\]]+)\}/g, (match, path) => {
+	debugLog('Template', 'Replacing template variables for:', obj);
+	debugLog('Template', 'Template:', template);
+
+	// Remove the outer quotes if they exist
+	template = template.replace(/^"(.*)"$/, '$1');
+	debugLog('Template', 'Template after quote removal:', template);
+
+	// If obj is a string that looks like an object, try to parse it
+	if (typeof obj === 'string') {
+		try {
+			// Remove any outer parentheses and parse
+			const objString = obj.replace(/^\(|\)$/g, '').trim();
+			obj = parseObjectString(objString);
+			debugLog('Template', 'Parsed object:', obj);
+		} catch (error) {
+			debugLog('Template', 'Failed to parse object string:', obj);
+		}
+	}
+
+	let result = template.replace(/\$\{([\w.]+)\}/g, (match, path) => {
+		debugLog('Template', 'Replacing:', match);
 		const value = getNestedProperty(obj, path);
-		return value !== undefined ? value : '';
+		debugLog('Template', 'Replaced with:', value);
+		return value !== undefined && value !== 'undefined' ? value : '';
 	});
+
+	debugLog('Template', 'Result after variable replacement:', result);
+
+	// Replace \n with actual newlines
+	result = result.replace(/\\n/g, '\n');
+	debugLog('Template', 'Result after newline replacement:', result);
 
 	// Remove any empty lines (which might be caused by undefined values)
 	result = result.split('\n').filter(line => line.trim() !== '').join('\n');
+	debugLog('Template', 'Result after empty line removal:', result);
 
-	// Remove surrounding quotes if present
-	result = result.replace(/^"(.*)"$/, '$1');
-	
-	// Replace escaped newlines with actual newlines
-	result = result.replace(/\\n/g, '\n');
+	return result.trim();
+}
 
-	return result;
+function parseObjectString(str: string): any {
+	const obj: any = {};
+	const regex = /(\w+):\s*("(?:\\.|[^"\\])*"|[^,}]+)/g;
+	let match;
+
+	while ((match = regex.exec(str)) !== null) {
+		let [, key, value] = match;
+		// Remove quotes from the value if it's a string
+		if (value.startsWith('"') && value.endsWith('"')) {
+			value = value.slice(1, -1);
+		}
+		obj[key] = value === 'undefined' ? undefined : value;
+	}
+
+	return obj;
 }
 
 function getNestedProperty(obj: any, path: string): any {
-	const result = path.split(/[\.\[\]]/).filter(Boolean).reduce((current, key) => {
-		return current && current[key] !== undefined ? current[key] : undefined;
+	debugLog('Template', 'Getting nested property:', { obj, path });
+	const result = path.split('.').reduce((current, key) => {
+		return current && typeof current === 'object' ? current[key] : undefined;
 	}, obj);
+	debugLog('Template', 'Nested property result:', result);
 	return result;
 }

@@ -1,60 +1,85 @@
-import { filters } from '../filters';
+import { debugLog } from '../debug';
 
 export const map = (str: string, param?: string): string => {
+	debugLog('Map', 'map input:', str);
+	debugLog('Map', 'map param:', param);
+
 	let array;
 	try {
 		array = JSON.parse(str);
+		debugLog('Map', 'Parsed array:', JSON.stringify(array, null, 2));
 	} catch (error) {
+		debugLog('Map', 'Parsing failed, using input as single item');
 		array = [str];
 	}
 
 	if (Array.isArray(array) && param) {
 		const match = param.match(/^\s*(\w+)\s*=>\s*(.+)$/);
 		if (!match) {
-			console.error('Invalid arrow function syntax');
+			debugLog('Map', 'Invalid arrow function syntax');
 			return str;
 		}
 		const [, argName, expression] = match;
+		debugLog('Map', 'Arrow function parsed:', { argName, expression });
 
-		const mappedArray = array.map(item => {
-			const itemStr = typeof item === 'string' ? item : JSON.stringify(item);
+		const mappedArray = array.map((item, index) => {
+			debugLog('Map', `Processing item ${index}:`, JSON.stringify(item, null, 2));
+			// Check if the expression is an object literal
+			if (expression.trim().startsWith('{') && expression.trim().endsWith('}')) {
+				// Use a simple object to store the mapped properties
+				const mappedItem: { [key: string]: any } = {};
 
-			const replacedExpression = expression.replace(
-				new RegExp(`\\$\\{${argName}\\}`, 'g'),
-				itemStr
-			);
+				// Parse the expression to extract property assignments
+				const assignments = expression.match(/\{(.+)\}/)?.[1].split(',') || [];
 
-			const result = applyFiltersInExpression(replacedExpression, item);
-			return result;
+				assignments.forEach((assignment) => {
+					const [key, value] = assignment.split(':').map(s => s.trim());
+					// Remove any surrounding quotes from the key
+					const cleanKey = key.replace(/^['"](.+)['"]$/, '$1');
+					debugLog('Map', 'Processing assignment:', { cleanKey, value });
+					// Evaluate the value expression
+					const cleanValue = evaluateExpression(value, item, argName);
+					debugLog('Map', 'Cleaned value:', cleanValue);
+					mappedItem[cleanKey] = cleanValue;
+					debugLog('Map', `Assigned ${cleanKey}:`, mappedItem[cleanKey]);
+				});
+
+				debugLog('Map', 'Mapped item:', mappedItem);
+				return mappedItem;
+			} else {
+				// If it's not an object literal, treat it as a simple expression
+				return evaluateExpression(expression, item, argName);
+				}
 		});
 
-		const finalResult = mappedArray.join('\n');
-		return finalResult;
+		debugLog('Map', 'Mapped array:', JSON.stringify(mappedArray, null, 2));
+		return JSON.stringify(mappedArray);
 	}
+	debugLog('Map', 'map output (unchanged):', str);
 	return str;
 };
 
-function applyFiltersInExpression(expression: string, item: any): string {
-	const filterRegex = /(\w+)\s*\|\s*(\w+)(?:\s*:\s*([^|]+))?/g;
-	let result = expression;
-	let match;
-
-	while ((match = filterRegex.exec(expression)) !== null) {
-		const [fullMatch, value, filterName, filterParam] = match;
-		const filter = filters[filterName];
-		if (filter) {
-			const filtered = filter(typeof item === 'string' ? item : JSON.stringify(item), filterParam);
-			result = result.replace(fullMatch, filtered);
-		} else {
-			console.warn('Filter not found:', filterName);
-		}
+function evaluateExpression(expression: string, item: any, argName: string): any {
+	const result = expression.replace(new RegExp(`${argName}\\.([\\w.\\[\\]]+)`, 'g'), (_, prop) => {
+		const value = getNestedProperty(item, prop);
+		debugLog('Map', `Replacing ${argName}.${prop} with:`, value);
+		return JSON.stringify(value);
+	});
+	try {
+		return JSON.parse(result);
+	} catch {
+		return result.replace(/^["'](.+)["']$/, '$1');
 	}
+}
 
-	// Remove surrounding quotes if present
-	result = result.replace(/^"(.*)"$/, '$1');
-	
-	// Replace escaped newlines with actual newlines
-	result = result.replace(/\\n/g, '\n');
-
+function getNestedProperty(obj: any, path: string): any {
+	debugLog('Map', 'Getting nested property:', { obj: JSON.stringify(obj), path });
+	const result = path.split(/[\.\[\]]/).filter(Boolean).reduce((current, key) => {
+		if (current && Array.isArray(current) && /^\d+$/.test(key)) {
+			return current[parseInt(key, 10)];
+		}
+		return current && current[key] !== undefined ? current[key] : undefined;
+	}, obj);
+	debugLog('Map', 'Nested property result:', result);
 	return result;
 }
