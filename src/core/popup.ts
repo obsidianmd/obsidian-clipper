@@ -261,6 +261,12 @@ document.addEventListener('DOMContentLoaded', async function() {
 							} else {
 								showError('Error initializing page content: Unknown error');
 							}
+							await initializeTemplateFields(currentTemplate, initializedContent.currentVariables, initializedContent.noteName, extractedData.schemaOrgData);
+
+							document.querySelector('.clipper')?.classList.remove('hidden');
+							setupMetadataToggle();
+						} else {
+							showError('Unable to initialize page content.');
 						}
 					} else {
 						showError('Unable to get page content. Please try reloading the page.');
@@ -299,21 +305,39 @@ document.addEventListener('DOMContentLoaded', async function() {
 			const metadataProperties = document.querySelector('.metadata-properties') as HTMLElement;
 			
 			if (metadataHeader && metadataProperties) {
-				metadataHeader.addEventListener('click', () => {
-					const isCollapsed = metadataProperties.classList.toggle('collapsed');
-					metadataHeader.classList.toggle('collapsed');
-					setLocalStorage('propertiesCollapsed', isCollapsed);
-				});
+				metadataHeader.removeEventListener('click', toggleMetadataProperties);
+				metadataHeader.addEventListener('click', toggleMetadataProperties);
 
+				// Set initial state
 				getLocalStorage('propertiesCollapsed').then((isCollapsed) => {
-					if (isCollapsed) {
-						metadataProperties.classList.add('collapsed');
-						metadataHeader.classList.add('collapsed');
-					} else {
-						metadataProperties.classList.remove('collapsed');
-						metadataHeader.classList.remove('collapsed');
-					}
+					updateMetadataToggleState(isCollapsed);
 				});
+			}
+		}
+
+		function toggleMetadataProperties() {
+			const metadataProperties = document.querySelector('.metadata-properties') as HTMLElement;
+			const metadataHeader = document.querySelector('.metadata-properties-header') as HTMLElement;
+			
+			if (metadataProperties && metadataHeader) {
+				const isCollapsed = metadataProperties.classList.toggle('collapsed');
+				metadataHeader.classList.toggle('collapsed');
+				setLocalStorage('propertiesCollapsed', isCollapsed);
+			}
+		}
+
+		function updateMetadataToggleState(isCollapsed: boolean) {
+			const metadataProperties = document.querySelector('.metadata-properties') as HTMLElement;
+			const metadataHeader = document.querySelector('.metadata-properties-header') as HTMLElement;
+			
+			if (metadataProperties && metadataHeader) {
+				if (isCollapsed) {
+					metadataProperties.classList.add('collapsed');
+					metadataHeader.classList.add('collapsed');
+				} else {
+					metadataProperties.classList.remove('collapsed');
+					metadataHeader.classList.remove('collapsed');
+				}
 			}
 		}
 
@@ -394,9 +418,9 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 			for (const property of template.properties) {
 
-				const propertyDiv = createElementWithClass('div', 'metadata-property');
-				propertyDiv.dataset.id = property.id; // Add the property ID to the element
-
+				const propertyDiv = document.createElement('div');
+				propertyDiv.className = 'metadata-property';
+				propertyDiv.dataset.id = property.id;
 				let value = await replaceVariables(tabId, unescapeValue(property.value), variables, currentUrl);
 
 				// Apply type-specific parsing
