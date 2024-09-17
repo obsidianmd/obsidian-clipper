@@ -130,7 +130,9 @@ Filters allow you to modify variables in a template. Filters are applied to vari
 	- `foldState` is a boolean to set the fold state (true for folded, false for unfolded, null for not foldable)
 - `capitalize` capitalizes the first character of the value and converts the rest to lowercase, e.g. `"hELLO wORLD"|capitalize` returns `"Hello world"`.
 - `camel` converts text to `camelCase`.
-- `date` converts a date to the specified format such as `date:YYYY-MM-DD`, [see reference](https://day.js.org/docs/en/display/format).
+- `date` converts a date to the specified format, [see reference](https://day.js.org/docs/en/display/format).
+	- `date:"YYYY-MM-DD"` converts a date to "YYYY-MM-DD".
+	- Use `date:("outputFormat", "inputFormat")` to specify the input format, e.g. `"12/01/2024"|date:("YYYY-MM-DD", "MM/DD/YYYY")` parses "12/01/2024" and returns `"2024-12-01"`.
 - `first` returns the first element of an array as a string.
 	- `["a","b","c"]|first` returns `"a"`.
 	- If the input is not an array, it returns the input unchanged.
