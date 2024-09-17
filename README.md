@@ -133,6 +133,9 @@ Filters allow you to modify variables in a template. Filters are applied to vari
 - `date` converts a date to the specified format, [see reference](https://day.js.org/docs/en/display/format).
 	- `date:"YYYY-MM-DD"` converts a date to "YYYY-MM-DD".
 	- Use `date:("outputFormat", "inputFormat")` to specify the input format, e.g. `"12/01/2024"|date:("YYYY-MM-DD", "MM/DD/YYYY")` parses "12/01/2024" and returns `"2024-12-01"`.
+- `date_modify` modifies a date by adding or subtracting a specified amount of time, [see reference](https://day.js.org/docs/en/manipulate/add).
+	- `"2024-12-01"|date_modify:"+1 year"` returns `"2025-12-01"`
+	- `"2024-12-01"|date_modify:"- 2 months"` returns `"2024-10-01"`
 - `first` returns the first element of an array as a string.
 	- `["a","b","c"]|first` returns `"a"`.
 	- If the input is not an array, it returns the input unchanged.

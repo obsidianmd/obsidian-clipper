@@ -30,6 +30,7 @@ import { wikilink } from './filters/wikilink';
 import { template } from './filters/template';
 import { map } from './filters/map';
 import { strip_tags } from './filters/strip_tags';
+import { date_modify } from './filters/date_modify';
 
 export const filters: { [key: string]: FilterFunction } = {
 	blockquote,
@@ -37,6 +38,7 @@ export const filters: { [key: string]: FilterFunction } = {
 	capitalize,
 	callout,
 	date,
+	date_modify,
 	first,
 	footnote,
 	image,
@@ -55,7 +57,7 @@ export const filters: { [key: string]: FilterFunction } = {
 	split,
 	strip_attr,
 	strip_md,
-	stripmd: strip_md, // stripmd is an alias for strip_md
+	stripmd: strip_md, // an alias for strip_md
 	strip_tags,
 	table,
 	template,
