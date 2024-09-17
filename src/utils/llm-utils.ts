@@ -9,17 +9,109 @@ export function initializeLLMSettings(): void {
 
 	if (apiKeyInput && modelSelect) {
 		apiKeyInput.value = generalSettings.openaiApiKey || '';
-		modelSelect.value = generalSettings.openaiModel || 'gpt-4o-mini';
+		modelSelect.value = generalSettings.interpreterModel || 'gpt-4o-mini';
 	}
 }
 
 const RATE_LIMIT_RESET_TIME = 60000; // 1 minute in milliseconds
 let lastRequestTime = 0;
 
-export async function sendToLLM(userPrompt: string, content: string, promptVariables: PromptVariable[]): Promise<{ userResponse: any; promptResponses: any[] }> {
-	const apiKey = generalSettings.openaiApiKey;
-	const model = generalSettings.openaiModel || 'gpt-4o-mini';
+async function sendToAnthropicLLM(userPrompt: string, content: string, promptVariables: PromptVariable[]): Promise<{ userResponse: any; promptResponses: any[] }> {
+	const apiKey = generalSettings.anthropicApiKey;
+	const model = generalSettings.interpreterModel;
 
+	if (!apiKey) {
+		throw new Error('Anthropic API key is not set');
+	}
+
+	try {
+		const systemContent = {
+			variables: promptVariables.map(({ key, prompt }) => ({ key, prompt })),
+			instructions: "Please respond to the user prompt and each variable prompt. Format your response as a JSON object with 'user_response' for the main prompt and 'variable_responses' for the variable prompts."
+		};
+
+		const requestBody = {
+			model: model,
+			max_tokens: 1000,
+			messages: [
+				{ role: 'user', content: `${userPrompt}\n\nContent: ${content}` }
+			],
+			system: JSON.stringify(systemContent)
+		};
+
+		console.log('Sending request to Anthropic API:', requestBody);
+
+		const response = await fetch('https://api.anthropic.com/v1/messages', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'x-api-key': apiKey,
+				'anthropic-version': '2023-06-01',
+				'anthropic-dangerous-direct-browser-access': 'true'
+			},
+			body: JSON.stringify(requestBody)
+		});
+
+		if (!response.ok) {
+			const errorData = await response.json();
+			console.error('Anthropic API error response:', errorData);
+			throw new Error(`Anthropic API error: ${response.statusText} ${errorData.error?.message || ''}`);
+		}
+
+		const data = await response.json();
+		console.log('Anthropic API response:', data);
+
+		const llmResponseContent = data.content[0].text;
+		console.log('Raw LLM response:', llmResponseContent);
+
+		return parseAnthropicResponse(llmResponseContent, promptVariables);
+	} catch (error) {
+		console.error('Error sending to Anthropic LLM:', error);
+		throw error;
+	}
+}
+
+function parseAnthropicResponse(responseContent: string, promptVariables: PromptVariable[]): { userResponse: any; promptResponses: any[] } {
+	let parsedResponse;
+	try {
+		// First, try to parse the entire response as JSON
+		parsedResponse = JSON.parse(responseContent);
+	} catch (parseError) {
+		console.warn('Failed to parse entire LLM response as JSON. Attempting to extract JSON from the response.');
+		// If that fails, try to extract JSON from the response
+		const jsonMatch = responseContent.match(/\{[\s\S]*\}/);
+		if (jsonMatch) {
+			try {
+				parsedResponse = JSON.parse(jsonMatch[0]);
+			} catch (extractError) {
+				console.warn('Failed to extract JSON from LLM response. Using raw response.');
+				parsedResponse = { user_response: responseContent };
+			}
+		} else {
+			console.warn('No JSON found in LLM response. Using raw response.');
+			parsedResponse = { user_response: responseContent };
+		}
+	}
+
+	const userResponse = parsedResponse.user_response || '';
+	let promptResponses: any[] = [];
+
+	if (parsedResponse.variable_responses) {
+		promptResponses = promptVariables.map(variable => ({
+			key: variable.key,
+			prompt: variable.prompt,
+			user_response: parsedResponse.variable_responses[variable.key] || parsedResponse.variable_responses[variable.prompt] || ''
+		}));
+	}
+
+	return {
+		userResponse: promptResponses.find(r => r.key === 'prompt_1')?.user_response || userResponse,
+		promptResponses
+	};
+}
+
+async function sendToOpenAILLM(userPrompt: string, content: string, promptVariables: PromptVariable[]): Promise<{ userResponse: any; promptResponses: any[] }> {
+	const apiKey = generalSettings.openaiApiKey;
 	if (!apiKey) {
 		throw new Error('OpenAI API key is not set');
 	}
@@ -37,7 +129,7 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 		};
 
 		const requestBody = {
-			model: model,
+			model: generalSettings.interpreterModel || 'gpt-4o-mini',
 			messages: [
 				{ role: 'system', content: JSON.stringify(systemContent) },
 				{ role: 'user', content: `${userPrompt}\n\nContent: ${content}` }
@@ -74,45 +166,54 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 		const llmResponseContent = data.choices[0].message.content;
 		console.log('Raw LLM response:', llmResponseContent);
 
-		let parsedResponse;
-		try {
-			// Check if the response is already a JSON object
-			if (typeof llmResponseContent === 'object' && llmResponseContent !== null) {
-				parsedResponse = llmResponseContent;
-			} else {
-				// Remove code block markers if they exist
-				const cleanedResponse = llmResponseContent.replace(/^```json\n|\n```$/g, '');
-				parsedResponse = JSON.parse(cleanedResponse);
-			}
-		} catch (parseError) {
-			console.warn('Failed to parse LLM response as JSON. Using raw response.');
-			return {
-				userResponse: llmResponseContent,
-				promptResponses: []
-			};
-		}
-
-		const userResponse = parsedResponse.user_response || '';
-		let promptResponses: any[] = [];
-
-		if (parsedResponse.variable_responses) {
-			promptResponses = promptVariables.map(variable => {
-				const response = parsedResponse.variable_responses[variable.key] || parsedResponse.variable_responses[variable.prompt];
-				return {
-					key: variable.key,
-					prompt: variable.prompt,
-					user_response: response !== undefined ? response : ''
-				};
-			});
-		}
-
-		return {
-			userResponse: promptResponses.find(r => r.key === 'prompt_1')?.user_response || userResponse,
-			promptResponses
-		};
+		return parseOpenAIResponse(llmResponseContent, promptVariables);
 	} catch (error) {
-		console.error('Error sending to LLM:', error);
+		console.error('Error sending to OpenAI LLM:', error);
 		throw error;
+	}
+}
+
+function parseOpenAIResponse(responseContent: string, promptVariables: PromptVariable[]): { userResponse: any; promptResponses: any[] } {
+	let parsedResponse;
+	try {
+		// Remove code block markers if they exist
+		const cleanedResponse = responseContent.replace(/^```json\n|\n```$/g, '');
+		parsedResponse = JSON.parse(cleanedResponse);
+	} catch (parseError) {
+		console.warn('Failed to parse LLM response as JSON. Using raw response.');
+		return {
+			userResponse: responseContent,
+			promptResponses: []
+		};
+	}
+
+	const userResponse = parsedResponse.user_response || '';
+	let promptResponses: any[] = [];
+
+	if (parsedResponse.variable_responses) {
+		promptResponses = promptVariables.map(variable => {
+			const response = parsedResponse.variable_responses[variable.key] || parsedResponse.variable_responses[variable.prompt];
+			return {
+				key: variable.key,
+				prompt: variable.prompt,
+				user_response: response !== undefined ? response : ''
+			};
+		});
+	}
+
+	return {
+		userResponse: promptResponses.find(r => r.key === 'prompt_1')?.user_response || userResponse,
+		promptResponses
+	};
+}
+
+export async function sendToLLM(userPrompt: string, content: string, promptVariables: PromptVariable[]): Promise<{ userResponse: any; promptResponses: any[] }> {
+	const model = generalSettings.interpreterModel || 'gpt-4o-mini';
+
+	if (model.startsWith('claude-')) {
+		return sendToAnthropicLLM(userPrompt, content, promptVariables);
+	} else {
+		return sendToOpenAILLM(userPrompt, content, promptVariables);
 	}
 }
 

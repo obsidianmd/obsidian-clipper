@@ -6,7 +6,7 @@ export interface Settings {
 	betaFeatures: boolean;
 	silentOpen: boolean;
 	openaiApiKey?: string;
-	openaiModel?: string;
+	interpreterModel?: string;
 	anthropicApiKey?: string;
 	interpreterEnabled: boolean;
 	interpreterAutoRun: boolean;
@@ -18,7 +18,7 @@ export let generalSettings: Settings = {
 	silentOpen: false
 	showMoreActionsButton: false,
 	openaiApiKey: '',
-	openaiModel: 'gpt-4o-mini',
+	interpreterModel: 'gpt-4o-mini',
 	anthropicApiKey: '',
 	interpreterEnabled: false,
 	interpreterAutoRun: false
@@ -41,7 +41,7 @@ export async function loadSettings(): Promise<Settings> {
 		betaFeatures: data.general_settings?.betaFeatures ?? false,
 		silentOpen: data.general_settings?.silentOpen ?? false
 		openaiApiKey: data.interpreter_settings?.openaiApiKey || '',
-		openaiModel: data.interpreter_settings?.openaiModel || 'gpt-4o-mini',
+		interpreterModel: data.interpreter_settings?.interpreterModel || 'gpt-4o-mini',
 		anthropicApiKey: data.interpreter_settings?.anthropicApiKey || '',
 		interpreterEnabled: data.interpreter_settings?.interpreterEnabled ?? false,
 		interpreterAutoRun: data.interpreter_settings?.interpreterAutoRun ?? false
@@ -63,7 +63,7 @@ export async function saveSettings(settings?: Partial<Settings>): Promise<void> 
 		},
 		interpreter_settings: {
 			openaiApiKey: generalSettings.openaiApiKey,
-			openaiModel: generalSettings.openaiModel,
+			interpreterModel: generalSettings.interpreterModel,
 			anthropicApiKey: generalSettings.anthropicApiKey,
 			interpreterEnabled: generalSettings.interpreterEnabled,
 			interpreterAutoRun: generalSettings.interpreterAutoRun

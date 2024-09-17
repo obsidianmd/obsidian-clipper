@@ -16,7 +16,7 @@ export function initializeInterpreterSettings(): void {
 
 		if (apiKeyInput) apiKeyInput.value = generalSettings.openaiApiKey || '';
 		if (anthropicApiKeyInput) anthropicApiKeyInput.value = generalSettings.anthropicApiKey || '';
-		if (modelSelect) modelSelect.value = generalSettings.openaiModel || 'gpt-4o-mini';
+		if (modelSelect) modelSelect.value = generalSettings.interpreterModel || 'gpt-4o-mini';
 		if (interpreterToggle) interpreterToggle.checked = generalSettings.interpreterEnabled;
 		if (interpreterAutoRunToggle) interpreterAutoRunToggle.checked = generalSettings.interpreterAutoRun;
 		initializeAutoSave();
@@ -40,7 +40,7 @@ function saveInterpreterSettingsFromForm(): void {
 	const updatedSettings = {
 		openaiApiKey: apiKeyInput.value,
 		anthropicApiKey: anthropicApiKeyInput.value,
-		openaiModel: modelSelect.value,
+		interpreterModel: modelSelect.value,
 		interpreterEnabled: interpreterToggle.checked,
 		interpreterAutoRun: interpreterAutoRunToggle.checked
 	};
