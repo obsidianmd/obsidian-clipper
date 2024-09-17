@@ -218,6 +218,14 @@ Filters allow you to modify variables in a template. Filters are applied to vari
 	- For arrays: `["page1","page2"]|wikilink` returns an array of wikilinks without aliases.
 	- For arrays with alias: `["page1","page2"]|wikilink:"alias"` returns an array of wikilinks with the same alias for all links.
 	- For objects: `{"page1": "alias1", "page2": "alias2"}|wikilink` returns wikilinks with the keys as page names and values as aliases.
+- `safe_name` sanitizes a string to be used as a safe file name.
+  - Basic usage: `safe_name` applies the most conservative sanitization rules.
+  - OS-specific usage: `safe_name:os` where `os` can be `windows`, `mac`, or `linux`.
+  - Examples:
+    - `"File: Name?"|safe_name` returns `"File- Name-"`
+    - `"con.txt"|safe_name:windows` returns `"_con.txt"`
+    - `".hidden"|safe_name:mac` returns `"_hidden"`
+  - The filter always ensures the resulting name is not empty and is no longer than 255 characters.
 
 ## Building the extension
 

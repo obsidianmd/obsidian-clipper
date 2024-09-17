@@ -1,10 +1,12 @@
 import { FilterFunction } from '../types/types';
 import { debugLog } from './debug';
+
 import { blockquote } from './filters/blockquote';
+import { callout } from './filters/callout';
 import { camel } from './filters/camel';
 import { capitalize } from './filters/capitalize';
-import { callout } from './filters/callout';
 import { date } from './filters/date';
+import { date_modify } from './filters/date_modify';
 import { first } from './filters/first';
 import { footnote } from './filters/footnote';
 import { image } from './filters/image';
@@ -13,32 +15,32 @@ import { kebab } from './filters/kebab';
 import { last } from './filters/last';
 import { list } from './filters/list';
 import { lower } from './filters/lower';
+import { map } from './filters/map';
 import { markdown } from './filters/markdown';
 import { object } from './filters/object';
 import { pascal } from './filters/pascal';
 import { replace } from './filters/replace';
+import { safe_name } from './filters/safe_name';
 import { slice } from './filters/slice';
 import { snake } from './filters/snake';
 import { split } from './filters/split';
 import { strip_attr } from './filters/strip_attr';
 import { strip_md } from './filters/strip_md';
+import { strip_tags } from './filters/strip_tags';
 import { table } from './filters/table';
-import { trim } from './filters/trim';
+import { template } from './filters/template';
 import { title } from './filters/title';
+import { trim } from './filters/trim';
 import { upper } from './filters/upper';
 import { wikilink } from './filters/wikilink';
-import { template } from './filters/template';
-import { map } from './filters/map';
-import { strip_tags } from './filters/strip_tags';
-import { date_modify } from './filters/date_modify';
 
 export const filters: { [key: string]: FilterFunction } = {
 	blockquote,
+	callout,
 	camel,
 	capitalize,
-	callout,
-	date,
 	date_modify,
+	date,
 	first,
 	footnote,
 	image,
@@ -52,19 +54,20 @@ export const filters: { [key: string]: FilterFunction } = {
 	object,
 	pascal,
 	replace,
+	safe_name,
 	slice,
 	snake,
 	split,
 	strip_attr,
 	strip_md,
-	stripmd: strip_md, // an alias for strip_md
 	strip_tags,
+	stripmd: strip_md, // an alias for strip_md
 	table,
 	template,
-	trim,
 	title,
+	trim,
 	upper,
-	wikilink,
+	wikilink
 };
 
 export function applyFilters(value: string | any[], filterNames: string[], currentUrl?: string): string {
