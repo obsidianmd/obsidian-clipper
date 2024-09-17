@@ -7,6 +7,7 @@ import browser from './browser-polyfill';
 import { convertDate } from './date-utils';
 import { debugLog } from './debug';
 import dayjs from 'dayjs';
+import { generalSettings } from '../utils/storage-utils';
 
 export function extractReadabilityContent(doc: Document): ReturnType<Readability['parse']> | null {
 	try {
@@ -96,17 +97,20 @@ async function processSchema(match: string, variables: { [key: string]: string }
 }
 
 async function processPrompt(match: string, variables: { [key: string]: string }, currentUrl: string): Promise<string> {
-	const promptRegex = /{{prompt:\\?"(.*?)\\?"(\|.*?)?}}/;
-	const matches = match.match(promptRegex);
-	if (!matches) {
-		console.error('Invalid prompt format:', match);
-		return match;
-	}
-
-	const [, promptText, filters = ''] = matches;
+	if (generalSettings.interpreterEnabled) {
+		const promptRegex = /{{prompt:\\?"(.*?)\\?"(\|.*?)?}}/;
+		const matches = match.match(promptRegex);
+		if (!matches) {
+			console.error('Invalid prompt format:', match);
+			return match;
+		}
 	
-	// Return the original match without processing
-	return match;
+		const [, promptText, filters = ''] = matches;
+	
+		return match;
+	} else {
+		return '';
+	}
 }
 
 function getNestedProperty(obj: any, path: string): any {

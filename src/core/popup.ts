@@ -154,6 +154,8 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 		console.log('General settings:', loadedSettings);
 
+		initializeInterpreter();
+
 		await loadTemplates();
 
 		const vaultContainer = document.getElementById('vault-container') as HTMLElement;
@@ -520,9 +522,11 @@ document.addEventListener('DOMContentLoaded', async function() {
 				});
 			}
 
-			await initializeLLMComponents(template, variables, tabId, currentUrl);
-
 			if (template) {
+				if (generalSettings.interpreterEnabled) {
+					await initializeLLMComponents(template, variables, tabId, currentUrl);
+				}
+
 				const replacedTemplate = await getReplacedTemplate(template, variables, tabId, currentUrl);
 				console.log('Current template with replaced variables:', JSON.stringify(replacedTemplate, null, 2));
 			}
@@ -704,3 +708,10 @@ async function processLLM(promptToUse: string, contentToProcess: string): Promis
 		}
 	}
 });
+
+function initializeInterpreter(): void {
+	const interpreterElement = document.getElementById('interpreter');
+	if (interpreterElement) {
+		interpreterElement.style.display = generalSettings.interpreterEnabled ? 'block' : 'none';
+	}
+}

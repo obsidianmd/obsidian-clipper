@@ -19,7 +19,19 @@ export function initializeInterpreterSettings(): void {
 		if (modelSelect) modelSelect.value = generalSettings.interpreterModel || 'gpt-4o-mini';
 		if (interpreterToggle) interpreterToggle.checked = generalSettings.interpreterEnabled;
 		if (interpreterAutoRunToggle) interpreterAutoRunToggle.checked = generalSettings.interpreterAutoRun;
+		initializeToggles();
 		initializeAutoSave();
+
+		if (interpreterToggle) {
+			interpreterToggle.addEventListener('change', () => {
+				saveInterpreterSettingsFromForm();
+			});
+		}
+		if (interpreterAutoRunToggle) {
+			interpreterAutoRunToggle.addEventListener('change', () => {
+				saveInterpreterSettingsFromForm();
+			});
+		}
 	});
 }
 
