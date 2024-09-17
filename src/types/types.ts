@@ -22,3 +22,5 @@ export interface Property {
 export interface ExtractedContent {
 	[key: string]: string;
 }
+
+export type FilterFunction = (value: string, param?: string) => string | any[];

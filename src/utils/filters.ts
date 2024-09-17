@@ -1,3 +1,4 @@
+import { FilterFunction } from '../types/types';
 import { blockquote } from './filters/blockquote';
 import { camel } from './filters/camel';
 import { capitalize } from './filters/capitalize';
@@ -18,7 +19,8 @@ import { replace } from './filters/replace';
 import { slice } from './filters/slice';
 import { snake } from './filters/snake';
 import { split } from './filters/split';
-import { stripmd } from './filters/stripmd';
+import { strip_attr } from './filters/strip_attr';
+import { strip_md } from './filters/strip_md';
 import { table } from './filters/table';
 import { trim } from './filters/trim';
 import { title } from './filters/title';
@@ -26,9 +28,7 @@ import { upper } from './filters/upper';
 import { wikilink } from './filters/wikilink';
 import { template } from './filters/template';
 import { map } from './filters/map';
-
-// Update the FilterFunction type to allow for string or any[] return type
-export type FilterFunction = (value: string, param?: string) => string | any[];
+import { strip_tags } from './filters/strip_tags';
 
 export const filters: { [key: string]: FilterFunction } = {
 	blockquote,
@@ -52,13 +52,15 @@ export const filters: { [key: string]: FilterFunction } = {
 	slice,
 	snake,
 	split,
-	stripmd,
+	strip_attr,
+	strip_md,
+	strip_tags,
 	table,
 	template,
 	trim,
 	title,
 	upper,
-	wikilink
+	wikilink,
 };
 
 export function applyFilters(value: string | any[], filterNames: string[], url?: string): string {
