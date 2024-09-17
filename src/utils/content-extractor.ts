@@ -17,7 +17,7 @@ async function processVariable(match: string, variables: { [key: string]: string
 	const filtersString = filterParts.join('|');
 	const value = variables[`{{${variableName}}}`] || '';
 	const filterNames = filtersString.split('|').filter(Boolean);
-	const result = applyFilters(value, filterNames);
+	const result = applyFilters(value, filterNames, currentUrl);
 	return result;
 }
 
@@ -37,7 +37,7 @@ async function processSelector(tabId: number, match: string, currentUrl: string)
 	
 	if (filtersString) {
 		const filterNames = filtersString.split('|').map(f => f.trim());
-		return applyFilters(contentString, filterNames);
+		return applyFilters(contentString, filterNames, currentUrl);
 	}
 	
 	return contentString;
@@ -88,7 +88,7 @@ async function processSchema(match: string, variables: { [key: string]: string }
 	}
 
 	const filterNames = filtersString.split('|').filter(Boolean);
-	const result = applyFilters(schemaValue, filterNames);
+	const result = applyFilters(schemaValue, filterNames, currentUrl);
 	return result;
 }
 

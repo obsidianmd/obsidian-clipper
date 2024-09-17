@@ -65,7 +65,7 @@ export const filters: { [key: string]: FilterFunction } = {
 	wikilink,
 };
 
-export function applyFilters(value: string | any[], filterNames: string[]): string {
+export function applyFilters(value: string | any[], filterNames: string[], currentUrl?: string): string {
 	let processedValue = value;
 
 	const result = filterNames.reduce((result, filterName) => {
@@ -75,7 +75,14 @@ export function applyFilters(value: string | any[], filterNames: string[]): stri
 		const filter = filters[name];
 		if (filter) {
 			const stringInput = typeof result === 'string' ? result : JSON.stringify(result);
-			const output = filter(stringInput, params.length === 1 ? params[0] : params.join(','));
+			
+			// If it's the markdown filter and no URL is provided, use the currentUrl
+			let filterParams = params.length === 1 ? params[0] : params.join(',');
+			if (name === 'markdown' && !params.length && currentUrl) {
+				filterParams = currentUrl;
+			}
+			
+			const output = filter(stringInput, filterParams);
 			
 			debugLog('Filters', `Filter ${name} output:`, output);
 
