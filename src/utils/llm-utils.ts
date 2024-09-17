@@ -16,7 +16,7 @@ export function initializeLLMSettings(): void {
 const RATE_LIMIT_RESET_TIME = 60000; // 1 minute in milliseconds
 let lastRequestTime = 0;
 
-async function sendToAnthropicLLM(userPrompt: string, content: string, promptVariables: PromptVariable[]): Promise<{ userResponse: any; promptResponses: any[] }> {
+async function sendToAnthropic(userPrompt: string, content: string, promptVariables: PromptVariable[]): Promise<{ userResponse: any; promptResponses: any[] }> {
 	const apiKey = generalSettings.anthropicApiKey;
 	const model = generalSettings.interpreterModel;
 
@@ -110,7 +110,7 @@ function parseAnthropicResponse(responseContent: string, promptVariables: Prompt
 	};
 }
 
-async function sendToOpenAILLM(userPrompt: string, content: string, promptVariables: PromptVariable[]): Promise<{ userResponse: any; promptResponses: any[] }> {
+async function sendToOpenAI(userPrompt: string, content: string, promptVariables: PromptVariable[]): Promise<{ userResponse: any; promptResponses: any[] }> {
 	const apiKey = generalSettings.openaiApiKey;
 	if (!apiKey) {
 		throw new Error('OpenAI API key is not set');
@@ -211,9 +211,9 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 	const model = generalSettings.interpreterModel || 'gpt-4o-mini';
 
 	if (model.startsWith('claude-')) {
-		return sendToAnthropicLLM(userPrompt, content, promptVariables);
+		return sendToAnthropic(userPrompt, content, promptVariables);
 	} else {
-		return sendToOpenAILLM(userPrompt, content, promptVariables);
+		return sendToOpenAI(userPrompt, content, promptVariables);
 	}
 }
 
@@ -292,32 +292,32 @@ export function collectPromptVariables(template: Template | null): PromptVariabl
 }
 
 export async function initializeLLMComponents(template: Template, variables: { [key: string]: string }, tabId: number, currentUrl: string) {
-	const llmContainer = document.getElementById('llm-container');
-	const processLlmBtn = document.getElementById('process-llm-btn');
+	const interpreterContainer = document.getElementById('interpreter');
+	const interpretBtn = document.getElementById('interpret-btn');
 	const promptContextTextarea = document.getElementById('prompt-context') as HTMLTextAreaElement;
 
 	if (template && template.prompt) {
-		if (llmContainer) llmContainer.style.display = 'flex';
+		if (interpreterContainer) interpreterContainer.style.display = 'flex';
 		if (promptContextTextarea) {
 			let promptToDisplay = await replaceVariables(tabId, template.prompt, variables, currentUrl);
 			promptContextTextarea.value = promptToDisplay;
 		}
-		if (processLlmBtn) {
-			processLlmBtn.addEventListener('click', () => handleLLMProcessing(template, variables, tabId, currentUrl));
+		if (interpretBtn) {
+			interpretBtn.addEventListener('click', () => handleLLMProcessing(template, variables, tabId, currentUrl));
 		}
 	} else {
-		if (llmContainer) llmContainer.style.display = 'none';
+		if (interpreterContainer) interpreterContainer.style.display = 'none';
 	}
 }
 
 export async function handleLLMProcessing(template: Template, variables: { [key: string]: string }, tabId: number, currentUrl: string) {
-	const processLlmBtn = document.getElementById('process-llm-btn') as HTMLButtonElement;
-	const llmErrorMessage = document.getElementById('llm-error-message') as HTMLDivElement;
+	const interpretBtn = document.getElementById('interpret-btn') as HTMLButtonElement;
+	const interpreterErrorMessage = document.getElementById('interperter-error') as HTMLDivElement;
 	
 	try {
 		// Hide any previous error message
-		llmErrorMessage.style.display = 'none';
-		llmErrorMessage.textContent = '';
+		interpreterErrorMessage.style.display = 'none';
+		interpreterErrorMessage.textContent = '';
 
 		const contentToProcess = variables.content || '';
 		const promptContextTextarea = document.getElementById('prompt-context') as HTMLTextAreaElement;
@@ -333,8 +333,8 @@ export async function handleLLMProcessing(template: Template, variables: { [key:
 			});
 
 			// Change button text and add class
-			processLlmBtn.textContent = 'Processing';
-			processLlmBtn.classList.add('processing');
+			interpretBtn.textContent = 'Processing';
+			interpretBtn.classList.add('processing');
 
 			await processLLM(
 				promptToUse,
@@ -345,8 +345,8 @@ export async function handleLLMProcessing(template: Template, variables: { [key:
 			);
 
 			// Revert button text and remove class
-			processLlmBtn.textContent = 'Process with LLM';
-			processLlmBtn.classList.remove('processing');
+			interpretBtn.textContent = 'Process with LLM';
+			interpretBtn.classList.remove('processing');
 		} else {
 			console.log('Skipping LLM processing: missing tab ID, URL, or prompt');
 			throw new Error('Skipping LLM processing: missing tab ID, URL, or prompt');
@@ -355,12 +355,12 @@ export async function handleLLMProcessing(template: Template, variables: { [key:
 		console.error('Error processing LLM:', error);
 		
 		// Revert button text and remove class in case of error
-		processLlmBtn.textContent = 'Process with LLM';
-		processLlmBtn.classList.remove('processing');
+		interpretBtn.textContent = 'Process with LLM';
+		interpretBtn.classList.remove('processing');
 
 		// Display the error message
-		llmErrorMessage.textContent = error instanceof Error ? error.message : 'An unknown error occurred while processing the LLM request.';
-		llmErrorMessage.style.display = 'block';
+		interpreterErrorMessage.textContent = error instanceof Error ? error.message : 'An unknown error occurred while processing the LLM request.';
+		interpreterErrorMessage.style.display = 'block';
 
 		if (error instanceof Error) {
 			throw error;
@@ -371,10 +371,10 @@ export async function handleLLMProcessing(template: Template, variables: { [key:
 }
 
 function updateLLMResponse(response: string) {
-	const llmErrorMessage = document.getElementById('llm-error-message');
-	if (llmErrorMessage) {
-		llmErrorMessage.style.display = 'none';
-		llmErrorMessage.textContent = '';
+	const interpreterErrorMessage = document.getElementById('interperter-error');
+	if (interpreterErrorMessage) {
+		interpreterErrorMessage.style.display = 'none';
+		interpreterErrorMessage.textContent = '';
 	}
 }
 
