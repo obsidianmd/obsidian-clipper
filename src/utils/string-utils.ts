@@ -26,17 +26,17 @@ export function sanitizeFileName(fileName: string): string {
 
 	if (isWindows) {
 		sanitized = sanitized
-			.replace(/[<>:"\/\\|?*\x00-\x1F]/g, '-')
+			.replace(/[<>:"\/\\|?*\x00-\x1F]/g, '')
 			.replace(/^(con|prn|aux|nul|com[0-9]|lpt[0-9])(\..*)?$/i, '_$1$2')
 			.replace(/[\s.]+$/, '');
 	} else if (isMac) {
 		sanitized = sanitized
-			.replace(/[\/:\x00-\x1F]/g, '-')
+			.replace(/[\/:\x00-\x1F]/g, '')
 			.replace(/^\./, '_');
 	} else {
 		// Linux and other systems
 		sanitized = sanitized
-			.replace(/[\/\x00-\x1F]/g, '-')
+			.replace(/[\/\x00-\x1F]/g, '')
 			.replace(/^\./, '_');
 	}
 
