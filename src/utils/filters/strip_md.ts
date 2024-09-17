@@ -1,4 +1,4 @@
-export const stripmd = (str: string): string => {
+export const strip_md = (str: string): string => {
 		// Remove images first
 		str = str.replace(/!\[([^\]]*)\]\([^\)]+\)/g, '');
 		str = str.replace(/!\[\[([^\]]+)\]\]/g, '');
