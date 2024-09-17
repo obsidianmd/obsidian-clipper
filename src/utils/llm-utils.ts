@@ -312,7 +312,7 @@ export async function initializeLLMComponents(template: Template, variables: { [
 
 export async function handleLLMProcessing(template: Template, variables: { [key: string]: string }, tabId: number, currentUrl: string) {
 	const interpretBtn = document.getElementById('interpret-btn') as HTMLButtonElement;
-	const interpreterErrorMessage = document.getElementById('interperter-error') as HTMLDivElement;
+	const interpreterErrorMessage = document.getElementById('interpreter-error') as HTMLDivElement;
 	
 	try {
 		// Hide any previous error message
