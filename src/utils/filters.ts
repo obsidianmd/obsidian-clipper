@@ -55,6 +55,7 @@ export const filters: { [key: string]: FilterFunction } = {
 	split,
 	strip_attr,
 	strip_md,
+	stripmd: strip_md, // stripmd is an alias for strip_md
 	strip_tags,
 	table,
 	template,
