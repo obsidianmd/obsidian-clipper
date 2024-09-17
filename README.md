@@ -190,13 +190,13 @@ Filters allow you to modify variables in a template. Filters are applied to vari
 	- `"hello world"|split:" "` returns `["hello","world"]`.
 	- If no separator is provided, it splits on every character: `"hello"|split` returns `["h","e","l","l","o"]`.
 	- Regular expressions can be used as separators: `"a1b2c3"|split:[0-9]` returns `["a","b","c"]`.
-- `strip_attr` removes all HTML attributes.
+- `strip_attr` removes all HTML attributes from a string.
 	- Use `strip_attr:("class, id")` to keep specific attributes.
 	- Example: `"<div class="test" id="example">Content</div>"|strip_attr:("class")` returns `<div id="example">Content</div>`.
 - `strip_md` removes all Markdown formatting and returns a plain text string, e.g. turning `**text**` into `text`.
 	- Turns formatted text into unformatted plain text, including bold, italic, highlights, headers, code, blockquotes, tables, task lists, and wikilinks.
 	- Entirely removes tables, footnotes, images, and HTML elements.
-- `strip_tags` removes all HTML tag.
+- `strip_tags` removes all HTML tags from a string.
 	- Use `strip_tags:("p,strong,em")` to keep specific tags.
 	- Example: `"<p>Hello <b>world</b>!</p>"|strip_tags:("b")` returns `Hello <b>world</b>!`.
 - `table` converts an array or array of objects into a Markdown table:
