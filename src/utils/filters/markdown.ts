@@ -1,7 +1,7 @@
 import { createMarkdownContent } from '../markdown-converter';
 
-export const markdown = (str: string, url?: string): string => {
-	const baseUrl = url || 'about:blank';
+export const markdown = (str: string, param?: string): string => {
+	const [baseUrl = '/'] = param ? param.split(',') : [];
 	try {
 		return createMarkdownContent(str, baseUrl);
 	} catch (error) {

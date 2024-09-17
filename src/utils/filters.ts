@@ -1,4 +1,5 @@
 import { FilterFunction } from '../types/types';
+import { debugLog } from './debug';
 import { blockquote } from './filters/blockquote';
 import { camel } from './filters/camel';
 import { capitalize } from './filters/capitalize';
@@ -63,21 +64,20 @@ export const filters: { [key: string]: FilterFunction } = {
 	wikilink,
 };
 
-export function applyFilters(value: string | any[], filterNames: string[], url?: string): string {
+export function applyFilters(value: string | any[], filterNames: string[]): string {
 	let processedValue = value;
 
 	const result = filterNames.reduce((result, filterName) => {
-		const [name, ...params] = filterName.split(':');
-		const param = params.join(':'); // Rejoin in case the param contained colons
+		const [name, ...params] = parseFilterString(filterName);
+		debugLog('Filters', `Applying filter: ${name}, Params:`, params);
 
 		const filter = filters[name];
 		if (filter) {
-			// Ensure the input to the filter is always a string
 			const stringInput = typeof result === 'string' ? result : JSON.stringify(result);
-			// Pass the URL to the markdown filter, use param for others
-			const output = name === 'markdown' ? filter(stringInput, url) : filter(stringInput, param);
+			const output = filter(stringInput, params.length === 1 ? params[0] : params.join(','));
 			
-			// If the output is a string that looks like JSON, try to parse it
+			debugLog('Filters', `Filter ${name} output:`, output);
+
 			if (typeof output === 'string' && (output.startsWith('[') || output.startsWith('{'))) {
 				try {
 					return JSON.parse(output);
@@ -88,10 +88,54 @@ export function applyFilters(value: string | any[], filterNames: string[], url?:
 			return output;
 		} else {
 			console.error(`Invalid filter: ${name}`);
+			debugLog('Filters', `Available filters:`, Object.keys(filters));
 			return result;
 		}
 	}, processedValue);
 
-	// Ensure the final result is always a string
 	return typeof result === 'string' ? result : JSON.stringify(result);
+}
+
+function parseFilterString(filterString: string): string[] {
+	// Remove outer quotes if present
+	filterString = filterString.replace(/^['"](.*)['"]$/, '$1');
+
+	const parts: string[] = [];
+	let current = '';
+	let depth = 0;
+	let inQuote = false;
+
+	for (let i = 0; i < filterString.length; i++) {
+		const char = filterString[i];
+
+		if (char === '"' && filterString[i - 1] !== '\\') {
+			inQuote = !inQuote;
+		}
+
+		if (!inQuote) {
+			if (char === '(') depth++;
+			if (char === ')') depth--;
+		}
+
+		if (char === ':' && depth === 0 && !inQuote && parts.length === 0) {
+			parts.push(current.trim());
+			current = '';
+		} else {
+			current += char;
+		}
+	}
+
+	if (current) {
+		parts.push(current.trim());
+	}
+
+	// If only one part, split it into name and parameters
+	if (parts.length === 1) {
+		const match = parts[0].match(/^(\w+)\s*\((.*)\)$/);
+		if (match) {
+			return [match[1], match[2]];
+		}
+	}
+
+	return parts;
 }
