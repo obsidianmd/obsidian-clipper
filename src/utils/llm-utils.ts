@@ -3,16 +3,6 @@ import { PromptVariable, Template } from '../types/types';
 import { replaceVariables } from './content-extractor';
 import { applyFilters } from './filters';
 
-export function initializeLLMSettings(): void {
-	const apiKeyInput = document.getElementById('openai-api-key') as HTMLInputElement;
-	const modelSelect = document.getElementById('default-model') as HTMLSelectElement;
-
-	if (apiKeyInput && modelSelect) {
-		apiKeyInput.value = generalSettings.openaiApiKey || '';
-		modelSelect.value = generalSettings.interpreterModel || 'gpt-4o-mini';
-	}
-}
-
 const RATE_LIMIT_RESET_TIME = 60000; // 1 minute in milliseconds
 let lastRequestTime = 0;
 
@@ -225,9 +215,12 @@ export async function processLLM(
 	updateFields: (variables: PromptVariable[], responses: any[]) => void
 ): Promise<void> {
 	try {
-		if (!generalSettings.openaiApiKey) {
-			console.warn('OpenAI API key is not set. Skipping LLM processing.');
-			throw new Error('OpenAI API key is not set. Please set it in the extension settings.');
+		if (!generalSettings.openaiApiKey && !generalSettings.anthropicApiKey) {
+			throw new Error('No API key is set. Please set an API key in the extension settings.');
+		}
+
+		if (promptVariables.length === 0) {
+			throw new Error('No prompt variables found. Please add at least one prompt variable to your template.');
 		}
 
 		const { userResponse, promptResponses } = await sendToLLM(promptToUse, contentToProcess, promptVariables);
@@ -348,8 +341,7 @@ export async function handleLLMProcessing(template: Template, variables: { [key:
 			interpretBtn.textContent = 'Process with LLM';
 			interpretBtn.classList.remove('processing');
 		} else {
-			console.log('Skipping LLM processing: missing tab ID, URL, or prompt');
-			throw new Error('Skipping LLM processing: missing tab ID, URL, or prompt');
+			throw new Error('Missing tab ID, URL, or prompt');
 		}
 	} catch (error) {
 		console.error('Error processing LLM:', error);
@@ -361,12 +353,6 @@ export async function handleLLMProcessing(template: Template, variables: { [key:
 		// Display the error message
 		interpreterErrorMessage.textContent = error instanceof Error ? error.message : 'An unknown error occurred while processing the LLM request.';
 		interpreterErrorMessage.style.display = 'block';
-
-		if (error instanceof Error) {
-			throw error;
-		} else {
-			throw new Error('An unknown error occurred while processing the LLM request.');
-		}
 	}
 }
 

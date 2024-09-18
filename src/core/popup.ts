@@ -12,7 +12,7 @@ import { loadTemplates, createDefaultTemplate } from '../managers/template-manag
 import browser from '../utils/browser-polyfill';
 import { detectBrowser, addBrowserClassToHtml } from '../utils/browser-detection';
 import { createElementWithClass, createElementWithHTML } from '../utils/dom-utils';
-import { initializeLLMComponents, handleLLMProcessing } from '../utils/llm-utils';
+import { initializeLLMComponents, handleLLMProcessing, collectPromptVariables } from '../utils/llm-utils';
 
 let currentTemplate: Template | null = null;
 let templates: Template[] = [];
@@ -525,6 +525,19 @@ document.addEventListener('DOMContentLoaded', async function() {
 			if (template) {
 				if (generalSettings.interpreterEnabled) {
 					await initializeLLMComponents(template, variables, tabId, currentUrl);
+
+					// Check if there are any prompt variables
+					const promptVariables = collectPromptVariables(template);
+
+					// If auto-run is enabled and there are prompt variables, process with LLM
+					if (generalSettings.interpreterAutoRun && promptVariables.length > 0) {
+						try {
+							await handleLLMProcessing(template, variables, tabId, currentUrl);
+						} catch (error) {
+							console.error('Error auto-processing with LLM:', error);
+							// Optionally, you can show an error message to the user here
+						}
+					}
 				}
 
 				const replacedTemplate = await getReplacedTemplate(template, variables, tabId, currentUrl);
