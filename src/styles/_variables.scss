@@ -21,8 +21,8 @@
 	--radius-s: 4px;
 	--radius-m: 8px;
 
-	--text-error: var(--color-red);
-	--text-success: var(--color-green);
+	--text-error: hsl(var(--color-red-hsl));
+	--text-success: hsl(var(--color-green-hsl));
 	--text-normal: var(--color-base-100);
 	--text-muted: var(--color-base-70);
 	--text-faint: var(--color-base-50);
@@ -74,6 +74,12 @@
 				calc(var(--accent-h) - 3),
 				calc(var(--accent-s) * 1.02),
 				calc(var(--accent-l) * 1.15));
+		
+		--color-accent-3:
+			hsl(
+				calc(var(--accent-h) - 3),
+				calc(var(--accent-s) * 1.02),
+				calc(var(--accent-l) * 0.85));
 
 		--color-base-00: #ffffff;
 		--color-base-05: #fcfcfc;
@@ -93,6 +99,9 @@
 		--color-orange-rgb: 236, 117, 0;
 		--color-red: #e93147;
 		--color-green: #08b94e;
+
+		--color-red-hsl: 353, 81%, 55%;
+		--color-green-hsl: 144, 92%, 38%;
 
 		--mono-rgb-0: 255, 255, 255;
 		--mono-rgb-100: 0, 0, 0;
@@ -147,6 +156,12 @@
 				calc(var(--accent-s) * 1.05),
 				calc(var(--accent-l) * 1.29));
 
+		--color-accent-3:
+			hsl(
+				calc(var(--accent-h) - 3),
+				calc(var(--accent-s) * 1.02),
+				calc(var(--accent-l) * 1.29));
+
 		--color-base-00: #1e1e1e;
 		--color-base-05: #212121;
 		--color-base-10: #242424;
@@ -164,8 +179,8 @@
 		
 		--color-orange-rgb: 233, 151, 63;
 
-		--color-red: #fb464c;
-		--color-green: #44cf6e;
+		--color-red-hsl: 358, 96%, 63%;
+		--color-green-hsl: 138, 59%, 54%;
 
 		--interactive-accent: var(--color-accent);
 		--interactive-accent-hover: var(--color-accent-1);

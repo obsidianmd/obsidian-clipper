@@ -312,15 +312,20 @@ export async function initializeLLMComponents(template: Template, variables: { [
 }
 
 export async function handleLLMProcessing(template: Template, variables: { [key: string]: string }, tabId: number, currentUrl: string, selectedModel: string) {
+	const interpreterContainer = document.getElementById('interpreter');
 	const interpretBtn = document.getElementById('interpret-btn') as HTMLButtonElement;
 	const interpreterErrorMessage = document.getElementById('interpreter-error') as HTMLDivElement;
 	const llmTimer = document.getElementById('llm-timer') as HTMLSpanElement;
 	const modelSelect = document.getElementById('model-select') as HTMLSelectElement;
+	const clipButton = document.getElementById('clip-button') as HTMLButtonElement;
 	
 	try {
 		// Hide any previous error message
 		interpreterErrorMessage.style.display = 'none';
 		interpreterErrorMessage.textContent = '';
+
+		// Remove any previous done or error classes
+		interpreterContainer?.classList.remove('done', 'error');
 
 		const contentToProcess = variables.content || '';
 		const promptContextTextarea = document.getElementById('prompt-context') as HTMLTextAreaElement;
@@ -343,6 +348,9 @@ export async function handleLLMProcessing(template: Template, variables: { [key:
 			// Change button text and add class
 			interpretBtn.textContent = 'thinking';
 			interpretBtn.classList.add('processing');
+
+			// Disable the clip button
+			clipButton.disabled = true;
 
 			// Show and update the timer
 			llmTimer.style.display = 'inline';
@@ -376,6 +384,13 @@ export async function handleLLMProcessing(template: Template, variables: { [key:
 			interpretBtn.textContent = 'done';
 			interpretBtn.classList.remove('processing');
 			interpretBtn.classList.add('done');
+			interpretBtn.disabled = true;
+
+			// Add done class to interpreter container
+			interpreterContainer?.classList.add('done');
+
+			// Re-enable the clip button
+			clipButton.disabled = false;
 		} else {
 			throw new Error('Missing tab ID, URL, or prompt');
 		}
@@ -386,6 +401,10 @@ export async function handleLLMProcessing(template: Template, variables: { [key:
 		interpretBtn.textContent = 'error';
 		interpretBtn.classList.remove('processing');
 		interpretBtn.classList.add('error');
+		interpretBtn.disabled = true;
+
+		// Add error class to interpreter container
+		interpreterContainer?.classList.add('error');
 
 		// Hide the timer
 		llmTimer.style.display = 'none';
@@ -393,6 +412,9 @@ export async function handleLLMProcessing(template: Template, variables: { [key:
 		// Display the error message
 		interpreterErrorMessage.textContent = error instanceof Error ? error.message : 'An unknown error occurred while processing the LLM request.';
 		interpreterErrorMessage.style.display = 'block';
+
+		// Re-enable the clip button
+		clipButton.disabled = false;
 	}
 }
 
