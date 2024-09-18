@@ -16,8 +16,7 @@ async function processVariable(match: string, variables: { [key: string]: string
 	const [variableName, ...filterParts] = fullVariableName.split('|');
 	const filtersString = filterParts.join('|');
 	const value = variables[`{{${variableName}}}`] || '';
-	const filterNames = filtersString.split('|').filter(Boolean);
-	const result = applyFilters(value, filterNames, currentUrl);
+	const result = applyFilters(value, filtersString, currentUrl);
 	return result;
 }
 
@@ -36,8 +35,7 @@ async function processSelector(tabId: number, match: string, currentUrl: string)
 	const contentString = Array.isArray(content) ? JSON.stringify(content) : content;
 	
 	if (filtersString) {
-		const filterNames = filtersString.split('|').map(f => f.trim());
-		return applyFilters(contentString, filterNames, currentUrl);
+		return applyFilters(contentString, filtersString, currentUrl);
 	}
 	
 	return contentString;
@@ -87,9 +85,7 @@ async function processSchema(match: string, variables: { [key: string]: string }
 		}
 	}
 
-	const filterNames = filtersString.split('|').filter(Boolean);
-	const result = applyFilters(schemaValue, filterNames, currentUrl);
-	return result;
+	return applyFilters(schemaValue, filtersString, currentUrl);
 }
 
 function getNestedProperty(obj: any, path: string): any {

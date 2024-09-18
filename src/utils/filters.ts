@@ -70,45 +70,6 @@ export const filters: { [key: string]: FilterFunction } = {
 	wikilink
 };
 
-export function applyFilters(value: string | any[], filterNames: string[], currentUrl?: string): string {
-	let processedValue = value;
-
-	const result = filterNames.reduce((result, filterName) => {
-		const [name, ...params] = parseFilterString(filterName);
-		debugLog('Filters', `Applying filter: ${name}, Params:`, params);
-
-		const filter = filters[name];
-		if (filter) {
-			const stringInput = typeof result === 'string' ? result : JSON.stringify(result);
-			
-			// If it's the markdown filter and no URL is provided, use the currentUrl
-			let filterParams = params.length === 1 ? params[0] : params.join(',');
-			if (name === 'markdown' && !params.length && currentUrl) {
-				filterParams = currentUrl;
-			}
-			
-			const output = filter(stringInput, filterParams);
-			
-			debugLog('Filters', `Filter ${name} output:`, output);
-
-			if (typeof output === 'string' && (output.startsWith('[') || output.startsWith('{'))) {
-				try {
-					return JSON.parse(output);
-				} catch {
-					return output;
-				}
-			}
-			return output;
-		} else {
-			console.error(`Invalid filter: ${name}`);
-			debugLog('Filters', `Available filters:`, Object.keys(filters));
-			return result;
-		}
-	}, processedValue);
-
-	return typeof result === 'string' ? result : JSON.stringify(result);
-}
-
 function parseFilterString(filterString: string): string[] {
 	// Remove outer quotes if present
 	filterString = filterString.replace(/^['"](.*)['"]$/, '$1');
@@ -118,37 +79,102 @@ function parseFilterString(filterString: string): string[] {
 	let depth = 0;
 	let inQuote = false;
 
+	// Iterate through each character in the filterString
 	for (let i = 0; i < filterString.length; i++) {
 		const char = filterString[i];
 
+		// Toggle quote state if we encounter an unescaped quote
 		if (char === '"' && filterString[i - 1] !== '\\') {
 			inQuote = !inQuote;
 		}
 
+		// Track parentheses depth when not inside quotes
 		if (!inQuote) {
 			if (char === '(') depth++;
 			if (char === ')') depth--;
 		}
 
+		// If we encounter a colon at depth 0 and not in quotes, and it's the first colon
 		if (char === ':' && depth === 0 && !inQuote && parts.length === 0) {
+			// Add the current accumulated string as a part (filter name)
 			parts.push(current.trim());
-			current = '';
+			current = ''; // Reset current
 		} else {
+			// Otherwise, add the character to the current string
 			current += char;
 		}
 	}
 
+	// Add any remaining characters as the last part
 	if (current) {
 		parts.push(current.trim());
 	}
 
-	// If only one part, split it into name and parameters
+	// If we have parameters, split them by the pipe character
+	if (parts.length > 1) {
+		const [filterName, ...params] = parts;
+		const splitParams = params.join(':').split('|').map(param => param.trim());
+		return [filterName, ...splitParams];
+	}
+
+	// If only one part is found, check if it's a function-like syntax
 	if (parts.length === 1) {
 		const match = parts[0].match(/^(\w+)\s*\((.*)\)$/);
 		if (match) {
-			return [match[1], match[2]];
+			// If it matches, split the parameters by pipe and return
+			const params = match[2].split('|').map(param => param.trim());
+			return [match[1], ...params];
 		}
 	}
 
 	return parts;
+}
+
+export function applyFilters(value: string | any[], filterString: string, currentUrl?: string): string {
+	let processedValue = value;
+
+	// Split the filter string into individual filter names
+	const filterNames = filterString.split('|').filter(Boolean);
+
+	// Reduce through all filter names, applying each filter sequentially
+	const result = filterNames.reduce((result, filterName) => {
+			// Parse the filter string into name and parameters
+			const [name, ...params] = parseFilterString(filterName);
+			debugLog('Filters', `Applying filter: ${name}, Params:`, params);
+
+			// Get the filter function from the filters object
+			const filter = filters[name];
+			if (filter) {
+				// Convert the input to a string if it's not already
+				const stringInput = typeof result === 'string' ? result : JSON.stringify(result);
+				
+				// Special case for markdown filter: use currentUrl if no params provided
+				if (name === 'markdown' && params.length === 0 && currentUrl) {
+					params.push(currentUrl);
+				}
+				
+				// Apply the filter and get the output
+				const output = filter(stringInput, ...params);
+				
+				debugLog('Filters', `Filter ${name} output:`, output);
+
+				// If the output is a string that looks like JSON, try to parse it
+				if (typeof output === 'string' && (output.startsWith('[') || output.startsWith('{'))) {
+					try {
+						return JSON.parse(output);
+					} catch {
+						return output;
+					}
+				}
+				return output;
+			} else {
+				// If the filter doesn't exist, log an error and return the unmodified result
+				console.error(`Invalid filter: ${name}`);
+				debugLog('Filters', `Available filters:`, Object.keys(filters));
+				return result;
+			}
+		}, processedValue);
+
+	// Ensure the final result is a string
+	return typeof result === 'string' ? result : JSON.stringify(result);
 }
