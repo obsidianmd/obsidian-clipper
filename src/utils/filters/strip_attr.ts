@@ -1,6 +1,6 @@
 export const strip_attr = (html: string, keepAttributes: string = ''): string => {
-	// Remove any surrounding quotes from keepAttributes
-	keepAttributes = keepAttributes.replace(/^['"](.*)['"]$/, '$1');
+	// Remove any surrounding quotes (both single and double) and unescape internal quotes
+	keepAttributes = keepAttributes.replace(/^(['"])(.*)\1$/, '$2').replace(/\\(['"])/g, '$1');
 	
 	const keepAttributesList = keepAttributes.split(',').map(attr => attr.trim()).filter(Boolean);
 
@@ -10,7 +10,9 @@ export const strip_attr = (html: string, keepAttributes: string = ''): string =>
 		}
 
 		const keepAttrs = keepAttributesList.map(attr => {
-			const regex = new RegExp(`\\s${attr}\\s*=\\s*("[^"]*"|'[^']*')`, 'i');
+			// Escape special regex characters in the attribute name
+			const escapedAttr = attr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+			const regex = new RegExp(`\\s${escapedAttr}\\s*=\\s*("[^"]*"|'[^']*')`, 'i');
 			const attrMatch = match.match(regex);
 			return attrMatch ? attrMatch[0] : '';
 		}).filter(Boolean).join(' ');

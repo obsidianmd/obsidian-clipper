@@ -7,9 +7,15 @@ export const join = (str: string, param?: string): string => {
 		return str;
 	}
 
-	if (Array.isArray(array)) {
-		const separator = param ? JSON.parse(`"${param}"`) : ',';
-		return array.join(separator);
+	if (!Array.isArray(array)) {
+		return str;
 	}
-	return str;
+
+	let separator = ',';
+	if (param) {
+		// Remove outer quotes if present
+		separator = param.replace(/^(['"])(.*)\1$/, '$2');
+	}
+
+	return array.join(separator);
 };

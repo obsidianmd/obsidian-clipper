@@ -7,14 +7,17 @@ export const callout = (str: string, param?: string): string => {
 		// Remove outer parentheses if present
 		param = param.replace(/^\((.*)\)$/, '$1');
 		
-		// Split by comma, but respect quoted strings
-		const params = param.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(p => p.trim().replace(/^"|"$/g, ''));
+		// Split by comma, but respect both single and double quoted strings
+		const params = param.split(/,(?=(?:(?:[^"']*["'][^"']*["'])*[^"']*$))/).map(p => {
+			// Trim whitespace and remove surrounding quotes (both single and double)
+			return p.trim().replace(/^(['"])(.*)\1$/, '$2');
+		});
 		
 		if (params.length > 0) type = params[0] || type;
 		if (params.length > 1) title = params[1] || title;
 		if (params.length > 2) {
-			if (params[2] === 'true') foldState = '-';
-			else if (params[2] === 'false') foldState = '+';
+			if (params[2].toLowerCase() === 'true') foldState = '-';
+			else if (params[2].toLowerCase() === 'false') foldState = '+';
 		}
 	}
 

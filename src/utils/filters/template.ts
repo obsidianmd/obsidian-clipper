@@ -9,6 +9,11 @@ export const template = (input: string | any[], param?: string): string => {
 		return typeof input === 'string' ? input : JSON.stringify(input);
 	}
 
+	// Remove outer parentheses if present
+	param = param.replace(/^\((.*)\)$/, '$1');
+	// Remove surrounding quotes (both single and double)
+	param = param.replace(/^(['"])(.*)\1$/, '$2');
+
 	let obj: any[] = [];
 	if (typeof input === 'string') {
 		try {
@@ -36,16 +41,10 @@ function replaceTemplateVariables(obj: any, template: string): string {
 	debugLog('Template', 'Replacing template variables for:', obj);
 	debugLog('Template', 'Template:', template);
 
-	// Remove the outer quotes if they exist
-	template = template.replace(/^"(.*)"$/, '$1');
-	debugLog('Template', 'Template after quote removal:', template);
-
 	// If obj is a string that looks like an object, try to parse it
 	if (typeof obj === 'string') {
 		try {
-			// Remove any outer parentheses and parse
-			const objString = obj.replace(/^\(|\)$/g, '').trim();
-			obj = parseObjectString(objString);
+			obj = parseObjectString(obj);
 			debugLog('Template', 'Parsed object:', obj);
 		} catch (error) {
 			debugLog('Template', 'Failed to parse object string:', obj);

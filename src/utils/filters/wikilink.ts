@@ -1,7 +1,16 @@
-export const wikilink = (str: string, alias?: string): string => {
+export const wikilink = (str: string, param?: string): string => {
 	if (!str.trim()) {
 		return str;
 	}
+
+	let alias = '';
+	if (param) {
+		// Remove outer parentheses if present
+		param = param.replace(/^\((.*)\)$/, '$1');
+		// Remove surrounding quotes (both single and double)
+		alias = param.replace(/^(['"])(.*)\1$/, '$2');
+	}
+
 	try {
 		const data = JSON.parse(str);
 		

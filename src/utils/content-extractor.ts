@@ -5,6 +5,7 @@ import { Readability } from '@mozilla/readability';
 import { applyFilters } from './filters';
 import browser from './browser-polyfill';
 import { convertDate } from './date-utils';
+import { debugLog } from './debug';
 
 export function extractReadabilityContent(doc: Document): ReturnType<Readability['parse']> {
 	const reader = new Readability(doc, {keepClasses:true})
@@ -34,11 +35,10 @@ async function processSelector(tabId: number, match: string, currentUrl: string)
 	// Convert content to string if it's an array
 	const contentString = Array.isArray(content) ? JSON.stringify(content) : content;
 	
-	if (filtersString) {
-		return applyFilters(contentString, filtersString, currentUrl);
-	}
+	debugLog('ContentExtractor', 'Applying filters:', { selector, filterString: filtersString });
+	const filteredContent = applyFilters(contentString, filtersString, currentUrl);
 	
-	return contentString;
+	return filteredContent;
 }
 
 async function processSchema(match: string, variables: { [key: string]: string }, currentUrl: string): Promise<string> {

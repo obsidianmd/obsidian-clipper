@@ -1,6 +1,6 @@
 export const strip_tags = (html: string, keepTags: string = ''): string => {
-	// Remove any surrounding quotes from keepTags
-	keepTags = keepTags.replace(/^['"](.*)['"]$/, '$1');
+	// Remove any surrounding quotes (both single and double) and unescape internal quotes
+	keepTags = keepTags.replace(/^(['"])(.*)\1$/, '$2').replace(/\\(['"])/g, '$1');
 	
 	const keepTagsList = keepTags.split(',').map(tag => tag.trim()).filter(Boolean);
 
@@ -11,7 +11,8 @@ export const strip_tags = (html: string, keepTags: string = ''): string => {
 		result = html.replace(/<\/?[^>]+(>|$)/g, '');
 	} else {
 		// Create a regex that matches all tags except those in keepTagsList
-		const regex = new RegExp(`<(?!\\/?(?:${keepTagsList.join('|')})\\b)[^>]+>`, 'gi');
+		const escapedTags = keepTagsList.map(tag => tag.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+		const regex = new RegExp(`<(?!\\/?(?:${escapedTags})\\b)[^>]+>`, 'gi');
 		result = html.replace(regex, '');
 	}
 

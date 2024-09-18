@@ -70,77 +70,141 @@ export const filters: { [key: string]: FilterFunction } = {
 	wikilink
 };
 
-function parseFilterString(filterString: string): string[] {
-	// Remove outer quotes if present
-	filterString = filterString.replace(/^['"](.*)['"]$/, '$1');
-
-	const parts: string[] = [];
+// Split the individual filter names
+function splitFilterString(filterString: string): string[] {
+	const filters: string[] = [];
 	let current = '';
-	let depth = 0;
 	let inQuote = false;
+	let quoteType = '';
+	let escapeNext = false;
+	let depth = 0;
 
 	// Iterate through each character in the filterString
 	for (let i = 0; i < filterString.length; i++) {
 		const char = filterString[i];
 
-		// Toggle quote state if we encounter an unescaped quote
-		if (char === '"' && filterString[i - 1] !== '\\') {
-			inQuote = !inQuote;
-		}
-
-		// Track parentheses depth when not inside quotes
-		if (!inQuote) {
-			if (char === '(') depth++;
-			if (char === ')') depth--;
-		}
-
-		// If we encounter a colon at depth 0 and not in quotes, and it's the first colon
-		if (char === ':' && depth === 0 && !inQuote && parts.length === 0) {
-			// Add the current accumulated string as a part (filter name)
-			parts.push(current.trim());
-			current = ''; // Reset current
+		if (escapeNext) {
+			// If the previous character was a backslash, add this character as-is
+			current += char;
+			escapeNext = false;
+		} else if (char === '\\') {
+			// If this is a backslash, set escapeNext flag to true
+			current += char;
+			escapeNext = true;
+		} else if ((char === '"' || char === "'") && !escapeNext) {
+			// If this is an unescaped quote, toggle the inQuote flag
+			if (!inQuote) {
+				inQuote = true;
+				quoteType = char;
+			} else if (char === quoteType) {
+				inQuote = false;
+				quoteType = '';
+			}
+			current += char;
+		} else if (char === '(' && !inQuote) {
+			// If this is an opening parenthesis outside of quotes, increase depth
+			current += char;
+			depth++;
+		} else if (char === ')' && !inQuote) {
+			// If this is a closing parenthesis outside of quotes, decrease depth
+			current += char;
+			depth--;
+		} else if (char === '|' && !inQuote && depth === 0) {
+			// If this is a pipe character outside of quotes and parentheses,
+			// it's a filter separator. Add the current filter and reset.
+			filters.push(current.trim());
+			current = '';
 		} else {
-			// Otherwise, add the character to the current string
+			// For any other character, simply add it to the current filter
 			current += char;
 		}
 	}
 
-	// Add any remaining characters as the last part
+	// Add the last filter if there's anything left in current
+	if (current) {
+		filters.push(current.trim());
+	}
+
+	return filters;
+}
+
+// Parse the filter into name and parameters
+function parseFilterString(filterString: string): string[] {
+	// Remove outer quotes if present (both single and double quotes)
+	filterString = filterString.replace(/^(['"])(.*)\1$/, '$2');
+
+	const parts: string[] = [];
+	let current = '';
+	let depth = 0;
+	let inQuote = false;
+	let quoteType = '';
+	let escapeNext = false;
+
+	// Iterate through each character in the filterString
+	for (let i = 0; i < filterString.length; i++) {
+		const char = filterString[i];
+
+		if (escapeNext) {
+			current += char;
+			escapeNext = false;
+		} else if (char === '\\') {
+			current += char;
+			escapeNext = true;
+		} else if ((char === '"' || char === "'") && !escapeNext) {
+			if (!inQuote) {
+				inQuote = true;
+				quoteType = char;
+			} else if (char === quoteType) {
+				inQuote = false;
+				quoteType = '';
+			}
+			current += char;
+		} else if (!inQuote) {
+			if (char === '(') depth++;
+			if (char === ')') depth--;
+			
+			if (char === ':' && depth === 0 && parts.length === 0) {
+				parts.push(current.trim());
+				current = '';
+			} else {
+				current += char;
+			}
+		} else {
+			current += char;
+		}
+	}
+
 	if (current) {
 		parts.push(current.trim());
 	}
 
-	// If we have parameters, split them by the pipe character
-	if (parts.length > 1) {
-		const [filterName, ...params] = parts;
-		const splitParams = params.join(':').split('|').map(param => param.trim());
-		return [filterName, ...splitParams];
-	}
-
-	// If only one part is found, check if it's a function-like syntax
-	if (parts.length === 1) {
-		const match = parts[0].match(/^(\w+)\s*\((.*)\)$/);
-		if (match) {
-			// If it matches, split the parameters by pipe and return
-			const params = match[2].split('|').map(param => param.trim());
-			return [match[1], ...params];
-		}
+	// Special handling for replace filter
+	if (parts[0] === 'replace' && parts.length > 1) {
+		return [parts[0], parts.slice(1).join(':')];
 	}
 
 	return parts;
 }
 
 export function applyFilters(value: string | any[], filterString: string, currentUrl?: string): string {
+	debugLog('Filters', 'applyFilters called with:', { value, filterString, currentUrl });
+
+	if (!filterString) {
+		debugLog('Filters', 'Empty filter string, returning original value');
+		return typeof value === 'string' ? value : JSON.stringify(value);
+	}
+
 	let processedValue = value;
 
-	// Split the filter string into individual filter names
-	const filterNames = filterString.split('|').filter(Boolean);
+	// Split the filter string into individual filter names, accounting for escaped pipes and quotes
+	const filterNames = splitFilterString(filterString);
+	debugLog('Filters', 'Split filter string:', filterNames);
 
 	// Reduce through all filter names, applying each filter sequentially
 	const result = filterNames.reduce((result, filterName) => {
 			// Parse the filter string into name and parameters
 			const [name, ...params] = parseFilterString(filterName);
-			debugLog('Filters', `Applying filter: ${name}, Params:`, params);
+			debugLog('Filters', `Parsed filter: ${name}, Params:`, params);
 
 			// Get the filter function from the filters object
 			const filter = filters[name];
@@ -154,7 +218,7 @@ export function applyFilters(value: string | any[], filterString: string, curren
 				}
 				
 				// Apply the filter and get the output
-				const output = filter(stringInput, ...params);
+				const output = filter(stringInput, params.join(':'));
 				
 				debugLog('Filters', `Filter ${name} output:`, output);
 
