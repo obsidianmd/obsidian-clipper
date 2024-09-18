@@ -3,13 +3,13 @@ import { PromptVariable, Template } from '../types/types';
 import { replaceVariables } from './content-extractor';
 import { applyFilters } from './filters';
 import { formatDuration } from './string-utils';
+import { modelList } from './model-list';
 
 const RATE_LIMIT_RESET_TIME = 60000; // 1 minute in milliseconds
 let lastRequestTime = 0;
 
-async function sendToAnthropic(userPrompt: string, content: string, promptVariables: PromptVariable[]): Promise<{ userResponse: any; promptResponses: any[] }> {
+async function sendToAnthropic(userPrompt: string, content: string, promptVariables: PromptVariable[], model: string): Promise<{ userResponse: any; promptResponses: any[] }> {
 	const apiKey = generalSettings.anthropicApiKey;
-	const model = generalSettings.interpreterModel;
 
 	if (!apiKey) {
 		throw new Error('Anthropic API key is not set');
@@ -101,7 +101,7 @@ function parseAnthropicResponse(responseContent: string, promptVariables: Prompt
 	};
 }
 
-async function sendToOpenAI(userPrompt: string, content: string, promptVariables: PromptVariable[]): Promise<{ userResponse: any; promptResponses: any[] }> {
+async function sendToOpenAI(userPrompt: string, content: string, promptVariables: PromptVariable[], model: string): Promise<{ userResponse: any; promptResponses: any[] }> {
 	const apiKey = generalSettings.openaiApiKey;
 	if (!apiKey) {
 		throw new Error('OpenAI API key is not set');
@@ -120,7 +120,7 @@ async function sendToOpenAI(userPrompt: string, content: string, promptVariables
 		};
 
 		const requestBody = {
-			model: generalSettings.interpreterModel || 'gpt-4o-mini',
+			model: model,
 			messages: [
 				{ role: 'system', content: JSON.stringify(systemContent) },
 				{ role: 'user', content: `${userPrompt}\n\nContent: ${content}` }
@@ -198,13 +198,11 @@ function parseOpenAIResponse(responseContent: string, promptVariables: PromptVar
 	};
 }
 
-export async function sendToLLM(userPrompt: string, content: string, promptVariables: PromptVariable[]): Promise<{ userResponse: any; promptResponses: any[] }> {
-	const model = generalSettings.interpreterModel || 'gpt-4o-mini';
-
+export async function sendToLLM(userPrompt: string, content: string, promptVariables: PromptVariable[], model: string): Promise<{ userResponse: any; promptResponses: any[] }> {
 	if (model.startsWith('claude-')) {
-		return sendToAnthropic(userPrompt, content, promptVariables);
+		return sendToAnthropic(userPrompt, content, promptVariables, model);
 	} else {
-		return sendToOpenAI(userPrompt, content, promptVariables);
+		return sendToOpenAI(userPrompt, content, promptVariables, model);
 	}
 }
 
@@ -213,7 +211,8 @@ export async function processLLM(
 	contentToProcess: string,
 	promptVariables: PromptVariable[],
 	updateUI: (response: string) => void,
-	updateFields: (variables: PromptVariable[], responses: any[]) => void
+	updateFields: (variables: PromptVariable[], responses: any[]) => void,
+	model: string
 ): Promise<void> {
 	try {
 		if (!generalSettings.openaiApiKey && !generalSettings.anthropicApiKey) {
@@ -224,7 +223,7 @@ export async function processLLM(
 			throw new Error('No prompt variables found. Please add at least one prompt variable to your template.');
 		}
 
-		const { userResponse, promptResponses } = await sendToLLM(promptToUse, contentToProcess, promptVariables);
+		const { userResponse, promptResponses } = await sendToLLM(promptToUse, contentToProcess, promptVariables, model);
 		console.log('LLM Response:', { userResponse, promptResponses });
 
 		// Convert userResponse to string if it's an array or object
@@ -289,6 +288,7 @@ export async function initializeLLMComponents(template: Template, variables: { [
 	const interpreterContainer = document.getElementById('interpreter');
 	const interpretBtn = document.getElementById('interpret-btn');
 	const promptContextTextarea = document.getElementById('prompt-context') as HTMLTextAreaElement;
+	const modelSelect = document.getElementById('model-select') as HTMLSelectElement;
 
 	if (template && template.prompt) {
 		if (interpreterContainer) interpreterContainer.style.display = 'flex';
@@ -297,17 +297,25 @@ export async function initializeLLMComponents(template: Template, variables: { [
 			promptContextTextarea.value = promptToDisplay;
 		}
 		if (interpretBtn) {
-			interpretBtn.addEventListener('click', () => handleLLMProcessing(template, variables, tabId, currentUrl));
+			interpretBtn.addEventListener('click', () => handleLLMProcessing(template, variables, tabId, currentUrl, modelSelect.value));
+		}
+		if (modelSelect) {
+			modelSelect.style.display = 'inline-block';
+			modelSelect.innerHTML = modelList.map(model => 
+				`<option value="${model.value}">${model.label}</option>`
+			).join('');
+			modelSelect.value = generalSettings.interpreterModel || modelList[0].value;
 		}
 	} else {
 		if (interpreterContainer) interpreterContainer.style.display = 'none';
 	}
 }
 
-export async function handleLLMProcessing(template: Template, variables: { [key: string]: string }, tabId: number, currentUrl: string) {
+export async function handleLLMProcessing(template: Template, variables: { [key: string]: string }, tabId: number, currentUrl: string, selectedModel: string) {
 	const interpretBtn = document.getElementById('interpret-btn') as HTMLButtonElement;
 	const interpreterErrorMessage = document.getElementById('interpreter-error') as HTMLDivElement;
 	const llmTimer = document.getElementById('llm-timer') as HTMLSpanElement;
+	const modelSelect = document.getElementById('model-select') as HTMLSelectElement;
 	
 	try {
 		// Hide any previous error message
@@ -324,7 +332,8 @@ export async function handleLLMProcessing(template: Template, variables: { [key:
 
 			console.log('Unique prompts to be sent to LLM:', { 
 				userPrompt: promptToUse, 
-				promptVariables: promptVariables.map(({ key, prompt }) => ({ key, prompt }))
+				promptVariables: promptVariables.map(({ key, prompt }) => ({ key, prompt })),
+				model: selectedModel
 			});
 
 			// Start the timer
@@ -332,7 +341,7 @@ export async function handleLLMProcessing(template: Template, variables: { [key:
 			let timerInterval: number;
 
 			// Change button text and add class
-			interpretBtn.textContent = 'Processing';
+			interpretBtn.textContent = 'thinking';
 			interpretBtn.classList.add('processing');
 
 			// Show and update the timer
@@ -350,7 +359,8 @@ export async function handleLLMProcessing(template: Template, variables: { [key:
 				contentToProcess,
 				promptVariables,
 				updateLLMResponse,
-				updateFieldsWithLLMResponses
+				updateFieldsWithLLMResponses,
+				selectedModel
 			);
 
 			// Stop the timer and log the final time
@@ -363,8 +373,9 @@ export async function handleLLMProcessing(template: Template, variables: { [key:
 			llmTimer.textContent = formatDuration(totalTime);
 
 			// Revert button text and remove class
-			interpretBtn.textContent = 'Process with LLM';
+			interpretBtn.textContent = 'done';
 			interpretBtn.classList.remove('processing');
+			interpretBtn.classList.add('done');
 		} else {
 			throw new Error('Missing tab ID, URL, or prompt');
 		}
@@ -372,8 +383,9 @@ export async function handleLLMProcessing(template: Template, variables: { [key:
 		console.error('Error processing LLM:', error);
 		
 		// Revert button text and remove class in case of error
-		interpretBtn.textContent = 'Process with LLM';
+		interpretBtn.textContent = 'error';
 		interpretBtn.classList.remove('processing');
+		interpretBtn.classList.add('error');
 
 		// Hide the timer
 		llmTimer.style.display = 'none';

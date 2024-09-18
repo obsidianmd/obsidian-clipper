@@ -1,6 +1,7 @@
 import { initializeToggles } from '../utils/ui-utils';
 import { generalSettings, loadSettings, saveSettings } from '../utils/storage-utils';
 import { updateUrl } from '../utils/routing';
+import { modelList } from '../utils/model-list';
 
 export function initializeInterpreterSettings(): void {
 	const interpreterSettingsForm = document.getElementById('interpreter-settings-form');
@@ -16,7 +17,12 @@ export function initializeInterpreterSettings(): void {
 
 		if (apiKeyInput) apiKeyInput.value = generalSettings.openaiApiKey || '';
 		if (anthropicApiKeyInput) anthropicApiKeyInput.value = generalSettings.anthropicApiKey || '';
-		if (modelSelect) modelSelect.value = generalSettings.interpreterModel || 'gpt-4o-mini';
+		if (modelSelect) {
+			modelSelect.innerHTML = modelList.map(model => 
+				`<option value="${model.value}">${model.label}</option>`
+			).join('');
+			modelSelect.value = generalSettings.interpreterModel || modelList[0].value;
+		}
 		if (interpreterToggle) interpreterToggle.checked = generalSettings.interpreterEnabled;
 		if (interpreterAutoRunToggle) interpreterAutoRunToggle.checked = generalSettings.interpreterAutoRun;
 		initializeToggles();

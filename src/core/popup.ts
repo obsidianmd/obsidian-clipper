@@ -542,7 +542,9 @@ document.addEventListener('DOMContentLoaded', async function() {
 					// If auto-run is enabled and there are prompt variables, process with LLM
 					if (generalSettings.interpreterAutoRun && promptVariables.length > 0) {
 						try {
-							await handleLLMProcessing(template, variables, tabId, currentUrl);
+							const modelSelect = document.getElementById('model-select') as HTMLSelectElement;
+							const selectedModel = modelSelect?.value || generalSettings.interpreterModel || 'gpt-4o-mini';
+							await handleLLMProcessing(template, variables, tabId, currentUrl, selectedModel);
 						} catch (error) {
 							console.error('Error auto-processing with LLM:', error);
 							// Optionally, you can show an error message to the user here
@@ -703,8 +705,10 @@ async function processLLM(promptToUse: string, contentToProcess: string): Promis
 		}
 
 		const promptVariables = collectPromptVariables(currentTemplate);
+		const modelSelect = document.getElementById('model-select') as HTMLSelectElement;
+		const selectedModel = modelSelect?.value || generalSettings.interpreterModel || 'gpt-4o-mini';
 
-		const { userResponse, promptResponses } = await sendToLLM(promptToUse, contentToProcess, promptVariables);
+		const { userResponse, promptResponses } = await sendToLLM(promptToUse, contentToProcess, promptVariables, selectedModel);
 		console.log('LLM Response:', { userResponse, promptResponses });
 
 		const llmResponseDiv = document.getElementById('llm-response');
