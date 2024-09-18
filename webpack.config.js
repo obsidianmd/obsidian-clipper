@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs');
 const CopyPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const ZipPlugin = require('zip-webpack-plugin');
@@ -9,6 +10,19 @@ const firefoxConfig = {
 		'background-firefox': './src/background-firefox.ts',
 	},
 };
+
+// Remove .DS_Store files
+function removeDSStore(dir) {
+	const files = fs.readdirSync(dir);
+	files.forEach(file => {
+		const filePath = path.join(dir, file);
+		if (fs.statSync(filePath).isDirectory()) {
+			removeDSStore(filePath);
+		} else if (file === '.DS_Store') {
+			fs.unlinkSync(filePath);
+		}
+	});
+}
 
 module.exports = (env, argv) => {
 	const isFirefox = env.BROWSER === 'firefox';
@@ -80,8 +94,15 @@ module.exports = (env, argv) => {
 			new MiniCssExtractPlugin({
 				filename: 'style.css'
 			}),
+			{
+				apply: (compiler) => {
+					compiler.hooks.afterEmit.tap('RemoveDSStore', (compilation) => {
+						removeDSStore(path.resolve(__dirname, outputDir));
+					});
+				}
+				},
 			new ZipPlugin({
-				path: './',
+				path: path.resolve(__dirname, 'builds'),
 				filename: `obsidian-web-clipper-${browserName}.${package.version}.zip`,
 			})
 		]
