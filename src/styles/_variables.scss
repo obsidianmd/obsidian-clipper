@@ -77,8 +77,8 @@
 		
 		--color-accent-3:
 			hsl(
-				calc(var(--accent-h) - 3),
-				calc(var(--accent-s) * 1.02),
+				calc(var(--accent-h) + 3),
+				calc(var(--accent-s) * 0.96),
 				calc(var(--accent-l) * 0.85));
 
 		--color-base-00: #ffffff;
