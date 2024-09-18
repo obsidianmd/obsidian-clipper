@@ -75,6 +75,7 @@ function splitFilterString(filterString: string): string[] {
 	const filters: string[] = [];
 	let current = '';
 	let inQuote = false;
+	let quoteType = '';
 	let escapeNext = false;
 	let depth = 0;
 
@@ -90,10 +91,16 @@ function splitFilterString(filterString: string): string[] {
 			// If this is a backslash, set escapeNext flag to true
 			current += char;
 			escapeNext = true;
-		} else if (char === '"' && !escapeNext) {
+		} else if ((char === '"' || char === "'") && !escapeNext) {
 			// If this is an unescaped quote, toggle the inQuote flag
+			if (!inQuote) {
+				inQuote = true;
+				quoteType = char;
+			} else if (char === quoteType) {
+				inQuote = false;
+				quoteType = '';
+			}
 			current += char;
-			inQuote = !inQuote;
 		} else if (char === '(' && !inQuote) {
 			// If this is an opening parenthesis outside of quotes, increase depth
 			current += char;
@@ -123,13 +130,14 @@ function splitFilterString(filterString: string): string[] {
 
 // Parse the filter into name and parameters
 function parseFilterString(filterString: string): string[] {
-	// Remove outer quotes if present
-	filterString = filterString.replace(/^['"](.*)['"]$/, '$1');
+	// Remove outer quotes if present (both single and double quotes)
+	filterString = filterString.replace(/^(['"])(.*)\1$/, '$2');
 
 	const parts: string[] = [];
 	let current = '';
 	let depth = 0;
 	let inQuote = false;
+	let quoteType = '';
 	let escapeNext = false;
 
 	// Iterate through each character in the filterString
@@ -142,8 +150,14 @@ function parseFilterString(filterString: string): string[] {
 		} else if (char === '\\') {
 			current += char;
 			escapeNext = true;
-		} else if (char === '"' && !escapeNext) {
-			inQuote = !inQuote;
+		} else if ((char === '"' || char === "'") && !escapeNext) {
+			if (!inQuote) {
+				inQuote = true;
+				quoteType = char;
+			} else if (char === quoteType) {
+				inQuote = false;
+				quoteType = '';
+			}
 			current += char;
 		} else if (!inQuote) {
 			if (char === '(') depth++;
@@ -182,7 +196,7 @@ export function applyFilters(value: string | any[], filterString: string, curren
 
 	let processedValue = value;
 
-	// Split into individual filter names
+	// Split the filter string into individual filter names, accounting for escaped pipes and quotes
 	const filterNames = splitFilterString(filterString);
 	debugLog('Filters', 'Split filter string:', filterNames);
 
