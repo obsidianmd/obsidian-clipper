@@ -3,16 +3,34 @@
 		display: flex;
 		flex-direction: column;
 		gap: 8px;
+
+		.interpreter-controls {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+		}
 	}
+
 	#prompt-context {
 		display: none !important;
 	}
+
 	#interpret-btn {
 		&.processing {
 			cursor: not-allowed;
 		}
 	}
-	#llm-error-message {
+
+	#llm-timer {
+		font-size: 0.75rem;
+		color: var(--text-muted);
+		min-width: 2.75rem;
+		text-align: end;
+		font-variant: tabular-nums;
+		font-family: var(--font-monospace-default);
+	}
+
+	#interpreter-error {
 		border: 1px solid var(--background-modifier-border);
 		border-radius: 4px;
 		padding: 8px;

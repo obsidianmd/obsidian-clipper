@@ -32,7 +32,10 @@
 			<div class="clipper-footer">
 				<div id="interpreter" style="display: none;">
 					<textarea id="prompt-context" rows="3"></textarea>
-					<button id="interpret-btn">Process with LLM</button>
+					<div class="interpreter-controls">
+						<button id="interpret-btn">Process with LLM</button>
+						<span id="llm-timer" style="display: none;"></span>
+					</div>
 					<div id="interpreter-error" style="display: none;"></div>
 				</div>
 				<div class="vault-path-container">

@@ -2,6 +2,7 @@ import { generalSettings } from './storage-utils';
 import { PromptVariable, Template } from '../types/types';
 import { replaceVariables } from './content-extractor';
 import { applyFilters } from './filters';
+import { formatDuration } from './string-utils';
 
 const RATE_LIMIT_RESET_TIME = 60000; // 1 minute in milliseconds
 let lastRequestTime = 0;
@@ -306,6 +307,7 @@ export async function initializeLLMComponents(template: Template, variables: { [
 export async function handleLLMProcessing(template: Template, variables: { [key: string]: string }, tabId: number, currentUrl: string) {
 	const interpretBtn = document.getElementById('interpret-btn') as HTMLButtonElement;
 	const interpreterErrorMessage = document.getElementById('interpreter-error') as HTMLDivElement;
+	const llmTimer = document.getElementById('llm-timer') as HTMLSpanElement;
 	
 	try {
 		// Hide any previous error message
@@ -325,9 +327,23 @@ export async function handleLLMProcessing(template: Template, variables: { [key:
 				promptVariables: promptVariables.map(({ key, prompt }) => ({ key, prompt }))
 			});
 
+			// Start the timer
+			const startTime = performance.now();
+			let timerInterval: number;
+
 			// Change button text and add class
 			interpretBtn.textContent = 'Processing';
 			interpretBtn.classList.add('processing');
+
+			// Show and update the timer
+			llmTimer.style.display = 'inline';
+			llmTimer.textContent = '0ms';
+
+			// Update the timer text with elapsed time
+			timerInterval = window.setInterval(() => {
+				const elapsedTime = performance.now() - startTime;
+				llmTimer.textContent = formatDuration(elapsedTime);
+			}, 10);
 
 			await processLLM(
 				promptToUse,
@@ -336,6 +352,15 @@ export async function handleLLMProcessing(template: Template, variables: { [key:
 				updateLLMResponse,
 				updateFieldsWithLLMResponses
 			);
+
+			// Stop the timer and log the final time
+			clearInterval(timerInterval);
+			const endTime = performance.now();
+			const totalTime = endTime - startTime;
+			console.log(`LLM processing completed in ${formatDuration(totalTime)}`);
+
+			// Update the final time in the timer element
+			llmTimer.textContent = formatDuration(totalTime);
 
 			// Revert button text and remove class
 			interpretBtn.textContent = 'Process with LLM';
@@ -349,6 +374,9 @@ export async function handleLLMProcessing(template: Template, variables: { [key:
 		// Revert button text and remove class in case of error
 		interpretBtn.textContent = 'Process with LLM';
 		interpretBtn.classList.remove('processing');
+
+		// Hide the timer
+		llmTimer.style.display = 'none';
 
 		// Display the error message
 		interpreterErrorMessage.textContent = error instanceof Error ? error.message : 'An unknown error occurred while processing the LLM request.';
