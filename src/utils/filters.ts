@@ -70,59 +70,7 @@ export const filters: { [key: string]: FilterFunction } = {
 	wikilink
 };
 
-function parseFilterString(filterString: string): string[] {
-	// Remove outer quotes if present
-	filterString = filterString.replace(/^['"](.*)['"]$/, '$1');
-
-	const parts: string[] = [];
-	let current = '';
-	let depth = 0;
-	let inQuote = false;
-	let escapeNext = false;
-
-	// Iterate through each character in the filterString
-	for (let i = 0; i < filterString.length; i++) {
-		const char = filterString[i];
-
-		if (escapeNext) {
-			current += char;
-			escapeNext = false;
-		} else if (char === '\\') {
-			current += char;
-			escapeNext = true;
-		} else if (char === '"' && !escapeNext) {
-			inQuote = !inQuote;
-			current += char;
-		} else if (!inQuote) {
-			if (char === '(') depth++;
-			if (char === ')') depth--;
-			
-			if (char === ':' && depth === 0 && parts.length === 0) {
-				parts.push(current.trim());
-				current = '';
-			} else {
-				current += char;
-			}
-		} else {
-			current += char;
-		}
-	}
-
-	if (current) {
-		parts.push(current.trim());
-	}
-
-	// If we have parameters, split them by comma, respecting quotes and escaped characters
-	if (parts.length > 1) {
-		const [filterName, ...params] = parts;
-		const splitParams = params.join(':').split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/);
-		return [filterName, ...splitParams.map(param => param.trim())];
-	}
-
-	return parts;
-}
-
-// This function splits the filter string into individual filter names, accounting for escaped pipes and quotes
+// Split the individual filter names
 function splitFilterString(filterString: string): string[] {
 	const filters: string[] = [];
 	let current = '';
@@ -173,6 +121,57 @@ function splitFilterString(filterString: string): string[] {
 	return filters;
 }
 
+// Parse the filter into name and parameters
+function parseFilterString(filterString: string): string[] {
+	// Remove outer quotes if present
+	filterString = filterString.replace(/^['"](.*)['"]$/, '$1');
+
+	const parts: string[] = [];
+	let current = '';
+	let depth = 0;
+	let inQuote = false;
+	let escapeNext = false;
+
+	// Iterate through each character in the filterString
+	for (let i = 0; i < filterString.length; i++) {
+		const char = filterString[i];
+
+		if (escapeNext) {
+			current += char;
+			escapeNext = false;
+		} else if (char === '\\') {
+			current += char;
+			escapeNext = true;
+		} else if (char === '"' && !escapeNext) {
+			inQuote = !inQuote;
+			current += char;
+		} else if (!inQuote) {
+			if (char === '(') depth++;
+			if (char === ')') depth--;
+			
+			if (char === ':' && depth === 0 && parts.length === 0) {
+				parts.push(current.trim());
+				current = '';
+			} else {
+				current += char;
+			}
+		} else {
+			current += char;
+		}
+	}
+
+	if (current) {
+		parts.push(current.trim());
+	}
+
+	// Special handling for replace filter
+	if (parts[0] === 'replace' && parts.length > 1) {
+		return [parts[0], parts.slice(1).join(':')];
+	}
+
+	return parts;
+}
+
 export function applyFilters(value: string | any[], filterString: string, currentUrl?: string): string {
 	debugLog('Filters', 'applyFilters called with:', { value, filterString, currentUrl });
 
@@ -183,7 +182,7 @@ export function applyFilters(value: string | any[], filterString: string, curren
 
 	let processedValue = value;
 
-	// Split the filter string into individual filter names, accounting for escaped pipes and quotes
+	// Split into individual filter names
 	const filterNames = splitFilterString(filterString);
 	debugLog('Filters', 'Split filter string:', filterNames);
 
