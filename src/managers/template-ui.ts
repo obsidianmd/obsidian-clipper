@@ -286,7 +286,7 @@ export function addPropertyToEditor(name: string = '', value: string = '', type:
 		type: 'text',
 		class: 'property-value',
 		id: `${propertyId}-value`,
-		value: escapeHtml(unescapeValue(value)),
+		value: unescapeValue(value),
 		placeholder: 'Property value'
 	});
 	propertyDiv.appendChild(valueInput);

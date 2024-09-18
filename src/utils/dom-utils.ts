@@ -6,10 +6,8 @@ export function createElementWithClass(tagName: string, className: string): HTML
 
 export function createElementWithHTML(tagName: string, innerHTML: string, attributes: Record<string, string> = {}): HTMLElement {
 	const element = document.createElement(tagName);
-	element.textContent = innerHTML;
-	Object.entries(attributes).forEach(([key, value]) => {
-		element.setAttribute(key, value);
-	});
+	element.innerHTML = innerHTML;
+	Object.entries(attributes).forEach(([key, value]) => element.setAttribute(key, value));
 	return element;
 }
 
