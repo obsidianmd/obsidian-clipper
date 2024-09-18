@@ -1,3 +1,6 @@
+.logo {
+	fill: var(--color-accent-1);
+}
 #settings {
 	margin: 0 auto;
 	padding: 0;
@@ -23,13 +26,19 @@
 		justify-content: space-between;
 		align-items: center;
 		padding: 0 max(6%,24px);
+		height: 48px;
 		border-bottom: 1px solid var(--background-modifier-border);
 		#navbar-title {
 			font-weight: 600;
 			font-size: var(--font-ui-medium);
 			flex-grow: 1;
+			display: flex;
+			align-items: center;
+			gap: 6px;
+			svg {
+				height: 20px;
+			}
 		}
-		height: 48px;
 	}
 
 	.hamburger-menu {
