@@ -10,13 +10,12 @@ export const strip_attr = (html: string, keepAttributes: string = ''): string =>
 		}
 
 		const keepAttrs = keepAttributesList.map(attr => {
-			// Escape special regex characters in the attribute name
 			const escapedAttr = attr.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 			const regex = new RegExp(`\\s${escapedAttr}\\s*=\\s*("[^"]*"|'[^']*')`, 'i');
 			const attrMatch = match.match(regex);
-			return attrMatch ? attrMatch[0] : '';
+			return attrMatch ? attrMatch[0].trim() : '';
 		}).filter(Boolean).join(' ');
 
-		return `<${tag}${keepAttrs ? ' ' + keepAttrs : ''}>`;
+		return keepAttrs ? `<${tag} ${keepAttrs}>` : `<${tag}>`;
 	});
 };
