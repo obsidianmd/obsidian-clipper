@@ -1,6 +1,7 @@
 {
 	"manifest_version": 3,
 	"name": "Obsidian Web Clipper",
+	"homepage_url": "https://obsidian.md/",
 	"version": "0.4.6",
 	"description": "Save content from the web to your Obsidian vault, in a portable, durable format that you can access even offline.",
 	"permissions": [
