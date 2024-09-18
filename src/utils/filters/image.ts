@@ -1,9 +1,18 @@
 import { escapeMarkdown } from '../string-utils';
 
-export const image = (str: string, altText?: string): string => {
+export const image = (str: string, param?: string): string => {
 	if (!str.trim()) {
 		return str;
 	}
+
+	let altText = '';
+	if (param) {
+		// Remove outer parentheses if present
+		param = param.replace(/^\((.*)\)$/, '$1');
+		// Remove surrounding quotes (both single and double)
+		altText = param.replace(/^(['"])(.*)\1$/, '$2');
+	}
+
 	try {
 		const data = JSON.parse(str);
 		
@@ -17,19 +26,21 @@ export const image = (str: string, altText?: string): string => {
 		};
 
 		if (Array.isArray(data)) {
-			const result = data.flatMap(item => {
+			const result = data.map(item => {
 				if (typeof item === 'object' && item !== null) {
 					return processObject(item);
 				}
-				return item ? `![${altText || ''}](${escapeMarkdown(String(item))})` : '';
+				return item ? `![${altText}](${escapeMarkdown(String(item))})` : '';
 			});
-			return JSON.stringify(result);
+			return result.join('\n');
 		} else if (typeof data === 'object' && data !== null) {
-			return JSON.stringify(processObject(data));
+			return processObject(data).join('\n');
 		}
 	} catch (error) {
-		// If parsing fails, treat it as a single string
-		return `![${altText || ''}](${escapeMarkdown(str)})`;
+		// If parsing fails, treat it as a single URL string
+		return `![${altText}](${escapeMarkdown(str)})`;
 	}
+
+	// Add this line to satisfy the linter
 	return str;
 };
