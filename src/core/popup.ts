@@ -10,7 +10,7 @@ import { getLocalStorage, setLocalStorage, loadGeneralSettings, generalSettings,
 import { formatVariables, unescapeValue } from '../utils/string-utils';
 import { loadTemplates, createDefaultTemplate } from '../managers/template-manager';
 import browser from '../utils/browser-polyfill';
-import { detectBrowser } from '../utils/browser-detection';
+import { detectBrowser, addBrowserClassToHtml } from '../utils/browser-detection';
 import { createElementWithClass, createElementWithHTML } from '../utils/dom-utils';
 
 let currentTemplate: Template | null = null;
@@ -104,36 +104,6 @@ async function handleClip() {
 		console.error('Error in handleClip:', error);
 		showError('Failed to save to Obsidian. Please try again.');
 		throw error; // Re-throw the error so it can be caught by the caller
-	}
-}
-
-async function addBrowserClassToHtml() {
-	const browser = await detectBrowser();
-	const htmlElement = document.documentElement;
-
-	// Remove any existing browser classes
-	htmlElement.classList.remove('is-firefox-mobile', 'is-chromium', 'is-firefox', 'is-edge', 'is-chrome', 'is-brave');
-
-	// Add the appropriate class based on the detected browser
-	switch (browser) {
-		case 'firefox-mobile':
-			htmlElement.classList.add('is-firefox-mobile', 'is-firefox');
-			break;
-		case 'firefox':
-			htmlElement.classList.add('is-firefox');
-			break;
-		case 'edge':
-			htmlElement.classList.add('is-edge', 'is-chromium');
-			break;
-		case 'chrome':
-			htmlElement.classList.add('is-chrome', 'is-chromium');
-			break;
-		case 'brave':
-			htmlElement.classList.add('is-brave', 'is-chromium');
-			break;
-		default:
-			// For 'other' browsers, we don't add any class
-			break;
 	}
 }
 
@@ -489,17 +459,24 @@ document.addEventListener('DOMContentLoaded', async function() {
 			}
 		}
 
-		function initializeUI() {
+		async function initializeUI() {
 			const clipButton = document.getElementById('clip-button');
 			if (clipButton) {
 				clipButton.addEventListener('click', handleClip);
 				clipButton.focus();
 			}
 
+			// On Firefox Mobile close the popup when the settings button is clicked
+			// because otherwise the settings page is opened in the background
 			const settingsButton = document.getElementById('open-settings');
 			if (settingsButton) {
-				settingsButton.addEventListener('click', function() {
+				settingsButton.addEventListener('click', async function() {
 					browser.runtime.openOptionsPage();
+					
+					const browserType = await detectBrowser();
+					if (browserType === 'firefox-mobile') {
+						setTimeout(() => window.close(), 50);
+					}
 				});
 			}
 

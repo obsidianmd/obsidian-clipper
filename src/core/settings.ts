@@ -10,6 +10,7 @@ import { icons } from '../icons/icons';
 import { showGeneralSettings } from '../managers/general-settings-ui';
 import { updateUrl } from '../utils/routing';
 import browser from '../utils/browser-polyfill';
+import { addBrowserClassToHtml } from '../utils/browser-detection';
 
 document.addEventListener('DOMContentLoaded', async () => {
 	const newTemplateBtn = document.getElementById('new-template-btn') as HTMLButtonElement;
@@ -161,6 +162,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 		initializeAddPropertyButton();
 		handleTemplateDrag();
 	}
-
+	await addBrowserClassToHtml();
 	await initializeSettings();
 });

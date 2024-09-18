@@ -22,3 +22,33 @@ export async function detectBrowser(): Promise<'chrome' | 'firefox' | 'firefox-m
 		return 'other';
 	}
 }
+
+export async function addBrowserClassToHtml() {
+	const browser = await detectBrowser();
+	const htmlElement = document.documentElement;
+
+	// Remove any existing browser classes
+	htmlElement.classList.remove('is-firefox-mobile', 'is-chromium', 'is-firefox', 'is-edge', 'is-chrome', 'is-brave');
+
+	// Add the appropriate class based on the detected browser
+	switch (browser) {
+		case 'firefox-mobile':
+			htmlElement.classList.add('is-firefox-mobile', 'is-firefox');
+			break;
+		case 'firefox':
+			htmlElement.classList.add('is-firefox');
+			break;
+		case 'edge':
+			htmlElement.classList.add('is-edge', 'is-chromium');
+			break;
+		case 'chrome':
+			htmlElement.classList.add('is-chrome', 'is-chromium');
+			break;
+		case 'brave':
+			htmlElement.classList.add('is-brave', 'is-chromium');
+			break;
+		default:
+			// For 'other' browsers, we don't add any class
+			break;
+	}
+}

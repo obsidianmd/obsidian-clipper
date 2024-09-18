@@ -5,9 +5,10 @@ button {
 	background-color: var(--background-primary);
 	border-radius: 4px;
 	box-shadow: 0 0 0 1px var(--background-modifier-border);
+	font-size: var(--font-ui-smaller);
 	height: var(--input-height);
 	user-select: none;
-	padding: 4px 12px;
+	padding: 0.25rem 0.75rem;
 	outline: none;
 	border: none;
 	&:not(.clickable-icon) {
