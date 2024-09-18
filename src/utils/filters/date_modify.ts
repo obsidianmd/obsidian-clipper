@@ -1,4 +1,7 @@
 import dayjs from 'dayjs';
+import advancedFormat from 'dayjs/plugin/advancedFormat';
+
+dayjs.extend(advancedFormat);
 
 export const date_modify = (str: string, param?: string): string => {
 	if (!param) {
@@ -33,5 +36,7 @@ export const date_modify = (str: string, param?: string): string => {
 		date = date.subtract(numericAmount, unit as any);
 	}
 
-	return date.format('YYYY-MM-DD');
+	// Use 'YYYY-MM-DD' as default format, but allow for custom format
+	const format = param.split(',')[1]?.trim() || 'YYYY-MM-DD';
+	return date.format(format);
 };

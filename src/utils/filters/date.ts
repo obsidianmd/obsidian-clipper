@@ -1,7 +1,9 @@
 import dayjs from 'dayjs';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
+import advancedFormat from 'dayjs/plugin/advancedFormat';
 
 dayjs.extend(customParseFormat);
+dayjs.extend(advancedFormat);
 
 export const date = (str: string, param?: string): string => {
 	// Remove outer parentheses if present and split by comma, respecting quotes
