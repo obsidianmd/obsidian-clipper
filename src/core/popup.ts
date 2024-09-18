@@ -11,6 +11,7 @@ import { formatVariables, unescapeValue } from '../utils/string-utils';
 import { loadTemplates, createDefaultTemplate } from '../managers/template-manager';
 import browser from '../utils/browser-polyfill';
 import { detectBrowser } from '../utils/browser-detection';
+import { createElementWithClass, createElementWithHTML } from '../utils/dom-utils';
 
 let currentTemplate: Template | null = null;
 let templates: Template[] = [];
@@ -384,8 +385,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 			}
 
 			for (const property of template.properties) {
-				const propertyDiv = document.createElement('div');
-				propertyDiv.className = 'metadata-property';
+				const propertyDiv = createElementWithClass('div', 'metadata-property');
 				let value = await replaceVariables(tabId, unescapeValue(property.value), variables, currentUrl);
 
 				// Apply type-specific parsing
@@ -405,11 +405,23 @@ document.addEventListener('DOMContentLoaded', async function() {
 						break;
 				}
 
-				propertyDiv.innerHTML = `
-					<span class="metadata-property-icon"><i data-lucide="${getPropertyTypeIcon(property.type)}"></i></span>
-					<label for="${property.name}">${property.name}</label>
-					<input id="${property.name}" type="text" value="${escapeHtml(value)}" data-type="${property.type}" data-template-value="${escapeHtml(property.value)}" />
-				`;
+				const iconSpan = createElementWithClass('span', 'metadata-property-icon');
+				iconSpan.appendChild(createElementWithHTML('i', '', { 'data-lucide': getPropertyTypeIcon(property.type) }));
+				propertyDiv.appendChild(iconSpan);
+
+				const label = document.createElement('label');
+				label.setAttribute('for', property.name);
+				label.textContent = property.name;
+				propertyDiv.appendChild(label);
+
+				const input = document.createElement('input');
+				input.id = property.name;
+				input.type = 'text';
+				input.value = value;
+				input.setAttribute('data-type', property.type);
+				input.setAttribute('data-template-value', property.value);
+				propertyDiv.appendChild(input);
+
 				templateProperties.appendChild(propertyDiv);
 			}
 
@@ -497,16 +509,42 @@ document.addEventListener('DOMContentLoaded', async function() {
 				
 				showMoreActionsButton.addEventListener('click', function() {
 					if (currentTemplate && Object.keys(currentVariables).length > 0) {
-						const formattedVariables = formatVariables(currentVariables);
-						variablesPanel.innerHTML = `
-							<div class="variables-header">
-								<h3>Page variables</h3>
-								<span class="close-panel clickable-icon" aria-label="Close">
-									<i data-lucide="x"></i>
-								</span>
-							</div>
-							<div class="variable-list">${formattedVariables}</div>
-						`;
+						const variablesPanel = document.querySelector('.variables-panel') as HTMLElement;
+						variablesPanel.innerHTML = '';
+
+						const headerDiv = createElementWithClass('div', 'variables-header');
+						const headerTitle = document.createElement('h3');
+						headerTitle.textContent = 'Page variables';
+						headerDiv.appendChild(headerTitle);
+
+						const closeButton = createElementWithClass('span', 'close-panel clickable-icon');
+						closeButton.setAttribute('aria-label', 'Close');
+						closeButton.appendChild(createElementWithHTML('i', '', { 'data-lucide': 'x' }));
+						headerDiv.appendChild(closeButton);
+
+						variablesPanel.appendChild(headerDiv);
+
+						const variableListDiv = createElementWithClass('div', 'variable-list');
+						Object.entries(currentVariables).forEach(([key, value]) => {
+							const variableItem = createElementWithClass('div', 'variable-item');
+							
+							const keySpan = createElementWithClass('span', 'variable-key');
+							keySpan.textContent = key;
+							keySpan.setAttribute('data-variable', `{{${key}}}`);
+							variableItem.appendChild(keySpan);
+
+							const chevronSpan = createElementWithClass('span', 'chevron-icon');
+							chevronSpan.appendChild(createElementWithHTML('i', '', { 'data-lucide': 'chevron-down' }));
+							variableItem.appendChild(chevronSpan);
+
+							const valueSpan = createElementWithClass('span', 'variable-value');
+							valueSpan.textContent = value;
+							variableItem.appendChild(valueSpan);
+
+							variableListDiv.appendChild(variableItem);
+						});
+						variablesPanel.appendChild(variableListDiv);
+
 						variablesPanel.classList.add('show');
 						initializeIcons();
 
@@ -546,8 +584,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 							});
 						});
 
-						const closePanel = variablesPanel.querySelector('.close-panel') as HTMLElement;
-						closePanel.addEventListener('click', function() {
+						closeButton.addEventListener('click', function() {
 							variablesPanel.classList.remove('show');
 						});
 					} else {

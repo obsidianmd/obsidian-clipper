@@ -6,6 +6,7 @@ import { generalSettings } from '../utils/storage-utils';
 import { updateUrl } from '../utils/routing';
 import { handleDragStart, handleDragOver, handleDrop, handleDragEnd } from '../utils/drag-and-drop';
 import browser from '../utils/browser-polyfill';
+import { createElementWithClass, createElementWithHTML } from '../utils/dom-utils';
 
 let hasUnsavedChanges = false;
 
@@ -26,15 +27,21 @@ export function updateTemplateList(loadedTemplates?: Template[]): void {
 	templatesToUse.forEach((template, index) => {
 		if (template && template.name && template.id) {
 			const li = document.createElement('li');
-			li.innerHTML = `
-				<div class="drag-handle">
-					<i data-lucide="grip-vertical"></i>
-				</div>
-				<span class="template-name">${template.name}</span>
-				<button type="button" class="delete-template-btn clickable-icon" aria-label="Delete template">
-					<i data-lucide="trash-2"></i>
-				</button>
-			`;
+			
+			const dragHandle = createElementWithClass('div', 'drag-handle');
+			dragHandle.appendChild(createElementWithHTML('i', '', { 'data-lucide': 'grip-vertical' }));
+			li.appendChild(dragHandle);
+
+			const templateName = createElementWithClass('span', 'template-name');
+			templateName.textContent = template.name;
+			li.appendChild(templateName);
+
+			const deleteBtn = createElementWithClass('button', 'delete-template-btn clickable-icon');
+			deleteBtn.setAttribute('type', 'button');
+			deleteBtn.setAttribute('aria-label', 'Delete template');
+			deleteBtn.appendChild(createElementWithHTML('i', '', { 'data-lucide': 'trash-2' }));
+			li.appendChild(deleteBtn);
+
 			li.dataset.id = template.id;
 			li.dataset.index = index.toString();
 			li.draggable = true;
@@ -44,13 +51,12 @@ export function updateTemplateList(loadedTemplates?: Template[]): void {
 					showTemplateEditor(template);
 				}
 			});
-			const deleteBtn = li.querySelector('.delete-template-btn');
-			if (deleteBtn) {
-				deleteBtn.addEventListener('click', (e) => {
-					e.stopPropagation();
-					deleteTemplate(template.id);
-				});
-			}
+			
+			deleteBtn.addEventListener('click', (e) => {
+				e.stopPropagation();
+				deleteTemplate(template.id);
+			});
+			
 			if (index === editingTemplateIndex) {
 				li.classList.add('active');
 			}
@@ -173,7 +179,11 @@ export function showTemplateEditor(template: Template | null): void {
 
 	const vaultSelect = document.getElementById('template-vault') as HTMLSelectElement;
 	if (vaultSelect) {
-		vaultSelect.innerHTML = '<option value="">Last used</option>';
+		vaultSelect.innerHTML = '';
+		const lastUsedOption = document.createElement('option');
+		lastUsedOption.value = '';
+		lastUsedOption.textContent = 'Last used';
+		vaultSelect.appendChild(lastUsedOption);
 		generalSettings.vaults.forEach(vault => {
 			const option = document.createElement('option');
 			option.value = vault;
@@ -238,32 +248,55 @@ export function addPropertyToEditor(name: string = '', value: string = '', type:
 	if (!templateProperties) return;
 
 	const propertyId = id || Date.now().toString() + Math.random().toString(36).slice(2, 11);
-	const propertyDiv = document.createElement('div');
-	propertyDiv.className = 'property-editor';
-	propertyDiv.innerHTML = `
-		<div class="drag-handle">
-			<i data-lucide="grip-vertical"></i>
-		</div>
-		<div class="property-select">
-			<div class="property-selected" data-value="${type}">
-				<i data-lucide="${getPropertyTypeIcon(type)}"></i>
-			</div>
-			<select class="property-type" id="${propertyId}-type">
-				<option value="text">Text</option>
-				<option value="multitext">List</option>
-				<option value="number">Number</option>
-				<option value="checkbox">Checkbox</option>
-				<option value="date">Date</option>
-				<option value="datetime">Date & time</option>
-			</select>
-		</div>
-		<input type="text" class="property-name" id="${propertyId}-name" value="${name}" placeholder="Property name">
-		<input type="text" class="property-value" id="${propertyId}-value" value="${escapeHtml(unescapeValue(value))}" placeholder="Property value">
-		<button type="button" class="remove-property-btn clickable-icon" aria-label="Remove property">
-			<i data-lucide="trash-2"></i>
-		</button>
-	`;
+	const propertyDiv = createElementWithClass('div', 'property-editor');
 	propertyDiv.dataset.id = propertyId;
+
+	const dragHandle = createElementWithClass('div', 'drag-handle');
+	dragHandle.appendChild(createElementWithHTML('i', '', { 'data-lucide': 'grip-vertical' }));
+	propertyDiv.appendChild(dragHandle);
+
+	const propertySelectDiv = createElementWithClass('div', 'property-select');
+	const propertySelectedDiv = createElementWithClass('div', 'property-selected');
+	propertySelectedDiv.dataset.value = type;
+	propertySelectedDiv.appendChild(createElementWithHTML('i', '', { 'data-lucide': getPropertyTypeIcon(type) }));
+	propertySelectDiv.appendChild(propertySelectedDiv);
+
+	const select = document.createElement('select');
+	select.className = 'property-type';
+	select.id = `${propertyId}-type`;
+	['text', 'multitext', 'number', 'checkbox', 'date', 'datetime'].forEach(optionValue => {
+		const option = document.createElement('option');
+		option.value = optionValue;
+		option.textContent = optionValue.charAt(0).toUpperCase() + optionValue.slice(1);
+		select.appendChild(option);
+	});
+	propertySelectDiv.appendChild(select);
+	propertyDiv.appendChild(propertySelectDiv);
+
+	const nameInput = createElementWithHTML('input', '', {
+		type: 'text',
+		class: 'property-name',
+		id: `${propertyId}-name`,
+		value: name,
+		placeholder: 'Property name'
+	});
+	propertyDiv.appendChild(nameInput);
+
+	const valueInput = createElementWithHTML('input', '', {
+		type: 'text',
+		class: 'property-value',
+		id: `${propertyId}-value`,
+		value: escapeHtml(unescapeValue(value)),
+		placeholder: 'Property value'
+	});
+	propertyDiv.appendChild(valueInput);
+
+	const removeBtn = createElementWithClass('button', 'remove-property-btn clickable-icon');
+	removeBtn.setAttribute('type', 'button');
+	removeBtn.setAttribute('aria-label', 'Remove property');
+	removeBtn.appendChild(createElementWithHTML('i', '', { 'data-lucide': 'trash-2' }));
+	propertyDiv.appendChild(removeBtn);
+
 	templateProperties.appendChild(propertyDiv);
 
 	propertyDiv.addEventListener('mousedown', (event) => {
@@ -288,23 +321,16 @@ export function addPropertyToEditor(name: string = '', value: string = '', type:
 	propertyDiv.addEventListener('dragend', resetDraggable);
 	propertyDiv.addEventListener('mouseup', resetDraggable);
 
-	const propertySelect = propertyDiv.querySelector('.property-select');
-	if (!propertySelect) return;
+	if (select) {
+		select.value = type;
 
-	const propertySelected = propertySelect.querySelector('.property-selected');
-	const hiddenSelect = propertySelect.querySelector('select');
-
-	if (hiddenSelect) {
-		hiddenSelect.value = type;
-
-		hiddenSelect.addEventListener('change', function() {
-			if (propertySelected) updateSelectedOption(this.value, propertySelected as HTMLElement);
+		select.addEventListener('change', function() {
+			if (propertySelectedDiv) updateSelectedOption(this.value, propertySelectedDiv);
 		});
 	}
 
-	const removePropertyBtn = propertyDiv.querySelector('.remove-property-btn');
-	if (removePropertyBtn) {
-		removePropertyBtn.addEventListener('click', () => {
+	if (removeBtn) {
+		removeBtn.addEventListener('click', () => {
 			templateProperties.removeChild(propertyDiv);
 		});
 	}
@@ -314,14 +340,21 @@ export function addPropertyToEditor(name: string = '', value: string = '', type:
 	propertyDiv.addEventListener('drop', handleDrop);
 	propertyDiv.addEventListener('dragend', handleDragEnd);
 
-	if (propertySelected) updateSelectedOption(type, propertySelected as HTMLElement);
+	updateSelectedOption(type, propertySelectedDiv);
 
 	initializeIcons(propertyDiv);
 }
 
 function updateSelectedOption(value: string, propertySelected: HTMLElement): void {
 	const iconName = getPropertyTypeIcon(value);
-	propertySelected.innerHTML = `<i data-lucide="${iconName}"></i>`;
+	
+	// Clear existing content
+	propertySelected.innerHTML = '';
+	
+	// Create and append the new icon element
+	const iconElement = createElementWithHTML('i', '', { 'data-lucide': iconName });
+	propertySelected.appendChild(iconElement);
+	
 	propertySelected.setAttribute('data-value', value);
 	initializeIcons(propertySelected);
 }

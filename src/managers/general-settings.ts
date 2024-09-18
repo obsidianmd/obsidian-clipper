@@ -4,6 +4,7 @@ import { getCommands } from '../utils/hotkeys';
 import { initializeToggles } from '../utils/ui-utils';
 import { generalSettings, loadGeneralSettings, saveGeneralSettings } from '../utils/storage-utils';
 import { detectBrowser } from '../utils/browser-detection';
+import { createElementWithClass, createElementWithHTML } from '../utils/dom-utils';
 
 export function updateVaultList(): void {
 	const vaultList = document.getElementById('vault-list') as HTMLUListElement;
@@ -12,22 +13,27 @@ export function updateVaultList(): void {
 	vaultList.innerHTML = '';
 	generalSettings.vaults.forEach((vault, index) => {
 		const li = document.createElement('li');
-		li.innerHTML = `
-			<div class="drag-handle">
-				<i data-lucide="grip-vertical"></i>
-			</div>
-			<span>${vault}</span>
-			<button type="button" class="remove-vault-btn clickable-icon" aria-label="Remove vault">
-				<i data-lucide="trash-2"></i>
-			</button>
-		`;
 		li.dataset.index = index.toString();
 		li.draggable = true;
+
+		const dragHandle = createElementWithClass('div', 'drag-handle');
+		dragHandle.appendChild(createElementWithHTML('i', '', { 'data-lucide': 'grip-vertical' }));
+		li.appendChild(dragHandle);
+
+		const span = document.createElement('span');
+		span.textContent = vault;
+		li.appendChild(span);
+
+		const removeBtn = createElementWithClass('button', 'remove-vault-btn clickable-icon');
+		removeBtn.setAttribute('type', 'button');
+		removeBtn.setAttribute('aria-label', 'Remove vault');
+		removeBtn.appendChild(createElementWithHTML('i', '', { 'data-lucide': 'trash-2' }));
+		li.appendChild(removeBtn);
+
 		li.addEventListener('dragstart', handleDragStart);
 		li.addEventListener('dragover', handleDragOver);
 		li.addEventListener('drop', handleDrop);
 		li.addEventListener('dragend', handleDragEnd);
-		const removeBtn = li.querySelector('.remove-vault-btn') as HTMLButtonElement;
 		removeBtn.addEventListener('click', (e) => {
 			e.stopPropagation();
 			removeVault(index);
@@ -71,7 +77,10 @@ export async function setShortcutInstructions() {
 			default:
 				instructions = 'To change key assignments, please refer to your browser\'s extension settings.';
 		}
-		shortcutInstructionsElement.innerHTML = `Keyboard shortcuts give you quick access to clipper features. ${instructions}`;
+		shortcutInstructionsElement.textContent = 'Keyboard shortcuts give you quick access to clipper features. ';
+		const codeElement = document.createElement('code');
+		codeElement.textContent = instructions.replace(/<\/?code>/g, '');
+		shortcutInstructionsElement.appendChild(codeElement);
 	}
 }
 
@@ -119,12 +128,16 @@ function initializeKeyboardShortcuts(): void {
 
 	getCommands().then(commands => {
 		commands.forEach(command => {
-			const shortcutItem = document.createElement('div');
-			shortcutItem.className = 'shortcut-item';
-			shortcutItem.innerHTML = `
-				<span>${command.description}</span>
-				<span class="setting-hotkey">${command.shortcut || 'Not set'}</span>
-			`;
+			const shortcutItem = createElementWithClass('div', 'shortcut-item');
+			
+			const descriptionSpan = document.createElement('span');
+			descriptionSpan.textContent = command.description;
+			shortcutItem.appendChild(descriptionSpan);
+
+			const hotkeySpan = createElementWithClass('span', 'setting-hotkey');
+			hotkeySpan.textContent = command.shortcut || 'Not set';
+			shortcutItem.appendChild(hotkeySpan);
+
 			shortcutsList.appendChild(shortcutItem);
 		});
 	});
