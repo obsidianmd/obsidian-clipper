@@ -1,0 +1,71 @@
+#template-properties {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	margin: 12px 0;
+	&:empty {
+		display: none;
+	}
+	> .property-editor {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		gap: 4px;
+	}
+	.property-name {
+		max-width: 120px;
+	}
+}
+
+.property-select {
+	position: relative;
+	color: var(--text-muted);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	select {
+		opacity: 0;
+		width: 24px;
+		height: var(--input-height);
+		cursor: pointer;
+		z-index: 2;
+	}
+	.property-selected {
+		z-index: 1;
+		position: absolute;
+		top: 0;
+		left: 0;
+		user-select: none;
+		width: 24px;
+		height: var(--input-height);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		opacity: 0.85;
+		svg {
+			width: 16px;
+			height: 16px;
+		}
+	}
+	&:hover {
+		color: var(--text-normal);
+	}
+}
+
+.metadata-add-button {
+	padding: 2px 0 8px;
+	margin-left: -2px;
+	font-weight: 500;
+	color: var(--text-muted);
+	font-size: var(--font-ui-small);
+	user-select: none;
+	white-space: nowrap;
+	a {
+		cursor: pointer;
+		border-radius: 4px;
+		padding: 6px 8px;
+		&:hover {
+			background-color: var(--background-modifier-hover);
+		}
+	}
+}

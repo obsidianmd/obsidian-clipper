@@ -101,18 +101,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 	}
 
 	function initializeSidebar(): void {
-		const sidebarItems = document.querySelectorAll('.sidebar li[data-section]');
+		const sidebarItems = document.querySelectorAll('#sidebar li[data-section], #template-list li');
 		const sections = document.querySelectorAll('.settings-section');
-		const sidebar = document.querySelector('.sidebar');
+		const sidebar = document.getElementById('sidebar');
+		const settingsContainer = document.getElementById('settings');
+
 		if (sidebar) {
 			sidebar.addEventListener('click', (event) => {
 				const target = event.target as HTMLElement;
 				if (target.dataset.section === 'general') {
 					showGeneralSettings();
 				}
+				if (settingsContainer) {
+					settingsContainer.classList.remove('sidebar-open');
+				}
 			});
 		}
-	
+
 		sidebarItems.forEach(item => {
 			item.addEventListener('click', () => {
 				const sectionId = (item as HTMLElement).dataset.section;
@@ -132,8 +137,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 						section.classList.remove('active');
 					}
 				});
+				if (settingsContainer) {
+					settingsContainer.classList.remove('sidebar-open');
+				}
 			});
 		});
+
+		const hamburgerMenu = document.getElementById('hamburger-menu');
+
+		if (hamburgerMenu && settingsContainer) {
+			hamburgerMenu.addEventListener('click', () => {
+				settingsContainer.classList.toggle('sidebar-open');
+			});
+		}
 	}
 
 	const templateForm = document.getElementById('template-settings-form');

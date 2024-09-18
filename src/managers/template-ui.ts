@@ -66,9 +66,10 @@ export function showTemplateEditor(template: Template | null): void {
 	let editingTemplate: Template;
 
 	if (!template) {
+		const newTemplateName = getUniqueTemplateName('New template');
 		editingTemplate = {
 			id: Date.now().toString() + Math.random().toString(36).slice(2, 11),
-			name: 'New template',
+			name: newTemplateName,
 			behavior: 'create',
 			noteNameFormat: '{{title}}',
 			path: 'Clippings',
@@ -76,8 +77,8 @@ export function showTemplateEditor(template: Template | null): void {
 			properties: [],
 			triggers: []
 		};
-		templates.push(editingTemplate);
-		setEditingTemplateIndex(templates.length - 1);
+		templates.unshift(editingTemplate);
+		setEditingTemplateIndex(0);
 		saveTemplateSettings().then(() => {
 			updateTemplateList();
 		}).catch(error => {
@@ -137,7 +138,7 @@ export function showTemplateEditor(template: Template | null): void {
 	const generalSection = document.getElementById('general-section');
 	if (generalSection) generalSection.style.display = 'none';
 
-	document.querySelectorAll('.sidebar li[data-section]').forEach(item => item.classList.remove('active'));
+	document.querySelectorAll('#sidebar li[data-section]').forEach(item => item.classList.remove('active'));
 	document.querySelectorAll('#template-list li').forEach(item => item.classList.remove('active'));
 	if (editingTemplateIndex !== -1) {
 		const activeTemplateItem = document.querySelector(`#template-list li[data-id="${templates[editingTemplateIndex].id}"]`);
@@ -405,4 +406,17 @@ function handleAddProperty(): void {
 	if (editingTemplateIndex !== -1) {
 		updateTemplateFromForm();
 	}
+}
+
+function getUniqueTemplateName(baseName: string): string {
+	const existingNames = new Set(templates.map(t => t.name));
+	let newName = baseName;
+	let counter = 1;
+
+	while (existingNames.has(newName)) {
+		newName = `${baseName} ${counter}`;
+		counter++;
+	}
+
+	return newName;
 }

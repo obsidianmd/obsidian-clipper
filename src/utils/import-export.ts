@@ -76,7 +76,8 @@ export function importTemplate(): void {
 					newName = `${importedTemplate.name} (${counter++})`;
 				}
 				importedTemplate.name = newName;
-				templates.push(importedTemplate as Template);
+
+				templates.unshift(importedTemplate as Template);
 
 				saveTemplateSettings();
 				updateTemplateList();
@@ -218,10 +219,11 @@ function importTemplateFile(file: File): void {
 			let newName = importedTemplate.name as string;
 			let counter = 1;
 			while (templates.some(t => t.name === newName)) {
-				newName = `${importedTemplate.name} (${counter++})`;
+				newName = `${importedTemplate.name} ${counter++}`;
 			}
 			importedTemplate.name = newName;
-			templates.push(importedTemplate as Template);
+
+			templates.unshift(importedTemplate as Template);
 
 			saveTemplateSettings();
 			updateTemplateList();

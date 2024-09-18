@@ -9,18 +9,27 @@
 <body style="height: 100%; overflow: hidden;">
 		<div id="settings">
 			
-			<div class="settings-container">
-				<div class="sidebar">
+			<div id="settings-container">
+				<div id="sidebar">
 					<ul>
 						<li class="sidebar-heading">Settings</li>
 						<li data-section="general" class="active">General</li>
 						<li class="sidebar-heading">Templates</li>
 					</ul>
-					<ul id="template-list"></ul>
 					<button type="button" id="new-template-btn" class="mod-cta">New template</button>
+					<ul id="template-list"></ul>
+					
 				</div>
 				
-				<div class="content">
+				<div id="content">
+					<div id="navbar">
+						<div id="navbar-title">
+							Obsidian Web Clipper
+						</div>
+						<button id="hamburger-menu" class="hamburger-menu">
+							<span class="hamburger-icon"></span>
+						</button>
+					</div>
 					<div id="general-section" class="settings-section active">
 						<div class="settings-section-header">
 							<h2>General settings</h2>
