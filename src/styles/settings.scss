@@ -285,6 +285,7 @@
 			left: 0;
 			right: 0;
 			z-index: 10;
+			padding: 0 24px;
 			width: 100%;
 			display: flex;
 			background-color: var(--background-secondary);
@@ -292,6 +293,9 @@
 			.hamburger-menu {
 				display: block;
 			}
+		}
+		.settings-section {
+			margin: 24px;
 		}
 		#content {
 			padding-top: 48px;
