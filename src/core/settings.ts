@@ -209,7 +209,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 						sectionToShow.style.display = 'block';
 						sectionToShow.classList.add('active');
 					}
-				});
+				}
 				if (settingsContainer) {
 					settingsContainer.classList.remove('sidebar-open');
 				}

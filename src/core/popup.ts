@@ -13,6 +13,7 @@ import browser from '../utils/browser-polyfill';
 import { detectBrowser, addBrowserClassToHtml } from '../utils/browser-detection';
 import { createElementWithClass, createElementWithHTML } from '../utils/dom-utils';
 import { initializeLLMComponents, handleLLMProcessing, collectPromptVariables } from '../utils/llm-utils';
+import { sendToLLM, updateFieldsWithLLMResponses } from '../utils/llm-utils';
 
 let currentTemplate: Template | null = null;
 let templates: Template[] = [];
@@ -158,14 +159,20 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 		await loadTemplates();
 
-		const vaultContainer = document.getElementById('vault-container') as HTMLElement;
-		const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement;
-		const templateContainer = document.getElementById('template-container') as HTMLElement;
-		const templateDropdown = document.getElementById('template-select') as HTMLSelectElement;
+		const vaultContainer = document.getElementById('vault-container');
+		const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement | null;
+		const templateContainer = document.getElementById('template-container');
+		const templateDropdown = document.getElementById('template-select') as HTMLSelectElement | null;
+
+		if (!vaultDropdown || !templateDropdown) {
+			throw new Error('Required dropdown elements not found');
+		}
 
 		updateVaultDropdown(loadedSettings.vaults);
 
 		function updateVaultDropdown(vaults: string[]) {
+			if (!vaultDropdown || !vaultContainer) return;
+
 			vaultDropdown.innerHTML = '';
 			
 			vaults.forEach(vault => {
@@ -284,14 +291,20 @@ document.addEventListener('DOMContentLoaded', async function() {
 			}
 
 			// Only show template selector if there are multiple templates
-			if (templates.length > 1) {
-				templateContainer.style.display = 'block';
+			if (templateContainer) {
+				if (templates.length > 1) {
+					templateContainer.style.display = 'block';
+				} else {
+					templateContainer.classList.add('hidden');
+				}
 			} else {
-				templateContainer.classList.add('hidden');
+				console.warn('Template container not found');
 			}
 		});
 
 		function populateTemplateDropdown() {
+			if (!templateDropdown) return;
+
 			templateDropdown.innerHTML = '';
 			
 			templates.forEach((template: Template) => {
@@ -420,10 +433,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 			}
 
 			for (const property of template.properties) {
-
-				const propertyDiv = document.createElement('div');
-				propertyDiv.className = 'metadata-property';
-				propertyDiv.dataset.id = property.id;
+				const propertyDiv = createElementWithClass('div', 'metadata-property');
 				let value = await replaceVariables(tabId, unescapeValue(property.value), variables, currentUrl);
 
 				// Apply type-specific parsing
@@ -579,6 +589,8 @@ document.addEventListener('DOMContentLoaded', async function() {
 			if (clipButton) {
 				clipButton.addEventListener('click', handleClip);
 				clipButton.focus();
+			} else {
+				console.warn('Clip button not found');
 			}
 
 			// On Firefox Mobile close the popup when the settings button is clicked
@@ -662,7 +674,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 		}
 
 		// Call this function after loading templates and settings
-		initializeUI();
+		await initializeUI();
 
 		const variablesPanel = document.createElement('div');
 		variablesPanel.className = 'variables-panel';
@@ -720,7 +732,7 @@ async function processLLM(promptToUse: string, contentToProcess: string): Promis
 			showError('An unknown error occurred while processing the LLM request.');
 		}
 	}
-});
+}
 
 function initializeInterpreter(): void {
 	const interpreterElement = document.getElementById('interpreter');
