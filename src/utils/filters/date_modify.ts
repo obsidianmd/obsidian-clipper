@@ -15,8 +15,11 @@ export const date_modify = (str: string, param?: string): string => {
 		return str;
 	}
 
+	// Remove outer parentheses if present
+	param = param.replace(/^\((.*)\)$/, '$1');
+	
 	// Remove any surrounding quotes and trim whitespace
-	param = param.replace(/^["']|["']$/g, '').trim();
+	param = param.replace(/^(['"])(.*)\1$/, '$2').trim();
 
 	// Updated regex to allow for optional spaces and plural units
 	const regex = /^([+-])\s*(\d+)\s*(\w+)s?$/;
@@ -36,7 +39,5 @@ export const date_modify = (str: string, param?: string): string => {
 		date = date.subtract(numericAmount, unit as any);
 	}
 
-	// Use 'YYYY-MM-DD' as default format, but allow for custom format
-	const format = param.split(',')[1]?.trim() || 'YYYY-MM-DD';
-	return date.format(format);
+	return date.format('YYYY-MM-DD');
 };

@@ -6,10 +6,20 @@ dayjs.extend(customParseFormat);
 dayjs.extend(advancedFormat);
 
 export const date = (str: string, param?: string): string => {
-	// Remove outer parentheses if present and split by comma, respecting quotes
-	const paramMatches = param ? param.replace(/^\(|\)$/g, '').match(/(?:[^\s"]+|"[^"]*")+/g) : null;
-	const params = paramMatches || [];
-	const [outputFormat, inputFormat] = params.map(p => p.replace(/^"|"$/g, '').trim());
+	if (!param) {
+		return dayjs(str).format('YYYY-MM-DD');
+	}
+
+	// Remove outer parentheses if present
+	param = param.replace(/^\((.*)\)$/, '$1');
+	
+	// Split by comma, but respect both single and double quoted strings
+	const params = param.split(/,(?=(?:(?:[^"']*["'][^"']*["'])*[^"']*$))/).map(p => {
+		// Trim whitespace and remove surrounding quotes (both single and double)
+		return p.trim().replace(/^(['"])(.*)\1$/, '$2');
+	});
+
+	const [outputFormat, inputFormat] = params;
 
 	let date;
 	if (inputFormat) {
@@ -25,6 +35,5 @@ export const date = (str: string, param?: string): string => {
 		return str;
 	}
 
-	// Use outputFormat if provided, otherwise use 'YYYY-MM-DD' as default
-	return date.format(outputFormat || 'YYYY-MM-DD');
+	return date.format(outputFormat);
 };
