@@ -4,11 +4,11 @@ interface NavigatorExtended extends Navigator {
 	};
 }
 
-export async function detectBrowser(): Promise<'chrome' | 'firefox' | 'brave' | 'edge' | 'other'> {
+export async function detectBrowser(): Promise<'chrome' | 'firefox' | 'firefox-mobile' | 'brave' | 'edge' | 'other'> {
 	const userAgent = navigator.userAgent.toLowerCase();
 	
-	if (userAgent.indexOf("firefox") > -1) {
-		return 'firefox';
+	if (userAgent.includes('firefox')) {
+		return userAgent.includes('mobile') ? 'firefox-mobile' : 'firefox';
 	} else if (userAgent.indexOf("edg/") > -1) {
 		return 'edge';
 	} else if (userAgent.indexOf("chrome") > -1) {

@@ -56,6 +56,9 @@
 		"gecko": {
 			"id": "clipper@obsidian.md",
 			"strict_min_version": "109.0"
+		},
+		"gecko_android": {
+			"strict_min_version": "109.0"
 		}
 	}
 }

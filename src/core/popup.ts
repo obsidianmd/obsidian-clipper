@@ -10,6 +10,7 @@ import { getLocalStorage, setLocalStorage, loadGeneralSettings, generalSettings,
 import { formatVariables, unescapeValue } from '../utils/string-utils';
 import { loadTemplates, createDefaultTemplate } from '../managers/template-manager';
 import browser from '../utils/browser-polyfill';
+import { detectBrowser } from '../utils/browser-detection';
 
 let currentTemplate: Template | null = null;
 let templates: Template[] = [];
@@ -105,11 +106,43 @@ async function handleClip() {
 	}
 }
 
+async function addBrowserClassToHtml() {
+	const browser = await detectBrowser();
+	const htmlElement = document.documentElement;
+
+	// Remove any existing browser classes
+	htmlElement.classList.remove('is-firefox-mobile', 'is-chromium', 'is-firefox', 'is-edge', 'is-chrome', 'is-brave');
+
+	// Add the appropriate class based on the detected browser
+	switch (browser) {
+		case 'firefox-mobile':
+			htmlElement.classList.add('is-firefox-mobile', 'is-firefox');
+			break;
+		case 'firefox':
+			htmlElement.classList.add('is-firefox');
+			break;
+		case 'edge':
+			htmlElement.classList.add('is-edge', 'is-chromium');
+			break;
+		case 'chrome':
+			htmlElement.classList.add('is-chrome', 'is-chromium');
+			break;
+		case 'brave':
+			htmlElement.classList.add('is-brave', 'is-chromium');
+			break;
+		default:
+			// For 'other' browsers, we don't add any class
+			break;
+	}
+}
+
 document.addEventListener('DOMContentLoaded', async function() {
 	try {
 		await ensureContentScriptLoaded();
 		
 		initializeIcons();
+
+		await addBrowserClassToHtml();
 
 		loadedSettings = await loadGeneralSettings();
 		console.log('General settings:', loadedSettings);

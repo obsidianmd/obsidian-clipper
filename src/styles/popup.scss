@@ -1,13 +1,30 @@
-.popup:has(.variables-panel.show) {
-	width: 500px;
+:root {
+	--popup-height: 500px;
+	--popup-width: 340px;
+	--popup-width-expanded: 500px;
+}
+.is-firefox-mobile {
+	--popup-height: 100vh;
+	--popup-width: 100vw;
+	--popup-width-expanded: 100vw;
+}
+
+#popup {
+	height: var(--popup-height);
+	overflow: hidden;
+}
+
+#popup-container:has(.variables-panel.show) {
+	width: var(--popup-width-expanded);
 	transition: width 0.1s ease-in-out;
 	overflow: hidden;
 }
-.popup {
-	width: 340px;
-	height: 500px;
+#popup-container {
+	width: var(--popup-width);
+	height: var(--popup-height);
 	overflow: hidden;
 	transition: width 0.1s ease-in-out;
+
 	::selection {
 		background-color: var(--text-selection);
 	}
@@ -47,6 +64,7 @@
 		background-color: var(--background-modifier-border-focus);
 	}
 }
+
 .clipper {
 	display: flex;
 	flex-direction: column;
