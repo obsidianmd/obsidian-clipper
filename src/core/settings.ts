@@ -148,6 +148,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 		if (hamburgerMenu && settingsContainer) {
 			hamburgerMenu.addEventListener('click', () => {
 				settingsContainer.classList.toggle('sidebar-open');
+				hamburgerMenu.classList.toggle('is-active');
 			});
 		}
 	}

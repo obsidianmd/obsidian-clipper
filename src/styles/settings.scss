@@ -49,7 +49,6 @@
 		height: 2px;
 		background-color: var(--text-normal);
 		position: relative;
-		transition: background-color 0.3s ease;
 
 		&::before,
 		&::after {
@@ -59,15 +58,30 @@
 			width: 24px;
 			height: 2px;
 			background-color: var(--text-normal);
-			transition: transform 0.3s ease;
+			transition: transform 0.15s ease, top 0.15s ease;
 		}
-
 		&::before {
 			top: -6px;
 		}
-
 		&::after {
 			bottom: -6px;
+		}
+	}
+
+	&.is-active {
+		.hamburger-icon {
+			background-color: transparent;
+
+			&::before,
+			&::after {
+				top: 0;
+			}
+			&::before {
+				transform: rotate(45deg);
+			}
+			&::after {
+				transform: rotate(-45deg);
+			}
 		}
 	}
 }
@@ -297,6 +311,23 @@
 		&.sidebar-open {
 			#sidebar {
 				display: block;
+			}
+
+			.hamburger-menu {
+				.hamburger-icon {
+					background-color: transparent;
+
+					&::before,
+					&::after {
+						top: 0;
+					}
+					&::before {
+						transform: rotate(45deg);
+					}
+					&::after {
+						transform: rotate(-45deg);
+					}
+				}
 			}
 		}
 	}
