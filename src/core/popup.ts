@@ -375,23 +375,11 @@ document.addEventListener('DOMContentLoaded', async function() {
 						break;
 				}
 
-				const iconSpan = createElementWithClass('span', 'metadata-property-icon');
-				iconSpan.appendChild(createElementWithHTML('i', '', { 'data-lucide': getPropertyTypeIcon(property.type) }));
-				propertyDiv.appendChild(iconSpan);
-
-				const label = document.createElement('label');
-				label.setAttribute('for', property.name);
-				label.textContent = property.name;
-				propertyDiv.appendChild(label);
-
-				const input = document.createElement('input');
-				input.id = property.name;
-				input.type = 'text';
-				input.value = value;
-				input.setAttribute('data-type', property.type);
-				input.setAttribute('data-template-value', property.value);
-				propertyDiv.appendChild(input);
-
+				propertyDiv.innerHTML = `
+					<span class="metadata-property-icon"><i data-lucide="${getPropertyTypeIcon(property.type)}"></i></span>
+					<label for="${property.name}">${property.name}</label>
+					<input id="${property.name}" type="text" value="${escapeHtml(value)}" data-type="${property.type}" data-template-value="${escapeHtml(property.value)}" />
+				`;
 				templateProperties.appendChild(propertyDiv);
 			}
 
@@ -486,42 +474,16 @@ document.addEventListener('DOMContentLoaded', async function() {
 				
 				showMoreActionsButton.addEventListener('click', function() {
 					if (currentTemplate && Object.keys(currentVariables).length > 0) {
-						const variablesPanel = document.querySelector('.variables-panel') as HTMLElement;
-						variablesPanel.innerHTML = '';
-
-						const headerDiv = createElementWithClass('div', 'variables-header');
-						const headerTitle = document.createElement('h3');
-						headerTitle.textContent = 'Page variables';
-						headerDiv.appendChild(headerTitle);
-
-						const closeButton = createElementWithClass('span', 'close-panel clickable-icon');
-						closeButton.setAttribute('aria-label', 'Close');
-						closeButton.appendChild(createElementWithHTML('i', '', { 'data-lucide': 'x' }));
-						headerDiv.appendChild(closeButton);
-
-						variablesPanel.appendChild(headerDiv);
-
-						const variableListDiv = createElementWithClass('div', 'variable-list');
-						Object.entries(currentVariables).forEach(([key, value]) => {
-							const variableItem = createElementWithClass('div', 'variable-item');
-							
-							const keySpan = createElementWithClass('span', 'variable-key');
-							keySpan.textContent = key;
-							keySpan.setAttribute('data-variable', `{{${key}}}`);
-							variableItem.appendChild(keySpan);
-
-							const chevronSpan = createElementWithClass('span', 'chevron-icon');
-							chevronSpan.appendChild(createElementWithHTML('i', '', { 'data-lucide': 'chevron-down' }));
-							variableItem.appendChild(chevronSpan);
-
-							const valueSpan = createElementWithClass('span', 'variable-value');
-							valueSpan.textContent = value;
-							variableItem.appendChild(valueSpan);
-
-							variableListDiv.appendChild(variableItem);
-						});
-						variablesPanel.appendChild(variableListDiv);
-
+						const formattedVariables = formatVariables(currentVariables);
+						variablesPanel.innerHTML = `
+							<div class="variables-header">
+								<h3>Page variables</h3>
+								<span class="close-panel clickable-icon" aria-label="Close">
+									<i data-lucide="x"></i>
+								</span>
+							</div>
+							<div class="variable-list">${formattedVariables}</div>
+						`;
 						variablesPanel.classList.add('show');
 						initializeIcons();
 
@@ -561,7 +523,8 @@ document.addEventListener('DOMContentLoaded', async function() {
 							});
 						});
 
-						closeButton.addEventListener('click', function() {
+						const closePanel = variablesPanel.querySelector('.close-panel') as HTMLElement;
+						closePanel.addEventListener('click', function() {
 							variablesPanel.classList.remove('show');
 						});
 					} else {
