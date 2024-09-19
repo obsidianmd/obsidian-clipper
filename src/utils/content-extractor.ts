@@ -108,9 +108,20 @@ export async function replaceVariables(tabId: number, text: string, variables: {
 				const [variableName, ...filterParts] = match.slice(2, -2).split('|');
 				let value = variables[`{{${variableName}}}`] || '';
 				
-				// If the value is 'now' and there's no date filter specified, add it
+				// Handle 'now' for date and time
 				if (value === 'now' && !filterParts.some(part => part.startsWith('date:'))) {
 					filterParts.unshift('date:"YYYY-MM-DD"');
+				}
+				
+				// Handle published date
+				if (variableName === 'published' && !filterParts.some(part => part.startsWith('date:'))) {
+					if (dayjs(value).isValid()) {
+						// If it's a valid date with time, use a format that includes time
+						filterParts.unshift('date:"YYYY-MM-DD HH:mm:ss"');
+					} else {
+						// If it's just a date or invalid, use only the date format
+						filterParts.unshift('date:"YYYY-MM-DD"');
+					}
 				}
 				
 				const filtersString = filterParts.join('|');
@@ -230,7 +241,9 @@ export async function initializePageContent(content: string, selectedHtml: strin
 	const publishedDate = 
 		getMetaContent(doc, "property", "article:published_time")
 		|| timeElement?.getAttribute("datetime");
-	const published = publishedDate ? `${convertDate(new Date(publishedDate))}` : "";
+	
+	// Store the full published date/time if available, otherwise use just the date
+	const published = publishedDate ? dayjs(publishedDate).isValid() ? publishedDate : dayjs(publishedDate).format('YYYY-MM-DD') : "";
 
 	const site =
 		getMetaContent(doc, "property", "og:site_name")
