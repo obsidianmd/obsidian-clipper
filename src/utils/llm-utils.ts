@@ -212,7 +212,8 @@ export async function processLLM(
 	promptVariables: PromptVariable[],
 	updateUI: (response: string) => void,
 	updateFields: (variables: PromptVariable[], responses: any[]) => void,
-	model: string
+	model: string,
+	template: Template
 ): Promise<void> {
 	try {
 		if (!generalSettings.openaiApiKey && !generalSettings.anthropicApiKey) {
@@ -223,7 +224,10 @@ export async function processLLM(
 			throw new Error('No prompt variables found. Please add at least one prompt variable to your template.');
 		}
 
-		const { userResponse, promptResponses } = await sendToLLM(promptToUse, contentToProcess, promptVariables, model);
+		// Use the template context if available, otherwise fall back to the default prompt context
+		const contextToUse = template.context || generalSettings.defaultPromptContext || "You are a helpful assistant. Please analyze the following content and provide a concise summary.";
+
+		const { userResponse, promptResponses } = await sendToLLM(contextToUse, contentToProcess, promptVariables, model);
 		console.log('LLM Response:', { userResponse, promptResponses });
 
 		// Convert userResponse to string if it's an array or object
@@ -290,12 +294,23 @@ export async function initializeLLMComponents(template: Template, variables: { [
 	const promptContextTextarea = document.getElementById('prompt-context') as HTMLTextAreaElement;
 	const modelSelect = document.getElementById('model-select') as HTMLSelectElement;
 
-	if (template && template.context) {
-		if (interpreterContainer) interpreterContainer.style.display = 'flex';
-		if (promptContextTextarea) {
-			let promptToDisplay = await replaceVariables(tabId, template.context, variables, currentUrl);
-			promptContextTextarea.value = promptToDisplay;
-		}
+	const promptVariables = collectPromptVariables(template);
+
+	// Hide interpreter if it's disabled or there are no prompt variables
+	if (!generalSettings.interpreterEnabled || promptVariables.length === 0) {
+		if (interpreterContainer) interpreterContainer.style.display = 'none';
+		return;
+	}
+
+	if (interpreterContainer) interpreterContainer.style.display = 'flex';
+	
+	if (promptContextTextarea) {
+		let promptToDisplay = template.context || generalSettings.defaultPromptContext;
+		promptToDisplay = await replaceVariables(tabId, promptToDisplay, variables, currentUrl);
+		promptContextTextarea.value = promptToDisplay;
+	}
+
+	if (template) {
 		if (interpretBtn) {
 			interpretBtn.addEventListener('click', () => handleLLMProcessing(template, variables, tabId, currentUrl, modelSelect.value));
 		}
@@ -306,8 +321,6 @@ export async function initializeLLMComponents(template: Template, variables: { [
 			).join('');
 			modelSelect.value = generalSettings.interpreterModel || modelList[0].value;
 		}
-	} else {
-		if (interpreterContainer) interpreterContainer.style.display = 'none';
 	}
 }
 
@@ -368,7 +381,8 @@ export async function handleLLMProcessing(template: Template, variables: { [key:
 				promptVariables,
 				updateLLMResponse,
 				updateFieldsWithLLMResponses,
-				selectedModel
+				selectedModel,
+				template
 			);
 
 			// Stop the timer and log the final time

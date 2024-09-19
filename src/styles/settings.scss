@@ -124,6 +124,12 @@
 		display: flex;
 	}
 
+	form {
+		> div {
+			margin-bottom: 3rem;
+		}
+	}
+
 	.settings-section-header {
 		display: flex;
 		flex-direction: row;
@@ -264,9 +270,6 @@
 }
 
 #general-settings-form {
-	> div {
-		margin-bottom: 3rem;
-	}
 	#keyboard-shortcuts-list {
 		display: flex;
 		flex-direction: column;

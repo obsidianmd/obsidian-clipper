@@ -49,6 +49,11 @@ export function initializeInterpreterSettings(): void {
 			});
 		}
 		updatePromptContextVisibility();
+
+		const defaultPromptContextInput = document.getElementById('default-prompt-context') as HTMLTextAreaElement;
+		if (defaultPromptContextInput) {
+			defaultPromptContextInput.value = generalSettings.defaultPromptContext || "You are a helpful assistant. Please analyze the following content and provide a concise summary.";
+		}
 	});
 }
 
@@ -66,12 +71,15 @@ function saveInterpreterSettingsFromForm(): void {
 	const interpreterToggle = document.getElementById('interpreter-toggle') as HTMLInputElement;
 	const interpreterAutoRunToggle = document.getElementById('interpreter-auto-run-toggle') as HTMLInputElement;
 
+	const defaultPromptContextInput = document.getElementById('default-prompt-context') as HTMLTextAreaElement;
+
 	const updatedSettings = {
 		openaiApiKey: apiKeyInput.value,
 		anthropicApiKey: anthropicApiKeyInput.value,
 		interpreterModel: modelSelect.value,
 		interpreterEnabled: interpreterToggle.checked,
-		interpreterAutoRun: interpreterAutoRunToggle.checked
+		interpreterAutoRun: interpreterAutoRunToggle.checked,
+		defaultPromptContext: defaultPromptContextInput.value
 	};
 
 	saveSettings(updatedSettings);

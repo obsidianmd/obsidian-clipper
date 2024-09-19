@@ -17,7 +17,7 @@
 						<li data-section="interpreter">Interpreter</li>
 						<li class="sidebar-heading">Templates</li>
 					</ul>
-					<button type="button" id="new-template-btn" class="mod-cta">New template</button>
+					<button type="button" id="new-template-btn" class="mod-cta">New&nbsp;template</button>
 					<ul id="template-list"></ul>
 					
 				</div>
@@ -115,7 +115,7 @@
 									<div class="setting-item-info">
 										<label for="interpreter-toggle">Enable interpreter</label>
 										<div class="setting-item-description">
-											Allows you to use prompt variables in your templates, to fill in information using natural language such as <code>{{prompt:"a summary of the page"}}</code>. Requires an API key.
+											Allows you to use prompt variables in your templates, to fill in information using natural language such as <code>{{prompt:"a summary of the page"}}</code>. Requires an API&nbsp;key.
 										</div>
 									</div>
 									<div class="setting-item-control">
@@ -135,6 +135,11 @@
 										</div>
 									</div>
 								</div>
+								<div class="setting-item">
+									<label for="default-prompt-context" style="font-weight: 400;">Default prompt context</label>
+									<div class="setting-item-description">The model will use this context to interpret prompt variables. Variables can be used&nbsp;here.</div>
+									<textarea id="default-prompt-context" rows="4" placeholder="{{fullHtml}}"></textarea>
+								</div>
 							</div>
 							<div>
 								<h3>Models</h3>
@@ -152,7 +157,7 @@
 								<div class="setting-item mod-horizontal">
 									<div class="setting-item-info">
 										<label for="openai-api-key">OpenAI API key</label>
-										<div class="setting-item-description">You can get your OpenAI API key <a href="https://platform.openai.com/api-keys" target="_blank">here</a>.</div>
+										<div class="setting-item-description">You can get your OpenAI API&nbsp;key&nbsp;<a href="https://platform.openai.com/api-keys" target="_blank">here</a>.</div>
 									</div>
 									<div class="setting-item-control">
 										<input type="password" id="openai-api-key" placeholder="OpenAI API key">
@@ -161,13 +166,14 @@
 								<div class="setting-item mod-horizontal">
 									<div class="setting-item-info">
 										<label for="anthropic-api-key">Anthropic API key</label>
-										<div class="setting-item-description">You can get your Anthropic API key <a href="https://console.anthropic.com/settings/keys" target="_blank">here</a>.</div>
+										<div class="setting-item-description">You can get your Anthropic API&nbsp;key&nbsp;<a href="https://console.anthropic.com/settings/keys" target="_blank">here</a>.</div>
 									</div>
 									<div class="setting-item-control">
 										<input type="password" id="anthropic-api-key" placeholder="Anthropic API key">
 									</div>
 								</div>
 							</div>
+							
 						</form>
 					</div>
 
@@ -261,9 +267,9 @@
 									<textarea id="note-content-format" rows="6" placeholder="{{content}}"></textarea>
 								</div>
 								<div class="setting-item" id="prompt-context-container">
-									<label for="prompt-context">Prompt context</label>
-									<div class="setting-item-description">The context used to generate prompt variables. By default the context is the full HTML of the page, unless you specify custom context, such as a subset of the page. Variables can be used&nbsp;here.</div>
-									<textarea id="prompt-context" rows="4" placeholder="{{fullHtml}}"></textarea>
+									<label for="prompt-context">Interpreter context</label>
+									<div class="setting-item-description">The context used to interpret prompt variables. Overrides the default context defined in <a href="?section=interpreter">Interpreter settings</a>. Variables can be used&nbsp;here.</div>
+									<textarea id="prompt-context" rows="4"></textarea>
 								</div>
 							</div>
 						</form>

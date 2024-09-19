@@ -741,6 +741,6 @@ async function processLLM(promptToUse: string, contentToProcess: string): Promis
 function initializeInterpreter(): void {
 	const interpreterElement = document.getElementById('interpreter');
 	if (interpreterElement) {
-		interpreterElement.style.display = generalSettings.interpreterEnabled ? 'block' : 'none';
+		interpreterElement.style.display = generalSettings.interpreterEnabled ? 'flex' : 'none';
 	}
 }

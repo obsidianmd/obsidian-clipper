@@ -10,6 +10,7 @@ export interface Settings {
 	anthropicApiKey?: string;
 	interpreterEnabled: boolean;
 	interpreterAutoRun: boolean;
+	defaultPromptContext: string;
 }
 
 export let generalSettings: Settings = {
@@ -21,7 +22,8 @@ export let generalSettings: Settings = {
 	interpreterModel: 'gpt-4o-mini',
 	anthropicApiKey: '',
 	interpreterEnabled: false,
-	interpreterAutoRun: false
+	interpreterAutoRun: false,
+	defaultPromptContext: '{{fullHtml|strip_tags:("script,h1,h2,h3,h4,h5,h6,meta,a,ol,ul,li,p,em,strong,i,b,img,video,audio,math,tablecite,strong,td,th,tr,caption,u")|strip_attr:("alt,src,href,id,content,property,name,datetime,title")}}'
 };
 
 export function setLocalStorage(key: string, value: any): Promise<void> {
@@ -36,15 +38,16 @@ export async function loadSettings(): Promise<Settings> {
 	const data = await browser.storage.sync.get(['general_settings', 'vaults', 'interpreter_settings']);
 
 	generalSettings = {
-		showMoreActionsButton: data.general_settings?.showMoreActionsButton ?? true,
 		vaults: data.vaults || [],
+		showMoreActionsButton: data.general_settings?.showMoreActionsButton ?? true,
 		betaFeatures: data.general_settings?.betaFeatures ?? false,
 		silentOpen: data.general_settings?.silentOpen ?? false
 		openaiApiKey: data.interpreter_settings?.openaiApiKey || '',
 		interpreterModel: data.interpreter_settings?.interpreterModel || 'gpt-4o-mini',
 		anthropicApiKey: data.interpreter_settings?.anthropicApiKey || '',
 		interpreterEnabled: data.interpreter_settings?.interpreterEnabled ?? false,
-		interpreterAutoRun: data.interpreter_settings?.interpreterAutoRun ?? false
+		interpreterAutoRun: data.interpreter_settings?.interpreterAutoRun ?? false,
+		defaultPromptContext: data.interpreter_settings?.defaultPromptContext || '{{fullHtml|strip_tags:("script,h1,h2,h3,h4,h5,h6,meta,a,ol,ul,li,p,em,strong,i,b,img,video,audio,math,tablecite,strong,td,th,tr,caption,u")|strip_attr:("alt,src,href,id,content,property,name,datetime,title")}}'
 	};
 	
 	return generalSettings;
@@ -66,7 +69,8 @@ export async function saveSettings(settings?: Partial<Settings>): Promise<void> 
 			interpreterModel: generalSettings.interpreterModel,
 			anthropicApiKey: generalSettings.anthropicApiKey,
 			interpreterEnabled: generalSettings.interpreterEnabled,
-			interpreterAutoRun: generalSettings.interpreterAutoRun
+			interpreterAutoRun: generalSettings.interpreterAutoRun,
+			defaultPromptContext: generalSettings.defaultPromptContext
 		}
 	});
 }
