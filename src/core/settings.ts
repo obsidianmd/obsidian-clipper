@@ -1,5 +1,15 @@
 import { Template } from '../types/types';
-import { loadTemplates, createDefaultTemplate, templates, getTemplates, findTemplateById, saveTemplateSettings } from '../managers/template-manager';
+import { 
+	loadTemplates, 
+	createDefaultTemplate, 
+	templates, 
+	getTemplates, 
+	findTemplateById, 
+	saveTemplateSettings, 
+	duplicateTemplate,
+	getEditingTemplateIndex, // Add this import
+	deleteTemplate // Add this import
+} from '../managers/template-manager';
 import { updateTemplateList, showTemplateEditor, resetUnsavedChanges, initializeAddPropertyButton } from '../managers/template-ui';
 import { initializeGeneralSettings } from '../managers/general-settings';
 import { initializeDragAndDrop, handleTemplateDrag } from '../utils/drag-and-drop';
@@ -17,6 +27,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 	const exportTemplateBtn = document.getElementById('export-template-btn') as HTMLButtonElement;
 	const importTemplateBtn = document.getElementById('import-template-btn') as HTMLButtonElement;
 	const resetDefaultTemplateBtn = document.getElementById('reset-default-template-btn') as HTMLButtonElement;
+	const duplicateTemplateBtn = document.getElementById('duplicate-template-btn') as HTMLElement;
+	const deleteTemplateBtn = document.getElementById('delete-template-btn') as HTMLElement;
+	const moreActionsBtn = document.getElementById('more-actions-btn') as HTMLButtonElement;
+	const menu = document.querySelector('.menu-btn') as HTMLElement;
 
 	async function initializeSettings(): Promise<void> {
 		await initializeGeneralSettings();
@@ -59,6 +73,63 @@ document.addEventListener('DOMContentLoaded', async () => {
 				showTemplateEditor(null);
 			});
 		}
+
+		if (duplicateTemplateBtn) {
+			duplicateTemplateBtn.addEventListener('click', () => {
+				menu.classList.remove('show');
+				const editingTemplateIndex = getEditingTemplateIndex();
+				if (editingTemplateIndex !== -1) {
+					const currentTemplate = templates[editingTemplateIndex];
+					const newTemplate = duplicateTemplate(currentTemplate.id);
+					saveTemplateSettings().then(() => {
+						updateTemplateList();
+						showTemplateEditor(newTemplate);
+						updateUrl('templates', newTemplate.id);
+					}).catch(error => {
+						console.error('Failed to duplicate template:', error);
+						alert('Failed to duplicate template. Please try again.');
+					});
+				}
+			});
+		}
+
+		if (deleteTemplateBtn) {
+			deleteTemplateBtn.addEventListener('click', () => {
+				menu.classList.remove('show');
+				const editingTemplateIndex = getEditingTemplateIndex();
+				if (editingTemplateIndex !== -1) {
+					const currentTemplate = templates[editingTemplateIndex];
+					if (confirm(`Are you sure you want to delete the template "${currentTemplate.name}"?`)) {
+						deleteTemplate(currentTemplate.id);
+						saveTemplateSettings().then(() => {
+							updateTemplateList();
+							if (templates.length > 0) {
+								showTemplateEditor(templates[0]);
+							} else {
+								showGeneralSettings();
+							}
+						}).catch(error => {
+							console.error('Failed to delete template:', error);
+							alert('Failed to delete template. Please try again.');
+						});
+					}
+				}
+			});
+		}
+
+		if (moreActionsBtn) {
+			moreActionsBtn.addEventListener('click', (event) => {
+				event.stopPropagation(); // Prevent this click from immediately closing the dropdown
+				menu.classList.toggle('show');
+			});
+		}
+
+		// Close the menu when clicking outside of it
+		document.addEventListener('click', (event) => {
+			if (!menu.contains(event.target as Node)) {
+				menu.classList.remove('show');
+			}
+		});
 	}
 
 	async function handleUrlParameters(): Promise<void> {

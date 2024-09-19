@@ -1,0 +1,50 @@
+.menu-btn {
+	position: relative;
+	display: inline-block;
+
+	.menu-toggle {
+		cursor: pointer;
+	}
+
+	.menu {
+		display: none;
+		position: absolute;
+		right: 0;
+		border: 1px solid var(--background-modifier-border-hover);
+		background-color: var(--background-secondary);
+		flex-direction: column;
+		min-width: 160px;
+		box-shadow: var(--shadow-s);
+		z-index: 1;
+		list-style-type: none;
+		padding: 4px;
+		margin: 4px 0 0 0;
+		border-radius: var(--radius-s);
+		user-select: none;
+	}
+
+	&.show .menu {
+		display: flex;
+	}
+}
+
+.menu-item {
+	display: flex;
+	align-items: center;
+	cursor: pointer;
+	gap: 8px;
+	padding: 4px 8px;
+	font-size: var(--font-ui-smaller);
+	border-radius: var(--radius-s);
+	white-space: nowrap;
+
+	&:hover {
+		background-color: var(--background-modifier-hover);
+	}
+}
+
+.menu-item-icon {
+	flex: 0 1 auto;
+	display: flex;
+	color: var(--text-muted);
+}

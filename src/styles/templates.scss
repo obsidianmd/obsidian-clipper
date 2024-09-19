@@ -62,7 +62,7 @@
 	white-space: nowrap;
 	a {
 		cursor: pointer;
-		border-radius: 4px;
+		border-radius: var(--radius-s);
 		padding: 6px 8px;
 		&:hover {
 			background-color: var(--background-modifier-hover);

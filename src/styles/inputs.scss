@@ -16,7 +16,7 @@ textarea {
 	font-size: var(--font-ui-smaller);
 	color: var(--text-normal);
 	font-family: inherit;
-	border-radius: 4px;
+	border-radius: var(--radius-s);
 	outline: none;
 	width: 100%;
 	margin: 0;

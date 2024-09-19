@@ -18,6 +18,8 @@
 
 	--input-height: 1.875rem;
 
+	--radius-s: 4px;
+
 	--text-normal: var(--color-base-100);
 	--text-muted: var(--color-base-70);
 	--text-faint: var(--color-base-50);
@@ -105,6 +107,11 @@
 
 		--interactive-normal: var(--color-base-00);
 		--interactive-hover: var(--color-base-10);
+
+		--shadow-s:
+			0px 1px 2px rgba(0, 0, 0, .028),
+			0px 3.4px 6.7px rgba(0, 0, 0, .042),
+			0px 15px 30px rgba(0, 0, 0, .07);
 	}
 }
 
@@ -173,5 +180,10 @@
 
 		--interactive-normal: var(--color-base-30);
 		--interactive-hover: var(--color-base-35);
+
+		--shadow-s:
+			0px 1px 2px rgba(0, 0, 0, 0.121),
+			0px 3.4px 6.7px rgba(0, 0, 0, 0.179),
+			0px 15px 30px rgba(0, 0, 0, 0.3);
 	}
 }

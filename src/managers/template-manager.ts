@@ -108,3 +108,41 @@ export function getTemplates(): Template[] {
 export function findTemplateById(id: string): Template | undefined {
 	return templates.find(template => template.id === id);
 }
+
+export function duplicateTemplate(templateId: string): Template {
+	const originalTemplate = templates.find(t => t.id === templateId);
+	if (!originalTemplate) {
+		throw new Error('Template not found');
+	}
+
+	const newTemplate: Template = JSON.parse(JSON.stringify(originalTemplate));
+	newTemplate.id = Date.now().toString() + Math.random().toString(36).slice(2, 11);
+	newTemplate.name = getUniqueTemplateName(originalTemplate.name);
+	
+	templates.unshift(newTemplate);
+	return newTemplate;
+}
+
+function getUniqueTemplateName(baseName: string): string {
+	const baseNameWithoutNumber = baseName.replace(/\s\d+$/, '');
+	const existingNames = new Set(templates.map(t => t.name));
+	let newName = baseNameWithoutNumber;
+	let counter = 1;
+
+	while (existingNames.has(newName)) {
+		counter++;
+		newName = `${baseNameWithoutNumber} ${counter}`;
+	}
+
+	return newName;
+}
+
+export function deleteTemplate(templateId: string): boolean {
+	const index = templates.findIndex(t => t.id === templateId);
+	if (index !== -1) {
+		templates.splice(index, 1);
+		setEditingTemplateIndex(-1);
+		return true;
+	}
+	return false;
+}

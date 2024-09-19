@@ -189,7 +189,7 @@
 			align-items: center;
 			cursor: pointer;
 			padding: 4px 6px;
-			border-radius: 4px;
+			border-radius: var(--radius-s);
 			user-select: none;
 
 			&:hover {
@@ -226,13 +226,19 @@
 				cursor: pointer;
 				padding: 2px;
 				color: var(--text-muted);
-				opacity: 0.7;
-				transition: opacity 0.2s ease;
+				opacity: 0;
 				margin: -6px;
 				box-shadow: none;
 
-				&:hover {
-					opacity: 1;
+				
+			}
+			&.active,
+			&:hover {
+				.delete-template-btn {
+					opacity: 0.7;
+					&:hover {
+						opacity: 1;
+					}
 				}
 			}
 		}
@@ -280,7 +286,7 @@
 		.setting-hotkey {
 			background-color: var(--background-secondary);
 			padding: 2px 8px;
-			border-radius: 4px;
+			border-radius: var(--radius-s);
 			font-size: var(--font-ui-smaller);
 		}
 	}

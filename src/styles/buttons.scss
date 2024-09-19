@@ -3,7 +3,7 @@ button {
 	width: 100%;
 	color: var(--text-normal);
 	background-color: var(--background-primary);
-	border-radius: 4px;
+	border-radius: var(--radius-s);
 	box-shadow: 0 0 0 1px var(--background-modifier-border);
 	font-size: var(--font-ui-smaller);
 	height: var(--input-height);
@@ -53,10 +53,6 @@ button.clickable-icon {
 	align-items: center;
 	justify-content: center;
 	box-shadow: none;
-	svg {
-		width: 16px;
-		height: 16px;
-	}
 	&:hover {
 		color: var(--text-normal);
 		background-color: var(--background-modifier-hover);
