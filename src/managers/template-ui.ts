@@ -108,7 +108,7 @@ export function showTemplateEditor(template: Template | null): void {
 			noteContentFormat: '{{content}}',
 			properties: [],
 			triggers: [],
-			prompt: ''
+			context: ''
 		};
 		templates.unshift(editingTemplate);
 		setEditingTemplateIndex(0);
@@ -150,7 +150,7 @@ export function showTemplateEditor(template: Template | null): void {
 	if (noteContentFormat) noteContentFormat.value = editingTemplate.noteContentFormat || '';
 
 	const promptContextTextarea = document.getElementById('prompt-context') as HTMLTextAreaElement;
-	if (promptContextTextarea) promptContextTextarea.value = editingTemplate.prompt || '';
+	if (promptContextTextarea) promptContextTextarea.value = editingTemplate.context || '';
 
 	updateBehaviorFields();
 
@@ -393,7 +393,7 @@ export function updateTemplateFromForm(): void {
 	if (noteContentFormat) template.noteContentFormat = noteContentFormat.value;
 
 	const promptContextTextarea = document.getElementById('prompt-context') as HTMLTextAreaElement;
-	if (promptContextTextarea) template.prompt = promptContextTextarea.value;
+	if (promptContextTextarea) template.context = promptContextTextarea.value;
 
 	const propertyElements = document.querySelectorAll('#template-properties .property-editor');
 	template.properties = Array.from(propertyElements).map(prop => {

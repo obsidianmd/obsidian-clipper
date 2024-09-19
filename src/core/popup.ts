@@ -569,8 +569,8 @@ document.addEventListener('DOMContentLoaded', async function() {
 				triggers: template.triggers
 			};
 
-			if (template.prompt) {
-				replacedTemplate.prompt = await replaceVariables(tabId, template.prompt, variables, currentUrl);
+			if (template.context) {
+				replacedTemplate.context = await replaceVariables(tabId, template.context, variables, currentUrl);
 			}
 
 			for (const prop of template.properties) {

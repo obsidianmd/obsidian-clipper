@@ -89,7 +89,7 @@ export function createDefaultTemplate(): Template {
 		noteNameFormat: '{{title}}',
 		path: 'Clippings',
 		noteContentFormat: '{{content}}',
-		prompt: "Summarize the following content in 3-5 bullet points:",
+		context: "",
 		properties: [
 			{ id: Date.now().toString() + Math.random().toString(36).slice(2, 11), name: 'title', value: '{{title}}', type: 'text' },
 			{ id: Date.now().toString() + Math.random().toString(36).slice(2, 11), name: 'source', value: '{{url}}', type: 'text' },

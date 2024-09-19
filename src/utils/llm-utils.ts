@@ -290,10 +290,10 @@ export async function initializeLLMComponents(template: Template, variables: { [
 	const promptContextTextarea = document.getElementById('prompt-context') as HTMLTextAreaElement;
 	const modelSelect = document.getElementById('model-select') as HTMLSelectElement;
 
-	if (template && template.prompt) {
+	if (template && template.context) {
 		if (interpreterContainer) interpreterContainer.style.display = 'flex';
 		if (promptContextTextarea) {
-			let promptToDisplay = await replaceVariables(tabId, template.prompt, variables, currentUrl);
+			let promptToDisplay = await replaceVariables(tabId, template.context, variables, currentUrl);
 			promptContextTextarea.value = promptToDisplay;
 		}
 		if (interpretBtn) {
