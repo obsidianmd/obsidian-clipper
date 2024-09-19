@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 					if (templates.length > 0) {
 						showTemplateEditor(templates[0]);
 					} else {
-						showGeneralSettings();
+						showSettingsSection();
 					}
 				}).catch(error => {
 					console.error('Failed to delete template:', error);
