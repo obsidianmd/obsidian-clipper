@@ -23,7 +23,7 @@
 		user-select: none;
 	}
 
-	&.show .menu {
+	.menu.show {
 		display: flex;
 	}
 }

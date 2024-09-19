@@ -54,7 +54,7 @@ export function updateTemplateList(loadedTemplates?: Template[]): void {
 			
 			deleteBtn.addEventListener('click', (e) => {
 				e.stopPropagation();
-				deleteTemplate(template.id);
+				deleteTemplateFromList(template.id);
 			});
 			
 			if (index === editingTemplateIndex) {
@@ -66,6 +66,30 @@ export function updateTemplateList(loadedTemplates?: Template[]): void {
 		}
 	});
 	initializeIcons(templateList);
+}
+
+// Rename this function to make it clear it's for deleting from the list
+function deleteTemplateFromList(templateId: string): void {
+	const index = templates.findIndex(t => t.id === templateId);
+	if (index !== -1) {
+		if (confirm(`Are you sure you want to delete the template "${templates[index].name}"?`)) {
+			templates.splice(index, 1);
+
+			if (editingTemplateIndex === index) {
+				if (templates.length > 0) {
+					const newIndex = Math.max(0, index - 1);
+					showTemplateEditor(templates[newIndex]);
+				} else {
+					clearTemplateEditor();
+				}
+			} else if (editingTemplateIndex > index) {
+				setEditingTemplateIndex(editingTemplateIndex - 1);
+			}
+			
+			saveTemplateSettings();
+			updateTemplateList();
+		}
+	}
 }
 
 export function showTemplateEditor(template: Template | null): void {
@@ -216,29 +240,6 @@ function updateBehaviorFields(): void {
 		} else {
 			if (propertiesContainer) propertiesContainer.style.display = 'block';
 			if (propertiesWarning) propertiesWarning.style.display = 'none';
-		}
-	}
-}
-
-export function deleteTemplate(templateId: string): void {
-	const index = templates.findIndex(t => t.id === templateId);
-	if (index !== -1) {
-		if (confirm(`Are you sure you want to delete the template "${templates[index].name}"?`)) {
-			templates.splice(index, 1);
-
-			if (editingTemplateIndex === index) {
-				if (templates.length > 0) {
-					const newIndex = Math.max(0, index - 1);
-					showTemplateEditor(templates[newIndex]);
-				} else {
-					clearTemplateEditor();
-				}
-			} else if (editingTemplateIndex > index) {
-				setEditingTemplateIndex(editingTemplateIndex - 1);
-			}
-			
-			saveTemplateSettings();
-			updateTemplateList();
 		}
 	}
 }

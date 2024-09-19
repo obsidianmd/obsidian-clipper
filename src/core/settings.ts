@@ -7,8 +7,8 @@ import {
 	findTemplateById, 
 	saveTemplateSettings, 
 	duplicateTemplate,
-	getEditingTemplateIndex, // Add this import
-	deleteTemplate // Add this import
+	getEditingTemplateIndex,
+	deleteTemplate
 } from '../managers/template-manager';
 import { updateTemplateList, showTemplateEditor, resetUnsavedChanges, initializeAddPropertyButton } from '../managers/template-ui';
 import { initializeGeneralSettings } from '../managers/general-settings';
@@ -21,6 +21,7 @@ import { showGeneralSettings } from '../managers/general-settings-ui';
 import { updateUrl } from '../utils/routing';
 import browser from '../utils/browser-polyfill';
 import { addBrowserClassToHtml } from '../utils/browser-detection';
+import { initializeMenu, addMenuItemListener } from '../managers/menu-manager';
 
 document.addEventListener('DOMContentLoaded', async () => {
 	const newTemplateBtn = document.getElementById('new-template-btn') as HTMLButtonElement;
@@ -40,6 +41,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 		await handleUrlParameters();
 		initializeSidebar();
 		initializeAutoSave();
+
+		console.log('Initializing menu');
+		initializeMenu('more-actions-btn', 'template-actions-menu');
 
 		exportTemplateBtn.addEventListener('click', exportTemplate);
 		importTemplateBtn.addEventListener('click', importTemplate);
@@ -74,62 +78,45 @@ document.addEventListener('DOMContentLoaded', async () => {
 			});
 		}
 
-		if (duplicateTemplateBtn) {
-			duplicateTemplateBtn.addEventListener('click', () => {
-				menu.classList.remove('show');
-				const editingTemplateIndex = getEditingTemplateIndex();
-				if (editingTemplateIndex !== -1) {
-					const currentTemplate = templates[editingTemplateIndex];
-					const newTemplate = duplicateTemplate(currentTemplate.id);
-					saveTemplateSettings().then(() => {
-						updateTemplateList();
-						showTemplateEditor(newTemplate);
-						updateUrl('templates', newTemplate.id);
-					}).catch(error => {
-						console.error('Failed to duplicate template:', error);
-						alert('Failed to duplicate template. Please try again.');
-					});
-				}
+		addMenuItemListener('duplicate-template-btn', 'template-actions-menu', duplicateCurrentTemplate);
+		addMenuItemListener('delete-template-btn', 'template-actions-menu', deleteCurrentTemplate);
+	}
+
+	function duplicateCurrentTemplate(): void {
+		const editingTemplateIndex = getEditingTemplateIndex();
+		if (editingTemplateIndex !== -1) {
+			const currentTemplate = templates[editingTemplateIndex];
+			const newTemplate = duplicateTemplate(currentTemplate.id);
+			saveTemplateSettings().then(() => {
+				updateTemplateList();
+				showTemplateEditor(newTemplate);
+				updateUrl('templates', newTemplate.id);
+			}).catch(error => {
+				console.error('Failed to duplicate template:', error);
+				alert('Failed to duplicate template. Please try again.');
 			});
 		}
+	}
 
-		if (deleteTemplateBtn) {
-			deleteTemplateBtn.addEventListener('click', () => {
-				menu.classList.remove('show');
-				const editingTemplateIndex = getEditingTemplateIndex();
-				if (editingTemplateIndex !== -1) {
-					const currentTemplate = templates[editingTemplateIndex];
-					if (confirm(`Are you sure you want to delete the template "${currentTemplate.name}"?`)) {
-						deleteTemplate(currentTemplate.id);
-						saveTemplateSettings().then(() => {
-							updateTemplateList();
-							if (templates.length > 0) {
-								showTemplateEditor(templates[0]);
-							} else {
-								showGeneralSettings();
-							}
-						}).catch(error => {
-							console.error('Failed to delete template:', error);
-							alert('Failed to delete template. Please try again.');
-						});
+	function deleteCurrentTemplate(): void {
+		const editingTemplateIndex = getEditingTemplateIndex();
+		if (editingTemplateIndex !== -1) {
+			const currentTemplate = templates[editingTemplateIndex];
+			if (confirm(`Are you sure you want to delete the template "${currentTemplate.name}"?`)) {
+				deleteTemplate(currentTemplate.id);
+				saveTemplateSettings().then(() => {
+					updateTemplateList();
+					if (templates.length > 0) {
+						showTemplateEditor(templates[0]);
+					} else {
+						showGeneralSettings();
 					}
-				}
-			});
-		}
-
-		if (moreActionsBtn) {
-			moreActionsBtn.addEventListener('click', (event) => {
-				event.stopPropagation(); // Prevent this click from immediately closing the dropdown
-				menu.classList.toggle('show');
-			});
-		}
-
-		// Close the menu when clicking outside of it
-		document.addEventListener('click', (event) => {
-			if (!menu.contains(event.target as Node)) {
-				menu.classList.remove('show');
+				}).catch(error => {
+					console.error('Failed to delete template:', error);
+					alert('Failed to delete template. Please try again.');
+				});
 			}
-		});
+		}
 	}
 
 	async function handleUrlParameters(): Promise<void> {
