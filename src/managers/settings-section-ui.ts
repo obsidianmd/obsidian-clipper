@@ -1,40 +1,40 @@
 import { updateUrl } from '../utils/routing';
 import { generalSettings } from '../utils/storage-utils';
+import { updatePromptContextVisibility } from './interpreter-settings';
 
-export function showSettingsSection(): void {
-	const generalSection = document.getElementById('general-section');
-	const templatesSection = document.getElementById('templates-section');
-	if (generalSection) {
-		generalSection.style.display = 'block';
-		generalSection.classList.add('active');
-	}
-	if (templatesSection) {
-		templatesSection.style.display = 'none';
-		templatesSection.classList.remove('active');
-	}
-	updateUrl('general');
+export function showSettingsSection(section: 'general' | 'interpreter' | 'templates'): void {
+	const sections = ['general', 'interpreter', 'templates'];
+	
+	sections.forEach(s => {
+		const sectionElement = document.getElementById(`${s}-section`);
+		if (sectionElement) {
+			sectionElement.style.display = s === section ? 'block' : 'none';
+			sectionElement.classList.toggle('active', s === section);
+		}
+	});
 
 	// Update sidebar active state
 	document.querySelectorAll('#sidebar li').forEach(item => item.classList.remove('active'));
-	const generalItem = document.querySelector('#sidebar li[data-section="general"]');
-	const interpreterSection = document.getElementById('interpreter-section');
+	const activeItem = document.querySelector(`#sidebar li[data-section="${section}"]`);
+	if (activeItem) activeItem.classList.add('active');
 
-	if (generalSection) {
-		generalSection.style.display = 'block';
-		generalSection.classList.add('active');
+	updateUrl(section);
+
+	if (section === 'interpreter') {
+		updateInterpreterSettings();
 	}
-	if (interpreterSection) interpreterSection.style.display = 'none';
 
-	updateUrl('general');
+	if (section === 'templates') {
+		const templateEditor = document.getElementById('template-editor');
+		if (templateEditor) {
+			templateEditor.style.display = 'block';
+		}
+	}
 
-	// Update sidebar active state
-	document.querySelectorAll('.sidebar li').forEach(item => item.classList.remove('active'));
-	if (generalItem) generalItem.classList.add('active');
+	updatePromptContextVisibility();
 }
 
-export function showInterpreterSettings(): void {
-	// ... existing code ...
-
+function updateInterpreterSettings(): void {
 	const interpreterToggle = document.getElementById('interpreter-toggle') as HTMLInputElement;
 	const interpreterAutoRunToggle = document.getElementById('interpreter-auto-run-toggle') as HTMLInputElement;
 
@@ -44,6 +44,4 @@ export function showInterpreterSettings(): void {
 	if (interpreterAutoRunToggle) {
 		interpreterAutoRunToggle.checked = generalSettings.interpreterAutoRun;
 	}
-
-	// ... rest of the function ...
 }

@@ -20,7 +20,7 @@ export function initializeToggles(): void {
 	});
 }
 
-function updateToggleState(container: HTMLElement, checkbox: HTMLInputElement): void {
+export function updateToggleState(container: HTMLElement, checkbox: HTMLInputElement): void {
 	if (checkbox.checked) {
 		container.classList.add('is-enabled');
 	} else {

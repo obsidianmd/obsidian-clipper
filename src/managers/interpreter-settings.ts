@@ -1,7 +1,8 @@
-import { initializeToggles } from '../utils/ui-utils';
+import { initializeToggles, updateToggleState } from '../utils/ui-utils';
 import { generalSettings, loadSettings, saveSettings } from '../utils/storage-utils';
 import { updateUrl } from '../utils/routing';
 import { modelList } from '../utils/model-list';
+import { showSettingsSection } from './settings-section-ui';
 
 export function initializeInterpreterSettings(): void {
 	const interpreterSettingsForm = document.getElementById('interpreter-settings-form');
@@ -23,21 +24,31 @@ export function initializeInterpreterSettings(): void {
 			).join('');
 			modelSelect.value = generalSettings.interpreterModel || modelList[0].value;
 		}
-		if (interpreterToggle) interpreterToggle.checked = generalSettings.interpreterEnabled;
-		if (interpreterAutoRunToggle) interpreterAutoRunToggle.checked = generalSettings.interpreterAutoRun;
+		if (interpreterToggle) {
+			interpreterToggle.checked = generalSettings.interpreterEnabled;
+			updateToggleState(interpreterToggle.parentElement as HTMLElement, interpreterToggle);
+		}
+		if (interpreterAutoRunToggle) {
+			interpreterAutoRunToggle.checked = generalSettings.interpreterAutoRun;
+			updateToggleState(interpreterAutoRunToggle.parentElement as HTMLElement, interpreterAutoRunToggle);
+		}
 		initializeToggles();
 		initializeAutoSave();
 
 		if (interpreterToggle) {
 			interpreterToggle.addEventListener('change', () => {
 				saveInterpreterSettingsFromForm();
+				updatePromptContextVisibility();
+				updateToggleState(interpreterToggle.parentElement as HTMLElement, interpreterToggle);
 			});
 		}
 		if (interpreterAutoRunToggle) {
 			interpreterAutoRunToggle.addEventListener('change', () => {
 				saveInterpreterSettingsFromForm();
+				updateToggleState(interpreterAutoRunToggle.parentElement as HTMLElement, interpreterAutoRunToggle);
 			});
 		}
+		updatePromptContextVisibility();
 	});
 }
 
@@ -74,22 +85,11 @@ function debounce(func: Function, delay: number): (...args: any[]) => void {
 	};
 }
 
-export function showInterpreterSettings(): void {
-	const generalSection = document.getElementById('general-section');
-	const interpreterSection = document.getElementById('interpreter-section');
-	const templatesSection = document.getElementById('templates-section');
+export function updatePromptContextVisibility(): void {
+	const interpreterToggle = document.getElementById('interpreter-toggle') as HTMLInputElement;
+	const promptContextContainer = document.getElementById('prompt-context-container');
 
-	if (generalSection) generalSection.style.display = 'none';
-	if (interpreterSection) {
-		interpreterSection.style.display = 'block';
-		interpreterSection.classList.add('active');
+	if (promptContextContainer) {
+		promptContextContainer.style.display = interpreterToggle.checked ? 'block' : 'none';
 	}
-	if (templatesSection) templatesSection.style.display = 'none';
-
-	updateUrl('interpreter');
-
-	// Update sidebar active state
-	document.querySelectorAll('.sidebar li').forEach(item => item.classList.remove('active'));
-	const interpreterItem = document.querySelector('.sidebar li[data-section="interpreter"]');
-	if (interpreterItem) interpreterItem.classList.add('active');
 }

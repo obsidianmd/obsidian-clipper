@@ -13,13 +13,13 @@ import {
 import { updateTemplateList, showTemplateEditor, resetUnsavedChanges, initializeAddPropertyButton } from '../managers/template-ui';
 import { initializeGeneralSettings } from '../managers/general-settings';
 import { showSettingsSection } from '../managers/settings-section-ui';
-import { initializeInterpreterSettings, showInterpreterSettings } from '../managers/interpreter-settings';
+import { initializeInterpreterSettings } from '../managers/interpreter-settings';
 import { initializeDragAndDrop, handleTemplateDrag } from '../utils/drag-and-drop';
 import { initializeAutoSave } from '../utils/auto-save';
 import { exportTemplate, importTemplate, initializeDropZone } from '../utils/import-export';
 import { createIcons } from 'lucide';
 import { icons } from '../icons/icons';
-import { updateUrl } from '../utils/routing';
+import { updateUrl, getUrlParameters } from '../utils/routing';
 import browser from '../utils/browser-polyfill';
 import { addBrowserClassToHtml } from '../utils/browser-detection';
 import { initializeMenu, addMenuItemListener } from '../managers/menu';
@@ -122,24 +122,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 	}
 
 	async function handleUrlParameters(): Promise<void> {
-		const urlParams = new URLSearchParams(window.location.search);
-		const section = urlParams.get('section');
-		const templateId = urlParams.get('template');
+		const { section, templateId } = getUrlParameters();
 
-		if (section === 'general') {
-			showSettingsSection();
-		} else if (section === 'interpreter') {
-			showInterpreterSettings();
+		if (section === 'general' || section === 'interpreter') {
+			showSettingsSection(section);
 		} else if (templateId) {
 			const template = findTemplateById(templateId);
 			if (template) {
 				showTemplateEditor(template);
 			} else {
 				console.error(`Template with id ${templateId} not found`);
-				showSettingsSection();
+				showSettingsSection('general');
 			}
 		} else {
-			showSettingsSection();
+			showSettingsSection('general');
 		}
 	}
 
@@ -174,10 +170,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 		if (sidebar) {
 			sidebar.addEventListener('click', (event) => {
 				const target = event.target as HTMLElement;
-				if (target.dataset.section === 'general') {
-					showSettingsSection();
-				} else if (target.dataset.section === 'interpreter') {
-					showInterpreterSettings();
+				if (target.dataset.section === 'general' || target.dataset.section === 'interpreter') {
+					showSettingsSection(target.dataset.section as 'general' | 'interpreter');
 				}
 				if (settingsContainer) {
 					settingsContainer.classList.remove('sidebar-open');
