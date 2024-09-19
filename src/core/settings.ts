@@ -111,11 +111,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 					if (templates.length > 0) {
 						showTemplateEditor(templates[0]);
 					} else {
-						showSettingsSection();
+						showSettingsSection('general');
 					}
 				}).catch(error => {
 					console.error('Failed to delete template:', error);
 					alert('Failed to delete template. Please try again.');
+					showSettingsSection('general');
 				});
 			}
 		}
