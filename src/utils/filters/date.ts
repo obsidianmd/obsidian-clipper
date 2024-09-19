@@ -6,8 +6,11 @@ dayjs.extend(customParseFormat);
 dayjs.extend(advancedFormat);
 
 export const date = (str: string, param?: string): string => {
+	// If the input is 'now' used in shorthands {{date}} and {{time}}, use the current date and time
+	const inputDate = str === 'now' ? new Date() : str;
+
 	if (!param) {
-		return dayjs(str).format('YYYY-MM-DD');
+		return dayjs(inputDate).format('YYYY-MM-DD');
 	}
 
 	// Remove outer parentheses if present
@@ -24,10 +27,10 @@ export const date = (str: string, param?: string): string => {
 	let date;
 	if (inputFormat) {
 		// If inputFormat is provided, use it to parse the date
-		date = dayjs(str, inputFormat, true);
+		date = dayjs(inputDate, inputFormat, true);
 	} else {
 		// If no inputFormat, let dayjs try to parse it automatically
-		date = dayjs(str);
+		date = dayjs(inputDate);
 	}
 
 	if (!date.isValid()) {

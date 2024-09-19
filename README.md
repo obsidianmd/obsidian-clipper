@@ -64,7 +64,8 @@ These variables are automatically generated based on the page content. The main 
 | ------------------- | ---------------------------------------------------- |
 | `{{author}}`        | Author of the page                                   |
 | `{{content}}`       | Article content, or the selection if present         |
-| `{{date}}`          | Today's date                                         |
+| `{{date}}`          | Current date                                         |
+| `{{time}}`          | Current date and time                                |
 | `{{description}}`   | Description or excerpt                               |
 | `{{domain}}`        | Domain                                               |
 | `{{fullHtml}}`      | Unprocessed HTML for the full page content           |

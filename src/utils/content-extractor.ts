@@ -6,6 +6,7 @@ import { applyFilters } from './filters';
 import browser from './browser-polyfill';
 import { convertDate } from './date-utils';
 import { debugLog } from './debug';
+import dayjs from 'dayjs';
 
 export function extractReadabilityContent(doc: Document): ReturnType<Readability['parse']> {
 	const reader = new Readability(doc, {keepClasses:true})
@@ -104,7 +105,16 @@ export async function replaceVariables(tabId: number, text: string, variables: {
 			} else if (match.startsWith('{{schema:')) {
 				replacement = await processSchema(match, variables, currentUrl);
 			} else {
-				replacement = await processVariable(match, variables, currentUrl);
+				const [variableName, ...filterParts] = match.slice(2, -2).split('|');
+				let value = variables[`{{${variableName}}}`] || '';
+				
+				// If the value is 'now' and there's no date filter specified, add it
+				if (value === 'now' && !filterParts.some(part => part.startsWith('date:'))) {
+					filterParts.unshift('date:"YYYY-MM-DD"');
+				}
+				
+				const filtersString = filterParts.join('|');
+				replacement = applyFilters(value, filtersString, currentUrl);
 			}
 			text = text.replace(match, replacement);
 		}
@@ -241,7 +251,8 @@ export async function initializePageContent(content: string, selectedHtml: strin
 	const currentVariables: { [key: string]: string } = {
 		'{{author}}': author,
 		'{{content}}': markdownBody,
-		'{{date}}': convertDate(new Date()),
+		'{{date}}': 'now',
+		'{{time}}': dayjs().format('YYYY-MM-DDTHH:mm:ssZ'),
 		'{{description}}': description,
 		'{{domain}}': domain,
 		'{{fullHtml}}': fullHtml,
