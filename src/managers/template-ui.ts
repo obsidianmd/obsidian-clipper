@@ -165,7 +165,7 @@ export function showTemplateEditor(template: Template | null): void {
 	const triggersTextarea = document.getElementById('url-patterns') as HTMLTextAreaElement;
 	if (triggersTextarea) triggersTextarea.value = editingTemplate && editingTemplate.triggers ? editingTemplate.triggers.join('\n') : '';
 
-	showSettingsSection('templates');
+	showSettingsSection('templates', editingTemplate.id);
 
 	if (!editingTemplate.id) {
 		const templateNameField = document.getElementById('template-name') as HTMLInputElement;

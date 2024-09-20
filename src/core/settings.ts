@@ -12,7 +12,7 @@ import {
 } from '../managers/template-manager';
 import { updateTemplateList, showTemplateEditor, resetUnsavedChanges, initializeAddPropertyButton } from '../managers/template-ui';
 import { initializeGeneralSettings } from '../managers/general-settings';
-import { showSettingsSection } from '../managers/settings-section-ui';
+import { showSettingsSection, initializeSidebar } from '../managers/settings-section-ui';
 import { initializeInterpreterSettings } from '../managers/interpreter-settings';
 import { initializeDragAndDrop, handleTemplateDrag } from '../utils/drag-and-drop';
 import { initializeAutoSave } from '../utils/auto-save';
@@ -55,25 +55,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 	}
 
 	function initializeTemplateListeners(): void {
-		const templateList = document.getElementById('template-list');
-		if (templateList) {
-			templateList.addEventListener('click', (event) => {
-				const target = event.target as HTMLElement;
-				const listItem = target.closest('li');
-				if (listItem && listItem.dataset.id) {
-					const currentTemplates = getTemplates();
-					const selectedTemplate = currentTemplates.find((t: Template) => t.id === listItem.dataset.id);
-					if (selectedTemplate) {
-						resetUnsavedChanges();
-						showTemplateEditor(selectedTemplate);
-						updateUrl('templates', selectedTemplate.id);
-					}
-				}
-			});
-		} else {
-			console.error('Template list not found');
-		}
-
 		if (newTemplateBtn) {
 			newTemplateBtn.addEventListener('click', () => {
 				showTemplateEditor(null);
@@ -160,90 +141,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 		});
 	}
 
-	function initializeSidebar(): void {
-		const sidebarItems = document.querySelectorAll('#sidebar li[data-section], #template-list li');
-		const sections = document.querySelectorAll('.settings-section');
-		const sidebar = document.getElementById('sidebar');
-		const settingsContainer = document.getElementById('settings');
-		const templateList = document.getElementById('template-list');
-
-
-		if (sidebar) {
-			sidebar.addEventListener('click', (event) => {
-				const target = event.target as HTMLElement;
-				if (target.dataset.section === 'general' || target.dataset.section === 'interpreter') {
-					showSettingsSection(target.dataset.section as 'general' | 'interpreter');
-				}
-				if (settingsContainer) {
-					settingsContainer.classList.remove('sidebar-open');
-				}
-			});
-		}
-
-		if (templateList) {
-			templateList.addEventListener('click', (event) => {
-				const target = event.target as HTMLElement;
-				const listItem = target.closest('li');
-				if (listItem && listItem.dataset.id) {
-					hideAllSections();
-					showTemplatesSection();
-				}
-			});
-		}
-
-		sidebarItems.forEach(item => {
-			item.addEventListener('click', () => {
-				const sectionId = (item as HTMLElement).dataset.section;
-				sidebarItems.forEach(i => i.classList.remove('active'));
-				item.classList.add('active');
-				document.querySelectorAll('#template-list li').forEach(templateItem => templateItem.classList.remove('active'));
-				hideAllSections();
-				if (sectionId) {
-					const sectionToShow = document.getElementById(`${sectionId}-section`);
-					if (sectionToShow) {
-						sectionToShow.style.display = 'block';
-						sectionToShow.classList.add('active');
-					}
-				}
-				if (settingsContainer) {
-					settingsContainer.classList.remove('sidebar-open');
-				}
-			});
-		});
-
-		const hamburgerMenu = document.getElementById('hamburger-menu');
-
-		if (hamburgerMenu && settingsContainer) {
-			hamburgerMenu.addEventListener('click', () => {
-				settingsContainer.classList.toggle('sidebar-open');
-				hamburgerMenu.classList.toggle('is-active');
-			});
-		}
-	}
-
-	function hideAllSections(): void {
-		const sections = document.querySelectorAll('.settings-section');
-		sections.forEach(section => {
-			(section as HTMLElement).style.display = 'none';
-			section.classList.remove('active');
-		});
-	}
-
-	function showTemplatesSection(): void {
-		const templatesSection = document.getElementById('templates-section');
-		if (templatesSection) {
-			templatesSection.style.display = 'block';
-			templatesSection.classList.add('active');
-		}
-		const templateEditor = document.getElementById('template-editor');
-		if (templateEditor) {
-			templateEditor.style.display = 'block';
-		}
-	}
-
 	const templateForm = document.getElementById('template-settings-form');
 	if (templateForm) {
-		initializeAutoSave();
 		initializeDragAndDrop();
 		initializeDropZone();
 		initializeAddPropertyButton();
