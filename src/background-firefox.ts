@@ -66,4 +66,20 @@ browser.runtime.onInstalled.addListener(() => {
 			browser.tabs.sendMessage(tab.id, { action: "ping" });
 		}
 	});
+
+	function createContextMenu() {
+		browser.contextMenus.create({
+			id: "open-obsidian-clipper",
+			title: "Add to Obsidian",
+			contexts: ["page", "selection"]
+		});
+	}
+
+	browser.contextMenus.onClicked.addListener((info, tab) => {
+		if (info.menuItemId === "open-obsidian-clipper") {
+			browser.browserAction.openPopup();
+		}
+	});
+
+	createContextMenu();
 });
