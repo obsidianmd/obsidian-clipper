@@ -1,7 +1,6 @@
 import { initializeToggles, updateToggleState } from '../utils/ui-utils';
 import { ModelConfig, generalSettings, loadSettings, saveSettings } from '../utils/storage-utils';
-import { updateUrl } from '../utils/routing';
-import { showSettingsSection } from './settings-section-ui';
+import { initializeIcons } from '../icons/icons';
 
 export function updatePromptContextVisibility(): void {
 	const interpreterToggle = document.getElementById('interpreter-toggle') as HTMLInputElement;
@@ -87,8 +86,12 @@ function createModelListItem(model: ModelConfig, index: number): HTMLElement {
 		</div>
 		<div class="model-list-item-actions">
 			${model.provider !== 'OpenAI' && model.provider !== 'Anthropic' ? `
-				<button class="edit-model-btn" data-index="${index}">Edit</button>
-				<button class="delete-model-btn" data-index="${index}">Delete</button>
+				<button class="edit-model-btn clickable-icon" data-index="${index}" aria-label="Edit model">
+					<i data-lucide="pen-line"></i>
+				</button>
+				<button class="delete-model-btn clickable-icon" data-index="${index}" aria-label="Delete model">
+					<i data-lucide="trash-2"></i>
+				</button>
 			` : ''}
 			<div class="checkbox-container mod-small">
 				<input type="checkbox" id="model-${index}" ${model.enabled ? 'checked' : ''}>
@@ -118,6 +121,9 @@ function createModelListItem(model: ModelConfig, index: number): HTMLElement {
 			deleteBtn.addEventListener('click', () => deleteModel(index));
 		}
 	}
+
+	// Initialize Lucide icons
+	initializeIcons(modelItem);
 
 	return modelItem;
 }

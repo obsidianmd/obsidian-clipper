@@ -1,22 +1,41 @@
-import { Trash2, AlignLeft, Binary, List, Calendar, Clock, Ellipsis, SquareCheckBig, GripVertical, Settings, X, ChevronRight, ChevronDown, CopyPlus, AlertTriangle } from 'lucide';
+import {
+	AlertTriangle,
+	AlignLeft, 
+	Binary, 
+	Calendar, 
+	ChevronDown,
+	ChevronRight,
+	Clock, 
+	CopyPlus,
+	Ellipsis, 
+	GripVertical,
+	List, 
+	PenLine,
+	Settings,
+	SquareCheckBig, 
+	Trash2, 
+	X
+} from 'lucide';
+
 import { createIcons } from 'lucide';
 
 export const icons = {
-	Trash2,
-	CopyPlus,
+	AlertTriangle,
 	AlignLeft,
 	Binary,
-	List,
 	Calendar,
-	Clock,
-	Ellipsis,
-	SquareCheckBig,
-	GripVertical,
-	Settings,
-	X,
-	ChevronRight,
 	ChevronDown,
-	AlertTriangle
+	ChevronRight,
+	Clock,
+	CopyPlus,
+	Ellipsis,
+	GripVertical,
+	List,
+	PenLine,
+	Settings,
+	SquareCheckBig,
+	Trash2,
+	X
 };
 
 export function initializeIcons(root: HTMLElement | Document = document) {
