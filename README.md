@@ -63,7 +63,8 @@ These variables are automatically generated based on the page content. The main 
 | Variable            | Description                                          |
 | ------------------- | ---------------------------------------------------- |
 | `{{author}}`        | Author of the page                                   |
-| `{{content}}`       | Article content, or the selection if present         |
+| `{{content}}`       | Article content or selection, in Markdown format     |
+| `{{contentHtml}}`   | Article content or selection, in HTML format         |
 | `{{date}}`          | Current date                                         |
 | `{{time}}`          | Current date and time                                |
 | `{{description}}`   | Description or excerpt                               |
@@ -72,7 +73,6 @@ These variables are automatically generated based on the page content. The main 
 | `{{image}}`         | Social share image URL                               |
 | `{{published}}`     | Published date                                       |
 | `{{title}}`         | Title of the page                                    |
-| `{{selectionHtml}}` | Unprocessed HTML for selected content                |
 | `{{url}}`           | Current URL                                          |
 
 #### Meta variables

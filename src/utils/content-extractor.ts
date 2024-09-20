@@ -264,6 +264,7 @@ export async function initializePageContent(content: string, selectedHtml: strin
 	const currentVariables: { [key: string]: string } = {
 		'{{author}}': author,
 		'{{content}}': markdownBody,
+		'{{contentHtml}}': content,
 		'{{date}}': 'now',
 		'{{time}}': dayjs().format('YYYY-MM-DDTHH:mm:ssZ'),
 		'{{description}}': description,
@@ -273,7 +274,6 @@ export async function initializePageContent(content: string, selectedHtml: strin
 		'{{noteName}}': noteName,
 		'{{published}}': published,
 		'{{site}}': site,
-		'{{selectionHtml}}': selectedHtml,
 		'{{title}}': title,
 		'{{url}}': currentUrl
 	};
