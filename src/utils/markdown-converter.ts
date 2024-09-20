@@ -364,7 +364,7 @@ export function createMarkdownContent(content: string, url: string) {
 				return (
 					(node.nodeName === 'SUP' && node.classList.contains('reference')) ||
 					(node.nodeName === 'CITE' && node.classList.contains('ltx_cite')) ||
-					(node.nodeName === 'SUP' && node.id.startsWith('fnref:'))
+					(node.nodeName === 'SUP' && node.querySelector('a[href$="#fn:"]') !== null)
 				);
 			}
 			return false;
@@ -376,34 +376,36 @@ export function createMarkdownContent(content: string, url: string) {
 					const footnotes = Array.from(links).map(link => {
 						const href = link.getAttribute('href');
 						if (href) {
-							let id = href.startsWith('#cite_note-') 
-								? href.replace('#cite_note-', '')
-								: href.startsWith('#fn:')
-									? href.replace('#fn:', '')
-									: href.split('#').pop() || '';
-							id = id.replace('bib.', '').replace('bib', '');
-							return `[^${id}]`;
+							const match = href.split('/').pop()?.match(/cite_note-(\d+)/);
+							if (match) {
+								return `[^${match[1]}]`;
+							}
 						}
 						return '';
 					});
 					return footnotes.join('');
 				} else if (node.nodeName === 'CITE' && node.classList.contains('ltx_cite')) {
-					const links = node.querySelectorAll('a');
-					const footnotes = Array.from(links).map(link => {
+					const link = node.querySelector('a');
+					if (link) {
 						const href = link.getAttribute('href');
 						if (href) {
-							let id = href.startsWith('#bib.') 
-								? href.replace('#bib.', '')
-								: href.split('#').pop() || '';
-							id = id.replace('bib.', '').replace('bib', '');
+							const match = href.split('/').pop()?.match(/bib\.bib(\d+)/);
+							if (match) {
+								return `[^${match[1]}]`;
+							}
+						}
+					}
+					return content;
+				} else if (node.nodeName === 'SUP' && node.querySelector('a[href$="#fn:"]')) {
+					const link = node.querySelector('a[href$="#fn:"]');
+					if (link) {
+						const href = link.getAttribute('href');
+						if (href) {
+							const id = href.split('#fn:').pop();
 							return `[^${id}]`;
 						}
-						return '';
-					});
-					return footnotes.join('');
-				} else if (node.nodeName === 'SUP' && node.id.startsWith('fnref:')) {
-					const id = node.id.replace('fnref:', '');
-					return `[^${id}]`;
+					}
+					return content;
 				}
 			}
 			return content;
@@ -425,11 +427,19 @@ export function createMarkdownContent(content: string, url: string) {
 		replacement: (content, node) => {
 			if (node instanceof HTMLElement) {
 				const references = Array.from(node.children).map(li => {
-					let id = li.id.replace('cite_note-', '').replace('bib.', '').replace('bib', '').replace('fn:', '');
+					let id;
+					if (li.id.startsWith('bib.bib')) {
+						id = li.id.replace('bib.bib', '');
+					} else if (li.id.startsWith('fn:')) {
+						id = li.id.replace('fn:', '');
+					} else {
+						const match = li.id.split('/').pop()?.match(/cite_note-(\d+)/);
+						id = match ? match[1] : li.id.replace('fn:', '');
+					}
 					const referenceContent = turndownService.turndown(li.innerHTML);
 					// Remove the backlink from the footnote content
-					const cleanedContent = referenceContent.replace(/\s*↩︎$/, '');
-					return `[^${id}]: ${cleanedContent.trim()}`;
+					const cleanedContent = referenceContent.replace(/\s*↩︎$/, '').trim();
+					return `[^${id}]: ${cleanedContent}`;
 				});
 				return '\n\n' + references.join('\n\n') + '\n\n';
 			}
