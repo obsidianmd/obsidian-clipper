@@ -357,14 +357,14 @@ export function createMarkdownContent(content: string, url: string) {
 		}
 	});
 
-	// Update the citations rule
+
 	turndownService.addRule('citations', {
 		filter: (node: Node): boolean => {
 			if (node instanceof Element) {
 				return (
 					(node.nodeName === 'SUP' && node.classList.contains('reference')) ||
 					(node.nodeName === 'CITE' && node.classList.contains('ltx_cite')) ||
-					(node.nodeName === 'SUP' && node.querySelector('a[href$="#fn:"]') !== null)
+					(node.nodeName === 'SUP' && node.id.startsWith('fnref:'))
 				);
 			}
 			return false;
@@ -395,17 +395,9 @@ export function createMarkdownContent(content: string, url: string) {
 							}
 						}
 					}
-					return content;
-				} else if (node.nodeName === 'SUP' && node.querySelector('a[href$="#fn:"]')) {
-					const link = node.querySelector('a[href$="#fn:"]');
-					if (link) {
-						const href = link.getAttribute('href');
-						if (href) {
-							const id = href.split('#fn:').pop();
-							return `[^${id}]`;
-						}
-					}
-					return content;
+				} else if (node.nodeName === 'SUP' && node.id.startsWith('fnref:')) {
+					const id = node.id.replace('fnref:', '');
+					return `[^${id}]`;
 				}
 			}
 			return content;
@@ -460,8 +452,6 @@ export function createMarkdownContent(content: string, url: string) {
 			// Reference numbers and anchor links
 			if (node.classList.contains('ltx_role_refnum')) return true;
 			if (node.classList.contains('ltx_tag_bibitem')) return true;
-			if (node.id?.startsWith('fnref:')) return true;
-			if (node.getAttribute('href')?.startsWith('#fnref:')) return true;
 			if (node.classList.contains('footnote-backref')) return true;
 			if (node.classList.contains('ref') && (node.getAttribute('href')?.startsWith('#') || /\/#.+$/.test(node.getAttribute('href') || ''))) return true;
 			if (node.classList.contains('anchor') && (node.getAttribute('href')?.startsWith('#') || /\/#.+$/.test(node.getAttribute('href') || ''))) return true;
