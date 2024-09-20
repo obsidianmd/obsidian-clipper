@@ -181,7 +181,7 @@ function initializeSilentOpenToggle(): void {
 	if (silentOpenToggle) {
 		silentOpenToggle.checked = generalSettings.silentOpen;
 		silentOpenToggle.addEventListener('change', () => {
-			saveGeneralSettings({ silentOpen: silentOpenToggle.checked });
+			saveSettings({ silentOpen: silentOpenToggle.checked });
 		});
 	}
 }

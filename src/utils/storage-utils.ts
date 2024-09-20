@@ -16,7 +16,7 @@ export interface Settings {
 export let generalSettings: Settings = {
 	vaults: [],
 	betaFeatures: false,
-	silentOpen: false
+	silentOpen: false,
 	showMoreActionsButton: false,
 	openaiApiKey: '',
 	interpreterModel: 'gpt-4o-mini',
@@ -41,7 +41,7 @@ export async function loadSettings(): Promise<Settings> {
 		vaults: data.vaults || [],
 		showMoreActionsButton: data.general_settings?.showMoreActionsButton ?? true,
 		betaFeatures: data.general_settings?.betaFeatures ?? false,
-		silentOpen: data.general_settings?.silentOpen ?? false
+		silentOpen: data.general_settings?.silentOpen ?? false,
 		openaiApiKey: data.interpreter_settings?.openaiApiKey || '',
 		interpreterModel: data.interpreter_settings?.interpreterModel || 'gpt-4o-mini',
 		anthropicApiKey: data.interpreter_settings?.anthropicApiKey || '',
