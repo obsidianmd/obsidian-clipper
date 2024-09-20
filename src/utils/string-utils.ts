@@ -19,8 +19,9 @@ export function escapeDoubleQuotes(str: string): string {
 }
 
 export function sanitizeFileName(fileName: string): string {
-	const isWindows = navigator.platform.indexOf('Win') > -1;
-	const isMac = navigator.platform.indexOf('Mac') > -1;
+	const platform = (navigator as any).userAgentData?.platform || navigator.platform || '';
+	const isWindows = /win/i.test(platform);
+	const isMac = /mac/i.test(platform);
 
 	let sanitized = fileName;
 
