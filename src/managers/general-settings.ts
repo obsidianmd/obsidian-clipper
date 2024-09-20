@@ -89,6 +89,7 @@ export function initializeGeneralSettings(): void {
 		updateVaultList();
 		initializeShowMoreActionsToggle();
 		initializeBetaFeaturesToggle();
+		initializeSilentOpenToggle();
 		initializeVaultInput();
 		initializeKeyboardShortcuts();
 		initializeToggles();
@@ -149,6 +150,16 @@ function initializeBetaFeaturesToggle(): void {
 		betaFeaturesToggle.checked = generalSettings.betaFeatures;
 		betaFeaturesToggle.addEventListener('change', () => {
 			saveGeneralSettings({ betaFeatures: betaFeaturesToggle.checked });
+		});
+	}
+}
+
+function initializeSilentOpenToggle(): void {
+	const silentOpenToggle = document.getElementById('silent-open-toggle') as HTMLInputElement;
+	if (silentOpenToggle) {
+		silentOpenToggle.checked = generalSettings.silentOpen;
+		silentOpenToggle.addEventListener('change', () => {
+			saveGeneralSettings({ silentOpen: silentOpenToggle.checked });
 		});
 	}
 }

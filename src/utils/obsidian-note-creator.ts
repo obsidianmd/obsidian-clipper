@@ -86,6 +86,14 @@ export function saveToObsidian(fileContent: string, noteName: string, path: stri
 		obsidianUrl = `obsidian://new?file=${encodeURIComponent(path + sanitizeFileName(noteName))}`;
 	}
 
+	const vaultParam = vault ? `&vault=${encodeURIComponent(vault)}` : '';
+	obsidianUrl += vaultParam;
+
+	// Add silent parameter if silentOpen is enabled
+	if (generalSettings.silentOpen) {
+		obsidianUrl += '&silent=true';
+	}
+
 	if (generalSettings.betaFeatures) {
 		// Use clipboard for content in beta mode
 		navigator.clipboard.writeText(content).then(() => {
@@ -102,9 +110,6 @@ export function saveToObsidian(fileContent: string, noteName: string, path: stri
 		obsidianUrl += `&content=${encodeURIComponent(content)}`;
 		openObsidianUrl(obsidianUrl);
 	}
-
-	const vaultParam = vault ? `&vault=${encodeURIComponent(vault)}` : '';
-	obsidianUrl += vaultParam;
 
 	function openObsidianUrl(url: string): void {
 		browser.tabs.query({active: true, currentWindow: true}).then((tabs) => {

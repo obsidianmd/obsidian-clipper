@@ -4,12 +4,14 @@ export interface GeneralSettings {
 	showMoreActionsButton: boolean;
 	vaults: string[];
 	betaFeatures: boolean;
+	silentOpen: boolean;
 }
 
 export let generalSettings: GeneralSettings = {
 	showMoreActionsButton: true,
 	vaults: [],
-	betaFeatures: false
+	betaFeatures: false,
+	silentOpen: false
 };
 
 export function setLocalStorage(key: string, value: any): Promise<void> {
@@ -26,7 +28,8 @@ export async function loadGeneralSettings(): Promise<GeneralSettings> {
 	generalSettings = {
 		showMoreActionsButton: data.general_settings?.showMoreActionsButton ?? true,
 		vaults: data.vaults || [],
-		betaFeatures: data.general_settings?.betaFeatures ?? false
+		betaFeatures: data.general_settings?.betaFeatures ?? false,
+		silentOpen: data.general_settings?.silentOpen ?? false
 	};
 	
 	return generalSettings;
@@ -38,7 +41,8 @@ export async function saveGeneralSettings(settings?: Partial<GeneralSettings>): 
 	await browser.storage.sync.set({ 
 		general_settings: {
 			showMoreActionsButton: generalSettings.showMoreActionsButton,
-			betaFeatures: generalSettings.betaFeatures
+			betaFeatures: generalSettings.betaFeatures,
+			silentOpen: generalSettings.silentOpen
 		},
 		vaults: generalSettings.vaults 
 	});
