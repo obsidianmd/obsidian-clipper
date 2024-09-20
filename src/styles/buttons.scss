@@ -60,3 +60,21 @@ button.clickable-icon {
 		box-shadow: none;
 	}
 }
+
+.add-button {
+	padding: 2px 0 8px;
+	margin-left: -2px;
+	font-weight: 500;
+	color: var(--text-muted);
+	font-size: var(--font-ui-small);
+	user-select: none;
+	white-space: nowrap;
+	a {
+		cursor: pointer;
+		border-radius: var(--radius-s);
+		padding: 6px 8px;
+		&:hover {
+			background-color: var(--background-modifier-hover);
+		}
+	}
+}

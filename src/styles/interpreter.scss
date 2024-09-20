@@ -155,14 +155,18 @@
 }
 
 .model-form {
-	margin: 8px 0;
+	margin: 8px 0 0;
 	display: flex;
 	flex-direction: row;
 	gap: 8px;
 }
 
+.model-list-container {
+	margin-bottom: 24px;
+}
+
 #model-list {
-	margin: 0 0 16px 0;
+	margin: 0 0 8px 0;
 	.model-list-item {
 		display: flex;
 		flex-direction: row;
@@ -193,6 +197,3 @@
 	}
 }
 
-#add-model-btn {
-	margin-bottom: 24px;
-}

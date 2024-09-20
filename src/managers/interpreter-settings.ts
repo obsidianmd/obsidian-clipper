@@ -86,13 +86,13 @@ function createModelListItem(model: ModelConfig, index: number): HTMLElement {
 			<div class="model-provider">${model.provider || 'Custom'}</div>
 		</div>
 		<div class="model-list-item-actions">
-			<div class="checkbox-container mod-small">
-				<input type="checkbox" id="model-${index}" ${model.enabled ? 'checked' : ''}>
-			</div>
 			${model.provider !== 'OpenAI' && model.provider !== 'Anthropic' ? `
 				<button class="edit-model-btn" data-index="${index}">Edit</button>
 				<button class="delete-model-btn" data-index="${index}">Delete</button>
 			` : ''}
+			<div class="checkbox-container mod-small">
+				<input type="checkbox" id="model-${index}" ${model.enabled ? 'checked' : ''}>
+			</div>
 		</div>
 	`;
 
