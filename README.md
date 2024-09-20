@@ -173,6 +173,8 @@ Filters allow you to modify variables in a template. Filters are applied to vari
 	- `object:values` returns an array of the object's values.
 	- Example: `{"a":1,"b":2}|object:array` returns `[["a",1],["b",2]]`.
 - `pascal` converts text to `PascalCase`.
+- `remove_html` removes specified HTML elements and their content from a string.
+	- Supports tag name, class, or id, e.g. `{{content|remove_html:("img,.class-name,#element-id")}}`
 - `replace` replaces occurrences of specified strings:
 	- Simple replacement: `"hello!"|replace:",":""` removes all commas.
 	- Multiple replacements: `"hello world"|replace:("e":"a","o":"0")` returns `"hall0 w0rld"`.
@@ -200,7 +202,7 @@ Filters allow you to modify variables in a template. Filters are applied to vari
 - `strip_md` removes all Markdown formatting and returns a plain text string, e.g. turning `**text**` into `text`.
 	- Turns formatted text into unformatted plain text, including bold, italic, highlights, headers, code, blockquotes, tables, task lists, and wikilinks.
 	- Entirely removes tables, footnotes, images, and HTML elements.
-- `strip_tags` removes all HTML tags from a string.
+- `strip_tags` removes all HTML tags from a string. Unlike `remove_html` this doesn't remove the content within the tags.
 	- Use `strip_tags:("p,strong,em")` to keep specific tags.
 	- Example: `"<p>Hello <b>world</b>!</p>"|strip_tags:("b")` returns `Hello <b>world</b>!`.
 - `table` converts an array or array of objects into a Markdown table:

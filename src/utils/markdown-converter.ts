@@ -490,6 +490,12 @@ export function createMarkdownContent(content: string, url: string) {
 			markdown = markdown.slice(titleMatch[0].length);
 		}
 
+		// Remove any empty links e.g. [](example.com) that remain, along with surrounding newlines
+		markdown = markdown.replace(/\n*\[]\([^)]+\)\n*/g, '');
+
+		// Remove any consecutive newlines more than two
+		markdown = markdown.replace(/\n{3,}/g, '\n\n');
+
 		return markdown.trim();
 	} catch (error) {
 		console.error('Error converting HTML to Markdown:', error);

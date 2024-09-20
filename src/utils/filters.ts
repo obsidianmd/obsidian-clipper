@@ -19,6 +19,7 @@ import { map } from './filters/map';
 import { markdown } from './filters/markdown';
 import { object } from './filters/object';
 import { pascal } from './filters/pascal';
+import { remove_html } from './filters/remove_html';
 import { replace } from './filters/replace';
 import { safe_name } from './filters/safe_name';
 import { slice } from './filters/slice';
@@ -53,6 +54,7 @@ export const filters: { [key: string]: FilterFunction } = {
 	markdown,
 	object,
 	pascal,
+	remove_html,
 	replace,
 	safe_name,
 	slice,
