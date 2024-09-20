@@ -36,7 +36,7 @@ export function sanitizeFileName(fileName: string): string {
 	} else {
 		// Linux and other systems
 		sanitized = sanitized
-			.replace(/[\/\x00-\x1F]/g, '')
+			.replace(/[<>:"\/\\|?*\x00-\x1F]/g, '')
 			.replace(/^\./, '_');
 	}
 
