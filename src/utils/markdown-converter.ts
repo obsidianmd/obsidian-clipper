@@ -493,7 +493,7 @@ export function createMarkdownContent(content: string, url: string) {
 		return markdown.trim();
 	} catch (error) {
 		console.error('Error converting HTML to Markdown:', error);
-		debugLog('Markdown', 'Problematic content:', content.substring(0, 1000) + '...');
+		console.log('Problematic content:', content.substring(0, 1000) + '...');
 		return `Failed to convert content to Markdown. Original HTML:\n\n${content}`;
 	}
 }
