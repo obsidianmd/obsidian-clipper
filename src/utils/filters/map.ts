@@ -49,7 +49,7 @@ export const map = (str: string, param?: string): string => {
 			} else {
 				// If it's not an object literal, treat it as a simple expression
 				return evaluateExpression(expression, item, argName);
-				}
+			}
 		});
 
 		debugLog('Map', 'Mapped array:', JSON.stringify(mappedArray, null, 2));
@@ -60,6 +60,10 @@ export const map = (str: string, param?: string): string => {
 };
 
 function evaluateExpression(expression: string, item: any, argName: string): any {
+	if (typeof item === 'string') {
+		// For simple string arrays, return the item directly
+		return item;
+	}
 	const result = expression.replace(new RegExp(`${argName}\\.([\\w.\\[\\]]+)`, 'g'), (_, prop) => {
 		const value = getNestedProperty(item, prop);
 		debugLog('Map', `Replacing ${argName}.${prop} with:`, value);
