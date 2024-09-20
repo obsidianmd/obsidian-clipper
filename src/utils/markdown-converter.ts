@@ -2,8 +2,11 @@ import TurndownService from 'turndown';
 import { gfm } from 'turndown-plugin-gfm';
 import { MathMLToLaTeX } from 'mathml-to-latex';
 import { processUrls } from './string-utils';
+import { debugLog } from './debug';
 
 export function createMarkdownContent(content: string, url: string) {
+	debugLog('Markdown', 'Starting markdown conversion for URL:', url);
+	debugLog('Markdown', 'Content length:', content.length);
 
 	const baseUrl = new URL(url);
 	const markdownContent = processUrls(content, baseUrl);
@@ -16,7 +19,11 @@ export function createMarkdownContent(content: string, url: string) {
 		emDelimiter: '*',
 	});
 
-	turndownService.use(gfm);
+	try {
+		turndownService.use(gfm);
+	} catch (error) {
+		console.error('Error applying GFM plugin:', error);
+	}
 
 	turndownService.remove(['style', 'script']);
 
@@ -462,13 +469,31 @@ export function createMarkdownContent(content: string, url: string) {
 		}
 	});
 
-	let markdown = turndownService.turndown(markdownContent);
+	turndownService.addRule('handleTextNodesInTables', {
+		filter: function (node: Node): boolean {
+			return node.nodeType === Node.TEXT_NODE && 
+				   node.parentNode !== null && 
+				   node.parentNode.nodeName === 'TD';
+		},
+		replacement: function (content: string): string {
+			return content;
+		}
+	});
 
-	// Remove the title from the beginning of the content if it exists
-	const titleMatch = markdown.match(/^# .+\n+/);
-	if (titleMatch) {
-		markdown = markdown.slice(titleMatch[0].length);
+	try {
+		let markdown = turndownService.turndown(markdownContent);
+		debugLog('Markdown', 'Markdown conversion successful');
+
+		// Remove the title from the beginning of the content if it exists
+		const titleMatch = markdown.match(/^# .+\n+/);
+		if (titleMatch) {
+			markdown = markdown.slice(titleMatch[0].length);
+		}
+
+		return markdown.trim();
+	} catch (error) {
+		console.error('Error converting HTML to Markdown:', error);
+		console.log('Problematic content:', content.substring(0, 1000) + '...');
+		return `Failed to convert content to Markdown. Original HTML:\n\n${content}`;
 	}
-
-	return markdown.trim();
 }

@@ -1,5 +1,14 @@
 import browser from './browser-polyfill';
 
+/*
+Debug modes:
+- ContentExtractor
+- Filters
+- Map
+- Markdown
+- Template
+*/
+
 let debugMode = false;
 
 // Initialize debug mode from storage
