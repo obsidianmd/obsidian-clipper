@@ -2,10 +2,11 @@ import TurndownService from 'turndown';
 import { gfm } from 'turndown-plugin-gfm';
 import { MathMLToLaTeX } from 'mathml-to-latex';
 import { processUrls } from './string-utils';
+import { debugLog } from './debug';
 
 export function createMarkdownContent(content: string, url: string) {
-	console.log('Starting markdown conversion for URL:', url);
-	console.log('Content length:', content.length);
+	debugLog('Markdown', 'Starting markdown conversion for URL:', url);
+	debugLog('Markdown', 'Content length:', content.length);
 
 	const baseUrl = new URL(url);
 	const markdownContent = processUrls(content, baseUrl);
@@ -481,7 +482,7 @@ export function createMarkdownContent(content: string, url: string) {
 
 	try {
 		let markdown = turndownService.turndown(markdownContent);
-		console.log('Markdown conversion successful');
+		debugLog('Markdown', 'Markdown conversion successful');
 
 		// Remove the title from the beginning of the content if it exists
 		const titleMatch = markdown.match(/^# .+\n+/);
@@ -492,7 +493,7 @@ export function createMarkdownContent(content: string, url: string) {
 		return markdown.trim();
 	} catch (error) {
 		console.error('Error converting HTML to Markdown:', error);
-		console.log('Problematic content:', content.substring(0, 1000) + '...');
+		debugLog('Markdown', 'Problematic content:', content.substring(0, 1000) + '...');
 		return `Failed to convert content to Markdown. Original HTML:\n\n${content}`;
 	}
 }
