@@ -20,13 +20,11 @@ export function initializeInterpreterSettings(): void {
 	loadSettings().then(() => {
 		const apiKeyInput = document.getElementById('openai-api-key') as HTMLInputElement;
 		const anthropicApiKeyInput = document.getElementById('anthropic-api-key') as HTMLInputElement;
-		const defaultModelSelect = document.getElementById('default-model') as HTMLSelectElement;
 		const interpreterToggle = document.getElementById('interpreter-toggle') as HTMLInputElement;
 		const interpreterAutoRunToggle = document.getElementById('interpreter-auto-run-toggle') as HTMLInputElement;
 
 		if (apiKeyInput) apiKeyInput.value = generalSettings.openaiApiKey || '';
 		if (anthropicApiKeyInput) anthropicApiKeyInput.value = generalSettings.anthropicApiKey || '';
-		if (defaultModelSelect) defaultModelSelect.value = generalSettings.interpreterModel || '';
 		if (interpreterToggle) {
 			interpreterToggle.checked = generalSettings.interpreterEnabled;
 			updateToggleState(interpreterToggle.parentElement as HTMLElement, interpreterToggle);
@@ -57,14 +55,15 @@ export function initializeInterpreterSettings(): void {
 		if (defaultPromptContextInput) {
 			defaultPromptContextInput.value = generalSettings.defaultPromptContext || "You are a helpful assistant. Please analyze the following content and provide a concise summary.";
 		}
+
+		// Initialize the model list
+		initializeModelList();
 	});
 
 	const addModelBtn = document.getElementById('add-model-btn');
 	if (addModelBtn) {
 		addModelBtn.addEventListener('click', (event) => addModelToList(event));
 	}
-
-	initializeModelList();
 }
 
 function initializeModelList() {
@@ -84,38 +83,47 @@ function createModelListItem(model: ModelConfig, index: number): HTMLElement {
 	modelItem.innerHTML = `
 		<div class="model-list-item-info">
 			<div class="model-name">${model.name}</div>
-			<div class="model-provider">${model.provider}</div>
+			<div class="model-provider">${model.provider || 'Custom'}</div>
 		</div>
 		<div class="model-list-item-actions">
-			<div class="checkbox-container">
+			<div class="checkbox-container mod-small">
 				<input type="checkbox" id="model-${index}" ${model.enabled ? 'checked' : ''}>
 			</div>
-			<button class="edit-model-btn" data-index="${index}">Edit</button>
-			<button class="delete-model-btn" data-index="${index}">Delete</button>
+			${model.provider !== 'OpenAI' && model.provider !== 'Anthropic' ? `
+				<button class="edit-model-btn" data-index="${index}">Edit</button>
+				<button class="delete-model-btn" data-index="${index}">Delete</button>
+			` : ''}
 		</div>
 	`;
 
 	const checkbox = modelItem.querySelector(`#model-${index}`) as HTMLInputElement;
 	checkbox.addEventListener('change', () => {
-		generalSettings.models[index].enabled = checkbox.checked;
-		saveSettings();
+		if (generalSettings.models && generalSettings.models[index]) {
+			generalSettings.models[index].enabled = checkbox.checked;
+			saveSettings();
+		} else {
+			console.error(`Model at index ${index} not found in generalSettings.models`);
+			checkbox.checked = !checkbox.checked;
+		}
 	});
 
-	const editBtn = modelItem.querySelector('.edit-model-btn');
-	if (editBtn) {
-		editBtn.addEventListener('click', () => editModel(index));
-	}
+	if (model.provider !== 'OpenAI' && model.provider !== 'Anthropic') {
+		const editBtn = modelItem.querySelector('.edit-model-btn');
+		if (editBtn) {
+			editBtn.addEventListener('click', () => editModel(index));
+		}
 
-	const deleteBtn = modelItem.querySelector('.delete-model-btn');
-	if (deleteBtn) {
-		deleteBtn.addEventListener('click', () => deleteModel(index));
+		const deleteBtn = modelItem.querySelector('.delete-model-btn');
+		if (deleteBtn) {
+			deleteBtn.addEventListener('click', () => deleteModel(index));
+		}
 	}
 
 	return modelItem;
 }
 
 function addModelToList(event: Event) {
-	event.preventDefault(); // Prevent default form submission
+	event.preventDefault();
 	const modelList = document.getElementById('model-list');
 	if (!modelList) return;
 
@@ -123,6 +131,7 @@ function addModelToList(event: Event) {
 		id: Date.now().toString(),
 		name: '',
 		provider: '',
+		baseUrl: '',
 		enabled: true
 	};
 
@@ -146,15 +155,11 @@ function createModelForm(model: ModelConfig, index?: number): HTMLElement {
 	modelForm.className = 'setting-item';
 	modelForm.innerHTML = `
 		<form class="model-form">
-			<input type="text" name="name" placeholder="Model Name" value="${model.name}" required>
-			<input type="text" name="provider" placeholder="Provider" value="${model.provider}" required>
-			<input type="text" name="baseUrl" placeholder="Base URL (optional)" value="${model.baseUrl || ''}">
-			<input type="password" name="apiKey" placeholder="API Key (optional)" value="${model.apiKey || ''}">
-			<div class="checkbox-container">
-				<input type="checkbox" name="enabled" ${model.enabled ? 'checked' : ''}>
-				<label for="enabled">Enabled</label>
-			</div>
-			<button type="button" class="save-btn">Save</button>
+			<input type="text" name="name" placeholder="Model name" value="${model.name}" required>
+			<input type="text" name="provider" placeholder="Provider (optional)" value="${model.provider || ''}">
+			<input type="text" name="baseUrl" placeholder="Base URL" value="${model.baseUrl || ''}" required>
+			<input type="password" name="apiKey" placeholder="API key (optional)" value="${model.apiKey || ''}">
+			<button type="button" class="save-btn mod-cta">Save</button>
 			<button type="button" class="cancel-btn">Cancel</button>
 		</form>
 	`;
@@ -165,13 +170,18 @@ function createModelForm(model: ModelConfig, index?: number): HTMLElement {
 		e.preventDefault();
 		const formData = new FormData(form as HTMLFormElement);
 		const updatedModel: ModelConfig = {
-			id: model.id,
+			id: model.id || Date.now().toString(),
 			name: formData.get('name') as string,
-			provider: formData.get('provider') as string,
+			provider: formData.get('provider') as string || undefined,
 			baseUrl: formData.get('baseUrl') as string,
-			apiKey: formData.get('apiKey') as string,
-			enabled: formData.get('enabled') === 'on'
+			apiKey: formData.get('apiKey') as string || undefined,
+			enabled: true // Always set to true when saving
 		};
+
+		if (!updatedModel.name || !updatedModel.baseUrl) {
+			alert('Model Name and Base URL are required.');
+			return;
+		}
 
 		if (index !== undefined) {
 			generalSettings.models[index] = updatedModel;
@@ -192,6 +202,12 @@ function createModelForm(model: ModelConfig, index?: number): HTMLElement {
 }
 
 function deleteModel(index: number) {
+	const modelToDelete = generalSettings.models[index];
+	if (modelToDelete.provider === 'OpenAI' || modelToDelete.provider === 'Anthropic') {
+		console.warn('Attempted to delete a default model. This operation is not allowed.');
+		return;
+	}
+
 	if (confirm('Are you sure you want to delete this model?')) {
 		generalSettings.models.splice(index, 1);
 		saveSettings();
@@ -209,7 +225,6 @@ function initializeAutoSave(): void {
 function saveInterpreterSettingsFromForm(): void {
 	const apiKeyInput = document.getElementById('openai-api-key') as HTMLInputElement;
 	const anthropicApiKeyInput = document.getElementById('anthropic-api-key') as HTMLInputElement;
-	const defaultModelSelect = document.getElementById('default-model') as HTMLSelectElement;
 	const interpreterToggle = document.getElementById('interpreter-toggle') as HTMLInputElement;
 	const interpreterAutoRunToggle = document.getElementById('interpreter-auto-run-toggle') as HTMLInputElement;
 	const defaultPromptContextInput = document.getElementById('default-prompt-context') as HTMLTextAreaElement;
@@ -217,7 +232,6 @@ function saveInterpreterSettingsFromForm(): void {
 	const updatedSettings = {
 		openaiApiKey: apiKeyInput.value,
 		anthropicApiKey: anthropicApiKeyInput.value,
-		interpreterModel: defaultModelSelect.value,
 		interpreterEnabled: interpreterToggle.checked,
 		interpreterAutoRun: interpreterAutoRunToggle.checked,
 		defaultPromptContext: defaultPromptContextInput.value

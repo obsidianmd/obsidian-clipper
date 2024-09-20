@@ -1,10 +1,8 @@
-import { generalSettings } from './storage-utils';
+import { generalSettings, ModelConfig } from './storage-utils';
 import { PromptVariable, Template } from '../types/types';
 import { replaceVariables } from './content-extractor';
 import { applyFilters } from './filters';
 import { formatDuration } from './string-utils';
-import { modelList } from './model-list';
-import { ModelConfig } from './storage-utils';
 
 const RATE_LIMIT_RESET_TIME = 60000; // 1 minute in milliseconds
 let lastRequestTime = 0;
@@ -397,10 +395,12 @@ export async function initializeLLMComponents(template: Template, variables: { [
 		}
 		if (modelSelect) {
 			modelSelect.style.display = 'inline-block';
-			modelSelect.innerHTML = modelList.map(model => 
-				`<option value="${model.value}">${model.label}</option>`
-			).join('');
-			modelSelect.value = generalSettings.interpreterModel || modelList[0].value;
+			modelSelect.innerHTML = generalSettings.models
+				.filter(model => model.enabled)
+				.map(model => 
+					`<option value="${model.id}">${model.name}</option>`
+				).join('');
+			modelSelect.value = generalSettings.interpreterModel || (generalSettings.models[0]?.id ?? '');
 		}
 	}
 }
