@@ -153,3 +153,39 @@
 		}
 	}
 }
+
+#model-list {
+	margin: 0 0 16px 0;
+	.model-list-item {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-between;
+		gap: 8px;
+		border-bottom: 1px solid var(--background-modifier-border);
+		padding: 4px 0;
+	}
+	.model-list-item-actions {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: flex-end;
+		gap: 8px;
+	}
+	.model-list-item-info {
+		display: flex;
+		flex-direction: row;
+		gap: 4px;
+	}
+	.model-name {
+		font-size: var(--font-ui-small);
+	}
+	.model-provider {
+		font-size: var(--font-ui-smaller);
+		color: var(--text-muted);
+	}
+}
+
+#add-model-btn {
+	margin-bottom: 24px;
+}

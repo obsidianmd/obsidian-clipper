@@ -4,6 +4,7 @@ import { replaceVariables } from './content-extractor';
 import { applyFilters } from './filters';
 import { formatDuration } from './string-utils';
 import { modelList } from './model-list';
+import { ModelConfig } from './storage-utils';
 
 const RATE_LIMIT_RESET_TIME = 60000; // 1 minute in milliseconds
 let lastRequestTime = 0;
@@ -198,11 +199,91 @@ function parseOpenAIResponse(responseContent: string, promptVariables: PromptVar
 	};
 }
 
-export async function sendToLLM(userPrompt: string, content: string, promptVariables: PromptVariable[], model: string): Promise<{ userResponse: any; promptResponses: any[] }> {
-	if (model.startsWith('claude-')) {
-		return sendToAnthropic(userPrompt, content, promptVariables, model);
-	} else {
-		return sendToOpenAI(userPrompt, content, promptVariables, model);
+async function sendToCustomModel(userPrompt: string, content: string, promptVariables: PromptVariable[], model: ModelConfig): Promise<{ userResponse: any; promptResponses: any[] }> {
+	if (!model.apiKey) {
+		throw new Error(`API key is not set for model ${model.name}`);
+	}
+
+	try {
+		const requestBody = {
+			model: model.id,
+			messages: [
+				{ role: 'system', content: JSON.stringify({ variables: promptVariables.map(({ key, prompt }) => ({ key, prompt })) }) },
+				{ role: 'user', content: `${userPrompt}\n\nContent: ${content}` }
+			]
+		};
+
+		const response = await fetch(model.baseUrl || 'https://api.openai.com/v1/chat/completions', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${model.apiKey}`
+			},
+			body: JSON.stringify(requestBody)
+		});
+
+		if (!response.ok) {
+			const errorData = await response.json();
+			throw new Error(`API error: ${response.statusText} ${errorData.error?.message || ''}`);
+		}
+
+		const data = await response.json();
+		const llmResponseContent = data.choices[0].message.content;
+
+		return parseCustomModelResponse(llmResponseContent, promptVariables);
+	} catch (error) {
+		console.error(`Error sending to ${model.name}:`, error);
+		throw error;
+	}
+}
+
+function parseCustomModelResponse(responseContent: string, promptVariables: PromptVariable[]): { userResponse: any; promptResponses: any[] } {
+	// Implement parsing logic similar to parseOpenAIResponse or parseAnthropicResponse
+	let parsedResponse;
+	try {
+		const cleanedResponse = responseContent.replace(/^```json\n|\n```$/g, '');
+		parsedResponse = JSON.parse(cleanedResponse);
+	} catch (parseError) {
+		console.warn('Failed to parse custom model response as JSON. Using raw response.');
+		return {
+			userResponse: responseContent,
+			promptResponses: []
+		};
+	}
+
+	const userResponse = parsedResponse.user_response || '';
+	let promptResponses: any[] = [];
+
+	if (parsedResponse.variable_responses) {
+		promptResponses = promptVariables.map(variable => {
+			const response = parsedResponse.variable_responses[variable.key] || parsedResponse.variable_responses[variable.prompt];
+			return {
+				key: variable.key,
+				prompt: variable.prompt,
+				user_response: response !== undefined ? response : ''
+			};
+		});
+	}
+
+	return {
+		userResponse: promptResponses.find(r => r.key === 'prompt_1')?.user_response || userResponse,
+		promptResponses
+	};
+}
+
+export async function sendToLLM(userPrompt: string, content: string, promptVariables: PromptVariable[], modelId: string): Promise<{ userResponse: any; promptResponses: any[] }> {
+	const model = generalSettings.models.find(m => m.id === modelId);
+	if (!model) {
+		throw new Error(`Model with id ${modelId} not found`);
+	}
+
+	switch (model.provider) {
+		case 'OpenAI':
+			return sendToOpenAI(userPrompt, content, promptVariables, model.id);
+		case 'Anthropic':
+			return sendToAnthropic(userPrompt, content, promptVariables, model.id);
+		default:
+			return sendToCustomModel(userPrompt, content, promptVariables, model);
 	}
 }
 
