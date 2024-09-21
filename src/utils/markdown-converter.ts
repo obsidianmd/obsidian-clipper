@@ -17,6 +17,7 @@ export function createMarkdownContent(content: string, url: string) {
 		bulletListMarker: '-',
 		codeBlockStyle: 'fenced',
 		emDelimiter: '*',
+		preformattedCode: true,
 	});
 
 	try {
@@ -477,6 +478,82 @@ export function createMarkdownContent(content: string, url: string) {
 		},
 		replacement: function (content: string): string {
 			return content;
+		}
+	});
+
+	turndownService.addRule('preformattedCode', {
+		filter: (node) => {
+			return node.nodeName === 'PRE' && node.querySelector('code') !== null;
+		},
+		replacement: (content, node) => {
+			if (!(node instanceof HTMLElement)) return content;
+
+			const codeElement = node.querySelector('code');
+			if (!codeElement) return content;
+
+			// Function to get language from class
+			const getLanguageFromClass = (classList: DOMTokenList): string => {
+				for (const className of Array.from(classList)) {
+					if (className.startsWith('language-')) {
+						return className.slice(9); // Remove 'language-' prefix
+					}
+				}
+				return '';
+			};
+
+			// Try to get the language from the class attribute
+			let language = '';
+			
+			// Check pre element
+			language = getLanguageFromClass(node.classList);
+			
+			// Check code element if language not found
+			if (!language && codeElement) {
+				language = getLanguageFromClass(codeElement.classList);
+			}
+			
+			// Check parent elements if language still not found
+			if (!language) {
+				let parent = node.parentElement;
+				while (parent && !language) {
+					language = getLanguageFromClass(parent.classList);
+					parent = parent.parentElement;
+				}
+			}
+
+			// If no language found in class, fallback to data-language
+			if (!language) {
+				language = node.dataset.language || '';
+			}
+
+			// Function to recursively extract text content while preserving structure
+			const extractStructuredText = (element: Node): string => {
+				if (element.nodeType === Node.TEXT_NODE) {
+					return element.textContent || '';
+				} else if (element instanceof HTMLElement) {
+					let text = '';
+					element.childNodes.forEach(child => {
+						if (child instanceof HTMLElement && child.classList.contains('ec-line')) {
+							text += extractStructuredText(child) + '\n';
+						} else {
+							text += extractStructuredText(child);
+						}
+					});
+					return text;
+				}
+				return '';
+			};
+
+			// Extract all text content from the code element
+			let codeContent = extractStructuredText(codeElement);
+
+			// Remove any extra newlines at the start or end
+			codeContent = codeContent.replace(/^\n+|\n+$/g, '');
+
+			// Escape any backticks in the code
+			const escapedCode = codeContent.replace(/`/g, '\\`');
+
+			return `\n\`\`\`${language}\n${escapedCode}\n\`\`\`\n`;
 		}
 	});
 
