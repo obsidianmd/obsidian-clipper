@@ -224,11 +224,17 @@ function updateBehaviorFields(): void {
 	const noteNameFormatContainer = document.getElementById('note-name-format-container');
 	const pathContainer = document.getElementById('path-name-container');
 	const noteNameFormat = document.getElementById('note-name-format') as HTMLInputElement;
-	const pathInput = document.getElementById('template-path-name') as HTMLInputElement;
+	const behaviorWarningContainer = document.getElementById('behavior-warning-container');
 
 	if (behaviorSelect) {
 		const selectedBehavior = behaviorSelect.value;
 		const isDailyNote = selectedBehavior === 'append-daily' || selectedBehavior === 'prepend-daily';
+
+		if (selectedBehavior !== 'create') {
+			if (behaviorWarningContainer) behaviorWarningContainer.style.display = 'flex';
+		} else {
+			if (behaviorWarningContainer) behaviorWarningContainer.style.display = 'none';
+		}
 
 		if (noteNameFormatContainer) noteNameFormatContainer.style.display = isDailyNote ? 'none' : 'block';
 		if (pathContainer) pathContainer.style.display = isDailyNote ? 'none' : 'block';
@@ -247,10 +253,6 @@ function updateBehaviorFields(): void {
 				default:
 					noteNameFormat.placeholder = 'Note name format';
 			}
-		}
-
-		if (pathInput) {
-			pathInput.required = !isDailyNote;
 		}
 	}
 }
@@ -386,17 +388,6 @@ export function updateTemplateFromForm(): void {
 	const isDailyNote = template.behavior === 'append-daily' || template.behavior === 'prepend-daily';
 
 	const pathInput = document.getElementById('template-path-name') as HTMLInputElement;
-	if (pathInput) {
-		if (!isDailyNote && pathInput.value.trim() === '') {
-			console.error('Path is required for non-daily note behaviors');
-			pathInput.setCustomValidity('Path is required for non-daily note behaviors');
-			pathInput.reportValidity();
-			return;
-		} else {
-			pathInput.setCustomValidity('');
-			template.path = isDailyNote ? '' : pathInput.value;
-		}
-	}
 
 	const noteNameFormat = document.getElementById('note-name-format') as HTMLInputElement;
 	if (noteNameFormat) {

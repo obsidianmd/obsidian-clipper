@@ -1,6 +1,24 @@
 .logo {
 	fill: var(--color-accent-1);
 }
+.warning-container {
+	background-color: rgba(var(--color-orange-rgb), 0.1);
+	padding: 12px;
+	border-radius: var(--radius-m);
+	margin: 8px 0 0;
+	font-size: var(--font-ui-smaller);
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 8px;
+	.warning-icon {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: rgb(var(--color-orange-rgb));
+	}
+}
+
 #settings {
 	margin: 0 auto;
 	padding: 0;

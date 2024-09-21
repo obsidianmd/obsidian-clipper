@@ -19,6 +19,7 @@
 	--input-height: 1.875rem;
 
 	--radius-s: 4px;
+	--radius-m: 8px;
 
 	--text-normal: var(--color-base-100);
 	--text-muted: var(--color-base-70);
@@ -87,6 +88,8 @@
 		--color-base-70: #5c5c5c;
 		--color-base-100: #222222;
 
+		--color-orange-rgb: 236, 117, 0;
+
 		--mono-rgb-0: 255, 255, 255;
 		--mono-rgb-100: 0, 0, 0;
 
@@ -154,6 +157,8 @@
 		--color-base-60: #999999;
 		--color-base-70: #b3b3b3;
 		--color-base-100: #dadada;
+		
+		--color-orange-rgb: 233, 151, 63;
 
 		--interactive-accent: var(--color-accent);
 		--interactive-accent-hover: var(--color-accent-1);
