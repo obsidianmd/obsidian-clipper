@@ -1,15 +1,9 @@
 import { Template, Property } from '../types/types';
 import { templates, saveTemplateSettings, editingTemplateIndex } from '../managers/template-manager';
 import { showTemplateEditor, updateTemplateList } from '../managers/template-ui';
+import { sanitizeFileName } from './string-utils';
 
 const SCHEMA_VERSION = '0.1.0';
-
-function toKebabCase(str: string): string {
-	return str
-		.replace(/([a-z])([A-Z])/g, '$1-$2')
-		.replace(/[\s_]+/g, '-')
-		.toLowerCase();
-}
 
 export function exportTemplate(): void {
 	if (editingTemplateIndex === -1) {
@@ -18,7 +12,8 @@ export function exportTemplate(): void {
 	}
 
 	const template = templates[editingTemplateIndex] as Template;
-	const templateFile = `${toKebabCase(template.name)}-clipper.json`;
+	const sanitizedName = sanitizeFileName(template.name);
+	const templateFile = `${sanitizedName.replace(/\s+/g, '-').toLowerCase()}-clipper.json`;
 
 	const orderedTemplate: Partial<Template> & { schemaVersion: string } = {
 		schemaVersion: SCHEMA_VERSION,
