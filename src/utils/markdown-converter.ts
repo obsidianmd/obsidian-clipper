@@ -557,6 +557,45 @@ export function createMarkdownContent(content: string, url: string) {
 		}
 	});
 
+	turndownService.addRule('MathJax', {
+		filter: (node) => {
+			const isMjxContainer = node.nodeName.toLowerCase() === 'mjx-container';
+			return isMjxContainer;
+		},
+		replacement: (content, node) => {
+			if (!(node instanceof HTMLElement)) {
+				return content;
+			}
+
+			const assistiveMml = node.querySelector('mjx-assistive-mml');
+			if (!assistiveMml) {
+				return content;
+			}
+
+			const mathElement = assistiveMml.querySelector('math');
+			if (!mathElement) {
+				return content;
+			}
+
+			let latex;
+			try {
+				latex = MathMLToLaTeX.convert(mathElement.outerHTML);
+			} catch (error) {
+				console.error('Error converting MathML to LaTeX:', error);
+				return content;
+			}
+
+			// Check if it's an inline or block math element
+			const isBlock = node.getAttribute('display') === 'block';
+
+			if (isBlock) {
+				return `\n$$\n${latex}\n$$\n`;
+			} else {
+				return `$${latex}$`;
+			}
+		}
+	});
+
 	try {
 		let markdown = turndownService.turndown(markdownContent);
 		debugLog('Markdown', 'Markdown conversion successful');
