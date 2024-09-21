@@ -175,6 +175,7 @@ Filters allow you to modify variables in a template. Filters are applied to vari
 - `pascal` converts text to `PascalCase`.
 - `remove_html` removes specified HTML elements and their content from a string.
 	- Supports tag name, class, or id, e.g. `{{content|remove_html:("img,.class-name,#element-id")}}`
+	- To remove only HTML tags or attributes without removing the content use the `strip_tags` or `strip_attr` filters.
 - `replace` replaces occurrences of specified strings:
 	- Simple replacement: `"hello!"|replace:",":""` removes all commas.
 	- Multiple replacements: `"hello world"|replace:("e":"a","o":"0")` returns `"hall0 w0rld"`.
