@@ -181,14 +181,21 @@
 		flex-direction: row;
 		align-items: center;
 		justify-content: flex-end;
+		gap: 2px;
+		.clickable-icon {
+			height: 24px;
+			width: 24px;
+		}
 	}
 	.model-list-item-info {
 		display: flex;
 		flex-direction: row;
 		gap: 4px;
+		min-width: 60%;
 	}
 	.model-name {
 		font-size: var(--font-ui-small);
+		min-width: 50%;
 	}
 	.model-provider {
 		font-size: var(--font-ui-smaller);

@@ -55,7 +55,6 @@ export function initializeInterpreterSettings(): void {
 			defaultPromptContextInput.value = generalSettings.defaultPromptContext || "You are a helpful assistant. Please analyze the following content and provide a concise summary.";
 		}
 
-		// Initialize the model list
 		initializeModelList();
 	});
 
@@ -122,7 +121,6 @@ function createModelListItem(model: ModelConfig, index: number): HTMLElement {
 		}
 	}
 
-	// Initialize Lucide icons
 	initializeIcons(modelItem);
 
 	return modelItem;
@@ -181,7 +179,7 @@ function createModelForm(model: ModelConfig, index?: number): HTMLElement {
 			provider: formData.get('provider') as string || undefined,
 			baseUrl: formData.get('baseUrl') as string,
 			apiKey: formData.get('apiKey') as string || undefined,
-			enabled: true // Always set to true when saving
+			enabled: model.enabled
 		};
 
 		if (!updatedModel.name || !updatedModel.baseUrl) {
@@ -201,7 +199,13 @@ function createModelForm(model: ModelConfig, index?: number): HTMLElement {
 
 	const cancelBtn = modelForm.querySelector('.cancel-btn');
 	cancelBtn?.addEventListener('click', () => {
-		initializeModelList();
+		const modelList = document.getElementById('model-list');
+		if (modelList && index !== undefined) {
+			const existingItem = createModelListItem(generalSettings.models[index], index);
+			modelList.replaceChild(existingItem, modelForm);
+		} else if (modelList) {
+			modelList.removeChild(modelForm);
+		}
 	});
 
 	return modelForm;
