@@ -12,7 +12,7 @@ export const replace = (str: string, param?: string): string => {
 	return replacements.reduce((acc, replacement) => {
 		let [search, replace] = replacement.split(/(?<!\\):/).map(p => {
 			// Remove surrounding quotes and unescape characters
-			return p.trim().replace(/^["']|["']$/g, '').replace(/\\(.)/g, '$1');
+			return p.trim().replace(/^["']|["']$/g, '');
 		});
 
 		// Use an empty string if replace is undefined or an empty string
@@ -23,8 +23,11 @@ export const replace = (str: string, param?: string): string => {
 			return acc.split(search).join(replace);
 		}
 
-		// Escape special regex characters in search string
-		const searchRegex = new RegExp(search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
+		// Handle escaped sequences
+		search = search.replace(/\\(.)/g, '$1');
+
+		// Escape special regex characters in search string, except for already escaped ones
+		const searchRegex = new RegExp(search.replace(/([.*+?^${}()[\]\\])/g, '\\$1'), 'g');
 
 		// Use a custom replace function to handle global replacement
 		return acc.replace(searchRegex, replace);
