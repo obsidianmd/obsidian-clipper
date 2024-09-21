@@ -7,106 +7,11 @@ import { formatDuration } from './string-utils';
 const RATE_LIMIT_RESET_TIME = 60000; // 1 minute in milliseconds
 let lastRequestTime = 0;
 
-async function sendToAnthropic(userPrompt: string, content: string, promptVariables: PromptVariable[], model: string): Promise<{ userResponse: any; promptResponses: any[] }> {
-	const apiKey = generalSettings.anthropicApiKey;
-
+export async function sendToLLM(userPrompt: string, content: string, promptVariables: PromptVariable[], model: ModelConfig, apiKey: string): Promise<{ userResponse: any; promptResponses: any[] }> {
 	if (!apiKey) {
-		throw new Error('Anthropic API key is not set');
+		throw new Error(`API key is not set for model ${model.name}`);
 	}
 
-	try {
-		const systemContent = {
-			variables: promptVariables.map(({ key, prompt }) => ({ key, prompt })),
-			instructions: "Please respond to the user prompt and each variable prompt. Format your response as a JSON object with 'user_response' for the main prompt and 'variable_responses' for the variable prompts."
-		};
-
-		const requestBody = {
-			model: model,
-			max_tokens: 1000,
-			messages: [
-				{ role: 'user', content: `${userPrompt}\n\nContent: ${content}` }
-			],
-			system: JSON.stringify(systemContent)
-		};
-
-		console.log('Sending request to Anthropic API:', requestBody);
-
-		const response = await fetch('https://api.anthropic.com/v1/messages', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'x-api-key': apiKey,
-				'anthropic-version': '2023-06-01',
-				'anthropic-dangerous-direct-browser-access': 'true'
-			},
-			body: JSON.stringify(requestBody)
-		});
-
-		if (!response.ok) {
-			const errorData = await response.json();
-			console.error('Anthropic API error response:', errorData);
-			throw new Error(`Anthropic API error: ${response.statusText} ${errorData.error?.message || ''}`);
-		}
-
-		const data = await response.json();
-		console.log('Anthropic API response:', data);
-
-		const llmResponseContent = data.content[0].text;
-		console.log('Raw LLM response:', llmResponseContent);
-
-		return parseAnthropicResponse(llmResponseContent, promptVariables);
-	} catch (error) {
-		console.error('Error sending to Anthropic LLM:', error);
-		throw error;
-	}
-}
-
-function parseAnthropicResponse(responseContent: string, promptVariables: PromptVariable[]): { userResponse: any; promptResponses: any[] } {
-	let parsedResponse;
-	try {
-		// First, try to parse the entire response as JSON
-		parsedResponse = JSON.parse(responseContent);
-	} catch (parseError) {
-		console.warn('Failed to parse entire LLM response as JSON. Attempting to extract JSON from the response.');
-		// If that fails, try to extract JSON from the response
-		const jsonMatch = responseContent.match(/\{[\s\S]*\}/);
-		if (jsonMatch) {
-			try {
-				parsedResponse = JSON.parse(jsonMatch[0]);
-			} catch (extractError) {
-				console.warn('Failed to extract JSON from LLM response. Using raw response.');
-				parsedResponse = { user_response: responseContent };
-			}
-		} else {
-			console.warn('No JSON found in LLM response. Using raw response.');
-			parsedResponse = { user_response: responseContent };
-		}
-	}
-
-	const userResponse = parsedResponse.user_response || '';
-	let promptResponses: any[] = [];
-
-	if (parsedResponse.variable_responses) {
-		promptResponses = promptVariables.map(variable => ({
-			key: variable.key,
-			prompt: variable.prompt,
-			user_response: parsedResponse.variable_responses[variable.key] || parsedResponse.variable_responses[variable.prompt] || ''
-		}));
-	}
-
-	return {
-		userResponse: promptResponses.find(r => r.key === 'prompt_1')?.user_response || userResponse,
-		promptResponses
-	};
-}
-
-async function sendToOpenAI(userPrompt: string, content: string, promptVariables: PromptVariable[], model: string): Promise<{ userResponse: any; promptResponses: any[] }> {
-	const apiKey = generalSettings.openaiApiKey;
-	if (!apiKey) {
-		throw new Error('OpenAI API key is not set');
-	}
-
-	// Simple cooldown
 	const now = Date.now();
 	if (now - lastRequestTime < RATE_LIMIT_RESET_TIME) {
 		throw new Error(`Rate limit cooldown. Please wait ${Math.ceil((RATE_LIMIT_RESET_TIME - (now - lastRequestTime)) / 1000)} seconds before trying again.`);
@@ -118,52 +23,73 @@ async function sendToOpenAI(userPrompt: string, content: string, promptVariables
 			instructions: "Please respond to the user prompt and each variable prompt. Format your response as a JSON object with 'user_response' for the main prompt and 'variable_responses' for the variable prompts."
 		};
 
-		const requestBody = {
-			model: model,
+		let requestBody: any = {
+			model: model.id,
 			messages: [
 				{ role: 'system', content: JSON.stringify(systemContent) },
 				{ role: 'user', content: `${userPrompt}\n\nContent: ${content}` }
 			]
 		};
 
-		console.log('Sending request to OpenAI API:', requestBody);
+		// Adjust request body for Anthropic models
+		if (model.provider === 'Anthropic') {
+			requestBody = {
+				model: model.id,
+				max_tokens: 1000,
+				messages: [
+					{ role: 'user', content: `${userPrompt}\n\nContent: ${content}` }
+				],
+				system: JSON.stringify(systemContent)
+			};
+		}
 
-		const response = await fetch('https://api.openai.com/v1/chat/completions', {
+		console.log(`Sending request to ${model.provider || 'Custom'} API:`, requestBody);
+
+		const response = await fetch(model.baseUrl, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${apiKey}`
+				'Authorization': `Bearer ${apiKey}`,
+				...(model.provider === 'Anthropic' ? {
+					'anthropic-version': '2023-06-01',
+					'anthropic-dangerous-direct-browser-access': 'true'
+				} : {})
 			},
 			body: JSON.stringify(requestBody)
 		});
 
 		if (!response.ok) {
 			if (response.status === 429) {
-				lastRequestTime = now; // Set the last request time on rate limit error
-				throw new Error('OpenAI API rate limit exceeded. Please try again in about a minute.');
+				lastRequestTime = now;
+				throw new Error(`${model.provider || 'API'} rate limit exceeded. Please try again in about a minute.`);
 			} else {
 				const errorData = await response.json();
-				console.error('OpenAI API error response:', errorData);
-				throw new Error(`OpenAI API error: ${response.statusText} ${errorData.error?.message || ''}`);
+				console.error(`${model.provider || 'API'} error response:`, errorData);
+				throw new Error(`${model.provider || 'API'} error: ${response.statusText} ${errorData.error?.message || ''}`);
 			}
 		}
 
 		const data = await response.json();
-		console.log('OpenAI API response:', data);
+		console.log(`${model.provider || 'API'} response:`, data);
 
-		lastRequestTime = now; // Set the last request time on successful request
+		lastRequestTime = now;
 
-		const llmResponseContent = data.choices[0].message.content;
+		let llmResponseContent: string;
+		if (model.provider === 'Anthropic') {
+			llmResponseContent = data.content[0].text;
+		} else {
+			llmResponseContent = data.choices[0].message.content;
+		}
 		console.log('Raw LLM response:', llmResponseContent);
 
-		return parseOpenAIResponse(llmResponseContent, promptVariables);
+		return parseLLMResponse(llmResponseContent, promptVariables);
 	} catch (error) {
-		console.error('Error sending to OpenAI LLM:', error);
+		console.error(`Error sending to ${model.provider || 'Custom'} LLM:`, error);
 		throw error;
 	}
 }
 
-function parseOpenAIResponse(responseContent: string, promptVariables: PromptVariable[]): { userResponse: any; promptResponses: any[] } {
+function parseLLMResponse(responseContent: string, promptVariables: PromptVariable[]): { userResponse: any; promptResponses: any[] } {
 	let parsedResponse;
 	try {
 		// Remove code block markers if they exist
@@ -197,106 +123,18 @@ function parseOpenAIResponse(responseContent: string, promptVariables: PromptVar
 	};
 }
 
-async function sendToCustomModel(userPrompt: string, content: string, promptVariables: PromptVariable[], model: ModelConfig): Promise<{ userResponse: any; promptResponses: any[] }> {
-	if (!model.apiKey) {
-		throw new Error(`API key is not set for model ${model.name}`);
-	}
-
-	try {
-		const requestBody = {
-			model: model.id,
-			messages: [
-				{ role: 'system', content: JSON.stringify({ variables: promptVariables.map(({ key, prompt }) => ({ key, prompt })) }) },
-				{ role: 'user', content: `${userPrompt}\n\nContent: ${content}` }
-			]
-		};
-
-		const response = await fetch(model.baseUrl || 'https://api.openai.com/v1/chat/completions', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${model.apiKey}`
-			},
-			body: JSON.stringify(requestBody)
-		});
-
-		if (!response.ok) {
-			const errorData = await response.json();
-			throw new Error(`API error: ${response.statusText} ${errorData.error?.message || ''}`);
-		}
-
-		const data = await response.json();
-		const llmResponseContent = data.choices[0].message.content;
-
-		return parseCustomModelResponse(llmResponseContent, promptVariables);
-	} catch (error) {
-		console.error(`Error sending to ${model.name}:`, error);
-		throw error;
-	}
-}
-
-function parseCustomModelResponse(responseContent: string, promptVariables: PromptVariable[]): { userResponse: any; promptResponses: any[] } {
-	// Implement parsing logic similar to parseOpenAIResponse or parseAnthropicResponse
-	let parsedResponse;
-	try {
-		const cleanedResponse = responseContent.replace(/^```json\n|\n```$/g, '');
-		parsedResponse = JSON.parse(cleanedResponse);
-	} catch (parseError) {
-		console.warn('Failed to parse custom model response as JSON. Using raw response.');
-		return {
-			userResponse: responseContent,
-			promptResponses: []
-		};
-	}
-
-	const userResponse = parsedResponse.user_response || '';
-	let promptResponses: any[] = [];
-
-	if (parsedResponse.variable_responses) {
-		promptResponses = promptVariables.map(variable => {
-			const response = parsedResponse.variable_responses[variable.key] || parsedResponse.variable_responses[variable.prompt];
-			return {
-				key: variable.key,
-				prompt: variable.prompt,
-				user_response: response !== undefined ? response : ''
-			};
-		});
-	}
-
-	return {
-		userResponse: promptResponses.find(r => r.key === 'prompt_1')?.user_response || userResponse,
-		promptResponses
-	};
-}
-
-export async function sendToLLM(userPrompt: string, content: string, promptVariables: PromptVariable[], modelId: string): Promise<{ userResponse: any; promptResponses: any[] }> {
-	const model = generalSettings.models.find(m => m.id === modelId);
-	if (!model) {
-		throw new Error(`Model with id ${modelId} not found`);
-	}
-
-	switch (model.provider) {
-		case 'OpenAI':
-			return sendToOpenAI(userPrompt, content, promptVariables, model.id);
-		case 'Anthropic':
-			return sendToAnthropic(userPrompt, content, promptVariables, model.id);
-		default:
-			return sendToCustomModel(userPrompt, content, promptVariables, model);
-	}
-}
-
 export async function processLLM(
 	promptToUse: string,
 	contentToProcess: string,
 	promptVariables: PromptVariable[],
 	updateUI: (response: string) => void,
 	updateFields: (variables: PromptVariable[], responses: any[]) => void,
-	model: string,
+	model: ModelConfig,
 	template: Template
 ): Promise<void> {
 	try {
-		if (!generalSettings.openaiApiKey && !generalSettings.anthropicApiKey) {
-			throw new Error('No API key is set. Please set an API key in the extension settings.');
+		if (!model.apiKey) {
+			throw new Error(`No API key is set for model ${model.name}. Please set an API key in the extension settings.`);
 		}
 
 		if (promptVariables.length === 0) {
@@ -306,7 +144,7 @@ export async function processLLM(
 		// Use the template context if available, otherwise fall back to the default prompt context
 		const contextToUse = template.context || generalSettings.defaultPromptContext || "You are a helpful assistant. Please analyze the following content and provide a concise summary.";
 
-		const { userResponse, promptResponses } = await sendToLLM(contextToUse, contentToProcess, promptVariables, model);
+		const { userResponse, promptResponses } = await sendToLLM(contextToUse, contentToProcess, promptVariables, model, model.apiKey);
 		console.log('LLM Response:', { userResponse, promptResponses });
 
 		// Convert userResponse to string if it's an array or object
@@ -391,7 +229,14 @@ export async function initializeLLMComponents(template: Template, variables: { [
 
 	if (template) {
 		if (interpretBtn) {
-			interpretBtn.addEventListener('click', () => handleLLMProcessing(template, variables, tabId, currentUrl, modelSelect.value));
+			interpretBtn.addEventListener('click', async () => {
+				const selectedModelId = modelSelect.value;
+				const modelConfig = generalSettings.models.find(m => m.id === selectedModelId);
+				if (!modelConfig) {
+					throw new Error(`Model configuration not found for ${selectedModelId}`);
+				}
+				await handleLLMProcessing(template, variables, tabId, currentUrl, modelConfig);
+			});
 		}
 		if (modelSelect) {
 			modelSelect.style.display = 'inline-block';
@@ -405,14 +250,19 @@ export async function initializeLLMComponents(template: Template, variables: { [
 	}
 }
 
-export async function handleLLMProcessing(template: Template, variables: { [key: string]: string }, tabId: number, currentUrl: string, selectedModel: string) {
+export async function handleLLMProcessing(
+	template: Template,
+	variables: { [key: string]: string },
+	tabId: number,
+	currentUrl: string,
+	modelConfig: ModelConfig
+): Promise<void> {
 	const interpreterContainer = document.getElementById('interpreter');
 	const interpretBtn = document.getElementById('interpret-btn') as HTMLButtonElement;
 	const interpreterErrorMessage = document.getElementById('interpreter-error') as HTMLDivElement;
 	const llmTimer = document.getElementById('llm-timer') as HTMLSpanElement;
-	const modelSelect = document.getElementById('model-select') as HTMLSelectElement;
 	const clipButton = document.getElementById('clip-button') as HTMLButtonElement;
-	
+
 	try {
 		// Hide any previous error message
 		interpreterErrorMessage.style.display = 'none';
@@ -421,74 +271,80 @@ export async function handleLLMProcessing(template: Template, variables: { [key:
 		// Remove any previous done or error classes
 		interpreterContainer?.classList.remove('done', 'error');
 
-		const contentToProcess = variables.content || '';
-		const promptContextTextarea = document.getElementById('prompt-context') as HTMLTextAreaElement;
-		
-		if (tabId && currentUrl && promptContextTextarea) {
-			let promptToUse = promptContextTextarea.value;
-
-			const promptVariables = collectPromptVariables(template);
-
-			console.log('Unique prompts to be sent to LLM:', { 
-				userPrompt: promptToUse, 
-				promptVariables: promptVariables.map(({ key, prompt }) => ({ key, prompt })),
-				model: selectedModel
-			});
-
-			// Start the timer
-			const startTime = performance.now();
-			let timerInterval: number;
-
-			// Change button text and add class
-			interpretBtn.textContent = 'thinking';
-			interpretBtn.classList.add('processing');
-
-			// Disable the clip button
-			clipButton.disabled = true;
-
-			// Show and update the timer
-			llmTimer.style.display = 'inline';
-			llmTimer.textContent = '0ms';
-
-			// Update the timer text with elapsed time
-			timerInterval = window.setInterval(() => {
-				const elapsedTime = performance.now() - startTime;
-				llmTimer.textContent = formatDuration(elapsedTime);
-			}, 10);
-
-			await processLLM(
-				promptToUse,
-				contentToProcess,
-				promptVariables,
-				updateLLMResponse,
-				updateFieldsWithLLMResponses,
-				selectedModel,
-				template
-			);
-
-			// Stop the timer and log the final time
-			clearInterval(timerInterval);
-			const endTime = performance.now();
-			const totalTime = endTime - startTime;
-			console.log(`LLM processing completed in ${formatDuration(totalTime)}`);
-
-			// Update the final time in the timer element
-			llmTimer.textContent = formatDuration(totalTime);
-
-			// Revert button text and remove class
-			interpretBtn.textContent = 'done';
-			interpretBtn.classList.remove('processing');
-			interpretBtn.classList.add('done');
-			interpretBtn.disabled = true;
-
-			// Add done class to interpreter container
-			interpreterContainer?.classList.add('done');
-
-			// Re-enable the clip button
-			clipButton.disabled = false;
+		let apiKey: string | undefined;
+		if (modelConfig.provider === 'OpenAI') {
+			apiKey = generalSettings.openaiApiKey;
+		} else if (modelConfig.provider === 'Anthropic') {
+			apiKey = generalSettings.anthropicApiKey;
 		} else {
-			throw new Error('Missing tab ID, URL, or prompt');
+			apiKey = modelConfig.apiKey;
 		}
+
+		if (!apiKey) {
+			throw new Error(`No API key is set for ${modelConfig.provider || 'the selected model'}. Please set an API key in the extension settings.`);
+		}
+
+		const promptVariables = collectPromptVariables(template);
+
+		if (promptVariables.length === 0) {
+			throw new Error('No prompt variables found. Please add at least one prompt variable to your template.');
+		}
+
+		const contextToUse = template.context || generalSettings.defaultPromptContext || "You are a helpful assistant. Please analyze the following content and provide a concise summary.";
+
+		const contentToProcess = variables.content || '';
+
+		// Start the timer
+		const startTime = performance.now();
+		let timerInterval: number;
+
+		// Change button text and add class
+		interpretBtn.textContent = 'thinking';
+		interpretBtn.classList.add('processing');
+
+		// Disable the clip button
+		clipButton.disabled = true;
+
+		// Show and update the timer
+		llmTimer.style.display = 'inline';
+		llmTimer.textContent = '0ms';
+
+		// Update the timer text with elapsed time
+		timerInterval = window.setInterval(() => {
+			const elapsedTime = performance.now() - startTime;
+			llmTimer.textContent = formatDuration(elapsedTime);
+		}, 10);
+
+		const { userResponse, promptResponses } = await sendToLLM(contextToUse, contentToProcess, promptVariables, modelConfig, apiKey);
+		console.log('LLM Response:', { userResponse, promptResponses });
+
+		// Stop the timer and log the final time
+		clearInterval(timerInterval);
+		const endTime = performance.now();
+		const totalTime = endTime - startTime;
+		console.log(`LLM processing completed in ${formatDuration(totalTime)}`);
+
+		// Update the final time in the timer element
+		llmTimer.textContent = formatDuration(totalTime);
+
+		// Revert button text and remove class
+		interpretBtn.textContent = 'done';
+		interpretBtn.classList.remove('processing');
+		interpretBtn.classList.add('done');
+		interpretBtn.disabled = true;
+
+		// Add done class to interpreter container
+		interpreterContainer?.classList.add('done');
+
+		// Update UI with response
+		updateLLMResponse(userResponse);
+		
+		// Update fields with all prompt responses
+		updateFieldsWithLLMResponses(promptVariables, promptResponses);
+
+		// Re-enable the clip button
+		clipButton.disabled = false;
+
 	} catch (error) {
 		console.error('Error processing LLM:', error);
 		
@@ -510,6 +366,12 @@ export async function handleLLMProcessing(template: Template, variables: { [key:
 
 		// Re-enable the clip button
 		clipButton.disabled = false;
+
+		if (error instanceof Error) {
+			throw new Error(`${error.message}`);
+		} else {
+			throw new Error('An unknown error occurred while processing the LLM request.');
+		}
 	}
 }
 

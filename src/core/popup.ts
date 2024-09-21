@@ -14,6 +14,7 @@ import { detectBrowser, addBrowserClassToHtml } from '../utils/browser-detection
 import { createElementWithClass, createElementWithHTML } from '../utils/dom-utils';
 import { initializeLLMComponents, handleLLMProcessing, collectPromptVariables } from '../utils/llm-utils';
 import { sendToLLM, updateFieldsWithLLMResponses } from '../utils/llm-utils';
+import { ModelConfig } from '../utils/storage-utils';
 
 let currentTemplate: Template | null = null;
 let templates: Template[] = [];
@@ -109,15 +110,22 @@ async function handleClip() {
 	try {
 		const promptVariables = collectPromptVariables(currentTemplate);
 
-		if (promptVariables.length > 0 || currentTemplate.prompt) {
-			const { userResponse, promptResponses } = await sendToLLM(currentTemplate.prompt || '', noteContent, promptVariables);
-
-			// Update the note content field with the user prompt response
-			if (currentTemplate.prompt) {
-				noteContentField.value = `${userResponse}\n\n${noteContentField.value}`;
+		if (promptVariables.length > 0 || currentTemplate.context) {
+			const modelSelect = document.getElementById('model-select') as HTMLSelectElement;
+			const selectedModelId = modelSelect?.value || generalSettings.interpreterModel || 'gpt-4o-mini';
+			const modelConfig = generalSettings.models.find(m => m.id === selectedModelId);
+			if (!modelConfig) {
+				throw new Error(`Model configuration not found for ${selectedModelId}`);
 			}
 
-			updateFieldsWithLLMResponses(promptVariables, promptResponses);
+			// Get the current tab information
+			const tabs = await browser.tabs.query({active: true, currentWindow: true});
+			const currentTab = tabs[0];
+			if (!currentTab || !currentTab.id) {
+				throw new Error('Unable to get current tab information');
+			}
+
+			await handleLLMProcessing(currentTemplate, currentVariables, currentTab.id, currentTab.url || '', modelConfig);
 		}
 
 		// Regenerate file content with updated fields
@@ -543,8 +551,12 @@ document.addEventListener('DOMContentLoaded', async function() {
 					if (generalSettings.interpreterAutoRun && promptVariables.length > 0) {
 						try {
 							const modelSelect = document.getElementById('model-select') as HTMLSelectElement;
-							const selectedModel = modelSelect?.value || generalSettings.interpreterModel || 'gpt-4o-mini';
-							await handleLLMProcessing(template, variables, tabId, currentUrl, selectedModel);
+							const selectedModelId = modelSelect?.value || generalSettings.interpreterModel || 'gpt-4o-mini';
+							const modelConfig = generalSettings.models.find(m => m.id === selectedModelId);
+							if (!modelConfig) {
+								throw new Error(`Model configuration not found for ${selectedModelId}`);
+							}
+							await handleLLMProcessing(template, variables, tabId, currentUrl, modelConfig);
 						} catch (error) {
 							console.error('Error auto-processing with LLM:', error);
 							// Optionally, you can show an error message to the user here
@@ -698,17 +710,34 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 async function processLLM(promptToUse: string, contentToProcess: string): Promise<void> {
 	try {
-		if (!loadedSettings.openaiApiKey) {
-			console.warn('OpenAI API key is not set. Skipping LLM processing.');
-			showError('OpenAI API key is not set. Please set it in the extension settings.');
+		if (!loadedSettings.openaiApiKey && !loadedSettings.anthropicApiKey) {
+			console.warn('No API key is set. Skipping LLM processing.');
+			showError('No API key is set. Please set an API key in the extension settings.');
 			return;
 		}
 
 		const promptVariables = collectPromptVariables(currentTemplate);
 		const modelSelect = document.getElementById('model-select') as HTMLSelectElement;
-		const selectedModel = modelSelect?.value || generalSettings.interpreterModel || 'gpt-4o-mini';
+		const selectedModelId = modelSelect?.value || generalSettings.interpreterModel || 'gpt-4o-mini';
+		const modelConfig = generalSettings.models.find(m => m.id === selectedModelId);
+		if (!modelConfig) {
+			throw new Error(`Model configuration not found for ${selectedModelId}`);
+		}
 
-		const { userResponse, promptResponses } = await sendToLLM(promptToUse, contentToProcess, promptVariables, selectedModel);
+		let apiKey: string;
+		if (modelConfig.provider === 'OpenAI') {
+			apiKey = loadedSettings.openaiApiKey || '';
+		} else if (modelConfig.provider === 'Anthropic') {
+			apiKey = loadedSettings.anthropicApiKey || '';
+		} else {
+			apiKey = modelConfig.apiKey || '';
+		}
+
+		if (!apiKey) {
+			throw new Error(`No API key found for ${modelConfig.provider || 'the selected model'}`);
+		}
+
+		const { userResponse, promptResponses } = await sendToLLM(promptToUse, contentToProcess, promptVariables, modelConfig, apiKey);
 		console.log('LLM Response:', { userResponse, promptResponses });
 
 		const llmResponseDiv = document.getElementById('llm-response');
