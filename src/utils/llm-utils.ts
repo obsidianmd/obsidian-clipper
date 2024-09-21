@@ -23,23 +23,37 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 			instructions: "Please respond to the user prompt and each variable prompt. Format your response as a JSON object with 'user_response' for the main prompt and 'variable_responses' for the variable prompts."
 		};
 
-		let requestBody: any = {
-			model: model.id,
-			messages: [
-				{ role: 'system', content: JSON.stringify(systemContent) },
-				{ role: 'user', content: `${userPrompt}\n\nContent: ${content}` }
-			]
+		let requestBody: any;
+		let headers: HeadersInit = {
+			'Content-Type': 'application/json',
 		};
 
-		// Adjust request body for Anthropic models
 		if (model.provider === 'Anthropic') {
 			requestBody = {
 				model: model.id,
-				max_tokens: 1000,
+				max_tokens: 600,
 				messages: [
 					{ role: 'user', content: `${userPrompt}\n\nContent: ${content}` }
 				],
 				system: JSON.stringify(systemContent)
+			};
+			headers = {
+				...headers,
+				'x-api-key': apiKey,
+				'anthropic-version': '2023-06-01',
+				'anthropic-dangerous-direct-browser-access': 'true'
+			};
+		} else {
+			requestBody = {
+				model: model.id,
+				messages: [
+					{ role: 'system', content: JSON.stringify(systemContent) },
+					{ role: 'user', content: `${userPrompt}\n\nContent: ${content}` }
+				]
+			};
+			headers = {
+				...headers,
+				'Authorization': `Bearer ${apiKey}`
 			};
 		}
 
@@ -47,14 +61,7 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 
 		const response = await fetch(model.baseUrl, {
 			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${apiKey}`,
-				...(model.provider === 'Anthropic' ? {
-					'anthropic-version': '2023-06-01',
-					'anthropic-dangerous-direct-browser-access': 'true'
-				} : {})
-			},
+			headers: headers,
 			body: JSON.stringify(requestBody)
 		});
 
@@ -76,13 +83,15 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 
 		let llmResponseContent: string;
 		if (model.provider === 'Anthropic') {
-			llmResponseContent = data.content[0].text;
+			llmResponseContent = JSON.stringify(data);
 		} else {
 			llmResponseContent = data.choices[0].message.content;
 		}
 		console.log('Raw LLM response:', llmResponseContent);
 
-		return parseLLMResponse(llmResponseContent, promptVariables);
+		return model.provider === 'Anthropic' 
+			? parseAnthropicResponse(llmResponseContent, promptVariables)
+			: parseLLMResponse(llmResponseContent, promptVariables);
 	} catch (error) {
 		console.error(`Error sending to ${model.provider || 'Custom'} LLM:`, error);
 		throw error;
@@ -119,6 +128,47 @@ function parseLLMResponse(responseContent: string, promptVariables: PromptVariab
 
 	return {
 		userResponse: promptResponses.find(r => r.key === 'prompt_1')?.user_response || userResponse,
+		promptResponses
+	};
+}
+
+function parseAnthropicResponse(responseContent: string, promptVariables: PromptVariable[]): { userResponse: any; promptResponses: any[] } {
+	let parsedResponse;
+	try {
+		// Parse the entire Anthropic response
+		const anthropicResponse = JSON.parse(responseContent);
+		
+		// Extract the text content from the response
+		const textContent = anthropicResponse.content[0].text;
+		
+		// Find the JSON object within the text content
+		const jsonMatch = textContent.match(/\{[\s\S]*\}/);
+		if (jsonMatch) {
+			parsedResponse = JSON.parse(jsonMatch[0]);
+		} else {
+			throw new Error('No JSON found in Anthropic response');
+		}
+	} catch (parseError) {
+		console.warn('Failed to parse Anthropic response:', parseError);
+		return {
+			userResponse: responseContent,
+			promptResponses: []
+		};
+	}
+
+	const userResponse = parsedResponse.user_response || '';
+	let promptResponses: any[] = [];
+
+	if (parsedResponse.variable_responses) {
+		promptResponses = promptVariables.map(variable => ({
+			key: variable.key,
+			prompt: variable.prompt,
+			user_response: parsedResponse.variable_responses[variable.key] || ''
+		}));
+	}
+
+	return {
+		userResponse,
 		promptResponses
 	};
 }
@@ -225,6 +275,10 @@ export async function initializeLLMComponents(template: Template, variables: { [
 		let promptToDisplay = template.context || generalSettings.defaultPromptContext;
 		promptToDisplay = await replaceVariables(tabId, promptToDisplay, variables, currentUrl);
 		promptContextTextarea.value = promptToDisplay;
+
+		promptContextTextarea.addEventListener('input', () => {
+			template.context = promptContextTextarea.value;
+		});
 	}
 
 	if (template) {
@@ -262,6 +316,7 @@ export async function handleLLMProcessing(
 	const interpreterErrorMessage = document.getElementById('interpreter-error') as HTMLDivElement;
 	const llmTimer = document.getElementById('llm-timer') as HTMLSpanElement;
 	const clipButton = document.getElementById('clip-button') as HTMLButtonElement;
+	const promptContextTextarea = document.getElementById('prompt-context') as HTMLTextAreaElement;
 
 	try {
 		// Hide any previous error message
@@ -290,7 +345,8 @@ export async function handleLLMProcessing(
 			throw new Error('No prompt variables found. Please add at least one prompt variable to your template.');
 		}
 
-		const contextToUse = template.context || generalSettings.defaultPromptContext || "You are a helpful assistant. Please analyze the following content and provide a concise summary.";
+		// Use the content from the prompt-context textarea
+		const contextToUse = promptContextTextarea.value || generalSettings.defaultPromptContext || "You are a helpful assistant. Please analyze the following content and provide a concise summary.";
 
 		const contentToProcess = variables.content || '';
 
