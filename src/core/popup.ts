@@ -189,7 +189,19 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 			if (currentTab.id) {
 				try {
-					const extractedData = await extractPageContent(currentTab.id);
+					let extractedData = null;
+					let retryCount = 0;
+					const maxRetries = 10;
+					const retryDelay = 250; //ms
+
+					while (!extractedData && retryCount < maxRetries) {
+						extractedData = await extractPageContent(currentTab.id);
+						if (!extractedData) {
+							retryCount++;
+							await new Promise(resolve => setTimeout(resolve, retryDelay));
+						}
+					}
+
 					if (extractedData) {
 						const initializedContent = await initializePageContent(extractedData.content, extractedData.selectedHtml, extractedData.extractedContent, currentUrl, extractedData.schemaOrgData, extractedData.fullHtml);
 						if (initializedContent) {
@@ -200,11 +212,13 @@ document.addEventListener('DOMContentLoaded', async function() {
 							}
 
 							await initializeTemplateFields(currentTemplate, initializedContent.currentVariables, initializedContent.noteName, extractedData.schemaOrgData);
+
+							document.querySelector('.clipper')?.classList.remove('hidden');
 						} else {
 							showError('Unable to initialize page content.');
 						}
 					} else {
-						showError('Unable to get page content. Try reloading the page.');
+						showError('Unable to get page content.');
 					}
 				} catch (error: unknown) {
 					console.error('Error in popup initialization:', error);
