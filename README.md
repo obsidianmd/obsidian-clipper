@@ -165,6 +165,10 @@ Filters allow you to modify variables in a template. Filters are applied to vari
 - `last` returns the last element of an array as a string.
 	- `["a","b","c"]|last` returns `"c"`.
 	- If the input is not an array, it returns the input unchanged.
+- `link` converts strings, arrays, or objects into Markdown link syntax (not to be confused with wikilinks).
+	- For strings: `"url"|link:"author"` returns `[author](url)`.
+	- For arrays: `["url1","url2"]|link:"author"` returns an array of Markdown links with the same text for all links.
+	- For objects: `{"url1": "Author 1", "url2": "Author 2"}|link` returns Markdown links with the text that matches the object keys.
 - `list` converts an array to a bullet list.
 	- Use `list:task` to convert to a task list.
 	- Use `list:numbered` to convert to a numbered list.

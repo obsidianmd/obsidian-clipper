@@ -14,6 +14,7 @@ import { join } from './filters/join';
 import { kebab } from './filters/kebab';
 import { last } from './filters/last';
 import { list } from './filters/list';
+import { link } from './filters/link';
 import { lower } from './filters/lower';
 import { map } from './filters/map';
 import { markdown } from './filters/markdown';
@@ -48,6 +49,7 @@ export const filters: { [key: string]: FilterFunction } = {
 	join,
 	kebab,
 	last,
+	link,
 	list,
 	lower,
 	map,
