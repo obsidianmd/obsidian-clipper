@@ -448,11 +448,6 @@ export function updateFieldsWithLLMResponses(promptVariables: PromptVariable[], 
 				if (response && response.user_response !== undefined) {
 					let value = response.user_response;
 					
-					if (filters) {
-						const filterNames = filters.slice(1).split('|').filter(Boolean);
-						value = applyFilters(value, filterNames);
-					}
-					
 					// Handle array or object responses
 					if (typeof value === 'object') {
 						try {
@@ -461,6 +456,10 @@ export function updateFieldsWithLLMResponses(promptVariables: PromptVariable[], 
 							console.error('Error stringifying object:', error);
 							value = String(value);
 						}
+					}
+
+					if (filters) {
+						value = applyFilters(value, filters.slice(1));
 					}
 					
 					return value;
