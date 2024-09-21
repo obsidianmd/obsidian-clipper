@@ -133,19 +133,20 @@ export function showTemplateEditor(template: Template | null): void {
 	if (templateProperties) templateProperties.innerHTML = '';
 
 	const pathInput = document.getElementById('template-path-name') as HTMLInputElement;
-	if (pathInput) pathInput.value = editingTemplate.path;
+	if (pathInput) pathInput.value = editingTemplate.path || '';
 
 	const behaviorSelect = document.getElementById('template-behavior') as HTMLSelectElement;
 	if (behaviorSelect) behaviorSelect.value = editingTemplate.behavior || 'create';
+	
 	const noteNameFormat = document.getElementById('note-name-format') as HTMLInputElement;
 	if (noteNameFormat) {
 		noteNameFormat.value = editingTemplate.noteNameFormat || '{{title}}';
-		noteNameFormat.required = true;
 	}
 
 	const noteContentFormat = document.getElementById('note-content-format') as HTMLTextAreaElement;
 	if (noteContentFormat) noteContentFormat.value = editingTemplate.noteContentFormat || '';
 
+	// Call updateBehaviorFields here to set the initial state
 	updateBehaviorFields();
 
 	if (behaviorSelect) {
@@ -221,13 +222,18 @@ export function showTemplateEditor(template: Template | null): void {
 function updateBehaviorFields(): void {
 	const behaviorSelect = document.getElementById('template-behavior') as HTMLSelectElement;
 	const noteNameFormatContainer = document.getElementById('note-name-format-container');
+	const pathContainer = document.getElementById('path-name-container');
 	const propertiesContainer = document.getElementById('properties-container');
 	const propertiesWarning = document.getElementById('properties-warning');
 	const noteNameFormat = document.getElementById('note-name-format') as HTMLInputElement;
+	const pathInput = document.getElementById('template-path-name') as HTMLInputElement;
 
 	if (behaviorSelect) {
 		const selectedBehavior = behaviorSelect.value;
-		if (noteNameFormatContainer) noteNameFormatContainer.style.display = 'block'; // Always show
+		const isDailyNote = selectedBehavior === 'append-daily' || selectedBehavior === 'prepend-daily';
+
+		if (noteNameFormatContainer) noteNameFormatContainer.style.display = isDailyNote ? 'none' : 'block';
+		if (pathContainer) pathContainer.style.display = isDailyNote ? 'none' : 'block';
 
 		if (selectedBehavior.startsWith('append-') || selectedBehavior.startsWith('prepend-')) {
 			if (propertiesContainer) propertiesContainer.style.display = 'none';
@@ -238,7 +244,7 @@ function updateBehaviorFields(): void {
 		}
 
 		if (noteNameFormat) {
-			noteNameFormat.required = true;
+			noteNameFormat.required = !isDailyNote;
 			switch (selectedBehavior) {
 				case 'append-specific':
 				case 'prepend-specific':
@@ -251,6 +257,10 @@ function updateBehaviorFields(): void {
 				default:
 					noteNameFormat.placeholder = 'Note name format';
 			}
+		}
+
+		if (pathInput) {
+			pathInput.required = !isDailyNote;
 		}
 	}
 }
@@ -381,16 +391,28 @@ export function updateTemplateFromForm(): void {
 	}
 
 	const behaviorSelect = document.getElementById('template-behavior') as HTMLSelectElement;
-	if (behaviorSelect) template.behavior = behaviorSelect.value;
+	if (behaviorSelect) template.behavior = behaviorSelect.value as Template['behavior'];
+
+	const isDailyNote = template.behavior === 'append-daily' || template.behavior === 'prepend-daily';
 
 	const pathInput = document.getElementById('template-path-name') as HTMLInputElement;
-	if (pathInput) template.path = pathInput.value;
+	if (pathInput) {
+		if (!isDailyNote && pathInput.value.trim() === '') {
+			console.error('Path is required for non-daily note behaviors');
+			pathInput.setCustomValidity('Path is required for non-daily note behaviors');
+			pathInput.reportValidity();
+			return;
+		} else {
+			pathInput.setCustomValidity('');
+			template.path = isDailyNote ? '' : pathInput.value;
+		}
+	}
 
 	const noteNameFormat = document.getElementById('note-name-format') as HTMLInputElement;
 	if (noteNameFormat) {
-		if (noteNameFormat.value.trim() === '') {
-			console.error('Note name format is required');
-			noteNameFormat.setCustomValidity('Note name format is required');
+		if (!isDailyNote && noteNameFormat.value.trim() === '') {
+			console.error('Note name format is required for non-daily note behaviors');
+			noteNameFormat.setCustomValidity('Note name format is required for non-daily note behaviors');
 			noteNameFormat.reportValidity();
 			return;
 		} else {

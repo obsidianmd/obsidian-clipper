@@ -67,31 +67,23 @@ export async function saveToObsidian(
 	noteName: string,
 	path: string,
 	vault: string,
-	behavior: string,
+	behavior: Template['behavior'],
 	noteNameFormat: string
 ): Promise<void> {
 	let obsidianUrl: string;
 
-	// Ensure path ends with a slash
-	if (path && !path.endsWith('/')) {
-		path += '/';
-	}
+	const isDailyNote = behavior === 'append-daily' || behavior === 'prepend-daily';
 
-	const formattedNoteName = behavior.endsWith('-daily') 
-		? dayjs().format(noteNameFormat) 
-		: sanitizeFileName(noteName);
+	if (isDailyNote) {
+		obsidianUrl = `obsidian://daily?`;
+	} else {
+		// Ensure path ends with a slash
+		if (path && !path.endsWith('/')) {
+			path += '/';
+		}
 
-	switch (behavior) {
-		case 'append-specific':
-		case 'prepend-specific':
-			obsidianUrl = `obsidian://new?file=${encodeURIComponent(path + formattedNoteName)}`;
-			break;
-		case 'append-daily':
-		case 'prepend-daily':
-			obsidianUrl = `obsidian://daily?file=${encodeURIComponent(path + formattedNoteName)}`;
-			break;
-		default: // 'create'
-			obsidianUrl = `obsidian://new?file=${encodeURIComponent(path + formattedNoteName)}`;
+		const formattedNoteName = sanitizeFileName(noteName);
+		obsidianUrl = `obsidian://new?file=${encodeURIComponent(path + formattedNoteName)}`;
 	}
 
 	if (behavior.startsWith('append')) {

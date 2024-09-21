@@ -15,16 +15,22 @@ export function exportTemplate(): void {
 	const sanitizedName = sanitizeFileName(template.name);
 	const templateFile = `${sanitizedName.replace(/\s+/g, '-').toLowerCase()}-clipper.json`;
 
+	const isDailyNote = template.behavior === 'append-daily' || template.behavior === 'prepend-daily';
+
 	const orderedTemplate: Partial<Template> & { schemaVersion: string } = {
 		schemaVersion: SCHEMA_VERSION,
 		name: template.name,
 		behavior: template.behavior,
-		noteNameFormat: template.noteNameFormat,
-		path: template.path,
 		noteContentFormat: template.noteContentFormat,
 		properties: template.properties.map(({ name, value, type }) => ({ name, value, type })) as Property[],
 		triggers: template.triggers,
 	};
+
+	// Only include noteNameFormat and path for non-daily note behaviors
+	if (!isDailyNote) {
+		orderedTemplate.noteNameFormat = template.noteNameFormat;
+		orderedTemplate.path = template.path;
+	}
 
 	const jsonContent = JSON.stringify(orderedTemplate, null, '\t');
 
@@ -89,16 +95,24 @@ export function importTemplate(): void {
 }
 
 function validateImportedTemplate(template: Partial<Template>): boolean {
-	const requiredFields: (keyof Template)[] = ['name', 'behavior', 'path', 'properties', 'noteContentFormat'];
+	const requiredFields: (keyof Template)[] = ['name', 'behavior', 'properties', 'noteContentFormat'];
 	const validTypes = ['text', 'multitext', 'number', 'checkbox', 'date', 'datetime'];
-	return requiredFields.every(field => template.hasOwnProperty(field)) &&
-		Array.isArray(template.properties) &&
+	
+	const isDailyNote = template.behavior === 'append-daily' || template.behavior === 'prepend-daily';
+
+	const hasRequiredFields = requiredFields.every(field => template.hasOwnProperty(field));
+	const hasValidProperties = Array.isArray(template.properties) &&
 		template.properties!.every(prop => 
 			prop.hasOwnProperty('name') && 
 			prop.hasOwnProperty('value') && 
 			prop.hasOwnProperty('type') &&
 			validTypes.includes(prop.type)
 		);
+
+	// Check for noteNameFormat and path only if it's not a daily note template
+	const hasValidNoteNameAndPath = isDailyNote || (template.hasOwnProperty('noteNameFormat') && template.hasOwnProperty('path'));
+
+	return hasRequiredFields && hasValidProperties && hasValidNoteNameAndPath;
 }
 
 export function initializeDropZone(): void {

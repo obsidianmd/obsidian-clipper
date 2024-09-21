@@ -73,15 +73,26 @@ async function handleClip() {
 	const noteNameField = document.getElementById('note-name-field') as HTMLInputElement;
 	const pathField = document.getElementById('path-name-field') as HTMLInputElement;
 
-	if (!vaultDropdown || !noteContentField || !noteNameField || !pathField) {
+	if (!vaultDropdown || !noteContentField) {
 		showError('Some required fields are missing. Please try reloading the extension.');
 		return;
 	}
 
 	const selectedVault = currentTemplate.vault || vaultDropdown.value;
 	const noteContent = noteContentField.value;
-	const noteName = noteNameField.value;
-	const path = pathField.value;
+	const isDailyNote = currentTemplate.behavior === 'append-daily' || currentTemplate.behavior === 'prepend-daily';
+
+	let noteName = '';
+	let path = '';
+
+	if (!isDailyNote) {
+		if (!noteNameField || !pathField) {
+			showError('Note name or path field is missing. Please try reloading the extension.');
+			return;
+		}
+		noteName = noteNameField.value;
+		path = pathField.value;
+	}
 
 	const properties = Array.from(document.querySelectorAll('.metadata-property input')).map(input => ({
 		name: input.id,
