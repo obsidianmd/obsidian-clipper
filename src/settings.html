@@ -145,26 +145,26 @@
 									<label for="template-behavior">Behavior</label>
 									<select id="template-behavior">
 										<option value="create">Create new note</option>
-										<option value="append-specific">Add to existing note</option>
-										<option value="append-daily">Add to daily note</option>
+										<option value="append-specific">Add to an existing note, at the bottom</option>
+										<option value="prepend-specific">Add to an existing note, at the top</option>
+										<option value="append-daily">Add to daily note, at the bottom</option>
+										<option value="prepend-daily">Add to daily note, at the top</option>
 									</select>
+								</div>
+								<div id="behavior-warning-container" class="warning-container" style="display: none;">
+									<div class="warning-icon">
+										<i data-lucide="alert-triangle"></i>
+									</div>
+									<div class="warning-text">
+										Adding to an existing note or daily note requires Obsidian 1.7.2 or later.
+									</div>
 								</div>
 								<div class="setting-item" id="note-name-format-container" style="display: none;">
 									<label for="note-name-format">Note name</label>
-									<div class="setting-item-description">Format for the file name when creating a new note. You can use variables like {{title}}, {{date}}, and {{published}} to pre-populate data from the&nbsp;page. <a href="https://github.com/obsidianmd/obsidian-clipper?tab=readme-ov-file#template-variables" target="_blank">Learn&nbsp;more</a>.</div>
+									<div class="setting-item-description">Format for the file name of the note. You can use variables like {{title}}, {{date}}, and {{published}} to pre-populate data from the&nbsp;page. <a href="https://github.com/obsidianmd/obsidian-clipper?tab=readme-ov-file#template-variables" target="_blank">Learn&nbsp;more</a>.</div>
 									<input type="text" id="note-name-format" placeholder="{{title}}" />
 								</div>
-								<div class="setting-item" id="specific-note-container" style="display: none;">
-									<label for="specific-note-name">Note to add to</label>
-									<div class="setting-item-description">The name of the note to add&nbsp;to.</div>
-									<input type="text" id="specific-note-name" placeholder="Note name" />
-								</div>
-								<div class="setting-item" id="daily-note-format-container" style="display: none;">
-									<label for="daily-note-format">Daily note format</label>
-									<div class="setting-item-description">Make sure this is the same format as your daily note template in Obsidian&nbsp;settings.</div>
-									<input type="text" id="daily-note-format" placeholder="YYYY-MM-DD" value="YYYY-MM-DD" />
-								</div>
-								<div class="setting-item">
+								<div class="setting-item" id="path-name-container" style="display: none;">
 									<label for="template-path-name">Note location</label>
 									<div class="setting-item-description">The folder or path of the note.</div>
 									<input type="text" id="template-path-name" placeholder="Clippings" />
@@ -180,10 +180,6 @@
 									<label for="url-patterns">Template triggers</label>
 									<div class="setting-item-description">Define rules to automatically select this template if it matches a URL pattern or contains schema.org data. One rule per&nbsp;line.</div>
 									<textarea id="url-patterns" placeholder="https://example.com/" rows="2"></textarea>
-								</div>
-								<div id="properties-warning" style="display: none;">
-									<label>Properties</label>
-									<div class="setting-item-description">Properties are not available when adding to an existing&nbsp;note.</div>
 								</div>
 								<div id="properties-container">
 									<label>Properties</label>

@@ -1,5 +1,4 @@
 import browser from './browser-polyfill';
-import dayjs from 'dayjs';
 import { escapeDoubleQuotes, sanitizeFileName } from '../utils/string-utils';
 import { Template, Property } from '../types/types';
 import { generalSettings } from './storage-utils';
@@ -62,28 +61,33 @@ export async function generateFrontmatter(properties: Property[]): Promise<strin
 	return frontmatter;
 }
 
-export function saveToObsidian(fileContent: string, noteName: string, path: string, vault: string, behavior: string, specificNoteName?: string, dailyNoteFormat?: string): void {
+export async function saveToObsidian(
+	fileContent: string,
+	noteName: string,
+	path: string,
+	vault: string,
+	behavior: Template['behavior'],
+): Promise<void> {
 	let obsidianUrl: string;
-	let content = fileContent;
 
-	// Ensure path ends with a slash
-	if (path && !path.endsWith('/')) {
-		path += '/';
+	const isDailyNote = behavior === 'append-daily' || behavior === 'prepend-daily';
+
+	if (isDailyNote) {
+		obsidianUrl = `obsidian://daily?`;
+	} else {
+		// Ensure path ends with a slash
+		if (path && !path.endsWith('/')) {
+			path += '/';
+		}
+
+		const formattedNoteName = sanitizeFileName(noteName);
+		obsidianUrl = `obsidian://new?file=${encodeURIComponent(path + formattedNoteName)}`;
 	}
 
-	if (behavior === 'append-specific' || behavior === 'append-daily') {
-		let appendFileName: string;
-		if (behavior === 'append-specific') {
-			appendFileName = specificNoteName!;
-		} else {
-			appendFileName = dayjs().format(dailyNoteFormat!);
-		}
-		obsidianUrl = `obsidian://new?file=${encodeURIComponent(path + appendFileName)}&append=true`;
-		
-		// Add newlines at the beginning to separate from existing content
-		content = '\n' + content;
-	} else {
-		obsidianUrl = `obsidian://new?file=${encodeURIComponent(path + sanitizeFileName(noteName))}`;
+	if (behavior.startsWith('append')) {
+		obsidianUrl += '&append=true';
+	} else if (behavior.startsWith('prepend')) {
+		obsidianUrl += '&prepend=true';
 	}
 
 	const vaultParam = vault ? `&vault=${encodeURIComponent(vault)}` : '';
@@ -96,18 +100,18 @@ export function saveToObsidian(fileContent: string, noteName: string, path: stri
 
 	if (generalSettings.betaFeatures) {
 		// Use clipboard for content in beta mode
-		navigator.clipboard.writeText(content).then(() => {
+		navigator.clipboard.writeText(fileContent).then(() => {
 			obsidianUrl += `&clipboard`;
 			openObsidianUrl(obsidianUrl);
 		}).catch(err => {
 			console.error('Failed to copy content to clipboard:', err);
 			// Fallback to the URI method if clipboard fails
-			obsidianUrl += `&content=${encodeURIComponent(content)}`;
+			obsidianUrl += `&content=${encodeURIComponent(fileContent)}`;
 			openObsidianUrl(obsidianUrl);
 		});
 	} else {
 		// Use the URI method
-		obsidianUrl += `&content=${encodeURIComponent(content)}`;
+		obsidianUrl += `&content=${encodeURIComponent(fileContent)}`;
 		openObsidianUrl(obsidianUrl);
 	}
 

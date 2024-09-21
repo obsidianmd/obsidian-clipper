@@ -73,15 +73,26 @@ async function handleClip() {
 	const noteNameField = document.getElementById('note-name-field') as HTMLInputElement;
 	const pathField = document.getElementById('path-name-field') as HTMLInputElement;
 
-	if (!vaultDropdown || !noteContentField || !noteNameField || !pathField) {
+	if (!vaultDropdown || !noteContentField) {
 		showError('Some required fields are missing. Please try reloading the extension.');
 		return;
 	}
 
 	const selectedVault = currentTemplate.vault || vaultDropdown.value;
 	const noteContent = noteContentField.value;
-	const noteName = noteNameField.value;
-	const path = pathField.value;
+	const isDailyNote = currentTemplate.behavior === 'append-daily' || currentTemplate.behavior === 'prepend-daily';
+
+	let noteName = '';
+	let path = '';
+
+	if (!isDailyNote) {
+		if (!noteNameField || !pathField) {
+			showError('Note name or path field is missing. Please try reloading the extension.');
+			return;
+		}
+		noteName = noteNameField.value;
+		path = pathField.value;
+	}
 
 	const properties = Array.from(document.querySelectorAll('.metadata-property input')).map(input => ({
 		name: input.id,
@@ -90,15 +101,11 @@ async function handleClip() {
 	}));
 
 	let fileContent: string;
-	if (currentTemplate.behavior === 'create') {
-		const frontmatter = await generateFrontmatter(properties as Property[]);
-		fileContent = frontmatter + noteContent;
-	} else {
-		fileContent = noteContent;
-	}
+	const frontmatter = await generateFrontmatter(properties as Property[]);
+	fileContent = frontmatter + noteContent;
 
 	try {
-		await saveToObsidian(fileContent, noteName, path, selectedVault, currentTemplate.behavior, currentTemplate.specificNoteName, currentTemplate.dailyNoteFormat);
+		await saveToObsidian(fileContent, noteName, path, selectedVault, currentTemplate.behavior);
 		setTimeout(() => window.close(), 50);
 	} catch (error) {
 		console.error('Error in handleClip:', error);
@@ -406,10 +413,19 @@ document.addEventListener('DOMContentLoaded', async function() {
 			}
 
 			const pathField = document.getElementById('path-name-field') as HTMLInputElement;
-			if (pathField) {
-				let formattedPath = await replaceVariables(tabId, template.path, variables, currentUrl);
-				pathField.value = formattedPath;
-				pathField.setAttribute('data-template-value', template.path);
+			const pathContainer = document.querySelector('.vault-path-container') as HTMLElement;
+			
+			if (pathField && pathContainer) {
+				const isDailyNote = template.behavior === 'append-daily' || template.behavior === 'prepend-daily';
+				
+				if (isDailyNote) {
+					pathField.style.display = 'none';
+				} else {
+					pathContainer.style.display = 'flex';
+					let formattedPath = await replaceVariables(tabId, template.path, variables, currentUrl);
+					pathField.value = formattedPath;
+					pathField.setAttribute('data-template-value', template.path);
+				}
 			}
 
 			const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
