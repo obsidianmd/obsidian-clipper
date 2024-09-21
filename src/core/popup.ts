@@ -413,10 +413,19 @@ document.addEventListener('DOMContentLoaded', async function() {
 			}
 
 			const pathField = document.getElementById('path-name-field') as HTMLInputElement;
-			if (pathField) {
-				let formattedPath = await replaceVariables(tabId, template.path, variables, currentUrl);
-				pathField.value = formattedPath;
-				pathField.setAttribute('data-template-value', template.path);
+			const pathContainer = document.querySelector('.vault-path-container') as HTMLElement;
+			
+			if (pathField && pathContainer) {
+				const isDailyNote = template.behavior === 'append-daily' || template.behavior === 'prepend-daily';
+				
+				if (isDailyNote) {
+					pathField.style.display = 'none';
+				} else {
+					pathContainer.style.display = 'flex';
+					let formattedPath = await replaceVariables(tabId, template.path, variables, currentUrl);
+					pathField.value = formattedPath;
+					pathField.setAttribute('data-template-value', template.path);
+				}
 			}
 
 			const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;

@@ -229,6 +229,9 @@
 		display: flex;
 		flex-direction: row;
 		gap: 8px;
+		#vault-container {
+			flex-grow: 1;
+		}
 		#vault-select {
 			font-weight: 500;
 			min-width: 100px;
