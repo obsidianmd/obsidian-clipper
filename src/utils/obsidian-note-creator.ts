@@ -1,5 +1,4 @@
 import browser from './browser-polyfill';
-import dayjs from 'dayjs';
 import { escapeDoubleQuotes, sanitizeFileName } from '../utils/string-utils';
 import { Template, Property } from '../types/types';
 import { generalSettings } from './storage-utils';
@@ -68,7 +67,6 @@ export async function saveToObsidian(
 	path: string,
 	vault: string,
 	behavior: Template['behavior'],
-	noteNameFormat: string
 ): Promise<void> {
 	let obsidianUrl: string;
 
@@ -91,6 +89,9 @@ export async function saveToObsidian(
 	} else if (behavior.startsWith('prepend')) {
 		obsidianUrl += '&prepend=true';
 	}
+
+	const vaultParam = vault ? `&vault=${encodeURIComponent(vault)}` : '';
+	obsidianUrl += vaultParam;
 
 	// Add silent parameter if silentOpen is enabled
 	if (generalSettings.silentOpen) {

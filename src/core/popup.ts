@@ -101,17 +101,11 @@ async function handleClip() {
 	}));
 
 	let fileContent: string;
-	if (currentTemplate.behavior === 'create') {
-		const frontmatter = await generateFrontmatter(properties as Property[]);
-		fileContent = frontmatter + noteContent;
-	} else {
-		// For append and prepend behaviors, we might want to add a separator
-		const separator = '\n\n---\n\n';
-		fileContent = currentTemplate.behavior.startsWith('prepend') ? noteContent + separator : separator + noteContent;
-	}
+	const frontmatter = await generateFrontmatter(properties as Property[]);
+	fileContent = frontmatter + noteContent;
 
 	try {
-		await saveToObsidian(fileContent, noteName, path, selectedVault, currentTemplate.behavior, currentTemplate.noteNameFormat);
+		await saveToObsidian(fileContent, noteName, path, selectedVault, currentTemplate.behavior);
 		setTimeout(() => window.close(), 50);
 	} catch (error) {
 		console.error('Error in handleClip:', error);

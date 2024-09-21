@@ -223,8 +223,6 @@ function updateBehaviorFields(): void {
 	const behaviorSelect = document.getElementById('template-behavior') as HTMLSelectElement;
 	const noteNameFormatContainer = document.getElementById('note-name-format-container');
 	const pathContainer = document.getElementById('path-name-container');
-	const propertiesContainer = document.getElementById('properties-container');
-	const propertiesWarning = document.getElementById('properties-warning');
 	const noteNameFormat = document.getElementById('note-name-format') as HTMLInputElement;
 	const pathInput = document.getElementById('template-path-name') as HTMLInputElement;
 
@@ -234,14 +232,6 @@ function updateBehaviorFields(): void {
 
 		if (noteNameFormatContainer) noteNameFormatContainer.style.display = isDailyNote ? 'none' : 'block';
 		if (pathContainer) pathContainer.style.display = isDailyNote ? 'none' : 'block';
-
-		if (selectedBehavior.startsWith('append-') || selectedBehavior.startsWith('prepend-')) {
-			if (propertiesContainer) propertiesContainer.style.display = 'none';
-			if (propertiesWarning) propertiesWarning.style.display = 'block';
-		} else {
-			if (propertiesContainer) propertiesContainer.style.display = 'block';
-			if (propertiesWarning) propertiesWarning.style.display = 'none';
-		}
 
 		if (noteNameFormat) {
 			noteNameFormat.required = !isDailyNote;
