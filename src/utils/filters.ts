@@ -182,7 +182,10 @@ function parseFilterString(filterString: string): string[] {
 
 	// Special handling for replace filter
 	if (parts[0] === 'replace' && parts.length > 1) {
-		return [parts[0], parts.slice(1).join(':')];
+		const replacePart = parts.slice(1).join(':');
+		// Check if it's wrapped in parentheses and remove them if so
+		const cleanedReplacePart = replacePart.replace(/^\((.*)\)$/, '$1');
+		return [parts[0], cleanedReplacePart];
 	}
 
 	return parts;

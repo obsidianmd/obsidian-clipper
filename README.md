@@ -180,6 +180,7 @@ Filters allow you to modify variables in a template. Filters are applied to vari
 	- Multiple replacements: `"hello world"|replace:("e":"a","o":"0")` returns `"hall0 w0rld"`.
 	- Replacements are applied in the order they are specified.
 	- To replace with an empty string, use `""` as the replacement value.
+	- Special characters including `: | { } ( ) ' "` should be escaped with a backslash when used in the search term, e.g. `\:` to search for a literal colon.
 - `safe_name` sanitizes a string to be used as a safe file name.
 	- By default, `safe_name` applies the most conservative sanitization rules.
 	- OS-specific usage: `safe_name:os` where `os` can be `windows`, `mac`, or `linux` to only apply the rules for that operating system.
