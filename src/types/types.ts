@@ -1,14 +1,12 @@
 export interface Template {
 	id: string;
 	name: string;
-	behavior: string;
+	behavior: 'create' | 'append-specific' | 'append-daily' | 'prepend-specific' | 'prepend-daily';
 	noteNameFormat: string;
 	path: string;
 	noteContentFormat: string;
 	properties: Property[];
 	triggers?: string[];
-	specificNoteName?: string;
-	dailyNoteFormat?: string;
 	vault?: string;
 }
 

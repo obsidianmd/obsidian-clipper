@@ -136,14 +136,12 @@ export function showTemplateEditor(template: Template | null): void {
 	if (pathInput) pathInput.value = editingTemplate.path;
 
 	const behaviorSelect = document.getElementById('template-behavior') as HTMLSelectElement;
-	
 	if (behaviorSelect) behaviorSelect.value = editingTemplate.behavior || 'create';
-	const specificNoteName = document.getElementById('specific-note-name') as HTMLInputElement;
-	if (specificNoteName) specificNoteName.value = editingTemplate.specificNoteName || '';
-	const dailyNoteFormat = document.getElementById('daily-note-format') as HTMLInputElement;
-	if (dailyNoteFormat) dailyNoteFormat.value = editingTemplate.dailyNoteFormat || 'YYYY-MM-DD';
 	const noteNameFormat = document.getElementById('note-name-format') as HTMLInputElement;
-	if (noteNameFormat) noteNameFormat.value = editingTemplate.noteNameFormat || '{{title}}';
+	if (noteNameFormat) {
+		noteNameFormat.value = editingTemplate.noteNameFormat || '{{title}}';
+		noteNameFormat.required = true;
+	}
 
 	const noteContentFormat = document.getElementById('note-content-format') as HTMLTextAreaElement;
 	if (noteContentFormat) noteContentFormat.value = editingTemplate.noteContentFormat || '';
@@ -222,24 +220,37 @@ export function showTemplateEditor(template: Template | null): void {
 
 function updateBehaviorFields(): void {
 	const behaviorSelect = document.getElementById('template-behavior') as HTMLSelectElement;
-	const specificNoteContainer = document.getElementById('specific-note-container');
-	const dailyNoteFormatContainer = document.getElementById('daily-note-format-container');
 	const noteNameFormatContainer = document.getElementById('note-name-format-container');
 	const propertiesContainer = document.getElementById('properties-container');
 	const propertiesWarning = document.getElementById('properties-warning');
+	const noteNameFormat = document.getElementById('note-name-format') as HTMLInputElement;
 
 	if (behaviorSelect) {
 		const selectedBehavior = behaviorSelect.value;
-		if (specificNoteContainer) specificNoteContainer.style.display = selectedBehavior === 'append-specific' ? 'block' : 'none';
-		if (dailyNoteFormatContainer) dailyNoteFormatContainer.style.display = selectedBehavior === 'append-daily' ? 'block' : 'none';
-		if (noteNameFormatContainer) noteNameFormatContainer.style.display = selectedBehavior === 'create' ? 'block' : 'none';
-		
-		if (selectedBehavior === 'append-specific' || selectedBehavior === 'append-daily') {
+		if (noteNameFormatContainer) noteNameFormatContainer.style.display = 'block'; // Always show
+
+		if (selectedBehavior.startsWith('append-') || selectedBehavior.startsWith('prepend-')) {
 			if (propertiesContainer) propertiesContainer.style.display = 'none';
 			if (propertiesWarning) propertiesWarning.style.display = 'block';
 		} else {
 			if (propertiesContainer) propertiesContainer.style.display = 'block';
 			if (propertiesWarning) propertiesWarning.style.display = 'none';
+		}
+
+		if (noteNameFormat) {
+			noteNameFormat.required = true;
+			switch (selectedBehavior) {
+				case 'append-specific':
+				case 'prepend-specific':
+					noteNameFormat.placeholder = 'Specific note name';
+					break;
+				case 'append-daily':
+				case 'prepend-daily':
+					noteNameFormat.placeholder = 'Daily note format (e.g., YYYY-MM-DD)';
+					break;
+				default:
+					noteNameFormat.placeholder = 'Note name format';
+			}
 		}
 	}
 }
@@ -376,13 +387,17 @@ export function updateTemplateFromForm(): void {
 	if (pathInput) template.path = pathInput.value;
 
 	const noteNameFormat = document.getElementById('note-name-format') as HTMLInputElement;
-	if (noteNameFormat) template.noteNameFormat = noteNameFormat.value;
-
-	const specificNoteName = document.getElementById('specific-note-name') as HTMLInputElement;
-	if (specificNoteName) template.specificNoteName = specificNoteName.value;
-
-	const dailyNoteFormat = document.getElementById('daily-note-format') as HTMLInputElement;
-	if (dailyNoteFormat) template.dailyNoteFormat = dailyNoteFormat.value;
+	if (noteNameFormat) {
+		if (noteNameFormat.value.trim() === '') {
+			console.error('Note name format is required');
+			noteNameFormat.setCustomValidity('Note name format is required');
+			noteNameFormat.reportValidity();
+			return;
+		} else {
+			noteNameFormat.setCustomValidity('');
+			template.noteNameFormat = noteNameFormat.value;
+		}
+	}
 
 	const noteContentFormat = document.getElementById('note-content-format') as HTMLTextAreaElement;
 	if (noteContentFormat) template.noteContentFormat = noteContentFormat.value;

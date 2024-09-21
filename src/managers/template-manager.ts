@@ -45,6 +45,11 @@ export async function saveTemplateSettings(): Promise<string[]> {
 	const templateChunks: { [key: string]: string[] } = {};
 
 	for (const template of templates) {
+		if (!template.noteNameFormat || template.noteNameFormat.trim() === '') {
+			warnings.push(`Warning: Template "${template.name}" has an empty note name format. Using default "{{title}}".`);
+			template.noteNameFormat = '{{title}}';
+		}
+
 		const [chunks, warning] = await prepareTemplateForSave(template);
 		templateChunks[STORAGE_KEY_PREFIX + template.id] = chunks;
 		if (warning) {

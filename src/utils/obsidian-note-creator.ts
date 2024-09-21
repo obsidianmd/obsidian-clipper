@@ -62,32 +62,43 @@ export async function generateFrontmatter(properties: Property[]): Promise<strin
 	return frontmatter;
 }
 
-export function saveToObsidian(fileContent: string, noteName: string, path: string, vault: string, behavior: string, specificNoteName?: string, dailyNoteFormat?: string): void {
+export async function saveToObsidian(
+	fileContent: string,
+	noteName: string,
+	path: string,
+	vault: string,
+	behavior: string,
+	noteNameFormat: string
+): Promise<void> {
 	let obsidianUrl: string;
-	let content = fileContent;
 
 	// Ensure path ends with a slash
 	if (path && !path.endsWith('/')) {
 		path += '/';
 	}
 
-	if (behavior === 'append-specific' || behavior === 'append-daily') {
-		let appendFileName: string;
-		if (behavior === 'append-specific') {
-			appendFileName = specificNoteName!;
-		} else {
-			appendFileName = dayjs().format(dailyNoteFormat!);
-		}
-		obsidianUrl = `obsidian://new?file=${encodeURIComponent(path + appendFileName)}&append=true`;
-		
-		// Add newlines at the beginning to separate from existing content
-		content = '\n' + content;
-	} else {
-		obsidianUrl = `obsidian://new?file=${encodeURIComponent(path + sanitizeFileName(noteName))}`;
+	const formattedNoteName = behavior.endsWith('-daily') 
+		? dayjs().format(noteNameFormat) 
+		: sanitizeFileName(noteName);
+
+	switch (behavior) {
+		case 'append-specific':
+		case 'prepend-specific':
+			obsidianUrl = `obsidian://new?file=${encodeURIComponent(path + formattedNoteName)}`;
+			break;
+		case 'append-daily':
+		case 'prepend-daily':
+			obsidianUrl = `obsidian://daily?file=${encodeURIComponent(path + formattedNoteName)}`;
+			break;
+		default: // 'create'
+			obsidianUrl = `obsidian://new?file=${encodeURIComponent(path + formattedNoteName)}`;
 	}
 
-	const vaultParam = vault ? `&vault=${encodeURIComponent(vault)}` : '';
-	obsidianUrl += vaultParam;
+	if (behavior.startsWith('append')) {
+		obsidianUrl += '&append=true';
+	} else if (behavior.startsWith('prepend')) {
+		obsidianUrl += '&prepend=true';
+	}
 
 	// Add silent parameter if silentOpen is enabled
 	if (generalSettings.silentOpen) {
@@ -96,18 +107,18 @@ export function saveToObsidian(fileContent: string, noteName: string, path: stri
 
 	if (generalSettings.betaFeatures) {
 		// Use clipboard for content in beta mode
-		navigator.clipboard.writeText(content).then(() => {
+		navigator.clipboard.writeText(fileContent).then(() => {
 			obsidianUrl += `&clipboard`;
 			openObsidianUrl(obsidianUrl);
 		}).catch(err => {
 			console.error('Failed to copy content to clipboard:', err);
 			// Fallback to the URI method if clipboard fails
-			obsidianUrl += `&content=${encodeURIComponent(content)}`;
+			obsidianUrl += `&content=${encodeURIComponent(fileContent)}`;
 			openObsidianUrl(obsidianUrl);
 		});
 	} else {
 		// Use the URI method
-		obsidianUrl += `&content=${encodeURIComponent(content)}`;
+		obsidianUrl += `&content=${encodeURIComponent(fileContent)}`;
 		openObsidianUrl(obsidianUrl);
 	}
 
