@@ -25,3 +25,6 @@ Steps to reproduce the behavior:
 
 **Expected behavior**
 A clear and concise description of what you expected to happen.
+
+**Your template file**
+Go to your template in Web Clipper settings and click on "Export". Attach the JSON file here, or paste the content below.

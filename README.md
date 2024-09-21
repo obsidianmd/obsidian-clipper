@@ -26,6 +26,16 @@ If you want to install the extension manually, go to [releases](https://github.c
 
 Some example templates are available in the [clipper-templates repo](https://github.com/kepano/clipper-templates). 
 
+### Import and export templates
+
+To import a template:
+
+1. Open the extension then click the Settings cog icon
+2. Go to any template
+3. Click **Import** in the top right or drag and drop your `.json` template file(s) anywhere in the template area.
+
+To export a template click **Export** in the top right. This will download the template `.json` file.
+
 ### Template triggers
 
 Template triggers allow you to automatically select a template based on the current page URL or schema.org data. You can define multiple rules for each template, separated by a new line.
