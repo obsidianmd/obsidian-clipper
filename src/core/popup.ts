@@ -465,7 +465,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 						value = dayjs(value).isValid() ? dayjs(value).format('YYYY-MM-DD') : value;
 						break;
 					case 'datetime':
-						value = dayjs(value).isValid() ? dayjs(value).format('YYYY-MM-DD HH:mm:ss') : value;
+						value = dayjs(value).isValid() ? dayjs(value).format('YYYY-MM-DDTHH:mm:ssZ') : value;
 						break;
 				}
 
