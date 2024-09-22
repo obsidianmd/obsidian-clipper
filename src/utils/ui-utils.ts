@@ -27,3 +27,8 @@ export function updateToggleState(container: HTMLElement, checkbox: HTMLInputEle
 		container.classList.remove('is-enabled');
 	}
 }
+
+export function adjustNoteNameHeight(textarea: HTMLTextAreaElement): void {
+	textarea.style.minHeight = '2rem';
+	textarea.style.minHeight = textarea.scrollHeight + 'px';
+}

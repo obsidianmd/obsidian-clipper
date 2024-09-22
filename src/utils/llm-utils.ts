@@ -3,6 +3,7 @@ import { PromptVariable, Template } from '../types/types';
 import { replaceVariables } from './content-extractor';
 import { applyFilters } from './filters';
 import { formatDuration } from './string-utils';
+import { adjustNoteNameHeight } from './ui-utils';
 
 const RATE_LIMIT_RESET_TIME = 60000; // 1 minute in milliseconds
 let lastRequestTime = 0;
@@ -407,6 +408,12 @@ export async function handleLLMProcessing(
 		// Re-enable the clip button
 		clipButton.disabled = false;
 
+		// Adjust height for noteNameField after LLM processing
+		const noteNameField = document.getElementById('note-name-field') as HTMLTextAreaElement | null;
+		if (noteNameField instanceof HTMLTextAreaElement) {
+			adjustNoteNameHeight(noteNameField);
+		}
+
 	} catch (error) {
 		console.error('Error processing LLM:', error);
 		
@@ -475,6 +482,11 @@ export function updateFieldsWithLLMResponses(promptVariables: PromptVariable[], 
 				}
 				return match; // Return original if no match found
 			});
+
+			// Adjust height for noteNameField after updating its value
+			if (input.id === 'note-name-field' && input instanceof HTMLTextAreaElement) {
+				adjustNoteNameHeight(input);
+			}
 		}
 	});
 }

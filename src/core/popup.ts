@@ -12,6 +12,7 @@ import browser from '../utils/browser-polyfill';
 import { detectBrowser, addBrowserClassToHtml } from '../utils/browser-detection';
 import { createElementWithClass, createElementWithHTML } from '../utils/dom-utils';
 import { initializeLLMComponents, handleLLMProcessing, collectPromptVariables } from '../utils/llm-utils';
+import { adjustNoteNameHeight } from '../utils/ui-utils';
 
 let currentTemplate: Template | null = null;
 let templates: Template[] = [];
@@ -416,13 +417,8 @@ document.addEventListener('DOMContentLoaded', async function() {
 		});
 
 		const noteNameField = document.getElementById('note-name-field') as HTMLTextAreaElement;
-		function adjustTextareaHeight(textarea: HTMLTextAreaElement) {
-			textarea.style.minHeight = '2rem';
-			textarea.style.minHeight = textarea.scrollHeight + 'px';
-		}
-
 		function handleNoteNameInput() {
-			adjustTextareaHeight(noteNameField);
+			adjustNoteNameHeight(noteNameField);
 		}
 
 		noteNameField.addEventListener('input', handleNoteNameInput);
@@ -433,7 +429,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 		});
 
 		// Initial height adjustment
-		adjustTextareaHeight(noteNameField);
+		adjustNoteNameHeight(noteNameField);
 
 		async function initializeTemplateFields(template: Template | null, variables: { [key: string]: string }, noteName?: string, schemaOrgData?: any) {
 			if (!template) {
@@ -493,7 +489,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 				let formattedNoteName = await replaceVariables(tabId, template.noteNameFormat, variables, currentUrl);
 				noteNameField.setAttribute('data-template-value', template.noteNameFormat);
 				noteNameField.value = formattedNoteName;
-				adjustTextareaHeight(noteNameField);
+				adjustNoteNameHeight(noteNameField);
 			}
 
 			const pathField = document.getElementById('path-name-field') as HTMLInputElement;
