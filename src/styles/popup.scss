@@ -148,8 +148,9 @@
 		margin: 0;
 		display: flex;
 		flex-direction: column;
+		flex-shrink: 1;
 		gap: 1px;
-		max-height: 240px;
+		max-height: 46%;;
 		overflow-y: scroll;
 		&:empty {
 			display: none;
