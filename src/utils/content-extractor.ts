@@ -239,9 +239,9 @@ export async function initializePageContent(content: string, selectedHtml: strin
 
 		// Define preset variables with fallbacks
 		const title =
-			getSchemaProperty(schemaOrgData, 'headline')
-			|| getMetaContent(doc, "property", "og:title")
+			getMetaContent(doc, "property", "og:title")
 			|| getMetaContent(doc, "name", "twitter:title")
+			|| getSchemaProperty(schemaOrgData, 'headline')
 			|| getMetaContent(doc, "name", "title")
 			|| getMetaContent(doc, "name", "sailthru.title")
 			|| doc.querySelector('title')?.textContent?.trim()
