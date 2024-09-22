@@ -72,10 +72,35 @@ async function handleClip() {
 	const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
 	const noteNameField = document.getElementById('note-name-field') as HTMLInputElement;
 	const pathField = document.getElementById('path-name-field') as HTMLInputElement;
+	const interpretBtn = document.getElementById('interpret-btn') as HTMLButtonElement;
 
 	if (!vaultDropdown || !noteContentField) {
 		showError('Some required fields are missing. Please try reloading the extension.');
 		return;
+	}
+
+	// Check if LLM processing is ongoing or needed. Kind of a dumb way to check but it works for now.
+	if (interpretBtn) {
+		if (interpretBtn.classList.contains('processing')) {
+			console.log('LLM processing is ongoing. Waiting for completion...');
+			try {
+				await waitForInterpreter(interpretBtn);
+			} catch (error) {
+				console.error('LLM processing failed:', error);
+				showError('LLM processing failed. Please try again.');
+				return;
+			}
+		} else if (interpretBtn.textContent?.toLowerCase() !== 'done') {
+			console.log('LLM processing has not been started. Starting now...');
+			interpretBtn.click(); // Trigger LLM processing
+			try {
+				await waitForInterpreter(interpretBtn);
+			} catch (error) {
+				console.error('LLM processing failed:', error);
+				showError('LLM processing failed. Please try again.');
+				return;
+			}
+		}
 	}
 
 	const selectedVault = currentTemplate.vault || vaultDropdown.value;
@@ -124,6 +149,26 @@ async function handleClip() {
 		showError('Failed to save to Obsidian. Please try again.');
 		throw error;
 	}
+}
+
+// Wait for LLM processing to complete
+function waitForInterpreter(interpretBtn: HTMLButtonElement): Promise<void> {
+	return new Promise((resolve, reject) => {
+		const checkProcessing = () => {
+			if (!interpretBtn.classList.contains('processing')) {
+				if (interpretBtn.textContent?.toLowerCase() === 'done') {
+					resolve();
+				} else if (interpretBtn.textContent?.toLowerCase() === 'error') {
+					reject(new Error('LLM processing failed'));
+				} else {
+					setTimeout(checkProcessing, 100); // Check every 100ms
+				}
+			} else {
+				setTimeout(checkProcessing, 100); // Check every 100ms
+			}
+		};
+		checkProcessing();
+	});
 }
 
 document.addEventListener('DOMContentLoaded', async function() {
