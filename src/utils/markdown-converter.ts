@@ -387,11 +387,26 @@ export function createMarkdownContent(content: string, url: string) {
 				node.parentElement && 
 				/^H[1-6]$/.test(node.parentElement.nodeName) && 
 				node.getAttribute('href')?.split('/').pop()?.startsWith('#')) {
+				// Only remove if the text content is '#' or it contains an img
+				return (node.textContent?.trim() === '#') || node.querySelector('img') !== null;
+			}
+
+			// Simplify headings with anchor links
+			if (node.nodeName.match(/^H[1-6]$/) && 
+				node.children.length === 1 && 
+				node.firstElementChild?.nodeName === 'A' &&
+				node.firstElementChild.getAttribute('href')?.split('/').pop()?.startsWith('#')) {
 				return true;
 			}
+
 			return false;
 		},
-		replacement: function () {
+		replacement: function (content, node) {
+			if (node instanceof HTMLElement && node.nodeName.match(/^H[1-6]$/)) {
+				const level = node.nodeName.charAt(1);
+				const text = node.textContent?.trim() || '';
+				return `\n${'#'.repeat(Number(level))} ${text}\n`;
+			}
 			return '';
 		}
 	});
@@ -613,7 +628,8 @@ export function createMarkdownContent(content: string, url: string) {
 		}
 
 		// Remove any empty links e.g. [](example.com) that remain, along with surrounding newlines
-		markdown = markdown.replace(/\n*\[]\([^)]+\)\n*/g, '');
+		// But don't affect image links like ![](image.jpg)
+		markdown = markdown.replace(/\n*(?<!!)\[]\([^)]+\)\n*/g, '');
 
 		// Remove any consecutive newlines more than two
 		markdown = markdown.replace(/\n{3,}/g, '\n\n');
