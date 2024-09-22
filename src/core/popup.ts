@@ -80,8 +80,9 @@ async function handleClip() {
 		return;
 	}
 
-	// Check if LLM processing is ongoing or needed. Kind of a dumb way to check but it works for now.
-	if (interpretBtn) {
+	// Check if interpreter is enabled, the button exists, and there are prompt variables
+	const promptVariables = collectPromptVariables(currentTemplate);
+	if (generalSettings.interpreterEnabled && interpretBtn && promptVariables.length > 0) {
 		if (interpretBtn.classList.contains('processing')) {
 			console.log('LLM processing is ongoing. Waiting for completion...');
 			try {
