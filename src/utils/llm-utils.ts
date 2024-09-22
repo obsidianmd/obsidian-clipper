@@ -33,7 +33,7 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 				model: model.id,
 				max_tokens: 800,
 				messages: [
-					{ role: 'user', content: `${userPrompt}\n\nContent: ${content}` }
+					{ role: 'user', content: `${userPrompt}` }
 				],
 				system: JSON.stringify(systemContent)
 			};
@@ -48,7 +48,7 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 				model: model.id,
 				messages: [
 					{ role: 'system', content: JSON.stringify(systemContent) },
-					{ role: 'user', content: `${userPrompt}\n\nContent: ${content}` }
+					{ role: 'user', content: `${userPrompt}` }
 				]
 			};
 			headers = {
