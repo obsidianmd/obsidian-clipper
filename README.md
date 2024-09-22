@@ -76,13 +76,14 @@ These variables are automatically generated based on the page content. The main 
 | `{{content}}`       | Article content or selection, in Markdown format     |
 | `{{contentHtml}}`   | Article content or selection, in HTML format         |
 | `{{date}}`          | Current date                                         |
-| `{{time}}`          | Current date and time                                |
 | `{{description}}`   | Description or excerpt                               |
 | `{{domain}}`        | Domain                                               |
 | `{{fullHtml}}`      | Unprocessed HTML for the full page content           |
 | `{{image}}`         | Social share image URL                               |
 | `{{published}}`     | Published date                                       |
+| `{{site}}`          | Site name or publisher                               |
 | `{{title}}`         | Title of the page                                    |
+| `{{time}}`          | Current date and time                                |
 | `{{url}}`           | Current URL                                          |
 
 #### Meta variables

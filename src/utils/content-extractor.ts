@@ -239,17 +239,22 @@ export async function initializePageContent(content: string, selectedHtml: strin
 
 		// Define preset variables with fallbacks
 		const title =
-			getMetaContent(doc, "property", "og:title")
+			getSchemaProperty(schemaOrgData, 'headline')
+			|| getMetaContent(doc, "property", "og:title")
 			|| getMetaContent(doc, "name", "twitter:title")
 			|| getMetaContent(doc, "name", "title")
+			|| getMetaContent(doc, "name", "sailthru.title")
 			|| doc.querySelector('title')?.textContent?.trim()
 			|| '';
 
 		const noteName = sanitizeFileName(title);
 
-		const author =
-			getMetaContent(doc, "name", "author")
+		const authorName =
+			getMetaContent(doc, "name", "sailthru.author")
+			|| getSchemaProperty(schemaOrgData, 'author.name')
 			|| getMetaContent(doc, "property", "author")
+			|| getMetaContent(doc, "name", "byl")
+			|| getMetaContent(doc, "name", "author")
 			|| getMetaContent(doc, "name", "twitter:creator")
 			|| getMetaContent(doc, "property", "og:site_name")
 			|| getMetaContent(doc, "name", "application-name")
@@ -260,7 +265,9 @@ export async function initializePageContent(content: string, selectedHtml: strin
 			getMetaContent(doc, "name", "description")
 			|| getMetaContent(doc, "property", "description")
 			|| getMetaContent(doc, "property", "og:description")
+			|| getSchemaProperty(schemaOrgData, 'description')
 			|| getMetaContent(doc, "name", "twitter:description")
+			|| getMetaContent(doc, "name", "sailthru.description")
 			|| '';
 
 		const domain = new URL(currentUrl).hostname.replace(/^www\./, '');
@@ -268,19 +275,28 @@ export async function initializePageContent(content: string, selectedHtml: strin
 		const image =
 			getMetaContent(doc, "property", "og:image")
 			|| getMetaContent(doc, "name", "twitter:image")
+			|| getSchemaProperty(schemaOrgData, 'image.url')
+			|| getMetaContent(doc, "name", "sailthru.image.full")
 			|| '';
 
 		const timeElement = doc.querySelector("time");
 		const publishedDate = 
-			getMetaContent(doc, "property", "article:published_time")
-			|| timeElement?.getAttribute("datetime");
+			getSchemaProperty(schemaOrgData, 'datePublished')
+			|| getMetaContent(doc, "property", "article:published_time")
+			|| timeElement?.getAttribute("datetime")
+			|| getMetaContent(doc, "name", "sailthru.date")
+			|| '';
 		
 		const published = publishedDate ? dayjs(publishedDate).isValid() ? publishedDate : dayjs(publishedDate).format('YYYY-MM-DD') : "";
 
 		const site =
-			getMetaContent(doc, "property", "og:site_name")
-			|| getMetaContent(doc, "name", "application-name")
+			getSchemaProperty(schemaOrgData, 'publisher.name')
+			|| getMetaContent(doc, "property", "og:site_name")
+			|| getSchemaProperty(schemaOrgData, 'sourceOrganization.name')
 			|| getMetaContent(doc, "name", "copyright")
+			|| getSchemaProperty(schemaOrgData, 'copyrightHolder.name')
+			|| getSchemaProperty(schemaOrgData, 'isPartOf.name')
+			|| getMetaContent(doc, "name", "application-name")
 			|| '';
 
 		if (selectedHtml) {
@@ -294,7 +310,7 @@ export async function initializePageContent(content: string, selectedHtml: strin
 		const markdownBody = createMarkdownContent(content, currentUrl);
 
 		const currentVariables: { [key: string]: string } = {
-			'{{author}}': author,
+			'{{author}}': authorName,
 			'{{content}}': markdownBody,
 			'{{contentHtml}}': content,
 			'{{date}}': 'now',
@@ -333,8 +349,6 @@ export async function initializePageContent(content: string, selectedHtml: strin
 		if (schemaOrgData) {
 			addSchemaOrgDataToVariables(schemaOrgData, currentVariables);
 		}
-
-		console.log('Available variables:', currentVariables);
 
 		return {
 			noteName,
@@ -383,3 +397,57 @@ function addSchemaOrgDataToVariables(schemaData: any, variables: { [key: string]
 		});
 	}
 }
+
+function getSchemaProperty(schemaOrgData: any, property: string, defaultValue: string = ''): string {
+	if (!schemaOrgData) return defaultValue;
+
+	const memoKey = JSON.stringify(schemaOrgData) + property;
+	if (getSchemaProperty.memoized.has(memoKey)) {
+		return getSchemaProperty.memoized.get(memoKey) as string;
+	}
+
+	const searchSchema = (data: any, props: string[]): string => {
+		if (typeof data === 'string') return data;
+		if (!data || typeof data !== 'object') return '';
+
+		if (Array.isArray(data)) {
+			for (const item of data) {
+				const result = searchSchema(item, props);
+				if (result) return result;
+			}
+			return '';
+		}
+
+		const [currentProp, ...remainingProps] = props;
+		if (!currentProp) {
+			if (typeof data === 'string') return data;
+			if (typeof data === 'object' && data.name) return data.name;
+			return '';
+		}
+
+		const value = data[currentProp];
+		if (value !== undefined) {
+			return searchSchema(value, remainingProps);
+		}
+
+		for (const key in data) {
+			if (typeof data[key] === 'object') {
+				const result = searchSchema(data[key], props);
+				if (result) return result;
+			}
+		}
+
+		return '';
+	};
+
+	try {
+		const result = searchSchema(schemaOrgData, property.split('.')) || defaultValue;
+		getSchemaProperty.memoized.set(memoKey, result);
+		return result;
+	} catch (error) {
+		console.error(`Error in getSchemaProperty for ${property}:`, error);
+		return defaultValue;
+	}
+}
+
+getSchemaProperty.memoized = new Map<string, string>();
