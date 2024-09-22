@@ -1,0 +1,46 @@
+select,
+.dropdown {
+	-webkit-appearance: none;
+	appearance: none;
+	height: var(--input-height);
+	background-color: var(--dropdown-background);
+	padding: var(--dropdown-padding);
+	border: 1px solid var(--background-modifier-border);
+	font-size: var(--font-ui-smaller);
+	color: var(--text-normal);
+	font-family: inherit;
+	border-radius: var(--radius-s);
+	outline: none;
+	width: 100%;
+	margin: 0;
+	user-select: none;
+	cursor: pointer;
+
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23000' opacity='0.64' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' %3E%3Cpath d='m7 15 5 5 5-5'/%3E%3Cpath d='m7 9 5-5 5 5'/%3E%3C/svg%3E");
+	background-repeat: no-repeat, repeat;
+	/* arrow icon position (1em from the right, 50% vertical) , then gradient position*/
+	background-position: var(--dropdown-background-position);
+	/* icon size, then gradient */
+	background-size: var(--dropdown-background-size);
+
+	&:hover {
+		transition:
+			box-shadow .15s ease-in-out,
+			border .15s ease-in-out;
+	}
+	&:active,
+	&:focus,
+	&:focus-visible {
+		outline: none;
+		border-color: var(--background-modifier-border-focus);
+		box-shadow: 0 0 0 2px var(--background-modifier-border-focus);
+		transition:
+			box-shadow .15s ease-in-out,
+			border .15s ease-in-out;
+	}
+}
+@media (prefers-color-scheme: dark) {
+	select, .dropdown {
+		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23FFF' opacity='0.7' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' %3E%3Cpath d='m7 15 5 5 5-5'/%3E%3Cpath d='m7 9 5-5 5 5'/%3E%3C/svg%3E");
+	}
+}

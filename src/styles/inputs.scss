@@ -3,25 +3,15 @@ textarea {
 	min-height: 3rem;
 	padding: 0.375rem 0.5rem;
 }
-select {
-	user-select: none;
-	cursor: pointer;
-}
 input[type="password"],
 input[type="text"] {
 	height: var(--input-height);
 	padding: 0 0.5rem;
 }
-select {
-	height: var(--input-height);
-	padding: 0 0.25rem;
-}
-
 textarea::placeholder,
 input::placeholder {
 	color: var(--text-faint);
 }
-select,
 input[type="password"],
 input[type="text"],
 textarea {

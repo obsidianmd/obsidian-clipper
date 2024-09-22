@@ -131,7 +131,7 @@
 			color: var(--text-normal);
 		}
 		svg {
-			color: var(--text-faint);
+			color: var(--text-muted);
 			transition: transform 0.1s ease-in-out;
 		}
 		&.collapsed {
