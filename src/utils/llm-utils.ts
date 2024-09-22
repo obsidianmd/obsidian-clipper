@@ -20,7 +20,7 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 	try {
 		const systemContent = {
 			variables: promptVariables.map(({ key, prompt }) => ({ key, prompt })),
-			instructions: "Please respond to the user prompt and each variable prompt. Format your response as a JSON object with 'user_response' for the main prompt and 'variable_responses' for the variable prompts. Make your responses concise."
+			instructions: "You are a helpful assistant. Please respond to each variable prompt. Format your response as a JSON object with 'variable_responses' for the variable prompts. Make your responses concise."
 		};
 
 		let requestBody: any;
