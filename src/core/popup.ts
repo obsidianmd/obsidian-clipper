@@ -182,7 +182,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 		loadedSettings = await loadSettings();
 
-		console.log('General settings:', loadedSettings);
+		debugLog('Settings', 'General settings:', loadedSettings);
 
 		await loadTemplates();
 
@@ -652,14 +652,23 @@ document.addEventListener('DOMContentLoaded', async function() {
 						// Search variables
 						const searchInput = variablesPanel.querySelector('#variables-search') as HTMLInputElement;
 						searchInput.addEventListener('input', debounce(handleVariableSearch, 300));
+						handleVariableSearch();
 
 						// Add click event listeners to variable keys and chevrons
 						const variableItems = variablesPanel.querySelectorAll('.variable-item');
 						variableItems.forEach(item => {
 							const key = item.querySelector('.variable-key') as HTMLElement;
-							const chevron = item.querySelector('.chevron-icon') as HTMLElement;
-							const valueElement = item.querySelector('.variable-value') as HTMLElement;
+							const variableName = key.getAttribute('data-variable');
+						
+							// Skip contentHtml and fullHtml variables
+							if (variableName === '{{contentHtml}}' || variableName === '{{fullHtml}}') {
+								item.remove();
+								return;
+							}
 
+							const chevron = item.querySelector('.chevron-icon') as HTMLElement;
+							const valueElement = item.querySelector('.variable-value') as HTMLElement;	
+								
 							if (valueElement.scrollWidth > valueElement.clientWidth) {
 								item.classList.add('has-overflow');
 							}
@@ -702,17 +711,21 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 		function handleVariableSearch() {
 			const searchInput = document.getElementById('variables-search') as HTMLInputElement;
-			const searchTerm = searchInput.value.toLowerCase();
+			const searchTerm = searchInput.value.trim().toLowerCase();
 			const variableItems = variablesPanel.querySelectorAll('.variable-item');
 
 			variableItems.forEach(item => {
-				const htmlItem = item as HTMLElement; // Cast item to HTMLElement
+				const htmlItem = item as HTMLElement;
 				const key = htmlItem.querySelector('.variable-key') as HTMLElement;
 				const value = htmlItem.querySelector('.variable-value') as HTMLElement;
 				const keyText = key.textContent?.toLowerCase() || '';
 				const valueText = value.textContent?.toLowerCase() || '';
 
-				if (keyText.includes(searchTerm) || valueText.includes(searchTerm)) {
+				if (searchTerm.length < 2) {
+					htmlItem.style.display = 'flex';
+					resetHighlight(key);
+					resetHighlight(value);
+				} else if (keyText.includes(searchTerm) || valueText.includes(searchTerm)) {
 					htmlItem.style.display = 'flex';
 					highlightText(key, searchTerm);
 					highlightText(value, searchTerm);
@@ -726,6 +739,10 @@ document.addEventListener('DOMContentLoaded', async function() {
 			const originalText = element.textContent || '';
 			const regex = new RegExp(`(${searchTerm})`, 'gi');
 			element.innerHTML = originalText.replace(regex, '<mark>$1</mark>');
+		}
+
+		function resetHighlight(element: HTMLElement) {
+			element.innerHTML = element.textContent || '';
 		}
 
 		// Call this function after loading templates and settings
