@@ -19,10 +19,17 @@
 		opacity .15s ease-in-out;
 	outline: 0 solid var(--background-modifier-border-focus);
 
+	
 	input[type='checkbox'] {
 		position: absolute;
+		display: none;
 		opacity: 0;
 		left: 0;
+		width: 100%;
+		height: 100%;
+		margin: 0;
+		padding: 0;
+		z-index: 10;
 	}
 
 	&:focus-within {
@@ -35,6 +42,12 @@
 				inset 0 6px 20px rgba(0, 0, 0, .14),
 				inset 0 0 1px rgba(0, 0, 0, .28);
 		}
+	}
+	
+	&.mod-small {
+		--toggle-width: 34px;
+		--toggle-thumb-width: 15px;
+		--toggle-thumb-height: 15px;
 	}
 
 	&.is-enabled {

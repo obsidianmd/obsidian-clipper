@@ -14,9 +14,10 @@
 					<ul>
 						<li class="sidebar-heading">Settings</li>
 						<li data-section="general" class="active">General</li>
+						<li data-section="interpreter" display="none">Interpreter</li>
 						<li class="sidebar-heading">Templates</li>
 					</ul>
-					<button type="button" id="new-template-btn" class="mod-cta">New template</button>
+					<button type="button" id="new-template-btn" class="mod-cta">New&nbsp;template</button>
 					<ul id="template-list"></ul>
 					
 				</div>
@@ -103,6 +104,74 @@
 						</form>
 					</div>
 
+					<div id="interpreter-section" class="settings-section">
+						<div class="settings-section-header">
+							<h2>Interpreter settings</h2>
+						</div>
+						<form id="interpreter-settings-form">
+							<div>
+								<h3>Interpreter</h3>
+								<div class="setting-item mod-horizontal">
+									<div class="setting-item-info">
+										<label for="interpreter-toggle">Enable interpreter</label>
+										<div class="setting-item-description">
+											Allows you to use prompt variables in your templates, to fill in information using natural language such as <code>{{prompt:"a summary of the page"}}</code>. Requires an API&nbsp;key.
+										</div>
+									</div>
+									<div class="setting-item-control">
+										<div class="checkbox-container">
+											<input type="checkbox" id="interpreter-toggle" />
+										</div>
+									</div>
+								</div>
+								<div class="setting-item mod-horizontal">
+									<div class="setting-item-info">
+										<label for="interpreter-auto-run-toggle">Automatically run</label>
+										<div class="setting-item-description">Run prompt variables immediately if the template contains any. This will consume API credits with your model provider. Turn off if you only want to run interpreter manually.</div>
+									</div>
+									<div class="setting-item-control">
+										<div class="checkbox-container">
+											<input type="checkbox" id="interpreter-auto-run-toggle" />
+										</div>
+									</div>
+								</div>
+								<div class="setting-item">
+									<label for="default-prompt-context" style="font-weight: 400;">Default prompt context</label>
+									<div class="setting-item-description">The model will use this context to interpret prompt variables. Variables can be used&nbsp;here.</div>
+									<textarea id="default-prompt-context" rows="4" placeholder="{{fullHtml}}" spellcheck="false"></textarea>
+								</div>
+							</div>
+							<div>
+								<h3>Models</h3>
+								<div class="model-list-container">
+									<div id="model-list"></div>
+									<div class="add-btn">
+										<a id="add-model-btn">+ Add model</a>
+									</div>
+								</div>
+								<div class="setting-item mod-horizontal">
+									<div class="setting-item-info">
+										<label for="openai-api-key">OpenAI API key</label>
+										<div class="setting-item-description">You can get your OpenAI API&nbsp;key&nbsp;<a href="https://platform.openai.com/api-keys" target="_blank">here</a>.</div>
+									</div>
+									<div class="setting-item-control">
+										<input type="password" id="openai-api-key" placeholder="OpenAI API key">
+									</div>
+								</div>
+								<div class="setting-item mod-horizontal">
+									<div class="setting-item-info">
+										<label for="anthropic-api-key">Anthropic API key</label>
+										<div class="setting-item-description">You can get your Anthropic API&nbsp;key&nbsp;<a href="https://console.anthropic.com/settings/keys" target="_blank">here</a>.</div>
+									</div>
+									<div class="setting-item-control">
+										<input type="password" id="anthropic-api-key" placeholder="Anthropic API key">
+									</div>
+								</div>
+							</div>
+							
+						</form>
+					</div>
+
 					<div id="templates-section" class="settings-section">
 						<div class="settings-section-header">
 							<h2 id="template-editor-title">Edit template</h2>
@@ -179,18 +248,23 @@
 								<div class="setting-item">
 									<label for="url-patterns">Template triggers</label>
 									<div class="setting-item-description">Define rules to automatically select this template if it matches a URL pattern or contains schema.org data. One rule per&nbsp;line.</div>
-									<textarea id="url-patterns" placeholder="https://example.com/" rows="2"></textarea>
+									<textarea id="url-patterns" placeholder="https://example.com/" rows="2" spellcheck="false"></textarea>
 								</div>
 								<div id="properties-container">
 									<label>Properties</label>
 									<div class="setting-item-description">Properties to add to the top of the clipped note. Use variables to pre-populate data from the&nbsp;page.</div>
 									<div id="template-properties"></div>
-									<div class="metadata-add-button"><a id="add-property-btn">+ Add property</a></div>
+									<div class="add-btn metadata-add-btn"><a id="add-property-btn">+ Add property</a></div>
 								</div>
 								<div class="setting-item">
 									<label for="note-content-format">Note content</label>
 									<div class="setting-item-description">Customize the content of the note. Use variables to pre-populate data from the&nbsp;page.</div>
 									<textarea id="note-content-format" rows="6" placeholder="{{content}}"></textarea>
+								</div>
+								<div class="setting-item" id="prompt-context-container">
+									<label for="prompt-context">Interpreter context</label>
+									<div class="setting-item-description">The context used to interpret prompt variables. Overrides the default context defined in <a href="?section=interpreter">Interpreter settings</a>. Variables can be used&nbsp;here.</div>
+									<textarea id="prompt-context" rows="4" spellcheck="false"></textarea>
 								</div>
 							</div>
 						</form>

@@ -82,7 +82,6 @@ export function escapeHtml(unsafe: string): string {
 		.replace(/'/g, "&#039;");
 }
 
-
 export function makeUrlAbsolute(element: Element, attributeName: string, baseUrl: URL) {
 	const attributeValue = element.getAttribute(attributeName);
 	if (attributeValue) {
@@ -133,4 +132,12 @@ export function processUrls(htmlContent: string, baseUrl: URL): string {
 	tempDiv.querySelectorAll('a').forEach(link => makeUrlAbsolute(link, 'href', baseUrl));
 	
 	return tempDiv.innerHTML;
+}
+
+export function formatDuration(ms: number): string {
+	if (ms < 1000) {
+		return `${Math.round(ms)}ms`;
+	} else {
+		return `${(ms / 1000).toFixed(2)}s`;
+	}
 }

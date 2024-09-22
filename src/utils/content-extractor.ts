@@ -7,6 +7,7 @@ import browser from './browser-polyfill';
 import { convertDate } from './date-utils';
 import { debugLog } from './debug';
 import dayjs from 'dayjs';
+import { generalSettings } from '../utils/storage-utils';
 
 export function extractReadabilityContent(doc: Document): ReturnType<Readability['parse']> | null {
 	try {
@@ -28,15 +29,16 @@ async function processVariable(match: string, variables: { [key: string]: string
 }
 
 async function processSelector(tabId: number, match: string, currentUrl: string): Promise<string> {
-	const selectorRegex = /{{selector:(.*?)(?:\|(.*?))?}}/;
+	const selectorRegex = /{{(selector|selectorHtml):(.*?)(?:\|(.*?))?}}/;
 	const matches = match.match(selectorRegex);
 	if (!matches) {
 		console.error('Invalid selector format:', match);
 		return match;
 	}
 
-	const [, selector, filtersString] = matches;
-	const { content } = await extractContentBySelector(tabId, selector);
+	const [, selectorType, selector, filtersString] = matches;
+	const extractHtml = selectorType === 'selectorHtml';
+	const { content } = await extractContentBySelector(tabId, selector, extractHtml);
 	
 	// Convert content to string if it's an array
 	const contentString = Array.isArray(content) ? JSON.stringify(content) : content;
@@ -94,21 +96,42 @@ async function processSchema(match: string, variables: { [key: string]: string }
 	return applyFilters(schemaValue, filtersString, currentUrl);
 }
 
+// This function doesn't really do anything, it just returns the whole prompt variable
+// so that it's still visible in the input fields in the popup
+async function processPrompt(match: string, variables: { [key: string]: string }, currentUrl: string): Promise<string> {
+	if (generalSettings.interpreterEnabled) {
+		const promptRegex = /{{prompt:\\?"(.*?)\\?"(\|.*?)?}}/;
+		const matches = match.match(promptRegex);
+		if (!matches) {
+			console.error('Invalid prompt format:', match);
+			return match;
+		}
+	
+		const [, promptText, filters = ''] = matches;
+	
+		return match;
+	} else {
+		return '';
+	}
+}
+
 function getNestedProperty(obj: any, path: string): any {
 	return path.split('.').reduce((prev, curr) => prev && prev[curr], obj);
 }
 
 export async function replaceVariables(tabId: number, text: string, variables: { [key: string]: string }, currentUrl: string): Promise<string> {
-	const regex = /{{(?:schema:)?(?:selector:)?(.*?)}}/g;
+	const regex = /{{(?:schema:)?(?:selector:)?(?:prompt:)?(.*?)}}/g;
 	const matches = text.match(regex);
 
 	if (matches) {
 		for (const match of matches) {
 			let replacement: string;
-			if (match.startsWith('{{selector:')) {
+			if (match.startsWith('{{selector:') || match.startsWith('{{selectorHtml:')) {
 				replacement = await processSelector(tabId, match, currentUrl);
 			} else if (match.startsWith('{{schema:')) {
 				replacement = await processSchema(match, variables, currentUrl);
+			} else if (match.startsWith('{{prompt:')) {
+				replacement = await processPrompt(match, variables, currentUrl);
 			} else {
 				const [variableName, ...filterParts] = match.slice(2, -2).split('|');
 				let value = variables[`{{${variableName}}}`] || '';
@@ -170,7 +193,7 @@ export function getMetaContent(doc: Document, attr: string, value: string): stri
 	return element ? element.getAttribute("content")?.trim() ?? "" : "";
 }
 
-export async function extractContentBySelector(tabId: number, selector: string): Promise<{ content: string; schemaOrgData: any }> {
+export async function extractContentBySelector(tabId: number, selector: string, extractHtml: boolean = false): Promise<{ content: string; schemaOrgData: any }> {
 	const attributeMatch = selector.match(/:([a-zA-Z-]+)$/);
 	let baseSelector = selector;
 	let attribute: string | undefined;
@@ -181,7 +204,12 @@ export async function extractContentBySelector(tabId: number, selector: string):
 	}
 
 	try {
-		const response = await browser.tabs.sendMessage(tabId, { action: "extractContent", selector: baseSelector, attribute: attribute });
+		const response = await browser.tabs.sendMessage(tabId, { 
+			action: "extractContent", 
+			selector: baseSelector, 
+			attribute: attribute,
+			extractHtml: extractHtml
+		});
 		let content = response ? response.content : '';
 		
 		// Ensure content is always a string

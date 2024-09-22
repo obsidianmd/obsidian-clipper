@@ -20,10 +20,15 @@ export function initializeToggles(): void {
 	});
 }
 
-function updateToggleState(container: HTMLElement, checkbox: HTMLInputElement): void {
+export function updateToggleState(container: HTMLElement, checkbox: HTMLInputElement): void {
 	if (checkbox.checked) {
 		container.classList.add('is-enabled');
 	} else {
 		container.classList.remove('is-enabled');
 	}
+}
+
+export function adjustNoteNameHeight(textarea: HTMLTextAreaElement): void {
+	textarea.style.minHeight = '2rem';
+	textarea.style.minHeight = textarea.scrollHeight + 'px';
 }

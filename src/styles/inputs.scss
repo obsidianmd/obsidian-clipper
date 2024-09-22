@@ -6,9 +6,23 @@ textarea {
 select {
 	user-select: none;
 	cursor: pointer;
+}
+input[type="password"],
+input[type="text"] {
 	height: var(--input-height);
+	padding: 0 0.5rem;
+}
+select {
+	height: var(--input-height);
+	padding: 0 0.25rem;
+}
+
+textarea::placeholder,
+input::placeholder {
+	color: var(--text-faint);
 }
 select,
+input[type="password"],
 input[type="text"],
 textarea {
 	background: var(--background-primary);
@@ -37,20 +51,6 @@ textarea {
 			border .15s ease-in-out;
 	}
 }
-select {
-	padding: 0 0.25rem;
-}
-
-textarea::placeholder,
-input::placeholder {
-	color: var(--text-faint);
-}
-
-input[type="text"] {
-	height: var(--input-height);
-	padding: 0 0.5rem;
-}
-
 label {
 	display: block;
 	margin: 20px 0 6px;

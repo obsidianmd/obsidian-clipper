@@ -34,7 +34,21 @@ browser.runtime.onMessage.addListener(function(request: any, sender: browser.Run
 
 		const schemaOrgData = extractSchemaOrgData();
 
-		const fullHtmlWithoutIndentation = document.body.innerHTML
+		// Create a new DOMParser
+		const parser = new DOMParser();
+		// Parse the document's HTML
+		const doc = parser.parseFromString(document.documentElement.outerHTML, 'text/html');
+		
+		// Remove all script and style elements
+		doc.querySelectorAll('script, style').forEach(el => el.remove());
+
+		// Remove style attributes from all elements
+		doc.querySelectorAll('*').forEach(el => el.removeAttribute('style'));
+
+		// Get the modified HTML without scripts, styles, and style attributes
+		const cleanedHtml = doc.documentElement.outerHTML;
+
+		const fullHtmlWithoutIndentation = cleanedHtml
 			.replace(/\t/g, '') // Remove tabs
 			.replace(/^[ \t]+/gm, ''); // Remove leading spaces and tabs from each line
 
@@ -48,7 +62,7 @@ browser.runtime.onMessage.addListener(function(request: any, sender: browser.Run
 
 		sendResponse(response);
 	} else if (request.action === "extractContent") {
-		const content = extractContentBySelector(request.selector, request.attribute);
+		const content = extractContentBySelector(request.selector, request.attribute, request.extractHtml);
 		sendResponse({ content: content, schemaOrgData: extractSchemaOrgData() });
 	} else if (request.action === "logObsidianUri") {
 		console.log('Obsidian URI created:', request.uri);
@@ -57,7 +71,7 @@ browser.runtime.onMessage.addListener(function(request: any, sender: browser.Run
 	return true;
 });
 
-function extractContentBySelector(selector: string, attribute?: string): string | string[] {
+function extractContentBySelector(selector: string, attribute?: string, extractHtml: boolean = false): string | string[] {
 	const elements = document.querySelectorAll(selector);
 	
 	if (elements.length > 1) {
@@ -65,13 +79,13 @@ function extractContentBySelector(selector: string, attribute?: string): string 
 			if (attribute) {
 				return el.getAttribute(attribute) || '';
 			}
-			return el.textContent?.trim() || '';
+			return extractHtml ? el.outerHTML : el.textContent?.trim() || '';
 		});
 	} else if (elements.length === 1) {
 		if (attribute) {
 			return elements[0].getAttribute(attribute) || '';
 		}
-		return elements[0].textContent?.trim() || '';
+		return extractHtml ? elements[0].outerHTML : elements[0].textContent?.trim() || '';
 	} else {
 		return '';
 	}

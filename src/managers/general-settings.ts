@@ -2,7 +2,7 @@ import { handleDragStart, handleDragOver, handleDrop, handleDragEnd } from '../u
 import { initializeIcons } from '../icons/icons';
 import { getCommands } from '../utils/hotkeys';
 import { initializeToggles } from '../utils/ui-utils';
-import { generalSettings, loadGeneralSettings, saveGeneralSettings } from '../utils/storage-utils';
+import { generalSettings, loadSettings, saveSettings } from '../utils/storage-utils';
 import { detectBrowser } from '../utils/browser-detection';
 import { createElementWithClass, createElementWithHTML } from '../utils/dom-utils';
 
@@ -46,13 +46,13 @@ export function updateVaultList(): void {
 
 export function addVault(vault: string): void {
 	generalSettings.vaults.push(vault);
-	saveGeneralSettings();
+	saveSettings();
 	updateVaultList();
 }
 
 export function removeVault(index: number): void {
 	generalSettings.vaults.splice(index, 1);
-	saveGeneralSettings();
+	saveSettings();
 	updateVaultList();
 }
 
@@ -85,7 +85,7 @@ export async function setShortcutInstructions() {
 }
 
 export function initializeGeneralSettings(): void {
-	loadGeneralSettings().then(() => {
+	loadSettings().then(() => {
 		updateVaultList();
 		initializeShowMoreActionsToggle();
 		initializeBetaFeaturesToggle();
@@ -94,16 +94,41 @@ export function initializeGeneralSettings(): void {
 		initializeKeyboardShortcuts();
 		initializeToggles();
 		setShortcutInstructions();
+		initializeAutoSave();
 	});
 }
 
+function initializeAutoSave(): void {
+	const generalSettingsForm = document.getElementById('general-settings-form');
+	if (generalSettingsForm) {
+		generalSettingsForm.addEventListener('input', debounce(saveSettingsFromForm, 500));
+	}
+}
+
+function saveSettingsFromForm(): void {
+	const showMoreActionsToggle = document.getElementById('show-more-actions-toggle') as HTMLInputElement;
+	const betaFeaturesToggle = document.getElementById('beta-features-toggle') as HTMLInputElement;
+
+	const updatedSettings = {
+		showMoreActionsButton: showMoreActionsToggle.checked,
+		betaFeatures: betaFeaturesToggle.checked
+	};
+
+	saveSettings(updatedSettings);
+}
+
+function debounce(func: Function, delay: number): (...args: any[]) => void {
+	let timeoutId: NodeJS.Timeout;
+	return (...args: any[]) => {
+		clearTimeout(timeoutId);
+		timeoutId = setTimeout(() => func(...args), delay);
+	};
+}
+
 function initializeShowMoreActionsToggle(): void {
-	const ShowMoreActionsToggle = document.getElementById('show-more-actions-toggle') as HTMLInputElement;
-	if (ShowMoreActionsToggle) {
-		ShowMoreActionsToggle.checked = generalSettings.showMoreActionsButton;
-		ShowMoreActionsToggle.addEventListener('change', () => {
-			saveGeneralSettings({ showMoreActionsButton: ShowMoreActionsToggle.checked });
-		});
+	const showMoreActionsToggle = document.getElementById('show-more-actions-toggle') as HTMLInputElement;
+	if (showMoreActionsToggle) {
+		showMoreActionsToggle.checked = generalSettings.showMoreActionsButton;
 	}
 }
 
@@ -148,9 +173,6 @@ function initializeBetaFeaturesToggle(): void {
 	const betaFeaturesToggle = document.getElementById('beta-features-toggle') as HTMLInputElement;
 	if (betaFeaturesToggle) {
 		betaFeaturesToggle.checked = generalSettings.betaFeatures;
-		betaFeaturesToggle.addEventListener('change', () => {
-			saveGeneralSettings({ betaFeatures: betaFeaturesToggle.checked });
-		});
 	}
 }
 
@@ -159,7 +181,7 @@ function initializeSilentOpenToggle(): void {
 	if (silentOpenToggle) {
 		silentOpenToggle.checked = generalSettings.silentOpen;
 		silentOpenToggle.addEventListener('change', () => {
-			saveGeneralSettings({ silentOpen: silentOpenToggle.checked });
+			saveSettings({ silentOpen: silentOpenToggle.checked });
 		});
 	}
 }

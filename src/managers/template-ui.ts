@@ -7,6 +7,8 @@ import { updateUrl } from '../utils/routing';
 import { handleDragStart, handleDragOver, handleDrop, handleDragEnd } from '../utils/drag-and-drop';
 import browser from '../utils/browser-polyfill';
 import { createElementWithClass, createElementWithHTML } from '../utils/dom-utils';
+import { updatePromptContextVisibility } from './interpreter-settings';
+import { showSettingsSection } from './settings-section-ui';
 
 let hasUnsavedChanges = false;
 
@@ -105,7 +107,8 @@ export function showTemplateEditor(template: Template | null): void {
 			path: 'Clippings',
 			noteContentFormat: '{{content}}',
 			properties: [],
-			triggers: []
+			triggers: [],
+			context: ''
 		};
 		templates.unshift(editingTemplate);
 		setEditingTemplateIndex(0);
@@ -146,7 +149,9 @@ export function showTemplateEditor(template: Template | null): void {
 	const noteContentFormat = document.getElementById('note-content-format') as HTMLTextAreaElement;
 	if (noteContentFormat) noteContentFormat.value = editingTemplate.noteContentFormat || '';
 
-	// Call updateBehaviorFields here to set the initial state
+	const promptContextTextarea = document.getElementById('prompt-context') as HTMLTextAreaElement;
+	if (promptContextTextarea) promptContextTextarea.value = editingTemplate.context || '';
+
 	updateBehaviorFields();
 
 	if (behaviorSelect) {
@@ -160,26 +165,7 @@ export function showTemplateEditor(template: Template | null): void {
 	const triggersTextarea = document.getElementById('url-patterns') as HTMLTextAreaElement;
 	if (triggersTextarea) triggersTextarea.value = editingTemplate && editingTemplate.triggers ? editingTemplate.triggers.join('\n') : '';
 
-	const templateEditor = document.getElementById('template-editor');
-	if (templateEditor) templateEditor.style.display = 'block';
-	const templatesSection = document.getElementById('templates-section');
-	if (templatesSection) templatesSection.style.display = 'block';
-	const generalSection = document.getElementById('general-section');
-	if (generalSection) generalSection.style.display = 'none';
-
-	document.querySelectorAll('#sidebar li[data-section]').forEach(item => item.classList.remove('active'));
-	document.querySelectorAll('#template-list li').forEach(item => item.classList.remove('active'));
-	if (editingTemplateIndex !== -1) {
-		const activeTemplateItem = document.querySelector(`#template-list li[data-id="${templates[editingTemplateIndex].id}"]`);
-		if (activeTemplateItem) {
-			activeTemplateItem.classList.add('active');
-		}
-	}
-
-	if (templatesSection) templatesSection.classList.add('active');
-	if (generalSection) generalSection.classList.remove('active');
-
-	updateTemplateList();
+	showSettingsSection('templates', editingTemplate.id);
 
 	if (!editingTemplate.id) {
 		const templateNameField = document.getElementById('template-name') as HTMLInputElement;
@@ -217,6 +203,7 @@ export function showTemplateEditor(template: Template | null): void {
 	}
 
 	updateUrl('templates', editingTemplate.id);
+	updatePromptContextVisibility();
 }
 
 function updateBehaviorFields(): void {
@@ -404,6 +391,9 @@ export function updateTemplateFromForm(): void {
 
 	const noteContentFormat = document.getElementById('note-content-format') as HTMLTextAreaElement;
 	if (noteContentFormat) template.noteContentFormat = noteContentFormat.value;
+
+	const promptContextTextarea = document.getElementById('prompt-context') as HTMLTextAreaElement;
+	if (promptContextTextarea) template.context = promptContextTextarea.value;
 
 	const propertyElements = document.querySelectorAll('#template-properties .property-editor');
 	template.properties = Array.from(propertyElements).map(prop => {

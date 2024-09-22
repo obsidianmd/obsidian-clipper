@@ -36,7 +36,16 @@
 					</div>
 					<input id="path-name-field" type="text" placeholder="Folder"/>
 				</div>
-				<button id="clip-button" class="mod-cta">Add to Obsidian</button>
+				<div id="interpreter" style="display: none;">
+					<textarea id="prompt-context" rows="3"></textarea>
+					<div class="interpreter-controls">
+						<select id="model-select" style="display: none;"></select>
+						<button id="interpret-btn">interpret</button>
+						<span id="interpreter-timer" style="display: none;"></span>
+					</div>
+					<div id="interpreter-error" style="display: none;"></div>
+				</div>
+				<button id="clip-btn" class="mod-cta">Add to Obsidian</button>
 			</div>
 		</div>
 		<script type="module" src="popup.js"></script>

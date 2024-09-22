@@ -12,13 +12,14 @@ import {
 } from '../managers/template-manager';
 import { updateTemplateList, showTemplateEditor, resetUnsavedChanges, initializeAddPropertyButton } from '../managers/template-ui';
 import { initializeGeneralSettings } from '../managers/general-settings';
+import { showSettingsSection, initializeSidebar } from '../managers/settings-section-ui';
+import { initializeInterpreterSettings } from '../managers/interpreter-settings';
 import { initializeDragAndDrop, handleTemplateDrag } from '../utils/drag-and-drop';
 import { initializeAutoSave } from '../utils/auto-save';
 import { exportTemplate, importTemplate, initializeDropZone } from '../utils/import-export';
 import { createIcons } from 'lucide';
 import { icons } from '../icons/icons';
-import { showGeneralSettings } from '../managers/general-settings-ui';
-import { updateUrl } from '../utils/routing';
+import { updateUrl, getUrlParameters } from '../utils/routing';
 import browser from '../utils/browser-polyfill';
 import { addBrowserClassToHtml } from '../utils/browser-detection';
 import { initializeMenu, addMenuItemListener } from '../managers/menu';
@@ -35,6 +36,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 	async function initializeSettings(): Promise<void> {
 		await initializeGeneralSettings();
+		await initializeInterpreterSettings();
 		const loadedTemplates = await loadTemplates();
 		updateTemplateList(loadedTemplates);
 		initializeTemplateListeners();
@@ -53,25 +55,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 	}
 
 	function initializeTemplateListeners(): void {
-		const templateList = document.getElementById('template-list');
-		if (templateList) {
-			templateList.addEventListener('click', (event) => {
-				const target = event.target as HTMLElement;
-				const listItem = target.closest('li');
-				if (listItem && listItem.dataset.id) {
-					const currentTemplates = getTemplates();
-					const selectedTemplate = currentTemplates.find((t: Template) => t.id === listItem.dataset.id);
-					if (selectedTemplate) {
-						resetUnsavedChanges();
-						showTemplateEditor(selectedTemplate);
-						updateUrl('templates', selectedTemplate.id);
-					}
-				}
-			});
-		} else {
-			console.error('Template list not found');
-		}
-
 		if (newTemplateBtn) {
 			newTemplateBtn.addEventListener('click', () => {
 				showTemplateEditor(null);
@@ -109,33 +92,32 @@ document.addEventListener('DOMContentLoaded', async () => {
 					if (templates.length > 0) {
 						showTemplateEditor(templates[0]);
 					} else {
-						showGeneralSettings();
+						showSettingsSection('general');
 					}
 				}).catch(error => {
 					console.error('Failed to delete template:', error);
 					alert('Failed to delete template. Please try again.');
+					showSettingsSection('general');
 				});
 			}
 		}
 	}
 
 	async function handleUrlParameters(): Promise<void> {
-		const urlParams = new URLSearchParams(window.location.search);
-		const section = urlParams.get('section');
-		const templateId = urlParams.get('template');
+		const { section, templateId } = getUrlParameters();
 
-		if (section === 'general') {
-			showGeneralSettings();
+		if (section === 'general' || section === 'interpreter') {
+			showSettingsSection(section);
 		} else if (templateId) {
 			const template = findTemplateById(templateId);
 			if (template) {
 				showTemplateEditor(template);
 			} else {
 				console.error(`Template with id ${templateId} not found`);
-				showGeneralSettings();
+				showSettingsSection('general');
 			}
 		} else {
-			showGeneralSettings();
+			showSettingsSection('general');
 		}
 	}
 
@@ -159,62 +141,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 		});
 	}
 
-	function initializeSidebar(): void {
-		const sidebarItems = document.querySelectorAll('#sidebar li[data-section], #template-list li');
-		const sections = document.querySelectorAll('.settings-section');
-		const sidebar = document.getElementById('sidebar');
-		const settingsContainer = document.getElementById('settings');
-
-		if (sidebar) {
-			sidebar.addEventListener('click', (event) => {
-				const target = event.target as HTMLElement;
-				if (target.dataset.section === 'general') {
-					showGeneralSettings();
-				}
-				if (settingsContainer) {
-					settingsContainer.classList.remove('sidebar-open');
-				}
-			});
-		}
-
-		sidebarItems.forEach(item => {
-			item.addEventListener('click', () => {
-				const sectionId = (item as HTMLElement).dataset.section;
-				sidebarItems.forEach(i => i.classList.remove('active'));
-				item.classList.add('active');
-				document.querySelectorAll('#template-list li').forEach(templateItem => templateItem.classList.remove('active'));
-				const templateEditor = document.getElementById('template-editor');
-				if (templateEditor) {
-					templateEditor.style.display = 'none';
-				}
-				sections.forEach(section => {
-					if (section.id === `${sectionId}-section`) {
-						(section as HTMLElement).style.display = 'block';
-						section.classList.add('active');
-					} else {
-						(section as HTMLElement).style.display = 'none';
-						section.classList.remove('active');
-					}
-				});
-				if (settingsContainer) {
-					settingsContainer.classList.remove('sidebar-open');
-				}
-			});
-		});
-
-		const hamburgerMenu = document.getElementById('hamburger-menu');
-
-		if (hamburgerMenu && settingsContainer) {
-			hamburgerMenu.addEventListener('click', () => {
-				settingsContainer.classList.toggle('sidebar-open');
-				hamburgerMenu.classList.toggle('is-active');
-			});
-		}
-	}
-
 	const templateForm = document.getElementById('template-settings-form');
 	if (templateForm) {
-		initializeAutoSave();
 		initializeDragAndDrop();
 		initializeDropZone();
 		initializeAddPropertyButton();

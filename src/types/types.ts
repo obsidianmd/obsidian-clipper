@@ -8,6 +8,7 @@ export interface Template {
 	properties: Property[];
 	triggers?: string[];
 	vault?: string;
+	context?: string;
 }
 
 export interface Property {
@@ -22,3 +23,9 @@ export interface ExtractedContent {
 }
 
 export type FilterFunction = (value: string, param?: string) => string | any[];
+
+export interface PromptVariable {
+	key: string;
+	prompt: string;
+	filters?: string;
+}

@@ -2,7 +2,7 @@ import { Template, Property } from '../types/types';
 import { templates, getTemplates, saveTemplateSettings, getEditingTemplateIndex } from '../managers/template-manager';
 import { updateTemplateList } from '../managers/template-ui';
 import { updateVaultList } from '../managers/general-settings';
-import { generalSettings, saveGeneralSettings } from './storage-utils';
+import { generalSettings, saveSettings } from './storage-utils';
 
 let draggedElement: HTMLElement | null = null;
 
@@ -151,7 +151,7 @@ function handleVaultReorder(newIndex: number): void {
 	if (oldIndex !== -1 && oldIndex !== newIndex) {
 		const [movedVault] = generalSettings.vaults.splice(oldIndex, 1);
 		generalSettings.vaults.splice(newIndex, 0, movedVault);
-		saveGeneralSettings();
+		saveSettings();
 		updateVaultList();
 	}
 }

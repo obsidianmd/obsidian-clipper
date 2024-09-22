@@ -1,23 +1,25 @@
 import dayjs from 'dayjs';
-import { Template, Property } from '../types/types';
+import { Template, Property, PromptVariable } from '../types/types';
 import { generateFrontmatter, saveToObsidian } from '../utils/obsidian-note-creator';
-import { sanitizeFileName } from '../utils/string-utils';
 import { extractPageContent, initializePageContent, replaceVariables } from '../utils/content-extractor';
 import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
 import { decompressFromUTF16 } from 'lz-string';
 import { findMatchingTemplate, matchPattern } from '../utils/triggers';
-import { getLocalStorage, setLocalStorage, loadGeneralSettings, generalSettings, GeneralSettings } from '../utils/storage-utils';
+import { getLocalStorage, setLocalStorage, loadSettings, generalSettings, Settings } from '../utils/storage-utils';
 import { formatVariables, unescapeValue } from '../utils/string-utils';
 import { loadTemplates, createDefaultTemplate } from '../managers/template-manager';
 import browser from '../utils/browser-polyfill';
 import { detectBrowser, addBrowserClassToHtml } from '../utils/browser-detection';
 import { createElementWithClass, createElementWithHTML } from '../utils/dom-utils';
+import { initializeInterpreter, handleInterpreterUI, collectPromptVariables } from '../utils/interpreter';
+import { adjustNoteNameHeight } from '../utils/ui-utils';
+import { debugLog } from '../utils/debug';
 
 let currentTemplate: Template | null = null;
 let templates: Template[] = [];
 let currentVariables: { [key: string]: string } = {};
 
-let loadedSettings: GeneralSettings;
+let loadedSettings: Settings;
 
 async function ensureContentScriptLoaded() {
 	const tabs = await browser.tabs.query({active: true, currentWindow: true});
@@ -72,10 +74,34 @@ async function handleClip() {
 	const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
 	const noteNameField = document.getElementById('note-name-field') as HTMLInputElement;
 	const pathField = document.getElementById('path-name-field') as HTMLInputElement;
+	const interpretBtn = document.getElementById('interpret-btn') as HTMLButtonElement;
 
 	if (!vaultDropdown || !noteContentField) {
 		showError('Some required fields are missing. Please try reloading the extension.');
 		return;
+	}
+
+	// Check if interpreter is enabled, the button exists, and there are prompt variables
+	const promptVariables = collectPromptVariables(currentTemplate);
+	if (generalSettings.interpreterEnabled && interpretBtn && promptVariables.length > 0) {
+		if (interpretBtn.classList.contains('processing')) {
+			try {
+				await waitForInterpreter(interpretBtn);
+			} catch (error) {
+				console.error('Interpreter processing failed:', error);
+				showError('Interpreter processing failed. Please try again.');
+				return;
+			}
+		} else if (interpretBtn.textContent?.toLowerCase() !== 'done') {
+			interpretBtn.click(); // Trigger processing
+			try {
+				await waitForInterpreter(interpretBtn);
+			} catch (error) {
+				console.error('Interpreter processing failed:', error);
+				showError('Interpreter processing failed. Please try again.');
+				return;
+			}
+		}
 	}
 
 	const selectedVault = currentTemplate.vault || vaultDropdown.value;
@@ -105,13 +131,44 @@ async function handleClip() {
 	fileContent = frontmatter + noteContent;
 
 	try {
+		if (currentTemplate.behavior === 'create') {
+			const updatedProperties = Array.from(document.querySelectorAll('.metadata-property input')).map(input => ({
+				name: input.id,
+				value: (input as HTMLInputElement).value,
+				type: input.getAttribute('data-type') || 'text'
+			}));
+			const frontmatter = await generateFrontmatter(updatedProperties as Property[]);
+			fileContent = frontmatter + noteContentField.value;
+		} else {
+			fileContent = noteContentField.value;
+		}
+
 		await saveToObsidian(fileContent, noteName, path, selectedVault, currentTemplate.behavior);
 		setTimeout(() => window.close(), 50);
 	} catch (error) {
 		console.error('Error in handleClip:', error);
 		showError('Failed to save to Obsidian. Please try again.');
-		throw error; // Re-throw the error so it can be caught by the caller
+		throw error;
 	}
+}
+
+function waitForInterpreter(interpretBtn: HTMLButtonElement): Promise<void> {
+	return new Promise((resolve, reject) => {
+		const checkProcessing = () => {
+			if (!interpretBtn.classList.contains('processing')) {
+				if (interpretBtn.textContent?.toLowerCase() === 'done') {
+					resolve();
+				} else if (interpretBtn.textContent?.toLowerCase() === 'error') {
+					reject(new Error('Interpreter processing failed'));
+				} else {
+					setTimeout(checkProcessing, 100); // Check every 100ms
+				}
+			} else {
+				setTimeout(checkProcessing, 100); // Check every 100ms
+			}
+		};
+		checkProcessing();
+	});
 }
 
 document.addEventListener('DOMContentLoaded', async function() {
@@ -122,19 +179,26 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 		await addBrowserClassToHtml();
 
-		loadedSettings = await loadGeneralSettings();
+		loadedSettings = await loadSettings();
+
 		console.log('General settings:', loadedSettings);
 
 		await loadTemplates();
 
-		const vaultContainer = document.getElementById('vault-container') as HTMLElement;
-		const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement;
-		const templateContainer = document.getElementById('template-container') as HTMLElement;
-		const templateDropdown = document.getElementById('template-select') as HTMLSelectElement;
+		const vaultContainer = document.getElementById('vault-container');
+		const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement | null;
+		const templateContainer = document.getElementById('template-container');
+		const templateDropdown = document.getElementById('template-select') as HTMLSelectElement | null;
+
+		if (!vaultDropdown || !templateDropdown) {
+			throw new Error('Required dropdown elements not found');
+		}
 
 		updateVaultDropdown(loadedSettings.vaults);
 
 		function updateVaultDropdown(vaults: string[]) {
+			if (!vaultDropdown || !vaultContainer) return;
+
 			vaultDropdown.innerHTML = '';
 			
 			vaults.forEach(vault => {
@@ -222,6 +286,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 								await initializeTemplateFields(currentTemplate, initializedContent.currentVariables, initializedContent.noteName, extractedData.schemaOrgData);
 
 								document.querySelector('.clipper')?.classList.remove('hidden');
+								setupMetadataToggle();
 							} else {
 								showError('Unable to initialize page content. Please try reloading the page.');
 							}
@@ -247,14 +312,20 @@ document.addEventListener('DOMContentLoaded', async function() {
 			}
 
 			// Only show template selector if there are multiple templates
-			if (templates.length > 1) {
-				templateContainer.style.display = 'block';
+			if (templateContainer) {
+				if (templates.length > 1) {
+					templateContainer.style.display = 'block';
+				} else {
+					templateContainer.classList.add('hidden');
+				}
 			} else {
-				templateContainer.classList.add('hidden');
+				console.warn('Template container not found');
 			}
 		});
 
 		function populateTemplateDropdown() {
+			if (!templateDropdown) return;
+
 			templateDropdown.innerHTML = '';
 			
 			templates.forEach((template: Template) => {
@@ -338,15 +409,8 @@ document.addEventListener('DOMContentLoaded', async function() {
 		});
 
 		const noteNameField = document.getElementById('note-name-field') as HTMLTextAreaElement;
-		
-		function adjustTextareaHeight(textarea: HTMLTextAreaElement) {
-			textarea.style.minHeight = '2rem';
-			textarea.style.minHeight = textarea.scrollHeight + 'px';
-		}
-
 		function handleNoteNameInput() {
-			noteNameField.value = sanitizeFileName(noteNameField.value);
-			adjustTextareaHeight(noteNameField);
+			adjustNoteNameHeight(noteNameField);
 		}
 
 		noteNameField.addEventListener('input', handleNoteNameInput);
@@ -357,7 +421,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 		});
 
 		// Initial height adjustment
-		adjustTextareaHeight(noteNameField);
+		adjustNoteNameHeight(noteNameField);
 
 		async function initializeTemplateFields(template: Template | null, variables: { [key: string]: string }, noteName?: string, schemaOrgData?: any) {
 			if (!template) {
@@ -412,13 +476,12 @@ document.addEventListener('DOMContentLoaded', async function() {
 				`;
 				templateProperties.appendChild(propertyDiv);
 			}
-
-			const noteNameField = document.getElementById('note-name-field') as HTMLTextAreaElement;
+			
 			if (noteNameField) {
 				let formattedNoteName = await replaceVariables(tabId, template.noteNameFormat, variables, currentUrl);
-				noteNameField.value = sanitizeFileName(formattedNoteName);
 				noteNameField.setAttribute('data-template-value', template.noteNameFormat);
-				adjustTextareaHeight(noteNameField);
+				noteNameField.value = formattedNoteName;
+				adjustNoteNameHeight(noteNameField);
 			}
 
 			const pathField = document.getElementById('path-name-field') as HTMLInputElement;
@@ -484,13 +547,71 @@ document.addEventListener('DOMContentLoaded', async function() {
 					setLocalStorage('lastSelectedVault', vaultDropdown.value);
 				});
 			}
+
+			if (template) {
+				if (generalSettings.interpreterEnabled) {
+					await initializeInterpreter(template, variables, tabId, currentUrl);
+
+					// Check if there are any prompt variables
+					const promptVariables = collectPromptVariables(template);
+
+					// If auto-run is enabled and there are prompt variables, use interpreter
+					if (generalSettings.interpreterAutoRun && promptVariables.length > 0) {
+						try {
+							const modelSelect = document.getElementById('model-select') as HTMLSelectElement;
+							const selectedModelId = modelSelect?.value || generalSettings.interpreterModel || 'gpt-4o-mini';
+							const modelConfig = generalSettings.models.find(m => m.id === selectedModelId);
+							if (!modelConfig) {
+								throw new Error(`Model configuration not found for ${selectedModelId}`);
+							}
+							await handleInterpreterUI(template, variables, tabId, currentUrl, modelConfig);
+						} catch (error) {
+							console.error('Error auto-processing with interpreter:', error);
+						}
+					}
+				}
+
+				const replacedTemplate = await getReplacedTemplate(template, variables, tabId, currentUrl);
+				debugLog('Variables', 'Current template with replaced variables:', JSON.stringify(replacedTemplate, null, 2));
+			}
+		}
+
+		async function getReplacedTemplate(template: Template, variables: { [key: string]: string }, tabId: number, currentUrl: string): Promise<any> {
+			const replacedTemplate: any = {
+				schemaVersion: "0.1.0",
+				name: template.name,
+				behavior: template.behavior,
+				noteNameFormat: await replaceVariables(tabId, template.noteNameFormat, variables, currentUrl),
+				path: template.path,
+				noteContentFormat: await replaceVariables(tabId, template.noteContentFormat, variables, currentUrl),
+				properties: [],
+				triggers: template.triggers
+			};
+
+			if (template.context) {
+				replacedTemplate.context = await replaceVariables(tabId, template.context, variables, currentUrl);
+			}
+
+			for (const prop of template.properties) {
+				const replacedProp: Property = {
+					id: prop.id, // Include the id property
+					name: prop.name,
+					value: await replaceVariables(tabId, prop.value, variables, currentUrl),
+					type: prop.type
+				};
+				replacedTemplate.properties.push(replacedProp);
+			}
+
+			return replacedTemplate;
 		}
 
 		async function initializeUI() {
-			const clipButton = document.getElementById('clip-button');
+			const clipButton = document.getElementById('clip-btn');
 			if (clipButton) {
 				clipButton.addEventListener('click', handleClip);
 				clipButton.focus();
+			} else {
+				console.warn('Clip button not found');
 			}
 
 			// On Firefox Mobile close the popup when the settings button is clicked
@@ -574,7 +695,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 		}
 
 		// Call this function after loading templates and settings
-		initializeUI();
+		await initializeUI();
 
 		const variablesPanel = document.createElement('div');
 		variablesPanel.className = 'variables-panel';
