@@ -42,6 +42,16 @@
 	.variables-header {
 		padding: 8px 12px 0px;
 		border-bottom: 1px solid var(--background-modifier-border);
+		display: flex;
+		flex-direction: column;
+	}
+
+	#variables-search {
+		width: 100%;
+		padding: 4px 8px;
+		border-radius: 40px;
+		font-size: var(--font-ui-smaller);
+		margin-bottom: 8px;
 	}
 
 	.variable-list {
@@ -122,5 +132,15 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 		margin: 0;
+	}
+
+	.variable-value,
+	.variable-key {
+		mark {
+			box-shadow: 0 0 0 2px var(--text-highlight-bg);
+			background-color: var(--text-highlight-bg);
+			color: var(--text-normal);
+			border-radius: 2px;
+		}
 	}
 }

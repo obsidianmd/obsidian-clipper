@@ -14,6 +14,7 @@ import { createElementWithClass, createElementWithHTML } from '../utils/dom-util
 import { initializeInterpreter, handleInterpreterUI, collectPromptVariables } from '../utils/interpreter';
 import { adjustNoteNameHeight } from '../utils/ui-utils';
 import { debugLog } from '../utils/debug';
+import { debounce } from '../utils/debounce';
 
 let currentTemplate: Template | null = null;
 let templates: Template[] = [];
@@ -638,6 +639,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 						variablesPanel.innerHTML = `
 							<div class="variables-header">
 								<h3>Page variables</h3>
+								<input type="text" id="variables-search" placeholder="Search variables...">
 								<span class="close-panel clickable-icon" aria-label="Close">
 									<i data-lucide="x"></i>
 								</span>
@@ -646,6 +648,10 @@ document.addEventListener('DOMContentLoaded', async function() {
 						`;
 						variablesPanel.classList.add('show');
 						initializeIcons();
+
+						// Search variables
+						const searchInput = variablesPanel.querySelector('#variables-search') as HTMLInputElement;
+						searchInput.addEventListener('input', debounce(handleVariableSearch, 300));
 
 						// Add click event listeners to variable keys and chevrons
 						const variableItems = variablesPanel.querySelectorAll('.variable-item');
@@ -692,6 +698,34 @@ document.addEventListener('DOMContentLoaded', async function() {
 					}
 				});
 			}
+		}
+
+		function handleVariableSearch() {
+			const searchInput = document.getElementById('variables-search') as HTMLInputElement;
+			const searchTerm = searchInput.value.toLowerCase();
+			const variableItems = variablesPanel.querySelectorAll('.variable-item');
+
+			variableItems.forEach(item => {
+				const htmlItem = item as HTMLElement; // Cast item to HTMLElement
+				const key = htmlItem.querySelector('.variable-key') as HTMLElement;
+				const value = htmlItem.querySelector('.variable-value') as HTMLElement;
+				const keyText = key.textContent?.toLowerCase() || '';
+				const valueText = value.textContent?.toLowerCase() || '';
+
+				if (keyText.includes(searchTerm) || valueText.includes(searchTerm)) {
+					htmlItem.style.display = 'flex';
+					highlightText(key, searchTerm);
+					highlightText(value, searchTerm);
+				} else {
+					htmlItem.style.display = 'none';
+				}
+			});
+		}
+
+		function highlightText(element: HTMLElement, searchTerm: string) {
+			const originalText = element.textContent || '';
+			const regex = new RegExp(`(${searchTerm})`, 'gi');
+			element.innerHTML = originalText.replace(regex, '<mark>$1</mark>');
 		}
 
 		// Call this function after loading templates and settings

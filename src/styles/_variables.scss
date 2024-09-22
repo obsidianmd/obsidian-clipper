@@ -31,6 +31,9 @@
 	--text-accent-hover: var(--color-accent-2);
 	--text-on-accent: white;
 
+	--text-highlight-bg-rgb: 255, 208, 0;
+	--text-highlight-bg: rgba(var(--text-highlight-bg-rgb), .4);
+
 	--font-ui-smaller: 0.8125rem;
 	--font-ui-small: 0.875rem;
 	--font-ui-medium: 0.9375rem;
