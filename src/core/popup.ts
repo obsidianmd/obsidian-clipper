@@ -105,34 +105,12 @@ async function handleClip() {
 	fileContent = frontmatter + noteContent;
 
 	try {
-		const promptVariables = collectPromptVariables(currentTemplate);
-
-		if (promptVariables.length > 0 || currentTemplate.context) {
-			const modelSelect = document.getElementById('model-select') as HTMLSelectElement;
-			const selectedModelId = modelSelect?.value || generalSettings.interpreterModel || 'gpt-4o-mini';
-			const modelConfig = generalSettings.models.find(m => m.id === selectedModelId);
-			if (!modelConfig) {
-				throw new Error(`Model configuration not found for ${selectedModelId}`);
-			}
-
-			// Get the current tab information
-			const tabs = await browser.tabs.query({active: true, currentWindow: true});
-			const currentTab = tabs[0];
-			if (!currentTab || !currentTab.id) {
-				throw new Error('Unable to get current tab information');
-			}
-
-			await handleLLMProcessing(currentTemplate, currentVariables, currentTab.id, currentTab.url || '', modelConfig);
-		}
-
-		// Regenerate file content with updated fields
-		const updatedProperties = Array.from(document.querySelectorAll('.metadata-property input')).map(input => ({
-			name: input.id,
-			value: (input as HTMLInputElement).value,
-			type: input.getAttribute('data-type') || 'text'
-		}));
-
 		if (currentTemplate.behavior === 'create') {
+			const updatedProperties = Array.from(document.querySelectorAll('.metadata-property input')).map(input => ({
+				name: input.id,
+				value: (input as HTMLInputElement).value,
+				type: input.getAttribute('data-type') || 'text'
+			}));
 			const frontmatter = await generateFrontmatter(updatedProperties as Property[]);
 			fileContent = frontmatter + noteContentField.value;
 		} else {
@@ -144,7 +122,7 @@ async function handleClip() {
 	} catch (error) {
 		console.error('Error in handleClip:', error);
 		showError('Failed to save to Obsidian. Please try again.');
-		throw error; // Re-throw the error so it can be caught by the caller
+		throw error;
 	}
 }
 

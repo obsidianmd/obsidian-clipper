@@ -33,7 +33,7 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 				model: model.id,
 				max_tokens: 800,
 				messages: [
-					{ role: 'user', content: `${userPrompt}` }
+					{ role: 'user', content: `${userPrompt}\n\nContent: ${content}` }
 				],
 				system: JSON.stringify(systemContent)
 			};
@@ -48,7 +48,7 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 				model: model.id,
 				messages: [
 					{ role: 'system', content: JSON.stringify(systemContent) },
-					{ role: 'user', content: `${userPrompt}` }
+					{ role: 'user', content: `${userPrompt}\n\nContent: ${content}` }
 				]
 			};
 			headers = {
@@ -270,10 +270,12 @@ export async function initializeLLMComponents(template: Template, variables: { [
 	// Hide interpreter if it's disabled or there are no prompt variables
 	if (!generalSettings.interpreterEnabled || promptVariables.length === 0) {
 		if (interpreterContainer) interpreterContainer.style.display = 'none';
+		if (interpretBtn) interpretBtn.style.display = 'none';
 		return;
 	}
 
 	if (interpreterContainer) interpreterContainer.style.display = 'flex';
+	if (interpretBtn) interpretBtn.style.display = 'inline-block';
 	
 	if (promptContextTextarea) {
 		let promptToDisplay = template.context || generalSettings.defaultPromptContext;
