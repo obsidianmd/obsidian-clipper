@@ -13,6 +13,7 @@ import { detectBrowser, addBrowserClassToHtml } from '../utils/browser-detection
 import { createElementWithClass, createElementWithHTML } from '../utils/dom-utils';
 import { initializeInterpreter, handleInterpreterUI, collectPromptVariables } from '../utils/interpreter';
 import { adjustNoteNameHeight } from '../utils/ui-utils';
+import { debugLog } from '../utils/debug';
 
 let currentTemplate: Template | null = null;
 let templates: Template[] = [];
@@ -84,22 +85,20 @@ async function handleClip() {
 	const promptVariables = collectPromptVariables(currentTemplate);
 	if (generalSettings.interpreterEnabled && interpretBtn && promptVariables.length > 0) {
 		if (interpretBtn.classList.contains('processing')) {
-			console.log('LLM processing is ongoing. Waiting for completion...');
 			try {
 				await waitForInterpreter(interpretBtn);
 			} catch (error) {
-				console.error('LLM processing failed:', error);
-				showError('LLM processing failed. Please try again.');
+				console.error('Interpreter processing failed:', error);
+				showError('Interpreter processing failed. Please try again.');
 				return;
 			}
 		} else if (interpretBtn.textContent?.toLowerCase() !== 'done') {
-			console.log('LLM processing has not been started. Starting now...');
-			interpretBtn.click(); // Trigger LLM processing
+			interpretBtn.click(); // Trigger processing
 			try {
 				await waitForInterpreter(interpretBtn);
 			} catch (error) {
-				console.error('LLM processing failed:', error);
-				showError('LLM processing failed. Please try again.');
+				console.error('Interpreter processing failed:', error);
+				showError('Interpreter processing failed. Please try again.');
 				return;
 			}
 		}
@@ -153,7 +152,6 @@ async function handleClip() {
 	}
 }
 
-// Wait for LLM processing to complete
 function waitForInterpreter(interpretBtn: HTMLButtonElement): Promise<void> {
 	return new Promise((resolve, reject) => {
 		const checkProcessing = () => {
@@ -161,7 +159,7 @@ function waitForInterpreter(interpretBtn: HTMLButtonElement): Promise<void> {
 				if (interpretBtn.textContent?.toLowerCase() === 'done') {
 					resolve();
 				} else if (interpretBtn.textContent?.toLowerCase() === 'error') {
-					reject(new Error('LLM processing failed'));
+					reject(new Error('Interpreter processing failed'));
 				} else {
 					setTimeout(checkProcessing, 100); // Check every 100ms
 				}
@@ -557,7 +555,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 					// Check if there are any prompt variables
 					const promptVariables = collectPromptVariables(template);
 
-					// If auto-run is enabled and there are prompt variables, process with LLM
+					// If auto-run is enabled and there are prompt variables, use interpreter
 					if (generalSettings.interpreterAutoRun && promptVariables.length > 0) {
 						try {
 							const modelSelect = document.getElementById('model-select') as HTMLSelectElement;
@@ -568,14 +566,13 @@ document.addEventListener('DOMContentLoaded', async function() {
 							}
 							await handleInterpreterUI(template, variables, tabId, currentUrl, modelConfig);
 						} catch (error) {
-							console.error('Error auto-processing with LLM:', error);
-							// Optionally, you can show an error message to the user here
+							console.error('Error auto-processing with interpreter:', error);
 						}
 					}
 				}
 
 				const replacedTemplate = await getReplacedTemplate(template, variables, tabId, currentUrl);
-				console.log('Current template with replaced variables:', JSON.stringify(replacedTemplate, null, 2));
+				debugLog('Variables', 'Current template with replaced variables:', JSON.stringify(replacedTemplate, null, 2));
 			}
 		}
 
