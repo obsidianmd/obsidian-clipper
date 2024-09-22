@@ -375,6 +375,7 @@ export function updateTemplateFromForm(): void {
 	const isDailyNote = template.behavior === 'append-daily' || template.behavior === 'prepend-daily';
 
 	const pathInput = document.getElementById('template-path-name') as HTMLInputElement;
+	if (pathInput) template.path = pathInput.value;
 
 	const noteNameFormat = document.getElementById('note-name-format') as HTMLInputElement;
 	if (noteNameFormat) {
