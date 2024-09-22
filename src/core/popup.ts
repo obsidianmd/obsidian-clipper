@@ -1,7 +1,6 @@
 import dayjs from 'dayjs';
 import { Template, Property, PromptVariable } from '../types/types';
 import { generateFrontmatter, saveToObsidian } from '../utils/obsidian-note-creator';
-import { sanitizeFileName } from '../utils/string-utils';
 import { extractPageContent, initializePageContent, replaceVariables } from '../utils/content-extractor';
 import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
 import { decompressFromUTF16 } from 'lz-string';
@@ -13,8 +12,6 @@ import browser from '../utils/browser-polyfill';
 import { detectBrowser, addBrowserClassToHtml } from '../utils/browser-detection';
 import { createElementWithClass, createElementWithHTML } from '../utils/dom-utils';
 import { initializeLLMComponents, handleLLMProcessing, collectPromptVariables } from '../utils/llm-utils';
-import { sendToLLM, updateFieldsWithLLMResponses } from '../utils/llm-utils';
-import { ModelConfig } from '../utils/storage-utils';
 
 let currentTemplate: Template | null = null;
 let templates: Template[] = [];
@@ -708,65 +705,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 	}
 });
 
-async function processLLM(promptToUse: string, contentToProcess: string): Promise<void> {
-	try {
-		if (!loadedSettings.openaiApiKey && !loadedSettings.anthropicApiKey) {
-			console.warn('No API key is set. Skipping LLM processing.');
-			showError('No API key is set. Please set an API key in the extension settings.');
-			return;
-		}
-
-		const promptVariables = collectPromptVariables(currentTemplate);
-		const modelSelect = document.getElementById('model-select') as HTMLSelectElement;
-		const selectedModelId = modelSelect?.value || generalSettings.interpreterModel || 'gpt-4o-mini';
-		const modelConfig = generalSettings.models.find(m => m.id === selectedModelId);
-		if (!modelConfig) {
-			throw new Error(`Model configuration not found for ${selectedModelId}`);
-		}
-
-		let apiKey: string;
-		if (modelConfig.provider === 'OpenAI') {
-			apiKey = loadedSettings.openaiApiKey || '';
-		} else if (modelConfig.provider === 'Anthropic') {
-			apiKey = loadedSettings.anthropicApiKey || '';
-		} else {
-			apiKey = modelConfig.apiKey || '';
-		}
-
-		if (!apiKey) {
-			throw new Error(`No API key found for ${modelConfig.provider || 'the selected model'}`);
-		}
-
-		const { userResponse, promptResponses } = await sendToLLM(promptToUse, contentToProcess, promptVariables, modelConfig, apiKey);
-		console.log('LLM Response:', { userResponse, promptResponses });
-
-		const llmResponseDiv = document.getElementById('llm-response');
-		if (llmResponseDiv) {
-			llmResponseDiv.textContent = userResponse;
-			llmResponseDiv.style.display = 'block';
-		}
-
-		const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
-		if (noteContentField) {
-			noteContentField.value = `${userResponse}\n\n${noteContentField.value}`;
-		}
-
-		updateFieldsWithLLMResponses(promptVariables, promptResponses);
-
-	} catch (error) {
-		console.error('Error getting LLM response:', error);
-		if (error instanceof Error) {
-			if (error.message.includes('rate limit')) {
-				showError(`LLM Error: ${error.message} The LLM response will be skipped for now.`);
-			} else {
-				showError(`LLM Error: ${error.message}`);
-			}
-		} else {
-			showError('An unknown error occurred while processing the LLM request.');
-		}
-	}
-}
-
+// Check if interpreter is enabled and show the interpreter container
 function initializeInterpreter(): void {
 	const interpreterElement = document.getElementById('interpreter');
 	if (interpreterElement) {

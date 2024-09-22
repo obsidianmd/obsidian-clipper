@@ -20,7 +20,7 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 	try {
 		const systemContent = {
 			variables: promptVariables.map(({ key, prompt }) => ({ key, prompt })),
-			instructions: "Please respond to the user prompt and each variable prompt. Format your response as a JSON object with 'user_response' for the main prompt and 'variable_responses' for the variable prompts."
+			instructions: "Please respond to the user prompt and each variable prompt. Format your response as a JSON object with 'user_response' for the main prompt and 'variable_responses' for the variable prompts. Make your responses concise."
 		};
 
 		let requestBody: any;
@@ -31,9 +31,9 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 		if (model.provider === 'Anthropic') {
 			requestBody = {
 				model: model.id,
-				max_tokens: 600,
+				max_tokens: 800,
 				messages: [
-					{ role: 'user', content: `${userPrompt}\n\nContent: ${content}` }
+					{ role: 'user', content: `${userPrompt}` }
 				],
 				system: JSON.stringify(systemContent)
 			};
@@ -48,7 +48,7 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 				model: model.id,
 				messages: [
 					{ role: 'system', content: JSON.stringify(systemContent) },
-					{ role: 'user', content: `${userPrompt}\n\nContent: ${content}` }
+					{ role: 'user', content: `${userPrompt}` }
 				]
 			};
 			headers = {
@@ -139,7 +139,11 @@ function parseAnthropicResponse(responseContent: string, promptVariables: Prompt
 		const anthropicResponse = JSON.parse(responseContent);
 		
 		// Extract the text content from the response
-		const textContent = anthropicResponse.content[0].text;
+		const textContent = anthropicResponse.content[0]?.text;
+		
+		if (!textContent) {
+			throw new Error('No text content found in Anthropic response');
+		}
 		
 		// Find the JSON object within the text content
 		const jsonMatch = textContent.match(/\{[\s\S]*\}/);
@@ -444,7 +448,10 @@ export function updateFieldsWithLLMResponses(promptVariables: PromptVariable[], 
 	allInputs.forEach((input) => {
 		if (input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement) {
 			input.value = input.value.replace(/{{prompt:"(.*?)"(\|.*?)?}}/g, (match, promptText, filters) => {
-				const response = promptResponses.find(r => r.prompt === promptText);
+				const variable = promptVariables.find(v => v.prompt === promptText);
+				if (!variable) return match;
+
+				const response = promptResponses.find(r => r.key === variable.key);
 				if (response && response.user_response !== undefined) {
 					let value = response.user_response;
 					
