@@ -19,9 +19,9 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 	}
 
 	try {
-		const systemContent = {
-			variables: promptVariables.map(({ key, prompt }) => ({ key, prompt })),
-			instructions: "You are a helpful assistant. Please respond to each variable prompt. Format your response as a JSON object with 'variable_responses' for the variable prompts. Make your responses concise."
+		const systemContent = {	
+			instructions: "You are a helpful assistant. Please respond to each variable prompt. Format your response as a JSON object with 'variable_responses' for the variable prompts. Make your responses concise.",
+			variables: promptVariables.map(({ key, prompt }) => ({ key, prompt }))
 		};
 
 		let requestBody: any;
@@ -44,6 +44,16 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 				'anthropic-version': '2023-06-01',
 				'anthropic-dangerous-direct-browser-access': 'true'
 			};
+		} else if (model.provider === 'Ollama') {
+			requestBody = {
+				model: model.name, // Use the model ID from the configuration
+				messages: [
+					{ role: 'system', content: JSON.stringify(systemContent) },
+					{ role: 'user', content: `${userPrompt}` }
+				],
+				stream: false
+			};
+			// Ollama doesn't require an API key for local use, so we don't set any headers
 		} else {
 			requestBody = {
 				model: model.id,
@@ -67,28 +77,35 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 		});
 
 		if (!response.ok) {
-			if (response.status === 429) {
-				lastRequestTime = now;
-				throw new Error(`${model.provider || 'API'} rate limit exceeded. Please try again in about a minute.`);
-			} else {
-				const errorData = await response.json();
-				console.error(`${model.provider || 'API'} error response:`, errorData);
-				throw new Error(`${model.provider || 'API'} error: ${response.statusText} ${errorData.error?.message || ''}`);
-			}
+			const errorText = await response.text();
+			console.error(`${model.provider || 'API'} error response:`, errorText);
+			throw new Error(`${model.provider || 'API'} error: ${response.statusText} ${errorText}`);
 		}
 
-		const data = await response.json();
-		console.log(`${model.provider || 'API'} response:`, data);
+		const responseText = await response.text();
+		console.log(`Raw ${model.provider || 'API'} response:`, responseText);
+
+		let data;
+		try {
+			data = JSON.parse(responseText);
+		} catch (error) {
+			console.error('Error parsing JSON response:', error);
+			throw new Error(`Failed to parse response from ${model.provider || 'API'}`);
+		}
+
+		console.log(`Parsed ${model.provider || 'API'} response:`, data);
 
 		lastRequestTime = now;
 
 		let llmResponseContent: string;
 		if (model.provider === 'Anthropic') {
 			llmResponseContent = JSON.stringify(data);
+		} else if (model.provider === 'Ollama') {
+			llmResponseContent = data.response; // Ollama returns the response directly
 		} else {
 			llmResponseContent = data.choices[0].message.content;
 		}
-		console.log('Raw LLM response:', llmResponseContent);
+		console.log('Processed LLM response:', llmResponseContent);
 
 		return model.provider === 'Anthropic' 
 			? parseAnthropicResponse(llmResponseContent, promptVariables)
