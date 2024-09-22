@@ -26,6 +26,40 @@ export function createMarkdownContent(content: string, url: string) {
 		console.error('Error applying GFM plugin:', error);
 	}
 
+	turndownService.addRule('table', {
+		filter: 'table',
+		replacement: function(content, node) {
+			if (!(node instanceof HTMLTableElement)) return content;
+
+			// Check if it's an ArXiv equation table
+			if (node.classList.contains('ltx_equation') || node.classList.contains('ltx_eqn_table')) {
+				return handleNestedEquations(node);
+			}
+
+			// Process the table
+			const rows = Array.from(node.rows).map(row => {
+				const cells = Array.from(row.cells).map(cell => {
+					// Remove newlines and trim the content
+					let cellContent = turndownService.turndown(cell.innerHTML)
+						.replace(/\n/g, ' ')
+						.trim();
+					// Escape pipe characters
+					cellContent = cellContent.replace(/\|/g, '\\|');
+					return cellContent;
+				});
+				return `| ${cells.join(' | ')} |`;
+			});
+
+			// Create the separator row
+			const separatorRow = `| ${Array(rows[0].split('|').length - 2).fill('---').join(' | ')} |`;
+
+			// Combine all rows
+			const tableContent = [rows[0], separatorRow, ...rows.slice(1)].join('\n');
+
+			return `\n\n${tableContent}\n\n`;
+		}
+	});
+
 	turndownService.remove(['style', 'script']);
 
 	// Keep iframes, video, audio, sup, and sub elements
@@ -220,100 +254,6 @@ export function createMarkdownContent(content: string, url: string) {
 		}).join('\n\n');
 	}
 
-	turndownService.addRule('table', {
-		filter: 'table',
-		replacement: function(content: string, node: Node): string {
-			if (!(node instanceof HTMLElement)) return content;
-
-			// Check if it's an ArXiv equation table
-			if (node.classList.contains('ltx_equation') || node.classList.contains('ltx_eqn_table')) {
-				return handleNestedEquations(node);
-			}
-
-			return content;
-		}
-	});
-
-	function extractLatex(element: Element): string {
-		// Check if the element is a <math> element and has an alttext attribute
-		if (element.nodeName.toLowerCase() === 'math') {
-			const alttext = element.getAttribute('alttext');
-			if (alttext) {
-				return alttext.trim();
-			}
-		}
-
-		// If not, look for a nested <math> element with alttext
-		const mathElement = element.querySelector('math[alttext]');
-		if (mathElement) {
-			const alttext = mathElement.getAttribute('alttext');
-			if (alttext) {
-				return alttext.trim();
-			}
-		}
-
-		// Fallback to existing logic
-		const annotation = element.querySelector('annotation[encoding="application/x-tex"]');
-		if (annotation?.textContent) {
-			return annotation.textContent.trim();
-		}
-
-		const mathNode = element.nodeName.toLowerCase() === 'math' ? element : element.querySelector('math');
-		if (mathNode) {
-			return MathMLToLaTeX.convert(mathNode.outerHTML);
-		}
-
-		const imgNode = element.querySelector('img');
-		return imgNode?.getAttribute('alt') || '';
-	}
-
-
-	turndownService.addRule('math', {
-		filter: (node) => {
-			return node.nodeName.toLowerCase() === 'math' || 
-				(node instanceof Element && node.classList && 
-				(node.classList.contains('mwe-math-element') || 
-				node.classList.contains('mwe-math-fallback-image-inline') || 
-				node.classList.contains('mwe-math-fallback-image-display')));
-		},
-		replacement: (content, node) => {
-			if (!(node instanceof Element)) return content;
-
-			let latex = extractLatex(node);
-
-			// Remove leading and trailing whitespace
-			latex = latex.trim();
-
-			// Check if the math element is within a table
-			const isInTable = node.closest('table') !== null;
-
-			// Check if it's an inline or block math element
-			if (!isInTable && (
-				node.getAttribute('display') === 'block' || 
-				node.classList.contains('mwe-math-fallback-image-display') || 
-				(node.parentElement && node.parentElement.classList.contains('mwe-math-element') && 
-				node.parentElement.previousElementSibling && 
-				node.parentElement.previousElementSibling.nodeName.toLowerCase() === 'p')
-			)) {
-				return `\n$$$\n${latex}\n$$$\n`;
-			} else {
-				// For inline math, ensure there's a space before and after only if needed
-				const prevNode = node.previousSibling;
-				const nextNode = node.nextSibling;
-				const prevChar = prevNode?.textContent?.slice(-1) || '';
-				const nextChar = nextNode?.textContent?.[0] || '';
-
-				const isStartOfLine = !prevNode || (prevNode.nodeType === Node.TEXT_NODE && prevNode.textContent?.trim() === '');
-				const isEndOfLine = !nextNode || (nextNode.nodeType === Node.TEXT_NODE && nextNode.textContent?.trim() === '');
-
-				const leftSpace = (!isStartOfLine && prevChar && !/[\s$]/.test(prevChar)) ? ' ' : '';
-				const rightSpace = (!isEndOfLine && nextChar && !/[\s$]/.test(nextChar)) ? ' ' : '';
-
-				return `${leftSpace}$${latex}$${rightSpace}`;
-			}
-		}
-	});
-
 	turndownService.addRule('arXivEnumerate', {
 		filter: (node) => {
 			return node.nodeName === 'OL' && node.classList.contains('ltx_enumerate');
@@ -330,20 +270,6 @@ export function createMarkdownContent(content: string, url: string) {
 			});
 			
 			return '\n\n' + items.join('\n\n') + '\n\n';
-		}
-	});
-
-	turndownService.addRule('table', {
-		filter: 'table',
-		replacement: function(content: string, node: Node): string {
-			if (!(node instanceof HTMLElement)) return content;
-
-			// Check if it's an ArXiv equation table
-			if (node.classList.contains('ltx_equation') || node.classList.contains('ltx_eqn_table')) {
-				return handleNestedEquations(node);
-			}
-
-			return content;
 		}
 	});
 
@@ -592,6 +518,86 @@ export function createMarkdownContent(content: string, url: string) {
 				return `\n$$\n${latex}\n$$\n`;
 			} else {
 				return `$${latex}$`;
+			}
+		}
+	});
+
+	function extractLatex(element: Element): string {
+		// Check if the element is a <math> element and has an alttext attribute
+		if (element.nodeName.toLowerCase() === 'math') {
+			const alttext = element.getAttribute('alttext');
+			if (alttext) {
+				return alttext.trim();
+			}
+		}
+
+		// If not, look for a nested <math> element with alttext
+		const mathElement = element.querySelector('math[alttext]');
+		if (mathElement) {
+			const alttext = mathElement.getAttribute('alttext');
+			if (alttext) {
+				return alttext.trim();
+			}
+		}
+
+		// Fallback to existing logic
+		const annotation = element.querySelector('annotation[encoding="application/x-tex"]');
+		if (annotation?.textContent) {
+			return annotation.textContent.trim();
+		}
+
+		const mathNode = element.nodeName.toLowerCase() === 'math' ? element : element.querySelector('math');
+		if (mathNode) {
+			return MathMLToLaTeX.convert(mathNode.outerHTML);
+		}
+
+		const imgNode = element.querySelector('img');
+		return imgNode?.getAttribute('alt') || '';
+	}
+
+
+	turndownService.addRule('math', {
+		filter: (node) => {
+			return node.nodeName.toLowerCase() === 'math' || 
+				(node instanceof Element && node.classList && 
+				(node.classList.contains('mwe-math-element') || 
+				node.classList.contains('mwe-math-fallback-image-inline') || 
+				node.classList.contains('mwe-math-fallback-image-display')));
+		},
+		replacement: (content, node) => {
+			if (!(node instanceof Element)) return content;
+
+			let latex = extractLatex(node);
+
+			// Remove leading and trailing whitespace
+			latex = latex.trim();
+
+			// Check if the math element is within a table
+			const isInTable = node.closest('table') !== null;
+
+			// Check if it's an inline or block math element
+			if (!isInTable && (
+				node.getAttribute('display') === 'block' || 
+				node.classList.contains('mwe-math-fallback-image-display') || 
+				(node.parentElement && node.parentElement.classList.contains('mwe-math-element') && 
+				node.parentElement.previousElementSibling && 
+				node.parentElement.previousElementSibling.nodeName.toLowerCase() === 'p')
+			)) {
+				return `\n$$$\n${latex}\n$$$\n`;
+			} else {
+				// For inline math, ensure there's a space before and after only if needed
+				const prevNode = node.previousSibling;
+				const nextNode = node.nextSibling;
+				const prevChar = prevNode?.textContent?.slice(-1) || '';
+				const nextChar = nextNode?.textContent?.[0] || '';
+
+				const isStartOfLine = !prevNode || (prevNode.nodeType === Node.TEXT_NODE && prevNode.textContent?.trim() === '');
+				const isEndOfLine = !nextNode || (nextNode.nodeType === Node.TEXT_NODE && nextNode.textContent?.trim() === '');
+
+				const leftSpace = (!isStartOfLine && prevChar && !/[\s$]/.test(prevChar)) ? ' ' : '';
+				const rightSpace = (!isEndOfLine && nextChar && !/[\s$]/.test(nextChar)) ? ' ' : '';
+
+				return `${leftSpace}$${latex}$${rightSpace}`;
 			}
 		}
 	});
