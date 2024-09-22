@@ -1,0 +1,56 @@
+{
+	"manifest_version": 3,
+	"name": "Obsidian Web Clipper",
+	"homepage_url": "https://obsidian.md/",
+	"version": "0.6.1",
+	"description": "Save content from the web in a private and durable format that you can access offline. The official browser extension for Obsidian.",
+	"permissions": [
+		"activeTab",
+		"contextMenus",
+		"storage",
+		"scripting"
+	],
+	"action": {
+		"default_popup": "popup.html",
+		"default_icon": {
+			"16": "icons/icon16.png",
+			"48": "icons/icon48.png",
+			"128": "icons/icon128.png"
+		}
+	},
+	"options_ui": {
+		"page": "settings.html",
+		"open_in_tab": true
+	},
+	"icons": {
+		"16": "icons/icon16.png",
+		"48": "icons/icon48.png",
+		"128": "icons/icon128.png"
+	},
+	"background": {
+		"scripts": ["background-safari.js"],
+		"type": "module"
+	},
+	"content_scripts": [
+		{
+			"matches": ["http://*/*", "https://*/*"],
+			"js": ["content.js"]
+		}
+	],
+	"content_security_policy": {
+		"extension_pages": "script-src 'self'; object-src 'self'"
+	},
+	"commands": {
+		"_execute_action": {
+			"suggested_key": {
+				"default": "Alt+Shift+O",
+				"mac": "Alt+Shift+O"
+			},
+			"description": "Open Obsidian Clipper"
+		}
+	},
+	"host_permissions": [
+		"http://*/*",
+		"https://*/*"
+	]
+}

@@ -6,6 +6,7 @@ node_modules/
 # Build
 dist/
 dist_firefox/
+dist_safari/
 builds/
 
 .cursorrules

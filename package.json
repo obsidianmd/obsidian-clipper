@@ -7,7 +7,8 @@
 		"dev:firefox": "webpack --watch --env BROWSER=firefox",
 		"build:chrome": "webpack --env BROWSER=chrome",
 		"build:firefox": "webpack --env BROWSER=firefox",
-		"build": "npm run build:chrome && npm run build:firefox",
+		"build:safari": "webpack --env BROWSER=safari",
+		"build": "npm run build:chrome && npm run build:firefox && npm run build:safari",
 		"dev": "npm run dev:chrome"
 	},
 	"devDependencies": {
@@ -31,6 +32,7 @@
 	"dependencies": {
 		"@mozilla/readability": "^0.5.0",
 		"@types/mozilla-readability": "^0.2.1",
+		"@types/safari-extension": "^0.0.33",
 		"dayjs": "^1.11.13",
 		"lucide": "^0.359.0",
 		"lz-string": "^1.5.0",

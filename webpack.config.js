@@ -10,6 +10,11 @@ const firefoxConfig = {
 		'background-firefox': './src/background-firefox.ts',
 	},
 };
+const safariConfig = {
+	entry: {
+		'background-safari': './src/background-safari.ts',
+	},
+};
 
 // Remove .DS_Store files
 function removeDSStore(dir) {
@@ -26,8 +31,9 @@ function removeDSStore(dir) {
 
 module.exports = (env, argv) => {
 	const isFirefox = env.BROWSER === 'firefox';
-	const outputDir = isFirefox ? 'dist_firefox' : 'dist';
-	const browserName = isFirefox ? 'firefox' : 'chrome';
+	const isSafari = env.BROWSER === 'safari';
+	const outputDir = isFirefox ? 'dist_firefox' : (isSafari ? 'dist_safari' : 'dist');
+	const browserName = isFirefox ? 'firefox' : (isSafari ? 'safari' : 'chrome');
 
 	return {
 		mode: 'production',
@@ -37,7 +43,8 @@ module.exports = (env, argv) => {
 			content: './src/content.ts',
 			background: './src/background.ts',
 			styles: './src/style.scss',
-			...firefoxConfig.entry
+			...(isFirefox ? firefoxConfig.entry : {}),
+			...(isSafari ? safariConfig.entry : {}),
 		},
 		output: {
 			path: path.resolve(__dirname, outputDir),
@@ -82,7 +89,8 @@ module.exports = (env, argv) => {
 			new CopyPlugin({
 				patterns: [
 					{ 
-						from: isFirefox ? "src/manifest.firefox.json" : "src/manifest.chrome.json", 
+						from: isFirefox ? "src/manifest.firefox.json" : 
+							  (isSafari ? "src/manifest.safari.json" : "src/manifest.chrome.json"), 
 						to: "manifest.json" 
 					},
 					{ from: "src/popup.html", to: "popup.html" },
