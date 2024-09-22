@@ -4,6 +4,7 @@ import { replaceVariables } from './content-extractor';
 import { applyFilters } from './filters';
 import { formatDuration } from './string-utils';
 import { adjustNoteNameHeight } from './ui-utils';
+import { debugLog } from './debug';
 
 const RATE_LIMIT_RESET_TIME = 60000; // 1 minute in milliseconds
 let lastRequestTime = 0;
@@ -68,7 +69,7 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 			};
 		}
 
-		console.log(`Sending request to ${model.provider || 'Custom'} API:`, requestBody);
+		debugLog('Interpreter', `Sending request to ${model.provider || 'Custom'} API:`, requestBody);
 
 		const response = await fetch(model.baseUrl, {
 			method: 'POST',
@@ -83,7 +84,7 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 		}
 
 		const responseText = await response.text();
-		console.log(`Raw ${model.provider || 'API'} response:`, responseText);
+		debugLog('Interpreter', `Raw ${model.provider || 'API'} response:`, responseText);
 
 		let data;
 		try {
@@ -93,7 +94,7 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 			throw new Error(`Failed to parse response from ${model.provider || 'API'}`);
 		}
 
-		console.log(`Parsed ${model.provider || 'API'} response:`, data);
+		debugLog('Interpreter', `Parsed ${model.provider || 'API'} response:`, data);
 
 		lastRequestTime = now;
 
@@ -105,13 +106,13 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 		} else {
 			llmResponseContent = data.choices[0].message.content;
 		}
-		console.log('Processed LLM response:', llmResponseContent);
+		debugLog('Interpreter', 'Processed LLM response:', llmResponseContent);
 
 		return model.provider === 'Anthropic' 
 			? parseAnthropicResponse(llmResponseContent, promptVariables)
 			: parseLLMResponse(llmResponseContent, promptVariables);
 	} catch (error) {
-		console.error(`Error sending to ${model.provider || 'Custom'} LLM:`, error);
+		console.error(`Error sending to ${model.provider || 'custom'} LLM:`, error);
 		throw error;
 	}
 }
@@ -123,7 +124,7 @@ function parseLLMResponse(responseContent: string, promptVariables: PromptVariab
 		const cleanedResponse = responseContent.replace(/^```json\n|\n```$/g, '');
 		parsedResponse = JSON.parse(cleanedResponse);
 	} catch (parseError) {
-		console.warn('Failed to parse LLM response as JSON. Using raw response.');
+		debugLog('Interpreter', 'Failed to parse LLM response as JSON. Using raw response.');
 		return {
 			userResponse: responseContent,
 			promptResponses: []
@@ -171,7 +172,7 @@ function parseAnthropicResponse(responseContent: string, promptVariables: Prompt
 			throw new Error('No JSON found in Anthropic response');
 		}
 	} catch (parseError) {
-		console.warn('Failed to parse Anthropic response:', parseError);
+		debugLog('Interpreter', 'Failed to parse Anthropic response:', parseError);
 		return {
 			userResponse: responseContent,
 			promptResponses: []
@@ -354,13 +355,13 @@ export async function handleInterpreterUI(
 		}, 10);
 
 		const { userResponse, promptResponses } = await sendToLLM(contextToUse, contentToProcess, promptVariables, modelConfig, apiKey);
-		console.log('LLM Response:', { userResponse, promptResponses });
+		debugLog('Interpreter', 'LLM response:', { userResponse, promptResponses });
 
 		// Stop the timer and log the final time
 		clearInterval(timerInterval);
 		const endTime = performance.now();
 		const totalTime = endTime - startTime;
-		console.log(`LLM processing completed in ${formatDuration(totalTime)}`);
+		debugLog('Interpreter', `Interpreter processing completed in ${formatDuration(totalTime)}`);
 
 		// Update the final time in the timer element
 		responseTimer.textContent = formatDuration(totalTime);
@@ -373,17 +374,14 @@ export async function handleInterpreterUI(
 
 		// Add done class to interpreter container
 		interpreterContainer?.classList.add('done');
-
-		// Update UI with response
-		updateLLMResponse(userResponse);
 		
 		// Update fields with all prompt responses
-		updateFieldsWithLLMResponses(promptVariables, promptResponses);
+		replacePromptVariables(promptVariables, promptResponses);
 
 		// Re-enable the clip button
 		clipButton.disabled = false;
 
-		// Adjust height for noteNameField after LLM processing
+		// Adjust height for noteNameField after content is replacedd
 		const noteNameField = document.getElementById('note-name-field') as HTMLTextAreaElement | null;
 		if (noteNameField instanceof HTMLTextAreaElement) {
 			adjustNoteNameHeight(noteNameField);
@@ -405,7 +403,7 @@ export async function handleInterpreterUI(
 		responseTimer.style.display = 'none';
 
 		// Display the error message
-		interpreterErrorMessage.textContent = error instanceof Error ? error.message : 'An unknown error occurred while processing the LLM request.';
+		interpreterErrorMessage.textContent = error instanceof Error ? error.message : 'An unknown error occurred while processing the interpreter request.';
 		interpreterErrorMessage.style.display = 'block';
 
 		// Re-enable the clip button
@@ -414,20 +412,13 @@ export async function handleInterpreterUI(
 		if (error instanceof Error) {
 			throw new Error(`${error.message}`);
 		} else {
-			throw new Error('An unknown error occurred while processing the LLM request.');
+			throw new Error('An unknown error occurred while processing the interpreter request.');
 		}
 	}
 }
 
-function updateLLMResponse(response: string) {
-	const interpreterErrorMessage = document.getElementById('interperter-error');
-	if (interpreterErrorMessage) {
-		interpreterErrorMessage.style.display = 'none';
-		interpreterErrorMessage.textContent = '';
-	}
-}
-
-export function updateFieldsWithLLMResponses(promptVariables: PromptVariable[], promptResponses: any[]) {
+// Similar to replaceVariables, but happens after the LLM response is received
+export function replacePromptVariables(promptVariables: PromptVariable[], promptResponses: any[]) {
 	const allInputs = document.querySelectorAll('input, textarea');
 	allInputs.forEach((input) => {
 		if (input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement) {

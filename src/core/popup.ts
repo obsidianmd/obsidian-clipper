@@ -11,7 +11,7 @@ import { loadTemplates, createDefaultTemplate } from '../managers/template-manag
 import browser from '../utils/browser-polyfill';
 import { detectBrowser, addBrowserClassToHtml } from '../utils/browser-detection';
 import { createElementWithClass, createElementWithHTML } from '../utils/dom-utils';
-import { initializeInterpreter, handleInterpreterUI, collectPromptVariables } from '../utils/llm-utils';
+import { initializeInterpreter, handleInterpreterUI, collectPromptVariables } from '../utils/interpreter';
 import { adjustNoteNameHeight } from '../utils/ui-utils';
 
 let currentTemplate: Template | null = null;
