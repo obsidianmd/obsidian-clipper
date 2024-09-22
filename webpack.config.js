@@ -103,7 +103,7 @@ module.exports = (env, argv) => {
 				},
 			new ZipPlugin({
 				path: path.resolve(__dirname, 'builds'),
-				filename: `obsidian-web-clipper-${browserName}.${package.version}.zip`,
+				filename: `obsidian-web-clipper-${package.version}-${browserName}.zip`,
 			})
 		]
 	};
