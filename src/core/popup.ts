@@ -11,7 +11,7 @@ import { loadTemplates, createDefaultTemplate } from '../managers/template-manag
 import browser from '../utils/browser-polyfill';
 import { detectBrowser, addBrowserClassToHtml } from '../utils/browser-detection';
 import { createElementWithClass, createElementWithHTML } from '../utils/dom-utils';
-import { initializeLLMComponents, handleLLMProcessing, collectPromptVariables } from '../utils/llm-utils';
+import { initializeInterpreter, handleInterpreterUI, collectPromptVariables } from '../utils/llm-utils';
 import { adjustNoteNameHeight } from '../utils/ui-utils';
 
 let currentTemplate: Template | null = null;
@@ -184,8 +184,6 @@ document.addEventListener('DOMContentLoaded', async function() {
 		loadedSettings = await loadSettings();
 
 		console.log('General settings:', loadedSettings);
-
-		initializeInterpreter();
 
 		await loadTemplates();
 
@@ -554,7 +552,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 			if (template) {
 				if (generalSettings.interpreterEnabled) {
-					await initializeLLMComponents(template, variables, tabId, currentUrl);
+					await initializeInterpreter(template, variables, tabId, currentUrl);
 
 					// Check if there are any prompt variables
 					const promptVariables = collectPromptVariables(template);
@@ -568,7 +566,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 							if (!modelConfig) {
 								throw new Error(`Model configuration not found for ${selectedModelId}`);
 							}
-							await handleLLMProcessing(template, variables, tabId, currentUrl, modelConfig);
+							await handleInterpreterUI(template, variables, tabId, currentUrl, modelConfig);
 						} catch (error) {
 							console.error('Error auto-processing with LLM:', error);
 							// Optionally, you can show an error message to the user here
@@ -611,7 +609,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 		}
 
 		async function initializeUI() {
-			const clipButton = document.getElementById('clip-button');
+			const clipButton = document.getElementById('clip-btn');
 			if (clipButton) {
 				clipButton.addEventListener('click', handleClip);
 				clipButton.focus();
@@ -719,11 +717,3 @@ document.addEventListener('DOMContentLoaded', async function() {
 		showError('Failed to initialize the extension. Please try reloading the page.');
 	}
 });
-
-// Check if interpreter is enabled and show the interpreter container
-function initializeInterpreter(): void {
-	const interpreterElement = document.getElementById('interpreter');
-	if (interpreterElement) {
-		interpreterElement.style.display = generalSettings.interpreterEnabled ? 'flex' : 'none';
-	}
-}

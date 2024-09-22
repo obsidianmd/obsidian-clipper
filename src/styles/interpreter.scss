@@ -100,7 +100,7 @@
 				color: var(--text-success);
 			}
 			~ {
-				#llm-timer {
+				#interpreter-timer {
 					color: var(--text-success);
 				}
 			}
@@ -113,7 +113,7 @@
 				color: var(--text-error);
 			}
 			~ {
-				#llm-timer {
+				#interpreter-timer {
 					color: var(--text-error);
 				}
 			}
@@ -123,7 +123,7 @@
 		}
 	}
 
-	#llm-timer {
+	#interpreter-timer {
 		user-select: none;
 		cursor: default;
 		font-size: 0.75rem;
@@ -148,7 +148,7 @@
 		line-height: 1.2;
 	}
 	
-	#clip-button {
+	#clip-btn {
 		&:disabled {
 			opacity: 0.67;
 			cursor: not-allowed;

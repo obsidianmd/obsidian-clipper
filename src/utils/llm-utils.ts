@@ -195,47 +195,6 @@ function parseAnthropicResponse(responseContent: string, promptVariables: Prompt
 	};
 }
 
-export async function processLLM(
-	promptToUse: string,
-	contentToProcess: string,
-	promptVariables: PromptVariable[],
-	updateUI: (response: string) => void,
-	updateFields: (variables: PromptVariable[], responses: any[]) => void,
-	model: ModelConfig,
-	template: Template
-): Promise<void> {
-	try {
-		if (!model.apiKey) {
-			throw new Error(`No API key is set for model ${model.name}. Please set an API key in the extension settings.`);
-		}
-
-		if (promptVariables.length === 0) {
-			throw new Error('No prompt variables found. Please add at least one prompt variable to your template.');
-		}
-
-		// Use the template context if available, otherwise fall back to the default prompt context
-		const contextToUse = template.context || generalSettings.defaultPromptContext || "You are a helpful assistant. Please analyze the following content and provide a concise summary.";
-
-		const { userResponse, promptResponses } = await sendToLLM(contextToUse, contentToProcess, promptVariables, model, model.apiKey);
-		console.log('LLM Response:', { userResponse, promptResponses });
-
-		// Convert userResponse to string if it's an array or object
-		const stringResponse = typeof userResponse === 'object' ? JSON.stringify(userResponse, null, 2) : userResponse;
-		updateUI(stringResponse);
-		
-		// Update fields with all prompt responses
-		updateFields(promptVariables, promptResponses);
-
-	} catch (error) {
-		console.error('Error getting LLM response:', error);
-		if (error instanceof Error) {
-			throw new Error(`${error.message}`);
-		} else {
-			throw new Error('An unknown error occurred while processing the LLM request.');
-		}
-	}
-}
-
 export function collectPromptVariables(template: Template | null): PromptVariable[] {
 	const promptMap = new Map<string, PromptVariable>();
 	const promptRegex = /{{prompt:"(.*?)"(\|.*?)?}}/g;
@@ -277,7 +236,7 @@ export function collectPromptVariables(template: Template | null): PromptVariabl
 	return Array.from(promptMap.values());
 }
 
-export async function initializeLLMComponents(template: Template, variables: { [key: string]: string }, tabId: number, currentUrl: string) {
+export async function initializeInterpreter(template: Template, variables: { [key: string]: string }, tabId: number, currentUrl: string) {
 	const interpreterContainer = document.getElementById('interpreter');
 	const interpretBtn = document.getElementById('interpret-btn');
 	const promptContextTextarea = document.getElementById('prompt-context') as HTMLTextAreaElement;
@@ -313,7 +272,7 @@ export async function initializeLLMComponents(template: Template, variables: { [
 				if (!modelConfig) {
 					throw new Error(`Model configuration not found for ${selectedModelId}`);
 				}
-				await handleLLMProcessing(template, variables, tabId, currentUrl, modelConfig);
+				await handleInterpreterUI(template, variables, tabId, currentUrl, modelConfig);
 			});
 		}
 		if (modelSelect) {
@@ -328,7 +287,7 @@ export async function initializeLLMComponents(template: Template, variables: { [
 	}
 }
 
-export async function handleLLMProcessing(
+export async function handleInterpreterUI(
 	template: Template,
 	variables: { [key: string]: string },
 	tabId: number,
@@ -338,8 +297,8 @@ export async function handleLLMProcessing(
 	const interpreterContainer = document.getElementById('interpreter');
 	const interpretBtn = document.getElementById('interpret-btn') as HTMLButtonElement;
 	const interpreterErrorMessage = document.getElementById('interpreter-error') as HTMLDivElement;
-	const llmTimer = document.getElementById('llm-timer') as HTMLSpanElement;
-	const clipButton = document.getElementById('clip-button') as HTMLButtonElement;
+	const responseTimer = document.getElementById('interpreter-timer') as HTMLSpanElement;
+	const clipButton = document.getElementById('clip-btn') as HTMLButtonElement;
 	const promptContextTextarea = document.getElementById('prompt-context') as HTMLTextAreaElement;
 
 	try {
@@ -369,8 +328,7 @@ export async function handleLLMProcessing(
 			throw new Error('No prompt variables found. Please add at least one prompt variable to your template.');
 		}
 
-		// Use the content from the prompt-context textarea
-		const contextToUse = promptContextTextarea.value || generalSettings.defaultPromptContext || "You are a helpful assistant. Please analyze the following content and provide a concise summary.";
+		const contextToUse = promptContextTextarea.value || generalSettings.defaultPromptContext;
 
 		const contentToProcess = variables.content || '';
 
@@ -386,13 +344,13 @@ export async function handleLLMProcessing(
 		clipButton.disabled = true;
 
 		// Show and update the timer
-		llmTimer.style.display = 'inline';
-		llmTimer.textContent = '0ms';
+		responseTimer.style.display = 'inline';
+		responseTimer.textContent = '0ms';
 
 		// Update the timer text with elapsed time
 		timerInterval = window.setInterval(() => {
 			const elapsedTime = performance.now() - startTime;
-			llmTimer.textContent = formatDuration(elapsedTime);
+			responseTimer.textContent = formatDuration(elapsedTime);
 		}, 10);
 
 		const { userResponse, promptResponses } = await sendToLLM(contextToUse, contentToProcess, promptVariables, modelConfig, apiKey);
@@ -405,7 +363,7 @@ export async function handleLLMProcessing(
 		console.log(`LLM processing completed in ${formatDuration(totalTime)}`);
 
 		// Update the final time in the timer element
-		llmTimer.textContent = formatDuration(totalTime);
+		responseTimer.textContent = formatDuration(totalTime);
 
 		// Revert button text and remove class
 		interpretBtn.textContent = 'done';
@@ -444,7 +402,7 @@ export async function handleLLMProcessing(
 		interpreterContainer?.classList.add('error');
 
 		// Hide the timer
-		llmTimer.style.display = 'none';
+		responseTimer.style.display = 'none';
 
 		// Display the error message
 		interpreterErrorMessage.textContent = error instanceof Error ? error.message : 'An unknown error occurred while processing the LLM request.';
