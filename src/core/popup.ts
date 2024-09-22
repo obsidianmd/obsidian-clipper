@@ -290,6 +290,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 								await initializeTemplateFields(currentTemplate, initializedContent.currentVariables, initializedContent.noteName, extractedData.schemaOrgData);
 
 								document.querySelector('.clipper')?.classList.remove('hidden');
+								setupMetadataToggle();
 							} else {
 								showError('Unable to initialize page content. Please try reloading the page.');
 							}
@@ -300,12 +301,6 @@ document.addEventListener('DOMContentLoaded', async function() {
 							} else {
 								showError('Error initializing page content: Unknown error');
 							}
-							await initializeTemplateFields(currentTemplate, initializedContent.currentVariables, initializedContent.noteName, extractedData.schemaOrgData);
-
-							document.querySelector('.clipper')?.classList.remove('hidden');
-							setupMetadataToggle();
-						} else {
-							showError('Unable to initialize page content.');
 						}
 					} else {
 						showError('Unable to get page content. Please try reloading the page.');
