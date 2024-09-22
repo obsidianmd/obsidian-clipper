@@ -210,22 +210,31 @@ document.addEventListener('DOMContentLoaded', async function() {
 					}
 
 					if (extractedData) {
-						const initializedContent = await initializePageContent(extractedData.content, extractedData.selectedHtml, extractedData.extractedContent, currentUrl, extractedData.schemaOrgData, extractedData.fullHtml);
-						if (initializedContent) {
-							currentTemplate = findMatchingTemplate(currentUrl, templates, extractedData.schemaOrgData) || templates[0];
+						try {
+							const initializedContent = await initializePageContent(extractedData.content, extractedData.selectedHtml, extractedData.extractedContent, currentUrl, extractedData.schemaOrgData, extractedData.fullHtml);
+							if (initializedContent) {
+								currentTemplate = findMatchingTemplate(currentUrl, templates, extractedData.schemaOrgData) || templates[0];
 
-							if (currentTemplate) {
-								templateDropdown.value = currentTemplate.name;
+								if (currentTemplate) {
+									templateDropdown.value = currentTemplate.name;
+								}
+
+								await initializeTemplateFields(currentTemplate, initializedContent.currentVariables, initializedContent.noteName, extractedData.schemaOrgData);
+
+								document.querySelector('.clipper')?.classList.remove('hidden');
+							} else {
+								showError('Unable to initialize page content. Please try reloading the page.');
 							}
-
-							await initializeTemplateFields(currentTemplate, initializedContent.currentVariables, initializedContent.noteName, extractedData.schemaOrgData);
-
-							document.querySelector('.clipper')?.classList.remove('hidden');
-						} else {
-							showError('Unable to initialize page content.');
+						} catch (error: unknown) {
+							console.error('Error initializing page content:', error);
+							if (error instanceof Error) {
+								showError(`Error initializing page content: ${error.message}`);
+							} else {
+								showError('Error initializing page content: Unknown error');
+							}
 						}
 					} else {
-						showError('Unable to get page content.');
+						showError('Unable to get page content. Please try reloading the page.');
 					}
 				} catch (error: unknown) {
 					console.error('Error in popup initialization:', error);

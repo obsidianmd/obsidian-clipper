@@ -8,9 +8,14 @@ import { convertDate } from './date-utils';
 import { debugLog } from './debug';
 import dayjs from 'dayjs';
 
-export function extractReadabilityContent(doc: Document): ReturnType<Readability['parse']> {
-	const reader = new Readability(doc, {keepClasses:true})
-	return reader.parse();
+export function extractReadabilityContent(doc: Document): ReturnType<Readability['parse']> | null {
+	try {
+		const reader = new Readability(doc, {keepClasses:true})
+		return reader.parse();
+	} catch (error) {
+		console.error('Error in extractReadabilityContent:', error);
+		return null;
+	}
 }
 
 async function processVariable(match: string, variables: { [key: string]: string }, currentUrl: string): Promise<string> {
@@ -195,119 +200,126 @@ export async function extractContentBySelector(tabId: number, selector: string):
 }
 
 export async function initializePageContent(content: string, selectedHtml: string, extractedContent: ExtractedContent, currentUrl: string, schemaOrgData: any, fullHtml: string) {
-	const parser = new DOMParser();
-	const doc = parser.parseFromString(content, 'text/html');
+	try {
+		const parser = new DOMParser();
+		const doc = parser.parseFromString(content, 'text/html');
 
-	const readabilityArticle = extractReadabilityContent(doc);
-	if (!readabilityArticle) {
-		console.error('Failed to parse content with Readability');
-		return null;
-	}
-
-	// Define preset variables with fallbacks
-	const title =
-		getMetaContent(doc, "property", "og:title")
-		|| getMetaContent(doc, "name", "twitter:title")
-		|| getMetaContent(doc, "name", "title")
-		|| doc.querySelector('title')?.textContent?.trim()
-		|| '';
-
-	const noteName = sanitizeFileName(title);
-
-	const author =
-		getMetaContent(doc, "name", "author")
-		|| getMetaContent(doc, "property", "author")
-		|| getMetaContent(doc, "name", "twitter:creator")
-		|| getMetaContent(doc, "property", "og:site_name")
-		|| getMetaContent(doc, "name", "application-name")
-		|| getMetaContent(doc, "name", "copyright")
-		|| '';
-
-	const description =
-		getMetaContent(doc, "name", "description")
-		|| getMetaContent(doc, "property", "description")
-		|| getMetaContent(doc, "property", "og:description")
-		|| getMetaContent(doc, "name", "twitter:description")
-		|| '';
-
-	const domain = new URL(currentUrl).hostname.replace(/^www\./, '');
-
-	const image =
-		getMetaContent(doc, "property", "og:image")
-		|| getMetaContent(doc, "name", "twitter:image")
-		|| '';
-
-	const timeElement = doc.querySelector("time");
-	const publishedDate = 
-		getMetaContent(doc, "property", "article:published_time")
-		|| timeElement?.getAttribute("datetime");
-	
-	// Store the full published date/time if available, otherwise use just the date
-	const published = publishedDate ? dayjs(publishedDate).isValid() ? publishedDate : dayjs(publishedDate).format('YYYY-MM-DD') : "";
-
-	const site =
-		getMetaContent(doc, "property", "og:site_name")
-		|| getMetaContent(doc, "name", "application-name")
-		|| getMetaContent(doc, "name", "copyright")
-		|| '';
-
-
-	if (selectedHtml) {
-		// If there's selected HTML, use it directly
-		content = selectedHtml;
-	} else {
-		content = readabilityArticle.content;
-	}
-
-	const markdownBody = createMarkdownContent(content, currentUrl);
-
-	const currentVariables: { [key: string]: string } = {
-		'{{author}}': author,
-		'{{content}}': markdownBody,
-		'{{contentHtml}}': content,
-		'{{date}}': 'now',
-		'{{time}}': dayjs().format('YYYY-MM-DDTHH:mm:ssZ'),
-		'{{description}}': description,
-		'{{domain}}': domain,
-		'{{fullHtml}}': fullHtml,
-		'{{image}}': image,
-		'{{noteName}}': noteName,
-		'{{published}}': published,
-		'{{site}}': site,
-		'{{title}}': title,
-		'{{url}}': currentUrl
-	};
-
-	// Add extracted content to variables
-	Object.entries(extractedContent).forEach(([key, value]) => {
-		currentVariables[`{{${key}}}`] = value;
-	});
-
-	// Add all meta tags to variables
-	doc.querySelectorAll('meta').forEach(meta => {
-		const name = meta.getAttribute('name');
-		const property = meta.getAttribute('property');
-		const content = meta.getAttribute('content');
-
-		if (name && content) {
-			currentVariables[`{{meta:name:${name}}}`] = content;
+		const readabilityArticle = extractReadabilityContent(doc);
+		if (!readabilityArticle) {
+			console.warn('Failed to parse content with Readability, falling back to full content');
 		}
-		if (property && content) {
-			currentVariables[`{{meta:property:${property}}}`] = content;
+
+		// Define preset variables with fallbacks
+		const title =
+			getMetaContent(doc, "property", "og:title")
+			|| getMetaContent(doc, "name", "twitter:title")
+			|| getMetaContent(doc, "name", "title")
+			|| doc.querySelector('title')?.textContent?.trim()
+			|| '';
+
+		const noteName = sanitizeFileName(title);
+
+		const author =
+			getMetaContent(doc, "name", "author")
+			|| getMetaContent(doc, "property", "author")
+			|| getMetaContent(doc, "name", "twitter:creator")
+			|| getMetaContent(doc, "property", "og:site_name")
+			|| getMetaContent(doc, "name", "application-name")
+			|| getMetaContent(doc, "name", "copyright")
+			|| '';
+
+		const description =
+			getMetaContent(doc, "name", "description")
+			|| getMetaContent(doc, "property", "description")
+			|| getMetaContent(doc, "property", "og:description")
+			|| getMetaContent(doc, "name", "twitter:description")
+			|| '';
+
+		const domain = new URL(currentUrl).hostname.replace(/^www\./, '');
+
+		const image =
+			getMetaContent(doc, "property", "og:image")
+			|| getMetaContent(doc, "name", "twitter:image")
+			|| '';
+
+		const timeElement = doc.querySelector("time");
+		const publishedDate = 
+			getMetaContent(doc, "property", "article:published_time")
+			|| timeElement?.getAttribute("datetime");
+		
+		const published = publishedDate ? dayjs(publishedDate).isValid() ? publishedDate : dayjs(publishedDate).format('YYYY-MM-DD') : "";
+
+		const site =
+			getMetaContent(doc, "property", "og:site_name")
+			|| getMetaContent(doc, "name", "application-name")
+			|| getMetaContent(doc, "name", "copyright")
+			|| '';
+
+		if (selectedHtml) {
+			content = selectedHtml;
+		} else if (readabilityArticle && readabilityArticle.content) {
+			content = readabilityArticle.content;
+		} else {
+			content = doc.body.innerHTML || fullHtml;
 		}
-	});
 
-	// Add schema.org data to variables
-	if (schemaOrgData) {
-		addSchemaOrgDataToVariables(schemaOrgData, currentVariables);
+		const markdownBody = createMarkdownContent(content, currentUrl);
+
+		const currentVariables: { [key: string]: string } = {
+			'{{author}}': author,
+			'{{content}}': markdownBody,
+			'{{contentHtml}}': content,
+			'{{date}}': 'now',
+			'{{time}}': dayjs().format('YYYY-MM-DDTHH:mm:ssZ'),
+			'{{description}}': description,
+			'{{domain}}': domain,
+			'{{fullHtml}}': fullHtml,
+			'{{image}}': image,
+			'{{noteName}}': noteName,
+			'{{published}}': published,
+			'{{site}}': site,
+			'{{title}}': title,
+			'{{url}}': currentUrl
+		};
+
+		// Add extracted content to variables
+		Object.entries(extractedContent).forEach(([key, value]) => {
+			currentVariables[`{{${key}}}`] = value;
+		});
+
+		// Add all meta tags to variables
+		doc.querySelectorAll('meta').forEach(meta => {
+			const name = meta.getAttribute('name');
+			const property = meta.getAttribute('property');
+			const content = meta.getAttribute('content');
+
+			if (name && content) {
+				currentVariables[`{{meta:name:${name}}}`] = content;
+			}
+			if (property && content) {
+				currentVariables[`{{meta:property:${property}}}`] = content;
+			}
+		});
+
+		// Add schema.org data to variables
+		if (schemaOrgData) {
+			addSchemaOrgDataToVariables(schemaOrgData, currentVariables);
+		}
+
+		console.log('Available variables:', currentVariables);
+
+		return {
+			noteName,
+			currentVariables
+		};
+	} catch (error: unknown) {
+		console.error('Error in initializePageContent:', error);
+		if (error instanceof Error) {
+			throw new Error(`Unable to initialize page content: ${error.message}`);
+		} else {
+			throw new Error('Unable to initialize page content: Unknown error');
+		}
 	}
-
-	console.log('Available variables:', currentVariables);
-
-	return {
-		noteName,
-		currentVariables
-	};
 }
 
 function addSchemaOrgDataToVariables(schemaData: any, variables: { [key: string]: string }, prefix: string = '') {
