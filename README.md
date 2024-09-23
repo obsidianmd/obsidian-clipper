@@ -97,13 +97,15 @@ Meta variables allow you to extract data from meta tags in the page.
 
 #### Selector variables
 
-Selector variables allow you to extract data from elements on the page using the syntax `{{selector:cssSelector:attribute}}`, where `:attribute` is optional. If no attribute is specified, the text content of the element is returned.
+Selector variables allow you to extract text content from elements on the page using the syntax `{{selector:cssSelector:attribute}}`, where `:attribute` is optional. If no attribute is specified, the text content of the element is returned. You can also use `{{selectorHtml:cssSelector}}` to get the HTML content of the element.
 
 - `{{selector:h1}}` returns text content of the first `h1` element on the page.
 - `{{selector:.author}}` returns text content of the first `.author` element on the page.
 - `{{selector:img.hero:src}}` returns the `src` attribute of the first image with class `hero`.
 - `{{selector:a.main-link:href}}` returns the `href` attribute of the first anchor tag with class `main-link`.
+- `{{selectorHtml:body}}` returns the entire HTML of the body element.
 - Nested CSS selectors and combinators are supported if you need more specificity.
+- If multiple elements match the selector, an array is returned, which you can process with filters like `join` or `map`.
 
 #### Schema.org variables
 
