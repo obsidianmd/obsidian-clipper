@@ -22,6 +22,8 @@ If you want to install the extension manually, go to [releases](https://github.c
 - **Edge:** drag and drop the Chrome version `.zip` in `edge://extensions/`
 - **Brave:** drag and drop the Chrome version `.zip` in `brave://extensions/`
 
+On Linux, make sure that Obsidian URI is registered. [See instructions on the Obsidian Help site.](https://help.obsidian.md/Extending+Obsidian/Obsidian+URI#Register+Obsidian+URI)
+
 ## Using templates
 
 Some example templates are available in the [clipper-templates repo](https://github.com/kepano/clipper-templates). 
