@@ -1,6 +1,12 @@
 import browser from './utils/browser-polyfill';
 
-let isSidePanelOpen = false;
+function isValidUrl(url: string): boolean {
+	return url.startsWith('http://') || url.startsWith('https://');
+}
+
+let sidePanelOpenWindows: Set<number> = new Set();
+let currentActiveTabId: number | undefined;
+let currentWindowId: number | undefined;
 
 browser.action.onClicked.addListener((tab) => {
 	if (tab.id) {
@@ -13,13 +19,13 @@ browser.action.onClicked.addListener((tab) => {
 
 browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
 	if (request.action === "extractContent" && sender.tab && sender.tab.id) {
-		if (!isSidePanelOpen) {
+		if (!sender.tab.windowId || !sidePanelOpenWindows.has(sender.tab.windowId)) {
 			sendResponse();
 			return true;
 		}
 
 		browser.tabs.sendMessage(sender.tab.id, request)
-			.then(response => {
+			.then(() => {
 				sendResponse();
 			})
 			.catch(error => {
@@ -61,9 +67,9 @@ function createContextMenu() {
 browser.contextMenus.onClicked.addListener((info, tab) => {
 	if (info.menuItemId === "open-obsidian-clipper") {
 		browser.action.openPopup();
-	} else if (info.menuItemId === 'openSidePanel' && tab && tab.id) {
+	} else if (info.menuItemId === 'openSidePanel' && tab && tab.id && tab.windowId) {
 		chrome.sidePanel.open({ tabId: tab.id });
-		isSidePanelOpen = true;
+		sidePanelOpenWindows.add(tab.windowId);
 		ensureContentScriptLoaded(tab.id);
 	}
 });
@@ -72,23 +78,69 @@ browser.runtime.onInstalled.addListener(() => {
 	createContextMenu();
 });
 
+function updateCurrentActiveTab(windowId: number) {
+	browser.tabs.query({ active: true, windowId: windowId }).then((tabs) => {
+		if (tabs[0] && tabs[0].id && tabs[0].url) {
+			currentActiveTabId = tabs[0].id;
+			currentWindowId = windowId;
+			if (sidePanelOpenWindows.has(windowId)) {
+				browser.runtime.sendMessage({ 
+					action: "activeTabChanged", 
+					tabId: currentActiveTabId,
+					isValidUrl: isValidUrl(tabs[0].url)
+				});
+			}
+		}
+	});
+}
+
+// Call this function when a tab is activated
+browser.tabs.onActivated.addListener((activeInfo) => {
+	updateCurrentActiveTab(activeInfo.windowId);
+});
+
+// Call this function when a tab is updated
+browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+	if (changeInfo.status === 'complete' && tab.active && tab.windowId) {
+		updateCurrentActiveTab(tab.windowId);
+	}
+});
+
+// Update for window focus changes
+browser.windows.onFocusChanged.addListener((windowId) => {
+	if (windowId !== browser.windows.WINDOW_ID_NONE) {
+		updateCurrentActiveTab(windowId);
+	}
+});
+
+// Modify the existing message listener
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 	const handleMessage = async () => {
-		if (message.type === 'open_side_panel' && sender.tab && sender.tab.id) {
+		if (message.action === "getCurrentActiveTab") {
+			sendResponse({ tabId: currentActiveTabId });
+		} else if (message.type === 'open_side_panel' && sender.tab && sender.tab.id) {
 			await chrome.sidePanel.open({ tabId: sender.tab.id });
 			await chrome.sidePanel.setOptions({
 				tabId: sender.tab.id,
 				path: 'sidebar.html',
 				enabled: true
 			});
-			isSidePanelOpen = true;
+			if (sender.tab.windowId) {
+				sidePanelOpenWindows.add(sender.tab.windowId);
+			}
 			await ensureContentScriptLoaded(sender.tab.id);
+			updateCurrentActiveTab(sender.tab.windowId);
 		} else if (message.action === "ensureContentScriptLoaded" && message.tabId) {
 			await ensureContentScriptLoaded(message.tabId);
 		} else if (message.action === "sidePanelOpened") {
-			isSidePanelOpen = true;
+			if (sender.tab && sender.tab.windowId) {
+				sidePanelOpenWindows.add(sender.tab.windowId);
+				updateCurrentActiveTab(sender.tab.windowId);
+			}
 		} else if (message.action === "sidePanelClosed") {
-			isSidePanelOpen = false;
+			if (sender.tab && sender.tab.windowId) {
+				sidePanelOpenWindows.delete(sender.tab.windowId);
+			}
 		}
 	};
 
@@ -102,34 +154,35 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 function ensureContentScriptLoaded(tabId: number) {
 	return new Promise<void>((resolve, reject) => {
-		chrome.tabs.sendMessage(tabId, { action: "ping" }, response => {
+		chrome.tabs.get(tabId, (tab) => {
 			if (chrome.runtime.lastError) {
-				// Content script is not loaded, inject it
-				chrome.scripting.executeScript({
-					target: { tabId: tabId },
-					files: ['content.js']
-				}, () => {
-					if (chrome.runtime.lastError) {
-						reject(chrome.runtime.lastError);
-					} else {
-						resolve();
-					}
-				});
-			} else {
-				resolve();
+				reject(new Error(chrome.runtime.lastError.message));
+				return;
 			}
+			
+			if (!tab.url || !isValidUrl(tab.url)) {
+				reject(new Error('Invalid URL'));
+				return;
+			}
+
+			chrome.tabs.sendMessage(tabId, { action: "ping" }, response => {
+				if (chrome.runtime.lastError) {
+					// Content script is not loaded, inject it
+					chrome.scripting.executeScript({
+						target: { tabId: tabId },
+						files: ['content.js']
+					}, () => {
+						if (chrome.runtime.lastError) {
+							reject(new Error(`Failed to inject content script: ${chrome.runtime.lastError.message}`));
+						} else {
+							// Wait a bit to ensure the script is fully loaded
+							setTimeout(resolve, 100);
+						}
+					});
+				} else {
+					resolve();
+				}
+			});
 		});
 	});
 }
-
-browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-	if (changeInfo.status === 'complete' && isSidePanelOpen) {
-		browser.runtime.sendMessage({ action: "tabUrlChanged", tabId: tabId })
-			.catch(error => console.error("Error sending tabUrlChanged message:", error));
-	}
-});
-
-// Remove the onVisibilityChanged listener
-// chrome.sidePanel.onVisibilityChanged.addListener(({ visible }) => {
-// 	isSidePanelOpen = visible;
-// });

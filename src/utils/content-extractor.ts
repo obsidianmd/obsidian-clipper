@@ -152,6 +152,12 @@ export async function extractPageContent(tabId: number): Promise<{
 	fullHtml: string;
 } | null> {
 	try {
+		const tab = await browser.tabs.get(tabId);
+		if (tab.url && (tab.url.startsWith('chrome://') || tab.url.startsWith('about:') || tab.url.startsWith('edge://'))) {
+			throw new Error('Cannot access browser internal pages');
+		}
+
+		await browser.runtime.sendMessage({ action: "ensureContentScriptLoaded", tabId });
 		const response = await browser.tabs.sendMessage(tabId, { action: "getPageContent" });
 		if (response && response.content) {
 			return {
@@ -162,10 +168,10 @@ export async function extractPageContent(tabId: number): Promise<{
 				fullHtml: response.fullHtml
 			};
 		}
-		return null;
+		throw new Error('Invalid response from content script');
 	} catch (error) {
 		console.error('Error extracting page content:', error);
-		return null;
+		throw error; // Propagate the error to be handled by the caller
 	}
 }
 

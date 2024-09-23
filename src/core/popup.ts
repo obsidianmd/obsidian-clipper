@@ -186,17 +186,24 @@ async function refreshFields() {
 		return;
 	}
 
-	const tabs = await browser.tabs.query({active: true, currentWindow: true});
-	const currentTab = tabs[0];
-	if (currentTab?.id) {
+	currentTabId = await getCurrentActiveTab();
+
+	if (currentTabId) {
 		try {
-			const extractedData = await extractPageContent(currentTab.id);
+			const tab = await browser.tabs.get(currentTabId);
+			if (!tab.url || !isValidUrl(tab.url)) {
+				throw new Error('This page cannot be clipped');
+			}
+
+			const extractedData = await extractPageContent(currentTabId);
 			if (extractedData) {
+				const currentTab = await browser.tabs.get(currentTabId);
+				const currentUrl = currentTab.url || '';
 				const initializedContent = await initializePageContent(
 					extractedData.content,
 					extractedData.selectedHtml,
 					extractedData.extractedContent,
-					currentTab.url!,
+					currentUrl,
 					extractedData.schemaOrgData,
 					extractedData.fullHtml
 				);
@@ -209,16 +216,18 @@ async function refreshFields() {
 					);
 					setupMetadataToggle();
 				} else {
-					logError('Unable to initialize page content.');
+					throw new Error('Unable to initialize page content.');
 				}
 			} else {
-				logError('Unable to retrieve page content. Try reloading the page.');
+				throw new Error('Unable to extract page content.');
 			}
 		} catch (error) {
-			logError('Error initializing template fields:', error);
+			console.error('Error refreshing fields:', error);
+			const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+			showError(errorMessage);
 		}
 	} else {
-		logError('No active tab found');
+		showError('No active tab found. Please try reloading the extension.');
 	}
 }
 
@@ -232,16 +241,6 @@ async function initializeTemplateFields(template: Template | null, variables: { 
 	const templateProperties = document.querySelector('.metadata-properties') as HTMLElement;
 	templateProperties.innerHTML = '';
 
-	const tabs = await browser.tabs.query({active: true, currentWindow: true});
-	const currentTab = tabs[0];
-	const tabId = currentTab?.id;
-	const currentUrl = currentTab?.url || '';
-
-	if (!tabId) {
-		logError('No active tab found');
-		return;
-	}
-
 	if (!Array.isArray(template.properties)) {
 		logError('Template properties are not an array');
 		return;
@@ -249,7 +248,7 @@ async function initializeTemplateFields(template: Template | null, variables: { 
 
 	for (const property of template.properties) {
 		const propertyDiv = createElementWithClass('div', 'metadata-property');
-		let value = await replaceVariables(tabId, unescapeValue(property.value), variables, currentUrl);
+		let value = await replaceVariables(currentTabId!, unescapeValue(property.value), variables, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
 
 		// Apply type-specific parsing
 		switch (property.type) {
@@ -284,7 +283,7 @@ async function initializeTemplateFields(template: Template | null, variables: { 
 	
 	const noteNameField = document.getElementById('note-name-field') as HTMLTextAreaElement;
 	if (noteNameField) {
-		let formattedNoteName = await replaceVariables(tabId, template.noteNameFormat, variables, currentUrl);
+		let formattedNoteName = await replaceVariables(currentTabId!, template.noteNameFormat, variables, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
 		noteNameField.setAttribute('data-template-value', template.noteNameFormat);
 		noteNameField.value = formattedNoteName;
 		adjustNoteNameHeight(noteNameField);
@@ -300,7 +299,7 @@ async function initializeTemplateFields(template: Template | null, variables: { 
 			pathField.style.display = 'none';
 		} else {
 			pathContainer.style.display = 'flex';
-			let formattedPath = await replaceVariables(tabId, template.path, variables, currentUrl);
+			let formattedPath = await replaceVariables(currentTabId!, template.path, variables, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
 			pathField.value = formattedPath;
 			pathField.setAttribute('data-template-value', template.path);
 		}
@@ -309,7 +308,7 @@ async function initializeTemplateFields(template: Template | null, variables: { 
 	const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
 	if (noteContentField) {
 		if (template.noteContentFormat) {
-			let content = await replaceVariables(tabId, template.noteContentFormat, variables, currentUrl);
+			let content = await replaceVariables(currentTabId!, template.noteContentFormat, variables, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
 			noteContentField.value = content;
 			noteContentField.setAttribute('data-template-value', template.noteContentFormat);
 		} else {
@@ -320,6 +319,8 @@ async function initializeTemplateFields(template: Template | null, variables: { 
 
 	if (Object.keys(variables).length > 0) {
 		if (template.triggers && template.triggers.length > 0) {
+			const currentTab = await browser.tabs.get(currentTabId!);
+			const currentUrl = currentTab.url || '';
 			const matchingPattern = template.triggers.find(pattern => 
 				matchPattern(pattern, currentUrl, schemaOrgData)
 			);
@@ -356,7 +357,7 @@ async function initializeTemplateFields(template: Template | null, variables: { 
 
 	if (template) {
 		if (generalSettings.interpreterEnabled) {
-			await initializeInterpreter(template, variables, tabId, currentUrl);
+			await initializeInterpreter(template, variables, currentTabId!, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
 
 			// Check if there are any prompt variables
 			const promptVariables = collectPromptVariables(template);
@@ -370,14 +371,14 @@ async function initializeTemplateFields(template: Template | null, variables: { 
 					if (!modelConfig) {
 						throw new Error(`Model configuration not found for ${selectedModelId}`);
 					}
-					await handleInterpreterUI(template, variables, tabId, currentUrl, modelConfig);
+					await handleInterpreterUI(template, variables, currentTabId!, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '', modelConfig);
 				} catch (error) {
 					console.error('Error auto-processing with interpreter:', error);
 				}
 			}
 		}
 
-		const replacedTemplate = await getReplacedTemplate(template, variables, tabId, currentUrl);
+		const replacedTemplate = await getReplacedTemplate(template, variables, currentTabId!, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
 		debugLog('Variables', 'Current template with replaced variables:', JSON.stringify(replacedTemplate, null, 2));
 	}
 }
@@ -452,9 +453,33 @@ async function getReplacedTemplate(template: Template, variables: { [key: string
 	return replacedTemplate;
 }
 
+async function getCurrentActiveTab(): Promise<number | undefined> {
+	return new Promise((resolve) => {
+		browser.runtime.sendMessage({ action: "getCurrentActiveTab" })
+			.then((response: { tabId: number | undefined }) => {
+				resolve(response.tabId);
+			})
+			.catch((error) => {
+				console.error('Error getting current active tab:', error);
+				resolve(undefined);
+			});
+	});
+}
+
 document.addEventListener('DOMContentLoaded', async function() {
 	try {
-		await ensureContentScriptLoaded();
+		currentTabId = await getCurrentActiveTab();
+		if (currentTabId) {
+			const tab = await browser.tabs.get(currentTabId);
+			if (!tab.url || !isValidUrl(tab.url)) {
+				showError('This page cannot be clipped');
+				return;
+			}
+			await ensureContentScriptLoaded();
+			await refreshFields();
+		} else {
+			showError('No active tab found. Please try reloading the extension.');
+		}
 		
 		initializeIcons();
 
@@ -793,9 +818,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 			browser.runtime.sendMessage({ action: "sidePanelOpened" });
 			
 			browser.tabs.onActivated.addListener(async (activeInfo) => {
-				currentTabId = activeInfo.tabId;
-				await browser.runtime.sendMessage({ action: "ensureContentScriptLoaded", tabId: currentTabId });
-				refreshFields();
+				// Remove this listener as it's now handled in the background script
 			});
 
 			// Inform background script when side panel is closed
@@ -811,6 +834,17 @@ document.addEventListener('DOMContentLoaded', async function() {
 			await browser.runtime.sendMessage({ action: "ensureContentScriptLoaded", tabId: currentTabId });
 			refreshFields();
 		}
+
+		browser.runtime.onMessage.addListener((request) => {
+			if (request.action === "activeTabChanged") {
+				currentTabId = request.tabId;
+				if (request.isValidUrl) {
+					refreshFields();
+				} else {
+					showError('This page cannot be clipped');
+				}
+			}
+		});
 
 	} catch (error) {
 		console.error('Error initializing popup:', error);
