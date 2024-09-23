@@ -12,6 +12,7 @@
 #popup {
 	height: var(--popup-height);
 	overflow: hidden;
+	font-family: var(--font-default);
 }
 
 #popup-container:has(.variables-panel.show) {
