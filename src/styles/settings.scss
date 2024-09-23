@@ -325,14 +325,11 @@
 @media (max-width: 768px) {
 	#settings {
 		#navbar {
-			position: fixed;
-			top: 0;
-			left: 0;
-			right: 0;
-			z-index: 10;
 			padding: 0 24px;
 			width: 100%;
 			display: flex;
+			height: 48px;
+			min-height: 48px;
 			background-color: var(--background-secondary);
 
 			.hamburger-menu {
@@ -340,10 +337,16 @@
 			}
 		}
 		.settings-section {
-			margin: 24px;
+			margin: 0;
+			padding: 24px;
+			overflow: scroll;
+			-webkit-overflow-scrolling: touch;
 		}
 		#content {
-			padding-top: 48px;
+			display: flex;
+			flex-direction: column;
+			overflow:hidden;
+			height: 100vh;
 		}
 		#sidebar {
 			width: 100%;
@@ -363,6 +366,7 @@
 			}
 
 			.hamburger-menu {
+				-webkit-tap-highlight-color: transparent;
 				.hamburger-icon {
 					background-color: transparent;
 

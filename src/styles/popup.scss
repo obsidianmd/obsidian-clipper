@@ -3,6 +3,7 @@
 	--popup-width: 340px;
 	--popup-width-expanded: 500px;
 }
+.is-mobile-safari,
 .is-firefox-mobile {
 	--popup-height: 100vh;
 	--popup-width: 100vw;
@@ -25,7 +26,7 @@
 	max-height: 100%;
 	display: flex;
 	flex-direction: column;
-	width: var(--popup-width);
+	width: 100%;
 	height: 100%;
 	overflow: hidden;
 	transition: width 0.1s ease-in-out;
