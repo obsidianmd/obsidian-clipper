@@ -16,15 +16,58 @@ import { adjustNoteNameHeight } from '../utils/ui-utils';
 import { debugLog } from '../utils/debug';
 import { debounce } from '../utils/debounce';
 
+let loadedSettings: Settings;
 let currentTemplate: Template | null = null;
 let templates: Template[] = [];
 let currentVariables: { [key: string]: string } = {};
 
-let loadedSettings: Settings;
-
 const isSidePanel = window.location.pathname.includes('sidebar.html');
 
 let currentTabId: number | undefined;
+
+async function initializeExtension() {
+	try {
+		await addBrowserClassToHtml();
+		loadedSettings = await loadSettings();
+		debugLog('Settings', 'General settings:', loadedSettings);
+
+		templates = await loadTemplates();
+		debugLog('Templates', 'Loaded templates:', templates);
+
+		if (templates.length === 0) {
+			console.error('No templates loaded');
+			showError('No templates available. Please add a template in the settings.');
+			return false;
+		}
+
+		currentTemplate = templates[0]; // Set the first template as default
+		debugLog('Templates', 'Current template set to:', currentTemplate);
+
+		currentTabId = await getCurrentActiveTab();
+		if (currentTabId) {
+			const tab = await browser.tabs.get(currentTabId);
+			if (!tab.url || isBlankPage(tab.url)) {
+				showError('This page cannot be clipped. Please navigate to a web page.');
+				return false;
+			}
+			if (!isValidUrl(tab.url)) {
+				showError('This page cannot be clipped. Only http and https URLs are supported.');
+				return false;
+			}
+			await ensureContentScriptLoaded();
+			await refreshFields(true);
+		} else {
+			showError('No active tab found. Please try reloading the extension.');
+			return false;
+		}
+
+		return true;
+	} catch (error) {
+		console.error('Error initializing extension:', error);
+		showError('Failed to initialize the extension. Please try reloading the page.');
+		return false;
+	}
+}
 
 async function ensureContentScriptLoaded() {
 	const tabs = await browser.tabs.query({active: true, currentWindow: true});
@@ -188,8 +231,10 @@ function isBlankPage(url: string): boolean {
 	return url === 'about:blank' || url === 'chrome://newtab/' || url === 'edge://newtab/';
 }
 
-async function refreshFields() {
-	if (!currentTemplate) {
+async function refreshFields(forceTemplateCheck: boolean = false) {
+	if (templates.length === 0) {
+		console.warn('No templates available');
+		showError('No templates available. Please add a template in the settings.');
 		return;
 	}
 
@@ -209,8 +254,20 @@ async function refreshFields() {
 
 			const extractedData = await extractPageContent(currentTabId);
 			if (extractedData) {
-				const currentTab = await browser.tabs.get(currentTabId);
-				const currentUrl = currentTab.url || '';
+				const currentUrl = tab.url;
+
+				// Check if we need to switch templates based on triggers
+				if (forceTemplateCheck || !currentTemplate) {
+					const matchedTemplate = findMatchingTemplate(currentUrl, templates, extractedData.schemaOrgData);
+					if (matchedTemplate) {
+						currentTemplate = matchedTemplate;
+					} else {
+						// If no matching template is found, use the first template
+						currentTemplate = templates[0];
+					}
+					updateTemplateDropdown();
+				}
+
 				const initializedContent = await initializePageContent(
 					extractedData.content,
 					extractedData.selectedHtml,
@@ -240,6 +297,13 @@ async function refreshFields() {
 		}
 	} else {
 		showError('No active tab found. Please try reloading the extension.');
+	}
+}
+
+function updateTemplateDropdown() {
+	const templateDropdown = document.getElementById('template-select') as HTMLSelectElement;
+	if (templateDropdown && currentTemplate) {
+		templateDropdown.value = currentTemplate.name;
 	}
 }
 
@@ -478,34 +542,40 @@ async function getCurrentActiveTab(): Promise<number | undefined> {
 	});
 }
 
+function updateVaultDropdown(vaults: string[]) {
+	const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement | null;
+	const vaultContainer = document.getElementById('vault-container');
+
+	if (!vaultDropdown || !vaultContainer) return;
+
+	vaultDropdown.innerHTML = '';
+	
+	vaults.forEach(vault => {
+		const option = document.createElement('option');
+		option.value = vault;
+		option.textContent = vault;
+		vaultDropdown.appendChild(option);
+	});
+
+	// Only show vault selector if one is defined
+	if (vaults.length > 0) {
+		vaultContainer.style.display = 'block';
+		vaultDropdown.value = vaults[0];
+	} else {
+		vaultContainer.style.display = 'none';
+	}
+}
+
 document.addEventListener('DOMContentLoaded', async function() {
 	try {
-		currentTabId = await getCurrentActiveTab();
-		if (currentTabId) {
-			const tab = await browser.tabs.get(currentTabId);
-			if (!tab.url || isBlankPage(tab.url)) {
-				showError('This page cannot be clipped. Please navigate to a web page.');
-				return;
-			}
-			if (!isValidUrl(tab.url)) {
-				showError('This page cannot be clipped. Only http and https URLs are supported.');
-				return;
-			}
-			await ensureContentScriptLoaded();
-			await refreshFields();
-		} else {
-			showError('No active tab found. Please try reloading the extension.');
+		const initialized = await initializeExtension();
+		if (!initialized) {
+			// If initialization failed, we've already shown an error, so just return
+			return;
 		}
-		
+
+		// Continue with the rest of the initialization process
 		initializeIcons();
-
-		await addBrowserClassToHtml();
-
-		loadedSettings = await loadSettings();
-
-		debugLog('Settings', 'General settings:', loadedSettings);
-
-		await loadTemplates();
 
 		const vaultContainer = document.getElementById('vault-container');
 		const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement | null;
@@ -517,27 +587,6 @@ document.addEventListener('DOMContentLoaded', async function() {
 		}
 
 		updateVaultDropdown(loadedSettings.vaults);
-
-		function updateVaultDropdown(vaults: string[]) {
-			if (!vaultDropdown || !vaultContainer) return;
-
-			vaultDropdown.innerHTML = '';
-			
-			vaults.forEach(vault => {
-				const option = document.createElement('option');
-				option.value = vault;
-				option.textContent = vault;
-				vaultDropdown.appendChild(option);
-			});
-
-			// Only show vault selector if one is defined
-			if (vaults.length > 0) {
-				vaultContainer.style.display = 'block';
-				vaultDropdown.value = vaults[0];
-			} else {
-				vaultContainer.style.display = 'none';
-			}
-		}
 
 		// Load templates from sync storage and populate dropdown
 		browser.storage.sync.get(['template_list']).then(async (data: { template_list?: string[] }) => {
@@ -855,7 +904,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 			if (request.action === "activeTabChanged") {
 				currentTabId = request.tabId;
 				if (request.isValidUrl) {
-					refreshFields();
+					refreshFields(true); // Force template check when URL changes
 				} else if (request.isBlankPage) {
 					showError('This page cannot be clipped. Please navigate to a web page.');
 				} else {

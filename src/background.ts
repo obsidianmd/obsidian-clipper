@@ -91,6 +91,7 @@ function updateCurrentActiveTab(windowId: number) {
 				browser.runtime.sendMessage({ 
 					action: "activeTabChanged", 
 					tabId: currentActiveTabId,
+					url: tabs[0].url,
 					isValidUrl: isValidUrl(tabs[0].url),
 					isBlankPage: isBlankPage(tabs[0].url)
 				});
