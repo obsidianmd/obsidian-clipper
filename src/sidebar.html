@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html id="popup" class="is-sidebar">
+	<head>
+		<title>Obsidian Web Clipper</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+		<link rel="stylesheet" href="style.css">
+		<script src="browser-polyfill.min.js"></script>
+	</head>
+	<body id="popup-container">
+		<a href="#" id="open-settings" class="clickable-icon" aria-label="Settings">
+			<i data-lucide="settings"></i>
+		</a>
+		<a href="#" id="show-variables" class="clickable-icon" aria-label="Show variables">
+			<i data-lucide="ellipsis"></i>
+		</a>
+		<p class="error-message" style="display: none;"></p>
+		<div class="clipper">
+			<div id="template-container" style="display: none;">
+				<select id="template-select">
+					<option value="">Select a template</option>
+				</select>
+			</div>
+			<textarea id="note-name-field" type="text" placeholder="Note name" rows="1"></textarea>
+			<div class="metadata-properties-header">
+				Properties
+				<i data-lucide="chevron-down"></i>
+			</div>
+			<div class="metadata-properties"></div>
+			<div id="note-content-container">
+				<textarea id="note-content-field" rows="4" placeholder="Notes about this page..."></textarea>
+			</div>
+			<div class="clipper-footer">
+				<div class="vault-path-container">
+					<div id="vault-container" style="display: none;">
+						<select id="vault-select"></select>
+					</div>
+					<input id="path-name-field" type="text" placeholder="Folder"/>
+				</div>
+				<div id="interpreter" style="display: none;">
+					<textarea id="prompt-context" rows="3"></textarea>
+					<div class="interpreter-controls">
+						<select id="model-select" style="display: none;"></select>
+						<button id="interpret-btn">interpret</button>
+						<span id="interpreter-timer" style="display: none;"></span>
+					</div>
+					<div id="interpreter-error" style="display: none;"></div>
+				</div>
+				<button id="clip-btn" class="mod-cta">Add to Obsidian</button>
+			</div>
+		</div>
+		<script type="module" src="popup.js"></script>
+	</body>
+</html>

@@ -94,6 +94,7 @@ module.exports = (env, argv) => {
 						to: "manifest.json" 
 					},
 					{ from: "src/popup.html", to: "popup.html" },
+					{ from: "src/sidebar.html", to: "sidebar.html" },
 					{ from: "src/settings.html", to: "settings.html" },
 					{ from: "src/icons", to: "icons" },
 					{ from: "node_modules/webextension-polyfill/dist/browser-polyfill.min.js", to: "browser-polyfill.min.js" }

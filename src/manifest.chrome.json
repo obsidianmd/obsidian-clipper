@@ -8,10 +8,19 @@
 		"activeTab",
 		"commands",
 		"contextMenus",
-		"storage"
+		"sidePanel",
+		"storage",
+		"scripting"
+	],
+	"host_permissions": [
+		"http://*/*",
+		"https://*/*"
 	],
 	"action": {
 		"default_popup": "popup.html"
+	},
+	"side_panel": {
+		"default_path": "sidebar.html"
 	},
 	"options_ui": {
 		"page": "settings.html",
