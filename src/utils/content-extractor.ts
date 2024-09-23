@@ -255,10 +255,15 @@ export async function initializePageContent(content: string, selectedHtml: strin
 			|| getMetaContent(doc, "property", "author")
 			|| getMetaContent(doc, "name", "byl")
 			|| getMetaContent(doc, "name", "author")
-			|| getMetaContent(doc, "name", "twitter:creator")
-			|| getMetaContent(doc, "property", "og:site_name")
-			|| getMetaContent(doc, "name", "application-name")
 			|| getMetaContent(doc, "name", "copyright")
+			|| getSchemaProperty(schemaOrgData, 'copyrightHolder.name')
+			|| getMetaContent(doc, "property", "og:site_name")
+			|| getSchemaProperty(schemaOrgData, 'publisher.name')
+			|| getMetaContent(doc, "property", "og:site_name")
+			|| getSchemaProperty(schemaOrgData, 'sourceOrganization.name')
+			|| getSchemaProperty(schemaOrgData, 'isPartOf.name')
+			|| getMetaContent(doc, "name", "twitter:creator")
+			|| getMetaContent(doc, "name", "application-name")
 			|| '';
 
 		const description =
