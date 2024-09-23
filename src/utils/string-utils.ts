@@ -128,6 +128,7 @@ export function processUrls(htmlContent: string, baseUrl: URL): string {
 	tempDiv.innerHTML = htmlContent;
 	
 	// Handle relative URLs for both images and links
+	tempDiv.querySelectorAll('img').forEach(img => makeUrlAbsolute(img, 'srcset', baseUrl));
 	tempDiv.querySelectorAll('img').forEach(img => makeUrlAbsolute(img, 'src', baseUrl));
 	tempDiv.querySelectorAll('a').forEach(link => makeUrlAbsolute(link, 'href', baseUrl));
 	

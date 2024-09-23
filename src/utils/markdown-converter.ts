@@ -1,5 +1,4 @@
 import TurndownService from 'turndown';
-import { gfm } from 'turndown-plugin-gfm';
 import { MathMLToLaTeX } from 'mathml-to-latex';
 import { processUrls } from './string-utils';
 import { debugLog } from './debug';
@@ -9,7 +8,8 @@ export function createMarkdownContent(content: string, url: string) {
 	debugLog('Markdown', 'Content length:', content.length);
 
 	const baseUrl = new URL(url);
-	const markdownContent = processUrls(content, baseUrl);
+	// Process all URLs at the beginning
+	const processedContent = processUrls(content, baseUrl);
 
 	const turndownService = new TurndownService({
 		headingStyle: 'atx',
@@ -37,7 +37,17 @@ export function createMarkdownContent(content: string, url: string) {
 				return handleNestedEquations(node);
 			}
 
-			// Process the table
+			// Check if the table has colspan or rowspan
+			const hasComplexStructure = Array.from(node.querySelectorAll('td, th')).some(cell => 
+				cell.hasAttribute('colspan') || cell.hasAttribute('rowspan')
+			);
+
+			if (hasComplexStructure) {
+				// Keep the HTML for complex tables
+				return '\n\n' + node.outerHTML + '\n\n';
+			}
+
+			// Process simple tables as before
 			const rows = Array.from(node.rows).map(row => {
 				const cells = Array.from(row.cells).map(cell => {
 					// Remove newlines and trim the content
@@ -374,8 +384,6 @@ export function createMarkdownContent(content: string, url: string) {
 			if (node.classList.contains('mw-editsection')) return true;
 			// Wikipedia cite backlinks
 			if (node.classList.contains('mw-cite-backlink')) return true;
-			// Wikipedia infoboxes as they usually have colspans
-			if (node.nodeName === 'TABLE' && node.classList.contains('infobox')) return true;
 			// Reference numbers and anchor links
 			if (node.classList.contains('ltx_role_refnum')) return true;
 			if (node.classList.contains('ltx_tag_bibitem')) return true;
@@ -618,7 +626,7 @@ export function createMarkdownContent(content: string, url: string) {
 	});
 
 	try {
-		let markdown = turndownService.turndown(markdownContent);
+		let markdown = turndownService.turndown(processedContent);
 		debugLog('Markdown', 'Markdown conversion successful');
 
 		// Remove the title from the beginning of the content if it exists
@@ -637,7 +645,7 @@ export function createMarkdownContent(content: string, url: string) {
 		return markdown.trim();
 	} catch (error) {
 		console.error('Error converting HTML to Markdown:', error);
-		console.log('Problematic content:', content.substring(0, 1000) + '...');
-		return `Partial conversion completed with errors. Original HTML:\n\n${content}`;
+		console.log('Problematic content:', processedContent.substring(0, 1000) + '...');
+		return `Partial conversion completed with errors. Original HTML:\n\n${processedContent}`;
 	}
 }
