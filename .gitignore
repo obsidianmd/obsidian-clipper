@@ -9,4 +9,9 @@ dist_firefox/
 dist_safari/
 builds/
 
+# Xcode
+*.xcuserstate
+project.xcworkspace/
+xcuserdata/
+
 .cursorrules

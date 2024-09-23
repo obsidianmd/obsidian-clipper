@@ -279,7 +279,9 @@ export function addPropertyToEditor(name: string = '', value: string = '', type:
 		class: 'property-name',
 		id: `${propertyId}-name`,
 		value: name,
-		placeholder: 'Property name'
+		placeholder: 'Property name',
+		autocapitalize: 'off',
+		autocomplete: 'off'
 	});
 	propertyDiv.appendChild(nameInput);
 

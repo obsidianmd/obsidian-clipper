@@ -45,6 +45,7 @@
 
 	#model-select {
 		user-select: none;
+		-webkit-user-select: none;
 		cursor: default;
 		font-variant: tabular-nums;
 		background-color: transparent;
@@ -71,6 +72,7 @@
 
 	#interpret-btn {
 		user-select: none;
+		-webkit-user-select: none;
 		font-family: var(--font-monospace-default);
 		font-weight: 600;
 		font-size: 0.75rem;
@@ -125,6 +127,7 @@
 
 	#interpreter-timer {
 		user-select: none;
+		-webkit-user-select: none;
 		cursor: default;
 		font-size: 0.75rem;
 		color: var(--text-accent);

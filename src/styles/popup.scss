@@ -3,6 +3,7 @@
 	--popup-width: 340px;
 	--popup-width-expanded: 500px;
 }
+.is-mobile-safari,
 .is-firefox-mobile {
 	--popup-height: 100vh;
 	--popup-width: 100vw;
@@ -12,6 +13,7 @@
 #popup {
 	height: var(--popup-height);
 	overflow: hidden;
+	font-family: var(--font-default);
 }
 
 #popup-container:has(.variables-panel.show) {
@@ -20,6 +22,7 @@
 	overflow: hidden;
 }
 #popup-container {
+	scrollbar-width: thin;
 	max-height: 100%;
 	display: flex;
 	flex-direction: column;
@@ -38,6 +41,7 @@
 		right: 4px;
 		border-radius: var(--radius-s);
 		user-select: none;
+		-webkit-user-select: none;
 		background-color: transparent;
 	}
 	.error-message {
@@ -50,20 +54,21 @@
 		justify-content: center;
 		height: 100%;
 	}
+
 	::-webkit-scrollbar{
 		width: 8px;
 	}
-	::-webkit-scrollbar-track-piece{
+	::-webkit-scrollbar-track-piece {
 		background-color: var(--background-primary);
 	}
-	::-webkit-scrollbar-thumb{
+	::-webkit-scrollbar-thumb {
 		background-color: var(--background-modifier-border-hover);
 		outline: 2px solid var(--background-primary);
 		outline-offset: -2px;
 		border: .1px solid var(--background-primary);
 		border-radius: 10px;
 	}
-	::-webkit-scrollbar-thumb:hover{
+	::-webkit-scrollbar-thumb:hover {
 		background-color: var(--background-modifier-border-focus);
 	}
 }
@@ -122,6 +127,7 @@
 		font-weight: 500;
 		color: var(--text-muted);
 		user-select: none;
+		-webkit-user-select: none;
 		cursor: pointer;
 		display: flex;
 		flex-direction: row;
@@ -131,7 +137,7 @@
 			color: var(--text-normal);
 		}
 		svg {
-			color: var(--text-faint);
+			color: var(--text-muted);
 			transition: transform 0.1s ease-in-out;
 		}
 		&.collapsed {
@@ -143,6 +149,7 @@
 	}
 
 	.metadata-properties {
+		scrollbar-width: thin;
 		--input-height: 28px;
 		padding: 2px 8px 8px;
 		margin: 0;
@@ -188,6 +195,7 @@
 				color: var(--text-muted);
 				font-size: var(--font-ui-small);
 				user-select: none;
+				-webkit-user-select: none;
 				margin: 0;
 			}
 			input {
@@ -206,6 +214,7 @@
 		display: flex;
 		flex-grow: 1;
 		#note-content-field {
+			scrollbar-width: thin;
 			border-radius: 0;
 			border: none;
 			border-top: 1px solid var(--background-modifier-border);

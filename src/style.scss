@@ -9,6 +9,9 @@ html {
 	font-size: 16px;
 }
 
+.is-mobile-safari {
+	font-size: 18px;
+}
 .is-firefox-mobile {
 	font-size: 20px;
 }
@@ -23,16 +26,17 @@ body {
 }
 
 @import 'styles/buttons';
-@import 'styles/toggles';
 @import 'styles/dragging';
+@import 'styles/dropdowns';
+@import 'styles/icons';
 @import 'styles/inputs';
-@import 'styles/menu';
+@import 'styles/inspect-variables';
 @import 'styles/interpreter';
+@import 'styles/menu';
+@import 'styles/popup';
 @import 'styles/settings';
 @import 'styles/templates';
-@import 'styles/popup';
-@import 'styles/icons';
-@import 'styles/inspect-variables';
+@import 'styles/toggles';
 
 a.text-muted,
 .text-muted {

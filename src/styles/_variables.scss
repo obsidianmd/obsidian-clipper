@@ -13,6 +13,12 @@
 
 	--background-modifier-hover: rgba(var(--mono-rgb-100), .075);
 
+	--dropdown-background: transparent;
+	--dropdown-background-hover: var(--interactive-hover);
+	--dropdown-background-position: right .25rem top 50%, 0 0;
+	--dropdown-background-size: 1rem auto, 100%;
+	--dropdown-padding: 0 .5rem;
+
 	--interactive-accent: var(--color-accent-1);
 	--interactive-accent-hover: var(--color-accent-2);
 

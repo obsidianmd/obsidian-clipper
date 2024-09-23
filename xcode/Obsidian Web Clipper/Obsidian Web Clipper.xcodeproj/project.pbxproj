@@ -1,0 +1,1012 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		7AEF057F2CA0F50D005FFBC2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AEF057E2CA0F50D005FFBC2 /* AppDelegate.swift */; };
+		7AEF05812CA0F50D005FFBC2 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AEF05802CA0F50D005FFBC2 /* SceneDelegate.swift */; };
+		7AEF05842CA0F50D005FFBC2 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05832CA0F50D005FFBC2 /* Base */; };
+		7AEF05872CA0F50D005FFBC2 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05862CA0F50D005FFBC2 /* Base */; };
+		7AEF05902CA0F50D005FFBC2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AEF058F2CA0F50D005FFBC2 /* AppDelegate.swift */; };
+		7AEF05932CA0F50D005FFBC2 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05922CA0F50D005FFBC2 /* Base */; };
+		7AEF059B2CA0F50D005FFBC2 /* Obsidian Web Clipper Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 7AEF059A2CA0F50D005FFBC2 /* Obsidian Web Clipper Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		7AEF05A52CA0F50D005FFBC2 /* Obsidian Web Clipper Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 7AEF05A42CA0F50D005FFBC2 /* Obsidian Web Clipper Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		7AEF05AB2CA0F50D005FFBC2 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF056F2CA0F50D005FFBC2 /* Base */; };
+		7AEF05AC2CA0F50D005FFBC2 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF056F2CA0F50D005FFBC2 /* Base */; };
+		7AEF05AD2CA0F50D005FFBC2 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05702CA0F50D005FFBC2 /* Icon.png */; };
+		7AEF05AE2CA0F50D005FFBC2 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05702CA0F50D005FFBC2 /* Icon.png */; };
+		7AEF05AF2CA0F50D005FFBC2 /* Style.css in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05712CA0F50D005FFBC2 /* Style.css */; };
+		7AEF05B02CA0F50D005FFBC2 /* Style.css in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05712CA0F50D005FFBC2 /* Style.css */; };
+		7AEF05B12CA0F50D005FFBC2 /* Script.js in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05722CA0F50D005FFBC2 /* Script.js */; };
+		7AEF05B22CA0F50D005FFBC2 /* Script.js in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05722CA0F50D005FFBC2 /* Script.js */; };
+		7AEF05B32CA0F50D005FFBC2 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AEF05732CA0F50D005FFBC2 /* ViewController.swift */; };
+		7AEF05B42CA0F50D005FFBC2 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AEF05732CA0F50D005FFBC2 /* ViewController.swift */; };
+		7AEF05B52CA0F50D005FFBC2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05742CA0F50D005FFBC2 /* Assets.xcassets */; };
+		7AEF05B62CA0F50D005FFBC2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05742CA0F50D005FFBC2 /* Assets.xcassets */; };
+		7AEF05B72CA0F50D005FFBC2 /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AEF05762CA0F50D005FFBC2 /* SafariWebExtensionHandler.swift */; };
+		7AEF05B82CA0F50D005FFBC2 /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AEF05762CA0F50D005FFBC2 /* SafariWebExtensionHandler.swift */; };
+		7AEF05DC2CA0F50D005FFBC2 /* settings.js.LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05CA2CA0F50D005FFBC2 /* settings.js.LICENSE.txt */; };
+		7AEF05DD2CA0F50D005FFBC2 /* background-safari.js in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05CB2CA0F50D005FFBC2 /* background-safari.js */; };
+		7AEF05DE2CA0F50D005FFBC2 /* popup.js in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05CC2CA0F50D005FFBC2 /* popup.js */; };
+		7AEF05DF2CA0F50D005FFBC2 /* popup.js.LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05CE2CA0F50D005FFBC2 /* popup.js.LICENSE.txt */; };
+		7AEF05E02CA0F50D005FFBC2 /* popup.html in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05CF2CA0F50D005FFBC2 /* popup.html */; };
+		7AEF05E12CA0F50D005FFBC2 /* browser-polyfill.min.js in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05D02CA0F50D005FFBC2 /* browser-polyfill.min.js */; };
+		7AEF05E22CA0F50D005FFBC2 /* icons in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05D32CA0F50D005FFBC2 /* icons */; };
+		7AEF05E32CA0F50D005FFBC2 /* style.css in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05D42CA0F50D005FFBC2 /* style.css */; };
+		7AEF05E42CA0F50D005FFBC2 /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05D52CA0F50D005FFBC2 /* manifest.json */; };
+		7AEF05E52CA0F50D005FFBC2 /* content.js in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05D62CA0F50D005FFBC2 /* content.js */; };
+		7AEF05E62CA0F50D005FFBC2 /* settings.html in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05D82CA0F50D005FFBC2 /* settings.html */; };
+		7AEF05E72CA0F50D005FFBC2 /* styles.js in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05D92CA0F50D005FFBC2 /* styles.js */; };
+		7AEF05E82CA0F50D005FFBC2 /* settings.js in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05DA2CA0F50D005FFBC2 /* settings.js */; };
+		7AEF05E92CA0F50D005FFBC2 /* settings.js.LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05CA2CA0F50D005FFBC2 /* settings.js.LICENSE.txt */; };
+		7AEF05EA2CA0F50D005FFBC2 /* background-safari.js in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05CB2CA0F50D005FFBC2 /* background-safari.js */; };
+		7AEF05EB2CA0F50D005FFBC2 /* popup.js in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05CC2CA0F50D005FFBC2 /* popup.js */; };
+		7AEF05EC2CA0F50D005FFBC2 /* popup.js.LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05CE2CA0F50D005FFBC2 /* popup.js.LICENSE.txt */; };
+		7AEF05ED2CA0F50D005FFBC2 /* popup.html in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05CF2CA0F50D005FFBC2 /* popup.html */; };
+		7AEF05EE2CA0F50D005FFBC2 /* browser-polyfill.min.js in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05D02CA0F50D005FFBC2 /* browser-polyfill.min.js */; };
+		7AEF05EF2CA0F50D005FFBC2 /* icons in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05D32CA0F50D005FFBC2 /* icons */; };
+		7AEF05F02CA0F50D005FFBC2 /* style.css in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05D42CA0F50D005FFBC2 /* style.css */; };
+		7AEF05F12CA0F50D005FFBC2 /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05D52CA0F50D005FFBC2 /* manifest.json */; };
+		7AEF05F22CA0F50D005FFBC2 /* content.js in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05D62CA0F50D005FFBC2 /* content.js */; };
+		7AEF05F32CA0F50D005FFBC2 /* settings.html in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05D82CA0F50D005FFBC2 /* settings.html */; };
+		7AEF05F42CA0F50D005FFBC2 /* styles.js in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05D92CA0F50D005FFBC2 /* styles.js */; };
+		7AEF05F52CA0F50D005FFBC2 /* settings.js in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05DA2CA0F50D005FFBC2 /* settings.js */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		7AEF059C2CA0F50D005FFBC2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7AEF05682CA0F50C005FFBC2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7AEF05992CA0F50D005FFBC2;
+			remoteInfo = "Obsidian Web Clipper Extension (iOS)";
+		};
+		7AEF05A62CA0F50D005FFBC2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 7AEF05682CA0F50C005FFBC2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 7AEF05A32CA0F50D005FFBC2;
+			remoteInfo = "Obsidian Web Clipper Extension (macOS)";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		7AEF05BE2CA0F50D005FFBC2 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				7AEF059B2CA0F50D005FFBC2 /* Obsidian Web Clipper Extension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7AEF05C52CA0F50D005FFBC2 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				7AEF05A52CA0F50D005FFBC2 /* Obsidian Web Clipper Extension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		7AEF056F2CA0F50D005FFBC2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = ../Base.lproj/Main.html; sourceTree = "<group>"; };
+		7AEF05702CA0F50D005FFBC2 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
+		7AEF05712CA0F50D005FFBC2 /* Style.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = Style.css; sourceTree = "<group>"; };
+		7AEF05722CA0F50D005FFBC2 /* Script.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = Script.js; sourceTree = "<group>"; };
+		7AEF05732CA0F50D005FFBC2 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		7AEF05742CA0F50D005FFBC2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		7AEF05762CA0F50D005FFBC2 /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
+		7AEF057B2CA0F50D005FFBC2 /* Obsidian Web Clipper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Obsidian Web Clipper.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7AEF057E2CA0F50D005FFBC2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		7AEF05802CA0F50D005FFBC2 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		7AEF05832CA0F50D005FFBC2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		7AEF05862CA0F50D005FFBC2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		7AEF05882CA0F50D005FFBC2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		7AEF058D2CA0F50D005FFBC2 /* Obsidian Web Clipper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Obsidian Web Clipper.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7AEF058F2CA0F50D005FFBC2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		7AEF05922CA0F50D005FFBC2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		7AEF05942CA0F50D005FFBC2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		7AEF05952CA0F50D005FFBC2 /* Obsidian Web Clipper.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Obsidian Web Clipper.entitlements"; sourceTree = "<group>"; };
+		7AEF059A2CA0F50D005FFBC2 /* Obsidian Web Clipper Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Obsidian Web Clipper Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7AEF059F2CA0F50D005FFBC2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		7AEF05A42CA0F50D005FFBC2 /* Obsidian Web Clipper Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Obsidian Web Clipper Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7AEF05A92CA0F50D005FFBC2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		7AEF05AA2CA0F50D005FFBC2 /* Obsidian Web Clipper.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Obsidian Web Clipper.entitlements"; sourceTree = "<group>"; };
+		7AEF05CA2CA0F50D005FFBC2 /* settings.js.LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = settings.js.LICENSE.txt; path = ../../../dist_safari/settings.js.LICENSE.txt; sourceTree = "<group>"; };
+		7AEF05CB2CA0F50D005FFBC2 /* background-safari.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = "background-safari.js"; path = "../../../dist_safari/background-safari.js"; sourceTree = "<group>"; };
+		7AEF05CC2CA0F50D005FFBC2 /* popup.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = popup.js; path = ../../../dist_safari/popup.js; sourceTree = "<group>"; };
+		7AEF05CD2CA0F50D005FFBC2 /* popup.js.map */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.module-map"; name = popup.js.map; path = ../../../dist_safari/popup.js.map; sourceTree = "<group>"; };
+		7AEF05CE2CA0F50D005FFBC2 /* popup.js.LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = popup.js.LICENSE.txt; path = ../../../dist_safari/popup.js.LICENSE.txt; sourceTree = "<group>"; };
+		7AEF05CF2CA0F50D005FFBC2 /* popup.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = popup.html; path = ../../../dist_safari/popup.html; sourceTree = "<group>"; };
+		7AEF05D02CA0F50D005FFBC2 /* browser-polyfill.min.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = "browser-polyfill.min.js"; path = "../../../dist_safari/browser-polyfill.min.js"; sourceTree = "<group>"; };
+		7AEF05D12CA0F50D005FFBC2 /* style.css.map */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.module-map"; name = style.css.map; path = ../../../dist_safari/style.css.map; sourceTree = "<group>"; };
+		7AEF05D22CA0F50D005FFBC2 /* content.js.map */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.module-map"; name = content.js.map; path = ../../../dist_safari/content.js.map; sourceTree = "<group>"; };
+		7AEF05D32CA0F50D005FFBC2 /* icons */ = {isa = PBXFileReference; lastKnownFileType = folder; name = icons; path = ../../../dist_safari/icons; sourceTree = "<group>"; };
+		7AEF05D42CA0F50D005FFBC2 /* style.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; name = style.css; path = ../../../dist_safari/style.css; sourceTree = "<group>"; };
+		7AEF05D52CA0F50D005FFBC2 /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = manifest.json; path = ../../../dist_safari/manifest.json; sourceTree = "<group>"; };
+		7AEF05D62CA0F50D005FFBC2 /* content.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = content.js; path = ../../../dist_safari/content.js; sourceTree = "<group>"; };
+		7AEF05D72CA0F50D005FFBC2 /* settings.js.map */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.module-map"; name = settings.js.map; path = ../../../dist_safari/settings.js.map; sourceTree = "<group>"; };
+		7AEF05D82CA0F50D005FFBC2 /* settings.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = settings.html; path = ../../../dist_safari/settings.html; sourceTree = "<group>"; };
+		7AEF05D92CA0F50D005FFBC2 /* styles.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = styles.js; path = ../../../dist_safari/styles.js; sourceTree = "<group>"; };
+		7AEF05DA2CA0F50D005FFBC2 /* settings.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = settings.js; path = ../../../dist_safari/settings.js; sourceTree = "<group>"; };
+		7AEF05DB2CA0F50D005FFBC2 /* background-safari.js.map */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.module-map"; name = "background-safari.js.map"; path = "../../../dist_safari/background-safari.js.map"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		7AEF05782CA0F50D005FFBC2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7AEF058A2CA0F50D005FFBC2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7AEF05972CA0F50D005FFBC2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7AEF05A12CA0F50D005FFBC2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		7AEF05672CA0F50C005FFBC2 = {
+			isa = PBXGroup;
+			children = (
+				7AEF056C2CA0F50D005FFBC2 /* Shared (App) */,
+				7AEF05752CA0F50D005FFBC2 /* Shared (Extension) */,
+				7AEF057D2CA0F50D005FFBC2 /* iOS (App) */,
+				7AEF058E2CA0F50D005FFBC2 /* macOS (App) */,
+				7AEF059E2CA0F50D005FFBC2 /* iOS (Extension) */,
+				7AEF05A82CA0F50D005FFBC2 /* macOS (Extension) */,
+				7AEF057C2CA0F50D005FFBC2 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		7AEF056C2CA0F50D005FFBC2 /* Shared (App) */ = {
+			isa = PBXGroup;
+			children = (
+				7AEF05732CA0F50D005FFBC2 /* ViewController.swift */,
+				7AEF05742CA0F50D005FFBC2 /* Assets.xcassets */,
+				7AEF056D2CA0F50D005FFBC2 /* Resources */,
+			);
+			path = "Shared (App)";
+			sourceTree = "<group>";
+		};
+		7AEF056D2CA0F50D005FFBC2 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				7AEF056E2CA0F50D005FFBC2 /* Main.html */,
+				7AEF05702CA0F50D005FFBC2 /* Icon.png */,
+				7AEF05712CA0F50D005FFBC2 /* Style.css */,
+				7AEF05722CA0F50D005FFBC2 /* Script.js */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		7AEF05752CA0F50D005FFBC2 /* Shared (Extension) */ = {
+			isa = PBXGroup;
+			children = (
+				7AEF05C92CA0F50D005FFBC2 /* Resources */,
+				7AEF05762CA0F50D005FFBC2 /* SafariWebExtensionHandler.swift */,
+			);
+			path = "Shared (Extension)";
+			sourceTree = "<group>";
+		};
+		7AEF057C2CA0F50D005FFBC2 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				7AEF057B2CA0F50D005FFBC2 /* Obsidian Web Clipper.app */,
+				7AEF058D2CA0F50D005FFBC2 /* Obsidian Web Clipper.app */,
+				7AEF059A2CA0F50D005FFBC2 /* Obsidian Web Clipper Extension.appex */,
+				7AEF05A42CA0F50D005FFBC2 /* Obsidian Web Clipper Extension.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		7AEF057D2CA0F50D005FFBC2 /* iOS (App) */ = {
+			isa = PBXGroup;
+			children = (
+				7AEF057E2CA0F50D005FFBC2 /* AppDelegate.swift */,
+				7AEF05802CA0F50D005FFBC2 /* SceneDelegate.swift */,
+				7AEF05822CA0F50D005FFBC2 /* LaunchScreen.storyboard */,
+				7AEF05852CA0F50D005FFBC2 /* Main.storyboard */,
+				7AEF05882CA0F50D005FFBC2 /* Info.plist */,
+			);
+			path = "iOS (App)";
+			sourceTree = "<group>";
+		};
+		7AEF058E2CA0F50D005FFBC2 /* macOS (App) */ = {
+			isa = PBXGroup;
+			children = (
+				7AEF058F2CA0F50D005FFBC2 /* AppDelegate.swift */,
+				7AEF05912CA0F50D005FFBC2 /* Main.storyboard */,
+				7AEF05942CA0F50D005FFBC2 /* Info.plist */,
+				7AEF05952CA0F50D005FFBC2 /* Obsidian Web Clipper.entitlements */,
+			);
+			path = "macOS (App)";
+			sourceTree = "<group>";
+		};
+		7AEF059E2CA0F50D005FFBC2 /* iOS (Extension) */ = {
+			isa = PBXGroup;
+			children = (
+				7AEF059F2CA0F50D005FFBC2 /* Info.plist */,
+			);
+			path = "iOS (Extension)";
+			sourceTree = "<group>";
+		};
+		7AEF05A82CA0F50D005FFBC2 /* macOS (Extension) */ = {
+			isa = PBXGroup;
+			children = (
+				7AEF05A92CA0F50D005FFBC2 /* Info.plist */,
+				7AEF05AA2CA0F50D005FFBC2 /* Obsidian Web Clipper.entitlements */,
+			);
+			path = "macOS (Extension)";
+			sourceTree = "<group>";
+		};
+		7AEF05C92CA0F50D005FFBC2 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				7AEF05CA2CA0F50D005FFBC2 /* settings.js.LICENSE.txt */,
+				7AEF05CB2CA0F50D005FFBC2 /* background-safari.js */,
+				7AEF05CC2CA0F50D005FFBC2 /* popup.js */,
+				7AEF05CD2CA0F50D005FFBC2 /* popup.js.map */,
+				7AEF05CE2CA0F50D005FFBC2 /* popup.js.LICENSE.txt */,
+				7AEF05CF2CA0F50D005FFBC2 /* popup.html */,
+				7AEF05D02CA0F50D005FFBC2 /* browser-polyfill.min.js */,
+				7AEF05D12CA0F50D005FFBC2 /* style.css.map */,
+				7AEF05D22CA0F50D005FFBC2 /* content.js.map */,
+				7AEF05D32CA0F50D005FFBC2 /* icons */,
+				7AEF05D42CA0F50D005FFBC2 /* style.css */,
+				7AEF05D52CA0F50D005FFBC2 /* manifest.json */,
+				7AEF05D62CA0F50D005FFBC2 /* content.js */,
+				7AEF05D72CA0F50D005FFBC2 /* settings.js.map */,
+				7AEF05D82CA0F50D005FFBC2 /* settings.html */,
+				7AEF05D92CA0F50D005FFBC2 /* styles.js */,
+				7AEF05DA2CA0F50D005FFBC2 /* settings.js */,
+				7AEF05DB2CA0F50D005FFBC2 /* background-safari.js.map */,
+			);
+			name = Resources;
+			path = "Shared (Extension)";
+			sourceTree = SOURCE_ROOT;
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		7AEF057A2CA0F50D005FFBC2 /* Obsidian Web Clipper (iOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7AEF05BF2CA0F50D005FFBC2 /* Build configuration list for PBXNativeTarget "Obsidian Web Clipper (iOS)" */;
+			buildPhases = (
+				7AEF05772CA0F50D005FFBC2 /* Sources */,
+				7AEF05782CA0F50D005FFBC2 /* Frameworks */,
+				7AEF05792CA0F50D005FFBC2 /* Resources */,
+				7AEF05BE2CA0F50D005FFBC2 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				7AEF059D2CA0F50D005FFBC2 /* PBXTargetDependency */,
+			);
+			name = "Obsidian Web Clipper (iOS)";
+			productName = "Obsidian Web Clipper (iOS)";
+			productReference = 7AEF057B2CA0F50D005FFBC2 /* Obsidian Web Clipper.app */;
+			productType = "com.apple.product-type.application";
+		};
+		7AEF058C2CA0F50D005FFBC2 /* Obsidian Web Clipper (macOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7AEF05C62CA0F50D005FFBC2 /* Build configuration list for PBXNativeTarget "Obsidian Web Clipper (macOS)" */;
+			buildPhases = (
+				7AEF05892CA0F50D005FFBC2 /* Sources */,
+				7AEF058A2CA0F50D005FFBC2 /* Frameworks */,
+				7AEF058B2CA0F50D005FFBC2 /* Resources */,
+				7AEF05C52CA0F50D005FFBC2 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				7AEF05A72CA0F50D005FFBC2 /* PBXTargetDependency */,
+			);
+			name = "Obsidian Web Clipper (macOS)";
+			productName = "Obsidian Web Clipper (macOS)";
+			productReference = 7AEF058D2CA0F50D005FFBC2 /* Obsidian Web Clipper.app */;
+			productType = "com.apple.product-type.application";
+		};
+		7AEF05992CA0F50D005FFBC2 /* Obsidian Web Clipper Extension (iOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7AEF05BB2CA0F50D005FFBC2 /* Build configuration list for PBXNativeTarget "Obsidian Web Clipper Extension (iOS)" */;
+			buildPhases = (
+				7AEF05962CA0F50D005FFBC2 /* Sources */,
+				7AEF05972CA0F50D005FFBC2 /* Frameworks */,
+				7AEF05982CA0F50D005FFBC2 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Obsidian Web Clipper Extension (iOS)";
+			productName = "Obsidian Web Clipper Extension (iOS)";
+			productReference = 7AEF059A2CA0F50D005FFBC2 /* Obsidian Web Clipper Extension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		7AEF05A32CA0F50D005FFBC2 /* Obsidian Web Clipper Extension (macOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7AEF05C22CA0F50D005FFBC2 /* Build configuration list for PBXNativeTarget "Obsidian Web Clipper Extension (macOS)" */;
+			buildPhases = (
+				7AEF05A02CA0F50D005FFBC2 /* Sources */,
+				7AEF05A12CA0F50D005FFBC2 /* Frameworks */,
+				7AEF05A22CA0F50D005FFBC2 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Obsidian Web Clipper Extension (macOS)";
+			productName = "Obsidian Web Clipper Extension (macOS)";
+			productReference = 7AEF05A42CA0F50D005FFBC2 /* Obsidian Web Clipper Extension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		7AEF05682CA0F50C005FFBC2 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1540;
+				LastUpgradeCheck = 1540;
+				TargetAttributes = {
+					7AEF057A2CA0F50D005FFBC2 = {
+						CreatedOnToolsVersion = 15.4;
+					};
+					7AEF058C2CA0F50D005FFBC2 = {
+						CreatedOnToolsVersion = 15.4;
+					};
+					7AEF05992CA0F50D005FFBC2 = {
+						CreatedOnToolsVersion = 15.4;
+					};
+					7AEF05A32CA0F50D005FFBC2 = {
+						CreatedOnToolsVersion = 15.4;
+					};
+				};
+			};
+			buildConfigurationList = 7AEF056B2CA0F50C005FFBC2 /* Build configuration list for PBXProject "Obsidian Web Clipper" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 7AEF05672CA0F50C005FFBC2;
+			productRefGroup = 7AEF057C2CA0F50D005FFBC2 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				7AEF057A2CA0F50D005FFBC2 /* Obsidian Web Clipper (iOS) */,
+				7AEF058C2CA0F50D005FFBC2 /* Obsidian Web Clipper (macOS) */,
+				7AEF05992CA0F50D005FFBC2 /* Obsidian Web Clipper Extension (iOS) */,
+				7AEF05A32CA0F50D005FFBC2 /* Obsidian Web Clipper Extension (macOS) */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		7AEF05792CA0F50D005FFBC2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7AEF05AD2CA0F50D005FFBC2 /* Icon.png in Resources */,
+				7AEF05842CA0F50D005FFBC2 /* Base in Resources */,
+				7AEF05AB2CA0F50D005FFBC2 /* Base in Resources */,
+				7AEF05B12CA0F50D005FFBC2 /* Script.js in Resources */,
+				7AEF05B52CA0F50D005FFBC2 /* Assets.xcassets in Resources */,
+				7AEF05872CA0F50D005FFBC2 /* Base in Resources */,
+				7AEF05AF2CA0F50D005FFBC2 /* Style.css in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7AEF058B2CA0F50D005FFBC2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7AEF05AE2CA0F50D005FFBC2 /* Icon.png in Resources */,
+				7AEF05B02CA0F50D005FFBC2 /* Style.css in Resources */,
+				7AEF05932CA0F50D005FFBC2 /* Base in Resources */,
+				7AEF05B22CA0F50D005FFBC2 /* Script.js in Resources */,
+				7AEF05B62CA0F50D005FFBC2 /* Assets.xcassets in Resources */,
+				7AEF05AC2CA0F50D005FFBC2 /* Base in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7AEF05982CA0F50D005FFBC2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7AEF05F32CA0F50D005FFBC2 /* settings.html in Resources */,
+				7AEF05EA2CA0F50D005FFBC2 /* background-safari.js in Resources */,
+				7AEF05F02CA0F50D005FFBC2 /* style.css in Resources */,
+				7AEF05ED2CA0F50D005FFBC2 /* popup.html in Resources */,
+				7AEF05F42CA0F50D005FFBC2 /* styles.js in Resources */,
+				7AEF05EE2CA0F50D005FFBC2 /* browser-polyfill.min.js in Resources */,
+				7AEF05F22CA0F50D005FFBC2 /* content.js in Resources */,
+				7AEF05F12CA0F50D005FFBC2 /* manifest.json in Resources */,
+				7AEF05EB2CA0F50D005FFBC2 /* popup.js in Resources */,
+				7AEF05EC2CA0F50D005FFBC2 /* popup.js.LICENSE.txt in Resources */,
+				7AEF05EF2CA0F50D005FFBC2 /* icons in Resources */,
+				7AEF05E92CA0F50D005FFBC2 /* settings.js.LICENSE.txt in Resources */,
+				7AEF05F52CA0F50D005FFBC2 /* settings.js in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7AEF05A22CA0F50D005FFBC2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7AEF05E62CA0F50D005FFBC2 /* settings.html in Resources */,
+				7AEF05DD2CA0F50D005FFBC2 /* background-safari.js in Resources */,
+				7AEF05E32CA0F50D005FFBC2 /* style.css in Resources */,
+				7AEF05E02CA0F50D005FFBC2 /* popup.html in Resources */,
+				7AEF05E72CA0F50D005FFBC2 /* styles.js in Resources */,
+				7AEF05E12CA0F50D005FFBC2 /* browser-polyfill.min.js in Resources */,
+				7AEF05E52CA0F50D005FFBC2 /* content.js in Resources */,
+				7AEF05E42CA0F50D005FFBC2 /* manifest.json in Resources */,
+				7AEF05DE2CA0F50D005FFBC2 /* popup.js in Resources */,
+				7AEF05DF2CA0F50D005FFBC2 /* popup.js.LICENSE.txt in Resources */,
+				7AEF05E22CA0F50D005FFBC2 /* icons in Resources */,
+				7AEF05DC2CA0F50D005FFBC2 /* settings.js.LICENSE.txt in Resources */,
+				7AEF05E82CA0F50D005FFBC2 /* settings.js in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		7AEF05772CA0F50D005FFBC2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7AEF05B32CA0F50D005FFBC2 /* ViewController.swift in Sources */,
+				7AEF057F2CA0F50D005FFBC2 /* AppDelegate.swift in Sources */,
+				7AEF05812CA0F50D005FFBC2 /* SceneDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7AEF05892CA0F50D005FFBC2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7AEF05B42CA0F50D005FFBC2 /* ViewController.swift in Sources */,
+				7AEF05902CA0F50D005FFBC2 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7AEF05962CA0F50D005FFBC2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7AEF05B72CA0F50D005FFBC2 /* SafariWebExtensionHandler.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7AEF05A02CA0F50D005FFBC2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7AEF05B82CA0F50D005FFBC2 /* SafariWebExtensionHandler.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		7AEF059D2CA0F50D005FFBC2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 7AEF05992CA0F50D005FFBC2 /* Obsidian Web Clipper Extension (iOS) */;
+			targetProxy = 7AEF059C2CA0F50D005FFBC2 /* PBXContainerItemProxy */;
+		};
+		7AEF05A72CA0F50D005FFBC2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 7AEF05A32CA0F50D005FFBC2 /* Obsidian Web Clipper Extension (macOS) */;
+			targetProxy = 7AEF05A62CA0F50D005FFBC2 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		7AEF056E2CA0F50D005FFBC2 /* Main.html */ = {
+			isa = PBXVariantGroup;
+			children = (
+				7AEF056F2CA0F50D005FFBC2 /* Base */,
+			);
+			name = Main.html;
+			sourceTree = "<group>";
+		};
+		7AEF05822CA0F50D005FFBC2 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				7AEF05832CA0F50D005FFBC2 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		7AEF05852CA0F50D005FFBC2 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				7AEF05862CA0F50D005FFBC2 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		7AEF05912CA0F50D005FFBC2 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				7AEF05922CA0F50D005FFBC2 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		7AEF05B92CA0F50D005FFBC2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		7AEF05BA2CA0F50D005FFBC2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		7AEF05BC2CA0F50D005FFBC2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6JSW4SJWN9;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "iOS (Extension)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Obsidian Web Clipper Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "md.obsidian.Obsidian-Web-Clipper.Extension";
+				PRODUCT_NAME = "Obsidian Web Clipper Extension";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		7AEF05BD2CA0F50D005FFBC2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6JSW4SJWN9;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "iOS (Extension)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Obsidian Web Clipper Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "md.obsidian.Obsidian-Web-Clipper.Extension";
+				PRODUCT_NAME = "Obsidian Web Clipper Extension";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		7AEF05C02CA0F50D005FFBC2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6JSW4SJWN9;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "iOS (App)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Obsidian Web Clipper";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "md.obsidian.Obsidian-Web-Clipper";
+				PRODUCT_NAME = "Obsidian Web Clipper";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		7AEF05C12CA0F50D005FFBC2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6JSW4SJWN9;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "iOS (App)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Obsidian Web Clipper";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "md.obsidian.Obsidian-Web-Clipper";
+				PRODUCT_NAME = "Obsidian Web Clipper";
+				SDKROOT = iphoneos;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		7AEF05C32CA0F50D005FFBC2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "macOS (Extension)/Obsidian Web Clipper.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "macOS (Extension)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Obsidian Web Clipper Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "md.obsidian.Obsidian-Web-Clipper.Extension";
+				PRODUCT_NAME = "Obsidian Web Clipper Extension";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		7AEF05C42CA0F50D005FFBC2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = "macOS (Extension)/Obsidian Web Clipper.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "macOS (Extension)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Obsidian Web Clipper Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "md.obsidian.Obsidian-Web-Clipper.Extension";
+				PRODUCT_NAME = "Obsidian Web Clipper Extension";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		7AEF05C72CA0F50D005FFBC2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "macOS (App)/Obsidian Web Clipper.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "macOS (App)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Obsidian Web Clipper";
+				INFOPLIST_KEY_NSMainStoryboardFile = Main;
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "md.obsidian.Obsidian-Web-Clipper";
+				PRODUCT_NAME = "Obsidian Web Clipper";
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		7AEF05C82CA0F50D005FFBC2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "macOS (App)/Obsidian Web Clipper.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "macOS (App)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Obsidian Web Clipper";
+				INFOPLIST_KEY_NSMainStoryboardFile = Main;
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "md.obsidian.Obsidian-Web-Clipper";
+				PRODUCT_NAME = "Obsidian Web Clipper";
+				SDKROOT = macosx;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		7AEF056B2CA0F50C005FFBC2 /* Build configuration list for PBXProject "Obsidian Web Clipper" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7AEF05B92CA0F50D005FFBC2 /* Debug */,
+				7AEF05BA2CA0F50D005FFBC2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7AEF05BB2CA0F50D005FFBC2 /* Build configuration list for PBXNativeTarget "Obsidian Web Clipper Extension (iOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7AEF05BC2CA0F50D005FFBC2 /* Debug */,
+				7AEF05BD2CA0F50D005FFBC2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7AEF05BF2CA0F50D005FFBC2 /* Build configuration list for PBXNativeTarget "Obsidian Web Clipper (iOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7AEF05C02CA0F50D005FFBC2 /* Debug */,
+				7AEF05C12CA0F50D005FFBC2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7AEF05C22CA0F50D005FFBC2 /* Build configuration list for PBXNativeTarget "Obsidian Web Clipper Extension (macOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7AEF05C32CA0F50D005FFBC2 /* Debug */,
+				7AEF05C42CA0F50D005FFBC2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7AEF05C62CA0F50D005FFBC2 /* Build configuration list for PBXNativeTarget "Obsidian Web Clipper (macOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7AEF05C72CA0F50D005FFBC2 /* Debug */,
+				7AEF05C82CA0F50D005FFBC2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 7AEF05682CA0F50C005FFBC2 /* Project object */;
+}

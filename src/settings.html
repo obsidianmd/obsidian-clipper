@@ -2,7 +2,7 @@
 <html lang="en" style="height: 100%; overflow: hidden;">
 <head>
 	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 	<title>Obsidian Web Clipper Settings</title>
 	<link rel="stylesheet" href="style.css">
 </head>
@@ -41,10 +41,10 @@
 								<div>
 									<h3>Vaults</h3>
 									<div class="setting-item-description">By default, clipped notes are saved to the currently open vault. You can add vaults here if you want the option to save to different vaults. Vault names must exactly match the name of the Obsidian vault. Press enter to add a&nbsp;vault.</div>
-									<input type="text" id="vault-input" placeholder="Press enter to add a vault" />
+									<input type="text" id="vault-input" placeholder="Press enter to add a vault" autocomplete="off" spellcheck="false" />
 									<ul id="vault-list"></ul>
 								</div>
-								<div>
+								<div id="hotkeys-subsection">
 									<h3>Hotkeys</h3>
 									<div class="setting-item-description shortcut-instructions">
 									</div>

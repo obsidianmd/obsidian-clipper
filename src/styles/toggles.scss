@@ -8,6 +8,7 @@
 	height: calc(var(--toggle-thumb-height) + var(--toggle-border-width) * 2);
 	position: relative;
 	user-select: none;
+	-webkit-user-select: none;
 	width: var(--toggle-width);
 	box-shadow:
 		inset 0 4px 10px rgba(0, 0, 0, .07),

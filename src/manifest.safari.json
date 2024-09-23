@@ -19,8 +19,7 @@
 		}
 	},
 	"options_ui": {
-		"page": "settings.html",
-		"open_in_tab": true
+		"page": "settings.html"
 	},
 	"icons": {
 		"16": "icons/icon16.png",
@@ -28,13 +27,13 @@
 		"128": "icons/icon128.png"
 	},
 	"background": {
-		"scripts": ["background-safari.js"],
-		"type": "module"
+		"service_worker": "background.js"
 	},
 	"content_scripts": [
 		{
 			"matches": ["http://*/*", "https://*/*"],
-			"js": ["content.js"]
+			"js": ["content.js"],
+			"css": ["style.css"]
 		}
 	],
 	"content_security_policy": {
@@ -52,5 +51,10 @@
 	"host_permissions": [
 		"http://*/*",
 		"https://*/*"
+	],
+	"web_accessible_resources": [
+		{
+			"resources": [ "style.css" ]
+		}
 	]
 }
