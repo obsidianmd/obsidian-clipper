@@ -26,7 +26,7 @@
 	max-height: 100%;
 	display: flex;
 	flex-direction: column;
-	width: 100%;
+	width: var(--popup-width);
 	height: 100%;
 	overflow: hidden;
 	transition: width 0.1s ease-in-out;
