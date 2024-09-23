@@ -74,13 +74,14 @@ export async function setShortcutInstructions() {
 			case 'edge':
 				instructions = 'To change key assignments, go to <code>edge://extensions/shortcuts</code>';
 				break;
+			case 'safari':
+			case 'mobile-safari':
+				instructions = 'Keyboard shortcuts are not available for Safari extensions.';
+				break;
 			default:
 				instructions = 'To change key assignments, please refer to your browser\'s extension settings.';
 		}
-		shortcutInstructionsElement.textContent = 'Keyboard shortcuts give you quick access to clipper features. ';
-		const codeElement = document.createElement('code');
-		codeElement.textContent = instructions.replace(/<\/?code>/g, '');
-		shortcutInstructionsElement.appendChild(codeElement);
+		shortcutInstructionsElement.innerHTML = 'Keyboard shortcuts give you quick access to clipper features. ' + instructions;
 	}
 }
 
@@ -148,25 +149,36 @@ function initializeVaultInput(): void {
 	}
 }
 
-function initializeKeyboardShortcuts(): void {
+async function initializeKeyboardShortcuts(): Promise<void> {
 	const shortcutsList = document.getElementById('keyboard-shortcuts-list');
 	if (!shortcutsList) return;
 
-	getCommands().then(commands => {
-		commands.forEach(command => {
-			const shortcutItem = createElementWithClass('div', 'shortcut-item');
-			
-			const descriptionSpan = document.createElement('span');
-			descriptionSpan.textContent = command.description;
-			shortcutItem.appendChild(descriptionSpan);
+	const browser = await detectBrowser();
 
-			const hotkeySpan = createElementWithClass('span', 'setting-hotkey');
-			hotkeySpan.textContent = command.shortcut || 'Not set';
-			shortcutItem.appendChild(hotkeySpan);
+	if (browser === 'safari' || browser === 'mobile-safari') {
+		// For Safari, display a message about keyboard shortcuts not being available
+		const messageItem = document.createElement('div');
+		messageItem.className = 'shortcut-item';
+		messageItem.textContent = 'Keyboard shortcuts are not available in Safari extensions.';
+		shortcutsList.appendChild(messageItem);
+	} else {
+		// For other browsers, proceed with displaying the shortcuts
+		getCommands().then(commands => {
+			commands.forEach(command => {
+				const shortcutItem = createElementWithClass('div', 'shortcut-item');
+				
+				const descriptionSpan = document.createElement('span');
+				descriptionSpan.textContent = command.description;
+				shortcutItem.appendChild(descriptionSpan);
 
-			shortcutsList.appendChild(shortcutItem);
+				const hotkeySpan = createElementWithClass('span', 'setting-hotkey');
+				hotkeySpan.textContent = command.shortcut || 'Not set';
+				shortcutItem.appendChild(hotkeySpan);
+
+				shortcutsList.appendChild(shortcutItem);
+			});
 		});
-	});
+	}
 }
 
 function initializeBetaFeaturesToggle(): void {

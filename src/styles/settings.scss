@@ -215,6 +215,7 @@
 			padding: 4px 6px;
 			border-radius: var(--radius-s);
 			user-select: none;
+			-webkit-user-select: none;
 
 			&:hover {
 				background-color: var(--background-modifier-hover);
@@ -310,6 +311,14 @@
 			border-radius: var(--radius-s);
 			font-size: var(--font-ui-smaller);
 		}
+	}
+}
+
+.is-firefox-mobile,
+.is-safari,
+.is-mobile-safari {
+	#hotkeys-subsection {
+		display: none;
 	}
 }
 

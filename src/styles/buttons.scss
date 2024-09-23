@@ -8,6 +8,7 @@ button {
 	font-size: var(--font-ui-smaller);
 	height: var(--input-height);
 	user-select: none;
+	-webkit-user-select: none;
 	padding: 0.25rem 0.75rem;
 	outline: none;
 	border: none;
@@ -68,6 +69,7 @@ button.clickable-icon {
 	color: var(--text-normal);
 	font-size: var(--font-ui-small);
 	user-select: none;
+	-webkit-user-select: none;
 	white-space: nowrap;
 	a {
 		cursor: pointer;
