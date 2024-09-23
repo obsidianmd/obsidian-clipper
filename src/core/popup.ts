@@ -463,10 +463,16 @@ document.addEventListener('DOMContentLoaded', async function() {
 						value = (value.toLowerCase() === 'true' || value === '1').toString();
 						break;
 					case 'date':
-						value = dayjs(value).isValid() ? dayjs(value).format('YYYY-MM-DD') : value;
+						// Don't override user-specified date format
+						if (!property.value.includes('|date:')) {
+							value = dayjs(value).isValid() ? dayjs(value).format('YYYY-MM-DD') : value;
+						}
 						break;
 					case 'datetime':
-						value = dayjs(value).isValid() ? dayjs(value).format('YYYY-MM-DDTHH:mm:ssZ') : value;
+						// Don't override user-specified datetime format
+						if (!property.value.includes('|date:')) {
+							value = dayjs(value).isValid() ? dayjs(value).format('YYYY-MM-DDTHH:mm:ssZ') : value;
+						}
 						break;
 				}
 
