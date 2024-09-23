@@ -21,7 +21,8 @@ export function createMarkdownContent(content: string, url: string) {
 	});
 
 	try {
-		turndownService.use(gfm);
+		var taskListItems = require('turndown-plugin-gfm').taskListItems
+		turndownService.use(taskListItems)
 	} catch (error) {
 		console.error('Error applying GFM plugin:', error);
 	}
@@ -637,6 +638,6 @@ export function createMarkdownContent(content: string, url: string) {
 	} catch (error) {
 		console.error('Error converting HTML to Markdown:', error);
 		console.log('Problematic content:', content.substring(0, 1000) + '...');
-		return `Failed to convert content to Markdown. Original HTML:\n\n${content}`;
+		return `Partial conversion completed with errors. Original HTML:\n\n${content}`;
 	}
 }
