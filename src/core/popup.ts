@@ -21,7 +21,7 @@ let currentTemplate: Template | null = null;
 let templates: Template[] = [];
 let currentVariables: { [key: string]: string } = {};
 
-const isSidePanel = window.location.pathname.includes('sidebar.html');
+const isSidePanel = window.location.pathname.includes('side-panel.html');
 
 let currentTabId: number | undefined;
 
@@ -196,7 +196,11 @@ async function handleClip() {
 		}
 
 		await saveToObsidian(fileContent, noteName, path, selectedVault, currentTemplate.behavior);
-		setTimeout(() => window.close(), 50);
+		
+		// Only close the window if it's not running in side panel mode
+		if (!isSidePanel) {
+			setTimeout(() => window.close(), 1500);
+		}
 	} catch (error) {
 		console.error('Error in handleClip:', error);
 		showError('Failed to save to Obsidian. Please try again.');

@@ -58,11 +58,11 @@ browser.commands.onCommand.addListener((command) => {
 function createContextMenu() {
 	browser.contextMenus.create({
 		id: "open-obsidian-clipper",
-		title: "Add to Obsidian",
+		title: "Clip this page",
 		contexts: ["page", "selection"]
 	});
 	browser.contextMenus.create({
-		id: 'openSidePanel',
+		id: 'open-side-panel',
 		title: 'Open side panel',
 		contexts: ["page", "selection"]
 	});
@@ -71,7 +71,7 @@ function createContextMenu() {
 browser.contextMenus.onClicked.addListener((info, tab) => {
 	if (info.menuItemId === "open-obsidian-clipper") {
 		browser.action.openPopup();
-	} else if (info.menuItemId === 'openSidePanel' && tab && tab.id && tab.windowId) {
+	} else if (info.menuItemId === 'open-side-panel' && tab && tab.id && tab.windowId) {
 		chrome.sidePanel.open({ tabId: tab.id });
 		sidePanelOpenWindows.add(tab.windowId);
 		ensureContentScriptLoaded(tab.id);
@@ -128,7 +128,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 			await chrome.sidePanel.open({ tabId: sender.tab.id });
 			await chrome.sidePanel.setOptions({
 				tabId: sender.tab.id,
-				path: 'sidebar.html',
+				path: 'side-panel.html',
 				enabled: true
 			});
 			if (sender.tab.windowId) {

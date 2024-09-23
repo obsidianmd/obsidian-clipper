@@ -3,7 +3,7 @@
 	--popup-width: 340px;
 	--popup-width-expanded: 500px;
 }
-.is-sidebar,
+.is-side-panel,
 .is-mobile-safari,
 .is-firefox-mobile {
 	--popup-height: 100vh;
@@ -66,7 +66,7 @@
 		background-color: var(--background-modifier-border-hover);
 		outline: 2px solid var(--background-primary);
 		outline-offset: -2px;
-		border: .1px solid var(--background-primary);
+		border: 1px solid var(--background-primary);
 		border-radius: 10px;
 	}
 	::-webkit-scrollbar-thumb:hover {
@@ -77,7 +77,7 @@
 .clipper {
 	display: flex;
 	flex-direction: column;
-	padding-top: 6px;
+	padding-top: 5px;
 	height: 100%;
 	max-height: 100%;
 	overflow: hidden;
@@ -87,7 +87,7 @@
 		border-radius: 0;
 		border: none;
 		padding: 6px 8px 2px 12px;
-		width: calc(100% - 36px);
+		width: calc(100% - 56px);
 		margin-inline-start: 0;
 		margin-inline-end: auto;
 		font-weight: 500;
@@ -218,7 +218,7 @@
 			scrollbar-width: thin;
 			border-radius: 0;
 			border: none;
-			border-top: 1px solid var(--background-modifier-border);
+			border-top: 1px solid var(--divider-color);
 			padding: 10px;
 			resize: none;
 			&:active,
@@ -234,7 +234,7 @@
 		flex-direction: column;
 		gap: 8px;
 		padding: 10px 10px;
-		border-top: 1px solid var(--background-modifier-border);
+		border-top: 1px solid var(--divider-color);
 		background-color: var(--background-primary);
 		button {
 			font-weight: 500;
