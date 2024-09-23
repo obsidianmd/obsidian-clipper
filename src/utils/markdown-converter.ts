@@ -284,7 +284,6 @@ export function createMarkdownContent(content: string, url: string) {
 		}
 	});
 
-
 	turndownService.addRule('citations', {
 		filter: (node: Node): boolean => {
 			if (node instanceof Element) {
@@ -303,9 +302,9 @@ export function createMarkdownContent(content: string, url: string) {
 					const footnotes = Array.from(links).map(link => {
 						const href = link.getAttribute('href');
 						if (href) {
-							const match = href.split('/').pop()?.match(/cite_note-(\d+)/);
+							const match = href.split('/').pop()?.match(/(?:cite_note|cite_ref)-(.+)/);
 							if (match) {
-								return `[^${match[1]}]`;
+								return `[^${match[1].toLowerCase()}]`;
 							}
 						}
 						return '';
@@ -318,13 +317,13 @@ export function createMarkdownContent(content: string, url: string) {
 						if (href) {
 							const match = href.split('/').pop()?.match(/bib\.bib(\d+)/);
 							if (match) {
-								return `[^${match[1]}]`;
+								return `[^${match[1].toLowerCase()}]`;
 							}
 						}
 					}
 				} else if (node.nodeName === 'SUP' && node.id.startsWith('fnref:')) {
 					const id = node.id.replace('fnref:', '');
-					return `[^${id}]`;
+					return `[^${id.toLowerCase()}]`;
 				}
 			}
 			return content;
@@ -352,13 +351,13 @@ export function createMarkdownContent(content: string, url: string) {
 					} else if (li.id.startsWith('fn:')) {
 						id = li.id.replace('fn:', '');
 					} else {
-						const match = li.id.split('/').pop()?.match(/cite_note-(\d+)/);
+						const match = li.id.split('/').pop()?.match(/cite_note-(.+)/);
 						id = match ? match[1] : li.id.replace('fn:', '');
 					}
 					const referenceContent = turndownService.turndown(li.innerHTML);
 					// Remove the backlink from the footnote content
 					const cleanedContent = referenceContent.replace(/\s*↩︎$/, '').trim();
-					return `[^${id}]: ${cleanedContent}`;
+					return `[^${id.toLowerCase()}]: ${cleanedContent}`;
 				});
 				return '\n\n' + references.join('\n\n') + '\n\n';
 			}
