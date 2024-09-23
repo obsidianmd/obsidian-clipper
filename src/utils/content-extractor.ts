@@ -134,24 +134,7 @@ export async function replaceVariables(tabId: number, text: string, variables: {
 				replacement = await processPrompt(match, variables, currentUrl);
 			} else {
 				const [variableName, ...filterParts] = match.slice(2, -2).split('|');
-				let value = variables[`{{${variableName}}}`] || '';
-				
-				// Handle 'now' for date and time
-				if (value === 'now' && !filterParts.some(part => part.startsWith('date:'))) {
-					filterParts.unshift('date:"YYYY-MM-DD"');
-				}
-				
-				// Handle published date
-				if (variableName === 'published' && !filterParts.some(part => part.startsWith('date:'))) {
-					if (dayjs(value).isValid()) {
-						// If it's a valid date with time, use a format that includes time
-						filterParts.unshift('date:"YYYY-MM-DD HH:mm:ss"');
-					} else {
-						// If it's just a date or invalid, use only the date format
-						filterParts.unshift('date:"YYYY-MM-DD"');
-					}
-				}
-				
+				let value = variables[`{{${variableName}}}`] || '';				
 				const filtersString = filterParts.join('|');
 				replacement = applyFilters(value, filtersString, currentUrl);
 			}
@@ -184,6 +167,12 @@ export async function extractPageContent(tabId: number): Promise<{
 		console.error('Error extracting page content:', error);
 		return null;
 	}
+}
+
+export function getTimeElement(doc: Document): string {
+	const selector = `time`;
+	const element = Array.from(doc.querySelectorAll(selector))[0];
+	return element ? (element.getAttribute("datetime")?.trim() ?? element.textContent?.trim() ?? "") : "";
 }
 
 export function getMetaContent(doc: Document, attr: string, value: string): string {
@@ -284,15 +273,12 @@ export async function initializePageContent(content: string, selectedHtml: strin
 			|| getMetaContent(doc, "name", "sailthru.image.full")
 			|| '';
 
-		const timeElement = doc.querySelector("time");
-		const publishedDate = 
+		const published = 
 			getSchemaProperty(schemaOrgData, 'datePublished')
 			|| getMetaContent(doc, "property", "article:published_time")
-			|| timeElement?.getAttribute("datetime")
+			|| getTimeElement(doc)
 			|| getMetaContent(doc, "name", "sailthru.date")
 			|| '';
-		
-		const published = publishedDate ? dayjs(publishedDate).isValid() ? publishedDate : dayjs(publishedDate).format('YYYY-MM-DD') : "";
 
 		const site =
 			getSchemaProperty(schemaOrgData, 'publisher.name')
@@ -318,7 +304,7 @@ export async function initializePageContent(content: string, selectedHtml: strin
 			'{{author}}': authorName,
 			'{{content}}': markdownBody,
 			'{{contentHtml}}': content,
-			'{{date}}': 'now',
+			'{{date}}': dayjs().format('YYYY-MM-DD'),
 			'{{time}}': dayjs().format('YYYY-MM-DDTHH:mm:ssZ'),
 			'{{description}}': description,
 			'{{domain}}': domain,
