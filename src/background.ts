@@ -4,6 +4,10 @@ function isValidUrl(url: string): boolean {
 	return url.startsWith('http://') || url.startsWith('https://');
 }
 
+function isBlankPage(url: string): boolean {
+	return url === 'about:blank' || url === 'chrome://newtab/' || url === 'edge://newtab/';
+}
+
 let sidePanelOpenWindows: Set<number> = new Set();
 let currentActiveTabId: number | undefined;
 let currentWindowId: number | undefined;
@@ -87,7 +91,8 @@ function updateCurrentActiveTab(windowId: number) {
 				browser.runtime.sendMessage({ 
 					action: "activeTabChanged", 
 					tabId: currentActiveTabId,
-					isValidUrl: isValidUrl(tabs[0].url)
+					isValidUrl: isValidUrl(tabs[0].url),
+					isBlankPage: isBlankPage(tabs[0].url)
 				});
 			}
 		}

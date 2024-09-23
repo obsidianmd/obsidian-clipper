@@ -180,9 +180,16 @@ function waitForInterpreter(interpretBtn: HTMLButtonElement): Promise<void> {
 	});
 }
 
+function isValidUrl(url: string): boolean {
+	return url.startsWith('http://') || url.startsWith('https://');
+}
+
+function isBlankPage(url: string): boolean {
+	return url === 'about:blank' || url === 'chrome://newtab/' || url === 'edge://newtab/';
+}
+
 async function refreshFields() {
 	if (!currentTemplate) {
-		console.warn('No current template selected');
 		return;
 	}
 
@@ -191,8 +198,13 @@ async function refreshFields() {
 	if (currentTabId) {
 		try {
 			const tab = await browser.tabs.get(currentTabId);
-			if (!tab.url || !isValidUrl(tab.url)) {
-				throw new Error('This page cannot be clipped');
+			if (!tab.url || isBlankPage(tab.url)) {
+				showError('This page cannot be clipped. Please navigate to a web page.');
+				return;
+			}
+			if (!isValidUrl(tab.url)) {
+				showError('This page cannot be clipped. Only http and https URLs are supported.');
+				return;
 			}
 
 			const extractedData = await extractPageContent(currentTabId);
@@ -471,8 +483,12 @@ document.addEventListener('DOMContentLoaded', async function() {
 		currentTabId = await getCurrentActiveTab();
 		if (currentTabId) {
 			const tab = await browser.tabs.get(currentTabId);
-			if (!tab.url || !isValidUrl(tab.url)) {
-				showError('This page cannot be clipped');
+			if (!tab.url || isBlankPage(tab.url)) {
+				showError('This page cannot be clipped. Please navigate to a web page.');
+				return;
+			}
+			if (!isValidUrl(tab.url)) {
+				showError('This page cannot be clipped. Only http and https URLs are supported.');
 				return;
 			}
 			await ensureContentScriptLoaded();
@@ -840,8 +856,10 @@ document.addEventListener('DOMContentLoaded', async function() {
 				currentTabId = request.tabId;
 				if (request.isValidUrl) {
 					refreshFields();
+				} else if (request.isBlankPage) {
+					showError('This page cannot be clipped. Please navigate to a web page.');
 				} else {
-					showError('This page cannot be clipped');
+					showError('This page cannot be clipped. Only http and https URLs are supported.');
 				}
 			}
 		});
