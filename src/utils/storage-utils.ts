@@ -13,6 +13,7 @@ export interface Settings {
 	vaults: string[];
 	showMoreActionsButton: boolean;
 	betaFeatures: boolean;
+	legacyMode: boolean;
 	silentOpen: boolean;
 	openaiApiKey?: string;
 	anthropicApiKey?: string;
@@ -26,6 +27,7 @@ export interface Settings {
 export let generalSettings: Settings = {
 	vaults: [],
 	betaFeatures: false,
+	legacyMode: false,
 	silentOpen: false,
 	showMoreActionsButton: false,
 	openaiApiKey: '',
@@ -59,6 +61,7 @@ export async function loadSettings(): Promise<Settings> {
 		vaults: data.vaults || [],
 		showMoreActionsButton: data.general_settings?.showMoreActionsButton ?? true,
 		betaFeatures: data.general_settings?.betaFeatures ?? false,
+		legacyMode: data.general_settings?.legacyMode ?? false,
 		silentOpen: data.general_settings?.silentOpen ?? false,
 		openaiApiKey: data.interpreter_settings?.openaiApiKey || '',
 		anthropicApiKey: data.interpreter_settings?.anthropicApiKey || '',
@@ -81,6 +84,7 @@ export async function saveSettings(settings?: Partial<Settings>): Promise<void> 
 		general_settings: {
 			showMoreActionsButton: generalSettings.showMoreActionsButton,
 			betaFeatures: generalSettings.betaFeatures,
+			legacyMode: generalSettings.legacyMode,
 			silentOpen: generalSettings.silentOpen
 		},
 		interpreter_settings: {
@@ -93,4 +97,9 @@ export async function saveSettings(settings?: Partial<Settings>): Promise<void> 
 			defaultPromptContext: generalSettings.defaultPromptContext
 		}
 	});
+}
+
+export async function setLegacyMode(enabled: boolean): Promise<void> {
+	await saveSettings({ legacyMode: enabled });
+	console.log(`Legacy mode ${enabled ? 'enabled' : 'disabled'}`);
 }

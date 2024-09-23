@@ -90,6 +90,7 @@ export function initializeGeneralSettings(): void {
 		updateVaultList();
 		initializeShowMoreActionsToggle();
 		initializeBetaFeaturesToggle();
+		initializeLegacyModeToggle();
 		initializeSilentOpenToggle();
 		initializeVaultInput();
 		initializeKeyboardShortcuts();
@@ -109,13 +110,15 @@ function initializeAutoSave(): void {
 function saveSettingsFromForm(): void {
 	const showMoreActionsToggle = document.getElementById('show-more-actions-toggle') as HTMLInputElement;
 	const betaFeaturesToggle = document.getElementById('beta-features-toggle') as HTMLInputElement;
+	const legacyModeToggle = document.getElementById('legacy-mode-toggle') as HTMLInputElement;
+	const silentOpenToggle = document.getElementById('silent-open-toggle') as HTMLInputElement;
 
-	const updatedSettings = {
-		showMoreActionsButton: showMoreActionsToggle.checked,
-		betaFeatures: betaFeaturesToggle.checked
-	};
-
-	saveSettings(updatedSettings);
+	const settings = {
+		showMoreActionsButton: showMoreActionsToggle?.checked,
+		betaFeatures: betaFeaturesToggle?.checked,
+		legacyMode: legacyModeToggle?.checked,
+		silentOpen: silentOpenToggle?.checked
+	}
 }
 
 function debounce(func: Function, delay: number): (...args: any[]) => void {
@@ -185,6 +188,19 @@ function initializeBetaFeaturesToggle(): void {
 	const betaFeaturesToggle = document.getElementById('beta-features-toggle') as HTMLInputElement;
 	if (betaFeaturesToggle) {
 		betaFeaturesToggle.checked = generalSettings.betaFeatures;
+		betaFeaturesToggle.addEventListener('change', () => {
+			saveSettings({ betaFeatures: betaFeaturesToggle.checked });
+		});
+	}
+}
+
+function initializeLegacyModeToggle(): void {
+	const legacyModeToggle = document.getElementById('legacy-mode-toggle') as HTMLInputElement;
+	if (legacyModeToggle) {
+		legacyModeToggle.checked = generalSettings.legacyMode;
+		legacyModeToggle.addEventListener('change', () => {
+			saveSettings({ legacyMode: legacyModeToggle.checked });
+		});
 	}
 }
 

@@ -98,21 +98,22 @@ export async function saveToObsidian(
 		obsidianUrl += '&silent=true';
 	}
 
-	if (generalSettings.betaFeatures) {
-		// Use clipboard for content in beta mode
-		navigator.clipboard.writeText(fileContent).then(() => {
-			obsidianUrl += `&clipboard`;
-			openObsidianUrl(obsidianUrl);
-		}).catch(err => {
-			console.error('Failed to copy content to clipboard:', err);
-			// Fallback to the URI method if clipboard fails
-			obsidianUrl += `&content=${encodeURIComponent(fileContent)}`;
-			openObsidianUrl(obsidianUrl);
-		});
-	} else {
+	if (generalSettings.legacyMode) {
 		// Use the URI method
 		obsidianUrl += `&content=${encodeURIComponent(fileContent)}`;
 		openObsidianUrl(obsidianUrl);
+	} else {
+		// Use clipboard
+		navigator.clipboard.writeText(fileContent).then(() => {
+			obsidianUrl += `&clipboard`;
+			obsidianUrl += `&content=${encodeURIComponent("Web Clipper requires Obsidian 1.7.2 or above. You may need to install the [early access](https://help.obsidian.md/Obsidian/Early+access+versions) version.")}`;
+			openObsidianUrl(obsidianUrl);
+		}).catch(err => {
+			console.error('Failed to copy content to clipboard:', err);
+			obsidianUrl += `&clipboard`;
+			obsidianUrl += `&content=${encodeURIComponent("There was an error creating the content. Make sure you are using Obsidian 1.7.2 or above.")}`;
+			openObsidianUrl(obsidianUrl);
+		});
 	}
 
 	function openObsidianUrl(url: string): void {
