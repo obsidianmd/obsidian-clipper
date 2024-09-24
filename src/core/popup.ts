@@ -16,6 +16,7 @@ import { adjustNoteNameHeight } from '../utils/ui-utils';
 import { debugLog } from '../utils/debug';
 import { showVariables, initializeVariablesPanel, updateVariablesPanel } from '../managers/inspect-variables';
 import { ensureContentScriptLoaded } from '../utils/content-script-utils';
+import { isBlankPage, isValidUrl } from '../utils/active-tab-manager';
 
 let loadedSettings: Settings;
 let currentTemplate: Template | null = null;
@@ -369,14 +370,6 @@ function waitForInterpreter(interpretBtn: HTMLButtonElement): Promise<void> {
 		};
 		checkProcessing();
 	});
-}
-
-function isValidUrl(url: string): boolean {
-	return url.startsWith('http://') || url.startsWith('https://');
-}
-
-function isBlankPage(url: string): boolean {
-	return url === 'about:blank' || url === 'chrome://newtab/' || url === 'edge://newtab/';
 }
 
 async function refreshFields(tabId: number) {

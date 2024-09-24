@@ -20,10 +20,10 @@ export async function updateCurrentActiveTab(windowId: number) {
 	}
 }
 
-function isValidUrl(url: string): boolean {
+export function isValidUrl(url: string): boolean {
 	return url.startsWith('http://') || url.startsWith('https://');
 }
 
-function isBlankPage(url: string): boolean {
+export function isBlankPage(url: string): boolean {
 	return url === 'about:blank' || url === 'chrome://newtab/' || url === 'edge://newtab/';
 }
