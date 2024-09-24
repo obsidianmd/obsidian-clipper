@@ -6,6 +6,8 @@ import { Template } from '../types/types';
 let variablesPanel: HTMLElement;
 let currentTemplate: Template | null;
 let currentVariables: { [key: string]: string };
+let isPanelOpen: boolean = false;
+let currentSearchTerm: string = '';
 
 export function initializeVariablesPanel(panel: HTMLElement, template: Template | null, variables: { [key: string]: string }) {
 	variablesPanel = panel;
@@ -13,7 +15,15 @@ export function initializeVariablesPanel(panel: HTMLElement, template: Template 
 	currentVariables = variables;
 }
 
-export function showVariables() {
+export function updateVariablesPanel(template: Template | null, variables: { [key: string]: string }) {
+	currentTemplate = template;
+	currentVariables = variables;
+	if (isPanelOpen) {
+		showVariables(true);
+	}
+}
+
+export async function showVariables(isUpdate: boolean = false) {
 	if (!variablesPanel) {
 		console.error('variablesPanel is not initialized');
 		return;
@@ -22,35 +32,45 @@ export function showVariables() {
 	if (currentTemplate && Object.keys(currentVariables).length > 0) {
 		const formattedVariables = formatVariables(currentVariables);
 
-		variablesPanel.innerHTML = `
-			<div class="variables-header">
-				<h3>Page variables</h3>
-				<input type="text" id="variables-search" placeholder="Search variables...">
-				<span class="close-panel clickable-icon" aria-label="Close">
-					<i data-lucide="x"></i>
-				</span>
-			</div>
-			<div class="variable-list">${formattedVariables}</div>
-		`;
+		if (!isUpdate) {
+			variablesPanel.innerHTML = `
+				<div class="variables-header">
+					<h3>Page variables</h3>
+					<input type="text" id="variables-search" placeholder="Search variables...">
+					<span class="close-panel clickable-icon" aria-label="Close">
+						<i data-lucide="x"></i>
+					</span>
+				</div>
+				<div class="variable-list">${formattedVariables}</div>
+			`;
 
-		variablesPanel.classList.add('show');
-		initializeIcons();
+			variablesPanel.classList.add('show');
+			isPanelOpen = true;
+			initializeIcons();
 
-		// Search variables
-		const searchInput = variablesPanel.querySelector('#variables-search') as HTMLInputElement;
-		if (searchInput) {
-			searchInput.addEventListener('input', debounce(handleVariableSearch, 300));
+			// Search variables
+			const searchInput = variablesPanel.querySelector('#variables-search') as HTMLInputElement;
+			if (searchInput) {
+				searchInput.addEventListener('input', debounce(handleVariableSearch, 300));
+			}
+
+			// Add click event listener to close panel
+			const closePanel = variablesPanel.querySelector('.close-panel') as HTMLElement;
+			if (closePanel) {
+				closePanel.addEventListener('click', function() {
+					variablesPanel.classList.remove('show');
+					isPanelOpen = false;
+					currentSearchTerm = '';
+				});
+			}
+		} else {
+			const variableList = variablesPanel.querySelector('.variable-list') as HTMLElement;
+			if (variableList) {
+				variableList.innerHTML = formattedVariables;
+			}
 		}
 
 		handleVariableSearch();
-
-		// Add click event listener to close panel
-		const closePanel = variablesPanel.querySelector('.close-panel') as HTMLElement;
-		if (closePanel) {
-			closePanel.addEventListener('click', function() {
-				variablesPanel.classList.remove('show');
-			});
-		}
 	} else {
 		console.log('No variables available to display');
 	}
@@ -58,7 +78,7 @@ export function showVariables() {
 
 function handleVariableSearch() {
 	const searchInput = document.getElementById('variables-search') as HTMLInputElement;
-	const searchTerm = searchInput.value.trim().toLowerCase();
+	currentSearchTerm = searchInput ? searchInput.value.trim().toLowerCase() : '';
 	const variableItems = variablesPanel.querySelectorAll('.variable-item');
 
 	variableItems.forEach((item: Element) => {
@@ -77,10 +97,10 @@ function handleVariableSearch() {
 		}
 
 		const chevron = item.querySelector('.chevron-icon') as HTMLElement;
-			const valueElement = item.querySelector('.variable-value') as HTMLElement;	
+		const valueElement = item.querySelector('.variable-value') as HTMLElement;	
 				
-			if (valueElement.scrollWidth > valueElement.clientWidth) {
-				item.classList.add('has-overflow');
+		if (valueElement.scrollWidth > valueElement.clientWidth) {
+			item.classList.add('has-overflow');
 		}
 
 		key.addEventListener('click', function() {
@@ -107,14 +127,14 @@ function handleVariableSearch() {
 			}
 		});
 
-		if (searchTerm.length < 2) {
+		if (currentSearchTerm.length < 2) {
 			htmlItem.style.display = 'flex';
 			resetHighlight(key);
 			resetHighlight(value);
-		} else if (keyText.includes(searchTerm) || valueText.includes(searchTerm)) {
+		} else if (keyText.includes(currentSearchTerm) || valueText.includes(currentSearchTerm)) {
 			htmlItem.style.display = 'flex';
-			highlightText(key, searchTerm);
-			highlightText(value, searchTerm);
+			highlightText(key, currentSearchTerm);
+			highlightText(value, currentSearchTerm);
 		} else {
 			htmlItem.style.display = 'none';
 		}

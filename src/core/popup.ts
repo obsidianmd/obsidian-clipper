@@ -14,7 +14,7 @@ import { createElementWithClass } from '../utils/dom-utils';
 import { initializeInterpreter, handleInterpreterUI, collectPromptVariables } from '../utils/interpreter';
 import { adjustNoteNameHeight } from '../utils/ui-utils';
 import { debugLog } from '../utils/debug';
-import { showVariables, initializeVariablesPanel } from '../managers/inspect-variables';
+import { showVariables, initializeVariablesPanel, updateVariablesPanel } from '../managers/inspect-variables';
 
 let loadedSettings: Settings;
 let currentTemplate: Template | null = null;
@@ -213,10 +213,11 @@ async function initializeUI() {
 	document.body.appendChild(variablesPanel);
 
 	if (showMoreActionsButton) {
-		initializeVariablesPanel(variablesPanel, currentTemplate, currentVariables);
-		showMoreActionsButton.addEventListener('click', (e) => {
+		showMoreActionsButton.addEventListener('click', async (e) => {
 			e.preventDefault();
-			showVariables();
+			// Initialize the variables panel with the latest data
+			initializeVariablesPanel(variablesPanel, currentTemplate, currentVariables);
+			await showVariables();
 		});
 	}
 
@@ -434,6 +435,9 @@ async function refreshFields(forceTemplateCheck: boolean = false) {
 						extractedData.schemaOrgData
 					);
 					setupMetadataToggle();
+
+					// Update variables panel if it's open
+					updateVariablesPanel(currentTemplate, currentVariables);
 				} else {
 					throw new Error('Unable to initialize page content.');
 				}
