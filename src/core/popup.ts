@@ -131,12 +131,11 @@ function setupMessageListeners() {
 document.addEventListener('DOMContentLoaded', async function() {
 	const tabs = await browser.tabs.query({active: true, currentWindow: true});
 	const currentTab = tabs[0];
-	const currentTabId = currentTab?.id;
+	currentTabId = currentTab?.id;
 
 	if (currentTabId) {
 		try {		
-			if (currentTabId !== undefined) {
-				const initialized = await initializeExtension(currentTabId);
+			const initialized = await initializeExtension(currentTabId);
 			if (!initialized) {
 				showError('Failed to initialize the extension. Please try reloading the page.');
 				return;
@@ -146,7 +145,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 			initializeIcons();
 			updateVaultDropdown(loadedSettings.vaults);
 			populateTemplateDropdown();
-			setupEventListeners();
+			setupEventListeners(currentTabId);
 			await initializeUI();
 			setupMetadataToggle();
 
@@ -160,25 +159,24 @@ document.addEventListener('DOMContentLoaded', async function() {
 						showVariables();
 					});
 			}
-			} else {
-				showError('Failed to get the current tab ID. Please try reloading the page.');
-			}
 		} catch (error) {
 			console.error('Error initializing popup:', error);
 			showError('Failed to initialize the extension. Please try reloading the page.');
 		}
+	} else {
+		showError('Failed to get the current tab ID. Please try reloading the page.');
 	}
 });
 
-function setupEventListeners() {
+function setupEventListeners(tabId: number) {
 	const templateDropdown = document.getElementById('template-select') as HTMLSelectElement;
 	if (templateDropdown) {
 		templateDropdown.addEventListener('change', async function(this: HTMLSelectElement) {
+			console.log('Template changed to:', this.value, tabId);
 			currentTemplate = templates.find((t: Template) => t.name === this.value) || null;
 			if (currentTemplate) {
-				if (currentTabId !== undefined) {
-					await refreshFields(currentTabId);
-				}
+				// Pass false to refreshFields to prevent checking for a matching template
+				await refreshFields(tabId, false);
 			} else {
 				logError('Selected template not found');
 			}
@@ -370,7 +368,7 @@ function waitForInterpreter(interpretBtn: HTMLButtonElement): Promise<void> {
 	});
 }
 
-async function refreshFields(tabId: number) {
+async function refreshFields(tabId: number, checkTemplateTriggers: boolean = true) {
 	if (templates.length === 0) {
 		console.warn('No templates available');
 		showError('No templates available. Please add a template in the settings.');
@@ -392,15 +390,17 @@ async function refreshFields(tabId: number) {
 		if (extractedData) {
 			const currentUrl = tab.url;
 
-			// Always check for the correct template
-			const matchedTemplate = findMatchingTemplate(currentUrl, templates, extractedData.schemaOrgData);
-			if (matchedTemplate) {
-				currentTemplate = matchedTemplate;
-			} else {
-				// If no matching template is found, use the first template
-				currentTemplate = templates[0];
+			// Only check for the correct template if checkTemplateTriggers is true
+			if (checkTemplateTriggers) {
+				const matchedTemplate = findMatchingTemplate(currentUrl, templates, extractedData.schemaOrgData);
+				if (matchedTemplate) {
+					currentTemplate = matchedTemplate;
+				} else {
+					// If no matching template is found, use the first template
+					currentTemplate = templates[0];
+				}
+				updateTemplateDropdown();
 			}
-			updateTemplateDropdown();
 
 			const initializedContent = await initializePageContent(
 				extractedData.content,
@@ -544,21 +544,7 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 		}
 	}
 
-	// if (Object.keys(variables).length > 0) {
-	// 	if (template.triggers && template.triggers.length > 0) {
-	// 		const currentTab = await browser.tabs.get(currentTabId!);
-	// 		const currentUrl = currentTab.url || '';
-	// 		const matchingPattern = template.triggers.find(pattern => 
-	// 			matchPattern(pattern, currentUrl, schemaOrgData)
-	// 		);
-	// 		if (matchingPattern) {
-	// 			console.log(`Matched template trigger: ${matchingPattern}`);
-	// 		}
-	// 	}
-	// }
-
 	initializeIcons();
-	// setupMetadataToggle();
 
 	const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement;
 	if (vaultDropdown) {
