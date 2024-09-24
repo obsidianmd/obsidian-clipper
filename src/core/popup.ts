@@ -117,7 +117,7 @@ function setupMessageListeners() {
 		} else if (request.action === "activeTabChanged") {
 			currentTabId = request.tabId;
 			if (request.isValidUrl) {
-				refreshFields(true); // Force template check when URL changes
+				refreshFields(); // Force template check when URL changes
 			} else if (request.isBlankPage) {
 				showError('This page cannot be clipped. Please navigate to a web page.');
 			} else {
@@ -380,7 +380,7 @@ function isBlankPage(url: string): boolean {
 	return url === 'about:blank' || url === 'chrome://newtab/' || url === 'edge://newtab/';
 }
 
-async function refreshFields(forceTemplateCheck: boolean = false) {
+async function refreshFields() {
 	if (templates.length === 0) {
 		console.warn('No templates available');
 		showError('No templates available. Please add a template in the settings.');
@@ -405,17 +405,15 @@ async function refreshFields(forceTemplateCheck: boolean = false) {
 			if (extractedData) {
 				const currentUrl = tab.url;
 
-				// Check if we need to switch templates based on triggers
-				if (forceTemplateCheck || !currentTemplate) {
-					const matchedTemplate = findMatchingTemplate(currentUrl, templates, extractedData.schemaOrgData);
-					if (matchedTemplate) {
-						currentTemplate = matchedTemplate;
-					} else {
-						// If no matching template is found, use the first template
-						currentTemplate = templates[0];
-					}
-					updateTemplateDropdown();
+				// Always check for the correct template
+				const matchedTemplate = findMatchingTemplate(currentUrl, templates, extractedData.schemaOrgData);
+				if (matchedTemplate) {
+					currentTemplate = matchedTemplate;
+				} else {
+					// If no matching template is found, use the first template
+					currentTemplate = templates[0];
 				}
+				updateTemplateDropdown();
 
 				const initializedContent = await initializePageContent(
 					extractedData.content,
