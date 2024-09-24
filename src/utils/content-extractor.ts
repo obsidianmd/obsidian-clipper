@@ -154,7 +154,6 @@ export async function extractPageContent(tabId: number): Promise<{
 	fullHtml: string;
 } | null> {
 	try {
-		await browser.runtime.sendMessage({ action: "ensureContentScriptLoaded", tabId });
 		const response = await browser.tabs.sendMessage(tabId, { action: "getPageContent" });
 		if (response && response.content) {
 			return {

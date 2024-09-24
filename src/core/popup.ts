@@ -414,6 +414,7 @@ async function refreshFields(tabId: number) {
 				currentVariables = initializedContent.currentVariables;
 				console.log('Updated currentVariables:', currentVariables);
 				await initializeTemplateFields(
+					tabId,
 					currentTemplate,
 					initializedContent.currentVariables,
 					initializedContent.noteName,
@@ -457,7 +458,7 @@ function populateTemplateDropdown() {
 	}
 }
 
-async function initializeTemplateFields(template: Template | null, variables: { [key: string]: string }, noteName?: string, schemaOrgData?: any) {
+async function initializeTemplateFields(currentTabId: number, template: Template | null, variables: { [key: string]: string }, noteName?: string, schemaOrgData?: any) {
 	if (!template) {
 		logError('No template selected');
 		return;
