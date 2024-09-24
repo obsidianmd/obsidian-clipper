@@ -6,45 +6,244 @@ import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
 import { decompressFromUTF16 } from 'lz-string';
 import { findMatchingTemplate, matchPattern } from '../utils/triggers';
 import { getLocalStorage, setLocalStorage, loadSettings, generalSettings, Settings } from '../utils/storage-utils';
-import { formatVariables, unescapeValue } from '../utils/string-utils';
+import { escapeHtml, formatVariables, unescapeValue } from '../utils/string-utils';
 import { loadTemplates, createDefaultTemplate } from '../managers/template-manager';
 import browser from '../utils/browser-polyfill';
 import { detectBrowser, addBrowserClassToHtml } from '../utils/browser-detection';
-import { createElementWithClass, createElementWithHTML } from '../utils/dom-utils';
+import { createElementWithClass } from '../utils/dom-utils';
 import { initializeInterpreter, handleInterpreterUI, collectPromptVariables } from '../utils/interpreter';
 import { adjustNoteNameHeight } from '../utils/ui-utils';
 import { debugLog } from '../utils/debug';
-import { debounce } from '../utils/debounce';
+import { showVariables, initializeVariablesPanel, updateVariablesPanel } from '../managers/inspect-variables';
+import { ensureContentScriptLoaded } from '../utils/content-script-utils';
+import { isBlankPage, isValidUrl } from '../utils/active-tab-manager';
 
+let loadedSettings: Settings;
 let currentTemplate: Template | null = null;
 let templates: Template[] = [];
 let currentVariables: { [key: string]: string } = {};
+let currentTabId: number | undefined;
 
-let loadedSettings: Settings;
+const isSidePanel = window.location.pathname.includes('side-panel.html');
 
-async function ensureContentScriptLoaded() {
-	const tabs = await browser.tabs.query({active: true, currentWindow: true});
-	if (tabs[0]?.id) {
-		try {
-			await browser.runtime.sendMessage({ action: "ensureContentScriptLoaded", tabId: tabs[0].id });
-		} catch (error) {
-			console.error('Error ensuring content script is loaded:', error);
-			throw error;
+async function initializeExtension(tabId: number) {
+	try {
+		await addBrowserClassToHtml();
+		loadedSettings = await loadSettings();
+		debugLog('Settings', 'General settings:', loadedSettings);
+
+		templates = await loadTemplates();
+		debugLog('Templates', 'Loaded templates:', templates);
+
+		if (templates.length === 0) {
+			console.error('No templates loaded');
+			return false;
 		}
+
+		currentTemplate = templates[0]; // Set the first template as default
+		debugLog('Templates', 'Current template set to:', currentTemplate);
+
+		const tab = await browser.tabs.get(tabId);
+		if (!tab.url || isBlankPage(tab.url)) {
+			return false;
+		}
+		if (!isValidUrl(tab.url)) {
+			return false;
+		}
+		await ensureContentScriptLoaded(tabId);
+		await refreshFields(tabId);
+
+		await loadAndSetupTemplates();
+
+		// Setup message listeners
+		setupMessageListeners();
+
+		return true;
+	} catch (error) {
+		console.error('Error initializing extension:', error);
+		return false;
 	}
 }
 
-browser.runtime.onMessage.addListener((request: any, sender: browser.Runtime.MessageSender, sendResponse: (response?: any) => void) => {
-	if (request.action === "triggerQuickClip") {
-		handleClip().then(() => {
-			sendResponse({success: true});
-		}).catch((error) => {
-			console.error('Error in handleClip:', error);
-			sendResponse({success: false, error: error.message});
+async function loadAndSetupTemplates() {
+	const data = await browser.storage.sync.get(['template_list']);
+	const templateIds = data.template_list || [];
+	const loadedTemplates = await Promise.all(templateIds.map(async (id: string) => {
+		try {
+			const result = await browser.storage.sync.get(`template_${id}`);
+			const compressedChunks = result[`template_${id}`];
+			if (compressedChunks) {
+				const decompressedData = decompressFromUTF16(compressedChunks.join(''));
+				const template = JSON.parse(decompressedData);
+				if (template && Array.isArray(template.properties)) {
+					return template;
+				}
+			}
+		} catch (error) {
+			console.error(`Error parsing template ${id}:`, error);
+		}
+		return null;
+	}));
+
+	templates = loadedTemplates.filter((t): t is Template => t !== null);
+
+	if (templates.length === 0) {
+		currentTemplate = createDefaultTemplate();
+		templates = [currentTemplate];
+	} else {
+		currentTemplate = templates[0];
+	}
+}
+
+function setupMessageListeners() {
+	browser.runtime.onMessage.addListener((request: any, sender: browser.Runtime.MessageSender, sendResponse: (response?: any) => void) => {
+		console.log('Received message:', request);
+		if (request.action === "triggerQuickClip") {
+			handleClip().then(() => {
+				sendResponse({success: true});
+			}).catch((error) => {
+				console.error('Error in handleClip:', error);
+				sendResponse({success: false, error: error.message});
+			});
+			return true;
+		} else if (request.action === "tabUrlChanged") {
+			if (request.tabId === currentTabId) {
+				if (currentTabId !== undefined) {
+					refreshFields(currentTabId);
+				}
+			}
+		} else if (request.action === "activeTabChanged") {
+			currentTabId = request.tabId;
+			if (request.isValidUrl) {
+				if (currentTabId !== undefined) {
+					refreshFields(currentTabId); // Force template check when URL changes
+				}
+			} else if (request.isBlankPage) {
+				showError('This page cannot be clipped.');
+			} else {
+				showError('This page cannot be clipped. Only http and https URLs are supported.');
+			}
+		}
+	});
+}
+
+document.addEventListener('DOMContentLoaded', async function() {
+	initializeIcons();
+	const refreshButton = document.getElementById('refresh-pane');
+	if (refreshButton) {
+		refreshButton.addEventListener('click', (e) => {
+			e.preventDefault();
+			refreshPopup();
 		});
-		return true;
+	}
+
+	const tabs = await browser.tabs.query({active: true, currentWindow: true});
+	const currentTab = tabs[0];
+	currentTabId = currentTab?.id;
+
+	if (currentTabId) {
+		try {		
+			const initialized = await initializeExtension(currentTabId);
+			if (!initialized) {
+				showError('This page cannot be clipped.');
+				return;
+			}
+
+			// DOM-dependent initializations
+			updateVaultDropdown(loadedSettings.vaults);
+			populateTemplateDropdown();
+			setupEventListeners(currentTabId);
+			await initializeUI();
+			setupMetadataToggle();
+
+			// Initial content load
+			await refreshFields(currentTabId);
+
+			const showMoreActionsButton = document.getElementById('show-variables');
+			if (showMoreActionsButton) {
+					showMoreActionsButton.addEventListener('click', (e) => {
+						e.preventDefault();
+						showVariables();
+					});
+			}
+		} catch (error) {
+			console.error('Error initializing popup:', error);
+			showError('Please try reloading the page.');
+		}
+	} else {
+		showError('Please try reloading the page.');
 	}
 });
+
+function setupEventListeners(tabId: number) {
+	const templateDropdown = document.getElementById('template-select') as HTMLSelectElement;
+	if (templateDropdown) {
+		templateDropdown.addEventListener('change', async function(this: HTMLSelectElement) {
+			console.log('Template changed to:', this.value, tabId);
+			currentTemplate = templates.find((t: Template) => t.name === this.value) || null;
+			if (currentTemplate) {
+				// Pass false to refreshFields to prevent checking for a matching template
+				await refreshFields(tabId, false);
+			} else {
+				logError('Selected template not found');
+			}
+		});
+	}
+
+	const noteNameField = document.getElementById('note-name-field') as HTMLTextAreaElement;
+	if (noteNameField) {
+		noteNameField.addEventListener('input', () => adjustNoteNameHeight(noteNameField));
+		noteNameField.addEventListener('keydown', function(e) {
+			if (e.key === 'Enter' && !e.shiftKey) {
+				e.preventDefault();
+			}
+		});
+	}
+}
+
+async function initializeUI() {
+	const clipButton = document.getElementById('clip-btn');
+	if (clipButton) {
+		clipButton.addEventListener('click', handleClip);
+		clipButton.focus();
+	} else {
+		console.warn('Clip button not found');
+	}
+
+	const settingsButton = document.getElementById('open-settings');
+	if (settingsButton) {
+		settingsButton.addEventListener('click', async function() {
+			browser.runtime.openOptionsPage();
+			
+			const browserType = await detectBrowser();
+			if (browserType === 'firefox-mobile') {
+				setTimeout(() => window.close(), 50);
+			}
+		});
+	}
+
+	const showMoreActionsButton = document.getElementById('show-variables') as HTMLElement;
+	const variablesPanel = document.createElement('div');
+	variablesPanel.className = 'variables-panel';
+	document.body.appendChild(variablesPanel);
+
+	if (showMoreActionsButton) {
+		showMoreActionsButton.addEventListener('click', async (e) => {
+			e.preventDefault();
+			// Initialize the variables panel with the latest data
+			initializeVariablesPanel(variablesPanel, currentTemplate, currentVariables);
+			await showVariables();
+		});
+	}
+
+	if (isSidePanel) {
+		browser.runtime.sendMessage({ action: "sidePanelOpened" });
+		
+		window.addEventListener('unload', () => {
+			browser.runtime.sendMessage({ action: "sidePanelClosed" });
+		});
+	}
+}
 
 function showError(message: string): void {
 	const errorMessage = document.querySelector('.error-message') as HTMLElement;
@@ -145,7 +344,11 @@ async function handleClip() {
 		}
 
 		await saveToObsidian(fileContent, noteName, path, selectedVault, currentTemplate.behavior);
-		setTimeout(() => window.close(), 50);
+		
+		// Only close the window if it's not running in side panel mode
+		if (!isSidePanel) {
+			setTimeout(() => window.close(), 1500);
+		}
 	} catch (error) {
 		console.error('Error in handleClip:', error);
 		showError('Failed to save to Obsidian. Please try again.');
@@ -172,602 +375,326 @@ function waitForInterpreter(interpretBtn: HTMLButtonElement): Promise<void> {
 	});
 }
 
-document.addEventListener('DOMContentLoaded', async function() {
+async function refreshFields(tabId: number, checkTemplateTriggers: boolean = true) {
+	if (templates.length === 0) {
+		console.warn('No templates available');
+		showError('No templates available. Please add a template in the settings.');
+		return;
+	}
+
 	try {
-		await ensureContentScriptLoaded();
-		
-		initializeIcons();
-
-		await addBrowserClassToHtml();
-
-		loadedSettings = await loadSettings();
-
-		debugLog('Settings', 'General settings:', loadedSettings);
-
-		await loadTemplates();
-
-		const vaultContainer = document.getElementById('vault-container');
-		const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement | null;
-		const templateContainer = document.getElementById('template-container');
-		const templateDropdown = document.getElementById('template-select') as HTMLSelectElement | null;
-
-		if (!vaultDropdown || !templateDropdown) {
-			throw new Error('Required dropdown elements not found');
+		const tab = await browser.tabs.get(tabId);
+		if (!tab.url || isBlankPage(tab.url)) {
+			showError('This page cannot be clipped. Please navigate to a web page.');
+			return;
+		}
+		if (!isValidUrl(tab.url)) {
+			showError('This page cannot be clipped. Only http and https URLs are supported.');
+			return;
 		}
 
-		updateVaultDropdown(loadedSettings.vaults);
+		const extractedData = await extractPageContent(tabId);
+		if (extractedData) {
+			const currentUrl = tab.url;
 
-		function updateVaultDropdown(vaults: string[]) {
-			if (!vaultDropdown || !vaultContainer) return;
+			// Only check for the correct template if checkTemplateTriggers is true
+			if (checkTemplateTriggers) {
+				const matchedTemplate = findMatchingTemplate(currentUrl, templates, extractedData.schemaOrgData);
+				if (matchedTemplate) {
+					currentTemplate = matchedTemplate;
+				} else {
+					// If no matching template is found, use the first template
+					currentTemplate = templates[0];
+				}
+				updateTemplateDropdown();
+			}
 
-			vaultDropdown.innerHTML = '';
-			
-			vaults.forEach(vault => {
-				const option = document.createElement('option');
-				option.value = vault;
-				option.textContent = vault;
-				vaultDropdown.appendChild(option);
-			});
+			const initializedContent = await initializePageContent(
+				extractedData.content,
+				extractedData.selectedHtml,
+				extractedData.extractedContent,
+				currentUrl,
+				extractedData.schemaOrgData,
+				extractedData.fullHtml
+			);
+			if (initializedContent) {
+				currentVariables = initializedContent.currentVariables;
+				console.log('Updated currentVariables:', currentVariables);
+				await initializeTemplateFields(
+					tabId,
+					currentTemplate,
+					initializedContent.currentVariables,
+					initializedContent.noteName,
+					extractedData.schemaOrgData
+				);
+				setupMetadataToggle();
 
-			// Only show vault selector if one is defined
-			if (vaults.length > 0) {
-				vaultContainer.style.display = 'block';
-				vaultDropdown.value = vaults[0];
+				// Update variables panel if it's open
+				updateVariablesPanel(currentTemplate, currentVariables);
 			} else {
-				vaultContainer.style.display = 'none';
+				throw new Error('Unable to initialize page content.');
 			}
-		}
-
-		// Load templates from sync storage and populate dropdown
-		browser.storage.sync.get(['template_list']).then(async (data: { template_list?: string[] }) => {
-			const templateIds = data.template_list || [];
-			const loadedTemplates = await Promise.all(templateIds.map(async id => {
-				try {
-					const result = await browser.storage.sync.get(`template_${id}`);
-					const compressedChunks = result[`template_${id}`];
-					if (compressedChunks) {
-						const decompressedData = decompressFromUTF16(compressedChunks.join(''));
-						const template = JSON.parse(decompressedData);
-						if (template && Array.isArray(template.properties)) {
-							return template;
-						}
-					}
-				} catch (error) {
-					console.error(`Error parsing template ${id}:`, error);
-				}
-				return null;
-			}));
-
-			templates = loadedTemplates.filter((t): t is Template => t !== null);
-
-			if (templates.length === 0) {
-				currentTemplate = createDefaultTemplate();
-				templates = [currentTemplate];
-			} else {
-				currentTemplate = templates[0];
-			}
-
-			populateTemplateDropdown();
-
-			// After templates are loaded, match template based on URL
-			const tabs = await browser.tabs.query({active: true, currentWindow: true});
-			const currentTab = tabs[0];
-			if (!currentTab.url || currentTab.url.startsWith('chrome-extension://') || currentTab.url.startsWith('chrome://') || currentTab.url.startsWith('about:') || currentTab.url.startsWith('file://')) {
-				showError('This page cannot be clipped.');
-				return;
-			}
-
-			const currentUrl = currentTab.url;
-
-			if (currentTab.id) {
-				try {
-					let extractedData = null;
-					let retryCount = 0;
-					const maxRetries = 10;
-					const retryDelay = 250; //ms
-
-					while (!extractedData && retryCount < maxRetries) {
-						extractedData = await extractPageContent(currentTab.id);
-						if (!extractedData) {
-							retryCount++;
-							await new Promise(resolve => setTimeout(resolve, retryDelay));
-						}
-					}
-
-					if (extractedData) {
-						try {
-							const initializedContent = await initializePageContent(extractedData.content, extractedData.selectedHtml, extractedData.extractedContent, currentUrl, extractedData.schemaOrgData, extractedData.fullHtml);
-							if (initializedContent) {
-								currentTemplate = findMatchingTemplate(currentUrl, templates, extractedData.schemaOrgData) || templates[0];
-
-								if (currentTemplate) {
-									templateDropdown.value = currentTemplate.name;
-								}
-
-								await initializeTemplateFields(currentTemplate, initializedContent.currentVariables, initializedContent.noteName, extractedData.schemaOrgData);
-
-								document.querySelector('.clipper')?.classList.remove('hidden');
-								setupMetadataToggle();
-							} else {
-								showError('Unable to initialize page content. Please try reloading the page.');
-							}
-						} catch (error: unknown) {
-							console.error('Error initializing page content:', error);
-							if (error instanceof Error) {
-								showError(`Error initializing page content: ${error.message}`);
-							} else {
-								showError('Error initializing page content: Unknown error');
-							}
-						}
-					} else {
-						showError('Unable to get page content. Please try reloading the page.');
-					}
-				} catch (error: unknown) {
-					console.error('Error in popup initialization:', error);
-					if (error instanceof Error) {
-						showError(`An error occurred: ${error.message}`);
-					} else {
-						showError('An unexpected error occurred');
-					}
-				}
-			}
-
-			// Only show template selector if there are multiple templates
-			if (templateContainer) {
-				if (templates.length > 1) {
-					templateContainer.style.display = 'block';
-				} else {
-					templateContainer.classList.add('hidden');
-				}
-			} else {
-				console.warn('Template container not found');
-			}
-		});
-
-		function populateTemplateDropdown() {
-			if (!templateDropdown) return;
-
-			templateDropdown.innerHTML = '';
-			
-			templates.forEach((template: Template) => {
-				const option = document.createElement('option');
-				option.value = template.name;
-				option.textContent = template.name;
-				templateDropdown.appendChild(option);
-			});
-		}
-
-		function setupMetadataToggle() {
-			const metadataHeader = document.querySelector('.metadata-properties-header') as HTMLElement;
-			const metadataProperties = document.querySelector('.metadata-properties') as HTMLElement;
-			
-			if (metadataHeader && metadataProperties) {
-				metadataHeader.removeEventListener('click', toggleMetadataProperties);
-				metadataHeader.addEventListener('click', toggleMetadataProperties);
-
-				// Set initial state
-				getLocalStorage('propertiesCollapsed').then((isCollapsed) => {
-					updateMetadataToggleState(isCollapsed);
-				});
-			}
-		}
-
-		function toggleMetadataProperties() {
-			const metadataProperties = document.querySelector('.metadata-properties') as HTMLElement;
-			const metadataHeader = document.querySelector('.metadata-properties-header') as HTMLElement;
-			
-			if (metadataProperties && metadataHeader) {
-				const isCollapsed = metadataProperties.classList.toggle('collapsed');
-				metadataHeader.classList.toggle('collapsed');
-				setLocalStorage('propertiesCollapsed', isCollapsed);
-			}
-		}
-
-		function updateMetadataToggleState(isCollapsed: boolean) {
-			const metadataProperties = document.querySelector('.metadata-properties') as HTMLElement;
-			const metadataHeader = document.querySelector('.metadata-properties-header') as HTMLElement;
-			
-			if (metadataProperties && metadataHeader) {
-				if (isCollapsed) {
-					metadataProperties.classList.add('collapsed');
-					metadataHeader.classList.add('collapsed');
-				} else {
-					metadataProperties.classList.remove('collapsed');
-					metadataHeader.classList.remove('collapsed');
-				}
-			}
-		}
-
-		// Template selection change
-		templateDropdown.addEventListener('change', async function(this: HTMLSelectElement) {
-			currentTemplate = templates.find((t: Template) => t.name === this.value) || null;
-			if (currentTemplate) {
-				const tabs = await browser.tabs.query({active: true, currentWindow: true});
-				const currentTab = tabs[0];
-				if (currentTab?.id) {
-					try {
-						const extractedData = await extractPageContent(currentTab.id);
-						if (extractedData) {
-							const initializedContent = await initializePageContent(extractedData.content, extractedData.selectedHtml, extractedData.extractedContent, currentTab.url!, extractedData.schemaOrgData, extractedData.fullHtml);
-							if (initializedContent) {
-								await initializeTemplateFields(currentTemplate, initializedContent.currentVariables, initializedContent.noteName, extractedData.schemaOrgData);
-								setupMetadataToggle();
-							} else {
-								logError('Unable to initialize page content.');
-							}
-						} else {
-							logError('Unable to retrieve page content. Try reloading the page.');
-						}
-					} catch (error) {
-						logError('Error initializing template fields:', error);
-					}
-				} else {
-					logError('No active tab found');
-				}
-			} else {
-				logError('Selected template not found');
-			}
-		});
-
-		const noteNameField = document.getElementById('note-name-field') as HTMLTextAreaElement;
-		function handleNoteNameInput() {
-			adjustNoteNameHeight(noteNameField);
-		}
-
-		noteNameField.addEventListener('input', handleNoteNameInput);
-		noteNameField.addEventListener('keydown', function(e) {
-			if (e.key === 'Enter' && !e.shiftKey) {
-				e.preventDefault();
-			}
-		});
-
-		// Initial height adjustment
-		adjustNoteNameHeight(noteNameField);
-
-		async function initializeTemplateFields(template: Template | null, variables: { [key: string]: string }, noteName?: string, schemaOrgData?: any) {
-			if (!template) {
-				logError('No template selected');
-				return;
-			}
-
-			currentVariables = variables;
-			const templateProperties = document.querySelector('.metadata-properties') as HTMLElement;
-			templateProperties.innerHTML = '';
-
-			const tabs = await browser.tabs.query({active: true, currentWindow: true});
-			const currentTab = tabs[0];
-			const tabId = currentTab?.id;
-			const currentUrl = currentTab?.url || '';
-
-			if (!tabId) {
-				logError('No active tab found');
-				return;
-			}
-
-			if (!Array.isArray(template.properties)) {
-				logError('Template properties are not an array');
-				return;
-			}
-
-			for (const property of template.properties) {
-				const propertyDiv = createElementWithClass('div', 'metadata-property');
-				let value = await replaceVariables(tabId, unescapeValue(property.value), variables, currentUrl);
-
-				// Apply type-specific parsing
-				switch (property.type) {
-					case 'number':
-						const numericValue = value.replace(/[^\d.-]/g, '');
-						value = numericValue ? parseFloat(numericValue).toString() : value;
-						break;
-					case 'checkbox':
-						value = (value.toLowerCase() === 'true' || value === '1').toString();
-						break;
-					case 'date':
-						// Don't override user-specified date format
-						if (!property.value.includes('|date:')) {
-							value = dayjs(value).isValid() ? dayjs(value).format('YYYY-MM-DD') : value;
-						}
-						break;
-					case 'datetime':
-						// Don't override user-specified datetime format
-						if (!property.value.includes('|date:')) {
-							value = dayjs(value).isValid() ? dayjs(value).format('YYYY-MM-DDTHH:mm:ssZ') : value;
-						}
-						break;
-				}
-
-				propertyDiv.innerHTML = `
-					<span class="metadata-property-icon"><i data-lucide="${getPropertyTypeIcon(property.type)}"></i></span>
-					<label for="${property.name}">${property.name}</label>
-					<input id="${property.name}" type="text" value="${escapeHtml(value)}" data-type="${property.type}" data-template-value="${escapeHtml(property.value)}" />
-				`;
-				templateProperties.appendChild(propertyDiv);
-			}
-			
-			if (noteNameField) {
-				let formattedNoteName = await replaceVariables(tabId, template.noteNameFormat, variables, currentUrl);
-				noteNameField.setAttribute('data-template-value', template.noteNameFormat);
-				noteNameField.value = formattedNoteName;
-				adjustNoteNameHeight(noteNameField);
-			}
-
-			const pathField = document.getElementById('path-name-field') as HTMLInputElement;
-			const pathContainer = document.querySelector('.vault-path-container') as HTMLElement;
-			
-			if (pathField && pathContainer) {
-				const isDailyNote = template.behavior === 'append-daily' || template.behavior === 'prepend-daily';
-				
-				if (isDailyNote) {
-					pathField.style.display = 'none';
-				} else {
-					pathContainer.style.display = 'flex';
-					let formattedPath = await replaceVariables(tabId, template.path, variables, currentUrl);
-					pathField.value = formattedPath;
-					pathField.setAttribute('data-template-value', template.path);
-				}
-			}
-
-			const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
-			if (noteContentField) {
-				if (template.noteContentFormat) {
-					let content = await replaceVariables(tabId, template.noteContentFormat, variables, currentUrl);
-					noteContentField.value = content;
-					noteContentField.setAttribute('data-template-value', template.noteContentFormat);
-				} else {
-					noteContentField.value = '';
-					noteContentField.setAttribute('data-template-value', '');
-				}
-			}
-
-			if (Object.keys(variables).length > 0) {
-				if (template.triggers && template.triggers.length > 0) {
-					const matchingPattern = template.triggers.find(pattern => 
-						matchPattern(pattern, currentUrl, schemaOrgData)
-					);
-					if (matchingPattern) {
-						console.log(`Matched template trigger: ${matchingPattern}`);
-					}
-				} else {
-					console.log('No template triggers defined for this template');
-				}
-			}
-
-			initializeIcons();
-			setupMetadataToggle();
-
-			const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement;
-			if (vaultDropdown) {
-				if (template.vault) {
-					vaultDropdown.value = template.vault;
-				} else {
-					// Try to get the previously selected vault
-					getLocalStorage('lastSelectedVault').then((lastSelectedVault) => {
-						if (lastSelectedVault && loadedSettings.vaults.includes(lastSelectedVault)) {
-							vaultDropdown.value = lastSelectedVault;
-						} else if (loadedSettings.vaults.length > 0) {
-							vaultDropdown.value = loadedSettings.vaults[0];
-						}
-					});
-				}
-
-				vaultDropdown.addEventListener('change', () => {
-					setLocalStorage('lastSelectedVault', vaultDropdown.value);
-				});
-			}
-
-			if (template) {
-				if (generalSettings.interpreterEnabled) {
-					await initializeInterpreter(template, variables, tabId, currentUrl);
-
-					// Check if there are any prompt variables
-					const promptVariables = collectPromptVariables(template);
-
-					// If auto-run is enabled and there are prompt variables, use interpreter
-					if (generalSettings.interpreterAutoRun && promptVariables.length > 0) {
-						try {
-							const modelSelect = document.getElementById('model-select') as HTMLSelectElement;
-							const selectedModelId = modelSelect?.value || generalSettings.interpreterModel || 'gpt-4o-mini';
-							const modelConfig = generalSettings.models.find(m => m.id === selectedModelId);
-							if (!modelConfig) {
-								throw new Error(`Model configuration not found for ${selectedModelId}`);
-							}
-							await handleInterpreterUI(template, variables, tabId, currentUrl, modelConfig);
-						} catch (error) {
-							console.error('Error auto-processing with interpreter:', error);
-						}
-					}
-				}
-
-				const replacedTemplate = await getReplacedTemplate(template, variables, tabId, currentUrl);
-				debugLog('Variables', 'Current template with replaced variables:', JSON.stringify(replacedTemplate, null, 2));
-			}
-		}
-
-		async function getReplacedTemplate(template: Template, variables: { [key: string]: string }, tabId: number, currentUrl: string): Promise<any> {
-			const replacedTemplate: any = {
-				schemaVersion: "0.1.0",
-				name: template.name,
-				behavior: template.behavior,
-				noteNameFormat: await replaceVariables(tabId, template.noteNameFormat, variables, currentUrl),
-				path: template.path,
-				noteContentFormat: await replaceVariables(tabId, template.noteContentFormat, variables, currentUrl),
-				properties: [],
-				triggers: template.triggers
-			};
-
-			if (template.context) {
-				replacedTemplate.context = await replaceVariables(tabId, template.context, variables, currentUrl);
-			}
-
-			for (const prop of template.properties) {
-				const replacedProp: Property = {
-					id: prop.id, // Include the id property
-					name: prop.name,
-					value: await replaceVariables(tabId, prop.value, variables, currentUrl),
-					type: prop.type
-				};
-				replacedTemplate.properties.push(replacedProp);
-			}
-
-			return replacedTemplate;
-		}
-
-		async function initializeUI() {
-			const clipButton = document.getElementById('clip-btn');
-			if (clipButton) {
-				clipButton.addEventListener('click', handleClip);
-				clipButton.focus();
-			} else {
-				console.warn('Clip button not found');
-			}
-
-			// On Firefox Mobile close the popup when the settings button is clicked
-			// because otherwise the settings page is opened in the background
-			const settingsButton = document.getElementById('open-settings');
-			if (settingsButton) {
-				settingsButton.addEventListener('click', async function() {
-					browser.runtime.openOptionsPage();
-					
-					const browserType = await detectBrowser();
-					if (browserType === 'firefox-mobile') {
-						setTimeout(() => window.close(), 50);
-					}
-				});
-			}
-
-			const showMoreActionsButton = document.getElementById('show-variables') as HTMLElement;
-			if (showMoreActionsButton) {
-				showMoreActionsButton.style.display = loadedSettings.showMoreActionsButton ? 'flex' : 'none';
-				
-				showMoreActionsButton.addEventListener('click', function() {
-					if (currentTemplate && Object.keys(currentVariables).length > 0) {
-						const formattedVariables = formatVariables(currentVariables);
-						variablesPanel.innerHTML = `
-							<div class="variables-header">
-								<h3>Page variables</h3>
-								<input type="text" id="variables-search" placeholder="Search variables...">
-								<span class="close-panel clickable-icon" aria-label="Close">
-									<i data-lucide="x"></i>
-								</span>
-							</div>
-							<div class="variable-list">${formattedVariables}</div>
-						`;
-						variablesPanel.classList.add('show');
-						initializeIcons();
-
-						// Search variables
-						const searchInput = variablesPanel.querySelector('#variables-search') as HTMLInputElement;
-						searchInput.addEventListener('input', debounce(handleVariableSearch, 300));
-						handleVariableSearch();
-
-						// Add click event listeners to variable keys and chevrons
-						const variableItems = variablesPanel.querySelectorAll('.variable-item');
-						variableItems.forEach(item => {
-							const key = item.querySelector('.variable-key') as HTMLElement;
-							const variableName = key.getAttribute('data-variable');
-						
-							// Skip contentHtml and fullHtml variables
-							if (variableName === '{{contentHtml}}' || variableName === '{{fullHtml}}') {
-								item.remove();
-								return;
-							}
-
-							const chevron = item.querySelector('.chevron-icon') as HTMLElement;
-							const valueElement = item.querySelector('.variable-value') as HTMLElement;	
-								
-							if (valueElement.scrollWidth > valueElement.clientWidth) {
-								item.classList.add('has-overflow');
-							}
-
-							key.addEventListener('click', function() {
-								const variableName = this.getAttribute('data-variable');
-								if (variableName) {
-									navigator.clipboard.writeText(variableName).then(() => {
-										const originalText = this.textContent;
-										this.textContent = 'Copied!';
-										setTimeout(() => {
-											this.textContent = originalText;
-										}, 1000);
-									}).catch(err => {
-										console.error('Failed to copy text: ', err);
-									});
-								}
-							});
-
-							chevron.addEventListener('click', function() {
-								item.classList.toggle('is-collapsed');
-								const chevronIcon = this.querySelector('i');
-								if (chevronIcon) {
-									chevronIcon.setAttribute('data-lucide', item.classList.contains('is-collapsed') ? 'chevron-right' : 'chevron-down');
-									initializeIcons();
-								}
-							});
-						});
-
-						const closePanel = variablesPanel.querySelector('.close-panel') as HTMLElement;
-						closePanel.addEventListener('click', function() {
-							variablesPanel.classList.remove('show');
-						});
-					} else {
-						console.log('No variables available to display');
-					}
-				});
-			}
-		}
-
-		function handleVariableSearch() {
-			const searchInput = document.getElementById('variables-search') as HTMLInputElement;
-			const searchTerm = searchInput.value.trim().toLowerCase();
-			const variableItems = variablesPanel.querySelectorAll('.variable-item');
-
-			variableItems.forEach(item => {
-				const htmlItem = item as HTMLElement;
-				const key = htmlItem.querySelector('.variable-key') as HTMLElement;
-				const value = htmlItem.querySelector('.variable-value') as HTMLElement;
-				const keyText = key.textContent?.toLowerCase() || '';
-				const valueText = value.textContent?.toLowerCase() || '';
-
-				if (searchTerm.length < 2) {
-					htmlItem.style.display = 'flex';
-					resetHighlight(key);
-					resetHighlight(value);
-				} else if (keyText.includes(searchTerm) || valueText.includes(searchTerm)) {
-					htmlItem.style.display = 'flex';
-					highlightText(key, searchTerm);
-					highlightText(value, searchTerm);
-				} else {
-					htmlItem.style.display = 'none';
-				}
-			});
-		}
-
-		function highlightText(element: HTMLElement, searchTerm: string) {
-			const originalText = element.textContent || '';
-			const regex = new RegExp(`(${searchTerm})`, 'gi');
-			element.innerHTML = originalText.replace(regex, '<mark>$1</mark>');
-		}
-
-		function resetHighlight(element: HTMLElement) {
-			element.innerHTML = element.textContent || '';
-		}
-
-		// Call this function after loading templates and settings
-		await initializeUI();
-
-		const variablesPanel = document.createElement('div');
-		variablesPanel.className = 'variables-panel';
-		document.body.appendChild(variablesPanel);
-
-		function escapeHtml(unsafe: string): string {
-			return unsafe
-				.replace(/&/g, "&amp;")
-				.replace(/</g, "&lt;")
-				.replace(/>/g, "&gt;")
-				.replace(/"/g, "&quot;")
-				.replace(/'/g, "&#039;");
+		} else {
+			throw new Error('Unable to extract page content.');
 		}
 	} catch (error) {
-		console.error('Error initializing popup:', error);
-		showError('Failed to initialize the extension. Please try reloading the page.');
+		console.error('Error refreshing fields:', error);
+		const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+		showError(errorMessage);
 	}
-});
+}
+
+function updateTemplateDropdown() {
+	const templateDropdown = document.getElementById('template-select') as HTMLSelectElement;
+	if (templateDropdown && currentTemplate) {
+		templateDropdown.value = currentTemplate.name;
+	}
+}
+
+function populateTemplateDropdown() {
+	const templateDropdown = document.getElementById('template-select') as HTMLSelectElement;
+	if (templateDropdown && currentTemplate) {
+		templateDropdown.innerHTML = '';
+		templates.forEach((template: Template) => {
+			const option = document.createElement('option');
+			option.value = template.name;
+			option.textContent = template.name;
+			templateDropdown.appendChild(option);
+		});
+		templateDropdown.value = currentTemplate.name;
+	}
+}
+
+async function initializeTemplateFields(currentTabId: number, template: Template | null, variables: { [key: string]: string }, noteName?: string, schemaOrgData?: any) {
+	if (!template) {
+		logError('No template selected');
+		return;
+	}
+
+	currentVariables = variables;
+	const templateProperties = document.querySelector('.metadata-properties') as HTMLElement;
+	templateProperties.innerHTML = '';
+
+	if (!Array.isArray(template.properties)) {
+		logError('Template properties are not an array');
+		return;
+	}
+
+	for (const property of template.properties) {
+		const propertyDiv = createElementWithClass('div', 'metadata-property');
+		let value = await replaceVariables(currentTabId!, unescapeValue(property.value), variables, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
+
+		// Apply type-specific parsing
+		switch (property.type) {
+			case 'number':
+				const numericValue = value.replace(/[^\d.-]/g, '');
+				value = numericValue ? parseFloat(numericValue).toString() : value;
+				break;
+			case 'checkbox':
+				value = (value.toLowerCase() === 'true' || value === '1').toString();
+				break;
+			case 'date':
+				// Don't override user-specified date format
+				if (!property.value.includes('|date:')) {
+					value = dayjs(value).isValid() ? dayjs(value).format('YYYY-MM-DD') : value;
+				}
+				break;
+			case 'datetime':
+				// Don't override user-specified datetime format
+				if (!property.value.includes('|date:')) {
+					value = dayjs(value).isValid() ? dayjs(value).format('YYYY-MM-DDTHH:mm:ssZ') : value;
+				}
+				break;
+		}
+
+		propertyDiv.innerHTML = `
+			<span class="metadata-property-icon"><i data-lucide="${getPropertyTypeIcon(property.type)}"></i></span>
+			<label for="${property.name}">${property.name}</label>
+			<input id="${property.name}" type="text" value="${escapeHtml(value)}" data-type="${property.type}" data-template-value="${escapeHtml(property.value)}" />
+		`;
+		templateProperties.appendChild(propertyDiv);
+	}
+	
+	const noteNameField = document.getElementById('note-name-field') as HTMLTextAreaElement;
+	if (noteNameField) {
+		let formattedNoteName = await replaceVariables(currentTabId!, template.noteNameFormat, variables, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
+		noteNameField.setAttribute('data-template-value', template.noteNameFormat);
+		noteNameField.value = formattedNoteName;
+		adjustNoteNameHeight(noteNameField);
+	}
+
+	const pathField = document.getElementById('path-name-field') as HTMLInputElement;
+	const pathContainer = document.querySelector('.vault-path-container') as HTMLElement;
+	
+	if (pathField && pathContainer) {
+		const isDailyNote = template.behavior === 'append-daily' || template.behavior === 'prepend-daily';
+		
+		if (isDailyNote) {
+			pathField.style.display = 'none';
+		} else {
+			pathContainer.style.display = 'flex';
+			let formattedPath = await replaceVariables(currentTabId!, template.path, variables, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
+			pathField.value = formattedPath;
+			pathField.setAttribute('data-template-value', template.path);
+		}
+	}
+
+	const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
+	if (noteContentField) {
+		if (template.noteContentFormat) {
+			let content = await replaceVariables(currentTabId!, template.noteContentFormat, variables, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
+			noteContentField.value = content;
+			noteContentField.setAttribute('data-template-value', template.noteContentFormat);
+		} else {
+			noteContentField.value = '';
+			noteContentField.setAttribute('data-template-value', '');
+		}
+	}
+
+	initializeIcons();
+
+	const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement;
+	if (vaultDropdown) {
+		if (template.vault) {
+			vaultDropdown.value = template.vault;
+		} else {
+			// Try to get the previously selected vault
+			getLocalStorage('lastSelectedVault').then((lastSelectedVault) => {
+				if (lastSelectedVault && loadedSettings.vaults.includes(lastSelectedVault)) {
+					vaultDropdown.value = lastSelectedVault;
+				} else if (loadedSettings.vaults.length > 0) {
+					vaultDropdown.value = loadedSettings.vaults[0];
+				}
+			});
+		}
+
+		vaultDropdown.addEventListener('change', () => {
+			setLocalStorage('lastSelectedVault', vaultDropdown.value);
+		});
+	}
+
+	if (template) {
+		if (generalSettings.interpreterEnabled) {
+			await initializeInterpreter(template, variables, currentTabId!, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
+
+			// Check if there are any prompt variables
+			const promptVariables = collectPromptVariables(template);
+
+			// If auto-run is enabled and there are prompt variables, use interpreter
+			if (generalSettings.interpreterAutoRun && promptVariables.length > 0) {
+				try {
+					const modelSelect = document.getElementById('model-select') as HTMLSelectElement;
+					const selectedModelId = modelSelect?.value || generalSettings.interpreterModel || 'gpt-4o-mini';
+					const modelConfig = generalSettings.models.find(m => m.id === selectedModelId);
+					if (!modelConfig) {
+						throw new Error(`Model configuration not found for ${selectedModelId}`);
+					}
+					await handleInterpreterUI(template, variables, currentTabId!, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '', modelConfig);
+				} catch (error) {
+					console.error('Error auto-processing with interpreter:', error);
+				}
+			}
+		}
+
+		const replacedTemplate = await getReplacedTemplate(template, variables, currentTabId!, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
+		debugLog('Variables', 'Current template with replaced variables:', JSON.stringify(replacedTemplate, null, 2));
+	}
+}
+
+function setupMetadataToggle() {
+	const metadataHeader = document.querySelector('.metadata-properties-header') as HTMLElement;
+	const metadataProperties = document.querySelector('.metadata-properties') as HTMLElement;
+	
+	if (metadataHeader && metadataProperties) {
+		metadataHeader.removeEventListener('click', toggleMetadataProperties);
+		metadataHeader.addEventListener('click', toggleMetadataProperties);
+
+		// Set initial state
+		getLocalStorage('propertiesCollapsed').then((isCollapsed) => {
+			updateMetadataToggleState(isCollapsed);
+		});
+	}
+}
+
+function toggleMetadataProperties() {
+	const metadataProperties = document.querySelector('.metadata-properties') as HTMLElement;
+	const metadataHeader = document.querySelector('.metadata-properties-header') as HTMLElement;
+	
+	if (metadataProperties && metadataHeader) {
+		const isCollapsed = metadataProperties.classList.toggle('collapsed');
+		metadataHeader.classList.toggle('collapsed');
+		setLocalStorage('propertiesCollapsed', isCollapsed);
+	}
+}
+
+function updateMetadataToggleState(isCollapsed: boolean) {
+	const metadataProperties = document.querySelector('.metadata-properties') as HTMLElement;
+	const metadataHeader = document.querySelector('.metadata-properties-header') as HTMLElement;
+	
+	if (metadataProperties && metadataHeader) {
+		if (isCollapsed) {
+			metadataProperties.classList.add('collapsed');
+			metadataHeader.classList.add('collapsed');
+		} else {
+			metadataProperties.classList.remove('collapsed');
+			metadataHeader.classList.remove('collapsed');
+		}
+	}
+}
+
+async function getReplacedTemplate(template: Template, variables: { [key: string]: string }, tabId: number, currentUrl: string): Promise<any> {
+	const replacedTemplate: any = {
+		schemaVersion: "0.1.0",
+		name: template.name,
+		behavior: template.behavior,
+		noteNameFormat: await replaceVariables(tabId, template.noteNameFormat, variables, currentUrl),
+		path: template.path,
+		noteContentFormat: await replaceVariables(tabId, template.noteContentFormat, variables, currentUrl),
+		properties: [],
+		triggers: template.triggers
+	};
+
+	if (template.context) {
+		replacedTemplate.context = await replaceVariables(tabId, template.context, variables, currentUrl);
+	}
+
+	for (const prop of template.properties) {
+		const replacedProp: Property = {
+			id: prop.id, // Include the id property
+			name: prop.name,
+			value: await replaceVariables(tabId, prop.value, variables, currentUrl),
+			type: prop.type
+		};
+		replacedTemplate.properties.push(replacedProp);
+	}
+
+	return replacedTemplate;
+}
+
+function updateVaultDropdown(vaults: string[]) {
+	const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement | null;
+	const vaultContainer = document.getElementById('vault-container');
+
+	if (!vaultDropdown || !vaultContainer) return;
+
+	vaultDropdown.innerHTML = '';
+	
+	vaults.forEach(vault => {
+		const option = document.createElement('option');
+		option.value = vault;
+		option.textContent = vault;
+		vaultDropdown.appendChild(option);
+	});
+
+	// Only show vault selector if one is defined
+	if (vaults.length > 0) {
+		vaultContainer.style.display = 'block';
+		vaultDropdown.value = vaults[0];
+	} else {
+		vaultContainer.style.display = 'none';
+	}
+}
+
+function refreshPopup() {
+	window.location.reload();
+}

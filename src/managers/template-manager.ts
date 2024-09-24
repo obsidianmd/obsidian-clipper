@@ -15,18 +15,55 @@ export function setEditingTemplateIndex(index: number): void {
 }
 
 export async function loadTemplates(): Promise<Template[]> {
-	const data = await browser.storage.sync.get(TEMPLATE_LIST_KEY);
-	const templateIds = data[TEMPLATE_LIST_KEY] || [];
-	const loadedTemplates = await Promise.all(templateIds.map(loadTemplate));
-	templates = loadedTemplates.filter((t): t is Template => t !== null);
+	try {
+		const data = await browser.storage.sync.get(['template_list']);
+		const templateIds = data.template_list || [];
 
-	if (templates.length === 0) {
+		if (templateIds.length === 0) {
+			console.log('No template IDs found, creating default template');
+			const defaultTemplate = createDefaultTemplate();
+			templates = [defaultTemplate];
+			await saveTemplateSettings();
+			return templates;
+		}
+
+		const loadedTemplates = await Promise.all(templateIds.map(async (id: string) => {
+			try {
+				const result = await browser.storage.sync.get(`template_${id}`);
+				const compressedChunks = result[`template_${id}`];
+				if (compressedChunks) {
+					const decompressedData = decompressFromUTF16(compressedChunks.join(''));
+					const template = JSON.parse(decompressedData);
+					if (template && Array.isArray(template.properties)) {
+						return template;
+					}
+				}
+				console.warn(`Template ${id} is invalid or missing`);
+				return null;
+			} catch (error) {
+				console.error(`Error parsing template ${id}:`, error);
+				return null;
+			}
+		}));
+
+		templates = loadedTemplates.filter((t): t is Template => t !== null);
+
+		if (templates.length === 0) {
+			console.log('No valid templates found, creating default template');
+			const defaultTemplate = createDefaultTemplate();
+			templates = [defaultTemplate];
+			await saveTemplateSettings();
+		}
+
+		return templates;
+	} catch (error) {
+		console.error('Error loading templates:', error);
+		// Instead of returning an empty array, create a default template
 		const defaultTemplate = createDefaultTemplate();
-		templates.push(defaultTemplate);
+		templates = [defaultTemplate];
 		await saveTemplateSettings();
+		return templates;
 	}
-
-	return templates;
 }
 
 async function loadTemplate(id: string): Promise<Template | null> {

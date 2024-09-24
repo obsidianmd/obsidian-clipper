@@ -28,7 +28,7 @@
 		"128": "icons/icon128.png"
 	},
 	"background": {
-		"scripts": ["background-firefox.js"],
+		"scripts": ["background.js"],
 		"type": "module"
 	},
 	"content_scripts": [

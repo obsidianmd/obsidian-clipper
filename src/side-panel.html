@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html id="popup">
+<html id="popup" class="is-side-panel">
 	<head>
 		<title>Obsidian Web Clipper</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -17,6 +17,9 @@
 				<a href="#" id="show-variables" class="clickable-icon" aria-label="Show variables">
 					<i data-lucide="ellipsis"></i>
 				</a>
+				<a href="#" id="refresh-pane" class="clickable-icon" aria-label="Refresh">
+					<i data-lucide="rotate-cw"></i>
+				</a>
 				<a href="#" id="open-settings" class="clickable-icon" aria-label="Settings">
 					<i data-lucide="settings"></i>
 				</a>		
@@ -24,7 +27,6 @@
 		</div>
 		<p class="error-message" style="display: none;"></p>
 		<div class="clipper">
-			
 			<textarea id="note-name-field" type="text" placeholder="Note name" rows="1"></textarea>
 			<div class="metadata-properties-header">
 				Properties

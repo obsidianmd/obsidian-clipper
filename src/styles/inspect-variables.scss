@@ -1,13 +1,3 @@
-#show-variables {
-	z-index: 100;
-	position: fixed;
-	top: 6px;
-	right: 32px;
-	user-select: none;
-	-webkit-user-select: none;
-	background-color: var(--background-primary);
-}
-
 .variables-panel {
 	display: none;
 	position: fixed;
@@ -43,7 +33,7 @@
 
 	.variables-header {
 		padding: 8px 12px 0px;
-		border-bottom: 1px solid var(--background-modifier-border);
+		border-bottom: 1px solid var(--divider-color);
 		display: flex;
 		flex-direction: column;
 	}

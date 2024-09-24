@@ -4,7 +4,6 @@ import { sanitizeFileName } from './string-utils';
 import { Readability } from '@mozilla/readability';
 import { applyFilters } from './filters';
 import browser from './browser-polyfill';
-import { convertDate } from './date-utils';
 import { debugLog } from './debug';
 import dayjs from 'dayjs';
 import { generalSettings } from '../utils/storage-utils';
@@ -19,15 +18,6 @@ export function extractReadabilityContent(doc: Document): ReturnType<Readability
 	}
 }
 
-async function processVariable(match: string, variables: { [key: string]: string }, currentUrl: string): Promise<string> {
-	const [, fullVariableName] = match.match(/{{(.*?)}}/) || [];
-	const [variableName, ...filterParts] = fullVariableName.split('|');
-	const filtersString = filterParts.join('|');
-	const value = variables[`{{${variableName}}}`] || '';
-	const result = applyFilters(value, filtersString, currentUrl);
-	return result;
-}
-
 async function processSelector(tabId: number, match: string, currentUrl: string): Promise<string> {
 	const selectorRegex = /{{(selector|selectorHtml):(.*?)(?:\|(.*?))?}}/;
 	const matches = match.match(selectorRegex);
@@ -38,15 +28,27 @@ async function processSelector(tabId: number, match: string, currentUrl: string)
 
 	const [, selectorType, selector, filtersString] = matches;
 	const extractHtml = selectorType === 'selectorHtml';
-	const { content } = await extractContentBySelector(tabId, selector, extractHtml);
+
+	try {
+		const response = await browser.tabs.sendMessage(tabId, { 
+			action: "extractContent", 
+			selector: selector,
+			extractHtml: extractHtml
+		});
+
+		let content = response ? response.content : '';
 	
-	// Convert content to string if it's an array
-	const contentString = Array.isArray(content) ? JSON.stringify(content) : content;
+		// Convert content to string if it's an array
+		const contentString = Array.isArray(content) ? JSON.stringify(content) : content;
 	
-	debugLog('ContentExtractor', 'Applying filters:', { selector, filterString: filtersString });
-	const filteredContent = applyFilters(contentString, filtersString, currentUrl);
+		debugLog('ContentExtractor', 'Applying filters:', { selector, filterString: filtersString });
+		const filteredContent = applyFilters(contentString, filtersString, currentUrl);
 	
-	return filteredContent;
+		return filteredContent;
+	} catch (error) {
+		console.error('Error extracting content by selector:', error);
+		return '';
+	}
 }
 
 async function processSchema(match: string, variables: { [key: string]: string }, currentUrl: string): Promise<string> {
@@ -162,10 +164,10 @@ export async function extractPageContent(tabId: number): Promise<{
 				fullHtml: response.fullHtml
 			};
 		}
-		return null;
+		throw new Error('Invalid response from content script');
 	} catch (error) {
 		console.error('Error extracting page content:', error);
-		return null;
+		throw error; // Propagate the error to be handled by the caller
 	}
 }
 
@@ -180,40 +182,6 @@ export function getMetaContent(doc: Document, attr: string, value: string): stri
 	const element = Array.from(doc.querySelectorAll(selector))
 		.find(el => el.getAttribute(attr)?.toLowerCase() === value.toLowerCase());
 	return element ? element.getAttribute("content")?.trim() ?? "" : "";
-}
-
-export async function extractContentBySelector(tabId: number, selector: string, extractHtml: boolean = false): Promise<{ content: string; schemaOrgData: any }> {
-	const attributeMatch = selector.match(/:([a-zA-Z-]+)$/);
-	let baseSelector = selector;
-	let attribute: string | undefined;
-
-	if (attributeMatch) {
-		attribute = attributeMatch[1];
-		baseSelector = selector.slice(0, -attribute.length - 1);
-	}
-
-	try {
-		const response = await browser.tabs.sendMessage(tabId, { 
-			action: "extractContent", 
-			selector: baseSelector, 
-			attribute: attribute,
-			extractHtml: extractHtml
-		});
-		let content = response ? response.content : '';
-		
-		// Ensure content is always a string
-		if (Array.isArray(content)) {
-			content = JSON.stringify(content);
-		}
-		
-		return {
-			content: content,
-			schemaOrgData: response ? response.schemaOrgData : null
-		};
-	} catch (error) {
-		console.error('Error extracting content by selector:', error);
-		return { content: '', schemaOrgData: null };
-	}
 }
 
 export async function initializePageContent(content: string, selectedHtml: string, extractedContent: ExtractedContent, currentUrl: string, schemaOrgData: any, fullHtml: string) {
