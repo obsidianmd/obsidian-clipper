@@ -52,6 +52,7 @@ async function initializeExtension() {
 				return false;
 			}
 			await ensureContentScriptLoaded();
+			await refreshFields();
 		} else {
 			return false;
 		}
@@ -151,11 +152,8 @@ document.addEventListener('DOMContentLoaded', async function() {
 		if (showMoreActionsButton) {
 			showMoreActionsButton.addEventListener('click', (e) => {
 				e.preventDefault();
-				console.log('Button clicked from DOMContentLoaded');
 				showVariables();
 			});
-		} else {
-			console.log('Show variables button not found');
 		}
 
 	} catch (error) {
@@ -189,10 +187,6 @@ function setupEventListeners() {
 }
 
 async function initializeUI() {
-	console.log('Initializing UI');
-	console.log('currentTemplate:', currentTemplate);
-	console.log('currentVariables:', currentVariables);
-
 	const clipButton = document.getElementById('clip-btn');
 	if (clipButton) {
 		clipButton.addEventListener('click', handleClip);
@@ -214,27 +208,19 @@ async function initializeUI() {
 	}
 
 	const showMoreActionsButton = document.getElementById('show-variables') as HTMLElement;
-	console.log('showMoreActionsButton:', showMoreActionsButton);
 	const variablesPanel = document.createElement('div');
 	variablesPanel.className = 'variables-panel';
 	document.body.appendChild(variablesPanel);
-	console.log('Variables panel created and appended to body');
 
 	if (showMoreActionsButton) {
-		console.log('Initializing variables panel');
 		initializeVariablesPanel(variablesPanel, currentTemplate, currentVariables);
 		showMoreActionsButton.addEventListener('click', (e) => {
 			e.preventDefault();
-			console.log('Show variables button clicked');
 			showVariables();
 		});
-		console.log('Event listener added to show variables button');
-	} else {
-		console.log('Show variables button not found');
 	}
 
 	if (isSidePanel) {
-		console.log('Running in side panel mode');
 		browser.runtime.sendMessage({ action: "sidePanelOpened" });
 		
 		window.addEventListener('unload', () => {

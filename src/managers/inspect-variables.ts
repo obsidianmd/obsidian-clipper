@@ -14,21 +14,14 @@ export function initializeVariablesPanel(panel: HTMLElement, template: Template 
 }
 
 export function showVariables() {
-	console.log('showVariables function called');
-	console.log('currentTemplate:', currentTemplate);
-	console.log('currentVariables:', currentVariables);
-
 	if (!variablesPanel) {
 		console.error('variablesPanel is not initialized');
 		return;
 	}
 
 	if (currentTemplate && Object.keys(currentVariables).length > 0) {
-		console.log('Conditions met, preparing to show variables');
 		const formattedVariables = formatVariables(currentVariables);
-		console.log('formattedVariables:', formattedVariables);
 
-		console.log('Updating variablesPanel innerHTML');
 		variablesPanel.innerHTML = `
 			<div class="variables-header">
 				<h3>Page variables</h3>
@@ -39,44 +32,25 @@ export function showVariables() {
 			</div>
 			<div class="variable-list">${formattedVariables}</div>
 		`;
-		console.log('variablesPanel innerHTML updated');
 
-		console.log('Adding show class to variablesPanel');
 		variablesPanel.classList.add('show');
-		console.log('show class added to variablesPanel');
-
-		console.log('Initializing icons');
 		initializeIcons();
-		console.log('Icons initialized');
 
 		// Search variables
 		const searchInput = variablesPanel.querySelector('#variables-search') as HTMLInputElement;
 		if (searchInput) {
-			console.log('Adding event listener to search input');
 			searchInput.addEventListener('input', debounce(handleVariableSearch, 300));
-			console.log('Event listener added to search input');
-		} else {
-			console.error('Search input not found');
 		}
 
-		console.log('Calling handleVariableSearch');
 		handleVariableSearch();
-		console.log('handleVariableSearch called');
 
 		// Add click event listener to close panel
 		const closePanel = variablesPanel.querySelector('.close-panel') as HTMLElement;
 		if (closePanel) {
-			console.log('Adding event listener to close panel');
 			closePanel.addEventListener('click', function() {
-				console.log('Close panel clicked');
 				variablesPanel.classList.remove('show');
 			});
-			console.log('Event listener added to close panel');
-		} else {
-			console.error('Close panel button not found');
 		}
-
-		console.log('Variables panel should now be visible');
 	} else {
 		console.log('No variables available to display');
 	}
@@ -93,6 +67,45 @@ function handleVariableSearch() {
 		const value = htmlItem.querySelector('.variable-value') as HTMLElement;
 		const keyText = key.textContent?.toLowerCase() || '';
 		const valueText = value.textContent?.toLowerCase() || '';
+
+		const variableName = key.getAttribute('data-variable');
+						
+		// Skip contentHtml and fullHtml variables
+		if (variableName === '{{contentHtml}}' || variableName === '{{fullHtml}}') {
+			item.remove();
+			return;
+		}
+
+		const chevron = item.querySelector('.chevron-icon') as HTMLElement;
+			const valueElement = item.querySelector('.variable-value') as HTMLElement;	
+				
+			if (valueElement.scrollWidth > valueElement.clientWidth) {
+				item.classList.add('has-overflow');
+		}
+
+		key.addEventListener('click', function() {
+			const variableName = this.getAttribute('data-variable');
+			if (variableName) {
+				navigator.clipboard.writeText(variableName).then(() => {
+					const originalText = this.textContent;
+					this.textContent = 'Copied!';
+					setTimeout(() => {
+						this.textContent = originalText;
+					}, 1000);
+				}).catch(err => {
+					console.error('Failed to copy text: ', err);
+				});
+			}
+		});
+
+		chevron.addEventListener('click', function() {
+			item.classList.toggle('is-collapsed');
+			const chevronIcon = this.querySelector('i');
+			if (chevronIcon) {
+				chevronIcon.setAttribute('data-lucide', item.classList.contains('is-collapsed') ? 'chevron-right' : 'chevron-down');
+				initializeIcons();
+			}
+		});
 
 		if (searchTerm.length < 2) {
 			htmlItem.style.display = 'flex';
