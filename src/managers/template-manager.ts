@@ -18,7 +18,6 @@ export async function loadTemplates(): Promise<Template[]> {
 	try {
 		const data = await browser.storage.sync.get(['template_list']);
 		const templateIds = data.template_list || [];
-		console.log('Template IDs loaded:', templateIds);
 
 		if (templateIds.length === 0) {
 			console.log('No template IDs found, creating default template');
@@ -48,7 +47,6 @@ export async function loadTemplates(): Promise<Template[]> {
 		}));
 
 		templates = loadedTemplates.filter((t): t is Template => t !== null);
-		console.log('Templates loaded:', templates);
 
 		if (templates.length === 0) {
 			console.log('No valid templates found, creating default template');

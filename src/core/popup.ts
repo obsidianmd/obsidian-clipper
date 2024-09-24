@@ -134,9 +134,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 	const currentTabId = currentTab?.id;
 
 	if (currentTabId) {
-		try {
-			await ensureContentScriptLoaded(currentTabId);
-		
+		try {		
 			if (currentTabId !== undefined) {
 				const initialized = await initializeExtension(currentTabId);
 			if (!initialized) {

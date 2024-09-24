@@ -135,13 +135,6 @@ async function setupTabListeners() {
 				updateCurrentActiveTab(tab.windowId);
 			}
 		});
-
-		// Update for window focus changes
-		browser.windows.onFocusChanged.addListener(async (windowId) => {
-			if (windowId !== browser.windows.WINDOW_ID_NONE && await isSidePanelOpen(windowId)) {
-				updateCurrentActiveTab(windowId);
-			}
-		});
 	}
 }
 
