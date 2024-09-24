@@ -14,7 +14,7 @@ import { createElementWithClass } from '../utils/dom-utils';
 import { initializeInterpreter, handleInterpreterUI, collectPromptVariables } from '../utils/interpreter';
 import { adjustNoteNameHeight } from '../utils/ui-utils';
 import { debugLog } from '../utils/debug';
-import { debounce } from '../utils/debounce';
+import { showVariables, initializeVariablesPanel } from '../managers/inspect-variables';
 
 let loadedSettings: Settings;
 let currentTemplate: Template | null = null;
@@ -36,7 +36,6 @@ async function initializeExtension() {
 
 		if (templates.length === 0) {
 			console.error('No templates loaded');
-			showError('No templates available. Please add a template in the settings.');
 			return false;
 		}
 
@@ -47,24 +46,200 @@ async function initializeExtension() {
 		if (currentTabId) {
 			const tab = await browser.tabs.get(currentTabId);
 			if (!tab.url || isBlankPage(tab.url)) {
-				showError('This page cannot be clipped. Please navigate to a web page.');
 				return false;
 			}
 			if (!isValidUrl(tab.url)) {
-				showError('This page cannot be clipped. Only http and https URLs are supported.');
 				return false;
 			}
 			await ensureContentScriptLoaded();
 		} else {
-			showError('No active tab found. Please try reloading the extension.');
 			return false;
 		}
+
+		// Move template loading here
+		await loadAndSetupTemplates();
+
+		// Setup message listeners
+		setupMessageListeners();
 
 		return true;
 	} catch (error) {
 		console.error('Error initializing extension:', error);
-		showError('Failed to initialize the extension. Please try reloading the page.');
 		return false;
+	}
+}
+
+async function loadAndSetupTemplates() {
+	const data = await browser.storage.sync.get(['template_list']);
+	const templateIds = data.template_list || [];
+	const loadedTemplates = await Promise.all(templateIds.map(async (id: string) => {
+		try {
+			const result = await browser.storage.sync.get(`template_${id}`);
+			const compressedChunks = result[`template_${id}`];
+			if (compressedChunks) {
+				const decompressedData = decompressFromUTF16(compressedChunks.join(''));
+				const template = JSON.parse(decompressedData);
+				if (template && Array.isArray(template.properties)) {
+					return template;
+				}
+			}
+		} catch (error) {
+			console.error(`Error parsing template ${id}:`, error);
+		}
+		return null;
+	}));
+
+	templates = loadedTemplates.filter((t): t is Template => t !== null);
+
+	if (templates.length === 0) {
+		currentTemplate = createDefaultTemplate();
+		templates = [currentTemplate];
+	} else {
+		currentTemplate = templates[0];
+	}
+}
+
+function setupMessageListeners() {
+	browser.runtime.onMessage.addListener((request: any, sender: browser.Runtime.MessageSender, sendResponse: (response?: any) => void) => {
+		if (request.action === "triggerQuickClip") {
+			handleClip().then(() => {
+				sendResponse({success: true});
+			}).catch((error) => {
+				console.error('Error in handleClip:', error);
+				sendResponse({success: false, error: error.message});
+			});
+			return true;
+		} else if (request.action === "tabUrlChanged") {
+			if (request.tabId === currentTabId) {
+				refreshFields();
+			}
+		} else if (request.action === "activeTabChanged") {
+			currentTabId = request.tabId;
+			if (request.isValidUrl) {
+				refreshFields(true); // Force template check when URL changes
+			} else if (request.isBlankPage) {
+				showError('This page cannot be clipped. Please navigate to a web page.');
+			} else {
+				showError('This page cannot be clipped. Only http and https URLs are supported.');
+			}
+		}
+	});
+}
+
+document.addEventListener('DOMContentLoaded', async function() {
+	try {
+		const initialized = await initializeExtension();
+		if (!initialized) {
+			showError('Failed to initialize the extension. Please try reloading the page.');
+			return;
+		}
+
+		// DOM-dependent initializations
+		initializeIcons();
+		updateVaultDropdown(loadedSettings.vaults);
+		updateTemplateDropdown();
+		setupEventListeners();
+		await initializeUI();
+		setupMetadataToggle();
+
+		// Initial content load
+		if (currentTabId) {
+			await refreshFields();
+		}
+
+		const showMoreActionsButton = document.getElementById('show-variables');
+		if (showMoreActionsButton) {
+			showMoreActionsButton.addEventListener('click', (e) => {
+				e.preventDefault();
+				console.log('Button clicked from DOMContentLoaded');
+				showVariables();
+			});
+		} else {
+			console.log('Show variables button not found');
+		}
+
+	} catch (error) {
+		console.error('Error initializing popup:', error);
+		showError('Failed to initialize the extension. Please try reloading the page.');
+	}
+});
+
+function setupEventListeners() {
+	const templateDropdown = document.getElementById('template-select') as HTMLSelectElement;
+	if (templateDropdown) {
+		templateDropdown.addEventListener('change', async function(this: HTMLSelectElement) {
+			currentTemplate = templates.find((t: Template) => t.name === this.value) || null;
+			if (currentTemplate) {
+				await refreshFields();
+			} else {
+				logError('Selected template not found');
+			}
+		});
+	}
+
+	const noteNameField = document.getElementById('note-name-field') as HTMLTextAreaElement;
+	if (noteNameField) {
+		noteNameField.addEventListener('input', () => adjustNoteNameHeight(noteNameField));
+		noteNameField.addEventListener('keydown', function(e) {
+			if (e.key === 'Enter' && !e.shiftKey) {
+				e.preventDefault();
+			}
+		});
+	}
+}
+
+async function initializeUI() {
+	console.log('Initializing UI');
+	console.log('currentTemplate:', currentTemplate);
+	console.log('currentVariables:', currentVariables);
+
+	const clipButton = document.getElementById('clip-btn');
+	if (clipButton) {
+		clipButton.addEventListener('click', handleClip);
+		clipButton.focus();
+	} else {
+		console.warn('Clip button not found');
+	}
+
+	const settingsButton = document.getElementById('open-settings');
+	if (settingsButton) {
+		settingsButton.addEventListener('click', async function() {
+			browser.runtime.openOptionsPage();
+			
+			const browserType = await detectBrowser();
+			if (browserType === 'firefox-mobile') {
+				setTimeout(() => window.close(), 50);
+			}
+		});
+	}
+
+	const showMoreActionsButton = document.getElementById('show-variables') as HTMLElement;
+	console.log('showMoreActionsButton:', showMoreActionsButton);
+	const variablesPanel = document.createElement('div');
+	variablesPanel.className = 'variables-panel';
+	document.body.appendChild(variablesPanel);
+	console.log('Variables panel created and appended to body');
+
+	if (showMoreActionsButton) {
+		console.log('Initializing variables panel');
+		initializeVariablesPanel(variablesPanel, currentTemplate, currentVariables);
+		showMoreActionsButton.addEventListener('click', (e) => {
+			e.preventDefault();
+			console.log('Show variables button clicked');
+			showVariables();
+		});
+		console.log('Event listener added to show variables button');
+	} else {
+		console.log('Show variables button not found');
+	}
+
+	if (isSidePanel) {
+		console.log('Running in side panel mode');
+		browser.runtime.sendMessage({ action: "sidePanelOpened" });
+		
+		window.addEventListener('unload', () => {
+			browser.runtime.sendMessage({ action: "sidePanelClosed" });
+		});
 	}
 }
 
@@ -79,22 +254,6 @@ async function ensureContentScriptLoaded() {
 		}
 	}
 }
-
-browser.runtime.onMessage.addListener((request: any, sender: browser.Runtime.MessageSender, sendResponse: (response?: any) => void) => {
-	if (request.action === "triggerQuickClip") {
-		handleClip().then(() => {
-			sendResponse({success: true});
-		}).catch((error) => {
-			console.error('Error in handleClip:', error);
-			sendResponse({success: false, error: error.message});
-		});
-		return true;
-	} else if (request.action === "tabUrlChanged") {
-		if (request.tabId === currentTabId) {
-			refreshFields();
-		}
-	}
-});
 
 function showError(message: string): void {
 	const errorMessage = document.querySelector('.error-message') as HTMLElement;
@@ -280,6 +439,8 @@ async function refreshFields(forceTemplateCheck: boolean = false) {
 					extractedData.fullHtml
 				);
 				if (initializedContent) {
+					currentVariables = initializedContent.currentVariables;
+					console.log('Updated currentVariables:', currentVariables);
 					await initializeTemplateFields(
 						currentTemplate,
 						initializedContent.currentVariables,
@@ -568,300 +729,3 @@ function updateVaultDropdown(vaults: string[]) {
 		vaultContainer.style.display = 'none';
 	}
 }
-
-document.addEventListener('DOMContentLoaded', async function() {
-	try {
-		const initialized = await initializeExtension();
-		if (!initialized) {
-			// If initialization failed, we've already shown an error, so just return
-			return;
-		}
-
-		// Continue with the rest of the initialization process
-		initializeIcons();
-
-		const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement | null;
-		const templateContainer = document.getElementById('template-container');
-		const templateDropdown = document.getElementById('template-select') as HTMLSelectElement | null;
-
-		if (!vaultDropdown || !templateDropdown) {
-			throw new Error('Required dropdown elements not found');
-		}
-
-		updateVaultDropdown(loadedSettings.vaults);
-
-		// Load templates from sync storage and populate dropdown
-		browser.storage.sync.get(['template_list']).then(async (data: { template_list?: string[] }) => {
-			const templateIds = data.template_list || [];
-			const loadedTemplates = await Promise.all(templateIds.map(async id => {
-				try {
-					const result = await browser.storage.sync.get(`template_${id}`);
-					const compressedChunks = result[`template_${id}`];
-					if (compressedChunks) {
-						const decompressedData = decompressFromUTF16(compressedChunks.join(''));
-						const template = JSON.parse(decompressedData);
-						if (template && Array.isArray(template.properties)) {
-							return template;
-						}
-					}
-				} catch (error) {
-					console.error(`Error parsing template ${id}:`, error);
-				}
-				return null;
-			}));
-
-			templates = loadedTemplates.filter((t): t is Template => t !== null);
-
-			if (templates.length === 0) {
-				currentTemplate = createDefaultTemplate();
-				templates = [currentTemplate];
-			} else {
-				currentTemplate = templates[0];
-			}
-
-			populateTemplateDropdown();
-
-			// After templates are loaded, match template based on URL
-			const tabs = await browser.tabs.query({active: true, currentWindow: true});
-			const currentTab = tabs[0];
-			if (!currentTab.url || currentTab.url.startsWith('chrome-extension://') || currentTab.url.startsWith('chrome://') || currentTab.url.startsWith('about:') || currentTab.url.startsWith('file://')) {
-				showError('This page cannot be clipped.');
-				return;
-			}
-
-			// Only show template selector if there are multiple templates
-			if (templateContainer) {
-				if (templates.length > 1) {
-					templateContainer.style.display = 'block';
-				} else {
-					templateContainer.classList.add('hidden');
-				}
-			} else {
-				console.warn('Template container not found');
-			}
-		});
-
-		function populateTemplateDropdown() {
-			if (!templateDropdown) return;
-
-			templateDropdown.innerHTML = '';
-			
-			templates.forEach((template: Template) => {
-				const option = document.createElement('option');
-				option.value = template.name;
-				option.textContent = template.name;
-				templateDropdown.appendChild(option);
-			});
-		}
-
-		// Template selection change
-		templateDropdown.addEventListener('change', async function(this: HTMLSelectElement) {
-			currentTemplate = templates.find((t: Template) => t.name === this.value) || null;
-			if (currentTemplate) {
-				await refreshFields();
-			} else {
-				logError('Selected template not found');
-			}
-		});
-
-		const noteNameField = document.getElementById('note-name-field') as HTMLTextAreaElement;
-		function handleNoteNameInput() {
-			adjustNoteNameHeight(noteNameField);
-		}
-
-		noteNameField.addEventListener('input', handleNoteNameInput);
-		noteNameField.addEventListener('keydown', function(e) {
-			if (e.key === 'Enter' && !e.shiftKey) {
-				e.preventDefault();
-			}
-		});
-
-		// Initial height adjustment
-		adjustNoteNameHeight(noteNameField);
-
-		async function initializeUI() {
-			const clipButton = document.getElementById('clip-btn');
-			if (clipButton) {
-				clipButton.addEventListener('click', handleClip);
-				clipButton.focus();
-			} else {
-				console.warn('Clip button not found');
-			}
-
-			// On Firefox Mobile close the popup when the settings button is clicked
-			// because otherwise the settings page is opened in the background
-			const settingsButton = document.getElementById('open-settings');
-			if (settingsButton) {
-				settingsButton.addEventListener('click', async function() {
-					browser.runtime.openOptionsPage();
-					
-					const browserType = await detectBrowser();
-					if (browserType === 'firefox-mobile') {
-						setTimeout(() => window.close(), 50);
-					}
-				});
-			}
-
-			const showMoreActionsButton = document.getElementById('show-variables') as HTMLElement;
-			if (showMoreActionsButton) {
-				showMoreActionsButton.style.display = loadedSettings.showMoreActionsButton ? 'flex' : 'none';
-				
-				showMoreActionsButton.addEventListener('click', function() {
-					if (currentTemplate && Object.keys(currentVariables).length > 0) {
-						const formattedVariables = formatVariables(currentVariables);
-						variablesPanel.innerHTML = `
-							<div class="variables-header">
-								<h3>Page variables</h3>
-								<input type="text" id="variables-search" placeholder="Search variables...">
-								<span class="close-panel clickable-icon" aria-label="Close">
-									<i data-lucide="x"></i>
-								</span>
-							</div>
-							<div class="variable-list">${formattedVariables}</div>
-						`;
-						variablesPanel.classList.add('show');
-						initializeIcons();
-
-						// Search variables
-						const searchInput = variablesPanel.querySelector('#variables-search') as HTMLInputElement;
-						searchInput.addEventListener('input', debounce(handleVariableSearch, 300));
-						handleVariableSearch();
-
-						// Add click event listeners to variable keys and chevrons
-						const variableItems = variablesPanel.querySelectorAll('.variable-item');
-						variableItems.forEach(item => {
-							const key = item.querySelector('.variable-key') as HTMLElement;
-							const variableName = key.getAttribute('data-variable');
-						
-							// Skip contentHtml and fullHtml variables
-							if (variableName === '{{contentHtml}}' || variableName === '{{fullHtml}}') {
-								item.remove();
-								return;
-							}
-
-							const chevron = item.querySelector('.chevron-icon') as HTMLElement;
-							const valueElement = item.querySelector('.variable-value') as HTMLElement;	
-								
-							if (valueElement.scrollWidth > valueElement.clientWidth) {
-								item.classList.add('has-overflow');
-							}
-
-							key.addEventListener('click', function() {
-								const variableName = this.getAttribute('data-variable');
-								if (variableName) {
-									navigator.clipboard.writeText(variableName).then(() => {
-										const originalText = this.textContent;
-										this.textContent = 'Copied!';
-										setTimeout(() => {
-											this.textContent = originalText;
-										}, 1000);
-									}).catch(err => {
-										console.error('Failed to copy text: ', err);
-									});
-								}
-							});
-
-							chevron.addEventListener('click', function() {
-								item.classList.toggle('is-collapsed');
-								const chevronIcon = this.querySelector('i');
-								if (chevronIcon) {
-									chevronIcon.setAttribute('data-lucide', item.classList.contains('is-collapsed') ? 'chevron-right' : 'chevron-down');
-									initializeIcons();
-								}
-							});
-						});
-
-						const closePanel = variablesPanel.querySelector('.close-panel') as HTMLElement;
-						closePanel.addEventListener('click', function() {
-							variablesPanel.classList.remove('show');
-						});
-					} else {
-						console.log('No variables available to display');
-					}
-				});
-			}
-		}
-
-		function handleVariableSearch() {
-			const searchInput = document.getElementById('variables-search') as HTMLInputElement;
-			const searchTerm = searchInput.value.trim().toLowerCase();
-			const variableItems = variablesPanel.querySelectorAll('.variable-item');
-
-			variableItems.forEach(item => {
-				const htmlItem = item as HTMLElement;
-				const key = htmlItem.querySelector('.variable-key') as HTMLElement;
-				const value = htmlItem.querySelector('.variable-value') as HTMLElement;
-				const keyText = key.textContent?.toLowerCase() || '';
-				const valueText = value.textContent?.toLowerCase() || '';
-
-				if (searchTerm.length < 2) {
-					htmlItem.style.display = 'flex';
-					resetHighlight(key);
-					resetHighlight(value);
-				} else if (keyText.includes(searchTerm) || valueText.includes(searchTerm)) {
-					htmlItem.style.display = 'flex';
-					highlightText(key, searchTerm);
-					highlightText(value, searchTerm);
-				} else {
-					htmlItem.style.display = 'none';
-				}
-			});
-		}
-
-		function highlightText(element: HTMLElement, searchTerm: string) {
-			const originalText = element.textContent || '';
-			const regex = new RegExp(`(${searchTerm})`, 'gi');
-			element.innerHTML = originalText.replace(regex, '<mark>$1</mark>');
-		}
-
-		function resetHighlight(element: HTMLElement) {
-			element.innerHTML = element.textContent || '';
-		}
-
-		// Call this function after loading templates and settings
-		await initializeUI();
-
-		const variablesPanel = document.createElement('div');
-		variablesPanel.className = 'variables-panel';
-		document.body.appendChild(variablesPanel);
-
-		if (isSidePanel) {
-			console.log('Running in side panel mode');
-			browser.runtime.sendMessage({ action: "sidePanelOpened" });
-			
-			browser.tabs.onActivated.addListener(async (activeInfo) => {
-				// Remove this listener as it's now handled in the background script
-			});
-
-			// Inform background script when side panel is closed
-			window.addEventListener('unload', () => {
-				browser.runtime.sendMessage({ action: "sidePanelClosed" });
-			});
-		}
-
-		// Initial content load
-		const tabs = await browser.tabs.query({active: true, currentWindow: true});
-		if (tabs[0]?.id) {
-			currentTabId = tabs[0].id;
-			await browser.runtime.sendMessage({ action: "ensureContentScriptLoaded", tabId: currentTabId });
-			refreshFields();
-		}
-
-		browser.runtime.onMessage.addListener((request) => {
-			if (request.action === "activeTabChanged") {
-				currentTabId = request.tabId;
-				if (request.isValidUrl) {
-					refreshFields(true); // Force template check when URL changes
-				} else if (request.isBlankPage) {
-					showError('This page cannot be clipped. Please navigate to a web page.');
-				} else {
-					showError('This page cannot be clipped. Only http and https URLs are supported.');
-				}
-			}
-		});
-
-	} catch (error) {
-		console.error('Error initializing popup:', error);
-		showError('Failed to initialize the extension. Please try reloading the page.');
-	}
-});
