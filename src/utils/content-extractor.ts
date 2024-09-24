@@ -4,7 +4,6 @@ import { sanitizeFileName } from './string-utils';
 import { Readability } from '@mozilla/readability';
 import { applyFilters } from './filters';
 import browser from './browser-polyfill';
-import { convertDate } from './date-utils';
 import { debugLog } from './debug';
 import dayjs from 'dayjs';
 import { generalSettings } from '../utils/storage-utils';
@@ -17,15 +16,6 @@ export function extractReadabilityContent(doc: Document): ReturnType<Readability
 		console.error('Error in extractReadabilityContent:', error);
 		return null;
 	}
-}
-
-async function processVariable(match: string, variables: { [key: string]: string }, currentUrl: string): Promise<string> {
-	const [, fullVariableName] = match.match(/{{(.*?)}}/) || [];
-	const [variableName, ...filterParts] = fullVariableName.split('|');
-	const filtersString = filterParts.join('|');
-	const value = variables[`{{${variableName}}}`] || '';
-	const result = applyFilters(value, filtersString, currentUrl);
-	return result;
 }
 
 async function processSelector(tabId: number, match: string, currentUrl: string): Promise<string> {
@@ -152,11 +142,7 @@ export async function extractPageContent(tabId: number): Promise<{
 	fullHtml: string;
 } | null> {
 	try {
-		const tab = await browser.tabs.get(tabId);
-		if (tab.url && (tab.url.startsWith('chrome://') || tab.url.startsWith('about:') || tab.url.startsWith('edge://'))) {
-			throw new Error('Cannot access browser internal pages');
-		}
-
+		await browser.runtime.sendMessage({ action: "ensureContentScriptLoaded", tabId });
 		const response = await browser.tabs.sendMessage(tabId, { action: "getPageContent" });
 		if (response && response.content) {
 			return {
@@ -198,6 +184,7 @@ export async function extractContentBySelector(tabId: number, selector: string, 
 	}
 
 	try {
+		console.log('Extracting page content for tab:', tabId);
 		const response = await browser.tabs.sendMessage(tabId, { 
 			action: "extractContent", 
 			selector: baseSelector, 
@@ -205,12 +192,12 @@ export async function extractContentBySelector(tabId: number, selector: string, 
 			extractHtml: extractHtml
 		});
 		let content = response ? response.content : '';
-		
+	
 		// Ensure content is always a string
 		if (Array.isArray(content)) {
 			content = JSON.stringify(content);
 		}
-		
+	
 		return {
 			content: content,
 			schemaOrgData: response ? response.schemaOrgData : null

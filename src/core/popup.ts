@@ -543,21 +543,21 @@ async function initializeTemplateFields(template: Template | null, variables: { 
 		}
 	}
 
-	if (Object.keys(variables).length > 0) {
-		if (template.triggers && template.triggers.length > 0) {
-			const currentTab = await browser.tabs.get(currentTabId!);
-			const currentUrl = currentTab.url || '';
-			const matchingPattern = template.triggers.find(pattern => 
-				matchPattern(pattern, currentUrl, schemaOrgData)
-			);
-			if (matchingPattern) {
-				console.log(`Matched template trigger: ${matchingPattern}`);
-			}
-		}
-	}
+	// if (Object.keys(variables).length > 0) {
+	// 	if (template.triggers && template.triggers.length > 0) {
+	// 		const currentTab = await browser.tabs.get(currentTabId!);
+	// 		const currentUrl = currentTab.url || '';
+	// 		const matchingPattern = template.triggers.find(pattern => 
+	// 			matchPattern(pattern, currentUrl, schemaOrgData)
+	// 		);
+	// 		if (matchingPattern) {
+	// 			console.log(`Matched template trigger: ${matchingPattern}`);
+	// 		}
+	// 	}
+	// }
 
 	initializeIcons();
-	setupMetadataToggle();
+	// setupMetadataToggle();
 
 	const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement;
 	if (vaultDropdown) {

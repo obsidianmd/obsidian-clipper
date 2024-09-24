@@ -15,22 +15,9 @@ browser.action.onClicked.addListener((tab) => {
 });
 
 browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
-	console.log('Received message:', request);
 	if (request.action === "extractContent" && sender.tab && sender.tab.id) {
-		// if (!sender.tab.windowId || !sidePanelOpenWindows.has(sender.tab.windowId)) {
-		// 	sendResponse();
-			// return true;
-		// }
-
-		browser.tabs.sendMessage(sender.tab.id, request)
-			.then(() => {
-				sendResponse();
-			})
-			.catch(error => {
-				console.error("Error sending message:", error);
-				sendResponse();
-			});
-		return true; // Indicates that we will send a response asynchronously
+		browser.tabs.sendMessage(sender.tab.id, request).then(sendResponse);
+		return true;
 	}
 });
 
