@@ -191,9 +191,3 @@ export function deleteTemplate(templateId: string): boolean {
 	}
 	return false;
 }
-
-// Add this function if it's not already defined
-async function saveTemplate(template: Template): Promise<void> {
-	templates = [...templates.filter(t => t.id !== template.id), template];
-	await saveTemplateSettings();
-}
