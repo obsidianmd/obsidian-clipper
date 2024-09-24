@@ -1,6 +1,6 @@
 Official Obsidian browser extension. Available for [Chrome](https://chromewebstore.google.com/detail/obsidian-web-clipper/cnjifjpddelmedmihgijeibhnjfabmlf), [Firefox](https://addons.mozilla.org/en-US/firefox/addon/web-clipper-obsidian/), Edge, Brave, and Arc. Support for Safari to come.
 
-⚠️ **Obsidian Clipper is still in beta and requires Obsidian 1.7.2.** If you see an empty note after clicking **Add to Obsidian** please make sure you are using Obsidian 1.7.2+ and turn on the "Early access features" in Web Clipper settings.
+⚠️ **Obsidian Clipper is still in beta and requires Obsidian 1.7.2.** If you see an empty note after clicking **Add to Obsidian** please make sure you are using Obsidian 1.7.2 or above, which currently is an [early access version](https://help.obsidian.md/Obsidian/Early+access+versions).
 
 ## Features
 
