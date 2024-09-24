@@ -34,7 +34,7 @@ async function processSelector(tabId: number, match: string, currentUrl: string)
 			action: "extractContent", 
 			selector: selector,
 			extractHtml: extractHtml
-		});
+		}) as { content: string };
 
 		let content = response ? response.content : '';
 	
@@ -146,28 +146,24 @@ export async function replaceVariables(tabId: number, text: string, variables: {
 	return text;
 }
 
-export async function extractPageContent(tabId: number): Promise<{
+interface ContentResponse {
 	content: string;
 	selectedHtml: string;
 	extractedContent: ExtractedContent;
 	schemaOrgData: any;
 	fullHtml: string;
-} | null> {
+}
+
+export async function extractPageContent(tabId: number): Promise<ContentResponse | null> {
 	try {
-		const response = await browser.tabs.sendMessage(tabId, { action: "getPageContent" });
+		const response = await browser.tabs.sendMessage(tabId, { action: "getPageContent" }) as ContentResponse;
 		if (response && response.content) {
-			return {
-				content: response.content,
-				selectedHtml: response.selectedHtml,
-				extractedContent: response.extractedContent,
-				schemaOrgData: response.schemaOrgData,
-				fullHtml: response.fullHtml
-			};
+			return response;
 		}
 		throw new Error('Invalid response from content script');
 	} catch (error) {
 		console.error('Error extracting page content:', error);
-		throw error; // Propagate the error to be handled by the caller
+		throw error;
 	}
 }
 

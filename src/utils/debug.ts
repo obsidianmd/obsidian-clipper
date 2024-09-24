@@ -9,11 +9,11 @@ Debug modes:
 - Template
 */
 
-let debugMode = false;
+let debugMode: boolean = false;
 
 // Initialize debug mode from storage
-browser.storage.local.get('debugMode').then((result) => {
-	debugMode = result.debugMode || false;
+browser.storage.local.get('debugMode').then((result: { debugMode?: boolean }) => {
+	debugMode = result.debugMode ?? false;
 	console.log(`Debug mode initialized to: ${debugMode ? 'ON' : 'OFF'}`);
 }).catch((error) => {
 	console.error('Error initializing debug mode:', error);

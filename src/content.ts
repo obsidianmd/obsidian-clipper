@@ -2,9 +2,9 @@ import browser from './utils/browser-polyfill';
 
 // Firefox
 browser.runtime.sendMessage({ action: "contentScriptLoaded" });
-browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
+browser.runtime.onMessage.addListener((request: any, sender, sendResponse) => {
 	if (request.action === "ping") {
-		sendResponse();
+		sendResponse({});
 		return true;
 	}
 });

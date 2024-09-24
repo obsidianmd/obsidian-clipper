@@ -17,7 +17,7 @@ export function setEditingTemplateIndex(index: number): void {
 export async function loadTemplates(): Promise<Template[]> {
 	try {
 		const data = await browser.storage.sync.get(['template_list']);
-		const templateIds = data.template_list || [];
+		const templateIds = data.template_list as string[] || [];
 
 		if (templateIds.length === 0) {
 			console.log('No template IDs found, creating default template');
@@ -30,7 +30,7 @@ export async function loadTemplates(): Promise<Template[]> {
 		const loadedTemplates = await Promise.all(templateIds.map(async (id: string) => {
 			try {
 				const result = await browser.storage.sync.get(`template_${id}`);
-				const compressedChunks = result[`template_${id}`];
+				const compressedChunks = result[`template_${id}`] as string[];
 				if (compressedChunks) {
 					const decompressedData = decompressFromUTF16(compressedChunks.join(''));
 					const template = JSON.parse(decompressedData);
@@ -46,7 +46,7 @@ export async function loadTemplates(): Promise<Template[]> {
 			}
 		}));
 
-		templates = loadedTemplates.filter((t): t is Template => t !== null);
+		templates = loadedTemplates.filter((t: Template | null): t is Template => t !== null);
 
 		if (templates.length === 0) {
 			console.log('No valid templates found, creating default template');
@@ -68,7 +68,7 @@ export async function loadTemplates(): Promise<Template[]> {
 
 async function loadTemplate(id: string): Promise<Template | null> {
 	const data = await browser.storage.sync.get(STORAGE_KEY_PREFIX + id);
-	const compressedChunks = data[STORAGE_KEY_PREFIX + id];
+	const compressedChunks = data[STORAGE_KEY_PREFIX + id] as string[];
 	if (compressedChunks) {
 		const decompressedData = decompressFromUTF16(compressedChunks.join(''));
 		return JSON.parse(decompressedData);

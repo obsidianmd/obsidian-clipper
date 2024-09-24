@@ -68,10 +68,10 @@ async function initializeExtension(tabId: number) {
 async function loadAndSetupTemplates() {
 	const data = await browser.storage.sync.get(['template_list']);
 	const templateIds = data.template_list || [];
-	const loadedTemplates = await Promise.all(templateIds.map(async (id: string) => {
+	const loadedTemplates = await Promise.all((templateIds as string[]).map(async (id: string) => {
 		try {
 			const result = await browser.storage.sync.get(`template_${id}`);
-			const compressedChunks = result[`template_${id}`];
+			const compressedChunks = result[`template_${id}`] as string[];
 			if (compressedChunks) {
 				const decompressedData = decompressFromUTF16(compressedChunks.join(''));
 				const template = JSON.parse(decompressedData);
@@ -85,7 +85,7 @@ async function loadAndSetupTemplates() {
 		return null;
 	}));
 
-	templates = loadedTemplates.filter((t): t is Template => t !== null);
+	templates = loadedTemplates.filter((t: Template | null): t is Template => t !== null);
 
 	if (templates.length === 0) {
 		currentTemplate = createDefaultTemplate();

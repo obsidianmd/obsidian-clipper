@@ -54,24 +54,59 @@ export function getLocalStorage(key: string): Promise<any> {
 	return browser.storage.local.get(key).then((result: {[key: string]: any}) => result[key]);
 }
 
-export async function loadSettings(): Promise<Settings> {
-	const data = await browser.storage.sync.get(['general_settings', 'vaults', 'interpreter_settings']);
-
-	generalSettings = {
-		vaults: data.vaults || [],
-		showMoreActionsButton: data.general_settings?.showMoreActionsButton ?? true,
-		betaFeatures: data.general_settings?.betaFeatures ?? false,
-		legacyMode: data.general_settings?.legacyMode ?? false,
-		silentOpen: data.general_settings?.silentOpen ?? false,
-		openaiApiKey: data.interpreter_settings?.openaiApiKey || '',
-		anthropicApiKey: data.interpreter_settings?.anthropicApiKey || '',
-		interpreterModel: data.interpreter_settings?.interpreterModel || 'gpt-4o-mini',
-		models: data.interpreter_settings?.models || generalSettings.models,
-		interpreterEnabled: data.interpreter_settings?.interpreterEnabled ?? false,
-		interpreterAutoRun: data.interpreter_settings?.interpreterAutoRun ?? false,
-		defaultPromptContext: data.interpreter_settings?.defaultPromptContext || generalSettings.defaultPromptContext
+interface StorageData {
+	general_settings?: {
+		showMoreActionsButton?: boolean;
+		betaFeatures?: boolean;
+		legacyMode?: boolean;
+		silentOpen?: boolean;
 	};
-	
+	vaults?: string[];
+	interpreter_settings?: {
+		openaiApiKey?: string;
+		anthropicApiKey?: string;
+		interpreterModel?: string;
+		models?: ModelConfig[];
+		interpreterEnabled?: boolean;
+		interpreterAutoRun?: boolean;
+		defaultPromptContext?: string;
+	};
+}
+
+export async function loadSettings(): Promise<Settings> {
+	const data = await browser.storage.sync.get(['general_settings', 'vaults', 'interpreter_settings']) as StorageData;
+
+	const defaultSettings: Settings = {
+		vaults: [],
+		showMoreActionsButton: false,
+		betaFeatures: false,
+		legacyMode: false,
+		silentOpen: false,
+		openaiApiKey: '',
+		anthropicApiKey: '',
+		interpreterModel: 'gpt-4o-mini',
+		models: generalSettings.models,
+		interpreterEnabled: false,
+		interpreterAutoRun: false,
+		defaultPromptContext: generalSettings.defaultPromptContext
+	};
+
+	const loadedSettings: Settings = {
+		vaults: data.vaults || defaultSettings.vaults,
+		showMoreActionsButton: data.general_settings?.showMoreActionsButton ?? defaultSettings.showMoreActionsButton,
+		betaFeatures: data.general_settings?.betaFeatures ?? defaultSettings.betaFeatures,
+		legacyMode: data.general_settings?.legacyMode ?? defaultSettings.legacyMode,
+		silentOpen: data.general_settings?.silentOpen ?? defaultSettings.silentOpen,
+		openaiApiKey: data.interpreter_settings?.openaiApiKey || defaultSettings.openaiApiKey,
+		anthropicApiKey: data.interpreter_settings?.anthropicApiKey || defaultSettings.anthropicApiKey,
+		interpreterModel: data.interpreter_settings?.interpreterModel || defaultSettings.interpreterModel,
+		models: data.interpreter_settings?.models || defaultSettings.models,
+		interpreterEnabled: data.interpreter_settings?.interpreterEnabled ?? defaultSettings.interpreterEnabled,
+		interpreterAutoRun: data.interpreter_settings?.interpreterAutoRun ?? defaultSettings.interpreterAutoRun,
+		defaultPromptContext: data.interpreter_settings?.defaultPromptContext || defaultSettings.defaultPromptContext
+	};
+
+	generalSettings = loadedSettings;
 	return generalSettings;
 }
 

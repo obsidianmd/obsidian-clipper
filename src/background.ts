@@ -14,7 +14,7 @@ browser.action.onClicked.addListener((tab) => {
 	}
 });
 
-browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
+browser.runtime.onMessage.addListener((request: any, sender, sendResponse) => {
 	if (request.action === "extractContent" && sender.tab && sender.tab.id) {
 		browser.tabs.sendMessage(sender.tab.id, request).then(sendResponse);
 		return true;
