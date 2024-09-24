@@ -3,6 +3,14 @@
 	--popup-width: 340px;
 	--popup-width-expanded: 500px;
 }
+
+.is-safari,
+.is-mobile-safari,
+.is-firefox-mobile {
+	#popup-container {
+		scrollbar-width: thin;
+	}
+}
 .is-side-panel,
 .is-mobile-safari,
 .is-firefox-mobile {
@@ -23,7 +31,6 @@
 	overflow: hidden;
 }
 #popup-container {
-	scrollbar-width: thin;
 	max-height: 100%;
 	display: flex;
 	flex-direction: column;
@@ -150,7 +157,6 @@
 	}
 
 	.metadata-properties {
-		scrollbar-width: thin;
 		--input-height: 28px;
 		padding: 2px 8px 8px;
 		margin: 0;
@@ -215,7 +221,6 @@
 		display: flex;
 		flex-grow: 1;
 		#note-content-field {
-			scrollbar-width: thin;
 			border-radius: 0;
 			border: none;
 			border-top: 1px solid var(--divider-color);
