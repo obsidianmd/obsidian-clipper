@@ -21,12 +21,11 @@ let loadedSettings: Settings;
 let currentTemplate: Template | null = null;
 let templates: Template[] = [];
 let currentVariables: { [key: string]: string } = {};
+let currentTabId: number | undefined;
 
 const isSidePanel = window.location.pathname.includes('side-panel.html');
 
-let currentTabId: number | undefined;
-
-async function initializeExtension() {
+async function initializeExtension(tabId: number) {
 	try {
 		await addBrowserClassToHtml();
 		loadedSettings = await loadSettings();
@@ -43,20 +42,15 @@ async function initializeExtension() {
 		currentTemplate = templates[0]; // Set the first template as default
 		debugLog('Templates', 'Current template set to:', currentTemplate);
 
-		currentTabId = await getCurrentActiveTab();
-		if (currentTabId) {
-			const tab = await browser.tabs.get(currentTabId);
-			if (!tab.url || isBlankPage(tab.url)) {
-				return false;
-			}
-			if (!isValidUrl(tab.url)) {
-				return false;
-			}
-			await ensureContentScriptLoaded(currentTabId);
-			await refreshFields();
-		} else {
+		const tab = await browser.tabs.get(tabId);
+		if (!tab.url || isBlankPage(tab.url)) {
 			return false;
 		}
+		if (!isValidUrl(tab.url)) {
+			return false;
+		}
+		await ensureContentScriptLoaded(tabId);
+		await refreshFields(tabId);
 
 		// Move template loading here
 		await loadAndSetupTemplates();
@@ -103,6 +97,7 @@ async function loadAndSetupTemplates() {
 
 function setupMessageListeners() {
 	browser.runtime.onMessage.addListener((request: any, sender: browser.Runtime.MessageSender, sendResponse: (response?: any) => void) => {
+		console.log('Received message:', request);
 		if (request.action === "triggerQuickClip") {
 			handleClip().then(() => {
 				sendResponse({success: true});
@@ -113,12 +108,16 @@ function setupMessageListeners() {
 			return true;
 		} else if (request.action === "tabUrlChanged") {
 			if (request.tabId === currentTabId) {
-				refreshFields();
+				if (currentTabId !== undefined) {
+					refreshFields(currentTabId);
+				}
 			}
 		} else if (request.action === "activeTabChanged") {
 			currentTabId = request.tabId;
 			if (request.isValidUrl) {
-				refreshFields(); // Force template check when URL changes
+				if (currentTabId !== undefined) {
+					refreshFields(currentTabId); // Force template check when URL changes
+				}
 			} else if (request.isBlankPage) {
 				showError('This page cannot be clipped. Please navigate to a web page.');
 			} else {
@@ -129,37 +128,46 @@ function setupMessageListeners() {
 }
 
 document.addEventListener('DOMContentLoaded', async function() {
-	try {
-		const initialized = await initializeExtension();
-		if (!initialized) {
+	const tabs = await browser.tabs.query({active: true, currentWindow: true});
+	const currentTab = tabs[0];
+	const currentTabId = currentTab?.id;
+
+	if (currentTabId) {
+		try {
+			await ensureContentScriptLoaded(currentTabId);
+		
+			if (currentTabId !== undefined) {
+				const initialized = await initializeExtension(currentTabId);
+			if (!initialized) {
+				showError('Failed to initialize the extension. Please try reloading the page.');
+				return;
+			}
+
+			// DOM-dependent initializations
+			initializeIcons();
+			updateVaultDropdown(loadedSettings.vaults);
+			populateTemplateDropdown();
+			setupEventListeners();
+			await initializeUI();
+			setupMetadataToggle();
+
+			// Initial content load
+			await refreshFields(currentTabId);
+
+			const showMoreActionsButton = document.getElementById('show-variables');
+			if (showMoreActionsButton) {
+					showMoreActionsButton.addEventListener('click', (e) => {
+						e.preventDefault();
+						showVariables();
+					});
+			}
+			} else {
+				showError('Failed to get the current tab ID. Please try reloading the page.');
+			}
+		} catch (error) {
+			console.error('Error initializing popup:', error);
 			showError('Failed to initialize the extension. Please try reloading the page.');
-			return;
 		}
-
-		// DOM-dependent initializations
-		initializeIcons();
-		updateVaultDropdown(loadedSettings.vaults);
-		populateTemplateDropdown();
-		setupEventListeners();
-		await initializeUI();
-		setupMetadataToggle();
-
-		// Initial content load
-		if (currentTabId) {
-			await refreshFields();
-		}
-
-		const showMoreActionsButton = document.getElementById('show-variables');
-		if (showMoreActionsButton) {
-			showMoreActionsButton.addEventListener('click', (e) => {
-				e.preventDefault();
-				showVariables();
-			});
-		}
-
-	} catch (error) {
-		console.error('Error initializing popup:', error);
-		showError('Failed to initialize the extension. Please try reloading the page.');
 	}
 });
 
@@ -169,7 +177,9 @@ function setupEventListeners() {
 		templateDropdown.addEventListener('change', async function(this: HTMLSelectElement) {
 			currentTemplate = templates.find((t: Template) => t.name === this.value) || null;
 			if (currentTemplate) {
-				await refreshFields();
+				if (currentTabId !== undefined) {
+					await refreshFields(currentTabId);
+				}
 			} else {
 				logError('Selected template not found');
 			}
@@ -369,75 +379,69 @@ function isBlankPage(url: string): boolean {
 	return url === 'about:blank' || url === 'chrome://newtab/' || url === 'edge://newtab/';
 }
 
-async function refreshFields() {
+async function refreshFields(tabId: number) {
 	if (templates.length === 0) {
 		console.warn('No templates available');
 		showError('No templates available. Please add a template in the settings.');
 		return;
 	}
 
-	currentTabId = await getCurrentActiveTab();
-
-	if (currentTabId) {
-		try {
-			const tab = await browser.tabs.get(currentTabId);
-			if (!tab.url || isBlankPage(tab.url)) {
-				showError('This page cannot be clipped. Please navigate to a web page.');
-				return;
-			}
-			if (!isValidUrl(tab.url)) {
-				showError('This page cannot be clipped. Only http and https URLs are supported.');
-				return;
-			}
-
-			const extractedData = await extractPageContent(currentTabId);
-			if (extractedData) {
-				const currentUrl = tab.url;
-
-				// Always check for the correct template
-				const matchedTemplate = findMatchingTemplate(currentUrl, templates, extractedData.schemaOrgData);
-				if (matchedTemplate) {
-					currentTemplate = matchedTemplate;
-				} else {
-					// If no matching template is found, use the first template
-					currentTemplate = templates[0];
-				}
-				updateTemplateDropdown();
-
-				const initializedContent = await initializePageContent(
-					extractedData.content,
-					extractedData.selectedHtml,
-					extractedData.extractedContent,
-					currentUrl,
-					extractedData.schemaOrgData,
-					extractedData.fullHtml
-				);
-				if (initializedContent) {
-					currentVariables = initializedContent.currentVariables;
-					console.log('Updated currentVariables:', currentVariables);
-					await initializeTemplateFields(
-						currentTemplate,
-						initializedContent.currentVariables,
-						initializedContent.noteName,
-						extractedData.schemaOrgData
-					);
-					setupMetadataToggle();
-
-					// Update variables panel if it's open
-					updateVariablesPanel(currentTemplate, currentVariables);
-				} else {
-					throw new Error('Unable to initialize page content.');
-				}
-			} else {
-				throw new Error('Unable to extract page content.');
-			}
-		} catch (error) {
-			console.error('Error refreshing fields:', error);
-			const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
-			showError(errorMessage);
+	try {
+		const tab = await browser.tabs.get(tabId);
+		if (!tab.url || isBlankPage(tab.url)) {
+			showError('This page cannot be clipped. Please navigate to a web page.');
+			return;
 		}
-	} else {
-		showError('No active tab found. Please try reloading the extension.');
+		if (!isValidUrl(tab.url)) {
+			showError('This page cannot be clipped. Only http and https URLs are supported.');
+			return;
+		}
+
+		const extractedData = await extractPageContent(tabId);
+		if (extractedData) {
+			const currentUrl = tab.url;
+
+			// Always check for the correct template
+			const matchedTemplate = findMatchingTemplate(currentUrl, templates, extractedData.schemaOrgData);
+			if (matchedTemplate) {
+				currentTemplate = matchedTemplate;
+			} else {
+				// If no matching template is found, use the first template
+				currentTemplate = templates[0];
+			}
+			updateTemplateDropdown();
+
+			const initializedContent = await initializePageContent(
+				extractedData.content,
+				extractedData.selectedHtml,
+				extractedData.extractedContent,
+				currentUrl,
+				extractedData.schemaOrgData,
+				extractedData.fullHtml
+			);
+			if (initializedContent) {
+				currentVariables = initializedContent.currentVariables;
+				console.log('Updated currentVariables:', currentVariables);
+				await initializeTemplateFields(
+					currentTemplate,
+					initializedContent.currentVariables,
+					initializedContent.noteName,
+					extractedData.schemaOrgData
+				);
+				setupMetadataToggle();
+
+				// Update variables panel if it's open
+				updateVariablesPanel(currentTemplate, currentVariables);
+			} else {
+				throw new Error('Unable to initialize page content.');
+			}
+		} else {
+			throw new Error('Unable to extract page content.');
+		}
+	} catch (error) {
+		console.error('Error refreshing fields:', error);
+		const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+		showError(errorMessage);
 	}
 }
 
@@ -680,19 +684,6 @@ async function getReplacedTemplate(template: Template, variables: { [key: string
 	}
 
 	return replacedTemplate;
-}
-
-async function getCurrentActiveTab(): Promise<number | undefined> {
-	return new Promise((resolve) => {
-		browser.runtime.sendMessage({ action: "getCurrentActiveTab" })
-			.then((response: { tabId: number | undefined }) => {
-				resolve(response.tabId);
-			})
-			.catch((error) => {
-				console.error('Error getting current active tab:', error);
-				resolve(undefined);
-			});
-	});
 }
 
 function updateVaultDropdown(vaults: string[]) {

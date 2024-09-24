@@ -1,10 +1,9 @@
 import browser from './utils/browser-polyfill';
 import { ensureContentScriptLoaded } from './utils/content-script-utils';
 import { detectBrowser } from './utils/browser-detection';
+import { updateCurrentActiveTab } from './utils/active-tab-manager';
 
 let sidePanelOpenWindows: Set<number> = new Set();
-let currentActiveTabId: number | undefined;
-let currentWindowId: number | undefined;
 
 browser.action.onClicked.addListener((tab) => {
 	if (tab.id) {
@@ -16,11 +15,12 @@ browser.action.onClicked.addListener((tab) => {
 });
 
 browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
+	console.log('Received message:', request);
 	if (request.action === "extractContent" && sender.tab && sender.tab.id) {
-		if (!sender.tab.windowId || !sidePanelOpenWindows.has(sender.tab.windowId)) {
-			sendResponse();
-			return true;
-		}
+		// if (!sender.tab.windowId || !sidePanelOpenWindows.has(sender.tab.windowId)) {
+		// 	sendResponse();
+			// return true;
+		// }
 
 		browser.tabs.sendMessage(sender.tab.id, request)
 			.then(() => {
@@ -30,7 +30,6 @@ browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
 				console.error("Error sending message:", error);
 				sendResponse();
 			});
-
 		return true; // Indicates that we will send a response asynchronously
 	}
 });
@@ -80,49 +79,9 @@ browser.runtime.onInstalled.addListener(() => {
 	createContextMenu();
 });
 
-function updateCurrentActiveTab(windowId: number) {
-	browser.tabs.query({ active: true, windowId: windowId }).then((tabs) => {
-		if (tabs[0] && tabs[0].id && tabs[0].url) {
-			currentActiveTabId = tabs[0].id;
-			currentWindowId = windowId;
-			if (sidePanelOpenWindows.has(windowId)) {
-				browser.runtime.sendMessage({ 
-					action: "activeTabChanged", 
-					tabId: currentActiveTabId,
-					url: tabs[0].url,
-					isValidUrl: isValidUrl(tabs[0].url),
-					isBlankPage: isBlankPage(tabs[0].url)
-				});
-			}
-		}
-	});
-}
-
-// Call this function when a tab is activated
-browser.tabs.onActivated.addListener((activeInfo) => {
-	updateCurrentActiveTab(activeInfo.windowId);
-});
-
-// Call this function when a tab is updated
-browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-	if (changeInfo.status === 'complete' && tab.active && tab.windowId) {
-		updateCurrentActiveTab(tab.windowId);
-	}
-});
-
-// Update for window focus changes
-browser.windows.onFocusChanged.addListener((windowId) => {
-	if (windowId !== browser.windows.WINDOW_ID_NONE) {
-		updateCurrentActiveTab(windowId);
-	}
-});
-
-// Modify the existing message listener
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 	const handleMessage = async () => {
-		if (message.action === "getCurrentActiveTab") {
-			sendResponse({ tabId: currentActiveTabId });
-		} else if (message.type === 'open_side_panel' && sender.tab && sender.tab.id) {
+		if (message.type === 'open_side_panel' && sender.tab && sender.tab.id) {
 			await chrome.sidePanel.open({ tabId: sender.tab.id });
 			await chrome.sidePanel.setOptions({
 				tabId: sender.tab.id,
@@ -156,10 +115,35 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 	return true;
 });
 
-function isValidUrl(url: string): boolean {
-	return url.startsWith('http://') || url.startsWith('https://');
+async function isSidePanelOpen(windowId: number): Promise<boolean> {
+	return sidePanelOpenWindows.has(windowId);
 }
 
-function isBlankPage(url: string): boolean {
-	return url === 'about:blank' || url === 'chrome://newtab/' || url === 'edge://newtab/';
+async function setupTabListeners() {
+	const browserType = await detectBrowser();
+	if (['chrome', 'brave', 'edge'].includes(browserType)) {
+		// Call this function when a tab is activated
+		browser.tabs.onActivated.addListener(async (activeInfo) => {
+			if (await isSidePanelOpen(activeInfo.windowId)) {
+				updateCurrentActiveTab(activeInfo.windowId);
+			}
+		});
+
+		// Call this function when a tab is updated
+		browser.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+			if (changeInfo.status === 'complete' && tab.active && tab.windowId && await isSidePanelOpen(tab.windowId)) {
+				updateCurrentActiveTab(tab.windowId);
+			}
+		});
+
+		// Update for window focus changes
+		browser.windows.onFocusChanged.addListener(async (windowId) => {
+			if (windowId !== browser.windows.WINDOW_ID_NONE && await isSidePanelOpen(windowId)) {
+				updateCurrentActiveTab(windowId);
+			}
+		});
+	}
 }
+
+// Initialize the tab listeners
+setupTabListeners();
