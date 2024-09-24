@@ -55,7 +55,6 @@ async function initializeExtension() {
 				return false;
 			}
 			await ensureContentScriptLoaded();
-			await refreshFields(true);
 		} else {
 			showError('No active tab found. Please try reloading the extension.');
 			return false;
@@ -581,7 +580,6 @@ document.addEventListener('DOMContentLoaded', async function() {
 		// Continue with the rest of the initialization process
 		initializeIcons();
 
-		const vaultContainer = document.getElementById('vault-container');
 		const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement | null;
 		const templateContainer = document.getElementById('template-container');
 		const templateDropdown = document.getElementById('template-select') as HTMLSelectElement | null;
@@ -629,61 +627,6 @@ document.addEventListener('DOMContentLoaded', async function() {
 			if (!currentTab.url || currentTab.url.startsWith('chrome-extension://') || currentTab.url.startsWith('chrome://') || currentTab.url.startsWith('about:') || currentTab.url.startsWith('file://')) {
 				showError('This page cannot be clipped.');
 				return;
-			}
-
-			const currentUrl = currentTab.url;
-
-			if (currentTab.id) {
-				try {
-					let extractedData = null;
-					let retryCount = 0;
-					const maxRetries = 10;
-					const retryDelay = 250; //ms
-
-					while (!extractedData && retryCount < maxRetries) {
-						extractedData = await extractPageContent(currentTab.id);
-						if (!extractedData) {
-							retryCount++;
-							await new Promise(resolve => setTimeout(resolve, retryDelay));
-						}
-					}
-
-					if (extractedData) {
-						try {
-							const initializedContent = await initializePageContent(extractedData.content, extractedData.selectedHtml, extractedData.extractedContent, currentUrl, extractedData.schemaOrgData, extractedData.fullHtml);
-							if (initializedContent) {
-								currentTemplate = findMatchingTemplate(currentUrl, templates, extractedData.schemaOrgData) || templates[0];
-
-								if (currentTemplate) {
-									templateDropdown.value = currentTemplate.name;
-								}
-
-								await initializeTemplateFields(currentTemplate, initializedContent.currentVariables, initializedContent.noteName, extractedData.schemaOrgData);
-
-								document.querySelector('.clipper')?.classList.remove('hidden');
-								setupMetadataToggle();
-							} else {
-								showError('Unable to initialize page content. Please try reloading the page.');
-							}
-						} catch (error: unknown) {
-							console.error('Error initializing page content:', error);
-							if (error instanceof Error) {
-								showError(`Error initializing page content: ${error.message}`);
-							} else {
-								showError('Error initializing page content: Unknown error');
-							}
-						}
-					} else {
-						showError('Unable to get page content. Please try reloading the page.');
-					}
-				} catch (error: unknown) {
-					console.error('Error in popup initialization:', error);
-					if (error instanceof Error) {
-						showError(`An error occurred: ${error.message}`);
-					} else {
-						showError('An unexpected error occurred');
-					}
-				}
 			}
 
 			// Only show template selector if there are multiple templates
