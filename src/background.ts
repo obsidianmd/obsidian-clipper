@@ -1,12 +1,6 @@
 import browser from './utils/browser-polyfill';
-
-function isValidUrl(url: string): boolean {
-	return url.startsWith('http://') || url.startsWith('https://');
-}
-
-function isBlankPage(url: string): boolean {
-	return url === 'about:blank' || url === 'chrome://newtab/' || url === 'edge://newtab/';
-}
+import { ensureContentScriptLoaded } from './utils/content-script-utils';
+import { detectBrowser } from './utils/browser-detection';
 
 let sidePanelOpenWindows: Set<number> = new Set();
 let currentActiveTabId: number | undefined;
@@ -55,17 +49,21 @@ browser.commands.onCommand.addListener((command) => {
 	}
 });
 
-function createContextMenu() {
+async function createContextMenu() {
 	browser.contextMenus.create({
 		id: "open-obsidian-clipper",
 		title: "Clip this page",
 		contexts: ["page", "selection"]
 	});
-	browser.contextMenus.create({
-		id: 'open-side-panel',
-		title: 'Open side panel',
-		contexts: ["page", "selection"]
-	});
+
+	const browserType = await detectBrowser();
+	if (browserType === 'chrome') {
+		browser.contextMenus.create({
+			id: 'open-side-panel',
+			title: 'Open side panel',
+			contexts: ["page", "selection"]
+		});
+	}
 }
 
 browser.contextMenus.onClicked.addListener((info, tab) => {
@@ -158,37 +156,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 	return true;
 });
 
-function ensureContentScriptLoaded(tabId: number) {
-	return new Promise<void>((resolve, reject) => {
-		chrome.tabs.get(tabId, (tab) => {
-			if (chrome.runtime.lastError) {
-				reject(new Error(chrome.runtime.lastError.message));
-				return;
-			}
-			
-			if (!tab.url || !isValidUrl(tab.url)) {
-				reject(new Error('Invalid URL'));
-				return;
-			}
+function isValidUrl(url: string): boolean {
+	return url.startsWith('http://') || url.startsWith('https://');
+}
 
-			chrome.tabs.sendMessage(tabId, { action: "ping" }, response => {
-				if (chrome.runtime.lastError) {
-					// Content script is not loaded, inject it
-					chrome.scripting.executeScript({
-						target: { tabId: tabId },
-						files: ['content.js']
-					}, () => {
-						if (chrome.runtime.lastError) {
-							reject(new Error(`Failed to inject content script: ${chrome.runtime.lastError.message}`));
-						} else {
-							// Wait a bit to ensure the script is fully loaded
-							setTimeout(resolve, 100);
-						}
-					});
-				} else {
-					resolve();
-				}
-			});
-		});
-	});
+function isBlankPage(url: string): boolean {
+	return url === 'about:blank' || url === 'chrome://newtab/' || url === 'edge://newtab/';
 }

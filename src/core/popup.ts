@@ -15,6 +15,7 @@ import { initializeInterpreter, handleInterpreterUI, collectPromptVariables } fr
 import { adjustNoteNameHeight } from '../utils/ui-utils';
 import { debugLog } from '../utils/debug';
 import { showVariables, initializeVariablesPanel, updateVariablesPanel } from '../managers/inspect-variables';
+import { ensureContentScriptLoaded } from '../utils/content-script-utils';
 
 let loadedSettings: Settings;
 let currentTemplate: Template | null = null;
@@ -51,7 +52,7 @@ async function initializeExtension() {
 			if (!isValidUrl(tab.url)) {
 				return false;
 			}
-			await ensureContentScriptLoaded();
+			await ensureContentScriptLoaded(currentTabId);
 			await refreshFields();
 		} else {
 			return false;
@@ -227,18 +228,6 @@ async function initializeUI() {
 		window.addEventListener('unload', () => {
 			browser.runtime.sendMessage({ action: "sidePanelClosed" });
 		});
-	}
-}
-
-async function ensureContentScriptLoaded() {
-	const tabs = await browser.tabs.query({active: true, currentWindow: true});
-	if (tabs[0]?.id) {
-		try {
-			await browser.runtime.sendMessage({ action: "ensureContentScriptLoaded", tabId: tabs[0].id });
-		} catch (error) {
-			console.error('Error ensuring content script is loaded:', error);
-			throw error;
-		}
 	}
 }
 

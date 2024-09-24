@@ -5,17 +5,6 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const ZipPlugin = require('zip-webpack-plugin');
 const package = require('./package.json');
 
-const firefoxConfig = {
-	entry: {
-		'background-firefox': './src/background-firefox.ts',
-	},
-};
-const safariConfig = {
-	entry: {
-		'background-safari': './src/background-safari.ts',
-	},
-};
-
 // Remove .DS_Store files
 function removeDSStore(dir) {
 	const files = fs.readdirSync(dir);
@@ -43,8 +32,6 @@ module.exports = (env, argv) => {
 			content: './src/content.ts',
 			background: './src/background.ts',
 			styles: './src/style.scss',
-			...(isFirefox ? firefoxConfig.entry : {}),
-			...(isSafari ? safariConfig.entry : {}),
 		},
 		output: {
 			path: path.resolve(__dirname, outputDir),
