@@ -53,7 +53,6 @@ async function initializeExtension(tabId: number) {
 		await ensureContentScriptLoaded(tabId);
 		await refreshFields(tabId);
 
-		// Move template loading here
 		await loadAndSetupTemplates();
 
 		// Setup message listeners
@@ -120,7 +119,7 @@ function setupMessageListeners() {
 					refreshFields(currentTabId); // Force template check when URL changes
 				}
 			} else if (request.isBlankPage) {
-				showError('This page cannot be clipped. Please navigate to a web page.');
+				showError('This page cannot be clipped.');
 			} else {
 				showError('This page cannot be clipped. Only http and https URLs are supported.');
 			}
@@ -129,6 +128,15 @@ function setupMessageListeners() {
 }
 
 document.addEventListener('DOMContentLoaded', async function() {
+	initializeIcons();
+	const refreshButton = document.getElementById('refresh-pane');
+	if (refreshButton) {
+		refreshButton.addEventListener('click', (e) => {
+			e.preventDefault();
+			refreshPopup();
+		});
+	}
+
 	const tabs = await browser.tabs.query({active: true, currentWindow: true});
 	const currentTab = tabs[0];
 	currentTabId = currentTab?.id;
@@ -137,12 +145,11 @@ document.addEventListener('DOMContentLoaded', async function() {
 		try {		
 			const initialized = await initializeExtension(currentTabId);
 			if (!initialized) {
-				showError('Failed to initialize the extension. Please try reloading the page.');
+				showError('This page cannot be clipped.');
 				return;
 			}
 
 			// DOM-dependent initializations
-			initializeIcons();
 			updateVaultDropdown(loadedSettings.vaults);
 			populateTemplateDropdown();
 			setupEventListeners(currentTabId);
@@ -161,10 +168,10 @@ document.addEventListener('DOMContentLoaded', async function() {
 			}
 		} catch (error) {
 			console.error('Error initializing popup:', error);
-			showError('Failed to initialize the extension. Please try reloading the page.');
+			showError('Please try reloading the page.');
 		}
 	} else {
-		showError('Failed to get the current tab ID. Please try reloading the page.');
+		showError('Please try reloading the page.');
 	}
 });
 
@@ -686,4 +693,8 @@ function updateVaultDropdown(vaults: string[]) {
 	} else {
 		vaultContainer.style.display = 'none';
 	}
+}
+
+function refreshPopup() {
+	window.location.reload();
 }

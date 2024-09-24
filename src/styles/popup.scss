@@ -42,16 +42,6 @@
 	::selection {
 		background-color: var(--text-selection);
 	}
-	#open-settings {
-		z-index: 10;
-		position: fixed;
-		top: 6px;
-		right: 4px;
-		border-radius: var(--radius-s);
-		user-select: none;
-		-webkit-user-select: none;
-		background-color: transparent;
-	}
 	.error-message {
 		margin: 0;
 		padding: 24px 12px;
@@ -84,35 +74,10 @@
 .clipper {
 	display: flex;
 	flex-direction: column;
-	padding-top: 5px;
 	height: 100%;
 	max-height: 100%;
 	overflow: hidden;
 
-	#template-select {
-		appearance: none;
-		border-radius: 0;
-		border: none;
-		padding: 6px 8px 2px 12px;
-		width: calc(100% - 56px);
-		margin-inline-start: 0;
-		margin-inline-end: auto;
-		font-weight: 500;
-		color: var(--text-muted);
-		cursor: pointer;
-		&:hover {
-			color: var(--text-normal);
-		}
-		&:active,
-		&:focus {
-			color: var(--text-normal);
-			box-shadow: none;
-		}
-	}
-
-	#template-container.hidden ~ #note-name-field {
-		padding: 4px 58px 10px 12px;
-	}
 	#note-name-field {
 		border: none;
 		border-radius: 0;
@@ -260,6 +225,60 @@
 	}
 }
 
-#show-variables {
+#popup-header {
 	display: flex;
+	flex-direction: row;
+	padding-top: 4px;
+}
+
+#template-container {
+	flex-grow: 1;
+	select {
+		width: 100%;
+	}
+}
+
+#template-container.hidden ~ #note-name-field {
+	padding: 4px 58px 10px 12px;
+}
+
+#template-select {
+	appearance: none;
+	border-radius: 0;
+	border: none;
+	padding: 6px 8px 2px 12px;
+	width: calc(100% - 56px);
+	margin-inline-start: 0;
+	margin-inline-end: auto;
+	font-weight: 500;
+	color: var(--text-muted);
+	cursor: pointer;
+	&:hover {
+		color: var(--text-normal);
+	}
+	&:active,
+	&:focus {
+		color: var(--text-normal);
+		box-shadow: none;
+	}
+}
+
+#popup-actions {
+	padding-right: 4px;
+	z-index: 100;
+	align-self: flex-end;
+	margin-left: auto;
+	user-select: none;
+	-webkit-user-select: none;
+	background-color: var(--background-primary);
+	display: flex;
+	flex-direction: row;
+	gap: 2px;
+	.clickable-icon {
+		width: 24px;
+		border-radius: var(--radius-s);
+		user-select: none;
+		-webkit-user-select: none;
+		background-color: transparent;
+	}
 }

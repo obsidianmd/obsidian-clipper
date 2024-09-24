@@ -7,19 +7,24 @@
 		<script src="browser-polyfill.min.js"></script>
 	</head>
 	<body id="popup-container">
-		<a href="#" id="open-settings" class="clickable-icon" aria-label="Settings">
-			<i data-lucide="settings"></i>
-		</a>
-		<a href="#" id="show-variables" class="clickable-icon" aria-label="Show variables">
-			<i data-lucide="ellipsis"></i>
-		</a>
-		<p class="error-message" style="display: none;"></p>
-		<div class="clipper">
+		<div id="popup-header">
 			<div id="template-container">
 				<select id="template-select">
 					<option value=""></option>
 				</select>
 			</div>
+			<div id="popup-actions">
+				<a href="#" id="show-variables" class="clickable-icon" aria-label="Show variables">
+					<i data-lucide="ellipsis"></i>
+				</a>
+				<a href="#" id="open-settings" class="clickable-icon" aria-label="Settings">
+					<i data-lucide="settings"></i>
+				</a>		
+			</div>
+		</div>
+		<p class="error-message" style="display: none;"></p>
+		<div class="clipper">
+			
 			<textarea id="note-name-field" type="text" placeholder="Note name" rows="1"></textarea>
 			<div class="metadata-properties-header">
 				Properties
