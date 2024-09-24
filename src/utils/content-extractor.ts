@@ -28,15 +28,27 @@ async function processSelector(tabId: number, match: string, currentUrl: string)
 
 	const [, selectorType, selector, filtersString] = matches;
 	const extractHtml = selectorType === 'selectorHtml';
-	const { content } = await extractContentBySelector(tabId, selector, extractHtml);
+
+	try {
+		const response = await browser.tabs.sendMessage(tabId, { 
+			action: "extractContent", 
+			selector: selector,
+			extractHtml: extractHtml
+		});
+
+		let content = response ? response.content : '';
 	
-	// Convert content to string if it's an array
-	const contentString = Array.isArray(content) ? JSON.stringify(content) : content;
+		// Convert content to string if it's an array
+		const contentString = Array.isArray(content) ? JSON.stringify(content) : content;
 	
-	debugLog('ContentExtractor', 'Applying filters:', { selector, filterString: filtersString });
-	const filteredContent = applyFilters(contentString, filtersString, currentUrl);
+		debugLog('ContentExtractor', 'Applying filters:', { selector, filterString: filtersString });
+		const filteredContent = applyFilters(contentString, filtersString, currentUrl);
 	
-	return filteredContent;
+		return filteredContent;
+	} catch (error) {
+		console.error('Error extracting content by selector:', error);
+		return '';
+	}
 }
 
 async function processSchema(match: string, variables: { [key: string]: string }, currentUrl: string): Promise<string> {
@@ -171,41 +183,6 @@ export function getMetaContent(doc: Document, attr: string, value: string): stri
 	const element = Array.from(doc.querySelectorAll(selector))
 		.find(el => el.getAttribute(attr)?.toLowerCase() === value.toLowerCase());
 	return element ? element.getAttribute("content")?.trim() ?? "" : "";
-}
-
-export async function extractContentBySelector(tabId: number, selector: string, extractHtml: boolean = false): Promise<{ content: string; schemaOrgData: any }> {
-	const attributeMatch = selector.match(/:([a-zA-Z-]+)$/);
-	let baseSelector = selector;
-	let attribute: string | undefined;
-
-	if (attributeMatch) {
-		attribute = attributeMatch[1];
-		baseSelector = selector.slice(0, -attribute.length - 1);
-	}
-
-	try {
-		console.log('Extracting page content for tab:', tabId);
-		const response = await browser.tabs.sendMessage(tabId, { 
-			action: "extractContent", 
-			selector: baseSelector, 
-			attribute: attribute,
-			extractHtml: extractHtml
-		});
-		let content = response ? response.content : '';
-	
-		// Ensure content is always a string
-		if (Array.isArray(content)) {
-			content = JSON.stringify(content);
-		}
-	
-		return {
-			content: content,
-			schemaOrgData: response ? response.schemaOrgData : null
-		};
-	} catch (error) {
-		console.error('Error extracting content by selector:', error);
-		return { content: '', schemaOrgData: null };
-	}
 }
 
 export async function initializePageContent(content: string, selectedHtml: string, extractedContent: ExtractedContent, currentUrl: string, schemaOrgData: any, fullHtml: string) {
