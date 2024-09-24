@@ -322,8 +322,22 @@
 	}
 }
 
+:root {
+	--settings-section-height-mobile: calc(100vh - var(--safe-area-inset-bottom) - 48px);
+}
+
+@supports (height: 100dvh) {
+	.is-mobile-safari {
+		--settings-section-height-mobile: calc(100dvh - 48px);
+	}
+}
+
 @media (max-width: 768px) {
 	#settings {
+		#settings-container {
+			min-height: 100vh;
+			overflow: hidden;
+		}
 		#navbar {
 			padding: 0 24px;
 			width: 100%;
@@ -338,10 +352,12 @@
 		}
 		.settings-section {
 			margin: 0;
-			padding: 24px;
+			padding: 24px 24px 48px;
+			height: var(--settings-section-height-mobile);
 			overflow: scroll;
 			-webkit-overflow-scrolling: touch;
 		}
+
 		#content {
 			display: flex;
 			flex-direction: column;

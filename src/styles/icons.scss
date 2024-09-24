@@ -1,17 +1,17 @@
 svg.lucide-icon {
 	stroke-width: 1.75px;
-	width: 16px;
-	height: 16px;
+	width: var(--icon-size);
+	height: var(--icon-size);
 }
 .metadata-property-icon {
 	margin-inline-start: 4px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	min-width: 16px;
+	min-width: var(--icon-size);
 	color: var(--text-muted);
 	svg {
-		width: 16px;
-		height: 16px;
+		width: var(--icon-size);
+		height: var(--icon-size);
 	}
 }

@@ -229,6 +229,7 @@
 	display: flex;
 	flex-direction: row;
 	padding-top: 4px;
+	align-items: center;
 }
 
 #template-container {
@@ -266,16 +267,15 @@
 #popup-actions {
 	padding-right: 4px;
 	z-index: 100;
-	align-self: flex-end;
+	justify-self: flex-end;
+	align-items: center;
 	margin-left: auto;
 	user-select: none;
 	-webkit-user-select: none;
 	background-color: var(--background-primary);
 	display: flex;
 	flex-direction: row;
-	gap: 2px;
 	.clickable-icon {
-		width: 24px;
 		border-radius: var(--radius-s);
 		user-select: none;
 		-webkit-user-select: none;

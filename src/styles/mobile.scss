@@ -1,0 +1,25 @@
+.is-mobile-safari {
+	font-size: 18px;
+}
+.is-firefox-mobile {
+	font-size: 20px;
+}
+
+.is-mobile-safari,
+.is-firefox-mobile {
+	height: 100%;
+	--icon-size: 1rem;
+	--input-shadow: none;
+	--input-shadow-hover: none;
+
+	button {
+		--input-height: 2.5rem;
+		border-radius: 2rem;
+		border: 0;
+		box-shadow: none;
+	}
+
+	a, button, label, input, textarea, select {
+		-webkit-tap-highlight-color: transparent;
+	}
+}
