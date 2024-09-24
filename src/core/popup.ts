@@ -138,7 +138,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 		// DOM-dependent initializations
 		initializeIcons();
 		updateVaultDropdown(loadedSettings.vaults);
-		updateTemplateDropdown();
+		populateTemplateDropdown();
 		setupEventListeners();
 		await initializeUI();
 		setupMetadataToggle();
@@ -461,6 +461,20 @@ function updateTemplateDropdown() {
 	}
 }
 
+function populateTemplateDropdown() {
+	const templateDropdown = document.getElementById('template-select') as HTMLSelectElement;
+	if (templateDropdown && currentTemplate) {
+		templateDropdown.innerHTML = '';
+		templates.forEach((template: Template) => {
+			const option = document.createElement('option');
+			option.value = template.name;
+			option.textContent = template.name;
+			templateDropdown.appendChild(option);
+		});
+		templateDropdown.value = currentTemplate.name;
+	}
+}
+
 async function initializeTemplateFields(template: Template | null, variables: { [key: string]: string }, noteName?: string, schemaOrgData?: any) {
 	if (!template) {
 		logError('No template selected');
@@ -557,8 +571,6 @@ async function initializeTemplateFields(template: Template | null, variables: { 
 			if (matchingPattern) {
 				console.log(`Matched template trigger: ${matchingPattern}`);
 			}
-		} else {
-			console.log('No template triggers defined for this template');
 		}
 	}
 
