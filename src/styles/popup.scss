@@ -245,8 +245,9 @@
 }
 
 .has-error {
+	#show-variables,
 	#template-select {
-		opacity: 0;
+		display: none;
 	}
 }
 

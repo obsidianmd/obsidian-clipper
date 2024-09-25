@@ -136,6 +136,17 @@ document.addEventListener('DOMContentLoaded', async function() {
 			refreshPopup();
 		});
 	}
+	const settingsButton = document.getElementById('open-settings');
+	if (settingsButton) {
+		settingsButton.addEventListener('click', async function() {
+			browser.runtime.openOptionsPage();
+			
+			const browserType = await detectBrowser();
+			if (browserType === 'firefox-mobile') {
+				setTimeout(() => window.close(), 50);
+			}
+		});
+	}
 
 	const tabs = await browser.tabs.query({active: true, currentWindow: true});
 	const currentTab = tabs[0];
@@ -208,18 +219,6 @@ async function initializeUI() {
 		clipButton.focus();
 	} else {
 		console.warn('Clip button not found');
-	}
-
-	const settingsButton = document.getElementById('open-settings');
-	if (settingsButton) {
-		settingsButton.addEventListener('click', async function() {
-			browser.runtime.openOptionsPage();
-			
-			const browserType = await detectBrowser();
-			if (browserType === 'firefox-mobile') {
-				setTimeout(() => window.close(), 50);
-			}
-		});
 	}
 
 	const showMoreActionsButton = document.getElementById('show-variables') as HTMLElement;
