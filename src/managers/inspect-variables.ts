@@ -35,16 +35,19 @@ export async function showVariables(isUpdate: boolean = false) {
 		if (!isUpdate) {
 			variablesPanel.innerHTML = `
 				<div class="variables-header">
-					<h3>Page variables</h3>
+  					<div class="variables-header-title">
+						<h3>Page variables</h3>
+						<span class="close-panel clickable-icon" aria-label="Close">
+							<i data-lucide="x"></i>
+						</span>
+					</div>
 					<input type="text" id="variables-search" placeholder="Search variables...">
-					<span class="close-panel clickable-icon" aria-label="Close">
-						<i data-lucide="x"></i>
-					</span>
 				</div>
 				<div class="variable-list">${formattedVariables}</div>
 			`;
 
 			variablesPanel.classList.add('show');
+			document.body.classList.add('variables-panel-open');
 			isPanelOpen = true;
 			initializeIcons();
 
@@ -54,14 +57,21 @@ export async function showVariables(isUpdate: boolean = false) {
 				searchInput.addEventListener('input', debounce(handleVariableSearch, 300));
 			}
 
-			// Add click event listener to close panel
+			// Keeping this for now, because we will probably add more actions to the ... menu later
 			const closePanel = variablesPanel.querySelector('.close-panel') as HTMLElement;
 			if (closePanel) {
 				closePanel.addEventListener('click', function() {
 					variablesPanel.classList.remove('show');
+					document.body.classList.remove('variables-panel-open');
 					isPanelOpen = false;
 					currentSearchTerm = '';
 				});
+			}
+			
+			// Add click event listener to close panel
+			const showMoreActionsButton = document.getElementById('show-variables');
+			if (showMoreActionsButton) {
+				showMoreActionsButton.addEventListener('click', closeVariablesPanel);
 			}
 		} else {
 			const variableList = variablesPanel.querySelector('.variable-list') as HTMLElement;
@@ -73,6 +83,20 @@ export async function showVariables(isUpdate: boolean = false) {
 		handleVariableSearch();
 	} else {
 		console.log('No variables available to display');
+	}
+}
+
+function closeVariablesPanel(e: Event) {
+	e.preventDefault();
+	variablesPanel.classList.remove('show');
+	document.body.classList.remove('variables-panel-open');
+	isPanelOpen = false;
+	currentSearchTerm = '';
+
+	// Remove the event listener when closing the panel
+	const showMoreActionsButton = document.getElementById('show-variables');
+	if (showMoreActionsButton) {
+		showMoreActionsButton.removeEventListener('click', closeVariablesPanel);
 	}
 }
 

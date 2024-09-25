@@ -288,6 +288,7 @@
 	background-color: var(--background-primary);
 	display: flex;
 	flex-direction: row;
+	gap: 2px;
 	.clickable-icon {
 		border-radius: var(--radius-s);
 		user-select: none;
