@@ -11,7 +11,5 @@ builds/
 
 # Xcode
 *.xcuserstate
-project.xcworkspace/
-xcuserdata/
 
 .cursorrules
