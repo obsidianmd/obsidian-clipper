@@ -31,7 +31,7 @@
 
 	h3 {
 		margin: 0;
-		padding: 0;
+		padding: 2px 0 0 0;
 		border: none;
 		user-select: none;
 		-webkit-user-select: none;
@@ -39,7 +39,7 @@
 	}
 
 	.variables-header {
-		padding: 0px 12px 0px;
+		padding: 2px 12px 0px;
 		border-bottom: 1px solid var(--divider-color);
 		display: flex;
 		flex-direction: column;
@@ -51,7 +51,6 @@
 		display: flex;
 		flex-direction: row;
 		justify-content: space-between;
-		align-items: center;
 	}
 
 	#variables-search {
