@@ -6,18 +6,16 @@
 	
 }
 
-.resizing { 
-	.clipper .clipper-footer {
-		
-		will-change: top;
-	}
+.is-mobile-safari {
+	--bottom: -200px;
+	--transition: bottom 0.2s ease-in-out;
 }
 
-.is-mobile-safari {
+.resizing { 
 	.clipper .clipper-footer {
-		position: fixed;
-		will-change: top;
-		top: calc((var(--vh) * 100) - 170px);
+		opacity: 0;
+		bottom: var(--bottom);
+		transition: var(--transition);
 	}
 }
 
@@ -33,6 +31,15 @@
 		border-radius: 2rem;
 		border: 0;
 		box-shadow: none;
+	}
+	.clipper {
+		max-height: 100dvh;
+	}
+	.clipper .clipper-footer {
+		will-change: bottom;
+		position: absolute;
+		bottom: 0;
+		transition: bottom 0.2s ease-in-out;
 	}
 
 	a, button, label, input, textarea, select {

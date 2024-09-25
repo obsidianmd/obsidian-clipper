@@ -144,7 +144,7 @@ function checkViewportHeight() {
 		clearTimeout(resizeTimer);
 		resizeTimer = setTimeout(() => {
 			document.body.classList.remove('resizing');
-		}, 2);  // Adjust debounce time as needed
+		}, 300);  // Adjust debounce time as needed
 
 		// Update the last known viewport height
 		lastViewportHeight = currentViewportHeight;
