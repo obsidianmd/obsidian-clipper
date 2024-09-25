@@ -43,8 +43,8 @@
 		flex-direction: row;
 		justify-content: space-between;
 		align-items: center;
-		padding: 0 max(6%,24px);
-		height: 48px;
+		padding: 0 max(6%,20px);
+		height: 40px;
 		border-bottom: 1px solid var(--background-modifier-border);
 		#navbar-title {
 			font-weight: 600;
@@ -72,9 +72,9 @@
 
 	.hamburger-icon {
 		display: block;
-		width: 24px;
+		width: 20px;
 		height: 2px;
-		background-color: var(--text-normal);
+		background-color: var(--text-muted);
 		position: relative;
 
 		&::before,
@@ -82,9 +82,9 @@
 			content: '';
 			left: 0;
 			position: absolute;
-			width: 24px;
+			width: 20px;
 			height: 2px;
-			background-color: var(--text-normal);
+			background-color: var(--text-muted);
 			transition: transform var(--duration-fast) ease, top var(--duration-fast) ease;
 		}
 		&::before {
