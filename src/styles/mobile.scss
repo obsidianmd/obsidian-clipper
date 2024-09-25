@@ -1,8 +1,22 @@
-.is-mobile-safari {
-	font-size: 18px;
-}
 .is-firefox-mobile {
 	font-size: 20px;
+}
+.is-mobile-safari {
+	font-size: 16px;
+	
+}
+
+.is-mobile-safari {
+	--bottom: -200px;
+	--transition: bottom 0.2s ease-in-out;
+}
+
+.resizing { 
+	.clipper .clipper-footer {
+		opacity: 0;
+		bottom: var(--bottom);
+		transition: var(--transition);
+	}
 }
 
 .is-mobile-safari,
@@ -17,6 +31,15 @@
 		border-radius: 2rem;
 		border: 0;
 		box-shadow: none;
+	}
+	.clipper {
+		max-height: 100dvh;
+	}
+	.clipper .clipper-footer {
+		will-change: bottom;
+		position: absolute;
+		bottom: 0;
+		transition: bottom 0.2s ease-in-out;
 	}
 
 	a, button, label, input, textarea, select {

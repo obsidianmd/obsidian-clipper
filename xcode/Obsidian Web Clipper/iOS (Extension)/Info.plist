@@ -9,5 +9,7 @@
 		<key>NSExtensionPrincipalClass</key>
 		<string>$(PRODUCT_MODULE_NAME).SafariWebExtensionHandler</string>
 	</dict>
+	<key>SFSafariCorrespondingMacOSExtensionBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 </dict>
 </plist>
