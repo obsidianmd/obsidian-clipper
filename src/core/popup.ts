@@ -254,11 +254,18 @@ function showError(message: string): void {
 		errorMessage.style.display = 'flex';
 		clipper.style.display = 'none';
 
-		// Ensure the settings icon is still visible when showing an error
-		const settingsIcon = document.getElementById('open-settings') as HTMLElement;
-		if (settingsIcon) {
-			settingsIcon.style.display = 'flex';
-		}
+		document.body.classList.add('has-error');
+	}
+}
+function clearError(): void {
+	const errorMessage = document.querySelector('.error-message') as HTMLElement;
+	const clipper = document.querySelector('.clipper') as HTMLElement;
+
+	if (errorMessage && clipper) {
+		errorMessage.style.display = 'none';
+		clipper.style.display = 'block';
+
+		document.body.classList.remove('has-error');
 	}
 }
 

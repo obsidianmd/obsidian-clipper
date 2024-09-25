@@ -48,6 +48,8 @@
 	--text-highlight-bg-rgb: 255, 208, 0;
 	--text-highlight-bg: rgba(var(--text-highlight-bg-rgb), .4);
 
+	--duration-fast: 0.15s;
+
 	--font-ui-smaller: 0.8125rem;
 	--font-ui-small: 0.875rem;
 	--font-ui-medium: 0.9375rem;
@@ -150,6 +152,8 @@
 
 @media (prefers-color-scheme: dark) {
 	:root {
+		--background-modifier-hover: rgba(var(--mono-rgb-100), .15);
+
 		--color-accent-hsl:
 				var(--accent-h),
 				var(--accent-s),

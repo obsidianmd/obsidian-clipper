@@ -85,7 +85,7 @@
 			width: 24px;
 			height: 2px;
 			background-color: var(--text-normal);
-			transition: transform 0.15s ease, top 0.15s ease;
+			transition: transform var(--duration-fast) ease, top var(--duration-fast) ease;
 		}
 		&::before {
 			top: -6px;
