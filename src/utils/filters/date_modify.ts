@@ -1,6 +1,12 @@
 import dayjs from 'dayjs';
+import isoWeek from "dayjs/plugin/isoWeek";
+import weekOfYear from "dayjs/plugin/weekOfYear";
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 import advancedFormat from 'dayjs/plugin/advancedFormat';
 
+dayjs.extend(customParseFormat);
+dayjs.extend(isoWeek);
+dayjs.extend(weekOfYear);
 dayjs.extend(advancedFormat);
 
 export const date_modify = (str: string, param?: string): string => {

@@ -268,7 +268,7 @@ export async function initializePageContent(content: string, selectedHtml: strin
 			'{{author}}': authorName,
 			'{{content}}': markdownBody,
 			'{{contentHtml}}': content,
-			'{{date}}': dayjs().format('YYYY-MM-DD'),
+			'{{date}}': dayjs().format('YYYY-MM-DDTHH:mm:ssZ'),
 			'{{time}}': dayjs().format('YYYY-MM-DDTHH:mm:ssZ'),
 			'{{description}}': description,
 			'{{domain}}': domain,
