@@ -261,7 +261,6 @@
 	color: var(--text-muted);
 	height: 1.625rem;
 	cursor: default;
-	transition: background-color var(--duration-fast) ease-in-out;
 	&:hover {
 		color: var(--text-normal);
 		background-color: var(--background-modifier-hover);
@@ -293,7 +292,6 @@
 		user-select: none;
 		-webkit-user-select: none;
 		background-color: transparent;
-		transition: background-color var(--duration-fast) ease-in-out;
 		cursor: default;
 		&:hover {
 			background-color: var(--background-modifier-hover);

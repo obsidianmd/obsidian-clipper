@@ -479,8 +479,13 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 	}
 
 	currentVariables = variables;
-	const templateProperties = document.querySelector('.metadata-properties') as HTMLElement;
-	templateProperties.innerHTML = '';
+	const existingTemplateProperties = document.querySelector('.metadata-properties') as HTMLElement;
+	
+	// Create a new off-screen element
+	const newTemplateProperties = createElementWithClass('div', 'metadata-properties');
+	newTemplateProperties.style.position = 'absolute';
+	newTemplateProperties.style.left = '-9999px';
+	document.body.appendChild(newTemplateProperties);
 
 	if (!Array.isArray(template.properties)) {
 		logError('Template properties are not an array');
@@ -519,9 +524,18 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 			<label for="${property.name}">${property.name}</label>
 			<input id="${property.name}" type="text" value="${escapeHtml(value)}" data-type="${property.type}" data-template-value="${escapeHtml(property.value)}" />
 		`;
-		templateProperties.appendChild(propertyDiv);
+		newTemplateProperties.appendChild(propertyDiv);
 	}
-	
+
+	// Replace the existing element with the new one
+	if (existingTemplateProperties && existingTemplateProperties.parentNode) {
+		existingTemplateProperties.parentNode.replaceChild(newTemplateProperties, existingTemplateProperties);
+	}
+
+	// Remove the temporary styling
+	newTemplateProperties.style.position = '';
+	newTemplateProperties.style.left = '';
+
 	const noteNameField = document.getElementById('note-name-field') as HTMLTextAreaElement;
 	if (noteNameField) {
 		let formattedNoteName = await replaceVariables(currentTabId!, template.noteNameFormat, variables, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
