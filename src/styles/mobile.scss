@@ -1,8 +1,24 @@
-.is-mobile-safari {
-	font-size: 18px;
-}
 .is-firefox-mobile {
 	font-size: 20px;
+}
+.is-mobile-safari {
+	font-size: 16px;
+	
+}
+
+.resizing { 
+	.clipper .clipper-footer {
+		
+		will-change: top;
+	}
+}
+
+.is-mobile-safari {
+	.clipper .clipper-footer {
+		position: fixed;
+		will-change: top;
+		top: calc((var(--vh) * 100) - 170px);
+	}
 }
 
 .is-mobile-safari,
