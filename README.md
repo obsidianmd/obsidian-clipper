@@ -270,3 +270,13 @@ This will create two directories:
 1. Open Firefox and navigate to `about:debugging#/runtime/this-firefox`
 2. Click **Load Temporary Add-on**
 3. Navigate to the `dist_firefox` directory and select the `manifest.json` file
+
+## Third-party libraries
+
+- [webextension-polyfill](https://github.com/mozilla/webextension-polyfill) for browser compatibility
+- [readability](https://github.com/mozilla/readability) for content extraction
+- [turndown](https://github.com/mixmark-io/turndown) for HTML to Markdown conversion
+- [dayjs](https://github.com/iamkun/dayjs) for date parsing and formatting
+- [lz-string](https://github.com/pieroxy/lz-string) for string compression
+- [lucide](https://github.com/lucide-icons/lucide) for icons
+- [mathml-to-latex](https://github.com/asnunes/mathml-to-latex) for MathML to LaTeX conversion
