@@ -40,28 +40,28 @@ export async function addBrowserClassToHtml() {
 	// Add the appropriate class based on the detected browser
 	switch (browser) {
 		case 'firefox-mobile':
-			htmlElement.classList.add('is-firefox-mobile', 'is-firefox');
+			htmlElement.classList.add('is-mobile', 'is-firefox-mobile', 'is-firefox');
 			break;
 		case 'firefox':
 			htmlElement.classList.add('is-firefox');
 			break;
 		case 'edge':
-			htmlElement.classList.add('is-edge', 'is-chromium');
+			htmlElement.classList.add('is-chromium', 'is-edge');
 			break;
 		case 'chrome':
-			htmlElement.classList.add('is-chrome', 'is-chromium');
+			htmlElement.classList.add('is-chromium', 'is-chrome');
 			break;
 		case 'brave':
-			htmlElement.classList.add('is-brave', 'is-chromium');
+			htmlElement.classList.add('is-chromium','is-brave');
 			break;
 		case 'safari':
 			htmlElement.classList.add('is-safari');
 			break;
 		case 'mobile-safari':
-			htmlElement.classList.add('is-mobile-safari', 'is-safari', 'is-ios');
+			htmlElement.classList.add('is-mobile', 'is-mobile-safari', 'is-safari', 'is-ios');
 			break;
 		case 'ipad-os':
-			htmlElement.classList.add('is-ipad-os', 'is-safari');
+			htmlElement.classList.add('is-mobile', 'is-ipad-os', 'is-safari');
 			break;
 		default:
 			// For 'other' browsers, we don't add any class

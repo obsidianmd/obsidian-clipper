@@ -1,3 +1,9 @@
+@media (max-width: 768px) {
+	.mh {
+		display: none;
+	}
+}
+
 .is-firefox-mobile {
 	font-size: 20px;
 }
@@ -6,7 +12,7 @@
 	
 }
 
-.is-mobile-safari {
+.is-mobile {
 	--bottom: -200px;
 	--transition: bottom 0.2s ease-in-out;
 }
@@ -19,8 +25,7 @@
 	}
 }
 
-.is-mobile-safari,
-.is-firefox-mobile {
+.is-mobile {
 	height: 100%;
 	--icon-size: 1rem;
 	--input-shadow: none;
