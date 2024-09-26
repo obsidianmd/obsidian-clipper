@@ -563,6 +563,8 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 	// Replace the existing element with the new one
 	if (existingTemplateProperties && existingTemplateProperties.parentNode) {
 		existingTemplateProperties.parentNode.replaceChild(newTemplateProperties, existingTemplateProperties);
+		// Remove the old element from the DOM
+		existingTemplateProperties.remove();
 	}
 
 	// Remove the temporary styling

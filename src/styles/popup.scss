@@ -225,6 +225,10 @@
 	}
 }
 
+.clipper ~ .metadata-properties {
+	display: none;
+}
+
 #popup-header {
 	display: flex;
 	flex-direction: row;
