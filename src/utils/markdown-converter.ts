@@ -75,7 +75,7 @@ export function createMarkdownContent(content: string, url: string) {
 
 	// Keep iframes, video, audio, sup, and sub elements
 	// @ts-ignore
-	turndownService.keep(['iframe', 'video', 'audio', 'sup', 'sub', 'svg', 'math']);
+	turndownService.keep(['iframe', 'video', 'audio', 'sup', 'sub', 'svg', 'math', 'aside']);
 	turndownService.remove(['button']);
 
 	// Custom rule to handle bullet lists without extra spaces
