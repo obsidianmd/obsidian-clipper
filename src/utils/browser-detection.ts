@@ -4,7 +4,7 @@ interface NavigatorExtended extends Navigator {
 	};
 }
 
-export async function detectBrowser(): Promise<'chrome' | 'firefox' | 'firefox-mobile' | 'brave' | 'edge' | 'safari' | 'mobile-safari' | 'other'> {
+export async function detectBrowser(): Promise<'chrome' | 'firefox' | 'firefox-mobile' | 'brave' | 'edge' | 'safari' | 'mobile-safari' | 'ipad-os' | 'other'> {
 	const userAgent = navigator.userAgent.toLowerCase();
 	
 	if (userAgent.includes('firefox')) {
@@ -19,7 +19,9 @@ export async function detectBrowser(): Promise<'chrome' | 'firefox' | 'firefox-m
 		}
 		return 'chrome';
 	} else if (userAgent.includes('safari')) {
-		if (userAgent.includes('mobile') || userAgent.includes('iphone') || userAgent.includes('ipad')) {
+		if (userAgent.includes('ipad')) {
+			return 'ipad-os';
+		} else if (userAgent.includes('mobile') || userAgent.includes('iphone')) {
 			return 'mobile-safari';
 		}
 		return 'safari';
@@ -33,7 +35,7 @@ export async function addBrowserClassToHtml() {
 	const htmlElement = document.documentElement;
 
 	// Remove any existing browser classes
-	htmlElement.classList.remove('is-firefox-mobile', 'is-chromium', 'is-firefox', 'is-edge', 'is-chrome', 'is-brave', 'is-safari', 'is-mobile-safari');
+	htmlElement.classList.remove('is-firefox-mobile', 'is-chromium', 'is-firefox', 'is-edge', 'is-chrome', 'is-brave', 'is-safari', 'is-mobile-safari', 'is-ipad-os');
 
 	// Add the appropriate class based on the detected browser
 	switch (browser) {
@@ -56,7 +58,10 @@ export async function addBrowserClassToHtml() {
 			htmlElement.classList.add('is-safari');
 			break;
 		case 'mobile-safari':
-			htmlElement.classList.add('is-mobile-safari', 'is-safari');
+			htmlElement.classList.add('is-mobile-safari', 'is-safari', 'is-ios');
+			break;
+		case 'ipad-os':
+			htmlElement.classList.add('is-ipad-os', 'is-safari');
 			break;
 		default:
 			// For 'other' browsers, we don't add any class
