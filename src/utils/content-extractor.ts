@@ -19,20 +19,21 @@ export function extractReadabilityContent(doc: Document): ReturnType<Readability
 }
 
 async function processSelector(tabId: number, match: string, currentUrl: string): Promise<string> {
-	const selectorRegex = /{{(selector|selectorHtml):(.*?)(?:\|(.*?))?}}/;
+	const selectorRegex = /{{(selector|selectorHtml):(.*?)(?::([a-zA-Z-]+))?(?:\|(.*?))?}}/;
 	const matches = match.match(selectorRegex);
 	if (!matches) {
 		console.error('Invalid selector format:', match);
 		return match;
 	}
 
-	const [, selectorType, selector, filtersString] = matches;
+	const [, selectorType, selector, attribute, filtersString] = matches;
 	const extractHtml = selectorType === 'selectorHtml';
 
 	try {
 		const response = await browser.tabs.sendMessage(tabId, { 
 			action: "extractContent", 
 			selector: selector,
+			attribute: attribute,
 			extractHtml: extractHtml
 		}) as { content: string };
 
