@@ -32,8 +32,7 @@
 	"content_scripts": [
 		{
 			"matches": ["http://*/*", "https://*/*"],
-			"js": ["content.js"],
-			"css": ["style.css"]
+			"js": ["content.js"]
 		}
 	],
 	"content_security_policy": {
@@ -51,10 +50,5 @@
 	"host_permissions": [
 		"http://*/*",
 		"https://*/*"
-	],
-	"web_accessible_resources": [
-		{
-			"resources": [ "style.css" ]
-		}
 	]
 }
