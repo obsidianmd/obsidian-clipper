@@ -72,21 +72,27 @@ browser.runtime.onMessage.addListener(function(request: any, sender: browser.Run
 });
 
 function extractContentBySelector(selector: string, attribute?: string, extractHtml: boolean = false): string | string[] {
-	const elements = document.querySelectorAll(selector);
-	
-	if (elements.length > 1) {
-		return Array.from(elements).map(el => {
+	try {
+		const elements = document.querySelectorAll(selector);
+		
+		if (elements.length > 1) {
+			return Array.from(elements).map(el => {
+				if (attribute) {
+					return el.getAttribute(attribute) || '';
+				}
+				return extractHtml ? el.outerHTML : el.textContent?.trim() || '';
+			});
+		} else if (elements.length === 1) {
 			if (attribute) {
-				return el.getAttribute(attribute) || '';
+				return elements[0].getAttribute(attribute) || '';
 			}
-			return extractHtml ? el.outerHTML : el.textContent?.trim() || '';
-		});
-	} else if (elements.length === 1) {
-		if (attribute) {
-			return elements[0].getAttribute(attribute) || '';
+			return extractHtml ? elements[0].outerHTML : elements[0].textContent?.trim() || '';
+		} else {
+			console.warn(`No elements found for selector: ${selector}`);
+			return '';
 		}
-		return extractHtml ? elements[0].outerHTML : elements[0].textContent?.trim() || '';
-	} else {
+	} catch (error) {
+		console.error('Error in extractContentBySelector:', error, { selector, attribute, extractHtml });
 		return '';
 	}
 }

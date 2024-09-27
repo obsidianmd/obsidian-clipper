@@ -19,15 +19,18 @@ export function extractReadabilityContent(doc: Document): ReturnType<Readability
 }
 
 async function processSelector(tabId: number, match: string, currentUrl: string): Promise<string> {
-	const selectorRegex = /{{(selector|selectorHtml):(.*?)(?::([a-zA-Z-]+))?(?:\|(.*?))?}}/;
+	const selectorRegex = /{{(selector|selectorHtml):(.*?)(?:\?(.*?))?(?:\|(.*?))?}}/;
 	const matches = match.match(selectorRegex);
 	if (!matches) {
 		console.error('Invalid selector format:', match);
 		return match;
 	}
 
-	const [, selectorType, selector, attribute, filtersString] = matches;
+	const [, selectorType, rawSelector, attribute, filtersString] = matches;
 	const extractHtml = selectorType === 'selectorHtml';
+
+	// Unescape any escaped quotes in the selector
+	const selector = rawSelector.replace(/\\"/g, '"');
 
 	try {
 		const response = await browser.tabs.sendMessage(tabId, { 
@@ -47,7 +50,7 @@ async function processSelector(tabId: number, match: string, currentUrl: string)
 	
 		return filteredContent;
 	} catch (error) {
-		console.error('Error extracting content by selector:', error);
+		console.error('Error extracting content by selector:', error, { selector, attribute, extractHtml });
 		return '';
 	}
 }
