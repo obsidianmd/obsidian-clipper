@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-clipper",
-	"version": "0.8.0",
+	"version": "0.8.1",
 	"description": "Official web clipper for Obsidian.",
 	"scripts": {
 		"dev:chrome": "webpack --watch --env BROWSER=chrome",

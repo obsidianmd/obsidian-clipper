@@ -19,7 +19,7 @@ export async function detectBrowser(): Promise<'chrome' | 'firefox' | 'firefox-m
 		}
 		return 'chrome';
 	} else if (userAgent.includes('safari')) {
-		if (userAgent.includes('ipad')) {
+		if (isIPad()) {
 			return 'ipad-os';
 		} else if (userAgent.includes('mobile') || userAgent.includes('iphone')) {
 			return 'mobile-safari';
@@ -28,6 +28,11 @@ export async function detectBrowser(): Promise<'chrome' | 'firefox' | 'firefox-m
 	} else {
 		return 'other';
 	}
+}
+
+function isIPad(): boolean {
+	return navigator.userAgent.includes('iPad') ||
+		(navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 }
 
 export async function addBrowserClassToHtml() {
@@ -61,7 +66,7 @@ export async function addBrowserClassToHtml() {
 			htmlElement.classList.add('is-mobile', 'is-mobile-safari', 'is-safari', 'is-ios');
 			break;
 		case 'ipad-os':
-			htmlElement.classList.add('is-mobile', 'is-ipad-os', 'is-safari');
+			htmlElement.classList.add('is-tablet', 'is-ipad-os', 'is-safari');
 			break;
 		default:
 			// For 'other' browsers, we don't add any class

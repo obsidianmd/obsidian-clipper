@@ -26,8 +26,8 @@ import { initializeMenu, addMenuItemListener } from '../managers/menu';
 
 document.addEventListener('DOMContentLoaded', async () => {
 	const newTemplateBtn = document.getElementById('new-template-btn') as HTMLButtonElement;
-	const exportTemplateBtn = document.getElementById('export-template-btn') as HTMLButtonElement;
-	const importTemplateBtn = document.getElementById('import-template-btn') as HTMLButtonElement;
+	const exportTemplateBtn = document.querySelectorAll('.export-template-btn') as NodeListOf<HTMLButtonElement>;
+	const importTemplateBtn = document.querySelectorAll('.import-template-btn') as NodeListOf<HTMLButtonElement>;
 	const resetDefaultTemplateBtn = document.getElementById('reset-default-template-btn') as HTMLButtonElement;
 	const duplicateTemplateBtn = document.getElementById('duplicate-template-btn') as HTMLElement;
 	const deleteTemplateBtn = document.getElementById('delete-template-btn') as HTMLElement;
@@ -47,8 +47,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 		console.log('Initializing menu');
 		initializeMenu('more-actions-btn', 'template-actions-menu');
 
-		exportTemplateBtn.addEventListener('click', exportTemplate);
-		importTemplateBtn.addEventListener('click', importTemplate);
+		exportTemplateBtn.forEach(btn => btn.addEventListener('click', exportTemplate));
+		importTemplateBtn.forEach(btn => btn.addEventListener('click', importTemplate));
 		resetDefaultTemplateBtn.addEventListener('click', resetDefaultTemplate);
 
 		createIcons({ icons });
@@ -60,9 +60,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 				showTemplateEditor(null);
 			});
 		}
-
+		
 		addMenuItemListener('duplicate-template-btn', 'template-actions-menu', duplicateCurrentTemplate);
 		addMenuItemListener('delete-template-btn', 'template-actions-menu', deleteCurrentTemplate);
+		addMenuItemListener('export-template-btn', 'template-actions-menu', exportTemplate);
+		addMenuItemListener('import-template-btn', 'template-actions-menu', importTemplate);
 	}
 
 	function duplicateCurrentTemplate(): void {

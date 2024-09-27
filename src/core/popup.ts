@@ -127,6 +127,7 @@ function setupMessageListeners() {
 	});
 }
 
+/* 
 let lastViewportHeight = window.innerHeight;
 let resizeTimer: ReturnType<typeof setTimeout>;
 
@@ -138,7 +139,6 @@ function checkViewportHeight() {
 		document.body.classList.add('resizing');
 		console.log('Resizing');
 		const vh = window.innerHeight * 0.01;
-		document.documentElement.style.setProperty('--vh', `${vh}px`);
 
 		// Reset the timer to remove the class after resizing has stopped
 		clearTimeout(resizeTimer);
@@ -155,11 +155,12 @@ function checkViewportHeight() {
 const resizeObserver = new ResizeObserver(() => {
 	checkViewportHeight();
 });
+*/
 
 document.addEventListener('DOMContentLoaded', async function() {
 
-	resizeObserver.observe(document.body);
-	console.log('Resize observer set up');
+	//resizeObserver.observe(document.body);
+	// console.log('Resize observer set up');
 
 	initializeIcons();
 	const refreshButton = document.getElementById('refresh-pane');
