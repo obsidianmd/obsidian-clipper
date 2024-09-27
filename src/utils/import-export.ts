@@ -32,6 +32,11 @@ export function exportTemplate(): void {
 		orderedTemplate.path = template.path;
 	}
 
+	// Include context only if it has a value
+	if (template.context) {
+		orderedTemplate.context = template.context;
+	}
+
 	const jsonContent = JSON.stringify(orderedTemplate, null, '\t');
 
 	const blob = new Blob([jsonContent], { type: 'application/json' });
@@ -70,6 +75,11 @@ export function importTemplate(): void {
 					...prop,
 					id: Date.now().toString() + Math.random().toString(36).substr(2, 9)
 				}));
+
+				// Keep the context if it exists in the imported template
+				if (importedTemplate.context) {
+					importedTemplate.context = importedTemplate.context;
+				}
 
 				let newName = importedTemplate.name as string;
 				let counter = 1;
@@ -112,7 +122,10 @@ function validateImportedTemplate(template: Partial<Template>): boolean {
 	// Check for noteNameFormat and path only if it's not a daily note template
 	const hasValidNoteNameAndPath = isDailyNote || (template.hasOwnProperty('noteNameFormat') && template.hasOwnProperty('path'));
 
-	return hasRequiredFields && hasValidProperties && hasValidNoteNameAndPath;
+	// Add optional check for context
+	const hasValidContext = !template.context || typeof template.context === 'string';
+
+	return hasRequiredFields && hasValidProperties && hasValidNoteNameAndPath && hasValidContext;
 }
 
 export function initializeDropZone(): void {
@@ -225,10 +238,15 @@ function importTemplateFile(file: File): void {
 				id: Date.now().toString() + Math.random().toString(36).substr(2, 9)
 			}));
 
+			// Keep the context if it exists in the imported template
+			if (importedTemplate.context) {
+				importedTemplate.context = importedTemplate.context;
+			}
+
 			let newName = importedTemplate.name as string;
 			let counter = 1;
 			while (templates.some(t => t.name === newName)) {
-				newName = `${importedTemplate.name} ${counter++}`;
+				newName = `${importedTemplate.name} (${counter++})`;
 			}
 			importedTemplate.name = newName;
 
