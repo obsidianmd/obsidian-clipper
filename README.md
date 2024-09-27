@@ -97,7 +97,7 @@ Meta variables allow you to extract data from meta tags in the page.
 
 #### Selector variables
 
-Selector variables allow you to extract text content from elements on the page using the syntax `{{selector:cssSelector:attribute}}`, where `:attribute` is optional. If no attribute is specified, the text content of the element is returned. You can also use `{{selectorHtml:cssSelector}}` to get the HTML content of the element.
+Selector variables allow you to extract text content from elements on the page using the syntax `{{selector:cssSelector?attribute}}`, where `?attribute` is optional. If no attribute is specified, the text content of the element is returned. You can also use `{{selectorHtml:cssSelector}}` to get the HTML content of the element.
 
 - `{{selector:h1}}` returns text content of the first `h1` element on the page.
 - `{{selector:.author}}` returns text content of the first `.author` element on the page.
