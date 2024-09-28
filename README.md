@@ -101,8 +101,8 @@ Selector variables allow you to extract text content from elements on the page u
 
 - `{{selector:h1}}` returns text content of the first `h1` element on the page.
 - `{{selector:.author}}` returns text content of the first `.author` element on the page.
-- `{{selector:img.hero:src}}` returns the `src` attribute of the first image with class `hero`.
-- `{{selector:a.main-link:href}}` returns the `href` attribute of the first anchor tag with class `main-link`.
+- `{{selector:img.hero?src}}` returns the `src` attribute of the first image with class `hero`.
+- `{{selector:a.main-link?href}}` returns the `href` attribute of the first anchor tag with class `main-link`.
 - `{{selectorHtml:body|markdown}}` returns the entire HTML of the `body` element, converted to Markdown using the `markdown` filter.
 - Nested CSS selectors and combinators are supported if you need more specificity.
 - If multiple elements match the selector, an array is returned, which you can process with filters like `join` or `map`.
