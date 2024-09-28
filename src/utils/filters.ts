@@ -9,6 +9,7 @@ import { date } from './filters/date';
 import { date_modify } from './filters/date_modify';
 import { first } from './filters/first';
 import { footnote } from './filters/footnote';
+import { html_to_json } from './filters/html_to_json';
 import { image } from './filters/image';
 import { join } from './filters/join';
 import { kebab } from './filters/kebab';
@@ -45,6 +46,7 @@ export const filters: { [key: string]: FilterFunction } = {
 	date,
 	first,
 	footnote,
+	html_to_json,
 	image,
 	join,
 	kebab,
