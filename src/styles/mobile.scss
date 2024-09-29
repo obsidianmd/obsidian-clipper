@@ -1,11 +1,14 @@
 @media (max-width: 768px) {
 	.mh {
-		display: none;
+		display: none !important;
+	}
+	.dkh {
+		display: flex;
 	}
 }
-@media (min-width: 768px) {
+@media (min-width: 769px) {
 	.dkh {
-		display: none;
+		display: none !important;
 	}
 }
 
@@ -38,6 +41,7 @@
 .is-mobile {
 	--bottom: -200px;
 	--transition: bottom 0.2s ease-in-out;
+	--interactive-normal: var(--color-base-20);
 
 	button {
 		font-weight: 600;

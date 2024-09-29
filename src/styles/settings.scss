@@ -189,6 +189,9 @@
 	border-inline-end: 1px solid var(--background-modifier-border);
 	padding: 0 16px 24px 16px;
 
+	.is-mobile & {
+		background-color: var(--background-primary);
+	}
 
 	.sidebar-heading {
 		font-weight: 500;
@@ -207,6 +210,9 @@
 		flex-direction: column;
 		gap: 2px;
 
+		.is-mobile & {
+			font-size: var(--font-ui-medium);
+		}
 		li {
 			display: flex;
 			justify-content: space-between;
@@ -274,18 +280,18 @@
 	#keyboard-shortcuts-list {
 		display: flex;
 		flex-direction: column;
-		margin-top: 8px;
+		margin-top: 0.5rem;
 	}
 
 	#vault-list {
 		display: flex;
 		flex-direction: column;
-		margin: 8px 0 24px;
+		margin: 0.5rem 0 1.5rem;
 		padding: 0;
 		li {
 			display: flex;
 			flex-direction: row;
-			gap: 4px;
+			gap: 0.25rem;
 			padding: 2px 0;
 			align-items: center;
 			font-size: var(--font-ui-small);
@@ -323,12 +329,12 @@
 }
 
 :root {
-	--settings-section-height-mobile: calc(100vh - var(--safe-area-inset-bottom) - 48px);
+	--settings-section-height-mobile: calc(100vh - var(--safe-area-inset-bottom) - 3rem);
 }
 
 @supports (height: 100dvh) {
 	.is-mobile-safari {
-		--settings-section-height-mobile: calc(100dvh - 48px);
+		--settings-section-height-mobile: calc(100dvh - 3rem);
 	}
 }
 
@@ -339,12 +345,12 @@
 			overflow: hidden;
 		}
 		#navbar {
-			padding: 0 24px;
+			padding: 0 1.5rem;
 			width: 100%;
 			display: flex;
-			height: 48px;
-			min-height: 48px;
-			background-color: var(--background-secondary);
+			height: 3rem;
+			min-height: 3rem;
+			background-color: var(--background-primary);
 
 			.hamburger-menu {
 				display: block;
@@ -352,7 +358,7 @@
 		}
 		.settings-section {
 			margin: 0;
-			padding: 24px 24px 48px;
+			padding: 1.5rem 1.5rem 3rem;
 			height: var(--settings-section-height-mobile);
 			overflow: scroll;
 			-webkit-overflow-scrolling: touch;
@@ -369,7 +375,7 @@
 			max-width: 100%;
 			display: none;
 			position: absolute;
-			top: 48px;
+			top: 3rem;
 			left: 0;
 			right: 0;
 			bottom: 0;

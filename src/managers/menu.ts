@@ -24,32 +24,33 @@ export function initializeMenu(menuBtnId: string, menuId: string): void {
 
 export function toggleMenu(menu: HTMLElement): void {
 	console.log('Toggling menu', menu);
+	const isOpening = !menu.classList.contains('show');
 	menu.classList.toggle('show');
+	document.body.classList.toggle('menu-open', isOpening);
 	console.log('Menu classes after toggle:', menu.classList);
 }
 
 export function closeMenu(menu: HTMLElement): void {
 	menu.classList.remove('show');
+	document.body.classList.remove('menu-open');
 }
 
 export function addMenuItemListener(
-	menuItemId: string, 
+	selector: string, 
 	menuId: string, 
 	callback: () => void
 ): void {
-	const menuItem = document.getElementById(menuItemId);
+	const menuItems = document.querySelectorAll(selector);
 	const menu = document.getElementById(menuId);
-	if (menuItem && menu) {
-		menuItem.replaceWith(menuItem.cloneNode(true));
-		const newMenuItem = document.getElementById(menuItemId);
-		if (newMenuItem) {
-			newMenuItem.addEventListener('click', (event) => {
+	if (menuItems.length && menu) {
+		menuItems.forEach(menuItem => {
+			menuItem.addEventListener('click', (event) => {
 				event.preventDefault();
 				closeMenu(menu);
 				callback();
 			});
-		}
+		});
 	} else {
-		console.error('Menu item or menu not found:', { menuItemId, menuId });
+		console.error('Menu item or menu not found:', { selector, menuId });
 	}
 }

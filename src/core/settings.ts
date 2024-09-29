@@ -47,8 +47,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 		console.log('Initializing menu');
 		initializeMenu('more-actions-btn', 'template-actions-menu');
 
-		exportTemplateBtn.forEach(btn => btn.addEventListener('click', exportTemplate));
-		importTemplateBtn.forEach(btn => btn.addEventListener('click', importTemplate));
+		document.querySelectorAll('.export-template-btn').forEach(btn => 
+			btn.addEventListener('click', exportTemplate)
+		);
+		document.querySelectorAll('.import-template-btn').forEach(btn => 
+			btn.addEventListener('click', importTemplate)
+		);
 		resetDefaultTemplateBtn.addEventListener('click', resetDefaultTemplate);
 
 		createIcons({ icons });
@@ -63,8 +67,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 		
 		addMenuItemListener('duplicate-template-btn', 'template-actions-menu', duplicateCurrentTemplate);
 		addMenuItemListener('delete-template-btn', 'template-actions-menu', deleteCurrentTemplate);
-		addMenuItemListener('export-template-btn', 'template-actions-menu', exportTemplate);
-		addMenuItemListener('import-template-btn', 'template-actions-menu', importTemplate);
 	}
 
 	function duplicateCurrentTemplate(): void {

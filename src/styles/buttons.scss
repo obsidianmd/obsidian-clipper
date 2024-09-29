@@ -10,8 +10,15 @@ button {
 	user-select: none;
 	-webkit-user-select: none;
 	padding: 0.25rem 0.75rem;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 	outline: none;
 	border: none;
+
+	.is-mobile & {
+		padding: 0.25rem 1rem;
+	}
 	&:not(.clickable-icon) {
 		background-color: var(--interactive-normal);
 		box-shadow: var(--input-shadow);
@@ -43,10 +50,10 @@ button {
 
 .clickable-icon,
 button.clickable-icon {
-	width: 1.75rem;
-	height: 1.75rem;
+	width: 2rem;
+	height: 2rem;
 	display: flex;
-	padding: 0px 4px;
+	padding: 0 0.25rem;
 	background-color: transparent;
 	color: var(--text-muted);
 	opacity: 0.85;
