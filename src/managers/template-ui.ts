@@ -47,13 +47,37 @@ export function updateTemplateList(loadedTemplates?: Template[]): void {
 			li.dataset.id = template.id;
 			li.dataset.index = index.toString();
 			li.draggable = true;
+
+			let touchStartTime: number;
+			let touchStartY: number;
+
+			li.addEventListener('touchstart', (e) => {
+				touchStartTime = Date.now();
+				touchStartY = e.touches[0].clientY;
+			});
+
+			li.addEventListener('touchend', (e) => {
+				const touchEndY = e.changedTouches[0].clientY;
+				const touchDuration = Date.now() - touchStartTime;
+				const touchDistance = Math.abs(touchEndY - touchStartY);
+
+				if (touchDuration < 300 && touchDistance < 10) {
+					const target = e.target as HTMLElement;
+					if (!target.closest('.delete-template-btn')) {
+						e.preventDefault();
+						showTemplateEditor(template);
+					}
+				}
+			});
+
+			// Keep the click event for non-touch devices
 			li.addEventListener('click', (e) => {
 				const target = e.target as HTMLElement;
 				if (!target.closest('.delete-template-btn')) {
 					showTemplateEditor(template);
 				}
 			});
-			
+
 			deleteBtn.addEventListener('click', (e) => {
 				e.stopPropagation();
 				deleteTemplateFromList(template.id);

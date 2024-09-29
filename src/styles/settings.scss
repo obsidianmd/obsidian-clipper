@@ -212,7 +212,7 @@
 			justify-content: space-between;
 			align-items: center;
 			cursor: pointer;
-			padding: 4px 6px;
+			padding: 0.25rem 0.375rem;
 			border-radius: var(--radius-s);
 			user-select: none;
 			-webkit-user-select: none;
@@ -229,11 +229,11 @@
 
 	#new-template-btn {
 		width: calc(100% - 12px);
-		margin: 8px 6px;
+		margin: 0.5rem 0.375rem;
 	}
 
 	#template-list {
-		padding: 8px 6px;
+		padding: 0.5rem 0.375rem;
 
 		li {
 			.template-name {

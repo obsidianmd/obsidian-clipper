@@ -39,8 +39,13 @@
 	--bottom: -200px;
 	--transition: bottom 0.2s ease-in-out;
 
+	button {
+		font-weight: 500;
+	}
+
 	.clipper {
 		max-height: 100dvh;
+		width: 100%;
 	}
 	.clipper .clipper-footer {
 		will-change: bottom;
