@@ -19,6 +19,26 @@ browser.runtime.onMessage.addListener((request: any, sender, sendResponse) => {
 		browser.tabs.sendMessage(sender.tab.id, request).then(sendResponse);
 		return true;
 	}
+
+	if (request.action === "ensureContentScriptLoaded" && request.tabId) {
+		ensureContentScriptLoaded(request.tabId).then(sendResponse);
+		return true;
+	}
+
+	if (request.action === "sidePanelOpened") {
+		if (sender.tab && sender.tab.windowId) {
+			sidePanelOpenWindows.add(sender.tab.windowId);
+			updateCurrentActiveTab(sender.tab.windowId);
+		}
+	}
+
+	if (request.action === "sidePanelClosed") {
+		if (sender.tab && sender.tab.windowId) {
+			sidePanelOpenWindows.delete(sender.tab.windowId);
+		}
+	}
+
+	return true;
 });
 
 browser.commands.onCommand.addListener((command) => {
@@ -64,42 +84,6 @@ browser.contextMenus.onClicked.addListener((info, tab) => {
 
 browser.runtime.onInstalled.addListener(() => {
 	createContextMenu();
-});
-
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-	const handleMessage = async () => {
-		if (message.type === 'open_side_panel' && sender.tab && sender.tab.id) {
-			await chrome.sidePanel.open({ tabId: sender.tab.id });
-			await chrome.sidePanel.setOptions({
-				tabId: sender.tab.id,
-				path: 'side-panel.html',
-				enabled: true
-			});
-			if (sender.tab.windowId) {
-				sidePanelOpenWindows.add(sender.tab.windowId);
-			}
-			await ensureContentScriptLoaded(sender.tab.id);
-			updateCurrentActiveTab(sender.tab.windowId);
-		} else if (message.action === "ensureContentScriptLoaded" && message.tabId) {
-			await ensureContentScriptLoaded(message.tabId);
-		} else if (message.action === "sidePanelOpened") {
-			if (sender.tab && sender.tab.windowId) {
-				sidePanelOpenWindows.add(sender.tab.windowId);
-				updateCurrentActiveTab(sender.tab.windowId);
-			}
-		} else if (message.action === "sidePanelClosed") {
-			if (sender.tab && sender.tab.windowId) {
-				sidePanelOpenWindows.delete(sender.tab.windowId);
-			}
-		}
-	};
-
-	handleMessage().then(() => sendResponse({ success: true })).catch(error => {
-		console.error('Error handling message:', error);
-		sendResponse({ success: false, error: error.message });
-	});
-
-	return true;
 });
 
 async function isSidePanelOpen(windowId: number): Promise<boolean> {
