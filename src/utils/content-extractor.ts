@@ -126,26 +126,26 @@ function getNestedProperty(obj: any, path: string): any {
 }
 
 export async function replaceVariables(tabId: number, text: string, variables: { [key: string]: string }, currentUrl: string): Promise<string> {
-	const regex = /{{(?:schema:)?(?:selector:)?(?:selectorHtml:)?(?:prompt:)?\s*(.*?)\s*}}/g;
+	const regex = /{{(?:schema:)?(?:selector:)?(?:selectorHtml:)?(?:prompt:)?\s*([\s\S]*?)\s*}}/g;
 	const matches = text.match(regex);
 
 	if (matches) {
 		for (const match of matches) {
 			let replacement: string;
 			const trimmedMatch = match.trim().slice(2, -2).trim();
+			const normalizedMatch = trimmedMatch.replace(/\s+/g, ' ');
 			
-			if (trimmedMatch.startsWith('selector:') || trimmedMatch.startsWith('selectorHtml:')) {
-				// Preserve spaces within the selector
-				const [selectorType, ...selectorParts] = trimmedMatch.split(':');
+			if (normalizedMatch.startsWith('selector:') || normalizedMatch.startsWith('selectorHtml:')) {
+				const [selectorType, ...selectorParts] = normalizedMatch.split(':');
 				const selector = selectorParts.join(':').trim();
 				const reconstructedMatch = `{{${selectorType}:${selector}}}`;
 				replacement = await processSelector(tabId, reconstructedMatch, currentUrl);
-			} else if (trimmedMatch.startsWith('schema:')) {
+			} else if (normalizedMatch.startsWith('schema:')) {
 				replacement = await processSchema(match, variables, currentUrl);
-			} else if (trimmedMatch.startsWith('prompt:')) {
+			} else if (normalizedMatch.startsWith('prompt:')) {
 				replacement = await processPrompt(match, variables, currentUrl);
 			} else {
-				const [variableName, ...filterParts] = trimmedMatch.split('|');
+				const [variableName, ...filterParts] = normalizedMatch.split('|').map(part => part.trim());
 				let value = variables[`{{${variableName.trim()}}}`] || '';				
 				const filtersString = filterParts.join('|');
 				replacement = applyFilters(value, filtersString, currentUrl);
