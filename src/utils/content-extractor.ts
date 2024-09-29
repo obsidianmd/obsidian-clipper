@@ -126,21 +126,27 @@ function getNestedProperty(obj: any, path: string): any {
 }
 
 export async function replaceVariables(tabId: number, text: string, variables: { [key: string]: string }, currentUrl: string): Promise<string> {
-	const regex = /{{(?:schema:)?(?:selector:)?(?:prompt:)?(.*?)}}/g;
+	const regex = /{{(?:schema:)?(?:selector:)?(?:selectorHtml:)?(?:prompt:)?\s*(.*?)\s*}}/g;
 	const matches = text.match(regex);
 
 	if (matches) {
 		for (const match of matches) {
 			let replacement: string;
-			if (match.startsWith('{{selector:') || match.startsWith('{{selectorHtml:')) {
-				replacement = await processSelector(tabId, match, currentUrl);
-			} else if (match.startsWith('{{schema:')) {
+			const trimmedMatch = match.trim().slice(2, -2).trim();
+			
+			if (trimmedMatch.startsWith('selector:') || trimmedMatch.startsWith('selectorHtml:')) {
+				// Preserve spaces within the selector
+				const [selectorType, ...selectorParts] = trimmedMatch.split(':');
+				const selector = selectorParts.join(':').trim();
+				const reconstructedMatch = `{{${selectorType}:${selector}}}`;
+				replacement = await processSelector(tabId, reconstructedMatch, currentUrl);
+			} else if (trimmedMatch.startsWith('schema:')) {
 				replacement = await processSchema(match, variables, currentUrl);
-			} else if (match.startsWith('{{prompt:')) {
+			} else if (trimmedMatch.startsWith('prompt:')) {
 				replacement = await processPrompt(match, variables, currentUrl);
 			} else {
-				const [variableName, ...filterParts] = match.slice(2, -2).split('|');
-				let value = variables[`{{${variableName}}}`] || '';				
+				const [variableName, ...filterParts] = trimmedMatch.split('|');
+				let value = variables[`{{${variableName.trim()}}}`] || '';				
 				const filtersString = filterParts.join('|');
 				replacement = applyFilters(value, filtersString, currentUrl);
 			}
@@ -269,20 +275,20 @@ export async function initializePageContent(content: string, selectedHtml: strin
 		const markdownBody = createMarkdownContent(content, currentUrl);
 
 		const currentVariables: { [key: string]: string } = {
-			'{{author}}': authorName,
-			'{{content}}': markdownBody,
-			'{{contentHtml}}': content,
-			'{{date}}': dayjs().format('YYYY-MM-DDTHH:mm:ssZ'),
-			'{{time}}': dayjs().format('YYYY-MM-DDTHH:mm:ssZ'),
-			'{{description}}': description,
-			'{{domain}}': domain,
-			'{{fullHtml}}': fullHtml,
-			'{{image}}': image,
-			'{{noteName}}': noteName,
-			'{{published}}': published,
-			'{{site}}': site,
-			'{{title}}': title,
-			'{{url}}': currentUrl
+			'{{author}}': authorName.trim(),
+			'{{content}}': markdownBody.trim(),
+			'{{contentHtml}}': content.trim(),
+			'{{date}}': dayjs().format('YYYY-MM-DDTHH:mm:ssZ').trim(),
+			'{{time}}': dayjs().format('YYYY-MM-DDTHH:mm:ssZ').trim(),
+			'{{description}}': description.trim(),
+			'{{domain}}': domain.trim(),
+			'{{fullHtml}}': fullHtml.trim(),
+			'{{image}}': image.trim(),
+			'{{noteName}}': noteName.trim(),
+			'{{published}}': published.trim(),
+			'{{site}}': site.trim(),
+			'{{title}}': title.trim(),
+			'{{url}}': currentUrl.trim()
 		};
 
 		// Add extracted content to variables

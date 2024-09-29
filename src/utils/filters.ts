@@ -85,6 +85,9 @@ function splitFilterString(filterString: string): string[] {
 	let escapeNext = false;
 	let depth = 0;
 
+	// Remove all spaces before and after | that are not within quotes or parentheses
+	filterString = filterString.replace(/\s*\|\s*(?=(?:[^"'()]*["'][^"'()]*["'])*[^"'()]*$)/g, '|');
+
 	// Iterate through each character in the filterString
 	for (let i = 0; i < filterString.length; i++) {
 		const char = filterString[i];
@@ -138,6 +141,9 @@ function splitFilterString(filterString: string): string[] {
 function parseFilterString(filterString: string): string[] {
 	// Remove outer quotes if present (both single and double quotes)
 	filterString = filterString.replace(/^(['"])(.*)\1$/, '$2');
+
+	// Remove all spaces before and after : that are not within quotes or parentheses
+	filterString = filterString.replace(/\s*:\s*(?=(?:[^"'()]*["'][^"'()]*["'])*[^"'()]*$)/g, ':');
 
 	const parts: string[] = [];
 	let current = '';
