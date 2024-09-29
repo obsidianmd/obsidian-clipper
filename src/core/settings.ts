@@ -1,14 +1,14 @@
 import { Template } from '../types/types';
 import { 
-	loadTemplates, 
 	createDefaultTemplate, 
-	templates, 
-	getTemplates, 
-	findTemplateById, 
-	saveTemplateSettings, 
+	deleteTemplate,
 	duplicateTemplate,
+	findTemplateById, 
 	getEditingTemplateIndex,
-	deleteTemplate
+	getTemplates, 
+	loadTemplates, 
+	saveTemplateSettings, 
+	templates,
 } from '../managers/template-manager';
 import { updateTemplateList, showTemplateEditor, resetUnsavedChanges, initializeAddPropertyButton } from '../managers/template-ui';
 import { initializeGeneralSettings } from '../managers/general-settings';
@@ -20,19 +20,12 @@ import { exportTemplate, importTemplate, initializeDropZone } from '../utils/imp
 import { createIcons } from 'lucide';
 import { icons } from '../icons/icons';
 import { updateUrl, getUrlParameters } from '../utils/routing';
-import browser from '../utils/browser-polyfill';
 import { addBrowserClassToHtml } from '../utils/browser-detection';
 import { initializeMenu, addMenuItemListener } from '../managers/menu';
 
 document.addEventListener('DOMContentLoaded', async () => {
 	const newTemplateBtn = document.getElementById('new-template-btn') as HTMLButtonElement;
-	const exportTemplateBtn = document.querySelectorAll('.export-template-btn') as NodeListOf<HTMLButtonElement>;
-	const importTemplateBtn = document.querySelectorAll('.import-template-btn') as NodeListOf<HTMLButtonElement>;
 	const resetDefaultTemplateBtn = document.getElementById('reset-default-template-btn') as HTMLButtonElement;
-	const duplicateTemplateBtn = document.getElementById('duplicate-template-btn') as HTMLElement;
-	const deleteTemplateBtn = document.getElementById('delete-template-btn') as HTMLElement;
-	const moreActionsBtn = document.getElementById('more-actions-btn') as HTMLButtonElement;
-	const menu = document.querySelector('.menu-btn') as HTMLElement;
 
 	async function initializeSettings(): Promise<void> {
 		await initializeGeneralSettings();
@@ -47,12 +40,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 		console.log('Initializing menu');
 		initializeMenu('more-actions-btn', 'template-actions-menu');
 
-		document.querySelectorAll('.export-template-btn').forEach(btn => 
-			btn.addEventListener('click', exportTemplate)
-		);
-		document.querySelectorAll('.import-template-btn').forEach(btn => 
-			btn.addEventListener('click', importTemplate)
-		);
+		addMenuItemListener('#duplicate-template-btn', 'template-actions-menu', duplicateCurrentTemplate);
+		addMenuItemListener('#delete-template-btn', 'template-actions-menu', deleteCurrentTemplate);
+
 		resetDefaultTemplateBtn.addEventListener('click', resetDefaultTemplate);
 
 		createIcons({ icons });
@@ -64,9 +54,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 				showTemplateEditor(null);
 			});
 		}
-		
-		addMenuItemListener('duplicate-template-btn', 'template-actions-menu', duplicateCurrentTemplate);
-		addMenuItemListener('delete-template-btn', 'template-actions-menu', deleteCurrentTemplate);
+
+		document.querySelectorAll('#duplicate-template-btn').forEach(btn => 
+			btn.addEventListener('click', duplicateCurrentTemplate)
+		);
+		document.querySelectorAll('#delete-template-btn').forEach(btn => 
+			btn.addEventListener('click', deleteCurrentTemplate)
+		);
+
+		document.querySelectorAll('.export-template-btn').forEach(btn => 
+			btn.addEventListener('click', exportTemplate)
+		);
+		document.querySelectorAll('.import-template-btn').forEach(btn => 
+			btn.addEventListener('click', importTemplate)
+		);
 	}
 
 	function duplicateCurrentTemplate(): void {

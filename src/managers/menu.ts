@@ -38,7 +38,7 @@ export function closeMenu(menu: HTMLElement): void {
 export function addMenuItemListener(
 	selector: string, 
 	menuId: string, 
-	callback: () => void
+	callback: (event: Event) => void
 ): void {
 	const menuItems = document.querySelectorAll(selector);
 	const menu = document.getElementById(menuId);
@@ -47,7 +47,7 @@ export function addMenuItemListener(
 			menuItem.addEventListener('click', (event) => {
 				event.preventDefault();
 				closeMenu(menu);
-				callback();
+				callback(event);
 			});
 		});
 	} else {
