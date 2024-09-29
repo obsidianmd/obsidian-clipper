@@ -277,6 +277,6 @@ This will create two directories:
 - [readability](https://github.com/mozilla/readability) for content extraction
 - [turndown](https://github.com/mixmark-io/turndown) for HTML to Markdown conversion
 - [dayjs](https://github.com/iamkun/dayjs) for date parsing and formatting
-- [lz-string](https://github.com/pieroxy/lz-string) for string compression
+- [lz-string](https://github.com/pieroxy/lz-string) to compress templates to reduce storage space
 - [lucide](https://github.com/lucide-icons/lucide) for icons
 - [mathml-to-latex](https://github.com/asnunes/mathml-to-latex) for MathML to LaTeX conversion

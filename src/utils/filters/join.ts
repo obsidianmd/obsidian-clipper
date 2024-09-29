@@ -15,6 +15,8 @@ export const join = (str: string, param?: string): string => {
 	if (param) {
 		// Remove outer quotes if present
 		separator = param.replace(/^(['"])(.*)\1$/, '$2');
+		// Replace \n with actual newline character
+		separator = separator.replace(/\\n/g, '\n');
 	}
 
 	return array.join(separator);
