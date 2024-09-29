@@ -70,6 +70,7 @@ export function initializeSidebar(): void {
 	const sidebar = document.getElementById('sidebar');
 	const settingsContainer = document.getElementById('settings');
 	const templateList = document.getElementById('template-list');
+	const hamburgerMenu = document.getElementById('hamburger-menu');
 
 	if (sidebar) {
 		sidebar.addEventListener('click', (event) => {
@@ -80,6 +81,9 @@ export function initializeSidebar(): void {
 			if (settingsContainer) {
 				settingsContainer.classList.remove('sidebar-open');
 			}
+			if (hamburgerMenu) {
+				hamburgerMenu.classList.remove('is-active');
+			}
 		});
 	}
 
@@ -89,11 +93,15 @@ export function initializeSidebar(): void {
 			const listItem = target.closest('li') as HTMLElement;
 			if (listItem && listItem.dataset.id) {
 				showSettingsSection('templates', listItem.dataset.id);
+				if (settingsContainer) {
+					settingsContainer.classList.remove('sidebar-open');
+				}
+				if (hamburgerMenu) {
+					hamburgerMenu.classList.remove('is-active');
+				}
 			}
 		});
 	}
-
-	const hamburgerMenu = document.getElementById('hamburger-menu');
 
 	if (hamburgerMenu && settingsContainer) {
 		hamburgerMenu.addEventListener('click', () => {

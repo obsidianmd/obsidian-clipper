@@ -13,7 +13,7 @@
 	font-size: 20px;
 }
 .is-mobile-safari {
-	-webkit-text-size-adjust: 120%;
+	-webkit-text-size-adjust: 112.5%;
 }
 
 .is-tablet,
@@ -40,7 +40,7 @@
 	--transition: bottom 0.2s ease-in-out;
 
 	button {
-		font-weight: 500;
+		font-weight: 600;
 	}
 
 	.clipper {
@@ -53,6 +53,9 @@
 		bottom: 0;
 		transition: bottom 0.2s ease-in-out;
 		padding: calc(var(--popup-padding) / 2) var(--popup-padding) 0;
+		button {
+			font-weight: 600;
+		}
 	}
 }
 .resizing { 

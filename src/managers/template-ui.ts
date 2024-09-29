@@ -66,6 +66,15 @@ export function updateTemplateList(loadedTemplates?: Template[]): void {
 					if (!target.closest('.delete-template-btn')) {
 						e.preventDefault();
 						showTemplateEditor(template);
+						// Add these lines to close the sidebar and deactivate the hamburger menu
+						const settingsContainer = document.getElementById('settings');
+						const hamburgerMenu = document.getElementById('hamburger-menu');
+						if (settingsContainer) {
+							settingsContainer.classList.remove('sidebar-open');
+						}
+						if (hamburgerMenu) {
+							hamburgerMenu.classList.remove('is-active');
+						}
 					}
 				}
 			});
