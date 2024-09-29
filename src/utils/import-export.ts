@@ -2,10 +2,11 @@ import { Template, Property } from '../types/types';
 import { templates, saveTemplateSettings, editingTemplateIndex } from '../managers/template-manager';
 import { showTemplateEditor, updateTemplateList } from '../managers/template-ui';
 import { sanitizeFileName } from './string-utils';
+import { detectBrowser } from './browser-detection';
 
 const SCHEMA_VERSION = '0.1.0';
 
-export function exportTemplate(): void {
+export async function exportTemplate(): Promise<void> {
 	if (editingTemplateIndex === -1) {
 		alert('Please select a template to export.');
 		return;
@@ -39,16 +40,45 @@ export function exportTemplate(): void {
 
 	const jsonContent = JSON.stringify(orderedTemplate, null, '\t');
 
-	const blob = new Blob([jsonContent], { type: 'application/json' });
-	const url = URL.createObjectURL(blob);
+	const browser = await detectBrowser();
+	const isIOSBrowser = browser === 'mobile-safari' || browser === 'ipad-os';
 
-	const a = document.createElement('a');
-	a.href = url;
-	a.download = templateFile;
-	document.body.appendChild(a);
-	a.click();
-	document.body.removeChild(a);
-	URL.revokeObjectURL(url);
+	if (isIOSBrowser) {
+		// For iOS, create a Blob and use the Web Share API if available
+		const blob = new Blob([jsonContent], { type: 'application/json' });
+		const file = new File([blob], templateFile, { type: 'application/json' });
+
+		if (navigator.share) {
+			try {
+				await navigator.share({
+					files: [file],
+					title: 'Exported template',
+					text: 'Obsidian Web Clipper template'
+				});
+			} catch (error) {
+				console.error('Error sharing:', error);
+				// Fallback to opening in a new tab if sharing fails
+				const dataUri = URL.createObjectURL(blob);
+				window.open(dataUri, '_blank');
+			}
+		} else {
+			// Fallback for older iOS versions
+			const dataUri = `data:application/json;charset=utf-8,${encodeURIComponent(jsonContent)}`;
+			window.open(dataUri, '_blank');
+		}
+	} else {
+		// For other platforms, use Blob and URL.createObjectURL
+		const blob = new Blob([jsonContent], { type: 'application/json' });
+		const url = URL.createObjectURL(blob);
+
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = templateFile;
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+		URL.revokeObjectURL(url);
+	}
 }
 
 export function importTemplate(): void {
