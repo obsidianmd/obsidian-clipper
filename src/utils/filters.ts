@@ -34,6 +34,7 @@ import { table } from './filters/table';
 import { template } from './filters/template';
 import { title } from './filters/title';
 import { trim } from './filters/trim';
+import { uncamel } from './filters/uncamel';
 import { upper } from './filters/upper';
 import { wikilink } from './filters/wikilink';
 
@@ -72,6 +73,7 @@ export const filters: { [key: string]: FilterFunction } = {
 	template,
 	title,
 	trim,
+	uncamel,
 	upper,
 	wikilink
 };

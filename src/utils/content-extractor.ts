@@ -347,8 +347,13 @@ function addSchemaOrgDataToVariables(schemaData: any, variables: { [key: string]
 			}
 		});
 	} else if (typeof schemaData === 'object' && schemaData !== null) {
+		// Store the entire object as JSON
+		const objectKey = `{{schema:${prefix.replace(/\.$/, '')}}}`;
+		variables[objectKey] = JSON.stringify(schemaData);
+
+		// Process individual properties
 		Object.entries(schemaData).forEach(([key, value]) => {
-			if (key === '@type') return; // Skip @type as it's used in the prefix
+			if (key === '@type') return;
 			
 			const variableKey = `{{schema:${prefix}${key}}}`;
 			if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {

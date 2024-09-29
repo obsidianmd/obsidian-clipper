@@ -239,6 +239,9 @@ Filters allow you to modify variables in a template. Filters are applied to vari
 - `title` returns a titlecased version of the value, e.g. `"hello world"|title` returns `"Hello World"`.
 - `trim` removes whitespace from both ends of a string.
 	- `"  hello world  "|trim` returns `"hello world"`.
+- `uncamel` converts camelCase or PascalCase to space-separated words, which you can further format with other filters like `title` or `capitalize`.
+	- `"camelCase"|uncamel` returns `"camel case"`.
+	- `"PascalCase"|uncamel` returns `"pascal case"`.
 - `upper` converts a value to uppercase, e.g. `"hello world"|upper` returns `"HELLO WORLD"`.
 - `wikilink` converts strings, arrays, or objects into Obsidian wikilink syntax.
 	- For strings: `"page"|wikilink` returns `[[page]]`.

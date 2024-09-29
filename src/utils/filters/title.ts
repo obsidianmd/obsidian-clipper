@@ -20,7 +20,7 @@ export const title = (input: string | string[], param?: string): string | string
 		} else if (typeof value === 'object' && value !== null) {
 			const result: {[key: string]: any} = {};
 			for (const [key, val] of Object.entries(value)) {
-				result[key] = processValue(val);
+				result[toTitleCase(key)] = processValue(val);
 			}
 			return result;
 		}
