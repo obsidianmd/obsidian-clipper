@@ -1,12 +1,10 @@
-Official Obsidian browser extension. Available for [Chrome](https://chromewebstore.google.com/detail/obsidian-web-clipper/cnjifjpddelmedmihgijeibhnjfabmlf), [Firefox](https://addons.mozilla.org/en-US/firefox/addon/web-clipper-obsidian/), [Safari](https://apps.apple.com/us/app/obsidian-web-clipper/id6720708363), Edge, Brave, and Arc.
-
-⚠️ **Obsidian Clipper is still in beta and requires Obsidian 1.7.2.** If you see an empty note after clicking **Add to Obsidian** please make sure you are using Obsidian 1.7.2 or above, which currently is an [early access version](https://help.obsidian.md/Obsidian/Early+access+versions).
+⚠️ **Obsidian Web Clipper is still in beta and requires Obsidian 1.7.2.** Please make sure you are using Obsidian 1.7.2 or above, which currently is an [early access version](https://help.obsidian.md/Obsidian/Early+access+versions).
 
 ## Features
 
 - **Customizable templates.** Create templates to automatically extract and organize metadata from web pages.
 - **Smart triggers.** Set up rules to automatically apply the right template based on the website you're clipping from.
-- **Plain text.** All your clips are saved in clean, durable, portable Markdown format — no proprietary formats, no lock-in, and available to you offline.
+- **No lock-in.** All your clips are saved in clean, durable, portable Markdown format — no proprietary formats, no lock-in, and available to you offline.
 
 ## Getting started
 
