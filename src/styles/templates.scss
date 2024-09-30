@@ -1,4 +1,4 @@
-#template-properties {
+.properties-list {
 	display: flex;
 	flex-direction: column;
 	gap: 0.375rem;
@@ -59,7 +59,7 @@
 }
 
 .is-mobile {
-	#template-properties {
+	#properties-list {
 		--input-height: 2rem;
 		--background-modifier-form-field: transparent;
 		gap: 0;

@@ -14,7 +14,12 @@ function updatePropertyTypesList(): void {
 
 	propertyTypesList.innerHTML = '';
 
-	generalSettings.propertyTypes.forEach(propertyType => {
+	// Sort property types by name
+	const sortedPropertyTypes = [...generalSettings.propertyTypes].sort((a, b) => 
+		a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
+	);
+
+	sortedPropertyTypes.forEach(propertyType => {
 		const listItem = createPropertyTypeListItem(propertyType);
 		propertyTypesList.appendChild(listItem);
 	});
@@ -23,14 +28,7 @@ function updatePropertyTypesList(): void {
 }
 
 function createPropertyTypeListItem(propertyType: { name: string; type: string }): HTMLElement {
-	const listItem = createElementWithClass('div', 'property-type-item');
-
-	const nameInput = createElementWithHTML('input', '', {
-		type: 'text',
-		value: propertyType.name,
-		class: 'property-type-name',
-		readonly: 'true'
-	});
+	const listItem = createElementWithClass('div', 'property-editor');
 
 	const typeSelect = document.createElement('select');
 	typeSelect.className = 'property-type-select';
@@ -42,13 +40,20 @@ function createPropertyTypeListItem(propertyType: { name: string; type: string }
 	});
 	typeSelect.value = propertyType.type;
 
+	const nameInput = createElementWithHTML('input', '', {
+		type: 'text',
+		value: propertyType.name,
+		class: 'property-type-name',
+		readonly: 'true'
+	});
+
 	const removeBtn = createElementWithClass('button', 'remove-property-type-btn clickable-icon');
 	removeBtn.setAttribute('type', 'button');
 	removeBtn.setAttribute('aria-label', 'Remove property type');
 	removeBtn.appendChild(createElementWithHTML('i', '', { 'data-lucide': 'trash-2' }));
 
-	listItem.appendChild(nameInput);
 	listItem.appendChild(typeSelect);
+	listItem.appendChild(nameInput);
 	listItem.appendChild(removeBtn);
 
 	typeSelect.addEventListener('change', () => updatePropertyType(propertyType.name, typeSelect.value));

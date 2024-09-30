@@ -15,6 +15,7 @@
 						<li class="sidebar-heading">Settings</li>
 						<li data-section="general" class="active">General</li>
 						<li data-section="interpreter" display="none">Interpreter</li>
+						<li data-section="properties">Properties</li>
 						<li class="sidebar-heading">Templates</li>
 					</ul>
 					<button type="button" id="new-template-btn" class="mod-cta">New&nbsp;template</button>
@@ -192,7 +193,7 @@
 						<form id="property-types-form">
 							<div>
 								<h3>Manage property types</h3>
-								<div id="property-types-list"></div>
+								<div id="property-types-list" class="properties-list"></div>
 								<div class="add-btn">
 									<a id="add-property-type-btn">+ Add property type</a>
 								</div>
@@ -302,7 +303,7 @@
 								<div id="properties-container">
 									<label>Properties</label>
 									<div class="setting-item-description">Properties to add to the top of the clipped note. Use variables to pre-populate data from the&nbsp;page.</div>
-									<div id="template-properties"></div>
+									<div id="template-properties" class="properties-list"></div>
 									<div class="add-btn metadata-add-btn"><a id="add-property-btn">+ Add property</a></div>
 								</div>
 								<div class="setting-item">

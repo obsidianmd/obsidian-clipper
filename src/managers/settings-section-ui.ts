@@ -5,12 +5,11 @@ import { Template } from '../types/types';
 import { initializePropertyTypesManager } from './property-types-manager';
 
 export function showSettingsSection(section: 'general' | 'interpreter' | 'templates' | 'properties', templateId?: string): void {
-	const sections = ['general', 'interpreter', 'templates'];
+	const sections = ['general', 'interpreter', 'properties', 'templates'];
 	
 	sections.forEach(s => {
 		const sectionElement = document.getElementById(`${s}-section`);
 		if (sectionElement) {
-			sectionElement.style.display = s === section ? 'block' : 'none';
 			sectionElement.classList.toggle('active', s === section);
 		}
 	});
@@ -29,15 +28,15 @@ export function showSettingsSection(section: 'general' | 'interpreter' | 'templa
 		updateInterpreterSettings();
 	}
 
+	if (section === 'properties') {
+		initializePropertyTypesManager();
+	}
+
 	if (section === 'templates') {
 		const templateEditor = document.getElementById('template-editor');
 		if (templateEditor) {
 			templateEditor.style.display = 'block';
 		}
-	}
-
-	if (section === 'properties') {
-		initializePropertyTypesManager();
 	}
 
 	updatePromptContextVisibility();
@@ -80,8 +79,8 @@ export function initializeSidebar(): void {
 	if (sidebar) {
 		sidebar.addEventListener('click', (event) => {
 			const target = event.target as HTMLElement;
-			if (target.dataset.section === 'general' || target.dataset.section === 'interpreter') {
-				showSettingsSection(target.dataset.section as 'general' | 'interpreter');
+			if (target.dataset.section === 'general' || target.dataset.section === 'interpreter' || target.dataset.section === 'properties') {
+				showSettingsSection(target.dataset.section as 'general' | 'interpreter' | 'properties');
 			}
 			if (settingsContainer) {
 				settingsContainer.classList.remove('sidebar-open');
