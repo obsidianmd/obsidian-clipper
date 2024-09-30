@@ -17,6 +17,7 @@ import { debugLog } from '../utils/debug';
 import { showVariables, initializeVariablesPanel, updateVariablesPanel } from '../managers/inspect-variables';
 import { ensureContentScriptLoaded } from '../utils/content-script-utils';
 import { isBlankPage, isValidUrl } from '../utils/active-tab-manager';
+import { memoize, memoizeWithExpiration } from '../utils/memoize';
 
 let loadedSettings: Settings;
 let currentTemplate: Template | null = null;
@@ -27,6 +28,37 @@ let lastUsedTemplateId: string | null = null;
 let lastSelectedVault: string | null = null;
 
 const isSidePanel = window.location.pathname.includes('side-panel.html');
+
+// Memoize replaceVariables with a short expiration and URL-sensitive key
+const memoizedReplaceVariables = memoizeWithExpiration(
+	async (tabId: number, template: string, variables: { [key: string]: string }, currentUrl: string) => {
+		return replaceVariables(tabId, template, variables, currentUrl);
+	},
+	{ expirationMs: 5000, keyFn: (tabId, template, variables, currentUrl) => `${tabId}-${template}-${currentUrl}` }
+);
+
+// Memoize generateFrontmatter with a longer expiration
+const memoizedGenerateFrontmatter = memoizeWithExpiration(
+	async (properties: Property[]) => {
+		return generateFrontmatter(properties);
+	},
+	{ expirationMs: 30000 }
+);
+
+// Memoize extractPageContent with URL-sensitive key and short expiration
+const memoizedExtractPageContent = memoizeWithExpiration(
+	async (tabId: number) => {
+		const tab = await browser.tabs.get(tabId);
+		return extractPageContent(tabId);
+	},
+	{ 
+		expirationMs: 5000, 
+		keyFn: async (tabId) => {
+			const tab = await browser.tabs.get(tabId);
+			return `${tabId}-${tab.url}`;
+		}
+	}
+);
 
 async function initializeExtension(tabId: number) {
 	try {
@@ -355,7 +387,7 @@ async function handleClip() {
 				name: input.id,
 				value: (input as HTMLInputElement).value
 			})) as Property[];
-			const frontmatter = await generateFrontmatter(updatedProperties as Property[]);
+			const frontmatter = await memoizedGenerateFrontmatter(updatedProperties as Property[]);
 			fileContent = frontmatter + noteContentField.value;
 		} else {
 			fileContent = noteContentField.value;
@@ -421,7 +453,7 @@ async function refreshFields(tabId: number, checkTemplateTriggers: boolean = tru
 			return;
 		}
 
-		const extractedData = await extractPageContent(tabId);
+		const extractedData = await memoizedExtractPageContent(tabId);
 		if (extractedData) {
 			const currentUrl = tab.url;
 
@@ -533,7 +565,7 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 
 	for (const property of template.properties) {
 		const propertyDiv = createElementWithClass('div', 'metadata-property');
-		let value = await replaceVariables(currentTabId!, unescapeValue(property.value), variables, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
+		let value = await memoizedReplaceVariables(currentTabId!, unescapeValue(property.value), variables, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
 
 		const propertyType = generalSettings.propertyTypes.find(p => p.name === property.name)?.type || 'text';
 
@@ -583,7 +615,7 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 
 	const noteNameField = document.getElementById('note-name-field') as HTMLTextAreaElement;
 	if (noteNameField) {
-		let formattedNoteName = await replaceVariables(currentTabId!, template.noteNameFormat, variables, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
+		let formattedNoteName = await memoizedReplaceVariables(currentTabId!, template.noteNameFormat, variables, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
 		noteNameField.setAttribute('data-template-value', template.noteNameFormat);
 		noteNameField.value = formattedNoteName;
 		adjustNoteNameHeight(noteNameField);
@@ -599,7 +631,7 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 			pathField.style.display = 'none';
 		} else {
 			pathContainer.style.display = 'flex';
-			let formattedPath = await replaceVariables(currentTabId!, template.path, variables, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
+			let formattedPath = await memoizedReplaceVariables(currentTabId!, template.path, variables, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
 			pathField.value = formattedPath;
 			pathField.setAttribute('data-template-value', template.path);
 		}
@@ -608,7 +640,7 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 	const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
 	if (noteContentField) {
 		if (template.noteContentFormat) {
-			let content = await replaceVariables(currentTabId!, template.noteContentFormat, variables, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
+			let content = await memoizedReplaceVariables(currentTabId!, template.noteContentFormat, variables, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
 			noteContentField.value = content;
 			noteContentField.setAttribute('data-template-value', template.noteContentFormat);
 		} else {
