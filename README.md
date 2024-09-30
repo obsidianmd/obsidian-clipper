@@ -251,15 +251,16 @@ Filters allow you to modify variables in a template. Filters are applied to vari
 
 ## Building the extension
 
-To build the extension for Chromium browsers and Firefox:
+To build the extension:
 
 ```
 npm run build
 ```
 
-This will create two directories:
+This will create three directories:
 - `dist/` for the Chromium version
 - `dist_firefox/` for the Firefox version
+- `dist_safari/` for the Safari version
 
 ### Installing in Chrome, Brave, Edge, and Arc
 
