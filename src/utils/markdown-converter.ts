@@ -433,13 +433,12 @@ export function createMarkdownContent(content: string, url: string) {
 
 	turndownService.addRule('preformattedCode', {
 		filter: (node) => {
-			return node.nodeName === 'PRE' && node.querySelector('code') !== null;
+			return node.nodeName === 'PRE';
 		},
 		replacement: (content, node) => {
 			if (!(node instanceof HTMLElement)) return content;
 
 			const codeElement = node.querySelector('code');
-			if (!codeElement) return content;
 
 			// Function to get language from class
 			const getLanguageFromClass = (classList: DOMTokenList): string => {
@@ -494,8 +493,8 @@ export function createMarkdownContent(content: string, url: string) {
 				return '';
 			};
 
-			// Extract all text content from the code element
-			let codeContent = extractStructuredText(codeElement);
+			// Extract all text content from the pre element or its code child
+			let codeContent = codeElement ? extractStructuredText(codeElement) : extractStructuredText(node);
 
 			// Remove any extra newlines at the start or end
 			codeContent = codeContent.replace(/^\n+|\n+$/g, '');
