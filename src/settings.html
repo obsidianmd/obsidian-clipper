@@ -192,17 +192,34 @@
 						</div>
 						<form id="property-types-form">
 							<div>
+								<h3>Import and export</h3>
+								<div class="setting-item mod-horizontal">
+									<div class="setting-item-info">
+										<label for="import-types-btn">Import properties</label>
+										<div class="setting-item-description">To import your properties from Obsidian, locate the <strong>types.json</strong> file in the <strong>.obsidian</strong> folder within your vault. Note this folder is hidden by default on most operating systems.</div>
+									</div>
+									<div class="setting-item-control">
+										<button type="button" id="import-types-btn">Import</button>
+									</div>
+								</div>
+								<div class="setting-item mod-horizontal">
+									<div class="setting-item-info">
+										<label for="export-types-btn">Export properties</label>
+										<div class="setting-item-description">Creates a <strong>types.json</strong> file that can be imported into your Obsidian vault, or other into Web Clipper on other devices.</div>
+									</div>
+									<div class="setting-item-control">
+										<button type="button" id="export-types-btn">Export</button>
+									</div>
+								</div>
+							</div>
+							<div>
 								<h3>All properties</h3>
 								<div id="property-types-list" class="properties-list"></div>
 								<div class="add-btn">
 									<a id="add-property-type-btn">+ Add property type</a>
 								</div>
 							</div>
-							<div>
-								<h3>Import/Export</h3>
-								<button type="button" id="import-types-btn">Import types.json</button>
-								<button type="button" id="export-types-btn">Export types.json</button>
-							</div>
+							
 						</form>
 					</div>
 
