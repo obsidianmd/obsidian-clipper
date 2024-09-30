@@ -4,9 +4,9 @@ import { generateFrontmatter, saveToObsidian } from '../utils/obsidian-note-crea
 import { extractPageContent, initializePageContent, replaceVariables } from '../utils/content-extractor';
 import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
 import { decompressFromUTF16 } from 'lz-string';
-import { findMatchingTemplate, matchPattern } from '../utils/triggers';
+import { findMatchingTemplate, initializeTriggers } from '../utils/triggers';
 import { getLocalStorage, setLocalStorage, loadSettings, generalSettings, Settings } from '../utils/storage-utils';
-import { escapeHtml, formatVariables, unescapeValue } from '../utils/string-utils';
+import { escapeHtml, unescapeValue } from '../utils/string-utils';
 import { loadTemplates, createDefaultTemplate } from '../managers/template-manager';
 import browser from '../utils/browser-polyfill';
 import { detectBrowser, addBrowserClassToHtml } from '../utils/browser-detection';
@@ -17,14 +17,48 @@ import { debugLog } from '../utils/debug';
 import { showVariables, initializeVariablesPanel, updateVariablesPanel } from '../managers/inspect-variables';
 import { ensureContentScriptLoaded } from '../utils/content-script-utils';
 import { isBlankPage, isValidUrl } from '../utils/active-tab-manager';
+import { memoize, memoizeWithExpiration } from '../utils/memoize';
 
 let loadedSettings: Settings;
 let currentTemplate: Template | null = null;
 let templates: Template[] = [];
 let currentVariables: { [key: string]: string } = {};
 let currentTabId: number | undefined;
+let lastUsedTemplateId: string | null = null;
+let lastSelectedVault: string | null = null;
 
 const isSidePanel = window.location.pathname.includes('side-panel.html');
+
+// Memoize replaceVariables with a short expiration and URL-sensitive key
+const memoizedReplaceVariables = memoizeWithExpiration(
+	async (tabId: number, template: string, variables: { [key: string]: string }, currentUrl: string) => {
+		return replaceVariables(tabId, template, variables, currentUrl);
+	},
+	{ expirationMs: 5000, keyFn: (tabId, template, variables, currentUrl) => `${tabId}-${template}-${currentUrl}` }
+);
+
+// Memoize generateFrontmatter with a longer expiration
+const memoizedGenerateFrontmatter = memoizeWithExpiration(
+	async (properties: Property[]) => {
+		return generateFrontmatter(properties);
+	},
+	{ expirationMs: 30000 }
+);
+
+// Memoize extractPageContent with URL-sensitive key and short expiration
+const memoizedExtractPageContent = memoizeWithExpiration(
+	async (tabId: number) => {
+		const tab = await browser.tabs.get(tabId);
+		return extractPageContent(tabId);
+	},
+	{ 
+		expirationMs: 5000, 
+		keyFn: async (tabId) => {
+			const tab = await browser.tabs.get(tabId);
+			return `${tabId}-${tab.url}`;
+		}
+	}
+);
 
 async function initializeExtension(tabId: number) {
 	try {
@@ -40,8 +74,24 @@ async function initializeExtension(tabId: number) {
 			return false;
 		}
 
-		currentTemplate = templates[0]; // Set the first template as default
+		// Initialize triggers to speed up template matching
+		initializeTriggers(templates);
+
+		// Load last used template
+		lastUsedTemplateId = await getLocalStorage('lastUsedTemplateId');
+		if (lastUsedTemplateId) {
+			currentTemplate = templates.find(t => t.id === lastUsedTemplateId) || templates[0];
+		} else {
+			currentTemplate = templates[0];
+		}
 		debugLog('Templates', 'Current template set to:', currentTemplate);
+
+		// Load last selected vault
+		lastSelectedVault = await getLocalStorage('lastSelectedVault');
+		if (!lastSelectedVault && loadedSettings.vaults.length > 0) {
+			lastSelectedVault = loadedSettings.vaults[0];
+		}
+		debugLog('Vaults', 'Last selected vault:', lastSelectedVault);
 
 		const tab = await browser.tabs.get(tabId);
 		if (!tab.url || isBlankPage(tab.url)) {
@@ -190,15 +240,8 @@ document.addEventListener('DOMContentLoaded', async function() {
 function setupEventListeners(tabId: number) {
 	const templateDropdown = document.getElementById('template-select') as HTMLSelectElement;
 	if (templateDropdown) {
-		templateDropdown.addEventListener('change', async function(this: HTMLSelectElement) {
-			console.log('Template changed to:', this.value, tabId);
-			currentTemplate = templates.find((t: Template) => t.name === this.value) || null;
-			if (currentTemplate) {
-				// Pass false to refreshFields to prevent checking for a matching template
-				await refreshFields(tabId, false);
-			} else {
-				logError('Selected template not found');
-			}
+		templateDropdown.addEventListener('change', function(this: HTMLSelectElement) {
+			handleTemplateChange(this.value);
 		});
 	}
 
@@ -288,6 +331,22 @@ async function handleClip() {
 		return;
 	}
 
+	const selectedVault = currentTemplate.vault || vaultDropdown.value;
+	const noteContent = noteContentField.value;
+	const isDailyNote = currentTemplate.behavior === 'append-daily' || currentTemplate.behavior === 'prepend-daily';
+
+	let noteName = '';
+	let path = '';
+
+	if (!isDailyNote) {
+		if (!noteNameField || !pathField) {
+			showError('Note name or path field is missing. Please try reloading the extension.');
+			return;
+		}
+		noteName = noteNameField.value;
+		path = pathField.value;
+	}
+
 	// Check if interpreter is enabled, the button exists, and there are prompt variables
 	const promptVariables = collectPromptVariables(currentTemplate);
 	if (generalSettings.interpreterEnabled && interpretBtn && promptVariables.length > 0) {
@@ -311,27 +370,11 @@ async function handleClip() {
 		}
 	}
 
-	const selectedVault = currentTemplate.vault || vaultDropdown.value;
-	const noteContent = noteContentField.value;
-	const isDailyNote = currentTemplate.behavior === 'append-daily' || currentTemplate.behavior === 'prepend-daily';
-
-	let noteName = '';
-	let path = '';
-
-	if (!isDailyNote) {
-		if (!noteNameField || !pathField) {
-			showError('Note name or path field is missing. Please try reloading the extension.');
-			return;
-		}
-		noteName = noteNameField.value;
-		path = pathField.value;
-	}
-
 	const properties = Array.from(document.querySelectorAll('.metadata-property input')).map(input => ({
+		id: (input as HTMLElement).dataset.id || Date.now().toString() + Math.random().toString(36).slice(2, 11),
 		name: input.id,
-		value: (input as HTMLInputElement).value,
-		type: input.getAttribute('data-type') || 'text'
-	}));
+		value: (input as HTMLInputElement).value
+	})) as Property[];
 
 	let fileContent: string;
 	const frontmatter = await generateFrontmatter(properties as Property[]);
@@ -340,11 +383,11 @@ async function handleClip() {
 	try {
 		if (currentTemplate.behavior === 'create') {
 			const updatedProperties = Array.from(document.querySelectorAll('.metadata-property input')).map(input => ({
+				id: (input as HTMLElement).dataset.id || Date.now().toString() + Math.random().toString(36).slice(2, 11),
 				name: input.id,
-				value: (input as HTMLInputElement).value,
-				type: input.getAttribute('data-type') || 'text'
-			}));
-			const frontmatter = await generateFrontmatter(updatedProperties as Property[]);
+				value: (input as HTMLInputElement).value
+			})) as Property[];
+			const frontmatter = await memoizedGenerateFrontmatter(updatedProperties as Property[]);
 			fileContent = frontmatter + noteContentField.value;
 		} else {
 			fileContent = noteContentField.value;
@@ -352,6 +395,16 @@ async function handleClip() {
 
 		await saveToObsidian(fileContent, noteName, path, selectedVault, currentTemplate.behavior);
 		
+		// Update last used template
+		lastUsedTemplateId = currentTemplate.id;
+		await setLocalStorage('lastUsedTemplateId', lastUsedTemplateId);
+
+		// Only update lastSelectedVault if the user explicitly chose a vault
+		if (!currentTemplate.vault) {
+			lastSelectedVault = selectedVault;
+			await setLocalStorage('lastSelectedVault', lastSelectedVault);
+		}
+
 		// Only close the window if it's not running in side panel mode
 		if (!isSidePanel) {
 			setTimeout(() => window.close(), 1500);
@@ -400,20 +453,26 @@ async function refreshFields(tabId: number, checkTemplateTriggers: boolean = tru
 			return;
 		}
 
-		const extractedData = await extractPageContent(tabId);
+		const extractedData = await memoizedExtractPageContent(tabId);
 		if (extractedData) {
 			const currentUrl = tab.url;
 
+			// Set the initial template to the last used one or the first template
+			currentTemplate = templates.find(t => t.id === lastUsedTemplateId) || templates[0];
+			updateTemplateDropdown();
+
 			// Only check for the correct template if checkTemplateTriggers is true
 			if (checkTemplateTriggers) {
-				const matchedTemplate = findMatchingTemplate(currentUrl, templates, extractedData.schemaOrgData);
+				const getSchemaOrgData = async () => {
+					return extractedData.schemaOrgData;
+				};
+
+				const matchedTemplate = await findMatchingTemplate(currentUrl, getSchemaOrgData);
 				if (matchedTemplate) {
+					console.log('Matched template:', matchedTemplate);
 					currentTemplate = matchedTemplate;
-				} else {
-					// If no matching template is found, use the first template
-					currentTemplate = templates[0];
+					updateTemplateDropdown();
 				}
-				updateTemplateDropdown();
 			}
 
 			const initializedContent = await initializePageContent(
@@ -425,6 +484,7 @@ async function refreshFields(tabId: number, checkTemplateTriggers: boolean = tru
 				extractedData.fullHtml
 			);
 			if (initializedContent) {
+				setupMetadataToggle();
 				currentVariables = initializedContent.currentVariables;
 				console.log('Updated currentVariables:', currentVariables);
 				await initializeTemplateFields(
@@ -434,7 +494,6 @@ async function refreshFields(tabId: number, checkTemplateTriggers: boolean = tru
 					initializedContent.noteName,
 					extractedData.schemaOrgData
 				);
-				setupMetadataToggle();
 
 				// Update variables panel if it's open
 				updateVariablesPanel(currentTemplate, currentVariables);
@@ -454,7 +513,7 @@ async function refreshFields(tabId: number, checkTemplateTriggers: boolean = tru
 function updateTemplateDropdown() {
 	const templateDropdown = document.getElementById('template-select') as HTMLSelectElement;
 	if (templateDropdown && currentTemplate) {
-		templateDropdown.value = currentTemplate.name;
+		templateDropdown.value = currentTemplate.id;
 	}
 }
 
@@ -464,11 +523,11 @@ function populateTemplateDropdown() {
 		templateDropdown.innerHTML = '';
 		templates.forEach((template: Template) => {
 			const option = document.createElement('option');
-			option.value = template.name;
+			option.value = template.id;
 			option.textContent = template.name;
 			templateDropdown.appendChild(option);
 		});
-		templateDropdown.value = currentTemplate.name;
+		templateDropdown.value = currentTemplate.id;
 	}
 }
 
@@ -478,9 +537,11 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 		return;
 	}
 
+	initializeIcons();
+
 	currentVariables = variables;
 	const existingTemplateProperties = document.querySelector('.metadata-properties') as HTMLElement;
-	
+
 	// Create a new off-screen element
 	const newTemplateProperties = createElementWithClass('div', 'metadata-properties');
 	newTemplateProperties.style.position = 'absolute';
@@ -492,12 +553,24 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 		return;
 	}
 
+	// Handle vault selection
+	const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement;
+	if (vaultDropdown) {
+		if (template.vault) {
+			vaultDropdown.value = template.vault;
+		} else if (lastSelectedVault) {
+			vaultDropdown.value = lastSelectedVault;
+		}
+	}
+
 	for (const property of template.properties) {
 		const propertyDiv = createElementWithClass('div', 'metadata-property');
-		let value = await replaceVariables(currentTabId!, unescapeValue(property.value), variables, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
+		let value = await memoizedReplaceVariables(currentTabId!, unescapeValue(property.value), variables, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
+
+		const propertyType = generalSettings.propertyTypes.find(p => p.name === property.name)?.type || 'text';
 
 		// Apply type-specific parsing
-		switch (property.type) {
+		switch (propertyType) {
 			case 'number':
 				const numericValue = value.replace(/[^\d.-]/g, '');
 				value = numericValue ? parseFloat(numericValue).toString() : value;
@@ -520,9 +593,9 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 		}
 
 		propertyDiv.innerHTML = `
-			<span class="metadata-property-icon"><i data-lucide="${getPropertyTypeIcon(property.type)}"></i></span>
+			<span class="metadata-property-icon"><i data-lucide="${getPropertyTypeIcon(propertyType)}"></i></span>
 			<label for="${property.name}">${property.name}</label>
-			<input id="${property.name}" type="text" value="${escapeHtml(value)}" data-type="${property.type}" data-template-value="${escapeHtml(property.value)}" />
+			<input id="${property.name}" type="text" value="${escapeHtml(value)}" data-type="${propertyType}" data-template-value="${escapeHtml(property.value)}" />
 		`;
 		newTemplateProperties.appendChild(propertyDiv);
 	}
@@ -538,9 +611,11 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 	newTemplateProperties.style.position = '';
 	newTemplateProperties.style.left = '';
 
+	initializeIcons();
+
 	const noteNameField = document.getElementById('note-name-field') as HTMLTextAreaElement;
 	if (noteNameField) {
-		let formattedNoteName = await replaceVariables(currentTabId!, template.noteNameFormat, variables, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
+		let formattedNoteName = await memoizedReplaceVariables(currentTabId!, template.noteNameFormat, variables, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
 		noteNameField.setAttribute('data-template-value', template.noteNameFormat);
 		noteNameField.value = formattedNoteName;
 		adjustNoteNameHeight(noteNameField);
@@ -556,7 +631,7 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 			pathField.style.display = 'none';
 		} else {
 			pathContainer.style.display = 'flex';
-			let formattedPath = await replaceVariables(currentTabId!, template.path, variables, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
+			let formattedPath = await memoizedReplaceVariables(currentTabId!, template.path, variables, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
 			pathField.value = formattedPath;
 			pathField.setAttribute('data-template-value', template.path);
 		}
@@ -565,35 +640,13 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 	const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
 	if (noteContentField) {
 		if (template.noteContentFormat) {
-			let content = await replaceVariables(currentTabId!, template.noteContentFormat, variables, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
+			let content = await memoizedReplaceVariables(currentTabId!, template.noteContentFormat, variables, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
 			noteContentField.value = content;
 			noteContentField.setAttribute('data-template-value', template.noteContentFormat);
 		} else {
 			noteContentField.value = '';
 			noteContentField.setAttribute('data-template-value', '');
 		}
-	}
-
-	initializeIcons();
-
-	const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement;
-	if (vaultDropdown) {
-		if (template.vault) {
-			vaultDropdown.value = template.vault;
-		} else {
-			// Try to get the previously selected vault
-			getLocalStorage('lastSelectedVault').then((lastSelectedVault) => {
-				if (lastSelectedVault && loadedSettings.vaults.includes(lastSelectedVault)) {
-					vaultDropdown.value = lastSelectedVault;
-				} else if (loadedSettings.vaults.length > 0) {
-					vaultDropdown.value = loadedSettings.vaults[0];
-				}
-			});
-		}
-
-		vaultDropdown.addEventListener('change', () => {
-			setLocalStorage('lastSelectedVault', vaultDropdown.value);
-		});
 	}
 
 	if (template) {
@@ -683,10 +736,9 @@ async function getReplacedTemplate(template: Template, variables: { [key: string
 
 	for (const prop of template.properties) {
 		const replacedProp: Property = {
-			id: prop.id, // Include the id property
+			id: prop.id,
 			name: prop.name,
-			value: await replaceVariables(tabId, prop.value, variables, currentUrl),
-			type: prop.type
+			value: await replaceVariables(tabId, prop.value, variables, currentUrl)
 		};
 		replacedTemplate.properties.push(replacedProp);
 	}
@@ -709,15 +761,32 @@ function updateVaultDropdown(vaults: string[]) {
 		vaultDropdown.appendChild(option);
 	});
 
-	// Only show vault selector if one is defined
+	// Only show vault selector if vaults are defined
 	if (vaults.length > 0) {
 		vaultContainer.style.display = 'block';
-		vaultDropdown.value = vaults[0];
+		if (lastSelectedVault && vaults.includes(lastSelectedVault)) {
+			vaultDropdown.value = lastSelectedVault;
+		} else {
+			vaultDropdown.value = vaults[0];
+		}
 	} else {
 		vaultContainer.style.display = 'none';
 	}
+
+	// Add event listener to update lastSelectedVault when changed
+	vaultDropdown.addEventListener('change', () => {
+		lastSelectedVault = vaultDropdown.value;
+		setLocalStorage('lastSelectedVault', lastSelectedVault);
+	});
 }
 
 function refreshPopup() {
 	window.location.reload();
+}
+
+function handleTemplateChange(templateId: string) {
+	currentTemplate = templates.find(t => t.id === templateId) || templates[0];
+	lastUsedTemplateId = currentTemplate.id;
+	setLocalStorage('lastUsedTemplateId', lastUsedTemplateId);
+	refreshFields(currentTabId!, false);
 }

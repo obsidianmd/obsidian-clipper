@@ -32,6 +32,7 @@ body {
 @import 'styles/settings';
 @import 'styles/side-panel';
 @import 'styles/templates';
+@import 'styles/tree-items';
 @import 'styles/toggles';
 
 a.text-muted,
@@ -41,6 +42,10 @@ a.text-muted,
 
 .small {
 	font-size: var(--font-ui-small);
+}
+
+strong {
+	font-weight: 600;
 }
 
 h2 {

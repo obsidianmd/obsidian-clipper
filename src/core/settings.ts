@@ -108,7 +108,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 	async function handleUrlParameters(): Promise<void> {
 		const { section, templateId } = getUrlParameters();
 
-		if (section === 'general' || section === 'interpreter') {
+		if (section === 'general' || section === 'interpreter' || section === 'properties') {
 			showSettingsSection(section);
 		} else if (templateId) {
 			const template = findTemplateById(templateId);

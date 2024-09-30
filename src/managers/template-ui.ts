@@ -2,7 +2,7 @@ import { Template, Property } from '../types/types';
 import { templates, editingTemplateIndex, saveTemplateSettings, getTemplates, setEditingTemplateIndex } from './template-manager';
 import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
 import { escapeValue, escapeHtml, unescapeValue } from '../utils/string-utils';
-import { generalSettings } from '../utils/storage-utils';
+import { generalSettings, updatePropertyType } from '../utils/storage-utils';
 import { updateUrl } from '../utils/routing';
 import { handleDragStart, handleDragOver, handleDrop, handleDragEnd } from '../utils/drag-and-drop';
 import browser from '../utils/browser-polyfill';
@@ -191,8 +191,10 @@ export function showTemplateEditor(template: Template | null): void {
 		behaviorSelect.addEventListener('change', updateBehaviorFields);
 	}
 
+	refreshPropertyNameSuggestions();
+
 	if (editingTemplate && Array.isArray(editingTemplate.properties)) {
-		editingTemplate.properties.forEach(property => addPropertyToEditor(property.name, property.value, property.type, property.id));
+		editingTemplate.properties.forEach(property => addPropertyToEditor(property.name, property.value, property.id));
 	}
 
 	const triggersTextarea = document.getElementById('url-patterns') as HTMLTextAreaElement;
@@ -277,7 +279,7 @@ function updateBehaviorFields(): void {
 	}
 }
 
-export function addPropertyToEditor(name: string = '', value: string = '', type: string = 'text', id: string | null = null): void {
+export function addPropertyToEditor(name: string = '', value: string = '', id: string | null = null): void {
 	const templateProperties = document.getElementById('template-properties');
 	if (!templateProperties) return;
 
@@ -291,8 +293,9 @@ export function addPropertyToEditor(name: string = '', value: string = '', type:
 
 	const propertySelectDiv = createElementWithClass('div', 'property-select');
 	const propertySelectedDiv = createElementWithClass('div', 'property-selected');
-	propertySelectedDiv.dataset.value = type;
-	propertySelectedDiv.appendChild(createElementWithHTML('i', '', { 'data-lucide': getPropertyTypeIcon(type) }));
+	const propertyType = generalSettings.propertyTypes.find(p => p.name === name)?.type || 'text';
+	propertySelectedDiv.dataset.value = propertyType;
+	propertySelectedDiv.appendChild(createElementWithHTML('i', '', { 'data-lucide': getPropertyTypeIcon(propertyType) }));
 	propertySelectDiv.appendChild(propertySelectedDiv);
 
 	const select = document.createElement('select');
@@ -304,8 +307,11 @@ export function addPropertyToEditor(name: string = '', value: string = '', type:
 		option.textContent = optionValue.charAt(0).toUpperCase() + optionValue.slice(1);
 		select.appendChild(option);
 	});
+	select.value = propertyType;
 	propertySelectDiv.appendChild(select);
 	propertyDiv.appendChild(propertySelectDiv);
+
+	const propertyTypeObj = generalSettings.propertyTypes.find(p => p.name === name);
 
 	const nameInput = createElementWithHTML('input', '', {
 		type: 'text',
@@ -314,9 +320,21 @@ export function addPropertyToEditor(name: string = '', value: string = '', type:
 		value: name,
 		placeholder: 'Property name',
 		autocapitalize: 'off',
-		autocomplete: 'off'
+		autocomplete: 'off',
+		list: 'property-name-suggestions'
 	});
 	propertyDiv.appendChild(nameInput);
+
+	// Create datalist for autocomplete if it doesn't exist
+	let datalist = document.getElementById('property-name-suggestions');
+	if (!datalist) {
+		datalist = document.createElement('datalist');
+		datalist.id = 'property-name-suggestions';
+		document.body.appendChild(datalist);
+	}
+
+	// Populate datalist with existing property types
+	updatePropertyNameSuggestions();
 
 	const valueInput = createElementWithHTML('input', '', {
 		type: 'text',
@@ -324,7 +342,7 @@ export function addPropertyToEditor(name: string = '', value: string = '', type:
 		id: `${propertyId}-value`,
 		value: unescapeValue(value),
 		placeholder: 'Property value'
-	});
+	}) as HTMLInputElement;
 	propertyDiv.appendChild(valueInput);
 
 	const removeBtn = createElementWithClass('button', 'remove-property-btn clickable-icon');
@@ -358,10 +376,14 @@ export function addPropertyToEditor(name: string = '', value: string = '', type:
 	propertyDiv.addEventListener('mouseup', resetDraggable);
 
 	if (select) {
-		select.value = type;
-
 		select.addEventListener('change', function() {
 			if (propertySelectedDiv) updateSelectedOption(this.value, propertySelectedDiv);
+			// Update the global property type
+			updatePropertyType(name, this.value).then(() => {
+				console.log(`Property type for ${name} updated to ${this.value}`);
+			}).catch(error => {
+				console.error(`Failed to update property type for ${name}:`, error);
+			});
 		});
 	}
 
@@ -376,9 +398,33 @@ export function addPropertyToEditor(name: string = '', value: string = '', type:
 	propertyDiv.addEventListener('drop', handleDrop);
 	propertyDiv.addEventListener('dragend', handleDragEnd);
 
-	updateSelectedOption(type, propertySelectedDiv);
+	updateSelectedOption(propertyType, propertySelectedDiv);
 
 	initializeIcons(propertyDiv);
+
+	nameInput.addEventListener('input', function(this: HTMLInputElement) {
+		const selectedType = generalSettings.propertyTypes.find(pt => pt.name === this.value);
+		if (selectedType) {
+			select.value = selectedType.type;
+			updateSelectedOption(selectedType.type, propertySelectedDiv);
+			
+			// Fill in the default value if it exists and the value input is empty
+			if (selectedType.defaultValue && !valueInput.value) {
+				valueInput.value = selectedType.defaultValue;
+			}
+		}
+	});
+
+	// Add a change event listener to handle selection from autocomplete
+	nameInput.addEventListener('change', function(this: HTMLInputElement) {
+		const selectedType = generalSettings.propertyTypes.find(pt => pt.name === this.value);
+		if (selectedType) {
+			// Fill in the default value if it exists, regardless of current value
+			if (selectedType.defaultValue) {
+				valueInput.value = selectedType.defaultValue;
+			}
+		}
+	});
 }
 
 function updateSelectedOption(value: string, propertySelected: HTMLElement): void {
@@ -497,4 +543,20 @@ function getUniqueTemplateName(baseName: string): string {
 	}
 
 	return newName;
+}
+
+function updatePropertyNameSuggestions(): void {
+	const datalist = document.getElementById('property-name-suggestions');
+	if (datalist) {
+		datalist.innerHTML = '';
+		generalSettings.propertyTypes.forEach(pt => {
+			const option = document.createElement('option');
+			option.value = pt.name;
+			datalist.appendChild(option);
+		});
+	}
+}
+
+export function refreshPropertyNameSuggestions(): void {
+	updatePropertyNameSuggestions();
 }

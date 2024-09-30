@@ -65,6 +65,10 @@ button.clickable-icon {
 		opacity: 1;
 		box-shadow: none;
 	}
+	&[disabled] {
+		opacity: 0.5;
+		cursor: not-allowed;
+	}
 }
 
 .add-btn {

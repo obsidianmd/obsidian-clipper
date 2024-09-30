@@ -121,7 +121,7 @@
 	margin: 24px max(6%, 24px) 72px max(6%, 24px);
 
 	&.active {
-		display: flex;
+		display: block;
 	}
 
 	form {
@@ -318,7 +318,7 @@
 		}
 		.setting-hotkey {
 			background-color: var(--background-secondary);
-			padding: 2px 8px;
+			padding: 0.125rem 0.5rem;
 			border-radius: var(--radius-s);
 			font-size: var(--font-ui-smaller);
 		}

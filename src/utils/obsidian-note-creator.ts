@@ -8,7 +8,9 @@ export async function generateFrontmatter(properties: Property[]): Promise<strin
 	for (const property of properties) {
 		frontmatter += `${property.name}:`;
 
-		switch (property.type) {
+		const propertyType = generalSettings.propertyTypes.find(p => p.name === property.name)?.type || 'text';
+
+		switch (propertyType) {
 			case 'multitext':
 				let items: string[];
 				if (property.value.trim().startsWith('["') && property.value.trim().endsWith('"]')) {
