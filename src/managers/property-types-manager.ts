@@ -1,6 +1,7 @@
 import { generalSettings, addPropertyType, updatePropertyType, removePropertyType, saveSettings } from '../utils/storage-utils';
 import { createElementWithClass, createElementWithHTML } from '../utils/dom-utils';
 import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
+import { templates } from './template-manager';
 
 export function initializePropertyTypesManager(): void {
 	updatePropertyTypesList();
@@ -14,20 +15,32 @@ function updatePropertyTypesList(): void {
 
 	propertyTypesList.innerHTML = '';
 
+	const propertyUsageCounts = countPropertyUsage();
+
 	// Sort property types by name
 	const sortedPropertyTypes = [...generalSettings.propertyTypes].sort((a, b) => 
 		a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
 	);
 
 	sortedPropertyTypes.forEach(propertyType => {
-		const listItem = createPropertyTypeListItem(propertyType);
+		const listItem = createPropertyTypeListItem(propertyType, propertyUsageCounts[propertyType.name] || 0);
 		propertyTypesList.appendChild(listItem);
 	});
 
 	initializeIcons(propertyTypesList);
 }
 
-function createPropertyTypeListItem(propertyType: { name: string; type: string }): HTMLElement {
+function countPropertyUsage(): Record<string, number> {
+	const usageCounts: Record<string, number> = {};
+	templates.forEach(template => {
+		template.properties.forEach(property => {
+			usageCounts[property.name] = (usageCounts[property.name] || 0) + 1;
+		});
+	});
+	return usageCounts;
+}
+
+function createPropertyTypeListItem(propertyType: { name: string; type: string }, usageCount: number): HTMLElement {
 	const listItem = createElementWithClass('div', 'property-editor');
 
 	const propertySelectDiv = createElementWithClass('div', 'property-select');
@@ -54,6 +67,9 @@ function createPropertyTypeListItem(propertyType: { name: string; type: string }
 		readonly: 'true'
 	});
 
+	const usageSpan = createElementWithClass('span', 'tree-item-flair');
+	usageSpan.textContent = `${usageCount}`;
+
 	const removeBtn = createElementWithClass('button', 'remove-property-btn clickable-icon');
 	removeBtn.setAttribute('type', 'button');
 	removeBtn.setAttribute('aria-label', 'Remove property type');
@@ -61,6 +77,7 @@ function createPropertyTypeListItem(propertyType: { name: string; type: string }
 
 	listItem.appendChild(propertySelectDiv);
 	listItem.appendChild(nameInput);
+	listItem.appendChild(usageSpan);
 	listItem.appendChild(removeBtn);
 
 	select.addEventListener('change', function() {
