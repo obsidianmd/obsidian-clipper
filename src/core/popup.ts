@@ -425,6 +425,7 @@ async function refreshFields(tabId: number, checkTemplateTriggers: boolean = tru
 				extractedData.fullHtml
 			);
 			if (initializedContent) {
+				setupMetadataToggle();
 				currentVariables = initializedContent.currentVariables;
 				console.log('Updated currentVariables:', currentVariables);
 				await initializeTemplateFields(
@@ -434,7 +435,6 @@ async function refreshFields(tabId: number, checkTemplateTriggers: boolean = tru
 					initializedContent.noteName,
 					extractedData.schemaOrgData
 				);
-				setupMetadataToggle();
 
 				// Update variables panel if it's open
 				updateVariablesPanel(currentTemplate, currentVariables);
@@ -478,9 +478,11 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 		return;
 	}
 
+	initializeIcons();
+
 	currentVariables = variables;
 	const existingTemplateProperties = document.querySelector('.metadata-properties') as HTMLElement;
-	
+
 	// Create a new off-screen element
 	const newTemplateProperties = createElementWithClass('div', 'metadata-properties');
 	newTemplateProperties.style.position = 'absolute';
@@ -540,6 +542,8 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 	newTemplateProperties.style.position = '';
 	newTemplateProperties.style.left = '';
 
+	initializeIcons();
+
 	const noteNameField = document.getElementById('note-name-field') as HTMLTextAreaElement;
 	if (noteNameField) {
 		let formattedNoteName = await replaceVariables(currentTabId!, template.noteNameFormat, variables, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
@@ -575,8 +579,6 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 			noteContentField.setAttribute('data-template-value', '');
 		}
 	}
-
-	initializeIcons();
 
 	const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement;
 	if (vaultDropdown) {
