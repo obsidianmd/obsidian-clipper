@@ -41,7 +41,7 @@
 						<form id="general-settings-form">
 								<div>
 									<h3>Vaults</h3>
-									<div class="setting-item-description">By default, clipped notes are saved to the currently open vault. You can add vaults here if you want the option to save to different vaults. Vault names must exactly match the name of the Obsidian vault. Press enter to add a&nbsp;vault.</div>
+									<div class="setting-item-description">By default, clipped notes are saved to the currently open vault. You can add vaults here if you want the option to save to different vaults. Vault names must exactly match the name of the Obsidian vault. Press <strong>enter</strong> to add a&nbsp;vault.</div>
 									<input type="text" id="vault-input" placeholder="Press enter to add a vault" autocomplete="off" spellcheck="false" />
 									<ul id="vault-list"></ul>
 								</div>
@@ -120,16 +120,15 @@
 
 					<div id="interpreter-section" class="settings-section">
 						<div class="settings-section-header">
-							<h2>Interpreter settings</h2>
+							<h2>Interpreter</h2>
 						</div>
 						<form id="interpreter-settings-form">
 							<div>
-								<h3>Interpreter</h3>
 								<div class="setting-item mod-horizontal">
 									<div class="setting-item-info">
 										<label for="interpreter-toggle">Enable interpreter</label>
 										<div class="setting-item-description">
-											Allows you to use prompt variables in your templates, to fill in information using natural language such as <code>{{prompt:"a summary of the page"}}</code>. Requires an API&nbsp;key.
+											Use natural language to extract data from pages. For example, you can use the template syntax <strong>{{prompt:"a summary of the page"}}</strong>. Requires an API&nbsp;key or local&nbsp;model.
 										</div>
 									</div>
 									<div class="setting-item-control">
@@ -192,7 +191,6 @@
 						</div>
 						<form id="property-types-form">
 							<div>
-								<h3>Import and export</h3>
 								<div class="setting-item mod-horizontal">
 									<div class="setting-item-info">
 										<label for="import-types-btn">Import properties</label>
@@ -214,7 +212,7 @@
 							</div>
 							<div>
 								<h3>All properties</h3>
-								<div class="add-btn">
+								<div class="add-btn" style="display: none;">
 									<a id="add-property-type-btn">+ Add property</a>
 								</div>
 								<div id="property-types-list" class="properties-list"></div>

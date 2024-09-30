@@ -63,16 +63,16 @@ export async function setShortcutInstructions() {
 		let instructions = '';
 		switch (browser) {
 			case 'chrome':
-				instructions = 'To change key assignments, go to <code>chrome://extensions/shortcuts</code>';
+				instructions = 'To change key assignments, go to <strong>chrome://extensions/shortcuts</strong>';
 				break;
 			case 'brave':
-				instructions = 'To change key assignments, go to <code>brave://extensions/shortcuts</code>';
+				instructions = 'To change key assignments, go to <strong>brave://extensions/shortcuts</strong>';
 				break;
 			case 'firefox':
-				instructions = 'To change key assignments, go to <code>about:addons</code>, click the gear icon, and select "Manage Extension Shortcuts".';
+				instructions = 'To change key assignments, go to <strong>about:addons</strong>, click the gear icon, and select "Manage Extension Shortcuts".';
 				break;
 			case 'edge':
-				instructions = 'To change key assignments, go to <code>edge://extensions/shortcuts</code>';
+				instructions = 'To change key assignments, go to <strong>edge://extensions/shortcuts</strong>';
 				break;
 			case 'safari':
 			case 'mobile-safari':
