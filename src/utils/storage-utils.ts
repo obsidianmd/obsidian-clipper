@@ -159,8 +159,10 @@ export async function updatePropertyType(name: string, newType: string): Promise
 	const index = generalSettings.propertyTypes.findIndex(p => p.name === name);
 	if (index !== -1) {
 		generalSettings.propertyTypes[index].type = newType;
-		await saveSettings();
+	} else {
+		generalSettings.propertyTypes.push({ name, type: newType });
 	}
+	await saveSettings();
 }
 
 export async function removePropertyType(name: string): Promise<void> {

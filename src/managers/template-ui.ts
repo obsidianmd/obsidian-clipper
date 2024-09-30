@@ -2,7 +2,7 @@ import { Template, Property } from '../types/types';
 import { templates, editingTemplateIndex, saveTemplateSettings, getTemplates, setEditingTemplateIndex } from './template-manager';
 import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
 import { escapeValue, escapeHtml, unescapeValue } from '../utils/string-utils';
-import { generalSettings } from '../utils/storage-utils';
+import { generalSettings, updatePropertyType } from '../utils/storage-utils';
 import { updateUrl } from '../utils/routing';
 import { handleDragStart, handleDragOver, handleDrop, handleDragEnd } from '../utils/drag-and-drop';
 import browser from '../utils/browser-polyfill';
@@ -362,6 +362,12 @@ export function addPropertyToEditor(name: string = '', value: string = '', id: s
 	if (select) {
 		select.addEventListener('change', function() {
 			if (propertySelectedDiv) updateSelectedOption(this.value, propertySelectedDiv);
+			// Update the global property type
+			updatePropertyType(name, this.value).then(() => {
+				console.log(`Property type for ${name} updated to ${this.value}`);
+			}).catch(error => {
+				console.error(`Failed to update property type for ${name}:`, error);
+			});
 		});
 	}
 
