@@ -40,9 +40,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 		console.log('Initializing menu');
 		initializeMenu('more-actions-btn', 'template-actions-menu');
 
-		addMenuItemListener('#duplicate-template-btn', 'template-actions-menu', duplicateCurrentTemplate);
-		addMenuItemListener('#delete-template-btn', 'template-actions-menu', deleteCurrentTemplate);
-
 		resetDefaultTemplateBtn.addEventListener('click', resetDefaultTemplate);
 
 		createIcons({ icons });
