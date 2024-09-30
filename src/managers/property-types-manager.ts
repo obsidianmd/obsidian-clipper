@@ -1,6 +1,6 @@
 import { generalSettings, addPropertyType, updatePropertyType, removePropertyType, saveSettings } from '../utils/storage-utils';
 import { createElementWithClass, createElementWithHTML } from '../utils/dom-utils';
-import { initializeIcons } from '../icons/icons';
+import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
 
 export function initializePropertyTypesManager(): void {
 	updatePropertyTypesList();
@@ -30,36 +30,60 @@ function updatePropertyTypesList(): void {
 function createPropertyTypeListItem(propertyType: { name: string; type: string }): HTMLElement {
 	const listItem = createElementWithClass('div', 'property-editor');
 
-	const typeSelect = document.createElement('select');
-	typeSelect.className = 'property-type-select';
+	const propertySelectDiv = createElementWithClass('div', 'property-select');
+	const propertySelectedDiv = createElementWithClass('div', 'property-selected');
+	propertySelectedDiv.dataset.value = propertyType.type;
+	propertySelectedDiv.appendChild(createElementWithHTML('i', '', { 'data-lucide': getPropertyTypeIcon(propertyType.type) }));
+	propertySelectDiv.appendChild(propertySelectedDiv);
+
+	const select = document.createElement('select');
+	select.className = 'property-type';
 	['text', 'multitext', 'number', 'checkbox', 'date', 'datetime'].forEach(type => {
 		const option = document.createElement('option');
 		option.value = type;
-		option.textContent = type;
-		typeSelect.appendChild(option);
+		option.textContent = type.charAt(0).toUpperCase() + type.slice(1);
+		select.appendChild(option);
 	});
-	typeSelect.value = propertyType.type;
+	select.value = propertyType.type;
+	propertySelectDiv.appendChild(select);
 
 	const nameInput = createElementWithHTML('input', '', {
 		type: 'text',
 		value: propertyType.name,
-		class: 'property-type-name',
+		class: 'property-name',
 		readonly: 'true'
 	});
 
-	const removeBtn = createElementWithClass('button', 'remove-property-type-btn clickable-icon');
+	const removeBtn = createElementWithClass('button', 'remove-property-btn clickable-icon');
 	removeBtn.setAttribute('type', 'button');
 	removeBtn.setAttribute('aria-label', 'Remove property type');
 	removeBtn.appendChild(createElementWithHTML('i', '', { 'data-lucide': 'trash-2' }));
 
-	listItem.appendChild(typeSelect);
+	listItem.appendChild(propertySelectDiv);
 	listItem.appendChild(nameInput);
 	listItem.appendChild(removeBtn);
 
-	typeSelect.addEventListener('change', () => updatePropertyType(propertyType.name, typeSelect.value));
+	select.addEventListener('change', function() {
+		updateSelectedOption(this.value, propertySelectedDiv);
+		updatePropertyType(propertyType.name, this.value).then(updatePropertyTypesList);
+	});
 	removeBtn.addEventListener('click', () => removePropertyType(propertyType.name).then(updatePropertyTypesList));
 
 	return listItem;
+}
+
+function updateSelectedOption(value: string, propertySelected: HTMLElement): void {
+	const iconName = getPropertyTypeIcon(value);
+	
+	// Clear existing content
+	propertySelected.innerHTML = '';
+	
+	// Create and append the new icon element
+	const iconElement = createElementWithHTML('i', '', { 'data-lucide': iconName });
+	propertySelected.appendChild(iconElement);
+	
+	propertySelected.setAttribute('data-value', value);
+	initializeIcons(propertySelected);
 }
 
 function setupAddPropertyTypeButton(): void {

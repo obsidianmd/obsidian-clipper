@@ -22,6 +22,23 @@
 	}
 }
 
+#property-types-list.properties-list {
+	gap: 0;
+	.property-editor {
+		border-radius: var(--radius-s);
+		&:hover {
+			background-color: var(--background-modifier-hover);
+		}
+	}
+	.property-name {
+		cursor: default;
+		max-width: 100%;
+		border: none;
+		box-shadow: none;
+		background-color: transparent;
+	}
+}
+
 .property-select {
 	position: relative;
 	color: var(--text-muted);
