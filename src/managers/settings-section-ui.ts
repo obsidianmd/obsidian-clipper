@@ -2,8 +2,9 @@ import { updateUrl } from '../utils/routing';
 import { generalSettings } from '../utils/storage-utils';
 import { updatePromptContextVisibility } from './interpreter-settings';
 import { Template } from '../types/types';
+import { initializePropertyTypesManager } from './property-types-manager';
 
-export function showSettingsSection(section: 'general' | 'interpreter' | 'templates', templateId?: string): void {
+export function showSettingsSection(section: 'general' | 'interpreter' | 'templates' | 'properties', templateId?: string): void {
 	const sections = ['general', 'interpreter', 'templates'];
 	
 	sections.forEach(s => {
@@ -33,6 +34,10 @@ export function showSettingsSection(section: 'general' | 'interpreter' | 'templa
 		if (templateEditor) {
 			templateEditor.style.display = 'block';
 		}
+	}
+
+	if (section === 'properties') {
+		initializePropertyTypesManager();
 	}
 
 	updatePromptContextVisibility();

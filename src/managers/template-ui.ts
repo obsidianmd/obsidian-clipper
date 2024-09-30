@@ -192,7 +192,7 @@ export function showTemplateEditor(template: Template | null): void {
 	}
 
 	if (editingTemplate && Array.isArray(editingTemplate.properties)) {
-		editingTemplate.properties.forEach(property => addPropertyToEditor(property.name, property.value, property.type, property.id));
+		editingTemplate.properties.forEach(property => addPropertyToEditor(property.name, property.value, property.id));
 	}
 
 	const triggersTextarea = document.getElementById('url-patterns') as HTMLTextAreaElement;
@@ -277,7 +277,7 @@ function updateBehaviorFields(): void {
 	}
 }
 
-export function addPropertyToEditor(name: string = '', value: string = '', type: string = 'text', id: string | null = null): void {
+export function addPropertyToEditor(name: string = '', value: string = '', id: string | null = null): void {
 	const templateProperties = document.getElementById('template-properties');
 	if (!templateProperties) return;
 
@@ -291,8 +291,9 @@ export function addPropertyToEditor(name: string = '', value: string = '', type:
 
 	const propertySelectDiv = createElementWithClass('div', 'property-select');
 	const propertySelectedDiv = createElementWithClass('div', 'property-selected');
-	propertySelectedDiv.dataset.value = type;
-	propertySelectedDiv.appendChild(createElementWithHTML('i', '', { 'data-lucide': getPropertyTypeIcon(type) }));
+	const propertyType = generalSettings.propertyTypes.find(p => p.name === name)?.type || 'text';
+	propertySelectedDiv.dataset.value = propertyType;
+	propertySelectedDiv.appendChild(createElementWithHTML('i', '', { 'data-lucide': getPropertyTypeIcon(propertyType) }));
 	propertySelectDiv.appendChild(propertySelectedDiv);
 
 	const select = document.createElement('select');
@@ -304,6 +305,7 @@ export function addPropertyToEditor(name: string = '', value: string = '', type:
 		option.textContent = optionValue.charAt(0).toUpperCase() + optionValue.slice(1);
 		select.appendChild(option);
 	});
+	select.value = propertyType;
 	propertySelectDiv.appendChild(select);
 	propertyDiv.appendChild(propertySelectDiv);
 
@@ -358,8 +360,6 @@ export function addPropertyToEditor(name: string = '', value: string = '', type:
 	propertyDiv.addEventListener('mouseup', resetDraggable);
 
 	if (select) {
-		select.value = type;
-
 		select.addEventListener('change', function() {
 			if (propertySelectedDiv) updateSelectedOption(this.value, propertySelectedDiv);
 		});
@@ -376,7 +376,7 @@ export function addPropertyToEditor(name: string = '', value: string = '', type:
 	propertyDiv.addEventListener('drop', handleDrop);
 	propertyDiv.addEventListener('dragend', handleDragEnd);
 
-	updateSelectedOption(type, propertySelectedDiv);
+	updateSelectedOption(propertyType, propertySelectedDiv);
 
 	initializeIcons(propertyDiv);
 }

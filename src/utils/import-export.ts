@@ -3,6 +3,7 @@ import { templates, saveTemplateSettings, editingTemplateIndex } from '../manage
 import { showTemplateEditor, updateTemplateList } from '../managers/template-ui';
 import { sanitizeFileName } from './string-utils';
 import { detectBrowser } from './browser-detection';
+import { generalSettings, addPropertyType } from '../utils/storage-utils';
 
 const SCHEMA_VERSION = '0.1.0';
 
@@ -23,7 +24,10 @@ export async function exportTemplate(): Promise<void> {
 		name: template.name,
 		behavior: template.behavior,
 		noteContentFormat: template.noteContentFormat,
-		properties: template.properties.map(({ name, value, type }) => ({ name, value, type })) as Property[],
+		properties: template.properties.map(({ id, name, value }) => {
+			const type = generalSettings.propertyTypes.find(pt => pt.name === name)?.type || 'text';
+			return { id, name, value, type };
+		}),
 		triggers: template.triggers,
 	};
 
@@ -91,7 +95,7 @@ export function importTemplate(): void {
 		if (!file) return;
 
 		const reader = new FileReader();
-		reader.onload = (e: ProgressEvent<FileReader>) => {
+		reader.onload = async (e: ProgressEvent<FileReader>) => {
 			try {
 				const importedTemplate = JSON.parse(e.target?.result as string) as Partial<Template>;
 				if (!validateImportedTemplate(importedTemplate)) {
@@ -100,11 +104,20 @@ export function importTemplate(): void {
 
 				importedTemplate.id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
 				
-				// Assign new IDs to properties
-				importedTemplate.properties = importedTemplate.properties?.map(prop => ({
-					...prop,
-					id: Date.now().toString() + Math.random().toString(36).substr(2, 9)
-				}));
+				// Handle property types
+				if (importedTemplate.properties) {
+					importedTemplate.properties = await Promise.all(importedTemplate.properties.map(async (prop: any) => {
+						const existingPropertyType = generalSettings.propertyTypes.find(pt => pt.name === prop.name);
+						if (!existingPropertyType) {
+							await addPropertyType(prop.name, prop.type || 'text');
+						}
+						return {
+							id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+							name: prop.name,
+							value: prop.value
+						};
+					}));
+				}
 
 				// Keep the context if it exists in the imported template
 				if (importedTemplate.context) {
@@ -142,11 +155,10 @@ function validateImportedTemplate(template: Partial<Template>): boolean {
 
 	const hasRequiredFields = requiredFields.every(field => template.hasOwnProperty(field));
 	const hasValidProperties = Array.isArray(template.properties) &&
-		template.properties!.every(prop => 
+		template.properties!.every((prop: any) => 
 			prop.hasOwnProperty('name') && 
 			prop.hasOwnProperty('value') && 
-			prop.hasOwnProperty('type') &&
-			validTypes.includes(prop.type)
+			(!prop.hasOwnProperty('type') || validTypes.includes(prop.type))
 		);
 
 	// Check for noteNameFormat and path only if it's not a daily note template

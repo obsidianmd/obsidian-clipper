@@ -9,6 +9,11 @@ export interface ModelConfig {
 	enabled: boolean;
 }
 
+export interface PropertyType {
+	name: string;
+	type: string;
+}
+
 export interface Settings {
 	vaults: string[];
 	showMoreActionsButton: boolean;
@@ -22,6 +27,7 @@ export interface Settings {
 	interpreterEnabled: boolean;
 	interpreterAutoRun: boolean;
 	defaultPromptContext: string;
+	propertyTypes: PropertyType[];
 }
 
 export let generalSettings: Settings = {
@@ -43,7 +49,8 @@ export let generalSettings: Settings = {
 	],
 	interpreterEnabled: false,
 	interpreterAutoRun: false,
-	defaultPromptContext: '{{fullHtml|strip_tags:("script,h1,h2,h3,h4,h5,h6,meta,a,ol,ul,li,p,em,strong,i,b,img,video,audio,math,tablecite,strong,td,th,tr,caption,u")|strip_attr:("alt,src,href,id,content,property,name,datetime,title")}}'
+	defaultPromptContext: '{{fullHtml|strip_tags:("script,h1,h2,h3,h4,h5,h6,meta,a,ol,ul,li,p,em,strong,i,b,img,video,audio,math,tablecite,strong,td,th,tr,caption,u")|strip_attr:("alt,src,href,id,content,property,name,datetime,title")}}',
+	propertyTypes: []
 };
 
 export function setLocalStorage(key: string, value: any): Promise<void> {
@@ -71,10 +78,11 @@ interface StorageData {
 		interpreterAutoRun?: boolean;
 		defaultPromptContext?: string;
 	};
+	property_types?: PropertyType[];
 }
 
 export async function loadSettings(): Promise<Settings> {
-	const data = await browser.storage.sync.get(['general_settings', 'vaults', 'interpreter_settings']) as StorageData;
+	const data = await browser.storage.sync.get(['general_settings', 'vaults', 'interpreter_settings', 'property_types']) as StorageData;
 
 	const defaultSettings: Settings = {
 		vaults: [],
@@ -88,7 +96,8 @@ export async function loadSettings(): Promise<Settings> {
 		models: generalSettings.models,
 		interpreterEnabled: false,
 		interpreterAutoRun: false,
-		defaultPromptContext: generalSettings.defaultPromptContext
+		defaultPromptContext: generalSettings.defaultPromptContext,
+		propertyTypes: []
 	};
 
 	const loadedSettings: Settings = {
@@ -103,7 +112,8 @@ export async function loadSettings(): Promise<Settings> {
 		models: data.interpreter_settings?.models || defaultSettings.models,
 		interpreterEnabled: data.interpreter_settings?.interpreterEnabled ?? defaultSettings.interpreterEnabled,
 		interpreterAutoRun: data.interpreter_settings?.interpreterAutoRun ?? defaultSettings.interpreterAutoRun,
-		defaultPromptContext: data.interpreter_settings?.defaultPromptContext || defaultSettings.defaultPromptContext
+		defaultPromptContext: data.interpreter_settings?.defaultPromptContext || defaultSettings.defaultPromptContext,
+		propertyTypes: data.property_types || defaultSettings.propertyTypes
 	};
 
 	generalSettings = loadedSettings;
@@ -130,11 +140,30 @@ export async function saveSettings(settings?: Partial<Settings>): Promise<void> 
 			interpreterEnabled: generalSettings.interpreterEnabled,
 			interpreterAutoRun: generalSettings.interpreterAutoRun,
 			defaultPromptContext: generalSettings.defaultPromptContext
-		}
+		},
+		property_types: generalSettings.propertyTypes
 	});
 }
 
 export async function setLegacyMode(enabled: boolean): Promise<void> {
 	await saveSettings({ legacyMode: enabled });
 	console.log(`Legacy mode ${enabled ? 'enabled' : 'disabled'}`);
+}
+
+export async function addPropertyType(name: string, type: string = 'text'): Promise<void> {
+	generalSettings.propertyTypes.push({ name, type });
+	await saveSettings();
+}
+
+export async function updatePropertyType(name: string, newType: string): Promise<void> {
+	const index = generalSettings.propertyTypes.findIndex(p => p.name === name);
+	if (index !== -1) {
+		generalSettings.propertyTypes[index].type = newType;
+		await saveSettings();
+	}
+}
+
+export async function removePropertyType(name: string): Promise<void> {
+	generalSettings.propertyTypes = generalSettings.propertyTypes.filter(p => p.name !== name);
+	await saveSettings();
 }

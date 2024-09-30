@@ -1,6 +1,7 @@
 import { Template, Property } from '../types/types';
 import { compressToUTF16, decompressFromUTF16 } from 'lz-string';
 import browser from '../utils/browser-polyfill';
+import { generalSettings, addPropertyType, PropertyType } from '../utils/storage-utils';
 
 export let templates: Template[] = [];
 export let editingTemplateIndex = -1;
@@ -54,6 +55,9 @@ export async function loadTemplates(): Promise<Template[]> {
 			templates = [defaultTemplate];
 			await saveTemplateSettings();
 		}
+
+		// After loading templates, update global property types
+		await updateGlobalPropertyTypes(templates);
 
 		return templates;
 	} catch (error) {
@@ -128,13 +132,13 @@ export function createDefaultTemplate(): Template {
 		noteContentFormat: '{{content}}',
 		context: "",
 		properties: [
-			{ id: Date.now().toString() + Math.random().toString(36).slice(2, 11), name: 'title', value: '{{title}}', type: 'text' },
-			{ id: Date.now().toString() + Math.random().toString(36).slice(2, 11), name: 'source', value: '{{url}}', type: 'text' },
-			{ id: Date.now().toString() + Math.random().toString(36).slice(2, 11), name: 'author', value: '{{author|split:", "|wikilink|join}}', type: 'multitext' },
-			{ id: Date.now().toString() + Math.random().toString(36).slice(2, 11), name: 'published', value: '{{published}}', type: 'date' },
-			{ id: Date.now().toString() + Math.random().toString(36).slice(2, 11), name: 'created', value: '{{date}}', type: 'date' },
-			{ id: Date.now().toString() + Math.random().toString(36).slice(2, 11), name: 'description', value: '{{description}}', type: 'text' },
-			{ id: Date.now().toString() + Math.random().toString(36).slice(2, 11), name: 'tags', value: 'clippings', type: 'multitext' }
+			{ id: Date.now().toString() + Math.random().toString(36).slice(2, 11), name: 'title', value: '{{title}}' },
+			{ id: Date.now().toString() + Math.random().toString(36).slice(2, 11), name: 'source', value: '{{url}}' },
+			{ id: Date.now().toString() + Math.random().toString(36).slice(2, 11), name: 'author', value: '{{author|split:", "|wikilink|join}}' },
+			{ id: Date.now().toString() + Math.random().toString(36).slice(2, 11), name: 'published', value: '{{published}}' },
+			{ id: Date.now().toString() + Math.random().toString(36).slice(2, 11), name: 'created', value: '{{date}}' },
+			{ id: Date.now().toString() + Math.random().toString(36).slice(2, 11), name: 'description', value: '{{description}}' },
+			{ id: Date.now().toString() + Math.random().toString(36).slice(2, 11), name: 'tags', value: 'clippings' }
 		],
 		triggers: []
 	};
@@ -188,4 +192,35 @@ export function deleteTemplate(templateId: string): boolean {
 		return true;
 	}
 	return false;
+}
+
+async function updateGlobalPropertyTypes(templates: Template[]): Promise<void> {
+	const existingTypes = new Set(generalSettings.propertyTypes.map(p => p.name));
+	const newTypes: PropertyType[] = [];
+
+	const defaultTypes: { [key: string]: string } = {
+		'title': 'text',
+		'source': 'text',
+		'author': 'multitext',
+		'published': 'date',
+		'created': 'date',
+		'description': 'text',
+		'tags': 'multitext'
+	};
+
+	templates.forEach(template => {
+		template.properties.forEach(property => {
+			if (!existingTypes.has(property.name)) {
+				newTypes.push({ 
+					name: property.name, 
+					type: defaultTypes[property.name] || 'text'
+				});
+				existingTypes.add(property.name);
+			}
+		});
+	});
+
+	for (const newType of newTypes) {
+		await addPropertyType(newType.name, newType.type);
+	}
 }

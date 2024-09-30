@@ -328,10 +328,10 @@ async function handleClip() {
 	}
 
 	const properties = Array.from(document.querySelectorAll('.metadata-property input')).map(input => ({
+		id: (input as HTMLElement).dataset.id || Date.now().toString() + Math.random().toString(36).slice(2, 11),
 		name: input.id,
-		value: (input as HTMLInputElement).value,
-		type: input.getAttribute('data-type') || 'text'
-	}));
+		value: (input as HTMLInputElement).value
+	})) as Property[];
 
 	let fileContent: string;
 	const frontmatter = await generateFrontmatter(properties as Property[]);
@@ -340,10 +340,10 @@ async function handleClip() {
 	try {
 		if (currentTemplate.behavior === 'create') {
 			const updatedProperties = Array.from(document.querySelectorAll('.metadata-property input')).map(input => ({
+				id: (input as HTMLElement).dataset.id || Date.now().toString() + Math.random().toString(36).slice(2, 11),
 				name: input.id,
-				value: (input as HTMLInputElement).value,
-				type: input.getAttribute('data-type') || 'text'
-			}));
+				value: (input as HTMLInputElement).value
+			})) as Property[];
 			const frontmatter = await generateFrontmatter(updatedProperties as Property[]);
 			fileContent = frontmatter + noteContentField.value;
 		} else {
@@ -496,8 +496,10 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 		const propertyDiv = createElementWithClass('div', 'metadata-property');
 		let value = await replaceVariables(currentTabId!, unescapeValue(property.value), variables, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
 
+		const propertyType = generalSettings.propertyTypes.find(p => p.name === property.name)?.type || 'text';
+
 		// Apply type-specific parsing
-		switch (property.type) {
+		switch (propertyType) {
 			case 'number':
 				const numericValue = value.replace(/[^\d.-]/g, '');
 				value = numericValue ? parseFloat(numericValue).toString() : value;
@@ -520,9 +522,9 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 		}
 
 		propertyDiv.innerHTML = `
-			<span class="metadata-property-icon"><i data-lucide="${getPropertyTypeIcon(property.type)}"></i></span>
+			<span class="metadata-property-icon"><i data-lucide="${getPropertyTypeIcon(propertyType)}"></i></span>
 			<label for="${property.name}">${property.name}</label>
-			<input id="${property.name}" type="text" value="${escapeHtml(value)}" data-type="${property.type}" data-template-value="${escapeHtml(property.value)}" />
+			<input id="${property.name}" type="text" value="${escapeHtml(value)}" data-type="${propertyType}" data-template-value="${escapeHtml(property.value)}" />
 		`;
 		newTemplateProperties.appendChild(propertyDiv);
 	}
@@ -683,10 +685,9 @@ async function getReplacedTemplate(template: Template, variables: { [key: string
 
 	for (const prop of template.properties) {
 		const replacedProp: Property = {
-			id: prop.id, // Include the id property
+			id: prop.id,
 			name: prop.name,
-			value: await replaceVariables(tabId, prop.value, variables, currentUrl),
-			type: prop.type
+			value: await replaceVariables(tabId, prop.value, variables, currentUrl)
 		};
 		replacedTemplate.properties.push(replacedProp);
 	}

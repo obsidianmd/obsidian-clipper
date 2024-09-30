@@ -15,7 +15,6 @@ export interface Property {
 	id: string;
 	name: string;
 	value: string;
-	type: string;
 }
 
 export interface ExtractedContent {
