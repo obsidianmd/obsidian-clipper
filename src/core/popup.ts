@@ -4,7 +4,7 @@ import { generateFrontmatter, saveToObsidian } from '../utils/obsidian-note-crea
 import { extractPageContent, initializePageContent, replaceVariables } from '../utils/content-extractor';
 import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
 import { decompressFromUTF16 } from 'lz-string';
-import { findMatchingTemplate, matchPattern } from '../utils/triggers';
+import { findMatchingTemplate, matchPattern, initializeTriggers } from '../utils/triggers';
 import { getLocalStorage, setLocalStorage, loadSettings, generalSettings, Settings } from '../utils/storage-utils';
 import { escapeHtml, formatVariables, unescapeValue } from '../utils/string-utils';
 import { loadTemplates, createDefaultTemplate } from '../managers/template-manager';
@@ -23,6 +23,7 @@ let currentTemplate: Template | null = null;
 let templates: Template[] = [];
 let currentVariables: { [key: string]: string } = {};
 let currentTabId: number | undefined;
+let lastUsedTemplateId: string | null = null;
 
 const isSidePanel = window.location.pathname.includes('side-panel.html');
 
@@ -40,7 +41,15 @@ async function initializeExtension(tabId: number) {
 			return false;
 		}
 
-		currentTemplate = templates[0]; // Set the first template as default
+		// Initialize triggers to speed up template matching
+		initializeTriggers(templates);
+
+		lastUsedTemplateId = await getLocalStorage('lastUsedTemplateId');
+		if (lastUsedTemplateId) {
+			currentTemplate = templates.find(t => t.id === lastUsedTemplateId) || templates[0];
+		} else {
+			currentTemplate = templates[0];
+		}
 		debugLog('Templates', 'Current template set to:', currentTemplate);
 
 		const tab = await browser.tabs.get(tabId);
@@ -190,15 +199,8 @@ document.addEventListener('DOMContentLoaded', async function() {
 function setupEventListeners(tabId: number) {
 	const templateDropdown = document.getElementById('template-select') as HTMLSelectElement;
 	if (templateDropdown) {
-		templateDropdown.addEventListener('change', async function(this: HTMLSelectElement) {
-			console.log('Template changed to:', this.value, tabId);
-			currentTemplate = templates.find((t: Template) => t.name === this.value) || null;
-			if (currentTemplate) {
-				// Pass false to refreshFields to prevent checking for a matching template
-				await refreshFields(tabId, false);
-			} else {
-				logError('Selected template not found');
-			}
+		templateDropdown.addEventListener('change', function(this: HTMLSelectElement) {
+			handleTemplateChange(this.value);
 		});
 	}
 
@@ -288,6 +290,22 @@ async function handleClip() {
 		return;
 	}
 
+	const selectedVault = currentTemplate.vault || vaultDropdown.value;
+	const noteContent = noteContentField.value;
+	const isDailyNote = currentTemplate.behavior === 'append-daily' || currentTemplate.behavior === 'prepend-daily';
+
+	let noteName = '';
+	let path = '';
+
+	if (!isDailyNote) {
+		if (!noteNameField || !pathField) {
+			showError('Note name or path field is missing. Please try reloading the extension.');
+			return;
+		}
+		noteName = noteNameField.value;
+		path = pathField.value;
+	}
+
 	// Check if interpreter is enabled, the button exists, and there are prompt variables
 	const promptVariables = collectPromptVariables(currentTemplate);
 	if (generalSettings.interpreterEnabled && interpretBtn && promptVariables.length > 0) {
@@ -309,22 +327,6 @@ async function handleClip() {
 				return;
 			}
 		}
-	}
-
-	const selectedVault = currentTemplate.vault || vaultDropdown.value;
-	const noteContent = noteContentField.value;
-	const isDailyNote = currentTemplate.behavior === 'append-daily' || currentTemplate.behavior === 'prepend-daily';
-
-	let noteName = '';
-	let path = '';
-
-	if (!isDailyNote) {
-		if (!noteNameField || !pathField) {
-			showError('Note name or path field is missing. Please try reloading the extension.');
-			return;
-		}
-		noteName = noteNameField.value;
-		path = pathField.value;
 	}
 
 	const properties = Array.from(document.querySelectorAll('.metadata-property input')).map(input => ({
@@ -352,6 +354,10 @@ async function handleClip() {
 
 		await saveToObsidian(fileContent, noteName, path, selectedVault, currentTemplate.behavior);
 		
+		// Update last used template
+		lastUsedTemplateId = currentTemplate.id;
+		await setLocalStorage('lastUsedTemplateId', lastUsedTemplateId);
+
 		// Only close the window if it's not running in side panel mode
 		if (!isSidePanel) {
 			setTimeout(() => window.close(), 1500);
@@ -404,16 +410,22 @@ async function refreshFields(tabId: number, checkTemplateTriggers: boolean = tru
 		if (extractedData) {
 			const currentUrl = tab.url;
 
+			// Set the initial template to the last used one or the first template
+			currentTemplate = templates.find(t => t.id === lastUsedTemplateId) || templates[0];
+			updateTemplateDropdown();
+
 			// Only check for the correct template if checkTemplateTriggers is true
 			if (checkTemplateTriggers) {
-				const matchedTemplate = findMatchingTemplate(currentUrl, templates, extractedData.schemaOrgData);
+				const getSchemaOrgData = async () => {
+					return extractedData.schemaOrgData;
+				};
+
+				const matchedTemplate = await findMatchingTemplate(currentUrl, getSchemaOrgData);
 				if (matchedTemplate) {
+					console.log('Matched template:', matchedTemplate);
 					currentTemplate = matchedTemplate;
-				} else {
-					// If no matching template is found, use the first template
-					currentTemplate = templates[0];
+					updateTemplateDropdown();
 				}
-				updateTemplateDropdown();
 			}
 
 			const initializedContent = await initializePageContent(
@@ -454,7 +466,7 @@ async function refreshFields(tabId: number, checkTemplateTriggers: boolean = tru
 function updateTemplateDropdown() {
 	const templateDropdown = document.getElementById('template-select') as HTMLSelectElement;
 	if (templateDropdown && currentTemplate) {
-		templateDropdown.value = currentTemplate.name;
+		templateDropdown.value = currentTemplate.id;
 	}
 }
 
@@ -464,11 +476,11 @@ function populateTemplateDropdown() {
 		templateDropdown.innerHTML = '';
 		templates.forEach((template: Template) => {
 			const option = document.createElement('option');
-			option.value = template.name;
+			option.value = template.id;
 			option.textContent = template.name;
 			templateDropdown.appendChild(option);
 		});
-		templateDropdown.value = currentTemplate.name;
+		templateDropdown.value = currentTemplate.id;
 	}
 }
 
@@ -723,4 +735,11 @@ function updateVaultDropdown(vaults: string[]) {
 
 function refreshPopup() {
 	window.location.reload();
+}
+
+function handleTemplateChange(templateId: string) {
+	currentTemplate = templates.find(t => t.id === templateId) || templates[0];
+	lastUsedTemplateId = currentTemplate.id;
+	setLocalStorage('lastUsedTemplateId', lastUsedTemplateId);
+	refreshFields(currentTabId!, false);
 }
