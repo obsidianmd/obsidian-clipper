@@ -5,11 +5,12 @@
 	"scripts": {
 		"dev:chrome": "webpack --watch --env BROWSER=chrome",
 		"dev:firefox": "webpack --watch --env BROWSER=firefox",
+		"dev:safari": "webpack --watch --env BROWSER=firefox",
 		"build:chrome": "webpack --env BROWSER=chrome",
 		"build:firefox": "webpack --env BROWSER=firefox",
 		"build:safari": "webpack --env BROWSER=safari",
 		"build": "npm run build:chrome && npm run build:firefox && npm run build:safari",
-		"dev": "npm run dev:chrome"
+		"dev": "npm run dev:chrome && npm run dev:firefox && npm run dev:safari"
 	},
 	"devDependencies": {
 		"@types/chrome": "^0.0.270",

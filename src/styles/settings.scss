@@ -292,6 +292,8 @@
 		margin: 0.5rem 0 1.5rem;
 		padding: 0;
 		li {
+			user-select: none;
+			-webkit-user-select: none;
 			display: flex;
 			flex-direction: row;
 			gap: 0.25rem;

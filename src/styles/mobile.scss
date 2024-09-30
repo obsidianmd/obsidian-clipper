@@ -24,8 +24,14 @@
 	height: 100%;
 	--popup-padding: 1rem;
 	--icon-size: 1rem;
+	--input-height: 2.25rem;
 	--input-shadow: none;
 	--input-shadow-hover: none;
+	--toggle-width: 3rem;
+	--toggle-radius: 1.5rem;
+	--toggle-thumb-radius: 1.5rem;
+	--toggle-thumb-height: 1.5rem;
+	--toggle-thumb-width: 1.5rem;
 
 	a, button, label, input, textarea, select {
 		-webkit-tap-highlight-color: transparent;
@@ -35,6 +41,14 @@
 		border-radius: 2rem;
 		border: 0;
 		box-shadow: none;
+	}
+	input,
+	input[type="password"],
+	input[type="text"],
+	select {
+		background-color: var(--background-secondary);
+		border: none;
+		border-radius: var(--radius-m);
 	}
 }
 

@@ -10,6 +10,8 @@ body.is-dragging {
 		z-index: 1000;
 		pointer-events: none;
 		cursor: grabbing !important;
+		user-select: none;
+		-webkit-user-select: none;
 	}
 }
 
