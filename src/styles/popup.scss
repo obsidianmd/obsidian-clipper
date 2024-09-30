@@ -81,6 +81,7 @@
 	#note-name-field {
 		border: none;
 		border-radius: 0;
+		background-color: transparent;
 		padding: 6px var(--popup-padding) 10px var(--popup-padding);
 		font-size: var(--font-ui-medium);
 		font-weight: 600;
@@ -186,6 +187,7 @@
 		display: flex;
 		flex-grow: 1;
 		#note-content-field {
+			background-color: transparent;
 			border-radius: 0;
 			border: none;
 			border-top: 1px solid var(--divider-color);
@@ -254,6 +256,7 @@
 #template-select {
 	appearance: none;
 	border: none;
+	background-color: transparent;
 	border-radius: var(--radius-m);
 	padding: 0 calc(var(--popup-padding) * 0.5);
 	width: 100%;

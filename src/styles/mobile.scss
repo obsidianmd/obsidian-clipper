@@ -22,6 +22,7 @@
 .is-tablet,
 .is-mobile {
 	height: 100%;
+	--background-modifier-form-field: var(--background-secondary);
 	--popup-padding: 1rem;
 	--icon-size: 1rem;
 	--input-height: 2.25rem;
@@ -45,8 +46,8 @@
 	input,
 	input[type="password"],
 	input[type="text"],
+	textarea,
 	select {
-		background-color: var(--background-secondary);
 		border: none;
 		border-radius: var(--radius-m);
 	}

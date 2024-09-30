@@ -15,7 +15,7 @@ input::placeholder {
 input[type="password"],
 input[type="text"],
 textarea {
-	background: var(--background-primary);
+	background: var(--background-modifier-form-field);
 	border: 1px solid var(--background-modifier-border);
 	font-size: var(--font-ui-smaller);
 	color: var(--text-normal);

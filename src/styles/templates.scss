@@ -1,8 +1,8 @@
 #template-properties {
 	display: flex;
 	flex-direction: column;
-	gap: 8px;
-	margin: 12px 0;
+	gap: 0.375rem;
+	margin: 0.75rem 0;
 	&:empty {
 		display: none;
 	}
@@ -10,10 +10,15 @@
 		display: flex;
 		flex-direction: row;
 		align-items: center;
-		gap: 4px;
+		gap: 0.375rem;
+		height: var(--input-height);
 	}
 	.property-name {
-		max-width: 120px;
+		max-width: 7rem;
+	}
+	.remove-property-btn {
+		height: var(--input-height);
+		width: 1.5rem;
 	}
 }
 
@@ -25,7 +30,7 @@
 	justify-content: center;
 	select {
 		opacity: 0;
-		width: 24px;
+		width: 1.5rem;
 		height: var(--input-height);
 		cursor: pointer;
 		z-index: 2;
@@ -37,18 +42,29 @@
 		left: 0;
 		user-select: none;
 		-webkit-user-select: none;
-		width: 24px;
+		width: 1.5rem;
 		height: var(--input-height);
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		opacity: 0.85;
 		svg {
-			width: 16px;
+			width: var();
 			height: 16px;
 		}
 	}
 	&:hover {
 		color: var(--text-normal);
+	}
+}
+
+.is-mobile {
+	#template-properties {
+		--input-height: 2rem;
+		--background-modifier-form-field: transparent;
+		gap: 0;
+		.property-editor {
+			border-bottom: 1px solid var(--background-modifier-border);
+		}
 	}
 }
