@@ -311,6 +311,8 @@ export function addPropertyToEditor(name: string = '', value: string = '', id: s
 	propertySelectDiv.appendChild(select);
 	propertyDiv.appendChild(propertySelectDiv);
 
+	const propertyTypeObj = generalSettings.propertyTypes.find(p => p.name === name);
+
 	const nameInput = createElementWithHTML('input', '', {
 		type: 'text',
 		class: 'property-name',
@@ -338,9 +340,9 @@ export function addPropertyToEditor(name: string = '', value: string = '', id: s
 		type: 'text',
 		class: 'property-value',
 		id: `${propertyId}-value`,
-		value: unescapeValue(value),
+		value: value,
 		placeholder: 'Property value'
-	});
+	}) as HTMLInputElement;
 	propertyDiv.appendChild(valueInput);
 
 	const removeBtn = createElementWithClass('button', 'remove-property-btn clickable-icon');
@@ -401,10 +403,26 @@ export function addPropertyToEditor(name: string = '', value: string = '', id: s
 	initializeIcons(propertyDiv);
 
 	nameInput.addEventListener('input', function(this: HTMLInputElement) {
-		const selectedType = generalSettings.propertyTypes.find(pt => pt.name === this.value)?.type;
+		const selectedType = generalSettings.propertyTypes.find(pt => pt.name === this.value);
 		if (selectedType) {
-			select.value = selectedType;
-			updateSelectedOption(selectedType, propertySelectedDiv);
+			select.value = selectedType.type;
+			updateSelectedOption(selectedType.type, propertySelectedDiv);
+			
+			// Fill in the default value if it exists and the value input is empty
+			if (selectedType.defaultValue && !valueInput.value) {
+				valueInput.value = selectedType.defaultValue;
+			}
+		}
+	});
+
+	// Add a change event listener to handle selection from autocomplete
+	nameInput.addEventListener('change', function(this: HTMLInputElement) {
+		const selectedType = generalSettings.propertyTypes.find(pt => pt.name === this.value);
+		if (selectedType) {
+			// Fill in the default value if it exists, regardless of current value
+			if (selectedType.defaultValue) {
+				valueInput.value = selectedType.defaultValue;
+			}
 		}
 	});
 }

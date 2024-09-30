@@ -12,6 +12,7 @@ export interface ModelConfig {
 export interface PropertyType {
 	name: string;
 	type: string;
+	defaultValue?: string;
 }
 
 export interface Settings {

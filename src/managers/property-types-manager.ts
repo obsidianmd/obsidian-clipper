@@ -1,4 +1,5 @@
-import { generalSettings, addPropertyType, updatePropertyType, removePropertyType, saveSettings } from '../utils/storage-utils';
+import { PropertyType } from '../types/types';
+import { generalSettings, saveSettings } from '../utils/storage-utils';
 import { createElementWithClass, createElementWithHTML } from '../utils/dom-utils';
 import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
 import { templates } from './template-manager';
@@ -14,9 +15,9 @@ export function initializePropertyTypesManager(): void {
 function ensureTagsProperty(): void {
 	const tagsProperty = generalSettings.propertyTypes.find(pt => pt.name === 'tags');
 	if (!tagsProperty) {
-		addPropertyType('tags', 'multitext');
+		addPropertyType('tags', 'multitext', '');
 	} else if (tagsProperty.type !== 'multitext') {
-		updatePropertyType('tags', 'multitext');
+		updatePropertyType('tags', 'multitext', tagsProperty.defaultValue || '');
 	}
 }
 
@@ -52,7 +53,7 @@ function countPropertyUsage(): Record<string, number> {
 	return usageCounts;
 }
 
-function createPropertyTypeListItem(propertyType: { name: string; type: string }, usageCount: number): HTMLElement {
+function createPropertyTypeListItem(propertyType: PropertyType, usageCount: number): HTMLElement {
 	const listItem = createElementWithClass('div', 'property-editor');
 
 	const propertySelectDiv = createElementWithClass('div', 'property-select');
@@ -61,7 +62,7 @@ function createPropertyTypeListItem(propertyType: { name: string; type: string }
 	propertySelectedDiv.appendChild(createElementWithHTML('i', '', { 'data-lucide': getPropertyTypeIcon(propertyType.type) }));
 	propertySelectDiv.appendChild(propertySelectedDiv);
 
-	const select = document.createElement('select');
+	const select = document.createElement('select') as HTMLSelectElement;
 	select.className = 'property-type';
 	['text', 'multitext', 'number', 'checkbox', 'date', 'datetime'].forEach(type => {
 		const option = document.createElement('option');
@@ -72,19 +73,23 @@ function createPropertyTypeListItem(propertyType: { name: string; type: string }
 	select.value = propertyType.type;
 	propertySelectDiv.appendChild(select);
 
-	const nameInput = createElementWithHTML('input', '', {
+	const nameInput = createElementWithClass('span', 'property-name');
+	nameInput.textContent = `${propertyType.name} `;
+
+	const defaultValueInput = createElementWithHTML('input', '', {
 		type: 'text',
-		value: propertyType.name,
-		class: 'property-name',
-		readonly: 'true'
-	});
+		value: propertyType.defaultValue || '',
+		class: 'property-default-value',
+		placeholder: 'Default value'
+	}) as HTMLInputElement;
 
 	const usageSpan = createElementWithClass('span', 'tree-item-flair');
 	usageSpan.textContent = `${usageCount}`;
 
 	listItem.appendChild(propertySelectDiv);
 	listItem.appendChild(nameInput);
-	
+	listItem.appendChild(defaultValueInput);
+	listItem.appendChild(usageSpan);
 
 	if (propertyType.name !== 'tags') {
 		if (usageCount === 0) {
@@ -94,20 +99,23 @@ function createPropertyTypeListItem(propertyType: { name: string; type: string }
 			removeBtn.appendChild(createElementWithHTML('i', '', { 'data-lucide': 'trash-2' }));
 			listItem.appendChild(removeBtn);
 
-			removeBtn.addEventListener('click', () => removePropertyType(propertyType.name).then(updatePropertyTypesList));
+			removeBtn.addEventListener('click', () => removePropertyType(propertyType.name));
 		}
 
 		select.addEventListener('change', function() {
 			updateSelectedOption(this.value, propertySelectedDiv);
-			updatePropertyType(propertyType.name, this.value).then(updatePropertyTypesList);
+			updatePropertyType(propertyType.name, this.value, defaultValueInput.value).then(updatePropertyTypesList);
+		});
+
+		defaultValueInput.addEventListener('change', function() {
+			updatePropertyType(propertyType.name, select.value, this.value).then(updatePropertyTypesList);
 		});
 	} else {
-		// For 'tags' property, disable the select and add a special class
+		// For 'tags' property, disable the select and default value input
 		select.disabled = true;
+		defaultValueInput.disabled = true;
 		listItem.classList.add('tags-property');
 	}
-
-	listItem.appendChild(usageSpan);
 
 	return listItem;
 }
@@ -163,7 +171,11 @@ async function importTypesJson(): Promise<void> {
 				try {
 					const content = JSON.parse(e.target?.result as string);
 					if (content.types) {
-						const newTypes = Object.entries(content.types).map(([name, type]) => ({ name, type: type as string }));
+						const newTypes = Object.entries(content.types).map(([name, typeInfo]: [string, any]) => ({
+							name,
+							type: typeof typeInfo === 'string' ? typeInfo : typeInfo.type,
+							defaultValue: typeof typeInfo === 'object' ? typeInfo.defaultValue : ''
+						}));
 						await mergePropertyTypes(newTypes);
 						updatePropertyTypesList();
 					}
@@ -178,20 +190,20 @@ async function importTypesJson(): Promise<void> {
 	input.click();
 }
 
-async function mergePropertyTypes(newTypes: { name: string; type: string }[]): Promise<void> {
+async function mergePropertyTypes(newTypes: PropertyType[]): Promise<void> {
 	for (const newType of newTypes) {
 		if (newType.name === 'tags') {
 			// Ensure 'tags' is always multitext
-			await updatePropertyType('tags', 'multitext');
+			await updatePropertyType('tags', 'multitext', newType.defaultValue || '');
 		} else {
 			const existingType = generalSettings.propertyTypes.find(pt => pt.name === newType.name);
-			if (existingType && existingType.type !== newType.type) {
-				const useNewType = await resolveConflict(newType.name, existingType.type, newType.type);
+			if (existingType) {
+				const useNewType = await resolveConflict(newType.name, existingType, newType);
 				if (useNewType) {
-					await updatePropertyType(newType.name, newType.type);
+					await updatePropertyType(newType.name, newType.type, newType.defaultValue || '');
 				}
-			} else if (!existingType) {
-				await addPropertyType(newType.name, newType.type);
+			} else {
+				await addPropertyType(newType.name, newType.type, newType.defaultValue || '');
 			}
 		}
 	}
@@ -199,9 +211,9 @@ async function mergePropertyTypes(newTypes: { name: string; type: string }[]): P
 	await saveSettings();
 }
 
-async function resolveConflict(name: string, existingType: string, newType: string): Promise<boolean> {
+async function resolveConflict(name: string, existing: PropertyType, newType: PropertyType): Promise<boolean> {
 	return new Promise<boolean>((resolve) => {
-		const message = `Property "${name}" already exists with type "${existingType}". Do you want to update it to "${newType}"?`;
+		const message = `Property "${name}" already exists with type "${existing.type}". Do you want to update it to type "${newType.type}"?`;
 		if (confirm(message)) {
 			resolve(true);
 		} else {
@@ -226,4 +238,27 @@ function exportTypesJson(): void {
 	a.click();
 
 	URL.revokeObjectURL(url);
+}
+
+// Update these functions to include defaultValue
+async function addPropertyType(name: string, type: string = 'text', defaultValue: string = ''): Promise<void> {
+	generalSettings.propertyTypes.push({ name, type, defaultValue });
+	await saveSettings();
+}
+
+async function updatePropertyType(name: string, newType: string, newDefaultValue: string): Promise<void> {
+	const index = generalSettings.propertyTypes.findIndex(p => p.name === name);
+	if (index !== -1) {
+		generalSettings.propertyTypes[index].type = newType;
+		generalSettings.propertyTypes[index].defaultValue = newDefaultValue;
+	} else {
+		generalSettings.propertyTypes.push({ name, type: newType, defaultValue: newDefaultValue });
+	}
+	await saveSettings();
+}
+
+async function removePropertyType(name: string): Promise<void> {
+	generalSettings.propertyTypes = generalSettings.propertyTypes.filter(p => p.name !== name);
+	await saveSettings();
+	updatePropertyTypesList();
 }

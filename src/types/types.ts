@@ -28,3 +28,9 @@ export interface PromptVariable {
 	prompt: string;
 	filters?: string;
 }
+
+export interface PropertyType {
+	name: string;
+	type: string;
+	defaultValue?: string;
+}

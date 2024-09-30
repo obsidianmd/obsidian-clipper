@@ -31,17 +31,18 @@
 }
 
 #property-types-list.properties-list {
-	gap: 0;
+
 	.property-editor {
 		border-radius: var(--radius-s);
 		padding-inline-start: 0.25rem;
-		&:hover {
-			background-color: var(--background-modifier-hover);
-		}
 	}
 	.property-name {
+		min-width: 7rem;
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+		font-size: var(--font-ui-smaller);
 		cursor: default;
-		max-width: 100%;
 		border: none;
 		box-shadow: none;
 		background-color: transparent;
