@@ -4,6 +4,7 @@ import { createElementWithClass, createElementWithHTML } from '../utils/dom-util
 import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
 import { templates } from './template-manager';
 import { refreshPropertyNameSuggestions } from './template-ui';
+import { detectBrowser } from '../utils/browser-detection';
 
 export function initializePropertyTypesManager(): void {
 	ensureTagsProperty();
@@ -230,21 +231,47 @@ async function resolveConflict(name: string, existing: PropertyType, newType: Pr
 	});
 }
 
-function exportTypesJson(): void {
+async function exportTypesJson(): Promise<void> {
 	const typesObject = generalSettings.propertyTypes.reduce((acc, { name, type }) => {
 		acc[name] = type;
 		return acc;
 	}, {} as Record<string, string>);
 
 	const content = JSON.stringify({ types: typesObject }, null, 2);
+	const fileName = 'types.json';
+
+	const browser = await detectBrowser();
+	const isIOSBrowser = browser === 'mobile-safari' || browser === 'ipad-os';
+
+	if (isIOSBrowser && navigator.share) {
+		const blob = new Blob([content], { type: 'application/json' });
+		const file = new File([blob], fileName, { type: 'application/json' });
+
+		try {
+			await navigator.share({
+				files: [file],
+				title: 'Exported property types',
+				text: 'Obsidian Web Clipper property types'
+			});
+		} catch (error) {
+			console.error('Error sharing:', error);
+			fallbackExport(content, fileName);
+		}
+	} else {
+		fallbackExport(content, fileName);
+	}
+}
+
+function fallbackExport(content: string, fileName: string): void {
 	const blob = new Blob([content], { type: 'application/json' });
 	const url = URL.createObjectURL(blob);
 
 	const a = document.createElement('a');
 	a.href = url;
-	a.download = 'types.json';
+	a.download = fileName;
+	document.body.appendChild(a);
 	a.click();
-
+	document.body.removeChild(a);
 	URL.revokeObjectURL(url);
 }
 
