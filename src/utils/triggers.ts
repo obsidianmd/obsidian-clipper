@@ -121,12 +121,10 @@ export function findMatchingTemplate(url: string, getSchemaOrgData: () => Promis
 					return template;
 				}
 			}
-			console.log('No schema match found');
 			return undefined;
 		});
 	}
 
-	console.log('No match found');
 	return Promise.resolve(undefined);
 }
 

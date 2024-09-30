@@ -4,9 +4,9 @@ import { generateFrontmatter, saveToObsidian } from '../utils/obsidian-note-crea
 import { extractPageContent, initializePageContent, replaceVariables } from '../utils/content-extractor';
 import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
 import { decompressFromUTF16 } from 'lz-string';
-import { findMatchingTemplate, matchPattern, initializeTriggers } from '../utils/triggers';
+import { findMatchingTemplate, initializeTriggers } from '../utils/triggers';
 import { getLocalStorage, setLocalStorage, loadSettings, generalSettings, Settings } from '../utils/storage-utils';
-import { escapeHtml, formatVariables, unescapeValue } from '../utils/string-utils';
+import { escapeHtml, unescapeValue } from '../utils/string-utils';
 import { loadTemplates, createDefaultTemplate } from '../managers/template-manager';
 import browser from '../utils/browser-polyfill';
 import { detectBrowser, addBrowserClassToHtml } from '../utils/browser-detection';
@@ -24,6 +24,7 @@ let templates: Template[] = [];
 let currentVariables: { [key: string]: string } = {};
 let currentTabId: number | undefined;
 let lastUsedTemplateId: string | null = null;
+let lastSelectedVault: string | null = null;
 
 const isSidePanel = window.location.pathname.includes('side-panel.html');
 
@@ -44,6 +45,7 @@ async function initializeExtension(tabId: number) {
 		// Initialize triggers to speed up template matching
 		initializeTriggers(templates);
 
+		// Load last used template
 		lastUsedTemplateId = await getLocalStorage('lastUsedTemplateId');
 		if (lastUsedTemplateId) {
 			currentTemplate = templates.find(t => t.id === lastUsedTemplateId) || templates[0];
@@ -51,6 +53,13 @@ async function initializeExtension(tabId: number) {
 			currentTemplate = templates[0];
 		}
 		debugLog('Templates', 'Current template set to:', currentTemplate);
+
+		// Load last selected vault
+		lastSelectedVault = await getLocalStorage('lastSelectedVault');
+		if (!lastSelectedVault && loadedSettings.vaults.length > 0) {
+			lastSelectedVault = loadedSettings.vaults[0];
+		}
+		debugLog('Vaults', 'Last selected vault:', lastSelectedVault);
 
 		const tab = await browser.tabs.get(tabId);
 		if (!tab.url || isBlankPage(tab.url)) {
@@ -358,6 +367,12 @@ async function handleClip() {
 		lastUsedTemplateId = currentTemplate.id;
 		await setLocalStorage('lastUsedTemplateId', lastUsedTemplateId);
 
+		// Only update lastSelectedVault if the user explicitly chose a vault
+		if (!currentTemplate.vault) {
+			lastSelectedVault = selectedVault;
+			await setLocalStorage('lastSelectedVault', lastSelectedVault);
+		}
+
 		// Only close the window if it's not running in side panel mode
 		if (!isSidePanel) {
 			setTimeout(() => window.close(), 1500);
@@ -506,6 +521,16 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 		return;
 	}
 
+	// Handle vault selection
+	const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement;
+	if (vaultDropdown) {
+		if (template.vault) {
+			vaultDropdown.value = template.vault;
+		} else if (lastSelectedVault) {
+			vaultDropdown.value = lastSelectedVault;
+		}
+	}
+
 	for (const property of template.properties) {
 		const propertyDiv = createElementWithClass('div', 'metadata-property');
 		let value = await replaceVariables(currentTabId!, unescapeValue(property.value), variables, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
@@ -590,26 +615,6 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 			noteContentField.value = '';
 			noteContentField.setAttribute('data-template-value', '');
 		}
-	}
-
-	const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement;
-	if (vaultDropdown) {
-		if (template.vault) {
-			vaultDropdown.value = template.vault;
-		} else {
-			// Try to get the previously selected vault
-			getLocalStorage('lastSelectedVault').then((lastSelectedVault) => {
-				if (lastSelectedVault && loadedSettings.vaults.includes(lastSelectedVault)) {
-					vaultDropdown.value = lastSelectedVault;
-				} else if (loadedSettings.vaults.length > 0) {
-					vaultDropdown.value = loadedSettings.vaults[0];
-				}
-			});
-		}
-
-		vaultDropdown.addEventListener('change', () => {
-			setLocalStorage('lastSelectedVault', vaultDropdown.value);
-		});
 	}
 
 	if (template) {
@@ -724,13 +729,23 @@ function updateVaultDropdown(vaults: string[]) {
 		vaultDropdown.appendChild(option);
 	});
 
-	// Only show vault selector if one is defined
+	// Only show vault selector if vaults are defined
 	if (vaults.length > 0) {
 		vaultContainer.style.display = 'block';
-		vaultDropdown.value = vaults[0];
+		if (lastSelectedVault && vaults.includes(lastSelectedVault)) {
+			vaultDropdown.value = lastSelectedVault;
+		} else {
+			vaultDropdown.value = vaults[0];
+		}
 	} else {
 		vaultContainer.style.display = 'none';
 	}
+
+	// Add event listener to update lastSelectedVault when changed
+	vaultDropdown.addEventListener('change', () => {
+		lastSelectedVault = vaultDropdown.value;
+		setLocalStorage('lastSelectedVault', lastSelectedVault);
+	});
 }
 
 function refreshPopup() {
