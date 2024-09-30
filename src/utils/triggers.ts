@@ -127,7 +127,6 @@ export async function findMatchingTemplate(url: string, getSchemaOrgData: () => 
 	return undefined;
 }
 
-// Update the matchPattern function to use memoizedInternalMatchPattern
 export function matchPattern(pattern: string, url: string, schemaOrgData: any): boolean {
 	return memoizedInternalMatchPattern(pattern, url, schemaOrgData);
 }

@@ -340,7 +340,7 @@ export function addPropertyToEditor(name: string = '', value: string = '', id: s
 		type: 'text',
 		class: 'property-value',
 		id: `${propertyId}-value`,
-		value: value,
+		value: unescapeValue(value),
 		placeholder: 'Property value'
 	}) as HTMLInputElement;
 	propertyDiv.appendChild(valueInput);
