@@ -2,6 +2,7 @@ import { generalSettings, addPropertyType, updatePropertyType, removePropertyTyp
 import { createElementWithClass, createElementWithHTML } from '../utils/dom-utils';
 import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
 import { templates } from './template-manager';
+import { refreshPropertyNameSuggestions } from './template-ui';
 
 export function initializePropertyTypesManager(): void {
 	ensureTagsProperty();
@@ -38,6 +39,7 @@ function updatePropertyTypesList(): void {
 	});
 
 	initializeIcons(propertyTypesList);
+	refreshPropertyNameSuggestions();
 }
 
 function countPropertyUsage(): Record<string, number> {
@@ -82,7 +84,7 @@ function createPropertyTypeListItem(propertyType: { name: string; type: string }
 
 	listItem.appendChild(propertySelectDiv);
 	listItem.appendChild(nameInput);
-	listItem.appendChild(usageSpan);
+	
 
 	if (propertyType.name !== 'tags') {
 		if (usageCount === 0) {
@@ -104,6 +106,8 @@ function createPropertyTypeListItem(propertyType: { name: string; type: string }
 		select.disabled = true;
 		listItem.classList.add('tags-property');
 	}
+
+	listItem.appendChild(usageSpan);
 
 	return listItem;
 }

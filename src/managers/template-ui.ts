@@ -191,6 +191,8 @@ export function showTemplateEditor(template: Template | null): void {
 		behaviorSelect.addEventListener('change', updateBehaviorFields);
 	}
 
+	refreshPropertyNameSuggestions();
+
 	if (editingTemplate && Array.isArray(editingTemplate.properties)) {
 		editingTemplate.properties.forEach(property => addPropertyToEditor(property.name, property.value, property.id));
 	}
@@ -316,9 +318,21 @@ export function addPropertyToEditor(name: string = '', value: string = '', id: s
 		value: name,
 		placeholder: 'Property name',
 		autocapitalize: 'off',
-		autocomplete: 'off'
+		autocomplete: 'off',
+		list: 'property-name-suggestions'
 	});
 	propertyDiv.appendChild(nameInput);
+
+	// Create datalist for autocomplete if it doesn't exist
+	let datalist = document.getElementById('property-name-suggestions');
+	if (!datalist) {
+		datalist = document.createElement('datalist');
+		datalist.id = 'property-name-suggestions';
+		document.body.appendChild(datalist);
+	}
+
+	// Populate datalist with existing property types
+	updatePropertyNameSuggestions();
 
 	const valueInput = createElementWithHTML('input', '', {
 		type: 'text',
@@ -385,6 +399,14 @@ export function addPropertyToEditor(name: string = '', value: string = '', id: s
 	updateSelectedOption(propertyType, propertySelectedDiv);
 
 	initializeIcons(propertyDiv);
+
+	nameInput.addEventListener('input', function(this: HTMLInputElement) {
+		const selectedType = generalSettings.propertyTypes.find(pt => pt.name === this.value)?.type;
+		if (selectedType) {
+			select.value = selectedType;
+			updateSelectedOption(selectedType, propertySelectedDiv);
+		}
+	});
 }
 
 function updateSelectedOption(value: string, propertySelected: HTMLElement): void {
@@ -503,4 +525,20 @@ function getUniqueTemplateName(baseName: string): string {
 	}
 
 	return newName;
+}
+
+function updatePropertyNameSuggestions(): void {
+	const datalist = document.getElementById('property-name-suggestions');
+	if (datalist) {
+		datalist.innerHTML = '';
+		generalSettings.propertyTypes.forEach(pt => {
+			const option = document.createElement('option');
+			option.value = pt.name;
+			datalist.appendChild(option);
+		});
+	}
+}
+
+export function refreshPropertyNameSuggestions(): void {
+	updatePropertyNameSuggestions();
 }

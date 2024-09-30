@@ -15,6 +15,9 @@
 	}
 	.property-name {
 		max-width: 7rem;
+		&::-webkit-calendar-picker-indicator {
+			display: none !important;
+		}
 	}
 	.remove-property-btn {
 		height: var(--input-height);
@@ -31,7 +34,7 @@
 	gap: 0;
 	.property-editor {
 		border-radius: var(--radius-s);
-		padding: 0 0.75rem 0 0.25rem;
+		padding-inline-start: 0.25rem;
 		&:hover {
 			background-color: var(--background-modifier-hover);
 		}
