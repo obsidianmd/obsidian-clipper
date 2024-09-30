@@ -4,9 +4,19 @@ import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
 import { templates } from './template-manager';
 
 export function initializePropertyTypesManager(): void {
+	ensureTagsProperty();
 	updatePropertyTypesList();
 	setupAddPropertyTypeButton();
 	setupImportExportButtons();
+}
+
+function ensureTagsProperty(): void {
+	const tagsProperty = generalSettings.propertyTypes.find(pt => pt.name === 'tags');
+	if (!tagsProperty) {
+		addPropertyType('tags', 'multitext');
+	} else if (tagsProperty.type !== 'multitext') {
+		updatePropertyType('tags', 'multitext');
+	}
 }
 
 function updatePropertyTypesList(): void {
@@ -17,7 +27,7 @@ function updatePropertyTypesList(): void {
 
 	const propertyUsageCounts = countPropertyUsage();
 
-	// Sort property types by name
+	// Sort all property types alphabetically
 	const sortedPropertyTypes = [...generalSettings.propertyTypes].sort((a, b) => 
 		a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
 	);
@@ -70,21 +80,30 @@ function createPropertyTypeListItem(propertyType: { name: string; type: string }
 	const usageSpan = createElementWithClass('span', 'tree-item-flair');
 	usageSpan.textContent = `${usageCount}`;
 
-	const removeBtn = createElementWithClass('button', 'remove-property-btn clickable-icon');
-	removeBtn.setAttribute('type', 'button');
-	removeBtn.setAttribute('aria-label', 'Remove property type');
-	removeBtn.appendChild(createElementWithHTML('i', '', { 'data-lucide': 'trash-2' }));
-
 	listItem.appendChild(propertySelectDiv);
 	listItem.appendChild(nameInput);
 	listItem.appendChild(usageSpan);
-	listItem.appendChild(removeBtn);
 
-	select.addEventListener('change', function() {
-		updateSelectedOption(this.value, propertySelectedDiv);
-		updatePropertyType(propertyType.name, this.value).then(updatePropertyTypesList);
-	});
-	removeBtn.addEventListener('click', () => removePropertyType(propertyType.name).then(updatePropertyTypesList));
+	if (propertyType.name !== 'tags') {
+		if (usageCount === 0) {
+			const removeBtn = createElementWithClass('button', 'remove-property-btn clickable-icon');
+			removeBtn.setAttribute('type', 'button');
+			removeBtn.setAttribute('aria-label', 'Remove property type');
+			removeBtn.appendChild(createElementWithHTML('i', '', { 'data-lucide': 'trash-2' }));
+			listItem.appendChild(removeBtn);
+
+			removeBtn.addEventListener('click', () => removePropertyType(propertyType.name).then(updatePropertyTypesList));
+		}
+
+		select.addEventListener('change', function() {
+			updateSelectedOption(this.value, propertySelectedDiv);
+			updatePropertyType(propertyType.name, this.value).then(updatePropertyTypesList);
+		});
+	} else {
+		// For 'tags' property, disable the select and add a special class
+		select.disabled = true;
+		listItem.classList.add('tags-property');
+	}
 
 	return listItem;
 }
@@ -128,20 +147,21 @@ function setupImportExportButtons(): void {
 	}
 }
 
-function importTypesJson(): void {
+async function importTypesJson(): Promise<void> {
 	const input = document.createElement('input');
 	input.type = 'file';
 	input.accept = '.json';
-	input.onchange = (event: Event) => {
+	input.onchange = async (event: Event) => {
 		const file = (event.target as HTMLInputElement).files?.[0];
 		if (file) {
 			const reader = new FileReader();
-			reader.onload = (e: ProgressEvent<FileReader>) => {
+			reader.onload = async (e: ProgressEvent<FileReader>) => {
 				try {
 					const content = JSON.parse(e.target?.result as string);
 					if (content.types) {
-						generalSettings.propertyTypes = Object.entries(content.types).map(([name, type]) => ({ name, type: type as string }));
-						saveSettings().then(updatePropertyTypesList);
+						const newTypes = Object.entries(content.types).map(([name, type]) => ({ name, type: type as string }));
+						await mergePropertyTypes(newTypes);
+						updatePropertyTypesList();
 					}
 				} catch (error) {
 					console.error('Error parsing types.json:', error);
@@ -152,6 +172,38 @@ function importTypesJson(): void {
 		}
 	};
 	input.click();
+}
+
+async function mergePropertyTypes(newTypes: { name: string; type: string }[]): Promise<void> {
+	for (const newType of newTypes) {
+		if (newType.name === 'tags') {
+			// Ensure 'tags' is always multitext
+			await updatePropertyType('tags', 'multitext');
+		} else {
+			const existingType = generalSettings.propertyTypes.find(pt => pt.name === newType.name);
+			if (existingType && existingType.type !== newType.type) {
+				const useNewType = await resolveConflict(newType.name, existingType.type, newType.type);
+				if (useNewType) {
+					await updatePropertyType(newType.name, newType.type);
+				}
+			} else if (!existingType) {
+				await addPropertyType(newType.name, newType.type);
+			}
+		}
+	}
+
+	await saveSettings();
+}
+
+async function resolveConflict(name: string, existingType: string, newType: string): Promise<boolean> {
+	return new Promise<boolean>((resolve) => {
+		const message = `Property "${name}" already exists with type "${existingType}". Do you want to update it to "${newType}"?`;
+		if (confirm(message)) {
+			resolve(true);
+		} else {
+			resolve(false);
+		}
+	});
 }
 
 function exportTypesJson(): void {

@@ -20,12 +20,18 @@
 		height: var(--input-height);
 		width: 1.5rem;
 	}
+	.tags-property {
+		.property-select {
+			opacity: 0.5;
+		}
+	}
 }
 
 #property-types-list.properties-list {
 	gap: 0;
 	.property-editor {
 		border-radius: var(--radius-s);
+		padding: 0 0.75rem 0 0.25rem;
 		&:hover {
 			background-color: var(--background-modifier-hover);
 		}
