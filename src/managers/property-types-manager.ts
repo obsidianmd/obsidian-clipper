@@ -74,7 +74,7 @@ function createPropertyTypeListItem(propertyType: PropertyType, usageCount: numb
 	propertySelectDiv.appendChild(select);
 
 	const nameInput = createElementWithClass('span', 'property-name');
-	nameInput.textContent = `${propertyType.name} `;
+	nameInput.textContent = `${propertyType.name}`;
 
 	const defaultValueInput = createElementWithHTML('input', '', {
 		type: 'text',
@@ -91,17 +91,26 @@ function createPropertyTypeListItem(propertyType: PropertyType, usageCount: numb
 	listItem.appendChild(defaultValueInput);
 	listItem.appendChild(usageSpan);
 
+	if (usageCount === 0 && propertyType.name !== 'tags') {
+		const removeBtn = createElementWithClass('button', 'remove-property-btn clickable-icon');
+		removeBtn.setAttribute('type', 'button');
+		removeBtn.setAttribute('aria-label', 'Remove property type');
+		removeBtn.appendChild(createElementWithHTML('i', '', { 'data-lucide': 'trash-2' }));
+		listItem.appendChild(removeBtn);
+
+		removeBtn.addEventListener('click', () => removePropertyType(propertyType.name));
+	} else {
+		const removeBtn = createElementWithClass('button', 'remove-property-btn clickable-icon');
+		removeBtn.setAttribute('type', 'button');
+		removeBtn.setAttribute('disabled', '');
+		removeBtn.setAttribute('aria-label', 'Remove property type');
+		removeBtn.appendChild(createElementWithHTML('i', '', { 'data-lucide': 'trash-2' }));
+		listItem.appendChild(removeBtn);
+
+		removeBtn.addEventListener('click', () => removePropertyType(propertyType.name));
+	}
+
 	if (propertyType.name !== 'tags') {
-		if (usageCount === 0) {
-			const removeBtn = createElementWithClass('button', 'remove-property-btn clickable-icon');
-			removeBtn.setAttribute('type', 'button');
-			removeBtn.setAttribute('aria-label', 'Remove property type');
-			removeBtn.appendChild(createElementWithHTML('i', '', { 'data-lucide': 'trash-2' }));
-			listItem.appendChild(removeBtn);
-
-			removeBtn.addEventListener('click', () => removePropertyType(propertyType.name));
-		}
-
 		select.addEventListener('change', function() {
 			updateSelectedOption(this.value, propertySelectedDiv);
 			updatePropertyType(propertyType.name, this.value, defaultValueInput.value).then(updatePropertyTypesList);
@@ -113,7 +122,6 @@ function createPropertyTypeListItem(propertyType: PropertyType, usageCount: numb
 	} else {
 		// For 'tags' property, disable the select and default value input
 		select.disabled = true;
-		defaultValueInput.disabled = true;
 		listItem.classList.add('tags-property');
 	}
 
