@@ -93,6 +93,9 @@
 		&:focus {
 			box-shadow: none;
 		}
+		&::-webkit-scrollbar {
+			display: none;
+		}
 	}
 
 	.metadata-properties-header {
@@ -173,6 +176,7 @@
 			}
 			input {
 				border: none;
+				background-color: transparent;
 				&:hover,
 				&:active,
 				&:focus {
@@ -220,7 +224,7 @@
 			flex-grow: 1;
 		}
 		#vault-select {
-			font-weight: 500;
+			font-weight: var(--clipper-select-font-weight);
 			min-width: 100px;
 			cursor: pointer;
 		}
@@ -262,7 +266,7 @@
 	width: 100%;
 	margin-inline-start: 0;
 	margin-inline-end: auto;
-	font-weight: 500;
+	font-weight: var(--clipper-select-font-weight);
 	color: var(--text-muted);
 	height: 1.625rem;
 	cursor: default;

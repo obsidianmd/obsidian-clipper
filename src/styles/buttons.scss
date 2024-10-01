@@ -48,8 +48,8 @@ button {
 
 .clickable-icon,
 button.clickable-icon {
-	width: 2rem;
-	height: 2rem;
+	width: var(--clickable-icon-size);
+	height: var(--clickable-icon-size);
 	display: flex;
 	padding: 0 0.25rem;
 	background-color: transparent;

@@ -23,6 +23,7 @@
 .is-mobile {
 	height: 100%;
 	--background-modifier-form-field: var(--background-secondary);
+	--clickable-icon-size: 2rem;
 	--popup-padding: 1rem;
 	--icon-size: 1rem;
 	--input-height: 2.25rem;
@@ -74,6 +75,9 @@
 		padding: calc(var(--popup-padding) / 2) var(--popup-padding) 0;
 		button {
 			font-weight: 600;
+		}
+		.vault-path-container {
+			gap:calc(var(--popup-padding) / 2);
 		}
 	}
 }

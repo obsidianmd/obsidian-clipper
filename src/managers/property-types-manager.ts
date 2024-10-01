@@ -93,17 +93,18 @@ function createPropertyTypeListItem(propertyType: PropertyType, usageCount: numb
 	listItem.appendChild(usageSpan);
 
 	if (usageCount === 0 && propertyType.name !== 'tags') {
-		const removeBtn = createElementWithClass('button', 'remove-property-btn clickable-icon');
+		const removeBtn = createElementWithClass('button', 'remove-property-btn clickable-icon') as HTMLButtonElement;
 		removeBtn.setAttribute('type', 'button');
+		removeBtn.disabled = true;
 		removeBtn.setAttribute('aria-label', 'Remove property type');
 		removeBtn.appendChild(createElementWithHTML('i', '', { 'data-lucide': 'trash-2' }));
 		listItem.appendChild(removeBtn);
 
 		removeBtn.addEventListener('click', () => removePropertyType(propertyType.name));
 	} else {
-		const removeBtn = createElementWithClass('button', 'remove-property-btn clickable-icon');
+		const removeBtn = createElementWithClass('button', 'remove-property-btn clickable-icon') as HTMLButtonElement;
 		removeBtn.setAttribute('type', 'button');
-		removeBtn.setAttribute('disabled', '');
+		removeBtn.disabled = true;
 		removeBtn.setAttribute('aria-label', 'Remove property type');
 		removeBtn.appendChild(createElementWithHTML('i', '', { 'data-lucide': 'trash-2' }));
 		listItem.appendChild(removeBtn);
