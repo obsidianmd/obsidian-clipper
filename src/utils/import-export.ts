@@ -25,9 +25,10 @@ export async function exportTemplate(): Promise<void> {
 		name: template.name,
 		behavior: template.behavior,
 		noteContentFormat: template.noteContentFormat,
-		properties: template.properties.map(({ name, value }) => {
+		properties: template.properties.map(({ id, name, value }) => {
 			const type = generalSettings.propertyTypes.find(pt => pt.name === name)?.type || 'text';
 			return { 
+				id,
 				name, 
 				value, 
 				type 
@@ -38,13 +39,12 @@ export async function exportTemplate(): Promise<void> {
 
 	// Only include noteNameFormat and path for non-daily note behaviors
 	if (!isDailyNote) {
-			orderedTemplate.noteNameFormat = template.noteNameFormat;
-			orderedTemplate.path = template.path;
+		orderedTemplate.noteNameFormat = template.noteNameFormat;
+		orderedTemplate.path = template.path;
 	}
 
 	// Include context only if it has a value
 	if (template.context) {
-		
 		orderedTemplate.context = template.context;
 	}
 
@@ -104,6 +104,8 @@ export function importTemplate(): void {
 		reader.onload = async (e: ProgressEvent<FileReader>) => {
 			try {
 				const importedTemplate = JSON.parse(e.target?.result as string) as Partial<Template>;
+				console.log('Imported template:', importedTemplate);
+
 				if (!validateImportedTemplate(importedTemplate)) {
 					throw new Error('Invalid template file');
 				}
@@ -113,11 +115,13 @@ export function importTemplate(): void {
 				// Handle property types and preserve existing IDs or generate new ones
 				if (importedTemplate.properties) {
 					importedTemplate.properties = await Promise.all(importedTemplate.properties.map(async (prop: any) => {
+						console.log('Processing property:', prop);
 						// Add or update the property type
-						await addPropertyType(prop.name, prop.type || 'text');
+						await addPropertyType(prop.name, prop.type || 'text', prop.value || '');
 						
 						// Use the type from generalSettings, which will be either the existing type or the newly added one
 						const type = generalSettings.propertyTypes.find(pt => pt.name === prop.name)?.type || 'text';
+						console.log(`Property ${prop.name} type after processing:`, type);
 						return {
 							id: prop.id || (Date.now().toString() + Math.random().toString(36).slice(2, 9)),
 							name: prop.name,
@@ -126,6 +130,8 @@ export function importTemplate(): void {
 						};
 					}));
 				}
+
+				console.log('Processed template properties:', importedTemplate.properties);
 
 				// Keep the context if it exists in the imported template
 				if (importedTemplate.context) {
@@ -139,6 +145,7 @@ export function importTemplate(): void {
 				}
 				importedTemplate.name = newName;
 
+				console.log('Final imported template:', importedTemplate);
 				templates.unshift(importedTemplate as Template);
 
 				saveTemplateSettings();
@@ -273,20 +280,45 @@ function handleFiles(files: FileList): void {
 
 function importTemplateFile(file: File): void {
 	const reader = new FileReader();
-	reader.onload = (e: ProgressEvent<FileReader>) => {
+	reader.onload = async (e: ProgressEvent<FileReader>) => {
 		try {
+			console.log('Starting template import');
 			const importedTemplate = JSON.parse(e.target?.result as string) as Partial<Template>;
+			console.log('Parsed imported template:', importedTemplate);
+
 			if (!validateImportedTemplate(importedTemplate)) {
 				throw new Error('Invalid template file');
 			}
 
 			importedTemplate.id = Date.now().toString() + Math.random().toString(36).slice(2, 9);
 			
-			// Assign new IDs to properties
-			importedTemplate.properties = importedTemplate.properties?.map(prop => ({
-				...prop,
-				id: Date.now().toString() + Math.random().toString(36).slice(2, 9)
-			}));
+			// Process property types immediately
+			if (importedTemplate.properties) {
+				console.log('Processing properties:', importedTemplate.properties);
+				for (const prop of importedTemplate.properties) {
+					console.log(`Processing property: ${prop.name}, type: ${prop.type || 'text'}, value: ${prop.value}`);
+					const existingPropertyType = generalSettings.propertyTypes.find(pt => pt.name === prop.name);
+					if (!existingPropertyType) {
+						// Only add the property type if it doesn't exist
+						await addPropertyType(prop.name, prop.type || 'text', prop.value || '');
+					} else {
+						console.log(`Property type ${prop.name} already exists, keeping existing type: ${existingPropertyType.type}`);
+					}
+				}
+				
+				// Reassign properties with existing or new types
+				importedTemplate.properties = importedTemplate.properties.map(prop => {
+					const existingPropertyType = generalSettings.propertyTypes.find(pt => pt.name === prop.name);
+					return {
+						id: prop.id || (Date.now().toString() + Math.random().toString(36).slice(2, 9)),
+						name: prop.name,
+						value: prop.value,
+						type: existingPropertyType ? existingPropertyType.type : (prop.type || 'text')
+					};
+				});
+			}
+
+			console.log('Processed template properties:', importedTemplate.properties);
 
 			// Keep the context if it exists in the imported template
 			if (importedTemplate.context) {
@@ -300,11 +332,13 @@ function importTemplateFile(file: File): void {
 			}
 			importedTemplate.name = newName;
 
+			console.log('Final imported template:', importedTemplate);
 			templates.unshift(importedTemplate as Template);
 
-			saveTemplateSettings();
+			await saveTemplateSettings();
 			updateTemplateList();
 			showTemplateEditor(importedTemplate as Template);
+			console.log('Template import completed');
 		} catch (error) {
 			console.error('Error parsing imported template:', error);
 			alert('Error importing template. Please check the file and try again.');

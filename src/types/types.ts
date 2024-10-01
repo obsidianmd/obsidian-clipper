@@ -12,9 +12,10 @@ export interface Template {
 }
 
 export interface Property {
-	id?: string;
+	id: string;
 	name: string;
 	value: string;
+	type?: string; // Add this line
 }
 
 export interface ExtractedContent {

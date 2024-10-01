@@ -10,7 +10,7 @@ export function initializePropertyTypesManager(): void {
 	ensureTagsProperty();
 	updatePropertyTypesList();
 	setupAddPropertyTypeButton();
-	setupImportExportButtons();
+	setupImportExportButtons(); // Make sure this line is present
 }
 
 function ensureTagsProperty(): void {
@@ -178,19 +178,31 @@ async function importTypesJson(): Promise<void> {
 			const reader = new FileReader();
 			reader.onload = async (e: ProgressEvent<FileReader>) => {
 				try {
+					console.log('Starting types import');
 					const content = JSON.parse(e.target?.result as string);
-					if (content.types) {
-						const newTypes = Object.entries(content.types).map(([name, typeInfo]: [string, any]) => ({
-							name,
-							type: typeof typeInfo === 'string' ? typeInfo : typeInfo.type,
-							defaultValue: typeof typeInfo === 'object' ? typeInfo.defaultValue : ''
-						}));
+					console.log('Parsed imported types:', content);
+
+					if (content && typeof content === 'object' && 'types' in content && typeof content.types === 'object') {
+						const newTypes = Object.entries(content.types).map(([name, type]) => {
+							console.log(`Processing type: ${name}, value:`, type);
+							if (typeof type !== 'string') {
+								console.warn(`Invalid type for property "${name}". Using 'text' as default.`);
+								return { name, type: 'text', defaultValue: '' };
+							}
+							return { name, type, defaultValue: '' };
+						});
+
+						console.log('Processed new types:', newTypes);
 						await mergePropertyTypes(newTypes);
 						updatePropertyTypesList();
+						console.log('Types import completed');
+					} else {
+						console.error('Invalid types.json format:', content);
+						throw new Error('Invalid types.json format: "types" property not found or is not an object');
 					}
 				} catch (error) {
 					console.error('Error parsing types.json:', error);
-					alert('Error importing types.json. Please check the file format.');
+					alert(`Error importing types.json: ${error instanceof Error ? error.message : 'Unknown error'}`);
 				}
 			};
 			reader.readAsText(file);
@@ -200,29 +212,41 @@ async function importTypesJson(): Promise<void> {
 }
 
 async function mergePropertyTypes(newTypes: PropertyType[]): Promise<void> {
+	console.log('Merging property types');
 	for (const newType of newTypes) {
+		console.log(`Processing type: ${newType.name}, type: ${newType.type}`);
 		if (newType.name === 'tags') {
-			// Ensure 'tags' is always multitext
-			await updatePropertyType('tags', 'multitext', newType.defaultValue || '');
+			console.log('Ensuring tags is multitext');
+			await updatePropertyType('tags', 'multitext', '');
 		} else {
 			const existingType = generalSettings.propertyTypes.find(pt => pt.name === newType.name);
 			if (existingType) {
-				const useNewType = await resolveConflict(newType.name, existingType, newType);
-				if (useNewType) {
-					await updatePropertyType(newType.name, newType.type, newType.defaultValue || '');
+				console.log(`Existing type found for ${newType.name}: ${existingType.type}`);
+				if (existingType.type !== newType.type) {
+					const useNewType = await resolveConflict(newType.name, 'type', existingType.type, newType.type);
+					if (useNewType) {
+						console.log(`Updating existing type: ${newType.name} to ${newType.type}`);
+						await updatePropertyType(newType.name, newType.type, existingType.defaultValue);
+					} else {
+						console.log(`Keeping existing type: ${newType.name} as ${existingType.type}`);
+					}
+				} else {
+					console.log(`No changes needed for existing type: ${newType.name}`);
 				}
 			} else {
-				await addPropertyType(newType.name, newType.type, newType.defaultValue || '');
+				console.log(`Adding new type: ${newType.name} as ${newType.type}`);
+				await addPropertyType(newType.name, newType.type, '');
 			}
 		}
 	}
 
 	await saveSettings();
+	console.log('Property types merged and saved');
 }
 
-async function resolveConflict(name: string, existing: PropertyType, newType: PropertyType): Promise<boolean> {
+async function resolveConflict(name: string, field: string, existingValue: string, newValue: string): Promise<boolean> {
 	return new Promise<boolean>((resolve) => {
-		const message = `Property "${name}" already exists with type "${existing.type}". Do you want to update it to type "${newType.type}"?`;
+		const message = `Property "${name}" has a conflict:\n${field}: "${existingValue}" -> "${newValue}"\nDo you want to update this ${field}?`;
 		if (confirm(message)) {
 			resolve(true);
 		} else {
@@ -276,26 +300,46 @@ function fallbackExport(content: string, fileName: string): void {
 }
 
 export async function addPropertyType(name: string, type: string = 'text', defaultValue: string = ''): Promise<void> {
+	console.log(`addPropertyType called with: name=${name}, type=${type}, defaultValue=${defaultValue}`);
 	const existingPropertyType = generalSettings.propertyTypes.find(pt => pt.name === name);
 	if (!existingPropertyType) {
-		generalSettings.propertyTypes.push({ name, type, defaultValue });
+		console.log(`Adding new property type: ${name} with type ${type}`);
+		const newPropertyType: PropertyType = { name, type };
+		if (defaultValue !== null && defaultValue !== '') {
+			newPropertyType.defaultValue = defaultValue;
+		}
+		generalSettings.propertyTypes.push(newPropertyType);
 		await saveSettings();
+	} else if (existingPropertyType.type !== type || existingPropertyType.defaultValue !== defaultValue) {
+		console.log(`Updating existing property type: ${name} from ${existingPropertyType.type} to ${type}`);
+		existingPropertyType.type = type;
+		if (defaultValue !== null && defaultValue !== '') {
+			existingPropertyType.defaultValue = defaultValue;
+		} else {
+			delete existingPropertyType.defaultValue;
+		}
+		await saveSettings();
+	} else {
+		console.log(`Property type ${name} already exists and is up to date`);
 	}
+	console.log('Current property types:', JSON.stringify(generalSettings.propertyTypes, null, 2));
 }
 
 export async function updatePropertyType(name: string, newType: string, newDefaultValue?: string): Promise<void> {
 	const index = generalSettings.propertyTypes.findIndex(p => p.name === name);
 	if (index !== -1) {
 		generalSettings.propertyTypes[index].type = newType;
-		if (newDefaultValue !== undefined) {
+		if (newDefaultValue !== undefined && newDefaultValue !== null && newDefaultValue !== '') {
 			generalSettings.propertyTypes[index].defaultValue = newDefaultValue;
+		} else {
+			delete generalSettings.propertyTypes[index].defaultValue;
 		}
 	} else {
-		generalSettings.propertyTypes.push({ 
-			name, 
-			type: newType, 
-			defaultValue: newDefaultValue ?? '' 
-		});
+		const newPropertyType: PropertyType = { name, type: newType };
+		if (newDefaultValue !== undefined && newDefaultValue !== null && newDefaultValue !== '') {
+			newPropertyType.defaultValue = newDefaultValue;
+		}
+		generalSettings.propertyTypes.push(newPropertyType);
 	}
 	await saveSettings();
 }
