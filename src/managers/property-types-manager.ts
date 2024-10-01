@@ -10,7 +10,8 @@ export function initializePropertyTypesManager(): void {
 	ensureTagsProperty();
 	updatePropertyTypesList();
 	setupAddPropertyTypeButton();
-	setupImportExportButtons(); // Make sure this line is present
+	setupImportExportButtons();
+	setupDeleteUnusedPropertiesButton();
 }
 
 function ensureTagsProperty(): void {
@@ -24,7 +25,8 @@ function ensureTagsProperty(): void {
 
 function updatePropertyTypesList(): void {
 	const propertyTypesList = document.getElementById('property-types-list');
-	if (!propertyTypesList) return;
+	const deleteUnusedButton = document.getElementById('delete-unused-properties-btn');
+	if (!propertyTypesList || !deleteUnusedButton) return;
 
 	propertyTypesList.innerHTML = '';
 
@@ -35,10 +37,29 @@ function updatePropertyTypesList(): void {
 		a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
 	);
 
+	const usedProperties = new Set<string>();
+	templates.forEach(template => {
+		template.properties.forEach(property => {
+			usedProperties.add(property.name);
+		});
+	});
+
+	let hasUnusedProperties = false;
+
 	sortedPropertyTypes.forEach(propertyType => {
-		const listItem = createPropertyTypeListItem(propertyType, propertyUsageCounts[propertyType.name] || 0);
+		const isUsed = usedProperties.has(propertyType.name);
+		if (!isUsed && propertyType.name !== 'tags') {
+			hasUnusedProperties = true;
+		}
+		const listItem = createPropertyTypeListItem(propertyType, propertyUsageCounts[propertyType.name] || 0, isUsed);
 		propertyTypesList.appendChild(listItem);
 	});
+
+	// Show or hide the "Remove unused" button
+	const deleteUnusedButtonContainer = deleteUnusedButton.closest('.setting-item');
+	if (deleteUnusedButtonContainer instanceof HTMLElement) {
+		deleteUnusedButtonContainer.style.display = hasUnusedProperties ? 'flex' : 'none';
+	}
 
 	initializeIcons(propertyTypesList);
 	refreshPropertyNameSuggestions();
@@ -54,7 +75,7 @@ function countPropertyUsage(): Record<string, number> {
 	return usageCounts;
 }
 
-function createPropertyTypeListItem(propertyType: PropertyType, usageCount: number): HTMLElement {
+function createPropertyTypeListItem(propertyType: PropertyType, usageCount: number, isUsed: boolean): HTMLElement {
 	const listItem = createElementWithClass('div', 'property-editor');
 
 	const propertySelectDiv = createElementWithClass('div', 'property-select');
@@ -92,7 +113,7 @@ function createPropertyTypeListItem(propertyType: PropertyType, usageCount: numb
 	listItem.appendChild(defaultValueInput);
 	listItem.appendChild(usageSpan);
 
-	if (usageCount === 0 && propertyType.name != 'tags') {
+	if (usageCount === 0 && propertyType.name !== 'tags') {
 		const removeBtn = createElementWithClass('button', 'remove-property-btn clickable-icon');
 		removeBtn.setAttribute('type', 'button');
 		removeBtn.setAttribute('aria-label', 'Remove property type');
@@ -107,8 +128,6 @@ function createPropertyTypeListItem(propertyType: PropertyType, usageCount: numb
 		removeBtn.setAttribute('aria-label', 'Remove property type');
 		removeBtn.appendChild(createElementWithHTML('i', '', { 'data-lucide': 'trash-2' }));
 		listItem.appendChild(removeBtn);
-
-		removeBtn.addEventListener('click', () => removePropertyType(propertyType.name));
 	}
 
 	if (propertyType.name !== 'tags') {
@@ -348,4 +367,38 @@ export async function removePropertyType(name: string): Promise<void> {
 	generalSettings.propertyTypes = generalSettings.propertyTypes.filter(p => p.name !== name);
 	await saveSettings();
 	updatePropertyTypesList();
+}
+
+function setupDeleteUnusedPropertiesButton(): void {
+	const deleteUnusedButton = document.getElementById('delete-unused-properties-btn');
+	if (deleteUnusedButton) {
+		deleteUnusedButton.addEventListener('click', deleteUnusedProperties);
+	}
+}
+
+async function deleteUnusedProperties(): Promise<void> {
+	const usedProperties = new Set<string>();
+	
+	// Collect all properties used in templates
+	templates.forEach(template => {
+		template.properties.forEach(property => {
+			usedProperties.add(property.name);
+		});
+	});
+
+	// Filter out unused properties
+	const unusedProperties = generalSettings.propertyTypes.filter(pt => !usedProperties.has(pt.name) && pt.name !== 'tags');
+	
+	if (unusedProperties.length === 0) {
+		alert('No unused properties found.');
+		return;
+	}
+
+	const confirmMessage = `Are you sure you want to remove ${unusedProperties.length} unused properties?`;
+	if (confirm(confirmMessage)) {
+		generalSettings.propertyTypes = generalSettings.propertyTypes.filter(pt => usedProperties.has(pt.name) || pt.name === 'tags');
+		await saveSettings();
+		updatePropertyTypesList(); // This will update the button visibility
+		alert(`Removed ${unusedProperties.length} unused properties.`);
+	}
 }
