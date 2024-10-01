@@ -26,6 +26,9 @@
 	.tags-property {
 		.property-select {
 			opacity: 0.5;
+			select {
+				cursor: not-allowed;
+			}
 		}
 	}
 }
