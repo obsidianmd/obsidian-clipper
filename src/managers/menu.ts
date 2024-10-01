@@ -2,8 +2,6 @@ export function initializeMenu(menuBtnId: string, menuId: string): void {
 	const moreActionsBtn = document.getElementById(menuBtnId) as HTMLButtonElement;
 	const menu = document.getElementById(menuId) as HTMLElement;
 
-	console.log('Initializing menu:', { menuBtnId, menuId, moreActionsBtn, menu });
-
 	if (moreActionsBtn && menu) {
 		moreActionsBtn.addEventListener('click', (event) => {
 			console.log('More actions button clicked');

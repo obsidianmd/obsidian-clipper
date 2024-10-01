@@ -21,7 +21,7 @@ import { createIcons } from 'lucide';
 import { icons } from '../icons/icons';
 import { updateUrl, getUrlParameters } from '../utils/routing';
 import { addBrowserClassToHtml } from '../utils/browser-detection';
-import { initializeMenu, addMenuItemListener } from '../managers/menu';
+import { initializeMenu } from '../managers/menu';
 
 document.addEventListener('DOMContentLoaded', async () => {
 	const newTemplateBtn = document.getElementById('new-template-btn') as HTMLButtonElement;
@@ -36,8 +36,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 		await handleUrlParameters();
 		initializeSidebar();
 		initializeAutoSave();
-
-		console.log('Initializing menu');
 		initializeMenu('more-actions-btn', 'template-actions-menu');
 
 		resetDefaultTemplateBtn.addEventListener('click', resetDefaultTemplate);

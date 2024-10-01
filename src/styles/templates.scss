@@ -14,7 +14,7 @@
 		height: var(--input-height);
 	}
 	.property-name {
-		max-width: 7rem;
+		max-width: var(--metadata-label-width);
 		&::-webkit-calendar-picker-indicator {
 			display: none !important;
 		}
@@ -39,14 +39,20 @@
 			padding: 0.25rem;
 			border-radius: var(--radius-s);
 			color: var(--text-faint);
+			margin-left: auto;
+			justify-self: flex-end;
+			display: none;
+		}
+		.remove-property-btn {
+			justify-self: flex-end;
 		}
 		.remove-property-btn[disabled] {
-			opacity: 0.35;
+			opacity: 0;
 			pointer-events: none;
 		}
 	}
 	.property-name {
-		min-width: 7rem;
+		min-width: var(--metadata-label-width);
 		overflow: hidden;
 		white-space: nowrap;
 		text-overflow: ellipsis;
