@@ -1,7 +1,8 @@
 :root {
-	--popup-width: 360px;
+	--popup-width: 350px;
 	--popup-width-expanded: 500px;
-	--popup-height: 520px;
+	--popup-height: 540px;
+	--popup-max-height: 540px;
 }
 
 .is-safari,
@@ -15,6 +16,7 @@
 .is-mobile-safari,
 .is-firefox-mobile {
 	--popup-height: 100vh;
+	--popup-max-height: 100vh;
 	--popup-width: 100vw;
 	--popup-width-expanded: 100vw;
 }
@@ -22,7 +24,7 @@
 #popup {
 	scrollbar-width: none;
 	height: max(var(--popup-height), 100vh);
-	max-height: max(var(--popup-height), 100vh);
+	max-height: var(--popup-max-height);
 	overflow: hidden;
 	font-family: var(--font-default);
 	&::-webkit-scrollbar {
