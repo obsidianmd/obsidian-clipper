@@ -1,7 +1,8 @@
 import { Template, Property } from '../types/types';
 import { compressToUTF16, decompressFromUTF16 } from 'lz-string';
 import browser from '../utils/browser-polyfill';
-import { generalSettings, addPropertyType, PropertyType } from '../utils/storage-utils';
+import { generalSettings, PropertyType } from '../utils/storage-utils';
+import { addPropertyType } from './property-types-manager';
 
 export let templates: Template[] = [];
 export let editingTemplateIndex = -1;
@@ -198,22 +199,24 @@ async function updateGlobalPropertyTypes(templates: Template[]): Promise<void> {
 	const existingTypes = new Set(generalSettings.propertyTypes.map(p => p.name));
 	const newTypes: PropertyType[] = [];
 
-	const defaultTypes: { [key: string]: string } = {
-		'title': 'text',
-		'source': 'text',
-		'author': 'multitext',
-		'published': 'date',
-		'created': 'date',
-		'description': 'text',
-		'tags': 'multitext'
+	const defaultTypes: { [key: string]: { type: string, defaultValue: string } } = {
+		'title': { type: 'text', defaultValue: '{{title}}' },
+		'source': { type: 'text', defaultValue: '{{url}}' },
+		'author': { type: 'multitext', defaultValue: '{{author|split:", "|wikilink|join}}' },
+		'published': { type: 'date', defaultValue: '{{published}}' },
+		'created': { type: 'date', defaultValue: '{{date}}' },
+		'description': { type: 'text', defaultValue: '{{description}}' },
+		'tags': { type: 'multitext', defaultValue: 'clippings' }
 	};
 
 	templates.forEach(template => {
 		template.properties.forEach(property => {
 			if (!existingTypes.has(property.name)) {
+				const defaultType = defaultTypes[property.name] || { type: 'text', defaultValue: '' };
 				newTypes.push({ 
 					name: property.name, 
-					type: defaultTypes[property.name] || 'text'
+					type: defaultType.type,
+					defaultValue: defaultType.defaultValue
 				});
 				existingTypes.add(property.name);
 			}
@@ -221,6 +224,6 @@ async function updateGlobalPropertyTypes(templates: Template[]): Promise<void> {
 	});
 
 	for (const newType of newTypes) {
-		await addPropertyType(newType.name, newType.type);
+		await addPropertyType(newType.name, newType.type, newType.defaultValue);
 	}
 }

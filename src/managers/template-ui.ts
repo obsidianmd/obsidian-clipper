@@ -1,15 +1,14 @@
 import { Template, Property } from '../types/types';
-import { templates, editingTemplateIndex, saveTemplateSettings, getTemplates, setEditingTemplateIndex } from './template-manager';
+import { templates, editingTemplateIndex, saveTemplateSettings, setEditingTemplateIndex } from './template-manager';
 import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
-import { escapeValue, escapeHtml, unescapeValue } from '../utils/string-utils';
-import { generalSettings, updatePropertyType } from '../utils/storage-utils';
+import { escapeValue, unescapeValue } from '../utils/string-utils';
+import { generalSettings } from '../utils/storage-utils';
 import { updateUrl } from '../utils/routing';
 import { handleDragStart, handleDragOver, handleDrop, handleDragEnd } from '../utils/drag-and-drop';
-import browser from '../utils/browser-polyfill';
 import { createElementWithClass, createElementWithHTML } from '../utils/dom-utils';
 import { updatePromptContextVisibility } from './interpreter-settings';
 import { showSettingsSection } from './settings-section-ui';
-
+import { updatePropertyType } from './property-types-manager';
 let hasUnsavedChanges = false;
 
 export function resetUnsavedChanges(): void {
@@ -310,8 +309,6 @@ export function addPropertyToEditor(name: string = '', value: string = '', id: s
 	select.value = propertyType;
 	propertySelectDiv.appendChild(select);
 	propertyDiv.appendChild(propertySelectDiv);
-
-	const propertyTypeObj = generalSettings.propertyTypes.find(p => p.name === name);
 
 	const nameInput = createElementWithHTML('input', '', {
 		type: 'text',

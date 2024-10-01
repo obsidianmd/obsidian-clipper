@@ -3,7 +3,8 @@ import { templates, saveTemplateSettings, editingTemplateIndex } from '../manage
 import { showTemplateEditor, updateTemplateList } from '../managers/template-ui';
 import { sanitizeFileName } from './string-utils';
 import { detectBrowser } from './browser-detection';
-import { generalSettings, addPropertyType } from '../utils/storage-utils';
+import { generalSettings } from '../utils/storage-utils';
+import { addPropertyType } from '../managers/property-types-manager';
 
 const SCHEMA_VERSION = '0.1.0';
 
@@ -24,21 +25,26 @@ export async function exportTemplate(): Promise<void> {
 		name: template.name,
 		behavior: template.behavior,
 		noteContentFormat: template.noteContentFormat,
-		properties: template.properties.map(({ id, name, value }) => {
+		properties: template.properties.map(({ name, value }) => {
 			const type = generalSettings.propertyTypes.find(pt => pt.name === name)?.type || 'text';
-			return { id, name, value, type };
+			return { 
+				name, 
+				value, 
+				type 
+			};
 		}),
 		triggers: template.triggers,
 	};
 
 	// Only include noteNameFormat and path for non-daily note behaviors
 	if (!isDailyNote) {
-		orderedTemplate.noteNameFormat = template.noteNameFormat;
-		orderedTemplate.path = template.path;
+			orderedTemplate.noteNameFormat = template.noteNameFormat;
+			orderedTemplate.path = template.path;
 	}
 
 	// Include context only if it has a value
 	if (template.context) {
+		
 		orderedTemplate.context = template.context;
 	}
 
@@ -102,19 +108,21 @@ export function importTemplate(): void {
 					throw new Error('Invalid template file');
 				}
 
-				importedTemplate.id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
+				importedTemplate.id = Date.now().toString() + Math.random().toString(36).slice(2, 9);
 				
-				// Handle property types
+				// Handle property types and preserve existing IDs or generate new ones
 				if (importedTemplate.properties) {
 					importedTemplate.properties = await Promise.all(importedTemplate.properties.map(async (prop: any) => {
-						const existingPropertyType = generalSettings.propertyTypes.find(pt => pt.name === prop.name);
-						if (!existingPropertyType) {
-							await addPropertyType(prop.name, prop.type || 'text');
-						}
+						// Add or update the property type
+						await addPropertyType(prop.name, prop.type || 'text');
+						
+						// Use the type from generalSettings, which will be either the existing type or the newly added one
+						const type = generalSettings.propertyTypes.find(pt => pt.name === prop.name)?.type || 'text';
 						return {
-							id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+							id: prop.id || (Date.now().toString() + Math.random().toString(36).slice(2, 9)),
 							name: prop.name,
-							value: prop.value
+							value: prop.value,
+							type: type
 						};
 					}));
 				}
@@ -272,12 +280,12 @@ function importTemplateFile(file: File): void {
 				throw new Error('Invalid template file');
 			}
 
-			importedTemplate.id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
+			importedTemplate.id = Date.now().toString() + Math.random().toString(36).slice(2, 9);
 			
 			// Assign new IDs to properties
 			importedTemplate.properties = importedTemplate.properties?.map(prop => ({
 				...prop,
-				id: Date.now().toString() + Math.random().toString(36).substr(2, 9)
+				id: Date.now().toString() + Math.random().toString(36).slice(2, 9)
 			}));
 
 			// Keep the context if it exists in the imported template

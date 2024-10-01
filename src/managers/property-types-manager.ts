@@ -275,24 +275,32 @@ function fallbackExport(content: string, fileName: string): void {
 	URL.revokeObjectURL(url);
 }
 
-// Update these functions to include defaultValue
-async function addPropertyType(name: string, type: string = 'text', defaultValue: string = ''): Promise<void> {
-	generalSettings.propertyTypes.push({ name, type, defaultValue });
-	await saveSettings();
+export async function addPropertyType(name: string, type: string = 'text', defaultValue: string = ''): Promise<void> {
+	const existingPropertyType = generalSettings.propertyTypes.find(pt => pt.name === name);
+	if (!existingPropertyType) {
+		generalSettings.propertyTypes.push({ name, type, defaultValue });
+		await saveSettings();
+	}
 }
 
-async function updatePropertyType(name: string, newType: string, newDefaultValue: string): Promise<void> {
+export async function updatePropertyType(name: string, newType: string, newDefaultValue?: string): Promise<void> {
 	const index = generalSettings.propertyTypes.findIndex(p => p.name === name);
 	if (index !== -1) {
 		generalSettings.propertyTypes[index].type = newType;
-		generalSettings.propertyTypes[index].defaultValue = newDefaultValue;
+		if (newDefaultValue !== undefined) {
+			generalSettings.propertyTypes[index].defaultValue = newDefaultValue;
+		}
 	} else {
-		generalSettings.propertyTypes.push({ name, type: newType, defaultValue: newDefaultValue });
+		generalSettings.propertyTypes.push({ 
+			name, 
+			type: newType, 
+			defaultValue: newDefaultValue ?? '' 
+		});
 	}
 	await saveSettings();
 }
 
-async function removePropertyType(name: string): Promise<void> {
+export async function removePropertyType(name: string): Promise<void> {
 	generalSettings.propertyTypes = generalSettings.propertyTypes.filter(p => p.name !== name);
 	await saveSettings();
 	updatePropertyTypesList();

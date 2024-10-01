@@ -150,23 +150,3 @@ export async function setLegacyMode(enabled: boolean): Promise<void> {
 	await saveSettings({ legacyMode: enabled });
 	console.log(`Legacy mode ${enabled ? 'enabled' : 'disabled'}`);
 }
-
-export async function addPropertyType(name: string, type: string = 'text'): Promise<void> {
-	generalSettings.propertyTypes.push({ name, type });
-	await saveSettings();
-}
-
-export async function updatePropertyType(name: string, newType: string): Promise<void> {
-	const index = generalSettings.propertyTypes.findIndex(p => p.name === name);
-	if (index !== -1) {
-		generalSettings.propertyTypes[index].type = newType;
-	} else {
-		generalSettings.propertyTypes.push({ name, type: newType });
-	}
-	await saveSettings();
-}
-
-export async function removePropertyType(name: string): Promise<void> {
-	generalSettings.propertyTypes = generalSettings.propertyTypes.filter(p => p.name !== name);
-	await saveSettings();
-}
