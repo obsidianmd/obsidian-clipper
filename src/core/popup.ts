@@ -18,6 +18,7 @@ import { showVariables, initializeVariablesPanel, updateVariablesPanel } from '.
 import { ensureContentScriptLoaded } from '../utils/content-script-utils';
 import { isBlankPage, isValidUrl } from '../utils/active-tab-manager';
 import { memoize, memoizeWithExpiration } from '../utils/memoize';
+import { debounce } from '../utils/debounce';
 
 let loadedSettings: Settings;
 let currentTemplate: Template | null = null;
@@ -60,9 +61,50 @@ const memoizedExtractPageContent = memoizeWithExpiration(
 	}
 );
 
+// Add this variable to keep track of the previous width
+let previousWidth = window.innerWidth;
+
+function setPopupDimensions() {
+	// Get the actual height of the popup after the browser has determined its maximum
+	const actualHeight = document.documentElement.offsetHeight;
+	
+	// Calculate the viewport height and width
+	const viewportHeight = window.innerHeight;
+	const viewportWidth = window.innerWidth;
+	
+	// Use the smaller of the two heights
+	const finalHeight = Math.min(actualHeight, viewportHeight);
+	
+	// Set the --popup-height CSS variable to the final height
+	document.documentElement.style.setProperty('--popup-height', `${finalHeight}px`);
+
+	// Check if the width has changed
+	if (viewportWidth !== previousWidth) {
+		previousWidth = viewportWidth;
+		
+		// Adjust the note name field height
+		const noteNameField = document.getElementById('note-name-field') as HTMLTextAreaElement;
+		if (noteNameField) {
+			adjustNoteNameHeight(noteNameField);
+		}
+	}
+}
+
+const debouncedSetPopupDimensions = debounce(setPopupDimensions, 100); // 100ms delay
+
 async function initializeExtension(tabId: number) {
 	try {
+		// First, add the browser class to allow browser-specific styles to apply
 		await addBrowserClassToHtml();
+		
+		// Set an initial large height to allow the browser to determine the maximum
+		document.documentElement.style.setProperty('--popup-height', '2000px');
+		
+		// Use setTimeout to ensure the DOM has updated before we measure
+		setTimeout(() => {
+			setPopupDimensions(); // Call the non-debounced version initially
+		}, 0);
+
 		loadedSettings = await loadSettings();
 		debugLog('Settings', 'General settings:', loadedSettings);
 
@@ -790,3 +832,6 @@ function handleTemplateChange(templateId: string) {
 	setLocalStorage('lastUsedTemplateId', lastUsedTemplateId);
 	refreshFields(currentTabId!, false);
 }
+
+// Update the resize event listener to use the debounced version
+window.addEventListener('resize', debouncedSetPopupDimensions);
