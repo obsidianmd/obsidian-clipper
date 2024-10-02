@@ -9,6 +9,8 @@ import {
 	loadTemplates, 
 	saveTemplateSettings, 
 	templates,
+	cleanupTemplateStorage,
+	rebuildTemplateList
 } from '../managers/template-manager';
 import { updateTemplateList, showTemplateEditor, resetUnsavedChanges, initializeAddPropertyButton } from '../managers/template-ui';
 import { initializeGeneralSettings } from '../managers/general-settings';
@@ -21,6 +23,16 @@ import { icons } from '../icons/icons';
 import { updateUrl, getUrlParameters } from '../utils/routing';
 import { addBrowserClassToHtml } from '../utils/browser-detection';
 import { initializeMenu } from '../managers/menu';
+
+declare global {
+    interface Window {
+        cleanupTemplateStorage: () => Promise<void>;
+        rebuildTemplateList: () => Promise<void>;
+    }
+}
+
+window.cleanupTemplateStorage = cleanupTemplateStorage;
+window.rebuildTemplateList = rebuildTemplateList;
 
 document.addEventListener('DOMContentLoaded', async () => {
 	const newTemplateBtn = document.getElementById('new-template-btn') as HTMLButtonElement;
@@ -80,24 +92,24 @@ document.addEventListener('DOMContentLoaded', async () => {
 		}
 	}
 
-	function deleteCurrentTemplate(): void {
+	async function deleteCurrentTemplate(): Promise<void> {
 		const editingTemplateIndex = getEditingTemplateIndex();
 		if (editingTemplateIndex !== -1) {
 			const currentTemplate = templates[editingTemplateIndex];
 			if (confirm(`Are you sure you want to delete the template "${currentTemplate.name}"?`)) {
-				deleteTemplate(currentTemplate.id);
-				saveTemplateSettings().then(() => {
+				const success = await deleteTemplate(currentTemplate.id);
+				if (success) {
+					// Reload templates after deletion
+					await loadTemplates();
 					updateTemplateList();
 					if (templates.length > 0) {
 						showTemplateEditor(templates[0]);
 					} else {
 						showSettingsSection('general');
 					}
-				}).catch(error => {
-					console.error('Failed to delete template:', error);
+				} else {
 					alert('Failed to delete template. Please try again.');
-					showSettingsSection('general');
-				});
+				}
 			}
 		}
 	}
