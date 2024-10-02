@@ -26,6 +26,7 @@
 	border: var(--modal-border-width) solid var(--modal-border-color);
 	padding: 1rem;
 	position: relative;
+	height: var(--dialog-height);
 	min-height: 100px;
 	width: var(--dialog-width);
 	max-width: var(--dialog-max-width);
