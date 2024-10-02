@@ -23,6 +23,7 @@ import { icons } from '../icons/icons';
 import { updateUrl, getUrlParameters } from '../utils/routing';
 import { addBrowserClassToHtml } from '../utils/browser-detection';
 import { initializeMenu } from '../managers/menu';
+import { addMenuItemListener } from '../managers/menu';
 
 declare global {
     interface Window {
@@ -61,22 +62,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 			});
 		}
 
-		document.querySelectorAll('#duplicate-template-btn').forEach(btn => 
-			btn.addEventListener('click', duplicateCurrentTemplate)
-		);
-		document.querySelectorAll('#delete-template-btn').forEach(btn => 
-			btn.addEventListener('click', deleteCurrentTemplate)
-		);
-
-		document.querySelectorAll('.export-template-btn').forEach(btn => 
-			btn.addEventListener('click', exportTemplate)
-		);
-		document.querySelectorAll('.import-template-btn').forEach(btn => 
-			btn.addEventListener('click', showTemplateImportModal)
-		);
-		document.querySelectorAll('#copy-template-json-btn').forEach(btn => 
-			btn.addEventListener('click', copyCurrentTemplateToClipboard)
-		);
+		addMenuItemListener('#duplicate-template-btn', 'template-actions-menu', duplicateCurrentTemplate);
+		addMenuItemListener('#delete-template-btn', 'template-actions-menu', deleteCurrentTemplate);
+		addMenuItemListener('.export-template-btn', 'template-actions-menu', exportTemplate);
+		addMenuItemListener('.import-template-btn', 'template-actions-menu', showTemplateImportModal);
+		addMenuItemListener('#copy-template-json-btn', 'template-actions-menu', copyCurrentTemplateToClipboard);
 
 		document.querySelectorAll('#reset-default-template-btn').forEach(btn => 
 			btn.addEventListener('click', resetDefaultTemplate)

@@ -15,6 +15,12 @@ export function initializeMenu(menuBtnId: string, menuId: string): void {
 				closeMenu(menu);
 			}
 		});
+
+		menu.querySelectorAll('.menu-item').forEach(item => {
+			item.addEventListener('click', () => {
+				closeMenu(menu);
+			});
+		});
 	} else {
 		console.error('Menu button or menu element not found:', { menuBtnId, menuId });
 	}
