@@ -19,36 +19,33 @@ export function setEditingTemplateIndex(index: number): void {
 export async function loadTemplates(): Promise<Template[]> {
 	try {
 		const data = await browser.storage.sync.get(['template_list']);
-		const templateIds = data.template_list as string[] || [];
+		let templateIds = data.template_list as string[] || [];
 
-		if (templateIds.length === 0) {
-			console.log('No template IDs found, creating default template');
-			const defaultTemplate = createDefaultTemplate();
-			templates = [defaultTemplate];
-			await saveTemplateSettings();
-			return templates;
-		}
+		// Filter out any null or undefined values
+		templateIds = templateIds.filter(id => id != null);
 
-		const loadedTemplates = await Promise.all(templateIds.map(async (id: string) => {
-			try {
-				const result = await browser.storage.sync.get(`template_${id}`);
-				const compressedChunks = result[`template_${id}`] as string[];
-				if (compressedChunks) {
-					const decompressedData = decompressFromUTF16(compressedChunks.join(''));
-					const template = JSON.parse(decompressedData);
-					if (template && Array.isArray(template.properties)) {
-						return template;
+		if (templateIds.length > 0) {
+			const loadedTemplates = await Promise.all(templateIds.map(async (id: string) => {
+				try {
+					const result = await browser.storage.sync.get(`template_${id}`);
+					const compressedChunks = result[`template_${id}`] as string[];
+					if (compressedChunks) {
+						const decompressedData = decompressFromUTF16(compressedChunks.join(''));
+						const template = JSON.parse(decompressedData);
+						if (template && Array.isArray(template.properties)) {
+							return template;
+						}
 					}
+					console.warn(`Template ${id} is invalid or missing`);
+					return null;
+				} catch (error) {
+					console.error(`Error parsing template ${id}:`, error);
+					return null;
 				}
-				console.warn(`Template ${id} is invalid or missing`);
-				return null;
-			} catch (error) {
-				console.error(`Error parsing template ${id}:`, error);
-				return null;
-			}
-		}));
+			}));
 
-		templates = loadedTemplates.filter((t: Template | null): t is Template => t !== null);
+			templates = loadedTemplates.filter((t: Template | null): t is Template => t !== null);
+		}
 
 		if (templates.length === 0) {
 			console.log('No valid templates found, creating default template');
@@ -63,22 +60,11 @@ export async function loadTemplates(): Promise<Template[]> {
 		return templates;
 	} catch (error) {
 		console.error('Error loading templates:', error);
-		// Instead of returning an empty array, create a default template
 		const defaultTemplate = createDefaultTemplate();
 		templates = [defaultTemplate];
 		await saveTemplateSettings();
 		return templates;
 	}
-}
-
-async function loadTemplate(id: string): Promise<Template | null> {
-	const data = await browser.storage.sync.get(STORAGE_KEY_PREFIX + id);
-	const compressedChunks = data[STORAGE_KEY_PREFIX + id] as string[];
-	if (compressedChunks) {
-		const decompressedData = decompressFromUTF16(compressedChunks.join(''));
-		return JSON.parse(decompressedData);
-	}
-	return null;
 }
 
 export async function saveTemplateSettings(): Promise<string[]> {
@@ -185,13 +171,36 @@ function getUniqueTemplateName(baseName: string): string {
 	return newName;
 }
 
-export function deleteTemplate(templateId: string): boolean {
+export async function deleteTemplate(templateId: string): Promise<boolean> {
 	const index = templates.findIndex(t => t.id === templateId);
+	console.log('Deleting template:', templateId);
 	if (index !== -1) {
+		// Remove from the templates array
 		templates.splice(index, 1);
 		setEditingTemplateIndex(-1);
-		return true;
+
+		try {
+			// Remove the template from storage
+			await browser.storage.sync.remove(`template_${templateId}`);
+
+			// Get the current template_list
+			const data = await browser.storage.sync.get('template_list');
+			let templateIds = data.template_list as string[] || [];
+
+			// Remove the deleted template ID from the list
+			templateIds = templateIds.filter(id => id !== templateId);
+
+			// Update the template_list in storage
+			await browser.storage.sync.set({ 'template_list': templateIds });
+
+			console.log(`Template ${templateId} deleted successfully`);
+			return true;
+		} catch (error) {
+			console.log('Error deleting template:', error);
+			return false;
+		}
 	}
+	console.log('Error deleting template');
 	return false;
 }
 
@@ -226,4 +235,36 @@ async function updateGlobalPropertyTypes(templates: Template[]): Promise<void> {
 	for (const newType of newTypes) {
 		await addPropertyType(newType.name, newType.type, newType.defaultValue);
 	}
+}
+
+export async function rebuildTemplateList(): Promise<void> {
+	try {
+		// Get all items in storage
+		const allItems = await browser.storage.sync.get(null);
+		
+		// Filter for template keys and extract IDs
+		const templateIds = Object.keys(allItems)
+			.filter(key => key.startsWith('template_') && key !== 'template_list')
+			.map(key => key.replace('template_', ''));
+
+		console.log('Found template IDs:', templateIds);
+
+		// Update the template_list in storage
+		await browser.storage.sync.set({ 'template_list': templateIds });
+
+		console.log('Template list rebuilt successfully');
+
+		// Reload templates
+		templates = await loadTemplates();
+
+		console.log('Templates reloaded:', templates);
+	} catch (error) {
+		console.error('Error rebuilding template list:', error);
+	}
+}
+
+export async function cleanupTemplateStorage(): Promise<void> {
+	await rebuildTemplateList();
+	await loadTemplates();
+	console.log('Template storage cleaned up and rebuilt');
 }

@@ -1,10 +1,13 @@
 import { Template, Property } from '../types/types';
-import { templates, saveTemplateSettings, editingTemplateIndex } from '../managers/template-manager';
+import { templates, saveTemplateSettings, editingTemplateIndex, loadTemplates } from '../managers/template-manager';
 import { showTemplateEditor, updateTemplateList } from '../managers/template-ui';
 import { sanitizeFileName } from './string-utils';
 import { detectBrowser } from './browser-detection';
-import { generalSettings } from '../utils/storage-utils';
-import { addPropertyType } from '../managers/property-types-manager';
+import { generalSettings, loadSettings } from '../utils/storage-utils';
+import { addPropertyType, updatePropertyTypesList } from '../managers/property-types-manager';
+import { hideModal } from '../utils/modal-utils';
+import { showImportModal as showGenericImportModal } from './import-modal';
+import browser from '../utils/browser-polyfill';
 
 const SCHEMA_VERSION = '0.1.0';
 
@@ -52,8 +55,9 @@ export async function exportTemplate(): Promise<void> {
 
 	const browser = await detectBrowser();
 	const isIOSBrowser = browser === 'mobile-safari' || browser === 'ipad-os';
+	const isSafari = browser === 'safari';
 
-	if (isIOSBrowser) {
+	if (isIOSBrowser || isSafari) {
 		// For iOS, create a Blob and use the Web Share API if available
 		const blob = new Blob([jsonContent], { type: 'application/json' });
 		const file = new File([blob], templateFile, { type: 'application/json' });
@@ -91,15 +95,14 @@ export async function exportTemplate(): Promise<void> {
 	}
 }
 
-export function importTemplate(): void {
-	const input = document.createElement('input');
-	input.type = 'file';
-	input.accept = '.json';
+export function importTemplate(input?: HTMLInputElement): void {
+	if (!input) {
+		input = document.createElement('input');
+		input.type = 'file';
+		input.accept = '.json';
+	}
 
-	input.onchange = (event: Event) => {
-		const file = (event.target as HTMLInputElement).files?.[0];
-		if (!file) return;
-
+	const handleFile = (file: File) => {
 		const reader = new FileReader();
 		reader.onload = async (e: ProgressEvent<FileReader>) => {
 			try {
@@ -151,6 +154,7 @@ export function importTemplate(): void {
 				saveTemplateSettings();
 				updateTemplateList();
 				showTemplateEditor(importedTemplate as Template);
+				hideModal(document.getElementById('import-modal'));
 			} catch (error) {
 				console.error('Error parsing imported template:', error);
 				alert('Error importing template. Please check the file and try again.');
@@ -159,7 +163,17 @@ export function importTemplate(): void {
 		reader.readAsText(file);
 	};
 
-	input.click();
+	if (input.files && input.files.length > 0) {
+		handleFile(input.files[0]);
+	} else {
+		input.onchange = (event: Event) => {
+			const file = (event.target as HTMLInputElement).files?.[0];
+			if (file) {
+				handleFile(file);
+			}
+		};
+		input.click();
+	}
 }
 
 function validateImportedTemplate(template: Partial<Template>): boolean {
@@ -185,84 +199,9 @@ function validateImportedTemplate(template: Partial<Template>): boolean {
 	return hasRequiredFields && hasValidProperties && hasValidNoteNameAndPath && hasValidContext;
 }
 
-export function initializeDropZone(): void {
-	const dropZone = document.getElementById('template-drop-zone');
-	const body = document.body;
-
-	if (!dropZone) {
-		console.error('Drop zone not found');
-		return;
-	}
-
-	let dragCounter = 0;
-
-	body.addEventListener('dragenter', handleDragEnter, false);
-	body.addEventListener('dragleave', handleDragLeave, false);
-	body.addEventListener('dragover', handleDragOver, false);
-	body.addEventListener('drop', handleDrop, false);
-
-	function handleDragEnter(e: DragEvent): void {
-		e.preventDefault();
-		e.stopPropagation();
-		dragCounter++;
-		if (isFileDrag(e)) {
-			dropZone?.classList.add('drag-over');
-		}
-	}
-
-	function handleDragLeave(e: DragEvent): void {
-		e.preventDefault();
-		e.stopPropagation();
-		dragCounter--;
-		if (dragCounter === 0) {
-			dropZone?.classList.remove('drag-over');
-		}
-	}
-
-	function handleDragOver(e: DragEvent): void {
-		e.preventDefault();
-		e.stopPropagation();
-	}
-
-	function handleDrop(e: DragEvent): void {
-		e.preventDefault();
-		e.stopPropagation();
-		dropZone?.classList.remove('drag-over');
-		dragCounter = 0;
-		
-		if (isFileDrag(e)) {
-			const files = e.dataTransfer?.files;
-			if (files && files.length) {
-				handleFiles(files);
-			}
-		}
-	}
-
-	function isFileDrag(e: DragEvent): boolean {
-		if (e.dataTransfer?.types) {
-			for (let i = 0; i < e.dataTransfer.types.length; i++) {
-				if (e.dataTransfer.types[i] === "Files") {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-}
-
 function preventDefaults(e: Event): void {
 	e.preventDefault();
 	e.stopPropagation();
-}
-
-function highlight(e: Event): void {
-	const dropZone = document.getElementById('template-drop-zone');
-	dropZone?.classList.add('drag-over');
-}
-
-function unhighlight(e: Event): void {
-	const dropZone = document.getElementById('template-drop-zone');
-	dropZone?.classList.remove('drag-over');
 }
 
 function handleDrop(e: DragEvent): void {
@@ -278,66 +217,67 @@ function handleFiles(files: FileList): void {
 	Array.from(files).forEach(importTemplateFile);
 }
 
-function importTemplateFile(file: File): void {
+async function processImportedTemplate(importedTemplate: Partial<Template>): Promise<Template> {
+	console.log('Processing imported template:', importedTemplate);
+
+	if (!validateImportedTemplate(importedTemplate)) {
+		throw new Error('Invalid template file');
+	}
+
+	importedTemplate.id = Date.now().toString() + Math.random().toString(36).slice(2, 9);
+	
+	// Process property types
+	if (importedTemplate.properties) {
+		console.log('Processing properties:', importedTemplate.properties);
+		for (const prop of importedTemplate.properties) {
+			console.log(`Processing property: ${prop.name}, type: ${prop.type || 'text'}, value: ${prop.value}`);
+			const existingPropertyType = generalSettings.propertyTypes.find(pt => pt.name === prop.name);
+			if (!existingPropertyType) {
+				// Only add the property type if it doesn't exist
+				await addPropertyType(prop.name, prop.type || 'text', prop.value || '');
+			} else {
+				console.log(`Property type ${prop.name} already exists, keeping existing type: ${existingPropertyType.type}`);
+			}
+		}
+		
+		// Reassign properties with existing or new types
+		importedTemplate.properties = importedTemplate.properties.map(prop => {
+			const existingPropertyType = generalSettings.propertyTypes.find(pt => pt.name === prop.name);
+			return {
+				id: prop.id || (Date.now().toString() + Math.random().toString(36).slice(2, 9)),
+				name: prop.name,
+				value: prop.value,
+				type: existingPropertyType ? existingPropertyType.type : (prop.type || 'text')
+			};
+		});
+	}
+
+	console.log('Processed template properties:', importedTemplate.properties);
+
+	// Ensure unique name
+	let newName = importedTemplate.name as string;
+	let counter = 1;
+	while (templates.some(t => t.name === newName)) {
+		newName = `${importedTemplate.name} (${counter++})`;
+	}
+	importedTemplate.name = newName;
+
+	console.log('Final imported template:', importedTemplate);
+	return importedTemplate as Template;
+}
+
+export function importTemplateFile(file: File): void {
 	const reader = new FileReader();
 	reader.onload = async (e: ProgressEvent<FileReader>) => {
 		try {
 			console.log('Starting template import');
 			const importedTemplate = JSON.parse(e.target?.result as string) as Partial<Template>;
-			console.log('Parsed imported template:', importedTemplate);
-
-			if (!validateImportedTemplate(importedTemplate)) {
-				throw new Error('Invalid template file');
-			}
-
-			importedTemplate.id = Date.now().toString() + Math.random().toString(36).slice(2, 9);
+			const processedTemplate = await processImportedTemplate(importedTemplate);
 			
-			// Process property types immediately
-			if (importedTemplate.properties) {
-				console.log('Processing properties:', importedTemplate.properties);
-				for (const prop of importedTemplate.properties) {
-					console.log(`Processing property: ${prop.name}, type: ${prop.type || 'text'}, value: ${prop.value}`);
-					const existingPropertyType = generalSettings.propertyTypes.find(pt => pt.name === prop.name);
-					if (!existingPropertyType) {
-						// Only add the property type if it doesn't exist
-						await addPropertyType(prop.name, prop.type || 'text', prop.value || '');
-					} else {
-						console.log(`Property type ${prop.name} already exists, keeping existing type: ${existingPropertyType.type}`);
-					}
-				}
-				
-				// Reassign properties with existing or new types
-				importedTemplate.properties = importedTemplate.properties.map(prop => {
-					const existingPropertyType = generalSettings.propertyTypes.find(pt => pt.name === prop.name);
-					return {
-						id: prop.id || (Date.now().toString() + Math.random().toString(36).slice(2, 9)),
-						name: prop.name,
-						value: prop.value,
-						type: existingPropertyType ? existingPropertyType.type : (prop.type || 'text')
-					};
-				});
-			}
-
-			console.log('Processed template properties:', importedTemplate.properties);
-
-			// Keep the context if it exists in the imported template
-			if (importedTemplate.context) {
-				importedTemplate.context = importedTemplate.context;
-			}
-
-			let newName = importedTemplate.name as string;
-			let counter = 1;
-			while (templates.some(t => t.name === newName)) {
-				newName = `${importedTemplate.name} (${counter++})`;
-			}
-			importedTemplate.name = newName;
-
-			console.log('Final imported template:', importedTemplate);
-			templates.unshift(importedTemplate as Template);
-
+			templates.unshift(processedTemplate);
 			await saveTemplateSettings();
 			updateTemplateList();
-			showTemplateEditor(importedTemplate as Template);
+			showTemplateEditor(processedTemplate);
 			console.log('Template import completed');
 		} catch (error) {
 			console.error('Error parsing imported template:', error);
@@ -345,4 +285,138 @@ function importTemplateFile(file: File): void {
 		}
 	};
 	reader.readAsText(file);
+}
+
+export function showTemplateImportModal(): void {
+	showGenericImportModal(
+		'import-modal',
+		importTemplateFromJson,
+		'.json',
+		'Choose template file or drag and drop',
+		'Paste template JSON here',
+		true,
+		'Import template'
+	);
+}
+
+async function importTemplateFromJson(jsonContent: string): Promise<void> {
+	try {
+		const importedTemplate = JSON.parse(jsonContent) as Partial<Template>;
+		const processedTemplate = await processImportedTemplate(importedTemplate);
+		
+		templates.unshift(processedTemplate);
+		await saveTemplateSettings();
+		updateTemplateList();
+		showTemplateEditor(processedTemplate);
+	} catch (error) {
+		console.error('Error parsing imported template:', error);
+		throw new Error('Error importing template. Please check the file and try again.');
+	}
+}
+
+export function copyTemplateToClipboard(template: Template): void {
+	const { id, ...templateCopy } = template;
+
+	const jsonContent = JSON.stringify(templateCopy, null, 2);
+	
+	navigator.clipboard.writeText(jsonContent).then(() => {
+		alert('Copied template JSON to clipboard');
+	}).catch(err => {
+		console.error('Failed to copy template JSON: ', err);
+		alert('Failed to copy template JSON to clipboard');
+	});
+}
+
+export async function exportAllSettings(): Promise<void> {
+	console.log('Starting exportAllSettings function');
+	try {
+		console.log('Fetching all data from browser storage');
+		const allData = await browser.storage.sync.get(null);
+		console.log('All data fetched:', allData);
+
+		console.log('Stringifying data');
+		const jsonContent = JSON.stringify(allData, null, 2);
+		console.log('Data stringified, length:', jsonContent.length);
+
+		const fileName = 'obsidian-web-clipper-settings.json';
+		const browserType = await detectBrowser();
+
+		if (browserType === 'safari' || browserType === 'mobile-safari' || browserType === 'ipad-os') {
+			console.log('Detected Safari, using data URI');
+			const dataUri = `data:application/json;charset=utf-8,${encodeURIComponent(jsonContent)}`;
+			
+			if (navigator.share) {
+				try {
+					await navigator.share({
+						files: [new File([jsonContent], fileName, { type: 'application/json' })],
+						title: 'Exported Obsidian Web Clipper Settings',
+						text: 'Here are your exported settings for Obsidian Web Clipper.'
+					});
+				} catch (error) {
+					console.error('Error sharing:', error);
+					window.open(dataUri);
+				}
+			} else {
+				window.open(dataUri);
+			}
+		} else {
+			console.log('Using Blob for non-Safari browsers');
+			const blob = new Blob([jsonContent], { type: 'application/json' });
+			console.log('Blob created, size:', blob.size);
+
+			console.log('Creating object URL');
+			const url = URL.createObjectURL(blob);
+			console.log('Object URL created:', url);
+
+			console.log('Creating and appending anchor element');
+			const a = document.createElement('a');
+			a.href = url;
+			a.download = fileName;
+			document.body.appendChild(a);
+
+			console.log('Triggering click on anchor element');
+			a.click();
+
+			console.log('Removing anchor element');
+			document.body.removeChild(a);
+
+			console.log('Revoking object URL');
+			URL.revokeObjectURL(url);
+		}
+
+		console.log('Export completed successfully');
+	} catch (error) {
+		console.error('Error in exportAllSettings:', error);
+		alert('Failed to export settings. Please check the console for more details.');
+	}
+}
+
+export function importAllSettings(): void {
+	showGenericImportModal(
+		'import-modal',
+		importAllSettingsFromJson,
+		'.json',
+		'Choose settings file or drag and drop',
+		'Paste settings JSON here',
+		false,
+		'Import all settings'
+	);
+}
+
+async function importAllSettingsFromJson(jsonContent: string): Promise<void> {
+	try {
+		const settings = JSON.parse(jsonContent);
+		if (confirm('This will replace all your current settings, including templates and properties. Are you sure you want to continue?')) {
+			await browser.storage.sync.clear();
+			await browser.storage.sync.set(settings);
+			await loadSettings();
+			await loadTemplates();
+			updateTemplateList();
+			updatePropertyTypesList();
+			alert('All settings imported successfully. Please refresh the page to see the changes.');
+		}
+	} catch (error) {
+		console.error('Error importing all settings:', error);
+		throw new Error('Error importing settings. Please check the file and try again.');
+	}
 }

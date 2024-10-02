@@ -24,6 +24,11 @@
 	--clickable-icon-size: 1.75rem;
 	--clipper-select-font-weight: 500;
 
+	--dialog-width: 560px;
+	--dialog-height: auto;
+	--dialog-max-width: 80vw;
+	--dialog-max-height: 85vh;
+
 	--dropdown-background: transparent;
 	--dropdown-background-hover: var(--interactive-hover);
 	--dropdown-background-position: right .25rem top 50%, 0 0;
@@ -50,6 +55,17 @@
 	--input-height: 1.875rem;
 
 	--metadata-label-width: 7rem;
+
+	--modal-background: var(--background-primary);
+	--modal-width: 90vw;
+	--modal-height: 85vh;
+	--modal-max-width: 1100px;
+	--modal-max-height: 1000px;
+	--modal-max-width-narrow: 800px;
+	--modal-border-width: 1px;
+	--modal-border-color: var(--color-base-40, var(--background-modifier-border-focus));
+	--modal-radius: var(--radius-l);
+	--modal-community-sidebar-width: 280px;
 
 	--popup-padding: 0.75rem; 
 
@@ -82,6 +98,7 @@
 
 @media (prefers-color-scheme: light) {
 	:root {
+		--background-modifier-cover: rgba(220, 220, 220, 0.4);
 
 		--color-accent-hsl:
 				var(--accent-h),
@@ -159,11 +176,16 @@
 			0px 1px 2px rgba(0, 0, 0, .028),
 			0px 3.4px 6.7px rgba(0, 0, 0, .042),
 			0px 15px 30px rgba(0, 0, 0, .07);
+		--shadow-l:
+			0px 1.8px 7.3px rgba(0, 0, 0, 0.071),
+			0px 6.3px 24.7px rgba(0, 0, 0, 0.112),
+			0px 30px 90px rgba(0, 0, 0, 0.2);
 	}
 }
 
 @media (prefers-color-scheme: dark) {
 	:root {
+		--background-modifier-cover: rgba(10, 10, 10, .4);
 		--background-modifier-hover: rgba(var(--mono-rgb-100), .15);
 
 		--color-accent-hsl:
@@ -245,5 +267,9 @@
 			0px 1px 2px rgba(0, 0, 0, 0.121),
 			0px 3.4px 6.7px rgba(0, 0, 0, 0.179),
 			0px 15px 30px rgba(0, 0, 0, 0.3);
+		--shadow-l:
+			0px 1.8px 7.3px rgba(0, 0, 0, 0.071),
+			0px 6.3px 24.7px rgba(0, 0, 0, 0.112),
+			0px 30px 90px rgba(0, 0, 0, 0.2);
 	}
 }

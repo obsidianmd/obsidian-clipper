@@ -5,6 +5,7 @@ import {
 	Calendar, 
 	ChevronDown,
 	ChevronRight,
+	ClipboardList,
 	Clock, 
 	CopyPlus,
 	Ellipsis, 
@@ -16,7 +17,7 @@ import {
 	RotateCw,
 	Settings,
 	SquareCheckBig, 
-	Trash2, 
+	Trash2,
 	X
 } from 'lucide';
 
@@ -29,6 +30,7 @@ export const icons = {
 	Calendar,
 	ChevronDown,
 	ChevronRight,
+	ClipboardList,
 	Clock,
 	CopyPlus,
 	Ellipsis,

@@ -24,12 +24,24 @@
 	height: 100%;
 	--background-modifier-form-field: var(--background-secondary);
 	--clickable-icon-size: 2rem;
-	--popup-padding: 1rem;
+
+	--dialog-height: 100vh;
+	--dialog-width: 100vw;
+	--dialog-max-width: 100vw;
+	--dialog-max-height: 100vh;
+
 	--icon-size: 1rem;
 	--input-height: 2.25rem;
 	--input-shadow: none;
 	--input-shadow-hover: none;
+
 	--metadata-label-width: 5rem;
+
+	--modal-border-width: 0;
+	--modal-radius: 0;
+
+	--popup-padding: 1rem;
+
 	--toggle-width: 3rem;
 	--toggle-radius: 1.5rem;
 	--toggle-thumb-radius: 1.5rem;

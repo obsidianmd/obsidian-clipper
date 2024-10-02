@@ -114,6 +114,25 @@
 											<button type="button" id="reset-default-template-btn" class="mod-warning">Reset</button>
 										</div>
 									</div>
+									<!-- Add this at the end of the general settings section -->
+									<div class="setting-item mod-horizontal">
+										<div class="setting-item-info">
+											<label for="export-all-settings-btn">Export all settings</label>
+											<div class="setting-item-description">Export all settings including templates and properties.</div>
+										</div>
+										<div class="setting-item-control">
+											<button type="button" id="export-all-settings-btn">Export</button>
+										</div>
+									</div>
+									<div class="setting-item mod-horizontal">
+										<div class="setting-item-info">
+											<label for="import-all-settings-btn">Import all settings</label>
+											<div class="setting-item-description">Import all settings including templates and properties. This will replace your current configuration.</div>
+										</div>
+										<div class="setting-item-control">
+											<button type="button" id="import-all-settings-btn">Import</button>
+										</div>
+									</div>
 								</div>
 						</form>
 					</div>
@@ -247,6 +266,14 @@
 												Duplicate
 											</div>
 										</div>
+										<div class="menu-item" id="copy-template-json-btn">
+											<div class="menu-item-icon">
+												<i data-lucide="clipboard-list"></i>
+											</div>
+											<div class="menu-item-title">
+												Copy as JSON
+											</div>
+										</div>
 										<div class="menu-item export-template-btn dkh">
 											<div class="menu-item-icon">
 												<i data-lucide="files"></i>
@@ -274,9 +301,6 @@
 									</div>
 								</div>
 							</div>
-						</div>
-						<div id="template-drop-zone" class="template-drop-zone">
-							<p>Import template</p>
 						</div>
 						<form id="template-settings-form">
 							<div id="template-editor">
@@ -343,6 +367,28 @@
 							</div>
 						</form>
 					</div>
+				</div>
+			</div>
+		</div>
+
+		<div id="import-modal" class="modal-container">
+			<div class="modal-bg"></div>
+			<div class="modal">
+				<div class="modal-header">
+					<div class="modal-title">Import</div>
+				</div>
+				<div class="modal-content">
+					<div class="import-options">
+						<div class="import-drop-zone import-option">
+							<p>Drag and drop file here</p>
+						</div>
+						<p>Or paste content below</p>
+						<textarea class="import-json-textarea" placeholder="Paste JSON here"></textarea>
+					</div>
+				</div>
+				<div class="modal-button-container">
+					<button class="import-confirm-btn mod-cta">Import</button>
+					<button class="import-cancel-btn">Cancel</button>
 				</div>
 			</div>
 		</div>
