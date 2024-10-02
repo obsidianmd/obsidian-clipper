@@ -5,7 +5,7 @@ export function showImportModal(
 	modalId: string,
 	importFunction: (content: string) => Promise<void>,
 	fileExtension: string = '.json',
-	dropZoneText: string = 'Drag and drop file here',
+	dropZoneText: string = 'Choose a file or drag and drop',
 	textareaPlaceholder: string = 'Paste JSON here',
 	isTemplateImport: boolean = false
 ): void {

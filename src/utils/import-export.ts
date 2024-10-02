@@ -5,7 +5,7 @@ import { sanitizeFileName } from './string-utils';
 import { detectBrowser } from './browser-detection';
 import { generalSettings } from '../utils/storage-utils';
 import { addPropertyType } from '../managers/property-types-manager';
-import { showModal, hideModal } from '../utils/modal-utils';
+import { hideModal } from '../utils/modal-utils';
 import { showImportModal as showGenericImportModal } from './import-modal';
 
 const SCHEMA_VERSION = '0.1.0';
@@ -288,10 +288,10 @@ export function importTemplateFile(file: File): void {
 
 export function showTemplateImportModal(): void {
 	showGenericImportModal(
-		'generic-import-modal',
+		'import-modal',
 		importTemplateFromJson,
 		'.json',
-		'Drag and drop template file here',
+		'Choose template file or drag and drop',
 		'Paste template JSON here',
 		true
 	);
@@ -318,7 +318,7 @@ export function copyTemplateToClipboard(template: Template): void {
 	const jsonContent = JSON.stringify(templateCopy, null, 2);
 	
 	navigator.clipboard.writeText(jsonContent).then(() => {
-		alert('Template JSON copied to clipboard');
+		alert('Copied template JSON to clipboard');
 	}).catch(err => {
 		console.error('Failed to copy template JSON: ', err);
 		alert('Failed to copy template JSON to clipboard');

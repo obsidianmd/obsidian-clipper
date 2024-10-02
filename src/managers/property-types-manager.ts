@@ -191,10 +191,10 @@ function setupImportExportButtons(): void {
 
 function showTypesImportModal(): void {
 	showImportModal(
-		'generic-import-modal',
+		'import-modal',
 		importTypesFromJson,
 		'.json',
-		'Drag and drop types.json file here',
+		'Choose a file or drag and drop',
 		'Paste types.json content here'
 	);
 }
