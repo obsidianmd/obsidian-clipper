@@ -14,15 +14,13 @@ import { updateTemplateList, showTemplateEditor, resetUnsavedChanges, initialize
 import { initializeGeneralSettings } from '../managers/general-settings';
 import { showSettingsSection, initializeSidebar } from '../managers/settings-section-ui';
 import { initializeInterpreterSettings } from '../managers/interpreter-settings';
-import { initializeDragAndDrop, handleTemplateDrag } from '../utils/drag-and-drop';
 import { initializeAutoSave } from '../utils/auto-save';
-import { exportTemplate, importTemplate, initializeDropZone } from '../utils/import-export';
+import { exportTemplate, showImportModal } from '../utils/import-export';
 import { createIcons } from 'lucide';
 import { icons } from '../icons/icons';
 import { updateUrl, getUrlParameters } from '../utils/routing';
 import { addBrowserClassToHtml } from '../utils/browser-detection';
 import { initializeMenu } from '../managers/menu';
-import { showImportModal } from '../utils/import-export';
 
 document.addEventListener('DOMContentLoaded', async () => {
 	const newTemplateBtn = document.getElementById('new-template-btn') as HTMLButtonElement;
@@ -144,10 +142,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 	const templateForm = document.getElementById('template-settings-form');
 	if (templateForm) {
-		initializeDragAndDrop();
-		initializeDropZone();
 		initializeAddPropertyButton();
-		handleTemplateDrag();
 	}
 	await addBrowserClassToHtml();
 	await initializeSettings();

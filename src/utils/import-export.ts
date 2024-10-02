@@ -197,84 +197,9 @@ function validateImportedTemplate(template: Partial<Template>): boolean {
 	return hasRequiredFields && hasValidProperties && hasValidNoteNameAndPath && hasValidContext;
 }
 
-export function initializeDropZone(): void {
-	const dropZone = document.getElementById('template-drop-zone');
-	const body = document.body;
-
-	if (!dropZone) {
-		console.error('Drop zone not found');
-		return;
-	}
-
-	let dragCounter = 0;
-
-	body.addEventListener('dragenter', handleDragEnter, false);
-	body.addEventListener('dragleave', handleDragLeave, false);
-	body.addEventListener('dragover', handleDragOver, false);
-	body.addEventListener('drop', handleDrop, false);
-
-	function handleDragEnter(e: DragEvent): void {
-		e.preventDefault();
-		e.stopPropagation();
-		dragCounter++;
-		if (isFileDrag(e)) {
-			dropZone?.classList.add('drag-over');
-		}
-	}
-
-	function handleDragLeave(e: DragEvent): void {
-		e.preventDefault();
-		e.stopPropagation();
-		dragCounter--;
-		if (dragCounter === 0) {
-			dropZone?.classList.remove('drag-over');
-		}
-	}
-
-	function handleDragOver(e: DragEvent): void {
-		e.preventDefault();
-		e.stopPropagation();
-	}
-
-	function handleDrop(e: DragEvent): void {
-		e.preventDefault();
-		e.stopPropagation();
-		dropZone?.classList.remove('drag-over');
-		dragCounter = 0;
-		
-		if (isFileDrag(e)) {
-			const files = e.dataTransfer?.files;
-			if (files && files.length) {
-				handleFiles(files);
-			}
-		}
-	}
-
-	function isFileDrag(e: DragEvent): boolean {
-		if (e.dataTransfer?.types) {
-			for (let i = 0; i < e.dataTransfer.types.length; i++) {
-				if (e.dataTransfer.types[i] === "Files") {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-}
-
 function preventDefaults(e: Event): void {
 	e.preventDefault();
 	e.stopPropagation();
-}
-
-function highlight(e: Event): void {
-	const dropZone = document.getElementById('template-drop-zone');
-	dropZone?.classList.add('drag-over');
-}
-
-function unhighlight(e: Event): void {
-	const dropZone = document.getElementById('template-drop-zone');
-	dropZone?.classList.remove('drag-over');
 }
 
 function handleDrop(e: DragEvent): void {
@@ -370,6 +295,9 @@ export function showImportModal(): void {
 		console.error('Import modal elements not found');
 		return;
 	}
+
+	// Clear the textarea when showing the modal
+	jsonTextarea.value = '';
 
 	showModal(modal);
 
