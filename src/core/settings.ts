@@ -22,6 +22,7 @@ import { icons } from '../icons/icons';
 import { updateUrl, getUrlParameters } from '../utils/routing';
 import { addBrowserClassToHtml } from '../utils/browser-detection';
 import { initializeMenu } from '../managers/menu';
+import { showImportModal } from '../utils/import-export';
 
 document.addEventListener('DOMContentLoaded', async () => {
 	const newTemplateBtn = document.getElementById('new-template-btn') as HTMLButtonElement;
@@ -61,7 +62,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 			btn.addEventListener('click', exportTemplate)
 		);
 		document.querySelectorAll('.import-template-btn').forEach(btn => 
-			btn.addEventListener('click', importTemplate)
+			btn.addEventListener('click', showImportModal)
 		);
 	}
 

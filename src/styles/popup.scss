@@ -316,3 +316,63 @@
 		}
 	}
 }
+
+.modal {
+	display: none;
+	position: fixed;
+	z-index: 1000;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.5);
+
+	.modal-content {
+		background-color: var(--background-primary);
+		margin: 10% auto;
+		padding: 20px;
+		border-radius: 5px;
+		width: 80%;
+		max-width: 500px;
+
+		h2 {
+			margin-top: 0;
+		}
+
+		.import-options {
+			display: flex;
+			flex-direction: column;
+			gap: 20px;
+			margin-bottom: 20px;
+
+			.import-option {
+				border: 2px dashed var(--background-modifier-border);
+				border-radius: 5px;
+				padding: 20px;
+				text-align: center;
+				cursor: pointer;
+
+				&:hover {
+					background-color: var(--background-secondary);
+				}
+
+				i {
+					font-size: 2em;
+					color: var(--text-muted);
+				}
+			}
+
+			#import-json-textarea {
+				width: 100%;
+				height: 100px;
+				resize: vertical;
+			}
+		}
+
+		.modal-actions {
+			display: flex;
+			justify-content: flex-end;
+			gap: 10px;
+		}
+	}
+}

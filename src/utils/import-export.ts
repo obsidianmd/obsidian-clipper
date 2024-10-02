@@ -5,6 +5,7 @@ import { sanitizeFileName } from './string-utils';
 import { detectBrowser } from './browser-detection';
 import { generalSettings } from '../utils/storage-utils';
 import { addPropertyType } from '../managers/property-types-manager';
+import { showModal, hideModal } from './modal-utils';
 
 const SCHEMA_VERSION = '0.1.0';
 
@@ -52,8 +53,9 @@ export async function exportTemplate(): Promise<void> {
 
 	const browser = await detectBrowser();
 	const isIOSBrowser = browser === 'mobile-safari' || browser === 'ipad-os';
+	const isSafari = browser === 'safari';
 
-	if (isIOSBrowser) {
+	if (isIOSBrowser || isSafari) {
 		// For iOS, create a Blob and use the Web Share API if available
 		const blob = new Blob([jsonContent], { type: 'application/json' });
 		const file = new File([blob], templateFile, { type: 'application/json' });
@@ -345,4 +347,90 @@ function importTemplateFile(file: File): void {
 		}
 	};
 	reader.readAsText(file);
+}
+
+export function showImportModal(): void {
+	const modal = document.getElementById('import-modal');
+	const dropZone = document.getElementById('import-drop-zone');
+	const jsonTextarea = document.getElementById('import-json-textarea') as HTMLTextAreaElement | null;
+	const cancelBtn = document.getElementById('import-cancel-btn');
+	const confirmBtn = document.getElementById('import-confirm-btn');
+
+	if (!modal || !dropZone || !jsonTextarea || !cancelBtn || !confirmBtn) {
+		console.error('Import modal elements not found');
+		return;
+	}
+
+	showModal(modal);
+
+	dropZone.addEventListener('dragover', handleDragOver);
+	dropZone.addEventListener('drop', handleDrop);
+	dropZone.addEventListener('click', openFilePicker);
+	cancelBtn.addEventListener('click', () => hideModal(modal));
+	confirmBtn.addEventListener('click', () => {
+		const jsonContent = jsonTextarea.value.trim();
+		if (jsonContent) {
+			importTemplateFromJson(jsonContent);
+		}
+		hideModal(modal);
+	});
+
+	function handleDragOver(e: DragEvent): void {
+		e.preventDefault();
+		e.stopPropagation();
+	}
+
+	function handleDrop(e: DragEvent): void {
+		e.preventDefault();
+		e.stopPropagation();
+		const files = e.dataTransfer?.files;
+		if (files && files.length > 0) {
+			handleFile(files[0]);
+		}
+	}
+
+	function openFilePicker(): void {
+		const input = document.createElement('input');
+		input.type = 'file';
+		input.accept = '.json';
+		input.onchange = (event: Event) => {
+			const file = (event.target as HTMLInputElement).files?.[0];
+			if (file) {
+				handleFile(file);
+			}
+		};
+		input.click();
+	}
+
+	function handleFile(file: File): void {
+		const reader = new FileReader();
+		reader.onload = (event: ProgressEvent<FileReader>) => {
+			const content = event.target?.result as string;
+			if (jsonTextarea) {
+				jsonTextarea.value = content;
+			}
+			importTemplateFromJson(content);
+			hideModal(modal);
+		};
+		reader.readAsText(file);
+	}
+}
+
+function importTemplateFromJson(jsonContent: string): void {
+	try {
+		const importedTemplate = JSON.parse(jsonContent) as Partial<Template>;
+		if (!validateImportedTemplate(importedTemplate)) {
+			throw new Error('Invalid template file');
+		}
+		// ... rest of the existing import logic ...
+		console.log('Imported template:', importedTemplate);
+		// Add the template to the list and show it in the editor
+		templates.unshift(importedTemplate as Template);
+		saveTemplateSettings();
+		updateTemplateList();
+		showTemplateEditor(importedTemplate as Template);
+	} catch (error) {
+		console.error('Error parsing imported template:', error);
+		alert('Error importing template. Please check the file and try again.');
+	}
 }

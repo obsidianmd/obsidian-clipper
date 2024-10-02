@@ -347,6 +347,26 @@
 			</div>
 		</div>
 
+		<div id="import-modal" class="modal">
+			<div class="modal-content">
+				<h2>Import template</h2>
+				<div class="import-options">
+					<div id="import-drop-zone" class="import-option">
+						<p>Drag and drop template file here</p>
+						<i data-lucide="upload"></i>
+					</div>
+					<div class="import-option">
+						<p>Or paste template JSON below</p>
+						<textarea id="import-json-textarea" placeholder="Paste template JSON here"></textarea>
+					</div>
+				</div>
+				<div class="modal-actions">
+					<button id="import-cancel-btn" class="mod-warning">Cancel</button>
+					<button id="import-confirm-btn" class="mod-cta">Import</button>
+				</div>
+			</div>
+		</div>
+
 		<script type="module" src="settings.js"></script>
 </body>
 </html>

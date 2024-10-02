@@ -285,8 +285,9 @@ async function exportTypesJson(): Promise<void> {
 
 	const browser = await detectBrowser();
 	const isIOSBrowser = browser === 'mobile-safari' || browser === 'ipad-os';
+	const isSafari = browser === 'safari';
 
-	if (isIOSBrowser && navigator.share) {
+	if (isIOSBrowser || isSafari) {
 		const blob = new Blob([content], { type: 'application/json' });
 		const file = new File([blob], fileName, { type: 'application/json' });
 
