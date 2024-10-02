@@ -330,21 +330,61 @@ export function copyTemplateToClipboard(template: Template): void {
 export async function exportAllSettings(): Promise<void> {
 	console.log('Starting exportAllSettings function');
 	try {
+		console.log('Fetching all data from browser storage');
 		const allData = await browser.storage.sync.get(null);
+		console.log('All data fetched:', allData);
+
+		console.log('Stringifying data');
 		const jsonContent = JSON.stringify(allData, null, 2);
-		const blob = new Blob([jsonContent], { type: 'application/json' });
+		console.log('Data stringified, length:', jsonContent.length);
 
-		const url = URL.createObjectURL(blob);
-		const a = document.createElement('a');
-		a.href = url;
-		a.download = 'obsidian-web-clipper-settings.json';
-		document.body.appendChild(a);
+		const fileName = 'obsidian-web-clipper-settings.json';
+		const browserType = await detectBrowser();
 
-		a.click();
+		if (browserType === 'safari' || browserType === 'mobile-safari' || browserType === 'ipad-os') {
+			console.log('Detected Safari, using data URI');
+			const dataUri = `data:application/json;charset=utf-8,${encodeURIComponent(jsonContent)}`;
+			
+			if (navigator.share) {
+				try {
+					await navigator.share({
+						files: [new File([jsonContent], fileName, { type: 'application/json' })],
+						title: 'Exported Obsidian Web Clipper Settings',
+						text: 'Here are your exported settings for Obsidian Web Clipper.'
+					});
+				} catch (error) {
+					console.error('Error sharing:', error);
+					window.open(dataUri);
+				}
+			} else {
+				window.open(dataUri);
+			}
+		} else {
+			console.log('Using Blob for non-Safari browsers');
+			const blob = new Blob([jsonContent], { type: 'application/json' });
+			console.log('Blob created, size:', blob.size);
 
-		document.body.removeChild(a);
-		URL.revokeObjectURL(url);
+			console.log('Creating object URL');
+			const url = URL.createObjectURL(blob);
+			console.log('Object URL created:', url);
 
+			console.log('Creating and appending anchor element');
+			const a = document.createElement('a');
+			a.href = url;
+			a.download = fileName;
+			document.body.appendChild(a);
+
+			console.log('Triggering click on anchor element');
+			a.click();
+
+			console.log('Removing anchor element');
+			document.body.removeChild(a);
+
+			console.log('Revoking object URL');
+			URL.revokeObjectURL(url);
+		}
+
+		console.log('Export completed successfully');
 	} catch (error) {
 		console.error('Error in exportAllSettings:', error);
 		alert('Failed to export settings. Please check the console for more details.');

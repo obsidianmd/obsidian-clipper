@@ -24,34 +24,28 @@ export async function loadTemplates(): Promise<Template[]> {
 		// Filter out any null or undefined values
 		templateIds = templateIds.filter(id => id != null);
 
-		if (templateIds.length === 0) {
-			console.log('No template IDs found, creating default template');
-			const defaultTemplate = createDefaultTemplate();
-				templates = [defaultTemplate];
-				await saveTemplateSettings();
-				return templates;
-		}
-
-		const loadedTemplates = await Promise.all(templateIds.map(async (id: string) => {
-			try {
-				const result = await browser.storage.sync.get(`template_${id}`);
-				const compressedChunks = result[`template_${id}`] as string[];
-				if (compressedChunks) {
-					const decompressedData = decompressFromUTF16(compressedChunks.join(''));
-					const template = JSON.parse(decompressedData);
-					if (template && Array.isArray(template.properties)) {
-						return template;
+		if (templateIds.length > 0) {
+			const loadedTemplates = await Promise.all(templateIds.map(async (id: string) => {
+				try {
+					const result = await browser.storage.sync.get(`template_${id}`);
+					const compressedChunks = result[`template_${id}`] as string[];
+					if (compressedChunks) {
+						const decompressedData = decompressFromUTF16(compressedChunks.join(''));
+						const template = JSON.parse(decompressedData);
+						if (template && Array.isArray(template.properties)) {
+							return template;
+						}
 					}
+					console.warn(`Template ${id} is invalid or missing`);
+					return null;
+				} catch (error) {
+					console.error(`Error parsing template ${id}:`, error);
+					return null;
 				}
-				console.warn(`Template ${id} is invalid or missing`);
-				return null;
-			} catch (error) {
-				console.error(`Error parsing template ${id}:`, error);
-				return null;
-			}
-		}));
+			}));
 
-		templates = loadedTemplates.filter((t: Template | null): t is Template => t !== null);
+			templates = loadedTemplates.filter((t: Template | null): t is Template => t !== null);
+		}
 
 		if (templates.length === 0) {
 			console.log('No valid templates found, creating default template');
@@ -66,22 +60,11 @@ export async function loadTemplates(): Promise<Template[]> {
 		return templates;
 	} catch (error) {
 		console.error('Error loading templates:', error);
-		// Instead of returning an empty array, create a default template
 		const defaultTemplate = createDefaultTemplate();
 		templates = [defaultTemplate];
 		await saveTemplateSettings();
 		return templates;
 	}
-}
-
-async function loadTemplate(id: string): Promise<Template | null> {
-	const data = await browser.storage.sync.get(STORAGE_KEY_PREFIX + id);
-	const compressedChunks = data[STORAGE_KEY_PREFIX + id] as string[];
-	if (compressedChunks) {
-		const decompressedData = decompressFromUTF16(compressedChunks.join(''));
-		return JSON.parse(decompressedData);
-	}
-	return null;
 }
 
 export async function saveTemplateSettings(): Promise<string[]> {
