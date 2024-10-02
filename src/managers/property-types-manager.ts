@@ -195,7 +195,9 @@ function showTypesImportModal(): void {
 		importTypesFromJson,
 		'.json',
 		'Choose a file or drag and drop',
-		'Paste types.json content here'
+		'Paste types.json content here',
+		false,
+		'Import properties'
 	);
 }
 

@@ -293,7 +293,8 @@ export function showTemplateImportModal(): void {
 		'.json',
 		'Choose template file or drag and drop',
 		'Paste template JSON here',
-		true
+		true,
+		'Import template'
 	);
 }
 

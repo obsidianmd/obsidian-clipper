@@ -7,20 +7,23 @@ export function showImportModal(
 	fileExtension: string = '.json',
 	dropZoneText: string = 'Choose a file or drag and drop',
 	textareaPlaceholder: string = 'Paste JSON here',
-	isTemplateImport: boolean = false
+	isTemplateImport: boolean = false,
+	modalTitle: string = 'Import'
 ): void {
 	const modal = document.getElementById(modalId);
 	const dropZone = modal?.querySelector('.import-drop-zone') as HTMLElement;
 	const jsonTextarea = modal?.querySelector('.import-json-textarea') as HTMLTextAreaElement;
 	const cancelBtn = modal?.querySelector('.import-cancel-btn') as HTMLElement;
 	const confirmBtn = modal?.querySelector('.import-confirm-btn') as HTMLElement;
+	const titleElement = modal?.querySelector('.modal-title') as HTMLElement; // Add this line
 
-	if (!modal || !dropZone || !jsonTextarea || !cancelBtn || !confirmBtn) {
+	if (!modal || !dropZone || !jsonTextarea || !cancelBtn || !confirmBtn || !titleElement) {
 		console.error('Import modal elements not found');
 		return;
 	}
 
 	// Set custom text
+	titleElement.textContent = modalTitle;
 	const dropZoneTextElement = dropZone.querySelector('p');
 	if (dropZoneTextElement) dropZoneTextElement.textContent = dropZoneText;
 	jsonTextarea.placeholder = textareaPlaceholder;
