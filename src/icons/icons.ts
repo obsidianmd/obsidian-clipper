@@ -16,7 +16,7 @@ import {
 	RotateCw,
 	Settings,
 	SquareCheckBig, 
-	Trash2, 
+	Trash2,
 	X
 } from 'lucide';
 

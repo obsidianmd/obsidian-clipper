@@ -5,7 +5,7 @@ import { sanitizeFileName } from './string-utils';
 import { detectBrowser } from './browser-detection';
 import { generalSettings } from '../utils/storage-utils';
 import { addPropertyType } from '../managers/property-types-manager';
-import { showModal, hideModal } from './modal-utils';
+import { showModal, hideModal } from '../utils/modal-utils';
 
 const SCHEMA_VERSION = '0.1.0';
 
@@ -93,15 +93,14 @@ export async function exportTemplate(): Promise<void> {
 	}
 }
 
-export function importTemplate(): void {
-	const input = document.createElement('input');
-	input.type = 'file';
-	input.accept = '.json';
+export function importTemplate(input?: HTMLInputElement): void {
+	if (!input) {
+		input = document.createElement('input');
+		input.type = 'file';
+		input.accept = '.json';
+	}
 
-	input.onchange = (event: Event) => {
-		const file = (event.target as HTMLInputElement).files?.[0];
-		if (!file) return;
-
+	const handleFile = (file: File) => {
 		const reader = new FileReader();
 		reader.onload = async (e: ProgressEvent<FileReader>) => {
 			try {
@@ -153,6 +152,7 @@ export function importTemplate(): void {
 				saveTemplateSettings();
 				updateTemplateList();
 				showTemplateEditor(importedTemplate as Template);
+				hideModal(document.getElementById('import-modal'));
 			} catch (error) {
 				console.error('Error parsing imported template:', error);
 				alert('Error importing template. Please check the file and try again.');
@@ -161,7 +161,17 @@ export function importTemplate(): void {
 		reader.readAsText(file);
 	};
 
-	input.click();
+	if (input.files && input.files.length > 0) {
+		handleFile(input.files[0]);
+	} else {
+		input.onchange = (event: Event) => {
+			const file = (event.target as HTMLInputElement).files?.[0];
+			if (file) {
+				handleFile(file);
+			}
+		};
+		input.click();
+	}
 }
 
 function validateImportedTemplate(template: Partial<Template>): boolean {
@@ -410,27 +420,24 @@ export function showImportModal(): void {
 				jsonTextarea.value = content;
 			}
 			importTemplateFromJson(content);
-			hideModal(modal);
 		};
 		reader.readAsText(file);
 	}
 }
 
 function importTemplateFromJson(jsonContent: string): void {
-	try {
-		const importedTemplate = JSON.parse(jsonContent) as Partial<Template>;
-		if (!validateImportedTemplate(importedTemplate)) {
-			throw new Error('Invalid template file');
-		}
-		// ... rest of the existing import logic ...
-		console.log('Imported template:', importedTemplate);
-		// Add the template to the list and show it in the editor
-		templates.unshift(importedTemplate as Template);
-		saveTemplateSettings();
-		updateTemplateList();
-		showTemplateEditor(importedTemplate as Template);
-	} catch (error) {
-		console.error('Error parsing imported template:', error);
-		alert('Error importing template. Please check the file and try again.');
-	}
+	const blob = new Blob([jsonContent], { type: 'application/json' });
+	const file = new File([blob], 'imported-template.json', { type: 'application/json' });
+
+	const dataTransfer = new DataTransfer();
+	dataTransfer.items.add(file);
+
+	const input = document.createElement('input');
+	input.type = 'file';
+	input.files = dataTransfer.files;
+
+	const event = new Event('change', { bubbles: true });
+	input.dispatchEvent(event);
+
+	importTemplate(input);
 }

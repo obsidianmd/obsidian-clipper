@@ -1,6 +1,6 @@
 export function showModal(modal: HTMLElement | null): void {
 	if (modal) {
-		modal.style.display = 'block';
+		modal.style.display = 'flex';
 	}
 }
 
