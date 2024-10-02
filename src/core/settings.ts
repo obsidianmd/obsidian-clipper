@@ -12,11 +12,12 @@ import {
 	cleanupTemplateStorage,
 	rebuildTemplateList
 } from '../managers/template-manager';
-import { updateTemplateList, showTemplateEditor, initializeAddPropertyButton } from '../managers/template-ui';
+import { updateTemplateList, showTemplateEditor, resetUnsavedChanges, initializeAddPropertyButton } from '../managers/template-ui';
 import { initializeGeneralSettings } from '../managers/general-settings';
 import { showSettingsSection, initializeSidebar } from '../managers/settings-section-ui';
 import { initializeInterpreterSettings } from '../managers/interpreter-settings';
 import { initializeAutoSave } from '../utils/auto-save';
+import { handleTemplateDrag, initializeDragAndDrop } from '../utils/drag-and-drop';
 import { exportTemplate, showTemplateImportModal, copyTemplateToClipboard } from '../utils/import-export';
 import { createIcons } from 'lucide';
 import { icons } from '../icons/icons';
@@ -133,6 +134,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 	const templateForm = document.getElementById('template-settings-form');
 	if (templateForm) {
 		initializeAddPropertyButton();
+		initializeDragAndDrop();
+		handleTemplateDrag();
 	}
 	await addBrowserClassToHtml();
 	await initializeSettings();
