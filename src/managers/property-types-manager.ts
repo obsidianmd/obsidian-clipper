@@ -5,6 +5,7 @@ import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
 import { templates } from './template-manager';
 import { refreshPropertyNameSuggestions } from './template-ui';
 import { detectBrowser } from '../utils/browser-detection';
+import { unescapeValue } from '../utils/string-utils';
 
 export function initializePropertyTypesManager(): void {
 	ensureTagsProperty();
@@ -100,7 +101,7 @@ function createPropertyTypeListItem(propertyType: PropertyType, usageCount: numb
 
 	const defaultValueInput = createElementWithHTML('input', '', {
 		type: 'text',
-		value: propertyType.defaultValue || '',
+		value: unescapeValue(propertyType.defaultValue || ''),
 		class: 'property-default-value',
 		placeholder: 'Default value'
 	}) as HTMLInputElement;
