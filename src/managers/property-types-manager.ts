@@ -6,6 +6,7 @@ import { templates } from './template-manager';
 import { refreshPropertyNameSuggestions } from './template-ui';
 import { detectBrowser } from '../utils/browser-detection';
 import { unescapeValue } from '../utils/string-utils';
+import { showImportModal } from '../utils/import-modal';
 
 export function initializePropertyTypesManager(): void {
 	ensureTagsProperty();
@@ -180,7 +181,7 @@ function setupImportExportButtons(): void {
 	const exportButton = document.getElementById('export-types-btn');
 
 	if (importButton) {
-		importButton.addEventListener('click', importTypesJson);
+		importButton.addEventListener('click', showTypesImportModal);
 	}
 
 	if (exportButton) {
@@ -188,47 +189,37 @@ function setupImportExportButtons(): void {
 	}
 }
 
-async function importTypesJson(): Promise<void> {
-	const input = document.createElement('input');
-	input.type = 'file';
-	input.accept = '.json';
-	input.onchange = async (event: Event) => {
-		const file = (event.target as HTMLInputElement).files?.[0];
-		if (file) {
-			const reader = new FileReader();
-			reader.onload = async (e: ProgressEvent<FileReader>) => {
-				try {
-					console.log('Starting types import');
-					const content = JSON.parse(e.target?.result as string);
-					console.log('Parsed imported types:', content);
+function showTypesImportModal(): void {
+	showImportModal(
+		'generic-import-modal',
+		importTypesFromJson,
+		'.json',
+		'Drag and drop types.json file here',
+		'Paste types.json content here'
+	);
+}
 
-					if (content && typeof content === 'object' && 'types' in content && typeof content.types === 'object') {
-						const newTypes = Object.entries(content.types).map(([name, type]) => {
-							console.log(`Processing type: ${name}, value:`, type);
-							if (typeof type !== 'string') {
-								console.warn(`Invalid type for property "${name}". Using 'text' as default.`);
-								return { name, type: 'text', defaultValue: '' };
-							}
-							return { name, type, defaultValue: '' };
-						});
-
-						console.log('Processed new types:', newTypes);
-						await mergePropertyTypes(newTypes);
-						updatePropertyTypesList();
-						console.log('Types import completed');
-					} else {
-						console.error('Invalid types.json format:', content);
-						throw new Error('Invalid types.json format: "types" property not found or is not an object');
-					}
-				} catch (error) {
-					console.error('Error parsing types.json:', error);
-					alert(`Error importing types.json: ${error instanceof Error ? error.message : 'Unknown error'}`);
+async function importTypesFromJson(jsonContent: string): Promise<void> {
+	try {
+		const content = JSON.parse(jsonContent);
+		if (content && typeof content === 'object' && 'types' in content && typeof content.types === 'object') {
+			const newTypes = Object.entries(content.types).map(([name, type]) => {
+				if (typeof type !== 'string') {
+					console.warn(`Invalid type for property "${name}". Using 'text' as default.`);
+					return { name, type: 'text', defaultValue: '' };
 				}
-			};
-			reader.readAsText(file);
+				return { name, type, defaultValue: '' };
+			});
+
+			await mergePropertyTypes(newTypes);
+			updatePropertyTypesList();
+		} else {
+			throw new Error('Invalid types.json format: "types" property not found or is not an object');
 		}
-	};
-	input.click();
+	} catch (error) {
+		console.error('Error parsing types.json:', error);
+		throw new Error(`Error importing types.json: ${error instanceof Error ? error.message : 'Unknown error'}`);
+	}
 }
 
 async function mergePropertyTypes(newTypes: PropertyType[]): Promise<void> {
@@ -400,7 +391,6 @@ async function deleteUnusedProperties(): Promise<void> {
 	if (confirm(confirmMessage)) {
 		generalSettings.propertyTypes = generalSettings.propertyTypes.filter(pt => usedProperties.has(pt.name) || pt.name === 'tags');
 		await saveSettings();
-		updatePropertyTypesList(); // This will update the button visibility
-		alert(`Removed ${unusedProperties.length} unused properties.`);
+		updatePropertyTypesList();
 	}
 }

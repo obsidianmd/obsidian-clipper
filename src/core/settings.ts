@@ -17,7 +17,7 @@ import { initializeGeneralSettings } from '../managers/general-settings';
 import { showSettingsSection, initializeSidebar } from '../managers/settings-section-ui';
 import { initializeInterpreterSettings } from '../managers/interpreter-settings';
 import { initializeAutoSave } from '../utils/auto-save';
-import { exportTemplate, showImportModal } from '../utils/import-export';
+import { exportTemplate, showTemplateImportModal } from '../utils/import-export';
 import { createIcons } from 'lucide';
 import { icons } from '../icons/icons';
 import { updateUrl, getUrlParameters } from '../utils/routing';
@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 			btn.addEventListener('click', exportTemplate)
 		);
 		document.querySelectorAll('.import-template-btn').forEach(btn => 
-			btn.addEventListener('click', showImportModal)
+			btn.addEventListener('click', showTemplateImportModal)
 		);
 	}
 

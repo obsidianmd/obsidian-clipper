@@ -6,6 +6,7 @@ import { detectBrowser } from './browser-detection';
 import { generalSettings } from '../utils/storage-utils';
 import { addPropertyType } from '../managers/property-types-manager';
 import { showModal, hideModal } from '../utils/modal-utils';
+import { showImportModal as showGenericImportModal } from './import-modal';
 
 const SCHEMA_VERSION = '0.1.0';
 
@@ -215,66 +216,67 @@ function handleFiles(files: FileList): void {
 	Array.from(files).forEach(importTemplateFile);
 }
 
-function importTemplateFile(file: File): void {
+async function processImportedTemplate(importedTemplate: Partial<Template>): Promise<Template> {
+	console.log('Processing imported template:', importedTemplate);
+
+	if (!validateImportedTemplate(importedTemplate)) {
+		throw new Error('Invalid template file');
+	}
+
+	importedTemplate.id = Date.now().toString() + Math.random().toString(36).slice(2, 9);
+	
+	// Process property types
+	if (importedTemplate.properties) {
+		console.log('Processing properties:', importedTemplate.properties);
+		for (const prop of importedTemplate.properties) {
+			console.log(`Processing property: ${prop.name}, type: ${prop.type || 'text'}, value: ${prop.value}`);
+			const existingPropertyType = generalSettings.propertyTypes.find(pt => pt.name === prop.name);
+			if (!existingPropertyType) {
+				// Only add the property type if it doesn't exist
+				await addPropertyType(prop.name, prop.type || 'text', prop.value || '');
+			} else {
+				console.log(`Property type ${prop.name} already exists, keeping existing type: ${existingPropertyType.type}`);
+			}
+		}
+		
+		// Reassign properties with existing or new types
+		importedTemplate.properties = importedTemplate.properties.map(prop => {
+			const existingPropertyType = generalSettings.propertyTypes.find(pt => pt.name === prop.name);
+			return {
+				id: prop.id || (Date.now().toString() + Math.random().toString(36).slice(2, 9)),
+				name: prop.name,
+				value: prop.value,
+				type: existingPropertyType ? existingPropertyType.type : (prop.type || 'text')
+			};
+		});
+	}
+
+	console.log('Processed template properties:', importedTemplate.properties);
+
+	// Ensure unique name
+	let newName = importedTemplate.name as string;
+	let counter = 1;
+	while (templates.some(t => t.name === newName)) {
+		newName = `${importedTemplate.name} (${counter++})`;
+	}
+	importedTemplate.name = newName;
+
+	console.log('Final imported template:', importedTemplate);
+	return importedTemplate as Template;
+}
+
+export function importTemplateFile(file: File): void {
 	const reader = new FileReader();
 	reader.onload = async (e: ProgressEvent<FileReader>) => {
 		try {
 			console.log('Starting template import');
 			const importedTemplate = JSON.parse(e.target?.result as string) as Partial<Template>;
-			console.log('Parsed imported template:', importedTemplate);
-
-			if (!validateImportedTemplate(importedTemplate)) {
-				throw new Error('Invalid template file');
-			}
-
-			importedTemplate.id = Date.now().toString() + Math.random().toString(36).slice(2, 9);
+			const processedTemplate = await processImportedTemplate(importedTemplate);
 			
-			// Process property types immediately
-			if (importedTemplate.properties) {
-				console.log('Processing properties:', importedTemplate.properties);
-				for (const prop of importedTemplate.properties) {
-					console.log(`Processing property: ${prop.name}, type: ${prop.type || 'text'}, value: ${prop.value}`);
-					const existingPropertyType = generalSettings.propertyTypes.find(pt => pt.name === prop.name);
-					if (!existingPropertyType) {
-						// Only add the property type if it doesn't exist
-						await addPropertyType(prop.name, prop.type || 'text', prop.value || '');
-					} else {
-						console.log(`Property type ${prop.name} already exists, keeping existing type: ${existingPropertyType.type}`);
-					}
-				}
-				
-				// Reassign properties with existing or new types
-				importedTemplate.properties = importedTemplate.properties.map(prop => {
-					const existingPropertyType = generalSettings.propertyTypes.find(pt => pt.name === prop.name);
-					return {
-						id: prop.id || (Date.now().toString() + Math.random().toString(36).slice(2, 9)),
-						name: prop.name,
-						value: prop.value,
-						type: existingPropertyType ? existingPropertyType.type : (prop.type || 'text')
-					};
-				});
-			}
-
-			console.log('Processed template properties:', importedTemplate.properties);
-
-			// Keep the context if it exists in the imported template
-			if (importedTemplate.context) {
-				importedTemplate.context = importedTemplate.context;
-			}
-
-			let newName = importedTemplate.name as string;
-			let counter = 1;
-			while (templates.some(t => t.name === newName)) {
-				newName = `${importedTemplate.name} (${counter++})`;
-			}
-			importedTemplate.name = newName;
-
-			console.log('Final imported template:', importedTemplate);
-			templates.unshift(importedTemplate as Template);
-
+			templates.unshift(processedTemplate);
 			await saveTemplateSettings();
 			updateTemplateList();
-			showTemplateEditor(importedTemplate as Template);
+			showTemplateEditor(processedTemplate);
 			console.log('Template import completed');
 		} catch (error) {
 			console.error('Error parsing imported template:', error);
@@ -284,137 +286,28 @@ function importTemplateFile(file: File): void {
 	reader.readAsText(file);
 }
 
-export function showImportModal(): void {
-	const modal = document.getElementById('import-modal');
-	const dropZone = document.getElementById('import-drop-zone');
-	const jsonTextarea = document.getElementById('import-json-textarea') as HTMLTextAreaElement | null;
-	const cancelBtn = document.getElementById('import-cancel-btn');
-	const confirmBtn = document.getElementById('import-confirm-btn');
-
-	if (!modal || !dropZone || !jsonTextarea || !cancelBtn || !confirmBtn) {
-		console.error('Import modal elements not found');
-		return;
-	}
-
-	// Clear the textarea when showing the modal
-	jsonTextarea.value = '';
-
-	showModal(modal);
-
-	// Remove existing event listeners
-	dropZone.removeEventListener('dragover', handleDragOver);
-	dropZone.removeEventListener('drop', handleDrop);
-	dropZone.removeEventListener('click', openFilePicker);
-	cancelBtn.removeEventListener('click', handleCancel);
-	confirmBtn.removeEventListener('click', handleConfirm);
-
-	// Add event listeners
-	dropZone.addEventListener('dragover', handleDragOver);
-	dropZone.addEventListener('drop', handleDrop);
-	dropZone.addEventListener('click', openFilePicker);
-	cancelBtn.addEventListener('click', handleCancel);
-	confirmBtn.addEventListener('click', handleConfirm);
-
-	let fileInput: HTMLInputElement | null = null;
-
-	function handleDragOver(e: DragEvent): void {
-		e.preventDefault();
-		e.stopPropagation();
-	}
-
-	function handleDrop(e: DragEvent): void {
-		e.preventDefault();
-		e.stopPropagation();
-		const files = e.dataTransfer?.files;
-		if (files && files.length > 0) {
-			handleFile(files[0]);
-		}
-	}
-
-	function openFilePicker(e: Event): void {
-		e.preventDefault();
-		e.stopPropagation();
-		fileInput = document.createElement('input');
-		fileInput.type = 'file';
-		fileInput.accept = '.json';
-		fileInput.onchange = handleFileInputChange;
-		fileInput.click();
-	}
-
-	function handleFileInputChange(event: Event): void {
-		const file = (event.target as HTMLInputElement).files?.[0];
-		if (file) {
-			handleFile(file);
-		}
-		// Clean up the file input
-		if (fileInput) {
-			fileInput.remove();
-			fileInput = null;
-		}
-	}
-
-	function handleFile(file: File): void {
-		const reader = new FileReader();
-		reader.onload = (event: ProgressEvent<FileReader>) => {
-			const content = event.target?.result as string;
-			if (jsonTextarea) {
-				jsonTextarea.value = content;
-			}
-		};
-		reader.readAsText(file);
-	}
-
-	function handleCancel(): void {
-		cleanupModal();
-		hideModal(modal);
-	}
-
-	function handleConfirm(): void {
-		if (jsonTextarea) {
-			const jsonContent = jsonTextarea.value.trim();
-			if (jsonContent) {
-				importTemplateFromJson(jsonContent);
-			}
-		}
-		cleanupModal();
-		hideModal(modal);
-	}
-
-	function cleanupModal(): void {
-		// Remove event listeners
-		if (dropZone) {
-			dropZone.removeEventListener('dragover', handleDragOver);
-			dropZone.removeEventListener('drop', handleDrop);
-			dropZone.removeEventListener('click', openFilePicker);
-		}
-		if (cancelBtn) {
-			cancelBtn.removeEventListener('click', handleCancel);
-		}
-		if (confirmBtn) {
-			confirmBtn.removeEventListener('click', handleConfirm);
-		}
-
-		// Clean up the file input if it exists
-		if (fileInput) {
-			fileInput.remove();
-			fileInput = null;
-		}
-	}
+export function showTemplateImportModal(): void {
+	showGenericImportModal(
+		'generic-import-modal',
+		importTemplateFromJson,
+		'.json',
+		'Drag and drop template file here',
+		'Paste template JSON here',
+		true
+	);
 }
 
-function importTemplateFromJson(jsonContent: string): void {
-	const blob = new Blob([jsonContent], { type: 'application/json' });
-	const file = new File([blob], 'imported-template.json', { type: 'application/json' });
-
-	const dataTransfer = new DataTransfer();
-	dataTransfer.items.add(file);
-
-	const input = document.createElement('input');
-	input.type = 'file';
-	input.files = dataTransfer.files;
-
-	const event = new Event('change', { bubbles: true });
-	input.dispatchEvent(event);
-
-	importTemplate(input);
+async function importTemplateFromJson(jsonContent: string): Promise<void> {
+	try {
+		const importedTemplate = JSON.parse(jsonContent) as Partial<Template>;
+		const processedTemplate = await processImportedTemplate(importedTemplate);
+		
+		templates.unshift(processedTemplate);
+		await saveTemplateSettings();
+		updateTemplateList();
+		showTemplateEditor(processedTemplate);
+	} catch (error) {
+		console.error('Error parsing imported template:', error);
+		throw new Error('Error importing template. Please check the file and try again.');
+	}
 }
