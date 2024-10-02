@@ -21,6 +21,15 @@
 	--background-modifier-form-field: var(--background-primary);
 	--background-modifier-hover: rgba(var(--mono-rgb-100), .075);
 
+	/* Checkboxes */
+	--checkbox-radius: var(--radius-s);
+	--checkbox-size: 1rem;
+	--checkbox-marker-color: var(--background-primary);
+	--checkbox-color: var(--interactive-accent);
+	--checkbox-color-hover: var(--interactive-accent-hover);
+	--checkbox-border-color: var(--text-faint);
+	--checkbox-border-color-hover: var(--text-muted);
+
 	--clickable-icon-size: 1.75rem;
 	--clipper-select-font-weight: 500;
 

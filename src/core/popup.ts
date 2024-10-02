@@ -637,7 +637,10 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 		propertyDiv.innerHTML = `
 			<span class="metadata-property-icon"><i data-lucide="${getPropertyTypeIcon(propertyType)}"></i></span>
 			<label for="${property.name}">${property.name}</label>
-			<input id="${property.name}" type="text" value="${escapeHtml(value)}" data-type="${propertyType}" data-template-value="${escapeHtml(property.value)}" />
+			${propertyType === 'checkbox' 
+				? `<input id="${property.name}" type="checkbox" ${value === 'true' ? 'checked' : ''} data-type="${propertyType}" data-template-value="${escapeHtml(property.value)}" />`
+				: `<input id="${property.name}" type="text" value="${escapeHtml(value)}" data-type="${propertyType}" data-template-value="${escapeHtml(property.value)}" />`
+			}
 		`;
 		newTemplateProperties.appendChild(propertyDiv);
 	}
