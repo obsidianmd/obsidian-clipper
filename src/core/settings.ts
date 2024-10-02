@@ -12,7 +12,7 @@ import {
 	cleanupTemplateStorage,
 	rebuildTemplateList
 } from '../managers/template-manager';
-import { updateTemplateList, showTemplateEditor, resetUnsavedChanges, initializeAddPropertyButton } from '../managers/template-ui';
+import { updateTemplateList, showTemplateEditor, initializeAddPropertyButton } from '../managers/template-ui';
 import { initializeGeneralSettings } from '../managers/general-settings';
 import { showSettingsSection, initializeSidebar } from '../managers/settings-section-ui';
 import { initializeInterpreterSettings } from '../managers/interpreter-settings';
@@ -64,19 +64,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 		addMenuItemListener('.export-template-btn', 'template-actions-menu', exportTemplate);
 		addMenuItemListener('.import-template-btn', 'template-actions-menu', showTemplateImportModal);
 		addMenuItemListener('#copy-template-json-btn', 'template-actions-menu', copyCurrentTemplateToClipboard);
+	}
 
-		document.querySelectorAll('#reset-default-template-btn').forEach(btn => 
-			btn.addEventListener('click', resetDefaultTemplate)
-		);
-
-		const exportAllSettingsBtn = document.getElementById('export-all-settings-btn');
-		if (exportAllSettingsBtn) {
-			exportAllSettingsBtn.addEventListener('click', exportAllSettings);
-		}
-
-		const importAllSettingsBtn = document.getElementById('import-all-settings-btn');
-		if (importAllSettingsBtn) {
-			importAllSettingsBtn.addEventListener('click', importAllSettings);
+	function duplicateCurrentTemplate(): void {
+		const editingTemplateIndex = getEditingTemplateIndex();
+		if (editingTemplateIndex !== -1) {
+			const currentTemplate = templates[editingTemplateIndex];
+			const newTemplate = duplicateTemplate(currentTemplate.id);
+			saveTemplateSettings().then(() => {
+				updateTemplateList();
+				showTemplateEditor(newTemplate);
+				updateUrl('templates', newTemplate.id);
+			}).catch(error => {
+				console.error('Failed to duplicate template:', error);
+				alert('Failed to duplicate template. Please try again.');
+			});
 		}
 	}
 
