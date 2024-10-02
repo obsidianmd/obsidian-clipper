@@ -301,17 +301,21 @@ export function showImportModal(): void {
 
 	showModal(modal);
 
+	// Remove existing event listeners
+	dropZone.removeEventListener('dragover', handleDragOver);
+	dropZone.removeEventListener('drop', handleDrop);
+	dropZone.removeEventListener('click', openFilePicker);
+	cancelBtn.removeEventListener('click', handleCancel);
+	confirmBtn.removeEventListener('click', handleConfirm);
+
+	// Add event listeners
 	dropZone.addEventListener('dragover', handleDragOver);
 	dropZone.addEventListener('drop', handleDrop);
 	dropZone.addEventListener('click', openFilePicker);
-	cancelBtn.addEventListener('click', () => hideModal(modal));
-	confirmBtn.addEventListener('click', () => {
-		const jsonContent = jsonTextarea.value.trim();
-		if (jsonContent) {
-			importTemplateFromJson(jsonContent);
-		}
-		hideModal(modal);
-	});
+	cancelBtn.addEventListener('click', handleCancel);
+	confirmBtn.addEventListener('click', handleConfirm);
+
+	let fileInput: HTMLInputElement | null = null;
 
 	function handleDragOver(e: DragEvent): void {
 		e.preventDefault();
@@ -327,17 +331,26 @@ export function showImportModal(): void {
 		}
 	}
 
-	function openFilePicker(): void {
-		const input = document.createElement('input');
-		input.type = 'file';
-		input.accept = '.json';
-		input.onchange = (event: Event) => {
-			const file = (event.target as HTMLInputElement).files?.[0];
-			if (file) {
-				handleFile(file);
-			}
-		};
-		input.click();
+	function openFilePicker(e: Event): void {
+		e.preventDefault();
+		e.stopPropagation();
+		fileInput = document.createElement('input');
+		fileInput.type = 'file';
+		fileInput.accept = '.json';
+		fileInput.onchange = handleFileInputChange;
+		fileInput.click();
+	}
+
+	function handleFileInputChange(event: Event): void {
+		const file = (event.target as HTMLInputElement).files?.[0];
+		if (file) {
+			handleFile(file);
+		}
+		// Clean up the file input
+		if (fileInput) {
+			fileInput.remove();
+			fileInput = null;
+		}
 	}
 
 	function handleFile(file: File): void {
@@ -347,9 +360,45 @@ export function showImportModal(): void {
 			if (jsonTextarea) {
 				jsonTextarea.value = content;
 			}
-			importTemplateFromJson(content);
 		};
 		reader.readAsText(file);
+	}
+
+	function handleCancel(): void {
+		cleanupModal();
+		hideModal(modal);
+	}
+
+	function handleConfirm(): void {
+		if (jsonTextarea) {
+			const jsonContent = jsonTextarea.value.trim();
+			if (jsonContent) {
+				importTemplateFromJson(jsonContent);
+			}
+		}
+		cleanupModal();
+		hideModal(modal);
+	}
+
+	function cleanupModal(): void {
+		// Remove event listeners
+		if (dropZone) {
+			dropZone.removeEventListener('dragover', handleDragOver);
+			dropZone.removeEventListener('drop', handleDrop);
+			dropZone.removeEventListener('click', openFilePicker);
+		}
+		if (cancelBtn) {
+			cancelBtn.removeEventListener('click', handleCancel);
+		}
+		if (confirmBtn) {
+			confirmBtn.removeEventListener('click', handleConfirm);
+		}
+
+		// Clean up the file input if it exists
+		if (fileInput) {
+			fileInput.remove();
+			fileInput = null;
+		}
 	}
 }
 
