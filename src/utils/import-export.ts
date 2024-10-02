@@ -1,12 +1,13 @@
 import { Template, Property } from '../types/types';
-import { templates, saveTemplateSettings, editingTemplateIndex } from '../managers/template-manager';
+import { templates, saveTemplateSettings, editingTemplateIndex, loadTemplates } from '../managers/template-manager';
 import { showTemplateEditor, updateTemplateList } from '../managers/template-ui';
 import { sanitizeFileName } from './string-utils';
 import { detectBrowser } from './browser-detection';
-import { generalSettings } from '../utils/storage-utils';
-import { addPropertyType } from '../managers/property-types-manager';
+import { generalSettings, loadSettings } from '../utils/storage-utils';
+import { addPropertyType, updatePropertyTypesList } from '../managers/property-types-manager';
 import { hideModal } from '../utils/modal-utils';
 import { showImportModal as showGenericImportModal } from './import-modal';
+import browser from '../utils/browser-polyfill';
 
 const SCHEMA_VERSION = '0.1.0';
 
@@ -324,4 +325,58 @@ export function copyTemplateToClipboard(template: Template): void {
 		console.error('Failed to copy template JSON: ', err);
 		alert('Failed to copy template JSON to clipboard');
 	});
+}
+
+export async function exportAllSettings(): Promise<void> {
+	console.log('Starting exportAllSettings function');
+	try {
+		const allData = await browser.storage.sync.get(null);
+		const jsonContent = JSON.stringify(allData, null, 2);
+		const blob = new Blob([jsonContent], { type: 'application/json' });
+
+		const url = URL.createObjectURL(blob);
+		const a = document.createElement('a');
+		a.href = url;
+		a.download = 'obsidian-web-clipper-settings.json';
+		document.body.appendChild(a);
+
+		a.click();
+
+		document.body.removeChild(a);
+		URL.revokeObjectURL(url);
+
+	} catch (error) {
+		console.error('Error in exportAllSettings:', error);
+		alert('Failed to export settings. Please check the console for more details.');
+	}
+}
+
+export function importAllSettings(): void {
+	showGenericImportModal(
+		'import-modal',
+		importAllSettingsFromJson,
+		'.json',
+		'Choose settings file or drag and drop',
+		'Paste settings JSON here',
+		false,
+		'Import all settings'
+	);
+}
+
+async function importAllSettingsFromJson(jsonContent: string): Promise<void> {
+	try {
+		const settings = JSON.parse(jsonContent);
+		if (confirm('This will replace all your current settings, including templates and properties. Are you sure you want to continue?')) {
+			await browser.storage.sync.clear();
+			await browser.storage.sync.set(settings);
+			await loadSettings();
+			await loadTemplates();
+			updateTemplateList();
+			updatePropertyTypesList();
+			alert('All settings imported successfully. Please refresh the page to see the changes.');
+		}
+	} catch (error) {
+		console.error('Error importing all settings:', error);
+		throw new Error('Error importing settings. Please check the file and try again.');
+	}
 }

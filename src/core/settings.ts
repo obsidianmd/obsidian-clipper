@@ -26,10 +26,10 @@ import { initializeMenu } from '../managers/menu';
 import { addMenuItemListener } from '../managers/menu';
 
 declare global {
-    interface Window {
-        cleanupTemplateStorage: () => Promise<void>;
-        rebuildTemplateList: () => Promise<void>;
-    }
+	interface Window {
+		cleanupTemplateStorage: () => Promise<void>;
+		rebuildTemplateList: () => Promise<void>;
+	}
 }
 
 window.cleanupTemplateStorage = cleanupTemplateStorage;
@@ -37,7 +37,6 @@ window.rebuildTemplateList = rebuildTemplateList;
 
 document.addEventListener('DOMContentLoaded', async () => {
 	const newTemplateBtn = document.getElementById('new-template-btn') as HTMLButtonElement;
-	const resetDefaultTemplateBtn = document.getElementById('reset-default-template-btn') as HTMLButtonElement;
 
 	async function initializeSettings(): Promise<void> {
 		await initializeGeneralSettings();
@@ -49,8 +48,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 		initializeSidebar();
 		initializeAutoSave();
 		initializeMenu('more-actions-btn', 'template-actions-menu');
-
-		resetDefaultTemplateBtn.addEventListener('click', resetDefaultTemplate);
 
 		createIcons({ icons });
 	}
@@ -71,21 +68,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 		document.querySelectorAll('#reset-default-template-btn').forEach(btn => 
 			btn.addEventListener('click', resetDefaultTemplate)
 		);
-	}
 
-	function duplicateCurrentTemplate(): void {
-		const editingTemplateIndex = getEditingTemplateIndex();
-		if (editingTemplateIndex !== -1) {
-			const currentTemplate = templates[editingTemplateIndex];
-			const newTemplate = duplicateTemplate(currentTemplate.id);
-			saveTemplateSettings().then(() => {
-				updateTemplateList();
-				showTemplateEditor(newTemplate);
-				updateUrl('templates', newTemplate.id);
-			}).catch(error => {
-				console.error('Failed to duplicate template:', error);
-				alert('Failed to duplicate template. Please try again.');
-			});
+		const exportAllSettingsBtn = document.getElementById('export-all-settings-btn');
+		if (exportAllSettingsBtn) {
+			exportAllSettingsBtn.addEventListener('click', exportAllSettings);
+		}
+
+		const importAllSettingsBtn = document.getElementById('import-all-settings-btn');
+		if (importAllSettingsBtn) {
+			importAllSettingsBtn.addEventListener('click', importAllSettings);
 		}
 	}
 
@@ -127,26 +118,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 		} else {
 			showSettingsSection('general');
 		}
-	}
-
-	function resetDefaultTemplate(): void {
-		const defaultTemplate = createDefaultTemplate();
-		const currentTemplates = getTemplates();
-		const defaultIndex = currentTemplates.findIndex((t: Template) => t.name === 'Default');
-		
-		if (defaultIndex !== -1) {
-			currentTemplates[defaultIndex] = defaultTemplate;
-		} else {
-			currentTemplates.unshift(defaultTemplate);
-		}
-
-		saveTemplateSettings().then(() => {
-			updateTemplateList();
-			showTemplateEditor(defaultTemplate);
-		}).catch(error => {
-			console.error('Failed to reset default template:', error);
-			alert('Failed to reset default template. Please try again.');
-		});
 	}
 
 	function copyCurrentTemplateToClipboard(): void {

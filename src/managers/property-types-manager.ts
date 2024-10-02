@@ -25,7 +25,7 @@ function ensureTagsProperty(): void {
 	}
 }
 
-function updatePropertyTypesList(): void {
+export function updatePropertyTypesList(): void {
 	const propertyTypesList = document.getElementById('property-types-list');
 	const deleteUnusedButton = document.getElementById('delete-unused-properties-btn');
 	if (!propertyTypesList || !deleteUnusedButton) return;
