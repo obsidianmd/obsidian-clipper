@@ -311,3 +311,16 @@ async function importTemplateFromJson(jsonContent: string): Promise<void> {
 		throw new Error('Error importing template. Please check the file and try again.');
 	}
 }
+
+export function copyTemplateToClipboard(template: Template): void {
+	const { id, ...templateCopy } = template;
+
+	const jsonContent = JSON.stringify(templateCopy, null, 2);
+	
+	navigator.clipboard.writeText(jsonContent).then(() => {
+		alert('Template JSON copied to clipboard');
+	}).catch(err => {
+		console.error('Failed to copy template JSON: ', err);
+		alert('Failed to copy template JSON to clipboard');
+	});
+}

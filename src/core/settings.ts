@@ -17,7 +17,7 @@ import { initializeGeneralSettings } from '../managers/general-settings';
 import { showSettingsSection, initializeSidebar } from '../managers/settings-section-ui';
 import { initializeInterpreterSettings } from '../managers/interpreter-settings';
 import { initializeAutoSave } from '../utils/auto-save';
-import { exportTemplate, showTemplateImportModal } from '../utils/import-export';
+import { exportTemplate, showTemplateImportModal, copyTemplateToClipboard } from '../utils/import-export';
 import { createIcons } from 'lucide';
 import { icons } from '../icons/icons';
 import { updateUrl, getUrlParameters } from '../utils/routing';
@@ -73,6 +73,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 		);
 		document.querySelectorAll('.import-template-btn').forEach(btn => 
 			btn.addEventListener('click', showTemplateImportModal)
+		);
+		document.querySelectorAll('#copy-template-json-btn').forEach(btn => 
+			btn.addEventListener('click', copyCurrentTemplateToClipboard)
+		);
+
+		document.querySelectorAll('#reset-default-template-btn').forEach(btn => 
+			btn.addEventListener('click', resetDefaultTemplate)
 		);
 	}
 
@@ -150,6 +157,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 			console.error('Failed to reset default template:', error);
 			alert('Failed to reset default template. Please try again.');
 		});
+	}
+
+	function copyCurrentTemplateToClipboard(): void {
+		const editingTemplateIndex = getEditingTemplateIndex();
+		if (editingTemplateIndex !== -1) {
+			const currentTemplate = templates[editingTemplateIndex];
+			copyTemplateToClipboard(currentTemplate);
+		}
 	}
 
 	const templateForm = document.getElementById('template-settings-form');
