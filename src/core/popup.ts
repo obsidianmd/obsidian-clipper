@@ -412,11 +412,14 @@ async function handleClip() {
 		}
 	}
 
-	const properties = Array.from(document.querySelectorAll('.metadata-property input')).map(input => ({
-		id: (input as HTMLElement).dataset.id || Date.now().toString() + Math.random().toString(36).slice(2, 11),
-		name: input.id,
-		value: (input as HTMLInputElement).value
-	})) as Property[];
+	const properties = Array.from(document.querySelectorAll('.metadata-property input')).map(input => {
+		const inputElement = input as HTMLInputElement;
+		return {
+			id: inputElement.dataset.id || Date.now().toString() + Math.random().toString(36).slice(2, 11),
+			name: inputElement.id,
+			value: inputElement.type === 'checkbox' ? inputElement.checked : inputElement.value
+		};
+	}) as Property[];
 
 	let fileContent: string;
 	const frontmatter = await generateFrontmatter(properties as Property[]);
@@ -424,11 +427,14 @@ async function handleClip() {
 
 	try {
 		if (currentTemplate.behavior === 'create') {
-			const updatedProperties = Array.from(document.querySelectorAll('.metadata-property input')).map(input => ({
-				id: (input as HTMLElement).dataset.id || Date.now().toString() + Math.random().toString(36).slice(2, 11),
-				name: input.id,
-				value: (input as HTMLInputElement).value
-			})) as Property[];
+			const updatedProperties = Array.from(document.querySelectorAll('.metadata-property input')).map(input => {
+				const inputElement = input as HTMLInputElement;
+				return {
+					id: inputElement.dataset.id || Date.now().toString() + Math.random().toString(36).slice(2, 11),
+					name: inputElement.id,
+					value: inputElement.type === 'checkbox' ? inputElement.checked : inputElement.value
+				};
+			}) as Property[];
 			const frontmatter = await memoizedGenerateFrontmatter(updatedProperties as Property[]);
 			fileContent = frontmatter + noteContentField.value;
 		} else {

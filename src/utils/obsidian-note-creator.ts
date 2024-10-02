@@ -39,7 +39,8 @@ export async function generateFrontmatter(properties: Property[]): Promise<strin
 				frontmatter += numericValue ? ` ${parseFloat(numericValue)}\n` : '\n';
 				break;
 			case 'checkbox':
-				frontmatter += ` ${property.value.toLowerCase() === 'true' || property.value === '1'}\n`;
+				const isChecked = typeof property.value === 'boolean' ? property.value : property.value === 'true';
+				frontmatter += ` ${isChecked}\n`;
 				break;
 			case 'date':
 			case 'datetime':
