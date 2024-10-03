@@ -152,6 +152,7 @@ function addHighlight(highlight: HighlightData) {
 function mergeOverlappingHighlights(existingHighlights: HighlightData[], newHighlight: HighlightData): HighlightData[] {
 	const mergedHighlights: HighlightData[] = [];
 	let merged = false;
+	let mergedHighlight: HighlightData | null = null;
 
 	for (const existing of existingHighlights) {
 		if (existing.xpath === newHighlight.xpath && 
@@ -161,23 +162,30 @@ function mergeOverlappingHighlights(existingHighlights: HighlightData[], newHigh
 			
 			if (existing.startOffset! <= newHighlight.endOffset && existing.endOffset! >= newHighlight.startOffset) {
 				// Merge overlapping highlights
-				const mergedHighlight: HighlightData = {
-					...existing,
-					startOffset: Math.min(existing.startOffset!, newHighlight.startOffset),
-					endOffset: Math.max(existing.endOffset!, newHighlight.endOffset),
-					content: mergeContent(existing, newHighlight)
-				};
-				mergedHighlights.push(mergedHighlight);
+				if (!mergedHighlight) {
+					mergedHighlight = {
+						...existing,
+						startOffset: Math.min(existing.startOffset!, newHighlight.startOffset),
+						endOffset: Math.max(existing.endOffset!, newHighlight.endOffset),
+						content: mergeContent(existing, newHighlight)
+					};
+				} else {
+					mergedHighlight.startOffset = Math.min(mergedHighlight.startOffset!, existing.startOffset!);
+					mergedHighlight.endOffset = Math.max(mergedHighlight.endOffset!, existing.endOffset!);
+					mergedHighlight.content = mergeContent(mergedHighlight, existing);
+				}
 				merged = true;
-			} else {
+			} else if (!mergedHighlight) {
 				mergedHighlights.push(existing);
 			}
-		} else {
+		} else if (!mergedHighlight) {
 			mergedHighlights.push(existing);
 		}
 	}
 
-	if (!merged) {
+	if (mergedHighlight) {
+		mergedHighlights.push(mergedHighlight);
+	} else if (!merged) {
 		mergedHighlights.push(newHighlight);
 	}
 
