@@ -53,6 +53,9 @@
 	--font-ui-medium: 0.9375rem;
 	--font-ui-large: 1.125rem;
 
+	--font-smaller: var(--font-ui-smaller);
+	--font-small: var(--font-ui-small);
+
 	--font-default: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei Light", sans-serif;
 	--font-monospace-default: ui-monospace, SFMono-Regular, "Cascadia Mono", "Roboto Mono", "DejaVu Sans Mono", "Liberation Mono", Menlo, Monaco, "Consolas", "Source Code Pro", monospace;
 
@@ -63,7 +66,42 @@
 	--icon-size: 1rem;
 	--input-height: 1.875rem;
 
-	--metadata-label-width: 7rem;
+	/* Metadata */
+	--metadata-background: transparent;
+	--metadata-display-reading: block;
+	--metadata-display-editing: block;
+	--metadata-max-width: none;
+	--metadata-padding: var(--size-4-2) 0;
+	--metadata-border-color: var(--background-modifier-border);
+	--metadata-border-radius: 0;
+	--metadata-border-width: 0;
+	--metadata-divider-color: var(--background-modifier-border);
+	--metadata-divider-color-hover: transparent;
+	--metadata-divider-color-focus: transparent;
+	--metadata-divider-width: 0;
+	--metadata-gap: 3px;
+	--metadata-property-padding: 0;
+	--metadata-property-radius: 0.375rem;
+	--metadata-property-radius-hover: 0.375rem;
+	--metadata-property-radius-focus: 0.375rem;
+	--metadata-property-background: transparent;
+	--metadata-property-background-hover: transparent;
+	--metadata-property-background-active: var(--background-modifier-hover);
+	--metadata-label-background-hover: transparent;
+	--metadata-label-background-active: var(--background-modifier-hover);
+	--metadata-label-font: var(--font-interface);
+	--metadata-label-font-size: var(--font-smaller);
+	--metadata-label-font-weight: inherit;
+	--metadata-label-text-color: var(--text-muted);
+	--metadata-label-text-color-hover: var(--text-muted);
+	--metadata-label-width: 6.5rem;
+	--metadata-input-height: 1.75rem;
+	--metadata-input-text-color: var(--text-normal);
+	--metadata-input-font: var(--font-interface);
+	--metadata-input-font-size: var(--font-smaller);
+	--metadata-input-background: transparent;
+	--metadata-input-background-hover: transparent;
+	--metadata-input-background-active: var(--background-modifier-hover);
 
 	--modal-background: var(--background-primary);
 	--modal-width: 90vw;
