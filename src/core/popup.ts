@@ -667,7 +667,7 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 	newTemplateProperties.style.position = '';
 	newTemplateProperties.style.left = '';
 
-	initializeIcons();
+	initializeIcons(newTemplateProperties);
 
 	const noteNameField = document.getElementById('note-name-field') as HTMLTextAreaElement;
 	if (noteNameField) {
