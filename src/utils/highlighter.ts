@@ -322,6 +322,7 @@ export function saveHighlights() {
 	const url = window.location.href;
 	const data: StoredData = { highlights, url };
 	browser.storage.local.set({ [url]: data });
+	notifyHighlightsUpdated();
 }
 
 export function applyHighlights() {
@@ -435,6 +436,10 @@ function removeHighlightByElement(container: Element) {
 		applyHighlights();
 		saveHighlights();
 	}
+}
+
+function notifyHighlightsUpdated() {
+	browser.runtime.sendMessage({ action: "highlightsUpdated" });
 }
 
 export function getHighlights(): string[] {

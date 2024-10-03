@@ -19,6 +19,7 @@ import { ensureContentScriptLoaded } from '../utils/content-script-utils';
 import { isBlankPage, isValidUrl } from '../utils/active-tab-manager';
 import { memoizeWithExpiration } from '../utils/memoize';
 import { debounce } from '../utils/debounce';
+import { getHighlights } from '../utils/highlighter';
 
 let loadedSettings: Settings;
 let currentTemplate: Template | null = null;
@@ -220,6 +221,11 @@ function setupMessageListeners() {
 				showError('This page cannot be clipped.');
 			} else {
 				showError('This page cannot be clipped. Only http and https URLs are supported.');
+			}
+		} else if (request.action === "highlightsUpdated") {
+			// Refresh fields when highlights are updated
+			if (currentTabId !== undefined) {
+				refreshFields(currentTabId);
 			}
 		}
 	});
