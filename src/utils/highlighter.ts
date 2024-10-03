@@ -452,27 +452,49 @@ export function loadHighlights() {
 	});
 }
 
-const throttledApplyHighlights = throttle(() => {
-	if (!isApplyingHighlights) {
-		applyHighlights();
+function updateHighlightPositions() {
+	document.querySelectorAll('.obsidian-highlight-container').forEach((container: Element) => {
+		const index = container.getAttribute('data-highlight-index');
+		if (index !== null) {
+			const highlight = highlights[parseInt(index)];
+			const target = getElementByXPath(highlight.xpath);
+			if (target) {
+				updateHighlightOverlay(target, container as HTMLElement, highlight);
+			}
+		}
+	});
+}
+
+function updateHighlightOverlay(target: Element, container: HTMLElement, highlight: AnyHighlightData) {
+	container.innerHTML = ''; // Clear existing overlay elements
+	
+	if (highlight.type === 'text') {
+		createTextHighlightOverlay(target, container, highlight);
+	} else if (highlight.type === 'element') {
+		createElementHighlightOverlay(target, container, highlight);
+	} else {
+		createComplexHighlightOverlay(target, container, highlight);
 	}
-}, 500);
+}
 
-// Reapply highlights on window resize and scroll
-window.addEventListener('resize', throttledApplyHighlights);
-window.addEventListener('scroll', throttledApplyHighlights);
+const throttledUpdateHighlights = throttle(() => {
+	if (!isApplyingHighlights) {
+		updateHighlightPositions();
+	}
+}, 100);
 
-// Modify the mutation observer to use the throttled function
+window.addEventListener('resize', throttledUpdateHighlights);
+window.addEventListener('scroll', throttledUpdateHighlights);
+
 const observer = new MutationObserver((mutations) => {
 	if (!isApplyingHighlights) {
-		// Only trigger update if mutations affect highlight positions
 		const shouldUpdate = mutations.some(mutation => 
 			mutation.type === 'childList' || 
 			(mutation.type === 'attributes' && 
 			 (mutation.attributeName === 'style' || mutation.attributeName === 'class'))
 		);
 		if (shouldUpdate) {
-			throttledApplyHighlights();
+			throttledUpdateHighlights();
 		}
 	}
 });
@@ -480,8 +502,8 @@ observer.observe(document.body, {
 	childList: true, 
 	subtree: true, 
 	attributes: true,
-	attributeFilter: ['style', 'class'], // Only observe style and class changes
-	characterData: false // We don't need to observe text changes
+	attributeFilter: ['style', 'class'],
+	characterData: false
 });
 
 function createHoverOverlay(target: Element) {
