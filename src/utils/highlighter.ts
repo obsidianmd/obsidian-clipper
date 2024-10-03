@@ -4,6 +4,7 @@ import { getElementXPath, getElementByXPath } from './dom-utils';
 
 let isHighlighterMode = false;
 let highlights: HighlightData[] = [];
+let hoverOverlay: HTMLElement | null = null;
 
 interface HighlightData {
 	xpath: string;
@@ -12,13 +13,21 @@ interface HighlightData {
 	id: string;
 }
 
+interface StoredData {
+	highlights: HighlightData[];
+	url: string;
+}
+
 export function toggleHighlighter(isActive: boolean) {
 	isHighlighterMode = isActive;
 	document.body.classList.toggle('obsidian-highlighter-active', isHighlighterMode);
 	if (isHighlighterMode) {
 		document.addEventListener('mouseup', handleMouseUp);
+		document.addEventListener('mousemove', handleMouseMove);
 	} else {
 		document.removeEventListener('mouseup', handleMouseUp);
+		document.removeEventListener('mousemove', handleMouseMove);
+		removeHoverOverlay();
 	}
 	updateHighlightListeners();
 }
@@ -32,10 +41,24 @@ function handleMouseUp(event: MouseEvent) {
 		const target = event.target as Element;
 		if (target.classList.contains('obsidian-highlight-overlay')) {
 			removeHighlightByElement(target);
-		} else {
+		} else if (!isIgnoredElement(target)) {
 			highlightElement(target);
 		}
 	}
+}
+
+function handleMouseMove(event: MouseEvent) {
+	if (!isHighlighterMode) return;
+	const target = event.target as Element;
+	if (!isIgnoredElement(target)) {
+		createHoverOverlay(target);
+	} else {
+		removeHoverOverlay();
+	}
+}
+
+function isIgnoredElement(element: Element): boolean {
+	return element.tagName.toLowerCase() === 'html' || element.tagName.toLowerCase() === 'body';
 }
 
 function highlightElement(element: Element) {
@@ -78,6 +101,12 @@ export function updateHighlightListeners() {
 
 export function saveHighlights() {
 	const url = window.location.href;
+	const data: StoredData = { highlights, url };
+	browser.storage.local.set({ [url]: data });
+}
+
+export function applyHighlights() {
+	removeExistingHighlights();
 	
 	// Sort highlights based on their position in the DOM
 	highlights.sort((a, b) => {
@@ -88,14 +117,7 @@ export function saveHighlights() {
 		}
 		return 0;
 	});
-	
-	const data = { highlights, url };
-	browser.storage.local.set({ [url]: data });
-}
 
-export function applyHighlights() {
-	removeExistingHighlights();
-	
 	highlights.forEach((highlight, index) => {
 		const container = getElementByXPath(highlight.xpath);
 		if (container) {
@@ -155,8 +177,43 @@ export function getHighlights(): string[] {
 	return highlights.map(h => h.content);
 }
 
+export function loadHighlights() {
+	const url = window.location.href;
+	browser.storage.local.get(url).then((result) => {
+		const storedData = result[url] as StoredData | undefined;
+		if (storedData && Array.isArray(storedData.highlights)) {
+			highlights = storedData.highlights;
+			applyHighlights();
+		}
+	});
+}
+
 const debouncedApplyHighlights = debounce(applyHighlights, 100);
 
 // Reapply highlights on window resize and scroll
 window.addEventListener('resize', debouncedApplyHighlights);
 window.addEventListener('scroll', debouncedApplyHighlights);
+
+function createHoverOverlay(target: Element) {
+	removeHoverOverlay();
+	
+	hoverOverlay = document.createElement('div');
+	hoverOverlay.className = 'obsidian-highlight-hover-overlay';
+	
+	const rect = target.getBoundingClientRect();
+	
+	hoverOverlay.style.position = 'absolute';
+	hoverOverlay.style.left = `${rect.left + window.scrollX}px`;
+	hoverOverlay.style.top = `${rect.top + window.scrollY}px`;
+	hoverOverlay.style.width = `${rect.width}px`;
+	hoverOverlay.style.height = `${rect.height}px`;
+	
+	document.body.appendChild(hoverOverlay);
+}
+
+function removeHoverOverlay() {
+	if (hoverOverlay) {
+		hoverOverlay.remove();
+		hoverOverlay = null;
+	}
+}

@@ -31,3 +31,11 @@
 	z-index: 9999;
 	cursor: pointer;
 }
+
+.obsidian-highlight-hover-overlay {
+	position: absolute;
+	background-color: rgba(255, 255, 0, 0.2);
+	border: 2px solid rgba(255, 255, 0, 0.5);
+	pointer-events: none;
+	z-index: 9998;
+}

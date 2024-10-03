@@ -83,7 +83,8 @@ browser.runtime.onMessage.addListener(function(request: any, sender: browser.Run
 	return true;
 });
 
-// Load and apply highlights when the content script is injected
+// Initialize highlighter
+highlighter.loadHighlights();
 highlighter.applyHighlights();
 
 function extractContentBySelector(selector: string, attribute?: string, extractHtml: boolean = false): string | string[] {
