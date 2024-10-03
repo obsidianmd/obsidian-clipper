@@ -19,7 +19,6 @@ import { ensureContentScriptLoaded } from '../utils/content-script-utils';
 import { isBlankPage, isValidUrl } from '../utils/active-tab-manager';
 import { memoizeWithExpiration } from '../utils/memoize';
 import { debounce } from '../utils/debounce';
-import { getHighlights } from '../utils/highlighter';
 
 let loadedSettings: Settings;
 let currentTemplate: Template | null = null;
@@ -37,7 +36,7 @@ const memoizedReplaceVariables = memoizeWithExpiration(
 		return replaceVariables(tabId, template, variables, currentUrl);
 	},
 	{
-		expirationMs: 5000,
+		expirationMs: 1000,
 		keyFn: (tabId: number, template: string, variables: { [key: string]: string }, currentUrl: string) => 
 			`${tabId}-${template}-${currentUrl}`
 	}
@@ -48,7 +47,7 @@ const memoizedGenerateFrontmatter = memoizeWithExpiration(
 	async (properties: Property[]) => {
 		return generateFrontmatter(properties);
 	},
-	{ expirationMs: 30000 }
+	{ expirationMs: 1000 }
 );
 
 // Memoize extractPageContent with URL-sensitive key and short expiration
@@ -58,7 +57,7 @@ const memoizedExtractPageContent = memoizeWithExpiration(
 		return extractPageContent(tabId);
 	},
 	{ 
-		expirationMs: 5000, 
+		expirationMs: 1000, 
 		keyFn: async (tabId: number) => {
 			const tab = await browser.tabs.get(tabId);
 			return `${tabId}-${tab.url}`;

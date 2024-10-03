@@ -192,8 +192,20 @@ function getIntersectionRange(range1: Range, range2: Range): Range | null {
 
 function addHighlight(highlight: AnyHighlightData) {
 	highlights = mergeOverlappingHighlights(highlights, highlight);
+	sortHighlights();
 	applyHighlights();
 	saveHighlights();
+}
+
+function sortHighlights() {
+	highlights.sort((a, b) => {
+		const elementA = getElementByXPath(a.xpath);
+		const elementB = getElementByXPath(b.xpath);
+		if (elementA && elementB) {
+			return getElementVerticalPosition(elementA) - getElementVerticalPosition(elementB);
+		}
+		return 0;
+	});
 }
 
 function mergeOverlappingHighlights(existingHighlights: AnyHighlightData[], newHighlight: AnyHighlightData): AnyHighlightData[] {
@@ -322,7 +334,6 @@ export function saveHighlights() {
 	const url = window.location.href;
 	const data: StoredData = { highlights, url };
 	browser.storage.local.set({ [url]: data });
-	notifyHighlightsUpdated();
 }
 
 export function applyHighlights() {
@@ -338,12 +349,13 @@ export function applyHighlights() {
 	highlights.forEach((highlight, index) => {
 		const container = getElementByXPath(highlight.xpath);
 		if (container) {
-			createHighlightOverlay(container, index, highlight as AnyHighlightData);
+			createHighlightOverlay(container, index, highlight);
 		}
 	});
 
 	lastAppliedHighlights = currentHighlightsState;
 	isApplyingHighlights = false;
+	notifyHighlightsUpdated();
 }
 
 function createHighlightOverlay(target: Element, index: number, highlight: AnyHighlightData) {
@@ -431,8 +443,10 @@ function handleHighlightClick(event: MouseEvent) {
 function removeHighlightByElement(container: Element) {
 	const index = container.getAttribute('data-highlight-index');
 	if (index !== null) {
-		highlights = highlights.filter((_, i) => i.toString() !== index);
+		const highlightToRemove = highlights[parseInt(index)];
+		highlights = highlights.filter(h => h.id !== highlightToRemove.id);
 		container.remove();
+		sortHighlights();
 		applyHighlights();
 		saveHighlights();
 	}
@@ -520,10 +534,10 @@ function createHoverOverlay(target: Element) {
 	const rect = target.getBoundingClientRect();
 	
 	hoverOverlay.style.position = 'absolute';
-	hoverOverlay.style.left = `${rect.left + window.scrollX}px`;
-	hoverOverlay.style.top = `${rect.top + window.scrollY}px`;
-	hoverOverlay.style.width = `${rect.width}px`;
-	hoverOverlay.style.height = `${rect.height}px`;
+	hoverOverlay.style.left = `${rect.left + window.scrollX - 2}px`;
+	hoverOverlay.style.top = `${rect.top + window.scrollY - 2}px`;
+	hoverOverlay.style.width = `${rect.width + 4}px`;
+	hoverOverlay.style.height = `${rect.height + 4}px`;
 	
 	document.body.appendChild(hoverOverlay);
 }
@@ -551,4 +565,8 @@ function removeHighlightByEvent(event: Event) {
 
 export function removeExistingHighlights() {
 	document.querySelectorAll('.obsidian-highlight-container').forEach(el => el.remove());
+}
+
+function getElementVerticalPosition(element: Element): number {
+	return element.getBoundingClientRect().top + window.scrollY;
 }
