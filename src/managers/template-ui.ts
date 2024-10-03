@@ -279,9 +279,13 @@ function updateBehaviorFields(): void {
 	}
 }
 
-export function addPropertyToEditor(name: string = '', value: string = '', id: string | null = null): void {
+export function addPropertyToEditor(name: string = '', value: string = '', id: string | null = null): HTMLElement {
 	const templateProperties = document.getElementById('template-properties');
-	if (!templateProperties) return;
+	if (!templateProperties) {
+		console.error('Template properties container not found');
+		// Return a dummy element to satisfy the return type
+		return document.createElement('div');
+	}
 
 	const propertyId = id || Date.now().toString() + Math.random().toString(36).slice(2, 11);
 	const propertyDiv = createElementWithClass('div', 'property-editor');
@@ -376,12 +380,19 @@ export function addPropertyToEditor(name: string = '', value: string = '', id: s
 	if (select) {
 		select.addEventListener('change', function() {
 			if (propertySelectedDiv) updateSelectedOption(this.value, propertySelectedDiv);
+			
+			// Get the current name of the property
+			const nameInput = propertyDiv.querySelector('.property-name') as HTMLInputElement;
+			const currentName = nameInput.value;
+
 			// Update the global property type
-			updatePropertyType(name, this.value).then(() => {
-				console.log(`Property type for ${name} updated to ${this.value}`);
+			updatePropertyType(currentName, this.value).then(() => {
+				console.log(`Property type for ${currentName} updated to ${this.value}`);
 			}).catch(error => {
-				console.error(`Failed to update property type for ${name}:`, error);
+				console.error(`Failed to update property type for ${currentName}:`, error);
 			});
+
+			updateTemplateFromForm();
 		});
 	}
 
@@ -406,10 +417,22 @@ export function addPropertyToEditor(name: string = '', value: string = '', id: s
 			select.value = selectedType.type;
 			updateSelectedOption(selectedType.type, propertySelectedDiv);
 			
+			// Only update the property type if the name is not empty
+			if (this.value.trim() !== '') {
+				updatePropertyType(this.value, selectedType.type).then(() => {
+					console.log(`Property type for ${this.value} updated to ${selectedType.type}`);
+				}).catch(error => {
+					console.error(`Failed to update property type for ${this.value}:`, error);
+				});
+			}
+			
 			// Fill in the default value if it exists and the value input is empty
 			if (selectedType.defaultValue && !valueInput.value) {
 				valueInput.value = selectedType.defaultValue;
 			}
+
+			// Immediately update the template form
+			updateTemplateFromForm();
 		}
 	});
 
@@ -423,6 +446,8 @@ export function addPropertyToEditor(name: string = '', value: string = '', id: s
 			}
 		}
 	});
+
+	return propertyDiv; // Return the created propertyDiv
 }
 
 function updateSelectedOption(value: string, propertySelected: HTMLElement): void {
@@ -486,7 +511,7 @@ export function updateTemplateFromForm(): void {
 			value: escapeValue(valueInput.value),
 			type: typeSelect.getAttribute('data-value') || 'text'
 		};
-	});
+	}).filter(prop => prop.name.trim() !== ''); // Filter out properties with empty names
 
 	const triggersTextarea = document.getElementById('url-patterns') as HTMLTextAreaElement;
 	if (triggersTextarea) template.triggers = triggersTextarea.value.split('\n').filter(Boolean);
@@ -524,9 +549,23 @@ export function initializeAddPropertyButton(): void {
 }
 
 function handleAddProperty(): void {
-	addPropertyToEditor();
-	if (editingTemplateIndex !== -1) {
-		updateTemplateFromForm();
+	const templateProperties = document.getElementById('template-properties');
+	if (templateProperties) {
+		const newPropertyDiv = addPropertyToEditor();
+		if (newPropertyDiv.parentElement !== templateProperties) {
+			templateProperties.appendChild(newPropertyDiv);
+		}
+		const nameInput = newPropertyDiv.querySelector('.property-name') as HTMLInputElement;
+		if (nameInput) {
+			nameInput.focus();
+			nameInput.addEventListener('blur', () => {
+				if (nameInput.value.trim() === '') {
+					templateProperties.removeChild(newPropertyDiv);
+				} else {
+					updateTemplateFromForm();
+				}
+			}, { once: true });
+		}
 	}
 }
 
