@@ -74,8 +74,7 @@ browser.runtime.onMessage.addListener(function(request: any, sender: browser.Run
 		highlighter.toggleHighlighter(request.isActive);
 		sendResponse({ success: true });
 	} else if (request.action === "highlightSelection") {
-		highlighter.toggleHighlighter(request.isActive);
-		highlighter.handleHighlight();
+		highlighter.toggleHighlighter(true);
 		sendResponse({ success: true });
 	} else if (request.action === "clearHighlights") {
 		highlighter.clearHighlights();
@@ -83,6 +82,9 @@ browser.runtime.onMessage.addListener(function(request: any, sender: browser.Run
 	}
 	return true;
 });
+
+// Load and apply highlights when the content script is injected
+highlighter.applyHighlights();
 
 function extractContentBySelector(selector: string, attribute?: string, extractHtml: boolean = false): string | string[] {
 	try {

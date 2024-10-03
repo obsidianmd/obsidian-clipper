@@ -1,125 +1,162 @@
 import browser from './browser-polyfill';
 import { debounce } from './debounce';
+import { getElementXPath, getElementByXPath } from './dom-utils';
 
 let isHighlighterMode = false;
-let highlights: string[] = [];
+let highlights: HighlightData[] = [];
+
+interface HighlightData {
+	xpath: string;
+	content: string;
+	type: 'text' | 'element';
+	id: string;
+}
 
 export function toggleHighlighter(isActive: boolean) {
 	isHighlighterMode = isActive;
 	document.body.classList.toggle('obsidian-highlighter-active', isHighlighterMode);
 	if (isHighlighterMode) {
-		document.addEventListener('mouseup', debouncedHandleHighlight);
+		document.addEventListener('mouseup', handleMouseUp);
 	} else {
-		document.removeEventListener('mouseup', debouncedHandleHighlight);
+		document.removeEventListener('mouseup', handleMouseUp);
 	}
 	updateHighlightListeners();
 }
 
-export function updateHighlightListeners() {
-	document.querySelectorAll('.obsidian-highlight').forEach(highlight => {
-		highlight.removeEventListener('click', showRemoveTooltip);
-		if (isHighlighterMode) {
-			highlight.addEventListener('click', showRemoveTooltip);
-		}
-	});
-}
-
-export function handleHighlight() {
+function handleMouseUp(event: MouseEvent) {
+	if (!isHighlighterMode) return;
 	const selection = window.getSelection();
 	if (selection && !selection.isCollapsed) {
-		const range = selection.getRangeAt(0);
-		const newHighlight = document.createElement('span');
-		newHighlight.className = 'obsidian-highlight';
-		newHighlight.dataset.highlightId = Date.now().toString();
-
-		try {
-			range.surroundContents(newHighlight);
-			if (isHighlighterMode) {
-				newHighlight.addEventListener('click', showRemoveTooltip);
-			}
-
-			// Insert the new highlight in the correct position
-			insertHighlightInOrder(newHighlight);
-
-			saveHighlights();
-		} catch (error) {
-			console.error('Error creating highlight:', error);
+		handleTextSelection(selection);
+	} else {
+		const target = event.target as Element;
+		if (target.classList.contains('obsidian-highlight-overlay')) {
+			removeHighlightByElement(target);
+		} else {
+			highlightElement(target);
 		}
-
-		selection.removeAllRanges();
 	}
 }
 
-function insertHighlightInOrder(newHighlight: HTMLElement) {
-	const highlightElements = Array.from(document.querySelectorAll('.obsidian-highlight'));
-	let insertIndex = highlightElements.findIndex(el => {
-		return (el.compareDocumentPosition(newHighlight) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0;
+function highlightElement(element: Element) {
+	const xpath = getElementXPath(element);
+	const content = element.outerHTML;
+	addHighlight({ xpath, content, type: 'element', id: Date.now().toString() });
+}
+
+function handleTextSelection(selection: Selection) {
+	const range = selection.getRangeAt(0);
+	const content = range.cloneContents();
+	const tempDiv = document.createElement('div');
+	tempDiv.appendChild(content);
+	
+	const xpath = getElementXPath(range.commonAncestorContainer);
+	addHighlight({ 
+		xpath, 
+		content: tempDiv.innerHTML, 
+		type: 'text', 
+		id: Date.now().toString() 
 	});
+	
+	selection.removeAllRanges();
+}
 
-	if (insertIndex === -1) {
-		insertIndex = highlightElements.length;
-	}
+function addHighlight(highlight: HighlightData) {
+	highlights.push(highlight);
+	applyHighlights();
+	saveHighlights();
+}
 
-	highlights.splice(insertIndex, 0, newHighlight.outerHTML);
+export function updateHighlightListeners() {
+	document.querySelectorAll('.obsidian-highlight-overlay').forEach(highlight => {
+		highlight.removeEventListener('click', removeHighlightByEvent);
+		if (isHighlighterMode) {
+			highlight.addEventListener('click', removeHighlightByEvent);
+		}
+	});
 }
 
 export function saveHighlights() {
 	const url = window.location.href;
-	const data = { highlights: getHighlights(), url };
+	
+	// Sort highlights based on their position in the DOM
+	highlights.sort((a, b) => {
+		const elA = getElementByXPath(a.xpath);
+		const elB = getElementByXPath(b.xpath);
+		if (elA && elB) {
+			return elA.compareDocumentPosition(elB) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1;
+		}
+		return 0;
+	});
+	
+	const data = { highlights, url };
 	browser.storage.local.set({ [url]: data });
 }
 
 export function applyHighlights() {
-	const container = document.createElement('div');
-	container.innerHTML = highlights.join('');
-	document.body.appendChild(container);
-	updateHighlightListeners();
+	removeExistingHighlights();
+	
+	highlights.forEach((highlight, index) => {
+		const container = getElementByXPath(highlight.xpath);
+		if (container) {
+			createHighlightOverlay(container, index, highlight.type === 'text' ? highlight.content : null);
+		}
+	});
+}
+
+function createHighlightOverlay(target: Element, index: number, textContent: string | null = null) {
+	const overlay = document.createElement('div');
+	overlay.className = 'obsidian-highlight-overlay';
+	overlay.dataset.highlightIndex = index.toString();
+	
+	const rect = target.getBoundingClientRect();
+	
+	overlay.style.position = 'absolute';
+	overlay.style.left = `${rect.left + window.scrollX}px`;
+	overlay.style.top = `${rect.top + window.scrollY}px`;
+	overlay.style.width = `${rect.width}px`;
+	overlay.style.height = `${rect.height}px`;
+	
+	if (textContent) {
+		overlay.setAttribute('title', textContent);
+	}
+	
+	document.body.appendChild(overlay);
+}
+
+function removeExistingHighlights() {
+	document.querySelectorAll('.obsidian-highlight-overlay').forEach(el => el.remove());
 }
 
 export function clearHighlights() {
 	const url = window.location.href;
 	browser.storage.local.remove(url).then(() => {
 		highlights = [];
-		document.querySelectorAll('.obsidian-highlight').forEach(el => {
-			el.outerHTML = el.innerHTML;
-		});
+		removeExistingHighlights();
 		console.log('Highlights cleared for:', url);
 	});
 }
 
-function showRemoveTooltip(event: Event) {
-	event.stopPropagation();
-	const highlight = event.currentTarget as HTMLElement;
-
-	document.querySelectorAll('.obsidian-highlight-tooltip').forEach(el => el.remove());
-
-	const tooltip = document.createElement('div');
-	tooltip.className = 'obsidian-highlight-tooltip';
-	tooltip.textContent = 'Remove highlight';
-	tooltip.addEventListener('click', () => removeHighlight(highlight));
-
-	const rect = highlight.getBoundingClientRect();
-	tooltip.style.top = `${rect.bottom + window.scrollY}px`;
-	tooltip.style.left = `${rect.left + window.scrollX}px`;
-
-	document.body.appendChild(tooltip);
-	document.addEventListener('click', closeTooltip);
+function removeHighlightByEvent(event: Event) {
+	const overlay = event.currentTarget as HTMLElement;
+	removeHighlightByElement(overlay);
 }
 
-function closeTooltip() {
-	document.querySelectorAll('.obsidian-highlight-tooltip').forEach(el => el.remove());
-	document.removeEventListener('click', closeTooltip);
-}
-
-function removeHighlight(highlight: HTMLElement) {
-	highlight.outerHTML = highlight.innerHTML;
-	highlights = highlights.filter(h => !h.includes(highlight.dataset.highlightId!));
-	saveHighlights();
-	closeTooltip();
+function removeHighlightByElement(overlay: Element) {
+	const index = parseInt(overlay.getAttribute('data-highlight-index') || '-1', 10);
+	if (index >= 0) {
+		highlights.splice(index, 1);
+		applyHighlights();
+		saveHighlights();
+	}
 }
 
 export function getHighlights(): string[] {
-	return highlights;
+	return highlights.map(h => h.content);
 }
 
-const debouncedHandleHighlight = debounce(handleHighlight, 100);
+const debouncedApplyHighlights = debounce(applyHighlights, 100);
+
+// Reapply highlights on window resize and scroll
+window.addEventListener('resize', debouncedApplyHighlights);
+window.addEventListener('scroll', debouncedApplyHighlights);

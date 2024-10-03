@@ -23,3 +23,11 @@
 .obsidian-highlight-tooltip:hover {
 	background-color: #444;
 }
+
+.obsidian-highlight-overlay {
+	position: absolute;
+	background-color: rgba(255, 255, 0, 0.3);
+	pointer-events: auto;
+	z-index: 9999;
+	cursor: pointer;
+}

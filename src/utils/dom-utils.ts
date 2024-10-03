@@ -17,3 +17,27 @@ export function createOption(value: string, text: string): HTMLOptionElement {
 	option.textContent = text;
 	return option;
 }
+
+export function getElementXPath(element: Node): string {
+	if (element.nodeType === Node.DOCUMENT_NODE) return '';
+	if (element.nodeType !== Node.ELEMENT_NODE) {
+		return getElementXPath(element.parentNode!);
+	}
+
+	let ix = 0;
+	const siblings = element.parentNode?.childNodes || [];
+	for (let i = 0; i < siblings.length; i++) {
+		const sibling = siblings[i];
+		if (sibling === element) {
+			return getElementXPath(element.parentNode!) + '/' + (element as Element).tagName.toLowerCase() + '[' + (ix + 1) + ']';
+		}
+		if (sibling.nodeType === Node.ELEMENT_NODE && (sibling as Element).tagName === (element as Element).tagName) {
+			ix++;
+		}
+	}
+	return '';
+}
+
+export function getElementByXPath(xpath: string): Element | null {
+	return document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue as Element | null;
+}
