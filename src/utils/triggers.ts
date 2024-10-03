@@ -134,7 +134,7 @@ const memoizedFindMatchingTemplate = memoizeWithExpiration(
 		return undefined;
 	},
 	{
-		expirationMs: 60000, // Cache for 1 minute
+		expirationMs: 30000, // Cache for 30 seconds
 		keyFn: (url: string) => url // Use the full URL as the cache key
 	}
 );

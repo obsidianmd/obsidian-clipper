@@ -65,6 +65,7 @@ const memoizedExtractPageContent = memoizeWithExpiration(
 	}
 );
 
+// Width is used to update the note name field height
 let previousWidth = window.innerWidth;
 
 function setPopupDimensions() {
@@ -100,12 +101,13 @@ async function initializeExtension(tabId: number) {
 		// First, add the browser class to allow browser-specific styles to apply
 		await addBrowserClassToHtml();
 		
-		// Set an initial large height to allow the browser to determine the maximum
+		// Set an initial large height to allow the browser to determine the maximum height
+		// This is necessary for browsers that allow scaling the popup via page zoom
 		document.documentElement.style.setProperty('--popup-height', '2000px');
 		
 		// Use setTimeout to ensure the DOM has updated before we measure
 		setTimeout(() => {
-			setPopupDimensions(); // Call the non-debounced version initially
+			setPopupDimensions();
 		}, 0);
 
 		loadedSettings = await loadSettings();
@@ -137,6 +139,7 @@ async function initializeExtension(tabId: number) {
 			lastSelectedVault = loadedSettings.vaults[0];
 		}
 		debugLog('Vaults', 'Last selected vault:', lastSelectedVault);
+		updateVaultDropdown(loadedSettings.vaults);
 
 		const tab = await browser.tabs.get(tabId);
 		if (!tab.url || isBlankPage(tab.url)) {
@@ -223,12 +226,12 @@ function setupMessageListeners() {
 }
 
 document.addEventListener('DOMContentLoaded', async function() {
-	initializeIcons();
 	const refreshButton = document.getElementById('refresh-pane');
 	if (refreshButton) {
 		refreshButton.addEventListener('click', (e) => {
 			e.preventDefault();
 			refreshPopup();
+			initializeIcons(refreshButton);
 		});
 	}
 	const settingsButton = document.getElementById('open-settings');
@@ -241,6 +244,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 				setTimeout(() => window.close(), 50);
 			}
 		});
+		initializeIcons(settingsButton);
 	}
 
 	const tabs = await browser.tabs.query({active: true, currentWindow: true});
@@ -588,7 +592,15 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 		return;
 	}
 
-	initializeIcons();
+	// Handle vault selection
+	const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement;
+	if (vaultDropdown) {
+		if (template.vault) {
+			vaultDropdown.value = template.vault;
+		} else if (lastSelectedVault) {
+			vaultDropdown.value = lastSelectedVault;
+		}
+	}
 
 	currentVariables = variables;
 	const existingTemplateProperties = document.querySelector('.metadata-properties') as HTMLElement;
@@ -602,16 +614,6 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 	if (!Array.isArray(template.properties)) {
 		logError('Template properties are not an array');
 		return;
-	}
-
-	// Handle vault selection
-	const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement;
-	if (vaultDropdown) {
-		if (template.vault) {
-			vaultDropdown.value = template.vault;
-		} else if (lastSelectedVault) {
-			vaultDropdown.value = lastSelectedVault;
-		}
 	}
 
 	for (const property of template.properties) {
