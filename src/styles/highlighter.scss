@@ -59,3 +59,8 @@
 	pointer-events: auto;
 	cursor: pointer;
 }
+
+// Make this only apply in highlighter mode
+*::selection {
+	background-color: rgba(255, 235, 0, 0.3) !important;
+}
