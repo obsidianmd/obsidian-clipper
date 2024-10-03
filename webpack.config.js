@@ -4,6 +4,7 @@ const CopyPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const ZipPlugin = require('zip-webpack-plugin');
 const package = require('./package.json');
+const webpack = require('webpack');
 
 // Remove .DS_Store files
 function removeDSStore(dir) {
@@ -23,22 +24,23 @@ module.exports = (env, argv) => {
 	const isSafari = env.BROWSER === 'safari';
 	const outputDir = isFirefox ? 'dist_firefox' : (isSafari ? 'dist_safari' : 'dist');
 	const browserName = isFirefox ? 'firefox' : (isSafari ? 'safari' : 'chrome');
+	const isProduction = argv.mode === 'production';
 
 	return {
-		mode: 'production',
+		mode: argv.mode,
 		entry: {
 			popup: './src/core/popup.ts',
 			settings: './src/core/settings.ts',
 			content: './src/content.ts',
 			background: './src/background.ts',
-			styles: './src/style.scss',
+				styles: './src/style.scss',
 		},
 		output: {
 			path: path.resolve(__dirname, outputDir),
 			filename: '[name].js',
 			module: true,
 		},
-		devtool: 'source-map',
+		devtool: isProduction ? false : 'source-map',
 		experiments: {
 			outputModule: true,
 		},
@@ -59,13 +61,13 @@ module.exports = (env, argv) => {
 						{
 							loader: 'css-loader',
 							options: {
-								sourceMap: true
+								sourceMap: !isProduction
 							}
 						},
 						{
 							loader: 'sass-loader',
 							options: {
-								sourceMap: true
+								sourceMap: !isProduction
 							}
 						}
 					]
@@ -96,10 +98,14 @@ module.exports = (env, argv) => {
 						removeDSStore(path.resolve(__dirname, outputDir));
 					});
 				}
-				},
+			},
 			new ZipPlugin({
 				path: path.resolve(__dirname, 'builds'),
 				filename: `obsidian-web-clipper-${package.version}-${browserName}.zip`,
+			}),
+			new webpack.DefinePlugin({
+				'process.env.NODE_ENV': JSON.stringify(argv.mode),
+				'DEBUG_MODE': JSON.stringify(!isProduction)
 			})
 		]
 	};

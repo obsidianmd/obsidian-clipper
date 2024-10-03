@@ -1,25 +1,21 @@
 import browser from './browser-polyfill';
 
-/*
-Debug modes:
-- ContentExtractor
-- Filters
-- Map
-- Markdown
-- Template
-*/
+declare const DEBUG_MODE: boolean;
 
-let debugMode: boolean = false;
+let debugMode: boolean = DEBUG_MODE;
 
-// Initialize debug mode from storage
-browser.storage.local.get('debugMode').then((result: { debugMode?: boolean }) => {
-	debugMode = result.debugMode ?? false;
-	console.log(`Debug mode initialized to: ${debugMode ? 'ON' : 'OFF'}`);
-}).catch((error) => {
-	console.error('Error initializing debug mode:', error);
-});
+// Initialize debug mode from storage only in debug mode
+if (DEBUG_MODE) {
+	browser.storage.local.get('debugMode').then((result: { debugMode?: boolean }) => {
+		debugMode = result.debugMode ?? false;
+		console.log(`Debug mode initialized to: ${debugMode ? 'ON' : 'OFF'}`);
+	}).catch((error) => {
+		console.error('Error initializing debug mode:', error);
+	});
+}
 
 export const toggleDebug = (filterName: string) => {
+	if (!DEBUG_MODE) return;
 	debugMode = !debugMode;
 	// Save the new state to storage
 	browser.storage.local.set({ debugMode }).then(() => {
@@ -31,13 +27,15 @@ export const toggleDebug = (filterName: string) => {
 
 // Helper function for debug logging
 export const debugLog = (filterName: string, ...args: any[]) => {
-	if (debugMode) {
+	if (DEBUG_MODE && debugMode) {
 		console.log(`[${filterName}]`, ...args);
 	}
 };
 
 // Function to check if debug mode is on
-export const isDebugMode = () => debugMode;
+export const isDebugMode = () => DEBUG_MODE && debugMode;
 
-// Expose toggleDebug to the global scope
-(window as any).toggleDebug = toggleDebug;
+// Expose toggleDebug to the global scope only in debug mode
+if (DEBUG_MODE) {
+	(window as any).toggleDebug = toggleDebug;
+}

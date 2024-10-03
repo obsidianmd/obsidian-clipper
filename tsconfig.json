@@ -18,7 +18,7 @@
 		"sourceMap": true,
 		"typeRoots": ["./node_modules/@types", "./src/types"],
 		"moduleResolution": "node",
-		"types": ["chrome", "webextension-polyfill", "node"],
+		"types": ["chrome", "webextension-polyfill", "node", "webpack-env"],
 		"lib": ["es2017", "dom"]
 	},
 	"include": [
