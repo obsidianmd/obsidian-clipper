@@ -27,13 +27,17 @@
 .obsidian-highlight-overlay {
 	position: absolute;
 	background-color: rgba(255, 235, 0, 0.3);
+	border-radius: 4px;
 	mix-blend-mode: multiply;
-	pointer-events: none;
+	pointer-events: auto; // Change this from 'none' to 'auto'
 	z-index: 9999;
+	cursor: pointer; // Add this to indicate it's clickable
 }
 
 .obsidian-highlight-overlay[data-rect-index] {
-	background-color: rgba(255, 165, 0, 0.3);
+	background-color: rgba(255, 235, 0, 0.3);
+	box-shadow: 0 0 0 2px rgb(255 235 0 / 70%);
+	border-radius: 4px;
 }
 
 .obsidian-highlight-hover-overlay {

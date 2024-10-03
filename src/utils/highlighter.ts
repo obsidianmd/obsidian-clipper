@@ -335,13 +335,21 @@ function createOverlayElement(rect: DOMRect, index: number, rectIndex: number, c
 	
 	overlay.setAttribute('title', content);
 	
+	overlay.addEventListener('click', handleHighlightClick);
+	
 	document.body.appendChild(overlay);
+}
+
+function handleHighlightClick(event: MouseEvent) {
+	event.stopPropagation();
+	const overlay = event.currentTarget as HTMLElement;
+	removeHighlightByElement(overlay);
 }
 
 function removeHighlightByElement(overlay: Element) {
 	const index = overlay.getAttribute('data-highlight-index');
 	if (index !== null) {
-		highlights = highlights.filter((h, i) => i.toString() !== index);
+		highlights = highlights.filter((_, i) => i.toString() !== index);
 		document.querySelectorAll(`.obsidian-highlight-overlay[data-highlight-index="${index}"]`).forEach(el => el.remove());
 		applyHighlights();
 		saveHighlights();
