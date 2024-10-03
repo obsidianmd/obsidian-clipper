@@ -102,7 +102,32 @@ function handleTextSelection(selection: Selection) {
 }
 
 function addHighlight(highlight: HighlightData) {
-	highlights.push(highlight);
+	// Remove any existing text highlights that are contained within this new highlight
+	if (highlight.type === 'element') {
+		highlights = highlights.filter(h => {
+			if (h.type === 'text') {
+				const newElement = getElementByXPath(highlight.xpath);
+				const existingElement = getElementByXPath(h.xpath);
+				return !(newElement && existingElement && newElement.contains(existingElement));
+			}
+			return true;
+		});
+	}
+
+	// Check if this highlight is contained within an existing element highlight
+	const isContainedInElement = highlights.some(h => {
+		if (h.type === 'element') {
+			const existingElement = getElementByXPath(h.xpath);
+			const newElement = getElementByXPath(highlight.xpath);
+			return existingElement && newElement && existingElement.contains(newElement);
+		}
+		return false;
+	});
+
+	if (!isContainedInElement) {
+		highlights.push(highlight);
+	}
+
 	applyHighlights();
 	saveHighlights();
 }
