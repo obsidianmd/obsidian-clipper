@@ -346,17 +346,23 @@ export function applyHighlights() {
 }
 
 function createHighlightOverlay(target: Element, index: number, highlight: AnyHighlightData) {
+	const container = document.createElement('div');
+	container.className = 'obsidian-highlight-container';
+	container.dataset.highlightIndex = index.toString();
+	container.addEventListener('click', handleHighlightClick);
+	
 	if (highlight.type === 'text') {
-		createTextHighlightOverlay(target, index, highlight);
+		createTextHighlightOverlay(target, container, highlight);
 	} else if (highlight.type === 'element') {
-		createElementHighlightOverlay(target, index, highlight);
+		createElementHighlightOverlay(target, container, highlight);
 	} else {
-		// Handle complex highlights
-		createComplexHighlightOverlay(target, index, highlight);
+		createComplexHighlightOverlay(target, container, highlight);
 	}
+	
+	document.body.appendChild(container);
 }
 
-function createTextHighlightOverlay(target: Element, index: number, highlight: TextHighlightData) {
+function createTextHighlightOverlay(target: Element, container: HTMLElement, highlight: TextHighlightData) {
 	const range = document.createRange();
 	const startNode = findTextNodeAtOffset(target, highlight.startOffset);
 	const endNode = findTextNodeAtOffset(target, highlight.endOffset);
@@ -368,7 +374,7 @@ function createTextHighlightOverlay(target: Element, index: number, highlight: T
 		const rects = range.getClientRects();
 		for (let i = 0; i < rects.length; i++) {
 			const rect = rects[i];
-			createOverlayElement(rect, index, i, highlight.content);
+			createOverlayElement(rect, container, highlight.content);
 		}
 	}
 }
@@ -390,21 +396,19 @@ function findTextNodeAtOffset(element: Element, offset: number): { node: Node, o
 	return null;
 }
 
-function createElementHighlightOverlay(target: Element, index: number, highlight: ElementHighlightData) {
+function createElementHighlightOverlay(target: Element, container: HTMLElement, highlight: ElementHighlightData) {
 	const rect = target.getBoundingClientRect();
-	createOverlayElement(rect, index, 0, highlight.content);
+	createOverlayElement(rect, container, highlight.content);
 }
 
-function createComplexHighlightOverlay(target: Element, index: number, highlight: ComplexHighlightData) {
+function createComplexHighlightOverlay(target: Element, container: HTMLElement, highlight: ComplexHighlightData) {
 	const rect = target.getBoundingClientRect();
-	createOverlayElement(rect, index, 0, highlight.content);
+	createOverlayElement(rect, container, highlight.content);
 }
 
-function createOverlayElement(rect: DOMRect, index: number, rectIndex: number, content: string) {
+function createOverlayElement(rect: DOMRect, container: HTMLElement, content: string) {
 	const overlay = document.createElement('div');
 	overlay.className = 'obsidian-highlight-overlay';
-	overlay.dataset.highlightIndex = index.toString();
-	overlay.dataset.rectIndex = rectIndex.toString();
 	
 	overlay.style.position = 'absolute';
 	overlay.style.left = `${rect.left + window.scrollX}px`;
@@ -414,22 +418,20 @@ function createOverlayElement(rect: DOMRect, index: number, rectIndex: number, c
 	
 	overlay.setAttribute('title', content);
 	
-	overlay.addEventListener('click', handleHighlightClick);
-	
-	document.body.appendChild(overlay);
+	container.appendChild(overlay);
 }
 
 function handleHighlightClick(event: MouseEvent) {
 	event.stopPropagation();
-	const overlay = event.currentTarget as HTMLElement;
-	removeHighlightByElement(overlay);
+	const container = event.currentTarget as HTMLElement;
+	removeHighlightByElement(container);
 }
 
-function removeHighlightByElement(overlay: Element) {
-	const index = overlay.getAttribute('data-highlight-index');
+function removeHighlightByElement(container: Element) {
+	const index = container.getAttribute('data-highlight-index');
 	if (index !== null) {
 		highlights = highlights.filter((_, i) => i.toString() !== index);
-		document.querySelectorAll(`.obsidian-highlight-overlay[data-highlight-index="${index}"]`).forEach(el => el.remove());
+		container.remove();
 		applyHighlights();
 		saveHighlights();
 	}
@@ -521,5 +523,5 @@ function removeHighlightByEvent(event: Event) {
 }
 
 export function removeExistingHighlights() {
-	document.querySelectorAll('.obsidian-highlight-overlay').forEach(el => el.remove());
+	document.querySelectorAll('.obsidian-highlight-container').forEach(el => el.remove());
 }

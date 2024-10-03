@@ -30,7 +30,7 @@
 	box-shadow: 0 0 0 2px rgb(255 235 0 / 35%);
 	border-radius: 4px;
 	mix-blend-mode: multiply;
-	pointer-events: auto; // Change this from 'none' to 'auto'
+	pointer-events: auto;
 	z-index: 9999;
 	cursor: pointer; // Add this to indicate it's clickable
 }
@@ -49,4 +49,13 @@
 	box-shadow: 0 0 0 2px rgb(255 235 0 / 70%);
 	pointer-events: none;
 	z-index: 9998;
+}
+
+.obsidian-highlight-container {
+	top: 0;
+	position: absolute;
+	mix-blend-mode: multiply;
+	z-index: 9999;
+	pointer-events: auto;
+	cursor: pointer;
 }
