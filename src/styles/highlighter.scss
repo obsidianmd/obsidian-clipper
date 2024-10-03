@@ -26,7 +26,8 @@
 
 .obsidian-highlight-overlay {
 	position: absolute;
-	background-color: rgba(255, 235, 0, 0.3);
+	background-color: rgba(255, 235, 0, 0.35);
+	box-shadow: 0 0 0 2px rgb(255 235 0 / 35%);
 	border-radius: 4px;
 	mix-blend-mode: multiply;
 	pointer-events: auto; // Change this from 'none' to 'auto'
@@ -35,14 +36,16 @@
 }
 
 .obsidian-highlight-overlay[data-rect-index] {
-	background-color: rgba(255, 235, 0, 0.3);
+	background-color: rgba(255, 235, 0, 0.35);
+	mix-blend-mode: multiply;
 	border-radius: 4px;
 }
 
 .obsidian-highlight-hover-overlay {
 	position: absolute;
 	border-radius: 4px;
-	background-color: rgba(255, 235, 0, 0.025);
+	background-color: rgba(255, 235, 0, 0.0);
+	mix-blend-mode: multiply;
 	box-shadow: 0 0 0 2px rgb(255 235 0 / 70%);
 	pointer-events: none;
 	z-index: 9998;

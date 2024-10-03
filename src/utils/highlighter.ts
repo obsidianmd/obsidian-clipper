@@ -93,31 +93,63 @@ function handleTextSelection(selection: Selection) {
 
 function getHighlightRanges(range: Range): TextHighlightData[] {
 	const highlights: TextHighlightData[] = [];
-	const treeWalker = document.createTreeWalker(range.commonAncestorContainer, NodeFilter.SHOW_TEXT);
-	
-	let node: Node | null = treeWalker.currentNode;
-	while (node) {
-		if (range.intersectsNode(node)) {
-			const nodeRange = document.createRange();
-			nodeRange.selectNodeContents(node);
-			
-			const intersectionRange = getIntersectionRange(nodeRange, range);
-			if (intersectionRange) {
-				const parentElement = getHighlightableParent(node);
-				highlights.push({
-					xpath: getElementXPath(parentElement),
-					content: intersectionRange.toString(),
-					type: 'text',
-					id: Date.now().toString(),
-					startOffset: getTextOffset(parentElement, intersectionRange.startContainer, intersectionRange.startOffset),
-					endOffset: getTextOffset(parentElement, intersectionRange.endContainer, intersectionRange.endOffset)
-				});
-			}
-		}
-		node = treeWalker.nextNode();
-	}
-	
+	const fragment = range.cloneContents();
+	const tempDiv = document.createElement('div');
+	tempDiv.appendChild(fragment);
+
+	const parentElement = getHighlightableParent(range.commonAncestorContainer);
+	const xpath = getElementXPath(parentElement);
+
+	highlights.push({
+		xpath,
+		content: sanitizeAndPreserveFormatting(tempDiv.innerHTML),
+		type: 'text',
+		id: Date.now().toString(),
+		startOffset: getTextOffset(parentElement, range.startContainer, range.startOffset),
+		endOffset: getTextOffset(parentElement, range.endContainer, range.endOffset)
+	});
+
 	return highlights;
+}
+
+function sanitizeAndPreserveFormatting(html: string): string {
+	const tempDiv = document.createElement('div');
+	tempDiv.innerHTML = html;
+
+	// Remove any script tags
+	tempDiv.querySelectorAll('script').forEach(el => el.remove());
+
+	// Close any unclosed tags
+	return balanceTags(tempDiv.innerHTML);
+}
+
+function balanceTags(html: string): string {
+	const openingTags: string[] = [];
+	const regex = /<\/?([a-z]+)[^>]*>/gi;
+	let match;
+
+	while ((match = regex.exec(html)) !== null) {
+		if (match[0].startsWith('</')) {
+			// Closing tag
+			const lastOpenTag = openingTags.pop();
+			if (lastOpenTag !== match[1].toLowerCase()) {
+				// Mismatched tag, add it back
+				if (lastOpenTag) openingTags.push(lastOpenTag);
+			}
+		} else {
+			// Opening tag
+			openingTags.push(match[1].toLowerCase());
+		}
+	}
+
+	// Close any remaining open tags
+	let balancedHtml = html;
+	while (openingTags.length > 0) {
+		const tag = openingTags.pop();
+		balancedHtml += `</${tag}>`;
+	}
+
+	return balancedHtml;
 }
 
 function getHighlightableParent(node: Node): Element {
