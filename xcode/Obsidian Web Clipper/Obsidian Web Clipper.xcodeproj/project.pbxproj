@@ -126,21 +126,16 @@
 		7AEF05CA2CA0F50D005FFBC2 /* settings.js.LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = settings.js.LICENSE.txt; path = ../../../dist_safari/settings.js.LICENSE.txt; sourceTree = "<group>"; };
 		7AEF05CB2CA0F50D005FFBC2 /* background.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = background.js; path = ../../../dist_safari/background.js; sourceTree = "<group>"; };
 		7AEF05CC2CA0F50D005FFBC2 /* popup.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = popup.js; path = ../../../dist_safari/popup.js; sourceTree = "<group>"; };
-		7AEF05CD2CA0F50D005FFBC2 /* popup.js.map */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.module-map"; name = popup.js.map; path = ../../../dist_safari/popup.js.map; sourceTree = "<group>"; };
 		7AEF05CE2CA0F50D005FFBC2 /* popup.js.LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = popup.js.LICENSE.txt; path = ../../../dist_safari/popup.js.LICENSE.txt; sourceTree = "<group>"; };
 		7AEF05CF2CA0F50D005FFBC2 /* popup.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = popup.html; path = ../../../dist_safari/popup.html; sourceTree = "<group>"; };
 		7AEF05D02CA0F50D005FFBC2 /* browser-polyfill.min.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = "browser-polyfill.min.js"; path = "../../../dist_safari/browser-polyfill.min.js"; sourceTree = "<group>"; };
-		7AEF05D12CA0F50D005FFBC2 /* style.css.map */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.module-map"; name = style.css.map; path = ../../../dist_safari/style.css.map; sourceTree = "<group>"; };
-		7AEF05D22CA0F50D005FFBC2 /* content.js.map */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.module-map"; name = content.js.map; path = ../../../dist_safari/content.js.map; sourceTree = "<group>"; };
 		7AEF05D32CA0F50D005FFBC2 /* icons */ = {isa = PBXFileReference; lastKnownFileType = folder; name = icons; path = ../../../dist_safari/icons; sourceTree = "<group>"; };
 		7AEF05D42CA0F50D005FFBC2 /* style.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; name = style.css; path = ../../../dist_safari/style.css; sourceTree = "<group>"; };
 		7AEF05D52CA0F50D005FFBC2 /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = manifest.json; path = ../../../dist_safari/manifest.json; sourceTree = "<group>"; };
 		7AEF05D62CA0F50D005FFBC2 /* content.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = content.js; path = ../../../dist_safari/content.js; sourceTree = "<group>"; };
-		7AEF05D72CA0F50D005FFBC2 /* settings.js.map */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.module-map"; name = settings.js.map; path = ../../../dist_safari/settings.js.map; sourceTree = "<group>"; };
 		7AEF05D82CA0F50D005FFBC2 /* settings.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = settings.html; path = ../../../dist_safari/settings.html; sourceTree = "<group>"; };
 		7AEF05D92CA0F50D005FFBC2 /* styles.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = styles.js; path = ../../../dist_safari/styles.js; sourceTree = "<group>"; };
 		7AEF05DA2CA0F50D005FFBC2 /* settings.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = settings.js; path = ../../../dist_safari/settings.js; sourceTree = "<group>"; };
-		7AEF05DB2CA0F50D005FFBC2 /* background.js.map */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.module-map"; name = background.js.map; path = ../../../dist_safari/background.js.map; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -275,21 +270,16 @@
 				7AEF05CA2CA0F50D005FFBC2 /* settings.js.LICENSE.txt */,
 				7AEF05CB2CA0F50D005FFBC2 /* background.js */,
 				7AEF05CC2CA0F50D005FFBC2 /* popup.js */,
-				7AEF05CD2CA0F50D005FFBC2 /* popup.js.map */,
 				7AEF05CE2CA0F50D005FFBC2 /* popup.js.LICENSE.txt */,
 				7AEF05CF2CA0F50D005FFBC2 /* popup.html */,
 				7AEF05D02CA0F50D005FFBC2 /* browser-polyfill.min.js */,
-				7AEF05D12CA0F50D005FFBC2 /* style.css.map */,
-				7AEF05D22CA0F50D005FFBC2 /* content.js.map */,
 				7AEF05D32CA0F50D005FFBC2 /* icons */,
 				7AEF05D42CA0F50D005FFBC2 /* style.css */,
 				7AEF05D52CA0F50D005FFBC2 /* manifest.json */,
 				7AEF05D62CA0F50D005FFBC2 /* content.js */,
-				7AEF05D72CA0F50D005FFBC2 /* settings.js.map */,
 				7AEF05D82CA0F50D005FFBC2 /* settings.html */,
 				7AEF05D92CA0F50D005FFBC2 /* styles.js */,
 				7AEF05DA2CA0F50D005FFBC2 /* settings.js */,
-				7AEF05DB2CA0F50D005FFBC2 /* background.js.map */,
 			);
 			name = Resources;
 			path = "Shared (Extension)";
