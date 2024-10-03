@@ -3,7 +3,12 @@
 # NPM
 node_modules/
 
-# Build
+# Dev
+dev/
+dev_firefox/
+dev_safari/
+
+# Prod
 dist/
 dist_firefox/
 dist_safari/

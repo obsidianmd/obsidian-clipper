@@ -22,9 +22,18 @@ function removeDSStore(dir) {
 module.exports = (env, argv) => {
 	const isFirefox = env.BROWSER === 'firefox';
 	const isSafari = env.BROWSER === 'safari';
-	const outputDir = isFirefox ? 'dist_firefox' : (isSafari ? 'dist_safari' : 'dist');
-	const browserName = isFirefox ? 'firefox' : (isSafari ? 'safari' : 'chrome');
 	const isProduction = argv.mode === 'production';
+
+	const getOutputDir = () => {
+		if (isProduction) {
+			return isFirefox ? 'dist_firefox' : (isSafari ? 'dist_safari' : 'dist');
+		} else {
+			return isFirefox ? 'dev_firefox' : (isSafari ? 'dev_safari' : 'dev');
+		}
+	};
+
+	const outputDir = getOutputDir();
+	const browserName = isFirefox ? 'firefox' : (isSafari ? 'safari' : 'chrome');
 
 	return {
 		mode: argv.mode,
@@ -33,7 +42,7 @@ module.exports = (env, argv) => {
 			settings: './src/core/settings.ts',
 			content: './src/content.ts',
 			background: './src/background.ts',
-				styles: './src/style.scss',
+			styles: './src/style.scss',
 		},
 		output: {
 			path: path.resolve(__dirname, outputDir),
@@ -99,14 +108,16 @@ module.exports = (env, argv) => {
 					});
 				}
 			},
-			new ZipPlugin({
-				path: path.resolve(__dirname, 'builds'),
-				filename: `obsidian-web-clipper-${package.version}-${browserName}.zip`,
-			}),
 			new webpack.DefinePlugin({
 				'process.env.NODE_ENV': JSON.stringify(argv.mode),
 				'DEBUG_MODE': JSON.stringify(!isProduction)
-			})
+			}),
+			...(isProduction ? [
+				new ZipPlugin({
+					path: path.resolve(__dirname, 'builds'),
+					filename: `obsidian-web-clipper-${package.version}-${browserName}.zip`,
+				})
+			] : [])
 		]
 	};
 };
