@@ -11,6 +11,8 @@ interface HighlightData {
 	content: string;
 	type: 'text' | 'element';
 	id: string;
+	startOffset?: number;
+	endOffset?: number;
 }
 
 interface StoredData {
@@ -69,17 +71,32 @@ function highlightElement(element: Element) {
 
 function handleTextSelection(selection: Selection) {
 	const range = selection.getRangeAt(0);
-	const content = range.cloneContents();
-	const tempDiv = document.createElement('div');
-	tempDiv.appendChild(content);
+	const startContainer = range.startContainer;
+	const endContainer = range.endContainer;
 	
-	const xpath = getElementXPath(range.commonAncestorContainer);
-	addHighlight({ 
-		xpath, 
-		content: tempDiv.innerHTML, 
-		type: 'text', 
-		id: Date.now().toString() 
-	});
+	if (startContainer === endContainer && startContainer.nodeType === Node.TEXT_NODE) {
+		const xpath = getElementXPath(startContainer.parentNode!);
+		const content = range.toString();
+		addHighlight({ 
+			xpath, 
+			content, 
+			type: 'text', 
+			id: Date.now().toString(),
+			startOffset: range.startOffset,
+			endOffset: range.endOffset
+		});
+	} else {
+		// For more complex selections, fall back to highlighting the common ancestor
+		const commonAncestor = range.commonAncestorContainer;
+		const xpath = getElementXPath(commonAncestor);
+		const content = range.cloneContents().textContent || '';
+		addHighlight({ 
+			xpath, 
+			content, 
+			type: 'text', 
+			id: Date.now().toString() 
+		});
+	}
 	
 	selection.removeAllRanges();
 }
@@ -121,27 +138,38 @@ export function applyHighlights() {
 	highlights.forEach((highlight, index) => {
 		const container = getElementByXPath(highlight.xpath);
 		if (container) {
-			createHighlightOverlay(container, index, highlight.type === 'text' ? highlight.content : null);
+			createHighlightOverlay(container, index, highlight);
 		}
 	});
 }
 
-function createHighlightOverlay(target: Element, index: number, textContent: string | null = null) {
+function createHighlightOverlay(target: Element, index: number, highlight: HighlightData) {
 	const overlay = document.createElement('div');
 	overlay.className = 'obsidian-highlight-overlay';
 	overlay.dataset.highlightIndex = index.toString();
 	
-	const rect = target.getBoundingClientRect();
-	
-	overlay.style.position = 'absolute';
-	overlay.style.left = `${rect.left + window.scrollX}px`;
-	overlay.style.top = `${rect.top + window.scrollY}px`;
-	overlay.style.width = `${rect.width}px`;
-	overlay.style.height = `${rect.height}px`;
-	
-	if (textContent) {
-		overlay.setAttribute('title', textContent);
+	if (highlight.type === 'text' && highlight.startOffset !== undefined && highlight.endOffset !== undefined) {
+		const range = document.createRange();
+		range.setStart(target.firstChild!, highlight.startOffset);
+		range.setEnd(target.firstChild!, highlight.endOffset);
+		const rect = range.getBoundingClientRect();
+		
+		overlay.style.position = 'absolute';
+		overlay.style.left = `${rect.left + window.scrollX}px`;
+		overlay.style.top = `${rect.top + window.scrollY}px`;
+		overlay.style.width = `${rect.width}px`;
+		overlay.style.height = `${rect.height}px`;
+	} else {
+		const rect = target.getBoundingClientRect();
+		
+		overlay.style.position = 'absolute';
+		overlay.style.left = `${rect.left + window.scrollX}px`;
+		overlay.style.top = `${rect.top + window.scrollY}px`;
+		overlay.style.width = `${rect.width}px`;
+		overlay.style.height = `${rect.height}px`;
 	}
+	
+	overlay.setAttribute('title', highlight.content);
 	
 	document.body.appendChild(overlay);
 }
