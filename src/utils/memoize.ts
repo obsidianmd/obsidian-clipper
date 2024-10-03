@@ -1,7 +1,16 @@
-export function memoize<T extends (...args: any[]) => any>(fn: T): T {
+interface MemoizeOptions<T extends (...args: any[]) => any> {
+	resolver?: (...args: Parameters<T>) => string;
+	expirationMs?: number;
+	keyFn?: (...args: Parameters<T>) => string | Promise<string>;
+}
+
+export function memoize<T extends (...args: any[]) => any>(
+	fn: T,
+	options: MemoizeOptions<T> = {}
+): T {
 	const cache = new Map<string, ReturnType<T>>();
 	return ((...args: Parameters<T>): ReturnType<T> => {
-		const key = JSON.stringify(args);
+		const key = options.resolver ? options.resolver(...args) : JSON.stringify(args);
 		if (cache.has(key)) {
 			return cache.get(key)!;
 		}
@@ -11,14 +20,9 @@ export function memoize<T extends (...args: any[]) => any>(fn: T): T {
 	}) as T;
 }
 
-interface MemoizeOptions {
-	expirationMs: number;
-	keyFn?: (...args: any[]) => string | Promise<string>;
-}
-
 export function memoizeWithExpiration<T extends (...args: any[]) => any>(
 	fn: T,
-	options: MemoizeOptions
+	options: MemoizeOptions<T>
 ): T {
 	const cache = new Map<string, { value: ReturnType<T>; timestamp: number }>();
 	return (async (...args: Parameters<T>): Promise<ReturnType<T>> => {
@@ -26,7 +30,7 @@ export function memoizeWithExpiration<T extends (...args: any[]) => any>(
 		const now = Date.now();
 		if (cache.has(key)) {
 			const cached = cache.get(key)!;
-			if (now - cached.timestamp < options.expirationMs) {
+			if (now - cached.timestamp < (options.expirationMs || 0)) {
 				return cached.value;
 			}
 		}

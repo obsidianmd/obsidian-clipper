@@ -1,22 +1,33 @@
 import { Template } from '../types/types';
-import { memoize } from './memoize';
+import { memoize, memoizeWithExpiration } from './memoize';
 
-// Memoized version of the internal matchPattern function
-const memoizedInternalMatchPattern = memoize((pattern: string, url: string, schemaOrgData: any): boolean => {
-	if (pattern.startsWith('schema:')) {
-		return matchSchemaPattern(pattern, schemaOrgData);
-	} else if (pattern.startsWith('/') && pattern.endsWith('/')) {
-		try {
-			const regexPattern = new RegExp(pattern.slice(1, -1));
-			return regexPattern.test(url);
-		} catch (error) {
-			console.error(`Invalid regex pattern: ${pattern}`, error);
-			return false;
+// Modify the memoized function to handle regex patterns correctly
+const memoizedInternalMatchPattern = memoize(
+	(pattern: string, url: string, schemaOrgData: any): boolean => {
+		if (pattern.startsWith('schema:')) {
+			return matchSchemaPattern(pattern, schemaOrgData);
+		} else if (pattern.startsWith('/') && pattern.endsWith('/')) {
+			try {
+				const regexPattern = new RegExp(pattern.slice(1, -1));
+				const result = regexPattern.test(url);
+				return result;
+			} catch (error) {
+				console.error(`Invalid regex pattern: ${pattern}`, error);
+				return false;
+			}
+		} else {
+			return url.startsWith(pattern);
 		}
-	} else {
-		return url.startsWith(pattern);
+	},
+	{
+		resolver: (pattern: string, url: string) => {
+			if (pattern.startsWith('/') && pattern.endsWith('/')) {
+				return `${pattern}:${url}`;
+			}
+			return `${pattern}:${url.split('/').slice(0, 3).join('/')}`;
+		}
 	}
-});
+);
 
 interface TriggerMatch {
 	template: Template;
@@ -65,9 +76,6 @@ const urlTrie = new Trie();
 const regexTriggers: Array<{ template: Template; regex: RegExp; priority: number }> = [];
 const schemaTriggers: Array<{ template: Template; pattern: string; priority: number }> = [];
 
-let cachedUrl: string | null = null;
-let cachedResult: Template | undefined = undefined;
-
 let isInitialized = false;
 
 export function initializeTriggers(templates: Template[]): void {
@@ -93,39 +101,45 @@ export function initializeTriggers(templates: Template[]): void {
 	isInitialized = true;
 }
 
-export async function findMatchingTemplate(url: string, getSchemaOrgData: () => Promise<any>): Promise<Template | undefined> {
-	if (!isInitialized) {
-		console.warn('Triggers not initialized. Call initializeTriggers first.');
+const memoizedFindMatchingTemplate = memoizeWithExpiration(
+	async (url: string, getSchemaOrgData: () => Promise<any>): Promise<Template | undefined> => {
+		if (!isInitialized) {
+			console.warn('Triggers not initialized. Call initializeTriggers first.');
+			return undefined;
+		}
+
+		const schemaOrgData = await getSchemaOrgData();
+
+		// Check URL trie first
+		const urlMatch = urlTrie.findLongestMatch(url, schemaOrgData);
+		if (urlMatch) {
+			return urlMatch.template;
+		}
+
+		// Check schema triggers
+		for (const { template, pattern } of schemaTriggers) {
+			if (matchSchemaPattern(pattern, schemaOrgData)) {
+				console.log('Schema match found:', template);
+				return template;
+			}
+		}
+
+		// Then check regex triggers
+		for (const { template, regex } of regexTriggers) {
+			if (regex.test(url)) {
+				return template;
+			}
+		}
+
 		return undefined;
+	},
+	{
+		expirationMs: 60000, // Cache for 1 minute
+		keyFn: (url: string) => url // Use the full URL as the cache key
 	}
+);
 
-	const schemaOrgData = await getSchemaOrgData();
-
-	// Check URL trie first
-	const urlMatch = urlTrie.findLongestMatch(url, schemaOrgData);
-	if (urlMatch) {
-		console.log('URL match found:', urlMatch);
-		return urlMatch.template;
-	}
-
-	// Then check regex triggers
-	for (const { template, regex } of regexTriggers) {
-		if (memoizedInternalMatchPattern(regex.source, url, schemaOrgData)) {
-			console.log('Regex match found:', template);
-			return template;
-		}
-	}
-
-	// If no URL or regex match, check schema triggers
-	for (const { template, pattern } of schemaTriggers) {
-		if (memoizedInternalMatchPattern(pattern, url, schemaOrgData)) {
-			console.log('Schema match found:', template);
-			return template;
-		}
-	}
-
-	return undefined;
-}
+export const findMatchingTemplate = memoizedFindMatchingTemplate;
 
 export function matchPattern(pattern: string, url: string, schemaOrgData: any): boolean {
 	return memoizedInternalMatchPattern(pattern, url, schemaOrgData);

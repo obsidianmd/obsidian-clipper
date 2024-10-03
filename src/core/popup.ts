@@ -17,7 +17,7 @@ import { debugLog } from '../utils/debug';
 import { showVariables, initializeVariablesPanel, updateVariablesPanel } from '../managers/inspect-variables';
 import { ensureContentScriptLoaded } from '../utils/content-script-utils';
 import { isBlankPage, isValidUrl } from '../utils/active-tab-manager';
-import { memoize, memoizeWithExpiration } from '../utils/memoize';
+import { memoizeWithExpiration } from '../utils/memoize';
 import { debounce } from '../utils/debounce';
 
 let loadedSettings: Settings;
@@ -35,7 +35,11 @@ const memoizedReplaceVariables = memoizeWithExpiration(
 	async (tabId: number, template: string, variables: { [key: string]: string }, currentUrl: string) => {
 		return replaceVariables(tabId, template, variables, currentUrl);
 	},
-	{ expirationMs: 5000, keyFn: (tabId, template, variables, currentUrl) => `${tabId}-${template}-${currentUrl}` }
+	{
+		expirationMs: 5000,
+		keyFn: (tabId: number, template: string, variables: { [key: string]: string }, currentUrl: string) => 
+			`${tabId}-${template}-${currentUrl}`
+	}
 );
 
 // Memoize generateFrontmatter with a longer expiration
@@ -54,14 +58,13 @@ const memoizedExtractPageContent = memoizeWithExpiration(
 	},
 	{ 
 		expirationMs: 5000, 
-		keyFn: async (tabId) => {
+		keyFn: async (tabId: number) => {
 			const tab = await browser.tabs.get(tabId);
 			return `${tabId}-${tab.url}`;
 		}
 	}
 );
 
-// Add this variable to keep track of the previous width
 let previousWidth = window.innerWidth;
 
 function setPopupDimensions() {
