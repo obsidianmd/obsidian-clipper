@@ -161,35 +161,27 @@ function addHighlight(highlight: AnyHighlightData) {
 }
 
 function mergeOverlappingHighlights(existingHighlights: AnyHighlightData[], newHighlight: AnyHighlightData): AnyHighlightData[] {
-	let mergedHighlight: AnyHighlightData = newHighlight;
-	const unmergedHighlights: AnyHighlightData[] = [];
+	let mergedHighlights: AnyHighlightData[] = [];
+	let merged = false;
 
-	// First pass: find the largest container that encompasses the new highlight
 	for (const existing of existingHighlights) {
-		if (isContainedWithin(mergedHighlight, existing)) {
-			mergedHighlight = existing;
-		}
-	}
-
-	// Second pass: merge all highlights that overlap with or are contained within the merged highlight
-	for (const existing of existingHighlights) {
-		if (doHighlightsOverlap(existing, mergedHighlight) || isContainedWithin(existing, mergedHighlight)) {
-			mergedHighlight = mergeHighlights(mergedHighlight, existing);
+		if (doHighlightsOverlap(existing, newHighlight) || areHighlightsAdjacent(existing, newHighlight)) {
+			if (!merged) {
+				mergedHighlights.push(mergeHighlights(existing, newHighlight));
+				merged = true;
+			} else {
+				mergedHighlights[mergedHighlights.length - 1] = mergeHighlights(mergedHighlights[mergedHighlights.length - 1], existing);
+			}
 		} else {
-			unmergedHighlights.push(existing);
+			mergedHighlights.push(existing);
 		}
 	}
 
-	return [mergedHighlight];
-}
+	if (!merged) {
+		mergedHighlights.push(newHighlight);
+	}
 
-function isContainedWithin(inner: AnyHighlightData, outer: AnyHighlightData): boolean {
-	const innerElement = getElementByXPath(inner.xpath);
-	const outerElement = getElementByXPath(outer.xpath);
-
-	if (!innerElement || !outerElement) return false;
-
-	return outerElement.contains(innerElement);
+	return mergedHighlights;
 }
 
 function doHighlightsOverlap(highlight1: AnyHighlightData, highlight2: AnyHighlightData): boolean {
@@ -198,10 +190,27 @@ function doHighlightsOverlap(highlight1: AnyHighlightData, highlight2: AnyHighli
 
 	if (!element1 || !element2) return false;
 
-	return element1.contains(element2) || element2.contains(element1) || element1 === element2;
+	if (element1 === element2) {
+		// For text highlights in the same element, check for overlap
+		if (highlight1.type === 'text' && highlight2.type === 'text') {
+			return (highlight1.startOffset < highlight2.endOffset && highlight2.startOffset < highlight1.endOffset);
+		}
+		// For other types, consider them overlapping if they're in the same element
+		return true;
+	}
+
+	// Check if one element contains the other
+	return element1.contains(element2) || element2.contains(element1);
 }
 
-function mergeHighlights(highlight1: AnyHighlightData, highlight2: AnyHighlightData): ComplexHighlightData {
+function areHighlightsAdjacent(highlight1: AnyHighlightData, highlight2: AnyHighlightData): boolean {
+	if (highlight1.type === 'text' && highlight2.type === 'text' && highlight1.xpath === highlight2.xpath) {
+		return highlight1.endOffset === highlight2.startOffset || highlight2.endOffset === highlight1.startOffset;
+	}
+	return false;
+}
+
+function mergeHighlights(highlight1: AnyHighlightData, highlight2: AnyHighlightData): AnyHighlightData {
 	const element1 = getElementByXPath(highlight1.xpath);
 	const element2 = getElementByXPath(highlight2.xpath);
 
@@ -216,6 +225,18 @@ function mergeHighlights(highlight1: AnyHighlightData, highlight2: AnyHighlightD
 		mergedElement = element2;
 	} else {
 		mergedElement = findCommonAncestor(element1, element2);
+	}
+
+	if (highlight1.type === 'text' && highlight2.type === 'text' && highlight1.xpath === highlight2.xpath) {
+		return {
+			xpath: highlight1.xpath,
+			content: mergedElement.textContent?.slice(Math.min(highlight1.startOffset, highlight2.startOffset), 
+													  Math.max(highlight1.endOffset, highlight2.endOffset)) || '',
+			type: 'text',
+			id: Date.now().toString(),
+			startOffset: Math.min(highlight1.startOffset, highlight2.startOffset),
+			endOffset: Math.max(highlight1.endOffset, highlight2.endOffset)
+		};
 	}
 
 	return {
