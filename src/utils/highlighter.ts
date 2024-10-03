@@ -86,29 +86,8 @@ function highlightElement(element: Element) {
 
 function handleTextSelection(selection: Selection) {
 	const range = selection.getRangeAt(0);
-	const startContainer = range.startContainer;
-	const endContainer = range.endContainer;
-	
-	if (startContainer === endContainer && startContainer.nodeType === Node.TEXT_NODE) {
-		// Single node text selection
-		const xpath = getElementXPath(startContainer.parentNode as Element);
-		addHighlight({
-			xpath,
-			content: range.toString(),
-			type: 'text',
-			id: Date.now().toString(),
-			startOffset: range.startOffset,
-			endOffset: range.endOffset
-		});
-	} else {
-		// Multi-node text selection
-		const commonAncestor = range.commonAncestorContainer;
-		const xpath = getElementXPath(commonAncestor.nodeType === Node.ELEMENT_NODE ? commonAncestor as Element : commonAncestor.parentElement!);
-		
-		const highlightRanges = getHighlightRanges(range);
-		highlightRanges.forEach(hr => addHighlight(hr));
-	}
-	
+	const highlightRanges = getHighlightRanges(range);
+	highlightRanges.forEach(hr => addHighlight(hr));
 	selection.removeAllRanges();
 }
 
@@ -124,13 +103,14 @@ function getHighlightRanges(range: Range): TextHighlightData[] {
 			
 			const intersectionRange = getIntersectionRange(nodeRange, range);
 			if (intersectionRange) {
+				const parentElement = getHighlightableParent(node);
 				highlights.push({
-					xpath: getElementXPath(node.parentElement!),
+					xpath: getElementXPath(parentElement),
 					content: intersectionRange.toString(),
 					type: 'text',
 					id: Date.now().toString(),
-					startOffset: intersectionRange.startOffset,
-					endOffset: intersectionRange.endOffset
+					startOffset: getTextOffset(parentElement, intersectionRange.startContainer, intersectionRange.startOffset),
+					endOffset: getTextOffset(parentElement, intersectionRange.endContainer, intersectionRange.endOffset)
 				});
 			}
 		}
@@ -138,6 +118,30 @@ function getHighlightRanges(range: Range): TextHighlightData[] {
 	}
 	
 	return highlights;
+}
+
+function getHighlightableParent(node: Node): Element {
+	let current: Node | null = node;
+	while (current && current.nodeType !== Node.ELEMENT_NODE) {
+		current = current.parentNode;
+	}
+	return current as Element;
+}
+
+function getTextOffset(container: Element, targetNode: Node, targetOffset: number): number {
+	let offset = 0;
+	const treeWalker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
+	
+	let node: Node | null = treeWalker.currentNode;
+	while (node) {
+		if (node === targetNode) {
+			return offset + targetOffset;
+		}
+		offset += (node.textContent?.length || 0);
+		node = treeWalker.nextNode();
+	}
+	
+	return offset;
 }
 
 function getIntersectionRange(range1: Range, range2: Range): Range | null {
@@ -322,14 +326,36 @@ function createHighlightOverlay(target: Element, index: number, highlight: AnyHi
 
 function createTextHighlightOverlay(target: Element, index: number, highlight: TextHighlightData) {
 	const range = document.createRange();
-	range.setStart(target.firstChild!, highlight.startOffset);
-	range.setEnd(target.firstChild!, highlight.endOffset);
+	const startNode = findTextNodeAtOffset(target, highlight.startOffset);
+	const endNode = findTextNodeAtOffset(target, highlight.endOffset);
 	
-	const rects = range.getClientRects();
-	for (let i = 0; i < rects.length; i++) {
-		const rect = rects[i];
-		createOverlayElement(rect, index, i, highlight.content);
+	if (startNode && endNode) {
+		range.setStart(startNode.node, startNode.offset);
+		range.setEnd(endNode.node, endNode.offset);
+		
+		const rects = range.getClientRects();
+		for (let i = 0; i < rects.length; i++) {
+			const rect = rects[i];
+			createOverlayElement(rect, index, i, highlight.content);
+		}
 	}
+}
+
+function findTextNodeAtOffset(element: Element, offset: number): { node: Node, offset: number } | null {
+	let currentOffset = 0;
+	const treeWalker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+	
+	let node: Node | null = treeWalker.currentNode;
+	while (node) {
+		const nodeLength = node.textContent?.length || 0;
+		if (currentOffset + nodeLength >= offset) {
+			return { node, offset: offset - currentOffset };
+		}
+		currentOffset += nodeLength;
+		node = treeWalker.nextNode();
+	}
+	
+	return null;
 }
 
 function createElementHighlightOverlay(target: Element, index: number, highlight: ElementHighlightData) {
