@@ -4,6 +4,7 @@ import { detectBrowser } from './utils/browser-detection';
 import { updateCurrentActiveTab } from './utils/active-tab-manager';
 
 let sidePanelOpenWindows: Set<number> = new Set();
+let isHighlighterMode = false;
 
 browser.action.onClicked.addListener((tab) => {
 	if (tab.id) {
@@ -41,7 +42,7 @@ browser.runtime.onMessage.addListener((request: any, sender, sendResponse) => {
 	return true;
 });
 
-browser.commands.onCommand.addListener((command) => {
+browser.commands.onCommand.addListener((command, tab) => {
 	if (command === 'quick_clip') {
 		browser.tabs.query({active: true, currentWindow: true}).then((tabs) => {
 			if (tabs[0]?.id) {
@@ -53,6 +54,9 @@ browser.commands.onCommand.addListener((command) => {
 			}
 		});
 	}
+	if (command === "toggle_highlighter" && tab && tab.id) {
+		toggleHighlighterMode(tab.id);
+	}
 });
 
 async function createContextMenu() {
@@ -60,6 +64,24 @@ async function createContextMenu() {
 		id: "open-obsidian-clipper",
 		title: "Clip this page",
 		contexts: ["page", "selection"]
+	});
+
+	browser.contextMenus.create({
+		id: "toggle-highlighter",
+		title: "Highlight this page",
+		contexts: ["page"]
+	});
+
+	browser.contextMenus.create({
+		id: "highlight-selection",
+		title: "Highlight this",
+		contexts: ["selection"]
+	});
+
+	browser.contextMenus.create({
+		id: "clear-highlights",
+		title: "Clear highlights",
+		contexts: ["page"]
 	});
 
 	const browserType = await detectBrowser();
@@ -75,6 +97,12 @@ async function createContextMenu() {
 browser.contextMenus.onClicked.addListener((info, tab) => {
 	if (info.menuItemId === "open-obsidian-clipper") {
 		browser.action.openPopup();
+	} else if (info.menuItemId === "toggle-highlighter" && tab && tab.id) {
+		toggleHighlighterMode(tab.id);
+	} else if (info.menuItemId === "highlight-selection" && tab && tab.id) {
+		highlightSelection(tab.id);
+	} else if (info.menuItemId === "clear-highlights" && tab && tab.id) {
+		clearHighlights(tab.id);
 	} else if (info.menuItemId === 'open-side-panel' && tab && tab.id && tab.windowId) {
 		chrome.sidePanel.open({ tabId: tab.id });
 		sidePanelOpenWindows.add(tab.windowId);
@@ -107,6 +135,21 @@ async function setupTabListeners() {
 			}
 		});
 	}
+}
+
+
+function toggleHighlighterMode(tabId: number) {
+	isHighlighterMode = !isHighlighterMode;
+	browser.tabs.sendMessage(tabId, { action: "toggleHighlighter", isActive: isHighlighterMode });
+}
+
+function highlightSelection(tabId: number) {
+	isHighlighterMode = true;
+	browser.tabs.sendMessage(tabId, { action: "highlightSelection", isActive: isHighlighterMode });
+}
+
+function clearHighlights(tabId: number) {
+	browser.tabs.sendMessage(tabId, { action: "clearHighlights" });
 }
 
 // Initialize the tab listeners

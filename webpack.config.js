@@ -43,6 +43,7 @@ module.exports = (env, argv) => {
 			content: './src/content.ts',
 			background: './src/background.ts',
 			styles: './src/style.scss',
+			highlighter: './src/styles/highlighter.scss',
 		},
 		output: {
 			path: path.resolve(__dirname, outputDir),
@@ -99,7 +100,7 @@ module.exports = (env, argv) => {
 				],
 			}),
 			new MiniCssExtractPlugin({
-				filename: 'style.css'
+				filename: '[name].css'
 			}),
 			{
 				apply: (compiler) => {

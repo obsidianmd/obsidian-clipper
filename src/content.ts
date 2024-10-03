@@ -1,4 +1,5 @@
 import browser from './utils/browser-polyfill';
+import * as highlighter from './utils/highlighter';
 
 // Firefox
 browser.runtime.sendMessage({ action: "contentScriptLoaded" });
@@ -15,6 +16,7 @@ interface ContentResponse {
 	extractedContent: { [key: string]: string };
 	schemaOrgData: any;
 	fullHtml: string;
+	highlights: string[];
 }
 
 browser.runtime.onMessage.addListener(function(request: any, sender: browser.Runtime.MessageSender, sendResponse: (response?: any) => void) {
@@ -57,7 +59,8 @@ browser.runtime.onMessage.addListener(function(request: any, sender: browser.Run
 			selectedHtml: selectedHtml,
 			extractedContent: extractedContent,
 			schemaOrgData: schemaOrgData,
-			fullHtml: fullHtmlWithoutIndentation
+			fullHtml: fullHtmlWithoutIndentation,
+			highlights: highlighter.getHighlights()
 		};
 
 		sendResponse(response);
@@ -66,6 +69,16 @@ browser.runtime.onMessage.addListener(function(request: any, sender: browser.Run
 		sendResponse({ content: content, schemaOrgData: extractSchemaOrgData() });
 	} else if (request.action === "logObsidianUri") {
 		console.log('Obsidian URI created:', request.uri);
+		sendResponse({ success: true });
+	} else if (request.action === "toggleHighlighter") {
+		highlighter.toggleHighlighter(request.isActive);
+		sendResponse({ success: true });
+	} else if (request.action === "highlightSelection") {
+		highlighter.toggleHighlighter(request.isActive);
+		highlighter.handleHighlight();
+		sendResponse({ success: true });
+	} else if (request.action === "clearHighlights") {
+		highlighter.clearHighlights();
 		sendResponse({ success: true });
 	}
 	return true;
