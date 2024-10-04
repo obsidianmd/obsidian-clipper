@@ -41,3 +41,15 @@ export function getElementXPath(element: Node): string {
 export function getElementByXPath(xpath: string): Element | null {
 	return document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue as Element | null;
 }
+
+export function isDarkColor(color: string): boolean {
+	// Convert the color to RGB
+	const rgb = color.match(/\d+/g);
+	if (!rgb || rgb.length < 3) return false;
+
+	// Calculate the perceived brightness
+	const brightness = (parseInt(rgb[0]) * 299 + parseInt(rgb[1]) * 587 + parseInt(rgb[2]) * 114) / 1000;
+
+	// Return true if the brightness is below 128 (assuming 0-255 range)
+	return brightness < 128;
+}

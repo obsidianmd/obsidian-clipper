@@ -5,7 +5,7 @@ import {
 	handleMouseMove,
 	removeHoverOverlay,
 	updateHighlightListeners,
-	createHighlightOverlayGroup,
+	planHighlightOverlayRects,
 	removeExistingHighlights
 } from './highlighter-overlays';
 
@@ -412,23 +412,10 @@ export function applyHighlights() {
 
 	removeExistingHighlights();
 	
-	// First, create group for element highlights and complex highlights
 	highlights.forEach((highlight, index) => {
-		if (highlight.type === 'element' || highlight.type === 'complex') {
-			const container = getElementByXPath(highlight.xpath);
-			if (container) {
-				createHighlightOverlayGroup(container, index, highlight);
-			}
-		}
-	});
-
-	// Then, create group for text highlights
-	highlights.forEach((highlight, index) => {
-		if (highlight.type === 'text') {
-			const container = getElementByXPath(highlight.xpath);
-			if (container) {
-				createHighlightOverlayGroup(container, index, highlight);
-			}
+		const container = getElementByXPath(highlight.xpath);
+		if (container) {
+			planHighlightOverlayRects(container, highlight, index);
 		}
 	});
 

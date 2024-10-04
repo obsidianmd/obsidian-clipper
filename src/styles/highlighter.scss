@@ -5,7 +5,7 @@
 		cursor: crosshair !important;
 	}
 	*::selection {
-		background-color: rgba(255, 235, 0, 0.3) !important;
+		background-color: rgba(255, 235, 0, 0.35) !important;
 	}
 }
 
@@ -71,27 +71,24 @@
 
 .obsidian-highlight-overlay {
 	position: absolute;
-	background-color: rgba(255, 235, 0, 0.3);
-	box-shadow: 0 0 0 2px rgb(255 235 0 / 3%);
+	background-color: rgba(255, 235, 0, 0.35);
+	box-shadow: 0 0 0 2px rgb(255, 235, 0, 0.35);
 	border-radius: 4px;
 	mix-blend-mode: multiply;
 	pointer-events: auto;
 	z-index: 9999;
-	cursor: pointer; // Add this to indicate it's clickable
+	cursor: pointer;
+	&.obsidian-highlight-overlay-dark {
+		mix-blend-mode: screen;
+		box-shadow: 0 0 0 2px rgb(255, 235, 0, 0.25);
+		background-color: rgba(255, 235, 0, 0.25);
+	}
 }
 
-.obsidian-highlight-overlay[data-rect-index] {
-	background-color: rgba(255, 235, 0, 0.3);
-	mix-blend-mode: multiply;
-	border-radius: 4px;
-}
-
-.obsidian-highlight-hover-overlay {
+#obsidian-highlight-hover-overlay {
 	position: absolute;
 	border-radius: 5px;
-	background-color: rgba(255, 235, 0, 0.0);
-	mix-blend-mode: multiply;
-	border: 2px dashed rgb(255 235 0 / 100%);
+	border: 2px dashed rgb(255, 235, 0, 0.5);
 	pointer-events: none;
 	z-index: 9998;
 }
@@ -99,9 +96,7 @@
 .obsidian-highlight-container {
 	top: 0;
 	position: absolute;
-	mix-blend-mode: multiply;
 	z-index: 9999;
 	pointer-events: auto;
 	cursor: pointer;
 }
-
