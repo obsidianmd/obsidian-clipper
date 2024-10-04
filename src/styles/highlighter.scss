@@ -19,7 +19,7 @@
 	padding: 4px;
 	border-radius: 25px;
 	display: flex;
-	gap: 4px;
+	gap: 2px;
 	z-index: 100000;
 	font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei Light", sans-serif;
 	font-size: 14px;
@@ -28,6 +28,9 @@
 	-webkit-user-select: none;
 
 	button {
+		font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Microsoft YaHei Light", sans-serif !important;
+		font-size: 14px !important;
+		appearance: none !important;
 		background-color: transparent !important;
 		color: white !important;
 		font-weight: 500 !important;
@@ -36,6 +39,7 @@
 		border: none !important;
 		cursor: pointer !important;
 		box-shadow: none !important;
+		outline: none !important;
 		&:hover {
 			color: white !important;
 			background-color: rgba(255, 255, 255, 0.2) !important;

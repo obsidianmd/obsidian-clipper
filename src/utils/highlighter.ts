@@ -63,6 +63,7 @@ export function toggleHighlighter(isActive: boolean) {
 		removeHighlighterMenu();
 	}
 	updateHighlightListeners();
+	browser.runtime.sendMessage({ action: "highlighterModeChanged", isActive });
 }
 
 function createHighlighterMenu() {
@@ -465,6 +466,8 @@ export function clearHighlights() {
 		highlights = [];
 		removeExistingHighlights();
 		console.log('Highlights cleared for:', url);
+		browser.runtime.sendMessage({ action: "highlightsCleared" });
+		notifyHighlightsUpdated();
 	});
 }
 

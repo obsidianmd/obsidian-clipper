@@ -72,6 +72,7 @@ browser.runtime.onMessage.addListener(function(request: any, sender: browser.Run
 		sendResponse({ success: true });
 	} else if (request.action === "toggleHighlighter") {
 		highlighter.toggleHighlighter(request.isActive);
+		updateHighlightsState();
 		sendResponse({ success: true });
 	} else if (request.action === "highlightSelection") {
 		highlighter.toggleHighlighter(request.isActive);
@@ -81,6 +82,7 @@ browser.runtime.onMessage.addListener(function(request: any, sender: browser.Run
 				highlighter.handleTextSelection(selection);
 			}
 		}
+		updateHighlightsState();
 		sendResponse({ success: true });
 	} else if (request.action === "highlightElement") {
 		highlighter.toggleHighlighter(request.isActive);
@@ -125,9 +127,11 @@ browser.runtime.onMessage.addListener(function(request: any, sender: browser.Run
 				console.warn('Could not find element to highlight. Info:', request.targetElementInfo);
 			}
 		}
+		updateHighlightsState();
 		sendResponse({ success: true });
 	} else if (request.action === "clearHighlights") {
 		highlighter.clearHighlights();
+		updateHighlightsState();
 		sendResponse({ success: true });
 	}
 	return true;
@@ -188,3 +192,11 @@ function extractSchemaOrgData(): any {
 
 	return schemaData;
 }
+
+function updateHighlightsState() {
+	const hasHighlights = highlighter.getHighlights().length > 0;
+	browser.runtime.sendMessage({ action: "updateHighlightsState", hasHighlights });
+}
+
+// Call updateHighlightsState when the page loads
+window.addEventListener('load', updateHighlightsState);
