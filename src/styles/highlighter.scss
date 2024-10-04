@@ -1,14 +1,16 @@
-.obsidian-highlight {
-	background-color: rgba(255, 255, 0, 0.3);
-	cursor: pointer;
-}
-
 .obsidian-highlighter-active {
 	cursor: crosshair;
 
 	a {
 		cursor: crosshair !important;
 	}
+	*::selection {
+		background-color: rgba(255, 235, 0, 0.3) !important;
+	}
+}
+.obsidian-highlight {
+	background-color: rgba(255, 255, 0, 0.3);
+	cursor: pointer;
 }
 
 .obsidian-highlight-tooltip {
@@ -64,7 +66,3 @@
 	cursor: pointer;
 }
 
-// Make this only apply in highlighter mode
-*::selection {
-	background-color: rgba(255, 235, 0, 0.3) !important;
-}
