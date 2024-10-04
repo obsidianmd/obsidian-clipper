@@ -36,6 +36,7 @@ interface StoredData {
 	url: string;
 }
 
+// Toggle highlighter mode on or off
 export function toggleHighlighter(isActive: boolean) {
 	isHighlighterMode = isActive;
 	document.body.classList.toggle('obsidian-highlighter-active', isHighlighterMode);
@@ -52,6 +53,7 @@ export function toggleHighlighter(isActive: boolean) {
 	updateHighlightListeners();
 }
 
+// Disable clicking on links when highlighter is active
 function disableLinkClicks() {
 	document.querySelectorAll('a').forEach((link: HTMLElement) => {
 		const existingHandler = link.onclick;
@@ -65,6 +67,7 @@ function disableLinkClicks() {
 	});
 }
 
+// Restore original link click functionality
 function enableLinkClicks() {
 	document.querySelectorAll('a').forEach((link: HTMLElement) => {
 		const originalHandler = originalLinkClickHandlers.get(link);
@@ -77,6 +80,7 @@ function enableLinkClicks() {
 	});
 }
 
+// Handle mouse up events for highlighting
 function handleMouseUp(event: MouseEvent) {
 	if (!isHighlighterMode) return;
 	const selection = window.getSelection();
@@ -92,6 +96,7 @@ function handleMouseUp(event: MouseEvent) {
 	}
 }
 
+// Handles mouse move events for hover effects
 function handleMouseMove(event: MouseEvent) {
 	if (!isHighlighterMode) return;
 	const target = event.target as Element;
@@ -102,10 +107,12 @@ function handleMouseMove(event: MouseEvent) {
 	}
 }
 
+// Check if an element should be ignored for highlighting
 function isIgnoredElement(element: Element): boolean {
 	return element.tagName.toLowerCase() === 'html' || element.tagName.toLowerCase() === 'body';
 }
 
+// Highlight an entire element
 function highlightElement(element: Element) {
 	const xpath = getElementXPath(element);
 	const content = element.outerHTML;
@@ -120,6 +127,7 @@ function highlightElement(element: Element) {
 	});
 }
 
+// Handle text selection for highlighting
 function handleTextSelection(selection: Selection) {
 	const range = selection.getRangeAt(0);
 	const highlightRanges = getHighlightRanges(range);
@@ -127,6 +135,7 @@ function handleTextSelection(selection: Selection) {
 	selection.removeAllRanges();
 }
 
+// Get highlight ranges for a given text selection
 function getHighlightRanges(range: Range): TextHighlightData[] {
 	const highlights: TextHighlightData[] = [];
 	const fragment = range.cloneContents();
@@ -148,6 +157,7 @@ function getHighlightRanges(range: Range): TextHighlightData[] {
 	return highlights;
 }
 
+// Sanitize HTML content while preserving formatting
 function sanitizeAndPreserveFormatting(html: string): string {
 	const tempDiv = document.createElement('div');
 	tempDiv.innerHTML = html;
@@ -159,6 +169,7 @@ function sanitizeAndPreserveFormatting(html: string): string {
 	return balanceTags(tempDiv.innerHTML);
 }
 
+// Balance HTML tags to ensure proper nesting
 function balanceTags(html: string): string {
 	const openingTags: string[] = [];
 	const regex = /<\/?([a-z]+)[^>]*>/gi;
@@ -188,6 +199,7 @@ function balanceTags(html: string): string {
 	return balancedHtml;
 }
 
+// Find the nearest highlightable parent element
 function getHighlightableParent(node: Node): Element {
 	let current: Node | null = node;
 	while (current && current.nodeType !== Node.ELEMENT_NODE) {
@@ -196,6 +208,7 @@ function getHighlightableParent(node: Node): Element {
 	return current as Element;
 }
 
+// Calculate the text offset within a container element
 function getTextOffset(container: Element, targetNode: Node, targetOffset: number): number {
 	let offset = 0;
 	const treeWalker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
@@ -212,6 +225,7 @@ function getTextOffset(container: Element, targetNode: Node, targetOffset: numbe
 	return offset;
 }
 
+// Add a new highlight to the page
 function addHighlight(highlight: AnyHighlightData) {
 	highlights = mergeOverlappingHighlights(highlights, highlight);
 	sortHighlights();
@@ -219,6 +233,7 @@ function addHighlight(highlight: AnyHighlightData) {
 	saveHighlights();
 }
 
+// Sort highlights based on their vertical position
 function sortHighlights() {
 	highlights.sort((a, b) => {
 		const elementA = getElementByXPath(a.xpath);
@@ -230,6 +245,35 @@ function sortHighlights() {
 	});
 }
 
+// Check if two highlights overlap
+function doHighlightsOverlap(highlight1: AnyHighlightData, highlight2: AnyHighlightData): boolean {
+	const element1 = getElementByXPath(highlight1.xpath);
+	const element2 = getElementByXPath(highlight2.xpath);
+
+	if (!element1 || !element2) return false;
+
+	if (element1 === element2) {
+		// For text highlights in the same element, check for overlap
+		if (highlight1.type === 'text' && highlight2.type === 'text') {
+			return (highlight1.startOffset < highlight2.endOffset && highlight2.startOffset < highlight1.endOffset);
+		}
+		// For other types, consider them overlapping if they're in the same element
+		return true;
+	}
+
+	// Check if one element contains the other
+	return element1.contains(element2) || element2.contains(element1);
+}
+
+// Check if two highlights are adjacent
+function areHighlightsAdjacent(highlight1: AnyHighlightData, highlight2: AnyHighlightData): boolean {
+	if (highlight1.type === 'text' && highlight2.type === 'text' && highlight1.xpath === highlight2.xpath) {
+		return highlight1.endOffset === highlight2.startOffset || highlight2.endOffset === highlight1.startOffset;
+	}
+	return false;
+}
+
+// Merge overlapping highlights
 function mergeOverlappingHighlights(existingHighlights: AnyHighlightData[], newHighlight: AnyHighlightData): AnyHighlightData[] {
 	let mergedHighlights: AnyHighlightData[] = [];
 	let merged = false;
@@ -254,32 +298,7 @@ function mergeOverlappingHighlights(existingHighlights: AnyHighlightData[], newH
 	return mergedHighlights;
 }
 
-function doHighlightsOverlap(highlight1: AnyHighlightData, highlight2: AnyHighlightData): boolean {
-	const element1 = getElementByXPath(highlight1.xpath);
-	const element2 = getElementByXPath(highlight2.xpath);
-
-	if (!element1 || !element2) return false;
-
-	if (element1 === element2) {
-		// For text highlights in the same element, check for overlap
-		if (highlight1.type === 'text' && highlight2.type === 'text') {
-			return (highlight1.startOffset < highlight2.endOffset && highlight2.startOffset < highlight1.endOffset);
-		}
-		// For other types, consider them overlapping if they're in the same element
-		return true;
-	}
-
-	// Check if one element contains the other
-	return element1.contains(element2) || element2.contains(element1);
-}
-
-function areHighlightsAdjacent(highlight1: AnyHighlightData, highlight2: AnyHighlightData): boolean {
-	if (highlight1.type === 'text' && highlight2.type === 'text' && highlight1.xpath === highlight2.xpath) {
-		return highlight1.endOffset === highlight2.startOffset || highlight2.endOffset === highlight1.startOffset;
-	}
-	return false;
-}
-
+// Merge two highlights into one
 function mergeHighlights(highlight1: AnyHighlightData, highlight2: AnyHighlightData): AnyHighlightData {
 	const element1 = getElementByXPath(highlight1.xpath);
 	const element2 = getElementByXPath(highlight2.xpath);
@@ -336,6 +355,7 @@ function mergeHighlights(highlight1: AnyHighlightData, highlight2: AnyHighlightD
 	};
 }
 
+// Find the common ancestor of two elements
 function findCommonAncestor(element1: Element, element2: Element): Element {
 	const parents1 = getParents(element1);
 	const parents2 = getParents(element2);
@@ -349,6 +369,7 @@ function findCommonAncestor(element1: Element, element2: Element): Element {
 	return document.body; // Fallback to body if no common ancestor found
 }
 
+// Getsall parent elements of a given element
 function getParents(element: Element): Element[] {
 	const parents: Element[] = [];
 	let currentElement: Element | null = element;
@@ -362,6 +383,7 @@ function getParents(element: Element): Element[] {
 	return parents;
 }
 
+// Update event listeners for highlight overlays
 export function updateHighlightListeners() {
 	document.querySelectorAll('.obsidian-highlight-overlay').forEach(highlight => {
 		highlight.removeEventListener('click', removeHighlightByEvent);
@@ -371,12 +393,14 @@ export function updateHighlightListeners() {
 	});
 }
 
+// Save highlights to browser storage
 export function saveHighlights() {
 	const url = window.location.href;
 	const data: StoredData = { highlights, url };
 	browser.storage.local.set({ [url]: data });
 }
 
+// Apply all highlights to the page
 export function applyHighlights() {
 	if (isApplyingHighlights) return;
 	
@@ -387,22 +411,22 @@ export function applyHighlights() {
 
 	removeExistingHighlights();
 	
-	// First, create element and complex highlights
+	// First, create group for element highlights and complex highlights
 	highlights.forEach((highlight, index) => {
 		if (highlight.type === 'element' || highlight.type === 'complex') {
 			const container = getElementByXPath(highlight.xpath);
 			if (container) {
-				createHighlightOverlay(container, index, highlight);
+				createHighlightOverlayGroup(container, index, highlight);
 			}
 		}
 	});
 
-	// Then, create text highlights
+	// Then, create group for text highlights
 	highlights.forEach((highlight, index) => {
 		if (highlight.type === 'text') {
 			const container = getElementByXPath(highlight.xpath);
 			if (container) {
-				createHighlightOverlay(container, index, highlight);
+				createHighlightOverlayGroup(container, index, highlight);
 			}
 		}
 	});
@@ -412,6 +436,7 @@ export function applyHighlights() {
 	notifyHighlightsUpdated();
 }
 
+// Find a text node at a given offset within an element
 function findTextNodeAtOffset(element: Element, offset: number): { node: Node, offset: number } | null {
 	let currentOffset = 0;
 	const treeWalker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
@@ -435,7 +460,15 @@ function findTextNodeAtOffset(element: Element, offset: number): { node: Node, o
 	return null;
 }
 
-function createHighlightOverlay(target: Element, index: number, highlight: AnyHighlightData) {
+// Calculate the average line height of a set of rectangles
+function calculateAverageLineHeight(rects: DOMRectList): number {
+	const heights = Array.from(rects).map(rect => rect.height);
+	const sum = heights.reduce((a, b) => a + b, 0);
+	return sum / heights.length;
+}
+
+// Create a group for elements that are part of the same highlight
+function createHighlightOverlayGroup(target: Element, index: number, highlight: AnyHighlightData) {
 	let container = document.querySelector(`.obsidian-highlight-container[data-highlight-index="${index}"]`) as HTMLElement;
 	
 	if (!container) {
@@ -446,14 +479,15 @@ function createHighlightOverlay(target: Element, index: number, highlight: AnyHi
 		document.body.appendChild(container);
 	}
 	
-	createHighlightOverlayElements(target, container, highlight);
+	planHighlightOverlayRects(target, container, highlight);
 }
 
-function createHighlightOverlayElements(target: Element, container: HTMLElement, highlight: AnyHighlightData) {
+// Plan out the overlay rectangles depending on the type of highlight, i.e. individual lines of text or entire elements
+function planHighlightOverlayRects(target: Element, container: HTMLElement, highlight: AnyHighlightData) {
 	const existingOverlays = Array.from(document.querySelectorAll('.obsidian-highlight-overlay'));
 	if (highlight.type === 'complex' || highlight.type === 'element') {
 		const rect = target.getBoundingClientRect();
-		createOverlayElementsFromRects([rect], container, highlight.content, existingOverlays, false);
+		mergeHighlightOverlayRects([rect], container, highlight.content, existingOverlays, false);
 	} else if (highlight.type === 'text') {
 		try {
 			const range = document.createRange();
@@ -472,30 +506,25 @@ function createHighlightOverlayElements(target: Element, container: HTMLElement,
 				
 				// Only create overlays for complex rects if there are no text rects
 				if (textRects.length > 0) {
-					createOverlayElementsFromRects(textRects, container, highlight.content, existingOverlays, true);
+					mergeHighlightOverlayRects(textRects, container, highlight.content, existingOverlays, true);
 				} else {
-					createOverlayElementsFromRects(complexRects, container, highlight.content, existingOverlays, false);
+					mergeHighlightOverlayRects(complexRects, container, highlight.content, existingOverlays, false);
 				}
 			} else {
 				console.warn('Could not find start or end node for text highlight, falling back to element highlight');
 				const rect = target.getBoundingClientRect();
-				createOverlayElementsFromRects([rect], container, highlight.content, existingOverlays, false);
+				mergeHighlightOverlayRects([rect], container, highlight.content, existingOverlays, false);
 			}
 		} catch (error) {
 			console.error('Error creating text highlight, falling back to element highlight:', error);
 			const rect = target.getBoundingClientRect();
-			createOverlayElementsFromRects([rect], container, highlight.content, existingOverlays, false);
+			mergeHighlightOverlayRects([rect], container, highlight.content, existingOverlays, false);
 		}
 	}
 }
 
-function calculateAverageLineHeight(rects: DOMRectList): number {
-	const heights = Array.from(rects).map(rect => rect.height);
-	const sum = heights.reduce((a, b) => a + b, 0);
-	return sum / heights.length;
-}
-
-function createOverlayElementsFromRects(rects: DOMRect[], container: HTMLElement, content: string, existingOverlays: Element[], isText: boolean = false) {
+// Merge a set of rectangles, to avoid adjacent and overlapping highlights where possible
+function mergeHighlightOverlayRects(rects: DOMRect[], container: HTMLElement, content: string, existingOverlays: Element[], isText: boolean = false) {
 	let overlaysCreated = 0;
 
 	let mergedRects: DOMRect[] = [];
@@ -530,13 +559,14 @@ function createOverlayElementsFromRects(rects: DOMRect[], container: HTMLElement
 		});
 
 		if (!isDuplicate) {
-			createOverlayElement(rect, container, content, isText);
+			createHighlightOverlayElement(rect, container, content, isText);
 			overlaysCreated++;
 		}
 	}
 }
 
-function createOverlayElement(rect: DOMRect, container: HTMLElement, content: string, isText: boolean = false) {
+// Create an overlay element
+function createHighlightOverlayElement(rect: DOMRect, container: HTMLElement, content: string, isText: boolean = false) {
 	const overlay = document.createElement('div');
 	overlay.className = 'obsidian-highlight-overlay';
 	
@@ -551,12 +581,14 @@ function createOverlayElement(rect: DOMRect, container: HTMLElement, content: st
 	container.appendChild(overlay);
 }
 
+// Handle click events on highlight overlays
 function handleHighlightClick(event: MouseEvent) {
 	event.stopPropagation();
 	const container = event.currentTarget as HTMLElement;
 	removeHighlightByElement(container);
 }
 
+// Remove a highlight based on its container element
 function removeHighlightByElement(container: Element) {
 	const index = container.getAttribute('data-highlight-index');
 	if (index !== null) {
@@ -569,14 +601,17 @@ function removeHighlightByElement(container: Element) {
 	}
 }
 
+// Notify that highlights have been updated
 function notifyHighlightsUpdated() {
 	browser.runtime.sendMessage({ action: "highlightsUpdated" });
 }
 
+// Get all highlight contents
 export function getHighlights(): string[] {
 	return highlights.map(h => h.content);
 }
 
+// Load highlights from browser storage
 export function loadHighlights() {
 	const url = window.location.href;
 	browser.storage.local.get(url).then((result) => {
@@ -588,7 +623,8 @@ export function loadHighlights() {
 	});
 }
 
-function updateHighlightPositions() {
+// Update positions of all highlight overlays
+function updateHighlightOverlayPositions() {
 	document.querySelectorAll('.obsidian-highlight-container').forEach((container: Element) => {
 		const index = container.getAttribute('data-highlight-index');
 		if (index !== null) {
@@ -601,15 +637,16 @@ function updateHighlightPositions() {
 	});
 }
 
+// Update a highlight overlay
 function updateHighlightOverlay(target: Element, container: HTMLElement, highlight: AnyHighlightData) {
 	container.innerHTML = ''; // Clear existing overlay elements
 	
-	createHighlightOverlayElements(target, container, highlight);
+	planHighlightOverlayRects(target, container, highlight);
 }
 
 const throttledUpdateHighlights = throttle(() => {
 	if (!isApplyingHighlights) {
-		updateHighlightPositions();
+		updateHighlightOverlayPositions();
 	}
 }, 100);
 
@@ -636,6 +673,7 @@ observer.observe(document.body, {
 	characterData: false
 });
 
+// Create the hover overlay used to indicate which element will be highlighted
 function createHoverOverlay(target: Element) {
 	removeHoverOverlay();
 	
@@ -653,6 +691,7 @@ function createHoverOverlay(target: Element) {
 	document.body.appendChild(hoverOverlay);
 }
 
+// Removes the hover overlay
 function removeHoverOverlay() {
 	if (hoverOverlay) {
 		hoverOverlay.remove();
@@ -660,6 +699,18 @@ function removeHoverOverlay() {
 	}
 }
 
+// Remove a highlight in response to an event
+function removeHighlightByEvent(event: Event) {
+	const overlay = event.currentTarget as HTMLElement;
+	removeHighlightByElement(overlay);
+}
+
+// Remove all existing highlight overlays from the page
+export function removeExistingHighlights() {
+	document.querySelectorAll('.obsidian-highlight-container').forEach(el => el.remove());
+}
+
+// Clear all highlights from the page and storage
 export function clearHighlights() {
 	const url = window.location.href;
 	browser.storage.local.remove(url).then(() => {
@@ -669,15 +720,7 @@ export function clearHighlights() {
 	});
 }
 
-function removeHighlightByEvent(event: Event) {
-	const overlay = event.currentTarget as HTMLElement;
-	removeHighlightByElement(overlay);
-}
-
-export function removeExistingHighlights() {
-	document.querySelectorAll('.obsidian-highlight-container').forEach(el => el.remove());
-}
-
+// Get the vertical position of an element
 function getElementVerticalPosition(element: Element): number {
 	return element.getBoundingClientRect().top + window.scrollY;
 }
