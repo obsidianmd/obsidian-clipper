@@ -372,40 +372,6 @@ export function applyHighlights() {
 	notifyHighlightsUpdated();
 }
 
-function createHighlightOverlay(target: Element, index: number, highlight: AnyHighlightData) {
-	const container = document.createElement('div');
-	container.className = 'obsidian-highlight-container';
-	container.dataset.highlightIndex = index.toString();
-	container.addEventListener('click', handleHighlightClick);
-	
-	if (highlight.type === 'text') {
-		createTextHighlightOverlay(target, container, highlight);
-	} else if (highlight.type === 'element') {
-		createElementHighlightOverlay(target, container, highlight);
-	} else {
-		createComplexHighlightOverlay(target, container, highlight);
-	}
-	
-	document.body.appendChild(container);
-}
-
-function createTextHighlightOverlay(target: Element, container: HTMLElement, highlight: TextHighlightData) {
-	const range = document.createRange();
-	const startNode = findTextNodeAtOffset(target, highlight.startOffset);
-	const endNode = findTextNodeAtOffset(target, highlight.endOffset);
-	
-	if (startNode && endNode) {
-		range.setStart(startNode.node, startNode.offset);
-		range.setEnd(endNode.node, endNode.offset);
-		
-		const rects = range.getClientRects();
-		for (let i = 0; i < rects.length; i++) {
-			const rect = rects[i];
-			createOverlayElement(rect, container, highlight.content);
-		}
-	}
-}
-
 function findTextNodeAtOffset(element: Element, offset: number): { node: Node, offset: number } | null {
 	let currentOffset = 0;
 	const treeWalker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
@@ -423,14 +389,90 @@ function findTextNodeAtOffset(element: Element, offset: number): { node: Node, o
 	return null;
 }
 
-function createElementHighlightOverlay(target: Element, container: HTMLElement, highlight: ElementHighlightData) {
-	const rect = target.getBoundingClientRect();
-	createOverlayElement(rect, container, highlight.content);
+function createHighlightOverlay(target: Element, index: number, highlight: AnyHighlightData) {
+	let container = document.querySelector(`.obsidian-highlight-container[data-highlight-index="${index}"]`) as HTMLElement;
+	
+	if (!container) {
+		container = document.createElement('div');
+		container.className = 'obsidian-highlight-container';
+		container.dataset.highlightIndex = index.toString();
+		container.addEventListener('click', handleHighlightClick);
+		document.body.appendChild(container);
+	}
+	
+	createHighlightOverlayElements(target, container, highlight);
 }
 
-function createComplexHighlightOverlay(target: Element, container: HTMLElement, highlight: ComplexHighlightData) {
-	const rect = target.getBoundingClientRect();
-	createOverlayElement(rect, container, highlight.content);
+function createHighlightOverlayElements(target: Element, container: HTMLElement, highlight: AnyHighlightData) {
+	console.log('Creating highlight overlay elements:', { highlightType: highlight.type, xpath: highlight.xpath });
+	const existingOverlays = Array.from(container.querySelectorAll('.obsidian-highlight-overlay'));
+	console.log('Existing overlays:', existingOverlays.length);
+
+	if (highlight.type === 'text') {
+		const range = document.createRange();
+		const startNode = findTextNodeAtOffset(target, highlight.startOffset);
+		const endNode = findTextNodeAtOffset(target, highlight.endOffset);
+		
+		if (startNode && endNode) {
+			range.setStart(startNode.node, startNode.offset);
+			range.setEnd(endNode.node, endNode.offset);
+			
+			const rects = range.getClientRects();
+			console.log('Text highlight rects:', rects.length);
+			createOverlayElementsFromRects(rects, container, highlight.content, existingOverlays);
+		} else {
+			console.warn('Could not find start or end node for text highlight');
+		}
+	} else {
+		const rect = target.getBoundingClientRect();
+		console.log('Element/Complex highlight rect:', rect);
+		createOverlayElementsFromRects([rect], container, highlight.content, existingOverlays);
+	}
+}
+
+function createOverlayElementsFromRects(rects: DOMRectList | DOMRect[], container: HTMLElement, content: string, existingOverlays: Element[]) {
+	console.log('Creating overlay elements from rects:', rects.length);
+	let mergedRects: DOMRect[] = [];
+	let currentRect: DOMRect | null = null;
+
+	for (let i = 0; i < rects.length; i++) {
+		const rect = rects[i];
+		if (!currentRect) {
+			currentRect = new DOMRect(rect.x, rect.y, rect.width, rect.height);
+		} else if (Math.abs(rect.y - currentRect.y) < 1 && Math.abs(rect.height - currentRect.height) < 1) {
+			// Merge adjacent rects with the same height and y-position
+			currentRect.width = rect.right - currentRect.left;
+		} else {
+			mergedRects.push(currentRect);
+			currentRect = new DOMRect(rect.x, rect.y, rect.width, rect.height);
+		}
+	}
+	if (currentRect) {
+		mergedRects.push(currentRect);
+	}
+
+	for (const rect of mergedRects) {
+		const isDuplicate = existingOverlays.some(overlay => {
+			const overlayRect = overlay.getBoundingClientRect();
+			const duplicate = (
+				Math.abs(rect.left - overlayRect.left) < 1 &&
+				Math.abs(rect.top - overlayRect.top) < 1 &&
+				Math.abs(rect.width - overlayRect.width) < 1 &&
+				Math.abs(rect.height - overlayRect.height) < 1
+			);
+			if (duplicate) {
+				console.log('Duplicate overlay found:', { rect, overlayRect });
+			}
+			return duplicate;
+		});
+
+		if (!isDuplicate) {
+			console.log('Creating new overlay element:', rect);
+			createOverlayElement(rect, container, content);
+		} else {
+			console.log('Skipping duplicate overlay:', rect);
+		}
+	}
 }
 
 function createOverlayElement(rect: DOMRect, container: HTMLElement, content: string) {
@@ -446,6 +488,7 @@ function createOverlayElement(rect: DOMRect, container: HTMLElement, content: st
 	overlay.setAttribute('title', content);
 	
 	container.appendChild(overlay);
+	console.log('Overlay element created:', { left: overlay.style.left, top: overlay.style.top, width: overlay.style.width, height: overlay.style.height });
 }
 
 function handleHighlightClick(event: MouseEvent) {
@@ -501,13 +544,7 @@ function updateHighlightPositions() {
 function updateHighlightOverlay(target: Element, container: HTMLElement, highlight: AnyHighlightData) {
 	container.innerHTML = ''; // Clear existing overlay elements
 	
-	if (highlight.type === 'text') {
-		createTextHighlightOverlay(target, container, highlight);
-	} else if (highlight.type === 'element') {
-		createElementHighlightOverlay(target, container, highlight);
-	} else {
-		createComplexHighlightOverlay(target, container, highlight);
-	}
+	createHighlightOverlayElements(target, container, highlight);
 }
 
 const throttledUpdateHighlights = throttle(() => {
