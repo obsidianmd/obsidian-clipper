@@ -75,8 +75,6 @@ function enableLinkClicks() {
 			link.onclick = null;
 		}
 	});
-	// We don't need to clear the WeakMap as it will automatically
-	// remove entries when the links are no longer referenced
 }
 
 function handleMouseUp(event: MouseEvent) {
@@ -204,20 +202,6 @@ function getTextOffset(container: Element, targetNode: Node, targetOffset: numbe
 	}
 	
 	return offset;
-}
-
-function getIntersectionRange(range1: Range, range2: Range): Range | null {
-	const start = range1.compareBoundaryPoints(Range.START_TO_START, range2) < 0 ? range2.startContainer : range1.startContainer;
-	const end = range1.compareBoundaryPoints(Range.END_TO_END, range2) > 0 ? range2.endContainer : range1.endContainer;
-	
-	if (start.compareDocumentPosition(end) & Node.DOCUMENT_POSITION_FOLLOWING) {
-		const range = document.createRange();
-		range.setStart(start, start === range2.startContainer ? range2.startOffset : range1.startOffset);
-		range.setEnd(end, end === range2.endContainer ? range2.endOffset : range1.endOffset);
-		return range;
-	}
-	
-	return null;
 }
 
 function addHighlight(highlight: AnyHighlightData) {
