@@ -221,6 +221,10 @@
 		-webkit-user-select: none;
 		background-color: transparent;
 		cursor: default;
+		&.active {
+			background-color: hsla(var(--color-accent-hsl), 0.075);
+			color: var(--text-accent);
+		}
 		&:hover {
 			background-color: var(--background-modifier-hover);
 			transition: background-color var(--duration-fast) ease-in-out;

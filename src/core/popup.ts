@@ -28,6 +28,8 @@ let currentTabId: number | undefined;
 let lastUsedTemplateId: string | null = null;
 let lastSelectedVault: string | null = null;
 
+let isHighlighterModeActive = false;
+
 const isSidePanel = window.location.pathname.includes('side-panel.html');
 
 // Memoize replaceVariables with a short expiration and URL-sensitive key
@@ -155,6 +157,8 @@ async function initializeExtension(tabId: number) {
 
 		// Setup message listeners
 		setupMessageListeners();
+
+		await checkHighlighterModeState(tabId);
 
 		return true;
 	} catch (error) {
@@ -307,6 +311,11 @@ function setupEventListeners(tabId: number) {
 				e.preventDefault();
 			}
 		});
+	}
+
+	const highlighterModeButton = document.getElementById('highlighter-mode');
+	if (highlighterModeButton) {
+		highlighterModeButton.addEventListener('click', () => toggleHighlighterMode(tabId));
 	}
 }
 
@@ -855,6 +864,38 @@ function handleTemplateChange(templateId: string) {
 	lastUsedTemplateId = currentTemplate.id;
 	setLocalStorage('lastUsedTemplateId', lastUsedTemplateId);
 	refreshFields(currentTabId!, false);
+}
+
+async function toggleHighlighterMode(tabId: number) {
+	isHighlighterModeActive = !isHighlighterModeActive;
+	const highlighterModeButton = document.getElementById('highlighter-mode');
+	
+	if (highlighterModeButton) {
+		highlighterModeButton.classList.toggle('active', isHighlighterModeActive);
+	}
+
+	await browser.tabs.sendMessage(tabId, { 
+		action: "toggleHighlighter", 
+		isActive: isHighlighterModeActive 
+	});
+}
+
+async function checkHighlighterModeState(tabId: number) {
+	try {
+		const response = await browser.tabs.sendMessage(tabId, { action: "getHighlighterState" });
+		if (typeof response === 'object' && response !== null && 'isActive' in response) {
+			isHighlighterModeActive = Boolean(response.isActive);
+			const highlighterModeButton = document.getElementById('highlighter-mode');
+			
+			if (highlighterModeButton) {
+				highlighterModeButton.classList.toggle('active', isHighlighterModeActive);
+			}
+		} else {
+			console.error('Unexpected response format from getHighlighterState');
+		}
+	} catch (error) {
+		console.error('Error checking highlighter mode state:', error);
+	}
 }
 
 // Update the resize event listener to use the debounced version

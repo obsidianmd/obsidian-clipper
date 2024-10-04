@@ -19,6 +19,8 @@ interface ContentResponse {
 	highlights: string[];
 }
 
+let isHighlighterMode = false;
+
 browser.runtime.onMessage.addListener(function(request: any, sender: browser.Runtime.MessageSender, sendResponse: (response?: any) => void) {
 	if (request.action === "getPageContent") {
 		let selectedHtml = '';
@@ -71,7 +73,8 @@ browser.runtime.onMessage.addListener(function(request: any, sender: browser.Run
 		console.log('Obsidian URI created:', request.uri);
 		sendResponse({ success: true });
 	} else if (request.action === "toggleHighlighter") {
-		highlighter.toggleHighlighter(request.isActive);
+		isHighlighterMode = request.isActive;
+		highlighter.toggleHighlighter(isHighlighterMode);
 		updateHighlightsState();
 		sendResponse({ success: true });
 	} else if (request.action === "highlightSelection") {
@@ -133,6 +136,8 @@ browser.runtime.onMessage.addListener(function(request: any, sender: browser.Run
 		highlighter.clearHighlights();
 		updateHighlightsState();
 		sendResponse({ success: true });
+	} else if (request.action === "getHighlighterState") {
+		sendResponse({ isActive: isHighlighterMode });
 	}
 	return true;
 });
