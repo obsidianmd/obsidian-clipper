@@ -7,6 +7,7 @@ let highlights: AnyHighlightData[] = [];
 let hoverOverlay: HTMLElement | null = null;
 let isApplyingHighlights = false;
 let lastAppliedHighlights: string = '';
+let originalLinkClickHandlers: WeakMap<HTMLElement, (event: MouseEvent) => void> = new WeakMap();
 
 interface HighlightData {
 	xpath: string;
@@ -41,12 +42,41 @@ export function toggleHighlighter(isActive: boolean) {
 	if (isHighlighterMode) {
 		document.addEventListener('mouseup', handleMouseUp);
 		document.addEventListener('mousemove', handleMouseMove);
+		disableLinkClicks();
 	} else {
 		document.removeEventListener('mouseup', handleMouseUp);
 		document.removeEventListener('mousemove', handleMouseMove);
 		removeHoverOverlay();
+		enableLinkClicks();
 	}
 	updateHighlightListeners();
+}
+
+function disableLinkClicks() {
+	document.querySelectorAll('a').forEach((link: HTMLElement) => {
+		const existingHandler = link.onclick;
+		if (existingHandler) {
+			originalLinkClickHandlers.set(link, existingHandler as (event: MouseEvent) => void);
+		}
+		link.onclick = (e: MouseEvent) => {
+			e.preventDefault();
+			e.stopPropagation();
+		};
+	});
+}
+
+function enableLinkClicks() {
+	document.querySelectorAll('a').forEach((link: HTMLElement) => {
+		const originalHandler = originalLinkClickHandlers.get(link);
+		if (originalHandler) {
+			link.onclick = originalHandler;
+			originalLinkClickHandlers.delete(link);
+		} else {
+			link.onclick = null;
+		}
+	});
+	// We don't need to clear the WeakMap as it will automatically
+	// remove entries when the links are no longer referenced
 }
 
 function handleMouseUp(event: MouseEvent) {

@@ -5,6 +5,10 @@
 
 .obsidian-highlighter-active {
 	cursor: crosshair;
+
+	a {
+		cursor: crosshair !important;
+	}
 }
 
 .obsidian-highlight-tooltip {
