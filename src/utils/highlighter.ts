@@ -54,13 +54,40 @@ export function toggleHighlighter(isActive: boolean) {
 		document.addEventListener('mouseup', handleMouseUp);
 		document.addEventListener('mousemove', handleMouseMove);
 		disableLinkClicks();
+		createHighlighterMenu();
 	} else {
 		document.removeEventListener('mouseup', handleMouseUp);
 		document.removeEventListener('mousemove', handleMouseMove);
 		removeHoverOverlay();
 		enableLinkClicks();
+		removeHighlighterMenu();
 	}
 	updateHighlightListeners();
+}
+
+function createHighlighterMenu() {
+	const menu = document.createElement('div');
+	menu.className = 'obsidian-highlighter-menu';
+	menu.innerHTML = `
+		<button id="obsidian-clear-highlights">Clear</button>
+		<button id="obsidian-exit-highlighter">Exit</button>
+	`;
+	document.body.appendChild(menu);
+
+	document.getElementById('obsidian-clear-highlights')?.addEventListener('click', () => {
+		clearHighlights();
+	});
+
+	document.getElementById('obsidian-exit-highlighter')?.addEventListener('click', () => {
+		toggleHighlighter(false);
+	});
+	}
+
+	function removeHighlighterMenu() {
+	const menu = document.querySelector('.obsidian-highlighter-menu');
+	if (menu) {
+		menu.remove();
+	}
 }
 
 // Disable clicking on links when highlighter is active

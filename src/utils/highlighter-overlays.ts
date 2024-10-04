@@ -17,7 +17,10 @@ let hoverOverlay: HTMLElement | null = null;
 
 // Check if an element should be ignored for highlighting
 function isIgnoredElement(element: Element): boolean {
-	return element.tagName.toLowerCase() === 'html' || element.tagName.toLowerCase() === 'body';
+	return element.tagName.toLowerCase() === 'html' || 
+		element.tagName.toLowerCase() === 'body' || 
+		element.classList.contains('obsidian-highlighter-menu') ||
+		element.closest('.obsidian-highlighter-menu') !== null;
 }
 
 // Handles mouse move events for hover effects
