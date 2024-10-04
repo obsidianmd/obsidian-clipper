@@ -32,7 +32,8 @@
 	"content_scripts": [
 		{
 			"matches": ["http://*/*", "https://*/*"],
-			"js": ["content.js"]
+			"js": ["content.js"],
+			"css": ["highlighter.css"]
 		}
 	],
 	"content_security_policy": {
