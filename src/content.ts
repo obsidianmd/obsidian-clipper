@@ -74,7 +74,57 @@ browser.runtime.onMessage.addListener(function(request: any, sender: browser.Run
 		highlighter.toggleHighlighter(request.isActive);
 		sendResponse({ success: true });
 	} else if (request.action === "highlightSelection") {
-		highlighter.toggleHighlighter(true);
+		highlighter.toggleHighlighter(request.isActive);
+		if (request.highlightData && request.highlightData.type === 'text') {
+			const selection = window.getSelection();
+			if (selection && !selection.isCollapsed) {
+				highlighter.handleTextSelection(selection);
+			}
+		}
+		sendResponse({ success: true });
+	} else if (request.action === "highlightElement") {
+		highlighter.toggleHighlighter(request.isActive);
+		if (request.targetElementInfo) {
+			const { mediaType, srcUrl, pageUrl } = request.targetElementInfo;
+			
+			let elementToHighlight: Element | null = null;
+
+			// Function to compare URLs, handling both absolute and relative paths
+			const urlMatches = (elementSrc: string, targetSrc: string) => {
+				const elementUrl = new URL(elementSrc, pageUrl);
+				const targetUrl = new URL(targetSrc, pageUrl);
+				return elementUrl.href === targetUrl.href;
+			};
+
+			// Try to find the element using the src attribute
+			elementToHighlight = document.querySelector(`${mediaType}[src="${srcUrl}"]`);
+
+			// If not found, try with relative URL
+			if (!elementToHighlight) {
+				const relativeSrc = new URL(srcUrl).pathname;
+				elementToHighlight = document.querySelector(`${mediaType}[src="${relativeSrc}"]`);
+			}
+
+			// If still not found, iterate through all elements of the media type
+			if (!elementToHighlight) {
+				const elements = Array.from(document.getElementsByTagName(mediaType));
+				for (const el of elements) {
+					if (el instanceof HTMLImageElement || el instanceof HTMLVideoElement || el instanceof HTMLAudioElement) {
+						if (urlMatches(el.src, srcUrl)) {
+							elementToHighlight = el;
+							break;
+						}
+					}
+				}
+			}
+
+			if (elementToHighlight) {
+				const xpath = highlighter.getElementXPath(elementToHighlight);
+				highlighter.highlightElement(elementToHighlight);
+			} else {
+				console.warn('Could not find element to highlight. Info:', request.targetElementInfo);
+			}
+		}
 		sendResponse({ success: true });
 	} else if (request.action === "clearHighlights") {
 		highlighter.clearHighlights();

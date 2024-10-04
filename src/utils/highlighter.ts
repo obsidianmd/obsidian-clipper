@@ -18,9 +18,9 @@ let lastAppliedHighlights: string = '';
 let originalLinkClickHandlers: WeakMap<HTMLElement, (event: MouseEvent) => void> = new WeakMap();
 
 export interface HighlightData {
+	id: string;
 	xpath: string;
 	content: string;
-	id: string;
 }
 
 export interface TextHighlightData extends HighlightData {
@@ -440,3 +440,5 @@ export function clearHighlights() {
 		console.log('Highlights cleared for:', url);
 	});
 }
+
+export { getElementXPath } from './dom-utils';
