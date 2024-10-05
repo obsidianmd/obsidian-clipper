@@ -170,7 +170,8 @@ export async function extractPageContent(tabId: number): Promise<ContentResponse
 		if (response && response.content) {
 			return response;
 		}
-		throw new Error('Invalid response from content script');
+		// Content script was unable to load
+		throw new Error('Web Clipper was not able to start. Try restarting your browser.');
 	} catch (error) {
 		console.error('Error extracting page content:', error);
 		throw error;
