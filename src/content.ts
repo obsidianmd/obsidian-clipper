@@ -71,29 +71,29 @@ browser.runtime.onMessage.addListener(function(request: any, sender: browser.Run
 		console.log('Obsidian URI created:', request.uri);
 		sendResponse({ success: true });
 	} else if (request.action === "setHighlighterMode") {
-		highlighter.toggleHighlighter(request.isActive);
-		updateHighlightsState();
+		highlighter.toggleHighlighterMenu(request.isActive);
+		updateHasHighlights();
 		sendResponse({ success: true });
 		return true;
 	} else if (request.action === "getHighlighterMode") {
 		 browser.runtime.sendMessage({ action: "getHighlighterMode" }).then(sendResponse);
 		 return true;
 	} else if (request.action === "toggleHighlighter") {
-		highlighter.toggleHighlighter(request.isActive);
-		updateHighlightsState();
+		highlighter.toggleHighlighterMenu(request.isActive);
+		updateHasHighlights();
 		sendResponse({ success: true });
 	} else if (request.action === "highlightSelection") {
-		highlighter.toggleHighlighter(request.isActive);
+		highlighter.toggleHighlighterMenu(request.isActive);
 		if (request.highlightData && request.highlightData.type === 'text') {
 			const selection = window.getSelection();
 			if (selection && !selection.isCollapsed) {
 				highlighter.handleTextSelection(selection);
 			}
 		}
-		updateHighlightsState();
+		updateHasHighlights();
 		sendResponse({ success: true });
 	} else if (request.action === "highlightElement") {
-		highlighter.toggleHighlighter(request.isActive);
+		highlighter.toggleHighlighterMenu(request.isActive);
 		if (request.targetElementInfo) {
 			const { mediaType, srcUrl, pageUrl } = request.targetElementInfo;
 			
@@ -135,11 +135,11 @@ browser.runtime.onMessage.addListener(function(request: any, sender: browser.Run
 				console.warn('Could not find element to highlight. Info:', request.targetElementInfo);
 			}
 		}
-		updateHighlightsState();
+		updateHasHighlights();
 		sendResponse({ success: true });
 	} else if (request.action === "clearHighlights") {
 		highlighter.clearHighlights();
-		updateHighlightsState();
+		updateHasHighlights();
 		sendResponse({ success: true });
 	} else if (request.action === "getHighlighterState") {
 		browser.runtime.sendMessage({ action: "getHighlighterMode" })
@@ -211,10 +211,10 @@ function extractSchemaOrgData(): any {
 	return schemaData;
 }
 
-function updateHighlightsState() {
+function updateHasHighlights() {
 	const hasHighlights = highlighter.getHighlights().length > 0;
-	browser.runtime.sendMessage({ action: "updateHighlightsState", hasHighlights });
+	browser.runtime.sendMessage({ action: "updateHasHighlights", hasHighlights });
 }
 
-// Call updateHighlightsState when the page loads
-window.addEventListener('load', updateHighlightsState);
+// Call updateHasHighlights when the page loads
+window.addEventListener('load', updateHasHighlights);

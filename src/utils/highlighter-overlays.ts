@@ -13,7 +13,7 @@ import {
 import { throttle } from './throttle';
 import { getElementByXPath, isDarkColor } from './dom-utils';
 import browser from './browser-polyfill';
-import { toggleHighlighter } from './highlighter';
+import { toggleHighlighterMenu } from './highlighter';
 
 let hoverOverlay: HTMLElement | null = null;
 
@@ -294,7 +294,7 @@ async function handleHighlightClick(event: Event) {
 			if (!response.isActive) {
 				// Activate highlighter mode
 				await browser.runtime.sendMessage({ action: "setHighlighterMode", isActive: true });
-				toggleHighlighter(true);
+				toggleHighlighterMenu(true);
 			}
 		} else {
 			console.warn('Unexpected response format from getHighlighterMode');

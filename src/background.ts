@@ -48,6 +48,7 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 
 		if (typedRequest.action === "highlighterModeChanged" && sender.tab && typedRequest.isActive !== undefined) {
 			isHighlighterMode = typedRequest.isActive;
+			browser.runtime.sendMessage({ action: "updatePopupHighlighterUI", isActive: isHighlighterMode });
 			debouncedUpdateContextMenu(sender.tab.id!);
 		}
 
@@ -56,7 +57,7 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 			debouncedUpdateContextMenu(sender.tab.id!);
 		}
 
-		if (typedRequest.action === "updateHighlightsState" && sender.tab && typedRequest.hasHighlights !== undefined) {
+		if (typedRequest.action === "updateHasHighlights" && sender.tab && typedRequest.hasHighlights !== undefined) {
 			hasHighlights = typedRequest.hasHighlights;
 			debouncedUpdateContextMenu(sender.tab.id!);
 		}
@@ -112,7 +113,7 @@ const debouncedUpdateContextMenu = debounce(async (tabId: number) => {
 				{
 					id: isHighlighterMode ? "exit-highlighter" : "enter-highlighter",
 					title: isHighlighterMode ? "Exit highlighter mode" : "Highlight this page",
-					contexts: ["page"]
+					contexts: ["page","image", "video", "audio"]
 				},
 				{
 					id: "highlight-selection",
@@ -126,15 +127,7 @@ const debouncedUpdateContextMenu = debounce(async (tabId: number) => {
 				}
 			];
 
-		if (hasHighlights) {
-			menuItems.push({
-				id: "clear-highlights",
-				title: "Clear highlights",
-				contexts: ["page", "selection"]
-			});
-		}
-
-		const browserType = await detectBrowser();
+			const browserType = await detectBrowser();
 		if (browserType === 'chrome') {
 			menuItems.push({
 				id: 'open-side-panel',
@@ -153,23 +146,21 @@ const debouncedUpdateContextMenu = debounce(async (tabId: number) => {
 	}
 }, 100); // 100ms debounce time
 
-browser.contextMenus.onClicked.addListener((info, tab) => {
+browser.contextMenus.onClicked.addListener(async (info, tab) => {
 	if (info.menuItemId === "open-obsidian-clipper") {
 		browser.action.openPopup();
 	} else if (info.menuItemId === "enter-highlighter" && tab && tab.id) {
-		setHighlighterMode(tab.id, true);
+		await setHighlighterMode(tab.id, true);
 	} else if (info.menuItemId === "exit-highlighter" && tab && tab.id) {
-		setHighlighterMode(tab.id, false);
+		await setHighlighterMode(tab.id, false);
 	} else if (info.menuItemId === "highlight-selection" && tab && tab.id) {
-		highlightSelection(tab.id, info);
+		await highlightSelection(tab.id, info);
 	} else if (info.menuItemId === "highlight-element" && tab && tab.id) {
-		highlightElement(tab.id, info);
-	} else if (info.menuItemId === "clear-highlights" && tab && tab.id) {
-		clearHighlights(tab.id);
+		await highlightElement(tab.id, info);
 	} else if (info.menuItemId === 'open-side-panel' && tab && tab.id && tab.windowId) {
 		chrome.sidePanel.open({ tabId: tab.id });
 		sidePanelOpenWindows.add(tab.windowId);
-		ensureContentScriptLoaded(tab.id);
+		await ensureContentScriptLoaded(tab.id);
 	}
 });
 
@@ -199,16 +190,35 @@ async function setupTabListeners() {
 	}
 }
 
-function setHighlighterMode(tabId: number, activate: boolean) {
-	isHighlighterMode = activate;
-	browser.tabs.sendMessage(tabId, { action: "setHighlighterMode", isActive: activate });
-	browser.runtime.sendMessage({ action: "highlighterModeChanged", isActive: activate });
-	debouncedUpdateContextMenu(tabId);
-	browser.runtime.sendMessage({ action: "updatePopupHighlighterUI", isActive: activate });
+async function setHighlighterMode(tabId: number, activate: boolean) {
+	try {
+		// First, check if the tab exists
+		const tab = await browser.tabs.get(tabId);
+		if (!tab) {
+			console.error('Tab does not exist:', tabId);
+			return;
+		}
+
+		// Then, ensure the content script is loaded
+		await ensureContentScriptLoaded(tabId);
+
+		// Now try to send the message
+		isHighlighterMode = activate;
+		await browser.tabs.sendMessage(tabId, { action: "setHighlighterMode", isActive: activate });
+		debouncedUpdateContextMenu(tabId);
+		browser.runtime.sendMessage({ action: "updatePopupHighlighterUI", isActive: activate });
+	} catch (error) {
+		console.error('Error setting highlighter mode:', error);
+		// If there's still an error, the tab might have been closed or navigated away
+		// In this case, we should update our state accordingly
+		isHighlighterMode = false;
+		debouncedUpdateContextMenu(tabId);
+		browser.runtime.sendMessage({ action: "updatePopupHighlighterUI", isActive: false });
+	}
 }
 
-function toggleHighlighterMode(tabId: number) {
-	setHighlighterMode(tabId, !isHighlighterMode);
+async function toggleHighlighterMode(tabId: number) {
+	await setHighlighterMode(tabId, !isHighlighterMode);
 }
 
 async function highlightSelection(tabId: number, info: browser.Menus.OnClickData) {
@@ -243,10 +253,6 @@ async function highlightElement(tabId: number, info: browser.Menus.OnClickData) 
 	});
 	hasHighlights = true;
 	debouncedUpdateContextMenu(tabId);
-}
-
-function clearHighlights(tabId: number) {
-	browser.tabs.sendMessage(tabId, { action: "clearHighlights" });
 }
 
 // Initialize the tab listeners
