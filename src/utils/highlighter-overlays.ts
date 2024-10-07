@@ -180,7 +180,7 @@ function createHighlightOverlayElement(rect: DOMRect, content: string, isText: b
 	overlay.style.width = `${rect.width}px`;
 	overlay.style.height = `${rect.height}px`;
 	
-	overlay.setAttribute('title', content);
+	overlay.setAttribute('data-content', content);
 	
 	// Get the background color of the element under the highlight
 	const elementAtPoint = document.elementFromPoint(rect.left, rect.top);
