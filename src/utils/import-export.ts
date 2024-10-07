@@ -28,15 +28,11 @@ export async function exportTemplate(): Promise<void> {
 		name: template.name,
 		behavior: template.behavior,
 		noteContentFormat: template.noteContentFormat,
-		properties: template.properties.map(({ id, name, value }) => {
-			const type = generalSettings.propertyTypes.find(pt => pt.name === name)?.type || 'text';
-			return { 
-				id,
-				name, 
-				value, 
-				type 
-			};
-		}),
+		properties: template.properties.map(({ name, value, type }) => ({
+			name,
+			value,
+			type: type || generalSettings.propertyTypes.find(pt => pt.name === name)?.type || 'text'
+		})),
 		triggers: template.triggers,
 	};
 
