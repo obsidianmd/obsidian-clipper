@@ -67,8 +67,15 @@ export function toggleHighlighterMenu(isActive: boolean) {
 }
 
 function createHighlighterMenu() {
-	const menu = document.createElement('div');
-	menu.className = 'obsidian-highlighter-menu';
+	// Check if the menu already exists
+	let menu = document.querySelector('.obsidian-highlighter-menu');
+	
+	// If the menu doesn't exist, create it
+	if (!menu) {
+		menu = document.createElement('div');
+		menu.className = 'obsidian-highlighter-menu';
+		document.body.appendChild(menu);
+	}
 	
 	const highlightCount = highlights.length;
 	const highlightText = highlightCount === 1 ? '1 highlight' : `${highlightCount} highlights`;
@@ -80,7 +87,6 @@ function createHighlighterMenu() {
 			<button id="obsidian-exit-highlighter">Exit</button>
 		</div>
 	`;
-	document.body.appendChild(menu);
 
 	if (highlightCount > 0) {
 		document.getElementById('obsidian-clear-highlights')?.addEventListener('click', () => {
