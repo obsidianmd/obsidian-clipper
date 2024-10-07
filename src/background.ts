@@ -2,11 +2,13 @@ import browser from './utils/browser-polyfill';
 import { ensureContentScriptLoaded } from './utils/content-script-utils';
 import { detectBrowser } from './utils/browser-detection';
 import { updateCurrentActiveTab } from './utils/active-tab-manager';
-import { AnyHighlightData, ElementHighlightData, TextHighlightData } from './utils/highlighter';
+import { TextHighlightData } from './utils/highlighter';
+import { debounce } from './utils/debounce';
 
 let sidePanelOpenWindows: Set<number> = new Set();
 let isHighlighterMode = false;
 let hasHighlights = false;
+let isContextMenuCreating = false;
 
 browser.action.onClicked.addListener((tab) => {
 	if (tab.id) {
@@ -46,17 +48,17 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 
 		if (typedRequest.action === "highlighterModeChanged" && sender.tab && typedRequest.isActive !== undefined) {
 			isHighlighterMode = typedRequest.isActive;
-			updateContextMenu(sender.tab.id!);
+			debouncedUpdateContextMenu(sender.tab.id!);
 		}
 
 		if (typedRequest.action === "highlightsCleared" && sender.tab) {
 			hasHighlights = false;
-			updateContextMenu(sender.tab.id!);
+			debouncedUpdateContextMenu(sender.tab.id!);
 		}
 
 		if (typedRequest.action === "updateHighlightsState" && sender.tab && typedRequest.hasHighlights !== undefined) {
 			hasHighlights = typedRequest.hasHighlights;
-			updateContextMenu(sender.tab.id!);
+			debouncedUpdateContextMenu(sender.tab.id!);
 		}
 
 		if (typedRequest.action === "getHighlighterMode") {
@@ -88,100 +90,68 @@ browser.commands.onCommand.addListener((command, tab) => {
 	}
 });
 
-async function createContextMenu() {
-	browser.contextMenus.create({
-		id: "open-obsidian-clipper",
-		title: "Clip this page",
-		contexts: ["page", "selection", "image", "video", "audio"]
-	});
-
-	const browserType = await detectBrowser();
-	if (browserType === 'chrome') {
-		browser.contextMenus.create({
-			id: 'open-side-panel',
-			title: 'Open side panel',
-			contexts: ["page", "selection"]
-		});
+const debouncedUpdateContextMenu = debounce(async (tabId: number) => {
+	if (isContextMenuCreating) {
+		return;
 	}
+	isContextMenuCreating = true;
 
-	browser.contextMenus.create({
-		id: "toggle-highlighter",
-		title: "Highlight this page",
-		contexts: ["page"]
-	});
+	try {
+		await browser.contextMenus.removeAll();
 
-	browser.contextMenus.create({
-		id: "highlight-selection",
-		title: "Add to highlights",
-		contexts: ["selection"]
-	});
+		const menuItems: {
+			id: string;
+			title: string;
+			contexts: browser.Menus.ContextType[];
+		}[] = [
+				{
+					id: "open-obsidian-clipper",
+					title: "Clip this page",
+					contexts: ["page", "selection", "image", "video", "audio"]
+				},
+				{
+					id: isHighlighterMode ? "exit-highlighter" : "enter-highlighter",
+					title: isHighlighterMode ? "Exit highlighter mode" : "Highlight this page",
+					contexts: ["page"]
+				},
+				{
+					id: "highlight-selection",
+					title: "Add to highlights",
+					contexts: ["selection"]
+				},
+				{
+					id: "highlight-element",
+					title: "Add to highlights",
+					contexts: ["image", "video", "audio"]
+				}
+			];
 
-	browser.contextMenus.create({
-		id: "highlight-element",
-		title: "Add to highlights",
-		contexts: ["image", "video", "audio"]
-	});
+		if (hasHighlights) {
+			menuItems.push({
+				id: "clear-highlights",
+				title: "Clear highlights",
+				contexts: ["page", "selection"]
+			});
+		}
 
-	browser.contextMenus.create({
-		id: "clear-highlights",
-		title: "Clear highlights",
-		contexts: ["page","selection"]
-	});
+		const browserType = await detectBrowser();
+		if (browserType === 'chrome') {
+			menuItems.push({
+				id: 'open-side-panel',
+				title: 'Open side panel',
+				contexts: ["page", "selection"]
+			});
+		}
 
-}
-
-async function updateContextMenu(tabId: number) {
-	await browser.contextMenus.removeAll();
-
-	browser.contextMenus.create({
-		id: "open-obsidian-clipper",
-		title: "Clip this page",
-		contexts: ["page", "selection", "image", "video", "audio"]
-	});
-
-	const browserType = await detectBrowser();
-	if (browserType === 'chrome') {
-		browser.contextMenus.create({
-			id: 'open-side-panel',
-			title: 'Open side panel',
-			contexts: ["page", "selection"]
-		});
+		for (const item of menuItems) {
+			await browser.contextMenus.create(item);
+		}
+	} catch (error) {
+		console.error('Error updating context menu:', error);
+	} finally {
+		isContextMenuCreating = false;
 	}
-
-	if (isHighlighterMode) {
-		browser.contextMenus.create({
-			id: "exit-highlighter",
-			title: "Exit highlighter mode",
-			contexts: ["page"]
-		});
-	} else {
-		browser.contextMenus.create({
-			id: "enter-highlighter",
-			title: "Highlight this page",
-			contexts: ["page"]
-		});
-	}
-
-	browser.contextMenus.create({
-		id: "highlight-selection",
-		title: "Add to highlights",
-		contexts: ["selection"]
-	});
-
-	browser.contextMenus.create({
-		id: "highlight-element",
-		title: "Add to highlights",
-		contexts: ["image", "video", "audio"]
-	});
-
-	if (hasHighlights) {
-		browser.contextMenus.create({
-			id: "clear-highlights",
-			title: "Clear highlights",
-			contexts: ["page", "selection"]
-		});
-	}
-}
+}, 100); // 100ms debounce time
 
 browser.contextMenus.onClicked.addListener((info, tab) => {
 	if (info.menuItemId === "open-obsidian-clipper") {
@@ -204,7 +174,7 @@ browser.contextMenus.onClicked.addListener((info, tab) => {
 });
 
 browser.runtime.onInstalled.addListener(() => {
-	createContextMenu();
+	debouncedUpdateContextMenu(-1); // Use a dummy tabId for initial creation
 });
 
 async function isSidePanelOpen(windowId: number): Promise<boolean> {
@@ -214,14 +184,13 @@ async function isSidePanelOpen(windowId: number): Promise<boolean> {
 async function setupTabListeners() {
 	const browserType = await detectBrowser();
 	if (['chrome', 'brave', 'edge'].includes(browserType)) {
-		// Call this function when a tab is activated
+
 		browser.tabs.onActivated.addListener(async (activeInfo) => {
 			if (await isSidePanelOpen(activeInfo.windowId)) {
 				updateCurrentActiveTab(activeInfo.windowId);
 			}
 		});
 
-		// Call this function when a tab is updated
 		browser.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
 			if (changeInfo.status === 'complete' && tab.active && tab.windowId && await isSidePanelOpen(tab.windowId)) {
 				updateCurrentActiveTab(tab.windowId);
@@ -234,7 +203,7 @@ function setHighlighterMode(tabId: number, activate: boolean) {
 	isHighlighterMode = activate;
 	browser.tabs.sendMessage(tabId, { action: "setHighlighterMode", isActive: activate });
 	browser.runtime.sendMessage({ action: "highlighterModeChanged", isActive: activate });
-	updateContextMenu(tabId);
+	debouncedUpdateContextMenu(tabId);
 	browser.runtime.sendMessage({ action: "updatePopupHighlighterUI", isActive: activate });
 }
 
@@ -257,7 +226,7 @@ async function highlightSelection(tabId: number, info: browser.Menus.OnClickData
 		highlightData,
 	});
 	hasHighlights = true;
-	updateContextMenu(tabId);
+	debouncedUpdateContextMenu(tabId);
 }
 
 async function highlightElement(tabId: number, info: browser.Menus.OnClickData) {
@@ -273,7 +242,7 @@ async function highlightElement(tabId: number, info: browser.Menus.OnClickData) 
 		}
 	});
 	hasHighlights = true;
-	updateContextMenu(tabId);
+	debouncedUpdateContextMenu(tabId);
 }
 
 function clearHighlights(tabId: number) {

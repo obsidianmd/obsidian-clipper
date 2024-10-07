@@ -68,15 +68,24 @@ export function toggleHighlighter(isActive: boolean) {
 function createHighlighterMenu() {
 	const menu = document.createElement('div');
 	menu.className = 'obsidian-highlighter-menu';
+	
+	const highlightCount = highlights.length;
+	const highlightText = highlightCount === 1 ? '1 highlight' : `${highlightCount} highlights`;
+	
 	menu.innerHTML = `
-		<button id="obsidian-clear-highlights">Clear</button>
-		<button id="obsidian-exit-highlighter">Exit</button>
+		<span class="highlight-count">${highlightText}</span>
+		<div class="menu-buttons">
+			${highlightCount > 0 ? '<button id="obsidian-clear-highlights">Clear</button>' : ''}
+			<button id="obsidian-exit-highlighter">Exit</button>
+		</div>
 	`;
 	document.body.appendChild(menu);
 
-	document.getElementById('obsidian-clear-highlights')?.addEventListener('click', () => {
-		clearHighlights();
-	});
+	if (highlightCount > 0) {
+		document.getElementById('obsidian-clear-highlights')?.addEventListener('click', () => {
+			clearHighlights();
+		});
+	}
 
 	document.getElementById('obsidian-exit-highlighter')?.addEventListener('click', () => {
 		toggleHighlighter(false);
@@ -237,6 +246,7 @@ function addHighlight(highlight: AnyHighlightData) {
 	sortHighlights();
 	applyHighlights();
 	saveHighlights();
+	updateHighlighterMenu();
 }
 
 // Sort highlights based on their vertical position
@@ -455,7 +465,13 @@ export function clearHighlights() {
 		console.log('Highlights cleared for:', url);
 		browser.runtime.sendMessage({ action: "highlightsCleared" });
 		notifyHighlightsUpdated();
+		updateHighlighterMenu();
 	});
+}
+
+export function updateHighlighterMenu() {
+	removeHighlighterMenu();
+	createHighlighterMenu();
 }
 
 export { getElementXPath } from './dom-utils';

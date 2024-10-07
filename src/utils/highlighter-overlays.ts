@@ -7,10 +7,13 @@ import {
 	sortHighlights,
 	applyHighlights,
 	saveHighlights,
-	updateHighlights
+	updateHighlights,
+	updateHighlighterMenu
 } from './highlighter';
 import { throttle } from './throttle';
 import { getElementByXPath, isDarkColor } from './dom-utils';
+import browser from './browser-polyfill';
+import { toggleHighlighter } from './highlighter';
 
 let hoverOverlay: HTMLElement | null = null;
 
@@ -280,18 +283,50 @@ export function removeHoverOverlay() {
 }
 
 // Update the type of handleHighlightClick
-function handleHighlightClick(event: Event) {
+async function handleHighlightClick(event: Event) {
 	event.stopPropagation();
 	const overlay = event.currentTarget as HTMLElement;
-	const index = overlay.dataset.highlightIndex;
-	if (index !== undefined) {
-		const highlightToRemove = highlights[parseInt(index)];
+	
+	try {
+		// Check if highlighter mode is active, if not, activate it
+		const response = await browser.runtime.sendMessage({ action: "getHighlighterMode" });
+		if (response && typeof response === 'object' && 'isActive' in response) {
+			if (!response.isActive) {
+				// Activate highlighter mode
+				await browser.runtime.sendMessage({ action: "setHighlighterMode", isActive: true });
+				toggleHighlighter(true);
+			}
+		} else {
+			console.warn('Unexpected response format from getHighlighterMode');
+		}
+
+		if (!overlay || !overlay.dataset) {
+			console.warn('Invalid overlay element');
+			return;
+		}
+
+		const index = overlay.dataset.highlightIndex;
+		if (index === undefined) {
+			console.warn('No highlight index found on clicked element');
+			return;
+		}
+
+		const highlightIndex = parseInt(index);
+		if (isNaN(highlightIndex) || highlightIndex < 0 || highlightIndex >= highlights.length) {
+			console.warn(`Invalid highlight index: ${index}`);
+			return;
+		}
+
+		const highlightToRemove = highlights[highlightIndex];
 		const newHighlights = highlights.filter((h: AnyHighlightData) => h.id !== highlightToRemove.id);
 		updateHighlights(newHighlights);
-		removeExistingHighlightOverlays(parseInt(index));
+		removeExistingHighlightOverlays(highlightIndex);
 		sortHighlights();
 		applyHighlights();
 		saveHighlights();
+		updateHighlighterMenu();
+	} catch (error) {
+		console.error('Error handling highlight click:', error);
 	}
 }
 
