@@ -1,5 +1,4 @@
 import { 
-	isHighlighterMode, 
 	handleTextSelection, 
 	highlightElement, 
 	AnyHighlightData, 
@@ -25,7 +24,6 @@ function isIgnoredElement(element: Element): boolean {
 
 // Handles mouse move events for hover effects
 export function handleMouseMove(event: MouseEvent) {
-	if (!isHighlighterMode) return;
 	const target = event.target as Element;
 	if (!isIgnoredElement(target)) {
 		createOrUpdateHoverOverlay(target);
@@ -36,7 +34,6 @@ export function handleMouseMove(event: MouseEvent) {
 
 // Handle mouse up events for highlighting
 export function handleMouseUp(event: MouseEvent) {
-	if (!isHighlighterMode) return;
 	const selection = window.getSelection();
 	if (selection && !selection.isCollapsed) {
 		handleTextSelection(selection);
@@ -54,9 +51,7 @@ export function handleMouseUp(event: MouseEvent) {
 export function updateHighlightListeners() {
 	document.querySelectorAll('.obsidian-highlight-overlay').forEach(highlight => {
 		highlight.removeEventListener('click', handleHighlightClick);
-		if (isHighlighterMode) {
-			highlight.addEventListener('click', handleHighlightClick);
-		}
+		highlight.addEventListener('click', handleHighlightClick);
 	});
 }
 

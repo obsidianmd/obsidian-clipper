@@ -11,7 +11,6 @@ import {
 
 export type AnyHighlightData = TextHighlightData | ElementHighlightData | ComplexHighlightData;
 
-export let isHighlighterMode = false;
 export let highlights: AnyHighlightData[] = [];
 export let isApplyingHighlights = false;
 let lastAppliedHighlights: string = '';
@@ -48,9 +47,8 @@ export function updateHighlights(newHighlights: AnyHighlightData[]) {
 
 // Toggle highlighter mode on or off
 export function toggleHighlighter(isActive: boolean) {
-	isHighlighterMode = isActive;
-	document.body.classList.toggle('obsidian-highlighter-active', isHighlighterMode);
-	if (isHighlighterMode) {
+	document.body.classList.toggle('obsidian-highlighter-active', isActive);
+	if (isActive) {
 		document.addEventListener('mouseup', handleMouseUp);
 		document.addEventListener('mousemove', handleMouseMove);
 		disableLinkClicks();
@@ -80,7 +78,7 @@ function createHighlighterMenu() {
 	});
 
 	document.getElementById('obsidian-exit-highlighter')?.addEventListener('click', () => {
-		toggleHighlighter(false);
+		browser.runtime.sendMessage({ action: "setHighlighterMode", isActive: false });
 	});
 	}
 

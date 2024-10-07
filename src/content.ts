@@ -19,8 +19,6 @@ interface ContentResponse {
 	highlights: string[];
 }
 
-let isHighlighterMode = false;
-
 browser.runtime.onMessage.addListener(function(request: any, sender: browser.Runtime.MessageSender, sendResponse: (response?: any) => void) {
 	if (request.action === "getPageContent") {
 		let selectedHtml = '';
@@ -72,9 +70,15 @@ browser.runtime.onMessage.addListener(function(request: any, sender: browser.Run
 	} else if (request.action === "logObsidianUri") {
 		console.log('Obsidian URI created:', request.uri);
 		sendResponse({ success: true });
+	} else if (request.action === "setHighlighterMode") {
+		highlighter.toggleHighlighter(request.isActive);
+		updateHighlightsState();
+		sendResponse({ success: true });
+	} else if (request.action === "getHighlighterMode") {
+		 browser.runtime.sendMessage({ action: "getHighlighterMode" }).then(sendResponse);
+		 return true;
 	} else if (request.action === "toggleHighlighter") {
-		isHighlighterMode = request.isActive;
-		highlighter.toggleHighlighter(isHighlighterMode);
+		highlighter.toggleHighlighter(request.isActive);
 		updateHighlightsState();
 		sendResponse({ success: true });
 	} else if (request.action === "highlightSelection") {
@@ -137,7 +141,8 @@ browser.runtime.onMessage.addListener(function(request: any, sender: browser.Run
 		updateHighlightsState();
 		sendResponse({ success: true });
 	} else if (request.action === "getHighlighterState") {
-		sendResponse({ isActive: isHighlighterMode });
+		browser.runtime.sendMessage({ action: "getHighlighterMode" }).then(sendResponse);
+		return true;
 	}
 	return true;
 });

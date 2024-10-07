@@ -59,6 +59,14 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 			updateContextMenu(sender.tab.id!);
 		}
 
+		if (typedRequest.action === "getHighlighterMode") {
+			sendResponse({ isActive: isHighlighterMode });
+		}
+
+		if (typedRequest.action === "toggleHighlighterMode" && typedRequest.tabId) {
+			toggleHighlighterMode(typedRequest.tabId);
+			sendResponse({ success: true });
+		}
 	}
 	return true;
 });
@@ -76,7 +84,7 @@ browser.commands.onCommand.addListener((command, tab) => {
 		});
 	}
 	if (command === "toggle_highlighter" && tab && tab.id) {
-		toggleHighlighterMode(tab.id, !isHighlighterMode);
+		toggleHighlighterMode(tab.id);
 	}
 });
 
@@ -179,9 +187,9 @@ browser.contextMenus.onClicked.addListener((info, tab) => {
 	if (info.menuItemId === "open-obsidian-clipper") {
 		browser.action.openPopup();
 	} else if (info.menuItemId === "enter-highlighter" && tab && tab.id) {
-		toggleHighlighterMode(tab.id, true);
+		setHighlighterMode(tab.id, true);
 	} else if (info.menuItemId === "exit-highlighter" && tab && tab.id) {
-		toggleHighlighterMode(tab.id, false);
+		setHighlighterMode(tab.id, false);
 	} else if (info.menuItemId === "highlight-selection" && tab && tab.id) {
 		highlightSelection(tab.id, info);
 	} else if (info.menuItemId === "highlight-element" && tab && tab.id) {
@@ -222,8 +230,17 @@ async function setupTabListeners() {
 	}
 }
 
-function toggleHighlighterMode(tabId: number, activate: boolean) {
-	browser.tabs.sendMessage(tabId, { action: "toggleHighlighter", isActive: activate });
+function setHighlighterMode(tabId: number, activate: boolean) {
+	isHighlighterMode = activate;
+	browser.tabs.sendMessage(tabId, { action: "setHighlighterMode", isActive: activate });
+	browser.runtime.sendMessage({ action: "highlighterModeChanged", isActive: activate });
+	updateContextMenu(tabId);
+	// Send a message to update the popup UI
+	browser.runtime.sendMessage({ action: "updatePopupHighlighterUI", isActive: activate });
+}
+
+function toggleHighlighterMode(tabId: number) {
+	setHighlighterMode(tabId, !isHighlighterMode);
 }
 
 async function highlightSelection(tabId: number, info: browser.Menus.OnClickData) {
