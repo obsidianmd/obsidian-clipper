@@ -74,6 +74,7 @@ browser.runtime.onMessage.addListener(function(request: any, sender: browser.Run
 		highlighter.toggleHighlighter(request.isActive);
 		updateHighlightsState();
 		sendResponse({ success: true });
+		return true;
 	} else if (request.action === "getHighlighterMode") {
 		 browser.runtime.sendMessage({ action: "getHighlighterMode" }).then(sendResponse);
 		 return true;
@@ -141,7 +142,14 @@ browser.runtime.onMessage.addListener(function(request: any, sender: browser.Run
 		updateHighlightsState();
 		sendResponse({ success: true });
 	} else if (request.action === "getHighlighterState") {
-		browser.runtime.sendMessage({ action: "getHighlighterMode" }).then(sendResponse);
+		browser.runtime.sendMessage({ action: "getHighlighterMode" })
+			.then(response => {
+				sendResponse(response);
+			})
+			.catch(error => {
+				console.error("Error getting highlighter mode:", error);
+				sendResponse({ isActive: false });
+			});
 		return true;
 	}
 	return true;
