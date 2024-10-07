@@ -235,7 +235,6 @@ function setHighlighterMode(tabId: number, activate: boolean) {
 	browser.tabs.sendMessage(tabId, { action: "setHighlighterMode", isActive: activate });
 	browser.runtime.sendMessage({ action: "highlighterModeChanged", isActive: activate });
 	updateContextMenu(tabId);
-	// Send a message to update the popup UI
 	browser.runtime.sendMessage({ action: "updatePopupHighlighterUI", isActive: activate });
 }
 

@@ -59,6 +59,7 @@ export function toggleHighlighter(isActive: boolean) {
 		removeHoverOverlay();
 		enableLinkClicks();
 		removeHighlighterMenu();
+		removeExistingHighlights();
 	}
 	updateHighlightListeners();
 	browser.runtime.sendMessage({ action: "highlighterModeChanged", isActive });
@@ -78,11 +79,12 @@ function createHighlighterMenu() {
 	});
 
 	document.getElementById('obsidian-exit-highlighter')?.addEventListener('click', () => {
+		toggleHighlighter(false);
 		browser.runtime.sendMessage({ action: "setHighlighterMode", isActive: false });
 	});
-	}
+}
 
-	function removeHighlighterMenu() {
+function removeHighlighterMenu() {
 	const menu = document.querySelector('.obsidian-highlighter-menu');
 	if (menu) {
 		menu.remove();
