@@ -16,6 +16,15 @@ export let isApplyingHighlights = false;
 let lastAppliedHighlights: string = '';
 let originalLinkClickHandlers: WeakMap<HTMLElement, (event: MouseEvent) => void> = new WeakMap();
 
+interface HistoryAction {
+	type: 'add' | 'remove';
+	oldHighlights: AnyHighlightData[];
+	newHighlights: AnyHighlightData[];
+}
+
+let highlightHistory: HistoryAction[] = [];
+const MAX_HISTORY_LENGTH = 30;
+
 export interface HighlightData {
 	id: string;
 	xpath: string;
@@ -42,7 +51,9 @@ export interface StoredData {
 }
 
 export function updateHighlights(newHighlights: AnyHighlightData[]) {
+	const oldHighlights = [...highlights];
 	highlights = newHighlights;
+	addToHistory('add', oldHighlights, newHighlights);
 }
 
 // Toggle highlighter mode on or off
@@ -51,14 +62,14 @@ export function toggleHighlighterMenu(isActive: boolean) {
 	if (isActive) {
 		document.addEventListener('mouseup', handleMouseUp);
 		document.addEventListener('mousemove', handleMouseMove);
-		document.addEventListener('keydown', handleEscapeKey);
+		document.addEventListener('keydown', handleKeyDown);
 		disableLinkClicks();
 		createHighlighterMenu();
 		browser.runtime.sendMessage({ action: "highlighterModeChanged", isActive: true });
 	} else {
 		document.removeEventListener('mouseup', handleMouseUp);
 		document.removeEventListener('mousemove', handleMouseMove);
-		document.removeEventListener('keydown', handleEscapeKey);
+		document.removeEventListener('keydown', handleKeyDown);
 		removeHoverOverlay();
 		enableLinkClicks();
 		removeHighlighterMenu();
@@ -252,7 +263,10 @@ function getTextOffset(container: Element, targetNode: Node, targetOffset: numbe
 
 // Add a new highlight to the page
 function addHighlight(highlight: AnyHighlightData) {
-	highlights = mergeOverlappingHighlights(highlights, highlight);
+	const oldHighlights = [...highlights];
+	const mergedHighlights = mergeOverlappingHighlights(highlights, highlight);
+	highlights = mergedHighlights;
+	addToHistory('add', oldHighlights, mergedHighlights);
 	sortHighlights();
 	applyHighlights();
 	saveHighlights();
@@ -475,6 +489,7 @@ export function loadHighlights() {
 // Clear all highlights from the page and storage
 export function clearHighlights() {
 	const url = window.location.href;
+	const oldHighlights = [...highlights];
 	browser.storage.local.remove(url).then(() => {
 		highlights = [];
 		removeExistingHighlights();
@@ -482,6 +497,7 @@ export function clearHighlights() {
 		browser.runtime.sendMessage({ action: "highlightsCleared" });
 		notifyHighlightsUpdated();
 		updateHighlighterMenu();
+		addToHistory('remove', oldHighlights, []);
 	});
 }
 
@@ -490,15 +506,37 @@ export function updateHighlighterMenu() {
 	createHighlighterMenu();
 }
 
-function handleEscapeKey(event: KeyboardEvent) {
+function handleKeyDown(event: KeyboardEvent) {
 	if (event.key === 'Escape' && document.body.classList.contains('obsidian-highlighter-active')) {
 		exitHighlighterMode();
+	} else if ((event.metaKey || event.ctrlKey) && event.key === 'z') {
+		event.preventDefault();
+		undo();
 	}
 }
 
 function exitHighlighterMode() {
 	toggleHighlighterMenu(false);
 	browser.runtime.sendMessage({ action: "setHighlighterMode", isActive: false });
+}
+
+function addToHistory(type: 'add' | 'remove', oldHighlights: AnyHighlightData[], newHighlights: AnyHighlightData[]) {
+	highlightHistory.push({ type, oldHighlights, newHighlights });
+	if (highlightHistory.length > MAX_HISTORY_LENGTH) {
+		highlightHistory.shift();
+	}
+}
+
+function undo() {
+	if (highlightHistory.length > 0) {
+		const lastAction = highlightHistory.pop();
+		if (lastAction) {
+			highlights = [...lastAction.oldHighlights];
+			applyHighlights();
+			saveHighlights();
+			updateHighlighterMenu();
+		}
+	}
 }
 
 export { getElementXPath } from './dom-utils';
