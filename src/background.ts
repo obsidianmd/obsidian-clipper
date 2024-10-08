@@ -81,7 +81,7 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 	return true;
 });
 
-browser.commands.onCommand.addListener((command, tab) => {
+browser.commands.onCommand.addListener(async (command, tab) => {
 	if (command === 'quick_clip') {
 		browser.tabs.query({active: true, currentWindow: true}).then((tabs) => {
 			if (tabs[0]?.id) {
@@ -94,6 +94,7 @@ browser.commands.onCommand.addListener((command, tab) => {
 		});
 	}
 	if (command === "toggle_highlighter" && tab && tab.id) {
+		await ensureContentScriptLoaded(tab.id);
 		toggleHighlighterMode(tab.id);
 	}
 });
@@ -237,10 +238,17 @@ async function setHighlighterMode(tabId: number, activate: boolean) {
 }
 
 async function toggleHighlighterMode(tabId: number) {
-	const result = await browser.storage.local.get('isHighlighterMode');
-	const currentMode = result.isHighlighterMode;
-	await browser.storage.local.set({ isHighlighterMode: !currentMode });
-	await setHighlighterMode(tabId, !currentMode);
+	try {
+		const result = await browser.storage.local.get('isHighlighterMode');
+		const currentMode = result.isHighlighterMode || false;
+		const newMode = !currentMode;
+		await browser.storage.local.set({ isHighlighterMode: newMode });
+		await browser.tabs.sendMessage(tabId, { action: "setHighlighterMode", isActive: newMode });
+		debouncedUpdateContextMenu(tabId);
+		browser.runtime.sendMessage({ action: "updatePopupHighlighterUI", isActive: newMode });
+	} catch (error) {
+		console.error('Error toggling highlighter mode:', error);
+	}
 }
 
 async function highlightSelection(tabId: number, info: browser.Menus.OnClickData) {
