@@ -23,6 +23,7 @@ interface HistoryAction {
 }
 
 let highlightHistory: HistoryAction[] = [];
+let redoHistory: HistoryAction[] = [];
 const MAX_HISTORY_LENGTH = 30;
 
 export interface HighlightData {
@@ -511,7 +512,11 @@ function handleKeyDown(event: KeyboardEvent) {
 		exitHighlighterMode();
 	} else if ((event.metaKey || event.ctrlKey) && event.key === 'z') {
 		event.preventDefault();
-		undo();
+		if (event.shiftKey) {
+			redo();
+		} else {
+			undo();
+		}
 	}
 }
 
@@ -525,12 +530,15 @@ function addToHistory(type: 'add' | 'remove', oldHighlights: AnyHighlightData[],
 	if (highlightHistory.length > MAX_HISTORY_LENGTH) {
 		highlightHistory.shift();
 	}
+	// Clear redo history when a new action is performed
+	redoHistory = [];
 }
 
 function undo() {
 	if (highlightHistory.length > 0) {
 		const lastAction = highlightHistory.pop();
 		if (lastAction) {
+			redoHistory.push(lastAction);
 			highlights = [...lastAction.oldHighlights];
 			applyHighlights();
 			saveHighlights();
@@ -539,4 +547,18 @@ function undo() {
 	}
 }
 
+function redo() {
+	if (redoHistory.length > 0) {
+		const nextAction = redoHistory.pop();
+		if (nextAction) {
+			highlightHistory.push(nextAction);
+			highlights = [...nextAction.newHighlights];
+			applyHighlights();
+			saveHighlights();
+			updateHighlighterMenu();
+		}
+	}
+}
+
 export { getElementXPath } from './dom-utils';
+export { undo, redo };
