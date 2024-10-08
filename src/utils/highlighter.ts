@@ -523,6 +523,7 @@ function handleKeyDown(event: KeyboardEvent) {
 function exitHighlighterMode() {
 	toggleHighlighterMenu(false);
 	browser.runtime.sendMessage({ action: "setHighlighterMode", isActive: false });
+	browser.storage.local.set({ isHighlighterMode: false });
 }
 
 function addToHistory(type: 'add' | 'remove', oldHighlights: AnyHighlightData[], newHighlights: AnyHighlightData[]) {

@@ -20,6 +20,10 @@ import { isBlankPage, isValidUrl } from '../utils/active-tab-manager';
 import { memoizeWithExpiration } from '../utils/memoize';
 import { debounce } from '../utils/debounce';
 
+interface HighlighterStateResponse {
+	isActive: boolean;
+}
+
 let loadedSettings: Settings;
 let currentTemplate: Template | null = null;
 let templates: Template[] = [];
@@ -27,6 +31,7 @@ let currentVariables: { [key: string]: string } = {};
 let currentTabId: number | undefined;
 let lastUsedTemplateId: string | null = null;
 let lastSelectedVault: string | null = null;
+let isHighlighterMode = false;
 
 const isSidePanel = window.location.pathname.includes('side-panel.html');
 
@@ -229,6 +234,9 @@ function setupMessageListeners() {
 			}
 		} else if (request.action === "updatePopupHighlighterUI") {
 			updateHighlighterModeUI(request.isActive);
+		} else if (request.action === "highlighterModeChanged") {
+			isHighlighterMode = request.isActive;
+			updateHighlighterModeUI(isHighlighterMode);
 		}
 	});
 }
@@ -314,7 +322,7 @@ function setupEventListeners(tabId: number) {
 
 	const highlighterModeButton = document.getElementById('highlighter-mode');
 	if (highlighterModeButton) {
-		highlighterModeButton.addEventListener('click', () => checkHighlighterModeState(tabId, true));
+		highlighterModeButton.addEventListener('click', () => toggleHighlighterMode(tabId));
 	}
 }
 
@@ -865,27 +873,44 @@ function handleTemplateChange(templateId: string) {
 	refreshFields(currentTabId!, false);
 }
 
-async function checkHighlighterModeState(tabId: number, toggle: boolean = false) {
+async function checkHighlighterModeState(tabId: number) {
 	try {
-		if (toggle) {
-			await browser.runtime.sendMessage({ action: "toggleHighlighterMode", tabId });
-		}
-		const response = await browser.runtime.sendMessage({ action: "getHighlighterMode" });
-		if (typeof response === 'object' && response !== null && 'isActive' in response) {
-			const isActive = Boolean(response.isActive);
-			updateHighlighterModeUI(isActive);
-		} else {
-			console.error('Unexpected response format from getHighlighterMode');
-		}
+		const result = await browser.storage.local.get('isHighlighterMode');
+		updateHighlighterModeUI(result.isHighlighterMode as boolean);
 	} catch (error) {
 		console.error('Error checking highlighter mode state:', error);
+		// If there's an error, assume highlighter mode is off
+		isHighlighterMode = false;
+		updateHighlighterModeUI(false);
 	}
+}
+
+async function toggleHighlighterMode(tabId: number) {
+	isHighlighterMode = !isHighlighterMode;
+	await setLocalStorage('isHighlighterMode', isHighlighterMode);
+	
+	// Send a message to the content script to toggle the highlighter mode
+	await browser.tabs.sendMessage(tabId, { 
+		action: "setHighlighterMode", 
+		isActive: isHighlighterMode 
+	});
+
+	// Update the UI
+	updateHighlighterModeUI(isHighlighterMode);
+
+	// Notify the background script about the change
+	await browser.runtime.sendMessage({ 
+		action: "highlighterModeChanged", 
+		isActive: isHighlighterMode 
+	});
 }
 
 function updateHighlighterModeUI(isActive: boolean) {
 	const highlighterModeButton = document.getElementById('highlighter-mode');
 	if (highlighterModeButton) {
 		highlighterModeButton.classList.toggle('active', isActive);
+		highlighterModeButton.setAttribute('aria-pressed', isActive.toString());
+		highlighterModeButton.title = isActive ? 'Disable highlighter' : 'Enable highlighter';
 	}
 }
 
