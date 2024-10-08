@@ -19,8 +19,6 @@ interface ContentResponse {
 	highlights: string[];
 }
 
-let isHighlighterMode = false;
-
 browser.runtime.onMessage.addListener(function(request: any, sender: browser.Runtime.MessageSender, sendResponse: (response?: any) => void) {
 	if (request.action === "getPageContent") {
 		let selectedHtml = '';
@@ -73,9 +71,7 @@ browser.runtime.onMessage.addListener(function(request: any, sender: browser.Run
 		console.log('Obsidian URI created:', request.uri);
 		sendResponse({ success: true });
 	} else if (request.action === "setHighlighterMode") {
-		isHighlighterMode = request.isActive;
-		browser.storage.local.set({ isHighlighterMode: request.isActive });
-		highlighter.toggleHighlighterMenu(isHighlighterMode);
+		highlighter.toggleHighlighterMenu(request.isActive);
 		updateHasHighlights();
 		sendResponse({ success: true });
 		return true;

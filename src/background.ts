@@ -179,18 +179,12 @@ async function setupTabListeners() {
 		browser.tabs.onActivated.addListener(async (activeInfo) => {
 			if (await isSidePanelOpen(activeInfo.windowId)) {
 				updateCurrentActiveTab(activeInfo.windowId);
-				if (isHighlighterMode) {
-					await setHighlighterMode(activeInfo.tabId, true);
-				}
 			}
 		});
 
 		browser.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
 			if (changeInfo.status === 'complete' && tab.active && tab.windowId && await isSidePanelOpen(tab.windowId)) {
 				updateCurrentActiveTab(tab.windowId);
-				if (isHighlighterMode) {
-					await setHighlighterMode(tabId, true);
-				}
 			}
 		});
 	}
@@ -210,30 +204,21 @@ async function setHighlighterMode(tabId: number, activate: boolean) {
 
 		// Now try to send the message
 		isHighlighterMode = activate;
-		await browser.storage.local.set({ isHighlighterMode: activate });
 		await browser.tabs.sendMessage(tabId, { action: "setHighlighterMode", isActive: activate });
 		debouncedUpdateContextMenu(tabId);
 		browser.runtime.sendMessage({ action: "updatePopupHighlighterUI", isActive: activate });
-
-		// Store the highlighter mode state
-		await browser.storage.local.set({ isHighlighterMode: activate });
 	} catch (error) {
 		console.error('Error setting highlighter mode:', error);
 		// If there's still an error, the tab might have been closed or navigated away
 		// In this case, we should update our state accordingly
 		isHighlighterMode = false;
-		await browser.storage.local.set({ isHighlighterMode: false });
 		debouncedUpdateContextMenu(tabId);
 		browser.runtime.sendMessage({ action: "updatePopupHighlighterUI", isActive: false });
-		await browser.storage.local.set({ isHighlighterMode: false });
 	}
 }
 
 async function toggleHighlighterMode(tabId: number) {
-	const result = await browser.storage.local.get('isHighlighterMode');
-	const currentMode = result.isHighlighterMode;
-	await browser.storage.local.set({ isHighlighterMode: !currentMode });
-	await setHighlighterMode(tabId, !currentMode);
+	await setHighlighterMode(tabId, !isHighlighterMode);
 }
 
 async function highlightSelection(tabId: number, info: browser.Menus.OnClickData) {
@@ -272,8 +257,3 @@ async function highlightElement(tabId: number, info: browser.Menus.OnClickData) 
 
 // Initialize the tab listeners
 setupTabListeners();
-
-// Initialize the global highlighter state when the extension starts
-browser.storage.local.get('isHighlighterMode').then((result: { isHighlighterMode?: boolean }) => {
-	isHighlighterMode = result.isHighlighterMode ?? false;
-});
