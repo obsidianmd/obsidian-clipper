@@ -88,7 +88,58 @@ export function toggleHighlighterMenu(isActive: boolean) {
 	updateHighlightListeners();
 }
 
-function createHighlighterMenu() {
+export function canUndo(): boolean {
+	return highlightHistory.length > 0;
+}
+
+export function canRedo(): boolean {
+	return redoHistory.length > 0;
+}
+
+export function undo() {
+	if (canUndo()) {
+		const lastAction = highlightHistory.pop();
+		if (lastAction) {
+			redoHistory.push(lastAction);
+			highlights = [...lastAction.oldHighlights];
+			applyHighlights();
+			saveHighlights();
+			updateHighlighterMenu();
+			updateUndoRedoButtons();
+		}
+	}
+}
+
+export function redo() {
+	if (canRedo()) {
+		const nextAction = redoHistory.pop();
+		if (nextAction) {
+			highlightHistory.push(nextAction);
+			highlights = [...nextAction.newHighlights];
+			applyHighlights();
+			saveHighlights();
+			updateHighlighterMenu();
+			updateUndoRedoButtons();
+		}
+	}
+}
+
+function updateUndoRedoButtons() {
+	const undoButton = document.getElementById('obsidian-undo-highlights');
+	const redoButton = document.getElementById('obsidian-redo-highlights');
+
+	if (undoButton) {
+		undoButton.classList.toggle('active', canUndo());
+		undoButton.setAttribute('aria-disabled', (!canUndo()).toString());
+	}
+
+	if (redoButton) {
+		redoButton.classList.toggle('active', canRedo());
+		redoButton.setAttribute('aria-disabled', (!canRedo()).toString());
+	}
+}
+
+export function createHighlighterMenu() {
 	// Check if the menu already exists
 	let menu = document.querySelector('.obsidian-highlighter-menu');
 	
@@ -105,8 +156,9 @@ function createHighlighterMenu() {
 	menu.innerHTML = `
 		${highlightCount > 0 ? `<button id="obsidian-quick-clip" class="mod-cta">Clip highlights</button>` : '<span class="no-highlights">Select elements to highlight</span>'}
 		${highlightCount > 0 ? `<button id="obsidian-clear-highlights">${highlightText} <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg></button>` : ''}
+		<button id="obsidian-undo-highlights"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-undo-2"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5v0a5.5 5.5 0 0 1-5.5 5.5H11"/></svg></button>
+		<button id="obsidian-redo-highlights"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-redo-2"><path d="m15 14 5-5-5-5"/><path d="M20 9H9.5A5.5 5.5 0 0 0 4 14.5v0A5.5 5.5 0 0 0 9.5 20H13"/></svg></button>
 		<button id="obsidian-exit-highlighter"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>	
-
 	`;
 
 	if (highlightCount > 0) {
@@ -121,6 +173,16 @@ function createHighlighterMenu() {
 	document.getElementById('obsidian-exit-highlighter')?.addEventListener('click', () => {
 		exitHighlighterMode();
 	});
+
+	document.getElementById('obsidian-undo-highlights')?.addEventListener('click', () => {
+		undo();
+	});
+
+	document.getElementById('obsidian-redo-highlights')?.addEventListener('click', () => {
+		redo();
+	});
+
+	updateUndoRedoButtons();
 }
 
 function removeHighlighterMenu() {
@@ -541,33 +603,7 @@ function addToHistory(type: 'add' | 'remove', oldHighlights: AnyHighlightData[],
 	}
 	// Clear redo history when a new action is performed
 	redoHistory = [];
-}
-
-function undo() {
-	if (highlightHistory.length > 0) {
-		const lastAction = highlightHistory.pop();
-		if (lastAction) {
-			redoHistory.push(lastAction);
-			highlights = [...lastAction.oldHighlights];
-			applyHighlights();
-			saveHighlights();
-			updateHighlighterMenu();
-		}
-	}
-}
-
-function redo() {
-	if (redoHistory.length > 0) {
-		const nextAction = redoHistory.pop();
-		if (nextAction) {
-			highlightHistory.push(nextAction);
-			highlights = [...nextAction.newHighlights];
-			applyHighlights();
-			saveHighlights();
-			updateHighlighterMenu();
-		}
-	}
+	updateUndoRedoButtons();
 }
 
 export { getElementXPath } from './dom-utils';
-export { undo, redo };
