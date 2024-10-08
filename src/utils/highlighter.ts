@@ -67,39 +67,32 @@ export function toggleHighlighterMenu(isActive: boolean) {
 }
 
 function createHighlighterMenu() {
-	const menu = document.createElement('div');
-	menu.className = 'obsidian-highlighter-menu';
+	// Check if the menu already exists
+	let menu = document.querySelector('.obsidian-highlighter-menu');
+	
+	// If the menu doesn't exist, create it
+	if (!menu) {
+		menu = document.createElement('div');
+		menu.className = 'obsidian-highlighter-menu';
+		document.body.appendChild(menu);
+	}
 	
 	const highlightCount = highlights.length;
-	const highlightText = highlightCount === 1 ? '1 highlight' : `${highlightCount} highlights`;
-
+	const highlightText = `${highlightCount}`;
+	
 	menu.innerHTML = `
-		<span class="highlight-count">${highlightText}</span>
-		<div class="menu-buttons">
-			${highlightCount > 0 ? '<button id="obsidian-clear-highlights">Clear</button>' : ''}
-			${highlightCount > 0 ? '<button id="obsidian-quick-clip">Clip</button>' : ''}
-			<button id="obsidian-exit-highlighter">Exit</button>
-		</div>
+		${highlightCount > 0 ? `<button id="obsidian-quick-clip" class="mod-cta">Clip highlights</button>` : '<span class="no-highlights">Select elements to highlight</span>'}
+		${highlightCount > 0 ? `<button id="obsidian-clear-highlights">${highlightText} <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg></button>` : ''}
+		<button id="obsidian-exit-highlighter"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>	
+
 	`;
-	document.body.appendChild(menu);
 
 	if (highlightCount > 0) {
 		document.getElementById('obsidian-clear-highlights')?.addEventListener('click', () => {
 			clearHighlights();
 		});
-	}
-
-	if (highlightCount > 0) {
 		document.getElementById('obsidian-quick-clip')?.addEventListener('click', () => {
-			browser.tabs.query({active: true, currentWindow: true}).then((tabs) => {
-				if (tabs[0]?.id) {
-					browser.action.openPopup();
-					setTimeout(() => {
-						browser.runtime.sendMessage({action: "triggerQuickClip"})
-							.catch(error => console.error("Failed to send quick clip message:", error));
-					}, 500);
-				}
-			});
+			browser.runtime.sendMessage({action: "quickClip"})
 		});
 	}
 

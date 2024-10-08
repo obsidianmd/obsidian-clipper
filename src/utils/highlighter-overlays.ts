@@ -186,7 +186,6 @@ function createHighlightOverlayElement(rect: DOMRect, content: string, isText: b
 	const elementAtPoint = document.elementFromPoint(rect.left, rect.top);
 	if (elementAtPoint) {
 		const bgColor = getEffectiveBackgroundColor(elementAtPoint as HTMLElement);
-		console.log('Effective background color:', bgColor);
 		if (isDarkColor(bgColor)) {
 			overlay.classList.add('obsidian-highlight-overlay-dark');
 		}
@@ -301,7 +300,6 @@ async function handleHighlightClick(event: Event) {
 		}
 
 		if (!overlay || !overlay.dataset) {
-			console.warn('Invalid overlay element');
 			return;
 		}
 
