@@ -197,7 +197,6 @@ async function loadAndSetupTemplates() {
 
 function setupMessageListeners() {
 	browser.runtime.onMessage.addListener((request: any, sender: browser.Runtime.MessageSender, sendResponse: (response?: any) => void) => {
-		console.log('Received message:', request);
 		if (request.action === "triggerQuickClip") {
 			handleClip().then(() => {
 				sendResponse({success: true});

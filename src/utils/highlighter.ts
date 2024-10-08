@@ -416,8 +416,13 @@ function getParents(element: Element): Element[] {
 // Save highlights to browser storage
 export function saveHighlights() {
 	const url = window.location.href;
-	const data: StoredData = { highlights, url };
-	browser.storage.local.set({ [url]: data });
+	if (highlights.length > 0) {
+		const data: StoredData = { highlights, url };
+		browser.storage.local.set({ [url]: data });
+	} else {
+		// Remove the entry if there are no highlights
+		browser.storage.local.remove(url);
+	}
 }
 
 // Apply all highlights to the page
@@ -441,6 +446,7 @@ export function applyHighlights() {
 	lastAppliedHighlights = currentHighlightsState;
 	isApplyingHighlights = false;
 	notifyHighlightsUpdated();
+	saveHighlights(); // Add this line to ensure storage is updated
 }
 
 // Notify that highlights have been updated
