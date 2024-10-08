@@ -51,12 +51,14 @@ export function toggleHighlighterMenu(isActive: boolean) {
 	if (isActive) {
 		document.addEventListener('mouseup', handleMouseUp);
 		document.addEventListener('mousemove', handleMouseMove);
+		document.addEventListener('keydown', handleEscapeKey);
 		disableLinkClicks();
 		createHighlighterMenu();
 		browser.runtime.sendMessage({ action: "highlighterModeChanged", isActive: true });
 	} else {
 		document.removeEventListener('mouseup', handleMouseUp);
 		document.removeEventListener('mousemove', handleMouseMove);
+		document.removeEventListener('keydown', handleEscapeKey);
 		removeHoverOverlay();
 		enableLinkClicks();
 		removeHighlighterMenu();
@@ -97,8 +99,7 @@ function createHighlighterMenu() {
 	}
 
 	document.getElementById('obsidian-exit-highlighter')?.addEventListener('click', () => {
-		toggleHighlighterMenu(false);
-		browser.runtime.sendMessage({ action: "setHighlighterMode", isActive: false });
+		exitHighlighterMode();
 	});
 }
 
@@ -487,6 +488,17 @@ export function clearHighlights() {
 export function updateHighlighterMenu() {
 	removeHighlighterMenu();
 	createHighlighterMenu();
+}
+
+function handleEscapeKey(event: KeyboardEvent) {
+	if (event.key === 'Escape' && document.body.classList.contains('obsidian-highlighter-active')) {
+		exitHighlighterMode();
+	}
+}
+
+function exitHighlighterMode() {
+	toggleHighlighterMenu(false);
+	browser.runtime.sendMessage({ action: "setHighlighterMode", isActive: false });
 }
 
 export { getElementXPath } from './dom-utils';
