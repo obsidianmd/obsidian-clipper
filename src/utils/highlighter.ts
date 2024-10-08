@@ -6,7 +6,9 @@ import {
 	removeHoverOverlay,
 	updateHighlightListeners,
 	planHighlightOverlayRects,
-	removeExistingHighlights
+	removeExistingHighlights,
+	handleTouchStart,
+	handleTouchMove
 } from './highlighter-overlays';
 
 export type AnyHighlightData = TextHighlightData | ElementHighlightData | ComplexHighlightData;
@@ -63,6 +65,9 @@ export function toggleHighlighterMenu(isActive: boolean) {
 	if (isActive) {
 		document.addEventListener('mouseup', handleMouseUp);
 		document.addEventListener('mousemove', handleMouseMove);
+		document.addEventListener('touchstart', handleTouchStart);
+		document.addEventListener('touchmove', handleTouchMove);
+		document.addEventListener('touchend', handleMouseUp);
 		document.addEventListener('keydown', handleKeyDown);
 		disableLinkClicks();
 		createHighlighterMenu();
@@ -70,6 +75,9 @@ export function toggleHighlighterMenu(isActive: boolean) {
 	} else {
 		document.removeEventListener('mouseup', handleMouseUp);
 		document.removeEventListener('mousemove', handleMouseMove);
+		document.removeEventListener('touchstart', handleTouchStart);
+		document.removeEventListener('touchmove', handleTouchMove);
+		document.removeEventListener('touchend', handleMouseUp);
 		document.removeEventListener('keydown', handleKeyDown);
 		removeHoverOverlay();
 		enableLinkClicks();

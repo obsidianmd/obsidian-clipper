@@ -16,6 +16,9 @@ import browser from './browser-polyfill';
 import { toggleHighlighterMenu } from './highlighter';
 
 let hoverOverlay: HTMLElement | null = null;
+let touchStartX: number = 0;
+let touchStartY: number = 0;
+let isTouchMoved: boolean = false;
 
 // Check if an element should be ignored for highlighting
 function isIgnoredElement(element: Element): boolean {
@@ -26,8 +29,16 @@ function isIgnoredElement(element: Element): boolean {
 }
 
 // Handles mouse move events for hover effects
-export function handleMouseMove(event: MouseEvent) {
-	const target = event.target as Element;
+export function handleMouseMove(event: MouseEvent | TouchEvent) {
+	let target: Element;
+	if (event instanceof MouseEvent) {
+		target = event.target as Element;
+	} else {
+		// Touch event
+		const touch = event.changedTouches[0];
+		target = document.elementFromPoint(touch.clientX, touch.clientY) as Element;
+	}
+
 	if (!isIgnoredElement(target)) {
 		createOrUpdateHoverOverlay(target);
 	} else {
@@ -36,12 +47,24 @@ export function handleMouseMove(event: MouseEvent) {
 }
 
 // Handle mouse up events for highlighting
-export function handleMouseUp(event: MouseEvent) {
+export function handleMouseUp(event: MouseEvent | TouchEvent) {
+	let target: Element;
+	if (event instanceof MouseEvent) {
+		target = event.target as Element;
+	} else {
+		// Touch event
+		if (isTouchMoved) {
+			isTouchMoved = false;
+			return; // Don't highlight if the touch moved (scrolling)
+		}
+		const touch = event.changedTouches[0];
+		target = document.elementFromPoint(touch.clientX, touch.clientY) as Element;
+	}
+
 	const selection = window.getSelection();
 	if (selection && !selection.isCollapsed) {
 		handleTextSelection(selection);
 	} else {
-		const target = event.target as Element;
 		if (target.classList.contains('obsidian-highlight-overlay')) {
 			handleHighlightClick(event);
 		} else if (!isIgnoredElement(target)) {
@@ -50,11 +73,34 @@ export function handleMouseUp(event: MouseEvent) {
 	}
 }
 
+// Add touch start handler
+export function handleTouchStart(event: TouchEvent) {
+	const touch = event.touches[0];
+	touchStartX = touch.clientX;
+	touchStartY = touch.clientY;
+	isTouchMoved = false;
+}
+
+// Add touch move handler
+export function handleTouchMove(event: TouchEvent) {
+	const touch = event.touches[0];
+	const moveThreshold = 10; // pixels
+
+	if (Math.abs(touch.clientX - touchStartX) > moveThreshold ||
+		Math.abs(touch.clientY - touchStartY) > moveThreshold) {
+		isTouchMoved = true;
+	}
+
+	handleMouseMove(event);
+}
+
 // Update event listeners for highlight overlays
 export function updateHighlightListeners() {
 	document.querySelectorAll('.obsidian-highlight-overlay').forEach(highlight => {
 		highlight.removeEventListener('click', handleHighlightClick);
+		highlight.removeEventListener('touchend', handleHighlightClick);
 		highlight.addEventListener('click', handleHighlightClick);
+		highlight.addEventListener('touchend', handleHighlightClick);
 	});
 }
 
@@ -192,6 +238,7 @@ function createHighlightOverlayElement(rect: DOMRect, content: string, isText: b
 	}
 	
 	overlay.addEventListener('click', handleHighlightClick);
+	overlay.addEventListener('touchend', handleHighlightClick);
 	document.body.appendChild(overlay);
 }
 
@@ -284,6 +331,7 @@ export function removeHoverOverlay() {
 // Update the type of handleHighlightClick
 async function handleHighlightClick(event: Event) {
 	event.stopPropagation();
+	event.preventDefault(); // Prevent default touch behavior
 	const overlay = event.currentTarget as HTMLElement;
 	
 	try {

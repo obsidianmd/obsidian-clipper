@@ -33,7 +33,9 @@
 	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2) !important;
 	user-select: none;
 	-webkit-user-select: none;
+	-webkit-font-smoothing: antialiased !important;
 	font-variant-numeric: tabular-nums;
+	white-space: nowrap !important;
 
 	.no-highlights {
 		font-weight: 600 !important;
@@ -73,6 +75,7 @@
 		gap: 4px;
 		background-color: rgba(255, 255, 255, 0.1) !important;
 		box-shadow: inset rgba(255, 255, 255, 0.1) 0px 0px 0px 1px !important;
+		-webkit-font-smoothing: antialiased !important;
 		svg {
 			color: #bebebe;
 			width: 16px;
