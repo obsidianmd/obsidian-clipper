@@ -1,7 +1,6 @@
 import browser from './utils/browser-polyfill';
 import * as highlighter from './utils/highlighter';
 
-// Add this type declaration at the top of the file
 declare global {
 	interface Window {
 		obsidianHighlighterInitialized?: boolean;
