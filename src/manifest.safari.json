@@ -40,15 +40,6 @@
 	"content_security_policy": {
 		"extension_pages": "script-src 'self'; object-src 'self'"
 	},
-	"commands": {
-		"_execute_action": {
-			"suggested_key": {
-				"default": "Alt+Shift+O",
-				"mac": "Alt+Shift+O"
-			},
-			"description": "Open Obsidian Clipper"
-		}
-	},
 	"host_permissions": [
 		"http://*/*",
 		"https://*/*"
