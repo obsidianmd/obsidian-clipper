@@ -10,6 +10,7 @@ import {
 	handleTouchStart,
 	handleTouchMove
 } from './highlighter-overlays';
+import { detectBrowser } from './browser-detection';
 
 export type AnyHighlightData = TextHighlightData | ElementHighlightData | ComplexHighlightData;
 
@@ -139,6 +140,29 @@ function updateUndoRedoButtons() {
 	}
 }
 
+async function handleClipButtonClick(e: Event) {
+	e.preventDefault();
+	const browserType = await detectBrowser();
+
+	try {
+		const response = await browser.runtime.sendMessage({action: "openPopup"});
+		if (response && typeof response === 'object' && 'success' in response) {
+			if (!response.success) {
+				throw new Error((response as { error?: string }).error || 'Unknown error');
+			}
+		} else {
+			throw new Error('Invalid response from background script');
+		}
+	} catch (error) {
+		console.error('Error opening popup:', error);
+		if (browserType === 'firefox') {
+			alert("Permission denied. To enable Web Clipper opening, go to about:config and set this to true:\n\nextensions.openPopupWithoutUserGesture.enabled");
+		} else {
+			console.error('Failed to open popup:', error);
+		}
+	}
+}
+
 export function createHighlighterMenu() {
 	// Check if the menu already exists
 	let menu = document.querySelector('.obsidian-highlighter-menu');
@@ -154,7 +178,7 @@ export function createHighlighterMenu() {
 	const highlightText = `${highlightCount}`;
 	
 	menu.innerHTML = `
-		${highlightCount > 0 ? `<button id="obsidian-quick-clip" class="mod-cta">Clip highlights</button>` : '<span class="no-highlights">Select elements to highlight</span>'}
+		${highlightCount > 0 ? `<button id="obsidian-clip-button" class="mod-cta">Clip highlights</button>` : '<span class="no-highlights">Select elements to highlight</span>'}
 		${highlightCount > 0 ? `<button id="obsidian-clear-highlights">${highlightText} <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg></button>` : ''}
 		<button id="obsidian-undo-highlights"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-undo-2"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5v0a5.5 5.5 0 0 1-5.5 5.5H11"/></svg></button>
 		<button id="obsidian-redo-highlights"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-redo-2"><path d="m15 14 5-5-5-5"/><path d="M20 9H9.5A5.5 5.5 0 0 0 4 14.5v0A5.5 5.5 0 0 0 9.5 20H13"/></svg></button>
@@ -165,8 +189,8 @@ export function createHighlighterMenu() {
 		document.getElementById('obsidian-clear-highlights')?.addEventListener('click', () => {
 			clearHighlights();
 		});
-		document.getElementById('obsidian-quick-clip')?.addEventListener('click', () => {
-			browser.runtime.sendMessage({action: "openPopup"})
+		document.getElementById('obsidian-clip-button')?.addEventListener('click', (e) => {
+			handleClipButtonClick(e);
 		});
 	}
 

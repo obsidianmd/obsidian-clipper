@@ -19,7 +19,7 @@ browser.action.onClicked.addListener((tab) => {
 	}
 });
 
-browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime.MessageSender, sendResponse: (response?: any) => void) => {
+browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime.MessageSender, sendResponse: (response?: any) => void): true | undefined => {
 	if (typeof request === 'object' && request !== null) {
 		const typedRequest = request as { action: string; isActive?: boolean; hasHighlights?: boolean; tabId?: number };
 		
@@ -73,11 +73,26 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 		}
 
 		if (typedRequest.action === "openPopup") {
-			browser.action.openPopup();
-			sendResponse({ success: true });
+			browser.action.openPopup()
+				.then(() => {
+					sendResponse({ success: true });
+				})
+				.catch((error: unknown) => {
+					console.error('Error opening popup in background script:', error);
+					sendResponse({ success: false, error: error instanceof Error ? error.message : String(error) });
+				});
+			return true;
+		}
+
+		// For other actions that use sendResponse
+		if (typedRequest.action === "extractContent" || 
+			typedRequest.action === "ensureContentScriptLoaded" ||
+			typedRequest.action === "getHighlighterMode" ||
+			typedRequest.action === "toggleHighlighterMode") {
+			return true;
 		}
 	}
-	return true;
+	return undefined;
 });
 
 browser.commands.onCommand.addListener(async (command, tab) => {
