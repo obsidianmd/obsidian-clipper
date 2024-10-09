@@ -335,18 +335,6 @@ async function handleHighlightClick(event: Event) {
 	const overlay = event.currentTarget as HTMLElement;
 	
 	try {
-		// Check if highlighter mode is active, if not, activate it
-		const response = await browser.runtime.sendMessage({ action: "getHighlighterMode" });
-		if (response && typeof response === 'object' && 'isActive' in response) {
-			if (!response.isActive) {
-				// Activate highlighter mode
-				await browser.runtime.sendMessage({ action: "setHighlighterMode", isActive: true });
-				toggleHighlighterMenu(true);
-			}
-		} else {
-			console.warn('Unexpected response format from getHighlighterMode');
-		}
-
 		if (!overlay || !overlay.dataset) {
 			return;
 		}
