@@ -20,10 +20,6 @@ import { isBlankPage, isValidUrl } from '../utils/active-tab-manager';
 import { memoizeWithExpiration } from '../utils/memoize';
 import { debounce } from '../utils/debounce';
 
-interface HighlighterStateResponse {
-	isActive: boolean;
-}
-
 let loadedSettings: Settings;
 let currentTemplate: Template | null = null;
 let templates: Template[] = [];
@@ -873,7 +869,8 @@ function handleTemplateChange(templateId: string) {
 async function checkHighlighterModeState(tabId: number) {
 	try {
 		const result = await browser.storage.local.get('isHighlighterMode');
-		updateHighlighterModeUI(result.isHighlighterMode as boolean);
+		isHighlighterMode = result.isHighlighterMode as boolean;
+		updateHighlighterModeUI(isHighlighterMode);
 	} catch (error) {
 		console.error('Error checking highlighter mode state:', error);
 		// If there's an error, assume highlighter mode is off
