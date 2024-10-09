@@ -24,8 +24,10 @@
 		opacity: 0;
 		background-color: transparent;
 		border-radius: var(--radius-s);
-		&:hover {
-			background-color: var(--background-modifier-hover);
+		@media (hover: hover) {
+			&:hover {
+				background-color: var(--background-modifier-hover);
+			}
 		}
 	}
 
@@ -105,8 +107,10 @@
 		cursor: pointer;
 		transition: color 0.2s ease;
 
-		&:hover {
-			color: var(--text-accent-hover);
+		@media (hover: hover) {
+			&:hover {
+				color: var(--text-accent-hover);
+			}
 		}
 	}
 
@@ -129,8 +133,10 @@
 			width: 16px;
 			height: 16px;
 		}
-		&:hover {
-			color: var(--text-accent);
+		@media (hover: hover) {
+			&:hover {
+				color: var(--text-accent);
+			}
 		}
 	}
 

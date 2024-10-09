@@ -53,8 +53,10 @@
 	transition:
 		box-shadow .15s ease-in-out,
 		border .15s ease-in-out;
-	&:hover {
-		box-shadow: 0 0 0 1px var(--background-modifier-border);
+	@media (hover: hover) {
+		&:hover {
+			box-shadow: 0 0 0 1px var(--background-modifier-border);
+		}
 	}
 	&:focus-within {
 		box-shadow: 0 0 0 2px var(--background-modifier-border-focus);

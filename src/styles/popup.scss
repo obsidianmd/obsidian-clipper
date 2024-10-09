@@ -188,10 +188,12 @@
 	color: var(--text-muted);
 	height: 1.625rem;
 	cursor: default;
-	&:hover {
-		color: var(--text-normal);
-		background-color: var(--background-modifier-hover);
-		transition: background-color var(--duration-fast) ease-in-out;
+	@media (hover: hover) {
+		&:hover {
+			color: var(--text-normal);
+			background-color: var(--background-modifier-hover);
+			transition: background-color var(--duration-fast) ease-in-out;
+		}
 	}
 	&:active,
 	&:focus {
@@ -225,9 +227,11 @@
 			background-color: hsla(var(--color-accent-hsl), 0.075);
 			color: var(--text-accent);
 		}
-		&:hover {
-			background-color: var(--background-modifier-hover);
-			transition: background-color var(--duration-fast) ease-in-out;
+		@media (hover: hover) {
+			&:hover {
+				background-color: var(--background-modifier-hover);
+				transition: background-color var(--duration-fast) ease-in-out;
+			}
 		}
 	}
 }

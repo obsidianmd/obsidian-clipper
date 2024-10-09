@@ -21,9 +21,11 @@ button {
 		background-color: var(--interactive-normal);
 		box-shadow: var(--input-shadow);
 	}
-	&:hover {
-		background-color: var(--interactive-hover);
-		box-shadow: var(--input-shadow-hover);
+	@media (hover: hover) {
+		&:hover {
+			background-color: var(--interactive-hover);
+			box-shadow: var(--input-shadow-hover);
+		}
 	}
 	&:active,
 	&:focus {
@@ -34,8 +36,10 @@ button {
 	&.mod-cta {
 		background-color: var(--interactive-accent);
 		color: var(--text-on-accent);
-		&:hover {
-			background-color: var(--interactive-accent-hover);
+		@media (hover: hover) {
+			&:hover {
+				background-color: var(--interactive-accent-hover);
+			}
 		}
 		&:active,
 		&:focus {
@@ -59,11 +63,13 @@ button.clickable-icon {
 	align-items: center;
 	justify-content: center;
 	box-shadow: none;
-	&:hover {
-		color: var(--text-normal);
-		background-color: var(--background-modifier-hover);
-		opacity: 1;
-		box-shadow: none;
+	@media (hover: hover) {
+		&:hover {
+			color: var(--text-normal);
+			background-color: var(--background-modifier-hover);
+			opacity: 1;
+			box-shadow: none;
+		}
 	}
 	&[disabled] {
 		opacity: 0.5;
@@ -84,8 +90,10 @@ button.clickable-icon {
 		cursor: pointer;
 		border-radius: var(--radius-s);
 		padding: 6px 8px;
-		&:hover {
-			background-color: var(--background-modifier-hover);
+		@media (hover: hover) {
+			&:hover {
+				background-color: var(--background-modifier-hover);
+			}
 		}
 	}
 }

@@ -4,6 +4,7 @@
 		--obsidian-highlighter-menu-padding: 4px;
 		--obsidian-highlighter-menu-height: 30px;
 		--obsidian-undo-button-display: flex;
+		--obsidian-highlighter-button-border: none;
 		top: auto !important;
 		bottom: 25px !important;
 	}
@@ -14,6 +15,7 @@
 	--obsidian-highlighter-menu-padding: 4px;
 	--obsidian-highlighter-menu-height: 24px;
 	--obsidian-undo-button-display: none;
+	--obsidian-highlighter-button-border: inset rgba(255, 255, 255, 0.1) 0px 0px 0px 1px !important;
 
 	cursor: crosshair;
 	a {
@@ -100,27 +102,31 @@
 		font-variant-numeric: tabular-nums !important;
 		gap: 4px;
 		background-color: rgba(255, 255, 255, 0.1) !important;
-		box-shadow: inset rgba(255, 255, 255, 0.1) 0px 0px 0px 1px !important;
+		box-shadow: var(--obsidian-highlighter-button-border) !important;
 		-webkit-font-smoothing: antialiased !important;
 		svg {
 			color: #bebebe;
 			width: 16px;
 			height: 16px;
 		}
-		&:hover {
-			color: white !important;
-			background-color: rgba(255, 255, 255, 0.25) !important;
-			svg {
+		@media (hover: hover) {
+			&:hover {
 				color: white !important;
+				background-color: rgba(255, 255, 255, 0.25) !important;
+				svg {
+					color: white !important;
+				}
 			}
 		}
 		&.mod-cta {
 			background-color: #895DF4 !important;
 			color: white !important;
 			padding: 0 8px !important;
-			box-shadow: inset rgba(166, 138, 249, 0.3) 0px 0px 0px 1px !important;
-			&:hover {
-				background-color: #A68AF9 !important;
+			box-shadow: var(--obsidian-highlighter-button-border) !important;
+			@media (hover: hover) {
+				&:hover {
+					background-color: #A68AF9 !important;
+				}
 			}
 		}
 	}

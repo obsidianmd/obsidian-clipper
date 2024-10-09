@@ -27,8 +27,10 @@ body.is-dragging {
 		width: 16px;
 		height: 16px;
 	}
-	&:hover {
-		opacity: 1;
+	@media (hover: hover) {
+		&:hover {
+			opacity: 1;
+		}
 	}
 	&:focus, &:active {
 		cursor: grabbing !important;

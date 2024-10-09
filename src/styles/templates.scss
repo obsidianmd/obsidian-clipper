@@ -98,8 +98,10 @@
 			height: 16px;
 		}
 	}
-	&:hover {
-		color: var(--text-normal);
+	@media (hover: hover) {
+		&:hover {
+			color: var(--text-normal);
+		}
 	}
 }
 

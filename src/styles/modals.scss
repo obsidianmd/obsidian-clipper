@@ -80,8 +80,10 @@
 		font-weight: 500;
 		cursor: pointer;
 
-		&:hover {
-			background-color: hsla(var(--color-accent-hsl), 0.1);
+		@media (hover: hover) {
+			&:hover {
+				background-color: hsla(var(--color-accent-hsl), 0.1);
+			}
 		}
 
 		i {
