@@ -95,16 +95,16 @@ declare global {
 		} else if (request.action === "setHighlighterMode") {
 			isHighlighterMode = request.isActive;
 			browser.storage.local.set({ isHighlighterMode: request.isActive });
-			updateHasHighlights();
 			highlighter.toggleHighlighterMenu(isHighlighterMode);
+			updateHasHighlights();
 			sendResponse({ success: true });
 			return true;
 		} else if (request.action === "getHighlighterMode") {
 			browser.runtime.sendMessage({ action: "getHighlighterMode" }).then(sendResponse);
 			return true;
 		} else if (request.action === "toggleHighlighter") {
-			updateHasHighlights();
 			highlighter.toggleHighlighterMenu(request.isActive);
+			updateHasHighlights();
 			sendResponse({ success: true });
 		} else if (request.action === "highlightSelection") {
 			highlighter.toggleHighlighterMenu(request.isActive);
@@ -236,11 +236,9 @@ declare global {
 		browser.runtime.sendMessage({ action: "updateHasHighlights", hasHighlights });
 	}
 
-	document.addEventListener('DOMContentLoaded', () => {
-		// Initialize highlighter
-		highlighter.loadHighlights();
-		highlighter.applyHighlights();
-	});
+	// Initialize highlighter
+	highlighter.loadHighlights();
+	highlighter.applyHighlights();
 
 	// Call updateHasHighlights when the page loads
 	window.addEventListener('load', updateHasHighlights);
