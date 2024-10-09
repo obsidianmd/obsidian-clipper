@@ -10,13 +10,15 @@
 	}
 }
 
-.obsidian-highlighter-active {
+body.obsidian-highlighter-active {
 	--obsidian-highlighter-menu-font-size: 13px;
 	--obsidian-highlighter-menu-padding: 4px;
 	--obsidian-highlighter-menu-height: 24px;
 	--obsidian-undo-button-display: none;
 	--obsidian-highlighter-button-border: inset rgba(255, 255, 255, 0.1) 0px 0px 0px 1px !important;
 
+	// Disable pinch zoom on mobile
+	touch-action: pan-x pan-y;
 	cursor: crosshair;
 	a {
 		cursor: crosshair !important;
