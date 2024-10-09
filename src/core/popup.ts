@@ -41,7 +41,7 @@ const memoizedReplaceVariables = memoizeWithExpiration(
 		return replaceVariables(tabId, template, variables, currentUrl);
 	},
 	{
-		expirationMs: 1000,
+		expirationMs: 500,
 		keyFn: (tabId: number, template: string, variables: { [key: string]: string }, currentUrl: string) => 
 			`${tabId}-${template}-${currentUrl}`
 	}
@@ -52,7 +52,7 @@ const memoizedGenerateFrontmatter = memoizeWithExpiration(
 	async (properties: Property[]) => {
 		return generateFrontmatter(properties);
 	},
-	{ expirationMs: 1000 }
+	{ expirationMs: 500 }
 );
 
 // Memoize extractPageContent with URL-sensitive key and short expiration
@@ -62,7 +62,7 @@ const memoizedExtractPageContent = memoizeWithExpiration(
 		return extractPageContent(tabId);
 	},
 	{ 
-		expirationMs: 1000, 
+		expirationMs: 500, 
 		keyFn: async (tabId: number) => {
 			const tab = await browser.tabs.get(tabId);
 			return `${tabId}-${tab.url}`;
@@ -233,6 +233,7 @@ function setupMessageListeners() {
 				refreshFields(currentTabId);
 			}
 		} else if (request.action === "updatePopupHighlighterUI") {
+			isHighlighterMode = request.isActive;
 			updateHighlighterModeUI(request.isActive);
 		} else if (request.action === "highlighterModeChanged") {
 			isHighlighterMode = request.isActive;

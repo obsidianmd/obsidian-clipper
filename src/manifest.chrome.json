@@ -10,7 +10,8 @@
 		"contextMenus",
 		"sidePanel",
 		"storage",
-		"scripting"
+		"scripting",
+		"webNavigation"
 	],
 	"host_permissions": [
 		"http://*/*",

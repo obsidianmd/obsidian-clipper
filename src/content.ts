@@ -72,19 +72,24 @@ browser.runtime.onMessage.addListener(function(request: any, sender: browser.Run
 	} else if (request.action === "logObsidianUri") {
 		console.log('Obsidian URI created:', request.uri);
 		sendResponse({ success: true });
+	} else if (request.action === "paintHighlights") {
+		highlighter.loadHighlights();
+		highlighter.applyHighlights();
+		sendResponse({ success: true });
+		return true;
 	} else if (request.action === "setHighlighterMode") {
 		isHighlighterMode = request.isActive;
 		browser.storage.local.set({ isHighlighterMode: request.isActive });
-		highlighter.toggleHighlighterMenu(isHighlighterMode);
 		updateHasHighlights();
+		highlighter.toggleHighlighterMenu(isHighlighterMode);
 		sendResponse({ success: true });
 		return true;
 	} else if (request.action === "getHighlighterMode") {
 		 browser.runtime.sendMessage({ action: "getHighlighterMode" }).then(sendResponse);
 		 return true;
 	} else if (request.action === "toggleHighlighter") {
-		highlighter.toggleHighlighterMenu(request.isActive);
 		updateHasHighlights();
+		highlighter.toggleHighlighterMenu(request.isActive);
 		sendResponse({ success: true });
 	} else if (request.action === "highlightSelection") {
 		highlighter.toggleHighlighterMenu(request.isActive);
@@ -159,10 +164,6 @@ browser.runtime.onMessage.addListener(function(request: any, sender: browser.Run
 	return true;
 });
 
-// Initialize highlighter
-highlighter.loadHighlights();
-highlighter.applyHighlights();
-
 function extractContentBySelector(selector: string, attribute?: string, extractHtml: boolean = false): string | string[] {
 	try {
 		const elements = document.querySelectorAll(selector);
@@ -219,6 +220,12 @@ function updateHasHighlights() {
 	const hasHighlights = highlighter.getHighlights().length > 0;
 	browser.runtime.sendMessage({ action: "updateHasHighlights", hasHighlights });
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+	// Initialize highlighter
+	highlighter.loadHighlights();
+	highlighter.applyHighlights();
+});
 
 // Call updateHasHighlights when the page loads
 window.addEventListener('load', updateHasHighlights);

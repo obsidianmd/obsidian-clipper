@@ -186,20 +186,44 @@ async function setupTabListeners() {
 		browser.tabs.onActivated.addListener(async (activeInfo) => {
 			if (await isSidePanelOpen(activeInfo.windowId)) {
 				updateCurrentActiveTab(activeInfo.windowId);
-				if (isHighlighterMode) {
-					await setHighlighterMode(activeInfo.tabId, true);
-				}
+				await setHighlighterMode(activeInfo.tabId, false);
+				await paintHighlights(activeInfo.tabId);
 			}
 		});
 
 		browser.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
 			if (changeInfo.status === 'complete' && tab.active && tab.windowId && await isSidePanelOpen(tab.windowId)) {
 				updateCurrentActiveTab(tab.windowId);
-				if (isHighlighterMode) {
-					await setHighlighterMode(tabId, true);
-				}
+				await setHighlighterMode(tabId, false);
+				await paintHighlights(tabId);
 			}
 		});
+
+		browser.webNavigation.onCommitted.addListener(async (details) => {
+			if (details.frameId === 0) { // Only for main frame
+				await setHighlighterMode(details.tabId, false);
+				await paintHighlights(details.tabId);
+			}
+		});
+	}
+}
+
+
+async function paintHighlights(tabId: number) {
+	try {
+		// First, check if the tab exists
+		const tab = await browser.tabs.get(tabId);
+		if (!tab) {
+			console.error('Tab does not exist:', tabId);
+			return;
+		}
+
+		// Then, ensure the content script is loaded
+		await ensureContentScriptLoaded(tabId);
+
+		await browser.tabs.sendMessage(tabId, { action: "paintHighlights" });	
+	} catch (error) {
+		console.error('Error setting highlighter mode:', error);
 	}
 }
 
