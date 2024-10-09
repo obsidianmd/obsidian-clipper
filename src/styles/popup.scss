@@ -203,8 +203,11 @@
 	}
 }
 
-.is-chromium #popup-header {
-	--radius-m: 40px;
+.is-mobile-safari,
+.is-chromium {
+	#popup-header {
+		--radius-m: 40px;
+	}
 }
 
 #popup-actions {

@@ -186,25 +186,53 @@ export function createHighlighterMenu() {
 	`;
 
 	if (highlightCount > 0) {
-		document.getElementById('obsidian-clear-highlights')?.addEventListener('click', () => {
-			clearHighlights();
-		});
-		document.getElementById('obsidian-clip-button')?.addEventListener('click', (e) => {
-			handleClipButtonClick(e);
+		const clearButton = document.getElementById('obsidian-clear-highlights');
+		const clipButton = document.getElementById('obsidian-clip-button');
+
+		if (clearButton) {
+			clearButton.addEventListener('click', clearHighlights);
+			clearButton.addEventListener('touchend', (e) => {
+				e.preventDefault();
+				clearHighlights();
+			});
+		}
+
+		if (clipButton) {
+			clipButton.addEventListener('click', handleClipButtonClick);
+			clipButton.addEventListener('touchend', (e) => {
+				e.preventDefault();
+				handleClipButtonClick(e);
+			});
+		}
+	}
+
+	const exitButton = document.getElementById('obsidian-exit-highlighter');
+	const undoButton = document.getElementById('obsidian-undo-highlights');
+	const redoButton = document.getElementById('obsidian-redo-highlights');
+
+	if (exitButton) {
+		exitButton.addEventListener('click', exitHighlighterMode);
+		exitButton.addEventListener('touchend', (e) => {
+			e.preventDefault();
+			exitHighlighterMode();
 		});
 	}
 
-	document.getElementById('obsidian-exit-highlighter')?.addEventListener('click', () => {
-		exitHighlighterMode();
-	});
+	if (undoButton) {
+		undoButton.addEventListener('click', undo);
+		undoButton.addEventListener('touchend', (e) => {
+			e.preventDefault();
+			undo();
+		});
+	}
 
-	document.getElementById('obsidian-undo-highlights')?.addEventListener('click', () => {
-		undo();
-	});
-
-	document.getElementById('obsidian-redo-highlights')?.addEventListener('click', () => {
-		redo();
-	});
+	if (redoButton) {
+		redoButton.addEventListener('click', redo);
+		redoButton.addEventListener('touchend', (e) => {
+			e.preventDefault();
+			redo();
+		});
+	}
 
 	updateUndoRedoButtons();
 }
