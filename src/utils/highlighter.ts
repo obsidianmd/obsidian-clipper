@@ -156,7 +156,7 @@ async function handleClipButtonClick(e: Event) {
 	} catch (error) {
 		console.error('Error opening popup:', error);
 		if (browserType === 'firefox') {
-			alert("Permission denied. To enable Web Clipper opening, go to about:config and set this to true:\n\nextensions.openPopupWithoutUserGesture.enabled");
+			alert("Additional permissions required. To open Web Clipper from the highlighter, go to about:config and set this to true:\n\nextensions.openPopupWithoutUserGesture.enabled");
 		} else {
 			console.error('Failed to open popup:', error);
 		}
