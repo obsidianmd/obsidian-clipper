@@ -61,8 +61,10 @@
 		padding: 0px;
 		color: var(--text-accent);
 		opacity: 0.75;
-		&:hover {
-			opacity: 1;
+		@media (hover: hover) {
+			&:hover {
+				opacity: 1;
+			}
 		}
 		&:active,
 		&:focus {
@@ -90,16 +92,20 @@
 			pointer-events: none;
 			cursor: default;
 			color: var(--text-accent);
-			&:hover {
-				color: var(--text-accent);
+			@media (hover: hover) {
+				&:hover {
+					color: var(--text-accent);
+				}
 			}
 		}
 		&.done {
 			pointer-events: none;
 			cursor: default;
 			color: var(--text-success);
-			&:hover {
-				color: var(--text-success);
+			@media (hover: hover) {
+				&:hover {
+					color: var(--text-success);
+				}
 			}
 			~ {
 				#interpreter-timer {
@@ -111,8 +117,10 @@
 			pointer-events: none;
 			cursor: default;
 			color: var(--text-error);
-			&:hover {
-				color: var(--text-error);
+			@media (hover: hover) {
+				&:hover {
+					color: var(--text-error);
+				}
 			}
 			~ {
 				#interpreter-timer {
@@ -120,8 +128,10 @@
 				}
 			}
 		}
-		&:hover {
-			color: var(--color-accent-3);
+		@media (hover: hover) {
+			&:hover {
+				color: var(--color-accent-3);
+			}
 		}
 	}
 

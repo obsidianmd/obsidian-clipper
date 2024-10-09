@@ -9,3 +9,4 @@ export function debounce<T extends (...args: any[]) => any>(
 		timeout = setTimeout(() => func.apply(context, args), wait);
 	};
 }
+

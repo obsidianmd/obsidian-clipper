@@ -25,11 +25,13 @@ textarea {
 	width: 100%;
 	margin: 0;
 
-	&:hover {
-		border-color: var(--background-modifier-border-hover);
-		transition:
+	@media (hover: hover) {
+		&:hover {
+			border-color: var(--background-modifier-border-hover);
+			transition:
 			box-shadow .15s ease-in-out,
 			border .15s ease-in-out;
+		}
 	}
 	&:active,
 	&:focus,

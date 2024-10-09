@@ -8,7 +8,8 @@
 		"activeTab",
 		"contextMenus",
 		"storage",
-		"scripting"
+		"scripting",
+		"webNavigation"
 	],
 	"action": {
 		"default_popup": "popup.html",
@@ -34,7 +35,8 @@
 	"content_scripts": [
 		{
 			"matches": ["http://*/*", "https://*/*"],
-			"js": ["content.js"]
+			"js": ["content.js"],
+			"css": ["highlighter.css"]
 		}
 	],
 	"content_security_policy": {
@@ -47,6 +49,13 @@
 				"mac": "Alt+Shift+O"
 			},
 			"description": "Open Obsidian Clipper"
+		},
+		"toggle_highlighter": {
+			"suggested_key": {
+				"default": "Alt+H",
+				"mac": "Alt+H"
+			},
+			"description": "Toggle highlighter mode"
 		}
 	},
 	"host_permissions": [

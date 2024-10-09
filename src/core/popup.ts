@@ -27,6 +27,7 @@ let currentVariables: { [key: string]: string } = {};
 let currentTabId: number | undefined;
 let lastUsedTemplateId: string | null = null;
 let lastSelectedVault: string | null = null;
+let isHighlighterMode = false;
 
 const isSidePanel = window.location.pathname.includes('side-panel.html');
 
@@ -36,7 +37,7 @@ const memoizedReplaceVariables = memoizeWithExpiration(
 		return replaceVariables(tabId, template, variables, currentUrl);
 	},
 	{
-		expirationMs: 5000,
+		expirationMs: 500,
 		keyFn: (tabId: number, template: string, variables: { [key: string]: string }, currentUrl: string) => 
 			`${tabId}-${template}-${currentUrl}`
 	}
@@ -47,7 +48,7 @@ const memoizedGenerateFrontmatter = memoizeWithExpiration(
 	async (properties: Property[]) => {
 		return generateFrontmatter(properties);
 	},
-	{ expirationMs: 30000 }
+	{ expirationMs: 500 }
 );
 
 // Memoize extractPageContent with URL-sensitive key and short expiration
@@ -57,7 +58,7 @@ const memoizedExtractPageContent = memoizeWithExpiration(
 		return extractPageContent(tabId);
 	},
 	{ 
-		expirationMs: 5000, 
+		expirationMs: 500, 
 		keyFn: async (tabId: number) => {
 			const tab = await browser.tabs.get(tabId);
 			return `${tabId}-${tab.url}`;
@@ -156,6 +157,8 @@ async function initializeExtension(tabId: number) {
 		// Setup message listeners
 		setupMessageListeners();
 
+		await checkHighlighterModeState(tabId);
+
 		return true;
 	} catch (error) {
 		console.error('Error initializing extension:', error);
@@ -195,7 +198,6 @@ async function loadAndSetupTemplates() {
 
 function setupMessageListeners() {
 	browser.runtime.onMessage.addListener((request: any, sender: browser.Runtime.MessageSender, sendResponse: (response?: any) => void) => {
-		console.log('Received message:', request);
 		if (request.action === "triggerQuickClip") {
 			handleClip().then(() => {
 				sendResponse({success: true});
@@ -221,11 +223,24 @@ function setupMessageListeners() {
 			} else {
 				showError('This page cannot be clipped. Only http and https URLs are supported.');
 			}
+		} else if (request.action === "highlightsUpdated") {
+			// Refresh fields when highlights are updated
+			if (currentTabId !== undefined) {
+				refreshFields(currentTabId);
+			}
+		} else if (request.action === "updatePopupHighlighterUI") {
+			isHighlighterMode = request.isActive;
+			updateHighlighterModeUI(request.isActive);
+		} else if (request.action === "highlighterModeChanged") {
+			isHighlighterMode = request.isActive;
+			updateHighlighterModeUI(isHighlighterMode);
 		}
 	});
 }
 
 document.addEventListener('DOMContentLoaded', async function() {
+	browser.runtime.connect({ name: 'popup' });
+
 	const refreshButton = document.getElementById('refresh-pane');
 	if (refreshButton) {
 		refreshButton.addEventListener('click', (e) => {
@@ -238,11 +253,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 	if (settingsButton) {
 		settingsButton.addEventListener('click', async function() {
 			browser.runtime.openOptionsPage();
-			
-			const browserType = await detectBrowser();
-			if (browserType === 'firefox-mobile') {
-				setTimeout(() => window.close(), 50);
-			}
+			setTimeout(() => window.close(), 50);
 		});
 		initializeIcons(settingsButton);
 	}
@@ -302,6 +313,11 @@ function setupEventListeners(tabId: number) {
 				e.preventDefault();
 			}
 		});
+	}
+
+	const highlighterModeButton = document.getElementById('highlighter-mode');
+	if (highlighterModeButton) {
+		highlighterModeButton.addEventListener('click', () => toggleHighlighterMode(tabId));
 	}
 }
 
@@ -462,7 +478,7 @@ async function handleClip() {
 
 		// Only close the window if it's not running in side panel mode
 		if (!isSidePanel) {
-			setTimeout(() => window.close(), 1500);
+			setTimeout(() => window.close(), 500);
 		}
 	} catch (error) {
 		console.error('Error in handleClip:', error);
@@ -536,7 +552,8 @@ async function refreshFields(tabId: number, checkTemplateTriggers: boolean = tru
 				extractedData.extractedContent,
 				currentUrl,
 				extractedData.schemaOrgData,
-				extractedData.fullHtml
+				extractedData.fullHtml,
+				extractedData.highlights || []
 			);
 			if (initializedContent) {
 				setupMetadataToggle();
@@ -849,6 +866,54 @@ function handleTemplateChange(templateId: string) {
 	lastUsedTemplateId = currentTemplate.id;
 	setLocalStorage('lastUsedTemplateId', lastUsedTemplateId);
 	refreshFields(currentTabId!, false);
+}
+
+async function checkHighlighterModeState(tabId: number) {
+	try {
+		const result = await browser.storage.local.get('isHighlighterMode');
+		isHighlighterMode = result.isHighlighterMode as boolean;
+		updateHighlighterModeUI(isHighlighterMode);
+	} catch (error) {
+		console.error('Error checking highlighter mode state:', error);
+		// If there's an error, assume highlighter mode is off
+		isHighlighterMode = false;
+		updateHighlighterModeUI(false);
+	}
+}
+
+async function toggleHighlighterMode(tabId: number) {
+	const result = await browser.storage.local.get('isHighlighterMode');
+	const wasHighlighterModeActive = result.isHighlighterMode as boolean;
+	isHighlighterMode = !wasHighlighterModeActive;
+	await setLocalStorage('isHighlighterMode', isHighlighterMode);
+
+	// Send a message to the content script to toggle the highlighter mode
+	await browser.tabs.sendMessage(tabId, { 
+		action: "setHighlighterMode", 
+		isActive: isHighlighterMode 
+	});
+
+	// Notify the background script about the change
+	browser.runtime.sendMessage({ 
+		action: "highlighterModeChanged", 
+		isActive: isHighlighterMode 
+	});
+
+	// Close the popup if highlighter mode is turned on and not in side panel
+	if (isHighlighterMode && !wasHighlighterModeActive && !isSidePanel) {
+		window.close();
+	} else {
+		updateHighlighterModeUI(isHighlighterMode);
+	}
+}
+
+function updateHighlighterModeUI(isActive: boolean) {
+	const highlighterModeButton = document.getElementById('highlighter-mode');
+	if (highlighterModeButton) {
+		highlighterModeButton.classList.toggle('active', isActive);
+		highlighterModeButton.setAttribute('aria-pressed', isActive.toString());
+		highlighterModeButton.title = isActive ? 'Disable highlighter' : 'Enable highlighter';
+	}
 }
 
 // Update the resize event listener to use the debounced version

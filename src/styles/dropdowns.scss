@@ -23,10 +23,12 @@ select {
 	/* icon size, then gradient */
 	background-size: var(--dropdown-background-size);
 
-	&:hover {
-		transition:
+	@media (hover: hover) {
+		&:hover {
+			transition:
 			box-shadow .15s ease-in-out,
 			border .15s ease-in-out;
+		}
 	}
 	&:active,
 	&:focus,

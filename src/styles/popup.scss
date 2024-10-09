@@ -169,6 +169,7 @@
 }
 
 .has-error {
+	#highlighter-mode,
 	#show-variables,
 	#template-select {
 		display: none;
@@ -188,10 +189,12 @@
 	color: var(--text-muted);
 	height: 1.625rem;
 	cursor: default;
-	&:hover {
-		color: var(--text-normal);
-		background-color: var(--background-modifier-hover);
-		transition: background-color var(--duration-fast) ease-in-out;
+	@media (hover: hover) {
+		&:hover {
+			color: var(--text-normal);
+			background-color: var(--background-modifier-hover);
+			transition: background-color var(--duration-fast) ease-in-out;
+		}
 	}
 	&:active,
 	&:focus {
@@ -200,8 +203,11 @@
 	}
 }
 
-.is-chromium #popup-header {
-	--radius-m: 40px;
+.is-mobile-safari,
+.is-chromium {
+	#popup-header {
+		--radius-m: 40px;
+	}
 }
 
 #popup-actions {
@@ -221,9 +227,18 @@
 		-webkit-user-select: none;
 		background-color: transparent;
 		cursor: default;
-		&:hover {
-			background-color: var(--background-modifier-hover);
-			transition: background-color var(--duration-fast) ease-in-out;
+		&.active {
+			background-color: hsla(var(--color-accent-hsl), 0.075);
+			color: var(--text-accent);
+		}
+		@media (hover: hover) {
+			&:hover {
+				background-color: var(--background-modifier-hover);
+				transition: background-color var(--duration-fast) ease-in-out;
+			}
+			&.active:hover {
+				background-color: hsla(var(--color-accent-hsl), 0.15);
+			}
 		}
 	}
 }

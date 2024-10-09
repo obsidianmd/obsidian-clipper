@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7A15D4702CB5D97B00BC4F99 /* highlighter.css in Resources */ = {isa = PBXBuildFile; fileRef = 7A15D46F2CB5D97B00BC4F99 /* highlighter.css */; };
+		7A15D4712CB5D97B00BC4F99 /* highlighter.css in Resources */ = {isa = PBXBuildFile; fileRef = 7A15D46F2CB5D97B00BC4F99 /* highlighter.css */; };
 		7AEF057F2CA0F50D005FFBC2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AEF057E2CA0F50D005FFBC2 /* AppDelegate.swift */; };
 		7AEF05812CA0F50D005FFBC2 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AEF05802CA0F50D005FFBC2 /* SceneDelegate.swift */; };
 		7AEF05842CA0F50D005FFBC2 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05832CA0F50D005FFBC2 /* Base */; };
@@ -100,6 +102,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		7A15D46F2CB5D97B00BC4F99 /* highlighter.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; name = highlighter.css; path = "/Users/kepano/Documents/Git/obsidian-clipper/dist_safari/highlighter.css"; sourceTree = "<absolute>"; };
 		7AEF056F2CA0F50D005FFBC2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = ../Base.lproj/Main.html; sourceTree = "<group>"; };
 		7AEF05702CA0F50D005FFBC2 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
 		7AEF05712CA0F50D005FFBC2 /* Style.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = Style.css; sourceTree = "<group>"; };
@@ -271,6 +274,7 @@
 				7AEF05CB2CA0F50D005FFBC2 /* background.js */,
 				7AEF05CC2CA0F50D005FFBC2 /* popup.js */,
 				7AEF05CE2CA0F50D005FFBC2 /* popup.js.LICENSE.txt */,
+				7A15D46F2CB5D97B00BC4F99 /* highlighter.css */,
 				7AEF05CF2CA0F50D005FFBC2 /* popup.html */,
 				7AEF05D02CA0F50D005FFBC2 /* browser-polyfill.min.js */,
 				7AEF05D32CA0F50D005FFBC2 /* icons */,
@@ -438,6 +442,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7AEF05F32CA0F50D005FFBC2 /* settings.html in Resources */,
+				7A15D4712CB5D97B00BC4F99 /* highlighter.css in Resources */,
 				7AEF05EA2CA0F50D005FFBC2 /* background.js in Resources */,
 				7AEF05F02CA0F50D005FFBC2 /* style.css in Resources */,
 				7AEF05ED2CA0F50D005FFBC2 /* popup.html in Resources */,
@@ -458,6 +463,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7AEF05E62CA0F50D005FFBC2 /* settings.html in Resources */,
+				7A15D4702CB5D97B00BC4F99 /* highlighter.css in Resources */,
 				7AEF05DD2CA0F50D005FFBC2 /* background.js in Resources */,
 				7AEF05E32CA0F50D005FFBC2 /* style.css in Resources */,
 				7AEF05E02CA0F50D005FFBC2 /* popup.html in Resources */,

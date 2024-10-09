@@ -162,6 +162,7 @@ interface ContentResponse {
 	extractedContent: ExtractedContent;
 	schemaOrgData: any;
 	fullHtml: string;
+	highlights?: string[];
 }
 
 export async function extractPageContent(tabId: number): Promise<ContentResponse | null> {
@@ -191,7 +192,7 @@ export function getMetaContent(doc: Document, attr: string, value: string): stri
 	return element ? element.getAttribute("content")?.trim() ?? "" : "";
 }
 
-export async function initializePageContent(content: string, selectedHtml: string, extractedContent: ExtractedContent, currentUrl: string, schemaOrgData: any, fullHtml: string) {
+export async function initializePageContent(content: string, selectedHtml: string, extractedContent: ExtractedContent, currentUrl: string, schemaOrgData: any, fullHtml: string, highlights: string[]) {
 	try {
 		const parser = new DOMParser();
 		const doc = parser.parseFromString(content, 'text/html');
@@ -265,7 +266,10 @@ export async function initializePageContent(content: string, selectedHtml: strin
 			|| getMetaContent(doc, "name", "application-name")
 			|| '';
 
-		if (selectedHtml) {
+		if (highlights && highlights.length > 0) {
+			const highlightsContent = highlights.join('\n\n\n');
+			content = highlightsContent;
+		} else if (selectedHtml) {
 			content = selectedHtml;
 		} else if (readabilityArticle && readabilityArticle.content) {
 			content = readabilityArticle.content;

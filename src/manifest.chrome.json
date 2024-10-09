@@ -10,7 +10,8 @@
 		"contextMenus",
 		"sidePanel",
 		"storage",
-		"scripting"
+		"scripting",
+		"webNavigation"
 	],
 	"host_permissions": [
 		"http://*/*",
@@ -38,7 +39,8 @@
 	"content_scripts": [
 		{
 			"matches": ["http://*/*", "https://*/*"],
-			"js": ["content.js"]
+			"js": ["content.js"],
+			"css": ["highlighter.css"]
 		}
 	],
 	"content_security_policy": {
@@ -58,6 +60,13 @@
 				"mac": "Alt+Shift+O"
 			},
 			"description": "Quick clip"
+		},
+		"toggle_highlighter": {
+			"suggested_key": {
+				"default": "Alt+H",
+				"mac": "Alt+H"
+			},
+			"description": "Toggle highlighter mode"
 		}
 	}
 }

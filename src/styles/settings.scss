@@ -178,8 +178,10 @@
 		line-height: 1.3;
 		a {
 			color: var(--text-muted);
-			&:hover {
-				color: var(--text-accent);
+			@media (hover: hover) {
+				&:hover {
+					color: var(--text-accent);
+				}
 			}
 		}
 	}
@@ -229,8 +231,10 @@
 			user-select: none;
 			-webkit-user-select: none;
 
-			&:hover {
-				background-color: var(--background-modifier-hover);
+			@media (hover: hover) {
+				&:hover {
+					background-color: var(--background-modifier-hover);
+				}
 			}
 			&.active {
 				background-color: var(--background-modifier-hover);
