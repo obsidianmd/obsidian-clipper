@@ -1,7 +1,7 @@
 import browser from './utils/browser-polyfill';
 import { ensureContentScriptLoaded } from './utils/content-script-utils';
 import { detectBrowser } from './utils/browser-detection';
-import { updateCurrentActiveTab } from './utils/active-tab-manager';
+import { updateCurrentActiveTab, isValidUrl, isBlankPage } from './utils/active-tab-manager';
 import { TextHighlightData } from './utils/highlighter';
 import { debounce } from './utils/debounce';
 
@@ -228,8 +228,12 @@ async function paintHighlights(tabId: number) {
 	try {
 		// First, check if the tab exists
 		const tab = await browser.tabs.get(tabId);
-		if (!tab) {
-			console.error('Tab does not exist:', tabId);
+		if (!tab || !tab.url) {
+			return;
+		}
+
+		// Check if the URL is valid and not a blank page
+		if (!isValidUrl(tab.url) || isBlankPage(tab.url)) {
 			return;
 		}
 
@@ -238,7 +242,7 @@ async function paintHighlights(tabId: number) {
 
 		await browser.tabs.sendMessage(tabId, { action: "paintHighlights" });	
 	} catch (error) {
-		console.error('Error setting highlighter mode:', error);
+		console.error('Error painting highlights:', error);
 	}
 }
 
@@ -246,8 +250,12 @@ async function setHighlighterMode(tabId: number, activate: boolean) {
 	try {
 		// First, check if the tab exists
 		const tab = await browser.tabs.get(tabId);
-		if (!tab) {
-			console.error('Tab does not exist:', tabId);
+		if (!tab || !tab.url) {
+			return;
+		}
+
+		// Check if the URL is valid and not a blank page
+		if (!isValidUrl(tab.url) || isBlankPage(tab.url)) {
 			return;
 		}
 
