@@ -9,6 +9,34 @@ let sidePanelOpenWindows: Set<number> = new Set();
 let isHighlighterMode = false;
 let hasHighlights = false;
 let isContextMenuCreating = false;
+let popupPorts: { [tabId: number]: browser.Runtime.Port } = {};
+
+// Check if a popup is open for a given tab
+function isPopupOpen(tabId: number): boolean {
+	return popupPorts.hasOwnProperty(tabId);
+}
+
+browser.runtime.onConnect.addListener((port) => {
+	if (port.name === 'popup') {
+		const tabId = port.sender?.tab?.id;
+		if (tabId) {
+			popupPorts[tabId] = port;
+			port.onDisconnect.addListener(() => {
+				delete popupPorts[tabId];
+			});
+		}
+	}
+});
+
+async function sendMessageToPopup(tabId: number, message: any): Promise<void> {
+	if (isPopupOpen(tabId)) {
+		try {
+			await popupPorts[tabId].postMessage(message);
+		} catch (error) {
+			console.warn(`Error sending message to popup for tab ${tabId}:`, error);
+		}
+	}
+}
 
 browser.action.onClicked.addListener((tab) => {
 	if (tab.id) {
@@ -48,7 +76,9 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 
 		if (typedRequest.action === "highlighterModeChanged" && sender.tab && typedRequest.isActive !== undefined) {
 			isHighlighterMode = typedRequest.isActive;
-			browser.runtime.sendMessage({ action: "updatePopupHighlighterUI", isActive: isHighlighterMode });
+			if (sender.tab.id) {
+				sendMessageToPopup(sender.tab.id, { action: "updatePopupHighlighterUI", isActive: isHighlighterMode });
+			}
 			debouncedUpdateContextMenu(sender.tab.id!);
 		}
 
@@ -267,7 +297,7 @@ async function setHighlighterMode(tabId: number, activate: boolean) {
 		await browser.storage.local.set({ isHighlighterMode: activate });
 		await browser.tabs.sendMessage(tabId, { action: "setHighlighterMode", isActive: activate });
 		debouncedUpdateContextMenu(tabId);
-		browser.runtime.sendMessage({ action: "updatePopupHighlighterUI", isActive: activate });
+		await sendMessageToPopup(tabId, { action: "updatePopupHighlighterUI", isActive: activate });
 
 		// Store the highlighter mode state
 		await browser.storage.local.set({ isHighlighterMode: activate });
@@ -278,7 +308,7 @@ async function setHighlighterMode(tabId: number, activate: boolean) {
 		isHighlighterMode = false;
 		await browser.storage.local.set({ isHighlighterMode: false });
 		debouncedUpdateContextMenu(tabId);
-		browser.runtime.sendMessage({ action: "updatePopupHighlighterUI", isActive: false });
+		await sendMessageToPopup(tabId, { action: "updatePopupHighlighterUI", isActive: false });
 		await browser.storage.local.set({ isHighlighterMode: false });
 	}
 }
@@ -291,7 +321,7 @@ async function toggleHighlighterMode(tabId: number) {
 		await browser.storage.local.set({ isHighlighterMode: newMode });
 		await browser.tabs.sendMessage(tabId, { action: "setHighlighterMode", isActive: newMode });
 		debouncedUpdateContextMenu(tabId);
-		browser.runtime.sendMessage({ action: "updatePopupHighlighterUI", isActive: newMode });
+		await sendMessageToPopup(tabId, { action: "updatePopupHighlighterUI", isActive: newMode });
 	} catch (error) {
 		console.error('Error toggling highlighter mode:', error);
 	}

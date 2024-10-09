@@ -239,6 +239,8 @@ function setupMessageListeners() {
 }
 
 document.addEventListener('DOMContentLoaded', async function() {
+	browser.runtime.connect({ name: 'popup' });
+
 	const refreshButton = document.getElementById('refresh-pane');
 	if (refreshButton) {
 		refreshButton.addEventListener('click', (e) => {
