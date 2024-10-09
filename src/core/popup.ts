@@ -254,11 +254,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 	if (settingsButton) {
 		settingsButton.addEventListener('click', async function() {
 			browser.runtime.openOptionsPage();
-			
-			const browserType = await detectBrowser();
-			if (browserType === 'firefox-mobile') {
-				setTimeout(() => window.close(), 50);
-			}
+			setTimeout(() => window.close(), 50);
 		});
 		initializeIcons(settingsButton);
 	}
@@ -483,7 +479,7 @@ async function handleClip() {
 
 		// Only close the window if it's not running in side panel mode
 		if (!isSidePanel) {
-			setTimeout(() => window.close(), 1500);
+			setTimeout(() => window.close(), 500);
 		}
 	} catch (error) {
 		console.error('Error in handleClip:', error);
@@ -886,23 +882,29 @@ async function checkHighlighterModeState(tabId: number) {
 }
 
 async function toggleHighlighterMode(tabId: number) {
-	isHighlighterMode = !isHighlighterMode;
+	const result = await browser.storage.local.get('isHighlighterMode');
+	const wasHighlighterModeActive = result.isHighlighterMode as boolean;
+	isHighlighterMode = !wasHighlighterModeActive;
 	await setLocalStorage('isHighlighterMode', isHighlighterMode);
-	
+
 	// Send a message to the content script to toggle the highlighter mode
 	await browser.tabs.sendMessage(tabId, { 
 		action: "setHighlighterMode", 
 		isActive: isHighlighterMode 
 	});
 
-	// Update the UI
-	updateHighlighterModeUI(isHighlighterMode);
-
 	// Notify the background script about the change
-	await browser.runtime.sendMessage({ 
+	browser.runtime.sendMessage({ 
 		action: "highlighterModeChanged", 
 		isActive: isHighlighterMode 
 	});
+
+	// Close the popup if highlighter mode is turned on and not in side panel
+	if (isHighlighterMode && !wasHighlighterModeActive && !isSidePanel) {
+		window.close();
+	} else {
+		updateHighlighterModeUI(isHighlighterMode);
+	}
 }
 
 function updateHighlighterModeUI(isActive: boolean) {

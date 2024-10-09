@@ -166,7 +166,7 @@ export function createHighlighterMenu() {
 			clearHighlights();
 		});
 		document.getElementById('obsidian-quick-clip')?.addEventListener('click', () => {
-			browser.runtime.sendMessage({action: "quickClip"})
+			browser.runtime.sendMessage({action: "openPopup"})
 		});
 	}
 

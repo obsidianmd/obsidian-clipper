@@ -72,9 +72,8 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 			sendResponse({ success: true });
 		}
 
-		if (typedRequest.action === "quickClip") {
+		if (typedRequest.action === "openPopup") {
 			browser.action.openPopup();
-			browser.runtime.sendMessage({action: "triggerQuickClip"})
 			sendResponse({ success: true });
 		}
 	}
