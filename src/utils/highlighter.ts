@@ -10,7 +10,7 @@ import {
 	handleTouchStart,
 	handleTouchMove
 } from './highlighter-overlays';
-import { detectBrowser } from './browser-detection';
+import { detectBrowser, addBrowserClassToHtml } from './browser-detection';
 
 export type AnyHighlightData = TextHighlightData | ElementHighlightData | ComplexHighlightData;
 
@@ -72,6 +72,7 @@ export function toggleHighlighterMenu(isActive: boolean) {
 		document.addEventListener('keydown', handleKeyDown);
 		disableLinkClicks();
 		createHighlighterMenu();
+		addBrowserClassToHtml();
 		browser.runtime.sendMessage({ action: "highlighterModeChanged", isActive: true });
 	} else {
 		document.removeEventListener('mouseup', handleMouseUp);

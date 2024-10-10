@@ -169,7 +169,6 @@ export function planHighlightOverlayRects(target: Element, highlight: AnyHighlig
 				mergeHighlightOverlayRects([rect], highlight.content, existingOverlays, false, index);
 			}
 		} catch (error) {
-			console.error('Error creating text highlight, falling back to element highlight:', error);
 			const rect = target.getBoundingClientRect();
 			mergeHighlightOverlayRects([rect], highlight.content, existingOverlays, false, index);
 		}
