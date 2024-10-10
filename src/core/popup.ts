@@ -26,7 +26,7 @@ let currentTemplate: Template | null = null;
 let templates: Template[] = [];
 let currentVariables: { [key: string]: string } = {};
 let currentTabId: number | undefined;
-let lastUsedTemplateId: string | null = null;
+let lastSelectedVault: string | null = null;
 let isHighlighterMode = false;
 
 const isSidePanel = window.location.pathname.includes('side-panel.html');
@@ -125,14 +125,15 @@ async function initializeExtension(tabId: number) {
 		// Initialize triggers to speed up template matching
 		initializeTriggers(templates);
 
-		// Load last used template
-		lastUsedTemplateId = await getLocalStorage('lastUsedTemplateId');
-		if (lastUsedTemplateId) {
-			currentTemplate = templates.find(t => t.id === lastUsedTemplateId) || templates[0];
-		} else {
-			currentTemplate = templates[0];
-		}
+		currentTemplate = templates[0];
 		debugLog('Templates', 'Current template set to:', currentTemplate);
+
+		// Load last selected vault
+		lastSelectedVault = await getLocalStorage('lastSelectedVault');
+		if (!lastSelectedVault && loadedSettings.vaults.length > 0) {
+			lastSelectedVault = loadedSettings.vaults[0];
+		}
+		debugLog('Vaults', 'Last selected vault:', lastSelectedVault);
 
 		updateVaultDropdown(loadedSettings.vaults);
 
@@ -459,10 +460,12 @@ async function handleClip() {
 		}
 
 		await saveToObsidian(fileContent, noteName, path, selectedVault, currentTemplate.behavior);
-		
-		// Update last used template
-		lastUsedTemplateId = currentTemplate.id;
-		await setLocalStorage('lastUsedTemplateId', lastUsedTemplateId);
+
+		// Only update lastSelectedVault if the user explicitly chose a vault
+		if (!currentTemplate.vault) {
+			lastSelectedVault = selectedVault;
+			await setLocalStorage('lastSelectedVault', lastSelectedVault);
+		}
 
 		// Only close the window if it's not running in side panel mode
 		if (!isSidePanel) {
@@ -516,8 +519,8 @@ async function refreshFields(tabId: number, checkTemplateTriggers: boolean = tru
 		if (extractedData) {
 			const currentUrl = tab.url;
 
-			// Set the initial template to the last used one or the first template
-			currentTemplate = templates.find(t => t.id === lastUsedTemplateId) || templates[0];
+			// Set the initial template to the first template
+			currentTemplate = templates[0];
 			updateTemplateDropdown();
 
 			// Only check for the correct template if checkTemplateTriggers is true
@@ -602,6 +605,8 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 	if (vaultDropdown) {
 		if (template.vault) {
 			vaultDropdown.value = template.vault;
+		} else if (lastSelectedVault) {
+			vaultDropdown.value = lastSelectedVault;
 		}
 	}
 
@@ -827,10 +832,20 @@ function updateVaultDropdown(vaults: string[]) {
 	// Only show vault selector if vaults are defined
 	if (vaults.length > 0) {
 		vaultContainer.style.display = 'block';
-		vaultDropdown.value = vaults[0];
+		if (lastSelectedVault && vaults.includes(lastSelectedVault)) {
+			vaultDropdown.value = lastSelectedVault;
+		} else {
+			vaultDropdown.value = vaults[0];
+		}
 	} else {
 		vaultContainer.style.display = 'none';
 	}
+
+	// Add event listener to update lastSelectedVault when changed
+	vaultDropdown.addEventListener('change', () => {
+		lastSelectedVault = vaultDropdown.value;
+		setLocalStorage('lastSelectedVault', lastSelectedVault);
+	});
 }
 
 function refreshPopup() {
@@ -839,8 +854,6 @@ function refreshPopup() {
 
 function handleTemplateChange(templateId: string) {
 	currentTemplate = templates.find(t => t.id === templateId) || templates[0];
-	lastUsedTemplateId = currentTemplate.id;
-	setLocalStorage('lastUsedTemplateId', lastUsedTemplateId);
 	refreshFields(currentTabId!, false);
 }
 
