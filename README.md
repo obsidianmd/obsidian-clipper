@@ -69,23 +69,23 @@ Template variables can be used to automatically pre-populate data from the page 
 
 #### Preset variables
 
-Preset variables are automatically generated based on the page content. These should work for nearly all websites. The main content variable is `{{content}}`, which contains the article content or the selection if there is any selected text on the page. Note that `{{content}}` attempts to extract the main content of the page, which may not always be what you want. In that case, you can use other preset variables or selector variables to extract the content you need.
+Preset variables are automatically generated based on the page content. These should work for nearly all websites. The main content variable is `{{content}}`, which contains the article content, or the highlights, or the selection if there is any selected text on the page. Note that `{{content}}` attempts to extract the main content of the page, which may not always be what you want. In that case, you can use other preset variables or selector variables to extract the content you need.
 
-| Variable            | Description                                          |
-| ------------------- | ---------------------------------------------------- |
-| `{{author}}`        | Author of the page                                   |
-| `{{content}}`       | Article content or selection, in Markdown format     |
-| `{{contentHtml}}`   | Article content or selection, in HTML format         |
-| `{{date}}`          | Current date                                         |
-| `{{description}}`   | Description or excerpt                               |
-| `{{domain}}`        | Domain                                               |
-| `{{fullHtml}}`      | Unprocessed HTML for the full page content           |
-| `{{image}}`         | Social share image URL                               |
-| `{{published}}`     | Published date                                       |
-| `{{site}}`          | Site name or publisher                               |
-| `{{title}}`         | Title of the page                                    |
-| `{{time}}`          | Current date and time                                |
-| `{{url}}`           | Current URL                                          |
+| Variable            | Description                                                   |
+| ------------------- | ------------------------------------------------------------- |
+| `{{author}}`        | Author of the page                                            |
+| `{{content}}`       | Article content, highlights, or selection, in Markdown format |
+| `{{contentHtml}}`   | Article content, highlights, or selection, in HTML format     |
+| `{{date}}`          | Current date                                                  |
+| `{{description}}`   | Description or excerpt                                        |
+| `{{domain}}`        | Domain                                                        |
+| `{{fullHtml}}`      | Unprocessed HTML for the full page content                    |
+| `{{image}}`         | Social share image URL                                        |
+| `{{published}}`     | Published date                                                |
+| `{{site}}`          | Site name or publisher                                        |
+| `{{title}}`         | Title of the page                                             |
+| `{{time}}`          | Current date and time                                         |
+| `{{url}}`           | Current URL                                                   |
 
 #### Meta variables
 

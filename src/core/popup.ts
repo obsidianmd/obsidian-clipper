@@ -19,6 +19,7 @@ import { ensureContentScriptLoaded } from '../utils/content-script-utils';
 import { isBlankPage, isValidUrl } from '../utils/active-tab-manager';
 import { memoizeWithExpiration } from '../utils/memoize';
 import { debounce } from '../utils/debounce';
+import { AnyHighlightData } from '../utils/highlighter';
 
 let loadedSettings: Settings;
 let currentTemplate: Template | null = null;
