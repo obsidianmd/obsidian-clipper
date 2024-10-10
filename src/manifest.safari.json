@@ -43,5 +43,28 @@
 	"host_permissions": [
 		"http://*/*",
 		"https://*/*"
-	]
+	],
+	"commands": {
+		"_execute_action": {
+			"suggested_key": {
+				"default": "Ctrl+Shift+O",
+				"mac": "Command+Shift+O"
+			},
+			"description": "Open Obsidian Clipper"
+		},
+		"quick_clip": {
+			"suggested_key": {
+				"default": "Alt+Shift+O",
+				"mac": "Alt+Shift+O"
+			},
+			"description": "Quick clip"
+		},
+		"toggle_highlighter": {
+			"suggested_key": {
+				"default": "Alt+H",
+				"mac": "Alt+H"
+			},
+			"description": "Toggle highlighter mode"
+		}
+	}
 }
