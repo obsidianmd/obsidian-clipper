@@ -26,7 +26,6 @@ let templates: Template[] = [];
 let currentVariables: { [key: string]: string } = {};
 let currentTabId: number | undefined;
 let lastUsedTemplateId: string | null = null;
-let lastSelectedVault: string | null = null;
 let isHighlighterMode = false;
 
 const isSidePanel = window.location.pathname.includes('side-panel.html');
@@ -134,12 +133,6 @@ async function initializeExtension(tabId: number) {
 		}
 		debugLog('Templates', 'Current template set to:', currentTemplate);
 
-		// Load last selected vault
-		lastSelectedVault = await getLocalStorage('lastSelectedVault');
-		if (!lastSelectedVault && loadedSettings.vaults.length > 0) {
-			lastSelectedVault = loadedSettings.vaults[0];
-		}
-		debugLog('Vaults', 'Last selected vault:', lastSelectedVault);
 		updateVaultDropdown(loadedSettings.vaults);
 
 		const tab = await browser.tabs.get(tabId);
@@ -470,12 +463,6 @@ async function handleClip() {
 		lastUsedTemplateId = currentTemplate.id;
 		await setLocalStorage('lastUsedTemplateId', lastUsedTemplateId);
 
-		// Only update lastSelectedVault if the user explicitly chose a vault
-		if (!currentTemplate.vault) {
-			lastSelectedVault = selectedVault;
-			await setLocalStorage('lastSelectedVault', lastSelectedVault);
-		}
-
 		// Only close the window if it's not running in side panel mode
 		if (!isSidePanel) {
 			setTimeout(() => window.close(), 500);
@@ -614,8 +601,6 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 	if (vaultDropdown) {
 		if (template.vault) {
 			vaultDropdown.value = template.vault;
-		} else if (lastSelectedVault) {
-			vaultDropdown.value = lastSelectedVault;
 		}
 	}
 
@@ -841,20 +826,10 @@ function updateVaultDropdown(vaults: string[]) {
 	// Only show vault selector if vaults are defined
 	if (vaults.length > 0) {
 		vaultContainer.style.display = 'block';
-		if (lastSelectedVault && vaults.includes(lastSelectedVault)) {
-			vaultDropdown.value = lastSelectedVault;
-		} else {
-			vaultDropdown.value = vaults[0];
-		}
+		vaultDropdown.value = vaults[0];
 	} else {
 		vaultContainer.style.display = 'none';
 	}
-
-	// Add event listener to update lastSelectedVault when changed
-	vaultDropdown.addEventListener('change', () => {
-		lastSelectedVault = vaultDropdown.value;
-		setLocalStorage('lastSelectedVault', lastSelectedVault);
-	});
 }
 
 function refreshPopup() {
