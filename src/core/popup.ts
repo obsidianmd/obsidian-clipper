@@ -9,7 +9,7 @@ import { getLocalStorage, setLocalStorage, loadSettings, generalSettings, Settin
 import { escapeHtml, unescapeValue } from '../utils/string-utils';
 import { loadTemplates, createDefaultTemplate } from '../managers/template-manager';
 import browser from '../utils/browser-polyfill';
-import { detectBrowser, addBrowserClassToHtml } from '../utils/browser-detection';
+import { addBrowserClassToHtml } from '../utils/browser-detection';
 import { createElementWithClass } from '../utils/dom-utils';
 import { initializeInterpreter, handleInterpreterUI, collectPromptVariables } from '../utils/interpreter';
 import { adjustNoteNameHeight } from '../utils/ui-utils';
@@ -679,7 +679,7 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 	if (noteNameField) {
 		let formattedNoteName = await memoizedReplaceVariables(currentTabId!, template.noteNameFormat, variables, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
 		noteNameField.setAttribute('data-template-value', template.noteNameFormat);
-		noteNameField.value = formattedNoteName;
+		noteNameField.value = formattedNoteName.trim();
 		adjustNoteNameHeight(noteNameField);
 	}
 
