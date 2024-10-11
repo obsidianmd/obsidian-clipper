@@ -37,7 +37,7 @@ const memoizedReplaceVariables = memoizeWithExpiration(
 		return replaceVariables(tabId, template, variables, currentUrl);
 	},
 	{
-		expirationMs: 500,
+		expirationMs: 50,
 		keyFn: (tabId: number, template: string, variables: { [key: string]: string }, currentUrl: string) => 
 			`${tabId}-${template}-${currentUrl}`
 	}
@@ -48,7 +48,7 @@ const memoizedGenerateFrontmatter = memoizeWithExpiration(
 	async (properties: Property[]) => {
 		return generateFrontmatter(properties);
 	},
-	{ expirationMs: 500 }
+	{ expirationMs: 50 }
 );
 
 // Memoize extractPageContent with URL-sensitive key and short expiration
@@ -58,7 +58,7 @@ const memoizedExtractPageContent = memoizeWithExpiration(
 		return extractPageContent(tabId);
 	},
 	{ 
-		expirationMs: 500, 
+		expirationMs: 50, 
 		keyFn: async (tabId: number) => {
 			const tab = await browser.tabs.get(tabId);
 			return `${tabId}-${tab.url}`;

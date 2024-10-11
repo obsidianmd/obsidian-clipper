@@ -286,17 +286,13 @@ async function setHighlighterMode(tabId: number, activate: boolean) {
 		debouncedUpdateContextMenu(tabId);
 		await sendMessageToPopup(tabId, { action: "updatePopupHighlighterUI", isActive: activate });
 
-		// Store the highlighter mode state
-		await browser.storage.local.set({ isHighlighterMode: activate });
 	} catch (error) {
 		console.error('Error setting highlighter mode:', error);
-		// If there's still an error, the tab might have been closed or navigated away
-		// In this case, we should update our state accordingly
+		// If there's an error, assume highlighter mode should be off
 		isHighlighterMode = false;
 		await browser.storage.local.set({ isHighlighterMode: false });
 		debouncedUpdateContextMenu(tabId);
 		await sendMessageToPopup(tabId, { action: "updatePopupHighlighterUI", isActive: false });
-		await browser.storage.local.set({ isHighlighterMode: false });
 	}
 }
 

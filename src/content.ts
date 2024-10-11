@@ -93,7 +93,6 @@ declare global {
 			return true;
 		} else if (request.action === "setHighlighterMode") {
 			isHighlighterMode = request.isActive;
-			browser.storage.local.set({ isHighlighterMode: request.isActive });
 			highlighter.toggleHighlighterMenu(isHighlighterMode);
 			updateHasHighlights();
 			sendResponse({ success: true });
@@ -241,4 +240,16 @@ declare global {
 
 	// Call updateHasHighlights when the page loads
 	window.addEventListener('load', updateHasHighlights);
+
+	// Deactivate highlighter mode on unload
+	function handlePageUnload() {
+		if (isHighlighterMode) {
+			highlighter.toggleHighlighterMenu(false);
+			browser.runtime.sendMessage({ action: "highlighterModeChanged", isActive: false });
+			browser.storage.local.set({ isHighlighterMode: false });
+		}
+	}
+
+	window.addEventListener('beforeunload', handlePageUnload);
+
 })();
