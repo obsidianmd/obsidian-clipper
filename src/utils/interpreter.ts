@@ -1,6 +1,6 @@
 import { generalSettings, ModelConfig } from './storage-utils';
 import { PromptVariable, Template } from '../types/types';
-import { replaceVariables } from './content-extractor';
+import { compileTemplate } from './content-extractor';
 import { applyFilters } from './filters';
 import { formatDuration } from './string-utils';
 import { adjustNoteNameHeight } from './ui-utils';
@@ -257,7 +257,7 @@ export async function initializeInterpreter(template: Template, variables: { [ke
 	
 	if (promptContextTextarea) {
 		let promptToDisplay = template.context || generalSettings.defaultPromptContext;
-		promptToDisplay = await replaceVariables(tabId, promptToDisplay, variables, currentUrl);
+		promptToDisplay = await compileTemplate(tabId, promptToDisplay, variables, currentUrl);
 		promptContextTextarea.value = promptToDisplay;
 
 		promptContextTextarea.addEventListener('input', () => {

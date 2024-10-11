@@ -6,9 +6,12 @@ import { applyFilters } from './filters';
 import browser from './browser-polyfill';
 import { debugLog } from './debug';
 import dayjs from 'dayjs';
-import { generalSettings } from '../utils/storage-utils';
+
 import { AnyHighlightData } from './highlighter';
 import { processForLoop } from './tags/for_loop';
+import { processSelector } from './tags/selector';
+import { processSchema } from './tags/schema';
+import { processPrompt } from './tags/prompt';
 
 export function extractReadabilityContent(doc: Document): ReturnType<Readability['parse']> | null {
 	try {
@@ -20,107 +23,21 @@ export function extractReadabilityContent(doc: Document): ReturnType<Readability
 	}
 }
 
-async function processSelector(tabId: number, match: string, currentUrl: string): Promise<string> {
-	const selectorRegex = /{{(selector|selectorHtml):(.*?)(?:\?(.*?))?(?:\|(.*?))?}}/;
-	const matches = match.match(selectorRegex);
-	if (!matches) {
-		console.error('Invalid selector format:', match);
-		return match;
-	}
-
-	const [, selectorType, rawSelector, attribute, filtersString] = matches;
-	const extractHtml = selectorType === 'selectorHtml';
-
-	// Unescape any escaped quotes in the selector
-	const selector = rawSelector.replace(/\\"/g, '"');
-
-	try {
-		const response = await browser.tabs.sendMessage(tabId, { 
-			action: "extractContent", 
-			selector: selector,
-			attribute: attribute,
-			extractHtml: extractHtml
-		}) as { content: string };
-
-		let content = response ? response.content : '';
-	
-		// Convert content to string if it's an array
-		const contentString = Array.isArray(content) ? JSON.stringify(content) : content;
-	
-		debugLog('ContentExtractor', 'Applying filters:', { selector, filterString: filtersString });
-		const filteredContent = applyFilters(contentString, filtersString, currentUrl);
-	
-		return filteredContent;
-	} catch (error) {
-		console.error('Error extracting content by selector:', error, { selector, attribute, extractHtml });
-		return '';
-	}
-}
-
-// Export the processSchema function
-export async function processSchema(match: string, variables: { [key: string]: any }, currentUrl: string): Promise<string> {
-	const [, fullSchemaKey] = match.match(/{{schema:(.*?)}}/) || [];
-	const [schemaKey, ...filterParts] = fullSchemaKey.split('|');
-	const filtersString = filterParts.join('|');
-
-	let schemaValue: any = variables[`{{schema:${schemaKey}}}`];
-
-	if (schemaValue === undefined) {
-		console.error(`Schema value not found for key: ${schemaKey}`);
-		return match;
-	}
-
-	console.log(`Raw schema value for ${schemaKey}:`, schemaValue);
-
-	if (typeof schemaValue === 'string') {
-		try {
-			schemaValue = JSON.parse(schemaValue);
-		} catch (error) {
-			console.error('Error parsing schema JSON:', error);
-			console.log('Returning raw schema value');
-			return applyFilters(schemaValue, filtersString, currentUrl);
-		}
-	}
-
-	console.log(`Parsed schema value for ${schemaKey}:`, schemaValue);
-
-	// If schemaValue is an object or array, stringify it
-	if (typeof schemaValue === 'object') {
-		schemaValue = JSON.stringify(schemaValue);
-	}
-
-	return applyFilters(schemaValue, filtersString, currentUrl);
-}
-
-// This function doesn't really do anything, it just returns the whole prompt variable
-// so that it's still visible in the input fields in the popup
-async function processPrompt(match: string, variables: { [key: string]: string }, currentUrl: string): Promise<string> {
-	if (generalSettings.interpreterEnabled) {
-		const promptRegex = /{{prompt:\\?"(.*?)\\?"(\|.*?)?}}/;
-		const matches = match.match(promptRegex);
-		if (!matches) {
-			console.error('Invalid prompt format:', match);
-			return match;
-		}
-	
-		const [, promptText, filters = ''] = matches;
-	
-		return match;
-	} else {
-		return '';
-	}
-}
-
-function getNestedProperty(obj: any, path: string): any {
-	return path.split('.').reduce((prev, curr) => prev && prev[curr], obj);
-}
-export async function replaceVariables(tabId: number, text: string, variables: { [key: string]: any }, currentUrl: string): Promise<string> {
+// Main function to compile the template
+export async function compileTemplate(tabId: number, text: string, variables: { [key: string]: any }, currentUrl: string): Promise<string> {
 	// Process for loops
+	const processedText = await processLogicStructures(text, variables, currentUrl);
+	
+	// Process other variables and filters
+	return await processVariables(tabId, processedText, variables, currentUrl);
+}
+
+// Function to process logic structures like for loops
+async function processLogicStructures(text: string, variables: { [key: string]: any }, currentUrl: string): Promise<string> {
 	let processedText = text;
 	const forLoopRegex = /{%\s*for\s+(\w+)\s+in\s+([\w:@]+)\s*%}/g;
 	let match;
-	let startIndex = 0;
-
+	
 	while ((match = forLoopRegex.exec(processedText)) !== null) {
 		const [fullMatch, iteratorName, arrayName] = match;
 		const startPos = match.index;
@@ -144,7 +61,6 @@ export async function replaceVariables(tabId: number, text: string, variables: {
 
 		if (nestLevel === 0) {
 			const loopContent = processedText.substring(startPos, endPos);
-			console.log("Content being passed to processForLoop:", loopContent);
 			const processedLoop = await processForLoop(loopContent, variables, currentUrl);
 			processedText = processedText.substring(0, startPos) + processedLoop + processedText.substring(endPos);
 			forLoopRegex.lastIndex = startPos + processedLoop.length;
@@ -154,10 +70,15 @@ export async function replaceVariables(tabId: number, text: string, variables: {
 		}
 	}
 
-	// Process other variables and filters
+	return processedText;
+}
+
+// Function to process variables and apply filters
+async function processVariables(tabId: number, text: string, variables: { [key: string]: any }, currentUrl: string): Promise<string> {
 	const regex = /{{([\s\S]*?)}}/g;
-	
-	let result = processedText;
+	let result = text;
+	let match;
+
 	while ((match = regex.exec(result)) !== null) {
 		const fullMatch = match[0];
 		const trimmedMatch = match[1].trim();
@@ -171,10 +92,7 @@ export async function replaceVariables(tabId: number, text: string, variables: {
 		} else if (trimmedMatch.startsWith('prompt:')) {
 			replacement = await processPrompt(fullMatch, variables, currentUrl);
 		} else {
-			const [variableName, ...filterParts] = trimmedMatch.split('|').map(part => part.trim());
-			let value = variables[`{{${variableName}}}`] || '';
-			const filtersString = filterParts.join('|');
-			replacement = applyFilters(value, filtersString, currentUrl);
+			replacement = await processSimpleVariable(trimmedMatch, variables, currentUrl);
 		}
 
 		result = result.substring(0, match.index) + replacement + result.substring(match.index + fullMatch.length);
@@ -182,6 +100,14 @@ export async function replaceVariables(tabId: number, text: string, variables: {
 	}
 
 	return result;
+}
+
+// Function to process a simple variable (without special prefixes)
+async function processSimpleVariable(variableString: string, variables: { [key: string]: any }, currentUrl: string): Promise<string> {
+	const [variableName, ...filterParts] = variableString.split('|').map(part => part.trim());
+	let value = variables[`{{${variableName}}}`] || '';
+	const filtersString = filterParts.join('|');
+	return applyFilters(value, filtersString, currentUrl);
 }
 
 interface ContentResponse {

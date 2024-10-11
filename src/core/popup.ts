@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import { Template, Property, PromptVariable } from '../types/types';
 import { generateFrontmatter, saveToObsidian } from '../utils/obsidian-note-creator';
-import { extractPageContent, initializePageContent, replaceVariables } from '../utils/content-extractor';
+import { extractPageContent, initializePageContent, compileTemplate } from '../utils/content-extractor';
 import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
 import { decompressFromUTF16 } from 'lz-string';
 import { findMatchingTemplate, initializeTriggers } from '../utils/triggers';
@@ -31,10 +31,10 @@ let isHighlighterMode = false;
 
 const isSidePanel = window.location.pathname.includes('side-panel.html');
 
-// Memoize replaceVariables with a short expiration and URL-sensitive key
-const memoizedReplaceVariables = memoizeWithExpiration(
+// Memoize compileTemplate with a short expiration and URL-sensitive key
+const memoizedCompileTemplate = memoizeWithExpiration(
 	async (tabId: number, template: string, variables: { [key: string]: string }, currentUrl: string) => {
-		return replaceVariables(tabId, template, variables, currentUrl);
+		return compileTemplate(tabId, template, variables, currentUrl);
 	},
 	{
 		expirationMs: 50,
@@ -622,7 +622,7 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 
 	for (const property of template.properties) {
 		const propertyDiv = createElementWithClass('div', 'metadata-property');
-		let value = await memoizedReplaceVariables(currentTabId!, unescapeValue(property.value), variables, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
+		let value = await memoizedCompileTemplate(currentTabId!, unescapeValue(property.value), variables, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
 
 		const propertyType = generalSettings.propertyTypes.find(p => p.name === property.name)?.type || 'text';
 
@@ -679,7 +679,7 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 
 	const noteNameField = document.getElementById('note-name-field') as HTMLTextAreaElement;
 	if (noteNameField) {
-		let formattedNoteName = await memoizedReplaceVariables(currentTabId!, template.noteNameFormat, variables, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
+		let formattedNoteName = await memoizedCompileTemplate(currentTabId!, template.noteNameFormat, variables, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
 		noteNameField.setAttribute('data-template-value', template.noteNameFormat);
 		noteNameField.value = formattedNoteName.trim();
 		adjustNoteNameHeight(noteNameField);
@@ -695,7 +695,7 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 			pathField.style.display = 'none';
 		} else {
 			pathContainer.style.display = 'flex';
-			let formattedPath = await memoizedReplaceVariables(currentTabId!, template.path, variables, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
+			let formattedPath = await memoizedCompileTemplate(currentTabId!, template.path, variables, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
 			pathField.value = formattedPath;
 			pathField.setAttribute('data-template-value', template.path);
 		}
@@ -704,7 +704,7 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 	const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
 	if (noteContentField) {
 		if (template.noteContentFormat) {
-			let content = await memoizedReplaceVariables(currentTabId!, template.noteContentFormat, variables, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
+			let content = await memoizedCompileTemplate(currentTabId!, template.noteContentFormat, variables, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
 			noteContentField.value = content;
 			noteContentField.setAttribute('data-template-value', template.noteContentFormat);
 		} else {
@@ -787,22 +787,22 @@ async function getReplacedTemplate(template: Template, variables: { [key: string
 		schemaVersion: "0.1.0",
 		name: template.name,
 		behavior: template.behavior,
-		noteNameFormat: await replaceVariables(tabId, template.noteNameFormat, variables, currentUrl),
+		noteNameFormat: await compileTemplate(tabId, template.noteNameFormat, variables, currentUrl),
 		path: template.path,
-		noteContentFormat: await replaceVariables(tabId, template.noteContentFormat, variables, currentUrl),
+		noteContentFormat: await compileTemplate(tabId, template.noteContentFormat, variables, currentUrl),
 		properties: [],
 		triggers: template.triggers
 	};
 
 	if (template.context) {
-		replacedTemplate.context = await replaceVariables(tabId, template.context, variables, currentUrl);
+		replacedTemplate.context = await compileTemplate(tabId, template.context, variables, currentUrl);
 	}
 
 	for (const prop of template.properties) {
 		const replacedProp: Property = {
 			id: prop.id,
 			name: prop.name,
-			value: await replaceVariables(tabId, prop.value, variables, currentUrl)
+			value: await compileTemplate(tabId, prop.value, variables, currentUrl)
 		};
 		replacedTemplate.properties.push(replacedProp);
 	}

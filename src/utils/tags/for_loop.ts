@@ -1,4 +1,4 @@
-import { processSchema } from '../content-extractor';
+import { processSchema } from './schema';
 import { applyFilters } from '../filters';
 
 export async function processForLoop(match: string, variables: { [key: string]: any }, currentUrl: string): Promise<string> {
