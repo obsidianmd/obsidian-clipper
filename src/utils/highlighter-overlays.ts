@@ -216,7 +216,6 @@ function mergeHighlightOverlayRects(rects: DOMRect[], content: string, existingO
 
 // Create an overlay element
 function createHighlightOverlayElement(rect: DOMRect, content: string, isText: boolean = false, index: number) {
-	console.log(`Creating highlight overlay for index ${index}`);
 	const overlay = document.createElement('div');
 	overlay.className = 'obsidian-highlight-overlay';
 	overlay.dataset.highlightIndex = index.toString();
@@ -275,7 +274,6 @@ function updateHighlightOverlayPositions() {
 
 // Remove existing highlight overlays for a specific index
 function removeExistingHighlightOverlays(index: number) {
-	console.log(`Removing highlights for index ${index}`);
 	document.querySelectorAll(`.obsidian-highlight-overlay[data-highlight-index="${index}"]`).forEach(el => el.remove());
 }
 
@@ -409,7 +407,6 @@ async function handleHighlightClick(event: Event) {
 export function removeExistingHighlights() {
 	const existingHighlights = document.querySelectorAll('.obsidian-highlight-overlay');
 	if (existingHighlights.length > 0) {
-		console.log('Removing all existing highlights');
 		existingHighlights.forEach(el => el.remove());
 	}
 }

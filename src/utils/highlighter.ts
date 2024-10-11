@@ -569,8 +569,7 @@ export function applyHighlights() {
 	if (highlights.length === 0) {
 		return; // Don't do anything if there are no highlights
 	}
-	
-	console.log('Applying highlights');
+
 	if (isApplyingHighlights) return;
 	
 	const currentHighlightsState = JSON.stringify(highlights);
