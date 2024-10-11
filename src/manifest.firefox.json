@@ -8,8 +8,7 @@
 		"activeTab",
 		"contextMenus",
 		"storage",
-		"scripting",
-		"webNavigation"
+		"scripting"
 	],
 	"action": {
 		"default_popup": "popup.html",

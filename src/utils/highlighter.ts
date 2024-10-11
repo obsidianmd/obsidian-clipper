@@ -605,15 +605,15 @@ export function getHighlights(): string[] {
 // Load highlights from browser storage
 export function loadHighlights() {
 	const url = window.location.href;
-	browser.storage.local.get(url).then((result) => {
+	return browser.storage.local.get(url).then((result) => {
 		const storedData = result[url] as StoredData | undefined;
 		if (storedData && Array.isArray(storedData.highlights) && storedData.highlights.length > 0) {
 			highlights = storedData.highlights;
 			applyHighlights();
 		} else {
 			highlights = [];
-			console.log('No highlights found for this page');
 		}
+		lastAppliedHighlights = JSON.stringify(highlights);
 	});
 }
 
