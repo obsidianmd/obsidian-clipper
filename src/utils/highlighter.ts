@@ -566,6 +566,7 @@ export function saveHighlights() {
 
 // Apply all highlights to the page
 export function applyHighlights() {
+	console.log('Applying highlights');
 	if (isApplyingHighlights) return;
 	
 	const currentHighlightsState = JSON.stringify(highlights);
@@ -585,7 +586,6 @@ export function applyHighlights() {
 	lastAppliedHighlights = currentHighlightsState;
 	isApplyingHighlights = false;
 	notifyHighlightsUpdated();
-	saveHighlights(); // Add this line to ensure storage is updated
 }
 
 // Notify that highlights have been updated

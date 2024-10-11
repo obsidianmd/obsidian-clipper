@@ -12,13 +12,12 @@ import {
 } from './highlighter';
 import { throttle } from './throttle';
 import { getElementByXPath, isDarkColor } from './dom-utils';
-import browser from './browser-polyfill';
-import { toggleHighlighterMenu } from './highlighter';
 
 let hoverOverlay: HTMLElement | null = null;
 let touchStartX: number = 0;
 let touchStartY: number = 0;
 let isTouchMoved: boolean = false;
+let lastHoverTarget: Element | null = null;
 
 // Check if an element should be ignored for highlighting
 function isIgnoredElement(element: Element): boolean {
@@ -215,6 +214,7 @@ function mergeHighlightOverlayRects(rects: DOMRect[], content: string, existingO
 
 // Create an overlay element
 function createHighlightOverlayElement(rect: DOMRect, content: string, isText: boolean = false, index: number) {
+	console.log(`Creating highlight overlay for index ${index}`);
 	const overlay = document.createElement('div');
 	overlay.className = 'obsidian-highlight-overlay';
 	overlay.dataset.highlightIndex = index.toString();
@@ -269,6 +269,7 @@ function updateHighlightOverlayPositions() {
 
 // Remove existing highlight overlays for a specific index
 function removeExistingHighlightOverlays(index: number) {
+	console.log(`Removing highlights for index ${index}`);
 	document.querySelectorAll(`.obsidian-highlight-overlay[data-highlight-index="${index}"]`).forEach(el => el.remove());
 }
 
@@ -284,9 +285,13 @@ window.addEventListener('scroll', throttledUpdateHighlights);
 const observer = new MutationObserver((mutations) => {
 	if (!isApplyingHighlights) {
 		const shouldUpdate = mutations.some(mutation => 
-			mutation.type === 'childList' || 
+			(mutation.type === 'childList' && 
+			 (mutation.target instanceof Element) && 
+			 !mutation.target.id.startsWith('obsidian-highlight')) || 
 			(mutation.type === 'attributes' && 
-			 (mutation.attributeName === 'style' || mutation.attributeName === 'class'))
+			 (mutation.attributeName === 'style' || mutation.attributeName === 'class') &&
+			 (mutation.target instanceof Element) &&
+			 !mutation.target.id.startsWith('obsidian-highlight'))
 		);
 		if (shouldUpdate) {
 			throttledUpdateHighlights();
@@ -304,6 +309,10 @@ observer.observe(document.body, {
 
 // Create or update the hover overlay used to indicate which element will be highlighted
 function createOrUpdateHoverOverlay(target: Element) {
+	// Only update if the target has changed
+	if (target === lastHoverTarget) return;
+	lastHoverTarget = target;
+
 	if (!hoverOverlay) {
 		hoverOverlay = document.createElement('div');
 		hoverOverlay.id = 'obsidian-highlight-hover-overlay';
@@ -325,6 +334,7 @@ export function removeHoverOverlay() {
 	if (hoverOverlay) {
 		hoverOverlay.style.display = 'none';
 	}
+	lastHoverTarget = null;
 }
 
 // Update the type of handleHighlightClick
@@ -365,5 +375,6 @@ async function handleHighlightClick(event: Event) {
 
 // Remove all existing highlight overlays from the page
 export function removeExistingHighlights() {
+	console.log('Removing all existing highlights');
 	document.querySelectorAll('.obsidian-highlight-overlay').forEach(el => el.remove());
 }
