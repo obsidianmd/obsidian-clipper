@@ -222,10 +222,11 @@ function createHighlightOverlayElement(rect: DOMRect, content: string, isText: b
 	overlay.dataset.highlightIndex = index.toString();
 	
 	overlay.style.position = 'absolute';
-	overlay.style.left = `${rect.left + window.scrollX}px`;
-	overlay.style.top = `${rect.top + window.scrollY}px`;
-	overlay.style.width = `${rect.width}px`;
-	overlay.style.height = `${rect.height}px`;
+
+	overlay.style.left = `${rect.left + window.scrollX - 2}px`;
+	overlay.style.top = `${rect.top + window.scrollY - 2}px`;
+	overlay.style.width = `${rect.width + 4}px`;
+	overlay.style.height = `${rect.height + 4}px`;
 	
 	overlay.setAttribute('data-content', content);
 	
@@ -325,21 +326,47 @@ function createOrUpdateHoverOverlay(target: Element) {
 	}
 	
 	const rect = target.getBoundingClientRect();
-	
+
 	hoverOverlay.style.position = 'absolute';
 	hoverOverlay.style.left = `${rect.left + window.scrollX - 2}px`;
 	hoverOverlay.style.top = `${rect.top + window.scrollY - 2}px`;
 	hoverOverlay.style.width = `${rect.width + 4}px`;
 	hoverOverlay.style.height = `${rect.height + 4}px`;
 	hoverOverlay.style.display = 'block';
+
+	// Remove 'is-hovering' class from all highlight overlays
+	document.querySelectorAll('.obsidian-highlight-overlay.is-hovering').forEach(el => {
+		el.classList.remove('is-hovering');
+	});
+
+	// Remove 'on-highlight' class from hover overlay
+	hoverOverlay.classList.remove('on-highlight');
+
+	// Check if the target is a highlight overlay
+	if (target.classList.contains('obsidian-highlight-overlay')) {
+		const index = target.getAttribute('data-highlight-index');
+		if (index) {
+			// Add 'is-hovering' class to all highlight overlays with the same index
+			document.querySelectorAll(`.obsidian-highlight-overlay[data-highlight-index="${index}"]`).forEach(el => {
+				el.classList.add('is-hovering');
+			});
+			// Add 'on-highlight' class to hover overlay
+			hoverOverlay.classList.add('on-highlight');
+		}
+	}
 }
 
-// Removes the hover overlay
+// Modify the removeHoverOverlay function to also remove the 'is-hovering' class
 export function removeHoverOverlay() {
 	if (hoverOverlay) {
 		hoverOverlay.style.display = 'none';
 	}
 	lastHoverTarget = null;
+
+	// Remove 'is-hovering' class from all highlight overlays
+	document.querySelectorAll('.obsidian-highlight-overlay.is-hovering').forEach(el => {
+		el.classList.remove('is-hovering');
+	});
 }
 
 // Update the type of handleHighlightClick
