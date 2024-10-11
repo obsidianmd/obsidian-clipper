@@ -23,54 +23,49 @@ export function extractReadabilityContent(doc: Document): ReturnType<Readability
 	}
 }
 
-// Main function to compile the template
-export async function compileTemplate(tabId: number, text: string, variables: { [key: string]: any }, currentUrl: string): Promise<string> {
-	// Process for loops
-	const processedText = await processLogicStructures(text, variables, currentUrl);
-	
-	// Process other variables and filters
-	return await processVariables(tabId, processedText, variables, currentUrl);
-}
+// Define a type for logic handlers
+type LogicHandler = {
+	type: string;
+	regex: RegExp;
+	process: (match: RegExpExecArray, variables: { [key: string]: any }, currentUrl: string) => Promise<string>;
+};
 
-// Function to process logic structures like for loops
+// Define logic handlers
+const logicHandlers: LogicHandler[] = [
+	{
+		type: 'for',
+		regex: /{%\s*for\s+(\w+)\s+in\s+([\w:@]+)\s*%}([\s\S]*?){%\s*endfor\s*%}/g,
+		process: async (match, variables, currentUrl) => {
+			const [fullMatch, iteratorName, arrayName, loopContent] = match;
+			return processForLoop(fullMatch, variables, currentUrl);
+		}
+	},
+	// Add more logic handlers
+];
+
+// Function to process logic structures
 async function processLogicStructures(text: string, variables: { [key: string]: any }, currentUrl: string): Promise<string> {
 	let processedText = text;
-	const forLoopRegex = /{%\s*for\s+(\w+)\s+in\s+([\w:@]+)\s*%}/g;
-	let match;
 	
-	while ((match = forLoopRegex.exec(processedText)) !== null) {
-		const [fullMatch, iteratorName, arrayName] = match;
-		const startPos = match.index;
-		let nestLevel = 1;
-		let endPos = startPos + fullMatch.length;
-
-		while (nestLevel > 0 && endPos < processedText.length) {
-			const nextFor = processedText.indexOf('{% for', endPos);
-			const nextEndFor = processedText.indexOf('{% endfor %}', endPos);
-
-			if (nextFor !== -1 && nextFor < nextEndFor) {
-				nestLevel++;
-				endPos = nextFor + 1;
-			} else if (nextEndFor !== -1) {
-				nestLevel--;
-				endPos = nextEndFor + '{% endfor %}'.length;
-			} else {
-				break; // Unmatched for loop, break to avoid infinite loop
-			}
-		}
-
-		if (nestLevel === 0) {
-			const loopContent = processedText.substring(startPos, endPos);
-			const processedLoop = await processForLoop(loopContent, variables, currentUrl);
-			processedText = processedText.substring(0, startPos) + processedLoop + processedText.substring(endPos);
-			forLoopRegex.lastIndex = startPos + processedLoop.length;
-		} else {
-			console.error("Unmatched for loop:", fullMatch);
-			forLoopRegex.lastIndex = startPos + fullMatch.length;
+	for (const handler of logicHandlers) {
+		let match;
+		while ((match = handler.regex.exec(processedText)) !== null) {
+			const result = await handler.process(match, variables, currentUrl);
+			processedText = processedText.substring(0, match.index) + result + processedText.substring(match.index + match[0].length);
+			handler.regex.lastIndex = match.index + result.length;
 		}
 	}
 
 	return processedText;
+}
+
+// Main function to compile the template
+export async function compileTemplate(tabId: number, text: string, variables: { [key: string]: any }, currentUrl: string): Promise<string> {
+	// Process logic structures
+	const processedText = await processLogicStructures(text, variables, currentUrl);
+	
+	// Process other variables and filters
+	return await processVariables(tabId, processedText, variables, currentUrl);
 }
 
 // Function to process variables and apply filters
