@@ -519,10 +519,6 @@ async function refreshFields(tabId: number, checkTemplateTriggers: boolean = tru
 		if (extractedData) {
 			const currentUrl = tab.url;
 
-			// Set the initial template to the first template
-			currentTemplate = templates[0];
-			updateTemplateDropdown();
-
 			// Only check for the correct template if checkTemplateTriggers is true
 			if (checkTemplateTriggers) {
 				const getSchemaOrgData = async () => {
