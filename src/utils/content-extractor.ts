@@ -8,6 +8,7 @@ import { debugLog } from './debug';
 import dayjs from 'dayjs';
 import { generalSettings } from '../utils/storage-utils';
 import { AnyHighlightData } from './highlighter';
+import { processForLoop } from './tags/for_loop';
 
 export function extractReadabilityContent(doc: Document): ReturnType<Readability['parse']> | null {
 	try {
@@ -56,7 +57,8 @@ async function processSelector(tabId: number, match: string, currentUrl: string)
 	}
 }
 
-async function processSchema(match: string, variables: { [key: string]: string }, currentUrl: string): Promise<string> {
+// Export the processSchema function
+export async function processSchema(match: string, variables: { [key: string]: string }, currentUrl: string): Promise<string> {
 	const [, fullSchemaKey] = match.match(/{{schema:(.*?)}}/) || [];
 	const [schemaKey, ...filterParts] = fullSchemaKey.split('|');
 	const filtersString = filterParts.join('|');
@@ -127,34 +129,51 @@ function getNestedProperty(obj: any, path: string): any {
 }
 
 export async function replaceVariables(tabId: number, text: string, variables: { [key: string]: string }, currentUrl: string): Promise<string> {
-	const regex = /{{(?:schema:)?(?:selector:)?(?:selectorHtml:)?(?:prompt:)?\s*([\s\S]*?)\s*}}/g;
-	const matches = text.match(regex);
-
-	if (matches) {
-		for (const match of matches) {
-			let replacement: string;
-			const trimmedMatch = match.trim().slice(2, -2).trim();
-			const normalizedMatch = trimmedMatch.replace(/\s+/g, ' ');
-			
-			if (normalizedMatch.startsWith('selector:') || normalizedMatch.startsWith('selectorHtml:')) {
-				const [selectorType, ...selectorParts] = normalizedMatch.split(':');
-				const selector = selectorParts.join(':').trim();
-				const reconstructedMatch = `{{${selectorType}:${selector}}}`;
-				replacement = await processSelector(tabId, reconstructedMatch, currentUrl);
-			} else if (normalizedMatch.startsWith('schema:')) {
-				replacement = await processSchema(match, variables, currentUrl);
-			} else if (normalizedMatch.startsWith('prompt:')) {
-				replacement = await processPrompt(match, variables, currentUrl);
-			} else {
-				const [variableName, ...filterParts] = normalizedMatch.split('|').map(part => part.trim());
-				let value = variables[`{{${variableName.trim()}}}`] || '';				
-				const filtersString = filterParts.join('|');
-				replacement = applyFilters(value, filtersString, currentUrl);
-			}
-			text = text.replace(match, replacement);
+	// First, process for loops
+	const forLoopRegex = /{%\s*for\s+\w+\s+in\s+[\w:@]+\s*%}[\s\S]*?{%\s*endfor\s*%}/g;
+	let processedText = text;
+	const forLoopMatches = text.match(forLoopRegex);
+	
+	if (forLoopMatches) {
+		for (const match of forLoopMatches) {
+			const processedLoop = await processForLoop(match, variables, currentUrl);
+			processedText = processedText.replace(match, processedLoop);
 		}
 	}
-	return text;
+
+	// Then process other variables and filters
+	const regex = /{{(?:schema:)?(?:selector:)?(?:selectorHtml:)?(?:prompt:)?\s*([\s\S]*?)\s*}}/g;
+	
+	let result = processedText;
+	let match;
+	while ((match = regex.exec(result)) !== null) {
+		const fullMatch = match[0];
+		const trimmedMatch = match[1].trim();
+		const normalizedMatch = trimmedMatch.replace(/\s+/g, ' ');
+		
+		let replacement: string;
+
+		if (normalizedMatch.startsWith('selector:') || normalizedMatch.startsWith('selectorHtml:')) {
+			const [selectorType, ...selectorParts] = normalizedMatch.split(':');
+			const selector = selectorParts.join(':').trim();
+			const reconstructedMatch = `{{${selectorType}:${selector}}}`;
+			replacement = await processSelector(tabId, reconstructedMatch, currentUrl);
+		} else if (normalizedMatch.startsWith('schema:')) {
+			replacement = await processSchema(fullMatch, variables, currentUrl);
+		} else if (normalizedMatch.startsWith('prompt:')) {
+			replacement = await processPrompt(fullMatch, variables, currentUrl);
+		} else {
+			const [variableName, ...filterParts] = normalizedMatch.split('|').map(part => part.trim());
+			let value = variables[`{{${variableName.trim()}}}`] || '';				
+			const filtersString = filterParts.join('|');
+			replacement = applyFilters(value, filtersString, currentUrl);
+		}
+
+		result = result.substring(0, match.index) + replacement + result.substring(match.index + fullMatch.length);
+		regex.lastIndex = match.index + replacement.length;
+	}
+
+	return result;
 }
 
 interface ContentResponse {
