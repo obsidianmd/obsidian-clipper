@@ -58,48 +58,35 @@ async function processSelector(tabId: number, match: string, currentUrl: string)
 }
 
 // Export the processSchema function
-export async function processSchema(match: string, variables: { [key: string]: string }, currentUrl: string): Promise<string> {
+export async function processSchema(match: string, variables: { [key: string]: any }, currentUrl: string): Promise<string> {
 	const [, fullSchemaKey] = match.match(/{{schema:(.*?)}}/) || [];
 	const [schemaKey, ...filterParts] = fullSchemaKey.split('|');
 	const filtersString = filterParts.join('|');
 
-	let schemaValue = '';
+	let schemaValue: any = variables[`{{schema:${schemaKey}}}`];
 
-	// Check if we're dealing with a nested array access
-	const nestedArrayMatch = schemaKey.match(/(.*?)\[(\*|\d+)\](.*)/);
-	if (nestedArrayMatch) {
-		const [, arrayKey, indexOrStar, propertyKey] = nestedArrayMatch;
+	if (schemaValue === undefined) {
+		console.error(`Schema value not found for key: ${schemaKey}`);
+		return match;
+	}
 
-		// Handle shorthand notation for nested arrays
-		let fullArrayKey = arrayKey;
-		if (!arrayKey.includes('@')) {
-			const matchingKey = Object.keys(variables).find(key => key.includes('@') && key.endsWith(`:${arrayKey}}}`));
-			if (matchingKey) {
-				fullArrayKey = matchingKey.replace('{{schema:', '').replace('}}', '');
-			}
-		}
+	console.log(`Raw schema value for ${schemaKey}:`, schemaValue);
 
-		const arrayValue = JSON.parse(variables[`{{schema:${fullArrayKey}}}`] || '[]');
-		if (Array.isArray(arrayValue)) {
-			if (indexOrStar === '*') {
-				schemaValue = JSON.stringify(arrayValue.map(item => getNestedProperty(item, propertyKey.slice(1))).filter(Boolean));
-			} else {
-				const index = parseInt(indexOrStar, 10);
-				schemaValue = arrayValue[index] ? getNestedProperty(arrayValue[index], propertyKey.slice(1)) : '';
-			}
+	if (typeof schemaValue === 'string') {
+		try {
+			schemaValue = JSON.parse(schemaValue);
+		} catch (error) {
+			console.error('Error parsing schema JSON:', error);
+			console.log('Returning raw schema value');
+			return applyFilters(schemaValue, filtersString, currentUrl);
 		}
-	} else {
-		// Shorthand handling for non-array schemas
-		if (!schemaKey.includes('@')) {
-			const matchingKey = Object.keys(variables).find(key => key.includes('@') && key.endsWith(`:${schemaKey}}}`));
-			if (matchingKey) {
-				schemaValue = variables[matchingKey];
-			}
-		}
-		// If no matching shorthand found or it's a full key, use the original logic
-		if (!schemaValue) {
-			schemaValue = variables[`{{schema:${schemaKey}}}`] || '';
-		}
+	}
+
+	console.log(`Parsed schema value for ${schemaKey}:`, schemaValue);
+
+	// If schemaValue is an object or array, stringify it
+	if (typeof schemaValue === 'object') {
+		schemaValue = JSON.stringify(schemaValue);
 	}
 
 	return applyFilters(schemaValue, filtersString, currentUrl);
@@ -127,44 +114,65 @@ async function processPrompt(match: string, variables: { [key: string]: string }
 function getNestedProperty(obj: any, path: string): any {
 	return path.split('.').reduce((prev, curr) => prev && prev[curr], obj);
 }
-
-export async function replaceVariables(tabId: number, text: string, variables: { [key: string]: string }, currentUrl: string): Promise<string> {
-	// First, process for loops
-	const forLoopRegex = /{%\s*for\s+\w+\s+in\s+[\w:@]+\s*%}[\s\S]*?{%\s*endfor\s*%}/g;
+export async function replaceVariables(tabId: number, text: string, variables: { [key: string]: any }, currentUrl: string): Promise<string> {
+	// Process for loops
 	let processedText = text;
-	const forLoopMatches = text.match(forLoopRegex);
-	
-	if (forLoopMatches) {
-		for (const match of forLoopMatches) {
-			const processedLoop = await processForLoop(match, variables, currentUrl);
-			processedText = processedText.replace(match, processedLoop);
+	const forLoopRegex = /{%\s*for\s+(\w+)\s+in\s+([\w:@]+)\s*%}/g;
+	let match;
+	let startIndex = 0;
+
+	while ((match = forLoopRegex.exec(processedText)) !== null) {
+		const [fullMatch, iteratorName, arrayName] = match;
+		const startPos = match.index;
+		let nestLevel = 1;
+		let endPos = startPos + fullMatch.length;
+
+		while (nestLevel > 0 && endPos < processedText.length) {
+			const nextFor = processedText.indexOf('{% for', endPos);
+			const nextEndFor = processedText.indexOf('{% endfor %}', endPos);
+
+			if (nextFor !== -1 && nextFor < nextEndFor) {
+				nestLevel++;
+				endPos = nextFor + 1;
+			} else if (nextEndFor !== -1) {
+				nestLevel--;
+				endPos = nextEndFor + '{% endfor %}'.length;
+			} else {
+				break; // Unmatched for loop, break to avoid infinite loop
+			}
+		}
+
+		if (nestLevel === 0) {
+			const loopContent = processedText.substring(startPos, endPos);
+			console.log("Content being passed to processForLoop:", loopContent);
+			const processedLoop = await processForLoop(loopContent, variables, currentUrl);
+			processedText = processedText.substring(0, startPos) + processedLoop + processedText.substring(endPos);
+			forLoopRegex.lastIndex = startPos + processedLoop.length;
+		} else {
+			console.error("Unmatched for loop:", fullMatch);
+			forLoopRegex.lastIndex = startPos + fullMatch.length;
 		}
 	}
 
-	// Then process other variables and filters
-	const regex = /{{(?:schema:)?(?:selector:)?(?:selectorHtml:)?(?:prompt:)?\s*([\s\S]*?)\s*}}/g;
+	// Process other variables and filters
+	const regex = /{{([\s\S]*?)}}/g;
 	
 	let result = processedText;
-	let match;
 	while ((match = regex.exec(result)) !== null) {
 		const fullMatch = match[0];
 		const trimmedMatch = match[1].trim();
-		const normalizedMatch = trimmedMatch.replace(/\s+/g, ' ');
 		
 		let replacement: string;
 
-		if (normalizedMatch.startsWith('selector:') || normalizedMatch.startsWith('selectorHtml:')) {
-			const [selectorType, ...selectorParts] = normalizedMatch.split(':');
-			const selector = selectorParts.join(':').trim();
-			const reconstructedMatch = `{{${selectorType}:${selector}}}`;
-			replacement = await processSelector(tabId, reconstructedMatch, currentUrl);
-		} else if (normalizedMatch.startsWith('schema:')) {
+		if (trimmedMatch.startsWith('selector:') || trimmedMatch.startsWith('selectorHtml:')) {
+			replacement = await processSelector(tabId, fullMatch, currentUrl);
+		} else if (trimmedMatch.startsWith('schema:')) {
 			replacement = await processSchema(fullMatch, variables, currentUrl);
-		} else if (normalizedMatch.startsWith('prompt:')) {
+		} else if (trimmedMatch.startsWith('prompt:')) {
 			replacement = await processPrompt(fullMatch, variables, currentUrl);
 		} else {
-			const [variableName, ...filterParts] = normalizedMatch.split('|').map(part => part.trim());
-			let value = variables[`{{${variableName.trim()}}}`] || '';				
+			const [variableName, ...filterParts] = trimmedMatch.split('|').map(part => part.trim());
+			let value = variables[`{{${variableName}}}`] || '';
 			const filtersString = filterParts.join('|');
 			replacement = applyFilters(value, filtersString, currentUrl);
 		}
