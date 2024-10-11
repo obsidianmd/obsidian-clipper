@@ -566,6 +566,10 @@ export function saveHighlights() {
 
 // Apply all highlights to the page
 export function applyHighlights() {
+	if (highlights.length === 0) {
+		return; // Don't do anything if there are no highlights
+	}
+	
 	console.log('Applying highlights');
 	if (isApplyingHighlights) return;
 	
@@ -603,9 +607,12 @@ export function loadHighlights() {
 	const url = window.location.href;
 	browser.storage.local.get(url).then((result) => {
 		const storedData = result[url] as StoredData | undefined;
-		if (storedData && Array.isArray(storedData.highlights)) {
+		if (storedData && Array.isArray(storedData.highlights) && storedData.highlights.length > 0) {
 			highlights = storedData.highlights;
 			applyHighlights();
+		} else {
+			highlights = [];
+			console.log('No highlights found for this page');
 		}
 	});
 }

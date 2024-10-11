@@ -136,7 +136,7 @@ function calculateAverageLineHeight(rects: DOMRectList): number {
 
 // Plan out the overlay rectangles depending on the type of highlight
 export function planHighlightOverlayRects(target: Element, highlight: AnyHighlightData, index: number) {
-	const existingOverlays = Array.from(document.querySelectorAll('.obsidian-highlight-overlay'));
+	const existingOverlays = Array.from(document.querySelectorAll(`.obsidian-highlight-overlay[data-highlight-index="${index}"]`));
 	if (highlight.type === 'complex' || highlight.type === 'element') {
 		const rect = target.getBoundingClientRect();
 		mergeHighlightOverlayRects([rect], highlight.content, existingOverlays, false, index);
@@ -156,10 +156,11 @@ export function planHighlightOverlayRects(target: Element, highlight: AnyHighlig
 				const textRects = Array.from(rects).filter(rect => rect.height <= averageLineHeight * 1.5);
 				const complexRects = Array.from(rects).filter(rect => rect.height > averageLineHeight * 1.5);
 				
-				// Only create overlays for complex rects if there are no text rects
+				// Create overlays for all rects
 				if (textRects.length > 0) {
 					mergeHighlightOverlayRects(textRects, highlight.content, existingOverlays, true, index);
-				} else {
+				}
+				if (complexRects.length > 0) {
 					mergeHighlightOverlayRects(complexRects, highlight.content, existingOverlays, false, index);
 				}
 			} else {
@@ -168,6 +169,7 @@ export function planHighlightOverlayRects(target: Element, highlight: AnyHighlig
 				mergeHighlightOverlayRects([rect], highlight.content, existingOverlays, false, index);
 			}
 		} catch (error) {
+			console.error('Error creating text highlight:', error);
 			const rect = target.getBoundingClientRect();
 			mergeHighlightOverlayRects([rect], highlight.content, existingOverlays, false, index);
 		}
@@ -261,7 +263,10 @@ function updateHighlightOverlayPositions() {
 	highlights.forEach((highlight, index) => {
 		const target = getElementByXPath(highlight.xpath);
 		if (target) {
-			removeExistingHighlightOverlays(index);
+			const existingOverlays = document.querySelectorAll(`.obsidian-highlight-overlay[data-highlight-index="${index}"]`);
+			if (existingOverlays.length > 0) {
+				removeExistingHighlightOverlays(index);
+			}
 			planHighlightOverlayRects(target, highlight, index);
 		}
 	});
@@ -375,6 +380,9 @@ async function handleHighlightClick(event: Event) {
 
 // Remove all existing highlight overlays from the page
 export function removeExistingHighlights() {
-	console.log('Removing all existing highlights');
-	document.querySelectorAll('.obsidian-highlight-overlay').forEach(el => el.remove());
+	const existingHighlights = document.querySelectorAll('.obsidian-highlight-overlay');
+	if (existingHighlights.length > 0) {
+		console.log('Removing all existing highlights');
+		existingHighlights.forEach(el => el.remove());
+	}
 }
