@@ -27,11 +27,9 @@ const logicHandlers: LogicHandler[] = [
 // Main function to compile the template
 export async function compileTemplate(tabId: number, text: string, variables: { [key: string]: any }, currentUrl: string): Promise<string> {
 	// Process logic
-	// const processedText = await processLogic(text, variables, currentUrl);
-	// remember to change `text` to `processedText` below, if using logic
-
+	const processedText = await processLogic(text, variables, currentUrl);
 	// Process other variables and filters
-	return await processVariables(tabId, text, variables, currentUrl);
+	return await processVariables(tabId, processedText, variables, currentUrl);
 }
 
 // Process logic structures
@@ -51,7 +49,7 @@ export async function processLogic(text: string, variables: { [key: string]: any
 }
 
 // Process variables and apply filters
-async function processVariables(tabId: number, text: string, variables: { [key: string]: any }, currentUrl: string): Promise<string> {
+export async function processVariables(tabId: number, text: string, variables: { [key: string]: any }, currentUrl: string): Promise<string> {
 	const regex = /{{([\s\S]*?)}}/g;
 	let result = text;
 	let match;
