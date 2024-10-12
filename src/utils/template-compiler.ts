@@ -1,9 +1,9 @@
-import { applyFilters } from './filters';
-import { processForLoop } from './tags/for';
 import { processSimpleVariable } from './variables/simple';
 import { processSelector } from './variables/selector';
 import { processSchema } from './variables/schema';
 import { processPrompt } from './variables/prompt';
+
+import { processForLoop } from './tags/for';
 
 // Define a type for logic handlers
 type LogicHandler = {
@@ -24,6 +24,16 @@ const logicHandlers: LogicHandler[] = [
 	// Add more logic handlers
 ];
 
+// Main function to compile the template
+export async function compileTemplate(tabId: number, text: string, variables: { [key: string]: any }, currentUrl: string): Promise<string> {
+	// Process logic
+	// const processedText = await processLogic(text, variables, currentUrl);
+	// remember to change `text` to `processedText` below, if using logic
+
+	// Process other variables and filters
+	return await processVariables(tabId, text, variables, currentUrl);
+}
+
 // Function to process logic structures
 export async function processLogic(text: string, variables: { [key: string]: any }, currentUrl: string): Promise<string> {
 	let processedText = text;
@@ -38,16 +48,6 @@ export async function processLogic(text: string, variables: { [key: string]: any
 	}
 
 	return processedText;
-}
-
-// Main function to compile the template
-export async function compileTemplate(tabId: number, text: string, variables: { [key: string]: any }, currentUrl: string): Promise<string> {
-	// Process logic
-	// const processedText = await processLogic(text, variables, currentUrl);
-	// remember to change `text` to `processedText` below, if using logic
-
-	// Process other variables and filters
-	return await processVariables(tabId, text, variables, currentUrl);
 }
 
 // Function to process variables and apply filters
