@@ -34,7 +34,7 @@ export async function compileTemplate(tabId: number, text: string, variables: { 
 	return await processVariables(tabId, text, variables, currentUrl);
 }
 
-// Function to process logic structures
+// Process logic structures
 export async function processLogic(text: string, variables: { [key: string]: any }, currentUrl: string): Promise<string> {
 	let processedText = text;
 	
@@ -50,7 +50,7 @@ export async function processLogic(text: string, variables: { [key: string]: any
 	return processedText;
 }
 
-// Function to process variables and apply filters
+// Process variables and apply filters
 async function processVariables(tabId: number, text: string, variables: { [key: string]: any }, currentUrl: string): Promise<string> {
 	const regex = /{{([\s\S]*?)}}/g;
 	let result = text;
