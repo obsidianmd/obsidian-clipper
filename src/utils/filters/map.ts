@@ -24,33 +24,41 @@ export const map = (str: string, param?: string): string => {
 
 		const mappedArray = array.map((item, index) => {
 			debugLog('Map', `Processing item ${index}:`, JSON.stringify(item, null, 2));
-			// Check if the expression is an object literal
-			if (expression.trim().startsWith('{') && expression.trim().endsWith('}')) {
+			// Check if the expression is an object literal or a string literal
+			if ((expression.trim().startsWith('{') && expression.trim().endsWith('}')) ||
+				(expression.trim().startsWith('"') && expression.trim().endsWith('"')) ||
+				(expression.trim().startsWith("'") && expression.trim().endsWith("'"))) {
 				// Use a simple object to store the mapped properties
 				const mappedItem: { [key: string]: any } = {};
 
-				// Parse the expression to extract property assignments
-				const assignments = expression.match(/\{(.+)\}/)?.[1].split(',') || [];
+				// Parse the expression to extract property assignments or string literal
+				if (expression.trim().startsWith('{')) {
+					const assignments = expression.match(/\{(.+)\}/)?.[1].split(',') || [];
 
-				assignments.forEach((assignment) => {
-					const [key, value] = assignment.split(':').map(s => s.trim());
-					// Remove any surrounding quotes from the key
-					const cleanKey = key.replace(/^['"](.+)['"]$/, '$1');
-					debugLog('Map', 'Processing assignment:', { cleanKey, value });
-					// Evaluate the value expression
-					const cleanValue = evaluateExpression(value, item, argName);
-					debugLog('Map', 'Cleaned value:', cleanValue);
-					mappedItem[cleanKey] = cleanValue;
-					debugLog('Map', `Assigned ${cleanKey}:`, mappedItem[cleanKey]);
-				});
+					assignments.forEach((assignment) => {
+						const [key, value] = assignment.split(':').map(s => s.trim());
+						// Remove any surrounding quotes from the key
+						const cleanKey = key.replace(/^['"](.+)['"]$/, '$1');
+						debugLog('Map', 'Processing assignment:', { cleanKey, value });
+						// Evaluate the value expression
+						const cleanValue = evaluateExpression(value, item, argName);
+						debugLog('Map', 'Cleaned value:', cleanValue);
+						mappedItem[cleanKey] = cleanValue;
+						debugLog('Map', `Assigned ${cleanKey}:`, mappedItem[cleanKey]);
+					});
+				} else {
+					// Handle string literal
+					const stringLiteral = expression.trim().slice(1, -1);
+					mappedItem.str = stringLiteral.replace(new RegExp(`\\$\\{${argName}\\}`, 'g'), item);
+				}
 
 				debugLog('Map', 'Mapped item:', mappedItem);
 				return mappedItem;
 			} else {
-				// If it's not an object literal, treat it as a simple expression
+				// If it's not an object literal or string literal, treat it as a simple expression
 				return evaluateExpression(expression, item, argName);
-			}
-		});
+				}
+			});
 
 		debugLog('Map', 'Mapped array:', JSON.stringify(mappedArray, null, 2));
 		return JSON.stringify(mappedArray);

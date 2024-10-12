@@ -58,6 +58,11 @@ function replaceTemplateVariables(obj: any, template: string): string {
 		return value !== undefined && value !== 'undefined' ? value : '';
 	});
 
+	// Handle the case where obj is a simple string (from string literal in map)
+	if (typeof obj === 'object' && obj.str) {
+		result = result.replace(/\$\{str\}/g, obj.str);
+	}
+
 	debugLog('Template', 'Result after variable replacement:', result);
 
 	// Replace \n with actual newlines

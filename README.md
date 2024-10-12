@@ -183,6 +183,9 @@ Filters allow you to modify variables in a template. Filters are applied to vari
 		- Example: `[{gem: "obsidian", color: "black"}, {gem: "amethyst", color: "purple"}]|map:item => item.gem` returns `["obsidian", "amethyst"]`.
 	- Parentheses are needed for object literals and complex expressions: `map:item => ({key: value})`.
 		- Example: `[{gem: "obsidian", color: "black"}, {gem: "amethyst", color: "purple"}]|map:item => ({name: item.gem, hex: item.color === "black" ? "#000" : "#800080"})`  returns `[{name: "obsidian", hex: "#000"}, {name: "amethyst", hex: "#800080"}]`.
+	- String literals are supported and automatically wrapped in an object with a `str` property:
+		- Example: `["rock", "pop"]|map:item => "genres/${item}"` returns `[{str: "genres/rock"}, {str: "genres/pop"}]`.
+		- The `str` property is used to store the result of string literal transformations.
 	- Can be combined with `template` filter, e.g. `map:item => ({name: ${item.gem}, color: item.color})|template:"- ${name} is ${color}\n"`
 - `markdown` converts a string to an [Obsidian Flavored Markdown](https://help.obsidian.md/Editing+and+formatting/Obsidian+Flavored+Markdown) formatted string.
 	- Useful when combined with variables that return HTML such as `{{contentHtml}}`, `{{fullHtml}}`, and selector variables like `{{selectorHtml:cssSelector}}`.
@@ -233,8 +236,11 @@ Filters allow you to modify variables in a template. Filters are applied to vari
 - `template` applies a template string to an object or array of objects.
 	- Syntax: `object|template:"Template with ${variable}"`.
 	- Access nested properties: `{"gem":{"name":"Obsidian"}}|template:"${gem.name}"` returns `"Obsidian"`.
-	- For objects: `{"gem":"obsidian","hardness":5}|template:"${gem} has a hardness of ${hardness}"` returns `"obsidian has a hardness of 7"`.
-	- For arrays: `[{"gem":"obsidian","hardness":5},{"gem":"amethyst","hardness":7}]|template:"- ${gem} has a hardness of ${hardness}\n"`
+	- For objects: `{"gem":"obsidian","hardness":5}|template:"${gem} has a hardness of ${hardness}"` returns `"obsidian has a hardness of 5"`.
+	- For arrays: `[{"gem":"obsidian","hardness":5},{"gem":"amethyst","hardness":7}]|template:"- ${gem} has a hardness of ${hardness}\n"` returns a formatted list.
+	- Works with string literals from `map` by accessing the `str` property:
+		- Example: `["rock", "pop"]|map:item => "genres/${item}"|template:"${str}"` returns `"genres/rock\ngenres/pop"`.
+		- The `str` property is automatically used when applying `template` to objects created by `map` with string literals.
 - `title` returns a titlecased version of the value, e.g. `"hello world"|title` returns `"Hello World"`.
 - `trim` removes whitespace from both ends of a string.
 	- `"  hello world  "|trim` returns `"hello world"`.
