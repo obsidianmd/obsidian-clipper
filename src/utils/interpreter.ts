@@ -1,6 +1,6 @@
 import { generalSettings, ModelConfig } from './storage-utils';
 import { PromptVariable, Template } from '../types/types';
-import { compileTemplate } from './content-extractor';
+import { compileTemplate } from './template-compiler';
 import { applyFilters } from './filters';
 import { formatDuration } from './string-utils';
 import { adjustNoteNameHeight } from './ui-utils';

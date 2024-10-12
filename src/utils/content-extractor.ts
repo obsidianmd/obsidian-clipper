@@ -2,16 +2,11 @@ import { ExtractedContent } from '../types/types';
 import { createMarkdownContent } from './markdown-converter';
 import { sanitizeFileName } from './string-utils';
 import { Readability } from '@mozilla/readability';
-import { applyFilters } from './filters';
 import browser from './browser-polyfill';
 import { debugLog } from './debug';
 import dayjs from 'dayjs';
 
 import { AnyHighlightData } from './highlighter';
-import { processForLoop } from './tags/for';
-import { processSelector } from './variables/selector';
-import { processSchema } from './variables/schema';
-import { processPrompt } from './variables/prompt';
 
 export function extractReadabilityContent(doc: Document): ReturnType<Readability['parse']> | null {
 	try {
@@ -21,88 +16,6 @@ export function extractReadabilityContent(doc: Document): ReturnType<Readability
 		console.error('Error in extractReadabilityContent:', error);
 		return null;
 	}
-}
-
-// Define a type for logic handlers
-type LogicHandler = {
-	type: string;
-	regex: RegExp;
-	process: (match: RegExpExecArray, variables: { [key: string]: any }, currentUrl: string, processLogic: (text: string, variables: { [key: string]: any }, currentUrl: string) => Promise<string>) => Promise<string>;
-};
-
-// Define logic handlers
-const logicHandlers: LogicHandler[] = [
-	{
-		type: 'for',
-		regex: /{%\s*for\s+(\w+)\s+in\s+([\w:@]+)\s*%}([\s\S]*?){%\s*endfor\s*%}/g,
-		process: async (match, variables, currentUrl, processLogic) => {
-			return processForLoop(match, variables, currentUrl, processLogic);
-		}
-	},
-	// Add more logic handlers
-];
-
-// Function to process logic structures
-export async function processLogic(text: string, variables: { [key: string]: any }, currentUrl: string): Promise<string> {
-	let processedText = text;
-	
-	for (const handler of logicHandlers) {
-		let match;
-		while ((match = handler.regex.exec(processedText)) !== null) {
-			const result = await handler.process(match, variables, currentUrl, processLogic);
-			processedText = processedText.substring(0, match.index) + result + processedText.substring(match.index + match[0].length);
-			handler.regex.lastIndex = match.index + result.length;
-		}
-	}
-
-	return processedText;
-}
-
-// Main function to compile the template
-export async function compileTemplate(tabId: number, text: string, variables: { [key: string]: any }, currentUrl: string): Promise<string> {
-	// Process logic
-	// const processedText = await processLogic(text, variables, currentUrl);
-	// remember to change `text` to `processedText` below, if using logic
-
-	// Process other variables and filters
-	return await processVariables(tabId, text, variables, currentUrl);
-}
-
-// Function to process variables and apply filters
-async function processVariables(tabId: number, text: string, variables: { [key: string]: any }, currentUrl: string): Promise<string> {
-	const regex = /{{([\s\S]*?)}}/g;
-	let result = text;
-	let match;
-
-	while ((match = regex.exec(result)) !== null) {
-		const fullMatch = match[0];
-		const trimmedMatch = match[1].trim();
-		
-		let replacement: string;
-
-		if (trimmedMatch.startsWith('selector:') || trimmedMatch.startsWith('selectorHtml:')) {
-			replacement = await processSelector(tabId, fullMatch, currentUrl);
-		} else if (trimmedMatch.startsWith('schema:')) {
-			replacement = await processSchema(fullMatch, variables, currentUrl);
-		} else if (trimmedMatch.startsWith('prompt:')) {
-			replacement = await processPrompt(fullMatch, variables, currentUrl);
-		} else {
-			replacement = await processSimpleVariable(trimmedMatch, variables, currentUrl);
-		}
-
-		result = result.substring(0, match.index) + replacement + result.substring(match.index + fullMatch.length);
-		regex.lastIndex = match.index + replacement.length;
-	}
-
-	return result;
-}
-
-// Function to process a simple variable (without special prefixes)
-async function processSimpleVariable(variableString: string, variables: { [key: string]: any }, currentUrl: string): Promise<string> {
-	const [variableName, ...filterParts] = variableString.split('|').map(part => part.trim());
-	let value = variables[`{{${variableName}}}`] || '';
-	const filtersString = filterParts.join('|');
-	return applyFilters(value, filtersString, currentUrl);
 }
 
 interface ContentResponse {

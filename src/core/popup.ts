@@ -1,7 +1,8 @@
 import dayjs from 'dayjs';
 import { Template, Property, PromptVariable } from '../types/types';
 import { generateFrontmatter, saveToObsidian } from '../utils/obsidian-note-creator';
-import { extractPageContent, initializePageContent, compileTemplate } from '../utils/content-extractor';
+import { extractPageContent, initializePageContent } from '../utils/content-extractor';
+import { compileTemplate } from '../utils/template-compiler';
 import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
 import { decompressFromUTF16 } from 'lz-string';
 import { findMatchingTemplate, initializeTriggers } from '../utils/triggers';
@@ -19,7 +20,6 @@ import { ensureContentScriptLoaded } from '../utils/content-script-utils';
 import { isBlankPage, isValidUrl } from '../utils/active-tab-manager';
 import { memoizeWithExpiration } from '../utils/memoize';
 import { debounce } from '../utils/debounce';
-import { AnyHighlightData } from '../utils/highlighter';
 
 let loadedSettings: Settings;
 let currentTemplate: Template | null = null;
