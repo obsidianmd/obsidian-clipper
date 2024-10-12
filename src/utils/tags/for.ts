@@ -5,7 +5,7 @@ export async function processForLoop(
     match: RegExpExecArray, 
     variables: { [key: string]: any }, 
     currentUrl: string,
-    processLogicStructures: (text: string, variables: { [key: string]: any }, currentUrl: string) => Promise<string>
+    processLogic: (text: string, variables: { [key: string]: any }, currentUrl: string) => Promise<string>
 ): Promise<string> {
     console.log('Processing loop:', match[0]);
     
@@ -43,7 +43,7 @@ export async function processForLoop(
         console.log(`Processing item ${index} of ${arrayName}:`, item);
         const itemVariables = { ...variables, [iteratorName]: item };
         // Process nested loops and other logic structures recursively
-        let itemContent = await processLogicStructures(loopContent, itemVariables, currentUrl);
+        let itemContent = await processLogic(loopContent, itemVariables, currentUrl);
         // Process variables after nested loops
         itemContent = await processVariables(itemContent, itemVariables, currentUrl);
         return itemContent.trim();

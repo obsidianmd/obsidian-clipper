@@ -27,7 +27,7 @@ export function extractReadabilityContent(doc: Document): ReturnType<Readability
 type LogicHandler = {
 	type: string;
 	regex: RegExp;
-	process: (match: RegExpExecArray, variables: { [key: string]: any }, currentUrl: string, processLogicStructures: (text: string, variables: { [key: string]: any }, currentUrl: string) => Promise<string>) => Promise<string>;
+	process: (match: RegExpExecArray, variables: { [key: string]: any }, currentUrl: string, processLogic: (text: string, variables: { [key: string]: any }, currentUrl: string) => Promise<string>) => Promise<string>;
 };
 
 // Define logic handlers
@@ -35,21 +35,21 @@ const logicHandlers: LogicHandler[] = [
 	{
 		type: 'for',
 		regex: /{%\s*for\s+(\w+)\s+in\s+([\w:@]+)\s*%}([\s\S]*?){%\s*endfor\s*%}/g,
-		process: async (match, variables, currentUrl, processLogicStructures) => {
-			return processForLoop(match, variables, currentUrl, processLogicStructures);
+		process: async (match, variables, currentUrl, processLogic) => {
+			return processForLoop(match, variables, currentUrl, processLogic);
 		}
 	},
 	// Add more logic handlers
 ];
 
 // Function to process logic structures
-export async function processLogicStructures(text: string, variables: { [key: string]: any }, currentUrl: string): Promise<string> {
+export async function processLogic(text: string, variables: { [key: string]: any }, currentUrl: string): Promise<string> {
 	let processedText = text;
 	
 	for (const handler of logicHandlers) {
 		let match;
 		while ((match = handler.regex.exec(processedText)) !== null) {
-			const result = await handler.process(match, variables, currentUrl, processLogicStructures);
+			const result = await handler.process(match, variables, currentUrl, processLogic);
 			processedText = processedText.substring(0, match.index) + result + processedText.substring(match.index + match[0].length);
 			handler.regex.lastIndex = match.index + result.length;
 		}
@@ -60,6 +60,10 @@ export async function processLogicStructures(text: string, variables: { [key: st
 
 // Main function to compile the template
 export async function compileTemplate(tabId: number, text: string, variables: { [key: string]: any }, currentUrl: string): Promise<string> {
+	// Process logic
+	// const processedText = await processLogic(text, variables, currentUrl);
+	// remember to change `text` to `processedText` below, if using logic
+
 	// Process other variables and filters
 	return await processVariables(tabId, text, variables, currentUrl);
 }
