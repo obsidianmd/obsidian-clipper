@@ -78,11 +78,6 @@ export async function initializePageContent(content: string, selectedHtml: strin
 		const parser = new DOMParser();
 		const doc = parser.parseFromString(content, 'text/html');
 
-		const readabilityArticle = extractReadabilityContent(doc);
-		if (!readabilityArticle) {
-			console.warn('Failed to parse content with Readability, falling back to full content');
-		}
-
 		// Define preset variables with fallbacks
 		const title =
 			getMetaContent(doc, "property", "og:title")
@@ -146,6 +141,11 @@ export async function initializePageContent(content: string, selectedHtml: strin
 			|| getSchemaProperty(schemaOrgData, 'isPartOf.name')
 			|| getMetaContent(doc, "name", "application-name")
 			|| '';
+
+		const readabilityArticle = extractReadabilityContent(doc);
+		if (!readabilityArticle) {
+			console.warn('Failed to parse content with Readability, falling back to full content');
+		}
 
 		if (highlights && highlights.length > 0) {
 			const highlightsContent = highlights.map(highlight => highlight.content).join('\n\n\n');
