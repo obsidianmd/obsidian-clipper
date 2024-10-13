@@ -422,6 +422,9 @@ export function createMarkdownContent(content: string, url: string) {
 	turndownService.addRule('removals', {
 		filter: function (node) {
 			if (!(node instanceof HTMLElement)) return false;
+			// Back to top links
+			if (node.id.startsWith('back-to-top')) return true;
+			if (node.classList.contains('back-to-top')) return true;
 			// Wikipedia edit buttons
 			if (node.classList.contains('mw-editsection')) return true;
 			// Wikipedia cite backlinks
