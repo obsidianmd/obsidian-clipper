@@ -311,9 +311,33 @@ async function importTemplateFromJson(jsonContent: string): Promise<void> {
 }
 
 export function copyTemplateToClipboard(template: Template): void {
-	const { id, ...templateCopy } = template;
+	const isDailyNote = template.behavior === 'append-daily' || template.behavior === 'prepend-daily';
 
-	const jsonContent = JSON.stringify(templateCopy, null, 2);
+	const orderedTemplate: Partial<Template> & { schemaVersion: string } = {
+		schemaVersion: SCHEMA_VERSION,
+		name: template.name,
+		behavior: template.behavior,
+		noteContentFormat: template.noteContentFormat,
+		properties: template.properties.map(({ name, value, type }) => ({
+			name,
+			value,
+			type: type || generalSettings.propertyTypes.find(pt => pt.name === name)?.type || 'text'
+		})),
+		triggers: template.triggers,
+	};
+
+	// Only include noteNameFormat and path for non-daily note behaviors
+	if (!isDailyNote) {
+		orderedTemplate.noteNameFormat = template.noteNameFormat;
+		orderedTemplate.path = template.path;
+	}
+
+	// Include context only if it has a value
+	if (template.context) {
+		orderedTemplate.context = template.context;
+	}
+
+	const jsonContent = JSON.stringify(orderedTemplate, null, 2);
 	
 	navigator.clipboard.writeText(jsonContent).then(() => {
 		alert('Copied template JSON to clipboard');
