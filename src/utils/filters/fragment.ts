@@ -10,6 +10,17 @@ interface TextFragmentParts {
 }
 
 export const fragment = (str: string, param?: string): string => {
+	if (!param) {
+		return str;
+	}
+
+	// Use a regex to split the param, extracting the URL and custom name
+	const match = param.match(/^(.*?):?((https?:\/\/|file:\/\/).*$)/);
+	const linktext = String(
+		match?.[1]?.trim().replace(/(['"])/g, "") || "link"
+	); // Custom name (if any), with quotes removed
+	const currentUrl = String(match?.[2] || param); // URL (or whole param if no URL found)
+
 	const extractTextFragmentParts = (
 		selectedText: SelectedText
 	): TextFragmentParts => {
@@ -60,18 +71,18 @@ export const fragment = (str: string, param?: string): string => {
 			return data
 				.map(
 					(item) =>
-						`${item} [link](${
-							param ? param : ""
-						}${createTextFragmentUrl(item)})`
+						`${item} [${linktext}](${currentUrl}${createTextFragmentUrl(
+							item
+						)})`
 				)
 				.join("\n");
 		} else if (typeof data === "object" && data !== null) {
 			return Object.entries(data)
 				.map(
 					([key, value]) =>
-						`${value} [${key}](${
-							param ? param : ""
-						}${createTextFragmentUrl(String(value))})`
+						`${value} [${linktext}](${currentUrl}${createTextFragmentUrl(
+							String(value)
+						)})`
 				)
 				.join("\n");
 		}
