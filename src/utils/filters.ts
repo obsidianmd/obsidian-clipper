@@ -237,6 +237,11 @@ export function applyFilters(value: string | any[], filterString: string, curren
 				if (name === 'markdown' && params.length === 0 && currentUrl) {
 					params.push(currentUrl);
 				}
+
+				// Special case for fragment filter: use currentUrl if no params provided
+				if (name === 'fragment' && currentUrl) {
+					params.push(currentUrl);
+				} 
 				
 				// Apply the filter and get the output
 				const output = filter(stringInput, params.join(':'));
