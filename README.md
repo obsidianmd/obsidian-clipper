@@ -80,6 +80,7 @@ Preset variables are automatically generated based on the page content. These sh
 | `{{description}}`   | Description or excerpt                                        |
 | `{{domain}}`        | Domain                                                        |
 | `{{fullHtml}}`      | Unprocessed HTML for the full page content                    |
+| `{{highlights}}`    | Highlights with text and timestamps                           |
 | `{{image}}`         | Social share image URL                                        |
 | `{{published}}`     | Published date                                                |
 | `{{site}}`          | Site name or publisher                                        |
