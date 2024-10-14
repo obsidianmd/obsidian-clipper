@@ -1,5 +1,6 @@
 import browser from './utils/browser-polyfill';
 import * as highlighter from './utils/highlighter';
+import { loadSettings, generalSettings } from './utils/storage-utils';
 
 declare global {
 	interface Window {
@@ -87,9 +88,12 @@ declare global {
 			const content = extractContentBySelector(request.selector, request.attribute, request.extractHtml);
 			sendResponse({ content: content, schemaOrgData: extractSchemaOrgData() });
 		} else if (request.action === "paintHighlights") {
-			highlighter.loadHighlights();
-			highlighter.applyHighlights();
-			sendResponse({ success: true });
+			highlighter.loadHighlights().then(() => {
+				if (generalSettings.alwaysShowHighlights) {
+					highlighter.applyHighlights();
+				}
+				sendResponse({ success: true });
+			});
 			return true;
 		} else if (request.action === "setHighlighterMode") {
 			isHighlighterMode = request.isActive;
@@ -234,9 +238,19 @@ declare global {
 		browser.runtime.sendMessage({ action: "updateHasHighlights", hasHighlights });
 	}
 
+	async function initializeHighlighter() {
+		await loadSettings();
+		await highlighter.loadHighlights();
+		
+		if (generalSettings.alwaysShowHighlights) {
+			highlighter.applyHighlights();
+		}
+		
+		updateHasHighlights();
+	}
+
 	// Initialize highlighter
-	highlighter.loadHighlights();
-	highlighter.applyHighlights();
+	initializeHighlighter();
 
 	// Call updateHasHighlights when the page loads
 	window.addEventListener('load', updateHasHighlights);

@@ -103,6 +103,7 @@ export function initializeGeneralSettings(): void {
 		initializeAutoSave();
 		initializeResetDefaultTemplateButton();
 		initializeExportImportAllSettingsButtons();
+		initializeHighlighterSettings();
 	});
 }
 
@@ -118,13 +119,21 @@ function saveSettingsFromForm(): void {
 	const betaFeaturesToggle = document.getElementById('beta-features-toggle') as HTMLInputElement;
 	const legacyModeToggle = document.getElementById('legacy-mode-toggle') as HTMLInputElement;
 	const silentOpenToggle = document.getElementById('silent-open-toggle') as HTMLInputElement;
+	const highlighterToggle = document.getElementById('highlighter-toggle') as HTMLInputElement;
+	const alwaysShowHighlightsToggle = document.getElementById('highlighter-visibility') as HTMLInputElement;
+	const highlightBehaviorSelect = document.getElementById('highlighter-behavior') as HTMLSelectElement;
 
 	const settings = {
 		showMoreActionsButton: showMoreActionsToggle?.checked,
 		betaFeatures: betaFeaturesToggle?.checked,
 		legacyMode: legacyModeToggle?.checked,
-		silentOpen: silentOpenToggle?.checked
-	}
+		silentOpen: silentOpenToggle?.checked,
+		highlighterEnabled: highlighterToggle?.checked,
+		alwaysShowHighlights: alwaysShowHighlightsToggle?.checked,
+		highlightBehavior: highlightBehaviorSelect?.value
+	};
+
+	saveSettings(settings);
 }
 
 function debounce(func: Function, delay: number): (...args: any[]) => void {
@@ -256,5 +265,32 @@ function initializeExportImportAllSettingsButtons(): void {
 	const importAllSettingsBtn = document.getElementById('import-all-settings-btn');
 	if (importAllSettingsBtn) {
 		importAllSettingsBtn.addEventListener('click', importAllSettings);
+	}
+}
+
+function initializeHighlighterSettings(): void {
+	const highlighterToggle = document.getElementById('highlighter-toggle') as HTMLInputElement;
+	const alwaysShowHighlightsToggle = document.getElementById('highlighter-visibility') as HTMLInputElement;
+	const highlightBehaviorSelect = document.getElementById('highlighter-behavior') as HTMLSelectElement;
+
+	if (highlighterToggle) {
+		highlighterToggle.checked = generalSettings.highlighterEnabled;
+		highlighterToggle.addEventListener('change', () => {
+			saveSettings({ highlighterEnabled: highlighterToggle.checked });
+		});
+	}
+
+	if (alwaysShowHighlightsToggle) {
+		alwaysShowHighlightsToggle.checked = generalSettings.alwaysShowHighlights;
+		alwaysShowHighlightsToggle.addEventListener('change', () => {
+			saveSettings({ alwaysShowHighlights: alwaysShowHighlightsToggle.checked });
+		});
+	}
+
+	if (highlightBehaviorSelect) {
+		highlightBehaviorSelect.value = generalSettings.highlightBehavior;
+		highlightBehaviorSelect.addEventListener('change', () => {
+			saveSettings({ highlightBehavior: highlightBehaviorSelect.value });
+		});
 	}
 }

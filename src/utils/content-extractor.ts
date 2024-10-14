@@ -5,8 +5,8 @@ import { Readability } from '@mozilla/readability';
 import browser from './browser-polyfill';
 import { debugLog } from './debug';
 import dayjs from 'dayjs';
-
 import { AnyHighlightData } from './highlighter';
+import { generalSettings } from './storage-utils';
 
 export function extractReadabilityContent(doc: Document): ReturnType<Readability['parse']> | null {
 	try {
@@ -148,7 +148,7 @@ export async function initializePageContent(content: string, selectedHtml: strin
 			console.warn('Failed to parse content with Readability, falling back to full content');
 		}
 
-		if (highlights && highlights.length > 0) {
+		if (generalSettings.highlighterEnabled && generalSettings.highlightBehavior !== 'no-highlights' && highlights && highlights.length > 0) {
 			const highlightsContent = highlights.map(highlight => highlight.content).join('');
 			content = highlightsContent;
 		} else if (selectedHtml) {

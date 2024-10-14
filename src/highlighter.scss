@@ -134,7 +134,15 @@ body.obsidian-highlighter-active {
 	}
 }
 
+body.obsidian-highlighter-always-show,
+body.obsidian-highlighter-active {
+	.obsidian-highlight-overlay {
+		display: block;
+	}
+}
+
 .obsidian-highlight-overlay {
+	display: none;
 	position: absolute;
 	background-color: rgba(255, 235, 0, 0.35);
 	border-radius: 4px;

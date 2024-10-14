@@ -21,6 +21,9 @@ export interface Settings {
 	betaFeatures: boolean;
 	legacyMode: boolean;
 	silentOpen: boolean;
+	highlighterEnabled: boolean;
+	alwaysShowHighlights: boolean;
+	highlightBehavior: string;
 	openaiApiKey?: string;
 	anthropicApiKey?: string;
 	interpreterModel?: string;
@@ -36,6 +39,9 @@ export let generalSettings: Settings = {
 	betaFeatures: false,
 	legacyMode: false,
 	silentOpen: false,
+	highlighterEnabled: true,
+	alwaysShowHighlights: false,
+	highlightBehavior: 'replace-content',
 	showMoreActionsButton: false,
 	openaiApiKey: '',
 	anthropicApiKey: '',
@@ -70,6 +76,11 @@ interface StorageData {
 		silentOpen?: boolean;
 	};
 	vaults?: string[];
+	highlighter_settings?: {
+		highlighterEnabled?: boolean;
+		alwaysShowHighlights?: boolean;
+		highlightBehavior?: string;
+	};
 	interpreter_settings?: {
 		openaiApiKey?: string;
 		anthropicApiKey?: string;
@@ -83,7 +94,7 @@ interface StorageData {
 }
 
 export async function loadSettings(): Promise<Settings> {
-	const data = await browser.storage.sync.get(['general_settings', 'vaults', 'interpreter_settings', 'property_types']) as StorageData;
+	const data = await browser.storage.sync.get(['general_settings', 'vaults', 'highlighter_settings', 'interpreter_settings', 'property_types']) as StorageData;
 
 	const defaultSettings: Settings = {
 		vaults: [],
@@ -91,6 +102,9 @@ export async function loadSettings(): Promise<Settings> {
 		betaFeatures: false,
 		legacyMode: false,
 		silentOpen: false,
+		highlighterEnabled: true,
+		alwaysShowHighlights: true,
+		highlightBehavior: 'replace-content',
 		openaiApiKey: '',
 		anthropicApiKey: '',
 		interpreterModel: 'gpt-4o-mini',
@@ -107,6 +121,9 @@ export async function loadSettings(): Promise<Settings> {
 		betaFeatures: data.general_settings?.betaFeatures ?? defaultSettings.betaFeatures,
 		legacyMode: data.general_settings?.legacyMode ?? defaultSettings.legacyMode,
 		silentOpen: data.general_settings?.silentOpen ?? defaultSettings.silentOpen,
+		highlighterEnabled: data.highlighter_settings?.highlighterEnabled ?? defaultSettings.highlighterEnabled,
+		alwaysShowHighlights: data.highlighter_settings?.alwaysShowHighlights ?? defaultSettings.alwaysShowHighlights,
+		highlightBehavior: data.highlighter_settings?.highlightBehavior ?? defaultSettings.highlightBehavior,
 		openaiApiKey: data.interpreter_settings?.openaiApiKey || defaultSettings.openaiApiKey,
 		anthropicApiKey: data.interpreter_settings?.anthropicApiKey || defaultSettings.anthropicApiKey,
 		interpreterModel: data.interpreter_settings?.interpreterModel || defaultSettings.interpreterModel,
@@ -132,6 +149,11 @@ export async function saveSettings(settings?: Partial<Settings>): Promise<void> 
 			betaFeatures: generalSettings.betaFeatures,
 			legacyMode: generalSettings.legacyMode,
 			silentOpen: generalSettings.silentOpen
+		},
+		highlighter_settings: {
+			highlighterEnabled: generalSettings.highlighterEnabled,
+			alwaysShowHighlights: generalSettings.alwaysShowHighlights,
+			highlightBehavior: generalSettings.highlightBehavior
 		},
 		interpreter_settings: {
 			openaiApiKey: generalSettings.openaiApiKey,

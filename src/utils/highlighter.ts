@@ -11,6 +11,7 @@ import {
 	handleTouchMove
 } from './highlighter-overlays';
 import { detectBrowser, addBrowserClassToHtml } from './browser-detection';
+import { generalSettings, loadSettings } from './storage-utils';
 
 export type AnyHighlightData = TextHighlightData | ElementHighlightData | ComplexHighlightData;
 
@@ -75,6 +76,7 @@ export function toggleHighlighterMenu(isActive: boolean) {
 		createHighlighterMenu();
 		addBrowserClassToHtml();
 		browser.runtime.sendMessage({ action: "highlighterModeChanged", isActive: true });
+		applyHighlights();
 	} else {
 		document.removeEventListener('mouseup', handleMouseUp);
 		document.removeEventListener('mousemove', handleMouseMove);
@@ -85,8 +87,10 @@ export function toggleHighlighterMenu(isActive: boolean) {
 		removeHoverOverlay();
 		enableLinkClicks();
 		removeHighlighterMenu();
-		removeExistingHighlights();
 		browser.runtime.sendMessage({ action: "highlighterModeChanged", isActive: false });
+		if (!generalSettings.alwaysShowHighlights) {
+			removeExistingHighlights();
+		}
 	}
 	updateHighlightListeners();
 }
@@ -604,18 +608,25 @@ export function getHighlights(): string[] {
 }
 
 // Load highlights from browser storage
-export function loadHighlights() {
+export async function loadHighlights() {
 	const url = window.location.href;
-	return browser.storage.local.get(url).then((result) => {
-		const storedData = result[url] as StoredData | undefined;
-		if (storedData && Array.isArray(storedData.highlights) && storedData.highlights.length > 0) {
-			highlights = storedData.highlights;
+	const result = await browser.storage.local.get(url);
+	const storedData = result[url] as StoredData | undefined;
+	
+	if (storedData && Array.isArray(storedData.highlights) && storedData.highlights.length > 0) {
+		highlights = storedData.highlights;
+		
+		// Load settings to check if "Always show highlights" is enabled
+		await loadSettings();
+		
+		if (generalSettings.alwaysShowHighlights) {
 			applyHighlights();
-		} else {
-			highlights = [];
+			document.body.classList.add('obsidian-highlighter-always-show');
 		}
-		lastAppliedHighlights = JSON.stringify(highlights);
-	});
+	} else {
+		highlights = [];
+	}
+	lastAppliedHighlights = JSON.stringify(highlights);
 }
 
 // Clear all highlights from the page and storage
@@ -652,9 +663,15 @@ function handleKeyDown(event: KeyboardEvent) {
 }
 
 function exitHighlighterMode() {
+	console.log('Exiting highlighter mode');
 	toggleHighlighterMenu(false);
 	browser.runtime.sendMessage({ action: "setHighlighterMode", isActive: false });
 	browser.storage.local.set({ isHighlighterMode: false });
+
+	// Remove highlight overlays if "Always show highlights" is off
+	if (!generalSettings.alwaysShowHighlights) {
+		removeExistingHighlights();
+	}
 }
 
 function addToHistory(type: 'add' | 'remove', oldHighlights: AnyHighlightData[], newHighlights: AnyHighlightData[]) {

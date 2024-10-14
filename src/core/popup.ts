@@ -857,6 +857,9 @@ async function checkHighlighterModeState(tabId: number) {
 	try {
 		const result = await browser.storage.local.get('isHighlighterMode');
 		isHighlighterMode = result.isHighlighterMode as boolean;
+		
+		loadedSettings = await loadSettings();
+		
 		updateHighlighterModeUI(isHighlighterMode);
 	} catch (error) {
 		console.error('Error checking highlighter mode state:', error);
@@ -895,9 +898,14 @@ async function toggleHighlighterMode(tabId: number) {
 function updateHighlighterModeUI(isActive: boolean) {
 	const highlighterModeButton = document.getElementById('highlighter-mode');
 	if (highlighterModeButton) {
-		highlighterModeButton.classList.toggle('active', isActive);
-		highlighterModeButton.setAttribute('aria-pressed', isActive.toString());
-		highlighterModeButton.title = isActive ? 'Disable highlighter' : 'Enable highlighter';
+		if (generalSettings.highlighterEnabled) {
+			highlighterModeButton.style.display = 'flex';
+			highlighterModeButton.classList.toggle('active', isActive);
+			highlighterModeButton.setAttribute('aria-pressed', isActive.toString());
+			highlighterModeButton.title = isActive ? 'Disable highlighter' : 'Enable highlighter';
+		} else {
+			highlighterModeButton.style.display = 'none';
+		}
 	}
 }
 

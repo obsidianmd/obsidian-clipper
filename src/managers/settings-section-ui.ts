@@ -4,8 +4,8 @@ import { updatePromptContextVisibility } from './interpreter-settings';
 import { Template } from '../types/types';
 import { initializePropertyTypesManager } from './property-types-manager';
 
-export function showSettingsSection(section: 'general' | 'interpreter' | 'templates' | 'properties', templateId?: string): void {
-	const sections = ['general', 'interpreter', 'properties', 'templates'];
+export function showSettingsSection(section: 'general' | 'properties' | 'highlighter' | 'interpreter' | 'templates', templateId?: string): void {
+	const sections = ['general', 'properties', 'highlighter', 'interpreter', 'templates'];
 	
 	sections.forEach(s => {
 		const sectionElement = document.getElementById(`${s}-section`);
@@ -77,10 +77,13 @@ export function initializeSidebar(): void {
 	const hamburgerMenu = document.getElementById('hamburger-menu');
 
 	if (sidebar) {
-		sidebar.addEventListener('click', (event) => {
+		sidebar.addEventListener('click', (event) => {	
 			const target = event.target as HTMLElement;
-			if (target.dataset.section === 'general' || target.dataset.section === 'interpreter' || target.dataset.section === 'properties') {
-				showSettingsSection(target.dataset.section as 'general' | 'interpreter' | 'properties');
+			if (target.dataset.section === 'general'
+				|| target.dataset.section === 'properties'
+				|| target.dataset.section === 'highlighter'
+				|| target.dataset.section === 'interpreter') {
+				showSettingsSection(target.dataset.section as 'general' | 'properties' | 'highlighter' | 'interpreter');
 			}
 			if (settingsContainer) {
 				settingsContainer.classList.remove('sidebar-open');

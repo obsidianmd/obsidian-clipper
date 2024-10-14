@@ -409,6 +409,7 @@ async function handleHighlightClick(event: Event) {
 // Remove all existing highlight overlays from the page
 export function removeExistingHighlights() {
 	const existingHighlights = document.querySelectorAll('.obsidian-highlight-overlay');
+	console.log('existingHighlights', existingHighlights.length);
 	if (existingHighlights.length > 0) {
 		existingHighlights.forEach(el => el.remove());
 	}
