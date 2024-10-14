@@ -17,7 +17,7 @@ export const strip_md = (str: string): string => {
 		str = str.replace(/`([^`]+)`/g, '$1');  // inline code
 		str = str.replace(/```[\s\S]*?```/g, '');  // code blocks
 		str = str.replace(/~~(.*?)~~/g, '$1');  // strikethrough
-		str = str.replace(/^[-*+] \[[x ]\] /gm, '');  // task lists
+		str = str.replace(/^[-*+] (\[[x ]\] )?/gm, '');  // task lists and list items
 		str = str.replace(/^([-*_]){3,}\s*$/gm, '');  // horizontal rules
 		str = str.replace(/^>\s+/gm, '');  // blockquotes
 		str = str.replace(/\|.*\|/g, '');  // tables (removed entirely)
