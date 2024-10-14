@@ -26,6 +26,8 @@ const logicHandlers: LogicHandler[] = [
 
 // Main function to compile the template
 export async function compileTemplate(tabId: number, text: string, variables: { [key: string]: any }, currentUrl: string): Promise<string> {
+	currentUrl = currentUrl.replace(/#:~:text=[^&]+(&|$)/, '');
+
 	// Process logic
 	const processedText = await processLogic(text, variables, currentUrl);
 	// Process other variables and filters

@@ -77,6 +77,7 @@ export async function initializePageContent(content: string, selectedHtml: strin
 	try {
 		const parser = new DOMParser();
 		const doc = parser.parseFromString(content, 'text/html');
+		currentUrl = currentUrl.replace(/#:~:text=[^&]+(&|$)/, '');
 
 		// Define preset variables with fallbacks
 		const title =
