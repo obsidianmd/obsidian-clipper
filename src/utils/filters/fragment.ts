@@ -9,9 +9,9 @@ interface TextFragmentParts {
 	suffix?: string;
 }
 
-export const fragment = (str: string, param?: string): string => {
+export const fragment = (str: string, param?: string): string[] => {
 	if (!param || !str.trim()) {
-		return str;
+		return [str];
 	}
 
 	// Use a regex to split the param, extracting the URL and custom name
@@ -72,7 +72,6 @@ export const fragment = (str: string, param?: string): string => {
 							item
 						)})`
 				)
-				.join("\n");
 		} else if (typeof data === "object" && data !== null) {
 			// Maybe useful for other filters
 			return Object.entries(data)
@@ -82,15 +81,16 @@ export const fragment = (str: string, param?: string): string => {
 							String(value)
 						)})`
 				)
-				.join("\n");
 		} else if (typeof data === "string") {
 			// If user pass a string
-			return `${data} [${linktext}](${currentUrl}${createTextFragmentUrl(
-				data
-			)})`;
+			return [
+				`${data} [${linktext}](${currentUrl}${createTextFragmentUrl(
+					data
+				)})`
+			];
 		}
 	} catch (error) {
 		console.error("Fragment filter error:", error);
 	}
-	return str;
+	return [str];
 };
