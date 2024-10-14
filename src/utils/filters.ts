@@ -38,6 +38,7 @@ import { uncamel } from './filters/uncamel';
 import { unescape } from './filters/unescape';
 import { upper } from './filters/upper';
 import { wikilink } from './filters/wikilink';
+import { fragment } from './filters/fragment';
 
 export const filters: { [key: string]: FilterFunction } = {
 	blockquote,
@@ -77,7 +78,8 @@ export const filters: { [key: string]: FilterFunction } = {
 	uncamel,
 	unescape,
 	upper,
-	wikilink
+	wikilink,
+	fragment
 };
 
 // Split the individual filter names
