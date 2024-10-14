@@ -33,6 +33,7 @@ export interface HighlightData {
 	id: string;
 	xpath: string;
 	content: string;
+	notes?: string[]; // Add this line
 }
 
 export interface TextHighlightData extends HighlightData {
@@ -273,7 +274,7 @@ function enableLinkClicks() {
 }
 
 // Highlight an entire element
-export function highlightElement(element: Element) {
+export function highlightElement(element: Element, notes?: string[]) {
 	const xpath = getElementXPath(element);
 	const content = element.outerHTML;
 	const isBlockElement = window.getComputedStyle(element).display === 'block';
@@ -284,14 +285,14 @@ export function highlightElement(element: Element) {
 		id: Date.now().toString(),
 		startOffset: 0,
 		endOffset: element.textContent?.length || 0
-	});
+	}, notes);
 }
 
 // Handle text selection for highlighting
-export function handleTextSelection(selection: Selection) {
+export function handleTextSelection(selection: Selection, notes?: string[]) {
 	const range = selection.getRangeAt(0);
 	const highlightRanges = getHighlightRanges(range);
-	highlightRanges.forEach(hr => addHighlight(hr));
+	highlightRanges.forEach(hr => addHighlight(hr, notes));
 	selection.removeAllRanges();
 }
 
@@ -386,9 +387,10 @@ function getTextOffset(container: Element, targetNode: Node, targetOffset: numbe
 }
 
 // Add a new highlight to the page
-function addHighlight(highlight: AnyHighlightData) {
+function addHighlight(highlight: AnyHighlightData, notes?: string[]) {
 	const oldHighlights = [...highlights];
-	const mergedHighlights = mergeOverlappingHighlights(highlights, highlight);
+	const newHighlight = { ...highlight, notes: notes || [] };
+	const mergedHighlights = mergeOverlappingHighlights(highlights, newHighlight);
 	highlights = mergedHighlights;
 	addToHistory('add', oldHighlights, mergedHighlights);
 	sortHighlights();

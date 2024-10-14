@@ -161,8 +161,23 @@ export async function initializePageContent(content: string, selectedHtml: strin
 
 		const markdownBody = createMarkdownContent(content, currentUrl);
 
-		// Convert each highlight to markdown individually and keep as an array
-		const markdownHighlights = highlights.map(highlight => createMarkdownContent(highlight.content, currentUrl));
+		// Convert each highlight to markdown individually and create an object with text, timestamp, and notes (if not empty)
+		const highlightsData = highlights.map(highlight => {
+			const highlightData: {
+				text: string;
+				timestamp: string;
+				notes?: string[];
+			} = {
+				text: createMarkdownContent(highlight.content, currentUrl),
+				timestamp: dayjs(parseInt(highlight.id)).toISOString(), // Convert to ISO format
+			};
+			
+			if (highlight.notes && highlight.notes.length > 0) {
+				highlightData.notes = highlight.notes;
+			}
+			
+			return highlightData;
+		});
 
 		const currentVariables: { [key: string]: string } = {
 			'{{author}}': authorName.trim(),
@@ -179,7 +194,7 @@ export async function initializePageContent(content: string, selectedHtml: strin
 			'{{site}}': site.trim(),
 			'{{title}}': title.trim(),
 			'{{url}}': currentUrl.trim(),
-			'{{highlights}}': highlights.length > 0 ? JSON.stringify(markdownHighlights) : '',
+			'{{highlights}}': JSON.stringify(highlightsData),
 		};
 
 		// Add extracted content to variables

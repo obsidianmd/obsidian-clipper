@@ -139,7 +139,7 @@ export function planHighlightOverlayRects(target: Element, highlight: AnyHighlig
 	const existingOverlays = Array.from(document.querySelectorAll(`.obsidian-highlight-overlay[data-highlight-index="${index}"]`));
 	if (highlight.type === 'complex' || highlight.type === 'element') {
 		const rect = target.getBoundingClientRect();
-		mergeHighlightOverlayRects([rect], highlight.content, existingOverlays, false, index);
+		mergeHighlightOverlayRects([rect], highlight.content, existingOverlays, false, index, highlight.notes);
 	} else if (highlight.type === 'text') {
 		try {
 			const range = document.createRange();
@@ -158,26 +158,26 @@ export function planHighlightOverlayRects(target: Element, highlight: AnyHighlig
 				
 				// Create overlays for all rects
 				if (textRects.length > 0) {
-					mergeHighlightOverlayRects(textRects, highlight.content, existingOverlays, true, index);
+					mergeHighlightOverlayRects(textRects, highlight.content, existingOverlays, true, index, highlight.notes);
 				}
 				if (complexRects.length > 0) {
-					mergeHighlightOverlayRects(complexRects, highlight.content, existingOverlays, false, index);
+					mergeHighlightOverlayRects(complexRects, highlight.content, existingOverlays, false, index, highlight.notes);
 				}
 			} else {
 				console.warn('Could not find start or end node for text highlight, falling back to element highlight');
 				const rect = target.getBoundingClientRect();
-				mergeHighlightOverlayRects([rect], highlight.content, existingOverlays, false, index);
+				mergeHighlightOverlayRects([rect], highlight.content, existingOverlays, false, index, highlight.notes);
 			}
 		} catch (error) {
 			console.error('Error creating text highlight:', error);
 			const rect = target.getBoundingClientRect();
-			mergeHighlightOverlayRects([rect], highlight.content, existingOverlays, false, index);
+			mergeHighlightOverlayRects([rect], highlight.content, existingOverlays, false, index, highlight.notes);
 		}
 	}
 }
 
 // Merge a set of rectangles, to avoid adjacent and overlapping highlights where possible
-function mergeHighlightOverlayRects(rects: DOMRect[], content: string, existingOverlays: Element[], isText: boolean = false, index: number) {
+function mergeHighlightOverlayRects(rects: DOMRect[], content: string, existingOverlays: Element[], isText: boolean = false, index: number, notes?: string[]) {
 	let mergedRects: DOMRect[] = [];
 	let currentRect: DOMRect | null = null;
 
@@ -209,13 +209,13 @@ function mergeHighlightOverlayRects(rects: DOMRect[], content: string, existingO
 		});
 
 		if (!isDuplicate) {
-			createHighlightOverlayElement(rect, content, isText, index);
+			createHighlightOverlayElement(rect, content, isText, index, notes);
 		}
 	}
 }
 
 // Create an overlay element
-function createHighlightOverlayElement(rect: DOMRect, content: string, isText: boolean = false, index: number) {
+function createHighlightOverlayElement(rect: DOMRect, content: string, isText: boolean = false, index: number, notes?: string[]) {
 	const overlay = document.createElement('div');
 	overlay.className = 'obsidian-highlight-overlay';
 	overlay.dataset.highlightIndex = index.toString();
@@ -228,6 +228,9 @@ function createHighlightOverlayElement(rect: DOMRect, content: string, isText: b
 	overlay.style.height = `${rect.height + 4}px`;
 	
 	overlay.setAttribute('data-content', content);
+	if (notes && notes.length > 0) {
+		overlay.setAttribute('data-notes', JSON.stringify(notes));
+	}
 	
 	// Get the background color of the element under the highlight
 	const elementAtPoint = document.elementFromPoint(rect.left, rect.top);
