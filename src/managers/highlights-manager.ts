@@ -21,7 +21,8 @@ export async function exportHighlights(): Promise<void> {
 		const url = URL.createObjectURL(blob);
 
 		const browserType = await detectBrowser();
-		const fileName = 'obsidian_web_clipper_highlights.json';
+		const timestamp = dayjs().format('YYYYMMDDHHmm');
+		const fileName = `obsidian-web-clipper-highlights-${timestamp}.json`;
 
 		if (browserType === 'safari' || browserType === 'mobile-safari') {
 			if (navigator.share) {
