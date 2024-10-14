@@ -10,7 +10,7 @@ interface TextFragmentParts {
 }
 
 export const fragment = (str: string, param?: string): string => {
-	if (!param) {
+	if (!param || !str.trim()) {
 		return str;
 	}
 
@@ -37,13 +37,9 @@ export const fragment = (str: string, param?: string): string => {
 			const start = words.slice(1, -2).join(" ");
 			const end = words[words.length - 2];
 			return { start, end, prefix, suffix };
-		} else if (words.length === 3) {
+		} else if (words.length < 4) {
 			const start = words[0];
-			const end = words[2];
-			return { start, end };
-		} else if (words.length === 2) {
-			const start = words[0];
-			const end = words[1];
+			const end = words[words.length - 1];
 			return { start, end };
 		}
 
@@ -67,6 +63,7 @@ export const fragment = (str: string, param?: string): string => {
 
 	try {
 		const data = JSON.parse(str);
+		// Default behavior for arrays(highlights/lists)
 		if (Array.isArray(data)) {
 			return data
 				.map(
@@ -77,6 +74,7 @@ export const fragment = (str: string, param?: string): string => {
 				)
 				.join("\n");
 		} else if (typeof data === "object" && data !== null) {
+			// Maybe useful for other filters
 			return Object.entries(data)
 				.map(
 					([key, value]) =>
@@ -85,6 +83,11 @@ export const fragment = (str: string, param?: string): string => {
 						)})`
 				)
 				.join("\n");
+		} else if (typeof data === "string") {
+			// If user pass a string
+			return `${data} [${linktext}](${currentUrl}${createTextFragmentUrl(
+				data
+			)})`;
 		}
 	} catch (error) {
 		console.error("Fragment filter error:", error);
