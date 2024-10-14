@@ -9,7 +9,7 @@ interface TextFragmentParts {
 	suffix?: string;
 }
 
-export const fragment = (str: string, param?: string): string[] => {
+export const fragment_link = (str: string, param?: string): string[] => {
 	if (!param || !str.trim()) {
 		return [str];
 	}

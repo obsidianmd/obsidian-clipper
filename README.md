@@ -157,6 +157,9 @@ Filters allow you to modify variables in a template. Filters are applied to vari
 - `footnote` converts an array or object into a list of Markdown footnotes.
 	- For arrays: `["first item","second item"]|footnote` returns: `[^1]: first item` etc.
 	- For objects: `{"First Note": "Content 1", "Second Note": "Content 2"}|footnote` returns: `[^first-note]: Content 1` etc.
+- `fragment_link` converts strings and arrays into [text fragment](https://developer.mozilla.org/en-US/docs/Web/URI/Fragment/Text_fragments) links. Defaults to "link" for the link text.
+	- `highlights|fragment` returns `Highlight content [link](text-fragment-url)`
+	- `highlights|fragment:"custom title"` returns `Highlight content [custom title](text-fragment-url)`
 - `image` converts strings, arrays, or objects into Markdown image syntax.
 	- For strings: `"image.jpg"|image:"alt text"` returns `![alt text](image.jpg)`.
 	- For arrays: `["image1.jpg","image2.jpg"]|image:"alt text"` returns an array of Markdown image strings with the same alt text for all images.

@@ -16,6 +16,7 @@ import { kebab } from './filters/kebab';
 import { last } from './filters/last';
 import { list } from './filters/list';
 import { link } from './filters/link';
+import { fragment_link } from './filters/fragment_link';
 import { lower } from './filters/lower';
 import { map } from './filters/map';
 import { markdown } from './filters/markdown';
@@ -38,7 +39,6 @@ import { uncamel } from './filters/uncamel';
 import { unescape } from './filters/unescape';
 import { upper } from './filters/upper';
 import { wikilink } from './filters/wikilink';
-import { fragment } from './filters/fragment';
 
 export const filters: { [key: string]: FilterFunction } = {
 	blockquote,
@@ -49,6 +49,7 @@ export const filters: { [key: string]: FilterFunction } = {
 	date,
 	first,
 	footnote,
+	fragment_link,
 	html_to_json,
 	image,
 	join,
@@ -78,8 +79,7 @@ export const filters: { [key: string]: FilterFunction } = {
 	uncamel,
 	unescape,
 	upper,
-	wikilink,
-	fragment
+	wikilink
 };
 
 // Split the individual filter names
@@ -239,7 +239,7 @@ export function applyFilters(value: string | any[], filterString: string, curren
 				}
 
 				// Special case for fragment filter: use currentUrl if no params provided
-				if (name === 'fragment' && currentUrl) {
+				if (name === 'fragment_link' && currentUrl) {
 					params.push(currentUrl);
 				} 
 				
