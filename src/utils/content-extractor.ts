@@ -40,7 +40,7 @@ export async function extractPageContent(tabId: number): Promise<ContentResponse
 							type: 'text',
 							id: Date.now().toString(),
 							xpath: '',
-							content: highlight,
+							content: `<div>` + highlight + `</div>`,
 							startOffset: 0,
 							endOffset: highlight.length
 						};
@@ -149,7 +149,7 @@ export async function initializePageContent(content: string, selectedHtml: strin
 		}
 
 		if (highlights && highlights.length > 0) {
-			const highlightsContent = highlights.map(highlight => highlight.content).join('\n\n\n');
+			const highlightsContent = highlights.map(highlight => highlight.content).join('');
 			content = highlightsContent;
 		} else if (selectedHtml) {
 			content = selectedHtml;
