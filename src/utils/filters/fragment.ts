@@ -25,7 +25,6 @@ export const fragment = (str: string, param?: string): string => {
 		selectedText: SelectedText
 	): TextFragmentParts => {
 		const text = strip_md(selectedText);
-		console.log(text);
 		const words = text.split(/\s+/).filter(Boolean);
 
 		// Use prefix and suffix to create a more accurate text fragment
