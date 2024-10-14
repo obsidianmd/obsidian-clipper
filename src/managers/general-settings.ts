@@ -9,6 +9,7 @@ import { createDefaultTemplate, getTemplates, saveTemplateSettings } from '../ma
 import { updateTemplateList, showTemplateEditor } from '../managers/template-ui';
 import { exportAllSettings, importAllSettings } from '../utils/import-export';
 import { Template } from '../types/types';
+import { exportHighlights } from './highlights-manager';
 
 export function updateVaultList(): void {
 	const vaultList = document.getElementById('vault-list') as HTMLUListElement;
@@ -104,6 +105,7 @@ export function initializeGeneralSettings(): void {
 		initializeResetDefaultTemplateButton();
 		initializeExportImportAllSettingsButtons();
 		initializeHighlighterSettings();
+		initializeExportHighlightsButton();
 	});
 }
 
@@ -265,6 +267,13 @@ function initializeExportImportAllSettingsButtons(): void {
 	const importAllSettingsBtn = document.getElementById('import-all-settings-btn');
 	if (importAllSettingsBtn) {
 		importAllSettingsBtn.addEventListener('click', importAllSettings);
+	}
+}
+
+function initializeExportHighlightsButton(): void {
+	const exportHighlightsBtn = document.getElementById('export-highlights');
+	if (exportHighlightsBtn) {
+		exportHighlightsBtn.addEventListener('click', exportHighlights);
 	}
 }
 

@@ -1,7 +1,6 @@
 import { updateUrl } from '../utils/routing';
 import { generalSettings } from '../utils/storage-utils';
 import { updatePromptContextVisibility } from './interpreter-settings';
-import { Template } from '../types/types';
 import { initializePropertyTypesManager } from './property-types-manager';
 
 export function showSettingsSection(section: 'general' | 'properties' | 'highlighter' | 'interpreter' | 'templates', templateId?: string): void {

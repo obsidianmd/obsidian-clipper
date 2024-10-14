@@ -56,6 +56,8 @@ export interface StoredData {
 	url: string;
 }
 
+type HighlightsStorage = Record<string, StoredData>;
+
 export function updateHighlights(newHighlights: AnyHighlightData[]) {
 	const oldHighlights = [...highlights];
 	highlights = newHighlights;
@@ -563,10 +565,18 @@ export function saveHighlights() {
 	const url = window.location.href;
 	if (highlights.length > 0) {
 		const data: StoredData = { highlights, url };
-		browser.storage.local.set({ [url]: data });
+		browser.storage.local.get('highlights').then((result: { highlights?: HighlightsStorage }) => {
+			const allHighlights: HighlightsStorage = result.highlights || {};
+			allHighlights[url] = data;
+			browser.storage.local.set({ highlights: allHighlights });
+		});
 	} else {
 		// Remove the entry if there are no highlights
-		browser.storage.local.remove(url);
+		browser.storage.local.get('highlights').then((result: { highlights?: HighlightsStorage }) => {
+			const allHighlights: HighlightsStorage = result.highlights || {};
+			delete allHighlights[url];
+			browser.storage.local.set({ highlights: allHighlights });
+		});
 	}
 }
 
@@ -610,8 +620,9 @@ export function getHighlights(): string[] {
 // Load highlights from browser storage
 export async function loadHighlights() {
 	const url = window.location.href;
-	const result = await browser.storage.local.get(url);
-	const storedData = result[url] as StoredData | undefined;
+	const result = await browser.storage.local.get('highlights');
+	const allHighlights = (result.highlights || {}) as HighlightsStorage;
+	const storedData = allHighlights[url];
 	
 	if (storedData && Array.isArray(storedData.highlights) && storedData.highlights.length > 0) {
 		highlights = storedData.highlights;
@@ -633,14 +644,18 @@ export async function loadHighlights() {
 export function clearHighlights() {
 	const url = window.location.href;
 	const oldHighlights = [...highlights];
-	browser.storage.local.remove(url).then(() => {
-		highlights = [];
-		removeExistingHighlights();
-		console.log('Highlights cleared for:', url);
-		browser.runtime.sendMessage({ action: "highlightsCleared" });
-		notifyHighlightsUpdated();
-		updateHighlighterMenu();
-		addToHistory('remove', oldHighlights, []);
+	browser.storage.local.get('highlights').then((result: { highlights?: HighlightsStorage }) => {
+		const allHighlights: HighlightsStorage = result.highlights || {};
+		delete allHighlights[url];
+		browser.storage.local.set({ highlights: allHighlights }).then(() => {
+			highlights = [];
+			removeExistingHighlights();
+			console.log('Highlights cleared for:', url);
+			browser.runtime.sendMessage({ action: "highlightsCleared" });
+			notifyHighlightsUpdated();
+			updateHighlighterMenu();
+			addToHistory('remove', oldHighlights, []);
+		});
 	});
 }
 
