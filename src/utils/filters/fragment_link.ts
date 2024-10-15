@@ -26,7 +26,7 @@ export const fragment_link = (str: string, param?: string): string[] => {
 		const words = text.split(/\s+/).filter(Boolean);
 
 		if (words.length > 10) {
-			const start = words.slice(0,5).join(" ");
+			const start = words.slice(0, 5).join(" ");
 			const end = words.slice(-5).join(" ");
 			return { start, end };
 		} else {
@@ -47,12 +47,26 @@ export const fragment_link = (str: string, param?: string): string[] => {
 		const data = JSON.parse(str);
 		// Default behavior for arrays(highlights/lists)
 		if (Array.isArray(data)) {
-			return data.map(
-				(item) =>
-					`${item} [${linktext}](${currentUrl}${createTextFragmentUrl(
-						item
-					)})`
-			);
+			return data.map((item) => {
+				if (
+					typeof item === "object" &&
+					item !== null &&
+					"text" in item
+				) {
+					return {
+						...item,
+						text: `${
+							item.text
+						} [${linktext}](${currentUrl}${createTextFragmentUrl(
+							item.text
+						)})`,
+					};
+				} else {
+					return `${item} [${linktext}](${currentUrl}${createTextFragmentUrl(
+						String(item)
+					)})`;
+				}
+			});
 		} else if (typeof data === "object" && data !== null) {
 			// Maybe useful for other filters
 			return Object.entries(data).map(
@@ -66,7 +80,7 @@ export const fragment_link = (str: string, param?: string): string[] => {
 			return [
 				`${data} [${linktext}](${currentUrl}${createTextFragmentUrl(
 					data
-				)})`
+				)})`,
 			];
 		}
 	} catch (error) {
