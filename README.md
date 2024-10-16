@@ -1,4 +1,4 @@
-⚠️ **Obsidian Web Clipper is still in beta and requires Obsidian 1.7.2.** Please make sure you are using Obsidian 1.7.2 or above, which currently is an [early access version](https://help.obsidian.md/Obsidian/Early+access+versions).
+⚠️ **Obsidian Web Clipper is still in beta and requires Obsidian 1.7.2.** Please make sure you are using Obsidian 1.7.2 or above.
 
 ## Features
 
