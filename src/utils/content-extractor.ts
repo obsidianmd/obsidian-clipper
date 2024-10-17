@@ -194,7 +194,7 @@ export async function initializePageContent(content: string, selectedHtml: strin
 			'{{site}}': site.trim(),
 			'{{title}}': title.trim(),
 			'{{url}}': currentUrl.trim(),
-			'{{highlights}}': JSON.stringify(highlightsData),
+			'{{highlights}}': highlights.length > 0 ? JSON.stringify(highlightsData) : '',
 		};
 
 		// Add extracted content to variables
