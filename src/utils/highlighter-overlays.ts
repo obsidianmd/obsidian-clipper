@@ -8,7 +8,8 @@ import {
 	applyHighlights,
 	saveHighlights,
 	updateHighlights,
-	updateHighlighterMenu
+	updateHighlighterMenu,
+	updateHighlightNotes
 } from './highlighter';
 import { throttle } from './throttle';
 import { getElementByXPath, isDarkColor } from './dom-utils';
@@ -22,7 +23,8 @@ let lastHoverTarget: Element | null = null;
 // Check if an element should be ignored for highlighting
 function isIgnoredElement(element: Element): boolean {
 	return element.tagName.toLowerCase() === 'html' || 
-		element.tagName.toLowerCase() === 'body' || 
+		element.tagName.toLowerCase() === 'body' ||
+		element.classList.contains('obsidian-highlight-annotate-button') ||
 		element.classList.contains('obsidian-highlighter-menu') ||
 		element.closest('.obsidian-highlighter-menu') !== null;
 }
@@ -221,7 +223,6 @@ function createHighlightOverlayElement(rect: DOMRect, content: string, isText: b
 	overlay.dataset.highlightIndex = index.toString();
 	
 	overlay.style.position = 'absolute';
-
 	overlay.style.left = `${rect.left + window.scrollX - 2}px`;
 	overlay.style.top = `${rect.top + window.scrollY - 2}px`;
 	overlay.style.width = `${rect.width + 4}px`;
@@ -240,6 +241,26 @@ function createHighlightOverlayElement(rect: DOMRect, content: string, isText: b
 			overlay.classList.add('obsidian-highlight-overlay-dark');
 		}
 	}
+	
+	const annotateButton = document.createElement('button');
+	annotateButton.className = 'obsidian-highlight-annotate-button';
+	annotateButton.textContent = 'Annotate';
+	annotateButton.addEventListener('click', (e) => {
+		e.stopPropagation();
+		e.preventDefault();
+		toggleAnnotationTextArea(overlay, notes);
+	});
+
+	// Make the button not highlightable
+	annotateButton.addEventListener('mousedown', (e) => {
+		e.stopPropagation();
+	});
+
+	annotateButton.addEventListener('touchstart', (e) => {
+		e.stopPropagation();
+	});
+
+	overlay.appendChild(annotateButton);
 	
 	overlay.addEventListener('click', handleHighlightClick);
 	overlay.addEventListener('touchend', handleHighlightClick);
@@ -374,6 +395,14 @@ export function removeHoverOverlay() {
 async function handleHighlightClick(event: Event) {
 	event.stopPropagation();
 	event.preventDefault(); // Prevent default touch behavior
+	const target = event.target as HTMLElement;
+	
+	// Don't remove the highlight when clicking the annotate button or textarea
+	if (target.classList.contains('obsidian-highlight-annotate-button') ||
+		target.classList.contains('obsidian-highlight-annotation-textarea')) {
+		return;
+	}
+
 	const overlay = event.currentTarget as HTMLElement;
 	
 	try {
@@ -412,5 +441,32 @@ export function removeExistingHighlights() {
 	console.log('existingHighlights', existingHighlights.length);
 	if (existingHighlights.length > 0) {
 		existingHighlights.forEach(el => el.remove());
+	}
+}
+
+function toggleAnnotationTextArea(overlay: HTMLElement, existingNotes?: string[]) {
+	let textArea = overlay.querySelector('.obsidian-highlight-annotation-textarea') as HTMLTextAreaElement;
+	
+	if (textArea) {
+		textArea.remove();
+	} else {
+		textArea = document.createElement('textarea');
+		textArea.className = 'obsidian-highlight-annotation-textarea';
+		textArea.value = existingNotes ? existingNotes.join('\n') : '';
+		textArea.placeholder = 'Add your annotation here...';
+		
+		textArea.addEventListener('keydown', (e) => {
+			if (e.key === 'Enter' && e.shiftKey) {
+				e.preventDefault();
+				const highlightId = overlay.dataset.highlightIndex;
+				if (highlightId) {
+					updateHighlightNotes(highlightId, textArea.value);
+				}
+				textArea.remove();
+			}
+		});
+
+		overlay.appendChild(textArea);
+		textArea.focus();
 	}
 }

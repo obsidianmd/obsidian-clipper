@@ -21,7 +21,7 @@ let lastAppliedHighlights: string = '';
 let originalLinkClickHandlers: WeakMap<HTMLElement, (event: MouseEvent) => void> = new WeakMap();
 
 interface HistoryAction {
-	type: 'add' | 'remove';
+	type: 'add' | 'remove' | 'update';
 	oldHighlights: AnyHighlightData[];
 	newHighlights: AnyHighlightData[];
 }
@@ -34,7 +34,7 @@ export interface HighlightData {
 	id: string;
 	xpath: string;
 	content: string;
-	notes?: string[]; // Add this line
+	notes?: string[];
 }
 
 export interface TextHighlightData extends HighlightData {
@@ -689,7 +689,7 @@ function exitHighlighterMode() {
 	}
 }
 
-function addToHistory(type: 'add' | 'remove', oldHighlights: AnyHighlightData[], newHighlights: AnyHighlightData[]) {
+function addToHistory(type: 'add' | 'remove' | 'update', oldHighlights: AnyHighlightData[], newHighlights: AnyHighlightData[]) {
 	highlightHistory.push({ type, oldHighlights, newHighlights });
 	if (highlightHistory.length > MAX_HISTORY_LENGTH) {
 		highlightHistory.shift();
@@ -697,6 +697,21 @@ function addToHistory(type: 'add' | 'remove', oldHighlights: AnyHighlightData[],
 	// Clear redo history when a new action is performed
 	redoHistory = [];
 	updateUndoRedoButtons();
+}
+
+export function updateHighlightNotes(highlightId: string, note: string) {
+	const highlightIndex = highlights.findIndex(h => h.id === highlightId);
+	if (highlightIndex !== -1) {
+		const oldHighlights = [...highlights];
+		const currentNotes = highlights[highlightIndex].notes || [];
+		highlights[highlightIndex] = { 
+			...highlights[highlightIndex], 
+			notes: [...currentNotes, note]
+		};
+		addToHistory('update', oldHighlights, highlights);
+		saveHighlights();
+		applyHighlights();
+	}
 }
 
 export { getElementXPath } from './dom-utils';

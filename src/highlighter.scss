@@ -168,6 +168,41 @@ body.obsidian-highlighter-active {
 			border: 2px dashed rgb(255, 235, 0, 0.5);
 		}
 	}
+
+	.obsidian-highlight-annotate-button {
+		position: absolute;
+		top: -12px;
+		right: 0;
+		background-color: #4a4a4a;
+		color: white;
+		border: none;
+		border-radius: 4px;
+		padding: 2px 6px;
+		font-size: 12px;
+		cursor: pointer;
+		opacity: 0;
+		pointer-events: auto;
+		z-index: 10001;
+	}
+
+	&:hover .obsidian-highlight-annotate-button {
+		opacity: 1;
+	}
+
+	.obsidian-highlight-annotation-textarea {
+		position: absolute;
+		top: 100%;
+		left: 0;
+		width: 100%;
+		min-height: 60px;
+		padding: 4px;
+		border: 1px solid #ccc;
+		border-radius: 4px;
+		background-color: white;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+		z-index: 10000;
+		resize: vertical;
+	}
 }
 
 #obsidian-highlight-hover-overlay {

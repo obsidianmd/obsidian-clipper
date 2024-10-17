@@ -1,6 +1,7 @@
 import browser from './utils/browser-polyfill';
 import * as highlighter from './utils/highlighter';
 import { loadSettings, generalSettings } from './utils/storage-utils';
+import { AnyHighlightData } from './utils/highlighter';
 
 declare global {
 	interface Window {
@@ -36,7 +37,7 @@ declare global {
 		extractedContent: { [key: string]: string };
 		schemaOrgData: any;
 		fullHtml: string;
-		highlights: string[];
+		highlights: AnyHighlightData[];
 	}
 
 	browser.runtime.onMessage.addListener(function(request: any, sender: browser.Runtime.MessageSender, sendResponse: (response?: any) => void) {
@@ -80,7 +81,7 @@ declare global {
 				extractedContent: extractedContent,
 				schemaOrgData: schemaOrgData,
 				fullHtml: fullHtmlWithoutIndentation,
-				highlights: highlighter.getHighlights()
+				highlights: highlighter.highlights
 			};
 
 			sendResponse(response);
