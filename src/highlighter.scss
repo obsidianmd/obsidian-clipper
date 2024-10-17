@@ -10,6 +10,15 @@
 	}
 }
 
+/* Hide the clip button on iPadOS because it's not supported  */
+.is-ipad-os {
+	.obsidian-highlighter-menu {
+		#obsidian-clip-button {
+			display: none;
+		}
+	}
+}
+
 body.obsidian-highlighter-active {
 	--obsidian-highlighter-menu-font-size: 13px;
 	--obsidian-highlighter-menu-padding: 4px;
