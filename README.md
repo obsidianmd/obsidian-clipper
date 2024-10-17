@@ -186,7 +186,7 @@ Filters allow you to modify variables in a template. Filters are applied to vari
 	- Syntax: `map:item => item.property` or `map:item => item.nested.property` for nested properties.
 		- Example: `[{gem: "obsidian", color: "black"}, {gem: "amethyst", color: "purple"}]|map:item => item.gem` returns `["obsidian", "amethyst"]`.
 	- Parentheses are needed for object literals and complex expressions: `map:item => ({key: value})`.
-		- Example: `[{gem: "obsidian", color: "black"}, {gem: "amethyst", color: "purple"}]|map:item => ({name: item.gem, hex: item.color === "black" ? "#000" : "#800080"})`  returns `[{name: "obsidian", hex: "#000"}, {name: "amethyst", hex: "#800080"}]`.
+		- Example: `[{gem: "obsidian", color: "black"}, {gem: "amethyst", color: "purple"}]|map:item => ({name: item.gem, hex: item.color})`  returns `[{name: "obsidian", hex: "#000"}, {name: "amethyst", hex: "#800080"}]`.
 	- String literals are supported and automatically wrapped in an object with a `str` property:
 		- Example: `["rock", "pop"]|map:item => "genres/${item}"` returns `[{str: "genres/rock"}, {str: "genres/pop"}]`.
 		- The `str` property is used to store the result of string literal transformations.

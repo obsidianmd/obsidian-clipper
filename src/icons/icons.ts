@@ -18,6 +18,7 @@ import {
 	RotateCw,
 	Settings,
 	SquareCheckBig, 
+	Tags,
 	Trash2,
 	X
 } from 'lucide';
@@ -66,7 +67,8 @@ export function getPropertyTypeIcon(type: string): string {
 		number: 'binary',
 		checkbox: 'square-check-big',
 		date: 'calendar',
-		datetime: 'clock'
+		datetime: 'clock',
+		tags: 'tags'
 	};
 	return iconMap[type] || 'align-left';
 }
