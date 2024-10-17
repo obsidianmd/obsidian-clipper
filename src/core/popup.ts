@@ -81,7 +81,7 @@ function setPopupDimensions() {
 	const finalHeight = Math.min(actualHeight, viewportHeight);
 	
 	// Set the --popup-height CSS variable to the final height
-	document.documentElement.style.setProperty('--popup-height', `${finalHeight}px`);
+	document.documentElement.style.setProperty('--chromium-popup-height', `${finalHeight}px`);
 
 	// Check if the width has changed
 	if (viewportWidth !== previousWidth) {
@@ -104,7 +104,7 @@ async function initializeExtension(tabId: number) {
 		
 		// Set an initial large height to allow the browser to determine the maximum height
 		// This is necessary for browsers that allow scaling the popup via page zoom
-		document.documentElement.style.setProperty('--popup-height', '2000px');
+		document.documentElement.style.setProperty('--chromium-popup-height', '2000px');
 		
 		// Use setTimeout to ensure the DOM has updated before we measure
 		setTimeout(() => {

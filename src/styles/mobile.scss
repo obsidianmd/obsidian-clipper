@@ -19,6 +19,11 @@
 	-webkit-text-size-adjust: 112.5%;
 }
 
+.is-tablet {
+	--clipper-button-font-weight: 600;
+	--clipper-button-font-size: 0.875rem;
+}
+
 .is-tablet,
 .is-mobile {
 	height: 100%;
@@ -35,25 +40,21 @@
 	--input-shadow: none;
 	--input-shadow-hover: none;
 
-	--metadata-label-width: 5rem;
+	--interactive-normal: var(--color-base-20);
+
+	--metadata-label-width: 6rem;
 
 	--modal-border-width: 0;
 	--modal-radius: 0;
 
 	--popup-padding: 1rem;
 
-	--toggle-width: 3rem;
-	--toggle-radius: 1.5rem;
-	--toggle-thumb-radius: 1.5rem;
-	--toggle-thumb-height: 1.5rem;
-	--toggle-thumb-width: 1.5rem;
-
 	a, button, label, input, textarea, select {
 		-webkit-tap-highlight-color: transparent;
 	}	
 	button {
+		font-weight: 600;
 		--input-height: 2.5rem;
-		border-radius: 2rem;
 		border: 0;
 		box-shadow: none;
 	}
@@ -70,12 +71,16 @@
 .is-mobile {
 	--bottom: -200px;
 	--transition: bottom 0.2s ease-in-out;
-	--interactive-normal: var(--color-base-20);
+
+	--toggle-width: 3rem;
+	--toggle-radius: 1.5rem;
+	--toggle-thumb-radius: 1.5rem;
+	--toggle-thumb-height: 1.5rem;
+	--toggle-thumb-width: 1.5rem;
 
 	button {
-		font-weight: 600;
+		border-radius: 2rem;
 	}
-
 	.clipper {
 		max-height: 100dvh;
 		width: 100%;

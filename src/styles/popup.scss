@@ -3,6 +3,7 @@
 	--popup-width-expanded: 500px;
 	--popup-height: 540px;
 	--popup-max-height: 540px;
+	--chromium-popup-height: 540px;
 }
 
 .is-safari,
@@ -19,6 +20,11 @@
 	--popup-max-height: 100vh;
 	--popup-width: 100vw;
 	--popup-width-expanded: 100vw;
+}
+
+/* For Chromium browsers that allow scaling the popup via page zoom */
+#popup.is-chromium {
+	height: max(var(--chromium-popup-height), 100vh);
 }
 
 #popup {
@@ -131,7 +137,8 @@
 		border-top: 1px solid var(--divider-color);
 		background-color: var(--background-primary);
 		button {
-			font-weight: 500;
+			font-weight: var(--clipper-button-font-weight);
+			font-size: var(--clipper-button-font-size);
 		}
 	}
 	.vault-path-container {
