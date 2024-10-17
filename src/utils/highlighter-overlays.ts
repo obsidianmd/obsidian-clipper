@@ -25,6 +25,7 @@ function isIgnoredElement(element: Element): boolean {
 	return element.tagName.toLowerCase() === 'html' || 
 		element.tagName.toLowerCase() === 'body' ||
 		element.classList.contains('obsidian-highlight-annotate-button') ||
+		element.classList.contains('obsidian-highlight-annotation-textarea') ||
 		element.classList.contains('obsidian-highlighter-menu') ||
 		element.closest('.obsidian-highlighter-menu') !== null;
 }
@@ -455,6 +456,15 @@ function toggleAnnotationTextArea(overlay: HTMLElement, existingNotes?: string[]
 		textArea.value = existingNotes ? existingNotes.join('\n') : '';
 		textArea.placeholder = 'Add your annotation here...';
 		
+		// Position the textarea
+		const rect = overlay.getBoundingClientRect();
+		textArea.style.position = 'absolute';
+		textArea.style.left = `${rect.left}px`;
+		textArea.style.top = `${rect.bottom + window.scrollY}px`;
+		textArea.style.width = `${rect.width}px`;
+		textArea.style.minHeight = '60px';
+		textArea.style.zIndex = '10002'; // Ensure it's above other elements
+
 		textArea.addEventListener('keydown', (e) => {
 			if (e.key === 'Enter' && e.shiftKey) {
 				e.preventDefault();
@@ -466,7 +476,7 @@ function toggleAnnotationTextArea(overlay: HTMLElement, existingNotes?: string[]
 			}
 		});
 
-		overlay.appendChild(textArea);
+		document.body.appendChild(textArea);
 		textArea.focus();
 	}
 }
