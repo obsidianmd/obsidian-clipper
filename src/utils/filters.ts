@@ -20,10 +20,12 @@ import { fragment_link } from './filters/fragment_link';
 import { lower } from './filters/lower';
 import { map } from './filters/map';
 import { markdown } from './filters/markdown';
+import { number_format } from './filters/number_format';
 import { object } from './filters/object';
 import { pascal } from './filters/pascal';
 import { remove_html } from './filters/remove_html';
 import { replace } from './filters/replace';
+import { round } from './filters/round';
 import { safe_name } from './filters/safe_name';
 import { slice } from './filters/slice';
 import { snake } from './filters/snake';
@@ -60,10 +62,12 @@ export const filters: { [key: string]: FilterFunction } = {
 	lower,
 	map,
 	markdown,
+	number_format,
 	object,
 	pascal,
 	remove_html,
 	replace,
+	round,
 	safe_name,
 	slice,
 	snake,

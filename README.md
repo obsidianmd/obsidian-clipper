@@ -186,7 +186,7 @@ Filters allow you to modify variables in a template. Filters are applied to vari
 	- Syntax: `map:item => item.property` or `map:item => item.nested.property` for nested properties.
 		- Example: `[{gem: "obsidian", color: "black"}, {gem: "amethyst", color: "purple"}]|map:item => item.gem` returns `["obsidian", "amethyst"]`.
 	- Parentheses are needed for object literals and complex expressions: `map:item => ({key: value})`.
-		- Example: `[{gem: "obsidian", color: "black"}, {gem: "amethyst", color: "purple"}]|map:item => ({name: item.gem, hex: item.color})`  returns `[{name: "obsidian", hex: "#000"}, {name: "amethyst", hex: "#800080"}]`.
+		- Example: `[{gem: "obsidian", color: "black"}, {gem: "amethyst", color: "purple"}]|map:item => ({name: item.gem, color: item.color})`  returns `[{name: "obsidian", color: "black"}, {name: "amethyst", color: "purple"}]`.
 	- String literals are supported and automatically wrapped in an object with a `str` property:
 		- Example: `["rock", "pop"]|map:item => "genres/${item}"` returns `[{str: "genres/rock"}, {str: "genres/pop"}]`.
 		- The `str` property is used to store the result of string literal transformations.
@@ -208,6 +208,9 @@ Filters allow you to modify variables in a template. Filters are applied to vari
 	- Replacements are applied in the order they are specified.
 	- To replace with an empty string, use `""` as the replacement value.
 	- Special characters including `: | { } ( ) ' "` should be escaped with a backslash when used in the search term, e.g. `\:` to search for a literal colon.
+- `round` rounds a number to the nearest integer or to a specified number of decimal places.
+	- Without parameters: `3.7|round` returns `"4"`.
+	- With decimal places specified: `3.14159|round:2` returns `"3.14"`.
 - `safe_name` sanitizes a string to be used as a safe file name.
 	- By default, `safe_name` applies the most conservative sanitization rules.
 	- OS-specific usage: `safe_name:os` where `os` can be `windows`, `mac`, or `linux` to only apply the rules for that operating system.
