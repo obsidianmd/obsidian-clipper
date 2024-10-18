@@ -209,8 +209,8 @@ Filters allow you to modify variables in a template. Filters are applied to vari
 	- To replace with an empty string, use `""` as the replacement value.
 	- Special characters including `: | { } ( ) ' "` should be escaped with a backslash when used in the search term, e.g. `\:` to search for a literal colon.
 - `round` rounds a number to the nearest integer or to a specified number of decimal places.
-	- Without parameters: `3.7|round` returns `"4"`.
-	- With decimal places specified: `3.14159|round:2` returns `"3.14"`.
+	- Without parameters: `3.7|round` returns `4`.
+	- With decimal places specified: `3.14159|round:2` returns `3.14`.
 - `safe_name` sanitizes a string to be used as a safe file name.
 	- By default, `safe_name` applies the most conservative sanitization rules.
 	- OS-specific usage: `safe_name:os` where `os` can be `windows`, `mac`, or `linux` to only apply the rules for that operating system.
