@@ -1,6 +1,6 @@
-⚠️ **Obsidian Web Clipper is still in beta and requires Obsidian 1.7.2.** Please make sure you are using Obsidian 1.7.2 or above. Visit the [Obsidian Help site](https://help.obsidian.md/Extending+Obsidian/Obsidian+Web+Clipper) for more information.
+⚠️ **Obsidian Web Clipper is still in beta and requires Obsidian 1.7.2.** Please make sure you are using Obsidian 1.7.2 or above. Visit the [Obsidian Help site](https://help.obsidian.md/web-clipper) for more information.
 
-## Getting started
+## Get started
 
 Install the extension by downloading it from the official directory for your browser:
 
@@ -8,9 +8,9 @@ Install the extension by downloading it from the official directory for your bro
 - **[Firefox Add-Ons](https://addons.mozilla.org/en-US/firefox/addon/web-clipper-obsidian/)** for Firefox and Firefox Mobile.
 - **[Safari Extensions](https://apps.apple.com/us/app/obsidian-web-clipper/id6720708363)** for macOS, iOS, and iPadOS.
 
-## Using the extension
+## Use the extension
 
-Documentation is available on the [Obsidian Help site](https://help.obsidian.md/Extending+Obsidian/Obsidian+Web+Clipper), which covers how to use templates, triggers, highlighting, and more.
+Documentation is available on the [Obsidian Help site](https://help.obsidian.md/web-clipper), which covers how to use templates, triggers, highlighting, and more.
 
 ## Developers
 
