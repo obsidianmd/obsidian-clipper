@@ -21,7 +21,9 @@ export async function updateCurrentActiveTab(windowId: number) {
 }
 
 export function isValidUrl(url: string): boolean {
-	return url.startsWith('http://') || url.startsWith('https://');
+	return url.startsWith('http://') || 
+		   url.startsWith('https://') || 
+		   url.startsWith('file:///');
 }
 
 export function isBlankPage(url: string): boolean {
