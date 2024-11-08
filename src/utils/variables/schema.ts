@@ -25,42 +25,17 @@ export async function processSchema(match: string, variables: { [key: string]: s
 }
 
 function getSchemaValue(variables: { [key: string]: string }, type: string, propertyPath: string): string {
-	// Check if we're dealing with a nested array access
-	const nestedArrayMatch = propertyPath.match(/(.*?)\[(\*|\d+)\](.*)/);
-	if (nestedArrayMatch) {
-		const [, arrayKey, indexOrStar, remainingPath] = nestedArrayMatch;
+	// Find matching schema based on type if specified
+	const matchingKey = findMatchingSchemaKey(variables, type, propertyPath);
+	if (!matchingKey) return '';
 
-		// Find matching schema based on type if specified
-		const matchingKey = findMatchingSchemaKey(variables, type, arrayKey);
-		if (!matchingKey) return '';
-
-		try {
-			const arrayValue = JSON.parse(variables[matchingKey] || '[]');
-			if (Array.isArray(arrayValue)) {
-				if (indexOrStar === '*') {
-					return JSON.stringify(arrayValue.map(item => getNestedProperty(item, remainingPath.slice(1))).filter(Boolean));
-				} else {
-					const index = parseInt(indexOrStar, 10);
-					return arrayValue[index] ? getNestedProperty(arrayValue[index], remainingPath.slice(1)) : '';
-				}
-			}
-		} catch (error) {
-			console.error('Error processing array schema:', error);
-			return '';
-		}
-	} else {
-		// Find matching schema based on type if specified
-		const matchingKey = findMatchingSchemaKey(variables, type, propertyPath);
-		if (matchingKey) {
-			try {
-				const value = JSON.parse(variables[matchingKey]);
-				return getNestedProperty(value, propertyPath) || variables[matchingKey] || '';
-			} catch {
-				return variables[matchingKey] || '';
-			}
-		}
+	try {
+		const value = JSON.parse(variables[matchingKey]);
+		return extractValueFromPath(value, propertyPath) || '';
+	} catch (error) {
+		console.error('Error processing schema value:', error);
+		return variables[matchingKey] || '';
 	}
-	return '';
 }
 
 function getGraphValue(variables: { [key: string]: string }, type: string, propertyPath: string): string {
@@ -94,26 +69,60 @@ function getGraphValue(variables: { [key: string]: string }, type: string, prope
 
 		if (!matchingItem) return '';
 
-		// Handle array access in property path
-		const nestedArrayMatch = propertyPath.match(/(.*?)\[(\*|\d+)\](.*)/);
-		if (nestedArrayMatch) {
-			const [, arrayKey, indexOrStar, remainingPath] = nestedArrayMatch;
-			const arrayValue = getNestedProperty(matchingItem, arrayKey);
-			
-			if (Array.isArray(arrayValue)) {
+		return extractValueFromPath(matchingItem, propertyPath) || '';
+	} catch (error) {
+		console.error('Error processing @graph data:', error);
+		return '';
+	}
+}
+
+function extractValueFromPath(obj: any, path: string): string {
+	try {
+		const parts = path.split('.');
+		let current = obj;
+
+		for (let i = 0; i < parts.length; i++) {
+			const part = parts[i];
+			const arrayMatch = part.match(/^(.*?)\[(\*|\d+)\]$/);
+
+			if (arrayMatch) {
+				const [, arrayKey, indexOrStar] = arrayMatch;
+				const array = arrayKey ? current[arrayKey] : current;
+
+				if (!Array.isArray(array)) return '';
+
 				if (indexOrStar === '*') {
-					return JSON.stringify(arrayValue.map(item => getNestedProperty(item, remainingPath.slice(1))).filter(Boolean));
+					// Get remaining path parts
+					const remainingPath = parts.slice(i + 1).join('.');
+					if (!remainingPath) {
+						return JSON.stringify(array);
+					}
+					// Map remaining path over array items
+					const results = array.map(item => {
+						try {
+							return extractValueFromPath(item, remainingPath);
+						} catch {
+							return null;
+						}
+					}).filter(Boolean);
+					return JSON.stringify(results);
 				} else {
 					const index = parseInt(indexOrStar, 10);
-					return arrayValue[index] ? getNestedProperty(arrayValue[index], remainingPath.slice(1)) : '';
+					if (!array[index]) return '';
+					current = array[index];
 				}
+			} else {
+				if (!current[part]) return '';
+				current = current[part];
 			}
 		}
 
-		// Get the nested property
-		return getNestedProperty(matchingItem, propertyPath) || '';
+		if (typeof current === 'object') {
+			return JSON.stringify(current);
+		}
+		return String(current);
 	} catch (error) {
-		console.error('Error processing @graph data:', error);
+		console.error('Error extracting value from path:', error);
 		return '';
 	}
 }
@@ -138,10 +147,13 @@ function findMatchingSchemaKey(variables: { [key: string]: string }, type: strin
 					? itemType === type 
 					: Array.isArray(itemType) && itemType.includes(type);
 				
-				return matchesType && hasProperty(value, propertyPath);
+				// For array paths, check the base property
+				const basePath = propertyPath.split('[')[0];
+				return matchesType && hasProperty(value, basePath);
 			} else {
-				// If no type specified, just check if property exists
-				return hasProperty(value, propertyPath);
+				// For array paths, check the base property
+				const basePath = propertyPath.split('[')[0];
+				return hasProperty(value, basePath);
 			}
 		} catch {
 			return false;
@@ -150,14 +162,10 @@ function findMatchingSchemaKey(variables: { [key: string]: string }, type: strin
 }
 
 function hasProperty(obj: any, path: string): boolean {
+	if (!path) return true;
 	try {
-		return getNestedProperty(obj, path) !== undefined;
+		return path.split('.').reduce((prev, curr) => prev && prev[curr], obj) !== undefined;
 	} catch {
 		return false;
 	}
-}
-
-function getNestedProperty(obj: any, path: string): any {
-	if (!path) return obj;
-	return path.split('.').reduce((prev, curr) => prev && prev[curr], obj);
 }
