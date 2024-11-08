@@ -221,9 +221,15 @@ declare global {
 					.replace(/^\s*<!\[CDATA\[([\s\S]*?)\]\]>\s*$/, '$1') // Remove CDATA wrapper
 					.replace(/^\s*(\*\/|\/\*)\s*|\s*(\*\/|\/\*)\s*$/g, '') // Remove any remaining comment markers at start or end
 					.trim();
-				
+					
 				const jsonData = JSON.parse(jsonContent);
-				schemaData.push(jsonData);
+
+				// If this is a @graph structure, add each item individually
+				if (jsonData['@graph'] && Array.isArray(jsonData['@graph'])) {
+					schemaData.push(...jsonData['@graph']);
+				} else {
+					schemaData.push(jsonData);
+				}
 			} catch (error) {
 				console.error('Error parsing schema.org data:', error);
 				console.error('Problematic JSON content:', jsonContent);
