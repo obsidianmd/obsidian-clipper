@@ -23,11 +23,12 @@ export function sanitizeFileName(fileName: string): string {
 	const isWindows = /win/i.test(platform);
 	const isMac = /mac/i.test(platform);
 
-	let sanitized = fileName;
+	// First remove Obsidian-specific characters that should be sanitized across all platforms
+	let sanitized = fileName.replace(/[#|\^\[\]]/g, '');
 
 	if (isWindows) {
 		sanitized = sanitized
-			.replace(/[<>:"\/\\|?*\x00-\x1F]/g, '')
+			.replace(/[<>:"\/\\?*\x00-\x1F]/g, '')
 			.replace(/^(con|prn|aux|nul|com[0-9]|lpt[0-9])(\..*)?$/i, '_$1$2')
 			.replace(/[\s.]+$/, '');
 	} else if (isMac) {
