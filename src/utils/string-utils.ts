@@ -87,11 +87,16 @@ export function makeUrlAbsolute(element: Element, attributeName: string, baseUrl
 	const attributeValue = element.getAttribute(attributeName);
 	if (attributeValue) {
 		try {
-			// Make sure the baseUrl ends with a slash, to deal with cases like src="x.png"
-			if (!baseUrl.href.endsWith('/')) {
-				baseUrl.href += '/';
+			// Create a new URL object from the base URL
+			const resolvedBaseUrl = new URL(baseUrl.href);
+			
+			// If the base URL points to a file, remove the filename to get the directory
+			if (!resolvedBaseUrl.pathname.endsWith('/')) {
+				resolvedBaseUrl.pathname = resolvedBaseUrl.pathname.substring(0, resolvedBaseUrl.pathname.lastIndexOf('/') + 1);
 			}
-			const url = new URL(attributeValue, baseUrl);
+			
+			const url = new URL(attributeValue, resolvedBaseUrl);
+			
 			if (!['http:', 'https:'].includes(url.protocol)) {
 				// Handle non-standard protocols (chrome-extension://, moz-extension://, brave://, etc.)
 				const parts = attributeValue.split('/');
@@ -104,7 +109,7 @@ export function makeUrlAbsolute(element: Element, attributeName: string, baseUrl
 				} else {
 					// If it doesn't look like a domain it's probably the extension URL, remove the non-standard protocol part and use baseUrl
 					const path = parts.slice(3).join('/');
-					const newUrl = new URL(path, baseUrl.origin).href;
+					const newUrl = new URL(path, resolvedBaseUrl.origin + resolvedBaseUrl.pathname).href;
 					element.setAttribute(attributeName, newUrl);
 				}
 			} else if (url.protocol === 'http:' || url.protocol === 'https:') {
