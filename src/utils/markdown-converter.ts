@@ -1,5 +1,6 @@
 import TurndownService from 'turndown';
 import { MathMLToLaTeX } from 'mathml-to-latex';
+import { processUrls } from './string-utils';
 import { debugLog } from './debug';
 
 const footnotes: { [key: string]: string } = {};
@@ -10,7 +11,7 @@ export function createMarkdownContent(content: string, url: string) {
 
 	const baseUrl = new URL(url);
 	// Process all URLs at the beginning
-	const processedContent = content;
+	const processedContent = processUrls(content, baseUrl);
 
 	const turndownService = new TurndownService({
 		headingStyle: 'atx',
