@@ -83,6 +83,15 @@ export function escapeHtml(unsafe: string): string {
 		.replace(/'/g, "&#039;");
 }
 
+// Cases to handle:
+// Full URLs: https://example.com/x.png
+// URLs without protocol: //example.com/x.png
+// Relative URLs:
+// - x.png
+// - /x.png
+// - img/x.png
+// - ../x.png
+
 export function makeUrlAbsolute(element: Element, attributeName: string, baseUrl: URL) {
 	const attributeValue = element.getAttribute(attributeName);
 	if (attributeValue) {
@@ -112,11 +121,6 @@ export function makeUrlAbsolute(element: Element, attributeName: string, baseUrl
 					const newUrl = new URL(path, resolvedBaseUrl.origin + resolvedBaseUrl.pathname).href;
 					element.setAttribute(attributeName, newUrl);
 				}
-			} else if (url.protocol === 'http:' || url.protocol === 'https:') {
-				// Already an absolute URL, no change needed
-				const newUrl = url.href;
-				element.setAttribute(attributeName, newUrl);
-
 			} else {
 				// Handle other cases (relative URLs, protocol-relative URLs)
 				const newUrl = url.href;
