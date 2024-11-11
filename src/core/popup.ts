@@ -10,7 +10,7 @@ import { getLocalStorage, setLocalStorage, loadSettings, generalSettings, Settin
 import { escapeHtml, unescapeValue } from '../utils/string-utils';
 import { loadTemplates, createDefaultTemplate } from '../managers/template-manager';
 import browser from '../utils/browser-polyfill';
-import { addBrowserClassToHtml } from '../utils/browser-detection';
+import { addBrowserClassToHtml, detectBrowser } from '../utils/browser-detection';
 import { createElementWithClass } from '../utils/dom-utils';
 import { initializeInterpreter, handleInterpreterUI, collectPromptVariables } from '../utils/interpreter';
 import { adjustNoteNameHeight } from '../utils/ui-utils';
@@ -319,7 +319,8 @@ function setupEventListeners(tabId: number) {
 	const moreButton = document.getElementById('more-btn');
 	const moreDropdown = document.querySelector('.more-dropdown');
 	const copyContentButton = document.getElementById('copy-content');
-	const saveFileButton = document.getElementById('save-file');
+	const saveDownloadsButton = document.getElementById('save-downloads');
+	const shareContentButton = document.getElementById('share-content');
 
 	if (moreButton && moreDropdown) {
 		moreButton.addEventListener('click', (e) => {
@@ -354,8 +355,8 @@ function setupEventListeners(tabId: number) {
 		});
 	}
 
-	if (saveFileButton) {
-		saveFileButton.addEventListener('click', async () => {
+	if (saveDownloadsButton) {
+		saveDownloadsButton.addEventListener('click', async () => {
 			const properties = Array.from(document.querySelectorAll('.metadata-property input')).map(input => {
 				const inputElement = input as HTMLInputElement;
 				return {
@@ -369,7 +370,87 @@ function setupEventListeners(tabId: number) {
 			const frontmatter = await generateFrontmatter(properties);
 			const fileContent = frontmatter + noteContentField.value;
 			
-			await saveAsFile(fileContent);
+			await saveToDownloads(fileContent);
+		});
+	}
+
+	if (shareContentButton) {
+		shareContentButton.addEventListener('click', (e) => {
+			// Get content synchronously
+			const properties = Array.from(document.querySelectorAll('.metadata-property input')).map(input => {
+				const inputElement = input as HTMLInputElement;
+				return {
+					id: inputElement.dataset.id || Date.now().toString() + Math.random().toString(36).slice(2, 11),
+					name: inputElement.id,
+					value: inputElement.type === 'checkbox' ? inputElement.checked : inputElement.value
+				};
+			}) as Property[];
+
+			const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
+			
+			// Use Promise.all to prepare the data
+			Promise.all([
+				generateFrontmatter(properties),
+				Promise.resolve(noteContentField.value)
+			]).then(([frontmatter, noteContent]) => {
+				const fileContent = frontmatter + noteContent;
+				
+				// Call share directly from the click handler
+				const noteNameField = document.getElementById('note-name-field') as HTMLInputElement;
+				let fileName = noteNameField?.value || 'untitled';
+				fileName = sanitizeFileName(fileName);
+				if (!fileName.toLowerCase().endsWith('.md')) {
+					fileName += '.md';
+				}
+
+				if (navigator.share && navigator.canShare) {
+					const blob = new Blob([fileContent], { type: 'text/markdown;charset=utf-8' });
+					const file = new File([blob], fileName, { type: 'text/markdown;charset=utf-8' });
+					
+					const shareData = {
+						files: [file],
+						title: fileName,
+						text: 'Shared from Obsidian Web Clipper'
+					};
+
+					if (navigator.canShare(shareData)) {
+						navigator.share(shareData)
+							.then(() => {
+								const moreDropdown = document.querySelector('.more-dropdown');
+								if (moreDropdown) {
+									moreDropdown.classList.remove('show');
+								}
+							})
+							.catch((error) => {
+								console.error('Error sharing:', error);
+								// Fallback to save to downloads instead of save as
+								saveToDownloads(fileContent);
+							});
+					} else {
+						saveToDownloads(fileContent);
+					}
+				} else {
+					saveToDownloads(fileContent);
+				}
+			});
+		});
+	}
+
+	// Only show the share button if we're on Safari and Web Share API is available
+	const shareButton = document.getElementById('share-content');
+	if (shareButton) {
+		detectBrowser().then(browser => {
+			const isSafariBrowser = ['safari', 'mobile-safari', 'ipad-os'].includes(browser);
+			if (!isSafariBrowser || !navigator.share || !navigator.canShare) {
+				shareButton.style.display = 'none';
+			} else {
+				// Test if we can share files (only on Safari)
+				const testFile = new File(["test"], "test.txt", { type: "text/plain" });
+				const testShare = { files: [testFile] };
+				if (!navigator.canShare(testShare)) {
+					shareButton.style.display = 'none';
+				}
+			}
 		});
 	}
 }
@@ -377,8 +458,8 @@ function setupEventListeners(tabId: number) {
 async function initializeUI() {
 	const clipButton = document.getElementById('clip-btn');
 	if (clipButton) {
-		clipButton.addEventListener('click', handleClip);
-		clipButton.focus();
+			clipButton.addEventListener('click', handleClip);
+			clipButton.focus();
 	} else {
 		console.warn('Clip button not found');
 	}
@@ -980,7 +1061,7 @@ async function copyToClipboard(content: string) {
 	}
 }
 
-async function saveAsFile(content: string) {
+async function saveToDownloads(content: string) {
 	try {
 		const noteNameField = document.getElementById('note-name-field') as HTMLInputElement;
 		let fileName = noteNameField?.value || 'untitled';
@@ -988,14 +1069,12 @@ async function saveAsFile(content: string) {
 		if (!fileName.toLowerCase().endsWith('.md')) {
 			fileName += '.md';
 		}
-
-		console.log('Saving file as:', fileName);
 		
 		const blob = new Blob([content], { type: 'text/markdown;charset=utf-8' });
 		await browser.downloads.download({
 			url: URL.createObjectURL(blob),
 			filename: fileName,
-			saveAs: true
+			saveAs: false // Don't show the save dialog
 		});
 		
 		const moreDropdown = document.querySelector('.more-dropdown');
