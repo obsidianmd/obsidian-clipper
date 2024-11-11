@@ -20,6 +20,7 @@ import { ensureContentScriptLoaded } from '../utils/content-script-utils';
 import { isBlankPage, isValidUrl } from '../utils/active-tab-manager';
 import { memoizeWithExpiration } from '../utils/memoize';
 import { debounce } from '../utils/debounce';
+import { sanitizeFileName } from '../utils/string-utils';
 
 let loadedSettings: Settings;
 let currentTemplate: Template | null = null;
@@ -313,6 +314,63 @@ function setupEventListeners(tabId: number) {
 	const highlighterModeButton = document.getElementById('highlighter-mode');
 	if (highlighterModeButton) {
 		highlighterModeButton.addEventListener('click', () => toggleHighlighterMode(tabId));
+	}
+
+	const moreButton = document.getElementById('more-btn');
+	const moreDropdown = document.querySelector('.more-dropdown');
+	const copyContentButton = document.getElementById('copy-content');
+	const saveFileButton = document.getElementById('save-file');
+
+	if (moreButton && moreDropdown) {
+		moreButton.addEventListener('click', (e) => {
+			e.stopPropagation();
+			moreDropdown.classList.toggle('show');
+		});
+
+		// Close dropdown when clicking outside
+		document.addEventListener('click', (e) => {
+			if (!moreButton.contains(e.target as Node)) {
+				moreDropdown.classList.remove('show');
+			}
+		});
+	}
+
+	if (copyContentButton) {
+		copyContentButton.addEventListener('click', async () => {
+			const properties = Array.from(document.querySelectorAll('.metadata-property input')).map(input => {
+				const inputElement = input as HTMLInputElement;
+				return {
+					id: inputElement.dataset.id || Date.now().toString() + Math.random().toString(36).slice(2, 11),
+					name: inputElement.id,
+					value: inputElement.type === 'checkbox' ? inputElement.checked : inputElement.value
+				};
+			}) as Property[];
+
+			const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
+			const frontmatter = await generateFrontmatter(properties);
+			const fileContent = frontmatter + noteContentField.value;
+			
+			await copyToClipboard(fileContent);
+		});
+	}
+
+	if (saveFileButton) {
+		saveFileButton.addEventListener('click', async () => {
+			const properties = Array.from(document.querySelectorAll('.metadata-property input')).map(input => {
+				const inputElement = input as HTMLInputElement;
+				return {
+					id: inputElement.dataset.id || Date.now().toString() + Math.random().toString(36).slice(2, 11),
+					name: inputElement.id,
+					value: inputElement.type === 'checkbox' ? inputElement.checked : inputElement.value
+				};
+			}) as Property[];
+
+			const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
+			const frontmatter = await generateFrontmatter(properties);
+			const fileContent = frontmatter + noteContentField.value;
+			
+			await saveAsFile(fileContent);
+		});
 	}
 }
 
@@ -906,6 +964,47 @@ function updateHighlighterModeUI(isActive: boolean) {
 		} else {
 			highlighterModeButton.style.display = 'none';
 		}
+	}
+}
+
+async function copyToClipboard(content: string) {
+	try {
+		await navigator.clipboard.writeText(content);
+		const moreDropdown = document.querySelector('.more-dropdown');
+		if (moreDropdown) {
+			moreDropdown.classList.remove('show');
+		}
+	} catch (error) {
+		console.error('Failed to copy to clipboard:', error);
+		showError('Failed to copy to clipboard');
+	}
+}
+
+async function saveAsFile(content: string) {
+	try {
+		const noteNameField = document.getElementById('note-name-field') as HTMLInputElement;
+		let fileName = noteNameField?.value || 'untitled';
+		fileName = sanitizeFileName(fileName);
+		if (!fileName.toLowerCase().endsWith('.md')) {
+			fileName += '.md';
+		}
+
+		console.log('Saving file as:', fileName);
+		
+		const blob = new Blob([content], { type: 'text/markdown;charset=utf-8' });
+		await browser.downloads.download({
+			url: URL.createObjectURL(blob),
+			filename: fileName,
+			saveAs: true
+		});
+		
+		const moreDropdown = document.querySelector('.more-dropdown');
+		if (moreDropdown) {
+			moreDropdown.classList.remove('show');
+		}
+	} catch (error) {
+		console.error('Failed to save file:', error);
+		showError('Failed to save file');
 	}
 }
 

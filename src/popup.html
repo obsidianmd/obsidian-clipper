@@ -53,7 +53,16 @@
 					</div>
 					<div id="interpreter-error" style="display: none;"></div>
 				</div>
-				<button id="clip-btn" class="mod-cta">Add to Obsidian</button>
+				<div class="action-buttons">
+					<button id="clip-btn" class="mod-cta">Add to Obsidian</button>
+					<div class="more-actions-container">
+						<button id="more-btn">More</button>
+						<div class="more-dropdown">
+							<button class="dropdown-item" id="copy-content">Copy to clipboard</button>
+							<button class="dropdown-item" id="save-file">Save as file</button>
+						</div>
+					</div>
+				</div>
 			</div>
 		</div>
 		<script type="module" src="popup.js"></script>
