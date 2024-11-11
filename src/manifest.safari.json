@@ -6,6 +6,7 @@
 	"description": "Save content from the web to Obsidian, in a private and durable format you can always access offline.",
 	"permissions": [
 		"activeTab",
+		"clipboardWrite",
 		"contextMenus",
 		"storage",
 		"scripting"
