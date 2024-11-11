@@ -119,6 +119,9 @@ body.obsidian-highlighter-active {
 			color: #bebebe;
 			width: 16px;
 			height: 16px;
+			path, line {
+				color: #bebebe;
+			}
 		}
 		@media (hover: hover) {
 			&:hover {
@@ -126,6 +129,9 @@ body.obsidian-highlighter-active {
 				background-color: rgba(255, 255, 255, 0.25) !important;
 				svg {
 					color: white !important;
+					path, line {
+						color: white !important;
+					}
 				}
 			}
 		}
