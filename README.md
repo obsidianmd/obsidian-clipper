@@ -1,4 +1,4 @@
-⚠️ **Obsidian Web Clipper is still in beta and requires Obsidian 1.7.2.** Please make sure you are using Obsidian 1.7.2 or above. Visit the [Obsidian Help site](https://help.obsidian.md/web-clipper) for more information.
+Obsidian Web Clipper is a browser extension that helps you highlight and save web pages. Visit the [Obsidian Help site](https://help.obsidian.md/web-clipper) for documentation and troubleshooting.
 
 ## Get started
 
