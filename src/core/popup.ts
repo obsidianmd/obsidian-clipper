@@ -21,6 +21,7 @@ import { isBlankPage, isValidUrl } from '../utils/active-tab-manager';
 import { memoizeWithExpiration } from '../utils/memoize';
 import { debounce } from '../utils/debounce';
 import { sanitizeFileName } from '../utils/string-utils';
+import { saveFile } from '../utils/file-utils';
 
 let loadedSettings: Settings;
 let currentTemplate: Template | null = null;
@@ -356,22 +357,7 @@ function setupEventListeners(tabId: number) {
 	}
 
 	if (saveDownloadsButton) {
-		saveDownloadsButton.addEventListener('click', async () => {
-			const properties = Array.from(document.querySelectorAll('.metadata-property input')).map(input => {
-				const inputElement = input as HTMLInputElement;
-				return {
-					id: inputElement.dataset.id || Date.now().toString() + Math.random().toString(36).slice(2, 11),
-					name: inputElement.id,
-					value: inputElement.type === 'checkbox' ? inputElement.checked : inputElement.value
-				};
-			}) as Property[];
-
-			const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
-			const frontmatter = await generateFrontmatter(properties);
-			const fileContent = frontmatter + noteContentField.value;
-			
-			await saveToDownloads(fileContent);
-		});
+		saveDownloadsButton.addEventListener('click', handleSaveToDownloads);
 	}
 
 	if (shareContentButton) {
@@ -1041,7 +1027,7 @@ function updateHighlighterModeUI(isActive: boolean) {
 	}
 }
 
-async function copyToClipboard(content: string) {
+export async function copyToClipboard(content: string) {
 	try {
 		await navigator.clipboard.writeText(content);
 		const moreDropdown = document.getElementById('more-dropdown');
@@ -1066,16 +1052,7 @@ async function copyToClipboard(content: string) {
 	}
 }
 
-function base64EncodeUnicode(str: string): string {
-	// First encode as UTF-8 to get the UTF-8 encoding of the characters
-	// Then convert the percent encodings into raw bytes for btoa
-	const utf8Bytes = encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, 
-		(match, p1) => String.fromCharCode(parseInt(p1, 16))
-	);
-	return btoa(utf8Bytes);
-}
-
-async function saveToDownloads(content: string) {
+async function handleSaveToDownloads() {
 	try {
 		const noteNameField = document.getElementById('note-name-field') as HTMLInputElement;
 		let fileName = noteNameField?.value || 'untitled';
@@ -1084,79 +1061,27 @@ async function saveToDownloads(content: string) {
 			fileName += '.md';
 		}
 
-		const browserType = await detectBrowser();
-		const isSafariBrowser = ['safari', 'mobile-safari', 'ipad-os'].includes(browserType);
-		
-		if (isSafariBrowser) {
-			// Use data URI approach for Safari
-			const dataUri = `data:text/markdown;charset=utf-8,${encodeURIComponent(content)}`;
-			const downloadScript = `
-				if (typeof downloadMarkdown !== 'function') {
-					function downloadMarkdown(filename, dataUri) {
-						const a = document.createElement('a');
-						a.href = dataUri;
-						a.download = filename;
-						document.body.appendChild(a);
-						a.click();
-						document.body.removeChild(a);
-					}
-				}
-				downloadMarkdown("${fileName}", "${dataUri}");
-			`;
+		const properties = Array.from(document.querySelectorAll('.metadata-property input')).map(input => {
+			const inputElement = input as HTMLInputElement;
+			return {
+				id: inputElement.dataset.id || Date.now().toString() + Math.random().toString(36).slice(2, 11),
+				name: inputElement.id,
+				value: inputElement.type === 'checkbox' ? inputElement.checked : inputElement.value
+			};
+		}) as Property[];
 
-			if (currentTabId) {
-				await browser.scripting.executeScript({
-					target: { tabId: currentTabId },
-					func: (fileName: string, dataUri: string) => {
-						const a = document.createElement('a');
-						a.href = dataUri;
-						a.download = fileName;
-						document.body.appendChild(a);
-						a.click();
-						document.body.removeChild(a);
-					},
-					args: [fileName, dataUri]
-				});
-			}
-		} else {
-			// Use base64 approach for other browsers
-			const downloadScript = `
-				if (typeof downloadMarkdown !== 'function') {
-					function downloadMarkdown(filename, base64Content) {
-						const content = atob(base64Content);
-						const blob = new Blob([content], { type: 'text/markdown;charset=utf-8' });
-						const url = URL.createObjectURL(blob);
-						const a = document.createElement('a');
-						a.href = url;
-						a.download = filename;
-						document.body.appendChild(a);
-						a.click();
-						document.body.removeChild(a);
-						URL.revokeObjectURL(url);
-					}
-				}
-				downloadMarkdown("${fileName}", "${base64EncodeUnicode(content)}");
-			`;
+		const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
+		const frontmatter = await generateFrontmatter(properties);
+		const fileContent = frontmatter + noteContentField.value;
 
-			if (currentTabId) {
-				await browser.scripting.executeScript({
-					target: { tabId: currentTabId },
-					func: (fileName: string, content: string) => {
-						const blob = new Blob([content], { type: 'text/markdown;charset=utf-8' });
-						const url = URL.createObjectURL(blob);
-						const a = document.createElement('a');
-						a.href = url;
-						a.download = fileName;
-						document.body.appendChild(a);
-						a.click();
-						document.body.removeChild(a);
-						URL.revokeObjectURL(url);
-					},
-					args: [fileName, content]
-				});
-			}
-		}
-		
+		await saveFile({
+			content: fileContent,
+			fileName,
+			mimeType: 'text/markdown',
+			tabId: currentTabId,
+			onError: (error) => showError('Failed to save file')
+		});
+
 		const moreDropdown = document.getElementById('more-dropdown');
 		if (moreDropdown) {
 			moreDropdown.classList.remove('show');
