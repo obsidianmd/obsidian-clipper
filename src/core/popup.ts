@@ -317,7 +317,7 @@ function setupEventListeners(tabId: number) {
 	}
 
 	const moreButton = document.getElementById('more-btn');
-	const moreDropdown = document.querySelector('.more-dropdown');
+	const moreDropdown = document.getElementById('more-dropdown');
 	const copyContentButton = document.getElementById('copy-content');
 	const saveDownloadsButton = document.getElementById('save-downloads');
 	const shareContentButton = document.getElementById('share-content');
@@ -416,7 +416,7 @@ function setupEventListeners(tabId: number) {
 					if (navigator.canShare(shareData)) {
 						navigator.share(shareData)
 							.then(() => {
-								const moreDropdown = document.querySelector('.more-dropdown');
+								const moreDropdown = document.getElementById('more-dropdown');
 								if (moreDropdown) {
 									moreDropdown.classList.remove('show');
 								}
@@ -1051,7 +1051,7 @@ function updateHighlighterModeUI(isActive: boolean) {
 async function copyToClipboard(content: string) {
 	try {
 		await navigator.clipboard.writeText(content);
-		const moreDropdown = document.querySelector('.more-dropdown');
+		const moreDropdown = document.getElementById('more-dropdown');
 		if (moreDropdown) {
 			moreDropdown.classList.remove('show');
 		}
@@ -1059,6 +1059,15 @@ async function copyToClipboard(content: string) {
 		console.error('Failed to copy to clipboard:', error);
 		showError('Failed to copy to clipboard');
 	}
+}
+
+function base64EncodeUnicode(str: string): string {
+	// First encode as UTF-8 to get the UTF-8 encoding of the characters
+	// Then convert the percent encodings into raw bytes for btoa
+	const utf8Bytes = encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, 
+		(match, p1) => String.fromCharCode(parseInt(p1, 16))
+	);
+	return btoa(utf8Bytes);
 }
 
 async function saveToDownloads(content: string) {
@@ -1069,15 +1078,81 @@ async function saveToDownloads(content: string) {
 		if (!fileName.toLowerCase().endsWith('.md')) {
 			fileName += '.md';
 		}
+
+		const browserType = await detectBrowser();
+		const isSafariBrowser = ['safari', 'mobile-safari', 'ipad-os'].includes(browserType);
 		
-		const blob = new Blob([content], { type: 'text/markdown;charset=utf-8' });
-		await browser.downloads.download({
-			url: URL.createObjectURL(blob),
-			filename: fileName,
-			saveAs: false // Don't show the save dialog
-		});
+		if (isSafariBrowser) {
+			// Use data URI approach for Safari
+			const dataUri = `data:text/markdown;charset=utf-8,${encodeURIComponent(content)}`;
+			const downloadScript = `
+				if (typeof downloadMarkdown !== 'function') {
+					function downloadMarkdown(filename, dataUri) {
+						const a = document.createElement('a');
+						a.href = dataUri;
+						a.download = filename;
+						document.body.appendChild(a);
+						a.click();
+						document.body.removeChild(a);
+					}
+				}
+				downloadMarkdown("${fileName}", "${dataUri}");
+			`;
+
+			if (currentTabId) {
+				await browser.scripting.executeScript({
+					target: { tabId: currentTabId },
+					func: (fileName: string, dataUri: string) => {
+						const a = document.createElement('a');
+						a.href = dataUri;
+						a.download = fileName;
+						document.body.appendChild(a);
+						a.click();
+						document.body.removeChild(a);
+					},
+					args: [fileName, dataUri]
+				});
+			}
+		} else {
+			// Use base64 approach for other browsers
+			const downloadScript = `
+				if (typeof downloadMarkdown !== 'function') {
+					function downloadMarkdown(filename, base64Content) {
+						const content = atob(base64Content);
+						const blob = new Blob([content], { type: 'text/markdown;charset=utf-8' });
+						const url = URL.createObjectURL(blob);
+						const a = document.createElement('a');
+						a.href = url;
+						a.download = filename;
+						document.body.appendChild(a);
+						a.click();
+						document.body.removeChild(a);
+						URL.revokeObjectURL(url);
+					}
+				}
+				downloadMarkdown("${fileName}", "${base64EncodeUnicode(content)}");
+			`;
+
+			if (currentTabId) {
+				await browser.scripting.executeScript({
+					target: { tabId: currentTabId },
+					func: (fileName: string, content: string) => {
+						const blob = new Blob([content], { type: 'text/markdown;charset=utf-8' });
+						const url = URL.createObjectURL(blob);
+						const a = document.createElement('a');
+						a.href = url;
+						a.download = fileName;
+						document.body.appendChild(a);
+						a.click();
+						document.body.removeChild(a);
+						URL.revokeObjectURL(url);
+					},
+					args: [fileName, content]
+				});
+			}
+		}
 		
-		const moreDropdown = document.querySelector('.more-dropdown');
+		const moreDropdown = document.getElementById('more-dropdown');
 		if (moreDropdown) {
 			moreDropdown.classList.remove('show');
 		}

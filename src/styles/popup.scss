@@ -156,6 +156,50 @@
 	}
 }
 
+#more-dropdown {
+	bottom: 100%;
+	right: 0;
+	z-index: 1000;
+	margin-bottom: 8px;
+	min-width: 160px;
+
+	&.show {
+		display: block;
+	}
+}
+
+.action-buttons {
+	display: flex;
+
+	width: 100%;
+	
+	#clip-btn {
+		flex: 1;
+	}
+	
+	#more-btn {
+		color: white;
+		background-color: var(--interactive-accent);
+		box-shadow: none;
+		border: none;
+		border-radius: 0 var(--radius-s) var(--radius-s) 0;
+		border-left: 1px solid rgba(0,0,0,0.2);
+		position: absolute;
+		right: 0;
+		width: auto;
+		white-space: nowrap;
+		padding: 0 4px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		@media (hover: hover) {
+			&:hover {
+				background-color: var(--interactive-accent-hover);
+			}
+		}
+	}
+}
+
 .clipper ~ .metadata-properties {
 	display: none;
 }
