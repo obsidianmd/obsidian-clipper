@@ -339,10 +339,13 @@ async function initializeUI() {
 					const propertyValueElement = property.querySelector('.metadata-property-value input');
 					let propertyValue = '';
 					if (propertyValueElement) {
-						if (propertyValueElement.type === 'checkbox') {
-							propertyValue = (propertyValueElement as HTMLInputElement).checked ? 'true' : 'false';
+						// Narrow down the type to HTMLInputElement here:
+						const inputElement = propertyValueElement as HTMLInputElement; // Type assertion
+	
+						if (inputElement.type === 'checkbox') {
+							propertyValue = inputElement.checked ? 'true' : 'false';
 						} else {
-							propertyValue = (propertyValueElement as HTMLInputElement).value;
+							propertyValue = inputElement.value;
 						}
 					}
 					if (propertyName) {
