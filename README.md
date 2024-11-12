@@ -1,4 +1,4 @@
-Obsidian Web Clipper is a browser extension that helps you highlight and save web pages. Visit the [Obsidian Help site](https://help.obsidian.md/web-clipper) for documentation and troubleshooting.
+Obsidian Web Clipper is a browser extension that helps you highlight and save web pages. Visit the [Obsidian Help site](https://help.obsidian.md/web-clipper) for documentation and [troubleshooting](https://help.obsidian.md/web-clipper/troubleshoot).
 
 ## Get started
 
@@ -10,7 +10,7 @@ Install the extension by downloading it from the official directory for your bro
 
 ## Use the extension
 
-Documentation is available on the [Obsidian Help site](https://help.obsidian.md/web-clipper), which covers how to use templates, triggers, highlighting, and more.
+Documentation is available on the [Obsidian Help site](https://help.obsidian.md/web-clipper), which covers how to use [highlighting](https://help.obsidian.md/web-clipper/highlight), [templates](https://help.obsidian.md/web-clipper/templates), [variables](https://help.obsidian.md/web-clipper/variables), [filters](https://help.obsidian.md/web-clipper/filters), and more.
 
 ## Developers
 
