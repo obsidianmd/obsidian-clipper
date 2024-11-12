@@ -325,24 +325,62 @@ async function initializeUI() {
 		console.warn('Clip button not found');
 	}
 
+	
 	const copyButton = document.getElementById('copy-btn');
-    if (copyButton) {
-        copyButton.addEventListener('click', async () => {
-            const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
-            if (noteContentField) {
-                await navigator.clipboard.writeText(noteContentField.value);
+	if (copyButton) {
+		copyButton.addEventListener('click', async () => {
+			try {
+				let textToCopy = '';
 
-                // Improved feedback: Temporarily change button text
-                const originalText = copyButton.textContent;
-                copyButton.textContent = 'Copied!';
-                setTimeout(() => {
-                    copyButton.textContent = originalText;
-                }, 1500); // Revert after 1.5 seconds
-            }
-        });
-    } else {
-        console.warn('Copy button not found');
-    }
+				// 1. Get Properties
+				const properties = document.querySelectorAll('.metadata-property');
+				properties.forEach(property => {
+					const propertyName = property.querySelector('.metadata-property-key label')?.textContent;
+					const propertyValueElement = property.querySelector('.metadata-property-value input');
+					let propertyValue = '';
+					if (propertyValueElement) {
+						if (propertyValueElement.type === 'checkbox') {
+							propertyValue = (propertyValueElement as HTMLInputElement).checked ? 'true' : 'false';
+						} else {
+							propertyValue = (propertyValueElement as HTMLInputElement).value;
+						}
+					}
+					if (propertyName) {
+						textToCopy += `${propertyName}: ${propertyValue}\n`;
+					}
+				});
+				textToCopy += '---\n'; // Separator between properties and content
+
+
+				// 2. Get Content
+				const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
+				if (noteContentField) {
+					textToCopy += noteContentField.value;
+				}
+
+
+				// 3. Copy to Clipboard
+				await navigator.clipboard.writeText(textToCopy);
+				const copiedMessage = document.querySelector('.copied-message') as HTMLElement;
+
+				// Show a copied message
+				copiedMessage.style.display = 'block';
+				setTimeout(() => {
+					copiedMessage.style.display = 'none';
+				}, 1500); // Hide after 1.5 seconds
+
+
+			} catch (error) {
+				console.error("Copy failed:", error);
+				// Optionally display a more prominent error message in the popup
+				// Or change button to "Error" temporarily, similar to the success message
+			}
+
+
+		});
+	} else {
+		console.warn('Copy button not found');
+	}
 
 	const showMoreActionsButton = document.getElementById('show-variables') as HTMLElement;
 	const variablesPanel = document.createElement('div');
