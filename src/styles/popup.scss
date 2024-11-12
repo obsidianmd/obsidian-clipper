@@ -160,7 +160,7 @@
 	bottom: 100%;
 	right: 0;
 	z-index: 1000;
-	margin-bottom: 8px;
+	margin-bottom: 6px;
 	min-width: 160px;
 
 	&.show {
@@ -170,7 +170,6 @@
 
 .action-buttons {
 	display: flex;
-
 	width: 100%;
 	
 	#clip-btn {
@@ -195,6 +194,9 @@
 		@media (hover: hover) {
 			&:hover {
 				background-color: var(--interactive-accent-hover);
+				box-shadow: none;
+				border: none;
+				border-left: 1px solid rgba(0,0,0,0.3);
 			}
 		}
 	}

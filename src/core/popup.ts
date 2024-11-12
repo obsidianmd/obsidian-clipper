@@ -409,7 +409,6 @@ function setupEventListeners(tabId: number) {
 					
 					const shareData = {
 						files: [file],
-						title: fileName,
 						text: 'Shared from Obsidian Web Clipper'
 					};
 
