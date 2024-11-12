@@ -325,6 +325,25 @@ async function initializeUI() {
 		console.warn('Clip button not found');
 	}
 
+	const copyButton = document.getElementById('copy-btn');
+    if (copyButton) {
+        copyButton.addEventListener('click', async () => {
+            const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
+            if (noteContentField) {
+                await navigator.clipboard.writeText(noteContentField.value);
+
+                // Improved feedback: Temporarily change button text
+                const originalText = copyButton.textContent;
+                copyButton.textContent = 'Copied!';
+                setTimeout(() => {
+                    copyButton.textContent = originalText;
+                }, 1500); // Revert after 1.5 seconds
+            }
+        });
+    } else {
+        console.warn('Copy button not found');
+    }
+
 	const showMoreActionsButton = document.getElementById('show-variables') as HTMLElement;
 	const variablesPanel = document.createElement('div');
 	variablesPanel.className = 'variables-panel';
