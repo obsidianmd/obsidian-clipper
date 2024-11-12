@@ -12,6 +12,11 @@
 		"storage",
 		"scripting"
 	],
+	"host_permissions": [
+		"<all_urls>",
+		"http://*/*",
+		"https://*/*"
+	],
 	"action": {
 		"default_popup": "popup.html",
 		"default_icon": {
@@ -59,10 +64,6 @@
 			"description": "Toggle highlighter mode"
 		}
 	},
-	"host_permissions": [
-		"http://*/*",
-		"https://*/*"
-	],
 	"browser_specific_settings": {
 		"gecko": {
 			"id": "clipper@obsidian.md",

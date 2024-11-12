@@ -27,12 +27,12 @@ export async function saveFile({
 		const browserType = await detectBrowser();
 		const isSafariBrowser = ['safari', 'mobile-safari', 'ipad-os'].includes(browserType);
 		
-		if (!tabId) {
-			throw new Error('Tab ID is required for saving files');
-		}
-
 		if (isSafariBrowser) {
 			// Use data URI approach for Safari
+			if (!tabId) {
+				throw new Error('Tab ID is required for saving files in Safari');
+			}
+
 			const dataUri = `data:${mimeType};charset=utf-8,${encodeURIComponent(content)}`;
 			await browser.scripting.executeScript({
 				target: { tabId },
@@ -47,22 +47,15 @@ export async function saveFile({
 				args: [fileName, dataUri]
 			});
 		} else {
-			// Use base64 approach for other browsers
-			await browser.scripting.executeScript({
-				target: { tabId },
-				func: (fileName: string, content: string, mimeType: string) => {
-					const blob = new Blob([content], { type: `${mimeType};charset=utf-8` });
-					const url = URL.createObjectURL(blob);
-					const a = document.createElement('a');
-					a.href = url;
-					a.download = fileName;
-					document.body.appendChild(a);
-					a.click();
-					document.body.removeChild(a);
-					URL.revokeObjectURL(url);
-				},
-				args: [fileName, content, mimeType]
-			});
+			const blob = new Blob([content], { type: `${mimeType};charset=utf-8` });
+			const url = URL.createObjectURL(blob);
+			const a = document.createElement('a');
+			a.href = url;
+			a.download = fileName;
+			document.body.appendChild(a);
+			a.click();
+			document.body.removeChild(a);
+			URL.revokeObjectURL(url);
 		}
 	} catch (error) {
 		console.error('Failed to save file:', error);
