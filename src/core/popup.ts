@@ -422,14 +422,8 @@ function setupEventListeners(tabId: number) {
 							})
 							.catch((error) => {
 								console.error('Error sharing:', error);
-								// Fallback to save to downloads instead of save as
-								saveToDownloads(fileContent);
 							});
-					} else {
-						saveToDownloads(fileContent);
 					}
-				} else {
-					saveToDownloads(fileContent);
 				}
 			});
 		});
@@ -457,8 +451,8 @@ function setupEventListeners(tabId: number) {
 async function initializeUI() {
 	const clipButton = document.getElementById('clip-btn');
 	if (clipButton) {
-			clipButton.addEventListener('click', handleClip);
-			clipButton.focus();
+		clipButton.addEventListener('click', handleClip);
+		clipButton.focus();
 	} else {
 		console.warn('Clip button not found');
 	}
@@ -1053,6 +1047,18 @@ async function copyToClipboard(content: string) {
 		const moreDropdown = document.getElementById('more-dropdown');
 		if (moreDropdown) {
 			moreDropdown.classList.remove('show');
+		}
+
+		// Change the main button text temporarily
+		const clipButton = document.getElementById('clip-btn');
+		if (clipButton) {
+			const originalText = clipButton.textContent || 'Add to Obsidian';
+			clipButton.textContent = 'Copied!';
+			
+			// Reset the text after 1.5 seconds
+			setTimeout(() => {
+				clipButton.textContent = originalText;
+			}, 1500);
 		}
 	} catch (error) {
 		console.error('Failed to copy to clipboard:', error);
