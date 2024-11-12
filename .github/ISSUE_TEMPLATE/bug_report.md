@@ -4,17 +4,22 @@ about: Create a report to help us improve
 title: 'BUG: '
 labels: ''
 assignees: ''
-
 ---
 
 **Version (please complete the following information):**
- - OS: [e.g. Windows]
- - Browser [e.g. Chrome, Firefox]
- - Web Clipper version: [e.g. 0.5.0]
-- Obsidian version: [e.g. 1.7.2]
+- OS: [e.g. Windows]
+- Browser [e.g. Chrome, Firefox]
+- Web Clipper version: [e.g. 0.9.5]
+- Obsidian version: [e.g. 1.7.5]
 
 **Describe the bug**
-A clear and concise description of what the bug is. If applicable, add screenshots to help explain your problem.
+A clear and concise description of the bug. If applicable, add screenshots to help explain the problem.
+
+**Expected behavior**
+What did you expect to happen?
+
+**URLs where the bug occurs**
+Any specific web pages where the bug can be replicated.
 
 **To reproduce**
 Steps to reproduce the behavior:
@@ -23,8 +28,9 @@ Steps to reproduce the behavior:
 3. Scroll down to '....'
 4. See error
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
-
 **Your template file**
-Go to your template in Web Clipper settings and click on "Export". Attach the JSON file here, or paste the content below.
+If you are using a custom template (i.e. not the Default template). Go to Web Clipper settings and click **More** → **Copy as JSON**. Paste the JSON code below.
+
+```json
+(paste here)
+```
