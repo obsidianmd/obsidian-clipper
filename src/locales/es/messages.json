@@ -147,6 +147,9 @@
 	"importAllSettingsDescription": {
 		"message": "Importa todos los ajustes incluyendo plantillas y propiedades. Esto reemplazará tu configuración actual."
 	},
+    "remove": {
+		"message": "Eliminar"
+	},
 	"reset": {
 		"message": "Restablecer"
 	},
@@ -155,5 +158,51 @@
 	},
 	"import": {
 		"message": "Importar"
+	},
+	"propertiesSettings": {
+		"message": "Propiedades"
+	},
+	"importProperties": {
+		"message": "Importar propiedades"
+	},
+	"importPropertiesDescription": {
+		"message": "Para importar tus propiedades desde Obsidian, localiza el archivo $strong_1_start$types.json$strong_1_end$ en la carpeta $strong_2_start$.obsidian$strong_2_end$ dentro de tu bóveda. Ten en cuenta que esta carpeta está oculta por defecto en la mayoría de los sistemas operativos.",
+		"placeholders": {
+			"strong_1_start": {
+				"content": "<strong>"
+			},
+			"strong_1_end": {
+				"content": "</strong>"
+			},
+			"strong_2_start": {
+				"content": "<strong>"
+			},
+			"strong_2_end": {
+				"content": "</strong>"
+			}
+		}
+	},
+	"exportProperties": {
+		"message": "Exportar propiedades"
+	},
+	"exportPropertiesDescription": {
+		"message": "Guarda las propiedades del Web Clipper en un archivo $strong_start$types.json$strong_end$ que puede ser importado en tu bóveda de Obsidian o en Web Clipper en otros dispositivos.",
+		"placeholders": {
+			"strong_start": {
+				"content": "<strong>"
+			},
+			"strong_end": {
+				"content": "</strong>"
+			}
+		}
+	},
+	"removeUnusedProperties": {
+		"message": "Eliminar propiedades no utilizadas"
+	},
+	"removeUnusedPropertiesDescription": {
+		"message": "Elimina todas las propiedades que no se utilizan en ninguna plantilla."
+	},
+	"allProperties": {
+		"message": "Todas las propiedades"
 	}
 } 

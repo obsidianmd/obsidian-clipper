@@ -282,40 +282,46 @@
 
 					<div id="properties-section" class="settings-section">
 						<div class="settings-section-header">
-							<h2>Properties</h2>
+							<h2 data-i18n="propertiesSettings">Properties</h2>
 						</div>
 						<form id="property-types-form">
 							<div>
 								<div class="setting-item mod-horizontal">
 									<div class="setting-item-info">
-										<label for="import-types-btn">Import properties</label>
-										<div class="setting-item-description">To import your properties from Obsidian, locate the <strong>types.json</strong> file in the <strong>.obsidian</strong> folder within your vault. Note this folder is hidden by default on most operating systems.</div>
+										<label for="import-types-btn" data-i18n="importProperties">Import properties</label>
+										<div class="setting-item-description" data-i18n="importPropertiesDescription">
+											To import your properties from Obsidian, locate the <strong>types.json</strong> file in the <strong>.obsidian</strong> folder within your vault. Note this folder is hidden by default on most operating systems.
+										</div>
 									</div>
 									<div class="setting-item-control">
-										<button type="button" id="import-types-btn">Import</button>
+										<button type="button" id="import-types-btn" data-i18n="import">Import</button>
 									</div>
 								</div>
 								<div class="setting-item mod-horizontal">
 									<div class="setting-item-info">
-										<label for="export-types-btn">Export properties</label>
-										<div class="setting-item-description">Save Web Clipper properties to a <strong>types.json</strong> file that can be imported into your Obsidian vault, or into Web Clipper on other devices.</div>
+										<label for="export-types-btn" data-i18n="exportProperties">Export properties</label>
+										<div class="setting-item-description" data-i18n="exportPropertiesDescription">
+											Save Web Clipper properties to a <strong>types.json</strong> file that can be imported into your Obsidian vault, or into Web Clipper on other devices.
+										</div>
 									</div>
 									<div class="setting-item-control">
-										<button type="button" id="export-types-btn">Export</button>
+										<button type="button" id="export-types-btn" data-i18n="export">Export</button>
 									</div>
 								</div>
 								<div class="setting-item mod-horizontal">
 									<div class="setting-item-info">
-										<label for="delete-unused-properties-btn">Remove unused properties</label>
-										<div class="setting-item-description">Remove all properties that are not used in any template.</div>
+										<label for="delete-unused-properties-btn" data-i18n="removeUnusedProperties">Remove unused properties</label>
+										<div class="setting-item-description" data-i18n="removeUnusedPropertiesDescription">
+											Remove all properties that are not used in any template.
+										</div>
 									</div>
 									<div class="setting-item-control">
-										<button type="button" id="delete-unused-properties-btn">Remove</button>
+										<button type="button" id="delete-unused-properties-btn" data-i18n="remove">Remove</button>
 									</div>
 								</div>
 							</div>
 							<div>
-								<h3>All properties</h3>
+								<h3 data-i18n="allProperties">All properties</h3>
 								<div class="add-btn" style="display: none;">
 									<a id="add-property-type-btn">+ Add property</a>
 								</div>

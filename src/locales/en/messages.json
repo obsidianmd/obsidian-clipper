@@ -147,6 +147,9 @@
 	"importAllSettingsDescription": {
 		"message": "Import all settings including templates and properties. This will replace your current configuration."
 	},
+	"remove": {
+		"message": "Remove"
+	},
 	"reset": {
 		"message": "Reset"
 	},
@@ -155,5 +158,51 @@
 	},
 	"import": {
 		"message": "Import"
+	},
+	"propertiesSettings": {
+		"message": "Properties"
+	},
+	"importProperties": {
+		"message": "Import properties"
+	},
+	"importPropertiesDescription": {
+		"message": "To import your properties from Obsidian, locate the $strong_1_start$types.json$strong_1_end$ file in the $strong_2_start$.obsidian$strong_2_end$ folder within your vault. Note this folder is hidden by default on most operating systems.",
+		"placeholders": {
+			"strong_1_start": {
+				"content": "<strong>"
+			},
+			"strong_1_end": {
+				"content": "</strong>"
+			},
+			"strong_2_start": {
+				"content": "<strong>"
+			},
+			"strong_2_end": {
+				"content": "</strong>"
+			}
+		}
+	},
+	"exportProperties": {
+		"message": "Export properties"
+	},
+	"exportPropertiesDescription": {
+		"message": "Save Web Clipper properties to a $strong_start$types.json$strong_end$ file that can be imported into your Obsidian vault, or into Web Clipper on other devices.",
+		"placeholders": {
+			"strong_start": {
+				"content": "<strong>"
+			},
+			"strong_end": {
+				"content": "</strong>"
+			}
+		}
+	},
+	"removeUnusedProperties": {
+		"message": "Remove unused properties"
+	},
+	"removeUnusedPropertiesDescription": {
+		"message": "Remove all properties that are not used in any template."
+	},
+	"allProperties": {
+		"message": "All properties"
 	}
 } 
