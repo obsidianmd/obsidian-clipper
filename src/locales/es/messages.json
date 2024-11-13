@@ -66,7 +66,7 @@
 		"message": "Elige el idioma de la interfaz de la extensión."
 	},
 	"systemDefault": {
-		"message": "Predeterminado del sistema"
+		"message": "Sistema"
 	},
 	"generalSettings": {
 		"message": "Ajustes generales"
@@ -389,5 +389,38 @@
 	},
 	"removeProperty": {
 		"message": "Eliminar propiedad"
+	},
+	"removeVault": {
+		"message": "Eliminar bóveda"
+	},
+	"shortcutInstructionsIntro": {
+		"message": "Los atajos de teclado te dan acceso rápido a las funciones del clipper."
+	},
+	"shortcutInstructionsChrome": {
+		"message": "Para cambiar las asignaciones de teclas, ve a $1"
+	},
+	"shortcutInstructionsBrave": {
+		"message": "Para cambiar las asignaciones de teclas, ve a $1"
+	},
+	"shortcutInstructionsFirefox": {
+		"message": "Para cambiar las asignaciones de teclas, ve a $1, haz clic en el icono de engranaje y selecciona \"Gestionar atajos de extensión\"."
+	},
+	"shortcutInstructionsEdge": {
+		"message": "Para cambiar las asignaciones de teclas, ve a $1"
+	},
+	"shortcutInstructionsSafari": {
+		"message": "Los atajos de teclado no están disponibles para extensiones de Safari."
+	},
+	"shortcutInstructionsDefault": {
+		"message": "Para cambiar las asignaciones de teclas, consulta la configuración de extensiones de tu navegador."
+	},
+	"shortcutNotSet": {
+		"message": "No establecido"
+	},
+	"defaultTemplateName": {
+		"message": "Predeterminado"
+	},
+	"failedToResetTemplate": {
+		"message": "Error al restablecer la plantilla predeterminada. Por favor, inténtalo de nuevo."
 	}
 } 

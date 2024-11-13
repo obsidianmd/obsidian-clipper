@@ -66,7 +66,7 @@
 		"message": "Choose the display language for the extension interface."
 	},
 	"systemDefault": {
-		"message": "System default"
+		"message": "System"
 	},
 	"generalSettings": {
 		"message": "General settings"
@@ -389,5 +389,38 @@
 	},
 	"removeProperty": {
 		"message": "Remove property"
+	},
+	"removeVault": {
+		"message": "Remove vault"
+	},
+	"shortcutInstructionsIntro": {
+		"message": "Keyboard shortcuts give you quick access to clipper features."
+	},
+	"shortcutInstructionsChrome": {
+		"message": "To change key assignments, go to $1"
+	},
+	"shortcutInstructionsBrave": {
+		"message": "To change key assignments, go to $1"
+	},
+	"shortcutInstructionsFirefox": {
+		"message": "To change key assignments, go to $1, click the gear icon, and select \"Manage Extension Shortcuts\"."
+	},
+	"shortcutInstructionsEdge": {
+		"message": "To change key assignments, go to $1"
+	},
+	"shortcutInstructionsSafari": {
+		"message": "Keyboard shortcuts are not available for Safari extensions."
+	},
+	"shortcutInstructionsDefault": {
+		"message": "To change key assignments, please refer to your browser's extension settings."
+	},
+	"shortcutNotSet": {
+		"message": "Not set"
+	},
+	"defaultTemplateName": {
+		"message": "Default"
+	},
+	"failedToResetTemplate": {
+		"message": "Failed to reset default template. Please try again."
 	}
 } 

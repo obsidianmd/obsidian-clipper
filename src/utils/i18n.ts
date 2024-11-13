@@ -25,6 +25,14 @@ export function getMessage(messageName: string, substitutions?: string | string[
 
 			let text = messageObj.message;
 
+			// Handle substitutions first
+			if (substitutions) {
+				const subsArray = Array.isArray(substitutions) ? substitutions : [substitutions];
+				subsArray.forEach((sub, index) => {
+					text = text.replace(`$${index + 1}`, sub);
+				});
+			}
+
 			// Handle placeholders if they exist
 			if (messageObj.placeholders) {
 				Object.entries(messageObj.placeholders).forEach(([key, value]) => {
@@ -46,6 +54,14 @@ export function getMessage(messageName: string, substitutions?: string | string[
 		}
 
 		let text = messageObj.message;
+
+		// Handle substitutions first
+		if (substitutions) {
+			const subsArray = Array.isArray(substitutions) ? substitutions : [substitutions];
+			subsArray.forEach((sub, index) => {
+				text = text.replace(`$${index + 1}`, sub);
+			});
+		}
 
 		// Handle placeholders if they exist
 		if (messageObj.placeholders) {
