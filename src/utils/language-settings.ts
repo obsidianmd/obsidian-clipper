@@ -26,7 +26,8 @@ export function getAvailableLanguages(): { code: string; name: string }[] {
 		{ code: 'en', name: 'English' },
 		{ code: 'es', name: 'Español' },
 		{ code: 'fr', name: 'Français' },
-		{ code: 'ja', name: '日本語' }
+		{ code: 'ja', name: '日本語' },
+		{ code: 'zh-CN', name: '简体中文' }
 	];
 }
 

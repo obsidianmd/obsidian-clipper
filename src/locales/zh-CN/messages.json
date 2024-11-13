@@ -1,0 +1,471 @@
+{
+	"addProperty": {
+		"message": "+ 添加属性"
+	},
+	"addToObsidian": {
+		"message": "添加到 Obsidian"
+	},
+	"addVaultPlaceholder": {
+		"message": "按回车键添加保管库"
+	},
+	"advanced": {
+		"message": "高级"
+	},
+	"allProperties": {
+		"message": "所有属性"
+	},
+	"alwaysShowHighlights": {
+		"message": "始终显示高亮"
+	},
+	"alwaysShowHighlightsDescription": {
+		"message": "加载页面时显示已保存的高亮内容。关闭此选项则仅在高亮模式激活时显示高亮。"
+	},
+	"appendToDaily": {
+		"message": "添加到日记末尾"
+	},
+	"appendToExisting": {
+		"message": "添加到现有笔记末尾"
+	},
+	"behavior": {
+		"message": "行为"
+	},
+	"behaviorWarning": {
+		"message": "添加到现有笔记或日记需要 Obsidian 1.7.2 或更高版本。"
+	},
+	"clipBehavior": {
+		"message": "剪藏行为"
+	},
+	"clipBehaviorDescription": {
+		"message": "选择如何将高亮内容保存到 Obsidian。定义 $strong_start${{content}}$strong_end$ 变量。",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"close": {
+		"message": "关闭"
+	},
+	"commandOpenClipper": {
+		"message": "打开 Obsidian 剪藏器"
+	},
+	"commandQuickClip": {
+		"message": "快速剪藏"
+	},
+	"commandToggleHighlighter": {
+		"message": "切换高亮模式"
+	},
+	"confirmDeleteTemplate": {
+		"message": "确定要删除模板「$1」吗？"
+	},
+	"copied": {
+		"message": "已复制！"
+	},
+	"copyAsJson": {
+		"message": "复制为 JSON"
+	},
+	"copyToClipboard": {
+		"message": "复制到剪贴板"
+	},
+	"createNewNote": {
+		"message": "创建新笔记"
+	},
+	"dailyNoteFormat": {
+		"message": "日记格式（如：YYYY-MM-DD）"
+	},
+	"defaultTemplateName": {
+		"message": "默认"
+	},
+	"delete": {
+		"message": "删除"
+	},
+	"disableHighlighter": {
+		"message": "禁用高亮"
+	},
+	"display": {
+		"message": "显示"
+	},
+	"duplicate": {
+		"message": "复制"
+	},
+	"earlyAccessDescription": {
+		"message": "使用需要最新$link_start$早期访问版本$link_end$的 Obsidian 功能。目前需要 Obsidian 1.7.2 或更高版本。",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/Obsidian/Early+access+versions\" target=\"_blank\">"
+			}
+		}
+	},
+	"earlyAccessFeatures": {
+		"message": "早期访问功能"
+	},
+	"editTemplate": {
+		"message": "编辑模板"
+	},
+	"enableHighlighter": {
+		"message": "启用高亮"
+	},
+	"enableHighlighterDescription": {
+		"message": "在网页上高亮内容并保存到 Obsidian。"
+	},
+	"error": {
+		"message": "错误"
+	},
+	"export": {
+		"message": "导出"
+	},
+	"exportAllSettings": {
+		"message": "导出所有设置"
+	},
+	"exportAllSettingsDescription": {
+		"message": "导出包括模板和属性在内的所有设置。"
+	},
+	"exportHighlights": {
+		"message": "导出高亮"
+	},
+	"exportHighlightsDescription": {
+		"message": "将高亮内容导出到文件。"
+	},
+	"exportProperties": {
+		"message": "导出属性"
+	},
+	"exportPropertiesDescription": {
+		"message": "将网页剪藏器的属性保存到 $strong_start$types.json$strong_end$ 文件，可以导入到 Obsidian 保管库或其他设备上的网页剪藏器。",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"extensionDescription": {
+		"message": "以私密且持久的格式保存网页内容，可离线访问。Obsidian 官方浏览器扩展。"
+	},
+	"extensionName": {
+		"message": "Obsidian 网页剪藏器"
+	},
+	"failedToCopyText": {
+		"message": "复制文本失败"
+	},
+	"failedToDeleteTemplate": {
+		"message": "删除模板失败。请重试。"
+	},
+	"failedToExtractContent": {
+		"message": "无法提取页面内容。"
+	},
+	"failedToInitialize": {
+		"message": "请尝试重新加载扩展。"
+	},
+	"failedToInitializeContent": {
+		"message": "无法初始化页面内容。"
+	},
+	"failedToProcessInterpreter": {
+		"message": "解释器处理失败。请重试。"
+	},
+	"failedToSave": {
+		"message": "保存文件失败"
+	},
+	"failedToSaveFile": {
+		"message": "保存文件失败"
+	},
+	"folder": {
+		"message": "文件夹"
+	},
+	"general": {
+		"message": "常规"
+	},
+	"generalSettings": {
+		"message": "常规设置"
+	},
+	"highlightPage": {
+		"message": "高亮页面"
+	},
+	"highlighter": {
+		"message": "高亮"
+	},
+	"highlighterSettings": {
+		"message": "高亮"
+	},
+	"hotkeys": {
+		"message": "快捷键"
+	},
+	"import": {
+		"message": "导入"
+	},
+	"importAllSettings": {
+		"message": "导入所有设置"
+	},
+	"importAllSettingsDescription": {
+		"message": "导入包括模板和属性在内的所有设置。这将替换您当前的配置。"
+	},
+	"importProperties": {
+		"message": "导入属性"
+	},
+	"importPropertiesDescription": {
+		"message": "要从 Obsidian 导入属性，请在保管库中找到 $strong_2_start$.obsidian$strong_2_end$ 文件夹中的 $strong_1_start$types.json$strong_1_end$ 文件。请注意，该文件夹在大多数操作系统中默认是隐藏的。",
+		"placeholders": {
+			"strong_1_end": {
+				"content": "</strong>"
+			},
+			"strong_1_start": {
+				"content": "<strong>"
+			},
+			"strong_2_end": {
+				"content": "</strong>"
+			},
+			"strong_2_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"interpreter": {
+		"message": "解释器"
+	},
+	"interpreterContext": {
+		"message": "解释器上下文"
+	},
+	"interpreterContextDescription": {
+		"message": "用于解释提示变量的上下文。覆盖$link_start$解释器设置$link_end$中定义的默认上下文。此处可以使用变量。",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=interpreter\">"
+			}
+		}
+	},
+	"language": {
+		"message": "语言"
+	},
+	"languageDescription": {
+		"message": "选择扩展界面的显示语言。"
+	},
+	"lastUsed": {
+		"message": "最近使用"
+	},
+	"legacyMode": {
+		"message": "传统模式"
+	},
+	"legacyModeDescription": {
+		"message": "使用与 Obsidian 1.6.7 或更早版本兼容的 URI 剪藏方法。请注意，您可以剪藏的内容长度受浏览器和操作系统限制。某些页面可能会静默失败。"
+	},
+	"more": {
+		"message": "更多"
+	},
+	"newTemplate": {
+		"message": "新建模板"
+	},
+	"noHighlights": {
+		"message": "不执行任何操作"
+	},
+	"noTemplates": {
+		"message": "没有可用的模板。请在设置中添加模板。"
+	},
+	"noteContent": {
+		"message": "笔记内容"
+	},
+	"noteContentDescription": {
+		"message": "自定义笔记内容。使用变量预填充页面数据。"
+	},
+	"noteLocation": {
+		"message": "笔记位置"
+	},
+	"noteLocationDescription": {
+		"message": "笔记的文件夹或路径。"
+	},
+	"noteName": {
+		"message": "笔记名称"
+	},
+	"noteNameFormat": {
+		"message": "笔记名称"
+	},
+	"noteNameFormatDescription": {
+		"message": "笔记文件名的格式。您可以使用 {{title}}、{{date}} 和 {{published}} 等变量预填充页面数据。$link_start$了解更多$link_end$",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/variables\" target=\"_blank\">"
+			}
+		}
+	},
+	"notesAboutPage": {
+		"message": "关于此页面的笔记..."
+	},
+	"onlyHttpSupported": {
+		"message": "无法剪藏此页面。仅支持 http 和 https URL。"
+	},
+	"pageCannotBeClipped": {
+		"message": "无法剪藏此页面。"
+	},
+	"pageVariables": {
+		"message": "页面变量"
+	},
+	"pleaseReload": {
+		"message": "请尝试重新加载页面。"
+	},
+	"prependToDaily": {
+		"message": "添加到日记开头"
+	},
+	"prependToExisting": {
+		"message": "添加到现有笔记开头"
+	},
+	"properties": {
+		"message": "属性"
+	},
+	"propertiesSettings": {
+		"message": "属性"
+	},
+	"propertyName": {
+		"message": "属性名称"
+	},
+	"propertyValue": {
+		"message": "属性值"
+	},
+	"refresh": {
+		"message": "刷新"
+	},
+	"remove": {
+		"message": "移除"
+	},
+	"removeProperty": {
+		"message": "移除属性"
+	},
+	"removeUnusedProperties": {
+		"message": "移除未使用的属性"
+	},
+	"removeUnusedPropertiesDescription": {
+		"message": "移除所有未在任何模板中使用的属性。"
+	},
+	"removeVault": {
+		"message": "移除保管库"
+	},
+	"replaceContent": {
+		"message": "替换页面内容"
+	},
+	"reset": {
+		"message": "重置"
+	},
+	"resetDefaultTemplate": {
+		"message": "重置默认模板"
+	},
+	"resetDefaultTemplateDescription": {
+		"message": "移除对默认模板的所有更改。"
+	},
+	"saveFile": {
+		"message": "保存文件..."
+	},
+	"searchVariables": {
+		"message": "搜索变量..."
+	},
+	"settings": {
+		"message": "设置"
+	},
+	"settingsHeading": {
+		"message": "设置"
+	},
+	"share": {
+		"message": "分享..."
+	},
+	"shortcutInstructionsBrave": {
+		"message": "要更改快捷键，请前往 $1"
+	},
+	"shortcutInstructionsChrome": {
+		"message": "要更改快捷键，请前往 $1"
+	},
+	"shortcutInstructionsDefault": {
+		"message": "要更改快捷键，请参考浏览器的扩展设置。"
+	},
+	"shortcutInstructionsEdge": {
+		"message": "要更改快捷键，请前往 $1"
+	},
+	"shortcutInstructionsFirefox": {
+		"message": "要更改快捷键，请前往 $1，点击齿轮图标并选择“管理扩展快捷方式”"
+	},
+	"shortcutInstructionsIntro": {
+		"message": "键盘快捷键可以快速访问剪藏器功能。"
+	},
+	"shortcutInstructionsSafari": {
+		"message": "Safari 扩展不支持键盘快捷键。"
+	},
+	"shortcutNotSet": {
+		"message": "未设置"
+	},
+	"showActionsButton": {
+		"message": "显示操作按钮"
+	},
+	"showActionsDescription": {
+		"message": "允许从剪藏器菜单查看页面变量。有助于查看模板中可用的变量。"
+	},
+	"showPageVariables": {
+		"message": "显示页面变量"
+	},
+	"silentOpen": {
+		"message": "保存笔记但不打开"
+	},
+	"silentOpenDescription": {
+		"message": "剪藏的笔记将被保存但不会在新标签页中打开。Obsidian 仍会被置于前台。"
+	},
+	"specificNoteName": {
+		"message": "特定笔记名称"
+	},
+	"systemDefault": {
+		"message": "系统默认"
+	},
+	"templateName": {
+		"message": "模板名称"
+	},
+	"templateProperties": {
+		"message": "属性"
+	},
+	"templatePropertiesDescription": {
+		"message": "添加到剪藏笔记顶部的属性。使用变量预填充页面数据。"
+	},
+	"templateTriggers": {
+		"message": "模板触发器"
+	},
+	"templateTriggersDescription": {
+		"message": "定义规则以在匹配 URL 模式或包含 schema.org 数据时自动选择此模板。每行一个规则。"
+	},
+	"templatesHeading": {
+		"message": "模板"
+	},
+	"vault": {
+		"message": "保管库"
+	},
+	"vaultDescription": {
+		"message": "选择此模板的默认保管库。前往$link_start$常规设置$link_end$添加或移除保管库。",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=general\">"
+			}
+		}
+	},
+	"vaults": {
+		"message": "保管库"
+	},
+	"vaultsDescription": {
+		"message": "默认情况下，剪藏的笔记会保存到当前打开的保管库。如果您需要保存到不同的保管库，可以在此处添加保管库。保管库名称必须与 Obsidian 保管库的名称完全匹配。按 $strong_start$回车键$strong_end$ 添加保管库。",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	}
+} 
