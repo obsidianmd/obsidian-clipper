@@ -48,3 +48,4 @@ For Firefox:
 - [lz-string](https://github.com/pieroxy/lz-string) to compress templates to reduce storage space
 - [lucide](https://github.com/lucide-icons/lucide) for icons
 - [mathml-to-latex](https://github.com/asnunes/mathml-to-latex) for MathML to LaTeX conversion
+- [dompurify](https://github.com/cure53/DOMPurify) for sanitizing HTML
