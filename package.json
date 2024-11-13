@@ -14,6 +14,7 @@
 	},
 	"devDependencies": {
 		"@types/chrome": "^0.0.270",
+		"@types/dompurify": "^3.0.5",
 		"@types/lz-string": "^1.5.0",
 		"@types/node": "^22.5.4",
 		"@types/turndown": "^5.0.5",
@@ -36,6 +37,7 @@
 		"@types/mozilla-readability": "^0.2.1",
 		"@types/safari-extension": "^0.0.33",
 		"dayjs": "^1.11.13",
+		"dompurify": "^3.0.9",
 		"lucide": "^0.359.0",
 		"lz-string": "^1.5.0",
 		"mathml-to-latex": "^1.4.1",

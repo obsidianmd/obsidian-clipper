@@ -10,6 +10,7 @@ import { updateTemplateList, showTemplateEditor } from '../managers/template-ui'
 import { exportAllSettings, importAllSettings } from '../utils/import-export';
 import { Template } from '../types/types';
 import { exportHighlights } from './highlights-manager';
+import { getMessage } from '../utils/i18n';
 
 export function updateVaultList(): void {
 	const vaultList = document.getElementById('vault-list') as HTMLUListElement;
@@ -31,7 +32,7 @@ export function updateVaultList(): void {
 
 		const removeBtn = createElementWithClass('button', 'remove-vault-btn clickable-icon');
 		removeBtn.setAttribute('type', 'button');
-		removeBtn.setAttribute('aria-label', 'Remove vault');
+		removeBtn.setAttribute('aria-label', getMessage('removeVault'));
 		removeBtn.appendChild(createElementWithHTML('i', '', { 'data-lucide': 'trash-2' }));
 		li.appendChild(removeBtn);
 
@@ -68,25 +69,25 @@ export async function setShortcutInstructions() {
 		let instructions = '';
 		switch (browser) {
 			case 'chrome':
-				instructions = 'To change key assignments, go to <strong>chrome://extensions/shortcuts</strong>';
+				instructions = getMessage('shortcutInstructionsChrome', ['<strong>chrome://extensions/shortcuts</strong>']);
 				break;
 			case 'brave':
-				instructions = 'To change key assignments, go to <strong>brave://extensions/shortcuts</strong>';
+				instructions = getMessage('shortcutInstructionsBrave', ['<strong>brave://extensions/shortcuts</strong>']);
 				break;
 			case 'firefox':
-				instructions = 'To change key assignments, go to <strong>about:addons</strong>, click the gear icon, and select "Manage Extension Shortcuts".';
+				instructions = getMessage('shortcutInstructionsFirefox', ['<strong>about:addons</strong>']);
 				break;
 			case 'edge':
-				instructions = 'To change key assignments, go to <strong>edge://extensions/shortcuts</strong>';
+				instructions = getMessage('shortcutInstructionsEdge', ['<strong>edge://extensions/shortcuts</strong>']);
 				break;
 			case 'safari':
 			case 'mobile-safari':
-				instructions = 'Keyboard shortcuts are not available for Safari extensions.';
+				instructions = getMessage('shortcutInstructionsSafari');
 				break;
 			default:
-				instructions = 'To change key assignments, please refer to your browser\'s extension settings.';
+				instructions = getMessage('shortcutInstructionsDefault');
 		}
-		shortcutInstructionsElement.innerHTML = 'Keyboard shortcuts give you quick access to clipper features. ' + instructions;
+		shortcutInstructionsElement.innerHTML = getMessage('shortcutInstructionsIntro') + ' ' + instructions;
 	}
 }
 
@@ -179,7 +180,7 @@ async function initializeKeyboardShortcuts(): Promise<void> {
 		// For Safari, display a message about keyboard shortcuts not being available
 		const messageItem = document.createElement('div');
 		messageItem.className = 'shortcut-item';
-		messageItem.textContent = 'Keyboard shortcuts are not available in Safari extensions.';
+		messageItem.textContent = getMessage('shortcutInstructionsSafari');
 		shortcutsList.appendChild(messageItem);
 	} else {
 		// For other browsers, proceed with displaying the shortcuts
@@ -192,7 +193,7 @@ async function initializeKeyboardShortcuts(): Promise<void> {
 				shortcutItem.appendChild(descriptionSpan);
 
 				const hotkeySpan = createElementWithClass('span', 'setting-hotkey');
-				hotkeySpan.textContent = command.shortcut || 'Not set';
+				hotkeySpan.textContent = command.shortcut || getMessage('shortcutNotSet');
 				shortcutItem.appendChild(hotkeySpan);
 
 				shortcutsList.appendChild(shortcutItem);
@@ -241,7 +242,7 @@ function initializeResetDefaultTemplateButton(): void {
 export function resetDefaultTemplate(): void {
 	const defaultTemplate = createDefaultTemplate();
 	const currentTemplates = getTemplates();
-	const defaultIndex = currentTemplates.findIndex((t: Template) => t.name === 'Default');
+	const defaultIndex = currentTemplates.findIndex((t: Template) => t.name === getMessage('defaultTemplateName'));
 	
 	if (defaultIndex !== -1) {
 		currentTemplates[defaultIndex] = defaultTemplate;
@@ -254,7 +255,7 @@ export function resetDefaultTemplate(): void {
 		showTemplateEditor(defaultTemplate);
 	}).catch(error => {
 		console.error('Failed to reset default template:', error);
-		alert('Failed to reset default template. Please try again.');
+		alert(getMessage('failedToResetTemplate'));
 	});
 }
 

@@ -1,0 +1,471 @@
+{
+	"addProperty": {
+		"message": "+ プロパティを追加"
+	},
+	"addToObsidian": {
+		"message": "Obsidianに追加"
+	},
+	"addVaultPlaceholder": {
+		"message": "Enterキーを押して保管庫を追加"
+	},
+	"advanced": {
+		"message": "詳細設定"
+	},
+	"allProperties": {
+		"message": "すべてのプロパティ"
+	},
+	"alwaysShowHighlights": {
+		"message": "常にハイライトを表示"
+	},
+	"alwaysShowHighlightsDescription": {
+		"message": "ページ読み込み時に保存したハイライトを表示します。オフにすると、ハイライトモードが有効な時のみ表示されます。"
+	},
+	"appendToDaily": {
+		"message": "デイリーノートの末尾に追加"
+	},
+	"appendToExisting": {
+		"message": "既存のノートの末尾に追加"
+	},
+	"behavior": {
+		"message": "動作"
+	},
+	"behaviorWarning": {
+		"message": "既存のノートやデイリーノートへの追加にはObsidian 1.7.2以降が必要です。"
+	},
+	"clipBehavior": {
+		"message": "クリップの動作"
+	},
+	"clipBehaviorDescription": {
+		"message": "ハイライトしたコンテンツをObsidianに保存する方法を選択します。$strong_start${{content}}$strong_end$変数を定義します。",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"close": {
+		"message": "閉じる"
+	},
+	"commandOpenClipper": {
+		"message": "Obsidian Clipperを開く"
+	},
+	"commandQuickClip": {
+		"message": "クイッククリップ"
+	},
+	"commandToggleHighlighter": {
+		"message": "ハイライトモードの切り替え"
+	},
+	"confirmDeleteTemplate": {
+		"message": "テンプレート「$1」を削除してもよろしいですか？"
+	},
+	"copied": {
+		"message": "コピーしました！"
+	},
+	"copyAsJson": {
+		"message": "JSONとしてコピー"
+	},
+	"copyToClipboard": {
+		"message": "クリップボードにコピー"
+	},
+	"createNewNote": {
+		"message": "新規ノートを作成"
+	},
+	"dailyNoteFormat": {
+		"message": "デイリーノートの形式（例：YYYY-MM-DD）"
+	},
+	"defaultTemplateName": {
+		"message": "デフォルト"
+	},
+	"delete": {
+		"message": "削除"
+	},
+	"disableHighlighter": {
+		"message": "ハイライトを無効化"
+	},
+	"display": {
+		"message": "表示"
+	},
+	"duplicate": {
+		"message": "複製"
+	},
+	"earlyAccessDescription": {
+		"message": "Obsidianの最新の$link_start$アーリーアクセスバージョン$link_end$が必要な機能を使用します。現在はObsidian 1.7.2以降が必要です。",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/Obsidian/Early+access+versions\" target=\"_blank\">"
+			}
+		}
+	},
+	"earlyAccessFeatures": {
+		"message": "アーリーアクセス機能"
+	},
+	"editTemplate": {
+		"message": "テンプレートを編集"
+	},
+	"enableHighlighter": {
+		"message": "ハイライトを有効化"
+	},
+	"enableHighlighterDescription": {
+		"message": "WebページのコンテンツをハイライトしてObsidianに保存できます。"
+	},
+	"error": {
+		"message": "エラー"
+	},
+	"export": {
+		"message": "エクスポート"
+	},
+	"exportAllSettings": {
+		"message": "すべての設定をエクスポート"
+	},
+	"exportAllSettingsDescription": {
+		"message": "テンプレートとプロパティを含むすべての設定をエクスポートします。"
+	},
+	"exportHighlights": {
+		"message": "ハイライトをエクスポート"
+	},
+	"exportHighlightsDescription": {
+		"message": "ハイライトをファイルにエクスポートします。"
+	},
+	"exportProperties": {
+		"message": "プロパティをエクスポート"
+	},
+	"exportPropertiesDescription": {
+		"message": "Web Clipperのプロパティを$strong_start$types.json$strong_end$ファイルに保存します。このファイルはObsidian保管庫や他のデバイスのWeb Clipperにインポートできます。",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"extensionDescription": {
+		"message": "Webコンテンツをプライベートで永続的なオフラインアクセス可能な形式で保存します。Obsidianの公式ブラウザ拡張機能です。"
+	},
+	"extensionName": {
+		"message": "Obsidian Web Clipper"
+	},
+	"failedToCopyText": {
+		"message": "テキストのコピーに失敗しました"
+	},
+	"failedToDeleteTemplate": {
+		"message": "テンプレートの削除に失敗しまた。もう一度お試しください。"
+	},
+	"failedToExtractContent": {
+		"message": "ページコンテンツの抽出に失敗しました。"
+	},
+	"failedToInitialize": {
+		"message": "拡張機能の再読み込みをお試しください。"
+	},
+	"failedToInitializeContent": {
+		"message": "ページコンテンツの初期化に失敗しました。"
+	},
+	"failedToProcessInterpreter": {
+		"message": "インタープリターの処理に失敗しました。もう一度お試しください。"
+	},
+	"failedToSave": {
+		"message": "ファイルの保存に失敗しました"
+	},
+	"failedToSaveFile": {
+		"message": "ファイルの保存に失敗しました"
+	},
+	"folder": {
+		"message": "フォルダ"
+	},
+	"general": {
+		"message": "一般"
+	},
+	"generalSettings": {
+		"message": "一般設定"
+	},
+	"highlightPage": {
+		"message": "ページをハイライト"
+	},
+	"highlighter": {
+		"message": "ハイライト"
+	},
+	"highlighterSettings": {
+		"message": "ハイライト"
+	},
+	"hotkeys": {
+		"message": "ホットキー"
+	},
+	"import": {
+		"message": "インポート"
+	},
+	"importAllSettings": {
+		"message": "すべての設定をインポート"
+	},
+	"importAllSettingsDescription": {
+		"message": "テンプレートとプロパティを含むすべての設定をインポートします。現在の設定は上書きされます。"
+	},
+	"importProperties": {
+		"message": "プロパティをインポート"
+	},
+	"importPropertiesDescription": {
+		"message": "Obsidianからプロパティをインポートするには、保管庫内の$strong_2_start$.obsidian$strong_2_end$フォルダにある$strong_1_start$types.json$strong_1_end$ファイルを探してください。このフォルダは多くのOSでデフォルトで非表示になっています。",
+		"placeholders": {
+			"strong_1_end": {
+				"content": "</strong>"
+			},
+			"strong_1_start": {
+				"content": "<strong>"
+			},
+			"strong_2_end": {
+				"content": "</strong>"
+			},
+			"strong_2_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"interpreter": {
+		"message": "インタープリター"
+	},
+	"interpreterContext": {
+		"message": "インタープリターコンテキスト"
+	},
+	"interpreterContextDescription": {
+		"message": "プロンプト変数の解釈に使用されるコンテキストです。$link_start$インタープリター設定$link_end$で定義されたデフォルトコンテキストを上書きします。ここで変数を使用できます。",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=interpreter\">"
+			}
+		}
+	},
+	"language": {
+		"message": "言語"
+	},
+	"languageDescription": {
+		"message": "拡張機能のインターフェース表示言語を選択します。"
+	},
+	"lastUsed": {
+		"message": "最後に使用"
+	},
+	"legacyMode": {
+		"message": "レガシーモード"
+	},
+	"legacyModeDescription": {
+		"message": "Obsidian 1.6.7以前と互換性のあるURIクリップ方式を使用します。クリップできるコンテンツの長さはブラウザとOSによって制限されます。エラーなしに失敗する場合があります。"
+	},
+	"more": {
+		"message": "その他"
+	},
+	"newTemplate": {
+		"message": "新規テンプレート"
+	},
+	"noHighlights": {
+		"message": "何もしない"
+	},
+	"noTemplates": {
+		"message": "テンプレートがありません。設定でテンプレートを追加してください。"
+	},
+	"noteContent": {
+		"message": "ノートの内容"
+	},
+	"noteContentDescription": {
+		"message": "ノートの内容をカスタマイズします。変数を使用してページのデータを事前に入力できます。"
+	},
+	"noteLocation": {
+		"message": "ノートの場所"
+	},
+	"noteLocationDescription": {
+		"message": "ノートのフォルダまたはパス。"
+	},
+	"noteName": {
+		"message": "ノート名"
+	},
+	"noteNameFormat": {
+		"message": "ノート名"
+	},
+	"noteNameFormatDescription": {
+		"message": "ノートのファイル名の形式です。{{title}}、{{date}}、{{published}}などの変数を使用してページのデータを事前に入力できます。$link_start$詳細$link_end$",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/variabless\" target=\"_blank\">"
+			}
+		}
+	},
+	"notesAboutPage": {
+		"message": "このページに関するノート..."
+	},
+	"onlyHttpSupported": {
+		"message": "このページはクリップできません。httpとhttpsのURLのみがサポートされています。"
+	},
+	"pageCannotBeClipped": {
+		"message": "このページはクリップできません。"
+	},
+	"pageVariables": {
+		"message": "ページ変数"
+	},
+	"pleaseReload": {
+		"message": "ページの再読み込みをお試しください。"
+	},
+	"prependToDaily": {
+		"message": "デイリーノートの先頭に追加"
+	},
+	"prependToExisting": {
+		"message": "既存のノートの先頭に追加"
+	},
+	"properties": {
+		"message": "プロパティ"
+	},
+	"propertiesSettings": {
+		"message": "プロパティ"
+	},
+	"propertyName": {
+		"message": "プロパティ名"
+	},
+	"propertyValue": {
+		"message": "プロパティ値"
+	},
+	"refresh": {
+		"message": "更新"
+	},
+	"remove": {
+		"message": "削除"
+	},
+	"removeProperty": {
+		"message": "プロパティを削除"
+	},
+	"removeUnusedProperties": {
+		"message": "未使用のプロパティを削除"
+	},
+	"removeUnusedPropertiesDescription": {
+		"message": "どのテンプレートでも使用されていないプロパティをすべて削除します。"
+	},
+	"removeVault": {
+		"message": "保管庫を削除"
+	},
+	"replaceContent": {
+		"message": "ページコンテンツを置換"
+	},
+	"reset": {
+		"message": "リセット"
+	},
+	"resetDefaultTemplate": {
+		"message": "デフォルトテンプレートをリセット"
+	},
+	"resetDefaultTemplateDescription": {
+		"message": "デフォルトテンプレートへの変更をすべて削除します。"
+	},
+	"saveFile": {
+		"message": "ファイルを保存..."
+	},
+	"searchVariables": {
+		"message": "変数を検索..."
+	},
+	"settings": {
+		"message": "設定"
+	},
+	"settingsHeading": {
+		"message": "設定"
+	},
+	"share": {
+		"message": "共有..."
+	},
+	"shortcutInstructionsBrave": {
+		"message": "キー割り当てを変更するには、$1に移動してください"
+	},
+	"shortcutInstructionsChrome": {
+		"message": "キー割り当てを変更するには、$1に移動してください"
+	},
+	"shortcutInstructionsDefault": {
+		"message": "キー割り当てを変更するには、ブラウザの拡張機能設定を参照してください。"
+	},
+	"shortcutInstructionsEdge": {
+		"message": "キー割り当てを変更するには、$1に移動してください"
+	},
+	"shortcutInstructionsFirefox": {
+		"message": "キー割り当てを変更するには、$1に移動し、歯車アイコンをクリックして「拡張機能のショートカットを管理」を選択してください。"
+	},
+	"shortcutInstructionsIntro": {
+		"message": "キーボードショートカットでクリッパー機能に素早くアクセスできます。"
+	},
+	"shortcutInstructionsSafari": {
+		"message": "Safariの拡張機能ではキーボードショートカットは利用できません。"
+	},
+	"shortcutNotSet": {
+		"message": "未設定"
+	},
+	"showActionsButton": {
+		"message": "アクションボタンを表示"
+	},
+	"showActionsDescription": {
+		"message": "クリッパーメニューからページ変数を確認できます。テンプレートで使用可能な変数を確認するのに便利です。"
+	},
+	"showPageVariables": {
+		"message": "ページ変数を表示"
+	},
+	"silentOpen": {
+		"message": "ノートを開かずに保存"
+	},
+	"silentOpenDescription": {
+		"message": "クリップしたノートは保存されますが、新しいタブで開きません。Obsidianは引き続き前面に表示されます。"
+	},
+	"specificNoteName": {
+		"message": "特定のノート名"
+	},
+	"systemDefault": {
+		"message": "システム"
+	},
+	"templateName": {
+		"message": "テンプレート名"
+	},
+	"templateProperties": {
+		"message": "プロパティ"
+	},
+	"templatePropertiesDescription": {
+		"message": "クリップしたノートの先頭に追加するプロパティです。変数を使用してページのデータを事前に入力できます。"
+	},
+	"templateTriggers": {
+		"message": "テンプレートトリガー"
+	},
+	"templateTriggersDescription": {
+		"message": "URLパターンやschema.orgデータに一致する場合に、このテンプレートを自動的に択するルールを定義します。1行に1つのルールを述してください。"
+	},
+	"templatesHeading": {
+		"message": "テンプレート"
+	},
+	"vault": {
+		"message": "保管庫"
+	},
+	"vaultDescription": {
+		"message": "このテンプレートのデフォルト保管庫を選択します。保管庫の追加や削除は$link_start$一般設定$link_end$で行えます。",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=general\">"
+			}
+		}
+	},
+	"vaults": {
+		"message": "保管庫"
+	},
+	"vaultsDescription": {
+		"message": "デフォルトでは、クリップしたノートは現在開いている保管庫に保存されます。異なる保管庫に保存するオプションが必要な場合は、ここで保管庫を追加できます。保管庫名はObsidian保管庫の名前と完全に一致する必要があります。$strong_start$Enter$strong_end$キーを押して保管庫を追加します。",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	}
+} 

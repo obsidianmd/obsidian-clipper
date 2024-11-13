@@ -1,5 +1,6 @@
 {
 	"manifest_version": 3,
+	"default_locale": "en",
 	"name": "Obsidian Web Clipper",
 	"homepage_url": "https://obsidian.md/",
 	"version": "0.9.5",

@@ -12,14 +12,14 @@
 			<div id="settings-container">
 				<div id="sidebar">
 					<ul>
-						<li class="sidebar-heading">Settings</li>
-						<li data-section="general" class="active">General</li>
-						<li data-section="properties">Properties</li>
-						<li data-section="highlighter">Highlighter</li>
-						<li data-section="interpreter" display="none">Interpreter</li>
-						<li class="sidebar-heading">Templates</li>
+						<li class="sidebar-heading" data-i18n="settingsHeading">Settings</li>
+						<li data-section="general" class="active" data-i18n="general">General</li>
+						<li data-section="properties" data-i18n="properties">Properties</li>
+						<li data-section="highlighter" data-i18n="highlighter">Highlighter</li>
+						<li data-section="interpreter" display="none" data-i18n="interpreter">Interpreter</li>
+						<li class="sidebar-heading" data-i18n="templatesHeading">Templates</li>
 					</ul>
-					<button type="button" id="new-template-btn" class="mod-cta">New&nbsp;template</button>
+					<button type="button" id="new-template-btn" class="mod-cta" data-i18n="newTemplate">New&nbsp;template</button>
 					<ul id="template-list"></ul>
 					
 				</div>
@@ -37,116 +37,134 @@
 					</div>
 					<div id="general-section" class="settings-section active">
 						<div class="settings-section-header">
-							<h2>General settings</h2>
+							<h2 data-i18n="generalSettings">General settings</h2>
 						</div>
 						<form id="general-settings-form">
-								<div>
-									<h3>Vaults</h3>
-									<div class="setting-item-description">By default, clipped notes are saved to the currently open vault. You can add vaults here if you want the option to save to different vaults. Vault names must exactly match the name of the Obsidian vault. Press <strong>enter</strong> to add a&nbsp;vault.</div>
-									<input type="text" id="vault-input" placeholder="Press enter to add a vault" autocomplete="off" spellcheck="false" />
-									<ul id="vault-list"></ul>
+							<div>
+								<h3 data-i18n="display">Display</h3>
+								<div class="setting-item mod-horizontal">
+									<div class="setting-item-info">
+										<label for="language-select" data-i18n="language">Language</label>
+										<div class="setting-item-description" data-i18n="languageDescription">
+											Choose the display language for the extension interface.
+										</div>
+									</div>
+									<div class="setting-item-control">
+										<select id="language-select">
+											<option value="" data-i18n="systemDefault">System default</option>
+											<option value="en">English</option>
+											<option value="es">Español</option>
+										</select>
+									</div>
 								</div>
-								<div id="hotkeys-subsection">
-									<h3>Hotkeys</h3>
-									<div class="setting-item-description shortcut-instructions">
-									</div>
-									<div id="keyboard-shortcuts-list"></div>
+							</div>
+							<div>
+								<h3 data-i18n="vaults">Vaults</h3>
+								<div class="setting-item-description" data-i18n="vaultsDescription">By default, clipped notes are saved to the currently open vault. You can add vaults here if you want the option to save to different vaults. Vault names must exactly match the name of the Obsidian vault. Press <strong>enter</strong> to add a&nbsp;vault.</div>
+								<input type="text" id="vault-input" data-i18n="addVaultPlaceholder" placeholder="Press enter to add a vault" autocomplete="off" spellcheck="false" />
+								<ul id="vault-list"></ul>
+							</div>
+							<div id="hotkeys-subsection">
+								<h3 data-i18n="hotkeys">Hotkeys</h3>
+								<div class="setting-item-description shortcut-instructions">
 								</div>
-								<div>
-									<h3>Advanced</h3>
-									<div class="setting-item mod-horizontal" style="display: none;">
-										<div class="setting-item-info">
-											<label for="show-more-actions-toggle">Show actions button</label>
-											<div class="setting-item-description">
-												Allows you to inspect page variables from the clipper menu. Useful for seeing the variables that are available to use in&nbsp;templates.
-											</div>
-										</div>
-										<div class="setting-item-control">
-											<div class="checkbox-container is-enabled">
-												<input type="checkbox" id="show-more-actions-toggle" />
-											</div>
+								<div id="keyboard-shortcuts-list"></div>
+							</div>
+							<div>
+								<h3 data-i18n="advanced">Advanced</h3>
+								<div class="setting-item mod-horizontal" style="display: none;">
+									<div class="setting-item-info">
+										<label for="show-more-actions-toggle" data-i18n="showActionsButton">Show actions button</label>
+										<div class="setting-item-description" data-i18n="showActionsDescription">
+											Allows you to inspect page variables from the clipper menu. Useful for seeing the variables that are available to use in&nbsp;templates.
 										</div>
 									</div>
-									<div class="setting-item mod-horizontal" style="display: none;">
-										<div class="setting-item-info">
-											<label for="beta-features-toggle">Early access features</label>
-											<div class="setting-item-description">
-												Use features that require the latest <a href="https://help.obsidian.md/Obsidian/Early+access+versions" target="_blank">early access version</a> of Obsidian. Currently requires Obsidian 1.7.2 or later.
-											</div>
-										</div>
-										<div class="setting-item-control">
-											<div class="checkbox-container">
-												<input type="checkbox" id="beta-features-toggle" />
-											</div>
-										</div>
-									</div>
-									<div class="setting-item mod-horizontal">
-										<div class="setting-item-info">
-											<label for="silent-open-toggle">Save clipped note without opening&nbsp;it</label>
-											<div class="setting-item-description">
-												Clipped notes will be saved but will not open as a new tab. Obsidian will still be brought to the foreground.
-											</div>
-										</div>
-										<div class="setting-item-control">
-											<div class="checkbox-container">
-												<input type="checkbox" id="silent-open-toggle" />
-											</div>
-										</div>
-									</div>
-									<div class="setting-item mod-horizontal">
-										<div class="setting-item-info">
-											<label for="legacy-mode-toggle">Legacy&nbsp;mode</label>
-											<div class="setting-item-description">
-												Uses the URI clipping method compatible with Obsidian 1.6.7 or earlier. Note that the length of the content you can clip is limited by your browser and OS. Some pages may fail without any errors.
-											</div>
-										</div>
-										<div class="setting-item-control">
-											<div class="checkbox-container">
-												<input type="checkbox" id="legacy-mode-toggle" />
-											</div>
-										</div>
-									</div>
-									<div class="setting-item mod-horizontal">
-										<div class="setting-item-info">
-											<label for="reset-default-template-btn">Reset default template</label>
-											<div class="setting-item-description">Remove any changes you've made to the default&nbsp;template.</div>
-										</div>
-										<div class="setting-item-control">
-											<button type="button" id="reset-default-template-btn" class="mod-warning">Reset</button>
-										</div>
-									</div>
-									<div class="setting-item mod-horizontal">
-										<div class="setting-item-info">
-											<label for="export-all-settings-btn">Export all settings</label>
-											<div class="setting-item-description">Export all settings including templates and properties.</div>
-										</div>
-										<div class="setting-item-control">
-											<button type="button" id="export-all-settings-btn">Export</button>
-										</div>
-									</div>
-									<div class="setting-item mod-horizontal">
-										<div class="setting-item-info">
-											<label for="import-all-settings-btn">Import all settings</label>
-											<div class="setting-item-description">Import all settings including templates and properties. This will replace your current configuration.</div>
-										</div>
-										<div class="setting-item-control">
-											<button type="button" id="import-all-settings-btn">Import</button>
+									<div class="setting-item-control">
+										<div class="checkbox-container is-enabled">
+											<input type="checkbox" id="show-more-actions-toggle" />
 										</div>
 									</div>
 								</div>
+								<div class="setting-item mod-horizontal" style="display: none;">
+									<div class="setting-item-info">
+										<label for="beta-features-toggle" data-i18n="earlyAccessFeatures">Early access features</label>
+										<div class="setting-item-description" data-i18n="earlyAccessDescription">
+											Use features that require the latest <a href="https://help.obsidian.md/Obsidian/Early+access+versions" target="_blank">early access version</a> of Obsidian. Currently requires Obsidian 1.7.2 or later.
+										</div>
+									</div>
+									<div class="setting-item-control">
+										<div class="checkbox-container">
+											<input type="checkbox" id="beta-features-toggle" />
+										</div>
+									</div>
+								</div>
+								<div class="setting-item mod-horizontal">
+									<div class="setting-item-info">
+										<label for="silent-open-toggle" data-i18n="silentOpen">Save clipped note without opening&nbsp;it</label>
+										<div class="setting-item-description" data-i18n="silentOpenDescription">
+											Clipped notes will be saved but will not open as a new tab. Obsidian will still be brought to the foreground.
+										</div>
+									</div>
+									<div class="setting-item-control">
+										<div class="checkbox-container">
+											<input type="checkbox" id="silent-open-toggle" />
+										</div>
+									</div>
+								</div>
+								<div class="setting-item mod-horizontal">
+									<div class="setting-item-info">
+										<label for="legacy-mode-toggle" data-i18n="legacyMode">Legacy&nbsp;mode</label>
+										<div class="setting-item-description" data-i18n="legacyModeDescription">
+											Uses the URI clipping method compatible with Obsidian 1.6.7 or earlier. Note that the length of the content you can clip is limited by your browser and OS. Some pages may fail without any errors.
+										</div>
+									</div>
+									<div class="setting-item-control">
+										<div class="checkbox-container">
+											<input type="checkbox" id="legacy-mode-toggle" />
+										</div>
+									</div>
+								</div>
+								<div class="setting-item mod-horizontal">
+									<div class="setting-item-info">
+										<label for="reset-default-template-btn" data-i18n="resetDefaultTemplate">Reset default template</label>
+										<div class="setting-item-description" data-i18n="resetDefaultTemplateDescription">Remove any changes you've made to the default&nbsp;template.</div>
+									</div>
+									<div class="setting-item-control">
+										<button type="button" id="reset-default-template-btn" class="mod-warning" data-i18n="reset">Reset</button>
+									</div>
+								</div>
+								<div class="setting-item mod-horizontal">
+									<div class="setting-item-info">
+										<label for="export-all-settings-btn" data-i18n="exportAllSettings">Export all settings</label>
+										<div class="setting-item-description" data-i18n="exportAllSettingsDescription">Export all settings including templates and properties.</div>
+									</div>
+									<div class="setting-item-control">
+										<button type="button" id="export-all-settings-btn" data-i18n="export">Export</button>
+									</div>
+								</div>
+								<div class="setting-item mod-horizontal">
+									<div class="setting-item-info">
+										<label for="import-all-settings-btn" data-i18n="importAllSettings">Import all settings</label>
+										<div class="setting-item-description" data-i18n="importAllSettingsDescription">Import all settings including templates and properties. This will replace your current configuration.</div>
+									</div>
+									<div class="setting-item-control">
+										<button type="button" id="import-all-settings-btn" data-i18n="import">Import</button>
+									</div>
+								</div>
+							</div>
 						</form>
 					</div>
 
 					<div id="highlighter-section" class="settings-section">
 						<div class="settings-section-header">
-							<h2>Highlighter</h2>
+							<h2 data-i18n="highlighterSettings">Highlighter</h2>
 						</div>
 						<form id="highlighter-settings-form">
 							<div class="setting-item mod-horizontal" style="display: none;">
 								<div class="setting-item-info">
-									<label for="highlighter-toggle">Enable highlighter</label>
-									<div class="setting-item-description">
-										Highlight content on web pages that you can save to&nbsp;Obsidian.
+									<label for="highlighter-toggle" data-i18n="enableHighlighter">Enable highlighter</label>
+									<div class="setting-item-description" data-i18n="enableHighlighterDescription">
+										Highlight content on web pages that you can save to Obsidian.
 									</div>
 								</div>
 								<div class="setting-item-control">
@@ -157,17 +175,19 @@
 							</div>
 							<div class="setting-item mod-horizontal">
 								<div class="setting-item-info">
-									<label for="export-highlights">Export highlights</label>
-									<div class="setting-item-description">Export your highlights to a file.</div>
+									<label for="export-highlights" data-i18n="exportHighlights">Export highlights</label>
+									<div class="setting-item-description" data-i18n="exportHighlightsDescription">
+										Export your highlights to a file.
+									</div>
 								</div>
 								<div class="setting-item-control">
-									<button type="button" id="export-highlights">Export</button>
+									<button type="button" id="export-highlights" data-i18n="export">Export</button>
 								</div>
 							</div>
 							<div class="setting-item mod-horizontal">
 								<div class="setting-item-info">
-									<label for="highlighter-visibility">Always show highlights</label>
-									<div class="setting-item-description">
+									<label for="highlighter-visibility" data-i18n="alwaysShowHighlights">Always show highlights</label>
+									<div class="setting-item-description" data-i18n="alwaysShowHighlightsDescription">
 										Display your saved highlights when you load a page. Turn off to only display highlights when highlighter mode is activated.
 									</div>
 								</div>
@@ -180,15 +200,15 @@
 							
 							<div class="setting-item">
 								<div class="setting-item-info">
-									<label for="highlighter-behavior" style="font-weight: 400;">Clip behavior</label>
-									<div class="setting-item-description">
+									<label for="highlighter-behavior" style="font-weight: 400;" data-i18n="clipBehavior">Clip behavior</label>
+									<div class="setting-item-description" data-i18n="clipBehaviorDescription">
 										Choose how highlighted content is saved to Obsidian. Defines the <strong>{{content}}</strong> variable.
 									</div>
 								</div>
 								<div class="setting-item-control">
 									<select id="highlighter-behavior">
-										<option value="replace-content">Replace the page content</option>
-										<option value="no-highlights">Do nothing</option>
+										<option value="replace-content" data-i18n="replaceContent">Replace the page content</option>
+										<option value="no-highlights" data-i18n="noHighlights">Do nothing</option>
 									</select>
 								</div>
 							</div>
@@ -264,40 +284,46 @@
 
 					<div id="properties-section" class="settings-section">
 						<div class="settings-section-header">
-							<h2>Properties</h2>
+							<h2 data-i18n="propertiesSettings">Properties</h2>
 						</div>
 						<form id="property-types-form">
 							<div>
 								<div class="setting-item mod-horizontal">
 									<div class="setting-item-info">
-										<label for="import-types-btn">Import properties</label>
-										<div class="setting-item-description">To import your properties from Obsidian, locate the <strong>types.json</strong> file in the <strong>.obsidian</strong> folder within your vault. Note this folder is hidden by default on most operating systems.</div>
+										<label for="import-types-btn" data-i18n="importProperties">Import properties</label>
+										<div class="setting-item-description" data-i18n="importPropertiesDescription">
+											To import your properties from Obsidian, locate the <strong>types.json</strong> file in the <strong>.obsidian</strong> folder within your vault. Note this folder is hidden by default on most operating systems.
+										</div>
 									</div>
 									<div class="setting-item-control">
-										<button type="button" id="import-types-btn">Import</button>
+										<button type="button" id="import-types-btn" data-i18n="import">Import</button>
 									</div>
 								</div>
 								<div class="setting-item mod-horizontal">
 									<div class="setting-item-info">
-										<label for="export-types-btn">Export properties</label>
-										<div class="setting-item-description">Save Web Clipper properties to a <strong>types.json</strong> file that can be imported into your Obsidian vault, or into Web Clipper on other devices.</div>
+										<label for="export-types-btn" data-i18n="exportProperties">Export properties</label>
+										<div class="setting-item-description" data-i18n="exportPropertiesDescription">
+											Save Web Clipper properties to a <strong>types.json</strong> file that can be imported into your Obsidian vault, or into Web Clipper on other devices.
+										</div>
 									</div>
 									<div class="setting-item-control">
-										<button type="button" id="export-types-btn">Export</button>
+										<button type="button" id="export-types-btn" data-i18n="export">Export</button>
 									</div>
 								</div>
 								<div class="setting-item mod-horizontal">
 									<div class="setting-item-info">
-										<label for="delete-unused-properties-btn">Remove unused properties</label>
-										<div class="setting-item-description">Remove all properties that are not used in any template.</div>
+										<label for="delete-unused-properties-btn" data-i18n="removeUnusedProperties">Remove unused properties</label>
+										<div class="setting-item-description" data-i18n="removeUnusedPropertiesDescription">
+											Remove all properties that are not used in any template.
+										</div>
 									</div>
 									<div class="setting-item-control">
-										<button type="button" id="delete-unused-properties-btn">Remove</button>
+										<button type="button" id="delete-unused-properties-btn" data-i18n="remove">Remove</button>
 									</div>
 								</div>
 							</div>
 							<div>
-								<h3>All properties</h3>
+								<h3 data-i18n="allProperties">All properties</h3>
 								<div class="add-btn" style="display: none;">
 									<a id="add-property-type-btn">+ Add property</a>
 								</div>
@@ -309,18 +335,18 @@
 
 					<div id="templates-section" class="settings-section">
 						<div class="settings-section-header">
-							<h2 id="template-editor-title">Edit template</h2>
+							<h2 id="template-editor-title" data-i18n="editTemplate">Edit template</h2>
 							<div class="settings-section-actions">
-								<button class="export-template-btn mh">Export</button>
-								<button class="import-template-btn mh">Import</button>
+								<button class="export-template-btn mh" data-i18n="export">Export</button>
+								<button class="import-template-btn mh" data-i18n="import">Import</button>
 								<div class="menu-btn">
-									<button id="more-actions-btn" class="menu-toggle">More</button>
+									<button id="more-actions-btn" class="menu-toggle" data-i18n="more">More</button>
 									<div id="template-actions-menu" class="menu">
 										<div class="menu-item" id="duplicate-template-btn">
 											<div class="menu-item-icon">
 												<i data-lucide="copy-plus"></i>
 											</div>
-											<div class="menu-item-title">
+											<div class="menu-item-title" data-i18n="duplicate">
 												Duplicate
 											</div>
 										</div>
@@ -328,7 +354,7 @@
 											<div class="menu-item-icon">
 												<i data-lucide="copy"></i>
 											</div>
-											<div class="menu-item-title">
+											<div class="menu-item-title" data-i18n="copyAsJson">
 												Copy as JSON
 											</div>
 										</div>
@@ -336,7 +362,7 @@
 											<div class="menu-item-icon">
 												<i data-lucide="files"></i>
 											</div>
-											<div class="menu-item-title">
+											<div class="menu-item-title" data-i18n="export">
 												Export
 											</div>
 										</div>
@@ -344,7 +370,7 @@
 											<div class="menu-item-icon">
 												<i data-lucide="import"></i>
 											</div>
-											<div class="menu-item-title">
+											<div class="menu-item-title" data-i18n="import">
 												Import
 											</div>
 										</div>
@@ -352,7 +378,7 @@
 											<div class="menu-item-icon">
 												<i data-lucide="trash-2"></i>
 											</div>
-											<div class="menu-item-title">
+											<div class="menu-item-title" data-i18n="delete">
 												Delete
 											</div>
 										</div>
@@ -363,63 +389,65 @@
 						<form id="template-settings-form">
 							<div id="template-editor">
 								<div class="setting-item">
-									<label for="template-name">Template name</label>
-									<input type="text" id="template-name" placeholder="Template name" />
+									<label for="template-name" data-i18n="templateName">Template name</label>
+									<input type="text" id="template-name" data-i18n="templateName" placeholder="Template name" />
 								</div>
 								<div class="setting-item">
-									<label for="template-behavior">Behavior</label>
+									<label for="template-behavior" data-i18n="behavior">Behavior</label>
 									<select id="template-behavior">
-										<option value="create">Create new note</option>
-										<option value="append-specific">Add to an existing note, at the bottom</option>
-										<option value="prepend-specific">Add to an existing note, at the top</option>
-										<option value="append-daily">Add to daily note, at the bottom</option>
-										<option value="prepend-daily">Add to daily note, at the top</option>
+										<option value="create" data-i18n="createNewNote">Create new note</option>
+										<option value="append-specific" data-i18n="appendToExisting">Add to an existing note, at the bottom</option>
+										<option value="prepend-specific" data-i18n="prependToExisting">Add to an existing note, at the top</option>
+										<option value="append-daily" data-i18n="appendToDaily">Add to daily note, at the bottom</option>
+										<option value="prepend-daily" data-i18n="prependToDaily">Add to daily note, at the top</option>
 									</select>
 								</div>
 								<div id="behavior-warning-container" class="warning-container" style="display: none;">
 									<div class="warning-icon">
 										<i data-lucide="alert-triangle"></i>
 									</div>
-									<div class="warning-text">
+									<div class="warning-text" data-i18n="behaviorWarning">
 										Adding to an existing note or daily note requires Obsidian 1.7.2 or later.
 									</div>
 								</div>
 								<div class="setting-item" id="note-name-format-container" style="display: none;">
-									<label for="note-name-format">Note name</label>
-									<div class="setting-item-description">Format for the file name of the note. You can use variables like {{title}}, {{date}}, and {{published}} to pre-populate data from the&nbsp;page. <a href="https://github.com/obsidianmd/obsidian-clipper?tab=readme-ov-file#template-variables" target="_blank">Learn&nbsp;more</a>.</div>
+									<label for="note-name-format" data-i18n="noteNameFormat">Note name</label>
+									<div class="setting-item-description" data-i18n="noteNameFormatDescription">Format for the file name of the note. You can use variables like {{title}}, {{date}}, and {{published}} to pre-populate data from the page.</div>
 									<input type="text" id="note-name-format" placeholder="{{title}}" />
 								</div>
 								<div class="setting-item" id="path-name-container" style="display: none;">
-									<label for="template-path-name">Note location</label>
-									<div class="setting-item-description">The folder or path of the note.</div>
+									<label for="template-path-name" data-i18n="noteLocation">Note location</label>
+									<div class="setting-item-description" data-i18n="noteLocationDescription">The folder or path of the note.</div>
 									<input type="text" id="template-path-name" placeholder="Clippings" />
 								</div>
 								<div class="setting-item">
-									<label for="template-vault">Vault</label>
-									<div class="setting-item-description">Select the default vault for this template. Go to <a href="?section=general">general settings</a> to add or remove&nbsp;vaults.</div>
+									<label for="template-vault" data-i18n="vault">Vault</label>
+									<div class="setting-item-description" data-i18n="vaultDescription">Select the default vault for this template. Go to general settings to add or remove vaults.</div>
 									<select id="template-vault">
-										<option value="">Last used</option>
+										<option value="" data-i18n="lastUsed">Last used</option>
 									</select>
 								</div>
 								<div class="setting-item">
-									<label for="url-patterns">Template triggers</label>
-									<div class="setting-item-description">Define rules to automatically select this template if it matches a URL pattern or contains schema.org data. One rule per&nbsp;line.</div>
+									<label for="url-patterns" data-i18n="templateTriggers">Template triggers</label>
+									<div class="setting-item-description" data-i18n="templateTriggersDescription">Define rules to automatically select this template if it matches a URL pattern or contains schema.org data. One rule per line.</div>
 									<textarea id="url-patterns" placeholder="https://example.com/" rows="2" spellcheck="false"></textarea>
 								</div>
 								<div id="properties-container">
-									<label>Properties</label>
-									<div class="setting-item-description">Properties to add to the top of the clipped note. Use variables to pre-populate data from the&nbsp;page.</div>
+									<label data-i18n="templateProperties">Properties</label>
+									<div class="setting-item-description" data-i18n="templatePropertiesDescription">Properties to add to the top of the clipped note. Use variables to pre-populate data from the page.</div>
 									<div id="template-properties" class="properties-list"></div>
-									<div class="add-btn metadata-add-btn"><a id="add-property-btn">+ Add property</a></div>
+									<div class="add-btn metadata-add-btn">
+										<a id="add-property-btn" data-i18n="addProperty">+ Add property</a>
+									</div>
 								</div>
 								<div class="setting-item">
-									<label for="note-content-format">Note content</label>
-									<div class="setting-item-description">Customize the content of the note. Use variables to pre-populate data from the&nbsp;page.</div>
+									<label for="note-content-format" data-i18n="noteContent">Note content</label>
+									<div class="setting-item-description" data-i18n="noteContentDescription">Customize the content of the note. Use variables to pre-populate data from the page.</div>
 									<textarea id="note-content-format" rows="6" placeholder="{{content}}"></textarea>
 								</div>
 								<div class="setting-item" id="prompt-context-container">
-									<label for="prompt-context">Interpreter context</label>
-									<div class="setting-item-description">The context used to interpret prompt variables. Overrides the default context defined in <a href="?section=interpreter">Interpreter settings</a>. Variables can be used&nbsp;here.</div>
+									<label for="prompt-context" data-i18n="interpreterContext">Interpreter context</label>
+									<div class="setting-item-description" data-i18n="interpreterContextDescription">The context used to interpret prompt variables. Overrides the default context defined in Interpreter settings. Variables can be used here.</div>
 									<textarea id="prompt-context" rows="4" spellcheck="false"></textarea>
 								</div>
 							</div>

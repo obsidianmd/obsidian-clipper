@@ -25,6 +25,8 @@ import { updateUrl, getUrlParameters } from '../utils/routing';
 import { addBrowserClassToHtml } from '../utils/browser-detection';
 import { initializeMenu } from '../managers/menu';
 import { addMenuItemListener } from '../managers/menu';
+import { getCurrentLanguage, setLanguage, getAvailableLanguages, getMessage } from '../utils/language-settings';
+import { translatePage } from '../utils/i18n';
 
 declare global {
 	interface Window {
@@ -40,6 +42,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 	const newTemplateBtn = document.getElementById('new-template-btn') as HTMLButtonElement;
 
 	async function initializeSettings(): Promise<void> {
+		// Initialize translations first
+		await translatePage();
+		
 		await initializeGeneralSettings();
 		await initializeInterpreterSettings();
 		const loadedTemplates = await loadTemplates();
@@ -51,6 +56,40 @@ document.addEventListener('DOMContentLoaded', async () => {
 		initializeMenu('more-actions-btn', 'template-actions-menu');
 
 		createIcons({ icons });
+
+		// Initialize language selector
+		const languageSelect = document.getElementById('language-select') as HTMLSelectElement;
+		if (languageSelect) {
+			await initializeLanguageSelector(languageSelect);
+		}
+	}
+
+	async function initializeLanguageSelector(languageSelect: HTMLSelectElement): Promise<void> {
+		try {
+			// Initialize i18n first
+			await translatePage();
+			
+			// Populate language options
+			const languages = getAvailableLanguages();
+			const currentLanguage = await getCurrentLanguage();
+			
+			languageSelect.innerHTML = languages.map(lang => {
+				const displayName = lang.code === '' ? getMessage('systemDefault') : lang.name;
+				return `<option value="${lang.code}" ${lang.code === currentLanguage ? 'selected' : ''}>${displayName}</option>`;
+			}).join('');
+
+			// Add change listener
+			languageSelect.addEventListener('change', async () => {
+				try {
+					await setLanguage(languageSelect.value);
+					window.location.reload(); // Force reload the current page
+				} catch (error) {
+					console.error('Failed to change language:', error);
+				}
+			});
+		} catch (error) {
+			console.error('Failed to initialize language selector:', error);
+		}
 	}
 
 	function initializeTemplateListeners(): void {
@@ -137,6 +176,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 		initializeDragAndDrop();
 		handleTemplateDrag();
 	}
+
 	await addBrowserClassToHtml();
 	await initializeSettings();
 });
