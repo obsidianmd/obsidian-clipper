@@ -55,14 +55,14 @@
 				"default": "Alt+Shift+O",
 				"mac": "Alt+Shift+O"
 			},
-			"description": "Open Obsidian Clipper"
+			"description": "__MSG_commandOpenClipper__"
 		},
 		"toggle_highlighter": {
 			"suggested_key": {
 				"default": "Alt+H",
 				"mac": "Alt+H"
 			},
-			"description": "Toggle highlighter mode"
+			"description": "__MSG_commandToggleHighlighter__"
 		}
 	},
 	"browser_specific_settings": {

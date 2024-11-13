@@ -461,5 +461,14 @@
 	},
 	"failedToDeleteTemplate": {
 		"message": "Failed to delete template. Please try again."
+	},
+	"commandOpenClipper": {
+		"message": "Open Obsidian Clipper"
+	},
+	"commandQuickClip": {
+		"message": "Quick clip"
+	},
+	"commandToggleHighlighter": {
+		"message": "Toggle highlighter mode"
 	}
 } 

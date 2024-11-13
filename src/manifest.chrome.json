@@ -55,21 +55,21 @@
 				"default": "Ctrl+Shift+O",
 				"mac": "Command+Shift+O"
 			},
-			"description": "Open Obsidian Clipper"
+			"description": "__MSG_commandOpenClipper__"
 		},
 		"quick_clip": {
 			"suggested_key": {
 				"default": "Alt+Shift+O",
 				"mac": "Alt+Shift+O"
 			},
-			"description": "Quick clip"
+			"description": "__MSG_commandQuickClip__"
 		},
 		"toggle_highlighter": {
 			"suggested_key": {
 				"default": "Alt+H",
 				"mac": "Alt+H"
 			},
-			"description": "Toggle highlighter mode"
+			"description": "__MSG_commandToggleHighlighter__"
 		}
 	}
 }

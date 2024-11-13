@@ -461,5 +461,14 @@
 	},
 	"failedToDeleteTemplate": {
 		"message": "Error al eliminar la plantilla. Por favor, inténtalo de nuevo."
+	},
+	"commandOpenClipper": {
+		"message": "Abrir Obsidian Clipper"
+	},
+	"commandQuickClip": {
+		"message": "Guardado rápido"
+	},
+	"commandToggleHighlighter": {
+		"message": "Alternar modo resaltador"
 	}
 } 
