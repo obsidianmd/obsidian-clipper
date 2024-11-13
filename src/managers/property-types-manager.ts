@@ -4,9 +4,10 @@ import { createElementWithClass, createElementWithHTML } from '../utils/dom-util
 import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
 import { templates } from './template-manager';
 import { refreshPropertyNameSuggestions } from './template-ui';
-import { detectBrowser } from '../utils/browser-detection';
 import { unescapeValue } from '../utils/string-utils';
 import { showImportModal } from '../utils/import-modal';
+import { saveFile } from '../utils/file-utils';
+import browser from '../utils/browser-polyfill';
 
 export function initializePropertyTypesManager(): void {
 	ensureTagsProperty();
@@ -277,40 +278,12 @@ async function exportTypesJson(): Promise<void> {
 	const content = JSON.stringify({ types: typesObject }, null, 2);
 	const fileName = 'types.json';
 
-	const browser = await detectBrowser();
-	const isIOSBrowser = browser === 'mobile-safari' || browser === 'ipad-os';
-	const isSafari = browser === 'safari';
-
-	if (isIOSBrowser || isSafari) {
-		const blob = new Blob([content], { type: 'application/json' });
-		const file = new File([blob], fileName, { type: 'application/json' });
-
-		try {
-			await navigator.share({
-				files: [file],
-				title: 'Exported property types',
-				text: 'Obsidian Web Clipper property types'
-			});
-		} catch (error) {
-			console.error('Error sharing:', error);
-			fallbackExport(content, fileName);
-		}
-	} else {
-		fallbackExport(content, fileName);
-	}
-}
-
-function fallbackExport(content: string, fileName: string): void {
-	const blob = new Blob([content], { type: 'application/json' });
-	const url = URL.createObjectURL(blob);
-
-	const a = document.createElement('a');
-	a.href = url;
-	a.download = fileName;
-	document.body.appendChild(a);
-	a.click();
-	document.body.removeChild(a);
-	URL.revokeObjectURL(url);
+	await saveFile({
+		content,
+		fileName,
+		mimeType: 'application/json',
+		onError: (error) => console.error('Failed to export types:', error)
+	});
 }
 
 export async function addPropertyType(name: string, type: string = 'text', defaultValue: string = ''): Promise<void> {

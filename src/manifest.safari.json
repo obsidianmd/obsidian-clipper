@@ -8,8 +8,14 @@
 		"activeTab",
 		"clipboardWrite",
 		"contextMenus",
+		"downloads",
 		"storage",
 		"scripting"
+	],
+	"host_permissions": [
+		"<all_urls>",
+		"http://*/*",
+		"https://*/*"
 	],
 	"action": {
 		"default_popup": "popup.html",
@@ -40,10 +46,6 @@
 	"content_security_policy": {
 		"extension_pages": "script-src 'self'; object-src 'self'"
 	},
-	"host_permissions": [
-		"http://*/*",
-		"https://*/*"
-	],
 	"commands": {
 		"_execute_action": {
 			"suggested_key": {

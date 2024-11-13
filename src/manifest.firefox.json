@@ -8,8 +8,14 @@
 		"activeTab",
 		"clipboardWrite",
 		"contextMenus",
+		"downloads",
 		"storage",
 		"scripting"
+	],
+	"host_permissions": [
+		"<all_urls>",
+		"http://*/*",
+		"https://*/*"
 	],
 	"action": {
 		"default_popup": "popup.html",
@@ -58,10 +64,6 @@
 			"description": "Toggle highlighter mode"
 		}
 	},
-	"host_permissions": [
-		"http://*/*",
-		"https://*/*"
-	],
 	"browser_specific_settings": {
 		"gecko": {
 			"id": "clipper@obsidian.md",

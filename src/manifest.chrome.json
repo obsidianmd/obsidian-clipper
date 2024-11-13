@@ -9,11 +9,13 @@
 		"clipboardWrite",
 		"commands",
 		"contextMenus",
+		"downloads",
 		"sidePanel",
 		"storage",
 		"scripting"
 	],
 	"host_permissions": [
+		"<all_urls>",
 		"http://*/*",
 		"https://*/*"
 	],

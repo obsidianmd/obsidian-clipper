@@ -8,6 +8,7 @@ import { addPropertyType, updatePropertyTypesList } from '../managers/property-t
 import { hideModal } from '../utils/modal-utils';
 import { showImportModal as showGenericImportModal } from './import-modal';
 import browser from '../utils/browser-polyfill';
+import { saveFile } from './file-utils';
 
 const SCHEMA_VERSION = '0.1.0';
 
@@ -19,7 +20,7 @@ export async function exportTemplate(): Promise<void> {
 
 	const template = templates[editingTemplateIndex] as Template;
 	const sanitizedName = sanitizeFileName(template.name);
-	const templateFile = `${sanitizedName.replace(/\s+/g, '-').toLowerCase()}-clipper.json`;
+	const fileName = `${sanitizedName.replace(/\s+/g, '-').toLowerCase()}-clipper.json`;
 
 	const isDailyNote = template.behavior === 'append-daily' || template.behavior === 'prepend-daily';
 
@@ -47,48 +48,14 @@ export async function exportTemplate(): Promise<void> {
 		orderedTemplate.context = template.context;
 	}
 
-	const jsonContent = JSON.stringify(orderedTemplate, null, '\t');
-
-	const browser = await detectBrowser();
-	const isIOSBrowser = browser === 'mobile-safari' || browser === 'ipad-os';
-	const isSafari = browser === 'safari';
-
-	if (isIOSBrowser || isSafari) {
-		// For iOS, create a Blob and use the Web Share API if available
-		const blob = new Blob([jsonContent], { type: 'application/json' });
-		const file = new File([blob], templateFile, { type: 'application/json' });
-
-		if (navigator.share) {
-			try {
-				await navigator.share({
-					files: [file],
-					title: 'Exported template',
-					text: 'Obsidian Web Clipper template'
-				});
-			} catch (error) {
-				console.error('Error sharing:', error);
-				// Fallback to opening in a new tab if sharing fails
-				const dataUri = URL.createObjectURL(blob);
-				window.open(dataUri, '_blank');
-			}
-		} else {
-			// Fallback for older iOS versions
-			const dataUri = `data:application/json;charset=utf-8,${encodeURIComponent(jsonContent)}`;
-			window.open(dataUri, '_blank');
-		}
-	} else {
-		// For other platforms, use Blob and URL.createObjectURL
-		const blob = new Blob([jsonContent], { type: 'application/json' });
-		const url = URL.createObjectURL(blob);
-
-		const a = document.createElement('a');
-		a.href = url;
-		a.download = templateFile;
-		document.body.appendChild(a);
-		a.click();
-		document.body.removeChild(a);
-		URL.revokeObjectURL(url);
-	}
+	const content = JSON.stringify(orderedTemplate, null, '\t');
+	
+	await saveFile({
+		content,
+		fileName,
+		mimeType: 'application/json',
+		onError: (error) => console.error('Failed to export template:', error)
+	});
 }
 
 export function importTemplate(input?: HTMLInputElement): void {
@@ -355,54 +322,17 @@ export async function exportAllSettings(): Promise<void> {
 		console.log('All data fetched:', allData);
 
 		console.log('Stringifying data');
-		const jsonContent = JSON.stringify(allData, null, 2);
-		console.log('Data stringified, length:', jsonContent.length);
+		const content = JSON.stringify(allData, null, 2);
+		console.log('Data stringified, length:', content.length);
 
 		const fileName = 'obsidian-web-clipper-settings.json';
-		const browserType = await detectBrowser();
 
-		if (browserType === 'safari' || browserType === 'mobile-safari' || browserType === 'ipad-os') {
-			console.log('Detected Safari, using data URI');
-			const dataUri = `data:application/json;charset=utf-8,${encodeURIComponent(jsonContent)}`;
-			
-			if (navigator.share) {
-				try {
-					await navigator.share({
-						files: [new File([jsonContent], fileName, { type: 'application/json' })],
-						title: 'Exported Obsidian Web Clipper Settings',
-						text: 'Here are your exported settings for Obsidian Web Clipper.'
-					});
-				} catch (error) {
-					console.error('Error sharing:', error);
-					window.open(dataUri);
-				}
-			} else {
-				window.open(dataUri);
-			}
-		} else {
-			console.log('Using Blob for non-Safari browsers');
-			const blob = new Blob([jsonContent], { type: 'application/json' });
-			console.log('Blob created, size:', blob.size);
-
-			console.log('Creating object URL');
-			const url = URL.createObjectURL(blob);
-			console.log('Object URL created:', url);
-
-			console.log('Creating and appending anchor element');
-			const a = document.createElement('a');
-			a.href = url;
-			a.download = fileName;
-			document.body.appendChild(a);
-
-			console.log('Triggering click on anchor element');
-			a.click();
-
-			console.log('Removing anchor element');
-			document.body.removeChild(a);
-
-			console.log('Revoking object URL');
-			URL.revokeObjectURL(url);
-		}
+		await saveFile({
+			content,
+			fileName,
+			mimeType: 'application/json',
+			onError: (error) => console.error('Failed to export settings:', error)
+		});
 
 		console.log('Export completed successfully');
 	} catch (error) {
