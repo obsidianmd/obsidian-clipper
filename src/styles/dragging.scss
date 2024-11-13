@@ -21,6 +21,8 @@ body.is-dragging {
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	user-select: none;
+	-webkit-user-select: none;
 	margin-left: -2px;
 	margin-right: 2px;
 	svg {

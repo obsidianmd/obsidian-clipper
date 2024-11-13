@@ -28,7 +28,7 @@
 
 .metadata-properties {
 	--input-height: var(--metadata-input-height);
-	padding: 2px 0.5rem 0.5rem;
+	padding: var(--popup-properties-padding);
 	margin: 0;
 	display: flex;
 	flex-direction: column;
