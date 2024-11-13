@@ -245,5 +245,23 @@
 	},
 	"noHighlights": {
 		"message": "Do nothing"
+	},
+	"settingsHeading": {
+		"message": "Settings"
+	},
+	"templatesHeading": {
+		"message": "Templates"
+	},
+	"general": {
+		"message": "General"
+	},
+	"highlighter": {
+		"message": "Highlighter"
+	},
+	"interpreter": {
+		"message": "Interpreter"
+	},
+	"newTemplate": {
+		"message": "New template"
 	}
 } 

@@ -245,5 +245,23 @@
 	},
 	"noHighlights": {
 		"message": "No hacer nada"
+	},
+	"settingsHeading": {
+		"message": "Ajustes"
+	},
+	"templatesHeading": {
+		"message": "Plantillas"
+	},
+	"general": {
+		"message": "General"
+	},
+	"highlighter": {
+		"message": "Resaltador"
+	},
+	"interpreter": {
+		"message": "Intérprete"
+	},
+	"newTemplate": {
+		"message": "Nueva plantilla"
 	}
 } 
