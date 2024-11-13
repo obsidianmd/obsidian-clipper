@@ -30,6 +30,7 @@ export async function saveFile({
 		if (isSafari) {
 			const blob = new Blob([content], { type: 'application/json' });
 			const file = new File([blob], fileName, { type: 'application/json' });
+			const dataUri = `data:${mimeType};charset=utf-8,${encodeURIComponent(content)}`;
 
 			// Use share API if there is no tab ID, e.g. in settings pages
 			if (!tabId) {
@@ -40,11 +41,11 @@ export async function saveFile({
 					});
 				} catch (error) {
 					console.error('Error sharing:', error);
+					window.open(dataUri);
 				}
 				throw new Error('Tab ID is required for saving files in Safari');
 			}
 
-			const dataUri = `data:${mimeType};charset=utf-8,${encodeURIComponent(content)}`;
 			await browser.scripting.executeScript({
 				target: { tabId },
 				func: (fileName: string, dataUri: string) => {
