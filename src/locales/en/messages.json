@@ -263,5 +263,131 @@
 	},
 	"newTemplate": {
 		"message": "New template"
+	},
+	"editTemplate": {
+		"message": "Edit template"
+	},
+	"templateName": {
+		"message": "Template name"
+	},
+	"behavior": {
+		"message": "Behavior"
+	},
+	"createNewNote": {
+		"message": "Create new note"
+	},
+	"appendToExisting": {
+		"message": "Add to an existing note, at the bottom"
+	},
+	"prependToExisting": {
+		"message": "Add to an existing note, at the top"
+	},
+	"appendToDaily": {
+		"message": "Add to daily note, at the bottom"
+	},
+	"prependToDaily": {
+		"message": "Add to daily note, at the top"
+	},
+	"behaviorWarning": {
+		"message": "Adding to an existing note or daily note requires Obsidian 1.7.2 or later."
+	},
+	"noteNameFormat": {
+		"message": "Note name"
+	},
+	"noteNameFormatDescription": {
+		"message": "Format for the file name of the note. You can use variables like {{title}}, {{date}}, and {{published}} to pre-populate data from the page. $link_start$Learn more$link_end$.",
+		"placeholders": {
+			"link_start": {
+				"content": "<a href=\"https://github.com/obsidianmd/obsidian-clipper?tab=readme-ov-file#template-variables\" target=\"_blank\">"
+			},
+			"link_end": {
+				"content": "</a>"
+			}
+		}
+	},
+	"noteLocation": {
+		"message": "Note location"
+	},
+	"noteLocationDescription": {
+		"message": "The folder or path of the note."
+	},
+	"vault": {
+		"message": "Vault"
+	},
+	"vaultDescription": {
+		"message": "Select the default vault for this template. Go to $link_start$general settings$link_end$ to add or remove vaults.",
+		"placeholders": {
+			"link_start": {
+				"content": "<a href=\"?section=general\">"
+			},
+			"link_end": {
+				"content": "</a>"
+			}
+		}
+	},
+	"lastUsed": {
+		"message": "Last used"
+	},
+	"templateTriggers": {
+		"message": "Template triggers"
+	},
+	"templateTriggersDescription": {
+		"message": "Define rules to automatically select this template if it matches a URL pattern or contains schema.org data. One rule per line."
+	},
+	"templateProperties": {
+		"message": "Properties"
+	},
+	"templatePropertiesDescription": {
+		"message": "Properties to add to the top of the clipped note. Use variables to pre-populate data from the page."
+	},
+	"addProperty": {
+		"message": "+ Add property"
+	},
+	"noteContent": {
+		"message": "Note content"
+	},
+	"noteContentDescription": {
+		"message": "Customize the content of the note. Use variables to pre-populate data from the page."
+	},
+	"interpreterContext": {
+		"message": "Interpreter context"
+	},
+	"interpreterContextDescription": {
+		"message": "The context used to interpret prompt variables. Overrides the default context defined in $link_start$Interpreter settings$link_end$. Variables can be used here.",
+		"placeholders": {
+			"link_start": {
+				"content": "<a href=\"?section=interpreter\">"
+			},
+			"link_end": {
+				"content": "</a>"
+			}
+		}
+	},
+	"duplicate": {
+		"message": "Duplicate"
+	},
+	"copyAsJson": {
+		"message": "Copy as JSON"
+	},
+	"delete": {
+		"message": "Delete"
+	},
+	"more": {
+		"message": "More"
+	},
+	"specificNoteName": {
+		"message": "Specific note name"
+	},
+	"dailyNoteFormat": {
+		"message": "Daily note format (e.g., YYYY-MM-DD)"
+	},
+	"propertyName": {
+		"message": "Property name"
+	},
+	"propertyValue": {
+		"message": "Property value"
+	},
+	"removeProperty": {
+		"message": "Remove property"
 	}
 } 

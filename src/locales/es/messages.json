@@ -263,5 +263,131 @@
 	},
 	"newTemplate": {
 		"message": "Nueva plantilla"
+	},
+	"editTemplate": {
+		"message": "Editar plantilla"
+	},
+	"templateName": {
+		"message": "Nombre de la plantilla"
+	},
+	"behavior": {
+		"message": "Comportamiento"
+	},
+	"createNewNote": {
+		"message": "Crear nueva nota"
+	},
+	"appendToExisting": {
+		"message": "Agregar a una nota existente, al final"
+	},
+	"prependToExisting": {
+		"message": "Agregar a una nota existente, al principio"
+	},
+	"appendToDaily": {
+		"message": "Agregar a la nota diaria, al final"
+	},
+	"prependToDaily": {
+		"message": "Agregar a la nota diaria, al principio"
+	},
+	"behaviorWarning": {
+		"message": "Agregar a una nota existente o nota diaria requiere Obsidian 1.7.2 o posterior."
+	},
+	"noteNameFormat": {
+		"message": "Nombre de la nota"
+	},
+	"noteNameFormatDescription": {
+		"message": "Formato para el nombre del archivo de la nota. Puedes usar variables como {{title}}, {{date}} y {{published}} para pre-poblar datos de la página. $link_start$Más información$link_end$.",
+		"placeholders": {
+			"link_start": {
+				"content": "<a href=\"https://github.com/obsidianmd/obsidian-clipper?tab=readme-ov-file#template-variables\" target=\"_blank\">"
+			},
+			"link_end": {
+				"content": "</a>"
+			}
+		}
+	},
+	"noteLocation": {
+		"message": "Ubicación de la nota"
+	},
+	"noteLocationDescription": {
+		"message": "La carpeta o ruta de la nota."
+	},
+	"vault": {
+		"message": "Bóveda"
+	},
+	"vaultDescription": {
+		"message": "Selecciona la bóveda predeterminada para esta plantilla. Ve a $link_start$ajustes generales$link_end$ para agregar o eliminar bóvedas.",
+		"placeholders": {
+			"link_start": {
+				"content": "<a href=\"?section=general\">"
+			},
+			"link_end": {
+				"content": "</a>"
+			}
+		}
+	},
+	"lastUsed": {
+		"message": "Último usado"
+	},
+	"templateTriggers": {
+		"message": "Activadores de plantilla"
+	},
+	"templateTriggersDescription": {
+		"message": "Define reglas para seleccionar automáticamente esta plantilla si coincide con un patrón de URL o contiene datos de schema.org. Una regla por línea."
+	},
+	"templateProperties": {
+		"message": "Propiedades"
+	},
+	"templatePropertiesDescription": {
+		"message": "Propiedades para agregar en la parte superior de la nota guardada. Usa variables para pre-poblar datos de la página."
+	},
+	"addProperty": {
+		"message": "+ Agregar propiedad"
+	},
+	"noteContent": {
+		"message": "Contenido de la nota"
+	},
+	"noteContentDescription": {
+		"message": "Personaliza el contenido de la nota. Usa variables para pre-poblar datos de la página."
+	},
+	"interpreterContext": {
+		"message": "Contexto del intérprete"
+	},
+	"interpreterContextDescription": {
+		"message": "El contexto utilizado para interpretar variables de prompt. Anula el contexto predeterminado definido en $link_start$Ajustes del intérprete$link_end$. Se pueden usar variables aquí.",
+		"placeholders": {
+			"link_start": {
+				"content": "<a href=\"?section=interpreter\">"
+			},
+			"link_end": {
+				"content": "</a>"
+			}
+		}
+	},
+	"duplicate": {
+		"message": "Duplicar"
+	},
+	"copyAsJson": {
+		"message": "Copiar como JSON"
+	},
+	"delete": {
+		"message": "Eliminar"
+	},
+	"more": {
+		"message": "Más"
+	},
+	"specificNoteName": {
+		"message": "Nombre específico de la nota"
+	},
+	"dailyNoteFormat": {
+		"message": "Formato de nota diaria (ej., YYYY-MM-DD)"
+	},
+	"propertyName": {
+		"message": "Nombre de la propiedad"
+	},
+	"propertyValue": {
+		"message": "Valor de la propiedad"
+	},
+	"removeProperty": {
+		"message": "Eliminar propiedad"
 	}
 } 

@@ -9,6 +9,7 @@ import { createElementWithClass, createElementWithHTML } from '../utils/dom-util
 import { updatePromptContextVisibility } from './interpreter-settings';
 import { showSettingsSection } from './settings-section-ui';
 import { updatePropertyType } from './property-types-manager';
+import { getMessage } from '../utils/i18n';
 let hasUnsavedChanges = false;
 
 export function resetUnsavedChanges(): void {
@@ -131,7 +132,7 @@ export function showTemplateEditor(template: Template | null): void {
 	let editingTemplate: Template;
 
 	if (!template) {
-		const newTemplateName = getUniqueTemplateName('New template');
+		const newTemplateName = getUniqueTemplateName(getMessage('newTemplate'));
 		editingTemplate = {
 			id: Date.now().toString() + Math.random().toString(36).slice(2, 11),
 			name: newTemplateName,
@@ -164,7 +165,7 @@ export function showTemplateEditor(template: Template | null): void {
 	const templateName = document.getElementById('template-name') as HTMLInputElement;
 	const templateProperties = document.getElementById('template-properties');
 
-	if (templateEditorTitle) templateEditorTitle.textContent = 'Edit template';
+	if (templateEditorTitle) templateEditorTitle.textContent = getMessage('editTemplate');
 	if (templateName) templateName.value = editingTemplate.name;
 	if (templateProperties) templateProperties.innerHTML = '';
 
@@ -226,7 +227,7 @@ export function showTemplateEditor(template: Template | null): void {
 		vaultSelect.innerHTML = '';
 		const lastUsedOption = document.createElement('option');
 		lastUsedOption.value = '';
-		lastUsedOption.textContent = 'Last used';
+		lastUsedOption.textContent = getMessage('lastUsed');
 		vaultSelect.appendChild(lastUsedOption);
 		generalSettings.vaults.forEach(vault => {
 			const option = document.createElement('option');
@@ -266,14 +267,14 @@ function updateBehaviorFields(): void {
 			switch (selectedBehavior) {
 				case 'append-specific':
 				case 'prepend-specific':
-					noteNameFormat.placeholder = 'Specific note name';
+					noteNameFormat.placeholder = getMessage('specificNoteName');
 					break;
 				case 'append-daily':
 				case 'prepend-daily':
-					noteNameFormat.placeholder = 'Daily note format (e.g., YYYY-MM-DD)';
+					noteNameFormat.placeholder = getMessage('dailyNoteFormat');
 					break;
 				default:
-					noteNameFormat.placeholder = 'Note name format';
+					noteNameFormat.placeholder = getMessage('noteNameFormat');
 			}
 		}
 	}
@@ -320,7 +321,7 @@ export function addPropertyToEditor(name: string = '', value: string = '', id: s
 		class: 'property-name',
 		id: `${propertyId}-name`,
 		value: name,
-		placeholder: 'Property name',
+		placeholder: getMessage('propertyName'),
 		autocapitalize: 'off',
 		autocomplete: 'off',
 		list: 'property-name-suggestions'
@@ -343,13 +344,13 @@ export function addPropertyToEditor(name: string = '', value: string = '', id: s
 		class: 'property-value',
 		id: `${propertyId}-value`,
 		value: unescapeValue(value),
-		placeholder: 'Property value'
+		placeholder: getMessage('propertyValue')
 	}) as HTMLInputElement;
 	propertyDiv.appendChild(valueInput);
 
 	const removeBtn = createElementWithClass('button', 'remove-property-btn clickable-icon');
 	removeBtn.setAttribute('type', 'button');
-	removeBtn.setAttribute('aria-label', 'Remove property');
+	removeBtn.setAttribute('aria-label', getMessage('removeProperty'));
 	removeBtn.appendChild(createElementWithHTML('i', '', { 'data-lucide': 'trash-2' }));
 	propertyDiv.appendChild(removeBtn);
 
@@ -527,7 +528,7 @@ function clearTemplateEditor(): void {
 	const templateEditorTitle = document.getElementById('template-editor-title');
 	const templateName = document.getElementById('template-name') as HTMLInputElement;
 	const templateProperties = document.getElementById('template-properties');
-	if (templateEditorTitle) templateEditorTitle.textContent = 'New template';
+	if (templateEditorTitle) templateEditorTitle.textContent = getMessage('newTemplate');
 	if (templateName) templateName.value = '';
 	if (templateProperties) templateProperties.innerHTML = '';
 	const pathInput = document.getElementById('template-path-name') as HTMLInputElement;
