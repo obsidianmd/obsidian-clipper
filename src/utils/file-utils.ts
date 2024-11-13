@@ -33,14 +33,20 @@ export async function saveFile({
 			const dataUri = `data:${mimeType};charset=utf-8,${encodeURIComponent(content)}`;
 
 			// Use share API if there is no tab ID, e.g. in settings pages
-			if (!tabId) {
-				try {
-					await navigator.share({
-						files: [file],
-						text: fileName
-					});
-				} catch (error) {
-					console.error('Error sharing:', error);
+			if (!tabId) {				
+				if (navigator.share) {
+					try {
+						await navigator.share({
+							files: [file],
+							text: fileName
+						});
+					} catch (error) {
+						console.error('Error sharing:', error);
+						// Fallback to opening in a new tab if sharing fails
+						window.open(dataUri);
+					}
+				} else {
+					// Fallback for older iOS versions
 					window.open(dataUri);
 				}
 				throw new Error('Tab ID is required for saving files in Safari');
