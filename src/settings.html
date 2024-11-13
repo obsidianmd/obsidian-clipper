@@ -157,14 +157,14 @@
 
 					<div id="highlighter-section" class="settings-section">
 						<div class="settings-section-header">
-							<h2>Highlighter</h2>
+							<h2 data-i18n="highlighterSettings">Highlighter</h2>
 						</div>
 						<form id="highlighter-settings-form">
 							<div class="setting-item mod-horizontal" style="display: none;">
 								<div class="setting-item-info">
-									<label for="highlighter-toggle">Enable highlighter</label>
-									<div class="setting-item-description">
-										Highlight content on web pages that you can save to&nbsp;Obsidian.
+									<label for="highlighter-toggle" data-i18n="enableHighlighter">Enable highlighter</label>
+									<div class="setting-item-description" data-i18n="enableHighlighterDescription">
+										Highlight content on web pages that you can save to Obsidian.
 									</div>
 								</div>
 								<div class="setting-item-control">
@@ -175,17 +175,19 @@
 							</div>
 							<div class="setting-item mod-horizontal">
 								<div class="setting-item-info">
-									<label for="export-highlights">Export highlights</label>
-									<div class="setting-item-description">Export your highlights to a file.</div>
+									<label for="export-highlights" data-i18n="exportHighlights">Export highlights</label>
+									<div class="setting-item-description" data-i18n="exportHighlightsDescription">
+										Export your highlights to a file.
+									</div>
 								</div>
 								<div class="setting-item-control">
-									<button type="button" id="export-highlights">Export</button>
+									<button type="button" id="export-highlights" data-i18n="export">Export</button>
 								</div>
 							</div>
 							<div class="setting-item mod-horizontal">
 								<div class="setting-item-info">
-									<label for="highlighter-visibility">Always show highlights</label>
-									<div class="setting-item-description">
+									<label for="highlighter-visibility" data-i18n="alwaysShowHighlights">Always show highlights</label>
+									<div class="setting-item-description" data-i18n="alwaysShowHighlightsDescription">
 										Display your saved highlights when you load a page. Turn off to only display highlights when highlighter mode is activated.
 									</div>
 								</div>
@@ -198,15 +200,15 @@
 							
 							<div class="setting-item">
 								<div class="setting-item-info">
-									<label for="highlighter-behavior" style="font-weight: 400;">Clip behavior</label>
-									<div class="setting-item-description">
+									<label for="highlighter-behavior" style="font-weight: 400;" data-i18n="clipBehavior">Clip behavior</label>
+									<div class="setting-item-description" data-i18n="clipBehaviorDescription">
 										Choose how highlighted content is saved to Obsidian. Defines the <strong>{{content}}</strong> variable.
 									</div>
 								</div>
 								<div class="setting-item-control">
 									<select id="highlighter-behavior">
-										<option value="replace-content">Replace the page content</option>
-										<option value="no-highlights">Do nothing</option>
+										<option value="replace-content" data-i18n="replaceContent">Replace the page content</option>
+										<option value="no-highlights" data-i18n="noHighlights">Do nothing</option>
 									</select>
 								</div>
 							</div>

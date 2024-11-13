@@ -204,5 +204,46 @@
 	},
 	"allProperties": {
 		"message": "All properties"
+	},
+	"highlighterSettings": {
+		"message": "Highlighter"
+	},
+	"enableHighlighter": {
+		"message": "Enable highlighter"
+	},
+	"enableHighlighterDescription": {
+		"message": "Highlight content on web pages that you can save to Obsidian."
+	},
+	"exportHighlights": {
+		"message": "Export highlights"
+	},
+	"exportHighlightsDescription": {
+		"message": "Export your highlights to a file."
+	},
+	"alwaysShowHighlights": {
+		"message": "Always show highlights"
+	},
+	"alwaysShowHighlightsDescription": {
+		"message": "Display your saved highlights when you load a page. Turn off to only display highlights when highlighter mode is activated."
+	},
+	"clipBehavior": {
+		"message": "Clip behavior"
+	},
+	"clipBehaviorDescription": {
+		"message": "Choose how highlighted content is saved to Obsidian. Defines the $strong_start${{content}}$strong_end$ variable.",
+		"placeholders": {
+			"strong_start": {
+				"content": "<strong>"
+			},
+			"strong_end": {
+				"content": "</strong>"
+			}
+		}
+	},
+	"replaceContent": {
+		"message": "Replace the page content"
+	},
+	"noHighlights": {
+		"message": "Do nothing"
 	}
 } 

@@ -204,5 +204,46 @@
 	},
 	"allProperties": {
 		"message": "Todas las propiedades"
+	},
+	"highlighterSettings": {
+		"message": "Resaltador"
+	},
+	"enableHighlighter": {
+		"message": "Activar resaltador"
+	},
+	"enableHighlighterDescription": {
+		"message": "Resalta contenido en páginas web que puedes guardar en Obsidian."
+	},
+	"exportHighlights": {
+		"message": "Exportar resaltados"
+	},
+	"exportHighlightsDescription": {
+		"message": "Exporta tus resaltados a un archivo."
+	},
+	"alwaysShowHighlights": {
+		"message": "Mostrar siempre los resaltados"
+	},
+	"alwaysShowHighlightsDescription": {
+		"message": "Muestra tus resaltados guardados cuando cargas una página. Desactiva para mostrar los resaltados solo cuando el modo resaltador está activado."
+	},
+	"clipBehavior": {
+		"message": "Comportamiento de guardado"
+	},
+	"clipBehaviorDescription": {
+		"message": "Elige cómo se guarda el contenido resaltado en Obsidian. Define la variable $strong_start${{content}}$strong_end$.",
+		"placeholders": {
+			"strong_start": {
+				"content": "<strong>"
+			},
+			"strong_end": {
+				"content": "</strong>"
+			}
+		}
+	},
+	"replaceContent": {
+		"message": "Reemplazar el contenido de la página"
+	},
+	"noHighlights": {
+		"message": "No hacer nada"
 	}
 } 
