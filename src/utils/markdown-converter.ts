@@ -579,7 +579,7 @@ export function createMarkdownContent(content: string, url: string) {
 			}
 
 			// Check if it's an inline or block math element
-			const isBlock = node.getAttribute('display') === 'block';
+			const isBlock = mathElement.getAttribute('display') === 'block';
 
 			if (isBlock) {
 				return `\n$$\n${latex}\n$$\n`;
