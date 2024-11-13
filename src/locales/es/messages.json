@@ -147,7 +147,10 @@
 	"importAllSettingsDescription": {
 		"message": "Importa todos los ajustes incluyendo plantillas y propiedades. Esto reemplazará tu configuración actual."
 	},
-    "remove": {
+    "refresh": {
+		"message": "Refrescar"
+	},
+	"remove": {
 		"message": "Eliminar"
 	},
 	"reset": {
@@ -422,5 +425,41 @@
 	},
 	"failedToResetTemplate": {
 		"message": "Error al restablecer la plantilla predeterminada. Por favor, inténtalo de nuevo."
+	},
+	"pageVariables": {
+		"message": "Variables de página"
+	},
+	"close": {
+		"message": "Cerrar"
+	},
+	"searchVariables": {
+		"message": "Buscar variables..."
+	},
+	"disableHighlighter": {
+		"message": "Desactivar resaltador"
+	},
+	"failedToCopyText": {
+		"message": "Error al copiar el texto"
+	},
+	"failedToSaveFile": {
+		"message": "Error al guardar el archivo"
+	},
+	"failedToInitialize": {
+		"message": "Por favor, intenta recargar la extensión."
+	},
+	"failedToProcessInterpreter": {
+		"message": "Error al procesar el intérprete. Por favor, inténtalo de nuevo."
+	},
+	"failedToExtractContent": {
+		"message": "No se pudo extraer el contenido de la página."
+	},
+	"failedToInitializeContent": {
+		"message": "No se pudo inicializar el contenido de la página."
+	},
+	"confirmDeleteTemplate": {
+		"message": "¿Estás seguro de que quieres eliminar la plantilla \"$1\"?"
+	},
+	"failedToDeleteTemplate": {
+		"message": "Error al eliminar la plantilla. Por favor, inténtalo de nuevo."
 	}
 } 

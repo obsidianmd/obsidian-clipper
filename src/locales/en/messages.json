@@ -387,6 +387,9 @@
 	"propertyValue": {
 		"message": "Property value"
 	},
+	"refresh": {
+		"message": "Refresh"
+	},
 	"removeProperty": {
 		"message": "Remove property"
 	},
@@ -422,5 +425,41 @@
 	},
 	"failedToResetTemplate": {
 		"message": "Failed to reset default template. Please try again."
+	},
+	"pageVariables": {
+		"message": "Page variables"
+	},
+	"close": {
+		"message": "Close"
+	},
+	"searchVariables": {
+		"message": "Search variables..."
+	},
+	"disableHighlighter": {
+		"message": "Disable highlighter"
+	},
+	"failedToCopyText": {
+		"message": "Failed to copy text"
+	},
+	"failedToSaveFile": {
+		"message": "Failed to save file"
+	},
+	"failedToInitialize": {
+		"message": "Please try reloading the extension."
+	},
+	"failedToProcessInterpreter": {
+		"message": "Interpreter processing failed. Please try again."
+	},
+	"failedToExtractContent": {
+		"message": "Unable to extract page content."
+	},
+	"failedToInitializeContent": {
+		"message": "Unable to initialize page content."
+	},
+	"confirmDeleteTemplate": {
+		"message": "Are you sure you want to delete the template \"$1\"?"
+	},
+	"failedToDeleteTemplate": {
+		"message": "Failed to delete template. Please try again."
 	}
 } 

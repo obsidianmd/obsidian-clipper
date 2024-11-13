@@ -2,6 +2,7 @@ import { initializeIcons } from '../icons/icons';
 import { debounce } from '../utils/debounce';
 import { formatVariables } from '../utils/string-utils';
 import { Template } from '../types/types';
+import { getMessage } from '../utils/i18n';
 
 let variablesPanel: HTMLElement;
 let currentTemplate: Template | null;
@@ -36,12 +37,12 @@ export async function showVariables(isUpdate: boolean = false) {
 			variablesPanel.innerHTML = `
 				<div class="variables-header">
   					<div class="variables-header-title">
-						<h3>Page variables</h3>
-						<span class="close-panel clickable-icon" aria-label="Close">
+						<h3>${getMessage('pageVariables')}</h3>
+						<span class="close-panel clickable-icon" aria-label="${getMessage('close')}">
 							<i data-lucide="x"></i>
 						</span>
 					</div>
-					<input type="text" id="variables-search" placeholder="Search variables...">
+					<input type="text" id="variables-search" placeholder="${getMessage('searchVariables')}">
 				</div>
 				<div class="variable-list">${formattedVariables}</div>
 			`;
@@ -57,7 +58,6 @@ export async function showVariables(isUpdate: boolean = false) {
 				searchInput.addEventListener('input', debounce(handleVariableSearch, 300));
 			}
 
-			// Keeping this for now, because we will probably add more actions to the ... menu later
 			const closePanel = variablesPanel.querySelector('.close-panel') as HTMLElement;
 			if (closePanel) {
 				closePanel.addEventListener('click', function() {
@@ -68,7 +68,6 @@ export async function showVariables(isUpdate: boolean = false) {
 				});
 			}
 			
-			// Add click event listener to close panel
 			const showMoreActionsButton = document.getElementById('show-variables');
 			if (showMoreActionsButton) {
 				showMoreActionsButton.addEventListener('click', closeVariablesPanel);
@@ -93,7 +92,6 @@ function closeVariablesPanel(e: Event) {
 	isPanelOpen = false;
 	currentSearchTerm = '';
 
-	// Remove the event listener when closing the panel
 	const showMoreActionsButton = document.getElementById('show-variables');
 	if (showMoreActionsButton) {
 		showMoreActionsButton.removeEventListener('click', closeVariablesPanel);
@@ -132,7 +130,7 @@ function handleVariableSearch() {
 			if (variableName) {
 				navigator.clipboard.writeText(variableName).then(() => {
 					const originalText = this.textContent;
-					this.textContent = 'Copied!';
+					this.textContent = getMessage('copied');
 					setTimeout(() => {
 						this.textContent = originalText;
 					}, 1000);

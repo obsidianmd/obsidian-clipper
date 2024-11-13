@@ -1,52 +1,17 @@
 import browser from './browser-polyfill';
-import { getCurrentLanguage, matchBrowserLanguage } from './language-settings';
+import { getCurrentLanguage, matchBrowserLanguage, getEffectiveLanguage } from './language-settings';
 import DOMPurify from 'dompurify';
 
 let currentLanguage: string | null = null;
 
 export async function initializeI18n() {
-	currentLanguage = await getCurrentLanguage();
+	currentLanguage = await getEffectiveLanguage();
 }
 
 export function getMessage(messageName: string, substitutions?: string | string[]): string {
 	try {
-		// If no language is set (system default) or language is empty string
-		if (!currentLanguage || currentLanguage === '') {
-			// Try to match browser language to available languages
-			const matchedLang = matchBrowserLanguage();
-			
-			// Load messages for the matched language
-			const messages = require(`../locales/${matchedLang}/messages.json`);
-			const messageObj = messages[messageName];
-			
-			if (!messageObj) {
-				return browser.i18n.getMessage(messageName, substitutions) || messageName;
-			}
-
-			let text = messageObj.message;
-
-			// Handle substitutions first
-			if (substitutions) {
-				const subsArray = Array.isArray(substitutions) ? substitutions : [substitutions];
-				subsArray.forEach((sub, index) => {
-					text = text.replace(`$${index + 1}`, sub);
-				});
-			}
-
-			// Handle placeholders if they exist
-			if (messageObj.placeholders) {
-				Object.entries(messageObj.placeholders).forEach(([key, value]) => {
-					const placeholder = `$${key}$`;
-					const content = (value as { content: string }).content;
-					text = text.replace(placeholder, content);
-				});
-			}
-
-			return text;
-		}
-
-		// Load messages for the explicitly selected language
-		const messages = require(`../locales/${currentLanguage}/messages.json`);
+		// Load messages for the current language
+		const messages = require(`../locales/${currentLanguage || 'en'}/messages.json`);
 		const messageObj = messages[messageName];
 		
 		if (!messageObj) {

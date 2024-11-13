@@ -7,9 +7,7 @@ export async function getCurrentLanguage(): Promise<string> {
 	if (savedLanguage && savedLanguage !== '') {
 		return savedLanguage;
 	}
-	// Get browser language and extract base language code
-	const browserLang = browser.i18n.getUILanguage().split('-')[0];
-	return '';  // Still return empty for system default
+	return ''; // Return empty string for system default
 }
 
 export async function setLanguage(language: string): Promise<void> {
@@ -32,15 +30,30 @@ export function getAvailableLanguages(): { code: string; name: string }[] {
 
 // Helper function to match browser language to available languages
 export function matchBrowserLanguage(): string {
-	const browserLang = browser.i18n.getUILanguage().split('-')[0]; // Get base language code
+	const browserLang = browser.i18n.getUILanguage().toLowerCase().split('-')[0]; // Get base language code
 	const availableLangs = getAvailableLanguages()
 		.map(lang => lang.code)
 		.filter(code => code !== ''); // Exclude system default option
 
-	return availableLangs.includes(browserLang) ? browserLang : 'en';
+	// If browser language matches an available language, use it
+	if (availableLangs.includes(browserLang)) {
+		return browserLang;
+	}
+
+	// Otherwise default to English
+	return 'en';
 }
 
 // Export getMessage for use in settings.ts
 export function getMessage(messageName: string): string {
 	return getI18nMessage(messageName);
+}
+
+// Helper function to get the effective language
+export async function getEffectiveLanguage(): Promise<string> {
+	const currentLang = await getCurrentLanguage();
+	if (currentLang && currentLang !== '') {
+		return currentLang;
+	}
+	return matchBrowserLanguage();
 } 

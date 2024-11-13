@@ -165,6 +165,7 @@ async function initializeExtension(tabId: number) {
 		return true;
 	} catch (error) {
 		console.error('Error initializing extension:', error);
+		showError('failedToInitialize');
 		return false;
 	}
 }
@@ -222,9 +223,9 @@ function setupMessageListeners() {
 					refreshFields(currentTabId); // Force template check when URL changes
 				}
 			} else if (request.isBlankPage) {
-				showError('This page cannot be clipped.');
+				showError(getMessage('pageCannotBeClipped'));
 			} else {
-				showError('This page cannot be clipped. Only http and https URLs are supported.');
+				showError(getMessage('onlyHttpSupported'));
 			}
 		} else if (request.action === "highlightsUpdated") {
 			// Refresh fields when highlights are updated
@@ -269,7 +270,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 		try {		
 			const initialized = await initializeExtension(currentTabId);
 			if (!initialized) {
-				showError('This page cannot be clipped.');
+				showError(getMessage('pageCannotBeClipped'));
 				return;
 			}
 
@@ -293,10 +294,10 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 		} catch (error) {
 			console.error('Error initializing popup:', error);
-			showError('Please try reloading the page.');
+			showError(getMessage('pleaseReloadPage'));
 		}
 	} else {
-		showError('Please try reloading the page.');
+		showError(getMessage('pleaseReloadPage'));
 	}
 });
 
@@ -553,7 +554,7 @@ async function handleClip() {
 				await waitForInterpreter(interpretBtn);
 			} catch (error) {
 				console.error('Interpreter processing failed:', error);
-				showError('Interpreter processing failed. Please try again.');
+				showError('failedToProcessInterpreter');
 				return;
 			}
 		} else if (interpretBtn.textContent?.toLowerCase() !== 'done') {
@@ -562,7 +563,7 @@ async function handleClip() {
 				await waitForInterpreter(interpretBtn);
 			} catch (error) {
 				console.error('Interpreter processing failed:', error);
-				showError('Interpreter processing failed. Please try again.');
+				showError('failedToProcessInterpreter');
 				return;
 			}
 		}
@@ -611,24 +612,24 @@ async function handleClip() {
 		}
 	} catch (error) {
 		console.error('Error in handleClip:', error);
-		showError('Failed to save to Obsidian. Please try again.');
+		showError('failedToSaveFile');
 		throw error;
 	}
 }
 
-function waitForInterpreter(interpretBtn: HTMLButtonElement): Promise<void> {
+async function waitForInterpreter(interpretBtn: HTMLButtonElement): Promise<void> {
 	return new Promise((resolve, reject) => {
 		const checkProcessing = () => {
 			if (!interpretBtn.classList.contains('processing')) {
 				if (interpretBtn.textContent?.toLowerCase() === 'done') {
 					resolve();
 				} else if (interpretBtn.textContent?.toLowerCase() === 'error') {
-					reject(new Error('Interpreter processing failed'));
+					reject(new Error(getMessage('failedToProcessInterpreter')));
 				} else {
-					setTimeout(checkProcessing, 100); // Check every 100ms
+					setTimeout(checkProcessing, 100);
 				}
 			} else {
-				setTimeout(checkProcessing, 100); // Check every 100ms
+				setTimeout(checkProcessing, 100);
 			}
 		};
 		checkProcessing();
@@ -1040,7 +1041,7 @@ function updateHighlighterModeUI(isActive: boolean) {
 			highlighterModeButton.style.display = 'flex';
 			highlighterModeButton.classList.toggle('active', isActive);
 			highlighterModeButton.setAttribute('aria-pressed', isActive.toString());
-			highlighterModeButton.title = isActive ? 'Disable highlighter' : 'Enable highlighter';
+			highlighterModeButton.title = isActive ? getMessage('disableHighlighter') : getMessage('enableHighlighter');
 		} else {
 			highlighterModeButton.style.display = 'none';
 		}
@@ -1058,8 +1059,8 @@ export async function copyToClipboard(content: string) {
 		// Change the main button text temporarily
 		const clipButton = document.getElementById('clip-btn');
 		if (clipButton) {
-			const originalText = clipButton.textContent || 'Add to Obsidian';
-			clipButton.textContent = 'Copied!';
+			const originalText = clipButton.textContent || getMessage('addToObsidian');
+			clipButton.textContent = getMessage('copied');
 			
 			// Reset the text after 1.5 seconds
 			setTimeout(() => {
@@ -1068,7 +1069,7 @@ export async function copyToClipboard(content: string) {
 		}
 	} catch (error) {
 		console.error('Failed to copy to clipboard:', error);
-		showError('Failed to copy to clipboard');
+		showError('failedToCopyText');
 	}
 }
 
@@ -1099,7 +1100,7 @@ async function handleSaveToDownloads() {
 			fileName,
 			mimeType: 'text/markdown',
 			tabId: currentTabId,
-			onError: (error) => showError('Failed to save file')
+			onError: (error) => showError('failedToSaveFile')
 		});
 
 		const moreDropdown = document.getElementById('more-dropdown');
@@ -1108,7 +1109,7 @@ async function handleSaveToDownloads() {
 		}
 	} catch (error) {
 		console.error('Failed to save file:', error);
-		showError('Failed to save file');
+		showError('failedToSaveFile');
 	}
 }
 
