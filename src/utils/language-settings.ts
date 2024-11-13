@@ -25,7 +25,8 @@ export function getAvailableLanguages(): { code: string; name: string }[] {
 		{ code: '', name: 'systemDefault' }, // This will be translated via data-i18n
 		{ code: 'en', name: 'English' },
 		{ code: 'es', name: 'Español' },
-		{ code: 'fr', name: 'Français' }
+		{ code: 'fr', name: 'Français' },
+		{ code: 'ja', name: '日本語' }
 	];
 }
 
