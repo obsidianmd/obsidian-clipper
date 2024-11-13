@@ -78,7 +78,15 @@
 		"message": "Vaults"
 	},
 	"vaultsDescription": {
-		"message": "By default, clipped notes are saved to the currently open vault. You can add vaults here if you want the option to save to different vaults. Vault names must exactly match the name of the Obsidian vault. Press enter to add a vault."
+		"message": "By default, clipped notes are saved to the currently open vault. You can add vaults here if you want the option to save to different vaults. Vault names must exactly match the name of the Obsidian vault. Press $strong_start$enter$strong_end$ to add a vault.",
+		"placeholders": {
+			"strong_start": {
+				"content": "<strong>"
+			},
+			"strong_end": {
+				"content": "</strong>"
+			}
+		}
 	},
 	"addVaultPlaceholder": {
 		"message": "Press enter to add a vault"
@@ -99,7 +107,15 @@
 		"message": "Early access features"
 	},
 	"earlyAccessDescription": {
-		"message": "Use features that require the latest early access version of Obsidian. Currently requires Obsidian 1.7.2 or later."
+		"message": "Use features that require the latest $link_start$early access version$link_end$ of Obsidian. Currently requires Obsidian 1.7.2 or later.",
+		"placeholders": {
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/Obsidian/Early+access+versions\" target=\"_blank\">"
+			},
+			"link_end": {
+				"content": "</a>"
+			}
+		}
 	},
 	"silentOpen": {
 		"message": "Save clipped note without opening it"

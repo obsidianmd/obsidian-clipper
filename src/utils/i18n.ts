@@ -1,5 +1,6 @@
 import browser from './browser-polyfill';
-import { getCurrentLanguage } from './language-settings';
+import { getCurrentLanguage, matchBrowserLanguage } from './language-settings';
+import DOMPurify from 'dompurify';
 
 let currentLanguage: string | null = null;
 
@@ -8,15 +9,54 @@ export async function initializeI18n() {
 }
 
 export function getMessage(messageName: string, substitutions?: string | string[]): string {
-	// If no language is explicitly set, use browser's i18n
-	if (!currentLanguage) {
-		return browser.i18n.getMessage(messageName, substitutions) || messageName;
-	}
-
-	// Otherwise, load messages for the selected language
 	try {
+		// If no language is set (system default) or language is empty string
+		if (!currentLanguage || currentLanguage === '') {
+			// Try to match browser language to available languages
+			const matchedLang = matchBrowserLanguage();
+			
+			// Load messages for the matched language
+			const messages = require(`../locales/${matchedLang}/messages.json`);
+			const messageObj = messages[messageName];
+			
+			if (!messageObj) {
+				return browser.i18n.getMessage(messageName, substitutions) || messageName;
+			}
+
+			let text = messageObj.message;
+
+			// Handle placeholders if they exist
+			if (messageObj.placeholders) {
+				Object.entries(messageObj.placeholders).forEach(([key, value]) => {
+					const placeholder = `$${key}$`;
+					const content = (value as { content: string }).content;
+					text = text.replace(placeholder, content);
+				});
+			}
+
+			return text;
+		}
+
+		// Load messages for the explicitly selected language
 		const messages = require(`../locales/${currentLanguage}/messages.json`);
-		return messages[messageName]?.message || messageName;
+		const messageObj = messages[messageName];
+		
+		if (!messageObj) {
+			return browser.i18n.getMessage(messageName, substitutions) || messageName;
+		}
+
+		let text = messageObj.message;
+
+		// Handle placeholders if they exist
+		if (messageObj.placeholders) {
+			Object.entries(messageObj.placeholders).forEach(([key, value]) => {
+				const placeholder = `$${key}$`;
+				const content = (value as { content: string }).content;
+				text = text.replace(placeholder, content);
+			});
+		}
+
+		return text;
 	} catch (error) {
 		console.warn(`Failed to load messages for language ${currentLanguage}`, error);
 		return browser.i18n.getMessage(messageName, substitutions) || messageName;
@@ -34,7 +74,8 @@ export async function translatePage() {
 			if (element instanceof HTMLInputElement || element instanceof HTMLTextAreaElement) {
 				element.placeholder = translation;
 			} else {
-				element.textContent = translation;
+				// Sanitize HTML content before inserting
+				element.innerHTML = DOMPurify.sanitize(translation);
 			}
 		}
 	});

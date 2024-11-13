@@ -78,7 +78,15 @@
 		"message": "Bóvedas"
 	},
 	"vaultsDescription": {
-		"message": "Por defecto, las notas se guardan en la bóveda abierta actualmente. Puedes añadir bóvedas aquí si quieres la opción de guardar en diferentes bóvedas. Los nombres de las bóvedas deben coincidir exactamente con el nombre de la bóveda de Obsidian. Presiona enter para añadir una bóveda."
+		"message": "Por defecto, las notas se guardan en la bóveda abierta actualmente. Puedes añadir bóvedas aquí si quieres la opción de guardar en diferentes bóvedas. Los nombres de las bóvedas deben coincidir exactamente con el nombre de la bóveda de Obsidian. Presiona $strong_start$enter$strong_end$ para añadir una bóveda.",
+		"placeholders": {
+			"strong_start": {
+				"content": "<strong>"
+			},
+			"strong_end": {
+				"content": "</strong>"
+			}
+		}
 	},
 	"addVaultPlaceholder": {
 		"message": "Presiona enter para añadir una bóveda"
@@ -99,7 +107,15 @@
 		"message": "Funciones de acceso anticipado"
 	},
 	"earlyAccessDescription": {
-		"message": "Usa funciones que requieren la última versión de acceso anticipado de Obsidian. Actualmente requiere Obsidian 1.7.2 o posterior."
+		"message": "Usa funciones que requieren la última versión de $link_start$acceso anticipado$link_end$ de Obsidian. Actualmente requiere Obsidian 1.7.2 o posterior.",
+		"placeholders": {
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/Obsidian/Early+access+versions\" target=\"_blank\">"
+			},
+			"link_end": {
+				"content": "</a>"
+			}
+		}
 	},
 	"silentOpen": {
 		"message": "Guardar nota sin abrirla"

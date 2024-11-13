@@ -25,7 +25,7 @@ import { updateUrl, getUrlParameters } from '../utils/routing';
 import { addBrowserClassToHtml } from '../utils/browser-detection';
 import { initializeMenu } from '../managers/menu';
 import { addMenuItemListener } from '../managers/menu';
-import { getCurrentLanguage, setLanguage, getAvailableLanguages } from '../utils/language-settings';
+import { getCurrentLanguage, setLanguage, getAvailableLanguages, getMessage } from '../utils/language-settings';
 import { translatePage } from '../utils/i18n';
 
 declare global {
@@ -66,19 +66,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 	async function initializeLanguageSelector(languageSelect: HTMLSelectElement): Promise<void> {
 		try {
+			// Initialize i18n first
+			await translatePage();
+			
 			// Populate language options
 			const languages = getAvailableLanguages();
 			const currentLanguage = await getCurrentLanguage();
 			
-			languageSelect.innerHTML = languages.map(lang => 
-				`<option value="${lang.code}" ${lang.code === currentLanguage ? 'selected' : ''}>${lang.name}</option>`
-			).join('');
+			languageSelect.innerHTML = languages.map(lang => {
+				const displayName = lang.code === '' ? getMessage('systemDefault') : lang.name;
+				return `<option value="${lang.code}" ${lang.code === currentLanguage ? 'selected' : ''}>${displayName}</option>`;
+			}).join('');
 
 			// Add change listener
 			languageSelect.addEventListener('change', async () => {
 				try {
 					await setLanguage(languageSelect.value);
-					// The page will reload automatically after language change
+					window.location.reload(); // Force reload the current page
 				} catch (error) {
 					console.error('Failed to change language:', error);
 				}
