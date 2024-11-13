@@ -58,5 +58,86 @@
 	},
 	"pleaseReload": {
 		"message": "Please try reloading the page."
+	},
+	"language": {
+		"message": "Language"
+	},
+	"languageDescription": {
+		"message": "Choose the display language for the extension interface."
+	},
+	"systemDefault": {
+		"message": "System default"
+	},
+	"generalSettings": {
+		"message": "General settings"
+	},
+	"display": {
+		"message": "Display"
+	},
+	"vaults": {
+		"message": "Vaults"
+	},
+	"vaultsDescription": {
+		"message": "By default, clipped notes are saved to the currently open vault. You can add vaults here if you want the option to save to different vaults. Vault names must exactly match the name of the Obsidian vault. Press enter to add a vault."
+	},
+	"addVaultPlaceholder": {
+		"message": "Press enter to add a vault"
+	},
+	"hotkeys": {
+		"message": "Hotkeys"
+	},
+	"advanced": {
+		"message": "Advanced"
+	},
+	"showActionsButton": {
+		"message": "Show actions button"
+	},
+	"showActionsDescription": {
+		"message": "Allows you to inspect page variables from the clipper menu. Useful for seeing the variables that are available to use in templates."
+	},
+	"earlyAccessFeatures": {
+		"message": "Early access features"
+	},
+	"earlyAccessDescription": {
+		"message": "Use features that require the latest early access version of Obsidian. Currently requires Obsidian 1.7.2 or later."
+	},
+	"silentOpen": {
+		"message": "Save clipped note without opening it"
+	},
+	"silentOpenDescription": {
+		"message": "Clipped notes will be saved but will not open as a new tab. Obsidian will still be brought to the foreground."
+	},
+	"legacyMode": {
+		"message": "Legacy mode"
+	},
+	"legacyModeDescription": {
+		"message": "Uses the URI clipping method compatible with Obsidian 1.6.7 or earlier. Note that the length of the content you can clip is limited by your browser and OS. Some pages may fail without any errors."
+	},
+	"resetDefaultTemplate": {
+		"message": "Reset default template"
+	},
+	"resetDefaultTemplateDescription": {
+		"message": "Remove any changes you've made to the default template."
+	},
+	"exportAllSettings": {
+		"message": "Export all settings"
+	},
+	"exportAllSettingsDescription": {
+		"message": "Export all settings including templates and properties."
+	},
+	"importAllSettings": {
+		"message": "Import all settings"
+	},
+	"importAllSettingsDescription": {
+		"message": "Import all settings including templates and properties. This will replace your current configuration."
+	},
+	"reset": {
+		"message": "Reset"
+	},
+	"export": {
+		"message": "Export"
+	},
+	"import": {
+		"message": "Import"
 	}
 } 

@@ -37,103 +37,121 @@
 					</div>
 					<div id="general-section" class="settings-section active">
 						<div class="settings-section-header">
-							<h2>General settings</h2>
+							<h2 data-i18n="generalSettings">General settings</h2>
 						</div>
 						<form id="general-settings-form">
-								<div>
-									<h3>Vaults</h3>
-									<div class="setting-item-description">By default, clipped notes are saved to the currently open vault. You can add vaults here if you want the option to save to different vaults. Vault names must exactly match the name of the Obsidian vault. Press <strong>enter</strong> to add a&nbsp;vault.</div>
-									<input type="text" id="vault-input" placeholder="Press enter to add a vault" autocomplete="off" spellcheck="false" />
-									<ul id="vault-list"></ul>
+							<div>
+								<h3 data-i18n="display">Display</h3>
+								<div class="setting-item mod-horizontal">
+									<div class="setting-item-info">
+										<label for="language-select" data-i18n="language">Language</label>
+										<div class="setting-item-description" data-i18n="languageDescription">
+											Choose the display language for the extension interface.
+										</div>
+									</div>
+									<div class="setting-item-control">
+										<select id="language-select">
+											<option value="" data-i18n="systemDefault">System default</option>
+											<option value="en">English</option>
+											<option value="es">Español</option>
+										</select>
+									</div>
 								</div>
-								<div id="hotkeys-subsection">
-									<h3>Hotkeys</h3>
-									<div class="setting-item-description shortcut-instructions">
-									</div>
-									<div id="keyboard-shortcuts-list"></div>
+							</div>
+							<div>
+								<h3 data-i18n="vaults">Vaults</h3>
+								<div class="setting-item-description" data-i18n="vaultsDescription">By default, clipped notes are saved to the currently open vault. You can add vaults here if you want the option to save to different vaults. Vault names must exactly match the name of the Obsidian vault. Press <strong>enter</strong> to add a&nbsp;vault.</div>
+								<input type="text" id="vault-input" data-i18n="addVaultPlaceholder" placeholder="Press enter to add a vault" autocomplete="off" spellcheck="false" />
+								<ul id="vault-list"></ul>
+							</div>
+							<div id="hotkeys-subsection">
+								<h3 data-i18n="hotkeys">Hotkeys</h3>
+								<div class="setting-item-description shortcut-instructions">
 								</div>
-								<div>
-									<h3>Advanced</h3>
-									<div class="setting-item mod-horizontal" style="display: none;">
-										<div class="setting-item-info">
-											<label for="show-more-actions-toggle">Show actions button</label>
-											<div class="setting-item-description">
-												Allows you to inspect page variables from the clipper menu. Useful for seeing the variables that are available to use in&nbsp;templates.
-											</div>
-										</div>
-										<div class="setting-item-control">
-											<div class="checkbox-container is-enabled">
-												<input type="checkbox" id="show-more-actions-toggle" />
-											</div>
+								<div id="keyboard-shortcuts-list"></div>
+							</div>
+							<div>
+								<h3 data-i18n="advanced">Advanced</h3>
+								<div class="setting-item mod-horizontal" style="display: none;">
+									<div class="setting-item-info">
+										<label for="show-more-actions-toggle" data-i18n="showActionsButton">Show actions button</label>
+										<div class="setting-item-description" data-i18n="showActionsDescription">
+											Allows you to inspect page variables from the clipper menu. Useful for seeing the variables that are available to use in&nbsp;templates.
 										</div>
 									</div>
-									<div class="setting-item mod-horizontal" style="display: none;">
-										<div class="setting-item-info">
-											<label for="beta-features-toggle">Early access features</label>
-											<div class="setting-item-description">
-												Use features that require the latest <a href="https://help.obsidian.md/Obsidian/Early+access+versions" target="_blank">early access version</a> of Obsidian. Currently requires Obsidian 1.7.2 or later.
-											</div>
-										</div>
-										<div class="setting-item-control">
-											<div class="checkbox-container">
-												<input type="checkbox" id="beta-features-toggle" />
-											</div>
-										</div>
-									</div>
-									<div class="setting-item mod-horizontal">
-										<div class="setting-item-info">
-											<label for="silent-open-toggle">Save clipped note without opening&nbsp;it</label>
-											<div class="setting-item-description">
-												Clipped notes will be saved but will not open as a new tab. Obsidian will still be brought to the foreground.
-											</div>
-										</div>
-										<div class="setting-item-control">
-											<div class="checkbox-container">
-												<input type="checkbox" id="silent-open-toggle" />
-											</div>
-										</div>
-									</div>
-									<div class="setting-item mod-horizontal">
-										<div class="setting-item-info">
-											<label for="legacy-mode-toggle">Legacy&nbsp;mode</label>
-											<div class="setting-item-description">
-												Uses the URI clipping method compatible with Obsidian 1.6.7 or earlier. Note that the length of the content you can clip is limited by your browser and OS. Some pages may fail without any errors.
-											</div>
-										</div>
-										<div class="setting-item-control">
-											<div class="checkbox-container">
-												<input type="checkbox" id="legacy-mode-toggle" />
-											</div>
-										</div>
-									</div>
-									<div class="setting-item mod-horizontal">
-										<div class="setting-item-info">
-											<label for="reset-default-template-btn">Reset default template</label>
-											<div class="setting-item-description">Remove any changes you've made to the default&nbsp;template.</div>
-										</div>
-										<div class="setting-item-control">
-											<button type="button" id="reset-default-template-btn" class="mod-warning">Reset</button>
-										</div>
-									</div>
-									<div class="setting-item mod-horizontal">
-										<div class="setting-item-info">
-											<label for="export-all-settings-btn">Export all settings</label>
-											<div class="setting-item-description">Export all settings including templates and properties.</div>
-										</div>
-										<div class="setting-item-control">
-											<button type="button" id="export-all-settings-btn">Export</button>
-										</div>
-									</div>
-									<div class="setting-item mod-horizontal">
-										<div class="setting-item-info">
-											<label for="import-all-settings-btn">Import all settings</label>
-											<div class="setting-item-description">Import all settings including templates and properties. This will replace your current configuration.</div>
-										</div>
-										<div class="setting-item-control">
-											<button type="button" id="import-all-settings-btn">Import</button>
+									<div class="setting-item-control">
+										<div class="checkbox-container is-enabled">
+											<input type="checkbox" id="show-more-actions-toggle" />
 										</div>
 									</div>
 								</div>
+								<div class="setting-item mod-horizontal" style="display: none;">
+									<div class="setting-item-info">
+										<label for="beta-features-toggle" data-i18n="earlyAccessFeatures">Early access features</label>
+										<div class="setting-item-description" data-i18n="earlyAccessDescription">
+											Use features that require the latest <a href="https://help.obsidian.md/Obsidian/Early+access+versions" target="_blank">early access version</a> of Obsidian. Currently requires Obsidian 1.7.2 or later.
+										</div>
+									</div>
+									<div class="setting-item-control">
+										<div class="checkbox-container">
+											<input type="checkbox" id="beta-features-toggle" />
+										</div>
+									</div>
+								</div>
+								<div class="setting-item mod-horizontal">
+									<div class="setting-item-info">
+										<label for="silent-open-toggle" data-i18n="silentOpen">Save clipped note without opening&nbsp;it</label>
+										<div class="setting-item-description" data-i18n="silentOpenDescription">
+											Clipped notes will be saved but will not open as a new tab. Obsidian will still be brought to the foreground.
+										</div>
+									</div>
+									<div class="setting-item-control">
+										<div class="checkbox-container">
+											<input type="checkbox" id="silent-open-toggle" />
+										</div>
+									</div>
+								</div>
+								<div class="setting-item mod-horizontal">
+									<div class="setting-item-info">
+										<label for="legacy-mode-toggle" data-i18n="legacyMode">Legacy&nbsp;mode</label>
+										<div class="setting-item-description" data-i18n="legacyModeDescription">
+											Uses the URI clipping method compatible with Obsidian 1.6.7 or earlier. Note that the length of the content you can clip is limited by your browser and OS. Some pages may fail without any errors.
+										</div>
+									</div>
+									<div class="setting-item-control">
+										<div class="checkbox-container">
+											<input type="checkbox" id="legacy-mode-toggle" />
+										</div>
+									</div>
+								</div>
+								<div class="setting-item mod-horizontal">
+									<div class="setting-item-info">
+										<label for="reset-default-template-btn" data-i18n="resetDefaultTemplate">Reset default template</label>
+										<div class="setting-item-description" data-i18n="resetDefaultTemplateDescription">Remove any changes you've made to the default&nbsp;template.</div>
+									</div>
+									<div class="setting-item-control">
+										<button type="button" id="reset-default-template-btn" class="mod-warning" data-i18n="reset">Reset</button>
+									</div>
+								</div>
+								<div class="setting-item mod-horizontal">
+									<div class="setting-item-info">
+										<label for="export-all-settings-btn" data-i18n="exportAllSettings">Export all settings</label>
+										<div class="setting-item-description" data-i18n="exportAllSettingsDescription">Export all settings including templates and properties.</div>
+									</div>
+									<div class="setting-item-control">
+										<button type="button" id="export-all-settings-btn" data-i18n="export">Export</button>
+									</div>
+								</div>
+								<div class="setting-item mod-horizontal">
+									<div class="setting-item-info">
+										<label for="import-all-settings-btn" data-i18n="importAllSettings">Import all settings</label>
+										<div class="setting-item-description" data-i18n="importAllSettingsDescription">Import all settings including templates and properties. This will replace your current configuration.</div>
+									</div>
+									<div class="setting-item-control">
+										<button type="button" id="import-all-settings-btn" data-i18n="import">Import</button>
+									</div>
+								</div>
+							</div>
 						</form>
 					</div>
 

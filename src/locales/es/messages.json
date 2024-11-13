@@ -1,0 +1,143 @@
+{
+	"extensionName": {
+		"message": "Obsidian Web Clipper"
+	},
+	"extensionDescription": {
+		"message": "Guarda contenido web en un formato privado y duradero al que puedes acceder sin conexión. La extensión oficial para Obsidian."
+	},
+	"addToObsidian": {
+		"message": "Agregar a Obsidian"
+	},
+	"noteName": {
+		"message": "Nombre de la nota"
+	},
+	"notesAboutPage": {
+		"message": "Notas sobre esta página..."
+	},
+	"folder": {
+		"message": "Carpeta"
+	},
+	"settings": {
+		"message": "Ajustes"
+	},
+	"showPageVariables": {
+		"message": "Mostrar variables de página"
+	},
+	"highlightPage": {
+		"message": "Resaltar página"
+	},
+	"copyToClipboard": {
+		"message": "Copiar al portapapeles"
+	},
+	"saveFile": {
+		"message": "Guardar archivo..."
+	},
+	"share": {
+		"message": "Compartir..."
+	},
+	"properties": {
+		"message": "Propiedades"
+	},
+	"copied": {
+		"message": "¡Copiado!"
+	},
+	"error": {
+		"message": "Error"
+	},
+	"pageCannotBeClipped": {
+		"message": "Esta página no se puede guardar."
+	},
+	"onlyHttpSupported": {
+		"message": "Esta página no se puede guardar. Solo se admiten URLs http y https."
+	},
+	"noTemplates": {
+		"message": "No hay plantillas disponibles. Por favor, añade una plantilla en los ajustes."
+	},
+	"failedToSave": {
+		"message": "Error al guardar el archivo"
+	},
+	"pleaseReload": {
+		"message": "Por favor, intenta recargar la página."
+	},
+	"language": {
+		"message": "Idioma"
+	},
+	"languageDescription": {
+		"message": "Elige el idioma de la interfaz de la extensión."
+	},
+	"systemDefault": {
+		"message": "Predeterminado del sistema"
+	},
+	"generalSettings": {
+		"message": "Ajustes generales"
+	},
+	"display": {
+		"message": "Pantalla"
+	},
+	"vaults": {
+		"message": "Bóvedas"
+	},
+	"vaultsDescription": {
+		"message": "Por defecto, las notas se guardan en la bóveda abierta actualmente. Puedes añadir bóvedas aquí si quieres la opción de guardar en diferentes bóvedas. Los nombres de las bóvedas deben coincidir exactamente con el nombre de la bóveda de Obsidian. Presiona enter para añadir una bóveda."
+	},
+	"addVaultPlaceholder": {
+		"message": "Presiona enter para añadir una bóveda"
+	},
+	"hotkeys": {
+		"message": "Atajos de teclado"
+	},
+	"advanced": {
+		"message": "Avanzado"
+	},
+	"showActionsButton": {
+		"message": "Mostrar botón de acciones"
+	},
+	"showActionsDescription": {
+		"message": "Permite inspeccionar las variables de página desde el menú del clipper. Útil para ver las variables disponibles para usar en las plantillas."
+	},
+	"earlyAccessFeatures": {
+		"message": "Funciones de acceso anticipado"
+	},
+	"earlyAccessDescription": {
+		"message": "Usa funciones que requieren la última versión de acceso anticipado de Obsidian. Actualmente requiere Obsidian 1.7.2 o posterior."
+	},
+	"silentOpen": {
+		"message": "Guardar nota sin abrirla"
+	},
+	"silentOpenDescription": {
+		"message": "Las notas se guardarán pero no se abrirán en una nueva pestaña. Obsidian seguirá siendo traído al primer plano."
+	},
+	"legacyMode": {
+		"message": "Modo heredado"
+	},
+	"legacyModeDescription": {
+		"message": "Usa el método de guardado URI compatible con Obsidian 1.6.7 o anterior. Ten en cuenta que la longitud del contenido que puedes guardar está limitada por tu navegador y sistema operativo. Algunas páginas pueden fallar sin mostrar errores."
+	},
+	"resetDefaultTemplate": {
+		"message": "Restablecer plantilla predeterminada"
+	},
+	"resetDefaultTemplateDescription": {
+		"message": "Elimina cualquier cambio que hayas hecho a la plantilla predeterminada."
+	},
+	"exportAllSettings": {
+		"message": "Exportar todos los ajustes"
+	},
+	"exportAllSettingsDescription": {
+		"message": "Exporta todos los ajustes incluyendo plantillas y propiedades."
+	},
+	"importAllSettings": {
+		"message": "Importar todos los ajustes"
+	},
+	"importAllSettingsDescription": {
+		"message": "Importa todos los ajustes incluyendo plantillas y propiedades. Esto reemplazará tu configuración actual."
+	},
+	"reset": {
+		"message": "Restablecer"
+	},
+	"export": {
+		"message": "Exportar"
+	},
+	"import": {
+		"message": "Importar"
+	}
+} 
