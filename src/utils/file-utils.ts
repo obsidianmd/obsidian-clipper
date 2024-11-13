@@ -25,11 +25,22 @@ export async function saveFile({
 }: SaveFileOptions): Promise<void> {
 	try {
 		const browserType = await detectBrowser();
-		const isSafariBrowser = ['safari', 'mobile-safari', 'ipad-os'].includes(browserType);
+		const isSafari = ['ios', 'mobile-ios', 'ipad-os', 'safari', 'mobile-safari'].includes(browserType);
 		
-		if (isSafariBrowser) {
-			// Use data URI approach for Safari
+		if (isSafari) {
+			const blob = new Blob([content], { type: 'application/json' });
+			const file = new File([blob], fileName, { type: 'application/json' });
+
+			// Use share API if there is no tab ID, e.g. in settings pages
 			if (!tabId) {
+				try {
+					await navigator.share({
+						files: [file],
+						text: fileName
+					});
+				} catch (error) {
+					console.error('Error sharing:', error);
+				}
 				throw new Error('Tab ID is required for saving files in Safari');
 			}
 
