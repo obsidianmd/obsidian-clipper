@@ -1,227 +1,18 @@
 {
-	"extensionName": {
-		"message": "Obsidian Web Clipper"
-	},
-	"extensionDescription": {
-		"message": "Guarda contenido web en un formato privado y duradero al que puedes acceder sin conexión. La extensión oficial para Obsidian."
+	"addProperty": {
+		"message": "+ Agregar propiedad"
 	},
 	"addToObsidian": {
 		"message": "Agregar a Obsidian"
 	},
-	"noteName": {
-		"message": "Nombre de la nota"
-	},
-	"notesAboutPage": {
-		"message": "Notas sobre esta página..."
-	},
-	"folder": {
-		"message": "Carpeta"
-	},
-	"settings": {
-		"message": "Ajustes"
-	},
-	"showPageVariables": {
-		"message": "Mostrar variables de página"
-	},
-	"highlightPage": {
-		"message": "Resaltar página"
-	},
-	"copyToClipboard": {
-		"message": "Copiar al portapapeles"
-	},
-	"saveFile": {
-		"message": "Guardar archivo..."
-	},
-	"share": {
-		"message": "Compartir..."
-	},
-	"properties": {
-		"message": "Propiedades"
-	},
-	"copied": {
-		"message": "¡Copiado!"
-	},
-	"error": {
-		"message": "Error"
-	},
-	"pageCannotBeClipped": {
-		"message": "Esta página no se puede guardar."
-	},
-	"onlyHttpSupported": {
-		"message": "Esta página no se puede guardar. Solo se admiten URLs http y https."
-	},
-	"noTemplates": {
-		"message": "No hay plantillas disponibles. Por favor, añade una plantilla en los ajustes."
-	},
-	"failedToSave": {
-		"message": "Error al guardar el archivo"
-	},
-	"pleaseReload": {
-		"message": "Por favor, intenta recargar la página."
-	},
-	"language": {
-		"message": "Idioma"
-	},
-	"languageDescription": {
-		"message": "Elige el idioma de la interfaz de la extensión."
-	},
-	"systemDefault": {
-		"message": "Sistema"
-	},
-	"generalSettings": {
-		"message": "Ajustes generales"
-	},
-	"display": {
-		"message": "Pantalla"
-	},
-	"vaults": {
-		"message": "Bóvedas"
-	},
-	"vaultsDescription": {
-		"message": "Por defecto, las notas se guardan en la bóveda abierta actualmente. Puedes añadir bóvedas aquí si quieres la opción de guardar en diferentes bóvedas. Los nombres de las bóvedas deben coincidir exactamente con el nombre de la bóveda de Obsidian. Presiona $strong_start$enter$strong_end$ para añadir una bóveda.",
-		"placeholders": {
-			"strong_start": {
-				"content": "<strong>"
-			},
-			"strong_end": {
-				"content": "</strong>"
-			}
-		}
-	},
 	"addVaultPlaceholder": {
 		"message": "Presiona enter para añadir una bóveda"
-	},
-	"hotkeys": {
-		"message": "Atajos de teclado"
 	},
 	"advanced": {
 		"message": "Avanzado"
 	},
-	"showActionsButton": {
-		"message": "Mostrar botón de acciones"
-	},
-	"showActionsDescription": {
-		"message": "Permite inspeccionar las variables de página desde el menú del clipper. Útil para ver las variables disponibles para usar en las plantillas."
-	},
-	"earlyAccessFeatures": {
-		"message": "Funciones de acceso anticipado"
-	},
-	"earlyAccessDescription": {
-		"message": "Usa funciones que requieren la última versión de $link_start$acceso anticipado$link_end$ de Obsidian. Actualmente requiere Obsidian 1.7.2 o posterior.",
-		"placeholders": {
-			"link_start": {
-				"content": "<a href=\"https://help.obsidian.md/Obsidian/Early+access+versions\" target=\"_blank\">"
-			},
-			"link_end": {
-				"content": "</a>"
-			}
-		}
-	},
-	"silentOpen": {
-		"message": "Guardar nota sin abrirla"
-	},
-	"silentOpenDescription": {
-		"message": "Las notas se guardarán pero no se abrirán en una nueva pestaña. Obsidian seguirá siendo traído al primer plano."
-	},
-	"legacyMode": {
-		"message": "Modo heredado"
-	},
-	"legacyModeDescription": {
-		"message": "Usa el método de guardado URI compatible con Obsidian 1.6.7 o anterior. Ten en cuenta que la longitud del contenido que puedes guardar está limitada por tu navegador y sistema operativo. Algunas páginas pueden fallar sin mostrar errores."
-	},
-	"resetDefaultTemplate": {
-		"message": "Restablecer plantilla predeterminada"
-	},
-	"resetDefaultTemplateDescription": {
-		"message": "Elimina cualquier cambio que hayas hecho a la plantilla predeterminada."
-	},
-	"exportAllSettings": {
-		"message": "Exportar todos los ajustes"
-	},
-	"exportAllSettingsDescription": {
-		"message": "Exporta todos los ajustes incluyendo plantillas y propiedades."
-	},
-	"importAllSettings": {
-		"message": "Importar todos los ajustes"
-	},
-	"importAllSettingsDescription": {
-		"message": "Importa todos los ajustes incluyendo plantillas y propiedades. Esto reemplazará tu configuración actual."
-	},
-    "refresh": {
-		"message": "Refrescar"
-	},
-	"remove": {
-		"message": "Eliminar"
-	},
-	"reset": {
-		"message": "Restablecer"
-	},
-	"export": {
-		"message": "Exportar"
-	},
-	"import": {
-		"message": "Importar"
-	},
-	"propertiesSettings": {
-		"message": "Propiedades"
-	},
-	"importProperties": {
-		"message": "Importar propiedades"
-	},
-	"importPropertiesDescription": {
-		"message": "Para importar tus propiedades desde Obsidian, localiza el archivo $strong_1_start$types.json$strong_1_end$ en la carpeta $strong_2_start$.obsidian$strong_2_end$ dentro de tu bóveda. Ten en cuenta que esta carpeta está oculta por defecto en la mayoría de los sistemas operativos.",
-		"placeholders": {
-			"strong_1_start": {
-				"content": "<strong>"
-			},
-			"strong_1_end": {
-				"content": "</strong>"
-			},
-			"strong_2_start": {
-				"content": "<strong>"
-			},
-			"strong_2_end": {
-				"content": "</strong>"
-			}
-		}
-	},
-	"exportProperties": {
-		"message": "Exportar propiedades"
-	},
-	"exportPropertiesDescription": {
-		"message": "Guarda las propiedades del Web Clipper en un archivo $strong_start$types.json$strong_end$ que puede ser importado en tu bóveda de Obsidian o en Web Clipper en otros dispositivos.",
-		"placeholders": {
-			"strong_start": {
-				"content": "<strong>"
-			},
-			"strong_end": {
-				"content": "</strong>"
-			}
-		}
-	},
-	"removeUnusedProperties": {
-		"message": "Eliminar propiedades no utilizadas"
-	},
-	"removeUnusedPropertiesDescription": {
-		"message": "Elimina todas las propiedades que no se utilizan en ninguna plantilla."
-	},
 	"allProperties": {
 		"message": "Todas las propiedades"
-	},
-	"highlighterSettings": {
-		"message": "Resaltador"
-	},
-	"enableHighlighter": {
-		"message": "Activar resaltador"
-	},
-	"enableHighlighterDescription": {
-		"message": "Resalta contenido en páginas web que puedes guardar en Obsidian."
-	},
-	"exportHighlights": {
-		"message": "Exportar resaltados"
-	},
-	"exportHighlightsDescription": {
-		"message": "Exporta tus resaltados a un archivo."
 	},
 	"alwaysShowHighlights": {
 		"message": "Mostrar siempre los resaltados"
@@ -229,238 +20,34 @@
 	"alwaysShowHighlightsDescription": {
 		"message": "Muestra tus resaltados guardados cuando cargas una página. Desactiva para mostrar los resaltados solo cuando el modo resaltador está activado."
 	},
+	"appendToDaily": {
+		"message": "Agregar a la nota diaria, al final"
+	},
+	"appendToExisting": {
+		"message": "Agregar a una nota existente, al final"
+	},
+	"behavior": {
+		"message": "Comportamiento"
+	},
+	"behaviorWarning": {
+		"message": "Agregar a una nota existente o nota diaria requiere Obsidian 1.7.2 o posterior."
+	},
 	"clipBehavior": {
 		"message": "Comportamiento de guardado"
 	},
 	"clipBehaviorDescription": {
 		"message": "Elige cómo se guarda el contenido resaltado en Obsidian. Define la variable $strong_start${{content}}$strong_end$.",
 		"placeholders": {
-			"strong_start": {
-				"content": "<strong>"
-			},
 			"strong_end": {
 				"content": "</strong>"
-			}
-		}
-	},
-	"replaceContent": {
-		"message": "Reemplazar el contenido de la página"
-	},
-	"noHighlights": {
-		"message": "No hacer nada"
-	},
-	"settingsHeading": {
-		"message": "Ajustes"
-	},
-	"templatesHeading": {
-		"message": "Plantillas"
-	},
-	"general": {
-		"message": "General"
-	},
-	"highlighter": {
-		"message": "Resaltador"
-	},
-	"interpreter": {
-		"message": "Intérprete"
-	},
-	"newTemplate": {
-		"message": "Nueva plantilla"
-	},
-	"editTemplate": {
-		"message": "Editar plantilla"
-	},
-	"templateName": {
-		"message": "Nombre de la plantilla"
-	},
-	"behavior": {
-		"message": "Comportamiento"
-	},
-	"createNewNote": {
-		"message": "Crear nueva nota"
-	},
-	"appendToExisting": {
-		"message": "Agregar a una nota existente, al final"
-	},
-	"prependToExisting": {
-		"message": "Agregar a una nota existente, al principio"
-	},
-	"appendToDaily": {
-		"message": "Agregar a la nota diaria, al final"
-	},
-	"prependToDaily": {
-		"message": "Agregar a la nota diaria, al principio"
-	},
-	"behaviorWarning": {
-		"message": "Agregar a una nota existente o nota diaria requiere Obsidian 1.7.2 o posterior."
-	},
-	"noteNameFormat": {
-		"message": "Nombre de la nota"
-	},
-	"noteNameFormatDescription": {
-		"message": "Formato para el nombre del archivo de la nota. Puedes usar variables como {{title}}, {{date}} y {{published}} para pre-poblar datos de la página. $link_start$Más información$link_end$.",
-		"placeholders": {
-			"link_start": {
-				"content": "<a href=\"https://github.com/obsidianmd/obsidian-clipper?tab=readme-ov-file#template-variables\" target=\"_blank\">"
 			},
-			"link_end": {
-				"content": "</a>"
+			"strong_start": {
+				"content": "<strong>"
 			}
 		}
-	},
-	"noteLocation": {
-		"message": "Ubicación de la nota"
-	},
-	"noteLocationDescription": {
-		"message": "La carpeta o ruta de la nota."
-	},
-	"vault": {
-		"message": "Bóveda"
-	},
-	"vaultDescription": {
-		"message": "Selecciona la bóveda predeterminada para esta plantilla. Ve a $link_start$ajustes generales$link_end$ para agregar o eliminar bóvedas.",
-		"placeholders": {
-			"link_start": {
-				"content": "<a href=\"?section=general\">"
-			},
-			"link_end": {
-				"content": "</a>"
-			}
-		}
-	},
-	"lastUsed": {
-		"message": "Último usado"
-	},
-	"templateTriggers": {
-		"message": "Activadores de plantilla"
-	},
-	"templateTriggersDescription": {
-		"message": "Define reglas para seleccionar automáticamente esta plantilla si coincide con un patrón de URL o contiene datos de schema.org. Una regla por línea."
-	},
-	"templateProperties": {
-		"message": "Propiedades"
-	},
-	"templatePropertiesDescription": {
-		"message": "Propiedades para agregar en la parte superior de la nota guardada. Usa variables para pre-poblar datos de la página."
-	},
-	"addProperty": {
-		"message": "+ Agregar propiedad"
-	},
-	"noteContent": {
-		"message": "Contenido de la nota"
-	},
-	"noteContentDescription": {
-		"message": "Personaliza el contenido de la nota. Usa variables para pre-poblar datos de la página."
-	},
-	"interpreterContext": {
-		"message": "Contexto del intérprete"
-	},
-	"interpreterContextDescription": {
-		"message": "El contexto utilizado para interpretar variables de prompt. Anula el contexto predeterminado definido en $link_start$Ajustes del intérprete$link_end$. Se pueden usar variables aquí.",
-		"placeholders": {
-			"link_start": {
-				"content": "<a href=\"?section=interpreter\">"
-			},
-			"link_end": {
-				"content": "</a>"
-			}
-		}
-	},
-	"duplicate": {
-		"message": "Duplicar"
-	},
-	"copyAsJson": {
-		"message": "Copiar como JSON"
-	},
-	"delete": {
-		"message": "Eliminar"
-	},
-	"more": {
-		"message": "Más"
-	},
-	"specificNoteName": {
-		"message": "Nombre específico de la nota"
-	},
-	"dailyNoteFormat": {
-		"message": "Formato de nota diaria (ej., YYYY-MM-DD)"
-	},
-	"propertyName": {
-		"message": "Nombre de la propiedad"
-	},
-	"propertyValue": {
-		"message": "Valor de la propiedad"
-	},
-	"removeProperty": {
-		"message": "Eliminar propiedad"
-	},
-	"removeVault": {
-		"message": "Eliminar bóveda"
-	},
-	"shortcutInstructionsIntro": {
-		"message": "Los atajos de teclado te dan acceso rápido a las funciones del clipper."
-	},
-	"shortcutInstructionsChrome": {
-		"message": "Para cambiar las asignaciones de teclas, ve a $1"
-	},
-	"shortcutInstructionsBrave": {
-		"message": "Para cambiar las asignaciones de teclas, ve a $1"
-	},
-	"shortcutInstructionsFirefox": {
-		"message": "Para cambiar las asignaciones de teclas, ve a $1, haz clic en el icono de engranaje y selecciona \"Gestionar atajos de extensión\"."
-	},
-	"shortcutInstructionsEdge": {
-		"message": "Para cambiar las asignaciones de teclas, ve a $1"
-	},
-	"shortcutInstructionsSafari": {
-		"message": "Los atajos de teclado no están disponibles para extensiones de Safari."
-	},
-	"shortcutInstructionsDefault": {
-		"message": "Para cambiar las asignaciones de teclas, consulta la configuración de extensiones de tu navegador."
-	},
-	"shortcutNotSet": {
-		"message": "No establecido"
-	},
-	"defaultTemplateName": {
-		"message": "Predeterminado"
-	},
-	"failedToResetTemplate": {
-		"message": "Error al restablecer la plantilla predeterminada. Por favor, inténtalo de nuevo."
-	},
-	"pageVariables": {
-		"message": "Variables de página"
 	},
 	"close": {
 		"message": "Cerrar"
-	},
-	"searchVariables": {
-		"message": "Buscar variables..."
-	},
-	"disableHighlighter": {
-		"message": "Desactivar resaltador"
-	},
-	"failedToCopyText": {
-		"message": "Error al copiar el texto"
-	},
-	"failedToSaveFile": {
-		"message": "Error al guardar el archivo"
-	},
-	"failedToInitialize": {
-		"message": "Por favor, intenta recargar la extensión."
-	},
-	"failedToProcessInterpreter": {
-		"message": "Error al procesar el intérprete. Por favor, inténtalo de nuevo."
-	},
-	"failedToExtractContent": {
-		"message": "No se pudo extraer el contenido de la página."
-	},
-	"failedToInitializeContent": {
-		"message": "No se pudo inicializar el contenido de la página."
-	},
-	"confirmDeleteTemplate": {
-		"message": "¿Estás seguro de que quieres eliminar la plantilla \"$1\"?"
-	},
-	"failedToDeleteTemplate": {
-		"message": "Error al eliminar la plantilla. Por favor, inténtalo de nuevo."
 	},
 	"commandOpenClipper": {
 		"message": "Abrir Obsidian Clipper"
@@ -470,5 +57,418 @@
 	},
 	"commandToggleHighlighter": {
 		"message": "Alternar modo resaltador"
+	},
+	"confirmDeleteTemplate": {
+		"message": "¿Estás seguro de que quieres eliminar la plantilla \"$1\"?"
+	},
+	"copied": {
+		"message": "¡Copiado!"
+	},
+	"copyAsJson": {
+		"message": "Copiar como JSON"
+	},
+	"copyToClipboard": {
+		"message": "Copiar al portapapeles"
+	},
+	"createNewNote": {
+		"message": "Crear nueva nota"
+	},
+	"dailyNoteFormat": {
+		"message": "Formato de nota diaria (ej., YYYY-MM-DD)"
+	},
+	"defaultTemplateName": {
+		"message": "Predeterminado"
+	},
+	"delete": {
+		"message": "Eliminar"
+	},
+	"disableHighlighter": {
+		"message": "Desactivar resaltador"
+	},
+	"display": {
+		"message": "Pantalla"
+	},
+	"duplicate": {
+		"message": "Duplicar"
+	},
+	"earlyAccessDescription": {
+		"message": "Usa funciones que requieren la última versión de $link_start$acceso anticipado$link_end$ de Obsidian. Actualmente requiere Obsidian 1.7.2 o posterior.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/Obsidian/Early+access+versions\" target=\"_blank\">"
+			}
+		}
+	},
+	"earlyAccessFeatures": {
+		"message": "Funciones de acceso anticipado"
+	},
+	"editTemplate": {
+		"message": "Editar plantilla"
+	},
+	"enableHighlighter": {
+		"message": "Activar resaltador"
+	},
+	"enableHighlighterDescription": {
+		"message": "Resalta contenido en páginas web que puedes guardar en Obsidian."
+	},
+	"error": {
+		"message": "Error"
+	},
+	"export": {
+		"message": "Exportar"
+	},
+	"exportAllSettings": {
+		"message": "Exportar todos los ajustes"
+	},
+	"exportAllSettingsDescription": {
+		"message": "Exporta todos los ajustes incluyendo plantillas y propiedades."
+	},
+	"exportHighlights": {
+		"message": "Exportar resaltados"
+	},
+	"exportHighlightsDescription": {
+		"message": "Exporta tus resaltados a un archivo."
+	},
+	"exportProperties": {
+		"message": "Exportar propiedades"
+	},
+	"exportPropertiesDescription": {
+		"message": "Guarda las propiedades del Web Clipper en un archivo $strong_start$types.json$strong_end$ que puede ser importado en tu bóveda de Obsidian o en Web Clipper en otros dispositivos.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"extensionDescription": {
+		"message": "Guarda contenido web en un formato privado y duradero al que puedes acceder sin conexión. La extensión oficial para Obsidian."
+	},
+	"extensionName": {
+		"message": "Obsidian Web Clipper"
+	},
+	"failedToCopyText": {
+		"message": "Error al copiar el texto"
+	},
+	"failedToDeleteTemplate": {
+		"message": "Error al eliminar la plantilla. Por favor, inténtalo de nuevo."
+	},
+	"failedToExtractContent": {
+		"message": "No se pudo extraer el contenido de la página."
+	},
+	"failedToInitialize": {
+		"message": "Por favor, intenta recargar la extensión."
+	},
+	"failedToInitializeContent": {
+		"message": "No se pudo inicializar el contenido de la página."
+	},
+	"failedToProcessInterpreter": {
+		"message": "Error al procesar el intérprete. Por favor, inténtalo de nuevo."
+	},
+	"failedToResetTemplate": {
+		"message": "Error al restablecer la plantilla predeterminada. Por favor, inténtalo de nuevo."
+	},
+	"failedToSave": {
+		"message": "Error al guardar el archivo"
+	},
+	"failedToSaveFile": {
+		"message": "Error al guardar el archivo"
+	},
+	"folder": {
+		"message": "Carpeta"
+	},
+	"general": {
+		"message": "General"
+	},
+	"generalSettings": {
+		"message": "Ajustes generales"
+	},
+	"highlightPage": {
+		"message": "Resaltar página"
+	},
+	"highlighter": {
+		"message": "Resaltador"
+	},
+	"highlighterSettings": {
+		"message": "Resaltador"
+	},
+	"hotkeys": {
+		"message": "Atajos de teclado"
+	},
+	"import": {
+		"message": "Importar"
+	},
+	"importAllSettings": {
+		"message": "Importar todos los ajustes"
+	},
+	"importAllSettingsDescription": {
+		"message": "Importa todos los ajustes incluyendo plantillas y propiedades. Esto reemplazará tu configuración actual."
+	},
+	"importProperties": {
+		"message": "Importar propiedades"
+	},
+	"importPropertiesDescription": {
+		"message": "Para importar tus propiedades desde Obsidian, localiza el archivo $strong_1_start$types.json$strong_1_end$ en la carpeta $strong_2_start$.obsidian$strong_2_end$ dentro de tu bóveda. Ten en cuenta que esta carpeta está oculta por defecto en la mayoría de los sistemas operativos.",
+		"placeholders": {
+			"strong_1_end": {
+				"content": "</strong>"
+			},
+			"strong_1_start": {
+				"content": "<strong>"
+			},
+			"strong_2_end": {
+				"content": "</strong>"
+			},
+			"strong_2_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"interpreter": {
+		"message": "Intérprete"
+	},
+	"interpreterContext": {
+		"message": "Contexto del intérprete"
+	},
+	"interpreterContextDescription": {
+		"message": "El contexto utilizado para interpretar variables de prompt. Anula el contexto predeterminado definido en $link_start$Ajustes del intérprete$link_end$. Se pueden usar variables aquí.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=interpreter\">"
+			}
+		}
+	},
+	"language": {
+		"message": "Idioma"
+	},
+	"languageDescription": {
+		"message": "Elige el idioma de la interfaz de la extensión."
+	},
+	"lastUsed": {
+		"message": "Último usado"
+	},
+	"legacyMode": {
+		"message": "Modo heredado"
+	},
+	"legacyModeDescription": {
+		"message": "Usa el método de guardado URI compatible con Obsidian 1.6.7 o anterior. Ten en cuenta que la longitud del contenido que puedes guardar está limitada por tu navegador y sistema operativo. Algunas páginas pueden fallar sin mostrar errores."
+	},
+	"more": {
+		"message": "Más"
+	},
+	"newTemplate": {
+		"message": "Nueva plantilla"
+	},
+	"noHighlights": {
+		"message": "No hacer nada"
+	},
+	"noTemplates": {
+		"message": "No hay plantillas disponibles. Por favor, añade una plantilla en los ajustes."
+	},
+	"noteContent": {
+		"message": "Contenido de la nota"
+	},
+	"noteContentDescription": {
+		"message": "Personaliza el contenido de la nota. Usa variables para pre-poblar datos de la página."
+	},
+	"noteLocation": {
+		"message": "Ubicación de la nota"
+	},
+	"noteLocationDescription": {
+		"message": "La carpeta o ruta de la nota."
+	},
+	"noteName": {
+		"message": "Nombre de la nota"
+	},
+	"noteNameFormat": {
+		"message": "Nombre de la nota"
+	},
+	"noteNameFormatDescription": {
+		"message": "Formato para el nombre del archivo de la nota. Puedes usar variables como {{title}}, {{date}} y {{published}} para pre-poblar datos de la página. $link_start$Más información$link_end$.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://github.com/obsidianmd/obsidian-clipper?tab=readme-ov-file#template-variables\" target=\"_blank\">"
+			}
+		}
+	},
+	"notesAboutPage": {
+		"message": "Notas sobre esta página..."
+	},
+	"onlyHttpSupported": {
+		"message": "Esta página no se puede guardar. Solo se admiten URLs http y https."
+	},
+	"pageCannotBeClipped": {
+		"message": "Esta página no se puede guardar."
+	},
+	"pageVariables": {
+		"message": "Variables de página"
+	},
+	"pleaseReload": {
+		"message": "Por favor, intenta recargar la página."
+	},
+	"prependToDaily": {
+		"message": "Agregar a la nota diaria, al principio"
+	},
+	"prependToExisting": {
+		"message": "Agregar a una nota existente, al principio"
+	},
+	"properties": {
+		"message": "Propiedades"
+	},
+	"propertiesSettings": {
+		"message": "Propiedades"
+	},
+	"propertyName": {
+		"message": "Nombre de la propiedad"
+	},
+	"propertyValue": {
+		"message": "Valor de la propiedad"
+	},
+	"refresh": {
+		"message": "Refrescar"
+	},
+	"remove": {
+		"message": "Eliminar"
+	},
+	"removeProperty": {
+		"message": "Eliminar propiedad"
+	},
+	"removeUnusedProperties": {
+		"message": "Eliminar propiedades no utilizadas"
+	},
+	"removeUnusedPropertiesDescription": {
+		"message": "Elimina todas las propiedades que no se utilizan en ninguna plantilla."
+	},
+	"removeVault": {
+		"message": "Eliminar bóveda"
+	},
+	"replaceContent": {
+		"message": "Reemplazar el contenido de la página"
+	},
+	"reset": {
+		"message": "Restablecer"
+	},
+	"resetDefaultTemplate": {
+		"message": "Restablecer plantilla predeterminada"
+	},
+	"resetDefaultTemplateDescription": {
+		"message": "Elimina cualquier cambio que hayas hecho a la plantilla predeterminada."
+	},
+	"saveFile": {
+		"message": "Guardar archivo..."
+	},
+	"searchVariables": {
+		"message": "Buscar variables..."
+	},
+	"settings": {
+		"message": "Ajustes"
+	},
+	"settingsHeading": {
+		"message": "Ajustes"
+	},
+	"share": {
+		"message": "Compartir..."
+	},
+	"shortcutInstructionsBrave": {
+		"message": "Para cambiar las asignaciones de teclas, ve a $1"
+	},
+	"shortcutInstructionsChrome": {
+		"message": "Para cambiar las asignaciones de teclas, ve a $1"
+	},
+	"shortcutInstructionsDefault": {
+		"message": "Para cambiar las asignaciones de teclas, consulta la configuración de extensiones de tu navegador."
+	},
+	"shortcutInstructionsEdge": {
+		"message": "Para cambiar las asignaciones de teclas, ve a $1"
+	},
+	"shortcutInstructionsFirefox": {
+		"message": "Para cambiar las asignaciones de teclas, ve a $1, haz clic en el icono de engranaje y selecciona \"Gestionar atajos de extensión\"."
+	},
+	"shortcutInstructionsIntro": {
+		"message": "Los atajos de teclado te dan acceso rápido a las funciones del clipper."
+	},
+	"shortcutInstructionsSafari": {
+		"message": "Los atajos de teclado no están disponibles para extensiones de Safari."
+	},
+	"shortcutNotSet": {
+		"message": "No establecido"
+	},
+	"showActionsButton": {
+		"message": "Mostrar botón de acciones"
+	},
+	"showActionsDescription": {
+		"message": "Permite inspeccionar las variables de página desde el menú del clipper. Útil para ver las variables disponibles para usar en las plantillas."
+	},
+	"showPageVariables": {
+		"message": "Mostrar variables de página"
+	},
+	"silentOpen": {
+		"message": "Guardar nota sin abrirla"
+	},
+	"silentOpenDescription": {
+		"message": "Las notas se guardarán pero no se abrirán en una nueva pestaña. Obsidian seguirá siendo traído al primer plano."
+	},
+	"specificNoteName": {
+		"message": "Nombre específico de la nota"
+	},
+	"systemDefault": {
+		"message": "Sistema"
+	},
+	"templateName": {
+		"message": "Nombre de la plantilla"
+	},
+	"templateProperties": {
+		"message": "Propiedades"
+	},
+	"templatePropertiesDescription": {
+		"message": "Propiedades para agregar en la parte superior de la nota guardada. Usa variables para pre-poblar datos de la página."
+	},
+	"templateTriggers": {
+		"message": "Activadores de plantilla"
+	},
+	"templateTriggersDescription": {
+		"message": "Define reglas para seleccionar automáticamente esta plantilla si coincide con un patrón de URL o contiene datos de schema.org. Una regla por línea."
+	},
+	"templatesHeading": {
+		"message": "Plantillas"
+	},
+	"vault": {
+		"message": "Bóveda"
+	},
+	"vaultDescription": {
+		"message": "Selecciona la bóveda predeterminada para esta plantilla. Ve a $link_start$ajustes generales$link_end$ para agregar o eliminar bóvedas.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=general\">"
+			}
+		}
+	},
+	"vaults": {
+		"message": "Bóvedas"
+	},
+	"vaultsDescription": {
+		"message": "Por defecto, las notas se guardan en la bóveda abierta actualmente. Puedes añadir bóvedas aquí si quieres la opción de guardar en diferentes bóvedas. Los nombres de las bóvedas deben coincidir exactamente con el nombre de la bóveda de Obsidian. Presiona $strong_start$enter$strong_end$ para añadir una bóveda.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
 	}
-} 
+}

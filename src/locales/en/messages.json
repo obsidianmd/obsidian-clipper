@@ -1,224 +1,18 @@
 {
-	"extensionName": {
-		"message": "Obsidian Web Clipper"
-	},
-	"extensionDescription": {
-		"message": "Save content from the web in a private and durable format that you can access offline. The official browser extension for Obsidian."
+	"addProperty": {
+		"message": "+ Add property"
 	},
 	"addToObsidian": {
 		"message": "Add to Obsidian"
 	},
-	"noteName": {
-		"message": "Note name"
-	},
-	"notesAboutPage": {
-		"message": "Notes about this page..."
-	},
-	"folder": {
-		"message": "Folder"
-	},
-	"settings": {
-		"message": "Settings"
-	},
-	"showPageVariables": {
-		"message": "Show page variables"
-	},
-	"highlightPage": {
-		"message": "Highlight page"
-	},
-	"copyToClipboard": {
-		"message": "Copy to clipboard"
-	},
-	"saveFile": {
-		"message": "Save file..."
-	},
-	"share": {
-		"message": "Share..."
-	},
-	"properties": {
-		"message": "Properties"
-	},
-	"copied": {
-		"message": "Copied!"
-	},
-	"error": {
-		"message": "Error"
-	},
-	"pageCannotBeClipped": {
-		"message": "This page cannot be clipped."
-	},
-	"onlyHttpSupported": {
-		"message": "This page cannot be clipped. Only http and https URLs are supported."
-	},
-	"noTemplates": {
-		"message": "No templates available. Please add a template in the settings."
-	},
-	"failedToSave": {
-		"message": "Failed to save file"
-	},
-	"pleaseReload": {
-		"message": "Please try reloading the page."
-	},
-	"language": {
-		"message": "Language"
-	},
-	"languageDescription": {
-		"message": "Choose the display language for the extension interface."
-	},
-	"systemDefault": {
-		"message": "System"
-	},
-	"generalSettings": {
-		"message": "General settings"
-	},
-	"display": {
-		"message": "Display"
-	},
-	"vaults": {
-		"message": "Vaults"
-	},
-	"vaultsDescription": {
-		"message": "By default, clipped notes are saved to the currently open vault. You can add vaults here if you want the option to save to different vaults. Vault names must exactly match the name of the Obsidian vault. Press $strong_start$enter$strong_end$ to add a vault.",
-		"placeholders": {
-			"strong_start": {
-				"content": "<strong>"
-			},
-			"strong_end": {
-				"content": "</strong>"
-			}
-		}
-	},
 	"addVaultPlaceholder": {
 		"message": "Press enter to add a vault"
-	},
-	"hotkeys": {
-		"message": "Hotkeys"
 	},
 	"advanced": {
 		"message": "Advanced"
 	},
-	"showActionsButton": {
-		"message": "Show actions button"
-	},
-	"showActionsDescription": {
-		"message": "Allows you to inspect page variables from the clipper menu. Useful for seeing the variables that are available to use in templates."
-	},
-	"earlyAccessFeatures": {
-		"message": "Early access features"
-	},
-	"earlyAccessDescription": {
-		"message": "Use features that require the latest $link_start$early access version$link_end$ of Obsidian. Currently requires Obsidian 1.7.2 or later.",
-		"placeholders": {
-			"link_start": {
-				"content": "<a href=\"https://help.obsidian.md/Obsidian/Early+access+versions\" target=\"_blank\">"
-			},
-			"link_end": {
-				"content": "</a>"
-			}
-		}
-	},
-	"silentOpen": {
-		"message": "Save clipped note without opening it"
-	},
-	"silentOpenDescription": {
-		"message": "Clipped notes will be saved but will not open as a new tab. Obsidian will still be brought to the foreground."
-	},
-	"legacyMode": {
-		"message": "Legacy mode"
-	},
-	"legacyModeDescription": {
-		"message": "Uses the URI clipping method compatible with Obsidian 1.6.7 or earlier. Note that the length of the content you can clip is limited by your browser and OS. Some pages may fail without any errors."
-	},
-	"resetDefaultTemplate": {
-		"message": "Reset default template"
-	},
-	"resetDefaultTemplateDescription": {
-		"message": "Remove any changes you've made to the default template."
-	},
-	"exportAllSettings": {
-		"message": "Export all settings"
-	},
-	"exportAllSettingsDescription": {
-		"message": "Export all settings including templates and properties."
-	},
-	"importAllSettings": {
-		"message": "Import all settings"
-	},
-	"importAllSettingsDescription": {
-		"message": "Import all settings including templates and properties. This will replace your current configuration."
-	},
-	"remove": {
-		"message": "Remove"
-	},
-	"reset": {
-		"message": "Reset"
-	},
-	"export": {
-		"message": "Export"
-	},
-	"import": {
-		"message": "Import"
-	},
-	"propertiesSettings": {
-		"message": "Properties"
-	},
-	"importProperties": {
-		"message": "Import properties"
-	},
-	"importPropertiesDescription": {
-		"message": "To import your properties from Obsidian, locate the $strong_1_start$types.json$strong_1_end$ file in the $strong_2_start$.obsidian$strong_2_end$ folder within your vault. Note this folder is hidden by default on most operating systems.",
-		"placeholders": {
-			"strong_1_start": {
-				"content": "<strong>"
-			},
-			"strong_1_end": {
-				"content": "</strong>"
-			},
-			"strong_2_start": {
-				"content": "<strong>"
-			},
-			"strong_2_end": {
-				"content": "</strong>"
-			}
-		}
-	},
-	"exportProperties": {
-		"message": "Export properties"
-	},
-	"exportPropertiesDescription": {
-		"message": "Save Web Clipper properties to a $strong_start$types.json$strong_end$ file that can be imported into your Obsidian vault, or into Web Clipper on other devices.",
-		"placeholders": {
-			"strong_start": {
-				"content": "<strong>"
-			},
-			"strong_end": {
-				"content": "</strong>"
-			}
-		}
-	},
-	"removeUnusedProperties": {
-		"message": "Remove unused properties"
-	},
-	"removeUnusedPropertiesDescription": {
-		"message": "Remove all properties that are not used in any template."
-	},
 	"allProperties": {
 		"message": "All properties"
-	},
-	"highlighterSettings": {
-		"message": "Highlighter"
-	},
-	"enableHighlighter": {
-		"message": "Enable highlighter"
-	},
-	"enableHighlighterDescription": {
-		"message": "Highlight content on web pages that you can save to Obsidian."
-	},
-	"exportHighlights": {
-		"message": "Export highlights"
-	},
-	"exportHighlightsDescription": {
-		"message": "Export your highlights to a file."
 	},
 	"alwaysShowHighlights": {
 		"message": "Always show highlights"
@@ -226,128 +20,217 @@
 	"alwaysShowHighlightsDescription": {
 		"message": "Display your saved highlights when you load a page. Turn off to only display highlights when highlighter mode is activated."
 	},
+	"appendToDaily": {
+		"message": "Add to daily note, at the bottom"
+	},
+	"appendToExisting": {
+		"message": "Add to an existing note, at the bottom"
+	},
+	"behavior": {
+		"message": "Behavior"
+	},
+	"behaviorWarning": {
+		"message": "Adding to an existing note or daily note requires Obsidian 1.7.2 or later."
+	},
 	"clipBehavior": {
 		"message": "Clip behavior"
 	},
 	"clipBehaviorDescription": {
 		"message": "Choose how highlighted content is saved to Obsidian. Defines the $strong_start${{content}}$strong_end$ variable.",
 		"placeholders": {
-			"strong_start": {
-				"content": "<strong>"
-			},
 			"strong_end": {
 				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
 			}
 		}
 	},
-	"replaceContent": {
-		"message": "Replace the page content"
+	"close": {
+		"message": "Close"
 	},
-	"noHighlights": {
-		"message": "Do nothing"
+	"commandOpenClipper": {
+		"message": "Open Obsidian Clipper"
 	},
-	"settingsHeading": {
-		"message": "Settings"
+	"commandQuickClip": {
+		"message": "Quick clip"
 	},
-	"templatesHeading": {
-		"message": "Templates"
+	"commandToggleHighlighter": {
+		"message": "Toggle highlighter mode"
 	},
-	"general": {
-		"message": "General"
+	"confirmDeleteTemplate": {
+		"message": "Are you sure you want to delete the template \"$1\"?"
 	},
-	"highlighter": {
-		"message": "Highlighter"
+	"copied": {
+		"message": "Copied!"
 	},
-	"interpreter": {
-		"message": "Interpreter"
+	"copyAsJson": {
+		"message": "Copy as JSON"
 	},
-	"newTemplate": {
-		"message": "New template"
-	},
-	"editTemplate": {
-		"message": "Edit template"
-	},
-	"templateName": {
-		"message": "Template name"
-	},
-	"behavior": {
-		"message": "Behavior"
+	"copyToClipboard": {
+		"message": "Copy to clipboard"
 	},
 	"createNewNote": {
 		"message": "Create new note"
 	},
-	"appendToExisting": {
-		"message": "Add to an existing note, at the bottom"
+	"dailyNoteFormat": {
+		"message": "Daily note format (e.g., YYYY-MM-DD)"
 	},
-	"prependToExisting": {
-		"message": "Add to an existing note, at the top"
+	"defaultTemplateName": {
+		"message": "Default"
 	},
-	"appendToDaily": {
-		"message": "Add to daily note, at the bottom"
+	"delete": {
+		"message": "Delete"
 	},
-	"prependToDaily": {
-		"message": "Add to daily note, at the top"
+	"disableHighlighter": {
+		"message": "Disable highlighter"
 	},
-	"behaviorWarning": {
-		"message": "Adding to an existing note or daily note requires Obsidian 1.7.2 or later."
+	"display": {
+		"message": "Display"
 	},
-	"noteNameFormat": {
-		"message": "Note name"
+	"duplicate": {
+		"message": "Duplicate"
 	},
-	"noteNameFormatDescription": {
-		"message": "Format for the file name of the note. You can use variables like {{title}}, {{date}}, and {{published}} to pre-populate data from the page. $link_start$Learn more$link_end$.",
+	"earlyAccessDescription": {
+		"message": "Use features that require the latest $link_start$early access version$link_end$ of Obsidian. Currently requires Obsidian 1.7.2 or later.",
 		"placeholders": {
-			"link_start": {
-				"content": "<a href=\"https://github.com/obsidianmd/obsidian-clipper?tab=readme-ov-file#template-variables\" target=\"_blank\">"
-			},
 			"link_end": {
 				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/Obsidian/Early+access+versions\" target=\"_blank\">"
 			}
 		}
 	},
-	"noteLocation": {
-		"message": "Note location"
+	"earlyAccessFeatures": {
+		"message": "Early access features"
 	},
-	"noteLocationDescription": {
-		"message": "The folder or path of the note."
+	"editTemplate": {
+		"message": "Edit template"
 	},
-	"vault": {
-		"message": "Vault"
+	"enableHighlighter": {
+		"message": "Enable highlighter"
 	},
-	"vaultDescription": {
-		"message": "Select the default vault for this template. Go to $link_start$general settings$link_end$ to add or remove vaults.",
+	"enableHighlighterDescription": {
+		"message": "Highlight content on web pages that you can save to Obsidian."
+	},
+	"error": {
+		"message": "Error"
+	},
+	"export": {
+		"message": "Export"
+	},
+	"exportAllSettings": {
+		"message": "Export all settings"
+	},
+	"exportAllSettingsDescription": {
+		"message": "Export all settings including templates and properties."
+	},
+	"exportHighlights": {
+		"message": "Export highlights"
+	},
+	"exportHighlightsDescription": {
+		"message": "Export your highlights to a file."
+	},
+	"exportProperties": {
+		"message": "Export properties"
+	},
+	"exportPropertiesDescription": {
+		"message": "Save Web Clipper properties to a $strong_start$types.json$strong_end$ file that can be imported into your Obsidian vault, or into Web Clipper on other devices.",
 		"placeholders": {
-			"link_start": {
-				"content": "<a href=\"?section=general\">"
+			"strong_end": {
+				"content": "</strong>"
 			},
-			"link_end": {
-				"content": "</a>"
+			"strong_start": {
+				"content": "<strong>"
 			}
 		}
 	},
-	"lastUsed": {
-		"message": "Last used"
+	"extensionDescription": {
+		"message": "Save content from the web in a private and durable format that you can access offline. The official browser extension for Obsidian."
 	},
-	"templateTriggers": {
-		"message": "Template triggers"
+	"extensionName": {
+		"message": "Obsidian Web Clipper"
 	},
-	"templateTriggersDescription": {
-		"message": "Define rules to automatically select this template if it matches a URL pattern or contains schema.org data. One rule per line."
+	"failedToCopyText": {
+		"message": "Failed to copy text"
 	},
-	"templateProperties": {
-		"message": "Properties"
+	"failedToDeleteTemplate": {
+		"message": "Failed to delete template. Please try again."
 	},
-	"templatePropertiesDescription": {
-		"message": "Properties to add to the top of the clipped note. Use variables to pre-populate data from the page."
+	"failedToExtractContent": {
+		"message": "Unable to extract page content."
 	},
-	"addProperty": {
-		"message": "+ Add property"
+	"failedToInitialize": {
+		"message": "Please try reloading the extension."
 	},
-	"noteContent": {
-		"message": "Note content"
+	"failedToInitializeContent": {
+		"message": "Unable to initialize page content."
 	},
-	"noteContentDescription": {
-		"message": "Customize the content of the note. Use variables to pre-populate data from the page."
+	"failedToProcessInterpreter": {
+		"message": "Interpreter processing failed. Please try again."
+	},
+	"failedToResetTemplate": {
+		"message": "Failed to reset default template. Please try again."
+	},
+	"failedToSave": {
+		"message": "Failed to save file"
+	},
+	"failedToSaveFile": {
+		"message": "Failed to save file"
+	},
+	"folder": {
+		"message": "Folder"
+	},
+	"general": {
+		"message": "General"
+	},
+	"generalSettings": {
+		"message": "General settings"
+	},
+	"highlightPage": {
+		"message": "Highlight page"
+	},
+	"highlighter": {
+		"message": "Highlighter"
+	},
+	"highlighterSettings": {
+		"message": "Highlighter"
+	},
+	"hotkeys": {
+		"message": "Hotkeys"
+	},
+	"import": {
+		"message": "Import"
+	},
+	"importAllSettings": {
+		"message": "Import all settings"
+	},
+	"importAllSettingsDescription": {
+		"message": "Import all settings including templates and properties. This will replace your current configuration."
+	},
+	"importProperties": {
+		"message": "Import properties"
+	},
+	"importPropertiesDescription": {
+		"message": "To import your properties from Obsidian, locate the $strong_1_start$types.json$strong_1_end$ file in the $strong_2_start$.obsidian$strong_2_end$ folder within your vault. Note this folder is hidden by default on most operating systems.",
+		"placeholders": {
+			"strong_1_end": {
+				"content": "</strong>"
+			},
+			"strong_1_start": {
+				"content": "<strong>"
+			},
+			"strong_2_end": {
+				"content": "</strong>"
+			},
+			"strong_2_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"interpreter": {
+		"message": "Interpreter"
 	},
 	"interpreterContext": {
 		"message": "Interpreter context"
@@ -355,31 +238,96 @@
 	"interpreterContextDescription": {
 		"message": "The context used to interpret prompt variables. Overrides the default context defined in $link_start$Interpreter settings$link_end$. Variables can be used here.",
 		"placeholders": {
-			"link_start": {
-				"content": "<a href=\"?section=interpreter\">"
-			},
 			"link_end": {
 				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=interpreter\">"
 			}
 		}
 	},
-	"duplicate": {
-		"message": "Duplicate"
+	"language": {
+		"message": "Language"
 	},
-	"copyAsJson": {
-		"message": "Copy as JSON"
+	"languageDescription": {
+		"message": "Choose the display language for the extension interface."
 	},
-	"delete": {
-		"message": "Delete"
+	"lastUsed": {
+		"message": "Last used"
+	},
+	"legacyMode": {
+		"message": "Legacy mode"
+	},
+	"legacyModeDescription": {
+		"message": "Uses the URI clipping method compatible with Obsidian 1.6.7 or earlier. Note that the length of the content you can clip is limited by your browser and OS. Some pages may fail without any errors."
 	},
 	"more": {
 		"message": "More"
 	},
-	"specificNoteName": {
-		"message": "Specific note name"
+	"newTemplate": {
+		"message": "New template"
 	},
-	"dailyNoteFormat": {
-		"message": "Daily note format (e.g., YYYY-MM-DD)"
+	"noHighlights": {
+		"message": "Do nothing"
+	},
+	"noTemplates": {
+		"message": "No templates available. Please add a template in the settings."
+	},
+	"noteContent": {
+		"message": "Note content"
+	},
+	"noteContentDescription": {
+		"message": "Customize the content of the note. Use variables to pre-populate data from the page."
+	},
+	"noteLocation": {
+		"message": "Note location"
+	},
+	"noteLocationDescription": {
+		"message": "The folder or path of the note."
+	},
+	"noteName": {
+		"message": "Note name"
+	},
+	"noteNameFormat": {
+		"message": "Note name"
+	},
+	"noteNameFormatDescription": {
+		"message": "Format for the file name of the note. You can use variables like {{title}}, {{date}}, and {{published}} to pre-populate data from the page. $link_start$Learn more$link_end$.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://github.com/obsidianmd/obsidian-clipper?tab=readme-ov-file#template-variables\" target=\"_blank\">"
+			}
+		}
+	},
+	"notesAboutPage": {
+		"message": "Notes about this page..."
+	},
+	"onlyHttpSupported": {
+		"message": "This page cannot be clipped. Only http and https URLs are supported."
+	},
+	"pageCannotBeClipped": {
+		"message": "This page cannot be clipped."
+	},
+	"pageVariables": {
+		"message": "Page variables"
+	},
+	"pleaseReload": {
+		"message": "Please try reloading the page."
+	},
+	"prependToDaily": {
+		"message": "Add to daily note, at the top"
+	},
+	"prependToExisting": {
+		"message": "Add to an existing note, at the top"
+	},
+	"properties": {
+		"message": "Properties"
+	},
+	"propertiesSettings": {
+		"message": "Properties"
 	},
 	"propertyName": {
 		"message": "Property name"
@@ -390,85 +338,137 @@
 	"refresh": {
 		"message": "Refresh"
 	},
+	"remove": {
+		"message": "Remove"
+	},
 	"removeProperty": {
 		"message": "Remove property"
+	},
+	"removeUnusedProperties": {
+		"message": "Remove unused properties"
+	},
+	"removeUnusedPropertiesDescription": {
+		"message": "Remove all properties that are not used in any template."
 	},
 	"removeVault": {
 		"message": "Remove vault"
 	},
-	"shortcutInstructionsIntro": {
-		"message": "Keyboard shortcuts give you quick access to clipper features."
+	"replaceContent": {
+		"message": "Replace the page content"
+	},
+	"reset": {
+		"message": "Reset"
+	},
+	"resetDefaultTemplate": {
+		"message": "Reset default template"
+	},
+	"resetDefaultTemplateDescription": {
+		"message": "Remove any changes you've made to the default template."
+	},
+	"saveFile": {
+		"message": "Save file..."
+	},
+	"searchVariables": {
+		"message": "Search variables..."
+	},
+	"settings": {
+		"message": "Settings"
+	},
+	"settingsHeading": {
+		"message": "Settings"
+	},
+	"share": {
+		"message": "Share..."
+	},
+	"shortcutInstructionsBrave": {
+		"message": "To change key assignments, go to $1"
 	},
 	"shortcutInstructionsChrome": {
 		"message": "To change key assignments, go to $1"
 	},
-	"shortcutInstructionsBrave": {
+	"shortcutInstructionsDefault": {
+		"message": "To change key assignments, please refer to your browser's extension settings."
+	},
+	"shortcutInstructionsEdge": {
 		"message": "To change key assignments, go to $1"
 	},
 	"shortcutInstructionsFirefox": {
 		"message": "To change key assignments, go to $1, click the gear icon, and select \"Manage Extension Shortcuts\"."
 	},
-	"shortcutInstructionsEdge": {
-		"message": "To change key assignments, go to $1"
+	"shortcutInstructionsIntro": {
+		"message": "Keyboard shortcuts give you quick access to clipper features."
 	},
 	"shortcutInstructionsSafari": {
 		"message": "Keyboard shortcuts are not available for Safari extensions."
 	},
-	"shortcutInstructionsDefault": {
-		"message": "To change key assignments, please refer to your browser's extension settings."
-	},
 	"shortcutNotSet": {
 		"message": "Not set"
 	},
-	"defaultTemplateName": {
-		"message": "Default"
+	"showActionsButton": {
+		"message": "Show actions button"
 	},
-	"failedToResetTemplate": {
-		"message": "Failed to reset default template. Please try again."
+	"showActionsDescription": {
+		"message": "Allows you to inspect page variables from the clipper menu. Useful for seeing the variables that are available to use in templates."
 	},
-	"pageVariables": {
-		"message": "Page variables"
+	"showPageVariables": {
+		"message": "Show page variables"
 	},
-	"close": {
-		"message": "Close"
+	"silentOpen": {
+		"message": "Save clipped note without opening it"
 	},
-	"searchVariables": {
-		"message": "Search variables..."
+	"silentOpenDescription": {
+		"message": "Clipped notes will be saved but will not open as a new tab. Obsidian will still be brought to the foreground."
 	},
-	"disableHighlighter": {
-		"message": "Disable highlighter"
+	"specificNoteName": {
+		"message": "Specific note name"
 	},
-	"failedToCopyText": {
-		"message": "Failed to copy text"
+	"systemDefault": {
+		"message": "System"
 	},
-	"failedToSaveFile": {
-		"message": "Failed to save file"
+	"templateName": {
+		"message": "Template name"
 	},
-	"failedToInitialize": {
-		"message": "Please try reloading the extension."
+	"templateProperties": {
+		"message": "Properties"
 	},
-	"failedToProcessInterpreter": {
-		"message": "Interpreter processing failed. Please try again."
+	"templatePropertiesDescription": {
+		"message": "Properties to add to the top of the clipped note. Use variables to pre-populate data from the page."
 	},
-	"failedToExtractContent": {
-		"message": "Unable to extract page content."
+	"templateTriggers": {
+		"message": "Template triggers"
 	},
-	"failedToInitializeContent": {
-		"message": "Unable to initialize page content."
+	"templateTriggersDescription": {
+		"message": "Define rules to automatically select this template if it matches a URL pattern or contains schema.org data. One rule per line."
 	},
-	"confirmDeleteTemplate": {
-		"message": "Are you sure you want to delete the template \"$1\"?"
+	"templatesHeading": {
+		"message": "Templates"
 	},
-	"failedToDeleteTemplate": {
-		"message": "Failed to delete template. Please try again."
+	"vault": {
+		"message": "Vault"
 	},
-	"commandOpenClipper": {
-		"message": "Open Obsidian Clipper"
+	"vaultDescription": {
+		"message": "Select the default vault for this template. Go to $link_start$general settings$link_end$ to add or remove vaults.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=general\">"
+			}
+		}
 	},
-	"commandQuickClip": {
-		"message": "Quick clip"
+	"vaults": {
+		"message": "Vaults"
 	},
-	"commandToggleHighlighter": {
-		"message": "Toggle highlighter mode"
+	"vaultsDescription": {
+		"message": "By default, clipped notes are saved to the currently open vault. You can add vaults here if you want the option to save to different vaults. Vault names must exactly match the name of the Obsidian vault. Press $strong_start$enter$strong_end$ to add a vault.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
 	}
-} 
+}
