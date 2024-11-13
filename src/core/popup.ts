@@ -22,6 +22,7 @@ import { memoizeWithExpiration } from '../utils/memoize';
 import { debounce } from '../utils/debounce';
 import { sanitizeFileName } from '../utils/string-utils';
 import { saveFile } from '../utils/file-utils';
+import { translatePage, getMessage } from '../utils/i18n';
 
 let loadedSettings: Settings;
 let currentTemplate: Template | null = null;
@@ -101,6 +102,9 @@ const debouncedSetPopupDimensions = debounce(setPopupDimensions, 100); // 100ms 
 
 async function initializeExtension(tabId: number) {
 	try {
+		// Initialize translations
+		translatePage();
+		
 		// First, add the browser class to allow browser-specific styles to apply
 		await addBrowserClassToHtml();
 		
@@ -141,10 +145,12 @@ async function initializeExtension(tabId: number) {
 
 		const tab = await browser.tabs.get(tabId);
 		if (!tab.url || isBlankPage(tab.url)) {
-			return false;
+			showError('pageCannotBeClipped');
+			return;
 		}
 		if (!isValidUrl(tab.url)) {
-			return false;
+			showError('onlyHttpSupported');
+			return;
 		}
 		await ensureContentScriptLoaded(tabId);
 		await refreshFields(tabId);
@@ -480,12 +486,12 @@ async function initializeUI() {
 	}
 }
 
-function showError(message: string): void {
+function showError(messageKey: string): void {
 	const errorMessage = document.querySelector('.error-message') as HTMLElement;
 	const clipper = document.querySelector('.clipper') as HTMLElement;
 
 	if (errorMessage && clipper) {
-		errorMessage.textContent = message;
+		errorMessage.textContent = getMessage(messageKey);
 		errorMessage.style.display = 'flex';
 		clipper.style.display = 'none';
 
@@ -632,18 +638,18 @@ function waitForInterpreter(interpretBtn: HTMLButtonElement): Promise<void> {
 async function refreshFields(tabId: number, checkTemplateTriggers: boolean = true) {
 	if (templates.length === 0) {
 		console.warn('No templates available');
-		showError('No templates available. Please add a template in the settings.');
+		showError('noTemplates');
 		return;
 	}
 
 	try {
 		const tab = await browser.tabs.get(tabId);
 		if (!tab.url || isBlankPage(tab.url)) {
-			showError('This page cannot be clipped. Please navigate to a web page.');
+			showError('pageCannotBeClipped');
 			return;
 		}
 		if (!isValidUrl(tab.url)) {
-			showError('This page cannot be clipped. Only http and https URLs are supported.');
+			showError('onlyHttpSupported');
 			return;
 		}
 

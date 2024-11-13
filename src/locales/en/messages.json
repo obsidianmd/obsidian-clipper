@@ -1,0 +1,62 @@
+{
+	"extensionName": {
+		"message": "Obsidian Web Clipper"
+	},
+	"extensionDescription": {
+		"message": "Save content from the web in a private and durable format that you can access offline. The official browser extension for Obsidian."
+	},
+	"addToObsidian": {
+		"message": "Add to Obsidian"
+	},
+	"noteName": {
+		"message": "Note name"
+	},
+	"notesAboutPage": {
+		"message": "Notes about this page..."
+	},
+	"folder": {
+		"message": "Folder"
+	},
+	"settings": {
+		"message": "Settings"
+	},
+	"showPageVariables": {
+		"message": "Show page variables"
+	},
+	"highlightPage": {
+		"message": "Highlight page"
+	},
+	"copyToClipboard": {
+		"message": "Copy to clipboard"
+	},
+	"saveFile": {
+		"message": "Save file..."
+	},
+	"share": {
+		"message": "Share..."
+	},
+	"properties": {
+		"message": "Properties"
+	},
+	"copied": {
+		"message": "Copied!"
+	},
+	"error": {
+		"message": "Error"
+	},
+	"pageCannotBeClipped": {
+		"message": "This page cannot be clipped."
+	},
+	"onlyHttpSupported": {
+		"message": "This page cannot be clipped. Only http and https URLs are supported."
+	},
+	"noTemplates": {
+		"message": "No templates available. Please add a template in the settings."
+	},
+	"failedToSave": {
+		"message": "Failed to save file"
+	},
+	"pleaseReload": {
+		"message": "Please try reloading the page."
+	}
+} 
