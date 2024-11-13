@@ -360,74 +360,87 @@ function setupEventListeners(tabId: number) {
 		saveDownloadsButton.addEventListener('click', handleSaveToDownloads);
 	}
 
-	if (shareContentButton) {
-		shareContentButton.addEventListener('click', (e) => {
-			// Get content synchronously
-			const properties = Array.from(document.querySelectorAll('.metadata-property input')).map(input => {
-				const inputElement = input as HTMLInputElement;
-				return {
-					id: inputElement.dataset.id || Date.now().toString() + Math.random().toString(36).slice(2, 11),
-					name: inputElement.id,
-					value: inputElement.type === 'checkbox' ? inputElement.checked : inputElement.value
-				};
-			}) as Property[];
-
-			const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
-			
-			// Use Promise.all to prepare the data
-			Promise.all([
-				generateFrontmatter(properties),
-				Promise.resolve(noteContentField.value)
-			]).then(([frontmatter, noteContent]) => {
-				const fileContent = frontmatter + noteContent;
-				
-				// Call share directly from the click handler
-				const noteNameField = document.getElementById('note-name-field') as HTMLInputElement;
-				let fileName = noteNameField?.value || 'untitled';
-				fileName = sanitizeFileName(fileName);
-				if (!fileName.toLowerCase().endsWith('.md')) {
-					fileName += '.md';
-				}
-
-				if (navigator.share && navigator.canShare) {
-					const blob = new Blob([fileContent], { type: 'text/markdown;charset=utf-8' });
-					const file = new File([blob], fileName, { type: 'text/markdown;charset=utf-8' });
-					
-					const shareData = {
-						files: [file],
-						text: 'Shared from Obsidian Web Clipper'
+	const shareButtons = document.querySelectorAll('.share-content');
+	if (shareButtons) {
+		shareButtons.forEach(button => {
+			button.addEventListener('click', (e) => {
+				// Get content synchronously
+				const properties = Array.from(document.querySelectorAll('.metadata-property input')).map(input => {
+					const inputElement = input as HTMLInputElement;
+					return {
+						id: inputElement.dataset.id || Date.now().toString() + Math.random().toString(36).slice(2, 11),
+						name: inputElement.id,
+						value: inputElement.type === 'checkbox' ? inputElement.checked : inputElement.value
 					};
+				}) as Property[];
 
-					if (navigator.canShare(shareData)) {
-						navigator.share(shareData)
-							.then(() => {
-								const moreDropdown = document.getElementById('more-dropdown');
-								if (moreDropdown) {
-									moreDropdown.classList.remove('show');
-								}
-							})
-							.catch((error) => {
-								console.error('Error sharing:', error);
-							});
+				const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
+				
+				// Use Promise.all to prepare the data
+				Promise.all([
+					generateFrontmatter(properties),
+					Promise.resolve(noteContentField.value)
+				]).then(([frontmatter, noteContent]) => {
+					const fileContent = frontmatter + noteContent;
+					
+					// Call share directly from the click handler
+					const noteNameField = document.getElementById('note-name-field') as HTMLInputElement;
+					let fileName = noteNameField?.value || 'untitled';
+					fileName = sanitizeFileName(fileName);
+					if (!fileName.toLowerCase().endsWith('.md')) {
+						fileName += '.md';
 					}
-				}
+
+					if (navigator.share && navigator.canShare) {
+						const blob = new Blob([fileContent], { type: 'text/markdown;charset=utf-8' });
+						const file = new File([blob], fileName, { type: 'text/markdown;charset=utf-8' });
+						
+						const shareData = {
+							files: [file],
+							text: 'Shared from Obsidian Web Clipper'
+						};
+
+						if (navigator.canShare(shareData)) {
+							navigator.share(shareData)
+								.then(() => {
+									const moreDropdown = document.getElementById('more-dropdown');
+									if (moreDropdown) {
+										moreDropdown.classList.remove('show');
+									}
+								})
+								.catch((error) => {
+									console.error('Error sharing:', error);
+								});
+						}
+					}
+				});
 			});
 		});
 	}
 
-	// Only show the share button if we're on Safari and Web Share API is available
-	const shareButton = document.getElementById('share-content');
-	if (shareButton) {
+	// Update the visibility check for share buttons
+	const shareButtonElements = document.querySelectorAll('.share-content');
+	if (shareButtonElements.length > 0) {
 		detectBrowser().then(browser => {
 			const isSafariBrowser = ['safari', 'mobile-safari', 'ipad-os'].includes(browser);
 			if (!isSafariBrowser || !navigator.share || !navigator.canShare) {
-				shareButton.style.display = 'none';
+				shareButtonElements.forEach(button => {
+					const parentElement = button.closest('.share-btn, .menu-item') as HTMLElement;
+					if (parentElement) {
+						parentElement.style.display = 'none';
+					}
+				});
 			} else {
 				// Test if we can share files (only on Safari)
 				const testFile = new File(["test"], "test.txt", { type: "text/plain" });
 				const testShare = { files: [testFile] };
 				if (!navigator.canShare(testShare)) {
-					shareButton.style.display = 'none';
+					shareButtonElements.forEach(button => {
+						const parentElement = button.closest('.share-btn, .menu-item') as HTMLElement;
+						if (parentElement) {
+							parentElement.style.display = 'none';
+						}
+					});
 				}
 			}
 		});
@@ -438,6 +451,7 @@ async function initializeUI() {
 	const clipButton = document.getElementById('clip-btn');
 	if (clipButton) {
 		clipButton.addEventListener('click', handleClip);
+		
 		clipButton.focus();
 	} else {
 		console.warn('Clip button not found');
