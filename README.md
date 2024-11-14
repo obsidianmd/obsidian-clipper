@@ -22,7 +22,7 @@ In no particular order:
 
 - More languages
 - RTL support
-- Annotate for highlights
+- Annotate highlights
 - Save Markdown with inline highlights
 - Save images locally (requires changes to Obsidian app)
 - Template directory
