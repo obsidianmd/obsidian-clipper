@@ -1,0 +1,474 @@
+{
+	"addProperty": {
+		"message": "+ Добавить свойство"
+	},
+	"addToObsidian": {
+		"message": "Добавить в Obsidian"
+	},
+	"addVaultPlaceholder": {
+		"message": "Нажмите enter чтобы добавить в хранилище"
+	},
+	"advanced": {
+		"message": "Расширенные настройки"
+	},
+	"allProperties": {
+		"message": "Все свойства"
+	},
+	"alwaysShowHighlights": {
+		"message": "Всегда показывать выделение маркером"
+	},
+	"alwaysShowHighlightsDescription": {
+		"message": "Отображение сохраненных выделений маркером при загрузке страницы. Выключите, чтобы отображать выделения маркером только при включении режима."
+	},
+	"appendToDaily": {
+		"message": "Добавлять в конец ежедневной заметки"
+	},
+	"appendToExisting": {
+		"message": "Добавлять в конец существующей заметки"
+	},
+	"behavior": {
+		"message": "Поведение"
+	},
+	"behaviorWarning": {
+		"message": "Для добавления в существующую заметку или ежедневную заметку требуется Obsidian 1.7.2 или более поздняя версия."
+	},
+	"clipBehavior": {
+		"message": "Поведение при сохранении" 
+	},
+	"clipBehaviorDescription": {
+		"message": "Выберите способ сохранения выделенного содержимого в Obsidian. Содержится в переменной $strong_start${{content}}$strong_end$.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"close": {
+		"message": "Закрыть"
+	},
+	"commandOpenClipper": {
+		"message": "Открыть Obsidian Clipper"
+	},
+	"commandQuickClip": {
+		"message": "Быстрое сохранение"
+	},
+	"commandToggleHighlighter": {
+		"message": "Режим маркера"
+	},
+	"confirmDeleteTemplate": {
+		"message": "Вы уверены, что хотите удалить шаблон \"$1\"?"
+	},
+	"copied": {
+		"message": "Скопировано!"
+	},
+	"copyAsJson": {
+		"message": "Копировать как JSON"
+	},
+	"copyToClipboard": {
+		"message": "Копировать в буфер обмена"
+	},
+	"createNewNote": {
+		"message": "Создать заметку"
+	},
+	"dailyNoteFormat": {
+		"message": "Формат ежедневной заметки (например, YYYY-MM-DD)"
+	},
+	"defaultTemplateName": {
+		"message": "По умолчанию"
+	},
+	"delete": {
+		"message": "Удалить"
+	},
+	"disableHighlighter": {
+		"message": "Выключить маркер"
+	},
+	"display": {
+		"message": "Отображение"
+	},
+	"duplicate": {
+		"message": "Дублировать"
+	},
+	"earlyAccessDescription": {
+		"message": "Используйте функции, для которых требуется последняя $link_start$версия Obsidian из раннего доступа$link_end$. В настоящее время требуется Obsidian 1.7.2 или более поздняя версия.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/Obsidian/Early+access+versions\" target=\"_blank\">"
+			}
+		}
+	},
+	"earlyAccessFeatures": {
+		"message": "Функции раннего доступа"
+	},
+	"editTemplate": {
+		"message": "Изменить шаблон"
+	},
+	"enableHighlighter": {
+		"message": "Включить маркер"
+	},
+	"enableHighlighterDescription": {
+		"message": "Выделите содержимое веб-страниц, которое хотите сохранить в Obsidian."
+	},
+	"error": {
+		"message": "Ошибка"
+	},
+	"export": {
+		"message": "Экспорт"
+	},
+	"exportAllSettings": {
+		"message": "Экспорт всех настроек"
+	},
+	"exportAllSettingsDescription": {
+		"message": "Экспорт всех настроек, включая шаблоны и свойства."
+	},
+	"exportHighlights": {
+		"message": "Экспорт выделений маркером"
+	},
+	"exportHighlightsDescription": {
+		"message": "Экспорт выделенных маркером элементов в файл."
+	},
+	"exportProperties": {
+		"message": "Экспорт свойств"
+	},
+	"exportPropertiesDescription": {
+		"message": "Сохраните свойства Web Clipper в файле $strong_start$types.json$strong_end$, который можно импортировать в хранилище Obsidian или в Web Clipper на других устройствах.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"extensionDescription": {
+		"message": "Сохраняйте содержимое веб-страниц в конфиденциальном и долговременном формате, к которому можно получить доступ в автономном режиме. Официальное расширение для браузера Obsidian."
+	},
+	"extensionName": {
+		"message": "Obsidian Web Clipper"
+	},
+	"failedToCopyText": {
+		"message": "Не удалось скопировать текст"
+	},
+	"failedToDeleteTemplate": {
+		"message": "Не удалось удалить шаблон. Пожалуйста, попробуйте еще раз."
+	},
+	"failedToExtractContent": {
+		"message": "Невозможно извлечь содержимое страницы."
+	},
+	"failedToInitialize": {
+		"message": "Пожалуйста, попробуйте перезагрузить расширение."
+	},
+	"failedToInitializeContent": {
+		"message": "Невозможно инициализировать содержимое страницы."
+	},
+	"failedToProcessInterpreter": {
+		"message": "Обработка переводчика не удалась. Пожалуйста, попробуйте еще раз."
+	},
+	"failedToResetTemplate": {
+		"message": "Не удалось сбросить шаблон по умолчанию. Пожалуйста, попробуйте еще раз."
+	},
+	"failedToSave": {
+		"message": "Не удалось сохранить файл"
+	},
+	"failedToSaveFile": {
+		"message": "Не удалось сохранить файл"
+	},
+	"folder": {
+		"message": "Папка"
+	},
+	"general": {
+		"message": "Основное"
+	},
+	"generalSettings": {
+		"message": "Основные настройки"
+	},
+	"highlightPage": {
+		"message": "Выделить страницу"
+	},
+	"highlighter": {
+		"message": "Маркер"
+	},
+	"highlighterSettings": {
+		"message": "Маркер"
+	},
+	"hotkeys": {
+		"message": "Горячие клавиши"
+	},
+	"import": {
+		"message": "Импорт"
+	},
+	"importAllSettings": {
+		"message": "Импорт всех настроек"
+	},
+	"importAllSettingsDescription": {
+		"message": "Импорт всех настроек, включая шаблоны и свойства. Это заменит вашу текущую конфигурацию."
+	},
+	"importProperties": {
+		"message": "Импорт свойств"
+	},
+	"importPropertiesDescription": {
+		"message": "Для импорта свойства из Obsidian, найдите файл $strong_1_start$types.json$strong_1_end$ в папке $strong_2_start$.obsidian$strong_2_end$ в вашем хранилище. Обратите внимание, что эта папка по умолчанию скрыта в большинстве операционных систем.",
+		"placeholders": {
+			"strong_1_end": {
+				"content": "</strong>"
+			},
+			"strong_1_start": {
+				"content": "<strong>"
+			},
+			"strong_2_end": {
+				"content": "</strong>"
+			},
+			"strong_2_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"interpreter": {
+		"message": "Интерпретатор"
+	},
+	"interpreterContext": {
+		"message": "Контекст интерпретатора"
+	},
+	"interpreterContextDescription": {
+		"message": "Контекст, используемый для интерпретации запросов. Переопределяет контекст по умолчанию, определенный в $link_start$настройках интерпретатора$link_end$. Здесь могут использоваться переменные.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=interpreter\">"
+			}
+		}
+	},
+	"language": {
+		"message": "Язык"
+	},
+	"languageDescription": {
+		"message": "Выберите язык отображения интерфейса расширения."
+	},
+	"lastUsed": {
+		"message": "Последнее использованное"
+	},
+	"legacyMode": {
+		"message": "Режим совместимости"
+	},
+	"legacyModeDescription": {
+		"message": "Использует метод обработки URI, совместимый с Obsidian 1.6.7 или более ранней версией. Обратите внимание, что длина контента, который вы можете вырезать, ограничена вашим браузером и ОС. Некоторые страницы могут не открыться без ошибок."
+	},
+	"more": {
+		"message": "Далее"
+	},
+	"newTemplate": {
+		"message": "Новый шаблон"
+	},
+	"noHighlights": {
+		"message": "Ничего не делать"
+	},
+	"noTemplates": {
+		"message": "Нет доступных шаблонов. Пожалуйста, добавьте шаблон в настройках."
+	},
+	"noteContent": {
+		"message": "Содержимое заметки"
+	},
+	"noteContentDescription": {
+		"message": "Настройте содержание заметки. Используйте переменные для предварительного заполнения данных со страницы."
+	},
+	"noteLocation": {
+		"message": "Расположение заметки"
+	},
+	"noteLocationDescription": {
+		"message": "Папки или путь для заметки."
+	},
+	"noteName": {
+		"message": "Название заметки"
+	},
+	"noteNameFormat": {
+		"message": "Название заметки"
+	},
+	"noteNameFormatDescription": {
+		"message": "Формат для имени файла заметки. Вы можете использовать переменные {{title}}, {{date}} и {{published}} для предварительного заполнения данных со страницы. $link_start$Узнать больше$link_end$.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/variabless\" target=\"_blank\">"
+			}
+		}
+	},
+	"notesAboutPage": {
+		"message": "Заметки об этой странице..."
+	},
+	"onlyHttpSupported": {
+		"message": "Эту страницу нельзя сохранить. Поддерживаются только URL-адреса http и https."
+	},
+	"pageCannotBeClipped": {
+		"message": "Эту страницу нельзя сохранить."
+	},
+	"pageVariables": {
+		"message": "Переменные страницы"
+	},
+	"pleaseReload": {
+		"message": "Пожалуйста, попробуйте перезагрузить страницу."
+	},
+	"prependToDaily": {
+		"message": "Добавить в начало ежедневной заметки"
+	},
+	"prependToExisting": {
+		"message": "Добавить в начало существующей заметки"
+	},
+	"properties": {
+		"message": "Свойства"
+	},
+	"propertiesSettings": {
+		"message": "Свойства"
+	},
+	"propertyName": {
+		"message": "Название свойства"
+	},
+	"propertyValue": {
+		"message": "Значение свойства"
+	},
+	"refresh": {
+		"message": "Обновить"
+	},
+	"remove": {
+		"message": "Удалить"
+	},
+	"removeProperty": {
+		"message": "Удалить свойство"
+	},
+	"removeUnusedProperties": {
+		"message": "Удалить неиспользуемые свойства"
+	},
+	"removeUnusedPropertiesDescription": {
+		"message": "Удалить все свойства, которые не используются ни в одном шаблоне."
+	},
+	"removeVault": {
+		"message": "Удалить хранилище"
+	},
+	"replaceContent": {
+		"message": "Заменить содержимое страницы"
+	},
+	"reset": {
+		"message": "Сброс"
+	},
+	"resetDefaultTemplate": {
+		"message": "Сброс шаблона по умолчанию"
+	},
+	"resetDefaultTemplateDescription": {
+		"message": "Удалить все изменения, внесенные в шаблон по умолчанию."
+	},
+	"saveFile": {
+		"message": "Сохранить файл..."
+	},
+	"searchVariables": {
+		"message": "Поиск переменных..."
+	},
+	"settings": {
+		"message": "Настройки"
+	},
+	"settingsHeading": {
+		"message": "Настройки"
+	},
+	"share": {
+		"message": "Поделиться..."
+	},
+	"shortcutInstructionsBrave": {
+		"message": "Для изменения назначения клавиш, перейдите в $1"
+	},
+	"shortcutInstructionsChrome": {
+		"message": "Для изменения назначения клавиш, перейдите в $1"
+	},
+	"shortcutInstructionsDefault": {
+		"message": "Для изменения назначения клавиш, перейдите к настройки расширений вашего браузера."
+	},
+	"shortcutInstructionsEdge": {
+		"message": "Для изменения назначения клавиш, перейдите в $1"
+	},
+	"shortcutInstructionsFirefox": {
+		"message": "Для изменения назначения клавиш, перейдите в $1, нажмите на значок шестеренки и выберите \"Управление ярлыками расширений\"."
+	},
+	"shortcutInstructionsIntro": {
+		"message": "Горячие клавиши обеспечивают быстрый доступ к функциям расширения."
+	},
+	"shortcutInstructionsSafari": {
+		"message": "Горячие клавиши недоступны для расширений Safari."
+	},
+	"shortcutNotSet": {
+		"message": "Не установлено"
+	},
+	"showActionsButton": {
+		"message": "Показать кнопку действий"
+	},
+	"showActionsDescription": {
+		"message": "Позволяет просматривать переменные страницы из меню расширения. Полезно для просмотра переменных, доступных для использования в шаблонах."
+	},
+	"showPageVariables": {
+		"message": "Показать переменные страницы"
+	},
+	"silentOpen": {
+		"message": "Сохранять заметки, не открывая их"
+	},
+	"silentOpenDescription": {
+		"message": "Заметки будут сохранены, но не откроются в новой вкладке. Obsidian по-прежнему будет выводиться на передний план."
+	},
+	"specificNoteName": {
+		"message": "Особое название заметки"
+	},
+	"systemDefault": {
+		"message": "Системный"
+	},
+	"templateName": {
+		"message": "Название шаблона"
+	},
+	"templateProperties": {
+		"message": "Свойства"
+	},
+	"templatePropertiesDescription": {
+		"message": "Свойства для добавления в верхнюю часть заметки. Используйте переменные для предварительного заполнения данных со страницы."
+	},
+	"templateTriggers": {
+		"message": "Триггеры шаблона"
+	},
+	"templateTriggersDescription": {
+		"message": "Определите правила для автоматического выбора этого шаблона, если он соответствует шаблону URL или содержит данные schema.org. По одному правилу на строку."
+	},
+	"templatesHeading": {
+		"message": "Шаблоны"
+	},
+	"vault": {
+		"message": "Хранилище"
+	},
+	"vaultDescription": {
+		"message": "Выберите хранилище по умолчанию для этого шаблона. Перейдите в раздел $link_start$основных настроек$link_end$, чтобы добавить или удалить хранилища.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=general\">"
+			}
+		}
+	},
+	"vaults": {
+		"message": "Хранилища"
+	},
+	"vaultsDescription": {
+		"message": "По умолчанию заметки сохраняются в текущем открытом хранилище. Вы можете добавить хранилища здесь, если хотите иметь возможность сохранять в разных хранилищах. Имена хранилищ должны полностью совпадать с именем хранилища Obsidian. Нажмите $strong_start$Enter$strong_end$, чтобы добавить хранилище.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	}
+}
