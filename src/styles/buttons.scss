@@ -1,5 +1,9 @@
-button {
+button,
+.btn {
 	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
 	width: 100%;
 	color: var(--text-normal);
 	background-color: var(--background-primary);
@@ -13,6 +17,7 @@ button {
 	white-space: nowrap;
 	outline: none;
 	border: none;
+	text-decoration: none;
 
 	.is-mobile & {
 		padding: 0.25rem 1rem;

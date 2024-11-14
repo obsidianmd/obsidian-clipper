@@ -188,6 +188,12 @@
 	"generalSettings": {
 		"message": "General settings"
 	},
+	"help": {
+		"message": "Help"
+	},
+	"helpDescription": {
+		"message": "Learn how to use Web Clipper and get help troubleshooting."
+	},
 	"highlightPage": {
 		"message": "Highlight page"
 	},
@@ -307,6 +313,9 @@
 	},
 	"onlyHttpSupported": {
 		"message": "This page cannot be clipped. Only http and https URLs are supported."
+	},
+	"open": {
+		"message": "Open"
 	},
 	"pageCannotBeClipped": {
 		"message": "This page cannot be clipped."
