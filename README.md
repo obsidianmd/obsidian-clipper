@@ -20,14 +20,15 @@ You can help translate Web Clipper into your language. Submit your translation v
 
 In no particular order:
 
-- More languages
-- RTL support
-- Annotate highlights
-- Save Markdown with inline highlights
-- Save images locally (requires changes to Obsidian app)
-- Template directory
-- Template validation
-- Template logic (if/for)
+- [ ] Add to Microsoft Edge directory (awaiting approval)
+- [ ] Translate UI into more languages
+- [ ] RTL support
+- [ ] Annotate highlights
+- [ ] Save Markdown with inline highlights
+- [ ] Save images locally (requires changes to Obsidian app)
+- [ ] Template directory
+- [ ] Template validation
+- [ ] Template logic (if/for)
 
 ## Developers
 
