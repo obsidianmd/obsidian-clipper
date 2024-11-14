@@ -396,7 +396,7 @@
 		"message": "キーボードショートカットでクリッパー機能に素早くアクセスできます。"
 	},
 	"shortcutInstructionsSafari": {
-		"message": "Safariの拡張機能ではキーボードショートカットは利用できません。"
+		"message": "Safariではキーボードショートカットをカスタマイズできません。"
 	},
 	"shortcutNotSet": {
 		"message": "未設定"

@@ -408,7 +408,7 @@
 		"message": "Keyboard shortcuts give you quick access to clipper features."
 	},
 	"shortcutInstructionsSafari": {
-		"message": "Keyboard shortcuts are not available for Safari extensions."
+		"message": "Keyboard shortcuts are not customizable on Safari."
 	},
 	"shortcutNotSet": {
 		"message": "Not set"

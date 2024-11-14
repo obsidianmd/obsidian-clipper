@@ -176,7 +176,7 @@ async function initializeKeyboardShortcuts(): Promise<void> {
 
 	const browser = await detectBrowser();
 
-	if (browser === 'safari' || browser === 'mobile-safari') {
+	if (browser === 'mobile-safari') {
 		// For Safari, display a message about keyboard shortcuts not being available
 		const messageItem = document.createElement('div');
 		messageItem.className = 'shortcut-item';

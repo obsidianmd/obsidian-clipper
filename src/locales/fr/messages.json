@@ -396,7 +396,7 @@
 		"message": "Les raccourcis clavier vous donnent un accès rapide aux fonctionnalités du clipper."
 	},
 	"shortcutInstructionsSafari": {
-		"message": "Les raccourcis clavier ne sont pas disponibles pour les extensions Safari."
+		"message": "Les raccourcis clavier ne sont pas personnalisables sur Safari."
 	},
 	"shortcutNotSet": {
 		"message": "Non défini"

@@ -399,7 +399,7 @@
 		"message": "Los atajos de teclado te dan acceso rápido a las funciones del clipper."
 	},
 	"shortcutInstructionsSafari": {
-		"message": "Los atajos de teclado no están disponibles para extensiones de Safari."
+		"message": "Los atajos de teclado no son personalizables en Safari."
 	},
 	"shortcutNotSet": {
 		"message": "No establecido"

@@ -396,7 +396,7 @@
 		"message": "键盘快捷键可以快速访问剪藏器功能。"
 	},
 	"shortcutInstructionsSafari": {
-		"message": "Safari 扩展不支持键盘快捷键。"
+		"message": "Safari 上的键盘快捷键无法自定义。"
 	},
 	"shortcutNotSet": {
 		"message": "未设置"
