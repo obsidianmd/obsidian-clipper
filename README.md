@@ -16,6 +16,19 @@ Documentation is available on the [Obsidian Help site](https://help.obsidian.md/
 
 You can help translate Web Clipper into your language. Submit your translation via pull request using the format found in the [/locales](/src/locales) folder.
 
+## Roadmap
+
+In no particular order:
+
+- More languages
+- RTL support
+- Annotate for highlights
+- Save Markdown with inline highlights
+- Save images locally (requires changes to Obsidian app)
+- Template directory
+- Template validation
+- Template logic (if/for)
+
 ## Developers
 
 To build the extension:
