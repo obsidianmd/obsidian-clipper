@@ -411,7 +411,19 @@ export function sortHighlights() {
 		const elementA = getElementByXPath(a.xpath);
 		const elementB = getElementByXPath(b.xpath);
 		if (elementA && elementB) {
-			return getElementVerticalPosition(elementA) - getElementVerticalPosition(elementB);
+			const verticalDiff = getElementVerticalPosition(elementA) - getElementVerticalPosition(elementB);
+			
+			// If elements are at the same vertical position (same paragraph)
+			if (verticalDiff === 0) {
+				// If both are text highlights in the same element, sort by offset
+				if (a.type === 'text' && b.type === 'text' && a.xpath === b.xpath) {
+					return a.startOffset - b.startOffset;
+				}
+				// Otherwise, sort by horizontal position
+				return elementA.getBoundingClientRect().left - elementB.getBoundingClientRect().left;
+			}
+			
+			return verticalDiff;
 		}
 		return 0;
 	});
