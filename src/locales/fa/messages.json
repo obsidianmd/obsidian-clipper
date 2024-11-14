@@ -1,0 +1,475 @@
+{
+	"addProperty": {
+		"message": "+ افزودن خواص"
+	},
+	"addToObsidian": {
+		"message": "به ابسیدین اضافه کنید"
+	},
+	"addVaultPlaceholder": {
+		"message": "برای افزودن به خزانه بر enter کلیک کنید"
+	},
+	"advanced": {
+		"message": "پیشرفته"
+	},
+	"allProperties": {
+		"message": "همه خواص"
+	},
+	"alwaysShowHighlights": {
+		"message": "همیشه جملات روشن را نشان دهید"
+	},
+	"alwaysShowHighlightsDescription": {
+		"message": "هنگام بارگذاری صفحه، جملات روشن ذخیره شده خود را نمایش بشود. آن را خاموش کنید تا فقط وقتی حالت جملات روشن فعال است جملات روشن نمایش داده شود."
+	},
+	"appendToDaily": {
+		"message": "اضافه کردن به یادداشت روزانه، در آخر آن "
+	},
+	"appendToExisting": {
+		"message": "اضافه کردن به یادداشت موجود، در آخر آن"
+	},
+	"behavior": {
+		"message": "رفتار"
+	},
+	"behaviorWarning": {
+		"message": "افزودن به یادداشت موجود یا یادداشت روزانه به ابسیدین  ورژن ۱.۷.۲ یا بالاتر نیاز دارد"
+	},
+	"clipBehavior": {
+		"message": "رفتار کلیپ"
+	},
+	"clipBehaviorDescription": {
+		"message": "نحوه ذخیره جملات روشن در ابسیدین را انتخاب کنید. متغییر مربوط به $strong_start$محتوا$strong_end$ را تعریف مي‌کند.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"close": {
+		"message": "بستن"
+	},
+	"commandOpenClipper": {
+		"message": "کلیپر ابسیدین را باز کن"
+	},
+	"commandQuickClip": {
+		"message": "کلیپ سریع"
+	},
+	"commandToggleHighlighter": {
+		"message": "حالت جملات روشن را فعال یا نا‌فعال کن"
+	},
+	"confirmDeleteTemplate": {
+		"message": "آیا مطمئنید که می خواهید الگوی \"$1\" را حذف کنید؟"
+	},
+	"copied": {
+		"message": "کپی شد!"
+	},
+	"copyAsJson": {
+		"message": "کپی به JSON"
+	},
+	"copyToClipboard": {
+		"message": "به کلیپ بورد کپی کن"
+	},
+	"createNewNote": {
+		"message": "یادداشت جدید ایجاد کن"
+	},
+	"dailyNoteFormat": {
+		"message": "قالب یادداشت روزانه (به عنوان مثال، YYYY-MM-DD)"
+	},
+	"defaultTemplateName": {
+		"message": "پیش فرض"
+	},
+	"delete": {
+		"message": "حذف کن"
+	},
+	"disableHighlighter": {
+		"message": "مارکر جملات روشن را غیرفعال کن"
+	},
+	"display": {
+		"message": "نمایش"
+	},
+	"duplicate": {
+		"message": "دو نسخه کن"
+	},
+	"earlyAccessDescription": {
+		"message": "از ویژگی هایی استفاده کنید که به آخرین $link_start$نسخه زودرس$link_end$ ابسیدین نیاز دارند. در حال حاضر به ابسیدین ۱.۷.۲ یا جدیدتر نیاز دارید.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/Obsidian/Early+access+versions\" target=\"_blank\">"
+			}
+		}
+	},
+	"earlyAccessFeatures": {
+		"message": "ویژگی‌های نسخه زودرس"
+	},
+	"editTemplate": {
+		"message": "ویرایش قالب"
+	},
+	"enableHighlighter": {
+		"message": "مارکر جملات روشن را فعال کن"
+	},
+	"enableHighlighterDescription": {
+		"message": "محتوایی را که می‌خواهید در ابسیدین ذخیره کنید را برجسته کنید"
+	},
+	"error": {
+		"message": "خطا"
+	},
+	"export": {
+		"message": "استخراج"
+	},
+	"exportAllSettings": {
+		"message": "همه تنظیمات را استخراج کن"
+	},
+	"exportAllSettingsDescription": {
+		"message": "همه تنظیمات را استخراج کنید حتی قالب‌ها و خواص."
+	},
+	"exportHighlights": {
+		"message": "جملات روشن را استخراج کن "
+	},
+	"exportHighlightsDescription": {
+		"message": "جملات روشن را به یک فایل استخراج کن "
+	},
+	"exportProperties": {
+		"message": "استخراج خواص"
+	},
+	"exportPropertiesDescription": {
+		"message": "ویژگی‌های Web Clipper را در یک فایل $strong_start$types.json$strong_end$ ذخیره کنید که می‌تواند به خزانه ابسیدین شما یا در دستگاه‌های دیگر به Web Clipper وارد شود.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"extensionDescription": {
+		"message": "محتوای وب را در قالبی خصوصی و بادوام ذخیره کنید که بتوانید به صورت آفلاین به آن دسترسی داشته باشید. پسوند رسمی مرورگر برای ابسیدین."
+	},
+	"extensionName": {
+		"message": "Obsidian Web Clipper"
+	},
+	"failedToCopyText": {
+		"message": "متن کپی نشد"
+	},
+	"failedToDeleteTemplate": {
+		"message": "حذف قالب انجام نشد. لطفا دوباره امتحان کنید."
+	},
+	"failedToExtractContent": {
+		"message": "استخراج محتوای صفحه ناموفق بود."
+	},
+	"failedToInitialize": {
+		"message": "لطفاً برنامه افزودنی را دوباره بارگیری کنید."
+	},
+	"failedToInitializeContent": {
+		"message": "مقداردهی اولیه محتوای صفحه ممکن نیست."
+	},
+	"failedToProcessInterpreter": {
+		"message": "پردازش تفسیرگر ناموفق بود. لطفا دوباره امتحان کنید."
+	},
+	"failedToResetTemplate": {
+		"message": "بازنشانی قالب پیش‌فرض انجام نشد. لطفا دوباره امتحان کنید."
+	},
+	"failedToSave": {
+		"message": "فایل ذخیره نشد"
+	},
+	"failedToSaveFile": {
+		"message": "فایل ذخیره نشد"
+	},
+	"folder": {
+		"message": "پوشه"
+	},
+	"general": {
+		"message": "عمومی"
+	},
+	"generalSettings": {
+		"message": "تنظیمات عمومی"
+	},
+	"highlightPage": {
+		"message": "صحفه را برجسته کن"
+	},
+	"highlighter": {
+		"message": "مارکر"
+	},
+	"highlighterSettings": {
+		"message": "مارکر"
+	},
+	"hotkeys": {
+		"message": "کلیدهای میانبر"
+	},
+	"import": {
+		"message": "درج"
+	},
+	"importAllSettings": {
+		"message": "درج تمام تنظیمات"
+	},
+	"importAllSettingsDescription": {
+		"message": "درج تمام تنظیمات حتی خواص و قالب‌ها. این جایگزین تنظیمات فعلی شما خواهد شد."
+	},
+	"importProperties": {
+		"message": "درج خواص"
+	},
+	"importPropertiesDescription": {
+		"message": "برای وارد کردن خواص خود از ابسیدین فایل $strong_1_start$types.json$strong_1_end$ را در پوشه $strong_2_start$.obsidian$strong_2_end$ درون خزانه خود پیدا کنید. توجه داشته باشید که این پوشه به طور پیش فرض در اکثر سیستم عامل ها پنهان است.",
+		"placeholders": {
+			"strong_1_end": {
+				"content": "</strong>"
+			},
+			"strong_1_start": {
+				"content": "<strong>"
+			},
+			"strong_2_end": {
+				"content": "</strong>"
+			},
+			"strong_2_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"interpreter": {
+		"message": "تفسیرگر"
+	},
+	"interpreterContext": {
+		"message": "زمینه تفسیرگر"
+	},
+	"interpreterContextDescription": {
+		"message": "زمینه مورد استفاده برای تفسیر متغیرهای سریع. زمینه پیش فرض تعریف شده در $link_start$تنظیمات تفسیرگر$link_end$ را لغو می کند. در اینجا می توان از متغیرها استفاده کرد.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=interpreter\">"
+			}
+		}
+	},
+	"language": {
+		"message": "زبان"
+	},
+	"languageDescription": {
+		"message": "زبان نمایش را برای برنامه انتخاب کنید."
+	},
+	"lastUsed": {
+		"message": "آخرین استفاده"
+	},
+	"legacyMode": {
+		"message": "حالت قدیمی"
+	},
+	"legacyModeDescription": {
+		"message": "از روش برش URI سازگار با ابسیدین ۱.۶.۷ یا نسخه قبلی استفاده می کند. توجه داشته باشید که طول محتوایی که می توانید کلیپ کنید توسط مرورگر و سیستم عامل شما محدود است. برخی از صفحات ممکن است بدون هیچ خطایی از کار بیفتند."
+	},
+	"more": {
+		"message": "بیشتر"
+	},
+	"newTemplate": {
+		"message": "قالب جدید"
+	},
+	"noHighlights": {
+		"message": "هیچ کاری نکن"
+	},
+	"noTemplates": {
+		"message": "هیچ قالبی در دسترس نیست لطفا یک قالب در تنظیمات اضافه کنید."
+	},
+	"noteContent": {
+		"message": "محتوای یادداشت"
+	},
+	"noteContentDescription": {
+        "message": "محتوای یادداشت را ویرایش کنید. از متغیرها برای پرکردن صحفه از اینترنت استفاده کنید."
+	},
+	"noteLocation": {
+		"message": "مکان یادداشت"
+	},
+	"noteLocationDescription": {
+		"message": "پوشه یا مسیر یادداشت."
+	},
+	"noteName": {
+		"message": "نام یادداشت"
+	},
+	"noteNameFormat": {
+		"message": "نام یادداشت"
+	},
+	"noteNameFormatDescription": {
+		"message": "فرمت نام فایل یادداشت. می‌توانید از متغیرهایی مانند {{title}}، {{date}} و {{published}} برای پر کردن داده‌های صفحه از قبل استفاده کنید. $link_start$بیشتر بیاموزید$link_end$.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/variabless\" target=\"_blank\">"
+			}
+		}
+	},
+	"notesAboutPage": {
+		"message": "یادداشت‌هایی در مورد این صفحه ..."
+	},
+	"onlyHttpSupported": {
+		"message": "این صفحه را نمی توان کلیپ داد. فقط آدرس های http و https پشتیبانی می شوند."
+	},
+	"pageCannotBeClipped": {
+		"message": "این صفحه را نمی توان کلیپ داد."
+	},
+	"pageVariables": {
+		"message": "متغیرهای صفحه"
+	},
+	"pleaseReload": {
+		"message": "لطفاً صفحه را دوباره بارگیری کنید."
+	},
+	"prependToDaily": {
+		"message": "به یادداشت روزانه، از اول اضافه کنید"
+	},
+	"prependToExisting": {
+		"message": "به یادداشت موجود، از اول اضافه کنید"
+	},
+	"properties": {
+		"message": "خواص"
+	},
+	"propertiesSettings": {
+		"message": "خواص"
+	},
+	"propertyName": {
+		"message": "نام خاص"
+	},
+	"propertyValue": {
+		"message": "مقدار خاص"
+	},
+	"refresh": {
+		"message": "ریفرش"
+	},
+	"remove": {
+		"message": "حذف"
+	},
+	"removeProperty": {
+		"message": "حذف خاص"
+	},
+	"removeUnusedProperties": {
+		"message": "حذف خواصی که استفاده نشدند"
+	},
+	"removeUnusedPropertiesDescription": {
+		"message": "حذف تمام خواصی که در هیچ قالبی استفاده نشده‌اند"
+	},
+	"removeVault": {
+		"message": "حذف خزانه"
+	},
+	"replaceContent": {
+		"message": "محتوای صفحه را جایگزین کن"
+	},
+	"reset": {
+		"message": "بازنشانی کن"
+	},
+	"resetDefaultTemplate": {
+		"message": "بازنشانی قالب پیش فرض"
+	},
+	"resetDefaultTemplateDescription": {
+		"message": "هر تغییری که در قالب پیش فرض ایجاد کرده اید را حذف کن"
+	},
+	"saveFile": {
+		"message": "ذخیره فایل..."
+	},
+	"searchVariables": {
+		"message": "جستجوی متغیرها..."
+	},
+	"settings": {
+		"message": "تنظیمات"
+	},
+	"settingsHeading": {
+		"message": "تنظیمات"
+	},
+	"share": {
+		"message": " اشتراک ..."
+	},
+	"shortcutInstructionsBrave": {
+		"message": "برای تغییر کلیدهای میان‌بر به $1 بروید"
+	},
+	"shortcutInstructionsChrome": {
+        "message": "برای تغییر کلیدهای میان‌بر به $1 بروید"
+	},
+	"shortcutInstructionsDefault": {
+		"message": "برای تغییر کلیدهای میان‌بر، لطفاً به تنظیمات افزونه مرورگر خود مراجعه کنید."
+	},
+	"shortcutInstructionsEdge": {
+		"message": "برای تغییر کلیدهای میان‌بر به $1 بروید"
+	},
+	"shortcutInstructionsFirefox": {
+		"message": "برای تغییر کلیدهای میان‌بر، به $1 بروید، روی نماد چرخ دنده کلیک کنید و \"Manage Extension Shortcuts\" را انتخاب کنید."
+	},
+	"shortcutInstructionsIntro": {
+		"message": "میانبرهای کلیدی به شما امکان دسترسی سریع به ویژگی های کلیپر می دهد."
+	},
+	"shortcutInstructionsSafari": {
+		"message": "میانبرهای کلیدی برای برنامه های افزودنی Safari در دسترس نیستند."
+	},
+	"shortcutNotSet": {
+		"message": "تنظیم نشده است"
+	},
+	"showActionsButton": {
+		"message": "دکمه نمایش اقدامات"
+	},
+	"showActionsDescription": {
+		"message": "به شما امکان می دهد تا متغیرهای صفحه را از منوی کلیپر بررسی کنید. برای دیدن متغیرهایی که برای استفاده در قالب ها در دسترس هستند مفید است."
+	},
+	"showPageVariables": {
+		"message": "نمایش متغیرهای صفحه"
+	},
+	"silentOpen": {
+		"message": "یادداشت بریده شده را بدون باز کردن آن ذخیره کنید"
+	},
+	"silentOpenDescription": {
+		"message": "یادداشت های بریده شده ذخیره می شوند اما به عنوان یک برگه جدید باز نمی شوند. ابسیدین همچنان در پیش زمینه قرار خواهد گرفت."
+	},
+	"specificNoteName": {
+		"message": "نام یادداشت خاص"
+	},
+	"systemDefault": {
+		"message": "سیستم"
+	},
+	"templateName": {
+		"message": "نام قالب"
+	},
+	"templateProperties": {
+		"message": "خواص"
+	},
+	"templatePropertiesDescription": {
+		"message": "خواص که برای افزودن به بالای یادداشت بریده شده. از متغیرها برای از پیش پر کردن داده ها از صفحه استفاده کنید."
+	},
+	"templateTriggers": {
+		"message": "محرک های قالب"
+	},
+	"templateTriggersDescription": {
+		"message": "قوانینی را تعریف کنید که وقتی URL با آن مطابق باشد این قالب انتخاب شود. فقط یک قانون در هر خط."
+	},
+	"templatesHeading": {
+		"message": "قالب‌ها"
+	},
+	"vault": {
+		"message": "خزانه"
+	},
+	"vaultDescription": {
+		"message": "Sخزانه پیش فرض را برای این قالب انتخاب کنید. برای افزودن یا حذف خزانه‌ها به $link_start$تنظیمات عمومی$link_end$ بروید.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=general\">"
+			}
+		}
+	},
+	"vaults": {
+		"message": "خزانه‌ها"
+	},
+	"vaultsDescription": {
+		"message": "به طور پیش‌فرض، یادداشت‌های بریده شده در خزانه باز فعلی ذخیره می‌شوند. اگر می‌خواهید گزینه ذخیره در خزانه‌های مختلف را داشته باشید، می‌توانید خزانه‌ها را در اینجا اضافه کنید. نام خزانه باید دقیقاً با نام خزانه ابسیدین مطابقت داشته باشد. برای افزودن خزانه، $strong_start$enter$strong_end$ را فشار دهید.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	}
+}
+
