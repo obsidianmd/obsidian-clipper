@@ -188,6 +188,9 @@
 		position: absolute;
 		right: 0;
 	}
+	.share-btn {
+		display: none;
+	}
 	#more-btn {
 		color: white;
 		background-color: var(--interactive-accent);
@@ -215,17 +218,19 @@
 
 .is-tablet,
 .is-mobile {
-	#more-btn {
-		display: none;
-	}
-	.share-btn {
-		margin-left: 0.25rem;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		--icon-size: 22px;
-		.clickable-icon {
-			color: var(--text-accent);
+	.action-buttons {
+		#more-btn {
+			display: none;
+		}
+		.share-btn {
+			margin-left: 0.25rem;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			--icon-size: 22px;
+			.clickable-icon {
+				color: var(--text-accent);
+			}
 		}
 	}
 }
