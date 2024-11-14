@@ -49,6 +49,7 @@
 	gap: 2px;
 	align-items: center;
 	border-radius: var(--radius-s);
+	overflow: hidden;
 	min-height: var(--input-height);
 	transition:
 		box-shadow .15s ease-in-out,
