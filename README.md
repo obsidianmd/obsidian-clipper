@@ -12,6 +12,10 @@ Install the extension by downloading it from the official directory for your bro
 
 Documentation is available on the [Obsidian Help site](https://help.obsidian.md/web-clipper), which covers how to use [highlighting](https://help.obsidian.md/web-clipper/highlight), [templates](https://help.obsidian.md/web-clipper/templates), [variables](https://help.obsidian.md/web-clipper/variables), [filters](https://help.obsidian.md/web-clipper/filters), and more.
 
+## Translations
+
+You can help translate Web Clipper into your language. Submit your translation via pull request using the format found in the [/locales](/src/locales) folder.
+
 ## Developers
 
 To build the extension:
