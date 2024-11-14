@@ -20,6 +20,7 @@ You can help translate Web Clipper into your language. Submit your translation v
 
 In no particular order:
 
+- [ ] A different icon for Web Clipper #135
 - [ ] Add to Microsoft Edge directory (awaiting approval)
 - [ ] Translate UI into more languages
 - [ ] RTL support
