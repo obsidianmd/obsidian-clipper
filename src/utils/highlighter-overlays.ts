@@ -112,16 +112,18 @@ function findTextNodeAtOffset(element: Element, offset: number): { node: Node, o
 	while (node) {
 		const nodeLength = node.textContent?.length || 0;
 		if (currentOffset + nodeLength >= offset) {
-			return { node, offset: offset - currentOffset };
+			// Ensure offset is within bounds of the node
+			const adjustedOffset = Math.min(Math.max(0, offset - currentOffset), nodeLength);
+			return { node, offset: adjustedOffset };
 		}
 		currentOffset += nodeLength;
 		node = treeWalker.nextNode();
 	}
 	
-	// If we couldn't find the exact offset, return the last text node and its length
-	const lastNode = treeWalker.lastChild();
-	if (lastNode) {
-		return { node: lastNode, offset: lastNode.textContent?.length || 0 };
+	// If we couldn't find the exact offset, return the first text node with offset 0
+	const firstNode = document.createTreeWalker(element, NodeFilter.SHOW_TEXT).firstChild();
+	if (firstNode) {
+		return { node: firstNode, offset: 0 };
 	}
 	
 	return null;
@@ -147,24 +149,48 @@ export function planHighlightOverlayRects(target: Element, highlight: AnyHighlig
 			const endNode = findTextNodeAtOffset(target, highlight.endOffset);
 			
 			if (startNode && endNode) {
-				range.setStart(startNode.node, startNode.offset);
-				range.setEnd(endNode.node, endNode.offset);
-				
-				const rects = range.getClientRects();
-				
-				const averageLineHeight = calculateAverageLineHeight(rects);
-				const textRects = Array.from(rects).filter(rect => rect.height <= averageLineHeight * 1.5);
-				const complexRects = Array.from(rects).filter(rect => rect.height > averageLineHeight * 1.5);
-				
-				// Create overlays for all rects
-				if (textRects.length > 0) {
-					mergeHighlightOverlayRects(textRects, highlight.content, existingOverlays, true, index, highlight.notes);
-				}
-				if (complexRects.length > 0) {
-					mergeHighlightOverlayRects(complexRects, highlight.content, existingOverlays, false, index, highlight.notes);
+				try {
+					// Try to set start position
+					try {
+						range.setStart(startNode.node, startNode.offset);
+					} catch {
+						// Fallback to node start
+						range.setStart(startNode.node, 0);
+					}
+					
+					// Try to set end position
+					try {
+						range.setEnd(endNode.node, endNode.offset);
+					} catch {
+						// Fallback to node end
+						range.setEnd(endNode.node, endNode.node.textContent?.length || 0);
+					}
+					
+					const rects = range.getClientRects();
+					
+					if (rects.length === 0) {
+						const rect = target.getBoundingClientRect();
+						mergeHighlightOverlayRects([rect], highlight.content, existingOverlays, false, index, highlight.notes);
+						return;
+					}
+					
+					const averageLineHeight = calculateAverageLineHeight(rects);
+					const textRects = Array.from(rects).filter(rect => rect.height <= averageLineHeight * 1.5);
+					const complexRects = Array.from(rects).filter(rect => rect.height > averageLineHeight * 1.5);
+					
+					if (textRects.length > 0) {
+						mergeHighlightOverlayRects(textRects, highlight.content, existingOverlays, true, index, highlight.notes);
+					}
+					if (complexRects.length > 0) {
+						mergeHighlightOverlayRects(complexRects, highlight.content, existingOverlays, false, index, highlight.notes);
+					}
+				} catch (error) {
+					// Fallback to element highlight
+					const rect = target.getBoundingClientRect();
+					mergeHighlightOverlayRects([rect], highlight.content, existingOverlays, false, index, highlight.notes);
 				}
 			} else {
-				console.warn('Could not find start or end node for text highlight, falling back to element highlight');
+				// Fallback to element highlight
 				const rect = target.getBoundingClientRect();
 				mergeHighlightOverlayRects([rect], highlight.content, existingOverlays, false, index, highlight.notes);
 			}
