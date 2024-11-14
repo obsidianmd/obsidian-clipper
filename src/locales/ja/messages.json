@@ -467,5 +467,14 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"help": {
+		"message": "ヘルプ"
+	},
+	"helpDescription": {
+		"message": "Web Clipperの使い方とトラブルシューティングのヘルプを参照してください。"
+	},
+	"open": {
+		"message": "開く"
 	}
 } 

@@ -467,5 +467,14 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"help": {
+		"message": "帮助"
+	},
+	"helpDescription": {
+		"message": "了解如何使用 Web Clipper 并获取故障排除帮助。"
+	},
+	"open": {
+		"message": "打开"
 	}
 } 

@@ -470,6 +470,15 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"help": {
+		"message": "راهنما"
+	},
+	"helpDescription": {
+		"message": "نحوه استفاده از Web Clipper را بیاموزید و در رفع مشکلات کمک بگیرید."
+	},
+	"open": {
+		"message": "باز کردن"
 	}
 }
 

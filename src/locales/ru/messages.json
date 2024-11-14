@@ -470,5 +470,14 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"help": {
+		"message": "Помощь"
+	},
+	"helpDescription": {
+		"message": "Узнайте, как использовать Web Clipper и получите помощь в устранении неполадок."
+	},
+	"open": {
+		"message": "Открыть"
 	}
 }

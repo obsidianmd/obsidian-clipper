@@ -467,5 +467,14 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"help": {
+		"message": "Aide"
+	},
+	"helpDescription": {
+		"message": "Apprenez à utiliser Web Clipper et obtenez de l'aide pour le dépannage."
+	},
+	"open": {
+		"message": "Ouvrir"
 	}
 }
