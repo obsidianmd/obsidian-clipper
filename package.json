@@ -1,7 +1,7 @@
 {
-	"name": "obsidian-clipper",
+	"name": "logseq-clipper",
 	"version": "0.9.5",
-	"description": "Official web clipper for Obsidian.",
+	"description": "Unofficial web clipper for Logseq.",
 	"scripts": {
 		"dev:chrome": "webpack --watch --env BROWSER=chrome --mode development",
 		"dev:firefox": "webpack --watch --env BROWSER=firefox --mode development",

@@ -1,7 +1,7 @@
 export interface Template {
 	id: string;
 	name: string;
-	behavior: 'create' | 'append-specific' | 'append-daily' | 'prepend-specific' | 'prepend-daily';
+	behavior: 'create' | 'append-daily' | 'cursor';
 	noteNameFormat: string;
 	path: string;
 	noteContentFormat: string;

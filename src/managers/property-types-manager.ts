@@ -35,7 +35,7 @@ export function updatePropertyTypesList(): void {
 	const propertyUsageCounts = countPropertyUsage();
 
 	// Sort all property types alphabetically
-	const sortedPropertyTypes = [...generalSettings.propertyTypes].sort((a, b) => 
+	const sortedPropertyTypes = [...generalSettings.propertyTypes].sort((a, b) =>
 		a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
 	);
 
@@ -133,12 +133,12 @@ function createPropertyTypeListItem(propertyType: PropertyType, usageCount: numb
 	}
 
 	if (propertyType.name !== 'tags') {
-		select.addEventListener('change', function() {
+		select.addEventListener('change', function () {
 			updateSelectedOption(this.value, propertySelectedDiv);
 			updatePropertyType(propertyType.name, this.value, defaultValueInput.value).then(updatePropertyTypesList);
 		});
 
-		defaultValueInput.addEventListener('change', function() {
+		defaultValueInput.addEventListener('change', function () {
 			updatePropertyType(propertyType.name, select.value, this.value).then(updatePropertyTypesList);
 		});
 	} else {
@@ -152,14 +152,14 @@ function createPropertyTypeListItem(propertyType: PropertyType, usageCount: numb
 
 function updateSelectedOption(value: string, propertySelected: HTMLElement): void {
 	const iconName = getPropertyTypeIcon(value);
-	
+
 	// Clear existing content
 	propertySelected.innerHTML = '';
-	
+
 	// Create and append the new icon element
 	const iconElement = createElementWithHTML('i', '', { 'data-lucide': iconName });
 	propertySelected.appendChild(iconElement);
-	
+
 	propertySelected.setAttribute('data-value', value);
 	initializeIcons(propertySelected);
 }
@@ -289,7 +289,7 @@ async function exportTypesJson(): Promise<void> {
 			await navigator.share({
 				files: [file],
 				title: 'Exported property types',
-				text: 'Obsidian Web Clipper property types'
+				text: 'Logseq Web Clipper property types'
 			});
 		} catch (error) {
 			console.error('Error sharing:', error);
@@ -373,7 +373,7 @@ function setupDeleteUnusedPropertiesButton(): void {
 
 async function deleteUnusedProperties(): Promise<void> {
 	const usedProperties = new Set<string>();
-	
+
 	// Collect all properties used in templates
 	templates.forEach(template => {
 		template.properties.forEach(property => {
@@ -383,7 +383,7 @@ async function deleteUnusedProperties(): Promise<void> {
 
 	// Filter out unused properties
 	const unusedProperties = generalSettings.propertyTypes.filter(pt => !usedProperties.has(pt.name) && pt.name !== 'tags');
-	
+
 	if (unusedProperties.length === 0) {
 		alert('No unused properties found.');
 		return;

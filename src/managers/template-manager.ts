@@ -113,7 +113,7 @@ export function createDefaultTemplate(): Template {
 	return {
 		id: Date.now().toString() + Math.random().toString(36).slice(2, 11),
 		name: 'Default',
-		behavior: 'create',
+		behavior: 'append-daily',
 		noteNameFormat: '{{title}}',
 		path: 'Clippings',
 		noteContentFormat: '{{content}}',
@@ -152,7 +152,7 @@ export function duplicateTemplate(templateId: string): Template {
 	const newTemplate: Template = JSON.parse(JSON.stringify(originalTemplate));
 	newTemplate.id = Date.now().toString() + Math.random().toString(36).slice(2, 11);
 	newTemplate.name = getUniqueTemplateName(originalTemplate.name);
-	
+
 	templates.unshift(newTemplate);
 	return newTemplate;
 }
@@ -222,8 +222,8 @@ async function updateGlobalPropertyTypes(templates: Template[]): Promise<void> {
 		template.properties.forEach(property => {
 			if (!existingTypes.has(property.name)) {
 				const defaultType = defaultTypes[property.name] || { type: 'text', defaultValue: '' };
-				newTypes.push({ 
-					name: property.name, 
+				newTypes.push({
+					name: property.name,
 					type: defaultType.type,
 					defaultValue: defaultType.defaultValue
 				});
@@ -241,7 +241,7 @@ export async function rebuildTemplateList(): Promise<void> {
 	try {
 		// Get all items in storage
 		const allItems = await browser.storage.sync.get(null);
-		
+
 		// Filter for template keys and extract IDs
 		const templateIds = Object.keys(allItems)
 			.filter(key => key.startsWith('template_') && key !== 'template_list')

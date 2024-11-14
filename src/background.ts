@@ -50,7 +50,7 @@ browser.action.onClicked.addListener((tab) => {
 browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime.MessageSender, sendResponse: (response?: any) => void): true | undefined => {
 	if (typeof request === 'object' && request !== null) {
 		const typedRequest = request as { action: string; isActive?: boolean; hasHighlights?: boolean; tabId?: number };
-		
+
 		if (typedRequest.action === "extractContent" && sender.tab && sender.tab.id) {
 			browser.tabs.sendMessage(sender.tab.id, request).then(sendResponse);
 			return true;
@@ -115,7 +115,7 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 		}
 
 		// For other actions that use sendResponse
-		if (typedRequest.action === "extractContent" || 
+		if (typedRequest.action === "extractContent" ||
 			typedRequest.action === "ensureContentScriptLoaded" ||
 			typedRequest.action === "getHighlighterMode" ||
 			typedRequest.action === "toggleHighlighterMode") {
@@ -127,11 +127,11 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 
 browser.commands.onCommand.addListener(async (command, tab) => {
 	if (command === 'quick_clip') {
-		browser.tabs.query({active: true, currentWindow: true}).then((tabs) => {
+		browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
 			if (tabs[0]?.id) {
 				browser.action.openPopup();
 				setTimeout(() => {
-					browser.runtime.sendMessage({action: "triggerQuickClip"})
+					browser.runtime.sendMessage({ action: "triggerQuickClip" })
 						.catch(error => console.error("Failed to send quick clip message:", error));
 				}, 500);
 			}
@@ -158,14 +158,14 @@ const debouncedUpdateContextMenu = debounce(async (tabId: number) => {
 			contexts: browser.Menus.ContextType[];
 		}[] = [
 				{
-					id: "open-obsidian-clipper",
+					id: "open-logseq-clipper",
 					title: "Clip this page",
 					contexts: ["page", "selection", "image", "video", "audio"]
 				},
 				{
 					id: isHighlighterMode ? "exit-highlighter" : "enter-highlighter",
 					title: isHighlighterMode ? "Exit highlighter mode" : "Highlight this page",
-					contexts: ["page","image", "video", "audio"]
+					contexts: ["page", "image", "video", "audio"]
 				},
 				{
 					id: "highlight-selection",
@@ -179,7 +179,7 @@ const debouncedUpdateContextMenu = debounce(async (tabId: number) => {
 				}
 			];
 
-			const browserType = await detectBrowser();
+		const browserType = await detectBrowser();
 		if (browserType === 'chrome') {
 			menuItems.push({
 				id: 'open-side-panel',
@@ -199,7 +199,7 @@ const debouncedUpdateContextMenu = debounce(async (tabId: number) => {
 }, 100); // 100ms debounce time
 
 browser.contextMenus.onClicked.addListener(async (info, tab) => {
-	if (info.menuItemId === "open-obsidian-clipper") {
+	if (info.menuItemId === "open-logseq-clipper") {
 		browser.action.openPopup();
 	} else if (info.menuItemId === "enter-highlighter" && tab && tab.id) {
 		await setHighlighterMode(tab.id, true);
@@ -312,15 +312,15 @@ async function toggleHighlighterMode(tabId: number) {
 
 async function highlightSelection(tabId: number, info: browser.Menus.OnClickData) {
 	isHighlighterMode = true;
-	
+
 	const highlightData: Partial<TextHighlightData> = {
 		id: Date.now().toString(),
 		type: 'text',
 		content: info.selectionText || '',
 	};
 
-	await browser.tabs.sendMessage(tabId, { 
-		action: "highlightSelection", 
+	await browser.tabs.sendMessage(tabId, {
+		action: "highlightSelection",
 		isActive: isHighlighterMode,
 		highlightData,
 	});
@@ -331,8 +331,8 @@ async function highlightSelection(tabId: number, info: browser.Menus.OnClickData
 async function highlightElement(tabId: number, info: browser.Menus.OnClickData) {
 	isHighlighterMode = true;
 
-	await browser.tabs.sendMessage(tabId, { 
-		action: "highlightElement", 
+	await browser.tabs.sendMessage(tabId, {
+		action: "highlightElement",
 		isActive: isHighlighterMode,
 		targetElementInfo: {
 			mediaType: info.mediaType === 'image' ? 'img' : info.mediaType,

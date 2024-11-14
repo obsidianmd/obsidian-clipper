@@ -21,7 +21,7 @@ export async function exportTemplate(): Promise<void> {
 	const sanitizedName = sanitizeFileName(template.name);
 	const templateFile = `${sanitizedName.replace(/\s+/g, '-').toLowerCase()}-clipper.json`;
 
-	const isDailyNote = template.behavior === 'append-daily' || template.behavior === 'prepend-daily';
+	const isDailyNote = template.behavior === 'append-daily'
 
 	const orderedTemplate: Partial<Template> & { schemaVersion: string } = {
 		schemaVersion: SCHEMA_VERSION,
@@ -63,7 +63,7 @@ export async function exportTemplate(): Promise<void> {
 				await navigator.share({
 					files: [file],
 					title: 'Exported template',
-					text: 'Obsidian Web Clipper template'
+					text: 'Logseq Web Clipper template'
 				});
 			} catch (error) {
 				console.error('Error sharing:', error);
@@ -110,14 +110,14 @@ export function importTemplate(input?: HTMLInputElement): void {
 				}
 
 				importedTemplate.id = Date.now().toString() + Math.random().toString(36).slice(2, 9);
-				
+
 				// Handle property types and preserve existing IDs or generate new ones
 				if (importedTemplate.properties) {
 					importedTemplate.properties = await Promise.all(importedTemplate.properties.map(async (prop: any) => {
 						console.log('Processing property:', prop);
 						// Add or update the property type
 						await addPropertyType(prop.name, prop.type || 'text', prop.value || '');
-						
+
 						// Use the type from generalSettings, which will be either the existing type or the newly added one
 						const type = generalSettings.propertyTypes.find(pt => pt.name === prop.name)?.type || 'text';
 						console.log(`Property ${prop.name} type after processing:`, type);
@@ -175,14 +175,14 @@ export function importTemplate(input?: HTMLInputElement): void {
 function validateImportedTemplate(template: Partial<Template>): boolean {
 	const requiredFields: (keyof Template)[] = ['name', 'behavior', 'properties', 'noteContentFormat'];
 	const validTypes = ['text', 'multitext', 'number', 'checkbox', 'date', 'datetime'];
-	
-	const isDailyNote = template.behavior === 'append-daily' || template.behavior === 'prepend-daily';
+
+	const isDailyNote = template.behavior === 'append-daily'
 
 	const hasRequiredFields = requiredFields.every(field => template.hasOwnProperty(field));
 	const hasValidProperties = Array.isArray(template.properties) &&
-		template.properties!.every((prop: any) => 
-			prop.hasOwnProperty('name') && 
-			prop.hasOwnProperty('value') && 
+		template.properties!.every((prop: any) =>
+			prop.hasOwnProperty('name') &&
+			prop.hasOwnProperty('value') &&
 			(!prop.hasOwnProperty('type') || validTypes.includes(prop.type))
 		);
 
@@ -221,7 +221,7 @@ async function processImportedTemplate(importedTemplate: Partial<Template>): Pro
 	}
 
 	importedTemplate.id = Date.now().toString() + Math.random().toString(36).slice(2, 9);
-	
+
 	// Process property types
 	if (importedTemplate.properties) {
 		console.log('Processing properties:', importedTemplate.properties);
@@ -235,7 +235,7 @@ async function processImportedTemplate(importedTemplate: Partial<Template>): Pro
 				console.log(`Property type ${prop.name} already exists, keeping existing type: ${existingPropertyType.type}`);
 			}
 		}
-		
+
 		// Reassign properties with existing or new types
 		importedTemplate.properties = importedTemplate.properties.map(prop => {
 			const existingPropertyType = generalSettings.propertyTypes.find(pt => pt.name === prop.name);
@@ -269,7 +269,7 @@ export function importTemplateFile(file: File): void {
 			console.log('Starting template import');
 			const importedTemplate = JSON.parse(e.target?.result as string) as Partial<Template>;
 			const processedTemplate = await processImportedTemplate(importedTemplate);
-			
+
 			templates.unshift(processedTemplate);
 			await saveTemplateSettings();
 			updateTemplateList();
@@ -299,7 +299,7 @@ async function importTemplateFromJson(jsonContent: string): Promise<void> {
 	try {
 		const importedTemplate = JSON.parse(jsonContent) as Partial<Template>;
 		const processedTemplate = await processImportedTemplate(importedTemplate);
-		
+
 		templates.unshift(processedTemplate);
 		await saveTemplateSettings();
 		updateTemplateList();
@@ -311,7 +311,7 @@ async function importTemplateFromJson(jsonContent: string): Promise<void> {
 }
 
 export function copyTemplateToClipboard(template: Template): void {
-	const isDailyNote = template.behavior === 'append-daily' || template.behavior === 'prepend-daily';
+	const isDailyNote = template.behavior === 'append-daily'
 
 	const orderedTemplate: Partial<Template> & { schemaVersion: string } = {
 		schemaVersion: SCHEMA_VERSION,
@@ -338,7 +338,7 @@ export function copyTemplateToClipboard(template: Template): void {
 	}
 
 	const jsonContent = JSON.stringify(orderedTemplate, null, 2);
-	
+
 	navigator.clipboard.writeText(jsonContent).then(() => {
 		alert('Copied template JSON to clipboard');
 	}).catch(err => {
@@ -358,19 +358,19 @@ export async function exportAllSettings(): Promise<void> {
 		const jsonContent = JSON.stringify(allData, null, 2);
 		console.log('Data stringified, length:', jsonContent.length);
 
-		const fileName = 'obsidian-web-clipper-settings.json';
+		const fileName = 'logseq-web-clipper-settings.json';
 		const browserType = await detectBrowser();
 
 		if (browserType === 'safari' || browserType === 'mobile-safari' || browserType === 'ipad-os') {
 			console.log('Detected Safari, using data URI');
 			const dataUri = `data:application/json;charset=utf-8,${encodeURIComponent(jsonContent)}`;
-			
+
 			if (navigator.share) {
 				try {
 					await navigator.share({
 						files: [new File([jsonContent], fileName, { type: 'application/json' })],
-						title: 'Exported Obsidian Web Clipper Settings',
-						text: 'Here are your exported settings for Obsidian Web Clipper.'
+						title: 'Exported Logseq Web Clipper Settings',
+						text: 'Here are your exported settings for Logseq Web Clipper.'
 					});
 				} catch (error) {
 					console.error('Error sharing:', error);

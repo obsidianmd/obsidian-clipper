@@ -4,20 +4,20 @@ import { loadSettings, generalSettings } from './utils/storage-utils';
 
 declare global {
 	interface Window {
-		obsidianHighlighterInitialized?: boolean;
+		logseqHighlighterInitialized?: boolean;
 	}
 }
 
 // Use a self-executing function to create a closure
 // This allows the script to be re-executed without redeclaring variables
-(function() {
+(function () {
 	// Check if the script has already been initialized
-	if (window.hasOwnProperty('obsidianHighlighterInitialized')) {
+	if (window.hasOwnProperty('logseqHighlighterInitialized')) {
 		return;  // Exit if already initialized
 	}
 
 	// Mark as initialized
-	window.obsidianHighlighterInitialized = true;
+	window.logseqHighlighterInitialized = true;
 
 	let isHighlighterMode = false;
 
@@ -39,11 +39,11 @@ declare global {
 		highlights: string[];
 	}
 
-	browser.runtime.onMessage.addListener(function(request: any, sender: browser.Runtime.MessageSender, sendResponse: (response?: any) => void) {
+	browser.runtime.onMessage.addListener(function (request: any, sender: browser.Runtime.MessageSender, sendResponse: (response?: any) => void) {
 		if (request.action === "getPageContent") {
 			let selectedHtml = '';
 			const selection = window.getSelection();
-			
+
 			if (selection && selection.rangeCount > 0) {
 				const range = selection.getRangeAt(0);
 				const clonedSelection = range.cloneContents();
@@ -60,7 +60,7 @@ declare global {
 			const parser = new DOMParser();
 			// Parse the document's HTML
 			const doc = parser.parseFromString(document.documentElement.outerHTML, 'text/html');
-			
+
 			// Remove all script and style elements
 			doc.querySelectorAll('script, style').forEach(el => el.remove());
 
@@ -72,7 +72,7 @@ declare global {
 				['src', 'href', 'srcset'].forEach(attr => {
 					const value = element.getAttribute(attr);
 					if (!value) return;
-					
+
 					if (attr === 'srcset') {
 						const newSrcset = value.split(',').map(src => {
 							const [url, size] = src.trim().split(' ');
@@ -150,7 +150,7 @@ declare global {
 			highlighter.toggleHighlighterMenu(request.isActive);
 			if (request.targetElementInfo) {
 				const { mediaType, srcUrl, pageUrl } = request.targetElementInfo;
-				
+
 				let elementToHighlight: Element | null = null;
 
 				// Function to compare URLs, handling both absolute and relative paths
@@ -212,7 +212,7 @@ declare global {
 	function extractContentBySelector(selector: string, attribute?: string, extractHtml: boolean = false): string | string[] {
 		try {
 			const elements = document.querySelectorAll(selector);
-			
+
 			if (elements.length > 1) {
 				return Array.from(elements).map(el => {
 					if (attribute) {
@@ -241,7 +241,7 @@ declare global {
 
 		schemaScripts.forEach(script => {
 			let jsonContent = script.textContent || '';
-			
+
 			try {
 				// Consolidated regex to clean up the JSON content
 				jsonContent = jsonContent
@@ -249,7 +249,7 @@ declare global {
 					.replace(/^\s*<!\[CDATA\[([\s\S]*?)\]\]>\s*$/, '$1') // Remove CDATA wrapper
 					.replace(/^\s*(\*\/|\/\*)\s*|\s*(\*\/|\/\*)\s*$/g, '') // Remove any remaining comment markers at start or end
 					.trim();
-					
+
 				const jsonData = JSON.parse(jsonContent);
 
 				// If this is a @graph structure, add each item individually
@@ -275,11 +275,11 @@ declare global {
 	async function initializeHighlighter() {
 		await loadSettings();
 		await highlighter.loadHighlights();
-		
+
 		if (generalSettings.alwaysShowHighlights) {
 			highlighter.applyHighlights();
 		}
-		
+
 		updateHasHighlights();
 	}
 

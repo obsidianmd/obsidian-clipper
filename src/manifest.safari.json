@@ -1,9 +1,8 @@
 {
 	"manifest_version": 3,
-	"name": "Obsidian Web Clipper",
-	"homepage_url": "https://obsidian.md/",
+	"name": "Logseq Web Clipper",
 	"version": "0.9.5",
-	"description": "Save content from the web to Obsidian, in a private and durable format you can always access offline.",
+	"description": "Save content from the web to Logseq, in a private and durable format you can access offline.",
 	"permissions": [
 		"activeTab",
 		"clipboardWrite",
@@ -32,9 +31,16 @@
 	},
 	"content_scripts": [
 		{
-			"matches": ["http://*/*", "https://*/*"],
-			"js": ["content.js"],
-			"css": ["highlighter.css"]
+			"matches": [
+				"http://*/*",
+				"https://*/*"
+			],
+			"js": [
+				"content.js"
+			],
+			"css": [
+				"highlighter.css"
+			]
 		}
 	],
 	"content_security_policy": {
@@ -50,7 +56,7 @@
 				"default": "Ctrl+Shift+O",
 				"mac": "Command+Shift+O"
 			},
-			"description": "Open Obsidian Clipper"
+			"description": "Open Logseq Clipper"
 		},
 		"quick_clip": {
 			"suggested_key": {

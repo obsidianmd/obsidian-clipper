@@ -20,13 +20,13 @@ import { ensureContentScriptLoaded } from '../utils/content-script-utils';
 import { isBlankPage, isValidUrl } from '../utils/active-tab-manager';
 import { memoizeWithExpiration } from '../utils/memoize';
 import { debounce } from '../utils/debounce';
+import { formatHighlightsToLogseq } from '../utils/formatHighlightsToLogseq';
 
 let loadedSettings: Settings;
 let currentTemplate: Template | null = null;
 let templates: Template[] = [];
 let currentVariables: { [key: string]: string } = {};
 let currentTabId: number | undefined;
-let lastSelectedVault: string | null = null;
 let isHighlighterMode = false;
 
 const isSidePanel = window.location.pathname.includes('side-panel.html');
@@ -38,7 +38,7 @@ const memoizedCompileTemplate = memoizeWithExpiration(
 	},
 	{
 		expirationMs: 50,
-		keyFn: (tabId: number, template: string, variables: { [key: string]: string }, currentUrl: string) => 
+		keyFn: (tabId: number, template: string, variables: { [key: string]: string }, currentUrl: string) =>
 			`${tabId}-${template}-${currentUrl}`
 	}
 );
@@ -57,8 +57,8 @@ const memoizedExtractPageContent = memoizeWithExpiration(
 		const tab = await browser.tabs.get(tabId);
 		return extractPageContent(tabId);
 	},
-	{ 
-		expirationMs: 50, 
+	{
+		expirationMs: 50,
 		keyFn: async (tabId: number) => {
 			const tab = await browser.tabs.get(tabId);
 			return `${tabId}-${tab.url}`;
@@ -72,21 +72,21 @@ let previousWidth = window.innerWidth;
 function setPopupDimensions() {
 	// Get the actual height of the popup after the browser has determined its maximum
 	const actualHeight = document.documentElement.offsetHeight;
-	
+
 	// Calculate the viewport height and width
 	const viewportHeight = window.innerHeight;
 	const viewportWidth = window.innerWidth;
-	
+
 	// Use the smaller of the two heights
 	const finalHeight = Math.min(actualHeight, viewportHeight);
-	
+
 	// Set the --popup-height CSS variable to the final height
 	document.documentElement.style.setProperty('--chromium-popup-height', `${finalHeight}px`);
 
 	// Check if the width has changed
 	if (viewportWidth !== previousWidth) {
 		previousWidth = viewportWidth;
-		
+
 		// Adjust the note name field height
 		const noteNameField = document.getElementById('note-name-field') as HTMLTextAreaElement;
 		if (noteNameField) {
@@ -101,11 +101,11 @@ async function initializeExtension(tabId: number) {
 	try {
 		// First, add the browser class to allow browser-specific styles to apply
 		await addBrowserClassToHtml();
-		
+
 		// Set an initial large height to allow the browser to determine the maximum height
 		// This is necessary for browsers that allow scaling the popup via page zoom
 		document.documentElement.style.setProperty('--chromium-popup-height', '2000px');
-		
+
 		// Use setTimeout to ensure the DOM has updated before we measure
 		setTimeout(() => {
 			setPopupDimensions();
@@ -127,15 +127,6 @@ async function initializeExtension(tabId: number) {
 
 		currentTemplate = templates[0];
 		debugLog('Templates', 'Current template set to:', currentTemplate);
-
-		// Load last selected vault
-		lastSelectedVault = await getLocalStorage('lastSelectedVault');
-		if (!lastSelectedVault && loadedSettings.vaults.length > 0) {
-			lastSelectedVault = loadedSettings.vaults[0];
-		}
-		debugLog('Vaults', 'Last selected vault:', lastSelectedVault);
-
-		updateVaultDropdown(loadedSettings.vaults);
 
 		const tab = await browser.tabs.get(tabId);
 		if (!tab.url || isBlankPage(tab.url)) {
@@ -195,10 +186,10 @@ function setupMessageListeners() {
 	browser.runtime.onMessage.addListener((request: any, sender: browser.Runtime.MessageSender, sendResponse: (response?: any) => void) => {
 		if (request.action === "triggerQuickClip") {
 			handleClip().then(() => {
-				sendResponse({success: true});
+				sendResponse({ success: true });
 			}).catch((error) => {
 				console.error('Error in handleClip:', error);
-				sendResponse({success: false, error: error.message});
+				sendResponse({ success: false, error: error.message });
 			});
 			return true;
 		} else if (request.action === "tabUrlChanged") {
@@ -233,7 +224,7 @@ function setupMessageListeners() {
 	});
 }
 
-document.addEventListener('DOMContentLoaded', async function() {
+document.addEventListener('DOMContentLoaded', async function () {
 	browser.runtime.connect({ name: 'popup' });
 
 	const refreshButton = document.getElementById('refresh-pane');
@@ -246,19 +237,19 @@ document.addEventListener('DOMContentLoaded', async function() {
 	}
 	const settingsButton = document.getElementById('open-settings');
 	if (settingsButton) {
-		settingsButton.addEventListener('click', async function() {
+		settingsButton.addEventListener('click', async function () {
 			browser.runtime.openOptionsPage();
 			setTimeout(() => window.close(), 50);
 		});
 		initializeIcons(settingsButton);
 	}
 
-	const tabs = await browser.tabs.query({active: true, currentWindow: true});
+	const tabs = await browser.tabs.query({ active: true, currentWindow: true });
 	const currentTab = tabs[0];
 	currentTabId = currentTab?.id;
 
 	if (currentTabId) {
-		try {		
+		try {
 			const initialized = await initializeExtension(currentTabId);
 			if (!initialized) {
 				showError('This page cannot be clipped.');
@@ -266,7 +257,6 @@ document.addEventListener('DOMContentLoaded', async function() {
 			}
 
 			// DOM-dependent initializations
-			updateVaultDropdown(loadedSettings.vaults);
 			populateTemplateDropdown();
 			setupEventListeners(currentTabId);
 			await initializeUI();
@@ -277,10 +267,10 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 			const showMoreActionsButton = document.getElementById('show-variables');
 			if (showMoreActionsButton) {
-					showMoreActionsButton.addEventListener('click', (e) => {
-						e.preventDefault();
-						showVariables();
-					});
+				showMoreActionsButton.addEventListener('click', (e) => {
+					e.preventDefault();
+					showVariables();
+				});
 			}
 
 		} catch (error) {
@@ -295,7 +285,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 function setupEventListeners(tabId: number) {
 	const templateDropdown = document.getElementById('template-select') as HTMLSelectElement;
 	if (templateDropdown) {
-		templateDropdown.addEventListener('change', function(this: HTMLSelectElement) {
+		templateDropdown.addEventListener('change', function (this: HTMLSelectElement) {
 			handleTemplateChange(this.value);
 		});
 	}
@@ -303,7 +293,7 @@ function setupEventListeners(tabId: number) {
 	const noteNameField = document.getElementById('note-name-field') as HTMLTextAreaElement;
 	if (noteNameField) {
 		noteNameField.addEventListener('input', () => adjustNoteNameHeight(noteNameField));
-		noteNameField.addEventListener('keydown', function(e) {
+		noteNameField.addEventListener('keydown', function (e) {
 			if (e.key === 'Enter' && !e.shiftKey) {
 				e.preventDefault();
 			}
@@ -341,7 +331,7 @@ async function initializeUI() {
 
 	if (isSidePanel) {
 		browser.runtime.sendMessage({ action: "sidePanelOpened" });
-		
+
 		window.addEventListener('unload', () => {
 			browser.runtime.sendMessage({ action: "sidePanelClosed" });
 		});
@@ -360,17 +350,6 @@ function showError(message: string): void {
 		document.body.classList.add('has-error');
 	}
 }
-function clearError(): void {
-	const errorMessage = document.querySelector('.error-message') as HTMLElement;
-	const clipper = document.querySelector('.clipper') as HTMLElement;
-
-	if (errorMessage && clipper) {
-		errorMessage.style.display = 'none';
-		clipper.style.display = 'block';
-
-		document.body.classList.remove('has-error');
-	}
-}
 
 function logError(message: string, error?: any): void {
 	console.error(message, error);
@@ -380,31 +359,26 @@ function logError(message: string, error?: any): void {
 async function handleClip() {
 	if (!currentTemplate) return;
 
-	const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement;
 	const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
 	const noteNameField = document.getElementById('note-name-field') as HTMLInputElement;
-	const pathField = document.getElementById('path-name-field') as HTMLInputElement;
 	const interpretBtn = document.getElementById('interpret-btn') as HTMLButtonElement;
 
-	if (!vaultDropdown || !noteContentField) {
+	if (!noteContentField) {
 		showError('Some required fields are missing. Please try reloading the extension.');
 		return;
 	}
 
-	const selectedVault = currentTemplate.vault || vaultDropdown.value;
 	const noteContent = noteContentField.value;
-	const isDailyNote = currentTemplate.behavior === 'append-daily' || currentTemplate.behavior === 'prepend-daily';
+	const isDailyNote = currentTemplate.behavior === 'append-daily'
 
 	let noteName = '';
-	let path = '';
 
 	if (!isDailyNote) {
-		if (!noteNameField || !pathField) {
+		if (!noteNameField) {
 			showError('Note name or path field is missing. Please try reloading the extension.');
 			return;
 		}
 		noteName = noteNameField.value;
-		path = pathField.value;
 	}
 
 	// Check if interpreter is enabled, the button exists, and there are prompt variables
@@ -441,7 +415,7 @@ async function handleClip() {
 
 	let fileContent: string;
 	const frontmatter = await generateFrontmatter(properties as Property[]);
-	fileContent = frontmatter + noteContent;
+	fileContent = frontmatter + formatHighlightsToLogseq(noteContent);
 
 	try {
 		if (currentTemplate.behavior === 'create') {
@@ -454,18 +428,10 @@ async function handleClip() {
 				};
 			}) as Property[];
 			const frontmatter = await memoizedGenerateFrontmatter(updatedProperties as Property[]);
-			fileContent = frontmatter + noteContentField.value;
-		} else {
-			fileContent = noteContentField.value;
+			fileContent = frontmatter + formatHighlightsToLogseq(noteContentField.value)
 		}
 
-		await saveToObsidian(fileContent, noteName, path, selectedVault, currentTemplate.behavior);
-
-		// Only update lastSelectedVault if the user explicitly chose a vault
-		if (!currentTemplate.vault) {
-			lastSelectedVault = selectedVault;
-			await setLocalStorage('lastSelectedVault', lastSelectedVault);
-		}
+		await saveToObsidian(fileContent, noteName, currentTemplate.behavior);
 
 		// Only close the window if it's not running in side panel mode
 		if (!isSidePanel) {
@@ -473,7 +439,7 @@ async function handleClip() {
 		}
 	} catch (error) {
 		console.error('Error in handleClip:', error);
-		showError('Failed to save to Obsidian. Please try again.');
+		showError('Failed to save to Logseq. Please try again.');
 		throw error;
 	}
 }
@@ -596,16 +562,6 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 		return;
 	}
 
-	// Handle vault selection
-	const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement;
-	if (vaultDropdown) {
-		if (template.vault) {
-			vaultDropdown.value = template.vault;
-		} else if (lastSelectedVault) {
-			vaultDropdown.value = lastSelectedVault;
-		}
-	}
-
 	currentVariables = variables;
 	const existingTemplateProperties = document.querySelector('.metadata-properties') as HTMLElement;
 
@@ -655,10 +611,10 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 				<label for="${property.name}">${property.name}</label>
 			</div>
 			<div class="metadata-property-value">
-				${propertyType === 'checkbox' 
-					? `<input id="${property.name}" type="checkbox" ${value === 'true' ? 'checked' : ''} data-type="${propertyType}" data-template-value="${escapeHtml(property.value)}" />`
-					: `<input id="${property.name}" type="text" value="${escapeHtml(value)}" data-type="${propertyType}" data-template-value="${escapeHtml(property.value)}" />`
-				}
+				${propertyType === 'checkbox'
+				? `<input id="${property.name}" type="checkbox" ${value === 'true' ? 'checked' : ''} data-type="${propertyType}" data-template-value="${escapeHtml(property.value)}" />`
+				: `<input id="${property.name}" type="text" value="${escapeHtml(value)}" data-type="${propertyType}" data-template-value="${escapeHtml(property.value)}" />`
+			}
 			</div>
 		`;
 		newTemplateProperties.appendChild(propertyDiv);
@@ -683,22 +639,6 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 		noteNameField.setAttribute('data-template-value', template.noteNameFormat);
 		noteNameField.value = formattedNoteName.trim();
 		adjustNoteNameHeight(noteNameField);
-	}
-
-	const pathField = document.getElementById('path-name-field') as HTMLInputElement;
-	const pathContainer = document.querySelector('.vault-path-container') as HTMLElement;
-	
-	if (pathField && pathContainer) {
-		const isDailyNote = template.behavior === 'append-daily' || template.behavior === 'prepend-daily';
-		
-		if (isDailyNote) {
-			pathField.style.display = 'none';
-		} else {
-			pathContainer.style.display = 'flex';
-			let formattedPath = await memoizedCompileTemplate(currentTabId!, template.path, variables, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
-			pathField.value = formattedPath;
-			pathField.setAttribute('data-template-value', template.path);
-		}
 	}
 
 	const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
@@ -744,7 +684,7 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 function setupMetadataToggle() {
 	const metadataHeader = document.querySelector('.metadata-properties-header') as HTMLElement;
 	const metadataProperties = document.querySelector('.metadata-properties') as HTMLElement;
-	
+
 	if (metadataHeader && metadataProperties) {
 		metadataHeader.removeEventListener('click', toggleMetadataProperties);
 		metadataHeader.addEventListener('click', toggleMetadataProperties);
@@ -759,7 +699,7 @@ function setupMetadataToggle() {
 function toggleMetadataProperties() {
 	const metadataProperties = document.querySelector('.metadata-properties') as HTMLElement;
 	const metadataHeader = document.querySelector('.metadata-properties-header') as HTMLElement;
-	
+
 	if (metadataProperties && metadataHeader) {
 		const isCollapsed = metadataProperties.classList.toggle('collapsed');
 		metadataHeader.classList.toggle('collapsed');
@@ -770,7 +710,7 @@ function toggleMetadataProperties() {
 function updateMetadataToggleState(isCollapsed: boolean) {
 	const metadataProperties = document.querySelector('.metadata-properties') as HTMLElement;
 	const metadataHeader = document.querySelector('.metadata-properties-header') as HTMLElement;
-	
+
 	if (metadataProperties && metadataHeader) {
 		if (isCollapsed) {
 			metadataProperties.classList.add('collapsed');
@@ -810,40 +750,6 @@ async function getReplacedTemplate(template: Template, variables: { [key: string
 	return replacedTemplate;
 }
 
-function updateVaultDropdown(vaults: string[]) {
-	const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement | null;
-	const vaultContainer = document.getElementById('vault-container');
-
-	if (!vaultDropdown || !vaultContainer) return;
-
-	vaultDropdown.innerHTML = '';
-	
-	vaults.forEach(vault => {
-		const option = document.createElement('option');
-		option.value = vault;
-		option.textContent = vault;
-		vaultDropdown.appendChild(option);
-	});
-
-	// Only show vault selector if vaults are defined
-	if (vaults.length > 0) {
-		vaultContainer.style.display = 'block';
-		if (lastSelectedVault && vaults.includes(lastSelectedVault)) {
-			vaultDropdown.value = lastSelectedVault;
-		} else {
-			vaultDropdown.value = vaults[0];
-		}
-	} else {
-		vaultContainer.style.display = 'none';
-	}
-
-	// Add event listener to update lastSelectedVault when changed
-	vaultDropdown.addEventListener('change', () => {
-		lastSelectedVault = vaultDropdown.value;
-		setLocalStorage('lastSelectedVault', lastSelectedVault);
-	});
-}
-
 function refreshPopup() {
 	window.location.reload();
 }
@@ -857,9 +763,9 @@ async function checkHighlighterModeState(tabId: number) {
 	try {
 		const result = await browser.storage.local.get('isHighlighterMode');
 		isHighlighterMode = result.isHighlighterMode as boolean;
-		
+
 		loadedSettings = await loadSettings();
-		
+
 		updateHighlighterModeUI(isHighlighterMode);
 	} catch (error) {
 		console.error('Error checking highlighter mode state:', error);
@@ -876,15 +782,15 @@ async function toggleHighlighterMode(tabId: number) {
 	await setLocalStorage('isHighlighterMode', isHighlighterMode);
 
 	// Send a message to the content script to toggle the highlighter mode
-	await browser.tabs.sendMessage(tabId, { 
-		action: "setHighlighterMode", 
-		isActive: isHighlighterMode 
+	await browser.tabs.sendMessage(tabId, {
+		action: "setHighlighterMode",
+		isActive: isHighlighterMode
 	});
 
 	// Notify the background script about the change
-	browser.runtime.sendMessage({ 
-		action: "highlighterModeChanged", 
-		isActive: isHighlighterMode 
+	browser.runtime.sendMessage({
+		action: "highlighterModeChanged",
+		isActive: isHighlighterMode
 	});
 
 	// Close the popup if highlighter mode is turned on and not in side panel

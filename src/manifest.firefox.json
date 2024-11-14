@@ -1,9 +1,8 @@
 {
 	"manifest_version": 3,
-	"name": "Obsidian Web Clipper",
-	"homepage_url": "https://obsidian.md/",
+	"name": "Logseq Web Clipper",
 	"version": "0.9.5",
-	"description": "Save content from the web in a private and durable format that you can access offline. The official browser extension for Obsidian.",
+	"description": "Save content from the web to Logseq, in a private and durable format you can access offline.",
 	"permissions": [
 		"activeTab",
 		"clipboardWrite",
@@ -29,14 +28,23 @@
 		"128": "icons/icon128.png"
 	},
 	"background": {
-		"scripts": ["background.js"],
+		"scripts": [
+			"background.js"
+		],
 		"type": "module"
 	},
 	"content_scripts": [
 		{
-			"matches": ["http://*/*", "https://*/*"],
-			"js": ["content.js"],
-			"css": ["highlighter.css"]
+			"matches": [
+				"http://*/*",
+				"https://*/*"
+			],
+			"js": [
+				"content.js"
+			],
+			"css": [
+				"highlighter.css"
+			]
 		}
 	],
 	"content_security_policy": {
@@ -48,7 +56,7 @@
 				"default": "Alt+Shift+O",
 				"mac": "Alt+Shift+O"
 			},
-			"description": "Open Obsidian Clipper"
+			"description": "Open Logseq Clipper"
 		},
 		"toggle_highlighter": {
 			"suggested_key": {
@@ -64,7 +72,7 @@
 	],
 	"browser_specific_settings": {
 		"gecko": {
-			"id": "clipper@obsidian.md",
+			"id": "clipper@logseq.md",
 			"strict_min_version": "113.0"
 		},
 		"gecko_android": {

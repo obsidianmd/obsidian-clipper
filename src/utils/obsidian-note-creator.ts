@@ -4,32 +4,18 @@ import { Template, Property } from '../types/types';
 import { generalSettings } from './storage-utils';
 
 export async function generateFrontmatter(properties: Property[]): Promise<string> {
-	let frontmatter = '---\n';
+	let frontmatter = '\u200B\n';
 	for (const property of properties) {
-		frontmatter += `${property.name}:`;
+		frontmatter += `${property.name}::`; // Use double colons
 
 		const propertyType = generalSettings.propertyTypes.find(p => p.name === property.name)?.type || 'text';
 
 		switch (propertyType) {
 			case 'multitext':
-				let items: string[];
-				if (property.value.trim().startsWith('["') && property.value.trim().endsWith('"]')) {
-					try {
-						items = JSON.parse(property.value);
-					} catch (e) {
-						// If parsing fails, fall back to splitting by comma
-						items = property.value.split(',').map(item => item.trim());
-					}
-				} else {
-					// Split by comma, but keep wikilinks intact
-					items = property.value.split(/,(?![^\[]*\]\])/).map(item => item.trim());
-				}
-				items = items.filter(item => item !== '');
-				if (items.length > 0) {
-					frontmatter += '\n';
-					items.forEach(item => {
-						frontmatter += `  - "${escapeDoubleQuotes(item)}"\n`;
-					});
+				const tags = property.value.split(' ').map(tag => tag.trim()).filter(tag => tag !== '');
+				if (tags.length > 0) {
+					const formattedTags = tags.map(tag => `#${tag}`).join(' ');
+					frontmatter += ` ${formattedTags}\n`;
 				} else {
 					frontmatter += '\n';
 				}
@@ -54,7 +40,7 @@ export async function generateFrontmatter(properties: Property[]): Promise<strin
 				frontmatter += property.value.trim() !== '' ? ` "${escapeDoubleQuotes(property.value)}"\n` : '\n';
 		}
 	}
-	frontmatter += '---\n';
+	frontmatter += 'Highlights:\n';
 
 	// Check if the frontmatter is empty
 	if (frontmatter.trim() === '---\n---') {
@@ -67,62 +53,29 @@ export async function generateFrontmatter(properties: Property[]): Promise<strin
 export async function saveToObsidian(
 	fileContent: string,
 	noteName: string,
-	path: string,
-	vault: string,
 	behavior: Template['behavior'],
 ): Promise<void> {
 	let obsidianUrl: string;
 
-	const isDailyNote = behavior === 'append-daily' || behavior === 'prepend-daily';
+	const isDailyNote = behavior === 'append-daily'
 
 	if (isDailyNote) {
-		obsidianUrl = `obsidian://daily?`;
+		obsidianUrl = `logseq://x-callback-url/quickCapture?page=TODAY&append=true`;
 	} else {
-		// Ensure path ends with a slash
-		if (path && !path.endsWith('/')) {
-			path += '/';
-		}
-
 		const formattedNoteName = sanitizeFileName(noteName);
-		obsidianUrl = `obsidian://new?file=${encodeURIComponent(path + formattedNoteName)}`;
+		obsidianUrl = `logseq://x-callback-url/quickCapture?page=${formattedNoteName}`;
 	}
-
-	if (behavior.startsWith('append')) {
-		obsidianUrl += '&append=true';
-	} else if (behavior.startsWith('prepend')) {
-		obsidianUrl += '&prepend=true';
-	}
-
-	const vaultParam = vault ? `&vault=${encodeURIComponent(vault)}` : '';
-	obsidianUrl += vaultParam;
 
 	// Add silent parameter if silentOpen is enabled
 	if (generalSettings.silentOpen) {
 		obsidianUrl += '&silent=true';
 	}
 
-	if (generalSettings.legacyMode) {
-		// Use the URI method
-		obsidianUrl += `&content=${encodeURIComponent(fileContent)}`;
-		console.log('Obsidian URL:', obsidianUrl);
-		openObsidianUrl(obsidianUrl);
-	} else {
-		// Use clipboard
-		navigator.clipboard.writeText(fileContent).then(() => {
-			obsidianUrl += `&clipboard`;
-			openObsidianUrl(obsidianUrl);
-			console.log('Obsidian URL:', obsidianUrl);
-		}).catch(err => {
-			console.log('Obsidian URL:', obsidianUrl);
-			console.error('Failed to copy content to clipboard:', err);
-			obsidianUrl += `&clipboard`;
-			obsidianUrl += `&content=${encodeURIComponent("There was an error creating the content. Make sure you are using Obsidian 1.7.2 or above.")}`;
-			openObsidianUrl(obsidianUrl);
-		});
-	}
+	obsidianUrl += `&content=${encodeURIComponent(fileContent)}`;
+	openObsidianUrl(obsidianUrl);
 
 	function openObsidianUrl(url: string): void {
-		browser.tabs.query({active: true, currentWindow: true}).then((tabs) => {
+		browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
 			const currentTab = tabs[0];
 			if (currentTab && currentTab.id) {
 				browser.tabs.update(currentTab.id, { url: url });

@@ -21,18 +21,18 @@ export function updateTemplateList(loadedTemplates?: Template[]): void {
 		console.error('Template list element not found');
 		return;
 	}
-	
+
 	const templatesToUse = loadedTemplates || templates;
-	
+
 	// Filter out null or undefined templates
-	const validTemplates = templatesToUse.filter((template): template is Template => 
+	const validTemplates = templatesToUse.filter((template): template is Template =>
 		template != null && typeof template === 'object' && 'id' in template && 'name' in template
 	);
 
 	templateList.innerHTML = '';
 	validTemplates.forEach((template, index) => {
 		const li = document.createElement('li');
-		
+
 		const dragHandle = createElementWithClass('div', 'drag-handle');
 		dragHandle.appendChild(createElementWithHTML('i', '', { 'data-lucide': 'grip-vertical' }));
 		li.appendChild(dragHandle);
@@ -94,7 +94,7 @@ export function updateTemplateList(loadedTemplates?: Template[]): void {
 			e.stopPropagation();
 			deleteTemplateFromList(template.id);
 		});
-		
+
 		if (index === editingTemplateIndex) {
 			li.classList.add('active');
 		}
@@ -135,7 +135,7 @@ export function showTemplateEditor(template: Template | null): void {
 		editingTemplate = {
 			id: Date.now().toString() + Math.random().toString(36).slice(2, 11),
 			name: newTemplateName,
-			behavior: 'create',
+			behavior: 'append-daily',
 			noteNameFormat: '{{title}}',
 			path: 'Clippings',
 			noteContentFormat: '{{content}}',
@@ -173,7 +173,7 @@ export function showTemplateEditor(template: Template | null): void {
 
 	const behaviorSelect = document.getElementById('template-behavior') as HTMLSelectElement;
 	if (behaviorSelect) behaviorSelect.value = editingTemplate.behavior || 'create';
-	
+
 	const noteNameFormat = document.getElementById('note-name-format') as HTMLInputElement;
 	if (noteNameFormat) {
 		noteNameFormat.value = editingTemplate.noteNameFormat || '{{title}}';
@@ -250,7 +250,7 @@ function updateBehaviorFields(): void {
 
 	if (behaviorSelect) {
 		const selectedBehavior = behaviorSelect.value;
-		const isDailyNote = selectedBehavior === 'append-daily' || selectedBehavior === 'prepend-daily';
+		const isDailyNote = selectedBehavior === 'append-daily'
 
 		if (selectedBehavior !== 'create') {
 			if (behaviorWarningContainer) behaviorWarningContainer.style.display = 'flex';
@@ -264,12 +264,7 @@ function updateBehaviorFields(): void {
 		if (noteNameFormat) {
 			noteNameFormat.required = !isDailyNote;
 			switch (selectedBehavior) {
-				case 'append-specific':
-				case 'prepend-specific':
-					noteNameFormat.placeholder = 'Specific note name';
-					break;
 				case 'append-daily':
-				case 'prepend-daily':
 					noteNameFormat.placeholder = 'Daily note format (e.g., YYYY-MM-DD)';
 					break;
 				default:
@@ -378,9 +373,9 @@ export function addPropertyToEditor(name: string = '', value: string = '', id: s
 	propertyDiv.addEventListener('mouseup', resetDraggable);
 
 	if (select) {
-		select.addEventListener('change', function() {
+		select.addEventListener('change', function () {
 			if (propertySelectedDiv) updateSelectedOption(this.value, propertySelectedDiv);
-			
+
 			// Get the current name of the property
 			const nameInput = propertyDiv.querySelector('.property-name') as HTMLInputElement;
 			const currentName = nameInput.value;
@@ -411,12 +406,12 @@ export function addPropertyToEditor(name: string = '', value: string = '', id: s
 
 	initializeIcons(propertyDiv);
 
-	nameInput.addEventListener('input', function(this: HTMLInputElement) {
+	nameInput.addEventListener('input', function (this: HTMLInputElement) {
 		const selectedType = generalSettings.propertyTypes.find(pt => pt.name === this.value);
 		if (selectedType) {
 			select.value = selectedType.type;
 			updateSelectedOption(selectedType.type, propertySelectedDiv);
-			
+
 			// Only update the property type if the name is not empty
 			if (this.value.trim() !== '') {
 				updatePropertyType(this.value, selectedType.type).then(() => {
@@ -425,7 +420,7 @@ export function addPropertyToEditor(name: string = '', value: string = '', id: s
 					console.error(`Failed to update property type for ${this.value}:`, error);
 				});
 			}
-			
+
 			// Fill in the default value if it exists and the value input is empty
 			if (selectedType.defaultValue && !valueInput.value) {
 				valueInput.value = selectedType.defaultValue;
@@ -437,7 +432,7 @@ export function addPropertyToEditor(name: string = '', value: string = '', id: s
 	});
 
 	// Add a change event listener to handle selection from autocomplete
-	nameInput.addEventListener('change', function(this: HTMLInputElement) {
+	nameInput.addEventListener('change', function (this: HTMLInputElement) {
 		const selectedType = generalSettings.propertyTypes.find(pt => pt.name === this.value);
 		if (selectedType) {
 			// Fill in the default value if it exists, regardless of current value
@@ -452,14 +447,14 @@ export function addPropertyToEditor(name: string = '', value: string = '', id: s
 
 function updateSelectedOption(value: string, propertySelected: HTMLElement): void {
 	const iconName = getPropertyTypeIcon(value);
-	
+
 	// Clear existing content
 	propertySelected.innerHTML = '';
-	
+
 	// Create and append the new icon element
 	const iconElement = createElementWithHTML('i', '', { 'data-lucide': iconName });
 	propertySelected.appendChild(iconElement);
-	
+
 	propertySelected.setAttribute('data-value', value);
 	initializeIcons(propertySelected);
 }
@@ -476,7 +471,7 @@ export function updateTemplateFromForm(): void {
 	const behaviorSelect = document.getElementById('template-behavior') as HTMLSelectElement;
 	if (behaviorSelect) template.behavior = behaviorSelect.value as Template['behavior'];
 
-	const isDailyNote = template.behavior === 'append-daily' || template.behavior === 'prepend-daily';
+	const isDailyNote = template.behavior === 'append-daily'
 
 	const pathInput = document.getElementById('template-path-name') as HTMLInputElement;
 	if (pathInput) template.path = pathInput.value;

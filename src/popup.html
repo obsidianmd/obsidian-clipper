@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html id="popup">
 	<head>
-		<title>Obsidian Web Clipper</title>
+		<title>Logseq Web Clipper</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 		<link rel="stylesheet" href="style.css">
 		<script src="browser-polyfill.min.js"></script>
@@ -38,12 +38,6 @@
 				<textarea id="note-content-field" rows="4" placeholder="Notes about this page..."></textarea>
 			</div>
 			<div class="clipper-footer">
-				<div class="vault-path-container">
-					<div id="vault-container" style="display: none;">
-						<select id="vault-select"></select>
-					</div>
-					<input id="path-name-field" type="text" placeholder="Folder"/>
-				</div>
 				<div id="interpreter" style="display: none;">
 					<textarea id="prompt-context" rows="3"></textarea>
 					<div class="interpreter-controls">
@@ -53,7 +47,7 @@
 					</div>
 					<div id="interpreter-error" style="display: none;"></div>
 				</div>
-				<button id="clip-btn" class="mod-cta">Add to Obsidian</button>
+				<button id="clip-btn" class="mod-cta">Add to Logseq</button>
 			</div>
 		</div>
 		<script type="module" src="popup.js"></script>
