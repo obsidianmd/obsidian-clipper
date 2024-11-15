@@ -1,4 +1,8 @@
-Obsidian Web Clipper is a browser extension that helps you highlight and save web pages. Visit the [Obsidian Help site](https://help.obsidian.md/web-clipper) for documentation and [troubleshooting](https://help.obsidian.md/web-clipper/troubleshoot).
+Obsidian Web Clipper helps you highlight and capture the web in your favorite browser. Anything you save is stored as durable Markdown files that you can read offline, and preserve for the long term.
+
+- **[Download Web Clipper](https://obsidian.md/clipper)**
+- **[Documentation](https://help.obsidian.md/web-clipper)**
+- **[Troubleshooting](https://help.obsidian.md/web-clipper/troubleshoot)**
 
 ## Get started
 
@@ -20,13 +24,13 @@ You can help translate Web Clipper into your language. Submit your translation v
 
 In no particular order:
 
-- [ ] A different icon for Web Clipper #135
-- [ ] Add to Microsoft Edge directory (awaiting approval)
-- [ ] Translate UI into more languages
+- [ ] A separate icon for Web Clipper
+- [ ] Add to Microsoft Edge directory, awaiting approval
+- [ ] Translate UI into more languages — help is welcomed
 - [ ] RTL support
 - [ ] Annotate highlights
 - [ ] Save Markdown with inline highlights
-- [ ] Save images locally (requires changes to Obsidian app)
+- [ ] Save images locally — requires changes to Obsidian app
 - [ ] Template directory
 - [ ] Template validation
 - [ ] Template logic (if/for)
