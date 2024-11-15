@@ -63,8 +63,8 @@
 		},
 		"toggle_highlighter": {
 			"suggested_key": {
-				"default": "Alt+H",
-				"mac": "Alt+H"
+				"default": "Alt+Shift+H",
+				"mac": "Alt+Shift+H"
 			},
 			"description": "Toggle highlighter mode"
 		}
