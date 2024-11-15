@@ -1,4 +1,5 @@
-Obsidian Web Clipper is a browser extension that helps you highlight and save web pages. Visit the [Obsidian Help site](https://help.obsidian.md/web-clipper) for documentation and troubleshooting.
+A fork of the official [Obsidian Web Clipper](https://github.com/obsidianmd/obsidian-clipper), adapted for Logseq. Logseq Web Clipper is a browser extension that helps you highlight and save web pages. 
+
 
 ## Get started
 
