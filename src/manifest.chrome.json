@@ -5,7 +5,6 @@
 	"description": "Save content from the web to Logseq, in a private and durable format you can access offline.",
 	"permissions": [
 		"activeTab",
-		"clipboardWrite",
 		"commands",
 		"contextMenus",
 		"sidePanel",
