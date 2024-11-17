@@ -2,7 +2,7 @@
 name: Bug report
 about: Create a report to help us improve. Please review Troubleshooting steps before you submit a bug.
 title: 'BUG: '
-labels: ''
+labels: 'bug'
 assignees: ''
 ---
 
