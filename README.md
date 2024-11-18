@@ -32,7 +32,6 @@ See the [help wanted](https://github.com/obsidianmd/obsidian-clipper/issues?q=is
 In no particular order:
 
 - [ ] A separate icon for Web Clipper
-- [ ] Add to Microsoft Edge directory, awaiting approval
 - [ ] Translate UI into more languages — help is welcomed
 - [ ] RTL support
 - [ ] Annotate highlights
