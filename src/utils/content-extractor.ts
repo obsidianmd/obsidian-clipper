@@ -174,6 +174,12 @@ export async function initializePageContent(content: string, selectedHtml: strin
 			|| getMetaContent(doc, "name", "application-name")
 			|| '';
 
+		const favicon = 
+			getMetaContent(doc, "property", "og:image:favicon")
+			|| doc.querySelector("link[rel='icon']")?.getAttribute("href")
+			|| doc.querySelector("link[rel='shortcut icon']")?.getAttribute("href")
+			|| new URL("/favicon.ico", currentUrl).href;
+
 		const readabilityArticle = extractReadabilityContent(doc);
 		if (!readabilityArticle) {
 			console.warn('Failed to parse content with Readability, falling back to full content');
@@ -220,6 +226,7 @@ export async function initializePageContent(content: string, selectedHtml: strin
 			'{{time}}': dayjs().format('YYYY-MM-DDTHH:mm:ssZ').trim(),
 			'{{description}}': description.trim(),
 			'{{domain}}': domain.trim(),
+			'{{favicon}}': favicon.trim(),
 			'{{fullHtml}}': fullHtml.trim(),
 			'{{image}}': image.trim(),
 			'{{noteName}}': noteName.trim(),
