@@ -33,13 +33,13 @@ In no particular order:
 
 - [ ] A separate icon for Web Clipper
 - [ ] Translate UI into more languages — help is welcomed
-- [ ] RTL support
 - [ ] Annotate highlights
-- [ ] Save Markdown with inline highlights
 - [ ] Save images locally — requires changes to Obsidian app
 - [ ] Template directory
 - [ ] Template validation
 - [ ] Template logic (if/for)
+- [x] Save Markdown with inline highlights
+- [x] RTL support
 
 ## Developers
 
