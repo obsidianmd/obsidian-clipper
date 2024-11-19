@@ -329,10 +329,6 @@ function getSchemaProperty(schemaOrgData: any, property: string, defaultValue: s
 		if (!data || typeof data !== 'object') return '';
 
 		if (Array.isArray(data)) {
-			// If the full path is 'author.name', concatenate the names
-			if (fullPath === 'author.name') {
-				return data.map((item: any) => searchSchema(item, ['name'], 'name')).filter(Boolean).join(', ');
-			}
 			return data.map((item: any) => searchSchema(item, props, fullPath)).filter(Boolean).join(', ');
 		}
 
