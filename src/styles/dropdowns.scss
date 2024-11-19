@@ -42,6 +42,28 @@ select {
 	}
 }
 
+#settings {
+	select {
+		border: none;
+		&:not(.clickable-icon) {
+			background-color: var(--interactive-normal);
+			box-shadow: var(--input-shadow);
+		}
+		@media (hover: hover) {
+			&:hover {
+				background-color: var(--interactive-hover);
+				box-shadow: var(--input-shadow-hover);
+			}
+		}
+		&:active,
+		&:focus {
+			box-shadow: 0 0 0 2px var(--background-modifier-border-focus);
+			transition:
+				box-shadow .15s ease-in-out;
+		}
+	}
+}
+
 @media (prefers-color-scheme: dark) {
 	select {
 		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23FFF' opacity='0.7' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' %3E%3Cpath d='m7 15 5 5 5-5'/%3E%3Cpath d='m7 9 5-5 5 5'/%3E%3C/svg%3E");
