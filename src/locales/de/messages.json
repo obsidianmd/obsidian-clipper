@@ -1,0 +1,486 @@
+{
+	"addProperty": {
+		"message": "+ Eigenschaft hinzufügen"
+	},
+	"addToObsidian": {
+		"message": "Zu Obsidian hinzufügen"
+	},
+	"addVaultPlaceholder": {
+		"message": "Drücken Sie Enter, um einen Tresor hinzuzufügen"
+	},
+	"advanced": {
+		"message": "Erweitert"
+	},
+	"allProperties": {
+		"message": "Alle Eigenschaften"
+	},
+	"alwaysShowHighlights": {
+		"message": "Hervorhebungen immer anzeigen"
+	},
+	"alwaysShowHighlightsDescription": {
+		"message": "Zeigt Ihre gespeicherten Hervorhebungen beim Laden einer Seite an. Deaktivieren Sie dies, um Hervorhebungen nur anzuzeigen, wenn der Hervorhebungsmodus aktiviert ist."
+	},
+	"appendToDaily": {
+		"message": "Zur Tagesnotiz am Ende hinzufügen"
+	},
+	"appendToExisting": {
+		"message": "Zu bestehender Notiz am Ende hinzufügen"
+	},
+	"behavior": {
+		"message": "Verhalten"
+	},
+	"behaviorWarning": {
+		"message": "Das Hinzufügen zu einer bestehenden Notiz oder Tagesnotiz erfordert Obsidian 1.7.2 oder höher."
+	},
+	"clipBehavior": {
+		"message": "Ausschneideverhalten"
+	},
+	"clipBehaviorDescription": {
+		"message": "Wählen Sie, wie hervorgehobener Inhalt in Obsidian gespeichert wird. Definiert die $strong_start${{content}}$strong_end$ Variable.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"close": {
+		"message": "Schließen"
+	},
+	"commandOpenClipper": {
+		"message": "Obsidian Web Clipper öffnen"
+	},
+	"commandQuickClip": {
+		"message": "Schnelles Ausschneiden"
+	},
+	"commandToggleHighlighter": {
+		"message": "Hervorhebungsmodus umschalten"
+	},
+	"confirmDeleteTemplate": {
+		"message": "Sind Sie sicher, dass Sie die Vorlage \"$1\" löschen möchten?"
+	},
+	"copied": {
+		"message": "Kopiert!"
+	},
+	"copyAsJson": {
+		"message": "Als JSON kopieren"
+	},
+	"copyToClipboard": {
+		"message": "In die Zwischenablage kopieren"
+	},
+	"createNewNote": {
+		"message": "Neue Notiz erstellen"
+	},
+	"dailyNoteFormat": {
+		"message": "Tagesnotiz-Format (z.B. YYYY-MM-DD)"
+	},
+	"defaultTemplateName": {
+		"message": "Standard"
+	},
+	"delete": {
+		"message": "Löschen"
+	},
+	"disableHighlighter": {
+		"message": "Hervorheber deaktivieren"
+	},
+	"display": {
+		"message": "Anzeige"
+	},
+	"duplicate": {
+		"message": "Duplizieren"
+	},
+	"earlyAccessDescription": {
+		"message": "Verwenden Sie Funktionen, die die neueste $link_start$Early Access Version$link_end$ von Obsidian erfordern. Erfordert derzeit Obsidian 1.7.2 oder höher.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/Obsidian/Early+access+versions\" target=\"_blank\">"
+			}
+		}
+	},
+	"earlyAccessFeatures": {
+		"message": "Early Access Funktionen"
+	},
+	"editTemplate": {
+		"message": "Vorlage bearbeiten"
+	},
+	"enableHighlighter": {
+		"message": "Hervorheber aktivieren"
+	},
+	"enableHighlighterDescription": {
+		"message": "Heben Sie Inhalte auf Webseiten hervor, die Sie in Obsidian speichern möchten."
+	},
+	"error": {
+		"message": "Fehler"
+	},
+	"export": {
+		"message": "Exportieren"
+	},
+	"exportAllSettings": {
+		"message": "Alle Einstellungen exportieren"
+	},
+	"exportAllSettingsDescription": {
+		"message": "Exportieren Sie alle Einstellungen einschließlich Vorlagen und Eigenschaften."
+	},
+	"exportHighlights": {
+		"message": "Hervorhebungen exportieren"
+	},
+	"exportHighlightsDescription": {
+		"message": "Exportieren Sie Ihre Hervorhebungen in eine Datei."
+	},
+	"exportProperties": {
+		"message": "Eigenschaften exportieren"
+	},
+	"exportPropertiesDescription": {
+		"message": "Speichern Sie Web Clipper Eigenschaften in einer $strong_start$types.json$strong_end$ Datei, die in Ihren Obsidian-Tresor oder in Web Clipper auf anderen Geräten importiert werden kann.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"extensionDescription": {
+		"message": "Speichern Sie Webinhalte in einem privaten und dauerhaften Format, auf das Sie offline zugreifen können. Die offizielle Browser-Erweiterung für Obsidian."
+	},
+	"extensionName": {
+		"message": "Obsidian Web Clipper"
+	},
+	"failedToCopyText": {
+		"message": "Text konnte nicht kopiert werden"
+	},
+	"failedToDeleteTemplate": {
+		"message": "Vorlage konnte nicht gelöscht werden. Bitte versuchen Sie es erneut."
+	},
+	"failedToExtractContent": {
+		"message": "Seiteninhalt konnte nicht extrahiert werden."
+	},
+	"failedToInitialize": {
+		"message": "Bitte versuchen Sie, die Erweiterung neu zu laden."
+	},
+	"failedToInitializeContent": {
+		"message": "Seiteninhalt konnte nicht initialisiert werden."
+	},
+	"failedToProcessInterpreter": {
+		"message": "Interpreter-Verarbeitung fehlgeschlagen. Bitte versuchen Sie es erneut."
+	},
+	"failedToResetTemplate": {
+		"message": "Standardvorlage konnte nicht zurückgesetzt werden. Bitte versuchen Sie es erneut."
+	},
+	"failedToSave": {
+		"message": "Datei konnte nicht gespeichert werden"
+	},
+	"failedToSaveFile": {
+		"message": "Datei konnte nicht gespeichert werden"
+	},
+	"folder": {
+		"message": "Ordner"
+	},
+	"general": {
+		"message": "Allgemein"
+	},
+	"generalSettings": {
+		"message": "Allgemeine Einstellungen"
+	},
+	"help": {
+		"message": "Hilfe"
+	},
+	"helpDescription": {
+		"message": "Lernen Sie, wie Sie den Web Clipper verwenden und erhalten Sie Hilfe bei der Fehlerbehebung."
+	},
+	"highlightInline": {
+		"message": "Seiteninhalt hervorheben"
+	},
+	"highlightPage": {
+		"message": "Seite hervorheben"
+	},
+	"highlighter": {
+		"message": "Hervorheber"
+	},
+	"highlighterSettings": {
+		"message": "Hervorheber"
+	},
+	"hotkeys": {
+		"message": "Tastenkombinationen"
+	},
+	"import": {
+		"message": "Importieren"
+	},
+	"importAllSettings": {
+		"message": "Alle Einstellungen importieren"
+	},
+	"importAllSettingsDescription": {
+		"message": "Importieren Sie alle Einstellungen einschließlich Vorlagen und Eigenschaften. Dies wird Ihre aktuelle Konfiguration ersetzen."
+	},
+	"importProperties": {
+		"message": "Eigenschaften importieren"
+	},
+	"importPropertiesDescription": {
+		"message": "Um Ihre Eigenschaften aus Obsidian zu importieren, suchen Sie die $strong_1_start$types.json$strong_1_end$ Datei im $strong_2_start$.obsidian$strong_2_end$ Ordner in Ihrem Tresor. Beachten Sie, dass dieser Ordner standardmäßig auf den meisten Betriebssystemen versteckt ist.",
+		"placeholders": {
+			"strong_1_end": {
+				"content": "</strong>"
+			},
+			"strong_1_start": {
+				"content": "<strong>"
+			},
+			"strong_2_end": {
+				"content": "</strong>"
+			},
+			"strong_2_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"interpreter": {
+		"message": "Interpreter"
+	},
+	"interpreterContext": {
+		"message": "Interpreter-Kontext"
+	},
+	"interpreterContextDescription": {
+		"message": "Der Kontext, der zur Interpretation von Prompt-Variablen verwendet wird. Überschreibt den Standardkontext, der in den $link_start$Interpreter-Einstellungen$link_end$ definiert ist. Variablen können hier verwendet werden.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=interpreter\">"
+			}
+		}
+	},
+	"language": {
+		"message": "Sprache"
+	},
+	"languageDescription": {
+		"message": "Wählen Sie die Anzeigesprache für die Erweiterungsoberfläche."
+	},
+	"lastUsed": {
+		"message": "Zuletzt verwendet"
+	},
+	"legacyMode": {
+		"message": "Legacy-Modus"
+	},
+	"legacyModeDescription": {
+		"message": "Verwendet die URI-Ausschneidemethode, die mit Obsidian 1.6.7 oder älter kompatibel ist. Beachten Sie, dass die Länge des Inhalts, den Sie ausschneiden können, durch Ihren Browser und das Betriebssystem begrenzt ist. Einige Seiten können ohne Fehlermeldungen fehlschlagen."
+	},
+	"more": {
+		"message": "Mehr"
+	},
+	"newTemplate": {
+		"message": "Neue Vorlage"
+	},
+	"noHighlights": {
+		"message": "Nichts tun"
+	},
+	"noTemplates": {
+		"message": "Keine Vorlagen verfügbar. Bitte fügen Sie eine Vorlage in den Einstellungen hinzu."
+	},
+	"noteContent": {
+		"message": "Notizinhalt"
+	},
+	"noteContentDescription": {
+		"message": "Passen Sie den Inhalt der Notiz an. Verwenden Sie Variablen, um Daten von der Seite vorab auszufüllen."
+	},
+	"noteLocation": {
+		"message": "Notizstandort"
+	},
+	"noteLocationDescription": {
+		"message": "Der Ordner oder Pfad der Notiz."
+	},
+	"noteName": {
+		"message": "Notizname"
+	},
+	"noteNameFormat": {
+		"message": "Notizname"
+	},
+	"noteNameFormatDescription": {
+		"message": "Format für den Dateinamen der Notiz. Sie können Variablen wie {{title}}, {{date}} und {{published}} verwenden, um Daten von der Seite vorab auszufüllen. $link_start$Mehr erfahren$link_end$.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/variables\" target=\"_blank\">"
+			}
+		}
+	},
+	"notesAboutPage": {
+		"message": "Notizen zu dieser Seite..."
+	},
+	"onlyHttpSupported": {
+		"message": "Diese Seite kann nicht ausgeschnitten werden. Nur http und https URLs werden unterstützt."
+	},
+	"open": {
+		"message": "Öffnen"
+	},
+	"pageCannotBeClipped": {
+		"message": "Diese Seite kann nicht ausgeschnitten werden."
+	},
+	"pageVariables": {
+		"message": "Seitenvariablen"
+	},
+	"pleaseReload": {
+		"message": "Bitte versuchen Sie, die Seite neu zu laden."
+	},
+	"prependToDaily": {
+		"message": "Zur Tagesnotiz am Anfang hinzufügen"
+	},
+	"prependToExisting": {
+		"message": "Zu bestehender Notiz am Anfang hinzufügen"
+	},
+	"properties": {
+		"message": "Eigenschaften"
+	},
+	"propertiesSettings": {
+		"message": "Eigenschaften"
+	},
+	"propertyName": {
+		"message": "Eigenschaftsname"
+	},
+	"propertyValue": {
+		"message": "Eigenschaftswert"
+	},
+	"refresh": {
+		"message": "Aktualisieren"
+	},
+	"remove": {
+		"message": "Entfernen"
+	},
+	"removeProperty": {
+		"message": "Eigenschaft entfernen"
+	},
+	"removeUnusedProperties": {
+		"message": "Ungenutzte Eigenschaften entfernen"
+	},
+	"removeUnusedPropertiesDescription": {
+		"message": "Entfernen Sie alle Eigenschaften, die in keiner Vorlage verwendet werden."
+	},
+	"removeVault": {
+		"message": "Tresor entfernen"
+	},
+	"replaceContent": {
+		"message": "Seiteninhalt ersetzen"
+	},
+	"reset": {
+		"message": "Zurücksetzen"
+	},
+	"resetDefaultTemplate": {
+		"message": "Standardvorlage zurücksetzen"
+	},
+	"resetDefaultTemplateDescription": {
+		"message": "Entfernen Sie alle Änderungen, die Sie an der Standardvorlage vorgenommen haben."
+	},
+	"saveFile": {
+		"message": "Datei speichern..."
+	},
+	"searchVariables": {
+		"message": "Variablen suchen..."
+	},
+	"settings": {
+		"message": "Einstellungen"
+	},
+	"settingsHeading": {
+		"message": "Einstellungen"
+	},
+	"share": {
+		"message": "Teilen..."
+	},
+	"shortcutInstructionsBrave": {
+		"message": "Um Tastenzuweisungen zu ändern, gehen Sie zu $1"
+	},
+	"shortcutInstructionsChrome": {
+		"message": "Um Tastenzuweisungen zu ändern, gehen Sie zu $1"
+	},
+	"shortcutInstructionsDefault": {
+		"message": "Um Tastenzuweisungen zu ändern, beachten Sie bitte die Erweiterungseinstellungen Ihres Browsers."
+	},
+	"shortcutInstructionsEdge": {
+		"message": "Um Tastenzuweisungen zu ändern, gehen Sie zu $1"
+	},
+	"shortcutInstructionsFirefox": {
+		"message": "Um Tastenzuweisungen zu ändern, gehen Sie zu $1, klicken Sie auf das Zahnrad-Symbol und wählen Sie \"Erweiterungs-Tastenkombinationen verwalten\"."
+	},
+	"shortcutInstructionsIntro": {
+		"message": "Tastenkombinationen geben Ihnen schnellen Zugriff auf Clipper-Funktionen."
+	},
+	"shortcutInstructionsSafari": {
+		"message": "Tastenkombinationen können in Safari nicht angepasst werden."
+	},
+	"shortcutNotSet": {
+		"message": "Nicht festgelegt"
+	},
+	"showActionsButton": {
+		"message": "Aktionsschaltfläche anzeigen"
+	},
+	"showActionsDescription": {
+		"message": "Ermöglicht es Ihnen, Seitenvariablen aus dem Clipper-Menü zu inspizieren. Nützlich, um die Variablen zu sehen, die in Vorlagen verwendet werden können."
+	},
+	"showPageVariables": {
+		"message": "Seitenvariablen anzeigen"
+	},
+	"silentOpen": {
+		"message": "Ausgeschnittene Notiz ohne Öffnen speichern"
+	},
+	"silentOpenDescription": {
+		"message": "Ausgeschnittene Notizen werden gespeichert, aber nicht als neuer Tab geöffnet. Obsidian wird trotzdem in den Vordergrund gebracht."
+	},
+	"specificNoteName": {
+		"message": "Spezifischer Notizname"
+	},
+	"systemDefault": {
+		"message": "System"
+	},
+	"templateName": {
+		"message": "Vorlagenname"
+	},
+	"templateProperties": {
+		"message": "Eigenschaften"
+	},
+	"templatePropertiesDescription": {
+		"message": "Eigenschaften, die oben zur ausgeschnittenen Notiz hinzugefügt werden sollen. Verwenden Sie Variablen, um Daten von der Seite vorab auszufüllen."
+	},
+	"templateTriggers": {
+		"message": "Vorlagen-Trigger"
+	},
+	"templateTriggersDescription": {
+		"message": "Definieren Sie Regeln, um diese Vorlage automatisch auszuwählen, wenn sie mit einem URL-Muster übereinstimmt oder schema.org-Daten enthält. Eine Regel pro Zeile."
+	},
+	"templatesHeading": {
+		"message": "Vorlagen"
+	},
+	"vault": {
+		"message": "Tresor"
+	},
+	"vaultDescription": {
+		"message": "Wählen Sie den Standard-Tresor für diese Vorlage. Gehen Sie zu $link_start$allgemeinen Einstellungen$link_end$, um Tresore hinzuzufügen oder zu entfernen.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=general\">"
+			}
+		}
+	},
+	"vaults": {
+		"message": "Tresore"
+	},
+	"vaultsDescription": {
+		"message": "Standardmäßig werden ausgeschnittene Notizen im aktuell geöffneten Tresor gespeichert. Sie können hier Tresore hinzufügen, wenn Sie die Option haben möchten, in verschiedenen Tresoren zu speichern. Tresornamen müssen exakt mit dem Namen des Obsidian-Tresors übereinstimmen. Drücken Sie $strong_start$Enter$strong_end$, um einen Tresor hinzuzufügen.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	}
+} 
