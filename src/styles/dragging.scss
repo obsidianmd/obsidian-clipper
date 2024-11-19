@@ -23,8 +23,8 @@ body.is-dragging {
 	justify-content: center;
 	user-select: none;
 	-webkit-user-select: none;
-	margin-left: -2px;
-	margin-right: 2px;
+	margin-inline-start: -2px;
+	margin-inline-end: 2px;
 	svg {
 		width: 16px;
 		height: 16px;

@@ -10,7 +10,7 @@ import { updateTemplateList, showTemplateEditor } from '../managers/template-ui'
 import { exportAllSettings, importAllSettings } from '../utils/import-export';
 import { Template } from '../types/types';
 import { exportHighlights } from './highlights-manager';
-import { getMessage } from '../utils/i18n';
+import { getMessage, setupLanguageAndDirection } from '../utils/i18n';
 
 export function updateVaultList(): void {
 	const vaultList = document.getElementById('vault-list') as HTMLUListElement;
@@ -92,7 +92,9 @@ export async function setShortcutInstructions() {
 }
 
 export function initializeGeneralSettings(): void {
-	loadSettings().then(() => {
+	loadSettings().then(async () => {
+		await setupLanguageAndDirection();
+
 		updateVaultList();
 		initializeShowMoreActionsToggle();
 		initializeBetaFeaturesToggle();

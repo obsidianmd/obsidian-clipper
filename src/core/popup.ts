@@ -22,7 +22,7 @@ import { memoizeWithExpiration } from '../utils/memoize';
 import { debounce } from '../utils/debounce';
 import { sanitizeFileName } from '../utils/string-utils';
 import { saveFile } from '../utils/file-utils';
-import { translatePage, getMessage } from '../utils/i18n';
+import { translatePage, getMessage, setupLanguageAndDirection } from '../utils/i18n';
 
 let loadedSettings: Settings;
 let currentTemplate: Template | null = null;
@@ -104,6 +104,9 @@ async function initializeExtension(tabId: number) {
 	try {
 		// Initialize translations
 		translatePage();
+		
+		// Setup language and RTL support
+		await setupLanguageAndDirection();
 		
 		// First, add the browser class to allow browser-specific styles to apply
 		await addBrowserClassToHtml();
