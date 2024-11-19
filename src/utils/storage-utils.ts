@@ -15,6 +15,13 @@ export interface PropertyType {
 	defaultValue?: string;
 }
 
+export interface HistoryEntry {
+	datetime: string;
+	url: string;
+	action: keyof Settings['stats'];
+	title?: string;
+}
+
 export interface Settings {
 	vaults: string[];
 	showMoreActionsButton: boolean;
@@ -32,6 +39,13 @@ export interface Settings {
 	interpreterAutoRun: boolean;
 	defaultPromptContext: string;
 	propertyTypes: PropertyType[];
+	stats: {
+		addToObsidian: number;
+		saveFile: number;
+		copyToClipboard: number;
+		share: number;
+	};
+	history: HistoryEntry[];
 }
 
 export let generalSettings: Settings = {
@@ -57,7 +71,14 @@ export let generalSettings: Settings = {
 	interpreterEnabled: false,
 	interpreterAutoRun: false,
 	defaultPromptContext: '{{fullHtml|strip_tags:("script,h1,h2,h3,h4,h5,h6,meta,a,ol,ul,li,p,em,strong,i,b,img,video,audio,math,tablecite,strong,td,th,tr,caption,u")|strip_attr:("alt,src,href,id,content,property,name,datetime,title")}}',
-	propertyTypes: []
+	propertyTypes: [],
+	stats: {
+		addToObsidian: 0,
+		saveFile: 0,
+		copyToClipboard: 0,
+		share: 0
+	},
+	history: []
 };
 
 export function setLocalStorage(key: string, value: any): Promise<void> {
@@ -91,10 +112,25 @@ interface StorageData {
 		defaultPromptContext?: string;
 	};
 	property_types?: PropertyType[];
+	stats?: {
+		addToObsidian: number;
+		saveFile: number;
+		copyToClipboard: number;
+		share: number;
+	};
+	history?: HistoryEntry[];
 }
 
 export async function loadSettings(): Promise<Settings> {
-	const data = await browser.storage.sync.get(['general_settings', 'vaults', 'highlighter_settings', 'interpreter_settings', 'property_types']) as StorageData;
+	const data = await browser.storage.sync.get([
+		'general_settings', 
+		'vaults', 
+		'highlighter_settings', 
+		'interpreter_settings', 
+		'property_types',
+		'stats',
+		'history'
+	]) as StorageData;
 
 	const defaultSettings: Settings = {
 		vaults: [],
@@ -112,7 +148,14 @@ export async function loadSettings(): Promise<Settings> {
 		interpreterEnabled: false,
 		interpreterAutoRun: false,
 		defaultPromptContext: generalSettings.defaultPromptContext,
-		propertyTypes: []
+		propertyTypes: [],
+		stats: {
+			addToObsidian: 0,
+			saveFile: 0,
+			copyToClipboard: 0,
+			share: 0
+		},
+		history: []
 	};
 
 	const loadedSettings: Settings = {
@@ -131,7 +174,9 @@ export async function loadSettings(): Promise<Settings> {
 		interpreterEnabled: data.interpreter_settings?.interpreterEnabled ?? defaultSettings.interpreterEnabled,
 		interpreterAutoRun: data.interpreter_settings?.interpreterAutoRun ?? defaultSettings.interpreterAutoRun,
 		defaultPromptContext: data.interpreter_settings?.defaultPromptContext || defaultSettings.defaultPromptContext,
-		propertyTypes: data.property_types || defaultSettings.propertyTypes
+		propertyTypes: data.property_types || defaultSettings.propertyTypes,
+		stats: data.stats || defaultSettings.stats,
+		history: (data.history || []) as HistoryEntry[]
 	};
 
 	generalSettings = loadedSettings;
@@ -164,11 +209,52 @@ export async function saveSettings(settings?: Partial<Settings>): Promise<void> 
 			interpreterAutoRun: generalSettings.interpreterAutoRun,
 			defaultPromptContext: generalSettings.defaultPromptContext
 		},
-		property_types: generalSettings.propertyTypes
+		property_types: generalSettings.propertyTypes,
+		stats: generalSettings.stats,
+		history: generalSettings.history
 	});
 }
 
 export async function setLegacyMode(enabled: boolean): Promise<void> {
 	await saveSettings({ legacyMode: enabled });
 	console.log(`Legacy mode ${enabled ? 'enabled' : 'disabled'}`);
+}
+
+export async function incrementStat(action: keyof Settings['stats']): Promise<void> {
+	const settings = await loadSettings();
+	settings.stats[action]++;
+	await saveSettings(settings);
+
+	// Get the current tab's URL and title
+	const tabs = await browser.tabs.query({ active: true, currentWindow: true });
+	if (tabs[0]?.url) {
+		await addHistoryEntry(action, tabs[0].url, tabs[0].title);
+	}
+}
+
+export async function addHistoryEntry(action: keyof Settings['stats'], url: string, title?: string): Promise<void> {
+	const entry: HistoryEntry = {
+		datetime: new Date().toISOString(),
+		url,
+		action,
+		title
+	};
+
+	// Get existing history from local storage
+	const result = await browser.storage.local.get('history');
+	const history: HistoryEntry[] = (result.history || []) as HistoryEntry[];
+
+	// Add new entry at the beginning
+	history.unshift(entry);
+
+	// Keep only the last 1000 entries
+	const trimmedHistory = history.slice(0, 1000);
+
+	// Save back to local storage
+	await browser.storage.local.set({ history: trimmedHistory });
+}
+
+export async function getClipHistory(): Promise<HistoryEntry[]> {
+	const result = await browser.storage.local.get('history');
+	return (result.history || []) as HistoryEntry[];
 }

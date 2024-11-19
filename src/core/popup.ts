@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import { Template, Property, PromptVariable } from '../types/types';
+import { incrementStat, addHistoryEntry, getClipHistory } from '../utils/storage-utils';
 import { generateFrontmatter, saveToObsidian } from '../utils/obsidian-note-creator';
 import { extractPageContent, initializePageContent } from '../utils/content-extractor';
 import { compileTemplate } from '../utils/template-compiler';
@@ -373,7 +374,7 @@ function setupEventListeners(tabId: number) {
 	const shareButtons = document.querySelectorAll('.share-content');
 	if (shareButtons) {
 		shareButtons.forEach(button => {
-			button.addEventListener('click', (e) => {
+			button.addEventListener('click', async (e) => {
 				// Get content synchronously
 				const properties = Array.from(document.querySelectorAll('.metadata-property input')).map(input => {
 					const inputElement = input as HTMLInputElement;
@@ -412,10 +413,11 @@ function setupEventListeners(tabId: number) {
 
 						if (navigator.canShare(shareData)) {
 							navigator.share(shareData)
-								.then(() => {
+								.then(async () => {
+									await incrementStat('share');
 									const moreDropdown = document.getElementById('more-dropdown');
 									if (moreDropdown) {
-										moreDropdown.classList.remove('show');
+											moreDropdown.classList.remove('show');
 									}
 								})
 								.catch((error) => {
@@ -602,6 +604,7 @@ async function handleClip() {
 		}
 
 		await saveToObsidian(fileContent, noteName, path, selectedVault, currentTemplate.behavior);
+		await incrementStat('addToObsidian');
 
 		// Only update lastSelectedVault if the user explicitly chose a vault
 		if (!currentTemplate.vault) {
@@ -1054,10 +1057,7 @@ function updateHighlighterModeUI(isActive: boolean) {
 export async function copyToClipboard(content: string) {
 	try {
 		await navigator.clipboard.writeText(content);
-		const moreDropdown = document.getElementById('more-dropdown');
-		if (moreDropdown) {
-			moreDropdown.classList.remove('show');
-		}
+		await incrementStat('copyToClipboard');
 
 		// Change the main button text temporarily
 		const clipButton = document.getElementById('clip-btn');
@@ -1105,6 +1105,8 @@ async function handleSaveToDownloads() {
 			tabId: currentTabId,
 			onError: (error) => showError('failedToSaveFile')
 		});
+
+		await incrementStat('saveFile');
 
 		const moreDropdown = document.getElementById('more-dropdown');
 		if (moreDropdown) {
