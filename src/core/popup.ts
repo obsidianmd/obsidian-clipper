@@ -23,6 +23,7 @@ import { debounce } from '../utils/debounce';
 import { sanitizeFileName } from '../utils/string-utils';
 import { saveFile } from '../utils/file-utils';
 import { translatePage, getMessage } from '../utils/i18n';
+import { getEffectiveLanguage } from '../utils/language-settings';
 
 let loadedSettings: Settings;
 let currentTemplate: Template | null = null;
@@ -100,10 +101,24 @@ function setPopupDimensions() {
 
 const debouncedSetPopupDimensions = debounce(setPopupDimensions, 100); // 100ms delay
 
+async function setupRTLSupport() {
+	const { isRTL } = await getEffectiveLanguage();
+	if (isRTL) {
+		document.body.classList.add('mod-rtl');
+		document.body.setAttribute('dir', 'rtl');
+	} else {
+		document.body.classList.remove('mod-rtl');
+		document.body.removeAttribute('dir');
+	}
+}
+
 async function initializeExtension(tabId: number) {
 	try {
 		// Initialize translations
 		translatePage();
+		
+		// Setup RTL support
+		await setupRTLSupport();
 		
 		// First, add the browser class to allow browser-specific styles to apply
 		await addBrowserClassToHtml();

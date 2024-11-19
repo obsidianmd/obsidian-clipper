@@ -54,11 +54,36 @@ export function getMessage(messageName: string): string {
 	return getI18nMessage(messageName);
 }
 
-// Helper function to get the effective language
-export async function getEffectiveLanguage(): Promise<string> {
+// Add this function to check if a language code is RTL
+export function isRTLLanguage(languageCode: string): boolean {
+	// List of RTL language codes
+	const rtlLanguages = [
+		'ar',  // Arabic
+		'arc', // Aramaic
+		'ckb', // Central Kurdish (Sorani)
+		'dv',  // Divehi/Maldivian
+		'fa',  // Persian/Farsi
+		'ha',  // Hausa (when written in Arabic script)
+		'he',  // Hebrew
+		'khw', // Khowar
+		'ks',  // Kashmiri
+		'ku',  // Kurdish (in Arabic script)
+		'ps',  // Pashto
+		'sd',  // Sindhi
+		'syr', // Syriac
+		'ur',  // Urdu
+		'uz-AF', // Uzbek (in Afghanistan)
+		'yi'   // Yiddish
+	];
+	return rtlLanguages.includes(languageCode.toLowerCase().split('-')[0]);
+}
+
+// Modify getEffectiveLanguage to also return if it's RTL
+export async function getEffectiveLanguage(): Promise<{ code: string; isRTL: boolean }> {
 	const currentLang = await getCurrentLanguage();
-	if (currentLang && currentLang !== '') {
-		return currentLang;
-	}
-	return matchBrowserLanguage();
+	const languageCode = currentLang && currentLang !== '' ? currentLang : matchBrowserLanguage();
+	return {
+		code: languageCode,
+		isRTL: isRTLLanguage(languageCode)
+	};
 } 
