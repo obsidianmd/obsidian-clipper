@@ -324,38 +324,82 @@ function getSchemaProperty(schemaOrgData: any, property: string, defaultValue: s
 		return getSchemaProperty.memoized.get(memoKey) as string;
 	}
 
-	const searchSchema = (data: any, props: string[], fullPath: string): string => {
-		if (typeof data === 'string') return data;
-		if (!data || typeof data !== 'object') return '';
+	const searchSchema = (data: any, props: string[], fullPath: string, isExactMatch: boolean = true): string[] => {
+		if (typeof data === 'string') {
+			return props.length === 0 ? [data] : [];
+		}
+		
+		if (!data || typeof data !== 'object') {
+			return [];
+		}
 
 		if (Array.isArray(data)) {
-			return data.map((item: any) => searchSchema(item, props, fullPath)).filter(Boolean).join(', ');
+
+			const currentProp = props[0];
+			if (/^\[\d+\]$/.test(currentProp)) {
+				const index = parseInt(currentProp.slice(1, -1));
+				if (data[index]) {
+					return searchSchema(data[index], props.slice(1), fullPath, isExactMatch);
+				}
+				return [];
+			}
+			
+			if (props.length === 0 && data.every(item => typeof item === 'string' || typeof item === 'number')) {
+				return data.map(String);
+			}
+			
+			// Collect all matches from array items
+			const results = data.flatMap(item => 
+				searchSchema(item, props, fullPath, isExactMatch)
+			);
+			return results;
 		}
 
 		const [currentProp, ...remainingProps] = props;
+		
 		if (!currentProp) {
-			if (typeof data === 'string') return data;
-			if (typeof data === 'object' && data.name) return data.name;
-			return '';
+			if (typeof data === 'string') return [data];
+			if (typeof data === 'object' && data.name) {
+				return [data.name];
+			}
+			return [];
 		}
 
-		const value = data[currentProp];
-		if (value !== undefined) {
-			return searchSchema(value, remainingProps, fullPath ? `${fullPath}.${currentProp}` : currentProp);
+		// Check for exact path match first
+		if (data.hasOwnProperty(currentProp)) {
+			return searchSchema(data[currentProp], remainingProps, 
+				fullPath ? `${fullPath}.${currentProp}` : currentProp, true);
 		}
 
-		for (const key in data) {
-			if (typeof data[key] === 'object') {
-				const result = searchSchema(data[key], props, fullPath ? `${fullPath}.${key}` : key);
-				if (result) return result;
+		// Only search nested objects if we're allowing non-exact matches
+		if (!isExactMatch) {
+			const nestedResults: string[] = [];
+			for (const key in data) {
+				if (typeof data[key] === 'object') {
+					const results = searchSchema(data[key], props, 
+						fullPath ? `${fullPath}.${key}` : key, false);
+					nestedResults.push(...results);
+				}
+			}
+			if (nestedResults.length > 0) {
+				return nestedResults;
 			}
 		}
 
-		return '';
+		return [];
 	};
 
 	try {
-		const result = searchSchema(schemaOrgData, property.split('.'), '') || defaultValue;
+		// First try exact match
+		let results = searchSchema(schemaOrgData, property.split('.'), '', true);
+		
+		// If no exact match found, try recursive search
+		if (results.length === 0) {
+			results = searchSchema(schemaOrgData, property.split('.'), '', false);
+		}
+		
+		const result = results.length > 0 ? results.filter(Boolean).join(', ') : defaultValue;
+		
 		getSchemaProperty.memoized.set(memoKey, result);
 		return result;
 	} catch (error) {
