@@ -196,17 +196,17 @@ export async function initializePageContent(content: string, selectedHtml: strin
 
 		if (generalSettings.highlighterEnabled && highlights && highlights.length > 0) {
 			if (generalSettings.highlightBehavior === 'highlight-inline') {
-				console.log('Processing highlights in inline mode:', highlights.length, 'highlights');
+				debugLog('Highlights', 'Processing highlights in inline mode:', highlights.length, 'highlights');
 				// Get the readable content first
 				let processedContent = readabilityArticle?.content || content;
-				console.log('Initial content length:', processedContent.length);
+				debugLog('Highlights', 'Initial content length:', processedContent.length);
 				
 				// Create a temporary container
 				const tempDiv = document.createElement('div');
 				tempDiv.innerHTML = processedContent;
 
 				// Filter for text highlights and sort by position
-				console.log('Raw highlights:', highlights.map(h => ({
+				debugLog('Highlights', 'Raw highlights:', highlights.map(h => ({
 					type: h.type,
 					xpath: h.xpath,
 					hasStartOffset: 'startOffset' in h,
@@ -248,12 +248,12 @@ export async function initializePageContent(content: string, selectedHtml: strin
 						return 0;
 					});
 
-				console.log('Found text highlights:', textHighlights.length);
+				debugLog('Highlights', 'Found text highlights:', textHighlights.length);
 
 				// Process each text highlight
 				for (const highlight of textHighlights) {
 					try {
-						console.log('Processing highlight:', {
+						debugLog('Highlights', 'Processing highlight:', {
 							type: highlight.type,
 							xpath: highlight.xpath,
 							content: highlight.content
@@ -271,11 +271,11 @@ export async function initializePageContent(content: string, selectedHtml: strin
 							if (element) {
 								if ('type' in highlight && highlight.type === 'element') {
 									// For element highlights, wrap the entire element
-									console.log('Processing element highlight');
+									debugLog('Highlights', 'Processing element highlight');
 									const mark = document.createElement('mark');
 									element.parentNode?.insertBefore(mark, element);
 									mark.appendChild(element);
-									console.log('Created mark element for element:', mark.outerHTML);
+									debugLog('Highlights', 'Created mark element for element:', mark.outerHTML);
 								} else {
 									// Existing text highlight logic...
 									const range = document.createRange();
@@ -295,7 +295,7 @@ export async function initializePageContent(content: string, selectedHtml: strin
 										if (!startNode && currentOffset + length > highlight.startOffset) {
 											startNode = node;
 											startOffset = highlight.startOffset - currentOffset;
-											console.log('Found start node:', {
+											debugLog('Highlights', 'Found start node:', {
 												text: node.textContent,
 												offset: startOffset
 											});
@@ -304,7 +304,7 @@ export async function initializePageContent(content: string, selectedHtml: strin
 										if (!endNode && currentOffset + length >= highlight.endOffset) {
 											endNode = node;
 											endOffset = highlight.endOffset - currentOffset;
-											console.log('Found end node:', {
+											debugLog('Highlights', 'Found end node:', {
 												text: node.textContent,
 												offset: endOffset
 											});
@@ -315,7 +315,7 @@ export async function initializePageContent(content: string, selectedHtml: strin
 									}
 									
 									if (startNode && endNode) {
-										console.log('Creating mark element for text:', {
+										debugLog('Highlights', 'Creating mark element for text:', {
 											start: startNode.textContent?.slice(startOffset),
 											end: endNode.textContent?.slice(0, endOffset)
 										});
@@ -325,17 +325,17 @@ export async function initializePageContent(content: string, selectedHtml: strin
 										
 										const mark = document.createElement('mark');
 										range.surroundContents(mark);
-										console.log('Created mark element:', mark.outerHTML);
+										debugLog('Highlights', 'Created mark element:', mark.outerHTML);
 									} else {
-										console.warn('Could not find start or end node');
+										debugLog('Highlights', 'Could not find start or end node');
 									}
 								}
 							} else {
-								console.warn('Could not find element for xpath:', highlight.xpath);
+								debugLog('Highlights', 'Could not find element for xpath:', highlight.xpath);
 							}
 						} else {
 							// Content-based search logic
-							console.log('Searching for content:', highlight.content);
+							debugLog('Highlights', 'Searching for content:', highlight.content);
 							
 							// Parse the HTML content
 							const contentDiv = document.createElement('div');
@@ -354,19 +354,19 @@ export async function initializePageContent(content: string, selectedHtml: strin
 							// If it's a block element (p, div, blockquote), handle it differently
 							const blockElement = innerDiv.querySelector('p, div, blockquote');
 							if (blockElement) {
-								console.log('Found block element:', blockElement.tagName);
+								debugLog('Highlights', 'Found block element:', blockElement.tagName);
 								
 								// Get all paragraphs from both the source and target
 								const sourceDiv = document.createElement('div');
 								sourceDiv.innerHTML = innerContent;
 								const sourceParagraphs = Array.from(sourceDiv.querySelectorAll('p'));
 								
-								console.log('Found source paragraphs:', sourceParagraphs.length);
+								debugLog('Highlights', 'Found source paragraphs:', sourceParagraphs.length);
 								
 								// For each source paragraph, find and mark the corresponding paragraph in tempDiv
 								sourceParagraphs.forEach(sourceParagraph => {
 									const sourceText = stripHtml(sourceParagraph.outerHTML).trim();
-									console.log('Looking for paragraph:', sourceText);
+									debugLog('Highlights', 'Looking for paragraph:', sourceText);
 									
 									// Find matching paragraph in tempDiv
 									const paragraphs = Array.from(tempDiv.querySelectorAll('p'));
@@ -374,12 +374,12 @@ export async function initializePageContent(content: string, selectedHtml: strin
 										const targetText = stripHtml(targetParagraph.outerHTML).trim();
 										
 										if (targetText === sourceText) {
-											console.log('Found matching paragraph:', targetParagraph.outerHTML);
+											debugLog('Highlights', 'Found matching paragraph:', targetParagraph.outerHTML);
 											const mark = document.createElement('mark');
 											mark.innerHTML = targetParagraph.innerHTML;
 											targetParagraph.innerHTML = '';
 											targetParagraph.appendChild(mark);
-											console.log('Created mark element for paragraph:', targetParagraph.outerHTML);
+											debugLog('Highlights', 'Created mark element for paragraph:', targetParagraph.outerHTML);
 											break;
 										}
 									}
@@ -388,7 +388,7 @@ export async function initializePageContent(content: string, selectedHtml: strin
 								// For inline text, use the text-based search
 								const searchText = stripHtml(innerContent).trim();
 								
-								console.log('Searching for text:', searchText);
+								debugLog('Highlights', 'Searching for text:', searchText);
 								
 								// Create a text walker for the entire tempDiv
 								const walker = document.createTreeWalker(tempDiv, NodeFilter.SHOW_TEXT);
@@ -399,7 +399,7 @@ export async function initializePageContent(content: string, selectedHtml: strin
 									const index = nodeText.indexOf(searchText);
 									
 									if (index !== -1) {
-										console.log('Found matching text in node:', {
+										debugLog('Highlights', 'Found matching text in node:', {
 											text: nodeText,
 											index: index
 										});
@@ -410,22 +410,22 @@ export async function initializePageContent(content: string, selectedHtml: strin
 										
 										const mark = document.createElement('mark');
 										range.surroundContents(mark);
-										console.log('Created mark element:', mark.outerHTML);
+										debugLog('Highlights', 'Created mark element:', mark.outerHTML);
 										break;
 									}
 								}
 							}
 						}
 					} catch (error) {
-						console.warn('Error processing highlight:', error);
+							debugLog('Highlights', 'Error processing highlight:', error);
 					}
 				}
 				
 				
 				
 				content = tempDiv.innerHTML;
-				console.log('Final content length:', content.length);
-				console.log('Number of mark elements:', content.match(/<mark>/g)?.length || 0);
+				debugLog('Highlights', 'Final content length:', content.length);
+				debugLog('Highlights', 'Number of mark elements:', content.match(/<mark>/g)?.length || 0);
 			} else if (generalSettings.highlightBehavior === 'replace-content') {
 				const highlightsContent = highlights.map(highlight => highlight.content).join('');
 				content = highlightsContent;

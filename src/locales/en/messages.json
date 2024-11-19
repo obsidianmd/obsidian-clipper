@@ -194,6 +194,9 @@
 	"helpDescription": {
 		"message": "Learn how to use Web Clipper and get help troubleshooting."
 	},
+	"highlightInline": {
+		"message": "Highlight the page content"
+	},
 	"highlightPage": {
 		"message": "Highlight page"
 	},
