@@ -479,6 +479,9 @@
 	},
 	"open": {
 		"message": "باز کردن"
+	},
+	"highlightInline": {
+		"message": "محتوای صفحه را برجسته کنید"
 	}
 }
 

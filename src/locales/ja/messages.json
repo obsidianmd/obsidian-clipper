@@ -476,5 +476,8 @@
 	},
 	"open": {
 		"message": "開く"
+	},
+	"highlightInline": {
+		"message": "ページ内容を高亮表示"
 	}
 } 

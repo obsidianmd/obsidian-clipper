@@ -479,5 +479,8 @@
 	},
 	"open": {
 		"message": "Abrir"
+	},
+	"highlightInline": {
+		"message": "Resaltar el contenido de la página"
 	}
 }

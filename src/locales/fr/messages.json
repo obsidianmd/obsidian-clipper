@@ -476,5 +476,8 @@
 	},
 	"open": {
 		"message": "Ouvrir"
+	},
+	"highlightInline": {
+		"message": "Surligner le contenu de la page"
 	}
 }
