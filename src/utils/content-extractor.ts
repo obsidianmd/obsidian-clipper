@@ -5,9 +5,54 @@ import { Readability } from '@mozilla/readability';
 import browser from './browser-polyfill';
 import { debugLog } from './debug';
 import dayjs from 'dayjs';
-import { AnyHighlightData, TextHighlightData } from './highlighter';
+import { AnyHighlightData, TextHighlightData, HighlightData } from './highlighter';
 import { generalSettings } from './storage-utils';
 import { getElementByXPath } from './dom-utils';
+
+// Define ElementHighlightData type inline since it's not exported from highlighter.ts
+interface ElementHighlightData extends HighlightData {
+	type: 'element';
+}
+
+// Add this helper function at the top level
+function canHighlightElement(element: Element): boolean {
+	// List of elements that can't be nested inside mark
+	const unsupportedElements = ['img', 'video', 'audio', 'iframe', 'canvas', 'svg', 'math', 'table'];
+	
+	// Check if the element contains any unsupported elements
+	const hasUnsupportedElements = unsupportedElements.some(tag => 
+		element.getElementsByTagName(tag).length > 0
+	);
+	
+	// Check if the element itself is an unsupported type
+	const isUnsupportedType = unsupportedElements.includes(element.tagName.toLowerCase());
+	
+	return !hasUnsupportedElements && !isUnsupportedType;
+}
+
+// Add this helper function at the top level
+function normalizeHtml(html: string): string {
+	return html
+		.replace(/\s+/g, ' ') // Normalize whitespace
+		.replace(/>\s+</g, '><') // Remove whitespace between tags
+		.replace(/\s*\/>/g, '/>') // Normalize self-closing tags
+		.trim();
+}
+
+// Add this helper function at the top level
+function stripHtml(html: string): string {
+	const div = document.createElement('div');
+	div.innerHTML = html;
+	return div.textContent || '';
+}
+
+// Add this helper function at the top level
+function normalizeText(text: string): string {
+	return text
+		.replace(/\s+/g, ' ') // Normalize whitespace
+		.toLowerCase() // Case insensitive
+		.trim();
+}
 
 export function extractReadabilityContent(doc: Document): ReturnType<Readability['parse']> | null {
 	try {
@@ -169,22 +214,34 @@ export async function initializePageContent(content: string, selectedHtml: strin
 				})));
 
 				const textHighlights = highlights
-					.filter((h): h is TextHighlightData => 
-						h.type === 'text' && 
-						(
-							// Either has a valid xpath
-							(typeof h.xpath === 'string' && h.xpath.trim() !== '') ||
-							// Or has content we can search for
-							(typeof h.content === 'string' && h.content.trim() !== '')
-						)
-					)
+					.filter((h): h is (TextHighlightData | ElementHighlightData) => {
+						if (h.type === 'text') {
+							return (
+								// Either has a valid xpath
+								(typeof h.xpath === 'string' && h.xpath.trim() !== '') ||
+								// Or has content we can search for
+								(typeof h.content === 'string' && h.content.trim() !== '')
+							);
+						}
+						
+						// For element highlights, check if they can be safely highlighted
+						if (h.type === 'element' && h.xpath && h.xpath.trim() !== '') {
+							const element = getElementByXPath(h.xpath);
+							return element ? canHighlightElement(element) : false;
+						}
+						
+						return false;
+					})
 					.sort((a, b) => {
 						// Only compare by xpath if both highlights have valid xpaths
 						if (a.xpath && b.xpath && a.xpath.trim() !== '' && b.xpath.trim() !== '') {
 							const elementA = getElementByXPath(a.xpath);
 							const elementB = getElementByXPath(b.xpath);
 							if (elementA === elementB) {
-								return b.startOffset - a.startOffset;
+								// Only compare startOffsets if both are text highlights
+								if (a.type === 'text' && b.type === 'text') {
+									return b.startOffset - a.startOffset;
+								}
 							}
 						}
 						// Otherwise maintain original order
@@ -197,14 +254,12 @@ export async function initializePageContent(content: string, selectedHtml: strin
 				for (const highlight of textHighlights) {
 					try {
 						console.log('Processing highlight:', {
+							type: highlight.type,
 							xpath: highlight.xpath,
-							content: highlight.content,
-							startOffset: highlight.startOffset,
-							endOffset: highlight.endOffset
+							content: highlight.content
 						});
 
 						if (highlight.xpath) {
-							// Existing xpath-based logic...
 							const element = document.evaluate(
 								highlight.xpath,
 								tempDiv,
@@ -214,91 +269,150 @@ export async function initializePageContent(content: string, selectedHtml: strin
 							).singleNodeValue as Element;
 
 							if (element) {
-								console.log('Found element for xpath:', element.tagName);
-								const range = document.createRange();
-								const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
-								
-								let currentOffset = 0;
-								let startNode = null;
-								let endNode = null;
-								let startOffset = 0;
-								let endOffset = 0;
-								
-								// Find the start and end nodes
-								let node;
-								while (node = walker.nextNode() as Text) {
-									const length = node.length;
-									
-									if (!startNode && currentOffset + length > highlight.startOffset) {
-										startNode = node;
-										startOffset = highlight.startOffset - currentOffset;
-										console.log('Found start node:', {
-											text: node.textContent,
-											offset: startOffset
-										});
-									}
-									
-									if (!endNode && currentOffset + length >= highlight.endOffset) {
-										endNode = node;
-										endOffset = highlight.endOffset - currentOffset;
-										console.log('Found end node:', {
-											text: node.textContent,
-											offset: endOffset
-										});
-										break;
-									}
-									
-									currentOffset += length;
-								}
-								
-								if (startNode && endNode) {
-									console.log('Creating mark element for text:', {
-										start: startNode.textContent?.slice(startOffset),
-										end: endNode.textContent?.slice(0, endOffset)
-									});
-									
-									range.setStart(startNode, startOffset);
-									range.setEnd(endNode, endOffset);
-									
+								if ('type' in highlight && highlight.type === 'element') {
+									// For element highlights, wrap the entire element
+									console.log('Processing element highlight');
 									const mark = document.createElement('mark');
-									range.surroundContents(mark);
-									console.log('Created mark element:', mark.outerHTML);
+									element.parentNode?.insertBefore(mark, element);
+									mark.appendChild(element);
+									console.log('Created mark element for element:', mark.outerHTML);
 								} else {
-									console.warn('Could not find start or end node');
+									// Existing text highlight logic...
+									const range = document.createRange();
+									const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+									
+									let currentOffset = 0;
+									let startNode = null;
+									let endNode = null;
+									let startOffset = 0;
+									let endOffset = 0;
+									
+									// Find the start and end nodes
+									let node;
+									while (node = walker.nextNode() as Text) {
+										const length = node.length;
+										
+										if (!startNode && currentOffset + length > highlight.startOffset) {
+											startNode = node;
+											startOffset = highlight.startOffset - currentOffset;
+											console.log('Found start node:', {
+												text: node.textContent,
+												offset: startOffset
+											});
+										}
+										
+										if (!endNode && currentOffset + length >= highlight.endOffset) {
+											endNode = node;
+											endOffset = highlight.endOffset - currentOffset;
+											console.log('Found end node:', {
+												text: node.textContent,
+												offset: endOffset
+											});
+											break;
+										}
+										
+										currentOffset += length;
+									}
+									
+									if (startNode && endNode) {
+										console.log('Creating mark element for text:', {
+											start: startNode.textContent?.slice(startOffset),
+											end: endNode.textContent?.slice(0, endOffset)
+										});
+										
+										range.setStart(startNode, startOffset);
+										range.setEnd(endNode, endOffset);
+										
+										const mark = document.createElement('mark');
+										range.surroundContents(mark);
+										console.log('Created mark element:', mark.outerHTML);
+									} else {
+										console.warn('Could not find start or end node');
+									}
 								}
 							} else {
 								console.warn('Could not find element for xpath:', highlight.xpath);
 							}
 						} else {
-							// New content-based search logic
+							// Content-based search logic
 							console.log('Searching for content:', highlight.content);
 							
-							// Strip the div wrapper if it exists
-							const searchContent = highlight.content.replace(/<div>(.*?)<\/div>/, '$1');
+							// Parse the HTML content
+							const contentDiv = document.createElement('div');
+							contentDiv.innerHTML = highlight.content;
 							
-							// Create a text walker for the entire tempDiv
-							const walker = document.createTreeWalker(tempDiv, NodeFilter.SHOW_TEXT);
+							// Strip outer div if it's the only child
+							const innerContent = contentDiv.children.length === 1 && 
+								contentDiv.firstElementChild?.tagName === 'DIV' ? 
+								contentDiv.firstElementChild.innerHTML : 
+								contentDiv.innerHTML;
 							
-							let node;
-							while (node = walker.nextNode() as Text) {
-								const text = node.textContent || '';
-								const index = text.indexOf(searchContent);
+							// Create a temporary parser for the inner content
+							const innerDiv = document.createElement('div');
+							innerDiv.innerHTML = innerContent;
+							
+							// If it's a block element (p, div, blockquote), handle it differently
+							const blockElement = innerDiv.querySelector('p, div, blockquote');
+							if (blockElement) {
+								console.log('Found block element:', blockElement.tagName);
 								
-								if (index !== -1) {
-									console.log('Found matching text in node:', {
-										text: text,
-										index: index
-									});
+								// Get all paragraphs from both the source and target
+								const sourceDiv = document.createElement('div');
+								sourceDiv.innerHTML = innerContent;
+								const sourceParagraphs = Array.from(sourceDiv.querySelectorAll('p'));
+								
+								console.log('Found source paragraphs:', sourceParagraphs.length);
+								
+								// For each source paragraph, find and mark the corresponding paragraph in tempDiv
+								sourceParagraphs.forEach(sourceParagraph => {
+									const sourceText = stripHtml(sourceParagraph.outerHTML).trim();
+									console.log('Looking for paragraph:', sourceText);
 									
-									const range = document.createRange();
-									range.setStart(node, index);
-									range.setEnd(node, index + searchContent.length);
+									// Find matching paragraph in tempDiv
+									const paragraphs = Array.from(tempDiv.querySelectorAll('p'));
+									for (const targetParagraph of paragraphs) {
+										const targetText = stripHtml(targetParagraph.outerHTML).trim();
+										
+										if (targetText === sourceText) {
+											console.log('Found matching paragraph:', targetParagraph.outerHTML);
+											const mark = document.createElement('mark');
+											mark.innerHTML = targetParagraph.innerHTML;
+											targetParagraph.innerHTML = '';
+											targetParagraph.appendChild(mark);
+											console.log('Created mark element for paragraph:', targetParagraph.outerHTML);
+											break;
+										}
+									}
+								});
+							} else {
+								// For inline text, use the text-based search
+								const searchText = stripHtml(innerContent).trim();
+								
+								console.log('Searching for text:', searchText);
+								
+								// Create a text walker for the entire tempDiv
+								const walker = document.createTreeWalker(tempDiv, NodeFilter.SHOW_TEXT);
+								
+								let node;
+								while (node = walker.nextNode() as Text) {
+									const nodeText = node.textContent || '';
+									const index = nodeText.indexOf(searchText);
 									
-									const mark = document.createElement('mark');
-									range.surroundContents(mark);
-									console.log('Created mark element:', mark.outerHTML);
-									
-									break;
+									if (index !== -1) {
+										console.log('Found matching text in node:', {
+											text: nodeText,
+											index: index
+										});
+										
+										const range = document.createRange();
+										range.setStart(node, index);
+										range.setEnd(node, index + searchText.length);
+										
+										const mark = document.createElement('mark');
+										range.surroundContents(mark);
+										console.log('Created mark element:', mark.outerHTML);
+										break;
+									}
 								}
 							}
 						}
@@ -306,6 +420,7 @@ export async function initializePageContent(content: string, selectedHtml: strin
 						console.warn('Error processing highlight:', error);
 					}
 				}
+				
 				
 				
 				content = tempDiv.innerHTML;
