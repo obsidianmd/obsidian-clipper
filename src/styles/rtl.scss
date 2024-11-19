@@ -1,0 +1,16 @@
+.mod-rtl {
+	--dropdown-background-position: left .25rem top 50%, 0 0;
+
+	svg.lucide-icon:not(
+		.lucide-help-circle,
+		.lucide-check,
+		.lucide-check-square,
+		.lucide-code-2) {
+			transform: scale(-1, 1);
+	}
+
+	.action-buttons .menu-btn {
+		left: 0;
+		right: auto;
+	}
+}

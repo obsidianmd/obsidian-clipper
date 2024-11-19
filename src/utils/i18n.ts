@@ -160,10 +160,10 @@ export async function setupLanguageAndDirection(): Promise<void> {
 
 	// Set RTL support
 	if (isRTL) {
-		document.body.classList.add('mod-rtl');
-		document.body.setAttribute('dir', 'rtl');
+		document.documentElement.classList.add('mod-rtl');
+		document.documentElement.setAttribute('dir', 'rtl');
 	} else {
-		document.body.classList.remove('mod-rtl');
-		document.body.removeAttribute('dir');
+		document.documentElement.classList.remove('mod-rtl');
+		document.documentElement.removeAttribute('dir');
 	}
 }
