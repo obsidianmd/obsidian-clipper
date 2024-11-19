@@ -7,7 +7,11 @@ import { debugLog } from './debug';
 import dayjs from 'dayjs';
 import { AnyHighlightData, TextHighlightData, HighlightData } from './highlighter';
 import { generalSettings } from './storage-utils';
-import { getElementByXPath } from './dom-utils';
+import { 
+	getElementByXPath,
+	wrapElementWithMark,
+	wrapTextWithMark 
+} from './dom-utils';
 
 // Define ElementHighlightData type inline since it's not exported from highlighter.ts
 interface ElementHighlightData extends HighlightData {
@@ -194,248 +198,17 @@ export async function initializePageContent(content: string, selectedHtml: strin
 			console.warn('Failed to parse content with Readability, falling back to full content');
 		}
 
-		if (generalSettings.highlighterEnabled && highlights && highlights.length > 0) {
-			if (generalSettings.highlightBehavior === 'highlight-inline') {
-				debugLog('Highlights', 'Processing highlights in inline mode:', highlights.length, 'highlights');
-				// Get the readable content first
-				let processedContent = readabilityArticle?.content || content;
-				debugLog('Highlights', 'Initial content length:', processedContent.length);
-				
-				// Create a temporary container
-				const tempDiv = document.createElement('div');
-				tempDiv.innerHTML = processedContent;
-
-				// Filter for text highlights and sort by position
-				debugLog('Highlights', 'Raw highlights:', highlights.map(h => ({
-					type: h.type,
-					xpath: h.xpath,
-					hasStartOffset: 'startOffset' in h,
-					hasEndOffset: 'endOffset' in h
-				})));
-
-				const textHighlights = highlights
-					.filter((h): h is (TextHighlightData | ElementHighlightData) => {
-						if (h.type === 'text') {
-							return (
-								// Either has a valid xpath
-								(typeof h.xpath === 'string' && h.xpath.trim() !== '') ||
-								// Or has content we can search for
-								(typeof h.content === 'string' && h.content.trim() !== '')
-							);
-						}
-						
-						// For element highlights, check if they can be safely highlighted
-						if (h.type === 'element' && h.xpath && h.xpath.trim() !== '') {
-							const element = getElementByXPath(h.xpath);
-							return element ? canHighlightElement(element) : false;
-						}
-						
-						return false;
-					})
-					.sort((a, b) => {
-						// Only compare by xpath if both highlights have valid xpaths
-						if (a.xpath && b.xpath && a.xpath.trim() !== '' && b.xpath.trim() !== '') {
-							const elementA = getElementByXPath(a.xpath);
-							const elementB = getElementByXPath(b.xpath);
-							if (elementA === elementB) {
-								// Only compare startOffsets if both are text highlights
-								if (a.type === 'text' && b.type === 'text') {
-									return b.startOffset - a.startOffset;
-								}
-							}
-						}
-						// Otherwise maintain original order
-						return 0;
-					});
-
-				debugLog('Highlights', 'Found text highlights:', textHighlights.length);
-
-				// Process each text highlight
-				for (const highlight of textHighlights) {
-					try {
-						debugLog('Highlights', 'Processing highlight:', {
-							type: highlight.type,
-							xpath: highlight.xpath,
-							content: highlight.content
-						});
-
-						if (highlight.xpath) {
-							const element = document.evaluate(
-								highlight.xpath,
-								tempDiv,
-								null,
-								XPathResult.FIRST_ORDERED_NODE_TYPE,
-								null
-							).singleNodeValue as Element;
-
-							if (element) {
-								if ('type' in highlight && highlight.type === 'element') {
-									// For element highlights, wrap the entire element
-									debugLog('Highlights', 'Processing element highlight');
-									const mark = document.createElement('mark');
-									element.parentNode?.insertBefore(mark, element);
-									mark.appendChild(element);
-									debugLog('Highlights', 'Created mark element for element:', mark.outerHTML);
-								} else {
-									// Existing text highlight logic...
-									const range = document.createRange();
-									const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
-									
-									let currentOffset = 0;
-									let startNode = null;
-									let endNode = null;
-									let startOffset = 0;
-									let endOffset = 0;
-									
-									// Find the start and end nodes
-									let node;
-									while (node = walker.nextNode() as Text) {
-										const length = node.length;
-										
-										if (!startNode && currentOffset + length > highlight.startOffset) {
-											startNode = node;
-											startOffset = highlight.startOffset - currentOffset;
-											debugLog('Highlights', 'Found start node:', {
-												text: node.textContent,
-												offset: startOffset
-											});
-										}
-										
-										if (!endNode && currentOffset + length >= highlight.endOffset) {
-											endNode = node;
-											endOffset = highlight.endOffset - currentOffset;
-											debugLog('Highlights', 'Found end node:', {
-												text: node.textContent,
-												offset: endOffset
-											});
-											break;
-										}
-										
-										currentOffset += length;
-									}
-									
-									if (startNode && endNode) {
-										debugLog('Highlights', 'Creating mark element for text:', {
-											start: startNode.textContent?.slice(startOffset),
-											end: endNode.textContent?.slice(0, endOffset)
-										});
-										
-										range.setStart(startNode, startOffset);
-										range.setEnd(endNode, endOffset);
-										
-										const mark = document.createElement('mark');
-										range.surroundContents(mark);
-										debugLog('Highlights', 'Created mark element:', mark.outerHTML);
-									} else {
-										debugLog('Highlights', 'Could not find start or end node');
-									}
-								}
-							} else {
-								debugLog('Highlights', 'Could not find element for xpath:', highlight.xpath);
-							}
-						} else {
-							// Content-based search logic
-							debugLog('Highlights', 'Searching for content:', highlight.content);
-							
-							// Parse the HTML content
-							const contentDiv = document.createElement('div');
-							contentDiv.innerHTML = highlight.content;
-							
-							// Strip outer div if it's the only child
-							const innerContent = contentDiv.children.length === 1 && 
-								contentDiv.firstElementChild?.tagName === 'DIV' ? 
-								contentDiv.firstElementChild.innerHTML : 
-								contentDiv.innerHTML;
-							
-							// Create a temporary parser for the inner content
-							const innerDiv = document.createElement('div');
-							innerDiv.innerHTML = innerContent;
-							
-							// If it's a block element (p, div, blockquote), handle it differently
-							const blockElement = innerDiv.querySelector('p, div, blockquote');
-							if (blockElement) {
-								debugLog('Highlights', 'Found block element:', blockElement.tagName);
-								
-								// Get all paragraphs from both the source and target
-								const sourceDiv = document.createElement('div');
-								sourceDiv.innerHTML = innerContent;
-								const sourceParagraphs = Array.from(sourceDiv.querySelectorAll('p'));
-								
-								debugLog('Highlights', 'Found source paragraphs:', sourceParagraphs.length);
-								
-								// For each source paragraph, find and mark the corresponding paragraph in tempDiv
-								sourceParagraphs.forEach(sourceParagraph => {
-									const sourceText = stripHtml(sourceParagraph.outerHTML).trim();
-									debugLog('Highlights', 'Looking for paragraph:', sourceText);
-									
-									// Find matching paragraph in tempDiv
-									const paragraphs = Array.from(tempDiv.querySelectorAll('p'));
-									for (const targetParagraph of paragraphs) {
-										const targetText = stripHtml(targetParagraph.outerHTML).trim();
-										
-										if (targetText === sourceText) {
-											debugLog('Highlights', 'Found matching paragraph:', targetParagraph.outerHTML);
-											const mark = document.createElement('mark');
-											mark.innerHTML = targetParagraph.innerHTML;
-											targetParagraph.innerHTML = '';
-											targetParagraph.appendChild(mark);
-											debugLog('Highlights', 'Created mark element for paragraph:', targetParagraph.outerHTML);
-											break;
-										}
-									}
-								});
-							} else {
-								// For inline text, use the text-based search
-								const searchText = stripHtml(innerContent).trim();
-								
-								debugLog('Highlights', 'Searching for text:', searchText);
-								
-								// Create a text walker for the entire tempDiv
-								const walker = document.createTreeWalker(tempDiv, NodeFilter.SHOW_TEXT);
-								
-								let node;
-								while (node = walker.nextNode() as Text) {
-									const nodeText = node.textContent || '';
-									const index = nodeText.indexOf(searchText);
-									
-									if (index !== -1) {
-										debugLog('Highlights', 'Found matching text in node:', {
-											text: nodeText,
-											index: index
-										});
-										
-										const range = document.createRange();
-										range.setStart(node, index);
-										range.setEnd(node, index + searchText.length);
-										
-										const mark = document.createElement('mark');
-										range.surroundContents(mark);
-										debugLog('Highlights', 'Created mark element:', mark.outerHTML);
-										break;
-									}
-								}
-							}
-						}
-					} catch (error) {
-							debugLog('Highlights', 'Error processing highlight:', error);
-					}
-				}
-				
-				
-				
-				content = tempDiv.innerHTML;
-				debugLog('Highlights', 'Final content length:', content.length);
-				debugLog('Highlights', 'Number of mark elements:', content.match(/<mark>/g)?.length || 0);
-			} else if (generalSettings.highlightBehavior === 'replace-content') {
-				const highlightsContent = highlights.map(highlight => highlight.content).join('');
-				content = highlightsContent;
-			}
-		} else if (selectedHtml) {
+		if (selectedHtml) {
 			content = selectedHtml;
 		} else if (readabilityArticle && readabilityArticle.content) {
 			content = readabilityArticle.content;
 		} else {
 			content = doc.body.innerHTML || fullHtml;
+		}
+
+		// Process highlights after getting the base content
+		if (generalSettings.highlighterEnabled && generalSettings.highlightBehavior !== 'no-highlights' && highlights && highlights.length > 0) {
+			content = processHighlights(content, highlights, readabilityArticle);
 		}
 
 		const markdownBody = createMarkdownContent(content, currentUrl);
@@ -608,3 +381,161 @@ function getSchemaProperty(schemaOrgData: any, property: string, defaultValue: s
 }
 
 getSchemaProperty.memoized = new Map<string, string>();
+
+function processHighlights(content: string, highlights: AnyHighlightData[], readabilityArticle: ReturnType<Readability['parse']> | null): string {
+	// First check if highlighter is enabled and we have highlights
+	if (!generalSettings.highlighterEnabled || !highlights?.length) {
+		return content;
+	}
+
+	// Then check the behavior setting
+	if (generalSettings.highlightBehavior === 'no-highlights') {
+		return content;
+	}
+
+	if (generalSettings.highlightBehavior === 'replace-content') {
+		return highlights.map(highlight => highlight.content).join('');
+	}
+
+	if (generalSettings.highlightBehavior === 'highlight-inline') {
+		// Use readability content if available, otherwise fall back to original content
+		const processedContent = readabilityArticle?.content || content;
+		debugLog('Highlights', 'Using content length:', processedContent.length);
+
+		const tempDiv = document.createElement('div');
+		tempDiv.innerHTML = processedContent;
+
+		const textHighlights = filterAndSortHighlights(highlights);
+		debugLog('Highlights', 'Processing highlights:', textHighlights.length);
+
+		for (const highlight of textHighlights) {
+			processHighlight(highlight, tempDiv);
+		}
+
+		return tempDiv.innerHTML;
+	}
+
+	// Default fallback
+	return content;
+}
+
+function filterAndSortHighlights(highlights: AnyHighlightData[]): (TextHighlightData | ElementHighlightData)[] {
+	return highlights
+		.filter((h): h is (TextHighlightData | ElementHighlightData) => {
+			if (h.type === 'text') {
+				return !!(h.xpath?.trim() || h.content?.trim());
+			}
+			if (h.type === 'element' && h.xpath?.trim()) {
+				const element = getElementByXPath(h.xpath);
+				return element ? canHighlightElement(element) : false;
+			}
+			return false;
+		})
+		.sort((a, b) => {
+			if (a.xpath && b.xpath) {
+				const elementA = getElementByXPath(a.xpath);
+				const elementB = getElementByXPath(b.xpath);
+				if (elementA === elementB && a.type === 'text' && b.type === 'text') {
+					return b.startOffset - a.startOffset;
+				}
+			}
+			return 0;
+		});
+}
+
+function processHighlight(highlight: TextHighlightData | ElementHighlightData, tempDiv: HTMLDivElement) {
+	try {
+		if (highlight.xpath) {
+			processXPathHighlight(highlight, tempDiv);
+		} else {
+			processContentBasedHighlight(highlight, tempDiv);
+		}
+	} catch (error) {
+		debugLog('Highlights', 'Error processing highlight:', error);
+	}
+}
+
+function processXPathHighlight(highlight: TextHighlightData | ElementHighlightData, tempDiv: HTMLDivElement) {
+	const element = document.evaluate(
+		highlight.xpath,
+		tempDiv,
+		null,
+		XPathResult.FIRST_ORDERED_NODE_TYPE,
+		null
+	).singleNodeValue as Element;
+
+	if (!element) {
+		debugLog('Highlights', 'Could not find element for xpath:', highlight.xpath);
+		return;
+	}
+
+	if (highlight.type === 'element') {
+		wrapElementWithMark(element);
+	} else {
+		wrapTextWithMark(element, highlight as TextHighlightData);
+	}
+}
+
+function processContentBasedHighlight(highlight: TextHighlightData | ElementHighlightData, tempDiv: HTMLDivElement) {
+	const contentDiv = document.createElement('div');
+	contentDiv.innerHTML = highlight.content;
+
+	const innerContent = contentDiv.children.length === 1 && 
+		contentDiv.firstElementChild?.tagName === 'DIV' ? 
+		contentDiv.firstElementChild.innerHTML : 
+		contentDiv.innerHTML;
+
+	const paragraphs = Array.from(contentDiv.querySelectorAll('p'));
+	if (paragraphs.length) {
+		processContentParagraphs(paragraphs, tempDiv);
+	} else {
+		processInlineContent(innerContent, tempDiv);
+	}
+}
+
+function processContentParagraphs(sourceParagraphs: Element[], tempDiv: HTMLDivElement) {
+	sourceParagraphs.forEach(sourceParagraph => {
+		const sourceText = stripHtml(sourceParagraph.outerHTML).trim();
+		debugLog('Highlights', 'Looking for paragraph:', sourceText);
+		
+		const paragraphs = Array.from(tempDiv.querySelectorAll('p'));
+		for (const targetParagraph of paragraphs) {
+			const targetText = stripHtml(targetParagraph.outerHTML).trim();
+			
+			if (targetText === sourceText) {
+				debugLog('Highlights', 'Found matching paragraph:', targetParagraph.outerHTML);
+				wrapElementWithMark(targetParagraph);
+				break;
+			}
+		}
+	});
+}
+
+function processInlineContent(content: string, tempDiv: HTMLDivElement) {
+	const searchText = stripHtml(content).trim();
+	debugLog('Highlights', 'Searching for text:', searchText);
+	
+	const walker = document.createTreeWalker(tempDiv, NodeFilter.SHOW_TEXT);
+	
+	let node;
+	while (node = walker.nextNode() as Text) {
+		const nodeText = node.textContent || '';
+		const index = nodeText.indexOf(searchText);
+		
+		if (index !== -1) {
+			debugLog('Highlights', 'Found matching text in node:', {
+				text: nodeText,
+				index: index
+			});
+			
+			const range = document.createRange();
+			range.setStart(node, index);
+			range.setEnd(node, index + searchText.length);
+			
+			const mark = document.createElement('mark');
+			range.surroundContents(mark);
+			debugLog('Highlights', 'Created mark element:', mark.outerHTML);
+			break;
+		}
+	}
+}

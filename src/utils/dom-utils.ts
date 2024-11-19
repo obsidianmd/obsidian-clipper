@@ -53,3 +53,46 @@ export function isDarkColor(color: string): boolean {
 	// Return true if the brightness is below 128 (assuming 0-255 range)
 	return brightness < 128;
 }
+
+export function wrapElementWithMark(element: Element): void {
+	const mark = document.createElement('mark');
+	mark.innerHTML = element.innerHTML;
+	element.innerHTML = '';
+	element.appendChild(mark);
+}
+
+export function wrapTextWithMark(element: Element, highlight: { startOffset: number; endOffset: number }): void {
+	const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+	let currentOffset = 0;
+	let startNode = null;
+	let endNode = null;
+	let startOffset = 0;
+	let endOffset = 0;
+	
+	let node;
+	while (node = walker.nextNode() as Text) {
+		const length = node.length;
+		
+		if (!startNode && currentOffset + length > highlight.startOffset) {
+			startNode = node;
+			startOffset = highlight.startOffset - currentOffset;
+		}
+		
+		if (!endNode && currentOffset + length >= highlight.endOffset) {
+			endNode = node;
+			endOffset = highlight.endOffset - currentOffset;
+			break;
+		}
+		
+		currentOffset += length;
+	}
+	
+	if (startNode && endNode) {
+		const range = document.createRange();
+		range.setStart(startNode, startOffset);
+		range.setEnd(endNode, endOffset);
+		
+		const mark = document.createElement('mark');
+		range.surroundContents(mark);
+	}
+}
