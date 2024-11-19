@@ -8,6 +8,7 @@ let currentLanguage: string | null = null;
 export function getAvailableLanguages(): { code: string; name: string }[] {
 	return [
 		{ code: '', name: 'systemDefault' }, // This will be translated via data-i18n
+		{ code: 'ar', name: 'العربية' },
 		{ code: 'en', name: 'English' },
 		{ code: 'es', name: 'Español' },
 		{ code: 'fa', name: 'فارسی' },
