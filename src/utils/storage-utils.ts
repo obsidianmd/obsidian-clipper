@@ -41,7 +41,7 @@ export let generalSettings: Settings = {
 	silentOpen: false,
 	highlighterEnabled: true,
 	alwaysShowHighlights: false,
-	highlightBehavior: 'replace-content',
+	highlightBehavior: 'highlight-inline',
 	showMoreActionsButton: false,
 	openaiApiKey: '',
 	anthropicApiKey: '',
@@ -104,15 +104,15 @@ export async function loadSettings(): Promise<Settings> {
 		silentOpen: false,
 		highlighterEnabled: true,
 		alwaysShowHighlights: true,
-		highlightBehavior: 'replace-content',
+		highlightBehavior: 'highlight-inline',
 		openaiApiKey: '',
 		anthropicApiKey: '',
 		interpreterModel: 'gpt-4o-mini',
 		models: generalSettings.models,
-		interpreterEnabled: false,
-		interpreterAutoRun: false,
-		defaultPromptContext: generalSettings.defaultPromptContext,
-		propertyTypes: []
+			interpreterEnabled: false,
+			interpreterAutoRun: false,
+			defaultPromptContext: generalSettings.defaultPromptContext,
+			propertyTypes: []
 	};
 
 	const loadedSettings: Settings = {

@@ -5,8 +5,9 @@ import { Readability } from '@mozilla/readability';
 import browser from './browser-polyfill';
 import { debugLog } from './debug';
 import dayjs from 'dayjs';
-import { AnyHighlightData } from './highlighter';
+import { AnyHighlightData, TextHighlightData } from './highlighter';
 import { generalSettings } from './storage-utils';
+import { getElementByXPath } from './dom-utils';
 
 export function extractReadabilityContent(doc: Document): ReturnType<Readability['parse']> | null {
 	try {
@@ -148,9 +149,172 @@ export async function initializePageContent(content: string, selectedHtml: strin
 			console.warn('Failed to parse content with Readability, falling back to full content');
 		}
 
-		if (generalSettings.highlighterEnabled && generalSettings.highlightBehavior !== 'no-highlights' && highlights && highlights.length > 0) {
-			const highlightsContent = highlights.map(highlight => highlight.content).join('');
-			content = highlightsContent;
+		if (generalSettings.highlighterEnabled && highlights && highlights.length > 0) {
+			if (generalSettings.highlightBehavior === 'highlight-inline') {
+				console.log('Processing highlights in inline mode:', highlights.length, 'highlights');
+				// Get the readable content first
+				let processedContent = readabilityArticle?.content || content;
+				console.log('Initial content length:', processedContent.length);
+				
+				// Create a temporary container
+				const tempDiv = document.createElement('div');
+				tempDiv.innerHTML = processedContent;
+
+				// Filter for text highlights and sort by position
+				console.log('Raw highlights:', highlights.map(h => ({
+					type: h.type,
+					xpath: h.xpath,
+					hasStartOffset: 'startOffset' in h,
+					hasEndOffset: 'endOffset' in h
+				})));
+
+				const textHighlights = highlights
+					.filter((h): h is TextHighlightData => 
+						h.type === 'text' && 
+						(
+							// Either has a valid xpath
+							(typeof h.xpath === 'string' && h.xpath.trim() !== '') ||
+							// Or has content we can search for
+							(typeof h.content === 'string' && h.content.trim() !== '')
+						)
+					)
+					.sort((a, b) => {
+						// Only compare by xpath if both highlights have valid xpaths
+						if (a.xpath && b.xpath && a.xpath.trim() !== '' && b.xpath.trim() !== '') {
+							const elementA = getElementByXPath(a.xpath);
+							const elementB = getElementByXPath(b.xpath);
+							if (elementA === elementB) {
+								return b.startOffset - a.startOffset;
+							}
+						}
+						// Otherwise maintain original order
+						return 0;
+					});
+
+				console.log('Found text highlights:', textHighlights.length);
+
+				// Process each text highlight
+				for (const highlight of textHighlights) {
+					try {
+						console.log('Processing highlight:', {
+							xpath: highlight.xpath,
+							content: highlight.content,
+							startOffset: highlight.startOffset,
+							endOffset: highlight.endOffset
+						});
+
+						if (highlight.xpath) {
+							// Existing xpath-based logic...
+							const element = document.evaluate(
+								highlight.xpath,
+								tempDiv,
+								null,
+								XPathResult.FIRST_ORDERED_NODE_TYPE,
+								null
+							).singleNodeValue as Element;
+
+							if (element) {
+								console.log('Found element for xpath:', element.tagName);
+								const range = document.createRange();
+								const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+								
+								let currentOffset = 0;
+								let startNode = null;
+								let endNode = null;
+								let startOffset = 0;
+								let endOffset = 0;
+								
+								// Find the start and end nodes
+								let node;
+								while (node = walker.nextNode() as Text) {
+									const length = node.length;
+									
+									if (!startNode && currentOffset + length > highlight.startOffset) {
+										startNode = node;
+										startOffset = highlight.startOffset - currentOffset;
+										console.log('Found start node:', {
+											text: node.textContent,
+											offset: startOffset
+										});
+									}
+									
+									if (!endNode && currentOffset + length >= highlight.endOffset) {
+										endNode = node;
+										endOffset = highlight.endOffset - currentOffset;
+										console.log('Found end node:', {
+											text: node.textContent,
+											offset: endOffset
+										});
+										break;
+									}
+									
+									currentOffset += length;
+								}
+								
+								if (startNode && endNode) {
+									console.log('Creating mark element for text:', {
+										start: startNode.textContent?.slice(startOffset),
+										end: endNode.textContent?.slice(0, endOffset)
+									});
+									
+									range.setStart(startNode, startOffset);
+									range.setEnd(endNode, endOffset);
+									
+									const mark = document.createElement('mark');
+									range.surroundContents(mark);
+									console.log('Created mark element:', mark.outerHTML);
+								} else {
+									console.warn('Could not find start or end node');
+								}
+							} else {
+								console.warn('Could not find element for xpath:', highlight.xpath);
+							}
+						} else {
+							// New content-based search logic
+							console.log('Searching for content:', highlight.content);
+							
+							// Strip the div wrapper if it exists
+							const searchContent = highlight.content.replace(/<div>(.*?)<\/div>/, '$1');
+							
+							// Create a text walker for the entire tempDiv
+							const walker = document.createTreeWalker(tempDiv, NodeFilter.SHOW_TEXT);
+							
+							let node;
+							while (node = walker.nextNode() as Text) {
+								const text = node.textContent || '';
+								const index = text.indexOf(searchContent);
+								
+								if (index !== -1) {
+									console.log('Found matching text in node:', {
+										text: text,
+										index: index
+									});
+									
+									const range = document.createRange();
+									range.setStart(node, index);
+									range.setEnd(node, index + searchContent.length);
+									
+									const mark = document.createElement('mark');
+									range.surroundContents(mark);
+									console.log('Created mark element:', mark.outerHTML);
+									
+									break;
+								}
+							}
+						}
+					} catch (error) {
+						console.warn('Error processing highlight:', error);
+					}
+				}
+				
+				
+				content = tempDiv.innerHTML;
+				console.log('Final content length:', content.length);
+				console.log('Number of mark elements:', content.match(/<mark>/g)?.length || 0);
+			} else if (generalSettings.highlightBehavior === 'replace-content') {
+				const highlightsContent = highlights.map(highlight => highlight.content).join('');
+				content = highlightsContent;
+			}
 		} else if (selectedHtml) {
 			content = selectedHtml;
 		} else if (readabilityArticle && readabilityArticle.content) {
