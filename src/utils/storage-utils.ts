@@ -109,10 +109,10 @@ export async function loadSettings(): Promise<Settings> {
 		anthropicApiKey: '',
 		interpreterModel: 'gpt-4o-mini',
 		models: generalSettings.models,
-			interpreterEnabled: false,
-			interpreterAutoRun: false,
-			defaultPromptContext: generalSettings.defaultPromptContext,
-			propertyTypes: []
+		interpreterEnabled: false,
+		interpreterAutoRun: false,
+		defaultPromptContext: generalSettings.defaultPromptContext,
+		propertyTypes: []
 	};
 
 	const loadedSettings: Settings = {

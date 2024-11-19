@@ -213,7 +213,7 @@
 		"message": "درج خواص"
 	},
 	"importPropertiesDescription": {
-		"message": "برای وارد کردن خواص خود از ابسیدین فایل $strong_1_start$types.json$strong_1_end$ را در پوشه $strong_2_start$.obsidian$strong_2_end$ درون خزانه خود پیدا کنید. توجه داشته باشید که این پوشه به طور پیش فرض در اکثر سیستم عامل ها پنهان است.",
+		"message": "برای وارد کردن خواص خود از ابسیدین فایل $strong_1_start$types.json$strong_1_end$ را در پوشه $strong_2_start$.obsidian$strong_2_end$ درون خزانه خود پیدا کنید. توجه داش��ه باشید که این پوشه به طور پیش فرض در اکثر سیستم عامل ها پنهان است.",
 		"placeholders": {
 			"strong_1_end": {
 				"content": "</strong>"
@@ -479,6 +479,9 @@
 	},
 	"open": {
 		"message": "باز کردن"
+	},
+	"highlightInline": {
+		"message": "محتوای صفحه را برجسته کنید"
 	}
 }
 

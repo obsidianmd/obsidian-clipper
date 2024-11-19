@@ -476,5 +476,8 @@
 	},
 	"open": {
 		"message": "打开"
+	},
+	"highlightInline": {
+		"message": "高亮页面内容"
 	}
 } 

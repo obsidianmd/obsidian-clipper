@@ -18,7 +18,6 @@ interface ElementHighlightData extends HighlightData {
 	type: 'element';
 }
 
-// Add this helper function at the top level
 function canHighlightElement(element: Element): boolean {
 	// List of elements that can't be nested inside mark
 	const unsupportedElements = ['img', 'video', 'audio', 'iframe', 'canvas', 'svg', 'math', 'table'];
@@ -34,28 +33,10 @@ function canHighlightElement(element: Element): boolean {
 	return !hasUnsupportedElements && !isUnsupportedType;
 }
 
-// Add this helper function at the top level
-function normalizeHtml(html: string): string {
-	return html
-		.replace(/\s+/g, ' ') // Normalize whitespace
-		.replace(/>\s+</g, '><') // Remove whitespace between tags
-		.replace(/\s*\/>/g, '/>') // Normalize self-closing tags
-		.trim();
-}
-
-// Add this helper function at the top level
 function stripHtml(html: string): string {
 	const div = document.createElement('div');
 	div.innerHTML = html;
 	return div.textContent || '';
-}
-
-// Add this helper function at the top level
-function normalizeText(text: string): string {
-	return text
-		.replace(/\s+/g, ' ') // Normalize whitespace
-		.toLowerCase() // Case insensitive
-		.trim();
 }
 
 export function extractReadabilityContent(doc: Document): ReturnType<Readability['parse']> | null {
