@@ -1,11 +1,59 @@
 import browser from './browser-polyfill';
-import { getCurrentLanguage, matchBrowserLanguage, getEffectiveLanguage } from './language-settings';
+import { getLocalStorage, setLocalStorage } from './storage-utils';
 import DOMPurify from 'dompurify';
 
 let currentLanguage: string | null = null;
 
+// Return raw values, translation will be handled by the i18n system
+export function getAvailableLanguages(): { code: string; name: string }[] {
+	return [
+		{ code: '', name: 'systemDefault' }, // This will be translated via data-i18n
+		{ code: 'en', name: 'English' },
+		{ code: 'es', name: 'Español' },
+		{ code: 'fa', name: 'فارسی' },
+		{ code: 'fr', name: 'Français' },
+		{ code: 'ja', name: '日本語' },
+		{ code: 'ru', name: 'Русский' },
+		{ code: 'zh-CN', name: '简体中文' }
+	];
+}
+
+export async function getCurrentLanguage(): Promise<string> {
+	const savedLanguage = await getLocalStorage('language');
+	if (savedLanguage && savedLanguage !== '') {
+		return savedLanguage;
+	}
+	return ''; // Return empty string for system default
+}
+
+export async function setLanguage(language: string): Promise<void> {
+	await setLocalStorage('language', language);
+	// Reload all extension pages to apply the new language
+	const extensionPages = await browser.extension.getViews();
+	extensionPages.forEach(page => {
+		page.location.reload();
+	});
+}
+
+// Helper function to match browser language to available languages
+export function matchBrowserLanguage(): string {
+	const browserLang = browser.i18n.getUILanguage().toLowerCase().split('-')[0]; // Get base language code
+	const availableLangs = getAvailableLanguages()
+		.map(lang => lang.code)
+		.filter(code => code !== ''); // Exclude system default option
+
+	// If browser language matches an available language, use it
+	if (availableLangs.includes(browserLang)) {
+		return browserLang;
+	}
+
+	// Otherwise default to English
+	return 'en';
+}
+
 export async function initializeI18n() {
-	currentLanguage = await getEffectiveLanguage();
+	const { code } = await getEffectiveLanguage();
+	currentLanguage = code;
 }
 
 export function getMessage(messageName: string, substitutions?: string | string[]): string {
@@ -68,4 +116,54 @@ export async function translatePage() {
 			element.setAttribute('title', getMessage(key));
 		}
 	});
-} 
+}
+
+// Helper function to get the effective language
+export async function getEffectiveLanguage(): Promise<{ code: string; isRTL: boolean }> {
+	const currentLang = await getCurrentLanguage();
+	const languageCode = currentLang && currentLang !== '' ? currentLang : matchBrowserLanguage();
+	return {
+		code: languageCode,
+		isRTL: isRTLLanguage(languageCode)
+	};
+}
+
+export function isRTLLanguage(languageCode: string): boolean {
+	// List of RTL language codes
+	const rtlLanguages = [
+		'ar',  // Arabic
+		'arc', // Aramaic
+		'ckb', // Central Kurdish (Sorani)
+		'dv',  // Divehi/Maldivian
+		'fa',  // Persian/Farsi
+		'ha',  // Hausa (when written in Arabic script)
+		'he',  // Hebrew
+		'khw', // Khowar
+		'ks',  // Kashmiri
+		'ku',  // Kurdish (in Arabic script)
+		'ps',  // Pashto
+		'sd',  // Sindhi
+		'syr', // Syriac
+		'ur',  // Urdu
+		'uz-AF', // Uzbek (in Afghanistan)
+		'yi'   // Yiddish
+	];
+	return rtlLanguages.includes(languageCode.toLowerCase().split('-')[0]);
+}
+
+// Helper function to set up language and RTL support
+export async function setupLanguageAndDirection(): Promise<void> {
+	const { code: languageCode, isRTL } = await getEffectiveLanguage();
+
+	// Set HTML lang attribute
+	document.documentElement.setAttribute('lang', languageCode);
+
+	// Set RTL support
+	if (isRTL) {
+		document.body.classList.add('mod-rtl');
+		document.body.setAttribute('dir', 'rtl');
+	} else {
+		document.body.classList.remove('mod-rtl');
+		document.body.removeAttribute('dir');
+	}
+}

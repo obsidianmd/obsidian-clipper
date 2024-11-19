@@ -10,8 +10,7 @@ import { updateTemplateList, showTemplateEditor } from '../managers/template-ui'
 import { exportAllSettings, importAllSettings } from '../utils/import-export';
 import { Template } from '../types/types';
 import { exportHighlights } from './highlights-manager';
-import { getMessage } from '../utils/i18n';
-import { getEffectiveLanguage } from '../utils/language-settings';
+import { getMessage, setupLanguageAndDirection } from '../utils/i18n';
 
 export function updateVaultList(): void {
 	const vaultList = document.getElementById('vault-list') as HTMLUListElement;
@@ -94,14 +93,7 @@ export async function setShortcutInstructions() {
 
 export function initializeGeneralSettings(): void {
 	loadSettings().then(async () => {
-		const { isRTL } = await getEffectiveLanguage();
-		if (isRTL) {
-			document.body.classList.add('mod-rtl');
-			document.body.setAttribute('dir', 'rtl');
-		} else {
-			document.body.classList.remove('mod-rtl');
-			document.body.removeAttribute('dir');
-		}
+		await setupLanguageAndDirection();
 
 		updateVaultList();
 		initializeShowMoreActionsToggle();
