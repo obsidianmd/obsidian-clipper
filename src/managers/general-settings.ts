@@ -11,6 +11,7 @@ import { exportAllSettings, importAllSettings } from '../utils/import-export';
 import { Template } from '../types/types';
 import { exportHighlights } from './highlights-manager';
 import { getMessage, setupLanguageAndDirection } from '../utils/i18n';
+import { importHighlights } from './highlights-manager';
 
 export function updateVaultList(): void {
 	const vaultList = document.getElementById('vault-list') as HTMLUListElement;
@@ -304,5 +305,10 @@ function initializeHighlighterSettings(): void {
 		highlightBehaviorSelect.addEventListener('change', () => {
 			saveSettings({ highlightBehavior: highlightBehaviorSelect.value });
 		});
+	}
+
+	const importHighlightsBtn = document.getElementById('import-highlights');
+	if (importHighlightsBtn) {
+		importHighlightsBtn.addEventListener('click', importHighlights);
 	}
 }

@@ -218,6 +218,12 @@
 	"importAllSettingsDescription": {
 		"message": "Import all settings including templates and properties. This will replace your current configuration."
 	},
+	"importHighlights": {
+		"message": "Import highlights"
+	},
+	"importHighlightsDescription": {
+		"message": "Import your highlights from a file."
+	},
 	"importProperties": {
 		"message": "Import properties"
 	},

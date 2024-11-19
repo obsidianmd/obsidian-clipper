@@ -1,7 +1,22 @@
 import browser from '../utils/browser-polyfill';
 import { detectBrowser } from '../utils/browser-detection';
-import { AnyHighlightData } from '../utils/highlighter';
+import { AnyHighlightData, StoredData } from '../utils/highlighter';
 import dayjs from 'dayjs';
+import { showImportModal } from '../utils/import-modal';
+
+interface ExportedHighlight {
+	text: string;
+	timestamp: string;
+}
+
+interface ExportedData {
+	url: string;
+	highlights: ExportedHighlight[];
+}
+
+interface HighlightsStorage {
+	[url: string]: StoredData;
+}
 
 export async function exportHighlights(): Promise<void> {
 	try {
@@ -53,4 +68,81 @@ export async function exportHighlights(): Promise<void> {
 		console.error('Error exporting highlights:', error);
 		alert('Failed to export highlights. Please check the console for more details.');
 	}
+}
+
+export function importHighlights(): void {
+	showImportModal(
+		'import-modal',
+		importHighlightsFromJson,
+		'.json',
+		'Choose highlights file or drag and drop',
+		'Paste highlights JSON here',
+		false,
+		'Import highlights'
+	);
+}
+
+async function importHighlightsFromJson(jsonContent: string): Promise<void> {
+	try {
+		const importedData = JSON.parse(jsonContent) as ExportedData[];
+		
+		// Validate the imported data structure
+		if (!Array.isArray(importedData) || !importedData.every(isValidHighlightData)) {
+			throw new Error('Invalid highlights file format');
+		}
+
+		// Get current highlights
+		const result = await browser.storage.local.get('highlights');
+		// Initialize with an empty object that has the correct index signature
+		const currentHighlights = (result.highlights || {}) as HighlightsStorage;
+
+		// Merge imported highlights with existing ones
+		importedData.forEach(({ url, highlights }) => {
+			if (!currentHighlights[url]) {
+				currentHighlights[url] = { highlights: [], url };
+			}
+
+			// Convert imported highlights to the correct format
+			const formattedHighlights = highlights.map(h => ({
+				id: new Date(h.timestamp).getTime().toString(),
+				content: h.text,
+				color: 'yellow', // Default color
+				position: {}, // Position will be recalculated when page is visited
+				type: 'text' as const,
+				xpath: '', // Will be recalculated when page is visited
+				startOffset: 0,
+				endOffset: h.text.length
+			}));
+
+			// Merge while avoiding duplicates based on content
+			const existingContents = new Set(currentHighlights[url].highlights.map((h: AnyHighlightData) => h.content));
+			formattedHighlights.forEach(highlight => {
+				if (!existingContents.has(highlight.content)) {
+					currentHighlights[url].highlights.push(highlight);
+					existingContents.add(highlight.content);
+				}
+			});
+		});
+
+		// Save merged highlights
+		await browser.storage.local.set({ highlights: currentHighlights });
+		alert('Highlights imported successfully');
+	} catch (error) {
+		console.error('Error importing highlights:', error);
+		throw new Error('Error importing highlights. Please check the file and try again.');
+	}
+}
+
+function isValidHighlightData(data: unknown): data is ExportedData {
+	return (
+		!!data &&
+		typeof (data as ExportedData).url === 'string' &&
+		Array.isArray((data as ExportedData).highlights) &&
+		(data as ExportedData).highlights.every((h: unknown) => 
+			!!h &&
+			typeof (h as ExportedHighlight).text === 'string' &&
+			typeof (h as ExportedHighlight).timestamp === 'string' &&
+			!isNaN(Date.parse((h as ExportedHighlight).timestamp))
+		)
+	);
 }
