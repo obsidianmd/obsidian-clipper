@@ -233,7 +233,7 @@
 		"message": "インタープリターコンテキスト"
 	},
 	"interpreterContextDescription": {
-		"message": "プロンプト変数の解釈に使用されるコンテキストです。$link_start$インタープリター設定$link_end$��定義されたデフォルトコンテキストを上書きします。ここで変数を使用できます。",
+		"message": "プロンプト変数の解釈に使用されるコンテキストです。$link_start$インタープリター設定$link_end$で定義されたデフォルトコンテキストを上書きします。ここで変数を使用できます。",
 		"placeholders": {
 			"link_end": {
 				"content": "</a>"
@@ -435,7 +435,7 @@
 		"message": "テンプレートトリガー"
 	},
 	"templateTriggersDescription": {
-		"message": "URLパターンやschema.orgデータに一致する場合に、このテンプレートを自動的に択するルー��を定義します。1行に1つのルールを述してください。"
+		"message": "URLパターンやschema.orgデータに一致する場合に、このテンプレートを自動的に択するルールを定義します。1行に1つのルールを述してください。"
 	},
 	"templatesHeading": {
 		"message": "テンプレート"
