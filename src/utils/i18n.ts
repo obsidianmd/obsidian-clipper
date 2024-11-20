@@ -14,6 +14,7 @@ export function getAvailableLanguages(): { code: string; name: string }[] {
 		{ code: 'es', name: 'Español' },
 		{ code: 'fa', name: 'فارسی' },
 		{ code: 'fr', name: 'Français' },
+		{ code: 'id', name: 'Bahasa Indonesia' },
 		{ code: 'ja', name: '日本語' },
 		{ code: 'ru', name: 'Русский' },
 		{ code: 'zh-CN', name: '简体中文' }
