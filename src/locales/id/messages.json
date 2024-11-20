@@ -6,10 +6,10 @@
 		"message": "Tambah ke Obsidian"
 	},
 	"addVaultPlaceholder": {
-		"message": "Tekan enter untuk menambah vault"
+		"message": "Tekan enter untuk menambahkan vault"
 	},
 	"advanced": {
-		"message": "Lanjutan"
+		"message": "Opsi Lanjutan"
 	},
 	"allProperties": {
 		"message": "Semua properti"
@@ -18,25 +18,25 @@
 		"message": "Selalu tampilkan sorotan"
 	},
 	"alwaysShowHighlightsDescription": {
-		"message": "Tampilkan sorotan yang tersimpan saat memuat halaman. Matikan untuk hanya menampilkan sorotan saat mode penyorot diaktifkan."
+		"message": "Tampilkan sorotan yang tersimpan saat memuat halaman. Matikan untuk hanya menampilkan sorotan saat mode sorotan diaktifkan."
 	},
 	"appendToDaily": {
-		"message": "Tambah ke catatan harian, di bagian bawah"
+		"message": "Tambah ke catatan harian, di bagian akhir"
 	},
 	"appendToExisting": {
-		"message": "Tambah ke catatan yang ada, di bagian bawah"
+		"message": "Tambah ke catatan yang telah ada, di bagian akhir"
 	},
 	"behavior": {
 		"message": "Perilaku"
 	},
 	"behaviorWarning": {
-		"message": "Menambahkan ke catatan yang ada atau catatan harian memerlukan Obsidian 1.7.2 atau yang lebih baru."
+		"message": "Perlu Obsidian 1.7.2 atau yang lebih baru untuk dapat menambahkan ke catatan yang telah ada atau catatan harian."
 	},
 	"clipBehavior": {
 		"message": "Perilaku klip"
 	},
 	"clipBehaviorDescription": {
-		"message": "Pilih bagaimana konten yang disorot disimpan ke Obsidian. Mendefinisikan variabel $strong_start${{content}}$strong_end$.",
+		"message": "Pilih bagaimana penyimpanan konten yang telah disorot ke dalam Obsidian. Mendefinisikan variabel $strong_start${{content}}$strong_end$.",
 		"placeholders": {
 			"strong_end": {
 				"content": "</strong>"
@@ -56,7 +56,7 @@
 		"message": "Klip cepat"
 	},
 	"commandToggleHighlighter": {
-		"message": "Aktifkan/nonaktifkan mode penyorot"
+		"message": "Aktifkan/nonaktifkan mode sorotan"
 	},
 	"confirmDeleteTemplate": {
 		"message": "Apakah Anda yakin ingin menghapus template \"$1\"?"
@@ -83,7 +83,7 @@
 		"message": "Hapus"
 	},
 	"disableHighlighter": {
-		"message": "Nonaktifkan penyorot"
+		"message": "Nonaktifkan sorotan"
 	},
 	"display": {
 		"message": "Tampilan"
@@ -103,16 +103,16 @@
 		}
 	},
 	"earlyAccessFeatures": {
-		"message": "Fitur akses awal"
+		"message": "Fitur early access"
 	},
 	"editTemplate": {
-		"message": "Edit template"
+		"message": "Ubah template"
 	},
 	"enableHighlighter": {
-		"message": "Aktifkan penyorot"
+		"message": "Aktifkan sorotan"
 	},
 	"enableHighlighterDescription": {
-		"message": "Sorot konten di halaman web yang dapat Anda simpan ke Obsidian."
+		"message": "Sorot konten di halaman web yang dapat disimpan ke Obsidian."
 	},
 	"error": {
 		"message": "Error"
@@ -130,13 +130,13 @@
 		"message": "Ekspor sorotan"
 	},
 	"exportHighlightsDescription": {
-		"message": "Ekspor sorotan Anda ke file."
+		"message": "Ekspor sorotan yang dimiliki ke dalam file."
 	},
 	"exportProperties": {
 		"message": "Ekspor properti"
 	},
 	"exportPropertiesDescription": {
-		"message": "Simpan properti Web Clipper ke file $strong_start$types.json$strong_end$ yang dapat diimpor ke vault Obsidian Anda, atau ke Web Clipper di perangkat lain.",
+		"message": "Simpan properti Web Clipper ke file $strong_start$types.json$strong_end$ yang dapat diimpor ke dalam vault Obsidian, atau ke Web Clipper di perangkat lain.",
 		"placeholders": {
 			"strong_end": {
 				"content": "</strong>"
@@ -147,7 +147,7 @@
 		}
 	},
 	"extensionDescription": {
-		"message": "Simpan konten dari web dalam format pribadi dan tahan lama yang dapat Anda akses secara offline. Ekstensi browser resmi untuk Obsidian."
+		"message": "Simpan konten dari web dalam format yang bersifat privat dan tahan lama dan dapat diakses secara offline. Ekstensi browser resmi untuk Obsidian."
 	},
 	"extensionName": {
 		"message": "Obsidian Web Clipper"
