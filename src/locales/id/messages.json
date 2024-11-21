@@ -168,7 +168,7 @@
 		"message": "Tidak dapat menginisialisasi konten laman web."
 	},
 	"failedToProcessInterpreter": {
-		"message": "Pemrosesan interpreter gagal. Silakan coba lagi."
+		"message": "Tidak dapat memuat proses interpreter. Silakan coba lagi."
 	},
 	"failedToResetTemplate": {
 		"message": "Gagal mengatur ulang template default. Silakan coba lagi."
@@ -360,13 +360,13 @@
 		"message": "Hapus properti yang tidak digunakan"
 	},
 	"removeUnusedPropertiesDescription": {
-		"message": "Hapus semua properti yang tidak digunakan dalam template apa pun."
+		"message": "Hapus semua properti yang tidak digunakan dalam template apapun."
 	},
 	"removeVault": {
 		"message": "Hapus vault"
 	},
 	"replaceContent": {
-		"message": "Ganti konten halaman"
+		"message": "Ganti konten laman web"
 	},
 	"reset": {
 		"message": "Atur ulang"
@@ -375,7 +375,7 @@
 		"message": "Atur ulang template default"
 	},
 	"resetDefaultTemplateDescription": {
-		"message": "Hapus perubahan apa pun yang Anda buat pada template default."
+		"message": "Hapus semua perubahan yang telah dibuat pada template default."
 	},
 	"saveFile": {
 		"message": "Simpan file..."
@@ -420,10 +420,10 @@
 		"message": "Tampilkan tombol aksi"
 	},
 	"showActionsDescription": {
-		"message": "Memungkinkan Anda memeriksa variabel halaman dari menu clipper. Berguna untuk melihat variabel yang dapat digunakan di dalam template."
+		"message": "Memungkinkan Anda memeriksa variabel laman web dari menu clipper. Berguna untuk melihat variabel yang dapat digunakan di dalam template."
 	},
 	"showPageVariables": {
-		"message": "Tampilkan variabel halaman"
+		"message": "Tampilkan variabel laman web"
 	},
 	"silentOpen": {
 		"message": "Simpan catatan yang diklip tanpa membuka catatan"
