@@ -1,0 +1,486 @@
+{
+	"addProperty": {
+		"message": "+ Adicionar propriedade"
+	},
+	"addToObsidian": {
+		"message": "Adicionar ao Obsidian"
+	},
+	"addVaultPlaceholder": {
+		"message": "Pressione Enter para adicionar um cofre"
+	},
+	"advanced": {
+		"message": "Avançado"
+	},
+	"allProperties": {
+		"message": "Todas as propriedades"
+	},
+	"alwaysShowHighlights": {
+		"message": "Sempre mostrar marcações"
+	},
+	"alwaysShowHighlightsDescription": {
+		"message": "Exiba suas marcações salvos ao carregar a página. Desative para exibir as marcações somente quando o modo marcador estiver ativado."
+	},
+	"appendToDaily": {
+		"message": "Adicionar à nota diária, no final"
+	},
+	"appendToExisting": {
+		"message": "Adicionar a uma nota existente, no final"
+	},
+	"behavior": {
+		"message": "Comportamento"
+	},
+	"behaviorWarning": {
+		"message": "Adicionar a uma nota existente ou nota diária requer a versão 1.7.2 ou posterior do Obsidian."
+	},
+	"clipBehavior": {
+		"message": "Comportamento da captura"
+	},
+	"clipBehaviorDescription": {
+		"message": "Escolha como o conteúdo destacado será salvo no Obsidian. Define a variável $strong_start${{content}}$strong_end$.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"close": {
+		"message": "Fechar"
+	},
+	"commandOpenClipper": {
+		"message": "Abrir Obsidian Clipper"
+	},
+	"commandQuickClip": {
+		"message": "Captura rápida"
+	},
+	"commandToggleHighlighter": {
+		"message": "Alternar modo marcador"
+	},
+	"confirmDeleteTemplate": {
+		"message": "Tem certeza que deseja deletar o modelo \"$1\"?"
+	},
+	"copied": {
+		"message": "Copiado!"
+	},
+	"copyAsJson": {
+		"message": "Copiar como JSON"
+	},
+	"copyToClipboard": {
+		"message": "Copiar para a área de transferência"
+	},
+	"createNewNote": {
+		"message": "Criar nova nota"
+	},
+	"dailyNoteFormat": {
+		"message": "Formato da nota diária (ex: YYYY-MM-DD)"
+	},
+	"defaultTemplateName": {
+		"message": "Padrão"
+	},
+	"delete": {
+		"message": "Deletar"
+	},
+	"disableHighlighter": {
+		"message": "Desativar marcador"
+	},
+	"display": {
+		"message": "Exibir"
+	},
+	"duplicate": {
+		"message": "Duplicar"
+	},
+	"earlyAccessDescription": {
+		"message": "Use recursos que exigem a $link_start$versão de acesso antecipado$link_end$ mais recente do Obsidian. Atualmente, requer a versão 1.7.2 ou posterior.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/Obsidian/Early+access+versions\" target=\"_blank\">"
+			}
+		}
+	},
+	"earlyAccessFeatures": {
+		"message": "Recursos de acesso antecipado"
+	},
+	"editTemplate": {
+		"message": "Editar modelo"
+	},
+	"enableHighlighter": {
+		"message": "Ativar marcador"
+	},
+	"enableHighlighterDescription": {
+		"message": "Demarque o conteúdo de páginas da internet para que possa salvar no Obsidian."
+	},
+	"error": {
+		"message": "Error"
+	},
+	"export": {
+		"message": "Exportar"
+	},
+	"exportAllSettings": {
+		"message": "Exportar todas as configurações"
+	},
+	"exportAllSettingsDescription": {
+		"message": "Exporta todas as configurações, incluindo modelos e propriedades."
+	},
+	"exportHighlights": {
+		"message": "Exportar marcações"
+	},
+	"exportHighlightsDescription": {
+		"message": "Exporta as marcações para um arquivo."
+	},
+	"exportProperties": {
+		"message": "Exportar propriedades"
+	},
+	"exportPropertiesDescription": {
+		"message": "Salve as propriedades do Web Clipper em um arquivo $strong_start$types.json$strong_end$ que pode ser importado para o cofre do Obsidian, ou para o Web Clipper em outros dispositivos.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"extensionDescription": {
+		"message": "Salve o conteúdo da internet em um formato privado e durável, que pode ser acessado off-line. A extensão de navegador oficial do Obsidian."
+	},
+	"extensionName": {
+		"message": "Obsidian Web Clipper"
+	},
+	"failedToCopyText": {
+		"message": "Falha ao copiar o texto"
+	},
+	"failedToDeleteTemplate": {
+		"message": "Falha ao deletar modelo. Por favor, tente novamente."
+	},
+	"failedToExtractContent": {
+		"message": "Não foi possível extrair o conteúdo da página."
+	},
+	"failedToInitialize": {
+		"message": "Por favor, tente recarregar a extensão."
+	},
+	"failedToInitializeContent": {
+		"message": "Não foi possível inicializar o conteúdo da página."
+	},
+	"failedToProcessInterpreter": {
+		"message": "Falha no processamento do intérprete. Por favor, tente novamente."
+	},
+	"failedToResetTemplate": {
+		"message": "Falha ao redefinir o modelo padrão. Por favor, tente novamente."
+	},
+	"failedToSave": {
+		"message": "Falha ao salvar o arquivo"
+	},
+	"failedToSaveFile": {
+		"message": "Falha ao salvar o arquivo"
+	},
+	"folder": {
+		"message": "Pasta"
+	},
+	"general": {
+		"message": "Geral"
+	},
+	"generalSettings": {
+		"message": "Configurações gerais"
+	},
+	"help": {
+		"message": "Ajuda"
+	},
+	"helpDescription": {
+		"message": "Aprenda a usar o Web Clipper e obtenha ajuda para solucionar problemas."
+	},
+	"highlightInline": {
+		"message": "Realçar o conteúdo da página"
+	},
+	"highlightPage": {
+		"message": "Marcar pagina"
+	},
+	"highlighter": {
+		"message": "Marcador"
+	},
+	"highlighterSettings": {
+		"message": "Marcador"
+	},
+	"hotkeys": {
+		"message": "Teclas de atalho"
+	},
+	"import": {
+		"message": "Importar"
+	},
+	"importAllSettings": {
+		"message": "Importar configurações"
+	},
+	"importAllSettingsDescription": {
+		"message": "Importe todas as configurações, incluindo modelos e propriedades. Isso substituirá a configuração atual."
+	},
+	"importProperties": {
+		"message": "Importar propriedades"
+	},
+	"importPropertiesDescription": {
+		"message": "Para importar suas propriedades do Obsidian, localize o arquivo $strong_1_start$types.json$strong_1_end$ no pasta $strong_2_start$.obsidian$strong_2_end$ dentro do seu Cofre. Observe que essa pasta é ocultada por padrão na maioria dos sistemas operacionais.",
+		"placeholders": {
+			"strong_1_end": {
+				"content": "</strong>"
+			},
+			"strong_1_start": {
+				"content": "<strong>"
+			},
+			"strong_2_end": {
+				"content": "</strong>"
+			},
+			"strong_2_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"interpreter": {
+		"message": "Intérprete"
+	},
+	"interpreterContext": {
+		"message": "Contexto do intérprete"
+	},
+	"interpreterContextDescription": {
+		"message": "The context used to interpret prompt variables. Overrides the default context defined in $link_start$Interpreter settings$link_end$. Variables can be used here.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=interpreter\">"
+			}
+		}
+	},
+	"language": {
+		"message": "Idioma"
+	},
+	"languageDescription": {
+		"message": "Escolha o idioma de exibição para a interface da extensão."
+	},
+	"lastUsed": {
+		"message": "Usado pela última vez"
+	},
+	"legacyMode": {
+		"message": "Modo legado"
+	},
+	"legacyModeDescription": {
+		"message": "Utiliza o método de captura por URI compatível com o Obsidian 1.6.7 ou versões anteriores. Observe que o tamanho do conteúdo que pode ser capturado é limitado pelo seu navegador e pelo sistema operacional. Algumas páginas podem falhar sem exibir erros."
+	},
+	"more": {
+		"message": "Mais"
+	},
+	"newTemplate": {
+		"message": "Novo modelo"
+	},
+	"noHighlights": {
+		"message": "Não fazer nada"
+	},
+	"noTemplates": {
+		"message": "Nenhum modelo disponível. Por favor, adicione um modelo nas configurações."
+	},
+	"noteContent": {
+		"message": "Conteúdo da nota"
+	},
+	"noteContentDescription": {
+		"message": "Personalize o conteúdo da nota. Use variáveis para preencher os dados da página automaticamente."
+	},
+	"noteLocation": {
+		"message": "Localização da nota"
+	},
+	"noteLocationDescription": {
+		"message": "O caminho ou a pasta da nota."
+	},
+	"noteName": {
+		"message": "Nome da nota"
+	},
+	"noteNameFormat": {
+		"message": "Nome da nota"
+	},
+	"noteNameFormatDescription": {
+		"message": "Formato para o nome do arquivo da nota. Você pode usar variáveis como {{title}}, {{date}} e {{published}} para preencher automaticamente os dados da página. $link_start$Saiba mais$link_end$.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/variables\" target=\"_blank\">"
+			}
+		}
+	},
+	"notesAboutPage": {
+		"message": "Notas sobre esta página..."
+	},
+	"onlyHttpSupported": {
+		"message": "Esta página não pode ser capturada. Somente URLs HTTP e HTTPS são suportados."
+	},
+	"open": {
+		"message": "Abrir"
+	},
+	"pageCannotBeClipped": {
+		"message": "Esta página não pode ser capturada."
+	},
+	"pageVariables": {
+		"message": "Variáveis da página"
+	},
+	"pleaseReload": {
+		"message": "Por favor, tente recarregar a página."
+	},
+	"prependToDaily": {
+		"message": "Adicionar à nota diária, no início"
+	},
+	"prependToExisting": {
+		"message": "Adicionar a uma nota existente, no início"
+	},
+	"properties": {
+		"message": "Propriedades"
+	},
+	"propertiesSettings": {
+		"message": "Propriedades"
+	},
+	"propertyName": {
+		"message": "nome da propriedade"
+	},
+	"propertyValue": {
+		"message": "valor da propriedade"
+	},
+	"refresh": {
+		"message": "Atualizar"
+	},
+	"remove": {
+		"message": "Remover"
+	},
+	"removeProperty": {
+		"message": "Remover propriedade"
+	},
+	"removeUnusedProperties": {
+		"message": "Remover propriedades não usadas"
+	},
+	"removeUnusedPropertiesDescription": {
+		"message": "Remove todas as propriedades que não são utilizadas em nenhum modelo."
+	},
+	"removeVault": {
+		"message": "Remover cofre"
+	},
+	"replaceContent": {
+		"message": "Substituir o conteúdo da página"
+	},
+	"reset": {
+		"message": "Redefinir"
+	},
+	"resetDefaultTemplate": {
+		"message": "Redefinir o modelo padrão"
+	},
+	"resetDefaultTemplateDescription": {
+		"message": "Remove quaisquer alterações que você tenha feito no modelo padrão."
+	},
+	"saveFile": {
+		"message": "Salvar arquivo..."
+	},
+	"searchVariables": {
+		"message": "Procurar variáveis..."
+	},
+	"settings": {
+		"message": "Configurações"
+	},
+	"settingsHeading": {
+		"message": "Configurações"
+	},
+	"share": {
+		"message": "Compartilhar..."
+	},
+	"shortcutInstructionsBrave": {
+		"message": "Para alterar as atribuições de teclas, acesse $1"
+	},
+	"shortcutInstructionsChrome": {
+		"message": "Para alterar as atribuições de teclas, acesse $1"
+	},
+	"shortcutInstructionsDefault": {
+		"message": "Para alterar as atribuições de teclas, acesse as configurações da extensão no seu navegador."
+	},
+	"shortcutInstructionsEdge": {
+		"message": "Para alterar as atribuições de teclas, acesse $1"
+	},
+	"shortcutInstructionsFirefox": {
+		"message": "Para alterar as atribuições de teclas, acesse $1, clique no ícone de engrenagem e selecione \"Gerenciar atalhos de extensões\"."
+	},
+	"shortcutInstructionsIntro": {
+		"message": "Atalhos de teclado lhe dão rápido acesso aos recursos do Web Clipper."
+	},
+	"shortcutInstructionsSafari": {
+		"message": "Atalhos de teclado não são customizáveis no Safari."
+	},
+	"shortcutNotSet": {
+		"message": "Não definido"
+	},
+	"showActionsButton": {
+		"message": "Mostrar botões de ações"
+	},
+	"showActionsDescription": {
+		"message": "Permite inspecionar as variáveis da página a partir do menu de captura. Útil para visualizar as variáveis que estão disponíveis para uso em modelos."
+	},
+	"showPageVariables": {
+		"message": "Exibir variáveis"
+	},
+	"silentOpen": {
+		"message": "Salvar captura sem abrir a nota"
+	},
+	"silentOpenDescription": {
+		"message": "As notas capturadas serão salvas, mas não serão abertas em uma nova guia. O Obsidian ainda será trazido para o primeiro plano."
+	},
+	"specificNoteName": {
+		"message": "Nome da nota específica"
+	},
+	"systemDefault": {
+		"message": "Sistema"
+	},
+	"templateName": {
+		"message": "Nome do modelo"
+	},
+	"templateProperties": {
+		"message": "Propriedades"
+	},
+	"templatePropertiesDescription": {
+		"message": "Propriedades a serem adicionadas ao topo da nota capturada. Use variáveis para preencher automaticamente os dados da página."
+	},
+	"templateTriggers": {
+		"message": "Acionadores do modelo"
+	},
+	"templateTriggersDescription": {
+		"message": "Defina regras para automaticamente selecionar este modelo se ele corresponder a um padrão de URL ou contiver dados do schema.org. Uma regra por linha."
+	},
+	"templatesHeading": {
+		"message": "Modelos"
+	},
+	"vault": {
+		"message": "Cofre"
+	},
+	"vaultDescription": {
+		"message": "Selecione o cofre padrão para este modelo. Acesse $link_start$Configurações gerais$link_end$ para adicionar ou remover cofres.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=general\">"
+			}
+		}
+	},
+	"vaults": {
+		"message": "Cofres"
+	},
+	"vaultsDescription": {
+		"message": "Por padrão, as notas capturadas são salvas no cofre aberto no momento. Você pode adicionar cofres aqui se quiser ter a opção de salvar em cofres diferentes. Os nomes dos cofres devem corresponder exatamente ao nome do cofre do Obsidian. Pressione $strong_start$Enter$strong_end$ para adicionar um cofre.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	}
+}
