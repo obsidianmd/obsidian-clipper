@@ -195,8 +195,14 @@
 		"message": "Activer l'interpréteur"
 	},
 	"enableInterpreterDescription": {
-		"message": "Utilisez le langage naturel pour extraire des données des pages. Par exemple, vous pouvez utiliser la syntaxe $strong_start${{prompt:\"un résumé de la page\"}}$strong_end$. Nécessite une clé API ou un modèle personnalisé configuré ci-dessous.",
+		"message": "Utilisez le langage naturel pour extraire des données des pages. Par exemple, vous pouvez utiliser la syntaxe $strong_start${{prompt:\"un résumé de la page\"}}$strong_end$. Nécessite une clé API ou un modèle personnalisé configuré ci-dessous. $link_start$En savoir plus$link_end$.",
 		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/interpreter\" target=\"_blank\">"
+			},
 			"strong_end": {
 				"content": "</strong>"
 			},

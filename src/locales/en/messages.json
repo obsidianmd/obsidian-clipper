@@ -183,8 +183,14 @@
 		"message": "Enable interpreter"
 	},
 	"enableInterpreterDescription": {
-		"message": "Use natural language to extract data from pages. For example, you can use the template syntax $strong_start${{prompt:\"a summary of the page\"}}$strong_end$. Requires an API key or custom model configured below.",
+		"message": "Use natural language to extract data from pages. For example, you can use the template syntax $strong_start${{prompt:\"a summary of the page\"}}$strong_end$. Requires an API key or custom model configured below.  $link_start$Learn more$link_end$.",
 		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/interpreter\" target=\"_blank\">"
+			},
 			"strong_end": {
 				"content": "</strong>"
 			},
