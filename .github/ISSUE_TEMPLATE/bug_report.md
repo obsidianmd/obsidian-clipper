@@ -4,6 +4,27 @@ about: Create a report to help us improve. Please review Troubleshooting steps b
 title: 'BUG: '
 labels: 'bug'
 assignees: ''
+body:
+- type: checkboxes
+  attributes:
+    label: Troubleshooting
+    description: Please review [Troubleshooting instructions](https://help.obsidian.md/web-clipper/troubleshoot) before opening an issue.
+    options:
+      - label: I have reviewed the troubleshooting instructions
+        required: true
+- type: input
+  attributes:
+    label: Operating System
+    description: What operating system are you using?
+    value: operating system
+  validations:
+    required: true
+- type: input
+  attributes:
+    label: Browser
+  validations:
+    required: true
+
 ---
 
 **Version (please complete the following information):**
