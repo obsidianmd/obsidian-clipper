@@ -144,6 +144,9 @@
 	"display": {
 		"message": "Display"
 	},
+	"done": {
+		"message": "Done"
+	},
 	"dragAndDropFile": {
 		"message": "Drag and drop file here"
 	},

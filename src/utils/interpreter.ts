@@ -5,6 +5,7 @@ import { applyFilters } from './filters';
 import { formatDuration } from './string-utils';
 import { adjustNoteNameHeight } from './ui-utils';
 import { debugLog } from './debug';
+import { getMessage } from './i18n';
 
 const RATE_LIMIT_RESET_TIME = 60000; // 1 minute in milliseconds
 let lastRequestTime = 0;
@@ -338,7 +339,7 @@ export async function handleInterpreterUI(
 		let timerInterval: number;
 
 		// Change button text and add class
-		interpretBtn.textContent = 'thinking';
+		interpretBtn.textContent = getMessage('thinking');
 		interpretBtn.classList.add('processing');
 
 		// Disable the clip button
@@ -367,7 +368,7 @@ export async function handleInterpreterUI(
 		responseTimer.textContent = formatDuration(totalTime);
 
 		// Revert button text and remove class
-		interpretBtn.textContent = 'done';
+		interpretBtn.textContent = getMessage('done');
 		interpretBtn.classList.remove('processing');
 		interpretBtn.classList.add('done');
 		interpretBtn.disabled = true;
@@ -391,7 +392,7 @@ export async function handleInterpreterUI(
 		console.error('Error processing LLM:', error);
 		
 		// Revert button text and remove class in case of error
-		interpretBtn.textContent = 'error';
+		interpretBtn.textContent = getMessage('error');
 		interpretBtn.classList.remove('processing');
 		interpretBtn.classList.add('error');
 		interpretBtn.disabled = true;
