@@ -67,6 +67,18 @@
 	"cancel": {
 		"message": "Annuler"
 	},
+	"chooseFile": {
+		"message": "Choisir un fichier"
+	},
+	"choosePropertiesFile": {
+		"message": "Choisir un fichier de propriétés"
+	},
+	"chooseSettingsFile": {
+		"message": "Choisir un fichier de paramètres"
+	},
+	"chooseTemplateFile": {
+		"message": "Choisir un fichier de modèle"
+	},
 	"clipBehavior": {
 		"message": "Comportement de sauvegarde"
 	},
@@ -95,6 +107,9 @@
 	},
 	"confirmDeleteTemplate": {
 		"message": "Êtes-vous sûr de vouloir supprimer le modèle \"$1\" ?"
+	},
+	"confirmReplaceSettings": {
+		"message": "Cela remplacera tous vos paramètres actuels, y compris les modèles et les propriétés. Êtes-vous sûr de vouloir continuer ?"
 	},
 	"copied": {
 		"message": "Copié !"
@@ -131,6 +146,21 @@
 	},
 	"display": {
 		"message": "Affichage"
+	},
+	"done": {
+		"message": "terminé"
+	},
+	"dragAndDropFile": {
+		"message": "Glissez et déposez un fichier ici"
+	},
+	"dragAndDropProperties": {
+		"message": "Glissez et déposez un fichier de propriétés ici"
+	},
+	"dragAndDropSettings": {
+		"message": "Glissez et déposez un fichier de paramètres ici"
+	},
+	"dragAndDropTemplate": {
+		"message": "Glissez et déposez un fichier de modèle ici"
 	},
 	"duplicate": {
 		"message": "Dupliquer"
@@ -186,6 +216,9 @@
 	},
 	"exportAllSettingsDescription": {
 		"message": "Exporte tous les paramètres, y compris les modèles et les propriétés."
+	},
+	"exportError": {
+		"message": "Erreur lors de l'exportation. Veuillez réessayer."
 	},
 	"exportHighlights": {
 		"message": "Exporter les surlignages"
@@ -276,6 +309,12 @@
 	"importAllSettingsDescription": {
 		"message": "Importe tous les paramètres, y compris les modèles et les propriétés. Cela remplacera votre configuration actuelle."
 	},
+	"importError": {
+		"message": "Erreur lors de l'importation. Veuillez vérifier le fichier et réessayer."
+	},
+	"importModalTitle": {
+		"message": "Importer"
+	},
 	"importProperties": {
 		"message": "Importer les propriétés"
 	},
@@ -295,6 +334,15 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"importSettings": {
+		"message": "Importer les paramètres"
+	},
+	"importTemplate": {
+		"message": "Importer un modèle"
+	},
+	"interpret": {
+		"message": "interpréter"
 	},
 	"interpreter": {
 		"message": "Interpréteur"
@@ -363,6 +411,9 @@
 	},
 	"modelProviderPlaceholder": {
 		"message": "Fournisseur"
+	},
+	"modelRequired": {
+		"message": "Le nom du modèle et l'URL de base sont requis."
 	},
 	"models": {
 		"message": "Modèles de langage"
@@ -437,11 +488,26 @@
 	"optional": {
 		"message": "(optionnel)"
 	},
+	"orPasteBelow": {
+		"message": "Ou collez le contenu ci-dessous"
+	},
 	"pageCannotBeClipped": {
 		"message": "Cette page ne peut pas être enregistrée."
 	},
 	"pageVariables": {
 		"message": "Variables de page"
+	},
+	"pasteJsonHere": {
+		"message": "Collez le JSON ici"
+	},
+	"pastePropertiesJson": {
+		"message": "Collez le JSON des propriétés ici"
+	},
+	"pasteSettingsJson": {
+		"message": "Collez le JSON des paramètres ici"
+	},
+	"pasteTemplateJson": {
+		"message": "Collez le JSON du modèle ici"
 	},
 	"pleaseReload": {
 		"message": "Veuillez essayer de recharger la page."
@@ -451,6 +517,9 @@
 	},
 	"prependToExisting": {
 		"message": "Ajouter à une note existante, au début"
+	},
+	"processing": {
+		"message": "traitement"
 	},
 	"properties": {
 		"message": "Propriétés"
@@ -512,8 +581,17 @@
 	"settingsHeading": {
 		"message": "Paramètres"
 	},
+	"settingsImported": {
+		"message": "Paramètres importés avec succès. Veuillez actualiser la page pour voir les changements."
+	},
 	"share": {
 		"message": "Partager..."
+	},
+	"shareError": {
+		"message": "Erreur lors du partage"
+	},
+	"sharedFromClipper": {
+		"message": "Partagé depuis Obsidian Web Clipper"
 	},
 	"shortcutInstructionsBrave": {
 		"message": "Pour modifier les assignations de touches, allez à $1"
@@ -560,6 +638,12 @@
 	"systemDefault": {
 		"message": "Système"
 	},
+	"templateCopied": {
+		"message": "Modèle copié dans le presse-papiers"
+	},
+	"templateCopyError": {
+		"message": "Échec de la copie du modèle dans le presse-papiers"
+	},
 	"templateName": {
 		"message": "Nom du modèle"
 	},
@@ -577,6 +661,9 @@
 	},
 	"templatesHeading": {
 		"message": "Modèles"
+	},
+	"thinking": {
+		"message": "réflexion"
 	},
 	"vault": {
 		"message": "Coffre"

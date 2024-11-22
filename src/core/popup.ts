@@ -104,7 +104,7 @@ const debouncedSetPopupDimensions = debounce(setPopupDimensions, 100); // 100ms 
 async function initializeExtension(tabId: number) {
 	try {
 		// Initialize translations
-		translatePage();
+		await translatePage();
 		
 		// Setup language and RTL support
 		await setupLanguageAndDirection();

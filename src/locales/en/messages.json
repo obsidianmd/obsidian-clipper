@@ -67,6 +67,18 @@
 	"cancel": {
 		"message": "Cancel"
 	},
+	"chooseFile": {
+		"message": "Choose a file"
+	},
+	"choosePropertiesFile": {
+		"message": "Choose properties file"
+	},
+	"chooseSettingsFile": {
+		"message": "Choose settings file"
+	},
+	"chooseTemplateFile": {
+		"message": "Choose template file"
+	},
 	"clipBehavior": {
 		"message": "Clip behavior"
 	},
@@ -131,6 +143,9 @@
 	},
 	"display": {
 		"message": "Display"
+	},
+	"dragAndDropFile": {
+		"message": "Drag and drop file here"
 	},
 	"duplicate": {
 		"message": "Duplicate"
@@ -279,6 +294,9 @@
 	"importAllSettingsDescription": {
 		"message": "Import all settings including templates and properties. This will replace your current configuration."
 	},
+	"importModalTitle": {
+		"message": "Import"
+	},
 	"importProperties": {
 		"message": "Import properties"
 	},
@@ -298,6 +316,15 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"importSettings": {
+		"message": "Import settings"
+	},
+	"importTemplate": {
+		"message": "Import template"
+	},
+	"interpret": {
+		"message": "interpret"
 	},
 	"interpreter": {
 		"message": "Interpreter"
@@ -440,11 +467,17 @@
 	"optional": {
 		"message": "(optional)"
 	},
+	"orPasteBelow": {
+		"message": "Or paste content below"
+	},
 	"pageCannotBeClipped": {
 		"message": "This page cannot be clipped."
 	},
 	"pageVariables": {
 		"message": "Page variables"
+	},
+	"pasteJsonHere": {
+		"message": "Paste JSON here"
 	},
 	"pleaseReload": {
 		"message": "Please try reloading the page."
@@ -454,6 +487,9 @@
 	},
 	"prependToExisting": {
 		"message": "Add to an existing note, at the top"
+	},
+	"processing": {
+		"message": "processing"
 	},
 	"properties": {
 		"message": "Properties"
@@ -580,6 +616,9 @@
 	},
 	"templatesHeading": {
 		"message": "Templates"
+	},
+	"thinking": {
+		"message": "thinking"
 	},
 	"vault": {
 		"message": "Vault"
