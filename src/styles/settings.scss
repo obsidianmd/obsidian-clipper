@@ -9,7 +9,7 @@
 	font-size: var(--font-ui-smaller);
 	display: flex;
 	flex-direction: row;
-	align-items: center;
+	align-items: flex-start;
 	gap: 8px;
 	.warning-icon {
 		display: flex;
