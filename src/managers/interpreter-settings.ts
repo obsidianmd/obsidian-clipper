@@ -8,9 +8,14 @@ import { getMessage, translatePage } from '../utils/i18n';
 export function updatePromptContextVisibility(): void {
 	const interpreterToggle = document.getElementById('interpreter-toggle') as HTMLInputElement;
 	const promptContextContainer = document.getElementById('prompt-context-container');
+	const interpreterSection = document.getElementById('interpreter-section');
 
 	if (promptContextContainer) {
 		promptContextContainer.style.display = interpreterToggle.checked ? 'block' : 'none';
+	}
+
+	if (interpreterSection) {
+		interpreterSection.classList.toggle('is-disabled', !interpreterToggle.checked);
 	}
 }
 
@@ -24,12 +29,18 @@ export function initializeInterpreterSettings(): void {
 		const anthropicApiKeyInput = document.getElementById('anthropic-api-key') as HTMLInputElement;
 		const interpreterToggle = document.getElementById('interpreter-toggle') as HTMLInputElement;
 		const interpreterAutoRunToggle = document.getElementById('interpreter-auto-run-toggle') as HTMLInputElement;
+		const interpreterSection = document.getElementById('interpreter-section');
 
 		if (apiKeyInput) apiKeyInput.value = generalSettings.openaiApiKey || '';
 		if (anthropicApiKeyInput) anthropicApiKeyInput.value = generalSettings.anthropicApiKey || '';
 		if (interpreterToggle) {
 			interpreterToggle.checked = generalSettings.interpreterEnabled;
 			updateToggleState(interpreterToggle.parentElement as HTMLElement, interpreterToggle);
+			
+			// Set initial disabled state
+			if (interpreterSection) {
+				interpreterSection.classList.toggle('is-disabled', !interpreterToggle.checked);
+			}
 		}
 		if (interpreterAutoRunToggle) {
 			interpreterAutoRunToggle.checked = generalSettings.interpreterAutoRun;

@@ -246,3 +246,11 @@
 	}
 }
 
+#interpreter-section {
+	&.is-disabled {
+		form > div:not(:first-child) {
+			opacity: 0.5;
+			pointer-events: none;
+		}
+	}
+}

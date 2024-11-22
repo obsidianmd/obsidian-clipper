@@ -115,7 +115,7 @@
 		"message": "Contexte par défaut de l'interpréteur"
 	},
 	"defaultInterpreterContextDescription": {
-		"message": "Le modèle utilisera ce contexte pour interpréter les variables de prompt. Les variables peuvent être utilisées ici."
+		"message": "Le modèle utilisera ce contexte pour interpréter les variables de prompt. Les variables et filtres peuvent être utilisés ici."
 	},
 	"defaultTemplateName": {
 		"message": "Par défaut"
@@ -259,10 +259,10 @@
 		"message": "Surligner la page"
 	},
 	"highlighter": {
-		"message": "Surlignage"
+		"message": "Surligneur"
 	},
 	"highlighterSettings": {
-		"message": "Surlignage"
+		"message": "Surligneur"
 	},
 	"hotkeys": {
 		"message": "Raccourcis clavier"

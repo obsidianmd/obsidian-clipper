@@ -115,7 +115,7 @@
 		"message": "Default interpreter context"
 	},
 	"defaultInterpreterContextDescription": {
-		"message": "The model will use this context to interpret prompt variables. Variables can be used here."
+		"message": "The model will use this context to interpret prompt variables. Variables and filters can be used here."
 	},
 	"defaultTemplateName": {
 		"message": "Default"
