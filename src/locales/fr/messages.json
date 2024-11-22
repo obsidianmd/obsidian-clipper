@@ -142,7 +142,7 @@
 		"message": "Êtes-vous sûr de vouloir supprimer ce modèle ?"
 	},
 	"disableHighlighter": {
-		"message": "Désactiver le surlignage"
+		"message": "Désactiver le surlignageur"
 	},
 	"display": {
 		"message": "Affichage"
@@ -186,7 +186,7 @@
 		"message": "Modifier le modèle"
 	},
 	"enableHighlighter": {
-		"message": "Activer le surlignage"
+		"message": "Activer le surligneur"
 	},
 	"enableHighlighterDescription": {
 		"message": "Surlignez du contenu sur les pages web que vous pouvez sauvegarder dans Obsidian."
