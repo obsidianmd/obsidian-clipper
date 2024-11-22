@@ -226,15 +226,15 @@
 
 					<div id="interpreter-section" class="settings-section">
 						<div class="settings-section-header">
-							<h2>Interpreter</h2>
+							<h2 data-i18n="interpreter">Interpreter</h2>
 						</div>
 						<form id="interpreter-settings-form">
 							<div>
 								<div class="setting-item mod-horizontal">
 									<div class="setting-item-info">
-										<label for="interpreter-toggle">Enable interpreter</label>
-										<div class="setting-item-description">
-											Use natural language to extract data from pages. For example, you can use the template syntax <strong>{{prompt:"a summary of the page"}}</strong>. Requires an API&nbsp;key or custom model configured&nbsp;below.
+										<label for="interpreter-toggle" data-i18n="enableInterpreter">Enable interpreter</label>
+										<div class="setting-item-description" data-i18n="enableInterpreterDescription">
+											Use natural language to extract data from pages. For example, you can use the template syntax <strong>{{prompt:"a summary of the page"}}</strong>. Requires an API key or custom model configured below.
 										</div>
 									</div>
 									<div class="setting-item-control">
@@ -245,8 +245,8 @@
 								</div>
 								<div class="setting-item mod-horizontal">
 									<div class="setting-item-info">
-										<label for="interpreter-auto-run-toggle">Automatically run</label>
-										<div class="setting-item-description">Run prompt variables immediately if the template contains any. This will consume API credits with your model provider. Turn off if you only want to run interpreter manually.</div>
+										<label for="interpreter-auto-run-toggle" data-i18n="autoRunInterpreter">Automatically run</label>
+										<div class="setting-item-description" data-i18n="autoRunInterpreterDescription">Run prompt variables immediately if the template contains any. This will consume API credits with your model provider. Turn off if you only want to run interpreter manually.</div>
 									</div>
 									<div class="setting-item-control">
 										<div class="checkbox-container">
@@ -255,50 +255,49 @@
 									</div>
 								</div>
 								<div class="setting-item">
-									<label for="default-prompt-context" style="font-weight: 400;">Default interpreter context</label>
-									<div class="setting-item-description">The model will use this context to interpret prompt variables. Variables can be used&nbsp;here.</div>
+									<label for="default-prompt-context" style="font-weight: 400;" data-i18n="defaultInterpreterContext">Default interpreter context</label>
+									<div class="setting-item-description" data-i18n="defaultInterpreterContextDescription">The model will use this context to interpret prompt variables. Variables can be used here.</div>
 									<textarea id="default-prompt-context" rows="4" placeholder="{{fullHtml}}" spellcheck="false"></textarea>
 								</div>
 							</div>
 							<div>
-								<h3>Models</h3>
+								<h3 data-i18n="models">Models</h3>
 								<div class="model-list-container">
 									<div id="model-list"></div>
 									<div class="add-btn">
-										<a id="add-model-btn">+ Add model</a>
+										<a id="add-model-btn" data-i18n="addModel">+ Add model</a>
 									</div>
 								</div>
 							</div>
 							<div>
-								<h3>Providers</h3>
+								<h3 data-i18n="providers">Providers</h3>
 								<div id="api-keys-warning-container" class="warning-container" style="margin-bottom: 0.5rem;">
 									<div class="warning-icon">
 										<i data-lucide="alert-triangle"></i>
 									</div>
-									<div class="warning-text">
+									<div class="warning-text" data-i18n="apiKeysWarning">
 										By using an external provider you agree to their terms and privacy policy. Interpreter requests are sent directly to the provider you choose. Obsidian does not gather or store any data about your requests.
 									</div>
 								</div>
 								<div class="setting-item mod-horizontal">
 									<div class="setting-item-info">
-										<label for="openai-api-key">OpenAI API key</label>
-										<div class="setting-item-description">You can get your OpenAI API&nbsp;key&nbsp;<a href="https://platform.openai.com/api-keys" target="_blank">here</a>.</div>
+										<label for="openai-api-key" data-i18n="openaiApiKey">OpenAI API key</label>
+										<div class="setting-item-description" data-i18n="openaiApiKeyDescription">You can get your OpenAI API key <a href="https://platform.openai.com/api-keys" target="_blank">here</a>.</div>
 									</div>
 									<div class="setting-item-control">
-										<input type="password" id="openai-api-key" placeholder="OpenAI API key">
+										<input type="password" id="openai-api-key" data-i18n-placeholder="openaiApiKey" placeholder="OpenAI API key">
 									</div>
 								</div>
 								<div class="setting-item mod-horizontal">
 									<div class="setting-item-info">
-										<label for="anthropic-api-key">Anthropic API key</label>
-										<div class="setting-item-description">You can get your Anthropic API&nbsp;key&nbsp;<a href="https://console.anthropic.com/settings/keys" target="_blank">here</a>.</div>
+										<label for="anthropic-api-key" data-i18n="anthropicApiKey">Anthropic API key</label>
+										<div class="setting-item-description" data-i18n="anthropicApiKeyDescription">You can get your Anthropic API key <a href="https://console.anthropic.com/settings/keys" target="_blank">here</a>.</div>
 									</div>
 									<div class="setting-item-control">
-										<input type="password" id="anthropic-api-key" placeholder="Anthropic API key">
+										<input type="password" id="anthropic-api-key" data-i18n-placeholder="anthropicApiKey" placeholder="Anthropic API key">
 									</div>
 								</div>
 							</div>
-							
 						</form>
 					</div>
 
@@ -503,51 +502,57 @@
 			<div class="modal-bg"></div>
 			<div class="modal">
 				<div class="modal-header">
-					<div class="modal-title">Add model</div>
+					<div class="modal-title" data-i18n="addModelTitle">Add model</div>
 				</div>
 				<div class="modal-content">
 					<form id="model-form">
 						<div class="setting-item">
 							<div class="setting-item-info">
-								<label for="model-name">Model name</label>
-								<div class="setting-item-description">Enter a name for this model configuration.</div>
+								<label for="model-name" data-i18n="modelName">Model name</label>
+								<div class="setting-item-description" data-i18n="modelNameDescription">Enter a name for this model configuration.</div>
 							</div>
 							<div class="setting-item-control">
-								<input type="text" id="model-name" name="name" placeholder="Model name" required>
+								<input type="text" id="model-name" name="name" data-i18n-placeholder="modelName" placeholder="Model name" required>
 							</div>
 						</div>
 						<div class="setting-item">
 							<div class="setting-item-info">
-								<label for="model-provider">Provider <span class="optional">(optional)</span></label>
-								<div class="setting-item-description">Enter the model provider name.</div>
+								<label for="model-provider">
+									<span data-i18n="modelProvider">Provider</span>
+									<span class="optional" data-i18n="optional">(optional)</span>
+								</label>
+								<div class="setting-item-description" data-i18n="modelProviderDescription">Enter the model provider name.</div>
 							</div>
 							<div class="setting-item-control">
-								<input type="text" id="model-provider" name="provider" placeholder="Provider">
+								<input type="text" id="model-provider" name="provider" data-i18n-placeholder="modelProvider" placeholder="Provider">
 							</div>
 						</div>
 						<div class="setting-item">
 							<div class="setting-item-info">
-								<label for="model-base-url">Base URL</label>
-								<div class="setting-item-description">The API endpoint URL for this model.</div>
+								<label for="model-base-url" data-i18n="modelBaseUrl">Base URL</label>
+								<div class="setting-item-description" data-i18n="modelBaseUrlDescription">The API endpoint URL for this model.</div>
 							</div>
 							<div class="setting-item-control">
-								<input type="text" id="model-base-url" name="baseUrl" placeholder="Base URL" required>
+								<input type="text" id="model-base-url" name="baseUrl" data-i18n-placeholder="modelBaseUrl" placeholder="Base URL" required>
 							</div>
 						</div>
 						<div class="setting-item">
 							<div class="setting-item-info">
-								<label for="model-api-key">API key <span class="optional">(optional)</span></label>
-								<div class="setting-item-description">Enter the API key for this model.</div>
+								<label for="model-api-key">
+									<span data-i18n="modelApiKey">API key</span>
+									<span class="optional" data-i18n="optional">(optional)</span>
+								</label>
+								<div class="setting-item-description" data-i18n="modelApiKeyDescription">Enter the API key for this model.</div>
 							</div>
 							<div class="setting-item-control">
-								<input type="password" id="model-api-key" name="apiKey" placeholder="API key">
+								<input type="password" id="model-api-key" name="apiKey" data-i18n-placeholder="modelApiKey" placeholder="API key">
 							</div>
 						</div>
 					</form>
 				</div>
 				<div class="modal-button-container">
-					<button class="model-confirm-btn mod-cta">Save</button>
-					<button class="model-cancel-btn">Cancel</button>
+					<button class="model-confirm-btn mod-cta" data-i18n="save">Save</button>
+					<button class="model-cancel-btn" data-i18n="cancel">Cancel</button>
 				</div>
 			</div>
 		</div>

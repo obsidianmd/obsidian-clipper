@@ -3,6 +3,7 @@ import { ModelConfig, generalSettings, loadSettings, saveSettings } from '../uti
 import { initializeIcons } from '../icons/icons';
 import { showModal, hideModal } from '../utils/modal-utils';
 import { updateUrl, getUrlParameters } from '../utils/routing';
+import { getMessage, translatePage } from '../utils/i18n';
 
 export function updatePromptContextVisibility(): void {
 	const interpreterToggle = document.getElementById('interpreter-toggle') as HTMLInputElement;
@@ -159,7 +160,7 @@ function showModelModal(model: ModelConfig, index?: number): void {
 
 	const titleElement = modal.querySelector('.modal-title');
 	if (titleElement) {
-		titleElement.textContent = index !== undefined ? 'Edit model' : 'Add model';
+		titleElement.textContent = index !== undefined ? getMessage('editModel') : getMessage('addModelTitle');
 	}
 
 	const form = modal.querySelector('#model-form') as HTMLFormElement;
@@ -221,6 +222,12 @@ function showModelModal(model: ModelConfig, index?: number): void {
 	});
 
 	showModal(modal);
+	
+	// Translate the modal content after showing it
+	translatePage().then(() => {
+		// Re-initialize icons after translation
+		initializeIcons(modal);
+	});
 }
 
 function deleteModel(index: number) {
@@ -230,7 +237,7 @@ function deleteModel(index: number) {
 		return;
 	}
 
-	if (confirm('Are you sure you want to delete this model?')) {
+	if (confirm(getMessage('deleteModelConfirm'))) {
 		generalSettings.models.splice(index, 1);
 		saveSettings();
 		initializeModelList();
