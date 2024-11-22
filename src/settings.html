@@ -270,7 +270,7 @@
 								</div>
 							</div>
 							<div>
-								<h3>Authentication</h3>
+								<h3>Providers</h3>
 								<div id="api-keys-warning-container" class="warning-container" style="margin-bottom: 0.5rem;">
 									<div class="warning-icon">
 										<i data-lucide="alert-triangle"></i>
@@ -495,6 +495,59 @@
 				<div class="modal-button-container">
 					<button class="import-confirm-btn mod-cta">Import</button>
 					<button class="import-cancel-btn">Cancel</button>
+				</div>
+			</div>
+		</div>
+
+		<div id="model-modal" class="modal-container">
+			<div class="modal-bg"></div>
+			<div class="modal">
+				<div class="modal-header">
+					<div class="modal-title">Add model</div>
+				</div>
+				<div class="modal-content">
+					<form id="model-form">
+						<div class="setting-item">
+							<div class="setting-item-info">
+								<label for="model-name">Model name</label>
+								<div class="setting-item-description">Enter a name for this model configuration.</div>
+							</div>
+							<div class="setting-item-control">
+								<input type="text" id="model-name" name="name" placeholder="Model name" required>
+							</div>
+						</div>
+						<div class="setting-item">
+							<div class="setting-item-info">
+								<label for="model-provider">Provider <span class="optional">(optional)</span></label>
+								<div class="setting-item-description">Enter the model provider name.</div>
+							</div>
+							<div class="setting-item-control">
+								<input type="text" id="model-provider" name="provider" placeholder="Provider">
+							</div>
+						</div>
+						<div class="setting-item">
+							<div class="setting-item-info">
+								<label for="model-base-url">Base URL</label>
+								<div class="setting-item-description">The API endpoint URL for this model.</div>
+							</div>
+							<div class="setting-item-control">
+								<input type="text" id="model-base-url" name="baseUrl" placeholder="Base URL" required>
+							</div>
+						</div>
+						<div class="setting-item">
+							<div class="setting-item-info">
+								<label for="model-api-key">API key <span class="optional">(optional)</span></label>
+								<div class="setting-item-description">Enter the API key for this model.</div>
+							</div>
+							<div class="setting-item-control">
+								<input type="password" id="model-api-key" name="apiKey" placeholder="API key">
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-button-container">
+					<button class="model-confirm-btn mod-cta">Save</button>
+					<button class="model-cancel-btn">Cancel</button>
 				</div>
 			</div>
 		</div>

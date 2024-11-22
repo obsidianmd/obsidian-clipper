@@ -1,6 +1,8 @@
 import { initializeToggles, updateToggleState } from '../utils/ui-utils';
 import { ModelConfig, generalSettings, loadSettings, saveSettings } from '../utils/storage-utils';
 import { initializeIcons } from '../icons/icons';
+import { showModal, hideModal } from '../utils/modal-utils';
+import { updateUrl, getUrlParameters } from '../utils/routing';
 
 export function updatePromptContextVisibility(): void {
 	const interpreterToggle = document.getElementById('interpreter-toggle') as HTMLInputElement;
@@ -112,12 +114,20 @@ function createModelListItem(model: ModelConfig, index: number): HTMLElement {
 	if (model.provider !== 'OpenAI' && model.provider !== 'Anthropic') {
 		const editBtn = modelItem.querySelector('.edit-model-btn');
 		if (editBtn) {
-			editBtn.addEventListener('click', () => editModel(index));
+			editBtn.addEventListener('click', (e) => {
+				e.preventDefault();
+				e.stopPropagation();
+				editModel(index);
+			});
 		}
 
 		const deleteBtn = modelItem.querySelector('.delete-model-btn');
 		if (deleteBtn) {
-			deleteBtn.addEventListener('click', () => deleteModel(index));
+			deleteBtn.addEventListener('click', (e) => {
+				e.preventDefault();
+				e.stopPropagation();
+				deleteModel(index);
+			});
 		}
 	}
 
@@ -128,9 +138,6 @@ function createModelListItem(model: ModelConfig, index: number): HTMLElement {
 
 function addModelToList(event: Event) {
 	event.preventDefault();
-	const modelList = document.getElementById('model-list');
-	if (!modelList) return;
-
 	const newModel: ModelConfig = {
 		id: Date.now().toString(),
 		name: '',
@@ -138,41 +145,52 @@ function addModelToList(event: Event) {
 		baseUrl: '',
 		enabled: true
 	};
-
-	const modelItem = createModelForm(newModel);
-	modelList.appendChild(modelItem);
+	showModelModal(newModel);
 }
 
 function editModel(index: number) {
-	const modelList = document.getElementById('model-list');
-	if (!modelList) return;
-
 	const modelToEdit = generalSettings.models[index];
-	const modelItem = createModelForm(modelToEdit, index);
-
-	const oldModelItem = modelList.children[index];
-	modelList.replaceChild(modelItem, oldModelItem);
+	showModelModal(modelToEdit, index);
 }
 
-function createModelForm(model: ModelConfig, index?: number): HTMLElement {
-	const modelForm = document.createElement('div');
-	modelForm.className = 'setting-item';
-	modelForm.innerHTML = `
-		<form class="model-form">
-			<input type="text" name="name" placeholder="Model name" value="${model.name}" required>
-			<input type="text" name="provider" placeholder="Provider (optional)" value="${model.provider || ''}">
-			<input type="text" name="baseUrl" placeholder="Base URL" value="${model.baseUrl || ''}" required>
-			<input type="password" name="apiKey" placeholder="API key (optional)" value="${model.apiKey || ''}">
-			<button type="button" class="save-btn mod-cta">Save</button>
-			<button type="button" class="cancel-btn">Cancel</button>
-		</form>
-	`;
+function showModelModal(model: ModelConfig, index?: number): void {
+	const modal = document.getElementById('model-modal');
+	if (!modal) return;
 
-	const form = modelForm.querySelector('form');
-	const saveBtn = modelForm.querySelector('.save-btn');
-	saveBtn?.addEventListener('click', (e) => {
-		e.preventDefault();
-		const formData = new FormData(form as HTMLFormElement);
+	const titleElement = modal.querySelector('.modal-title');
+	if (titleElement) {
+		titleElement.textContent = index !== undefined ? 'Edit model' : 'Add model';
+	}
+
+	const form = modal.querySelector('#model-form') as HTMLFormElement;
+	if (form) {
+		const nameInput = form.querySelector('[name="name"]') as HTMLInputElement;
+		const providerInput = form.querySelector('[name="provider"]') as HTMLInputElement;
+		const baseUrlInput = form.querySelector('[name="baseUrl"]') as HTMLInputElement;
+		const apiKeyInput = form.querySelector('[name="apiKey"]') as HTMLInputElement;
+
+		nameInput.value = model.name;
+		providerInput.value = model.provider || '';
+		baseUrlInput.value = model.baseUrl || '';
+		apiKeyInput.value = model.apiKey || '';
+	}
+
+	const confirmBtn = modal.querySelector('.model-confirm-btn');
+	const cancelBtn = modal.querySelector('.model-cancel-btn');
+
+	// Remove existing event listeners
+	const newConfirmBtn = confirmBtn?.cloneNode(true);
+	const newCancelBtn = cancelBtn?.cloneNode(true);
+	if (confirmBtn && newConfirmBtn) {
+		confirmBtn.parentNode?.replaceChild(newConfirmBtn, confirmBtn);
+	}
+	if (cancelBtn && newCancelBtn) {
+		cancelBtn.parentNode?.replaceChild(newCancelBtn, cancelBtn);
+	}
+
+	// Add new event listeners
+	newConfirmBtn?.addEventListener('click', () => {
+		const formData = new FormData(form);
 		const updatedModel: ModelConfig = {
 			id: model.id || Date.now().toString(),
 			name: formData.get('name') as string,
@@ -183,7 +201,7 @@ function createModelForm(model: ModelConfig, index?: number): HTMLElement {
 		};
 
 		if (!updatedModel.name || !updatedModel.baseUrl) {
-			alert('Model Name and Base URL are required.');
+			alert('Model name and Base URL are required.');
 			return;
 		}
 
@@ -195,20 +213,14 @@ function createModelForm(model: ModelConfig, index?: number): HTMLElement {
 
 		saveSettings();
 		initializeModelList();
+		hideModal(modal);
 	});
 
-	const cancelBtn = modelForm.querySelector('.cancel-btn');
-	cancelBtn?.addEventListener('click', () => {
-		const modelList = document.getElementById('model-list');
-		if (modelList && index !== undefined) {
-			const existingItem = createModelListItem(generalSettings.models[index], index);
-			modelList.replaceChild(existingItem, modelForm);
-		} else if (modelList) {
-			modelList.removeChild(modelForm);
-		}
+	newCancelBtn?.addEventListener('click', () => {
+		hideModal(modal);
 	});
 
-	return modelForm;
+	showModal(modal);
 }
 
 function deleteModel(index: number) {
