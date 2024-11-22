@@ -20,6 +20,8 @@ export interface HistoryEntry {
 	url: string;
 	action: keyof Settings['stats'];
 	title?: string;
+	vault?: string;
+	path?: string;
 }
 
 export interface Settings {
@@ -128,9 +130,11 @@ export async function loadSettings(): Promise<Settings> {
 		'highlighter_settings', 
 		'interpreter_settings', 
 		'property_types',
-		'stats',
-		'history'
+		'stats'
 	]) as StorageData;
+
+	const localData = await browser.storage.local.get('history');
+	const history = (localData.history || []) as HistoryEntry[];
 
 	const defaultSettings: Settings = {
 		vaults: [],
@@ -176,7 +180,7 @@ export async function loadSettings(): Promise<Settings> {
 		defaultPromptContext: data.interpreter_settings?.defaultPromptContext || defaultSettings.defaultPromptContext,
 		propertyTypes: data.property_types || defaultSettings.propertyTypes,
 		stats: data.stats || defaultSettings.stats,
-		history: (data.history || []) as HistoryEntry[]
+		history: history
 	};
 
 	generalSettings = loadedSettings;
@@ -210,8 +214,7 @@ export async function saveSettings(settings?: Partial<Settings>): Promise<void> 
 			defaultPromptContext: generalSettings.defaultPromptContext
 		},
 		property_types: generalSettings.propertyTypes,
-		stats: generalSettings.stats,
-		history: generalSettings.history
+		stats: generalSettings.stats
 	});
 }
 
@@ -220,7 +223,11 @@ export async function setLegacyMode(enabled: boolean): Promise<void> {
 	console.log(`Legacy mode ${enabled ? 'enabled' : 'disabled'}`);
 }
 
-export async function incrementStat(action: keyof Settings['stats']): Promise<void> {
+export async function incrementStat(
+	action: keyof Settings['stats'],
+	vault?: string,
+	path?: string
+): Promise<void> {
 	const settings = await loadSettings();
 	settings.stats[action]++;
 	await saveSettings(settings);
@@ -228,16 +235,24 @@ export async function incrementStat(action: keyof Settings['stats']): Promise<vo
 	// Get the current tab's URL and title
 	const tabs = await browser.tabs.query({ active: true, currentWindow: true });
 	if (tabs[0]?.url) {
-		await addHistoryEntry(action, tabs[0].url, tabs[0].title);
+		await addHistoryEntry(action, tabs[0].url, tabs[0].title, vault, path);
 	}
 }
 
-export async function addHistoryEntry(action: keyof Settings['stats'], url: string, title?: string): Promise<void> {
+export async function addHistoryEntry(
+	action: keyof Settings['stats'], 
+	url: string, 
+	title?: string,
+	vault?: string,
+	path?: string
+): Promise<void> {
 	const entry: HistoryEntry = {
 		datetime: new Date().toISOString(),
 		url,
 		action,
-		title
+		title,
+		vault,
+		path
 	};
 
 	// Get existing history from local storage

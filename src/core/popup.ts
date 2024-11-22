@@ -412,9 +412,14 @@ function setupEventListeners(tabId: number) {
 						};
 
 						if (navigator.canShare(shareData)) {
+							const pathField = document.getElementById('path-name-field') as HTMLInputElement;
+							const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement;
+							const path = pathField?.value || '';
+							const vault = vaultDropdown?.value || '';
+
 							navigator.share(shareData)
 								.then(async () => {
-									await incrementStat('share');
+									await incrementStat('share', vault, path);
 									const moreDropdown = document.getElementById('more-dropdown');
 									if (moreDropdown) {
 											moreDropdown.classList.remove('show');
@@ -604,7 +609,7 @@ async function handleClip() {
 		}
 
 		await saveToObsidian(fileContent, noteName, path, selectedVault, currentTemplate.behavior);
-		await incrementStat('addToObsidian');
+		await incrementStat('addToObsidian', selectedVault, path);
 
 		// Only update lastSelectedVault if the user explicitly chose a vault
 		if (!currentTemplate.vault) {
@@ -1057,7 +1062,13 @@ function updateHighlighterModeUI(isActive: boolean) {
 export async function copyToClipboard(content: string) {
 	try {
 		await navigator.clipboard.writeText(content);
-		await incrementStat('copyToClipboard');
+		
+		const pathField = document.getElementById('path-name-field') as HTMLInputElement;
+		const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement;
+		const path = pathField?.value || '';
+		const vault = vaultDropdown?.value || '';
+		
+		await incrementStat('copyToClipboard', vault, path);
 
 		// Change the main button text temporarily
 		const clipButton = document.getElementById('clip-btn');
@@ -1079,12 +1090,13 @@ export async function copyToClipboard(content: string) {
 async function handleSaveToDownloads() {
 	try {
 		const noteNameField = document.getElementById('note-name-field') as HTMLInputElement;
+		const pathField = document.getElementById('path-name-field') as HTMLInputElement;
+		const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement;
+		
 		let fileName = noteNameField?.value || 'untitled';
-		fileName = sanitizeFileName(fileName);
-		if (!fileName.toLowerCase().endsWith('.md')) {
-			fileName += '.md';
-		}
-
+		const path = pathField?.value || '';
+		const vault = vaultDropdown?.value || '';
+		
 		const properties = Array.from(document.querySelectorAll('.metadata-property input')).map(input => {
 			const inputElement = input as HTMLInputElement;
 			return {
@@ -1106,7 +1118,7 @@ async function handleSaveToDownloads() {
 			onError: (error) => showError('failedToSaveFile')
 		});
 
-		await incrementStat('saveFile');
+		await incrementStat('saveFile', vault, path);
 
 		const moreDropdown = document.getElementById('more-dropdown');
 		if (moreDropdown) {
