@@ -1,4 +1,10 @@
 {
+	"addModel": {
+		"message": "+ モデルを追加"
+	},
+	"addModelTitle": {
+		"message": "モデルを追加"
+	},
 	"addProperty": {
 		"message": "+ プロパティを追加"
 	},
@@ -20,11 +26,37 @@
 	"alwaysShowHighlightsDescription": {
 		"message": "ページ読み込み時に保存したハイライトを表示します。オフにすると、ハイライトモードが有効な時のみ表示されます。"
 	},
+	"anthropicApiKey": {
+		"message": "Anthropic APIキー"
+	},
+	"anthropicApiKeyDescription": {
+		"message": "Anthropic APIキーは$link_start$こちら$link_end$で取得できます。",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://console.anthropic.com/settings/keys\" target=\"_blank\">"
+			}
+		}
+	},
+	"anthropicApiKeyPlaceholder": {
+		"message": "Anthropic APIキー"
+	},
+	"apiKeysWarning": {
+		"message": "外部プロバイダーを使用することで、そのプロバイダーの利用規約とプライバシーポリシーに同意したことになります。インタープリターのリクエストは選択したプロバイダーに直接送信されます。Obsidianはリクエストに関するデータを収集または保存しません。"
+	},
 	"appendToDaily": {
 		"message": "デイリーノートの末尾に追加"
 	},
 	"appendToExisting": {
 		"message": "既存のノートの末尾に追加"
+	},
+	"autoRunInterpreter": {
+		"message": "自動実行"
+	},
+	"autoRunInterpreterDescription": {
+		"message": "テンプレートにプロンプト変数が含まれている場合、即座に実行します。これによりモデルプロバイダーのAPIクレジットが消費されます。インタープリターを手動でのみ実行したい場合はオフにしてください。"
 	},
 	"behavior": {
 		"message": "動作"
@@ -76,17 +108,29 @@
 	"dailyNoteFormat": {
 		"message": "デイリーノートの形式（例：YYYY-MM-DD）"
 	},
+	"defaultInterpreterContext": {
+		"message": "デフォルトインタープ���ターコンテキスト"
+	},
+	"defaultInterpreterContextDescription": {
+		"message": "モデルはプロンプト変数を解釈する際にこのコンテキストを使用します。変数とフィルターを使用できます。"
+	},
 	"defaultTemplateName": {
 		"message": "デフォルト"
 	},
 	"delete": {
 		"message": "削除"
 	},
+	"deleteModelConfirm": {
+		"message": "このモデルを削除してもよろしいですか？"
+	},
 	"disableHighlighter": {
 		"message": "ハイライトを無効化"
 	},
 	"display": {
 		"message": "表示"
+	},
+	"done": {
+		"message": "完了"
 	},
 	"duplicate": {
 		"message": "複製"
@@ -105,6 +149,9 @@
 	"earlyAccessFeatures": {
 		"message": "アーリーアクセス機能"
 	},
+	"editModel": {
+		"message": "モデルを編集"
+	},
 	"editTemplate": {
 		"message": "テンプレートを編集"
 	},
@@ -113,6 +160,26 @@
 	},
 	"enableHighlighterDescription": {
 		"message": "WebページのコンテンツをハイライトしてObsidianに保存できます。"
+	},
+	"enableInterpreter": {
+		"message": "インタープリターを有効化"
+	},
+	"enableInterpreterDescription": {
+		"message": "自然言語を使用してページからデータを抽出します。例えば、テンプレート構文$strong_start${{prompt:\"ページの要約\"}}$strong_end$を使用できます。APIキーまたは以下で設定したカスタムモデルが必要です。$link_start$詳細$link_end$",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/interpreter\" target=\"_blank\">"
+			},
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
 	},
 	"error": {
 		"message": "エラー"
@@ -156,7 +223,7 @@
 		"message": "テキストのコピーに失敗しました"
 	},
 	"failedToDeleteTemplate": {
-		"message": "テンプレートの削除に失敗しまた。もう一度お試しください。"
+		"message": "テンプレートの削除に失敗しまた。もう一度お試しくださ���。"
 	},
 	"failedToExtractContent": {
 		"message": "ページコンテンツの抽出に失敗しました。"
@@ -184,6 +251,15 @@
 	},
 	"generalSettings": {
 		"message": "一般設定"
+	},
+	"help": {
+		"message": "ヘルプ"
+	},
+	"helpDescription": {
+		"message": "Web Clipperの使い方とトラブルシューティングのヘルプを参照してください。"
+	},
+	"highlightInline": {
+		"message": "ページ内容を高亮表示"
 	},
 	"highlightPage": {
 		"message": "ページをハイライト"
@@ -226,6 +302,9 @@
 			}
 		}
 	},
+	"interpret": {
+		"message": "解釈"
+	},
 	"interpreter": {
 		"message": "インタープリター"
 	},
@@ -257,6 +336,45 @@
 	},
 	"legacyModeDescription": {
 		"message": "Obsidian 1.6.7以前と互換性のあるURIクリップ方式を使用します。クリップできるコンテンツの長さはブラウザとOSによって制限されます。エラーなしに失敗する場合があります。"
+	},
+	"modelApiKey": {
+		"message": "APIキー"
+	},
+	"modelApiKeyDescription": {
+		"message": "このモデルのAPIキーを入力してください。"
+	},
+	"modelApiKeyPlaceholder": {
+		"message": "APIキー"
+	},
+	"modelBaseUrl": {
+		"message": "ベースURL"
+	},
+	"modelBaseUrlDescription": {
+		"message": "このモデルのAPIエンドポイントURL。"
+	},
+	"modelBaseUrlPlaceholder": {
+		"message": "ベースURL"
+	},
+	"modelName": {
+		"message": "モデル名"
+	},
+	"modelNameDescription": {
+		"message": "このモデル設定の名前を入力してください。"
+	},
+	"modelNamePlaceholder": {
+		"message": "モデル名"
+	},
+	"modelProvider": {
+		"message": "プロバイダー"
+	},
+	"modelProviderDescription": {
+		"message": "モデルプロバイダーの名前を入力してください。"
+	},
+	"modelProviderPlaceholder": {
+		"message": "プロバイダー"
+	},
+	"models": {
+		"message": "モデル"
 	},
 	"more": {
 		"message": "その他"
@@ -305,6 +423,29 @@
 	"onlyHttpSupported": {
 		"message": "このページはクリップできません。httpとhttpsのURLのみがサポートされています。"
 	},
+	"open": {
+		"message": "開く"
+	},
+	"openaiApiKey": {
+		"message": "OpenAI APIキー"
+	},
+	"openaiApiKeyDescription": {
+		"message": "OpenAI APIキーは$link_start$こちら$link_end$で取得できます。",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://platform.openai.com/api-keys\" target=\"_blank\">"
+			}
+		}
+	},
+	"openaiApiKeyPlaceholder": {
+		"message": "OpenAI APIキー"
+	},
+	"optional": {
+		"message": "(オプション)"
+	},
 	"pageCannotBeClipped": {
 		"message": "このページはクリップできません。"
 	},
@@ -320,6 +461,9 @@
 	"prependToExisting": {
 		"message": "既存のノートの先頭に追加"
 	},
+	"processing": {
+		"message": "処理中"
+	},
 	"properties": {
 		"message": "プロパティ"
 	},
@@ -331,6 +475,9 @@
 	},
 	"propertyValue": {
 		"message": "プロパティ値"
+	},
+	"providers": {
+		"message": "プロバイダー"
 	},
 	"refresh": {
 		"message": "更新"
@@ -362,6 +509,9 @@
 	"resetDefaultTemplateDescription": {
 		"message": "デフォルトテンプレートへの変更をすべて削除します。"
 	},
+	"save": {
+		"message": "保存"
+	},
 	"saveFile": {
 		"message": "ファイルを保存..."
 	},
@@ -384,7 +534,7 @@
 		"message": "キー割り当てを変更するには、$1に移動してください"
 	},
 	"shortcutInstructionsDefault": {
-		"message": "キー割り当てを変更するには、ブラウザの拡張機能設定を参照してください。"
+		"message": "キー割り当てを変更するには、ブラウザの拡張機���設定を参照してください。"
 	},
 	"shortcutInstructionsEdge": {
 		"message": "キー割り当てを変更するには、$1に移動してください"
@@ -440,6 +590,9 @@
 	"templatesHeading": {
 		"message": "テンプレート"
 	},
+	"thinking": {
+		"message": "考え中"
+	},
 	"vault": {
 		"message": "保管庫"
 	},
@@ -467,17 +620,5 @@
 				"content": "<strong>"
 			}
 		}
-	},
-	"help": {
-		"message": "ヘルプ"
-	},
-	"helpDescription": {
-		"message": "Web Clipperの使い方とトラブルシューティングのヘルプを参照してください。"
-	},
-	"open": {
-		"message": "開く"
-	},
-	"highlightInline": {
-		"message": "ページ内容を高亮表示"
 	}
-} 
+}

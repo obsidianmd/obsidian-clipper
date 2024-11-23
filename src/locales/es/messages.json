@@ -482,5 +482,125 @@
 	},
 	"highlightInline": {
 		"message": "Resaltar el contenido de la página"
+	},
+	"addModel": {
+		"message": "+ Agregar modelo"
+	},
+	"addModelTitle": {
+		"message": "Agregar modelo"
+	},
+	"anthropicApiKey": {
+		"message": "Clave API de Anthropic"
+	},
+	"anthropicApiKeyDescription": {
+		"message": "Puedes obtener tu clave API de Anthropic $link_start$aquí$link_end$.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://console.anthropic.com/settings/keys\" target=\"_blank\">"
+			}
+		}
+	},
+	"apiKeysWarning": {
+		"message": "Al usar un proveedor externo, aceptas sus términos y política de privacidad. Las solicitudes del intérprete se envían directamente al proveedor que elijas. Obsidian no recopila ni almacena ningún dato sobre tus solicitudes."
+	},
+	"autoRunInterpreter": {
+		"message": "Ejecutar automáticamente"
+	},
+	"autoRunInterpreterDescription": {
+		"message": "Ejecuta las variables de prompt inmediatamente si la plantilla contiene alguna. Esto consumirá créditos de API con tu proveedor de modelo. Desactiva si solo quieres ejecutar el intérprete manualmente."
+	},
+	"defaultInterpreterContext": {
+		"message": "Contexto predeterminado del intérprete"
+	},
+	"defaultInterpreterContextDescription": {
+		"message": "El modelo usará este contexto para interpretar las variables de prompt. Se pueden usar variables y filtros aquí."
+	},
+	"deleteModelConfirm": {
+		"message": "¿Estás seguro de que quieres eliminar este modelo?"
+	},
+	"done": {
+		"message": "hecho"
+	},
+	"editModel": {
+		"message": "Editar modelo"
+	},
+	"enableInterpreter": {
+		"message": "Habilitar intérprete"
+	},
+	"enableInterpreterDescription": {
+		"message": "Usa lenguaje natural para extraer datos de las páginas. Por ejemplo, puedes usar la sintaxis de plantilla $strong_start${{prompt:\"un resumen de la página\"}}$strong_end$. Requiere una clave API o modelo personalizado configurado abajo. $link_start$Más información$link_end$",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/interpreter\" target=\"_blank\">"
+			},
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"interpret": {
+		"message": "interpretar"
+	},
+	"modelApiKey": {
+		"message": "Clave API"
+	},
+	"modelApiKeyDescription": {
+		"message": "Ingresa la clave API para este modelo."
+	},
+	"modelBaseUrl": {
+		"message": "URL base"
+	},
+	"modelBaseUrlDescription": {
+		"message": "La URL del endpoint API para este modelo."
+	},
+	"modelName": {
+		"message": "Nombre del modelo"
+	},
+	"modelNameDescription": {
+		"message": "Ingresa un nombre para esta configuración de modelo."
+	},
+	"modelProvider": {
+		"message": "Proveedor"
+	},
+	"modelProviderDescription": {
+		"message": "Ingresa el nombre del proveedor del modelo."
+	},
+	"models": {
+		"message": "Modelos"
+	},
+	"openaiApiKey": {
+		"message": "Clave API de OpenAI"
+	},
+	"openaiApiKeyDescription": {
+		"message": "Puedes obtener tu clave API de OpenAI $link_start$aquí$link_end$.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://platform.openai.com/api-keys\" target=\"_blank\">"
+			}
+		}
+	},
+	"optional": {
+		"message": "(opcional)"
+	},
+	"processing": {
+		"message": "procesando"
+	},
+	"providers": {
+		"message": "Proveedores"
+	},
+	"thinking": {
+		"message": "pensando"
 	}
 }

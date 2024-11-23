@@ -1,4 +1,10 @@
 {
+	"addModel": {
+		"message": "+ 모델 추가"
+	},
+	"addModelTitle": {
+		"message": "모델 추가"
+	},
 	"addProperty": {
 		"message": "+ 속성 추가하기"
 	},
@@ -20,11 +26,34 @@
 	"alwaysShowHighlightsDescription": {
 		"message": "웹페이지를 로드할 때 저장된 하이라이트를 표시합니다. 하이라이트 모드가 활성화된 경우에만 하이라이트를 표시하려면 이 옵션을 끄십시오."
 	},
+	"anthropicApiKey": {
+		"message": "Anthropic API 키"
+	},
+	"anthropicApiKeyDescription": {
+		"message": "Anthropic API 키는 $link_start$여기$link_end$에서 얻을 수 있습니다.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://console.anthropic.com/settings/keys\" target=\"_blank\">"
+			}
+		}
+	},
+	"apiKeysWarning": {
+		"message": "외부 제공자를 사용하면 해당 제공자의 이용 약관 및 개인정보 보호정책에 동의하는 것입니다. 인터프리터 요청은 선택한 제공자에게 직접 전송됩니다. Obsidian은 요청에 대한 데이터를 수집하거나 저장하지 않습니다."
+	},
 	"appendToDaily": {
 		"message": "데일리 노트 맨 아래에 추가"
 	},
 	"appendToExisting": {
 		"message": "기존에 있는 노트 맨 아래에 추가"
+	},
+	"autoRunInterpreter": {
+		"message": "자동 실행"
+	},
+	"autoRunInterpreterDescription": {
+		"message": "템플릿에 프롬프트 변수가 포함되어 있는 경우 즉시 실행합니다. 이는 모델 제공자의 API 크레딧을 소비합니다. 인터프리터를 수동으로만 실행하려면 끄십시오."
 	},
 	"behavior": {
 		"message": "동작 방식"
@@ -76,17 +105,29 @@
 	"dailyNoteFormat": {
 		"message": "데일리 노트 형식 (e.g., YYYY-MM-DD)"
 	},
+	"defaultInterpreterContext": {
+		"message": "기본 인터프리터 컨텍스트"
+	},
+	"defaultInterpreterContextDescription": {
+		"message": "모델이 프롬프트 변수를 해석하는 데 사용할 컨텍스트입니다. 변수와 필터를 사용할 수 있습니다."
+	},
 	"defaultTemplateName": {
 		"message": "기본 템플릿"
 	},
 	"delete": {
 		"message": "삭제"
 	},
+	"deleteModelConfirm": {
+		"message": "이 모델을 삭제하시겠습니까?"
+	},
 	"disableHighlighter": {
 		"message": "하이라이터 끄기"
 	},
 	"display": {
 		"message": "표시"
+	},
+	"done": {
+		"message": "완료"
 	},
 	"duplicate": {
 		"message": "복제"
@@ -105,6 +146,9 @@
 	"earlyAccessFeatures": {
 		"message": "얼리 액세스 기능"
 	},
+	"editModel": {
+		"message": "모델 편집"
+	},
 	"editTemplate": {
 		"message": "템플릿 편집"
 	},
@@ -113,6 +157,26 @@
 	},
 	"enableHighlighterDescription": {
 		"message": "하이라이트한 웹페이지 내용을 Obsidian에 저장합니다."
+	},
+	"enableInterpreter": {
+		"message": "인터프리터 활성화"
+	},
+	"enableInterpreterDescription": {
+		"message": "자연어를 사용하여 페이지에서 데이터를 추출합니다. 예를 들어, $strong_start${{prompt:\"페이지 요약\"}}$strong_end$ 템플릿 구문을 사용할 수 있습니다. API 키 또는 아래에서 구성된 사용자 지정 모델이 필요합니다. $link_start$자세히 알아보기$link_end$",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/interpreter\" target=\"_blank\">"
+			},
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
 	},
 	"error": {
 		"message": "에러"
@@ -238,6 +302,9 @@
 			}
 		}
 	},
+	"interpret": {
+		"message": "해석"
+	},
 	"interpreter": {
 		"message": "인터프리터"
 	},
@@ -245,7 +312,7 @@
 		"message": "인터프리터 컨텍스트"
 	},
 	"interpreterContextDescription": {
-		"message": "프롬프트 변수를 해석하는 데 사용되는 컨텍스트입니다. $link_start$인터프리터 설정$link_end$에 정의된 기본 컨텍스트를 재정의합니다. 여기서 변수를 사용할 수 있습니다.",
+		"message": "프롬프트 변수를 해석하는 데 사용되는 컨텍스트입니다. $link_start$인��프리터 설정$link_end$에 정의된 기본 컨텍스트를 재정의합니다. 여기서 변수를 사용할 수 있습니다.",
 		"placeholders": {
 			"link_end": {
 				"content": "</a>"
@@ -269,6 +336,33 @@
 	},
 	"legacyModeDescription": {
 		"message": "Obsidian 1.6.7 이하 버전과 호환되는 URI 클리핑 방법을 사용합니다. 클립할 수 있는 내용량은 브라우저와 OS에 따라 제한됩니다. 일부 페이지는 오류 없이 실패할 수 있습니다."
+	},
+	"modelApiKey": {
+		"message": "API 키"
+	},
+	"modelApiKeyDescription": {
+		"message": "이 모델의 API 키를 입력하세요."
+	},
+	"modelBaseUrl": {
+		"message": "기본 URL"
+	},
+	"modelBaseUrlDescription": {
+		"message": "이 모델의 API 엔드포인트 URL입니다."
+	},
+	"modelName": {
+		"message": "모델 이름"
+	},
+	"modelNameDescription": {
+		"message": "이 모델 구성의 이름을 입력하세요."
+	},
+	"modelProvider": {
+		"message": "제공자"
+	},
+	"modelProviderDescription": {
+		"message": "모델 제공자의 이름을 입력하세요."
+	},
+	"models": {
+		"message": "모델"
 	},
 	"more": {
 		"message": "더 보기"
@@ -320,6 +414,23 @@
 	"open": {
 		"message": "열기"
 	},
+	"openaiApiKey": {
+		"message": "OpenAI API 키"
+	},
+	"openaiApiKeyDescription": {
+		"message": "OpenAI API 키는 $link_start$여기$link_end$에서 얻을 수 있습니다.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://platform.openai.com/api-keys\" target=\"_blank\">"
+			}
+		}
+	},
+	"optional": {
+		"message": "(선택사항)"
+	},
 	"pageCannotBeClipped": {
 		"message": "이 페이지는 클립할 수 없습니다."
 	},
@@ -335,6 +446,9 @@
 	"prependToExisting": {
 		"message": "기존에 있는 노트 맨 위에 추가"
 	},
+	"processing": {
+		"message": "처리 중"
+	},
 	"properties": {
 		"message": "속성"
 	},
@@ -346,6 +460,9 @@
 	},
 	"propertyValue": {
 		"message": "속성 값"
+	},
+	"providers": {
+		"message": "제공자"
 	},
 	"refresh": {
 		"message": "새로 고침"
@@ -454,6 +571,9 @@
 	},
 	"templatesHeading": {
 		"message": "템플릿"
+	},
+	"thinking": {
+		"message": "생각 중"
 	},
 	"vault": {
 		"message": "보관소"

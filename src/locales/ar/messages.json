@@ -1,4 +1,10 @@
 {
+	"addModel": {
+		"message": "+ إضافة نموذج"
+	},
+	"addModelTitle": {
+		"message": "إضافة نموذج"
+	},
 	"addProperty": {
 		"message": "+ إضافة خاصية"
 	},
@@ -20,11 +26,34 @@
 	"alwaysShowHighlightsDescription": {
 		"message": "عرض التظليلات المحفوظة عند تحميل الصفحة. قم بإيقافها لعرض التظليلات فقط عند تفعيل وضع التظليل."
 	},
+	"anthropicApiKey": {
+		"message": "مفتاح Anthropic API"
+	},
+	"anthropicApiKeyDescription": {
+		"message": "يمكنك الحصول على مفتاح Anthropic API الخاص بك $link_start$هنا$link_end$.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://console.anthropic.com/settings/keys\" target=\"_blank\">"
+			}
+		}
+	},
+	"apiKeysWarning": {
+		"message": "باستخدام مزود خارجي، فإنك توافق على شروطهم وسياسة الخصوصية الخاصة بهم. يتم إرسال طلبات المفسر مباشرة إلى المزود الذي تختاره. لا يقوم Obsidian بجمع أو تخزين أي بيانات حول طلباتك."
+	},
 	"appendToDaily": {
 		"message": "إضافة إلى الملاحظة اليومية، في النهاية"
 	},
 	"appendToExisting": {
 		"message": "إضافة إلى ملاحظة موجودة، في النهاية"
+	},
+	"autoRunInterpreter": {
+		"message": "تشغيل تلقائي"
+	},
+	"autoRunInterpreterDescription": {
+		"message": "تشغيل متغيرات الإدخال فورًا إذا كان القالب يحتوي على أي منها. سيستهلك هذا رصيد API مع مزود النموذج الخاص بك. قم بإيقاف التشغيل إذا كنت تريد فقط تشغيل المفسر يدويًا."
 	},
 	"behavior": {
 		"message": "السلوك"
@@ -76,17 +105,29 @@
 	"dailyNoteFormat": {
 		"message": "تنسيق الملاحظة اليومية (مثال: YYYY-MM-DD)"
 	},
+	"defaultInterpreterContext": {
+		"message": "سياق المفسر الافتراضي"
+	},
+	"defaultInterpreterContextDescription": {
+		"message": "سيستخدم النموذج هذا السياق لتفسير متغيرات الإدخال. يمكن استخدام المتغيرات والمرشحات هنا."
+	},
 	"defaultTemplateName": {
 		"message": "افتراضي"
 	},
 	"delete": {
 		"message": "حذف"
 	},
+	"deleteModelConfirm": {
+		"message": "هل أنت متأكد من أنك تريد حذف هذا النموذج؟"
+	},
 	"disableHighlighter": {
 		"message": "تعطيل المظلل"
 	},
 	"display": {
 		"message": "العرض"
+	},
+	"done": {
+		"message": "تم"
 	},
 	"duplicate": {
 		"message": "نسخ"
@@ -105,6 +146,9 @@
 	"earlyAccessFeatures": {
 		"message": "ميزات الوصول المبكر"
 	},
+	"editModel": {
+		"message": "تعديل النموذج"
+	},
 	"editTemplate": {
 		"message": "تعديل القالب"
 	},
@@ -113,6 +157,26 @@
 	},
 	"enableHighlighterDescription": {
 		"message": "قم بتظليل المحتوى على صفحات الويب الذي تريد حفظه في أوبسيديان."
+	},
+	"enableInterpreter": {
+		"message": "تمكين المفسر"
+	},
+	"enableInterpreterDescription": {
+		"message": "استخدم اللغة الطبيعية لاستخراج البيانات من الصفحات. على سبيل المثال، يمكنك استخدام صيغة القالب $strong_start${{prompt:\"ملخص للصفحة\"}}$strong_end$. يتطلب مفتاح API أو نموذج مخصص تم تكوينه أدناه. $link_start$تعلم المزيد$link_end$",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/interpreter\" target=\"_blank\">"
+			},
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
 	},
 	"error": {
 		"message": "خطأ"
@@ -238,6 +302,9 @@
 			}
 		}
 	},
+	"interpret": {
+		"message": "تفسير"
+	},
 	"interpreter": {
 		"message": "المفسر"
 	},
@@ -269,6 +336,33 @@
 	},
 	"legacyModeDescription": {
 		"message": "يستخدم طريقة قص URI المتوافقة مع أوبسيديان 1.6.7 أو أقدم. لاحظ أن طول المحتوى الذي يمكنك قصه محدود بواسطة متصفحك ونظام التشغيل. قد تفشل بعض الصفحات بدون أي أخطاء."
+	},
+	"modelApiKey": {
+		"message": "مفتاح API"
+	},
+	"modelApiKeyDescription": {
+		"message": "أدخل مفتاح API لهذا النموذج."
+	},
+	"modelBaseUrl": {
+		"message": "عنوان URL الأساسي"
+	},
+	"modelBaseUrlDescription": {
+		"message": "عنوان URL لنقطة نهاية API لهذا النموذج."
+	},
+	"modelName": {
+		"message": "اسم النموذج"
+	},
+	"modelNameDescription": {
+		"message": "أدخل اسمًا لتكوين هذا النموذج."
+	},
+	"modelProvider": {
+		"message": "المزود"
+	},
+	"modelProviderDescription": {
+		"message": "أدخل اسم مزود النموذج."
+	},
+	"models": {
+		"message": "النماذج"
 	},
 	"more": {
 		"message": "المزيد"
@@ -320,6 +414,23 @@
 	"open": {
 		"message": "فتح"
 	},
+	"openaiApiKey": {
+		"message": "مفتاح OpenAI API"
+	},
+	"openaiApiKeyDescription": {
+		"message": "يمكنك الحصول على مفتاح OpenAI API الخاص بك $link_start$هنا$link_end$.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://platform.openai.com/api-keys\" target=\"_blank\">"
+			}
+		}
+	},
+	"optional": {
+		"message": "(اختياري)"
+	},
 	"pageCannotBeClipped": {
 		"message": "لا يمكن قص هذه الصفحة."
 	},
@@ -335,6 +446,9 @@
 	"prependToExisting": {
 		"message": "إضافة إلى ملاحظة موجودة، في البداية"
 	},
+	"processing": {
+		"message": "جاري المعالجة"
+	},
 	"properties": {
 		"message": "الخصائص"
 	},
@@ -346,6 +460,9 @@
 	},
 	"propertyValue": {
 		"message": "قيمة الخاصية"
+	},
+	"providers": {
+		"message": "المزودون"
 	},
 	"refresh": {
 		"message": "تحديث"
@@ -455,6 +572,9 @@
 	"templatesHeading": {
 		"message": "القوالب"
 	},
+	"thinking": {
+		"message": "يفكر"
+	},
 	"vault": {
 		"message": "الخزينة"
 	},
@@ -483,4 +603,4 @@
 			}
 		}
 	}
-} 
+}
