@@ -230,7 +230,7 @@ export async function initializePageContent(content: string, selectedHtml: strin
 			'{{fullHtml}}': fullHtml.trim(),
 			'{{image}}': image.trim(),
 			'{{noteName}}': noteName.trim(),
-			'{{published}}': published.trim(),
+			'{{published}}': published.split(',')[0].trim(),
 			'{{site}}': site.trim(),
 			'{{title}}': title.trim(),
 			'{{url}}': currentUrl.trim(),
