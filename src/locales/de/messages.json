@@ -1,4 +1,10 @@
 {
+	"addModel": {
+		"message": "+ Modell hinzufügen"
+	},
+	"addModelTitle": {
+		"message": "Modell hinzufügen"
+	},
 	"addProperty": {
 		"message": "+ Eigenschaft hinzufügen"
 	},
@@ -20,11 +26,34 @@
 	"alwaysShowHighlightsDescription": {
 		"message": "Zeigt Ihre gespeicherten Hervorhebungen beim Laden einer Seite an. Deaktivieren Sie dies, um Hervorhebungen nur anzuzeigen, wenn der Hervorhebungsmodus aktiviert ist."
 	},
+	"anthropicApiKey": {
+		"message": "Anthropic API-Schlüssel"
+	},
+	"anthropicApiKeyDescription": {
+		"message": "Sie können Ihren Anthropic API-Schlüssel $link_start$hier$link_end$ erhalten.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://console.anthropic.com/settings/keys\" target=\"_blank\">"
+			}
+		}
+	},
+	"apiKeysWarning": {
+		"message": "Durch die Nutzung eines externen Anbieters stimmen Sie dessen Nutzungsbedingungen und Datenschutzrichtlinien zu. Interpreter-Anfragen werden direkt an den von Ihnen gewählten Anbieter gesendet. Obsidian sammelt oder speichert keine Daten über Ihre Anfragen."
+	},
 	"appendToDaily": {
 		"message": "Zur Tagesnotiz am Ende hinzufügen"
 	},
 	"appendToExisting": {
 		"message": "Zu bestehender Notiz am Ende hinzufügen"
+	},
+	"autoRunInterpreter": {
+		"message": "Automatisch ausführen"
+	},
+	"autoRunInterpreterDescription": {
+		"message": "Führt Prompt-Variablen sofort aus, wenn die Vorlage welche enthält. Dies verbraucht API-Guthaben bei Ihrem Modellanbieter. Deaktivieren Sie dies, wenn Sie den Interpreter nur manuell ausführen möchten."
 	},
 	"behavior": {
 		"message": "Verhalten"
@@ -76,17 +105,29 @@
 	"dailyNoteFormat": {
 		"message": "Tagesnotiz-Format (z.B. YYYY-MM-DD)"
 	},
+	"defaultInterpreterContext": {
+		"message": "Standard-Interpreter-Kontext"
+	},
+	"defaultInterpreterContextDescription": {
+		"message": "Das Modell wird diesen Kontext verwenden, um Prompt-Variablen zu interpretieren. Variablen und Filter können hier verwendet werden."
+	},
 	"defaultTemplateName": {
 		"message": "Standard"
 	},
 	"delete": {
 		"message": "Löschen"
 	},
+	"deleteModelConfirm": {
+		"message": "Sind Sie sicher, dass Sie dieses Modell löschen möchten?"
+	},
 	"disableHighlighter": {
 		"message": "Hervorheber deaktivieren"
 	},
 	"display": {
 		"message": "Anzeige"
+	},
+	"done": {
+		"message": "fertig"
 	},
 	"duplicate": {
 		"message": "Duplizieren"
@@ -105,6 +146,9 @@
 	"earlyAccessFeatures": {
 		"message": "Early Access Funktionen"
 	},
+	"editModel": {
+		"message": "Modell bearbeiten"
+	},
 	"editTemplate": {
 		"message": "Vorlage bearbeiten"
 	},
@@ -113,6 +157,26 @@
 	},
 	"enableHighlighterDescription": {
 		"message": "Heben Sie Inhalte auf Webseiten hervor, die Sie in Obsidian speichern möchten."
+	},
+	"enableInterpreter": {
+		"message": "Interpreter aktivieren"
+	},
+	"enableInterpreterDescription": {
+		"message": "Verwenden Sie natürliche Sprache, um Daten aus Seiten zu extrahieren. Zum Beispiel können Sie die Vorlagensyntax $strong_start${{prompt:\"eine Zusammenfassung der Seite\"}}$strong_end$ verwenden. Erfordert einen API-Schlüssel oder ein unten konfiguriertes benutzerdefiniertes Modell. $link_start$Mehr erfahren$link_end$",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/interpreter\" target=\"_blank\">"
+			},
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
 	},
 	"error": {
 		"message": "Fehler"
@@ -238,6 +302,9 @@
 			}
 		}
 	},
+	"interpret": {
+		"message": "interpretieren"
+	},
 	"interpreter": {
 		"message": "Interpreter"
 	},
@@ -269,6 +336,33 @@
 	},
 	"legacyModeDescription": {
 		"message": "Verwendet die URI-Ausschneidemethode, die mit Obsidian 1.6.7 oder älter kompatibel ist. Beachten Sie, dass die Länge des Inhalts, den Sie ausschneiden können, durch Ihren Browser und das Betriebssystem begrenzt ist. Einige Seiten können ohne Fehlermeldungen fehlschlagen."
+	},
+	"modelApiKey": {
+		"message": "API-Schlüssel"
+	},
+	"modelApiKeyDescription": {
+		"message": "Geben Sie den API-Schlüssel für dieses Modell ein."
+	},
+	"modelBaseUrl": {
+		"message": "Basis-URL"
+	},
+	"modelBaseUrlDescription": {
+		"message": "Die API-Endpunkt-URL für dieses Modell."
+	},
+	"modelName": {
+		"message": "Modellname"
+	},
+	"modelNameDescription": {
+		"message": "Geben Sie einen Namen für diese Modellkonfiguration ein."
+	},
+	"modelProvider": {
+		"message": "Anbieter"
+	},
+	"modelProviderDescription": {
+		"message": "Geben Sie den Namen des Modellanbieters ein."
+	},
+	"models": {
+		"message": "Modelle"
 	},
 	"more": {
 		"message": "Mehr"
@@ -320,6 +414,23 @@
 	"open": {
 		"message": "Öffnen"
 	},
+	"openaiApiKey": {
+		"message": "OpenAI API-Schlüssel"
+	},
+	"openaiApiKeyDescription": {
+		"message": "Sie können Ihren OpenAI API-Schlüssel $link_start$hier$link_end$ erhalten.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://platform.openai.com/api-keys\" target=\"_blank\">"
+			}
+		}
+	},
+	"optional": {
+		"message": "(optional)"
+	},
 	"pageCannotBeClipped": {
 		"message": "Diese Seite kann nicht ausgeschnitten werden."
 	},
@@ -335,6 +446,9 @@
 	"prependToExisting": {
 		"message": "Zu bestehender Notiz am Anfang hinzufügen"
 	},
+	"processing": {
+		"message": "verarbeite"
+	},
 	"properties": {
 		"message": "Eigenschaften"
 	},
@@ -346,6 +460,9 @@
 	},
 	"propertyValue": {
 		"message": "Eigenschaftswert"
+	},
+	"providers": {
+		"message": "Anbieter"
 	},
 	"refresh": {
 		"message": "Aktualisieren"
@@ -455,6 +572,9 @@
 	"templatesHeading": {
 		"message": "Vorlagen"
 	},
+	"thinking": {
+		"message": "denke nach"
+	},
 	"vault": {
 		"message": "Tresor"
 	},
@@ -483,4 +603,4 @@
 			}
 		}
 	}
-} 
+}

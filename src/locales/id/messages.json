@@ -1,4 +1,10 @@
 {
+	"addModel": {
+		"message": "+ Tambah model"
+	},
+	"addModelTitle": {
+		"message": "Tambah model"
+	},
 	"addProperty": {
 		"message": "+ Tambah properti"
 	},
@@ -20,11 +26,34 @@
 	"alwaysShowHighlightsDescription": {
 		"message": "Tampilkan sorotan yang tersimpan saat memuat laman web. Matikan untuk hanya menampilkan sorotan saat mode sorotan diaktifkan."
 	},
+	"anthropicApiKey": {
+		"message": "Kunci API Anthropic"
+	},
+	"anthropicApiKeyDescription": {
+		"message": "Anda dapat memperoleh kunci API Anthropic Anda $link_start$di sini$link_end$.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://console.anthropic.com/settings/keys\" target=\"_blank\">"
+			}
+		}
+	},
+	"apiKeysWarning": {
+		"message": "Dengan menggunakan penyedia eksternal, Anda menyetujui persyaratan dan kebijakan privasi mereka. Permintaan interpreter dikirim langsung ke penyedia yang Anda pilih. Obsidian tidak mengumpulkan atau menyimpan data apa pun tentang permintaan Anda."
+	},
 	"appendToDaily": {
 		"message": "Tambah ke catatan harian, di bagian akhir"
 	},
 	"appendToExisting": {
 		"message": "Tambah ke catatan yang telah ada, di bagian akhir"
+	},
+	"autoRunInterpreter": {
+		"message": "Jalankan secara otomatis"
+	},
+	"autoRunInterpreterDescription": {
+		"message": "Jalankan variabel prompt segera jika template berisi variabel. Ini akan menggunakan kredit API dari penyedia model Anda. Matikan jika Anda hanya ingin menjalankan interpreter secara manual."
 	},
 	"behavior": {
 		"message": "Perilaku"
@@ -76,17 +105,29 @@
 	"dailyNoteFormat": {
 		"message": "Format catatan harian (mis., YYYY-MM-DD)"
 	},
+	"defaultInterpreterContext": {
+		"message": "Konteks interpreter default"
+	},
+	"defaultInterpreterContextDescription": {
+		"message": "Model akan menggunakan konteks ini untuk menginterpretasikan variabel prompt. Variabel dan filter dapat digunakan di sini."
+	},
 	"defaultTemplateName": {
 		"message": "Default"
 	},
 	"delete": {
 		"message": "Hapus"
 	},
+	"deleteModelConfirm": {
+		"message": "Apakah Anda yakin ingin menghapus model ini?"
+	},
 	"disableHighlighter": {
 		"message": "Nonaktifkan sorotan"
 	},
 	"display": {
 		"message": "Tampilan"
+	},
+	"done": {
+		"message": "selesai"
 	},
 	"duplicate": {
 		"message": "Duplikat"
@@ -105,6 +146,9 @@
 	"earlyAccessFeatures": {
 		"message": "Fitur early access"
 	},
+	"editModel": {
+		"message": "Edit model"
+	},
 	"editTemplate": {
 		"message": "Ubah template"
 	},
@@ -113,6 +157,26 @@
 	},
 	"enableHighlighterDescription": {
 		"message": "Sorot konten di laman web yang dapat disimpan ke Obsidian."
+	},
+	"enableInterpreter": {
+		"message": "Aktifkan interpreter"
+	},
+	"enableInterpreterDescription": {
+		"message": "Gunakan bahasa alami untuk mengekstrak data dari halaman. Misalnya, Anda dapat menggunakan sintaks template $strong_start${{prompt:\"ringkasan halaman\"}}$strong_end$. Memerlukan kunci API atau model kustom yang dikonfigurasi di bawah. $link_start$Pelajari lebih lanjut$link_end$",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/interpreter\" target=\"_blank\">"
+			},
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
 	},
 	"error": {
 		"message": "Error"
@@ -238,6 +302,9 @@
 			}
 		}
 	},
+	"interpret": {
+		"message": "interpretasi"
+	},
 	"interpreter": {
 		"message": "Interpreter"
 	},
@@ -269,6 +336,33 @@
 	},
 	"legacyModeDescription": {
 		"message": "Menggunakan metode klip URI yang kompatibel dengan Obsidian 1.6.7 atau yang lebih lama. Perhatikan bahwa panjang konten yang dapat Anda klip dibatasi oleh browser dan sistem operasi Anda. Beberapa laman web bisa saja gagal tanpa ada pesan error yang tampil."
+	},
+	"modelApiKey": {
+		"message": "Kunci API"
+	},
+	"modelApiKeyDescription": {
+		"message": "Masukkan kunci API untuk model ini."
+	},
+	"modelBaseUrl": {
+		"message": "URL dasar"
+	},
+	"modelBaseUrlDescription": {
+		"message": "URL endpoint API untuk model ini."
+	},
+	"modelName": {
+		"message": "Nama model"
+	},
+	"modelNameDescription": {
+		"message": "Masukkan nama untuk konfigurasi model ini."
+	},
+	"modelProvider": {
+		"message": "Penyedia"
+	},
+	"modelProviderDescription": {
+		"message": "Masukkan nama penyedia model."
+	},
+	"models": {
+		"message": "Model"
 	},
 	"more": {
 		"message": "Lainnya"
@@ -320,6 +414,23 @@
 	"open": {
 		"message": "Buka"
 	},
+	"openaiApiKey": {
+		"message": "Kunci API OpenAI"
+	},
+	"openaiApiKeyDescription": {
+		"message": "Anda dapat memperoleh kunci API OpenAI Anda $link_start$di sini$link_end$.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://platform.openai.com/api-keys\" target=\"_blank\">"
+			}
+		}
+	},
+	"optional": {
+		"message": "(opsional)"
+	},
 	"pageCannotBeClipped": {
 		"message": "Laman ini tidak dapat diklip."
 	},
@@ -335,6 +446,9 @@
 	"prependToExisting": {
 		"message": "Tambah ke catatan yang telah ada, di bagian awal"
 	},
+	"processing": {
+		"message": "memproses"
+	},
 	"properties": {
 		"message": "Properti"
 	},
@@ -346,6 +460,9 @@
 	},
 	"propertyValue": {
 		"message": "Value properti"
+	},
+	"providers": {
+		"message": "Penyedia"
 	},
 	"refresh": {
 		"message": "Muat ulang"
@@ -454,6 +571,9 @@
 	},
 	"templatesHeading": {
 		"message": "Template"
+	},
+	"thinking": {
+		"message": "berpikir"
 	},
 	"vault": {
 		"message": "Vault"

@@ -1,4 +1,10 @@
 {
+	"addModel": {
+		"message": "+ Добавить модель"
+	},
+	"addModelTitle": {
+		"message": "Добавить модель"
+	},
 	"addProperty": {
 		"message": "+ Добавить свойство"
 	},
@@ -20,11 +26,34 @@
 	"alwaysShowHighlightsDescription": {
 		"message": "Отображение сохраненных выделений маркером при загрузке страницы. Выключите, чтобы отображать выделения маркером только при включении режима."
 	},
+	"anthropicApiKey": {
+		"message": "Ключ API Anthropic"
+	},
+	"anthropicApiKeyDescription": {
+		"message": "Вы можете получить ваш ключ API Anthropic $link_start$здесь$link_end$.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://console.anthropic.com/settings/keys\" target=\"_blank\">"
+			}
+		}
+	},
+	"apiKeysWarning": {
+		"message": "Используя внешнего провайдера, вы соглашаетесь с их условиями использования и политикой конфиденциальности. Запросы интерпретатора отправляются напрямую выбранному вами провайдеру. Obsidian не собирает и не хранит никаких данных о ваших запросах."
+	},
 	"appendToDaily": {
 		"message": "Добавлять в конец ежедневной заметки"
 	},
 	"appendToExisting": {
 		"message": "Добавлять в конец существующей заметки"
+	},
+	"autoRunInterpreter": {
+		"message": "Автоматический запуск"
+	},
+	"autoRunInterpreterDescription": {
+		"message": "Немедленно выполнять переменные подсказок, если они есть в шаблоне. Это будет расходовать API-кредиты вашего провайдера модели. Отключите, если хотите запускать интерпретатор только вручную."
 	},
 	"behavior": {
 		"message": "Поведение"
@@ -33,7 +62,7 @@
 		"message": "Для добавления в существующую заметку или ежедневную заметку требуется Obsidian 1.7.2 или более поздняя версия."
 	},
 	"clipBehavior": {
-		"message": "Поведение при сохранении" 
+		"message": "Поведение при сохранении"
 	},
 	"clipBehaviorDescription": {
 		"message": "Выберите способ сохранения выделенного содержимого в Obsidian. Содержится в переменной $strong_start${{content}}$strong_end$.",
@@ -76,17 +105,29 @@
 	"dailyNoteFormat": {
 		"message": "Формат ежедневной заметки (например, YYYY-MM-DD)"
 	},
+	"defaultInterpreterContext": {
+		"message": "Контекст интерпретатора по умолчанию"
+	},
+	"defaultInterpreterContextDescription": {
+		"message": "Модель будет использовать этот контекст для интерпретации переменных подсказок. Здесь можно использовать переменные и фильтры."
+	},
 	"defaultTemplateName": {
 		"message": "По умолчанию"
 	},
 	"delete": {
 		"message": "Удалить"
 	},
+	"deleteModelConfirm": {
+		"message": "Вы уверены, что хотите удалить эту модель?"
+	},
 	"disableHighlighter": {
 		"message": "Выключить маркер"
 	},
 	"display": {
 		"message": "Отображение"
+	},
+	"done": {
+		"message": "готово"
 	},
 	"duplicate": {
 		"message": "Дублировать"
@@ -105,6 +146,9 @@
 	"earlyAccessFeatures": {
 		"message": "Функции раннего доступа"
 	},
+	"editModel": {
+		"message": "Редактировать модель"
+	},
 	"editTemplate": {
 		"message": "Изменить шаблон"
 	},
@@ -113,6 +157,26 @@
 	},
 	"enableHighlighterDescription": {
 		"message": "Выделите содержимое веб-страниц, которое хотите сохранить в Obsidian."
+	},
+	"enableInterpreter": {
+		"message": "Включить интерпретатор"
+	},
+	"enableInterpreterDescription": {
+		"message": "Используйте естественный язык для извлечения данных из страниц. Например, вы можете использовать синтаксис шаблона $strong_start${{prompt:\"краткое содержание страницы\"}}$strong_end$. Требуется ключ API или настроенная ниже пользовательская модель. $link_start$Узнать больше$link_end$",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/interpreter\" target=\"_blank\">"
+			},
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
 	},
 	"error": {
 		"message": "Ошибка"
@@ -188,6 +252,15 @@
 	"generalSettings": {
 		"message": "Основные настройки"
 	},
+	"help": {
+		"message": "Помощь"
+	},
+	"helpDescription": {
+		"message": "Узнайте, как использовать Web Clipper и получите помощь в устранении неполадок."
+	},
+	"highlightInline": {
+		"message": "Выделить содержимое страницы"
+	},
 	"highlightPage": {
 		"message": "Выделить страницу"
 	},
@@ -229,6 +302,9 @@
 			}
 		}
 	},
+	"interpret": {
+		"message": "интерпретировать"
+	},
 	"interpreter": {
 		"message": "Интерпретатор"
 	},
@@ -260,6 +336,33 @@
 	},
 	"legacyModeDescription": {
 		"message": "Использует метод обработки URI, совместимый с Obsidian 1.6.7 или более ранней версией. Обратите внимание, что длина контента, который вы можете вырезать, ограничена вашим браузером и ОС. Некоторые страницы могут не открыться без ошибок."
+	},
+	"modelApiKey": {
+		"message": "Ключ API"
+	},
+	"modelApiKeyDescription": {
+		"message": "Введите ключ API для этой модели."
+	},
+	"modelBaseUrl": {
+		"message": "Базовый URL"
+	},
+	"modelBaseUrlDescription": {
+		"message": "URL конечной точки API для этой модели."
+	},
+	"modelName": {
+		"message": "Название модели"
+	},
+	"modelNameDescription": {
+		"message": "Введите название для этой конфигурации модели."
+	},
+	"modelProvider": {
+		"message": "Провайдер"
+	},
+	"modelProviderDescription": {
+		"message": "Введите название провайдера модели."
+	},
+	"models": {
+		"message": "Модели"
 	},
 	"more": {
 		"message": "Далее"
@@ -308,6 +411,26 @@
 	"onlyHttpSupported": {
 		"message": "Эту страницу нельзя сохранить. Поддерживаются только URL-адреса http и https."
 	},
+	"open": {
+		"message": "Открыть"
+	},
+	"openaiApiKey": {
+		"message": "Ключ API OpenAI"
+	},
+	"openaiApiKeyDescription": {
+		"message": "Вы можете получить ваш ключ API OpenAI $link_start$здесь$link_end$.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://platform.openai.com/api-keys\" target=\"_blank\">"
+			}
+		}
+	},
+	"optional": {
+		"message": "(необязательно)"
+	},
 	"pageCannotBeClipped": {
 		"message": "Эту страницу нельзя сохранить."
 	},
@@ -323,6 +446,9 @@
 	"prependToExisting": {
 		"message": "Добавить в начало существующей заметки"
 	},
+	"processing": {
+		"message": "обработка"
+	},
 	"properties": {
 		"message": "Свойства"
 	},
@@ -334,6 +460,9 @@
 	},
 	"propertyValue": {
 		"message": "Значение свойства"
+	},
+	"providers": {
+		"message": "Провайдеры"
 	},
 	"refresh": {
 		"message": "Обновить"
@@ -443,6 +572,9 @@
 	"templatesHeading": {
 		"message": "Шаблоны"
 	},
+	"thinking": {
+		"message": "думаю"
+	},
 	"vault": {
 		"message": "Хранилище"
 	},
@@ -470,17 +602,5 @@
 				"content": "<strong>"
 			}
 		}
-	},
-	"help": {
-		"message": "Помощь"
-	},
-	"helpDescription": {
-		"message": "Узнайте, как использовать Web Clipper и получите помощь в устранении неполадок."
-	},
-	"open": {
-		"message": "Открыть"
-	},
-	"highlightInline": {
-		"message": "Выделить содержимое страницы"
 	}
 }
