@@ -1,5 +1,7 @@
 ---
 permalink: web-clipper/capture
+aliases:
+  - Obsidian Web Clipper/Capture web pages
 ---
 Once you install the [[Introduction to Obsidian Web Clipper|Web Clipper]] browser extension, you can access it in several ways, depending on your browser:
 
@@ -19,7 +21,17 @@ By default Web Clipper attempts to intelligently extract only the main article c
 - If a selection is present, it uses the selection. You can use `Ctrl/Cmd+A` to select the entire page.
 - If any [[Highlight web pages|highlights]] are present, it uses the highlights.
 
-## Clipper functionality
+## Hotkeys
+
+Web Clipper includes keyboard shortcuts you can use to speed up your workflow. To change key mappings go to **Web Clipper Settings** → **General** and follow the instructions for your browser. Mappings can be changed for all browsers except Safari which does not support editing hotkeys.
+
+| Action                  | macOS         | Windows/Linux  |
+| ----------------------- | ------------- | -------------- |
+| Open clipper            | `Cmd+Shift+O` | `Ctrl+Shift+O` |
+| Quick clip              | `Opt+Shift+O` | `Alt+Shift+O`  |
+| Toggle highlighter mode | `Opt+Shift+H` | `Alt+Shift+H`  |
+
+## Interface functionality
 
 The Web Clipper interface is divided into four sections:
 
@@ -40,3 +52,4 @@ Footer functionality includes:
 - **Vault** dropdown to switch between saved vaults added in Web Clipper settings.
 - **Folder** field to define which folder to save to.
 - **Add to Obsidian** button to save data to Obsidian.
+

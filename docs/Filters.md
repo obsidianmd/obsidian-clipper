@@ -87,7 +87,7 @@ Filters that apply [[Basic formatting syntax]] and [[Advanced formatting syntax]
 
 ## HTML processing
 
-Filters that process HTML content and convert HTML to Markdown.
+Filters that process HTML content and convert HTML to Markdown. Note that your input [[Variables|variable]] must contain HTML content, e.g. using `{{fullHtml}}`, `{{contentHtml}}` or a `{{selectorHtml:}}` variable.
 
 - `markdown` converts a string to an [[Obsidian Flavored Markdown]] formatted string.
 	- Useful when combined with variables that return HTML such as `{{contentHtml}}`, `{{fullHtml}}`, and selector variables like `{{selectorHtml:cssSelector}}`.

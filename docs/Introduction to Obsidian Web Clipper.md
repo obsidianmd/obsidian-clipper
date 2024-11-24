@@ -17,15 +17,17 @@ Obsidian Web Clipper is a free browser extension that lets you highlight pages a
 Get the Obsidian Web Clipper extension from the official directory for your browser:
 
 - [Chrome Web Store](https://chromewebstore.google.com/detail/obsidian-web-clipper/cnjifjpddelmedmihgijeibhnjfabmlf)
-	- For Chrome, Brave, Edge, Arc, Orion, and other Chromium-based browsers.
+	- For Chrome, Brave, Arc, Orion, and other Chromium-based browsers.
 - [Firefox Add-Ons](https://addons.mozilla.org/en-US/firefox/addon/web-clipper-obsidian/)
 	- For Firefox and Firefox Mobile.
 - [Safari Extensions](https://apps.apple.com/us/app/obsidian-web-clipper/id6720708363)
 	- For macOS, iOS, and iPadOS.
+- [Edge Add-Ons](https://microsoftedge.microsoft.com/addons/detail/obsidian-web-clipper/eigdjhmgnaaeaonimdklocfekkaanfme)
+	- For Microsoft Edge.
 
 ## How to use Web Clipper
 
-- [[Capture web pages]]
+- [[Clip web pages]]
 	- Get started clipping content from web pages.
 - [[Highlight web pages]]
 	- Highlight content on web pages.

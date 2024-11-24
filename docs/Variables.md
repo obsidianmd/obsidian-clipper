@@ -24,6 +24,7 @@ The main content variable is `{{content}}`, which contains the article content, 
 | `{{date}}`        | Current date, can be formatted using the `date` filter                                 |
 | `{{description}}` | Description or excerpt                                                                 |
 | `{{domain}}`      | Domain                                                                                 |
+| `{{favicon}}`     | Favicon URL                                                                            |
 | `{{fullHtml}}`    | Unprocessed HTML for the full page content                                             |
 | `{{highlights}}`  | [[Highlight web pages\|Highlights]] with text and timestamps                           |
 | `{{image}}`       | Social share image URL                                                                 |
@@ -50,7 +51,7 @@ The syntax is `{{selector:cssSelector?attribute}}`, where `?attribute` is option
 - `{{selector:.author}}` returns text content of the first `.author` element on the page.
 - `{{selector:img.hero?src}}` returns the `src` attribute of the first image with class `hero`.
 - `{{selector:a.main-link?href}}` returns the `href` attribute of the first anchor tag with class `main-link`.
-- `{{selectorHtml:body|markdown}}` returns the entire HTML of the `body` element, converted to Markdown using the `markdown` [[Filters|filter]].
+- `{{selectorHtml:body|markdown}}` returns the entire HTML of the `body` element, converted to Markdown using the `markdown` [[Filters#HTML processing|filter]].
 - Nested CSS selectors and combinators are supported if you need more specificity.
 - If multiple elements match the selector, an array is returned, which you can process with [[Filters#Arrays and objects|array and object filters]] like `join` or `map`.
 
