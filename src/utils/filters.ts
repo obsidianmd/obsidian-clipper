@@ -2,6 +2,7 @@ import { FilterFunction } from '../types/types';
 import { debugLog } from './debug';
 
 import { blockquote } from './filters/blockquote';
+import { calc } from './filters/calc';
 import { callout } from './filters/callout';
 import { camel } from './filters/camel';
 import { capitalize } from './filters/capitalize';
@@ -45,6 +46,7 @@ import { wikilink } from './filters/wikilink';
 
 export const filters: { [key: string]: FilterFunction } = {
 	blockquote,
+	calc,
 	callout,
 	camel,
 	capitalize,
