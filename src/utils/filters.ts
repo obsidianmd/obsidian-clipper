@@ -9,6 +9,7 @@ import { date } from './filters/date';
 import { date_modify } from './filters/date_modify';
 import { first } from './filters/first';
 import { footnote } from './filters/footnote';
+import { fragment_link } from './filters/fragment_link';
 import { html_to_json } from './filters/html_to_json';
 import { image } from './filters/image';
 import { join } from './filters/join';
@@ -16,7 +17,7 @@ import { kebab } from './filters/kebab';
 import { last } from './filters/last';
 import { list } from './filters/list';
 import { link } from './filters/link';
-import { fragment_link } from './filters/fragment_link';
+import { length } from './filters/length';
 import { lower } from './filters/lower';
 import { map } from './filters/map';
 import { markdown } from './filters/markdown';
@@ -57,6 +58,7 @@ export const filters: { [key: string]: FilterFunction } = {
 	join,
 	kebab,
 	last,
+	length,
 	link,
 	list,
 	lower,
