@@ -55,6 +55,8 @@
 		max-width: 40%;
 		font-size: 0.6875rem;
 		padding: 0px;
+		padding-inline-end: 1.25rem;
+		text-overflow: ellipsis;
 		color: var(--text-accent);
 		opacity: 0.75;
 		@media (hover: hover) {
@@ -215,9 +217,9 @@
 		flex-direction: row;
 		align-items: center;
 		justify-content: space-between;
-		gap: 4px;
+		gap: 0.5rem;
 		border-bottom: 1px solid var(--background-modifier-border);
-		padding: 4px 0;
+		padding: 0.25rem 0;
 	}
 	.model-list-item-actions {
 		display: flex;
@@ -233,7 +235,7 @@
 	.model-list-item-info {
 		display: flex;
 		flex-direction: row;
-		gap: 4px;
+		gap: 0.5rem;
 		min-width: 60%;
 	}
 	.model-name {
