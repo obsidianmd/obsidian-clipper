@@ -1,7 +1,10 @@
 body.is-dragging {
 	cursor: grabbing !important;
 }
-.property-editor, #template-list li, #vault-list li {
+.model-list-item,
+.property-editor,
+#template-list li,
+#vault-list li {
 	position: relative;
 	z-index: 1;
 

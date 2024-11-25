@@ -2,7 +2,6 @@ import { initializeToggles, updateToggleState } from '../utils/ui-utils';
 import { ModelConfig, generalSettings, loadSettings, saveSettings } from '../utils/storage-utils';
 import { initializeIcons } from '../icons/icons';
 import { showModal, hideModal } from '../utils/modal-utils';
-import { updateUrl, getUrlParameters } from '../utils/routing';
 import { getMessage, translatePage } from '../utils/i18n';
 
 export function updatePromptContextVisibility(): void {
@@ -78,7 +77,7 @@ export function initializeInterpreterSettings(): void {
 	}
 }
 
-function initializeModelList() {
+export function initializeModelList() {
 	const modelList = document.getElementById('model-list');
 	if (!modelList) return;
 
@@ -87,12 +86,21 @@ function initializeModelList() {
 		const modelItem = createModelListItem(model, index);
 		modelList.appendChild(modelItem);
 	});
+
+	// Initialize icons for the entire list after all items are added
+	initializeIcons(modelList);
 }
 
 function createModelListItem(model: ModelConfig, index: number): HTMLElement {
 	const modelItem = document.createElement('div');
 	modelItem.className = 'model-list-item';
+	modelItem.draggable = true;
+	modelItem.dataset.index = index.toString();
+
 	modelItem.innerHTML = `
+		<div class="drag-handle">
+			<i data-lucide="grip-vertical"></i>
+		</div>
 		<div class="model-list-item-info">
 			<div class="model-name">${model.name}</div>
 			<div class="model-provider">${model.provider || 'Custom'}</div>
@@ -113,15 +121,29 @@ function createModelListItem(model: ModelConfig, index: number): HTMLElement {
 	`;
 
 	const checkbox = modelItem.querySelector(`#model-${index}`) as HTMLInputElement;
-	checkbox.addEventListener('change', () => {
-		if (generalSettings.models && generalSettings.models[index]) {
-			generalSettings.models[index].enabled = checkbox.checked;
-			saveSettings();
-		} else {
-			console.error(`Model at index ${index} not found in generalSettings.models`);
+	const checkboxContainer = modelItem.querySelector('.checkbox-container') as HTMLElement;
+	
+	if (checkbox && checkboxContainer) {
+		updateToggleState(checkboxContainer, checkbox);
+
+		checkbox.addEventListener('change', () => {
+			if (generalSettings.models && generalSettings.models[index]) {
+				generalSettings.models[index].enabled = checkbox.checked;
+				updateToggleState(checkboxContainer, checkbox);
+				saveSettings();
+			} else {
+				console.error(`Model at index ${index} not found in generalSettings.models`);
+				checkbox.checked = !checkbox.checked;
+				updateToggleState(checkboxContainer, checkbox);
+			}
+		});
+
+		checkboxContainer.addEventListener('click', (event) => {
+			event.preventDefault();
 			checkbox.checked = !checkbox.checked;
-		}
-	});
+			checkbox.dispatchEvent(new Event('change'));
+		});
+	}
 
 	if (model.provider !== 'OpenAI' && model.provider !== 'Anthropic') {
 		const editBtn = modelItem.querySelector('.edit-model-btn');

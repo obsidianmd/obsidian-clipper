@@ -216,16 +216,17 @@
 		display: flex;
 		flex-direction: row;
 		align-items: center;
-		justify-content: space-between;
-		gap: 0.5rem;
+		gap: 0.25rem;
 		border-bottom: 1px solid var(--background-modifier-border);
 		padding: 0.25rem 0;
+		user-select: none;
 	}
 	.model-list-item-actions {
 		display: flex;
 		flex-direction: row;
 		align-items: center;
 		justify-content: flex-end;
+		margin-inline-start: auto;
 		gap: 2px;
 		.clickable-icon {
 			height: 24px;
