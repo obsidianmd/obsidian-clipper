@@ -28,8 +28,7 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 	try {
 		const systemContent = {	
 			instructions:
-				`You are a helpful assistant. Your task is to interpret HTML content. You will be given a list of prompts. Please respond with only one JSON object named \`prompts_responses\` — no explanatory text before or after. Your \`prompts_responses\` object should contain key/value pairs. Use the keys I provided, e.g. \`prompt_1\`, \`prompt_2\`, and add your responses as the values. For each value provide your response as a Markdown string, unless otherwise specified. If the prompt asks for a list, your response should be a Markdown string. Make your responses concise. For example: given {"prompts":{"prompt_1":"four tags about the content","prompt_2":"three bullet points summarizing the text"}} your response should look like: {"prompts_responses":{"prompt_1":"tag1, tag2, tag3, tag4","prompt_2":"- bullet1\n- bullet 2\n- bullet3"}}`,
-			prompts: promptVariables.reduce((acc, { key, prompt }) => {
+			`You are a helpful assistant. Please respond with one JSON object named \`prompts_responses\` — no explanatory text before or after. Use the keys I provided, e.g. \`prompt_1\`, \`prompt_2\`, and fill in the values. Values should be Markdown strings unless otherwise specified. Make your responses concise. For example your response should look like: {"prompts_responses":{"prompt_1":"tag1, tag2, tag3, tag4","prompt_2":"- bullet1\n- bullet 2\n- bullet3"}}`,			prompts: promptVariables.reduce((acc, { key, prompt }) => {
 				acc[key] = prompt;
 				return acc;
 			}, {} as { [key: string]: string })
@@ -174,19 +173,22 @@ function parseAnthropicResponse(responseContent: string, promptVariables: Prompt
 			throw new Error('No text content found in Anthropic response');
 		}
 		
-		// Find the JSON object within the text content and properly handle escaped quotes
+		// Find the JSON object within the text content
 		const jsonMatch = textContent.match(/\{[\s\S]*\}/);
 		if (jsonMatch) {
-			// Replace problematic escaped quotes with temporary markers
+			// Sanitize the JSON string:
 			const sanitizedJson = jsonMatch[0]
-				.replace(/\\"/g, '___QUOTE___') // Replace escaped quotes with marker
-				.replace(/"([^"]+)":/g, '$1:') // Remove quotes around property names
-				.replace(/___QUOTE___/g, '\\"'); // Put escaped quotes back
+				.replace(/\\"/g, '___QUOTE___') // Replace escaped quotes
+				.replace(/[«»]/g, '"') // Replace French quotes
+				.replace(/[\u0000-\u001F\u007F-\u009F]/g, '') // Remove control characters
+				.replace(/\n\s*\n/g, '\\n') // Handle multiple newlines
+				.replace(/([^\\])"/g, '$1\\"') // Escape unescaped quotes
+				.replace(/___QUOTE___/g, '\\"'); // Restore escaped quotes
 			
 			try {
 				parsedResponse = JSON.parse(sanitizedJson);
 			} catch (innerError) {
-				console.error('Error parsing sanitized JSON:', innerError);
+				console.error('Error parsing sanitized JSON:', innerError, sanitizedJson);
 				// Fallback to trying to parse the original match
 				parsedResponse = JSON.parse(jsonMatch[0]);
 			}
@@ -196,8 +198,8 @@ function parseAnthropicResponse(responseContent: string, promptVariables: Prompt
 	} catch (parseError) {
 		debugLog('Interpreter', 'Failed to parse Anthropic response:', parseError);
 		return {
-				userResponse: responseContent,
-				promptResponses: []
+			userResponse: responseContent,
+			promptResponses: []
 		};
 	}
 
