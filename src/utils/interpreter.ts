@@ -1,4 +1,4 @@
-import { generalSettings, ModelConfig } from './storage-utils';
+import { generalSettings, ModelConfig, saveSettings } from './storage-utils';
 import { PromptVariable, Template } from '../types/types';
 import { compileTemplate } from './template-compiler';
 import { applyFilters } from './filters';
@@ -225,7 +225,6 @@ export function collectPromptVariables(template: Template | null): PromptVariabl
 		}
 	}
 
-	// Add this section to collect prompts from all input fields
 	const allInputs = document.querySelectorAll('input, textarea');
 	allInputs.forEach((input) => {
 		if (input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement) {
@@ -289,6 +288,11 @@ export async function initializeInterpreter(template: Template, variables: { [ke
 					`<option value="${model.id}">${model.name}</option>`
 				).join('');
 			modelSelect.value = generalSettings.interpreterModel || (generalSettings.models[0]?.id ?? '');
+
+			modelSelect.addEventListener('change', async () => {
+				generalSettings.interpreterModel = modelSelect.value;
+				await saveSettings();
+			});
 		}
 	}
 }

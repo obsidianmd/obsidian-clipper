@@ -874,7 +874,7 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 			if (generalSettings.interpreterAutoRun && promptVariables.length > 0) {
 				try {
 					const modelSelect = document.getElementById('model-select') as HTMLSelectElement;
-					const selectedModelId = modelSelect?.value || generalSettings.interpreterModel || 'gpt-4o-mini';
+					const selectedModelId = modelSelect?.value || generalSettings.interpreterModel;
 					const modelConfig = generalSettings.models.find(m => m.id === selectedModelId);
 					if (!modelConfig) {
 						throw new Error(`Model configuration not found for ${selectedModelId}`);
