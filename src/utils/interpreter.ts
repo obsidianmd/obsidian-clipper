@@ -258,7 +258,10 @@ export async function initializeInterpreter(template: Template, variables: { [ke
 	if (interpretBtn) interpretBtn.style.display = 'inline-block';
 	
 	if (promptContextTextarea) {
-		let promptToDisplay = template.context || generalSettings.defaultPromptContext;
+		let promptToDisplay =
+			template.context
+			|| generalSettings.defaultPromptContext
+			|| '{{fullHtml|remove_html:(".footer,#footer,header,footer,style,script")|strip_tags:("script,h1,h2,h3,h4,h5,h6,meta,a,ol,ul,li,p,em,strong,i,b,s,strike,u,sup,sub,img,video,audio,math,table,cite,td,th,tr,caption")|strip_attr:("alt,src,href,id,content,property,name,datetime,title")}}';
 		promptToDisplay = await compileTemplate(tabId, promptToDisplay, variables, currentUrl);
 		promptContextTextarea.value = promptToDisplay;
 
@@ -331,8 +334,7 @@ export async function handleInterpreterUI(
 			throw new Error('No prompt variables found. Please add at least one prompt variable to your template.');
 		}
 
-		const contextToUse = promptContextTextarea.value || generalSettings.defaultPromptContext;
-
+		const contextToUse = promptContextTextarea.value;
 		const contentToProcess = variables.content || '';
 
 		// Start the timer

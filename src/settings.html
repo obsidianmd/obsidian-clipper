@@ -257,11 +257,6 @@
 										</div>
 									</div>
 								</div>
-								<div class="setting-item">
-									<label for="default-prompt-context" style="font-weight: 400;" data-i18n="defaultInterpreterContext">Default interpreter context</label>
-									<div class="setting-item-description" data-i18n="defaultInterpreterContextDescription">The model will use this context to interpret prompt variables. Variables can be used here.</div>
-									<textarea id="default-prompt-context" rows="4" placeholder="{{fullHtml}}" spellcheck="false"></textarea>
-								</div>
 							</div>
 							<div>
 								<h3 data-i18n="models">Models</h3>
@@ -299,6 +294,14 @@
 									<div class="setting-item-control">
 										<input type="password" id="anthropic-api-key" data-i18n="anthropicApiKey" placeholder="Anthropic API key">
 									</div>
+								</div>
+							</div>
+							<div>
+								<h3 data-i18n="advanced">Advanced</h3>
+								<div class="setting-item">
+									<label for="default-prompt-context" style="font-weight: 400;" data-i18n="defaultInterpreterContext">Default interpreter context</label>
+									<div class="setting-item-description" data-i18n="defaultInterpreterContextDescription">Override the context used to interpret prompt variables. Variables can be used here.</div>
+									<textarea id="default-prompt-context" rows="4" placeholder="{{fullHtml}}" spellcheck="false"></textarea>
 								</div>
 							</div>
 						</form>

@@ -65,7 +65,7 @@ export function initializeInterpreterSettings(): void {
 
 		const defaultPromptContextInput = document.getElementById('default-prompt-context') as HTMLTextAreaElement;
 		if (defaultPromptContextInput) {
-			defaultPromptContextInput.value = generalSettings.defaultPromptContext || "You are a helpful assistant. Please analyze the following content and provide a concise summary.";
+			defaultPromptContextInput.value = generalSettings.defaultPromptContext;
 		}
 
 		initializeModelList();
