@@ -10,6 +10,9 @@ import { getMessage } from './i18n';
 const RATE_LIMIT_RESET_TIME = 60000; // 1 minute in milliseconds
 let lastRequestTime = 0;
 
+// Store event listeners for cleanup
+const eventListeners = new WeakMap<HTMLElement, { [key: string]: EventListener }>();
+
 export async function sendToLLM(userPrompt: string, content: string, promptVariables: PromptVariable[], model: ModelConfig, apiKey: string): Promise<{ userResponse: any; promptResponses: any[] }> {
 	if (!apiKey) {
 		throw new Error(`API key is not set for model ${model.name}`);
@@ -23,7 +26,7 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 	try {
 		const systemContent = {	
 			instructions:
-				"You are a helpful assistant. Your task is to interpret HTML and Markdown content. Please respond to each prompt in the variables array. Return your response as a JSON object with 'variable_responses' containing responses to the prompts. Within each response, always return the content as a string in Markdown format unless otherwise specified. For example, if the user asks for a list, return a list in Markdown format. Make your responses concise.",
+				"You are a helpful assistant. Your task is to interpret HTML and Markdown content. Please respond to each prompt in the `variables` object. Return your response as JSON with a matching `variable_responses` object. Keep the key names, but replace the prompt value(s) with your response(s). Each value in the `variable_responses` object should be a string in Markdown format, unless otherwise specified. For example, if the user asks for a list, return the list as one Markdown string. Make your responses concise.",
 			variables: promptVariables.map(({ key, prompt }) => ({ key, prompt }))
 		};
 
@@ -244,6 +247,24 @@ export async function initializeInterpreter(template: Template, variables: { [ke
 	const promptContextTextarea = document.getElementById('prompt-context') as HTMLTextAreaElement;
 	const modelSelect = document.getElementById('model-select') as HTMLSelectElement;
 
+	function removeOldListeners(element: HTMLElement, eventType: string) {
+		const listeners = eventListeners.get(element);
+		if (listeners && listeners[eventType]) {
+			element.removeEventListener(eventType, listeners[eventType]);
+		}
+	}
+
+	function storeListener(element: HTMLElement, eventType: string, listener: EventListener) {
+		let listeners = eventListeners.get(element);
+		if (!listeners) {
+			listeners = {};
+			eventListeners.set(element, listeners);
+		}
+		removeOldListeners(element, eventType);
+		listeners[eventType] = listener;
+		element.addEventListener(eventType, listener);
+	}
+
 	const promptVariables = collectPromptVariables(template);
 
 	// Hide interpreter if it's disabled or there are no prompt variables
@@ -257,30 +278,40 @@ export async function initializeInterpreter(template: Template, variables: { [ke
 	if (interpretBtn) interpretBtn.style.display = 'inline-block';
 	
 	if (promptContextTextarea) {
+		const inputListener = () => {
+			template.context = promptContextTextarea.value;
+		};
+		storeListener(promptContextTextarea, 'input', inputListener);
+
 		let promptToDisplay =
 			template.context
 			|| generalSettings.defaultPromptContext
 			|| '{{fullHtml|remove_html:(".footer,#footer,header,footer,style,script")|strip_tags:("script,h1,h2,h3,h4,h5,h6,meta,a,ol,ul,li,p,em,strong,i,b,s,strike,u,sup,sub,img,video,audio,math,table,cite,td,th,tr,caption")|strip_attr:("alt,src,href,id,content,property,name,datetime,title")}}';
 		promptToDisplay = await compileTemplate(tabId, promptToDisplay, variables, currentUrl);
 		promptContextTextarea.value = promptToDisplay;
-
-		promptContextTextarea.addEventListener('input', () => {
-			template.context = promptContextTextarea.value;
-		});
 	}
 
 	if (template) {
-		if (interpretBtn) {
-			interpretBtn.addEventListener('click', async () => {
+		// Only add click listener if auto-run is disabled
+		if (interpretBtn && !generalSettings.interpreterAutoRun) {
+			const clickListener = async () => {
 				const selectedModelId = modelSelect.value;
 				const modelConfig = generalSettings.models.find(m => m.id === selectedModelId);
 				if (!modelConfig) {
 					throw new Error(`Model configuration not found for ${selectedModelId}`);
 				}
 				await handleInterpreterUI(template, variables, tabId, currentUrl, modelConfig);
-			});
+			};
+			storeListener(interpretBtn, 'click', clickListener);
 		}
+
 		if (modelSelect) {
+			const changeListener = async () => {
+				generalSettings.interpreterModel = modelSelect.value;
+				await saveSettings();
+			};
+			storeListener(modelSelect, 'change', changeListener);
+
 			modelSelect.style.display = 'inline-block';
 			modelSelect.innerHTML = generalSettings.models
 				.filter(model => model.enabled)
@@ -288,11 +319,6 @@ export async function initializeInterpreter(template: Template, variables: { [ke
 					`<option value="${model.id}">${model.name}</option>`
 				).join('');
 			modelSelect.value = generalSettings.interpreterModel || (generalSettings.models[0]?.id ?? '');
-
-			modelSelect.addEventListener('change', async () => {
-				generalSettings.interpreterModel = modelSelect.value;
-				await saveSettings();
-			});
 		}
 	}
 }
@@ -365,31 +391,28 @@ export async function handleInterpreterUI(
 		const { userResponse, promptResponses } = await sendToLLM(contextToUse, contentToProcess, promptVariables, modelConfig, apiKey);
 		debugLog('Interpreter', 'LLM response:', { userResponse, promptResponses });
 
-		// Stop the timer and log the final time
+		// Stop the timer and update UI
 		clearInterval(timerInterval);
 		const endTime = performance.now();
 		const totalTime = endTime - startTime;
-		debugLog('Interpreter', `Interpreter processing completed in ${formatDuration(totalTime)}`);
-
-		// Update the final time in the timer element
 		responseTimer.textContent = formatDuration(totalTime);
 
-		// Revert button text and remove class
+		// Update button state
 		interpretBtn.textContent = getMessage('done');
 		interpretBtn.classList.remove('processing');
 		interpretBtn.classList.add('done');
 		interpretBtn.disabled = true;
 
-		// Add done class to interpreter container
+		// Add done class to container
 		interpreterContainer?.classList.add('done');
 		
-		// Update fields with all prompt responses
+		// Update fields with responses
 		replacePromptVariables(promptVariables, promptResponses);
 
-		// Re-enable the clip button
+		// Re-enable clip button
 		clipButton.disabled = false;
 
-		// Adjust height for noteNameField after content is replacedd
+		// Adjust height for noteNameField after content is replaced
 		const noteNameField = document.getElementById('note-name-field') as HTMLTextAreaElement | null;
 		if (noteNameField instanceof HTMLTextAreaElement) {
 			adjustNoteNameHeight(noteNameField);

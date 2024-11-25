@@ -157,7 +157,6 @@ async function initializeExtension(tabId: number) {
 			return;
 		}
 		await ensureContentScriptLoaded(tabId);
-		await refreshFields(tabId);
 
 		await loadAndSetupTemplates();
 
@@ -873,6 +872,7 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 			// If auto-run is enabled and there are prompt variables, use interpreter
 			if (generalSettings.interpreterAutoRun && promptVariables.length > 0) {
 				try {
+					const interpretBtn = document.getElementById('interpret-btn') as HTMLButtonElement;
 					const modelSelect = document.getElementById('model-select') as HTMLSelectElement;
 					const selectedModelId = modelSelect?.value || generalSettings.interpreterModel;
 					const modelConfig = generalSettings.models.find(m => m.id === selectedModelId);
@@ -880,8 +880,18 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 						throw new Error(`Model configuration not found for ${selectedModelId}`);
 					}
 					await handleInterpreterUI(template, variables, currentTabId!, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '', modelConfig);
+					
+					// Ensure the button shows the completed state after auto-run
+					if (interpretBtn) {
+						interpretBtn.classList.add('done');
+						interpretBtn.disabled = true;
+					}
 				} catch (error) {
 					console.error('Error auto-processing with interpreter:', error);
+					const interpretBtn = document.getElementById('interpret-btn') as HTMLButtonElement;
+					if (interpretBtn) {
+						interpretBtn.classList.add('error');
+					}
 				}
 			}
 		}
