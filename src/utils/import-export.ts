@@ -9,8 +9,15 @@ import { hideModal } from '../utils/modal-utils';
 import { showImportModal as showGenericImportModal } from './import-modal';
 import browser from '../utils/browser-polyfill';
 import { saveFile } from './file-utils';
+import { compressToUTF16, decompressFromUTF16 } from 'lz-string';
 
 const SCHEMA_VERSION = '0.1.0';
+
+// Add these type definitions at the top
+interface StorageData {
+	[key: string]: any;
+	template_list?: string[];
+}
 
 export async function exportTemplate(): Promise<void> {
 	if (editingTemplateIndex === -1) {
@@ -318,11 +325,30 @@ export async function exportAllSettings(): Promise<void> {
 	console.log('Starting exportAllSettings function');
 	try {
 		console.log('Fetching all data from browser storage');
-		const allData = await browser.storage.sync.get(null);
+		const allData = await browser.storage.sync.get(null) as StorageData;
 		console.log('All data fetched:', allData);
 
-		console.log('Stringifying data');
-		const content = JSON.stringify(allData, null, 2);
+		// Create a copy of the data to modify
+		const exportData: StorageData = { ...allData };
+
+		// Decompress all templates
+		const templateIds = exportData.template_list || [];
+		for (const id of templateIds) {
+			const key = `template_${id}`;
+			if (exportData[key] && Array.isArray(exportData[key])) {
+				try {
+					// Join chunks and decompress
+					const compressedData = (exportData[key] as string[]).join('');
+					const decompressedData = decompressFromUTF16(compressedData);
+					exportData[key] = JSON.parse(decompressedData);
+				} catch (error) {
+					console.error(`Failed to decompress template ${id}:`, error);
+				}
+			}
+		}
+
+		console.log('Data prepared for export:', exportData);
+		const content = JSON.stringify(exportData, null, 2);
 		console.log('Data stringified, length:', content.length);
 
 		const fileName = 'obsidian-web-clipper-settings.json';
@@ -355,10 +381,37 @@ export function importAllSettings(): void {
 
 async function importAllSettingsFromJson(jsonContent: string): Promise<void> {
 	try {
-		const settings = JSON.parse(jsonContent);
+		const settings = JSON.parse(jsonContent) as StorageData;
+		
 		if (confirm('This will replace all your current settings, including templates and properties. Are you sure you want to continue?')) {
+			// Create a copy of the settings to modify
+			const importData: StorageData = { ...settings };
+			
+			// Compress all templates
+			const templateIds = importData.template_list || [];
+			for (const id of templateIds) {
+				const key = `template_${id}`;
+				if (importData[key] && typeof importData[key] === 'object') {
+					try {
+						// Compress the template data
+						const templateStr = JSON.stringify(importData[key]);
+						const compressedData = compressToUTF16(templateStr);
+						
+						// Split into chunks
+						const chunks: string[] = [];
+						const CHUNK_SIZE = 8000;
+						for (let i = 0; i < compressedData.length; i += CHUNK_SIZE) {
+							chunks.push(compressedData.slice(i, i + CHUNK_SIZE));
+						}
+						importData[key] = chunks;
+					} catch (error) {
+						console.error(`Failed to compress template ${id}:`, error);
+					}
+				}
+			}
+
 			await browser.storage.sync.clear();
-			await browser.storage.sync.set(settings);
+			await browser.storage.sync.set(importData);
 			await loadSettings();
 			await loadTemplates();
 			updateTemplateList();
