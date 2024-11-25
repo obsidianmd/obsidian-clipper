@@ -14,6 +14,8 @@ let lastRequestTime = 0;
 const eventListeners = new WeakMap<HTMLElement, { [key: string]: EventListener }>();
 
 export async function sendToLLM(userPrompt: string, content: string, promptVariables: PromptVariable[], model: ModelConfig, apiKey: string): Promise<{ userResponse: any; promptResponses: any[] }> {
+	debugLog('Interpreter', 'Sending request to LLM...');
+	
 	if (!apiKey) {
 		throw new Error(`API key is not set for model ${model.name}`);
 	}
@@ -26,8 +28,11 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 	try {
 		const systemContent = {	
 			instructions:
-				"You are a helpful assistant. Your task is to interpret HTML and Markdown content. Please respond to each prompt in the `variables` object. Return your response as JSON with a matching `variable_responses` object. Keep the key names, but replace the prompt value(s) with your response(s). Each value in the `variable_responses` object should be a string in Markdown format, unless otherwise specified. For example, if the user asks for a list, return the list as one Markdown string. Make your responses concise.",
-			variables: promptVariables.map(({ key, prompt }) => ({ key, prompt }))
+				`You are a helpful assistant. Your task is to interpret HTML content. You will be given a list of prompts. Please respond with only one JSON object named \`prompts_responses\` — no explanatory text before or after. Your \`prompts_responses\` object should contain key/value pairs. Use the keys I provided, e.g. \`prompt_1\`, \`prompt_2\`, and add your responses as the values. For each value provide your response as a Markdown string, unless otherwise specified. If the prompt asks for a list, your response should be a Markdown string. Make your responses concise. For example: given {"prompts":{"prompt_1":"four tags about the content","prompt_2":"three bullet points summarizing the text"}} your response should look like: {"prompts_responses":{"prompt_1":"tag1, tag2, tag3, tag4","prompt_2":"- bullet1\n- bullet 2\n- bullet3"}}`,
+			prompts: promptVariables.reduce((acc, { key, prompt }) => {
+				acc[key] = prompt;
+				return acc;
+			}, {} as { [key: string]: string })
 		};
 
 		let requestBody: any;
@@ -139,9 +144,9 @@ function parseLLMResponse(responseContent: string, promptVariables: PromptVariab
 	const userResponse = parsedResponse.user_response || '';
 	let promptResponses: any[] = [];
 
-	if (parsedResponse.variable_responses) {
+	if (parsedResponse.prompts_responses) {
 		promptResponses = promptVariables.map(variable => {
-			const response = parsedResponse.variable_responses[variable.key] || parsedResponse.variable_responses[variable.prompt];
+			const response = parsedResponse.prompts_responses[variable.key] || parsedResponse.prompts_responses[variable.prompt];
 			return {
 				key: variable.key,
 				prompt: variable.prompt,
@@ -169,29 +174,41 @@ function parseAnthropicResponse(responseContent: string, promptVariables: Prompt
 			throw new Error('No text content found in Anthropic response');
 		}
 		
-		// Find the JSON object within the text content
+		// Find the JSON object within the text content and properly handle escaped quotes
 		const jsonMatch = textContent.match(/\{[\s\S]*\}/);
 		if (jsonMatch) {
-			parsedResponse = JSON.parse(jsonMatch[0]);
+			// Replace problematic escaped quotes with temporary markers
+			const sanitizedJson = jsonMatch[0]
+				.replace(/\\"/g, '___QUOTE___') // Replace escaped quotes with marker
+				.replace(/"([^"]+)":/g, '$1:') // Remove quotes around property names
+				.replace(/___QUOTE___/g, '\\"'); // Put escaped quotes back
+			
+			try {
+				parsedResponse = JSON.parse(sanitizedJson);
+			} catch (innerError) {
+				console.error('Error parsing sanitized JSON:', innerError);
+				// Fallback to trying to parse the original match
+				parsedResponse = JSON.parse(jsonMatch[0]);
+			}
 		} else {
 			throw new Error('No JSON found in Anthropic response');
 		}
 	} catch (parseError) {
 		debugLog('Interpreter', 'Failed to parse Anthropic response:', parseError);
 		return {
-			userResponse: responseContent,
-			promptResponses: []
+				userResponse: responseContent,
+				promptResponses: []
 		};
 	}
 
 	const userResponse = parsedResponse.user_response || '';
 	let promptResponses: any[] = [];
 
-	if (parsedResponse.variable_responses) {
+	if (parsedResponse.prompts_responses) {
 		promptResponses = promptVariables.map(variable => ({
 			key: variable.key,
 			prompt: variable.prompt,
-			user_response: parsedResponse.variable_responses[variable.key] || ''
+			user_response: parsedResponse.prompts_responses[variable.key] || ''
 		}));
 	}
 
