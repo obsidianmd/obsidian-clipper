@@ -48,6 +48,10 @@ label {
 	margin: 20px 0 6px;
 	font-weight: 600;
 	font-size: var(--font-ui-medium);
+	.optional {
+		font-size: var(--font-ui-smaller);
+		color: var(--text-faint);
+	}
 }
 
 input[type=checkbox] {
