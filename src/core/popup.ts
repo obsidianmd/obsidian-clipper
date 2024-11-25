@@ -567,8 +567,8 @@ async function handleClip() {
 				showError('failedToProcessInterpreter');
 				return;
 			}
-		} else if (interpretBtn.textContent?.toLowerCase() !== getMessage('done').toLowerCase()) {
-			interpretBtn.click(); // Trigger processing
+		} else if (!interpretBtn.classList.contains('done')) {
+			interpretBtn.click(); // Only trigger if not already processed
 			try {
 				await waitForInterpreter(interpretBtn);
 			} catch (error) {
@@ -632,9 +632,9 @@ async function waitForInterpreter(interpretBtn: HTMLButtonElement): Promise<void
 	return new Promise((resolve, reject) => {
 		const checkProcessing = () => {
 			if (!interpretBtn.classList.contains('processing')) {
-				if (interpretBtn.textContent?.toLowerCase() === getMessage('done').toLowerCase()) {
+				if (interpretBtn.classList.contains('done')) {
 					resolve();
-				} else if (interpretBtn.textContent?.toLowerCase() === getMessage('error').toLowerCase()) {
+				} else if (interpretBtn.classList.contains('error')) {
 					reject(new Error(getMessage('failedToProcessInterpreter')));
 				} else {
 					setTimeout(checkProcessing, 100);
