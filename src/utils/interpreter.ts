@@ -22,7 +22,8 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 
 	try {
 		const systemContent = {	
-			instructions: "You are a helpful assistant. Please respond to each variable prompt. Format your response as a JSON object with 'variable_responses' for the variable prompts. Make your responses concise.",
+			instructions:
+				"You are a helpful assistant. Your task is to interpret HTML and Markdown content. Please respond to each prompt in the variables array. Return your response as a JSON object with 'variable_responses' containing responses to the prompts. Within each response, always return the content as a string in Markdown format unless otherwise specified. For example, if the user asks for a list, return a list in Markdown format. Make your responses concise.",
 			variables: promptVariables.map(({ key, prompt }) => ({ key, prompt }))
 		};
 
