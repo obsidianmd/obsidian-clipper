@@ -66,7 +66,7 @@ export async function processVariables(tabId: number, text: string, variables: {
 			replacement = await processSelector(tabId, fullMatch, currentUrl);
 		} else if (trimmedMatch.startsWith('schema:')) {
 			replacement = await processSchema(fullMatch, variables, currentUrl);
-		} else if (trimmedMatch.startsWith('prompt:')) {
+		} else if (trimmedMatch.startsWith('"') || trimmedMatch.startsWith('prompt:')) {
 			replacement = await processPrompt(fullMatch, variables, currentUrl);
 		} else {
 			replacement = await processSimpleVariable(trimmedMatch, variables, currentUrl);

@@ -4,7 +4,7 @@ import { generalSettings } from '../storage-utils';
 // so that it's still visible in the input fields in the popup
 export async function processPrompt(match: string, variables: { [key: string]: string }, currentUrl: string): Promise<string> {
 	if (generalSettings.interpreterEnabled) {
-		const promptRegex = /{{prompt:\\?"(.*?)\\?"(\|.*?)?}}/;
+		const promptRegex = /{{"\\?"(.*?)\\?"(\|.*?)?}}/;
 		const matches = match.match(promptRegex);
 		if (!matches) {
 			console.error('Invalid prompt format:', match);
