@@ -6,7 +6,6 @@ export function updateUrl(section: string, templateId?: string): void {
 		url += `&template=${templateId}`;
 	}
 	window.history.pushState({}, '', url);
-	initializeToggles();
 }
 
 export function getUrlParameters(): { section: string | null, templateId: string | null } {

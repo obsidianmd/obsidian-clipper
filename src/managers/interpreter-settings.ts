@@ -127,25 +127,7 @@ function createModelListItem(model: ModelConfig, index: number): HTMLElement {
 	const checkboxContainer = modelItem.querySelector('.checkbox-container') as HTMLElement;
 	
 	if (checkbox && checkboxContainer) {
-		updateToggleState(checkboxContainer, checkbox);
-
-		checkbox.addEventListener('change', () => {
-			if (generalSettings.models && generalSettings.models[index]) {
-				generalSettings.models[index].enabled = checkbox.checked;
-				updateToggleState(checkboxContainer, checkbox);
-				saveSettings();
-			} else {
-				console.error(`Model at index ${index} not found in generalSettings.models`);
-				checkbox.checked = !checkbox.checked;
-				updateToggleState(checkboxContainer, checkbox);
-			}
-		});
-
-		checkboxContainer.addEventListener('click', (event) => {
-			event.preventDefault();
-			checkbox.checked = !checkbox.checked;
-			checkbox.dispatchEvent(new Event('change'));
-		});
+		initializeToggles(modelItem);
 	}
 
 	if (model.provider !== 'OpenAI' && model.provider !== 'Anthropic') {
