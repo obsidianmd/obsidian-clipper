@@ -135,6 +135,7 @@ export async function loadSettings(): Promise<Settings> {
 	const localData = await browser.storage.local.get('history');
 	const history = (localData.history || []) as HistoryEntry[];
 
+	// Load default settings first
 	const defaultSettings: Settings = {
 		vaults: [],
 		showMoreActionsButton: false,
@@ -161,6 +162,7 @@ export async function loadSettings(): Promise<Settings> {
 		history: []
 	};
 
+	// Load user settings
 	const loadedSettings: Settings = {
 		vaults: data.vaults || defaultSettings.vaults,
 		showMoreActionsButton: data.general_settings?.showMoreActionsButton ?? defaultSettings.showMoreActionsButton,
@@ -181,6 +183,30 @@ export async function loadSettings(): Promise<Settings> {
 		stats: data.stats || defaultSettings.stats,
 		history: history
 	};
+
+	// Migrate models to include providerId if missing
+	if (loadedSettings.models) {
+		loadedSettings.models = loadedSettings.models.map(model => {
+			if (!model.providerId) {
+				// For custom models without providerId, use their id
+				return {
+					...model,
+					providerId: model.id
+				};
+			}
+			return model;
+		});
+
+		// Save migrated models back to storage
+		if (loadedSettings.models.some(model => !model.providerId)) {
+			await browser.storage.sync.set({
+				interpreter_settings: {
+					...data.interpreter_settings,
+					models: loadedSettings.models
+				}
+			});
+		}
+	}
 
 	generalSettings = loadedSettings;
 	return generalSettings;
