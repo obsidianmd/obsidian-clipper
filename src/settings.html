@@ -513,24 +513,14 @@
 				<div class="modal-content">
 					<form id="model-form">
 						<div class="setting-item">
-							<div class="setting-item-info">
-								<label for="model-name" data-i18n="modelName">Model name</label>
-								<div class="setting-item-description" data-i18n="modelNameDescription">Enter a name for this model configuration.</div>
-							</div>
-							<div class="setting-item-control">
-								<input type="text" id="model-name" name="name" data-i18n="modelName" placeholder="Model name" required>
-							</div>
-						</div>
-						<div class="setting-item">
-							<div class="setting-item-info">
-								<label for="model-provider">
-									<span data-i18n="modelProvider">Provider</span>
-									<span class="optional" data-i18n="optional">(optional)</span>
+								<div class="setting-item-info">
+								<label for="model-name">
+									<span data-i18n="modelName">Model name</span>
 								</label>
-								<div class="setting-item-description" data-i18n="modelProviderDescription">Enter the model provider name.</div>
+								<div class="setting-item-description" data-i18n="modelNameDescription">A name for this model.</div>
 							</div>
 							<div class="setting-item-control">
-								<input type="text" id="model-provider" name="provider" data-i18n="modelProvider" placeholder="Provider">
+								<input type="text" id="model-name" name="name" data-i18n="modelName" placeholder="Model name">
 							</div>
 						</div>
 						<div class="setting-item">
@@ -544,11 +534,32 @@
 						</div>
 						<div class="setting-item">
 							<div class="setting-item-info">
+								<label for="model-provider-id" data-i18n="modelProviderId">Model ID</label>
+								<div class="setting-item-description" data-i18n="modelProviderIdDescription">Enter the ID of the model.</div>
+							</div>
+							<div class="setting-item-control">
+								<input type="text" id="model-provider-id" name="providerId" data-i18n="modelProviderId" placeholder="Model ID" required>
+							</div>
+						</div>
+						<div class="setting-item">
+							<div class="setting-item-info">
+								<label for="model-provider">
+									<span data-i18n="modelProvider">Provider</span>
+									<span class="optional" data-i18n="optional">(optional)</span>
+								</label>
+								<div class="setting-item-description" data-i18n="modelProviderDescription">The model provider, e.g. Ollama, OpenRouter, Google, etc.</div>
+							</div>
+							<div class="setting-item-control">
+								<input type="text" id="model-provider" name="provider" data-i18n="modelProvider" placeholder="Provider">
+							</div>
+						</div>
+						<div class="setting-item">
+							<div class="setting-item-info">
 								<label for="model-api-key">
 									<span data-i18n="modelApiKey">API key</span>
 									<span class="optional" data-i18n="optional">(optional)</span>
 								</label>
-								<div class="setting-item-description" data-i18n="modelApiKeyDescription">Enter the API key for this model.</div>
+								<div class="setting-item-description" data-i18n="modelApiKeyDescription">Enter the API key for this model. May not be required for all providers.</div>
 							</div>
 							<div class="setting-item-control">
 								<input type="text" id="model-api-key" name="apiKey" data-i18n="modelApiKey" placeholder="API key">

@@ -41,7 +41,7 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 
 		if (model.provider === 'Anthropic') {
 			requestBody = {
-				model: model.id,
+				model: model.providerId,
 				max_tokens: 800,
 				messages: [
 					{ role: 'user', content: `${userPrompt}` }
@@ -56,7 +56,7 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 			};
 		} else if (model.provider === 'Ollama') {
 			requestBody = {
-				model: model.name, // Use the model ID from the configuration
+				model: model.providerId,
 				messages: [
 					{ role: 'system', content: JSON.stringify(systemContent) },
 					{ role: 'user', content: `${userPrompt}` }
@@ -66,7 +66,7 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 			// Ollama doesn't require an API key for local use, so we don't set any headers
 		} else {
 			requestBody = {
-				model: model.id,
+				model: model.providerId,
 				messages: [
 					{ role: 'system', content: JSON.stringify(systemContent) },
 					{ role: 'user', content: `${userPrompt}` }

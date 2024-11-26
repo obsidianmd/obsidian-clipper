@@ -371,7 +371,7 @@
 		"message": "API key"
 	},
 	"modelApiKeyDescription": {
-		"message": "Enter the API key for this model."
+		"message": "Enter the API key for this model. May not be required for all providers."
 	},
 	"modelApiKeyPlaceholder": {
 		"message": "API key"
@@ -380,16 +380,25 @@
 		"message": "Base URL"
 	},
 	"modelBaseUrlDescription": {
-		"message": "The API endpoint URL for this model."
+		"message": "API endpoint for this model."
 	},
 	"modelBaseUrlPlaceholder": {
 		"message": "Base URL"
 	},
+	"modelProviderId": {
+		"message": "Model ID"
+	},
+	"modelProviderIdDescription": {
+		"message": "The identifier of the model from your provider. Typically a short name without spaces."
+	},
+	"modelProviderIdPlaceholder": {
+		"message": "Model ID"
+	},
 	"modelName": {
-		"message": "Model name"
+		"message": "Display name"
 	},
 	"modelNameDescription": {
-		"message": "Enter a name for this model configuration."
+		"message": "The name of the model you want to display in the interface."
 	},
 	"modelNamePlaceholder": {
 		"message": "Model name"
@@ -398,7 +407,7 @@
 		"message": "Provider"
 	},
 	"modelProviderDescription": {
-		"message": "Enter the model provider name."
+		"message": "The model provider, e.g. Ollama, OpenRouter, Google, etc."
 	},
 	"modelProviderPlaceholder": {
 		"message": "Provider"

@@ -174,6 +174,7 @@ function addModelToList(event: Event) {
 	event.preventDefault();
 	const newModel: ModelConfig = {
 		id: Date.now().toString(),
+		providerId: '',
 		name: '',
 		provider: '',
 		baseUrl: '',
@@ -202,11 +203,13 @@ function showModelModal(model: ModelConfig, index?: number): void {
 		const providerInput = form.querySelector('[name="provider"]') as HTMLInputElement;
 		const baseUrlInput = form.querySelector('[name="baseUrl"]') as HTMLInputElement;
 		const apiKeyInput = form.querySelector('[name="apiKey"]') as HTMLInputElement;
+		const providerIdInput = form.querySelector('[name="providerId"]') as HTMLInputElement;
 
 		nameInput.value = model.name;
 		providerInput.value = model.provider || '';
 		baseUrlInput.value = model.baseUrl || '';
 		apiKeyInput.value = model.apiKey || '';
+		providerIdInput.value = model.providerId || '';
 	}
 
 	const confirmBtn = modal.querySelector('.model-confirm-btn');
@@ -225,17 +228,20 @@ function showModelModal(model: ModelConfig, index?: number): void {
 	// Add new event listeners
 	newConfirmBtn?.addEventListener('click', () => {
 		const formData = new FormData(form);
+		const providerId = formData.get('providerId') as string;
 		const updatedModel: ModelConfig = {
 			id: model.id || Date.now().toString(),
+			providerId: providerId,
 			name: formData.get('name') as string,
 			provider: formData.get('provider') as string || undefined,
 			baseUrl: formData.get('baseUrl') as string,
+			
 			apiKey: formData.get('apiKey') as string || undefined,
 			enabled: model.enabled
 		};
 
-		if (!updatedModel.name || !updatedModel.baseUrl) {
-			alert('Model name and Base URL are required.');
+		if (!updatedModel.name || !updatedModel.baseUrl || !updatedModel.providerId) {
+			alert('Model name, Base URL, and Model ID are required.');
 			return;
 		}
 
