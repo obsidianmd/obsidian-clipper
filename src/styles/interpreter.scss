@@ -1,29 +1,35 @@
 .clipper {
 	#interpreter {
+		--interpreter-background-color: hsla(var(--color-accent-hsl), 0.075);
+		--interpreter-border-color: hsla(var(--color-accent-hsl), 0.15);
+		--interpreter-text-color: var(--text-accent);
 		display: none;
 		flex-direction: column;
 
 		border-radius: 4px;
-		background-color: hsla(var(--color-accent-hsl), 0.075);
-		border: 1px solid hsla(var(--color-accent-hsl), 0.15);
+		background-color: var(--interpreter-background-color);
+		border: 1px solid var(--interpreter-border-color);
 
 		&.done {
-			background-color: hsla(var(--color-green-hsl), 0.1);
-			border-color: hsla(var(--color-green-hsl), 0.15);
+			--interpreter-background-color: hsla(var(--color-green-hsl), 0.1);
+			--interpreter-border-color: hsla(var(--color-green-hsl), 0.15);
+			--interpreter-text-color: var(--text-success);
 			#model-select {
-				color: var(--text-success);
 				opacity: 1;
 			}
 		}
 
 		&.error {
-			background-color: hsla(var(--color-red-hsl), 0.1);
-			border-color: hsla(var(--color-red-hsl), 0.15);
-
+			--interpreter-background-color: hsla(var(--color-red-hsl), 0.1);
+			--interpreter-border-color: hsla(var(--color-red-hsl), 0.15);
+			--interpreter-text-color: var(--text-error);
 			#model-select {
-				color: var(--text-error);
 				opacity: 1;
 			}
+		}
+
+		#model-select {
+			color: var(--interpreter-text-color);
 		}
 	}
 
@@ -44,7 +50,9 @@
 		-webkit-user-select: none;
 		cursor: default;
 		font-variant: tabular-nums;
+		background-image: none;
 		background-color: transparent;
+		color: var(--interpreter-text-color);
 		font-family: var(--font-monospace-default);
 		height: 1.5rem;
 		appearance: none;
@@ -146,10 +154,26 @@
 		font-variant: tabular-nums;
 	}
 
+	.token-counter {
+		display: none;
+		padding: 0.5rem 0.5rem;
+		font-size: 0.6875rem;
+		color: var(--text-muted);
+		font-family: var(--font-monospace-default);
+		border-top: 1px solid var(--interpreter-border-color);
+		
+		&.warning {
+			color: var(--text-warning);
+		}
+		
+		&.error {
+			color: var(--text-error);
+		}
+	}
 
 	#interpreter-error {
 		border-top: 1px solid  hsla(var(--color-red-hsl), 0.15);
-		padding: 8px;
+		padding: 0.5rem;
 		font-size: var(--font-ui-smaller);
 		color: var(--text-error);
 		white-space: pre-wrap;
@@ -256,20 +280,5 @@
 			opacity: 0.5;
 			pointer-events: none;
 		}
-	}
-}
-
-.token-counter {
-	font-size: 0.8em;
-	color: var(--text-muted);
-	font-family: var(--font-monospace-default);
-	margin-right: 8px;
-	
-	&.warning {
-		color: var(--text-warning);
-	}
-	
-	&.error {
-		color: var(--text-error);
 	}
 }

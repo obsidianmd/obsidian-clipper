@@ -6,7 +6,7 @@ export function countTokens(text: string): number {
 
 export function updateTokenCount(text: string, displayElement: HTMLElement): void {
 	const count = countTokens(text);
-	displayElement.textContent = `${count}`;
+	displayElement.textContent = `~${count} tokens`;
 	
 	// Add warning class if count is getting high
 	displayElement.classList.toggle('warning', count > 1500);
