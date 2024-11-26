@@ -1,229 +1,326 @@
 {
-    "addProperty": {
-        "message": "+ 新增屬性"
-    },
-    "addToObsidian": {
-        "message": "新增到 Obsidian"
-    },
-    "addVaultPlaceholder": {
-        "message": "按 Enter 鍵新增儲存庫"
-    },
-    "advanced": {
-        "message": "進階"
-    },
-    "allProperties": {
-        "message": "所有屬性"
-    },
-    "alwaysShowHighlights": {
-        "message": "總是顯示標記"
-    },
-    "alwaysShowHighlightsDescription": {
-        "message": "載入頁面時顯示已儲存的標記。關閉此選項則僅在啟用標記模式時顯示標記。"
-    },
-    "appendToDaily": {
-        "message": "新增到每日筆記底部"
-    },
-    "appendToExisting": {
-        "message": "新增到現有筆記底部"
-    },
-    "behavior": {
-        "message": "行為"
-    },
-    "behaviorWarning": {
-        "message": "新增到現有筆記或每日筆記需要 Obsidian 1.7.2 或更高版本。"
-    },
-    "clipBehavior": {
-        "message": "擷取行為"
-    },
-    "clipBehaviorDescription": {
-        "message": "選擇如何將標記的內容儲存到 Obsidian。定義 $strong_start${{content}}$strong_end$ 變數。",
-        "placeholders": {
-            "strong_end": {
-                "content": "</strong>"
-            },
-            "strong_start": {
-                "content": "<strong>"
-            }
-        }
-    },
-    "close": {
-        "message": "關閉"
-    },
-    "commandOpenClipper": {
-        "message": "開啟 Obsidian Clipper"
-    },
-    "commandQuickClip": {
-        "message": "快速擷取"
-    },
-    "commandToggleHighlighter": {
-        "message": "切換標記模式"
-    },
-    "confirmDeleteTemplate": {
-        "message": "您確定要刪除範本 \"$1\" 嗎？"
-    },
-    "copied": {
-        "message": "已複製！"
-    },
-    "copyAsJson": {
-        "message": "複製為 JSON"
-    },
-    "copyToClipboard": {
-        "message": "複製到剪貼簿"
-    },
-    "createNewNote": {
-        "message": "建立新筆記"
-    },
-    "dailyNoteFormat": {
-        "message": "每日筆記格式（例如 YYYY-MM-DD）"
-    },
-    "defaultTemplateName": {
-        "message": "預設"
-    },
-    "delete": {
-        "message": "刪除"
-    },
-    "disableHighlighter": {
-        "message": "停用標記"
-    },
-    "display": {
-        "message": "顯示"
-    },
-    "duplicate": {
-        "message": "複製"
-    },
-    "earlyAccessDescription": {
-        "message": "使用需要最新 $link_start$早期訪問版本$link_end$ 的 Obsidian 功能。目前需要 Obsidian 1.7.2 或更高版本。",
-        "placeholders": {
-            "link_end": {
-                "content": "</a>"
-            },
-            "link_start": {
-                "content": "<a href=\"https://help.obsidian.md/Obsidian/Early+access+versions\" target=\"_blank\">"
-            }
-        }
-    },
-    "earlyAccessFeatures": {
-        "message": "早期訪問功能"
-    },
-    "editTemplate": {
-        "message": "編輯範本"
-    },
-    "enableHighlighter": {
-        "message": "啟用標記"
-    },
-    "enableHighlighterDescription": {
-        "message": "在網頁上標記內容，您可以將其儲存到 Obsidian。"
-    },
-    "error": {
-        "message": "錯誤"
-    },
-    "export": {
-        "message": "匯出"
-    },
-    "exportAllSettings": {
-        "message": "匯出所有設定"
-    },
-    "exportAllSettingsDescription": {
-        "message": "匯出所有設定，包括範本和屬性。"
-    },
-    "exportHighlights": {
-        "message": "匯出標記"
-    },
-    "exportHighlightsDescription": {
-        "message": "將您的標記匯出到檔案。"
-    },
-    "exportProperties": {
-        "message": "匯出屬性"
-    },
-    "exportPropertiesDescription": {
-        "message": "將 Web Clipper 屬性儲存到 $strong_start$types.json$strong_end$ 檔案，可以匯入到您的 Obsidian 儲存庫，或匯入到其他裝置上的 Web Clipper。",
-        "placeholders": {
-            "strong_end": {
-                "content": "</strong>"
-            },
-            "strong_start": {
-                "content": "<strong>"
-            }
-        }
-    },
-    "extensionDescription": {
-        "message": "將網路內容以私密且穩定的格式儲存下來，供您離線存取使用。這是 Obsidian 官方推出的瀏覽器擴充套件。"
-    },
-    "extensionName": {
-        "message": "Obsidian 網頁擷取器"
-    },
-    "failedToCopyText": {
-        "message": "複製文字失敗"
-    },
-    "failedToDeleteTemplate": {
-        "message": "刪除範本失敗。請再試一次。"
-    },
-    "failedToExtractContent": {
-        "message": "無法擷取頁面內容。"
-    },
-    "failedToInitialize": {
-        "message": "請嘗試重新載入擴充功能。"
-    },
-    "failedToInitializeContent": {
-        "message": "無法初始化頁面內容。"
-    },
-    "failedToProcessInterpreter": {
-        "message": "解譯器處理失敗。請再試一次。"
-    },
-    "failedToResetTemplate": {
-        "message": "重置預設範本失敗。請再試一次。"
-    },
-    "failedToSave": {
-        "message": "儲存檔案失敗"
-    },
-    "failedToSaveFile": {
-        "message": "儲存檔案失敗"
-    },
-    "folder": {
-        "message": "資料夾"
-    },
-    "general": {
-        "message": "一般"
-    },
-    "generalSettings": {
-        "message": "一般設定"
-    },
-    "help": {
-        "message": "說明"
-    },
-    "helpDescription": {
-        "message": "了解如何使用網頁擷取器並獲得故障排除的幫助。"
-    },
-    "highlightInline": {
-        "message": "標記頁面內容"
-    },
-    "highlightPage": {
-        "message": "標記頁面"
-    },
-    "highlighter": {
-        "message": "標記工具"
-    },
-    "highlighterSettings": {
-        "message": "標記工具設定"
-    },
-    "hotkeys": {
-        "message": "快捷鍵"
-    },
-    "import": {
-        "message": "匯入"
-    },
-    "importAllSettings": {
-        "message": "匯入所有設定"
-    },
-    "importAllSettingsDescription": {
-        "message": "匯入所有設定，包括範本和屬性。這將取代您目前的配置。"
-    },
-    "importProperties": {
-        "message": "匯入屬性"
-    },
-    "importPropertiesDescription": {
-        "message": "要從 Obsidian 匯入您的屬性，請在儲存庫中的 $strong_1_start$.obsidian$strong_1_end$ 資料夾中找到 $strong_2_start$types.json$strong_2_end$ 檔案。請注意，這個資料夾在大多數作業系統中預設是隱藏的。",
-        "placeholders": {
+	"addModel": {
+		"message": "+ 新增模型"
+	},
+	"addModelTitle": {
+		"message": "新增模型"
+	},
+	"addProperty": {
+		"message": "+ 新增屬性"
+	},
+	"addToObsidian": {
+		"message": "新增到 Obsidian"
+	},
+	"addVaultPlaceholder": {
+		"message": "按 Enter 鍵新增儲存庫"
+	},
+	"advanced": {
+		"message": "進階"
+	},
+	"allProperties": {
+		"message": "所有屬性"
+	},
+	"alwaysShowHighlights": {
+		"message": "總是顯示標記"
+	},
+	"alwaysShowHighlightsDescription": {
+		"message": "載入頁面時顯示已儲存的標記。關閉此選項則僅在啟用標記模式時顯示標記。"
+	},
+	"anthropicApiKey": {
+		"message": "Anthropic API 金鑰"
+	},
+	"anthropicApiKeyDescription": {
+		"message": "您可以在$link_start$這裡$link_end$取得 Anthropic API 金鑰。",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://console.anthropic.com/settings/keys\" target=\"_blank\">"
+			}
+		}
+	},
+	"anthropicApiKeyPlaceholder": {
+		"message": "Anthropic API 金鑰"
+	},
+	"apiKeysWarning": {
+		"message": "使用外部提供者即表示您同意其條款和隐私政策。解譯器請求直接發送給您選擇的提供者。Obsidian 不會收集或儲存任何關於您請求的資料。"
+	},
+	"appendToDaily": {
+		"message": "新增到每日筆記底部"
+	},
+	"appendToExisting": {
+		"message": "新增到現有筆記底部"
+	},
+	"autoRunInterpreter": {
+		"message": "自動運行"
+	},
+	"autoRunInterpreterDescription": {
+		"message": "如果範本包含提示變數，則立即運行。這將消耗模型提供者的 API 額度。如果您只想手動運行解譯器，請關閉此選項。"
+	},
+	"behavior": {
+		"message": "行為"
+	},
+	"behaviorWarning": {
+		"message": "新增到現有筆記或每日筆記需要 Obsidian 1.7.2 或更高版本。"
+	},
+	"cancel": {
+		"message": "取消"
+	},
+	"chooseFile": {
+		"message": "選擇檔案"
+	},
+	"choosePropertiesFile": {
+		"message": "選擇屬性檔案"
+	},
+	"choosePropertiesFile": {
+		"message": "選擇屬性檔案"
+	},
+	"chooseSettingsFile": {
+		"message": "選擇設定檔案"
+	},
+	"chooseSettingsFile": {
+		"message": "選擇設定檔案"
+	},
+	"chooseTemplateFile": {
+		"message": "選擇範本檔案"
+	},
+	"chooseTemplateFile": {
+		"message": "選擇範本檔案"
+	},
+	"clipBehavior": {
+		"message": "擷取行為"
+	},
+	"clipBehaviorDescription": {
+		"message": "選擇如何將標記的內容儲存到 Obsidian。定義 $strong_start${{content}}$strong_end$ 變數。",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"close": {
+		"message": "關閉"
+	},
+	"commandOpenClipper": {
+		"message": "開啟 Obsidian Clipper"
+	},
+	"commandQuickClip": {
+		"message": "快速擷取"
+	},
+	"commandToggleHighlighter": {
+		"message": "切換標記模式"
+	},
+	"confirmDeleteTemplate": {
+		"message": "您確定要刪除範本 \"$1\" 嗎？"
+	},
+	"copied": {
+		"message": "已複製！"
+	},
+	"copyAsJson": {
+		"message": "複製為 JSON"
+	},
+	"copyToClipboard": {
+		"message": "複製到剪貼簿"
+	},
+	"createNewNote": {
+		"message": "建立新筆記"
+	},
+	"dailyNoteFormat": {
+		"message": "每日筆記格式（例如 YYYY-MM-DD）"
+	},
+	"defaultInterpreterContext": {
+		"message": "預設解譯器上下文"
+	},
+	"defaultInterpreterContextDescription": {
+		"message": "用於解釋提示變數的上下文。可以在此處使用變數。"
+	},
+	"defaultTemplateName": {
+		"message": "預設"
+	},
+	"delete": {
+		"message": "刪除"
+	},
+	"deleteModelConfirm": {
+		"message": "您確定要刪除此模型嗎？"
+	},
+	"disableHighlighter": {
+		"message": "停用標記"
+	},
+	"display": {
+		"message": "顯示"
+	},
+	"done": {
+		"message": "完成"
+	},
+	"dragAndDropFile": {
+		"message": "將檔案拖放到這裡"
+	},
+	"duplicate": {
+		"message": "複製"
+	},
+	"earlyAccessDescription": {
+		"message": "使用需要最新 $link_start$早期訪問版本$link_end$ 的 Obsidian 功能。目前需要 Obsidian 1.7.2 或更高版本。",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/Obsidian/Early+access+versions\" target=\"_blank\">"
+			}
+		}
+	},
+	"earlyAccessFeatures": {
+		"message": "早期訪問功能"
+	},
+	"editModel": {
+		"message": "編輯模型"
+	},
+	"editTemplate": {
+		"message": "編輯範本"
+	},
+	"enableHighlighter": {
+		"message": "啟用標記"
+	},
+	"enableHighlighterDescription": {
+		"message": "在網頁上標記內容，您可以將其儲存到 Obsidian。"
+	},
+	"enableInterpreter": {
+		"message": "啟用解譯器"
+	},
+	"enableInterpreterDescription": {
+		"message": "使用自然語言從頁面提取資料。例如，您可以使用範本語法 $strong_start${{\"頁面摘要\"}}$strong_end$。需要 API 金鑰或下面配置的自定義模型。$link_start$了解更多$link_end$",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/interpreter\" target=\"_blank\">"
+			},
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"error": {
+		"message": "錯誤"
+	},
+	"export": {
+		"message": "匯出"
+	},
+	"exportAllSettings": {
+		"message": "匯出所有設定"
+	},
+	"exportAllSettingsDescription": {
+		"message": "匯出所有設定，包括範本和屬性。"
+	},
+	"exportHighlights": {
+		"message": "匯出標記"
+	},
+	"exportHighlightsDescription": {
+		"message": "將您的標記匯出到檔案。"
+	},
+	"exportProperties": {
+		"message": "匯出屬性"
+	},
+	"exportPropertiesDescription": {
+		"message": "將 Web Clipper 屬性儲存到 $strong_start$types.json$strong_end$ 檔案，可以匯入到您的 Obsidian 儲存庫，或匯入到其他裝置上的 Web Clipper。",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"extensionDescription": {
+		"message": "將網路內容以私密且穩定的格式儲存下來，供您離線存取使用。這是 Obsidian 官方推出的瀏覽器擴充套件。"
+	},
+	"extensionName": {
+		"message": "Obsidian 網頁擷取器"
+	},
+	"failedToCopyText": {
+		"message": "複製文字失敗"
+	},
+	"failedToDeleteTemplate": {
+		"message": "刪除範本失敗。請再試一次。"
+	},
+	"failedToExtractContent": {
+		"message": "無法擷取頁面內容。"
+	},
+	"failedToInitialize": {
+		"message": "請嘗試重新載入擴充功能。"
+	},
+	"failedToInitializeContent": {
+		"message": "無法初始化頁面內容。"
+	},
+	"failedToProcessInterpreter": {
+		"message": "解譯器處理失敗。請再試一次。"
+	},
+	"failedToResetTemplate": {
+		"message": "重置預設範本失敗。請再試一次。"
+	},
+	"failedToSave": {
+		"message": "儲存檔案失敗"
+	},
+	"failedToSaveFile": {
+		"message": "儲存檔案失敗"
+	},
+	"folder": {
+		"message": "資料夾"
+	},
+	"general": {
+		"message": "一般"
+	},
+	"generalSettings": {
+		"message": "一般設定"
+	},
+	"help": {
+		"message": "說明"
+	},
+	"helpDescription": {
+		"message": "了解如何使用網頁擷取器並獲得故障排除的幫助。"
+	},
+	"highlightInline": {
+		"message": "標記頁面內容"
+	},
+	"highlightPage": {
+		"message": "標記頁面"
+	},
+	"highlighter": {
+		"message": "標記工具"
+	},
+	"highlighterSettings": {
+		"message": "標記工具設定"
+	},
+	"hotkeys": {
+		"message": "快捷鍵"
+	},
+	"import": {
+		"message": "匯入"
+	},
+	"importAllSettings": {
+		"message": "匯入所有設定"
+	},
+	"importAllSettingsDescription": {
+		"message": "匯入所有設定，包括範本和屬性。這將取代您目前的配置。"
+	},
+	"importModalTitle": {
+		"message": "匯入"
+	},
+	"importProperties": {
+		"message": "匯入屬性"
+	},
+	"importPropertiesDescription": {
+		"message": "要從 Obsidian 匯入您的屬性，請在儲存庫中的 $strong_1_start$.obsidian$strong_1_end$ 資料夾中找到 $strong_2_start$types.json$strong_2_end$ 檔案。請注意，這個資料夾在大多數作業系統中預設是隱藏的。",
+		"placeholders": {
 			"strong_1_end": {
 				"content": "</strong>"
 			},
@@ -237,250 +334,345 @@
 				"content": "<strong>"
 			}
 		}
-    },
-    "interpreter": {
-        "message": "解譯器"
-    },
-    "interpreterContext": {
-        "message": "解譯器上下文"
-    },
-    "interpreterContextDescription": {
-        "message": "用於解釋提示變數的上下文。覆蓋在 $link_start$解譯器設定$link_end$ 中定義的預設上下文。這裡可以使用變數。",
-        "placeholders": {
-            "link_end": {
-                "content": "</a>"
-            },
-            "link_start": {
-                "content": "<a href=\"https://help.obsidian.md/web-clipper/variables\" target=\"_blank\">"
-            }
-        }
-    },
-    "language": {
-        "message": "語言"
-    },
-    "languageDescription": {
-        "message": "選擇擴充功能介面的顯示語言。"
-    },
-    "lastUsed": {
-        "message": "上次使用"
-    },
-    "legacyMode": {
-        "message": "舊版模式"
-    },
-    "legacyModeDescription": {
-        "message": "使用與 Obsidian 1.6.7 或更早版本相容的 URI 擷取方法。請注意，您可以擷取的內容長度受限於您的瀏覽器和作業系統。有些頁面可能會在沒有任何錯誤的情況下失敗。"
-    },
-    "more": {
-        "message": "更多"
-    },
-    "newTemplate": {
-        "message": "新範本"
-    },
-    "noHighlights": {
-        "message": "不執行任何操作"
-    },
-    "noTemplates": {
-        "message": "沒有可用的範本。請在設定中新增範本。"
-    },
-    "noteContent": {
-        "message": "筆記內容"
-    },
-    "noteContentDescription": {
-        "message": "自訂筆記的內容。使用變數從頁面預填資料。"
-    },
-    "noteLocation": {
-        "message": "筆記位置"
-    },
-    "noteLocationDescription": {
-        "message": "筆記的資料夾或路徑。"
-    },
-    "noteName": {
-        "message": "筆記名稱"
-    },
-    "noteNameFormat": {
-        "message": "筆記名稱"
-    },
-    "noteNameFormatDescription": {
-        "message": "筆記檔案名稱的格式。您可以使用變數如 {{title}}、{{date}} 和 {{published}} 從頁面預填資料。$link_start$了解更多$link_end$。",
-        "placeholders": {
-            "link_end": {
-                "content": "</a>"
-            },
-            "link_start": {
-                "content": "<a href=\"https://help.obsidian.md/web-clipper/variables\" target=\"_blank\">"
-            }
-        }
-    },
-    "notesAboutPage": {
-        "message": "關於此頁面的筆記..."
-    },
-    "onlyHttpSupported": {
-        "message": "此頁面無法擷取。僅支援 http 和 https URL。"
-    },
-    "open": {
-        "message": "開啟"
-    },
-    "pageCannotBeClipped": {
-        "message": "此頁面無法擷取。"
-    },
-    "pageVariables": {
-        "message": "頁面變數"
-    },
-    "pleaseReload": {
-        "message": "請嘗試重新載入頁面。"
-    },
-    "prependToDaily": {
-        "message": "新增到每日筆記頂部"
-    },
-    "prependToExisting": {
-        "message": "新增到現有筆記頂部"
-    },
-    "properties": {
-        "message": "屬性"
-    },
-    "propertiesSettings": {
-        "message": "屬性"
-    },
-    "propertyName": {
-        "message": "屬性名稱"
-    },
-    "propertyValue": {
-        "message": "屬性值"
-    },
-    "refresh": {
-        "message": "重新整理"
-    },
-    "remove": {
-        "message": "移除"
-    },
-    "removeProperty": {
-        "message": "移除屬性"
-    },
-    "removeUnusedProperties": {
-        "message": "移除未使用的屬性"
-    },
-    "removeUnusedPropertiesDescription": {
-        "message": "移除所有未在任何範本中使用的屬性。"
-    },
-    "removeVault": {
-        "message": "移除儲存庫"
-    },
-    "replaceContent": {
-        "message": "取代頁面內容"
-    },
-    "reset": {
-        "message": "重置"
-    },
-    "resetDefaultTemplate": {
-        "message": "重置預設範本"
-    },
-    "resetDefaultTemplateDescription": {
-        "message": "移除您對預設範本所做的任何更改。"
-    },
-    "saveFile": {
-        "message": "儲存檔案..."
-    },
-    "searchVariables": {
-        "message": "搜尋變數..."
-    },
-    "settings": {
-        "message": "設定"
-    },
-    "settingsHeading": {
-        "message": "設定"
-    },
-    "share": {
-        "message": "分享..."
-    },
-    "shortcutInstructionsBrave": {
-        "message": "要更改鍵盤分配，請前往 $1"
-    },
-    "shortcutInstructionsChrome": {
-        "message": "要更改鍵盤分配，請前往 $1"
-    },
-    "shortcutInstructionsDefault": {
-        "message": "要更改鍵盤分配，請參考您的瀏覽器擴充設定。"
-    },
-    "shortcutInstructionsEdge": {
-        "message": "要更改鍵盤分配，請前往 $1"
-    },
-    "shortcutInstructionsFirefox": {
-        "message": "要更改鍵盤分配，請前往 $1，點擊齒輪圖示，並選擇「管理擴充快捷鍵」。"
-    },
-    "shortcutInstructionsIntro": {
-        "message": "鍵盤快捷鍵讓您快速存取擷取器功能。"
-    },
-    "shortcutInstructionsSafari": {
-        "message": "Safari 不支援自訂鍵盤快捷鍵。"
-    },
-    "shortcutNotSet": {
-        "message": "未設定"
-    },
-    "showActionsButton": {
-        "message": "顯示操作按鈕"
-    },
-    "showActionsDescription": {
-        "message": "允許您從擷取器選單中檢查頁面變數。對於查看可用於範本的變數非常有用。"
-    },
-    "showPageVariables": {
-        "message": "顯示頁面變數"
-    },
-    "silentOpen": {
-        "message": "儲存擷取筆記但不開啟"
-    },
-    "silentOpenDescription": {
-        "message": "擷取的筆記將被儲存但不會開啟為新標籤。Obsidian 仍會被提到上層。"
-    },
-    "specificNoteName": {
-        "message": "特定筆記名稱"
-    },
-    "systemDefault": {
-        "message": "系統"
-    },
-    "templateName": {
-        "message": "範本名稱"
-    },
-    "templateProperties": {
-        "message": "屬性"
-    },
-    "templatePropertiesDescription": {
-        "message": "要新增到擷取筆記頂部的屬性。使用變數從頁面預填資料。"
-    },
-    "templateTriggers": {
-        "message": "範本觸發器"
-    },
-    "templateTriggersDescription": {
-        "message": "定義規則以自動選擇此範本，如果它符合 URL 模式或包含 schema.org 資料。每行一個規則。"
-    },
-    "templatesHeading": {
-        "message": "範本"
-    },
-    "vault": {
-        "message": "儲存庫"
-    },
-    "vaultDescription": {
-        "message": "選擇此範本的預設儲存庫。前往 $link_start$一般設定$link_end$ 以新增或移除儲存庫。",
-        "placeholders": {
-            "link_end": {
-                "content": "</a>"
-            },
-            "link_start": {
-                "content": "<a href=\"?section=general\">"
-            }
-        }
-    },
-    "vaults": {
-        "message": "儲存庫"
-    },
-    "vaultsDescription": {
-        "message": "預設情況下，擷取的筆記會儲存到目前開啟的儲存庫。您可以在這裡新增儲存庫，如果您想要選擇儲存到不同的儲存庫。儲存庫名稱必須與 Obsidian 儲存庫的名稱完全相同。按 $strong_start$enter$strong_end$ 以新增儲存庫。",
-        "placeholders": {
-            "strong_end": {
-                "content": "</strong>"
-            },
-            "strong_start": {
-                "content": "<strong>"
-            }
-        }
-    }
+	},
+	"importSettings": {
+		"message": "匯入設定"
+	},
+	"importTemplate": {
+		"message": "匯入範本"
+	},
+	"interpret": {
+		"message": "解譯"
+	},
+	"interpreter": {
+		"message": "解譯器"
+	},
+	"interpreterContext": {
+		"message": "解譯器上下文"
+	},
+	"interpreterContextDescription": {
+		"message": "用於解釋提示變數的上下文。覆蓋在 $link_start$解譯器設定$link_end$ 中定義的預設上下文。這裡可以使用變數。",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/variables\" target=\"_blank\">"
+			}
+		}
+	},
+	"language": {
+		"message": "語言"
+	},
+	"languageDescription": {
+		"message": "選擇擴充功能介面的顯示語言。"
+	},
+	"lastUsed": {
+		"message": "上次使用"
+	},
+	"legacyMode": {
+		"message": "舊版模式"
+	},
+	"legacyModeDescription": {
+		"message": "使用與 Obsidian 1.6.7 或更早版本相容的 URI 擷取方法。請注意，您可以擷取的內容長度受限於您的瀏覽器和作業系統。有些頁面可能會在沒有任何錯誤的情況下失敗。"
+	},
+	"modelApiKey": {
+		"message": "API 金鑰"
+	},
+	"modelApiKeyDescription": {
+		"message": "輸入此模型的 API 金鑰。可能不是所有提供者都需要。"
+	},
+	"modelApiKeyPlaceholder": {
+		"message": "API 金鑰"
+	},
+	"modelBaseUrl": {
+		"message": "基礎 URL"
+	},
+	"modelBaseUrlDescription": {
+		"message": "此模型的 API 端點 URL。"
+	},
+	"modelBaseUrlPlaceholder": {
+		"message": "基礎 URL"
+	},
+	"modelName": {
+		"message": "模型名稱"
+	},
+	"modelNameDescription": {
+		"message": "您想要在介面中顯示的模型名稱。"
+	},
+	"modelNamePlaceholder": {
+		"message": "模型名稱"
+	},
+	"modelProvider": {
+		"message": "提供者"
+	},
+	"modelProviderDescription": {
+		"message": "模型提供者，例如 Ollama、OpenRouter、Google 等。"
+	},
+	"modelProviderId": {
+		"message": "模型 ID"
+	},
+	"modelProviderIdDescription": {
+		"message": "來自您提供者的模型識別碼。通常是一個不含空格的簡短名稱。"
+	},
+	"modelProviderIdPlaceholder": {
+		"message": "模型 ID"
+	},
+	"modelProviderPlaceholder": {
+		"message": "提供者"
+	},
+	"models": {
+		"message": "模型"
+	},
+	"more": {
+		"message": "更多"
+	},
+	"newTemplate": {
+		"message": "新範本"
+	},
+	"noHighlights": {
+		"message": "不執行任何操作"
+	},
+	"noTemplates": {
+		"message": "沒有可用的範本。請在設定中新增範本。"
+	},
+	"noteContent": {
+		"message": "筆記內容"
+	},
+	"noteContentDescription": {
+		"message": "自訂筆記的內容。使用變數從頁面預填資料。"
+	},
+	"noteLocation": {
+		"message": "筆記位置"
+	},
+	"noteLocationDescription": {
+		"message": "筆記的資料夾或路徑。"
+	},
+	"noteName": {
+		"message": "筆記名稱"
+	},
+	"noteNameFormat": {
+		"message": "筆記名稱"
+	},
+	"noteNameFormatDescription": {
+		"message": "筆記檔案名稱的格式。您可以使用變數如 {{title}}、{{date}} 和 {{published}} 從頁面預填資料。$link_start$了解更多$link_end$。",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/variables\" target=\"_blank\">"
+			}
+		}
+	},
+	"notesAboutPage": {
+		"message": "關於此頁面的筆記..."
+	},
+	"onlyHttpSupported": {
+		"message": "此頁面無法擷取。僅支援 http 和 https URL。"
+	},
+	"open": {
+		"message": "開啟"
+	},
+	"openaiApiKey": {
+		"message": "OpenAI API 金鑰"
+	},
+	"openaiApiKeyDescription": {
+		"message": "您可以在$link_start$這裡$link_end$取得 OpenAI API 金鑰。",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://platform.openai.com/api-keys\" target=\"_blank\">"
+			}
+		}
+	},
+	"openaiApiKeyPlaceholder": {
+		"message": "OpenAI API 金鑰"
+	},
+	"optional": {
+		"message": "（選填）"
+	},
+	"orPasteBelow": {
+		"message": "或在下方貼上內容"
+	},
+	"pageCannotBeClipped": {
+		"message": "此頁面無法擷取。"
+	},
+	"pageVariables": {
+		"message": "頁面變數"
+	},
+	"pasteJsonHere": {
+		"message": "在此貼上 JSON"
+	},
+	"pleaseReload": {
+		"message": "請嘗試重新載入頁面。"
+	},
+	"prependToDaily": {
+		"message": "新增到每日筆記頂部"
+	},
+	"prependToExisting": {
+		"message": "新增到現有筆記頂部"
+	},
+	"processing": {
+		"message": "處理中"
+	},
+	"properties": {
+		"message": "屬性"
+	},
+	"propertiesSettings": {
+		"message": "屬性"
+	},
+	"propertyName": {
+		"message": "屬性名稱"
+	},
+	"propertyValue": {
+		"message": "屬性值"
+	},
+	"providers": {
+		"message": "提供者"
+	},
+	"refresh": {
+		"message": "重新整理"
+	},
+	"remove": {
+		"message": "移除"
+	},
+	"removeProperty": {
+		"message": "移除屬性"
+	},
+	"removeUnusedProperties": {
+		"message": "移除未使用的屬性"
+	},
+	"removeUnusedPropertiesDescription": {
+		"message": "移除所有未在任何範本中使用的屬性。"
+	},
+	"removeVault": {
+		"message": "移除儲存庫"
+	},
+	"replaceContent": {
+		"message": "取代頁面內容"
+	},
+	"reset": {
+		"message": "重置"
+	},
+	"resetDefaultTemplate": {
+		"message": "重置預設範本"
+	},
+	"resetDefaultTemplateDescription": {
+		"message": "移除您對預設範本所做的任何更改。"
+	},
+	"save": {
+		"message": "儲存"
+	},
+	"saveFile": {
+		"message": "儲存檔案..."
+	},
+	"searchVariables": {
+		"message": "搜尋變數..."
+	},
+	"settings": {
+		"message": "設定"
+	},
+	"settingsHeading": {
+		"message": "設定"
+	},
+	"share": {
+		"message": "分享..."
+	},
+	"shortcutInstructionsBrave": {
+		"message": "要更改鍵盤分配，請前往 $1"
+	},
+	"shortcutInstructionsChrome": {
+		"message": "要更改鍵盤分配，請前往 $1"
+	},
+	"shortcutInstructionsDefault": {
+		"message": "要更改鍵盤分配，請參考您的瀏覽器擴充設定。"
+	},
+	"shortcutInstructionsEdge": {
+		"message": "要更改鍵盤分配，請前往 $1"
+	},
+	"shortcutInstructionsFirefox": {
+		"message": "要更改鍵盤分配，請前往 $1，點擊齒輪圖示，並選擇「管理擴充快捷鍵」。"
+	},
+	"shortcutInstructionsIntro": {
+		"message": "鍵盤快捷鍵讓您快速存取擷取器功能。"
+	},
+	"shortcutInstructionsSafari": {
+		"message": "Safari 不支援自訂鍵盤快捷鍵。"
+	},
+	"shortcutNotSet": {
+		"message": "未設定"
+	},
+	"showActionsButton": {
+		"message": "顯示操作按鈕"
+	},
+	"showActionsDescription": {
+		"message": "允許您從擷取器選單中檢查頁面變數。對於查看可用於範本的變數非常有用。"
+	},
+	"showPageVariables": {
+		"message": "顯示頁面變數"
+	},
+	"silentOpen": {
+		"message": "儲存擷取筆記但不開啟"
+	},
+	"silentOpenDescription": {
+		"message": "擷取的筆記將被儲存但不會開啟為新標籤。Obsidian 仍會被提到上層。"
+	},
+	"specificNoteName": {
+		"message": "特定筆記名稱"
+	},
+	"systemDefault": {
+		"message": "系統"
+	},
+	"templateName": {
+		"message": "範本名稱"
+	},
+	"templateProperties": {
+		"message": "屬性"
+	},
+	"templatePropertiesDescription": {
+		"message": "要新增到擷取筆記頂部的屬性。使用變數從頁面預填資料。"
+	},
+	"templateTriggers": {
+		"message": "範本觸發器"
+	},
+	"templateTriggersDescription": {
+		"message": "定義規則以自動選擇此範本，如果它符合 URL 模式或包含 schema.org 資料。每行一個規則。"
+	},
+	"templatesHeading": {
+		"message": "範本"
+	},
+	"thinking": {
+		"message": "思考中"
+	},
+	"vault": {
+		"message": "儲存庫"
+	},
+	"vaultDescription": {
+		"message": "選擇此範本的預設儲存庫。前往 $link_start$一般設定$link_end$ 以新增或移除儲存庫。",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=general\">"
+			}
+		}
+	},
+	"vaults": {
+		"message": "儲存庫"
+	},
+	"vaultsDescription": {
+		"message": "預設情況下，擷取的筆記會儲存到目前開啟的儲存庫。您可以在這裡新增儲存庫，如果您想要選擇儲存到不同的儲存庫。儲存庫名稱必須與 Obsidian 儲存庫的名稱完全相同。按 $strong_start$enter$strong_end$ 以新增儲存庫。",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	}
 }
