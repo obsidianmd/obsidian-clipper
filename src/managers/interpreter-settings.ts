@@ -206,7 +206,10 @@ function showModelModal(model: ModelConfig, index?: number): void {
 
 	const titleElement = modal.querySelector('.modal-title');
 	if (titleElement) {
-		titleElement.textContent = index !== undefined ? getMessage('editModel') : getMessage('addModelTitle');
+		titleElement.setAttribute('data-i18n', index !== undefined ? 'editModel' : 'addModelTitle');
+		translatePage().then(() => {
+			initializeIcons(modal);
+		});
 	}
 
 	const form = modal.querySelector('#model-form') as HTMLFormElement;
