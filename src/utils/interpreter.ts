@@ -29,7 +29,10 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 	try {
 		const systemContent = {	
 			instructions:
-			`You are a helpful assistant. Please respond with one JSON object named \`prompts_responses\` — no explanatory text before or after. Use the keys I provided, e.g. \`prompt_1\`, \`prompt_2\`, and fill in the values. Values should be Markdown strings unless otherwise specified. Make your responses concise. For example your response should look like: {"prompts_responses":{"prompt_1":"tag1, tag2, tag3, tag4","prompt_2":"- bullet1\n- bullet 2\n- bullet3"}}`,			prompts: promptVariables.reduce((acc, { key, prompt }) => {
+			`You are a helpful assistant. Please respond with one JSON object named \`prompts_responses\` — no explanatory text before or after. Use the keys provided, e.g. \`prompt_1\`, \`prompt_2\`, and fill in the values. Values should be Markdown strings unless otherwise specified. Make your responses concise. For example your response should look like: {"prompts_responses":{"prompt_1":"tag1, tag2, tag3, tag4","prompt_2":"- bullet1\n- bullet 2\n- bullet3"}}`
+		};
+		const promptContent = {	
+			prompts: promptVariables.reduce((acc, { key, prompt }) => {
 				acc[key] = prompt;
 				return acc;
 			}, {} as { [key: string]: string })
@@ -45,7 +48,7 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 				model: model.providerId,
 				max_tokens: 800,
 				messages: [
-					{ role: 'user', content: `${userPrompt}` }
+					{ role: 'user', content: `${JSON.stringify(promptContent)}\n\n${userPrompt}` }
 				],
 				system: JSON.stringify(systemContent)
 			};
@@ -60,21 +63,22 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 				model: model.providerId,
 				messages: [
 					{ role: 'system', content: JSON.stringify(systemContent) },
-					{ role: 'user', content: `${userPrompt}` }
+					{ role: 'user', content: `${JSON.stringify(promptContent)}\n\n${userPrompt}` }
 				],
 				stream: false
 			};
-			// Ollama doesn't require an API key for local use, so we don't set any headers
 		} else {
 			requestBody = {
 				model: model.providerId,
 				messages: [
 					{ role: 'system', content: JSON.stringify(systemContent) },
-					{ role: 'user', content: `${userPrompt}` }
+					{ role: 'user', content: `${JSON.stringify(promptContent)}\n\n${userPrompt}` }
 				]
 			};
 			headers = {
 				...headers,
+				"HTTP-Referer": 'https://obsidian.md/',
+				"X-Title": 'Obsidian Web Clipper',
 				'Authorization': `Bearer ${apiKey}`
 			};
 		}
@@ -110,7 +114,19 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 
 		let llmResponseContent: string;
 		if (model.provider === 'Anthropic') {
-			llmResponseContent = data.content[0]?.text || JSON.stringify(data);
+			try {
+				// Parse the text content which contains JSON
+				const textContent = data.content[0]?.text;
+				if (!textContent) {
+					throw new Error('No text content in Anthropic response');
+				}
+				// Parse the JSON string inside the text content
+				const parsedContent = JSON.parse(textContent);
+				llmResponseContent = JSON.stringify(parsedContent);
+			} catch (error) {
+				console.error('Error parsing Anthropic content:', error);
+				throw error;
+			}
 		} else if (model.provider === 'Ollama') {
 			llmResponseContent = data.response;
 		} else {
@@ -128,29 +144,20 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 function parseLLMResponse(responseContent: string, promptVariables: PromptVariable[]): { userResponse: any; promptResponses: any[] } {
 	let parsedResponse;
 	try {
-		// Try to find and parse JSON content in the response
-		const cleanedResponse = responseContent.replace(/^```json\n|\n```$/g, ''); // Remove code block markers
-		const jsonMatch = cleanedResponse.match(/\{[\s\S]*\}/);
-		if (jsonMatch) {
-			// Clean up common JSON issues
-			const sanitizedJson = jsonMatch[0]
-				.replace(/\\"/g, '___QUOTE___') // Replace escaped quotes
-				.replace(/[«»]/g, '"') // Replace French quotes
-				.replace(/[\u0000-\u001F\u007F-\u009F]/g, '') // Remove control characters
-				.replace(/\n\s*\n/g, '\\n') // Handle multiple newlines
-				.replace(/([^\\])"/g, '$1\\"') // Escape unescaped quotes
-				.replace(/___QUOTE___/g, '\\"'); // Restore escaped quotes
-
-			try {
-				parsedResponse = JSON.parse(sanitizedJson);
-			} catch (innerError) {
-				console.error('Error parsing sanitized JSON:', innerError);
-				// Fallback to trying to parse the original match
-				parsedResponse = JSON.parse(jsonMatch[0]);
-			}
-		} else {
-			// If no JSON found, try parsing the whole cleaned response
+		// Remove code block markers if they exist
+		const cleanedResponse = responseContent.replace(/^```json\n|\n```$/g, '');
+		
+		// First try parsing the response directly
+		try {
 			parsedResponse = JSON.parse(cleanedResponse);
+		} catch (directParseError) {
+			// If direct parsing fails, try to find and parse JSON content
+			const jsonMatch = cleanedResponse.match(/\{[\s\S]*\}/);
+			if (jsonMatch) {
+				parsedResponse = JSON.parse(jsonMatch[0]);
+			} else {
+				throw directParseError;
+			}
 		}
 	} catch (parseError) {
 		debugLog('Interpreter', 'Failed to parse response as JSON. Using raw response.');
