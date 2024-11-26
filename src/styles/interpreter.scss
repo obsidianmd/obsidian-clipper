@@ -183,13 +183,6 @@
 		display: none;
 		line-height: 1.2;
 	}
-	
-	#clip-btn {
-		&:disabled {
-			opacity: 0.67;
-			cursor: not-allowed;
-		}
-	}
 }
 
 .model-form {

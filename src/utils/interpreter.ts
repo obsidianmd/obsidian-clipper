@@ -318,6 +318,7 @@ export async function handleInterpreterUI(
 	const interpreterErrorMessage = document.getElementById('interpreter-error') as HTMLDivElement;
 	const responseTimer = document.getElementById('interpreter-timer') as HTMLSpanElement;
 	const clipButton = document.getElementById('clip-btn') as HTMLButtonElement;
+	const moreButton = document.getElementById('more-btn') as HTMLButtonElement;
 	const promptContextTextarea = document.getElementById('prompt-context') as HTMLTextAreaElement;
 
 	try {
@@ -360,6 +361,7 @@ export async function handleInterpreterUI(
 
 		// Disable the clip button
 		clipButton.disabled = true;
+		moreButton.disabled = true;
 
 		// Show and update the timer
 		responseTimer.style.display = 'inline';
@@ -394,6 +396,7 @@ export async function handleInterpreterUI(
 
 		// Re-enable clip button
 		clipButton.disabled = false;
+		moreButton.disabled = false;
 
 		// Adjust height for noteNameField after content is replaced
 		const noteNameField = document.getElementById('note-name-field') as HTMLTextAreaElement | null;
@@ -422,6 +425,7 @@ export async function handleInterpreterUI(
 
 		// Re-enable the clip button
 		clipButton.disabled = false;
+		moreButton.disabled = false;
 
 		if (error instanceof Error) {
 			throw new Error(`${error.message}`);

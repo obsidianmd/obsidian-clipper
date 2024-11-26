@@ -186,9 +186,14 @@
 		}
 	}
 	.menu-btn {
+		background-color: var(--background-primary);
 		position: absolute;
 		right: 0;
 		cursor: default;
+		border-start-start-radius: 0;
+		border-start-end-radius: var(--radius-s);
+		border-end-start-radius: 0;
+		border-end-end-radius: var(--radius-s);
 	}
 	.share-btn {
 		display: none;
