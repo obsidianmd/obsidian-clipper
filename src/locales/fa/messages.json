@@ -1,4 +1,10 @@
 {
+	"addModel": {
+		"message": "+ افزودن مدل"
+	},
+	"addModelTitle": {
+		"message": "افزودن مدل"
+	},
 	"addProperty": {
 		"message": "+ افزودن خواص"
 	},
@@ -20,17 +26,43 @@
 	"alwaysShowHighlightsDescription": {
 		"message": "هنگام بارگذاری صفحه، جملات روشن ذخیره شده خود را نمایش بشود. آن را خاموش کنید تا فقط وقتی حالت جملات روشن فعال است جملات روشن نمایش داده شود."
 	},
+	"anthropicApiKey": {
+		"message": "کلید API آنتروپیک"
+	},
+	"anthropicApiKeyDescription": {
+		"message": "شما می‌توانید کلید API آنتروپیک خود را از $link_start$اینجا$link_end$ دریافت کنید.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://console.anthropic.com/settings/keys\" target=\"_blank\">"
+			}
+		}
+	},
+	"apiKeysWarning": {
+		"message": "با استفاده از یک ارائه‌دهنده خارجی، شما با شرایط و سیاست حریم خصوصی آنها موافقت می‌کنید. درخواست‌های مفسر مستقیماً به ارائه‌دهنده انتخابی شما ارسال می‌شود. Obsidian هیچ داده‌ای در مورد درخواست‌های شما جمع‌آوری یا ذخیره نمی‌کند."
+	},
 	"appendToDaily": {
 		"message": "اضافه کردن به یادداشت روزانه، در آخر آن "
 	},
 	"appendToExisting": {
 		"message": "اضافه کردن به یادداشت موجود، در آخر آن"
 	},
+	"autoRunInterpreter": {
+		"message": "اجرای خودکار"
+	},
+	"autoRunInterpreterDescription": {
+		"message": "اگر قالب شامل متغیرهای پرامپت باشد، فوراً اجرا می‌شود. این کار اعتبار API ارائه‌دهنده مدل شما را مصرف می‌کند. اگر می‌خواهید مفسر را فقط به صورت دستی اجرا کنید، آن را خاموش کنید."
+	},
 	"behavior": {
 		"message": "رفتار"
 	},
 	"behaviorWarning": {
 		"message": "افزودن به یادداشت موجود یا یادداشت روزانه به ابسیدین  ورژن ۱.۷.۲ یا بالاتر نیاز دارد"
+	},
+	"cancel": {
+		"message": "لغو"
 	},
 	"clipBehavior": {
 		"message": "رفتار کلیپ"
@@ -76,17 +108,29 @@
 	"dailyNoteFormat": {
 		"message": "قالب یادداشت روزانه (به عنوان مثال، YYYY-MM-DD)"
 	},
+	"defaultInterpreterContext": {
+		"message": "متن پیش‌فرض مفسر"
+	},
+	"defaultInterpreterContextDescription": {
+		"message": "مدل از این متن برای تفسیر متغیرهای پرامپت استفاده خواهد کرد. متغیرها و فیلترها می‌توانند اینجا استفاده شوند."
+	},
 	"defaultTemplateName": {
 		"message": "پیش فرض"
 	},
 	"delete": {
 		"message": "حذف کن"
 	},
+	"deleteModelConfirm": {
+		"message": "آیا مطمئن هستید که می‌خواهید این مدل را حذف کنید؟"
+	},
 	"disableHighlighter": {
 		"message": "مارکر جملات روشن را غیرفعال کن"
 	},
 	"display": {
 		"message": "نمایش"
+	},
+	"done": {
+		"message": "انجام شد"
 	},
 	"duplicate": {
 		"message": "دو نسخه کن"
@@ -105,6 +149,9 @@
 	"earlyAccessFeatures": {
 		"message": "ویژگی‌های نسخه زودرس"
 	},
+	"editModel": {
+		"message": "ویرایش مدل"
+	},
 	"editTemplate": {
 		"message": "ویرایش قالب"
 	},
@@ -113,6 +160,26 @@
 	},
 	"enableHighlighterDescription": {
 		"message": "محتوایی را که می‌خواهید در ابسیدین ذخیره کنید را برجسته کنید"
+	},
+	"enableInterpreter": {
+		"message": "فعال‌سازی مفسر"
+	},
+	"enableInterpreterDescription": {
+		"message": "از زبان طبیعی برای استخراج داده‌ها از صفحات استفاده کنید. برای مثال، می‌توانید از نحو قالب $strong_start${{\"خلاصه‌ای از صفحه\"}}$strong_end$ استفاده کنید. نیاز به کلید API یا مدل سفارشی پیکربندی شده در زیر دارد. $link_start$بیشتر بدانید$link_end$",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/interpreter\" target=\"_blank\">"
+			},
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
 	},
 	"error": {
 		"message": "خطا"
@@ -188,6 +255,15 @@
 	"generalSettings": {
 		"message": "تنظیمات عمومی"
 	},
+	"help": {
+		"message": "راهنما"
+	},
+	"helpDescription": {
+		"message": "نحوه استفاده از Web Clipper را بیاموزید و در رفع مشکلات کمک بگیرید."
+	},
+	"highlightInline": {
+		"message": "محتوای صفحه را برجسته کنید"
+	},
 	"highlightPage": {
 		"message": "صحفه را برجسته کن"
 	},
@@ -229,6 +305,9 @@
 			}
 		}
 	},
+	"interpret": {
+		"message": "تفسیر"
+	},
 	"interpreter": {
 		"message": "تفسیرگر"
 	},
@@ -261,6 +340,42 @@
 	"legacyModeDescription": {
 		"message": "از روش برش URI سازگار با ابسیدین ۱.۶.۷ یا نسخه قبلی استفاده می کند. توجه داشته باشید که طول محتوایی که می توانید کلیپ کنید توسط مرورگر و سیستم عامل شما محدود است. برخی از صفحات ممکن است بدون هیچ خطایی از کار بیفتند."
 	},
+	"modelApiKey": {
+		"message": "کلید API"
+	},
+	"modelApiKeyDescription": {
+		"message": "کلید API را برای این مدل وارد کنید. ممکن است برای همه ارائه‌دهندگان لازم نباشد."
+	},
+	"modelBaseUrl": {
+		"message": "URL پایه"
+	},
+	"modelBaseUrlDescription": {
+		"message": "URL نقطه پایانی API برای این مدل."
+	},
+	"modelName": {
+		"message": "نام مدل"
+	},
+	"modelNameDescription": {
+		"message": "نام مدلی که می‌خواهید در رابط کاربری نمایش داده شود."
+	},
+	"modelProvider": {
+		"message": "ارائه‌دهنده"
+	},
+	"modelProviderDescription": {
+		"message": "ارائه‌دهنده مدل، مثلاً Ollama، OpenRouter، Google و غیره."
+	},
+	"modelProviderId": {
+		"message": "شناسه مدل"
+	},
+	"modelProviderIdDescription": {
+		"message": "شناسه مدل از ارائه‌دهنده شما. معمولاً یک نام کوتاه بدون فاصله است."
+	},
+	"modelProviderIdPlaceholder": {
+		"message": "شناسه مدل"
+	},
+	"models": {
+		"message": "مدل‌ها"
+	},
 	"more": {
 		"message": "بیشتر"
 	},
@@ -277,7 +392,7 @@
 		"message": "محتوای یادداشت"
 	},
 	"noteContentDescription": {
-        "message": "محتوای یادداشت را ویرایش کنید. از متغیرها برای پرکردن صحفه از اینترنت استفاده کنید."
+		"message": "محتوای یادداشت را ویرایش کنید. از متغیرها برای پرکردن صحفه از اینترنت استفاده کنید."
 	},
 	"noteLocation": {
 		"message": "مکان یادداشت"
@@ -308,6 +423,26 @@
 	"onlyHttpSupported": {
 		"message": "این صفحه را نمی توان کلیپ داد. فقط آدرس های http و https پشتیبانی می شوند."
 	},
+	"open": {
+		"message": "باز کردن"
+	},
+	"openaiApiKey": {
+		"message": "کلید API اوپن‌ای‌آی"
+	},
+	"openaiApiKeyDescription": {
+		"message": "شما می‌توانید کلید API اوپن‌ای‌آی خود را از $link_start$اینجا$link_end$ دریافت کنید.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://platform.openai.com/api-keys\" target=\"_blank\">"
+			}
+		}
+	},
+	"optional": {
+		"message": "(اختیاری)"
+	},
 	"pageCannotBeClipped": {
 		"message": "این صفحه را نمی توان کلیپ داد."
 	},
@@ -323,6 +458,9 @@
 	"prependToExisting": {
 		"message": "به یادداشت موجود، از اول اضافه کنید"
 	},
+	"processing": {
+		"message": "در حال پردازش"
+	},
 	"properties": {
 		"message": "خواص"
 	},
@@ -334,6 +472,9 @@
 	},
 	"propertyValue": {
 		"message": "مقدار خاص"
+	},
+	"providers": {
+		"message": "ارائه‌دهندگان"
 	},
 	"refresh": {
 		"message": "ریفرش"
@@ -365,6 +506,9 @@
 	"resetDefaultTemplateDescription": {
 		"message": "هر تغییری که در قالب پیش فرض ایجاد کرده اید را حذف کن"
 	},
+	"save": {
+		"message": "ذخیره"
+	},
 	"saveFile": {
 		"message": "ذخیره فایل..."
 	},
@@ -384,7 +528,7 @@
 		"message": "برای تغییر کلیدهای میان‌بر به $1 بروید"
 	},
 	"shortcutInstructionsChrome": {
-        "message": "برای تغییر کلیدهای میان‌بر به $1 بروید"
+		"message": "برای تغییر کلیدهای میان‌بر به $1 بروید"
 	},
 	"shortcutInstructionsDefault": {
 		"message": "برای تغییر کلیدهای میان‌بر، لطفاً به تنظیمات افزونه مرورگر خود مراجعه کنید."
@@ -443,6 +587,9 @@
 	"templatesHeading": {
 		"message": "قالب‌ها"
 	},
+	"thinking": {
+		"message": "در حال فکر کردن"
+	},
 	"vault": {
 		"message": "خزانه"
 	},
@@ -470,18 +617,5 @@
 				"content": "<strong>"
 			}
 		}
-	},
-	"help": {
-		"message": "راهنما"
-	},
-	"helpDescription": {
-		"message": "نحوه استفاده از Web Clipper را بیاموزید و در رفع مشکلات کمک بگیرید."
-	},
-	"open": {
-		"message": "باز کردن"
-	},
-	"highlightInline": {
-		"message": "محتوای صفحه را برجسته کنید"
 	}
 }
-

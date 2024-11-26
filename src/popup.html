@@ -44,7 +44,7 @@
 					<div id="vault-container" style="display: none;">
 						<select id="vault-select"></select>
 					</div>
-					<input id="path-name-field" type="text" placeholder="Folder"/>
+					<input id="path-name-field" type="text" data-i18n="folder"/>
 				</div>
 				<div id="interpreter" style="display: none;">
 					<textarea id="prompt-context" rows="3"></textarea>
@@ -53,9 +53,10 @@
 						<button id="interpret-btn" data-i18n="interpret">interpret</button>
 						<span id="interpreter-timer" style="display: none;"></span>
 					</div>
+					<div id="token-counter" class="token-counter"></div>
 					<div id="interpreter-error" style="display: none;"></div>
 				</div>
-				<div class="action-buttons">
+				<div class="action-buttons" id="action-buttons">
 					<button id="clip-btn" class="mod-cta" data-i18n="addToObsidian">Add to Obsidian</button>
 					<div class="menu-btn">
 						<button id="more-btn"><i data-lucide="chevron-down"></i></button>
@@ -73,7 +74,7 @@
 									<i data-lucide="file-down"></i>
 								</div>
 								<div class="menu-item-title" data-i18n="saveFile">
-									Save file&hellip;
+									Save file...
 								</div>
 							</div>
 							<div class="menu-item share-content">
@@ -81,12 +82,13 @@
 									<i data-lucide="arrow-up-right"></i>
 								</div>
 								<div class="menu-item-title" data-i18n="share">
-									Share&hellip;
+									Share...
 								</div>
+							</div>
 						</div>
 					</div>
 					<div class="share-btn">
-						<a class="share-content clickable-icon"><i data-lucide="share"></i></a>
+						<a class="share-content clickable-icon" data-i18n-title="share"><i data-lucide="share"></i></a>
 					</div>
 				</div>
 			</div>

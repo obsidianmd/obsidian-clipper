@@ -1,13 +1,20 @@
 import { initializeToggles, updateToggleState } from '../utils/ui-utils';
 import { ModelConfig, generalSettings, loadSettings, saveSettings } from '../utils/storage-utils';
 import { initializeIcons } from '../icons/icons';
+import { showModal, hideModal } from '../utils/modal-utils';
+import { getMessage, translatePage } from '../utils/i18n';
 
 export function updatePromptContextVisibility(): void {
 	const interpreterToggle = document.getElementById('interpreter-toggle') as HTMLInputElement;
 	const promptContextContainer = document.getElementById('prompt-context-container');
+	const interpreterSection = document.getElementById('interpreter-section');
 
 	if (promptContextContainer) {
 		promptContextContainer.style.display = interpreterToggle.checked ? 'block' : 'none';
+	}
+
+	if (interpreterSection) {
+		interpreterSection.classList.toggle('is-disabled', !interpreterToggle.checked);
 	}
 }
 
@@ -21,12 +28,18 @@ export function initializeInterpreterSettings(): void {
 		const anthropicApiKeyInput = document.getElementById('anthropic-api-key') as HTMLInputElement;
 		const interpreterToggle = document.getElementById('interpreter-toggle') as HTMLInputElement;
 		const interpreterAutoRunToggle = document.getElementById('interpreter-auto-run-toggle') as HTMLInputElement;
+		const interpreterSection = document.getElementById('interpreter-section');
 
 		if (apiKeyInput) apiKeyInput.value = generalSettings.openaiApiKey || '';
 		if (anthropicApiKeyInput) anthropicApiKeyInput.value = generalSettings.anthropicApiKey || '';
 		if (interpreterToggle) {
 			interpreterToggle.checked = generalSettings.interpreterEnabled;
 			updateToggleState(interpreterToggle.parentElement as HTMLElement, interpreterToggle);
+			
+			// Set initial disabled state
+			if (interpreterSection) {
+				interpreterSection.classList.toggle('is-disabled', !interpreterToggle.checked);
+			}
 		}
 		if (interpreterAutoRunToggle) {
 			interpreterAutoRunToggle.checked = generalSettings.interpreterAutoRun;
@@ -52,7 +65,7 @@ export function initializeInterpreterSettings(): void {
 
 		const defaultPromptContextInput = document.getElementById('default-prompt-context') as HTMLTextAreaElement;
 		if (defaultPromptContextInput) {
-			defaultPromptContextInput.value = generalSettings.defaultPromptContext || "You are a helpful assistant. Please analyze the following content and provide a concise summary.";
+			defaultPromptContextInput.value = generalSettings.defaultPromptContext;
 		}
 
 		initializeModelList();
@@ -64,7 +77,7 @@ export function initializeInterpreterSettings(): void {
 	}
 }
 
-function initializeModelList() {
+export function initializeModelList() {
 	const modelList = document.getElementById('model-list');
 	if (!modelList) return;
 
@@ -73,12 +86,21 @@ function initializeModelList() {
 		const modelItem = createModelListItem(model, index);
 		modelList.appendChild(modelItem);
 	});
+
+	// Initialize icons for the entire list after all items are added
+	initializeIcons(modelList);
 }
 
 function createModelListItem(model: ModelConfig, index: number): HTMLElement {
 	const modelItem = document.createElement('div');
 	modelItem.className = 'model-list-item';
+	modelItem.draggable = true;
+	modelItem.dataset.index = index.toString();
+
 	modelItem.innerHTML = `
+		<div class="drag-handle">
+			<i data-lucide="grip-vertical"></i>
+		</div>
 		<div class="model-list-item-info">
 			<div class="model-name">${model.name}</div>
 			<div class="model-provider">${model.provider || 'Custom'}</div>
@@ -87,6 +109,9 @@ function createModelListItem(model: ModelConfig, index: number): HTMLElement {
 			${model.provider !== 'OpenAI' && model.provider !== 'Anthropic' ? `
 				<button class="edit-model-btn clickable-icon" data-index="${index}" aria-label="Edit model">
 					<i data-lucide="pen-line"></i>
+				</button>
+				<button class="duplicate-model-btn clickable-icon" data-index="${index}" aria-label="Duplicate model">
+					<i data-lucide="copy-plus"></i>
 				</button>
 				<button class="delete-model-btn clickable-icon" data-index="${index}" aria-label="Delete model">
 					<i data-lucide="trash-2"></i>
@@ -99,25 +124,56 @@ function createModelListItem(model: ModelConfig, index: number): HTMLElement {
 	`;
 
 	const checkbox = modelItem.querySelector(`#model-${index}`) as HTMLInputElement;
-	checkbox.addEventListener('change', () => {
-		if (generalSettings.models && generalSettings.models[index]) {
-			generalSettings.models[index].enabled = checkbox.checked;
-			saveSettings();
-		} else {
-			console.error(`Model at index ${index} not found in generalSettings.models`);
+	const checkboxContainer = modelItem.querySelector('.checkbox-container') as HTMLElement;
+	
+	if (checkbox && checkboxContainer) {
+		updateToggleState(checkboxContainer, checkbox);
+
+		checkbox.addEventListener('change', () => {
+			if (generalSettings.models && generalSettings.models[index]) {
+				generalSettings.models[index].enabled = checkbox.checked;
+				updateToggleState(checkboxContainer, checkbox);
+				saveSettings();
+			} else {
+				console.error(`Model at index ${index} not found in generalSettings.models`);
+				checkbox.checked = !checkbox.checked;
+				updateToggleState(checkboxContainer, checkbox);
+			}
+		});
+
+		checkboxContainer.addEventListener('click', (event) => {
+			event.preventDefault();
 			checkbox.checked = !checkbox.checked;
-		}
-	});
+			checkbox.dispatchEvent(new Event('change'));
+		});
+	}
 
 	if (model.provider !== 'OpenAI' && model.provider !== 'Anthropic') {
+		const duplicateBtn = modelItem.querySelector('.duplicate-model-btn');
+		if (duplicateBtn) {
+			duplicateBtn.addEventListener('click', (e) => {
+				e.preventDefault();
+				e.stopPropagation();
+				duplicateModel(index);
+			});
+		}
+
 		const editBtn = modelItem.querySelector('.edit-model-btn');
 		if (editBtn) {
-			editBtn.addEventListener('click', () => editModel(index));
+			editBtn.addEventListener('click', (e) => {
+				e.preventDefault();
+				e.stopPropagation();
+				editModel(index);
+			});
 		}
 
 		const deleteBtn = modelItem.querySelector('.delete-model-btn');
 		if (deleteBtn) {
-			deleteBtn.addEventListener('click', () => deleteModel(index));
+			deleteBtn.addEventListener('click', (e) => {
+				e.preventDefault();
+				e.stopPropagation();
+				deleteModel(index);
+			});
 		}
 	}
 
@@ -128,62 +184,79 @@ function createModelListItem(model: ModelConfig, index: number): HTMLElement {
 
 function addModelToList(event: Event) {
 	event.preventDefault();
-	const modelList = document.getElementById('model-list');
-	if (!modelList) return;
-
 	const newModel: ModelConfig = {
 		id: Date.now().toString(),
+		providerId: '',
 		name: '',
 		provider: '',
 		baseUrl: '',
 		enabled: true
 	};
-
-	const modelItem = createModelForm(newModel);
-	modelList.appendChild(modelItem);
+	showModelModal(newModel);
 }
 
 function editModel(index: number) {
-	const modelList = document.getElementById('model-list');
-	if (!modelList) return;
-
 	const modelToEdit = generalSettings.models[index];
-	const modelItem = createModelForm(modelToEdit, index);
-
-	const oldModelItem = modelList.children[index];
-	modelList.replaceChild(modelItem, oldModelItem);
+	showModelModal(modelToEdit, index);
 }
 
-function createModelForm(model: ModelConfig, index?: number): HTMLElement {
-	const modelForm = document.createElement('div');
-	modelForm.className = 'setting-item';
-	modelForm.innerHTML = `
-		<form class="model-form">
-			<input type="text" name="name" placeholder="Model name" value="${model.name}" required>
-			<input type="text" name="provider" placeholder="Provider (optional)" value="${model.provider || ''}">
-			<input type="text" name="baseUrl" placeholder="Base URL" value="${model.baseUrl || ''}" required>
-			<input type="password" name="apiKey" placeholder="API key (optional)" value="${model.apiKey || ''}">
-			<button type="button" class="save-btn mod-cta">Save</button>
-			<button type="button" class="cancel-btn">Cancel</button>
-		</form>
-	`;
+function showModelModal(model: ModelConfig, index?: number): void {
+	const modal = document.getElementById('model-modal');
+	if (!modal) return;
 
-	const form = modelForm.querySelector('form');
-	const saveBtn = modelForm.querySelector('.save-btn');
-	saveBtn?.addEventListener('click', (e) => {
-		e.preventDefault();
-		const formData = new FormData(form as HTMLFormElement);
+	const titleElement = modal.querySelector('.modal-title');
+	if (titleElement) {
+		titleElement.setAttribute('data-i18n', index !== undefined ? 'editModel' : 'addModelTitle');
+		translatePage().then(() => {
+			initializeIcons(modal);
+		});
+	}
+
+	const form = modal.querySelector('#model-form') as HTMLFormElement;
+	if (form) {
+		const nameInput = form.querySelector('[name="name"]') as HTMLInputElement;
+		const providerInput = form.querySelector('[name="provider"]') as HTMLInputElement;
+		const baseUrlInput = form.querySelector('[name="baseUrl"]') as HTMLInputElement;
+		const apiKeyInput = form.querySelector('[name="apiKey"]') as HTMLInputElement;
+		const providerIdInput = form.querySelector('[name="providerId"]') as HTMLInputElement;
+
+		nameInput.value = model.name;
+		providerInput.value = model.provider || '';
+		baseUrlInput.value = model.baseUrl || '';
+		apiKeyInput.value = model.apiKey || '';
+		providerIdInput.value = model.providerId || '';
+	}
+
+	const confirmBtn = modal.querySelector('.model-confirm-btn');
+	const cancelBtn = modal.querySelector('.model-cancel-btn');
+
+	// Remove existing event listeners
+	const newConfirmBtn = confirmBtn?.cloneNode(true);
+	const newCancelBtn = cancelBtn?.cloneNode(true);
+	if (confirmBtn && newConfirmBtn) {
+		confirmBtn.parentNode?.replaceChild(newConfirmBtn, confirmBtn);
+	}
+	if (cancelBtn && newCancelBtn) {
+		cancelBtn.parentNode?.replaceChild(newCancelBtn, cancelBtn);
+	}
+
+	// Add new event listeners
+	newConfirmBtn?.addEventListener('click', () => {
+		const formData = new FormData(form);
+		const providerId = formData.get('providerId') as string;
 		const updatedModel: ModelConfig = {
 			id: model.id || Date.now().toString(),
+			providerId: providerId,
 			name: formData.get('name') as string,
 			provider: formData.get('provider') as string || undefined,
 			baseUrl: formData.get('baseUrl') as string,
+			
 			apiKey: formData.get('apiKey') as string || undefined,
 			enabled: model.enabled
 		};
 
-		if (!updatedModel.name || !updatedModel.baseUrl) {
-			alert('Model Name and Base URL are required.');
+		if (!updatedModel.name || !updatedModel.baseUrl || !updatedModel.providerId) {
+			alert('Model name, Base URL, and Model ID are required.');
 			return;
 		}
 
@@ -195,20 +268,20 @@ function createModelForm(model: ModelConfig, index?: number): HTMLElement {
 
 		saveSettings();
 		initializeModelList();
+		hideModal(modal);
 	});
 
-	const cancelBtn = modelForm.querySelector('.cancel-btn');
-	cancelBtn?.addEventListener('click', () => {
-		const modelList = document.getElementById('model-list');
-		if (modelList && index !== undefined) {
-			const existingItem = createModelListItem(generalSettings.models[index], index);
-			modelList.replaceChild(existingItem, modelForm);
-		} else if (modelList) {
-			modelList.removeChild(modelForm);
-		}
+	newCancelBtn?.addEventListener('click', () => {
+		hideModal(modal);
 	});
 
-	return modelForm;
+	showModal(modal);
+	
+	// Translate the modal content after showing it
+	translatePage().then(() => {
+		// Re-initialize icons after translation
+		initializeIcons(modal);
+	});
 }
 
 function deleteModel(index: number) {
@@ -218,7 +291,7 @@ function deleteModel(index: number) {
 		return;
 	}
 
-	if (confirm('Are you sure you want to delete this model?')) {
+	if (confirm(getMessage('deleteModelConfirm'))) {
 		generalSettings.models.splice(index, 1);
 		saveSettings();
 		initializeModelList();
@@ -256,4 +329,22 @@ function debounce(func: Function, delay: number): (...args: any[]) => void {
 		clearTimeout(timeoutId);
 		timeoutId = setTimeout(() => func(...args), delay);
 	};
+}
+
+function duplicateModel(index: number) {
+	const modelToDuplicate = generalSettings.models[index];
+	const duplicatedModel: ModelConfig = {
+		...modelToDuplicate,
+		id: Date.now().toString(),
+		name: `${modelToDuplicate.name} (copy)`,
+		enabled: true
+	};
+
+	generalSettings.models.push(duplicatedModel);
+	saveSettings();
+	initializeModelList();
+
+	// Show edit modal for the new model
+	const newIndex = generalSettings.models.length - 1;
+	showModelModal(duplicatedModel, newIndex);
 }

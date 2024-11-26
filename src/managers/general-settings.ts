@@ -11,6 +11,7 @@ import { exportAllSettings, importAllSettings } from '../utils/import-export';
 import { Template } from '../types/types';
 import { exportHighlights } from './highlights-manager';
 import { getMessage, setupLanguageAndDirection } from '../utils/i18n';
+import { debounce } from '../utils/debounce';
 
 export function updateVaultList(): void {
 	const vaultList = document.getElementById('vault-list') as HTMLUListElement;
@@ -139,14 +140,6 @@ function saveSettingsFromForm(): void {
 	};
 
 	saveSettings(settings);
-}
-
-function debounce(func: Function, delay: number): (...args: any[]) => void {
-	let timeoutId: NodeJS.Timeout;
-	return (...args: any[]) => {
-		clearTimeout(timeoutId);
-		timeoutId = setTimeout(() => func(...args), delay);
-	};
 }
 
 function initializeShowMoreActionsToggle(): void {

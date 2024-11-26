@@ -1,33 +1,35 @@
-#sidebar ul li[data-section="interpreter"] {
-	display: none !important;
-}
-
 .clipper {
 	#interpreter {
+		--interpreter-background-color: hsla(var(--color-accent-hsl), 0.075);
+		--interpreter-border-color: hsla(var(--color-accent-hsl), 0.15);
+		--interpreter-text-color: var(--text-accent);
 		display: none;
 		flex-direction: column;
 
 		border-radius: 4px;
-		background-color: hsla(var(--color-accent-hsl), 0.075);
-		border: 1px solid hsla(var(--color-accent-hsl), 0.15);
+		background-color: var(--interpreter-background-color);
+		border: 1px solid var(--interpreter-border-color);
 
 		&.done {
-			background-color: hsla(var(--color-green-hsl), 0.1);
-			border-color: hsla(var(--color-green-hsl), 0.15);
+			--interpreter-background-color: hsla(var(--color-green-hsl), 0.1);
+			--interpreter-border-color: hsla(var(--color-green-hsl), 0.15);
+			--interpreter-text-color: var(--text-success);
 			#model-select {
-				color: var(--text-success);
 				opacity: 1;
 			}
 		}
 
 		&.error {
-			background-color: hsla(var(--color-red-hsl), 0.1);
-			border-color: hsla(var(--color-red-hsl), 0.15);
-
+			--interpreter-background-color: hsla(var(--color-red-hsl), 0.1);
+			--interpreter-border-color: hsla(var(--color-red-hsl), 0.15);
+			--interpreter-text-color: var(--text-error);
 			#model-select {
-				color: var(--text-error);
 				opacity: 1;
 			}
+		}
+
+		#model-select {
+			color: var(--interpreter-text-color);
 		}
 	}
 
@@ -48,7 +50,9 @@
 		-webkit-user-select: none;
 		cursor: default;
 		font-variant: tabular-nums;
+		background-image: none;
 		background-color: transparent;
+		color: var(--interpreter-text-color);
 		font-family: var(--font-monospace-default);
 		height: 1.5rem;
 		appearance: none;
@@ -56,9 +60,11 @@
 		border: none;
 		box-shadow: none;
 		flex-shrink: 1;
-		max-width: 40%;
+		max-width: 50%;
 		font-size: 0.6875rem;
 		padding: 0px;
+		padding-inline-end: 1.25rem;
+		text-overflow: ellipsis;
 		color: var(--text-accent);
 		opacity: 0.75;
 		@media (hover: hover) {
@@ -73,6 +79,7 @@
 	}
 
 	#interpret-btn {
+		cursor: default;
 		user-select: none;
 		-webkit-user-select: none;
 		font-family: var(--font-monospace-default);
@@ -147,10 +154,26 @@
 		font-variant: tabular-nums;
 	}
 
+	.token-counter {
+		display: none;
+		padding: 0.5rem 0.5rem;
+		font-size: 0.6875rem;
+		color: var(--text-muted);
+		font-family: var(--font-monospace-default);
+		border-top: 1px solid var(--interpreter-border-color);
+		
+		&.warning {
+			color: var(--text-warning);
+		}
+		
+		&.error {
+			color: var(--text-error);
+		}
+	}
 
 	#interpreter-error {
 		border-top: 1px solid  hsla(var(--color-red-hsl), 0.15);
-		padding: 8px;
+		padding: 0.5rem;
 		font-size: var(--font-ui-smaller);
 		color: var(--text-error);
 		white-space: pre-wrap;
@@ -160,20 +183,45 @@
 		display: none;
 		line-height: 1.2;
 	}
+}
+
+.model-form {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
 	
-	#clip-btn {
-		&:disabled {
-			opacity: 0.67;
-			cursor: not-allowed;
+	.setting-item {
+		border: none;
+		padding: 0;
+	}
+
+	.setting-item-info {
+		margin-bottom: 0.5rem;
+		
+		label {
+			font-weight: 600;
+			margin-bottom: 0.25rem;
+			display: block;
+		}
+	}
+
+	.setting-item-description {
+		color: var(--text-muted);
+		font-size: var(--font-ui-smaller);
+		margin-bottom: 0.25rem;
+	}
+
+	.setting-item-control {
+		input {
+			width: 100%;
 		}
 	}
 }
 
-.model-form {
-	margin: 8px 0 0;
-	display: flex;
-	flex-direction: row;
-	gap: 4px;
+#model-modal {
+	.modal {
+		max-width: 500px;
+	}
 }
 
 .model-list-container {
@@ -186,16 +234,17 @@
 		display: flex;
 		flex-direction: row;
 		align-items: center;
-		justify-content: space-between;
-		gap: 4px;
+		gap: 0.25rem;
 		border-bottom: 1px solid var(--background-modifier-border);
-		padding: 4px 0;
+		padding: 0.25rem 0;
+		user-select: none;
 	}
 	.model-list-item-actions {
 		display: flex;
 		flex-direction: row;
 		align-items: center;
 		justify-content: flex-end;
+		margin-inline-start: auto;
 		gap: 2px;
 		.clickable-icon {
 			height: 24px;
@@ -205,7 +254,7 @@
 	.model-list-item-info {
 		display: flex;
 		flex-direction: row;
-		gap: 4px;
+		gap: 0.5rem;
 		min-width: 60%;
 	}
 	.model-name {
@@ -218,3 +267,11 @@
 	}
 }
 
+#interpreter-section {
+	&.is-disabled {
+		form > div:not(:first-child) {
+			opacity: 0.5;
+			pointer-events: none;
+		}
+	}
+}

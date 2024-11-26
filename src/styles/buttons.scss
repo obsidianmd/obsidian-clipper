@@ -19,6 +19,10 @@ button,
 	border: none;
 	text-decoration: none;
 
+	&:disabled {
+		opacity: 0.67;
+		cursor: not-allowed;
+	}
 	.is-mobile & {
 		padding: 0.25rem 1rem;
 	}

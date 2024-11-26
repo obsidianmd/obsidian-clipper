@@ -104,7 +104,7 @@ const debouncedSetPopupDimensions = debounce(setPopupDimensions, 100); // 100ms 
 async function initializeExtension(tabId: number) {
 	try {
 		// Initialize translations
-		translatePage();
+		await translatePage();
 		
 		// Setup language and RTL support
 		await setupLanguageAndDirection();
@@ -157,7 +157,6 @@ async function initializeExtension(tabId: number) {
 			return;
 		}
 		await ensureContentScriptLoaded(tabId);
-		await refreshFields(tabId);
 
 		await loadAndSetupTemplates();
 
@@ -567,8 +566,8 @@ async function handleClip() {
 				showError('failedToProcessInterpreter');
 				return;
 			}
-		} else if (interpretBtn.textContent?.toLowerCase() !== 'done') {
-			interpretBtn.click(); // Trigger processing
+		} else if (!interpretBtn.classList.contains('done')) {
+			interpretBtn.click(); // Only trigger if not already processed
 			try {
 				await waitForInterpreter(interpretBtn);
 			} catch (error) {
@@ -632,9 +631,9 @@ async function waitForInterpreter(interpretBtn: HTMLButtonElement): Promise<void
 	return new Promise((resolve, reject) => {
 		const checkProcessing = () => {
 			if (!interpretBtn.classList.contains('processing')) {
-				if (interpretBtn.textContent?.toLowerCase() === 'done') {
+				if (interpretBtn.classList.contains('done')) {
 					resolve();
-				} else if (interpretBtn.textContent?.toLowerCase() === 'error') {
+				} else if (interpretBtn.classList.contains('error')) {
 					reject(new Error(getMessage('failedToProcessInterpreter')));
 				} else {
 					setTimeout(checkProcessing, 100);
@@ -873,15 +872,26 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 			// If auto-run is enabled and there are prompt variables, use interpreter
 			if (generalSettings.interpreterAutoRun && promptVariables.length > 0) {
 				try {
+					const interpretBtn = document.getElementById('interpret-btn') as HTMLButtonElement;
 					const modelSelect = document.getElementById('model-select') as HTMLSelectElement;
-					const selectedModelId = modelSelect?.value || generalSettings.interpreterModel || 'gpt-4o-mini';
+					const selectedModelId = modelSelect?.value || generalSettings.interpreterModel;
 					const modelConfig = generalSettings.models.find(m => m.id === selectedModelId);
 					if (!modelConfig) {
 						throw new Error(`Model configuration not found for ${selectedModelId}`);
 					}
 					await handleInterpreterUI(template, variables, currentTabId!, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '', modelConfig);
+					
+					// Ensure the button shows the completed state after auto-run
+					if (interpretBtn) {
+						interpretBtn.classList.add('done');
+						interpretBtn.disabled = true;
+					}
 				} catch (error) {
 					console.error('Error auto-processing with interpreter:', error);
+					const interpretBtn = document.getElementById('interpret-btn') as HTMLButtonElement;
+					if (interpretBtn) {
+						interpretBtn.classList.add('error');
+					}
 				}
 			}
 		}

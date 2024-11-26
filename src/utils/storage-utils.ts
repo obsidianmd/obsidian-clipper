@@ -2,6 +2,7 @@ import browser from './browser-polyfill';
 
 export interface ModelConfig {
 	id: string;
+	providerId: string;
 	name: string;
 	provider?: string;
 	baseUrl: string;
@@ -63,16 +64,14 @@ export let generalSettings: Settings = {
 	anthropicApiKey: '',
 	interpreterModel: 'gpt-4o-mini',
 	models: [
-		{ id: 'gpt-4o-mini', name: 'GPT-4o Mini', provider: 'OpenAI', baseUrl: 'https://api.openai.com/v1/chat/completions', enabled: true },
-		{ id: 'gpt-4o', name: 'GPT-4o', provider: 'OpenAI', baseUrl: 'https://api.openai.com/v1/chat/completions', enabled: true },
-		{ id: 'gpt-o1-mini', name: 'GPT-o1 Mini', provider: 'OpenAI', baseUrl: 'https://api.openai.com/v1/chat/completions', enabled: true },
-		{ id: 'claude-3-5-sonnet-20240620', name: 'Claude 3.5 Sonnet', provider: 'Anthropic', baseUrl: 'https://api.anthropic.com/v1/messages', enabled: true },
-		{ id: 'claude-3-haiku-20240307', name: 'Claude 3 Haiku', provider: 'Anthropic', baseUrl: 'https://api.anthropic.com/v1/messages', enabled: true },
-		{ id: 'claude-3-opus-20240229', name: 'Claude 3 Opus', provider: 'Anthropic', baseUrl: 'https://api.anthropic.com/v1/messages', enabled: true }
+		{ id: 'gpt-4o-mini', providerId: 'gpt-4o-mini', name: 'GPT-4o Mini', provider: 'OpenAI', baseUrl: 'https://api.openai.com/v1/chat/completions', enabled: true },
+		{ id: 'gpt-4o', providerId: 'gpt-4o', name: 'GPT-4o', provider: 'OpenAI', baseUrl: 'https://api.openai.com/v1/chat/completions', enabled: true },
+		{ id: 'claude-3-5-sonnet-20240620', providerId: 'claude-3-5-sonnet-20240620', name: 'Claude 3.5 Sonnet', provider: 'Anthropic', baseUrl: 'https://api.anthropic.com/v1/messages', enabled: true },
+		{ id: 'claude-3-haiku-20240307', providerId: 'claude-3-haiku-20240307', name: 'Claude 3 Haiku', provider: 'Anthropic', baseUrl: 'https://api.anthropic.com/v1/messages', enabled: true },
 	],
 	interpreterEnabled: false,
 	interpreterAutoRun: false,
-	defaultPromptContext: '{{fullHtml|strip_tags:("script,h1,h2,h3,h4,h5,h6,meta,a,ol,ul,li,p,em,strong,i,b,img,video,audio,math,tablecite,strong,td,th,tr,caption,u")|strip_attr:("alt,src,href,id,content,property,name,datetime,title")}}',
+	defaultPromptContext: '',
 	propertyTypes: [],
 	stats: {
 		addToObsidian: 0,
@@ -136,6 +135,7 @@ export async function loadSettings(): Promise<Settings> {
 	const localData = await browser.storage.local.get('history');
 	const history = (localData.history || []) as HistoryEntry[];
 
+	// Load default settings first
 	const defaultSettings: Settings = {
 		vaults: [],
 		showMoreActionsButton: false,
@@ -162,6 +162,7 @@ export async function loadSettings(): Promise<Settings> {
 		history: []
 	};
 
+	// Load user settings
 	const loadedSettings: Settings = {
 		vaults: data.vaults || defaultSettings.vaults,
 		showMoreActionsButton: data.general_settings?.showMoreActionsButton ?? defaultSettings.showMoreActionsButton,
@@ -182,6 +183,30 @@ export async function loadSettings(): Promise<Settings> {
 		stats: data.stats || defaultSettings.stats,
 		history: history
 	};
+
+	// Migrate models to include providerId if missing
+	if (loadedSettings.models) {
+		loadedSettings.models = loadedSettings.models.map(model => {
+			if (!model.providerId) {
+				// For custom models without providerId, use their id
+				return {
+					...model,
+					providerId: model.id
+				};
+			}
+			return model;
+		});
+
+		// Save migrated models back to storage
+		if (loadedSettings.models.some(model => !model.providerId)) {
+			await browser.storage.sync.set({
+				interpreter_settings: {
+					...data.interpreter_settings,
+					models: loadedSettings.models
+				}
+			});
+		}
+	}
 
 	generalSettings = loadedSettings;
 	return generalSettings;

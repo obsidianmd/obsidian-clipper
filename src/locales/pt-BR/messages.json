@@ -1,4 +1,10 @@
 {
+	"addModel": {
+		"message": "+ Adicionar modelo"
+	},
+	"addModelTitle": {
+		"message": "Adicionar modelo"
+	},
 	"addProperty": {
 		"message": "+ Adicionar propriedade"
 	},
@@ -20,17 +26,43 @@
 	"alwaysShowHighlightsDescription": {
 		"message": "Exiba suas marcações salvos ao carregar a página. Desative para exibir as marcações somente quando o modo marcador estiver ativado."
 	},
+	"anthropicApiKey": {
+		"message": "Chave API Anthropic"
+	},
+	"anthropicApiKeyDescription": {
+		"message": "Você pode obter sua chave API Anthropic $link_start$aqui$link_end$.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://console.anthropic.com/settings/keys\" target=\"_blank\">"
+			}
+		}
+	},
+	"apiKeysWarning": {
+		"message": "Ao usar um provedor externo, você concorda com seus termos e política de privacidade. As solicitações do interpretador são enviadas diretamente ao provedor que você escolher. O Obsidian não coleta nem armazena nenhum dado sobre suas solicitações."
+	},
 	"appendToDaily": {
 		"message": "Adicionar à nota diária, no final"
 	},
 	"appendToExisting": {
 		"message": "Adicionar a uma nota existente, no final"
 	},
+	"autoRunInterpreter": {
+		"message": "Executar automaticamente"
+	},
+	"autoRunInterpreterDescription": {
+		"message": "Execute variáveis de prompt imediatamente se o modelo contiver alguma. Isso consumirá créditos de API com seu provedor de modelo. Desative se você quiser executar o interpretador apenas manualmente."
+	},
 	"behavior": {
 		"message": "Comportamento"
 	},
 	"behaviorWarning": {
 		"message": "Adicionar a uma nota existente ou nota diária requer a versão 1.7.2 ou posterior do Obsidian."
+	},
+	"cancel": {
+		"message": "Cancelar"
 	},
 	"clipBehavior": {
 		"message": "Comportamento da captura"
@@ -76,17 +108,29 @@
 	"dailyNoteFormat": {
 		"message": "Formato da nota diária (ex: YYYY-MM-DD)"
 	},
+	"defaultInterpreterContext": {
+		"message": "Contexto padrão do interpretador"
+	},
+	"defaultInterpreterContextDescription": {
+		"message": "O modelo usará este contexto para interpretar variáveis de prompt. Variáveis e filtros podem ser usados aqui."
+	},
 	"defaultTemplateName": {
 		"message": "Padrão"
 	},
 	"delete": {
 		"message": "Deletar"
 	},
+	"deleteModelConfirm": {
+		"message": "Tem certeza que deseja excluir este modelo?"
+	},
 	"disableHighlighter": {
 		"message": "Desativar marcador"
 	},
 	"display": {
 		"message": "Exibir"
+	},
+	"done": {
+		"message": "Concluído"
 	},
 	"duplicate": {
 		"message": "Duplicar"
@@ -105,6 +149,9 @@
 	"earlyAccessFeatures": {
 		"message": "Recursos de acesso antecipado"
 	},
+	"editModel": {
+		"message": "Editar modelo"
+	},
 	"editTemplate": {
 		"message": "Editar modelo"
 	},
@@ -113,6 +160,26 @@
 	},
 	"enableHighlighterDescription": {
 		"message": "Demarque o conteúdo de páginas da internet para que possa salvar no Obsidian."
+	},
+	"enableInterpreter": {
+		"message": "Habilitar interpretador"
+	},
+	"enableInterpreterDescription": {
+		"message": "Use linguagem natural para extrair dados das páginas. Por exemplo, você pode usar a sintaxe de modelo $strong_start${{\"um resumo da página\"}}$strong_end$. Requer uma chave API ou modelo personalizado configurado abaixo. $link_start$Saiba mais$link_end$",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/interpreter\" target=\"_blank\">"
+			},
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
 	},
 	"error": {
 		"message": "Error"
@@ -238,6 +305,9 @@
 			}
 		}
 	},
+	"interpret": {
+		"message": "interpretar"
+	},
 	"interpreter": {
 		"message": "Intérprete"
 	},
@@ -269,6 +339,51 @@
 	},
 	"legacyModeDescription": {
 		"message": "Utiliza o método de captura por URI compatível com o Obsidian 1.6.7 ou versões anteriores. Observe que o tamanho do conteúdo que pode ser capturado é limitado pelo seu navegador e pelo sistema operacional. Algumas páginas podem falhar sem exibir erros."
+	},
+	"modelApiKey": {
+		"message": "Chave API"
+	},
+	"modelApiKeyDescription": {
+		"message": "Digite a chave API para este modelo. Pode não ser necessária para todos os provedores."
+	},
+	"modelApiKeyDescription": {
+		"message": "Digite a chave API para este modelo. Pode não ser necessária para todos os provedores."
+	},
+	"modelBaseUrl": {
+		"message": "URL base"
+	},
+	"modelBaseUrlDescription": {
+		"message": "A URL do endpoint API para este modelo."
+	},
+	"modelName": {
+		"message": "Nome do modelo"
+	},
+	"modelNameDescription": {
+		"message": "O nome do modelo que você deseja exibir na interface."
+	},
+	"modelNameDescription": {
+		"message": "O nome do modelo que você deseja exibir na interface."
+	},
+	"modelProvider": {
+		"message": "Provedor"
+	},
+	"modelProviderDescription": {
+		"message": "O provedor do modelo, por exemplo Ollama, OpenRouter, Google, etc."
+	},
+	"modelProviderDescription": {
+		"message": "O provedor do modelo, por exemplo Ollama, OpenRouter, Google, etc."
+	},
+	"modelProviderId": {
+		"message": "ID do modelo"
+	},
+	"modelProviderIdDescription": {
+		"message": "O identificador do modelo do seu provedor. Geralmente um nome curto sem espaços."
+	},
+	"modelProviderIdPlaceholder": {
+		"message": "ID do modelo"
+	},
+	"models": {
+		"message": "Modelos"
 	},
 	"more": {
 		"message": "Mais"
@@ -320,6 +435,23 @@
 	"open": {
 		"message": "Abrir"
 	},
+	"openaiApiKey": {
+		"message": "Chave API OpenAI"
+	},
+	"openaiApiKeyDescription": {
+		"message": "Você pode obter sua chave API OpenAI $link_start$aqui$link_end$.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://platform.openai.com/api-keys\" target=\"_blank\">"
+			}
+		}
+	},
+	"optional": {
+		"message": "(opcional)"
+	},
 	"pageCannotBeClipped": {
 		"message": "Esta página não pode ser capturada."
 	},
@@ -335,6 +467,9 @@
 	"prependToExisting": {
 		"message": "Adicionar a uma nota existente, no início"
 	},
+	"processing": {
+		"message": "processando"
+	},
 	"properties": {
 		"message": "Propriedades"
 	},
@@ -346,6 +481,9 @@
 	},
 	"propertyValue": {
 		"message": "valor da propriedade"
+	},
+	"providers": {
+		"message": "Provedores"
 	},
 	"refresh": {
 		"message": "Atualizar"
@@ -376,6 +514,9 @@
 	},
 	"resetDefaultTemplateDescription": {
 		"message": "Remove quaisquer alterações que você tenha feito no modelo padrão."
+	},
+	"save": {
+		"message": "Salvar"
 	},
 	"saveFile": {
 		"message": "Salvar arquivo..."
@@ -454,6 +595,9 @@
 	},
 	"templatesHeading": {
 		"message": "Modelos"
+	},
+	"thinking": {
+		"message": "pensando"
 	},
 	"vault": {
 		"message": "Cofre"

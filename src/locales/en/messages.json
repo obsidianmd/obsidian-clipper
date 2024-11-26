@@ -1,4 +1,10 @@
 {
+	"addModel": {
+		"message": "+ Add model"
+	},
+	"addModelTitle": {
+		"message": "Add model"
+	},
 	"addProperty": {
 		"message": "+ Add property"
 	},
@@ -20,17 +26,58 @@
 	"alwaysShowHighlightsDescription": {
 		"message": "Display your saved highlights when you load a page. Turn off to only display highlights when highlighter mode is activated."
 	},
+	"anthropicApiKey": {
+		"message": "Anthropic API key"
+	},
+	"anthropicApiKeyDescription": {
+		"message": "You can get your Anthropic API key $link_start$here$link_end$.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://console.anthropic.com/settings/keys\" target=\"_blank\">"
+			}
+		}
+	},
+	"anthropicApiKeyPlaceholder": {
+		"message": "Anthropic API key"
+	},
+	"apiKeysWarning": {
+		"message": "By using an external provider you agree to their terms and privacy policy. Interpreter requests are sent directly to the provider you choose. Obsidian does not gather or store any data about your requests."
+	},
 	"appendToDaily": {
 		"message": "Add to daily note, at the bottom"
 	},
 	"appendToExisting": {
 		"message": "Add to an existing note, at the bottom"
 	},
+	"autoRunInterpreter": {
+		"message": "Automatically run"
+	},
+	"autoRunInterpreterDescription": {
+		"message": "Run prompt variables immediately if the template contains any. This will consume API credits with your model provider. Turn off if you only want to run interpreter manually."
+	},
 	"behavior": {
 		"message": "Behavior"
 	},
 	"behaviorWarning": {
 		"message": "Adding to an existing note or daily note requires Obsidian 1.7.2 or later."
+	},
+	"cancel": {
+		"message": "Cancel"
+	},
+	"chooseFile": {
+		"message": "Choose a file"
+	},
+	"choosePropertiesFile": {
+		"message": "Choose properties file"
+	},
+	"chooseSettingsFile": {
+		"message": "Choose settings file"
+	},
+	"chooseTemplateFile": {
+		"message": "Choose template file"
 	},
 	"clipBehavior": {
 		"message": "Clip behavior"
@@ -76,17 +123,32 @@
 	"dailyNoteFormat": {
 		"message": "Daily note format (e.g., YYYY-MM-DD)"
 	},
+	"defaultInterpreterContext": {
+		"message": "Default interpreter context"
+	},
+	"defaultInterpreterContextDescription": {
+		"message": "Override the context used to interpret prompt variables. Variables can be used here."
+	},
 	"defaultTemplateName": {
 		"message": "Default"
 	},
 	"delete": {
 		"message": "Delete"
 	},
+	"deleteModelConfirm": {
+		"message": "Are you sure you want to delete this model?"
+	},
 	"disableHighlighter": {
 		"message": "Disable highlighter"
 	},
 	"display": {
 		"message": "Display"
+	},
+	"done": {
+		"message": "Done"
+	},
+	"dragAndDropFile": {
+		"message": "Drag and drop file here"
 	},
 	"duplicate": {
 		"message": "Duplicate"
@@ -105,6 +167,9 @@
 	"earlyAccessFeatures": {
 		"message": "Early access features"
 	},
+	"editModel": {
+		"message": "Edit model"
+	},
 	"editTemplate": {
 		"message": "Edit template"
 	},
@@ -113,6 +178,26 @@
 	},
 	"enableHighlighterDescription": {
 		"message": "Highlight content on web pages that you can save to Obsidian."
+	},
+	"enableInterpreter": {
+		"message": "Enable interpreter"
+	},
+	"enableInterpreterDescription": {
+		"message": "Use natural language to extract data from pages. For example, you can use the template syntax $strong_start${{\"a summary of the page\"}}$strong_end$. Requires an API key or custom model configured below.  $link_start$Learn more$link_end$.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/interpreter\" target=\"_blank\">"
+			},
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
 	},
 	"error": {
 		"message": "Error"
@@ -218,6 +303,9 @@
 	"importAllSettingsDescription": {
 		"message": "Import all settings including templates and properties. This will replace your current configuration."
 	},
+	"importModalTitle": {
+		"message": "Import"
+	},
 	"importProperties": {
 		"message": "Import properties"
 	},
@@ -237,6 +325,15 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"importSettings": {
+		"message": "Import settings"
+	},
+	"importTemplate": {
+		"message": "Import template"
+	},
+	"interpret": {
+		"message": "interpret"
 	},
 	"interpreter": {
 		"message": "Interpreter"
@@ -269,6 +366,54 @@
 	},
 	"legacyModeDescription": {
 		"message": "Uses the URI clipping method compatible with Obsidian 1.6.7 or earlier. Note that the length of the content you can clip is limited by your browser and OS. Some pages may fail without any errors."
+	},
+	"modelApiKey": {
+		"message": "API key"
+	},
+	"modelApiKeyDescription": {
+		"message": "Enter the API key for this model. May not be required for all providers."
+	},
+	"modelApiKeyPlaceholder": {
+		"message": "API key"
+	},
+	"modelBaseUrl": {
+		"message": "Base URL"
+	},
+	"modelBaseUrlDescription": {
+		"message": "API endpoint for this model."
+	},
+	"modelBaseUrlPlaceholder": {
+		"message": "Base URL"
+	},
+	"modelName": {
+		"message": "Display name"
+	},
+	"modelNameDescription": {
+		"message": "The name of the model you want to display in the interface."
+	},
+	"modelNamePlaceholder": {
+		"message": "Model name"
+	},
+	"modelProvider": {
+		"message": "Provider"
+	},
+	"modelProviderDescription": {
+		"message": "The model provider, e.g. Ollama, OpenRouter, Google, etc."
+	},
+	"modelProviderId": {
+		"message": "Model ID"
+	},
+	"modelProviderIdDescription": {
+		"message": "The identifier of the model from your provider. Typically a short name without spaces."
+	},
+	"modelProviderIdPlaceholder": {
+		"message": "Model ID"
+	},
+	"modelProviderPlaceholder": {
+		"message": "Provider"
+	},
+	"models": {
+		"message": "Models"
 	},
 	"more": {
 		"message": "More"
@@ -320,11 +465,37 @@
 	"open": {
 		"message": "Open"
 	},
+	"openaiApiKey": {
+		"message": "OpenAI API key"
+	},
+	"openaiApiKeyDescription": {
+		"message": "You can get your OpenAI API key $link_start$here$link_end$.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://platform.openai.com/api-keys\" target=\"_blank\">"
+			}
+		}
+	},
+	"openaiApiKeyPlaceholder": {
+		"message": "OpenAI API key"
+	},
+	"optional": {
+		"message": "(optional)"
+	},
+	"orPasteBelow": {
+		"message": "Or paste content below"
+	},
 	"pageCannotBeClipped": {
 		"message": "This page cannot be clipped."
 	},
 	"pageVariables": {
 		"message": "Page variables"
+	},
+	"pasteJsonHere": {
+		"message": "Paste JSON here"
 	},
 	"pleaseReload": {
 		"message": "Please try reloading the page."
@@ -334,6 +505,9 @@
 	},
 	"prependToExisting": {
 		"message": "Add to an existing note, at the top"
+	},
+	"processing": {
+		"message": "processing"
 	},
 	"properties": {
 		"message": "Properties"
@@ -346,6 +520,9 @@
 	},
 	"propertyValue": {
 		"message": "Property value"
+	},
+	"providers": {
+		"message": "Providers"
 	},
 	"refresh": {
 		"message": "Refresh"
@@ -376,6 +553,9 @@
 	},
 	"resetDefaultTemplateDescription": {
 		"message": "Remove any changes you've made to the default template."
+	},
+	"save": {
+		"message": "Save"
 	},
 	"saveFile": {
 		"message": "Save file..."
@@ -454,6 +634,9 @@
 	},
 	"templatesHeading": {
 		"message": "Templates"
+	},
+	"thinking": {
+		"message": "thinking"
 	},
 	"vault": {
 		"message": "Vault"

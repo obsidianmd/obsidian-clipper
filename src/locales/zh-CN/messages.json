@@ -1,4 +1,10 @@
 {
+	"addModel": {
+		"message": "+ 添加模型"
+	},
+	"addModelTitle": {
+		"message": "添加模型"
+	},
 	"addProperty": {
 		"message": "+ 添加属性"
 	},
@@ -20,17 +26,43 @@
 	"alwaysShowHighlightsDescription": {
 		"message": "加载页面时显示已保存的高亮内容。关闭此选项则仅在高亮模式激活时显示高亮。"
 	},
+	"anthropicApiKey": {
+		"message": "Anthropic API 密钥"
+	},
+	"anthropicApiKeyDescription": {
+		"message": "您可以在$link_start$这里$link_end$获取 Anthropic API 密钥。",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://console.anthropic.com/settings/keys\" target=\"_blank\">"
+			}
+		}
+	},
+	"apiKeysWarning": {
+		"message": "使用外部提供商即表示您同意其条款和隐私政策。解释器请求直接发送给您选择的提供商。Obsidian 不会收集或存储任何关于您请求的数据。"
+	},
 	"appendToDaily": {
 		"message": "添加到日记末尾"
 	},
 	"appendToExisting": {
 		"message": "添加到现有笔记末尾"
 	},
+	"autoRunInterpreter": {
+		"message": "自动运行"
+	},
+	"autoRunInterpreterDescription": {
+		"message": "如果模板包含提示变量，则立即运行。这将消耗模型提供商的 API 额度。如果您只想手动运行解释器，请关闭此选项。"
+	},
 	"behavior": {
 		"message": "行为"
 	},
 	"behaviorWarning": {
 		"message": "添加到现有笔记或日记需要 Obsidian 1.7.2 或更高版本。"
+	},
+	"cancel": {
+		"message": "取消"
 	},
 	"clipBehavior": {
 		"message": "剪藏行为"
@@ -76,17 +108,29 @@
 	"dailyNoteFormat": {
 		"message": "日记格式（如：YYYY-MM-DD）"
 	},
+	"defaultInterpreterContext": {
+		"message": "默认解释器上下文"
+	},
+	"defaultInterpreterContextDescription": {
+		"message": "模型将使用此上下文来解释提示变量。可以在此处使用变量和过滤器。"
+	},
 	"defaultTemplateName": {
 		"message": "默认"
 	},
 	"delete": {
 		"message": "删除"
 	},
+	"deleteModelConfirm": {
+		"message": "您确定要删除此模型吗？"
+	},
 	"disableHighlighter": {
 		"message": "禁用高亮"
 	},
 	"display": {
 		"message": "显示"
+	},
+	"done": {
+		"message": "完成"
 	},
 	"duplicate": {
 		"message": "复制"
@@ -105,6 +149,9 @@
 	"earlyAccessFeatures": {
 		"message": "早期访问功能"
 	},
+	"editModel": {
+		"message": "编辑模型"
+	},
 	"editTemplate": {
 		"message": "编辑模板"
 	},
@@ -113,6 +160,26 @@
 	},
 	"enableHighlighterDescription": {
 		"message": "在网页上高亮内容并保存到 Obsidian。"
+	},
+	"enableInterpreter": {
+		"message": "启用解释器"
+	},
+	"enableInterpreterDescription": {
+		"message": "使用自然语言从页面提取数据。例如，您可以使用模板语法 $strong_start${{\"页面摘要\"}}$strong_end$。需要 API 密钥或下面配置的自定义模型。$link_start$了解更多$link_end$",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/interpreter\" target=\"_blank\">"
+			},
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
 	},
 	"error": {
 		"message": "错误"
@@ -185,6 +252,15 @@
 	"generalSettings": {
 		"message": "常规设置"
 	},
+	"help": {
+		"message": "帮助"
+	},
+	"helpDescription": {
+		"message": "了解如何使用 Web Clipper 并获取故障排除帮助。"
+	},
+	"highlightInline": {
+		"message": "高亮页面内容"
+	},
 	"highlightPage": {
 		"message": "高亮页面"
 	},
@@ -226,6 +302,9 @@
 			}
 		}
 	},
+	"interpret": {
+		"message": "解释"
+	},
 	"interpreter": {
 		"message": "解释器"
 	},
@@ -257,6 +336,42 @@
 	},
 	"legacyModeDescription": {
 		"message": "使用与 Obsidian 1.6.7 或更早版本兼容的 URI 剪藏方法。请注意，您可以剪藏的内容长度受浏览器和操作系统限制。某些页面可能会静默失败。"
+	},
+	"modelApiKey": {
+		"message": "API 密钥"
+	},
+	"modelApiKeyDescription": {
+		"message": "输入此模型的 API 密钥。并非所有提供商都需要。"
+	},
+	"modelBaseUrl": {
+		"message": "基础 URL"
+	},
+	"modelBaseUrlDescription": {
+		"message": "此模型的 API 端点 URL。"
+	},
+	"modelName": {
+		"message": "模型名称"
+	},
+	"modelNameDescription": {
+		"message": "您想在界面中显示的模型名称。"
+	},
+	"modelProvider": {
+		"message": "提供商"
+	},
+	"modelProviderDescription": {
+		"message": "模型提供商，例如 Ollama、OpenRouter、Google 等。"
+	},
+	"modelProviderId": {
+		"message": "模型 ID"
+	},
+	"modelProviderIdDescription": {
+		"message": "来自提供商的模型标识符。通常是一个不含空格的简短名称。"
+	},
+	"modelProviderIdPlaceholder": {
+		"message": "模型 ID"
+	},
+	"models": {
+		"message": "模型"
 	},
 	"more": {
 		"message": "更多"
@@ -305,6 +420,26 @@
 	"onlyHttpSupported": {
 		"message": "无法剪藏此页面。仅支持 http 和 https URL。"
 	},
+	"open": {
+		"message": "打开"
+	},
+	"openaiApiKey": {
+		"message": "OpenAI API 密钥"
+	},
+	"openaiApiKeyDescription": {
+		"message": "您可以在$link_start$这里$link_end$获取 OpenAI API 密钥。",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://platform.openai.com/api-keys\" target=\"_blank\">"
+			}
+		}
+	},
+	"optional": {
+		"message": "(可选)"
+	},
 	"pageCannotBeClipped": {
 		"message": "无法剪藏此页面。"
 	},
@@ -320,6 +455,9 @@
 	"prependToExisting": {
 		"message": "添加到现有笔记开头"
 	},
+	"processing": {
+		"message": "处理中"
+	},
 	"properties": {
 		"message": "属性"
 	},
@@ -331,6 +469,9 @@
 	},
 	"propertyValue": {
 		"message": "属性值"
+	},
+	"providers": {
+		"message": "提供商"
 	},
 	"refresh": {
 		"message": "刷新"
@@ -361,6 +502,9 @@
 	},
 	"resetDefaultTemplateDescription": {
 		"message": "移除对默认模板的所有更改。"
+	},
+	"save": {
+		"message": "保存"
 	},
 	"saveFile": {
 		"message": "保存文件..."
@@ -440,6 +584,9 @@
 	"templatesHeading": {
 		"message": "模板"
 	},
+	"thinking": {
+		"message": "思考中"
+	},
 	"vault": {
 		"message": "保管库"
 	},
@@ -467,17 +614,5 @@
 				"content": "<strong>"
 			}
 		}
-	},
-	"help": {
-		"message": "帮助"
-	},
-	"helpDescription": {
-		"message": "了解如何使用 Web Clipper 并获取故障排除帮助。"
-	},
-	"open": {
-		"message": "打开"
-	},
-	"highlightInline": {
-		"message": "高亮页面内容"
 	}
-} 
+}

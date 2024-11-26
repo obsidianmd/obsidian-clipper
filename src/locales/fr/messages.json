@@ -1,4 +1,10 @@
 {
+	"addModel": {
+		"message": "+ Ajouter un modèle"
+	},
+	"addModelTitle": {
+		"message": "Ajouter un modèle de langage"
+	},
 	"addProperty": {
 		"message": "+ Ajouter une propriété"
 	},
@@ -20,17 +26,58 @@
 	"alwaysShowHighlightsDescription": {
 		"message": "Affiche vos surlignages sauvegardés lors du chargement d'une page. Désactivez pour n'afficher les surlignages que lorsque le mode surlignage est activé."
 	},
+	"anthropicApiKey": {
+		"message": "Clé API Anthropic"
+	},
+	"anthropicApiKeyDescription": {
+		"message": "Vous pouvez obtenir votre clé API Anthropic $link_start$ici$link_end$.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://console.anthropic.com/settings/keys\" target=\"_blank\">"
+			}
+		}
+	},
+	"anthropicApiKeyPlaceholder": {
+		"message": "Clé API Anthropic"
+	},
+	"apiKeysWarning": {
+		"message": "En utilisant un fournisseur externe, vous acceptez leurs conditions d'utilisation et leur politique de confidentialité. Les requêtes de l'interpréteur sont envoyées directement au fournisseur que vous choisissez. Obsidian ne collecte ni ne stocke aucune donnée concernant vos requêtes."
+	},
 	"appendToDaily": {
 		"message": "Ajouter à la note quotidienne, à la fin"
 	},
 	"appendToExisting": {
 		"message": "Ajouter à une note existante, à la fin"
 	},
+	"autoRunInterpreter": {
+		"message": "Exécuter automatiquement"
+	},
+	"autoRunInterpreterDescription": {
+		"message": "Exécute les variables de prompt immédiatement si le modèle en contient. Cela consommera des crédits API avec votre fournisseur de modèle. Désactivez si vous souhaitez exécuter l'interpréteur manuellement uniquement."
+	},
 	"behavior": {
 		"message": "Comportement"
 	},
 	"behaviorWarning": {
 		"message": "L'ajout à une note existante ou à la note quotidienne nécessite Obsidian 1.7.2 ou ultérieur."
+	},
+	"cancel": {
+		"message": "Annuler"
+	},
+	"chooseFile": {
+		"message": "Choisir un fichier"
+	},
+	"choosePropertiesFile": {
+		"message": "Choisir un fichier de propriétés"
+	},
+	"chooseSettingsFile": {
+		"message": "Choisir un fichier de paramètres"
+	},
+	"chooseTemplateFile": {
+		"message": "Choisir un fichier de modèle"
 	},
 	"clipBehavior": {
 		"message": "Comportement de sauvegarde"
@@ -61,6 +108,9 @@
 	"confirmDeleteTemplate": {
 		"message": "Êtes-vous sûr de vouloir supprimer le modèle \"$1\" ?"
 	},
+	"confirmReplaceSettings": {
+		"message": "Cela remplacera tous vos paramètres actuels, y compris les modèles et les propriétés. Êtes-vous sûr de vouloir continuer ?"
+	},
 	"copied": {
 		"message": "Copié !"
 	},
@@ -76,17 +126,41 @@
 	"dailyNoteFormat": {
 		"message": "Format de note quotidienne (ex: YYYY-MM-DD)"
 	},
+	"defaultInterpreterContext": {
+		"message": "Contexte par défaut de l'interpréteur"
+	},
+	"defaultInterpreterContextDescription": {
+		"message": "Le modèle utilisera ce contexte pour interpréter les variables de prompt. Les variables et filtres peuvent être utilisés ici."
+	},
 	"defaultTemplateName": {
 		"message": "Par défaut"
 	},
 	"delete": {
 		"message": "Supprimer"
 	},
+	"deleteModelConfirm": {
+		"message": "Êtes-vous sûr de vouloir supprimer ce modèle ?"
+	},
 	"disableHighlighter": {
-		"message": "Désactiver le surlignage"
+		"message": "Désactiver le surlignageur"
 	},
 	"display": {
 		"message": "Affichage"
+	},
+	"done": {
+		"message": "terminé"
+	},
+	"dragAndDropFile": {
+		"message": "Glissez et déposez un fichier ici"
+	},
+	"dragAndDropProperties": {
+		"message": "Glissez et déposez un fichier de propriétés ici"
+	},
+	"dragAndDropSettings": {
+		"message": "Glissez et déposez un fichier de paramètres ici"
+	},
+	"dragAndDropTemplate": {
+		"message": "Glissez et déposez un fichier de modèle ici"
 	},
 	"duplicate": {
 		"message": "Dupliquer"
@@ -105,14 +179,37 @@
 	"earlyAccessFeatures": {
 		"message": "Fonctionnalités d'accès anticipé"
 	},
+	"editModel": {
+		"message": "Modifier le modèle de langage"
+	},
 	"editTemplate": {
 		"message": "Modifier le modèle"
 	},
 	"enableHighlighter": {
-		"message": "Activer le surlignage"
+		"message": "Activer le surligneur"
 	},
 	"enableHighlighterDescription": {
 		"message": "Surlignez du contenu sur les pages web que vous pouvez sauvegarder dans Obsidian."
+	},
+	"enableInterpreter": {
+		"message": "Activer l'interpréteur"
+	},
+	"enableInterpreterDescription": {
+		"message": "Utilisez le langage naturel pour extraire des données des pages. Par exemple, vous pouvez utiliser la syntaxe $strong_start${{\"un résumé de la page\"}}$strong_end$. Nécessite une clé API ou un modèle personnalisé configuré ci-dessous. $link_start$En savoir plus$link_end$.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/interpreter\" target=\"_blank\">"
+			},
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
 	},
 	"error": {
 		"message": "Erreur"
@@ -125,6 +222,9 @@
 	},
 	"exportAllSettingsDescription": {
 		"message": "Exporte tous les paramètres, y compris les modèles et les propriétés."
+	},
+	"exportError": {
+		"message": "Erreur lors de l'exportation. Veuillez réessayer."
 	},
 	"exportHighlights": {
 		"message": "Exporter les surlignages"
@@ -185,14 +285,23 @@
 	"generalSettings": {
 		"message": "Paramètres généraux"
 	},
+	"help": {
+		"message": "Aide"
+	},
+	"helpDescription": {
+		"message": "Apprenez à utiliser Web Clipper et obtenez de l'aide pour le dépannage."
+	},
+	"highlightInline": {
+		"message": "Surligner le contenu de la page"
+	},
 	"highlightPage": {
 		"message": "Surligner la page"
 	},
 	"highlighter": {
-		"message": "Surlignage"
+		"message": "Surligneur"
 	},
 	"highlighterSettings": {
-		"message": "Surlignage"
+		"message": "Surligneur"
 	},
 	"hotkeys": {
 		"message": "Raccourcis clavier"
@@ -205,6 +314,12 @@
 	},
 	"importAllSettingsDescription": {
 		"message": "Importe tous les paramètres, y compris les modèles et les propriétés. Cela remplacera votre configuration actuelle."
+	},
+	"importError": {
+		"message": "Erreur lors de l'importation. Veuillez vérifier le fichier et réessayer."
+	},
+	"importModalTitle": {
+		"message": "Importer"
 	},
 	"importProperties": {
 		"message": "Importer les propriétés"
@@ -225,6 +340,15 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"importSettings": {
+		"message": "Importer les paramètres"
+	},
+	"importTemplate": {
+		"message": "Importer un modèle"
+	},
+	"interpret": {
+		"message": "interpréter"
 	},
 	"interpreter": {
 		"message": "Interpréteur"
@@ -257,6 +381,57 @@
 	},
 	"legacyModeDescription": {
 		"message": "Utilise la méthode d'enregistrement URI compatible avec Obsidian 1.6.7 ou antérieur. Notez que la longueur du contenu que vous pouvez enregistrer est limitée par votre navigateur et votre système d'exploitation. Certaines pages peuvent échouer sans erreur."
+	},
+	"modelApiKey": {
+		"message": "Clé API"
+	},
+	"modelApiKeyDescription": {
+		"message": "Entrez la clé API pour ce modèle. Peut ne pas être requise pour tous les fournisseurs."
+	},
+	"modelApiKeyPlaceholder": {
+		"message": "Clé API"
+	},
+	"modelBaseUrl": {
+		"message": "URL de base"
+	},
+	"modelBaseUrlDescription": {
+		"message": "L'URL du point de terminaison API pour ce modèle."
+	},
+	"modelBaseUrlPlaceholder": {
+		"message": "URL de base"
+	},
+	"modelName": {
+		"message": "Nom du modèle de langage"
+	},
+	"modelNameDescription": {
+		"message": "Le nom du modèle que vous souhaitez afficher dans l'interface."
+	},
+	"modelNamePlaceholder": {
+		"message": "Nom du modèle de langage"
+	},
+	"modelProvider": {
+		"message": "Fournisseur"
+	},
+	"modelProviderDescription": {
+		"message": "Le fournisseur du modèle, par exemple Ollama, OpenRouter, Google, etc."
+	},
+	"modelProviderId": {
+		"message": "ID du modèle"
+	},
+	"modelProviderIdDescription": {
+		"message": "L'identifiant du modèle de votre fournisseur. Généralement un nom court sans espaces."
+	},
+	"modelProviderIdPlaceholder": {
+		"message": "ID du modèle"
+	},
+	"modelProviderPlaceholder": {
+		"message": "Fournisseur"
+	},
+	"modelRequired": {
+		"message": "Le nom du modèle et l'URL de base sont requis."
+	},
+	"models": {
+		"message": "Modèles de langage"
 	},
 	"more": {
 		"message": "Plus"
@@ -305,11 +480,49 @@
 	"onlyHttpSupported": {
 		"message": "Cette page ne peut pas être enregistrée. Seules les URLs http et https sont supportées."
 	},
+	"open": {
+		"message": "Ouvrir"
+	},
+	"openaiApiKey": {
+		"message": "Clé API OpenAI"
+	},
+	"openaiApiKeyDescription": {
+		"message": "Vous pouvez obtenir votre clé API OpenAI $link_start$ici$link_end$.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://platform.openai.com/api-keys\" target=\"_blank\">"
+			}
+		}
+	},
+	"openaiApiKeyPlaceholder": {
+		"message": "Clé API OpenAI"
+	},
+	"optional": {
+		"message": "(optionnel)"
+	},
+	"orPasteBelow": {
+		"message": "Ou collez le contenu ci-dessous"
+	},
 	"pageCannotBeClipped": {
 		"message": "Cette page ne peut pas être enregistrée."
 	},
 	"pageVariables": {
 		"message": "Variables de page"
+	},
+	"pasteJsonHere": {
+		"message": "Collez le JSON ici"
+	},
+	"pastePropertiesJson": {
+		"message": "Collez le JSON des propriétés ici"
+	},
+	"pasteSettingsJson": {
+		"message": "Collez le JSON des paramètres ici"
+	},
+	"pasteTemplateJson": {
+		"message": "Collez le JSON du modèle ici"
 	},
 	"pleaseReload": {
 		"message": "Veuillez essayer de recharger la page."
@@ -319,6 +532,9 @@
 	},
 	"prependToExisting": {
 		"message": "Ajouter à une note existante, au début"
+	},
+	"processing": {
+		"message": "traitement"
 	},
 	"properties": {
 		"message": "Propriétés"
@@ -331,6 +547,9 @@
 	},
 	"propertyValue": {
 		"message": "Valeur de la propriété"
+	},
+	"providers": {
+		"message": "Fournisseurs"
 	},
 	"refresh": {
 		"message": "Actualiser"
@@ -362,6 +581,9 @@
 	"resetDefaultTemplateDescription": {
 		"message": "Supprime toutes les modifications apportées au modèle par défaut."
 	},
+	"save": {
+		"message": "Enregistrer"
+	},
 	"saveFile": {
 		"message": "Enregistrer le fichier..."
 	},
@@ -374,8 +596,17 @@
 	"settingsHeading": {
 		"message": "Paramètres"
 	},
+	"settingsImported": {
+		"message": "Paramètres importés avec succès. Veuillez actualiser la page pour voir les changements."
+	},
 	"share": {
 		"message": "Partager..."
+	},
+	"shareError": {
+		"message": "Erreur lors du partage"
+	},
+	"sharedFromClipper": {
+		"message": "Partagé depuis Obsidian Web Clipper"
 	},
 	"shortcutInstructionsBrave": {
 		"message": "Pour modifier les assignations de touches, allez à $1"
@@ -422,6 +653,12 @@
 	"systemDefault": {
 		"message": "Système"
 	},
+	"templateCopied": {
+		"message": "Modèle copié dans le presse-papiers"
+	},
+	"templateCopyError": {
+		"message": "Échec de la copie du modèle dans le presse-papiers"
+	},
 	"templateName": {
 		"message": "Nom du modèle"
 	},
@@ -439,6 +676,9 @@
 	},
 	"templatesHeading": {
 		"message": "Modèles"
+	},
+	"thinking": {
+		"message": "réflexion"
 	},
 	"vault": {
 		"message": "Coffre"
@@ -467,17 +707,5 @@
 				"content": "<strong>"
 			}
 		}
-	},
-	"help": {
-		"message": "Aide"
-	},
-	"helpDescription": {
-		"message": "Apprenez à utiliser Web Clipper et obtenez de l'aide pour le dépannage."
-	},
-	"open": {
-		"message": "Ouvrir"
-	},
-	"highlightInline": {
-		"message": "Surligner le contenu de la page"
 	}
 }
