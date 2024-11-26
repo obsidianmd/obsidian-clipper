@@ -110,6 +110,9 @@ function createModelListItem(model: ModelConfig, index: number): HTMLElement {
 				<button class="edit-model-btn clickable-icon" data-index="${index}" aria-label="Edit model">
 					<i data-lucide="pen-line"></i>
 				</button>
+				<button class="duplicate-model-btn clickable-icon" data-index="${index}" aria-label="Duplicate model">
+					<i data-lucide="copy-plus"></i>
+				</button>
 				<button class="delete-model-btn clickable-icon" data-index="${index}" aria-label="Delete model">
 					<i data-lucide="trash-2"></i>
 				</button>
@@ -146,6 +149,15 @@ function createModelListItem(model: ModelConfig, index: number): HTMLElement {
 	}
 
 	if (model.provider !== 'OpenAI' && model.provider !== 'Anthropic') {
+		const duplicateBtn = modelItem.querySelector('.duplicate-model-btn');
+		if (duplicateBtn) {
+			duplicateBtn.addEventListener('click', (e) => {
+				e.preventDefault();
+				e.stopPropagation();
+				duplicateModel(index);
+			});
+		}
+
 		const editBtn = modelItem.querySelector('.edit-model-btn');
 		if (editBtn) {
 			editBtn.addEventListener('click', (e) => {
@@ -314,4 +326,22 @@ function debounce(func: Function, delay: number): (...args: any[]) => void {
 		clearTimeout(timeoutId);
 		timeoutId = setTimeout(() => func(...args), delay);
 	};
+}
+
+function duplicateModel(index: number) {
+	const modelToDuplicate = generalSettings.models[index];
+	const duplicatedModel: ModelConfig = {
+		...modelToDuplicate,
+		id: Date.now().toString(),
+		name: `${modelToDuplicate.name} (copy)`,
+		enabled: true
+	};
+
+	generalSettings.models.push(duplicatedModel);
+	saveSettings();
+	initializeModelList();
+
+	// Show edit modal for the new model
+	const newIndex = generalSettings.models.length - 1;
+	showModelModal(duplicatedModel, newIndex);
 }

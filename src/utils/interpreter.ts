@@ -27,7 +27,8 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 	}
 
 	try {
-		const systemContent = `You are a helpful assistant. Please respond with one JSON object named \`prompts_responses\` — no explanatory text before or after. Use the keys provided, e.g. \`prompt_1\`, \`prompt_2\`, and fill in the values. Values should be Markdown strings unless otherwise specified. Make your responses concise. For example your response should look like: {"prompts_responses":{"prompt_1":"tag1, tag2, tag3, tag4","prompt_2":"- bullet1\n- bullet 2\n- bullet3"}}`;
+		const systemContent = 
+			`You are a helpful assistant. Please respond with one JSON object named \`prompts_responses\` — no explanatory text before or after. Use the keys provided, e.g. \`prompt_1\`, \`prompt_2\`, and fill in the values. Values should be Markdown strings unless otherwise specified. Make your responses concise. For example, your response should look like: {"prompts_responses":{"prompt_1":"tag1, tag2, tag3","prompt_2":"- bullet1\n- bullet 2\n- bullet3"}}`;
 		
 		const promptContent = {	
 			prompts: promptVariables.reduce((acc, { key, prompt }) => {
