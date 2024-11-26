@@ -110,7 +110,7 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 
 		let llmResponseContent: string;
 		if (model.provider === 'Anthropic') {
-			llmResponseContent = JSON.stringify(data);
+			llmResponseContent = data.content[0]?.text || JSON.stringify(data);
 		} else if (model.provider === 'Ollama') {
 			llmResponseContent = data.response;
 		} else {
@@ -118,9 +118,7 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 		}
 		debugLog('Interpreter', 'Processed LLM response:', llmResponseContent);
 
-		return model.provider === 'Anthropic' 
-			? parseAnthropicResponse(llmResponseContent, promptVariables)
-			: parseLLMResponse(llmResponseContent, promptVariables);
+		return parseLLMResponse(llmResponseContent, promptVariables);
 	} catch (error) {
 		console.error(`Error sending to ${model.provider || 'custom'} LLM:`, error);
 		throw error;
@@ -130,54 +128,11 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 function parseLLMResponse(responseContent: string, promptVariables: PromptVariable[]): { userResponse: any; promptResponses: any[] } {
 	let parsedResponse;
 	try {
-		// Remove code block markers if they exist
-		const cleanedResponse = responseContent.replace(/^```json\n|\n```$/g, '');
-		parsedResponse = JSON.parse(cleanedResponse);
-	} catch (parseError) {
-		debugLog('Interpreter', 'Failed to parse LLM response as JSON. Using raw response.');
-		return {
-			userResponse: responseContent,
-			promptResponses: []
-		};
-	}
-
-	const userResponse = parsedResponse.user_response || '';
-	let promptResponses: any[] = [];
-
-	if (parsedResponse.prompts_responses) {
-		promptResponses = promptVariables.map(variable => {
-			const response = parsedResponse.prompts_responses[variable.key] || parsedResponse.prompts_responses[variable.prompt];
-			return {
-				key: variable.key,
-				prompt: variable.prompt,
-				user_response: response !== undefined ? response : ''
-			};
-		});
-	}
-
-	return {
-		userResponse: promptResponses.find(r => r.key === 'prompt_1')?.user_response || userResponse,
-		promptResponses
-	};
-}
-
-function parseAnthropicResponse(responseContent: string, promptVariables: PromptVariable[]): { userResponse: any; promptResponses: any[] } {
-	let parsedResponse;
-	try {
-		// Parse the entire Anthropic response
-		const anthropicResponse = JSON.parse(responseContent);
-		
-		// Extract the text content from the response
-		const textContent = anthropicResponse.content[0]?.text;
-		
-		if (!textContent) {
-			throw new Error('No text content found in Anthropic response');
-		}
-		
-		// Find the JSON object within the text content
-		const jsonMatch = textContent.match(/\{[\s\S]*\}/);
+		// Try to find and parse JSON content in the response
+		const cleanedResponse = responseContent.replace(/^```json\n|\n```$/g, ''); // Remove code block markers
+		const jsonMatch = cleanedResponse.match(/\{[\s\S]*\}/);
 		if (jsonMatch) {
-			// Sanitize the JSON string:
+			// Clean up common JSON issues
 			const sanitizedJson = jsonMatch[0]
 				.replace(/\\"/g, '___QUOTE___') // Replace escaped quotes
 				.replace(/[«»]/g, '"') // Replace French quotes
@@ -185,19 +140,20 @@ function parseAnthropicResponse(responseContent: string, promptVariables: Prompt
 				.replace(/\n\s*\n/g, '\\n') // Handle multiple newlines
 				.replace(/([^\\])"/g, '$1\\"') // Escape unescaped quotes
 				.replace(/___QUOTE___/g, '\\"'); // Restore escaped quotes
-			
+
 			try {
 				parsedResponse = JSON.parse(sanitizedJson);
 			} catch (innerError) {
-				console.error('Error parsing sanitized JSON:', innerError, sanitizedJson);
+				console.error('Error parsing sanitized JSON:', innerError);
 				// Fallback to trying to parse the original match
 				parsedResponse = JSON.parse(jsonMatch[0]);
 			}
 		} else {
-			throw new Error('No JSON found in Anthropic response');
+			// If no JSON found, try parsing the whole cleaned response
+			parsedResponse = JSON.parse(cleanedResponse);
 		}
 	} catch (parseError) {
-		debugLog('Interpreter', 'Failed to parse Anthropic response:', parseError);
+		debugLog('Interpreter', 'Failed to parse response as JSON. Using raw response.');
 		return {
 			userResponse: responseContent,
 			promptResponses: []
