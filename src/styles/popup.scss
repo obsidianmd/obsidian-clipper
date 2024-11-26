@@ -151,7 +151,7 @@
 		#vault-select {
 			font-weight: var(--clipper-select-font-weight);
 			min-width: 100px;
-			cursor: pointer;
+			cursor: default;
 		}
 	}
 }
@@ -176,6 +176,7 @@
 	
 	#clip-btn {
 		flex: 1;
+		cursor: default;
 	}
 	#clip-btn:focus ~ .menu-btn #more-btn {
 		box-shadow: none;
@@ -187,11 +188,14 @@
 	.menu-btn {
 		position: absolute;
 		right: 0;
+		cursor: default;
 	}
 	.share-btn {
 		display: none;
+		cursor: default;
 	}
 	#more-btn {
+		cursor: default;
 		color: white;
 		background-color: var(--interactive-accent);
 		box-shadow: inset 0 0 0 1px rgba(var(--mono-rgb-100), 0.12);

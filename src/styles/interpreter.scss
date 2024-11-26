@@ -71,6 +71,7 @@
 	}
 
 	#interpret-btn {
+		cursor: default;
 		user-select: none;
 		-webkit-user-select: none;
 		font-family: var(--font-monospace-default);
@@ -255,5 +256,20 @@
 			opacity: 0.5;
 			pointer-events: none;
 		}
+	}
+}
+
+.token-counter {
+	font-size: 0.8em;
+	color: var(--text-muted);
+	font-family: var(--font-monospace-default);
+	margin-right: 8px;
+	
+	&.warning {
+		color: var(--text-warning);
+	}
+	
+	&.error {
+		color: var(--text-error);
 	}
 }

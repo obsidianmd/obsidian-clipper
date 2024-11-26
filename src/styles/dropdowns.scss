@@ -25,9 +25,10 @@ select {
 
 	@media (hover: hover) {
 		&:hover {
+			border: 1px solid var(--background-modifier-border-hover);
 			transition:
-			box-shadow .15s ease-in-out,
-			border .15s ease-in-out;
+				box-shadow .15s ease-in-out,
+				border .15s ease-in-out;
 		}
 	}
 	&:active,

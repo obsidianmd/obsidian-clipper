@@ -6,6 +6,7 @@ import { formatDuration } from './string-utils';
 import { adjustNoteNameHeight } from './ui-utils';
 import { debugLog } from './debug';
 import { getMessage } from './i18n';
+import { updateTokenCount } from './token-counter';
 
 const RATE_LIMIT_RESET_TIME = 60000; // 1 minute in milliseconds
 let lastRequestTime = 0;
@@ -111,7 +112,7 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 		if (model.provider === 'Anthropic') {
 			llmResponseContent = JSON.stringify(data);
 		} else if (model.provider === 'Ollama') {
-			llmResponseContent = data.response; // Ollama returns the response directly
+			llmResponseContent = data.response;
 		} else {
 			llmResponseContent = data.choices[0].message.content;
 		}
@@ -297,17 +298,28 @@ export async function initializeInterpreter(template: Template, variables: { [ke
 	if (interpretBtn) interpretBtn.style.display = 'inline-block';
 	
 	if (promptContextTextarea) {
+		const tokenCounter = document.getElementById('token-counter');
+		
 		const inputListener = () => {
 			template.context = promptContextTextarea.value;
+			if (tokenCounter) {
+				updateTokenCount(promptContextTextarea.value, tokenCounter);
+			}
 		};
+		
 		storeListener(promptContextTextarea, 'input', inputListener);
 
 		let promptToDisplay =
 			template.context
 			|| generalSettings.defaultPromptContext
-			|| '{{fullHtml|remove_html:(".footer,#footer,header,footer,style,script")|strip_tags:("script,h1,h2,h3,h4,h5,h6,meta,a,ol,ul,li,p,em,strong,i,b,s,strike,u,sup,sub,img,video,audio,math,table,cite,td,th,tr,caption")|strip_attr:("alt,src,href,id,content,property,name,datetime,title")}}';
+			|| '{{fullHtml|remove_html:("#navbar,.footer,#footer,header,footer,style,script")|strip_tags:("script,h1,h2,h3,h4,h5,h6,meta,a,ol,ul,li,p,em,strong,i,b,s,strike,u,sup,sub,img,video,audio,math,table,cite,td,th,tr,caption")|strip_attr:("alt,src,href,id,content,property,name,datetime,title")}}';
 		promptToDisplay = await compileTemplate(tabId, promptToDisplay, variables, currentUrl);
 		promptContextTextarea.value = promptToDisplay;
+		
+		// Initial token count
+		if (tokenCounter) {
+			updateTokenCount(promptContextTextarea.value, tokenCounter);
+		}
 	}
 
 	if (template) {
