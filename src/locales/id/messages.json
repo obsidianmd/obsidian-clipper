@@ -162,7 +162,7 @@
 		"message": "Aktifkan interpreter"
 	},
 	"enableInterpreterDescription": {
-		"message": "Gunakan bahasa alami untuk mengekstrak data dari halaman. Misalnya, Anda dapat menggunakan sintaks template $strong_start${{prompt:\"ringkasan halaman\"}}$strong_end$. Memerlukan kunci API atau model kustom yang dikonfigurasi di bawah. $link_start$Pelajari lebih lanjut$link_end$",
+		"message": "Gunakan bahasa alami untuk mengekstrak data dari halaman. Misalnya, Anda dapat menggunakan sintaks template $strong_start${{\"ringkasan halaman\"}}$strong_end$. Memerlukan kunci API atau model kustom yang dikonfigurasi di bawah. $link_start$Pelajari lebih lanjut$link_end$",
 		"placeholders": {
 			"link_end": {
 				"content": "</a>"
@@ -341,7 +341,7 @@
 		"message": "Kunci API"
 	},
 	"modelApiKeyDescription": {
-		"message": "Masukkan kunci API untuk model ini."
+		"message": "Masukkan kunci API untuk model ini. Mungkin tidak diperlukan untuk semua penyedia."
 	},
 	"modelBaseUrl": {
 		"message": "URL dasar"
@@ -353,13 +353,22 @@
 		"message": "Nama model"
 	},
 	"modelNameDescription": {
-		"message": "Masukkan nama untuk konfigurasi model ini."
+		"message": "Nama model yang ingin Anda tampilkan di antarmuka."
 	},
 	"modelProvider": {
 		"message": "Penyedia"
 	},
 	"modelProviderDescription": {
-		"message": "Masukkan nama penyedia model."
+		"message": "Penyedia model, misalnya Ollama, OpenRouter, Google, dll."
+	},
+	"modelProviderId": {
+		"message": "ID model"
+	},
+	"modelProviderIdDescription": {
+		"message": "Pengidentifikasi model dari penyedia Anda. Biasanya nama pendek tanpa spasi."
+	},
+	"modelProviderIdPlaceholder": {
+		"message": "ID model"
 	},
 	"models": {
 		"message": "Model"

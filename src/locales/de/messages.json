@@ -162,7 +162,7 @@
 		"message": "Interpreter aktivieren"
 	},
 	"enableInterpreterDescription": {
-		"message": "Verwenden Sie natürliche Sprache, um Daten aus Seiten zu extrahieren. Zum Beispiel können Sie die Vorlagensyntax $strong_start${{prompt:\"eine Zusammenfassung der Seite\"}}$strong_end$ verwenden. Erfordert einen API-Schlüssel oder ein unten konfiguriertes benutzerdefiniertes Modell. $link_start$Mehr erfahren$link_end$",
+		"message": "Verwenden Sie natürliche Sprache, um Daten aus Seiten zu extrahieren. Zum Beispiel können Sie die Vorlagensyntax $strong_start${{\"eine Zusammenfassung der Seite\"}}$strong_end$ verwenden. Erfordert einen API-Schlüssel oder ein unten konfiguriertes benutzerdefiniertes Modell. $link_start$Mehr erfahren$link_end$",
 		"placeholders": {
 			"link_end": {
 				"content": "</a>"
@@ -341,7 +341,7 @@
 		"message": "API-Schlüssel"
 	},
 	"modelApiKeyDescription": {
-		"message": "Geben Sie den API-Schlüssel für dieses Modell ein."
+		"message": "Geben Sie den API-Schlüssel für dieses Modell ein. Wird möglicherweise nicht für alle Anbieter benötigt."
 	},
 	"modelBaseUrl": {
 		"message": "Basis-URL"
@@ -353,13 +353,22 @@
 		"message": "Modellname"
 	},
 	"modelNameDescription": {
-		"message": "Geben Sie einen Namen für diese Modellkonfiguration ein."
+		"message": "Der Name des Modells, der in der Benutzeroberfläche angezeigt werden soll."
 	},
 	"modelProvider": {
 		"message": "Anbieter"
 	},
 	"modelProviderDescription": {
-		"message": "Geben Sie den Namen des Modellanbieters ein."
+		"message": "Der Modellanbieter, z.B. Ollama, OpenRouter, Google, etc."
+	},
+	"modelProviderId": {
+		"message": "Modell-ID"
+	},
+	"modelProviderIdDescription": {
+		"message": "Die Kennung des Modells von Ihrem Anbieter. Typischerweise ein kurzer Name ohne Leerzeichen."
+	},
+	"modelProviderIdPlaceholder": {
+		"message": "Modell-ID"
 	},
 	"models": {
 		"message": "Modelle"

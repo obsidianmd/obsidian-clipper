@@ -162,7 +162,7 @@
 		"message": "启用解释器"
 	},
 	"enableInterpreterDescription": {
-		"message": "使用自然语言从页面提取数据。例如，您可以使用模板语法 $strong_start${{prompt:\"页面摘要\"}}$strong_end$。需要 API 密钥或下面配置的自定义模型。$link_start$了解更多$link_end$",
+		"message": "使用自然语言从页面提取数据。例如，您可以使用模板语法 $strong_start${{\"页面摘要\"}}$strong_end$。需要 API 密钥或下面配置的自定义模型。$link_start$了解更多$link_end$",
 		"placeholders": {
 			"link_end": {
 				"content": "</a>"
@@ -338,7 +338,7 @@
 		"message": "API 密钥"
 	},
 	"modelApiKeyDescription": {
-		"message": "输入此模型的 API 密钥。"
+		"message": "输入此模型的 API 密钥。并非所有提供商都需要。"
 	},
 	"modelBaseUrl": {
 		"message": "基础 URL"
@@ -350,13 +350,22 @@
 		"message": "模型名称"
 	},
 	"modelNameDescription": {
-		"message": "为此模型配置输入名称。"
+		"message": "您想在界面中显示的模型名称。"
 	},
 	"modelProvider": {
 		"message": "提供商"
 	},
 	"modelProviderDescription": {
-		"message": "输入模型提供商名称。"
+		"message": "模型提供商，例如 Ollama、OpenRouter、Google 等。"
+	},
+	"modelProviderId": {
+		"message": "模型 ID"
+	},
+	"modelProviderIdDescription": {
+		"message": "来自提供商的模型标识符。通常是一个不含空格的简短名称。"
+	},
+	"modelProviderIdPlaceholder": {
+		"message": "模型 ID"
 	},
 	"models": {
 		"message": "模型"

@@ -109,7 +109,7 @@
 		"message": "デイリーノートの形式（例：YYYY-MM-DD）"
 	},
 	"defaultInterpreterContext": {
-		"message": "デフォルトインタープ���ターコンテキスト"
+		"message": "デフォルトインタープリターコンテキスト"
 	},
 	"defaultInterpreterContextDescription": {
 		"message": "モデルはプロンプト変数を解釈する際にこのコンテキストを使用します。変数とフィルターを使用できます。"
@@ -165,7 +165,7 @@
 		"message": "インタープリターを有効化"
 	},
 	"enableInterpreterDescription": {
-		"message": "自然言語を使用してページからデータを抽出します。例えば、テンプレート構文$strong_start${{prompt:\"ページの要約\"}}$strong_end$を使用できます。APIキーまたは以下で設定したカスタムモデルが必要です。$link_start$詳細$link_end$",
+		"message": "自然言語を使用してページからデータを抽出します。例えば、テンプレート構文$strong_start${{\"ページの要約\"}}$strong_end$を使用できます。APIキーまたは以下で設定したカスタムモデルが必要です。$link_start$詳細$link_end$",
 		"placeholders": {
 			"link_end": {
 				"content": "</a>"
@@ -223,7 +223,7 @@
 		"message": "テキストのコピーに失敗しました"
 	},
 	"failedToDeleteTemplate": {
-		"message": "テンプレートの削除に失敗しまた。もう一度お試しくださ���。"
+		"message": "テンプレートの削除に失敗しまた。もう一度お試しください。"
 	},
 	"failedToExtractContent": {
 		"message": "ページコンテンツの抽出に失敗しました。"
@@ -341,7 +341,7 @@
 		"message": "APIキー"
 	},
 	"modelApiKeyDescription": {
-		"message": "このモデルのAPIキーを入力してください。"
+		"message": "このモデルのAPIキーを入力してください。すべてのプロバイダーで必要とは限りません。"
 	},
 	"modelApiKeyPlaceholder": {
 		"message": "APIキー"
@@ -359,7 +359,7 @@
 		"message": "モデル名"
 	},
 	"modelNameDescription": {
-		"message": "このモデル設定の名前を入力してください。"
+		"message": "インターフェースに表示したいモデルの名前。"
 	},
 	"modelNamePlaceholder": {
 		"message": "モデル名"
@@ -368,7 +368,16 @@
 		"message": "プロバイダー"
 	},
 	"modelProviderDescription": {
-		"message": "モデルプロバイダーの名前を入力してください。"
+		"message": "モデルプロバイダー（例：Ollama、OpenRouter、Google など）。"
+	},
+	"modelProviderId": {
+		"message": "モデルID"
+	},
+	"modelProviderIdDescription": {
+		"message": "プロバイダーのモデルの識別子。通常はスペースを含まない短い名前です。"
+	},
+	"modelProviderIdPlaceholder": {
+		"message": "モデルID"
 	},
 	"modelProviderPlaceholder": {
 		"message": "プロバイダー"
@@ -534,7 +543,7 @@
 		"message": "キー割り当てを変更するには、$1に移動してください"
 	},
 	"shortcutInstructionsDefault": {
-		"message": "キー割り当てを変更するには、ブラウザの拡張機���設定を参照してください。"
+		"message": "キー割り当てを変更するには、ブラウザの拡張機能設定を参照してください。"
 	},
 	"shortcutInstructionsEdge": {
 		"message": "キー割り当てを変更するには、$1に移動してください"

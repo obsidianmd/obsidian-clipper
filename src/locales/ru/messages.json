@@ -162,7 +162,7 @@
 		"message": "Включить интерпретатор"
 	},
 	"enableInterpreterDescription": {
-		"message": "Используйте естественный язык для извлечения данных из страниц. Например, вы можете использовать синтаксис шаблона $strong_start${{prompt:\"краткое содержание страницы\"}}$strong_end$. Требуется ключ API или настроенная ниже пользовательская модель. $link_start$Узнать больше$link_end$",
+		"message": "Используйте естественный язык для извлечения данных из страниц. Например, вы можете использовать синтаксис шаблона $strong_start${{\"краткое содержание страницы\"}}$strong_end$. Требуется ключ API или настроенная ниже пользовательская модель. $link_start$Узнать больше$link_end$",
 		"placeholders": {
 			"link_end": {
 				"content": "</a>"
@@ -341,7 +341,7 @@
 		"message": "Ключ API"
 	},
 	"modelApiKeyDescription": {
-		"message": "Введите ключ API для этой модели."
+		"message": "Введите API-ключ для этой модели. Может не требоваться для всех провайдеров."
 	},
 	"modelBaseUrl": {
 		"message": "Базовый URL"
@@ -353,13 +353,22 @@
 		"message": "Название модели"
 	},
 	"modelNameDescription": {
-		"message": "Введите название для этой конфигурации модели."
+		"message": "Имя модели, которое вы хотите отображать в интерфейсе."
 	},
 	"modelProvider": {
 		"message": "Провайдер"
 	},
 	"modelProviderDescription": {
-		"message": "Введите название провайдера модели."
+		"message": "Провайдер модели, например Ollama, OpenRouter, Google и т.д."
+	},
+	"modelProviderId": {
+		"message": "ID модели"
+	},
+	"modelProviderIdDescription": {
+		"message": "Идентификатор модели от вашего провайдера. Обычно это короткое имя без пробелов."
+	},
+	"modelProviderIdPlaceholder": {
+		"message": "ID модели"
 	},
 	"models": {
 		"message": "Модели"

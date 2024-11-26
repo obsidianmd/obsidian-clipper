@@ -162,7 +162,7 @@
 		"message": "فعال‌سازی مفسر"
 	},
 	"enableInterpreterDescription": {
-		"message": "از زبان طبیعی برای استخراج داده‌ها از صفحات استفاده کنید. برای مثال، می‌توانید از نحو قالب $strong_start${{prompt:\"خلاصه‌ای از صفحه\"}}$strong_end$ استفاده کنید. نیاز به کلید API یا مدل سفارشی پیکربندی شده در زیر دارد. $link_start$بیشتر بدانید$link_end$",
+		"message": "از زبان طبیعی برای استخراج داده‌ها از صفحات استفاده کنید. برای مثال، می‌توانید از نحو قالب $strong_start${{\"خلاصه‌ای از صفحه\"}}$strong_end$ استفاده کنید. نیاز به کلید API یا مدل سفارشی پیکربندی شده در زیر دارد. $link_start$بیشتر بدانید$link_end$",
 		"placeholders": {
 			"link_end": {
 				"content": "</a>"
@@ -341,7 +341,7 @@
 		"message": "کلید API"
 	},
 	"modelApiKeyDescription": {
-		"message": "کلید API برای این مدل را وارد کنید."
+		"message": "کلید API را برای این مدل وارد کنید. ممکن است برای همه ارائه‌دهندگان لازم نباشد."
 	},
 	"modelBaseUrl": {
 		"message": "URL پایه"
@@ -353,13 +353,22 @@
 		"message": "نام مدل"
 	},
 	"modelNameDescription": {
-		"message": "نامی برای این پیکربندی مدل وارد کنید."
+		"message": "نام مدلی که می‌خواهید در رابط کاربری نمایش داده شود."
 	},
 	"modelProvider": {
 		"message": "ارائه‌دهنده"
 	},
 	"modelProviderDescription": {
-		"message": "نام ارائه‌دهنده مدل را وارد کنید."
+		"message": "ارائه‌دهنده مدل، مثلاً Ollama، OpenRouter، Google و غیره."
+	},
+	"modelProviderId": {
+		"message": "شناسه مدل"
+	},
+	"modelProviderIdDescription": {
+		"message": "شناسه مدل از ارائه‌دهنده شما. معمولاً یک نام کوتاه بدون فاصله است."
+	},
+	"modelProviderIdPlaceholder": {
+		"message": "شناسه مدل"
 	},
 	"models": {
 		"message": "مدل‌ها"

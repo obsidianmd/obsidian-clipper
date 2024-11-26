@@ -162,7 +162,7 @@
 		"message": "인터프리터 활성화"
 	},
 	"enableInterpreterDescription": {
-		"message": "자연어를 사용하여 페이지에서 데이터를 추출합니다. 예를 들어, $strong_start${{prompt:\"페이지 요약\"}}$strong_end$ 템플릿 구문을 사용할 수 있습니다. API 키 또는 아래에서 구성된 사용자 지정 모델이 필요합니다. $link_start$자세히 알아보기$link_end$",
+		"message": "자연어를 사용하여 페이지에서 데이터를 추출합니다. 예를 들어, $strong_start${{\"페이지 요약\"}}$strong_end$ 템플릿 구문을 사용할 수 있습니다. API 키 또는 아래에서 구성된 사용자 지정 모델이 필요합니다. $link_start$자세히 알아보기$link_end$",
 		"placeholders": {
 			"link_end": {
 				"content": "</a>"
@@ -312,7 +312,7 @@
 		"message": "인터프리터 컨텍스트"
 	},
 	"interpreterContextDescription": {
-		"message": "프롬프트 변수를 해석하는 데 사용되는 컨텍스트입니다. $link_start$인��프리터 설정$link_end$에 정의된 기본 컨텍스트를 재정의합니다. 여기서 변수를 사용할 수 있습니다.",
+		"message": "프롬프트 변수를 해석하는 데 사용되는 컨텍스트입니다. $link_start$인프리터 설정$link_end$에 정의된 기본 컨텍스트를 재정의합니다. 여기서 변수를 사용할 수 있습니다.",
 		"placeholders": {
 			"link_end": {
 				"content": "</a>"
@@ -341,7 +341,7 @@
 		"message": "API 키"
 	},
 	"modelApiKeyDescription": {
-		"message": "이 모델의 API 키를 입력하세요."
+		"message": "이 모델의 API 키를 입력하세요. 일부 제공자의 경우 필요하지 않을 수 있습니다."
 	},
 	"modelBaseUrl": {
 		"message": "기본 URL"
@@ -353,13 +353,22 @@
 		"message": "모델 이름"
 	},
 	"modelNameDescription": {
-		"message": "이 모델 구성의 이름을 입력하세요."
+		"message": "인터페이스에 표시할 모델 이름입니다."
 	},
 	"modelProvider": {
 		"message": "제공자"
 	},
 	"modelProviderDescription": {
-		"message": "모델 제공자의 이름을 입력하세요."
+		"message": "모델 제공자 (예: Ollama, OpenRouter, Google 등)"
+	},
+	"modelProviderId": {
+		"message": "모델 ID"
+	},
+	"modelProviderIdDescription": {
+		"message": "제공자의 모델 식별자입니다. 일반적으로 공백이 없는 짧은 이름입니다."
+	},
+	"modelProviderIdPlaceholder": {
+		"message": "모델 ID"
 	},
 	"models": {
 		"message": "모델"

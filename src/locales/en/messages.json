@@ -183,7 +183,7 @@
 		"message": "Enable interpreter"
 	},
 	"enableInterpreterDescription": {
-		"message": "Use natural language to extract data from pages. For example, you can use the template syntax $strong_start${{prompt:\"a summary of the page\"}}$strong_end$. Requires an API key or custom model configured below.  $link_start$Learn more$link_end$.",
+		"message": "Use natural language to extract data from pages. For example, you can use the template syntax $strong_start${{\"a summary of the page\"}}$strong_end$. Requires an API key or custom model configured below.  $link_start$Learn more$link_end$.",
 		"placeholders": {
 			"link_end": {
 				"content": "</a>"
@@ -385,15 +385,6 @@
 	"modelBaseUrlPlaceholder": {
 		"message": "Base URL"
 	},
-	"modelProviderId": {
-		"message": "Model ID"
-	},
-	"modelProviderIdDescription": {
-		"message": "The identifier of the model from your provider. Typically a short name without spaces."
-	},
-	"modelProviderIdPlaceholder": {
-		"message": "Model ID"
-	},
 	"modelName": {
 		"message": "Display name"
 	},
@@ -408,6 +399,15 @@
 	},
 	"modelProviderDescription": {
 		"message": "The model provider, e.g. Ollama, OpenRouter, Google, etc."
+	},
+	"modelProviderId": {
+		"message": "Model ID"
+	},
+	"modelProviderIdDescription": {
+		"message": "The identifier of the model from your provider. Typically a short name without spaces."
+	},
+	"modelProviderIdPlaceholder": {
+		"message": "Model ID"
 	},
 	"modelProviderPlaceholder": {
 		"message": "Provider"

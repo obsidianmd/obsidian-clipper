@@ -162,7 +162,7 @@
 		"message": "تمكين المفسر"
 	},
 	"enableInterpreterDescription": {
-		"message": "استخدم اللغة الطبيعية لاستخراج البيانات من الصفحات. على سبيل المثال، يمكنك استخدام صيغة القالب $strong_start${{prompt:\"ملخص للصفحة\"}}$strong_end$. يتطلب مفتاح API أو نموذج مخصص تم تكوينه أدناه. $link_start$تعلم المزيد$link_end$",
+		"message": "استخدم اللغة الطبيعية لاستخراج البيانات من الصفحات. على سبيل المثال، يمكنك استخدام صيغة القالب $strong_start${{\"ملخص للصفحة\"}}$strong_end$. يتطلب مفتاح API أو نموذج مخصص تم تكوينه أدناه. $link_start$تعلم المزيد$link_end$",
 		"placeholders": {
 			"link_end": {
 				"content": "</a>"
@@ -341,7 +341,7 @@
 		"message": "مفتاح API"
 	},
 	"modelApiKeyDescription": {
-		"message": "أدخل مفتاح API لهذا النموذج."
+		"message": "أدخل مفتاح API لهذا النموذج. قد لا يكون مطلوبًا لجميع المزودين."
 	},
 	"modelBaseUrl": {
 		"message": "عنوان URL الأساسي"
@@ -353,13 +353,22 @@
 		"message": "اسم النموذج"
 	},
 	"modelNameDescription": {
-		"message": "أدخل اسمًا لتكوين هذا النموذج."
+		"message": "اسم النموذج الذي تريد عرضه في الواجهة."
 	},
 	"modelProvider": {
 		"message": "المزود"
 	},
 	"modelProviderDescription": {
-		"message": "أدخل اسم مزود النموذج."
+		"message": "مزود النموذج، على سبيل المثال Ollama أو OpenRouter أو Google، إلخ."
+	},
+	"modelProviderId": {
+		"message": "معرف النموذج"
+	},
+	"modelProviderIdDescription": {
+		"message": "معرف النموذج من المزود الخاص بك. عادةً ما يكون اسمًا قصيرًا بدون مسافات."
+	},
+	"modelProviderIdPlaceholder": {
+		"message": "معرف النموذج"
 	},
 	"models": {
 		"message": "النماذج"
