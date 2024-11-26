@@ -14,7 +14,7 @@ let lastRequestTime = 0;
 // Store event listeners for cleanup
 const eventListeners = new WeakMap<HTMLElement, { [key: string]: EventListener }>();
 
-export async function sendToLLM(userPrompt: string, content: string, promptVariables: PromptVariable[], model: ModelConfig, apiKey: string): Promise<{ userResponse: any; promptResponses: any[] }> {
+export async function sendToLLM(promptContext: string, content: string, promptVariables: PromptVariable[], model: ModelConfig, apiKey: string): Promise<{ promptResponses: any[] }> {
 	debugLog('Interpreter', 'Sending request to LLM...');
 	
 	if (!apiKey) {
@@ -27,10 +27,8 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 	}
 
 	try {
-		const systemContent = {	
-			instructions:
-			`You are a helpful assistant. Please respond with one JSON object named \`prompts_responses\` — no explanatory text before or after. Use the keys provided, e.g. \`prompt_1\`, \`prompt_2\`, and fill in the values. Values should be Markdown strings unless otherwise specified. Make your responses concise. For example your response should look like: {"prompts_responses":{"prompt_1":"tag1, tag2, tag3, tag4","prompt_2":"- bullet1\n- bullet 2\n- bullet3"}}`
-		};
+		const systemContent = `You are a helpful assistant. Please respond with one JSON object named \`prompts_responses\` — no explanatory text before or after. Use the keys provided, e.g. \`prompt_1\`, \`prompt_2\`, and fill in the values. Values should be Markdown strings unless otherwise specified. Make your responses concise. For example your response should look like: {"prompts_responses":{"prompt_1":"tag1, tag2, tag3, tag4","prompt_2":"- bullet1\n- bullet 2\n- bullet3"}}`;
+		
 		const promptContent = {	
 			prompts: promptVariables.reduce((acc, { key, prompt }) => {
 				acc[key] = prompt;
@@ -48,9 +46,10 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 				model: model.providerId,
 				max_tokens: 800,
 				messages: [
-					{ role: 'user', content: `${JSON.stringify(promptContent)}\n\n${userPrompt}` }
+					{ role: 'user', content: `${promptContext}` },
+					{ role: 'user', content: `${JSON.stringify(promptContent)}` }
 				],
-				system: JSON.stringify(systemContent)
+				system: systemContent
 			};
 			headers = {
 				...headers,
@@ -62,17 +61,20 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 			requestBody = {
 				model: model.providerId,
 				messages: [
-					{ role: 'system', content: JSON.stringify(systemContent) },
-					{ role: 'user', content: `${JSON.stringify(promptContent)}\n\n${userPrompt}` }
+					{ role: 'system', content: systemContent },
+					{ role: 'user', content: `${promptContext}` },
+					{ role: 'user', content: `${JSON.stringify(promptContent)}` }
 				],
+				format: 'json',
 				stream: false
 			};
 		} else {
 			requestBody = {
 				model: model.providerId,
 				messages: [
-					{ role: 'system', content: JSON.stringify(systemContent) },
-					{ role: 'user', content: `${JSON.stringify(promptContent)}\n\n${userPrompt}` }
+					{ role: 'system', content: systemContent },
+					{ role: 'user', content: `${promptContext}` },
+					{ role: 'user', content: `${JSON.stringify(promptContent)}` }
 				]
 			};
 			headers = {
@@ -114,23 +116,11 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 
 		let llmResponseContent: string;
 		if (model.provider === 'Anthropic') {
-			try {
-				// Parse the text content which contains JSON
-				const textContent = data.content[0]?.text;
-				if (!textContent) {
-					throw new Error('No text content in Anthropic response');
-				}
-				// Parse the JSON string inside the text content
-				const parsedContent = JSON.parse(textContent);
-				llmResponseContent = JSON.stringify(parsedContent);
-			} catch (error) {
-				console.error('Error parsing Anthropic content:', error);
-				throw error;
-			}
+			llmResponseContent = data.content[0]?.text || JSON.stringify(data);
 		} else if (model.provider === 'Ollama') {
-			llmResponseContent = data.response;
+			llmResponseContent = data.message?.content || JSON.stringify(data);
 		} else {
-			llmResponseContent = data.choices[0].message.content;
+			llmResponseContent = data.choices[0]?.message?.content || JSON.stringify(data);
 		}
 		debugLog('Interpreter', 'Processed LLM response:', llmResponseContent);
 
@@ -141,47 +131,45 @@ export async function sendToLLM(userPrompt: string, content: string, promptVaria
 	}
 }
 
-function parseLLMResponse(responseContent: string, promptVariables: PromptVariable[]): { userResponse: any; promptResponses: any[] } {
-	let parsedResponse;
+interface LLMResponse {
+	prompts_responses: { [key: string]: string };
+}
+
+function parseLLMResponse(responseContent: string, promptVariables: PromptVariable[]): { promptResponses: any[] } {
 	try {
-		// Remove code block markers if they exist
-		const cleanedResponse = responseContent.replace(/^```json\n|\n```$/g, '');
+		let parsedResponse: LLMResponse;
 		
-		// First try parsing the response directly
+		// First try parsing the entire response
 		try {
-			parsedResponse = JSON.parse(cleanedResponse);
-		} catch (directParseError) {
-			// If direct parsing fails, try to find and parse JSON content
-			const jsonMatch = cleanedResponse.match(/\{[\s\S]*\}/);
-			if (jsonMatch) {
-				parsedResponse = JSON.parse(jsonMatch[0]);
-			} else {
-				throw directParseError;
+			parsedResponse = JSON.parse(responseContent);
+		} catch (e) {
+			// If that fails, try to find and parse JSON content
+			const jsonMatch = responseContent.match(/\{[\s\S]*\}/);
+			if (!jsonMatch) {
+				throw new Error('No JSON object found in response');
 			}
+			parsedResponse = JSON.parse(jsonMatch[0]);
 		}
-	} catch (parseError) {
-		debugLog('Interpreter', 'Failed to parse response as JSON. Using raw response.');
-		return {
-			userResponse: responseContent,
-			promptResponses: []
-		};
-	}
 
-	const userResponse = parsedResponse.user_response || '';
-	let promptResponses: any[] = [];
+		// If we don't have prompts_responses, return empty array
+		if (!parsedResponse.prompts_responses) {
+			debugLog('Interpreter', 'No prompts_responses found in parsed response');
+			return { promptResponses: [] };
+		}
 
-	if (parsedResponse.prompts_responses) {
-		promptResponses = promptVariables.map(variable => ({
+		// Map the responses to their prompts
+		const promptResponses = promptVariables.map(variable => ({
 			key: variable.key,
 			prompt: variable.prompt,
 			user_response: parsedResponse.prompts_responses[variable.key] || ''
 		}));
-	}
 
-	return {
-		userResponse,
-		promptResponses
-	};
+		debugLog('Interpreter', 'Mapped prompt responses:', promptResponses);
+		return { promptResponses };
+	} catch (parseError) {
+		debugLog('Interpreter', 'Failed to parse response as JSON:', parseError);
+		return { promptResponses: [] };
+	}
 }
 
 export function collectPromptVariables(template: Template | null): PromptVariable[] {
@@ -382,8 +370,8 @@ export async function handleInterpreterUI(
 			responseTimer.textContent = formatDuration(elapsedTime);
 		}, 10);
 
-		const { userResponse, promptResponses } = await sendToLLM(contextToUse, contentToProcess, promptVariables, modelConfig, apiKey);
-		debugLog('Interpreter', 'LLM response:', { userResponse, promptResponses });
+		const { promptResponses } = await sendToLLM(contextToUse, contentToProcess, promptVariables, modelConfig, apiKey);
+		debugLog('Interpreter', 'LLM response:', { promptResponses });
 
 		// Stop the timer and update UI
 		clearInterval(timerInterval);
