@@ -61,6 +61,9 @@
 	"behaviorWarning": {
 		"message": "الإضافة إلى ملاحظة موجودة أو ملاحظة يومية تتطلب أوبسيديان 1.7.2 أو أحدث."
 	},
+	"cancel": {
+		"message": "إلغاء"
+	},
 	"clipBehavior": {
 		"message": "سلوك القص"
 	},
@@ -502,6 +505,9 @@
 	},
 	"resetDefaultTemplateDescription": {
 		"message": "إزالة أي تغييرات قمت بها على القالب الافتراضي."
+	},
+	"save": {
+		"message": "حفظ"
 	},
 	"saveFile": {
 		"message": "حفظ الملف..."

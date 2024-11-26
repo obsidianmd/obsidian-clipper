@@ -61,6 +61,9 @@
 	"behaviorWarning": {
 		"message": "Для добавления в существующую заметку или ежедневную заметку требуется Obsidian 1.7.2 или более поздняя версия."
 	},
+	"cancel": {
+		"message": "Отмена"
+	},
 	"clipBehavior": {
 		"message": "Поведение при сохранении"
 	},
@@ -502,6 +505,9 @@
 	},
 	"resetDefaultTemplateDescription": {
 		"message": "Удалить все изменения, внесенные в шаблон по умолчанию."
+	},
+	"save": {
+		"message": "Сохранить"
 	},
 	"saveFile": {
 		"message": "Сохранить файл..."

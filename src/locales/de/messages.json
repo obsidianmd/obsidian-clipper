@@ -61,6 +61,9 @@
 	"behaviorWarning": {
 		"message": "Das Hinzufügen zu einer bestehenden Notiz oder Tagesnotiz erfordert Obsidian 1.7.2 oder höher."
 	},
+	"cancel": {
+		"message": "Abbrechen"
+	},
 	"clipBehavior": {
 		"message": "Ausschneideverhalten"
 	},
@@ -502,6 +505,9 @@
 	},
 	"resetDefaultTemplateDescription": {
 		"message": "Entfernen Sie alle Änderungen, die Sie an der Standardvorlage vorgenommen haben."
+	},
+	"save": {
+		"message": "Speichern"
 	},
 	"saveFile": {
 		"message": "Datei speichern..."

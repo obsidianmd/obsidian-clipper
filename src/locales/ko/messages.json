@@ -61,6 +61,9 @@
 	"behaviorWarning": {
 		"message": "기존에 있는 노트나 데일리 노트에 추가하려면 Obsidian 1.7.2 이상이 필요합니다."
 	},
+	"cancel": {
+		"message": "취소"
+	},
 	"clipBehavior": {
 		"message": "클립 동작 방식"
 	},
@@ -502,6 +505,9 @@
 	},
 	"resetDefaultTemplateDescription": {
 		"message": "기본 템플릿으로 초기화하여 템플릿에 대한 모든 사용자 정의를 제거합니다."
+	},
+	"save": {
+		"message": "저장"
 	},
 	"saveFile": {
 		"message": "파일 저장..."

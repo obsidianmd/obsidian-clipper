@@ -61,6 +61,9 @@
 	"behaviorWarning": {
 		"message": "Adicionar a uma nota existente ou nota diária requer a versão 1.7.2 ou posterior do Obsidian."
 	},
+	"cancel": {
+		"message": "Cancelar"
+	},
 	"clipBehavior": {
 		"message": "Comportamento da captura"
 	},
@@ -511,6 +514,9 @@
 	},
 	"resetDefaultTemplateDescription": {
 		"message": "Remove quaisquer alterações que você tenha feito no modelo padrão."
+	},
+	"save": {
+		"message": "Salvar"
 	},
 	"saveFile": {
 		"message": "Salvar arquivo..."

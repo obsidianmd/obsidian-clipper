@@ -64,6 +64,9 @@
 	"behaviorWarning": {
 		"message": "既存のノートやデイリーノートへの追加にはObsidian 1.7.2以降が必要です。"
 	},
+	"cancel": {
+		"message": "キャンセル"
+	},
 	"clipBehavior": {
 		"message": "クリップの動作"
 	},

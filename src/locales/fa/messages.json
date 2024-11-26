@@ -61,6 +61,9 @@
 	"behaviorWarning": {
 		"message": "افزودن به یادداشت موجود یا یادداشت روزانه به ابسیدین  ورژن ۱.۷.۲ یا بالاتر نیاز دارد"
 	},
+	"cancel": {
+		"message": "لغو"
+	},
 	"clipBehavior": {
 		"message": "رفتار کلیپ"
 	},
@@ -502,6 +505,9 @@
 	},
 	"resetDefaultTemplateDescription": {
 		"message": "هر تغییری که در قالب پیش فرض ایجاد کرده اید را حذف کن"
+	},
+	"save": {
+		"message": "ذخیره"
 	},
 	"saveFile": {
 		"message": "ذخیره فایل..."

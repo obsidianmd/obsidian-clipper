@@ -61,6 +61,9 @@
 	"behaviorWarning": {
 		"message": "添加到现有笔记或日记需要 Obsidian 1.7.2 或更高版本。"
 	},
+	"cancel": {
+		"message": "取消"
+	},
 	"clipBehavior": {
 		"message": "剪藏行为"
 	},
@@ -499,6 +502,9 @@
 	},
 	"resetDefaultTemplateDescription": {
 		"message": "移除对默认模板的所有更改。"
+	},
+	"save": {
+		"message": "保存"
 	},
 	"saveFile": {
 		"message": "保存文件..."

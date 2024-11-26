@@ -61,6 +61,9 @@
 	"behaviorWarning": {
 		"message": "Perlu Obsidian 1.7.2 atau yang lebih baru untuk dapat menambahkan ke catatan yang telah ada atau catatan harian."
 	},
+	"cancel": {
+		"message": "Batal"
+	},
 	"clipBehavior": {
 		"message": "Perilaku klip"
 	},
@@ -502,6 +505,9 @@
 	},
 	"resetDefaultTemplateDescription": {
 		"message": "Hapus semua perubahan yang telah dibuat pada template default."
+	},
+	"save": {
+		"message": "Simpan"
 	},
 	"saveFile": {
 		"message": "Simpan file..."
