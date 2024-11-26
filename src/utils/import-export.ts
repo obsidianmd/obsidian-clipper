@@ -391,21 +391,27 @@ async function importAllSettingsFromJson(jsonContent: string): Promise<void> {
 			const templateIds = importData.template_list || [];
 			for (const id of templateIds) {
 				const key = `template_${id}`;
-				if (importData[key] && typeof importData[key] === 'object') {
+				if (importData[key]) {
 					try {
-						// Compress the template data
-						const templateStr = JSON.stringify(importData[key]);
-						const compressedData = compressToUTF16(templateStr);
-						
-						// Split into chunks
-						const chunks: string[] = [];
-						const CHUNK_SIZE = 8000;
-						for (let i = 0; i < compressedData.length; i += CHUNK_SIZE) {
-							chunks.push(compressedData.slice(i, i + CHUNK_SIZE));
+						// Check if the data is already compressed (will be an array of strings)
+						const isAlreadyCompressed = Array.isArray(importData[key]) && 
+							importData[key].every((chunk: any) => typeof chunk === 'string');
+
+						if (!isAlreadyCompressed) {
+							// Compress the template data
+							const templateStr = JSON.stringify(importData[key]);
+							const compressedData = compressToUTF16(templateStr);
+							
+							// Split into chunks
+							const chunks: string[] = [];
+							const CHUNK_SIZE = 8000;
+							for (let i = 0; i < compressedData.length; i += CHUNK_SIZE) {
+								chunks.push(compressedData.slice(i, i + CHUNK_SIZE));
+							}
+							importData[key] = chunks;
 						}
-						importData[key] = chunks;
 					} catch (error) {
-						console.error(`Failed to compress template ${id}:`, error);
+						console.error(`Failed to process template ${id}:`, error);
 					}
 				}
 			}
