@@ -346,9 +346,6 @@
 	"modelApiKeyDescription": {
 		"message": "Digite a chave API para este modelo. Pode não ser necessária para todos os provedores."
 	},
-	"modelApiKeyDescription": {
-		"message": "Digite a chave API para este modelo. Pode não ser necessária para todos os provedores."
-	},
 	"modelBaseUrl": {
 		"message": "URL base"
 	},
@@ -361,14 +358,8 @@
 	"modelNameDescription": {
 		"message": "O nome do modelo que você deseja exibir na interface."
 	},
-	"modelNameDescription": {
-		"message": "O nome do modelo que você deseja exibir na interface."
-	},
 	"modelProvider": {
 		"message": "Provedor"
-	},
-	"modelProviderDescription": {
-		"message": "O provedor do modelo, por exemplo Ollama, OpenRouter, Google, etc."
 	},
 	"modelProviderDescription": {
 		"message": "O provedor do modelo, por exemplo Ollama, OpenRouter, Google, etc."
