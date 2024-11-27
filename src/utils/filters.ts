@@ -27,6 +27,7 @@ import { object } from './filters/object';
 import { pascal } from './filters/pascal';
 import { remove_html } from './filters/remove_html';
 import { replace } from './filters/replace';
+import { replace_tags } from './filters/replace_tags';
 import { round } from './filters/round';
 import { safe_name } from './filters/safe_name';
 import { slice } from './filters/slice';
@@ -71,6 +72,7 @@ export const filters: { [key: string]: FilterFunction } = {
 	pascal,
 	remove_html,
 	replace,
+	replace_tags,
 	round,
 	safe_name,
 	slice,

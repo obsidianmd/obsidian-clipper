@@ -117,6 +117,12 @@ Filters to process HTML content and convert HTML to Markdown. Note that your inp
 - `strip_tags` removes all HTML tags from a string. Unlike `remove_html` this doesn't remove the content within the tags.
 	- Use `strip_tags:("p,strong,em")` to keep specific tags.
 	- Example: `"<p>Hello <b>world</b>!</p>"|strip_tags:("b")` returns `Hello <b>world</b>!`.
+- `replace_tags` replaces specified HTML tags with different tags while preserving their attributes and content.
+	- Single replacement: `{{contentHtml|replace_tags:"strong":"h2"}}` replaces all `<strong>` tags with `<h2>` tags.
+	- Multiple replacements: `{{contentHtml|replace_tags:("strong":"h2","em":"i","p":"div")}}`
+	- Use an empty string as the target to remove the tag: `{{contentHtml|replace_tags:"h2":""}}` removes all `<h2>` tags while preserving their content.
+	- Preserves any attributes on the original tags when converting to another tag.
+	- Example: `"<strong class='important'>Hello</strong>"|replace_tags:"strong":"h2"` returns `<h2 class='important'>Hello</h2>`.
 
 ## Arrays and objects
 
