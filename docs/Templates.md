@@ -58,3 +58,7 @@ You can trigger templates based on [schema.org](https://schema.org/) data presen
 - `schema:@Recipe.name=Cookie` will match pages where `@Recipe.name` is "Cookie".
 
 Schema.org values can also be used to [[Variables#Schema.org variables|pre-populate data in templates]].
+
+### Interpreter context
+
+When [[Interpret web pages|Interpreter]] is enabled, you can use [[Variables#Prompt variables|prompt variables]] to extract page content with natural language. For each template you can define the [[Interpret web pages#Context|context]] that Interpreter has access too. 

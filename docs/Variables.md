@@ -3,9 +3,10 @@ permalink: web-clipper/variables
 ---
 [[Obsidian Web Clipper/Templates|Web Clipper templates]] can use variables to automatically pre-populate data from the page in a template. Variables can be used in the **note name**, **note location**, **properties**, and **note content**. Variables can also be modified using [[filters]].
 
-Use the `...` icon in the [[Introduction to Obsidian Web Clipper|Web Clipper]] extension to access the current page variables for use in templates. There are four types of variables you can use:
+Use the `...` icon in the [[Introduction to Obsidian Web Clipper|Web Clipper]] extension to access the current page variables for use in templates. There are five types of variables you can use:
 
 - Preset variables
+- Prompt variables
 - Meta variables
 - Selector variables
 - Schema.org variables
@@ -33,6 +34,29 @@ The main content variable is `{{content}}`, which contains the article content, 
 | `{{title}}`       | Title of the page                                                                      |
 | `{{time}}`        | Current date and time                                                                  |
 | `{{url}}`         | Current URL                                                                            |
+
+## Prompt variables
+
+Prompt variables leverage language models to extract and modify data using natural language. Prompt variables require [[Interpret web pages|Interpreter]] to be enabled and configured.
+
+Prompt variables use the syntax `{{"a summary of the page"}}`. The double quotes around the prompt are important and distinguish prompts from preset variables. Prompt responses can be post-processed with [[filters]], e.g. `{{"a summary of the page"|blockquote}}`.
+
+Prompt variables have the benefit of being extremely flexible and easy to write, however they come with several tradeoffs: they are slower to run, and may have cost and privacy considerations depending on the provider you choose.
+
+If the data you want to extract is in a consistent format it is best to *not* use prompt variables. Unlike other variable types, prompt variables need to be processed by an external language model, so they are replaced only once [[Interpret web pages|Interpreter]] has run.
+
+### Examples
+
+Prompts can use any natural language query. Depending on the model you use, prompts can query or translate data across languages.
+
+- `{{"a three bullet point summary, translated to French"}}` to extract bullet points about the page, and translate them to French.
+
+Prompts can transform page content into JSON that can be manipulated with [[Filters|filters]]. For example:
+
+```
+{{"return a JSON object for each tweet, that includes the author, tweet_text, date in YYYY-MM-DD format, and images array (if there are any)"|map:tweet => ({text: tweet.tweet_text, author: tweet.author, date: tweet.date})|template:"${text}\n— [[@${author}]], [[${date}]]\n"}}
+```
+
 
 ## Meta variables
 

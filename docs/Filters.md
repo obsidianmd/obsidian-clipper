@@ -3,12 +3,12 @@ permalink: web-clipper/filters
 ---
 Filters allow you to modify [[variables]] in [[Obsidian Web Clipper/Templates|Web Clipper templates]]. Filters are applied to variables using the syntax `{{variable|filter}}`.
 
-- Filters work for any kind of [[Variables|variable]] including `meta`, `selector`, and `schema` variables.
+- Filters work for any kind of [[Variables|variable]] including `prompt`, `meta`, `selector`, and `schema` variables.
 - Filters can be chained, e.g. `{{variable|filter1|filter2}}`, and are applied in the order they are added.
 
-## Dates and numbers
+## Dates
 
-Filters that convert dates and numbers.
+Filters to convert and modify dates.
 
 - `date` converts a date to the specified format, [see reference](https://day.js.org/docs/en/display/format).
 	- `{{date|date:"YYYY-MM-DD"}}` converts the current date to "YYYY-MM-DD".
@@ -16,13 +16,27 @@ Filters that convert dates and numbers.
 - `date_modify` modifies a date by adding or subtracting a specified amount of time, [see reference](https://day.js.org/docs/en/manipulate/add).
 	- `"2024-12-01"|date_modify:"+1 year"` returns `"2025-12-01"`
 	- `"2024-12-01"|date_modify:"- 2 months"` returns `"2024-10-01"`
+
+## Numbers
+
+Filters to modify numbers.
+
+- `calc` performs basic arithmetic operations on numbers.
+	- Supports operators: `+`, `-`, `*`, `/`, `**` (or `^`) for exponentiation.
+	- Example: `"5"|calc:"+10"` returns `"15"`.
+	- Example: `"2"|calc:"**3"` returns `"8"` (2 cubed).
+	- Returns the original string if the input is not a number.
+- `length` returns the length of strings, arrays, or number of keys in objects.
+	- For strings: `"hello"|length` returns `"5".`
+	- For arrays: `["a","b","c"]|length` returns `"3".`
+	- For objects: `{"a":1,"b":2}|length` returns `"2"`.
 - `round` rounds a number to the nearest integer or to a specified number of decimal places.
 	- Without parameters: `3.7|round` returns `4`.
 	- With decimal places specified: `3.14159|round:2` returns `3.14`.
 
 ## Text conversion and capitalization
 
-Filters that convert text strings from one format to another.
+Filters to convert text strings from one format to another.
 
 - `camel` converts text to `camelCase`.
 - `capitalize` capitalizes the first character of the value and converts the rest to lowercase, e.g. `"hELLO wORLD"|capitalize` returns `"Hello world"`.
@@ -49,7 +63,7 @@ Filters that convert text strings from one format to another.
 
 ## Text formatting
 
-Filters that apply [[Basic formatting syntax]] and [[Advanced formatting syntax]] to text.
+Filters to apply [[Basic formatting syntax]] and [[Advanced formatting syntax]] to text.
 
 - `blockquote` adds a Markdown quote prefix (`> `) to each line of the input.
 - `callout` creates a [[Callouts|callout]] with optional parameters: `{{variable|callout:("type", "title", foldState)}}`
@@ -87,7 +101,7 @@ Filters that apply [[Basic formatting syntax]] and [[Advanced formatting syntax]
 
 ## HTML processing
 
-Filters that process HTML content and convert HTML to Markdown. Note that your input [[Variables|variable]] must contain HTML content, e.g. using `{{fullHtml}}`, `{{contentHtml}}` or a `{{selectorHtml:}}` variable.
+Filters to process HTML content and convert HTML to Markdown. Note that your input [[Variables|variable]] must contain HTML content, e.g. using `{{fullHtml}}`, `{{contentHtml}}` or a `{{selectorHtml:}}` variable.
 
 - `markdown` converts a string to an [[Obsidian Flavored Markdown]] formatted string.
 	- Useful when combined with variables that return HTML such as `{{contentHtml}}`, `{{fullHtml}}`, and selector variables like `{{selectorHtml:cssSelector}}`.
@@ -106,7 +120,7 @@ Filters that process HTML content and convert HTML to Markdown. Note that your i
 
 ## Arrays and objects
 
-Filters that process arrays and objects.
+Filters to process arrays and objects.
 
 - `first` returns the first element of an array as a string.
 	- `["a","b","c"]|first` returns `"a"`.

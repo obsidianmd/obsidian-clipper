@@ -49,7 +49,8 @@ Header functionality includes:
 
 Footer functionality includes:
 
+- **Add to Obsidian** button to save data to Obsidian.
 - **Vault** dropdown to switch between saved vaults added in Web Clipper settings.
 - **Folder** field to define which folder to save to.
-- **Add to Obsidian** button to save data to Obsidian.
+- **Interpreter** to run [[Interpret web pages|natural language prompts]] on the page.
 
