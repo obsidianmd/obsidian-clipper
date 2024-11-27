@@ -46,9 +46,16 @@ Filters to convert text strings from one format to another.
 - `replace` replaces occurrences of specified text:
 	- Simple replacement: `"hello!"|replace:",":""` removes all commas.
 	- Multiple replacements: `"hello world"|replace:("e":"a","o":"0")` returns `"hall0 w0rld"`.
+	- Regex support using JavaScript regex syntax:
+		- Format: `/pattern/flags` where flags are optional
+		- Replace all vowels: `"hello world"|replace:"/[aeiou]/g":"*"` → `"h*ll* w*rld"`
+		- Case-insensitive: `"HELLO world"|replace:"/hello/i":"hi"` → `"hi world"`
+		- Multiple regex: `"hello world"|replace:("/[aeiou]/g":"*","/\s+/":"-")` → `"h*ll*-w*rld"`
+		- Available flags: `g` (global), `i` (case-insensitive), `m` (multiline), `s` (dotAll), `u` (unicode), `y` (sticky)
 	- Replacements are applied in the order they are specified.
 	- To remove specified text, use `""` as the replacement value.
-	- Special characters including `: | { } ( ) ' "` should be escaped with a backslash when used in the search term, e.g. `\:` to search for a literal colon.
+	- Special characters including `: | { } ( ) ' "` should be escaped with a backslash in non-regex searches.
+	- To use a literal forward slash in non-regex searches, escape it: `"path/to/file"|replace:"\\/":","`
 - `safe_name` converts text to a safe file name.
 	- By default, `safe_name` applies the most conservative sanitization rules.
 	- OS-specific rules can be applied with `safe_name:os` where `os` can be `windows`, `mac`, or `linux` to only apply the rules for that operating system.

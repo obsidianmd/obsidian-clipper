@@ -100,6 +100,7 @@ function splitFilterString(filterString: string): string[] {
 	let quoteType = '';
 	let escapeNext = false;
 	let depth = 0;
+	let inRegex = false;
 
 	// Remove all spaces before and after | that are not within quotes or parentheses
 	filterString = filterString.replace(/\s*\|\s*(?=(?:[^"'()]*["'][^"'()]*["'])*[^"'()]*$)/g, '|');
@@ -114,33 +115,35 @@ function splitFilterString(filterString: string): string[] {
 			escapeNext = false;
 		} else if (char === '\\') {
 			// If this is a backslash, set escapeNext flag to true
-			current += char;
 			escapeNext = true;
-		} else if ((char === '"' || char === "'") && !escapeNext) {
-			// If this is an unescaped quote, toggle the inQuote flag
-			if (!inQuote) {
-				inQuote = true;
-				quoteType = char;
-			} else if (char === quoteType) {
-				inQuote = false;
-				quoteType = '';
-			}
 			current += char;
-		} else if (char === '(' && !inQuote) {
-			// If this is an opening parenthesis outside of quotes, increase depth
+		} else if ((char === '"' || char === "'") && !escapeNext) {
+			// Toggle quote state and track quote type, but don't include quotes in output
+			inQuote = !inQuote;
+			quoteType = inQuote ? char : '';
+			continue;
+		} else if (char === '/' && !inQuote && !inRegex && (current.endsWith(':') || current.endsWith('('))) {
+			// Start tracking a regex pattern if we see a forward slash after a colon or opening parenthesis
+			inRegex = true;
+			current += char;
+		} else if (char === '/' && inRegex && !escapeNext) {
+			// Stop tracking regex pattern when we see the closing forward slash (unless escaped)
+			inRegex = false;
+			current += char;
+		} else if (char === '(' && !inQuote && !inRegex) {
+			// If this is an unescaped opening parenthesis, increment the depth
 			current += char;
 			depth++;
-		} else if (char === ')' && !inQuote) {
-			// If this is a closing parenthesis outside of quotes, decrease depth
+		} else if (char === ')' && !inQuote && !inRegex) {
+			// If this is an unescaped closing parenthesis, decrement the depth
 			current += char;
 			depth--;
-		} else if (char === '|' && !inQuote && depth === 0) {
-			// If this is a pipe character outside of quotes and parentheses,
-			// it's a filter separator. Add the current filter and reset.
+		} else if (char === '|' && !inQuote && !inRegex && depth === 0) {
+			// Split filters on pipe character when not in quotes, regex, or parentheses
 			filters.push(current.trim());
 			current = '';
 		} else {
-			// For any other character, simply add it to the current filter
+			// For any other character, add it to the current filter
 			current += char;
 		}
 	}
@@ -155,18 +158,13 @@ function splitFilterString(filterString: string): string[] {
 
 // Parse the filter into name and parameters
 function parseFilterString(filterString: string): string[] {
-	// Remove outer quotes if present (both single and double quotes)
-	filterString = filterString.replace(/^(['"])(.*)\1$/, '$2');
-
-	// Remove all spaces before and after : that are not within quotes or parentheses
-	filterString = filterString.replace(/\s*:\s*(?=(?:[^"'()]*["'][^"'()]*["'])*[^"'()]*$)/g, ':');
-
 	const parts: string[] = [];
 	let current = '';
 	let depth = 0;
 	let inQuote = false;
 	let quoteType = '';
 	let escapeNext = false;
+	let inRegex = false;
 
 	// Iterate through each character in the filterString
 	for (let i = 0; i < filterString.length; i++) {
@@ -177,8 +175,10 @@ function parseFilterString(filterString: string): string[] {
 			escapeNext = false;
 		} else if (char === '\\') {
 			current += char;
-			escapeNext = true;
-		} else if ((char === '"' || char === "'") && !escapeNext) {
+			if (!inRegex) {
+				escapeNext = true;
+			}
+		} else if ((char === '"' || char === "'") && !escapeNext && !inRegex) {
 			if (!inQuote) {
 				inQuote = true;
 				quoteType = char;
@@ -186,8 +186,14 @@ function parseFilterString(filterString: string): string[] {
 				inQuote = false;
 				quoteType = '';
 			}
+			continue;
+		} else if (char === '/' && !inQuote && !inRegex && (current === '' || current.endsWith(':') || current.endsWith('('))) {
+			inRegex = true;
 			current += char;
-		} else if (!inQuote) {
+		} else if (char === '/' && inRegex && !escapeNext) {
+			inRegex = false;
+			current += char;
+		} else if (!inQuote && !inRegex) {
 			if (char === '(') depth++;
 			if (char === ')') depth--;
 			
@@ -211,6 +217,15 @@ function parseFilterString(filterString: string): string[] {
 		const replacePart = parts.slice(1).join(':');
 		// Check if it's wrapped in parentheses and remove them if so
 		const cleanedReplacePart = replacePart.replace(/^\((.*)\)$/, '$1');
+		
+		if (cleanedReplacePart.startsWith('/')) {
+			const lastColonIndex = cleanedReplacePart.lastIndexOf(':');
+			if (lastColonIndex !== -1) {
+				const search = cleanedReplacePart.substring(0, lastColonIndex);
+				const replace = cleanedReplacePart.substring(lastColonIndex + 1);
+				return [parts[0], `${search}:${replace}`];
+			}
+		}
 		return [parts[0], cleanedReplacePart];
 	}
 
