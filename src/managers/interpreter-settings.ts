@@ -128,6 +128,11 @@ function createModelListItem(model: ModelConfig, index: number): HTMLElement {
 	
 	if (checkbox && checkboxContainer) {
 		initializeToggles(modelItem);
+		checkbox.addEventListener('change', () => {
+			// Update the model's enabled state and save settings
+			generalSettings.models[index].enabled = checkbox.checked;
+			saveSettings();
+		});
 	}
 
 	if (model.provider !== 'OpenAI' && model.provider !== 'Anthropic') {
