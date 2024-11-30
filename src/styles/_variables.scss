@@ -126,6 +126,8 @@
 
 	--text-error: hsl(var(--color-red-hsl));
 	--text-success: hsl(var(--color-green-hsl));
+	--text-warning: rgb(var(--color-orange-rgb));
+
 	--text-normal: var(--color-base-100);
 	--text-muted: var(--color-base-70);
 	--text-faint: var(--color-base-50);

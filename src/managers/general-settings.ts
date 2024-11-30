@@ -12,6 +12,7 @@ import { Template } from '../types/types';
 import { exportHighlights } from './highlights-manager';
 import { getMessage, setupLanguageAndDirection } from '../utils/i18n';
 import { debounce } from '../utils/debounce';
+import browser from '../utils/browser-polyfill';
 
 export function updateVaultList(): void {
 	const vaultList = document.getElementById('vault-list') as HTMLUListElement;
@@ -92,9 +93,29 @@ export async function setShortcutInstructions() {
 	}
 }
 
+async function initializeVersionDisplay(): Promise<void> {
+	const manifest = browser.runtime.getManifest();
+	const versionNumber = document.getElementById('version-number');
+	const updateAvailable = document.getElementById('update-available');
+
+	if (versionNumber) {
+		versionNumber.textContent = manifest.version;
+	}
+
+	// Listen for extension updates
+	browser.runtime.onUpdateAvailable.addListener((details) => {
+		if (updateAvailable) {
+			updateAvailable.style.display = 'block';
+		}
+	});
+}
+
 export function initializeGeneralSettings(): void {
 	loadSettings().then(async () => {
 		await setupLanguageAndDirection();
+
+		// Add version check initialization
+		await initializeVersionDisplay();
 
 		updateVaultList();
 		initializeShowMoreActionsToggle();
