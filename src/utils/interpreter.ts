@@ -51,7 +51,7 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 
 		if (provider.id === 'anthropic') {
 			requestBody = {
-				model: model.providerId,
+				model: model.providerModelId,
 				max_tokens: 800,
 				messages: [
 					{ role: 'user', content: `${promptContext}` },
@@ -67,7 +67,7 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 			};
 		} else if (provider.id === 'ollama') {
 			requestBody = {
-				model: model.providerId,
+				model: model.providerModelId,
 				messages: [
 					{ role: 'system', content: systemContent },
 					{ role: 'user', content: `${promptContext}` },
@@ -79,7 +79,7 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 		} else {
 			// Default OpenAI-compatible request format
 			requestBody = {
-				model: model.providerId,
+				model: model.providerModelId,
 				messages: [
 					{ role: 'system', content: systemContent },
 					{ role: 'user', content: `${promptContext}` },
