@@ -67,6 +67,9 @@
 	"cancel": {
 		"message": "取消"
 	},
+	"changelog": {
+		"message": "更新日誌"
+	},
 	"chooseFile": {
 		"message": "選擇檔案"
 	},
@@ -638,6 +641,12 @@
 	"thinking": {
 		"message": "思考中"
 	},
+	"updateAvailable": {
+		"message": "有可用更新。"
+	},
+	"usingLatestVersion": {
+		"message": "您正在使用最新版本。"
+	},
 	"vault": {
 		"message": "儲存庫"
 	},
@@ -665,5 +674,8 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"version": {
+		"message": "版本"
 	}
 }

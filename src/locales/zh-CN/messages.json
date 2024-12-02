@@ -64,6 +64,9 @@
 	"cancel": {
 		"message": "取消"
 	},
+	"changelog": {
+		"message": "更新日志"
+	},
 	"clipBehavior": {
 		"message": "剪藏行为"
 	},
@@ -587,6 +590,12 @@
 	"thinking": {
 		"message": "思考中"
 	},
+	"updateAvailable": {
+		"message": "有可用更新。"
+	},
+	"usingLatestVersion": {
+		"message": "您正在使用最新版本。"
+	},
 	"vault": {
 		"message": "保管库"
 	},
@@ -614,5 +623,8 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"version": {
+		"message": "版本"
 	}
 }

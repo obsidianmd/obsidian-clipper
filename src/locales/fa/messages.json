@@ -64,6 +64,9 @@
 	"cancel": {
 		"message": "لغو"
 	},
+	"changelog": {
+		"message": "تغییرات"
+	},
 	"clipBehavior": {
 		"message": "رفتار کلیپ"
 	},
@@ -590,6 +593,12 @@
 	"thinking": {
 		"message": "در حال فکر کردن"
 	},
+	"updateAvailable": {
+		"message": "به‌روزرسانی جدید در دسترس است."
+	},
+	"usingLatestVersion": {
+		"message": "شما از آخرین نسخه استفاده می‌کنید."
+	},
 	"vault": {
 		"message": "خزانه"
 	},
@@ -617,5 +626,8 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"version": {
+		"message": "نسخه"
 	}
 }

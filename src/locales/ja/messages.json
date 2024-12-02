@@ -67,6 +67,9 @@
 	"cancel": {
 		"message": "キャンセル"
 	},
+	"changelog": {
+		"message": "変更履歴"
+	},
 	"clipBehavior": {
 		"message": "クリップの動作"
 	},
@@ -605,6 +608,12 @@
 	"thinking": {
 		"message": "考え中"
 	},
+	"updateAvailable": {
+		"message": "アップデートが利用可能です。"
+	},
+	"usingLatestVersion": {
+		"message": "最新バージョンを使用しています。"
+	},
 	"vault": {
 		"message": "保管庫"
 	},
@@ -632,5 +641,8 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"version": {
+		"message": "バージョン"
 	}
 }

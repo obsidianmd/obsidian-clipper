@@ -64,6 +64,9 @@
 	"cancel": {
 		"message": "Batal"
 	},
+	"changelog": {
+		"message": "Catatan perubahan"
+	},
 	"clipBehavior": {
 		"message": "Perilaku klip"
 	},
@@ -590,6 +593,12 @@
 	"thinking": {
 		"message": "berpikir"
 	},
+	"updateAvailable": {
+		"message": "Pembaruan tersedia."
+	},
+	"usingLatestVersion": {
+		"message": "Anda menggunakan versi terbaru."
+	},
 	"vault": {
 		"message": "Vault"
 	},
@@ -617,5 +626,8 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"version": {
+		"message": "Versi"
 	}
 }
