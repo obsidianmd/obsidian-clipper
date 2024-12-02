@@ -1,55 +1,7 @@
 import browser from './browser-polyfill';
+import { Settings, ModelConfig, PropertyType, HistoryEntry, Provider } from '../types/types';
 
-export interface ModelConfig {
-	id: string;
-	providerId: string;
-	name: string;
-	provider?: string;
-	baseUrl: string;
-	apiKey?: string;
-	enabled: boolean;
-}
-
-export interface PropertyType {
-	name: string;
-	type: string;
-	defaultValue?: string;
-}
-
-export interface HistoryEntry {
-	datetime: string;
-	url: string;
-	action: keyof Settings['stats'];
-	title?: string;
-	vault?: string;
-	path?: string;
-}
-
-export interface Settings {
-	vaults: string[];
-	showMoreActionsButton: boolean;
-	betaFeatures: boolean;
-	legacyMode: boolean;
-	silentOpen: boolean;
-	highlighterEnabled: boolean;
-	alwaysShowHighlights: boolean;
-	highlightBehavior: string;
-	openaiApiKey?: string;
-	anthropicApiKey?: string;
-	interpreterModel?: string;
-	models: ModelConfig[];
-	interpreterEnabled: boolean;
-	interpreterAutoRun: boolean;
-	defaultPromptContext: string;
-	propertyTypes: PropertyType[];
-	stats: {
-		addToObsidian: number;
-		saveFile: number;
-		copyToClipboard: number;
-		share: number;
-	};
-	history: HistoryEntry[];
-}
+export type { Settings, ModelConfig, PropertyType, HistoryEntry, Provider };
 
 export let generalSettings: Settings = {
 	vaults: [],
@@ -60,14 +12,26 @@ export let generalSettings: Settings = {
 	alwaysShowHighlights: false,
 	highlightBehavior: 'highlight-inline',
 	showMoreActionsButton: false,
-	openaiApiKey: '',
-	anthropicApiKey: '',
 	interpreterModel: 'gpt-4o-mini',
 	models: [
-		{ id: 'gpt-4o-mini', providerId: 'gpt-4o-mini', name: 'GPT-4o Mini', provider: 'OpenAI', baseUrl: 'https://api.openai.com/v1/chat/completions', enabled: true },
-		{ id: 'gpt-4o', providerId: 'gpt-4o', name: 'GPT-4o', provider: 'OpenAI', baseUrl: 'https://api.openai.com/v1/chat/completions', enabled: true },
-		{ id: 'claude-3-5-sonnet-20240620', providerId: 'claude-3-5-sonnet-20240620', name: 'Claude 3.5 Sonnet', provider: 'Anthropic', baseUrl: 'https://api.anthropic.com/v1/messages', enabled: true },
-		{ id: 'claude-3-haiku-20240307', providerId: 'claude-3-haiku-20240307', name: 'Claude 3 Haiku', provider: 'Anthropic', baseUrl: 'https://api.anthropic.com/v1/messages', enabled: true },
+		{ id: 'gpt-4o-mini', providerId: 'openai', name: 'GPT-4o Mini', enabled: true },
+		{ id: 'gpt-4o', providerId: 'openai', name: 'GPT-4o', enabled: true },
+		{ id: 'claude-3-5-sonnet-20240620', providerId: 'anthropic', name: 'Claude 3.5 Sonnet', enabled: true },
+		{ id: 'claude-3-haiku-20240307', providerId: 'anthropic', name: 'Claude 3 Haiku', enabled: true },
+	],
+	providers: [
+		{
+			id: 'openai',
+			name: 'OpenAI',
+			baseUrl: 'https://api.openai.com/v1/chat/completions',
+			apiKey: ''
+		},
+		{
+			id: 'anthropic',
+			name: 'Anthropic',
+			baseUrl: 'https://api.anthropic.com/v1/messages',
+			apiKey: ''
+		}
 	],
 	interpreterEnabled: false,
 	interpreterAutoRun: false,
@@ -90,6 +54,18 @@ export function getLocalStorage(key: string): Promise<any> {
 	return browser.storage.local.get(key).then((result: {[key: string]: any}) => result[key]);
 }
 
+// Add interface for old model format
+interface LegacyModelConfig {
+	id: string;
+	name: string;
+	provider?: string;
+	providerId?: string;
+	baseUrl?: string;
+	apiKey?: string;
+	enabled: boolean;
+}
+
+// Update the StorageData interface
 interface StorageData {
 	general_settings?: {
 		showMoreActionsButton?: boolean;
@@ -107,7 +83,8 @@ interface StorageData {
 		openaiApiKey?: string;
 		anthropicApiKey?: string;
 		interpreterModel?: string;
-		models?: ModelConfig[];
+		models?: LegacyModelConfig[];
+		providers?: Provider[];
 		interpreterEnabled?: boolean;
 		interpreterAutoRun?: boolean;
 		defaultPromptContext?: string;
@@ -120,6 +97,79 @@ interface StorageData {
 		share: number;
 	};
 	history?: HistoryEntry[];
+}
+
+function migrateModelsAndProviders(data: StorageData, defaultSettings: Settings): { models: ModelConfig[], providers: Provider[] } {
+	// Start with default providers
+	let providers = defaultSettings.providers;
+	let models = defaultSettings.models;
+
+	// If we have existing models, we need to ensure their providers exist
+	if (data.interpreter_settings?.models) {
+		const existingModels = data.interpreter_settings.models;
+		const customProviders = new Map<string, Provider>();
+
+		// First pass: collect all unique providers from existing models
+		existingModels.forEach((model: LegacyModelConfig) => {
+			if (model.provider && !customProviders.has(model.provider) && 
+				!providers.some(p => p.name === model.provider)) {
+				// Create a new provider from the model's provider info
+				const newProvider: Provider = {
+					id: model.provider.toLowerCase().replace(/\s+/g, '-'),
+					name: model.provider,
+					baseUrl: model.baseUrl || '',
+					apiKey: model.apiKey || ''
+				};
+				customProviders.set(model.provider, newProvider);
+			}
+		});
+
+		// Add all custom providers to our providers list
+		providers = [
+			...providers,
+			...Array.from(customProviders.values())
+		];
+
+		// Second pass: update models to reference providers
+		models = existingModels.map((model: LegacyModelConfig) => {
+			let providerId: string;
+
+			// Determine the provider ID
+			if (model.provider === 'OpenAI') {
+				providerId = 'openai';
+			} else if (model.provider === 'Anthropic') {
+				providerId = 'anthropic';
+			} else if (model.provider) {
+				// Find the custom provider we created
+				const customProvider = customProviders.get(model.provider);
+				providerId = customProvider?.id || model.provider.toLowerCase().replace(/\s+/g, '-');
+			} else {
+				providerId = model.providerId || ''; // Use existing providerId if available
+			}
+
+			return {
+				id: model.id,
+				providerId,
+				name: model.name,
+				enabled: model.enabled
+			};
+		});
+	}
+
+	// Migrate API keys to providers if they exist
+	if (data.interpreter_settings?.openaiApiKey || data.interpreter_settings?.anthropicApiKey) {
+		providers = providers.map(provider => {
+			if (provider.id === 'openai' && data.interpreter_settings?.openaiApiKey) {
+				return { ...provider, apiKey: data.interpreter_settings.openaiApiKey };
+			}
+			if (provider.id === 'anthropic' && data.interpreter_settings?.anthropicApiKey) {
+				return { ...provider, apiKey: data.interpreter_settings.anthropicApiKey };
+			}
+			return provider;
+		});
+	}
+
+	return { models, providers };
 }
 
 export async function loadSettings(): Promise<Settings> {
@@ -145,14 +195,13 @@ export async function loadSettings(): Promise<Settings> {
 		highlighterEnabled: true,
 		alwaysShowHighlights: true,
 		highlightBehavior: 'highlight-inline',
-		openaiApiKey: '',
-		anthropicApiKey: '',
 		interpreterModel: 'gpt-4o-mini',
 		models: generalSettings.models,
 		interpreterEnabled: false,
 		interpreterAutoRun: false,
 		defaultPromptContext: generalSettings.defaultPromptContext,
 		propertyTypes: [],
+		providers: generalSettings.providers,
 		stats: {
 			addToObsidian: 0,
 			saveFile: 0,
@@ -161,6 +210,9 @@ export async function loadSettings(): Promise<Settings> {
 		},
 		history: []
 	};
+
+	// Migrate models and providers
+	const { models, providers } = migrateModelsAndProviders(data, defaultSettings);
 
 	// Load user settings
 	const loadedSettings: Settings = {
@@ -172,10 +224,9 @@ export async function loadSettings(): Promise<Settings> {
 		highlighterEnabled: data.highlighter_settings?.highlighterEnabled ?? defaultSettings.highlighterEnabled,
 		alwaysShowHighlights: data.highlighter_settings?.alwaysShowHighlights ?? defaultSettings.alwaysShowHighlights,
 		highlightBehavior: data.highlighter_settings?.highlightBehavior ?? defaultSettings.highlightBehavior,
-		openaiApiKey: data.interpreter_settings?.openaiApiKey || defaultSettings.openaiApiKey,
-		anthropicApiKey: data.interpreter_settings?.anthropicApiKey || defaultSettings.anthropicApiKey,
 		interpreterModel: data.interpreter_settings?.interpreterModel || defaultSettings.interpreterModel,
-		models: data.interpreter_settings?.models || defaultSettings.models,
+		models,
+		providers,
 		interpreterEnabled: data.interpreter_settings?.interpreterEnabled ?? defaultSettings.interpreterEnabled,
 		interpreterAutoRun: data.interpreter_settings?.interpreterAutoRun ?? defaultSettings.interpreterAutoRun,
 		defaultPromptContext: data.interpreter_settings?.defaultPromptContext || defaultSettings.defaultPromptContext,
@@ -183,30 +234,6 @@ export async function loadSettings(): Promise<Settings> {
 		stats: data.stats || defaultSettings.stats,
 		history: history
 	};
-
-	// Migrate models to include providerId if missing
-	if (loadedSettings.models) {
-		loadedSettings.models = loadedSettings.models.map(model => {
-			if (!model.providerId) {
-				// For custom models without providerId, use their id
-				return {
-					...model,
-					providerId: model.id
-				};
-			}
-			return model;
-		});
-
-		// Save migrated models back to storage
-		if (loadedSettings.models.some(model => !model.providerId)) {
-			await browser.storage.sync.set({
-				interpreter_settings: {
-					...data.interpreter_settings,
-					models: loadedSettings.models
-				}
-			});
-		}
-	}
 
 	generalSettings = loadedSettings;
 	return generalSettings;
@@ -216,6 +243,7 @@ export async function saveSettings(settings?: Partial<Settings>): Promise<void> 
 	if (settings) {
 		generalSettings = { ...generalSettings, ...settings };
 	}
+
 	await browser.storage.sync.set({
 		vaults: generalSettings.vaults,
 		general_settings: {
@@ -230,10 +258,9 @@ export async function saveSettings(settings?: Partial<Settings>): Promise<void> 
 			highlightBehavior: generalSettings.highlightBehavior
 		},
 		interpreter_settings: {
-			openaiApiKey: generalSettings.openaiApiKey,
-			anthropicApiKey: generalSettings.anthropicApiKey,
 			interpreterModel: generalSettings.interpreterModel,
 			models: generalSettings.models,
+			providers: generalSettings.providers,
 			interpreterEnabled: generalSettings.interpreterEnabled,
 			interpreterAutoRun: generalSettings.interpreterAutoRun,
 			defaultPromptContext: generalSettings.defaultPromptContext

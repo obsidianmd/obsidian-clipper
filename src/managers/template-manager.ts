@@ -1,7 +1,7 @@
-import { Template, Property } from '../types/types';
+import { Template, Property, PropertyType } from '../types/types';
 import { compressToUTF16, decompressFromUTF16 } from 'lz-string';
 import browser from '../utils/browser-polyfill';
-import { generalSettings, PropertyType } from '../utils/storage-utils';
+import { generalSettings } from '../utils/storage-utils';
 import { addPropertyType } from './property-types-manager';
 
 export let templates: Template[] = [];
