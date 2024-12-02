@@ -97,6 +97,7 @@ async function initializeVersionDisplay(): Promise<void> {
 	const manifest = browser.runtime.getManifest();
 	const versionNumber = document.getElementById('version-number');
 	const updateAvailable = document.getElementById('update-available');
+	const usingLatestVersion = document.getElementById('using-latest-version');
 
 	if (versionNumber) {
 		versionNumber.textContent = manifest.version;
@@ -104,8 +105,9 @@ async function initializeVersionDisplay(): Promise<void> {
 
 	// Listen for extension updates
 	browser.runtime.onUpdateAvailable.addListener((details) => {
-		if (updateAvailable) {
+		if (updateAvailable && usingLatestVersion) {
 			updateAvailable.style.display = 'block';
+			usingLatestVersion.style.display = 'none';
 		}
 	});
 }

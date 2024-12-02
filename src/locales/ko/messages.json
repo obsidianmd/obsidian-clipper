@@ -64,6 +64,9 @@
 	"cancel": {
 		"message": "취소"
 	},
+	"changelog": {
+		"message": "변경 내역"
+	},
 	"clipBehavior": {
 		"message": "클립 동작 방식"
 	},
@@ -590,6 +593,12 @@
 	"thinking": {
 		"message": "생각 중"
 	},
+	"updateAvailable": {
+		"message": "업데이트가 있습니다."
+	},
+	"usingLatestVersion": {
+		"message": "최신 버전을 사용 중입니다."
+	},
 	"vault": {
 		"message": "보관소"
 	},
@@ -617,5 +626,8 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"version": {
+		"message": "버전"
 	}
 }

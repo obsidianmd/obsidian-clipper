@@ -64,6 +64,9 @@
 	"cancel": {
 		"message": "Abbrechen"
 	},
+	"changelog": {
+		"message": "Änderungsprotokoll"
+	},
 	"clipBehavior": {
 		"message": "Ausschneideverhalten"
 	},
@@ -590,6 +593,12 @@
 	"thinking": {
 		"message": "denke nach"
 	},
+	"updateAvailable": {
+		"message": "Ein Update ist verfügbar."
+	},
+	"usingLatestVersion": {
+		"message": "Sie verwenden die neueste Version."
+	},
 	"vault": {
 		"message": "Tresor"
 	},
@@ -617,5 +626,8 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"version": {
+		"message": "Version"
 	}
 }

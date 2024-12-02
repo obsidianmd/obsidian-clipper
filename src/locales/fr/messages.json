@@ -67,6 +67,9 @@
 	"cancel": {
 		"message": "Annuler"
 	},
+	"changelog": {
+		"message": "Journal des modifications"
+	},
 	"chooseFile": {
 		"message": "Choisir un fichier"
 	},
@@ -680,6 +683,12 @@
 	"thinking": {
 		"message": "réflexion"
 	},
+	"updateAvailable": {
+		"message": "Une mise à jour est disponible."
+	},
+	"usingLatestVersion": {
+		"message": "Vous utilisez la dernière version."
+	},
 	"vault": {
 		"message": "Coffre"
 	},
@@ -707,5 +716,8 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"version": {
+		"message": "Version"
 	}
 }

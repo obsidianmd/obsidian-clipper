@@ -64,6 +64,9 @@
 	"cancel": {
 		"message": "Cancelar"
 	},
+	"changelog": {
+		"message": "Registro de alterações"
+	},
 	"clipBehavior": {
 		"message": "Comportamento da captura"
 	},
@@ -590,6 +593,12 @@
 	"thinking": {
 		"message": "pensando"
 	},
+	"updateAvailable": {
+		"message": "Uma atualização está disponível."
+	},
+	"usingLatestVersion": {
+		"message": "Você está usando a versão mais recente."
+	},
 	"vault": {
 		"message": "Cofre"
 	},
@@ -617,5 +626,8 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"version": {
+		"message": "Versão"
 	}
 }

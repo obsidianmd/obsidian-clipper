@@ -67,6 +67,9 @@
 	"cancel": {
 		"message": "Cancel"
 	},
+	"changelog": {
+		"message": "Changelog"
+	},
 	"chooseFile": {
 		"message": "Choose a file"
 	},
@@ -638,6 +641,12 @@
 	"thinking": {
 		"message": "thinking"
 	},
+	"updateAvailable": {
+		"message": "An update is available."
+	},
+	"usingLatestVersion": {
+		"message": "You are using the latest version."
+	},
 	"vault": {
 		"message": "Vault"
 	},
@@ -668,11 +677,5 @@
 	},
 	"version": {
 		"message": "Version"
-	},
-	"updateAvailable": {
-		"message": "An update is available."
-	},
-	"changelog": {
-		"message": "Changelog"
 	}
 }

@@ -617,5 +617,17 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"version": {
+		"message": "الإصدار"
+	},
+	"updateAvailable": {
+		"message": "يتوفر تحديث جديد."
+	},
+	"usingLatestVersion": {
+		"message": "أنت تستخدم أحدث إصدار."
+	},
+	"changelog": {
+		"message": "سجل التغييرات"
 	}
 }

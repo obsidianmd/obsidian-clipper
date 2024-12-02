@@ -64,6 +64,9 @@
 	"cancel": {
 		"message": "Отмена"
 	},
+	"changelog": {
+		"message": "История изменений"
+	},
 	"clipBehavior": {
 		"message": "Поведение при сохранении"
 	},
@@ -590,6 +593,12 @@
 	"thinking": {
 		"message": "думаю"
 	},
+	"updateAvailable": {
+		"message": "Доступно обновление."
+	},
+	"usingLatestVersion": {
+		"message": "Вы используете последнюю версию."
+	},
 	"vault": {
 		"message": "Хранилище"
 	},
@@ -617,5 +626,8 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"version": {
+		"message": "Версия"
 	}
 }

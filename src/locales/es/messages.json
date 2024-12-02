@@ -64,6 +64,9 @@
 	"cancel": {
 		"message": "Cancelar"
 	},
+	"changelog": {
+		"message": "Registro de cambios"
+	},
 	"clipBehavior": {
 		"message": "Comportamiento de guardado"
 	},
@@ -590,6 +593,12 @@
 	"thinking": {
 		"message": "pensando"
 	},
+	"updateAvailable": {
+		"message": "Hay una actualización disponible."
+	},
+	"usingLatestVersion": {
+		"message": "Estás usando la última versión."
+	},
 	"vault": {
 		"message": "Bóveda"
 	},
@@ -617,5 +626,8 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"version": {
+		"message": "Versión"
 	}
 }
