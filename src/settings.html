@@ -525,15 +525,15 @@
 								<div class="setting-item-description" data-i18n="modelProviderDescription">Select the provider for this model.</div>
 							</div>
 							<div class="setting-item-control">
-								<select id="model-provider" required>
+								<select id="model-provider" name="providerId" required>
 									<option value="" data-i18n="selectProvider">Select a provider</option>
 								</select>
 							</div>
 						</div>
 						<div class="setting-item">
-								<div class="setting-item-info">
+							<div class="setting-item-info">
 								<label for="model-name">
-									<span data-i18n="modelName">Model name</span>
+									<span data-i18n="modelName">Display name</span>
 								</label>
 								<div class="setting-item-description" data-i18n="modelNameDescription">A name for this model.</div>
 							</div>
@@ -543,13 +543,14 @@
 						</div>
 						<div class="setting-item">
 							<div class="setting-item-info">
-								<label for="model-provider-id" data-i18n="modelProviderId">Model ID</label>
-								<div class="setting-item-description" data-i18n="modelProviderIdDescription">The identifier of the model from your provider.</div>
+								<label for="provider-model-id" data-i18n="providerModelId">Model ID</label>
+								<div class="setting-item-description" data-i18n="providerModelIdDescription">The model identifier from your provider (e.g., gpt-4, claude-3-haiku).</div>
 							</div>
 							<div class="setting-item-control">
-								<input type="text" id="model-provider-id" name="providerId" data-i18n="modelProviderId" placeholder="Model ID" required>
+								<input type="text" id="provider-model-id" name="providerModelId" data-i18n="providerModelId" placeholder="Model ID" required>
 							</div>
 						</div>
+						
 					</form>
 				</div>
 				<div class="modal-button-container">
@@ -604,7 +605,7 @@
 								<div class="setting-item-description" data-i18n="providerApiKeyDescription">Your API key for this provider.</div>
 							</div>
 							<div class="setting-item-control">
-								<input type="password" id="provider-api-key" name="apiKey" data-i18n="providerApiKey" placeholder="API key">
+								<input type="text" id="provider-api-key" name="apiKey" data-i18n="providerApiKey" placeholder="API key">
 							</div>
 						</div>
 					</form>

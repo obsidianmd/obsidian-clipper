@@ -71,6 +71,7 @@ export interface Settings {
 export interface ModelConfig {
 	id: string;
 	providerId: string;
+	providerModelId: string;
 	name: string;
 	enabled: boolean;
 }

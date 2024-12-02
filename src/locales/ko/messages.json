@@ -367,13 +367,13 @@
 	"modelProviderDescription": {
 		"message": "모델 제공자 (예: Ollama, OpenRouter, Google 등)"
 	},
-	"modelProviderId": {
+	"providerModelId": {
 		"message": "모델 ID"
 	},
-	"modelProviderIdDescription": {
+	"providerModelIdDescription": {
 		"message": "제공자의 모델 식별자입니다. 일반적으로 공백이 없는 짧은 이름입니다."
 	},
-	"modelProviderIdPlaceholder": {
+	"providerModelIdPlaceholder": {
 		"message": "모델 ID"
 	},
 	"models": {

@@ -367,13 +367,13 @@
 	"modelProviderDescription": {
 		"message": "O provedor do modelo, por exemplo Ollama, OpenRouter, Google, etc."
 	},
-	"modelProviderId": {
+	"providerModelId": {
 		"message": "ID do modelo"
 	},
-	"modelProviderIdDescription": {
+	"providerModelIdDescription": {
 		"message": "O identificador do modelo do seu provedor. Geralmente um nome curto sem espaços."
 	},
-	"modelProviderIdPlaceholder": {
+	"providerModelIdPlaceholder": {
 		"message": "ID do modelo"
 	},
 	"models": {

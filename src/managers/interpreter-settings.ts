@@ -7,30 +7,30 @@ import { getMessage, translatePage } from '../utils/i18n';
 import { debugLog } from '../utils/debug';
 
 const PRESET_PROVIDERS = {
-	openai: {
-		id: 'openai',
-		name: 'OpenAI',
-		baseUrl: 'https://api.openai.com/v1/chat/completions'
-	},
 	anthropic: {
 		id: 'anthropic',
 		name: 'Anthropic',
 		baseUrl: 'https://api.anthropic.com/v1/messages'
+	},
+	azure: {
+		id: 'azure',
+		name: 'Azure',
+		baseUrl: ''
 	},
 	ollama: {
 		id: 'ollama',
 		name: 'Ollama',
 		baseUrl: 'http://127.0.0.1:11434/api/chat'
 	},
+	openai: {
+		id: 'openai',
+		name: 'OpenAI',
+		baseUrl: 'https://api.openai.com/v1/chat/completions'
+	},
 	openrouter: {
 		id: 'openrouter',
 		name: 'OpenRouter',
 		baseUrl: 'https://openrouter.ai/api/v1/chat/completions'
-	},
-	azure: {
-		id: 'azure',
-		name: 'Azure',
-		baseUrl: '' // User must provide their Azure endpoint
 	}
 };
 
@@ -139,7 +139,10 @@ function createProviderListItem(provider: Provider, index: number): HTMLElement 
 
 	providerItem.innerHTML = `
 		<div class="provider-list-item-info">
-			<div class="provider-name">${provider.name}</div>
+			<div class="provider-name">
+				${provider.name}
+			</div>
+			${!provider.apiKey ? '<span class="provider-no-key text-warning">No API key</span>' : ''}
 		</div>
 		<div class="provider-list-item-actions">
 			<button class="edit-provider-btn clickable-icon" data-index="${index}" aria-label="Edit provider">
@@ -395,7 +398,6 @@ function createModelListItem(model: ModelConfig, index: number): HTMLElement {
 		});
 	}
 
-	// Allow editing all models now
 	const duplicateBtn = modelItem.querySelector('.duplicate-model-btn');
 	if (duplicateBtn) {
 		duplicateBtn.addEventListener('click', (e) => {
@@ -433,6 +435,7 @@ function addModelToList(event: Event) {
 	const newModel: ModelConfig = {
 		id: Date.now().toString(),
 		providerId: '',
+		providerModelId: '',
 		name: '',
 		enabled: true
 	};
@@ -457,55 +460,68 @@ function showModelModal(model: ModelConfig, index?: number) {
 	}
 
 	const form = modal.querySelector('#model-form') as HTMLFormElement;
-	if (form) {
-		const nameInput = form.querySelector('[name="name"]') as HTMLInputElement;
-		const modelIdInput = form.querySelector('[name="providerId"]') as HTMLInputElement;
-		const providerSelect = form.querySelector('#model-provider') as HTMLSelectElement;
-
-		nameInput.value = model.name;
-		modelIdInput.value = model.providerId;
-
-		// Populate provider select
-		providerSelect.innerHTML = '<option value="" data-i18n="selectProvider">Select a provider</option>';
-		generalSettings.providers.forEach(provider => {
-			const option = document.createElement('option');
-			option.value = provider.id;
-			option.textContent = provider.name;
-			providerSelect.appendChild(option);
-		});
-		providerSelect.value = model.providerId;
-
-		// Update modelIdInput when provider changes
-		providerSelect.addEventListener('change', () => {
-			modelIdInput.value = providerSelect.value;
-		});
+	if (!form) {
+		console.error('Model form not found');
+		return;
 	}
 
+	// Get all form elements
+	const nameInput = form.querySelector('[name="name"]') as HTMLInputElement;
+	const providerModelIdInput = form.querySelector('[name="providerModelId"]') as HTMLInputElement;
+	const providerSelect = form.querySelector('#model-provider') as HTMLSelectElement;
+
+	// Check if all required elements exist
+	if (!nameInput || !providerModelIdInput || !providerSelect) {
+		console.error('Required form elements not found:', {
+			nameInput: !!nameInput,
+			providerModelIdInput: !!providerModelIdInput,
+			providerSelect: !!providerSelect
+		});
+		return;
+	}
+
+	// Set form values
+	nameInput.value = model.name;
+	providerModelIdInput.value = model.providerModelId || '';
+
+	// Populate provider select
+	providerSelect.innerHTML = '<option value="" data-i18n="selectProvider">Select a provider</option>';
+	generalSettings.providers.forEach(provider => {
+		const option = document.createElement('option');
+		option.value = provider.id;
+		option.textContent = provider.name;
+		providerSelect.appendChild(option);
+	});
+	providerSelect.value = model.providerId;
+
+	// Handle buttons
 	const confirmBtn = modal.querySelector('.model-confirm-btn');
 	const cancelBtn = modal.querySelector('.model-cancel-btn');
 
-	// Remove existing event listeners
-	const newConfirmBtn = confirmBtn?.cloneNode(true);
-	const newCancelBtn = cancelBtn?.cloneNode(true);
-	if (confirmBtn && newConfirmBtn) {
-		confirmBtn.parentNode?.replaceChild(newConfirmBtn, confirmBtn);
-	}
-	if (cancelBtn && newCancelBtn) {
-		cancelBtn.parentNode?.replaceChild(newCancelBtn, cancelBtn);
+	if (!confirmBtn || !cancelBtn) {
+		console.error('Modal buttons not found');
+		return;
 	}
 
+	// Remove existing event listeners
+	const newConfirmBtn = confirmBtn.cloneNode(true);
+	const newCancelBtn = cancelBtn.cloneNode(true);
+	confirmBtn.parentNode?.replaceChild(newConfirmBtn, confirmBtn);
+	cancelBtn.parentNode?.replaceChild(newCancelBtn, cancelBtn);
+
 	// Add new event listeners
-	newConfirmBtn?.addEventListener('click', () => {
+	newConfirmBtn.addEventListener('click', () => {
 		const formData = new FormData(form);
 		const updatedModel: ModelConfig = {
 			id: model.id,
 			providerId: formData.get('providerId') as string,
+			providerModelId: formData.get('providerModelId') as string,
 			name: formData.get('name') as string,
 			enabled: model.enabled
 		};
 
-		if (!updatedModel.name || !updatedModel.providerId) {
-			alert('Model name and Provider are required.');
+		if (!updatedModel.name || !updatedModel.providerId || !updatedModel.providerModelId) {
+			alert('Model name, Provider, and Model ID are required.');
 			return;
 		}
 
@@ -520,7 +536,7 @@ function showModelModal(model: ModelConfig, index?: number) {
 		hideModal(modal);
 	});
 
-	newCancelBtn?.addEventListener('click', () => {
+	newCancelBtn.addEventListener('click', () => {
 		hideModal(modal);
 	});
 
@@ -585,21 +601,4 @@ function duplicateModel(index: number) {
 	// Show edit modal for the new model
 	const newIndex = generalSettings.models.length - 1;
 	showModelModal(duplicatedModel, newIndex);
-}
-
-function addPresetProvider(presetId: keyof typeof PRESET_PROVIDERS) {
-	const preset = PRESET_PROVIDERS[presetId];
-	const newProvider: Provider = {
-		...preset,
-		id: Date.now().toString(),
-		apiKey: ''
-	};
-
-	generalSettings.providers.push(newProvider);
-	saveSettings();
-	initializeProviderList();
-
-	// Show edit modal for the new provider
-	const newIndex = generalSettings.providers.length - 1;
-	showProviderModal(newProvider, newIndex);
 }

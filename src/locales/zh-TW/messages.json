@@ -403,13 +403,13 @@
 	"modelProviderDescription": {
 		"message": "模型提供者，例如 Ollama、OpenRouter、Google 等。"
 	},
-	"modelProviderId": {
+	"providerModelId": {
 		"message": "模型 ID"
 	},
-	"modelProviderIdDescription": {
+	"providerModelIdDescription": {
 		"message": "來自您提供者的模型識別碼。通常是一個不含空格的簡短名稱。"
 	},
-	"modelProviderIdPlaceholder": {
+	"providerModelIdPlaceholder": {
 		"message": "模型 ID"
 	},
 	"modelProviderPlaceholder": {

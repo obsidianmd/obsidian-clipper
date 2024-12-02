@@ -367,13 +367,13 @@
 	"modelProviderDescription": {
 		"message": "Penyedia model, misalnya Ollama, OpenRouter, Google, dll."
 	},
-	"modelProviderId": {
+	"providerModelId": {
 		"message": "ID model"
 	},
-	"modelProviderIdDescription": {
+	"providerModelIdDescription": {
 		"message": "Pengidentifikasi model dari penyedia Anda. Biasanya nama pendek tanpa spasi."
 	},
-	"modelProviderIdPlaceholder": {
+	"providerModelIdPlaceholder": {
 		"message": "ID model"
 	},
 	"models": {

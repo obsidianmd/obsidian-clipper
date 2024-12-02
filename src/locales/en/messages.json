@@ -403,13 +403,13 @@
 	"modelProviderDescription": {
 		"message": "Select the provider for this model."
 	},
-	"modelProviderId": {
+	"providerModelId": {
 		"message": "Model ID"
 	},
-	"modelProviderIdDescription": {
-		"message": "The identifier of the model from your provider."
+	"providerModelIdDescription": {
+		"message": "The identifier of the model from your provider. Typically a short name without spaces."
 	},
-	"modelProviderIdPlaceholder": {
+	"providerModelIdPlaceholder": {
 		"message": "Model ID"
 	},
 	"modelProviderPlaceholder": {

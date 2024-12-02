@@ -1,5 +1,6 @@
 import browser from './browser-polyfill';
 import { Settings, ModelConfig, PropertyType, HistoryEntry, Provider } from '../types/types';
+import { debugLog } from './debug';
 
 export type { Settings, ModelConfig, PropertyType, HistoryEntry, Provider };
 
@@ -14,10 +15,10 @@ export let generalSettings: Settings = {
 	showMoreActionsButton: false,
 	interpreterModel: 'gpt-4o-mini',
 	models: [
-		{ id: 'gpt-4o-mini', providerId: 'openai', name: 'GPT-4o Mini', enabled: true },
-		{ id: 'gpt-4o', providerId: 'openai', name: 'GPT-4o', enabled: true },
-		{ id: 'claude-3-5-sonnet-20240620', providerId: 'anthropic', name: 'Claude 3.5 Sonnet', enabled: true },
-		{ id: 'claude-3-haiku-20240307', providerId: 'anthropic', name: 'Claude 3 Haiku', enabled: true },
+		{ id: 'gpt-4o-mini', providerId: 'openai', providerModelId: 'gpt-4o-mini', name: 'GPT-4o Mini', enabled: true },
+		{ id: 'gpt-4o', providerId: 'openai', providerModelId: 'gpt-4o', name: 'GPT-4o', enabled: true },
+		{ id: 'claude-3-5-sonnet-20240620', providerId: 'anthropic', providerModelId: 'claude-3-sonnet-20240620', name: 'Claude 3.5 Sonnet', enabled: true },
+		{ id: 'claude-3-haiku-20240307', providerId: 'anthropic', providerModelId: 'claude-3-haiku-20240307', name: 'Claude 3 Haiku', enabled: true },
 	],
 	providers: [
 		{
@@ -63,6 +64,7 @@ interface LegacyModelConfig {
 	baseUrl?: string;
 	apiKey?: string;
 	enabled: boolean;
+	providerModelId?: string;
 }
 
 // Update the StorageData interface
@@ -106,7 +108,7 @@ function migrateModelsAndProviders(data: StorageData, defaultSettings: Settings)
 
 	// If we have existing models, we need to ensure their providers exist
 	if (data.interpreter_settings?.models) {
-		const existingModels = data.interpreter_settings.models;
+		const existingModels = data.interpreter_settings.models as LegacyModelConfig[];
 		const customProviders = new Map<string, Provider>();
 
 		// First pass: collect all unique providers from existing models
@@ -147,25 +149,16 @@ function migrateModelsAndProviders(data: StorageData, defaultSettings: Settings)
 				providerId = model.providerId || ''; // Use existing providerId if available
 			}
 
+			// For modelId, use either existing modelId or the id field
+			const providerModelId = model.providerModelId || model.id;
+
 			return {
 				id: model.id,
 				providerId,
+				providerModelId,
 				name: model.name,
 				enabled: model.enabled
 			};
-		});
-	}
-
-	// Migrate API keys to providers if they exist
-	if (data.interpreter_settings?.openaiApiKey || data.interpreter_settings?.anthropicApiKey) {
-		providers = providers.map(provider => {
-			if (provider.id === 'openai' && data.interpreter_settings?.openaiApiKey) {
-				return { ...provider, apiKey: data.interpreter_settings.openaiApiKey };
-			}
-			if (provider.id === 'anthropic' && data.interpreter_settings?.anthropicApiKey) {
-				return { ...provider, apiKey: data.interpreter_settings.anthropicApiKey };
-			}
-			return provider;
 		});
 	}
 
@@ -196,12 +189,12 @@ export async function loadSettings(): Promise<Settings> {
 		alwaysShowHighlights: true,
 		highlightBehavior: 'highlight-inline',
 		interpreterModel: 'gpt-4o-mini',
-		models: generalSettings.models,
+		models: [],
+		providers: [],
 		interpreterEnabled: false,
 		interpreterAutoRun: false,
-		defaultPromptContext: generalSettings.defaultPromptContext,
+		defaultPromptContext: '',
 		propertyTypes: [],
-		providers: generalSettings.providers,
 		stats: {
 			addToObsidian: 0,
 			saveFile: 0,
@@ -211,31 +204,44 @@ export async function loadSettings(): Promise<Settings> {
 		history: []
 	};
 
-	// Migrate models and providers
-	const { models, providers } = migrateModelsAndProviders(data, defaultSettings);
+	// First load stored providers or use defaults
+	const providers = data.interpreter_settings?.providers || generalSettings.providers;
+	debugLog('Settings', 'Loaded providers:', providers);
+
+	// Then load stored models or use defaults, ensuring they match ModelConfig type
+	const storedModels = data.interpreter_settings?.models || generalSettings.models;
+	const models: ModelConfig[] = storedModels.map((model: LegacyModelConfig) => ({
+		id: model.id,
+		providerId: model.providerId || model.provider?.toLowerCase().replace(/\s+/g, '-') || '',
+		providerModelId: model.providerModelId || model.id,
+		name: model.name,
+		enabled: model.enabled
+	}));
+	debugLog('Settings', 'Loaded models:', models);
 
 	// Load user settings
 	const loadedSettings: Settings = {
 		vaults: data.vaults || defaultSettings.vaults,
-		showMoreActionsButton: data.general_settings?.showMoreActionsButton ?? defaultSettings.showMoreActionsButton,
-		betaFeatures: data.general_settings?.betaFeatures ?? defaultSettings.betaFeatures,
-		legacyMode: data.general_settings?.legacyMode ?? defaultSettings.legacyMode,
-		silentOpen: data.general_settings?.silentOpen ?? defaultSettings.silentOpen,
-		highlighterEnabled: data.highlighter_settings?.highlighterEnabled ?? defaultSettings.highlighterEnabled,
-		alwaysShowHighlights: data.highlighter_settings?.alwaysShowHighlights ?? defaultSettings.alwaysShowHighlights,
-		highlightBehavior: data.highlighter_settings?.highlightBehavior ?? defaultSettings.highlightBehavior,
-		interpreterModel: data.interpreter_settings?.interpreterModel || defaultSettings.interpreterModel,
-		models,
-		providers,
-		interpreterEnabled: data.interpreter_settings?.interpreterEnabled ?? defaultSettings.interpreterEnabled,
-		interpreterAutoRun: data.interpreter_settings?.interpreterAutoRun ?? defaultSettings.interpreterAutoRun,
-		defaultPromptContext: data.interpreter_settings?.defaultPromptContext || defaultSettings.defaultPromptContext,
-		propertyTypes: data.property_types || defaultSettings.propertyTypes,
-		stats: data.stats || defaultSettings.stats,
-		history: history
+			showMoreActionsButton: data.general_settings?.showMoreActionsButton ?? defaultSettings.showMoreActionsButton,
+			betaFeatures: data.general_settings?.betaFeatures ?? defaultSettings.betaFeatures,
+			legacyMode: data.general_settings?.legacyMode ?? defaultSettings.legacyMode,
+			silentOpen: data.general_settings?.silentOpen ?? defaultSettings.silentOpen,
+			highlighterEnabled: data.highlighter_settings?.highlighterEnabled ?? defaultSettings.highlighterEnabled,
+			alwaysShowHighlights: data.highlighter_settings?.alwaysShowHighlights ?? defaultSettings.alwaysShowHighlights,
+			highlightBehavior: data.highlighter_settings?.highlightBehavior ?? defaultSettings.highlightBehavior,
+			interpreterModel: data.interpreter_settings?.interpreterModel || defaultSettings.interpreterModel,
+			models,
+			providers,
+			interpreterEnabled: data.interpreter_settings?.interpreterEnabled ?? defaultSettings.interpreterEnabled,
+			interpreterAutoRun: data.interpreter_settings?.interpreterAutoRun ?? defaultSettings.interpreterAutoRun,
+			defaultPromptContext: data.interpreter_settings?.defaultPromptContext || defaultSettings.defaultPromptContext,
+			propertyTypes: data.property_types || defaultSettings.propertyTypes,
+			stats: data.stats || defaultSettings.stats,
+			history: history
 	};
 
 	generalSettings = loadedSettings;
+	debugLog('Settings', 'Loaded settings:', generalSettings);
 	return generalSettings;
 }
 
