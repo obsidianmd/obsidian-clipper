@@ -259,6 +259,7 @@ function showProviderModal(provider: Provider, index?: number) {
 		const baseUrlInput = form.querySelector('[name="baseUrl"]') as HTMLInputElement;
 		const apiKeyInput = form.querySelector('[name="apiKey"]') as HTMLInputElement;
 		const presetSelect = form.querySelector('[name="preset"]') as HTMLSelectElement;
+		const nameContainer = nameInput.closest('.setting-item') as HTMLElement;
 
 		if (presetSelect) {
 			presetSelect.innerHTML = '<option value="">Custom</option>';
@@ -266,18 +267,36 @@ function showProviderModal(provider: Provider, index?: number) {
 				presetSelect.innerHTML += `<option value="${id}">${preset.name}</option>`;
 			});
 
-			presetSelect.addEventListener('change', () => {
-				const selectedPreset = PRESET_PROVIDERS[presetSelect.value as keyof typeof PRESET_PROVIDERS];
-				if (selectedPreset) {
+			// Set Anthropic as default for new providers
+			if (index === undefined) {
+				presetSelect.value = 'anthropic';
+				const selectedPreset = PRESET_PROVIDERS['anthropic'];
+				nameInput.value = selectedPreset.name;
+				baseUrlInput.value = selectedPreset.baseUrl;
+			}
+
+			// Hide/show name field based on preset selection
+			const updateNameVisibility = () => {
+				nameContainer.style.display = presetSelect.value ? 'none' : 'block';
+				if (presetSelect.value) {
+					const selectedPreset = PRESET_PROVIDERS[presetSelect.value as keyof typeof PRESET_PROVIDERS];
 					nameInput.value = selectedPreset.name;
 					baseUrlInput.value = selectedPreset.baseUrl;
 				}
-			});
+			};
+
+			presetSelect.addEventListener('change', updateNameVisibility);
+			
+			// Initial visibility
+			updateNameVisibility();
 		}
 
-		nameInput.value = provider.name;
-		baseUrlInput.value = provider.baseUrl;
-		apiKeyInput.value = provider.apiKey;
+		// Only set these values if editing an existing provider
+		if (index !== undefined) {
+			nameInput.value = provider.name;
+			baseUrlInput.value = provider.baseUrl;
+			apiKeyInput.value = provider.apiKey;
+		}
 	}
 
 	const confirmBtn = modal.querySelector('.provider-confirm-btn');

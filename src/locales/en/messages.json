@@ -691,7 +691,7 @@
 		"message": "Preset"
 	},
 	"providerPresetDescription": {
-		"message": "Choose from a list of common providers or create a custom one."
+		"message": "Choose a provider or create a custom one."
 	},
 	"providerName": {
 		"message": "Provider name"
