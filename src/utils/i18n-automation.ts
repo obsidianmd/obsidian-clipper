@@ -109,6 +109,8 @@ export default class I18nAutomation {
 			throw new Error('OpenAI API key not provided');
 		}
 
+		console.log(`  🤖 Translating: "${message.substring(0, 40)}${message.length > 40 ? '...' : ''}"`);
+
 		const response = await fetch('https://api.openai.com/v1/chat/completions', {
 			method: 'POST',
 			headers: {
@@ -133,48 +135,64 @@ export default class I18nAutomation {
 		}
 
 		const data = await response.json();
-		return data.choices[0].message.content || message;
+		const translatedText = data.choices[0].message.content || message;
+		console.log(`  ✓ Translated to: "${translatedText.substring(0, 40)}${translatedText.length > 40 ? '...' : ''}"`);
+		return translatedText;
 	}
 
 	// Process all locales
-	async processLocales(srcDir: string): Promise<void> {
+	async processLocales(srcDir: string, targetLocale?: string): Promise<void> {
+		console.log('\n🌍 Starting localization process...');
+		
 		// Read source (English) messages
+		console.log(`📖 Reading source messages from ${this.sourceLocale}...`);
 		const sourceFile = path.join(this.localesDir, this.sourceLocale, 'messages.json');
 		const sourceMessages: Messages = JSON.parse(await fs.promises.readFile(sourceFile, 'utf-8'));
+		console.log(`✓ Found ${Object.keys(sourceMessages).length} source messages`);
 
 		// Sort source messages
 		const sortedSourceMessages = this.sortMessages(sourceMessages);
-
-		// Save sorted English messages
 		await fs.promises.writeFile(
 			sourceFile,
 			JSON.stringify(sortedSourceMessages, null, '\t')
 		);
 
-		// Process other locales
+		// Get list of locales to process
 		const locales = await fs.promises.readdir(this.localesDir);
-		
-		for (const locale of locales) {
-			// Skip .DS_Store and other hidden files
-			if (locale.startsWith('.')) {
-				continue;
-			}
+		const localesToProcess = targetLocale 
+			? [targetLocale]
+			: locales.filter(locale => !locale.startsWith('.') && locale !== this.sourceLocale);
 
-			if (locale === this.sourceLocale) continue;
+		console.log(`\n🎯 Processing ${localesToProcess.length} locale(s): ${localesToProcess.join(', ')}`);
+
+		// Process selected locales
+		for (const locale of localesToProcess) {
+			console.log(`\n📝 Processing ${locale}...`);
+			
+			if (!locales.includes(locale)) {
+				console.log(`  Creating new locale directory: ${locale}`);
+				await fs.promises.mkdir(path.join(this.localesDir, locale), { recursive: true });
+			}
 
 			const localeFile = path.join(this.localesDir, locale, 'messages.json');
 			let localeMessages: Messages = {};
 
 			try {
 				localeMessages = JSON.parse(await fs.promises.readFile(localeFile, 'utf-8'));
+				console.log(`  📂 Found existing translations for ${locale}`);
 			} catch (error) {
-				console.log(`Creating new locale: ${locale}`);
+				console.log(`  ⚠️  No existing translations found for ${locale}, creating new file`);
 			}
 
 			// Add missing messages and translate them
-			for (const [key, value] of Object.entries(sortedSourceMessages)) {
-				if (!localeMessages[key]) {
+			const missingKeys = Object.keys(sortedSourceMessages).filter(key => !localeMessages[key]);
+			if (missingKeys.length > 0) {
+				console.log(`  🔍 Found ${missingKeys.length} missing translations`);
+				
+				for (const key of missingKeys) {
+					const value = sortedSourceMessages[key];
 					try {
+						console.log(`  ⚙️  Translating key: ${key}`);
 						const translatedMessage = await this.translateMessage(
 							value.message,
 							locale
@@ -184,15 +202,19 @@ export default class I18nAutomation {
 							...(value.placeholders && { placeholders: value.placeholders })
 						};
 					} catch (error) {
-						console.error(`Failed to translate message ${key} to ${locale}:`, error);
+						console.error(`  ❌ Failed to translate key ${key}:`, error);
 						localeMessages[key] = value;
 					}
 				}
+			} else {
+				console.log(`  ✓ All messages are already translated`);
 			}
 
 			// Remove messages that don't exist in English
-			for (const key of Object.keys(localeMessages)) {
-				if (!sortedSourceMessages[key]) {
+			const obsoleteKeys = Object.keys(localeMessages).filter(key => !sortedSourceMessages[key]);
+			if (obsoleteKeys.length > 0) {
+				console.log(`  🧹 Removing ${obsoleteKeys.length} obsolete messages`);
+				for (const key of obsoleteKeys) {
 					delete localeMessages[key];
 				}
 			}
@@ -203,6 +225,9 @@ export default class I18nAutomation {
 				localeFile,
 				JSON.stringify(sortedLocaleMessages, null, '\t')
 			);
+			console.log(`  💾 Saved translations for ${locale}`);
 		}
+
+		console.log('\n✨ Localization process completed successfully!\n');
 	}
 } 

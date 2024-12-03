@@ -8,6 +8,12 @@
 	"addProperty": {
 		"message": "+ Ajouter une propriété"
 	},
+	"addProvider": {
+		"message": "+ Ajouter un fournisseur"
+	},
+	"addProviderTitle": {
+		"message": "Ajouter un fournisseur"
+	},
 	"addToObsidian": {
 		"message": "Ajouter à Obsidian"
 	},
@@ -26,22 +32,8 @@
 	"alwaysShowHighlightsDescription": {
 		"message": "Affiche vos surlignages sauvegardés lors du chargement d'une page. Désactivez pour n'afficher les surlignages que lorsque le mode surlignage est activé."
 	},
-	"anthropicApiKey": {
-		"message": "Clé API Anthropic"
-	},
-	"anthropicApiKeyDescription": {
-		"message": "Vous pouvez obtenir votre clé API Anthropic $link_start$ici$link_end$.",
-		"placeholders": {
-			"link_end": {
-				"content": "</a>"
-			},
-			"link_start": {
-				"content": "<a href=\"https://console.anthropic.com/settings/keys\" target=\"_blank\">"
-			}
-		}
-	},
-	"anthropicApiKeyPlaceholder": {
-		"message": "Clé API Anthropic"
+	"apiKeyMissing": {
+		"message": "Pas de clé API"
 	},
 	"apiKeysWarning": {
 		"message": "En utilisant un fournisseur externe, vous acceptez leurs conditions d'utilisation et leur politique de confidentialité. Les requêtes de l'interpréteur sont envoyées directement au fournisseur que vous choisissez. Obsidian ne collecte ni ne stocke aucune donnée concernant vos requêtes."
@@ -66,6 +58,9 @@
 	},
 	"cancel": {
 		"message": "Annuler"
+	},
+	"cannotDeleteProvider": {
+		"message": "Impossible de supprimer le fournisseur \"$1\" car il est utilisé par $2 modèle(s)."
 	},
 	"changelog": {
 		"message": "Journal des modifications"
@@ -126,6 +121,9 @@
 	"createNewNote": {
 		"message": "Créer une nouvelle note"
 	},
+	"custom": {
+		"message": "Personnalisé"
+	},
 	"dailyNoteFormat": {
 		"message": "Format de note quotidienne (ex: YYYY-MM-DD)"
 	},
@@ -144,26 +142,17 @@
 	"deleteModelConfirm": {
 		"message": "Êtes-vous sûr de vouloir supprimer ce modèle ?"
 	},
+	"deleteProviderConfirm": {
+		"message": "Êtes-vous sûr de vouloir supprimer ce fournisseur ?"
+	},
 	"disableHighlighter": {
 		"message": "Désactiver le surlignageur"
-	},
-	"display": {
-		"message": "Affichage"
 	},
 	"done": {
 		"message": "terminé"
 	},
 	"dragAndDropFile": {
 		"message": "Glissez et déposez un fichier ici"
-	},
-	"dragAndDropProperties": {
-		"message": "Glissez et déposez un fichier de propriétés ici"
-	},
-	"dragAndDropSettings": {
-		"message": "Glissez et déposez un fichier de paramètres ici"
-	},
-	"dragAndDropTemplate": {
-		"message": "Glissez et déposez un fichier de modèle ici"
 	},
 	"duplicate": {
 		"message": "Dupliquer"
@@ -184,6 +173,9 @@
 	},
 	"editModel": {
 		"message": "Modifier le modèle de langage"
+	},
+	"editProvider": {
+		"message": "Modifier le fournisseur"
 	},
 	"editTemplate": {
 		"message": "Modifier le modèle"
@@ -226,9 +218,6 @@
 	"exportAllSettingsDescription": {
 		"message": "Exporte tous les paramètres, y compris les modèles et les propriétés."
 	},
-	"exportError": {
-		"message": "Erreur lors de l'exportation. Veuillez réessayer."
-	},
 	"exportHighlights": {
 		"message": "Exporter les surlignages"
 	},
@@ -261,8 +250,20 @@
 	"failedToDeleteTemplate": {
 		"message": "Échec de la suppression du modèle. Veuillez réessayer."
 	},
+	"failedToDuplicateTemplate": {
+		"message": "Échec de la duplication du modèle. Veuillez réessayer."
+	},
+	"failedToExportHighlights": {
+		"message": "Échec de l'exportation des surlignages. Veuillez vérifier la console pour plus de détails."
+	},
+	"failedToExportSettings": {
+		"message": "Échec de l'exportation des paramètres. Veuillez vérifier la console pour plus de détails."
+	},
 	"failedToExtractContent": {
 		"message": "Impossible d'extraire le contenu de la page."
+	},
+	"failedToImportTemplate": {
+		"message": "Erreur lors de l'importation du modèle. Veuillez vérifier le fichier et réessayer."
 	},
 	"failedToInitialize": {
 		"message": "Veuillez essayer de recharger l'extension."
@@ -273,11 +274,17 @@
 	"failedToProcessInterpreter": {
 		"message": "Échec du traitement de l'interpréteur. Veuillez réessayer."
 	},
+	"failedToResetTemplate": {
+		"message": "Échec de la réinitialisation du modèle par défaut. Veuillez réessayer."
+	},
 	"failedToSave": {
 		"message": "Échec de l'enregistrement du fichier"
 	},
 	"failedToSaveFile": {
 		"message": "Échec de l'enregistrement du fichier"
+	},
+	"failedToSaveProvider": {
+		"message": "Échec de l'enregistrement du fournisseur. Veuillez réessayer."
 	},
 	"folder": {
 		"message": "Dossier"
@@ -287,6 +294,9 @@
 	},
 	"generalSettings": {
 		"message": "Paramètres généraux"
+	},
+	"getApiKeyHere": {
+		"message": "Obtenez votre clé API $1 ici."
 	},
 	"help": {
 		"message": "Aide"
@@ -318,8 +328,8 @@
 	"importAllSettingsDescription": {
 		"message": "Importe tous les paramètres, y compris les modèles et les propriétés. Cela remplacera votre configuration actuelle."
 	},
-	"importError": {
-		"message": "Erreur lors de l'importation. Veuillez vérifier le fichier et réessayer."
+	"importFailed": {
+		"message": "L'importation a échoué. Veuillez vérifier la console pour plus de détails."
 	},
 	"importModalTitle": {
 		"message": "Importer"
@@ -385,32 +395,11 @@
 	"legacyModeDescription": {
 		"message": "Utilise la méthode d'enregistrement URI compatible avec Obsidian 1.6.7 ou antérieur. Notez que la longueur du contenu que vous pouvez enregistrer est limitée par votre navigateur et votre système d'exploitation. Certaines pages peuvent échouer sans erreur."
 	},
-	"modelApiKey": {
-		"message": "Clé API"
-	},
-	"modelApiKeyDescription": {
-		"message": "Entrez la clé API pour ce modèle. Peut ne pas être requise pour tous les fournisseurs."
-	},
-	"modelApiKeyPlaceholder": {
-		"message": "Clé API"
-	},
-	"modelBaseUrl": {
-		"message": "URL de base"
-	},
-	"modelBaseUrlDescription": {
-		"message": "L'URL du point de terminaison API pour ce modèle."
-	},
-	"modelBaseUrlPlaceholder": {
-		"message": "URL de base"
-	},
 	"modelName": {
 		"message": "Nom du modèle de langage"
 	},
 	"modelNameDescription": {
 		"message": "Le nom du modèle que vous souhaitez afficher dans l'interface."
-	},
-	"modelNamePlaceholder": {
-		"message": "Nom du modèle de langage"
 	},
 	"modelProvider": {
 		"message": "Fournisseur"
@@ -418,20 +407,11 @@
 	"modelProviderDescription": {
 		"message": "Le fournisseur du modèle, par exemple Ollama, OpenRouter, Google, etc."
 	},
-	"providerModelId": {
-		"message": "ID du modèle"
-	},
-	"providerModelIdDescription": {
-		"message": "L'identifiant du modèle de votre fournisseur. Généralement un nom court sans espaces."
-	},
-	"providerModelIdPlaceholder": {
-		"message": "ID du modèle"
-	},
 	"modelProviderPlaceholder": {
 		"message": "Fournisseur"
 	},
-	"modelRequired": {
-		"message": "Le nom du modèle et l'URL de base sont requis."
+	"modelRequiredFields": {
+		"message": "Le nom du modèle, le fournisseur et l'ID du modèle sont requis."
 	},
 	"models": {
 		"message": "Modèles de langage"
@@ -447,6 +427,9 @@
 	},
 	"noTemplates": {
 		"message": "Aucun modèle disponible. Veuillez ajouter un modèle dans les paramètres."
+	},
+	"noUnusedProperties": {
+		"message": "Aucune propriété inutilisée trouvée."
 	},
 	"noteContent": {
 		"message": "Contenu de la note"
@@ -486,23 +469,6 @@
 	"open": {
 		"message": "Ouvrir"
 	},
-	"openaiApiKey": {
-		"message": "Clé API OpenAI"
-	},
-	"openaiApiKeyDescription": {
-		"message": "Vous pouvez obtenir votre clé API OpenAI $link_start$ici$link_end$.",
-		"placeholders": {
-			"link_end": {
-				"content": "</a>"
-			},
-			"link_start": {
-				"content": "<a href=\"https://platform.openai.com/api-keys\" target=\"_blank\">"
-			}
-		}
-	},
-	"openaiApiKeyPlaceholder": {
-		"message": "Clé API OpenAI"
-	},
 	"optional": {
 		"message": "(optionnel)"
 	},
@@ -517,15 +483,6 @@
 	},
 	"pasteJsonHere": {
 		"message": "Collez le JSON ici"
-	},
-	"pastePropertiesJson": {
-		"message": "Collez le JSON des propriétés ici"
-	},
-	"pasteSettingsJson": {
-		"message": "Collez le JSON des paramètres ici"
-	},
-	"pasteTemplateJson": {
-		"message": "Collez le JSON du modèle ici"
 	},
 	"pleaseReload": {
 		"message": "Veuillez essayer de recharger la page."
@@ -550,6 +507,45 @@
 	},
 	"propertyValue": {
 		"message": "Valeur de la propriété"
+	},
+	"provider": {
+		"message": "Fournisseur"
+	},
+	"providerApiKey": {
+		"message": "Clé API"
+	},
+	"providerApiKeyDescription": {
+		"message": "Votre clé API pour ce fournisseur."
+	},
+	"providerBaseUrl": {
+		"message": "URL de base"
+	},
+	"providerBaseUrlDescription": {
+		"message": "L'URL du point de terminaison API pour ce fournisseur."
+	},
+	"providerModelId": {
+		"message": "ID du modèle"
+	},
+	"providerModelIdDescription": {
+		"message": "L'identifiant du modèle de votre fournisseur. Généralement un nom court sans espaces."
+	},
+	"providerModelIdPlaceholder": {
+		"message": "ID du modèle"
+	},
+	"providerName": {
+		"message": "Nom du fournisseur"
+	},
+	"providerNameDescription": {
+		"message": "Nom d'affichage pour ce fournisseur."
+	},
+	"providerPreset": {
+		"message": "Préréglage"
+	},
+	"providerPresetDescription": {
+		"message": "Choisissez un fournisseur ou créez-en un personnalisé."
+	},
+	"providerRequiredFields": {
+		"message": "Le nom du fournisseur et l'URL de base sont requis."
 	},
 	"providers": {
 		"message": "Fournisseurs"
@@ -593,23 +589,23 @@
 	"searchVariables": {
 		"message": "Rechercher des variables..."
 	},
+	"selectProvider": {
+		"message": "Sélectionnez un fournisseur"
+	},
+	"selectTemplateToExport": {
+		"message": "Veuillez sélectionner un modèle à exporter."
+	},
 	"settings": {
 		"message": "Paramètres"
 	},
 	"settingsHeading": {
 		"message": "Paramètres"
 	},
-	"settingsImported": {
-		"message": "Paramètres importés avec succès. Veuillez actualiser la page pour voir les changements."
+	"settingsImportSuccess": {
+		"message": "Tous les paramètres ont été importés avec succès. Veuillez rafraîchir la page pour voir les modifications."
 	},
 	"share": {
 		"message": "Partager..."
-	},
-	"shareError": {
-		"message": "Erreur lors du partage"
-	},
-	"sharedFromClipper": {
-		"message": "Partagé depuis Obsidian Web Clipper"
 	},
 	"shortcutInstructionsBrave": {
 		"message": "Pour modifier les assignations de touches, allez à $1"
@@ -683,6 +679,9 @@
 	"thinking": {
 		"message": "réflexion"
 	},
+	"unknownProvider": {
+		"message": "Fournisseur inconnu"
+	},
 	"updateAvailable": {
 		"message": "Une mise à jour est disponible."
 	},
@@ -719,17 +718,5 @@
 	},
 	"version": {
 		"message": "Version"
-	},
-	"unknownProvider": {
-		"message": "Fournisseur inconnu"
-	},
-	"apiKeyMissing": {
-		"message": "Pas de clé API"
-	},
-	"custom": {
-		"message": "Personnalisé"
-	},
-	"getApiKeyHere": {
-		"message": "Obtenez votre clé API $1 ici."
 	}
 }
