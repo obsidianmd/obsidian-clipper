@@ -55,17 +55,6 @@ export function getLocalStorage(key: string): Promise<any> {
 	return browser.storage.local.get(key).then((result: {[key: string]: any}) => result[key]);
 }
 
-interface LegacyModelConfig {
-	id: string;
-	name: string;
-	provider?: string;
-	providerId?: string;
-	baseUrl?: string;
-	apiKey?: string;
-	enabled: boolean;
-	providerModelId?: string;
-}
-
 interface StorageData {
 	general_settings?: {
 		showMoreActionsButton?: boolean;
@@ -97,211 +86,191 @@ interface StorageData {
 	history?: HistoryEntry[];
 }
 
-// interface LegacyStorageData extends StorageData {
-// 	openaiApiKey?: string;
-// 	anthropicApiKey?: string;
-// 	openaiModel?: string;
-// 	interpreter_settings?: {
-// 		openaiApiKey?: string;
-// 		anthropicApiKey?: string;
-// 		interpreterModel?: string;
-// 		models?: LegacyModelConfig[];
-// 		providers?: Provider[];
-// 		interpreterEnabled?: boolean;
-// 		interpreterAutoRun?: boolean;
-// 		defaultPromptContext?: string;
-// 	};
-// }
+interface LegacyModelConfig {
+	id: string;
+	name: string;
+	provider?: string;
+	providerId?: string;
+	baseUrl?: string;
+	apiKey?: string;
+	enabled: boolean;
+	providerModelId?: string;
+}
 
-// async function migrateModelsAndProviders(data: LegacyStorageData, defaultSettings: Settings): Promise<{ models: ModelConfig[], providers: Provider[] }> {
+interface LegacyInterpreterSettings {
+	openaiApiKey?: string;
+	anthropicApiKey?: string;
+	interpreterModel?: string;
+	models?: LegacyModelConfig[];
+	providers?: Provider[];
+	interpreterEnabled?: boolean;
+	interpreterAutoRun?: boolean;
+	defaultPromptContext?: string;
+}
+
+interface LegacyStorageData {
+	general_settings?: {
+		showMoreActionsButton?: boolean;
+		betaFeatures?: boolean;
+		legacyMode?: boolean;
+		silentOpen?: boolean;
+	};
+	vaults?: string[];
+	highlighter_settings?: {
+		highlighterEnabled?: boolean;
+		alwaysShowHighlights?: boolean;
+		highlightBehavior?: string;
+	};
+	interpreter_settings?: LegacyInterpreterSettings;
+	property_types?: PropertyType[];
+	stats?: {
+		addToObsidian: number;
+		saveFile: number;
+		copyToClipboard: number;
+		share: number;
+	};
+	history?: HistoryEntry[];
+	openaiApiKey?: string;
+	anthropicApiKey?: string;
+	openaiModel?: string;
+	migrationVersion?: number;
+}
+
+const CURRENT_MIGRATION_VERSION = 1;
+
+async function needsMigration(data: LegacyStorageData): Promise<boolean> {
+	// Check if migration has already been run
+	if (data.migrationVersion === CURRENT_MIGRATION_VERSION) {
+		return false;
+	}
+
+	// Check for presence of legacy API key fields
+	return !!(data.anthropicApiKey || 
+		data.openaiApiKey || 
+		data.interpreter_settings?.anthropicApiKey || 
+		data.interpreter_settings?.openaiApiKey ||
+		data.interpreter_settings?.models?.some(m => m.provider || m.apiKey));
+}
+
+async function migrateModelsAndProviders(data: LegacyStorageData): Promise<{ models: ModelConfig[], providers: Provider[] }> {
+	debugLog('Migration', 'Starting models and providers migration');
 	
-// 	// Start with default providers
-// 	let providers = data.interpreter_settings?.providers || defaultSettings.providers;
-// 	let models = data.interpreter_settings?.models || defaultSettings.models;
+	try {
+		// Start with default providers
+		let providers: Provider[] = [
+			{
+				id: 'openai',
+				name: 'OpenAI',
+				baseUrl: 'https://api.openai.com/v1/chat/completions',
+				apiKey: ''
+			},
+			{
+				id: 'anthropic',
+				name: 'Anthropic',
+				baseUrl: 'https://api.anthropic.com/v1/messages',
+				apiKey: ''
+			}
+		];
 
-// 	// Check for legacy keys in both locations
-// 	const hasLegacyKeys = data.anthropicApiKey || 
-// 		data.openaiApiKey || 
-// 		data.interpreter_settings?.anthropicApiKey || 
-// 		data.interpreter_settings?.openaiApiKey;
+		// Migrate API keys to providers
+		const openaiApiKey = data.openaiApiKey || data.interpreter_settings?.openaiApiKey || '';
+		const anthropicApiKey = data.anthropicApiKey || data.interpreter_settings?.anthropicApiKey || '';
 
-// 	debugLog('Settings', 'Legacy keys check:', {
-// 		topLevelAnthropicKey: data.anthropicApiKey,
-// 		topLevelOpenAIKey: data.openaiApiKey,
-// 		interpreterAnthropicKey: data.interpreter_settings?.anthropicApiKey,
-// 		interpreterOpenAIKey: data.interpreter_settings?.openaiApiKey,
-// 		hasLegacyKeys
-// 	});
+		if (openaiApiKey) {
+			const openaiProvider = providers.find(p => p.id === 'openai');
+			if (openaiProvider) {
+				openaiProvider.apiKey = openaiApiKey;
+				debugLog('Migration', 'Migrated OpenAI API key');
+			}
+		}
 
-// 	if (hasLegacyKeys) {
-// 		debugLog('Settings', 'Detected legacy API keys, running migration');
-// 		let needsSave = false;
+		if (anthropicApiKey) {
+			const anthropicProvider = providers.find(p => p.id === 'anthropic');
+			if (anthropicProvider) {
+				anthropicProvider.apiKey = anthropicApiKey;
+				debugLog('Migration', 'Migrated Anthropic API key');
+			}
+		}
 
-// 		// Migrate OpenAI API key - check all possible locations
-// 		const openaiApiKey = data.openaiApiKey || data.interpreter_settings?.openaiApiKey || '';
-// 		if (openaiApiKey) {
-// 			const openaiProvider = providers.find(p => p.id === 'openai');
-// 			debugLog('Settings', 'OpenAI migration:', { openaiApiKey, openaiProvider });
-// 			if (openaiProvider) {
-// 				openaiProvider.apiKey = openaiApiKey;
-// 				needsSave = true;
-// 				debugLog('Settings', 'Migrated OpenAI API key');
-// 			}
-// 		}
+		// Create a map to track custom providers
+		const customProviders = new Map<string, Provider>();
 
-// 		// Migrate Anthropic API key - check all possible locations
-// 		const anthropicApiKey = data.anthropicApiKey || data.interpreter_settings?.anthropicApiKey || '';
-// 		if (anthropicApiKey) {
-// 			const anthropicProvider = providers.find(p => p.id === 'anthropic');
-// 			debugLog('Settings', 'Anthropic migration:', { anthropicApiKey, anthropicProvider });
-// 			if (anthropicProvider) {
-// 				anthropicProvider.apiKey = anthropicApiKey;
-// 				needsSave = true;
-// 				debugLog('Settings', 'Migrated Anthropic API key');
-// 			}
-// 		}
-
-// 		// Clean up old keys if needed
-// 		if (needsSave) {
-// 			try {
-// 				debugLog('Settings', 'Starting migration cleanup...');
-
-// 				// First save the updated interpreter settings
-// 				const updatedInterpreterSettings = {
-// 					...data.interpreter_settings,
-// 					providers,
-// 				};
-
-// 				debugLog('Settings', 'Saving updated interpreter settings:', updatedInterpreterSettings);
-// 				await browser.storage.sync.set({ 
-// 					interpreter_settings: updatedInterpreterSettings
-// 				});
-
-// 				// Then clear out the old keys by setting them to null (undefined doesn't work in Chrome storage)
-// 				debugLog('Settings', 'Clearing legacy keys...');
-// 				await browser.storage.sync.remove(['anthropicApiKey', 'openaiApiKey', 'openaiModel']);
-
-// 				// Verify the cleanup
-// 				const verifyData = await browser.storage.sync.get(null);
-// 				debugLog('Settings', 'Storage after cleanup:', verifyData);
-
-// 			} catch (error) {
-// 				console.error('Error during migration cleanup:', error);
-// 				debugLog('Settings', 'Migration error:', error);
-// 			}
-// 		} else {
-// 			debugLog('Settings', 'No changes needed during migration');
-// 		}
-
-// 		// Update any OpenAI or Anthropic models to use the correct provider IDs
-// 		models = models.map(model => {
-// 			const legacyModel = model as LegacyModelConfig;
-			
-// 			// Create a new ModelConfig object
-// 			const updatedModel: ModelConfig = {
-// 				id: legacyModel.id,
-// 				providerId: '',
-// 				providerModelId: legacyModel.id,
-// 				name: legacyModel.name,
-// 				enabled: legacyModel.enabled
-// 			};
-			
-// 			// Update legacy OpenAI models
-// 			if (legacyModel.provider === 'OpenAI' || legacyModel.name.toLowerCase().includes('gpt')) {
-// 				updatedModel.providerId = 'openai';
-// 				updatedModel.providerModelId = legacyModel.id;
-// 			}
-			
-// 			// Update legacy Anthropic models
-// 			if (legacyModel.provider === 'Anthropic' || legacyModel.name.toLowerCase().includes('claude')) {
-// 				updatedModel.providerId = 'anthropic';
-// 				updatedModel.providerModelId = legacyModel.id;
-// 			}
-
-// 			return updatedModel;
-// 		});
-// 	}
-
-// 	// Handle any remaining custom providers from models
-// 	if (models?.length) {
-// 		const customProviders = new Map<string, Provider>();
-
-// 		// First pass: collect all unique providers from existing models
-// 		models.forEach((model) => {
-// 			const legacyModel = model as LegacyModelConfig;
-// 			if (legacyModel.provider && 
-// 				!customProviders.has(legacyModel.provider) && 
-// 				!providers.some(p => p.name === legacyModel.provider) &&
-// 				legacyModel.provider !== 'OpenAI' && 
-// 				legacyModel.provider !== 'Anthropic') {
+		// Get legacy models
+		const legacyModels = data.interpreter_settings?.models || [];
+		
+		// First pass: collect all unique custom providers
+		legacyModels.forEach((model) => {
+			if (model.provider && 
+				!customProviders.has(model.provider) && 
+				!providers.some(p => p.name === model.provider) &&
+				model.provider !== 'OpenAI' && 
+				model.provider !== 'Anthropic') {
 				
-// 				// Create a new provider from the model's provider info
-// 				const newProvider: Provider = {
-// 					id: legacyModel.provider.toLowerCase().replace(/\s+/g, '-'),
-// 					name: legacyModel.provider,
-// 					baseUrl: legacyModel.baseUrl || '',
-// 					apiKey: legacyModel.apiKey || ''
-// 				};
-// 				customProviders.set(legacyModel.provider, newProvider);
-// 			}
-// 		});
+				const providerId = model.provider.toLowerCase().replace(/\s+/g, '-');
+				const newProvider: Provider = {
+					id: providerId,
+					name: model.provider,
+					baseUrl: model.baseUrl || '',
+					apiKey: model.apiKey || ''
+				};
+				customProviders.set(model.provider, newProvider);
+				debugLog('Migration', `Created custom provider: ${model.provider}`);
+			}
+		});
 
-// 		// Add custom providers to our providers list
-// 		providers = [
-// 			...providers,
-// 			...Array.from(customProviders.values())
-// 		];
+		// Add custom providers to our providers list
+		providers = [...providers, ...Array.from(customProviders.values())];
 
-// 		// Second pass: ensure all models have proper provider references
-// 		models = models.map((model) => {
-// 			const legacyModel = model as LegacyModelConfig;
-			
-// 			// Skip if already processed in the OpenAI/Anthropic pass
-// 			if (model.providerId === 'openai' || model.providerId === 'anthropic') {
-// 				return model as ModelConfig;
-// 			}
+		// Second pass: create migrated models
+		const models: ModelConfig[] = legacyModels.map((model): ModelConfig => {
+			let providerId = '';
 
-// 			let providerId: string = '';
-// 			if (legacyModel.provider) {
-// 				const customProvider = customProviders.get(legacyModel.provider);
-// 				providerId = customProvider?.id || legacyModel.provider.toLowerCase().replace(/\s+/g, '-');
-// 			}
+			if (model.provider === 'OpenAI' || model.name.toLowerCase().includes('gpt')) {
+				providerId = 'openai';
+			} else if (model.provider === 'Anthropic' || model.name.toLowerCase().includes('claude')) {
+				providerId = 'anthropic';
+			} else if (model.provider) {
+				const customProvider = customProviders.get(model.provider);
+				providerId = customProvider?.id || model.provider.toLowerCase().replace(/\s+/g, '-');
+			}
 
-// 			const updatedModel: ModelConfig = {
-// 				id: legacyModel.id,
-// 				providerId,
-// 				providerModelId: legacyModel.id,
-// 				name: legacyModel.name,
-// 				enabled: legacyModel.enabled
-// 			};
+			return {
+				id: model.id,
+				providerId,
+				providerModelId: model.id,
+				name: model.name,
+				enabled: model.enabled
+			};
+		});
 
-// 			return updatedModel;
-// 		});
-// 	}
+		debugLog('Migration', `Migrated ${models.length} models`);
 
-// 	return { 
-// 		models: models as ModelConfig[], 
-// 		providers 
-// 	};
-// }
+		// Save migration version
+		await browser.storage.sync.set({ migrationVersion: CURRENT_MIGRATION_VERSION });
+
+		// Clean up legacy fields
+		await browser.storage.sync.remove([
+			'anthropicApiKey',
+			'openaiApiKey',
+			'openaiModel'
+		]);
+
+		debugLog('Migration', 'Migration completed successfully');
+
+		return {
+			models: models as ModelConfig[],
+			providers
+		};
+	} catch (error) {
+		console.error('Migration failed:', error);
+		debugLog('Migration', 'Migration failed:', error);
+		throw error;
+	}
+}
 
 export async function loadSettings(): Promise<Settings> {
-	const data = await browser.storage.sync.get([
-		'general_settings', 
-		'vaults', 
-		'highlighter_settings', 
-		'interpreter_settings',
-		'property_types',
-		'stats',
-		// Also get legacy keys to check if migration is needed
-		'anthropicApiKey',
-		'openaiApiKey',
-		'openaiModel'
-	]) as StorageData;
-
-	const localData = await browser.storage.local.get('history');
-	const history = (localData.history || []) as HistoryEntry[];
-
+	const data = await browser.storage.sync.get(null) as LegacyStorageData;
+	
 	// Load default settings first
 	const defaultSettings: Settings = {
 		vaults: [],
@@ -328,7 +297,21 @@ export async function loadSettings(): Promise<Settings> {
 		history: []
 	};
 
-
+	if (await needsMigration(data)) {
+		debugLog('Settings', 'Starting migration...');
+		try {
+			const { models, providers } = await migrateModelsAndProviders(data);
+			data.interpreter_settings = {
+				...data.interpreter_settings,
+				models,
+				providers
+			};
+			debugLog('Settings', 'Migration completed');
+		} catch (error) {
+			console.error('Migration failed:', error);
+			debugLog('Settings', 'Migration failed, using default settings');
+		}
+	}
 
 	// Load user settings
 	const loadedSettings: Settings = {
@@ -341,14 +324,14 @@ export async function loadSettings(): Promise<Settings> {
 		alwaysShowHighlights: data.highlighter_settings?.alwaysShowHighlights ?? defaultSettings.alwaysShowHighlights,
 		highlightBehavior: data.highlighter_settings?.highlightBehavior ?? defaultSettings.highlightBehavior,
 		interpreterModel: data.interpreter_settings?.interpreterModel || defaultSettings.interpreterModel,
-		models: data.interpreter_settings?.models || defaultSettings.models,
+		models: (data.interpreter_settings?.models as ModelConfig[]) || defaultSettings.models,
 		providers: data.interpreter_settings?.providers || defaultSettings.providers,
 		interpreterEnabled: data.interpreter_settings?.interpreterEnabled ?? defaultSettings.interpreterEnabled,
 		interpreterAutoRun: data.interpreter_settings?.interpreterAutoRun ?? defaultSettings.interpreterAutoRun,
 		defaultPromptContext: data.interpreter_settings?.defaultPromptContext || defaultSettings.defaultPromptContext,
 		propertyTypes: data.property_types || defaultSettings.propertyTypes,
 		stats: data.stats || defaultSettings.stats,
-		history: history
+		history: data.history || defaultSettings.history
 	};
 
 	generalSettings = loadedSettings;
