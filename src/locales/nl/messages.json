@@ -1,0 +1,722 @@
+{
+	"addModel": {
+		"message": "+ Model toevoegen"
+	},
+	"addModelTitle": {
+		"message": "Model toevoegen"
+	},
+	"addProperty": {
+		"message": "+ Eigenschap toevoegen"
+	},
+	"addProvider": {
+		"message": "+ Provider toevoegen"
+	},
+	"addProviderTitle": {
+		"message": "Provider toevoegen"
+	},
+	"addToObsidian": {
+		"message": "Toevoegen aan Obsidian"
+	},
+	"addVaultPlaceholder": {
+		"message": "Druk op Enter om een kluis toe te voegen"
+	},
+	"advanced": {
+		"message": "Geavanceerd"
+	},
+	"allProperties": {
+		"message": "Alle eigenschappen"
+	},
+	"alwaysShowHighlights": {
+		"message": "Markeringen altijd tonen"
+	},
+	"alwaysShowHighlightsDescription": {
+		"message": "Toon je opgeslagen markeringen wanneer je een pagina laadt. Schakel uit om markeringen alleen te tonen wanneer de markeerder actief is."
+	},
+	"apiKeyMissing": {
+		"message": "Geen API-sleutel"
+	},
+	"apiKeysWarning": {
+		"message": "Door een externe provider te gebruiken ga je akkoord met hun voorwaarden en privacybeleid. Interpreter-verzoeken worden direct naar de provider van jouw keuze gestuurd. Obsidian verzamelt of bewaart geen gegevens over je verzoeken."
+	},
+	"appendToDaily": {
+		"message": "Toevoegen aan dagelijkse notitie, onderaan"
+	},
+	"appendToExisting": {
+		"message": "Toevoegen aan bestaande notitie, onderaan"
+	},
+	"autoRunInterpreter": {
+		"message": "Automatisch uitvoeren"
+	},
+	"autoRunInterpreterDescription": {
+		"message": "Voer prompt-variabelen direct uit als het sjabloon deze bevat. Dit verbruikt API-credits bij je model-provider. Schakel uit als je de interpreter alleen handmatig wilt uitvoeren."
+	},
+	"behavior": {
+		"message": "Gedrag"
+	},
+	"behaviorWarning": {
+		"message": "Toevoegen aan een bestaande notitie of dagelijkse notitie vereist Obsidian 1.7.2 of hoger."
+	},
+	"cancel": {
+		"message": "Annuleren"
+	},
+	"cannotDeleteProvider": {
+		"message": "Kan provider \"$1\" niet verwijderen omdat deze wordt gebruikt door $2 model(len)."
+	},
+	"changelog": {
+		"message": "Wijzigingslogboek"
+	},
+	"chooseFile": {
+		"message": "Kies een bestand"
+	},
+	"choosePropertiesFile": {
+		"message": "Kies eigenschappenbestand"
+	},
+	"chooseSettingsFile": {
+		"message": "Kies instellingenbestand"
+	},
+	"chooseTemplateFile": {
+		"message": "Kies sjabloonbestand"
+	},
+	"clipBehavior": {
+		"message": "Clip-gedrag"
+	},
+	"clipBehaviorDescription": {
+		"message": "Kies hoe gemarkeerde inhoud wordt opgeslagen in Obsidian. Definieert de $strong_start${{content}}$strong_end$ variabele.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"close": {
+		"message": "Sluiten"
+	},
+	"commandOpenClipper": {
+		"message": "Open Obsidian Clipper"
+	},
+	"commandQuickClip": {
+		"message": "Snel knippen"
+	},
+	"commandToggleHighlighter": {
+		"message": "Markeerder in-/uitschakelen"
+	},
+	"confirmDeleteTemplate": {
+		"message": "Weet je zeker dat je het sjabloon \"$1\" wilt verwijderen?"
+	},
+	"confirmReplaceSettings": {
+		"message": "Dit vervangt al je huidige instellingen, inclusief sjablonen en eigenschappen. Weet je zeker dat je wilt doorgaan?"
+	},
+	"copied": {
+		"message": "Gekopieerd!"
+	},
+	"copyAsJson": {
+		"message": "Kopiëren als JSON"
+	},
+	"copyToClipboard": {
+		"message": "Kopiëren naar klembord"
+	},
+	"createNewNote": {
+		"message": "Nieuwe notitie maken"
+	},
+	"custom": {
+		"message": "Aangepast"
+	},
+	"dailyNoteFormat": {
+		"message": "Dagelijkse notitie formaat (bijv. YYYY-MM-DD)"
+	},
+	"defaultInterpreterContext": {
+		"message": "Standaard interpreter context"
+	},
+	"defaultInterpreterContextDescription": {
+		"message": "Het model gebruikt deze context om prompt-variabelen te interpreteren. Variabelen en filters kunnen hier worden gebruikt."
+	},
+	"defaultTemplateName": {
+		"message": "Standaard"
+	},
+	"delete": {
+		"message": "Verwijderen"
+	},
+	"deleteModelConfirm": {
+		"message": "Weet je zeker dat je dit model wilt verwijderen?"
+	},
+	"deleteProviderConfirm": {
+		"message": "Weet je zeker dat je deze provider wilt verwijderen?"
+	},
+	"disableHighlighter": {
+		"message": "Markeerder uitschakelen"
+	},
+	"done": {
+		"message": "Klaar"
+	},
+	"dragAndDropFile": {
+		"message": "Sleep bestand hierheen"
+	},
+	"duplicate": {
+		"message": "Dupliceren"
+	},
+	"earlyAccessDescription": {
+		"message": "Gebruik functies die de nieuwste $link_start$early access versie$link_end$ van Obsidian vereisen. Momenteel is Obsidian 1.7.2 of hoger vereist.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/Obsidian/Early+access+versions\" target=\"_blank\">"
+			}
+		}
+	},
+	"earlyAccessFeatures": {
+		"message": "Early access functies"
+	},
+	"editModel": {
+		"message": "Model bewerken"
+	},
+	"editProvider": {
+		"message": "Provider bewerken"
+	},
+	"editTemplate": {
+		"message": "Sjabloon bewerken"
+	},
+	"enableHighlighter": {
+		"message": "Markeerder inschakelen"
+	},
+	"enableHighlighterDescription": {
+		"message": "Markeer inhoud op webpagina's die je kunt opslaan in Obsidian."
+	},
+	"enableInterpreter": {
+		"message": "Interpreter inschakelen"
+	},
+	"enableInterpreterDescription": {
+		"message": "Gebruik natuurlijke taal om gegevens uit pagina's te halen. Je kunt bijvoorbeeld de sjabloonsyntax $strong_start${{\"een samenvatting van de pagina\"}}$strong_end$ gebruiken. Vereist een API-sleutel of aangepast model hieronder geconfigureerd. $link_start$Meer informatie$link_end$",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/interpreter\" target=\"_blank\">"
+			},
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"error": {
+		"message": "Fout"
+	},
+	"export": {
+		"message": "Exporteren"
+	},
+	"exportAllSettings": {
+		"message": "Alle instellingen exporteren"
+	},
+	"exportAllSettingsDescription": {
+		"message": "Exporteer alle instellingen inclusief sjablonen en eigenschappen."
+	},
+	"exportHighlights": {
+		"message": "Markeringen exporteren"
+	},
+	"exportHighlightsDescription": {
+		"message": "Exporteer je markeringen naar een bestand."
+	},
+	"exportProperties": {
+		"message": "Eigenschappen exporteren"
+	},
+	"exportPropertiesDescription": {
+		"message": "Sla Web Clipper eigenschappen op in een $strong_start$types.json$strong_end$ bestand dat kan worden geïmporteerd in je Obsidian kluis of in Web Clipper op andere apparaten.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"extensionDescription": {
+		"message": "Sla webinhoud op in een privé en duurzaam formaat dat je offline kunt bekijken. De officiële browserextensie voor Obsidian."
+	},
+	"extensionName": {
+		"message": "Obsidian Web Clipper"
+	},
+	"failedToCopyText": {
+		"message": "Tekst kopiëren mislukt"
+	},
+	"failedToDeleteTemplate": {
+		"message": "Sjabloon verwijderen mislukt. Probeer het opnieuw."
+	},
+	"failedToDuplicateTemplate": {
+		"message": "Sjabloon dupliceren mislukt. Probeer het opnieuw."
+	},
+	"failedToExportHighlights": {
+		"message": "Markeringen exporteren mislukt. Controleer de console voor meer details."
+	},
+	"failedToExportSettings": {
+		"message": "Instellingen exporteren mislukt. Controleer de console voor meer details."
+	},
+	"failedToExtractContent": {
+		"message": "Kan pagina-inhoud niet ophalen."
+	},
+	"failedToImportTemplate": {
+		"message": "Fout bij importeren sjabloon. Controleer het bestand en probeer het opnieuw."
+	},
+	"failedToInitialize": {
+		"message": "Probeer de extensie opnieuw te laden."
+	},
+	"failedToInitializeContent": {
+		"message": "Kan pagina-inhoud niet initialiseren."
+	},
+	"failedToProcessInterpreter": {
+		"message": "Interpreter verwerking mislukt. Probeer het opnieuw."
+	},
+	"failedToResetTemplate": {
+		"message": "Standaard sjabloon resetten mislukt. Probeer het opnieuw."
+	},
+	"failedToSave": {
+		"message": "Bestand opslaan mislukt"
+	},
+	"failedToSaveFile": {
+		"message": "Bestand opslaan mislukt"
+	},
+	"failedToSaveProvider": {
+		"message": "Provider opslaan mislukt. Probeer het opnieuw."
+	},
+	"folder": {
+		"message": "Map"
+	},
+	"general": {
+		"message": "Algemeen"
+	},
+	"generalSettings": {
+		"message": "Algemene instellingen"
+	},
+	"getApiKeyHere": {
+		"message": "Haal je $1 API-sleutel hier op."
+	},
+	"help": {
+		"message": "Help"
+	},
+	"helpDescription": {
+		"message": "Leer hoe je Web Clipper gebruikt en krijg hulp bij probleemoplossing."
+	},
+	"highlightInline": {
+		"message": "Markeer de pagina-inhoud"
+	},
+	"highlightPage": {
+		"message": "Pagina markeren"
+	},
+	"highlighter": {
+		"message": "Markeerder"
+	},
+	"highlighterSettings": {
+		"message": "Markeerder"
+	},
+	"hotkeys": {
+		"message": "Sneltoetsen"
+	},
+	"import": {
+		"message": "Importeren"
+	},
+	"importAllSettings": {
+		"message": "Alle instellingen importeren"
+	},
+	"importAllSettingsDescription": {
+		"message": "Importeer alle instellingen inclusief sjablonen en eigenschappen. Dit vervangt je huidige configuratie."
+	},
+	"importFailed": {
+		"message": "Importeren mislukt. Controleer de console voor meer details."
+	},
+	"importModalTitle": {
+		"message": "Importeren"
+	},
+	"importProperties": {
+		"message": "Eigenschappen importeren"
+	},
+	"importPropertiesDescription": {
+		"message": "Om je eigenschappen uit Obsidian te importeren, zoek het $strong_1_start$types.json$strong_1_end$ bestand in de $strong_2_start$.obsidian$strong_2_end$ map in je kluis. Deze map is standaard verborgen op de meeste besturingssystemen.",
+		"placeholders": {
+			"strong_1_end": {
+				"content": "</strong>"
+			},
+			"strong_1_start": {
+				"content": "<strong>"
+			},
+			"strong_2_end": {
+				"content": "</strong>"
+			},
+			"strong_2_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"importSettings": {
+		"message": "Instellingen importeren"
+	},
+	"importTemplate": {
+		"message": "Sjabloon importeren"
+	},
+	"interpret": {
+		"message": "interpreteren"
+	},
+	"interpreter": {
+		"message": "Interpreter"
+	},
+	"interpreterContext": {
+		"message": "Interpreter context"
+	},
+	"interpreterContextDescription": {
+		"message": "De context die wordt gebruikt om prompt-variabelen te interpreteren. Overschrijft de standaard context gedefinieerd in $link_start$Interpreter instellingen$link_end$. Variabelen kunnen hier worden gebruikt.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=interpreter\">"
+			}
+		}
+	},
+	"language": {
+		"message": "Taal"
+	},
+	"languageDescription": {
+		"message": "Kies de weergavetaal voor de extensie-interface."
+	},
+	"lastUsed": {
+		"message": "Laatst gebruikt"
+	},
+	"legacyMode": {
+		"message": "Legacy-modus"
+	},
+	"legacyModeDescription": {
+		"message": "Gebruikt de URI-clipmethode die compatibel is met Obsidian 1.6.7 of eerder. De lengte van de inhoud die je kunt knippen wordt beperkt door je browser en besturingssysteem. Sommige pagina's kunnen zonder foutmelding mislukken."
+	},
+	"modelName": {
+		"message": "Modelnaam"
+	},
+	"modelNameDescription": {
+		"message": "De naam van het model dat je wilt weergeven in de interface."
+	},
+	"modelProvider": {
+		"message": "Provider"
+	},
+	"modelProviderDescription": {
+		"message": "De provider van het model, bijvoorbeeld Ollama, OpenRouter, Google, etc."
+	},
+	"modelProviderPlaceholder": {
+		"message": "Provider"
+	},
+	"modelRequiredFields": {
+		"message": "Modelnaam, Provider en Model-ID zijn verplicht."
+	},
+	"models": {
+		"message": "Modellen"
+	},
+	"more": {
+		"message": "Meer"
+	},
+	"newTemplate": {
+		"message": "Nieuw sjabloon"
+	},
+	"noHighlights": {
+		"message": "Niets doen"
+	},
+	"noTemplates": {
+		"message": "Geen sjablonen beschikbaar. Voeg een sjabloon toe in de instellingen."
+	},
+	"noUnusedProperties": {
+		"message": "Geen ongebruikte eigenschappen gevonden."
+	},
+	"noteContent": {
+		"message": "Notitie-inhoud"
+	},
+	"noteContentDescription": {
+		"message": "Pas de inhoud van de notitie aan. Gebruik variabelen om gegevens van de pagina vooraf in te vullen."
+	},
+	"noteLocation": {
+		"message": "Notitielocatie"
+	},
+	"noteLocationDescription": {
+		"message": "De map of het pad van de notitie."
+	},
+	"noteName": {
+		"message": "Notitienaam"
+	},
+	"noteNameFormat": {
+		"message": "Notitienaam"
+	},
+	"noteNameFormatDescription": {
+		"message": "Formaat voor de bestandsnaam van de notitie. Je kunt variabelen zoals {{title}}, {{date}} en {{published}} gebruiken om gegevens van de pagina vooraf in te vullen. $link_start$Meer informatie$link_end$.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/variables\" target=\"_blank\">"
+			}
+		}
+	},
+	"notesAboutPage": {
+		"message": "Notities over deze pagina..."
+	},
+	"onlyHttpSupported": {
+		"message": "Deze pagina kan niet worden geknipt. Alleen http- en https-URL's worden ondersteund."
+	},
+	"open": {
+		"message": "Openen"
+	},
+	"optional": {
+		"message": "(optioneel)"
+	},
+	"orPasteBelow": {
+		"message": "Of plak inhoud hieronder"
+	},
+	"pageCannotBeClipped": {
+		"message": "Deze pagina kan niet worden geknipt."
+	},
+	"pageVariables": {
+		"message": "Paginavariabelen"
+	},
+	"pasteJsonHere": {
+		"message": "Plak JSON hier"
+	},
+	"pleaseReload": {
+		"message": "Probeer de pagina opnieuw te laden."
+	},
+	"prependToDaily": {
+		"message": "Toevoegen aan dagelijkse notitie, bovenaan"
+	},
+	"prependToExisting": {
+		"message": "Toevoegen aan bestaande notitie, bovenaan"
+	},
+	"processing": {
+		"message": "verwerken"
+	},
+	"properties": {
+		"message": "Eigenschappen"
+	},
+	"propertiesSettings": {
+		"message": "Eigenschappen"
+	},
+	"propertyName": {
+		"message": "Eigenschapnaam"
+	},
+	"propertyValue": {
+		"message": "Eigenschapwaarde"
+	},
+	"provider": {
+		"message": "Provider"
+	},
+	"providerApiKey": {
+		"message": "API-sleutel"
+	},
+	"providerApiKeyDescription": {
+		"message": "Je API-sleutel voor deze provider."
+	},
+	"providerBaseUrl": {
+		"message": "Basis-URL"
+	},
+	"providerBaseUrlDescription": {
+		"message": "De API-endpoint URL voor deze provider."
+	},
+	"providerModelId": {
+		"message": "Model-ID"
+	},
+	"providerModelIdDescription": {
+		"message": "De identifier van het model van je provider. Meestal een korte naam zonder spaties."
+	},
+	"providerModelIdPlaceholder": {
+		"message": "Model-ID"
+	},
+	"providerName": {
+		"message": "Providernaam"
+	},
+	"providerNameDescription": {
+		"message": "Weergavenaam voor deze provider."
+	},
+	"providerPreset": {
+		"message": "Voorinstelling"
+	},
+	"providerPresetDescription": {
+		"message": "Kies een provider of maak een aangepaste aan."
+	},
+	"providerRequiredFields": {
+		"message": "Providernaam en basis-URL zijn verplicht."
+	},
+	"providers": {
+		"message": "Providers"
+	},
+	"refresh": {
+		"message": "Vernieuwen"
+	},
+	"remove": {
+		"message": "Verwijderen"
+	},
+	"removeProperty": {
+		"message": "Eigenschap verwijderen"
+	},
+	"removeUnusedProperties": {
+		"message": "Ongebruikte eigenschappen verwijderen"
+	},
+	"removeUnusedPropertiesDescription": {
+		"message": "Verwijder alle eigenschappen die in geen enkel sjabloon worden gebruikt."
+	},
+	"removeVault": {
+		"message": "Kluis verwijderen"
+	},
+	"replaceContent": {
+		"message": "Pagina-inhoud vervangen"
+	},
+	"reset": {
+		"message": "Resetten"
+	},
+	"resetDefaultTemplate": {
+		"message": "Standaard sjabloon resetten"
+	},
+	"resetDefaultTemplateDescription": {
+		"message": "Verwijder alle wijzigingen die je hebt aangebracht aan het standaard sjabloon."
+	},
+	"save": {
+		"message": "Opslaan"
+	},
+	"saveFile": {
+		"message": "Bestand opslaan..."
+	},
+	"searchVariables": {
+		"message": "Zoek variabelen..."
+	},
+	"selectProvider": {
+		"message": "Selecteer een provider"
+	},
+	"selectTemplateToExport": {
+		"message": "Selecteer een sjabloon om te exporteren."
+	},
+	"settings": {
+		"message": "Instellingen"
+	},
+	"settingsHeading": {
+		"message": "Instellingen"
+	},
+	"settingsImportSuccess": {
+		"message": "Alle instellingen succesvol geïmporteerd. Vernieuw de pagina om de wijzigingen te zien."
+	},
+	"share": {
+		"message": "Delen..."
+	},
+	"shortcutInstructionsBrave": {
+		"message": "Om sneltoetsen te wijzigen, ga naar $1"
+	},
+	"shortcutInstructionsChrome": {
+		"message": "Om sneltoetsen te wijzigen, ga naar $1"
+	},
+	"shortcutInstructionsDefault": {
+		"message": "Om sneltoetsen te wijzigen, raadpleeg de extensie-instellingen van je browser."
+	},
+	"shortcutInstructionsEdge": {
+		"message": "Om sneltoetsen te wijzigen, ga naar $1"
+	},
+	"shortcutInstructionsFirefox": {
+		"message": "Om sneltoetsen te wijzigen, ga naar $1, klik op het tandwiel-icoon en selecteer \"Extensiesneltoetsen beheren\"."
+	},
+	"shortcutInstructionsIntro": {
+		"message": "Sneltoetsen geven je snelle toegang tot clipper-functies."
+	},
+	"shortcutInstructionsSafari": {
+		"message": "Sneltoetsen zijn niet aanpasbaar in Safari."
+	},
+	"shortcutNotSet": {
+		"message": "Niet ingesteld"
+	},
+	"showActionsButton": {
+		"message": "Toon actieknop"
+	},
+	"showActionsDescription": {
+		"message": "Hiermee kun je paginavariabelen bekijken vanuit het clipper-menu. Handig om te zien welke variabelen beschikbaar zijn voor gebruik in sjablonen."
+	},
+	"showPageVariables": {
+		"message": "Toon paginavariabelen"
+	},
+	"silentOpen": {
+		"message": "Geknipte notitie opslaan zonder te openen"
+	},
+	"silentOpenDescription": {
+		"message": "Geknipte notities worden opgeslagen maar niet geopend in een nieuw tabblad. Obsidian wordt nog steeds naar de voorgrond gebracht."
+	},
+	"specificNoteName": {
+		"message": "Specifieke notitienaam"
+	},
+	"systemDefault": {
+		"message": "Systeem"
+	},
+	"templateCopied": {
+		"message": "Sjabloon-JSON gekopieerd naar klembord"
+	},
+	"templateCopyError": {
+		"message": "Sjabloon-JSON kopiëren naar klembord mislukt"
+	},
+	"templateName": {
+		"message": "Sjabloonnaam"
+	},
+	"templateProperties": {
+		"message": "Eigenschappen"
+	},
+	"templatePropertiesDescription": {
+		"message": "Eigenschappen om toe te voegen aan de bovenkant van de geknipte notitie. Gebruik variabelen om gegevens van de pagina vooraf in te vullen."
+	},
+	"templateTriggers": {
+		"message": "Sjabloontriggers"
+	},
+	"templateTriggersDescription": {
+		"message": "Definieer regels om dit sjabloon automatisch te selecteren als het overeenkomt met een URL-patroon of schema.org-gegevens bevat. Één regel per regel."
+	},
+	"templatesHeading": {
+		"message": "Sjablonen"
+	},
+	"thinking": {
+		"message": "nadenken"
+	},
+	"unknownProvider": {
+		"message": "Onbekende provider"
+	},
+	"updateAvailable": {
+		"message": "Er is een update beschikbaar."
+	},
+	"usingLatestVersion": {
+		"message": "Je gebruikt de nieuwste versie."
+	},
+	"vault": {
+		"message": "Kluis"
+	},
+	"vaultDescription": {
+		"message": "Selecteer de standaard kluis voor dit sjabloon. Ga naar $link_start$algemene instellingen$link_end$ om kluizen toe te voegen of te verwijderen.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=general\">"
+			}
+		}
+	},
+	"vaults": {
+		"message": "Kluizen"
+	},
+	"vaultsDescription": {
+		"message": "Standaard worden geknipte notities opgeslagen in de momenteel geopende kluis. Je kunt hier kluizen toevoegen als je de optie wilt hebben om in verschillende kluizen op te slaan. Kluisnamen moeten exact overeenkomen met de naam van de Obsidian-kluis. Druk op $strong_start$enter$strong_end$ om een kluis toe te voegen.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"version": {
+		"message": "Versie"
+	}
+} 

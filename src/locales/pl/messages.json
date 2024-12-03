@@ -1,0 +1,722 @@
+{
+	"addModel": {
+		"message": "+ Dodaj model"
+	},
+	"addModelTitle": {
+		"message": "Dodaj model"
+	},
+	"addProperty": {
+		"message": "+ Dodaj właściwość"
+	},
+	"addProvider": {
+		"message": "+ Dodaj dostawcę"
+	},
+	"addProviderTitle": {
+		"message": "Dodaj dostawcę"
+	},
+	"addToObsidian": {
+		"message": "Dodaj do Obsidian"
+	},
+	"addVaultPlaceholder": {
+		"message": "Naciśnij enter, aby dodać skarbiec"
+	},
+	"advanced": {
+		"message": "Zaawansowane"
+	},
+	"allProperties": {
+		"message": "Wszystkie właściwości"
+	},
+	"alwaysShowHighlights": {
+		"message": "Zawsze pokazuj wyróżnienia"
+	},
+	"alwaysShowHighlightsDescription": {
+		"message": "Wyświetlaj zapisane wyróżnienia po załadowaniu strony. Wyłącz, aby wyświetlać wyróżnienia tylko w trybie podświetlania."
+	},
+	"apiKeyMissing": {
+		"message": "Brak klucza API"
+	},
+	"apiKeysWarning": {
+		"message": "Korzystając z zewnętrznego dostawcy, zgadzasz się na jego warunki i politykę prywatności. Żądania tłumacza są wysyłane bezpośrednio do wybranego dostawcy. Obsidian nie zbiera ani nie przechowuje żadnych danych na temat twoich żądań."
+	},
+	"appendToDaily": {
+		"message": "Dodaj do notatki codziennej, na dole"
+	},
+	"appendToExisting": {
+		"message": "Dodaj do istniejącej notatki, na dole"
+	},
+	"autoRunInterpreter": {
+		"message": "Uruchom automatycznie"
+	},
+	"autoRunInterpreterDescription": {
+		"message": "Uruchom zmienne promptu natychmiast, jeśli szablon je zawiera. To zużyje kredyty API u twojego dostawcy modelu. Wyłącz, jeśli chcesz uruchamiać interpreter manualnie."
+	},
+	"behavior": {
+		"message": "Zachowanie"
+	},
+	"behaviorWarning": {
+		"message": "Dodawanie do istniejącej notatki lub notatki codziennej wymaga Obsidian 1.7.2 lub nowszej."
+	},
+	"cancel": {
+		"message": "Anuluj"
+	},
+	"cannotDeleteProvider": {
+		"message": "Nie można usunąć dostawcy \"$1\", ponieważ jest używany przez $2 model(e)."
+	},
+	"changelog": {
+		"message": "Dziennik zmian"
+	},
+	"chooseFile": {
+		"message": "Wybierz plik"
+	},
+	"choosePropertiesFile": {
+		"message": "Wybierz plik właściwości"
+	},
+	"chooseSettingsFile": {
+		"message": "Wybierz plik ustawień"
+	},
+	"chooseTemplateFile": {
+		"message": "Wybierz plik szablonu"
+	},
+	"clipBehavior": {
+		"message": "Zachowanie klipu"
+	},
+	"clipBehaviorDescription": {
+		"message": "Wybierz, jak wyróżniona treść jest zapisywana w Obsidian. Definiuje zmienną $strong_start${{content}}$strong_end$.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"close": {
+		"message": "Zamknij"
+	},
+	"commandOpenClipper": {
+		"message": "Otwórz Obsidian Clipper"
+	},
+	"commandQuickClip": {
+		"message": "Szybki klip"
+	},
+	"commandToggleHighlighter": {
+		"message": "Przełącz tryb podświetlania"
+	},
+	"confirmDeleteTemplate": {
+		"message": "Czy na pewno chcesz usunąć szablon \"$1\"?"
+	},
+	"confirmReplaceSettings": {
+		"message": "Spowoduje to zastąpienie wszystkich bieżących ustawień, w tym szablonów i właściwości. Czy na pewno chcesz kontynuować?"
+	},
+	"copied": {
+		"message": "Skopiowano!"
+	},
+	"copyAsJson": {
+		"message": "Kopiuj jako JSON"
+	},
+	"copyToClipboard": {
+		"message": "Kopiuj do schowka"
+	},
+	"createNewNote": {
+		"message": "Utwórz nową notatkę"
+	},
+	"custom": {
+		"message": "Niestandardowe"
+	},
+	"dailyNoteFormat": {
+		"message": "Format notatki codziennej (np. RRRR-MM-DD)"
+	},
+	"defaultInterpreterContext": {
+		"message": "Domyślny kontekst interpretera"
+	},
+	"defaultInterpreterContextDescription": {
+		"message": "Zastąp kontekst używany do interpretacji zmiennych promptu. Zmienne mogą być tutaj używane."
+	},
+	"defaultTemplateName": {
+		"message": "Domyślny"
+	},
+	"delete": {
+		"message": "Usuń"
+	},
+	"deleteModelConfirm": {
+		"message": "Czy na pewno chcesz usunąć ten model?"
+	},
+	"deleteProviderConfirm": {
+		"message": "Czy na pewno chcesz usunąć tego dostawcę?"
+	},
+	"disableHighlighter": {
+		"message": "Wyłącz podświetlanie"
+	},
+	"done": {
+		"message": "Gotowe"
+	},
+	"dragAndDropFile": {
+		"message": "Przeciągnij i upuść plik tutaj"
+	},
+	"duplicate": {
+		"message": "Duplikuj"
+	},
+	"earlyAccessDescription": {
+		"message": "Korzystaj z funkcji wymagających najnowszej $link_start$wersji z wczesnym dostępem$link_end$ Obsidian. Obecnie wymaga Obsidian 1.7.2 lub nowszej.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/Obsidian/Early+access+versions\" target=\"_blank\">"
+			}
+		}
+	},
+	"earlyAccessFeatures": {
+		"message": "Funkcje z wczesnym dostępem"
+	},
+	"editModel": {
+		"message": "Edytuj model"
+	},
+	"editProvider": {
+		"message": "Edytuj dostawcę"
+	},
+	"editTemplate": {
+		"message": "Edytuj szablon"
+	},
+	"enableHighlighter": {
+		"message": "Włącz podświetlanie"
+	},
+	"enableHighlighterDescription": {
+		"message": "Podświetlaj treść na stronach internetowych, którą możesz zapisać w Obsidian."
+	},
+	"enableInterpreter": {
+		"message": "Włącz interpreter"
+	},
+	"enableInterpreterDescription": {
+		"message": "Używaj języka naturalnego do wyodrębniania danych ze stron. Na przykład, możesz użyć składni szablonu $strong_start${{\"podsumowanie strony\"}}$strong_end$. Wymaga klucza API lub niestandardowego modelu skonfigurowanego poniżej. $link_start$Dowiedz się więcej$link_end$.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/interpreter\" target=\"_blank\">"
+			},
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"error": {
+		"message": "Błąd"
+	},
+	"export": {
+		"message": "Eksportuj"
+	},
+	"exportAllSettings": {
+		"message": "Eksportuj wszystkie ustawienia"
+	},
+	"exportAllSettingsDescription": {
+		"message": "Eksportuj wszystkie ustawienia, w tym szablony i właściwości."
+	},
+	"exportHighlights": {
+		"message": "Eksportuj wyróżnienia"
+	},
+	"exportHighlightsDescription": {
+		"message": "Eksportuj swoje wyróżnienia do pliku."
+	},
+	"exportProperties": {
+		"message": "Eksportuj właściwości"
+	},
+	"exportPropertiesDescription": {
+		"message": "Zapisz właściwości Web Clipper do pliku $strong_start$types.json$strong_end$, który można zaimportować do twojego skarbca Obsidian lub do Web Clipper na innych urządzeniach.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"extensionDescription": {
+		"message": "Zapisuj treści z sieci w prywatnym i trwałym formacie, do którego możesz uzyskać dostęp offline. Oficjalne rozszerzenie przeglądarki dla Obsidian."
+	},
+	"extensionName": {
+		"message": "Obsidian Web Clipper"
+	},
+	"failedToCopyText": {
+		"message": "Nie udało się skopiować tekstu"
+	},
+	"failedToDeleteTemplate": {
+		"message": "Nie udało się usunąć szablonu. Spróbuj ponownie."
+	},
+	"failedToDuplicateTemplate": {
+		"message": "Nie udało się zduplikować szablonu. Spróbuj ponownie."
+	},
+	"failedToExportHighlights": {
+		"message": "Nie udało się wyeksportować wyróżnień. Sprawdź konsolę, aby uzyskać więcej szczegółów."
+	},
+	"failedToExportSettings": {
+		"message": "Nie udało się wyeksportować ustawień. Sprawdź konsolę, aby uzyskać więcej szczegółów."
+	},
+	"failedToExtractContent": {
+		"message": "Nie udało się wyodrębnić treści strony."
+	},
+	"failedToImportTemplate": {
+		"message": "Błąd podczas importowania szablonu. Sprawdź plik i spróbuj ponownie."
+	},
+	"failedToInitialize": {
+		"message": "Spróbuj ponownie załadować rozszerzenie."
+	},
+	"failedToInitializeContent": {
+		"message": "Nie udało się zainicjować treści strony."
+	},
+	"failedToProcessInterpreter": {
+		"message": "Przetwarzanie interpretera nie powiodło się. Spróbuj ponownie."
+	},
+	"failedToResetTemplate": {
+		"message": "Nie udało się zresetować domyślnego szablonu. Spróbuj ponownie."
+	},
+	"failedToSave": {
+		"message": "Nie udało się zapisać pliku"
+	},
+	"failedToSaveFile": {
+		"message": "Nie udało się zapisać pliku"
+	},
+	"failedToSaveProvider": {
+		"message": "Nie udało się zapisać dostawcy. Spróbuj ponownie."
+	},
+	"folder": {
+		"message": "Folder"
+	},
+	"general": {
+		"message": "Ogólne"
+	},
+	"generalSettings": {
+		"message": "Ustawienia ogólne"
+	},
+	"getApiKeyHere": {
+		"message": "Pobierz swój klucz API $1 tutaj."
+	},
+	"help": {
+		"message": "Pomoc"
+	},
+	"helpDescription": {
+		"message": "Dowiedz się, jak korzystać z Web Clipper i uzyskaj pomoc w rozwiązywaniu problemów."
+	},
+	"highlightInline": {
+		"message": "Podświetl treść strony"
+	},
+	"highlightPage": {
+		"message": "Podświetl stronę"
+	},
+	"highlighter": {
+		"message": "Podświetlacz"
+	},
+	"highlighterSettings": {
+		"message": "Podświetlacz"
+	},
+	"hotkeys": {
+		"message": "Skróty klawiszowe"
+	},
+	"import": {
+		"message": "Importuj"
+	},
+	"importAllSettings": {
+		"message": "Importuj wszystkie ustawienia"
+	},
+	"importAllSettingsDescription": {
+		"message": "Importuj wszystkie ustawienia, w tym szablony i właściwości. Spowoduje to zastąpienie twojej bieżącej konfiguracji."
+	},
+	"importFailed": {
+		"message": "Import nie powiódł się. Sprawdź konsolę, aby uzyskać więcej szczegółów."
+	},
+	"importModalTitle": {
+		"message": "Import"
+	},
+	"importProperties": {
+		"message": "Importuj właściwości"
+	},
+	"importPropertiesDescription": {
+		"message": "Aby zaimportować swoje właściwości z Obsidian, znajdź plik $strong_1_start$types.json$strong_1_end$ w folderze $strong_2_start$.obsidian$strong_2_end$ w swoim skarbcu. Zauważ, że ten folder jest domyślnie ukryty w większości systemów operacyjnych.",
+		"placeholders": {
+			"strong_1_end": {
+				"content": "</strong>"
+			},
+			"strong_1_start": {
+				"content": "<strong>"
+			},
+			"strong_2_end": {
+				"content": "</strong>"
+			},
+			"strong_2_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"importSettings": {
+		"message": "Importuj ustawienia"
+	},
+	"importTemplate": {
+		"message": "Importuj szablon"
+	},
+	"interpret": {
+		"message": "interpretuj"
+	},
+	"interpreter": {
+		"message": "Interpreter"
+	},
+	"interpreterContext": {
+		"message": "Kontekst interpretera"
+	},
+	"interpreterContextDescription": {
+		"message": "Kontekst używany do interpretacji zmiennych promptu. Zastępuje domyślny kontekst zdefiniowany w $link_start$Ustawieniach interpretera$link_end$. Zmienne mogą być tutaj używane.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=interpreter\">"
+			}
+		}
+	},
+	"language": {
+		"message": "Język"
+	},
+	"languageDescription": {
+		"message": "Wybierz język wyświetlania dla interfejsu rozszerzenia."
+	},
+	"lastUsed": {
+		"message": "Ostatnio używane"
+	},
+	"legacyMode": {
+		"message": "Tryb starszy"
+	},
+	"legacyModeDescription": {
+		"message": "Używa metody klipowania URI zgodnej z Obsidian 1.6.7 lub wcześniejszą. Zauważ, że długość treści, którą możesz przyciąć, jest ograniczona przez twoją przeglądarkę i system operacyjny. Niektóre strony mogą nie działać bez żadnych błędów."
+	},
+	"modelName": {
+		"message": "Nazwa modelu"
+	},
+	"modelNameDescription": {
+		"message": "Nazwa modelu, którą chcesz wyświetlić w interfejsie."
+	},
+	"modelProvider": {
+		"message": "Dostawca"
+	},
+	"modelProviderDescription": {
+		"message": "Dostawca modelu, na przykład Ollama, OpenRouter, Google, itp."
+	},
+	"modelProviderPlaceholder": {
+		"message": "Dostawca"
+	},
+	"modelRequiredFields": {
+		"message": "Nazwa modelu, Dostawca i ID modelu są wymagane."
+	},
+	"models": {
+		"message": "Modele"
+	},
+	"more": {
+		"message": "Więcej"
+	},
+	"newTemplate": {
+		"message": "Nowy szablon"
+	},
+	"noHighlights": {
+		"message": "Nie rób nic"
+	},
+	"noTemplates": {
+		"message": "Brak dostępnych szablonów. Dodaj szablon w ustawieniach."
+	},
+	"noUnusedProperties": {
+		"message": "Nie znaleziono nieużywanych właściwości."
+	},
+	"noteContent": {
+		"message": "Treść notatki"
+	},
+	"noteContentDescription": {
+		"message": "Dostosuj treść notatki. Użyj zmiennych, aby wstępnie wypełnić dane ze strony."
+	},
+	"noteLocation": {
+		"message": "Lokalizacja notatki"
+	},
+	"noteLocationDescription": {
+		"message": "Folder lub ścieżka notatki."
+	},
+	"noteName": {
+		"message": "Nazwa notatki"
+	},
+	"noteNameFormat": {
+		"message": "Format nazwy notatki"
+	},
+	"noteNameFormatDescription": {
+		"message": "Format nazwy pliku notatki. Możesz użyć zmiennych takich jak {{title}}, {{date}} i {{published}}, aby wstępnie wypełnić dane ze strony. $link_start$Dowiedz się więcej$link_end$.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/variables\" target=\"_blank\">"
+			}
+		}
+	},
+	"notesAboutPage": {
+		"message": "Notatki na temat tej strony..."
+	},
+	"onlyHttpSupported": {
+		"message": "Nie można przyciąć tej strony. Obsługiwane są tylko adresy URL http i https."
+	},
+	"open": {
+		"message": "Otwórz"
+	},
+	"optional": {
+		"message": "(opcjonalne)"
+	},
+	"orPasteBelow": {
+		"message": "Lub wklej treść poniżej"
+	},
+	"pageCannotBeClipped": {
+		"message": "Nie można przyciąć tej strony."
+	},
+	"pageVariables": {
+		"message": "Zmienne strony"
+	},
+	"pasteJsonHere": {
+		"message": "Wklej JSON tutaj"
+	},
+	"pleaseReload": {
+		"message": "Spróbuj ponownie załadować stronę."
+	},
+	"prependToDaily": {
+		"message": "Dodaj do notatki codziennej, na górze"
+	},
+	"prependToExisting": {
+		"message": "Dodaj do istniejącej notatki, na górze"
+	},
+	"processing": {
+		"message": "przetwarzanie"
+	},
+	"properties": {
+		"message": "Właściwości"
+	},
+	"propertiesSettings": {
+		"message": "Właściwości"
+	},
+	"propertyName": {
+		"message": "Nazwa właściwości"
+	},
+	"propertyValue": {
+		"message": "Wartość właściwości"
+	},
+	"provider": {
+		"message": "Dostawca"
+	},
+	"providerApiKey": {
+		"message": "Klucz API"
+	},
+	"providerApiKeyDescription": {
+		"message": "Twój klucz API dla tego dostawcy."
+	},
+	"providerBaseUrl": {
+		"message": "Podstawowy URL"
+	},
+	"providerBaseUrlDescription": {
+		"message": "URL punktu końcowego API dla tego dostawcy."
+	},
+	"providerModelId": {
+		"message": "ID modelu"
+	},
+	"providerModelIdDescription": {
+		"message": "Identyfikator modelu od twojego dostawcy. Zazwyczaj krótka nazwa bez spacji."
+	},
+	"providerModelIdPlaceholder": {
+		"message": "ID modelu"
+	},
+	"providerName": {
+		"message": "Nazwa dostawcy"
+	},
+	"providerNameDescription": {
+		"message": "Nazwa wyświetlana dla tego dostawcy."
+	},
+	"providerPreset": {
+		"message": "Ustawienie wstępne"
+	},
+	"providerPresetDescription": {
+		"message": "Wybierz dostawcę lub utwórz niestandardowego."
+	},
+	"providerRequiredFields": {
+		"message": "Nazwa dostawcy i podstawowy URL są wymagane."
+	},
+	"providers": {
+		"message": "Dostawcy"
+	},
+	"refresh": {
+		"message": "Odśwież"
+	},
+	"remove": {
+		"message": "Usuń"
+	},
+	"removeProperty": {
+		"message": "Usuń właściwość"
+	},
+	"removeUnusedProperties": {
+		"message": "Usuń nieużywane właściwości"
+	},
+	"removeUnusedPropertiesDescription": {
+		"message": "Usuń wszystkie właściwości, które nie są używane w żadnym szablonie."
+	},
+	"removeVault": {
+		"message": "Usuń skarbiec"
+	},
+	"replaceContent": {
+		"message": "Zastąp treść strony"
+	},
+	"reset": {
+		"message": "Resetuj"
+	},
+	"resetDefaultTemplate": {
+		"message": "Zresetuj domyślny szablon"
+	},
+	"resetDefaultTemplateDescription": {
+		"message": "Usuń wszystkie zmiany, które wprowadziłeś do domyślnego szablonu."
+	},
+	"save": {
+		"message": "Zapisz"
+	},
+	"saveFile": {
+		"message": "Zapisz plik..."
+	},
+	"searchVariables": {
+		"message": "Szukaj zmiennych..."
+	},
+	"selectProvider": {
+		"message": "Wybierz dostawcę"
+	},
+	"selectTemplateToExport": {
+		"message": "Proszę wybrać szablon do eksportu."
+	},
+	"settings": {
+		"message": "Ustawienia"
+	},
+	"settingsHeading": {
+		"message": "Ustawienia"
+	},
+	"settingsImportSuccess": {
+		"message": "Wszystkie ustawienia zostały pomyślnie zaimportowane. Odśwież stronę, aby zobaczyć zmiany."
+	},
+	"share": {
+		"message": "Udostępnij..."
+	},
+	"shortcutInstructionsBrave": {
+		"message": "Aby zmienić przypisania klawiszy, przejdź do $1"
+	},
+	"shortcutInstructionsChrome": {
+		"message": "Aby zmienić przypisania klawiszy, przejdź do $1"
+	},
+	"shortcutInstructionsDefault": {
+		"message": "Aby zmienić przypisania klawiszy, proszę odwołać się do ustawień rozszerzeń przeglądarki."
+	},
+	"shortcutInstructionsEdge": {
+		"message": "Aby zmienić przypisania klawiszy, przejdź do $1"
+	},
+	"shortcutInstructionsFirefox": {
+		"message": "Aby zmienić przypisania klawiszy, przejdź do $1, kliknij ikonę koła zębatego i wybierz \"Zarządzaj skrótami rozszerzeń\"."
+	},
+	"shortcutInstructionsIntro": {
+		"message": "Skróty klawiszowe umożliwiają szybki dostęp do funkcji klipera."
+	},
+	"shortcutInstructionsSafari": {
+		"message": "Skróty klawiszowe nie są dostosowywalne w Safari."
+	},
+	"shortcutNotSet": {
+		"message": "Nie ustawiono"
+	},
+	"showActionsButton": {
+		"message": "Pokaż przycisk akcji"
+	},
+	"showActionsDescription": {
+		"message": "Pozwala na inspekcję zmiennych strony z menu klipera. Przydatne do zobaczenia zmiennych, które są dostępne do użycia w szablonach."
+	},
+	"showPageVariables": {
+		"message": "Pokaż zmienne strony"
+	},
+	"silentOpen": {
+		"message": "Zapisz przyciętą notatkę bez otwierania jej"
+	},
+	"silentOpenDescription": {
+		"message": "Przycięte notatki zostaną zapisane, ale nie zostaną otwarte w nowej karcie. Obsidian nadal zostanie wyświetlony na pierwszym planie."
+	},
+	"specificNoteName": {
+		"message": "Określona nazwa notatki"
+	},
+	"systemDefault": {
+		"message": "System"
+	},
+	"templateCopied": {
+		"message": "Skopiowano szablon JSON do schowka"
+	},
+	"templateCopyError": {
+		"message": "Nie udało się skopiować szablonu JSON do schowka"
+	},
+	"templateName": {
+		"message": "Nazwa szablonu"
+	},
+	"templateProperties": {
+		"message": "Właściwości"
+	},
+	"templatePropertiesDescription": {
+		"message": "Właściwości do dodania na górze przyciętej notatki. Użyj zmiennych, aby wstępnie wypełnić dane ze strony."
+	},
+	"templateTriggers": {
+		"message": "Wyzwalacze szablonu"
+	},
+	"templateTriggersDescription": {
+		"message": "Zdefiniuj reguły, aby automatycznie wybierać ten szablon, jeśli pasuje do wzorca URL lub zawiera dane schema.org. Jedna reguła na linię."
+	},
+	"templatesHeading": {
+		"message": "Szablony"
+	},
+	"thinking": {
+		"message": "myślenie"
+	},
+	"unknownProvider": {
+		"message": "Nieznany dostawca"
+	},
+	"updateAvailable": {
+		"message": "Dostępna jest aktualizacja."
+	},
+	"usingLatestVersion": {
+		"message": "Używasz najnowszej wersji."
+	},
+	"vault": {
+		"message": "Skarbiec"
+	},
+	"vaultDescription": {
+		"message": "Wybierz domyślny skarbiec dla tego szablonu. Przejdź do $link_start$ustawień ogólnych$link_end$, aby dodać lub usunąć skarbce.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=general\">"
+			}
+		}
+	},
+	"vaults": {
+		"message": "Skarbce"
+	},
+	"vaultsDescription": {
+		"message": "Domyślnie przycięte notatki są zapisywane w aktualnie otwartym skarbcu. Możesz dodać skarbce tutaj, jeśli chcesz mieć możliwość zapisywania w różnych skarbcach. Nazwy skarbców muszą dokładnie odpowiadać nazwie skarbca Obsidian. Naciśnij $strong_start$enter$strong_end$, aby dodać skarbiec.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"version": {
+		"message": "Wersja"
+	}
+}

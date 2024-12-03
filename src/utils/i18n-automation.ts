@@ -22,7 +22,7 @@ export default class I18nAutomation {
 	private lastRequestTime = 0;
 	private requestInterval = 2000; // 2 seconds between requests
 	private maxRetries = 3;
-	private batchSize = 10; // Increase batch size to 10 messages
+	private batchSize = 20;
 
 	constructor(localesDir: string, openaiApiKey?: string) {
 		this.localesDir = localesDir;

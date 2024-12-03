@@ -18,6 +18,8 @@ export function getAvailableLanguages(): { code: string; name: string }[] {
 		{ code: 'it', name: 'Italiano' },
 		{ code: 'ja', name: '日本語' },
 		{ code: 'ko', name: '한국어' },
+		{ code: 'nl', name: 'Nederlands' },
+		{ code: 'pl', name: 'Polski' },
 		{ code: 'pt-BR', name: 'Português (Brasil)' },
 		{ code: 'ru', name: 'Русский' },
 		{ code: 'zh-CN', name: '简体中文' },
