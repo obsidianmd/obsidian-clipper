@@ -29,7 +29,9 @@ export default class I18nAutomation {
 		const usedKeys = new Set<string>();
 		const messagePattern = /getMessage\(['"]([^'"]+)['"]/g;
 		const i18nPattern = /data-i18n="([^"]+)"/g;
+		const i18nTitlePattern = /data-i18n="([^"]+)"/g;
 		const manifestPattern = /__MSG_([^_]+)__/g;
+		const showErrorPattern = /showError\(['"]([^'"]+)['"]/g;
 
 		const searchFiles = async (dir: string) => {
 			const files = await fs.promises.readdir(dir);
@@ -44,9 +46,11 @@ export default class I18nAutomation {
 					const content = await fs.promises.readFile(fullPath, 'utf-8');
 					
 					let match;
+					// Check for getMessage calls
 					while ((match = messagePattern.exec(content)) !== null) {
 						usedKeys.add(match[1]);
 					}
+					// Check for data-i18n attributes
 					while ((match = i18nPattern.exec(content)) !== null) {
 						usedKeys.add(match[1]);
 					}
@@ -55,6 +59,16 @@ export default class I18nAutomation {
 						while ((match = manifestPattern.exec(content)) !== null) {
 							usedKeys.add(match[1]);
 						}
+					}
+					// Check for modal titles and other special cases
+					if (file.includes('modal') || file.includes('settings.html')) {
+						while ((match = i18nTitlePattern.exec(content)) !== null) {
+							usedKeys.add(match[1]);
+						}
+					}
+					// Check for showError calls
+					while ((match = showErrorPattern.exec(content)) !== null) {
+						usedKeys.add(match[1]);
 					}
 				}
 			}
@@ -124,24 +138,14 @@ export default class I18nAutomation {
 
 	// Process all locales
 	async processLocales(srcDir: string): Promise<void> {
-		// 1. Find used messages
-		const usedKeys = await this.findUsedMessages(srcDir);
-		
 		// Read source (English) messages
 		const sourceFile = path.join(this.localesDir, this.sourceLocale, 'messages.json');
 		const sourceMessages: Messages = JSON.parse(await fs.promises.readFile(sourceFile, 'utf-8'));
 
-		// Remove unused messages from source
-		for (const key of Object.keys(sourceMessages)) {
-			if (!usedKeys.has(key)) {
-				delete sourceMessages[key];
-			}
-		}
-
 		// Sort source messages
 		const sortedSourceMessages = this.sortMessages(sourceMessages);
 
-		// Save updated source messages
+		// Save sorted English messages
 		await fs.promises.writeFile(
 			sourceFile,
 			JSON.stringify(sortedSourceMessages, null, '\t')
@@ -151,6 +155,11 @@ export default class I18nAutomation {
 		const locales = await fs.promises.readdir(this.localesDir);
 		
 		for (const locale of locales) {
+			// Skip .DS_Store and other hidden files
+			if (locale.startsWith('.')) {
+				continue;
+			}
+
 			if (locale === this.sourceLocale) continue;
 
 			const localeFile = path.join(this.localesDir, locale, 'messages.json');
@@ -181,7 +190,7 @@ export default class I18nAutomation {
 				}
 			}
 
-			// Remove unused messages
+			// Remove messages that don't exist in English
 			for (const key of Object.keys(localeMessages)) {
 				if (!sortedSourceMessages[key]) {
 					delete localeMessages[key];
