@@ -1,0 +1,17 @@
+{
+	"compilerOptions": {
+		"module": "CommonJS",
+		"moduleResolution": "node",
+		"target": "ES2020",
+		"esModuleInterop": true,
+		"allowSyntheticDefaultImports": true,
+		"sourceMap": true,
+		"outDir": "../dist-scripts",
+		"strict": true,
+		"types": ["node"]
+	},
+	"include": [
+		"./**/*",
+		"../src/utils/i18n-automation.ts"
+	]
+} 
