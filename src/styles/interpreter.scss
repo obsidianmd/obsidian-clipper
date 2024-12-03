@@ -298,6 +298,10 @@
 			min-width: 50%;
 		}
 		.provider-no-key {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			gap: 0.25rem;
 			font-size: var(--font-ui-smaller);
 		}
 		.provider-list-item-actions {

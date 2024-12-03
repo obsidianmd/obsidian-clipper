@@ -142,7 +142,7 @@ function createProviderListItem(provider: Provider, index: number): HTMLElement 
 			<div class="provider-name">
 				${provider.name}
 			</div>
-			${!provider.apiKey ? '<span class="provider-no-key text-warning">No API key</span>' : ''}
+			${!provider.apiKey ? '<span class="provider-no-key text-warning"><i data-lucide="alert-triangle"></i> No API key</span>' : ''}
 		</div>
 		<div class="provider-list-item-actions">
 			<button class="edit-provider-btn clickable-icon" data-index="${index}" aria-label="Edit provider">

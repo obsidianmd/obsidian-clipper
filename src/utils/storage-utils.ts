@@ -113,20 +113,37 @@ interface LegacyStorageData extends StorageData {
 	};
 }
 
-function migrateModelsAndProviders(data: LegacyStorageData, defaultSettings: Settings): { models: ModelConfig[], providers: Provider[] } {
+async function migrateModelsAndProviders(data: LegacyStorageData, defaultSettings: Settings): Promise<{ models: ModelConfig[], providers: Provider[] }> {
+	debugLog('Settings', 'Starting migration check with data:', data);
+	
 	// Start with default providers
 	let providers = data.interpreter_settings?.providers || defaultSettings.providers;
 	let models = data.interpreter_settings?.models || defaultSettings.models;
 
-	// Migrate legacy API keys if they exist
-	if (data) {
+	// Check for legacy keys in both locations
+	const hasLegacyKeys = data.anthropicApiKey || 
+		data.openaiApiKey || 
+		data.interpreter_settings?.anthropicApiKey || 
+		data.interpreter_settings?.openaiApiKey;
+
+	debugLog('Settings', 'Legacy keys check:', {
+		topLevelAnthropicKey: data.anthropicApiKey,
+		topLevelOpenAIKey: data.openaiApiKey,
+		interpreterAnthropicKey: data.interpreter_settings?.anthropicApiKey,
+		interpreterOpenAIKey: data.interpreter_settings?.openaiApiKey,
+		hasLegacyKeys
+	});
+
+	if (hasLegacyKeys) {
+		debugLog('Settings', 'Detected legacy API keys, running migration');
 		let needsSave = false;
 
 		// Migrate OpenAI API key - check all possible locations
-		const openaiApiKey = data.openaiApiKey || '';
+		const openaiApiKey = data.openaiApiKey || data.interpreter_settings?.openaiApiKey || '';
 		if (openaiApiKey) {
 			const openaiProvider = providers.find(p => p.id === 'openai');
-			if (openaiProvider && !openaiProvider.apiKey) {
+			debugLog('Settings', 'OpenAI migration:', { openaiApiKey, openaiProvider });
+			if (openaiProvider) {
 				openaiProvider.apiKey = openaiApiKey;
 				needsSave = true;
 				debugLog('Settings', 'Migrated OpenAI API key');
@@ -134,10 +151,11 @@ function migrateModelsAndProviders(data: LegacyStorageData, defaultSettings: Set
 		}
 
 		// Migrate Anthropic API key - check all possible locations
-		const anthropicApiKey = data.anthropicApiKey || '';
+		const anthropicApiKey = data.anthropicApiKey || data.interpreter_settings?.anthropicApiKey || '';
 		if (anthropicApiKey) {
 			const anthropicProvider = providers.find(p => p.id === 'anthropic');
-			if (anthropicProvider && !anthropicProvider.apiKey) {
+			debugLog('Settings', 'Anthropic migration:', { anthropicApiKey, anthropicProvider });
+			if (anthropicProvider) {
 				anthropicProvider.apiKey = anthropicApiKey;
 				needsSave = true;
 				debugLog('Settings', 'Migrated Anthropic API key');
@@ -145,12 +163,35 @@ function migrateModelsAndProviders(data: LegacyStorageData, defaultSettings: Set
 		}
 
 		// Clean up old keys if needed
-		if (needsSave && data.interpreter_settings) {
-			delete data.openaiApiKey;
-			delete data.anthropicApiKey;
-			
-			browser.storage.sync.set({ interpreter_settings: data.interpreter_settings })
-				.catch(error => console.error('Error saving migrated settings:', error));2
+		if (needsSave) {
+			try {
+				debugLog('Settings', 'Starting migration cleanup...');
+
+				// First save the updated interpreter settings
+				const updatedInterpreterSettings = {
+					...data.interpreter_settings,
+					providers,
+				};
+
+				debugLog('Settings', 'Saving updated interpreter settings:', updatedInterpreterSettings);
+				await browser.storage.sync.set({ 
+					interpreter_settings: updatedInterpreterSettings
+				});
+
+				// Then clear out the old keys by setting them to null (undefined doesn't work in Chrome storage)
+				debugLog('Settings', 'Clearing legacy keys...');
+				await browser.storage.sync.remove(['anthropicApiKey', 'openaiApiKey', 'openaiModel']);
+
+				// Verify the cleanup
+				const verifyData = await browser.storage.sync.get(null);
+				debugLog('Settings', 'Storage after cleanup:', verifyData);
+
+			} catch (error) {
+				console.error('Error during migration cleanup:', error);
+				debugLog('Settings', 'Migration error:', error);
+			}
+		} else {
+			debugLog('Settings', 'No changes needed during migration');
 		}
 
 		// Update any OpenAI or Anthropic models to use the correct provider IDs
@@ -250,10 +291,14 @@ export async function loadSettings(): Promise<Settings> {
 		'general_settings', 
 		'vaults', 
 		'highlighter_settings', 
-		'interpreter_settings', 
+		'interpreter_settings',
 		'property_types',
-		'stats'
-	]) as StorageData;
+		'stats',
+		// Also get legacy keys to check if migration is needed
+		'anthropicApiKey',
+		'openaiApiKey',
+		'openaiModel'
+	]) as LegacyStorageData;
 
 	const localData = await browser.storage.local.get('history');
 	const history = (localData.history || []) as HistoryEntry[];
@@ -285,8 +330,7 @@ export async function loadSettings(): Promise<Settings> {
 	};
 
 	// Migrate models and providers if needed
-	const { models, providers } = migrateModelsAndProviders(data, defaultSettings);
-	debugLog('Settings', 'Migrated models and providers:', { models, providers });
+	const { models, providers } = await migrateModelsAndProviders(data, defaultSettings);
 
 	// Load user settings
 	const loadedSettings: Settings = {
