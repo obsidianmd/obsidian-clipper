@@ -6,11 +6,19 @@ import { showModal, hideModal } from '../utils/modal-utils';
 import { getMessage, translatePage } from '../utils/i18n';
 import { debugLog } from '../utils/debug';
 
-const PRESET_PROVIDERS = {
+interface PresetProvider {
+	id: string;
+	name: string;
+	baseUrl: string;
+	apiKeyUrl?: string;
+}
+
+const PRESET_PROVIDERS: Record<string, PresetProvider> = {
 	anthropic: {
 		id: 'anthropic',
 		name: 'Anthropic',
-		baseUrl: 'https://api.anthropic.com/v1/messages'
+		baseUrl: 'https://api.anthropic.com/v1/messages',
+		apiKeyUrl: 'https://console.anthropic.com/settings/keys'
 	},
 	ollama: {
 		id: 'ollama',
@@ -20,12 +28,14 @@ const PRESET_PROVIDERS = {
 	openai: {
 		id: 'openai',
 		name: 'OpenAI',
-		baseUrl: 'https://api.openai.com/v1/chat/completions'
+		baseUrl: 'https://api.openai.com/v1/chat/completions',
+		apiKeyUrl: 'https://platform.openai.com/api-keys'
 	},
 	openrouter: {
 		id: 'openrouter',
 		name: 'OpenRouter',
-		baseUrl: 'https://openrouter.ai/api/v1/chat/completions'
+		baseUrl: 'https://openrouter.ai/api/v1/chat/completions',
+		apiKeyUrl: 'https://openrouter.ai/settings/keys'
 	}
 };
 
@@ -235,17 +245,17 @@ function deleteProvider(index: number) {
 	}
 }
 
-function showProviderModal(provider: Provider, index?: number) {
+async function showProviderModal(provider: Provider, index?: number) {
 	debugLog('Providers', 'Showing provider modal:', { provider, index });
 	const modal = document.getElementById('provider-modal');
 	if (!modal) return;
 
+	await translatePage();
+	initializeIcons(modal);
+
 	const titleElement = modal.querySelector('.modal-title');
 	if (titleElement) {
 		titleElement.setAttribute('data-i18n', index !== undefined ? 'editProvider' : 'addProviderTitle');
-		translatePage().then(() => {
-			initializeIcons(modal);
-		});
 	}
 
 	const form = modal.querySelector('#provider-form') as HTMLFormElement;
@@ -255,20 +265,18 @@ function showProviderModal(provider: Provider, index?: number) {
 		const apiKeyInput = form.querySelector('[name="apiKey"]') as HTMLInputElement;
 		const presetSelect = form.querySelector('[name="preset"]') as HTMLSelectElement;
 		const nameContainer = nameInput.closest('.setting-item') as HTMLElement;
+		const apiKeyContainer = form.querySelector('.setting-item:has([name="apiKey"]) .setting-item-description') as HTMLElement;
+
+		if (!apiKeyContainer) {
+			console.error('API key description container not found');
+			return;
+		}
 
 		if (presetSelect) {
 			presetSelect.innerHTML = `<option value="">${getMessage('custom')}</option>`;
 			Object.entries(PRESET_PROVIDERS).forEach(([id, preset]) => {
 				presetSelect.innerHTML += `<option value="${id}">${preset.name}</option>`;
 			});
-
-			// Set Anthropic as default for new providers
-			if (index === undefined) {
-				presetSelect.value = 'anthropic';
-				const selectedPreset = PRESET_PROVIDERS['anthropic'];
-				nameInput.value = selectedPreset.name;
-				baseUrlInput.value = selectedPreset.baseUrl;
-			}
 
 			// Hide/show name field based on preset selection
 			const updateNameVisibility = () => {
@@ -277,20 +285,38 @@ function showProviderModal(provider: Provider, index?: number) {
 					const selectedPreset = PRESET_PROVIDERS[presetSelect.value as keyof typeof PRESET_PROVIDERS];
 					nameInput.value = selectedPreset.name;
 					baseUrlInput.value = selectedPreset.baseUrl;
+
+					// Update API key link
+					if (selectedPreset.apiKeyUrl) {
+						const message = getMessage('getApiKeyHere').replace('$1', selectedPreset.name);
+						apiKeyContainer.innerHTML = `${getMessage('providerApiKeyDescription')} <a href="${selectedPreset.apiKeyUrl}" target="_blank">${message}</a>`;
+					} else {
+						// Remove any existing API key link
+						apiKeyContainer.innerHTML = getMessage('providerApiKeyDescription');
+					}
+				} else {
+					// Remove any existing API key link for custom providers
+					apiKeyContainer.innerHTML = getMessage('providerApiKeyDescription');
 				}
 			};
 
 			presetSelect.addEventListener('change', updateNameVisibility);
-			
-			// Initial visibility
-			updateNameVisibility();
-		}
 
-		// Only set these values if editing an existing provider
-		if (index !== undefined) {
-			nameInput.value = provider.name;
-			baseUrlInput.value = provider.baseUrl;
-			apiKeyInput.value = provider.apiKey;
+			// Set Anthropic as default for new providers
+			if (index === undefined) {
+				presetSelect.value = 'anthropic';
+				updateNameVisibility(); // This will handle setting name, baseUrl, and API key link
+			} else {
+				// Initial visibility for existing providers
+				updateNameVisibility();
+			}
+
+			// Only set these values if editing an existing provider
+			if (index !== undefined) {
+				nameInput.value = provider.name;
+				baseUrlInput.value = provider.baseUrl;
+				apiKeyInput.value = provider.apiKey;
+			}
 		}
 	}
 
@@ -347,12 +373,6 @@ function showProviderModal(provider: Provider, index?: number) {
 	});
 
 	showModal(modal);
-	
-	// Translate the modal content after showing it
-	translatePage().then(() => {
-		// Re-initialize icons after translation
-		initializeIcons(modal);
-	});
 }
 
 export function initializeModelList() {

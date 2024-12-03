@@ -652,25 +652,25 @@
 		"message": "Preestablecido"
 	},
 	"providerPresetDescription": {
-		"message": "Elige un proveedor o crea uno personalizado"
+		"message": "Elige un proveedor o crea uno personalizado."
 	},
 	"providerName": {
-		"message": "Nombre del proveedor"
+		"message": "Nombre del proveedor."
 	},
 	"providerNameDescription": {
-		"message": "Nombre para mostrar de este proveedor"
+		"message": "Nombre para mostrar de este proveedor."
 	},
 	"providerBaseUrl": {
 		"message": "URL base"
 	},
 	"providerBaseUrlDescription": {
-		"message": "La URL del punto final de la API para este proveedor"
+		"message": "La URL del punto final de la API para este proveedor."
 	},
 	"providerApiKey": {
 		"message": "Clave API"
 	},
 	"providerApiKeyDescription": {
-		"message": "Tu clave API para este proveedor"
+		"message": "Tu clave API para este proveedor."
 	},
 	"deleteProviderConfirm": {
 		"message": "¿Estás seguro de que quieres eliminar este proveedor?"
@@ -680,5 +680,8 @@
 	},
 	"provider": {
 		"message": "Proveedor"
+	},
+	"getApiKeyHere": {
+		"message": "Obtén tu clave API de $1 aquí."
 	}
 }

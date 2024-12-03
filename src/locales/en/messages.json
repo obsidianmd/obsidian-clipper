@@ -728,5 +728,8 @@
 	},
 	"custom": {
 		"message": "Custom"
+	},
+	"getApiKeyHere": {
+		"message": "Get your $1 API key here."
 	}
 }
