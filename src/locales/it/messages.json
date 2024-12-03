@@ -1,0 +1,722 @@
+{
+	"addModel": {
+		"message": "+ Aggiungi modello"
+	},
+	"addModelTitle": {
+		"message": "Aggiungi modello"
+	},
+	"addProperty": {
+		"message": "+ Aggiungi proprietà"
+	},
+	"addProvider": {
+		"message": "+ Aggiungi fornitore"
+	},
+	"addProviderTitle": {
+		"message": "Aggiungi fornitore"
+	},
+	"addToObsidian": {
+		"message": "Aggiungi a Obsidian"
+	},
+	"addVaultPlaceholder": {
+		"message": "Premi invio per aggiungere un vault"
+	},
+	"advanced": {
+		"message": "Avanzato"
+	},
+	"allProperties": {
+		"message": "Tutte le proprietà"
+	},
+	"alwaysShowHighlights": {
+		"message": "Mostra sempre gli evidenziatori"
+	},
+	"alwaysShowHighlightsDescription": {
+		"message": "Mostra i tuoi evidenziatori salvati quando carichi una pagina. Disattiva per visualizzare gli evidenziatori solo quando la modalità evidenziatore è attivata."
+	},
+	"apiKeyMissing": {
+		"message": "Nessuna chiave API"
+	},
+	"apiKeysWarning": {
+		"message": "Utilizzando un fornitore esterno, accetti i loro termini e la loro politica sulla privacy. Le richieste dell'interprete vengono inviate direttamente al fornitore che scegli. Obsidian non raccoglie o memorizza alcun dato sulle tue richieste."
+	},
+	"appendToDaily": {
+		"message": "Aggiungi alla nota giornaliera, in fondo"
+	},
+	"appendToExisting": {
+		"message": "Aggiungi a una nota esistente, in fondo"
+	},
+	"autoRunInterpreter": {
+		"message": "Esegui automaticamente"
+	},
+	"autoRunInterpreterDescription": {
+		"message": "Esegui immediatamente le variabili del prompt se il modello ne contiene. Questo consumerà i crediti API con il tuo fornitore di modelli. Disattiva se vuoi eseguire l'interprete manualmente."
+	},
+	"behavior": {
+		"message": "Comportamento"
+	},
+	"behaviorWarning": {
+		"message": "Aggiungere a una nota esistente o a una nota giornaliera richiede Obsidian 1.7.2 o successivo."
+	},
+	"cancel": {
+		"message": "Annulla"
+	},
+	"cannotDeleteProvider": {
+		"message": "Impossibile eliminare il fornitore \"$1\" perché viene utilizzato da $2 modello(i)."
+	},
+	"changelog": {
+		"message": "Registro delle modifiche"
+	},
+	"chooseFile": {
+		"message": "Scegli un file"
+	},
+	"choosePropertiesFile": {
+		"message": "Scegli il file delle proprietà"
+	},
+	"chooseSettingsFile": {
+		"message": "Scegli il file delle impostazioni"
+	},
+	"chooseTemplateFile": {
+		"message": "Scegli il file del modello"
+	},
+	"clipBehavior": {
+		"message": "Comportamento del clip"
+	},
+	"clipBehaviorDescription": {
+		"message": "Scegli come il contenuto evidenziato viene salvato in Obsidian. Definisce la variabile $strong_start${{content}}$strong_end$.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"close": {
+		"message": "Chiudi"
+	},
+	"commandOpenClipper": {
+		"message": "Apri Obsidian Clipper"
+	},
+	"commandQuickClip": {
+		"message": "Clip veloce"
+	},
+	"commandToggleHighlighter": {
+		"message": "Attiva/disattiva modalità evidenziatore"
+	},
+	"confirmDeleteTemplate": {
+		"message": "Sei sicuro di voler eliminare il modello \"$1\"?"
+	},
+	"confirmReplaceSettings": {
+		"message": "Questo sostituirà tutte le tue impostazioni attuali, compresi modelli e proprietà. Sei sicuro di voler continuare?"
+	},
+	"copied": {
+		"message": "Copiato!"
+	},
+	"copyAsJson": {
+		"message": "Copia come JSON"
+	},
+	"copyToClipboard": {
+		"message": "Copia negli appunti"
+	},
+	"createNewNote": {
+		"message": "Crea nuova nota"
+	},
+	"custom": {
+		"message": "Personalizzato"
+	},
+	"dailyNoteFormat": {
+		"message": "Formato della nota giornaliera (ad es., YYYY-MM-DD)"
+	},
+	"defaultInterpreterContext": {
+		"message": "Contesto dell'interprete predefinito"
+	},
+	"defaultInterpreterContextDescription": {
+		"message": "Il modello userà questo contesto per interpretare le variabili del prompt. Variabili e filtri possono essere usati qui."
+	},
+	"defaultTemplateName": {
+		"message": "Predefinito"
+	},
+	"delete": {
+		"message": "Elimina"
+	},
+	"deleteModelConfirm": {
+		"message": "Sei sicuro di voler eliminare questo modello?"
+	},
+	"deleteProviderConfirm": {
+		"message": "Sei sicuro di voler eliminare questo fornitore?"
+	},
+	"disableHighlighter": {
+		"message": "Disabilita evidenziatore"
+	},
+	"done": {
+		"message": "Fatto"
+	},
+	"dragAndDropFile": {
+		"message": "Trascina e rilascia il file qui"
+	},
+	"duplicate": {
+		"message": "Duplica"
+	},
+	"earlyAccessDescription": {
+		"message": "Utilizza funzioni che richiedono l'ultima $link_start$versione di accesso anticipato$link_end$ di Obsidian. Attualmente richiede Obsidian 1.7.2 o successivo.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/Obsidian/Early+access+versions\" target=\"_blank\">"
+			}
+		}
+	},
+	"earlyAccessFeatures": {
+		"message": "Funzioni di accesso anticipato"
+	},
+	"editModel": {
+		"message": "Modifica modello"
+	},
+	"editProvider": {
+		"message": "Modifica fornitore"
+	},
+	"editTemplate": {
+		"message": "Modifica modello"
+	},
+	"enableHighlighter": {
+		"message": "Abilita evidenziatore"
+	},
+	"enableHighlighterDescription": {
+		"message": "Evidenzia il contenuto sulle pagine web che puoi salvare in Obsidian."
+	},
+	"enableInterpreter": {
+		"message": "Abilita interprete"
+	},
+	"enableInterpreterDescription": {
+		"message": "Usa il linguaggio naturale per estrarre dati dalle pagine. Ad esempio, puoi usare la sintassi $strong_start${{\"un riassunto della pagina\"}}$strong_end$. Richiede una chiave API o un modello personalizzato configurato qui sotto. $link_start$Scopri di più$link_end$",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/interpreter\" target=\"_blank\">"
+			},
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"error": {
+		"message": "Errore"
+	},
+	"export": {
+		"message": "Esporta"
+	},
+	"exportAllSettings": {
+		"message": "Esporta tutte le impostazioni"
+	},
+	"exportAllSettingsDescription": {
+		"message": "Esporta tutte le impostazioni, compresi i modelli e le proprietà."
+	},
+	"exportHighlights": {
+		"message": "Esporta gli evidenziatori"
+	},
+	"exportHighlightsDescription": {
+		"message": "Esporta i tuoi evidenziatori in un file."
+	},
+	"exportProperties": {
+		"message": "Esporta proprietà"
+	},
+	"exportPropertiesDescription": {
+		"message": "Salva le proprietà del Web Clipper in un file $strong_start$types.json$strong_end$ che può essere importato nel tuo vault Obsidian, o nel Web Clipper su altri dispositivi.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"extensionDescription": {
+		"message": "Salva contenuti dal web in un formato privato e duraturo che puoi accedere offline. L'estensione del browser ufficiale per Obsidian."
+	},
+	"extensionName": {
+		"message": "Obsidian Web Clipper"
+	},
+	"failedToCopyText": {
+		"message": "Impossibile copiare il testo"
+	},
+	"failedToDeleteTemplate": {
+		"message": "Impossibile eliminare il modello. Per favore, riprova."
+	},
+	"failedToDuplicateTemplate": {
+		"message": "Impossibile duplicare il modello. Per favore, riprova."
+	},
+	"failedToExportHighlights": {
+		"message": "Impossibile esportare gli evidenziatori. Controlla la console per maggiori dettagli."
+	},
+	"failedToExportSettings": {
+		"message": "Impossibile esportare le impostazioni. Controlla la console per maggiori dettagli."
+	},
+	"failedToExtractContent": {
+		"message": "Impossibile estrarre il contenuto della pagina."
+	},
+	"failedToImportTemplate": {
+		"message": "Errore nell'importazione del modello. Controlla il file e riprova."
+	},
+	"failedToInitialize": {
+		"message": "Prova a ricaricare l'estensione."
+	},
+	"failedToInitializeContent": {
+		"message": "Impossibile inizializzare il contenuto della pagina."
+	},
+	"failedToProcessInterpreter": {
+		"message": "Elaborazione dell'interprete fallita. Per favore, riprova."
+	},
+	"failedToResetTemplate": {
+		"message": "Impossibile reimpostare il modello predefinito. Per favore, riprova."
+	},
+	"failedToSave": {
+		"message": "Impossibile salvare il file"
+	},
+	"failedToSaveFile": {
+		"message": "Impossibile salvare il file"
+	},
+	"failedToSaveProvider": {
+		"message": "Impossibile salvare il fornitore. Per favore, riprova."
+	},
+	"folder": {
+		"message": "Cartella"
+	},
+	"general": {
+		"message": "Generale"
+	},
+	"generalSettings": {
+		"message": "Impostazioni generali"
+	},
+	"getApiKeyHere": {
+		"message": "Ottieni la tua chiave API $1 qui."
+	},
+	"help": {
+		"message": "Aiuto"
+	},
+	"helpDescription": {
+		"message": "Scopri come utilizzare Web Clipper e ottieni aiuto per la risoluzione dei problemi."
+	},
+	"highlightInline": {
+		"message": "Evidenzia il contenuto della pagina"
+	},
+	"highlightPage": {
+		"message": "Evidenzia pagina"
+	},
+	"highlighter": {
+		"message": "Evidenziatore"
+	},
+	"highlighterSettings": {
+		"message": "Evidenziatore"
+	},
+	"hotkeys": {
+		"message": "Tasti di scelta rapida"
+	},
+	"import": {
+		"message": "Importa"
+	},
+	"importAllSettings": {
+		"message": "Importa tutte le impostazioni"
+	},
+	"importAllSettingsDescription": {
+		"message": "Importa tutte le impostazioni, compresi i modelli e le proprietà. Questo sostituirà la tua configurazione attuale."
+	},
+	"importFailed": {
+		"message": "Importazione fallita. Controlla la console per maggiori dettagli."
+	},
+	"importModalTitle": {
+		"message": "Importa"
+	},
+	"importProperties": {
+		"message": "Importa proprietà"
+	},
+	"importPropertiesDescription": {
+		"message": "Per importare le tue proprietà da Obsidian, individua il file $strong_1_start$types.json$strong_1_end$ nella cartella $strong_2_start$.obsidian$strong_2_end$ all'interno del tuo vault. Nota che questa cartella è nascosta di default sulla maggior parte dei sistemi operativi.",
+		"placeholders": {
+			"strong_1_end": {
+				"content": "</strong>"
+			},
+			"strong_1_start": {
+				"content": "<strong>"
+			},
+			"strong_2_end": {
+				"content": "</strong>"
+			},
+			"strong_2_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"importSettings": {
+		"message": "Importa impostazioni"
+	},
+	"importTemplate": {
+		"message": "Importa modello"
+	},
+	"interpret": {
+		"message": "interpretare"
+	},
+	"interpreter": {
+		"message": "Interprete"
+	},
+	"interpreterContext": {
+		"message": "Contesto dell'interprete"
+	},
+	"interpreterContextDescription": {
+		"message": "Il contesto utilizzato per interpretare le variabili del prompt. Sovrascrive il contesto predefinito definito nelle $link_start$Impostazioni dell'interprete$link_end$. Qui possono essere utilizzate le variabili.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=interpreter\">"
+			}
+		}
+	},
+	"language": {
+		"message": "Lingua"
+	},
+	"languageDescription": {
+		"message": "Scegli la lingua di visualizzazione per l'interfaccia dell'estensione."
+	},
+	"lastUsed": {
+		"message": "Ultimo utilizzato"
+	},
+	"legacyMode": {
+		"message": "Modalità legacy"
+	},
+	"legacyModeDescription": {
+		"message": "Utilizza il metodo di clipping URI compatibile con Obsidian 1.6.7 o precedente. Nota che la lunghezza del contenuto che puoi ritagliare è limitata dal tuo browser e dal sistema operativo. Alcune pagine potrebbero fallire senza alcun errore."
+	},
+	"modelName": {
+		"message": "Nome del modello"
+	},
+	"modelNameDescription": {
+		"message": "Il nome del modello che vuoi visualizzare nell'interfaccia."
+	},
+	"modelProvider": {
+		"message": "Fornitore"
+	},
+	"modelProviderDescription": {
+		"message": "Il fornitore del modello, ad esempio Ollama, OpenRouter, Google, ecc."
+	},
+	"modelProviderPlaceholder": {
+		"message": "Fornitore"
+	},
+	"modelRequiredFields": {
+		"message": "Nome del modello, Fornitore e ID del modello sono obbligatori."
+	},
+	"models": {
+		"message": "Modelli"
+	},
+	"more": {
+		"message": "Più"
+	},
+	"newTemplate": {
+		"message": "Nuovo modello"
+	},
+	"noHighlights": {
+		"message": "Non fare nulla"
+	},
+	"noTemplates": {
+		"message": "Nessun modello disponibile. Per favore, aggiungi un modello nelle impostazioni."
+	},
+	"noUnusedProperties": {
+		"message": "Nessuna proprietà inutilizzata trovata."
+	},
+	"noteContent": {
+		"message": "Contenuto della nota"
+	},
+	"noteContentDescription": {
+		"message": "Personalizza il contenuto della nota. Usa le variabili per pre-popolare i dati dalla pagina."
+	},
+	"noteLocation": {
+		"message": "Posizione della nota"
+	},
+	"noteLocationDescription": {
+		"message": "La cartella o il percorso della nota."
+	},
+	"noteName": {
+		"message": "Nome della nota"
+	},
+	"noteNameFormat": {
+		"message": "Formato del nome della nota"
+	},
+	"noteNameFormatDescription": {
+		"message": "Formato per il nome del file della nota. Puoi utilizzare variabili come {{title}}, {{date}}, e {{published}} per pre-popolare i dati dalla pagina. $link_start$Scopri di più$link_end$.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/variables\" target=\"_blank\">"
+			}
+		}
+	},
+	"notesAboutPage": {
+		"message": "Note su questa pagina..."
+	},
+	"onlyHttpSupported": {
+		"message": "Questa pagina non può essere ritagliata. Sono supportati solo gli URL http e https."
+	},
+	"open": {
+		"message": "Apri"
+	},
+	"optional": {
+		"message": "(opzionale)"
+	},
+	"orPasteBelow": {
+		"message": "O incolla il contenuto qui sotto"
+	},
+	"pageCannotBeClipped": {
+		"message": "Questa pagina non può essere ritagliata."
+	},
+	"pageVariables": {
+		"message": "Variabili della pagina"
+	},
+	"pasteJsonHere": {
+		"message": "Incolla JSON qui"
+	},
+	"pleaseReload": {
+		"message": "Prova a ricaricare la pagina."
+	},
+	"prependToDaily": {
+		"message": "Aggiungi alla nota giornaliera, in cima"
+	},
+	"prependToExisting": {
+		"message": "Aggiungi a una nota esistente, in cima"
+	},
+	"processing": {
+		"message": "elaborazione"
+	},
+	"properties": {
+		"message": "Proprietà"
+	},
+	"propertiesSettings": {
+		"message": "Proprietà"
+	},
+	"propertyName": {
+		"message": "Nome della proprietà"
+	},
+	"propertyValue": {
+		"message": "Valore della proprietà"
+	},
+	"provider": {
+		"message": "Fornitore"
+	},
+	"providerApiKey": {
+		"message": "Chiave API"
+	},
+	"providerApiKeyDescription": {
+		"message": "La tua chiave API per questo fornitore."
+	},
+	"providerBaseUrl": {
+		"message": "URL di base"
+	},
+	"providerBaseUrlDescription": {
+		"message": "L'URL del punto finale API per questo fornitore."
+	},
+	"providerModelId": {
+		"message": "ID del modello"
+	},
+	"providerModelIdDescription": {
+		"message": "L'identificatore del modello dal tuo fornitore. Tipicamente un nome breve senza spazi."
+	},
+	"providerModelIdPlaceholder": {
+		"message": "ID del modello"
+	},
+	"providerName": {
+		"message": "Nome del fornitore"
+	},
+	"providerNameDescription": {
+		"message": "Nome da visualizzare per questo fornitore."
+	},
+	"providerPreset": {
+		"message": "Preset"
+	},
+	"providerPresetDescription": {
+		"message": "Scegli un fornitore o creane uno personalizzato."
+	},
+	"providerRequiredFields": {
+		"message": "Il nome del fornitore e l'URL di base sono obbligatori."
+	},
+	"providers": {
+		"message": "Fornitori"
+	},
+	"refresh": {
+		"message": "Aggiorna"
+	},
+	"remove": {
+		"message": "Rimuovi"
+	},
+	"removeProperty": {
+		"message": "Rimuovi proprietà"
+	},
+	"removeUnusedProperties": {
+		"message": "Rimuovi proprietà inutilizzate"
+	},
+	"removeUnusedPropertiesDescription": {
+		"message": "Rimuovi tutte le proprietà che non vengono utilizzate in nessun modello."
+	},
+	"removeVault": {
+		"message": "Rimuovi vault"
+	},
+	"replaceContent": {
+		"message": "Sostituisci il contenuto della pagina"
+	},
+	"reset": {
+		"message": "Reset"
+	},
+	"resetDefaultTemplate": {
+		"message": "Reimposta modello predefinito"
+	},
+	"resetDefaultTemplateDescription": {
+		"message": "Rimuovi tutte le modifiche che hai apportato al modello predefinito."
+	},
+	"save": {
+		"message": "Salva"
+	},
+	"saveFile": {
+		"message": "Salva file..."
+	},
+	"searchVariables": {
+		"message": "Cerca variabili..."
+	},
+	"selectProvider": {
+		"message": "Seleziona un fornitore"
+	},
+	"selectTemplateToExport": {
+		"message": "Per favore, seleziona un modello da esportare."
+	},
+	"settings": {
+		"message": "Impostazioni"
+	},
+	"settingsHeading": {
+		"message": "Impostazioni"
+	},
+	"settingsImportSuccess": {
+		"message": "Tutte le impostazioni importate con successo. Per favore, aggiorna la pagina per vedere le modifiche."
+	},
+	"share": {
+		"message": "Condividi..."
+	},
+	"shortcutInstructionsBrave": {
+		"message": "Per modificare le assegnazioni dei tasti, vai a $1"
+	},
+	"shortcutInstructionsChrome": {
+		"message": "Per modificare le assegnazioni dei tasti, vai a $1"
+	},
+	"shortcutInstructionsDefault": {
+		"message": "Per modificare le assegnazioni dei tasti, si prega di fare riferimento alle impostazioni delle estensioni del tuo browser."
+	},
+	"shortcutInstructionsEdge": {
+		"message": "Per modificare le assegnazioni dei tasti, vai a $1"
+	},
+	"shortcutInstructionsFirefox": {
+		"message": "Per modificare le assegnazioni dei tasti, vai a $1, clicca sull'icona dell'ingranaggio e seleziona \"Gestisci scorciatoie estensione\"."
+	},
+	"shortcutInstructionsIntro": {
+		"message": "Le scorciatoie da tastiera ti danno un accesso rapido alle funzioni del clipper."
+	},
+	"shortcutInstructionsSafari": {
+		"message": "Le scorciatoie da tastiera non sono personalizzabili su Safari."
+	},
+	"shortcutNotSet": {
+		"message": "Non impostato"
+	},
+	"showActionsButton": {
+		"message": "Mostra pulsante azioni"
+	},
+	"showActionsDescription": {
+		"message": "Ti permette di ispezionare le variabili della pagina dal menu del clipper. Utile per vedere le variabili che sono disponibili per l'uso nei modelli."
+	},
+	"showPageVariables": {
+		"message": "Mostra variabili della pagina"
+	},
+	"silentOpen": {
+		"message": "Salva la nota ritagliata senza aprirla"
+	},
+	"silentOpenDescription": {
+		"message": "Le note ritagliate verranno salvate ma non si apriranno in una nuova scheda. Obsidian sarà comunque portato in primo piano."
+	},
+	"specificNoteName": {
+		"message": "Nome specifico della nota"
+	},
+	"systemDefault": {
+		"message": "Sistema"
+	},
+	"templateCopied": {
+		"message": "Copiato il modello JSON negli appunti"
+	},
+	"templateCopyError": {
+		"message": "Impossibile copiare il modello JSON negli appunti"
+	},
+	"templateName": {
+		"message": "Nome del modello"
+	},
+	"templateProperties": {
+		"message": "Proprietà"
+	},
+	"templatePropertiesDescription": {
+		"message": "Proprietà da aggiungere in cima alla nota ritagliata. Usa le variabili per pre-popolare i dati dalla pagina."
+	},
+	"templateTriggers": {
+		"message": "Trigger del modello"
+	},
+	"templateTriggersDescription": {
+		"message": "Definisci regole per selezionare automaticamente questo modello se corrisponde a un pattern URL o contiene dati schema.org. Una regola per riga."
+	},
+	"templatesHeading": {
+		"message": "Modelli"
+	},
+	"thinking": {
+		"message": "pensando"
+	},
+	"unknownProvider": {
+		"message": "Fornitore sconosciuto"
+	},
+	"updateAvailable": {
+		"message": "È disponibile un aggiornamento."
+	},
+	"usingLatestVersion": {
+		"message": "Stai utilizzando l'ultima versione."
+	},
+	"vault": {
+		"message": "Vault"
+	},
+	"vaultDescription": {
+		"message": "Seleziona il vault predefinito per questo modello. Vai alle $link_start$impostazioni generali$link_end$ per aggiungere o rimuovere vaults.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=general\">"
+			}
+		}
+	},
+	"vaults": {
+		"message": "Vaults"
+	},
+	"vaultsDescription": {
+		"message": "Per impostazione predefinita, le note ritagliate vengono salvate nel vault attualmente aperto. Puoi aggiungere vault qui se desideri avere l'opzione di salvare in vault diversi. I nomi dei vault devono corrispondere esattamente al nome del vault Obsidian. Premi $strong_start$invio$strong_end$ per aggiungere un vault.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"version": {
+		"message": "Versione"
+	}
+}

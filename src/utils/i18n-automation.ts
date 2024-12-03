@@ -93,7 +93,7 @@ Example response:
 			this.lastRequestTime = Date.now();
 
 			if (!response.ok) {
-				if (response.status === 429 && retryCount < this.maxRetries) {
+				if (response.status === 429) {
 					const retryAfter = response.headers.get('retry-after');
 					const waitTime = retryAfter ? parseInt(retryAfter) * 1000 : this.requestInterval * Math.pow(2, retryCount);
 					console.log(`  ⏳ Rate limited, waiting ${waitTime/1000}s before retry ${retryCount + 1}/${this.maxRetries}...`);
@@ -103,6 +103,9 @@ Example response:
 				throw new Error(`OpenAI API error: ${response.statusText}`);
 			}
 
+			// Reset the request interval on successful response
+			this.requestInterval = 2000; // Reset to base interval
+			
 			const data = await response.json();
 			return data.choices[0].message.content;
 		} catch (error) {

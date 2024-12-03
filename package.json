@@ -12,7 +12,8 @@
 		"build": "npm run build:chrome && npm run build:firefox && npm run build:safari",
 		"dev": "npm run dev:chrome",
 		"update-locales": "ts-node --project scripts/tsconfig.json scripts/update-locales.ts",
-		"check-strings": "ts-node --project scripts/tsconfig.json scripts/check-unused-strings.ts"
+		"check-strings": "ts-node --project scripts/tsconfig.json scripts/check-unused-strings.ts",
+		"add-locale": "ts-node --project scripts/tsconfig.json scripts/add-locale.ts"
 	},
 	"devDependencies": {
 		"@types/chrome": "^0.0.270",

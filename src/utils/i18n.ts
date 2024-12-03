@@ -7,7 +7,7 @@ let currentLanguage: string | null = null;
 // Return raw values, translation will be handled by the i18n system
 export function getAvailableLanguages(): { code: string; name: string }[] {
 	return [
-		{ code: '', name: 'systemDefault' }, // This will be translated via data-i18n
+		{ code: '', name: 'systemDefault' },
 		{ code: 'ar', name: 'العربية' },
 		{ code: 'de', name: 'Deutsch' },
 		{ code: 'en', name: 'English' },
@@ -15,6 +15,7 @@ export function getAvailableLanguages(): { code: string; name: string }[] {
 		{ code: 'fa', name: 'فارسی' },
 		{ code: 'fr', name: 'Français' },
 		{ code: 'id', name: 'Bahasa Indonesia' },
+		{ code: 'it', name: 'Italiano' },
 		{ code: 'ja', name: '日本語' },
 		{ code: 'ko', name: '한국어' },
 		{ code: 'pt-BR', name: 'Português (Brasil)' },
