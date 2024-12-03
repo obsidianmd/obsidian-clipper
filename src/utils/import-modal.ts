@@ -1,37 +1,47 @@
 import { showModal, hideModal } from './modal-utils';
 import { importTemplateFile } from './import-export';
+import { getMessage, translatePage } from './i18n';
 
-export function showImportModal(
+export async function showImportModal(
 	modalId: string,
 	importFunction: (content: string) => Promise<void>,
 	fileExtension: string = '.json',
-	dropZoneText: string = 'Choose a file or drag and drop',
-	textareaPlaceholder: string = 'Paste JSON here',
 	isTemplateImport: boolean = false,
-	modalTitle: string = 'Import'
-): void {
+	modalTitleKey: string = 'import'
+): Promise<void> {
 	const modal = document.getElementById(modalId);
 	const dropZone = modal?.querySelector('.import-drop-zone') as HTMLElement;
 	const jsonTextarea = modal?.querySelector('.import-json-textarea') as HTMLTextAreaElement;
 	const cancelBtn = modal?.querySelector('.import-cancel-btn') as HTMLElement;
 	const confirmBtn = modal?.querySelector('.import-confirm-btn') as HTMLElement;
-	const titleElement = modal?.querySelector('.modal-title') as HTMLElement; // Add this line
+	const titleElement = modal?.querySelector('.modal-title') as HTMLElement;
 
 	if (!modal || !dropZone || !jsonTextarea || !cancelBtn || !confirmBtn || !titleElement) {
 		console.error('Import modal elements not found');
 		return;
 	}
 
-	// Set custom text
-	titleElement.textContent = modalTitle;
+	// Set data-i18n attributes
+	titleElement.setAttribute('data-i18n', modalTitleKey);
 	const dropZoneTextElement = dropZone.querySelector('p');
-	if (dropZoneTextElement) dropZoneTextElement.textContent = dropZoneText;
-	jsonTextarea.placeholder = textareaPlaceholder;
+	if (dropZoneTextElement) {
+		dropZoneTextElement.setAttribute('data-i18n', 'dragAndDropFile');
+	}
+	jsonTextarea.setAttribute('data-i18n', 'pasteJsonHere');
+	cancelBtn.setAttribute('data-i18n', 'cancel');
+	confirmBtn.setAttribute('data-i18n', 'import');
+
+	const orText = modal.querySelector('.import-or-text');
+	if (orText) {
+		orText.setAttribute('data-i18n', 'orPasteBelow');
+	}
 
 	// Clear the textarea when showing the modal
 	jsonTextarea.value = '';
 
+	// Show modal and translate
 	showModal(modal);
+	await translatePage();
 
 	// Remove existing event listeners
 	dropZone.removeEventListener('dragover', handleDragOver);

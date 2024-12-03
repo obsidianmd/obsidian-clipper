@@ -6,7 +6,7 @@ import { detectBrowser } from './browser-detection';
 import { generalSettings, loadSettings } from '../utils/storage-utils';
 import { addPropertyType, updatePropertyTypesList } from '../managers/property-types-manager';
 import { hideModal } from '../utils/modal-utils';
-import { showImportModal as showGenericImportModal } from './import-modal';
+import { showImportModal } from './import-modal';
 import browser from '../utils/browser-polyfill';
 import { saveFile } from './file-utils';
 import { compressToUTF16, decompressFromUTF16 } from 'lz-string';
@@ -258,14 +258,12 @@ export function importTemplateFile(file: File): void {
 }
 
 export function showTemplateImportModal(): void {
-	showGenericImportModal(
+	showImportModal(
 		'import-modal',
 		importTemplateFromJson,
 		'.json',
-		'Choose template file or drag and drop',
-		'Paste template JSON here',
 		true,
-		'Import template'
+		'importTemplate'
 	);
 }
 
@@ -368,14 +366,12 @@ export async function exportAllSettings(): Promise<void> {
 }
 
 export function importAllSettings(): void {
-	showGenericImportModal(
+	showImportModal(
 		'import-modal',
 		importAllSettingsFromJson,
 		'.json',
-		'Choose settings file or drag and drop',
-		'Paste settings JSON here',
 		false,
-		'Import all settings'
+		'importAllSettings'
 	);
 }
 
