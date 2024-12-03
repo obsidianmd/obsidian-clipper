@@ -19,6 +19,10 @@ export default class I18nAutomation {
 	private localesDir: string;
 	private apiKey?: string;
 	private chatHistories: { [locale: string]: { role: string, content: string }[] } = {};
+	private lastRequestTime = 0;
+	private requestInterval = 2000; // 2 seconds between requests
+	private maxRetries = 3;
+	private batchSize = 10; // Increase batch size to 10 messages
 
 	constructor(localesDir: string, openaiApiKey?: string) {
 		this.localesDir = localesDir;
@@ -44,57 +48,135 @@ Translation guidelines:
 - Match the tone of the original text (error messages should sound like errors, etc.)
 - Consider the context of each string (button labels, error messages, descriptions, etc.)
 
-Please translate each message I send you. Respond with only the translated text, no explanations needed.`
+Response format:
+Always respond with a valid JSON object in this exact format:
+{"key1":"translation1","key2":"translation2"}
+
+Example input:
+save: (button) "Save to vault"
+error: (error message) "Failed to connect"
+
+Example response:
+{"save":"Sauvegarder dans le coffre","error":"Échec de la connexion"}`
 		}];
 	}
 
-	private async translateMessage(message: string, targetLanguage: string, key: string): Promise<string> {
-		if (!this.apiKey) {
-			throw new Error('OpenAI API key not provided');
+	private async sleep(ms: number): Promise<void> {
+		return new Promise(resolve => setTimeout(resolve, ms));
+	}
+
+	private async makeRequestWithRetry(
+		messages: { role: string, content: string }[],
+		retryCount = 0
+	): Promise<string> {
+		// Ensure we wait at least requestInterval ms between requests
+		const now = Date.now();
+		const timeSinceLastRequest = now - this.lastRequestTime;
+		if (timeSinceLastRequest < this.requestInterval) {
+			await this.sleep(this.requestInterval - timeSinceLastRequest);
 		}
 
-		// Initialize chat history if it doesn't exist
+		try {
+			const response = await fetch('https://api.openai.com/v1/chat/completions', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${this.apiKey}`
+				},
+				body: JSON.stringify({
+					model: "gpt-4",
+					messages: messages,
+					temperature: 0.3
+				})
+			});
+
+			this.lastRequestTime = Date.now();
+
+			if (!response.ok) {
+				if (response.status === 429 && retryCount < this.maxRetries) {
+					const retryAfter = response.headers.get('retry-after');
+					const waitTime = retryAfter ? parseInt(retryAfter) * 1000 : this.requestInterval * Math.pow(2, retryCount);
+					console.log(`  ⏳ Rate limited, waiting ${waitTime/1000}s before retry ${retryCount + 1}/${this.maxRetries}...`);
+					await this.sleep(waitTime);
+					return this.makeRequestWithRetry(messages, retryCount + 1);
+				}
+				throw new Error(`OpenAI API error: ${response.statusText}`);
+			}
+
+			const data = await response.json();
+			return data.choices[0].message.content;
+		} catch (error) {
+			if (retryCount < this.maxRetries) {
+				const waitTime = this.requestInterval * Math.pow(2, retryCount);
+				console.log(`  ⏳ Request failed, waiting ${waitTime/1000}s before retry ${retryCount + 1}/${this.maxRetries}...`);
+				await this.sleep(waitTime);
+				return this.makeRequestWithRetry(messages, retryCount + 1);
+			}
+			throw error;
+		}
+	}
+
+	private async translateBatch(
+		messages: { key: string; message: string }[],
+		targetLanguage: string
+	): Promise<{ [key: string]: string }> {
 		if (!this.chatHistories[targetLanguage]) {
 			this.initializeChatHistory(targetLanguage);
 		}
 
-		const context = this.getMessageContext(key);
-		console.log(`  🤖 Translating ${context}: "${message.substring(0, 40)}${message.length > 40 ? '...' : ''}"`);
+		// Format the batch request
+		const batchPrompt = messages.map(({ key, message }) => {
+			const context = this.getMessageContext(key);
+			return `${key}: (${context}) "${message}"`;
+		}).join('\n\n');
 
-		// Add message to translate to chat history
+		console.log(`  🤖 Translating batch of ${messages.length} messages:`);
+		messages.forEach(({ key, message }) => {
+			console.log(`    - ${key}: "${message.substring(0, 40)}${message.length > 40 ? '...' : ''}"`);
+		});
+
+		// Add batch to chat history
 		this.chatHistories[targetLanguage].push({
 			role: "user",
-			content: `Translate this ${context}: "${message}"`
+			content: `Translate these messages to ${targetLanguage}. Respond with a valid JSON object where keys match the input keys and values are the translations. Format the response as a single line without pretty-printing:\n\n${batchPrompt}`
 		});
 
-		const response = await fetch('https://api.openai.com/v1/chat/completions', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${this.apiKey}`
-			},
-			body: JSON.stringify({
-				model: "gpt-4",
-				messages: this.chatHistories[targetLanguage],
-				temperature: 0.3
-			})
-		});
+		try {
+			const response = await this.makeRequestWithRetry(this.chatHistories[targetLanguage]);
+			
+			// Clean and parse the JSON response
+			let translations: { [key: string]: string };
+			try {
+				const cleanJson = response.replace(/```json\n?|\n?```/g, '').trim();
+				translations = JSON.parse(cleanJson);
 
-		if (!response.ok) {
-			throw new Error(`OpenAI API error: ${response.statusText}`);
+				const missingKeys = messages.filter(({ key }) => !translations[key]);
+				if (missingKeys.length > 0) {
+					throw new Error(`Missing translations for keys: ${missingKeys.map(m => m.key).join(', ')}`);
+				}
+			} catch (error) {
+				console.error(`  ❌ Failed to parse response as JSON:`, response);
+				console.error(`  Error details:`, error);
+				throw new Error('Invalid response format');
+			}
+
+			// Add response to chat history
+			this.chatHistories[targetLanguage].push({
+				role: "assistant",
+				content: JSON.stringify(translations)
+			});
+
+			// Log translations
+			console.log(`  ➡️ Received translations (${targetLanguage}):`);
+			Object.entries(translations).forEach(([key, translation]) => {
+				console.log(`    - ${key}: "${translation.substring(0, 40)}${translation.length > 40 ? '...' : ''}"`);
+			});
+
+			return translations;
+		} catch (error) {
+			console.error(`  ❌ Batch translation failed:`, error);
+			throw error;
 		}
-
-		const data = await response.json();
-		const translatedText = data.choices[0].message.content || message;
-
-		// Add assistant's response to chat history
-		this.chatHistories[targetLanguage].push({
-			role: "assistant",
-			content: translatedText
-		});
-
-		console.log(`  ✓ Translated to: "${translatedText.substring(0, 40)}${translatedText.length > 40 ? '...' : ''}"`);
-		return translatedText;
 	}
 
 	private getMessageContext(key: string): string {
@@ -166,23 +248,39 @@ Please translate each message I send you. Respond with only the translated text,
 			if (missingKeys.length > 0) {
 				console.log(`  🔍 Found ${missingKeys.length} missing translations`);
 				
-				// Translate each missing message
-				for (const key of missingKeys) {
-					try {
-						const translatedMessage = await this.translateMessage(
-							sortedSourceMessages[key].message,
-							locale,
-							key
-						);
-						localeMessages[key] = {
-							message: translatedMessage,
-							...(sortedSourceMessages[key].placeholders && { 
-								placeholders: sortedSourceMessages[key].placeholders 
-							})
-						};
-					} catch (error) {
-						console.error(`  ❌ Failed to translate ${key}:`, error);
-						localeMessages[key] = sortedSourceMessages[key];
+				// Process messages in batches
+				for (let i = 0; i < missingKeys.length; i += this.batchSize) {
+					const batch = missingKeys.slice(i, i + this.batchSize).map(key => ({
+						key,
+						message: sortedSourceMessages[key].message
+					}));
+
+					// Try twice before falling back to source messages
+					for (let attempt = 1; attempt <= 2; attempt++) {
+						try {
+							const translations = await this.translateBatch(batch, locale);
+							
+							// Add translations to localeMessages
+							Object.entries(translations).forEach(([key, translation]) => {
+								localeMessages[key] = {
+									message: translation,
+									...(sortedSourceMessages[key].placeholders && { 
+										placeholders: sortedSourceMessages[key].placeholders 
+									})
+								};
+							});
+							break; // Success - exit retry loop
+						} catch (error) {
+							if (attempt === 1) {
+								console.log(`  ⚠️ First attempt failed, retrying batch...`);
+								continue;
+							}
+							console.error(`  ❌ Both translation attempts failed, using source messages as fallback`);
+							// Fall back to source messages after both attempts fail
+							batch.forEach(({ key }) => {
+								localeMessages[key] = sortedSourceMessages[key];
+							});
+						}
 					}
 				}
 			} else {

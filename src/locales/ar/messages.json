@@ -8,6 +8,12 @@
 	"addProperty": {
 		"message": "+ إضافة خاصية"
 	},
+	"addProvider": {
+		"message": "+ أضف مزود"
+	},
+	"addProviderTitle": {
+		"message": "أضف مزود"
+	},
 	"addToObsidian": {
 		"message": "إضافة إلى أوبسيديان"
 	},
@@ -26,19 +32,8 @@
 	"alwaysShowHighlightsDescription": {
 		"message": "عرض التظليلات المحفوظة عند تحميل الصفحة. قم بإيقافها لعرض التظليلات فقط عند تفعيل وضع التظليل."
 	},
-	"anthropicApiKey": {
-		"message": "مفتاح Anthropic API"
-	},
-	"anthropicApiKeyDescription": {
-		"message": "يمكنك الحصول على مفتاح Anthropic API الخاص بك $link_start$هنا$link_end$.",
-		"placeholders": {
-			"link_end": {
-				"content": "</a>"
-			},
-			"link_start": {
-				"content": "<a href=\"https://console.anthropic.com/settings/keys\" target=\"_blank\">"
-			}
-		}
+	"apiKeyMissing": {
+		"message": "لا يوجد مفتاح API"
 	},
 	"apiKeysWarning": {
 		"message": "باستخدام مزود خارجي، فإنك توافق على شروطهم وسياسة الخصوصية الخاصة بهم. يتم إرسال طلبات المفسر مباشرة إلى المزود الذي تختاره. لا يقوم Obsidian بجمع أو تخزين أي بيانات حول طلباتك."
@@ -63,6 +58,24 @@
 	},
 	"cancel": {
 		"message": "إلغاء"
+	},
+	"cannotDeleteProvider": {
+		"message": "لا يمكن حذف المزود \"$1\" لأنه يتم استخدامه بواسطة $2 نموذج (نماذج)."
+	},
+	"changelog": {
+		"message": "سجل التغييرات"
+	},
+	"chooseFile": {
+		"message": "اختر ملف"
+	},
+	"choosePropertiesFile": {
+		"message": "اختر ملف الخصائص"
+	},
+	"chooseSettingsFile": {
+		"message": "اختر ملف الإعدادات"
+	},
+	"chooseTemplateFile": {
+		"message": "اختر ملف القالب"
 	},
 	"clipBehavior": {
 		"message": "سلوك القص"
@@ -93,6 +106,9 @@
 	"confirmDeleteTemplate": {
 		"message": "هل أنت متأكد من أنك تريد حذف القالب \"$1\"؟"
 	},
+	"confirmReplaceSettings": {
+		"message": "سيؤدي هذا إلى استبدال كل إعداداتك الحالية، بما في ذلك القوالب والخصائص. هل أنت متأكد أنك تريد المتابعة؟"
+	},
 	"copied": {
 		"message": "تم النسخ!"
 	},
@@ -104,6 +120,9 @@
 	},
 	"createNewNote": {
 		"message": "إنشاء ملاحظة جديدة"
+	},
+	"custom": {
+		"message": "مخصص"
 	},
 	"dailyNoteFormat": {
 		"message": "تنسيق الملاحظة اليومية (مثال: YYYY-MM-DD)"
@@ -123,14 +142,17 @@
 	"deleteModelConfirm": {
 		"message": "هل أنت متأكد من أنك تريد حذف هذا النموذج؟"
 	},
+	"deleteProviderConfirm": {
+		"message": "هل أنت متأكد أنك تريد حذف هذا المزود؟"
+	},
 	"disableHighlighter": {
 		"message": "تعطيل المظلل"
 	},
-	"display": {
-		"message": "العرض"
-	},
 	"done": {
 		"message": "تم"
+	},
+	"dragAndDropFile": {
+		"message": "اسحب وأسقط الملف هنا"
 	},
 	"duplicate": {
 		"message": "نسخ"
@@ -151,6 +173,9 @@
 	},
 	"editModel": {
 		"message": "تعديل النموذج"
+	},
+	"editProvider": {
+		"message": "تعديل المزود"
 	},
 	"editTemplate": {
 		"message": "تعديل القالب"
@@ -225,8 +250,20 @@
 	"failedToDeleteTemplate": {
 		"message": "فشل حذف القالب. يرجى المحاولة مرة أخرى."
 	},
+	"failedToDuplicateTemplate": {
+		"message": "فشل في تكرار القالب. يرجى المحاولة مرة أخرى."
+	},
+	"failedToExportHighlights": {
+		"message": "فشل في تصدير الأبراز. يرجى التحقق من وحدة التحكم لمزيد من التفاصيل."
+	},
+	"failedToExportSettings": {
+		"message": "فشل في تصدير الإعدادات. يرجى التحقق من وحدة التحكم لمزيد من التفاصيل."
+	},
 	"failedToExtractContent": {
 		"message": "تعذر استخراج محتوى الصفحة."
+	},
+	"failedToImportTemplate": {
+		"message": "خطأ في استيراد القالب. يرجى التحقق من الملف والمحاولة مرة أخرى."
 	},
 	"failedToInitialize": {
 		"message": "يرجى محاولة إعادة تحميل الإضافة."
@@ -246,6 +283,9 @@
 	"failedToSaveFile": {
 		"message": "فشل حفظ الملف"
 	},
+	"failedToSaveProvider": {
+		"message": "فشل في حفظ المزود. يرجى المحاولة مرة أخرى."
+	},
 	"folder": {
 		"message": "مجلد"
 	},
@@ -254,6 +294,9 @@
 	},
 	"generalSettings": {
 		"message": "الإعدادات العامة"
+	},
+	"getApiKeyHere": {
+		"message": "احصل على مفتاح API الخاص بك $1 هنا."
 	},
 	"help": {
 		"message": "المساعدة"
@@ -285,6 +328,12 @@
 	"importAllSettingsDescription": {
 		"message": "استيراد جميع الإعدادات بما في ذلك القوالب والخصائص. سيؤدي هذا إلى استبدال التكوين الحالي الخاص بك."
 	},
+	"importFailed": {
+		"message": "فشل الاستيراد. يرجى التحقق من وحدة التحكم لمزيد من التفاصيل."
+	},
+	"importModalTitle": {
+		"message": "استيراد"
+	},
 	"importProperties": {
 		"message": "استيراد الخصائص"
 	},
@@ -304,6 +353,12 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"importSettings": {
+		"message": "استيراد الإعدادات"
+	},
+	"importTemplate": {
+		"message": "استيراد القالب"
 	},
 	"interpret": {
 		"message": "تفسير"
@@ -340,18 +395,6 @@
 	"legacyModeDescription": {
 		"message": "يستخدم طريقة قص URI المتوافقة مع أوبسيديان 1.6.7 أو أقدم. لاحظ أن طول المحتوى الذي يمكنك قصه محدود بواسطة متصفحك ونظام التشغيل. قد تفشل بعض الصفحات بدون أي أخطاء."
 	},
-	"modelApiKey": {
-		"message": "مفتاح API"
-	},
-	"modelApiKeyDescription": {
-		"message": "أدخل مفتاح API لهذا النموذج. قد لا يكون مطلوبًا لجميع المزودين."
-	},
-	"modelBaseUrl": {
-		"message": "عنوان URL الأساسي"
-	},
-	"modelBaseUrlDescription": {
-		"message": "عنوان URL لنقطة نهاية API لهذا النموذج."
-	},
 	"modelName": {
 		"message": "اسم النموذج"
 	},
@@ -364,14 +407,11 @@
 	"modelProviderDescription": {
 		"message": "مزود النموذج، على سبيل المثال Ollama أو OpenRouter أو Google، إلخ."
 	},
-	"providerModelId": {
-		"message": "معرف النموذج"
+	"modelProviderPlaceholder": {
+		"message": "المزود"
 	},
-	"providerModelIdDescription": {
-		"message": "معرف النموذج من المزود الخاص بك. عادةً ما يكون اسمًا قصيرًا بدون مسافات."
-	},
-	"providerModelIdPlaceholder": {
-		"message": "معرف النموذج"
+	"modelRequiredFields": {
+		"message": "اسم النموذج، المزود، ومعرف النموذج مطلوبين."
 	},
 	"models": {
 		"message": "النماذج"
@@ -387,6 +427,9 @@
 	},
 	"noTemplates": {
 		"message": "لا توجد قوالب متاحة. يرجى إضافة قالب في الإعدادات."
+	},
+	"noUnusedProperties": {
+		"message": "لم يتم العثور على خصائص غير مستخدمة."
 	},
 	"noteContent": {
 		"message": "محتوى الملاحظة"
@@ -426,28 +469,20 @@
 	"open": {
 		"message": "فتح"
 	},
-	"openaiApiKey": {
-		"message": "مفتاح OpenAI API"
-	},
-	"openaiApiKeyDescription": {
-		"message": "يمكنك الحصول على مفتاح OpenAI API الخاص بك $link_start$هنا$link_end$.",
-		"placeholders": {
-			"link_end": {
-				"content": "</a>"
-			},
-			"link_start": {
-				"content": "<a href=\"https://platform.openai.com/api-keys\" target=\"_blank\">"
-			}
-		}
-	},
 	"optional": {
 		"message": "(اختياري)"
+	},
+	"orPasteBelow": {
+		"message": "أو الصق المحتوى أدناه"
 	},
 	"pageCannotBeClipped": {
 		"message": "لا يمكن قص هذه الصفحة."
 	},
 	"pageVariables": {
 		"message": "متغيرات الصفحة"
+	},
+	"pasteJsonHere": {
+		"message": "الصق JSON هنا"
 	},
 	"pleaseReload": {
 		"message": "يرجى محاولة إعادة تحميل الصفحة."
@@ -472,6 +507,45 @@
 	},
 	"propertyValue": {
 		"message": "قيمة الخاصية"
+	},
+	"provider": {
+		"message": "المزود"
+	},
+	"providerApiKey": {
+		"message": "مفتاح API"
+	},
+	"providerApiKeyDescription": {
+		"message": "مفتاح API الخاص بك لهذا المزود."
+	},
+	"providerBaseUrl": {
+		"message": "URL الأساسي"
+	},
+	"providerBaseUrlDescription": {
+		"message": "URL نقطة النهاية لل API لهذا المزود."
+	},
+	"providerModelId": {
+		"message": "معرف النموذج"
+	},
+	"providerModelIdDescription": {
+		"message": "معرف النموذج من المزود الخاص بك. عادةً ما يكون اسمًا قصيرًا بدون مسافات."
+	},
+	"providerModelIdPlaceholder": {
+		"message": "معرف النموذج"
+	},
+	"providerName": {
+		"message": "اسم المزود"
+	},
+	"providerNameDescription": {
+		"message": "اسم العرض لهذا المزود."
+	},
+	"providerPreset": {
+		"message": "الإعداد المسبق"
+	},
+	"providerPresetDescription": {
+		"message": "اختر مزود أو أنشئ واحدًا مخصصًا."
+	},
+	"providerRequiredFields": {
+		"message": "اسم المزود وURL الأساسي مطلوبين."
 	},
 	"providers": {
 		"message": "المزودون"
@@ -515,11 +589,20 @@
 	"searchVariables": {
 		"message": "البحث عن المتغيرات..."
 	},
+	"selectProvider": {
+		"message": "اختر مزود"
+	},
+	"selectTemplateToExport": {
+		"message": "الرجاء اختيار قالب للتصدير."
+	},
 	"settings": {
 		"message": "الإعدادات"
 	},
 	"settingsHeading": {
 		"message": "الإعدادات"
+	},
+	"settingsImportSuccess": {
+		"message": "تم استيراد جميع الإعدادات بنجاح. يرجى تحديث الصفحة لرؤية التغييرات."
 	},
 	"share": {
 		"message": "مشاركة..."
@@ -569,6 +652,12 @@
 	"systemDefault": {
 		"message": "النظام"
 	},
+	"templateCopied": {
+		"message": "تم نسخ قالب JSON إلى الحافظة"
+	},
+	"templateCopyError": {
+		"message": "فشل في نسخ قالب JSON إلى الحافظة"
+	},
 	"templateName": {
 		"message": "اسم القالب"
 	},
@@ -589,6 +678,15 @@
 	},
 	"thinking": {
 		"message": "يفكر"
+	},
+	"unknownProvider": {
+		"message": "مزود غير معروف"
+	},
+	"updateAvailable": {
+		"message": "يتوفر تحديث جديد."
+	},
+	"usingLatestVersion": {
+		"message": "أنت تستخدم أحدث إصدار."
 	},
 	"vault": {
 		"message": "الخزينة"
@@ -620,14 +718,5 @@
 	},
 	"version": {
 		"message": "الإصدار"
-	},
-	"updateAvailable": {
-		"message": "يتوفر تحديث جديد."
-	},
-	"usingLatestVersion": {
-		"message": "أنت تستخدم أحدث إصدار."
-	},
-	"changelog": {
-		"message": "سجل التغييرات"
 	}
 }

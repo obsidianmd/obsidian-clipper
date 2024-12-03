@@ -8,6 +8,12 @@
 	"addProperty": {
 		"message": "+ Tambah properti"
 	},
+	"addProvider": {
+		"message": "+ Tambah penyedia"
+	},
+	"addProviderTitle": {
+		"message": "Tambah penyedia"
+	},
 	"addToObsidian": {
 		"message": "Tambah ke Obsidian"
 	},
@@ -26,19 +32,8 @@
 	"alwaysShowHighlightsDescription": {
 		"message": "Tampilkan sorotan yang tersimpan saat memuat laman web. Matikan untuk hanya menampilkan sorotan saat mode sorotan diaktifkan."
 	},
-	"anthropicApiKey": {
-		"message": "Kunci API Anthropic"
-	},
-	"anthropicApiKeyDescription": {
-		"message": "Anda dapat memperoleh kunci API Anthropic Anda $link_start$di sini$link_end$.",
-		"placeholders": {
-			"link_end": {
-				"content": "</a>"
-			},
-			"link_start": {
-				"content": "<a href=\"https://console.anthropic.com/settings/keys\" target=\"_blank\">"
-			}
-		}
+	"apiKeyMissing": {
+		"message": "Tidak ada kunci API"
 	},
 	"apiKeysWarning": {
 		"message": "Dengan menggunakan penyedia eksternal, Anda menyetujui persyaratan dan kebijakan privasi mereka. Permintaan interpreter dikirim langsung ke penyedia yang Anda pilih. Obsidian tidak mengumpulkan atau menyimpan data apa pun tentang permintaan Anda."
@@ -64,8 +59,23 @@
 	"cancel": {
 		"message": "Batal"
 	},
+	"cannotDeleteProvider": {
+		"message": "Tidak dapat menghapus penyedia \"$1\" karena sedang digunakan oleh $2 model."
+	},
 	"changelog": {
 		"message": "Catatan perubahan"
+	},
+	"chooseFile": {
+		"message": "Pilih file"
+	},
+	"choosePropertiesFile": {
+		"message": "Pilih file properti"
+	},
+	"chooseSettingsFile": {
+		"message": "Pilih file pengaturan"
+	},
+	"chooseTemplateFile": {
+		"message": "Pilih file template"
 	},
 	"clipBehavior": {
 		"message": "Perilaku klip"
@@ -96,6 +106,9 @@
 	"confirmDeleteTemplate": {
 		"message": "Apakah Anda yakin ingin menghapus template \"$1\"?"
 	},
+	"confirmReplaceSettings": {
+		"message": "Ini akan menggantikan semua pengaturan Anda saat ini, termasuk template dan properti. Anda yakin ingin melanjutkan?"
+	},
 	"copied": {
 		"message": "Tersalin!"
 	},
@@ -107,6 +120,9 @@
 	},
 	"createNewNote": {
 		"message": "Buat catatan baru"
+	},
+	"custom": {
+		"message": "Kustom"
 	},
 	"dailyNoteFormat": {
 		"message": "Format catatan harian (mis., YYYY-MM-DD)"
@@ -126,14 +142,17 @@
 	"deleteModelConfirm": {
 		"message": "Apakah Anda yakin ingin menghapus model ini?"
 	},
+	"deleteProviderConfirm": {
+		"message": "Anda yakin ingin menghapus penyedia ini?"
+	},
 	"disableHighlighter": {
 		"message": "Nonaktifkan sorotan"
 	},
-	"display": {
-		"message": "Tampilan"
-	},
 	"done": {
 		"message": "selesai"
+	},
+	"dragAndDropFile": {
+		"message": "Seret dan lepas file di sini"
 	},
 	"duplicate": {
 		"message": "Duplikat"
@@ -154,6 +173,9 @@
 	},
 	"editModel": {
 		"message": "Edit model"
+	},
+	"editProvider": {
+		"message": "Edit penyedia"
 	},
 	"editTemplate": {
 		"message": "Ubah template"
@@ -228,8 +250,20 @@
 	"failedToDeleteTemplate": {
 		"message": "Gagal menghapus template. Silakan coba lagi."
 	},
+	"failedToDuplicateTemplate": {
+		"message": "Gagal menduplikasi template. Silakan coba lagi."
+	},
+	"failedToExportHighlights": {
+		"message": "Gagal mengekspor sorotan. Silakan periksa konsol untuk detail lebih lanjut."
+	},
+	"failedToExportSettings": {
+		"message": "Gagal mengekspor pengaturan. Silakan periksa konsol untuk detail lebih lanjut."
+	},
 	"failedToExtractContent": {
 		"message": "Tidak dapat mengekstrak konten laman web."
+	},
+	"failedToImportTemplate": {
+		"message": "Kesalahan saat mengimpor template. Silakan periksa file dan coba lagi."
 	},
 	"failedToInitialize": {
 		"message": "Silakan coba muat ulang ekstensi."
@@ -249,6 +283,9 @@
 	"failedToSaveFile": {
 		"message": "Gagal menyimpan file"
 	},
+	"failedToSaveProvider": {
+		"message": "Gagal menyimpan penyedia. Silakan coba lagi."
+	},
 	"folder": {
 		"message": "Folder"
 	},
@@ -257,6 +294,9 @@
 	},
 	"generalSettings": {
 		"message": "Pengaturan umum"
+	},
+	"getApiKeyHere": {
+		"message": "Dapatkan kunci API $1 Anda di sini."
 	},
 	"help": {
 		"message": "Bantuan"
@@ -288,6 +328,12 @@
 	"importAllSettingsDescription": {
 		"message": "Impor semua pengaturan termasuk template dan properti. Ini akan menggantikan konfigurasi yang telah ada saat ini."
 	},
+	"importFailed": {
+		"message": "Impor gagal. Silakan periksa konsol untuk detail lebih lanjut."
+	},
+	"importModalTitle": {
+		"message": "Impor"
+	},
 	"importProperties": {
 		"message": "Impor properti"
 	},
@@ -307,6 +353,12 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"importSettings": {
+		"message": "Impor pengaturan"
+	},
+	"importTemplate": {
+		"message": "Impor template"
 	},
 	"interpret": {
 		"message": "interpretasi"
@@ -343,18 +395,6 @@
 	"legacyModeDescription": {
 		"message": "Menggunakan metode klip URI yang kompatibel dengan Obsidian 1.6.7 atau yang lebih lama. Perhatikan bahwa panjang konten yang dapat Anda klip dibatasi oleh browser dan sistem operasi Anda. Beberapa laman web bisa saja gagal tanpa ada pesan error yang tampil."
 	},
-	"modelApiKey": {
-		"message": "Kunci API"
-	},
-	"modelApiKeyDescription": {
-		"message": "Masukkan kunci API untuk model ini. Mungkin tidak diperlukan untuk semua penyedia."
-	},
-	"modelBaseUrl": {
-		"message": "URL dasar"
-	},
-	"modelBaseUrlDescription": {
-		"message": "URL endpoint API untuk model ini."
-	},
 	"modelName": {
 		"message": "Nama model"
 	},
@@ -367,14 +407,11 @@
 	"modelProviderDescription": {
 		"message": "Penyedia model, misalnya Ollama, OpenRouter, Google, dll."
 	},
-	"providerModelId": {
-		"message": "ID model"
+	"modelProviderPlaceholder": {
+		"message": "Penyedia"
 	},
-	"providerModelIdDescription": {
-		"message": "Pengidentifikasi model dari penyedia Anda. Biasanya nama pendek tanpa spasi."
-	},
-	"providerModelIdPlaceholder": {
-		"message": "ID model"
+	"modelRequiredFields": {
+		"message": "Nama model, Penyedia, dan ID Model diperlukan."
 	},
 	"models": {
 		"message": "Model"
@@ -390,6 +427,9 @@
 	},
 	"noTemplates": {
 		"message": "Tidak ada template yang tersedia. Silakan tambahkan template di pengaturan."
+	},
+	"noUnusedProperties": {
+		"message": "Tidak ada properti yang tidak digunakan ditemukan."
 	},
 	"noteContent": {
 		"message": "Konten catatan"
@@ -429,28 +469,20 @@
 	"open": {
 		"message": "Buka"
 	},
-	"openaiApiKey": {
-		"message": "Kunci API OpenAI"
-	},
-	"openaiApiKeyDescription": {
-		"message": "Anda dapat memperoleh kunci API OpenAI Anda $link_start$di sini$link_end$.",
-		"placeholders": {
-			"link_end": {
-				"content": "</a>"
-			},
-			"link_start": {
-				"content": "<a href=\"https://platform.openai.com/api-keys\" target=\"_blank\">"
-			}
-		}
-	},
 	"optional": {
 		"message": "(opsional)"
+	},
+	"orPasteBelow": {
+		"message": "Atau tempel konten di bawah ini"
 	},
 	"pageCannotBeClipped": {
 		"message": "Laman ini tidak dapat diklip."
 	},
 	"pageVariables": {
 		"message": "Variabel laman web"
+	},
+	"pasteJsonHere": {
+		"message": "Tempel JSON di sini"
 	},
 	"pleaseReload": {
 		"message": "Silakan coba muat ulang laman web."
@@ -475,6 +507,45 @@
 	},
 	"propertyValue": {
 		"message": "Value properti"
+	},
+	"provider": {
+		"message": "Penyedia"
+	},
+	"providerApiKey": {
+		"message": "Kunci API"
+	},
+	"providerApiKeyDescription": {
+		"message": "Kunci API Anda untuk penyedia ini."
+	},
+	"providerBaseUrl": {
+		"message": "URL Dasar"
+	},
+	"providerBaseUrlDescription": {
+		"message": "URL endpoint API untuk penyedia ini."
+	},
+	"providerModelId": {
+		"message": "ID model"
+	},
+	"providerModelIdDescription": {
+		"message": "Pengidentifikasi model dari penyedia Anda. Biasanya nama pendek tanpa spasi."
+	},
+	"providerModelIdPlaceholder": {
+		"message": "ID model"
+	},
+	"providerName": {
+		"message": "Nama penyedia"
+	},
+	"providerNameDescription": {
+		"message": "Nama tampilan untuk penyedia ini."
+	},
+	"providerPreset": {
+		"message": "Preset"
+	},
+	"providerPresetDescription": {
+		"message": "Pilih penyedia atau buat yang kustom."
+	},
+	"providerRequiredFields": {
+		"message": "Nama penyedia dan URL Dasar diperlukan."
 	},
 	"providers": {
 		"message": "Penyedia"
@@ -518,11 +589,20 @@
 	"searchVariables": {
 		"message": "Cari variabel..."
 	},
+	"selectProvider": {
+		"message": "Pilih penyedia"
+	},
+	"selectTemplateToExport": {
+		"message": "Silakan pilih template untuk diekspor."
+	},
 	"settings": {
 		"message": "Pengaturan"
 	},
 	"settingsHeading": {
 		"message": "Pengaturan"
+	},
+	"settingsImportSuccess": {
+		"message": "Semua pengaturan berhasil diimpor. Silakan segarkan halaman untuk melihat perubahannya."
 	},
 	"share": {
 		"message": "Bagikan..."
@@ -572,6 +652,12 @@
 	"systemDefault": {
 		"message": "Sistem"
 	},
+	"templateCopied": {
+		"message": "Template JSON telah disalin ke papan klip"
+	},
+	"templateCopyError": {
+		"message": "Gagal menyalin template JSON ke papan klip"
+	},
 	"templateName": {
 		"message": "Nama template"
 	},
@@ -592,6 +678,9 @@
 	},
 	"thinking": {
 		"message": "berpikir"
+	},
+	"unknownProvider": {
+		"message": "Penyedia tidak dikenal"
 	},
 	"updateAvailable": {
 		"message": "Pembaruan tersedia."
