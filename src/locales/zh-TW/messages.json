@@ -8,6 +8,12 @@
 	"addProperty": {
 		"message": "+ 新增屬性"
 	},
+	"addProvider": {
+		"message": "+ 新增提供者"
+	},
+	"addProviderTitle": {
+		"message": "新增提供者"
+	},
 	"addToObsidian": {
 		"message": "新增到 Obsidian"
 	},
@@ -26,22 +32,8 @@
 	"alwaysShowHighlightsDescription": {
 		"message": "載入頁面時顯示已儲存的標記。關閉此選項則僅在啟用標記模式時顯示標記。"
 	},
-	"anthropicApiKey": {
-		"message": "Anthropic API 金鑰"
-	},
-	"anthropicApiKeyDescription": {
-		"message": "您可以在$link_start$這裡$link_end$取得 Anthropic API 金鑰。",
-		"placeholders": {
-			"link_end": {
-				"content": "</a>"
-			},
-			"link_start": {
-				"content": "<a href=\"https://console.anthropic.com/settings/keys\" target=\"_blank\">"
-			}
-		}
-	},
-	"anthropicApiKeyPlaceholder": {
-		"message": "Anthropic API 金鑰"
+	"apiKeyMissing": {
+		"message": "無 API 金鑰"
 	},
 	"apiKeysWarning": {
 		"message": "使用外部提供者即表示您同意其條款和隐私政策。解譯器請求直接發送給您選擇的提供者。Obsidian 不會收集或儲存任何關於您請求的資料。"
@@ -66,6 +58,9 @@
 	},
 	"cancel": {
 		"message": "取消"
+	},
+	"cannotDeleteProvider": {
+		"message": "無法刪除提供者 \"$1\"，因為它正在被 $2 個模型使用。"
 	},
 	"changelog": {
 		"message": "更新日誌"
@@ -111,6 +106,9 @@
 	"confirmDeleteTemplate": {
 		"message": "您確定要刪除範本 \"$1\" 嗎？"
 	},
+	"confirmReplaceSettings": {
+		"message": "這將替換您目前的所有設定，包括模板和屬性。您確定要繼續嗎？"
+	},
 	"copied": {
 		"message": "已複製！"
 	},
@@ -122,6 +120,9 @@
 	},
 	"createNewNote": {
 		"message": "建立新筆記"
+	},
+	"custom": {
+		"message": "自訂"
 	},
 	"dailyNoteFormat": {
 		"message": "每日筆記格式（例如 YYYY-MM-DD）"
@@ -141,11 +142,11 @@
 	"deleteModelConfirm": {
 		"message": "您確定要刪除此模型嗎？"
 	},
+	"deleteProviderConfirm": {
+		"message": "您確定要刪除此提供者嗎？"
+	},
 	"disableHighlighter": {
 		"message": "停用標記"
-	},
-	"display": {
-		"message": "顯示"
 	},
 	"done": {
 		"message": "完成"
@@ -172,6 +173,9 @@
 	},
 	"editModel": {
 		"message": "編輯模型"
+	},
+	"editProvider": {
+		"message": "編輯提供者"
 	},
 	"editTemplate": {
 		"message": "編輯範本"
@@ -246,8 +250,20 @@
 	"failedToDeleteTemplate": {
 		"message": "刪除範本失敗。請再試一次。"
 	},
+	"failedToDuplicateTemplate": {
+		"message": "複製模板失敗。請再試一次。"
+	},
+	"failedToExportHighlights": {
+		"message": "匯出重點失敗。請檢查控制台以獲得更多詳細資訊。"
+	},
+	"failedToExportSettings": {
+		"message": "匯出設定失敗。請檢查控制台以獲得更多詳細資訊。"
+	},
 	"failedToExtractContent": {
 		"message": "無法擷取頁面內容。"
+	},
+	"failedToImportTemplate": {
+		"message": "匯入模板錯誤。請檢查檔案並再試一次。"
 	},
 	"failedToInitialize": {
 		"message": "請嘗試重新載入擴充功能。"
@@ -267,6 +283,9 @@
 	"failedToSaveFile": {
 		"message": "儲存檔案失敗"
 	},
+	"failedToSaveProvider": {
+		"message": "儲存提供者失敗。請再試一次。"
+	},
 	"folder": {
 		"message": "資料夾"
 	},
@@ -275,6 +294,9 @@
 	},
 	"generalSettings": {
 		"message": "一般設定"
+	},
+	"getApiKeyHere": {
+		"message": "在此處獲取您的 $1 API 金鑰。"
 	},
 	"help": {
 		"message": "說明"
@@ -305,6 +327,9 @@
 	},
 	"importAllSettingsDescription": {
 		"message": "匯入所有設定，包括範本和屬性。這將取代您目前的配置。"
+	},
+	"importFailed": {
+		"message": "匯入失敗。請檢查控制台以獲得更多詳細資訊。"
 	},
 	"importModalTitle": {
 		"message": "匯入"
@@ -370,32 +395,11 @@
 	"legacyModeDescription": {
 		"message": "使用與 Obsidian 1.6.7 或更早版本相容的 URI 擷取方法。請注意，您可以擷取的內容長度受限於您的瀏覽器和作業系統。有些頁面可能會在沒有任何錯誤的情況下失敗。"
 	},
-	"modelApiKey": {
-		"message": "API 金鑰"
-	},
-	"modelApiKeyDescription": {
-		"message": "輸入此模型的 API 金鑰。可能不是所有提供者都需要。"
-	},
-	"modelApiKeyPlaceholder": {
-		"message": "API 金鑰"
-	},
-	"modelBaseUrl": {
-		"message": "基礎 URL"
-	},
-	"modelBaseUrlDescription": {
-		"message": "此模型的 API 端點 URL。"
-	},
-	"modelBaseUrlPlaceholder": {
-		"message": "基礎 URL"
-	},
 	"modelName": {
 		"message": "模型名稱"
 	},
 	"modelNameDescription": {
 		"message": "您想要在介面中顯示的模型名稱。"
-	},
-	"modelNamePlaceholder": {
-		"message": "模型名稱"
 	},
 	"modelProvider": {
 		"message": "提供者"
@@ -403,17 +407,11 @@
 	"modelProviderDescription": {
 		"message": "模型提供者，例如 Ollama、OpenRouter、Google 等。"
 	},
-	"providerModelId": {
-		"message": "模型 ID"
-	},
-	"providerModelIdDescription": {
-		"message": "來自您提供者的模型識別碼。通常是一個不含空格的簡短名稱。"
-	},
-	"providerModelIdPlaceholder": {
-		"message": "模型 ID"
-	},
 	"modelProviderPlaceholder": {
 		"message": "提供者"
+	},
+	"modelRequiredFields": {
+		"message": "模型名稱、提供者和模型 ID 是必填的。"
 	},
 	"models": {
 		"message": "模型"
@@ -429,6 +427,9 @@
 	},
 	"noTemplates": {
 		"message": "沒有可用的範本。請在設定中新增範本。"
+	},
+	"noUnusedProperties": {
+		"message": "未找到未使用的屬性。"
 	},
 	"noteContent": {
 		"message": "筆記內容"
@@ -468,23 +469,6 @@
 	"open": {
 		"message": "開啟"
 	},
-	"openaiApiKey": {
-		"message": "OpenAI API 金鑰"
-	},
-	"openaiApiKeyDescription": {
-		"message": "您可以在$link_start$這裡$link_end$取得 OpenAI API 金鑰。",
-		"placeholders": {
-			"link_end": {
-				"content": "</a>"
-			},
-			"link_start": {
-				"content": "<a href=\"https://platform.openai.com/api-keys\" target=\"_blank\">"
-			}
-		}
-	},
-	"openaiApiKeyPlaceholder": {
-		"message": "OpenAI API 金鑰"
-	},
 	"optional": {
 		"message": "（選填）"
 	},
@@ -523,6 +507,45 @@
 	},
 	"propertyValue": {
 		"message": "屬性值"
+	},
+	"provider": {
+		"message": "提供者"
+	},
+	"providerApiKey": {
+		"message": "API 金鑰"
+	},
+	"providerApiKeyDescription": {
+		"message": "這是您的提供者 API 金鑰。"
+	},
+	"providerBaseUrl": {
+		"message": "基礎 URL"
+	},
+	"providerBaseUrlDescription": {
+		"message": "這是此提供者的 API 端點 URL。"
+	},
+	"providerModelId": {
+		"message": "模型 ID"
+	},
+	"providerModelIdDescription": {
+		"message": "來自您提供者的模型識別碼。通常是一個不含空格的簡短名稱。"
+	},
+	"providerModelIdPlaceholder": {
+		"message": "模型 ID"
+	},
+	"providerName": {
+		"message": "提供者名稱"
+	},
+	"providerNameDescription": {
+		"message": "此提供者的顯示名稱。"
+	},
+	"providerPreset": {
+		"message": "預設"
+	},
+	"providerPresetDescription": {
+		"message": "選擇一個提供者或創建一個自訂的。"
+	},
+	"providerRequiredFields": {
+		"message": "提供者名稱和基礎 URL 是必填的。"
 	},
 	"providers": {
 		"message": "提供者"
@@ -566,11 +589,20 @@
 	"searchVariables": {
 		"message": "搜尋變數..."
 	},
+	"selectProvider": {
+		"message": "選擇一個提供者"
+	},
+	"selectTemplateToExport": {
+		"message": "請選擇一個要匯出的模板。"
+	},
 	"settings": {
 		"message": "設定"
 	},
 	"settingsHeading": {
 		"message": "設定"
+	},
+	"settingsImportSuccess": {
+		"message": "所有設定已成功匯入。請刷新頁面以查看變更。"
 	},
 	"share": {
 		"message": "分享..."
@@ -620,6 +652,12 @@
 	"systemDefault": {
 		"message": "系統"
 	},
+	"templateCopied": {
+		"message": "已將模板 JSON 複製到剪貼簿"
+	},
+	"templateCopyError": {
+		"message": "無法將模板 JSON 複製到剪貼簿"
+	},
 	"templateName": {
 		"message": "範本名稱"
 	},
@@ -640,6 +678,9 @@
 	},
 	"thinking": {
 		"message": "思考中"
+	},
+	"unknownProvider": {
+		"message": "未知的提供者"
 	},
 	"updateAvailable": {
 		"message": "有可用更新。"

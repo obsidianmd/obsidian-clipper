@@ -130,7 +130,7 @@ Example response:
 			return `${key}: (${context}) "${message}"`;
 		}).join('\n\n');
 
-		console.log(`  🤖 Translating batch of ${messages.length} messages:`);
+		console.log(`\n  🤖 Translating batch of ${messages.length} messages to ${targetLanguage}`);
 		messages.forEach(({ key, message }) => {
 			console.log(`    - ${key}: "${message.substring(0, 40)}${message.length > 40 ? '...' : ''}"`);
 		});
@@ -155,7 +155,7 @@ Example response:
 					throw new Error(`Missing translations for keys: ${missingKeys.map(m => m.key).join(', ')}`);
 				}
 			} catch (error) {
-				console.error(`  ❌ Failed to parse response as JSON:`, response);
+				console.error(`\n  ❌ Failed to parse response as JSON:`, response);
 				console.error(`  Error details:`, error);
 				throw new Error('Invalid response format');
 			}
@@ -167,14 +167,14 @@ Example response:
 			});
 
 			// Log translations
-			console.log(`  ➡️ Received translations (${targetLanguage}):`);
+			console.log(`\n  ➡️  Received translations for ${targetLanguage}`);
 			Object.entries(translations).forEach(([key, translation]) => {
 				console.log(`    - ${key}: "${translation.substring(0, 40)}${translation.length > 40 ? '...' : ''}"`);
 			});
 
 			return translations;
 		} catch (error) {
-			console.error(`  ❌ Batch translation failed:`, error);
+			console.error(`\n  ❌ Batch translation failed:`, error);
 			throw error;
 		}
 	}
@@ -290,7 +290,7 @@ Example response:
 			// Remove messages that don't exist in English
 			const obsoleteKeys = Object.keys(localeMessages).filter(key => !sortedSourceMessages[key]);
 			if (obsoleteKeys.length > 0) {
-				console.log(`  🧹 Removing ${obsoleteKeys.length} obsolete messages`);
+				console.log(`\n  🧹 Removing ${obsoleteKeys.length} obsolete messages`);
 				for (const key of obsoleteKeys) {
 					delete localeMessages[key];
 				}

@@ -8,6 +8,12 @@
 	"addProperty": {
 		"message": "+ Agregar propiedad"
 	},
+	"addProvider": {
+		"message": "+ Agregar proveedor"
+	},
+	"addProviderTitle": {
+		"message": "Agregar proveedor"
+	},
 	"addToObsidian": {
 		"message": "Agregar a Obsidian"
 	},
@@ -26,19 +32,8 @@
 	"alwaysShowHighlightsDescription": {
 		"message": "Muestra tus resaltados guardados cuando cargas una página. Desactiva para mostrar los resaltados solo cuando el modo resaltador está activado."
 	},
-	"anthropicApiKey": {
-		"message": "Clave API de Anthropic"
-	},
-	"anthropicApiKeyDescription": {
-		"message": "Puedes obtener tu clave API de Anthropic $link_start$aquí$link_end$.",
-		"placeholders": {
-			"link_end": {
-				"content": "</a>"
-			},
-			"link_start": {
-				"content": "<a href=\"https://console.anthropic.com/settings/keys\" target=\"_blank\">"
-			}
-		}
+	"apiKeyMissing": {
+		"message": "Sin clave API"
 	},
 	"apiKeysWarning": {
 		"message": "Al usar un proveedor externo, aceptas sus términos y política de privacidad. Las solicitudes del intérprete se envían directamente al proveedor que elijas. Obsidian no recopila ni almacena ningún dato sobre tus solicitudes."
@@ -64,8 +59,23 @@
 	"cancel": {
 		"message": "Cancelar"
 	},
+	"cannotDeleteProvider": {
+		"message": "No se puede eliminar el proveedor \"$1\" porque está siendo utilizado por $2 modelo(s)."
+	},
 	"changelog": {
 		"message": "Registro de cambios"
+	},
+	"chooseFile": {
+		"message": "Elegir un archivo"
+	},
+	"choosePropertiesFile": {
+		"message": "Elegir archivo de propiedades"
+	},
+	"chooseSettingsFile": {
+		"message": "Elegir archivo de configuración"
+	},
+	"chooseTemplateFile": {
+		"message": "Elegir archivo de plantilla"
 	},
 	"clipBehavior": {
 		"message": "Comportamiento de guardado"
@@ -96,6 +106,9 @@
 	"confirmDeleteTemplate": {
 		"message": "¿Estás seguro de que quieres eliminar la plantilla \"$1\"?"
 	},
+	"confirmReplaceSettings": {
+		"message": "Esto reemplazará todas sus configuraciones actuales, incluyendo plantillas y propiedades. ¿Está seguro de que desea continuar?"
+	},
 	"copied": {
 		"message": "¡Copiado!"
 	},
@@ -107,6 +120,9 @@
 	},
 	"createNewNote": {
 		"message": "Crear nueva nota"
+	},
+	"custom": {
+		"message": "Personalizado"
 	},
 	"dailyNoteFormat": {
 		"message": "Formato de nota diaria (ej., YYYY-MM-DD)"
@@ -126,14 +142,17 @@
 	"deleteModelConfirm": {
 		"message": "¿Estás seguro de que quieres eliminar este modelo?"
 	},
+	"deleteProviderConfirm": {
+		"message": "¿Estás seguro de que quieres eliminar este proveedor?"
+	},
 	"disableHighlighter": {
 		"message": "Desactivar resaltador"
 	},
-	"display": {
-		"message": "Pantalla"
-	},
 	"done": {
 		"message": "hecho"
+	},
+	"dragAndDropFile": {
+		"message": "Arrastre y suelte el archivo aquí"
 	},
 	"duplicate": {
 		"message": "Duplicar"
@@ -154,6 +173,9 @@
 	},
 	"editModel": {
 		"message": "Editar modelo"
+	},
+	"editProvider": {
+		"message": "Editar proveedor"
 	},
 	"editTemplate": {
 		"message": "Editar plantilla"
@@ -228,8 +250,20 @@
 	"failedToDeleteTemplate": {
 		"message": "Error al eliminar la plantilla. Por favor, inténtalo de nuevo."
 	},
+	"failedToDuplicateTemplate": {
+		"message": "Error al duplicar la plantilla. Por favor, inténtelo de nuevo."
+	},
+	"failedToExportHighlights": {
+		"message": "Error al exportar los resaltados. Por favor, consulte la consola para más detalles."
+	},
+	"failedToExportSettings": {
+		"message": "Error al exportar las configuraciones. Por favor, consulte la consola para más detalles."
+	},
 	"failedToExtractContent": {
 		"message": "No se pudo extraer el contenido de la página."
+	},
+	"failedToImportTemplate": {
+		"message": "Error al importar la plantilla. Por favor, revise el archivo e intente de nuevo."
 	},
 	"failedToInitialize": {
 		"message": "Por favor, intenta recargar la extensión."
@@ -249,6 +283,9 @@
 	"failedToSaveFile": {
 		"message": "Error al guardar el archivo"
 	},
+	"failedToSaveProvider": {
+		"message": "Error al guardar el proveedor. Por favor, intente de nuevo."
+	},
 	"folder": {
 		"message": "Carpeta"
 	},
@@ -257,6 +294,9 @@
 	},
 	"generalSettings": {
 		"message": "Ajustes generales"
+	},
+	"getApiKeyHere": {
+		"message": "Obtén tu clave API de $1 aquí."
 	},
 	"help": {
 		"message": "Ayuda"
@@ -288,6 +328,12 @@
 	"importAllSettingsDescription": {
 		"message": "Importa todos los ajustes incluyendo plantillas y propiedades. Esto reemplazará tu configuración actual."
 	},
+	"importFailed": {
+		"message": "La importación falló. Por favor, consulte la consola para más detalles."
+	},
+	"importModalTitle": {
+		"message": "Importar"
+	},
 	"importProperties": {
 		"message": "Importar propiedades"
 	},
@@ -307,6 +353,12 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"importSettings": {
+		"message": "Importar configuraciones"
+	},
+	"importTemplate": {
+		"message": "Importar plantilla"
 	},
 	"interpret": {
 		"message": "interpretar"
@@ -343,18 +395,6 @@
 	"legacyModeDescription": {
 		"message": "Usa el método de guardado URI compatible con Obsidian 1.6.7 o anterior. Ten en cuenta que la longitud del contenido que puedes guardar está limitada por tu navegador y sistema operativo. Algunas páginas pueden fallar sin mostrar errores."
 	},
-	"modelApiKey": {
-		"message": "Clave API"
-	},
-	"modelApiKeyDescription": {
-		"message": "Ingrese la clave API para este modelo. Puede no ser necesaria para todos los proveedores."
-	},
-	"modelBaseUrl": {
-		"message": "URL base"
-	},
-	"modelBaseUrlDescription": {
-		"message": "La URL del endpoint API para este modelo."
-	},
 	"modelName": {
 		"message": "Nombre del modelo"
 	},
@@ -367,14 +407,11 @@
 	"modelProviderDescription": {
 		"message": "El proveedor del modelo, por ejemplo Ollama, OpenRouter, Google, etc."
 	},
-	"providerModelId": {
-		"message": "ID del modelo"
+	"modelProviderPlaceholder": {
+		"message": "Proveedor"
 	},
-	"providerModelIdDescription": {
-		"message": "El identificador del modelo de su proveedor. Típicamente un nombre corto sin espacios."
-	},
-	"providerModelIdPlaceholder": {
-		"message": "ID del modelo"
+	"modelRequiredFields": {
+		"message": "El nombre del modelo, el proveedor y la ID del modelo son obligatorios."
 	},
 	"models": {
 		"message": "Modelos"
@@ -390,6 +427,9 @@
 	},
 	"noTemplates": {
 		"message": "No hay plantillas disponibles. Por favor, añade una plantilla en los ajustes."
+	},
+	"noUnusedProperties": {
+		"message": "No se encontraron propiedades sin usar."
 	},
 	"noteContent": {
 		"message": "Contenido de la nota"
@@ -429,28 +469,20 @@
 	"open": {
 		"message": "Abrir"
 	},
-	"openaiApiKey": {
-		"message": "Clave API de OpenAI"
-	},
-	"openaiApiKeyDescription": {
-		"message": "Puedes obtener tu clave API de OpenAI $link_start$aquí$link_end$.",
-		"placeholders": {
-			"link_end": {
-				"content": "</a>"
-			},
-			"link_start": {
-				"content": "<a href=\"https://platform.openai.com/api-keys\" target=\"_blank\">"
-			}
-		}
-	},
 	"optional": {
 		"message": "(opcional)"
+	},
+	"orPasteBelow": {
+		"message": "O pegue el contenido a continuación"
 	},
 	"pageCannotBeClipped": {
 		"message": "Esta página no se puede guardar."
 	},
 	"pageVariables": {
 		"message": "Variables de página"
+	},
+	"pasteJsonHere": {
+		"message": "Pegue el JSON aquí"
 	},
 	"pleaseReload": {
 		"message": "Por favor, intenta recargar la página."
@@ -475,6 +507,45 @@
 	},
 	"propertyValue": {
 		"message": "Valor de la propiedad"
+	},
+	"provider": {
+		"message": "Proveedor"
+	},
+	"providerApiKey": {
+		"message": "Clave API"
+	},
+	"providerApiKeyDescription": {
+		"message": "Tu clave API para este proveedor."
+	},
+	"providerBaseUrl": {
+		"message": "URL base"
+	},
+	"providerBaseUrlDescription": {
+		"message": "La URL del punto final de la API para este proveedor."
+	},
+	"providerModelId": {
+		"message": "ID del modelo"
+	},
+	"providerModelIdDescription": {
+		"message": "El identificador del modelo de su proveedor. Típicamente un nombre corto sin espacios."
+	},
+	"providerModelIdPlaceholder": {
+		"message": "ID del modelo"
+	},
+	"providerName": {
+		"message": "Nombre del proveedor."
+	},
+	"providerNameDescription": {
+		"message": "Nombre para mostrar de este proveedor."
+	},
+	"providerPreset": {
+		"message": "Preestablecido"
+	},
+	"providerPresetDescription": {
+		"message": "Elige un proveedor o crea uno personalizado."
+	},
+	"providerRequiredFields": {
+		"message": "El nombre del proveedor y la URL base son obligatorios."
 	},
 	"providers": {
 		"message": "Proveedores"
@@ -518,11 +589,20 @@
 	"searchVariables": {
 		"message": "Buscar variables..."
 	},
+	"selectProvider": {
+		"message": "Seleccionar un proveedor"
+	},
+	"selectTemplateToExport": {
+		"message": "Por favor, seleccione una plantilla para exportar."
+	},
 	"settings": {
 		"message": "Ajustes"
 	},
 	"settingsHeading": {
 		"message": "Ajustes"
+	},
+	"settingsImportSuccess": {
+		"message": "Todas las configuraciones se importaron con éxito. Por favor, actualice la página para ver los cambios."
 	},
 	"share": {
 		"message": "Compartir..."
@@ -572,6 +652,12 @@
 	"systemDefault": {
 		"message": "Sistema"
 	},
+	"templateCopied": {
+		"message": "Se copió el JSON de la plantilla al portapapeles"
+	},
+	"templateCopyError": {
+		"message": "Error al copiar el JSON de la plantilla al portapapeles"
+	},
 	"templateName": {
 		"message": "Nombre de la plantilla"
 	},
@@ -592,6 +678,9 @@
 	},
 	"thinking": {
 		"message": "pensando"
+	},
+	"unknownProvider": {
+		"message": "Proveedor desconocido"
 	},
 	"updateAvailable": {
 		"message": "Hay una actualización disponible."
@@ -629,59 +718,5 @@
 	},
 	"version": {
 		"message": "Versión"
-	},
-	"unknownProvider": {
-		"message": "Proveedor desconocido"
-	},
-	"apiKeyMissing": {
-		"message": "Sin clave API"
-	},
-	"custom": {
-		"message": "Personalizado"
-	},
-	"addProvider": {
-		"message": "+ Agregar proveedor"
-	},
-	"addProviderTitle": {
-		"message": "Agregar proveedor"
-	},
-	"editProvider": {
-		"message": "Editar proveedor"
-	},
-	"providerPreset": {
-		"message": "Preestablecido"
-	},
-	"providerPresetDescription": {
-		"message": "Elige un proveedor o crea uno personalizado."
-	},
-	"providerName": {
-		"message": "Nombre del proveedor."
-	},
-	"providerNameDescription": {
-		"message": "Nombre para mostrar de este proveedor."
-	},
-	"providerBaseUrl": {
-		"message": "URL base"
-	},
-	"providerBaseUrlDescription": {
-		"message": "La URL del punto final de la API para este proveedor."
-	},
-	"providerApiKey": {
-		"message": "Clave API"
-	},
-	"providerApiKeyDescription": {
-		"message": "Tu clave API para este proveedor."
-	},
-	"deleteProviderConfirm": {
-		"message": "¿Estás seguro de que quieres eliminar este proveedor?"
-	},
-	"selectProvider": {
-		"message": "Seleccionar un proveedor"
-	},
-	"provider": {
-		"message": "Proveedor"
-	},
-	"getApiKeyHere": {
-		"message": "Obtén tu clave API de $1 aquí."
 	}
 }
