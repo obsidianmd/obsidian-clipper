@@ -26,23 +26,6 @@
 	"alwaysShowHighlightsDescription": {
 		"message": "Display your saved highlights when you load a page. Turn off to only display highlights when highlighter mode is activated."
 	},
-	"anthropicApiKey": {
-		"message": "Anthropic API key"
-	},
-	"anthropicApiKeyDescription": {
-		"message": "You can get your Anthropic API key $link_start$here$link_end$.",
-		"placeholders": {
-			"link_end": {
-				"content": "</a>"
-			},
-			"link_start": {
-				"content": "<a href=\"https://console.anthropic.com/settings/keys\" target=\"_blank\">"
-			}
-		}
-	},
-	"anthropicApiKeyPlaceholder": {
-		"message": "Anthropic API key"
-	},
 	"apiKeysWarning": {
 		"message": "By using an external provider you agree to their terms and privacy policy. Interpreter requests are sent directly to the provider you choose. Obsidian does not gather or store any data about your requests."
 	},
@@ -143,9 +126,6 @@
 	},
 	"disableHighlighter": {
 		"message": "Disable highlighter"
-	},
-	"display": {
-		"message": "Display"
 	},
 	"done": {
 		"message": "Done"
@@ -370,32 +350,11 @@
 	"legacyModeDescription": {
 		"message": "Uses the URI clipping method compatible with Obsidian 1.6.7 or earlier. Note that the length of the content you can clip is limited by your browser and OS. Some pages may fail without any errors."
 	},
-	"modelApiKey": {
-		"message": "API key"
-	},
-	"modelApiKeyDescription": {
-		"message": "Enter the API key for this model. May not be required for all providers."
-	},
-	"modelApiKeyPlaceholder": {
-		"message": "API key"
-	},
-	"modelBaseUrl": {
-		"message": "Base URL"
-	},
-	"modelBaseUrlDescription": {
-		"message": "API endpoint for this model."
-	},
-	"modelBaseUrlPlaceholder": {
-		"message": "Base URL"
-	},
 	"modelName": {
 		"message": "Display name"
 	},
 	"modelNameDescription": {
 		"message": "The name of the model you want to display in the interface."
-	},
-	"modelNamePlaceholder": {
-		"message": "Model name"
 	},
 	"modelProvider": {
 		"message": "Provider"
@@ -467,23 +426,6 @@
 	},
 	"open": {
 		"message": "Open"
-	},
-	"openaiApiKey": {
-		"message": "OpenAI API key"
-	},
-	"openaiApiKeyDescription": {
-		"message": "You can get your OpenAI API key $link_start$here$link_end$.",
-		"placeholders": {
-			"link_end": {
-				"content": "</a>"
-			},
-			"link_start": {
-				"content": "<a href=\"https://platform.openai.com/api-keys\" target=\"_blank\">"
-			}
-		}
-	},
-	"openaiApiKeyPlaceholder": {
-		"message": "OpenAI API key"
 	},
 	"optional": {
 		"message": "(optional)"

@@ -11,7 +11,8 @@
 		"build:safari": "webpack --env BROWSER=safari --mode production",
 		"build": "npm run build:chrome && npm run build:firefox && npm run build:safari",
 		"dev": "npm run dev:chrome",
-		"update-locales": "ts-node --project scripts/tsconfig.json scripts/update-locales.ts"
+		"update-locales": "ts-node --project scripts/tsconfig.json scripts/update-locales.ts",
+		"check-strings": "ts-node --project scripts/tsconfig.json scripts/check-unused-strings.ts"
 	},
 	"devDependencies": {
 		"@types/chrome": "^0.0.270",
