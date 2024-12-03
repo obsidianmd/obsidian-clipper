@@ -418,13 +418,13 @@
 	"modelProviderDescription": {
 		"message": "Le fournisseur du modèle, par exemple Ollama, OpenRouter, Google, etc."
 	},
-	"modelProviderId": {
+	"providerModelId": {
 		"message": "ID du modèle"
 	},
-	"modelProviderIdDescription": {
+	"providerModelIdDescription": {
 		"message": "L'identifiant du modèle de votre fournisseur. Généralement un nom court sans espaces."
 	},
-	"modelProviderIdPlaceholder": {
+	"providerModelIdPlaceholder": {
 		"message": "ID du modèle"
 	},
 	"modelProviderPlaceholder": {
@@ -719,5 +719,17 @@
 	},
 	"version": {
 		"message": "Version"
+	},
+	"unknownProvider": {
+		"message": "Fournisseur inconnu"
+	},
+	"apiKeyMissing": {
+		"message": "Pas de clé API"
+	},
+	"custom": {
+		"message": "Personnalisé"
+	},
+	"getApiKeyHere": {
+		"message": "Obtenez votre clé API $1 ici."
 	}
 }

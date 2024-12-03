@@ -364,13 +364,13 @@
 	"modelProviderDescription": {
 		"message": "模型提供商，例如 Ollama、OpenRouter、Google 等。"
 	},
-	"modelProviderId": {
+	"providerModelId": {
 		"message": "模型 ID"
 	},
-	"modelProviderIdDescription": {
+	"providerModelIdDescription": {
 		"message": "来自提供商的模型标识符。通常是一个不含空格的简短名称。"
 	},
-	"modelProviderIdPlaceholder": {
+	"providerModelIdPlaceholder": {
 		"message": "模型 ID"
 	},
 	"models": {

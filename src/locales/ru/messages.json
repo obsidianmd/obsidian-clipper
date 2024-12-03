@@ -367,13 +367,13 @@
 	"modelProviderDescription": {
 		"message": "Провайдер модели, например Ollama, OpenRouter, Google и т.д."
 	},
-	"modelProviderId": {
+	"providerModelId": {
 		"message": "ID модели"
 	},
-	"modelProviderIdDescription": {
+	"providerModelIdDescription": {
 		"message": "Идентификатор модели от вашего провайдера. Обычно это короткое имя без пробелов."
 	},
-	"modelProviderIdPlaceholder": {
+	"providerModelIdPlaceholder": {
 		"message": "ID модели"
 	},
 	"models": {

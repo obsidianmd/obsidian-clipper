@@ -364,13 +364,13 @@
 	"modelProviderDescription": {
 		"message": "مزود النموذج، على سبيل المثال Ollama أو OpenRouter أو Google، إلخ."
 	},
-	"modelProviderId": {
+	"providerModelId": {
 		"message": "معرف النموذج"
 	},
-	"modelProviderIdDescription": {
+	"providerModelIdDescription": {
 		"message": "معرف النموذج من المزود الخاص بك. عادةً ما يكون اسمًا قصيرًا بدون مسافات."
 	},
-	"modelProviderIdPlaceholder": {
+	"providerModelIdPlaceholder": {
 		"message": "معرف النموذج"
 	},
 	"models": {

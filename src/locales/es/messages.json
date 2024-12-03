@@ -367,13 +367,13 @@
 	"modelProviderDescription": {
 		"message": "El proveedor del modelo, por ejemplo Ollama, OpenRouter, Google, etc."
 	},
-	"modelProviderId": {
+	"providerModelId": {
 		"message": "ID del modelo"
 	},
-	"modelProviderIdDescription": {
+	"providerModelIdDescription": {
 		"message": "El identificador del modelo de su proveedor. Típicamente un nombre corto sin espacios."
 	},
-	"modelProviderIdPlaceholder": {
+	"providerModelIdPlaceholder": {
 		"message": "ID del modelo"
 	},
 	"models": {
@@ -629,5 +629,59 @@
 	},
 	"version": {
 		"message": "Versión"
+	},
+	"unknownProvider": {
+		"message": "Proveedor desconocido"
+	},
+	"apiKeyMissing": {
+		"message": "Sin clave API"
+	},
+	"custom": {
+		"message": "Personalizado"
+	},
+	"addProvider": {
+		"message": "+ Agregar proveedor"
+	},
+	"addProviderTitle": {
+		"message": "Agregar proveedor"
+	},
+	"editProvider": {
+		"message": "Editar proveedor"
+	},
+	"providerPreset": {
+		"message": "Preestablecido"
+	},
+	"providerPresetDescription": {
+		"message": "Elige un proveedor o crea uno personalizado."
+	},
+	"providerName": {
+		"message": "Nombre del proveedor."
+	},
+	"providerNameDescription": {
+		"message": "Nombre para mostrar de este proveedor."
+	},
+	"providerBaseUrl": {
+		"message": "URL base"
+	},
+	"providerBaseUrlDescription": {
+		"message": "La URL del punto final de la API para este proveedor."
+	},
+	"providerApiKey": {
+		"message": "Clave API"
+	},
+	"providerApiKeyDescription": {
+		"message": "Tu clave API para este proveedor."
+	},
+	"deleteProviderConfirm": {
+		"message": "¿Estás seguro de que quieres eliminar este proveedor?"
+	},
+	"selectProvider": {
+		"message": "Seleccionar un proveedor"
+	},
+	"provider": {
+		"message": "Proveedor"
+	},
+	"getApiKeyHere": {
+		"message": "Obtén tu clave API de $1 aquí."
 	}
 }

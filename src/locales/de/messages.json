@@ -367,13 +367,13 @@
 	"modelProviderDescription": {
 		"message": "Der Modellanbieter, z.B. Ollama, OpenRouter, Google, etc."
 	},
-	"modelProviderId": {
+	"providerModelId": {
 		"message": "Modell-ID"
 	},
-	"modelProviderIdDescription": {
+	"providerModelIdDescription": {
 		"message": "Die Kennung des Modells von Ihrem Anbieter. Typischerweise ein kurzer Name ohne Leerzeichen."
 	},
-	"modelProviderIdPlaceholder": {
+	"providerModelIdPlaceholder": {
 		"message": "Modell-ID"
 	},
 	"models": {

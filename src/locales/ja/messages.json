@@ -376,13 +376,13 @@
 	"modelProviderDescription": {
 		"message": "モデルプロバイダー（例：Ollama、OpenRouter、Google など）。"
 	},
-	"modelProviderId": {
+	"providerModelId": {
 		"message": "モデルID"
 	},
-	"modelProviderIdDescription": {
+	"providerModelIdDescription": {
 		"message": "プロバイダーのモデルの識別子。通常はスペースを含まない短い名前です。"
 	},
-	"modelProviderIdPlaceholder": {
+	"providerModelIdPlaceholder": {
 		"message": "モデルID"
 	},
 	"modelProviderPlaceholder": {

@@ -367,13 +367,13 @@
 	"modelProviderDescription": {
 		"message": "ارائه‌دهنده مدل، مثلاً Ollama، OpenRouter، Google و غیره."
 	},
-	"modelProviderId": {
+	"providerModelId": {
 		"message": "شناسه مدل"
 	},
-	"modelProviderIdDescription": {
+	"providerModelIdDescription": {
 		"message": "شناسه مدل از ارائه‌دهنده شما. معمولاً یک نام کوتاه بدون فاصله است."
 	},
-	"modelProviderIdPlaceholder": {
+	"providerModelIdPlaceholder": {
 		"message": "شناسه مدل"
 	},
 	"models": {

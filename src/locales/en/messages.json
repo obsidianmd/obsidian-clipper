@@ -401,15 +401,15 @@
 		"message": "Provider"
 	},
 	"modelProviderDescription": {
-		"message": "The model provider, e.g. Ollama, OpenRouter, Google, etc."
+		"message": "Select the provider for this model."
 	},
-	"modelProviderId": {
+	"providerModelId": {
 		"message": "Model ID"
 	},
-	"modelProviderIdDescription": {
+	"providerModelIdDescription": {
 		"message": "The identifier of the model from your provider. Typically a short name without spaces."
 	},
-	"modelProviderIdPlaceholder": {
+	"providerModelIdPlaceholder": {
 		"message": "Model ID"
 	},
 	"modelProviderPlaceholder": {
@@ -677,5 +677,59 @@
 	},
 	"version": {
 		"message": "Version"
+	},
+	"addProvider": {
+		"message": "+ Add provider"
+	},
+	"addProviderTitle": {
+		"message": "Add provider"
+	},
+	"editProvider": {
+		"message": "Edit provider"
+	},
+	"providerPreset": {
+		"message": "Preset"
+	},
+	"providerPresetDescription": {
+		"message": "Choose a provider or create a custom one."
+	},
+	"providerName": {
+		"message": "Provider name"
+	},
+	"providerNameDescription": {
+		"message": "Display name for this provider."
+	},
+	"providerBaseUrl": {
+		"message": "Base URL"
+	},
+	"providerBaseUrlDescription": {
+		"message": "The API endpoint URL for this provider."
+	},
+	"providerApiKey": {
+		"message": "API key"
+	},
+	"providerApiKeyDescription": {
+		"message": "Your API key for this provider."
+	},
+	"deleteProviderConfirm": {
+		"message": "Are you sure you want to delete this provider?"
+	},
+	"selectProvider": {
+		"message": "Select a provider"
+	},
+	"provider": {
+		"message": "Provider"
+	},
+	"unknownProvider": {
+		"message": "Unknown provider"
+	},
+	"apiKeyMissing": {
+		"message": "No API key"
+	},
+	"custom": {
+		"message": "Custom"
+	},
+	"getApiKeyHere": {
+		"message": "Get your $1 API key here."
 	}
 }
