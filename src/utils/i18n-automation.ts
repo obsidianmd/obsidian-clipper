@@ -18,98 +18,54 @@ export default class I18nAutomation {
 	private sourceLocale = 'en';
 	private localesDir: string;
 	private apiKey?: string;
+	private chatHistories: { [locale: string]: { role: string, content: string }[] } = {};
 
 	constructor(localesDir: string, openaiApiKey?: string) {
 		this.localesDir = localesDir;
 		this.apiKey = openaiApiKey;
 	}
 
-	// Find all message keys that are actually used in the codebase
-	private async findUsedMessages(srcDir: string): Promise<Set<string>> {
-		const usedKeys = new Set<string>();
-		const messagePattern = /getMessage\(['"]([^'"]+)['"]/g;
-		const i18nPattern = /data-i18n="([^"]+)"/g;
-		const i18nTitlePattern = /data-i18n="([^"]+)"/g;
-		const manifestPattern = /__MSG_([^_]+)__/g;
-		const showErrorPattern = /showError\(['"]([^'"]+)['"]/g;
+	private initializeChatHistory(targetLanguage: string) {
+		this.chatHistories[targetLanguage] = [{
+			role: "system",
+			content: `You are a professional translator for the Obsidian Web Clipper browser extension.
 
-		const searchFiles = async (dir: string) => {
-			const files = await fs.promises.readdir(dir);
-			
-			for (const file of files) {
-				const fullPath = path.join(dir, file);
-				const stat = await fs.promises.stat(fullPath);
-				
-				if (stat.isDirectory()) {
-					await searchFiles(fullPath);
-				} else if (/\.(ts|js|tsx|jsx|html|json)$/.test(file)) {
-					const content = await fs.promises.readFile(fullPath, 'utf-8');
-					
-					let match;
-					// Check for getMessage calls
-					while ((match = messagePattern.exec(content)) !== null) {
-						usedKeys.add(match[1]);
-					}
-					// Check for data-i18n attributes
-					while ((match = i18nPattern.exec(content)) !== null) {
-						usedKeys.add(match[1]);
-					}
-					// Check for manifest message references
-					if (file.includes('manifest.')) {
-						while ((match = manifestPattern.exec(content)) !== null) {
-							usedKeys.add(match[1]);
-						}
-					}
-					// Check for modal titles and other special cases
-					if (file.includes('modal') || file.includes('settings.html')) {
-						while ((match = i18nTitlePattern.exec(content)) !== null) {
-							usedKeys.add(match[1]);
-						}
-					}
-					// Check for showError calls
-					while ((match = showErrorPattern.exec(content)) !== null) {
-						usedKeys.add(match[1]);
-					}
-				}
-			}
-		};
+About the extension:
+- It's a browser extension that helps users save web content to their Obsidian vault
+- Users can clip entire articles, selected text, or highlights
+- It includes features for customizing templates, managing settings, and organizing clips
+- The interface needs to be clear and concise
 
-		// Search in src directory
-		await searchFiles(srcDir);
+Translation guidelines:
+- Translate from English to ${targetLanguage}
+- Preserve any placeholders like $1, $2, {{variable}}, etc.
+- Maintain consistent terminology throughout the extension
+- Keep UI text concise and clear
+- Match the tone of the original text (error messages should sound like errors, etc.)
+- Consider the context of each string (button labels, error messages, descriptions, etc.)
 
-		// Also search in root directory for manifest files
-		const rootDir = path.join(srcDir, '..');
-		const rootFiles = await fs.promises.readdir(rootDir);
-		for (const file of rootFiles) {
-			if (file.startsWith('manifest.') && file.endsWith('.json')) {
-				const content = await fs.promises.readFile(path.join(rootDir, file), 'utf-8');
-				let match;
-				while ((match = manifestPattern.exec(content)) !== null) {
-					usedKeys.add(match[1]);
-				}
-			}
-		}
-
-		return usedKeys;
+Please translate each message I send you. Respond with only the translated text, no explanations needed.`
+		}];
 	}
 
-	// Sort messages alphabetically by key
-	private sortMessages(messages: Messages): Messages {
-		return Object.keys(messages)
-			.sort()
-			.reduce((acc: Messages, key) => {
-				acc[key] = messages[key];
-				return acc;
-			}, {});
-	}
-
-	// Translate a message to a target language using OpenAI
-	private async translateMessage(message: string, targetLanguage: string): Promise<string> {
+	private async translateMessage(message: string, targetLanguage: string, key: string): Promise<string> {
 		if (!this.apiKey) {
 			throw new Error('OpenAI API key not provided');
 		}
 
-		console.log(`  🤖 Translating: "${message.substring(0, 40)}${message.length > 40 ? '...' : ''}"`);
+		// Initialize chat history if it doesn't exist
+		if (!this.chatHistories[targetLanguage]) {
+			this.initializeChatHistory(targetLanguage);
+		}
+
+		const context = this.getMessageContext(key);
+		console.log(`  🤖 Translating ${context}: "${message.substring(0, 40)}${message.length > 40 ? '...' : ''}"`);
+
+		// Add message to translate to chat history
+		this.chatHistories[targetLanguage].push({
+			role: "user",
+			content: `Translate this ${context}: "${message}"`
+		});
 
 		const response = await fetch('https://api.openai.com/v1/chat/completions', {
 			method: 'POST',
@@ -119,13 +75,7 @@ export default class I18nAutomation {
 			},
 			body: JSON.stringify({
 				model: "gpt-4",
-				messages: [{
-					role: "system",
-					content: `You are a professional translator. Translate the following text to ${targetLanguage}. Preserve any placeholders like $1, $2, {{variable}}, etc. Maintain the same tone and formality as the source text.`
-				}, {
-					role: "user",
-					content: message
-				}],
+				messages: this.chatHistories[targetLanguage],
 				temperature: 0.3
 			})
 		});
@@ -136,8 +86,35 @@ export default class I18nAutomation {
 
 		const data = await response.json();
 		const translatedText = data.choices[0].message.content || message;
+
+		// Add assistant's response to chat history
+		this.chatHistories[targetLanguage].push({
+			role: "assistant",
+			content: translatedText
+		});
+
 		console.log(`  ✓ Translated to: "${translatedText.substring(0, 40)}${translatedText.length > 40 ? '...' : ''}"`);
 		return translatedText;
+	}
+
+	private getMessageContext(key: string): string {
+		if (key.includes('error')) return 'error message';
+		if (key.includes('button')) return 'button label';
+		if (key.includes('title')) return 'title';
+		if (key.includes('description')) return 'description';
+		if (key.includes('tooltip')) return 'tooltip';
+		if (key.includes('placeholder')) return 'input placeholder';
+		return 'UI text';
+	}
+
+	// Sort messages alphabetically by key
+	private sortMessages(messages: Messages): Messages {
+		return Object.keys(messages)
+			.sort()
+			.reduce((acc: Messages, key) => {
+				acc[key] = messages[key];
+				return acc;
+			}, {});
 	}
 
 	// Process all locales
@@ -184,26 +161,28 @@ export default class I18nAutomation {
 				console.log(`  ⚠️  No existing translations found for ${locale}, creating new file`);
 			}
 
-			// Add missing messages and translate them
+			// Find missing translations
 			const missingKeys = Object.keys(sortedSourceMessages).filter(key => !localeMessages[key]);
 			if (missingKeys.length > 0) {
 				console.log(`  🔍 Found ${missingKeys.length} missing translations`);
 				
+				// Translate each missing message
 				for (const key of missingKeys) {
-					const value = sortedSourceMessages[key];
 					try {
-						console.log(`  ⚙️  Translating key: ${key}`);
 						const translatedMessage = await this.translateMessage(
-							value.message,
-							locale
+							sortedSourceMessages[key].message,
+							locale,
+							key
 						);
 						localeMessages[key] = {
 							message: translatedMessage,
-							...(value.placeholders && { placeholders: value.placeholders })
+							...(sortedSourceMessages[key].placeholders && { 
+								placeholders: sortedSourceMessages[key].placeholders 
+							})
 						};
 					} catch (error) {
-						console.error(`  ❌ Failed to translate key ${key}:`, error);
-						localeMessages[key] = value;
+						console.error(`  ❌ Failed to translate ${key}:`, error);
+						localeMessages[key] = sortedSourceMessages[key];
 					}
 				}
 			} else {
