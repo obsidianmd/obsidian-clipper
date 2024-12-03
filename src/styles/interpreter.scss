@@ -274,6 +274,13 @@
 		font-size: var(--font-ui-smaller);
 		color: var(--text-muted);
 	}
+	.model-provider-unknown {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		gap: 0.25rem;
+		color: var(--text-warning);
+	}
 }
 
 #provider-list {
@@ -303,6 +310,7 @@
 			align-items: center;
 			gap: 0.25rem;
 			font-size: var(--font-ui-smaller);
+			color: var(--text-warning);
 		}
 		.provider-list-item-actions {
 			display: flex;

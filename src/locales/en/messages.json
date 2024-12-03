@@ -719,5 +719,14 @@
 	},
 	"provider": {
 		"message": "Provider"
+	},
+	"unknownProvider": {
+		"message": "Unknown provider"
+	},
+	"apiKeyMissing": {
+		"message": "No API key"
+	},
+	"custom": {
+		"message": "Custom"
 	}
 }

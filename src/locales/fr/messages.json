@@ -719,5 +719,14 @@
 	},
 	"version": {
 		"message": "Version"
+	},
+	"unknownProvider": {
+		"message": "Fournisseur inconnu"
+	},
+	"apiKeyMissing": {
+		"message": "Pas de clé API"
+	},
+	"custom": {
+		"message": "Personnalisé"
 	}
 }

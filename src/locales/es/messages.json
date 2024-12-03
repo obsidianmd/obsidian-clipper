@@ -629,5 +629,56 @@
 	},
 	"version": {
 		"message": "Versión"
+	},
+	"unknownProvider": {
+		"message": "Proveedor desconocido"
+	},
+	"apiKeyMissing": {
+		"message": "Sin clave API"
+	},
+	"custom": {
+		"message": "Personalizado"
+	},
+	"addProvider": {
+		"message": "+ Agregar proveedor"
+	},
+	"addProviderTitle": {
+		"message": "Agregar proveedor"
+	},
+	"editProvider": {
+		"message": "Editar proveedor"
+	},
+	"providerPreset": {
+		"message": "Preestablecido"
+	},
+	"providerPresetDescription": {
+		"message": "Elige un proveedor o crea uno personalizado"
+	},
+	"providerName": {
+		"message": "Nombre del proveedor"
+	},
+	"providerNameDescription": {
+		"message": "Nombre para mostrar de este proveedor"
+	},
+	"providerBaseUrl": {
+		"message": "URL base"
+	},
+	"providerBaseUrlDescription": {
+		"message": "La URL del punto final de la API para este proveedor"
+	},
+	"providerApiKey": {
+		"message": "Clave API"
+	},
+	"providerApiKeyDescription": {
+		"message": "Tu clave API para este proveedor"
+	},
+	"deleteProviderConfirm": {
+		"message": "¿Estás seguro de que quieres eliminar este proveedor?"
+	},
+	"selectProvider": {
+		"message": "Seleccionar un proveedor"
+	},
+	"provider": {
+		"message": "Proveedor"
 	}
 }

@@ -12,11 +12,6 @@ const PRESET_PROVIDERS = {
 		name: 'Anthropic',
 		baseUrl: 'https://api.anthropic.com/v1/messages'
 	},
-	azure: {
-		id: 'azure',
-		name: 'Azure',
-		baseUrl: ''
-	},
 	ollama: {
 		id: 'ollama',
 		name: 'Ollama',
@@ -142,7 +137,7 @@ function createProviderListItem(provider: Provider, index: number): HTMLElement 
 			<div class="provider-name">
 				${provider.name}
 			</div>
-			${!provider.apiKey ? '<span class="provider-no-key text-warning"><i data-lucide="alert-triangle"></i> No API key</span>' : ''}
+			${!provider.apiKey ? `<span class="provider-no-key"><i data-lucide="alert-triangle"></i> ${getMessage('apiKeyMissing')}</span>` : ''}
 		</div>
 		<div class="provider-list-item-actions">
 			<button class="edit-provider-btn clickable-icon" data-index="${index}" aria-label="Edit provider">
@@ -262,7 +257,7 @@ function showProviderModal(provider: Provider, index?: number) {
 		const nameContainer = nameInput.closest('.setting-item') as HTMLElement;
 
 		if (presetSelect) {
-			presetSelect.innerHTML = '<option value="">Custom</option>';
+			presetSelect.innerHTML = `<option value="">${getMessage('custom')}</option>`;
 			Object.entries(PRESET_PROVIDERS).forEach(([id, preset]) => {
 				presetSelect.innerHTML += `<option value="${id}">${preset.name}</option>`;
 			});
@@ -380,7 +375,7 @@ function createModelListItem(model: ModelConfig, index: number): HTMLElement {
 	modelItem.dataset.index = index.toString();
 
 	const provider = generalSettings.providers.find(p => p.id === model.providerId);
-	const providerName = provider?.name || 'Unknown';
+	const providerName = provider?.name || `<span class="model-provider-unknown"><i data-lucide="alert-triangle"></i> ${getMessage('unknownProvider')}</span>`;
 
 	modelItem.innerHTML = `
 		<div class="drag-handle">
@@ -567,8 +562,6 @@ function showModelModal(model: ModelConfig, index?: number) {
 }
 
 function deleteModel(index: number) {
-	const modelToDelete = generalSettings.models[index];
-	
 	if (confirm(getMessage('deleteModelConfirm'))) {
 		generalSettings.models.splice(index, 1);
 		saveSettings();
