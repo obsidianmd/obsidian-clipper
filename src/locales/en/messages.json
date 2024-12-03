@@ -731,5 +731,50 @@
 	},
 	"getApiKeyHere": {
 		"message": "Get your $1 API key here."
+	},
+	"selectTemplateToExport": {
+		"message": "Please select a template to export."
+	},
+	"failedToImportTemplate": {
+		"message": "Error importing template. Please check the file and try again."
+	},
+	"confirmReplaceSettings": {
+		"message": "This will replace all your current settings, including templates and properties. Are you sure you want to continue?"
+	},
+	"settingsImportSuccess": {
+		"message": "All settings imported successfully. Please refresh the page to see the changes."
+	},
+	"failedToExportSettings": {
+		"message": "Failed to export settings. Please check the console for more details."
+	},
+	"importFailed": {
+		"message": "Import failed. Please check the console for more details."
+	},
+	"cannotDeleteProvider": {
+		"message": "Cannot delete provider \"$1\" because it is being used by $2 model(s)."
+	},
+	"providerRequiredFields": {
+		"message": "Provider name and Base URL are required."
+	},
+	"failedToSaveProvider": {
+		"message": "Failed to save provider. Please try again."
+	},
+	"modelRequiredFields": {
+		"message": "Model name, Provider, and Model ID are required."
+	},
+	"failedToDuplicateTemplate": {
+		"message": "Failed to duplicate template. Please try again."
+	},
+	"templateCopied": {
+		"message": "Copied template JSON to clipboard"
+	},
+	"templateCopyError": {
+		"message": "Failed to copy template JSON to clipboard"
+	},
+	"noUnusedProperties": {
+		"message": "No unused properties found."
+	},
+	"failedToExportHighlights": {
+		"message": "Failed to export highlights. Please check the console for more details."
 	}
 }

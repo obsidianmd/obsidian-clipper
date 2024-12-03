@@ -2,6 +2,7 @@ import browser from '../utils/browser-polyfill';
 import { detectBrowser } from '../utils/browser-detection';
 import { AnyHighlightData } from '../utils/highlighter';
 import dayjs from 'dayjs';
+import { getMessage } from '../utils/i18n';
 
 export async function exportHighlights(): Promise<void> {
 	try {
@@ -51,6 +52,6 @@ export async function exportHighlights(): Promise<void> {
 		URL.revokeObjectURL(url);
 	} catch (error) {
 		console.error('Error exporting highlights:', error);
-		alert('Failed to export highlights. Please check the console for more details.');
+		alert(getMessage('failedToExportHighlights'));
 	}
 }

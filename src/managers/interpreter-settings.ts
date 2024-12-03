@@ -229,13 +229,13 @@ function duplicateProvider(index: number) {
 	showProviderModal(duplicatedProvider, newIndex);
 }
 
-function deleteProvider(index: number) {
+function deleteProvider(index: number): void {
 	const providerToDelete = generalSettings.providers[index];
 	
 	// Check if any models are using this provider
 	const modelsUsingProvider = generalSettings.models.filter(m => m.providerId === providerToDelete.id);
 	if (modelsUsingProvider.length > 0) {
-		alert(`Cannot delete provider "${providerToDelete.name}" because it is being used by ${modelsUsingProvider.length} model(s).`);
+		alert(getMessage('cannotDeleteProvider', [providerToDelete.name, modelsUsingProvider.length.toString()]));
 		return;
 	}
 
@@ -347,7 +347,7 @@ async function showProviderModal(provider: Provider, index?: number) {
 		debugLog('Providers', 'Saving provider:', updatedProvider);
 
 		if (!updatedProvider.name || !updatedProvider.baseUrl) {
-			alert('Provider name and Base URL are required.');
+			alert(getMessage('providerRequiredFields'));
 			return;
 		}
 
@@ -365,7 +365,7 @@ async function showProviderModal(provider: Provider, index?: number) {
 			hideModal(modal);
 		}).catch(error => {
 			console.error('Failed to save settings:', error);
-			alert('Failed to save provider. Please try again.');
+			alert(getMessage('failedToSaveProvider'));
 		});
 	});
 
@@ -556,7 +556,7 @@ function showModelModal(model: ModelConfig, index?: number) {
 		};
 
 		if (!updatedModel.name || !updatedModel.providerId || !updatedModel.providerModelId) {
-			alert('Model name, Provider, and Model ID are required.');
+			alert(getMessage('modelRequiredFields'));
 			return;
 		}
 

@@ -112,8 +112,8 @@ export async function showImportModal(
 					cleanupModal();
 					hideModal(modal);
 				}).catch((error) => {
-					console.error('Import failed:', error);
-					alert('Import failed. Please check the console for more details.');
+					console.error('Error parsing imported template:', error);
+					alert(getMessage('failedToImportTemplate'));
 				});
 			};
 			reader.readAsText(file);
@@ -134,7 +134,7 @@ export async function showImportModal(
 					hideModal(modal);
 				}).catch((error) => {
 					console.error('Import failed:', error);
-					alert('Import failed. Please check the console for more details.');
+					alert(getMessage('importFailed'));
 				});
 			}
 		}

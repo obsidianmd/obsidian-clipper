@@ -7,7 +7,7 @@ import { refreshPropertyNameSuggestions } from './template-ui';
 import { unescapeValue } from '../utils/string-utils';
 import { showImportModal } from '../utils/import-modal';
 import { saveFile } from '../utils/file-utils';
-import browser from '../utils/browser-polyfill';
+import { getMessage } from '../utils/i18n';
 
 export function initializePropertyTypesManager(): void {
 	ensureTagsProperty();
@@ -356,7 +356,7 @@ async function deleteUnusedProperties(): Promise<void> {
 	const unusedProperties = generalSettings.propertyTypes.filter(pt => !usedProperties.has(pt.name) && pt.name !== 'tags');
 	
 	if (unusedProperties.length === 0) {
-		alert('No unused properties found.');
+		alert(getMessage('noUnusedProperties'));
 		return;
 	}
 
