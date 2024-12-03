@@ -145,6 +145,7 @@ function createProviderListItem(provider: Provider, index: number): HTMLElement 
 	providerItem.innerHTML = `
 		<div class="provider-list-item-info">
 			<div class="provider-name">
+				<div class="provider-icon-container"><span class="provider-icon icon-${provider.name.toLowerCase()}"></span></div>
 				${provider.name}
 			</div>
 			${!provider.apiKey ? `<span class="provider-no-key"><i data-lucide="alert-triangle"></i> ${getMessage('apiKeyMissing')}</span>` : ''}
