@@ -109,6 +109,7 @@
 			pointer-events: none;
 			cursor: default;
 			color: var(--text-success);
+			opacity: 1;
 			@media (hover: hover) {
 				&:hover {
 					color: var(--text-success);
@@ -124,6 +125,7 @@
 			pointer-events: none;
 			cursor: default;
 			color: var(--text-error);
+			opacity: 1;
 			@media (hover: hover) {
 				&:hover {
 					color: var(--text-error);
