@@ -146,7 +146,7 @@
 }
 
 .setting-item {
-	margin: 1rem 0;
+	margin: 1.5rem 0;
 	&.mod-horizontal {
 		display: flex;
 		flex-direction: row;
@@ -156,6 +156,9 @@
 		border-bottom: 1px solid var(--background-modifier-border);
 		padding: 0.75rem 0 0.75rem;
 		margin: 0;
+		+ .setting-item {
+			margin-top: 0;
+		}
 		.setting-item-description {
 			margin: 0.25rem 0;
 		}
