@@ -274,6 +274,9 @@
 	"failedToProcessInterpreter": {
 		"message": "Elaborazione dell'interprete fallita. Per favore, riprova."
 	},
+	"failedToResetProviders": {
+		"message": "Impossibile ripristinare i fornitori e i modelli"
+	},
 	"failedToResetTemplate": {
 		"message": "Impossibile reimpostare il modello predefinito. Per favore, riprova."
 	},
@@ -579,6 +582,12 @@
 	},
 	"resetDefaultTemplateDescription": {
 		"message": "Rimuovi tutte le modifiche che hai apportato al modello predefinito."
+	},
+	"resetProvidersAndModels": {
+		"message": "Ripristina i modelli predefiniti"
+	},
+	"resetProvidersAndModelsDescription": {
+		"message": "Ripristina i fornitori e i modelli alle impostazioni predefinite."
 	},
 	"save": {
 		"message": "Salva"

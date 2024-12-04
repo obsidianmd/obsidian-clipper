@@ -274,6 +274,9 @@
 	"failedToProcessInterpreter": {
 		"message": "Error al procesar el intérprete. Por favor, inténtalo de nuevo."
 	},
+	"failedToResetProviders": {
+		"message": "Error al restablecer los proveedores y modelos"
+	},
 	"failedToResetTemplate": {
 		"message": "Error al restablecer la plantilla predeterminada. Por favor, inténtalo de nuevo."
 	},
@@ -579,6 +582,12 @@
 	},
 	"resetDefaultTemplateDescription": {
 		"message": "Elimina cualquier cambio que hayas hecho a la plantilla predeterminada."
+	},
+	"resetProvidersAndModels": {
+		"message": "Restablecer modelos predeterminados"
+	},
+	"resetProvidersAndModelsDescription": {
+		"message": "Restablecer los proveedores y modelos a la configuración predeterminada."
 	},
 	"save": {
 		"message": "Guardar"

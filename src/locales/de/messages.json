@@ -274,6 +274,9 @@
 	"failedToProcessInterpreter": {
 		"message": "Interpreter-Verarbeitung fehlgeschlagen. Bitte versuchen Sie es erneut."
 	},
+	"failedToResetProviders": {
+		"message": "Fehler beim Zurücksetzen von Anbietern und Modellen"
+	},
 	"failedToResetTemplate": {
 		"message": "Standardvorlage konnte nicht zurückgesetzt werden. Bitte versuchen Sie es erneut."
 	},
@@ -579,6 +582,12 @@
 	},
 	"resetDefaultTemplateDescription": {
 		"message": "Entfernen Sie alle Änderungen, die Sie an der Standardvorlage vorgenommen haben."
+	},
+	"resetProvidersAndModels": {
+		"message": "Standardmodelle zurücksetzen"
+	},
+	"resetProvidersAndModelsDescription": {
+		"message": "Setzen Sie Anbieter und Modelle auf die Standardeinstellungen zurück."
 	},
 	"save": {
 		"message": "Speichern"

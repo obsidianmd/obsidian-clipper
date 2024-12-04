@@ -274,6 +274,9 @@
 	"failedToProcessInterpreter": {
 		"message": "解譯器處理失敗。請再試一次。"
 	},
+	"failedToResetProviders": {
+		"message": "重設提供者和模型失敗"
+	},
 	"failedToResetTemplate": {
 		"message": "重置預設範本失敗。請再試一次。"
 	},
@@ -579,6 +582,12 @@
 	},
 	"resetDefaultTemplateDescription": {
 		"message": "移除您對預設範本所做的任何更改。"
+	},
+	"resetProvidersAndModels": {
+		"message": "重設預設模型"
+	},
+	"resetProvidersAndModelsDescription": {
+		"message": "將提供者和模型重設為預設設定。"
 	},
 	"save": {
 		"message": "儲存"

@@ -274,6 +274,9 @@
 	"failedToProcessInterpreter": {
 		"message": "インタープリターの処理に失敗しました。もう一度お試しください。"
 	},
+	"failedToResetProviders": {
+		"message": "プロバイダーとモデルのリセットに失敗しました"
+	},
 	"failedToResetTemplate": {
 		"message": "\"デフォルトテンプレートのリセットに失敗しました。もう一度お試しください。\""
 	},
@@ -579,6 +582,12 @@
 	},
 	"resetDefaultTemplateDescription": {
 		"message": "デフォルトテンプレートへの変更をすべて削除します。"
+	},
+	"resetProvidersAndModels": {
+		"message": "デフォルトモデルをリセット"
+	},
+	"resetProvidersAndModelsDescription": {
+		"message": "プロバイダーとモデルをデフォルト設定にリセットします。"
 	},
 	"save": {
 		"message": "保存"

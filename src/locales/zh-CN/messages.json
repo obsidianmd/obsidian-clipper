@@ -274,6 +274,9 @@
 	"failedToProcessInterpreter": {
 		"message": "解释器处理失败。请重试。"
 	},
+	"failedToResetProviders": {
+		"message": "重置提供商和模型失败"
+	},
 	"failedToResetTemplate": {
 		"message": "无法重置默认模板。请再试一次。"
 	},
@@ -579,6 +582,12 @@
 	},
 	"resetDefaultTemplateDescription": {
 		"message": "移除对默认模板的所有更改。"
+	},
+	"resetProvidersAndModels": {
+		"message": "重置默认模型"
+	},
+	"resetProvidersAndModelsDescription": {
+		"message": "将提供商和模型重置为默认设置。"
 	},
 	"save": {
 		"message": "保存"

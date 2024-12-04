@@ -274,6 +274,9 @@
 	"failedToProcessInterpreter": {
 		"message": "Échec du traitement de l'interpréteur. Veuillez réessayer."
 	},
+	"failedToResetProviders": {
+		"message": "Échec de la réinitialisation des fournisseurs et des modèles"
+	},
 	"failedToResetTemplate": {
 		"message": "Échec de la réinitialisation du modèle par défaut. Veuillez réessayer."
 	},
@@ -579,6 +582,12 @@
 	},
 	"resetDefaultTemplateDescription": {
 		"message": "Supprime toutes les modifications apportées au modèle par défaut."
+	},
+	"resetProvidersAndModels": {
+		"message": "Réinitialiser les modèles par défaut"
+	},
+	"resetProvidersAndModelsDescription": {
+		"message": "Réinitialiser les fournisseurs et les modèles aux paramètres par défaut."
 	},
 	"save": {
 		"message": "Enregistrer"

@@ -274,6 +274,9 @@
 	"failedToProcessInterpreter": {
 		"message": "Обработка переводчика не удалась. Пожалуйста, попробуйте еще раз."
 	},
+	"failedToResetProviders": {
+		"message": "Не удалось сбросить поставщиков и модели"
+	},
 	"failedToResetTemplate": {
 		"message": "Не удалось сбросить шаблон по умолчанию. Пожалуйста, попробуйте еще раз."
 	},
@@ -579,6 +582,12 @@
 	},
 	"resetDefaultTemplateDescription": {
 		"message": "Удалить все изменения, внесенные в шаблон по умолчанию."
+	},
+	"resetProvidersAndModels": {
+		"message": "Сбросить модели по умолчанию"
+	},
+	"resetProvidersAndModelsDescription": {
+		"message": "Сбросьте поставщиков и модели до настроек по умолчанию."
 	},
 	"save": {
 		"message": "Сохранить"

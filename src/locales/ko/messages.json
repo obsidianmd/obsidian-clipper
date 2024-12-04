@@ -274,6 +274,9 @@
 	"failedToProcessInterpreter": {
 		"message": "인터프리터 처리에 실패했습니다. 다시 시도해 주세요."
 	},
+	"failedToResetProviders": {
+		"message": "공급자 및 모델 재설정 실패"
+	},
 	"failedToResetTemplate": {
 		"message": "템플릿을 초기화하지 못했습니다. 다시 시도해 주세요."
 	},
@@ -579,6 +582,12 @@
 	},
 	"resetDefaultTemplateDescription": {
 		"message": "기본 템플릿으로 초기화하여 템플릿에 대한 모든 사용자 정의를 제거합니다."
+	},
+	"resetProvidersAndModels": {
+		"message": "기본 모델 재설정"
+	},
+	"resetProvidersAndModelsDescription": {
+		"message": "공급자와 모델을 기본 설정으로 재설정합니다."
 	},
 	"save": {
 		"message": "저장"

@@ -274,6 +274,9 @@
 	"failedToProcessInterpreter": {
 		"message": "Interpreter verwerking mislukt. Probeer het opnieuw."
 	},
+	"failedToResetProviders": {
+		"message": "Resetten van providers en modellen mislukt"
+	},
 	"failedToResetTemplate": {
 		"message": "Standaard sjabloon resetten mislukt. Probeer het opnieuw."
 	},
@@ -580,6 +583,12 @@
 	"resetDefaultTemplateDescription": {
 		"message": "Verwijder alle wijzigingen die je hebt aangebracht aan het standaard sjabloon."
 	},
+	"resetProvidersAndModels": {
+		"message": "Standaardmodellen resetten"
+	},
+	"resetProvidersAndModelsDescription": {
+		"message": "Reset providers en modellen naar de standaardinstellingen."
+	},
 	"save": {
 		"message": "Opslaan"
 	},
@@ -719,4 +728,4 @@
 	"version": {
 		"message": "Versie"
 	}
-} 
+}

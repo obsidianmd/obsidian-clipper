@@ -274,6 +274,9 @@
 	"failedToProcessInterpreter": {
 		"message": "پردازش تفسیرگر ناموفق بود. لطفا دوباره امتحان کنید."
 	},
+	"failedToResetProviders": {
+		"message": "تنظیم مجدد ارائه دهندگان و مدل ها ناموفق بود"
+	},
 	"failedToResetTemplate": {
 		"message": "بازنشانی قالب پیش‌فرض انجام نشد. لطفا دوباره امتحان کنید."
 	},
@@ -579,6 +582,12 @@
 	},
 	"resetDefaultTemplateDescription": {
 		"message": "هر تغییری که در قالب پیش فرض ایجاد کرده اید را حذف کن"
+	},
+	"resetProvidersAndModels": {
+		"message": "تنظیم مجدد مدل های پیش فرض"
+	},
+	"resetProvidersAndModelsDescription": {
+		"message": "ارائه دهندگان و مدل ها را به تنظیمات پیش فرض تنظیم مجدد کنید."
 	},
 	"save": {
 		"message": "ذخیره"

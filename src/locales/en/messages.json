@@ -274,6 +274,9 @@
 	"failedToProcessInterpreter": {
 		"message": "Interpreter processing failed. Please try again."
 	},
+	"failedToResetProviders": {
+		"message": "Failed to reset providers and models"
+	},
 	"failedToResetTemplate": {
 		"message": "Failed to reset default template. Please try again."
 	},
@@ -580,6 +583,12 @@
 	"resetDefaultTemplateDescription": {
 		"message": "Remove any changes you've made to the default template."
 	},
+	"resetProvidersAndModels": {
+		"message": "Reset default models"
+	},
+	"resetProvidersAndModelsDescription": {
+		"message": "Reset providers and models to the default settings."
+	},
 	"save": {
 		"message": "Save"
 	},
@@ -718,14 +727,5 @@
 	},
 	"version": {
 		"message": "Version"
-	},
-	"resetProvidersAndModels": {
-		"message": "Reset default models"
-	},
-	"resetProvidersAndModelsDescription": {
-		"message": "Reset providers and models to the default settings."
-	},
-	"failedToResetProviders": {
-		"message": "Failed to reset providers and models"
 	}
 }

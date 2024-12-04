@@ -274,6 +274,9 @@
 	"failedToProcessInterpreter": {
 		"message": "فشلت معالجة المفسر. يرجى المحاولة مرة أخرى."
 	},
+	"failedToResetProviders": {
+		"message": "فشل في إعادة تعيين المزودين والنماذج"
+	},
 	"failedToResetTemplate": {
 		"message": "فشل إعادة تعيين القالب الافتراضي. يرجى المحاولة مرة أخرى."
 	},
@@ -579,6 +582,12 @@
 	},
 	"resetDefaultTemplateDescription": {
 		"message": "إزالة أي تغييرات قمت بها على القالب الافتراضي."
+	},
+	"resetProvidersAndModels": {
+		"message": "إعادة تعيين النماذج الافتراضية"
+	},
+	"resetProvidersAndModelsDescription": {
+		"message": "إعادة تعيين المزودين والنماذج إلى الإعدادات الافتراضية."
 	},
 	"save": {
 		"message": "حفظ"

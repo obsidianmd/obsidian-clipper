@@ -274,6 +274,9 @@
 	"failedToProcessInterpreter": {
 		"message": "Tidak dapat memuat proses interpreter. Silakan coba lagi."
 	},
+	"failedToResetProviders": {
+		"message": "Gagal mengatur ulang penyedia dan model"
+	},
 	"failedToResetTemplate": {
 		"message": "Gagal mengatur ulang template default. Silakan coba lagi."
 	},
@@ -579,6 +582,12 @@
 	},
 	"resetDefaultTemplateDescription": {
 		"message": "Hapus semua perubahan yang telah dibuat pada template default."
+	},
+	"resetProvidersAndModels": {
+		"message": "Atur ulang model default"
+	},
+	"resetProvidersAndModelsDescription": {
+		"message": "Atur ulang penyedia dan model ke pengaturan default."
 	},
 	"save": {
 		"message": "Simpan"

@@ -274,6 +274,9 @@
 	"failedToProcessInterpreter": {
 		"message": "Przetwarzanie zapytania nie powiodło się. Spróbuj ponownie."
 	},
+	"failedToResetProviders": {
+		"message": "Nie udało się zresetować dostawców i modeli"
+	},
 	"failedToResetTemplate": {
 		"message": "Nie udało się zresetować domyślnego szablonu. Spróbuj ponownie."
 	},
@@ -328,7 +331,7 @@
 	"importAllSettingsDescription": {
 		"message": "Zaimportuj wszystkie ustawienia, w tym szablony i atrybuty. Zastąpi to obecną konfigurację."
 	},
-  "importFailed": {
+	"importFailed": {
 		"message": "Import nie powiódł się. Sprawdź konsolę, aby uzyskać więcej informacji."
 	},
 	"importModalTitle": {
@@ -579,6 +582,12 @@
 	},
 	"resetDefaultTemplateDescription": {
 		"message": "Usuń wszelkie zmiany wprowadzone w domyślnym szablonie."
+	},
+	"resetProvidersAndModels": {
+		"message": "Zresetuj domyślne modele"
+	},
+	"resetProvidersAndModelsDescription": {
+		"message": "Zresetuj dostawców i modele do ustawień domyślnych."
 	},
 	"save": {
 		"message": "Zapisz"
