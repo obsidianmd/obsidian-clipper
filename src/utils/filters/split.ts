@@ -1,6 +1,7 @@
 export const split = (str: string, param?: string): string => {
-	if (!param) {
-		return JSON.stringify([str]);
+	// If no param is provided or param is empty string, split every character
+	if (!param || param === '') {
+		return JSON.stringify(str.split(''));
 	}
 
 	// Remove outer parentheses if present
