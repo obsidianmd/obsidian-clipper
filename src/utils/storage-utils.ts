@@ -425,3 +425,23 @@ export async function getClipHistory(): Promise<HistoryEntry[]> {
 	const result = await browser.storage.local.get('history');
 	return (result.history || []) as HistoryEntry[];
 }
+
+declare global {
+	interface Window {
+		debugStorage: (key?: string) => Promise<Record<string, unknown>>;
+	}
+}
+
+// Make storage accessible from console — use `window.debugStorage()` to see all sync storage, or `window.debugStorage(key)` to see a specific key
+window.debugStorage = (key?: string) => {
+	if (key) {
+		return browser.storage.sync.get(key).then(data => {
+			console.log(`Sync storage contents for key "${key}":`, data);
+			return data;
+		});
+	}
+	return browser.storage.sync.get(null).then(data => {
+		console.log('Sync storage contents:', data);
+		return data;
+	});
+};
