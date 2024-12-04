@@ -18,7 +18,7 @@
 		"message": "Zu Obsidian hinzufügen"
 	},
 	"addVaultPlaceholder": {
-		"message": "Drücken Sie Enter, um einen Tresor hinzuzufügen"
+		"message": "Drücken Sie Enter, um einen Vault hinzuzufügen"
 	},
 	"advanced": {
 		"message": "Erweitert"
@@ -228,7 +228,7 @@
 		"message": "Eigenschaften exportieren"
 	},
 	"exportPropertiesDescription": {
-		"message": "Speichern Sie Web Clipper Eigenschaften in einer $strong_start$types.json$strong_end$ Datei, die in Ihren Obsidian-Tresor oder in Web Clipper auf anderen Geräten importiert werden kann.",
+		"message": "Speichern Sie Web Clipper Eigenschaften in einer $strong_start$types.json$strong_end$ Datei, die in Ihren Obsidian-Vault oder in Web Clipper auf anderen Geräten importiert werden kann.",
 		"placeholders": {
 			"strong_end": {
 				"content": "</strong>"
@@ -341,7 +341,7 @@
 		"message": "Eigenschaften importieren"
 	},
 	"importPropertiesDescription": {
-		"message": "Um Ihre Eigenschaften aus Obsidian zu importieren, suchen Sie die $strong_1_start$types.json$strong_1_end$ Datei im $strong_2_start$.obsidian$strong_2_end$ Ordner in Ihrem Tresor. Beachten Sie, dass dieser Ordner standardmäßig auf den meisten Betriebssystemen versteckt ist.",
+		"message": "Um Ihre Eigenschaften aus Obsidian zu importieren, suchen Sie die $strong_1_start$types.json$strong_1_end$ Datei im $strong_2_start$.obsidian$strong_2_end$ Ordner in Ihrem Vault. Beachten Sie, dass dieser Ordner standardmäßig auf den meisten Betriebssystemen versteckt ist.",
 		"placeholders": {
 			"strong_1_end": {
 				"content": "</strong>"
@@ -569,7 +569,7 @@
 		"message": "Entfernen Sie alle Eigenschaften, die in keiner Vorlage verwendet werden."
 	},
 	"removeVault": {
-		"message": "Tresor entfernen"
+		"message": "Vault entfernen"
 	},
 	"replaceContent": {
 		"message": "Seiteninhalt ersetzen"
@@ -698,10 +698,10 @@
 		"message": "Sie verwenden die neueste Version."
 	},
 	"vault": {
-		"message": "Tresor"
+		"message": "Vault"
 	},
 	"vaultDescription": {
-		"message": "Wählen Sie den Standard-Tresor für diese Vorlage. Gehen Sie zu $link_start$allgemeinen Einstellungen$link_end$, um Tresore hinzuzufügen oder zu entfernen.",
+		"message": "Wählen Sie den Standard-Vault für diese Vorlage. Gehen Sie zu $link_start$allgemeinen Einstellungen$link_end$, um Vaulte hinzuzufügen oder zu entfernen.",
 		"placeholders": {
 			"link_end": {
 				"content": "</a>"
@@ -712,10 +712,10 @@
 		}
 	},
 	"vaults": {
-		"message": "Tresore"
+		"message": "Vaulte"
 	},
 	"vaultsDescription": {
-		"message": "Standardmäßig werden ausgeschnittene Notizen im aktuell geöffneten Tresor gespeichert. Sie können hier Tresore hinzufügen, wenn Sie die Option haben möchten, in verschiedenen Tresoren zu speichern. Tresornamen müssen exakt mit dem Namen des Obsidian-Tresors übereinstimmen. Drücken Sie $strong_start$Enter$strong_end$, um einen Tresor hinzuzufügen.",
+		"message": "Standardmäßig werden ausgeschnittene Notizen im aktuell geöffneten Vault gespeichert. Sie können hier Vaulte hinzufügen, wenn Sie die Option haben möchten, in verschiedenen Vaulten zu speichern. Vaultnamen müssen exakt mit dem Namen des Obsidian-Vaults übereinstimmen. Drücken Sie $strong_start$Enter$strong_end$, um einen Vault hinzuzufügen.",
 		"placeholders": {
 			"strong_end": {
 				"content": "</strong>"
