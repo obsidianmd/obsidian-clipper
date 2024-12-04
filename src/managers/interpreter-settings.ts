@@ -118,8 +118,13 @@ function initializeProviderList() {
 		return;
 	}
 
+	// Sort providers alphabetically by name
+	const sortedProviders = [...generalSettings.providers].sort((a, b) => 
+		a.name.toLowerCase().localeCompare(b.name.toLowerCase())
+	);
+
 	providerList.innerHTML = '';
-	generalSettings.providers.forEach((provider, index) => {
+	sortedProviders.forEach((provider, index) => {
 		const providerItem = createProviderListItem(provider, index);
 		providerList.appendChild(providerItem);
 	});
@@ -132,6 +137,7 @@ function createProviderListItem(provider: Provider, index: number): HTMLElement 
 	const providerItem = document.createElement('div');
 	providerItem.className = 'provider-list-item';
 	providerItem.dataset.index = index.toString();
+	providerItem.dataset.providerId = provider.id;
 
 	providerItem.innerHTML = `
 		<div class="provider-list-item-info">
@@ -142,13 +148,13 @@ function createProviderListItem(provider: Provider, index: number): HTMLElement 
 			${!provider.apiKey ? `<span class="provider-no-key"><i data-lucide="alert-triangle"></i> ${getMessage('apiKeyMissing')}</span>` : ''}
 		</div>
 		<div class="provider-list-item-actions">
-			<button class="edit-provider-btn clickable-icon" data-index="${index}" aria-label="Edit provider">
+			<button class="edit-provider-btn clickable-icon" data-provider-id="${provider.id}" aria-label="Edit provider">
 				<i data-lucide="pen-line"></i>
 			</button>
-			<button class="duplicate-provider-btn clickable-icon" data-index="${index}" aria-label="Duplicate provider">
+			<button class="duplicate-provider-btn clickable-icon" data-provider-id="${provider.id}" aria-label="Duplicate provider">
 				<i data-lucide="copy-plus"></i>
 			</button>
-			<button class="delete-provider-btn clickable-icon" data-index="${index}" aria-label="Delete provider">
+			<button class="delete-provider-btn clickable-icon" data-provider-id="${provider.id}" aria-label="Delete provider">
 				<i data-lucide="trash-2"></i>
 			</button>
 		</div>
@@ -159,7 +165,13 @@ function createProviderListItem(provider: Provider, index: number): HTMLElement 
 		editBtn.addEventListener('click', (e) => {
 			e.preventDefault();
 			e.stopPropagation();
-			editProvider(index);
+			const providerId = editBtn.getAttribute('data-provider-id');
+			if (providerId) {
+				const providerIndex = generalSettings.providers.findIndex(p => p.id === providerId);
+				if (providerIndex !== -1) {
+					editProvider(providerIndex);
+				}
+			}
 		});
 	}
 
@@ -168,7 +180,13 @@ function createProviderListItem(provider: Provider, index: number): HTMLElement 
 		duplicateBtn.addEventListener('click', (e) => {
 			e.preventDefault();
 			e.stopPropagation();
-			duplicateProvider(index);
+			const providerId = duplicateBtn.getAttribute('data-provider-id');
+			if (providerId) {
+				const providerIndex = generalSettings.providers.findIndex(p => p.id === providerId);
+				if (providerIndex !== -1) {
+					duplicateProvider(providerIndex);
+				}
+			}
 		});
 	}
 
@@ -177,7 +195,13 @@ function createProviderListItem(provider: Provider, index: number): HTMLElement 
 		deleteBtn.addEventListener('click', (e) => {
 			e.preventDefault();
 			e.stopPropagation();
-			deleteProvider(index);
+			const providerId = deleteBtn.getAttribute('data-provider-id');
+			if (providerId) {
+				const providerIndex = generalSettings.providers.findIndex(p => p.id === providerId);
+				if (providerIndex !== -1) {
+					deleteProvider(providerIndex);
+				}
+			}
 		});
 	}
 
@@ -511,11 +535,15 @@ function showModelModal(model: ModelConfig, index?: number) {
 	nameInput.value = model.name;
 	providerModelIdInput.value = model.providerModelId || '';
 
-	// Populate provider select
+	// Populate provider select with alphabetically sorted providers
 	providerSelect.innerHTML = '<option value="" data-i18n="selectProvider">Select a provider</option>';
-	generalSettings.providers.forEach(provider => {
+	const sortedProviders = [...generalSettings.providers].sort((a, b) => 
+		a.name.toLowerCase().localeCompare(b.name.toLowerCase())
+	);
+	sortedProviders.forEach(provider => {
 		const option = document.createElement('option');
 		option.value = provider.id;
+		
 		option.textContent = provider.name;
 		providerSelect.appendChild(option);
 	});
