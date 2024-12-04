@@ -20,6 +20,11 @@ const PRESET_PROVIDERS: Record<string, PresetProvider> = {
 		baseUrl: 'https://api.anthropic.com/v1/messages',
 		apiKeyUrl: 'https://console.anthropic.com/settings/keys'
 	},
+	azure: {
+		id: 'azure-openai',
+		name: 'Azure OpenAI',
+		baseUrl: 'https://{endpoint}/openai/deployments/{deployment-id}/chat/completions?api-version=2024-10-21',
+	},
 	ollama: {
 		id: 'ollama',
 		name: 'Ollama',
@@ -129,7 +134,7 @@ function createProviderListItem(provider: Provider, index: number): HTMLElement 
 	providerItem.innerHTML = `
 		<div class="provider-list-item-info">
 			<div class="provider-name">
-				<div class="provider-icon-container"><span class="provider-icon icon-${provider.name.toLowerCase()}"></span></div>
+				<div class="provider-icon-container"><span class="provider-icon icon-${provider.name.toLowerCase().replace(/\s+/g, '-')}"></span></div>
 				${provider.name}
 			</div>
 			${!provider.apiKey ? `<span class="provider-no-key"><i data-lucide="alert-triangle"></i> ${getMessage('apiKeyMissing')}</span>` : ''}

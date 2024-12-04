@@ -49,7 +49,22 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 			'Content-Type': 'application/json',
 		};
 
-		if (provider.id === 'anthropic') {
+		if (provider.id === 'azure-openai') {
+			requestBody = {
+				messages: [
+					{ role: 'system', content: systemContent },
+					{ role: 'user', content: `${promptContext}` },
+					{ role: 'user', content: `${JSON.stringify(promptContent)}` }
+				],
+				temperature: 0.5,
+				max_tokens: 800,
+				stream: false
+			};
+			headers = {
+				...headers,
+				'api-key': provider.apiKey
+			};
+		} else if (provider.id === 'anthropic') {
 			requestBody = {
 				model: model.providerModelId,
 				max_tokens: 800,
