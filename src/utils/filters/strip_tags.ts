@@ -1,4 +1,7 @@
 export const strip_tags = (html: string, keepTags: string = ''): string => {
+	// Remove outer parentheses if present
+	keepTags = keepTags.replace(/^\((.*)\)$/, '$1');
+	
 	// Remove any surrounding quotes (both single and double) and unescape internal quotes
 	keepTags = keepTags.replace(/^(['"])(.*)\1$/, '$2').replace(/\\(['"])/g, '$1');
 	
