@@ -134,7 +134,7 @@
 		"message": "Le modèle utilisera ce contexte pour interpréter les variables de prompt. Les variables et filtres peuvent être utilisés ici."
 	},
 	"defaultTemplateName": {
-		"message": "Par défaut"
+		"message": "Défaut"
 	},
 	"delete": {
 		"message": "Supprimer"

@@ -3,6 +3,7 @@ import { compressToUTF16, decompressFromUTF16 } from 'lz-string';
 import browser from '../utils/browser-polyfill';
 import { generalSettings } from '../utils/storage-utils';
 import { addPropertyType } from './property-types-manager';
+import { getMessage } from '../utils/i18n';
 
 export let templates: Template[] = [];
 export let editingTemplateIndex = -1;
@@ -112,7 +113,7 @@ async function prepareTemplateForSave(template: Template): Promise<[string[], st
 export function createDefaultTemplate(): Template {
 	return {
 		id: Date.now().toString() + Math.random().toString(36).slice(2, 11),
-		name: 'Default',
+		name: getMessage('defaultTemplateName'),
 		behavior: 'create',
 		noteNameFormat: '{{title}}',
 		path: 'Clippings',
