@@ -8,7 +8,7 @@
 	"addProperty": {
 		"message": "+ Dodaj atrybut"
 	},
-  "addProvider": {
+	"addProvider": {
 		"message": "+ Dodaj operatora"
 	},
 	"addProviderTitle": {
@@ -718,3 +718,5 @@
 	},
 	"version": {
 		"message": "Wersja"
+	}
+}
