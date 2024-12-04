@@ -56,7 +56,7 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 					{ role: 'user', content: `${promptContext}` },
 					{ role: 'user', content: `${JSON.stringify(promptContent)}` }
 				],
-				temperature: 0.4,
+				temperature: 0.5,
 				max_tokens: 800,
 				stream: false
 			};
@@ -72,7 +72,7 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 					{ role: 'user', content: `${promptContext}` },
 					{ role: 'user', content: `${JSON.stringify(promptContent)}` }
 				],
-				temperature: 0.4,
+				temperature: 0.5,
 				system: systemContent
 			};
 			headers = {
@@ -90,7 +90,7 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 					{ role: 'user', content: `${JSON.stringify(promptContent)}` }
 				],
 				format: 'json',
-				temperature: 0.4,
+				temperature: 0.5,
 				stream: false
 			};
 		} else {
@@ -102,7 +102,7 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 					{ role: 'user', content: `${promptContext}` },
 					{ role: 'user', content: `${JSON.stringify(promptContent)}` }
 				],
-				temperature: 0.4
+				temperature: 0.7
 			};
 			headers = {
 				...headers,
@@ -166,16 +166,29 @@ function parseLLMResponse(responseContent: string, promptVariables: PromptVariab
 	try {
 		let parsedResponse: LLMResponse;
 		
+		// If responseContent is already an object, stringify it first to normalize it
+		if (typeof responseContent === 'object') {
+			responseContent = JSON.stringify(responseContent);
+		}
+
 		// First try parsing the entire response
 		try {
-			parsedResponse = JSON.parse(responseContent);
+			// Replace any raw newlines in strings with \n before parsing
+			const sanitizedContent = responseContent.replace(/(?<=":)(\s*"[^"]*(?:\r?\n)[^"]*")(?=,?)/g, (match) => {
+				return match.replace(/\r?\n/g, '\\n');
+			});
+			parsedResponse = JSON.parse(sanitizedContent);
 		} catch (e) {
 			// If that fails, try to find and parse JSON content
 			const jsonMatch = responseContent.match(/\{[\s\S]*\}/);
 			if (!jsonMatch) {
 				throw new Error('No JSON object found in response');
 			}
-			parsedResponse = JSON.parse(jsonMatch[0]);
+			// Sanitize the matched JSON string
+			const sanitizedMatch = jsonMatch[0].replace(/(?<=":)(\s*"[^"]*(?:\r?\n)[^"]*")(?=,?)/g, (match) => {
+				return match.replace(/\r?\n/g, '\\n');
+			});
+			parsedResponse = JSON.parse(sanitizedMatch);
 		}
 
 		// If we don't have prompts_responses, return empty array
