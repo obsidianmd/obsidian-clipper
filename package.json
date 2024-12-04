@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-clipper",
-	"version": "0.10.0",
+	"version": "0.10.1",
 	"description": "Official web clipper for Obsidian.",
 	"scripts": {
 		"dev:chrome": "webpack --watch --env BROWSER=chrome --mode development",
@@ -10,7 +10,10 @@
 		"build:firefox": "webpack --env BROWSER=firefox --mode production",
 		"build:safari": "webpack --env BROWSER=safari --mode production",
 		"build": "npm run build:chrome && npm run build:firefox && npm run build:safari",
-		"dev": "npm run dev:chrome"
+		"dev": "npm run dev:chrome",
+		"update-locales": "ts-node --project scripts/tsconfig.json scripts/update-locales.ts",
+		"check-strings": "ts-node --project scripts/tsconfig.json scripts/check-unused-strings.ts",
+		"add-locale": "ts-node --project scripts/tsconfig.json scripts/add-locale.ts"
 	},
 	"devDependencies": {
 		"@types/chrome": "^0.0.270",
@@ -26,11 +29,14 @@
 		"sass": "^1.77.8",
 		"sass-loader": "^16.0.1",
 		"ts-loader": "^9.5.1",
+		"ts-node": "^10.9.2",
 		"typescript": "^5.5.4",
 		"webextension-polyfill": "^0.12.0",
 		"webpack": "^5.94.0",
 		"webpack-cli": "^5.1.4",
-		"zip-webpack-plugin": "^4.0.1"
+		"zip-webpack-plugin": "^4.0.1",
+		"dotenv": "^16.4.1",
+		"@types/dotenv": "^8.2.0"
 	},
 	"dependencies": {
 		"@mozilla/readability": "^0.5.0",

@@ -8,6 +8,12 @@
 	"addProperty": {
 		"message": "+ 속성 추가하기"
 	},
+	"addProvider": {
+		"message": "+ 공급자 추가"
+	},
+	"addProviderTitle": {
+		"message": "제공자 추가"
+	},
 	"addToObsidian": {
 		"message": "Obsidian에 추가하기"
 	},
@@ -26,19 +32,8 @@
 	"alwaysShowHighlightsDescription": {
 		"message": "웹페이지를 로드할 때 저장된 하이라이트를 표시합니다. 하이라이트 모드가 활성화된 경우에만 하이라이트를 표시하려면 이 옵션을 끄십시오."
 	},
-	"anthropicApiKey": {
-		"message": "Anthropic API 키"
-	},
-	"anthropicApiKeyDescription": {
-		"message": "Anthropic API 키는 $link_start$여기$link_end$에서 얻을 수 있습니다.",
-		"placeholders": {
-			"link_end": {
-				"content": "</a>"
-			},
-			"link_start": {
-				"content": "<a href=\"https://console.anthropic.com/settings/keys\" target=\"_blank\">"
-			}
-		}
+	"apiKeyMissing": {
+		"message": "API 키가 없습니다"
 	},
 	"apiKeysWarning": {
 		"message": "외부 제공자를 사용하면 해당 제공자의 이용 약관 및 개인정보 보호정책에 동의하는 것입니다. 인터프리터 요청은 선택한 제공자에게 직접 전송됩니다. Obsidian은 요청에 대한 데이터를 수집하거나 저장하지 않습니다."
@@ -64,8 +59,23 @@
 	"cancel": {
 		"message": "취소"
 	},
+	"cannotDeleteProvider": {
+		"message": "\"$1\" 공급자를 삭제할 수 없습니다. 이는 $2 모델에서 사용 중이기 때문입니다."
+	},
 	"changelog": {
 		"message": "변경 내역"
+	},
+	"chooseFile": {
+		"message": "파일을 선택하세요"
+	},
+	"choosePropertiesFile": {
+		"message": "속성 파일 선택"
+	},
+	"chooseSettingsFile": {
+		"message": "설정 파일을 선택하십시오"
+	},
+	"chooseTemplateFile": {
+		"message": "템플릿 파일을 선택하세요"
 	},
 	"clipBehavior": {
 		"message": "클립 동작 방식"
@@ -96,6 +106,9 @@
 	"confirmDeleteTemplate": {
 		"message": "템플릿을 삭제하시겠습니까? \"$1\"?"
 	},
+	"confirmReplaceSettings": {
+		"message": "이 작업은 현재의 모든 설정, 템플릿 및 속성을 대체합니다. 계속하시겠습니까?"
+	},
 	"copied": {
 		"message": "복사되었습니다!"
 	},
@@ -107,6 +120,9 @@
 	},
 	"createNewNote": {
 		"message": "새 노트 만들기"
+	},
+	"custom": {
+		"message": "사용자 정의"
 	},
 	"dailyNoteFormat": {
 		"message": "데일리 노트 형식 (e.g., YYYY-MM-DD)"
@@ -126,14 +142,17 @@
 	"deleteModelConfirm": {
 		"message": "이 모델을 삭제하시겠습니까?"
 	},
+	"deleteProviderConfirm": {
+		"message": "이 공급자를 삭제하시겠습니까?"
+	},
 	"disableHighlighter": {
 		"message": "하이라이터 끄기"
 	},
-	"display": {
-		"message": "표시"
-	},
 	"done": {
 		"message": "완료"
+	},
+	"dragAndDropFile": {
+		"message": "여기에 파일을 드래그 앤 드롭하세요"
 	},
 	"duplicate": {
 		"message": "복제"
@@ -154,6 +173,9 @@
 	},
 	"editModel": {
 		"message": "모델 편집"
+	},
+	"editProvider": {
+		"message": "공급자 편집"
 	},
 	"editTemplate": {
 		"message": "템플릿 편집"
@@ -228,8 +250,20 @@
 	"failedToDeleteTemplate": {
 		"message": "템플릿을 삭제하지 못했습니다. 다시 시도해 주세요."
 	},
+	"failedToDuplicateTemplate": {
+		"message": "템플릿 복제에 실패했습니다. 다시 시도해 주세요."
+	},
+	"failedToExportHighlights": {
+		"message": "하이라이트 내보내기에 실패했습니다. 자세한 내용은 콘솔을 확인해 주세요."
+	},
+	"failedToExportSettings": {
+		"message": "설정 내보내기에 실패했습니다. 자세한 내용은 콘솔을 확인해 주세요."
+	},
 	"failedToExtractContent": {
 		"message": "페이지 콘텐츠를 추출하지 못했습니다."
+	},
+	"failedToImportTemplate": {
+		"message": "템플릿 가져오기 오류. 파일을 확인하고 다시 시도해 주세요."
 	},
 	"failedToInitialize": {
 		"message": "확장 프로그램을 다시 로드해 주세요."
@@ -249,6 +283,9 @@
 	"failedToSaveFile": {
 		"message": "파일을 저장하지 못했습니다"
 	},
+	"failedToSaveProvider": {
+		"message": "제공자 저장에 실패했습니다. 다시 시도해 주세요."
+	},
 	"folder": {
 		"message": "Folder"
 	},
@@ -257,6 +294,9 @@
 	},
 	"generalSettings": {
 		"message": "일반 설정"
+	},
+	"getApiKeyHere": {
+		"message": "여기에서 $1 API 키를 받으세요."
 	},
 	"help": {
 		"message": "도움말"
@@ -288,6 +328,12 @@
 	"importAllSettingsDescription": {
 		"message": "템플릿과 속성을 포함한 모든 설정을 들여옵니다. 현재 구성이 대체됩니다."
 	},
+	"importFailed": {
+		"message": "가져오기 실패했습니다. 자세한 내용은 콘솔을 확인해 주세요."
+	},
+	"importModalTitle": {
+		"message": "수입"
+	},
 	"importProperties": {
 		"message": "속성 들여오기"
 	},
@@ -307,6 +353,12 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"importSettings": {
+		"message": "설정 가져오기"
+	},
+	"importTemplate": {
+		"message": "템플릿 가져오기"
 	},
 	"interpret": {
 		"message": "해석"
@@ -343,18 +395,6 @@
 	"legacyModeDescription": {
 		"message": "Obsidian 1.6.7 이하 버전과 호환되는 URI 클리핑 방법을 사용합니다. 클립할 수 있는 내용량은 브라우저와 OS에 따라 제한됩니다. 일부 페이지는 오류 없이 실패할 수 있습니다."
 	},
-	"modelApiKey": {
-		"message": "API 키"
-	},
-	"modelApiKeyDescription": {
-		"message": "이 모델의 API 키를 입력하세요. 일부 제공자의 경우 필요하지 않을 수 있습니다."
-	},
-	"modelBaseUrl": {
-		"message": "기본 URL"
-	},
-	"modelBaseUrlDescription": {
-		"message": "이 모델의 API 엔드포인트 URL입니다."
-	},
 	"modelName": {
 		"message": "모델 이름"
 	},
@@ -367,14 +407,11 @@
 	"modelProviderDescription": {
 		"message": "모델 제공자 (예: Ollama, OpenRouter, Google 등)"
 	},
-	"modelProviderId": {
-		"message": "모델 ID"
+	"modelProviderPlaceholder": {
+		"message": "공급자"
 	},
-	"modelProviderIdDescription": {
-		"message": "제공자의 모델 식별자입니다. 일반적으로 공백이 없는 짧은 이름입니다."
-	},
-	"modelProviderIdPlaceholder": {
-		"message": "모델 ID"
+	"modelRequiredFields": {
+		"message": "모델 이름, 제공자, 그리고 모델 ID가 필요합니다."
 	},
 	"models": {
 		"message": "모델"
@@ -390,6 +427,9 @@
 	},
 	"noTemplates": {
 		"message": "템플릿 없음. 설정에서 템플릿을 추가하세요."
+	},
+	"noUnusedProperties": {
+		"message": "사용하지 않는 속성이 발견되지 않았습니다."
 	},
 	"noteContent": {
 		"message": "노트 내용"
@@ -429,28 +469,20 @@
 	"open": {
 		"message": "열기"
 	},
-	"openaiApiKey": {
-		"message": "OpenAI API 키"
-	},
-	"openaiApiKeyDescription": {
-		"message": "OpenAI API 키는 $link_start$여기$link_end$에서 얻을 수 있습니다.",
-		"placeholders": {
-			"link_end": {
-				"content": "</a>"
-			},
-			"link_start": {
-				"content": "<a href=\"https://platform.openai.com/api-keys\" target=\"_blank\">"
-			}
-		}
-	},
 	"optional": {
 		"message": "(선택사항)"
+	},
+	"orPasteBelow": {
+		"message": "아래에 내용을 붙여넣으세요."
 	},
 	"pageCannotBeClipped": {
 		"message": "이 페이지는 클립할 수 없습니다."
 	},
 	"pageVariables": {
 		"message": "페이지 변수"
+	},
+	"pasteJsonHere": {
+		"message": "여기에 JSON을 붙여넣으세요"
 	},
 	"pleaseReload": {
 		"message": "페이지를 다시 로드해 주세요."
@@ -475,6 +507,45 @@
 	},
 	"propertyValue": {
 		"message": "속성 값"
+	},
+	"provider": {
+		"message": "공급자"
+	},
+	"providerApiKey": {
+		"message": "API 키"
+	},
+	"providerApiKeyDescription": {
+		"message": "이 공급자를 위한 API 키입니다."
+	},
+	"providerBaseUrl": {
+		"message": "기본 URL"
+	},
+	"providerBaseUrlDescription": {
+		"message": "이 제공자를 위한 API 엔드포인트 URL입니다."
+	},
+	"providerModelId": {
+		"message": "모델 ID"
+	},
+	"providerModelIdDescription": {
+		"message": "제공자의 모델 식별자입니다. 일반적으로 공백이 없는 짧은 이름입니다."
+	},
+	"providerModelIdPlaceholder": {
+		"message": "모델 ID"
+	},
+	"providerName": {
+		"message": "제공자 이름"
+	},
+	"providerNameDescription": {
+		"message": "이 공급자의 표시 이름."
+	},
+	"providerPreset": {
+		"message": "프리셋"
+	},
+	"providerPresetDescription": {
+		"message": "공급자를 선택하거나 사용자 정의 공급자를 생성하십시오."
+	},
+	"providerRequiredFields": {
+		"message": "공급자 이름과 기본 URL이 필요합니다."
 	},
 	"providers": {
 		"message": "제공자"
@@ -518,11 +589,20 @@
 	"searchVariables": {
 		"message": "변수 검색..."
 	},
+	"selectProvider": {
+		"message": "공급자를 선택하십시오"
+	},
+	"selectTemplateToExport": {
+		"message": "내보낼 템플릿을 선택해 주세요."
+	},
 	"settings": {
 		"message": "설정"
 	},
 	"settingsHeading": {
 		"message": "설정"
+	},
+	"settingsImportSuccess": {
+		"message": "모든 설정이 성공적으로 가져와졌습니다. 변경 사항을 확인하려면 페이지를 새로 고치십시오."
 	},
 	"share": {
 		"message": "공유..."
@@ -572,6 +652,12 @@
 	"systemDefault": {
 		"message": "시스템 기본값"
 	},
+	"templateCopied": {
+		"message": "클립보드에 템플릿 JSON을 복사했습니다."
+	},
+	"templateCopyError": {
+		"message": "템플릿 JSON을 클립보드에 복사하는 데 실패했습니다."
+	},
 	"templateName": {
 		"message": "템플릿 이름"
 	},
@@ -592,6 +678,9 @@
 	},
 	"thinking": {
 		"message": "생각 중"
+	},
+	"unknownProvider": {
+		"message": "알 수 없는 제공자"
 	},
 	"updateAvailable": {
 		"message": "업데이트가 있습니다."

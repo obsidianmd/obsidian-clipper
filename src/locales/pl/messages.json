@@ -8,6 +8,12 @@
 	"addProperty": {
 		"message": "+ Dodaj atrybut"
 	},
+  "addProvider": {
+		"message": "+ Dodaj operatora"
+	},
+	"addProviderTitle": {
+		"message": "Dodaj operatora"
+	},
 	"addToObsidian": {
 		"message": "Zapisz w Obsidian"
 	},
@@ -26,22 +32,8 @@
 	"alwaysShowHighlightsDescription": {
 		"message": "Wyświetl zapisane wyróżnienia po wczytaniu strony. Wyłącz, aby wyświetlać wyróżnienia tylko wtedy, gdy włączony jest tryb zakreślacza."
 	},
-	"anthropicApiKey": {
-		"message": "Klucz API Anthropic"
-	},
-	"anthropicApiKeyDescription": {
-		"message": "Klucz API Anthropic można uzyskać $link_start$tutaj$link_end$.",
-		"placeholders": {
-			"link_end": {
-				"content": "</a>"
-			},
-			"link_start": {
-				"content": "<a href=\"https://console.anthropic.com/settings/keys\" target=\"_blank\">"
-			}
-		}
-	},
-	"anthropicApiKeyPlaceholder": {
-		"message": "Klucz API Anthropic"
+	"apiKeyMissing": {
+		"message": "Brak klucza API"
 	},
 	"apiKeysWarning": {
 		"message": "Korzystając z usług zewnętrznego operatora, użytkownik akceptuje jego regulamin i politykę prywatności. Zapytania użytkowników wysyłane są bezpośrednio do wybranego operatora. Obsidian nie gromadzi ani nie przechowuje żadnych danych dotyczących zapytań."
@@ -66,6 +58,12 @@
 	},
 	"cancel": {
 		"message": "Anuluj"
+	},
+	"cannotDeleteProvider": {
+		"message": "Nie można usunąć dostawcy \"$1\", ponieważ jest używany przez $2 model(e)."
+	},
+	"changelog": {
+		"message": "Dziennik zmian"
 	},
 	"chooseFile": {
 		"message": "Wybierz plik"
@@ -108,6 +106,9 @@
 	"confirmDeleteTemplate": {
 		"message": "Czy na pewno chcesz usunąć szablon \"$1\"?"
 	},
+	"confirmReplaceSettings": {
+		"message": "Spowoduje to zastąpienie wszystkich bieżących ustawień, w tym szablonów i atrybutów. Czy na pewno chcesz kontynuować?"
+	},
 	"copied": {
 		"message": "Skopiowane!"
 	},
@@ -119,6 +120,9 @@
 	},
 	"createNewNote": {
 		"message": "Utwórz nową notatkę"
+	},
+	"custom": {
+		"message": "Niestandardowe"
 	},
 	"dailyNoteFormat": {
 		"message": "Format codziennej notatki (np. YYYY-MM-DD)"
@@ -138,14 +142,14 @@
 	"deleteModelConfirm": {
 		"message": "Czy na pewno chcesz usunąć ten model?"
 	},
+	"deleteProviderConfirm": {
+		"message": "Czy na pewno chcesz usunąć tego operatora?"
+	},
 	"disableHighlighter": {
 		"message": "Wyłącz zakreślacz"
 	},
-	"display": {
-		"message": "Wyświetlanie"
-	},
 	"done": {
-		"message": "Zrobione"
+		"message": "Gotowe"
 	},
 	"dragAndDropFile": {
 		"message": "Przeciągnij i upuść plik tutaj"
@@ -169,6 +173,9 @@
 	},
 	"editModel": {
 		"message": "Edytuj model"
+	},
+	"editProvider": {
+		"message": "Edytuj operatora"
 	},
 	"editTemplate": {
 		"message": "Edytuj szablon"
@@ -243,14 +250,26 @@
 	"failedToDeleteTemplate": {
 		"message": "Nie udało się usunąć szablonu. Spróbuj ponownie."
 	},
+	"failedToDuplicateTemplate": {
+		"message": "Nie udało się zduplikować szablonu. Spróbuj ponownie."
+	},
+	"failedToExportHighlights": {
+		"message": "Nie udało się wyeksportować wyróżnień. Sprawdź konsolę, aby uzyskać więcej informacji."
+	},
+	"failedToExportSettings": {
+		"message": "Nie udało się wyeksportować ustawień. Sprawdź konsolę, aby uzyskać więcej informacji."
+	},
 	"failedToExtractContent": {
-		"message": "Nie można wyodrębnić zawartości strony."
+		"message": "Nie udało się wyodrębnić zawartości strony."
+	},
+	"failedToImportTemplate": {
+		"message": "Błąd podczas importowania szablonu. Sprawdź plik i spróbuj ponownie."
 	},
 	"failedToInitialize": {
 		"message": "Spróbuj odświeżyć rozszerzenie."
 	},
 	"failedToInitializeContent": {
-		"message": "Nie można uruchomić zawartości strony."
+		"message": "Nie udało się uruchomić zawartości strony."
 	},
 	"failedToProcessInterpreter": {
 		"message": "Przetwarzanie zapytania nie powiodło się. Spróbuj ponownie."
@@ -264,6 +283,9 @@
 	"failedToSaveFile": {
 		"message": "Nie udało się zapisać pliku"
 	},
+	"failedToSaveProvider": {
+		"message": "Nie udało się zapisać operatora. Spróbuj ponownie."
+	},
 	"folder": {
 		"message": "Folder"
 	},
@@ -272,6 +294,9 @@
 	},
 	"generalSettings": {
 		"message": "Ustawienia ogólne"
+	},
+	"getApiKeyHere": {
+		"message": "Uzyskaj swój klucz API $1 tutaj."
 	},
 	"help": {
 		"message": "Pomoc"
@@ -302,6 +327,9 @@
 	},
 	"importAllSettingsDescription": {
 		"message": "Zaimportuj wszystkie ustawienia, w tym szablony i atrybuty. Zastąpi to obecną konfigurację."
+	},
+  "importFailed": {
+		"message": "Import nie powiódł się. Sprawdź konsolę, aby uzyskać więcej informacji."
 	},
 	"importModalTitle": {
 		"message": "Importuj"
@@ -367,50 +395,23 @@
 	"legacyModeDescription": {
 		"message": "Używa URI jako sposobu wyodrębniania treści, który jest kompatybilny z Obsidian w wersji 1.6.7 lub starszej. Należy pamiętać, że długość treści, którą można wyodrębnić, jest ograniczona przez przeglądarkę i system operacyjny. Część stron może nie działać pomimo braku błędów."
 	},
-	"modelApiKey": {
-		"message": "Klucz API"
-	},
-	"modelApiKeyDescription": {
-		"message": "Wprowadź klucz API dla tego modelu. Nie musi być wymagane w przypadku wszystkich operatorów."
-	},
-	"modelApiKeyPlaceholder": {
-		"message": "Klucz API"
-	},
-	"modelBaseUrl": {
-		"message": "Źródło"
-	},
-	"modelBaseUrlDescription": {
-		"message": "Interfejs API dla tego modelu."
-	},
-	"modelBaseUrlPlaceholder": {
-		"message": "Adres URL"
-	},
 	"modelName": {
-		"message": "Wyświetlana nazwa"
+		"message": "Nazwa modelu"
 	},
 	"modelNameDescription": {
 		"message": "Nazwa modelu wyświetlana w interfejsie."
-	},
-	"modelNamePlaceholder": {
-		"message": "Nazwa modelu"
 	},
 	"modelProvider": {
 		"message": "Operator"
 	},
 	"modelProviderDescription": {
-		"message": "Operator modelu, np. Ollama, OpenRouter, Google, etc."
-	},
-	"modelProviderId": {
-		"message": "ID modelu"
-	},
-	"modelProviderIdDescription": {
-		"message": "Identyfikator modelu od operatora. Zazwyczaj jest to krótka nazwa bez spacji."
-	},
-	"modelProviderIdPlaceholder": {
-		"message": "ID modelu"
+		"message": "Operator modelu, na przykład Ollama, OpenRouter, Google, itp."
 	},
 	"modelProviderPlaceholder": {
 		"message": "Operator"
+	},
+	"modelRequiredFields": {
+		"message": "Nazwa modelu, Dostawca i ID modelu są wymagane."
 	},
 	"models": {
 		"message": "Modele"
@@ -426,6 +427,9 @@
 	},
 	"noTemplates": {
 		"message": "Brak dostępnych szablonów. Dodaj szablon w ustawieniach."
+	},
+	"noUnusedProperties": {
+		"message": "Nie znaleziono nieużywanych atrybutów."
 	},
 	"noteContent": {
 		"message": "Treść notatki"
@@ -465,25 +469,8 @@
 	"open": {
 		"message": "Otwórz"
 	},
-	"openaiApiKey": {
-		"message": "Klucz API OpenAI"
-	},
-	"openaiApiKeyDescription": {
-		"message": "Klucz API OpenAI można uzyskać $link_start$tutaj$link_end$.",
-		"placeholders": {
-			"link_end": {
-				"content": "</a>"
-			},
-			"link_start": {
-				"content": "<a href=\"https://platform.openai.com/api-keys\" target=\"_blank\">"
-			}
-		}
-	},
-	"openaiApiKeyPlaceholder": {
-		"message": "Klucz API OpenAI"
-	},
 	"optional": {
-		"message": "(optional)"
+		"message": "(opcjonalne)"
 	},
 	"orPasteBelow": {
 		"message": "Możesz też wkleić treść poniżej"
@@ -520,6 +507,45 @@
 	},
 	"propertyValue": {
 		"message": "Wartość atrybutu"
+	},
+	"provider": {
+		"message": "Operator"
+	},
+	"providerApiKey": {
+		"message": "Klucz API"
+	},
+	"providerApiKeyDescription": {
+		"message": "Twój klucz API dla tego operatora."
+	},
+	"providerBaseUrl": {
+		"message": "Adres URL"
+	},
+	"providerBaseUrlDescription": {
+		"message": "URL punktu końcowego API dla tego operatora."
+	},
+	"providerModelId": {
+		"message": "ID modelu"
+	},
+	"providerModelIdDescription": {
+		"message": "Identyfikator modelu od twojego operatora. Zazwyczaj krótka nazwa bez spacji."
+	},
+	"providerModelIdPlaceholder": {
+		"message": "ID modelu"
+	},
+	"providerName": {
+		"message": "Nazwa operatora"
+	},
+	"providerNameDescription": {
+		"message": "Nazwa wyświetlana dla tego operatora."
+	},
+	"providerPreset": {
+		"message": "Ustawienie wstępne"
+	},
+	"providerPresetDescription": {
+		"message": "Wybierz operatora lub utwórz niestandardowego."
+	},
+	"providerRequiredFields": {
+		"message": "Nazwa operatora i adres URL są wymagane."
 	},
 	"providers": {
 		"message": "Operatorzy"
@@ -563,11 +589,20 @@
 	"searchVariables": {
 		"message": "Szukaj zmiennych..."
 	},
+	"selectProvider": {
+		"message": "Wybierz operatora"
+	},
+	"selectTemplateToExport": {
+		"message": "Wybierz szablon do eksportu."
+	},
 	"settings": {
 		"message": "Ustawienia"
 	},
 	"settingsHeading": {
 		"message": "Ustawienia"
+	},
+	"settingsImportSuccess": {
+		"message": "Wszystkie ustawienia zostały pomyślnie zaimportowane. Odśwież stronę, aby zobaczyć zmiany."
 	},
 	"share": {
 		"message": "Udostępnij..."
@@ -617,6 +652,12 @@
 	"systemDefault": {
 		"message": "System"
 	},
+	"templateCopied": {
+		"message": "Skopiowano szablon JSON do schowka"
+	},
+	"templateCopyError": {
+		"message": "Nie udało się skopiować szablonu JSON do schowka"
+	},
 	"templateName": {
 		"message": "Nazwa szablonu"
 	},
@@ -638,11 +679,20 @@
 	"thinking": {
 		"message": "analizowanie"
 	},
+	"unknownProvider": {
+		"message": "Nieznany operator"
+	},
+	"updateAvailable": {
+		"message": "Dostępna jest aktualizacja."
+	},
+	"usingLatestVersion": {
+		"message": "Używasz najnowszej wersji."
+	},
 	"vault": {
 		"message": "Sejf"
 	},
 	"vaultDescription": {
-		"message": "Wybierz domyślny sejf dla tego szablonu. Przejdź do $link_start$ustawień ogólnych$link_end$, aby dodawać lub usuwać sejfy.",
+		"message": "Wybierz domyślny sejf dla tego szablonu. Przejdź do $link_start$ustawień ogólnych$link_end$, aby dodać lub usunąć sejfy.",
 		"placeholders": {
 			"link_end": {
 				"content": "</a>"
@@ -668,11 +718,3 @@
 	},
 	"version": {
 		"message": "Wersja"
-	},
-	"updateAvailable": {
-		"message": "Dostępna jest aktualizacja."
-	},
-	"changelog": {
-		"message": "Lista zmian"
-	}
-}

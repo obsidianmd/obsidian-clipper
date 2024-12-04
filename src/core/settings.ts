@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 				updateUrl('templates', newTemplate.id);
 			}).catch(error => {
 				console.error('Failed to duplicate template:', error);
-				alert('Failed to duplicate template. Please try again.');
+				alert(getMessage('failedToDuplicateTemplate'));
 			});
 		}
 	}
@@ -121,7 +121,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 		const editingTemplateIndex = getEditingTemplateIndex();
 		if (editingTemplateIndex !== -1) {
 			const currentTemplate = templates[editingTemplateIndex];
-			if (confirm(`Are you sure you want to delete the template "${currentTemplate.name}"?`)) {
+			if (confirm(getMessage('confirmDeleteTemplate', [currentTemplate.name]))) {
 				const success = await deleteTemplate(currentTemplate.id);
 				if (success) {
 					// Reload templates after deletion
@@ -133,7 +133,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 						showSettingsSection('general');
 					}
 				} else {
-					alert('Failed to delete template. Please try again.');
+					alert(getMessage('failedToDeleteTemplate'));
 				}
 			}
 		}

@@ -8,6 +8,12 @@
 	"addProperty": {
 		"message": "+ Eigenschaft hinzufügen"
 	},
+	"addProvider": {
+		"message": "+ Anbieter hinzufügen"
+	},
+	"addProviderTitle": {
+		"message": "Anbieter hinzufügen"
+	},
 	"addToObsidian": {
 		"message": "Zu Obsidian hinzufügen"
 	},
@@ -26,19 +32,8 @@
 	"alwaysShowHighlightsDescription": {
 		"message": "Zeigt Ihre gespeicherten Hervorhebungen beim Laden einer Seite an. Deaktivieren Sie dies, um Hervorhebungen nur anzuzeigen, wenn der Hervorhebungsmodus aktiviert ist."
 	},
-	"anthropicApiKey": {
-		"message": "Anthropic API-Schlüssel"
-	},
-	"anthropicApiKeyDescription": {
-		"message": "Sie können Ihren Anthropic API-Schlüssel $link_start$hier$link_end$ erhalten.",
-		"placeholders": {
-			"link_end": {
-				"content": "</a>"
-			},
-			"link_start": {
-				"content": "<a href=\"https://console.anthropic.com/settings/keys\" target=\"_blank\">"
-			}
-		}
+	"apiKeyMissing": {
+		"message": "Kein API-Schlüssel"
 	},
 	"apiKeysWarning": {
 		"message": "Durch die Nutzung eines externen Anbieters stimmen Sie dessen Nutzungsbedingungen und Datenschutzrichtlinien zu. Interpreter-Anfragen werden direkt an den von Ihnen gewählten Anbieter gesendet. Obsidian sammelt oder speichert keine Daten über Ihre Anfragen."
@@ -64,8 +59,23 @@
 	"cancel": {
 		"message": "Abbrechen"
 	},
+	"cannotDeleteProvider": {
+		"message": "Anbieter \"$1\" kann nicht gelöscht werden, da er von $2 Modell(en) verwendet wird."
+	},
 	"changelog": {
 		"message": "Änderungsprotokoll"
+	},
+	"chooseFile": {
+		"message": "Datei auswählen"
+	},
+	"choosePropertiesFile": {
+		"message": "Eigenschaftsdatei auswählen"
+	},
+	"chooseSettingsFile": {
+		"message": "Einstellungsdatei auswählen"
+	},
+	"chooseTemplateFile": {
+		"message": "Vorlagendatei auswählen"
 	},
 	"clipBehavior": {
 		"message": "Ausschneideverhalten"
@@ -96,6 +106,9 @@
 	"confirmDeleteTemplate": {
 		"message": "Sind Sie sicher, dass Sie die Vorlage \"$1\" löschen möchten?"
 	},
+	"confirmReplaceSettings": {
+		"message": "Dies wird alle Ihre aktuellen Einstellungen, einschließlich Vorlagen und Eigenschaften, ersetzen. Sind Sie sicher, dass Sie fortfahren möchten?"
+	},
 	"copied": {
 		"message": "Kopiert!"
 	},
@@ -107,6 +120,9 @@
 	},
 	"createNewNote": {
 		"message": "Neue Notiz erstellen"
+	},
+	"custom": {
+		"message": "Benutzerdefiniert"
 	},
 	"dailyNoteFormat": {
 		"message": "Tagesnotiz-Format (z.B. YYYY-MM-DD)"
@@ -126,14 +142,17 @@
 	"deleteModelConfirm": {
 		"message": "Sind Sie sicher, dass Sie dieses Modell löschen möchten?"
 	},
+	"deleteProviderConfirm": {
+		"message": "Sind Sie sicher, dass Sie diesen Anbieter löschen möchten?"
+	},
 	"disableHighlighter": {
 		"message": "Hervorheber deaktivieren"
 	},
-	"display": {
-		"message": "Anzeige"
-	},
 	"done": {
 		"message": "fertig"
+	},
+	"dragAndDropFile": {
+		"message": "Datei hierher ziehen und ablegen"
 	},
 	"duplicate": {
 		"message": "Duplizieren"
@@ -154,6 +173,9 @@
 	},
 	"editModel": {
 		"message": "Modell bearbeiten"
+	},
+	"editProvider": {
+		"message": "Anbieter bearbeiten"
 	},
 	"editTemplate": {
 		"message": "Vorlage bearbeiten"
@@ -228,8 +250,20 @@
 	"failedToDeleteTemplate": {
 		"message": "Vorlage konnte nicht gelöscht werden. Bitte versuchen Sie es erneut."
 	},
+	"failedToDuplicateTemplate": {
+		"message": "Duplizieren der Vorlage fehlgeschlagen. Bitte versuchen Sie es erneut."
+	},
+	"failedToExportHighlights": {
+		"message": "Export der Markierungen fehlgeschlagen. Bitte überprüfen Sie die Konsole für weitere Details."
+	},
+	"failedToExportSettings": {
+		"message": "Export der Einstellungen fehlgeschlagen. Bitte überprüfen Sie die Konsole für weitere Details."
+	},
 	"failedToExtractContent": {
 		"message": "Seiteninhalt konnte nicht extrahiert werden."
+	},
+	"failedToImportTemplate": {
+		"message": "Fehler beim Importieren der Vorlage. Bitte überprüfen Sie die Datei und versuchen Sie es erneut."
 	},
 	"failedToInitialize": {
 		"message": "Bitte versuchen Sie, die Erweiterung neu zu laden."
@@ -249,6 +283,9 @@
 	"failedToSaveFile": {
 		"message": "Datei konnte nicht gespeichert werden"
 	},
+	"failedToSaveProvider": {
+		"message": "Speichern des Anbieters fehlgeschlagen. Bitte versuchen Sie es erneut."
+	},
 	"folder": {
 		"message": "Ordner"
 	},
@@ -257,6 +294,9 @@
 	},
 	"generalSettings": {
 		"message": "Allgemeine Einstellungen"
+	},
+	"getApiKeyHere": {
+		"message": "Holen Sie sich hier Ihren $1 API-Schlüssel."
 	},
 	"help": {
 		"message": "Hilfe"
@@ -288,6 +328,12 @@
 	"importAllSettingsDescription": {
 		"message": "Importieren Sie alle Einstellungen einschließlich Vorlagen und Eigenschaften. Dies wird Ihre aktuelle Konfiguration ersetzen."
 	},
+	"importFailed": {
+		"message": "Import fehlgeschlagen. Bitte überprüfen Sie die Konsole für weitere Details."
+	},
+	"importModalTitle": {
+		"message": "Importieren"
+	},
 	"importProperties": {
 		"message": "Eigenschaften importieren"
 	},
@@ -307,6 +353,12 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"importSettings": {
+		"message": "Einstellungen importieren"
+	},
+	"importTemplate": {
+		"message": "Vorlage importieren"
 	},
 	"interpret": {
 		"message": "interpretieren"
@@ -343,18 +395,6 @@
 	"legacyModeDescription": {
 		"message": "Verwendet die URI-Ausschneidemethode, die mit Obsidian 1.6.7 oder älter kompatibel ist. Beachten Sie, dass die Länge des Inhalts, den Sie ausschneiden können, durch Ihren Browser und das Betriebssystem begrenzt ist. Einige Seiten können ohne Fehlermeldungen fehlschlagen."
 	},
-	"modelApiKey": {
-		"message": "API-Schlüssel"
-	},
-	"modelApiKeyDescription": {
-		"message": "Geben Sie den API-Schlüssel für dieses Modell ein. Wird möglicherweise nicht für alle Anbieter benötigt."
-	},
-	"modelBaseUrl": {
-		"message": "Basis-URL"
-	},
-	"modelBaseUrlDescription": {
-		"message": "Die API-Endpunkt-URL für dieses Modell."
-	},
 	"modelName": {
 		"message": "Modellname"
 	},
@@ -367,14 +407,11 @@
 	"modelProviderDescription": {
 		"message": "Der Modellanbieter, z.B. Ollama, OpenRouter, Google, etc."
 	},
-	"modelProviderId": {
-		"message": "Modell-ID"
+	"modelProviderPlaceholder": {
+		"message": "Anbieter"
 	},
-	"modelProviderIdDescription": {
-		"message": "Die Kennung des Modells von Ihrem Anbieter. Typischerweise ein kurzer Name ohne Leerzeichen."
-	},
-	"modelProviderIdPlaceholder": {
-		"message": "Modell-ID"
+	"modelRequiredFields": {
+		"message": "Modellname, Anbieter und Modell-ID sind erforderlich."
 	},
 	"models": {
 		"message": "Modelle"
@@ -390,6 +427,9 @@
 	},
 	"noTemplates": {
 		"message": "Keine Vorlagen verfügbar. Bitte fügen Sie eine Vorlage in den Einstellungen hinzu."
+	},
+	"noUnusedProperties": {
+		"message": "Keine unbenutzten Eigenschaften gefunden."
 	},
 	"noteContent": {
 		"message": "Notizinhalt"
@@ -429,28 +469,20 @@
 	"open": {
 		"message": "Öffnen"
 	},
-	"openaiApiKey": {
-		"message": "OpenAI API-Schlüssel"
-	},
-	"openaiApiKeyDescription": {
-		"message": "Sie können Ihren OpenAI API-Schlüssel $link_start$hier$link_end$ erhalten.",
-		"placeholders": {
-			"link_end": {
-				"content": "</a>"
-			},
-			"link_start": {
-				"content": "<a href=\"https://platform.openai.com/api-keys\" target=\"_blank\">"
-			}
-		}
-	},
 	"optional": {
 		"message": "(optional)"
+	},
+	"orPasteBelow": {
+		"message": "Oder fügen Sie den Inhalt unten ein"
 	},
 	"pageCannotBeClipped": {
 		"message": "Diese Seite kann nicht ausgeschnitten werden."
 	},
 	"pageVariables": {
 		"message": "Seitenvariablen"
+	},
+	"pasteJsonHere": {
+		"message": "Fügen Sie hier JSON ein"
 	},
 	"pleaseReload": {
 		"message": "Bitte versuchen Sie, die Seite neu zu laden."
@@ -475,6 +507,45 @@
 	},
 	"propertyValue": {
 		"message": "Eigenschaftswert"
+	},
+	"provider": {
+		"message": "Anbieter"
+	},
+	"providerApiKey": {
+		"message": "API-Schlüssel"
+	},
+	"providerApiKeyDescription": {
+		"message": "Ihr API-Schlüssel für diesen Anbieter."
+	},
+	"providerBaseUrl": {
+		"message": "Basis-URL"
+	},
+	"providerBaseUrlDescription": {
+		"message": "Die API-Endpunkt-URL für diesen Anbieter."
+	},
+	"providerModelId": {
+		"message": "Modell-ID"
+	},
+	"providerModelIdDescription": {
+		"message": "Die Kennung des Modells von Ihrem Anbieter. Typischerweise ein kurzer Name ohne Leerzeichen."
+	},
+	"providerModelIdPlaceholder": {
+		"message": "Modell-ID"
+	},
+	"providerName": {
+		"message": "Anbietername"
+	},
+	"providerNameDescription": {
+		"message": "Anzeigename für diesen Anbieter."
+	},
+	"providerPreset": {
+		"message": "Voreinstellung"
+	},
+	"providerPresetDescription": {
+		"message": "Wählen Sie einen Anbieter aus oder erstellen Sie einen benutzerdefinierten."
+	},
+	"providerRequiredFields": {
+		"message": "Anbietername und Basis-URL sind erforderlich."
 	},
 	"providers": {
 		"message": "Anbieter"
@@ -518,11 +589,20 @@
 	"searchVariables": {
 		"message": "Variablen suchen..."
 	},
+	"selectProvider": {
+		"message": "Wählen Sie einen Anbieter aus"
+	},
+	"selectTemplateToExport": {
+		"message": "Bitte wählen Sie eine Vorlage zum Exportieren aus."
+	},
 	"settings": {
 		"message": "Einstellungen"
 	},
 	"settingsHeading": {
 		"message": "Einstellungen"
+	},
+	"settingsImportSuccess": {
+		"message": "Alle Einstellungen wurden erfolgreich importiert. Bitte aktualisieren Sie die Seite, um die Änderungen zu sehen."
 	},
 	"share": {
 		"message": "Teilen..."
@@ -572,6 +652,12 @@
 	"systemDefault": {
 		"message": "System"
 	},
+	"templateCopied": {
+		"message": "Vorlagen-JavaScript-Objekt-Notation (JSON) in die Zwischenablage kopiert"
+	},
+	"templateCopyError": {
+		"message": "Fehler beim Kopieren der Vorlagen-JavaScript-Objekt-Notation (JSON) in die Zwischenablage"
+	},
 	"templateName": {
 		"message": "Vorlagenname"
 	},
@@ -592,6 +678,9 @@
 	},
 	"thinking": {
 		"message": "denke nach"
+	},
+	"unknownProvider": {
+		"message": "Unbekannter Anbieter"
 	},
 	"updateAvailable": {
 		"message": "Ein Update ist verfügbar."

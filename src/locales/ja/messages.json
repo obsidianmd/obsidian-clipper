@@ -8,6 +8,12 @@
 	"addProperty": {
 		"message": "+ プロパティを追加"
 	},
+	"addProvider": {
+		"message": "\"+ プロバイダーを追加\""
+	},
+	"addProviderTitle": {
+		"message": "\"プロバイダーを追加\""
+	},
 	"addToObsidian": {
 		"message": "Obsidianに追加"
 	},
@@ -26,22 +32,8 @@
 	"alwaysShowHighlightsDescription": {
 		"message": "ページ読み込み時に保存したハイライトを表示します。オフにすると、ハイライトモードが有効な時のみ表示されます。"
 	},
-	"anthropicApiKey": {
-		"message": "Anthropic APIキー"
-	},
-	"anthropicApiKeyDescription": {
-		"message": "Anthropic APIキーは$link_start$こちら$link_end$で取得できます。",
-		"placeholders": {
-			"link_end": {
-				"content": "</a>"
-			},
-			"link_start": {
-				"content": "<a href=\"https://console.anthropic.com/settings/keys\" target=\"_blank\">"
-			}
-		}
-	},
-	"anthropicApiKeyPlaceholder": {
-		"message": "Anthropic APIキー"
+	"apiKeyMissing": {
+		"message": "\"APIキーがありません\""
 	},
 	"apiKeysWarning": {
 		"message": "外部プロバイダーを使用することで、そのプロバイダーの利用規約とプライバシーポリシーに同意したことになります。インタープリターのリクエストは選択したプロバイダーに直接送信されます。Obsidianはリクエストに関するデータを収集または保存しません。"
@@ -67,8 +59,23 @@
 	"cancel": {
 		"message": "キャンセル"
 	},
+	"cannotDeleteProvider": {
+		"message": "\"$2 モデルで使用中のため、プロバイダー \"$1\" を削除できません。\""
+	},
 	"changelog": {
 		"message": "変更履歴"
+	},
+	"chooseFile": {
+		"message": "\"ファイルを選択\""
+	},
+	"choosePropertiesFile": {
+		"message": "\"プロパティファイルを選択\""
+	},
+	"chooseSettingsFile": {
+		"message": "\"設定ファイルを選択\""
+	},
+	"chooseTemplateFile": {
+		"message": "\"テンプレートファイルを選択\""
 	},
 	"clipBehavior": {
 		"message": "クリップの動作"
@@ -99,6 +106,9 @@
 	"confirmDeleteTemplate": {
 		"message": "テンプレート「$1」を削除してもよろしいですか？"
 	},
+	"confirmReplaceSettings": {
+		"message": "\"これにより、現在のすべての設定（テンプレートとプロパティを含む）が置き換えられます。本当に続行しますか？\""
+	},
 	"copied": {
 		"message": "コピーしました！"
 	},
@@ -110,6 +120,9 @@
 	},
 	"createNewNote": {
 		"message": "新規ノートを作成"
+	},
+	"custom": {
+		"message": "\"カスタム\""
 	},
 	"dailyNoteFormat": {
 		"message": "デイリーノートの形式（例：YYYY-MM-DD）"
@@ -129,14 +142,17 @@
 	"deleteModelConfirm": {
 		"message": "このモデルを削除してもよろしいですか？"
 	},
+	"deleteProviderConfirm": {
+		"message": "\"このプロバイダーを削除してもよろしいですか？\""
+	},
 	"disableHighlighter": {
 		"message": "ハイライトを無効化"
 	},
-	"display": {
-		"message": "表示"
-	},
 	"done": {
 		"message": "完了"
+	},
+	"dragAndDropFile": {
+		"message": "\"ここにファイルをドラッグ＆ドロップ\""
 	},
 	"duplicate": {
 		"message": "複製"
@@ -157,6 +173,9 @@
 	},
 	"editModel": {
 		"message": "モデルを編集"
+	},
+	"editProvider": {
+		"message": "\"プロバイダーを編集\""
 	},
 	"editTemplate": {
 		"message": "テンプレートを編集"
@@ -231,8 +250,20 @@
 	"failedToDeleteTemplate": {
 		"message": "テンプレートの削除に失敗しまた。もう一度お試しください。"
 	},
+	"failedToDuplicateTemplate": {
+		"message": "\"テンプレートの複製に失敗しました。もう一度お試しください。\""
+	},
+	"failedToExportHighlights": {
+		"message": "\"ハイライトのエクスポートに失敗しました。詳細はコンソールを確認してください。\""
+	},
+	"failedToExportSettings": {
+		"message": "\"設定のエクスポートに失敗しました。詳細はコンソールを確認してください。\""
+	},
 	"failedToExtractContent": {
 		"message": "ページコンテンツの抽出に失敗しました。"
+	},
+	"failedToImportTemplate": {
+		"message": "\"テンプレートのインポートエラーです。ファイルを確認して、もう一度お試しください。\""
 	},
 	"failedToInitialize": {
 		"message": "拡張機能の再読み込みをお試しください。"
@@ -243,11 +274,17 @@
 	"failedToProcessInterpreter": {
 		"message": "インタープリターの処理に失敗しました。もう一度お試しください。"
 	},
+	"failedToResetTemplate": {
+		"message": "\"デフォルトテンプレートのリセットに失敗しました。もう一度お試しください。\""
+	},
 	"failedToSave": {
 		"message": "ファイルの保存に失敗しました"
 	},
 	"failedToSaveFile": {
 		"message": "ファイルの保存に失敗しました"
+	},
+	"failedToSaveProvider": {
+		"message": "\"プロバイダーの保存に失敗しました。もう一度お試しください。\""
 	},
 	"folder": {
 		"message": "フォルダ"
@@ -257,6 +294,9 @@
 	},
 	"generalSettings": {
 		"message": "一般設定"
+	},
+	"getApiKeyHere": {
+		"message": "\"$1のAPIキーはこちらから取得できます。\""
 	},
 	"help": {
 		"message": "ヘルプ"
@@ -288,6 +328,12 @@
 	"importAllSettingsDescription": {
 		"message": "テンプレートとプロパティを含むすべての設定をインポートします。現在の設定は上書きされます。"
 	},
+	"importFailed": {
+		"message": "\"インポートに失敗しました。詳細はコンソールを確認してください。\""
+	},
+	"importModalTitle": {
+		"message": "\"インポート\""
+	},
 	"importProperties": {
 		"message": "プロパティをインポート"
 	},
@@ -307,6 +353,12 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"importSettings": {
+		"message": "設定をインポート"
+	},
+	"importTemplate": {
+		"message": "テンプレートをインポート"
 	},
 	"interpret": {
 		"message": "解釈"
@@ -343,32 +395,11 @@
 	"legacyModeDescription": {
 		"message": "Obsidian 1.6.7以前と互換性のあるURIクリップ方式を使用します。クリップできるコンテンツの長さはブラウザとOSによって制限されます。エラーなしに失敗する場合があります。"
 	},
-	"modelApiKey": {
-		"message": "APIキー"
-	},
-	"modelApiKeyDescription": {
-		"message": "このモデルのAPIキーを入力してください。すべてのプロバイダーで必要とは限りません。"
-	},
-	"modelApiKeyPlaceholder": {
-		"message": "APIキー"
-	},
-	"modelBaseUrl": {
-		"message": "ベースURL"
-	},
-	"modelBaseUrlDescription": {
-		"message": "このモデルのAPIエンドポイントURL。"
-	},
-	"modelBaseUrlPlaceholder": {
-		"message": "ベースURL"
-	},
 	"modelName": {
 		"message": "モデル名"
 	},
 	"modelNameDescription": {
 		"message": "インターフェースに表示したいモデルの名前。"
-	},
-	"modelNamePlaceholder": {
-		"message": "モデル名"
 	},
 	"modelProvider": {
 		"message": "プロバイダー"
@@ -376,17 +407,11 @@
 	"modelProviderDescription": {
 		"message": "モデルプロバイダー（例：Ollama、OpenRouter、Google など）。"
 	},
-	"modelProviderId": {
-		"message": "モデルID"
-	},
-	"modelProviderIdDescription": {
-		"message": "プロバイダーのモデルの識別子。通常はスペースを含まない短い名前です。"
-	},
-	"modelProviderIdPlaceholder": {
-		"message": "モデルID"
-	},
 	"modelProviderPlaceholder": {
 		"message": "プロバイダー"
+	},
+	"modelRequiredFields": {
+		"message": "モデル名、プロバイダー、モデルIDは必須です。"
 	},
 	"models": {
 		"message": "モデル"
@@ -402,6 +427,9 @@
 	},
 	"noTemplates": {
 		"message": "テンプレートがありません。設定でテンプレートを追加してください。"
+	},
+	"noUnusedProperties": {
+		"message": "未使用のプロパティが見つかりませんでした。"
 	},
 	"noteContent": {
 		"message": "ノートの内容"
@@ -441,31 +469,20 @@
 	"open": {
 		"message": "開く"
 	},
-	"openaiApiKey": {
-		"message": "OpenAI APIキー"
-	},
-	"openaiApiKeyDescription": {
-		"message": "OpenAI APIキーは$link_start$こちら$link_end$で取得できます。",
-		"placeholders": {
-			"link_end": {
-				"content": "</a>"
-			},
-			"link_start": {
-				"content": "<a href=\"https://platform.openai.com/api-keys\" target=\"_blank\">"
-			}
-		}
-	},
-	"openaiApiKeyPlaceholder": {
-		"message": "OpenAI APIキー"
-	},
 	"optional": {
 		"message": "(オプション)"
+	},
+	"orPasteBelow": {
+		"message": "または以下に内容を貼り付けてください"
 	},
 	"pageCannotBeClipped": {
 		"message": "このページはクリップできません。"
 	},
 	"pageVariables": {
 		"message": "ページ変数"
+	},
+	"pasteJsonHere": {
+		"message": "ここにJSONを貼り付けてください"
 	},
 	"pleaseReload": {
 		"message": "ページの再読み込みをお試しください。"
@@ -490,6 +507,45 @@
 	},
 	"propertyValue": {
 		"message": "プロパティ値"
+	},
+	"provider": {
+		"message": "プロバイダー"
+	},
+	"providerApiKey": {
+		"message": "APIキー"
+	},
+	"providerApiKeyDescription": {
+		"message": "このプロバイダーのAPIキー。"
+	},
+	"providerBaseUrl": {
+		"message": "ベースURL"
+	},
+	"providerBaseUrlDescription": {
+		"message": "このプロバイダーのAPIエンドポイントURL。"
+	},
+	"providerModelId": {
+		"message": "モデルID"
+	},
+	"providerModelIdDescription": {
+		"message": "プロバイダーのモデルの識別子。通常はスペースを含まない短い名前です。"
+	},
+	"providerModelIdPlaceholder": {
+		"message": "モデルID"
+	},
+	"providerName": {
+		"message": "プロバイダー名"
+	},
+	"providerNameDescription": {
+		"message": "このプロバイダーの表示名。"
+	},
+	"providerPreset": {
+		"message": "プリセット"
+	},
+	"providerPresetDescription": {
+		"message": "プロバイダーを選択するか、カスタムプロバイダーを作成してください。"
+	},
+	"providerRequiredFields": {
+		"message": "プロバイダー名とベースURLは必須です。"
 	},
 	"providers": {
 		"message": "プロバイダー"
@@ -533,11 +589,20 @@
 	"searchVariables": {
 		"message": "変数を検索..."
 	},
+	"selectProvider": {
+		"message": "プロバイダーを選択"
+	},
+	"selectTemplateToExport": {
+		"message": "エクスポートするテンプレートを選択してください。"
+	},
 	"settings": {
 		"message": "設定"
 	},
 	"settingsHeading": {
 		"message": "設定"
+	},
+	"settingsImportSuccess": {
+		"message": "すべての設定が正常にインポートされました。変更を確認するにはページを更新してください。"
 	},
 	"share": {
 		"message": "共有..."
@@ -587,6 +652,12 @@
 	"systemDefault": {
 		"message": "システム"
 	},
+	"templateCopied": {
+		"message": "テンプレートのJSONをクリップボードにコピーしました"
+	},
+	"templateCopyError": {
+		"message": "テンプレートのJSONのクリップボードへのコピーに失敗しました"
+	},
 	"templateName": {
 		"message": "テンプレート名"
 	},
@@ -607,6 +678,9 @@
 	},
 	"thinking": {
 		"message": "考え中"
+	},
+	"unknownProvider": {
+		"message": "不明なプロバイダー"
 	},
 	"updateAvailable": {
 		"message": "アップデートが利用可能です。"

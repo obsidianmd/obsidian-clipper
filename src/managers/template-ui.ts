@@ -112,10 +112,16 @@ export function updateTemplateList(loadedTemplates?: Template[]): void {
 
 // Rename this function to make it clear it's for deleting from the list
 async function deleteTemplateFromList(templateId: string): Promise<void> {
-	if (confirm(`Are you sure you want to delete this template?`)) {
+	const template = templates.find(t => t.id === templateId);
+	if (!template) {
+		console.error('Template not found:', templateId);
+		return;
+	}
+
+	if (confirm(getMessage('confirmDeleteTemplate', [template.name]))) {
 		const success = await deleteTemplate(templateId);
 		if (success) {
-			const updatedTemplates = await loadTemplates(); // Use the returned value
+			const updatedTemplates = await loadTemplates();
 			updateTemplateList(updatedTemplates);
 			if (updatedTemplates.length > 0) {
 				showTemplateEditor(updatedTemplates[0]);
@@ -123,7 +129,7 @@ async function deleteTemplateFromList(templateId: string): Promise<void> {
 				showSettingsSection('general');
 			}
 		} else {
-			alert('Failed to delete template. Please try again.');
+			alert(getMessage('failedToDeleteTemplate'));
 		}
 	}
 }
@@ -486,7 +492,7 @@ export function updateTemplateFromForm(): void {
 	if (noteNameFormat) {
 		if (!isDailyNote && noteNameFormat.value.trim() === '') {
 			console.error('Note name format is required for non-daily note behaviors');
-			noteNameFormat.setCustomValidity('Note name format is required for non-daily note behaviors');
+			noteNameFormat.setCustomValidity(getMessage('noteNameRequired'));
 			noteNameFormat.reportValidity();
 			return;
 		} else {

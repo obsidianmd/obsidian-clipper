@@ -8,6 +8,12 @@
 	"addProperty": {
 		"message": "+ Добавить свойство"
 	},
+	"addProvider": {
+		"message": "+ Добавить провайдера"
+	},
+	"addProviderTitle": {
+		"message": "Добавить провайдера"
+	},
 	"addToObsidian": {
 		"message": "Добавить в Obsidian"
 	},
@@ -26,19 +32,8 @@
 	"alwaysShowHighlightsDescription": {
 		"message": "Отображение сохраненных выделений маркером при загрузке страницы. Выключите, чтобы отображать выделения маркером только при включении режима."
 	},
-	"anthropicApiKey": {
-		"message": "Ключ API Anthropic"
-	},
-	"anthropicApiKeyDescription": {
-		"message": "Вы можете получить ваш ключ API Anthropic $link_start$здесь$link_end$.",
-		"placeholders": {
-			"link_end": {
-				"content": "</a>"
-			},
-			"link_start": {
-				"content": "<a href=\"https://console.anthropic.com/settings/keys\" target=\"_blank\">"
-			}
-		}
+	"apiKeyMissing": {
+		"message": "Отсутствует API ключ"
 	},
 	"apiKeysWarning": {
 		"message": "Используя внешнего провайдера, вы соглашаетесь с их условиями использования и политикой конфиденциальности. Запросы интерпретатора отправляются напрямую выбранному вами провайдеру. Obsidian не собирает и не хранит никаких данных о ваших запросах."
@@ -64,8 +59,23 @@
 	"cancel": {
 		"message": "Отмена"
 	},
+	"cannotDeleteProvider": {
+		"message": "Невозможно удалить провайдера \"$1\", так как он используется в $2 модели(ях)."
+	},
 	"changelog": {
 		"message": "История изменений"
+	},
+	"chooseFile": {
+		"message": "Выберите файл"
+	},
+	"choosePropertiesFile": {
+		"message": "Выберите файл свойств"
+	},
+	"chooseSettingsFile": {
+		"message": "Выберите файл настроек"
+	},
+	"chooseTemplateFile": {
+		"message": "Выберите файл шаблона"
 	},
 	"clipBehavior": {
 		"message": "Поведение при сохранении"
@@ -96,6 +106,9 @@
 	"confirmDeleteTemplate": {
 		"message": "Вы уверены, что хотите удалить шаблон \"$1\"?"
 	},
+	"confirmReplaceSettings": {
+		"message": "Это заменит все ваши текущие настройки, включая шаблоны и свойства. Вы уверены, что хотите продолжить?"
+	},
 	"copied": {
 		"message": "Скопировано!"
 	},
@@ -107,6 +120,9 @@
 	},
 	"createNewNote": {
 		"message": "Создать заметку"
+	},
+	"custom": {
+		"message": "Пользовательский"
 	},
 	"dailyNoteFormat": {
 		"message": "Формат ежедневной заметки (например, YYYY-MM-DD)"
@@ -126,14 +142,17 @@
 	"deleteModelConfirm": {
 		"message": "Вы уверены, что хотите удалить эту модель?"
 	},
+	"deleteProviderConfirm": {
+		"message": "Вы уверены, что хотите удалить этого провайдера?"
+	},
 	"disableHighlighter": {
 		"message": "Выключить маркер"
 	},
-	"display": {
-		"message": "Отображение"
-	},
 	"done": {
 		"message": "готово"
+	},
+	"dragAndDropFile": {
+		"message": "Перетащите файл сюда"
 	},
 	"duplicate": {
 		"message": "Дублировать"
@@ -154,6 +173,9 @@
 	},
 	"editModel": {
 		"message": "Редактировать модель"
+	},
+	"editProvider": {
+		"message": "Редактировать провайдера"
 	},
 	"editTemplate": {
 		"message": "Изменить шаблон"
@@ -228,8 +250,20 @@
 	"failedToDeleteTemplate": {
 		"message": "Не удалось удалить шаблон. Пожалуйста, попробуйте еще раз."
 	},
+	"failedToDuplicateTemplate": {
+		"message": "Не удалось дублировать шаблон. Пожалуйста, попробуйте снова."
+	},
+	"failedToExportHighlights": {
+		"message": "Не удалось экспортировать выделенные фрагменты. Пожалуйста, проверьте консоль для получения дополнительной информации."
+	},
+	"failedToExportSettings": {
+		"message": "Не удалось экспортировать настройки. Пожалуйста, проверьте консоль для получения дополнительной информации."
+	},
 	"failedToExtractContent": {
 		"message": "Невозможно извлечь содержимое страницы."
+	},
+	"failedToImportTemplate": {
+		"message": "Ошибка при импорте шаблона. Пожалуйста, проверьте файл и попробуйте снова."
 	},
 	"failedToInitialize": {
 		"message": "Пожалуйста, попробуйте перезагрузить расширение."
@@ -249,6 +283,9 @@
 	"failedToSaveFile": {
 		"message": "Не удалось сохранить файл"
 	},
+	"failedToSaveProvider": {
+		"message": "Не удалось сохранить провайдера. Пожалуйста, попробуйте снова."
+	},
 	"folder": {
 		"message": "Папка"
 	},
@@ -257,6 +294,9 @@
 	},
 	"generalSettings": {
 		"message": "Основные настройки"
+	},
+	"getApiKeyHere": {
+		"message": "Получите ваш $1 API ключ здесь."
 	},
 	"help": {
 		"message": "Помощь"
@@ -288,6 +328,12 @@
 	"importAllSettingsDescription": {
 		"message": "Импорт всех настроек, включая шаблоны и свойства. Это заменит вашу текущую конфигурацию."
 	},
+	"importFailed": {
+		"message": "Импорт не удался. Пожалуйста, проверьте консоль для получения дополнительной информации."
+	},
+	"importModalTitle": {
+		"message": "Импорт"
+	},
 	"importProperties": {
 		"message": "Импорт свойств"
 	},
@@ -307,6 +353,12 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"importSettings": {
+		"message": "Импортировать настройки"
+	},
+	"importTemplate": {
+		"message": "Импортировать шаблон"
 	},
 	"interpret": {
 		"message": "интерпретировать"
@@ -343,18 +395,6 @@
 	"legacyModeDescription": {
 		"message": "Использует метод обработки URI, совместимый с Obsidian 1.6.7 или более ранней версией. Обратите внимание, что длина контента, который вы можете вырезать, ограничена вашим браузером и ОС. Некоторые страницы могут не открыться без ошибок."
 	},
-	"modelApiKey": {
-		"message": "Ключ API"
-	},
-	"modelApiKeyDescription": {
-		"message": "Введите API-ключ для этой модели. Может не требоваться для всех провайдеров."
-	},
-	"modelBaseUrl": {
-		"message": "Базовый URL"
-	},
-	"modelBaseUrlDescription": {
-		"message": "URL конечной точки API для этой модели."
-	},
 	"modelName": {
 		"message": "Название модели"
 	},
@@ -367,14 +407,11 @@
 	"modelProviderDescription": {
 		"message": "Провайдер модели, например Ollama, OpenRouter, Google и т.д."
 	},
-	"modelProviderId": {
-		"message": "ID модели"
+	"modelProviderPlaceholder": {
+		"message": "Провайдер"
 	},
-	"modelProviderIdDescription": {
-		"message": "Идентификатор модели от вашего провайдера. Обычно это короткое имя без пробелов."
-	},
-	"modelProviderIdPlaceholder": {
-		"message": "ID модели"
+	"modelRequiredFields": {
+		"message": "Требуются имя модели, провайдер и ID модели."
 	},
 	"models": {
 		"message": "Модели"
@@ -390,6 +427,9 @@
 	},
 	"noTemplates": {
 		"message": "Нет доступных шаблонов. Пожалуйста, добавьте шаблон в настройках."
+	},
+	"noUnusedProperties": {
+		"message": "Неиспользуемых свойств не найдено."
 	},
 	"noteContent": {
 		"message": "Содержимое заметки"
@@ -429,28 +469,20 @@
 	"open": {
 		"message": "Открыть"
 	},
-	"openaiApiKey": {
-		"message": "Ключ API OpenAI"
-	},
-	"openaiApiKeyDescription": {
-		"message": "Вы можете получить ваш ключ API OpenAI $link_start$здесь$link_end$.",
-		"placeholders": {
-			"link_end": {
-				"content": "</a>"
-			},
-			"link_start": {
-				"content": "<a href=\"https://platform.openai.com/api-keys\" target=\"_blank\">"
-			}
-		}
-	},
 	"optional": {
 		"message": "(необязательно)"
+	},
+	"orPasteBelow": {
+		"message": "Или вставьте содержимое ниже"
 	},
 	"pageCannotBeClipped": {
 		"message": "Эту страницу нельзя сохранить."
 	},
 	"pageVariables": {
 		"message": "Переменные страницы"
+	},
+	"pasteJsonHere": {
+		"message": "Вставьте JSON здесь"
 	},
 	"pleaseReload": {
 		"message": "Пожалуйста, попробуйте перезагрузить страницу."
@@ -475,6 +507,45 @@
 	},
 	"propertyValue": {
 		"message": "Значение свойства"
+	},
+	"provider": {
+		"message": "Провайдер"
+	},
+	"providerApiKey": {
+		"message": "API ключ"
+	},
+	"providerApiKeyDescription": {
+		"message": "Ваш API ключ для этого провайдера."
+	},
+	"providerBaseUrl": {
+		"message": "Базовый URL"
+	},
+	"providerBaseUrlDescription": {
+		"message": "URL конечной точки API для этого провайдера."
+	},
+	"providerModelId": {
+		"message": "ID модели"
+	},
+	"providerModelIdDescription": {
+		"message": "Идентификатор модели от вашего провайдера. Обычно это короткое имя без пробелов."
+	},
+	"providerModelIdPlaceholder": {
+		"message": "ID модели"
+	},
+	"providerName": {
+		"message": "Имя провайдера"
+	},
+	"providerNameDescription": {
+		"message": "Отображаемое имя для этого провайдера."
+	},
+	"providerPreset": {
+		"message": "Предустановка"
+	},
+	"providerPresetDescription": {
+		"message": "Выберите провайдера или создайте собственного."
+	},
+	"providerRequiredFields": {
+		"message": "Требуются имя провайдера и базовый URL."
 	},
 	"providers": {
 		"message": "Провайдеры"
@@ -518,11 +589,20 @@
 	"searchVariables": {
 		"message": "Поиск переменных..."
 	},
+	"selectProvider": {
+		"message": "Выберите провайдера"
+	},
+	"selectTemplateToExport": {
+		"message": "Пожалуйста, выберите шаблон для экспорта."
+	},
 	"settings": {
 		"message": "Настройки"
 	},
 	"settingsHeading": {
 		"message": "Настройки"
+	},
+	"settingsImportSuccess": {
+		"message": "Все настройки успешно импортированы. Пожалуйста, обновите страницу, чтобы увидеть изменения."
 	},
 	"share": {
 		"message": "Поделиться..."
@@ -572,6 +652,12 @@
 	"systemDefault": {
 		"message": "Системный"
 	},
+	"templateCopied": {
+		"message": "Шаблон JSON скопирован в буфер обмена"
+	},
+	"templateCopyError": {
+		"message": "Не удалось скопировать шаблон JSON в буфер обмена"
+	},
 	"templateName": {
 		"message": "Название шаблона"
 	},
@@ -592,6 +678,9 @@
 	},
 	"thinking": {
 		"message": "думаю"
+	},
+	"unknownProvider": {
+		"message": "Неизвестный провайдер"
 	},
 	"updateAvailable": {
 		"message": "Доступно обновление."

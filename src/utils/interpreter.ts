@@ -1,5 +1,5 @@
-import { generalSettings, ModelConfig, saveSettings } from './storage-utils';
-import { PromptVariable, Template } from '../types/types';
+import { generalSettings, saveSettings } from './storage-utils';
+import { PromptVariable, Template, ModelConfig } from '../types/types';
 import { compileTemplate } from './template-compiler';
 import { applyFilters } from './filters';
 import { formatDuration } from './string-utils';
@@ -14,11 +14,18 @@ let lastRequestTime = 0;
 // Store event listeners for cleanup
 const eventListeners = new WeakMap<HTMLElement, { [key: string]: EventListener }>();
 
-export async function sendToLLM(promptContext: string, content: string, promptVariables: PromptVariable[], model: ModelConfig, apiKey: string): Promise<{ promptResponses: any[] }> {
+export async function sendToLLM(promptContext: string, content: string, promptVariables: PromptVariable[], model: ModelConfig): Promise<{ promptResponses: any[] }> {
 	debugLog('Interpreter', 'Sending request to LLM...');
 	
-	if (!apiKey) {
-		throw new Error(`API key is not set for model ${model.name}`);
+	// Find the provider for this model
+	const provider = generalSettings.providers.find(p => p.id === model.providerId);
+	if (!provider) {
+		throw new Error(`Provider not found for model ${model.name}`);
+	}
+
+	// Get API key from provider
+	if (!provider.apiKey) {
+		throw new Error(`API key is not set for provider ${provider.name}`);
 	}
 
 	const now = Date.now();
@@ -42,53 +49,72 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 			'Content-Type': 'application/json',
 		};
 
-		if (model.provider === 'Anthropic') {
+		if (provider.id === 'azure-openai') {
 			requestBody = {
-				model: model.providerId,
+				messages: [
+					{ role: 'system', content: systemContent },
+					{ role: 'user', content: `${promptContext}` },
+					{ role: 'user', content: `${JSON.stringify(promptContent)}` }
+				],
+				temperature: 0.5,
+				max_tokens: 800,
+				stream: false
+			};
+			headers = {
+				...headers,
+				'api-key': provider.apiKey
+			};
+		} else if (provider.id === 'anthropic') {
+			requestBody = {
+				model: model.providerModelId,
 				max_tokens: 800,
 				messages: [
 					{ role: 'user', content: `${promptContext}` },
 					{ role: 'user', content: `${JSON.stringify(promptContent)}` }
 				],
+				temperature: 0.5,
 				system: systemContent
 			};
 			headers = {
 				...headers,
-				'x-api-key': apiKey,
+				'x-api-key': provider.apiKey,
 				'anthropic-version': '2023-06-01',
 				'anthropic-dangerous-direct-browser-access': 'true'
 			};
-		} else if (model.provider === 'Ollama') {
+		} else if (provider.id === 'ollama') {
 			requestBody = {
-				model: model.providerId,
+				model: model.providerModelId,
 				messages: [
 					{ role: 'system', content: systemContent },
 					{ role: 'user', content: `${promptContext}` },
 					{ role: 'user', content: `${JSON.stringify(promptContent)}` }
 				],
 				format: 'json',
+				temperature: 0.5,
 				stream: false
 			};
 		} else {
+			// Default OpenAI-compatible request format
 			requestBody = {
-				model: model.providerId,
+				model: model.providerModelId,
 				messages: [
 					{ role: 'system', content: systemContent },
 					{ role: 'user', content: `${promptContext}` },
 					{ role: 'user', content: `${JSON.stringify(promptContent)}` }
-				]
+				],
+				temperature: 0.7
 			};
 			headers = {
 				...headers,
 				"HTTP-Referer": 'https://obsidian.md/',
 				"X-Title": 'Obsidian Web Clipper',
-				'Authorization': `Bearer ${apiKey}`
+				'Authorization': `Bearer ${provider.apiKey}`
 			};
 		}
 
-		debugLog('Interpreter', `Sending request to ${model.provider || 'Custom'} API:`, requestBody);
+		debugLog('Interpreter', `Sending request to ${provider.name} API:`, requestBody);
 
-		const response = await fetch(model.baseUrl, {
+		const response = await fetch(provider.baseUrl, {
 			method: 'POST',
 			headers: headers,
 			body: JSON.stringify(requestBody)
@@ -96,29 +122,29 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 
 		if (!response.ok) {
 			const errorText = await response.text();
-			console.error(`${model.provider || 'API'} error response:`, errorText);
-			throw new Error(`${model.provider || 'API'} error: ${response.statusText} ${errorText}`);
+			console.error(`${provider.name} error response:`, errorText);
+			throw new Error(`${provider.name} error: ${response.statusText} ${errorText}`);
 		}
 
 		const responseText = await response.text();
-		debugLog('Interpreter', `Raw ${model.provider || 'API'} response:`, responseText);
+		debugLog('Interpreter', `Raw ${provider.name} response:`, responseText);
 
 		let data;
 		try {
 			data = JSON.parse(responseText);
 		} catch (error) {
 			console.error('Error parsing JSON response:', error);
-			throw new Error(`Failed to parse response from ${model.provider || 'API'}`);
+			throw new Error(`Failed to parse response from ${provider.name}`);
 		}
 
-		debugLog('Interpreter', `Parsed ${model.provider || 'API'} response:`, data);
+		debugLog('Interpreter', `Parsed ${provider.name} response:`, data);
 
 		lastRequestTime = now;
 
 		let llmResponseContent: string;
-		if (model.provider === 'Anthropic') {
+		if (provider.id === 'anthropic') {
 			llmResponseContent = data.content[0]?.text || JSON.stringify(data);
-		} else if (model.provider === 'Ollama') {
+		} else if (provider.id === 'ollama') {
 			llmResponseContent = data.message?.content || JSON.stringify(data);
 		} else {
 			llmResponseContent = data.choices[0]?.message?.content || JSON.stringify(data);
@@ -127,7 +153,7 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 
 		return parseLLMResponse(llmResponseContent, promptVariables);
 	} catch (error) {
-		console.error(`Error sending to ${model.provider || 'custom'} LLM:`, error);
+		console.error(`Error sending to ${provider.name} LLM:`, error);
 		throw error;
 	}
 }
@@ -140,16 +166,29 @@ function parseLLMResponse(responseContent: string, promptVariables: PromptVariab
 	try {
 		let parsedResponse: LLMResponse;
 		
+		// If responseContent is already an object, stringify it first to normalize it
+		if (typeof responseContent === 'object') {
+			responseContent = JSON.stringify(responseContent);
+		}
+
 		// First try parsing the entire response
 		try {
-			parsedResponse = JSON.parse(responseContent);
+			// Replace any raw newlines in strings with \n before parsing
+			const sanitizedContent = responseContent.replace(/(?<=":)(\s*"[^"]*(?:\r?\n)[^"]*")(?=,?)/g, (match) => {
+				return match.replace(/\r?\n/g, '\\n');
+			});
+			parsedResponse = JSON.parse(sanitizedContent);
 		} catch (e) {
 			// If that fails, try to find and parse JSON content
 			const jsonMatch = responseContent.match(/\{[\s\S]*\}/);
 			if (!jsonMatch) {
 				throw new Error('No JSON object found in response');
 			}
-			parsedResponse = JSON.parse(jsonMatch[0]);
+			// Sanitize the matched JSON string
+			const sanitizedMatch = jsonMatch[0].replace(/(?<=":)(\s*"[^"]*(?:\r?\n)[^"]*")(?=,?)/g, (match) => {
+				return match.replace(/\r?\n/g, '\\n');
+			});
+			parsedResponse = JSON.parse(sanitizedMatch);
 		}
 
 		// If we don't have prompts_responses, return empty array
@@ -329,17 +368,14 @@ export async function handleInterpreterUI(
 		// Remove any previous done or error classes
 		interpreterContainer?.classList.remove('done', 'error');
 
-		let apiKey: string | undefined;
-		if (modelConfig.provider === 'OpenAI') {
-			apiKey = generalSettings.openaiApiKey;
-		} else if (modelConfig.provider === 'Anthropic') {
-			apiKey = generalSettings.anthropicApiKey;
-		} else {
-			apiKey = modelConfig.apiKey;
+		// Find the provider for this model
+		const provider = generalSettings.providers.find(p => p.id === modelConfig.providerId);
+		if (!provider) {
+			throw new Error(`Provider not found for model ${modelConfig.name}`);
 		}
 
-		if (!apiKey) {
-			throw new Error(`No API key is set for ${modelConfig.provider || 'the selected model'}. Please set an API key in the extension settings.`);
+		if (!provider.apiKey) {
+			throw new Error(`No API key is set for ${provider.name}. Please set an API key in the extension settings.`);
 		}
 
 		const promptVariables = collectPromptVariables(template);
@@ -373,7 +409,7 @@ export async function handleInterpreterUI(
 			responseTimer.textContent = formatDuration(elapsedTime);
 		}, 10);
 
-		const { promptResponses } = await sendToLLM(contextToUse, contentToProcess, promptVariables, modelConfig, apiKey);
+		const { promptResponses } = await sendToLLM(contextToUse, contentToProcess, promptVariables, modelConfig);
 		debugLog('Interpreter', 'LLM response:', { promptResponses });
 
 		// Stop the timer and update UI

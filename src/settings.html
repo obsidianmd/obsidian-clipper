@@ -3,7 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-	<title>Obsidian Web Clipper Settings</title>
+	<title>Obsidian Web Clipper</title>
 	<link rel="stylesheet" href="style.css">
 </head>
 <body style="height: 100%; overflow: hidden;">
@@ -278,15 +278,6 @@
 								</div>
 							</div>
 							<div>
-								<h3 data-i18n="models">Models</h3>
-								<div class="model-list-container">
-									<div id="model-list"></div>
-									<div class="add-btn">
-										<a id="add-model-btn" data-i18n="addModel">+ Add model</a>
-									</div>
-								</div>
-							</div>
-							<div>
 								<h3 data-i18n="providers">Providers</h3>
 								<div id="api-keys-warning-container" class="warning-container" style="margin-bottom: 0.5rem;">
 									<div class="warning-icon">
@@ -296,22 +287,19 @@
 										By using an external provider you agree to their terms and privacy policy. Interpreter requests are sent directly to the provider you choose. Obsidian does not gather or store any data about your requests.
 									</div>
 								</div>
-								<div class="setting-item mod-horizontal">
-									<div class="setting-item-info">
-										<label for="openai-api-key" data-i18n="openaiApiKey">OpenAI API key</label>
-										<div class="setting-item-description" data-i18n="openaiApiKeyDescription">You can get your OpenAI API key <a href="https://platform.openai.com/api-keys" target="_blank">here</a>.</div>
-									</div>
-									<div class="setting-item-control">
-										<input type="text" id="openai-api-key" data-i18n="openaiApiKey" placeholder="OpenAI API key" autocomplete="off">
+								<div class="provider-list-container">
+									<div id="provider-list"></div>
+									<div class="add-btn">
+										<a id="add-provider-btn" data-i18n="addProvider">+ Add provider</a>
 									</div>
 								</div>
-								<div class="setting-item mod-horizontal">
-									<div class="setting-item-info">
-										<label for="anthropic-api-key" data-i18n="anthropicApiKey">Anthropic API key</label>
-										<div class="setting-item-description" data-i18n="anthropicApiKeyDescription">You can get your Anthropic API key <a href="https://console.anthropic.com/settings/keys" target="_blank">here</a>.</div>
-									</div>
-									<div class="setting-item-control">
-										<input type="text" id="anthropic-api-key" data-i18n="anthropicApiKey" placeholder="Anthropic API key" autocomplete="off">
+							</div>
+							<div>
+								<h3 data-i18n="models">Models</h3>
+								<div class="model-list-container">
+									<div id="model-list"></div>
+									<div class="add-btn">
+										<a id="add-model-btn" data-i18n="addModel">+ Add model</a>
 									</div>
 								</div>
 							</div>
@@ -505,20 +493,20 @@
 			<div class="modal-bg"></div>
 			<div class="modal">
 				<div class="modal-header">
-					<div class="modal-title">Import</div>
+					<div class="modal-title" data-i18n="importModalTitle">Import</div>
 				</div>
 				<div class="modal-content">
 					<div class="import-options">
 						<div class="import-drop-zone import-option">
-							<p>Drag and drop file here</p>
+							<p data-i18n="dragAndDropFile">Drag and drop file here</p>
 						</div>
-						<p>Or paste content below</p>
-						<textarea class="import-json-textarea" placeholder="Paste JSON here"></textarea>
+						<p class="import-or-text" data-i18n="orPasteBelow">Or paste content below</p>
+						<textarea class="import-json-textarea" data-i18n="pasteJsonHere"></textarea>
 					</div>
 				</div>
 				<div class="modal-button-container">
-					<button class="import-confirm-btn mod-cta">Import</button>
-					<button class="import-cancel-btn">Cancel</button>
+					<button class="import-confirm-btn mod-cta" data-i18n="import">Import</button>
+					<button class="import-cancel-btn" data-i18n="cancel">Cancel</button>
 				</div>
 			</div>
 		</div>
@@ -532,58 +520,37 @@
 				<div class="modal-content">
 					<form id="model-form">
 						<div class="setting-item">
-								<div class="setting-item-info">
+							<div class="setting-item-info">
+								<label for="model-provider" data-i18n="provider">Provider</label>
+								<div class="setting-item-description" data-i18n="modelProviderDescription">Select the provider for this model.</div>
+							</div>
+							<div class="setting-item-control">
+								<select id="model-provider" name="providerId" required>
+									<option value="" data-i18n="selectProvider">Select a provider</option>
+								</select>
+							</div>
+						</div>
+						<div class="setting-item">
+							<div class="setting-item-info">
 								<label for="model-name">
-									<span data-i18n="modelName">Model name</span>
+									<span data-i18n="modelName">Display name</span>
 								</label>
 								<div class="setting-item-description" data-i18n="modelNameDescription">A name for this model.</div>
 							</div>
 							<div class="setting-item-control">
-								<input type="text" id="model-name" name="name" data-i18n="modelName" placeholder="Model name">
+								<input type="text" id="model-name" name="name" data-i18n="modelName" placeholder="Model name" required>
 							</div>
 						</div>
 						<div class="setting-item">
 							<div class="setting-item-info">
-								<label for="model-base-url" data-i18n="modelBaseUrl">Base URL</label>
-								<div class="setting-item-description" data-i18n="modelBaseUrlDescription">The API endpoint URL for this model.</div>
+								<label for="provider-model-id" data-i18n="providerModelId">Model ID</label>
+								<div class="setting-item-description" data-i18n="providerModelIdDescription">The model identifier from your provider (e.g., gpt-4, claude-3-haiku).</div>
 							</div>
 							<div class="setting-item-control">
-								<input type="text" id="model-base-url" name="baseUrl" data-i18n="modelBaseUrl" placeholder="Base URL" required>
+								<input type="text" id="provider-model-id" name="providerModelId" data-i18n="providerModelId" placeholder="Model ID" required>
 							</div>
 						</div>
-						<div class="setting-item">
-							<div class="setting-item-info">
-								<label for="model-provider-id" data-i18n="modelProviderId">Model ID</label>
-								<div class="setting-item-description" data-i18n="modelProviderIdDescription">Enter the ID of the model.</div>
-							</div>
-							<div class="setting-item-control">
-								<input type="text" id="model-provider-id" name="providerId" data-i18n="modelProviderId" placeholder="Model ID" required>
-							</div>
-						</div>
-						<div class="setting-item">
-							<div class="setting-item-info">
-								<label for="model-provider">
-									<span data-i18n="modelProvider">Provider</span>
-									<span class="optional" data-i18n="optional">(optional)</span>
-								</label>
-								<div class="setting-item-description" data-i18n="modelProviderDescription">The model provider, e.g. Ollama, OpenRouter, Google, etc.</div>
-							</div>
-							<div class="setting-item-control">
-								<input type="text" id="model-provider" name="provider" data-i18n="modelProvider" placeholder="Provider">
-							</div>
-						</div>
-						<div class="setting-item">
-							<div class="setting-item-info">
-								<label for="model-api-key">
-									<span data-i18n="modelApiKey">API key</span>
-									<span class="optional" data-i18n="optional">(optional)</span>
-								</label>
-								<div class="setting-item-description" data-i18n="modelApiKeyDescription">Enter the API key for this model. May not be required for all providers.</div>
-							</div>
-							<div class="setting-item-control">
-								<input type="text" id="model-api-key" name="apiKey" data-i18n="modelApiKey" placeholder="API key">
-							</div>
-						</div>
+						
 					</form>
 				</div>
 				<div class="modal-button-container">
@@ -593,6 +560,64 @@
 			</div>
 		</div>
 
+		<div id="provider-modal" class="modal-container">
+			<div class="modal-bg"></div>
+			<div class="modal">
+				<div class="modal-header">
+					<div class="modal-title" data-i18n="addProviderTitle"></div>
+				</div>
+				<div class="modal-content">
+					<form id="provider-form">
+						<div class="setting-item">
+							<div class="setting-item-info">
+								<label for="provider-preset">
+									<span data-i18n="provider">Provider</span>
+								</label>
+								<div class="setting-item-description" data-i18n="providerPresetDescription">Choose a Provider or add a custom one.</div>
+							</div>
+							<div class="setting-item-control">
+								<select id="provider-preset" name="preset">
+									<option value="">Custom</option>
+								</select>
+							</div>
+						</div>
+						<div class="setting-item">
+							<div class="setting-item-info">
+								<label for="provider-name" data-i18n="providerName">Provider name</label>
+								<div class="setting-item-description" data-i18n="providerNameDescription">Display name for this provider.</div>
+							</div>
+							<div class="setting-item-control">
+								<input type="text" id="provider-name" name="name" data-i18n="providerName" placeholder="Provider name" required>
+							</div>
+						</div>
+						<div class="setting-item">
+							<div class="setting-item-info">
+								<label for="provider-base-url" data-i18n="providerBaseUrl">Base URL</label>
+								<div class="setting-item-description" data-i18n="providerBaseUrlDescription">The API endpoint URL for this provider.</div>
+							</div>
+							<div class="setting-item-control">
+								<input type="text" id="provider-base-url" name="baseUrl" data-i18n="providerBaseUrl" placeholder="Base URL" required>
+							</div>
+						</div>
+						<div class="setting-item">
+							<div class="setting-item-info">
+								<label for="provider-api-key" data-i18n="providerApiKey">API key</label>
+								<div class="setting-item-description" data-i18n="providerApiKeyDescription">Your API key for this provider.</div>
+							</div>
+							<div class="setting-item-control">
+								<input type="text" id="provider-api-key" name="apiKey" data-i18n="providerApiKey" placeholder="API key">
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="modal-button-container">
+					<button class="provider-confirm-btn mod-cta" data-i18n="save">Save</button>
+					<button class="provider-cancel-btn" data-i18n="cancel">Cancel</button>
+				</div>
+			</div>
+		</div>
+
 		<script type="module" src="settings.js"></script>
 </body>
+</html>
 </html>

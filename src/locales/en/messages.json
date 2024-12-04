@@ -8,6 +8,12 @@
 	"addProperty": {
 		"message": "+ Add property"
 	},
+	"addProvider": {
+		"message": "+ Add provider"
+	},
+	"addProviderTitle": {
+		"message": "Add provider"
+	},
 	"addToObsidian": {
 		"message": "Add to Obsidian"
 	},
@@ -26,22 +32,8 @@
 	"alwaysShowHighlightsDescription": {
 		"message": "Display your saved highlights when you load a page. Turn off to only display highlights when highlighter mode is activated."
 	},
-	"anthropicApiKey": {
-		"message": "Anthropic API key"
-	},
-	"anthropicApiKeyDescription": {
-		"message": "You can get your Anthropic API key $link_start$here$link_end$.",
-		"placeholders": {
-			"link_end": {
-				"content": "</a>"
-			},
-			"link_start": {
-				"content": "<a href=\"https://console.anthropic.com/settings/keys\" target=\"_blank\">"
-			}
-		}
-	},
-	"anthropicApiKeyPlaceholder": {
-		"message": "Anthropic API key"
+	"apiKeyMissing": {
+		"message": "No API key"
 	},
 	"apiKeysWarning": {
 		"message": "By using an external provider you agree to their terms and privacy policy. Interpreter requests are sent directly to the provider you choose. Obsidian does not gather or store any data about your requests."
@@ -66,6 +58,9 @@
 	},
 	"cancel": {
 		"message": "Cancel"
+	},
+	"cannotDeleteProvider": {
+		"message": "Cannot delete provider \"$1\" because it is being used by $2 model(s)."
 	},
 	"changelog": {
 		"message": "Changelog"
@@ -111,6 +106,9 @@
 	"confirmDeleteTemplate": {
 		"message": "Are you sure you want to delete the template \"$1\"?"
 	},
+	"confirmReplaceSettings": {
+		"message": "This will replace all your current settings, including templates and properties. Are you sure you want to continue?"
+	},
 	"copied": {
 		"message": "Copied!"
 	},
@@ -122,6 +120,9 @@
 	},
 	"createNewNote": {
 		"message": "Create new note"
+	},
+	"custom": {
+		"message": "Custom"
 	},
 	"dailyNoteFormat": {
 		"message": "Daily note format (e.g., YYYY-MM-DD)"
@@ -141,11 +142,11 @@
 	"deleteModelConfirm": {
 		"message": "Are you sure you want to delete this model?"
 	},
+	"deleteProviderConfirm": {
+		"message": "Are you sure you want to delete this provider?"
+	},
 	"disableHighlighter": {
 		"message": "Disable highlighter"
-	},
-	"display": {
-		"message": "Display"
 	},
 	"done": {
 		"message": "Done"
@@ -172,6 +173,9 @@
 	},
 	"editModel": {
 		"message": "Edit model"
+	},
+	"editProvider": {
+		"message": "Edit provider"
 	},
 	"editTemplate": {
 		"message": "Edit template"
@@ -246,8 +250,20 @@
 	"failedToDeleteTemplate": {
 		"message": "Failed to delete template. Please try again."
 	},
+	"failedToDuplicateTemplate": {
+		"message": "Failed to duplicate template. Please try again."
+	},
+	"failedToExportHighlights": {
+		"message": "Failed to export highlights. Please check the console for more details."
+	},
+	"failedToExportSettings": {
+		"message": "Failed to export settings. Please check the console for more details."
+	},
 	"failedToExtractContent": {
 		"message": "Unable to extract page content."
+	},
+	"failedToImportTemplate": {
+		"message": "Error importing template. Please check the file and try again."
 	},
 	"failedToInitialize": {
 		"message": "Please try reloading the extension."
@@ -267,6 +283,9 @@
 	"failedToSaveFile": {
 		"message": "Failed to save file"
 	},
+	"failedToSaveProvider": {
+		"message": "Failed to save provider. Please try again."
+	},
 	"folder": {
 		"message": "Folder"
 	},
@@ -275,6 +294,9 @@
 	},
 	"generalSettings": {
 		"message": "General settings"
+	},
+	"getApiKeyHere": {
+		"message": "Get your $1 API key here."
 	},
 	"help": {
 		"message": "Help"
@@ -305,6 +327,9 @@
 	},
 	"importAllSettingsDescription": {
 		"message": "Import all settings including templates and properties. This will replace your current configuration."
+	},
+	"importFailed": {
+		"message": "Import failed. Please check the console for more details."
 	},
 	"importModalTitle": {
 		"message": "Import"
@@ -370,50 +395,23 @@
 	"legacyModeDescription": {
 		"message": "Uses the URI clipping method compatible with Obsidian 1.6.7 or earlier. Note that the length of the content you can clip is limited by your browser and OS. Some pages may fail without any errors."
 	},
-	"modelApiKey": {
-		"message": "API key"
-	},
-	"modelApiKeyDescription": {
-		"message": "Enter the API key for this model. May not be required for all providers."
-	},
-	"modelApiKeyPlaceholder": {
-		"message": "API key"
-	},
-	"modelBaseUrl": {
-		"message": "Base URL"
-	},
-	"modelBaseUrlDescription": {
-		"message": "API endpoint for this model."
-	},
-	"modelBaseUrlPlaceholder": {
-		"message": "Base URL"
-	},
 	"modelName": {
 		"message": "Display name"
 	},
 	"modelNameDescription": {
 		"message": "The name of the model you want to display in the interface."
 	},
-	"modelNamePlaceholder": {
-		"message": "Model name"
-	},
 	"modelProvider": {
 		"message": "Provider"
 	},
 	"modelProviderDescription": {
-		"message": "The model provider, e.g. Ollama, OpenRouter, Google, etc."
-	},
-	"modelProviderId": {
-		"message": "Model ID"
-	},
-	"modelProviderIdDescription": {
-		"message": "The identifier of the model from your provider. Typically a short name without spaces."
-	},
-	"modelProviderIdPlaceholder": {
-		"message": "Model ID"
+		"message": "Select the provider for this model."
 	},
 	"modelProviderPlaceholder": {
 		"message": "Provider"
+	},
+	"modelRequiredFields": {
+		"message": "Model name, Provider, and Model ID are required."
 	},
 	"models": {
 		"message": "Models"
@@ -429,6 +427,9 @@
 	},
 	"noTemplates": {
 		"message": "No templates available. Please add a template in the settings."
+	},
+	"noUnusedProperties": {
+		"message": "No unused properties found."
 	},
 	"noteContent": {
 		"message": "Note content"
@@ -468,23 +469,6 @@
 	"open": {
 		"message": "Open"
 	},
-	"openaiApiKey": {
-		"message": "OpenAI API key"
-	},
-	"openaiApiKeyDescription": {
-		"message": "You can get your OpenAI API key $link_start$here$link_end$.",
-		"placeholders": {
-			"link_end": {
-				"content": "</a>"
-			},
-			"link_start": {
-				"content": "<a href=\"https://platform.openai.com/api-keys\" target=\"_blank\">"
-			}
-		}
-	},
-	"openaiApiKeyPlaceholder": {
-		"message": "OpenAI API key"
-	},
 	"optional": {
 		"message": "(optional)"
 	},
@@ -523,6 +507,45 @@
 	},
 	"propertyValue": {
 		"message": "Property value"
+	},
+	"provider": {
+		"message": "Provider"
+	},
+	"providerApiKey": {
+		"message": "API key"
+	},
+	"providerApiKeyDescription": {
+		"message": "Your API key for this provider."
+	},
+	"providerBaseUrl": {
+		"message": "Base URL"
+	},
+	"providerBaseUrlDescription": {
+		"message": "The API endpoint URL for this provider."
+	},
+	"providerModelId": {
+		"message": "Model ID"
+	},
+	"providerModelIdDescription": {
+		"message": "The identifier of the model from your provider. Typically a short name without spaces."
+	},
+	"providerModelIdPlaceholder": {
+		"message": "Model ID"
+	},
+	"providerName": {
+		"message": "Provider name"
+	},
+	"providerNameDescription": {
+		"message": "Display name for this provider."
+	},
+	"providerPreset": {
+		"message": "Preset"
+	},
+	"providerPresetDescription": {
+		"message": "Choose a provider or create a custom one."
+	},
+	"providerRequiredFields": {
+		"message": "Provider name and Base URL are required."
 	},
 	"providers": {
 		"message": "Providers"
@@ -566,11 +589,20 @@
 	"searchVariables": {
 		"message": "Search variables..."
 	},
+	"selectProvider": {
+		"message": "Select a provider"
+	},
+	"selectTemplateToExport": {
+		"message": "Please select a template to export."
+	},
 	"settings": {
 		"message": "Settings"
 	},
 	"settingsHeading": {
 		"message": "Settings"
+	},
+	"settingsImportSuccess": {
+		"message": "All settings imported successfully. Please refresh the page to see the changes."
 	},
 	"share": {
 		"message": "Share..."
@@ -620,6 +652,12 @@
 	"systemDefault": {
 		"message": "System"
 	},
+	"templateCopied": {
+		"message": "Copied template JSON to clipboard"
+	},
+	"templateCopyError": {
+		"message": "Failed to copy template JSON to clipboard"
+	},
 	"templateName": {
 		"message": "Template name"
 	},
@@ -640,6 +678,9 @@
 	},
 	"thinking": {
 		"message": "thinking"
+	},
+	"unknownProvider": {
+		"message": "Unknown provider"
 	},
 	"updateAvailable": {
 		"message": "An update is available."
