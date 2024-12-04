@@ -103,13 +103,24 @@ async function initializeVersionDisplay(): Promise<void> {
 		versionNumber.textContent = manifest.version;
 	}
 
-	// Listen for extension updates
-	browser.runtime.onUpdateAvailable.addListener((details) => {
-		if (updateAvailable && usingLatestVersion) {
-			updateAvailable.style.display = 'block';
+	// Only add update listener for browsers that support it
+	const currentBrowser = await detectBrowser();
+	if (currentBrowser !== 'safari' && currentBrowser !== 'mobile-safari' && browser.runtime.onUpdateAvailable) {
+		browser.runtime.onUpdateAvailable.addListener((details) => {
+			if (updateAvailable && usingLatestVersion) {
+				updateAvailable.style.display = 'block';
+				usingLatestVersion.style.display = 'none';
+			}
+		});
+	} else {
+		// For Safari, just hide the update status elements
+		if (updateAvailable) {
+			updateAvailable.style.display = 'none';
+		}
+		if (usingLatestVersion) {
 			usingLatestVersion.style.display = 'none';
 		}
-	});
+	}
 }
 
 export function initializeGeneralSettings(): void {
