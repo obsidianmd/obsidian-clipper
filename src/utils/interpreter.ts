@@ -56,7 +56,7 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 					{ role: 'user', content: `${promptContext}` },
 					{ role: 'user', content: `${JSON.stringify(promptContent)}` }
 				],
-				temperature: 0.5,
+				temperature: 0.4,
 				max_tokens: 800,
 				stream: false
 			};
@@ -72,6 +72,7 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 					{ role: 'user', content: `${promptContext}` },
 					{ role: 'user', content: `${JSON.stringify(promptContent)}` }
 				],
+				temperature: 0.4,
 				system: systemContent
 			};
 			headers = {
@@ -89,6 +90,7 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 					{ role: 'user', content: `${JSON.stringify(promptContent)}` }
 				],
 				format: 'json',
+				temperature: 0.4,
 				stream: false
 			};
 		} else {
@@ -99,7 +101,8 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 					{ role: 'system', content: systemContent },
 					{ role: 'user', content: `${promptContext}` },
 					{ role: 'user', content: `${JSON.stringify(promptContent)}` }
-				]
+				],
+				temperature: 0.4
 			};
 			headers = {
 				...headers,
