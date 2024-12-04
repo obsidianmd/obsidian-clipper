@@ -95,6 +95,8 @@ export function initializeInterpreterSettings(): void {
 	if (addProviderBtn) {
 		addProviderBtn.addEventListener('click', (event) => addProviderToList(event));
 	}
+
+	initializeResetProvidersButton();
 }
 
 function initializeInterpreterToggles(): void {
@@ -624,4 +626,77 @@ function duplicateModel(index: number) {
 	// Show edit modal for the new model
 	const newIndex = generalSettings.models.length - 1;
 	showModelModal(duplicatedModel, newIndex);
+}
+
+function initializeResetProvidersButton(): void {
+	const resetProvidersBtn = document.getElementById('reset-providers-btn');
+	if (resetProvidersBtn) {
+		resetProvidersBtn.addEventListener('click', async () => {
+			try {
+				// Keep custom providers
+				const defaultProviderIds = ['openai', 'anthropic'];
+				const customProviders = generalSettings.providers.filter(p => !defaultProviderIds.includes(p.id));
+				
+				// Reset default providers while preserving API keys
+				const defaultProviders = defaultProviderIds.map(id => {
+					const defaultProvider = PRESET_PROVIDERS[id];
+					const existing = generalSettings.providers.find(p => p.id === id);
+					return {
+						id,
+						name: defaultProvider.name,
+						baseUrl: defaultProvider.baseUrl,
+						apiKey: existing?.apiKey || ''
+					};
+				});
+
+				// Combine default and custom providers
+				generalSettings.providers = [...defaultProviders, ...customProviders];
+
+				// Create default models
+				const defaultModels: ModelConfig[] = [
+					{
+						id: 'gpt-4o-mini',
+						providerId: 'openai',
+						providerModelId: 'gpt-4o-mini',
+						name: 'GPT-4o Mini',
+						enabled: true
+					},
+					{
+						id: 'gpt-4o',
+						providerId: 'openai',
+						providerModelId: 'gpt-4o',
+						name: 'GPT-4o',
+						enabled: true
+					},
+					{
+						id: 'claude-3-sonnet',
+						providerId: 'anthropic',
+						providerModelId: 'claude-3-sonnet-20240620',
+						name: 'Claude 3.5 Sonnet',
+						enabled: true
+					},
+					{
+						id: 'claude-3-haiku',
+						providerId: 'anthropic',
+						providerModelId: 'claude-3-haiku-20240307',
+						name: 'Claude 3 Haiku',
+						enabled: true
+					}
+				];
+
+				// Keep custom models
+				const defaultModelIds = defaultModels.map(m => m.id);
+				const customModels = generalSettings.models.filter(m => !defaultModelIds.includes(m.id));
+				generalSettings.models = [...defaultModels, ...customModels];
+				
+				await saveSettings();
+				// Reinitialize the lists
+				initializeProviderList();
+				initializeModelList();
+			} catch (error) {
+				console.error('Failed to reset providers and models:', error);
+				alert(getMessage('failedToResetProviders'));
+			}
+		});
+	}
 }

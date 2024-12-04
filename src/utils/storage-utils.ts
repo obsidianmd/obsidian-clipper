@@ -156,41 +156,16 @@ async function migrateModelsAndProviders(data: LegacyStorageData): Promise<{ mod
 	debugLog('Migration', 'Starting models and providers migration');
 	
 	try {
-		// Start with default providers
-		let providers: Provider[] = [
-			{
-				id: 'openai',
-				name: 'OpenAI',
-				baseUrl: 'https://api.openai.com/v1/chat/completions',
-				apiKey: ''
-			},
-			{
-				id: 'anthropic',
-				name: 'Anthropic',
-				baseUrl: 'https://api.anthropic.com/v1/messages',
-				apiKey: ''
-			}
-		];
-
-		// Migrate API keys to providers
-		const openaiApiKey = data.openaiApiKey || data.interpreter_settings?.openaiApiKey || '';
-		const anthropicApiKey = data.anthropicApiKey || data.interpreter_settings?.anthropicApiKey || '';
-
-		if (openaiApiKey) {
-			const openaiProvider = providers.find(p => p.id === 'openai');
-			if (openaiProvider) {
-				openaiProvider.apiKey = openaiApiKey;
-				debugLog('Migration', 'Migrated OpenAI API key');
-			}
-		}
-
-		if (anthropicApiKey) {
-			const anthropicProvider = providers.find(p => p.id === 'anthropic');
-			if (anthropicProvider) {
-				anthropicProvider.apiKey = anthropicApiKey;
-				debugLog('Migration', 'Migrated Anthropic API key');
-			}
-		}
+		// Start with default providers from generalSettings
+		const defaultProviders = generalSettings.providers.map(provider => ({
+			...provider,
+			// Migrate API keys if they exist
+			apiKey: provider.id === 'openai' 
+				? (data.openaiApiKey || data.interpreter_settings?.openaiApiKey || provider.apiKey)
+				: provider.id === 'anthropic'
+					? (data.anthropicApiKey || data.interpreter_settings?.anthropicApiKey || provider.apiKey)
+					: provider.apiKey
+		}));
 
 		// Create a map to track custom providers
 		const customProviders = new Map<string, Provider>();
@@ -202,7 +177,7 @@ async function migrateModelsAndProviders(data: LegacyStorageData): Promise<{ mod
 		legacyModels.forEach((model) => {
 			if (model.provider && 
 				!customProviders.has(model.provider) && 
-				!providers.some(p => p.name === model.provider) &&
+				!defaultProviders.some(p => p.name === model.provider) &&
 				model.provider !== 'OpenAI' && 
 				model.provider !== 'Anthropic') {
 				
@@ -218,13 +193,14 @@ async function migrateModelsAndProviders(data: LegacyStorageData): Promise<{ mod
 			}
 		});
 
-		// Add custom providers to our providers list
-		providers = [...providers, ...Array.from(customProviders.values())];
-
-		// Second pass: create migrated models
+		// Combine default and custom providers
+		const allProviders = [...defaultProviders, ...Array.from(customProviders.values())];
+		
+		// Create migrated models with correct structure
 		const models: ModelConfig[] = legacyModels.map((model): ModelConfig => {
 			let providerId = '';
-
+			
+			// Match provider based on name or model name
 			if (model.provider === 'OpenAI' || model.name.toLowerCase().includes('gpt')) {
 				providerId = 'openai';
 			} else if (model.provider === 'Anthropic' || model.name.toLowerCase().includes('claude')) {
@@ -234,19 +210,20 @@ async function migrateModelsAndProviders(data: LegacyStorageData): Promise<{ mod
 				providerId = customProvider?.id || model.provider.toLowerCase().replace(/\s+/g, '-');
 			}
 
+			// Only keep the fields we need in the new model structure
 			return {
 				id: model.id,
-				providerId,
-				providerModelId: model.id,
 				name: model.name,
+				providerId: providerId,
+				providerModelId: model.id,
 				enabled: model.enabled
 			};
 		});
 
-		debugLog('Migration', `Migrated ${models.length} models`);
-
-		// Save migration version
-		await browser.storage.sync.set({ migrationVersion: CURRENT_MIGRATION_VERSION });
+		// If no models exist, use default models from generalSettings
+		if (models.length === 0) {
+			models.push(...generalSettings.models);
+		}
 
 		// Clean up legacy fields
 		await browser.storage.sync.remove([
@@ -255,11 +232,14 @@ async function migrateModelsAndProviders(data: LegacyStorageData): Promise<{ mod
 			'openaiModel'
 		]);
 
-		debugLog('Migration', 'Migration completed successfully');
+		// Save migration version
+		await browser.storage.sync.set({ migrationVersion: CURRENT_MIGRATION_VERSION });
 
+		debugLog('Migration', `Migrated ${models.length} models and ${allProviders.length} providers`);
+		
 		return {
-			models: models as ModelConfig[],
-			providers
+			models,
+			providers: allProviders
 		};
 	} catch (error) {
 		console.error('Migration failed:', error);

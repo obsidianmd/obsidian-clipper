@@ -718,5 +718,14 @@
 	},
 	"version": {
 		"message": "Version"
+	},
+	"resetProvidersAndModels": {
+		"message": "Reset default models"
+	},
+	"resetProvidersAndModelsDescription": {
+		"message": "Reset providers and models to the default settings."
+	},
+	"failedToResetProviders": {
+		"message": "Failed to reset providers and models"
 	}
 }
