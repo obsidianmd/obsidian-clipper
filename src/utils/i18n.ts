@@ -20,10 +20,10 @@ export function getAvailableLanguages(): { code: string; name: string }[] {
 		{ code: 'ko', name: '한국어' },
 		{ code: 'nl', name: 'Nederlands' },
 		{ code: 'pl', name: 'Polski' },
-		{ code: 'pt-BR', name: 'Português (Brasil)' },
+		{ code: 'pt_BR', name: 'Português (Brasil)' },
 		{ code: 'ru', name: 'Русский' },
-		{ code: 'zh-CN', name: '简体中文' },
-		{ code: 'zh-TW', name: '繁體中文' }
+		{ code: 'zh_CN', name: '简体中文' },
+		{ code: 'zh_TW', name: '繁體中文' }
 	];
 }
 

@@ -54,8 +54,8 @@ const LANGUAGE_NAMES: { [key: string]: string } = {
 	'nb': 'Norsk Bokmål',
 	'nl': 'Nederlands',
 	'pl': 'Polski',
-	'pt': 'Português',
-	'pt-BR': 'Português (Brasil)',
+	'pt_PT': 'Português',
+	'pt_BR': 'Português (Brasil)',
 	'ro': 'Română',
 	'ru': 'Русский',
 	'sk': 'Slovenčina',
@@ -68,8 +68,8 @@ const LANGUAGE_NAMES: { [key: string]: string } = {
 	'ur': 'اردو',
 	'uz': 'O‘zbek',
 	'vi': 'Tiếng Việt',
-	'zh-CN': '简体中文',
-	'zh-TW': '繁體中文'
+	'zh_CN': '简体中文',
+	'zh_TW': '繁體中文'
 };
 
 async function addLocale(locale: string) {
