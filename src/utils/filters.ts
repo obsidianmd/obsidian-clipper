@@ -1,5 +1,6 @@
 import { FilterFunction } from '../types/types';
 import { debugLog } from './debug';
+import { createParserState, processCharacter } from './parser-utils';
 
 import { blockquote } from './filters/blockquote';
 import { calc } from './filters/calc';
@@ -92,15 +93,10 @@ export const filters: { [key: string]: FilterFunction } = {
 	wikilink
 };
 
-// Split the individual filter names
+// Split individual filters
 function splitFilterString(filterString: string): string[] {
 	const filters: string[] = [];
-	let current = '';
-	let inQuote = false;
-	let quoteType = '';
-	let escapeNext = false;
-	let depth = 0;
-	let inRegex = false;
+	const state = createParserState();
 
 	// Remove all spaces before and after | that are not within quotes or parentheses
 	filterString = filterString.replace(/\s*\|\s*(?=(?:[^"'()]*["'][^"'()]*["'])*[^"'()]*$)/g, '|');
@@ -109,48 +105,19 @@ function splitFilterString(filterString: string): string[] {
 	for (let i = 0; i < filterString.length; i++) {
 		const char = filterString[i];
 
-		if (escapeNext) {
-			// If the previous character was a backslash, add this character as-is
-			current += char;
-			escapeNext = false;
-		} else if (char === '\\') {
-			// If this is a backslash, set escapeNext flag to true
-			escapeNext = true;
-			current += char;
-		} else if ((char === '"' || char === "'") && !escapeNext) {
-			// Toggle quote state and track quote type, but don't include quotes in output
-			inQuote = !inQuote;
-			quoteType = inQuote ? char : '';
-			continue;
-		} else if (char === '/' && !inQuote && !inRegex && (current.endsWith(':') || current.endsWith('('))) {
-			// Start tracking a regex pattern if we see a forward slash after a colon or opening parenthesis
-			inRegex = true;
-			current += char;
-		} else if (char === '/' && inRegex && !escapeNext) {
-			// Stop tracking regex pattern when we see the closing forward slash (unless escaped)
-			inRegex = false;
-			current += char;
-		} else if (char === '(' && !inQuote && !inRegex) {
-			// If this is an unescaped opening parenthesis, increment the depth
-			current += char;
-			depth++;
-		} else if (char === ')' && !inQuote && !inRegex) {
-			// If this is an unescaped closing parenthesis, decrement the depth
-			current += char;
-			depth--;
-		} else if (char === '|' && !inQuote && !inRegex && depth === 0) {
-			// Split filters on pipe character when not in quotes, regex, or parentheses
-			filters.push(current.trim());
-			current = '';
+		// Split filters on pipe character when not in quotes, regex, or parentheses
+		if (char === '|' && !state.inQuote && !state.inRegex && 
+			state.curlyDepth === 0 && state.parenDepth === 0) {
+			filters.push(state.current.trim());
+			state.current = '';
 		} else {
 			// For any other character, add it to the current filter
-			current += char;
+			processCharacter(char, state);
 		}
 	}
 
-	// Add the last filter if there's anything left in current
-	if (current) {
-		filters.push(current.trim());
+	if (state.current) {
+		filters.push(state.current.trim());
 	}
 
 	return filters;
@@ -159,74 +126,23 @@ function splitFilterString(filterString: string): string[] {
 // Parse the filter into name and parameters
 function parseFilterString(filterString: string): string[] {
 	const parts: string[] = [];
-	let current = '';
-	let depth = 0;
-	let inQuote = false;
-	let quoteType = '';
-	let escapeNext = false;
-	let inRegex = false;
+	const state = createParserState();
 
 	// Iterate through each character in the filterString
 	for (let i = 0; i < filterString.length; i++) {
 		const char = filterString[i];
 
-		if (escapeNext) {
-			current += char;
-			escapeNext = false;
-		} else if (char === '\\') {
-			current += char;
-			if (!inRegex) {
-				escapeNext = true;
-			}
-		} else if ((char === '"' || char === "'") && !escapeNext && !inRegex) {
-			if (!inQuote) {
-				inQuote = true;
-				quoteType = char;
-			} else if (char === quoteType) {
-				inQuote = false;
-				quoteType = '';
-			}
-			continue;
-		} else if (char === '/' && !inQuote && !inRegex && (current === '' || current.endsWith(':') || current.endsWith('('))) {
-			inRegex = true;
-			current += char;
-		} else if (char === '/' && inRegex && !escapeNext) {
-			inRegex = false;
-			current += char;
-		} else if (!inQuote && !inRegex) {
-			if (char === '(') depth++;
-			if (char === ')') depth--;
-			
-			if (char === ':' && depth === 0 && parts.length === 0) {
-				parts.push(current.trim());
-				current = '';
-			} else {
-				current += char;
-			}
+		if (char === ':' && !state.inQuote && !state.inRegex && 
+			state.parenDepth === 0 && parts.length === 0) {
+			parts.push(state.current.trim());
+			state.current = '';
 		} else {
-			current += char;
+			processCharacter(char, state);
 		}
 	}
 
-	if (current) {
-		parts.push(current.trim());
-	}
-
-	// Special handling for replace filter
-	if (parts[0] === 'replace' && parts.length > 1) {
-		const replacePart = parts.slice(1).join(':');
-		// Check if it's wrapped in parentheses and remove them if so
-		const cleanedReplacePart = replacePart.replace(/^\((.*)\)$/, '$1');
-		
-		if (cleanedReplacePart.startsWith('/')) {
-			const lastColonIndex = cleanedReplacePart.lastIndexOf(':');
-			if (lastColonIndex !== -1) {
-				const search = cleanedReplacePart.substring(0, lastColonIndex);
-				const replace = cleanedReplacePart.substring(lastColonIndex + 1);
-				return [parts[0], `${search}:${replace}`];
-			}
-		}
-		return [parts[0], cleanedReplacePart];
+	if (state.current) {
+		parts.push(state.current.trim());
 	}
 
 	return parts;
