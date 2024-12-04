@@ -26,7 +26,9 @@ import { markdown } from './filters/markdown';
 import { number_format } from './filters/number_format';
 import { object } from './filters/object';
 import { pascal } from './filters/pascal';
+import { remove_attr } from './filters/remove_attr';
 import { remove_html } from './filters/remove_html';
+import { remove_tags } from './filters/remove_tags';
 import { replace } from './filters/replace';
 import { replace_tags } from './filters/replace_tags';
 import { round } from './filters/round';
@@ -72,7 +74,9 @@ export const filters: { [key: string]: FilterFunction } = {
 	number_format,
 	object,
 	pascal,
+	remove_attr,
 	remove_html,
+	remove_tags,
 	replace,
 	replace_tags,
 	round,

@@ -112,16 +112,21 @@ Filters to process HTML content and convert HTML to Markdown. Note that your inp
 
 - `markdown` converts a string to an [[Obsidian Flavored Markdown]] formatted string.
 	- Useful when combined with variables that return HTML such as `{{contentHtml}}`, `{{fullHtml}}`, and selector variables like `{{selectorHtml:cssSelector}}`.
+- `remove_attr` removes specified HTML attributes from tags.
+	- Example: `"<div class="test" id="example">Content</div>"|remove_attr:"class"` returns `<div id="example">Content</div>`.
+	- Multiple attributes: `{{contentHtml|remove_attr:("class,style,id")}}`
 - `remove_html` removes specified HTML elements and their content from a string.
 	- Supports tag name, class, or id, e.g. `{{contentHtml|remove_html:("img,.class-name,#element-id")}}`
-	- To remove only HTML tags or attributes without removing the content use the `strip_tags` or `strip_attr` filters.
-- `strip_attr` removes all HTML attributes from a string.
+- `remove_tags` removes specified HTML tags. Keeps the content of the tags.
+	- Example: `"<p>Hello <b>world</b>!</p>"|remove_tags:"b"` returns `"<p>Hello world!</p>"`.
+	- Multiple tags: `{{contentHtml|remove_tags:("a,em,strong")}}`
+- `strip_attr` removes all HTML attributes from a string, except the specified attributes.
 	- Use `strip_attr:("class, id")` to keep specific attributes.
 	- Example: `"<div class="test" id="example">Content</div>"|strip_attr:("class")` returns `<div id="example">Content</div>`.
 - `strip_md` removes all Markdown formatting and returns a plain text string, e.g. turning `**text**` into `text`.
 	- Turns formatted text into unformatted plain text, including bold, italic, highlights, headers, code, blockquotes, tables, task lists, and wikilinks.
 	- Entirely removes tables, footnotes, images, and HTML elements.
-- `strip_tags` removes all HTML tags from a string. Unlike `remove_html` this doesn't remove the content within the tags.
+- `strip_tags` removes all HTML tags from a string, except the specified tags. Keeps the content of the tags.
 	- Use `strip_tags:("p,strong,em")` to keep specific tags.
 	- Example: `"<p>Hello <b>world</b>!</p>"|strip_tags:("b")` returns `Hello <b>world</b>!`.
 - `replace_tags` replaces specified HTML tags with different tags while preserving their attributes and content.
