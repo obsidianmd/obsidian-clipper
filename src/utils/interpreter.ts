@@ -49,7 +49,7 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 			'Content-Type': 'application/json',
 		};
 
-		if (provider.id === 'azure-openai') {
+		if (provider.baseUrl.includes('openai.azure.com')) {
 			requestBody = {
 				messages: [
 					{ role: 'system', content: systemContent },

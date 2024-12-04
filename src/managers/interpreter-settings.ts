@@ -23,7 +23,7 @@ const PRESET_PROVIDERS: Record<string, PresetProvider> = {
 	azure: {
 		id: 'azure-openai',
 		name: 'Azure OpenAI',
-		baseUrl: 'https://{endpoint}/openai/deployments/{deployment-id}/chat/completions?api-version=2024-10-21',
+		baseUrl: 'https://{resource-name}.openai.azure.com/openai/deployments/{deployment-id}/chat/completions?api-version=2024-10-21',
 	},
 	ollama: {
 		id: 'ollama',
@@ -273,7 +273,7 @@ async function showProviderModal(provider: Provider, index?: number) {
 			// When editing, try to find matching preset
 			if (index !== undefined) {
 				const matchingPreset = Object.entries(PRESET_PROVIDERS).find(([_, preset]) => 
-					preset.name === provider.name && preset.baseUrl === provider.baseUrl
+					preset.name === provider.name
 				);
 				presetSelect.value = matchingPreset ? matchingPreset[0] : '';
 			} else {
