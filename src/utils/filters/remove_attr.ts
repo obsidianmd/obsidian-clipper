@@ -16,9 +16,9 @@ export const remove_attr = (html: string, removeAttributes: string = ''): string
 		return html;
 	}
 
-	return html.replace(/<(\w+)\s+([^>]*?)>/g, (match, tag, attributes) => {
+	return html.replace(/<(\w+)\s+([^>]*?)>/g, (match: string, tag: string, attributes: string) => {
 		// For each attribute in the tag
-		const cleanedAttributes = attributes.split(/\s+/).filter(attr => {
+		const cleanedAttributes = attributes.split(/\s+/).filter((attr: string) => {
 			// Keep the attribute if it's not in the remove list
 			return !removeAttributesList.some(removeAttr => 
 				attr.toLowerCase().startsWith(removeAttr.toLowerCase() + '=')
