@@ -1,5 +1,6 @@
 import { FilterFunction } from '../types/types';
 import { debugLog } from './debug';
+import { createParserState, processCharacter } from './parser-utils';
 
 import { blockquote } from './filters/blockquote';
 import { calc } from './filters/calc';
@@ -92,14 +93,10 @@ export const filters: { [key: string]: FilterFunction } = {
 	wikilink
 };
 
-// Split the individual filter names
+// Split individual filters
 function splitFilterString(filterString: string): string[] {
 	const filters: string[] = [];
-	let current = '';
-	let inQuote = false;
-	let quoteType = '';
-	let escapeNext = false;
-	let depth = 0;
+	const state = createParserState();
 
 	// Remove all spaces before and after | that are not within quotes or parentheses
 	filterString = filterString.replace(/\s*\|\s*(?=(?:[^"'()]*["'][^"'()]*["'])*[^"'()]*$)/g, '|');
@@ -108,46 +105,19 @@ function splitFilterString(filterString: string): string[] {
 	for (let i = 0; i < filterString.length; i++) {
 		const char = filterString[i];
 
-		if (escapeNext) {
-			// If the previous character was a backslash, add this character as-is
-			current += char;
-			escapeNext = false;
-		} else if (char === '\\') {
-			// If this is a backslash, set escapeNext flag to true
-			current += char;
-			escapeNext = true;
-		} else if ((char === '"' || char === "'") && !escapeNext) {
-			// If this is an unescaped quote, toggle the inQuote flag
-			if (!inQuote) {
-				inQuote = true;
-				quoteType = char;
-			} else if (char === quoteType) {
-				inQuote = false;
-				quoteType = '';
-			}
-			current += char;
-		} else if (char === '(' && !inQuote) {
-			// If this is an opening parenthesis outside of quotes, increase depth
-			current += char;
-			depth++;
-		} else if (char === ')' && !inQuote) {
-			// If this is a closing parenthesis outside of quotes, decrease depth
-			current += char;
-			depth--;
-		} else if (char === '|' && !inQuote && depth === 0) {
-			// If this is a pipe character outside of quotes and parentheses,
-			// it's a filter separator. Add the current filter and reset.
-			filters.push(current.trim());
-			current = '';
+		// Split filters on pipe character when not in quotes, regex, or parentheses
+		if (char === '|' && !state.inQuote && !state.inRegex && 
+			state.curlyDepth === 0 && state.parenDepth === 0) {
+			filters.push(state.current.trim());
+			state.current = '';
 		} else {
-			// For any other character, simply add it to the current filter
-			current += char;
+			// For any other character, add it to the current filter
+			processCharacter(char, state);
 		}
 	}
 
-	// Add the last filter if there's anything left in current
-	if (current) {
-		filters.push(current.trim());
+	if (state.current) {
+		filters.push(state.current.trim());
 	}
 
 	return filters;
@@ -155,63 +125,24 @@ function splitFilterString(filterString: string): string[] {
 
 // Parse the filter into name and parameters
 function parseFilterString(filterString: string): string[] {
-	// Remove outer quotes if present (both single and double quotes)
-	filterString = filterString.replace(/^(['"])(.*)\1$/, '$2');
-
-	// Remove all spaces before and after : that are not within quotes or parentheses
-	filterString = filterString.replace(/\s*:\s*(?=(?:[^"'()]*["'][^"'()]*["'])*[^"'()]*$)/g, ':');
-
 	const parts: string[] = [];
-	let current = '';
-	let depth = 0;
-	let inQuote = false;
-	let quoteType = '';
-	let escapeNext = false;
+	const state = createParserState();
 
 	// Iterate through each character in the filterString
 	for (let i = 0; i < filterString.length; i++) {
 		const char = filterString[i];
 
-		if (escapeNext) {
-			current += char;
-			escapeNext = false;
-		} else if (char === '\\') {
-			current += char;
-			escapeNext = true;
-		} else if ((char === '"' || char === "'") && !escapeNext) {
-			if (!inQuote) {
-				inQuote = true;
-				quoteType = char;
-			} else if (char === quoteType) {
-				inQuote = false;
-				quoteType = '';
-			}
-			current += char;
-		} else if (!inQuote) {
-			if (char === '(') depth++;
-			if (char === ')') depth--;
-			
-			if (char === ':' && depth === 0 && parts.length === 0) {
-				parts.push(current.trim());
-				current = '';
-			} else {
-				current += char;
-			}
+		if (char === ':' && !state.inQuote && !state.inRegex && 
+			state.parenDepth === 0 && parts.length === 0) {
+			parts.push(state.current.trim());
+			state.current = '';
 		} else {
-			current += char;
+			processCharacter(char, state);
 		}
 	}
 
-	if (current) {
-		parts.push(current.trim());
-	}
-
-	// Special handling for replace filter
-	if (parts[0] === 'replace' && parts.length > 1) {
-		const replacePart = parts.slice(1).join(':');
-		// Check if it's wrapped in parentheses and remove them if so
-		const cleanedReplacePart = replacePart.replace(/^\((.*)\)$/, '$1');
-		return [parts[0], cleanedReplacePart];
+	if (state.current) {
+		parts.push(state.current.trim());
 	}
 
 	return parts;
