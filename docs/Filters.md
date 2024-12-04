@@ -179,3 +179,8 @@ Filters to process arrays and objects.
 	- Works with string literals from `map` by accessing the `str` property:
 		- Example: `["rock", "pop"]|map:item => "genres/${item}"|template:"${str}"` returns `"genres/rock\ngenres/pop"`.
 		- The `str` property is automatically used when applying `template` to objects created by `map` with string literals.
+- `unique` removes duplicate values from arrays and objects.
+	- For arrays of primitives: `[1,2,2,3,3]|unique` returns `[1,2,3]`.
+	- For arrays of objects: `[{"a":1},{"b":2},{"a":1}]|unique` returns `[{"a":1},{"b":2}]`.
+	- For objects: Removes properties with duplicate values, keeping the last occurrence's key.
+	- For strings: Returns the input unchanged.

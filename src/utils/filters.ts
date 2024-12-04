@@ -43,6 +43,7 @@ import { title } from './filters/title';
 import { trim } from './filters/trim';
 import { uncamel } from './filters/uncamel';
 import { unescape } from './filters/unescape';
+import { unique } from './filters/unique';
 import { upper } from './filters/upper';
 import { wikilink } from './filters/wikilink';
 
@@ -89,6 +90,7 @@ export const filters: { [key: string]: FilterFunction } = {
 	trim,
 	uncamel,
 	unescape,
+	unique,
 	upper,
 	wikilink
 };
