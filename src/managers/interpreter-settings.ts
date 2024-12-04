@@ -268,6 +268,17 @@ async function showProviderModal(provider: Provider, index?: number) {
 				presetSelect.innerHTML += `<option value="${id}">${preset.name}</option>`;
 			});
 
+			// When editing, try to find matching preset
+			if (index !== undefined) {
+				const matchingPreset = Object.entries(PRESET_PROVIDERS).find(([_, preset]) => 
+					preset.name === provider.name && preset.baseUrl === provider.baseUrl
+				);
+				presetSelect.value = matchingPreset ? matchingPreset[0] : '';
+			} else {
+				// Set Anthropic as default for new providers
+				presetSelect.value = 'anthropic';
+			}
+
 			// Hide/show name field based on preset selection
 			const updateNameVisibility = () => {
 				nameContainer.style.display = presetSelect.value ? 'none' : 'block';
@@ -281,26 +292,16 @@ async function showProviderModal(provider: Provider, index?: number) {
 						const message = getMessage('getApiKeyHere').replace('$1', selectedPreset.name);
 						apiKeyContainer.innerHTML = `${getMessage('providerApiKeyDescription')} <a href="${selectedPreset.apiKeyUrl}" target="_blank">${message}</a>`;
 					} else {
-						// Remove any existing API key link
 						apiKeyContainer.innerHTML = getMessage('providerApiKeyDescription');
 					}
 				} else {
-					// Remove any existing API key link for custom providers
 					apiKeyContainer.innerHTML = getMessage('providerApiKeyDescription');
 				}
 			};
 
 			presetSelect.addEventListener('change', updateNameVisibility);
-
-			// Set Anthropic as default for new providers
-			if (index === undefined) {
-				presetSelect.value = 'anthropic';
-				updateNameVisibility(); // This will handle setting name, baseUrl, and API key link
-			} else {
-				// Initial visibility for existing providers
-				updateNameVisibility();
-			}
-
+			updateNameVisibility(); // Initial visibility update
+			
 			// Only set these values if editing an existing provider
 			if (index !== undefined) {
 				nameInput.value = provider.name;
