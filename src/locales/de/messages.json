@@ -30,13 +30,13 @@
 		"message": "Hervorhebungen immer anzeigen"
 	},
 	"alwaysShowHighlightsDescription": {
-		"message": "Zeigt Ihre gespeicherten Hervorhebungen beim Laden einer Seite an. Deaktivieren Sie dies, um Hervorhebungen nur anzuzeigen, wenn der Hervorhebungsmodus aktiviert ist."
+		"message": "Zeigt deine gespeicherten Hervorhebungen beim Laden einer Seite an. Deaktiviere dies, um Hervorhebungen nur anzuzeigen, wenn der Hervorhebungsmodus aktiviert ist."
 	},
 	"apiKeyMissing": {
 		"message": "Kein API-Schlüssel"
 	},
 	"apiKeysWarning": {
-		"message": "Durch die Nutzung eines externen Anbieters stimmen Sie dessen Nutzungsbedingungen und Datenschutzrichtlinien zu. Interpreter-Anfragen werden direkt an den von Ihnen gewählten Anbieter gesendet. Obsidian sammelt oder speichert keine Daten über Ihre Anfragen."
+		"message": "Durch die Nutzung eines externen Anbieters stimmst du dessen Nutzungsbedingungen und Datenschutzrichtlinien zu. Interpreter-Anfragen werden direkt an den von dir gewählten Anbieter gesendet. Obsidian sammelt oder speichert keine Daten über deine Anfragen."
 	},
 	"appendToDaily": {
 		"message": "Zur Tagesnotiz am Ende hinzufügen"
@@ -48,7 +48,7 @@
 		"message": "Automatisch ausführen"
 	},
 	"autoRunInterpreterDescription": {
-		"message": "Führt Prompt-Variablen sofort aus, wenn die Vorlage welche enthält. Dies verbraucht API-Guthaben bei Ihrem Modellanbieter. Deaktivieren Sie dies, wenn Sie den Interpreter nur manuell ausführen möchten."
+		"message": "Führt Prompt-Variablen sofort aus, wenn die Vorlage welche enthält. Dies verbraucht API-Guthaben bei deinem Modellanbieter. Deaktiviere dies, wenn du den Interpreter nur manuell ausführen möchtest."
 	},
 	"behavior": {
 		"message": "Verhalten"
@@ -104,10 +104,10 @@
 		"message": "Hervorhebungsmodus umschalten"
 	},
 	"confirmDeleteTemplate": {
-		"message": "Sind Sie sicher, dass Sie die Vorlage \"$1\" löschen möchten?"
+		"message": "Möchtest du die Vorlage \"$1\" wirklich löschen?"
 	},
 	"confirmReplaceSettings": {
-		"message": "Dies wird alle Ihre aktuellen Einstellungen, einschließlich Vorlagen und Eigenschaften, ersetzen. Sind Sie sicher, dass Sie fortfahren möchten?"
+		"message": "Dies wird alle deine aktuellen Einstellungen, einschließlich Vorlagen und Eigenschaften, ersetzen. Möchtest du wirklich fortfahren?"
 	},
 	"copied": {
 		"message": "Kopiert!"
@@ -131,7 +131,7 @@
 		"message": "Standard-Interpreter-Kontext"
 	},
 	"defaultInterpreterContextDescription": {
-		"message": "Das Modell wird diesen Kontext verwenden, um Prompt-Variablen zu interpretieren. Variablen und Filter können hier verwendet werden."
+		"message": "Der Kontext, der zur Interpretation von Prompt-Variablen verwendet wird. Variablen können hier verwendet werden."
 	},
 	"defaultTemplateName": {
 		"message": "Standard"
@@ -190,7 +190,7 @@
 		"message": "Interpreter aktivieren"
 	},
 	"enableInterpreterDescription": {
-		"message": "Verwenden Sie natürliche Sprache, um Daten aus Seiten zu extrahieren. Zum Beispiel können Sie die Vorlagensyntax $strong_start${{\"eine Zusammenfassung der Seite\"}}$strong_end$ verwenden. Erfordert einen API-Schlüssel oder ein unten konfiguriertes benutzerdefiniertes Modell. $link_start$Mehr erfahren$link_end$",
+		"message": "Nutze natürliche Sprache, um Daten aus Seiten zu extrahieren. Du kannst zum Beispiel die Vorlagensyntax $strong_start${{\"eine Zusammenfassung der Seite\"}}$strong_end$ verwenden. Erfordert einen API-Schlüssel oder ein unten konfiguriertes benutzerdefiniertes Modell. $link_start$Mehr erfahren$link_end$.",
 		"placeholders": {
 			"link_end": {
 				"content": "</a>"
@@ -341,7 +341,7 @@
 		"message": "Eigenschaften importieren"
 	},
 	"importPropertiesDescription": {
-		"message": "Um Ihre Eigenschaften aus Obsidian zu importieren, suchen Sie die $strong_1_start$types.json$strong_1_end$ Datei im $strong_2_start$.obsidian$strong_2_end$ Ordner in Ihrem Vault. Beachten Sie, dass dieser Ordner standardmäßig auf den meisten Betriebssystemen versteckt ist.",
+		"message": "Um deine Eigenschaften aus Obsidian zu importieren, suche die $strong_1_start$types.json$strong_1_end$ Datei im $strong_2_start$.obsidian$strong_2_end$ Ordner in deinem Vault. Beachte, dass dieser Ordner standardmäßig auf den meisten Betriebssystemen versteckt ist.",
 		"placeholders": {
 			"strong_1_end": {
 				"content": "</strong>"
@@ -453,7 +453,7 @@
 		"message": "Notizname"
 	},
 	"noteNameFormatDescription": {
-		"message": "Format für den Dateinamen der Notiz. Sie können Variablen wie {{title}}, {{date}} und {{published}} verwenden, um Daten von der Seite vorab auszufüllen. $link_start$Mehr erfahren$link_end$.",
+		"message": "Format für den Dateinamen der Notiz. Du kannst Variablen wie {{title}}, {{date}} und {{published}} verwenden, um Daten von der Seite vorab auszufüllen. $link_start$Mehr erfahren$link_end$.",
 		"placeholders": {
 			"link_end": {
 				"content": "</a>"
@@ -662,10 +662,10 @@
 		"message": "System"
 	},
 	"templateCopied": {
-		"message": "Vorlagen-JavaScript-Objekt-Notation (JSON) in die Zwischenablage kopiert"
+		"message": "Vorlagen-JSON in Zwischenablage kopiert"
 	},
 	"templateCopyError": {
-		"message": "Fehler beim Kopieren der Vorlagen-JavaScript-Objekt-Notation (JSON) in die Zwischenablage"
+		"message": "Vorlagen-JSON konnte nicht in Zwischenablage kopiert werden"
 	},
 	"templateName": {
 		"message": "Vorlagenname"
@@ -715,7 +715,7 @@
 		"message": "Vaulte"
 	},
 	"vaultsDescription": {
-		"message": "Standardmäßig werden ausgeschnittene Notizen im aktuell geöffneten Vault gespeichert. Sie können hier Vaulte hinzufügen, wenn Sie die Option haben möchten, in verschiedenen Vaulten zu speichern. Vaultnamen müssen exakt mit dem Namen des Obsidian-Vaults übereinstimmen. Drücken Sie $strong_start$Enter$strong_end$, um einen Vault hinzuzufügen.",
+		"message": "Standardmäßig werden ausgeschnittene Notizen im aktuell geöffneten Vault gespeichert. Du kannst hier Vaults hinzufügen, wenn du die Option haben möchtest, in verschiedenen Vaults zu speichern. Vaultnamen müssen exakt mit dem Namen des Obsidian-Vaults übereinstimmen. Drücke $strong_start$Enter$strong_end$, um einen Vault hinzuzufügen.",
 		"placeholders": {
 			"strong_end": {
 				"content": "</strong>"
