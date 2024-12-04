@@ -1,4 +1,4 @@
-import { initializeToggles, updateToggleState } from '../utils/ui-utils';
+import { initializeToggles, updateToggleState, initializeSettingToggle } from '../utils/ui-utils';
 import { ModelConfig, Provider } from '../types/types';
 import { generalSettings, loadSettings, saveSettings } from '../utils/storage-utils';
 import { initializeIcons } from '../icons/icons';
@@ -68,34 +68,7 @@ export function initializeInterpreterSettings(): void {
 		initializeModelList();
 
 		// Initialize toggles and other UI elements
-		const interpreterToggle = document.getElementById('interpreter-toggle') as HTMLInputElement;
-		const interpreterAutoRunToggle = document.getElementById('interpreter-auto-run-toggle') as HTMLInputElement;
-		const interpreterSection = document.getElementById('interpreter-section');
-
-		if (interpreterToggle) {
-			interpreterToggle.checked = generalSettings.interpreterEnabled;
-			updateToggleState(interpreterToggle.parentElement as HTMLElement, interpreterToggle);
-			
-			if (interpreterSection) {
-				interpreterSection.classList.toggle('is-disabled', !interpreterToggle.checked);
-			}
-
-			interpreterToggle.addEventListener('change', () => {
-				saveInterpreterSettingsFromForm();
-				updatePromptContextVisibility();
-				updateToggleState(interpreterToggle.parentElement as HTMLElement, interpreterToggle);
-			});
-		}
-
-		if (interpreterAutoRunToggle) {
-			interpreterAutoRunToggle.checked = generalSettings.interpreterAutoRun;
-			updateToggleState(interpreterAutoRunToggle.parentElement as HTMLElement, interpreterAutoRunToggle);
-
-			interpreterAutoRunToggle.addEventListener('change', () => {
-				saveInterpreterSettingsFromForm();
-				updateToggleState(interpreterAutoRunToggle.parentElement as HTMLElement, interpreterAutoRunToggle);
-			});
-		}
+		initializeInterpreterToggles();
 
 		const defaultPromptContextInput = document.getElementById('default-prompt-context') as HTMLTextAreaElement;
 		if (defaultPromptContextInput) {
@@ -117,6 +90,17 @@ export function initializeInterpreterSettings(): void {
 	if (addProviderBtn) {
 		addProviderBtn.addEventListener('click', (event) => addProviderToList(event));
 	}
+}
+
+function initializeInterpreterToggles(): void {
+	initializeSettingToggle('interpreter-toggle', generalSettings.interpreterEnabled, (checked) => {
+		saveSettings({ ...generalSettings, interpreterEnabled: checked });
+		updatePromptContextVisibility();
+	});
+
+	initializeSettingToggle('interpreter-auto-run-toggle', generalSettings.interpreterAutoRun, (checked) => {
+		saveSettings({ ...generalSettings, interpreterAutoRun: checked });
+	});
 }
 
 function initializeProviderList() {
