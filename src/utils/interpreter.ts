@@ -81,7 +81,7 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 				'anthropic-version': '2023-06-01',
 				'anthropic-dangerous-direct-browser-access': 'true'
 			};
-		} else if (provider.id === 'ollama') {
+		} else if (provider.name.toLowerCase().includes('ollama')) {
 			requestBody = {
 				model: model.providerModelId,
 				messages: [
@@ -144,8 +144,18 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 		let llmResponseContent: string;
 		if (provider.id === 'anthropic') {
 			llmResponseContent = data.content[0]?.text || JSON.stringify(data);
-		} else if (provider.id === 'ollama') {
-			llmResponseContent = data.message?.content || JSON.stringify(data);
+		} else if (provider.name.toLowerCase().includes('ollama')) {
+			const messageContent = data.message?.content;
+			if (messageContent) {
+				try {
+					const parsedContent = JSON.parse(messageContent);
+					llmResponseContent = JSON.stringify(parsedContent);
+				} catch (error) {
+					llmResponseContent = messageContent;
+				}
+			} else {
+				llmResponseContent = JSON.stringify(data);
+			}
 		} else {
 			llmResponseContent = data.choices[0]?.message?.content || JSON.stringify(data);
 		}
