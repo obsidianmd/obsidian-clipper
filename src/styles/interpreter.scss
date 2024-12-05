@@ -257,11 +257,13 @@
 		align-items: center;
 		justify-content: flex-end;
 		margin-inline-start: auto;
-		gap: 2px;
 		flex-shrink: 0;
 		.clickable-icon {
-			height: 24px;
-			width: 24px;
+			height: var(--clickable-icon-size);
+			width: var(--clickable-icon-size);
+		}
+		.checkbox-container {
+			margin-inline-start: 0.5rem;
 		}
 	}
 	.model-list-item-info {
@@ -336,11 +338,10 @@
 			align-items: center;
 			justify-content: flex-end;
 			margin-inline-start: auto;
-			gap: 2px;
 			flex-shrink: 0;
 			.clickable-icon {
-				height: 24px;
-				width: 24px;
+				height: var(--clickable-icon-size);
+				width: var(--clickable-icon-size);
 			}
 		}
 	}
