@@ -25,6 +25,12 @@ const PRESET_PROVIDERS: Record<string, PresetProvider> = {
 		name: 'Azure OpenAI',
 		baseUrl: 'https://{resource-name}.openai.azure.com/openai/deployments/{deployment-id}/chat/completions?api-version=2024-10-21',
 	},
+	google: {
+		id: 'google',
+		name: 'Google Gemini',
+		baseUrl: 'https://generativelanguage.googleapis.com/v1beta/openai/',
+		apiKeyUrl: 'https://aistudio.google.com/apikey'
+	},
 	ollama: {
 		id: 'ollama',
 		name: 'Ollama',
