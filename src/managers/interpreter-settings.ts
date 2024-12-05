@@ -148,17 +148,18 @@ function createProviderListItem(provider: Provider, index: number): HTMLElement 
 	providerItem.innerHTML = `
 		<div class="provider-list-item-info">
 			<div class="provider-name">
-				<div class="provider-icon-container"><span class="provider-icon icon-${provider.name.toLowerCase().replace(/\s+/g, '-')}"></span></div>
-				${provider.name}
+				<div class="provider-icon-container">
+					<span class="provider-icon icon-${provider.name.toLowerCase().replace(/\s+/g, '-')}"></span>
+				</div>
+				<div class="provider-name-text">
+					${provider.name}
+				</div>
 			</div>
-			${!provider.apiKey ? `<span class="provider-no-key"><i data-lucide="alert-triangle"></i> ${getMessage('apiKeyMissing')}</span>` : ''}
+			${!provider.apiKey ? `<span class="provider-no-key"><i data-lucide="alert-triangle"></i> <span class="mh">${getMessage('apiKeyMissing')}</span></span>` : ''}
 		</div>
 		<div class="provider-list-item-actions">
 			<button class="edit-provider-btn clickable-icon" data-provider-id="${provider.id}" aria-label="Edit provider">
 				<i data-lucide="pen-line"></i>
-			</button>
-			<button class="duplicate-provider-btn clickable-icon" data-provider-id="${provider.id}" aria-label="Duplicate provider">
-				<i data-lucide="copy-plus"></i>
 			</button>
 			<button class="delete-provider-btn clickable-icon" data-provider-id="${provider.id}" aria-label="Delete provider">
 				<i data-lucide="trash-2"></i>
@@ -426,7 +427,7 @@ function createModelListItem(model: ModelConfig, index: number): HTMLElement {
 		</div>
 		<div class="model-list-item-info">
 			<div class="model-name">${model.name}</div>
-			<div class="model-provider">${providerName}</div>
+			<div class="model-provider mh">${providerName}</div>
 		</div>
 		<div class="model-list-item-actions">
 			<button class="edit-model-btn clickable-icon" data-index="${index}" aria-label="Edit model">

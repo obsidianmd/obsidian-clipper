@@ -117,7 +117,6 @@
 	display: none;
 	flex-direction: column;
 	gap: 8px;
-	max-width: 600px;
 	margin: 24px max(6%, 24px) 72px max(6%, 24px);
 
 	&.active {
@@ -128,6 +127,12 @@
 		> div {
 			margin-bottom: 3rem;
 		}
+	}
+}
+
+@media (min-width: 769px) {
+	.settings-section {
+		max-width: 600px;
 	}
 }
 

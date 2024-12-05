@@ -249,6 +249,7 @@
 		border-bottom: 1px solid var(--background-modifier-border);
 		padding: 0.25rem 0;
 		user-select: none;
+		line-height: 1.2;
 	}
 	.model-list-item-actions {
 		display: flex;
@@ -257,6 +258,7 @@
 		justify-content: flex-end;
 		margin-inline-start: auto;
 		gap: 2px;
+		flex-shrink: 0;
 		.clickable-icon {
 			height: 24px;
 			width: 24px;
@@ -291,16 +293,18 @@
 		display: flex;
 		flex-direction: row;
 		align-items: center;
-		gap: 0.25rem;
+		gap: 0.5rem;
 		border-bottom: 1px solid var(--background-modifier-border);
 		padding: 0.25rem 0;
 		user-select: none;
+		line-height: 1.2;
 
 		.provider-list-item-info {
 			display: flex;
 			flex-direction: row;
 			gap: 0.5rem;
 			min-width: 60%;
+
 		}
 		.provider-name {
 			font-size: var(--font-ui-small);
@@ -310,13 +314,21 @@
 			align-items: center;
 			gap: 0.5rem;
 		}
+		.provider-name-text {
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
 		.provider-no-key {
+
 			display: flex;
 			flex-direction: row;
 			align-items: center;
 			gap: 0.25rem;
 			font-size: var(--font-ui-smaller);
 			color: var(--text-warning);
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
 		}
 		.provider-list-item-actions {
 			display: flex;
@@ -325,6 +337,7 @@
 			justify-content: flex-end;
 			margin-inline-start: auto;
 			gap: 2px;
+			flex-shrink: 0;
 			.clickable-icon {
 				height: 24px;
 				width: 24px;
@@ -337,6 +350,7 @@
 	border: 1px solid var(--background-modifier-border);
 	border-radius: 50%;
 	display: inline-block;
+	min-width: 1.75rem;
 	width: 1.75rem;
 	height: 1.75rem;
 	overflow: hidden;
