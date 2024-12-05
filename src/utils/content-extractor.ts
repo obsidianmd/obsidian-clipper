@@ -1,4 +1,5 @@
 import { ExtractedContent } from '../types/types';
+import { ExtractorRegistry } from './extractor-registry';
 import { createMarkdownContent } from './markdown-converter';
 import { sanitizeFileName } from './string-utils';
 import { Readability } from '@mozilla/readability';
@@ -110,6 +111,27 @@ export async function initializePageContent(content: string, selectedHtml: strin
 		const doc = parser.parseFromString(content, 'text/html');
 		currentUrl = currentUrl.replace(/#:~:text=[^&]+(&|$)/, '');
 
+		const extractor = ExtractorRegistry.findExtractor(doc, currentUrl);
+		let readabilityArticle = null;
+		
+		if (selectedHtml) {
+			content = selectedHtml;
+		} else if (extractor) {
+			debugLog('Content', 'Using custom extractor');
+			const extractedResult = extractor.extract();
+			content = extractedResult.contentHtml;
+			if (extractedResult.extractedContent) {
+				extractedContent = { ...extractedContent, ...extractedResult.extractedContent };
+			}
+		} else {
+			readabilityArticle = extractReadabilityContent(doc);
+			if (readabilityArticle && readabilityArticle.content) {
+				content = readabilityArticle.content;
+			} else {
+				content = doc.body.innerHTML || fullHtml;
+			}
+		}
+
 		// Define preset variables with fallbacks
 		const title =
 			getMetaContent(doc, "property", "og:title")
@@ -179,19 +201,6 @@ export async function initializePageContent(content: string, selectedHtml: strin
 			|| doc.querySelector("link[rel='icon']")?.getAttribute("href")
 			|| doc.querySelector("link[rel='shortcut icon']")?.getAttribute("href")
 			|| new URL("/favicon.ico", currentUrl).href;
-
-		const readabilityArticle = extractReadabilityContent(doc);
-		if (!readabilityArticle) {
-			console.warn('Failed to parse content with Readability, falling back to full content');
-		}
-
-		if (selectedHtml) {
-			content = selectedHtml;
-		} else if (readabilityArticle && readabilityArticle.content) {
-			content = readabilityArticle.content;
-		} else {
-			content = doc.body.innerHTML || fullHtml;
-		}
 
 		// Process highlights after getting the base content
 		if (generalSettings.highlighterEnabled && generalSettings.highlightBehavior !== 'no-highlights' && highlights && highlights.length > 0) {
