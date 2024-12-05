@@ -1,5 +1,9 @@
 import { BaseExtractor } from './extractors/_base';
+
+// Extractors
+import { RedditExtractor } from './extractors/reddit';
 import { TwitterExtractor } from './extractors/twitter';
+
 
 type ExtractorConstructor = new (document: Document, url: string) => BaseExtractor;
 
@@ -22,24 +26,15 @@ export class ExtractorRegistry {
 			extractor: TwitterExtractor
 		});
 
-		// Example future mappings:
-		/*
-		this.register({
-			patterns: [
-				'youtube.com',
-				'youtu.be'
-			],
-			extractor: YouTubeExtractor
-		});
-
 		this.register({
 			patterns: [
 				'reddit.com',
+				'old.reddit.com',
+				'new.reddit.com',
 				/^https:\/\/[^\/]+\.reddit\.com/
 			],
 			extractor: RedditExtractor
 		});
-		*/
 	}
 
 	static register(mapping: ExtractorMapping) {
