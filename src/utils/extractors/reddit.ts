@@ -1,55 +1,95 @@
 import { BaseExtractor, ExtractorResult } from './_base';
 
 export class RedditExtractor extends BaseExtractor {
+	private shredditPost: Element | null;
+
+	constructor(document: Document, url: string) {
+		super(document, url);
+		this.shredditPost = document.querySelector('shreddit-post');
+	}
+
 	canExtract(): boolean {
-		return true;
+		return !!this.shredditPost;
 	}
 
 	extract(): ExtractorResult {
-		// Get the main post content
-		const post = this.extractPost();
-		
-		// Get comments
+		const postContent = this.getPostContent();
 		const comments = this.extractComments();
 
-		// Combine post and comments
-		const contentHtml = `
-<div class="reddit-post">
-	${post}
-</div>
-${comments ? `
-<hr>
-<h2>Comments</h2>
-<div class="reddit-comments">
-	${comments}
-</div>
-			` : ''}
-		`;
+		const contentHtml = this.createContentHtml(postContent, comments);
+		const postTitle = this.document.querySelector('h1')?.textContent?.trim() || '';
+		const subreddit = this.getSubreddit();
+		const postAuthor = this.getPostAuthor();
+		const description = this.createDescription(postContent);
 
 		return {
 			content: contentHtml,
 			contentHtml: contentHtml,
 			extractedContent: {
 				postId: this.getPostId(),
-				subreddit: this.getSubreddit(),
-				postAuthor: this.getPostAuthor(),
+				subreddit,
+				 postAuthor,
+			},
+			variables: {
+				title: postTitle,
+				author: postAuthor,
+				site: `r/${subreddit}`,
+				description,
 			}
 		};
 	}
 
-	private extractPost(): string {
-		// Get post content - handle text, images, and links
-		const postContent = this.document.querySelector('[slot="text-body"]');
-		const content = postContent?.innerHTML || '';
+	private getPostContent(): string {
+		const textBody = this.shredditPost?.querySelector('[slot="text-body"]')?.innerHTML || '';
+		const mediaBody = this.shredditPost?.querySelector('#post-image')?.outerHTML || '';
+		
+		return textBody + mediaBody;
+	}
 
-		return `<div class="post-content">
-	${content}
-	</div>`;
+	private createContentHtml(postContent: string, comments: string): string {
+		return `
+			<div class="reddit-post">
+				<div class="post-content">
+					${postContent}
+				</div>
+			</div>
+			${comments ? `
+				<hr>
+				<h2>Comments</h2>
+				<div class="reddit-comments">
+					${comments}
+				</div>
+			` : ''}
+		`.trim();
 	}
 
 	private extractComments(): string {
 		const comments = Array.from(this.document.querySelectorAll('shreddit-comment'));
 		return this.processComments(comments);
+	}
+
+	private getPostId(): string {
+		const match = this.url.match(/comments\/([a-zA-Z0-9]+)/);
+		return match?.[1] || '';
+	}
+
+	private getSubreddit(): string {
+		const match = this.url.match(/\/r\/([^/]+)/);
+		return match?.[1] || '';
+	}
+
+	private getPostAuthor(): string {
+		return this.shredditPost?.getAttribute('author') || '';
+	}
+
+	private createDescription(postContent: string): string {
+		if (!postContent) return '';
+
+		const tempDiv = document.createElement('div');
+		tempDiv.innerHTML = postContent;
+		return tempDiv.textContent?.trim()
+			.slice(0, 140)
+			.replace(/\s+/g, ' ') || '';
 	}
 
 	private processComments(comments: Element[]): string {
@@ -117,20 +157,5 @@ ${comments ? `
 		}
 
 		return html;
-	}
-
-	private getPostId(): string {
-		const match = this.url.match(/comments\/([a-zA-Z0-9]+)/);
-		return match ? match[1] : '';
-	}
-
-	private getSubreddit(): string {
-		const match = this.url.match(/\/r\/([^/]+)/);
-		return match ? match[1] : '';
-	}
-
-	private getPostAuthor(): string {
-		const authorElement = this.document.querySelector('[data-testid="post_author"]');
-		return authorElement?.textContent?.replace('u/', '') || '';
 	}
 } 
