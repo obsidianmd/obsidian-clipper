@@ -41,6 +41,10 @@ select {
 			box-shadow .15s ease-in-out,
 			border .15s ease-in-out;
 	}
+	option {
+		background-color: var(--background-secondary);
+		color: var(--text-normal);
+	}
 }
 
 #settings {

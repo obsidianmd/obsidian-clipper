@@ -295,7 +295,7 @@
 #template-select {
 	appearance: none;
 	border: none;
-	background-color: transparent;
+	background-color: var(--background-primary);
 	border-radius: var(--radius-m);
 	padding: 0 calc(var(--popup-padding) * 0.5);
 	width: 100%;
