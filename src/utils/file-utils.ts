@@ -24,6 +24,10 @@ export async function saveFile({
 	onError
 }: SaveFileOptions): Promise<void> {
 	try {
+		if (mimeType === 'text/markdown' && !fileName.toLowerCase().endsWith('.md')) {
+			fileName = `${fileName}.md`;
+		}
+
 		const browserType = await detectBrowser();
 		const isSafari = ['ios', 'mobile-ios', 'ipad-os', 'safari', 'mobile-safari'].includes(browserType);
 		
