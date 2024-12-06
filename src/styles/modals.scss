@@ -24,7 +24,7 @@
 	background-color: var(--modal-background);
 	border-radius: var(--modal-radius);
 	border: var(--modal-border-width) solid var(--modal-border-color);
-	padding: 1rem;
+	padding: var(--modal-padding);
 	position: relative;
 	height: var(--dialog-height);
 	min-height: 100px;

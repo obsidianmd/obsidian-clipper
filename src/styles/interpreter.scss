@@ -228,6 +228,11 @@
 
 .model-list-container {
 	margin-bottom: 24px;
+	overflow-x: scroll;
+}
+
+.provider-list-container {
+	overflow-x: scroll;
 }
 
 #interpreter-section {
@@ -270,7 +275,7 @@
 		display: flex;
 		flex-direction: row;
 		gap: 0.5rem;
-		min-width: 60%;
+		width: 60%;
 	}
 	.model-name {
 		font-size: var(--font-ui-small);
@@ -305,7 +310,7 @@
 			display: flex;
 			flex-direction: row;
 			gap: 0.5rem;
-			min-width: 60%;
+			width: 60%;
 
 		}
 		.provider-name {
