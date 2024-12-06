@@ -32,7 +32,7 @@ const PRESET_PROVIDERS: Record<string, PresetProvider> = {
 	google: {
 		id: 'google',
 		name: 'Google Gemini',
-		baseUrl: 'https://generativelanguage.googleapis.com/v1beta/openai/',
+		baseUrl: 'https://generativelanguage.googleapis.com/v1beta/chat/completions',
 		apiKeyUrl: 'https://aistudio.google.com/apikey'
 	},
 	ollama: {
