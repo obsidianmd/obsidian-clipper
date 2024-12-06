@@ -52,12 +52,17 @@ export const replace = (str: string, param?: string): string => {
 			}
 		}
 
-		// Handle escaped sequences for non-regex replacements
-		search = search.replace(/\\(.)/g, '$1');
+		// Handle escaped sequences for both search and replace
+		search = processEscapedCharacters(search);
 		replace = processEscapedCharacters(replace);
 
 		// For | and : characters, use string.split and join
 		if (search === '|' || search === ':') {
+			return acc.split(search).join(replace);
+		}
+
+		// For literal newlines and other special regex characters, use split and join
+		if (search.includes('\n') || search.includes('\r') || search.includes('\t')) {
 			return acc.split(search).join(replace);
 		}
 
