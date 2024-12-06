@@ -1,4 +1,5 @@
 import { ExtractedContent } from '../types/types';
+import { ExtractorRegistry } from './extractor-registry';
 import { createMarkdownContent } from './markdown-converter';
 import { sanitizeFileName } from './string-utils';
 import { Readability } from '@mozilla/readability';
@@ -104,94 +105,118 @@ export function getMetaContent(doc: Document, attr: string, value: string): stri
 	return element ? element.getAttribute("content")?.trim() ?? "" : "";
 }
 
+// At the beginning of the file, add this interface
+interface ExtractorVariables {
+	[key: string]: string;
+}
+
 export async function initializePageContent(content: string, selectedHtml: string, extractedContent: ExtractedContent, currentUrl: string, schemaOrgData: any, fullHtml: string, highlights: AnyHighlightData[]) {
 	try {
 		const parser = new DOMParser();
 		const doc = parser.parseFromString(content, 'text/html');
 		currentUrl = currentUrl.replace(/#:~:text=[^&]+(&|$)/, '');
 
-		// Define preset variables with fallbacks
+		const extractor = ExtractorRegistry.findExtractor(doc, currentUrl);
+		let readabilityArticle = null;
+		let extractorVariables: ExtractorVariables = {};
+		
+		if (selectedHtml) {
+			content = selectedHtml;
+		} else if (extractor) {
+			debugLog('Content', 'Using custom extractor');
+			const extractedResult = extractor.extract();
+			content = extractedResult.contentHtml;
+			if (extractedResult.extractedContent) {
+				extractedContent = { ...extractedContent, ...extractedResult.extractedContent };
+			}
+			if (extractedResult.variables) {
+				extractorVariables = extractedResult.variables;
+			}
+		} else {
+			readabilityArticle = extractReadabilityContent(doc);
+			if (readabilityArticle && readabilityArticle.content) {
+				content = readabilityArticle.content;
+			} else {
+				content = doc.body.innerHTML || fullHtml;
+			}
+		}
+
+		// Define preset variables with fallbacks, using extractor variables first
 		const title =
-			getMetaContent(doc, "property", "og:title")
-			|| getMetaContent(doc, "name", "twitter:title")
-			|| getSchemaProperty(schemaOrgData, 'headline')
-			|| getMetaContent(doc, "name", "title")
-			|| getMetaContent(doc, "name", "sailthru.title")
-			|| doc.querySelector('title')?.textContent?.trim()
-			|| '';
+			extractorVariables['title'] ||
+			getMetaContent(doc, "property", "og:title") ||
+			getMetaContent(doc, "name", "twitter:title") ||
+			getSchemaProperty(schemaOrgData, 'headline') ||
+			getMetaContent(doc, "name", "title") ||
+			getMetaContent(doc, "name", "sailthru.title") ||
+			doc.querySelector('title')?.textContent?.trim() ||
+			'';
 
 		const noteName = sanitizeFileName(title);
 
 		const authorName =
-			getMetaContent(doc, "name", "sailthru.author")
-			|| getSchemaProperty(schemaOrgData, 'author.name')
-			|| getMetaContent(doc, "property", "author")
-			|| getMetaContent(doc, "name", "byl")
-			|| getMetaContent(doc, "name", "author")
-			|| getMetaContent(doc, "name", "copyright")
-			|| getSchemaProperty(schemaOrgData, 'copyrightHolder.name')
-			|| getMetaContent(doc, "property", "og:site_name")
-			|| getSchemaProperty(schemaOrgData, 'publisher.name')
-			|| getMetaContent(doc, "property", "og:site_name")
-			|| getSchemaProperty(schemaOrgData, 'sourceOrganization.name')
-			|| getSchemaProperty(schemaOrgData, 'isPartOf.name')
-			|| getMetaContent(doc, "name", "twitter:creator")
-			|| getMetaContent(doc, "name", "application-name")
-			|| '';
+			extractorVariables['author'] ||
+			getMetaContent(doc, "name", "sailthru.author") ||
+			getSchemaProperty(schemaOrgData, 'author.name') ||
+			getMetaContent(doc, "property", "author") ||
+			getMetaContent(doc, "name", "byl") ||
+			getMetaContent(doc, "name", "author") ||
+			getMetaContent(doc, "name", "copyright") ||
+			getSchemaProperty(schemaOrgData, 'copyrightHolder.name') ||
+			getMetaContent(doc, "property", "og:site_name") ||
+			getSchemaProperty(schemaOrgData, 'publisher.name') ||
+			getMetaContent(doc, "property", "og:site_name") ||
+			getSchemaProperty(schemaOrgData, 'sourceOrganization.name') ||
+			getSchemaProperty(schemaOrgData, 'isPartOf.name') ||
+			getMetaContent(doc, "name", "twitter:creator") ||
+			getMetaContent(doc, "name", "application-name") ||
+			'';
 
 		const description =
-			getMetaContent(doc, "name", "description")
-			|| getMetaContent(doc, "property", "description")
-			|| getMetaContent(doc, "property", "og:description")
-			|| getSchemaProperty(schemaOrgData, 'description')
-			|| getMetaContent(doc, "name", "twitter:description")
-			|| getMetaContent(doc, "name", "sailthru.description")
-			|| '';
+			extractorVariables['description'] ||
+			getMetaContent(doc, "name", "description") ||
+			getMetaContent(doc, "property", "description") ||
+			getMetaContent(doc, "property", "og:description") ||
+			getSchemaProperty(schemaOrgData, 'description') ||
+			getMetaContent(doc, "name", "twitter:description") ||
+			getMetaContent(doc, "name", "sailthru.description") ||
+			'';
 
 		const domain = new URL(currentUrl).hostname.replace(/^www\./, '');
 
 		const image =
-			getMetaContent(doc, "property", "og:image")
-			|| getMetaContent(doc, "name", "twitter:image")
-			|| getSchemaProperty(schemaOrgData, 'image.url')
-			|| getMetaContent(doc, "name", "sailthru.image.full")
-			|| '';
+			extractorVariables['image'] ||
+			getMetaContent(doc, "property", "og:image") ||
+			getMetaContent(doc, "name", "twitter:image") ||
+			getSchemaProperty(schemaOrgData, 'image.url') ||
+			getMetaContent(doc, "name", "sailthru.image.full") ||
+			'';
 
-		const published = 
-			getSchemaProperty(schemaOrgData, 'datePublished')
-			|| getMetaContent(doc, "property", "article:published_time")
-			|| getTimeElement(doc)
-			|| getMetaContent(doc, "name", "sailthru.date")
-			|| '';
+		const published =
+			extractorVariables['published'] ||
+			getSchemaProperty(schemaOrgData, 'datePublished') ||
+			getMetaContent(doc, "property", "article:published_time") ||
+			getTimeElement(doc) ||
+			getMetaContent(doc, "name", "sailthru.date") ||
+			'';
 
 		const site =
-			getSchemaProperty(schemaOrgData, 'publisher.name')
-			|| getMetaContent(doc, "property", "og:site_name")
-			|| getSchemaProperty(schemaOrgData, 'sourceOrganization.name')
-			|| getMetaContent(doc, "name", "copyright")
-			|| getSchemaProperty(schemaOrgData, 'copyrightHolder.name')
-			|| getSchemaProperty(schemaOrgData, 'isPartOf.name')
-			|| getMetaContent(doc, "name", "application-name")
-			|| '';
+			extractorVariables['site'] ||
+			getSchemaProperty(schemaOrgData, 'publisher.name') ||
+			getMetaContent(doc, "property", "og:site_name") ||
+			getSchemaProperty(schemaOrgData, 'sourceOrganization.name') ||
+			getMetaContent(doc, "name", "copyright") ||
+			getSchemaProperty(schemaOrgData, 'copyrightHolder.name') ||
+			getSchemaProperty(schemaOrgData, 'isPartOf.name') ||
+			getMetaContent(doc, "name", "application-name") ||
+			'';
 
-		const favicon = 
-			getMetaContent(doc, "property", "og:image:favicon")
-			|| doc.querySelector("link[rel='icon']")?.getAttribute("href")
-			|| doc.querySelector("link[rel='shortcut icon']")?.getAttribute("href")
-			|| new URL("/favicon.ico", currentUrl).href;
-
-		const readabilityArticle = extractReadabilityContent(doc);
-		if (!readabilityArticle) {
-			console.warn('Failed to parse content with Readability, falling back to full content');
-		}
-
-		if (selectedHtml) {
-			content = selectedHtml;
-		} else if (readabilityArticle && readabilityArticle.content) {
-			content = readabilityArticle.content;
-		} else {
-			content = doc.body.innerHTML || fullHtml;
-		}
+		const favicon =
+			extractorVariables['favicon'] ||
+			getMetaContent(doc, "property", "og:image:favicon") ||
+			doc.querySelector("link[rel='icon']")?.getAttribute("href") ||
+			doc.querySelector("link[rel='shortcut icon']")?.getAttribute("href") ||
+			new URL("/favicon.ico", currentUrl).href;
 
 		// Process highlights after getting the base content
 		if (generalSettings.highlighterEnabled && generalSettings.highlightBehavior !== 'no-highlights' && highlights && highlights.length > 0) {
@@ -240,6 +265,13 @@ export async function initializePageContent(content: string, selectedHtml: strin
 		// Add extracted content to variables
 		Object.entries(extractedContent).forEach(([key, value]) => {
 			currentVariables[`{{${key}}}`] = value;
+		});
+
+		// Update the forEach to handle types properly
+		Object.entries(extractorVariables).forEach(([key, value]: [string, string]) => {
+			if (!currentVariables[`{{${key}}}`]) {
+				currentVariables[`{{${key}}}`] = value.trim();
+			}
 		});
 
 		// Add all meta tags to variables
