@@ -55,8 +55,24 @@ export class TwitterExtractor extends BaseExtractor {
 	private formatTweetText(text: string): string {
 		if (!text) return '';
 
-		// Split by newlines and filter out empty lines
-		const paragraphs = text.split('\n')
+		// Create a temporary div to parse and clean the HTML
+		const tempDiv = document.createElement('div');
+		tempDiv.innerHTML = text;
+
+		// Convert links to plain text with @ handles
+		tempDiv.querySelectorAll('a').forEach(link => {
+			const handle = link.textContent?.trim() || '';
+			link.replaceWith(handle);
+		});
+
+		// Remove unnecessary spans and divs but keep their content
+		tempDiv.querySelectorAll('span, div').forEach(element => {
+			element.replaceWith(...Array.from(element.childNodes));
+		});
+
+		// Get cleaned text and split into paragraphs
+		const cleanText = tempDiv.innerHTML;
+		const paragraphs = cleanText.split('\n')
 			.map(line => line.trim())
 			.filter(line => line);
 
@@ -80,24 +96,19 @@ export class TwitterExtractor extends BaseExtractor {
 		const tweetText = tweetClone.querySelector('[data-testid="tweetText"]')?.innerHTML || '';
 		const formattedText = this.formatTweetText(tweetText);
 		const images = this.extractImages(tweet);
-		const timestamp = tweet.querySelector('time');
-		const datetime = timestamp?.getAttribute('datetime') || '';
 		
-		// Get author name and handle from links
-		const nameElement = tweet.querySelector('[data-testid="User-Name"]');
-		const links = nameElement?.querySelectorAll('a');
-		const fullName = links?.[0]?.textContent?.trim() || '';
-		const handle = links?.[1]?.textContent?.trim() || '';
-		const date = datetime ? new Date(datetime).toISOString().split('T')[0] : '';
+		// Get author info and date
+		const userInfo = this.extractUserInfo(tweet);
 		
-		// Get permalink from time element's parent anchor
-		const permalink = timestamp?.closest('a')?.href || '';
+		// Extract quoted tweet if present
+		const quotedTweet = tweet.querySelector('[aria-labelledby*="id__"]');
+		const quotedContent = quotedTweet ? this.extractTweet(quotedTweet) : '';
 
 		return `
 			<div class="tweet">
 				<div class="tweet-header">
-					<span class="tweet-author"><strong>${fullName}</strong> <span class="tweet-handle">${handle}</span></span>
-					${date ? `<a href="${permalink}" class="tweet-date">${date}</a>` : ''}
+					<span class="tweet-author"><strong>${userInfo.fullName}</strong> <span class="tweet-handle">${userInfo.handle}</span></span>
+					${userInfo.date ? `<a href="${userInfo.permalink}" class="tweet-date">${userInfo.date}</a>` : ''}
 				</div>
 				${formattedText ? `<div class="tweet-text">${formattedText}</div>` : ''}
 				${images.length ? `
@@ -105,8 +116,36 @@ export class TwitterExtractor extends BaseExtractor {
 						${images.join('\n')}
 					</div>
 				` : ''}
+				${quotedContent ? `
+					<blockquote class="quoted-tweet">
+						${quotedContent}
+					</blockquote>
+				` : ''}
 			</div>
 		`.trim();
+	}
+
+	private extractUserInfo(tweet: Element) {
+		const nameElement = tweet.querySelector('[data-testid="User-Name"]');
+		if (!nameElement) return { fullName: '', handle: '', date: '', permalink: '' };
+
+		// Try to get name and handle from links first (main tweet structure)
+		const links = nameElement.querySelectorAll('a');
+		let fullName = links?.[0]?.textContent?.trim() || '';
+		let handle = links?.[1]?.textContent?.trim() || '';
+
+		// If links don't have the info, try to get from spans (quoted tweet structure)
+		if (!fullName || !handle) {
+			fullName = nameElement.querySelector('span[style*="color: rgb(15, 20, 25)"] span')?.textContent?.trim() || '';
+			handle = nameElement.querySelector('span[style*="color: rgb(83, 100, 113)"]')?.textContent?.trim() || '';
+		}
+
+		const timestamp = tweet.querySelector('time');
+		const datetime = timestamp?.getAttribute('datetime') || '';
+		const date = datetime ? new Date(datetime).toISOString().split('T')[0] : '';
+		const permalink = timestamp?.closest('a')?.href || '';
+
+		return { fullName, handle, date, permalink };
 	}
 
 	private extractImages(tweet: Element): string[] {
@@ -125,7 +164,8 @@ export class TwitterExtractor extends BaseExtractor {
 				if (img instanceof HTMLImageElement) {
 					// Get the highest quality image by removing size parameters
 					const highQualitySrc = img.src.replace(/&name=\w+$/, '&name=large');
-					images.push(`<img src="${highQualitySrc}" alt="${img.alt || ''}" />`);
+					const cleanAlt = img.alt?.replace(/\s+/g, ' ').trim() || '';
+					images.push(`<img src="${highQualitySrc}" alt="${cleanAlt}" />`);
 				}
 			});
 		}
