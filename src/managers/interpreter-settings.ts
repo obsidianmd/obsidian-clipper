@@ -11,6 +11,7 @@ interface PresetProvider {
 	name: string;
 	baseUrl: string;
 	apiKeyUrl?: string;
+	modelsList?: string;
 }
 
 const PRESET_PROVIDERS: Record<string, PresetProvider> = {
@@ -18,12 +19,15 @@ const PRESET_PROVIDERS: Record<string, PresetProvider> = {
 		id: 'anthropic',
 		name: 'Anthropic',
 		baseUrl: 'https://api.anthropic.com/v1/messages',
-		apiKeyUrl: 'https://console.anthropic.com/settings/keys'
+		apiKeyUrl: 'https://console.anthropic.com/settings/keys',
+		modelsList: 'https://docs.anthropic.com/en/docs/about-claude/models'
 	},
 	azure: {
 		id: 'azure-openai',
 		name: 'Azure OpenAI',
 		baseUrl: 'https://{resource-name}.openai.azure.com/openai/deployments/{deployment-id}/chat/completions?api-version=2024-10-21',
+		apiKeyUrl: 'https://oai.azure.com/portal/',
+		modelsList: 'https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models'
 	},
 	google: {
 		id: 'google',
@@ -34,19 +38,22 @@ const PRESET_PROVIDERS: Record<string, PresetProvider> = {
 	ollama: {
 		id: 'ollama',
 		name: 'Ollama',
-		baseUrl: 'http://127.0.0.1:11434/api/chat'
+		baseUrl: 'http://127.0.0.1:11434/api/chat',
+		modelsList: 'https://ollama.com/search'
 	},
 	openai: {
 		id: 'openai',
 		name: 'OpenAI',
 		baseUrl: 'https://api.openai.com/v1/chat/completions',
-		apiKeyUrl: 'https://platform.openai.com/api-keys'
+		apiKeyUrl: 'https://platform.openai.com/api-keys',
+		modelsList: 'https://platform.openai.com/docs/models'
 	},
 	openrouter: {
 		id: 'openrouter',
 		name: 'OpenRouter',
 		baseUrl: 'https://openrouter.ai/api/v1/chat/completions',
-		apiKeyUrl: 'https://openrouter.ai/settings/keys'
+		apiKeyUrl: 'https://openrouter.ai/settings/keys',
+		modelsList: 'https://openrouter.ai/models'
 	}
 };
 
@@ -704,17 +711,17 @@ function initializeResetProvidersButton(): void {
 						enabled: true
 					},
 					{
-						id: 'claude-3-sonnet',
+						id: 'claude-3-5-sonnet',
 						providerId: 'anthropic',
-						providerModelId: 'claude-3-sonnet-20240620',
+						providerModelId: 'claude-3-5-sonnet-latest',
 						name: 'Claude 3.5 Sonnet',
 						enabled: true
 					},
 					{
-						id: 'claude-3-haiku',
+						id: 'claude-3-5-haiku',
 						providerId: 'anthropic',
-						providerModelId: 'claude-3-haiku-20240307',
-						name: 'Claude 3 Haiku',
+						providerModelId: 'claude-3-5-haiku-latest',
+						name: 'Claude 3.5 Haiku',
 						enabled: true
 					}
 				];
