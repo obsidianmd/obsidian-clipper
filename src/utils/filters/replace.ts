@@ -42,6 +42,8 @@ export const replace = (str: string, param?: string): string => {
 		const regexInfo = parseRegexPattern(search);
 		if (regexInfo) {
 			try {
+				// Process escaped sequences in replacement string
+				replace = processEscapedCharacters(replace);
 				const regex = new RegExp(regexInfo.pattern, regexInfo.flags);
 				return acc.replace(regex, replace);
 			} catch (error) {
@@ -52,7 +54,7 @@ export const replace = (str: string, param?: string): string => {
 
 		// Handle escaped sequences for non-regex replacements
 		search = search.replace(/\\(.)/g, '$1');
-		replace = replace.replace(/\\(.)/g, '$1');
+		replace = processEscapedCharacters(replace);
 
 		// For | and : characters, use string.split and join
 		if (search === '|' || search === ':') {
@@ -64,3 +66,14 @@ export const replace = (str: string, param?: string): string => {
 		return acc.replace(searchRegex, replace);
 	}, str);
 };
+
+function processEscapedCharacters(str: string): string {
+	return str.replace(/\\([nrt]|[^nrt])/g, (match, char) => {
+		switch (char) {
+			case 'n': return '\n';
+			case 'r': return '\r';
+			case 't': return '\t';
+			default: return char;
+		}
+	});
+}
