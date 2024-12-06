@@ -44,7 +44,7 @@ export class TwitterExtractor extends BaseExtractor {
 				tweetAuthor,
 			},
 			variables: {
-				title: `Thread by @${tweetAuthor}`,
+				title: `Thread by ${tweetAuthor}`,
 				author: tweetAuthor,
 				site: 'X (Twitter)',
 				description,
@@ -68,13 +68,18 @@ export class TwitterExtractor extends BaseExtractor {
 		const tweetText = tweetClone.querySelector('[data-testid="tweetText"]')?.innerHTML || '';
 		const images = this.extractImages(tweet);
 		const timestamp = tweet.querySelector('time')?.getAttribute('datetime') || '';
-		const author = tweet.querySelector('[data-testid="User-Name"]')?.textContent?.trim() || '';
+		
+		// Get author name and handle from links
+		const nameElement = tweet.querySelector('[data-testid="User-Name"]');
+		const links = nameElement?.querySelectorAll('a');
+		const fullName = links?.[0]?.textContent?.trim() || '';
+		const handle = links?.[1]?.textContent?.trim() || '';
 		const date = timestamp ? new Date(timestamp).toISOString().split('T')[0] : '';
 
 		return `
 			<div class="tweet">
 				<div class="tweet-header">
-					<span class="tweet-author">${author}</span>
+					<span class="tweet-author"><strong>${fullName}</strong> <span class="tweet-handle">${handle}</span></span>
 					${date ? `<span class="tweet-date">${date}</span>` : ''}
 				</div>
 				${tweetText ? `<div class="tweet-text">${tweetText}</div>` : ''}
@@ -117,7 +122,9 @@ export class TwitterExtractor extends BaseExtractor {
 	}
 
 	private getTweetAuthor(): string {
-		return this.mainTweet?.querySelector('[data-testid="User-Name"]')?.textContent?.trim() || '';
+		const nameElement = this.mainTweet?.querySelector('[data-testid="User-Name"]');
+		const handle = nameElement?.querySelector('a')?.textContent?.trim() || '';
+		return handle.startsWith('@') ? handle : `@${handle}`;
 	}
 
 	private createDescription(tweet: Element | null): string {
