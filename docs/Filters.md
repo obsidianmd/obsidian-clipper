@@ -219,6 +219,12 @@ Removes only the specified HTML tags. Keeps the content of the tags.
 - Example: `"<p>Hello <b>world</b>!</p>"|remove_tags:"b"` returns `"<p>Hello world!</p>"`.
 - Multiple tags: `{{contentHtml|remove_tags:("a,em,strong")}}`
 
+### `replace_tags`
+
+Replaces HTML tags, maintaining the content and attributes of the tag.
+
+- `{{contentHtml|replace_tags:"strong":"h2"}}` replaces all `<strong>` tags with `<h2>`.
+
 ### `strip_attr`
 
 Removes **all** HTML attributes from a string.
