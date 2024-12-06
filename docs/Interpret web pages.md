@@ -54,48 +54,46 @@ To define a more targeted context use [[Variables#Selector variables|selector va
 > [!warning] Privacy
 > By using a third-party model provider you agree to their terms and privacy policy. Interpreter requests are sent directly to the provider you choose. Obsidian does not gather or store any data about your requests.
 
-### Preset models
+### Preset providers
 
-Interpreter includes several preset models available from Anthropic and OpenAI. To use these models you need an API key, which you can get by logging into your account:
+Interpreter includes several preset providers. To use these providers you need an API key which you can get by logging into your provider's account. You will also need to decide which model(s) to use.
 
-- [Anthropic API key](https://console.anthropic.com/login?selectAccount=true&returnTo=%2Fsettings%2Fkeys%3F)
-- [OpenAI API key](https://platform.openai.com/api-keys)
+| Provider           | API&nbsp;key                                                | Models                                                                             | Base URL                                                                                                              |
+| ------------------ | -------------------------------------------------- | ---------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Anthropic          | [API&nbsp;key](https://console.anthropic.com/settings/keys) | [Models](https://docs.anthropic.com/en/docs/about-claude/models)                     | `https://api.anthropic.com/v1/messages`                                                                               |
+| Azure&nbsp;OpenAI  | [API&nbsp;key](https://oai.azure.com/portal/)               | [Models](https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models) | `https://{resource-name}.openai.azure.com/openai/deployments/{deployment-id}/chat/completions?api-version=2024-10-21` |
+| Google&nbsp;Gemini | [API&nbsp;key](https://aistudio.google.com/apikey)          | [Models](https://ai.google.dev/gemini-api/docs/models/gemini)                        | `https://generativelanguage.googleapis.com/v1beta/chat/completions`                                                   |
+| Ollama             | n/a                                                | [Models](https://ollama.com/search)                                                  | `http://127.0.0.1:11434/api/chat`                                                                                     |
+| OpenAI             | [API&nbsp;key](https://platform.openai.com/api-keys)        | [Models](https://platform.openai.com/docs/models)                                    | `https://api.openai.com/v1/chat/completions`                                                                          |
+| OpenRouter         | [API&nbsp;key](https://openrouter.ai/settings/keys)         | [Models](https://openrouter.ai/models)                                               | `https://openrouter.ai/api/v1/chat/completions`                                                                       |
 
-### Custom models
+### Choosing a model
 
-To add a custom model go to Web Clipper **Settings** → **Interpreter** → **Add model**, then fill in the model configuration fields.
+In general we recommend using small models with Web Clipper because they are faster and perform fairly accurately for this task. Examples of smaller models include **Anthropic's Claude Haiku**, **Google Gemini Flash**, **Llama** with 3B or 8B parameters, or **OpenAI's Mini** series of models.
 
-See examples of configurations for OpenRouter and Ollama below.
+### Custom providers and models
 
-#### OpenRouter
+To add a custom provider and/or model go to Web Clipper **Settings** → **Interpreter**:
 
-[OpenRouter](https://openrouter.ai/) allows you to connect to many different models and providers.
+- **Add provider** to configure preset and custom providers.
+- **Add model** to configure preset and custom models.
 
-Once you have created an OpenRouter account, you will need [an API key](https://openrouter.ai/settings/keys). Then choose a model from the [model list](https://openrouter.ai/models).
+When adding a custom provider, we recommend that you use their chat completions endpoint for the **Base URL** — it typically ends with `/chat/completions`.
 
-In this example we use [Gemini Flash 1.5](https://openrouter.ai/google/gemini-flash-1.5). Enter the following values in Web Clipper **Add model** settings.
+### Local models
 
-| Field    | Value                                           |
-| -------- | ----------------------------------------------- |
-| Name     | Gemini Flash 1.5                                |
-| Base URL | `https://openrouter.ai/api/v1/chat/completions` |
-| Model ID | `google/gemini-flash-1.5-8b`                    |
-| Provider | OpenRouter                                      |
-| API key  | *(your OpenRouter API key)*                     |
+Interpreter can be use local models which offer greater privacy and offline compatibility. Several options for running local models exist. One of the easiest to configure is Ollama.
 
 #### Ollama
 
 [Ollama](https://ollama.com/) allows you to run language models locally and privately on your device. 
 
-Once you have downloaded and installed Ollama, choose a model from the [model list](https://ollama.com/search). In this example we use [Llama 3.2](https://ollama.com/library/llama3.2). Enter the following values in Web Clipper **Add model** settings.
+Once you have downloaded and installed Ollama, add Ollama using **Add provider** in Interpreter settings. Ollama does not require an API key. Then choose a model from the [model list](https://ollama.com/search). For example if you want to use [Llama 3.2](https://ollama.com/library/llama3.2), click **Add model**, then:
 
-| Field    | Value                             |
-| -------- | --------------------------------- |
-| Name     | Llama 3.2                         |
-| Base URL | `http://127.0.0.1:11434/api/chat` |
-| Model ID | `llama3.2`                        |
-| Provider | Ollama                            |
-| API key  | ollama                            |
+- **Provider:** Ollama
+- **Display name:** Llama 3.2, this value is customizable.
+- **Model ID:** `llama3.2`, this must exactly match the model ID from Olllama.
+
 **Start the Ollama server**
 
 To allow a browser extension to interact with Ollama you must give it explicit instruction when running the server, or else you will see a `403` error. 
