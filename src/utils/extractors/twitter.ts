@@ -52,6 +52,18 @@ export class TwitterExtractor extends BaseExtractor {
 		};
 	}
 
+	private formatTweetText(text: string): string {
+		if (!text) return '';
+
+		// Split by newlines and filter out empty lines
+		const paragraphs = text.split('\n')
+			.map(line => line.trim())
+			.filter(line => line);
+
+		// Wrap each paragraph in <p> tags
+		return paragraphs.map(p => `<p>${p}</p>`).join('\n');
+	}
+
 	private extractTweet(tweet: Element | null): string {
 		if (!tweet) return '';
 
@@ -66,23 +78,28 @@ export class TwitterExtractor extends BaseExtractor {
 		});
 
 		const tweetText = tweetClone.querySelector('[data-testid="tweetText"]')?.innerHTML || '';
+		const formattedText = this.formatTweetText(tweetText);
 		const images = this.extractImages(tweet);
-		const timestamp = tweet.querySelector('time')?.getAttribute('datetime') || '';
+		const timestamp = tweet.querySelector('time');
+		const datetime = timestamp?.getAttribute('datetime') || '';
 		
 		// Get author name and handle from links
 		const nameElement = tweet.querySelector('[data-testid="User-Name"]');
 		const links = nameElement?.querySelectorAll('a');
 		const fullName = links?.[0]?.textContent?.trim() || '';
 		const handle = links?.[1]?.textContent?.trim() || '';
-		const date = timestamp ? new Date(timestamp).toISOString().split('T')[0] : '';
+		const date = datetime ? new Date(datetime).toISOString().split('T')[0] : '';
+		
+		// Get permalink from time element's parent anchor
+		const permalink = timestamp?.closest('a')?.href || '';
 
 		return `
 			<div class="tweet">
 				<div class="tweet-header">
 					<span class="tweet-author"><strong>${fullName}</strong> <span class="tweet-handle">${handle}</span></span>
-					${date ? `<span class="tweet-date">${date}</span>` : ''}
+					${date ? `<a href="${permalink}" class="tweet-date">${date}</a>` : ''}
 				</div>
-				${tweetText ? `<div class="tweet-text">${tweetText}</div>` : ''}
+				${formattedText ? `<div class="tweet-text">${formattedText}</div>` : ''}
 				${images.length ? `
 					<div class="tweet-media">
 						${images.join('\n')}
@@ -123,7 +140,8 @@ export class TwitterExtractor extends BaseExtractor {
 
 	private getTweetAuthor(): string {
 		const nameElement = this.mainTweet?.querySelector('[data-testid="User-Name"]');
-		const handle = nameElement?.querySelector('a')?.textContent?.trim() || '';
+		const links = nameElement?.querySelectorAll('a');
+		const handle = links?.[1]?.textContent?.trim() || '';
 		return handle.startsWith('@') ? handle : `@${handle}`;
 	}
 
