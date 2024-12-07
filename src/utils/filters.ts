@@ -48,6 +48,7 @@ import { unescape } from './filters/unescape';
 import { unique } from './filters/unique';
 import { upper } from './filters/upper';
 import { wikilink } from './filters/wikilink';
+import { duration } from './filters/duration';
 
 export const filters: { [key: string]: FilterFunction } = {
 	blockquote,
@@ -96,7 +97,8 @@ export const filters: { [key: string]: FilterFunction } = {
 	unescape,
 	unique,
 	upper,
-	wikilink
+	wikilink,
+	duration
 };
 
 // Split individual filters
