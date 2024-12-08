@@ -21,7 +21,7 @@ export function getAvailableLanguages(): { code: string; name: string }[] {
 		{ code: 'ko', name: '한국어' },
 		{ code: 'nl', name: 'Nederlands' },
 		{ code: 'pl', name: 'Polski' },
-		{ code: 'pt_BR', name: 'Português (Brasil)' },
+		{ code: 'pt_BR', name: 'Português do Brasil' },
 		{ code: 'ru', name: 'Русский' },
 		{ code: 'tr', name: 'Türkçe' },
 		{ code: 'zh_CN', name: '简体中文' },
