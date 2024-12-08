@@ -14,6 +14,7 @@ export function getAvailableLanguages(): { code: string; name: string }[] {
 		{ code: 'es', name: 'Español' },
 		{ code: 'fa', name: 'فارسی' },
 		{ code: 'fr', name: 'Français' },
+		{ code: 'hi', name: 'हिन्दी' },
 		{ code: 'id', name: 'Bahasa Indonesia' },
 		{ code: 'it', name: 'Italiano' },
 		{ code: 'ja', name: '日本語' },
@@ -22,6 +23,7 @@ export function getAvailableLanguages(): { code: string; name: string }[] {
 		{ code: 'pl', name: 'Polski' },
 		{ code: 'pt_BR', name: 'Português (Brasil)' },
 		{ code: 'ru', name: 'Русский' },
+		{ code: 'tr', name: 'Türkçe' },
 		{ code: 'zh_CN', name: '简体中文' },
 		{ code: 'zh_TW', name: '繁體中文' }
 	];

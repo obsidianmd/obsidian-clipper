@@ -1,0 +1,731 @@
+{
+	"addModel": {
+		"message": "+ Model ekle"
+	},
+	"addModelTitle": {
+		"message": "Model ekle"
+	},
+	"addProperty": {
+		"message": "+ Özellik ekle"
+	},
+	"addProvider": {
+		"message": "+ Sağlayıcı ekle"
+	},
+	"addProviderTitle": {
+		"message": "Sağlayıcı ekle"
+	},
+	"addToObsidian": {
+		"message": "Obsidian'a ekle"
+	},
+	"addVaultPlaceholder": {
+		"message": "Kasa eklemek için enter'a basın"
+	},
+	"advanced": {
+		"message": "Gelişmiş"
+	},
+	"allProperties": {
+		"message": "Tüm özellikler"
+	},
+	"alwaysShowHighlights": {
+		"message": "Vurguları her zaman göster"
+	},
+	"alwaysShowHighlightsDescription": {
+		"message": "Sayfa yüklendiğinde kaydettiğiniz vurguları gösterir. Vurguları yalnızca vurgulayıcı modu etkinken göstermek için kapatın."
+	},
+	"apiKeyMissing": {
+		"message": "API anahtarı yok"
+	},
+	"apiKeysWarning": {
+		"message": "Harici sağlayıcı kullandığınızda, onların şartlarını ve gizlilik politikasını kabul edersiniz..."
+	},
+	"appendToDaily": {
+		"message": "Günlük nota, sona ekle"
+	},
+	"appendToExisting": {
+		"message": "Mevcut nota, sona ekle"
+	},
+	"autoRunInterpreter": {
+		"message": "Otomatik çalıştır"
+	},
+	"autoRunInterpreterDescription": {
+		"message": "Şablon prompt değişkenleri içeriyorsa hemen çalıştırır. Bu işlem, model sağlayıcınızın API kredilerini kullanır..."
+	},
+	"behavior": {
+		"message": "Davranış"
+	},
+	"behaviorWarning": {
+		"message": "Mevcut nota veya günlük nota ekleme için Obsidian 1.7.2 veya daha yeni sürüm gereklidir."
+	},
+	"cancel": {
+		"message": "İptal"
+	},
+	"cannotDeleteProvider": {
+		"message": "\"$1\" sağlayıcısı $2 model tarafından kullanıldığı için silinemez."
+	},
+	"changelog": {
+		"message": "Değişiklik günlüğü"
+	},
+	"chooseFile": {
+		"message": "Dosya seç"
+	},
+	"choosePropertiesFile": {
+		"message": "Özellikler dosyası seç"
+	},
+	"chooseSettingsFile": {
+		"message": "Ayarlar dosyası seç"
+	},
+	"chooseTemplateFile": {
+		"message": "Şablon dosyası seç"
+	},
+	"clipBehavior": {
+		"message": "Kırpma davranışı"
+	},
+	"clipBehaviorDescription": {
+		"message": "Vurgulanan içeriğin Obsidian'a nasıl kaydedileceğini seçin. $strong_start${{content}}$strong_end$ değişkenini tanımlar.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"close": {
+		"message": "Kapat"
+	},
+	"commandOpenClipper": {
+		"message": "Obsidian Kırpıcı'yı aç"
+	},
+	"commandQuickClip": {
+		"message": "Hızlı kırp"
+	},
+	"commandToggleHighlighter": {
+		"message": "Vurgulayıcı modunu aç/kapat"
+	},
+	"confirmDeleteTemplate": {
+		"message": "\"$1\" şablonunu silmek istediğinizden emin misiniz?"
+	},
+	"confirmReplaceSettings": {
+		"message": "Bu, şablonlar ve özellikler dahil tüm mevcut ayarlarınızı değiştirecektir. Devam etmek istiyor musunuz?"
+	},
+	"copied": {
+		"message": "Kopyalandı!"
+	},
+	"copyAsJson": {
+		"message": "JSON olarak kopyala"
+	},
+	"copyToClipboard": {
+		"message": "Panoya kopyala"
+	},
+	"createNewNote": {
+		"message": "Yeni not oluştur"
+	},
+	"custom": {
+		"message": "Özel"
+	},
+	"dailyNoteFormat": {
+		"message": "Günlük not formatı (örn: YYYY-MM-DD)"
+	},
+	"defaultInterpreterContext": {
+		"message": "Varsayılan yorumlayıcı bağlamı"
+	},
+	"defaultInterpreterContextDescription": {
+		"message": "İstem değişkenlerini yorumlamak için kullanılan bağlamı geçersiz kıl. Burada değişkenler kullanılabilir."
+	},
+	"defaultTemplateName": {
+		"message": "Varsayılan"
+	},
+	"delete": {
+		"message": "Sil"
+	},
+	"deleteModelConfirm": {
+		"message": "Bu modeli silmek istediğinizden emin misiniz?"
+	},
+	"deleteProviderConfirm": {
+		"message": "Bu sağlayıcıyı silmek istediğinizden emin misiniz?"
+	},
+	"disableHighlighter": {
+		"message": "Vurgulayıcıyı devre dışı bırak"
+	},
+	"done": {
+		"message": "Tamam"
+	},
+	"dragAndDropFile": {
+		"message": "Dosyayı buraya sürükleyip bırakın"
+	},
+	"duplicate": {
+		"message": "Çoğalt"
+	},
+	"earlyAccessDescription": {
+		"message": "Obsidian'ın en son $link_start$erken erişim sürümünü$link_end$ gerektiren özellikleri kullanın. Şu anda Obsidian 1.7.2 veya daha yeni sürüm gereklidir.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/Obsidian/Early+access+versions\" target=\"_blank\">"
+			}
+		}
+	},
+	"earlyAccessFeatures": {
+		"message": "Erken erişim özellikleri"
+	},
+	"editModel": {
+		"message": "Modeli düzenle"
+	},
+	"editProvider": {
+		"message": "Sağlayıcıyı düzenle"
+	},
+	"editTemplate": {
+		"message": "Şablonu düzenle"
+	},
+	"enableHighlighter": {
+		"message": "Vurgulayıcıyı etkinleştir"
+	},
+	"enableHighlighterDescription": {
+		"message": "Web sayfalarındaki Obsidian'a kaydedebileceğiniz içeriği vurgulayın."
+	},
+	"enableInterpreter": {
+		"message": "Yorumlayıcıyı etkinleştir"
+	},
+	"enableInterpreterDescription": {
+		"message": "Sayfalardan veri çıkarmak için doğal dil kullanın. Örneğin, $strong_start${{\"sayfanın özeti\"}}$strong_end$ şablon sözdizimini kullanabilirsiniz. Aşağıda yapılandırılmış bir API anahtarı veya özel model gerektirir. $link_start$Daha fazla bilgi$link_end$",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/interpreter\" target=\"_blank\">"
+			},
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"error": {
+		"message": "Hata"
+	},
+	"export": {
+		"message": "Dışa aktar"
+	},
+	"exportAllSettings": {
+		"message": "Tüm ayarları dışa aktar"
+	},
+	"exportAllSettingsDescription": {
+		"message": "Şablonlar ve özellikler dahil tüm ayarları dışa aktar."
+	},
+	"exportHighlights": {
+		"message": "Vurguları dışa aktar"
+	},
+	"exportHighlightsDescription": {
+		"message": "Vurgularınızı bir dosyaya dışa aktarın."
+	},
+	"exportProperties": {
+		"message": "Özellikleri dışa aktar"
+	},
+	"exportPropertiesDescription": {
+		"message": "Web Kırpıcı özelliklerini, Obsidian kasanıza veya diğer cihazlardaki Web Kırpıcı'ya aktarılabilen bir $strong_start$types.json$strong_end$ dosyasına kaydedin.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"extensionDescription": {
+		"message": "Web içeriğini çevrimdışı erişebileceğiniz özel ve kalıcı bir formatta kaydedin. Obsidian'ın resmi tarayıcı uzantısı."
+	},
+	"extensionName": {
+		"message": "Obsidian Web Kırpıcı"
+	},
+	"failedToCopyText": {
+		"message": "Metin kopyalanamadı"
+	},
+	"failedToDeleteTemplate": {
+		"message": "Şablon silinemedi. Lütfen tekrar deneyin."
+	},
+	"failedToDuplicateTemplate": {
+		"message": "Şablon çoğaltılamadı. Lütfen tekrar deneyin."
+	},
+	"failedToExportHighlights": {
+		"message": "Vurgular dışa aktarılamadı. Daha fazla ayrıntı için konsolu kontrol edin."
+	},
+	"failedToExportSettings": {
+		"message": "Ayarlar dışa aktarılamadı. Daha fazla ayrıntı için konsolu kontrol edin."
+	},
+	"failedToExtractContent": {
+		"message": "Sayfa içeriği çıkarılamadı."
+	},
+	"failedToImportTemplate": {
+		"message": "Şablon içe aktarılırken hata oluştu. Lütfen dosyayı kontrol edin ve tekrar deneyin."
+	},
+	"failedToInitialize": {
+		"message": "Lütfen uzantıyı yeniden yüklemeyi deneyin."
+	},
+	"failedToInitializeContent": {
+		"message": "Sayfa içeriği başlatılamadı."
+	},
+	"failedToProcessInterpreter": {
+		"message": "Yorumlayıcı işlemi başarısız oldu. Lütfen tekrar deneyin."
+	},
+	"failedToResetProviders": {
+		"message": "Sağlayıcılar ve modeller sıfırlanamadı"
+	},
+	"failedToResetTemplate": {
+		"message": "Varsayılan şablon sıfırlanamadı. Lütfen tekrar deneyin."
+	},
+	"failedToSave": {
+		"message": "Dosya kaydedilemedi"
+	},
+	"failedToSaveFile": {
+		"message": "Dosya kaydedilemedi"
+	},
+	"failedToSaveProvider": {
+		"message": "Sağlayıcı kaydedilemedi. Lütfen tekrar deneyin."
+	},
+	"folder": {
+		"message": "Klasör"
+	},
+	"general": {
+		"message": "Genel"
+	},
+	"generalSettings": {
+		"message": "Genel ayarlar"
+	},
+	"getApiKeyHere": {
+		"message": "$1 API anahtarınızı buradan alın."
+	},
+	"help": {
+		"message": "Yardım"
+	},
+	"helpDescription": {
+		"message": "Web Kırpıcı'yı nasıl kullanacağınızı öğrenin ve sorun giderme yardımı alın."
+	},
+	"highlightInline": {
+		"message": "Sayfa içeriğini vurgula"
+	},
+	"highlightPage": {
+		"message": "Sayfayı vurgula"
+	},
+	"highlighter": {
+		"message": "Vurgulayıcı"
+	},
+	"highlighterSettings": {
+		"message": "Vurgulayıcı"
+	},
+	"hotkeys": {
+		"message": "Kısayol tuşları"
+	},
+	"import": {
+		"message": "İçe aktar"
+	},
+	"importAllSettings": {
+		"message": "Tüm ayarları içe aktar"
+	},
+	"importAllSettingsDescription": {
+		"message": "Şablonlar ve özellikler dahil tüm ayarları içe aktar. Bu, mevcut yapılandırmanızı değiştirecektir."
+	},
+	"importFailed": {
+		"message": "İçe aktarma başarısız. Daha fazla ayrıntı için konsolu kontrol edin."
+	},
+	"importModalTitle": {
+		"message": "İçe aktar"
+	},
+	"importProperties": {
+		"message": "Özellikleri içe aktar"
+	},
+	"importPropertiesDescription": {
+		"message": "Obsidian'dan özellikleri içe aktarmak için, kasanızdaki $strong_2_start$.obsidian$strong_2_end$ klasöründe $strong_1_start$types.json$strong_1_end$ dosyasını bulun. Bu klasörün çoğu işletim sisteminde varsayılan olarak gizli oldu��unu unutmayın.",
+		"placeholders": {
+			"strong_1_end": {
+				"content": "</strong>"
+			},
+			"strong_1_start": {
+				"content": "<strong>"
+			},
+			"strong_2_end": {
+				"content": "</strong>"
+			},
+			"strong_2_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"importSettings": {
+		"message": "Ayarları içe aktar"
+	},
+	"importTemplate": {
+		"message": "Şablonu içe aktar"
+	},
+	"interpret": {
+		"message": "Yorumla"
+	},
+	"interpreter": {
+		"message": "Yorumlayıcı"
+	},
+	"interpreterContext": {
+		"message": "Yorumlayıcı bağlamı"
+	},
+	"interpreterContextDescription": {
+		"message": "İstem değişkenlerini yorumlamak için kullanılan bağlam. $link_start$Yorumlayıcı ayarlarında$link_end$ tanımlanan varsayılan bağlamı geçersiz kılar. Burada değişkenler kullanılabilir.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=interpreter\">"
+			}
+		}
+	},
+	"language": {
+		"message": "Dil"
+	},
+	"languageDescription": {
+		"message": "Uzantı arayüzü için görüntüleme dilini seçin."
+	},
+	"lastUsed": {
+		"message": "Son kullanılan"
+	},
+	"legacyMode": {
+		"message": "Eski mod"
+	},
+	"legacyModeDescription": {
+		"message": "Obsidian 1.6.7 veya daha eski sürümlerle uyumlu URI kırpma yöntemini kullanır. Kırpabileceğiniz içerik uzunluğunun tarayıcınız ve işletim sisteminiz tarafından sınırlandırıldığını unutmayın. Bazı sayfalar hata vermeden başarısız olabilir."
+	},
+	"modelName": {
+		"message": "Görünen ad"
+	},
+	"modelNameDescription": {
+		"message": "Arayüzde görüntülemek istediğiniz model adı."
+	},
+	"modelProvider": {
+		"message": "Sağlayıcı"
+	},
+	"modelProviderDescription": {
+		"message": "Model sağlayıcı, örneğin Ollama, OpenRouter, Google, vb."
+	},
+	"modelProviderPlaceholder": {
+		"message": "Sağlayıcı"
+	},
+	"modelRequiredFields": {
+		"message": "Model adı, Sağlayıcı ve Model ID gereklidir."
+	},
+	"models": {
+		"message": "Modeller"
+	},
+	"more": {
+		"message": "Daha fazla"
+	},
+	"newTemplate": {
+		"message": "Yeni şablon"
+	},
+	"noHighlights": {
+		"message": "Hiçbir şey yapma"
+	},
+	"noTemplates": {
+		"message": "Kullanılabilir şablon yok. Lütfen ayarlarda bir şablon ekleyin."
+	},
+	"noUnusedProperties": {
+		"message": "Kullanılmayan özellik bulunamadı."
+	},
+	"noteContent": {
+		"message": "Not içeriği"
+	},
+	"noteContentDescription": {
+		"message": "Not içeriğini özelleştirin. Sayfadan veri ön doldurmak için değişkenleri kullanın."
+	},
+	"noteLocation": {
+		"message": "Not konumu"
+	},
+	"noteLocationDescription": {
+		"message": "Notun klasörü veya yolu."
+	},
+	"noteName": {
+		"message": "Not adı"
+	},
+	"noteNameFormat": {
+		"message": "Not adı"
+	},
+	"noteNameFormatDescription": {
+		"message": "Not dosyasının adı için format. Sayfadan veri ön doldurmak için {{title}}, {{date}} ve {{published}} gibi değişkenleri kullanabilirsiniz. $link_start$Daha fazla bilgi$link_end$",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/variables\" target=\"_blank\">"
+			}
+		}
+	},
+	"notesAboutPage": {
+		"message": "Bu sayfa hakkında notlar..."
+	},
+	"onlyHttpSupported": {
+		"message": "Bu sayfa kırpılamaz. Yalnızca http ve https URL'leri desteklenir."
+	},
+	"open": {
+		"message": "Aç"
+	},
+	"optional": {
+		"message": "(isteğe bağlı)"
+	},
+	"orPasteBelow": {
+		"message": "Veya aşağıya yapıştırın"
+	},
+	"pageCannotBeClipped": {
+		"message": "Bu sayfa kırpılamaz."
+	},
+	"pageVariables": {
+		"message": "Sayfa değişkenleri"
+	},
+	"pasteJsonHere": {
+		"message": "JSON'u buraya yapıştırın"
+	},
+	"pleaseReload": {
+		"message": "Lütfen sayfayı yeniden yüklemeyi deneyin."
+	},
+	"prependToDaily": {
+		"message": "Günlük nota, başa ekle"
+	},
+	"prependToExisting": {
+		"message": "Mevcut nota, başa ekle"
+	},
+	"processing": {
+		"message": "İşleniyor"
+	},
+	"properties": {
+		"message": "Özellikler"
+	},
+	"propertiesSettings": {
+		"message": "Özellikler"
+	},
+	"propertyName": {
+		"message": "Özellik adı"
+	},
+	"propertyValue": {
+		"message": "Özellik değeri"
+	},
+	"provider": {
+		"message": "Sağlayıcı"
+	},
+	"providerApiKey": {
+		"message": "API anahtarı"
+	},
+	"providerApiKeyDescription": {
+		"message": "Bu sağlayıcı için API anahtarınız."
+	},
+	"providerBaseUrl": {
+		"message": "Temel URL"
+	},
+	"providerBaseUrlDescription": {
+		"message": "Bu sağlayıcı için API uç noktası URL'si."
+	},
+	"providerModelId": {
+		"message": "Model ID"
+	},
+	"providerModelIdDescription": {
+		"message": "Sağlayıcınızdan modelin tanımlayıcısı. Genellikle boşluk içermeyen kısa bir ad."
+	},
+	"providerModelIdPlaceholder": {
+		"message": "Model ID"
+	},
+	"providerName": {
+		"message": "Sağlayıcı adı"
+	},
+	"providerNameDescription": {
+		"message": "Bu sağlayıcı için görünen ad."
+	},
+	"providerPreset": {
+		"message": "Ön ayar"
+	},
+	"providerPresetDescription": {
+		"message": "Bir sağlayıcı seçin veya özel bir tane oluşturun."
+	},
+	"providerRequiredFields": {
+		"message": "Sağlayıcı adı ve Temel URL gereklidir."
+	},
+	"providers": {
+		"message": "Sağlayıcılar"
+	},
+	"refresh": {
+		"message": "Yenile"
+	},
+	"remove": {
+		"message": "Kaldır"
+	},
+	"removeProperty": {
+		"message": "Özelliği kaldır"
+	},
+	"removeUnusedProperties": {
+		"message": "Kullanılmayan özellikleri kaldır"
+	},
+	"removeUnusedPropertiesDescription": {
+		"message": "Hiçbir şablonda kullanılmayan tüm özellikleri kaldır."
+	},
+	"removeVault": {
+		"message": "Kasayı kaldır"
+	},
+	"replaceContent": {
+		"message": "Sayfa içeriğini değiştir"
+	},
+	"reset": {
+		"message": "Sıfırla"
+	},
+	"resetDefaultTemplate": {
+		"message": "Varsayılan şablonu sıfırla"
+	},
+	"resetDefaultTemplateDescription": {
+		"message": "Varsayılan şablonda yapılan tüm değişiklikleri kaldır."
+	},
+	"resetProvidersAndModels": {
+		"message": "Varsayılan modelleri sıfırla"
+	},
+	"resetProvidersAndModelsDescription": {
+		"message": "Sağlayıcıları ve modelleri varsayılan ayarlara sıfırla."
+	},
+	"save": {
+		"message": "Kaydet"
+	},
+	"saveFile": {
+		"message": "Dosyayı kaydet..."
+	},
+	"searchVariables": {
+		"message": "Değişkenleri ara..."
+	},
+	"selectProvider": {
+		"message": "Sağlayıcı seç"
+	},
+	"selectTemplateToExport": {
+		"message": "Lütfen dışa aktarmak için bir şablon seçin."
+	},
+	"settings": {
+		"message": "Ayarlar"
+	},
+	"settingsHeading": {
+		"message": "Ayarlar"
+	},
+	"settingsImportSuccess": {
+		"message": "Tüm ayarlar başarıyla içe aktarıldı. Değişiklikleri görmek için lütfen sayfayı yenileyin."
+	},
+	"share": {
+		"message": "Paylaş..."
+	},
+	"shortcutInstructionsBrave": {
+		"message": "Tuş atamalarını değiştirmek için, $1 adresine gidin"
+	},
+	"shortcutInstructionsChrome": {
+		"message": "Tuş atamalarını değiştirmek için, $1 adresine gidin"
+	},
+	"shortcutInstructionsDefault": {
+		"message": "Tuş atamalarını değiştirmek için, lütfen tarayıcınızın uzantı ayarlarına bakın."
+	},
+	"shortcutInstructionsEdge": {
+		"message": "Tuş atamalarını değiştirmek için, $1 adresine gidin"
+	},
+	"shortcutInstructionsFirefox": {
+		"message": "Tuş atamalarını değiştirmek için, $1 adresine gidin, dişli simgesine tıklayın ve \"Uzantı Kısayollarını Yönet\"i seçin"
+	},
+	"shortcutInstructionsIntro": {
+		"message": "Klavye kısayolları kırpıcı özelliklerine hızlı erişim sağlar."
+	},
+	"shortcutInstructionsSafari": {
+		"message": "Safari'de klavye kısayolları özelleştirilemez."
+	},
+	"shortcutNotSet": {
+		"message": "Ayarlanmadı"
+	},
+	"showActionsButton": {
+		"message": "İşlemler düğmesini göster"
+	},
+	"showActionsDescription": {
+		"message": "Kırpıcı menüsünden sayfa değişkenlerini inceleme izni verir. Şablonlarda kullanılabilecek değişkenleri görmek için faydalıdır."
+	},
+	"showPageVariables": {
+		"message": "Sayfa değişkenlerini göster"
+	},
+	"silentOpen": {
+		"message": "Kırpılan notu açmadan kaydet"
+	},
+	"silentOpenDescription": {
+		"message": "Kırpılan notlar kaydedilecek ancak yeni sekmede açılmayacak. Obsidian yine de ön plana getirilecek."
+	},
+	"specificNoteName": {
+		"message": "Belirli not adı"
+	},
+	"systemDefault": {
+		"message": "Sistem"
+	},
+	"templateCopied": {
+		"message": "Şablon JSON'u panoya kopyalandı"
+	},
+	"templateCopyError": {
+		"message": "Şablon JSON'u panoya kopyalanamadı"
+	},
+	"templateName": {
+		"message": "Şablon adı"
+	},
+	"templateProperties": {
+		"message": "Özellikler"
+	},
+	"templatePropertiesDescription": {
+		"message": "Kırpılan notun üstüne eklenecek özellikler. Sayfadan veri ön doldurmak için değişkenleri kullanın."
+	},
+	"templateTriggers": {
+		"message": "Şablon tetikleyicileri"
+	},
+	"templateTriggersDescription": {
+		"message": "URL deseni eşleştiğinde veya schema.org verisi içerdiğinde bu şablonu otomatik olarak seçmek için kurallar tanımlayın. Her satıra bir kural."
+	},
+	"templatesHeading": {
+		"message": "Şablonlar"
+	},
+	"thinking": {
+		"message": "Düşünüyor"
+	},
+	"unknownProvider": {
+		"message": "Bilinmeyen sağlayıcı"
+	},
+	"updateAvailable": {
+		"message": "Güncelleme mevcut."
+	},
+	"usingLatestVersion": {
+		"message": "En son sürümü kullanıyorsunuz."
+	},
+	"vault": {
+		"message": "Kasa"
+	},
+	"vaultDescription": {
+		"message": "Bu şablon için varsayılan kasayı seçin. Kasa eklemek veya kaldırmak için $link_start$genel ayarlar$link_end$ bölümüne gidin.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=general\">"
+			}
+		}
+	},
+	"vaults": {
+		"message": "Kasalar"
+	},
+	"vaultsDescription": {
+		"message": "Varsayılan olarak, kırpılan notlar şu anda açık olan kasaya kaydedilir. Farklı kasalara kaydetme seçeneği istiyorsanız buraya kasa ekleyebilirsiniz. Kasa adları Obsidian kasasının adıyla tam olarak eşleşmelidir. Kasa eklemek için $strong_start$enter$strong_end$ tuşuna basın.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"version": {
+		"message": "Sürüm"
+	}
+}
