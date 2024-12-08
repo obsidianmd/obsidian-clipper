@@ -3,9 +3,10 @@ import { BaseExtractor } from './extractors/_base';
 // Extractors
 import { RedditExtractor } from './extractors/reddit';
 import { TwitterExtractor } from './extractors/twitter';
+import { YoutubeExtractor } from './extractors/youtube';
 
 
-type ExtractorConstructor = new (document: Document, url: string) => BaseExtractor;
+type ExtractorConstructor = new (document: Document, url: string, schemaOrgData?: any) => BaseExtractor;
 
 interface ExtractorMapping {
 	patterns: (string | RegExp)[];
@@ -35,20 +36,30 @@ export class ExtractorRegistry {
 			],
 			extractor: RedditExtractor
 		});
+
+		this.register({
+			patterns: [
+				'youtube.com',
+				'youtu.be',
+				/youtube\.com\/watch\?v=.*/,
+				/youtu\.be\/.*/
+			],
+			extractor: YoutubeExtractor
+		});
 	}
 
 	static register(mapping: ExtractorMapping) {
 		this.mappings.push(mapping);
 	}
 
-	static findExtractor(document: Document, url: string): BaseExtractor | null {
+	static findExtractor(document: Document, url: string, schemaOrgData?: any): BaseExtractor | null {
 		try {
 			const domain = new URL(url).hostname;
 			
 			// Check cache first
 			if (this.domainCache.has(domain)) {
 				const cachedExtractor = this.domainCache.get(domain);
-				return cachedExtractor ? new cachedExtractor(document, url) : null;
+				return cachedExtractor ? new cachedExtractor(document, url, schemaOrgData) : null;
 			}
 
 			// Find matching extractor
@@ -63,7 +74,7 @@ export class ExtractorRegistry {
 				if (matches) {
 					// Cache the result
 					this.domainCache.set(domain, extractor);
-					return new extractor(document, url);
+					return new extractor(document, url, schemaOrgData);
 				}
 			}
 

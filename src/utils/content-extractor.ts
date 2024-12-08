@@ -110,13 +110,21 @@ interface ExtractorVariables {
 	[key: string]: string;
 }
 
-export async function initializePageContent(content: string, selectedHtml: string, extractedContent: ExtractedContent, currentUrl: string, schemaOrgData: any, fullHtml: string, highlights: AnyHighlightData[]) {
+export async function initializePageContent(
+	content: string, 
+	selectedHtml: string, 
+	extractedContent: ExtractedContent, 
+	currentUrl: string, 
+	schemaOrgData: any,
+	fullHtml: string, 
+	highlights: AnyHighlightData[]
+) {
 	try {
 		const parser = new DOMParser();
 		const doc = parser.parseFromString(content, 'text/html');
 		currentUrl = currentUrl.replace(/#:~:text=[^&]+(&|$)/, '');
 
-		const extractor = ExtractorRegistry.findExtractor(doc, currentUrl);
+		const extractor = ExtractorRegistry.findExtractor(doc, currentUrl, schemaOrgData);
 		let readabilityArticle = null;
 		let extractorVariables: ExtractorVariables = {};
 		

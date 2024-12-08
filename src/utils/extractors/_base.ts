@@ -14,10 +14,12 @@ export interface ExtractorResult {
 export abstract class BaseExtractor {
 	protected document: Document;
 	protected url: string;
+	protected schemaOrgData?: any;
 
-	constructor(document: Document, url: string) {
+	constructor(document: Document, url: string, schemaOrgData?: any) {
 		this.document = document;
 		this.url = url;
+		this.schemaOrgData = schemaOrgData;
 	}
 
 	abstract canExtract(): boolean;
