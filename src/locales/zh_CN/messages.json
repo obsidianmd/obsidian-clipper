@@ -78,7 +78,7 @@
 		"message": "选择模板文件"
 	},
 	"clipBehavior": {
-		"message": "剪藏行为"
+		"message": "保存方式"
 	},
 	"clipBehaviorDescription": {
 		"message": "选择如何将高亮内容保存到 Obsidian。定义 $strong_start${{content}}$strong_end$ 变量。",

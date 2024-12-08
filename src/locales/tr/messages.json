@@ -78,7 +78,7 @@
 		"message": "Şablon dosyası seç"
 	},
 	"clipBehavior": {
-		"message": "Kırpma davranışı"
+		"message": "Kaydetme şekli"
 	},
 	"clipBehaviorDescription": {
 		"message": "Vurgulanan içeriğin Obsidian'a nasıl kaydedileceğini seçin. $strong_start${{content}}$strong_end$ değişkenini tanımlar.",
@@ -341,7 +341,7 @@
 		"message": "Özellikleri içe aktar"
 	},
 	"importPropertiesDescription": {
-		"message": "Obsidian'dan özellikleri içe aktarmak için, kasanızdaki $strong_2_start$.obsidian$strong_2_end$ klasöründe $strong_1_start$types.json$strong_1_end$ dosyasını bulun. Bu klasörün çoğu işletim sisteminde varsayılan olarak gizli oldu��unu unutmayın.",
+		"message": "Obsidian'dan özellikleri içe aktarmak için, kasanızdaki $strong_2_start$.obsidian$strong_2_end$ klasöründe $strong_1_start$types.json$strong_1_end$ dosyasını bulun. Bu klasörün çoğu işletim sisteminde varsayılan olarak gizli olduğunu unutmayın.",
 		"placeholders": {
 			"strong_1_end": {
 				"content": "</strong>"
@@ -623,7 +623,7 @@
 		"message": "Tuş atamalarını değiştirmek için, $1 adresine gidin"
 	},
 	"shortcutInstructionsDefault": {
-		"message": "Tuş atamalarını değiştirmek için, lütfen tarayıcınızın uzantı ayarlarına bakın."
+		"message": "Klavye kısayollarını değiştirmek için tarayıcı ayarlarına gidin."
 	},
 	"shortcutInstructionsEdge": {
 		"message": "Tuş atamalarını değiştirmek için, $1 adresine gidin"
@@ -653,7 +653,7 @@
 		"message": "Kırpılan notu açmadan kaydet"
 	},
 	"silentOpenDescription": {
-		"message": "Kırpılan notlar kaydedilecek ancak yeni sekmede açılmayacak. Obsidian yine de ön plana getirilecek."
+		"message": "Notlar kaydedilir ama yeni sekmede açılmaz. Obsidian yine de öne gelir."
 	},
 	"specificNoteName": {
 		"message": "Belirli not adı"
