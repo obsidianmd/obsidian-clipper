@@ -345,12 +345,25 @@ export async function initializeInterpreter(template: Template, variables: { [ke
 			storeListener(modelSelect, 'change', changeListener);
 
 			modelSelect.style.display = 'inline-block';
-			modelSelect.innerHTML = generalSettings.models
-				.filter(model => model.enabled)
+			
+			// Filter enabled models
+			const enabledModels = generalSettings.models.filter(model => model.enabled);
+			
+			modelSelect.innerHTML = enabledModels
 				.map(model => 
 					`<option value="${model.id}">${model.name}</option>`
 				).join('');
-			modelSelect.value = generalSettings.interpreterModel || (generalSettings.models[0]?.id ?? '');
+
+			// Check if last selected model exists and is enabled
+			const lastSelectedModel = enabledModels.find(model => model.id === generalSettings.interpreterModel);
+			
+			if (!lastSelectedModel && enabledModels.length > 0) {
+				// If last selected model is not available/enabled, use first enabled model
+				generalSettings.interpreterModel = enabledModels[0].id;
+				await saveSettings();
+			}
+
+			modelSelect.value = generalSettings.interpreterModel || (enabledModels[0]?.id ?? '');
 		}
 	}
 }
