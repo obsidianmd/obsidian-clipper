@@ -35,6 +35,13 @@ const PRESET_PROVIDERS: Record<string, PresetProvider> = {
 		baseUrl: 'https://generativelanguage.googleapis.com/v1beta/chat/completions',
 		apiKeyUrl: 'https://aistudio.google.com/apikey'
 	},
+	huggingface: {
+		id: 'huggingface',
+		name: 'Hugging Face',
+		baseUrl: 'https://api-inference.huggingface.co/models/{model-id}/chat/completions',
+		apiKeyUrl: 'https://huggingface.co/settings/tokens',
+		modelsList: 'https://huggingface.co/models?pipeline_tag=text-generation&sort=trending'
+	},
 	ollama: {
 		id: 'ollama',
 		name: 'Ollama',

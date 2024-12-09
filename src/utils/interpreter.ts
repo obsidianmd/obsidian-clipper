@@ -44,12 +44,31 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 			}, {} as { [key: string]: string })
 		};
 
+		let requestUrl: string;
 		let requestBody: any;
 		let headers: HeadersInit = {
 			'Content-Type': 'application/json',
 		};
 
-		if (provider.baseUrl.includes('openai.azure.com')) {
+		if (provider.name.toLowerCase().includes('hugging')) {
+			// Replace {model-id} in baseUrl with the actual model ID
+			requestUrl = provider.baseUrl.replace('{model-id}', model.providerModelId);
+			requestBody = {
+				model: model.providerModelId,
+				messages: [
+					{ role: 'system', content: systemContent },
+					{ role: 'user', content: `${promptContext}` },
+					{ role: 'user', content: `${JSON.stringify(promptContent)}` }
+				],
+				max_tokens: 1600,
+				stream: false
+			};					
+			headers = {
+				...headers,
+				'Authorization': `Bearer ${provider.apiKey}`
+			};
+		} else if (provider.baseUrl.includes('openai.azure.com')) {
+			requestUrl = provider.baseUrl;
 			requestBody = {
 				messages: [
 					{ role: 'system', content: systemContent },
@@ -57,7 +76,7 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 					{ role: 'user', content: `${JSON.stringify(promptContent)}` }
 				],
 				temperature: 0.5,
-				max_tokens: 800,
+				max_tokens: 1600,
 				stream: false
 			};
 			headers = {
@@ -65,9 +84,10 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 				'api-key': provider.apiKey
 			};
 		} else if (provider.name.toLowerCase().includes('anthropic')) {
+			requestUrl = provider.baseUrl;
 			requestBody = {
 				model: model.providerModelId,
-				max_tokens: 800,
+				max_tokens: 1600,
 				messages: [
 					{ role: 'user', content: `${promptContext}` },
 					{ role: 'user', content: `${JSON.stringify(promptContent)}` }
@@ -82,6 +102,7 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 				'anthropic-dangerous-direct-browser-access': 'true'
 			};
 		} else if (provider.name.toLowerCase().includes('ollama')) {
+			requestUrl = provider.baseUrl;
 			requestBody = {
 				model: model.providerModelId,
 				messages: [
@@ -95,6 +116,7 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 			};
 		} else {
 			// Default OpenAI-compatible request format
+			requestUrl = provider.baseUrl;
 			requestBody = {
 				model: model.providerModelId,
 				messages: [
@@ -114,7 +136,7 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 
 		debugLog('Interpreter', `Sending request to ${provider.name} API:`, requestBody);
 
-		const response = await fetch(provider.baseUrl, {
+		const response = await fetch(requestUrl, {
 			method: 'POST',
 			headers: headers,
 			body: JSON.stringify(requestBody)
