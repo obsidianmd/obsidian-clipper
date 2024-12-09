@@ -158,11 +158,19 @@ export class TwitterExtractor extends BaseExtractor {
 
 		const images: string[] = [];
 		
+		// Skip images that are inside quoted tweets
+		const quotedTweet = tweet.querySelector('[aria-labelledby*="id__"]')?.querySelector('[data-testid="User-Name"]')?.closest('[aria-labelledby*="id__"]');
+		
 		for (const selector of imageContainers) {
 			const elements = tweet.querySelectorAll(selector);
+			
 			elements.forEach(img => {
+				// Skip if the image is inside a quoted tweet
+				if (quotedTweet?.contains(img)) {
+					return;
+				}
+
 				if (img instanceof HTMLImageElement) {
-					// Get the highest quality image by removing size parameters
 					const highQualitySrc = img.src.replace(/&name=\w+$/, '&name=large');
 					const cleanAlt = img.alt?.replace(/\s+/g, ' ').trim() || '';
 					images.push(`<img src="${highQualitySrc}" alt="${cleanAlt}" />`);
