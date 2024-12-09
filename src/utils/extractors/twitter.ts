@@ -101,7 +101,7 @@ export class TwitterExtractor extends BaseExtractor {
 		const userInfo = this.extractUserInfo(tweet);
 		
 		// Extract quoted tweet if present
-		const quotedTweet = tweet.querySelector('[aria-labelledby*="id__"]');
+		const quotedTweet = tweet.querySelector('[aria-labelledby*="id__"]')?.querySelector('[data-testid="User-Name"]')?.closest('[aria-labelledby*="id__"]');
 		const quotedContent = quotedTweet ? this.extractTweet(quotedTweet) : '';
 
 		return `
