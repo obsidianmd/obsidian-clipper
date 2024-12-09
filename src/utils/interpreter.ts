@@ -165,20 +165,34 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 
 		let llmResponseContent: string;
 		if (provider.name.toLowerCase().includes('anthropic')) {
-			llmResponseContent = data.content[0]?.text || JSON.stringify(data);
+			// Handle Anthropic's nested content structure
+			const textContent = data.content[0]?.text;
+			if (textContent) {
+				try {
+					// Try to parse the inner content first
+					const parsed = JSON.parse(textContent);
+					llmResponseContent = JSON.stringify(parsed);
+				} catch {
+					// If parsing fails, use the raw text
+					llmResponseContent = textContent;
+				}
+			} else {
+				llmResponseContent = JSON.stringify(data);
+			}
 		} else if (provider.name.toLowerCase().includes('ollama')) {
 			const messageContent = data.message?.content;
 			if (messageContent) {
 				try {
-					const parsedContent = JSON.parse(messageContent);
-					llmResponseContent = JSON.stringify(parsedContent);
-				} catch (error) {
+					const parsed = JSON.parse(messageContent);
+					llmResponseContent = JSON.stringify(parsed);
+				} catch {
 					llmResponseContent = messageContent;
 				}
 			} else {
 				llmResponseContent = JSON.stringify(data);
 			}
 		} else {
+			// OpenAI and others
 			llmResponseContent = data.choices[0]?.message?.content || JSON.stringify(data);
 		}
 		debugLog('Interpreter', 'Processed LLM response:', llmResponseContent);
@@ -198,34 +212,83 @@ function parseLLMResponse(responseContent: string, promptVariables: PromptVariab
 	try {
 		let parsedResponse: LLMResponse;
 		
-		// If responseContent is already an object, stringify it first to normalize it
+		// If responseContent is already an object, convert to string
 		if (typeof responseContent === 'object') {
 			responseContent = JSON.stringify(responseContent);
 		}
 
-		// First try parsing the entire response
+		// Helper function to sanitize JSON string
+		const sanitizeJsonString = (str: string) => {
+			// First, escape all quotes that are part of the content
+			let result = str.replace(/(?<!\\)"/g, '\\"');
+			
+			// Then unescape the quotes that are JSON structural elements
+			// This regex matches quotes that are preceded by {, [, :, or comma
+			result = result.replace(/(?<=[{[,:]\s*)\\"/g, '"');
+			// This regex matches quotes that are followed by }, ], :, or comma
+			result = result.replace(/\\"(?=\s*[}\],:}])/g, '"');
+			
+			return result
+				// Replace curly quotes
+				.replace(/[""]/g, '\\"')
+				// Properly escape newlines
+				.replace(/\n/g, '\\n')
+				// Remove any bad control characters
+				.replace(/[\u0000-\u001F\u007F-\u009F]/g, '')
+				// Remove any whitespace between quotes and colons
+				.replace(/"\s*:/g, '":')
+				.replace(/:\s*"/g, ':"')
+				// Fix any triple or more backslashes
+				.replace(/\\{3,}/g, '\\');
+		};
+
+		// First try to parse the content directly
 		try {
-			// Replace any raw newlines in strings with \n before parsing
-			const sanitizedContent = responseContent.replace(/(?<=":)(\s*"[^"]*(?:\r?\n)[^"]*")(?=,?)/g, (match) => {
-				return match.replace(/\r?\n/g, '\\n');
-			});
+			const sanitizedContent = sanitizeJsonString(responseContent);
+			debugLog('Interpreter', 'Sanitized content:', sanitizedContent);
 			parsedResponse = JSON.parse(sanitizedContent);
 		} catch (e) {
-			// If that fails, try to find and parse JSON content
+			// If direct parsing fails, try to extract and parse the JSON content
 			const jsonMatch = responseContent.match(/\{[\s\S]*\}/);
 			if (!jsonMatch) {
 				throw new Error('No JSON object found in response');
 			}
-			// Sanitize the matched JSON string
-			const sanitizedMatch = jsonMatch[0].replace(/(?<=":)(\s*"[^"]*(?:\r?\n)[^"]*")(?=,?)/g, (match) => {
-				return match.replace(/\r?\n/g, '\\n');
-			});
-			parsedResponse = JSON.parse(sanitizedMatch);
+
+			// Try parsing with minimal sanitization first
+			try {
+				const minimalSanitized = jsonMatch[0]
+					.replace(/[""]/g, '"')
+					.replace(/\n/g, '\\n');
+				parsedResponse = JSON.parse(minimalSanitized);
+			} catch (minimalError) {
+				// If minimal sanitization fails, try full sanitization
+				const sanitizedMatch = sanitizeJsonString(jsonMatch[0]);
+				debugLog('Interpreter', 'Fully sanitized match:', sanitizedMatch);
+				
+				try {
+					parsedResponse = JSON.parse(sanitizedMatch);
+				} catch (fullError) {
+					// Last resort: try to manually rebuild the JSON structure
+					const contentMatch = jsonMatch[0].match(/"prompt_1":\s*"([^]*?)(?:"}|"\s*})/);
+					if (!contentMatch) {
+						throw new Error('Could not extract prompt content');
+					}
+					
+					const content = contentMatch[1]
+						.replace(/\\/g, '\\\\')
+						.replace(/"/g, '\\"')
+						.replace(/\n/g, '\\n');
+					
+					const rebuiltJson = `{"prompts_responses":{"prompt_1":"${content}"}}`;
+					debugLog('Interpreter', 'Rebuilt JSON:', rebuiltJson);
+					parsedResponse = JSON.parse(rebuiltJson);
+				}
+			}
 		}
 
-		// If we don't have prompts_responses, return empty array
-		if (!parsedResponse.prompts_responses) {
-			debugLog('Interpreter', 'No prompts_responses found in parsed response');
+		// Validate the response structure
+		if (!parsedResponse?.prompts_responses) {
+			debugLog('Interpreter', 'No prompts_responses found in parsed response', parsedResponse);
 			return { promptResponses: [] };
 		}
 
@@ -236,10 +299,14 @@ function parseLLMResponse(responseContent: string, promptVariables: PromptVariab
 			user_response: parsedResponse.prompts_responses[variable.key] || ''
 		}));
 
-		debugLog('Interpreter', 'Mapped prompt responses:', promptResponses);
+		debugLog('Interpreter', 'Successfully mapped prompt responses:', promptResponses);
 		return { promptResponses };
 	} catch (parseError) {
-		debugLog('Interpreter', 'Failed to parse response as JSON:', parseError);
+		console.error('Failed to parse LLM response:', parseError);
+		debugLog('Interpreter', 'Parse error details:', {
+			error: parseError,
+			responseContent: responseContent
+		});
 		return { promptResponses: [] };
 	}
 }
