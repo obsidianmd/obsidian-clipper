@@ -64,7 +64,7 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 				...headers,
 				'api-key': provider.apiKey
 			};
-		} else if (provider.id === 'anthropic') {
+		} else if (provider.name.toLowerCase().includes('anthropic')) {
 			requestBody = {
 				model: model.providerModelId,
 				max_tokens: 800,
@@ -142,7 +142,7 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 		lastRequestTime = now;
 
 		let llmResponseContent: string;
-		if (provider.id === 'anthropic') {
+		if (provider.name.toLowerCase().includes('anthropic')) {
 			llmResponseContent = data.content[0]?.text || JSON.stringify(data);
 		} else if (provider.name.toLowerCase().includes('ollama')) {
 			const messageContent = data.message?.content;
