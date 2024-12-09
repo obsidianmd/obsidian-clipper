@@ -17,8 +17,8 @@ export let generalSettings: Settings = {
 	models: [
 		{ id: 'gpt-4o-mini', providerId: 'openai', providerModelId: 'gpt-4o-mini', name: 'GPT-4o Mini', enabled: true },
 		{ id: 'gpt-4o', providerId: 'openai', providerModelId: 'gpt-4o', name: 'GPT-4o', enabled: true },
-		{ id: 'claude-3-5-sonnet-20240620', providerId: 'anthropic', providerModelId: 'claude-3-sonnet-20240620', name: 'Claude 3.5 Sonnet', enabled: true },
-		{ id: 'claude-3-haiku-20240307', providerId: 'anthropic', providerModelId: 'claude-3-haiku-20240307', name: 'Claude 3 Haiku', enabled: true },
+		{ id: 'claude-3-5-sonnet-latest', providerId: 'anthropic', providerModelId: 'claude-3-5-sonnet-latest', name: 'Claude 3.5 Sonnet', enabled: true },
+		{ id: 'claude-3-5-haiku-latest', providerId: 'anthropic', providerModelId: 'claude-3-5-haiku-latest', name: 'Claude 3.5 Haiku', enabled: true },
 	],
 	providers: [
 		{
