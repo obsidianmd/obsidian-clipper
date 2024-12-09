@@ -1,14 +1,40 @@
 import { BaseExtractor, ExtractorResult } from './_base';
 
 export class TwitterExtractor extends BaseExtractor {
-	private mainTweet: Element | null;
-	private threadTweets: Element[];
+	private mainTweet: Element | null = null;
+	private threadTweets: Element[] = [];
 
 	constructor(document: Document, url: string) {
 		super(document, url);
-		// Get the main tweet and any thread tweets
-		this.mainTweet = document.querySelector('article[data-testid="tweet"]');
-		this.threadTweets = Array.from(document.querySelectorAll('article[data-testid="tweet"]')).slice(1);
+		
+		// Get all tweets from the timeline
+		const timeline = document.querySelector('[aria-label="Timeline: Conversation"]');
+		if (!timeline) {
+			// Try to find a single tweet if not in timeline view
+			const singleTweet = document.querySelector('article[data-testid="tweet"]');
+			if (singleTweet) {
+				this.mainTweet = singleTweet;
+			}
+			return;
+		}
+
+		// Get all tweets before any section with "Discover more" or similar headings
+		const allTweets = Array.from(timeline.querySelectorAll('article[data-testid="tweet"]'));
+		const firstSection = timeline.querySelector('section, h2')?.parentElement;
+		
+		if (firstSection) {
+			// Filter out tweets that appear after the first section
+			allTweets.forEach((tweet, index) => {
+				if (firstSection.compareDocumentPosition(tweet) & Node.DOCUMENT_POSITION_FOLLOWING) {
+					allTweets.splice(index);
+					return false;
+				}
+			});
+		}
+
+		// Set main tweet and thread tweets
+		this.mainTweet = allTweets[0] || null;
+		this.threadTweets = allTweets.slice(1);
 	}
 
 	canExtract(): boolean {
@@ -17,7 +43,7 @@ export class TwitterExtractor extends BaseExtractor {
 
 	extract(): ExtractorResult {
 		const mainContent = this.extractTweet(this.mainTweet);
-		const threadContent = this.threadTweets.map(tweet => this.extractTweet(tweet)).join('\n\n');
+		const threadContent = this.threadTweets.map(tweet => this.extractTweet(tweet)).join('\n<hr>\n');
 		
 		const contentHtml = `
 			<div class="tweet-thread">
@@ -25,6 +51,7 @@ export class TwitterExtractor extends BaseExtractor {
 					${mainContent}
 				</div>
 				${threadContent ? `
+					<hr>
 					<div class="thread-tweets">
 						${threadContent}
 					</div>
