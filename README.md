@@ -38,8 +38,6 @@ In no particular order:
 - [ ] Template directory
 - [ ] Template validation
 - [ ] Template logic (if/for)
-- [x] Save Markdown with inline highlights
-- [x] RTL support
 
 ## Developers
 
