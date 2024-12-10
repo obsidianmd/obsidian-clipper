@@ -4,8 +4,13 @@ interface NavigatorExtended extends Navigator {
 	};
 }
 
-export async function detectBrowser(): Promise<'chrome' | 'firefox' | 'firefox-mobile' | 'brave' | 'edge' | 'safari' | 'mobile-safari' | 'ipad-os' | 'other'> {
+export async function detectBrowser(): Promise<'chrome' | 'firefox' | 'firefox-mobile' | 'brave' | 'edge' | 'safari' | 'mobile-safari' | 'ipad-os' | 'orion' | 'other'> {
 	const userAgent = navigator.userAgent.toLowerCase();
+	
+	// Check for Orion first since it's based on WebKit/Safari
+	if ('KAGI' in window) {
+		return 'orion';
+	}
 	
 	if (userAgent.includes('firefox')) {
 		return userAgent.includes('mobile') ? 'firefox-mobile' : 'firefox';
@@ -40,7 +45,18 @@ export async function addBrowserClassToHtml() {
 	const htmlElement = document.documentElement;
 
 	// Remove any existing browser classes
-	htmlElement.classList.remove('is-firefox-mobile', 'is-chromium', 'is-firefox', 'is-edge', 'is-chrome', 'is-brave', 'is-safari', 'is-mobile-safari', 'is-ipad-os');
+	htmlElement.classList.remove(
+		'is-firefox-mobile',
+		'is-chromium',
+		'is-firefox',
+		'is-edge',
+		'is-chrome',
+		'is-brave',
+		'is-safari',
+		'is-mobile-safari',
+		'is-ipad-os',
+		'is-orion'
+	);
 
 	// Add the appropriate class based on the detected browser
 	switch (browser) {
@@ -67,6 +83,9 @@ export async function addBrowserClassToHtml() {
 			break;
 		case 'ipad-os':
 			htmlElement.classList.add('is-tablet', 'is-ipad-os', 'is-safari');
+			break;
+		case 'orion':
+			htmlElement.classList.add('is-orion');
 			break;
 		default:
 			// For 'other' browsers, we don't add any class
