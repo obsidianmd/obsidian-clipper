@@ -1,6 +1,16 @@
 export const table = (str: string): string => {
+	// Handle empty or invalid input
+	if (!str || str === 'undefined' || str === 'null') {
+		return str;
+	}
+
 	try {
 		const data = JSON.parse(str);
+
+		// Handle null or undefined after parsing
+		if (data === null || data === undefined) {
+			return str;
+		}
 
 		// Function to escape pipe characters in cell content
 		const escapeCell = (cell: string) => cell.replace(/\|/g, '\\|');
