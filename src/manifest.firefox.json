@@ -3,7 +3,7 @@
 	"default_locale": "en",
 	"name": "Obsidian Web Clipper",
 	"homepage_url": "https://obsidian.md/",
-	"version": "0.10.5",
+	"version": "0.10.6",
 	"description": "Save content from the web in a private and durable format that you can access offline. The official browser extension for Obsidian.",
 	"permissions": [
 		"activeTab",
