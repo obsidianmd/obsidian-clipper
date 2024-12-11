@@ -62,10 +62,6 @@ export async function extractPageContent(tabId: number): Promise<ContentResponse
 	try {
 		const response = await browser.tabs.sendMessage(tabId, { action: "getPageContent" }) as ContentResponse;
 		if (response && response.content) {
-			const tidyArticle = Tidy.parseFromString(response.content);
-			if (tidyArticle) {
-				response.content = tidyArticle.content;
-			}
 
 			// Ensure highlights are of the correct type
 			if (response.highlights && Array.isArray(response.highlights)) {
