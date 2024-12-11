@@ -1,4 +1,9 @@
 export const join = (str: string, param?: string): string => {
+	// Return early if input is empty or invalid
+	if (!str || str === 'undefined' || str === 'null') {
+		return '';
+	}
+
 	let array;
 	try {
 		array = JSON.parse(str);
