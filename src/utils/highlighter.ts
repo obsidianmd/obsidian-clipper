@@ -93,6 +93,7 @@ export function toggleHighlighterMenu(isActive: boolean) {
 		if (!generalSettings.alwaysShowHighlights) {
 			removeExistingHighlights();
 		}
+		document.body.classList.remove('overflowHidden');
 	}
 	updateHighlightListeners();
 }
@@ -667,6 +668,7 @@ export function clearHighlights() {
 			notifyHighlightsUpdated();
 			updateHighlighterMenu();
 			addToHistory('remove', oldHighlights, []);
+			document.body.classList.remove('overflowHidden'); // Remove overflowHidden class
 		});
 	});
 }
