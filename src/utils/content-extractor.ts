@@ -62,15 +62,9 @@ export async function extractPageContent(tabId: number): Promise<ContentResponse
 	try {
 		const response = await browser.tabs.sendMessage(tabId, { action: "getPageContent" }) as ContentResponse;
 		if (response && response.content) {
-			const parser = new DOMParser();
-			const doc = parser.parseFromString(response.content, 'text/html');
-
-			const tidyArticle = extractTidyContent(doc);
+			const tidyArticle = Tidy.parseFromString(response.content);
 			if (tidyArticle) {
 				response.content = tidyArticle.content;
-				response.extractedContent = {
-					...response.extractedContent
-				};
 			}
 
 			// Ensure highlights are of the correct type
@@ -153,9 +147,8 @@ export async function initializePageContent(
 			const tidyArticle = extractTidyContent(doc);
 			if (tidyArticle && tidyArticle.content) {
 				content = tidyArticle.content;
-				extractedContent = {
-					...extractedContent
-				};
+			} else {
+				content = doc.body.innerHTML || fullHtml;
 			}
 		}
 
