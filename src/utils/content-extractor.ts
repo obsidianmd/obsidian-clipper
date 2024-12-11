@@ -2,7 +2,7 @@ import { ExtractedContent } from '../types/types';
 import { ExtractorRegistry } from './extractor-registry';
 import { createMarkdownContent } from './markdown-converter';
 import { sanitizeFileName } from './string-utils';
-import { Readability } from '@mozilla/readability';
+import { Tidy } from './tidy';
 import browser from './browser-polyfill';
 import { debugLog } from './debug';
 import dayjs from 'dayjs';
@@ -40,12 +40,11 @@ function stripHtml(html: string): string {
 	return div.textContent || '';
 }
 
-export function extractReadabilityContent(doc: Document): ReturnType<Readability['parse']> | null {
+export function extractTidyContent(doc: Document): ReturnType<typeof Tidy.parse> | null {
 	try {
-		const reader = new Readability(doc, {keepClasses:true})
-		return reader.parse();
+		return Tidy.parse(doc);
 	} catch (error) {
-		console.error('Error in extractReadabilityContent:', error);
+		console.error('Error in extractTidyContent:', error);
 		return null;
 	}
 }
@@ -63,6 +62,17 @@ export async function extractPageContent(tabId: number): Promise<ContentResponse
 	try {
 		const response = await browser.tabs.sendMessage(tabId, { action: "getPageContent" }) as ContentResponse;
 		if (response && response.content) {
+			const parser = new DOMParser();
+			const doc = parser.parseFromString(response.content, 'text/html');
+
+			const tidyArticle = extractTidyContent(doc);
+			if (tidyArticle) {
+				response.content = tidyArticle.content;
+				response.extractedContent = {
+					...response.extractedContent
+				};
+			}
+
 			// Ensure highlights are of the correct type
 			if (response.highlights && Array.isArray(response.highlights)) {
 				response.highlights = response.highlights.map((highlight: string | AnyHighlightData) => {
@@ -105,7 +115,6 @@ export function getMetaContent(doc: Document, attr: string, value: string): stri
 	return element ? element.getAttribute("content")?.trim() ?? "" : "";
 }
 
-// At the beginning of the file, add this interface
 interface ExtractorVariables {
 	[key: string]: string;
 }
@@ -125,7 +134,7 @@ export async function initializePageContent(
 		currentUrl = currentUrl.replace(/#:~:text=[^&]+(&|$)/, '');
 
 		const extractor = ExtractorRegistry.findExtractor(doc, currentUrl, schemaOrgData);
-		let readabilityArticle = null;
+		let tidyArticle = null;
 		let extractorVariables: ExtractorVariables = {};
 		
 		if (selectedHtml) {
@@ -141,11 +150,12 @@ export async function initializePageContent(
 				extractorVariables = extractedResult.variables;
 			}
 		} else {
-			readabilityArticle = extractReadabilityContent(doc);
-			if (readabilityArticle && readabilityArticle.content) {
-				content = readabilityArticle.content;
-			} else {
-				content = doc.body.innerHTML || fullHtml;
+			const tidyArticle = extractTidyContent(doc);
+			if (tidyArticle && tidyArticle.content) {
+				content = tidyArticle.content;
+				extractedContent = {
+					...extractedContent
+				};
 			}
 		}
 
@@ -228,7 +238,7 @@ export async function initializePageContent(
 
 		// Process highlights after getting the base content
 		if (generalSettings.highlighterEnabled && generalSettings.highlightBehavior !== 'no-highlights' && highlights && highlights.length > 0) {
-			content = processHighlights(content, highlights, readabilityArticle);
+			content = processHighlights(content, highlights, tidyArticle);
 		}
 
 		const markdownBody = createMarkdownContent(content, currentUrl);
@@ -450,7 +460,7 @@ function getSchemaProperty(schemaOrgData: any, property: string, defaultValue: s
 
 getSchemaProperty.memoized = new Map<string, string>();
 
-function processHighlights(content: string, highlights: AnyHighlightData[], readabilityArticle: ReturnType<Readability['parse']> | null): string {
+function processHighlights(content: string, highlights: AnyHighlightData[], tidyArticle: ReturnType<typeof Tidy.parse> | null): string {
 	// First check if highlighter is enabled and we have highlights
 	if (!generalSettings.highlighterEnabled || !highlights?.length) {
 		return content;
@@ -466,8 +476,8 @@ function processHighlights(content: string, highlights: AnyHighlightData[], read
 	}
 
 	if (generalSettings.highlightBehavior === 'highlight-inline') {
-		// Use readability content if available, otherwise fall back to original content
-		const processedContent = readabilityArticle?.content || content;
+		// Use Tidy content if available, otherwise fall back to original content
+		const processedContent = tidyArticle?.content || content;
 		debugLog('Highlights', 'Using content length:', processedContent.length);
 
 		const tempDiv = document.createElement('div');
