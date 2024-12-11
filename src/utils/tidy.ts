@@ -11,7 +11,21 @@ export class Tidy {
 	private static BLOCK_ELEMENTS = ['div', 'section', 'article', 'main'];
 
 	/**
-	 * Main entry point - cleans up a document and returns the main content
+	 * Main entry point - cleans up HTML content and returns the main content
+	 */
+	static parseFromString(html: string) {
+		try {
+			const parser = new DOMParser();
+			const doc = parser.parseFromString(html, 'text/html');
+			return this.parse(doc);
+		} catch (error) {
+			console.error('Error parsing HTML:', error);
+			return null;
+		}
+	}
+
+	/**
+	 * Internal method to process an already parsed document
 	 */
 	static parse(doc: Document) {
 		debugLog('Tidy', 'Starting content extraction');
