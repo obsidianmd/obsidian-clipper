@@ -439,4 +439,5 @@ export function removeExistingHighlights() {
 	if (existingHighlights.length > 0) {
 		existingHighlights.forEach(el => el.remove());
 	}
+	document.body.classList.remove('overflowHidden');
 }
