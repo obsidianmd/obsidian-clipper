@@ -1,5 +1,17 @@
 import { applyFilters } from '../filters';
 
+function splitListString(str: string): string[] {
+	return str
+		// Split on numbered items (1. 2. etc) or bullet points (- * •)
+		.split(/(?=\d+\.|[-*•]\s)/)
+		.map(item => item
+			// Remove list markers
+			.replace(/^(?:\d+\.|[-*•])\s*/, '')
+			.trim()
+		)
+		.filter(item => item.length > 0);
+}
+
 export async function processSchema(match: string, variables: { [key: string]: string }, currentUrl: string): Promise<string> {
 	const [, fullSchemaKey] = match.match(/{{schema:(.*?)}}/) || [];
 	const [schemaKey, ...filterParts] = fullSchemaKey.split('|');
@@ -21,24 +33,44 @@ export async function processSchema(match: string, variables: { [key: string]: s
 			}
 		}
 
-		const arrayValue = JSON.parse(variables[`{{schema:${fullArrayKey}}}`] || '[]');
-		if (Array.isArray(arrayValue)) {
-			if (indexOrStar === '*') {
-				schemaValue = JSON.stringify(arrayValue.map(item => getNestedProperty(item, propertyKey.slice(1))).filter(Boolean));
+		try {
+			const rawValue = variables[`{{schema:${fullArrayKey}}}`] || '[]';
+			
+			// Check if the raw value looks like any kind of list
+			if (rawValue.trim().match(/^(?:\d+\.|[-*•]\s)/m)) {
+				const list = splitListString(rawValue);
+				if (indexOrStar === '*') {
+					schemaValue = JSON.stringify(list);
+				} else {
+					const index = parseInt(indexOrStar, 10);
+					schemaValue = list[index] || '';
+				}
 			} else {
-				const index = parseInt(indexOrStar, 10);
-				schemaValue = arrayValue[index] ? getNestedProperty(arrayValue[index], propertyKey.slice(1)) : '';
+				// Handle as JSON
+				const arrayValue = JSON.parse(rawValue);
+				if (Array.isArray(arrayValue)) {
+					if (indexOrStar === '*') {
+						schemaValue = JSON.stringify(arrayValue.map(item => getNestedProperty(item, propertyKey.slice(1))).filter(Boolean));
+					} else {
+						const index = parseInt(indexOrStar, 10);
+						schemaValue = arrayValue[index] ? getNestedProperty(arrayValue[index], propertyKey.slice(1)) : '';
+					}
+				}
 			}
+		} catch (error) {
+			console.error('Error processing schema array:', error);
+			console.error('Raw value:', variables[`{{schema:${fullArrayKey}}}`]);
+			return '';
 		}
 	} else {
-		// Shorthand handling for non-array schemas
+		// Handle non-array schemas
 		if (!schemaKey.includes('@')) {
 			const matchingKey = Object.keys(variables).find(key => key.includes('@') && key.endsWith(`:${schemaKey}}}`));
 			if (matchingKey) {
 				schemaValue = variables[matchingKey];
 			}
 		}
-		// If no matching shorthand found or it's a full key, use the original logic
+		// If no matching shorthand found or it's a full key
 		if (!schemaValue) {
 			schemaValue = variables[`{{schema:${schemaKey}}}`] || '';
 		}
