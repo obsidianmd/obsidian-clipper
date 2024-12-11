@@ -231,8 +231,6 @@ function parseLLMResponse(responseContent: string, promptVariables: PromptVariab
 			return result
 				// Replace curly quotes
 				.replace(/[""]/g, '\\"')
-				// Properly escape newlines
-				.replace(/\n/g, '\\n')
 				// Remove any bad control characters
 				.replace(/[\u0000-\u001F\u007F-\u009F]/g, '')
 				// Remove any whitespace between quotes and colons
@@ -257,8 +255,7 @@ function parseLLMResponse(responseContent: string, promptVariables: PromptVariab
 			// Try parsing with minimal sanitization first
 			try {
 				const minimalSanitized = jsonMatch[0]
-					.replace(/[""]/g, '"')
-					.replace(/\n/g, '\\n');
+					.replace(/[""]/g, '"');
 				parsedResponse = JSON.parse(minimalSanitized);
 			} catch (minimalError) {
 				// If minimal sanitization fails, try full sanitization
@@ -276,8 +273,7 @@ function parseLLMResponse(responseContent: string, promptVariables: PromptVariab
 					
 					const content = contentMatch[1]
 						.replace(/\\/g, '\\\\')
-						.replace(/"/g, '\\"')
-						.replace(/\n/g, '\\n');
+						.replace(/"/g, '\\"');
 					
 					const rebuiltJson = `{"prompts_responses":{"prompt_1":"${content}"}}`;
 					debugLog('Interpreter', 'Rebuilt JSON:', rebuiltJson);
@@ -291,6 +287,15 @@ function parseLLMResponse(responseContent: string, promptVariables: PromptVariab
 			debugLog('Interpreter', 'No prompts_responses found in parsed response', parsedResponse);
 			return { promptResponses: [] };
 		}
+
+		// Convert escaped newlines to actual newlines in the responses
+		Object.keys(parsedResponse.prompts_responses).forEach(key => {
+			if (typeof parsedResponse.prompts_responses[key] === 'string') {
+				parsedResponse.prompts_responses[key] = parsedResponse.prompts_responses[key]
+					.replace(/\\n/g, '\n')
+					.replace(/\r/g, '');
+			}
+		});
 
 		// Map the responses to their prompts
 		const promptResponses = promptVariables.map(variable => ({
