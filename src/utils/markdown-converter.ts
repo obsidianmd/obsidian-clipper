@@ -526,8 +526,14 @@ export function createMarkdownContent(content: string, url: string) {
 				} else if (element instanceof HTMLElement) {
 					let text = '';
 					element.childNodes.forEach(child => {
-						if (child instanceof HTMLElement && child.classList.contains('ec-line')) {
-							text += extractStructuredText(child) + '\n';
+						if (child instanceof HTMLElement) {
+							if (child.classList.contains('ec-line')) {
+								text += extractStructuredText(child) + '\n';
+							} else if (child.tagName === 'BR') {
+								text += '\n';
+							} else {
+								text += extractStructuredText(child);
+							}
 						} else {
 							text += extractStructuredText(child);
 						}
