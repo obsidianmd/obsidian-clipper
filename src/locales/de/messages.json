@@ -27,16 +27,16 @@
 		"message": "Alle Eigenschaften"
 	},
 	"alwaysShowHighlights": {
-		"message": "Hervorhebungen immer anzeigen"
+		"message": "Markierung immer anzeigen"
 	},
 	"alwaysShowHighlightsDescription": {
-		"message": "Zeigt deine gespeicherten Hervorhebungen beim Laden einer Seite an. Deaktiviere dies, um Hervorhebungen nur anzuzeigen, wenn der Hervorhebungsmodus aktiviert ist."
+		"message": "Zeigt deine gespeicherten Markierung beim Laden einer Seite an. Deaktiviere dies, um Markierungen nur anzuzeigen, wenn der Hervorhebungsmodus aktiviert ist."
 	},
 	"apiKeyMissing": {
 		"message": "Kein API-Schlüssel"
 	},
 	"apiKeysWarning": {
-		"message": "Durch die Nutzung eines externen Anbieters stimmst du dessen Nutzungsbedingungen und Datenschutzrichtlinien zu. Interpreter-Anfragen werden direkt an den von dir gewählten Anbieter gesendet. Obsidian sammelt oder speichert keine Daten über deine Anfragen."
+		"message": "Durch die Nutzung eines externen Anbieters stimmst du dessen Nutzungsbedingungen und Datenschutzrichtlinien zu. Interpreter-Anfragen werden direkt an den von dir gewählten Anbieter gesendet. Obsidian sammelt und speichert keine Daten über deine Anfragen."
 	},
 	"appendToDaily": {
 		"message": "Zur Tagesnotiz am Ende hinzufügen"
@@ -81,7 +81,7 @@
 		"message": "Speicherverhalten"
 	},
 	"clipBehaviorDescription": {
-		"message": "Wählen Sie, wie hervorgehobener Inhalt in Obsidian gespeichert wird. Definiert die $strong_start${{content}}$strong_end$ Variable.",
+		"message": "Wählen Sie, wie markierter Inhalt in Obsidian gespeichert wird. Definiert die $strong_start${{content}}$strong_end$ Variable.",
 		"placeholders": {
 			"strong_end": {
 				"content": "</strong>"
@@ -95,7 +95,7 @@
 		"message": "Schließen"
 	},
 	"commandOpenClipper": {
-		"message": "Obsidian Web Clipper öffnen"
+		"message": "Obsidian Web-Clipper öffnen"
 	},
 	"commandQuickClip": {
 		"message": "Schnelles Ausschneiden"
@@ -228,7 +228,7 @@
 		"message": "Eigenschaften exportieren"
 	},
 	"exportPropertiesDescription": {
-		"message": "Speichern Sie Web Clipper Eigenschaften in einer $strong_start$types.json$strong_end$ Datei, die in Ihren Obsidian-Vault oder in Web Clipper auf anderen Geräten importiert werden kann.",
+		"message": "Speichern Sie Web-Clipper Eigenschaften in einer $strong_start$types.json$strong_end$ Datei, die in Ihren Obsidian-Vault oder in Web-Clipper auf anderen Geräten importiert werden kann.",
 		"placeholders": {
 			"strong_end": {
 				"content": "</strong>"
@@ -242,7 +242,7 @@
 		"message": "Speichern Sie Webinhalte in einem privaten und dauerhaften Format, auf das Sie offline zugreifen können. Die offizielle Browser-Erweiterung für Obsidian."
 	},
 	"extensionName": {
-		"message": "Obsidian Web Clipper"
+		"message": "Obsidian Web-Clipper"
 	},
 	"failedToCopyText": {
 		"message": "Text konnte nicht kopiert werden"
@@ -305,7 +305,7 @@
 		"message": "Hilfe"
 	},
 	"helpDescription": {
-		"message": "Lernen Sie, wie Sie den Web Clipper verwenden und erhalten Sie Hilfe bei der Fehlerbehebung."
+		"message": "Lernen Sie, wie Sie den Web-Clipper verwenden und erhalten Sie Hilfe bei der Fehlerbehebung."
 	},
 	"highlightInline": {
 		"message": "Seiteninhalt hervorheben"
@@ -441,7 +441,7 @@
 		"message": "Passen Sie den Inhalt der Notiz an. Verwenden Sie Variablen, um Daten von der Seite vorab auszufüllen."
 	},
 	"noteLocation": {
-		"message": "Notizstandort"
+		"message": "Notizspeicherort"
 	},
 	"noteLocationDescription": {
 		"message": "Der Ordner oder Pfad der Notiz."
