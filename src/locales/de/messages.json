@@ -27,10 +27,10 @@
 		"message": "Alle Eigenschaften"
 	},
 	"alwaysShowHighlights": {
-		"message": "Markierung immer anzeigen"
+		"message": "Markierungen immer anzeigen"
 	},
 	"alwaysShowHighlightsDescription": {
-		"message": "Zeigt deine gespeicherten Markierung beim Laden einer Seite an. Deaktiviere dies, um Markierungen nur anzuzeigen, wenn der Hervorhebungsmodus aktiviert ist."
+		"message": "Zeigt deine gespeicherten Markierungen beim Laden einer Seite an. Deaktiviere dies, um Markierungen nur anzuzeigen, wenn der Hervorhebungsmodus aktiviert ist."
 	},
 	"apiKeyMissing": {
 		"message": "Kein API-Schlüssel"
