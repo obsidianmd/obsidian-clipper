@@ -30,25 +30,25 @@
 		"message": "Markierungen immer anzeigen"
 	},
 	"alwaysShowHighlightsDescription": {
-		"message": "Zeigt deine gespeicherten Markierungen beim Laden einer Seite an. Deaktiviere dies, um Markierungen nur anzuzeigen, wenn der Hervorhebungsmodus aktiviert ist."
+		"message": "Zeigt Ihre gespeicherten Markierungen beim Laden einer Seite an. Deaktiviere dies, um Markierungen nur anzuzeigen, wenn der Markiermodus aktiviert ist."
 	},
 	"apiKeyMissing": {
 		"message": "Kein API-Schlüssel"
 	},
 	"apiKeysWarning": {
-		"message": "Durch die Nutzung eines externen Anbieters stimmst du dessen Nutzungsbedingungen und Datenschutzrichtlinien zu. Interpreter-Anfragen werden direkt an den von dir gewählten Anbieter gesendet. Obsidian sammelt und speichert keine Daten über deine Anfragen."
+		"message": "Durch die Nutzung eines externen Anbieters stimmen Sie dessen Nutzungsbedingungen und Datenschutzrichtlinien zu. Interpreter-Anfragen werden direkt an den von dir gewählten Anbieter gesendet. Obsidian sammelt und speichert keine Daten über Ihre Anfragen."
 	},
 	"appendToDaily": {
-		"message": "Zur Tagesnotiz am Ende hinzufügen"
+		"message": "Zum Ende der Tagesnotiz hinzufügen"
 	},
 	"appendToExisting": {
-		"message": "Zu bestehender Notiz am Ende hinzufügen"
+		"message": "Zum Ende einer bestehenden Notiz hinzufügen"
 	},
 	"autoRunInterpreter": {
 		"message": "Automatisch ausführen"
 	},
 	"autoRunInterpreterDescription": {
-		"message": "Führt Prompt-Variablen sofort aus, wenn die Vorlage welche enthält. Dies verbraucht API-Guthaben bei deinem Modellanbieter. Deaktiviere dies, wenn du den Interpreter nur manuell ausführen möchtest."
+		"message": "Führt Prompt-Variablen sofort aus, wenn die Vorlage welche enthält. Dies verbraucht API-Guthaben bei Ihrem Modellanbieter. Deaktivieren Sie dies, wenn Sie den Interpreter nur manuell ausführen möchten."
 	},
 	"behavior": {
 		"message": "Verhalten"
@@ -63,7 +63,7 @@
 		"message": "Anbieter \"$1\" kann nicht gelöscht werden, da er von $2 Modell(en) verwendet wird."
 	},
 	"changelog": {
-		"message": "Änderungsprotokoll"
+		"message": "Änderungsverlauf"
 	},
 	"chooseFile": {
 		"message": "Datei auswählen"
@@ -101,13 +101,13 @@
 		"message": "Schnelles Ausschneiden"
 	},
 	"commandToggleHighlighter": {
-		"message": "Hervorhebungsmodus umschalten"
+		"message": "Markiermodus umschalten"
 	},
 	"confirmDeleteTemplate": {
-		"message": "Möchtest du die Vorlage \"$1\" wirklich löschen?"
+		"message": "Möchten Sie die Vorlage \"$1\" wirklich löschen?"
 	},
 	"confirmReplaceSettings": {
-		"message": "Dies wird alle deine aktuellen Einstellungen, einschließlich Vorlagen und Eigenschaften, ersetzen. Möchtest du wirklich fortfahren?"
+		"message": "Dies wird alle Ihre aktuellen Einstellungen, einschließlich Vorlagen und Eigenschaften, ersetzen. Möchten Sie wirklich fortfahren?"
 	},
 	"copied": {
 		"message": "Kopiert!"
@@ -146,7 +146,7 @@
 		"message": "Sind Sie sicher, dass Sie diesen Anbieter löschen möchten?"
 	},
 	"disableHighlighter": {
-		"message": "Hervorheber deaktivieren"
+		"message": "Marker deaktivieren"
 	},
 	"done": {
 		"message": "fertig"
@@ -181,7 +181,7 @@
 		"message": "Vorlage bearbeiten"
 	},
 	"enableHighlighter": {
-		"message": "Hervorheber aktivieren"
+		"message": "Marker aktivieren"
 	},
 	"enableHighlighterDescription": {
 		"message": "Heben Sie Inhalte auf Webseiten hervor, die Sie in Obsidian speichern möchten."
@@ -190,7 +190,7 @@
 		"message": "Interpreter aktivieren"
 	},
 	"enableInterpreterDescription": {
-		"message": "Nutze natürliche Sprache, um Daten aus Seiten zu extrahieren. Du kannst zum Beispiel die Vorlagensyntax $strong_start${{\"eine Zusammenfassung der Seite\"}}$strong_end$ verwenden. Erfordert einen API-Schlüssel oder ein unten konfiguriertes benutzerdefiniertes Modell. $link_start$Mehr erfahren$link_end$.",
+		"message": "Nutze natürliche Sprache, um Daten aus Seiten zu extrahieren. Sie können zum Beispiel die Vorlagensyntax $strong_start${{\"eine Zusammenfassung der Seite\"}}$strong_end$ verwenden. Erfordert einen API-Schlüssel oder ein unten konfiguriertes benutzerdefiniertes Modell. $link_start$Mehr erfahren$link_end$.",
 		"placeholders": {
 			"link_end": {
 				"content": "</a>"
@@ -219,10 +219,10 @@
 		"message": "Exportieren Sie alle Einstellungen einschließlich Vorlagen und Eigenschaften."
 	},
 	"exportHighlights": {
-		"message": "Hervorhebungen exportieren"
+		"message": "Markierungen exportieren"
 	},
 	"exportHighlightsDescription": {
-		"message": "Exportieren Sie Ihre Hervorhebungen in eine Datei."
+		"message": "Exportieren Sie Ihre Markierungen in eine Datei."
 	},
 	"exportProperties": {
 		"message": "Eigenschaften exportieren"
@@ -308,16 +308,16 @@
 		"message": "Lernen Sie, wie Sie den Web-Clipper verwenden und erhalten Sie Hilfe bei der Fehlerbehebung."
 	},
 	"highlightInline": {
-		"message": "Seiteninhalt hervorheben"
+		"message": "Seiteninhalt markieren"
 	},
 	"highlightPage": {
-		"message": "Seite hervorheben"
+		"message": "Seite markieren"
 	},
 	"highlighter": {
-		"message": "Hervorheber"
+		"message": "Marker"
 	},
 	"highlighterSettings": {
-		"message": "Hervorheber"
+		"message": "Marker"
 	},
 	"hotkeys": {
 		"message": "Tastenkombinationen"
@@ -341,7 +341,7 @@
 		"message": "Eigenschaften importieren"
 	},
 	"importPropertiesDescription": {
-		"message": "Um deine Eigenschaften aus Obsidian zu importieren, suche die $strong_1_start$types.json$strong_1_end$ Datei im $strong_2_start$.obsidian$strong_2_end$ Ordner in deinem Vault. Beachte, dass dieser Ordner standardmäßig auf den meisten Betriebssystemen versteckt ist.",
+		"message": "Um Ihre Eigenschaften aus Obsidian zu importieren, suche die $strong_1_start$types.json$strong_1_end$ Datei im $strong_2_start$.obsidian$strong_2_end$ Ordner in Ihren Vault. Beachte, dass dieser Ordner standardmäßig auf den meisten Betriebssystemen versteckt ist.",
 		"placeholders": {
 			"strong_1_end": {
 				"content": "</strong>"
@@ -453,7 +453,7 @@
 		"message": "Notizname"
 	},
 	"noteNameFormatDescription": {
-		"message": "Format für den Dateinamen der Notiz. Du kannst Variablen wie {{title}}, {{date}} und {{published}} verwenden, um Daten von der Seite vorab auszufüllen. $link_start$Mehr erfahren$link_end$.",
+		"message": "Format für den Dateinamen der Notiz. Sie können Variablen wie {{title}}, {{date}} und {{published}} verwenden, um Daten von der Seite vorab auszufüllen. $link_start$Mehr erfahren$link_end$.",
 		"placeholders": {
 			"link_end": {
 				"content": "</a>"
@@ -650,10 +650,10 @@
 		"message": "Seitenvariablen anzeigen"
 	},
 	"silentOpen": {
-		"message": "Ausgeschnittene Notiz ohne Öffnen speichern"
+		"message": "Ausgeschnittene Notiz ohne öffnen speichern"
 	},
 	"silentOpenDescription": {
-		"message": "Ausgeschnittene Notizen werden gespeichert, aber nicht als neuer Tab geöffnet. Obsidian wird trotzdem in den Vordergrund gebracht."
+		"message": "Ausgeschnittene Notizen werden gespeichert, aber nicht in einem neuen Tab geöffnet. Obsidian wird trotzdem in den Vordergrund gebracht."
 	},
 	"specificNoteName": {
 		"message": "Spezifischer Notizname"
@@ -715,7 +715,7 @@
 		"message": "Vaulte"
 	},
 	"vaultsDescription": {
-		"message": "Standardmäßig werden ausgeschnittene Notizen im aktuell geöffneten Vault gespeichert. Du kannst hier Vaults hinzufügen, wenn du die Option haben möchtest, in verschiedenen Vaults zu speichern. Vaultnamen müssen exakt mit dem Namen des Obsidian-Vaults übereinstimmen. Drücke $strong_start$Enter$strong_end$, um einen Vault hinzuzufügen.",
+		"message": "Standardmäßig werden ausgeschnittene Notizen im aktuell geöffneten Vault gespeichert. Sie können hier Vaults hinzufügen, wenn Sie die Option haben möchten, in verschiedenen Vaults zu speichern. Vaultnamen müssen exakt mit dem Namen des Obsidian-Vaults übereinstimmen. Drücke $strong_start$Enter$strong_end$, um einen Vault hinzuzufügen.",
 		"placeholders": {
 			"strong_end": {
 				"content": "</strong>"
