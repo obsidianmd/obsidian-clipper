@@ -5,6 +5,122 @@ import { debugLog } from './debug';
 
 const footnotes: { [key: string]: string } = {};
 
+const SUPPORTED_LANGUAGES = new Set([
+	// Markup & Web
+	'markup', 'html', 'xml', 'svg', 'mathml', 'ssml', 'atom', 'rss',
+	'javascript', 'js', 'jsx', 'typescript', 'ts', 'tsx',
+	'webassembly', 'wasm',
+	
+	// Common Programming Languages
+	'python',
+	'java',
+	'csharp', 'cs', 'dotnet', 'aspnet',
+	'cpp', 'c++', 'c', 'objc',
+	'ruby', 'rb',
+	'php',
+	'golang',
+	'rust',
+	'swift',
+	'kotlin',
+	'scala',
+	'dart',
+	
+	// Shell & Scripting
+	'bash', 'shell', 'sh',
+	'powershell',
+	'batch',
+	
+	// Data & Config
+	'json', 'jsonp',
+	'yaml', 'yml',
+	'toml',
+	'dockerfile',
+	'gitignore',
+	
+	// Query Languages
+	'sql', 'mysql', 'postgresql',
+	'graphql',
+	'mongodb',
+	'sparql',
+	
+	// Markup & Documentation
+	'markdown', 'md',
+	'latex', 'tex',
+	'asciidoc', 'adoc',
+	'jsdoc',
+	
+	// Functional Languages
+	'haskell', 'hs',
+	'elm',
+	'elixir',
+	'erlang',
+	'ocaml',
+	'fsharp',
+	'scheme',
+	'lisp', 'elisp',
+	'clojure',
+	
+	// Other Languages
+	'matlab',
+	'fortran',
+	'cobol',
+	'pascal',
+	'perl',
+	'lua',
+	'julia',
+	'groovy',
+	'crystal',
+	'nim',
+	'zig',
+	
+	// Domain Specific
+	'regex',
+	'gradle',
+	'cmake',
+	'makefile',
+	'nix',
+	'terraform',
+	'solidity',
+	'glsl',
+	'hlsl',
+	
+	// Assembly
+	'nasm',
+	'masm',
+	'armasm',
+	
+	// Game Development
+	'gdscript',
+	'unrealscript',
+	
+	// Others
+	'abap',
+	'actionscript',
+	'ada',
+	'agda',
+	'antlr4',
+	'applescript',
+	'arduino',
+	'coffeescript',
+	'django',
+	'erlang',
+	'fortran',
+	'haxe',
+	'idris',
+	'kotlin',
+	'livescript',
+	'matlab',
+	'nginx',
+	'pascal',
+	'prolog',
+	'puppet',
+	'scala',
+	'scheme',
+	'tcl',
+	'verilog',
+	'vhdl'
+]);
+
 export function createMarkdownContent(content: string, url: string) {
 	debugLog('Markdown', 'Starting markdown conversion for URL:', url);
 	debugLog('Markdown', 'Content length:', content.length);
@@ -482,72 +598,117 @@ export function createMarkdownContent(content: string, url: string) {
 		replacement: (content, node) => {
 			if (!(node instanceof HTMLElement)) return content;
 
-			const codeElement = node.querySelector('code');
-
 			// Function to get language from class
-			const getLanguageFromClass = (classList: DOMTokenList): string => {
-				for (const className of Array.from(classList)) {
-					if (className.startsWith('language-')) {
-						return className.slice(9); // Remove 'language-' prefix
+			const getLanguageFromClass = (element: HTMLElement): string => {
+				// Check data-lang attribute first
+				const dataLang = element.getAttribute('data-lang');
+				if (dataLang) {
+					return dataLang.toLowerCase();
+				}
+
+				// Define language patterns
+				const languagePatterns = [
+					/^language-(\w+)$/,          // language-javascript
+					/^lang-(\w+)$/,              // lang-javascript
+					/^(\w+)-code$/,              // javascript-code
+					/^code-(\w+)$/,              // code-javascript
+					/^syntax-(\w+)$/,            // syntax-javascript
+					/^code-snippet__(\w+)$/,     // code-snippet__javascript
+					/^highlight-(\w+)$/,         // highlight-javascript
+					/^(\w+)-snippet$/            // javascript-snippet
+				];
+
+				// Then check the class attribute for patterns
+				if (element.className && typeof element.className === 'string') {
+					for (const pattern of languagePatterns) {
+						const match = element.className.toLowerCase().match(pattern);
+						if (match) {
+							return match[1].toLowerCase();
+						}
+					}
+					// Then check for supported language
+					if (SUPPORTED_LANGUAGES.has(element.className.toLowerCase())) {
+						return element.className.toLowerCase();
 					}
 				}
+
+				const classNames = Array.from(element.classList);
+				
+				for (const className of classNames) {
+					// Check patterns first
+					for (const pattern of languagePatterns) {
+						const match = className.match(pattern);
+						if (match) {
+							return match[1].toLowerCase();
+						}
+					}
+				}
+
+				// Only check bare language names if no patterns were found
+				for (const className of classNames) {
+					if (SUPPORTED_LANGUAGES.has(className.toLowerCase())) {
+						return className.toLowerCase();
+					}
+				}
+
 				return '';
 			};
 
-			// Try to get the language from the class attribute
+			// Try to get the language from the element and its ancestors
 			let language = '';
+			let currentElement: HTMLElement | null = node;
 			
-			// Check pre element
-			language = getLanguageFromClass(node.classList);
-			
-			// Check code element if language not found
-			if (!language && codeElement) {
-				language = getLanguageFromClass(codeElement.classList);
-			}
-			
-			// Check parent elements if language still not found
-			if (!language) {
-				let parent = node.parentElement;
-				while (parent && !language) {
-					language = getLanguageFromClass(parent.classList);
-					parent = parent.parentElement;
+			while (currentElement && !language) {
+				language = getLanguageFromClass(currentElement);
+				
+				// Also check for code elements within the current element
+				if (!language && currentElement.querySelector('code')) {
+					language = getLanguageFromClass(currentElement.querySelector('code')!);
 				}
+				
+				currentElement = currentElement.parentElement;
 			}
 
-			// If no language found in class, fallback to data-language
-			if (!language) {
-				language = node.dataset.language || '';
-			}
+			// Extract and clean up code content
+			// ... rest of the existing code block handling ...
 
 			// Function to recursively extract text content while preserving structure
 			const extractStructuredText = (element: Node): string => {
 				if (element.nodeType === Node.TEXT_NODE) {
 					return element.textContent || '';
-				} else if (element instanceof HTMLElement) {
-					let text = '';
-					element.childNodes.forEach(child => {
-						if (child instanceof HTMLElement) {
-							if (child.classList.contains('ec-line')) {
-								text += extractStructuredText(child) + '\n';
-							} else if (child.tagName === 'BR') {
-								text += '\n';
-							} else {
-								text += extractStructuredText(child);
-							}
-						} else {
-							text += extractStructuredText(child);
-						}
-					});
-					return text;
 				}
-				return '';
+				
+				let text = '';
+				if (element instanceof HTMLElement) {
+					// Handle line breaks
+					if (element.tagName === 'BR') {
+						return '\n';
+					}
+					
+					// Handle code elements and their children
+					element.childNodes.forEach(child => {
+						text += extractStructuredText(child);
+					});
+					
+					// Add newline after each code element
+					if (element.tagName === 'CODE') {
+						text += '\n';
+					}
+				}
+				return text;
 			};
 
-			// Extract all text content from the pre element or its code child
-			let codeContent = codeElement ? extractStructuredText(codeElement) : extractStructuredText(node);
+			// Extract all text content
+			let codeContent = extractStructuredText(node);
 
-			// Remove any extra newlines at the start or end
-			codeContent = codeContent.replace(/^\n+|\n+$/g, '');
+			// Clean up the content
+			codeContent = codeContent
+				// Remove any extra newlines at the start
+				.replace(/^\n+/, '')
+				// Remove any extra newlines at the end
+				.replace(/\n+$/, '')
+				// Replace multiple consecutive newlines with a single newline
+				.replace(/\n{3,}/g, '\n\n');
 
 			// Escape any backticks in the code
 			const escapedCode = codeContent.replace(/`/g, '\\`');
