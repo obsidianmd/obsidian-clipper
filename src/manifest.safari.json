@@ -68,5 +68,15 @@
 			},
 			"description": "Toggle highlighter mode"
 		}
-	}
+	},
+	"web_accessible_resources": [
+		{
+			"resources": [
+				"icons/*",
+				"highlighter.css",
+				"tidy.css"
+			],
+			"matches": ["<all_urls>"]
+		}
+	]
 }
