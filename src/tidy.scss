@@ -1,66 +1,21 @@
-#obsidian-tidy-container {
-	position: fixed;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	background: white;
-	z-index: 999999;
-	padding: 20px;
-	overflow-y: auto;
-	font-family: system-ui, -apple-system, sans-serif;
-	line-height: 1.6;
-}
-
-.obsidian-tidy-toolbar {
-	position: sticky;
-	top: 0;
-	text-align: right;
-	padding: 10px;
-	background: white;
-	border-bottom: 1px solid #eee;
-}
-
-.obsidian-tidy-close {
-	background: none;
-	border: none;
-	font-size: 24px;
-	cursor: pointer;
-	padding: 5px 10px;
-	color: #666;
-
-	&:hover {
-		color: #000;
-	}
-}
-
-.obsidian-tidy-content {
-	max-width: 800px;
-	margin: 0 auto;
-	padding: 20px;
-
-	img {
-		max-width: 100%;
-		height: auto;
-	}
-}
-
-@media (prefers-color-scheme: dark) {
-	#obsidian-tidy-container {
-		background: #1a1a1a;
-		color: #eee;
-	}
-
-	.obsidian-tidy-toolbar {
-		background: #1a1a1a;
-		border-color: #333;
-	}
-
-	.obsidian-tidy-close {
-		color: #999;
-
-		&:hover {
-			color: #fff;
+body {
+    
+	&.obsidian-tidy-active {
+        font-size: 16px !important;
+        width: 42rem !important;
+        max-width: 90% !important;
+        margin: 0 auto !important;
+        line-height: 1.6 !important;
+        font-family: system-ui, -apple-system, sans-serif !important;
+		
+		@media (prefers-color-scheme: dark) {
+			background: #1a1a1a;
+			color: #eee;
 		}
 	}
-} 
+}
+
+#tidy-mode.active {
+	background-color: rgba(255, 255, 255, 0.2) !important;
+	color: white !important;
+}

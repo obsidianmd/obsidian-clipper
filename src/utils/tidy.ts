@@ -9,6 +9,23 @@ export class Tidy {
 	private static POSITIVE_PATTERNS = /article|content|main|post|body|text|blog|story/i;
 	private static NEGATIVE_PATTERNS = /comment|meta|footer|footnote|foot|nav|sidebar|banner|ad|popup|menu/i;
 	private static BLOCK_ELEMENTS = ['div', 'section', 'article', 'main'];
+	
+	// Add viewport meta tag to simulate mobile view
+	private static MOBILE_VIEWPORT = 'width=device-width, initial-scale=1, maximum-scale=1';
+	
+	private static HIDDEN_ELEMENTS_SELECTOR = [
+		'[aria-hidden="true"]',
+		'[hidden]',
+		'[style*="display: none"]',
+		'[style*="display:none"]',
+		'[style*="visibility: hidden"]',
+		'[style*="visibility:hidden"]',
+		'.hidden',
+		'.invisible'
+	].join(',');
+
+	private static originalHTML: string | null = null;
+	private static isActive: boolean = false;
 
 	/**
 	 * Main entry point - cleans up HTML content and returns the main content
@@ -17,6 +34,23 @@ export class Tidy {
 		try {
 			const parser = new DOMParser();
 			const doc = parser.parseFromString(html, 'text/html');
+			
+			// Simulate mobile viewport
+			const viewport = doc.createElement('meta');
+			viewport.setAttribute('name', 'viewport');
+			viewport.setAttribute('content', this.MOBILE_VIEWPORT);
+			doc.head.appendChild(viewport);
+			
+			// Force mobile media queries
+			const mobileStyle = doc.createElement('style');
+			mobileStyle.textContent = `
+				@media screen {
+					:root { max-width: 600px !important; }
+					body { max-width: 600px !important; }
+				}
+			`;
+			doc.head.appendChild(mobileStyle);
+
 			return this.parse(doc);
 		} catch (error) {
 			console.error('Error parsing HTML:', error);
@@ -30,16 +64,76 @@ export class Tidy {
 	static parse(doc: Document) {
 		debugLog('Tidy', 'Starting content extraction');
 
-		// First try to find the main content area
+		// Remove hidden elements first
+		this.removeHiddenElements(doc);
+		
+		// Remove common clutter elements
+		this.removeClutter(doc);
+
+		// Find main content
 		const mainContent = this.findMainContent(doc);
 		if (!mainContent) {
 			debugLog('Tidy', 'No main content found');
 			return null;
 		}
 
+		// Clean up the main content
+		this.cleanContent(mainContent);
+
 		return {
 			content: mainContent.outerHTML
 		};
+	}
+
+	private static removeHiddenElements(doc: Document) {
+		const hiddenElements = doc.querySelectorAll(this.HIDDEN_ELEMENTS_SELECTOR);
+		hiddenElements.forEach(el => el.remove());
+	}
+
+	private static removeClutter(doc: Document) {
+		const clutterSelectors = [
+			'link',
+			'iframe',
+			'nav',
+			'header:not(:first-child)',
+			'footer',
+			'[role="complementary"]',
+			'[role="banner"]',
+			'[role="navigation"]',
+			'.social-share',
+			'.related-articles',
+			'.recommended',
+			'#comments',
+			'.comments',
+		];
+
+		clutterSelectors.forEach(selector => {
+			doc.querySelectorAll(selector).forEach(el => el.remove());
+		});
+	}
+
+	private static cleanContent(element: Element) {
+		// Remove empty paragraphs and divs
+		element.querySelectorAll('p, div').forEach(el => {
+			if (!el.textContent?.trim() && !el.querySelector('img')) {
+				el.remove();
+			}
+		});
+
+		// Remove tracking pixels and tiny images
+		element.querySelectorAll('img').forEach(img => {
+			const width = parseInt(img.getAttribute('width') || '0');
+			const height = parseInt(img.getAttribute('height') || '0');
+			if (width <= 1 || height <= 1) {
+				img.remove();
+			}
+		});
+
+		// Remove click tracking attributes
+		element.querySelectorAll('[onclick], [data-tracking]').forEach(el => {
+			el.removeAttribute('onclick');
+			el.removeAttribute('data-tracking');
+		});
 	}
 
 	private static findMainContent(doc: Document): Element | null {
@@ -123,6 +217,70 @@ export class Tidy {
 		score += Math.min(images * 3, 9);
 
 		return score;
+	}
+
+	static toggle(doc: Document): boolean {
+		if (this.isActive) {
+			this.restore(doc);
+			return false;
+		} else {
+			this.apply(doc);
+			return true;
+		}
+	}
+
+	static apply(doc: Document) {
+		// Store original HTML for restoration
+		this.originalHTML = doc.documentElement.outerHTML;
+		
+		// Add viewport meta for mobile simulation
+		let viewport = doc.querySelector('meta[name="viewport"]');
+		if (!viewport) {
+			viewport = doc.createElement('meta');
+			viewport.setAttribute('name', 'viewport');
+			doc.head.appendChild(viewport);
+		}
+		viewport.setAttribute('content', this.MOBILE_VIEWPORT);
+
+		// Force mobile width
+		const mobileStyle = doc.createElement('style');
+		mobileStyle.id = 'obsidian-tidy-style';
+		mobileStyle.textContent = `
+			@media screen {
+				:root { max-width: 600px !important; margin: 0 auto !important; }
+				body { max-width: 600px !important; margin: 0 auto !important; padding: 20px !important; }
+			}
+		`;
+		doc.head.appendChild(mobileStyle);
+
+		// Remove hidden elements
+		this.removeHiddenElements(doc);
+		
+		// Remove clutter
+		this.removeClutter(doc);
+
+		// Find and clean main content
+		const mainContent = this.findMainContent(doc);
+		if (mainContent) {
+			this.cleanContent(mainContent);
+			// Replace body content with main content
+			doc.body.innerHTML = mainContent.outerHTML;
+		}
+
+		this.isActive = true;
+	}
+
+	static restore(doc: Document) {
+		if (this.originalHTML) {
+			// Remove our custom style
+			doc.getElementById('obsidian-tidy-style')?.remove();
+			
+			// Restore the original HTML
+			doc.documentElement.innerHTML = this.originalHTML;
+			
+			this.originalHTML = null;
+			this.isActive = false;
+		}
 	}
 
 } 

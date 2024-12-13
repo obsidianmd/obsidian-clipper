@@ -24,6 +24,12 @@ import { debounce } from '../utils/debounce';
 import { sanitizeFileName } from '../utils/string-utils';
 import { saveFile } from '../utils/file-utils';
 import { translatePage, getMessage, setupLanguageAndDirection } from '../utils/i18n';
+import { Tidy } from '../utils/tidy';
+
+interface TidyModeResponse {
+	success: boolean;
+	isActive: boolean;
+}
 
 let loadedSettings: Settings;
 let currentTemplate: Template | null = null;
@@ -1150,9 +1156,19 @@ window.addEventListener('resize', debouncedSetPopupDimensions);
 
 async function toggleTidyMode(tabId: number) {
 	try {
-		await browser.tabs.sendMessage(tabId, { 
+		const response = await browser.tabs.sendMessage(tabId, { 
 			action: "toggleTidyMode"
-		});
+		}) as TidyModeResponse;
+
+		// Update button state if successful
+		if (response && response.success) {
+			const tidyButton = document.getElementById('tidy-mode');
+			if (tidyButton) {
+				const isActive = response.isActive ?? false;
+				tidyButton.classList.toggle('active', isActive);
+				tidyButton.setAttribute('aria-pressed', isActive.toString());
+			}
+		}
 
 		// Close the popup if not in side panel
 		if (!isSidePanel) {

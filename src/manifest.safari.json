@@ -40,7 +40,7 @@
 		{
 			"matches": ["http://*/*", "https://*/*"],
 			"js": ["content.js"],
-			"css": ["highlighter.css"]
+			"css": ["highlighter.css", "tidy.css"]
 		}
 	],
 	"content_security_policy": {
@@ -68,15 +68,5 @@
 			},
 			"description": "Toggle highlighter mode"
 		}
-	},
-	"web_accessible_resources": [
-		{
-			"resources": [
-				"icons/*",
-				"highlighter.css",
-				"tidy.css"
-			],
-			"matches": ["<all_urls>"]
-		}
-	]
+	}
 }
