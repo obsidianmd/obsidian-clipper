@@ -42,7 +42,7 @@
 		{
 			"matches": ["http://*/*", "https://*/*"],
 			"js": ["content.js"],
-			"css": ["highlighter.css"]
+			"css": ["highlighter.css", "tidy.css"]
 		}
 	],
 	"content_security_policy": {
@@ -70,15 +70,5 @@
 			},
 			"description": "__MSG_commandToggleHighlighter__"
 		}
-	},
-	"web_accessible_resources": [
-		{
-			"resources": [
-				"icons/*",
-				"highlighter.css",
-				"tidy.css"
-			],
-			"matches": ["<all_urls>"]
-		}
-	]
+	}
 }
