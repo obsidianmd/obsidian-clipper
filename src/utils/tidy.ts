@@ -37,9 +37,6 @@ export class Tidy {
 			return null;
 		}
 
-		// Clean up the content
-		this.cleanup(mainContent);
-
 		return {
 			content: mainContent.outerHTML
 		};
@@ -128,49 +125,4 @@ export class Tidy {
 		return score;
 	}
 
-	private static cleanup(element: Element): void {
-		// Remove unwanted elements
-		const unwanted = element.querySelectorAll([
-			'script',
-			'style',
-			'iframe:not([src*="youtube"]):not([src*="vimeo"])',
-			'form',
-			'[class*="comment"]',
-			'[id*="comment"]',
-			'[class*="share"]',
-			'[class*="social"]',
-			'[class*="related"]',
-			'nav',
-			'header:not(:first-child)',
-			'footer',
-			'.ad',
-			'#ad',
-			'[role="complementary"]',
-			'aside',
-		].join(','));
-
-		unwanted.forEach(el => el.remove());
-
-		// Clean up attributes
-		this.cleanAttributes(element);
-	}
-
-	private static cleanAttributes(element: Element): void {
-		// Keep only essential attributes
-		const keepAttributes = ['src', 'href', 'alt', 'title', 'datetime'];
-		
-		const cleanElement = (el: Element) => {
-			// Remove all attributes except those in keepAttributes
-			Array.from(el.attributes).forEach(attr => {
-				if (!keepAttributes.includes(attr.name)) {
-					el.removeAttribute(attr.name);
-				}
-			});
-
-			// Recursively clean child elements
-			Array.from(el.children).forEach(child => cleanElement(child));
-		};
-
-		cleanElement(element);
-	}
 } 
