@@ -64,10 +64,14 @@ export class Tidy {
 	static parse(doc: Document) {
 		debugLog('Tidy', 'Starting content extraction');
 
+		// Store existing styles before cleaning
+		const existingStyles = Array.from(doc.querySelectorAll('style')).map(style => style.cloneNode(true));
+		const existingLinks = Array.from(doc.querySelectorAll('link[rel="stylesheet"]')).map(link => link.cloneNode(true));
+
 		// Remove hidden elements first
 		this.removeHiddenElements(doc);
 		
-		// Remove common clutter elements
+		// Remove common clutter
 		this.removeClutter(doc);
 
 		// Find main content
@@ -81,7 +85,9 @@ export class Tidy {
 		this.cleanContent(mainContent);
 
 		return {
-			content: mainContent.outerHTML
+			content: mainContent.outerHTML,
+			styles: existingStyles,
+			styleLinks: existingLinks
 		};
 	}
 
@@ -91,25 +97,25 @@ export class Tidy {
 	}
 
 	private static removeClutter(doc: Document) {
-		const clutterSelectors = [
-			'link',
-			'iframe',
-			'nav',
-			'header:not(:first-child)',
-			'footer',
-			'[role="complementary"]',
-			'[role="banner"]',
-			'[role="navigation"]',
-			'.social-share',
-			'.related-articles',
-			'.recommended',
-			'#comments',
-			'.comments',
-		];
+		// const clutterSelectors = [
+		// 	'link',
+		// 	'iframe',
+		// 	'nav',
+		// 	'header:not(:first-child)',
+		// 	'footer',
+		// 	'[role="complementary"]',
+		// 	'[role="banner"]',
+		// 	'[role="navigation"]',
+		// 	'.social-share',
+		// 	'.related-articles',
+		// 	'.recommended',
+		// 	'#comments',
+		// 	'.comments',
+		// ];
 
-		clutterSelectors.forEach(selector => {
-			doc.querySelectorAll(selector).forEach(el => el.remove());
-		});
+		// clutterSelectors.forEach(selector => {
+		// 	doc.querySelectorAll(selector).forEach(el => el.remove());
+		// });
 	}
 
 	private static cleanContent(element: Element) {
@@ -233,6 +239,10 @@ export class Tidy {
 		// Store original HTML for restoration
 		this.originalHTML = doc.documentElement.outerHTML;
 		
+		// Store existing styles before cleaning
+		const existingStyles = Array.from(doc.querySelectorAll('style')).map(style => style.cloneNode(true));
+		const existingLinks = Array.from(doc.querySelectorAll('link[rel="stylesheet"]')).map(link => link.cloneNode(true));
+		
 		// Add viewport meta for mobile simulation
 		let viewport = doc.querySelector('meta[name="viewport"]');
 		if (!viewport) {
@@ -242,22 +252,21 @@ export class Tidy {
 		}
 		viewport.setAttribute('content', this.MOBILE_VIEWPORT);
 
-		// Force mobile width
-		const mobileStyle = doc.createElement('style');
-		mobileStyle.id = 'obsidian-tidy-style';
-		mobileStyle.textContent = `
-			@media screen {
-				:root { max-width: 600px !important; margin: 0 auto !important; }
-				body { max-width: 600px !important; margin: 0 auto !important; padding: 20px !important; }
-			}
-		`;
-		doc.head.appendChild(mobileStyle);
+		// // Force mobile width
+		// const mobileStyle = doc.createElement('style');
+		// mobileStyle.id = 'obsidian-tidy-style';
+		// mobileStyle.textContent = `
+		// 	@media screen {
+		// 		:root { max-width: 600px !important; margin: 0 auto !important; }
+		// 		body { max-width: 600px !important; margin: 0 auto !important; padding: 20px !important; }
+		// 	}
+		// `;
 
 		// Remove hidden elements
 		this.removeHiddenElements(doc);
 		
 		// Remove clutter
-		this.removeClutter(doc);
+		// this.removeClutter(doc);
 
 		// Find and clean main content
 		const mainContent = this.findMainContent(doc);
@@ -266,6 +275,12 @@ export class Tidy {
 			// Replace body content with main content
 			doc.body.innerHTML = mainContent.outerHTML;
 		}
+
+		// Restore original styles and add our custom style
+		doc.head.innerHTML = ''; // Clear head to rebuild it
+		existingLinks.forEach(link => doc.head.appendChild(link));
+		existingStyles.forEach(style => doc.head.appendChild(style));
+		// doc.head.appendChild(mobileStyle);
 
 		this.isActive = true;
 	}
