@@ -1,6 +1,7 @@
 import browser from './utils/browser-polyfill';
 import * as highlighter from './utils/highlighter';
 import { loadSettings, generalSettings } from './utils/storage-utils';
+import { Tidy } from './utils/tidy';
 
 declare global {
 	interface Window {
@@ -205,6 +206,38 @@ declare global {
 					sendResponse({ isActive: false });
 				});
 			return true;
+		} else if (request.action === "toggleTidyMode") {
+			const tidyContent = Tidy.parseFromString(document.documentElement.outerHTML);
+			if (tidyContent && tidyContent.content) {
+				// Create and inject the tidy view
+				const tidyContainer = document.createElement('div');
+				tidyContainer.id = 'obsidian-tidy-container';
+				tidyContainer.innerHTML = `
+					<div class="obsidian-tidy-toolbar">
+						<button class="obsidian-tidy-close">✕</button>
+					</div>
+					<div class="obsidian-tidy-content">
+						${tidyContent.content}
+					</div>
+				`;
+
+				// Add the external stylesheet
+				const link = document.createElement('link');
+				link.rel = 'stylesheet';
+				link.href = browser.runtime.getURL('tidy.css');
+				document.head.appendChild(link);
+				document.body.appendChild(tidyContainer);
+
+				// Add close button handler
+				const closeButton = tidyContainer.querySelector('.obsidian-tidy-close');
+				if (closeButton) {
+					closeButton.addEventListener('click', () => {
+						tidyContainer.remove();
+						link.remove();
+					});
+				}
+			}
+			sendResponse({ success: true });
 		}
 		return true;
 	});

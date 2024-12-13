@@ -461,6 +461,11 @@ function setupEventListeners(tabId: number) {
 			}
 		});
 	}
+
+	const tidyModeButton = document.getElementById('tidy-mode');
+	if (tidyModeButton) {
+		tidyModeButton.addEventListener('click', () => toggleTidyMode(tabId));
+	}
 }
 
 async function initializeUI() {
@@ -1142,3 +1147,19 @@ async function handleSaveToDownloads() {
 
 // Update the resize event listener to use the debounced version
 window.addEventListener('resize', debouncedSetPopupDimensions);
+
+async function toggleTidyMode(tabId: number) {
+	try {
+		await browser.tabs.sendMessage(tabId, { 
+			action: "toggleTidyMode"
+		});
+
+		// Close the popup if not in side panel
+		if (!isSidePanel) {
+			window.close();
+		}
+	} catch (error) {
+		console.error('Error toggling tidy mode:', error);
+		showError('failedToToggleTidyMode');
+	}
+}
