@@ -759,7 +759,7 @@ export function createMarkdownContent(content: string, url: string) {
 		// Format space around Markdown links
 		markdown = markdown
 			// Add a space before links that directly follow text
- 			.replace(/(?<=[^!\s])(\[[^\]]+\]\(([^)]+)\))/g, ' $1')
+			.replace(/(?<=[^!\s(),])(\[[^\]]+\]\(([^)]+)\))/g, ' $1')
 			// Remove multiple spaces after links and replace them with a single space
 			.replace(/(?<!!)(\[[^\]]+\]\s*\([^)]+\))\s+/g, '$1 ')
 
