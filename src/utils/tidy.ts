@@ -271,10 +271,8 @@ export class Tidy {
 			'meta-',
 			'metadata',
 			'more-',
-			'-nav',
 			'nav-',
 			'navbar',
-			'navigation',
 			'next-',
 			'newsletter',
 			'overlay',
@@ -297,6 +295,7 @@ export class Tidy {
 			'tabs-',
 			'table-of-contents',
 			'toolbar',
+			'tree-item',
 			'-toc',
 			'trending',
 			'twitter'
@@ -395,7 +394,8 @@ export class Tidy {
 		// First look for elements with explicit content markers
 		const mainContent = doc.querySelector([
 			'body',
-			'main[role="main"]',
+			'main',
+			'[role="main"]',
 			'[role="article"]',
 			'article',
 			'[itemprop="articleBody"]',
