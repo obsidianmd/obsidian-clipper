@@ -24,7 +24,6 @@ import { debounce } from '../utils/debounce';
 import { sanitizeFileName } from '../utils/string-utils';
 import { saveFile } from '../utils/file-utils';
 import { translatePage, getMessage, setupLanguageAndDirection } from '../utils/i18n';
-import { Tidy } from '../utils/tidy';
 
 interface TidyModeResponse {
 	success: boolean;

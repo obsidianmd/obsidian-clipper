@@ -54,61 +54,17 @@ declare global {
 			}
 
 			const extractedContent: { [key: string]: string } = {};
-
 			const schemaOrgData = extractSchemaOrgData();
 
-			// Create a new DOMParser
-			const parser = new DOMParser();
-			// Parse the document's HTML
-			const doc = parser.parseFromString(document.documentElement.outerHTML, 'text/html');
-			
-			// Remove all script and style elements
-			doc.querySelectorAll('script, style').forEach(el => el.remove());
-
-			// Remove style attributes from all elements
-			doc.querySelectorAll('*').forEach(el => el.removeAttribute('style'));
-
-			// Convert all relative URLs to absolute
-			doc.querySelectorAll('[src], [href]').forEach(element => {
-				['src', 'href', 'srcset'].forEach(attr => {
-					const value = element.getAttribute(attr);
-					if (!value) return;
-					
-					if (attr === 'srcset') {
-						const newSrcset = value.split(',').map(src => {
-							const [url, size] = src.trim().split(' ');
-							try {
-								const absoluteUrl = new URL(url, document.baseURI).href;
-								return `${absoluteUrl}${size ? ' ' + size : ''}`;
-							} catch (e) {
-								return src;
-							}
-						}).join(', ');
-						element.setAttribute(attr, newSrcset);
-					} else if (!value.startsWith('http') && !value.startsWith('data:') && !value.startsWith('#') && !value.startsWith('//')) {
-						try {
-							const absoluteUrl = new URL(value, document.baseURI).href;
-							element.setAttribute(attr, absoluteUrl);
-						} catch (e) {
-							console.warn(`Failed to process ${attr} URL:`, value);
-						}
-					}
-				});
-			});
-
-			// Get the modified HTML without scripts, styles, and style attributes
-			const cleanedHtml = doc.documentElement.outerHTML;
-
-			const fullHtmlWithoutIndentation = cleanedHtml
-				.replace(/\t/g, '') // Remove tabs
-				.replace(/^[ \t]+/gm, ''); // Remove leading spaces and tabs from each line
+			// Use document directly instead of parsing HTML string
+			const tidyResult = Tidy.parse(document);
 
 			const response: ContentResponse = {
-				content: doc.documentElement.outerHTML,
+				content: tidyResult?.content || document.documentElement.outerHTML,
 				selectedHtml: selectedHtml,
 				extractedContent: extractedContent,
 				schemaOrgData: schemaOrgData,
-				fullHtml: fullHtmlWithoutIndentation,
+				fullHtml: document.documentElement.outerHTML,
 				highlights: highlighter.getHighlights()
 			};
 

@@ -30,43 +30,18 @@ export class Tidy {
 	/**
 	 * Main entry point - cleans up HTML content and returns the main content
 	 */
-	static parseFromString(html: string) {
-		try {
-			const parser = new DOMParser();
-			const doc = parser.parseFromString(html, 'text/html');
-			
-			// Simulate mobile viewport
-			const viewport = doc.createElement('meta');
-			viewport.setAttribute('name', 'viewport');
-			viewport.setAttribute('content', this.MOBILE_VIEWPORT);
-			doc.head.appendChild(viewport);
-			
-			// Force mobile media queries
-			const mobileStyle = doc.createElement('style');
-			mobileStyle.textContent = `
-				@media screen {
-					:root { max-width: 600px !important; }
-					body { max-width: 600px !important; }
-				}
-			`;
-			doc.head.appendChild(mobileStyle);
-
-			return this.parse(doc);
-		} catch (error) {
-			console.error('Error parsing HTML:', error);
-			return null;
-		}
-	}
-
-	/**
-	 * Internal method to process an already parsed document
-	 */
 	static parse(doc: Document) {
 		debugLog('Tidy', 'Starting content extraction');
 
 		// Store existing styles before cleaning
 		const existingStyles = Array.from(doc.querySelectorAll('style')).map(style => style.cloneNode(true));
 		const existingLinks = Array.from(doc.querySelectorAll('link[rel="stylesheet"]')).map(link => link.cloneNode(true));
+
+		// Add viewport meta for mobile simulation
+		const viewport = doc.createElement('meta');
+		viewport.setAttribute('name', 'viewport');
+		viewport.setAttribute('content', this.MOBILE_VIEWPORT);
+		doc.head.appendChild(viewport);
 
 		// Remove hidden elements first
 		this.removeHiddenElements(doc);
@@ -239,48 +214,34 @@ export class Tidy {
 		// Store original HTML for restoration
 		this.originalHTML = doc.documentElement.outerHTML;
 		
-		// Store existing styles before cleaning
-		const existingStyles = Array.from(doc.querySelectorAll('style')).map(style => style.cloneNode(true));
-		const existingLinks = Array.from(doc.querySelectorAll('link[rel="stylesheet"]')).map(link => link.cloneNode(true));
-		
-		// Add viewport meta for mobile simulation
-		let viewport = doc.querySelector('meta[name="viewport"]');
-		if (!viewport) {
-			viewport = doc.createElement('meta');
-			viewport.setAttribute('name', 'viewport');
-			doc.head.appendChild(viewport);
-		}
-		viewport.setAttribute('content', this.MOBILE_VIEWPORT);
-
-		// // Force mobile width
-		// const mobileStyle = doc.createElement('style');
-		// mobileStyle.id = 'obsidian-tidy-style';
-		// mobileStyle.textContent = `
-		// 	@media screen {
-		// 		:root { max-width: 600px !important; margin: 0 auto !important; }
-		// 		body { max-width: 600px !important; margin: 0 auto !important; padding: 20px !important; }
-		// 	}
-		// `;
-
-		// Remove hidden elements
-		this.removeHiddenElements(doc);
-		
-		// Remove clutter
-		// this.removeClutter(doc);
-
-		// Find and clean main content
-		const mainContent = this.findMainContent(doc);
-		if (mainContent) {
-			this.cleanContent(mainContent);
-			// Replace body content with main content
-			doc.body.innerHTML = mainContent.outerHTML;
+		// Parse the document
+		const parsed = this.parse(doc);
+		if (!parsed) {
+			debugLog('Tidy', 'Failed to parse document');
+			return;
 		}
 
-		// Restore original styles and add our custom style
-		doc.head.innerHTML = ''; // Clear head to rebuild it
-		existingLinks.forEach(link => doc.head.appendChild(link));
-		existingStyles.forEach(style => doc.head.appendChild(style));
-		// doc.head.appendChild(mobileStyle);
+		// Create clean HTML structure
+		doc.documentElement.innerHTML = `
+			<head>
+				<meta charset="UTF-8">
+				<meta name="viewport" content="${this.MOBILE_VIEWPORT}">
+				<style>
+					body {
+						max-width: 800px;
+						margin: 0 auto;
+						padding: 20px;
+						font-family: system-ui, -apple-system, sans-serif;
+						line-height: 1.6;
+					}
+					img {
+						max-width: 100%;
+						height: auto;
+					}
+				</style>
+			</head>
+			<body>${parsed.content}</body>
+		`;
 
 		this.isActive = true;
 	}
