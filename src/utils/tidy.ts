@@ -5,14 +5,19 @@ interface ContentScore {
 	element: Element;
 }
 
+interface StyleChange {
+	selector: string;
+	styles: string;
+}
+
 export class Tidy {
 	private static POSITIVE_PATTERNS = /article|content|main|post|body|text|blog|story/i;
 	private static NEGATIVE_PATTERNS = /comment|meta|footer|footnote|foot|nav|sidebar|banner|ad|popup|menu/i;
 	private static BLOCK_ELEMENTS = ['div', 'section', 'article', 'main'];
-	
-	// Add viewport meta tag to simulate mobile view
+
 	private static MOBILE_VIEWPORT = 'width=device-width, initial-scale=1, maximum-scale=1';
-	
+	private static MOBILE_WIDTH = 600; // Default mobile viewport width
+
 	private static HIDDEN_ELEMENTS_SELECTOR = [
 		'[aria-hidden="true"]',
 		'[hidden]',
@@ -26,10 +31,8 @@ export class Tidy {
 
 	private static originalHTML: string | null = null;
 	private static isActive: boolean = false;
-	private static MOBILE_WIDTH = 600; // Default mobile viewport width
 
 	private static ALLOWED_ATTRIBUTES = new Set([
-		// Essential attributes
 		'href',
 		'src',
 		'srcset',
@@ -57,27 +60,33 @@ export class Tidy {
 		const startElementCount = doc.getElementsByTagName('*').length;
 		debugLog('Tidy', `Initial element count: ${startElementCount}`);
 
-		// Create a deep clone of the document
-		const clone = doc.cloneNode(true) as Document;
-		
 		try {
-			// Simulate mobile viewport
-			this.simulateMobileViewport(doc);
-
-			// Force media query evaluation
-			this.evaluateMediaQueries(doc);
-
-			// Remove hidden elements first
-			this.removeHiddenElements(doc);
+			/**
+			 * First we look for elements that are hidden or styled differently on mobile and 
+			 * collect the styles that are applied to them. This is because most sites only
+			 * only show essential content on mobile, so it helps us to hide the clutter.
+			 * 
+			 * We run this before we clone the document to avoid making network requests.
+			 */
+			const mobileStyles = this.evaluateMediaQueries(doc);
 			
-			// Remove common clutter
-			this.removeClutter(doc);
+			// Clone the document
+			const clone = doc.cloneNode(true) as Document;
+
+			// Apply mobile style to clone
+			this.applyMobileStyles(clone, mobileStyles);
+			
+			// Perform destructive operations on the clone
+			this.removeHiddenElements(clone);
+			this.removeClutter(clone);
 
 			// Find main content
-			const mainContent = this.findMainContent(doc);
+			const mainContent = this.findMainContent(clone);
 			if (!mainContent) {
 				debugLog('Tidy', 'No main content found');
-				return null;
+				return {
+					content: doc.documentElement.outerHTML
+				};
 			}
 
 			// Clean up the main content
@@ -92,64 +101,22 @@ export class Tidy {
 			};
 		} catch (error) {
 			debugLog('Tidy', 'Error processing document:', error);
-			return null;
-		} finally {
-			// Help garbage collection
-			clone.body.innerHTML = '';
+			return {
+				content: doc.documentElement.outerHTML
+			};
 		}
 	}
 
-	private static simulateMobileViewport(doc: Document) {
+	private static evaluateMediaQueries(doc: Document): StyleChange[] {
+		const mobileStyles: StyleChange[] = [];
+
 		try {
-			// Ensure head element exists
-			if (!doc.head) {
-				const head = doc.createElement('head');
-				doc.documentElement.insertBefore(head, doc.documentElement.firstChild);
-			}
-
-			// Add viewport meta
-			let viewport = doc.querySelector('meta[name="viewport"]');
-			if (!viewport) {
-				viewport = doc.createElement('meta');
-				viewport.setAttribute('name', 'viewport');
-				viewport.setAttribute('content', this.MOBILE_VIEWPORT);
-				doc.head.appendChild(viewport);
-			} else {
-				viewport.setAttribute('content', this.MOBILE_VIEWPORT);
-			}
-
-			// Create or update style element
-			let style = doc.getElementById('obsidian-mobile-viewport');
-			if (!style) {
-				style = doc.createElement('style');
-				style.id = 'obsidian-mobile-viewport';
-				doc.head.appendChild(style);
-			}
-			
-			style.textContent = `
-				:root {
-					--obsidian-viewport-width: ${this.MOBILE_WIDTH}px;
-				}
-				html {
-					width: ${this.MOBILE_WIDTH}px !important;
-				}
-			`;
-		} catch (error) {
-			debugLog('Tidy', 'Error setting up mobile viewport:', error);
-			// Continue execution even if viewport setup fails
-		}
-	}
-
-	private static evaluateMediaQueries(doc: Document) {
-		try {
-			// Get all stylesheets, including inline styles
+			// Get all styles, including inline styles
 			const sheets = Array.from(doc.styleSheets).filter(sheet => {
 				try {
-					// Try to access cssRules to check if the sheet is accessible
 					const rules = sheet.cssRules;
 					return true;
 				} catch (e) {
-					// Skip inaccessible sheets (e.g., cross-origin)
 					return false;
 				}
 			});
@@ -159,26 +126,19 @@ export class Tidy {
 					const rules = Array.from(sheet.cssRules);
 					rules.forEach(rule => {
 						if (rule instanceof CSSMediaRule) {
-							// Check if this is a max-width media query
 							if (rule.conditionText.includes('max-width')) {
 								const maxWidth = parseInt(rule.conditionText.match(/\d+/)?.[0] || '0');
 								
-								// If our mobile width is less than the max-width, apply these rules
 								if (this.MOBILE_WIDTH <= maxWidth) {
 									Array.from(rule.cssRules).forEach(cssRule => {
 										if (cssRule instanceof CSSStyleRule) {
 											try {
-												const elements = doc.querySelectorAll(cssRule.selectorText);
-												elements.forEach(element => {
-													// Apply the styles directly to the element
-													element.setAttribute('style', 
-														(element.getAttribute('style') || '') + 
-														cssRule.style.cssText
-													);
+												mobileStyles.push({
+													selector: cssRule.selectorText,
+													styles: cssRule.style.cssText
 												});
 											} catch (e) {
-												// Skip problematic selectors
-												debugLog('Tidy', 'Error applying styles for selector:', cssRule.selectorText, e);
+												debugLog('Tidy', 'Error collecting styles for selector:', cssRule.selectorText, e);
 											}
 										}
 									});
@@ -187,13 +147,35 @@ export class Tidy {
 						}
 					});
 				} catch (e) {
-					// Skip errors for individual stylesheets
 					debugLog('Tidy', 'Error processing stylesheet:', e);
 				}
 			});
 		} catch (e) {
 			debugLog('Tidy', 'Error evaluating media queries:', e);
 		}
+
+		debugLog('Tidy', `Collected ${mobileStyles.length} style changes from media queries`);
+		return mobileStyles;
+	}
+
+	private static applyMobileStyles(doc: Document, mobileStyles: StyleChange[]) {
+		let appliedCount = 0;
+
+		mobileStyles.forEach(({selector, styles}) => {
+			try {
+				const elements = doc.querySelectorAll(selector);
+				elements.forEach(element => {
+					element.setAttribute('style', 
+						(element.getAttribute('style') || '') + styles
+					);
+					appliedCount++;
+				});
+			} catch (e) {
+				debugLog('Tidy', 'Error applying styles for selector:', selector, e);
+			}
+		});
+
+		debugLog('Tidy', `Applied ${appliedCount} style changes to elements`);
 	}
 
 	private static removeHiddenElements(doc: Document) {
@@ -236,6 +218,7 @@ export class Tidy {
 				'.ad',
 				'aside',
 				'button',
+				'dialog',
 				'fieldset',
 				'footer',
 				'form',
@@ -255,9 +238,9 @@ export class Tidy {
 				"[id^='ad-']",
 				'[id$="-ad"]',
 				'[role="banner"]',
+				'[role="dialog"]',
 				'[role="complementary"]',
-				'[role="navigation"]',
-				'[role="toolbar"]'
+				'[role="navigation"]'
 		];
 
 		// Patterns to match against class, id, and data-testid
@@ -265,36 +248,58 @@ export class Tidy {
 			'avatar',
 			'-ad-',
 			'_ad_',
+			'article-end ',
+			'article-title',
 			'author',
 			'banner',
 			'breadcrumb',
 			'byline',
+			'collections',
 			'comments',
 			'complementary',
+			'eyebrow',
+			'facebook',
 			'feedback',
 			'fixed',
 			'footer',
 			'global',
+			'google',
+			'goog-',
 			'header',
-			'hide-',
+			'link-box',
+			'menu-',
+			'meta-',
 			'metadata',
+			'more-',
+			'-nav',
+			'nav-',
 			'navbar',
 			'navigation',
+			'next-',
+			'newsletter',
+			'overlay',
 			'popular',
+			'popup',
 			'profile',
 			'promo',
+			'qr_code',
+			'qr-code',
 			'read-next',
 			'reading-list',
 			'recommend',
 			'register',
 			'related',
 			'share',
-			'sidebar',
+			'site-index',
 			'social',
 			'sticky',
 			'subscribe',
+			'tabs-',
+			'table-of-contents',
 			'toolbar',
-			'top'
+			'-toc',
+			'trending',
+			'twitter'
 		];
 
 		try {
