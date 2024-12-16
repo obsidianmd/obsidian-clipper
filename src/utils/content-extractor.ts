@@ -119,17 +119,23 @@ export async function initializePageContent(
 	highlights: AnyHighlightData[]
 ) {
 	try {
-		const parser = new DOMParser();
-		const doc = parser.parseFromString(content, 'text/html');
+		// If we have selected content, create a temporary document for it
+		let doc: Document;
+		if (selectedHtml) {
+			const parser = new DOMParser();
+			doc = parser.parseFromString(selectedHtml, 'text/html');
+		} else {
+			// Use the content directly
+			const parser = new DOMParser();
+			doc = parser.parseFromString(content, 'text/html');
+		}
+
 		currentUrl = currentUrl.replace(/#:~:text=[^&]+(&|$)/, '');
 
 		const extractor = ExtractorRegistry.findExtractor(doc, currentUrl, schemaOrgData);
-		let tidyArticle = null;
 		let extractorVariables: ExtractorVariables = {};
 		
-		if (selectedHtml) {
-			content = selectedHtml;
-		} else if (extractor) {
+		if (extractor) {
 			debugLog('Content', 'Using custom extractor');
 			const extractedResult = extractor.extract();
 			content = extractedResult.contentHtml;
@@ -138,13 +144,6 @@ export async function initializePageContent(
 			}
 			if (extractedResult.variables) {
 				extractorVariables = extractedResult.variables;
-			}
-		} else {
-			const tidyArticle = extractTidyContent(doc);
-			if (tidyArticle && tidyArticle.content) {
-				content = tidyArticle.content;
-			} else {
-				content = doc.body.innerHTML || fullHtml;
 			}
 		}
 
@@ -227,7 +226,7 @@ export async function initializePageContent(
 
 		// Process highlights after getting the base content
 		if (generalSettings.highlighterEnabled && generalSettings.highlightBehavior !== 'no-highlights' && highlights && highlights.length > 0) {
-			content = processHighlights(content, highlights, tidyArticle);
+			content = processHighlights(content, highlights);
 		}
 
 		const markdownBody = createMarkdownContent(content, currentUrl);
@@ -449,7 +448,7 @@ function getSchemaProperty(schemaOrgData: any, property: string, defaultValue: s
 
 getSchemaProperty.memoized = new Map<string, string>();
 
-function processHighlights(content: string, highlights: AnyHighlightData[], tidyArticle: ReturnType<typeof Tidy.parse> | null): string {
+function processHighlights(content: string, highlights: AnyHighlightData[]): string {
 	// First check if highlighter is enabled and we have highlights
 	if (!generalSettings.highlighterEnabled || !highlights?.length) {
 		return content;
@@ -465,12 +464,10 @@ function processHighlights(content: string, highlights: AnyHighlightData[], tidy
 	}
 
 	if (generalSettings.highlightBehavior === 'highlight-inline') {
-		// Use Tidy content if available, otherwise fall back to original content
-		const processedContent = tidyArticle?.content || content;
-		debugLog('Highlights', 'Using content length:', processedContent.length);
+		debugLog('Highlights', 'Using content length:', content.length);
 
 		const tempDiv = document.createElement('div');
-		tempDiv.innerHTML = processedContent;
+		tempDiv.innerHTML = content;
 
 		const textHighlights = filterAndSortHighlights(highlights);
 		debugLog('Highlights', 'Processing highlights:', textHighlights.length);
