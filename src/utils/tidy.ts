@@ -26,6 +26,25 @@ export class Tidy {
 
 	private static originalHTML: string | null = null;
 	private static isActive: boolean = false;
+	private static MOBILE_WIDTH = 600; // Default mobile viewport width
+
+	private static ALLOWED_ATTRIBUTES = new Set([
+		// Essential attributes
+		'href',
+		'src',
+		'alt',
+		'title',
+		'id',
+		'class',
+		'width',
+		'height',
+		'colspan',
+		'rowspan',
+		'headers',
+		'aria-label',
+		'role',
+		'lang'
+	]);
 
 	/**
 	 * Main entry point - cleans up HTML content and returns the main content
@@ -33,11 +52,11 @@ export class Tidy {
 	static parse(doc: Document) {
 		debugLog('Tidy', 'Starting content extraction');
 
-		// Add viewport meta for mobile simulation
-		const viewport = doc.createElement('meta');
-		viewport.setAttribute('name', 'viewport');
-		viewport.setAttribute('content', this.MOBILE_VIEWPORT);
-		doc.head.appendChild(viewport);
+		// Simulate mobile viewport
+		this.simulateMobileViewport(doc);
+
+		// Force media query evaluation
+		this.evaluateMediaQueries(doc);
 
 		// Remove hidden elements first
 		this.removeHiddenElements(doc);
@@ -60,9 +79,120 @@ export class Tidy {
 		};
 	}
 
+	private static simulateMobileViewport(doc: Document) {
+		try {
+			// Ensure head element exists
+			if (!doc.head) {
+				const head = doc.createElement('head');
+				doc.documentElement.insertBefore(head, doc.documentElement.firstChild);
+			}
+
+			// Add viewport meta
+			let viewport = doc.querySelector('meta[name="viewport"]');
+			if (!viewport) {
+				viewport = doc.createElement('meta');
+				viewport.setAttribute('name', 'viewport');
+				viewport.setAttribute('content', this.MOBILE_VIEWPORT);
+				doc.head.appendChild(viewport);
+			} else {
+				viewport.setAttribute('content', this.MOBILE_VIEWPORT);
+			}
+
+			// Create or update style element
+			let style = doc.getElementById('obsidian-mobile-viewport');
+			if (!style) {
+				style = doc.createElement('style');
+				style.id = 'obsidian-mobile-viewport';
+				doc.head.appendChild(style);
+			}
+			
+			style.textContent = `
+				:root {
+					--obsidian-viewport-width: ${this.MOBILE_WIDTH}px;
+				}
+				html {
+					width: ${this.MOBILE_WIDTH}px !important;
+				}
+			`;
+		} catch (error) {
+			debugLog('Tidy', 'Error setting up mobile viewport:', error);
+			// Continue execution even if viewport setup fails
+		}
+	}
+
+	private static evaluateMediaQueries(doc: Document) {
+		try {
+			// Get all stylesheets, including inline styles
+			const sheets = Array.from(doc.styleSheets).filter(sheet => {
+				try {
+					// Try to access cssRules to check if the sheet is accessible
+					const rules = sheet.cssRules;
+					return true;
+				} catch (e) {
+					// Skip inaccessible sheets (e.g., cross-origin)
+					return false;
+				}
+			});
+			
+			sheets.forEach(sheet => {
+				try {
+					const rules = Array.from(sheet.cssRules);
+					rules.forEach(rule => {
+						if (rule instanceof CSSMediaRule) {
+							// Check if this is a max-width media query
+							if (rule.conditionText.includes('max-width')) {
+								const maxWidth = parseInt(rule.conditionText.match(/\d+/)?.[0] || '0');
+								
+								// If our mobile width is less than the max-width, apply these rules
+								if (this.MOBILE_WIDTH <= maxWidth) {
+									Array.from(rule.cssRules).forEach(cssRule => {
+										if (cssRule instanceof CSSStyleRule) {
+											try {
+												const elements = doc.querySelectorAll(cssRule.selectorText);
+												elements.forEach(element => {
+													// Apply the styles directly to the element
+													element.setAttribute('style', 
+														(element.getAttribute('style') || '') + 
+														cssRule.style.cssText
+													);
+												});
+											} catch (e) {
+												// Skip problematic selectors
+												debugLog('Tidy', 'Error applying styles for selector:', cssRule.selectorText, e);
+											}
+										}
+									});
+								}
+							}
+						}
+					});
+				} catch (e) {
+					// Skip errors for individual stylesheets
+					debugLog('Tidy', 'Error processing stylesheet:', e);
+				}
+			});
+		} catch (e) {
+			debugLog('Tidy', 'Error evaluating media queries:', e);
+		}
+	}
+
 	private static removeHiddenElements(doc: Document) {
+		// Existing hidden elements selector
 		const hiddenElements = doc.querySelectorAll(this.HIDDEN_ELEMENTS_SELECTOR);
 		hiddenElements.forEach(el => el.remove());
+
+		// Also remove elements hidden by computed style
+		const allElements = doc.getElementsByTagName('*');
+		Array.from(allElements).forEach(element => {
+			const computedStyle = window.getComputedStyle(element);
+			if (
+				computedStyle.display === 'none' ||
+				computedStyle.visibility === 'hidden' ||
+				computedStyle.opacity === '0'
+			) {
+				element.remove();
+			}
+		});
 	}
 
 	private static removeClutter(doc: Document) {
@@ -90,25 +220,83 @@ export class Tidy {
 	private static cleanContent(element: Element) {
 		// Remove empty paragraphs and divs
 		element.querySelectorAll('p, div').forEach(el => {
-			if (!el.textContent?.trim() && !el.querySelector('img')) {
+			if (!el.textContent?.trim() && !el.querySelector('img, figure, picture, iframe, video, audio, canvas, svg, math, iframe')) {
 				el.remove();
 			}
 		});
 
-		// Remove tracking pixels and tiny images
-		element.querySelectorAll('img').forEach(img => {
-			const width = parseInt(img.getAttribute('width') || '0');
-			const height = parseInt(img.getAttribute('height') || '0');
-			if (width <= 1 || height <= 1) {
-				img.remove();
-			}
-		});
+		// Strip unwanted attributes
+		this.stripUnwantedAttributes(element);
+	}
 
-		// Remove click tracking attributes
-		element.querySelectorAll('[onclick], [data-tracking]').forEach(el => {
-			el.removeAttribute('onclick');
-			el.removeAttribute('data-tracking');
-		});
+	private static stripUnwantedAttributes(element: Element) {
+		const processElement = (el: Element) => {
+			// Get all attributes
+			const attributes = Array.from(el.attributes);
+			
+			// Remove attributes not in whitelist and not data-*
+			attributes.forEach(attr => {
+				const attrName = attr.name.toLowerCase();
+				if (!this.ALLOWED_ATTRIBUTES.has(attrName) && !attrName.startsWith('data-')) {
+					el.removeAttribute(attr.name);
+				}
+			});
+
+			// Special handling for style attribute - only keep essential styles
+			const style = el.getAttribute('style');
+			if (style) {
+				const essentialStyles = this.filterEssentialStyles(style);
+				if (essentialStyles) {
+					el.setAttribute('style', essentialStyles);
+				} else {
+					el.removeAttribute('style');
+				}
+			}
+		};
+
+		// Process the main element
+		processElement(element);
+
+		// Process all child elements
+		element.querySelectorAll('*').forEach(processElement);
+	}
+
+	private static filterEssentialStyles(style: string): string | null {
+		// List of essential style properties to keep
+		const essentialProperties = new Set([
+			'display',
+			'position',
+			'width',
+			'height',
+			'margin',
+			'padding',
+			'text-align',
+			'vertical-align',
+			'float',
+			'clear',
+			'border',
+			'background',
+			'color',
+			'font-size',
+			'font-weight',
+			'line-height',
+			'white-space'
+		]);
+
+		const styles = style.split(';')
+			.map(s => s.trim())
+			.filter(s => s.length > 0)
+			.map(s => {
+				const [property, ...values] = s.split(':');
+				return {
+					property: property.trim().toLowerCase(),
+					value: values.join(':').trim()
+				};
+			})
+			.filter(({property}) => essentialProperties.has(property))
+			.map(({property, value}) => `${property}: ${value}`);
+
+		return styles.length > 0 ? styles.join('; ') : null;
 	}
 
 	private static findMainContent(doc: Document): Element | null {
