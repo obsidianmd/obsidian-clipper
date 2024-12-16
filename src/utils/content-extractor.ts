@@ -119,23 +119,17 @@ export async function initializePageContent(
 	highlights: AnyHighlightData[]
 ) {
 	try {
-		// If we have selected content, create a temporary document for it
-		let doc: Document;
-		if (selectedHtml) {
-			const parser = new DOMParser();
-			doc = parser.parseFromString(selectedHtml, 'text/html');
-		} else {
-			// Use the content directly
-			const parser = new DOMParser();
-			doc = parser.parseFromString(content, 'text/html');
-		}
+		const parser = new DOMParser();
+		const doc = parser.parseFromString(fullHtml, 'text/html');
 
 		currentUrl = currentUrl.replace(/#:~:text=[^&]+(&|$)/, '');
 
 		const extractor = ExtractorRegistry.findExtractor(doc, currentUrl, schemaOrgData);
 		let extractorVariables: ExtractorVariables = {};
 		
-		if (extractor) {
+		if (selectedHtml) {
+			content = selectedHtml;
+		} else if (extractor) {
 			debugLog('Content', 'Using custom extractor');
 			const extractedResult = extractor.extract();
 			content = extractedResult.contentHtml;
