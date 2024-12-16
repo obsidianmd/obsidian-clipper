@@ -33,10 +33,6 @@ export class Tidy {
 	static parse(doc: Document) {
 		debugLog('Tidy', 'Starting content extraction');
 
-		// Store existing styles before cleaning
-		const existingStyles = Array.from(doc.querySelectorAll('style')).map(style => style.cloneNode(true));
-		const existingLinks = Array.from(doc.querySelectorAll('link[rel="stylesheet"]')).map(link => link.cloneNode(true));
-
 		// Add viewport meta for mobile simulation
 		const viewport = doc.createElement('meta');
 		viewport.setAttribute('name', 'viewport');
@@ -60,9 +56,7 @@ export class Tidy {
 		this.cleanContent(mainContent);
 
 		return {
-			content: mainContent.outerHTML,
-			styles: existingStyles,
-			styleLinks: existingLinks
+			content: mainContent.outerHTML
 		};
 	}
 
@@ -120,6 +114,7 @@ export class Tidy {
 	private static findMainContent(doc: Document): Element | null {
 		// First look for elements with explicit content markers
 		const mainContent = doc.querySelector([
+			'body',
 			'main[role="main"]',
 			'[role="article"]',
 			'article',
