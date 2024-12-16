@@ -32,6 +32,9 @@ export class Tidy {
 		// Essential attributes
 		'href',
 		'src',
+		'srcset',
+		'data-src',
+		'data-srcset',
 		'alt',
 		'title',
 		'id',
@@ -60,7 +63,7 @@ export class Tidy {
 
 		// Remove hidden elements first
 		this.removeHiddenElements(doc);
-		
+
 		// Remove common clutter
 		this.removeClutter(doc);
 
@@ -196,35 +199,106 @@ export class Tidy {
 	}
 
 	private static removeClutter(doc: Document) {
-		// const clutterSelectors = [
-		// 	'link',
-		// 	'iframe',
-		// 	'nav',
-		// 	'header:not(:first-child)',
-		// 	'footer',
-		// 	'[role="complementary"]',
-		// 	'[role="banner"]',
-		// 	'[role="navigation"]',
-		// 	'.social-share',
-		// 	'.related-articles',
-		// 	'.recommended',
-		// 	'#comments',
-		// 	'.comments',
-		// ];
+		// Basic selectors that don't need attribute variants
+		const basicSelectors = [
+			"#toc",
+			".toc",
+			'#comments',
+			'.Ad',
+			'.ad',
+			'aside',
+			'button',
+			'fieldset',
+			'footer',
+			'form',
+			'header',
+			'input',
+			'iframe',
+			'label',
+			'link',
+			'nav',
+			'noscript',
+			'option',
+			'select',
+			'sidebar',
+			'textarea',
+			"[class^='ad-']",
+			'[class$="-ad"]',
+			"[id^='ad-']",
+			'[id$="-ad"]',
+			'[role="banner"]',
+			'[role="complementary"]',
+			'[role="navigation"]'
+		];
 
-		// clutterSelectors.forEach(selector => {
-		// 	doc.querySelectorAll(selector).forEach(el => el.remove());
-		// });
+		// Patterns to match against class, id, and data-testid
+		const patterns = [
+			'avatar',
+			'-ad-',
+			'_ad_',
+			'author',
+			'banner',
+			'breadcrumb',
+			'byline',
+			'comments',
+			'complementary',
+			'feedback',
+			'fixed',
+			'footer',
+			'global',
+			'header',
+			'hide-',
+			'metadata',
+			'navbar',
+			'navigation',
+			'popular',
+			'profile',
+			'promo',
+			'read-next',
+			'reading-list',
+			'recommend',
+			'register',
+			'related',
+			'sidebar',
+			'social',
+			'sticky',
+			'subscribe',
+			'top'
+		];
+
+		try {
+			// First remove elements matching basic selectors
+			basicSelectors.forEach(selector => {
+				const elements = doc.getElementsByClassName(selector.slice(1)) || // For .class
+					doc.getElementById(selector.slice(1)) || // For #id
+					doc.querySelectorAll(selector); // For complex selectors
+				
+				Array.from(elements).forEach(el => el.remove());
+			});
+
+			// Then handle pattern matching using a more efficient approach
+			const allElements = doc.getElementsByTagName('*');
+			Array.from(allElements).forEach(el => {
+				// Check if element should be removed based on its attributes
+				const shouldRemove = patterns.some(pattern => {
+					const classMatch = el.className && typeof el.className === 'string' && 
+						el.className.toLowerCase().includes(pattern);
+					const idMatch = el.id && el.id.toLowerCase().includes(pattern);
+					const testIdMatch = el.getAttribute('data-testid')?.toLowerCase().includes(pattern);
+					
+					return classMatch || idMatch || testIdMatch;
+				});
+
+				if (shouldRemove) {
+					el.remove();
+				}
+			});
+		} catch (e) {
+			debugLog('Tidy', 'Error in removeClutter:', e);
+		}
 	}
 
 	private static cleanContent(element: Element) {
-		// Remove empty paragraphs and divs
-		element.querySelectorAll('p, div').forEach(el => {
-			if (!el.textContent?.trim() && !el.querySelector('img, figure, picture, iframe, video, audio, canvas, svg, math, iframe')) {
-				el.remove();
-			}
-		});
-
 		// Strip unwanted attributes
 		this.stripUnwantedAttributes(element);
 	}
@@ -241,17 +315,6 @@ export class Tidy {
 					el.removeAttribute(attr.name);
 				}
 			});
-
-			// Special handling for style attribute - only keep essential styles
-			const style = el.getAttribute('style');
-			if (style) {
-				const essentialStyles = this.filterEssentialStyles(style);
-				if (essentialStyles) {
-					el.setAttribute('style', essentialStyles);
-				} else {
-					el.removeAttribute('style');
-				}
-			}
 		};
 
 		// Process the main element
@@ -259,44 +322,6 @@ export class Tidy {
 
 		// Process all child elements
 		element.querySelectorAll('*').forEach(processElement);
-	}
-
-	private static filterEssentialStyles(style: string): string | null {
-		// List of essential style properties to keep
-		const essentialProperties = new Set([
-			'display',
-			'position',
-			'width',
-			'height',
-			'margin',
-			'padding',
-			'text-align',
-			'vertical-align',
-			'float',
-			'clear',
-			'border',
-			'background',
-			'color',
-			'font-size',
-			'font-weight',
-			'line-height',
-			'white-space'
-		]);
-
-		const styles = style.split(';')
-			.map(s => s.trim())
-			.filter(s => s.length > 0)
-			.map(s => {
-				const [property, ...values] = s.split(':');
-				return {
-					property: property.trim().toLowerCase(),
-					value: values.join(':').trim()
-				};
-			})
-			.filter(({property}) => essentialProperties.has(property))
-			.map(({property, value}) => `${property}: ${value}`);
-
-		return styles.length > 0 ? styles.join('; ') : null;
 	}
 
 	private static findMainContent(doc: Document): Element | null {
