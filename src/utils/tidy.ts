@@ -54,32 +54,49 @@ export class Tidy {
 	 */
 	static parse(doc: Document) {
 		debugLog('Tidy', 'Starting content extraction');
+		const startElementCount = doc.getElementsByTagName('*').length;
+		debugLog('Tidy', `Initial element count: ${startElementCount}`);
 
-		// Simulate mobile viewport
-		this.simulateMobileViewport(doc);
+		// Create a deep clone of the document
+		const clone = doc.cloneNode(true) as Document;
+		
+		try {
+			// Simulate mobile viewport
+			this.simulateMobileViewport(doc);
 
-		// Force media query evaluation
-		this.evaluateMediaQueries(doc);
+			// Force media query evaluation
+			this.evaluateMediaQueries(doc);
 
-		// Remove hidden elements first
-		this.removeHiddenElements(doc);
+			// Remove hidden elements first
+			this.removeHiddenElements(doc);
+			
+			// Remove common clutter
+			this.removeClutter(doc);
 
-		// Remove common clutter
-		this.removeClutter(doc);
+			// Find main content
+			const mainContent = this.findMainContent(doc);
+			if (!mainContent) {
+				debugLog('Tidy', 'No main content found');
+				return null;
+			}
 
-		// Find main content
-		const mainContent = this.findMainContent(doc);
-		if (!mainContent) {
-			debugLog('Tidy', 'No main content found');
+			// Clean up the main content
+			this.cleanContent(mainContent);
+
+			const finalElementCount = mainContent.getElementsByTagName('*').length;
+			debugLog('Tidy', `Final element count in main content: ${finalElementCount}`);
+			debugLog('Tidy', `Elements removed: ${startElementCount - finalElementCount}`);
+
+			return {
+				content: mainContent.outerHTML
+			};
+		} catch (error) {
+			debugLog('Tidy', 'Error processing document:', error);
 			return null;
+		} finally {
+			// Help garbage collection
+			clone.body.innerHTML = '';
 		}
-
-		// Clean up the main content
-		this.cleanContent(mainContent);
-
-		return {
-			content: mainContent.outerHTML
-		};
 	}
 
 	private static simulateMobileViewport(doc: Document) {
@@ -180,9 +197,14 @@ export class Tidy {
 	}
 
 	private static removeHiddenElements(doc: Document) {
+		let count = 0;
+
 		// Existing hidden elements selector
 		const hiddenElements = doc.querySelectorAll(this.HIDDEN_ELEMENTS_SELECTOR);
-		hiddenElements.forEach(el => el.remove());
+		hiddenElements.forEach(el => {
+			el.remove();
+			count++;
+		});
 
 		// Also remove elements hidden by computed style
 		const allElements = doc.getElementsByTagName('*');
@@ -194,41 +216,48 @@ export class Tidy {
 				computedStyle.opacity === '0'
 			) {
 				element.remove();
+				count++;
 			}
 		});
+
+		debugLog('Tidy', `Removed ${count} hidden elements`);
 	}
 
 	private static removeClutter(doc: Document) {
+		let basicSelectorCount = 0;
+		let patternMatchCount = 0;
+
 		// Basic selectors that don't need attribute variants
 		const basicSelectors = [
 			"#toc",
 			".toc",
 			'#comments',
-			'.Ad',
-			'.ad',
-			'aside',
-			'button',
-			'fieldset',
-			'footer',
-			'form',
-			'header',
-			'input',
-			'iframe',
-			'label',
-			'link',
-			'nav',
-			'noscript',
-			'option',
-			'select',
-			'sidebar',
-			'textarea',
-			"[class^='ad-']",
-			'[class$="-ad"]',
-			"[id^='ad-']",
-			'[id$="-ad"]',
-			'[role="banner"]',
-			'[role="complementary"]',
-			'[role="navigation"]'
+				'.Ad',
+				'.ad',
+				'aside',
+				'button',
+				'fieldset',
+				'footer',
+				'form',
+				'header',
+				'input',
+				'iframe',
+				'label',
+				'link',
+				'nav',
+				'noscript',
+				'option',
+				'select',
+				'sidebar',
+				'textarea',
+				"[class^='ad-']",
+				'[class$="-ad"]',
+				"[id^='ad-']",
+				'[id$="-ad"]',
+				'[role="banner"]',
+				'[role="complementary"]',
+				'[role="navigation"]',
+				'[role="toolbar"]'
 		];
 
 		// Patterns to match against class, id, and data-testid
@@ -259,26 +288,50 @@ export class Tidy {
 			'recommend',
 			'register',
 			'related',
+			'share',
 			'sidebar',
 			'social',
 			'sticky',
 			'subscribe',
+			'toolbar',
 			'top'
 		];
 
 		try {
 			// First remove elements matching basic selectors
 			basicSelectors.forEach(selector => {
-				const elements = doc.getElementsByClassName(selector.slice(1)) || // For .class
-					doc.getElementById(selector.slice(1)) || // For #id
-					doc.querySelectorAll(selector); // For complex selectors
+				let elements: Element[] = [];
 				
-				Array.from(elements).forEach(el => el.remove());
+				if (selector.startsWith('.')) {
+					// Class selector
+					elements = Array.from(doc.getElementsByClassName(selector.slice(1)));
+				} else if (selector.startsWith('#')) {
+					// ID selector
+					const element = doc.getElementById(selector.slice(1));
+					if (element) elements = [element];
+				} else {
+					// Complex selector
+					elements = Array.from(doc.querySelectorAll(selector));
+				}
+
+				elements.forEach(el => {
+					if (el && el.parentNode) {
+						el.remove();
+						basicSelectorCount++;
+					}
+				});
 			});
 
+			debugLog('Tidy', `Removed ${basicSelectorCount} elements matching basic selectors`);
+
 			// Then handle pattern matching using a more efficient approach
-			const allElements = doc.getElementsByTagName('*');
-			Array.from(allElements).forEach(el => {
+			const allElements = Array.from(doc.getElementsByTagName('*'));
+			
+			// We need to iterate backwards since we're removing elements
+			for (let i = allElements.length - 1; i >= 0; i--) {
+				const el = allElements[i];
+				if (!el || !el.parentNode) continue;
+
 				// Check if element should be removed based on its attributes
 				const shouldRemove = patterns.some(pattern => {
 					const classMatch = el.className && typeof el.className === 'string' && 
@@ -291,8 +344,12 @@ export class Tidy {
 
 				if (shouldRemove) {
 					el.remove();
+					patternMatchCount++;
 				}
-			});
+			}
+
+			debugLog('Tidy', `Removed ${patternMatchCount} elements matching patterns`);
+			debugLog('Tidy', `Total elements removed: ${basicSelectorCount + patternMatchCount}`);
 		} catch (e) {
 			debugLog('Tidy', 'Error in removeClutter:', e);
 		}
@@ -304,6 +361,8 @@ export class Tidy {
 	}
 
 	private static stripUnwantedAttributes(element: Element) {
+		let attributeCount = 0;
+
 		const processElement = (el: Element) => {
 			// Get all attributes
 			const attributes = Array.from(el.attributes);
@@ -313,6 +372,7 @@ export class Tidy {
 				const attrName = attr.name.toLowerCase();
 				if (!this.ALLOWED_ATTRIBUTES.has(attrName) && !attrName.startsWith('data-')) {
 					el.removeAttribute(attr.name);
+					attributeCount++;
 				}
 			});
 		};
@@ -322,6 +382,8 @@ export class Tidy {
 
 		// Process all child elements
 		element.querySelectorAll('*').forEach(processElement);
+
+		debugLog('Tidy', `Stripped ${attributeCount} attributes from elements`);
 	}
 
 	private static findMainContent(doc: Document): Element | null {
