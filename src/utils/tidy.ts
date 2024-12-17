@@ -552,12 +552,16 @@ export class Tidy {
 	}
 
 	static restore(doc: Document) {
-		if (this.originalHTML) {
-			// Remove our custom style
-			doc.getElementById('obsidian-tidy-style')?.remove();
-			
-			// Restore the original HTML
-			doc.documentElement.innerHTML = this.originalHTML;
+		if (this.originalHTML) {			
+			// Create a new parser
+			const parser = new DOMParser();
+			// Parse the original HTML
+			const newDoc = parser.parseFromString(this.originalHTML, 'text/html');
+			// Replace the current documentElement with the original one
+			doc.replaceChild(
+				newDoc.documentElement,
+				doc.documentElement
+			);
 			
 			this.originalHTML = null;
 			this.isActive = false;
