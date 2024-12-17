@@ -213,7 +213,7 @@ declare global {
 				console.error('Error in toggleTidyMode:', error);
 				sendResponse({ success: false, isActive: false });
 			}
-			return true;  // Important for async response
+			return true;
 		}
 		return true;
 	});
