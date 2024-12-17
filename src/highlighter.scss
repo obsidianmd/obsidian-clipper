@@ -216,4 +216,24 @@ body.obsidian-tidy-active {
 			filter: invert(1);
 		}
 	}
+	.metadata {
+		margin-bottom: 2em;
+		padding-bottom: 1em;
+		border-bottom: 1px solid #eee;
+	}
+	.metadata h1 {
+		margin: 0 0 0.5em 0;
+		line-height: 1.3;
+	}
+	.metadata-details {
+		color: #666;
+		font-size: 0.9em;
+	}
+	.metadata-details a {
+		color: inherit;
+		text-decoration: none;
+	}
+	.metadata-details a:hover {
+		text-decoration: underline;
+	}
 }

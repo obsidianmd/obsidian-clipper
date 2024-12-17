@@ -65,9 +65,12 @@ const BASIC_SELECTORS = [
 	'nav',
 	'noscript',
 	'option',
+	'script',
 	'select',
 	'sidebar',
+	'style',
 	'textarea',
+	'[src*="author"]',
 	'[class^="ad-"]',
 	'[class$="-ad"]',
 	'[id^="ad-"]',
@@ -111,6 +114,7 @@ const CLUTTER_PATTERNS = [
 	'header',
 	'link-box',
 	'loading',
+	'logo-',
 	'menu-',
 	'meta-',
 	'metadata',
@@ -124,33 +128,35 @@ const CLUTTER_PATTERNS = [
 	'overlay',
 	'popular',
 	'popup',
-	'post_date',
 	'post-date',
-	'post_title',
 	'post-title',
-	'prevnext',
+	'post_date',
+	'post_title',
 	'preview',
+	'prevnext',
 	'profile',
 	'promo',
-	'qr_code',
 	'qr-code',
+	'qr_code',
 	'read-next',
 	'reading-list',
 	'recommend',
 	'register',
 	'related',
+	'screen-reader-text',
 	'share',
 	'site-index',
+	'skip-',
 	'social',
 	'sponsor',
 	'sticky',
 	'subscribe',
-	'tabs-',
+	'-toc',
 	'table-of-contents',
+	'tabs-',
 	'toolbar',
 	'top-wrapper',
 	'tree-item',
-	'-toc',
 	'trending',
 	'twitter'
 ];
@@ -567,25 +573,36 @@ export class Tidy {
 			return;
 		}
 
-		// Fresh HTML to inject the tidy reader view
-		htmlElement.innerHTML = `
+		// Create reader view HTML with metadata
+		const readerHtml = `
 			<head>
 				<meta charset="UTF-8">
 				<meta name="viewport" content="${this.MOBILE_VIEWPORT}">
 			</head>
-			<body>${parsed.content}</body>
+			<body class="obsidian-tidy-active">
+				<article>
+				${parsed.title ? `<h1>${parsed.title}</h1>` : ''}
+					<div class="metadata">
+						<div class="metadata-details">
+							${parsed.author ? `<span>By ${parsed.author}</span>` : ''}
+							${parsed.published ? `<span> • ${parsed.published}</span>` : ''}
+							${parsed.domain ? `<span> • <a href="${doc.URL}">${parsed.domain}</a></span>` : ''}
+						</div>
+					</div>
+					${parsed.content}
+				</article>
+			</body>
 		`;
 
+		htmlElement.innerHTML = readerHtml;
+		
 		this.isActive = true;
 	}
 
 	static restore(doc: Document) {
 		if (this.originalHTML) {			
-			// Create a new parser
 			const parser = new DOMParser();
-			// Parse the original HTML
 			const newDoc = parser.parseFromString(this.originalHTML, 'text/html');
-			// Replace the current documentElement with the original one
 			doc.replaceChild(
 				newDoc.documentElement,
 				doc.documentElement
