@@ -162,6 +162,21 @@ interface StyleChange {
 	styles: string;
 }
 
+interface TidyResponse {
+	content: string;
+	title: string;
+	description: string;
+	domain: string;
+	favicon: string;
+	image: string;
+	published: string;
+	author: string;
+	site: string;
+}
+
+// Keep this interface for internal use
+interface TidyMetadata extends Omit<TidyResponse, 'content'> {}
+
 export class Tidy {
 	private static originalHTML: string | null = null;
 	private static isActive: boolean = false;
@@ -177,7 +192,7 @@ export class Tidy {
 	/**
 	 * Main entry point
 	 */
-	static parse(doc: Document) {
+	static parse(doc: Document): TidyResponse {
 		debugLog('Tidy', 'Starting content extraction');
 		const startElementCount = doc.getElementsByTagName('*').length;
 		debugLog('Tidy', `Initial element count: ${startElementCount}`);
@@ -203,7 +218,8 @@ export class Tidy {
 			if (!mainContent) {
 				debugLog('Tidy', 'No main content found');
 				return {
-					content: doc.body.innerHTML
+					content: doc.body.innerHTML,
+					...this.extractMetadata(doc)
 				};
 			}
 
@@ -222,13 +238,17 @@ export class Tidy {
 			debugLog('Tidy', `Final element count in main content: ${finalElementCount}`);
 			debugLog('Tidy', `Elements removed: ${startElementCount - finalElementCount}`);
 
+			const metadata = this.extractMetadata(doc);
+
 			return {
-				content: mainContent.outerHTML
+				content: mainContent ? mainContent.outerHTML : doc.body.innerHTML,
+				...metadata
 			};
 		} catch (error) {
 			debugLog('Tidy', 'Error processing document:', error);
 			return {
-				content: doc.body.innerHTML
+				content: doc.body.innerHTML,
+				...this.extractMetadata(doc)
 			};
 		}
 	}
@@ -566,6 +586,169 @@ export class Tidy {
 			this.originalHTML = null;
 			this.isActive = false;
 		}
+	}
+
+	private static extractMetadata(doc: Document): TidyMetadata {
+		let domain = '';
+		let url = '';
+
+		try {
+			// Try to get URL from document location
+			url = doc.location?.href || '';
+			if (url) {
+				domain = new URL(url).hostname.replace(/^www\./, '');
+			}
+		} catch (e) {
+			// If URL parsing fails, try to get from base tag
+			const baseTag = doc.querySelector('base[href]');
+			if (baseTag) {
+				try {
+					url = baseTag.getAttribute('href') || '';
+					domain = new URL(url).hostname.replace(/^www\./, '');
+				} catch (e) {
+					console.warn('Failed to parse base URL:', e);
+				}
+			}
+		}
+
+		return {
+			title: this.getTitle(doc),
+			description: this.getDescription(doc),
+			domain,
+			favicon: this.getFavicon(doc, url),
+			image: this.getImage(doc),
+			published: this.getPublished(doc),
+			author: this.getAuthor(doc),
+			site: this.getSite(doc)
+		};
+	}
+
+	private static getAuthor(doc: Document): string {
+		return (
+			this.getMetaContent(doc, "name", "sailthru.author") ||
+			this.getSchemaProperty(doc, 'author.name') ||
+			this.getMetaContent(doc, "property", "author") ||
+			this.getMetaContent(doc, "name", "byl") ||
+			this.getMetaContent(doc, "name", "author") ||
+			this.getMetaContent(doc, "name", "copyright") ||
+			this.getSchemaProperty(doc, 'copyrightHolder.name') ||
+			this.getMetaContent(doc, "property", "og:site_name") ||
+			this.getSchemaProperty(doc, 'publisher.name') ||
+			this.getSchemaProperty(doc, 'sourceOrganization.name') ||
+			this.getSchemaProperty(doc, 'isPartOf.name') ||
+			this.getMetaContent(doc, "name", "twitter:creator") ||
+			this.getMetaContent(doc, "name", "application-name") ||
+			''
+		);
+	}
+
+	private static getSite(doc: Document): string {
+		return (
+			this.getSchemaProperty(doc, 'publisher.name') ||
+			this.getMetaContent(doc, "property", "og:site_name") ||
+			this.getSchemaProperty(doc, 'sourceOrganization.name') ||
+			this.getMetaContent(doc, "name", "copyright") ||
+			this.getSchemaProperty(doc, 'copyrightHolder.name') ||
+			this.getSchemaProperty(doc, 'isPartOf.name') ||
+			this.getMetaContent(doc, "name", "application-name") ||
+			''
+		);
+	}
+
+	private static getTitle(doc: Document): string {
+		return (
+			this.getMetaContent(doc, "property", "og:title") ||
+			this.getMetaContent(doc, "name", "twitter:title") ||
+			this.getSchemaProperty(doc, 'headline') ||
+			this.getMetaContent(doc, "name", "title") ||
+			this.getMetaContent(doc, "name", "sailthru.title") ||
+			doc.querySelector('title')?.textContent?.trim() ||
+			''
+		);
+	}
+
+	private static getDescription(doc: Document): string {
+		return (
+			this.getMetaContent(doc, "name", "description") ||
+			this.getMetaContent(doc, "property", "description") ||
+			this.getMetaContent(doc, "property", "og:description") ||
+			this.getSchemaProperty(doc, 'description') ||
+			this.getMetaContent(doc, "name", "twitter:description") ||
+			this.getMetaContent(doc, "name", "sailthru.description") ||
+			''
+		);
+	}
+
+	private static getImage(doc: Document): string {
+		return (
+			this.getMetaContent(doc, "property", "og:image") ||
+			this.getMetaContent(doc, "name", "twitter:image") ||
+			this.getSchemaProperty(doc, 'image.url') ||
+			this.getMetaContent(doc, "name", "sailthru.image.full") ||
+			''
+		);
+	}
+
+	private static getFavicon(doc: Document, baseUrl: string): string {
+		const iconFromMeta = this.getMetaContent(doc, "property", "og:image:favicon");
+		if (iconFromMeta) return iconFromMeta;
+
+		const iconLink = doc.querySelector("link[rel='icon']")?.getAttribute("href");
+		if (iconLink) return iconLink;
+
+		const shortcutLink = doc.querySelector("link[rel='shortcut icon']")?.getAttribute("href");
+		if (shortcutLink) return shortcutLink;
+
+		// Only try to construct favicon URL if we have a valid base URL
+		if (baseUrl) {
+			try {
+				return new URL("/favicon.ico", baseUrl).href;
+			} catch (e) {
+				console.warn('Failed to construct favicon URL:', e);
+			}
+		}
+
+		return '';
+	}
+
+	private static getPublished(doc: Document): string {
+		return (
+			this.getSchemaProperty(doc, 'datePublished') ||
+			this.getMetaContent(doc, "property", "article:published_time") ||
+			this.getTimeElement(doc) ||
+			this.getMetaContent(doc, "name", "sailthru.date") ||
+			''
+		);
+	}
+
+	private static getMetaContent(doc: Document, attr: string, value: string): string {
+		const selector = `meta[${attr}]`;
+		const element = Array.from(doc.querySelectorAll(selector))
+			.find(el => el.getAttribute(attr)?.toLowerCase() === value.toLowerCase());
+		return element ? element.getAttribute("content")?.trim() ?? "" : "";
+	}
+
+	private static getTimeElement(doc: Document): string {
+		const selector = `time`;
+		const element = Array.from(doc.querySelectorAll(selector))[0];
+		return element ? (element.getAttribute("datetime")?.trim() ?? element.textContent?.trim() ?? "") : "";
+	}
+
+	private static getSchemaProperty(doc: Document, property: string): string {
+		// Basic implementation - you may want to move the full schema.org parsing logic here
+		const schemaElements = doc.querySelectorAll('script[type="application/ld+json"]');
+		for (const element of Array.from(schemaElements)) {
+			try {
+				const data = JSON.parse(element.textContent || '');
+				// Basic property lookup - you may want to implement more sophisticated traversal
+				if (data[property]) {
+					return data[property];
+				}
+			} catch (e) {
+				continue;
+			}
+		}
+		return '';
 	}
 
 } 

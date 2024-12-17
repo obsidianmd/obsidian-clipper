@@ -38,6 +38,14 @@ declare global {
 		schemaOrgData: any;
 		fullHtml: string;
 		highlights: string[];
+		title: string;
+		description: string;
+		domain: string;
+		favicon: string;
+		image: string;
+		published: string;
+		author: string;
+		site: string;
 	}
 
 	browser.runtime.onMessage.addListener(function(request: any, sender: browser.Runtime.MessageSender, sendResponse: (response?: any) => void) {
@@ -102,12 +110,21 @@ declare global {
 			const cleanedHtml = doc.documentElement.outerHTML;
 
 			const response: ContentResponse = {
-				content: tidyResult?.content || doc.documentElement.outerHTML,
+				content: tidyResult.content,
 				selectedHtml: selectedHtml,
 				extractedContent: extractedContent,
 				schemaOrgData: schemaOrgData,
 				fullHtml: cleanedHtml,
-				highlights: highlighter.getHighlights()
+				
+				highlights: highlighter.getHighlights(),
+				title: tidyResult.title,
+				description: tidyResult.description,
+				domain: tidyResult.domain,
+				favicon: tidyResult.favicon,
+				image: tidyResult.image,
+				published: tidyResult.published,
+				author: tidyResult.author,
+				site: tidyResult.site
 			};
 
 			sendResponse(response);
