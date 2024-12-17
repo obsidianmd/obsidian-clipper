@@ -369,55 +369,49 @@ export class Tidy {
 		let basicSelectorCount = 0;
 		let patternMatchCount = 0;
 
-		// First remove elements matching basic selectors
-		BASIC_SELECTORS.forEach(selector => {
-			let elements: Element[] = [];
-			
-			if (selector.startsWith('.')) {
-				// Class selector
-				elements = Array.from(doc.getElementsByClassName(selector.slice(1)));
-			} else if (selector.startsWith('#')) {
-				// ID selector
-				const element = doc.getElementById(selector.slice(1));
-				if (element) elements = [element];
-			} else {
-				// Complex selector
-				elements = Array.from(doc.querySelectorAll(selector));
+		// Combine all basic selectors into a single selector string for one query
+		const combinedSelector = BASIC_SELECTORS.join(',');
+		const basicElements = doc.querySelectorAll(combinedSelector);
+		basicElements.forEach(el => {
+			if (el?.parentNode) {
+				el.remove();
+				basicSelectorCount++;
 			}
-
-			elements.forEach(el => {
-				if (el && el.parentNode) {
-					el.remove();
-					basicSelectorCount++;
-				}
-			});
 		});
 
 		debugLog('Tidy', `Removed ${basicSelectorCount} elements matching basic selectors`);
 
-		// Then handle pattern matching using a more efficient approach
-		const allElements = Array.from(doc.getElementsByTagName('*'));
+		// Create RegExp objects once instead of creating them in each iteration
+		const patternRegexes = CLUTTER_PATTERNS.map(pattern => new RegExp(pattern, 'i'));
+
+		// Use a DocumentFragment for batch removals
+		const elementsToRemove = new Set<Element>();
 		
-		// We need to iterate backwards since we're removing elements
-		for (let i = allElements.length - 1; i >= 0; i--) {
-			const el = allElements[i];
-			if (!el || !el.parentNode) continue;
+		// Get all elements with class, id, or data-testid attributes for more targeted iteration
+		const elements = doc.querySelectorAll('[class], [id], [data-testid]');
+		
+		elements.forEach(el => {
+			if (!el || !el.parentNode) return;
 
-			// Check if element should be removed based on its attributes
-			const shouldRemove = CLUTTER_PATTERNS.some(pattern => {
-				const classMatch = el.className && typeof el.className === 'string' && 
-					el.className.toLowerCase().includes(pattern);
-				const idMatch = el.id && el.id.toLowerCase().includes(pattern);
-				const testIdMatch = el.getAttribute('data-testid')?.toLowerCase().includes(pattern);
-				
-				return classMatch || idMatch || testIdMatch;
-			});
-
+			const className = el.className && typeof el.className === 'string' ? 
+				el.className.toLowerCase() : '';
+			const id = el.id ? el.id.toLowerCase() : '';
+			const testId = el.getAttribute('data-testid')?.toLowerCase() || '';
+			
+			// Combine all attributes into one string for single pass checking
+			const attributeText = `${className} ${id} ${testId}`;
+			
+			// Check if any pattern matches
+			const shouldRemove = patternRegexes.some(regex => regex.test(attributeText));
+			
 			if (shouldRemove) {
-				el.remove();
+				elementsToRemove.add(el);
 				patternMatchCount++;
 			}
-		}
+		});
+
+		// Batch remove elements
+		elementsToRemove.forEach(el => el.remove());
 
 		debugLog('Tidy', `Removed ${patternMatchCount} elements matching patterns`);
 		debugLog('Tidy', `Total elements removed: ${basicSelectorCount + patternMatchCount}`);
