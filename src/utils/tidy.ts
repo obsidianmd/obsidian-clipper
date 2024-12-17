@@ -88,6 +88,9 @@ const CLUTTER_PATTERNS = [
 	'author',
 	'banner',
 	'breadcrumb',
+	'button',
+	'btn-',
+	'-btn',
 	'byline',
 	'catlinks',
 	'collections',
@@ -737,13 +740,21 @@ export class Tidy {
 		const selector = `meta[${attr}]`;
 		const element = Array.from(doc.querySelectorAll(selector))
 			.find(el => el.getAttribute(attr)?.toLowerCase() === value.toLowerCase());
-		return element ? element.getAttribute("content")?.trim() ?? "" : "";
+		const content = element ? element.getAttribute("content")?.trim() ?? "" : "";
+		return this.decodeHTMLEntities(content);
 	}
 
 	private static getTimeElement(doc: Document): string {
 		const selector = `time`;
 		const element = Array.from(doc.querySelectorAll(selector))[0];
-		return element ? (element.getAttribute("datetime")?.trim() ?? element.textContent?.trim() ?? "") : "";
+		const content = element ? (element.getAttribute("datetime")?.trim() ?? element.textContent?.trim() ?? "") : "";
+		return this.decodeHTMLEntities(content);
+	}
+
+	private static decodeHTMLEntities(text: string): string {
+		const textarea = document.createElement('textarea');
+		textarea.innerHTML = text;
+		return textarea.value;
 	}
 
 	private static getSchemaPropertyBasic(schemaOrgData: any, property: string): string {
@@ -841,7 +852,7 @@ export class Tidy {
 			}
 			
 			const result = results.length > 0 ? results.filter(Boolean).join(', ') : defaultValue;
-			return result;
+			return this.decodeHTMLEntities(result);
 		} catch (error) {
 			console.error(`Error in getSchemaProperty for ${property}:`, error);
 			return defaultValue;
