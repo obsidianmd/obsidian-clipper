@@ -11,7 +11,6 @@ const MOBILE_WIDTH = 600;
 
 // Hidden element selectors
 const HIDDEN_ELEMENTS_SELECTOR = [
-	'[aria-hidden="true"]',
 	'[hidden]',
 	'[style*="display: none"]',
 	'[style*="display:none"]',
@@ -44,9 +43,10 @@ const ALLOWED_ATTRIBUTES = new Set([
 
 // Basic selectors for removing clutter
 const BASIC_SELECTORS = [
-	"#toc",
-	".toc",
+	'#toc',
+	'.toc',
 	'#comments',
+	'#siteSub',
 	'.Ad',
 	'.ad',
 	'aside',
@@ -66,9 +66,9 @@ const BASIC_SELECTORS = [
 	'select',
 	'sidebar',
 	'textarea',
-	"[class^='ad-']",
+	'[class^="ad-"]',
 	'[class$="-ad"]',
-	"[id^='ad-']",
+	'[id^="ad-"]',
 	'[id$="-ad"]',
 	'[role="banner"]',
 	'[role="dialog"]',
@@ -87,6 +87,7 @@ const CLUTTER_PATTERNS = [
 	'banner',
 	'breadcrumb',
 	'byline',
+	'catlinks',
 	'collections',
 	'comments',
 	'complementary',
@@ -104,6 +105,8 @@ const CLUTTER_PATTERNS = [
 	'meta-',
 	'metadata',
 	'more-',
+	'mw-editsection',
+	'mw-jump-link',
 	'nav-',
 	'navbar',
 	'next-',
@@ -179,19 +182,19 @@ export class Tidy {
 
 			// Apply mobile style to clone
 			this.applyMobileStyles(clone, mobileStyles);
-			
-			// Perform destructive operations on the clone
-			this.removeHiddenElements(clone);
-			this.removeClutter(clone);
 
 			// Find main content
 			const mainContent = this.findMainContent(clone);
 			if (!mainContent) {
 				debugLog('Tidy', 'No main content found');
 				return {
-					content: doc.documentElement.outerHTML
+					content: doc.body.innerHTML
 				};
 			}
+
+			// Perform destructive operations on the clone
+			this.removeHiddenElements(clone);
+			this.removeClutter(clone);
 
 			// todo:
 			// - remove empty elements
@@ -210,7 +213,7 @@ export class Tidy {
 		} catch (error) {
 			debugLog('Tidy', 'Error processing document:', error);
 			return {
-				content: doc.documentElement.outerHTML
+				content: doc.body.innerHTML
 			};
 		}
 	}

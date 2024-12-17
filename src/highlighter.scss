@@ -188,17 +188,32 @@ body.obsidian-highlighter-active {
 }
 
 body.obsidian-tidy-active {
+	--obsidian-clipper-text-color: #000;
+	--obsidian-clipper-background-color: #fff;
+	background: var(--obsidian-clipper-background-color) !important;	
+	color: var(--obsidian-clipper-text-color) !important;
 	font-size: 16px !important;
 	width: 42rem !important;
+	margin: 4rem auto 16rem !important;
 	max-width: 90% !important;
-	margin: 0 auto !important;
 	line-height: 1.6 !important;
 	font-family: system-ui, -apple-system, sans-serif !important;
 	img, video, figure {
-		max-width: 100%;
+		max-width: 100% !important;
+		height: auto;
+	}
+	figure {
+		margin-inline-start: 0 !important;
+		margin-inline-end: 0 !important;
+	}
+	a {
+		color: var(--obsidian-tidy-text-color) !important;
 	}
 	@media (prefers-color-scheme: dark) {
-		background: #1a1a1a;
-		color: #eee;
+		--obsidian-clipper-text-color: #eee;
+		--obsidian-clipper-background-color: #1a1a1a;
+		.mw-invert {
+			filter: invert(1);
+		}
 	}
 }
