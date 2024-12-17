@@ -1,5 +1,139 @@
 import { debugLog } from './debug';
 
+// Patterns for scoring content
+const POSITIVE_PATTERNS = /article|content|main|post|body|text|blog|story/i;
+const NEGATIVE_PATTERNS = /comment|meta|footer|footnote|foot|nav|sidebar|banner|ad|popup|menu/i;
+const BLOCK_ELEMENTS = ['div', 'section', 'article', 'main'];
+
+// Mobile viewport settings
+const MOBILE_VIEWPORT = 'width=device-width, initial-scale=1, maximum-scale=1';
+const MOBILE_WIDTH = 600;
+
+// Hidden element selectors
+const HIDDEN_ELEMENTS_SELECTOR = [
+	'[aria-hidden="true"]',
+	'[hidden]',
+	'[style*="display: none"]',
+	'[style*="display:none"]',
+	'[style*="visibility: hidden"]',
+	'[style*="visibility:hidden"]',
+	'.hidden',
+	'.invisible'
+].join(',');
+
+// Allowed attributes
+const ALLOWED_ATTRIBUTES = new Set([
+	'href',
+	'src',
+	'srcset',
+	'data-src',
+	'data-srcset',
+	'alt',
+	'title',
+	'id',
+	'class',
+	'width',
+	'height',
+	'colspan',
+	'rowspan',
+	'headers',
+	'aria-label',
+	'role',
+	'lang'
+]);
+
+// Basic selectors for removing clutter
+const BASIC_SELECTORS = [
+	"#toc",
+	".toc",
+	'#comments',
+	'.Ad',
+	'.ad',
+	'aside',
+	'button',
+	'dialog',
+	'fieldset',
+	'footer',
+	'form',
+	'header',
+	'input',
+	'iframe',
+	'label',
+	'link',
+	'nav',
+	'noscript',
+	'option',
+	'select',
+	'sidebar',
+	'textarea',
+	"[class^='ad-']",
+	'[class$="-ad"]',
+	"[id^='ad-']",
+	'[id$="-ad"]',
+	'[role="banner"]',
+	'[role="dialog"]',
+	'[role="complementary"]',
+	'[role="navigation"]'
+];
+
+// Patterns for matching against class, id, and data-testid
+const CLUTTER_PATTERNS = [
+	'avatar',
+	'-ad-',
+	'_ad_',
+	'article-end ',
+	'article-title',
+	'author',
+	'banner',
+	'breadcrumb',
+	'byline',
+	'collections',
+	'comments',
+	'complementary',
+	'eyebrow',
+	'facebook',
+	'feedback',
+	'fixed',
+	'footer',
+	'global',
+	'google',
+	'goog-',
+	'header',
+	'link-box',
+	'menu-',
+	'meta-',
+	'metadata',
+	'more-',
+	'nav-',
+	'navbar',
+	'next-',
+	'newsletter',
+	'overlay',
+	'popular',
+	'popup',
+	'profile',
+	'promo',
+	'qr_code',
+	'qr-code',
+	'read-next',
+	'reading-list',
+	'recommend',
+	'register',
+	'related',
+	'share',
+	'site-index',
+	'social',
+	'sticky',
+	'subscribe',
+	'tabs-',
+	'table-of-contents',
+	'toolbar',
+	'tree-item',
+	'-toc',
+	'trending',
+	'twitter'
+];
+
 interface ContentScore {
 	score: number;
 	element: Element;
@@ -11,49 +145,19 @@ interface StyleChange {
 }
 
 export class Tidy {
-	private static POSITIVE_PATTERNS = /article|content|main|post|body|text|blog|story/i;
-	private static NEGATIVE_PATTERNS = /comment|meta|footer|footnote|foot|nav|sidebar|banner|ad|popup|menu/i;
-	private static BLOCK_ELEMENTS = ['div', 'section', 'article', 'main'];
-
-	private static MOBILE_VIEWPORT = 'width=device-width, initial-scale=1, maximum-scale=1';
-	private static MOBILE_WIDTH = 600; // Default mobile viewport width
-
-	private static HIDDEN_ELEMENTS_SELECTOR = [
-		'[aria-hidden="true"]',
-		'[hidden]',
-		'[style*="display: none"]',
-		'[style*="display:none"]',
-		'[style*="visibility: hidden"]',
-		'[style*="visibility:hidden"]',
-		'.hidden',
-		'.invisible'
-	].join(',');
-
 	private static originalHTML: string | null = null;
 	private static isActive: boolean = false;
 
-	private static ALLOWED_ATTRIBUTES = new Set([
-		'href',
-		'src',
-		'srcset',
-		'data-src',
-		'data-srcset',
-		'alt',
-		'title',
-		'id',
-		'class',
-		'width',
-		'height',
-		'colspan',
-		'rowspan',
-		'headers',
-		'aria-label',
-		'role',
-		'lang'
-	]);
+	private static readonly POSITIVE_PATTERNS = POSITIVE_PATTERNS;
+	private static readonly NEGATIVE_PATTERNS = NEGATIVE_PATTERNS;
+	private static readonly BLOCK_ELEMENTS = BLOCK_ELEMENTS;
+	private static readonly MOBILE_VIEWPORT = MOBILE_VIEWPORT;
+	private static readonly MOBILE_WIDTH = MOBILE_WIDTH;
+	private static readonly HIDDEN_ELEMENTS_SELECTOR = HIDDEN_ELEMENTS_SELECTOR;
+	private static readonly ALLOWED_ATTRIBUTES = ALLOWED_ATTRIBUTES;
 
 	/**
-	 * Main entry point - cleans up HTML content and returns the main content
+	 * Main entry point
 	 */
 	static parse(doc: Document) {
 		debugLog('Tidy', 'Starting content extraction');
@@ -88,6 +192,10 @@ export class Tidy {
 					content: doc.documentElement.outerHTML
 				};
 			}
+
+			// todo:
+			// - remove empty elements
+			// - clever removals of sections like comments, related, etc
 
 			// Clean up the main content
 			this.cleanContent(mainContent);
@@ -209,154 +317,58 @@ export class Tidy {
 		let basicSelectorCount = 0;
 		let patternMatchCount = 0;
 
-		// Basic selectors that don't need attribute variants
-		const basicSelectors = [
-			"#toc",
-			".toc",
-			'#comments',
-				'.Ad',
-				'.ad',
-				'aside',
-				'button',
-				'dialog',
-				'fieldset',
-				'footer',
-				'form',
-				'header',
-				'input',
-				'iframe',
-				'label',
-				'link',
-				'nav',
-				'noscript',
-				'option',
-				'select',
-				'sidebar',
-				'textarea',
-				"[class^='ad-']",
-				'[class$="-ad"]',
-				"[id^='ad-']",
-				'[id$="-ad"]',
-				'[role="banner"]',
-				'[role="dialog"]',
-				'[role="complementary"]',
-				'[role="navigation"]'
-		];
-
-		// Patterns to match against class, id, and data-testid
-		const patterns = [
-			'avatar',
-			'-ad-',
-			'_ad_',
-			'article-end ',
-			'article-title',
-			'author',
-			'banner',
-			'breadcrumb',
-			'byline',
-			'collections',
-			'comments',
-			'complementary',
-			'eyebrow',
-			'facebook',
-			'feedback',
-			'fixed',
-			'footer',
-			'global',
-			'google',
-			'goog-',
-			'header',
-			'link-box',
-			'menu-',
-			'meta-',
-			'metadata',
-			'more-',
-			'nav-',
-			'navbar',
-			'next-',
-			'newsletter',
-			'overlay',
-			'popular',
-			'popup',
-			'profile',
-			'promo',
-			'qr_code',
-			'qr-code',
-			'read-next',
-			'reading-list',
-			'recommend',
-			'register',
-			'related',
-			'share',
-			'site-index',
-			'social',
-			'sticky',
-			'subscribe',
-			'tabs-',
-			'table-of-contents',
-			'toolbar',
-			'tree-item',
-			'-toc',
-			'trending',
-			'twitter'
-		];
-
-		try {
-			// First remove elements matching basic selectors
-			basicSelectors.forEach(selector => {
-				let elements: Element[] = [];
-				
-				if (selector.startsWith('.')) {
-					// Class selector
-					elements = Array.from(doc.getElementsByClassName(selector.slice(1)));
-				} else if (selector.startsWith('#')) {
-					// ID selector
-					const element = doc.getElementById(selector.slice(1));
-					if (element) elements = [element];
-				} else {
-					// Complex selector
-					elements = Array.from(doc.querySelectorAll(selector));
-				}
-
-				elements.forEach(el => {
-					if (el && el.parentNode) {
-						el.remove();
-						basicSelectorCount++;
-					}
-				});
-			});
-
-			debugLog('Tidy', `Removed ${basicSelectorCount} elements matching basic selectors`);
-
-			// Then handle pattern matching using a more efficient approach
-			const allElements = Array.from(doc.getElementsByTagName('*'));
+		// First remove elements matching basic selectors
+		BASIC_SELECTORS.forEach(selector => {
+			let elements: Element[] = [];
 			
-			// We need to iterate backwards since we're removing elements
-			for (let i = allElements.length - 1; i >= 0; i--) {
-				const el = allElements[i];
-				if (!el || !el.parentNode) continue;
-
-				// Check if element should be removed based on its attributes
-				const shouldRemove = patterns.some(pattern => {
-					const classMatch = el.className && typeof el.className === 'string' && 
-						el.className.toLowerCase().includes(pattern);
-					const idMatch = el.id && el.id.toLowerCase().includes(pattern);
-					const testIdMatch = el.getAttribute('data-testid')?.toLowerCase().includes(pattern);
-					
-					return classMatch || idMatch || testIdMatch;
-				});
-
-				if (shouldRemove) {
-					el.remove();
-					patternMatchCount++;
-				}
+			if (selector.startsWith('.')) {
+				// Class selector
+				elements = Array.from(doc.getElementsByClassName(selector.slice(1)));
+			} else if (selector.startsWith('#')) {
+				// ID selector
+				const element = doc.getElementById(selector.slice(1));
+				if (element) elements = [element];
+			} else {
+				// Complex selector
+				elements = Array.from(doc.querySelectorAll(selector));
 			}
 
-			debugLog('Tidy', `Removed ${patternMatchCount} elements matching patterns`);
-			debugLog('Tidy', `Total elements removed: ${basicSelectorCount + patternMatchCount}`);
-		} catch (e) {
-			debugLog('Tidy', 'Error in removeClutter:', e);
+			elements.forEach(el => {
+				if (el && el.parentNode) {
+					el.remove();
+					basicSelectorCount++;
+				}
+			});
+		});
+
+		debugLog('Tidy', `Removed ${basicSelectorCount} elements matching basic selectors`);
+
+		// Then handle pattern matching using a more efficient approach
+		const allElements = Array.from(doc.getElementsByTagName('*'));
+		
+		// We need to iterate backwards since we're removing elements
+		for (let i = allElements.length - 1; i >= 0; i--) {
+			const el = allElements[i];
+			if (!el || !el.parentNode) continue;
+
+			// Check if element should be removed based on its attributes
+			const shouldRemove = CLUTTER_PATTERNS.some(pattern => {
+				const classMatch = el.className && typeof el.className === 'string' && 
+					el.className.toLowerCase().includes(pattern);
+				const idMatch = el.id && el.id.toLowerCase().includes(pattern);
+				const testIdMatch = el.getAttribute('data-testid')?.toLowerCase().includes(pattern);
+				
+				return classMatch || idMatch || testIdMatch;
+			});
+
+			if (shouldRemove) {
+				el.remove();
+				patternMatchCount++;
+			}
 		}
+
+		debugLog('Tidy', `Removed ${patternMatchCount} elements matching patterns`);
+		debugLog('Tidy', `Total elements removed: ${basicSelectorCount + patternMatchCount}`);
 	}
 
 	private static cleanContent(element: Element) {
@@ -496,24 +508,11 @@ export class Tidy {
 			return;
 		}
 
-		// Create clean HTML structure
+		// Fresh HTML to inject the tidy reader view
 		doc.documentElement.innerHTML = `
 			<head>
 				<meta charset="UTF-8">
 				<meta name="viewport" content="${this.MOBILE_VIEWPORT}">
-				<style>
-					body {
-						max-width: 800px;
-						margin: 0 auto;
-						padding: 20px;
-						font-family: system-ui, -apple-system, sans-serif;
-						line-height: 1.6;
-					}
-					img {
-						max-width: 100%;
-						height: auto;
-					}
-				</style>
 			</head>
 			<body>${parsed.content}</body>
 		`;

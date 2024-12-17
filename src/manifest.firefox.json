@@ -42,7 +42,7 @@
 		{
 			"matches": ["http://*/*", "https://*/*"],
 			"js": ["content.js"],
-			"css": ["highlighter.css", "tidy.css"]
+			"css": ["highlighter.css"]
 		}
 	],
 	"content_security_policy": {
