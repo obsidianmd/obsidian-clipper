@@ -519,6 +519,19 @@ export class Tidy {
 		// Store original HTML for restoration
 		this.originalHTML = doc.documentElement.outerHTML;
 		
+		// Clean the html element but preserve lang and dir attributes
+		const htmlElement = doc.documentElement;
+		const lang = htmlElement.getAttribute('lang');
+		const dir = htmlElement.getAttribute('dir');
+		
+		Array.from(htmlElement.attributes).forEach(attr => {
+			htmlElement.removeAttribute(attr.name);
+		});
+		
+		// Restore lang and dir if they existed
+		if (lang) htmlElement.setAttribute('lang', lang);
+		if (dir) htmlElement.setAttribute('dir', dir);
+		
 		// Parse the document
 		const parsed = this.parse(doc);
 		if (!parsed) {
@@ -527,7 +540,7 @@ export class Tidy {
 		}
 
 		// Fresh HTML to inject the tidy reader view
-		doc.documentElement.innerHTML = `
+		htmlElement.innerHTML = `
 			<head>
 				<meta charset="UTF-8">
 				<meta name="viewport" content="${this.MOBILE_VIEWPORT}">
