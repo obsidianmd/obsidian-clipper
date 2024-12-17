@@ -62,7 +62,6 @@ declare global {
 			}
 
 			const extractedContent: { [key: string]: string } = {};
-			const schemaOrgData = extractSchemaOrgData();
 
 			// Process with Tidy first while we have access to the document
 			const tidyResult = Tidy.parse(document);
@@ -110,27 +109,26 @@ declare global {
 			const cleanedHtml = doc.documentElement.outerHTML;
 
 			const response: ContentResponse = {
+				author: tidyResult.author,
 				content: tidyResult.content,
-				selectedHtml: selectedHtml,
-				extractedContent: extractedContent,
-				schemaOrgData: schemaOrgData,
-				fullHtml: cleanedHtml,
-				
-				highlights: highlighter.getHighlights(),
-				title: tidyResult.title,
 				description: tidyResult.description,
 				domain: tidyResult.domain,
+				extractedContent: extractedContent,
 				favicon: tidyResult.favicon,
+				fullHtml: cleanedHtml,
+				highlights: highlighter.getHighlights(),
 				image: tidyResult.image,
 				published: tidyResult.published,
-				author: tidyResult.author,
-				site: tidyResult.site
+				schemaOrgData: tidyResult.schemaOrgData,
+				selectedHtml: selectedHtml,
+				site: tidyResult.site,
+				title: tidyResult.title
 			};
 
 			sendResponse(response);
 		} else if (request.action === "extractContent") {
 			const content = extractContentBySelector(request.selector, request.attribute, request.extractHtml);
-			sendResponse({ content: content, schemaOrgData: extractSchemaOrgData() });
+			sendResponse({ content: content });
 		} else if (request.action === "paintHighlights") {
 			highlighter.loadHighlights().then(() => {
 				if (generalSettings.alwaysShowHighlights) {
@@ -259,38 +257,6 @@ declare global {
 			console.error('Error in extractContentBySelector:', error, { selector, attribute, extractHtml });
 			return '';
 		}
-	}
-
-	function extractSchemaOrgData(): any {
-		const schemaScripts = document.querySelectorAll('script[type="application/ld+json"]');
-		const schemaData: any[] = [];
-
-		schemaScripts.forEach(script => {
-			let jsonContent = script.textContent || '';
-			
-			try {
-				// Consolidated regex to clean up the JSON content
-				jsonContent = jsonContent
-					.replace(/\/\*[\s\S]*?\*\/|^\s*\/\/.*$/gm, '') // Remove multi-line and single-line comments
-					.replace(/^\s*<!\[CDATA\[([\s\S]*?)\]\]>\s*$/, '$1') // Remove CDATA wrapper
-					.replace(/^\s*(\*\/|\/\*)\s*|\s*(\*\/|\/\*)\s*$/g, '') // Remove any remaining comment markers at start or end
-					.trim();
-					
-				const jsonData = JSON.parse(jsonContent);
-
-				// If this is a @graph structure, add each item individually
-				if (jsonData['@graph'] && Array.isArray(jsonData['@graph'])) {
-					schemaData.push(...jsonData['@graph']);
-				} else {
-					schemaData.push(jsonData);
-				}
-			} catch (error) {
-				console.error('Error parsing schema.org data:', error);
-				console.error('Problematic JSON content:', jsonContent);
-			}
-		});
-
-		return schemaData;
 	}
 
 	function updateHasHighlights() {

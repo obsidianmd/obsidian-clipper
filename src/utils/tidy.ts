@@ -172,10 +172,21 @@ interface TidyResponse {
 	published: string;
 	author: string;
 	site: string;
+	schemaOrgData: any;
 }
 
 // Keep this interface for internal use
-interface TidyMetadata extends Omit<TidyResponse, 'content'> {}
+interface TidyMetadata extends Omit<TidyResponse, 'content'> {
+	title: string;
+	description: string;
+	domain: string;
+	favicon: string;
+	image: string;
+	published: string;
+	author: string;
+	site: string;
+	schemaOrgData: any;
+}
 
 export class Tidy {
 	private static originalHTML: string | null = null;
@@ -206,9 +217,8 @@ export class Tidy {
 			 * We run this before we clone the document to avoid making network requests.
 			 */
 			const mobileStyles = this.evaluateMediaQueries(doc);
-			
-			// Clone the document
 			const clone = doc.cloneNode(true) as Document;
+			const schemaOrgData = this.extractSchemaOrgData(doc);
 
 			// Apply mobile style to clone
 			this.applyMobileStyles(clone, mobileStyles);
@@ -219,7 +229,7 @@ export class Tidy {
 				debugLog('Tidy', 'No main content found');
 				return {
 					content: doc.body.innerHTML,
-					...this.extractMetadata(doc)
+					...this.extractMetadata(doc, schemaOrgData)
 				};
 			}
 
@@ -238,7 +248,7 @@ export class Tidy {
 			debugLog('Tidy', `Final element count in main content: ${finalElementCount}`);
 			debugLog('Tidy', `Elements removed: ${startElementCount - finalElementCount}`);
 
-			const metadata = this.extractMetadata(doc);
+			const metadata = this.extractMetadata(doc, schemaOrgData);
 
 			return {
 				content: mainContent ? mainContent.outerHTML : doc.body.innerHTML,
@@ -246,9 +256,10 @@ export class Tidy {
 			};
 		} catch (error) {
 			debugLog('Tidy', 'Error processing document:', error);
+			const schemaOrgData = this.extractSchemaOrgData(doc);
 			return {
 				content: doc.body.innerHTML,
-				...this.extractMetadata(doc)
+				...this.extractMetadata(doc, schemaOrgData)
 			};
 		}
 	}
@@ -588,7 +599,7 @@ export class Tidy {
 		}
 	}
 
-	private static extractMetadata(doc: Document): TidyMetadata {
+	private static extractMetadata(doc: Document, schemaOrgData: any): TidyMetadata {
 		let domain = '';
 		let url = '';
 
@@ -612,54 +623,55 @@ export class Tidy {
 		}
 
 		return {
-			title: this.getTitle(doc),
-			description: this.getDescription(doc),
+			title: this.getTitle(doc, schemaOrgData),
+			description: this.getDescription(doc, schemaOrgData),
 			domain,
 			favicon: this.getFavicon(doc, url),
-			image: this.getImage(doc),
-			published: this.getPublished(doc),
-			author: this.getAuthor(doc),
-			site: this.getSite(doc)
+			image: this.getImage(doc, schemaOrgData),
+			published: this.getPublished(doc, schemaOrgData),
+			author: this.getAuthor(doc, schemaOrgData),
+			site: this.getSite(doc, schemaOrgData),
+			schemaOrgData
 		};
 	}
 
-	private static getAuthor(doc: Document): string {
+	private static getAuthor(doc: Document, schemaOrgData: any): string {
 		return (
 			this.getMetaContent(doc, "name", "sailthru.author") ||
-			this.getSchemaProperty(doc, 'author.name') ||
+			this.getSchemaProperty(schemaOrgData, 'author.name') ||
 			this.getMetaContent(doc, "property", "author") ||
 			this.getMetaContent(doc, "name", "byl") ||
 			this.getMetaContent(doc, "name", "author") ||
 			this.getMetaContent(doc, "name", "copyright") ||
-			this.getSchemaProperty(doc, 'copyrightHolder.name') ||
+			this.getSchemaProperty(schemaOrgData, 'copyrightHolder.name') ||
 			this.getMetaContent(doc, "property", "og:site_name") ||
-			this.getSchemaProperty(doc, 'publisher.name') ||
-			this.getSchemaProperty(doc, 'sourceOrganization.name') ||
-			this.getSchemaProperty(doc, 'isPartOf.name') ||
+			this.getSchemaProperty(schemaOrgData, 'publisher.name') ||
+			this.getSchemaProperty(schemaOrgData, 'sourceOrganization.name') ||
+			this.getSchemaProperty(schemaOrgData, 'isPartOf.name') ||
 			this.getMetaContent(doc, "name", "twitter:creator") ||
 			this.getMetaContent(doc, "name", "application-name") ||
 			''
 		);
 	}
 
-	private static getSite(doc: Document): string {
+	private static getSite(doc: Document, schemaOrgData: any): string {
 		return (
-			this.getSchemaProperty(doc, 'publisher.name') ||
+			this.getSchemaProperty(schemaOrgData, 'publisher.name') ||
 			this.getMetaContent(doc, "property", "og:site_name") ||
-			this.getSchemaProperty(doc, 'sourceOrganization.name') ||
+			this.getSchemaProperty(schemaOrgData, 'sourceOrganization.name') ||
 			this.getMetaContent(doc, "name", "copyright") ||
-			this.getSchemaProperty(doc, 'copyrightHolder.name') ||
-			this.getSchemaProperty(doc, 'isPartOf.name') ||
+			this.getSchemaProperty(schemaOrgData, 'copyrightHolder.name') ||
+			this.getSchemaProperty(schemaOrgData, 'isPartOf.name') ||
 			this.getMetaContent(doc, "name", "application-name") ||
 			''
 		);
 	}
 
-	private static getTitle(doc: Document): string {
+	private static getTitle(doc: Document, schemaOrgData: any): string {
 		return (
 			this.getMetaContent(doc, "property", "og:title") ||
 			this.getMetaContent(doc, "name", "twitter:title") ||
-			this.getSchemaProperty(doc, 'headline') ||
+			this.getSchemaProperty(schemaOrgData, 'headline') ||
 			this.getMetaContent(doc, "name", "title") ||
 			this.getMetaContent(doc, "name", "sailthru.title") ||
 			doc.querySelector('title')?.textContent?.trim() ||
@@ -667,23 +679,23 @@ export class Tidy {
 		);
 	}
 
-	private static getDescription(doc: Document): string {
+	private static getDescription(doc: Document, schemaOrgData: any): string {
 		return (
 			this.getMetaContent(doc, "name", "description") ||
 			this.getMetaContent(doc, "property", "description") ||
 			this.getMetaContent(doc, "property", "og:description") ||
-			this.getSchemaProperty(doc, 'description') ||
+			this.getSchemaProperty(schemaOrgData, 'description') ||
 			this.getMetaContent(doc, "name", "twitter:description") ||
 			this.getMetaContent(doc, "name", "sailthru.description") ||
 			''
 		);
 	}
 
-	private static getImage(doc: Document): string {
+	private static getImage(doc: Document, schemaOrgData: any): string {
 		return (
 			this.getMetaContent(doc, "property", "og:image") ||
 			this.getMetaContent(doc, "name", "twitter:image") ||
-			this.getSchemaProperty(doc, 'image.url') ||
+			this.getSchemaProperty(schemaOrgData, 'image.url') ||
 			this.getMetaContent(doc, "name", "sailthru.image.full") ||
 			''
 		);
@@ -711,9 +723,9 @@ export class Tidy {
 		return '';
 	}
 
-	private static getPublished(doc: Document): string {
+	private static getPublished(doc: Document, schemaOrgData: any): string {
 		return (
-			this.getSchemaProperty(doc, 'datePublished') ||
+			this.getSchemaProperty(schemaOrgData, 'datePublished') ||
 			this.getMetaContent(doc, "property", "article:published_time") ||
 			this.getTimeElement(doc) ||
 			this.getMetaContent(doc, "name", "sailthru.date") ||
@@ -734,21 +746,139 @@ export class Tidy {
 		return element ? (element.getAttribute("datetime")?.trim() ?? element.textContent?.trim() ?? "") : "";
 	}
 
-	private static getSchemaProperty(doc: Document, property: string): string {
-		// Basic implementation - you may want to move the full schema.org parsing logic here
-		const schemaElements = doc.querySelectorAll('script[type="application/ld+json"]');
-		for (const element of Array.from(schemaElements)) {
+	private static getSchemaPropertyBasic(schemaOrgData: any, property: string): string {
+		if (!Array.isArray(schemaOrgData)) {
+			return '';
+		}
+
+		for (const item of schemaOrgData) {
 			try {
-				const data = JSON.parse(element.textContent || '');
-				// Basic property lookup - you may want to implement more sophisticated traversal
-				if (data[property]) {
-					return data[property];
+				if (item[property]) {
+					return item[property];
 				}
 			} catch (e) {
 				continue;
 			}
 		}
 		return '';
+	}
+
+	private static getSchemaProperty(schemaOrgData: any, property: string, defaultValue: string = ''): string {
+		if (!schemaOrgData) return defaultValue;
+	
+		const searchSchema = (data: any, props: string[], fullPath: string, isExactMatch: boolean = true): string[] => {
+			if (typeof data === 'string') {
+				return props.length === 0 ? [data] : [];
+			}
+			
+			if (!data || typeof data !== 'object') {
+				return [];
+			}
+	
+			if (Array.isArray(data)) {
+	
+				const currentProp = props[0];
+				if (/^\[\d+\]$/.test(currentProp)) {
+					const index = parseInt(currentProp.slice(1, -1));
+					if (data[index]) {
+						return searchSchema(data[index], props.slice(1), fullPath, isExactMatch);
+					}
+					return [];
+				}
+				
+				if (props.length === 0 && data.every(item => typeof item === 'string' || typeof item === 'number')) {
+					return data.map(String);
+				}
+				
+				// Collect all matches from array items
+				const results = data.flatMap(item => 
+					searchSchema(item, props, fullPath, isExactMatch)
+				);
+				return results;
+			}
+	
+			const [currentProp, ...remainingProps] = props;
+			
+			if (!currentProp) {
+				if (typeof data === 'string') return [data];
+				if (typeof data === 'object' && data.name) {
+					return [data.name];
+				}
+				return [];
+			}
+	
+			// Check for exact path match first
+			if (data.hasOwnProperty(currentProp)) {
+				return searchSchema(data[currentProp], remainingProps, 
+					fullPath ? `${fullPath}.${currentProp}` : currentProp, true);
+			}
+	
+			// Only search nested objects if we're allowing non-exact matches
+			if (!isExactMatch) {
+				const nestedResults: string[] = [];
+				for (const key in data) {
+					if (typeof data[key] === 'object') {
+						const results = searchSchema(data[key], props, 
+							fullPath ? `${fullPath}.${key}` : key, false);
+						nestedResults.push(...results);
+					}
+				}
+				if (nestedResults.length > 0) {
+					return nestedResults;
+				}
+			}
+	
+			return [];
+		};
+	
+		try {
+			// First try exact match
+			let results = searchSchema(schemaOrgData, property.split('.'), '', true);
+			
+			// If no exact match found, try recursive search
+			if (results.length === 0) {
+				results = searchSchema(schemaOrgData, property.split('.'), '', false);
+			}
+			
+			const result = results.length > 0 ? results.filter(Boolean).join(', ') : defaultValue;
+			return result;
+		} catch (error) {
+			console.error(`Error in getSchemaProperty for ${property}:`, error);
+			return defaultValue;
+		}
+	}
+	
+
+	private static extractSchemaOrgData(doc: Document): any {
+		const schemaScripts = doc.querySelectorAll('script[type="application/ld+json"]');
+		const schemaData: any[] = [];
+
+		schemaScripts.forEach(script => {
+			let jsonContent = script.textContent || '';
+			
+			try {
+				// Consolidated regex to clean up the JSON content
+				jsonContent = jsonContent
+					.replace(/\/\*[\s\S]*?\*\/|^\s*\/\/.*$/gm, '') // Remove multi-line and single-line comments
+					.replace(/^\s*<!\[CDATA\[([\s\S]*?)\]\]>\s*$/, '$1') // Remove CDATA wrapper
+					.replace(/^\s*(\*\/|\/\*)\s*|\s*(\*\/|\/\*)\s*$/g, '') // Remove any remaining comment markers at start or end
+					.trim();
+					
+				const jsonData = JSON.parse(jsonContent);
+
+				// If this is a @graph structure, add each item individually
+				if (jsonData['@graph'] && Array.isArray(jsonData['@graph'])) {
+					schemaData.push(...jsonData['@graph']);
+				} else {
+					schemaData.push(jsonData);
+				}
+			} catch (error) {
+				console.error('Error parsing schema.org data:', error);
+				console.error('Problematic JSON content:', jsonContent);
+			}
+		});
+
+		return schemaData;
 	}
 
 } 
