@@ -369,8 +369,29 @@ export class Tidy {
 	}
 
 	private static cleanContent(element: Element) {
+		// Remove HTML comments
+		this.removeHtmlComments(element);
+		
 		// Strip unwanted attributes
 		this.stripUnwantedAttributes(element);
+	}
+
+	private static removeHtmlComments(element: Element) {
+		const walker = document.createTreeWalker(
+			element,
+			NodeFilter.SHOW_COMMENT,
+			null
+		);
+
+		const comments: Comment[] = [];
+		let node;
+		while (node = walker.nextNode()) {
+			comments.push(node as Comment);
+		}
+
+		comments.forEach(comment => {
+			comment.remove();
+		});
 	}
 
 	private static stripUnwantedAttributes(element: Element) {
