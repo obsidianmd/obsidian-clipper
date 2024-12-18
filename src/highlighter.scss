@@ -187,7 +187,7 @@ body.obsidian-highlighter-active {
 	}
 }
 
-body.obsidian-tidy-active {
+body.obsidian-reader-active {
 	--obsidian-clipper-text-color: #000;
 	--obsidian-clipper-background-color: #fff;
 	background: var(--obsidian-clipper-background-color) !important;	
@@ -207,7 +207,7 @@ body.obsidian-tidy-active {
 		margin-inline-end: 0 !important;
 	}
 	a {
-		color: var(--obsidian-tidy-text-color) !important;
+		color: var(--obsidian-reader-text-color) !important;
 	}
 	@media (prefers-color-scheme: dark) {
 		--obsidian-clipper-text-color: #eee;
