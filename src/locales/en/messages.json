@@ -163,6 +163,9 @@
 	"disableHighlighter": {
 		"message": "Disable highlighter"
 	},
+	"disableReader": {
+		"message": "Disable reading view"
+	},
 	"done": {
 		"message": "Done"
 	},
@@ -220,6 +223,9 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"enableReader": {
+		"message": "Open reading view"
 	},
 	"error": {
 		"message": "Error"
@@ -606,6 +612,9 @@
 	},
 	"recommended": {
 		"message": "recommended"
+	},
+	"reader": {
+		"message": "Reader"
 	},
 	"refresh": {
 		"message": "Refresh"

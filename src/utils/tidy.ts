@@ -6,7 +6,6 @@ const NEGATIVE_PATTERNS = /comment|meta|footer|footnote|foot|nav|sidebar|banner|
 const BLOCK_ELEMENTS = ['div', 'section', 'article', 'main'];
 
 // Mobile viewport settings
-const MOBILE_VIEWPORT = 'width=device-width, initial-scale=1, maximum-scale=1';
 const MOBILE_WIDTH = 600;
 
 // Hidden element selectors
@@ -199,20 +198,12 @@ interface TidyMetadata extends Omit<TidyResponse, 'content'> {
 }
 
 export class Tidy {
-	private static originalHTML: string | null = null;
-	private static isActive: boolean = false;
-
 	private static readonly POSITIVE_PATTERNS = POSITIVE_PATTERNS;
 	private static readonly NEGATIVE_PATTERNS = NEGATIVE_PATTERNS;
 	private static readonly BLOCK_ELEMENTS = BLOCK_ELEMENTS;
-	private static readonly MOBILE_VIEWPORT = MOBILE_VIEWPORT;
-	private static readonly MOBILE_WIDTH = MOBILE_WIDTH;
 	private static readonly HIDDEN_ELEMENTS_SELECTOR = HIDDEN_ELEMENTS_SELECTOR;
 	private static readonly ALLOWED_ATTRIBUTES = ALLOWED_ATTRIBUTES;
 
-	/**
-	 * Main entry point
-	 */
 	static parse(doc: Document): TidyResponse {
 		debugLog('Tidy', 'Starting content extraction');
 		const startElementCount = doc.getElementsByTagName('*').length;
@@ -220,7 +211,7 @@ export class Tidy {
 
 		try {
 			/**
-			 * First we look for elements that are hidden or styled differently on mobile and 
+			 * First look for elements that are hidden or styled differently on mobile and 
 			 * collect the styles that are applied to them. This is because most sites only
 			 * only show essential content on mobile, so it helps us to hide the clutter.
 			 * 
@@ -296,7 +287,7 @@ export class Tidy {
 							if (rule.conditionText.includes('max-width')) {
 								const maxWidth = parseInt(rule.conditionText.match(/\d+/)?.[0] || '0');
 								
-								if (this.MOBILE_WIDTH <= maxWidth) {
+								if (MOBILE_WIDTH <= maxWidth) {
 									Array.from(rule.cssRules).forEach(cssRule => {
 										if (cssRule instanceof CSSStyleRule) {
 											try {
@@ -538,130 +529,6 @@ export class Tidy {
 		score += Math.min(images * 3, 9);
 
 		return score;
-	}
-
-	static toggle(doc: Document): boolean {
-		if (this.isActive) {
-			this.restore(doc);
-			return false;
-		} else {
-			this.apply(doc);
-			return true;
-		}
-	}
-
-	static apply(doc: Document) {
-		// Store original HTML for restoration
-		this.originalHTML = doc.documentElement.outerHTML;
-		
-		// Clean the html element but preserve lang and dir attributes
-		const htmlElement = doc.documentElement;
-		const lang = htmlElement.getAttribute('lang');
-		const dir = htmlElement.getAttribute('dir');
-		
-		Array.from(htmlElement.attributes).forEach(attr => {
-			htmlElement.removeAttribute(attr.name);
-		});
-		
-		// Restore lang and dir if they existed
-		if (lang) htmlElement.setAttribute('lang', lang);
-		if (dir) htmlElement.setAttribute('dir', dir);
-		
-		// Parse the document
-		const parsed = this.parse(doc);
-		if (!parsed) {
-			debugLog('Tidy', 'Failed to parse document');
-			return;
-		}
-
-		// Format the published date if it exists
-		let formattedDate = '';
-		if (parsed.published) {
-			try {
-				const date = new Date(parsed.published);
-				if (!isNaN(date.getTime())) {
-					formattedDate = new Intl.DateTimeFormat(undefined, {
-						year: 'numeric',
-						month: 'long',
-						day: 'numeric',
-						timeZone: 'UTC'
-					}).format(date);
-				} else {
-					formattedDate = parsed.published;
-				}
-			} catch (e) {
-				formattedDate = parsed.published;
-				debugLog('Tidy', 'Error formatting date:', e);
-			}
-		}
-
-		// Clean up head - remove unwanted elements but keep meta tags and non-stylesheet links
-		const head = doc.head;
-
-		// Remove scripts except JSON-LD schema
-		const scripts = head.querySelectorAll('script:not([type="application/ld+json"])');
-		scripts.forEach(el => el.remove());
-
-		// Remove base tags
-		const baseTags = head.querySelectorAll('base');
-		baseTags.forEach(el => el.remove());
-
-		// Remove only stylesheet links and style tags
-		const styleElements = head.querySelectorAll('link[rel="stylesheet"], link[as="style"], style');
-		styleElements.forEach(el => el.remove());
-
-		// Ensure we have our required meta tags
-		const existingViewport = head.querySelector('meta[name="viewport"]');
-		if (existingViewport) {
-			existingViewport.setAttribute('content', this.MOBILE_VIEWPORT);
-		} else {
-			const viewport = document.createElement('meta');
-			viewport.setAttribute('name', 'viewport');
-			viewport.setAttribute('content', this.MOBILE_VIEWPORT);
-			head.appendChild(viewport);
-		}
-
-		const existingCharset = head.querySelector('meta[charset]');
-		if (existingCharset) {
-			existingCharset.setAttribute('charset', 'UTF-8');
-		} else {
-			const charset = document.createElement('meta');
-			charset.setAttribute('charset', 'UTF-8');
-			head.insertBefore(charset, head.firstChild);
-		}
-
-		// Replace body content with reader view
-		doc.body.innerHTML = `
-			<article>
-			${parsed.title ? `<h1>${parsed.title}</h1>` : ''}
-				<div class="metadata">
-					<div class="metadata-details">
-						${parsed.author ? `<span>By ${parsed.author}</span>` : ''}
-						${formattedDate ? `<span> • ${formattedDate}</span>` : ''}
-						${parsed.domain ? `<span> • <a href="${doc.URL}">${parsed.domain}</a></span>` : ''}
-					</div>
-				</div>
-				${parsed.content}
-			</article>
-		`;
-
-		doc.body.className = 'obsidian-tidy-active';
-		
-		this.isActive = true;
-	}
-
-	static restore(doc: Document) {
-		if (this.originalHTML) {			
-			const parser = new DOMParser();
-			const newDoc = parser.parseFromString(this.originalHTML, 'text/html');
-			doc.replaceChild(
-				newDoc.documentElement,
-				doc.documentElement
-			);
-			
-			this.originalHTML = null;
-			this.isActive = false;
-		}
 	}
 
 	private static extractMetadata(doc: Document, schemaOrgData: any): TidyMetadata {

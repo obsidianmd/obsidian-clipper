@@ -2,6 +2,7 @@ import browser from './utils/browser-polyfill';
 import * as highlighter from './utils/highlighter';
 import { loadSettings, generalSettings } from './utils/storage-utils';
 import { Tidy } from './utils/tidy';
+import { Reader } from './utils/reader';
 
 declare global {
 	interface Window {
@@ -219,14 +220,14 @@ declare global {
 					sendResponse({ isActive: false });
 				});
 			return true;
-		} else if (request.action === "toggleTidyMode") {
+		} else if (request.action === "toggleReaderMode") {
 			try {
-				const isActive = Tidy.toggle(document);
-				document.body.classList.toggle('obsidian-tidy-active', isActive);
+				const isActive = Reader.toggle(document);
+				document.body.classList.toggle('obsidian-reader-active', isActive);
 				sendResponse({ success: true, isActive });
-			} catch (error) {
-				console.error('Error in toggleTidyMode:', error);
-				sendResponse({ success: false, isActive: false });
+			} catch (error: unknown) {
+				console.error('Error toggling reader mode:', error);
+				sendResponse({ success: false, error: error instanceof Error ? error.message : 'Unknown error' });
 			}
 			return true;
 		}

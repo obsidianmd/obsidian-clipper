@@ -25,7 +25,7 @@ import { sanitizeFileName } from '../utils/string-utils';
 import { saveFile } from '../utils/file-utils';
 import { translatePage, getMessage, setupLanguageAndDirection } from '../utils/i18n';
 
-interface TidyModeResponse {
+interface ReaderModeResponse {
 	success: boolean;
 	isActive: boolean;
 }
@@ -467,9 +467,9 @@ function setupEventListeners(tabId: number) {
 		});
 	}
 
-	const tidyModeButton = document.getElementById('tidy-mode');
-	if (tidyModeButton) {
-		tidyModeButton.addEventListener('click', () => toggleTidyMode(tabId));
+	const readerModeButton = document.getElementById('reader-mode');
+	if (readerModeButton) {
+		readerModeButton.addEventListener('click', () => toggleReaderMode(tabId));
 	}
 }
 
@@ -1079,6 +1079,32 @@ function updateHighlighterModeUI(isActive: boolean) {
 	}
 }
 
+async function toggleReaderMode(tabId: number) {
+	try {
+		const response = await browser.tabs.sendMessage(tabId, { 
+			action: "toggleReaderMode"
+		}) as ReaderModeResponse;
+
+		if (response && response.success) {
+			const readerButton = document.getElementById('reader-mode');
+			if (readerButton) {
+				const isActive = response.isActive ?? false;
+				readerButton.classList.toggle('active', isActive);
+				readerButton.setAttribute('aria-pressed', isActive.toString());
+				readerButton.title = isActive ? getMessage('disableReader') : getMessage('enableReader');
+			}
+		}
+
+		// Close the popup if not in side panel
+		if (!isSidePanel) {
+			window.close();
+		}
+	} catch (error) {
+		console.error('Error toggling reader mode:', error);
+		showError('failedToToggleReaderMode');
+	}
+}
+
 export async function copyToClipboard(content: string) {
 	try {
 		await navigator.clipboard.writeText(content);
@@ -1152,29 +1178,3 @@ async function handleSaveToDownloads() {
 
 // Update the resize event listener to use the debounced version
 window.addEventListener('resize', debouncedSetPopupDimensions);
-
-async function toggleTidyMode(tabId: number) {
-	try {
-		const response = await browser.tabs.sendMessage(tabId, { 
-			action: "toggleTidyMode"
-		}) as TidyModeResponse;
-
-		// Update button state if successful
-		if (response && response.success) {
-			const tidyButton = document.getElementById('tidy-mode');
-			if (tidyButton) {
-				const isActive = response.isActive ?? false;
-				tidyButton.classList.toggle('active', isActive);
-				tidyButton.setAttribute('aria-pressed', isActive.toString());
-			}
-		}
-
-		// Close the popup if not in side panel
-		if (!isSidePanel) {
-			window.close();
-		}
-	} catch (error) {
-		console.error('Error toggling tidy mode:', error);
-		showError('failedToToggleTidyMode');
-	}
-}
