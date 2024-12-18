@@ -183,7 +183,7 @@ interface TidyResponse extends TidyMetadata {
 }
 
 export class Tidy {
-	private static debug = false;
+	private static debug = true;
 
 	static enableDebug(enable: boolean = true) {
 		this.debug = enable;
@@ -517,31 +517,76 @@ export class Tidy {
 	}
 
 	private static findMainContent(doc: Document): Element | null {
-		// First look for elements with explicit content markers
-		const mainContent = doc.querySelector([
-			'body',
-			'main',
-			'[role="main"]',
-			'[role="article"]',
+		// Priority list of content markers
+		const contentSelectors = [
 			'article',
+			'[role="article"]',
 			'[itemprop="articleBody"]',
 			'.post-content',
 			'.article-content',
 			'#article-content',
 			'.content-article',
-		].join(','));
+			'main',
+			'[role="main"]',
+			'body'
+		];
 
-		if (mainContent) {
-			return mainContent;
+		// Find all potential content containers
+		const candidates: { element: Element; score: number }[] = [];
+		
+		contentSelectors.forEach((selector, index) => {
+			const elements = doc.querySelectorAll(selector);
+			elements.forEach(element => {
+				// Base score from selector priority (earlier = higher)
+				let score = (contentSelectors.length - index) * 10;
+				
+				// Add score based on content analysis
+				score += this.scoreElement(element);
+				
+				candidates.push({ element, score });
+			});
+		});
+
+		if (candidates.length === 0) {
+			// Fall back to scoring block elements
+			return this.findContentByScoring(doc);
 		}
 
-		// Fall back to scoring elements
+		// Sort by score descending
+		candidates.sort((a, b) => b.score - a.score);
+		
+		if (this.debug) {
+			this.log('Content candidates:', candidates.map(c => ({
+				element: c.element.tagName,
+				selector: this.getElementSelector(c.element),
+				score: c.score
+			})));
+		}
+
+		return candidates[0].element;
+	}
+
+	private static findContentByScoring(doc: Document): Element | null {
 		const candidates = this.scoreElements(doc);
-		if (candidates.length > 0) {
-			return candidates[0].element;
-		}
+		return candidates.length > 0 ? candidates[0].element : null;
+	}
 
-		return null;
+	private static getElementSelector(element: Element): string {
+		const parts: string[] = [];
+		let current: Element | null = element;
+		
+		while (current && current !== document.documentElement) {
+			let selector = current.tagName.toLowerCase();
+			if (current.id) {
+				selector += '#' + current.id;
+			} else if (current.className) {
+				selector += '.' + current.className.trim().split(/\s+/).join('.');
+			}
+			parts.unshift(selector);
+			current = current.parentElement;
+		}
+		
+		return parts.join(' > ');
 	}
 
 	private static scoreElements(doc: Document): ContentScore[] {
