@@ -1,5 +1,12 @@
 import { MetadataExtractor, TidyMetadata } from './metadata';
 
+// At the top of the file, after imports
+declare global {
+	interface Window {
+		Tidy: typeof Tidy;
+	}
+}
+
 // Patterns for scoring content
 const POSITIVE_PATTERNS = /article|content|main|post|body|text|blog|story/i;
 const NEGATIVE_PATTERNS = /comment|meta|footer|footnote|foot|nav|sidebar|banner|ad|popup|menu/i;
@@ -176,6 +183,18 @@ interface TidyResponse extends TidyMetadata {
 }
 
 export class Tidy {
+	private static debug = false;
+
+	static enableDebug(enable: boolean = true) {
+		this.debug = enable;
+	}
+
+	private static log(...args: any[]) {
+		if (this.debug) {
+			console.log('Tidy:', ...args);
+		}
+	}
+
 	private static readonly POSITIVE_PATTERNS = POSITIVE_PATTERNS;
 	private static readonly NEGATIVE_PATTERNS = NEGATIVE_PATTERNS;
 	private static readonly BLOCK_ELEMENTS = BLOCK_ELEMENTS;
@@ -319,6 +338,8 @@ export class Tidy {
 				count++;
 			}
 		});
+
+		this.log('Removed hidden elements:', count);
 	}
 
 	private static removeClutter(doc: Document) {
@@ -366,6 +387,12 @@ export class Tidy {
 
 		// Batch remove elements
 		elementsToRemove.forEach(el => el.remove());
+
+		this.log('Found clutter elements:', {
+			basicSelectors: basicSelectorCount,
+			patternMatches: patternMatchCount,
+			total: basicSelectorCount + patternMatchCount
+		});
 	}
 
 	private static cleanContent(element: Element) {
@@ -374,16 +401,19 @@ export class Tidy {
 		
 		// Strip unwanted attributes
 		this.stripUnwantedAttributes(element);
+
+		// Remove empty elements
+		this.removeEmptyElements(element);
 	}
 
 	private static removeHtmlComments(element: Element) {
+		const comments: Comment[] = [];
 		const walker = document.createTreeWalker(
 			element,
 			NodeFilter.SHOW_COMMENT,
 			null
 		);
 
-		const comments: Comment[] = [];
 		let node;
 		while (node = walker.nextNode()) {
 			comments.push(node as Comment);
@@ -392,16 +422,16 @@ export class Tidy {
 		comments.forEach(comment => {
 			comment.remove();
 		});
+
+		this.log('Removed HTML comments:', comments.length);
 	}
 
 	private static stripUnwantedAttributes(element: Element) {
 		let attributeCount = 0;
 
 		const processElement = (el: Element) => {
-			// Get all attributes
 			const attributes = Array.from(el.attributes);
 			
-			// Remove attributes not in whitelist and not data-*
 			attributes.forEach(attr => {
 				const attrName = attr.name.toLowerCase();
 				if (!this.ALLOWED_ATTRIBUTES.has(attrName) && !attrName.startsWith('data-')) {
@@ -411,11 +441,79 @@ export class Tidy {
 			});
 		};
 
-		// Process the main element
 		processElement(element);
-
-		// Process all child elements
 		element.querySelectorAll('*').forEach(processElement);
+
+		this.log('Stripped attributes:', attributeCount);
+	}
+
+	private static removeEmptyElements(element: Element) {
+		let removedCount = 0;
+		let iterations = 0;
+		let keepRemoving = true;
+
+		// Elements that are allowed to be empty
+		const allowEmpty = new Set([
+			'area',
+			'audio',
+			'base',
+			'br',
+			'col',
+			'embed',
+			'figure',
+			'hr',
+			'iframe',
+			'img',
+			'input',
+			'link',
+			'meta',
+			'object',
+			'param',
+			'picture',
+			'source',
+			'svg',
+			'td',
+			'th',
+			'track',
+			'video',
+			'wbr'
+		]);
+
+		while (keepRemoving) {
+			iterations++;
+			keepRemoving = false;
+			// Get all elements without children, working from deepest first
+			const emptyElements = Array.from(element.getElementsByTagName('*')).filter(el => {
+				if (allowEmpty.has(el.tagName.toLowerCase())) {
+					return false;
+				}
+				
+				// Check if element has only whitespace
+				const hasOnlyWhitespace = el.textContent?.trim().length === 0;
+				
+				// Check if element has no meaningful children
+				// Note: comments were already removed
+				const hasNoChildren = !el.hasChildNodes() || 
+					(Array.from(el.childNodes).every(node => 
+						node.nodeType === Node.TEXT_NODE && node.textContent?.trim().length === 0
+					));
+
+				return hasOnlyWhitespace && hasNoChildren;
+			});
+
+			if (emptyElements.length > 0) {
+				emptyElements.forEach(el => {
+					el.remove();
+					removedCount++;
+				});
+				keepRemoving = true;
+			}
+		}
+
+		this.log('Removed empty elements:', {
+			count: removedCount,
+			iterations
+		});
 	}
 
 	private static findMainContent(doc: Document): Element | null {
@@ -501,4 +599,6 @@ export class Tidy {
 		return score;
 	}
 
-} 
+}
+
+window.Tidy = Tidy; 
