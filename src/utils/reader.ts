@@ -1,4 +1,4 @@
-import { Tidy } from './tidy';
+import { Tidy } from './tidy/tidy';
 import { debugLog } from './debug';
 
 // Mobile viewport settings

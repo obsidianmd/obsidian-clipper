@@ -1,7 +1,7 @@
 import browser from './utils/browser-polyfill';
 import * as highlighter from './utils/highlighter';
 import { loadSettings, generalSettings } from './utils/storage-utils';
-import { Tidy } from './utils/tidy';
+import { Tidy } from './utils/tidy/tidy';
 import { Reader } from './utils/reader';
 
 declare global {

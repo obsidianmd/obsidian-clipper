@@ -2,7 +2,7 @@ import { ExtractedContent } from '../types/types';
 import { ExtractorRegistry } from './extractor-registry';
 import { createMarkdownContent } from './markdown-converter';
 import { sanitizeFileName } from './string-utils';
-import { Tidy } from './tidy';
+import { Tidy } from './tidy/tidy';
 import browser from './browser-polyfill';
 import { debugLog } from './debug';
 import dayjs from 'dayjs';
