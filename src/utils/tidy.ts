@@ -70,6 +70,7 @@ const BASIC_SELECTORS = [
 	'sidebar',
 	'style',
 	'textarea',
+	'[data-link-name*="skip"]',
 	'[src*="author"]',
 	'[class^="ad-"]',
 	'[class$="-ad"]',
@@ -573,28 +574,78 @@ export class Tidy {
 			return;
 		}
 
-		// Create reader view HTML with metadata
-		const readerHtml = `
-			<head>
-				<meta charset="UTF-8">
-				<meta name="viewport" content="${this.MOBILE_VIEWPORT}">
-			</head>
-			<body class="obsidian-tidy-active">
-				<article>
-				${parsed.title ? `<h1>${parsed.title}</h1>` : ''}
-					<div class="metadata">
-						<div class="metadata-details">
-							${parsed.author ? `<span>By ${parsed.author}</span>` : ''}
-							${parsed.published ? `<span> • ${parsed.published}</span>` : ''}
-							${parsed.domain ? `<span> • <a href="${doc.URL}">${parsed.domain}</a></span>` : ''}
-						</div>
+		// Format the published date if it exists
+		let formattedDate = '';
+		if (parsed.published) {
+			try {
+				const date = new Date(parsed.published);
+				if (!isNaN(date.getTime())) {
+					formattedDate = new Intl.DateTimeFormat(undefined, {
+						year: 'numeric',
+						month: 'long',
+						day: 'numeric',
+						timeZone: 'UTC'
+					}).format(date);
+				} else {
+					formattedDate = parsed.published;
+				}
+			} catch (e) {
+				formattedDate = parsed.published;
+				debugLog('Tidy', 'Error formatting date:', e);
+			}
+		}
+
+		// Clean up head - remove unwanted elements but keep meta tags and non-stylesheet links
+		const head = doc.head;
+
+		// Remove scripts except JSON-LD schema
+		const scripts = head.querySelectorAll('script:not([type="application/ld+json"])');
+		scripts.forEach(el => el.remove());
+
+		// Remove base tags
+		const baseTags = head.querySelectorAll('base');
+		baseTags.forEach(el => el.remove());
+
+		// Remove only stylesheet links and style tags
+		const styleElements = head.querySelectorAll('link[rel="stylesheet"], link[as="style"], style');
+		styleElements.forEach(el => el.remove());
+
+		// Ensure we have our required meta tags
+		const existingViewport = head.querySelector('meta[name="viewport"]');
+		if (existingViewport) {
+			existingViewport.setAttribute('content', this.MOBILE_VIEWPORT);
+		} else {
+			const viewport = document.createElement('meta');
+			viewport.setAttribute('name', 'viewport');
+			viewport.setAttribute('content', this.MOBILE_VIEWPORT);
+			head.appendChild(viewport);
+		}
+
+		const existingCharset = head.querySelector('meta[charset]');
+		if (existingCharset) {
+			existingCharset.setAttribute('charset', 'UTF-8');
+		} else {
+			const charset = document.createElement('meta');
+			charset.setAttribute('charset', 'UTF-8');
+			head.insertBefore(charset, head.firstChild);
+		}
+
+		// Replace body content with reader view
+		doc.body.innerHTML = `
+			<article>
+			${parsed.title ? `<h1>${parsed.title}</h1>` : ''}
+				<div class="metadata">
+					<div class="metadata-details">
+						${parsed.author ? `<span>By ${parsed.author}</span>` : ''}
+						${formattedDate ? `<span> • ${formattedDate}</span>` : ''}
+						${parsed.domain ? `<span> • <a href="${doc.URL}">${parsed.domain}</a></span>` : ''}
 					</div>
-					${parsed.content}
-				</article>
-			</body>
+				</div>
+				${parsed.content}
+			</article>
 		`;
 
-		htmlElement.innerHTML = readerHtml;
+		doc.body.className = 'obsidian-tidy-active';
 		
 		this.isActive = true;
 	}
