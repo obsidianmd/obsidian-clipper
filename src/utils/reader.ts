@@ -2,7 +2,7 @@ import { Tidy } from './tidy/tidy';
 import { debugLog } from './debug';
 
 // Mobile viewport settings
-const MOBILE_VIEWPORT = 'width=device-width, initial-scale=1, maximum-scale=1';
+const VIEWPORT = 'width=device-width, initial-scale=1, maximum-scale=1';
 
 export class Reader {
 	private static originalHTML: string | null = null;
@@ -71,11 +71,11 @@ export class Reader {
 		// Ensure we have our required meta tags
 		const existingViewport = head.querySelector('meta[name="viewport"]');
 		if (existingViewport) {
-			existingViewport.setAttribute('content', MOBILE_VIEWPORT);
+			existingViewport.setAttribute('content', VIEWPORT);
 		} else {
 			const viewport = document.createElement('meta');
 			viewport.setAttribute('name', 'viewport');
-			viewport.setAttribute('content', MOBILE_VIEWPORT);
+			viewport.setAttribute('content', VIEWPORT);
 			head.appendChild(viewport);
 		}
 
