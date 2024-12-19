@@ -34,10 +34,10 @@ In no particular order:
 - [ ] A separate icon for Web Clipper
 - [ ] Translate UI into more languages — help is welcomed
 - [ ] Annotate highlights
-- [ ] Save images locally — requires changes to Obsidian app
 - [ ] Template directory
 - [ ] Template validation
 - [ ] Template logic (if/for)
+- [x] Save images locally, [added in Obsidian 1.8.0](https://obsidian.md/changelog/2024-12-18-desktop-v1.8.0/)
 
 ## Developers
 
