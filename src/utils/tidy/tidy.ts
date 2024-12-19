@@ -53,7 +53,6 @@ const BASIC_SELECTORS = [
 	'.toc',
 	'#comments',
 	'#siteSub',
-	'.Ad',
 	'.ad',
 	'aside',
 	'button',
@@ -74,6 +73,8 @@ const BASIC_SELECTORS = [
 	'script',
 	'select',
 	'sidebar',
+	'.sidebar',
+	'#sidebar',
 	'style',
 	'textarea',
 	'[data-link-name*="skip"]',
@@ -203,7 +204,11 @@ export class Tidy {
 
 	static parse(doc: Document): TidyResponse {
 		try {
+			// Evaluate styles and sizes on original document
 			const mobileStyles = this.evaluateMediaQueries(doc);
+			const smallImages = this.findSmallImages(doc);
+			
+			// Clone after evaluation
 			const clone = doc.cloneNode(true) as Document;
 			const schemaOrgData = MetadataExtractor.extractSchemaOrgData(doc);
 
@@ -219,13 +224,12 @@ export class Tidy {
 				};
 			}
 
-			// Perform destructive operations on the clone
+			// Remove small images identified from original document
+			this.removeSmallImages(clone, smallImages);
+			
+			// Perform other destructive operations on the clone
 			this.removeHiddenElements(clone);
 			this.removeClutter(clone);
-
-			// todo:
-			// - remove empty elements
-			// - clever removals of sections like comments, related, etc
 
 			// Clean up the main content
 			this.cleanContent(mainContent);
@@ -514,6 +518,92 @@ export class Tidy {
 			count: removedCount,
 			iterations
 		});
+	}
+
+	private static findSmallImages(doc: Document): Set<string> {
+		let removedCount = 0;
+		const MIN_DIMENSION = 42;
+		const smallImages = new Set<string>();
+
+		const images = doc.getElementsByTagName('img');
+		Array.from(images).forEach(img => {
+			try {
+				const computedStyle = window.getComputedStyle(img);
+				
+				// Get all possible dimensions
+				const naturalWidth = img.naturalWidth || 0;
+				const naturalHeight = img.naturalHeight || 0;
+				const attrWidth = parseInt(img.getAttribute('width') || '0');
+				const attrHeight = parseInt(img.getAttribute('height') || '0');
+				const styleWidth = parseInt(computedStyle.width) || 0;
+				const styleHeight = parseInt(computedStyle.height) || 0;
+				const rect = img.getBoundingClientRect();
+				const displayWidth = rect.width;
+				const displayHeight = rect.height;
+
+				// Check if image is scaled down by CSS transform
+				const transform = computedStyle.transform;
+				const scale = transform ? parseFloat(transform.match(/scale\(([\d.]+)\)/)?.[1] || '1') : 1;
+				const scaledWidth = displayWidth * scale;
+				const scaledHeight = displayHeight * scale;
+
+				// Use the smallest non-zero dimensions we can find
+				const effectiveWidth = Math.min(
+					...[naturalWidth, attrWidth, styleWidth, scaledWidth]
+						.filter(dim => dim > 0)
+				);
+				const effectiveHeight = Math.min(
+					...[naturalHeight, attrHeight, styleHeight, scaledHeight]
+						.filter(dim => dim > 0)
+				);
+
+				if (effectiveWidth > 0 && effectiveHeight > 0 && 
+					(effectiveWidth < MIN_DIMENSION || effectiveHeight < MIN_DIMENSION)) {
+					// Store unique identifier for the image
+					const identifier = this.getImageIdentifier(img);
+					if (identifier) {
+						smallImages.add(identifier);
+						removedCount++;
+					}
+				}
+			} catch (e) {
+				console.error('Error processing image:', e);
+			}
+		});
+
+		this.log('Found small images:', removedCount);
+		return smallImages;
+	}
+
+	private static removeSmallImages(doc: Document, smallImages: Set<string>) {
+		let removedCount = 0;
+		const images = doc.getElementsByTagName('img');
+		
+		Array.from(images).forEach(img => {
+			const identifier = this.getImageIdentifier(img);
+			if (identifier && smallImages.has(identifier)) {
+				img.remove();
+				removedCount++;
+			}
+		});
+
+		this.log('Removed small images:', removedCount);
+	}
+
+	private static getImageIdentifier(img: HTMLImageElement): string | null {
+		// Try to create a unique identifier using various attributes
+		const src = img.src || img.getAttribute('data-src') || '';
+		const srcset = img.srcset || img.getAttribute('data-srcset') || '';
+		const alt = img.alt || '';
+		const className = img.className || '';
+		const id = img.id || '';
+		
+		if (src) return `src:${src}`;
+		if (srcset) return `srcset:${srcset}`;
+		if (id) return `id:${id}`;
+		if (className && alt) return `class:${className};alt:${alt}`;
+		
+		return null;
 	}
 
 	private static findMainContent(doc: Document): Element | null {
