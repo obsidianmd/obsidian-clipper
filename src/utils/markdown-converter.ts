@@ -29,46 +29,6 @@ export function createMarkdownContent(content: string, url: string) {
 		console.error('Error applying GFM plugin:', error);
 	}
 
-	turndownService.addRule('inlineLink', {
-		filter: function (node, options) {
-		  return (
-			options.linkStyle === 'inlined' &&
-			node.nodeName === 'A' &&
-			!!node.getAttribute('href')
-		  )
-		},
-		replacement: function (content, node) {
-			if (!(node instanceof HTMLElement)) return content;
-			
-			let href = node.getAttribute('href');
-			let trimmedHref = ""
-			
-			if (href) {
-				href = href.replace(/([()])/g, '\\$1')
-				trimmedHref = href.trim();
-			}
-
-			const trimmedContent = content.trim();
-			
-			// Check if it's an empty link
-			if (!trimmedContent && !trimmedHref) {
-				return '';
-			}
-		
-			// If it's just a bare URL, return it as is
-			if (trimmedContent === trimmedHref) {
-				return trimmedHref;
-			}
-	  
-		  	// Handle title attribute
-			let title = node.getAttribute('title');
-			title ? title.replace(/(\n+\s*)+/g, '\n') : '';
-			if (title) title = ' "' + title.replace(/"/g, '\\"') + '"'
-
-		  	return '[' + trimmedContent + '](' + trimmedHref + title + ')';
-		}
-	});
-
 	turndownService.addRule('table', {
 		filter: 'table',
 		replacement: function(content, node) {
@@ -389,17 +349,29 @@ export function createMarkdownContent(content: string, url: string) {
 			return content;
 		}
 	});
-
+	
 	turndownService.addRule('inlineFootnotes', {
 		filter: (node: Node): boolean => {
-			return node instanceof HTMLElement && 
-					node.nodeName === 'SPAN' && 
-					node.classList.contains('footnote-link');
+			return (
+				node instanceof HTMLElement &&
+				(
+				  (node.nodeName === 'SPAN' && node.classList.contains('footnote-link')) ||
+				  (node.nodeName === 'A' && node.classList.contains('citation'))
+				)
+			  );
 		},
 		replacement: (content, node) => {
 			if (node instanceof HTMLElement) {
-				const footnoteId = node.dataset.footnoteId;
-				const footnoteContent = node.dataset.footnoteContent;
+				let footnoteId = undefined;
+				let footnoteContent = undefined;
+
+				if (node.nodeName === 'SPAN' && node.classList.contains('footnote-link')) {
+					footnoteId = node.dataset.footnoteId
+					footnoteContent = node.dataset.footnoteContent
+				} else if (node.nodeName === 'A' && node.classList.contains('citation')) {
+					footnoteId = node.textContent;
+					footnoteContent = node.getAttribute('href');
+				}
 				
 				if (footnoteId && footnoteContent) {
 					// Store the footnote content for later use
@@ -414,7 +386,7 @@ export function createMarkdownContent(content: string, url: string) {
 			return content;
 		}
 	});
-
+	  
 	// Update the reference list rule
 	turndownService.addRule('referenceList', {
 		filter: (node: Node): boolean => {
@@ -755,14 +727,7 @@ export function createMarkdownContent(content: string, url: string) {
 
 		// Remove any consecutive newlines more than two
 		markdown = markdown.replace(/\n{3,}/g, '\n\n');
-
-		// Format space around Markdown links
-		markdown = markdown
-			// Add a space before links that directly follow text
-			.replace(/(?<=[^!\s(),])(\[[^\]]+\]\(([^)]+)\))/g, ' $1')
-			// Remove multiple spaces after links and replace them with a single space
-			.replace(/(?<!!)(\[[^\]]+\]\s*\([^)]+\))\s+/g, '$1 ')
-
+		
 		// Append footnotes at the end of the document
 		if (Object.keys(footnotes).length > 0) {
 			markdown += '\n\n---\n\n';
