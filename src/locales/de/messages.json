@@ -18,7 +18,7 @@
 		"message": "Zu Obsidian hinzufügen"
 	},
 	"addVaultPlaceholder": {
-		"message": "Drücken Sie Enter, um einen Vault hinzuzufügen"
+		"message": "Drücke Enter, um einen Vault hinzuzufügen"
 	},
 	"advanced": {
 		"message": "Erweitert"
@@ -30,13 +30,13 @@
 		"message": "Markierungen immer anzeigen"
 	},
 	"alwaysShowHighlightsDescription": {
-		"message": "Zeigt Ihre gespeicherten Markierungen beim Laden einer Seite an. Deaktiviere dies, um Markierungen nur anzuzeigen, wenn der Markiermodus aktiviert ist."
+		"message": "Zeigt Deine gespeicherten Markierungen beim Laden einer Seite an. Deaktiviere dies, um Markierungen nur anzuzeigen, wenn der Markiermodus aktiviert ist."
 	},
 	"apiKeyMissing": {
 		"message": "Kein API-Schlüssel"
 	},
 	"apiKeysWarning": {
-		"message": "Durch die Nutzung eines externen Anbieters stimmen Sie dessen Nutzungsbedingungen und Datenschutzrichtlinien zu. Interpreter-Anfragen werden direkt an den von Ihnen gewählten Anbieter gesendet. Obsidian sammelt und speichert keine Daten über Ihre Anfragen."
+		"message": "Durch die Nutzung eines externen Anbieters stimmst du dessen Nutzungsbedingungen und Datenschutzrichtlinien zu. Interpreter-Anfragen werden direkt an den von Dir gewählten Anbieter gesendet. Obsidian sammelt und speichert keine Daten über Deine Anfragen."
 	},
 	"appendToDaily": {
 		"message": "Zum Ende der Tagesnotiz hinzufügen"
@@ -48,7 +48,7 @@
 		"message": "Automatisch ausführen"
 	},
 	"autoRunInterpreterDescription": {
-		"message": "Führt Prompt-Variablen sofort aus, wenn die Vorlage welche enthält. Dies verbraucht API-Guthaben bei Ihrem Modellanbieter. Deaktivieren Sie dies, wenn Sie den Interpreter nur manuell ausführen möchten."
+		"message": "Führt Prompt-Variablen sofort aus, wenn die Vorlage welche enthält. Dies verbraucht API-Guthaben bei Deinem Modellanbieter. Deaktiviere dies, wenn Du den Interpreter nur manuell ausführen möchten."
 	},
 	"behavior": {
 		"message": "Verhalten"
@@ -81,8 +81,7 @@
 		"message": "Speicherverhalten"
 	},
 	"clipBehaviorDescription": {
-		"message": "Wählen Sie, wie markierter Inhalt in Obsidian gespeichert wird. Definiert die $strong_start${{content}}$strong_end$ Variable.",
-		"message": "Wählen Sie, wie markierter Inhalt in Obsidian gespeichert wird. Definiert die $strong_start${{content}}$strong_end$ Variable.",
+		"message": "Wähle wie markierter Inhalt in Obsidian gespeichert wird. Definiert die $strong_start${{content}}$strong_end$ Variable.",
 		"placeholders": {
 			"strong_end": {
 				"content": "</strong>"
@@ -105,10 +104,10 @@
 		"message": "Markiermodus umschalten"
 	},
 	"confirmDeleteTemplate": {
-		"message": "Möchten Sie die Vorlage \"$1\" wirklich löschen?"
+		"message": "Möchtest Du die Vorlage \"$1\" wirklich löschen?"
 	},
 	"confirmReplaceSettings": {
-		"message": "Dies wird alle Ihre aktuellen Einstellungen, einschließlich Vorlagen und Eigenschaften, ersetzen. Möchten Sie wirklich fortfahren?"
+		"message": "Dies wird alle Deine aktuellen Einstellungen, einschließlich Vorlagen und Eigenschaften, ersetzen. Möchtest Du wirklich fortfahren?"
 	},
 	"copied": {
 		"message": "Kopiert!"
@@ -141,16 +140,16 @@
 		"message": "Löschen"
 	},
 	"deleteModelConfirm": {
-		"message": "Sind Sie sicher, dass Sie dieses Modell löschen möchten?"
+		"message": "Bist Du sicher, dass Du dieses Modell löschen möchtest?"
 	},
 	"deleteProviderConfirm": {
-		"message": "Sind Sie sicher, dass Sie diesen Anbieter löschen möchten?"
+		"message": "Bist Du sicher, dass Du diesen Anbieter löschen möchtest?"
 	},
 	"disableHighlighter": {
 		"message": "Marker deaktivieren"
 	},
 	"done": {
-		"message": "fertig"
+		"message": "Fertig"
 	},
 	"dragAndDropFile": {
 		"message": "Datei hierher ziehen und ablegen"
@@ -159,7 +158,7 @@
 		"message": "Duplizieren"
 	},
 	"earlyAccessDescription": {
-		"message": "Verwenden Sie Funktionen, die die neueste $link_start$Early Access Version$link_end$ von Obsidian erfordern. Erfordert derzeit Obsidian 1.7.2 oder höher.",
+		"message": "Verwende Funktionen, welche die neueste $link_start$Early Access Version$link_end$ von Obsidian erfordern. Erfordert derzeit Obsidian 1.7.2 oder höher.",
 		"placeholders": {
 			"link_end": {
 				"content": "</a>"
@@ -185,13 +184,13 @@
 		"message": "Marker aktivieren"
 	},
 	"enableHighlighterDescription": {
-		"message": "Heben Sie Inhalte auf Webseiten hervor, die Sie in Obsidian speichern möchten."
+		"message": "Hebe Inhalte auf Webseiten hervor, die Du in Obsidian speichern möchtest."
 	},
 	"enableInterpreter": {
 		"message": "Interpreter aktivieren"
 	},
 	"enableInterpreterDescription": {
-		"message": "Nutze natürliche Sprache, um Daten aus Seiten zu extrahieren. Sie können zum Beispiel die Vorlagensyntax $strong_start${{\"eine Zusammenfassung der Seite\"}}$strong_end$ verwenden. Erfordert einen API-Schlüssel oder ein unten konfiguriertes benutzerdefiniertes Modell. $link_start$Mehr erfahren$link_end$.",
+		"message": "Nutze natürliche Sprache, um Daten aus Seiten zu extrahieren. Du kannst zum Beispiel die Vorlagensyntax $strong_start${{\"eine Zusammenfassung der Seite\"}}$strong_end$ verwenden. Erfordert einen API-Schlüssel oder ein unten konfiguriertes benutzerdefiniertes Modell. $link_start$Mehr erfahren$link_end$.",
 		"placeholders": {
 			"link_end": {
 				"content": "</a>"
@@ -217,20 +216,19 @@
 		"message": "Alle Einstellungen exportieren"
 	},
 	"exportAllSettingsDescription": {
-		"message": "Exportieren Sie alle Einstellungen einschließlich Vorlagen und Eigenschaften."
+		"message": "Exportiere alle Deine Einstellungen einschließlich Vorlagen und Eigenschaften."
 	},
 	"exportHighlights": {
 		"message": "Markierungen exportieren"
 	},
 	"exportHighlightsDescription": {
-		"message": "Exportieren Sie Ihre Markierungen in eine Datei."
+		"message": "Exportiere Deine Markierungen in eine Datei."
 	},
 	"exportProperties": {
 		"message": "Eigenschaften exportieren"
 	},
 	"exportPropertiesDescription": {
-		"message": "Speichern Sie Web-Clipper Eigenschaften in einer $strong_start$types.json$strong_end$ Datei, die in Ihren Obsidian-Vault oder in Web-Clipper auf anderen Geräten importiert werden kann.",
-		"message": "Speichern Sie Web-Clipper Eigenschaften in einer $strong_start$types.json$strong_end$ Datei, die in Ihren Obsidian-Vault oder in Web-Clipper auf anderen Geräten importiert werden kann.",
+		"message": "Speichert Deine Web-Clipper Eigenschaften in einer $strong_start$types.json$strong_end$ Datei, die in Deinem Obsidian-Vault oder in Web-Clipper auf anderen Geräten importiert werden kann.",
 		"placeholders": {
 			"strong_end": {
 				"content": "</strong>"
@@ -241,7 +239,7 @@
 		}
 	},
 	"extensionDescription": {
-		"message": "Speichern Sie Webinhalte in einem privaten und dauerhaften Format, auf das Sie offline zugreifen können. Die offizielle Browser-Erweiterung für Obsidian."
+		"message": "Speichet Deine Webinhalte in einem privaten und dauerhaften Format, auf das Du offline zugreifen kannst. Die offizielle Browser-Erweiterung für Obsidian."
 	},
 	"extensionName": {
 		"message": "Obsidian Web-Clipper"
@@ -250,37 +248,37 @@
 		"message": "Text konnte nicht kopiert werden"
 	},
 	"failedToDeleteTemplate": {
-		"message": "Vorlage konnte nicht gelöscht werden. Bitte versuchen Sie es erneut."
+		"message": "Vorlage konnte nicht gelöscht werden. Bitte versuch es erneut."
 	},
 	"failedToDuplicateTemplate": {
-		"message": "Duplizieren der Vorlage fehlgeschlagen. Bitte versuchen Sie es erneut."
+		"message": "Duplizieren der Vorlage fehlgeschlagen. Bitte versuch es erneut."
 	},
 	"failedToExportHighlights": {
-		"message": "Export der Markierungen fehlgeschlagen. Bitte überprüfen Sie die Konsole für weitere Details."
+		"message": "Export der Markierungen fehlgeschlagen. Bitte überprüfe die Konsole für weitere Details."
 	},
 	"failedToExportSettings": {
-		"message": "Export der Einstellungen fehlgeschlagen. Bitte überprüfen Sie die Konsole für weitere Details."
+		"message": "Export der Einstellungen fehlgeschlagen. Bitte überprüfe die Konsole für weitere Details."
 	},
 	"failedToExtractContent": {
 		"message": "Seiteninhalt konnte nicht extrahiert werden."
 	},
 	"failedToImportTemplate": {
-		"message": "Fehler beim Importieren der Vorlage. Bitte überprüfen Sie die Datei und versuchen Sie es erneut."
+		"message": "Fehler beim Importieren der Vorlage. Bitte überprüfe die Datei und versuche es erneut."
 	},
 	"failedToInitialize": {
-		"message": "Bitte versuchen Sie, die Erweiterung neu zu laden."
+		"message": "Bitte versuche, die Erweiterung neu zu laden."
 	},
 	"failedToInitializeContent": {
 		"message": "Seiteninhalt konnte nicht initialisiert werden."
 	},
 	"failedToProcessInterpreter": {
-		"message": "Interpreter-Verarbeitung fehlgeschlagen. Bitte versuchen Sie es erneut."
+		"message": "Interpreter-Verarbeitung fehlgeschlagen. Bitte versuche es erneut."
 	},
 	"failedToResetProviders": {
 		"message": "Fehler beim Zurücksetzen von Anbietern und Modellen"
 	},
 	"failedToResetTemplate": {
-		"message": "Standardvorlage konnte nicht zurückgesetzt werden. Bitte versuchen Sie es erneut."
+		"message": "Standardvorlage konnte nicht zurückgesetzt werden. Bitte versuche es erneut."
 	},
 	"failedToSave": {
 		"message": "Datei konnte nicht gespeichert werden"
@@ -289,7 +287,7 @@
 		"message": "Datei konnte nicht gespeichert werden"
 	},
 	"failedToSaveProvider": {
-		"message": "Speichern des Anbieters fehlgeschlagen. Bitte versuchen Sie es erneut."
+		"message": "Speichern des Anbieters fehlgeschlagen. Bitte versuche es erneut."
 	},
 	"folder": {
 		"message": "Ordner"
@@ -301,13 +299,13 @@
 		"message": "Allgemeine Einstellungen"
 	},
 	"getApiKeyHere": {
-		"message": "Holen Sie sich hier Ihren $1 API-Schlüssel."
+		"message": "Hole Dir hier Deinen $1 API-Schlüssel."
 	},
 	"help": {
 		"message": "Hilfe"
 	},
 	"helpDescription": {
-		"message": "Lernen Sie, wie Sie den Web-Clipper verwenden und erhalten Sie Hilfe bei der Fehlerbehebung."
+		"message": "Lerne, wie Du den Web-Clipper verwendest und erhalte Hilfe bei der Fehlerbehebung."
 	},
 	"highlightInline": {
 		"message": "Seiteninhalt markieren"
@@ -331,10 +329,10 @@
 		"message": "Alle Einstellungen importieren"
 	},
 	"importAllSettingsDescription": {
-		"message": "Importieren Sie alle Einstellungen einschließlich Vorlagen und Eigenschaften. Dies wird Ihre aktuelle Konfiguration ersetzen."
+		"message": "Importiere alle Einstellungen einschließlich Vorlagen und Eigenschaften. Dies wird Deine aktuelle Konfiguration ersetzen."
 	},
 	"importFailed": {
-		"message": "Import fehlgeschlagen. Bitte überprüfen Sie die Konsole für weitere Details."
+		"message": "Import fehlgeschlagen. Bitte überprüfe die Konsole für weitere Details."
 	},
 	"importModalTitle": {
 		"message": "Importieren"
@@ -343,7 +341,7 @@
 		"message": "Eigenschaften importieren"
 	},
 	"importPropertiesDescription": {
-		"message": "Um Ihre Eigenschaften aus Obsidian zu importieren, suche die $strong_1_start$types.json$strong_1_end$ Datei im $strong_2_start$.obsidian$strong_2_end$ Ordner in Ihren Vault. Beachte, dass dieser Ordner standardmäßig auf den meisten Betriebssystemen versteckt ist.",
+		"message": "Um Deine Eigenschaften aus Obsidian zu importieren, suche die $strong_1_start$types.json$strong_1_end$ Datei im $strong_2_start$.obsidian$strong_2_end$ Ordner in Deinem Vault. Beachte, dass dieser Ordner standardmäßig auf den meisten Betriebssystemen versteckt ist.",
 		"placeholders": {
 			"strong_1_end": {
 				"content": "</strong>"
@@ -389,7 +387,7 @@
 		"message": "Sprache"
 	},
 	"languageDescription": {
-		"message": "Wählen Sie die Anzeigesprache für die Erweiterungsoberfläche."
+		"message": "Wähle die Anzeigesprache für die Erweiterungsoberfläche."
 	},
 	"lastUsed": {
 		"message": "Zuletzt verwendet"
@@ -398,7 +396,7 @@
 		"message": "Legacy-Modus"
 	},
 	"legacyModeDescription": {
-		"message": "Verwendet die URI-Ausschneidemethode, die mit Obsidian 1.6.7 oder älter kompatibel ist. Beachten Sie, dass die Länge des Inhalts, den Sie ausschneiden können, durch Ihren Browser und das Betriebssystem begrenzt ist. Einige Seiten können ohne Fehlermeldungen fehlschlagen."
+		"message": "Verwendet die URI-Ausschneidemethode, die mit Obsidian 1.6.7 oder älter kompatibel ist. Beachte, dass die Länge des Inhalts, den Du ausschneiden kannst, durch Deinen Browser und das Betriebssystem begrenzt ist. Einige Seiten können ohne Fehlermeldungen fehlschlagen."
 	},
 	"modelName": {
 		"message": "Modellname"
@@ -431,7 +429,7 @@
 		"message": "Nichts tun"
 	},
 	"noTemplates": {
-		"message": "Keine Vorlagen verfügbar. Bitte fügen Sie eine Vorlage in den Einstellungen hinzu."
+		"message": "Keine Vorlagen verfügbar. Bitte füge eine Vorlage in den Einstellungen hinzu."
 	},
 	"noUnusedProperties": {
 		"message": "Keine unbenutzten Eigenschaften gefunden."
@@ -440,7 +438,7 @@
 		"message": "Notizinhalt"
 	},
 	"noteContentDescription": {
-		"message": "Passen Sie den Inhalt der Notiz an. Verwenden Sie Variablen, um Daten von der Seite vorab auszufüllen."
+		"message": "Passe den Inhalt der Notiz an. Verwende Variablen, um Daten von der Seite vorab auszufüllen."
 	},
 	"noteLocation": {
 		"message": "Notizspeicherort"
@@ -455,7 +453,7 @@
 		"message": "Notizname"
 	},
 	"noteNameFormatDescription": {
-		"message": "Format für den Dateinamen der Notiz. Sie können Variablen wie {{title}}, {{date}} und {{published}} verwenden, um Daten von der Seite vorab auszufüllen. $link_start$Mehr erfahren$link_end$.",
+		"message": "Format für den Dateinamen der Notiz. Du kannst Variablen wie {{title}}, {{date}} und {{published}} verwenden, um Daten von der Seite vorab auszufüllen. $link_start$Mehr erfahren$link_end$.",
 		"placeholders": {
 			"link_end": {
 				"content": "</a>"
@@ -478,7 +476,7 @@
 		"message": "(optional)"
 	},
 	"orPasteBelow": {
-		"message": "Oder fügen Sie den Inhalt unten ein"
+		"message": "Oder füge den Inhalt unten ein"
 	},
 	"pageCannotBeClipped": {
 		"message": "Diese Seite kann nicht ausgeschnitten werden."
@@ -487,10 +485,10 @@
 		"message": "Seitenvariablen"
 	},
 	"pasteJsonHere": {
-		"message": "Fügen Sie hier JSON ein"
+		"message": "Füge hier JSON ein"
 	},
 	"pleaseReload": {
-		"message": "Bitte versuchen Sie, die Seite neu zu laden."
+		"message": "Bitte versuche, die Seite neu zu laden."
 	},
 	"prependToDaily": {
 		"message": "Zur Tagesnotiz am Anfang hinzufügen"
@@ -499,7 +497,7 @@
 		"message": "Zu bestehender Notiz am Anfang hinzufügen"
 	},
 	"processing": {
-		"message": "verarbeite"
+		"message": "Verarbeite"
 	},
 	"properties": {
 		"message": "Eigenschaften"
@@ -520,7 +518,7 @@
 		"message": "API-Schlüssel"
 	},
 	"providerApiKeyDescription": {
-		"message": "Ihr API-Schlüssel für diesen Anbieter."
+		"message": "Dein API-Schlüssel für diesen Anbieter."
 	},
 	"providerBaseUrl": {
 		"message": "Basis-URL"
@@ -532,7 +530,7 @@
 		"message": "Modell-ID"
 	},
 	"providerModelIdDescription": {
-		"message": "Die Kennung des Modells von Ihrem Anbieter. Typischerweise ein kurzer Name ohne Leerzeichen."
+		"message": "Die Kennung des Modells von Deinem Anbieter. Typischerweise ein kurzer Name ohne Leerzeichen."
 	},
 	"providerModelIdPlaceholder": {
 		"message": "Modell-ID"
@@ -547,7 +545,7 @@
 		"message": "Voreinstellung"
 	},
 	"providerPresetDescription": {
-		"message": "Wählen Sie einen Anbieter aus oder erstellen Sie einen benutzerdefinierten."
+		"message": "Wähle einen Anbieter aus oder erstelle einen benutzerdefinierten."
 	},
 	"providerRequiredFields": {
 		"message": "Anbietername und Basis-URL sind erforderlich."
@@ -568,7 +566,7 @@
 		"message": "Ungenutzte Eigenschaften entfernen"
 	},
 	"removeUnusedPropertiesDescription": {
-		"message": "Entfernen Sie alle Eigenschaften, die in keiner Vorlage verwendet werden."
+		"message": "Entferne alle Eigenschaften, die in keiner Vorlage verwendet werden."
 	},
 	"removeVault": {
 		"message": "Vault entfernen"
@@ -583,13 +581,13 @@
 		"message": "Standardvorlage zurücksetzen"
 	},
 	"resetDefaultTemplateDescription": {
-		"message": "Entfernen Sie alle Änderungen, die Sie an der Standardvorlage vorgenommen haben."
+		"message": "Entferne alle Änderungen, die Du an der Standardvorlage vorgenommen hast."
 	},
 	"resetProvidersAndModels": {
 		"message": "Standardmodelle zurücksetzen"
 	},
 	"resetProvidersAndModelsDescription": {
-		"message": "Setzen Sie Anbieter und Modelle auf die Standardeinstellungen zurück."
+		"message": "Setze Anbieter und Modelle auf die Standardeinstellungen zurück."
 	},
 	"save": {
 		"message": "Speichern"
@@ -601,10 +599,10 @@
 		"message": "Variablen suchen..."
 	},
 	"selectProvider": {
-		"message": "Wählen Sie einen Anbieter aus"
+		"message": "Wähle einen Anbieter aus"
 	},
 	"selectTemplateToExport": {
-		"message": "Bitte wählen Sie eine Vorlage zum Exportieren aus."
+		"message": "Bitte wähle eine Vorlage zum Exportieren aus."
 	},
 	"settings": {
 		"message": "Einstellungen"
@@ -613,28 +611,28 @@
 		"message": "Einstellungen"
 	},
 	"settingsImportSuccess": {
-		"message": "Alle Einstellungen wurden erfolgreich importiert. Bitte aktualisieren Sie die Seite, um die Änderungen zu sehen."
+		"message": "Alle Einstellungen wurden erfolgreich importiert. Bitte aktualisiere die Seite, um die Änderungen zu sehen."
 	},
 	"share": {
 		"message": "Teilen..."
 	},
 	"shortcutInstructionsBrave": {
-		"message": "Um Tastenzuweisungen zu ändern, gehen Sie zu $1"
+		"message": "Um Tastenzuweisungen zu ändern, gehe zu $1"
 	},
 	"shortcutInstructionsChrome": {
-		"message": "Um Tastenzuweisungen zu ändern, gehen Sie zu $1"
+		"message": "Um Tastenzuweisungen zu ändern, gehe zu $1"
 	},
 	"shortcutInstructionsDefault": {
 		"message": "Öffne die Browser-Einstellungen um Tastenkombinationen zu ändern."
 	},
 	"shortcutInstructionsEdge": {
-		"message": "Um Tastenzuweisungen zu ändern, gehen Sie zu $1"
+		"message": "Um Tastenzuweisungen zu ändern, gehe zu $1"
 	},
 	"shortcutInstructionsFirefox": {
-		"message": "Um Tastenzuweisungen zu ändern, gehen Sie zu $1, klicken Sie auf das Zahnrad-Symbol und wählen Sie \"Erweiterungs-Tastenkombinationen verwalten\"."
+		"message": "Um Tastenzuweisungen zu ändern, gehe zu $1, klicke auf das Zahnrad-Symbol und wähle \"Erweiterungs-Tastenkombinationen verwalten\"."
 	},
 	"shortcutInstructionsIntro": {
-		"message": "Tastenkombinationen geben Ihnen schnellen Zugriff auf Clipper-Funktionen."
+		"message": "Tastenkombinationen geben Dir schnelleren Zugriff auf Clipper-Funktionen."
 	},
 	"shortcutInstructionsSafari": {
 		"message": "Tastenkombinationen können in Safari nicht angepasst werden."
@@ -646,7 +644,7 @@
 		"message": "Aktionsschaltfläche anzeigen"
 	},
 	"showActionsDescription": {
-		"message": "Ermöglicht es Ihnen, Seitenvariablen aus dem Clipper-Menü zu inspizieren. Nützlich, um die Variablen zu sehen, die in Vorlagen verwendet werden können."
+		"message": "Ermöglicht es Dir, Seitenvariablen aus dem Clipper-Menü zu inspizieren. Nützlich, um die Variablen zu sehen, die in Vorlagen verwendet werden können."
 	},
 	"showPageVariables": {
 		"message": "Seitenvariablen anzeigen"
@@ -676,19 +674,19 @@
 		"message": "Eigenschaften"
 	},
 	"templatePropertiesDescription": {
-		"message": "Eigenschaften, die oben zur ausgeschnittenen Notiz hinzugefügt werden sollen. Verwenden Sie Variablen, um Daten von der Seite vorab auszufüllen."
+		"message": "Eigenschaften, die oben zur ausgeschnittenen Notiz hinzugefügt werden sollen. Verwende Variablen, um Daten von der Seite vorab auszufüllen."
 	},
 	"templateTriggers": {
 		"message": "Vorlagen-Trigger"
 	},
 	"templateTriggersDescription": {
-		"message": "Definieren Sie Regeln, um diese Vorlage automatisch auszuwählen, wenn sie mit einem URL-Muster übereinstimmt oder schema.org-Daten enthält. Eine Regel pro Zeile."
+		"message": "Definiere Regeln, um diese Vorlage automatisch auszuwählen, wenn sie mit einem URL-Muster übereinstimmt oder schema.org-Daten enthält. Eine Regel pro Zeile."
 	},
 	"templatesHeading": {
 		"message": "Vorlagen"
 	},
 	"thinking": {
-		"message": "denke nach"
+		"message": "Denke nach"
 	},
 	"unknownProvider": {
 		"message": "Unbekannter Anbieter"
@@ -697,13 +695,13 @@
 		"message": "Ein Update ist verfügbar."
 	},
 	"usingLatestVersion": {
-		"message": "Sie verwenden die neueste Version."
+		"message": "Du verwendest die neueste Version."
 	},
 	"vault": {
 		"message": "Vault"
 	},
 	"vaultDescription": {
-		"message": "Wählen Sie den Standard-Vault für diese Vorlage. Gehen Sie zu $link_start$allgemeinen Einstellungen$link_end$, um Vaulte hinzuzufügen oder zu entfernen.",
+		"message": "Wähle den Standard-Vault für diese Vorlage aus. Gehen zu $link_start$allgemeinen Einstellungen$link_end$, um Vaulte hinzuzufügen oder zu entfernen.",
 		"placeholders": {
 			"link_end": {
 				"content": "</a>"
@@ -717,7 +715,7 @@
 		"message": "Vaulte"
 	},
 	"vaultsDescription": {
-		"message": "Standardmäßig werden ausgeschnittene Notizen im aktuell geöffneten Vault gespeichert. Sie können hier Vaults hinzufügen, wenn Sie die Option haben möchten, in verschiedenen Vaults zu speichern. Vaultnamen müssen exakt mit dem Namen des Obsidian-Vaults übereinstimmen. Drücken Sie $strong_start$Enter$strong_end$, um einen Vault hinzuzufügen.",
+		"message": "Standardmäßig werden ausgeschnittene Notizen im aktuell geöffneten Vault gespeichert. Du kannst hier Vaults hinzufügen, wenn Du die Option haben möchtest, in verschiedenen Vaults zu speichern. Vaultnamen müssen exakt mit dem Namen des Obsidian-Vaults übereinstimmen. Drücke $strong_start$Enter$strong_end$, um einen Vault hinzuzufügen.",
 		"placeholders": {
 			"strong_end": {
 				"content": "</strong>"
