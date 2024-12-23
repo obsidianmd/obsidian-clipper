@@ -1,0 +1,731 @@
+{
+	"addModel": {
+		"message": "+ মডেল যোগ করুন"
+	},
+	"addModelTitle": {
+		"message": "মডেল যোগ করুন"
+	},
+	"addProperty": {
+		"message": "+ প্রোপার্টি যোগ করুন"
+	},
+	"addProvider": {
+		"message": "+ প্রোভাইডার যোগ করুন"
+	},
+	"addProviderTitle": {
+		"message": "প্রোভাইডার যোগ করুন"
+	},
+	"addToObsidian": {
+		"message": "অবসিডিয়ানে যোগ করুন"
+	},
+	"addVaultPlaceholder": {
+		"message": "ভল্ট যোগ করতে এন্টার চাপুন"
+	},
+	"advanced": {
+		"message": "উন্নত"
+	},
+	"allProperties": {
+		"message": "সমস্ত প্রপার্টি"
+	},
+	"alwaysShowHighlights": {
+		"message": "সবসময় হাইলাইট দেখান"
+	},
+	"alwaysShowHighlightsDescription": {
+		"message": "পেইজ লোড হওয়ার সাথে সাথে আপনার হাইলাইট করা অংশগুলি দেখতে চান? এই বিকল্পটি চালু রাখুন। অন্যথায়, শুধুমাত্র হাইলাইটার মোড চালু থাকাকালীনই এগুলি দেখতে পাবেন।"
+	},
+	"apiKeyMissing": {
+		"message": "API কী নেই"
+	},
+	"apiKeysWarning": {
+		"message": "বাহ্যিক প্রোভাইডার ব্যবহার করে আপনি তাদের শর্তাবলী এবং গোপনীয়তা নীতির সাথে সম্মত হচ্ছেন। ইন্টারপ্রিটার রিকোয়েস্টগুলি আপনার নির্বাচিত প্রোভাইডারের কাছে সরাসরি পাঠানো হয়। Obsidian আপনার রিকোয়েস্ট সম্পর্কিত কোনও তথ্য সংগ্রহ বা সংরক্ষণ করে না।"
+	},
+	"appendToDaily": {
+		"message": "ডেইলি নোটের শেষে যোগ করুন"
+	},
+	"appendToExisting": {
+		"message": "একটি বিদ্যমান নোটের শেষে যোগ করুন"
+	},
+	"autoRunInterpreter": {
+		"message": "স্বয়ংক্রিয়ভাবে চালান"
+	},
+	"autoRunInterpreterDescription": {
+		"message": "টেমপ্লেটে কোনও প্রম্পট ভেরিয়েবল থাকলে তা স্বয়ংক্রিয়ভাবে চালানো হবে। এটি আপনার মডেল প্রোভাইডারের সাথে এপিআই ক্রেডিট ব্যবহার করবে। শুধুমাত্র ম্যানুয়ালি ইন্টারপ্রিটার চালাতে চাইলে এটি বন্ধ করুন।"
+	},
+	"behavior": {
+		"message": "আচরণ"
+	},
+	"behaviorWarning": {
+		"message": "বিদ্যমান নোট বা ডেইলি নোটে যোগ করতে হলে Obsidian 1.7.2 বা তার পরের সংস্করণ প্রয়োজন।"
+	},
+	"cancel": {
+		"message": "বাতিল করুন"
+	},
+	"cannotDeleteProvider": {
+		"message": "প্রোভাইডার \"$1\" মুছে ফেলা যাবে না কারণ এটি $2 টি মডেল দ্বারা ব্যবহৃত হচ্ছে।"
+	},
+	"changelog": {
+		"message": "চেঞ্জলগ"
+	},
+	"chooseFile": {
+		"message": "একটি ফাইল নির্বাচন করুন"
+	},
+	"choosePropertiesFile": {
+		"message": "প্রোপার্টি ফাইল নির্বাচন করুন"
+	},
+	"chooseSettingsFile": {
+		"message": "সেটিংস ফাইল নির্বাচন করুন"
+	},
+	"chooseTemplateFile": {
+		"message": "টেমপ্লেট ফাইল নির্বাচন করুন"
+	},
+	"clipBehavior": {
+		"message": "ক্লিপের আচরণ"
+	},
+	"clipBehaviorDescription": {
+		"message": "Obsidian এ হাইলাইট করা কনটেন্ট কীভাবে সংরক্ষণ করা হবে তা নির্বাচন করুন। এটি $strong_start${{content}}$strong_end$ ভেরিয়েবল সংজ্ঞায়িত করে।",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"close": {
+		"message": "বন্ধ করুন"
+	},
+	"commandOpenClipper": {
+		"message": "Obsidian Clipper খুলুন"
+	},
+	"commandQuickClip": {
+		"message": "দ্রুত ক্লিপ করুন"
+	},
+	"commandToggleHighlighter": {
+		"message": "হাইলাইটার মোড চালু/বন্ধ করুন"
+	},
+	"confirmDeleteTemplate": {
+		"message": "আপনি কি নিশ্চিতভাবে \"{1}\" টেমপ্লেটটি মুছে ফেলতে চান?"
+	},
+	"confirmReplaceSettings": {
+		"message": "এটি আপনার সকল বর্তমান সেটিংস, টেমপ্লেট এবং প্রোপার্টিস সহ প্রতিস্থাপন করবে।  আপনি কি নিশ্চিতভাবে এগিয়ে যেতে চান?"
+	},
+	"copied": {
+		"message": "কপি করা হয়েছে!"
+	},
+	"copyAsJson": {
+		"message": "JSON হিসেবে কপি করুন"
+	},
+	"copyToClipboard": {
+		"message": "ক্লিপবোর্ডে কপি করুন"
+	},
+	"createNewNote": {
+		"message": "নতুন নোট তৈরি করুন"
+	},
+	"custom": {
+		"message": "কাস্টম"
+	},
+	"dailyNoteFormat": {
+		"message": "ডেইলি নোটের ফরম্যাট (যেমন, YYYY-MM-DD)"
+	},
+	"defaultInterpreterContext": {
+		"message": "ডিফল্ট ইন্টারপ্রিটারের কনটেক্সট"
+	},
+	"defaultInterpreterContextDescription": {
+		"message": "প্রম্পট ভেরিয়েবলগুলিকে ব্যাখ্যা করতে ব্যবহৃত কনটেক্সট টি ওভাররাইড করুন। এখানে ভেরিয়েবলগুলি ব্যবহার করা যেতে পারে।"
+	},
+	"defaultTemplateName": {
+		"message": "ডিফল্ট"
+	},
+	"delete": {
+		"message": "মুছে ফেলুন"
+	},
+	"deleteModelConfirm": {
+		"message": "আপনি কি নিশ্চিতভাবে এই মডেলটি মুছে ফেলতে চান?"
+	},
+	"deleteProviderConfirm": {
+		"message": "আপনি কি নিশ্চিতভাবে এই প্রোভাইডারটি মুছে ফেলতে চান?"
+	},
+	"disableHighlighter": {
+		"message": "হাইলাইটার নিষ্ক্রিয় করুন"
+	},
+	"done": {
+		"message": "হয়েছে"
+	},
+	"dragAndDropFile": {
+		"message": "এখানে ফাইল টেনে আনুন এবং ছেড়ে দিন"
+	},
+	"duplicate": {
+		"message": "ডুপ্লিকেট করুন"
+	},
+	"earlyAccessDescription": {
+		"message": "Obsidian এর সর্বশেষ $link_start$আর্লি অ্যাক্সেস সংস্করণের$link_end$ প্রয়োজনীয় ফিচারগুলো ব্যবহার করুন। বর্তমানে Obsidian 1.7.2 বা তার পরের সংস্করণ প্রয়োজন।",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/Obsidian/Early+access+versions\" target=\"_blank\">"
+			}
+		}
+	},
+	"earlyAccessFeatures": {
+		"message": "আর্লি অ্যাক্সেসের ফিচারগুলো"
+	},
+	"editModel": {
+		"message": "মডেল সম্পাদনা করুন"
+	},
+	"editProvider": {
+		"message": "প্রোভাইডার সম্পাদনা করুন"
+	},
+	"editTemplate": {
+		"message": "টেমপ্লেট সম্পাদনা করুন"
+	},
+	"enableHighlighter": {
+		"message": "হাইলাইটার সক্রিয় করুন"
+	},
+	"enableHighlighterDescription": {
+		"message": "ওয়েব পেজ থেকে বিষয়বস্তু হাইলাইট করে Obsidian এ সংরক্ষণ করুন।"
+	},
+	"enableInterpreter": {
+		"message": "ইন্টারপ্রিটার সক্রিয় করুন"
+	},
+	"enableInterpreterDescription": {
+		"message": "পেজগুলো থেকে তথ্য আহরণের জন্য ন্যাচারাল ল্যাঙ্গুয়েজ ব্যবহার করুন। উদাহরণস্বরূপ, আপনি টেমপ্লেট সিনট্যাক্স $strong_start${{\"পৃষ্ঠার একটি সারাংশ\"}}$strong_end$ ব্যবহার করতে পারেন। নীচে কনফিগার করা একটি এপিআই কী বা কাস্টম মডেল প্রয়োজন।  $link_start$আরও জানুন$link_end$।",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/interpreter\" target=\"_blank\">"
+			},
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"error": {
+		"message": "ত্রুটি"
+	},
+	"export": {
+		"message": "এক্সপোর্ট করুন"
+	},
+	"exportAllSettings": {
+		"message": "সব সেটিংস এক্সপোর্ট করুন"
+	},
+	"exportAllSettingsDescription": {
+		"message": "টেমপ্লেট এবং প্রোপার্টি সহ সমস্ত সেটিংস এক্সপোর্ট করুন।"
+	},
+	"exportHighlights": {
+		"message": "হাইলাইটগুলি এক্সপোর্ট করুন"
+	},
+	"exportHighlightsDescription": {
+		"message": "আপনার হাইলাইটগুলি একটি ফাইলে এক্সপোর্ট করুন।"
+	},
+	"exportProperties": {
+		"message": "প্রোপার্টিগুলি এক্সপোর্ট করুন"
+	},
+	"exportPropertiesDescription": {
+		"message": "ওয়েব ক্লিপারের প্রোপার্টিগুলিকে একটি $strong_start$types.json$strong_end$ ফাইলে সংরক্ষণ করুন যা আপনার Obsidian ভল্টে বা অন্যান্য ডিভাইসে ওয়েব ক্লিপারে ইম্পোর্ট করা যেতে পারে।",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"extensionDescription": {
+		"message": "ওয়েব থেকে বিষয়বস্তু একটি ব্যক্তিগত এবং স্থায়ী ফর্ম্যাটে সংরক্ষণ করুন যা আপনি অফলাইনে অ্যাক্সেস করতে পারেন। Obsidian এর জন্য অফিসিয়াল ব্রাউজার এক্সটেনশান।"
+	},
+	"extensionName": {
+		"message": "Obsidian Web Clipper"
+	},
+	"failedToCopyText": {
+		"message": "টেক্সট কপি করতে ব্যর্থ হয়েছে"
+	},
+	"failedToDeleteTemplate": {
+		"message": "টেমপ্লেট মুছে ফেলতে ব্যর্থ হয়েছে। দয়া আবার চেষ্টা করুন।"
+	},
+	"failedToDuplicateTemplate": {
+		"message": "টেমপ্লেট ডুপ্লিকেট করতে ব্যর্থ হয়েছে। দয়া আবার চেষ্টা করুন।"
+	},
+	"failedToExportHighlights": {
+		"message": "হাইলাইটগুলি এক্সপোর্ট করতে ব্যর্থ হয়েছে। আরও বিস্তারিত জানার জন্য কনসোলটি পরীক্ষা করুন।"
+	},
+	"failedToExportSettings": {
+		"message": "সেটিংস এক্সপোর্ট করতে ব্যর্থ হয়েছে। আরও বিস্তারিত জানার জন্য কনসোলটি পরীক্ষা করুন।"
+	},
+	"failedToExtractContent": {
+		"message": "পৃষ্ঠার বিষয়বস্তু আহরণ করা যাচ্ছে না।"
+	},
+	"failedToImportTemplate": {
+		"message": "টেমপ্লেট ইম্পোর্ট করতে ব্যর্থ হয়েছে। দয়া করে ফাইলটি পরীক্ষা করে আবার চেষ্টা করুন।"
+	},
+	"failedToInitialize": {
+		"message": "দয়া করে এক্সটেনশনটি পুনরায় লোড করুন।"
+	},
+	"failedToInitializeContent": {
+		"message": "পেজের বিষয়বস্তু শুরু করা যাচ্ছে না।"
+	},
+	"failedToProcessInterpreter": {
+		"message": "ইন্টারপ্রিটার প্রসেসিং ব্যর্থ হয়েছে। দয়া করে আবার চেষ্টা করুন।"
+	},
+	"failedToResetProviders": {
+		"message": "প্রোভাইডার এবং মডেলগুলি রিসেট করতে ব্যর্থ হয়েছে।"
+	},
+	"failedToResetTemplate": {
+		"message": "ডিফল্ট টেমপ্লেট রিসেট করতে ব্যর্থ হয়েছে। দয়া করে আবার চেষ্টা করুন।"
+	},
+	"failedToSave": {
+		"message": "ফাইল সংরক্ষণ করতে ব্যর্থ হয়েছে।"
+	},
+	"failedToSaveFile": {
+		"message": "ফাইল সংরক্ষণ করতে ব্যর্থ হয়েছে।"
+	},
+	"failedToSaveProvider": {
+		"message": "প্রোভাইডার সংরক্ষণ করতে ব্যর্থ হয়েছে। দয়া করে আবার চেষ্টা করুন।"
+	},
+	"folder": {
+		"message": "ফোল্ডার"
+	},
+	"general": {
+		"message": "সাধারণ"
+	},
+	"generalSettings": {
+		"message": "সাধারণ সেটিংস"
+	},
+	"getApiKeyHere": {
+		"message": "আপনার $1 API কী এখান থেকে সংগ্রহ করুন।"
+	},
+	"help": {
+		"message": "সহায়তা"
+	},
+	"helpDescription": {
+		"message": "Web Clipper ব্যবহার করা শিখুন এবং সমস্যা সমাধানে সহায়তা পান।"
+	},
+	"highlightInline": {
+		"message": "Highlight the page content"
+	},
+	"highlightPage": {
+		"message": "Highlight page"
+	},
+	"highlighter": {
+		"message": "Highlighter"
+	},
+	"highlighterSettings": {
+		"message": "Highlighter"
+	},
+	"hotkeys": {
+		"message": "Hotkeys"
+	},
+	"import": {
+		"message": "Import"
+	},
+	"importAllSettings": {
+		"message": "Import all settings"
+	},
+	"importAllSettingsDescription": {
+		"message": "Import all settings including templates and properties. This will replace your current configuration."
+	},
+	"importFailed": {
+		"message": "Import failed. Please check the console for more details."
+	},
+	"importModalTitle": {
+		"message": "Import"
+	},
+	"importProperties": {
+		"message": "Import properties"
+	},
+	"importPropertiesDescription": {
+		"message": "To import your properties from Obsidian, locate the $strong_1_start$types.json$strong_1_end$ file in the $strong_2_start$.obsidian$strong_2_end$ folder within your vault. Note this folder is hidden by default on most operating systems.",
+		"placeholders": {
+			"strong_1_end": {
+				"content": "</strong>"
+			},
+			"strong_1_start": {
+				"content": "<strong>"
+			},
+			"strong_2_end": {
+				"content": "</strong>"
+			},
+			"strong_2_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"importSettings": {
+		"message": "Import settings"
+	},
+	"importTemplate": {
+		"message": "Import template"
+	},
+	"interpret": {
+		"message": "interpret"
+	},
+	"interpreter": {
+		"message": "Interpreter"
+	},
+	"interpreterContext": {
+		"message": "Interpreter context"
+	},
+	"interpreterContextDescription": {
+		"message": "The context used to interpret prompt variables. Overrides the default context defined in $link_start$Interpreter settings$link_end$. Variables can be used here.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=interpreter\">"
+			}
+		}
+	},
+	"language": {
+		"message": "Language"
+	},
+	"languageDescription": {
+		"message": "Choose the display language for the extension interface."
+	},
+	"lastUsed": {
+		"message": "Last used"
+	},
+	"legacyMode": {
+		"message": "Legacy mode"
+	},
+	"legacyModeDescription": {
+		"message": "Uses the URI clipping method compatible with Obsidian 1.6.7 or earlier. Note that the length of the content you can clip is limited by your browser and OS. Some pages may fail without any errors."
+	},
+	"modelName": {
+		"message": "Display name"
+	},
+	"modelNameDescription": {
+		"message": "The name of the model you want to display in the interface."
+	},
+	"modelProvider": {
+		"message": "Provider"
+	},
+	"modelProviderDescription": {
+		"message": "Select the provider for this model."
+	},
+	"modelProviderPlaceholder": {
+		"message": "Provider"
+	},
+	"modelRequiredFields": {
+		"message": "Model name, Provider, and Model ID are required."
+	},
+	"models": {
+		"message": "Models"
+	},
+	"more": {
+		"message": "More"
+	},
+	"newTemplate": {
+		"message": "New template"
+	},
+	"noHighlights": {
+		"message": "Do nothing"
+	},
+	"noTemplates": {
+		"message": "No templates available. Please add a template in the settings."
+	},
+	"noUnusedProperties": {
+		"message": "No unused properties found."
+	},
+	"noteContent": {
+		"message": "Note content"
+	},
+	"noteContentDescription": {
+		"message": "Customize the content of the note. Use variables to pre-populate data from the page."
+	},
+	"noteLocation": {
+		"message": "Note location"
+	},
+	"noteLocationDescription": {
+		"message": "The folder or path of the note."
+	},
+	"noteName": {
+		"message": "Note name"
+	},
+	"noteNameFormat": {
+		"message": "Note name"
+	},
+	"noteNameFormatDescription": {
+		"message": "Format for the file name of the note. You can use variables like {{title}}, {{date}}, and {{published}} to pre-populate data from the page. $link_start$Learn more$link_end$.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/variables\" target=\"_blank\">"
+			}
+		}
+	},
+	"notesAboutPage": {
+		"message": "Notes about this page..."
+	},
+	"onlyHttpSupported": {
+		"message": "This page cannot be clipped. Only http and https URLs are supported."
+	},
+	"open": {
+		"message": "Open"
+	},
+	"optional": {
+		"message": "(optional)"
+	},
+	"orPasteBelow": {
+		"message": "Or paste content below"
+	},
+	"pageCannotBeClipped": {
+		"message": "This page cannot be clipped."
+	},
+	"pageVariables": {
+		"message": "Page variables"
+	},
+	"pasteJsonHere": {
+		"message": "Paste JSON here"
+	},
+	"pleaseReload": {
+		"message": "Please try reloading the page."
+	},
+	"prependToDaily": {
+		"message": "Add to daily note, at the top"
+	},
+	"prependToExisting": {
+		"message": "Add to an existing note, at the top"
+	},
+	"processing": {
+		"message": "processing"
+	},
+	"properties": {
+		"message": "Properties"
+	},
+	"propertiesSettings": {
+		"message": "Properties"
+	},
+	"propertyName": {
+		"message": "Property name"
+	},
+	"propertyValue": {
+		"message": "Property value"
+	},
+	"provider": {
+		"message": "Provider"
+	},
+	"providerApiKey": {
+		"message": "API key"
+	},
+	"providerApiKeyDescription": {
+		"message": "Your API key for this provider."
+	},
+	"providerBaseUrl": {
+		"message": "Base URL"
+	},
+	"providerBaseUrlDescription": {
+		"message": "The API endpoint URL for this provider."
+	},
+	"providerModelId": {
+		"message": "Model ID"
+	},
+	"providerModelIdDescription": {
+		"message": "The identifier of the model from your provider. Typically a short name without spaces."
+	},
+	"providerModelIdPlaceholder": {
+		"message": "Model ID"
+	},
+	"providerName": {
+		"message": "Provider name"
+	},
+	"providerNameDescription": {
+		"message": "Display name for this provider."
+	},
+	"providerPreset": {
+		"message": "Preset"
+	},
+	"providerPresetDescription": {
+		"message": "Choose a provider or create a custom one."
+	},
+	"providerRequiredFields": {
+		"message": "Provider name and Base URL are required."
+	},
+	"providers": {
+		"message": "Providers"
+	},
+	"refresh": {
+		"message": "Refresh"
+	},
+	"remove": {
+		"message": "Remove"
+	},
+	"removeProperty": {
+		"message": "Remove property"
+	},
+	"removeUnusedProperties": {
+		"message": "Remove unused properties"
+	},
+	"removeUnusedPropertiesDescription": {
+		"message": "Remove all properties that are not used in any template."
+	},
+	"removeVault": {
+		"message": "Remove vault"
+	},
+	"replaceContent": {
+		"message": "Replace the page content"
+	},
+	"reset": {
+		"message": "Reset"
+	},
+	"resetDefaultTemplate": {
+		"message": "Reset default template"
+	},
+	"resetDefaultTemplateDescription": {
+		"message": "Remove any changes you've made to the default template."
+	},
+	"resetProvidersAndModels": {
+		"message": "Reset default models"
+	},
+	"resetProvidersAndModelsDescription": {
+		"message": "Reset providers and models to the default settings."
+	},
+	"save": {
+		"message": "Save"
+	},
+	"saveFile": {
+		"message": "Save file..."
+	},
+	"searchVariables": {
+		"message": "Search variables..."
+	},
+	"selectProvider": {
+		"message": "Select a provider"
+	},
+	"selectTemplateToExport": {
+		"message": "Please select a template to export."
+	},
+	"settings": {
+		"message": "Settings"
+	},
+	"settingsHeading": {
+		"message": "Settings"
+	},
+	"settingsImportSuccess": {
+		"message": "All settings imported successfully. Please refresh the page to see the changes."
+	},
+	"share": {
+		"message": "Share..."
+	},
+	"shortcutInstructionsBrave": {
+		"message": "To change key assignments, go to $1"
+	},
+	"shortcutInstructionsChrome": {
+		"message": "To change key assignments, go to $1"
+	},
+	"shortcutInstructionsDefault": {
+		"message": "To change key assignments, please refer to your browser's extension settings."
+	},
+	"shortcutInstructionsEdge": {
+		"message": "To change key assignments, go to $1"
+	},
+	"shortcutInstructionsFirefox": {
+		"message": "To change key assignments, go to $1, click the gear icon, and select \"Manage Extension Shortcuts\"."
+	},
+	"shortcutInstructionsIntro": {
+		"message": "Keyboard shortcuts give you quick access to clipper features."
+	},
+	"shortcutInstructionsSafari": {
+		"message": "Keyboard shortcuts are not customizable on Safari."
+	},
+	"shortcutNotSet": {
+		"message": "Not set"
+	},
+	"showActionsButton": {
+		"message": "Show actions button"
+	},
+	"showActionsDescription": {
+		"message": "Allows you to inspect page variables from the clipper menu. Useful for seeing the variables that are available to use in templates."
+	},
+	"showPageVariables": {
+		"message": "Show page variables"
+	},
+	"silentOpen": {
+		"message": "Save clipped note without opening it"
+	},
+	"silentOpenDescription": {
+		"message": "Clipped notes will be saved but will not open as a new tab. Obsidian will still be brought to the foreground."
+	},
+	"specificNoteName": {
+		"message": "Specific note name"
+	},
+	"systemDefault": {
+		"message": "System"
+	},
+	"templateCopied": {
+		"message": "Copied template JSON to clipboard"
+	},
+	"templateCopyError": {
+		"message": "Failed to copy template JSON to clipboard"
+	},
+	"templateName": {
+		"message": "Template name"
+	},
+	"templateProperties": {
+		"message": "Properties"
+	},
+	"templatePropertiesDescription": {
+		"message": "Properties to add to the top of the clipped note. Use variables to pre-populate data from the page."
+	},
+	"templateTriggers": {
+		"message": "Template triggers"
+	},
+	"templateTriggersDescription": {
+		"message": "Define rules to automatically select this template if it matches a URL pattern or contains schema.org data. One rule per line."
+	},
+	"templatesHeading": {
+		"message": "Templates"
+	},
+	"thinking": {
+		"message": "thinking"
+	},
+	"unknownProvider": {
+		"message": "Unknown provider"
+	},
+	"updateAvailable": {
+		"message": "An update is available."
+	},
+	"usingLatestVersion": {
+		"message": "You are using the latest version."
+	},
+	"vault": {
+		"message": "Vault"
+	},
+	"vaultDescription": {
+		"message": "Select the default vault for this template. Go to $link_start$general settings$link_end$ to add or remove vaults.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=general\">"
+			}
+		}
+	},
+	"vaults": {
+		"message": "Vaults"
+	},
+	"vaultsDescription": {
+		"message": "By default, clipped notes are saved to the currently open vault. You can add vaults here if you want the option to save to different vaults. Vault names must exactly match the name of the Obsidian vault. Press $strong_start$enter$strong_end$ to add a vault.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"version": {
+		"message": "Version"
+	}
+}
