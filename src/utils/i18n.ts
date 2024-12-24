@@ -13,6 +13,7 @@ export function getAvailableLanguages(): { code: string; name: string }[] {
 		{ code: 'en', name: 'English' },
 		{ code: 'es', name: 'Español' },
 		{ code: 'fa', name: 'فارسی' },
+		{code: 'bn', name: 'বাংলা'},
 		{ code: 'fr', name: 'Français' },
 		{ code: 'hi', name: 'हिन्दी' },
 		{ code: 'id', name: 'Bahasa Indonesia' },
@@ -72,7 +73,7 @@ export function getMessage(messageName: string, substitutions?: string | string[
 		// Load messages for the current language
 		const messages = require(`../locales/${currentLanguage || 'en'}/messages.json`);
 		const messageObj = messages[messageName];
-		
+
 		if (!messageObj) {
 			return browser.i18n.getMessage(messageName, substitutions) || messageName;
 		}
