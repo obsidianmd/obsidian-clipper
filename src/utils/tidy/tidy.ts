@@ -120,6 +120,7 @@ const CLUTTER_PATTERNS = [
 	'google',
 	'goog-',
 	'header',
+	'interlude',
 	'link-box',
 	'loading',
 	'logo-',
@@ -350,8 +351,29 @@ export class Tidy {
 		let basicSelectorCount = 0;
 		let patternMatchCount = 0;
 
-		// Combine all basic selectors into a single selector string for one query
-		const combinedSelector = BASIC_SELECTORS.join(',');
+		// Normalize and combine all basic selectors into a single selector string
+		const normalizedSelectors = BASIC_SELECTORS.map(selector => {
+			// Handle attribute selectors separately
+			if (selector.includes('[')) {
+				// Split attribute selectors into parts
+				const parts = selector.split(/(\[.*?\])/);
+				return parts.map(part => {
+					// Don't lowercase the attribute value if it's in quotes
+					if (part.startsWith('[') && part.includes('=')) {
+						const [attr, value] = part.slice(1, -1).split('=');
+						if (value.startsWith('"') || value.startsWith("'")) {
+							return `[${attr.toLowerCase()}=${value}]`;
+						}
+					}
+					return part.toLowerCase();
+				}).join('');
+			}
+			return selector.toLowerCase();
+		});
+
+		const combinedSelector = normalizedSelectors.join(',');
+		
+		// Query and remove elements
 		const basicElements = doc.querySelectorAll(combinedSelector);
 		basicElements.forEach(el => {
 			if (el?.parentNode) {
