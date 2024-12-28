@@ -18,7 +18,7 @@
 		"message": "Agregar a Obsidian"
 	},
 	"addVaultPlaceholder": {
-		"message": "Pressiona reton per afegir una cambra cuirassada"
+		"message": "Pressiona retorn per afegir una cambra cuirassada"
 	},
 	"advanced": {
 		"message": "Avançat"
@@ -60,7 +60,7 @@
 		"message": "Cancel·lar"
 	},
 	"cannotDeleteProvider": {
-		"message": "No es pot eliminar el proveïdor \"$1\" perquè s'utilitza p3r $2 model(s)."
+		"message": "No es pot eliminar el proveïdor \"$1\" perquè s'utilitza per $2 model(s)."
 	},
 	"changelog": {
 		"message": "Registre de canvis"
@@ -78,7 +78,7 @@
 		"message": "Escollir fitxer de plantilla"
 	},
 	"clipBehavior": {
-		"message": "Comportamento de guardat"
+		"message": "Comportament de guardat"
 	},
 	"clipBehaviorDescription": {
 		"message": "Escull com es guarda el contingut ressaltat a Obsidian. Defineix la variable $strong_start${{content}}$strong_end$.",
@@ -317,7 +317,7 @@
 		"message": "Ressaltador"
 	},
 	"highlighterSettings": {
-		"message": "Ressaltador"
+		"message": "Configuració del ressaltador"
 	},
 	"hotkeys": {
 		"message": "Dreceres de teclat"
@@ -450,7 +450,7 @@
 		"message": "Nom de la nota"
 	},
 	"noteNameFormat": {
-		"message": "Nom de la nota"
+		"message": "Format del nom de la nota"
 	},
 	"noteNameFormatDescription": {
 		"message": "Format per al nombre del fitxer de la nota. Pot usar variables com {{title}}, {{date}} i {{published}} per emplenar prèviament dades de la pàgina. $link_start$Més informació$link_end$.",
@@ -715,7 +715,7 @@
 		"message": "Cambres cuirassades"
 	},
 	"vaultsDescription": {
-		"message": "Por defecte, les notes es guarden a la cambra cuirassada oberta actualment. Pot afegir cambres cuirassades aquí si vol l'opció de guardar a diferents cambres cuirassades. Els noms de les cambres cuirassades han de coincidir exactament amb el nom de la cambra cuirassada d'Obsidian. Pressioni $strong_start$enter$strong_end$ per afegir una cambra cuirassada.",
+		"message": "Per defecte, les notes es guarden a la cambra cuirassada oberta actualment. Pot afegir cambres cuirassades aquí si vol l'opció de guardar a diferents cambres cuirassades. Els noms de les cambres cuirassades han de coincidir exactament amb el nom de la cambra cuirassada d'Obsidian. Pressioni $strong_start$enter$strong_end$ per afegir una cambra cuirassada.",
 		"placeholders": {
 			"strong_end": {
 				"content": "</strong>"
