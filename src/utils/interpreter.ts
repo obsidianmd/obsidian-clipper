@@ -111,6 +111,7 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 					{ role: 'user', content: `${JSON.stringify(promptContent)}` }
 				],
 				format: 'json',
+				num_ctx: 120000,
 				temperature: 0.5,
 				stream: false
 			};
