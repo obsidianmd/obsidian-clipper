@@ -860,6 +860,40 @@ export function createMarkdownContent(content: string, url: string) {
 		return tableClone.outerHTML;
 	}
 
+	turndownService.addRule('katex', {
+		filter: (node) => {
+			return node instanceof HTMLElement && 
+				   (node.classList.contains('math') || node.classList.contains('katex'));
+		},
+		replacement: (content, node) => {
+			if (!(node instanceof HTMLElement)) return content;
+
+			// Try to find the original LaTeX content
+			// 1. Check data-latex attribute
+			let latex = node.getAttribute('data-latex');
+			
+			// 2. If no data-latex, try to get from .katex-mathml
+			if (!latex) {
+				const mathml = node.querySelector('.katex-mathml annotation[encoding="application/x-tex"]');
+				latex = mathml?.textContent || '';
+			}
+
+			// 3. If still no content, use text content as fallback
+			if (!latex) {
+				latex = node.textContent?.trim() || '';
+			}
+
+			// Determine if it's an inline formula
+			const isInline = node.classList.contains('math-inline');
+			
+			if (isInline) {
+				return `$${latex}$`;
+			} else {
+				return `\n$$\n${latex}\n$$\n`;
+			}
+		}
+	});
+
 	try {
 		let markdown = turndownService.turndown(processedContent);
 		debugLog('Markdown', 'Markdown conversion successful');
