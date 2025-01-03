@@ -133,8 +133,8 @@ Converts an array or object into a list of Markdown footnotes.
 
 Converts strings and arrays into [text fragment](https://developer.mozilla.org/en-US/docs/Web/URI/Fragment/Text_fragments) links. Defaults to "link" for the link text.
 
-- `highlights|fragment` returns `Highlight content [link](text-fragment-url)`
-- `highlights|fragment:"custom title"` returns `Highlight content [custom title](text-fragment-url)
+- `highlights|fragment_link` returns `Highlight content [link](text-fragment-url)`
+- `highlights|fragment_link:"custom title"` returns `Highlight content [custom title](text-fragment-url)
 
 ### `image` 
 
