@@ -34,7 +34,7 @@ export interface HighlightData {
 	id: string;
 	xpath: string;
 	content: string;
-	notes?: string[]; // Add this line
+	notes?: string[]; // Annotations
 }
 
 export interface TextHighlightData extends HighlightData {
