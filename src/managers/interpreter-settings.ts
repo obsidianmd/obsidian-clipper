@@ -29,6 +29,13 @@ const PRESET_PROVIDERS: Record<string, PresetProvider> = {
 		apiKeyUrl: 'https://oai.azure.com/portal/',
 		modelsList: 'https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models'
 	},
+	deepseek: {
+		id: 'deepseek',
+		name: 'DeepSeek',
+		baseUrl: 'https://api.deepseek.com/v1/chat/completions',
+		apiKeyUrl: 'https://platform.deepseek.com/api_keys',
+		modelsList: 'https://api-docs.deepseek.com/quick_start/pricing',
+	},
 	google: {
 		id: 'google',
 		name: 'Google Gemini',
