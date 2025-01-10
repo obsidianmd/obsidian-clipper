@@ -465,17 +465,29 @@ export function createMarkdownContent(content: string, url: string) {
 			return content;
 		}
 	});
-
+	
 	turndownService.addRule('inlineFootnotes', {
 		filter: (node: Node): boolean => {
-			return node instanceof HTMLElement && 
-					node.nodeName === 'SPAN' && 
-					node.classList.contains('footnote-link');
+			return (
+				node instanceof HTMLElement &&
+				(
+				  (node.nodeName === 'SPAN' && node.classList.contains('footnote-link')) ||
+				  (node.nodeName === 'A' && node.classList.contains('citation'))
+				)
+			  );
 		},
 		replacement: (content, node) => {
 			if (node instanceof HTMLElement) {
-				const footnoteId = node.dataset.footnoteId;
-				const footnoteContent = node.dataset.footnoteContent;
+				let footnoteId = undefined;
+				let footnoteContent = undefined;
+
+				if (node.nodeName === 'SPAN' && node.classList.contains('footnote-link')) {
+					footnoteId = node.dataset.footnoteId
+					footnoteContent = node.dataset.footnoteContent
+				} else if (node.nodeName === 'A' && node.classList.contains('citation')) {
+					footnoteId = node.textContent;
+					footnoteContent = node.getAttribute('href');
+				}
 				
 				if (footnoteId && footnoteContent) {
 					// Store the footnote content for later use
@@ -490,7 +502,7 @@ export function createMarkdownContent(content: string, url: string) {
 			return content;
 		}
 	});
-
+	  
 	// Update the reference list rule
 	turndownService.addRule('referenceList', {
 		filter: (node: Node): boolean => {
@@ -913,7 +925,7 @@ export function createMarkdownContent(content: string, url: string) {
 
 		// Remove any consecutive newlines more than two
 		markdown = markdown.replace(/\n{3,}/g, '\n\n');
-
+		
 		// Append footnotes at the end of the document
 		if (Object.keys(footnotes).length > 0) {
 			markdown += '\n\n---\n\n';
