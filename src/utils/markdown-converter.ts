@@ -494,13 +494,16 @@ export function createMarkdownContent(content: string, url: string) {
 	// Update the reference list rule
 	turndownService.addRule('referenceList', {
 		filter: (node: Node): boolean => {
-			if (node instanceof HTMLElement) {
+			if (node instanceof HTMLOListElement) {
 				return (
-					(node.nodeName === 'OL' && node.classList.contains('references')) ||
-					(node.nodeName === 'OL' && node.classList.contains('footnotes-list')) ||
-					(node.nodeName === 'UL' && node.classList.contains('ltx_biblist')) ||
-					(node.nodeName === 'OL' && node.parentElement?.classList?.contains('footnotes') === true)
+					node.classList.contains('references') ||
+					node.classList.contains('footnotes-list') ||
+					node.parentElement?.classList?.contains('footnote') === true ||
+					node.parentElement?.classList?.contains('footnotes') === true
 				);
+			}
+			if (node instanceof HTMLUListElement) {
+				return node.classList.contains('ltx_biblist')
 			}
 			return false;
 		},
