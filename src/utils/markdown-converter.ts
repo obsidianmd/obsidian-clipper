@@ -502,7 +502,7 @@ export function createMarkdownContent(content: string, url: string) {
 			return content;
 		}
 	});
-	  
+
 	// Update the reference list rule
 	turndownService.addRule('referenceList', {
 		filter: (node: Node): boolean => {
@@ -925,7 +925,7 @@ export function createMarkdownContent(content: string, url: string) {
 
 		// Remove any consecutive newlines more than two
 		markdown = markdown.replace(/\n{3,}/g, '\n\n');
-		
+
 		// Append footnotes at the end of the document
 		if (Object.keys(footnotes).length > 0) {
 			markdown += '\n\n---\n\n';
@@ -933,7 +933,7 @@ export function createMarkdownContent(content: string, url: string) {
 				markdown += `[^${id}]: ${content}\n\n`;
 			}
 		}
-
+		
 		// Clear the footnotes object for the next conversion
 		Object.keys(footnotes).forEach(key => delete footnotes[key]);
 
