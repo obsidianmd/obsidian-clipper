@@ -22,7 +22,7 @@ export class ExtractorRegistry {
 		this.register({
 			patterns: [
 				'twitter.com',
-				'x.com'
+				/\/x\.com\/.*/,
 			],
 			extractor: TwitterExtractor
 		});
