@@ -1,0 +1,731 @@
+{
+	"addModel": {
+		"message": "+ মডেল যোগ করুন"
+	},
+	"addModelTitle": {
+		"message": "মডেল যোগ করুন"
+	},
+	"addProperty": {
+		"message": "+ প্রোপার্টি যোগ করুন"
+	},
+	"addProvider": {
+		"message": "+ প্রোভাইডার যোগ করুন"
+	},
+	"addProviderTitle": {
+		"message": "প্রোভাইডার যোগ করুন"
+	},
+	"addToObsidian": {
+		"message": "অবসিডিয়ানে যোগ করুন"
+	},
+	"addVaultPlaceholder": {
+		"message": "ভল্ট যোগ করতে এন্টার চাপুন"
+	},
+	"advanced": {
+		"message": "অ্যাডভান্সড"
+	},
+	"allProperties": {
+		"message": "সমস্ত প্রপার্টি"
+	},
+	"alwaysShowHighlights": {
+		"message": "সবসময় হাইলাইট দেখান"
+	},
+	"alwaysShowHighlightsDescription": {
+		"message": "পেইজ লোড হওয়ার সাথে সাথে আপনার হাইলাইট করা অংশগুলি দেখতে চান? এই বিকল্পটি চালু রাখুন। অন্যথায়, শুধুমাত্র হাইলাইটার মোড চালু থাকাকালীনই এগুলি দেখতে পাবেন।"
+	},
+	"apiKeyMissing": {
+		"message": "API কী নেই"
+	},
+	"apiKeysWarning": {
+		"message": "বাহ্যিক প্রোভাইডার ব্যবহার করে আপনি তাদের শর্তাবলী এবং গোপনীয়তা নীতির সাথে সম্মত হচ্ছেন। ইন্টারপ্রিটার রিকোয়েস্টগুলি আপনার নির্বাচিত প্রোভাইডারের কাছে সরাসরি পাঠানো হয়। Obsidian আপনার রিকোয়েস্ট সম্পর্কিত কোনও তথ্য সংগ্রহ বা সংরক্ষণ করে না।"
+	},
+	"appendToDaily": {
+		"message": "ডেইলি নোটের শেষে যোগ করুন"
+	},
+	"appendToExisting": {
+		"message": "একটি বিদ্যমান নোটের শেষে যোগ করুন"
+	},
+	"autoRunInterpreter": {
+		"message": "স্বয়ংক্রিয়ভাবে চালান"
+	},
+	"autoRunInterpreterDescription": {
+		"message": "টেমপ্লেটে কোনও প্রম্পট ভেরিয়েবল থাকলে তা স্বয়ংক্রিয়ভাবে চালানো হবে। এটি আপনার মডেল প্রোভাইডারের সাথে এপিআই ক্রেডিট ব্যবহার করবে। শুধুমাত্র ম্যানুয়ালি ইন্টারপ্রিটার চালাতে চাইলে এটি বন্ধ করুন।"
+	},
+	"behavior": {
+		"message": "আচরণ"
+	},
+	"behaviorWarning": {
+		"message": "বিদ্যমান নোট বা ডেইলি নোটে যোগ করতে হলে Obsidian 1.7.2 বা তার পরের সংস্করণ প্রয়োজন।"
+	},
+	"cancel": {
+		"message": "বাতিল করুন"
+	},
+	"cannotDeleteProvider": {
+		"message": "প্রোভাইডার \"$1\" মুছে ফেলা যাবে না কারণ এটি $2 টি মডেল দ্বারা ব্যবহৃত হচ্ছে।"
+	},
+	"changelog": {
+		"message": "চেঞ্জলগ"
+	},
+	"chooseFile": {
+		"message": "একটি ফাইল নির্বাচন করুন"
+	},
+	"choosePropertiesFile": {
+		"message": "প্রোপার্টি ফাইল নির্বাচন করুন"
+	},
+	"chooseSettingsFile": {
+		"message": "সেটিংস ফাইল নির্বাচন করুন"
+	},
+	"chooseTemplateFile": {
+		"message": "টেমপ্লেট ফাইল নির্বাচন করুন"
+	},
+	"clipBehavior": {
+		"message": "ক্লিপের আচরণ"
+	},
+	"clipBehaviorDescription": {
+		"message": "Obsidian এ হাইলাইট করা কনটেন্ট কীভাবে সংরক্ষণ করা হবে তা নির্বাচন করুন। এটি $strong_start${{content}}$strong_end$ ভেরিয়েবল সংজ্ঞায়িত করে।",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"close": {
+		"message": "বন্ধ করুন"
+	},
+	"commandOpenClipper": {
+		"message": "Obsidian Clipper খুলুন"
+	},
+	"commandQuickClip": {
+		"message": "দ্রুত ক্লিপ করুন"
+	},
+	"commandToggleHighlighter": {
+		"message": "হাইলাইটার মোড চালু/বন্ধ করুন"
+	},
+	"confirmDeleteTemplate": {
+		"message": "আপনি কি নিশ্চিতভাবে \"$1\" টেমপ্লেটটি মুছে ফেলতে চান?"
+	},
+	"confirmReplaceSettings": {
+		"message": "এটি আপনার সকল বর্তমান সেটিংস, টেমপ্লেট এবং প্রোপার্টিস সহ প্রতিস্থাপন করবে।  আপনি কি নিশ্চিতভাবে এগিয়ে যেতে চান?"
+	},
+	"copied": {
+		"message": "কপি করা হয়েছে!"
+	},
+	"copyAsJson": {
+		"message": "JSON হিসেবে কপি করুন"
+	},
+	"copyToClipboard": {
+		"message": "ক্লিপবোর্ডে কপি করুন"
+	},
+	"createNewNote": {
+		"message": "নতুন নোট তৈরি করুন"
+	},
+	"custom": {
+		"message": "কাস্টম"
+	},
+	"dailyNoteFormat": {
+		"message": "ডেইলি নোটের ফরম্যাট (যেমন, YYYY-MM-DD)"
+	},
+	"defaultInterpreterContext": {
+		"message": "ডিফল্ট ইন্টারপ্রিটারের কনটেক্সট"
+	},
+	"defaultInterpreterContextDescription": {
+		"message": "প্রম্পট ভেরিয়েবলগুলিকে ব্যাখ্যা করতে ব্যবহৃত কনটেক্সটটি ওভাররাইড করুন। এখানে ভেরিয়েবল ব্যবহার করা যেতে পারে।"
+	},
+	"defaultTemplateName": {
+		"message": "ডিফল্ট"
+	},
+	"delete": {
+		"message": "মুছে ফেলুন"
+	},
+	"deleteModelConfirm": {
+		"message": "আপনি কি নিশ্চিতভাবে এই মডেলটি মুছে ফেলতে চান?"
+	},
+	"deleteProviderConfirm": {
+		"message": "আপনি কি নিশ্চিতভাবে এই প্রোভাইডারটি মুছে ফেলতে চান?"
+	},
+	"disableHighlighter": {
+		"message": "হাইলাইটার নিষ্ক্রিয় করুন"
+	},
+	"done": {
+		"message": "হয়েছে"
+	},
+	"dragAndDropFile": {
+		"message": "এখানে ফাইল টেনে আনুন এবং ছেড়ে দিন"
+	},
+	"duplicate": {
+		"message": "ডুপ্লিকেট করুন"
+	},
+	"earlyAccessDescription": {
+		"message": "Obsidian এর সর্বশেষ $link_start$আর্লি অ্যাক্সেস সংস্করণের$link_end$ প্রয়োজনীয় ফিচারগুলো ব্যবহার করুন। বর্তমানে Obsidian 1.7.2 বা তার পরের সংস্করণ প্রয়োজন।",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/Obsidian/Early+access+versions\" target=\"_blank\">"
+			}
+		}
+	},
+	"earlyAccessFeatures": {
+		"message": "আর্লি অ্যাক্সেসের ফিচারগুলো"
+	},
+	"editModel": {
+		"message": "মডেল সম্পাদনা করুন"
+	},
+	"editProvider": {
+		"message": "প্রোভাইডার সম্পাদনা করুন"
+	},
+	"editTemplate": {
+		"message": "টেমপ্লেট সম্পাদনা করুন"
+	},
+	"enableHighlighter": {
+		"message": "হাইলাইটার সক্রিয় করুন"
+	},
+	"enableHighlighterDescription": {
+		"message": "ওয়েব পেজ থেকে বিষয়বস্তু হাইলাইট করে Obsidian এ সংরক্ষণ করুন।"
+	},
+	"enableInterpreter": {
+		"message": "ইন্টারপ্রিটার সক্রিয় করুন"
+	},
+	"enableInterpreterDescription": {
+		"message": "পেজগুলো থেকে তথ্য আহরণের জন্য ন্যাচারাল ল্যাঙ্গুয়েজ ব্যবহার করুন। উদাহরণস্বরূপ, আপনি টেমপ্লেট সিনট্যাক্স $strong_start${{\"পৃষ্ঠার একটি সারাংশ\"}}$strong_end$ ব্যবহার করতে পারেন। নীচে কনফিগার করা একটি এপিআই কী বা কাস্টম মডেল প্রয়োজন।  $link_start$আরও জানুন$link_end$।",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/interpreter\" target=\"_blank\">"
+			},
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"error": {
+		"message": "ত্রুটি"
+	},
+	"export": {
+		"message": "এক্সপোর্ট করুন"
+	},
+	"exportAllSettings": {
+		"message": "সব সেটিংস এক্সপোর্ট করুন"
+	},
+	"exportAllSettingsDescription": {
+		"message": "টেমপ্লেট এবং প্রোপার্টি সহ সমস্ত সেটিংস এক্সপোর্ট করুন।"
+	},
+	"exportHighlights": {
+		"message": "হাইলাইটগুলি এক্সপোর্ট করুন"
+	},
+	"exportHighlightsDescription": {
+		"message": "আপনার হাইলাইটগুলি একটি ফাইলে এক্সপোর্ট করুন।"
+	},
+	"exportProperties": {
+		"message": "প্রোপার্টিগুলি এক্সপোর্ট করুন"
+	},
+	"exportPropertiesDescription": {
+		"message": "ওয়েব ক্লিপারের প্রোপার্টিগুলিকে একটি $strong_start$types.json$strong_end$ ফাইলে সংরক্ষণ করুন যা আপনার Obsidian ভল্টে বা অন্যান্য ডিভাইসে ওয়েব ক্লিপারে ইম্পোর্ট করা যেতে পারে।",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"extensionDescription": {
+		"message": "ওয়েব থেকে বিষয়বস্তু একটি ব্যক্তিগত এবং স্থায়ী ফর্ম্যাটে সংরক্ষণ করুন যা আপনি অফলাইনে অ্যাক্সেস করতে পারেন। Obsidian এর জন্য অফিসিয়াল ব্রাউজার এক্সটেনশান।"
+	},
+	"extensionName": {
+		"message": "Obsidian Web Clipper"
+	},
+	"failedToCopyText": {
+		"message": "টেক্সট কপি করতে ব্যর্থ হয়েছে"
+	},
+	"failedToDeleteTemplate": {
+		"message": "টেমপ্লেট মুছে ফেলতে ব্যর্থ হয়েছে। দয়া আবার চেষ্টা করুন।"
+	},
+	"failedToDuplicateTemplate": {
+		"message": "টেমপ্লেট ডুপ্লিকেট করতে ব্যর্থ হয়েছে। দয়া আবার চেষ্টা করুন।"
+	},
+	"failedToExportHighlights": {
+		"message": "হাইলাইটগুলি এক্সপোর্ট করতে ব্যর্থ হয়েছে। আরও বিস্তারিত জানার জন্য কনসোলটি পরীক্ষা করুন।"
+	},
+	"failedToExportSettings": {
+		"message": "সেটিংস এক্সপোর্ট করতে ব্যর্থ হয়েছে। আরও বিস্তারিত জানার জন্য কনসোলটি পরীক্ষা করুন।"
+	},
+	"failedToExtractContent": {
+		"message": "পৃষ্ঠার বিষয়বস্তু আহরণ করা যাচ্ছে না।"
+	},
+	"failedToImportTemplate": {
+		"message": "টেমপ্লেট ইম্পোর্ট করতে ব্যর্থ হয়েছে। দয়া করে ফাইলটি পরীক্ষা করে আবার চেষ্টা করুন।"
+	},
+	"failedToInitialize": {
+		"message": "দয়া করে এক্সটেনশনটি পুনরায় লোড করুন।"
+	},
+	"failedToInitializeContent": {
+		"message": "পেজের বিষয়বস্তু শুরু করা যাচ্ছে না।"
+	},
+	"failedToProcessInterpreter": {
+		"message": "ইন্টারপ্রিটার প্রসেসিং ব্যর্থ হয়েছে। দয়া করে আবার চেষ্টা করুন।"
+	},
+	"failedToResetProviders": {
+		"message": "প্রোভাইডার এবং মডেলগুলি রিসেট করতে ব্যর্থ হয়েছে।"
+	},
+	"failedToResetTemplate": {
+		"message": "ডিফল্ট টেমপ্লেট রিসেট করতে ব্যর্থ হয়েছে। দয়া করে আবার চেষ্টা করুন।"
+	},
+	"failedToSave": {
+		"message": "ফাইল সংরক্ষণ করতে ব্যর্থ হয়েছে।"
+	},
+	"failedToSaveFile": {
+		"message": "ফাইল সংরক্ষণ করতে ব্যর্থ হয়েছে।"
+	},
+	"failedToSaveProvider": {
+		"message": "প্রোভাইডার সংরক্ষণ করতে ব্যর্থ হয়েছে। দয়া করে আবার চেষ্টা করুন।"
+	},
+	"folder": {
+		"message": "ফোল্ডার"
+	},
+	"general": {
+		"message": "সাধারণ"
+	},
+	"generalSettings": {
+		"message": "সাধারণ সেটিংস"
+	},
+	"getApiKeyHere": {
+		"message": "আপনার $1 API কী এখান থেকে সংগ্রহ করুন।"
+	},
+	"help": {
+		"message": "সহায়তা"
+	},
+	"helpDescription": {
+		"message": "ওয়েব ক্লিপার ব্যবহার করা শিখুন এবং সমস্যা সমাধানে সহায়তা পান।"
+	},
+	"highlightInline": {
+		"message": "পেজের বিষয়বস্তু হাইলাইট করুন"
+	},
+	"highlightPage": {
+		"message": "পেজ হাইলাইট করুন"
+	},
+	"highlighter": {
+		"message": "হাইলাইটার"
+	},
+	"highlighterSettings": {
+		"message": "হাইলাইটার"
+	},
+	"hotkeys": {
+		"message": "হটকি"
+	},
+	"import": {
+		"message": "ইম্পোর্ট করুন"
+	},
+	"importAllSettings": {
+		"message": "সব সেটিংস ইম্পোর্ট করুন"
+	},
+	"importAllSettingsDescription": {
+		"message": "টেমপ্লেট এবং প্রোপার্টি সহ সমস্ত সেটিংস ইম্পোর্ট করুন। এটি আপনার বর্তমান কনফিগারেশন রিপ্লেস করবে।"
+	},
+	"importFailed": {
+		"message": "ইম্পোর্ট ব্যর্থ হয়েছে। আরও বিস্তারিত জানার জন্য কনসোলটি চেক করুন।"
+	},
+	"importModalTitle": {
+		"message": "ইম্পোর্ট"
+	},
+	"importProperties": {
+		"message": "প্রোপার্টিগুলি ইম্পোর্ট করুন"
+	},
+	"importPropertiesDescription": {
+		"message": "Obsidian থেকে প্রোপার্টিগুলি ইম্পোর্ট করার জন্য আপনার ভল্টের মধ্যে $strong_2_start$.obsidian$strong_2_end$ ফোল্ডারে অবস্থিত $strong_1_start$types.json$strong_1_end$ ফাইলটি খুঁজুন। মনে রাখবেন এই ফোল্ডারটি বেশিরভাগ অপারেটিং সিস্টেমে ডিফল্টভাবে লুকানো থাকে।",
+		"placeholders": {
+			"strong_1_end": {
+				"content": "</strong>"
+			},
+			"strong_1_start": {
+				"content": "<strong>"
+			},
+			"strong_2_end": {
+				"content": "</strong>"
+			},
+			"strong_2_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"importSettings": {
+		"message": "সেটিংস ইম্পোর্ট করুন"
+	},
+	"importTemplate": {
+		"message": "টেমপ্লেট ইম্পোর্ট করুন"
+	},
+	"interpret": {
+		"message": "ইন্টারপ্রিট করুন"
+	},
+	"interpreter": {
+		"message": "ইন্টারপ্রিটার"
+	},
+	"interpreterContext": {
+		"message": "ইন্টারপ্রিটার কনটেক্সট"
+	},
+	"interpreterContextDescription": {
+		"message": "প্রম্পট ভেরিয়েবলগুলিকে ব্যাখ্যা করতে ব্যবহৃত কনটেক্সট। এটি $link_start$ইন্টারপ্রিটার সেটিংস$link_end$ এর ডিফল্ট কনটেক্সটকে ওভাররাইড করে। এখানে ভেরিয়েবল ব্যবহার করা যেতে পারে।",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=interpreter\">"
+			}
+		}
+	},
+	"language": {
+		"message": "ভাষা"
+	},
+	"languageDescription": {
+		"message": "এক্সটেনশনের ইন্টারফেসের ভাষা নির্বাচন করুন।"
+	},
+	"lastUsed": {
+		"message": "শেষ ব্যবহৃত"
+	},
+	"legacyMode": {
+		"message": "লেগ্যাসি মোড"
+	},
+	"legacyModeDescription": {
+		"message": "এটি Obsidian 1.6.7 বা তার আগের সংস্করণের সাথে সামঞ্জস্যপূর্ণ URI ক্লিপিং পদ্ধতি ব্যবহার করে। মনে রাখবেন, আপনার ব্রাউজার এবং অপারেটিং সিস্টেমের সীমাবদ্ধতার কারণে পেজের বিষয়বস্তু ক্লিপ করার পরিমাণ সীমিত থাকতে পারে। কিছু পেজ কোনো ত্রুটি বার্তা ছাড়াই ব্যর্থ হতে পারে।"
+	},
+	"modelName": {
+		"message": "প্রদর্শিত নাম"
+	},
+	"modelNameDescription": {
+		"message": "ইন্টারফেসে প্রদর্শনের জন্য মডেলের নাম।"
+	},
+	"modelProvider": {
+		"message": "প্রোভাইডার"
+	},
+	"modelProviderDescription": {
+		"message": "এই মডেলের জন্য প্রোভাইডার নির্বাচন করুন।"
+	},
+	"modelProviderPlaceholder": {
+		"message": "প্রোভাইডার"
+	},
+	"modelRequiredFields": {
+		"message": "মডেলের নাম, প্রোভাইডার এবং মডেল আইডি আবশ্যক।"
+	},
+	"models": {
+		"message": "মডেলসমূহ"
+	},
+	"more": {
+		"message": "আরও"
+	},
+	"newTemplate": {
+		"message": "নতুন টেমপ্লেট"
+	},
+	"noHighlights": {
+		"message": "কিছুই করবেন না"
+	},
+	"noTemplates": {
+		"message": "কোনো টেমপ্লেট পাওয়া যায়নি। সেটিংসে একটি টেমপ্লেট যোগ করুন।"
+	},
+	"noUnusedProperties": {
+		"message": "অব্যবহৃত কোনো প্রপার্টি পাওয়া যায়নি।"
+	},
+	"noteContent": {
+		"message": "নোটের বিষয়বস্তু"
+	},
+	"noteContentDescription": {
+		"message": "নোটের বিষয়বস্তু কাস্টমাইজ করুন। পেজ থেকে ডেটা প্রি-পপুলেট করার জন্য ভেরিয়েবল ব্যবহার করুন।"
+	},
+	"noteLocation": {
+		"message": "নোটের লোকেশন"
+	},
+	"noteLocationDescription": {
+		"message": "নোটের ফোল্ডার বা পাথ।"
+	},
+	"noteName": {
+		"message": "নোটের নাম"
+	},
+	"noteNameFormat": {
+		"message": "নোটের নাম"
+	},
+	"noteNameFormatDescription": {
+		"message": "নোটের ফাইল নামের ফরম্যাট। {{title}}, {{date}}, এবং {{published}} এর মতো ভেরিয়েবল ব্যবহার করে পেজ থেকে ডেটা প্রি-পপুলেট করুন। $link_start$আরও জানুন$link_end$।",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/variables\" target=\"_blank\">"
+			}
+		}
+	},
+	"notesAboutPage": {
+		"message": "এই পেজের বিষয়ে নোট..."
+	},
+	"onlyHttpSupported": {
+		"message": "এই পৃষ্ঠা ক্লিপ করা যাবে না। শুধুমাত্র http এবং https URL গ্রহণযোগ্য।"
+	},
+	"open": {
+		"message": "খুলুন"
+	},
+	"optional": {
+		"message": "(ঐচ্ছিক)"
+	},
+	"orPasteBelow": {
+		"message": "অথবা নিচে কনটেন্ট পেস্ট করুন"
+	},
+	"pageCannotBeClipped": {
+		"message": "এই পেজ ক্লিপ করা যাবে না।"
+	},
+	"pageVariables": {
+		"message": "পেজের ভেরিয়েবলসমূহ"
+	},
+	"pasteJsonHere": {
+		"message": "এখানে JSON পেস্ট করুন"
+	},
+	"pleaseReload": {
+		"message": "অনুগ্রহ করে পেজ রিলোড করার চেষ্টা করুন।"
+	},
+	"prependToDaily": {
+		"message": "ডেইলি নোটে উপরের দিকে যোগ করুন"
+	},
+	"prependToExisting": {
+		"message": "বিদ্যমান নোটের উপরের দিকে যোগ করুন"
+	},
+	"processing": {
+		"message": "প্রসেসিং"
+	},
+	"properties": {
+		"message": "প্রোপার্টি"
+	},
+	"propertiesSettings": {
+		"message": "প্রোপার্টি"
+	},
+	"propertyName": {
+		"message": "প্রোপার্টির নাম"
+	},
+	"propertyValue": {
+		"message": "প্রোপার্টির মান"
+	},
+	"provider": {
+		"message": "প্রোভাইডার"
+	},
+	"providerApiKey": {
+		"message": "API কী"
+	},
+	"providerApiKeyDescription": {
+		"message": "এই প্রোভাইডারের জন্য আপনার API কী।"
+	},
+	"providerBaseUrl": {
+		"message": "বেস URL"
+	},
+	"providerBaseUrlDescription": {
+		"message": "এই প্রোভাইডারের API এন্ডপয়েন্ট URL।"
+	},
+	"providerModelId": {
+		"message": "মডেল আইডি"
+	},
+	"providerModelIdDescription": {
+		"message": "আপনার প্রোভাইডারের মডেলের শনাক্তকারী। সাধারণত একটি স্পেস ছাড়া ছোট নাম।"
+	},
+	"providerModelIdPlaceholder": {
+		"message": "মডেল আইডি"
+	},
+	"providerName": {
+		"message": "প্রোভাইডারের নাম"
+	},
+	"providerNameDescription": {
+		"message": "এই প্রোভাইডারের জন্য প্রদর্শিত নাম।"
+	},
+	"providerPreset": {
+		"message": "প্রিসেট"
+	},
+	"providerPresetDescription": {
+		"message": "একটি প্রোভাইডার নির্বাচন করুন অথবা একটি কাস্টম প্রোভাইডার তৈরি করুন।"
+	},
+	"providerRequiredFields": {
+		"message": "প্রোভাইডারের নাম এবং বেস URL আবশ্যক।"
+	},
+	"providers": {
+		"message": "প্রোভাইডারস"
+	},
+	"refresh": {
+		"message": "রিফ্রেশ"
+	},
+	"remove": {
+		"message": "মুছে ফেলুন"
+	},
+	"removeProperty": {
+		"message": "প্রোপার্টি মুছে ফেলুন"
+	},
+	"removeUnusedProperties": {
+		"message": "অব্যবহৃত প্রোপার্টি মুছে ফেলুন"
+	},
+	"removeUnusedPropertiesDescription": {
+		"message": "যে প্রোপার্টিগুলি কোনো টেমপ্লেটে ব্যবহার হয়নি, সেগুলি মুছে ফেলুন।"
+	},
+	"removeVault": {
+		"message": "ভল্ট মুছে ফেলুন"
+	},
+	"replaceContent": {
+		"message": "পেজের বিষয়বস্তু রিপ্লেস করুন"
+	},
+	"reset": {
+		"message": "রিসেট"
+	},
+	"resetDefaultTemplate": {
+		"message": "ডিফল্ট টেমপ্লেট রিসেট করুন"
+	},
+	"resetDefaultTemplateDescription": {
+		"message": "ডিফল্ট টেমপ্লেটে আপনি যে পরিবর্তন করেছেন তা মুছে ফেলুন।"
+	},
+	"resetProvidersAndModels": {
+		"message": "ডিফল্ট মডেলগুলো রিসেট করুন"
+	},
+	"resetProvidersAndModelsDescription": {
+		"message": "প্রোভাইডার এবং মডেলগুলোকে ডিফল্ট সেটিংসে ফেরত নিন।"
+	},
+	"save": {
+		"message": "সংরক্ষণ করুন"
+	},
+	"saveFile": {
+		"message": "ফাইল সংরক্ষণ করুন..."
+	},
+	"searchVariables": {
+		"message": "ভেরিয়েবল অনুসন্ধান করুন..."
+	},
+	"selectProvider": {
+		"message": "একটি প্রোভাইডার নির্বাচন করুন"
+	},
+	"selectTemplateToExport": {
+		"message": "এক্সপোর্ট করার জন্য একটি টেমপ্লেট নির্বাচন করুন"
+	},
+	"settings": {
+		"message": "সেটিংস"
+	},
+	"settingsHeading": {
+		"message": "সেটিংস"
+	},
+	"settingsImportSuccess": {
+		"message": "সমস্ত সেটিংস সফলভাবে ইম্পোর্ট হয়েছে। পরিবর্তনগুলি দেখতে পেজটি রিফ্রেশ করুন।"
+	},
+	"share": {
+		"message": "শেয়ার করুন..."
+	},
+	"shortcutInstructionsBrave": {
+		"message": "কী অ্যাসাইনমেন্ট পরিবর্তন করতে $1 এ যান"
+	},
+	"shortcutInstructionsChrome": {
+		"message": "কী অ্যাসাইনমেন্ট পরিবর্তন করতে $1 এ যান"
+	},
+	"shortcutInstructionsDefault": {
+		"message": "কী অ্যাসাইনমেন্ট পরিবর্তন করতে, আপনার ব্রাউজারের এক্সটেনশন সেটিংসে যান।"
+	},
+	"shortcutInstructionsEdge": {
+		"message": "কী অ্যাসাইনমেন্ট পরিবর্তন করতে $1 এ যান"
+	},
+	"shortcutInstructionsFirefox": {
+		"message": "কী অ্যাসাইনমেন্ট পরিবর্তন করতে $1 এ যান, গিয়ার আইকনে ক্লিক করুন, এবং \"Manage Extension Shortcuts\" সিলেক্ট করুন।"
+	},
+	"shortcutInstructionsIntro": {
+		"message": "কীবোর্ড শর্টকাট আপনাকে ক্লিপার ফিচারগুলো দ্রুত ব্যবহার করার সুযোগ দেয়।"
+	},
+	"shortcutInstructionsSafari": {
+		"message": "সাফারিতে কীবোর্ড শর্টকাট কাস্টমাইজ করা যায় না।"
+	},
+	"shortcutNotSet": {
+		"message": "সেট করা হয়নি"
+	},
+	"showActionsButton": {
+		"message": "অ্যাকশনস বাটন দেখান"
+	},
+	"showActionsDescription": {
+		"message": "ক্লিপার মেনু থেকে পেজ ভ্যারিয়েবল গুলি পরিদর্শন করার সুযোগ দেয়। টেমপ্লেটে ব্যবহারযোগ্য ভ্যারিয়েবল দেখতে এটি উপকারী।"
+	},
+	"showPageVariables": {
+		"message": "পেজ ভ্যারিয়েবল দেখান"
+	},
+	"silentOpen": {
+		"message": "ক্লিপ করা নোটটি না খুলে সংরক্ষণ করুন"
+	},
+	"silentOpenDescription": {
+		"message": "ক্লিপ করা নোট সংরক্ষণ হবে, তবে এটি নতুন ট্যাবে খুলবে না। Obsidian অ্যাপটি সামনে প্রদর্শিত হবে।"
+	},
+	"specificNoteName": {
+		"message": "নির্দিষ্ট নোটের নাম"
+	},
+	"systemDefault": {
+		"message": "সিস্টেম"
+	},
+	"templateCopied": {
+		"message": "টেমপ্লেট JSON ক্লিপবোর্ডে কপি করা হয়েছে"
+	},
+	"templateCopyError": {
+		"message": "টেমপ্লেট JSON ক্লিপবোর্ডে কপি করতে ব্যর্থ হয়েছে"
+	},
+	"templateName": {
+		"message": "টেমপ্লেটের নাম"
+	},
+	"templateProperties": {
+		"message": "প্রোপার্টি"
+	},
+	"templatePropertiesDescription": {
+		"message": "ক্লিপ করা নোটের শীর্ষে যোগ করার জন্য প্রোপার্টি। পেজ থেকে ডেটা প্রি-পপুলেট করতে ভ্যারিয়েবল ব্যবহার করুন।"
+	},
+	"templateTriggers": {
+		"message": "টেমপ্লেট ট্রিগার"
+	},
+	"templateTriggersDescription": {
+		"message": "যদি কোনো URL প্যাটার্নের সাথে মেলে অথবা schema.org এর ডেটা থাকে, তবে এই টেমপ্লেটটি স্বয়ংক্রিয়ভাবে নির্বাচন করার জন্য নিয়ম তৈরি করুন। প্রতিটি নিয়ম এক লাইনে লিখুন।"
+	},
+	"templatesHeading": {
+		"message": "টেমপ্লেটস"
+	},
+	"thinking": {
+		"message": "ভাবছে"
+	},
+	"unknownProvider": {
+		"message": "অজানা প্রোভাইডার"
+	},
+	"updateAvailable": {
+		"message": "একটি আপডেট পাওয়া গেছে।"
+	},
+	"usingLatestVersion": {
+		"message": "আপনি সর্বশেষ সংস্করণ ব্যবহার করছেন।"
+	},
+	"vault": {
+		"message": "ভল্ট"
+	},
+	"vaultDescription": {
+		"message": "এই টেমপ্লেটের জন্য ডিফল্ট ভল্ট নির্বাচন করুন। ভল্ট যোগ বা মুছে ফেলতে $link_start$সাধারণ সেটিংস$link_end$ এ যান।",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=general\">"
+			}
+		}
+	},
+	"vaults": {
+		"message": "ভল্ট"
+	},
+	"vaultsDescription": {
+		"message": "ডিফল্টভাবে, ক্লিপ করা নোটগুলি বর্তমানে খোলা থাকা ভল্টে সংরক্ষিত হয়। আপনি যদি বিভিন্ন ভল্টে সংরক্ষণ করার অপশন চান, তবে এখানে ভল্ট যোগ করতে পারেন। ভল্টের নাম অবশ্যই Obsidian ভল্টের নামের সাথে পুরোপুরি মিলতে হবে। একটি ভল্ট যোগ করতে $strong_start$এন্টার$strong_end$ চাপুন।",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"version": {
+		"message": "সংস্করণ"
+	}
+}
