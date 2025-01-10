@@ -836,30 +836,6 @@ export function createMarkdownContent(content: string, url: string) {
 		}
 	});
 
-	function cleanupTableHTML(table: HTMLTableElement): string {
-		const allowedAttributes = ['src', 'href', 'style', 'align', 'width', 'height', 'rowspan', 'colspan', 'bgcolor', 'scope', 'valign', 'headers'];
-		
-		const cleanElement = (element: Element) => {
-			Array.from(element.attributes).forEach(attr => {
-				if (!allowedAttributes.includes(attr.name)) {
-					element.removeAttribute(attr.name);
-				}
-			});
-			
-			element.childNodes.forEach(child => {
-				if (child instanceof Element) {
-					cleanElement(child);
-				}
-			});
-		};
-
-		// Create a clone of the table to avoid modifying the original DOM
-		const tableClone = table.cloneNode(true) as HTMLTableElement;
-		cleanElement(tableClone);
-
-		return tableClone.outerHTML;
-	}
-
 	turndownService.addRule('katex', {
 		filter: (node) => {
 			return node instanceof HTMLElement && 
@@ -893,6 +869,30 @@ export function createMarkdownContent(content: string, url: string) {
 			}
 		}
 	});
+
+	function cleanupTableHTML(table: HTMLTableElement): string {
+		const allowedAttributes = ['src', 'href', 'style', 'align', 'width', 'height', 'rowspan', 'colspan', 'bgcolor', 'scope', 'valign', 'headers'];
+		
+		const cleanElement = (element: Element) => {
+			Array.from(element.attributes).forEach(attr => {
+				if (!allowedAttributes.includes(attr.name)) {
+					element.removeAttribute(attr.name);
+				}
+			});
+			
+			element.childNodes.forEach(child => {
+				if (child instanceof Element) {
+					cleanElement(child);
+				}
+			});
+		};
+
+		// Create a clone of the table to avoid modifying the original DOM
+		const tableClone = table.cloneNode(true) as HTMLTableElement;
+		cleanElement(tableClone);
+
+		return tableClone.outerHTML;
+	}
 
 	try {
 		let markdown = turndownService.turndown(processedContent);
