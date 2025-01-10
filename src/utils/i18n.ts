@@ -9,11 +9,12 @@ export function getAvailableLanguages(): { code: string; name: string }[] {
 	return [
 		{ code: '', name: 'systemDefault' },
 		{ code: 'ar', name: 'العربية' },
+		{ code: 'ca', name: 'Català' },
 		{ code: 'de', name: 'Deutsch' },
 		{ code: 'en', name: 'English' },
 		{ code: 'es', name: 'Español' },
 		{ code: 'fa', name: 'فارسی' },
-		{code: 'bn', name: 'বাংলা'},
+		{ code: 'bn', name: 'বাংলা'},
 		{ code: 'fr', name: 'Français' },
 		{ code: 'hi', name: 'हिन्दी' },
 		{ code: 'id', name: 'Bahasa Indonesia' },
