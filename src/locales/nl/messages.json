@@ -481,6 +481,9 @@
 	"orPasteBelow": {
 		"message": "Of plak inhoud hieronder"
 	},
+	"overwriteNote": {
+		"message": "Overschrijf notitie"
+	},
 	"pageCannotBeClipped": {
 		"message": "Deze pagina kan niet worden geknipt."
 	},

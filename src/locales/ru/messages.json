@@ -481,6 +481,9 @@
 	"orPasteBelow": {
 		"message": "Или вставьте содержимое ниже"
 	},
+	"overwriteNote": {
+		"message": "Перезаписать заметку"
+	},
 	"pageCannotBeClipped": {
 		"message": "Эту страницу нельзя сохранить."
 	},

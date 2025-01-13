@@ -481,6 +481,9 @@
 	"orPasteBelow": {
 		"message": "یا محتوا را در زیر بچسبانید"
 	},
+	"overwriteNote": {
+		"message": "یادداشت را بازنویسی کن"
+	},
 	"pageCannotBeClipped": {
 		"message": "این صفحه را نمی توان کلیپ داد."
 	},

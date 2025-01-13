@@ -481,6 +481,9 @@
 	"orPasteBelow": {
 		"message": "O pegue el contenido a continuación"
 	},
+	"overwriteNote": {
+		"message": "Sobrescribir nota"
+	},
 	"pageCannotBeClipped": {
 		"message": "Esta página no se puede guardar."
 	},

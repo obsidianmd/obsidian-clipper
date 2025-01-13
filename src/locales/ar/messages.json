@@ -481,6 +481,9 @@
 	"orPasteBelow": {
 		"message": "أو الصق المحتوى أدناه"
 	},
+	"overwriteNote": {
+		"message": "استبدال الملاحظة"
+	},
 	"pageCannotBeClipped": {
 		"message": "لا يمكن قص هذه الصفحة."
 	},

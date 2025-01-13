@@ -481,6 +481,9 @@
 	"orPasteBelow": {
 		"message": "Veya aşağıya yapıştırın"
 	},
+	"overwriteNote": {
+		"message": "Notu üzerine yaz"
+	},
 	"pageCannotBeClipped": {
 		"message": "Bu sayfa kırpılamaz."
 	},

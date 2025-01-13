@@ -481,6 +481,9 @@
 	"orPasteBelow": {
 		"message": "Oder füge den Inhalt unten ein"
 	},
+	"overwriteNote": {
+		"message": "Notiz überschreiben"
+	},
 	"pageCannotBeClipped": {
 		"message": "Diese Seite kann nicht ausgeschnitten werden."
 	},

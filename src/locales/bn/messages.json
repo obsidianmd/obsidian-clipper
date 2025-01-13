@@ -481,6 +481,9 @@
 	"orPasteBelow": {
 		"message": "অথবা নিচে কনটেন্ট পেস্ট করুন"
 	},
+	"overwriteNote": {
+		"message": "নোট পুনর্লিখন করুন"
+	},
 	"pageCannotBeClipped": {
 		"message": "এই পেজ ক্লিপ করা যাবে না।"
 	},

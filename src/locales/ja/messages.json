@@ -481,6 +481,9 @@
 	"orPasteBelow": {
 		"message": "または以下に内容を貼り付けてください"
 	},
+	"overwriteNote": {
+		"message": "ノートを上書きする"
+	},
 	"pageCannotBeClipped": {
 		"message": "このページはクリップできません。"
 	},

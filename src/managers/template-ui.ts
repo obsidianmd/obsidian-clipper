@@ -258,8 +258,9 @@ function updateBehaviorFields(): void {
 	if (behaviorSelect) {
 		const selectedBehavior = behaviorSelect.value;
 		const isDailyNote = selectedBehavior === 'append-daily' || selectedBehavior === 'prepend-daily';
+		const needsWarning = selectedBehavior !== 'create' && selectedBehavior !== 'overwrite';
 
-		if (selectedBehavior !== 'create') {
+		if (needsWarning) {
 			if (behaviorWarningContainer) behaviorWarningContainer.style.display = 'flex';
 		} else {
 			if (behaviorWarningContainer) behaviorWarningContainer.style.display = 'none';
@@ -273,6 +274,7 @@ function updateBehaviorFields(): void {
 			switch (selectedBehavior) {
 				case 'append-specific':
 				case 'prepend-specific':
+				case 'overwrite':
 					noteNameFormat.placeholder = getMessage('specificNoteName');
 					break;
 				case 'append-daily':

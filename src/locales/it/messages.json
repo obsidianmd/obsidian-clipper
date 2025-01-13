@@ -481,6 +481,9 @@
 	"orPasteBelow": {
 		"message": "O incolla il contenuto qui sotto"
 	},
+	"overwriteNote": {
+		"message": "Sovrascrivi nota"
+	},
 	"pageCannotBeClipped": {
 		"message": "Questa pagina non può essere ritagliata."
 	},

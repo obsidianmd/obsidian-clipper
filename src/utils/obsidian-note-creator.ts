@@ -91,6 +91,8 @@ export async function saveToObsidian(
 		obsidianUrl += '&append=true';
 	} else if (behavior.startsWith('prepend')) {
 		obsidianUrl += '&prepend=true';
+	} else if (behavior === 'overwrite') {
+		obsidianUrl += '&overwrite=true';
 	}
 
 	const vaultParam = vault ? `&vault=${encodeURIComponent(vault)}` : '';

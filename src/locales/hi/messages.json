@@ -481,6 +481,9 @@
 	"orPasteBelow": {
 		"message": "Ya niche paste karein"
 	},
+	"overwriteNote": {
+		"message": "नोट को अधिलेखित करें"
+	},
 	"pageCannotBeClipped": {
 		"message": "Is page ko clip nahi kiya ja sakta."
 	},

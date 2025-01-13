@@ -481,6 +481,9 @@
 	"orPasteBelow": {
 		"message": "Atau tempel konten di bawah ini"
 	},
+	"overwriteNote": {
+		"message": "Timpa catatan"
+	},
 	"pageCannotBeClipped": {
 		"message": "Laman ini tidak dapat diklip."
 	},

@@ -481,6 +481,9 @@
 	"orPasteBelow": {
 		"message": "或在下方貼上內容"
 	},
+	"overwriteNote": {
+		"message": "覆寫筆記"
+	},
 	"pageCannotBeClipped": {
 		"message": "此頁面無法擷取。"
 	},

@@ -481,6 +481,9 @@
 	"orPasteBelow": {
 		"message": "Możesz też wkleić treść poniżej"
 	},
+	"overwriteNote": {
+		"message": "Nadpisz notatkę"
+	},
 	"pageCannotBeClipped": {
 		"message": "Tej strony nie można przechwycić."
 	},

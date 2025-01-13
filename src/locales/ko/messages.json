@@ -481,6 +481,9 @@
 	"orPasteBelow": {
 		"message": "아래에 내용을 붙여넣으세요."
 	},
+	"overwriteNote": {
+		"message": "노트 덮어쓰기"
+	},
 	"pageCannotBeClipped": {
 		"message": "이 페이지는 클립할 수 없습니다."
 	},

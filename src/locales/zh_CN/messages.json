@@ -481,6 +481,9 @@
 	"orPasteBelow": {
 		"message": "或在下面粘贴内容"
 	},
+	"overwriteNote": {
+		"message": "覆盖笔记"
+	},
 	"pageCannotBeClipped": {
 		"message": "无法剪藏此页面。"
 	},

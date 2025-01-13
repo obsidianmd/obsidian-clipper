@@ -481,6 +481,9 @@
 	"orPasteBelow": {
 		"message": "Ou collez le contenu ci-dessous"
 	},
+	"overwriteNote": {
+		"message": "Écraser la note"
+	},
 	"pageCannotBeClipped": {
 		"message": "Cette page ne peut pas être enregistrée."
 	},

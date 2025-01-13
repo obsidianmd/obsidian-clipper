@@ -481,6 +481,9 @@
 	"orPasteBelow": {
 		"message": "Or paste content below"
 	},
+	"overwriteNote": {
+		"message": "Overwrite note"
+	},
 	"pageCannotBeClipped": {
 		"message": "This page cannot be clipped."
 	},
