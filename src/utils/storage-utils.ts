@@ -13,27 +13,9 @@ export let generalSettings: Settings = {
 	alwaysShowHighlights: false,
 	highlightBehavior: 'highlight-inline',
 	showMoreActionsButton: false,
-	interpreterModel: 'gpt-4o-mini',
-	models: [
-		{ id: 'gpt-4o-mini', providerId: 'openai', providerModelId: 'gpt-4o-mini', name: 'GPT-4o Mini', enabled: true },
-		{ id: 'gpt-4o', providerId: 'openai', providerModelId: 'gpt-4o', name: 'GPT-4o', enabled: true },
-		{ id: 'claude-3-5-sonnet-latest', providerId: 'anthropic', providerModelId: 'claude-3-5-sonnet-latest', name: 'Claude 3.5 Sonnet', enabled: true },
-		{ id: 'claude-3-5-haiku-latest', providerId: 'anthropic', providerModelId: 'claude-3-5-haiku-latest', name: 'Claude 3.5 Haiku', enabled: true },
-	],
-	providers: [
-		{
-			id: 'openai',
-			name: 'OpenAI',
-			baseUrl: 'https://api.openai.com/v1/chat/completions',
-			apiKey: ''
-		},
-		{
-			id: 'anthropic',
-			name: 'Anthropic',
-			baseUrl: 'https://api.anthropic.com/v1/messages',
-			apiKey: ''
-		}
-	],
+	interpreterModel: '',
+	models: [],
+	providers: [],
 	interpreterEnabled: false,
 	interpreterAutoRun: false,
 	defaultPromptContext: '',
@@ -156,17 +138,6 @@ async function migrateModelsAndProviders(data: LegacyStorageData): Promise<{ mod
 	debugLog('Migration', 'Starting models and providers migration');
 	
 	try {
-		// Start with default providers from generalSettings
-		const defaultProviders = generalSettings.providers.map(provider => ({
-			...provider,
-			// Migrate API keys if they exist
-			apiKey: provider.id === 'openai' 
-				? (data.openaiApiKey || data.interpreter_settings?.openaiApiKey || provider.apiKey)
-				: provider.id === 'anthropic'
-					? (data.anthropicApiKey || data.interpreter_settings?.anthropicApiKey || provider.apiKey)
-					: provider.apiKey
-		}));
-
 		// Create a map to track custom providers
 		const customProviders = new Map<string, Provider>();
 
@@ -176,10 +147,7 @@ async function migrateModelsAndProviders(data: LegacyStorageData): Promise<{ mod
 		// First pass: collect all unique custom providers
 		legacyModels.forEach((model) => {
 			if (model.provider && 
-				!customProviders.has(model.provider) && 
-				!defaultProviders.some(p => p.name === model.provider) &&
-				model.provider !== 'OpenAI' && 
-				model.provider !== 'Anthropic') {
+				!customProviders.has(model.provider)) {
 				
 				const providerId = model.provider.toLowerCase().replace(/\s+/g, '-');
 				const newProvider: Provider = {
@@ -193,19 +161,14 @@ async function migrateModelsAndProviders(data: LegacyStorageData): Promise<{ mod
 			}
 		});
 
-		// Combine default and custom providers
-		const allProviders = [...defaultProviders, ...Array.from(customProviders.values())];
+		// Use custom providers
+		const allProviders = Array.from(customProviders.values());
 		
 		// Create migrated models with correct structure
 		const models: ModelConfig[] = legacyModels.map((model): ModelConfig => {
 			let providerId = '';
 			
-			// Match provider based on name or model name
-			if (model.provider === 'OpenAI' || model.name.toLowerCase().includes('gpt')) {
-				providerId = 'openai';
-			} else if (model.provider === 'Anthropic' || model.name.toLowerCase().includes('claude')) {
-				providerId = 'anthropic';
-			} else if (model.provider) {
+			if (model.provider) {
 				const customProvider = customProviders.get(model.provider);
 				providerId = customProvider?.id || model.provider.toLowerCase().replace(/\s+/g, '-');
 			}
@@ -219,11 +182,6 @@ async function migrateModelsAndProviders(data: LegacyStorageData): Promise<{ mod
 				enabled: model.enabled
 			};
 		});
-
-		// If no models exist, use default models from generalSettings
-		if (models.length === 0) {
-			models.push(...generalSettings.models);
-		}
 
 		// Clean up legacy fields
 		await browser.storage.sync.remove([
@@ -261,7 +219,7 @@ export async function loadSettings(): Promise<Settings> {
 		highlighterEnabled: true,
 		alwaysShowHighlights: true,
 		highlightBehavior: 'highlight-inline',
-		interpreterModel: 'gpt-4o-mini',
+		interpreterModel: '',
 		models: [],
 		providers: [],
 		interpreterEnabled: false,
