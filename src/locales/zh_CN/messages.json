@@ -419,6 +419,9 @@
 	"models": {
 		"message": "模型"
 	},
+	"modelsListFor": {
+		"message": "$1的模型列表"
+	},
 	"more": {
 		"message": "更多"
 	},

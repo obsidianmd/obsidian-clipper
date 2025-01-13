@@ -419,6 +419,9 @@
 	"models": {
 		"message": "Model"
 	},
+	"modelsListFor": {
+		"message": "Daftar model untuk $1"
+	},
 	"more": {
 		"message": "Lainnya"
 	},

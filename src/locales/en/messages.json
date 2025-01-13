@@ -419,6 +419,9 @@
 	"models": {
 		"message": "Models"
 	},
+	"modelsListFor": {
+		"message": "Models list for $1"
+	},
 	"more": {
 		"message": "More"
 	},

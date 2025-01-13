@@ -419,6 +419,9 @@
 	"models": {
 		"message": "Modeller"
 	},
+	"modelsListFor": {
+		"message": "$1 için modeller listesi"
+	},
 	"more": {
 		"message": "Daha fazla"
 	},

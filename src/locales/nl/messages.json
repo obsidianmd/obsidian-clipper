@@ -419,6 +419,9 @@
 	"models": {
 		"message": "Modellen"
 	},
+	"modelsListFor": {
+		"message": "Modellenlijst voor $1"
+	},
 	"more": {
 		"message": "Meer"
 	},

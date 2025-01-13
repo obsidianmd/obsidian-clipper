@@ -419,6 +419,9 @@
 	"models": {
 		"message": "Modèles de langage"
 	},
+	"modelsListFor": {
+		"message": "Liste des modèles pour $1"
+	},
 	"more": {
 		"message": "Plus"
 	},

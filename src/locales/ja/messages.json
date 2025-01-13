@@ -419,6 +419,9 @@
 	"models": {
 		"message": "モデル"
 	},
+	"modelsListFor": {
+		"message": "$1のモデルリスト"
+	},
 	"more": {
 		"message": "その他"
 	},

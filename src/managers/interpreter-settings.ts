@@ -34,13 +34,14 @@ const PRESET_PROVIDERS: Record<string, PresetProvider> = {
 		name: 'DeepSeek',
 		baseUrl: 'https://api.deepseek.com/v1/chat/completions',
 		apiKeyUrl: 'https://platform.deepseek.com/api_keys',
-		modelsList: 'https://api-docs.deepseek.com/quick_start/pricing',
+		modelsList: 'https://api-docs.deepseek.com/quick_start/pricing'
 	},
 	google: {
 		id: 'google',
 		name: 'Google Gemini',
 		baseUrl: 'https://generativelanguage.googleapis.com/v1beta/chat/completions',
-		apiKeyUrl: 'https://aistudio.google.com/apikey'
+		apiKeyUrl: 'https://aistudio.google.com/apikey',
+		modelsList: 'https://ai.google.dev/gemini-api/docs/models/gemini'
 	},
 	huggingface: {
 		id: 'huggingface',
@@ -526,108 +527,135 @@ function editModel(index: number) {
 	showModelModal(modelToEdit, index);
 }
 
-function showModelModal(model: ModelConfig, index?: number) {
+async function showModelModal(model: ModelConfig, index?: number) {
+	debugLog('Providers', 'Showing model modal:', { model, index });
 	const modal = document.getElementById('model-modal');
 	if (!modal) return;
+
+	await translatePage();
+	initializeIcons(modal);
 
 	const titleElement = modal.querySelector('.modal-title');
 	if (titleElement) {
 		titleElement.setAttribute('data-i18n', index !== undefined ? 'editModel' : 'addModelTitle');
-		translatePage().then(() => {
-			initializeIcons(modal);
-		});
 	}
 
 	const form = modal.querySelector('#model-form') as HTMLFormElement;
-	if (!form) {
-		console.error('Model form not found');
-		return;
-	}
+	if (form) {
+		const providerSelect = form.querySelector('[name="providerId"]') as HTMLSelectElement;
+		const modelIdContainer = form.querySelector('.setting-item:has([name="providerModelId"]) .setting-item-description') as HTMLElement;
 
-	// Get all form elements
-	const nameInput = form.querySelector('[name="name"]') as HTMLInputElement;
-	const providerModelIdInput = form.querySelector('[name="providerModelId"]') as HTMLInputElement;
-	const providerSelect = form.querySelector('#model-provider') as HTMLSelectElement;
-
-	// Check if all required elements exist
-	if (!nameInput || !providerModelIdInput || !providerSelect) {
-		console.error('Required form elements not found:', {
-			nameInput: !!nameInput,
-			providerModelIdInput: !!providerModelIdInput,
-			providerSelect: !!providerSelect
-		});
-		return;
-	}
-
-	// Set form values
-	nameInput.value = model.name;
-	providerModelIdInput.value = model.providerModelId || '';
-
-	// Populate provider select with alphabetically sorted providers
-	providerSelect.innerHTML = '<option value="" data-i18n="selectProvider">Select a provider</option>';
-	const sortedProviders = [...generalSettings.providers].sort((a, b) => 
-		a.name.toLowerCase().localeCompare(b.name.toLowerCase())
-	);
-	sortedProviders.forEach(provider => {
-		const option = document.createElement('option');
-		option.value = provider.id;
-		
-		option.textContent = provider.name;
-		providerSelect.appendChild(option);
-	});
-	providerSelect.value = model.providerId;
-
-	// Handle buttons
-	const confirmBtn = modal.querySelector('.model-confirm-btn');
-	const cancelBtn = modal.querySelector('.model-cancel-btn');
-
-	if (!confirmBtn || !cancelBtn) {
-		console.error('Modal buttons not found');
-		return;
-	}
-
-	// Remove existing event listeners
-	const newConfirmBtn = confirmBtn.cloneNode(true);
-	const newCancelBtn = cancelBtn.cloneNode(true);
-	confirmBtn.parentNode?.replaceChild(newConfirmBtn, confirmBtn);
-	cancelBtn.parentNode?.replaceChild(newCancelBtn, cancelBtn);
-
-	// Add new event listeners
-	newConfirmBtn.addEventListener('click', () => {
-		const formData = new FormData(form);
-		const updatedModel: ModelConfig = {
-			id: model.id,
-			providerId: formData.get('providerId') as string,
-			providerModelId: formData.get('providerModelId') as string,
-			name: formData.get('name') as string,
-			enabled: model.enabled
-		};
-
-		if (!updatedModel.name || !updatedModel.providerId || !updatedModel.providerModelId) {
-			alert(getMessage('modelRequiredFields'));
+		if (!modelIdContainer) {
+			console.error('Model ID description container not found');
 			return;
 		}
 
-		if (index !== undefined) {
-			generalSettings.models[index] = updatedModel;
-		} else {
-			generalSettings.models.push(updatedModel);
+		// Add change handler for provider select
+		providerSelect.addEventListener('change', () => {
+			const selectedProviderId = providerSelect.value;
+			const provider = generalSettings.providers.find(p => p.id === selectedProviderId);
+			
+			if (provider) {
+				// Find matching preset provider to get modelsList URL
+				const presetProvider = Object.values(PRESET_PROVIDERS).find(
+					preset => preset.name === provider.name
+				);
+
+				if (presetProvider?.modelsList) {
+					modelIdContainer.innerHTML = `${getMessage('providerModelIdDescription')} <a href="${presetProvider.modelsList}" target="_blank">${getMessage('modelsListFor', provider.name)}</a>.`;
+				} else {
+					modelIdContainer.textContent = getMessage('providerModelIdDescription');
+				}
+			} else {
+				modelIdContainer.textContent = getMessage('providerModelIdDescription');
+			}
+		});
+
+		// If editing, trigger change event to update description
+		if (index !== undefined && model.providerId) {
+			providerSelect.value = model.providerId;
+			providerSelect.dispatchEvent(new Event('change'));
 		}
 
-		saveSettings();
-		initializeModelList();
-		hideModal(modal);
-	});
+		// Get all form elements
+		const nameInput = form.querySelector('[name="name"]') as HTMLInputElement;
+		const providerModelIdInput = form.querySelector('[name="providerModelId"]') as HTMLInputElement;
 
-	newCancelBtn.addEventListener('click', () => {
-		hideModal(modal);
-	});
+		// Check if all required elements exist
+		if (!nameInput || !providerModelIdInput) {
+			console.error('Required form elements not found:', {
+				nameInput: !!nameInput,
+				providerModelIdInput: !!providerModelIdInput
+			});
+			return;
+		}
 
-	showModal(modal);
-	
-	translatePage().then(() => {
-		initializeIcons(modal);
-	});
+		// Set form values
+		nameInput.value = model.name;
+		providerModelIdInput.value = model.providerModelId || '';
+
+		// Populate provider select with alphabetically sorted providers
+		providerSelect.innerHTML = '<option value="" data-i18n="selectProvider">Select a provider</option>';
+		const sortedProviders = [...generalSettings.providers].sort((a, b) => 
+			a.name.toLowerCase().localeCompare(b.name.toLowerCase())
+		);
+		sortedProviders.forEach(provider => {
+			const option = document.createElement('option');
+			option.value = provider.id;
+			
+			option.textContent = provider.name;
+			providerSelect.appendChild(option);
+		});
+		providerSelect.value = model.providerId;
+
+		// Handle buttons
+		const confirmBtn = modal.querySelector('.model-confirm-btn');
+		const cancelBtn = modal.querySelector('.model-cancel-btn');
+
+		if (!confirmBtn || !cancelBtn) {
+			console.error('Modal buttons not found');
+			return;
+		}
+
+		// Remove existing event listeners
+		const newConfirmBtn = confirmBtn.cloneNode(true);
+		const newCancelBtn = cancelBtn.cloneNode(true);
+		confirmBtn.parentNode?.replaceChild(newConfirmBtn, confirmBtn);
+		cancelBtn.parentNode?.replaceChild(newCancelBtn, cancelBtn);
+
+		// Add new event listeners
+		newConfirmBtn.addEventListener('click', () => {
+			const formData = new FormData(form);
+			const updatedModel: ModelConfig = {
+				id: model.id,
+				providerId: formData.get('providerId') as string,
+				providerModelId: formData.get('providerModelId') as string,
+				name: formData.get('name') as string,
+				enabled: model.enabled
+			};
+
+			if (!updatedModel.name || !updatedModel.providerId || !updatedModel.providerModelId) {
+				alert(getMessage('modelRequiredFields'));
+				return;
+			}
+
+			if (index !== undefined) {
+				generalSettings.models[index] = updatedModel;
+			} else {
+				generalSettings.models.push(updatedModel);
+			}
+
+			saveSettings();
+			initializeModelList();
+			hideModal(modal);
+		});
+
+		newCancelBtn.addEventListener('click', () => {
+			hideModal(modal);
+		});
+
+		showModal(modal);
+	}
 }
 
 function deleteModel(index: number) {

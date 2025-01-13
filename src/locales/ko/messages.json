@@ -419,6 +419,9 @@
 	"models": {
 		"message": "모델"
 	},
+	"modelsListFor": {
+		"message": "$1에 대한 모델 목록"
+	},
 	"more": {
 		"message": "더 보기"
 	},

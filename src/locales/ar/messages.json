@@ -419,6 +419,9 @@
 	"models": {
 		"message": "النماذج"
 	},
+	"modelsListFor": {
+		"message": "قائمة النماذج لـ $1"
+	},
 	"more": {
 		"message": "المزيد"
 	},

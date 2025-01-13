@@ -419,6 +419,9 @@
 	"models": {
 		"message": "مدل‌ها"
 	},
+	"modelsListFor": {
+		"message": "لیست مدل ها برای $1"
+	},
 	"more": {
 		"message": "بیشتر"
 	},

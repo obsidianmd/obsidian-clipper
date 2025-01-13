@@ -419,6 +419,9 @@
 	"models": {
 		"message": "মডেলসমূহ"
 	},
+	"modelsListFor": {
+		"message": "$1 এর জন্য মডেল তালিকা"
+	},
 	"more": {
 		"message": "আরও"
 	},
