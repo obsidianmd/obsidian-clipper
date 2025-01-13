@@ -89,7 +89,7 @@ const BASIC_SELECTORS = [
 	'[role="navigation"]'
 ];
 
-// Patterns for matching against class, id, and data-testid
+// Patterns for matching against class, id, data-testid, and data-qa
 const CLUTTER_PATTERNS = [
 	'avatar',
 	'-ad-',
@@ -98,6 +98,7 @@ const CLUTTER_PATTERNS = [
 	'article-title',
 	'author',
 	'banner',
+	'bottom-of-article',
 	'breadcrumb',
 	'button',
 	'btn-',
@@ -112,10 +113,12 @@ const CLUTTER_PATTERNS = [
 	'cta-',	
 	'discussion',
 	'eyebrow',
+	'expand-reduce',
 	'facebook',
 	'feedback',
 	'fixed',
 	'footer',
+	'for-you',
 	'global',
 	'google',
 	'goog-',
@@ -134,6 +137,7 @@ const CLUTTER_PATTERNS = [
 	'navbar',
 	'next-',
 //	'newsletter', used on Substack
+	'newsletter-signup',
 	'overlay',
 	'popular',
 	'popup',
@@ -150,6 +154,7 @@ const CLUTTER_PATTERNS = [
 	'read-next',
 	'reading-list',
 	'recommend',
+	'recirc',
 	'register',
 	'related',
 	'screen-reader-text',
@@ -389,7 +394,7 @@ export class Tidy {
 		const elementsToRemove = new Set<Element>();
 		
 		// Get all elements with class, id, or data-testid attributes for more targeted iteration
-		const elements = doc.querySelectorAll('[class], [id], [data-testid]');
+		const elements = doc.querySelectorAll('[class], [id], [data-testid], [data-qa]');
 		
 		elements.forEach(el => {
 			if (!el || !el.parentNode) return;
@@ -398,9 +403,10 @@ export class Tidy {
 				el.className.toLowerCase() : '';
 			const id = el.id ? el.id.toLowerCase() : '';
 			const testId = el.getAttribute('data-testid')?.toLowerCase() || '';
+			const testQa = el.getAttribute('data-qa')?.toLowerCase() || '';
 			
 			// Combine all attributes into one string for single pass checking
-			const attributeText = `${className} ${id} ${testId}`;
+			const attributeText = `${className} ${id} ${testId} ${testQa}`;
 			
 			// Check if any pattern matches
 			const shouldRemove = patternRegexes.some(regex => regex.test(attributeText));
@@ -544,7 +550,7 @@ export class Tidy {
 
 	private static findSmallImages(doc: Document): Set<string> {
 		let removedCount = 0;
-		const MIN_DIMENSION = 42;
+		const MIN_DIMENSION = 24;
 		const smallImages = new Set<string>();
 
 		const images = doc.getElementsByTagName('img');
