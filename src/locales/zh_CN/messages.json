@@ -493,6 +493,12 @@
 	"pleaseReload": {
 		"message": "请尝试重新加载页面。"
 	},
+	"popularModels": {
+		"message": "热门模型"
+	},
+	"popularModelsDescription": {
+		"message": "从常用模型中选择，或输入自定义模型详细信息。"
+	},
 	"prependToDaily": {
 		"message": "添加到日记开头"
 	},
@@ -555,6 +561,9 @@
 	},
 	"providers": {
 		"message": "提供商"
+	},
+	"recommended": {
+		"message": "推荐"
 	},
 	"refresh": {
 		"message": "刷新"

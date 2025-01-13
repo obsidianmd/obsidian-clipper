@@ -493,6 +493,12 @@
 	"pleaseReload": {
 		"message": "Spróbuj odświeżyć stronę."
 	},
+	"popularModels": {
+		"message": "Popularne modele"
+	},
+	"popularModelsDescription": {
+		"message": "Wybierz spośród często używanych modeli lub wprowadź szczegóły niestandardowego modelu."
+	},
 	"prependToDaily": {
 		"message": "Zapisz na górze codziennej notatki"
 	},
@@ -555,6 +561,9 @@
 	},
 	"providers": {
 		"message": "Operatorzy"
+	},
+	"recommended": {
+		"message": "rekomendowane"
 	},
 	"refresh": {
 		"message": "Odśwież"

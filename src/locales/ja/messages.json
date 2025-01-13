@@ -493,6 +493,12 @@
 	"pleaseReload": {
 		"message": "ページの再読み込みをお試しください。"
 	},
+	"popularModels": {
+		"message": "人気のモデル"
+	},
+	"popularModelsDescription": {
+		"message": "よく使用されるモデルから選択するか、カスタムモデルの詳細を入力してください。"
+	},
 	"prependToDaily": {
 		"message": "デイリーノートの先頭に追加"
 	},
@@ -555,6 +561,9 @@
 	},
 	"providers": {
 		"message": "プロバイダー"
+	},
+	"recommended": {
+		"message": "推奨"
 	},
 	"refresh": {
 		"message": "更新"

@@ -493,6 +493,12 @@
 	"pleaseReload": {
 		"message": "অনুগ্রহ করে পেজ রিলোড করার চেষ্টা করুন।"
 	},
+	"popularModels": {
+		"message": "জনপ্রিয় মডেলগুলি"
+	},
+	"popularModelsDescription": {
+		"message": "সাধারণত ব্যবহৃত মডেলগুলি থেকে চয়ন করুন বা কাস্টম মডেলের বিশদ লিখুন।"
+	},
 	"prependToDaily": {
 		"message": "ডেইলি নোটে উপরের দিকে যোগ করুন"
 	},
@@ -555,6 +561,9 @@
 	},
 	"providers": {
 		"message": "প্রোভাইডারস"
+	},
+	"recommended": {
+		"message": "প্রস্তাবিত"
 	},
 	"refresh": {
 		"message": "রিফ্রেশ"

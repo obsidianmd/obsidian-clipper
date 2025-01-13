@@ -493,6 +493,12 @@
 	"pleaseReload": {
 		"message": "請嘗試重新載入頁面。"
 	},
+	"popularModels": {
+		"message": "熱門模型"
+	},
+	"popularModelsDescription": {
+		"message": "選擇常用模型或輸入自定義模型詳情。"
+	},
 	"prependToDaily": {
 		"message": "新增到每日筆記頂部"
 	},
@@ -555,6 +561,9 @@
 	},
 	"providers": {
 		"message": "提供者"
+	},
+	"recommended": {
+		"message": "推薦"
 	},
 	"refresh": {
 		"message": "重新整理"

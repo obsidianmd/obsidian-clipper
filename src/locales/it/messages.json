@@ -493,6 +493,12 @@
 	"pleaseReload": {
 		"message": "Prova a ricaricare la pagina."
 	},
+	"popularModels": {
+		"message": "Modelli popolari"
+	},
+	"popularModelsDescription": {
+		"message": "Scegli tra i modelli comunemente utilizzati o inserisci i dettagli del modello personalizzato."
+	},
 	"prependToDaily": {
 		"message": "Aggiungi alla nota giornaliera, in cima"
 	},
@@ -555,6 +561,9 @@
 	},
 	"providers": {
 		"message": "Fornitori"
+	},
+	"recommended": {
+		"message": "raccomandato"
 	},
 	"refresh": {
 		"message": "Aggiorna"

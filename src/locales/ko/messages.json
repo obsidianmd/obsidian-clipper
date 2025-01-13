@@ -493,6 +493,12 @@
 	"pleaseReload": {
 		"message": "페이지를 다시 로드해 주세요."
 	},
+	"popularModels": {
+		"message": "인기 모델"
+	},
+	"popularModelsDescription": {
+		"message": "일반적으로 사용되는 모델 중에서 선택하거나 사용자 정의 모델 세부 정보를 입력하세요."
+	},
 	"prependToDaily": {
 		"message": "데일리 노트 맨 위에 추가"
 	},
@@ -555,6 +561,9 @@
 	},
 	"providers": {
 		"message": "제공자"
+	},
+	"recommended": {
+		"message": "추천"
 	},
 	"refresh": {
 		"message": "새로 고침"

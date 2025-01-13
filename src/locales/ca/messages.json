@@ -493,6 +493,12 @@
 	"pleaseReload": {
 		"message": "Si us plau, intenti recarregar la pàgina."
 	},
+	"popularModels": {
+		"message": "Models populars"
+	},
+	"popularModelsDescription": {
+		"message": "Trieu entre els models més utilitzats o introduïu els detalls del model personalitzat."
+	},
 	"prependToDaily": {
 		"message": "Agregar a la nota diària, al principi"
 	},
@@ -555,6 +561,9 @@
 	},
 	"providers": {
 		"message": "Proveïdors"
+	},
+	"recommended": {
+		"message": "recomanat"
 	},
 	"refresh": {
 		"message": "Actualitzar"

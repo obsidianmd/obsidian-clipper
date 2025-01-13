@@ -493,6 +493,12 @@
 	"pleaseReload": {
 		"message": "Lütfen sayfayı yeniden yüklemeyi deneyin."
 	},
+	"popularModels": {
+		"message": "Popüler modeller"
+	},
+	"popularModelsDescription": {
+		"message": "Sık kullanılan modellerden seçin veya özel model detaylarını girin."
+	},
 	"prependToDaily": {
 		"message": "Günlük nota, başa ekle"
 	},
@@ -555,6 +561,9 @@
 	},
 	"providers": {
 		"message": "Sağlayıcılar"
+	},
+	"recommended": {
+		"message": "önerilen"
 	},
 	"refresh": {
 		"message": "Yenile"

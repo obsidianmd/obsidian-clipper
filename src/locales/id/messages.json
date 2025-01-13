@@ -493,6 +493,12 @@
 	"pleaseReload": {
 		"message": "Silakan coba muat ulang laman web."
 	},
+	"popularModels": {
+		"message": "Model populer"
+	},
+	"popularModelsDescription": {
+		"message": "Pilih dari model yang sering digunakan atau masukkan detail model kustom."
+	},
 	"prependToDaily": {
 		"message": "Tambah ke catatan harian, di bagian awal"
 	},
@@ -555,6 +561,9 @@
 	},
 	"providers": {
 		"message": "Penyedia"
+	},
+	"recommended": {
+		"message": "direkomendasikan"
 	},
 	"refresh": {
 		"message": "Muat ulang"

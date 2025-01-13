@@ -493,6 +493,12 @@
 	"pleaseReload": {
 		"message": "Probeer de pagina opnieuw te laden."
 	},
+	"popularModels": {
+		"message": "Populaire modellen"
+	},
+	"popularModelsDescription": {
+		"message": "Kies uit veelgebruikte modellen of voer aangepaste modeldetails in."
+	},
 	"prependToDaily": {
 		"message": "Toevoegen aan dagelijkse notitie, bovenaan"
 	},
@@ -555,6 +561,9 @@
 	},
 	"providers": {
 		"message": "Providers"
+	},
+	"recommended": {
+		"message": "aanbevolen"
 	},
 	"refresh": {
 		"message": "Vernieuwen"

@@ -493,6 +493,12 @@
 	"pleaseReload": {
 		"message": "يرجى محاولة إعادة تحميل الصفحة."
 	},
+	"popularModels": {
+		"message": "النماذج الشائعة"
+	},
+	"popularModelsDescription": {
+		"message": "اختر من النماذج المستخدمة بشكل شائع أو أدخل تفاصيل النموذج المخصص."
+	},
 	"prependToDaily": {
 		"message": "إضافة إلى الملاحظة اليومية، في البداية"
 	},
@@ -555,6 +561,9 @@
 	},
 	"providers": {
 		"message": "المزودون"
+	},
+	"recommended": {
+		"message": "موصى به"
 	},
 	"refresh": {
 		"message": "تحديث"

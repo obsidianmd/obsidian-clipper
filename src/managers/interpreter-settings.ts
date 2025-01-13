@@ -12,6 +12,11 @@ interface PresetProvider {
 	baseUrl: string;
 	apiKeyUrl?: string;
 	modelsList?: string;
+	popularModels?: Array<{
+		id: string;
+		name: string;
+		recommended?: boolean;
+	}>;
 }
 
 const PRESET_PROVIDERS: Record<string, PresetProvider> = {
@@ -20,28 +25,42 @@ const PRESET_PROVIDERS: Record<string, PresetProvider> = {
 		name: 'Anthropic',
 		baseUrl: 'https://api.anthropic.com/v1/messages',
 		apiKeyUrl: 'https://console.anthropic.com/settings/keys',
-		modelsList: 'https://docs.anthropic.com/en/docs/about-claude/models'
+		modelsList: 'https://docs.anthropic.com/en/docs/about-claude/models',
+		popularModels: [
+			{ id: 'claude-3-5-haiku-latest', name: 'Claude 3.5 Haiku', recommended: true },
+			{ id: 'claude-3-5-sonnet-latest', name: 'Claude 3.5 Sonnet' }
+		]
 	},
 	azure: {
 		id: 'azure-openai',
 		name: 'Azure OpenAI',
 		baseUrl: 'https://{resource-name}.openai.azure.com/openai/deployments/{deployment-id}/chat/completions?api-version=2024-10-21',
 		apiKeyUrl: 'https://oai.azure.com/portal/',
-		modelsList: 'https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models'
+		modelsList: 'https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models',
+		popularModels: [
+			{ id: 'gpt-4o-mini', name: 'GPT-4o Mini', recommended: true },
+			{ id: 'gpt-4o', name: 'GPT-4o' },
+		]
 	},
 	deepseek: {
 		id: 'deepseek',
 		name: 'DeepSeek',
 		baseUrl: 'https://api.deepseek.com/v1/chat/completions',
 		apiKeyUrl: 'https://platform.deepseek.com/api_keys',
-		modelsList: 'https://api-docs.deepseek.com/quick_start/pricing'
+		modelsList: 'https://api-docs.deepseek.com/quick_start/pricing',
+		popularModels: [
+			{ id: 'deepseek-chat', name: 'DeepSeek Chat' }
+		]
 	},
 	google: {
 		id: 'google',
 		name: 'Google Gemini',
 		baseUrl: 'https://generativelanguage.googleapis.com/v1beta/chat/completions',
 		apiKeyUrl: 'https://aistudio.google.com/apikey',
-		modelsList: 'https://ai.google.dev/gemini-api/docs/models/gemini'
+		modelsList: 'https://ai.google.dev/gemini-api/docs/models/gemini',
+		popularModels: [
+			{ id: 'gemini-2.0-flash-exp', name: 'Gemini 2.0 Flash', recommended: true },
+		]
 	},
 	huggingface: {
 		id: 'huggingface',
@@ -54,21 +73,34 @@ const PRESET_PROVIDERS: Record<string, PresetProvider> = {
 		id: 'ollama',
 		name: 'Ollama',
 		baseUrl: 'http://127.0.0.1:11434/api/chat',
-		modelsList: 'https://ollama.com/search'
+		modelsList: 'https://ollama.com/search',
+		popularModels: [
+			{ id: 'llama3.2:1b', name: 'Llama 3.2 1B' },
+			{ id: 'llama3.2', name: 'Llama 3.2 3B' },
+			{ id: 'llama3.3', name: 'Llama 3.3 70B' }
+		]
 	},
 	openai: {
 		id: 'openai',
 		name: 'OpenAI',
 		baseUrl: 'https://api.openai.com/v1/chat/completions',
 		apiKeyUrl: 'https://platform.openai.com/api-keys',
-		modelsList: 'https://platform.openai.com/docs/models'
+		modelsList: 'https://platform.openai.com/docs/models',
+		popularModels: [
+			{ id: 'gpt-4o-mini', name: 'GPT-4o Mini', recommended: true },
+			{ id: 'gpt-4o', name: 'GPT-4o' },
+		]
 	},
 	openrouter: {
 		id: 'openrouter',
 		name: 'OpenRouter',
 		baseUrl: 'https://openrouter.ai/api/v1/chat/completions',
 		apiKeyUrl: 'https://openrouter.ai/settings/keys',
-		modelsList: 'https://openrouter.ai/models'
+		modelsList: 'https://openrouter.ai/models',
+		popularModels: [
+			{ id: 'meta-llama/llama-3.2-1b-instruct', name: 'Llama 3.2 1B Instruct' },
+			{ id: 'meta-llama/llama-3.2-3b-instruct', name: 'Llama 3.2 3B Instruct' }
+		]
 	}
 };
 
@@ -542,9 +574,13 @@ async function showModelModal(model: ModelConfig, index?: number) {
 	if (form) {
 		const providerSelect = form.querySelector('[name="providerId"]') as HTMLSelectElement;
 		const modelIdContainer = form.querySelector('.setting-item:has([name="providerModelId"]) .setting-item-description') as HTMLElement;
+		const modelSelectionContainer = form.querySelector('.model-selection-container') as HTMLElement;
+		const modelSelectionRadios = form.querySelector('#model-selection-radios') as HTMLElement;
+		const nameInput = form.querySelector('[name="name"]') as HTMLInputElement;
+		const providerModelIdInput = form.querySelector('[name="providerModelId"]') as HTMLInputElement;
 
-		if (!modelIdContainer) {
-			console.error('Model ID description container not found');
+		if (!modelIdContainer || !modelSelectionContainer || !modelSelectionRadios || !nameInput || !providerModelIdInput) {
+			console.error('Required form elements not found');
 			return;
 		}
 
@@ -554,7 +590,7 @@ async function showModelModal(model: ModelConfig, index?: number) {
 			const provider = generalSettings.providers.find(p => p.id === selectedProviderId);
 			
 			if (provider) {
-				// Find matching preset provider to get modelsList URL
+				// Find matching preset provider to get modelsList URL and popular models
 				const presetProvider = Object.values(PRESET_PROVIDERS).find(
 					preset => preset.name === provider.name
 				);
@@ -564,7 +600,57 @@ async function showModelModal(model: ModelConfig, index?: number) {
 				} else {
 					modelIdContainer.textContent = getMessage('providerModelIdDescription');
 				}
+
+				// Update popular models radio buttons
+				modelSelectionRadios.innerHTML = '';
+				if (presetProvider?.popularModels?.length) {
+					modelSelectionContainer.style.display = 'block';
+					
+					// Add popular models
+					presetProvider.popularModels.forEach((model, idx) => {
+						const radio = document.createElement('div');
+						radio.className = 'radio-option';
+						radio.innerHTML = `
+							<input type="radio" name="model-selection" id="pop-model-${idx}" value="${model.id}">
+							<label for="pop-model-${idx}">
+								${model.name}${model.recommended ? ` <span class="tag">${getMessage('recommended')}</span>` : ''}
+							</label>
+						`;
+						modelSelectionRadios.appendChild(radio);
+					});
+
+					// Add "Other" option
+					const otherRadio = document.createElement('div');
+					otherRadio.className = 'radio-option';
+					otherRadio.innerHTML = `
+						<input type="radio" name="model-selection" id="model-other" value="other">
+						<label for="model-other">${getMessage('custom')}</label>
+					`;
+					modelSelectionRadios.appendChild(otherRadio);
+
+					// Add change handler for radio buttons
+					modelSelectionRadios.addEventListener('change', (e) => {
+						const target = e.target as HTMLInputElement;
+						if (target.value === 'other') {
+							nameInput.value = '';
+							providerModelIdInput.value = '';
+							nameInput.disabled = false;
+							providerModelIdInput.disabled = false;
+						} else {
+							const selectedModel = presetProvider.popularModels?.find(m => m.id === target.value);
+							if (selectedModel) {
+								nameInput.value = selectedModel.name;
+								providerModelIdInput.value = selectedModel.id;
+								nameInput.disabled = true;
+								providerModelIdInput.disabled = true;
+							}
+						}
+					});
+				} else {
+					modelSelectionContainer.style.display = 'none';
+				}
 			} else {
+				modelSelectionContainer.style.display = 'none';
 				modelIdContainer.textContent = getMessage('providerModelIdDescription');
 			}
 		});
@@ -573,19 +659,6 @@ async function showModelModal(model: ModelConfig, index?: number) {
 		if (index !== undefined && model.providerId) {
 			providerSelect.value = model.providerId;
 			providerSelect.dispatchEvent(new Event('change'));
-		}
-
-		// Get all form elements
-		const nameInput = form.querySelector('[name="name"]') as HTMLInputElement;
-		const providerModelIdInput = form.querySelector('[name="providerModelId"]') as HTMLInputElement;
-
-		// Check if all required elements exist
-		if (!nameInput || !providerModelIdInput) {
-			console.error('Required form elements not found:', {
-				nameInput: !!nameInput,
-				providerModelIdInput: !!providerModelIdInput
-			});
-			return;
 		}
 
 		// Set form values

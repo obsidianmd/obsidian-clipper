@@ -493,6 +493,12 @@
 	"pleaseReload": {
 		"message": "Пожалуйста, попробуйте перезагрузить страницу."
 	},
+	"popularModels": {
+		"message": "Популярные модели"
+	},
+	"popularModelsDescription": {
+		"message": "Выберите из часто используемых моделей или введите данные пользовательской модели."
+	},
 	"prependToDaily": {
 		"message": "Добавить в начало ежедневной заметки"
 	},
@@ -555,6 +561,9 @@
 	},
 	"providers": {
 		"message": "Провайдеры"
+	},
+	"recommended": {
+		"message": "рекомендуется"
 	},
 	"refresh": {
 		"message": "Обновить"

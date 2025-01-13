@@ -493,6 +493,12 @@
 	"pleaseReload": {
 		"message": "Kripya page reload karne ki koshish karein."
 	},
+	"popularModels": {
+		"message": "लोकप्रिय मॉडल"
+	},
+	"popularModelsDescription": {
+		"message": "सामान्य रूप से प्रयुक्त मॉडलों में से चुनें या कस्टम मॉडल विवरण दर्ज करें।"
+	},
 	"prependToDaily": {
 		"message": "Daily note mein, shuruat mein add karein"
 	},
@@ -555,6 +561,9 @@
 	},
 	"providers": {
 		"message": "Providers"
+	},
+	"recommended": {
+		"message": "सिफारिश की गई"
 	},
 	"refresh": {
 		"message": "Refresh"

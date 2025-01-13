@@ -493,6 +493,12 @@
 	"pleaseReload": {
 		"message": "Please try reloading the page."
 	},
+	"popularModels": {
+		"message": "Popular models"
+	},
+	"popularModelsDescription": {
+		"message": "Choose from commonly used models or enter custom model details."
+	},
 	"prependToDaily": {
 		"message": "Add to daily note, at the top"
 	},
@@ -555,6 +561,9 @@
 	},
 	"providers": {
 		"message": "Providers"
+	},
+	"recommended": {
+		"message": "recommended"
 	},
 	"refresh": {
 		"message": "Refresh"

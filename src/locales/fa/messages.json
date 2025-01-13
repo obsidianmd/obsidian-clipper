@@ -493,6 +493,12 @@
 	"pleaseReload": {
 		"message": "لطفاً صفحه را دوباره بارگیری کنید."
 	},
+	"popularModels": {
+		"message": "مدل‌های محبوب"
+	},
+	"popularModelsDescription": {
+		"message": "از مدل‌هایی که بیشتر استفاده می‌شوند انتخاب کنید یا جزئیات مدل سفارشی را وارد کنید."
+	},
 	"prependToDaily": {
 		"message": "به یادداشت روزانه، از اول اضافه کنید"
 	},
@@ -555,6 +561,9 @@
 	},
 	"providers": {
 		"message": "ارائه‌دهندگان"
+	},
+	"recommended": {
+		"message": "توصیه شده"
 	},
 	"refresh": {
 		"message": "ریفرش"
