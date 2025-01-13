@@ -220,25 +220,29 @@ function parseLLMResponse(responseContent: string, promptVariables: PromptVariab
 
 		// Helper function to sanitize JSON string
 		const sanitizeJsonString = (str: string) => {
-			// First, escape all quotes that are part of the content
-			let result = str.replace(/(?<!\\)"/g, '\\"');
+			// First, normalize all newlines to \n
+			let result = str.replace(/\r\n/g, '\n');
+			
+			// Escape newlines properly
+			result = result.replace(/\n/g, '\\n');
+			
+			// Escape quotes that are part of the content
+			result = result.replace(/(?<!\\)"/g, '\\"');
 			
 			// Then unescape the quotes that are JSON structural elements
-			// This regex matches quotes that are preceded by {, [, :, or comma
-			result = result.replace(/(?<=[{[,:]\s*)\\"/g, '"');
-			// This regex matches quotes that are followed by }, ], :, or comma
-			result = result.replace(/\\"(?=\s*[}\],:}])/g, '"');
+			result = result.replace(/(?<=[{[,:]\s*)\\"/g, '"')
+				.replace(/\\"(?=\s*[}\],:}])/g, '"');
 			
 			return result
 				// Replace curly quotes
 				.replace(/[""]/g, '\\"')
 				// Remove any bad control characters
-				.replace(/[\u0000-\u001F\u007F-\u009F]/g, '')
+				.replace(/[\u0000-\u0008\u000B-\u001F\u007F-\u009F]/g, '')
 				// Remove any whitespace between quotes and colons
 				.replace(/"\s*:/g, '":')
 				.replace(/:\s*"/g, ':"')
 				// Fix any triple or more backslashes
-				.replace(/\\{3,}/g, '\\');
+				.replace(/\\{3,}/g, '\\\\');
 		};
 
 		// First try to parse the content directly
@@ -256,7 +260,9 @@ function parseLLMResponse(responseContent: string, promptVariables: PromptVariab
 			// Try parsing with minimal sanitization first
 			try {
 				const minimalSanitized = jsonMatch[0]
-					.replace(/[""]/g, '"');
+					.replace(/[""]/g, '"')
+					.replace(/\r\n/g, '\\n')
+					.replace(/\n/g, '\\n');
 				parsedResponse = JSON.parse(minimalSanitized);
 			} catch (minimalError) {
 				// If minimal sanitization fails, try full sanitization
@@ -267,16 +273,24 @@ function parseLLMResponse(responseContent: string, promptVariables: PromptVariab
 					parsedResponse = JSON.parse(sanitizedMatch);
 				} catch (fullError) {
 					// Last resort: try to manually rebuild the JSON structure
-					const contentMatch = jsonMatch[0].match(/"prompt_1":\s*"([^]*?)(?:"}|"\s*})/);
-					if (!contentMatch) {
-						throw new Error('Could not extract prompt content');
-					}
+					const prompts_responses: { [key: string]: string } = {};
 					
-					const content = contentMatch[1]
-						.replace(/\\/g, '\\\\')
-						.replace(/"/g, '\\"');
-					
-					const rebuiltJson = `{"prompts_responses":{"prompt_1":"${content}"}}`;
+					// Extract each prompt response separately
+					promptVariables.forEach((variable, index) => {
+						const promptKey = `prompt_${index + 1}`;
+						const promptRegex = new RegExp(`"${promptKey}"\\s*:\\s*"([^]*?)(?:"\\s*,|"\\s*})`, 'g');
+						const match = promptRegex.exec(jsonMatch[0]);
+						if (match) {
+							let content = match[1]
+								.replace(/\\/g, '\\\\')
+								.replace(/"/g, '\\"')
+								.replace(/\r\n/g, '\\n')
+								.replace(/\n/g, '\\n');
+							prompts_responses[promptKey] = content;
+						}
+					});
+
+					const rebuiltJson = JSON.stringify({ prompts_responses });
 					debugLog('Interpreter', 'Rebuilt JSON:', rebuiltJson);
 					parsedResponse = JSON.parse(rebuiltJson);
 				}
