@@ -595,18 +595,25 @@ async function showModelModal(model: ModelConfig, index?: number) {
 		providerModelIdInput.value = model.providerModelId || '';
 
 		// Populate provider select with alphabetically sorted providers
-		providerSelect.innerHTML = '<option value="" data-i18n="selectProvider">Select a provider</option>';
+		providerSelect.innerHTML = ''; // Clear first
+		const defaultOption = document.createElement('option');
+		defaultOption.value = '';
+		defaultOption.setAttribute('data-i18n', 'selectProvider');
+		providerSelect.appendChild(defaultOption);
+
 		const sortedProviders = [...generalSettings.providers].sort((a, b) => 
 			a.name.toLowerCase().localeCompare(b.name.toLowerCase())
 		);
 		sortedProviders.forEach(provider => {
 			const option = document.createElement('option');
 			option.value = provider.id;
-			
 			option.textContent = provider.name;
 			providerSelect.appendChild(option);
 		});
 		providerSelect.value = model.providerId;
+
+		// Translate the select options
+		translatePage();
 
 		// Handle buttons
 		const confirmBtn = modal.querySelector('.model-confirm-btn');
