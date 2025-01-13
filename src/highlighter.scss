@@ -189,6 +189,7 @@ body.obsidian-highlighter-active {
 
 body.obsidian-reader-active {
 	--obsidian-reader-background-primary: #fff;
+	--obsidian-reader-background-primary-alt: #fcfcfc;
 	--obsidian-reader-text-primary: #222222;
 	--obsidian-reader-text-muted: #5c5c5c;
 	--obsidian-reader-text-faint: #ababab;
@@ -198,6 +199,7 @@ body.obsidian-reader-active {
 
 	@media (prefers-color-scheme: dark) {
 		--obsidian-reader-background-primary: #1e1e1e;
+		--obsidian-reader-background-primary-alt: #212121;
 		--obsidian-reader-text-primary: #dadada;
 		--obsidian-reader-text-muted: #b3b3b3;
 		--obsidian-reader-text-faint: #666666;
@@ -228,6 +230,16 @@ body.obsidian-reader-active {
 	}
 	a {
 		color: var(--obsidian-reader-text-primary);
+	}
+	pre {
+		background-color: var(--obsidian-reader-background-primary-alt);
+		font-size: 0.85%;
+		border-radius: 8px;
+		padding: 12px 16px;
+		white-space: pre;
+		max-width: 100%;
+		overflow-x: auto;
+		border: 1px solid var(--obsidian-reader-border);
 	}
 	.metadata {
 		margin-bottom: 2em;
