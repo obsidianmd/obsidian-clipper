@@ -46,7 +46,7 @@ export function sanitizeFileName(fileName: string): string {
 	sanitized = sanitized
 		.replace(/^\.+/, '') // Remove leading periods
 		.trim()
-		.slice(0, 250); // Trim to 250 characters, leaving room to append ' 1.md'
+		.slice(0, 245); // Trim to 245 characters, leaving room to append ' 1.md'
 
 	// Ensure the file name is not empty
 	if (sanitized.length === 0) {
