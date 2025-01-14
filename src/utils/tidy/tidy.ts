@@ -62,7 +62,6 @@ const BASIC_SELECTORS = [
 	'footer',
 	'form',
 	'header',
-	'h1',
 	'input',
 	'iframe',
 	'label',
@@ -122,7 +121,6 @@ const CLUTTER_PATTERNS = [
 	'global',
 	'google',
 	'goog-',
-	'header',
 	'interlude',
 	'link-box',
 	'loading',
@@ -431,11 +429,37 @@ export class Tidy {
 		// Remove HTML comments
 		this.removeHtmlComments(element);
 		
+		// Handle h1 elements - remove first one and convert others to h2
+		this.handleHeadings(element);
+		
 		// Strip unwanted attributes
 		this.stripUnwantedAttributes(element);
 
 		// Remove empty elements
 		this.removeEmptyElements(element);
+	}
+
+	private static handleHeadings(element: Element) {
+		const h1s = element.getElementsByTagName('h1');
+		let isFirstH1 = true;
+
+		Array.from(h1s).forEach(h1 => {
+			if (isFirstH1) {
+				h1.remove();
+				isFirstH1 = false;
+			} else {
+				// Convert subsequent h1s to h2s
+				const h2 = document.createElement('h2');
+				h2.innerHTML = h1.innerHTML;
+				// Copy allowed attributes
+				Array.from(h1.attributes).forEach(attr => {
+					if (this.ALLOWED_ATTRIBUTES.has(attr.name)) {
+						h2.setAttribute(attr.name, attr.value);
+					}
+				});
+				h1.parentNode?.replaceChild(h2, h1);
+			}
+		});
 	}
 
 	private static removeHtmlComments(element: Element) {
