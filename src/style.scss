@@ -101,6 +101,9 @@ pre, code {
 		padding-top: 4px;
 		display: flex;
 		gap: 8px;
+		select {
+			width: auto;
+		}
 	}
 }
 
@@ -108,7 +111,7 @@ pre, code {
 	margin: 0;
 	padding: 1rem 0 2rem;
 	border-bottom: 1px solid var(--background-modifier-border);
-	
+
 	.chart-line {
 		position: relative;
 		height: 80px;
@@ -128,8 +131,15 @@ pre, code {
 		
 		.chart-line-path {
 			fill: none;
-			stroke: var(--interactive-accent);
+			stroke: var(--chart-line-color);
 			stroke-width: 2.5;
+			vector-effect: non-scaling-stroke;
+		}
+		
+		.chart-vertical-line {
+			stroke: var(--background-modifier-border);
+			stroke-width: 1;
+			stroke-dasharray: 3;
 			vector-effect: non-scaling-stroke;
 		}
 		
@@ -141,7 +151,8 @@ pre, code {
 			display: flex;
 			justify-content: space-between;
 			color: var(--text-muted);
-			font-size: 0.7rem;
+			font-size: 0.72rem;
+			user-select: none;
 		}
 
 		.chart-overlay {
@@ -155,19 +166,19 @@ pre, code {
 
 		.chart-tooltip {
 			position: absolute;
-			transform: translate(-50%, -100%);
 			padding: 4px 8px;
 			background: var(--background-primary);
 			border: 1px solid var(--background-modifier-border);
-			box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.1);
+			box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.05);
 			border-radius: 4px;
 			pointer-events: none;
 			z-index: 100;
-			font-size: 0.75rem;
+			font-size: 0.72rem;
 			display: flex;
 			flex-direction: row;
 			align-items: center;
 			gap: 1.5em;
+			user-select: none;
 			
 			.tooltip-date {
 				color: var(--text-muted);
@@ -175,8 +186,8 @@ pre, code {
 			}
 			
 			.tooltip-count {
-				color: var(--text-normal);
-				font-weight: 500;
+				color: var(--text-accent);
+				font-weight: 600;
 				text-align: center;
 			}
 		}

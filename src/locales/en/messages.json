@@ -760,5 +760,8 @@
 	},
 	"version": {
 		"message": "Version"
+	},
+	"history": {
+		"message": "History"
 	}
 }

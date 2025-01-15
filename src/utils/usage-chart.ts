@@ -4,6 +4,7 @@ import { HistoryEntry } from '../types/types';
 interface WeeklyUsage {
 	period: string;
 	count: number;
+	totalCount?: number;
 }
 
 interface ChartOptions {
@@ -32,6 +33,16 @@ interface ChartPoint {
 }
 
 export async function createUsageChart(container: HTMLElement, data: WeeklyUsage[]): Promise<void> {
+	// Calculate total clips for the period
+	const totalClips = data[0].totalCount !== undefined ? data[0].totalCount : 
+		data.reduce((sum, d) => sum + d.count, 0);
+	
+	// Update the description text
+	const description = document.querySelector('.usage-chart-title .setting-item-description');
+	if (description) {
+		description.textContent = `${totalClips} ${totalClips === 1 ? 'page' : 'pages'} clipped`;
+	}
+
 	// Clear any existing content
 	container.innerHTML = '';
 	container.classList.add('usage-chart');
@@ -54,7 +65,15 @@ export async function createUsageChart(container: HTMLElement, data: WeeklyUsage
 	svg.style.marginLeft = `${barGap/2}px`;
 	svg.style.marginRight = `${barGap/2}px`;
 	
-	// Create path for the chart line
+	// Create vertical line for cursor tracking (add this first)
+	const verticalLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+	verticalLine.classList.add('chart-vertical-line');
+	verticalLine.setAttribute('y1', '0');
+	verticalLine.setAttribute('y2', chartHeight.toString());
+	verticalLine.style.display = 'none';
+	svg.appendChild(verticalLine);
+	
+	// Create path for the chart line (add this second)
 	const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
 	path.classList.add('chart-line-path');
 	
@@ -126,16 +145,29 @@ export async function createUsageChart(container: HTMLElement, data: WeeklyUsage
 			return currDist < prevDist ? curr : prev;
 		});
 
-		// Position tooltip
-		const tooltipX = (closestPoint.x / viewBoxWidth) * rect.width;
-		tooltip.style.left = `${tooltipX}px`;
-		tooltip.style.top = `${(closestPoint.y / chartHeight) * rect.height}px`;
+		// Update tooltip content
 		tooltip.innerHTML = `<div class="tooltip-date">${closestPoint.date}</div><div class="tooltip-count">${closestPoint.count}</div>`;
 		tooltip.style.display = 'flex';
+
+		// Calculate smooth transform offset based on position
+		const position = x / rect.width; // 0 to 1
+		const minOffset = 10; // leftmost offset (%)
+		const maxOffset = -110; // rightmost offset (%)
+		const offset = minOffset + (maxOffset - minOffset) * position;
+		
+		tooltip.style.transform = `translate(${offset}%, 0)`;
+		tooltip.style.left = `${x}px`;
+		tooltip.style.top = `${e.clientY - rect.top - 30}px`;
+
+		// Update vertical line position immediately
+		verticalLine.setAttribute('x1', relativeX.toString());
+		verticalLine.setAttribute('x2', relativeX.toString());
+		verticalLine.style.display = 'block';
 	});
 
 	overlay.addEventListener('mouseleave', () => {
 		tooltip.style.display = 'none';
+		verticalLine.style.display = 'none';
 	});
 
 	chartContainer.appendChild(overlay);
@@ -152,93 +184,50 @@ export function aggregateUsageData(history: HistoryEntry[], options: ChartOption
 		dayjs(a.datetime).valueOf() - dayjs(b.datetime).valueOf()
 	);
 	
-	// Filter history based on time range
-	let filteredHistory = sortedHistory;
-	if (options.timeRange !== 'all') {
+	if (sortedHistory.length === 0) {
+		return [{
+			period: formatPeriodDate(today, today, options),
+			count: 0
+		}];
+	}
+
+	let displayStartDate: dayjs.Dayjs;
+	let displayPeriods: number;
+
+	if (options.timeRange === 'all') {
+		// For "all time", start from the earliest entry
+		const earliest = dayjs(sortedHistory[0].datetime);
+		displayStartDate = earliest.startOf(options.aggregation);
+		displayPeriods = today.diff(displayStartDate, options.aggregation) + 1;
+	} else {
 		const days = options.timeRange === '7d' ? 7 : 30;
-		const cutoff = today.subtract(days, 'day').startOf('day');
-		filteredHistory = sortedHistory.filter(entry => 
-			dayjs(entry.datetime).isAfter(cutoff)
-		);
+		displayStartDate = today.subtract(days - 1, 'day').startOf('day');
+		displayPeriods = options.timeRange === '7d' ? 
+			(options.aggregation === 'day' ? 7 : 2) : 
+			(options.aggregation === 'day' ? 30 : options.aggregation === 'week' ? 5 : 2);
 	}
 
-	// Determine number of periods to show
-	let periods: number;
-	let startDate: dayjs.Dayjs;
-	
-	switch (options.timeRange) {
-		case '7d':
-			periods = options.aggregation === 'day' ? 7 : 2;
-			startDate = today.subtract(6, 'day');
-			break;
-		case '30d':
-			periods = options.aggregation === 'day' ? 30 : 
-				options.aggregation === 'week' ? 5 : 2;
-			startDate = today.subtract(29, 'day');
-			break;
-		case 'all':
-			if (filteredHistory.length === 0) {
-				periods = 1;
-				startDate = today;
-			} else {
-				const earliest = dayjs(filteredHistory[0].datetime);
-				
-				// Calculate duration based on aggregation type
-				let duration: number;
-				switch (options.aggregation) {
-					case 'day':
-						duration = today.diff(earliest, 'day');
-						periods = Math.min(Math.max(duration + 1, 1), 30);
-						break;
-					case 'week':
-						duration = today.diff(earliest, 'week');
-						periods = Math.min(Math.max(duration + 1, 1), 12);
-						break;
-					case 'month':
-						duration = today.diff(earliest, 'month');
-						periods = Math.min(Math.max(duration + 1, 1), 12);
-						break;
-				}
-				startDate = today.subtract(periods - 1, options.aggregation);
-			}
-			break;
-	}
-
-	// Initialize periods with 0 counts
-	for (let i = 0; i < periods; i++) {
-		let periodStart: dayjs.Dayjs;
-		
-		switch (options.aggregation) {
-			case 'day':
-				periodStart = startDate.add(i, 'day');
-				break;
-			case 'week':
-				periodStart = startDate.add(i, 'week').startOf('week');
-				break;
-			case 'month':
-				periodStart = startDate.add(i, 'month').startOf('month');
-				break;
+	// Initialize display periods with 0 counts
+	for (let i = 0; i < displayPeriods; i++) {
+		let periodStart = displayStartDate.add(i, options.aggregation);
+		if (options.aggregation !== 'day') {
+			periodStart = periodStart.startOf(options.aggregation);
 		}
-		
 		const formattedDate = formatPeriodDate(periodStart, today, options);
 		periodsData.set(formattedDate, 0);
 	}
-	
-	// Count entries per period
-	filteredHistory.forEach(entry => {
+
+	// Count all entries
+	sortedHistory.forEach(entry => {
 		const entryDate = dayjs(entry.datetime);
-		let periodStart: dayjs.Dayjs;
-		
-		switch (options.aggregation) {
-			case 'day':
-				periodStart = entryDate;
-				break;
-			case 'week':
-				periodStart = entryDate.startOf('week');
-				break;
-			case 'month':
-				periodStart = entryDate.startOf('month');
-				break;
+		if (options.timeRange !== 'all' && 
+			(entryDate.isBefore(displayStartDate) || entryDate.isAfter(today))) {
+			return;
+		}
+
+		let periodStart = entryDate;
+		if (options.aggregation !== 'day') {
+			periodStart = periodStart.startOf(options.aggregation);
 		}
 		
 		const formattedDate = formatPeriodDate(periodStart, today, options);
@@ -246,9 +235,10 @@ export function aggregateUsageData(history: HistoryEntry[], options: ChartOption
 			periodsData.set(formattedDate, (periodsData.get(formattedDate) || 0) + 1);
 		}
 	});
-	
+
 	return Array.from(periodsData.entries()).map(([period, count]) => ({
 		period,
-		count
+		count,
+		totalCount: options.timeRange === 'all' ? sortedHistory.length : undefined
 	}));
 } 
