@@ -187,7 +187,11 @@ body.obsidian-highlighter-active {
 	}
 }
 
-body.obsidian-reader-active {
+html.obsidian-reader-active {
+	font-size: 62.5%;
+}
+
+.obsidian-reader-active	body {
 	--obsidian-reader-background-primary: #fff;
 	--obsidian-reader-background-primary-alt: #fcfcfc;
 	--obsidian-reader-text-primary: #222222;
@@ -214,8 +218,8 @@ body.obsidian-reader-active {
 
 	background: var(--obsidian-reader-background-primary) !important;	
 	color: var(--obsidian-reader-text-primary) !important;
-	font-size: 16px !important;
-	width: 42rem !important;
+	font-size: calc(1.5rem + 0.25vw) !important;
+	width: 38em !important;
 	margin: 4rem auto 16rem !important;
 	max-width: 90% !important;
 	line-height: 1.6 !important;

@@ -223,7 +223,7 @@ declare global {
 		} else if (request.action === "toggleReaderMode") {
 			try {
 				const isActive = Reader.toggle(document);
-				document.body.classList.toggle('obsidian-reader-active', isActive);
+				document.documentElement.classList.toggle('obsidian-reader-active', isActive);
 				sendResponse({ success: true, isActive });
 			} catch (error: unknown) {
 				console.error('Error toggling reader mode:', error);
