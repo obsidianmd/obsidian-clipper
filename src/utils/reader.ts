@@ -103,7 +103,7 @@ export class Reader {
 			</article>
 		`;
 
-		doc.body.className = 'obsidian-reader-active';
+		doc.documentElement.className = 'obsidian-reader-active';
 		
 		this.isActive = true;
 	}
