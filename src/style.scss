@@ -108,28 +108,8 @@ pre, code {
 	padding: 1rem 0 2rem;
 	border-bottom: 1px solid var(--background-modifier-border);
 	
-	.chart-label {
-		font-size: 0.8em;
-		color: var(--text-muted);
-		writing-mode: vertical-rl;
-		transform: rotate(180deg);
-		text-align: right;
-		height: 40px;
-		overflow: hidden;
-		display: none;
-	}
-	
-	.chart-count {
-		font-size: 0.8em;
-		color: var(--text-muted);
-		display: none;
-	}
-	
 	.chart-line {
 		position: relative;
-		display: flex;
-		align-items: flex-end;
-		gap: 4px;
 		height: 80px;
 		
 		svg {
@@ -148,14 +128,19 @@ pre, code {
 		.chart-line-path {
 			fill: none;
 			stroke: var(--interactive-accent);
-			stroke-width: 2px;
+			stroke-width: 3;
 			vector-effect: non-scaling-stroke;
 		}
 		
-		.chart-bar-container {
-			position: relative;
-			flex: 1;
-			height: 100%;
+		.chart-labels {
+			position: absolute;
+			bottom: -24px;
+			left: 0;
+			right: 0;
+			display: flex;
+			justify-content: space-between;
+			color: var(--text-muted);
+			font-size: var(--font-ui-smaller);
 		}
 	}
 }

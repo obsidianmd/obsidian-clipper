@@ -334,18 +334,18 @@ async function initializeUsageChart(): Promise<void> {
 	periodSelect.value = '30d';
 	aggregationSelect.value = 'day';
 	
-	const updateChart = () => {
+	const updateChart = async () => {
 		const options = {
 			timeRange: periodSelect.value as '7d' | '30d' | 'all',
 			aggregation: aggregationSelect.value as 'day' | 'week' | 'month'
 		};
 		
 		const chartData = aggregateUsageData(history, options);
-		createUsageChart(chartContainer, chartData);
+		await createUsageChart(chartContainer, chartData);
 	};
 
 	// Initialize with default selections
-	updateChart();
+	await updateChart();
 
 	// Update when any selector changes
 	periodSelect.addEventListener('change', updateChart);

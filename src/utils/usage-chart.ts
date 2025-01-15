@@ -11,7 +11,20 @@ interface ChartOptions {
 	aggregation: 'day' | 'week' | 'month';
 }
 
-export function createUsageChart(container: HTMLElement, data: WeeklyUsage[]): void {
+function formatPeriodDate(date: dayjs.Dayjs, today: dayjs.Dayjs, options: ChartOptions): string {
+	switch (options.aggregation) {
+		case 'day':
+		case 'week':
+			if (date.year() === today.year()) {
+				return date.format('MMM D');
+			}
+			return date.format('MMM D YYYY');
+		case 'month':
+			return date.format('MMM YYYY');
+	}
+}
+
+export async function createUsageChart(container: HTMLElement, data: WeeklyUsage[]): Promise<void> {
 	// Clear any existing content
 	container.innerHTML = '';
 	container.classList.add('usage-chart');
@@ -27,43 +40,59 @@ export function createUsageChart(container: HTMLElement, data: WeeklyUsage[]): v
 	// Create SVG for line chart
 	const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
 	svg.setAttribute('width', '100%');
-	svg.setAttribute('viewBox', `0 0 100 ${chartHeight}`);
+	svg.setAttribute('height', '100%');
+	const viewBoxWidth = 1000;
+	svg.setAttribute('viewBox', `0 0 ${viewBoxWidth} ${chartHeight}`);
 	svg.setAttribute('preserveAspectRatio', 'none');
 	svg.style.marginLeft = `${barGap/2}px`;
 	svg.style.marginRight = `${barGap/2}px`;
 	
-	// Create polyline for the chart line
-	const polyline = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
-	const points = data.map((d, i) => {
-		const x = (i / (data.length - 1)) * 100;
-		const y = chartHeight - ((d.count / maxCount) * chartHeight || 0);
-		return `${x},${y}`;
-	}).join(' ');
+	// Create path for the chart line
+	const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+	path.classList.add('chart-line-path');
 	
-	polyline.setAttribute('points', points);
-	polyline.classList.add('chart-line-path');
+	// Generate smooth curve path
+	const points = data.map((d, i) => ({
+		x: (i / (data.length - 1)) * viewBoxWidth,
+		y: chartHeight - ((d.count / maxCount) * chartHeight || 0)
+	}));
 	
-	svg.appendChild(polyline);
+	const pathData = points.reduce((acc, point, i, arr) => {
+		if (i === 0) return `M ${point.x},${point.y}`;
+		
+		const prev = arr[i - 1];
+		const tension = 0.2;
+		const dx = point.x - prev.x;
+		
+		const cp1x = prev.x + dx * tension;
+		const cp1y = prev.y;
+		const cp2x = point.x - dx * tension;
+		const cp2y = point.y;
+		
+		return `${acc} C ${cp1x},${cp1y} ${cp2x},${cp2y} ${point.x},${point.y}`;
+	}, '');
+	
+	path.setAttribute('d', pathData);
+	svg.appendChild(path);
 	chartContainer.appendChild(svg);
 	
-	// Add containers for labels
-	data.forEach((periodData, index) => {
-		const labelContainer = document.createElement('div');
-		labelContainer.className = 'chart-bar-container';
-		
-		const label = document.createElement('div');
-		label.className = 'chart-label';
-		label.textContent = periodData.period;
-		
-		const count = document.createElement('div');
-		count.className = 'chart-count';
-		count.textContent = periodData.count.toString();
-		
-		labelContainer.appendChild(label);
-		labelContainer.appendChild(count);
-		chartContainer.appendChild(labelContainer);
-	});
-
+	// Add date labels container
+	const labelsContainer = document.createElement('div');
+	labelsContainer.className = 'chart-labels';
+	
+	// Add start date
+	const startLabel = document.createElement('div');
+	startLabel.className = 'chart-date-label';
+	startLabel.textContent = data[0].period;
+	labelsContainer.appendChild(startLabel);
+	
+	// Add end date
+	const endLabel = document.createElement('div');
+	endLabel.className = 'chart-date-label';
+	endLabel.textContent = data[data.length - 1].period;
+	labelsContainer.appendChild(endLabel);
+	
+	chartContainer.appendChild(labelsContainer);
 	container.appendChild(chartContainer);
 }
 
@@ -131,50 +160,43 @@ export function aggregateUsageData(history: HistoryEntry[], options: ChartOption
 	// Initialize periods with 0 counts
 	for (let i = 0; i < periods; i++) {
 		let periodStart: dayjs.Dayjs;
-		let format: string;
 		
 		switch (options.aggregation) {
 			case 'day':
 				periodStart = startDate.add(i, 'day');
-				format = periodStart.year() === today.year() ? 'MMM D' : 'MMM D YYYY';
 				break;
 			case 'week':
 				periodStart = startDate.add(i, 'week').startOf('week');
-				format = periodStart.year() === today.year() ? 'MMM D' : 'MMM D YYYY';
 				break;
 			case 'month':
 				periodStart = startDate.add(i, 'month').startOf('month');
-				format = 'MMM YYYY';
 				break;
 		}
 		
-		periodsData.set(periodStart.format(format), 0);
+		const formattedDate = formatPeriodDate(periodStart, today, options);
+		periodsData.set(formattedDate, 0);
 	}
 	
 	// Count entries per period
 	filteredHistory.forEach(entry => {
 		const entryDate = dayjs(entry.datetime);
-		let periodStart: string;
+		let periodStart: dayjs.Dayjs;
 		
 		switch (options.aggregation) {
 			case 'day':
-				periodStart = entryDate.year() === today.year() ? 
-					entryDate.format('MMM D') : 
-					entryDate.format('MMM D YYYY');
+				periodStart = entryDate;
 				break;
 			case 'week':
-				const weekStart = entryDate.startOf('week');
-				periodStart = weekStart.year() === today.year() ? 
-					weekStart.format('MMM D') : 
-					weekStart.format('MMM D YYYY');
+				periodStart = entryDate.startOf('week');
 				break;
 			case 'month':
-				periodStart = entryDate.startOf('month').format('MMM YYYY');
+				periodStart = entryDate.startOf('month');
 				break;
 		}
 		
-		if (periodsData.has(periodStart)) {
-			periodsData.set(periodStart, (periodsData.get(periodStart) || 0) + 1);
+		const formattedDate = formatPeriodDate(periodStart, today, options);
+		if (periodsData.has(formattedDate)) {
+			periodsData.set(formattedDate, (periodsData.get(formattedDate) || 0) + 1);
 		}
 	});
 	
