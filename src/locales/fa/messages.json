@@ -1,4 +1,7 @@
 {
+	"activity": {
+		"message": "فعالیت"
+	},
 	"addModel": {
 		"message": "+ افزودن مدل"
 	},
@@ -25,6 +28,9 @@
 	},
 	"allProperties": {
 		"message": "همه خواص"
+	},
+	"allTime": {
+		"message": "کل زمان"
 	},
 	"alwaysShowHighlights": {
 		"message": "همیشه جملات روشن را نشان دهید"
@@ -55,6 +61,15 @@
 	},
 	"behaviorWarning": {
 		"message": "افزودن به یادداشت موجود یا یادداشت روزانه به ابسیدین  ورژن ۱.۷.۲ یا بالاتر نیاز دارد"
+	},
+	"byDay": {
+		"message": "روزها"
+	},
+	"byMonth": {
+		"message": "ماه ها"
+	},
+	"byWeek": {
+		"message": "هفته ها"
 	},
 	"cancel": {
 		"message": "لغو"
@@ -319,6 +334,9 @@
 	"highlighterSettings": {
 		"message": "مارکر"
 	},
+	"history": {
+		"message": "تاریخچه"
+	},
 	"hotkeys": {
 		"message": "کلیدهای میانبر"
 	},
@@ -388,6 +406,12 @@
 	},
 	"languageDescription": {
 		"message": "زبان نمایش را برای برنامه انتخاب کنید."
+	},
+	"last30Days": {
+		"message": "30 روز گذشته"
+	},
+	"last7Days": {
+		"message": "7 روز گذشته"
 	},
 	"lastUsed": {
 		"message": "آخرین استفاده"

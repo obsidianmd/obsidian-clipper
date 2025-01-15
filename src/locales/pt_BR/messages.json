@@ -1,4 +1,7 @@
 {
+	"activity": {
+		"message": "Atividade"
+	},
 	"addModel": {
 		"message": "+ Adicionar modelo"
 	},
@@ -25,6 +28,9 @@
 	},
 	"allProperties": {
 		"message": "Todas as propriedades"
+	},
+	"allTime": {
+		"message": "Todo o tempo"
 	},
 	"alwaysShowHighlights": {
 		"message": "Sempre mostrar marcações"
@@ -55,6 +61,15 @@
 	},
 	"behaviorWarning": {
 		"message": "Adicionar a uma nota existente ou nota diária requer a versão 1.7.2 ou posterior do Obsidian."
+	},
+	"byDay": {
+		"message": "Dias"
+	},
+	"byMonth": {
+		"message": "Meses"
+	},
+	"byWeek": {
+		"message": "Semanas"
 	},
 	"cancel": {
 		"message": "Cancelar"
@@ -319,6 +334,9 @@
 	"highlighterSettings": {
 		"message": "Marcador"
 	},
+	"history": {
+		"message": "Histórico"
+	},
 	"hotkeys": {
 		"message": "Teclas de atalho"
 	},
@@ -388,6 +406,12 @@
 	},
 	"languageDescription": {
 		"message": "Escolha o idioma de exibição para a interface da extensão."
+	},
+	"last30Days": {
+		"message": "Últimos 30 dias"
+	},
+	"last7Days": {
+		"message": "Últimos 7 dias"
 	},
 	"lastUsed": {
 		"message": "Usado pela última vez"

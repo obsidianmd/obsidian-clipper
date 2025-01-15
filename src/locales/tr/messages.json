@@ -1,4 +1,7 @@
 {
+	"activity": {
+		"message": "Aktivite"
+	},
 	"addModel": {
 		"message": "+ Model ekle"
 	},
@@ -25,6 +28,9 @@
 	},
 	"allProperties": {
 		"message": "Tüm özellikler"
+	},
+	"allTime": {
+		"message": "Tüm zamanlar"
 	},
 	"alwaysShowHighlights": {
 		"message": "Vurguları her zaman göster"
@@ -55,6 +61,15 @@
 	},
 	"behaviorWarning": {
 		"message": "Mevcut nota veya günlük nota ekleme için Obsidian 1.7.2 veya daha yeni sürüm gereklidir."
+	},
+	"byDay": {
+		"message": "Günler"
+	},
+	"byMonth": {
+		"message": "Aylar"
+	},
+	"byWeek": {
+		"message": "Haftalar"
 	},
 	"cancel": {
 		"message": "İptal"
@@ -319,6 +334,9 @@
 	"highlighterSettings": {
 		"message": "Vurgulayıcı"
 	},
+	"history": {
+		"message": "Geçmiş"
+	},
 	"hotkeys": {
 		"message": "Kısayol tuşları"
 	},
@@ -388,6 +406,12 @@
 	},
 	"languageDescription": {
 		"message": "Uzantı arayüzü için görüntüleme dilini seçin."
+	},
+	"last30Days": {
+		"message": "Son 30 gün"
+	},
+	"last7Days": {
+		"message": "Son 7 gün"
 	},
 	"lastUsed": {
 		"message": "Son kullanılan"

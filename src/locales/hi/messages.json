@@ -1,4 +1,7 @@
 {
+	"activity": {
+		"message": "गतिविधि"
+	},
 	"addModel": {
 		"message": "+ Model jodein"
 	},
@@ -25,6 +28,9 @@
 	},
 	"allProperties": {
 		"message": "Sabhi properties"
+	},
+	"allTime": {
+		"message": "सभी समय"
 	},
 	"alwaysShowHighlights": {
 		"message": "Hamesha highlights dikhayein"
@@ -55,6 +61,15 @@
 	},
 	"behaviorWarning": {
 		"message": "Maujuda note ya daily note mein jodne ke liye Obsidian 1.7.2 ya usse naya version chahiye."
+	},
+	"byDay": {
+		"message": "दिनों"
+	},
+	"byMonth": {
+		"message": "महीनों"
+	},
+	"byWeek": {
+		"message": "सप्ताहों"
 	},
 	"cancel": {
 		"message": "Cancel"
@@ -319,6 +334,9 @@
 	"highlighterSettings": {
 		"message": "Highlighter"
 	},
+	"history": {
+		"message": "इतिहास"
+	},
 	"hotkeys": {
 		"message": "Hotkeys"
 	},
@@ -388,6 +406,12 @@
 	},
 	"languageDescription": {
 		"message": "Extension interface ke liye display language chunein."
+	},
+	"last30Days": {
+		"message": "अंतिम 30 दिन"
+	},
+	"last7Days": {
+		"message": "अंतिम 7 दिन"
 	},
 	"lastUsed": {
 		"message": "Last used"

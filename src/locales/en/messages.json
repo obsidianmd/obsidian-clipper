@@ -1,4 +1,7 @@
 {
+	"activity": {
+		"message": "Activity"
+	},
 	"addModel": {
 		"message": "+ Add model"
 	},
@@ -25,6 +28,9 @@
 	},
 	"allProperties": {
 		"message": "All properties"
+	},
+	"allTime": {
+		"message": "All time"
 	},
 	"alwaysShowHighlights": {
 		"message": "Always show highlights"
@@ -55,6 +61,15 @@
 	},
 	"behaviorWarning": {
 		"message": "Adding to an existing note or daily note requires Obsidian 1.7.2 or later."
+	},
+	"byDay": {
+		"message": "Days"
+	},
+	"byMonth": {
+		"message": "Months"
+	},
+	"byWeek": {
+		"message": "Weeks"
 	},
 	"cancel": {
 		"message": "Cancel"
@@ -319,6 +334,9 @@
 	"highlighterSettings": {
 		"message": "Highlighter"
 	},
+	"history": {
+		"message": "History"
+	},
 	"hotkeys": {
 		"message": "Hotkeys"
 	},
@@ -386,26 +404,11 @@
 	"language": {
 		"message": "Language"
 	},
-	"last7Days": {
-		"message": "Last 7 days"
+	"languageDescription": {
+		"message": "Choose the display language for the extension interface."
 	},
 	"last30Days": {
 		"message": "Last 30 days"
-	},
-	"allTime": {
-		"message": "All time"
-	},
-	"byDay": {
-		"message": "Days"
-	},
-	"byWeek": {
-		"message": "Weeks"
-	},
-	"byMonth": {
-		"message": "Months"
-	},
-	"languageDescription": {
-		"message": "Choose the display language for the extension interface."
 	},
 	"lastUsed": {
 		"message": "Last used"
@@ -760,8 +763,5 @@
 	},
 	"version": {
 		"message": "Version"
-	},
-	"history": {
-		"message": "History"
 	}
 }

@@ -1,4 +1,7 @@
 {
+	"activity": {
+		"message": "ক্রিয়াকলাপ"
+	},
 	"addModel": {
 		"message": "+ মডেল যোগ করুন"
 	},
@@ -25,6 +28,9 @@
 	},
 	"allProperties": {
 		"message": "সমস্ত প্রপার্টি"
+	},
+	"allTime": {
+		"message": "সমস্ত সময়"
 	},
 	"alwaysShowHighlights": {
 		"message": "সবসময় হাইলাইট দেখান"
@@ -55,6 +61,15 @@
 	},
 	"behaviorWarning": {
 		"message": "বিদ্যমান নোট বা ডেইলি নোটে যোগ করতে হলে Obsidian 1.7.2 বা তার পরের সংস্করণ প্রয়োজন।"
+	},
+	"byDay": {
+		"message": "দিন"
+	},
+	"byMonth": {
+		"message": "মাস"
+	},
+	"byWeek": {
+		"message": "সপ্তাহ"
 	},
 	"cancel": {
 		"message": "বাতিল করুন"
@@ -319,6 +334,9 @@
 	"highlighterSettings": {
 		"message": "হাইলাইটার"
 	},
+	"history": {
+		"message": "ইতিহাস"
+	},
 	"hotkeys": {
 		"message": "হটকি"
 	},
@@ -388,6 +406,12 @@
 	},
 	"languageDescription": {
 		"message": "এক্সটেনশনের ইন্টারফেসের ভাষা নির্বাচন করুন।"
+	},
+	"last30Days": {
+		"message": "গত ৩০ দিন"
+	},
+	"last7Days": {
+		"message": "গত ৭ দিন"
 	},
 	"lastUsed": {
 		"message": "শেষ ব্যবহৃত"

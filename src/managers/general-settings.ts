@@ -329,14 +329,10 @@ async function initializeUsageChart(): Promise<void> {
 	if (!chartContainer || !periodSelect || !aggregationSelect) return;
 
 	const history = await getClipHistory();
-	
-	// Set default values
-	periodSelect.value = '30d';
-	aggregationSelect.value = 'day';
-	
+
 	const updateChart = async () => {
 		const options = {
-			timeRange: periodSelect.value as '7d' | '30d' | 'all',
+			timeRange: periodSelect.value as '30d' | 'all',
 			aggregation: aggregationSelect.value as 'day' | 'week' | 'month'
 		};
 		

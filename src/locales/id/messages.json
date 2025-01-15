@@ -1,4 +1,7 @@
 {
+	"activity": {
+		"message": "Aktivitas"
+	},
 	"addModel": {
 		"message": "+ Tambah model"
 	},
@@ -25,6 +28,9 @@
 	},
 	"allProperties": {
 		"message": "Semua properti"
+	},
+	"allTime": {
+		"message": "Sepanjang waktu"
 	},
 	"alwaysShowHighlights": {
 		"message": "Selalu tampilkan sorotan"
@@ -55,6 +61,15 @@
 	},
 	"behaviorWarning": {
 		"message": "Perlu Obsidian 1.7.2 atau yang lebih baru untuk dapat menambahkan ke catatan yang telah ada atau catatan harian."
+	},
+	"byDay": {
+		"message": "Hari"
+	},
+	"byMonth": {
+		"message": "Bulan"
+	},
+	"byWeek": {
+		"message": "Minggu"
 	},
 	"cancel": {
 		"message": "Batal"
@@ -319,6 +334,9 @@
 	"highlighterSettings": {
 		"message": "Penyorot"
 	},
+	"history": {
+		"message": "Riwayat"
+	},
 	"hotkeys": {
 		"message": "Tombol pintas"
 	},
@@ -388,6 +406,12 @@
 	},
 	"languageDescription": {
 		"message": "Pilih bahasa tampilan untuk antarmuka ekstensi."
+	},
+	"last30Days": {
+		"message": "30 hari terakhir"
+	},
+	"last7Days": {
+		"message": "7 hari terakhir"
 	},
 	"lastUsed": {
 		"message": "Terakhir digunakan"

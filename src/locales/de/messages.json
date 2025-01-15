@@ -1,4 +1,7 @@
 {
+	"activity": {
+		"message": "Aktivität"
+	},
 	"addModel": {
 		"message": "+ Modell hinzufügen"
 	},
@@ -25,6 +28,9 @@
 	},
 	"allProperties": {
 		"message": "Alle Eigenschaften"
+	},
+	"allTime": {
+		"message": "Gesamte Zeit"
 	},
 	"alwaysShowHighlights": {
 		"message": "Markierungen immer anzeigen"
@@ -55,6 +61,15 @@
 	},
 	"behaviorWarning": {
 		"message": "Das Hinzufügen zu einer bestehenden Notiz oder Tagesnotiz erfordert Obsidian 1.7.2 oder höher."
+	},
+	"byDay": {
+		"message": "Tage"
+	},
+	"byMonth": {
+		"message": "Monate"
+	},
+	"byWeek": {
+		"message": "Wochen"
 	},
 	"cancel": {
 		"message": "Abbrechen"
@@ -319,6 +334,9 @@
 	"highlighterSettings": {
 		"message": "Marker"
 	},
+	"history": {
+		"message": "Verlauf"
+	},
 	"hotkeys": {
 		"message": "Tastenkombinationen"
 	},
@@ -388,6 +406,12 @@
 	},
 	"languageDescription": {
 		"message": "Wähle die Anzeigesprache für die Erweiterungsoberfläche."
+	},
+	"last30Days": {
+		"message": "Letzte 30 Tage"
+	},
+	"last7Days": {
+		"message": "Letzte 7 Tage"
 	},
 	"lastUsed": {
 		"message": "Zuletzt verwendet"

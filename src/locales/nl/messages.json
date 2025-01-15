@@ -1,4 +1,7 @@
 {
+	"activity": {
+		"message": "Activiteit"
+	},
 	"addModel": {
 		"message": "+ Model toevoegen"
 	},
@@ -25,6 +28,9 @@
 	},
 	"allProperties": {
 		"message": "Alle eigenschappen"
+	},
+	"allTime": {
+		"message": "Alle tijd"
 	},
 	"alwaysShowHighlights": {
 		"message": "Markeringen altijd tonen"
@@ -55,6 +61,15 @@
 	},
 	"behaviorWarning": {
 		"message": "Toevoegen aan een bestaande notitie of dagelijkse notitie vereist Obsidian 1.7.2 of hoger."
+	},
+	"byDay": {
+		"message": "Dagen"
+	},
+	"byMonth": {
+		"message": "Maanden"
+	},
+	"byWeek": {
+		"message": "Weken"
 	},
 	"cancel": {
 		"message": "Annuleren"
@@ -319,6 +334,9 @@
 	"highlighterSettings": {
 		"message": "Markeerder"
 	},
+	"history": {
+		"message": "Geschiedenis"
+	},
 	"hotkeys": {
 		"message": "Sneltoetsen"
 	},
@@ -388,6 +406,12 @@
 	},
 	"languageDescription": {
 		"message": "Kies de weergavetaal voor de extensie-interface."
+	},
+	"last30Days": {
+		"message": "Laatste 30 dagen"
+	},
+	"last7Days": {
+		"message": "Laatste 7 dagen"
 	},
 	"lastUsed": {
 		"message": "Laatst gebruikt"

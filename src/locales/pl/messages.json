@@ -1,4 +1,7 @@
 {
+	"activity": {
+		"message": "Aktywność"
+	},
 	"addModel": {
 		"message": "+ Dodaj model"
 	},
@@ -25,6 +28,9 @@
 	},
 	"allProperties": {
 		"message": "Wszystkie atrybuty"
+	},
+	"allTime": {
+		"message": "Cały czas"
 	},
 	"alwaysShowHighlights": {
 		"message": "Zawsze pokazuj wyróżnienia"
@@ -55,6 +61,15 @@
 	},
 	"behaviorWarning": {
 		"message": "Aby zapisać w istniejącej lub codziennej notatce wymagany jest Obsidian w wersji 1.7.2 lub nowszej."
+	},
+	"byDay": {
+		"message": "Dni"
+	},
+	"byMonth": {
+		"message": "Miesiące"
+	},
+	"byWeek": {
+		"message": "Tygodnie"
 	},
 	"cancel": {
 		"message": "Anuluj"
@@ -319,6 +334,9 @@
 	"highlighterSettings": {
 		"message": "Zakreślacz"
 	},
+	"history": {
+		"message": "Historia"
+	},
 	"hotkeys": {
 		"message": "Skróty klawiszowe"
 	},
@@ -388,6 +406,12 @@
 	},
 	"languageDescription": {
 		"message": "Wybierz język interfejsu rozszerzenia."
+	},
+	"last30Days": {
+		"message": "Ostatnie 30 dni"
+	},
+	"last7Days": {
+		"message": "Ostatnie 7 dni"
 	},
 	"lastUsed": {
 		"message": "Ostatnio używane"

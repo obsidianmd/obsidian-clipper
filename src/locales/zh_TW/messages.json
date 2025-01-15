@@ -1,4 +1,7 @@
 {
+	"activity": {
+		"message": "活動"
+	},
 	"addModel": {
 		"message": "+ 新增模型"
 	},
@@ -25,6 +28,9 @@
 	},
 	"allProperties": {
 		"message": "所有屬性"
+	},
+	"allTime": {
+		"message": "所有時間"
 	},
 	"alwaysShowHighlights": {
 		"message": "總是顯示標記"
@@ -55,6 +61,15 @@
 	},
 	"behaviorWarning": {
 		"message": "新增到現有筆記或每日筆記需要 Obsidian 1.7.2 或更高版本。"
+	},
+	"byDay": {
+		"message": "天"
+	},
+	"byMonth": {
+		"message": "月"
+	},
+	"byWeek": {
+		"message": "週"
 	},
 	"cancel": {
 		"message": "取消"
@@ -319,6 +334,9 @@
 	"highlighterSettings": {
 		"message": "標記工具設定"
 	},
+	"history": {
+		"message": "歷史"
+	},
 	"hotkeys": {
 		"message": "快捷鍵"
 	},
@@ -388,6 +406,12 @@
 	},
 	"languageDescription": {
 		"message": "選擇擴充功能介面的顯示語言。"
+	},
+	"last30Days": {
+		"message": "過去30天"
+	},
+	"last7Days": {
+		"message": "過去7天"
 	},
 	"lastUsed": {
 		"message": "上次使用"

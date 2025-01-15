@@ -8,7 +8,7 @@ interface WeeklyUsage {
 }
 
 interface ChartOptions {
-	timeRange: '7d' | '30d' | 'all';
+	timeRange: '30d' | 'all';
 	aggregation: 'day' | 'week' | 'month';
 }
 
@@ -37,10 +37,19 @@ export async function createUsageChart(container: HTMLElement, data: WeeklyUsage
 	const totalClips = data[0].totalCount !== undefined ? data[0].totalCount : 
 		data.reduce((sum, d) => sum + d.count, 0);
 	
+	// Hide chart container if less than 20 items
+	const usageContainer = document.getElementById('usage-chart-container');
+	if (usageContainer && totalClips < 20) {
+		usageContainer.style.display = 'none';
+		return;
+	} else if (usageContainer) {
+		usageContainer.style.display = 'block';
+	}
+
 	// Update the description text
 	const description = document.querySelector('.usage-chart-title .setting-item-description');
 	if (description) {
-		description.textContent = `${totalClips} ${totalClips === 1 ? 'page' : 'pages'} clipped`;
+		description.textContent = `${totalClips} ${totalClips === 1 ? 'page' : 'pages'} saved`;
 	}
 
 	// Clear any existing content
@@ -52,8 +61,8 @@ export async function createUsageChart(container: HTMLElement, data: WeeklyUsage
 	const barGap = 4;
 
 	// Create chart container
-	const chartContainer = document.createElement('div');
-	chartContainer.className = 'chart-line';
+	const lineContainer = document.createElement('div');
+	lineContainer.className = 'chart-line';
 	
 	// Create SVG for line chart
 	const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -65,7 +74,7 @@ export async function createUsageChart(container: HTMLElement, data: WeeklyUsage
 	svg.style.marginLeft = `${barGap/2}px`;
 	svg.style.marginRight = `${barGap/2}px`;
 	
-	// Create vertical line for cursor tracking (add this first)
+	// Create vertical line for cursor tracking
 	const verticalLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
 	verticalLine.classList.add('chart-vertical-line');
 	verticalLine.setAttribute('y1', '0');
@@ -102,7 +111,7 @@ export async function createUsageChart(container: HTMLElement, data: WeeklyUsage
 	
 	path.setAttribute('d', pathData);
 	svg.appendChild(path);
-	chartContainer.appendChild(svg);
+	lineContainer.appendChild(svg);
 	
 	// Add date labels container
 	const labelsContainer = document.createElement('div');
@@ -120,13 +129,13 @@ export async function createUsageChart(container: HTMLElement, data: WeeklyUsage
 	endLabel.textContent = data[data.length - 1].period;
 	labelsContainer.appendChild(endLabel);
 	
-	chartContainer.appendChild(labelsContainer);
+	lineContainer.appendChild(labelsContainer);
 	
 	// Create tooltip
 	const tooltip = document.createElement('div');
 	tooltip.className = 'chart-tooltip';
 	tooltip.style.display = 'none';
-	chartContainer.appendChild(tooltip);
+	lineContainer.appendChild(tooltip);
 
 	// Add invisible overlay for mouse tracking
 	const overlay = document.createElement('div');
@@ -170,9 +179,8 @@ export async function createUsageChart(container: HTMLElement, data: WeeklyUsage
 		verticalLine.style.display = 'none';
 	});
 
-	chartContainer.appendChild(overlay);
-	
-	container.appendChild(chartContainer);
+	lineContainer.appendChild(overlay);
+	container.appendChild(lineContainer);
 }
 
 export function aggregateUsageData(history: HistoryEntry[], options: ChartOptions): WeeklyUsage[] {
@@ -200,11 +208,10 @@ export function aggregateUsageData(history: HistoryEntry[], options: ChartOption
 		displayStartDate = earliest.startOf(options.aggregation);
 		displayPeriods = today.diff(displayStartDate, options.aggregation) + 1;
 	} else {
-		const days = options.timeRange === '7d' ? 7 : 30;
-		displayStartDate = today.subtract(days - 1, 'day').startOf('day');
-		displayPeriods = options.timeRange === '7d' ? 
-			(options.aggregation === 'day' ? 7 : 2) : 
-			(options.aggregation === 'day' ? 30 : options.aggregation === 'week' ? 5 : 2);
+		// Only 30d option remains
+		displayStartDate = today.subtract(29, 'day').startOf('day');
+		displayPeriods = options.aggregation === 'day' ? 30 : 
+			options.aggregation === 'week' ? 5 : 2;
 	}
 
 	// Initialize display periods with 0 counts

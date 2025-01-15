@@ -1,4 +1,7 @@
 {
+	"activity": {
+		"message": "النشاط"
+	},
 	"addModel": {
 		"message": "+ إضافة نموذج"
 	},
@@ -25,6 +28,9 @@
 	},
 	"allProperties": {
 		"message": "جميع الخصائص"
+	},
+	"allTime": {
+		"message": "كل الوقت"
 	},
 	"alwaysShowHighlights": {
 		"message": "إظهار التظليلات دائماً"
@@ -55,6 +61,15 @@
 	},
 	"behaviorWarning": {
 		"message": "الإضافة إلى ملاحظة موجودة أو ملاحظة يومية تتطلب أوبسيديان 1.7.2 أو أحدث."
+	},
+	"byDay": {
+		"message": "أيام"
+	},
+	"byMonth": {
+		"message": "أشهر"
+	},
+	"byWeek": {
+		"message": "أسابيع"
 	},
 	"cancel": {
 		"message": "إلغاء"
@@ -319,6 +334,9 @@
 	"highlighterSettings": {
 		"message": "المظلل"
 	},
+	"history": {
+		"message": "التاريخ"
+	},
 	"hotkeys": {
 		"message": "اختصارات لوحة المفاتيح"
 	},
@@ -388,6 +406,12 @@
 	},
 	"languageDescription": {
 		"message": "اختر لغة العرض لواجهة الإضافة."
+	},
+	"last30Days": {
+		"message": "الـ 30 يومًا الماضية"
+	},
+	"last7Days": {
+		"message": "الـ 7 أيام الماضية"
 	},
 	"lastUsed": {
 		"message": "آخر استخدام"

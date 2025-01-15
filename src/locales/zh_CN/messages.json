@@ -1,4 +1,7 @@
 {
+	"activity": {
+		"message": "活动"
+	},
 	"addModel": {
 		"message": "+ 添加模型"
 	},
@@ -25,6 +28,9 @@
 	},
 	"allProperties": {
 		"message": "所有属性"
+	},
+	"allTime": {
+		"message": "全部时间"
 	},
 	"alwaysShowHighlights": {
 		"message": "始终显示高亮"
@@ -55,6 +61,15 @@
 	},
 	"behaviorWarning": {
 		"message": "添加到现有笔记或日记需要 Obsidian 1.7.2 或更高版本。"
+	},
+	"byDay": {
+		"message": "天"
+	},
+	"byMonth": {
+		"message": "月"
+	},
+	"byWeek": {
+		"message": "周"
 	},
 	"cancel": {
 		"message": "取消"
@@ -319,6 +334,9 @@
 	"highlighterSettings": {
 		"message": "高亮"
 	},
+	"history": {
+		"message": "历史"
+	},
 	"hotkeys": {
 		"message": "快捷键"
 	},
@@ -388,6 +406,12 @@
 	},
 	"languageDescription": {
 		"message": "选择扩展界面的显示语言。"
+	},
+	"last30Days": {
+		"message": "过去30天"
+	},
+	"last7Days": {
+		"message": "过去7天"
 	},
 	"lastUsed": {
 		"message": "最近使用"

@@ -1,4 +1,7 @@
 {
+	"activity": {
+		"message": "Активность"
+	},
 	"addModel": {
 		"message": "+ Добавить модель"
 	},
@@ -25,6 +28,9 @@
 	},
 	"allProperties": {
 		"message": "Все свойства"
+	},
+	"allTime": {
+		"message": "Все время"
 	},
 	"alwaysShowHighlights": {
 		"message": "Всегда показывать выделение маркером"
@@ -55,6 +61,15 @@
 	},
 	"behaviorWarning": {
 		"message": "Для добавления в существующую заметку или ежедневную заметку требуется Obsidian 1.7.2 или более поздняя версия."
+	},
+	"byDay": {
+		"message": "Дни"
+	},
+	"byMonth": {
+		"message": "Месяцы"
+	},
+	"byWeek": {
+		"message": "Недели"
 	},
 	"cancel": {
 		"message": "Отмена"
@@ -319,6 +334,9 @@
 	"highlighterSettings": {
 		"message": "Маркер"
 	},
+	"history": {
+		"message": "История"
+	},
 	"hotkeys": {
 		"message": "Горячие клавиши"
 	},
@@ -388,6 +406,12 @@
 	},
 	"languageDescription": {
 		"message": "Выберите язык отображения интерфейса расширения."
+	},
+	"last30Days": {
+		"message": "Последние 30 дней"
+	},
+	"last7Days": {
+		"message": "Последние 7 дней"
 	},
 	"lastUsed": {
 		"message": "Последнее использованное"

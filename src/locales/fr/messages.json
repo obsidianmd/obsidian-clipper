@@ -1,4 +1,7 @@
 {
+	"activity": {
+		"message": "Activité"
+	},
 	"addModel": {
 		"message": "+ Ajouter un modèle"
 	},
@@ -25,6 +28,9 @@
 	},
 	"allProperties": {
 		"message": "Toutes les propriétés"
+	},
+	"allTime": {
+		"message": "Tout le temps"
 	},
 	"alwaysShowHighlights": {
 		"message": "Toujours afficher les surlignages"
@@ -55,6 +61,15 @@
 	},
 	"behaviorWarning": {
 		"message": "L'ajout à une note existante ou à la note quotidienne nécessite Obsidian 1.7.2 ou ultérieur."
+	},
+	"byDay": {
+		"message": "Jours"
+	},
+	"byMonth": {
+		"message": "Mois"
+	},
+	"byWeek": {
+		"message": "Semaines"
 	},
 	"cancel": {
 		"message": "Annuler"
@@ -319,6 +334,9 @@
 	"highlighterSettings": {
 		"message": "Surligneur"
 	},
+	"history": {
+		"message": "Historique"
+	},
 	"hotkeys": {
 		"message": "Raccourcis clavier"
 	},
@@ -388,6 +406,12 @@
 	},
 	"languageDescription": {
 		"message": "Choisissez la langue d'affichage de l'interface de l'extension."
+	},
+	"last30Days": {
+		"message": "30 derniers jours"
+	},
+	"last7Days": {
+		"message": "7 derniers jours"
 	},
 	"lastUsed": {
 		"message": "Dernière utilisation"

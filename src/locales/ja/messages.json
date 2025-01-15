@@ -1,4 +1,7 @@
 {
+	"activity": {
+		"message": "アクティビティ"
+	},
 	"addModel": {
 		"message": "+ モデルを追加"
 	},
@@ -25,6 +28,9 @@
 	},
 	"allProperties": {
 		"message": "すべてのプロパティ"
+	},
+	"allTime": {
+		"message": "全期間"
 	},
 	"alwaysShowHighlights": {
 		"message": "常にハイライトを表示"
@@ -55,6 +61,15 @@
 	},
 	"behaviorWarning": {
 		"message": "既存のノートやデイリーノートへの追加にはObsidian 1.7.2以降が必要です。"
+	},
+	"byDay": {
+		"message": "日別"
+	},
+	"byMonth": {
+		"message": "月別"
+	},
+	"byWeek": {
+		"message": "週別"
 	},
 	"cancel": {
 		"message": "キャンセル"
@@ -319,6 +334,9 @@
 	"highlighterSettings": {
 		"message": "ハイライト"
 	},
+	"history": {
+		"message": "履歴"
+	},
 	"hotkeys": {
 		"message": "ホットキー"
 	},
@@ -388,6 +406,12 @@
 	},
 	"languageDescription": {
 		"message": "拡張機能のインターフェース表示言語を選択します。"
+	},
+	"last30Days": {
+		"message": "過去30日間"
+	},
+	"last7Days": {
+		"message": "過去7日間"
 	},
 	"lastUsed": {
 		"message": "最後に使用"

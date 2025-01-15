@@ -1,4 +1,7 @@
 {
+	"activity": {
+		"message": "Activitat"
+	},
 	"addModel": {
 		"message": "+ Agregar model"
 	},
@@ -25,6 +28,9 @@
 	},
 	"allProperties": {
 		"message": "Totes les propietats"
+	},
+	"allTime": {
+		"message": "Tot el temps"
 	},
 	"alwaysShowHighlights": {
 		"message": "Mostrar sempre els ressaltats"
@@ -55,6 +61,15 @@
 	},
 	"behaviorWarning": {
 		"message": "Agregar a una nota existent o nota diària requereix Obsidian 1.7.2 o posterior."
+	},
+	"byDay": {
+		"message": "Dies"
+	},
+	"byMonth": {
+		"message": "Mesos"
+	},
+	"byWeek": {
+		"message": "Setmanes"
 	},
 	"cancel": {
 		"message": "Cancel·lar"
@@ -319,6 +334,9 @@
 	"highlighterSettings": {
 		"message": "Configuració del ressaltador"
 	},
+	"history": {
+		"message": "Històric"
+	},
 	"hotkeys": {
 		"message": "Dreceres de teclat"
 	},
@@ -388,6 +406,12 @@
 	},
 	"languageDescription": {
 		"message": "Esculli l'idioma de la interfície de l'extensió."
+	},
+	"last30Days": {
+		"message": "Últims 30 dies"
+	},
+	"last7Days": {
+		"message": "Últims 7 dies"
 	},
 	"lastUsed": {
 		"message": "Últim usat"
