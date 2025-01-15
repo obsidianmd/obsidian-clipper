@@ -24,6 +24,13 @@ function formatPeriodDate(date: dayjs.Dayjs, today: dayjs.Dayjs, options: ChartO
 	}
 }
 
+interface ChartPoint {
+	x: number;
+	y: number;
+	date: string;
+	count: number;
+}
+
 export async function createUsageChart(container: HTMLElement, data: WeeklyUsage[]): Promise<void> {
 	// Clear any existing content
 	container.innerHTML = '';
@@ -52,9 +59,11 @@ export async function createUsageChart(container: HTMLElement, data: WeeklyUsage
 	path.classList.add('chart-line-path');
 	
 	// Generate smooth curve path
-	const points = data.map((d, i) => ({
+	const points: ChartPoint[] = data.map((d, i) => ({
 		x: (i / (data.length - 1)) * viewBoxWidth,
-		y: chartHeight - ((d.count / maxCount) * chartHeight || 0)
+		y: chartHeight - ((d.count / maxCount) * chartHeight || 0),
+		date: d.period,
+		count: d.count
 	}));
 	
 	const pathData = points.reduce((acc, point, i, arr) => {
@@ -93,6 +102,44 @@ export async function createUsageChart(container: HTMLElement, data: WeeklyUsage
 	labelsContainer.appendChild(endLabel);
 	
 	chartContainer.appendChild(labelsContainer);
+	
+	// Create tooltip
+	const tooltip = document.createElement('div');
+	tooltip.className = 'chart-tooltip';
+	tooltip.style.display = 'none';
+	chartContainer.appendChild(tooltip);
+
+	// Add invisible overlay for mouse tracking
+	const overlay = document.createElement('div');
+	overlay.className = 'chart-overlay';
+	
+	// Handle mouse movement
+	overlay.addEventListener('mousemove', (e) => {
+		const rect = overlay.getBoundingClientRect();
+		const x = e.clientX - rect.left;
+		const relativeX = (x / rect.width) * viewBoxWidth;
+
+		// Find closest point
+		const closestPoint = points.reduce((prev, curr) => {
+			const prevDist = Math.abs(prev.x - relativeX);
+			const currDist = Math.abs(curr.x - relativeX);
+			return currDist < prevDist ? curr : prev;
+		});
+
+		// Position tooltip
+		const tooltipX = (closestPoint.x / viewBoxWidth) * rect.width;
+		tooltip.style.left = `${tooltipX}px`;
+		tooltip.style.top = `${(closestPoint.y / chartHeight) * rect.height}px`;
+		tooltip.innerHTML = `<div class="tooltip-date">${closestPoint.date}</div><div class="tooltip-count">${closestPoint.count}</div>`;
+		tooltip.style.display = 'flex';
+	});
+
+	overlay.addEventListener('mouseleave', () => {
+		tooltip.style.display = 'none';
+	});
+
+	chartContainer.appendChild(overlay);
+	
 	container.appendChild(chartContainer);
 }
 
