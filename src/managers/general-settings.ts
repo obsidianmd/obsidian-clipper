@@ -13,7 +13,7 @@ import { exportHighlights } from './highlights-manager';
 import { getMessage, setupLanguageAndDirection } from '../utils/i18n';
 import { debounce } from '../utils/debounce';
 import browser from '../utils/browser-polyfill';
-import { createUsageChart, aggregateUsageData } from '../utils/usage-chart';
+import { createUsageChart, aggregateUsageData } from '../utils/charts';
 import { getClipHistory } from '../utils/storage-utils';
 import dayjs from 'dayjs';
 import weekOfYear from 'dayjs/plugin/weekOfYear';
