@@ -128,7 +128,7 @@ pre, code {
 		.chart-line-path {
 			fill: none;
 			stroke: var(--interactive-accent);
-			stroke-width: 3;
+			stroke-width: 2.5;
 			vector-effect: non-scaling-stroke;
 		}
 		
@@ -140,7 +140,7 @@ pre, code {
 			display: flex;
 			justify-content: space-between;
 			color: var(--text-muted);
-			font-size: var(--font-ui-smaller);
+			font-size: 0.7rem;
 		}
 	}
 }
