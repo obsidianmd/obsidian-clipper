@@ -76,3 +76,86 @@ h4 {
 pre, code {
 	font-family: var(--font-monospace-default);
 }
+
+.usage-chart-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	margin-bottom: 1rem;
+
+	.usage-chart-title {
+		h3 {
+			margin-top: 0;
+			margin-bottom: 4px;
+			padding-bottom: 0;
+			border-bottom: none;
+		}
+
+		.setting-item-description {
+			margin-top: 0;
+		}
+	}
+
+	.usage-chart-controls {
+		padding-top: 4px;
+		display: flex;
+		gap: 8px;
+	}
+}
+
+.usage-chart {
+	margin: 0;
+	padding: 1rem 0 2rem;
+	border-bottom: 1px solid var(--background-modifier-border);
+	
+	.chart-label {
+		font-size: 0.8em;
+		color: var(--text-muted);
+		writing-mode: vertical-rl;
+		transform: rotate(180deg);
+		text-align: right;
+		height: 40px;
+		overflow: hidden;
+		display: none;
+	}
+	
+	.chart-count {
+		font-size: 0.8em;
+		color: var(--text-muted);
+		display: none;
+	}
+	
+	.chart-line {
+		position: relative;
+		display: flex;
+		align-items: flex-end;
+		gap: 4px;
+		height: 80px;
+		
+		svg {
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			pointer-events: none;
+			z-index: 1;
+			overflow: visible;
+			width: 100%;
+			height: 100%;
+		}
+		
+		.chart-line-path {
+			fill: none;
+			stroke: var(--interactive-accent);
+			stroke-width: 2px;
+			vector-effect: non-scaling-stroke;
+		}
+		
+		.chart-bar-container {
+			position: relative;
+			flex: 1;
+			height: 100%;
+		}
+	}
+}

@@ -386,6 +386,24 @@
 	"language": {
 		"message": "Language"
 	},
+	"last7Days": {
+		"message": "Last 7 days"
+	},
+	"last30Days": {
+		"message": "Last 30 days"
+	},
+	"allTime": {
+		"message": "All time"
+	},
+	"byDay": {
+		"message": "Days"
+	},
+	"byWeek": {
+		"message": "Weeks"
+	},
+	"byMonth": {
+		"message": "Months"
+	},
 	"languageDescription": {
 		"message": "Choose the display language for the extension interface."
 	},

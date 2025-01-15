@@ -13,6 +13,12 @@ import { exportHighlights } from './highlights-manager';
 import { getMessage, setupLanguageAndDirection } from '../utils/i18n';
 import { debounce } from '../utils/debounce';
 import browser from '../utils/browser-polyfill';
+import { createUsageChart, aggregateUsageData } from '../utils/usage-chart';
+import { getClipHistory } from '../utils/storage-utils';
+import dayjs from 'dayjs';
+import weekOfYear from 'dayjs/plugin/weekOfYear';
+
+dayjs.extend(weekOfYear);
 
 export function updateVaultList(): void {
 	const vaultList = document.getElementById('vault-list') as HTMLUListElement;
@@ -144,6 +150,7 @@ export function initializeGeneralSettings(): void {
 		initializeExportImportAllSettingsButtons();
 		initializeHighlighterSettings();
 		initializeExportHighlightsButton();
+		await initializeUsageChart();
 	});
 }
 
@@ -313,4 +320,34 @@ function initializeHighlighterSettings(): void {
 			saveSettings({ ...generalSettings, highlightBehavior: highlightBehaviorSelect.value });
 		});
 	}
+}
+
+async function initializeUsageChart(): Promise<void> {
+	const chartContainer = document.getElementById('usage-chart');
+	const periodSelect = document.getElementById('usage-period-select') as HTMLSelectElement;
+	const aggregationSelect = document.getElementById('usage-aggregation-select') as HTMLSelectElement;
+	if (!chartContainer || !periodSelect || !aggregationSelect) return;
+
+	const history = await getClipHistory();
+	
+	// Set default values
+	periodSelect.value = '30d';
+	aggregationSelect.value = 'day';
+	
+	const updateChart = () => {
+		const options = {
+			timeRange: periodSelect.value as '7d' | '30d' | 'all',
+			aggregation: aggregationSelect.value as 'day' | 'week' | 'month'
+		};
+		
+		const chartData = aggregateUsageData(history, options);
+		createUsageChart(chartContainer, chartData);
+	};
+
+	// Initialize with default selections
+	updateChart();
+
+	// Update when any selector changes
+	periodSelect.addEventListener('change', updateChart);
+	aggregationSelect.addEventListener('change', updateChart);
 }
