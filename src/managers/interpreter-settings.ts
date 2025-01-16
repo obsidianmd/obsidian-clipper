@@ -356,10 +356,11 @@ async function showProviderModal(provider: Provider, index?: number) {
 		const apiKeyInput = form.querySelector('[name="apiKey"]') as HTMLInputElement;
 		const presetSelect = form.querySelector('[name="preset"]') as HTMLSelectElement;
 		const nameContainer = nameInput.closest('.setting-item') as HTMLElement;
-		const apiKeyContainer = form.querySelector('.setting-item:has([name="apiKey"]) .setting-item-description') as HTMLElement;
+		const apiKeyContainer = apiKeyInput.closest('.setting-item') as HTMLElement;
+		const apiKeyDescription = form.querySelector('.setting-item:has([name="apiKey"]) .setting-item-description') as HTMLElement;
 
-		if (!apiKeyContainer) {
-			console.error('API key description container not found');
+		if (!apiKeyContainer || !apiKeyDescription) {
+			console.error('API key containers not found');
 			return;
 		}
 
@@ -380,28 +381,33 @@ async function showProviderModal(provider: Provider, index?: number) {
 				presetSelect.value = 'anthropic';
 			}
 
-			// Hide/show name field based on preset selection
-			const updateNameVisibility = () => {
+			// Hide/show name field and update API key visibility based on preset selection
+			const updateVisibility = () => {
 				nameContainer.style.display = presetSelect.value ? 'none' : 'block';
 				if (presetSelect.value) {
 					const selectedPreset = PRESET_PROVIDERS[presetSelect.value as keyof typeof PRESET_PROVIDERS];
 					nameInput.value = selectedPreset.name;
 					baseUrlInput.value = selectedPreset.baseUrl;
 
-					// Update API key link
-					if (selectedPreset.apiKeyUrl) {
+					// Show/hide API key field based on whether it's required
+					apiKeyContainer.style.display = selectedPreset.apiKeyRequired === false ? 'none' : 'block';
+
+					// Update API key link if available
+					if (selectedPreset.apiKeyRequired !== false && selectedPreset.apiKeyUrl) {
 						const message = getMessage('getApiKeyHere').replace('$1', selectedPreset.name);
-						apiKeyContainer.innerHTML = `${getMessage('providerApiKeyDescription')} <a href="${selectedPreset.apiKeyUrl}" target="_blank">${message}</a>`;
+						apiKeyDescription.innerHTML = `${getMessage('providerApiKeyDescription')} <a href="${selectedPreset.apiKeyUrl}" target="_blank">${message}</a>`;
 					} else {
-						apiKeyContainer.innerHTML = getMessage('providerApiKeyDescription');
+						apiKeyDescription.innerHTML = getMessage('providerApiKeyDescription');
 					}
 				} else {
-					apiKeyContainer.innerHTML = getMessage('providerApiKeyDescription');
+					// For custom providers, show API key field by default
+					apiKeyContainer.style.display = 'block';
+					apiKeyDescription.innerHTML = getMessage('providerApiKeyDescription');
 				}
 			};
 
-			presetSelect.addEventListener('change', updateNameVisibility);
-			updateNameVisibility(); // Initial visibility update
+			presetSelect.addEventListener('change', updateVisibility);
+			updateVisibility();
 			
 			// Only set these values if editing an existing provider
 			if (index !== undefined) {
