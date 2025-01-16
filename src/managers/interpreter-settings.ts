@@ -11,6 +11,7 @@ interface PresetProvider {
 	name: string;
 	baseUrl: string;
 	apiKeyUrl?: string;
+	apiKeyRequired?: boolean;
 	modelsList?: string;
 	popularModels?: Array<{
 		id: string;
@@ -25,6 +26,7 @@ const PRESET_PROVIDERS: Record<string, PresetProvider> = {
 		name: 'Anthropic',
 		baseUrl: 'https://api.anthropic.com/v1/messages',
 		apiKeyUrl: 'https://console.anthropic.com/settings/keys',
+		apiKeyRequired: true,
 		modelsList: 'https://docs.anthropic.com/en/docs/about-claude/models',
 		popularModels: [
 			{ id: 'claude-3-5-haiku-latest', name: 'Claude 3.5 Haiku', recommended: true },
@@ -36,6 +38,7 @@ const PRESET_PROVIDERS: Record<string, PresetProvider> = {
 		name: 'Azure OpenAI',
 		baseUrl: 'https://{resource-name}.openai.azure.com/openai/deployments/{deployment-id}/chat/completions?api-version=2024-10-21',
 		apiKeyUrl: 'https://oai.azure.com/portal/',
+		apiKeyRequired: true,
 		modelsList: 'https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models',
 		popularModels: [
 			{ id: 'gpt-4o-mini', name: 'GPT-4o Mini', recommended: true },
@@ -47,6 +50,7 @@ const PRESET_PROVIDERS: Record<string, PresetProvider> = {
 		name: 'DeepSeek',
 		baseUrl: 'https://api.deepseek.com/v1/chat/completions',
 		apiKeyUrl: 'https://platform.deepseek.com/api_keys',
+		apiKeyRequired: true,
 		modelsList: 'https://api-docs.deepseek.com/quick_start/pricing',
 		popularModels: [
 			{ id: 'deepseek-chat', name: 'DeepSeek Chat' }
@@ -57,6 +61,7 @@ const PRESET_PROVIDERS: Record<string, PresetProvider> = {
 		name: 'Google Gemini',
 		baseUrl: 'https://generativelanguage.googleapis.com/v1beta/chat/completions',
 		apiKeyUrl: 'https://aistudio.google.com/apikey',
+		apiKeyRequired: true,
 		modelsList: 'https://ai.google.dev/gemini-api/docs/models/gemini',
 		popularModels: [
 			{ id: 'gemini-2.0-flash-exp', name: 'Gemini 2.0 Flash', recommended: true },
@@ -67,12 +72,14 @@ const PRESET_PROVIDERS: Record<string, PresetProvider> = {
 		name: 'Hugging Face',
 		baseUrl: 'https://api-inference.huggingface.co/models/{model-id}/chat/completions',
 		apiKeyUrl: 'https://huggingface.co/settings/tokens',
+		apiKeyRequired: true,
 		modelsList: 'https://huggingface.co/models?pipeline_tag=text-generation&sort=trending'
 	},
 	ollama: {
 		id: 'ollama',
 		name: 'Ollama',
 		baseUrl: 'http://127.0.0.1:11434/api/chat',
+		apiKeyRequired: false,
 		modelsList: 'https://ollama.com/search',
 		popularModels: [
 			{ id: 'llama3.2:1b', name: 'Llama 3.2 1B' },
@@ -85,6 +92,7 @@ const PRESET_PROVIDERS: Record<string, PresetProvider> = {
 		name: 'OpenAI',
 		baseUrl: 'https://api.openai.com/v1/chat/completions',
 		apiKeyUrl: 'https://platform.openai.com/api-keys',
+		apiKeyRequired: true,
 		modelsList: 'https://platform.openai.com/docs/models',
 		popularModels: [
 			{ id: 'gpt-4o-mini', name: 'GPT-4o Mini', recommended: true },
@@ -96,6 +104,7 @@ const PRESET_PROVIDERS: Record<string, PresetProvider> = {
 		name: 'OpenRouter',
 		baseUrl: 'https://openrouter.ai/api/v1/chat/completions',
 		apiKeyUrl: 'https://openrouter.ai/settings/keys',
+		apiKeyRequired: true,
 		modelsList: 'https://openrouter.ai/models',
 		popularModels: [
 			{ id: 'meta-llama/llama-3.2-1b-instruct', name: 'Llama 3.2 1B Instruct' },
@@ -704,13 +713,33 @@ async function showModelModal(model: ModelConfig, index?: number) {
 		// Add new event listeners
 		newConfirmBtn.addEventListener('click', () => {
 			const formData = new FormData(form);
-			const updatedModel: ModelConfig = {
+			const modelSelection = form.querySelector('input[name="model-selection"]:checked') as HTMLInputElement;
+			
+			let updatedModel: ModelConfig = {
 				id: model.id,
 				providerId: formData.get('providerId') as string,
-				providerModelId: formData.get('providerModelId') as string,
-				name: formData.get('name') as string,
+				providerModelId: '',
+				name: '',
 				enabled: model.enabled
 			};
+
+			// If a popular model is selected, use those values
+			if (modelSelection && modelSelection.value !== 'other') {
+				const provider = generalSettings.providers.find(p => p.id === updatedModel.providerId);
+				const presetProvider = Object.values(PRESET_PROVIDERS).find(
+					preset => preset.name === provider?.name
+				);
+				const selectedModel = presetProvider?.popularModels?.find(m => m.id === modelSelection.value);
+				
+				if (selectedModel) {
+					updatedModel.name = selectedModel.name;
+					updatedModel.providerModelId = selectedModel.id;
+				}
+			} else {
+				// Use form values for custom model
+				updatedModel.name = formData.get('name') as string;
+				updatedModel.providerModelId = formData.get('providerModelId') as string;
+			}
 
 			if (!updatedModel.name || !updatedModel.providerId || !updatedModel.providerModelId) {
 				alert(getMessage('modelRequiredFields'));
