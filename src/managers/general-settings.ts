@@ -2,7 +2,7 @@ import { handleDragStart, handleDragOver, handleDrop, handleDragEnd } from '../u
 import { initializeIcons } from '../icons/icons';
 import { getCommands } from '../utils/hotkeys';
 import { initializeToggles, updateToggleState, initializeSettingToggle } from '../utils/ui-utils';
-import { generalSettings, loadSettings, saveSettings } from '../utils/storage-utils';
+import { generalSettings, loadSettings, saveSettings, setLocalStorage, getLocalStorage } from '../utils/storage-utils';
 import { detectBrowser } from '../utils/browser-detection';
 import { createElementWithClass, createElementWithHTML } from '../utils/dom-utils';
 import { createDefaultTemplate, getTemplates, saveTemplateSettings } from '../managers/template-manager';
@@ -376,16 +376,21 @@ async function initializeUsageChart(): Promise<void> {
 }
 
 async function handleRating(rating: number) {
-	// Save the rating
-	if (!generalSettings.ratings) {
-		generalSettings.ratings = [];
-	}
+	// Get existing ratings from storage
+	const existingRatings = await getLocalStorage('ratings') || [];
 	
-	generalSettings.ratings.push({
+	// Add new rating
+	const newRating = {
 		rating,
 		date: new Date().toISOString()
-	});
+	};
 	
+	// Update both storage and generalSettings
+	const updatedRatings = [...existingRatings, newRating];
+	generalSettings.ratings = updatedRatings;
+	
+	// Save to storage
+	await setLocalStorage('ratings', updatedRatings);
 	await saveSettings();
 
 	if (rating >= 4) {
