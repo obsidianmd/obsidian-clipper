@@ -206,6 +206,13 @@ function createProviderListItem(provider: Provider, index: number): HTMLElement 
 	providerItem.dataset.index = index.toString();
 	providerItem.dataset.providerId = provider.id;
 
+	// Find matching preset provider to check if API key is required
+	const presetProvider = Object.values(PRESET_PROVIDERS).find(
+		preset => preset.name === provider.name
+	);
+
+	const hasNoKey = presetProvider?.apiKeyRequired && !provider.apiKey;
+
 	providerItem.innerHTML = `
 		<div class="provider-list-item-info">
 			<div class="provider-name">
@@ -216,7 +223,7 @@ function createProviderListItem(provider: Provider, index: number): HTMLElement 
 					${provider.name}
 				</div>
 			</div>
-			${!provider.apiKey ? `<span class="provider-no-key"><i data-lucide="alert-triangle"></i> <span class="mh">${getMessage('apiKeyMissing')}</span></span>` : ''}
+			${hasNoKey ? `<span class="provider-no-key"><i data-lucide="alert-triangle"></i> <span class="mh">${getMessage('apiKeyMissing')}</span></span>` : ''}
 		</div>
 		<div class="provider-list-item-actions">
 			<button class="edit-provider-btn clickable-icon" data-provider-id="${provider.id}" aria-label="Edit provider">
