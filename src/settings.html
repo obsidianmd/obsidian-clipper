@@ -39,8 +39,44 @@
 						<div class="settings-section-header">
 							<h2 data-i18n="generalSettings">General settings</h2>
 						</div>
+						<div id="usage-chart-container">
+							<div class="usage-chart-header">
+								<div class="usage-chart-title">
+									<div data-i18n="activity">Activity</div>
+									<div class="setting-item-description"></div>
+								</div>
+								<div class="usage-chart-controls">
+									<select id="usage-period-select" class="dropdown">
+										<option value="30d" data-i18n="last30Days">Last 30 days</option>
+										<option value="all" data-i18n="allTime">All time</option>
+									</select>
+									<select id="usage-aggregation-select" class="dropdown">
+										<option value="day" selected data-i18n="byDay">Days</option>
+										<option value="week" data-i18n="byWeek">Weeks</option>
+									</select>
+								</div>
+							</div>
+							<div id="usage-chart" class="usage-chart"></div>
+						</div>
 						<form id="general-settings-form">
 							<div>
+								<div class="setting-item mod-horizontal is-hidden" id="rate-extension">
+									<div class="setting-item-info">
+										<label data-i18n="feedback">Feedback</label>
+										<div class="setting-item-description" data-i18n="rateExtensionDescription">
+											Are you enjoying Web Clipper? Help us by giving it a rating.
+										</div>
+									</div>
+									<div class="setting-item-control">
+										<div class="star-rating">
+											<span class="star" data-rating="1">★</span>
+											<span class="star" data-rating="2">★</span>
+											<span class="star" data-rating="3">★</span>
+											<span class="star" data-rating="4">★</span>
+											<span class="star" data-rating="5">★</span>
+										</div>
+									</div>
+								</div>
 								<div class="setting-item mod-horizontal">
 									<div class="setting-item-info">
 										<label for="language-select" data-i18n="language">Language</label>
@@ -52,7 +88,6 @@
 										<select id="language-select">
 											<option value="" data-i18n="systemDefault">System default</option>
 											<option value="en">English</option>
-											<option value="es">Español</option>
 										</select>
 									</div>
 								</div>
@@ -615,6 +650,24 @@
 				</div>
 			</div>
 		</div>
+
+		<div id="feedback-modal" class="modal-container">
+			<div class="modal-bg"></div>
+			<div class="modal">
+				<div class="modal-header">
+					<div class="modal-title" data-i18n="feedbackTitle">Thanks for your feedback</div>
+				</div>
+				<div class="modal-content">
+					<p data-i18n="feedbackDescription">How can we improve Web Clipper? Please visit our help page, where you can report bugs, suggest features, and get help with common issues.</p>
+				</div>
+				<div class="modal-button-container">
+					<a class="btn mod-cta" href="https://help.obsidian.md/web-clipper/troubleshoot" target="_blank" data-i18n="help">Help</a>
+					<button class="feedback-close-btn" data-i18n="close">Close</button>
+				</div>
+			</div>
+		</div>
+
+		
 
 		<script type="module" src="settings.js"></script>
 </body>

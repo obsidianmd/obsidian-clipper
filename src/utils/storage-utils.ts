@@ -1,8 +1,8 @@
 import browser from './browser-polyfill';
-import { Settings, ModelConfig, PropertyType, HistoryEntry, Provider } from '../types/types';
+import { Settings, ModelConfig, PropertyType, HistoryEntry, Provider, Rating } from '../types/types';
 import { debugLog } from './debug';
 
-export type { Settings, ModelConfig, PropertyType, HistoryEntry, Provider };
+export type { Settings, ModelConfig, PropertyType, HistoryEntry, Provider, Rating };
 
 export let generalSettings: Settings = {
 	vaults: [],
@@ -26,7 +26,8 @@ export let generalSettings: Settings = {
 		copyToClipboard: 0,
 		share: 0
 	},
-	history: []
+	history: [],
+	ratings: []
 };
 
 export function setLocalStorage(key: string, value: any): Promise<void> {
@@ -66,6 +67,7 @@ interface StorageData {
 		share: number;
 	};
 	history?: HistoryEntry[];
+	ratings?: Rating[];
 }
 
 interface LegacyModelConfig {
@@ -116,6 +118,7 @@ interface LegacyStorageData {
 	anthropicApiKey?: string;
 	openaiModel?: string;
 	migrationVersion?: number;
+	ratings?: Rating[];
 }
 
 const CURRENT_MIGRATION_VERSION = 1;
@@ -232,7 +235,8 @@ export async function loadSettings(): Promise<Settings> {
 			copyToClipboard: 0,
 			share: 0
 		},
-		history: []
+		history: [],
+		ratings: []
 	};
 
 	if (await needsMigration(data)) {
@@ -269,7 +273,8 @@ export async function loadSettings(): Promise<Settings> {
 		defaultPromptContext: data.interpreter_settings?.defaultPromptContext || defaultSettings.defaultPromptContext,
 		propertyTypes: data.property_types || defaultSettings.propertyTypes,
 		stats: data.stats || defaultSettings.stats,
-		history: data.history || defaultSettings.history
+		history: data.history || defaultSettings.history,
+		ratings: data.ratings || defaultSettings.ratings
 	};
 
 	generalSettings = loadedSettings;

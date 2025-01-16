@@ -1,4 +1,7 @@
 {
+	"activity": {
+		"message": "Aktywność"
+	},
 	"addModel": {
 		"message": "+ Dodaj model"
 	},
@@ -25,6 +28,9 @@
 	},
 	"allProperties": {
 		"message": "Wszystkie atrybuty"
+	},
+	"allTime": {
+		"message": "Cały czas"
 	},
 	"alwaysShowHighlights": {
 		"message": "Zawsze pokazuj wyróżnienia"
@@ -55,6 +61,15 @@
 	},
 	"behaviorWarning": {
 		"message": "Aby zapisać w istniejącej lub codziennej notatce wymagany jest Obsidian w wersji 1.7.2 lub nowszej."
+	},
+	"byDay": {
+		"message": "Dni"
+	},
+	"byMonth": {
+		"message": "Miesiące"
+	},
+	"byWeek": {
+		"message": "Tygodnie"
 	},
 	"cancel": {
 		"message": "Anuluj"
@@ -289,6 +304,15 @@
 	"failedToSaveProvider": {
 		"message": "Nie udało się zapisać operatora. Spróbuj ponownie."
 	},
+	"feedback": {
+		"message": "Opinia"
+	},
+	"feedbackDescription": {
+		"message": "Jak możemy poprawić Web Clipper? Odwiedź naszą stronę pomocy, gdzie możesz zgłaszać błędy, proponować funkcje i uzyskać pomoc w rozwiązywaniu typowych problemów."
+	},
+	"feedbackTitle": {
+		"message": "Dziękujemy za Twoją opinię"
+	},
 	"folder": {
 		"message": "Folder"
 	},
@@ -318,6 +342,9 @@
 	},
 	"highlighterSettings": {
 		"message": "Zakreślacz"
+	},
+	"history": {
+		"message": "Historia"
 	},
 	"hotkeys": {
 		"message": "Skróty klawiszowe"
@@ -388,6 +415,9 @@
 	},
 	"languageDescription": {
 		"message": "Wybierz język interfejsu rozszerzenia."
+	},
+	"last30Days": {
+		"message": "Ostatnie 30 dni"
 	},
 	"lastUsed": {
 		"message": "Ostatnio używane"
@@ -490,6 +520,12 @@
 	"pageVariables": {
 		"message": "Zmienne strony"
 	},
+	"pagesSaved": {
+		"message": "strona zapisana"
+	},
+	"pagesSavedPlural": {
+		"message": "strony zapisane"
+	},
 	"pasteJsonHere": {
 		"message": "Wklej JSON tutaj"
 	},
@@ -564,6 +600,9 @@
 	},
 	"providers": {
 		"message": "Operatorzy"
+	},
+	"rateExtensionDescription": {
+		"message": "Czy podoba Ci się Web Clipper? Pomóż nam, oceniając go."
 	},
 	"recommended": {
 		"message": "rekomendowane"

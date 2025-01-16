@@ -1,4 +1,7 @@
 {
+	"activity": {
+		"message": "Aktivitas"
+	},
 	"addModel": {
 		"message": "+ Tambah model"
 	},
@@ -25,6 +28,9 @@
 	},
 	"allProperties": {
 		"message": "Semua properti"
+	},
+	"allTime": {
+		"message": "Sepanjang waktu"
 	},
 	"alwaysShowHighlights": {
 		"message": "Selalu tampilkan sorotan"
@@ -55,6 +61,15 @@
 	},
 	"behaviorWarning": {
 		"message": "Perlu Obsidian 1.7.2 atau yang lebih baru untuk dapat menambahkan ke catatan yang telah ada atau catatan harian."
+	},
+	"byDay": {
+		"message": "Hari"
+	},
+	"byMonth": {
+		"message": "Bulan"
+	},
+	"byWeek": {
+		"message": "Minggu"
 	},
 	"cancel": {
 		"message": "Batal"
@@ -289,6 +304,15 @@
 	"failedToSaveProvider": {
 		"message": "Gagal menyimpan penyedia. Silakan coba lagi."
 	},
+	"feedback": {
+		"message": "Umpan balik"
+	},
+	"feedbackDescription": {
+		"message": "Bagaimana kami bisa meningkatkan Web Clipper? Silakan kunjungi halaman bantuan kami, di mana Anda dapat melaporkan bug, menyarankan fitur, dan mendapatkan bantuan dengan masalah umum."
+	},
+	"feedbackTitle": {
+		"message": "Terima kasih atas umpan balik Anda"
+	},
 	"folder": {
 		"message": "Folder"
 	},
@@ -318,6 +342,9 @@
 	},
 	"highlighterSettings": {
 		"message": "Penyorot"
+	},
+	"history": {
+		"message": "Riwayat"
 	},
 	"hotkeys": {
 		"message": "Tombol pintas"
@@ -388,6 +415,9 @@
 	},
 	"languageDescription": {
 		"message": "Pilih bahasa tampilan untuk antarmuka ekstensi."
+	},
+	"last30Days": {
+		"message": "30 hari terakhir"
 	},
 	"lastUsed": {
 		"message": "Terakhir digunakan"
@@ -490,6 +520,12 @@
 	"pageVariables": {
 		"message": "Variabel laman web"
 	},
+	"pagesSaved": {
+		"message": "halaman tersimpan"
+	},
+	"pagesSavedPlural": {
+		"message": "halaman-halaman tersimpan"
+	},
 	"pasteJsonHere": {
 		"message": "Tempel JSON di sini"
 	},
@@ -564,6 +600,9 @@
 	},
 	"providers": {
 		"message": "Penyedia"
+	},
+	"rateExtensionDescription": {
+		"message": "Apakah Anda menikmati Web Clipper? Bantu kami dengan memberikan penilaian."
 	},
 	"recommended": {
 		"message": "direkomendasikan"

@@ -1,4 +1,7 @@
 {
+	"activity": {
+		"message": "गतिविधि"
+	},
 	"addModel": {
 		"message": "+ Model jodein"
 	},
@@ -25,6 +28,9 @@
 	},
 	"allProperties": {
 		"message": "Sabhi properties"
+	},
+	"allTime": {
+		"message": "सभी समय"
 	},
 	"alwaysShowHighlights": {
 		"message": "Hamesha highlights dikhayein"
@@ -55,6 +61,15 @@
 	},
 	"behaviorWarning": {
 		"message": "Maujuda note ya daily note mein jodne ke liye Obsidian 1.7.2 ya usse naya version chahiye."
+	},
+	"byDay": {
+		"message": "दिनों"
+	},
+	"byMonth": {
+		"message": "महीनों"
+	},
+	"byWeek": {
+		"message": "सप्ताहों"
 	},
 	"cancel": {
 		"message": "Cancel"
@@ -289,6 +304,15 @@
 	"failedToSaveProvider": {
 		"message": "Provider save karne mein fail. Kripya dobara koshish karein."
 	},
+	"feedback": {
+		"message": "प्रतिक्रिया"
+	},
+	"feedbackDescription": {
+		"message": "हम वेब क्लिपर को कैसे सुधार सकते हैं? कृपया हमारे सहायता पृष्ठ पर जाएं, जहां आप बग्स की रिपोर्ट कर सकते हैं, सुविधाओं का सुझाव दे सकते हैं, और सामान्य समस्याओं की सहायता प्राप्त कर सकते हैं।"
+	},
+	"feedbackTitle": {
+		"message": "आपकी प्रतिक्रिया के लिए धन्यवाद"
+	},
 	"folder": {
 		"message": "Folder"
 	},
@@ -318,6 +342,9 @@
 	},
 	"highlighterSettings": {
 		"message": "Highlighter"
+	},
+	"history": {
+		"message": "इतिहास"
 	},
 	"hotkeys": {
 		"message": "Hotkeys"
@@ -388,6 +415,9 @@
 	},
 	"languageDescription": {
 		"message": "Extension interface ke liye display language chunein."
+	},
+	"last30Days": {
+		"message": "अंतिम 30 दिन"
 	},
 	"lastUsed": {
 		"message": "Last used"
@@ -490,6 +520,12 @@
 	"pageVariables": {
 		"message": "Page variables"
 	},
+	"pagesSaved": {
+		"message": "पृष्ठ सहेजा गया"
+	},
+	"pagesSavedPlural": {
+		"message": "पृष्ठ सहेजे गए"
+	},
 	"pasteJsonHere": {
 		"message": "JSON yahan paste karein"
 	},
@@ -564,6 +600,9 @@
 	},
 	"providers": {
 		"message": "Providers"
+	},
+	"rateExtensionDescription": {
+		"message": "क्या आप वेब क्लिपर का आनंद ले रहे हैं? हमारी मदद करें इसे रेटिंग देकर।"
 	},
 	"recommended": {
 		"message": "सिफारिश की गई"

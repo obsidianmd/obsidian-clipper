@@ -1,4 +1,7 @@
 {
+	"activity": {
+		"message": "Aktivität"
+	},
 	"addModel": {
 		"message": "+ Modell hinzufügen"
 	},
@@ -25,6 +28,9 @@
 	},
 	"allProperties": {
 		"message": "Alle Eigenschaften"
+	},
+	"allTime": {
+		"message": "Gesamte Zeit"
 	},
 	"alwaysShowHighlights": {
 		"message": "Markierungen immer anzeigen"
@@ -55,6 +61,15 @@
 	},
 	"behaviorWarning": {
 		"message": "Das Hinzufügen zu einer bestehenden Notiz oder Tagesnotiz erfordert Obsidian 1.7.2 oder höher."
+	},
+	"byDay": {
+		"message": "Tage"
+	},
+	"byMonth": {
+		"message": "Monate"
+	},
+	"byWeek": {
+		"message": "Wochen"
 	},
 	"cancel": {
 		"message": "Abbrechen"
@@ -289,6 +304,15 @@
 	"failedToSaveProvider": {
 		"message": "Speichern des Anbieters fehlgeschlagen. Bitte versuche es erneut."
 	},
+	"feedback": {
+		"message": "Feedback"
+	},
+	"feedbackDescription": {
+		"message": "Wie können wir den Web Clipper verbessern? Bitte besuchen Sie unsere Hilfeseite, wo Sie Fehler melden, Funktionen vorschlagen und Hilfe bei häufigen Problemen erhalten können."
+	},
+	"feedbackTitle": {
+		"message": "Vielen Dank für Ihr Feedback"
+	},
 	"folder": {
 		"message": "Ordner"
 	},
@@ -318,6 +342,9 @@
 	},
 	"highlighterSettings": {
 		"message": "Marker"
+	},
+	"history": {
+		"message": "Verlauf"
 	},
 	"hotkeys": {
 		"message": "Tastenkombinationen"
@@ -388,6 +415,9 @@
 	},
 	"languageDescription": {
 		"message": "Wähle die Anzeigesprache für die Erweiterungsoberfläche."
+	},
+	"last30Days": {
+		"message": "Letzte 30 Tage"
 	},
 	"lastUsed": {
 		"message": "Zuletzt verwendet"
@@ -490,6 +520,12 @@
 	"pageVariables": {
 		"message": "Seitenvariablen"
 	},
+	"pagesSaved": {
+		"message": "Seite gespeichert"
+	},
+	"pagesSavedPlural": {
+		"message": "Seiten gespeichert"
+	},
 	"pasteJsonHere": {
 		"message": "Füge hier JSON ein"
 	},
@@ -564,6 +600,9 @@
 	},
 	"providers": {
 		"message": "Anbieter"
+	},
+	"rateExtensionDescription": {
+		"message": "Gefällt Ihnen der Web Clipper? Helfen Sie uns, indem Sie ihm eine Bewertung geben."
 	},
 	"recommended": {
 		"message": "empfohlen"

@@ -1,4 +1,7 @@
 {
+	"activity": {
+		"message": "ক্রিয়াকলাপ"
+	},
 	"addModel": {
 		"message": "+ মডেল যোগ করুন"
 	},
@@ -25,6 +28,9 @@
 	},
 	"allProperties": {
 		"message": "সমস্ত প্রপার্টি"
+	},
+	"allTime": {
+		"message": "সমস্ত সময়"
 	},
 	"alwaysShowHighlights": {
 		"message": "সবসময় হাইলাইট দেখান"
@@ -55,6 +61,15 @@
 	},
 	"behaviorWarning": {
 		"message": "বিদ্যমান নোট বা ডেইলি নোটে যোগ করতে হলে Obsidian 1.7.2 বা তার পরের সংস্করণ প্রয়োজন।"
+	},
+	"byDay": {
+		"message": "দিন"
+	},
+	"byMonth": {
+		"message": "মাস"
+	},
+	"byWeek": {
+		"message": "সপ্তাহ"
 	},
 	"cancel": {
 		"message": "বাতিল করুন"
@@ -289,6 +304,15 @@
 	"failedToSaveProvider": {
 		"message": "প্রোভাইডার সংরক্ষণ করতে ব্যর্থ হয়েছে। দয়া করে আবার চেষ্টা করুন।"
 	},
+	"feedback": {
+		"message": "মতামত"
+	},
+	"feedbackDescription": {
+		"message": "আমরা ওয়েব ক্লিপার কীভাবে উন্নত করতে পারি? দয়া করে আমাদের সাহায্য পৃষ্ঠায় যান, যেখানে আপনি বাগ রিপোর্ট করতে, বৈশিষ্ট্য প্রস্তাব করতে এবং সাধারণ সমস্যাগুলির সাহায্য পেতে পারেন।"
+	},
+	"feedbackTitle": {
+		"message": "আপনার মতামতের জন্য ধন্যবাদ"
+	},
 	"folder": {
 		"message": "ফোল্ডার"
 	},
@@ -318,6 +342,9 @@
 	},
 	"highlighterSettings": {
 		"message": "হাইলাইটার"
+	},
+	"history": {
+		"message": "ইতিহাস"
 	},
 	"hotkeys": {
 		"message": "হটকি"
@@ -388,6 +415,9 @@
 	},
 	"languageDescription": {
 		"message": "এক্সটেনশনের ইন্টারফেসের ভাষা নির্বাচন করুন।"
+	},
+	"last30Days": {
+		"message": "গত ৩০ দিন"
 	},
 	"lastUsed": {
 		"message": "শেষ ব্যবহৃত"
@@ -490,6 +520,12 @@
 	"pageVariables": {
 		"message": "পেজের ভেরিয়েবলসমূহ"
 	},
+	"pagesSaved": {
+		"message": "পৃষ্ঠা সংরক্ষিত হয়েছে"
+	},
+	"pagesSavedPlural": {
+		"message": "পৃষ্ঠাগুলি সংরক্ষিত হয়েছে"
+	},
 	"pasteJsonHere": {
 		"message": "এখানে JSON পেস্ট করুন"
 	},
@@ -564,6 +600,9 @@
 	},
 	"providers": {
 		"message": "প্রোভাইডারস"
+	},
+	"rateExtensionDescription": {
+		"message": "আপনি কি ওয়েব ক্লিপার উপভোগ করছেন? এটি একটি রেটিং দিয়ে আমাদের সাহায্য করুন।"
 	},
 	"recommended": {
 		"message": "প্রস্তাবিত"

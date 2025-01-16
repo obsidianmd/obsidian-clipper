@@ -1,4 +1,7 @@
 {
+	"activity": {
+		"message": "Activiteit"
+	},
 	"addModel": {
 		"message": "+ Model toevoegen"
 	},
@@ -25,6 +28,9 @@
 	},
 	"allProperties": {
 		"message": "Alle eigenschappen"
+	},
+	"allTime": {
+		"message": "Alle tijd"
 	},
 	"alwaysShowHighlights": {
 		"message": "Markeringen altijd tonen"
@@ -55,6 +61,15 @@
 	},
 	"behaviorWarning": {
 		"message": "Toevoegen aan een bestaande notitie of dagelijkse notitie vereist Obsidian 1.7.2 of hoger."
+	},
+	"byDay": {
+		"message": "Dagen"
+	},
+	"byMonth": {
+		"message": "Maanden"
+	},
+	"byWeek": {
+		"message": "Weken"
 	},
 	"cancel": {
 		"message": "Annuleren"
@@ -289,6 +304,15 @@
 	"failedToSaveProvider": {
 		"message": "Provider opslaan mislukt. Probeer het opnieuw."
 	},
+	"feedback": {
+		"message": "Feedback"
+	},
+	"feedbackDescription": {
+		"message": "Hoe kunnen we Web Clipper verbeteren? Bezoek alstublieft onze hulppagina, waar u bugs kunt melden, functies kunt voorstellen en hulp kunt krijgen bij veelvoorkomende problemen."
+	},
+	"feedbackTitle": {
+		"message": "Bedankt voor uw feedback"
+	},
 	"folder": {
 		"message": "Map"
 	},
@@ -318,6 +342,9 @@
 	},
 	"highlighterSettings": {
 		"message": "Markeerder"
+	},
+	"history": {
+		"message": "Geschiedenis"
 	},
 	"hotkeys": {
 		"message": "Sneltoetsen"
@@ -388,6 +415,9 @@
 	},
 	"languageDescription": {
 		"message": "Kies de weergavetaal voor de extensie-interface."
+	},
+	"last30Days": {
+		"message": "Laatste 30 dagen"
 	},
 	"lastUsed": {
 		"message": "Laatst gebruikt"
@@ -490,6 +520,12 @@
 	"pageVariables": {
 		"message": "Paginavariabelen"
 	},
+	"pagesSaved": {
+		"message": "pagina opgeslagen"
+	},
+	"pagesSavedPlural": {
+		"message": "pagina's opgeslagen"
+	},
 	"pasteJsonHere": {
 		"message": "Plak JSON hier"
 	},
@@ -564,6 +600,9 @@
 	},
 	"providers": {
 		"message": "Providers"
+	},
+	"rateExtensionDescription": {
+		"message": "Geniet u van Web Clipper? Help ons door het een beoordeling te geven."
 	},
 	"recommended": {
 		"message": "aanbevolen"

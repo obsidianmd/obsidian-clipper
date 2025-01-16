@@ -43,6 +43,11 @@ export interface Provider {
 	apiKey: string;
 }
 
+export interface Rating {
+	rating: number;
+	date: string;
+}
+
 export interface Settings {
 	vaults: string[];
 	showMoreActionsButton: boolean;
@@ -66,6 +71,7 @@ export interface Settings {
 		share: number;
 	};
 	history: HistoryEntry[];
+	ratings: Rating[];
 }
 
 export interface ModelConfig {

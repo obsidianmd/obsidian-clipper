@@ -1,4 +1,7 @@
 {
+	"activity": {
+		"message": "Aktivite"
+	},
 	"addModel": {
 		"message": "+ Model ekle"
 	},
@@ -25,6 +28,9 @@
 	},
 	"allProperties": {
 		"message": "Tüm özellikler"
+	},
+	"allTime": {
+		"message": "Tüm zamanlar"
 	},
 	"alwaysShowHighlights": {
 		"message": "Vurguları her zaman göster"
@@ -55,6 +61,15 @@
 	},
 	"behaviorWarning": {
 		"message": "Mevcut nota veya günlük nota ekleme için Obsidian 1.7.2 veya daha yeni sürüm gereklidir."
+	},
+	"byDay": {
+		"message": "Günler"
+	},
+	"byMonth": {
+		"message": "Aylar"
+	},
+	"byWeek": {
+		"message": "Haftalar"
 	},
 	"cancel": {
 		"message": "İptal"
@@ -289,6 +304,15 @@
 	"failedToSaveProvider": {
 		"message": "Sağlayıcı kaydedilemedi. Lütfen tekrar deneyin."
 	},
+	"feedback": {
+		"message": "Geri bildirim"
+	},
+	"feedbackDescription": {
+		"message": "Web Clipper'ı nasıl geliştirebiliriz? Lütfen yardım sayfamızı ziyaret edin, burada hataları bildirebilir, özellikler önerabilir ve yaygın sorunlarla ilgili yardım alabilirsiniz."
+	},
+	"feedbackTitle": {
+		"message": "Geri bildiriminiz için teşekkür ederiz"
+	},
 	"folder": {
 		"message": "Klasör"
 	},
@@ -318,6 +342,9 @@
 	},
 	"highlighterSettings": {
 		"message": "Vurgulayıcı"
+	},
+	"history": {
+		"message": "Geçmiş"
 	},
 	"hotkeys": {
 		"message": "Kısayol tuşları"
@@ -388,6 +415,9 @@
 	},
 	"languageDescription": {
 		"message": "Uzantı arayüzü için görüntüleme dilini seçin."
+	},
+	"last30Days": {
+		"message": "Son 30 gün"
 	},
 	"lastUsed": {
 		"message": "Son kullanılan"
@@ -490,6 +520,12 @@
 	"pageVariables": {
 		"message": "Sayfa değişkenleri"
 	},
+	"pagesSaved": {
+		"message": "sayfa kaydedildi"
+	},
+	"pagesSavedPlural": {
+		"message": "sayfalar kaydedildi"
+	},
 	"pasteJsonHere": {
 		"message": "JSON'u buraya yapıştırın"
 	},
@@ -564,6 +600,9 @@
 	},
 	"providers": {
 		"message": "Sağlayıcılar"
+	},
+	"rateExtensionDescription": {
+		"message": "Web Clipper'ı beğeniyor musunuz? Bize bir puan vererek yardımcı olun."
 	},
 	"recommended": {
 		"message": "önerilen"

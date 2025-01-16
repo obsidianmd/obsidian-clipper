@@ -1,4 +1,7 @@
 {
+	"activity": {
+		"message": "Activité"
+	},
 	"addModel": {
 		"message": "+ Ajouter un modèle"
 	},
@@ -25,6 +28,9 @@
 	},
 	"allProperties": {
 		"message": "Toutes les propriétés"
+	},
+	"allTime": {
+		"message": "Tout le temps"
 	},
 	"alwaysShowHighlights": {
 		"message": "Toujours afficher les surlignages"
@@ -55,6 +61,15 @@
 	},
 	"behaviorWarning": {
 		"message": "L'ajout à une note existante ou à la note quotidienne nécessite Obsidian 1.7.2 ou ultérieur."
+	},
+	"byDay": {
+		"message": "Jours"
+	},
+	"byMonth": {
+		"message": "Mois"
+	},
+	"byWeek": {
+		"message": "Semaines"
 	},
 	"cancel": {
 		"message": "Annuler"
@@ -289,6 +304,15 @@
 	"failedToSaveProvider": {
 		"message": "Échec de l'enregistrement du fournisseur. Veuillez réessayer."
 	},
+	"feedback": {
+		"message": "Retour d'information"
+	},
+	"feedbackDescription": {
+		"message": "Comment pouvons-nous améliorer Web Clipper? Veuillez visiter notre page d'aide, où vous pouvez signaler des bugs, suggérer des fonctionnalités et obtenir de l'aide pour les problèmes courants."
+	},
+	"feedbackTitle": {
+		"message": "Merci pour votre retour"
+	},
 	"folder": {
 		"message": "Dossier"
 	},
@@ -318,6 +342,9 @@
 	},
 	"highlighterSettings": {
 		"message": "Surligneur"
+	},
+	"history": {
+		"message": "Historique"
 	},
 	"hotkeys": {
 		"message": "Raccourcis clavier"
@@ -388,6 +415,9 @@
 	},
 	"languageDescription": {
 		"message": "Choisissez la langue d'affichage de l'interface de l'extension."
+	},
+	"last30Days": {
+		"message": "30 derniers jours"
 	},
 	"lastUsed": {
 		"message": "Dernière utilisation"
@@ -490,6 +520,12 @@
 	"pageVariables": {
 		"message": "Variables de page"
 	},
+	"pagesSaved": {
+		"message": "page sauvegardée"
+	},
+	"pagesSavedPlural": {
+		"message": "pages sauvegardées"
+	},
 	"pasteJsonHere": {
 		"message": "Collez le JSON ici"
 	},
@@ -564,6 +600,9 @@
 	},
 	"providers": {
 		"message": "Fournisseurs"
+	},
+	"rateExtensionDescription": {
+		"message": "Appréciez-vous Web Clipper? Aidez-nous en lui donnant une note."
 	},
 	"recommended": {
 		"message": "recommandé"

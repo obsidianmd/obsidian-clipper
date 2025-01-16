@@ -1,4 +1,7 @@
 {
+	"activity": {
+		"message": "アクティビティ"
+	},
 	"addModel": {
 		"message": "+ モデルを追加"
 	},
@@ -25,6 +28,9 @@
 	},
 	"allProperties": {
 		"message": "すべてのプロパティ"
+	},
+	"allTime": {
+		"message": "全期間"
 	},
 	"alwaysShowHighlights": {
 		"message": "常にハイライトを表示"
@@ -55,6 +61,15 @@
 	},
 	"behaviorWarning": {
 		"message": "既存のノートやデイリーノートへの追加にはObsidian 1.7.2以降が必要です。"
+	},
+	"byDay": {
+		"message": "日別"
+	},
+	"byMonth": {
+		"message": "月別"
+	},
+	"byWeek": {
+		"message": "週別"
 	},
 	"cancel": {
 		"message": "キャンセル"
@@ -289,6 +304,15 @@
 	"failedToSaveProvider": {
 		"message": "\"プロバイダーの保存に失敗しました。もう一度お試しください。\""
 	},
+	"feedback": {
+		"message": "フィードバック"
+	},
+	"feedbackDescription": {
+		"message": "Web Clipperをどのように改善できるでしょうか？バグを報告したり、機能を提案したり、一般的な問題に対するヘルプを得るために、ヘルプページをご覧ください。"
+	},
+	"feedbackTitle": {
+		"message": "フィードバックありがとうございます"
+	},
 	"folder": {
 		"message": "フォルダ"
 	},
@@ -318,6 +342,9 @@
 	},
 	"highlighterSettings": {
 		"message": "ハイライト"
+	},
+	"history": {
+		"message": "履歴"
 	},
 	"hotkeys": {
 		"message": "ホットキー"
@@ -388,6 +415,9 @@
 	},
 	"languageDescription": {
 		"message": "拡張機能のインターフェース表示言語を選択します。"
+	},
+	"last30Days": {
+		"message": "過去30日間"
 	},
 	"lastUsed": {
 		"message": "最後に使用"
@@ -490,6 +520,12 @@
 	"pageVariables": {
 		"message": "ページ変数"
 	},
+	"pagesSaved": {
+		"message": "ページが保存されました"
+	},
+	"pagesSavedPlural": {
+		"message": "ページが保存されました"
+	},
 	"pasteJsonHere": {
 		"message": "ここにJSONを貼り付けてください"
 	},
@@ -564,6 +600,9 @@
 	},
 	"providers": {
 		"message": "プロバイダー"
+	},
+	"rateExtensionDescription": {
+		"message": "Web Clipperを楽しんでいますか？評価をつけることで私たちを支えてください。"
 	},
 	"recommended": {
 		"message": "推奨"

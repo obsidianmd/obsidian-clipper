@@ -1,4 +1,7 @@
 {
+	"activity": {
+		"message": "Activitat"
+	},
 	"addModel": {
 		"message": "+ Agregar model"
 	},
@@ -25,6 +28,9 @@
 	},
 	"allProperties": {
 		"message": "Totes les propietats"
+	},
+	"allTime": {
+		"message": "Tot el temps"
 	},
 	"alwaysShowHighlights": {
 		"message": "Mostrar sempre els ressaltats"
@@ -55,6 +61,15 @@
 	},
 	"behaviorWarning": {
 		"message": "Agregar a una nota existent o nota diària requereix Obsidian 1.7.2 o posterior."
+	},
+	"byDay": {
+		"message": "Dies"
+	},
+	"byMonth": {
+		"message": "Mesos"
+	},
+	"byWeek": {
+		"message": "Setmanes"
 	},
 	"cancel": {
 		"message": "Cancel·lar"
@@ -289,6 +304,15 @@
 	"failedToSaveProvider": {
 		"message": "Error en guardar el proveïdor. Si us plau, torni-ho a intentar."
 	},
+	"feedback": {
+		"message": "Comentaris"
+	},
+	"feedbackDescription": {
+		"message": "Com podem millorar Web Clipper? Si us plau, visita la nostra pàgina d'ajuda, on pots informar de bugs, suggerir funcionalitats i obtenir ajuda amb problemes comuns."
+	},
+	"feedbackTitle": {
+		"message": "Gràcies pels teus comentaris"
+	},
 	"folder": {
 		"message": "Carpeta"
 	},
@@ -318,6 +342,9 @@
 	},
 	"highlighterSettings": {
 		"message": "Configuració del ressaltador"
+	},
+	"history": {
+		"message": "Històric"
 	},
 	"hotkeys": {
 		"message": "Dreceres de teclat"
@@ -388,6 +415,9 @@
 	},
 	"languageDescription": {
 		"message": "Esculli l'idioma de la interfície de l'extensió."
+	},
+	"last30Days": {
+		"message": "Últims 30 dies"
 	},
 	"lastUsed": {
 		"message": "Últim usat"
@@ -490,6 +520,12 @@
 	"pageVariables": {
 		"message": "Variables de pàgina"
 	},
+	"pagesSaved": {
+		"message": "pàgina desada"
+	},
+	"pagesSavedPlural": {
+		"message": "pàgines desades"
+	},
 	"pasteJsonHere": {
 		"message": "Enganxi el JSON aquí"
 	},
@@ -564,6 +600,9 @@
 	},
 	"providers": {
 		"message": "Proveïdors"
+	},
+	"rateExtensionDescription": {
+		"message": "T'està agradant Web Clipper? Ajuda'ns donant-li una valoració."
 	},
 	"recommended": {
 		"message": "recomanat"

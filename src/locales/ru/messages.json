@@ -1,4 +1,7 @@
 {
+	"activity": {
+		"message": "Активность"
+	},
 	"addModel": {
 		"message": "+ Добавить модель"
 	},
@@ -25,6 +28,9 @@
 	},
 	"allProperties": {
 		"message": "Все свойства"
+	},
+	"allTime": {
+		"message": "Все время"
 	},
 	"alwaysShowHighlights": {
 		"message": "Всегда показывать выделение маркером"
@@ -55,6 +61,15 @@
 	},
 	"behaviorWarning": {
 		"message": "Для добавления в существующую заметку или ежедневную заметку требуется Obsidian 1.7.2 или более поздняя версия."
+	},
+	"byDay": {
+		"message": "Дни"
+	},
+	"byMonth": {
+		"message": "Месяцы"
+	},
+	"byWeek": {
+		"message": "Недели"
 	},
 	"cancel": {
 		"message": "Отмена"
@@ -289,6 +304,15 @@
 	"failedToSaveProvider": {
 		"message": "Не удалось сохранить провайдера. Пожалуйста, попробуйте снова."
 	},
+	"feedback": {
+		"message": "Обратная связь"
+	},
+	"feedbackDescription": {
+		"message": "Как мы можем улучшить Web Clipper? Пожалуйста, посетите нашу страницу помощи, где вы можете сообщить о багах, предложить функции и получить помощь по распространенным проблемам."
+	},
+	"feedbackTitle": {
+		"message": "Спасибо за ваш отзыв"
+	},
 	"folder": {
 		"message": "Папка"
 	},
@@ -318,6 +342,9 @@
 	},
 	"highlighterSettings": {
 		"message": "Маркер"
+	},
+	"history": {
+		"message": "История"
 	},
 	"hotkeys": {
 		"message": "Горячие клавиши"
@@ -388,6 +415,9 @@
 	},
 	"languageDescription": {
 		"message": "Выберите язык отображения интерфейса расширения."
+	},
+	"last30Days": {
+		"message": "Последние 30 дней"
 	},
 	"lastUsed": {
 		"message": "Последнее использованное"
@@ -490,6 +520,12 @@
 	"pageVariables": {
 		"message": "Переменные страницы"
 	},
+	"pagesSaved": {
+		"message": "страница сохранена"
+	},
+	"pagesSavedPlural": {
+		"message": "страницы сохранены"
+	},
 	"pasteJsonHere": {
 		"message": "Вставьте JSON здесь"
 	},
@@ -564,6 +600,9 @@
 	},
 	"providers": {
 		"message": "Провайдеры"
+	},
+	"rateExtensionDescription": {
+		"message": "Вам нравится Web Clipper? Помогите нам, оценив его."
 	},
 	"recommended": {
 		"message": "рекомендуется"
