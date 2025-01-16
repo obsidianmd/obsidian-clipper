@@ -144,18 +144,17 @@ export function initializeGeneralSettings(): void {
 		// Add version check initialization
 		await initializeVersionDisplay();
 
-		// Get clip history and ratings to check conditions
+		// Get clip history and ratings
 		const history = await getClipHistory();
 		const totalClips = history.length;
 		const existingRatings = await getLocalStorage('ratings') || [];
 
-		// Show rating section only if conditions are met
+		// Show rating section only total clips >= 20 and no previous ratings
 		const rateExtensionSection = document.getElementById('rate-extension');
 		if (rateExtensionSection && totalClips >= 20 && existingRatings.length === 0) {
 			rateExtensionSection.classList.remove('is-hidden');
 		}
 
-		// Initialize star rating if visible and no previous rating
 		if (totalClips >= 20 && existingRatings.length === 0) {
 			const starRating = document.querySelector('.star-rating');
 			if (starRating) {

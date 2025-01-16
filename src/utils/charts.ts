@@ -47,14 +47,12 @@ export async function createUsageChart(container: HTMLElement, data: WeeklyUsage
 		usageContainer.style.display = 'block';
 	}
 
-	// Update the description text with localized strings
 	const description = document.querySelector('.usage-chart-title .setting-item-description');
 	if (description) {
 		const message = totalClips === 1 ? getMessage('pagesSaved') : getMessage('pagesSavedPlural');
 		description.textContent = `${totalClips} ${message}`;
 	}
 
-	// Clear any existing content
 	container.innerHTML = '';
 	container.classList.add('usage-chart');
 
@@ -84,7 +82,7 @@ export async function createUsageChart(container: HTMLElement, data: WeeklyUsage
 	verticalLine.style.display = 'none';
 	svg.appendChild(verticalLine);
 	
-	// Create path for the chart line (add this second)
+	// Create path for the chart line
 	const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
 	path.classList.add('chart-line-path');
 	
@@ -115,17 +113,15 @@ export async function createUsageChart(container: HTMLElement, data: WeeklyUsage
 	svg.appendChild(path);
 	lineContainer.appendChild(svg);
 	
-	// Add date labels container
+	// Date labels
 	const labelsContainer = document.createElement('div');
 	labelsContainer.className = 'chart-labels';
-	
-	// Add start date
+
 	const startLabel = document.createElement('div');
 	startLabel.className = 'chart-date-label';
 	startLabel.textContent = data[0].period;
 	labelsContainer.appendChild(startLabel);
-	
-	// Add end date
+
 	const endLabel = document.createElement('div');
 	endLabel.className = 'chart-date-label';
 	endLabel.textContent = data[data.length - 1].period;
@@ -133,7 +129,7 @@ export async function createUsageChart(container: HTMLElement, data: WeeklyUsage
 	
 	lineContainer.appendChild(labelsContainer);
 	
-	// Create tooltip
+	// Tooltip
 	const tooltip = document.createElement('div');
 	tooltip.className = 'chart-tooltip';
 	tooltip.style.display = 'none';
@@ -170,7 +166,7 @@ export async function createUsageChart(container: HTMLElement, data: WeeklyUsage
 		tooltip.style.left = `${x}px`;
 		tooltip.style.top = `${e.clientY - rect.top - 30}px`;
 
-		// Update vertical line position immediately
+		// Update vertical line position
 		verticalLine.setAttribute('x1', relativeX.toString());
 		verticalLine.setAttribute('x2', relativeX.toString());
 		verticalLine.style.display = 'block';

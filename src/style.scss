@@ -78,31 +78,6 @@ pre, code {
 	font-family: var(--font-monospace-default);
 }
 
-.star-rating {
-	display: flex;
-	gap: 0px;
-	
-	.star {
-		color: var(--background-modifier-border);
-		cursor: pointer;
-		font-size: 24px;
-		user-select: none;
-		
-		&:hover,
-		&.is-active {
-			color: var(--star-color);
-		}
-		
-		&:hover ~ .star {
-			color: var(--background-modifier-border);
-		}
-	}
-	
-	&:hover .star {
-		color: var(--star-color);
-	}
-}
-
 .is-hidden {
 	display: none;
 }
