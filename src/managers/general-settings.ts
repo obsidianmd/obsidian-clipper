@@ -17,8 +17,16 @@ import { createUsageChart, aggregateUsageData } from '../utils/charts';
 import { getClipHistory } from '../utils/storage-utils';
 import dayjs from 'dayjs';
 import weekOfYear from 'dayjs/plugin/weekOfYear';
+import { showModal } from '../utils/modal-utils';
 
 dayjs.extend(weekOfYear);
+
+const STORE_URLS = {
+	chrome: 'https://chromewebstore.google.com/detail/obsidian-web-clipper/cnjifjpddelmedmihgijeibhnjfabmlf',
+	firefox: 'https://addons.mozilla.org/en-US/firefox/addon/web-clipper-obsidian/',
+	safari: 'https://apps.apple.com/us/app/obsidian-web-clipper/id6720708363',
+	edge: 'https://microsoftedge.microsoft.com/addons/detail/obsidian-web-clipper/eigdjhmgnaaeaonimdklocfekkaanfme'
+};
 
 export function updateVaultList(): void {
 	const vaultList = document.getElementById('vault-list') as HTMLUListElement;
@@ -151,6 +159,25 @@ export function initializeGeneralSettings(): void {
 		initializeHighlighterSettings();
 		initializeExportHighlightsButton();
 		await initializeUsageChart();
+
+		// Initialize star rating
+		const starRating = document.querySelector('.star-rating');
+		if (starRating) {
+			const stars = starRating.querySelectorAll('.star');
+			stars.forEach(star => {
+				star.addEventListener('click', async () => {
+					const rating = parseInt(star.getAttribute('data-rating') || '0');
+					stars.forEach(s => {
+						if (parseInt(s.getAttribute('data-rating') || '0') <= rating) {
+							s.classList.add('is-active');
+						} else {
+							s.classList.remove('is-active');
+						}
+					});
+					await handleRating(rating);
+				});
+			});
+		}
 	});
 }
 
@@ -346,4 +373,45 @@ async function initializeUsageChart(): Promise<void> {
 	// Update when any selector changes
 	periodSelect.addEventListener('change', updateChart);
 	aggregationSelect.addEventListener('change', updateChart);
+}
+
+async function handleRating(rating: number) {
+	// Save the rating
+	if (!generalSettings.ratings) {
+		generalSettings.ratings = [];
+	}
+	
+	generalSettings.ratings.push({
+		rating,
+		date: new Date().toISOString()
+	});
+	
+	await saveSettings();
+
+	if (rating >= 4) {
+		// Redirect to appropriate store
+		const browser = await detectBrowser();
+		let storeUrl = STORE_URLS.chrome; // Default to Chrome store
+
+		switch (browser) {
+			case 'firefox':
+			case 'firefox-mobile':
+				storeUrl = STORE_URLS.firefox;
+				break;
+			case 'safari':
+			case 'mobile-safari':
+			case 'ipad-os':
+				storeUrl = STORE_URLS.safari;
+				break;
+			case 'edge':
+				storeUrl = STORE_URLS.edge;
+				break;
+		}
+
+		window.open(storeUrl, '_blank');
+	} else {
+		// Show feedback modal for ratings < 4
+		const modal = document.getElementById('feedback-modal');
+		showModal(modal);
+	}
 }

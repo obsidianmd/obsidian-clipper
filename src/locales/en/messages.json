@@ -763,5 +763,17 @@
 	},
 	"version": {
 		"message": "Version"
+	},
+	"rateExtension": {
+		"message": "Rate the extension"
+	},
+	"rateExtensionDescription": {
+		"message": "Are you enjoying Web Clipper? Tap a star to rate the extension."
+	},
+	"feedbackTitle": {
+		"message": "Help us improve"
+	},
+	"feedbackDescription": {
+		"message": "We're sorry you're having issues with Web Clipper. Please visit our Troubleshooting page, where you can find answers to common issues and report bugs."
 	}
 }

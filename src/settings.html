@@ -62,6 +62,23 @@
 							<div>
 								<div class="setting-item mod-horizontal">
 									<div class="setting-item-info">
+										<label data-i18n="rateExtension">Rate the extension</label>
+										<div class="setting-item-description" data-i18n="rateExtensionDescription">
+											Are you enjoying Web Clipper? Tap a star to rate the extension.
+										</div>
+									</div>
+									<div class="setting-item-control">
+										<div class="star-rating">
+											<span class="star" data-rating="1">★</span>
+											<span class="star" data-rating="2">★</span>
+											<span class="star" data-rating="3">★</span>
+											<span class="star" data-rating="4">★</span>
+											<span class="star" data-rating="5">★</span>
+										</div>
+									</div>
+								</div>
+								<div class="setting-item mod-horizontal">
+									<div class="setting-item-info">
 										<label for="language-select" data-i18n="language">Language</label>
 										<div class="setting-item-description" data-i18n="languageDescription">
 											Choose the display language for the extension interface.
@@ -71,7 +88,6 @@
 										<select id="language-select">
 											<option value="" data-i18n="systemDefault">System default</option>
 											<option value="en">English</option>
-											<option value="es">Español</option>
 										</select>
 									</div>
 								</div>
@@ -634,6 +650,24 @@
 				</div>
 			</div>
 		</div>
+
+		<div id="feedback-modal" class="modal-container">
+			<div class="modal-bg"></div>
+			<div class="modal">
+				<div class="modal-header">
+					<div class="modal-title" data-i18n="feedbackTitle">Help us improve</div>
+				</div>
+				<div class="modal-content">
+					<p data-i18n="feedbackDescription">We're sorry you're having issues with Web Clipper. Please visit our Troubleshooting page, where you can find answers to common issues and report bugs.</p>
+				</div>
+				<div class="modal-button-container">
+					<button class="mod-cta" href="https://help.obsidian.md/web-clipper/troubleshoot" data-i18n="help">Troubleshooting</button>
+					<button onclick="document.getElementById('feedback-modal').style.display='none'" data-i18n="close">Close</button>
+				</div>
+			</div>
+		</div>
+
+		
 
 		<script type="module" src="settings.js"></script>
 </body>
