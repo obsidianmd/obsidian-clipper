@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import { HistoryEntry } from '../types/types';
+import { getMessage } from '../utils/i18n';
 
 interface WeeklyUsage {
 	period: string;
@@ -46,10 +47,11 @@ export async function createUsageChart(container: HTMLElement, data: WeeklyUsage
 		usageContainer.style.display = 'block';
 	}
 
-	// Update the description text
+	// Update the description text with localized strings
 	const description = document.querySelector('.usage-chart-title .setting-item-description');
 	if (description) {
-		description.textContent = `${totalClips} ${totalClips === 1 ? 'page' : 'pages'} saved`;
+		const message = totalClips === 1 ? getMessage('pagesSaved') : getMessage('pagesSavedPlural');
+		description.textContent = `${totalClips} ${message}`;
 	}
 
 	// Clear any existing content

@@ -17,7 +17,7 @@ import { createUsageChart, aggregateUsageData } from '../utils/charts';
 import { getClipHistory } from '../utils/storage-utils';
 import dayjs from 'dayjs';
 import weekOfYear from 'dayjs/plugin/weekOfYear';
-import { showModal } from '../utils/modal-utils';
+import { showModal, hideModal } from '../utils/modal-utils';
 
 dayjs.extend(weekOfYear);
 
@@ -144,6 +144,43 @@ export function initializeGeneralSettings(): void {
 		// Add version check initialization
 		await initializeVersionDisplay();
 
+		// Get clip history and ratings to check conditions
+		const history = await getClipHistory();
+		const totalClips = history.length;
+		const existingRatings = await getLocalStorage('ratings') || [];
+
+		// Show rating section only if conditions are met
+		const rateExtensionSection = document.getElementById('rate-extension');
+		if (rateExtensionSection && totalClips >= 20 && existingRatings.length === 0) {
+			rateExtensionSection.classList.remove('is-hidden');
+		}
+
+		// Initialize star rating if visible and no previous rating
+		if (totalClips >= 20 && existingRatings.length === 0) {
+			const starRating = document.querySelector('.star-rating');
+			if (starRating) {
+				const stars = starRating.querySelectorAll('.star');
+				stars.forEach(star => {
+					star.addEventListener('click', async () => {
+						const rating = parseInt(star.getAttribute('data-rating') || '0');
+						stars.forEach(s => {
+							if (parseInt(s.getAttribute('data-rating') || '0') <= rating) {
+								s.classList.add('is-active');
+							} else {
+								s.classList.remove('is-active');
+							}
+						});
+						await handleRating(rating);
+						
+						// Hide the rating section after rating
+						if (rateExtensionSection) {
+							rateExtensionSection.style.display = 'none';
+						}
+					});
+				});
+			}
+		}
+
 		updateVaultList();
 		initializeShowMoreActionsToggle();
 		initializeBetaFeaturesToggle();
@@ -160,23 +197,11 @@ export function initializeGeneralSettings(): void {
 		initializeExportHighlightsButton();
 		await initializeUsageChart();
 
-		// Initialize star rating
-		const starRating = document.querySelector('.star-rating');
-		if (starRating) {
-			const stars = starRating.querySelectorAll('.star');
-			stars.forEach(star => {
-				star.addEventListener('click', async () => {
-					const rating = parseInt(star.getAttribute('data-rating') || '0');
-					stars.forEach(s => {
-						if (parseInt(s.getAttribute('data-rating') || '0') <= rating) {
-							s.classList.add('is-active');
-						} else {
-							s.classList.remove('is-active');
-						}
-					});
-					await handleRating(rating);
-				});
-			});
+		// Initialize feedback modal close button
+		const feedbackModal = document.getElementById('feedback-modal');
+		const feedbackCloseBtn = feedbackModal?.querySelector('.feedback-close-btn');
+		if (feedbackCloseBtn) {
+			feedbackCloseBtn.addEventListener('click', () => hideModal(feedbackModal));
 		}
 	});
 }

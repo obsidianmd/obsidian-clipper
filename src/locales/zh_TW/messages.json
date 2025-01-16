@@ -304,6 +304,15 @@
 	"failedToSaveProvider": {
 		"message": "儲存提供者失敗。請再試一次。"
 	},
+	"feedback": {
+		"message": "反饋"
+	},
+	"feedbackDescription": {
+		"message": "我們如何改善Web Clipper？請訪問我們的幫助頁面，您可以在那裡報告錯誤，建議功能，並獲得常見問題的幫助。"
+	},
+	"feedbackTitle": {
+		"message": "感謝您的反饋"
+	},
 	"folder": {
 		"message": "資料夾"
 	},
@@ -410,9 +419,6 @@
 	"last30Days": {
 		"message": "過去30天"
 	},
-	"last7Days": {
-		"message": "過去7天"
-	},
 	"lastUsed": {
 		"message": "上次使用"
 	},
@@ -514,6 +520,12 @@
 	"pageVariables": {
 		"message": "頁面變數"
 	},
+	"pagesSaved": {
+		"message": "已保存頁面"
+	},
+	"pagesSavedPlural": {
+		"message": "已保存的頁面"
+	},
 	"pasteJsonHere": {
 		"message": "在此貼上 JSON"
 	},
@@ -588,6 +600,9 @@
 	},
 	"providers": {
 		"message": "提供者"
+	},
+	"rateExtensionDescription": {
+		"message": "您喜歡Web Clipper嗎？請幫助我們給它評分。"
 	},
 	"recommended": {
 		"message": "推薦"

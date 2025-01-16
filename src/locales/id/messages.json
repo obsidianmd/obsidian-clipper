@@ -304,6 +304,15 @@
 	"failedToSaveProvider": {
 		"message": "Gagal menyimpan penyedia. Silakan coba lagi."
 	},
+	"feedback": {
+		"message": "Umpan balik"
+	},
+	"feedbackDescription": {
+		"message": "Bagaimana kami bisa meningkatkan Web Clipper? Silakan kunjungi halaman bantuan kami, di mana Anda dapat melaporkan bug, menyarankan fitur, dan mendapatkan bantuan dengan masalah umum."
+	},
+	"feedbackTitle": {
+		"message": "Terima kasih atas umpan balik Anda"
+	},
 	"folder": {
 		"message": "Folder"
 	},
@@ -410,9 +419,6 @@
 	"last30Days": {
 		"message": "30 hari terakhir"
 	},
-	"last7Days": {
-		"message": "7 hari terakhir"
-	},
 	"lastUsed": {
 		"message": "Terakhir digunakan"
 	},
@@ -514,6 +520,12 @@
 	"pageVariables": {
 		"message": "Variabel laman web"
 	},
+	"pagesSaved": {
+		"message": "halaman tersimpan"
+	},
+	"pagesSavedPlural": {
+		"message": "halaman-halaman tersimpan"
+	},
 	"pasteJsonHere": {
 		"message": "Tempel JSON di sini"
 	},
@@ -588,6 +600,9 @@
 	},
 	"providers": {
 		"message": "Penyedia"
+	},
+	"rateExtensionDescription": {
+		"message": "Apakah Anda menikmati Web Clipper? Bantu kami dengan memberikan penilaian."
 	},
 	"recommended": {
 		"message": "direkomendasikan"

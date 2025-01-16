@@ -60,11 +60,11 @@
 						</div>
 						<form id="general-settings-form">
 							<div>
-								<div class="setting-item mod-horizontal">
+								<div class="setting-item mod-horizontal is-hidden" id="rate-extension">
 									<div class="setting-item-info">
-										<label data-i18n="rateExtension">Rate the extension</label>
+										<label data-i18n="feedback">Feedback</label>
 										<div class="setting-item-description" data-i18n="rateExtensionDescription">
-											Are you enjoying Web Clipper? Tap a star to rate the extension.
+											Are you enjoying Web Clipper? Help us by giving it a rating.
 										</div>
 									</div>
 									<div class="setting-item-control">
@@ -655,14 +655,14 @@
 			<div class="modal-bg"></div>
 			<div class="modal">
 				<div class="modal-header">
-					<div class="modal-title" data-i18n="feedbackTitle">Help us improve</div>
+					<div class="modal-title" data-i18n="feedbackTitle">Thanks for your feedback</div>
 				</div>
 				<div class="modal-content">
-					<p data-i18n="feedbackDescription">We're sorry you're having issues with Web Clipper. Please visit our Troubleshooting page, where you can find answers to common issues and report bugs.</p>
+					<p data-i18n="feedbackDescription">How can we improve Web Clipper? Please visit our help page, where you can report bugs, suggest features, and get help with common issues.</p>
 				</div>
 				<div class="modal-button-container">
-					<button class="mod-cta" href="https://help.obsidian.md/web-clipper/troubleshoot" data-i18n="help">Troubleshooting</button>
-					<button onclick="document.getElementById('feedback-modal').style.display='none'" data-i18n="close">Close</button>
+					<a class="btn mod-cta" href="https://help.obsidian.md/web-clipper/troubleshoot" target="_blank" data-i18n="help">Help</a>
+					<button class="feedback-close-btn" data-i18n="close">Close</button>
 				</div>
 			</div>
 		</div>

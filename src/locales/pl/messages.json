@@ -304,6 +304,15 @@
 	"failedToSaveProvider": {
 		"message": "Nie udało się zapisać operatora. Spróbuj ponownie."
 	},
+	"feedback": {
+		"message": "Opinia"
+	},
+	"feedbackDescription": {
+		"message": "Jak możemy poprawić Web Clipper? Odwiedź naszą stronę pomocy, gdzie możesz zgłaszać błędy, proponować funkcje i uzyskać pomoc w rozwiązywaniu typowych problemów."
+	},
+	"feedbackTitle": {
+		"message": "Dziękujemy za Twoją opinię"
+	},
 	"folder": {
 		"message": "Folder"
 	},
@@ -410,9 +419,6 @@
 	"last30Days": {
 		"message": "Ostatnie 30 dni"
 	},
-	"last7Days": {
-		"message": "Ostatnie 7 dni"
-	},
 	"lastUsed": {
 		"message": "Ostatnio używane"
 	},
@@ -514,6 +520,12 @@
 	"pageVariables": {
 		"message": "Zmienne strony"
 	},
+	"pagesSaved": {
+		"message": "strona zapisana"
+	},
+	"pagesSavedPlural": {
+		"message": "strony zapisane"
+	},
 	"pasteJsonHere": {
 		"message": "Wklej JSON tutaj"
 	},
@@ -588,6 +600,9 @@
 	},
 	"providers": {
 		"message": "Operatorzy"
+	},
+	"rateExtensionDescription": {
+		"message": "Czy podoba Ci się Web Clipper? Pomóż nam, oceniając go."
 	},
 	"recommended": {
 		"message": "rekomendowane"

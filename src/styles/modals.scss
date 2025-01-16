@@ -65,7 +65,8 @@
 	gap: 0.5rem;
 	flex-wrap: wrap;
 	font-size: var(--font-ui-medium);
-	button {
+	button,
+	.btn {
 		width: auto;
 	}
 }

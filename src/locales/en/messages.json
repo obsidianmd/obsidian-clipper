@@ -304,6 +304,15 @@
 	"failedToSaveProvider": {
 		"message": "Failed to save provider. Please try again."
 	},
+	"feedback": {
+		"message": "Feedback"
+	},
+	"feedbackDescription": {
+		"message": "How can we improve Web Clipper? Please visit our help page, where you can report bugs, suggest features, and get help with common issues."
+	},
+	"feedbackTitle": {
+		"message": "Thanks for your feedback"
+	},
 	"folder": {
 		"message": "Folder"
 	},
@@ -511,6 +520,12 @@
 	"pageVariables": {
 		"message": "Page variables"
 	},
+	"pagesSaved": {
+		"message": "page saved"
+	},
+	"pagesSavedPlural": {
+		"message": "pages saved"
+	},
 	"pasteJsonHere": {
 		"message": "Paste JSON here"
 	},
@@ -585,6 +600,9 @@
 	},
 	"providers": {
 		"message": "Providers"
+	},
+	"rateExtensionDescription": {
+		"message": "Are you enjoying Web Clipper? Help us by giving it a rating."
 	},
 	"recommended": {
 		"message": "recommended"
@@ -763,17 +781,5 @@
 	},
 	"version": {
 		"message": "Version"
-	},
-	"rateExtension": {
-		"message": "Rate the extension"
-	},
-	"rateExtensionDescription": {
-		"message": "Are you enjoying Web Clipper? Tap a star to rate the extension."
-	},
-	"feedbackTitle": {
-		"message": "Help us improve"
-	},
-	"feedbackDescription": {
-		"message": "We're sorry you're having issues with Web Clipper. Please visit our Troubleshooting page, where you can find answers to common issues and report bugs."
 	}
 }

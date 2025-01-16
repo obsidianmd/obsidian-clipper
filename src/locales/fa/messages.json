@@ -304,6 +304,15 @@
 	"failedToSaveProvider": {
 		"message": "ذخیره سازی ارائه دهنده با شکست مواجه شد. لطفا دوباره تلاش کنید."
 	},
+	"feedback": {
+		"message": "بازخورد"
+	},
+	"feedbackDescription": {
+		"message": "چگونه می توانیم وب کلیپر را بهبود بخشیم؟ لطفا به صفحه کمک ما مراجعه کنید، که در آن می توانید اشکالات را گزارش دهید، ویژگی ها را پیشنهاد دهید و کمک در مورد مسائل رایج دریافت کنید."
+	},
+	"feedbackTitle": {
+		"message": "با تشکر از بازخورد شما"
+	},
 	"folder": {
 		"message": "پوشه"
 	},
@@ -410,9 +419,6 @@
 	"last30Days": {
 		"message": "30 روز گذشته"
 	},
-	"last7Days": {
-		"message": "7 روز گذشته"
-	},
 	"lastUsed": {
 		"message": "آخرین استفاده"
 	},
@@ -514,6 +520,12 @@
 	"pageVariables": {
 		"message": "متغیرهای صفحه"
 	},
+	"pagesSaved": {
+		"message": "صفحه ذخیره شد"
+	},
+	"pagesSavedPlural": {
+		"message": "صفحات ذخیره شدند"
+	},
 	"pasteJsonHere": {
 		"message": "JSON را اینجا بچسبانید"
 	},
@@ -588,6 +600,9 @@
 	},
 	"providers": {
 		"message": "ارائه‌دهندگان"
+	},
+	"rateExtensionDescription": {
+		"message": "آیا از وب کلیپر لذت می برید؟ با ارزیابی آن به ما کمک کنید."
 	},
 	"recommended": {
 		"message": "توصیه شده"

@@ -304,6 +304,15 @@
 	"failedToSaveProvider": {
 		"message": "\"プロバイダーの保存に失敗しました。もう一度お試しください。\""
 	},
+	"feedback": {
+		"message": "フィードバック"
+	},
+	"feedbackDescription": {
+		"message": "Web Clipperをどのように改善できるでしょうか？バグを報告したり、機能を提案したり、一般的な問題に対するヘルプを得るために、ヘルプページをご覧ください。"
+	},
+	"feedbackTitle": {
+		"message": "フィードバックありがとうございます"
+	},
 	"folder": {
 		"message": "フォルダ"
 	},
@@ -410,9 +419,6 @@
 	"last30Days": {
 		"message": "過去30日間"
 	},
-	"last7Days": {
-		"message": "過去7日間"
-	},
 	"lastUsed": {
 		"message": "最後に使用"
 	},
@@ -514,6 +520,12 @@
 	"pageVariables": {
 		"message": "ページ変数"
 	},
+	"pagesSaved": {
+		"message": "ページが保存されました"
+	},
+	"pagesSavedPlural": {
+		"message": "ページが保存されました"
+	},
 	"pasteJsonHere": {
 		"message": "ここにJSONを貼り付けてください"
 	},
@@ -588,6 +600,9 @@
 	},
 	"providers": {
 		"message": "プロバイダー"
+	},
+	"rateExtensionDescription": {
+		"message": "Web Clipperを楽しんでいますか？評価をつけることで私たちを支えてください。"
 	},
 	"recommended": {
 		"message": "推奨"

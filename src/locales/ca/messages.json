@@ -304,6 +304,15 @@
 	"failedToSaveProvider": {
 		"message": "Error en guardar el proveïdor. Si us plau, torni-ho a intentar."
 	},
+	"feedback": {
+		"message": "Comentaris"
+	},
+	"feedbackDescription": {
+		"message": "Com podem millorar Web Clipper? Si us plau, visita la nostra pàgina d'ajuda, on pots informar de bugs, suggerir funcionalitats i obtenir ajuda amb problemes comuns."
+	},
+	"feedbackTitle": {
+		"message": "Gràcies pels teus comentaris"
+	},
 	"folder": {
 		"message": "Carpeta"
 	},
@@ -410,9 +419,6 @@
 	"last30Days": {
 		"message": "Últims 30 dies"
 	},
-	"last7Days": {
-		"message": "Últims 7 dies"
-	},
 	"lastUsed": {
 		"message": "Últim usat"
 	},
@@ -514,6 +520,12 @@
 	"pageVariables": {
 		"message": "Variables de pàgina"
 	},
+	"pagesSaved": {
+		"message": "pàgina desada"
+	},
+	"pagesSavedPlural": {
+		"message": "pàgines desades"
+	},
 	"pasteJsonHere": {
 		"message": "Enganxi el JSON aquí"
 	},
@@ -588,6 +600,9 @@
 	},
 	"providers": {
 		"message": "Proveïdors"
+	},
+	"rateExtensionDescription": {
+		"message": "T'està agradant Web Clipper? Ajuda'ns donant-li una valoració."
 	},
 	"recommended": {
 		"message": "recomanat"

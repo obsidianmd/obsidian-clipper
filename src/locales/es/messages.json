@@ -304,6 +304,15 @@
 	"failedToSaveProvider": {
 		"message": "Error al guardar el proveedor. Por favor, intente de nuevo."
 	},
+	"feedback": {
+		"message": "Comentarios"
+	},
+	"feedbackDescription": {
+		"message": "¿Cómo podemos mejorar Web Clipper? Por favor, visita nuestra página de ayuda, donde puedes reportar errores, sugerir características y obtener ayuda con problemas comunes."
+	},
+	"feedbackTitle": {
+		"message": "Gracias por tus comentarios"
+	},
 	"folder": {
 		"message": "Carpeta"
 	},
@@ -410,9 +419,6 @@
 	"last30Days": {
 		"message": "Últimos 30 días"
 	},
-	"last7Days": {
-		"message": "Últimos 7 días"
-	},
 	"lastUsed": {
 		"message": "Último usado"
 	},
@@ -514,6 +520,12 @@
 	"pageVariables": {
 		"message": "Variables de página"
 	},
+	"pagesSaved": {
+		"message": "página guardada"
+	},
+	"pagesSavedPlural": {
+		"message": "páginas guardadas"
+	},
 	"pasteJsonHere": {
 		"message": "Pegue el JSON aquí"
 	},
@@ -588,6 +600,9 @@
 	},
 	"providers": {
 		"message": "Proveedores"
+	},
+	"rateExtensionDescription": {
+		"message": "¿Estás disfrutando de Web Clipper? Ayúdanos dándole una calificación."
 	},
 	"recommended": {
 		"message": "recomendado"

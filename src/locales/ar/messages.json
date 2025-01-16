@@ -304,6 +304,15 @@
 	"failedToSaveProvider": {
 		"message": "فشل في حفظ المزود. يرجى المحاولة مرة أخرى."
 	},
+	"feedback": {
+		"message": "الملاحظات"
+	},
+	"feedbackDescription": {
+		"message": "كيف يمكننا تحسين Web Clipper؟ يرجى زيارة صفحة المساعدة الخاصة بنا، حيث يمكنك الإبلاغ عن الأخطاء، اقتراح الميزات، والحصول على المساعدة في المشكلات الشائعة."
+	},
+	"feedbackTitle": {
+		"message": "شكراً لملاحظاتك"
+	},
 	"folder": {
 		"message": "مجلد"
 	},
@@ -410,9 +419,6 @@
 	"last30Days": {
 		"message": "الـ 30 يومًا الماضية"
 	},
-	"last7Days": {
-		"message": "الـ 7 أيام الماضية"
-	},
 	"lastUsed": {
 		"message": "آخر استخدام"
 	},
@@ -514,6 +520,12 @@
 	"pageVariables": {
 		"message": "متغيرات الصفحة"
 	},
+	"pagesSaved": {
+		"message": "تم حفظ الصفحة"
+	},
+	"pagesSavedPlural": {
+		"message": "تم حفظ الصفحات"
+	},
 	"pasteJsonHere": {
 		"message": "الصق JSON هنا"
 	},
@@ -588,6 +600,9 @@
 	},
 	"providers": {
 		"message": "المزودون"
+	},
+	"rateExtensionDescription": {
+		"message": "هل تستمتع بـ Web Clipper؟ ساعدنا عن طريق تقييمه."
 	},
 	"recommended": {
 		"message": "موصى به"

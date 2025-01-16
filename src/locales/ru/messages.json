@@ -304,6 +304,15 @@
 	"failedToSaveProvider": {
 		"message": "Не удалось сохранить провайдера. Пожалуйста, попробуйте снова."
 	},
+	"feedback": {
+		"message": "Обратная связь"
+	},
+	"feedbackDescription": {
+		"message": "Как мы можем улучшить Web Clipper? Пожалуйста, посетите нашу страницу помощи, где вы можете сообщить о багах, предложить функции и получить помощь по распространенным проблемам."
+	},
+	"feedbackTitle": {
+		"message": "Спасибо за ваш отзыв"
+	},
 	"folder": {
 		"message": "Папка"
 	},
@@ -410,9 +419,6 @@
 	"last30Days": {
 		"message": "Последние 30 дней"
 	},
-	"last7Days": {
-		"message": "Последние 7 дней"
-	},
 	"lastUsed": {
 		"message": "Последнее использованное"
 	},
@@ -514,6 +520,12 @@
 	"pageVariables": {
 		"message": "Переменные страницы"
 	},
+	"pagesSaved": {
+		"message": "страница сохранена"
+	},
+	"pagesSavedPlural": {
+		"message": "страницы сохранены"
+	},
 	"pasteJsonHere": {
 		"message": "Вставьте JSON здесь"
 	},
@@ -588,6 +600,9 @@
 	},
 	"providers": {
 		"message": "Провайдеры"
+	},
+	"rateExtensionDescription": {
+		"message": "Вам нравится Web Clipper? Помогите нам, оценив его."
 	},
 	"recommended": {
 		"message": "рекомендуется"

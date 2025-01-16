@@ -304,6 +304,15 @@
 	"failedToSaveProvider": {
 		"message": "Provider opslaan mislukt. Probeer het opnieuw."
 	},
+	"feedback": {
+		"message": "Feedback"
+	},
+	"feedbackDescription": {
+		"message": "Hoe kunnen we Web Clipper verbeteren? Bezoek alstublieft onze hulppagina, waar u bugs kunt melden, functies kunt voorstellen en hulp kunt krijgen bij veelvoorkomende problemen."
+	},
+	"feedbackTitle": {
+		"message": "Bedankt voor uw feedback"
+	},
 	"folder": {
 		"message": "Map"
 	},
@@ -410,9 +419,6 @@
 	"last30Days": {
 		"message": "Laatste 30 dagen"
 	},
-	"last7Days": {
-		"message": "Laatste 7 dagen"
-	},
 	"lastUsed": {
 		"message": "Laatst gebruikt"
 	},
@@ -514,6 +520,12 @@
 	"pageVariables": {
 		"message": "Paginavariabelen"
 	},
+	"pagesSaved": {
+		"message": "pagina opgeslagen"
+	},
+	"pagesSavedPlural": {
+		"message": "pagina's opgeslagen"
+	},
 	"pasteJsonHere": {
 		"message": "Plak JSON hier"
 	},
@@ -588,6 +600,9 @@
 	},
 	"providers": {
 		"message": "Providers"
+	},
+	"rateExtensionDescription": {
+		"message": "Geniet u van Web Clipper? Help ons door het een beoordeling te geven."
 	},
 	"recommended": {
 		"message": "aanbevolen"

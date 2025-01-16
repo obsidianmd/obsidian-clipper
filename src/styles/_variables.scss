@@ -150,7 +150,7 @@
 	--toggle-thumb-height: 18px;
 	--toggle-thumb-width: 18px;
 
-	--star-color: var(--text-accent);
+	--star-color: var(--color-yellow);
 }
 
 @media (prefers-color-scheme: light) {
@@ -204,6 +204,9 @@
 		--color-orange-rgb: 236, 117, 0;
 		--color-red: #e93147;
 		--color-green: #08b94e;
+
+		--color-yellow-rgb: 224, 172, 0;
+		--color-yellow: #e0ac00;
 
 		--color-red-hsl: 353, 81%, 55%;
 		--color-green-hsl: 144, 92%, 38%;
@@ -293,6 +296,9 @@
 
 		--color-red-hsl: 358, 96%, 63%;
 		--color-green-hsl: 138, 59%, 54%;
+
+		--color-yellow-rgb: 224, 222, 113;
+		--color-yellow: #e0de71;
 
 		--interactive-accent: var(--color-accent);
 		--interactive-accent-hover: var(--color-accent-1);

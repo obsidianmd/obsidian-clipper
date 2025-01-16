@@ -304,6 +304,15 @@
 	"failedToSaveProvider": {
 		"message": "제공자 저장에 실패했습니다. 다시 시도해 주세요."
 	},
+	"feedback": {
+		"message": "피드백"
+	},
+	"feedbackDescription": {
+		"message": "웹 클리퍼를 어떻게 개선할 수 있을까요? 버그를 보고하고, 기능을 제안하고, 일반적인 문제를 해결하는 데 도움이 되는 도움말 페이지를 방문해 주세요."
+	},
+	"feedbackTitle": {
+		"message": "피드백 감사합니다"
+	},
 	"folder": {
 		"message": "Folder"
 	},
@@ -410,9 +419,6 @@
 	"last30Days": {
 		"message": "지난 30일"
 	},
-	"last7Days": {
-		"message": "지난 7일"
-	},
 	"lastUsed": {
 		"message": "마지막으로 사용된 보관소"
 	},
@@ -514,6 +520,12 @@
 	"pageVariables": {
 		"message": "페이지 변수"
 	},
+	"pagesSaved": {
+		"message": "페이지 저장됨"
+	},
+	"pagesSavedPlural": {
+		"message": "페이지들이 저장됨"
+	},
 	"pasteJsonHere": {
 		"message": "여기에 JSON을 붙여넣으세요"
 	},
@@ -588,6 +600,9 @@
 	},
 	"providers": {
 		"message": "제공자"
+	},
+	"rateExtensionDescription": {
+		"message": "웹 클리퍼를 즐기고 계신가요? 평가를 통해 우리를 도와주세요."
 	},
 	"recommended": {
 		"message": "추천"

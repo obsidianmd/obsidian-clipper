@@ -114,6 +114,29 @@ export function getMessage(messageName: string, substitutions?: string | string[
 		const messageObj = messages[messageName];
 
 		if (!messageObj) {
+			// If message not found in current language, try English
+			if (currentLanguage !== 'en') {
+				const enMessages = require('../locales/en/messages.json');
+				const enMessageObj = enMessages[messageName];
+				if (enMessageObj) {
+					let text = enMessageObj.message;
+					// Handle substitutions and placeholders for English fallback
+					if (substitutions) {
+						const subsArray = Array.isArray(substitutions) ? substitutions : [substitutions];
+						subsArray.forEach((sub, index) => {
+							text = text.replace(`$${index + 1}`, sub);
+						});
+					}
+					if (enMessageObj.placeholders) {
+						Object.entries(enMessageObj.placeholders).forEach(([key, value]) => {
+							const placeholder = `$${key}$`;
+							const content = (value as { content: string }).content;
+							text = text.replace(placeholder, content);
+						});
+					}
+					return text;
+				}
+			}
 			return browser.i18n.getMessage(messageName, substitutions) || messageName;
 		}
 

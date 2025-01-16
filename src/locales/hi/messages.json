@@ -304,6 +304,15 @@
 	"failedToSaveProvider": {
 		"message": "Provider save karne mein fail. Kripya dobara koshish karein."
 	},
+	"feedback": {
+		"message": "प्रतिक्रिया"
+	},
+	"feedbackDescription": {
+		"message": "हम वेब क्लिपर को कैसे सुधार सकते हैं? कृपया हमारे सहायता पृष्ठ पर जाएं, जहां आप बग्स की रिपोर्ट कर सकते हैं, सुविधाओं का सुझाव दे सकते हैं, और सामान्य समस्याओं की सहायता प्राप्त कर सकते हैं।"
+	},
+	"feedbackTitle": {
+		"message": "आपकी प्रतिक्रिया के लिए धन्यवाद"
+	},
 	"folder": {
 		"message": "Folder"
 	},
@@ -410,9 +419,6 @@
 	"last30Days": {
 		"message": "अंतिम 30 दिन"
 	},
-	"last7Days": {
-		"message": "अंतिम 7 दिन"
-	},
 	"lastUsed": {
 		"message": "Last used"
 	},
@@ -514,6 +520,12 @@
 	"pageVariables": {
 		"message": "Page variables"
 	},
+	"pagesSaved": {
+		"message": "पृष्ठ सहेजा गया"
+	},
+	"pagesSavedPlural": {
+		"message": "पृष्ठ सहेजे गए"
+	},
 	"pasteJsonHere": {
 		"message": "JSON yahan paste karein"
 	},
@@ -588,6 +600,9 @@
 	},
 	"providers": {
 		"message": "Providers"
+	},
+	"rateExtensionDescription": {
+		"message": "क्या आप वेब क्लिपर का आनंद ले रहे हैं? हमारी मदद करें इसे रेटिंग देकर।"
 	},
 	"recommended": {
 		"message": "सिफारिश की गई"

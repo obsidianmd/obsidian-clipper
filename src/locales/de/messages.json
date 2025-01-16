@@ -304,6 +304,15 @@
 	"failedToSaveProvider": {
 		"message": "Speichern des Anbieters fehlgeschlagen. Bitte versuche es erneut."
 	},
+	"feedback": {
+		"message": "Feedback"
+	},
+	"feedbackDescription": {
+		"message": "Wie können wir den Web Clipper verbessern? Bitte besuchen Sie unsere Hilfeseite, wo Sie Fehler melden, Funktionen vorschlagen und Hilfe bei häufigen Problemen erhalten können."
+	},
+	"feedbackTitle": {
+		"message": "Vielen Dank für Ihr Feedback"
+	},
 	"folder": {
 		"message": "Ordner"
 	},
@@ -410,9 +419,6 @@
 	"last30Days": {
 		"message": "Letzte 30 Tage"
 	},
-	"last7Days": {
-		"message": "Letzte 7 Tage"
-	},
 	"lastUsed": {
 		"message": "Zuletzt verwendet"
 	},
@@ -514,6 +520,12 @@
 	"pageVariables": {
 		"message": "Seitenvariablen"
 	},
+	"pagesSaved": {
+		"message": "Seite gespeichert"
+	},
+	"pagesSavedPlural": {
+		"message": "Seiten gespeichert"
+	},
 	"pasteJsonHere": {
 		"message": "Füge hier JSON ein"
 	},
@@ -588,6 +600,9 @@
 	},
 	"providers": {
 		"message": "Anbieter"
+	},
+	"rateExtensionDescription": {
+		"message": "Gefällt Ihnen der Web Clipper? Helfen Sie uns, indem Sie ihm eine Bewertung geben."
 	},
 	"recommended": {
 		"message": "empfohlen"

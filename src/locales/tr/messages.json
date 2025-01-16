@@ -304,6 +304,15 @@
 	"failedToSaveProvider": {
 		"message": "Sağlayıcı kaydedilemedi. Lütfen tekrar deneyin."
 	},
+	"feedback": {
+		"message": "Geri bildirim"
+	},
+	"feedbackDescription": {
+		"message": "Web Clipper'ı nasıl geliştirebiliriz? Lütfen yardım sayfamızı ziyaret edin, burada hataları bildirebilir, özellikler önerabilir ve yaygın sorunlarla ilgili yardım alabilirsiniz."
+	},
+	"feedbackTitle": {
+		"message": "Geri bildiriminiz için teşekkür ederiz"
+	},
 	"folder": {
 		"message": "Klasör"
 	},
@@ -410,9 +419,6 @@
 	"last30Days": {
 		"message": "Son 30 gün"
 	},
-	"last7Days": {
-		"message": "Son 7 gün"
-	},
 	"lastUsed": {
 		"message": "Son kullanılan"
 	},
@@ -514,6 +520,12 @@
 	"pageVariables": {
 		"message": "Sayfa değişkenleri"
 	},
+	"pagesSaved": {
+		"message": "sayfa kaydedildi"
+	},
+	"pagesSavedPlural": {
+		"message": "sayfalar kaydedildi"
+	},
 	"pasteJsonHere": {
 		"message": "JSON'u buraya yapıştırın"
 	},
@@ -588,6 +600,9 @@
 	},
 	"providers": {
 		"message": "Sağlayıcılar"
+	},
+	"rateExtensionDescription": {
+		"message": "Web Clipper'ı beğeniyor musunuz? Bize bir puan vererek yardımcı olun."
 	},
 	"recommended": {
 		"message": "önerilen"
