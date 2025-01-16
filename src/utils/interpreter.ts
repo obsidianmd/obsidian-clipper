@@ -152,6 +152,15 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 		if (!response.ok) {
 			const errorText = await response.text();
 			console.error(`${provider.name} error response:`, errorText);
+			
+			// Add specific message for Ollama 403 errors
+			if (provider.name.toLowerCase().includes('ollama') && response.status === 403) {
+				throw new Error(
+					`Ollama cannot process requests originating from a browser extension without setting OLLAMA_ORIGINS. ` +
+					`See instructions at https://help.obsidian.md/web-clipper/interpreter`
+				);
+			}
+			
 			throw new Error(`${provider.name} error: ${response.statusText} ${errorText}`);
 		}
 
