@@ -290,8 +290,9 @@ export function highlightElement(element: Element, notes?: string[]) {
 		type: isBlockElement ? 'element' : 'text', 
 		id: Date.now().toString(),
 		startOffset: 0,
-		endOffset: element.textContent?.length || 0
-	}, notes);
+		endOffset: element.textContent?.length || 0,
+		notes: notes || []
+	});
 }
 
 // Handle text selection for highlighting
@@ -318,7 +319,8 @@ function getHighlightRanges(range: Range): TextHighlightData[] {
 		type: 'text',
 		id: Date.now().toString(),
 		startOffset: getTextOffset(parentElement, range.startContainer, range.startOffset),
-		endOffset: getTextOffset(parentElement, range.endContainer, range.endOffset)
+		endOffset: getTextOffset(parentElement, range.endContainer, range.endOffset),
+		notes: []
 	});
 
 	return highlights;
@@ -518,7 +520,8 @@ function mergeHighlights(highlight1: AnyHighlightData, highlight2: AnyHighlightD
 			xpath: getElementXPath(mergedElement),
 			content: mergedElement.outerHTML,
 			type: 'complex',
-			id: Date.now().toString()
+			id: Date.now().toString(),
+			notes: [...(highlight1.notes || []), ...(highlight2.notes || [])]
 		};
 	}
 
@@ -531,7 +534,8 @@ function mergeHighlights(highlight1: AnyHighlightData, highlight2: AnyHighlightD
 			type: 'text',
 			id: Date.now().toString(),
 			startOffset: Math.min(highlight1.startOffset, highlight2.startOffset),
-			endOffset: Math.max(highlight1.endOffset, highlight2.endOffset)
+			endOffset: Math.max(highlight1.endOffset, highlight2.endOffset),
+			notes: [...(highlight1.notes || []), ...(highlight2.notes || [])]
 		};
 	}
 
@@ -540,7 +544,8 @@ function mergeHighlights(highlight1: AnyHighlightData, highlight2: AnyHighlightD
 		xpath: getElementXPath(mergedElement),
 		content: mergedElement.outerHTML,
 		type: 'complex',
-		id: Date.now().toString()
+		id: Date.now().toString(),
+		notes: [...(highlight1.notes || []), ...(highlight2.notes || [])]
 	};
 }
 

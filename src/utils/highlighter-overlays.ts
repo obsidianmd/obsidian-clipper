@@ -270,6 +270,19 @@ function createHighlightOverlayElement(rect: DOMRect, content: string, isText: b
 	overlay.addEventListener('click', handleHighlightClick);
 	overlay.addEventListener('touchend', handleHighlightClick);
 	document.body.appendChild(overlay);
+
+	// Add annotation input field if notes are present
+	if (notes && notes.length > 0) {
+		const annotationContainer = document.createElement('div');
+		annotationContainer.className = 'annotation-container';
+		notes.forEach(note => {
+			const annotation = document.createElement('textarea');
+			annotation.className = 'annotation-input';
+			annotation.value = note;
+			annotationContainer.appendChild(annotation);
+		});
+		overlay.appendChild(annotationContainer);
+	}
 }
 
 // Helper function to get the effective background color

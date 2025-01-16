@@ -317,6 +317,7 @@ async function highlightSelection(tabId: number, info: browser.Menus.OnClickData
 		id: Date.now().toString(),
 		type: 'text',
 		content: info.selectionText || '',
+		notes: [] // Initialize notes as an empty array
 	};
 
 	await browser.tabs.sendMessage(tabId, { 
@@ -338,7 +339,8 @@ async function highlightElement(tabId: number, info: browser.Menus.OnClickData) 
 			mediaType: info.mediaType === 'image' ? 'img' : info.mediaType,
 			srcUrl: info.srcUrl,
 			pageUrl: info.pageUrl
-		}
+		},
+		notes: [] // Initialize notes as an empty array
 	});
 	hasHighlights = true;
 	debouncedUpdateContextMenu(tabId);

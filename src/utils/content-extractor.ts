@@ -74,7 +74,8 @@ export async function extractPageContent(tabId: number): Promise<ContentResponse
 							xpath: '',
 							content: `<div>` + highlight + `</div>`,
 							startOffset: 0,
-							endOffset: highlight.length
+							endOffset: highlight.length,
+							notes: [] // Initialize notes as an empty array
 						};
 					}
 					return highlight as AnyHighlightData;
