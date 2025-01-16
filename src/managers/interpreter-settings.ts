@@ -6,7 +6,7 @@ import { showModal, hideModal } from '../utils/modal-utils';
 import { getMessage, translatePage } from '../utils/i18n';
 import { debugLog } from '../utils/debug';
 
-interface PresetProvider {
+export interface PresetProvider {
 	id: string;
 	name: string;
 	baseUrl: string;
@@ -20,7 +20,7 @@ interface PresetProvider {
 	}>;
 }
 
-const PRESET_PROVIDERS: Record<string, PresetProvider> = {
+export const PRESET_PROVIDERS: Record<string, PresetProvider> = {
 	anthropic: {
 		id: 'anthropic',
 		name: 'Anthropic',
@@ -650,8 +650,8 @@ async function showModelModal(model: ModelConfig, index?: number) {
 							if (selectedModel) {
 								nameInput.value = selectedModel.name;
 								providerModelIdInput.value = selectedModel.id;
-								nameInput.disabled = true;
-								providerModelIdInput.disabled = true;
+								nameInput.disabled = false;
+								providerModelIdInput.disabled = false;
 							}
 						}
 					});
