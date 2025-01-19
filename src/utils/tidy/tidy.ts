@@ -1,6 +1,5 @@
 import { MetadataExtractor, TidyMetadata } from './metadata';
 
-// At the top of the file, after imports
 declare global {
 	interface Window {
 		Tidy: typeof Tidy;
@@ -76,7 +75,6 @@ const BASIC_SELECTORS = [
 	'#sidebar',
 	'style',
 	'textarea',
-	'time',
 	'[data-link-name*="skip"]',
 	'[src*="author"]',
 	'[href="#site-content"]',
@@ -694,6 +692,7 @@ export class Tidy {
 
 		if (candidates.length === 0) {
 			// Fall back to scoring block elements
+			// Currently <body> element is used as the fallback, so this is not used
 			return this.findContentByScoring(doc);
 		}
 
