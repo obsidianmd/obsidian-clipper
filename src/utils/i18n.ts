@@ -39,7 +39,18 @@ import 'dayjs/locale/zh';
 
 function convertToLocaleCode(locale: string): string {
 	// Convert locale codes like 'pt_BR' to 'pt-br'
-	return locale.toLowerCase().replace('_', '-');
+	const lowercaseLocale = locale.toLowerCase();
+
+	const specialCases: { [key: string]: string } = {
+		'tl': 'tl-ph',
+		'no': 'nb'
+	};
+	
+	if (specialCases[lowercaseLocale]) {
+		return specialCases[lowercaseLocale];
+	}
+	
+	return lowercaseLocale.replace('_', '-');
 }
 
 export function setDayjsLocale(locale: string): void {
