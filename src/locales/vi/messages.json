@@ -1,0 +1,785 @@
+{
+	"activity": {
+		"message": "Hoạt động"
+	},
+	"addModel": {
+		"message": "+ Thêm mô hình"
+	},
+	"addModelTitle": {
+		"message": "Thêm mô hình"
+	},
+	"addProperty": {
+		"message": "+ Thêm thuộc tính"
+	},
+	"addProvider": {
+		"message": "+ Thêm nhà cung cấp"
+	},
+	"addProviderTitle": {
+		"message": "Thêm nhà cung cấp"
+	},
+	"addToObsidian": {
+		"message": "Thêm vào Obsidian"
+	},
+	"addVaultPlaceholder": {
+		"message": "Nhấn enter để thêm kho lưu trữ"
+	},
+	"advanced": {
+		"message": "Nâng cao"
+	},
+	"allProperties": {
+		"message": "Tất cả thuộc tính"
+	},
+	"allTime": {
+		"message": "Mọi thời điểm"
+	},
+	"alwaysShowHighlights": {
+		"message": "Luôn hiển thị đánh dấu"
+	},
+	"alwaysShowHighlightsDescription": {
+		"message": "Hiển thị các đánh dấu đã lưu khi tải trang. Tắt để chỉ hiển thị đánh dấu khi chế độ đánh dấu được kích hoạt."
+	},
+	"apiKeyMissing": {
+		"message": "Không có khóa API"
+	},
+	"apiKeysWarning": {
+		"message": "Bằng cách sử dụng nhà cung cấp bên ngoài, bạn đồng ý với điều khoản và chính sách bảo mật của họ. Các yêu cầu thông dịch được gửi trực tiếp đến nhà cung cấp bạn chọn. Obsidian không thu thập hoặc lưu trữ bất kỳ dữ liệu nào về các yêu cầu của bạn."
+	},
+	"appendToDaily": {
+		"message": "Thêm vào ghi chú hàng ngày, ở cuối"
+	},
+	"appendToExisting": {
+		"message": "Thêm vào ghi chú hiện có, ở cuối"
+	},
+	"autoRunInterpreter": {
+		"message": "Tự động chạy"
+	},
+	"autoRunInterpreterDescription": {
+		"message": "Chạy các biến lời nhắc ngay lập tức nếu mẫu có chứa. Điều này sẽ tiêu tốn tín dụng API với nhà cung cấp mô hình của bạn. Tắt nếu bạn chỉ muốn chạy thông dịch thủ công."
+	},
+	"behavior": {
+		"message": "Hành vi"
+	},
+	"behaviorWarning": {
+		"message": "Thêm vào ghi chú hiện có hoặc ghi chú hàng ngày yêu cầu Obsidian 1.7.2 trở lên."
+	},
+	"byDay": {
+		"message": "Ngày"
+	},
+	"byMonth": {
+		"message": "Tháng"
+	},
+	"byWeek": {
+		"message": "Tuần"
+	},
+	"cancel": {
+		"message": "Hủy"
+	},
+	"cannotDeleteProvider": {
+		"message": "Không thể xóa nhà cung cấp \"$1\" vì đang được sử dụng bởi $2 mô hình."
+	},
+	"changelog": {
+		"message": "Nhật ký thay đổi"
+	},
+	"chooseFile": {
+		"message": "Chọn tệp"
+	},
+	"choosePropertiesFile": {
+		"message": "Chọn tệp thuộc tính"
+	},
+	"chooseSettingsFile": {
+		"message": "Chọn tệp cài đặt"
+	},
+	"chooseTemplateFile": {
+		"message": "Chọn tệp mẫu"
+	},
+	"clipBehavior": {
+		"message": "Hành vi lưu"
+	},
+	"clipBehaviorDescription": {
+		"message": "Chọn cách lưu nội dung đã đánh dấu vào Obsidian. Xác định biến $strong_start${{content}}$strong_end$.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"close": {
+		"message": "Đóng"
+	},
+	"commandOpenClipper": {
+		"message": "Mở Obsidian Clipper"
+	},
+	"commandQuickClip": {
+		"message": "Lưu nhanh"
+	},
+	"commandToggleHighlighter": {
+		"message": "Bật/tắt chế độ đánh dấu"
+	},
+	"confirmDeleteTemplate": {
+		"message": "Bạn có chắc chắn muốn xóa mẫu \"$1\"?"
+	},
+	"confirmReplaceSettings": {
+		"message": "Điều này sẽ thay thế tất cả cài đặt hiện tại của bạn, bao gồm mẫu và thuộc tính. Bạn có chắc chắn muốn tiếp tục?"
+	},
+	"copied": {
+		"message": "Đã sao chép!"
+	},
+	"copyAsJson": {
+		"message": "Sao chép dưới dạng JSON"
+	},
+	"copyToClipboard": {
+		"message": "Sao chép vào bộ nhớ tạm"
+	},
+	"createNewNote": {
+		"message": "Tạo ghi chú mới"
+	},
+	"custom": {
+		"message": "Tùy chỉnh"
+	},
+	"dailyNoteFormat": {
+		"message": "Định dạng ghi chú hàng ngày (ví dụ: YYYY-MM-DD)"
+	},
+	"defaultInterpreterContext": {
+		"message": "Ngữ cảnh thông dịch mặc định"
+	},
+	"defaultInterpreterContextDescription": {
+		"message": "Ghi đè ngữ cảnh được sử dụng để thông dịch các biến lời nhắc. Có thể sử dụng biến ở đây."
+	},
+	"defaultTemplateName": {
+		"message": "Mặc định"
+	},
+	"delete": {
+		"message": "Xóa"
+	},
+	"deleteModelConfirm": {
+		"message": "Bạn có chắc chắn muốn xóa mô hình này?"
+	},
+	"deleteProviderConfirm": {
+		"message": "Bạn có chắc chắn muốn xóa nhà cung cấp này?"
+	},
+	"disableHighlighter": {
+		"message": "Tắt đánh dấu"
+	},
+	"done": {
+		"message": "Xong"
+	},
+	"dragAndDropFile": {
+		"message": "Kéo và thả tệp vào đây"
+	},
+	"duplicate": {
+		"message": "Nhân bản"
+	},
+	"earlyAccessDescription": {
+		"message": "Sử dụng các tính năng yêu cầu phiên bản $link_start$early access$link_end$ mới nhất của Obsidian. Hiện yêu cầu Obsidian 1.7.2 trở lên.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/Obsidian/Early+access+versions\" target=\"_blank\">"
+			}
+		}
+	},
+	"earlyAccessFeatures": {
+		"message": "Tính năng truy cập sớm"
+	},
+	"editModel": {
+		"message": "Chỉnh sửa mô hình"
+	},
+	"editProvider": {
+		"message": "Chỉnh sửa nhà cung cấp"
+	},
+	"editTemplate": {
+		"message": "Chỉnh sửa mẫu"
+	},
+	"enableHighlighter": {
+		"message": "Bật đánh dấu"
+	},
+	"enableHighlighterDescription": {
+		"message": "Đánh dấu nội dung trên trang web mà bạn có thể lưu vào Obsidian."
+	},
+	"enableInterpreter": {
+		"message": "Bật thông dịch"
+	},
+	"enableInterpreterDescription": {
+		"message": "Sử dụng ngôn ngữ tự nhiên để trích xuất dữ liệu từ trang. Ví dụ, bạn có thể sử dụng cú pháp mẫu $strong_start${{\"tóm tắt trang\"}}$strong_end$. Yêu cầu khóa API hoặc mô hình tùy chỉnh được cấu hình bên dưới. $link_start$Tìm hiểu thêm$link_end$.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/interpreter\" target=\"_blank\">"
+			},
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"error": {
+		"message": "Lỗi"
+	},
+	"export": {
+		"message": "Xuất"
+	},
+	"exportAllSettings": {
+		"message": "Xuất tất cả cài đặt"
+	},
+	"exportAllSettingsDescription": {
+		"message": "Xuất tất cả cài đặt bao gồm mẫu và thuộc tính."
+	},
+	"exportHighlights": {
+		"message": "Xuất đánh dấu"
+	},
+	"exportHighlightsDescription": {
+		"message": "Xuất các đánh dấu của bạn vào một tệp."
+	},
+	"exportProperties": {
+		"message": "Xuất thuộc tính"
+	},
+	"exportPropertiesDescription": {
+		"message": "Lưu thuộc tính Web Clipper vào tệp $strong_start$types.json$strong_end$ có thể được nhập vào kho lưu trữ Obsidian của bạn hoặc vào Web Clipper trên các thiết bị khác.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"extensionDescription": {
+		"message": "Lưu nội dung từ web trong định dạng riêng tư và bền vững mà bạn có thể truy cập ngoại tuyến. Tiện ích mở rộng trình duyệt chính thức cho Obsidian."
+	},
+	"extensionName": {
+		"message": "Obsidian Web Clipper"
+	},
+	"failedToCopyText": {
+		"message": "Không thể sao chép văn bản"
+	},
+	"failedToDeleteTemplate": {
+		"message": "Không thể xóa mẫu. Vui lòng thử lại."
+	},
+	"failedToDuplicateTemplate": {
+		"message": "Không thể nhân bản mẫu. Vui lòng thử lại."
+	},
+	"failedToExportHighlights": {
+		"message": "Không thể xuất đánh dấu. Vui lòng kiểm tra bảng điều khiển để biết thêm chi tiết."
+	},
+	"failedToExportSettings": {
+		"message": "Không thể xuất cài đặt. Vui lòng kiểm tra bảng điều khiển để biết thêm chi tiết."
+	},
+	"failedToExtractContent": {
+		"message": "Không thể trích xuất nội dung trang."
+	},
+	"failedToImportTemplate": {
+		"message": "Lỗi khi nhập mẫu. Vui lòng kiểm tra tệp và thử lại."
+	},
+	"failedToInitialize": {
+		"message": "Vui lòng thử tải lại tiện ích mở rộng."
+	},
+	"failedToInitializeContent": {
+		"message": "Không thể khởi tạo nội dung trang."
+	},
+	"failedToProcessInterpreter": {
+		"message": "Xử lý thông dịch thất bại. Vui lòng thử lại."
+	},
+	"failedToResetProviders": {
+		"message": "Không thể đặt lại nhà cung cấp và mô hình"
+	},
+	"failedToResetTemplate": {
+		"message": "Không thể đặt lại mẫu mặc định. Vui lòng thử lại."
+	},
+	"failedToSave": {
+		"message": "Không thể lưu tệp"
+	},
+	"failedToSaveFile": {
+		"message": "Không thể lưu tệp"
+	},
+	"failedToSaveProvider": {
+		"message": "Không thể lưu nhà cung cấp. Vui lòng thử lại."
+	},
+	"feedback": {
+		"message": "Phản hồi"
+	},
+	"feedbackDescription": {
+		"message": "Làm thế nào chúng tôi có thể cải thiện Web Clipper? Vui lòng truy cập trang trợ giúp của chúng tôi, nơi bạn có thể báo cáo lỗi, đề xuất tính năng và nhận trợ giúp về các vấn đề phổ biến."
+	},
+	"feedbackTitle": {
+		"message": "Cảm ơn phản hồi của bạn"
+	},
+	"folder": {
+		"message": "Thư mục"
+	},
+	"general": {
+		"message": "Chung"
+	},
+	"generalSettings": {
+		"message": "Cài đặt chung"
+	},
+	"getApiKeyHere": {
+		"message": "Nhận khóa API $1 của bạn tại đây."
+	},
+	"help": {
+		"message": "Trợ giúp"
+	},
+	"helpDescription": {
+		"message": "Tìm hiểu cách sử dụng Web Clipper và nhận trợ giúp xử lý sự cố."
+	},
+	"highlightInline": {
+		"message": "Đánh dấu nội dung trang"
+	},
+	"highlightPage": {
+		"message": "Đánh dấu trang"
+	},
+	"highlighter": {
+		"message": "Đánh dấu"
+	},
+	"highlighterSettings": {
+		"message": "Đánh dấu"
+	},
+	"history": {
+		"message": "Lịch sử"
+	},
+	"hotkeys": {
+		"message": "Phím tắt"
+	},
+	"import": {
+		"message": "Nhập"
+	},
+	"importAllSettings": {
+		"message": "Nhập tất cả cài đặt"
+	},
+	"importAllSettingsDescription": {
+		"message": "Nhập tất cả cài đặt bao gồm mẫu và thuộc tính. Điều này sẽ thay thế cấu hình hiện tại của bạn."
+	},
+	"importFailed": {
+		"message": "Nhập thất bại. Vui lòng kiểm tra bảng điều khiển để biết thêm chi tiết."
+	},
+	"importModalTitle": {
+		"message": "Nhập"
+	},
+	"importProperties": {
+		"message": "Nhập thuộc tính"
+	},
+	"importPropertiesDescription": {
+		"message": "Để nhập thuộc tính từ Obsidian, hãy tìm tệp $strong_1_start$types.json$strong_1_end$ trong thư mục $strong_2_start$.obsidian$strong_2_end$ trong kho lưu trữ của bạn. Lưu ý rằng thư mục này được ẩn theo mặc định trên hầu hết các hệ điều hành.",
+		"placeholders": {
+			"strong_1_end": {
+				"content": "</strong>"
+			},
+			"strong_1_start": {
+				"content": "<strong>"
+			},
+			"strong_2_end": {
+				"content": "</strong>"
+			},
+			"strong_2_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"importSettings": {
+		"message": "Nhập cài đặt"
+	},
+	"importTemplate": {
+		"message": "Nhập mẫu"
+	},
+	"interpret": {
+		"message": "thông dịch"
+	},
+	"interpreter": {
+		"message": "Thông dịch"
+	},
+	"interpreterContext": {
+		"message": "Ngữ cảnh thông dịch"
+	},
+	"interpreterContextDescription": {
+		"message": "Ngữ cảnh được sử dụng để thông dịch các biến lời nhắc. Ghi đè ngữ cảnh mặc định được định nghĩa trong $link_start$Cài đặt thông dịch$link_end$. Có thể sử dụng biến ở đây.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=interpreter\">"
+			}
+		}
+	},
+	"language": {
+		"message": "Ngôn ngữ"
+	},
+	"languageDescription": {
+		"message": "Chọn ngôn ngữ hiển thị cho giao diện tiện ích mở rộng."
+	},
+	"last30Days": {
+		"message": "30 ngày qua"
+	},
+	"lastUsed": {
+		"message": "Sử dụng lần cuối"
+	},
+	"legacyMode": {
+		"message": "Chế độ cũ"
+	},
+	"legacyModeDescription": {
+		"message": "Sử dụng phương thức lưu URI tương thích với Obsidian 1.6.7 hoặc cũ hơn. Lưu ý rằng độ dài nội dung bạn có thể lưu bị giới hạn bởi trình duyệt và hệ điều hành của bạn. Một số trang có thể thất bại mà không có thông báo lỗi."
+	},
+	"modelName": {
+		"message": "Tên hiển thị"
+	},
+	"modelNameDescription": {
+		"message": "Tên của mô hình bạn muốn hiển thị trong giao diện."
+	},
+	"modelProvider": {
+		"message": "Nhà cung cấp"
+	},
+	"modelProviderDescription": {
+		"message": "Chọn nhà cung cấp cho mô hình này."
+	},
+	"modelProviderPlaceholder": {
+		"message": "Nhà cung cấp"
+	},
+	"modelRequiredFields": {
+		"message": "Tên mô hình, Nhà cung cấp và ID mô hình là bắt buộc."
+	},
+	"models": {
+		"message": "Mô hình"
+	},
+	"modelsListFor": {
+		"message": "Danh sách mô hình cho $1"
+	},
+	"more": {
+		"message": "Thêm"
+	},
+	"newTemplate": {
+		"message": "Mẫu mới"
+	},
+	"noHighlights": {
+		"message": "Không làm gì"
+	},
+	"noTemplates": {
+		"message": "Không có mẫu khả dụng. Vui lòng thêm mẫu trong cài đặt."
+	},
+	"noUnusedProperties": {
+		"message": "Không tìm thấy thuộc tính không sử dụng."
+	},
+	"noteContent": {
+		"message": "Nội dung ghi chú"
+	},
+	"noteContentDescription": {
+		"message": "Tùy chỉnh nội dung của ghi chú. Sử dụng biến để điền trước dữ liệu từ trang."
+	},
+	"noteLocation": {
+		"message": "Vị trí ghi chú"
+	},
+	"noteLocationDescription": {
+		"message": "Thư mục hoặc đường dẫn của ghi chú."
+	},
+	"noteName": {
+		"message": "Tên ghi chú"
+	},
+	"noteNameFormat": {
+		"message": "Tên ghi chú"
+	},
+	"noteNameFormatDescription": {
+		"message": "Định dạng cho tên tệp của ghi chú. Bạn có thể sử dụng các biến như {{title}}, {{date}} và {{published}} để điền trước dữ liệu từ trang. $link_start$Tìm hiểu thêm$link_end$.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/variables\" target=\"_blank\">"
+			}
+		}
+	},
+	"notesAboutPage": {
+		"message": "Ghi chú về trang này..."
+	},
+	"onlyHttpSupported": {
+		"message": "Trang này không thể được lưu. Chỉ hỗ trợ URL http và https."
+	},
+	"open": {
+		"message": "Mở"
+	},
+	"optional": {
+		"message": "(tùy chọn)"
+	},
+	"orPasteBelow": {
+		"message": "Hoặc dán nội dung bên dưới"
+	},
+	"overwriteNote": {
+		"message": "Ghi đè ghi chú"
+	},
+	"pageCannotBeClipped": {
+		"message": "Trang này không thể được lưu."
+	},
+	"pageVariables": {
+		"message": "Biến trang"
+	},
+	"pagesSaved": {
+		"message": "trang đã lưu"
+	},
+	"pagesSavedPlural": {
+		"message": "trang đã lưu"
+	},
+	"pasteJsonHere": {
+		"message": "Dán JSON vào đây"
+	},
+	"pleaseReload": {
+		"message": "Vui lòng thử tải lại trang."
+	},
+	"popularModels": {
+		"message": "Mô hình phổ biến"
+	},
+	"popularModelsDescription": {
+		"message": "Chọn từ các mô hình thường được sử dụng hoặc nhập chi tiết mô hình tùy chỉnh."
+	},
+	"prependToDaily": {
+		"message": "Thêm vào ghi chú hàng ngày, ở đầu"
+	},
+	"prependToExisting": {
+		"message": "Thêm vào ghi chú hiện có, ở đầu"
+	},
+	"processing": {
+		"message": "đang xử lý"
+	},
+	"properties": {
+		"message": "Thuộc tính"
+	},
+	"propertiesSettings": {
+		"message": "Thuộc tính"
+	},
+	"propertyName": {
+		"message": "Tên thuộc tính"
+	},
+	"propertyValue": {
+		"message": "Giá trị thuộc tính"
+	},
+	"provider": {
+		"message": "Nhà cung cấp"
+	},
+	"providerApiKey": {
+		"message": "Khóa API"
+	},
+	"providerApiKeyDescription": {
+		"message": "Khóa API của bạn cho nhà cung cấp này."
+	},
+	"providerBaseUrl": {
+		"message": "URL cơ sở"
+	},
+	"providerBaseUrlDescription": {
+		"message": "URL điểm cuối API cho nhà cung cấp này."
+	},
+	"providerModelId": {
+		"message": "ID mô hình"
+	},
+	"providerModelIdDescription": {
+		"message": "Định danh của mô hình từ nhà cung cấp của bạn. Thường là một tên ngắn không có dấu cách."
+	},
+	"providerModelIdPlaceholder": {
+		"message": "ID mô hình"
+	},
+	"providerName": {
+		"message": "Tên nhà cung cấp"
+	},
+	"providerNameDescription": {
+		"message": "Tên hiển thị cho nhà cung cấp này."
+	},
+	"providerPreset": {
+		"message": "Cài đặt trước"
+	},
+	"providerPresetDescription": {
+		"message": "Chọn một nhà cung cấp hoặc tạo một nhà cung cấp tùy chỉnh."
+	},
+	"providerRequiredFields": {
+		"message": "Tên nhà cung cấp và URL cơ sở là bắt buộc."
+	},
+	"providers": {
+		"message": "Nhà cung cấp"
+	},
+	"rateExtensionDescription": {
+		"message": "Bạn thích Web Clipper? Hãy giúp chúng tôi bằng cách đánh giá nó."
+	},
+	"recommended": {
+		"message": "được đề xuất"
+	},
+	"refresh": {
+		"message": "Làm mới"
+	},
+	"remove": {
+		"message": "Xóa"
+	},
+	"removeProperty": {
+		"message": "Xóa thuộc tính"
+	},
+	"removeUnusedProperties": {
+		"message": "Xóa thuộc tính không sử dụng"
+	},
+	"removeUnusedPropertiesDescription": {
+		"message": "Xóa tất cả thuộc tính không được sử dụng trong bất kỳ mẫu nào."
+	},
+	"removeVault": {
+		"message": "Xóa kho lưu trữ"
+	},
+	"replaceContent": {
+		"message": "Thay thế nội dung trang"
+	},
+	"reset": {
+		"message": "Đặt lại"
+	},
+	"resetDefaultTemplate": {
+		"message": "Đặt lại mẫu mặc định"
+	},
+	"resetDefaultTemplateDescription": {
+		"message": "Xóa mọi thay đổi bạn đã thực hiện đối với mẫu mặc định."
+	},
+	"resetProvidersAndModels": {
+		"message": "Đặt lại mô hình mặc định"
+	},
+	"resetProvidersAndModelsDescription": {
+		"message": "Đặt lại nhà cung cấp và mô hình về cài đặt mặc định."
+	},
+	"save": {
+		"message": "Lưu"
+	},
+	"saveFile": {
+		"message": "Lưu tệp..."
+	},
+	"searchVariables": {
+		"message": "Tìm kiếm biến..."
+	},
+	"selectProvider": {
+		"message": "Chọn nhà cung cấp"
+	},
+	"selectTemplateToExport": {
+		"message": "Chọn mẫu để xuất."
+	},
+	"settings": {
+		"message": "Cài đặt"
+	},
+	"settingsHeading": {
+		"message": "Cài đặt"
+	},
+	"settingsImportSuccess": {
+		"message": "Tất cả cài đặt đã được nhập thành công. Vui lòng làm mới trang để xem các thay đổi."
+	},
+	"share": {
+		"message": "Chia sẻ..."
+	},
+	"shortcutInstructionsBrave": {
+		"message": "Để thay đổi phím tắt, hãy đi tới $1"
+	},
+	"shortcutInstructionsChrome": {
+		"message": "Để thay đổi phím tắt, hãy đi tới $1"
+	},
+	"shortcutInstructionsDefault": {
+		"message": "Để thay đổi phím tắt, vui lòng xem cài đặt tiện ích mở rộng của trình duyệt của bạn."
+	},
+	"shortcutInstructionsEdge": {
+		"message": "Để thay đổi phím tắt, hãy đi tới $1"
+	},
+	"shortcutInstructionsFirefox": {
+		"message": "Để thay đổi phím tắt, hãy đi tới $1, nhấp vào biểu tượng bánh răng và chọn \"Quản lý phím tắt tiện ích mở rộng\""
+	},
+	"shortcutInstructionsIntro": {
+		"message": "Phím tắt giúp bạn truy cập nhanh các tính năng của clipper."
+	},
+	"shortcutInstructionsSafari": {
+		"message": "Phím tắt không thể tùy chỉnh trong Safari."
+	},
+	"shortcutNotSet": {
+		"message": "Chưa đặt"
+	},
+	"showActionsButton": {
+		"message": "Hiển thị nút hành động"
+	},
+	"showActionsDescription": {
+		"message": "Cho phép kiểm tra các biến trang từ menu clipper. Hữu ích để xem các biến có sẵn để sử dụng trong mẫu."
+	},
+	"showPageVariables": {
+		"message": "Hiển thị biến trang"
+	},
+	"silentOpen": {
+		"message": "Lưu ghi chú đã lưu mà không mở"
+	},
+	"silentOpenDescription": {
+		"message": "Ghi chú đã lưu sẽ được lưu nhưng không mở trong tab mới. Obsidian vẫn sẽ được đưa lên phía trước."
+	},
+	"specificNoteName": {
+		"message": "Tên ghi chú cụ thể"
+	},
+	"systemDefault": {
+		"message": "Mặc định hệ thống"
+	},
+	"templateCopied": {
+		"message": "Đã sao chép JSON mẫu vào bộ nhớ tạm"
+	},
+	"templateCopyError": {
+		"message": "Không thể sao chép JSON mẫu vào bộ nhớ tạm"
+	},
+	"templateName": {
+		"message": "Tên mẫu"
+	},
+	"templateProperties": {
+		"message": "Thuộc tính"
+	},
+	"templatePropertiesDescription": {
+		"message": "Thuộc tính để thêm vào đầu ghi chú đã lưu. Sử dụng biến để điền trước dữ liệu từ trang."
+	},
+	"templateTriggers": {
+		"message": "Bộ kích hoạt mẫu"
+	},
+	"templateTriggersDescription": {
+		"message": "Xác định quy tắc để tự động chọn mẫu này nếu nó khớp với mẫu URL hoặc chứa dữ liệu schema.org. Một quy tắc mỗi dòng."
+	},
+	"templatesHeading": {
+		"message": "Mẫu"
+	},
+	"thinking": {
+		"message": "đang suy nghĩ"
+	},
+	"unknownProvider": {
+		"message": "Nhà cung cấp không xác định"
+	},
+	"updateAvailable": {
+		"message": "Có bản cập nhật mới."
+	},
+	"usingLatestVersion": {
+		"message": "Bạn đang sử dụng phiên bản mới nhất."
+	},
+	"vault": {
+		"message": "Kho lưu trữ"
+	},
+	"vaultDescription": {
+		"message": "Chọn kho lưu trữ mặc định cho mẫu này. Đi tới $link_start$cài đặt chung$link_end$ để thêm hoặc xóa kho lưu trữ.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=general\">"
+			}
+		}
+	},
+	"vaults": {
+		"message": "Kho lưu trữ"
+	},
+	"vaultsDescription": {
+		"message": "Theo mặc định, ghi chú đã lưu được lưu vào kho lưu trữ hiện đang mở. Bạn có thể thêm kho lưu trữ ở đây nếu muốn có tùy chọn lưu vào các kho lưu trữ khác nhau. Tên kho lưu trữ phải khớp chính xác với tên kho lưu trữ Obsidian. Nhấn $strong_start$enter$strong_end$ để thêm kho lưu trữ.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"version": {
+		"message": "Phiên bản"
+	}
+}

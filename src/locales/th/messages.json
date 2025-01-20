@@ -1,0 +1,785 @@
+{
+	"activity": {
+		"message": "กิจกรรม"
+	},
+	"addModel": {
+		"message": "+ เพิ่มโมเดล"
+	},
+	"addModelTitle": {
+		"message": "เพิ่มโมเดล"
+	},
+	"addProperty": {
+		"message": "+ เพิ่มคุณสมบัติ"
+	},
+	"addProvider": {
+		"message": "+ เพิ่มผู้ให้บริการ"
+	},
+	"addProviderTitle": {
+		"message": "เพิ่มผู้ให้บริการ"
+	},
+	"addToObsidian": {
+		"message": "เพิ่มไปยัง Obsidian"
+	},
+	"addVaultPlaceholder": {
+		"message": "กด Enter เพื่อเพิ่มคลัง"
+	},
+	"advanced": {
+		"message": "ขั้นสูง"
+	},
+	"allProperties": {
+		"message": "คุณสมบัติทั้งหมด"
+	},
+	"allTime": {
+		"message": "ตลอดเวลา"
+	},
+	"alwaysShowHighlights": {
+		"message": "แสดงไฮไลต์เสมอ"
+	},
+	"alwaysShowHighlightsDescription": {
+		"message": "แสดงไฮไลต์ที่บันทึกไว้เมื่อโหลดหน้า ปิดเพื่อแสดงไฮไลต์เฉพาะเมื่อเปิดใช้งานโหมดไฮไลต์"
+	},
+	"apiKeyMissing": {
+		"message": "ไม่มีคีย์ API"
+	},
+	"apiKeysWarning": {
+		"message": "การใช้ผู้ให้บริการภายนอกถือว่าคุณยอมรับข้อกำหนดและนโยบายความเป็นส่วนตัวของพวกเขา คำขอตัวแปลจะถูกส่งตรงไปยังผู้ให้บริการที่คุณเลือก Obsidian ไม่ได้เก็บรวบรวมหรือจัดเก็บข้อมูลใดๆ เกี่ยวกับคำขอของคุณ"
+	},
+	"appendToDaily": {
+		"message": "เพิ่มไปยังบันทึกประจำวัน ที่ท้าย"
+	},
+	"appendToExisting": {
+		"message": "เพิ่มไปยังบันทึกที่มีอยู่ ที่ท้าย"
+	},
+	"autoRunInterpreter": {
+		"message": "เรียกใช้อัตโนมัติ"
+	},
+	"autoRunInterpreterDescription": {
+		"message": "เรียกใช้ตัวแปรพรอมต์ทันทีหากเทมเพลตมี จะใช้เครดิต API กับผู้ให้บริการโมเดลของคุณ ปิดถ้าคุณต้องการเรียกใช้ตัวแปลด้วยตนเองเท่านั้น"
+	},
+	"behavior": {
+		"message": "พฤติกรรม"
+	},
+	"behaviorWarning": {
+		"message": "การเพิ่มไปยังบันทึกที่มีอยู่หรือบันทึกประจำวันต้องใช้ Obsidian 1.7.2 หรือใหม่กว่า"
+	},
+	"byDay": {
+		"message": "วัน"
+	},
+	"byMonth": {
+		"message": "เดือน"
+	},
+	"byWeek": {
+		"message": "สัปดาห์"
+	},
+	"cancel": {
+		"message": "ยกเลิก"
+	},
+	"cannotDeleteProvider": {
+		"message": "ไม่สามารถลบผู้ให้บริการ \"$1\" เนื่องจากถูกใช้โดย $2 โมเดล"
+	},
+	"changelog": {
+		"message": "บันทึกการเปลี่ยนแปลง"
+	},
+	"chooseFile": {
+		"message": "เลือกไฟล์"
+	},
+	"choosePropertiesFile": {
+		"message": "เลือกไฟล์คุณสมบัติ"
+	},
+	"chooseSettingsFile": {
+		"message": "เลือกไฟล์การตั้งค่า"
+	},
+	"chooseTemplateFile": {
+		"message": "เลือกไฟล์เทมเพลต"
+	},
+	"clipBehavior": {
+		"message": "พฤติกรรมการคลิป"
+	},
+	"clipBehaviorDescription": {
+		"message": "เลือกวิธีบันทึกเนื้อหาที่เลือกไปยัง Obsidian กำหนดตัวแปร $strong_start${{content}}$strong_end$",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"close": {
+		"message": "ปิด"
+	},
+	"commandOpenClipper": {
+		"message": "เปิด Obsidian Clipper"
+	},
+	"commandQuickClip": {
+		"message": "คลิปด่วน"
+	},
+	"commandToggleHighlighter": {
+		"message": "สลับโหมดไฮไลต์"
+	},
+	"confirmDeleteTemplate": {
+		"message": "คุณแน่ใจหรือไม่ว่าต้องการลบเทมเพลต \"$1\"?"
+	},
+	"confirmReplaceSettings": {
+		"message": "การดำเนินการนี้จะแทนที่การตั้งค่าปัจจุบันทั้งหมดของคุณ รวมถึงเทมเพลตและคุณสมบัติ คุณแน่ใจหรือไม่ว่าต้องการดำเนินการต่อ?"
+	},
+	"copied": {
+		"message": "คัดลอกแล้ว!"
+	},
+	"copyAsJson": {
+		"message": "คัดลอกเป็น JSON"
+	},
+	"copyToClipboard": {
+		"message": "คัดลอกไปยังคลิปบอร์ด"
+	},
+	"createNewNote": {
+		"message": "สร้างบันทึกใหม่"
+	},
+	"custom": {
+		"message": "กำหนดเอง"
+	},
+	"dailyNoteFormat": {
+		"message": "รูปแบบบันทึกประจำวัน (เช่น YYYY-MM-DD)"
+	},
+	"defaultInterpreterContext": {
+		"message": "บริบทตัวแปลค่าเริ่มต้น"
+	},
+	"defaultInterpreterContextDescription": {
+		"message": "แทนที่บริบทที่ใช้ในการแปลตัวแปรพรอมต์ สามารถใช้ตัวแปรได้ที่นี่"
+	},
+	"defaultTemplateName": {
+		"message": "ค่าเริ่มต้น"
+	},
+	"delete": {
+		"message": "ลบ"
+	},
+	"deleteModelConfirm": {
+		"message": "คุณแน่ใจหรือไม่ว่าต้องการลบโมเดลนี้?"
+	},
+	"deleteProviderConfirm": {
+		"message": "คุณแน่ใจหรือไม่ว่าต้องการลบผู้ให้บริการนี้?"
+	},
+	"disableHighlighter": {
+		"message": "ปิดใช้งานไฮไลต์"
+	},
+	"done": {
+		"message": "เสร็จสิ้น"
+	},
+	"dragAndDropFile": {
+		"message": "ลากและวางไฟล์ที่นี่"
+	},
+	"duplicate": {
+		"message": "ทำซ้ำ"
+	},
+	"earlyAccessDescription": {
+		"message": "ใช้คุณสมบัติที่ต้องการ $link_start$เวอร์ชัน early access$link_end$ ล่าสุดของ Obsidian ปัจจุบันต้องใช้ Obsidian 1.7.2 หรือใหม่กว่า",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/Obsidian/Early+access+versions\" target=\"_blank\">"
+			}
+		}
+	},
+	"earlyAccessFeatures": {
+		"message": "คุณสมบัติ Early Access"
+	},
+	"editModel": {
+		"message": "แก้ไขโมเดล"
+	},
+	"editProvider": {
+		"message": "แก้ไขผู้ให้บริการ"
+	},
+	"editTemplate": {
+		"message": "แก้ไขเทมเพลต"
+	},
+	"enableHighlighter": {
+		"message": "เปิดใช้งานไฮไลต์"
+	},
+	"enableHighlighterDescription": {
+		"message": "ไฮไลต์เนื้อหาบนหน้าเว็บที่คุณสามารถบันทึกไปยัง Obsidian"
+	},
+	"enableInterpreter": {
+		"message": "เปิดใช้งานตัวแปล"
+	},
+	"enableInterpreterDescription": {
+		"message": "ใช้ภาษาธรรมชาติเพื่อดึงข้อมูลจากหน้า ตัวอย่างเช่น คุณสามารถใช้ไวยากรณ์เทมเพลต $strong_start${{\"สรุปของหน้านี้\"}}$strong_end$ ต้องใช้คีย์ API หรือกำหนดค่าโมเดลที่กำหนดเองด้านล่าง $link_start$เรียนรู้เพิ่มเติม$link_end$",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/interpreter\" target=\"_blank\">"
+			},
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"error": {
+		"message": "ข้อผิดพลาด"
+	},
+	"export": {
+		"message": "ส่งออก"
+	},
+	"exportAllSettings": {
+		"message": "ส่งออกการตั้งค่าทั้งหมด"
+	},
+	"exportAllSettingsDescription": {
+		"message": "ส่งออกการตั้งค่าทั้งหมดรวมถึงเทมเพลตและคุณสมบัติ"
+	},
+	"exportHighlights": {
+		"message": "ส่งออกไฮไลต์"
+	},
+	"exportHighlightsDescription": {
+		"message": "ส่งออกไฮไลต์ของคุณไปยังไฟล์"
+	},
+	"exportProperties": {
+		"message": "ส่งออกคุณสมบัติ"
+	},
+	"exportPropertiesDescription": {
+		"message": "บันทึกคุณสมบัติ Web Clipper ไปยังไฟล์ $strong_start$types.json$strong_end$ ที่สามารถนำเข้าไปยังคลัง Obsidian ของคุณหรือ Web Clipper บนอุปกรณ์อื่น",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"extensionDescription": {
+		"message": "บันทึกเนื้อหาจากเว็บในรูปแบบส่วนตัวและยั่งยืนที่คุณสามารถเข้าถึงได้แบบออฟไลน์ ส่วนขยายเบราว์เซอร์อย่างเป็นทางการสำหรับ Obsidian"
+	},
+	"extensionName": {
+		"message": "Obsidian Web Clipper"
+	},
+	"failedToCopyText": {
+		"message": "ไม่สามารถคัดลอกข้อความ"
+	},
+	"failedToDeleteTemplate": {
+		"message": "ไม่สามารถลบเทมเพลต ลองอีกครั้ง"
+	},
+	"failedToDuplicateTemplate": {
+		"message": "ไม่สามารถทำซ้ำเทมเพลต ลองอีกครั้ง"
+	},
+	"failedToExportHighlights": {
+		"message": "ไม่สามารถส่งออกไฮไลต์ ตรวจสอบคอนโซลสำหรับข้อมูลเพิ่มเติม"
+	},
+	"failedToExportSettings": {
+		"message": "ไม่สามารถส่งออกการตั้งค่า ตรวจสอบคอนโซลสำหรับข้อมูลเพิ่มเติม"
+	},
+	"failedToExtractContent": {
+		"message": "ไม่สามารถดึงเนื้อหาของหน้า"
+	},
+	"failedToImportTemplate": {
+		"message": "เกิดข้อผิดพลาดในการนำเข้าเทมเพลต ตรวจสอบไฟล์และลองอีกครั้ง"
+	},
+	"failedToInitialize": {
+		"message": "ลองโหลดส่วนขยายใหม่"
+	},
+	"failedToInitializeContent": {
+		"message": "ไม่สามารถเริ่มต้นเนื้อหาของหน้า"
+	},
+	"failedToProcessInterpreter": {
+		"message": "การประมวลผลตัวแปลล้มเหลว ลองอีกครั้ง"
+	},
+	"failedToResetProviders": {
+		"message": "ไม่สามารถรีเซ็ตผู้ให้บริการและโมเดล"
+	},
+	"failedToResetTemplate": {
+		"message": "ไม่สามารถรีเซ็ตเทมเพลตเริ่มต้น ลองอีกครั้ง"
+	},
+	"failedToSave": {
+		"message": "ไม่สามารถบันทึกไฟล์"
+	},
+	"failedToSaveFile": {
+		"message": "ไม่สามารถบันทึกไฟล์"
+	},
+	"failedToSaveProvider": {
+		"message": "ไม่สามารถบันทึกผู้ให้บริการ ลองอีกครั้ง"
+	},
+	"feedback": {
+		"message": "ข้อเสนอแนะ"
+	},
+	"feedbackDescription": {
+		"message": "เราจะปรับปรุง Web Clipper ได้อย่างไร? เยี่ยมชมหน้าช่วยเหลือของเราที่คุณสามารถรายงานข้อบกพร่อง แนะนำคุณสมบัติ และรับความช่วยเหลือเกี่ยวกับปัญหาทั่วไป"
+	},
+	"feedbackTitle": {
+		"message": "ขอบคุณสำหรับข้อเสนอแนะ"
+	},
+	"folder": {
+		"message": "โฟลเดอร์"
+	},
+	"general": {
+		"message": "ทั่วไป"
+	},
+	"generalSettings": {
+		"message": "การตั้งค่าทั่วไป"
+	},
+	"getApiKeyHere": {
+		"message": "รับคีย์ API $1 ของคุณที่นี่"
+	},
+	"help": {
+		"message": "ช่วยเหลือ"
+	},
+	"helpDescription": {
+		"message": "เรียนรู้วิธีใช้ Web Clipper และรับความช่วยเหลือในการแก้ไขปัญหา"
+	},
+	"highlightInline": {
+		"message": "ไฮไลต์เนื้อหาหน้า"
+	},
+	"highlightPage": {
+		"message": "ไฮไลต์หน้า"
+	},
+	"highlighter": {
+		"message": "ตัวไฮไลต์"
+	},
+	"highlighterSettings": {
+		"message": "ตัวไฮไลต์"
+	},
+	"history": {
+		"message": "ประวัติ"
+	},
+	"hotkeys": {
+		"message": "ปุ่มลัด"
+	},
+	"import": {
+		"message": "นำเข้า"
+	},
+	"importAllSettings": {
+		"message": "นำเข้าการตั้งค่าทั้งหมด"
+	},
+	"importAllSettingsDescription": {
+		"message": "นำเข้าการตั้งค่าทั้งหมดรวมถึงเทมเพลตและคุณสมบัติ การดำเนินการนี้จะแทนที่การกำหนดค่าปัจจุบันของคุณ"
+	},
+	"importFailed": {
+		"message": "การนำเข้าล้มเหลว ตรวจสอบคอนโซลสำหรับข้อมูลเพิ่มเติม"
+	},
+	"importModalTitle": {
+		"message": "นำเข้า"
+	},
+	"importProperties": {
+		"message": "นำเข้าคุณสมบัติ"
+	},
+	"importPropertiesDescription": {
+		"message": "ในการนำเข้าคุณสมบัติจาก Obsidian ให้ค้นหาไฟล์ $strong_1_start$types.json$strong_1_end$ ในโฟลเดอร์ $strong_2_start$.obsidian$strong_2_end$ ในคลังของคุณ โปรดทราบว่าโฟลเดอร์นี้ถูกซ่อนโดยค่าเริ่มต้นบนระบบปฏิบัติการส่วนใหญ่",
+		"placeholders": {
+			"strong_1_end": {
+				"content": "</strong>"
+			},
+			"strong_1_start": {
+				"content": "<strong>"
+			},
+			"strong_2_end": {
+				"content": "</strong>"
+			},
+			"strong_2_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"importSettings": {
+		"message": "นำเข้าการตั้งค่า"
+	},
+	"importTemplate": {
+		"message": "นำเข้าเทมเพลต"
+	},
+	"interpret": {
+		"message": "แปล"
+	},
+	"interpreter": {
+		"message": "ตัวแปล"
+	},
+	"interpreterContext": {
+		"message": "บริบทตัวแปล"
+	},
+	"interpreterContextDescription": {
+		"message": "บริบทที่ใช้ในการแปลตัวแปรพรอมต์ แทนที่บริบทเริ่มต้นที่กำหนดไว้ใน $link_start$การตั้งค่าตัวแปล$link_end$ สามารถใช้ตัวแปรได้ที่นี่",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=interpreter\">"
+			}
+		}
+	},
+	"language": {
+		"message": "ภาษา"
+	},
+	"languageDescription": {
+		"message": "เลือกภาษาที่แสดงสำหรับอินเทอร์เฟซส่วนขยาย"
+	},
+	"last30Days": {
+		"message": "30 วันที่ผ่านมา"
+	},
+	"lastUsed": {
+		"message": "ใช้ล่าสุด"
+	},
+	"legacyMode": {
+		"message": "โหมดเก่า"
+	},
+	"legacyModeDescription": {
+		"message": "ใช้วิธีการคลิป URI ที่เข้ากันได้กับ Obsidian 1.6.7 หรือเก่ากว่า โปรดทราบว่าความยาวของเนื้อหาที่คุณสามารถคลิปได้ถูกจำกัดโดยเบราว์เซอร์และระบบปฏิบัติการของคุณ บางหน้าอาจล้มเหลวโดยไม่มีข้อความแสดงข้อผิดพลาด"
+	},
+	"modelName": {
+		"message": "ชื่อที่แสดง"
+	},
+	"modelNameDescription": {
+		"message": "ชื่อของโมเดลที่คุณต้องการแสดงในอินเทอร์เฟซ"
+	},
+	"modelProvider": {
+		"message": "ผู้ให้บริการ"
+	},
+	"modelProviderDescription": {
+		"message": "เลือกผู้ให้บริการสำหรับโมเดลนี้"
+	},
+	"modelProviderPlaceholder": {
+		"message": "ผู้ให้บริการ"
+	},
+	"modelRequiredFields": {
+		"message": "ต้องระบุชื่อโมเดล ผู้ให้บริการ และ ID โมเดล"
+	},
+	"models": {
+		"message": "โมเดล"
+	},
+	"modelsListFor": {
+		"message": "รายการโมเดลสำหรับ $1"
+	},
+	"more": {
+		"message": "เพิ่มเติม"
+	},
+	"newTemplate": {
+		"message": "เทมเพลตใหม่"
+	},
+	"noHighlights": {
+		"message": "ไม่ทำอะไร"
+	},
+	"noTemplates": {
+		"message": "ไม่มีเทมเพลตที่ใช้ได้ เพิ่มเทมเพลตในการตั้งค่า"
+	},
+	"noUnusedProperties": {
+		"message": "ไม่พบคุณสมบัติที่ไม่ได้ใช้"
+	},
+	"noteContent": {
+		"message": "เนื้อหาบันทึก"
+	},
+	"noteContentDescription": {
+		"message": "ปรับแต่งเนื้อหาของบันทึก ใช้ตัวแปรเพื่อเติมข้อมูลจากหน้า"
+	},
+	"noteLocation": {
+		"message": "ตำแหน่งบันทึก"
+	},
+	"noteLocationDescription": {
+		"message": "โฟลเดอร์หรือเส้นทางสำหรับบันทึก"
+	},
+	"noteName": {
+		"message": "ชื่อบันทึก"
+	},
+	"noteNameFormat": {
+		"message": "ชื่อบันทึก"
+	},
+	"noteNameFormatDescription": {
+		"message": "รูปแบบชื่อไฟล์สำหรับบันทึก คุณสามารถใช้ตัวแปรเช่น {{title}}, {{date}} และ {{published}} เพื่อเติมข้อมูลจากหน้า $link_start$เรียนรู้เพิ่มเติม$link_end$",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/variables\" target=\"_blank\">"
+			}
+		}
+	},
+	"notesAboutPage": {
+		"message": "บันทึกเกี่ยวกับหน้านี้..."
+	},
+	"onlyHttpSupported": {
+		"message": "ไม่สามารถคลิปหน้านี้ได้ รองรับเฉพาะ URL แบบ http และ https เท่านั้น"
+	},
+	"open": {
+		"message": "เปิด"
+	},
+	"optional": {
+		"message": "(ไม่บังคับ)"
+	},
+	"orPasteBelow": {
+		"message": "หรือวางเนื้อหาด้านล่าง"
+	},
+	"overwriteNote": {
+		"message": "เขียนทับบันทึก"
+	},
+	"pageCannotBeClipped": {
+		"message": "ไม่สามารถคลิปหน้านี้ได้"
+	},
+	"pageVariables": {
+		"message": "ตัวแปรหน้า"
+	},
+	"pagesSaved": {
+		"message": "หน้าที่บันทึก"
+	},
+	"pagesSavedPlural": {
+		"message": "หน้าที่บันทึก"
+	},
+	"pasteJsonHere": {
+		"message": "วาง JSON ที่นี่"
+	},
+	"pleaseReload": {
+		"message": "โปรดลองโหลดหน้าใหม่"
+	},
+	"popularModels": {
+		"message": "โมเดลยอดนิยม"
+	},
+	"popularModelsDescription": {
+		"message": "เลือกจากโมเดลที่ใช้บ่อยหรือป้อนรายละเอียดโมเดลที่กำหนดเอง"
+	},
+	"prependToDaily": {
+		"message": "เพิ่มไปยังบันทึกประจำวัน ที่ต้น"
+	},
+	"prependToExisting": {
+		"message": "เพิ่มไปยังบันทึกที่มีอยู่ ที่ต้น"
+	},
+	"processing": {
+		"message": "กำลังประมวลผล"
+	},
+	"properties": {
+		"message": "คุณสมบัติ"
+	},
+	"propertiesSettings": {
+		"message": "คุณสมบัติ"
+	},
+	"propertyName": {
+		"message": "ชื่อคุณสมบัติ"
+	},
+	"propertyValue": {
+		"message": "ค่าคุณสมบัติ"
+	},
+	"provider": {
+		"message": "ผู้ให้บริการ"
+	},
+	"providerApiKey": {
+		"message": "คีย์ API"
+	},
+	"providerApiKeyDescription": {
+		"message": "คีย์ API ของคุณสำหรับผู้ให้บริการนี้"
+	},
+	"providerBaseUrl": {
+		"message": "URL พื้นฐาน"
+	},
+	"providerBaseUrlDescription": {
+		"message": "URL จุดสิ้นสุด API สำหรับผู้ให้บริการนี้"
+	},
+	"providerModelId": {
+		"message": "ID โมเดล"
+	},
+	"providerModelIdDescription": {
+		"message": "ตัวระบุของโมเดลจากผู้ให้บริการของคุณ โดยทั่วไปเป็นชื่อสั้นๆ ที่ไม่มีช่องว่าง"
+	},
+	"providerModelIdPlaceholder": {
+		"message": "ID โมเดล"
+	},
+	"providerName": {
+		"message": "ชื่อผู้ให้บริการ"
+	},
+	"providerNameDescription": {
+		"message": "ชื่อที่แสดงสำหรับผู้ให้บริการนี้"
+	},
+	"providerPreset": {
+		"message": "ค่าที่ตั้งไว้ล่วงหน้า"
+	},
+	"providerPresetDescription": {
+		"message": "เลือกผู้ให้บริการหรือสร้างผู้ให้บริการที่กำหนดเอง"
+	},
+	"providerRequiredFields": {
+		"message": "ต้องระบุชื่อผู้ให้บริการและ URL พื้นฐาน"
+	},
+	"providers": {
+		"message": "ผู้ให้บริการ"
+	},
+	"rateExtensionDescription": {
+		"message": "ชอบ Web Clipper ไหม? ช่วยเราด้วยการให้คะแนน"
+	},
+	"recommended": {
+		"message": "แนะนำ"
+	},
+	"refresh": {
+		"message": "รีเฟรช"
+	},
+	"remove": {
+		"message": "ลบ"
+	},
+	"removeProperty": {
+		"message": "ลบคุณสมบัติ"
+	},
+	"removeUnusedProperties": {
+		"message": "ลบคุณสมบัติที่ไม่ได้ใช้"
+	},
+	"removeUnusedPropertiesDescription": {
+		"message": "ลบคุณสมบัติทั้งหมดที่ไม่ได้ใช้ในเทมเพลตใดๆ"
+	},
+	"removeVault": {
+		"message": "ลบคลัง"
+	},
+	"replaceContent": {
+		"message": "แทนที่เนื้อหาหน้า"
+	},
+	"reset": {
+		"message": "รีเซ็ต"
+	},
+	"resetDefaultTemplate": {
+		"message": "รีเซ็ตเทมเพลตเริ่มต้น"
+	},
+	"resetDefaultTemplateDescription": {
+		"message": "ลบการเปลี่ยนแปลงทั้งหมดที่คุณทำกับเทมเพลตเริ่มต้น"
+	},
+	"resetProvidersAndModels": {
+		"message": "รีเซ็ตโมเดลเริ่มต้น"
+	},
+	"resetProvidersAndModelsDescription": {
+		"message": "รีเซ็ตผู้ให้บริการและโมเดลกลับเป็นค่าเริ่มต้น"
+	},
+	"save": {
+		"message": "บันทึก"
+	},
+	"saveFile": {
+		"message": "บันทึกไฟล์..."
+	},
+	"searchVariables": {
+		"message": "ค้นหาตัวแปร..."
+	},
+	"selectProvider": {
+		"message": "เลือกผู้ให้บริการ"
+	},
+	"selectTemplateToExport": {
+		"message": "เลือกเทมเพลตที่จะส่งออก"
+	},
+	"settings": {
+		"message": "การตั้งค่า"
+	},
+	"settingsHeading": {
+		"message": "การตั้งค่า"
+	},
+	"settingsImportSuccess": {
+		"message": "นำเข้าการตั้งค่าทั้งหมดสำเร็จ โปรดรีเฟรชหน้าเพื่อดูการเปลี่ยนแปลง"
+	},
+	"share": {
+		"message": "แชร์..."
+	},
+	"shortcutInstructionsBrave": {
+		"message": "เพื่อเปลี่ยนการกำหนดปุ่มลัด ไปที่ $1"
+	},
+	"shortcutInstructionsChrome": {
+		"message": "เพื่อเปลี่ยนการกำหนดปุ่มลัด ไปที่ $1"
+	},
+	"shortcutInstructionsDefault": {
+		"message": "เพื่อเปลี่ยนการกำหนดปุ่มลัด โปรดดูการตั้งค่าส่วนขยายของเบราว์เซอร์ของคุณ"
+	},
+	"shortcutInstructionsEdge": {
+		"message": "เพื่อเปลี่ยนการกำหนดปุ่มลัด ไปที่ $1"
+	},
+	"shortcutInstructionsFirefox": {
+		"message": "เพื่อเปลี่ยนการกำหนดปุ่มลัด ไปที่ $1 คลิกไอคอนเฟืองและเลือก \"จัดการปุ่มลัดส่วนขยาย\""
+	},
+	"shortcutInstructionsIntro": {
+		"message": "ปุ่มลัดให้คุณเข้าถึงฟังก์ชัน clipper ได้อย่างรวดเร็ว"
+	},
+	"shortcutInstructionsSafari": {
+		"message": "ไม่สามารถกำหนดปุ่มลัดเองได้ใน Safari"
+	},
+	"shortcutNotSet": {
+		"message": "ไม่ได้ตั้งค่า"
+	},
+	"showActionsButton": {
+		"message": "แสดงปุ่มการกระทำ"
+	},
+	"showActionsDescription": {
+		"message": "ให้คุณตรวจสอบตัวแปรหน้าจากเมนู clipper มีประโยชน์ในการดูตัวแปรที่มีให้ใช้ในเทมเพลต"
+	},
+	"showPageVariables": {
+		"message": "แสดงตัวแปรหน้า"
+	},
+	"silentOpen": {
+		"message": "บันทึกบันทึกที่คลิปโดยไม่เปิด"
+	},
+	"silentOpenDescription": {
+		"message": "บันทึกที่คลิปจะถูกบันทึกแต่ไม่เปิดเป็นแท็บใหม่ Obsidian จะยังคงถูกนำมาไว้ด้านหน้า"
+	},
+	"specificNoteName": {
+		"message": "ชื่อบันทึกเฉพาะ"
+	},
+	"systemDefault": {
+		"message": "ค่าเริ่มต้นของระบบ"
+	},
+	"templateCopied": {
+		"message": "คัดลอก JSON เทมเพลตไปยังคลิปบอร์ดแล้ว"
+	},
+	"templateCopyError": {
+		"message": "ไม่สามารถคัดลอก JSON เทมเพลตไปยังคลิปบอร์ด"
+	},
+	"templateName": {
+		"message": "ชื่อเทมเพลต"
+	},
+	"templateProperties": {
+		"message": "คุณสมบัติ"
+	},
+	"templatePropertiesDescription": {
+		"message": "คุณสมบัติที่จะเพิ่มที่ด้านบนของบันทึกที่คลิป ใช้ตัวแปรเพื่อเติมข้อมูลล่วงหน้าจากหน้า"
+	},
+	"templateTriggers": {
+		"message": "ตัวกระตุ้นเทมเพลต"
+	},
+	"templateTriggersDescription": {
+		"message": "กำหนดกฎเพื่อเลือกเทมเพลตนี้โดยอัตโนมัติถ้าตรงกับรูปแบบ URL หรือมีข้อมูล schema.org หนึ่งกฎต่อบรรทัด"
+	},
+	"templatesHeading": {
+		"message": "เทมเพลต"
+	},
+	"thinking": {
+		"message": "กำลังคิด"
+	},
+	"unknownProvider": {
+		"message": "ผู้ให้บริการที่ไม่รู้จัก"
+	},
+	"updateAvailable": {
+		"message": "มีการอัปเดตพร้อมใช้งาน"
+	},
+	"usingLatestVersion": {
+		"message": "คุณกำลังใช้เวอร์ชันล่าสุด"
+	},
+	"vault": {
+		"message": "คลัง"
+	},
+	"vaultDescription": {
+		"message": "เลือกคลังเริ่มต้นสำหรับเทมเพลตนี้ ไปที่ $link_start$การตั้งค่าทั่วไป$link_end$ เพื่อเพิ่มหรือลบคลัง",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=general\">"
+			}
+		}
+	},
+	"vaults": {
+		"message": "คลัง"
+	},
+	"vaultsDescription": {
+		"message": "โดยค่าเริ่มต้น บันทึกที่คลิปจะถูกบันทึกในคลังที่เปิดอยู่ คุณสามารถเพิ่มคลังที่นี่ถ้าคุณต้องการตัวเลือกในการบันทึกไปยังคลังต่างๆ ชื่อคลังต้องตรงกับชื่อคลัง Obsidian พอดี กด $strong_start$enter$strong_end$ เพื่อเพิ่มคลัง",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"version": {
+		"message": "เวอร์ชัน"
+	}
+}

@@ -6,23 +6,36 @@ import DOMPurify from 'dompurify';
 // Import dayjs locales that match our supported languages
 import 'dayjs/locale/ar';
 import 'dayjs/locale/ca';
+import 'dayjs/locale/cs';
+import 'dayjs/locale/da';
 import 'dayjs/locale/de';
+import 'dayjs/locale/el';
 import 'dayjs/locale/en';
 import 'dayjs/locale/es';
 import 'dayjs/locale/fa';
+import 'dayjs/locale/fi';
 import 'dayjs/locale/fr';
+import 'dayjs/locale/he';
 import 'dayjs/locale/hi';
+import 'dayjs/locale/hu';
 import 'dayjs/locale/id';
 import 'dayjs/locale/it';
 import 'dayjs/locale/ja';
 import 'dayjs/locale/ko';
+import 'dayjs/locale/nb';
 import 'dayjs/locale/nl';
 import 'dayjs/locale/pl';
 import 'dayjs/locale/pt';
+import 'dayjs/locale/ro';
 import 'dayjs/locale/ru';
+import 'dayjs/locale/sv';
+import 'dayjs/locale/th';
+import 'dayjs/locale/tl-ph';
 import 'dayjs/locale/tr';
-import 'dayjs/locale/zh';
+import 'dayjs/locale/uk';
+import 'dayjs/locale/vi';
 import 'dayjs/locale/zh-tw';
+import 'dayjs/locale/zh';
 
 function convertToLocaleCode(locale: string): string {
 	// Convert locale codes like 'pt_BR' to 'pt-br'
@@ -46,23 +59,36 @@ export function getAvailableLanguages(): { code: string; name: string }[] {
 	return [
 		{ code: '', name: 'systemDefault' },
 		{ code: 'ar', name: 'العربية' },
+		{ code: 'bn', name: 'বাংলা'},
 		{ code: 'ca', name: 'Català' },
+		{ code: 'cs', name: 'Čeština' },
+		{ code: 'da', name: 'Dansk' },
 		{ code: 'de', name: 'Deutsch' },
+		{ code: 'el', name: 'Ελληνικά' },
 		{ code: 'en', name: 'English' },
 		{ code: 'es', name: 'Español' },
 		{ code: 'fa', name: 'فارسی' },
-		{ code: 'bn', name: 'বাংলা'},
 		{ code: 'fr', name: 'Français' },
+		{ code: 'he', name: 'עברית' },
 		{ code: 'hi', name: 'हिन्दी' },
 		{ code: 'id', name: 'Bahasa Indonesia' },
 		{ code: 'it', name: 'Italiano' },
 		{ code: 'ja', name: '日本語' },
 		{ code: 'ko', name: '한국어' },
+		{ code: 'hu', name: 'Magyar' },
 		{ code: 'nl', name: 'Nederlands' },
+		{ code: 'no', name: 'Norsk' },
 		{ code: 'pl', name: 'Polski' },
 		{ code: 'pt_BR', name: 'Português do Brasil' },
+		{ code: 'ro', name: 'Română' },
 		{ code: 'ru', name: 'Русский' },
+		{ code: 'fi', name: 'Suomi' },
+		{ code: 'sv', name: 'Svenska' },
+		{ code: 'th', name: 'ไทย' },
+		{ code: 'tl', name: 'Tagalog' },
 		{ code: 'tr', name: 'Türkçe' },
+		{ code: 'uk', name: 'Українська' },
+		{ code: 'vi', name: 'Tiếng Việt' },
 		{ code: 'zh_CN', name: '简体中文' },
 		{ code: 'zh_TW', name: '繁體中文' }
 	];

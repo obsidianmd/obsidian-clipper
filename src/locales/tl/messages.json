@@ -1,0 +1,777 @@
+{
+	"activity": {
+		"message": "Aktibidad"
+	},
+	"addModel": {
+		"message": "+ Magdagdag ng modelo"
+	},
+	"addModelTitle": {
+		"message": "Magdagdag ng modelo"
+	},
+	"addProperty": {
+		"message": "+ Magdagdag ng katangian"
+	},
+	"addProvider": {
+		"message": "+ Magdagdag ng provider"
+	},
+	"addProviderTitle": {
+		"message": "Magdagdag ng provider"
+	},
+	"addToObsidian": {
+		"message": "Idagdag sa Obsidian"
+	},
+	"addVaultPlaceholder": {
+		"message": "Pindutin ang Enter para magdagdag ng vault"
+	},
+	"advanced": {
+		"message": "Advanced"
+	},
+	"allProperties": {
+		"message": "Lahat ng katangian"
+	},
+	"allTime": {
+		"message": "Lahat ng oras"
+	},
+	"alwaysShowHighlights": {
+		"message": "Palaging ipakita ang mga highlight"
+	},
+	"alwaysShowHighlightsDescription": {
+		"message": "Ipakita ang mga naka-save na highlight kapag nag-load ang pahina. I-disable para ipakita lang ang mga highlight kapag aktibo ang highlight mode."
+	},
+	"apiKeyMissing": {
+		"message": "Nawawala ang API key"
+	},
+	"apiKeysWarning": {
+		"message": "Sa paggamit ng external provider, tinatanggap mo ang kanilang mga tuntunin at patakaran sa privacy. Ang mga kahilingan sa interpreter ay direktang ipinapadala sa iyong napiling provider. Hindi nangongolekta o nag-iimbak ang Obsidian ng impormasyon tungkol sa iyong mga kahilingan."
+	},
+	"appendToDaily": {
+		"message": "Idagdag sa daily note, sa dulo"
+	},
+	"appendToExisting": {
+		"message": "Idagdag sa umiiral na note, sa dulo"
+	},
+	"autoRunInterpreter": {
+		"message": "Awtomatikong patakbuhin"
+	},
+	"autoRunInterpreterDescription": {
+		"message": "Agad na isinasagawa ang mga prompt variable kung mayroon sa template. Gumagamit ng API credits mula sa iyong model provider. I-disable kung gusto mo lang patakbuhin ang interpreter nang manu-mano."
+	},
+	"behavior": {
+		"message": "Pag-uugali"
+	},
+	"behaviorWarning": {
+		"message": "Ang pagdagdag sa umiiral o daily note ay nangangailangan ng Obsidian 1.7.2 o mas bago."
+	},
+	"byDay": {
+		"message": "Ayon sa araw"
+	},
+	"byMonth": {
+		"message": "Ayon sa buwan"
+	},
+	"byWeek": {
+		"message": "Ayon sa linggo"
+	},
+	"cancel": {
+		"message": "Kanselahin"
+	},
+	"cannotDeleteProvider": {
+		"message": "Hindi maaaring tanggalin ang provider na \"$1\" dahil ginagamit ito ng $2 (na) modelo."
+	},
+	"changelog": {
+		"message": "Talaan ng mga pagbabago"
+	},
+	"chooseFile": {
+		"message": "Pumili ng file"
+	},
+	"choosePropertiesFile": {
+		"message": "Pumili ng properties file"
+	},
+	"chooseSettingsFile": {
+		"message": "Pumili ng settings file"
+	},
+	"chooseTemplateFile": {
+		"message": "Pumili ng template file"
+	},
+	"clipBehavior": {
+		"message": "Pag-uugali ng pag-clip"
+	},
+	"clipBehaviorDescription": {
+		"message": "Piliin kung paano i-save ang napiling content sa Obsidian. Itinatakda ang variable na $strong_start${{content}}$strong_end$",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"close": {
+		"message": "Isara"
+	},
+	"commandOpenClipper": {
+		"message": "Buksan ang Obsidian Clipper"
+	},
+	"commandQuickClip": {
+		"message": "Quick clip"
+	},
+	"commandToggleHighlighter": {
+		"message": "I-toggle ang highlighter"
+	},
+	"confirmDeleteTemplate": {
+		"message": "Sigurado ka bang gusto mong tanggalin ang template na \"$1\"?"
+	},
+	"confirmReplaceSettings": {
+		"message": "Ang aksyong ito ay papalitan ang lahat ng iyong kasalukuyang settings, kasama ang mga template at properties. Sigurado ka bang gusto mong magpatuloy?"
+	},
+	"copied": {
+		"message": "Nakopya na!"
+	},
+	"copyAsJson": {
+		"message": "Kopyahin bilang JSON"
+	},
+	"copyToClipboard": {
+		"message": "Kopyahin sa clipboard"
+	},
+	"createNewNote": {
+		"message": "Gumawa ng bagong note"
+	},
+	"custom": {
+		"message": "Custom"
+	},
+	"dailyNoteFormat": {
+		"message": "Format ng daily note (hal. YYYY-MM-DD)"
+	},
+	"defaultInterpreterContext": {
+		"message": "Default na konteksto ng interpreter"
+	},
+	"defaultInterpreterContextDescription": {
+		"message": "I-override ang kontekstong ginagamit para sa pag-interpret ng mga prompt variable. Maaari kang gumamit ng mga variable dito."
+	},
+	"defaultTemplateName": {
+		"message": "Default"
+	},
+	"delete": {
+		"message": "Tanggalin"
+	},
+	"deleteModelConfirm": {
+		"message": "Sigurado ka bang gusto mong tanggalin ang modelong ito?"
+	},
+	"deleteProviderConfirm": {
+		"message": "Sigurado ka bang gusto mong tanggalin ang provider na ito?"
+	},
+	"disableHighlighter": {
+		"message": "I-disable ang highlighter"
+	},
+	"done": {
+		"message": "Tapos na"
+	},
+	"dragAndDropFile": {
+		"message": "I-drag at i-drop ang file dito"
+	},
+	"duplicate": {
+		"message": "Kopyahin"
+	},
+	"earlyAccessDescription": {
+		"message": "Gamitin ang mga feature na nangangailangan ng pinakabagong $link_start$early access version$link_end$ ng Obsidian. Kasalukuyang kailangan ang Obsidian 1.7.2 o mas bago.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/Obsidian/Early+access+versions\" target=\"_blank\">"
+			}
+		}
+	},
+	"earlyAccessFeatures": {
+		"message": "Mga early access na feature"
+	},
+	"editModel": {
+		"message": "I-edit ang modelo"
+	},
+	"editProvider": {
+		"message": "I-edit ang provider"
+	},
+	"editTemplate": {
+		"message": "I-edit ang template"
+	},
+	"enableHighlighter": {
+		"message": "I-enable ang highlighter"
+	},
+	"enableHighlighterDescription": {
+		"message": "Mag-highlight ng content sa mga webpage para i-save sa Obsidian"
+	},
+	"enableInterpreter": {
+		"message": "I-enable ang interpreter"
+	},
+	"enableInterpreterDescription": {
+		"message": "Gumamit ng natural na wika para kunin ang impormasyon mula sa mga pahina. Halimbawa, maaari mong gamitin ang template syntax na $strong_start${{\"i-summarize ang pahinang ito\"}}$strong_end$. Nangangailangan ng API key o pag-setup ng custom model sa ibaba. $link_start$Matuto pa$link_end$",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/interpreter\" target=\"_blank\">"
+			},
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"error": {
+		"message": "Error"
+	},
+	"export": {
+		"message": "I-export"
+	},
+	"exportAllSettings": {
+		"message": "I-export lahat ng settings"
+	},
+	"exportAllSettingsDescription": {
+		"message": "I-export lahat ng settings, kasama ang mga template at properties"
+	},
+	"exportHighlights": {
+		"message": "I-export ang mga highlight"
+	},
+	"exportHighlightsDescription": {
+		"message": "I-export ang iyong mga highlight sa isang file"
+	},
+	"exportProperties": {
+		"message": "I-export ang mga property"
+	},
+	"exportPropertiesDescription": {
+		"message": "I-save ang mga Web Clipper property sa $strong_start$types.json$strong_end$ file, na maaaring i-import sa iyong Obsidian vault o Web Clipper sa ibang device",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"extensionDescription": {
+		"message": "I-save ang web content sa pribado at pangmatagalang format, na maaaring ma-access offline. Ang opisyal na browser extension para sa Obsidian."
+	},
+	"extensionName": {
+		"message": "Obsidian Web Clipper"
+	},
+	"failedToCopyText": {
+		"message": "Hindi makopya ang text"
+	},
+	"failedToDeleteTemplate": {
+		"message": "Hindi matanggal ang template. Pakisubukang muli."
+	},
+	"failedToDuplicateTemplate": {
+		"message": "Hindi makopya ang template. Pakisubukang muli."
+	},
+	"failedToExportHighlights": {
+		"message": "Hindi ma-export ang mga highlight. Tingnan ang console para sa mga detalye."
+	},
+	"failedToExportSettings": {
+		"message": "Hindi ma-export ang mga setting. Tingnan ang console para sa mga detalye."
+	},
+	"failedToExtractContent": {
+		"message": "Hindi makuha ang content ng pahina."
+	},
+	"failedToImportTemplate": {
+		"message": "Error sa pag-import ng template. Tingnan ang file at subukang muli."
+	},
+	"failedToInitialize": {
+		"message": "Paki-reload ang extension."
+	},
+	"failedToInitializeContent": {
+		"message": "Hindi ma-initialize ang content ng pahina."
+	},
+	"failedToProcessInterpreter": {
+		"message": "Hindi maproseso ang interpreter. Pakisubukang muli."
+	},
+	"failedToResetProviders": {
+		"message": "Hindi ma-reset ang mga provider at model"
+	},
+	"failedToResetTemplate": {
+		"message": "Hindi ma-reset ang default template. Pakisubukang muli."
+	},
+	"failedToSave": {
+		"message": "Hindi ma-save ang file"
+	},
+	"failedToSaveFile": {
+		"message": "Hindi ma-save ang file"
+	},
+	"failedToSaveProvider": {
+		"message": "Hindi ma-save ang provider. Pakisubukang muli."
+	},
+	"feedback": {
+		"message": "Feedback"
+	},
+	"feedbackDescription": {
+		"message": "Paano namin mapapabuti ang Web Clipper? Bisitahin ang aming help page para mag-report ng bugs, magmungkahi ng mga feature, at makakuha ng tulong sa mga karaniwang problema."
+	},
+	"feedbackTitle": {
+		"message": "Salamat sa iyong feedback"
+	},
+	"folder": {
+		"message": "Folder"
+	},
+	"general": {
+		"message": "Pangkalahatan"
+	},
+	"generalSettings": {
+		"message": "Pangkalahatang Settings"
+	},
+	"getApiKeyHere": {
+		"message": "Kunin ang $1 API key dito"
+	},
+	"help": {
+		"message": "Tulong"
+	},
+	"helpDescription": {
+		"message": "Alamin kung paano gamitin ang Web Clipper at makakuha ng tulong sa troubleshooting"
+	},
+	"highlightInline": {
+		"message": "I-highlight ang content sa pahina"
+	},
+	"highlightPage": {
+		"message": "I-highlight ang pahina"
+	},
+	"highlighter": {
+		"message": "Highlighter"
+	},
+	"highlighterSettings": {
+		"message": "Highlighter"
+	},
+	"history": {
+		"message": "Kasaysayan"
+	},
+	"hotkeys": {
+		"message": "Mga hotkey"
+	},
+	"import": {
+		"message": "I-import"
+	},
+	"importAllSettings": {
+		"message": "I-import lahat ng settings"
+	},
+	"importAllSettingsDescription": {
+		"message": "I-import lahat ng settings, kasama ang mga template at properties. Papalitan nito ang iyong kasalukuyang configuration."
+	},
+	"importFailed": {
+		"message": "Nabigo ang pag-import. Tingnan ang console para sa mga detalye."
+	},
+	"importModalTitle": {
+		"message": "I-import"
+	},
+	"importProperties": {
+		"message": "I-import ang mga property"
+	},
+	"importPropertiesDescription": {
+		"message": "Para i-import ang mga property mula sa Obsidian, hanapin ang $strong_1_start$types.json$strong_1_end$ file sa $strong_2_start$.obsidian$strong_2_end$ folder ng iyong vault. Ang folder na ito ay nakatago by default sa karamihan ng operating system.",
+		"placeholders": {
+			"strong_1_end": {
+				"content": "</strong>"
+			},
+			"strong_1_start": {
+				"content": "<strong>"
+			},
+			"strong_2_end": {
+				"content": "</strong>"
+			},
+			"strong_2_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"importSettings": {
+		"message": "I-import ang mga setting"
+	},
+	"importTemplate": {
+		"message": "I-import ang template"
+	},
+	"interpret": {
+		"message": "I-interpret"
+	},
+	"interpreter": {
+		"message": "Interpreter"
+	},
+	"interpreterContext": {
+		"message": "Konteksto ng interpreter"
+	},
+	"interpreterContextDescription": {
+		"message": "Ang kontekstong ginagamit para i-interpret ang mga prompt variable. Ino-override nito ang default na konteksto na nakatakda sa $link_start$interpreter settings$link_end$. Maaari kang gumamit ng mga variable dito.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=interpreter\">"
+			}
+		}
+	},
+	"language": {
+		"message": "Wika"
+	},
+	"languageDescription": {
+		"message": "Piliin ang wika ng display para sa interface ng extension."
+	},
+	"last30Days": {
+		"message": "Huling 30 araw"
+	},
+	"lastUsed": {
+		"message": "Huling ginamit"
+	},
+	"legacyMode": {
+		"message": "Legacy mode"
+	},
+	"legacyModeDescription": {
+		"message": "Gumagamit ng URI capture method na compatible sa Obsidian 1.6.7 at mas luma. Tandaan na ang haba ng na-capture na content ay limitado ng browser at operating system. Ang ilang pahina ay maaaring mabigo nang walang error message."
+	},
+	"modelName": {
+		"message": "Pangalan ng model"
+	},
+	"modelNameDescription": {
+		"message": "Ang pangalang ipapakita sa model dropdown"
+	},
+	"modelProvider": {
+		"message": "Provider"
+	},
+	"modelProviderDescription": {
+		"message": "Piliin ang provider para sa model na ito"
+	},
+	"modelProviderPlaceholder": {
+		"message": "Provider"
+	},
+	"modelRequiredFields": {
+		"message": "Ang pangalan ng model, provider, at model ID ay kinakailangan."
+	},
+	"models": {
+		"message": "Mga model"
+	},
+	"modelsListFor": {
+		"message": "Listahan ng mga model para sa $1"
+	},
+	"more": {
+		"message": "Higit pa"
+	},
+	"newTemplate": {
+		"message": "Bagong template"
+	},
+	"noHighlights": {
+		"message": "Walang mga highlight"
+	},
+	"noTemplates": {
+		"message": "Walang available na mga template. Magdagdag ng template sa settings."
+	},
+	"noUnusedProperties": {
+		"message": "Walang nahanap na hindi ginagamit na mga property."
+	},
+	"noteContent": {
+		"message": "Content ng note"
+	},
+	"noteContentDescription": {
+		"message": "I-customize ang content ng note. Gumamit ng mga variable para i-prefill ang data mula sa pahina."
+	},
+	"noteLocation": {
+		"message": "Lokasyon ng note"
+	},
+	"noteLocationDescription": {
+		"message": "Ang folder o path para sa note."
+	},
+	"noteName": {
+		"message": "Pangalan ng note"
+	},
+	"noteNameFormat": {
+		"message": "Format ng pangalan ng note"
+	},
+	"noteNameFormatDescription": {
+		"message": "Ang format na ginagamit para bumuo ng mga pangalan ng note. Maaari kang gumamit ng mga variable."
+	},
+	"notesAboutPage": {
+		"message": "Mga note tungkol sa pahinang ito..."
+	},
+	"onlyHttpSupported": {
+		"message": "Hindi ma-clip ang pahinang ito. Tanging http at https URL lang ang suportado."
+	},
+	"open": {
+		"message": "Buksan"
+	},
+	"optional": {
+		"message": "(opsyonal)"
+	},
+	"orPasteBelow": {
+		"message": "O i-paste ang content sa ibaba"
+	},
+	"overwriteNote": {
+		"message": "I-overwrite ang note"
+	},
+	"pageCannotBeClipped": {
+		"message": "Hindi ma-clip ang pahinang ito."
+	},
+	"pageVariables": {
+		"message": "Mga variable ng pahina"
+	},
+	"pagesSaved": {
+		"message": "Na-save na ang pahina"
+	},
+	"pagesSavedPlural": {
+		"message": "Na-save na ang mga pahina"
+	},
+	"pasteJsonHere": {
+		"message": "I-paste ang JSON dito"
+	},
+	"pleaseReload": {
+		"message": "Paki-reload ang pahina."
+	},
+	"popularModels": {
+		"message": "Mga sikat na model"
+	},
+	"popularModelsDescription": {
+		"message": "Pumili mula sa mga karaniwang ginagamit na model o maglagay ng mga detalye para sa custom model."
+	},
+	"prependToDaily": {
+		"message": "Idagdag sa daily note, sa simula"
+	},
+	"prependToExisting": {
+		"message": "Idagdag sa umiiral na note, sa simula"
+	},
+	"processing": {
+		"message": "pinoproseso"
+	},
+	"properties": {
+		"message": "Mga property"
+	},
+	"propertiesSettings": {
+		"message": "Mga property"
+	},
+	"propertyName": {
+		"message": "Pangalan ng property"
+	},
+	"propertyValue": {
+		"message": "Value ng property"
+	},
+	"provider": {
+		"message": "Provider"
+	},
+	"providerApiKey": {
+		"message": "API key"
+	},
+	"providerApiKeyDescription": {
+		"message": "Ang iyong API key para sa provider na ito."
+	},
+	"providerBaseUrl": {
+		"message": "Base URL"
+	},
+	"providerBaseUrlDescription": {
+		"message": "Ang API endpoint URL para sa provider na ito."
+	},
+	"providerModelId": {
+		"message": "Model ID"
+	},
+	"providerModelIdDescription": {
+		"message": "Ang identifier ng model mula sa iyong provider. Karaniwang maikling pangalan na walang mga space."
+	},
+	"providerModelIdPlaceholder": {
+		"message": "Model ID"
+	},
+	"providerName": {
+		"message": "Pangalan ng provider"
+	},
+	"providerNameDescription": {
+		"message": "Display name para sa provider na ito."
+	},
+	"providerPreset": {
+		"message": "Preset"
+	},
+	"providerPresetDescription": {
+		"message": "Pumili ng provider o gumawa ng custom."
+	},
+	"providerRequiredFields": {
+		"message": "Kinakailangan ang pangalan ng provider at base URL."
+	},
+	"providers": {
+		"message": "Mga provider"
+	},
+	"rateExtensionDescription": {
+		"message": "Nagustuhan mo ba ang Web Clipper? Tulungan mo kami sa pamamagitan ng pagbibigay ng rating."
+	},
+	"recommended": {
+		"message": "inirerekomenda"
+	},
+	"refresh": {
+		"message": "I-refresh"
+	},
+	"remove": {
+		"message": "Tanggalin"
+	},
+	"removeProperty": {
+		"message": "Tanggalin ang property"
+	},
+	"removeUnusedProperties": {
+		"message": "Tanggalin ang mga hindi ginagamit na property"
+	},
+	"removeUnusedPropertiesDescription": {
+		"message": "Tanggalin ang lahat ng property na hindi ginagamit sa kahit anong template."
+	},
+	"removeVault": {
+		"message": "Tanggalin ang vault"
+	},
+	"replaceContent": {
+		"message": "Palitan ang content ng note"
+	},
+	"reset": {
+		"message": "I-reset"
+	},
+	"resetDefaultTemplate": {
+		"message": "I-reset ang default template"
+	},
+	"resetDefaultTemplateDescription": {
+		"message": "Tanggalin ang lahat ng pagbabagong ginawa sa default template."
+	},
+	"resetProvidersAndModels": {
+		"message": "I-reset ang mga model sa default"
+	},
+	"resetProvidersAndModelsDescription": {
+		"message": "I-reset ang mga provider at model sa default na settings."
+	},
+	"save": {
+		"message": "I-save"
+	},
+	"saveFile": {
+		"message": "I-save ang file..."
+	},
+	"searchVariables": {
+		"message": "Maghanap sa mga variable..."
+	},
+	"selectProvider": {
+		"message": "Pumili ng provider"
+	},
+	"selectTemplateToExport": {
+		"message": "Pumili ng template na i-export"
+	},
+	"settings": {
+		"message": "Mga Setting"
+	},
+	"settingsHeading": {
+		"message": "Mga Setting"
+	},
+	"settingsImportSuccess": {
+		"message": "Matagumpay na na-import ang lahat ng settings. I-reload ang pahina para makita ang mga pagbabago."
+	},
+	"share": {
+		"message": "Ibahagi..."
+	},
+	"shortcutInstructionsBrave": {
+		"message": "Para baguhin ang mga shortcut, pumunta sa $1"
+	},
+	"shortcutInstructionsChrome": {
+		"message": "Para baguhin ang mga shortcut, pumunta sa $1"
+	},
+	"shortcutInstructionsDefault": {
+		"message": "Para baguhin ang mga shortcut, tingnan ang extension settings ng iyong browser."
+	},
+	"shortcutInstructionsEdge": {
+		"message": "Para baguhin ang mga shortcut, pumunta sa $1"
+	},
+	"shortcutInstructionsFirefox": {
+		"message": "Para baguhin ang mga shortcut, pumunta sa $1, i-click ang gear icon at piliin ang \"Manage Extension Shortcuts\""
+	},
+	"shortcutInstructionsIntro": {
+		"message": "Ang mga shortcut ay nagbibigay ng mabilis na access sa mga clipping function."
+	},
+	"shortcutInstructionsSafari": {
+		"message": "Hindi maaaring i-configure ang mga shortcut sa Safari."
+	},
+	"shortcutNotSet": {
+		"message": "Hindi nakatakda"
+	},
+	"showActionsButton": {
+		"message": "Ipakita ang action button"
+	},
+	"showActionsDescription": {
+		"message": "Nagpapahintulot na makita ang mga variable ng pahina mula sa clipper menu. Kapaki-pakinabang para makita kung aling mga variable ang available para gamitin sa mga template."
+	},
+	"showPageVariables": {
+		"message": "Ipakita ang mga variable ng pahina"
+	},
+	"silentOpen": {
+		"message": "I-save ang mga note nang hindi binubuksan"
+	},
+	"silentOpenDescription": {
+		"message": "Ang mga na-clip na note ay mase-save pero hindi bubuksan sa bagong tab. Ang Obsidian ay dadalhin pa rin sa foreground."
+	},
+	"specificNoteName": {
+		"message": "Tiyak na pangalan ng note"
+	},
+	"systemDefault": {
+		"message": "System default"
+	},
+	"templateCopied": {
+		"message": "Na-copy na ang template JSON sa clipboard"
+	},
+	"templateCopyError": {
+		"message": "Hindi ma-copy ang template JSON sa clipboard"
+	},
+	"templateName": {
+		"message": "Pangalan ng template"
+	},
+	"templateProperties": {
+		"message": "Mga Property"
+	},
+	"templatePropertiesDescription": {
+		"message": "Mga property na idadagdag sa simula ng na-clip na note. Gumamit ng mga variable para i-prefill ang data mula sa pahina."
+	},
+	"templateTriggers": {
+		"message": "Mga Template Trigger"
+	},
+	"templateTriggersDescription": {
+		"message": "Magtakda ng mga patakaran para awtomatikong piliin ang template na ito kung tumutugma sa URL pattern o naglalaman ng schema.org data. Isang patakaran bawat linya."
+	},
+	"templatesHeading": {
+		"message": "Mga Template"
+	},
+	"thinking": {
+		"message": "nag-iisip"
+	},
+	"unknownProvider": {
+		"message": "Hindi kilalang provider"
+	},
+	"updateAvailable": {
+		"message": "May available na update"
+	},
+	"usingLatestVersion": {
+		"message": "Gumagamit ka ng pinakabagong bersyon"
+	},
+	"vault": {
+		"message": "Vault"
+	},
+	"vaultDescription": {
+		"message": "Piliin ang default vault para sa template na ito. Pumunta sa $link_start$general settings$link_end$ para magdagdag o magtanggal ng mga vault.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=general\">"
+			}
+		}
+	},
+	"vaults": {
+		"message": "Mga Vault"
+	},
+	"vaultsDescription": {
+		"message": "By default, ang mga na-clip na note ay sine-save sa bukas na vault. Maaari kang magdagdag ng mga vault dito kung gusto mong magkaroon ng opsyon na mag-save sa iba't ibang vault. Ang pangalan ng vault ay dapat eksaktong tumugma sa pangalan ng Obsidian vault. Pindutin ang $strong_start$enter$strong_end$ para magdagdag ng vault.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"version": {
+		"message": "Bersyon"
+	}
+}

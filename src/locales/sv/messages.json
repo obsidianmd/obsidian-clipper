@@ -1,0 +1,785 @@
+{
+	"activity": {
+		"message": "Aktivitet"
+	},
+	"addModel": {
+		"message": "+ Lägg till modell"
+	},
+	"addModelTitle": {
+		"message": "Lägg till modell"
+	},
+	"addProperty": {
+		"message": "+ Lägg till egenskap"
+	},
+	"addProvider": {
+		"message": "+ Lägg till leverantör"
+	},
+	"addProviderTitle": {
+		"message": "Lägg till leverantör"
+	},
+	"addToObsidian": {
+		"message": "Lägg till i Obsidian"
+	},
+	"addVaultPlaceholder": {
+		"message": "Tryck på retur för att lägga till ett valv"
+	},
+	"advanced": {
+		"message": "Avancerat"
+	},
+	"allProperties": {
+		"message": "Alla egenskaper"
+	},
+	"allTime": {
+		"message": "All tid"
+	},
+	"alwaysShowHighlights": {
+		"message": "Visa alltid markeringar"
+	},
+	"alwaysShowHighlightsDescription": {
+		"message": "Visa dina sparade markeringar när du laddar en sida. Stäng av för att endast visa markeringar när markeringsläget är aktiverat."
+	},
+	"apiKeyMissing": {
+		"message": "Ingen API-nyckel"
+	},
+	"apiKeysWarning": {
+		"message": "Genom att använda en extern leverantör godkänner du deras villkor och sekretesspolicy. Tolkningsförfrågningar skickas direkt till leverantören du väljer. Obsidian samlar inte in eller lagrar någon data om dina förfrågningar."
+	},
+	"appendToDaily": {
+		"message": "Lägg till i daglig anteckning, i slutet"
+	},
+	"appendToExisting": {
+		"message": "Lägg till i befintlig anteckning, i slutet"
+	},
+	"autoRunInterpreter": {
+		"message": "Kör automatiskt"
+	},
+	"autoRunInterpreterDescription": {
+		"message": "Kör promptvariabler omedelbart om mallen innehåller några. Detta kommer att förbruka API-krediter hos din modellleverantör. Stäng av om du bara vill köra tolken manuellt."
+	},
+	"behavior": {
+		"message": "Beteende"
+	},
+	"behaviorWarning": {
+		"message": "Att lägga till i en befintlig anteckning eller daglig anteckning kräver Obsidian 1.7.2 eller senare."
+	},
+	"byDay": {
+		"message": "Dagar"
+	},
+	"byMonth": {
+		"message": "Månader"
+	},
+	"byWeek": {
+		"message": "Veckor"
+	},
+	"cancel": {
+		"message": "Avbryt"
+	},
+	"cannotDeleteProvider": {
+		"message": "Kan inte ta bort leverantören \"$1\" eftersom den används av $2 modell(er)."
+	},
+	"changelog": {
+		"message": "Ändringslogg"
+	},
+	"chooseFile": {
+		"message": "Välj en fil"
+	},
+	"choosePropertiesFile": {
+		"message": "Välj egenskapsfil"
+	},
+	"chooseSettingsFile": {
+		"message": "Välj inställningsfil"
+	},
+	"chooseTemplateFile": {
+		"message": "Välj mallfil"
+	},
+	"clipBehavior": {
+		"message": "Klippbeteende"
+	},
+	"clipBehaviorDescription": {
+		"message": "Välj hur markerat innehåll sparas till Obsidian. Definierar variabeln $strong_start${{content}}$strong_end$.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"close": {
+		"message": "Stäng"
+	},
+	"commandOpenClipper": {
+		"message": "Öppna Obsidian Clipper"
+	},
+	"commandQuickClip": {
+		"message": "Snabbklipp"
+	},
+	"commandToggleHighlighter": {
+		"message": "Växla markeringsläge"
+	},
+	"confirmDeleteTemplate": {
+		"message": "Är du säker på att du vill ta bort mallen \"$1\"?"
+	},
+	"confirmReplaceSettings": {
+		"message": "Detta kommer att ersätta alla dina nuvarande inställningar, inklusive mallar och egenskaper. Är du säker på att du vill fortsätta?"
+	},
+	"copied": {
+		"message": "Kopierat!"
+	},
+	"copyAsJson": {
+		"message": "Kopiera som JSON"
+	},
+	"copyToClipboard": {
+		"message": "Kopiera till urklipp"
+	},
+	"createNewNote": {
+		"message": "Skapa ny anteckning"
+	},
+	"custom": {
+		"message": "Anpassad"
+	},
+	"dailyNoteFormat": {
+		"message": "Format för daglig anteckning (t.ex. YYYY-MM-DD)"
+	},
+	"defaultInterpreterContext": {
+		"message": "Standardkontext för tolk"
+	},
+	"defaultInterpreterContextDescription": {
+		"message": "Åsidosätt kontexten som används för att tolka promptvariabler. Variabler kan användas här."
+	},
+	"defaultTemplateName": {
+		"message": "Standard"
+	},
+	"delete": {
+		"message": "Ta bort"
+	},
+	"deleteModelConfirm": {
+		"message": "Är du säker på att du vill ta bort denna modell?"
+	},
+	"deleteProviderConfirm": {
+		"message": "Är du säker på att du vill ta bort denna leverantör?"
+	},
+	"disableHighlighter": {
+		"message": "Inaktivera markering"
+	},
+	"done": {
+		"message": "Klar"
+	},
+	"dragAndDropFile": {
+		"message": "Dra och släpp fil här"
+	},
+	"duplicate": {
+		"message": "Duplicera"
+	},
+	"earlyAccessDescription": {
+		"message": "Använd funktioner som kräver den senaste $link_start$early access-versionen$link_end$ av Obsidian. Kräver för närvarande Obsidian 1.7.2 eller senare.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/Obsidian/Early+access+versions\" target=\"_blank\">"
+			}
+		}
+	},
+	"earlyAccessFeatures": {
+		"message": "Early access-funktioner"
+	},
+	"editModel": {
+		"message": "Redigera modell"
+	},
+	"editProvider": {
+		"message": "Redigera leverantör"
+	},
+	"editTemplate": {
+		"message": "Redigera mall"
+	},
+	"enableHighlighter": {
+		"message": "Aktivera markering"
+	},
+	"enableHighlighterDescription": {
+		"message": "Markera innehåll på webbsidor som du kan spara till Obsidian."
+	},
+	"enableInterpreter": {
+		"message": "Aktivera tolk"
+	},
+	"enableInterpreterDescription": {
+		"message": "Använd naturligt språk för att extrahera data från sidor. Till exempel kan du använda mallsyntaxen $strong_start${{\"en sammanfattning av sidan\"}}$strong_end$. Kräver en API-nyckel eller anpassad modell konfigurerad nedan. $link_start$Läs mer$link_end$.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/interpreter\" target=\"_blank\">"
+			},
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"error": {
+		"message": "Fel"
+	},
+	"export": {
+		"message": "Exportera"
+	},
+	"exportAllSettings": {
+		"message": "Exportera alla inställningar"
+	},
+	"exportAllSettingsDescription": {
+		"message": "Exportera alla inställningar inklusive mallar och egenskaper."
+	},
+	"exportHighlights": {
+		"message": "Exportera markeringar"
+	},
+	"exportHighlightsDescription": {
+		"message": "Exportera dina markeringar till en fil."
+	},
+	"exportProperties": {
+		"message": "Exportera egenskaper"
+	},
+	"exportPropertiesDescription": {
+		"message": "Spara Web Clipper-egenskaper till en $strong_start$types.json$strong_end$-fil som kan importeras till ditt Obsidian-valv eller till Web Clipper på andra enheter.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"extensionDescription": {
+		"message": "Spara innehåll från webben i ett privat och hållbart format som du kan komma åt offline. Den officiella webbläsartillägget för Obsidian."
+	},
+	"extensionName": {
+		"message": "Obsidian Web Clipper"
+	},
+	"failedToCopyText": {
+		"message": "Det gick inte att kopiera texten"
+	},
+	"failedToDeleteTemplate": {
+		"message": "Det gick inte att ta bort mallen. Försök igen."
+	},
+	"failedToDuplicateTemplate": {
+		"message": "Det gick inte att duplicera mallen. Försök igen."
+	},
+	"failedToExportHighlights": {
+		"message": "Det gick inte att exportera markeringar. Kontrollera konsolen för mer information."
+	},
+	"failedToExportSettings": {
+		"message": "Det gick inte att exportera inställningar. Kontrollera konsolen för mer information."
+	},
+	"failedToExtractContent": {
+		"message": "Det gick inte att extrahera sidinnehållet."
+	},
+	"failedToImportTemplate": {
+		"message": "Fel vid import av mall. Kontrollera filen och försök igen."
+	},
+	"failedToInitialize": {
+		"message": "Försök att ladda om tillägget."
+	},
+	"failedToInitializeContent": {
+		"message": "Det gick inte att initiera sidinnehållet."
+	},
+	"failedToProcessInterpreter": {
+		"message": "Tolkbearbetningen misslyckades. Försök igen."
+	},
+	"failedToResetProviders": {
+		"message": "Det gick inte att återställa leverantörer och modeller"
+	},
+	"failedToResetTemplate": {
+		"message": "Det gick inte att återställa standardmallen. Försök igen."
+	},
+	"failedToSave": {
+		"message": "Det gick inte att spara filen"
+	},
+	"failedToSaveFile": {
+		"message": "Det gick inte att spara filen"
+	},
+	"failedToSaveProvider": {
+		"message": "Det gick inte att spara leverantören. Försök igen."
+	},
+	"feedback": {
+		"message": "Återkoppling"
+	},
+	"feedbackDescription": {
+		"message": "Hur kan vi förbättra Web Clipper? Besök vår hjälpsida där du kan rapportera buggar, föreslå funktioner och få hjälp med vanliga problem."
+	},
+	"feedbackTitle": {
+		"message": "Tack för din återkoppling"
+	},
+	"folder": {
+		"message": "Mapp"
+	},
+	"general": {
+		"message": "Allmänt"
+	},
+	"generalSettings": {
+		"message": "Allmänna inställningar"
+	},
+	"getApiKeyHere": {
+		"message": "Skaffa din $1 API-nyckel här."
+	},
+	"help": {
+		"message": "Hjälp"
+	},
+	"helpDescription": {
+		"message": "Lär dig hur du använder Web Clipper och få hjälp med felsökning."
+	},
+	"highlightInline": {
+		"message": "Markera sidinnehållet"
+	},
+	"highlightPage": {
+		"message": "Markera sida"
+	},
+	"highlighter": {
+		"message": "Markering"
+	},
+	"highlighterSettings": {
+		"message": "Markering"
+	},
+	"history": {
+		"message": "Historik"
+	},
+	"hotkeys": {
+		"message": "Kortkommandon"
+	},
+	"import": {
+		"message": "Importera"
+	},
+	"importAllSettings": {
+		"message": "Importera alla inställningar"
+	},
+	"importAllSettingsDescription": {
+		"message": "Importera alla inställningar inklusive mallar och egenskaper. Detta kommer att ersätta din nuvarande konfiguration."
+	},
+	"importFailed": {
+		"message": "Importen misslyckades. Kontrollera konsolen för mer information."
+	},
+	"importModalTitle": {
+		"message": "Importera"
+	},
+	"importProperties": {
+		"message": "Importera egenskaper"
+	},
+	"importPropertiesDescription": {
+		"message": "För att importera dina egenskaper från Obsidian, hitta $strong_1_start$types.json$strong_1_end$-filen i mappen $strong_2_start$.obsidian$strong_2_end$ i ditt valv. Observera att denna mapp är dold som standard på de flesta operativsystem.",
+		"placeholders": {
+			"strong_1_end": {
+				"content": "</strong>"
+			},
+			"strong_1_start": {
+				"content": "<strong>"
+			},
+			"strong_2_end": {
+				"content": "</strong>"
+			},
+			"strong_2_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"importSettings": {
+		"message": "Importera inställningar"
+	},
+	"importTemplate": {
+		"message": "Importera mall"
+	},
+	"interpret": {
+		"message": "tolka"
+	},
+	"interpreter": {
+		"message": "Tolk"
+	},
+	"interpreterContext": {
+		"message": "Tolkkontext"
+	},
+	"interpreterContextDescription": {
+		"message": "Kontexten som används för att tolka promptvariabler. Åsidosätter standardkontexten som definierats i $link_start$Tolkinställningar$link_end$. Variabler kan användas här.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=interpreter\">"
+			}
+		}
+	},
+	"language": {
+		"message": "Språk"
+	},
+	"languageDescription": {
+		"message": "Välj visningsspråk för tilläggets gränssnitt."
+	},
+	"last30Days": {
+		"message": "Senaste 30 dagarna"
+	},
+	"lastUsed": {
+		"message": "Senast använd"
+	},
+	"legacyMode": {
+		"message": "Äldre läge"
+	},
+	"legacyModeDescription": {
+		"message": "Använder URI-klippmetoden som är kompatibel med Obsidian 1.6.7 eller tidigare. Observera att längden på innehållet du kan klippa är begränsad av din webbläsare och operativsystem. Vissa sidor kan misslyckas utan felmeddelanden."
+	},
+	"modelName": {
+		"message": "Visningsnamn"
+	},
+	"modelNameDescription": {
+		"message": "Namnet på modellen du vill visa i gränssnittet."
+	},
+	"modelProvider": {
+		"message": "Leverantör"
+	},
+	"modelProviderDescription": {
+		"message": "Välj leverantören för denna modell."
+	},
+	"modelProviderPlaceholder": {
+		"message": "Leverantör"
+	},
+	"modelRequiredFields": {
+		"message": "Modellnamn, Leverantör och Modell-ID krävs."
+	},
+	"models": {
+		"message": "Modeller"
+	},
+	"modelsListFor": {
+		"message": "Modellista för $1"
+	},
+	"more": {
+		"message": "Mer"
+	},
+	"newTemplate": {
+		"message": "Ny mall"
+	},
+	"noHighlights": {
+		"message": "Gör ingenting"
+	},
+	"noTemplates": {
+		"message": "Inga mallar tillgängliga. Lägg till en mall i inställningarna."
+	},
+	"noUnusedProperties": {
+		"message": "Inga oanvända egenskaper hittades."
+	},
+	"noteContent": {
+		"message": "Anteckningsinnehåll"
+	},
+	"noteContentDescription": {
+		"message": "Anpassa innehållet i anteckningen. Använd variabler för att förfylla data från sidan."
+	},
+	"noteLocation": {
+		"message": "Anteckningsplats"
+	},
+	"noteLocationDescription": {
+		"message": "Mappen eller sökvägen för anteckningen."
+	},
+	"noteName": {
+		"message": "Anteckningsnamn"
+	},
+	"noteNameFormat": {
+		"message": "Anteckningsnamn"
+	},
+	"noteNameFormatDescription": {
+		"message": "Format för filnamnet på anteckningen. Du kan använda variabler som {{title}}, {{date}} och {{published}} för att förfylla data från sidan. $link_start$Läs mer$link_end$.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/variables\" target=\"_blank\">"
+			}
+		}
+	},
+	"notesAboutPage": {
+		"message": "Anteckningar om denna sida..."
+	},
+	"onlyHttpSupported": {
+		"message": "Denna sida kan inte klippas. Endast http- och https-URL:er stöds."
+	},
+	"open": {
+		"message": "Öppna"
+	},
+	"optional": {
+		"message": "(valfritt)"
+	},
+	"orPasteBelow": {
+		"message": "Eller klistra in innehåll nedan"
+	},
+	"overwriteNote": {
+		"message": "Skriv över anteckning"
+	},
+	"pageCannotBeClipped": {
+		"message": "Denna sida kan inte klippas."
+	},
+	"pageVariables": {
+		"message": "Sidvariabler"
+	},
+	"pagesSaved": {
+		"message": "sida sparad"
+	},
+	"pagesSavedPlural": {
+		"message": "sidor sparade"
+	},
+	"pasteJsonHere": {
+		"message": "Klistra in JSON här"
+	},
+	"pleaseReload": {
+		"message": "Försök att ladda om sidan."
+	},
+	"popularModels": {
+		"message": "Populära modeller"
+	},
+	"popularModelsDescription": {
+		"message": "Välj bland vanligt använda modeller eller ange anpassade modelldetaljer."
+	},
+	"prependToDaily": {
+		"message": "Lägg till i daglig anteckning, i början"
+	},
+	"prependToExisting": {
+		"message": "Lägg till i befintlig anteckning, i början"
+	},
+	"processing": {
+		"message": "bearbetar"
+	},
+	"properties": {
+		"message": "Egenskaper"
+	},
+	"propertiesSettings": {
+		"message": "Egenskaper"
+	},
+	"propertyName": {
+		"message": "Egenskapsnamn"
+	},
+	"propertyValue": {
+		"message": "Egenskapsvärde"
+	},
+	"provider": {
+		"message": "Leverantör"
+	},
+	"providerApiKey": {
+		"message": "API-nyckel"
+	},
+	"providerApiKeyDescription": {
+		"message": "Din API-nyckel för denna leverantör."
+	},
+	"providerBaseUrl": {
+		"message": "Bas-URL"
+	},
+	"providerBaseUrlDescription": {
+		"message": "API-slutpunktens URL för denna leverantör."
+	},
+	"providerModelId": {
+		"message": "Modell-ID"
+	},
+	"providerModelIdDescription": {
+		"message": "Identifieraren för modellen från din leverantör. Vanligtvis ett kort namn utan mellanslag."
+	},
+	"providerModelIdPlaceholder": {
+		"message": "Modell-ID"
+	},
+	"providerName": {
+		"message": "Leverantörsnamn"
+	},
+	"providerNameDescription": {
+		"message": "Visningsnamn för denna leverantör."
+	},
+	"providerPreset": {
+		"message": "Förinställning"
+	},
+	"providerPresetDescription": {
+		"message": "Välj en leverantör eller skapa en anpassad."
+	},
+	"providerRequiredFields": {
+		"message": "Leverantörsnamn och Bas-URL krävs."
+	},
+	"providers": {
+		"message": "Leverantörer"
+	},
+	"rateExtensionDescription": {
+		"message": "Gillar du Web Clipper? Hjälp oss genom att ge det ett betyg."
+	},
+	"recommended": {
+		"message": "rekommenderad"
+	},
+	"refresh": {
+		"message": "Uppdatera"
+	},
+	"remove": {
+		"message": "Ta bort"
+	},
+	"removeProperty": {
+		"message": "Ta bort egenskap"
+	},
+	"removeUnusedProperties": {
+		"message": "Ta bort oanvända egenskaper"
+	},
+	"removeUnusedPropertiesDescription": {
+		"message": "Ta bort alla egenskaper som inte används i någon mall."
+	},
+	"removeVault": {
+		"message": "Ta bort valv"
+	},
+	"replaceContent": {
+		"message": "Ersätt sidinnehållet"
+	},
+	"reset": {
+		"message": "Återställ"
+	},
+	"resetDefaultTemplate": {
+		"message": "Återställ standardmall"
+	},
+	"resetDefaultTemplateDescription": {
+		"message": "Ta bort alla ändringar du gjort i standardmallen."
+	},
+	"resetProvidersAndModels": {
+		"message": "Återställ standardmodeller"
+	},
+	"resetProvidersAndModelsDescription": {
+		"message": "Återställ leverantörer och modeller till standardinställningarna."
+	},
+	"save": {
+		"message": "Spara"
+	},
+	"saveFile": {
+		"message": "Spara fil..."
+	},
+	"searchVariables": {
+		"message": "Sök variabler..."
+	},
+	"selectProvider": {
+		"message": "Välj en leverantör"
+	},
+	"selectTemplateToExport": {
+		"message": "Välj en mall att exportera."
+	},
+	"settings": {
+		"message": "Inställningar"
+	},
+	"settingsHeading": {
+		"message": "Inställningar"
+	},
+	"settingsImportSuccess": {
+		"message": "Alla inställningar importerades framgångsrikt. Uppdatera sidan för att se ändringarna."
+	},
+	"share": {
+		"message": "Dela..."
+	},
+	"shortcutInstructionsBrave": {
+		"message": "För att ändra tangenttilldelningar, gå till $1"
+	},
+	"shortcutInstructionsChrome": {
+		"message": "För att ändra tangenttilldelningar, gå till $1"
+	},
+	"shortcutInstructionsDefault": {
+		"message": "För att ändra tangenttilldelningar, se din webbläsares tilläggsinställningar."
+	},
+	"shortcutInstructionsEdge": {
+		"message": "För att ändra tangenttilldelningar, gå till $1"
+	},
+	"shortcutInstructionsFirefox": {
+		"message": "För att ändra tangenttilldelningar, gå till $1, klicka på kugghjulsikonen och välj \"Hantera tilläggsgenvägar\""
+	},
+	"shortcutInstructionsIntro": {
+		"message": "Kortkommandon ger dig snabb åtkomst till clipper-funktioner."
+	},
+	"shortcutInstructionsSafari": {
+		"message": "Kortkommandon kan inte anpassas i Safari."
+	},
+	"shortcutNotSet": {
+		"message": "Inte inställd"
+	},
+	"showActionsButton": {
+		"message": "Visa åtgärdsknapp"
+	},
+	"showActionsDescription": {
+		"message": "Låter dig inspektera sidvariabler från clipper-menyn. Användbart för att se vilka variabler som finns tillgängliga att använda i mallar."
+	},
+	"showPageVariables": {
+		"message": "Visa sidvariabler"
+	},
+	"silentOpen": {
+		"message": "Spara klippt anteckning utan att öppna den"
+	},
+	"silentOpenDescription": {
+		"message": "Klippta anteckningar kommer att sparas men inte öppnas som en ny flik. Obsidian kommer fortfarande att flyttas till förgrunden."
+	},
+	"specificNoteName": {
+		"message": "Specifikt anteckningsnamn"
+	},
+	"systemDefault": {
+		"message": "System"
+	},
+	"templateCopied": {
+		"message": "Mall-JSON kopierad till urklipp"
+	},
+	"templateCopyError": {
+		"message": "Det gick inte att kopiera mall-JSON till urklipp"
+	},
+	"templateName": {
+		"message": "Mallnamn"
+	},
+	"templateProperties": {
+		"message": "Egenskaper"
+	},
+	"templatePropertiesDescription": {
+		"message": "Egenskaper att lägga till överst i den klippta anteckningen. Använd variabler för att förfylla data från sidan."
+	},
+	"templateTriggers": {
+		"message": "Mallutlösare"
+	},
+	"templateTriggersDescription": {
+		"message": "Definiera regler för att automatiskt välja denna mall om den matchar ett URL-mönster eller innehåller schema.org-data. En regel per rad."
+	},
+	"templatesHeading": {
+		"message": "Mallar"
+	},
+	"thinking": {
+		"message": "tänker"
+	},
+	"unknownProvider": {
+		"message": "Okänd leverantör"
+	},
+	"updateAvailable": {
+		"message": "En uppdatering finns tillgänglig."
+	},
+	"usingLatestVersion": {
+		"message": "Du använder den senaste versionen."
+	},
+	"vault": {
+		"message": "Valv"
+	},
+	"vaultDescription": {
+		"message": "Välj standardvalvet för denna mall. Gå till $link_start$allmänna inställningar$link_end$ för att lägga till eller ta bort valv.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=general\">"
+			}
+		}
+	},
+	"vaults": {
+		"message": "Valv"
+	},
+	"vaultsDescription": {
+		"message": "Som standard sparas klippta anteckningar i det för närvarande öppna valvet. Du kan lägga till valv här om du vill ha möjlighet att spara i olika valv. Valvnamn måste exakt matcha namnet på Obsidian-valvet. Tryck $strong_start$retur$strong_end$ för att lägga till ett valv.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"version": {
+		"message": "Version"
+	}
+}
