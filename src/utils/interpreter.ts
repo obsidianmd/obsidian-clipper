@@ -297,7 +297,6 @@ function parseLLMResponse(responseContent: string, promptVariables: PromptVariab
 						const match = promptRegex.exec(jsonMatch[0]);
 						if (match) {
 							let content = match[1]
-								.replace(/\\/g, '\\\\')
 								.replace(/"/g, '\\"')
 								.replace(/\r\n/g, '\\n')
 								.replace(/\n/g, '\\n');
