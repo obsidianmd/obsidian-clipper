@@ -162,7 +162,6 @@ const CLUTTER_PATTERNS = [
 	'skip-',
 	'social',
 	'sponsor',
-	'sticky',
 	'subscribe',
 	'-toc',
 	'table-of-contents',

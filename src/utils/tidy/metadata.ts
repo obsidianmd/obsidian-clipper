@@ -54,6 +54,7 @@ export class MetadataExtractor {
 			this.getMetaContent(doc, "property", "author") ||
 			this.getMetaContent(doc, "name", "byl") ||
 			this.getMetaContent(doc, "name", "author") ||
+			this.getMetaContent(doc, "name", "authorList") ||
 			this.getMetaContent(doc, "name", "copyright") ||
 			this.getSchemaProperty(schemaOrgData, 'copyrightHolder.name') ||
 			this.getMetaContent(doc, "property", "og:site_name") ||
@@ -138,6 +139,7 @@ export class MetadataExtractor {
 	private static getPublished(doc: Document, schemaOrgData: any): string {
 		return (
 			this.getSchemaProperty(schemaOrgData, 'datePublished') ||
+			this.getMetaContent(doc, "name", "publishDate") ||
 			this.getMetaContent(doc, "property", "article:published_time") ||
 			this.getTimeElement(doc) ||
 			this.getMetaContent(doc, "name", "sailthru.date") ||
