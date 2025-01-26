@@ -6,9 +6,9 @@ Filters allow you to modify [[variables]] in [[Obsidian Web Clipper/Templates|We
 - Filters work for any kind of [[Variables|variable]] including `prompt`, `meta`, `selector`, and `schema` variables.
 - Filters can be chained, e.g. `{{variable|filter1|filter2}}`, and are applied in the order they are added.
 
-## Date and time
+## Dates
 
-Convert and modify date and time values.
+Convert and modify dates.
 
 ### `date`
 
@@ -28,9 +28,9 @@ Modifies a date by adding or subtracting a specified amount of time, [see refere
 
 Converts ISO 8601 duration strings or seconds into formatted time strings. Uses tokens: `HH` (padded hours), `H` (hours), `mm` (padded minutes), `m` (minutes), `ss` (padded seconds), `s` (seconds).
 
-- `"PT1H30M"|duration:"HH:mm:ss"` returns `"01:30:00"`
-- `"3665"|duration:"H:mm:ss"` returns `"1:01:05"`
-- Setting `duration` without any parameters uses a smart format: `HH:mm:ss` for ≥1 hour, `mm:ss` for <1 hour.
+- `"PT1H30M"|duration:"HH:mm:ss"` returns `"01:30:00"`.
+- `"3665"|duration:"H:mm:ss"` returns `"1:01:05"`.
+- Setting `duration` without any parameters uses `HH:mm:ss` over 1 hour, `mm:ss` under 1 hour.
 - Supports both ISO 8601 duration strings (e.g., `PT6702S`, `PT1H30M`) and plain seconds.
 
 ## Text conversion and capitalization
@@ -134,7 +134,7 @@ Converts an array or object into a list of Markdown footnotes.
 Converts strings and arrays into [text fragment](https://developer.mozilla.org/en-US/docs/Web/URI/Fragment/Text_fragments) links. Defaults to "link" for the link text.
 
 - `highlights|fragment_link` returns `Highlight content [link](text-fragment-url)`
-- `highlights|fragment_link:"custom title"` returns `Highlight content [custom title](text-fragment-url)
+- `highlights|fragment_link:"custom title"` returns `Highlight content [custom title](text-fragment-url)`
 
 ### `image` 
 
@@ -156,10 +156,10 @@ Converts strings, arrays, or objects into Markdown link syntax (not to be confus
 
 Converts an array to a Markdown list.
 
-- Use `list` to convert to a bullet list.
-- Use `list:task` to convert to a task list.
-- Use `list:numbered` to convert to a numbered list.
-- Use `list:numbered-task` to convert to a task list with numbers.
+- `list` to convert to a bullet list.
+- `list:task` to convert to a task list.
+- `list:numbered` to convert to a numbered list.
+- `list:numbered-task` to convert to a task list with numbers.
 
 ### `table`
 
@@ -258,7 +258,7 @@ Removes **all** Markdown formatting and returns a plain text string, e.g. turnin
 
 ### `strip_tags`
 
-Removes **all** HTML tags from a string. Unlike `remove_html` this doesn't remove the content within the tags.
+Removes **all** HTML tags from a string. Content within the tag is preserved.
 
 - Use `strip_tags:("p,strong,em")` to keep specific tags.
 - Example: `"<p>Hello <b>world</b>!</p>"|strip_tags:("b")` returns `Hello <b>world</b>!`.
