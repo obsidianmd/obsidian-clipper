@@ -1,8 +1,6 @@
 import { createParserState, processCharacter, parseRegexPattern } from '../parser-utils';
 
 export const replace = (str: string, param?: string): string => {
-	//console.log('replace', { str, param });
-
 	if (!param) {
 		return str;
 	}
@@ -29,8 +27,6 @@ export const replace = (str: string, param?: string): string => {
 	if (state.current) {
 		replacements.push(state.current.trim());
 	}
-
-	//console.log('replacements', replacements);
 
 	// Apply each replacement in sequence
 	return replacements.reduce((acc, replacement) => {
