@@ -592,7 +592,7 @@ async function handleClip() {
 	fileContent = frontmatter + noteContent;
 
 	try {
-		if (currentTemplate.behavior === 'create') {
+		if (currentTemplate.behavior === 'create' || currentTemplate.behavior === 'overwrite') {
 			const updatedProperties = Array.from(document.querySelectorAll('.metadata-property input')).map(input => {
 				const inputElement = input as HTMLInputElement;
 				return {
