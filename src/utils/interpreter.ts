@@ -135,8 +135,8 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 			};
 			headers = {
 				...headers,
-				"HTTP-Referer": 'https://obsidian.md/',
-				"X-Title": 'Obsidian Web Clipper',
+				'HTTP-Referer': 'https://obsidian.md/',
+				'X-Title': 'Obsidian Web Clipper',
 				'Authorization': `Bearer ${provider.apiKey}`
 			};
 		}
@@ -570,7 +570,7 @@ export async function handleInterpreterUI(
 		responseTimer.textContent = formatDuration(totalTime);
 
 		// Update button state
-		interpretBtn.textContent = getMessage('done');
+		interpretBtn.textContent = getMessage('done').toLowerCase();
 		interpretBtn.classList.remove('processing');
 		interpretBtn.classList.add('done');
 		interpretBtn.disabled = true;
