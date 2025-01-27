@@ -42,7 +42,7 @@
 		"message": "Pas de clé API"
 	},
 	"apiKeysWarning": {
-		"message": "En utilisant un fournisseur externe, vous acceptez leurs conditions d'utilisation et leur politique de confidentialité. Les requêtes de l'interpréteur sont envoyées directement au fournisseur que vous choisissez. Obsidian ne collecte ni ne stocke aucune donnée concernant vos requêtes."
+		"message": "En utilisant un fournisseur externe, vous acceptez leurs conditions d'utilisation et leur politique de confidentialité. Les requêtes de l'interpréteur sont envoyées directement au fournisseur que vous choisissez. Obsidian ne collecte et ne stocke aucune donnée concernant vos requêtes."
 	},
 	"appendToDaily": {
 		"message": "Ajouter à la note quotidienne, à la fin"
@@ -161,7 +161,7 @@
 		"message": "Êtes-vous sûr de vouloir supprimer ce fournisseur ?"
 	},
 	"disableHighlighter": {
-		"message": "Désactiver le surlignageur"
+		"message": "Désactiver le surligneur"
 	},
 	"done": {
 		"message": "terminé"
@@ -199,7 +199,7 @@
 		"message": "Activer le surligneur"
 	},
 	"enableHighlighterDescription": {
-		"message": "Surlignez du contenu sur les pages web que vous pouvez sauvegarder dans Obsidian."
+		"message": "Surlignez du contenu sur les pages web que vous pouvez enrengistrer dans Obsidian."
 	},
 	"enableInterpreter": {
 		"message": "Activer l'interpréteur"
@@ -231,7 +231,7 @@
 		"message": "Exporter tous les paramètres"
 	},
 	"exportAllSettingsDescription": {
-		"message": "Exporte tous les paramètres, y compris les modèles et les propriétés."
+		"message": "Exporter tous les paramètres, y compris les modèles et les propriétés."
 	},
 	"exportHighlights": {
 		"message": "Exporter les surlignages"
@@ -423,7 +423,7 @@
 		"message": "Dernière utilisation"
 	},
 	"legacyMode": {
-		"message": "Mode hérité"
+		"message": "Mode compatibilité"
 	},
 	"legacyModeDescription": {
 		"message": "Utilise la méthode d'enregistrement URI compatible avec Obsidian 1.6.7 ou antérieur. Notez que la longueur du contenu que vous pouvez enregistrer est limitée par votre navigateur et votre système d'exploitation. Certaines pages peuvent échouer sans erreur."
@@ -671,19 +671,19 @@
 		"message": "Partager..."
 	},
 	"shortcutInstructionsBrave": {
-		"message": "Pour modifier les assignations de touches, allez à $1"
+		"message": "Pour modifier les assignations de touches, rendez-vous sur $1"
 	},
 	"shortcutInstructionsChrome": {
-		"message": "Pour modifier les assignations de touches, allez à $1"
+		"message": "Pour modifier les assignations de touches, rendez-vous sur $1"
 	},
 	"shortcutInstructionsDefault": {
 		"message": "Pour modifier les assignations de touches, consultez les paramètres d'extension de votre navigateur."
 	},
 	"shortcutInstructionsEdge": {
-		"message": "Pour modifier les assignations de touches, allez à $1"
+		"message": "Pour modifier les assignations de touches, rendez-vous sur $1"
 	},
 	"shortcutInstructionsFirefox": {
-		"message": "Pour modifier les assignations de touches, allez à $1, cliquez sur l'icône d'engrenage et sélectionnez \"Gérer les raccourcis d'extension\"."
+		"message": "Pour modifier les assignations de touches, rendez-vous sur $1, cliquez sur l'icône d'engrenage et sélectionnez \"Gérer les raccourcis d'extension\"."
 	},
 	"shortcutInstructionsIntro": {
 		"message": "Les raccourcis clavier vous donnent un accès rapide aux fonctionnalités du clipper."
@@ -707,7 +707,7 @@
 		"message": "Enregistrer la note sans l'ouvrir"
 	},
 	"silentOpenDescription": {
-		"message": "Les notes seront enregistrées mais ne s'ouvriront pas dans un nouvel onglet. Obsidian sera toujours mis au premier plan."
+		"message": "Les notes seront enregistrées mais ne s'ouvriront pas dans un nouvel onglet. Obsidian sera toujours amené au premier plan."
 	},
 	"specificNoteName": {
 		"message": "Nom spécifique de la note"
