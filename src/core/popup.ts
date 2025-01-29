@@ -619,6 +619,9 @@ async function handleClip() {
 		// Only close the window if it's not running in side panel mode
 		if (!isSidePanel) {
 			setTimeout(() => window.close(), 500);
+			if (generalSettings.autoCopyToClipboard) {
+				await copyToClipboard(fileContent);
+			}
 		}
 	} catch (error) {
 		console.error('Error in handleClip:', error);

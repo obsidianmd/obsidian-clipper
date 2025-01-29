@@ -72,6 +72,7 @@ export interface Settings {
 	};
 	history: HistoryEntry[];
 	ratings: Rating[];
+	autoCopyToClipboard: boolean;
 }
 
 export interface ModelConfig {

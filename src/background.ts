@@ -141,6 +141,9 @@ browser.commands.onCommand.addListener(async (command, tab) => {
 		await ensureContentScriptLoaded(tab.id);
 		toggleHighlighterMode(tab.id);
 	}
+	if (command === "copy_to_clipboard" && tab && tab.id) {
+		await browser.tabs.sendMessage(tab.id, { action: "copyToClipboard" });
+	}
 });
 
 const debouncedUpdateContextMenu = debounce(async (tabId: number) => {
