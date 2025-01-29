@@ -1,7 +1,7 @@
 import browser from './browser-polyfill';
 import { escapeDoubleQuotes, sanitizeFileName } from '../utils/string-utils';
 import { Template, Property } from '../types/types';
-import { generalSettings } from './storage-utils';
+import { generalSettings, incrementStat } from './storage-utils';
 
 export async function generateFrontmatter(properties: Property[]): Promise<string> {
 	let frontmatter = '---\n';
@@ -71,6 +71,13 @@ export async function saveToObsidian(
 	vault: string,
 	behavior: Template['behavior'],
 ): Promise<void> {
+	// If autoCopyToClipboard is enabled, only copy to clipboard and don't save to Obsidian
+	if (generalSettings.autoCopyToClipboard) {
+		await navigator.clipboard.writeText(fileContent);
+		await incrementStat('copyToClipboard', vault, path);
+		return; // Exit early before creating Obsidian URL or opening Obsidian
+	}
+
 	let obsidianUrl: string;
 
 	const isDailyNote = behavior === 'append-daily' || behavior === 'prepend-daily';

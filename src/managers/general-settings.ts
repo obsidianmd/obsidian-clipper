@@ -194,6 +194,7 @@ export function initializeGeneralSettings(): void {
 		initializeExportImportAllSettingsButtons();
 		initializeHighlighterSettings();
 		initializeExportHighlightsButton();
+		initializeAutoCopyToClipboardToggle();
 		await initializeUsageChart();
 
 		// Initialize feedback modal close button
@@ -222,6 +223,7 @@ function saveSettingsFromForm(): void {
 	const highlighterToggle = document.getElementById('highlighter-toggle') as HTMLInputElement;
 	const alwaysShowHighlightsToggle = document.getElementById('highlighter-visibility') as HTMLInputElement;
 	const highlightBehaviorSelect = document.getElementById('highlighter-behavior') as HTMLSelectElement;
+	const autoCopyToClipboardToggle = document.getElementById('auto-copy-clipboard-toggle') as HTMLInputElement;
 
 	const updatedSettings = {
 		...generalSettings, // Keep existing settings
@@ -231,7 +233,8 @@ function saveSettingsFromForm(): void {
 		silentOpen: silentOpenToggle?.checked ?? generalSettings.silentOpen,
 		highlighterEnabled: highlighterToggle?.checked ?? generalSettings.highlighterEnabled,
 		alwaysShowHighlights: alwaysShowHighlightsToggle?.checked ?? generalSettings.alwaysShowHighlights,
-		highlightBehavior: highlightBehaviorSelect?.value ?? generalSettings.highlightBehavior
+		highlightBehavior: highlightBehaviorSelect?.value ?? generalSettings.highlightBehavior,
+		autoCopyToClipboard: autoCopyToClipboardToggle?.checked ?? generalSettings.autoCopyToClipboard
 	};
 
 	saveSettings(updatedSettings);
@@ -314,6 +317,12 @@ function initializeResetDefaultTemplateButton(): void {
 	if (resetDefaultTemplateBtn) {
 		resetDefaultTemplateBtn.addEventListener('click', resetDefaultTemplate);
 	}
+}
+
+function initializeAutoCopyToClipboardToggle(): void {
+	initializeSettingToggle('auto-copy-clipboard-toggle', generalSettings.autoCopyToClipboard, (checked) => {
+		saveSettings({ autoCopyToClipboard: checked });
+	});
 }
 
 export function resetDefaultTemplate(): void {
