@@ -1,6 +1,7 @@
 import browser from './browser-polyfill';
 import { Settings, ModelConfig, PropertyType, HistoryEntry, Provider, Rating } from '../types/types';
 import { debugLog } from './debug';
+import { copyToClipboard } from 'core/popup';
 
 export type { Settings, ModelConfig, PropertyType, HistoryEntry, Provider, Rating };
 
@@ -27,7 +28,8 @@ export let generalSettings: Settings = {
 		share: 0
 	},
 	history: [],
-	ratings: []
+	ratings: [],
+	saveBehavior: 'addToObsidian'
 };
 
 export function setLocalStorage(key: string, value: any): Promise<void> {
@@ -44,6 +46,7 @@ interface StorageData {
 		betaFeatures?: boolean;
 		legacyMode?: boolean;
 		silentOpen?: boolean;
+		saveBehavior?: 'addToObsidian' | 'copyToClipboard' | 'saveFile';
 	};
 	vaults?: string[];
 	highlighter_settings?: {
@@ -98,6 +101,7 @@ interface LegacyStorageData {
 		betaFeatures?: boolean;
 		legacyMode?: boolean;
 		silentOpen?: boolean;
+		saveBehavior?: 'addToObsidian' | 'copyToClipboard' | 'saveFile';
 	};
 	vaults?: string[];
 	highlighter_settings?: {
@@ -229,6 +233,7 @@ export async function loadSettings(): Promise<Settings> {
 		interpreterAutoRun: false,
 		defaultPromptContext: '',
 		propertyTypes: [],
+		saveBehavior: 'addToObsidian',
 		stats: {
 			addToObsidian: 0,
 			saveFile: 0,
@@ -236,7 +241,7 @@ export async function loadSettings(): Promise<Settings> {
 			share: 0
 		},
 		history: [],
-		ratings: []
+		ratings: [],
 	};
 
 	if (await needsMigration(data)) {
@@ -274,7 +279,8 @@ export async function loadSettings(): Promise<Settings> {
 		propertyTypes: data.property_types || defaultSettings.propertyTypes,
 		stats: data.stats || defaultSettings.stats,
 		history: data.history || defaultSettings.history,
-		ratings: data.ratings || defaultSettings.ratings
+		ratings: data.ratings || defaultSettings.ratings,
+		saveBehavior: data.general_settings?.saveBehavior ?? defaultSettings.saveBehavior
 	};
 
 	generalSettings = loadedSettings;
@@ -293,7 +299,8 @@ export async function saveSettings(settings?: Partial<Settings>): Promise<void> 
 			showMoreActionsButton: generalSettings.showMoreActionsButton,
 			betaFeatures: generalSettings.betaFeatures,
 			legacyMode: generalSettings.legacyMode,
-			silentOpen: generalSettings.silentOpen
+			silentOpen: generalSettings.silentOpen,
+			saveBehavior: generalSettings.saveBehavior,
 		},
 		highlighter_settings: {
 			highlighterEnabled: generalSettings.highlighterEnabled,
