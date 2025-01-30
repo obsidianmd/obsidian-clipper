@@ -646,6 +646,12 @@
 	"save": {
 		"message": "Save"
 	},
+	"saveBehaviorLabel": {
+		"message": "Save behavior"
+	},
+	"saveBehaviorDescription": {
+		"message": "Choose the default save behavior for the extension. When you select \"copy to clipboard\" or \"save file\" it won't add the clipping to Obsidian."
+	},
 	"saveFile": {
 		"message": "Save file..."
 	},

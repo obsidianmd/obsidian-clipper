@@ -71,13 +71,6 @@ export async function saveToObsidian(
 	vault: string,
 	behavior: Template['behavior'],
 ): Promise<void> {
-	// If autoCopyToClipboard is enabled, only copy to clipboard and don't save to Obsidian
-	if (generalSettings.autoCopyToClipboard) {
-		await navigator.clipboard.writeText(fileContent);
-		await incrementStat('copyToClipboard', vault, path);
-		return; // Exit early before creating Obsidian URL or opening Obsidian
-	}
-
 	let obsidianUrl: string;
 
 	const isDailyNote = behavior === 'append-daily' || behavior === 'prepend-daily';

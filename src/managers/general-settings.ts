@@ -194,7 +194,7 @@ export function initializeGeneralSettings(): void {
 		initializeExportImportAllSettingsButtons();
 		initializeHighlighterSettings();
 		initializeExportHighlightsButton();
-		initializeAutoCopyToClipboardToggle();
+		initializeSaveBehaviorDropdown();
 		await initializeUsageChart();
 
 		// Initialize feedback modal close button
@@ -223,7 +223,6 @@ function saveSettingsFromForm(): void {
 	const highlighterToggle = document.getElementById('highlighter-toggle') as HTMLInputElement;
 	const alwaysShowHighlightsToggle = document.getElementById('highlighter-visibility') as HTMLInputElement;
 	const highlightBehaviorSelect = document.getElementById('highlighter-behavior') as HTMLSelectElement;
-	const autoCopyToClipboardToggle = document.getElementById('auto-copy-clipboard-toggle') as HTMLInputElement;
 
 	const updatedSettings = {
 		...generalSettings, // Keep existing settings
@@ -233,8 +232,7 @@ function saveSettingsFromForm(): void {
 		silentOpen: silentOpenToggle?.checked ?? generalSettings.silentOpen,
 		highlighterEnabled: highlighterToggle?.checked ?? generalSettings.highlighterEnabled,
 		alwaysShowHighlights: alwaysShowHighlightsToggle?.checked ?? generalSettings.alwaysShowHighlights,
-		highlightBehavior: highlightBehaviorSelect?.value ?? generalSettings.highlightBehavior,
-		autoCopyToClipboard: autoCopyToClipboardToggle?.checked ?? generalSettings.autoCopyToClipboard
+		highlightBehavior: highlightBehaviorSelect?.value ?? generalSettings.highlightBehavior
 	};
 
 	saveSettings(updatedSettings);
@@ -319,10 +317,15 @@ function initializeResetDefaultTemplateButton(): void {
 	}
 }
 
-function initializeAutoCopyToClipboardToggle(): void {
-	initializeSettingToggle('auto-copy-clipboard-toggle', generalSettings.autoCopyToClipboard, (checked) => {
-		saveSettings({ autoCopyToClipboard: checked });
-	});
+function initializeSaveBehaviorDropdown(): void {
+    const dropdown = document.getElementById('save-behavior-dropdown') as HTMLSelectElement;
+    if (!dropdown) return;
+
+    dropdown.value = generalSettings.saveBehavior;
+    dropdown.addEventListener('change', () => {
+        const newValue = dropdown.value as 'addToObsidian' | 'copyToClipboard' | 'saveFile';
+        saveSettings({ saveBehavior: newValue });
+    });
 }
 
 export function resetDefaultTemplate(): void {
@@ -452,4 +455,17 @@ async function handleRating(rating: number) {
 		const modal = document.getElementById('feedback-modal');
 		showModal(modal);
 	}
+}
+
+function initializeSettingDropdown(
+	elementId: string,
+	defaultValue: string,
+	onChange: (newValue: string) => void
+): void {
+	const dropdown = document.getElementById(elementId) as HTMLSelectElement;
+	if (!dropdown) return;
+	dropdown.value = defaultValue;
+	dropdown.addEventListener('change', () => {
+		onChange(dropdown.value);
+	});
 }

@@ -206,10 +206,10 @@ async function loadAndSetupTemplates() {
 function setupMessageListeners() {
 	browser.runtime.onMessage.addListener((request: any, sender: browser.Runtime.MessageSender, sendResponse: (response?: any) => void) => {
 		if (request.action === "triggerQuickClip") {
-			handleClip().then(() => {
+			handleClipObsidian().then(() => {
 				sendResponse({success: true});
 			}).catch((error) => {
-				console.error('Error in handleClip:', error);
+				console.error('Error in handleClipObsidian:', error);
 				sendResponse({success: false, error: error.message});
 			});
 			return true;
@@ -293,8 +293,8 @@ document.addEventListener('DOMContentLoaded', async function() {
 						e.preventDefault();
 						showVariables();
 					});
-			}
-
+				}
+			determineMainAction();
 		} catch (error) {
 			console.error('Error initializing popup:', error);
 			showError(getMessage('pleaseReloadPage'));
@@ -466,8 +466,6 @@ function setupEventListeners(tabId: number) {
 async function initializeUI() {
 	const clipButton = document.getElementById('clip-btn');
 	if (clipButton) {
-		clipButton.addEventListener('click', handleClip);
-		
 		clipButton.focus();
 	} else {
 		console.warn('Clip button not found');
@@ -523,111 +521,6 @@ function clearError(): void {
 function logError(message: string, error?: any): void {
 	console.error(message, error);
 	showError(message);
-}
-
-async function handleClip() {
-	if (!currentTemplate) return;
-
-	const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement;
-	const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
-	const noteNameField = document.getElementById('note-name-field') as HTMLInputElement;
-	const pathField = document.getElementById('path-name-field') as HTMLInputElement;
-	const interpretBtn = document.getElementById('interpret-btn') as HTMLButtonElement;
-
-	if (!vaultDropdown || !noteContentField) {
-		showError('Some required fields are missing. Please try reloading the extension.');
-		return;
-	}
-
-	const selectedVault = currentTemplate.vault || vaultDropdown.value;
-	const noteContent = noteContentField.value;
-	const isDailyNote = currentTemplate.behavior === 'append-daily' || currentTemplate.behavior === 'prepend-daily';
-
-	let noteName = '';
-	let path = '';
-
-	if (!isDailyNote) {
-		if (!noteNameField || !pathField) {
-			showError('Note name or path field is missing. Please try reloading the extension.');
-			return;
-		}
-		noteName = noteNameField.value;
-		path = pathField.value;
-	}
-
-	// Check if interpreter is enabled, the button exists, and there are prompt variables
-	const promptVariables = collectPromptVariables(currentTemplate);
-	if (generalSettings.interpreterEnabled && interpretBtn && promptVariables.length > 0) {
-		if (interpretBtn.classList.contains('processing')) {
-			try {
-				await waitForInterpreter(interpretBtn);
-			} catch (error) {
-				console.error('Interpreter processing failed:', error);
-				showError('failedToProcessInterpreter');
-				return;
-			}
-		} else if (!interpretBtn.classList.contains('done')) {
-			interpretBtn.click(); // Only trigger if not already processed
-			try {
-				await waitForInterpreter(interpretBtn);
-			} catch (error) {
-				console.error('Interpreter processing failed:', error);
-				showError('failedToProcessInterpreter');
-				return;
-			}
-		}
-	}
-
-	const properties = Array.from(document.querySelectorAll('.metadata-property input')).map(input => {
-		const inputElement = input as HTMLInputElement;
-		return {
-			id: inputElement.dataset.id || Date.now().toString() + Math.random().toString(36).slice(2, 11),
-			name: inputElement.id,
-			value: inputElement.type === 'checkbox' ? inputElement.checked : inputElement.value
-		};
-	}) as Property[];
-
-	let fileContent: string;
-	const frontmatter = await generateFrontmatter(properties as Property[]);
-	fileContent = frontmatter + noteContent;
-
-	try {
-		if (currentTemplate.behavior === 'create' || currentTemplate.behavior === 'overwrite') {
-			const updatedProperties = Array.from(document.querySelectorAll('.metadata-property input')).map(input => {
-				const inputElement = input as HTMLInputElement;
-				return {
-					id: inputElement.dataset.id || Date.now().toString() + Math.random().toString(36).slice(2, 11),
-					name: inputElement.id,
-					value: inputElement.type === 'checkbox' ? inputElement.checked : inputElement.value
-				};
-			}) as Property[];
-			const frontmatter = await memoizedGenerateFrontmatter(updatedProperties as Property[]);
-			fileContent = frontmatter + noteContentField.value;
-		} else {
-			fileContent = noteContentField.value;
-		}
-
-		await saveToObsidian(fileContent, noteName, path, selectedVault, currentTemplate.behavior);
-		await incrementStat('addToObsidian', selectedVault, path);
-
-		// Only update lastSelectedVault if the user explicitly chose a vault
-		if (!currentTemplate.vault) {
-			lastSelectedVault = selectedVault;
-			await setLocalStorage('lastSelectedVault', lastSelectedVault);
-		}
-
-		// Only close the window if it's not running in side panel mode
-		if (!isSidePanel) {
-			setTimeout(() => window.close(), 500);
-			if (generalSettings.autoCopyToClipboard) {
-				await copyToClipboard(fileContent);
-			}
-		}
-	} catch (error) {
-		console.error('Error in handleClip:', error);
-		showError('failedToSaveFile');
-		throw error;
-	}
 }
 
 async function waitForInterpreter(interpretBtn: HTMLButtonElement): Promise<void> {
@@ -1141,6 +1034,144 @@ async function handleSaveToDownloads() {
 		console.error('Failed to save file:', error);
 		showError('failedToSaveFile');
 	}
+}
+
+function determineMainAction() {
+    const mainButton = document.getElementById('clip-btn');
+    const moreDropdown = document.getElementById('more-dropdown');
+    const secondaryActions = moreDropdown?.querySelector('.secondary-actions');
+    if (!mainButton || !secondaryActions) return;
+
+    // Clear existing secondary actions
+    secondaryActions.innerHTML = '';
+
+    // Set up actions based on saved behavior
+    switch (loadedSettings.saveBehavior) {
+        case 'copyToClipboard':
+            mainButton.textContent = getMessage('copyToClipboard');
+            mainButton.onclick = () => copyContent();
+            // Add direct actions to secondary
+            addSecondaryAction(secondaryActions, 'addToObsidian', () => handleClipObsidian());
+            addSecondaryAction(secondaryActions, 'saveFile', handleSaveToDownloads);
+            break;
+        case 'saveFile':
+            mainButton.textContent = getMessage('saveFile');
+            mainButton.onclick = () => handleSaveToDownloads();
+            // Add direct actions to secondary
+            addSecondaryAction(secondaryActions, 'addToObsidian', () => handleClipObsidian());
+            addSecondaryAction(secondaryActions, 'copyToClipboard', copyContent);
+            break;
+        default: // 'addToObsidian'
+            mainButton.textContent = getMessage('addToObsidian');
+            mainButton.onclick = () => handleClipObsidian();
+            // Add direct actions to secondary
+            addSecondaryAction(secondaryActions, 'copyToClipboard', copyContent);
+            addSecondaryAction(secondaryActions, 'saveFile', handleSaveToDownloads);
+    }
+}
+
+// New function specifically for Obsidian operations
+async function handleClipObsidian(): Promise<void> {
+    if (!currentTemplate) return;
+
+    const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement;
+    const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
+    const noteNameField = document.getElementById('note-name-field') as HTMLInputElement;
+    const pathField = document.getElementById('path-name-field') as HTMLInputElement;
+    const interpretBtn = document.getElementById('interpret-btn') as HTMLButtonElement;
+
+    if (!vaultDropdown || !noteContentField) {
+        showError('Some required fields are missing. Please try reloading the extension.');
+        return;
+    }
+
+    try {
+        // Handle interpreter if needed
+        if (generalSettings.interpreterEnabled && interpretBtn && collectPromptVariables(currentTemplate).length > 0) {
+            if (interpretBtn.classList.contains('processing')) {
+                await waitForInterpreter(interpretBtn);
+            } else if (!interpretBtn.classList.contains('done')) {
+                interpretBtn.click();
+                await waitForInterpreter(interpretBtn);
+            }
+        }
+
+        // Gather content
+        const properties = Array.from(document.querySelectorAll('.metadata-property input')).map(input => {
+            const inputElement = input as HTMLInputElement;
+            return {
+                id: inputElement.dataset.id || Date.now().toString() + Math.random().toString(36).slice(2, 11),
+                name: inputElement.id,
+                value: inputElement.type === 'checkbox' ? inputElement.checked : inputElement.value
+            };
+        }) as Property[];
+
+        const frontmatter = await generateFrontmatter(properties);
+        const fileContent = frontmatter + noteContentField.value;
+
+        // Save to Obsidian
+        const selectedVault = currentTemplate.vault || vaultDropdown.value;
+        const isDailyNote = currentTemplate.behavior === 'append-daily' || currentTemplate.behavior === 'prepend-daily';
+        const noteName = isDailyNote ? '' : noteNameField?.value || '';
+        const path = isDailyNote ? '' : pathField?.value || '';
+
+        await saveToObsidian(fileContent, noteName, path, selectedVault, currentTemplate.behavior);
+        await incrementStat('addToObsidian', selectedVault, path);
+
+        if (!currentTemplate.vault) {
+            lastSelectedVault = selectedVault;
+            await setLocalStorage('lastSelectedVault', lastSelectedVault);
+        }
+
+        if (!isSidePanel) {
+            setTimeout(() => window.close(), 500);
+        }
+    } catch (error) {
+        console.error('Error in handleClipObsidian:', error);
+        showError('failedToSaveFile');
+        throw error;
+    }
+}
+
+function addSecondaryAction(container: Element, actionType: string, handler: () => void) {
+    const menuItem = document.createElement('div');
+    menuItem.className = 'menu-item';
+    menuItem.innerHTML = `
+        <div class="menu-item-icon">
+            <i data-lucide="${getActionIcon(actionType)}"></i>
+        </div>
+        <div class="menu-item-title" data-i18n="${actionType}">
+            ${getMessage(actionType)}
+        </div>
+    `;
+    menuItem.addEventListener('click', handler);
+    container.appendChild(menuItem);
+    initializeIcons(menuItem);
+}
+
+function getActionIcon(actionType: string): string {
+    switch (actionType) {
+        case 'copyToClipboard': return 'copy';
+        case 'saveFile': return 'file-down';
+        case 'addToObsidian': return 'book-open';
+        default: return 'plus';
+    }
+}
+
+async function copyContent() {
+    const properties = Array.from(document.querySelectorAll('.metadata-property input')).map(input => {
+        const inputElement = input as HTMLInputElement;
+        return {
+            id: inputElement.dataset.id || Date.now().toString() + Math.random().toString(36).slice(2, 11),
+            name: inputElement.id,
+            value: inputElement.type === 'checkbox' ? inputElement.checked : inputElement.value
+        };
+    }) as Property[];
+
+    const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
+    const frontmatter = await generateFrontmatter(properties);
+    const fileContent = frontmatter + noteContentField.value;
+    await copyToClipboard(fileContent);
 }
 
 // Update the resize event listener to use the debounced version

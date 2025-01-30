@@ -29,7 +29,7 @@ export let generalSettings: Settings = {
 	},
 	history: [],
 	ratings: [],
-	autoCopyToClipboard: false
+	saveBehavior: 'addToObsidian'
 };
 
 export function setLocalStorage(key: string, value: any): Promise<void> {
@@ -46,7 +46,7 @@ interface StorageData {
 		betaFeatures?: boolean;
 		legacyMode?: boolean;
 		silentOpen?: boolean;
-		autoCopyToClipboard?: boolean;
+		saveBehavior?: 'addToObsidian' | 'copyToClipboard' | 'saveFile';
 	};
 	vaults?: string[];
 	highlighter_settings?: {
@@ -101,7 +101,7 @@ interface LegacyStorageData {
 		betaFeatures?: boolean;
 		legacyMode?: boolean;
 		silentOpen?: boolean;
-		autoCopyToClipboard?: boolean;
+		saveBehavior?: 'addToObsidian' | 'copyToClipboard' | 'saveFile';
 	};
 	vaults?: string[];
 	highlighter_settings?: {
@@ -233,7 +233,7 @@ export async function loadSettings(): Promise<Settings> {
 		interpreterAutoRun: false,
 		defaultPromptContext: '',
 		propertyTypes: [],
-		autoCopyToClipboard: false,
+		saveBehavior: 'addToObsidian',
 		stats: {
 			addToObsidian: 0,
 			saveFile: 0,
@@ -280,7 +280,7 @@ export async function loadSettings(): Promise<Settings> {
 		stats: data.stats || defaultSettings.stats,
 		history: data.history || defaultSettings.history,
 		ratings: data.ratings || defaultSettings.ratings,
-		autoCopyToClipboard: data.general_settings?.autoCopyToClipboard ?? defaultSettings.autoCopyToClipboard	
+		saveBehavior: data.general_settings?.saveBehavior ?? defaultSettings.saveBehavior
 	};
 
 	generalSettings = loadedSettings;
@@ -300,7 +300,7 @@ export async function saveSettings(settings?: Partial<Settings>): Promise<void> 
 			betaFeatures: generalSettings.betaFeatures,
 			legacyMode: generalSettings.legacyMode,
 			silentOpen: generalSettings.silentOpen,
-			autoCopyToClipboard: generalSettings.autoCopyToClipboard
+			saveBehavior: generalSettings.saveBehavior,
 		},
 		highlighter_settings: {
 			highlighterEnabled: generalSettings.highlighterEnabled,

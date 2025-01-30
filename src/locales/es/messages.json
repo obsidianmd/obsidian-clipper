@@ -646,6 +646,12 @@
 	"save": {
 		"message": "Guardar"
 	},
+	"saveBehaviorLabel": {
+		"message": "Comportamiento de guardado"
+	},
+	"saveBehaviorDescription": {
+		"message": "Elija el comportamiento de guardado predeterminado para la extensión. Cuando seleccione \"copiar al portapapeles\" o \"guardar archivo\", no se añadirá el recorte a Obsidian."
+	},
 	"saveFile": {
 		"message": "Guardar archivo..."
 	},

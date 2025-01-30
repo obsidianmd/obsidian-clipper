@@ -48,6 +48,8 @@ export interface Rating {
 	date: string;
 }
 
+export type SaveBehavior = 'addToObsidian' | 'saveFile' | 'copyToClipboard';
+
 export interface Settings {
 	vaults: string[];
 	showMoreActionsButton: boolean;
@@ -72,7 +74,7 @@ export interface Settings {
 	};
 	history: HistoryEntry[];
 	ratings: Rating[];
-	autoCopyToClipboard: boolean;
+	saveBehavior: 'addToObsidian' | 'saveFile' | 'copyToClipboard';
 }
 
 export interface ModelConfig {
