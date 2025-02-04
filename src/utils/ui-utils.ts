@@ -104,3 +104,20 @@ export function initializeSettingToggle(
 		}
 	});
 }
+
+export function initializeSettingDropdown<T extends string>(
+    elementId: string, 
+    initialValue: T,
+    onChange: (newValue: T) => void
+): void {
+    const dropdown = document.getElementById(elementId) as HTMLSelectElement;
+    if (!dropdown) return;
+
+    // Set initial value
+    dropdown.value = initialValue;
+
+    // Add change listener
+    dropdown.addEventListener('change', () => {
+        onChange(dropdown.value as T);
+    });
+}

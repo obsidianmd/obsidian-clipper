@@ -1,7 +1,7 @@
 import browser from './browser-polyfill';
 import { escapeDoubleQuotes, sanitizeFileName } from '../utils/string-utils';
 import { Template, Property } from '../types/types';
-import { generalSettings } from './storage-utils';
+import { generalSettings, incrementStat } from './storage-utils';
 
 export async function generateFrontmatter(properties: Property[]): Promise<string> {
 	let frontmatter = '---\n';
