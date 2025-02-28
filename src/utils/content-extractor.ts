@@ -2,7 +2,7 @@ import { ExtractedContent } from '../types/types';
 import { ExtractorRegistry } from './extractor-registry';
 import { createMarkdownContent } from './markdown-converter';
 import { sanitizeFileName } from './string-utils';
-import { Tidy } from './tidy/tidy';
+import { Defuddle } from 'defuddle';
 import browser from './browser-polyfill';
 import { debugLog } from './debug';
 import dayjs from 'dayjs';
@@ -119,8 +119,8 @@ export async function initializePageContent(
 			}
 		}
 
-		const tidyResult = Tidy.parse(doc);
-		const noteName = sanitizeFileName(extractorVariables['title'] || tidyResult.title);
+		const defuddled = new Defuddle(doc).parse();
+		const noteName = sanitizeFileName(extractorVariables['title'] || defuddled.title);
 
 		// Process highlights after getting the base content
 		if (generalSettings.highlighterEnabled && generalSettings.highlightBehavior !== 'no-highlights' && highlights && highlights.length > 0) {
@@ -148,20 +148,20 @@ export async function initializePageContent(
 		});
 
 		const currentVariables: { [key: string]: string } = {
-			'{{author}}': tidyResult.author.trim(),
+			'{{author}}': defuddled.author.trim(),
 			'{{content}}': markdownBody.trim(),
 			'{{contentHtml}}': content.trim(),
 			'{{date}}': dayjs().format('YYYY-MM-DDTHH:mm:ssZ').trim(),
 			'{{time}}': dayjs().format('YYYY-MM-DDTHH:mm:ssZ').trim(),
-			'{{description}}': tidyResult.description.trim(),
-			'{{domain}}': tidyResult.domain,
-			'{{favicon}}': tidyResult.favicon,
+			'{{description}}': defuddled.description.trim(),
+			'{{domain}}': defuddled.domain,
+			'{{favicon}}': defuddled.favicon,
 			'{{fullHtml}}': fullHtml.trim(),
-			'{{image}}': tidyResult.image,
+			'{{image}}': defuddled.image,
 			'{{noteName}}': noteName.trim(),
-			'{{published}}': tidyResult.published.split(',')[0].trim(),
-			'{{site}}': tidyResult.site.trim(),
-			'{{title}}': tidyResult.title.trim(),
+			'{{published}}': defuddled.published.split(',')[0].trim(),
+			'{{site}}': defuddled.site.trim(),
+			'{{title}}': defuddled.title.trim(),
 			'{{url}}': currentUrl.trim(),
 			'{{highlights}}': highlights.length > 0 ? JSON.stringify(highlightsData) : '',
 		};

@@ -1,4 +1,4 @@
-import { Tidy } from './tidy/tidy';
+import { Defuddle } from 'defuddle';
 import { debugLog } from './debug';
 
 // Mobile viewport settings
@@ -26,17 +26,17 @@ export class Reader {
 		if (dir) htmlElement.setAttribute('dir', dir);
 		
 		// Parse the document
-		const parsed = Tidy.parse(doc);
-		if (!parsed) {
+		const defuddled = new Defuddle(document).parse();
+		if (!defuddled) {
 			debugLog('Reader', 'Failed to parse document');
 			return;
 		}
 
 		// Format the published date if it exists
 		let formattedDate = '';
-		if (parsed.published) {
+		if (defuddled.published) {
 			try {
-				const date = new Date(parsed.published);
+				const date = new Date(defuddled.published);
 				if (!isNaN(date.getTime())) {
 					formattedDate = new Intl.DateTimeFormat(undefined, {
 						year: 'numeric',
@@ -45,10 +45,10 @@ export class Reader {
 						timeZone: 'UTC'
 					}).format(date);
 				} else {
-					formattedDate = parsed.published;
+					formattedDate = defuddled.published;
 				}
 			} catch (e) {
-				formattedDate = parsed.published;
+				formattedDate = defuddled.published;
 				debugLog('Reader', 'Error formatting date:', e);
 			}
 		}
@@ -91,15 +91,15 @@ export class Reader {
 		// Replace body content with reader view
 		doc.body.innerHTML = `
 			<article>
-			${parsed.title ? `<h1>${parsed.title}</h1>` : ''}
+			${defuddled.title ? `<h1>${defuddled.title}</h1>` : ''}
 				<div class="metadata">
 					<div class="metadata-details">
-						${parsed.author ? `<span>By ${parsed.author}</span>` : ''}
+						${defuddled.author ? `<span>By ${defuddled.author}</span>` : ''}
 						${formattedDate ? `<span> • ${formattedDate}</span>` : ''}
-						${parsed.domain ? `<span> • <a href="${doc.URL}">${parsed.domain}</a></span>` : ''}
+						${defuddled.domain ? `<span> • <a href="${doc.URL}">${defuddled.domain}</a></span>` : ''}
 					</div>
 				</div>
-				${parsed.content}
+				${defuddled.content}
 			</article>
 		`;
 

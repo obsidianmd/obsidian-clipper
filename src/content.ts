@@ -1,7 +1,7 @@
 import browser from './utils/browser-polyfill';
 import * as highlighter from './utils/highlighter';
 import { loadSettings, generalSettings } from './utils/storage-utils';
-import { Tidy } from './utils/tidy/tidy';
+import { Defuddle } from 'defuddle';
 import { Reader } from './utils/reader';
 
 declare global {
@@ -64,8 +64,8 @@ declare global {
 
 			const extractedContent: { [key: string]: string } = {};
 
-			// Process with Tidy first while we have access to the document
-			const tidyResult = Tidy.parse(document);
+			// Process with Defuddle first while we have access to the document
+			const defuddled = new Defuddle(document).parse();
 
 			// Create a new DOMParser
 			const parser = new DOMParser();
@@ -110,20 +110,20 @@ declare global {
 			const cleanedHtml = doc.documentElement.outerHTML;
 
 			const response: ContentResponse = {
-				author: tidyResult.author,
-				content: tidyResult.content,
-				description: tidyResult.description,
-				domain: tidyResult.domain,
+				author: defuddled.author,
+				content: defuddled.content,
+				description: defuddled.description,
+				domain: defuddled.domain,
 				extractedContent: extractedContent,
-				favicon: tidyResult.favicon,
+				favicon: defuddled.favicon,
 				fullHtml: cleanedHtml,
 				highlights: highlighter.getHighlights(),
-				image: tidyResult.image,
-				published: tidyResult.published,
-				schemaOrgData: tidyResult.schemaOrgData,
+				image: defuddled.image,
+				published: defuddled.published,
+				schemaOrgData: defuddled.schemaOrgData,
 				selectedHtml: selectedHtml,
-				site: tidyResult.site,
-				title: tidyResult.title
+				site: defuddled.site,
+				title: defuddled.title
 			};
 
 			sendResponse(response);
