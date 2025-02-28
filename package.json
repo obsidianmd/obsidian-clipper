@@ -3,6 +3,8 @@
 	"version": "0.10.9",
 	"description": "Official web clipper for Obsidian.",
 	"scripts": {
+		"predev": "npm pkg set dependencies.defuddle=\"file:../defuddle\"",
+		"prebuild": "npm pkg set dependencies.defuddle=\"0.1.0\"",
 		"dev:chrome": "webpack --watch --env BROWSER=chrome --mode development",
 		"dev:firefox": "webpack --watch --env BROWSER=firefox --mode development",
 		"dev:safari": "webpack --watch --env BROWSER=safari --mode development",
@@ -41,7 +43,7 @@
 	"dependencies": {
 		"@types/safari-extension": "^0.0.33",
 		"dayjs": "^1.11.13",
-		"defuddle": "0.1.0",
+		"defuddle": "file:../defuddle",
 		"dompurify": "^3.0.9",
 		"lucide": "^0.359.0",
 		"lz-string": "^1.5.0",
