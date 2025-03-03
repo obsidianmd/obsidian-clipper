@@ -4,7 +4,7 @@
 	"description": "Official web clipper for Obsidian.",
 	"scripts": {
 		"predev": "npm pkg set dependencies.defuddle=\"file:../defuddle\"",
-		"prebuild": "npm pkg set dependencies.defuddle=\"0.1.0\"",
+		"prebuild": "npm pkg set dependencies.defuddle=\"0.1.1\"",
 		"dev:chrome": "webpack --watch --env BROWSER=chrome --mode development",
 		"dev:firefox": "webpack --watch --env BROWSER=firefox --mode development",
 		"dev:safari": "webpack --watch --env BROWSER=safari --mode development",
