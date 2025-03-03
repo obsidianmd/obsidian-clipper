@@ -25,6 +25,11 @@ import { sanitizeFileName } from '../utils/string-utils';
 import { saveFile } from '../utils/file-utils';
 import { translatePage, getMessage, setupLanguageAndDirection } from '../utils/i18n';
 
+interface ReaderModeResponse {
+	success: boolean;
+	isActive: boolean;
+}
+
 let loadedSettings: Settings;
 let currentTemplate: Template | null = null;
 let templates: Template[] = [];
@@ -460,6 +465,11 @@ function setupEventListeners(tabId: number) {
 				}
 			}
 		});
+	}
+
+	const readerModeButton = document.getElementById('reader-mode');
+	if (readerModeButton) {
+		readerModeButton.addEventListener('click', () => toggleReaderMode(tabId));
 	}
 }
 
@@ -1066,6 +1076,32 @@ function updateHighlighterModeUI(isActive: boolean) {
 		} else {
 			highlighterModeButton.style.display = 'none';
 		}
+	}
+}
+
+async function toggleReaderMode(tabId: number) {
+	try {
+		const response = await browser.tabs.sendMessage(tabId, { 
+			action: "toggleReaderMode"
+		}) as ReaderModeResponse;
+
+		if (response && response.success) {
+			const readerButton = document.getElementById('reader-mode');
+			if (readerButton) {
+				const isActive = response.isActive ?? false;
+				readerButton.classList.toggle('active', isActive);
+				readerButton.setAttribute('aria-pressed', isActive.toString());
+				readerButton.title = isActive ? getMessage('disableReader') : getMessage('enableReader');
+			}
+		}
+
+		// Close the popup if not in side panel
+		if (!isSidePanel) {
+			window.close();
+		}
+	} catch (error) {
+		console.error('Error toggling reader mode:', error);
+		showError('failedToToggleReaderMode');
 	}
 }
 
