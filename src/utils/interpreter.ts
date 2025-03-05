@@ -107,6 +107,26 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 				'anthropic-version': '2023-06-01',
 				'anthropic-dangerous-direct-browser-access': 'true'
 			};
+		} else if (provider.name.toLowerCase().includes('perplexity')) {
+			requestUrl = provider.baseUrl;
+			requestBody = {
+				model: model.providerModelId,
+				max_tokens: 1600,
+				messages: [
+					{ role: 'system', content: systemContent },
+					{ role: 'user', content: `
+						"${promptContext}"
+						"${JSON.stringify(promptContent)}"`
+					}
+				],
+				temperature: 0.3
+			};
+			headers = {
+				...headers,
+				'HTTP-Referer': 'https://obsidian.md/',
+				'X-Title': 'Obsidian Web Clipper',
+				'Authorization': `Bearer ${provider.apiKey}`
+			};
 		} else if (provider.name.toLowerCase().includes('ollama')) {
 			requestUrl = provider.baseUrl;
 			requestBody = {
