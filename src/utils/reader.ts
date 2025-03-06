@@ -10,6 +10,7 @@ interface ReaderSettings {
 	fontSize: number;
 	lineHeight: number;
 	maxWidth: number;
+	theme: string;
 }
 
 export class Reader {
@@ -19,7 +20,8 @@ export class Reader {
 	private static settings: ReaderSettings = {
 		fontSize: 16,
 		lineHeight: 1.6,
-		maxWidth: 38
+		maxWidth: 38,
+		theme: 'default'
 	};
 
 	private static async loadSettings(): Promise<void> {
@@ -74,6 +76,11 @@ export class Reader {
 						<path d="M3 5h18M3 10h18M3 15h18M3 20h18"/>
 					</svg>
 				</button>
+
+				<select class="obsidian-reader-settings-select" data-action="change-theme">
+					<option value="default">Default</option>
+					<option value="flexoki">Flexoki</option>
+				</select>
 			</div>
 		`;
 
@@ -84,12 +91,9 @@ export class Reader {
 				top: 20px;
 				right: 20px;
 				background: var(--obsidian-reader-background-primary);
-				border: 1px solid var(--obsidian-reader-border);
-				border-radius: 24px;
 				padding: 4px;
 				z-index: 999999999;
 				font-family: var(--obsidian-reader-font-family);
-				box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 			}
 			.obsidian-reader-settings-controls {
 				display: grid;
@@ -110,6 +114,26 @@ export class Reader {
 				padding: 0;
 			}
 			.obsidian-reader-settings-button:hover {
+				background: var(--obsidian-reader-background-primary-alt);
+				color: var(--obsidian-reader-text-primary);
+			}
+			.obsidian-reader-settings-select {
+				background: transparent;
+				border: none;
+				color: var(--obsidian-reader-text-muted);
+				font-family: var(--obsidian-reader-font-family);
+				font-size: 12px;
+				padding: 4px;
+				border-radius: 12px;
+				cursor: pointer;
+				margin-left: 4px;
+			}
+			.obsidian-reader-settings-select:hover {
+				background: var(--obsidian-reader-background-primary-alt);
+				color: var(--obsidian-reader-text-primary);
+			}
+			.obsidian-reader-settings-select:focus {
+				outline: none;
 				background: var(--obsidian-reader-background-primary-alt);
 				color: var(--obsidian-reader-text-primary);
 			}
@@ -141,10 +165,10 @@ export class Reader {
 					this.updateFontSize(doc, parseInt(style.getPropertyValue('--obsidian-reader-font-size')) + 1);
 					break;
 				case 'decrease-width':
-					this.updateWidth(doc, parseInt(style.getPropertyValue('--obsidian-reader-line-width')) - 2);
+					this.updateWidth(doc, parseInt(style.getPropertyValue('--obsidian-reader-line-width')) - 1);
 					break;
 				case 'increase-width':
-					this.updateWidth(doc, parseInt(style.getPropertyValue('--obsidian-reader-line-width')) + 2);
+					this.updateWidth(doc, parseInt(style.getPropertyValue('--obsidian-reader-line-width')) + 1);
 					break;
 				case 'decrease-line-height':
 					this.updateLineHeight(doc, parseFloat(style.getPropertyValue('--obsidian-reader-line-height')) - 0.1);
@@ -154,6 +178,15 @@ export class Reader {
 					break;
 			}
 		});
+
+		// Add theme select event listener
+		const themeSelect = settingsBar.querySelector('[data-action="change-theme"]') as HTMLSelectElement;
+		if (themeSelect) {
+			themeSelect.value = this.settings.theme;
+			themeSelect.addEventListener('change', () => {
+				this.updateTheme(doc, themeSelect.value as 'default' | 'flexoki');
+			});
+		}
 	}
 
 	private static updateFontSize(doc: Document, size: number) {
@@ -174,6 +207,12 @@ export class Reader {
 		height = Math.max(1.2, Math.min(2, Math.round(height * 10) / 10));
 		doc.documentElement.style.setProperty('--obsidian-reader-line-height', height.toString());
 		this.settings.lineHeight = height;
+		this.saveSettings();
+	}
+
+	private static updateTheme(doc: Document, theme: 'default' | 'flexoki'): void {
+		doc.documentElement.setAttribute('data-reader-theme', theme);
+		this.settings.theme = theme;
 		this.saveSettings();
 	}
 
@@ -306,7 +345,7 @@ export class Reader {
 							author ? `By ${author}` : '',
 							formattedDate || '',
 							domain ? `<a href="${doc.URL}">${domain}</a>` : ''
-						].filter(Boolean).map(item => `<span>${item}</span>`).join('<span> • </span>')}
+						].filter(Boolean).map(item => `<span>${item}</span>`).join('<span> · </span>')}
 					</div>
 				</div>
 				${content}
@@ -317,6 +356,7 @@ export class Reader {
 		if (extractorType) {
 			doc.documentElement.setAttribute('data-reader-extractor', extractorType);
 		}
+		doc.documentElement.setAttribute('data-reader-theme', this.settings.theme);
 		
 		// Initialize settings from local storage
 		doc.documentElement.style.setProperty('--obsidian-reader-font-size', `${this.settings.fontSize}px`);
