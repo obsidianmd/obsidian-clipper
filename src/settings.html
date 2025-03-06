@@ -16,6 +16,7 @@
 						<li data-section="general" class="active" data-i18n="general">General</li>
 						<li data-section="properties" data-i18n="properties">Properties</li>
 						<li data-section="highlighter" data-i18n="highlighter">Highlighter</li>
+						<li data-section="reader" data-i18n="reader">Reader</li>
 						<li data-section="interpreter" data-i18n="interpreter">Interpreter</li>
 						<li class="sidebar-heading" data-i18n="templatesHeading">Templates</li>
 					</ul>
@@ -259,6 +260,44 @@
 										<option value="highlight-inline" data-i18n="highlightInline">Highlight inline</option>
 										<option value="replace-content" data-i18n="replaceContent">Replace the page content</option>
 										<option value="no-highlights" data-i18n="noHighlights">Do nothing</option>
+									</select>
+								</div>
+							</div>
+						</form>
+					</div>
+
+					<div id="reader-section" class="settings-section">
+						<div class="settings-section-header">
+							<h2 data-i18n="reader">Reader</h2>
+						</div>
+						<form id="reader-settings-form">
+							<div class="setting-item">
+								<div class="setting-item-info">
+									<label for="reader-font-family" data-i18n="fontFamily">Font family</label>
+									<div class="setting-item-description" data-i18n="fontFamilyDescription">
+										Font used in reading view.
+									</div>
+								</div>
+								<div class="setting-item-control">
+									<select id="reader-font-family">
+										<option value="system-ui">System</option>
+										<option value="serif">Serif</option>
+										<option value="sans-serif">Sans-serif</option>
+									</select>
+								</div>
+							</div>
+
+							<div class="setting-item">
+								<div class="setting-item-info">
+									<label for="reader-theme" data-i18n="theme">Theme</label>
+									<div class="setting-item-description" data-i18n="themeDescription">
+										Color theme for reading view.
+									</div>
+								</div>
+								<div class="setting-item-control">
+									<select id="reader-theme">
+										<option value="default" data-i18n="default">Default</option>
+										<option value="flexoki" data-i18n="flexoki">Flexoki</option>
 									</select>
 								</div>
 							</div>

@@ -48,6 +48,14 @@ export interface Rating {
 	date: string;
 }
 
+export interface ReaderSettings {
+	fontSize: number;
+	fontFamily: string;
+	lineHeight: number;
+	maxWidth: number;
+	theme: 'default' | 'flexoki';
+}
+
 export interface Settings {
 	vaults: string[];
 	showMoreActionsButton: boolean;
@@ -64,6 +72,7 @@ export interface Settings {
 	interpreterAutoRun: boolean;
 	defaultPromptContext: string;
 	propertyTypes: PropertyType[];
+	readerSettings: ReaderSettings;
 	stats: {
 		addToObsidian: number;
 		saveFile: number;

@@ -49,7 +49,7 @@ declare global {
 		site: string;
 	}
 
-	browser.runtime.onMessage.addListener(function(request: any, sender: browser.Runtime.MessageSender, sendResponse: (response?: any) => void) {
+	browser.runtime.onMessage.addListener((request: any, sender: browser.Runtime.MessageSender, sendResponse: (response?: any) => void) => {
 		if (request.action === "getPageContent") {
 			let selectedHtml = '';
 			const selection = window.getSelection();
@@ -221,14 +221,16 @@ declare global {
 				});
 			return true;
 		} else if (request.action === "toggleReaderMode") {
-			try {
-				const isActive = Reader.toggle(document);
-				document.documentElement.classList.toggle('obsidian-reader-active', isActive);
-				sendResponse({ success: true, isActive });
-			} catch (error: unknown) {
-				console.error('Error toggling reader mode:', error);
-				sendResponse({ success: false, error: error instanceof Error ? error.message : 'Unknown error' });
-			}
+			(async () => {
+				try {
+					const isActive = await Reader.toggle(document);
+					document.documentElement.classList.toggle('obsidian-reader-active', isActive);
+					sendResponse({ success: true, isActive });
+				} catch (error: unknown) {
+					console.error('Error toggling reader mode:', error);
+					sendResponse({ success: false, error: error instanceof Error ? error.message : 'Unknown error' });
+				}
+			})();
 			return true;
 		}
 		return true;

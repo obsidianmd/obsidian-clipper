@@ -192,6 +192,10 @@ html.obsidian-reader-active {
 }
 
 .obsidian-reader-active	body {
+	--obsidian-reader-font-family: system-ui, -apple-system, sans-serif;
+	--obsidian-reader-dynamic-font-size: calc(var(--obsidian-reader-font-size) + 0.25vw);
+
+
 	--obsidian-reader-background-primary: #fff;
 	--obsidian-reader-background-primary-alt: #fcfcfc;
 	--obsidian-reader-text-primary: #222222;
@@ -218,12 +222,12 @@ html.obsidian-reader-active {
 
 	background: var(--obsidian-reader-background-primary) !important;	
 	color: var(--obsidian-reader-text-primary) !important;
-	font-size: calc(1.5rem + 0.25vw) !important;
-	width: 38em !important;
+	font-size: var(--obsidian-reader-dynamic-font-size) !important;
+	width: var(--obsidian-reader-line-width) !important;
 	margin: 4rem auto 16rem !important;
 	max-width: 90% !important;
-	line-height: 1.6 !important;
-	font-family: system-ui, -apple-system, sans-serif;
+	line-height: var(--obsidian-reader-line-height) !important;
+	font-family: var(--obsidian-reader-font-family) !important;
 	img, video, figure {
 		max-width: 100%;
 		height: auto;
