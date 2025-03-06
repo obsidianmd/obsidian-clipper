@@ -20,6 +20,13 @@ export let generalSettings: Settings = {
 	interpreterAutoRun: false,
 	defaultPromptContext: '',
 	propertyTypes: [],
+	readerSettings: {
+		fontSize: 1.5,
+		fontFamily: 'system-ui',
+		lineHeight: 1.6,
+		maxWidth: 38,
+		theme: 'default'
+	},
 	stats: {
 		addToObsidian: 0,
 		saveFile: 0,
@@ -50,6 +57,13 @@ interface StorageData {
 		highlighterEnabled?: boolean;
 		alwaysShowHighlights?: boolean;
 		highlightBehavior?: string;
+	};
+	reader_settings?: {
+		fontSize?: number;
+		fontFamily?: string;
+		lineHeight?: number;
+		maxWidth?: number;
+		theme?: 'default' | 'flexoki';
 	};
 	interpreter_settings?: {
 		interpreterModel?: string;
@@ -93,6 +107,13 @@ export async function loadSettings(): Promise<Settings> {
 		interpreterAutoRun: false,
 		defaultPromptContext: '',
 		propertyTypes: [],
+		readerSettings: {
+			fontSize: 1.5,
+			fontFamily: 'system-ui',
+			lineHeight: 1.6,
+			maxWidth: 38,
+			theme: 'default'
+		},
 		stats: {
 			addToObsidian: 0,
 			saveFile: 0,
@@ -126,6 +147,13 @@ export async function loadSettings(): Promise<Settings> {
 		interpreterAutoRun: data.interpreter_settings?.interpreterAutoRun ?? defaultSettings.interpreterAutoRun,
 		defaultPromptContext: data.interpreter_settings?.defaultPromptContext || defaultSettings.defaultPromptContext,
 		propertyTypes: data.property_types || defaultSettings.propertyTypes,
+		readerSettings: {
+			fontSize: data.reader_settings?.fontSize ?? defaultSettings.readerSettings.fontSize,
+			fontFamily: data.reader_settings?.fontFamily ?? defaultSettings.readerSettings.fontFamily,
+			lineHeight: data.reader_settings?.lineHeight ?? defaultSettings.readerSettings.lineHeight,
+			maxWidth: data.reader_settings?.maxWidth ?? defaultSettings.readerSettings.maxWidth,
+			theme: data.reader_settings?.theme as 'default' | 'flexoki' ?? defaultSettings.readerSettings.theme
+		},
 		stats: data.stats || defaultSettings.stats,
 		history: data.history || defaultSettings.history,
 		ratings: data.ratings || defaultSettings.ratings
@@ -163,6 +191,13 @@ export async function saveSettings(settings?: Partial<Settings>): Promise<void> 
 			defaultPromptContext: generalSettings.defaultPromptContext
 		},
 		property_types: generalSettings.propertyTypes,
+		reader_settings: {
+			fontSize: generalSettings.readerSettings.fontSize,
+			fontFamily: generalSettings.readerSettings.fontFamily,
+			lineHeight: generalSettings.readerSettings.lineHeight,
+			maxWidth: generalSettings.readerSettings.maxWidth,
+			theme: generalSettings.readerSettings.theme
+		},
 		stats: generalSettings.stats
 	});
 }
