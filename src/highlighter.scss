@@ -191,11 +191,8 @@ html.obsidian-reader-active {
 	font-size: 62.5%;
 }
 
-.obsidian-reader-active	body {
-	--obsidian-reader-font-family: system-ui, -apple-system, sans-serif;
-	--obsidian-reader-dynamic-font-size: calc(var(--obsidian-reader-font-size) + 0.25vw);
 
-
+.obsidian-reader-active {
 	--obsidian-reader-background-primary: #fff;
 	--obsidian-reader-background-primary-alt: #fcfcfc;
 	--obsidian-reader-text-primary: #222222;
@@ -214,7 +211,40 @@ html.obsidian-reader-active {
 		--obsidian-reader-text-accent: #dadada;
 		--obsidian-reader-text-accent-hover: #dadada;
 		--obsidian-reader-border: #363636;
+	}
+}
+.obsidian-reader-active[data-reader-theme="flexoki"] {
+	--obsidian-reader-background-primary: #FFFCF0;
+	--obsidian-reader-background-primary-alt: #F2F0E5;
+	--obsidian-reader-text-primary: #100F0F;
+	--obsidian-reader-text-muted: #5c5c5c;
+	--obsidian-reader-text-faint: #B7B5AC;
+	--obsidian-reader-text-accent: #100F0F;
+	--obsidian-reader-text-accent-hover: #100F0F;
+	--obsidian-reader-border: #E6E4D9;
 
+	@media (prefers-color-scheme: dark) {
+		--obsidian-reader-background-primary: #100F0F;
+		--obsidian-reader-background-primary-alt: #100F0F;
+		--obsidian-reader-text-primary: #CECDC3;
+		--obsidian-reader-text-muted: #878580;
+		--obsidian-reader-text-faint: #575653;
+		--obsidian-reader-text-accent: #CECDC3;
+		--obsidian-reader-text-accent-hover: #CECDC3;
+		--obsidian-reader-border: #282726;
+	}
+}
+
+.obsidian-reader-active	body {
+	--obsidian-reader-font-family: system-ui, -apple-system, sans-serif;
+	--obsidian-reader-dynamic-font-size: calc(var(--obsidian-reader-font-size) + 0.25vw);
+
+	@media (prefers-color-scheme: light) {
+		img {
+			mix-blend-mode: multiply;
+		}
+	}
+	@media (prefers-color-scheme: dark) {
 		.mw-invert {
 			filter: invert(1);
 		}
@@ -224,11 +254,34 @@ html.obsidian-reader-active {
 	color: var(--obsidian-reader-text-primary) !important;
 	font-size: var(--obsidian-reader-dynamic-font-size) !important;
 	width: var(--obsidian-reader-line-width) !important;
-	margin: 4rem auto 16rem !important;
+	margin: max(4rem, 6vh) auto 40vh !important;
 	max-width: 90% !important;
 	line-height: var(--obsidian-reader-line-height) !important;
 	font-family: var(--obsidian-reader-font-family) !important;
+	-webkit-font-smoothing: antialiased !important;
 
+	h1 {
+		margin: 0 0 0.5em 0;
+		line-height: 1.3;
+	}
+	.metadata {
+		margin-bottom: 2em;
+		padding-bottom: 1em;
+		border-bottom: 1px solid var(--obsidian-reader-border);
+	}
+	.metadata-details {
+		color: var(--obsidian-reader-text-muted);
+		font-size: 0.9em;
+
+		a {
+			color: inherit;
+			text-decoration: none;
+			color: var(--obsidian-reader-text-muted);
+		}
+		a:hover {
+			text-decoration: underline;
+		}
+	}
 	img, video, figure {
 		max-width: 100%;
 		height: auto;
@@ -241,13 +294,25 @@ html.obsidian-reader-active {
 			height: auto;
 		}
 	}
-
 	figure {
 		margin-inline-start: 0;
 		margin-inline-end: 0;
 	}
 	a {
 		color: var(--obsidian-reader-text-primary);
+	}
+	figcaption,
+	caption {
+		color: var(--obsidian-reader-text-muted);
+		font-size: 85%;
+		margin-top: 1em;
+		margin-bottom: 1em;
+	}
+	sup {
+		a {
+			text-decoration: none;
+			color: var(--obsidian-reader-text-muted);
+		}
 	}
 	hr {
 		background-color: var(--obsidian-reader-border);
@@ -256,38 +321,35 @@ html.obsidian-reader-active {
 		height: 1px;
 		margin: 1.5em 0;
 	}
-	pre {
+	pre, code {
 		background-color: var(--obsidian-reader-background-primary-alt);
+		border-radius: 6px;
+		border: 1px solid var(--obsidian-reader-border);
 		font-size: 85%;
-		border-radius: 8px;
-		padding: 12px 16px;
+	}
+	code {
+		padding: 0.1em 0.25em;
+	}
+	pre {
 		white-space: pre;
 		max-width: 100%;
 		overflow-x: auto;
-		border: 1px solid var(--obsidian-reader-border);
-	}
-	.metadata {
-		margin-bottom: 2em;
-		padding-bottom: 1em;
-		border-bottom: 1px solid var(--obsidian-reader-border);
-	}
-	h1 {
-		margin: 0 0 0.5em 0;
-		line-height: 1.3;
-	}
-	.metadata-details {
-		color: var(--obsidian-reader-text-muted);
-		font-size: 0.9em;
+		padding: 12px 16px;
+		code {
+			font-size: inherit;
+			border: none;
+			background-color: transparent;
+		}
 	}
 	table {
 		line-height: var(--obsidian-reader-line-height);
+		border-collapse: collapse !important;
+		tr {
+			td, th {
+				padding: 0.5em 1em !important;
+				border: 1px solid var(--obsidian-reader-border) !important;
+			}
+		}
 	}
-	.metadata-details a {
-		color: inherit;
-		text-decoration: none;
-		color: var(--obsidian-reader-text-muted);
-	}
-	.metadata-details a:hover {
-		text-decoration: underline;
-	}
+
 }
