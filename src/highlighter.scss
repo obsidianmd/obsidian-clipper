@@ -228,16 +228,33 @@ html.obsidian-reader-active {
 	max-width: 90% !important;
 	line-height: var(--obsidian-reader-line-height) !important;
 	font-family: var(--obsidian-reader-font-family) !important;
+
 	img, video, figure {
 		max-width: 100%;
 		height: auto;
 	}
+	iframe {
+		max-width: 100%;
+		width: 100%;
+		&[src*="youtube.com"] {
+			aspect-ratio: 16 / 9;
+			height: auto;
+		}
+	}
+
 	figure {
 		margin-inline-start: 0;
 		margin-inline-end: 0;
 	}
 	a {
 		color: var(--obsidian-reader-text-primary);
+	}
+	hr {
+		background-color: var(--obsidian-reader-border);
+		width: 100%;
+		border: 0;
+		height: 1px;
+		margin: 1.5em 0;
 	}
 	pre {
 		background-color: var(--obsidian-reader-background-primary-alt);
@@ -254,13 +271,16 @@ html.obsidian-reader-active {
 		padding-bottom: 1em;
 		border-bottom: 1px solid var(--obsidian-reader-border);
 	}
-	.metadata h1 {
+	h1 {
 		margin: 0 0 0.5em 0;
 		line-height: 1.3;
 	}
 	.metadata-details {
 		color: var(--obsidian-reader-text-muted);
 		font-size: 0.9em;
+	}
+	table {
+		line-height: var(--obsidian-reader-line-height);
 	}
 	.metadata-details a {
 		color: inherit;

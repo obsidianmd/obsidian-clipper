@@ -297,15 +297,16 @@ export class Reader {
 			head.insertBefore(charset, head.firstChild);
 		}
 
-		// Replace body content with reader view
 		doc.body.innerHTML = `
 			<article>
 			${title ? `<h1>${title}</h1>` : ''}
 				<div class="metadata">
 					<div class="metadata-details">
-						${author ? `<span>By ${author}</span>` : ''}
-						${formattedDate ? `<span> • ${formattedDate}</span>` : ''}
-						${domain ? `<span> • <a href="${doc.URL}">${domain}</a></span>` : ''}
+						${[
+							author ? `By ${author}` : '',
+							formattedDate || '',
+							domain ? `<a href="${doc.URL}">${domain}</a>` : ''
+						].filter(Boolean).map(item => `<span>${item}</span>`).join('<span> • </span>')}
 					</div>
 				</div>
 				${content}
