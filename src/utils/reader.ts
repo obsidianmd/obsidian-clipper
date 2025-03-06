@@ -1,6 +1,7 @@
 import { Defuddle } from 'defuddle';
 import { debugLog } from './debug';
 import { getLocalStorage, setLocalStorage } from './storage-utils';
+import { ExtractorRegistry } from './extractor-registry';
 
 // Mobile viewport settings
 const VIEWPORT = 'width=device-width, initial-scale=1, maximum-scale=1';
@@ -176,6 +177,43 @@ export class Reader {
 		this.saveSettings();
 	}
 
+	private static extractContent(doc: Document): { 
+		content: string; 
+		title?: string; 
+		author?: string; 
+		published?: string; 
+		domain?: string;
+		extractorType?: string;
+	} {
+		const defuddled = new Defuddle(doc).parse();
+		const schemaOrgData = defuddled.schemaOrgData;
+
+		// Try to use a specific extractor first
+		const extractor = ExtractorRegistry.findExtractor(doc, doc.URL, schemaOrgData);
+		if (extractor && extractor.canExtract()) {
+			debugLog('Reader', 'Using custom extractor');
+			const result = extractor.extract();
+			return {
+				content: result.contentHtml,
+				title: result.variables?.title,
+				author: result.variables?.author,
+				published: result.variables?.published,
+				domain: result.variables?.domain,
+				extractorType: extractor.constructor.name.replace('Extractor', '').toLowerCase()
+			};
+		}
+
+		// Fall back to Defuddle if no specific extractor or extraction failed
+		debugLog('Reader', 'Falling back to Defuddle');
+		return {
+			content: defuddled.content,
+			title: defuddled.title,
+			author: defuddled.author,
+			published: defuddled.published,
+			domain: defuddled.domain
+		};
+	}
+
 	static async apply(doc: Document) {
 		// Load saved settings first
 		await this.loadSettings();
@@ -196,18 +234,18 @@ export class Reader {
 		if (lang) htmlElement.setAttribute('lang', lang);
 		if (dir) htmlElement.setAttribute('dir', dir);
 		
-		// Parse the document
-		const defuddled = new Defuddle(document).parse();
-		if (!defuddled) {
-			debugLog('Reader', 'Failed to parse document');
+		// Extract content using extractors or Defuddle
+		const { content, title, author, published, domain, extractorType } = this.extractContent(doc);
+		if (!content) {
+			debugLog('Reader', 'Failed to extract content');
 			return;
 		}
 
 		// Format the published date if it exists
 		let formattedDate = '';
-		if (defuddled.published) {
+		if (published) {
 			try {
-				const date = new Date(defuddled.published);
+				const date = new Date(published);
 				if (!isNaN(date.getTime())) {
 					formattedDate = new Intl.DateTimeFormat(undefined, {
 						year: 'numeric',
@@ -216,10 +254,10 @@ export class Reader {
 						timeZone: 'UTC'
 					}).format(date);
 				} else {
-					formattedDate = defuddled.published;
+					formattedDate = published;
 				}
 			} catch (e) {
-				formattedDate = defuddled.published;
+				formattedDate = published;
 				debugLog('Reader', 'Error formatting date:', e);
 			}
 		}
@@ -262,19 +300,22 @@ export class Reader {
 		// Replace body content with reader view
 		doc.body.innerHTML = `
 			<article>
-			${defuddled.title ? `<h1>${defuddled.title}</h1>` : ''}
+			${title ? `<h1>${title}</h1>` : ''}
 				<div class="metadata">
 					<div class="metadata-details">
-						${defuddled.author ? `<span>By ${defuddled.author}</span>` : ''}
+						${author ? `<span>By ${author}</span>` : ''}
 						${formattedDate ? `<span> • ${formattedDate}</span>` : ''}
-						${defuddled.domain ? `<span> • <a href="${doc.URL}">${defuddled.domain}</a></span>` : ''}
+						${domain ? `<span> • <a href="${doc.URL}">${domain}</a></span>` : ''}
 					</div>
 				</div>
-				${defuddled.content}
+				${content}
 			</article>
 		`;
 
 		doc.documentElement.className = 'obsidian-reader-active';
+		if (extractorType) {
+			doc.documentElement.setAttribute('data-reader-extractor', extractorType);
+		}
 		
 		// Initialize settings from local storage
 		doc.documentElement.style.setProperty('--obsidian-reader-font-size', `${this.settings.fontSize}px`);
