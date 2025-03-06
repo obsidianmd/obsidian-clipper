@@ -67,6 +67,13 @@
 				"mac": "Alt+Shift+H"
 			},
 			"description": "Toggle highlighter mode"
+		},
+		"toggle_reader": {
+			"suggested_key": {
+				"default": "Alt+Shift+R",
+				"mac": "Alt+Shift+R"
+			},
+			"description": "Toggle reader mode"
 		}
 	}
 }
