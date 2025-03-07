@@ -19,6 +19,7 @@ export class Reader {
 	private static isActive: boolean = false;
 	private static settingsBar: HTMLElement | null = null;
 	private static iframe: HTMLIFrameElement | null = null;
+	private static stayInReader: boolean = false;
 	private static settings: ReaderSettings = {
 		fontSize: 16,
 		lineHeight: 1.6,
@@ -90,6 +91,13 @@ export class Reader {
 					<option value="light">Light</option>
 					<option value="dark">Dark</option>
 				</select>
+
+				<button class="obsidian-reader-settings-button" data-action="toggle-stay-in-reader" title="Stay in reader mode">
+					<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+						<path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+					</svg>
+				</button>
 			</div>
 		`;
 
@@ -127,6 +135,10 @@ export class Reader {
 				background: var(--obsidian-reader-background-primary-alt);
 				color: var(--obsidian-reader-text-primary);
 			}
+			.obsidian-reader-settings-button.active {
+				color: var(--obsidian-reader-text-accent-hover);
+				background: var(--obsidian-reader-background-primary-alt);
+			}
 			.obsidian-reader-settings-select {
 				background: transparent;
 				border: none;
@@ -146,6 +158,21 @@ export class Reader {
 				outline: none;
 				background: var(--obsidian-reader-background-primary-alt);
 				color: var(--obsidian-reader-text-primary);
+			}
+			.obsidian-reader-loading {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 2px;
+				background: var(--obsidian-reader-text-accent-hover);
+				transform-origin: 0 50%;
+				transform: scaleX(0);
+				transition: transform 300ms ease-out;
+				z-index: 999999999;
+			}
+			.obsidian-reader-loading.active {
+				transform: scaleX(1);
 			}
 			.obsidian-reader-outline {
 				position: fixed;
@@ -421,6 +448,113 @@ export class Reader {
 
 	private static observer: IntersectionObserver | null = null;
 
+	private static async loadNewPage(url: string, iframeDoc: Document) {
+		// Show loading indicator
+		const loading = iframeDoc.createElement('div');
+		loading.className = 'obsidian-reader-loading';
+		iframeDoc.body.appendChild(loading);
+		
+		// Start loading animation
+		requestAnimationFrame(() => loading.classList.add('active'));
+
+		try {
+			// Fetch the new page
+			const response = await fetch(url);
+			const html = await response.text();
+			
+			// Create a new document to parse the HTML
+			const parser = new DOMParser();
+			const newDoc = parser.parseFromString(html, 'text/html');
+			
+			// Extract content using extractors or Defuddle
+			const { content, title, author, published, domain, extractorType } = this.extractContent(newDoc);
+			
+			if (!content) {
+				throw new Error('Failed to extract content');
+			}
+
+			// Format the published date if it exists
+			let formattedDate = '';
+			if (published) {
+				try {
+					const date = new Date(published);
+					if (!isNaN(date.getTime())) {
+						formattedDate = new Intl.DateTimeFormat(undefined, {
+							year: 'numeric',
+							month: 'long',
+							day: 'numeric',
+							timeZone: 'UTC'
+						}).format(date);
+					} else {
+						formattedDate = published;
+					}
+				} catch (e) {
+					formattedDate = published;
+					debugLog('Reader', 'Error formatting date:', e);
+				}
+			}
+
+			// Update the iframe content
+			iframeDoc.body.innerHTML = `
+				<article>
+				${title ? `<h1>${title}</h1>` : ''}
+					<div class="metadata">
+						<div class="metadata-details">
+							${[
+								author ? `${author}` : '',
+								formattedDate || '',
+								domain ? `<a href="${url}">${domain}</a>` : ''
+							].filter(Boolean).map(item => `<span>${item}</span>`).join('<span> · </span>')}
+						</div>
+					</div>
+					${content}
+				</article>
+			`;
+
+			// Update window location without triggering a page load
+			window.history.pushState({}, '', url);
+			
+			// Re-add the settings bar and outline
+			this.injectSettingsBar(iframeDoc);
+			this.observer = this.generateOutline(iframeDoc);
+			
+			// Re-add click handler for links
+			this.setupLinkHandler(iframeDoc);
+
+			// Reset scroll position
+			iframeDoc.defaultView?.scrollTo({
+				top: 0,
+				behavior: 'instant'
+			});
+
+		} catch (error) {
+			console.error('Error loading page in reader mode:', error);
+			// If there's an error, navigate normally
+			window.location.href = url;
+		} finally {
+			// Remove loading indicator with fade out
+			if (loading) {
+				loading.addEventListener('transitionend', () => loading.remove());
+				loading.classList.remove('active');
+			}
+		}
+	}
+
+	private static setupLinkHandler(iframeDoc: Document) {
+		iframeDoc.addEventListener('click', async (e) => {
+			const target = e.target as HTMLElement;
+			const link = target.closest('a');
+			if (link && link.href && !link.href.startsWith('#')) {
+				e.preventDefault();
+				if (this.stayInReader) {
+					await this.loadNewPage(link.href, iframeDoc);
+				} else {
+					window.location.href = link.href;
+				}
+			}
+		});
+	}
+
 	static async apply(doc: Document) {
 		// Load saved settings first
 		await this.loadSettings();
@@ -532,15 +666,18 @@ export class Reader {
 		this.injectSettingsBar(iframeDoc);
 		this.observer = this.generateOutline(iframeDoc);
 		
-		// Link clicks should open in the parent tab, not in the iframe
-		iframeDoc.addEventListener('click', (e) => {
-			const target = e.target as HTMLElement;
-			const link = target.closest('a');
-			if (link && link.href) {
-				e.preventDefault();
-				window.location.href = link.href;
-			}
-		});
+		// Set up link handler
+		this.setupLinkHandler(iframeDoc);
+		
+		// Add stay-in-reader toggle handler
+		const stayInReaderButton = iframeDoc.querySelector('[data-action="toggle-stay-in-reader"]');
+		if (stayInReaderButton) {
+			stayInReaderButton.classList.toggle('active', this.stayInReader);
+			stayInReaderButton.addEventListener('click', () => {
+				this.stayInReader = !this.stayInReader;
+				stayInReaderButton.classList.toggle('active', this.stayInReader);
+			});
+		}
 		
 		this.isActive = true;
 	}
