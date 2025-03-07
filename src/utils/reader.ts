@@ -137,6 +137,38 @@ export class Reader {
 				background: var(--obsidian-reader-background-primary-alt);
 				color: var(--obsidian-reader-text-primary);
 			}
+			.obsidian-reader-outline {
+				position: fixed;
+				left: 0;
+				top: 0;
+				width: 240px;
+				padding: 16px;
+				overflow-y: auto;
+				font-family: var(--obsidian-reader-font-family);
+				font-size: 14px;
+				z-index: 999999998;
+			}
+			.obsidian-reader-outline-item {
+				color: var(--obsidian-reader-text-muted);
+				cursor: pointer;
+				padding: 4px 0;
+				text-overflow: ellipsis;
+				overflow: hidden;
+				white-space: nowrap;
+			}
+			.obsidian-reader-outline-item:hover {
+				color: var(--obsidian-reader-text-primary);
+			}
+			.obsidian-reader-outline-h3 {
+				padding-left: 16px;
+			}
+			.obsidian-reader-outline-h4 {
+				padding-left: 32px;
+			}
+			.obsidian-reader-outline-h5,
+			.obsidian-reader-outline-h6 {
+				padding-left: 48px;
+			}
 		`;
 
 		doc.head.appendChild(style);
@@ -253,6 +285,45 @@ export class Reader {
 		};
 	}
 
+	private static generateOutline(doc: Document) {
+		const article = doc.querySelector('article');
+		if (!article) return;
+
+		// Create outline container
+		const outline = doc.createElement('div');
+		outline.className = 'obsidian-reader-outline';
+
+		// Find all headings h2-h6
+		const headings = article.querySelectorAll('h2, h3, h4, h5, h6');
+		
+		if (headings.length === 0) {
+			outline.style.display = 'none';
+			return;
+		}
+
+		// Add unique IDs to headings if they don't have them
+		headings.forEach((heading, index) => {
+			if (!heading.id) {
+				heading.id = `heading-${index}`;
+			}
+		});
+
+		// Create outline items
+		headings.forEach((heading) => {
+			const item = doc.createElement('div');
+			item.className = `obsidian-reader-outline-item obsidian-reader-outline-${heading.tagName.toLowerCase()}`;
+			item.textContent = heading.textContent;
+			
+			item.addEventListener('click', () => {
+				heading.scrollIntoView({ behavior: 'smooth' });
+			});
+
+			outline.appendChild(item);
+		});
+
+		doc.body.appendChild(outline);
+	}
+
 	static async apply(doc: Document) {
 		// Load saved settings first
 		await this.loadSettings();
@@ -363,8 +434,9 @@ export class Reader {
 		doc.documentElement.style.setProperty('--obsidian-reader-line-height', this.settings.lineHeight.toString());
 		doc.documentElement.style.setProperty('--obsidian-reader-line-width', `${this.settings.maxWidth}em`);
 
-		// Add settings bar
+		// Add settings bar and outline
 		this.injectSettingsBar(doc);
+		this.generateOutline(doc);
 		
 		this.isActive = true;
 	}
@@ -380,6 +452,10 @@ export class Reader {
 			
 			this.originalHTML = null;
 			this.settingsBar = null;
+			const outline = doc.querySelector('.obsidian-reader-outline');
+			if (outline) {
+				outline.remove();
+			}
 			this.isActive = false;
 		}
 	}
