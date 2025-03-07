@@ -54,6 +54,7 @@ export interface ReaderSettings {
 	lineHeight: number;
 	maxWidth: number;
 	theme: 'default' | 'flexoki';
+	themeMode: 'auto' | 'light' | 'dark';
 }
 
 export interface Settings {

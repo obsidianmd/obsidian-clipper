@@ -11,6 +11,7 @@ interface ReaderSettings {
 	lineHeight: number;
 	maxWidth: number;
 	theme: string;
+	themeMode: 'auto' | 'light' | 'dark';
 }
 
 export class Reader {
@@ -21,7 +22,8 @@ export class Reader {
 		fontSize: 16,
 		lineHeight: 1.6,
 		maxWidth: 38,
-		theme: 'default'
+		theme: 'default',
+		themeMode: 'auto'
 	};
 
 	private static async loadSettings(): Promise<void> {
@@ -80,6 +82,12 @@ export class Reader {
 				<select class="obsidian-reader-settings-select" data-action="change-theme">
 					<option value="default">Default</option>
 					<option value="flexoki">Flexoki</option>
+				</select>
+
+				<select class="obsidian-reader-settings-select" data-action="change-theme-mode">
+					<option value="auto">Automatic</option>
+					<option value="light">Light</option>
+					<option value="dark">Dark</option>
 				</select>
 			</div>
 		`;
@@ -143,7 +151,7 @@ export class Reader {
 				top: 0;
 				width: 200px;
 				max-height: 100vh;
-				padding: 20px;
+				padding: max(2rem, 3vh) 20px 20px 20px;
 				overflow-y: auto;
 				font-size: 14px;
 				z-index: 999999998;
@@ -229,6 +237,15 @@ export class Reader {
 				this.updateTheme(doc, themeSelect.value as 'default' | 'flexoki');
 			});
 		}
+
+		// Add theme mode select event listener
+		const themeModeSelect = settingsBar.querySelector('[data-action="change-theme-mode"]') as HTMLSelectElement;
+		if (themeModeSelect) {
+			themeModeSelect.value = this.settings.themeMode;
+			themeModeSelect.addEventListener('change', () => {
+				this.updateThemeMode(doc, themeModeSelect.value as 'auto' | 'light' | 'dark');
+			});
+		}
 	}
 
 	private static updateFontSize(doc: Document, size: number) {
@@ -255,6 +272,21 @@ export class Reader {
 	private static updateTheme(doc: Document, theme: 'default' | 'flexoki'): void {
 		doc.documentElement.setAttribute('data-reader-theme', theme);
 		this.settings.theme = theme;
+		this.saveSettings();
+	}
+
+	private static updateThemeMode(doc: Document, mode: 'auto' | 'light' | 'dark'): void {
+		const html = doc.documentElement;
+		html.classList.remove('theme-light', 'theme-dark');
+
+		if (mode === 'auto') {
+			const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+			html.classList.add(prefersDark ? 'theme-dark' : 'theme-light');
+		} else {
+			html.classList.add(`theme-${mode}`);
+		}
+
+		this.settings.themeMode = mode;
 		this.saveSettings();
 	}
 
@@ -488,6 +520,9 @@ export class Reader {
 		}
 		doc.documentElement.setAttribute('data-reader-theme', this.settings.theme);
 		
+		// Apply theme mode
+		this.updateThemeMode(doc, this.settings.themeMode);
+
 		// Initialize settings from local storage
 		doc.documentElement.style.setProperty('--obsidian-reader-font-size', `${this.settings.fontSize}px`);
 		doc.documentElement.style.setProperty('--obsidian-reader-line-height', this.settings.lineHeight.toString());

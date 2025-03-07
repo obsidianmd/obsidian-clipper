@@ -25,7 +25,8 @@ export let generalSettings: Settings = {
 		fontFamily: 'system-ui',
 		lineHeight: 1.6,
 		maxWidth: 38,
-		theme: 'default'
+		theme: 'default',
+		themeMode: 'auto'
 	},
 	stats: {
 		addToObsidian: 0,
@@ -64,6 +65,7 @@ interface StorageData {
 		lineHeight?: number;
 		maxWidth?: number;
 		theme?: 'default' | 'flexoki';
+		themeMode?: 'auto' | 'light' | 'dark';
 	};
 	interpreter_settings?: {
 		interpreterModel?: string;
@@ -112,7 +114,8 @@ export async function loadSettings(): Promise<Settings> {
 			fontFamily: 'system-ui',
 			lineHeight: 1.6,
 			maxWidth: 38,
-			theme: 'default'
+			theme: 'default',
+			themeMode: 'auto'
 		},
 		stats: {
 			addToObsidian: 0,
@@ -152,7 +155,8 @@ export async function loadSettings(): Promise<Settings> {
 			fontFamily: data.reader_settings?.fontFamily ?? defaultSettings.readerSettings.fontFamily,
 			lineHeight: data.reader_settings?.lineHeight ?? defaultSettings.readerSettings.lineHeight,
 			maxWidth: data.reader_settings?.maxWidth ?? defaultSettings.readerSettings.maxWidth,
-			theme: data.reader_settings?.theme as 'default' | 'flexoki' ?? defaultSettings.readerSettings.theme
+			theme: data.reader_settings?.theme as 'default' | 'flexoki' ?? defaultSettings.readerSettings.theme,
+			themeMode: data.reader_settings?.themeMode as 'auto' | 'light' | 'dark' ?? defaultSettings.readerSettings.themeMode
 		},
 		stats: data.stats || defaultSettings.stats,
 		history: data.history || defaultSettings.history,
@@ -196,7 +200,8 @@ export async function saveSettings(settings?: Partial<Settings>): Promise<void> 
 			fontFamily: generalSettings.readerSettings.fontFamily,
 			lineHeight: generalSettings.readerSettings.lineHeight,
 			maxWidth: generalSettings.readerSettings.maxWidth,
-			theme: generalSettings.readerSettings.theme
+			theme: generalSettings.readerSettings.theme,
+			themeMode: generalSettings.readerSettings.themeMode
 		},
 		stats: generalSettings.stats
 	});
