@@ -472,7 +472,7 @@ export class Reader {
 				<div class="metadata">
 					<div class="metadata-details">
 						${[
-							author ? `By ${author}` : '',
+							author ? `${author}` : '',
 							formattedDate || '',
 							domain ? `<a href="${doc.URL}">${domain}</a>` : ''
 						].filter(Boolean).map(item => `<span>${item}</span>`).join('<span> · </span>')}
