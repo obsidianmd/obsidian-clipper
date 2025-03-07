@@ -563,6 +563,7 @@ export class Reader {
 		this.iframe = document.createElement('iframe');
 		this.iframe.style.cssText = `
 			position: fixed;
+			display: block !important;
 			top: 0;
 			left: 0;
 			width: 100%;
