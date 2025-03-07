@@ -141,23 +141,23 @@ export class Reader {
 				position: fixed;
 				left: 0;
 				top: 0;
-				width: 240px;
-				padding: 16px;
+				width: 200px;
+				max-height: 100vh;
+				padding: 20px;
 				overflow-y: auto;
-				font-family: var(--obsidian-reader-font-family);
 				font-size: 14px;
 				z-index: 999999998;
 			}
 			.obsidian-reader-outline-item {
-				color: var(--obsidian-reader-text-primary);
+				color: var(--obsidian-reader-text-muted);
 				cursor: pointer;
-				padding: 4px 0;
-				text-overflow: ellipsis;
-				overflow: hidden;
-				white-space: nowrap;
+				padding: 6px 8px;
+				border-radius: 4px;
+				line-height: 1.15;
 			}
 			.obsidian-reader-outline-item:hover {
 				color: var(--obsidian-reader-text-primary);
+				background-color: var(--obsidian-reader-background-primary-alt);
 			}
 			.obsidian-reader-outline-h3 {
 				padding-left: 16px;
@@ -171,7 +171,7 @@ export class Reader {
 			}
 			.obsidian-reader-outline-item.active {
 				color: var(--obsidian-reader-text-primary);
-				font-weight: 600;
+				background-color: var(--obsidian-reader-background-primary-alt);
 			}
 			.obsidian-reader-outline-item.faint {
 				color: var(--obsidian-reader-text-faint);

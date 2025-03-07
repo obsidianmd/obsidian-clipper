@@ -163,18 +163,18 @@ const debouncedUpdateContextMenu = debounce(async (tabId: number) => {
 		}[] = [
 				{
 					id: "open-obsidian-clipper",
-					title: "Clip this page",
+					title: "Save this page",
 					contexts: ["page", "selection", "image", "video", "audio"]
 				},
 				{
-					id: isHighlighterMode ? "exit-highlighter" : "enter-highlighter",
-					title: isHighlighterMode ? "Exit highlighter mode" : "Highlight this page",
-					contexts: ["page","image", "video", "audio"]
+					id: "toggle-reader",
+					title: "Reading view",
+					contexts: ["page", "selection"]
 				},
 				{
-					id: "toggle-reader",
-					title: "Toggle reading view",
-					contexts: ["page"]
+					id: isHighlighterMode ? "exit-highlighter" : "enter-highlighter",
+					title: isHighlighterMode ? "Exit highlighter" : "Highligher",
+					contexts: ["page","image", "video", "audio"]
 				},
 				{
 					id: "highlight-selection",
