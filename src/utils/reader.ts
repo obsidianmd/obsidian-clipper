@@ -12,6 +12,7 @@ interface ReaderSettings {
 	maxWidth: number;
 	theme: string;
 	themeMode: 'auto' | 'light' | 'dark';
+	stayInReader: boolean;
 }
 
 export class Reader {
@@ -19,13 +20,13 @@ export class Reader {
 	private static isActive: boolean = false;
 	private static settingsBar: HTMLElement | null = null;
 	private static iframe: HTMLIFrameElement | null = null;
-	private static stayInReader: boolean = false;
 	private static settings: ReaderSettings = {
 		fontSize: 16,
 		lineHeight: 1.6,
 		maxWidth: 38,
 		theme: 'default',
-		themeMode: 'auto'
+		themeMode: 'auto',
+		stayInReader: false
 	};
 
 	private static async loadSettings(): Promise<void> {
@@ -40,6 +41,11 @@ export class Reader {
 
 	private static async saveSettings(): Promise<void> {
 		await setLocalStorage('reader_settings', this.settings);
+	}
+
+	private static updateStayInReader(enabled: boolean): void {
+		this.settings.stayInReader = enabled;
+		this.saveSettings();
 	}
 
 	private static injectSettingsBar(doc: Document) {
@@ -546,7 +552,7 @@ export class Reader {
 			const link = target.closest('a');
 			if (link && link.href && !link.href.startsWith('#')) {
 				e.preventDefault();
-				if (this.stayInReader) {
+				if (this.settings.stayInReader) {
 					await this.loadNewPage(link.href, iframeDoc);
 				} else {
 					window.location.href = link.href;
@@ -673,10 +679,11 @@ export class Reader {
 		// Add stay-in-reader toggle handler
 		const stayInReaderButton = iframeDoc.querySelector('[data-action="toggle-stay-in-reader"]');
 		if (stayInReaderButton) {
-			stayInReaderButton.classList.toggle('active', this.stayInReader);
+			stayInReaderButton.classList.toggle('active', this.settings.stayInReader);
 			stayInReaderButton.addEventListener('click', () => {
-				this.stayInReader = !this.stayInReader;
-				stayInReaderButton.classList.toggle('active', this.stayInReader);
+				this.settings.stayInReader = !this.settings.stayInReader;
+				stayInReaderButton.classList.toggle('active', this.settings.stayInReader);
+				this.updateStayInReader(this.settings.stayInReader);
 			});
 		}
 		
