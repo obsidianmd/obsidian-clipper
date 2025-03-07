@@ -203,7 +203,7 @@ html.obsidian-reader-active {
 	--obsidian-reader-border: #e0e0e0;
 	--obsidian-reader-text-selection: #E8DFFD;
 
-	@media (prefers-color-scheme: dark) {
+	&.theme-dark {
 		--obsidian-reader-background-primary: #1e1e1e;
 		--obsidian-reader-background-primary-alt: #212121;
 		--obsidian-reader-text-primary: #dadada;
@@ -214,7 +214,9 @@ html.obsidian-reader-active {
 		--obsidian-reader-border: #363636;
 		--obsidian-reader-text-selection: #3A2D53;
 	}
+
 }
+
 .obsidian-reader-active[data-reader-theme="flexoki"] {
 	--obsidian-reader-background-primary: #FFFCF0;
 	--obsidian-reader-background-primary-alt: #F2F0E5;
@@ -226,7 +228,7 @@ html.obsidian-reader-active {
 	--obsidian-reader-border: #E6E4D9;
 	--obsidian-reader-text-selection: #DDF1E4;
 
-	@media (prefers-color-scheme: dark) {
+	&.theme-dark {
 		--obsidian-reader-background-primary: #100F0F;
 		--obsidian-reader-background-primary-alt: #1C1B1A;
 		--obsidian-reader-text-primary: #CECDC3;
@@ -239,20 +241,28 @@ html.obsidian-reader-active {
 	}
 }
 
-.obsidian-reader-active	body {
-	--obsidian-reader-font-family: system-ui, -apple-system, sans-serif;
-	--obsidian-reader-dynamic-font-size: calc(var(--obsidian-reader-font-size) + 0.25vw);
-
-	@media (prefers-color-scheme: light) {
+.obsidian-reader-active {
+	&.theme-light {
 		img, svg {
 			mix-blend-mode: multiply;
 		}
 	}
-	@media (prefers-color-scheme: dark) {
+	&.theme-dark {
 		.mw-invert {
 			filter: invert(1);
 		}
+		.invert-images {
+			img, svg {
+				filter: invert(1) hue-rotate(180deg);
+				mix-blend-mode: screen;
+			}
+		}
 	}
+}
+
+.obsidian-reader-active	body {
+	--obsidian-reader-font-family: system-ui, -apple-system, sans-serif;
+	--obsidian-reader-dynamic-font-size: calc(var(--obsidian-reader-font-size) + 0.25vw);
 
 	background: var(--obsidian-reader-background-primary) !important;	
 	color: var(--obsidian-reader-text-primary) !important;
@@ -375,6 +385,9 @@ html.obsidian-reader-active {
 		margin-top: 1em;
 		margin-bottom: 1em;
 		line-height: calc(var(--obsidian-reader-line-height) * 0.9);
+		a {
+			color: var(--obsidian-reader-text-muted);
+		}
 	}
 	sup {
 		a {
