@@ -149,7 +149,7 @@ export class Reader {
 				z-index: 999999998;
 			}
 			.obsidian-reader-outline-item {
-				color: var(--obsidian-reader-text-muted);
+				color: var(--obsidian-reader-text-primary);
 				cursor: pointer;
 				padding: 4px 0;
 				text-overflow: ellipsis;
@@ -168,6 +168,16 @@ export class Reader {
 			.obsidian-reader-outline-h5,
 			.obsidian-reader-outline-h6 {
 				padding-left: 48px;
+			}
+			.obsidian-reader-outline-item.active {
+				color: var(--obsidian-reader-text-primary);
+				font-weight: 600;
+			}
+			.obsidian-reader-outline-item.faint {
+				color: var(--obsidian-reader-text-faint);
+			}
+			.obsidian-reader-outline-item.faint:hover {
+				color: var(--obsidian-reader-text-muted);
 			}
 		`;
 
@@ -287,7 +297,7 @@ export class Reader {
 
 	private static generateOutline(doc: Document) {
 		const article = doc.querySelector('article');
-		if (!article) return;
+		if (!article) return null;
 
 		// Create outline container
 		const outline = doc.createElement('div');
@@ -298,7 +308,7 @@ export class Reader {
 		
 		if (headings.length === 0) {
 			outline.style.display = 'none';
-			return;
+			return null;
 		}
 
 		// Add unique IDs to headings if they don't have them
@@ -308,7 +318,9 @@ export class Reader {
 			}
 		});
 
-		// Create outline items
+		// Create outline items and store references
+		const outlineItems = new Map();
+
 		headings.forEach((heading) => {
 			const item = doc.createElement('div');
 			item.className = `obsidian-reader-outline-item obsidian-reader-outline-${heading.tagName.toLowerCase()}`;
@@ -319,10 +331,51 @@ export class Reader {
 			});
 
 			outline.appendChild(item);
+			outlineItems.set(heading, item);
+		});
+
+		// Set up intersection observer for headings
+		const observerCallback = (entries: IntersectionObserverEntry[]) => {
+			entries.forEach(entry => {
+				const heading = entry.target;
+				const item = outlineItems.get(heading);
+				
+				if (entry.isIntersecting) {
+					// Remove active state from all items
+					outlineItems.forEach((outlineItem) => {
+						outlineItem.classList.remove('active');
+					});
+					item?.classList.add('active');
+					
+					// Update faint state for all items
+					outlineItems.forEach((outlineItem, itemHeading) => {
+						const headingRect = itemHeading.getBoundingClientRect();
+						const currentHeadingRect = heading.getBoundingClientRect();
+						
+						if (headingRect.top < currentHeadingRect.top) {
+							outlineItem.classList.add('faint');
+						} else {
+							outlineItem.classList.remove('faint');
+						}
+					});
+				}
+			});
+		};
+
+		const observer = new IntersectionObserver(observerCallback, {
+			rootMargin: '-10% 0px -80% 0px', // Triggers when heading is in top 20% of viewport
+			threshold: 0
+		});
+
+		headings.forEach(heading => {
+			observer.observe(heading);
 		});
 
 		doc.body.appendChild(outline);
+		return observer;
 	}
+
+	private static observer: IntersectionObserver | null = null;
 
 	static async apply(doc: Document) {
 		// Load saved settings first
@@ -436,13 +489,19 @@ export class Reader {
 
 		// Add settings bar and outline
 		this.injectSettingsBar(doc);
-		this.generateOutline(doc);
+		this.observer = this.generateOutline(doc);
 		
 		this.isActive = true;
 	}
 
 	static restore(doc: Document) {
 		if (this.originalHTML) {			
+			// Disconnect the observer if it exists
+			if (this.observer) {
+				this.observer.disconnect();
+				this.observer = null;
+			}
+
 			const parser = new DOMParser();
 			const newDoc = parser.parseFromString(this.originalHTML, 'text/html');
 			doc.replaceChild(
