@@ -532,6 +532,16 @@ export class Reader {
 		this.injectSettingsBar(iframeDoc);
 		this.observer = this.generateOutline(iframeDoc);
 		
+		// Link clicks should open in the parent tab, not in the iframe
+		iframeDoc.addEventListener('click', (e) => {
+			const target = e.target as HTMLElement;
+			const link = target.closest('a');
+			if (link && link.href) {
+				e.preventDefault();
+				window.location.href = link.href;
+			}
+		});
+		
 		this.isActive = true;
 	}
 
