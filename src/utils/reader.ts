@@ -18,6 +18,7 @@ export class Reader {
 	private static originalHTML: string | null = null;
 	private static isActive: boolean = false;
 	private static settingsBar: HTMLElement | null = null;
+	private static iframe: HTMLIFrameElement | null = null;
 	private static settings: ReaderSettings = {
 		fontSize: 16,
 		lineHeight: 1.6,
@@ -102,6 +103,7 @@ export class Reader {
 				padding: 4px;
 				z-index: 999999999;
 				font-family: var(--obsidian-reader-font-family);
+				user-select: none;
 			}
 			.obsidian-reader-settings-controls {
 				display: grid;
@@ -155,6 +157,7 @@ export class Reader {
 				overflow-y: auto;
 				font-size: 14px;
 				z-index: 999999998;
+				user-select: none;
 			}
 			.obsidian-reader-outline-item {
 				color: var(--obsidian-reader-text-muted);
@@ -360,12 +363,15 @@ export class Reader {
 			
 			item.addEventListener('click', () => {
 				const rect = heading.getBoundingClientRect();
-				const scrollTop = window.pageYOffset || doc.documentElement.scrollTop;
-				const targetY = scrollTop + rect.top - window.innerHeight * 0.05;
-				window.scrollTo({
-					top: targetY,
-					behavior: 'smooth'
-				});
+				const iframeWindow = doc.defaultView;
+				if (iframeWindow) {
+					const scrollTop = iframeWindow.pageYOffset || doc.documentElement.scrollTop;
+					const targetY = scrollTop + rect.top - iframeWindow.innerHeight * 0.05;
+					iframeWindow.scrollTo({
+						top: targetY,
+						behavior: 'smooth'
+					});
+				}
 			});
 
 			outline.appendChild(item);
@@ -418,14 +424,33 @@ export class Reader {
 	static async apply(doc: Document) {
 		// Load saved settings first
 		await this.loadSettings();
-
-		// Store original HTML for restoration
-		this.originalHTML = doc.documentElement.outerHTML;
 		
+		// Create a sandboxed iframe
+		this.iframe = document.createElement('iframe');
+		this.iframe.style.cssText = `
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			border: none;
+			background: var(--obsidian-reader-background-primary);
+			z-index: 999999999;
+		`;
+		this.iframe.setAttribute('sandbox', 'allow-same-origin allow-popups');
+		document.body.appendChild(this.iframe);
+
+		// Get the iframe's document
+		const iframeDoc = this.iframe.contentDocument;
+		if (!iframeDoc) {
+			console.error('Failed to get iframe document');
+			return;
+		}
+
 		// Clean the html element but preserve lang and dir attributes
-		const htmlElement = doc.documentElement;
-		const lang = htmlElement.getAttribute('lang');
-		const dir = htmlElement.getAttribute('dir');
+		const htmlElement = iframeDoc.documentElement;
+		const lang = doc.documentElement.getAttribute('lang');
+		const dir = doc.documentElement.getAttribute('dir');
 		
 		Array.from(htmlElement.attributes).forEach(attr => {
 			htmlElement.removeAttribute(attr.name);
@@ -463,42 +488,17 @@ export class Reader {
 			}
 		}
 
-		// Clean up head - remove unwanted elements but keep meta tags and non-stylesheet links
-		const head = doc.head;
+		// Set up the iframe document
+		iframeDoc.head.innerHTML = `
+			<meta charset="UTF-8">
+			<meta name="viewport" content="${VIEWPORT}">
+			<style>
+				/* Import our CSS directly */
+				${this.getReaderStyles()}
+			</style>
+		`;
 
-		// Remove scripts except JSON-LD schema
-		const scripts = head.querySelectorAll('script:not([type="application/ld+json"])');
-		scripts.forEach(el => el.remove());
-
-		// Remove base tags
-		const baseTags = head.querySelectorAll('base');
-		baseTags.forEach(el => el.remove());
-
-		// Remove only stylesheet links and style tags
-		const styleElements = head.querySelectorAll('link[rel="stylesheet"], link[as="style"], style');
-		styleElements.forEach(el => el.remove());
-
-		// Ensure we have our required meta tags
-		const existingViewport = head.querySelector('meta[name="viewport"]');
-		if (existingViewport) {
-			existingViewport.setAttribute('content', VIEWPORT);
-		} else {
-			const viewport = document.createElement('meta');
-			viewport.setAttribute('name', 'viewport');
-			viewport.setAttribute('content', VIEWPORT);
-			head.appendChild(viewport);
-		}
-
-		const existingCharset = head.querySelector('meta[charset]');
-		if (existingCharset) {
-			existingCharset.setAttribute('charset', 'UTF-8');
-		} else {
-			const charset = document.createElement('meta');
-			charset.setAttribute('charset', 'UTF-8');
-			head.insertBefore(charset, head.firstChild);
-		}
-
-		doc.body.innerHTML = `
+		iframeDoc.body.innerHTML = `
 			<article>
 			${title ? `<h1>${title}</h1>` : ''}
 				<div class="metadata">
@@ -514,50 +514,42 @@ export class Reader {
 			</article>
 		`;
 
-		doc.documentElement.className = 'obsidian-reader-active';
+		iframeDoc.documentElement.className = 'obsidian-reader-active';
 		if (extractorType) {
-			doc.documentElement.setAttribute('data-reader-extractor', extractorType);
+			iframeDoc.documentElement.setAttribute('data-reader-extractor', extractorType);
 		}
-		doc.documentElement.setAttribute('data-reader-theme', this.settings.theme);
+		iframeDoc.documentElement.setAttribute('data-reader-theme', this.settings.theme);
 		
 		// Apply theme mode
-		this.updateThemeMode(doc, this.settings.themeMode);
+		this.updateThemeMode(iframeDoc, this.settings.themeMode);
 
 		// Initialize settings from local storage
-		doc.documentElement.style.setProperty('--obsidian-reader-font-size', `${this.settings.fontSize}px`);
-		doc.documentElement.style.setProperty('--obsidian-reader-line-height', this.settings.lineHeight.toString());
-		doc.documentElement.style.setProperty('--obsidian-reader-line-width', `${this.settings.maxWidth}em`);
+		iframeDoc.documentElement.style.setProperty('--obsidian-reader-font-size', `${this.settings.fontSize}px`);
+		iframeDoc.documentElement.style.setProperty('--obsidian-reader-line-height', this.settings.lineHeight.toString());
+		iframeDoc.documentElement.style.setProperty('--obsidian-reader-line-width', `${this.settings.maxWidth}em`);
 
 		// Add settings bar and outline
-		this.injectSettingsBar(doc);
-		this.observer = this.generateOutline(doc);
+		this.injectSettingsBar(iframeDoc);
+		this.observer = this.generateOutline(iframeDoc);
 		
 		this.isActive = true;
 	}
 
 	static restore(doc: Document) {
-		if (this.originalHTML) {			
-			// Disconnect the observer if it exists
-			if (this.observer) {
-				this.observer.disconnect();
-				this.observer = null;
-			}
-
-			const parser = new DOMParser();
-			const newDoc = parser.parseFromString(this.originalHTML, 'text/html');
-			doc.replaceChild(
-				newDoc.documentElement,
-				doc.documentElement
-			);
-			
-			this.originalHTML = null;
-			this.settingsBar = null;
-			const outline = doc.querySelector('.obsidian-reader-outline');
-			if (outline) {
-				outline.remove();
-			}
-			this.isActive = false;
+		// Disconnect the observer if it exists
+		if (this.observer) {
+			this.observer.disconnect();
+			this.observer = null;
 		}
+
+		// Remove the iframe
+		if (this.iframe) {
+			this.iframe.remove();
+			this.iframe = null;
+		}
+		
+		this.settingsBar = null;
+		this.isActive = false;
 	}
 
 	static async toggle(doc: Document): Promise<boolean> {
@@ -568,5 +560,374 @@ export class Reader {
 			await this.apply(doc);
 			return true;
 		}
+	}
+
+	private static getReaderStyles(): string {
+		// This contains all the CSS needed for reader mode
+		return `
+			html.obsidian-reader-active {
+				font-size: 62.5%;
+			}
+
+			.obsidian-reader-active {
+				--obsidian-reader-background-primary: #fff;
+				--obsidian-reader-background-primary-alt: #fcfcfc;
+				--obsidian-reader-text-primary: #222222;
+				--obsidian-reader-text-muted: #5c5c5c;
+				--obsidian-reader-text-faint: #ababab;
+				--obsidian-reader-text-accent: #222222;
+				--obsidian-reader-text-accent-hover: #8a5cf5;
+				--obsidian-reader-border: #e0e0e0;
+				--obsidian-reader-text-selection: #E8DFFD;
+
+				&.theme-dark {
+					--obsidian-reader-background-primary: #1e1e1e;
+					--obsidian-reader-background-primary-alt: #212121;
+					--obsidian-reader-text-primary: #dadada;
+					--obsidian-reader-text-muted: #b3b3b3;
+					--obsidian-reader-text-faint: #666666;
+					--obsidian-reader-text-accent: #dadada;
+					--obsidian-reader-text-accent-hover: #a68af9;
+					--obsidian-reader-border: #363636;
+					--obsidian-reader-text-selection: #3A2D53;
+				}
+			}
+
+			.obsidian-reader-active[data-reader-theme="flexoki"] {
+				--obsidian-reader-background-primary: #FFFCF0;
+				--obsidian-reader-background-primary-alt: #F2F0E5;
+				--obsidian-reader-text-primary: #100F0F;
+				--obsidian-reader-text-muted: #5c5c5c;
+				--obsidian-reader-text-faint: #B7B5AC;
+				--obsidian-reader-text-accent: #100F0F;
+				--obsidian-reader-text-accent-hover: #24837B;
+				--obsidian-reader-border: #E6E4D9;
+				--obsidian-reader-text-selection: #DDF1E4;
+
+				&.theme-dark {
+					--obsidian-reader-background-primary: #100F0F;
+					--obsidian-reader-background-primary-alt: #1C1B1A;
+					--obsidian-reader-text-primary: #CECDC3;
+					--obsidian-reader-text-muted: #878580;
+					--obsidian-reader-text-faint: #575653;
+					--obsidian-reader-text-accent: #CECDC3;
+					--obsidian-reader-text-accent-hover: #3AA99F;
+					--obsidian-reader-border: #282726;
+					--obsidian-reader-text-selection: #101F1D;
+				}
+			}
+
+			.obsidian-reader-active {
+				&.theme-light {
+					img, svg {
+						mix-blend-mode: multiply;
+					}
+				}
+				&.theme-dark {
+					.mw-invert {
+						filter: invert(1);
+					}
+					.invert-images {
+						img, svg {
+							filter: invert(1) hue-rotate(180deg);
+							mix-blend-mode: screen;
+						}
+					}
+				}
+			}
+
+			.obsidian-reader-settings {
+				position: fixed;
+				top: 20px;
+				right: 20px;
+				background: var(--obsidian-reader-background-primary);
+				padding: 4px;
+				z-index: 999999999;
+				font-family: var(--obsidian-reader-font-family);
+			}
+
+			.obsidian-reader-settings-controls {
+				display: grid;
+				align-items: center;
+				gap: 4px;
+			}
+
+			.obsidian-reader-settings-button {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				width: 24px;
+				height: 24px;
+				border: none;
+				background: transparent;
+				border-radius: 12px;
+				color: var(--obsidian-reader-text-muted);
+				cursor: pointer;
+				padding: 0;
+			}
+
+			.obsidian-reader-settings-button:hover {
+				background: var(--obsidian-reader-background-primary-alt);
+				color: var(--obsidian-reader-text-primary);
+			}
+
+			.obsidian-reader-settings-select {
+				background: transparent;
+				border: none;
+				color: var(--obsidian-reader-text-muted);
+				font-family: var(--obsidian-reader-font-family);
+				font-size: 12px;
+				padding: 4px;
+				border-radius: 12px;
+				cursor: pointer;
+				margin-left: 4px;
+			}
+
+			.obsidian-reader-settings-select:hover {
+				background: var(--obsidian-reader-background-primary-alt);
+				color: var(--obsidian-reader-text-primary);
+			}
+
+			.obsidian-reader-outline {
+				position: fixed;
+				left: 0;
+				top: 0;
+				width: 200px;
+				max-height: 100vh;
+				padding: max(2rem, 3vh) 20px 20px 20px;
+				overflow-y: auto;
+				font-size: 14px;
+				z-index: 999999998;
+			}
+
+			.obsidian-reader-outline-item {
+				color: var(--obsidian-reader-text-muted);
+				cursor: pointer;
+				padding: 6px 8px;
+				border-radius: 4px;
+				line-height: 1.15;
+			}
+
+			.obsidian-reader-outline-item:hover {
+				color: var(--obsidian-reader-text-primary);
+				background-color: var(--obsidian-reader-background-primary-alt);
+			}
+
+			.obsidian-reader-outline-h3 {
+				padding-left: 16px;
+			}
+
+			.obsidian-reader-outline-h4 {
+				padding-left: 32px;
+			}
+
+			.obsidian-reader-outline-h5,
+			.obsidian-reader-outline-h6 {
+				padding-left: 48px;
+			}
+
+			.obsidian-reader-outline-item.active {
+				color: var(--obsidian-reader-text-primary);
+				background-color: var(--obsidian-reader-background-primary-alt);
+			}
+
+			.obsidian-reader-outline-item.faint {
+				color: var(--obsidian-reader-text-faint);
+			}
+
+			.obsidian-reader-outline-item.faint:hover {
+				color: var(--obsidian-reader-text-muted);
+			}
+
+			.obsidian-reader-active body {
+				--obsidian-reader-font-family: system-ui, -apple-system, sans-serif;
+				--obsidian-reader-dynamic-font-size: calc(var(--obsidian-reader-font-size) + 0.25vw);
+
+				background: var(--obsidian-reader-background-primary) !important;	
+				color: var(--obsidian-reader-text-primary) !important;
+				font-size: var(--obsidian-reader-dynamic-font-size) !important;
+				width: var(--obsidian-reader-line-width) !important;
+				margin: max(4rem, 6vh) auto 40vh !important;
+				max-width: 90% !important;
+				line-height: var(--obsidian-reader-line-height) !important;
+				font-family: var(--obsidian-reader-font-family) !important;
+				-webkit-font-smoothing: antialiased !important;
+
+				::selection {
+					background-color: var(--obsidian-reader-text-selection);
+				}
+
+				article {
+					overflow: hidden;
+				}
+
+				h1 { 
+					font-weight: 700;
+					font-size: 1.6em;
+					letter-spacing: -0.02em;
+					line-height: calc(var(--obsidian-reader-line-height) * 0.75);
+					margin: 0 0 0.5em 0;
+				}
+
+				h2 {
+					font-weight: 700;
+					font-size: 1.3em;
+					letter-spacing: -0.015em;
+					margin-top: 1.8em;
+					margin-bottom: 0.5em;
+					line-height: calc(var(--obsidian-reader-line-height) * 0.85);
+				}
+
+				h3 { 
+					font-weight: 700;
+					font-size: 1.225em;
+					line-height: calc(var(--obsidian-reader-line-height) * 0.85);
+					margin-top: 2em;
+					margin-bottom: 0.5em;
+				}
+
+				h4 { 
+					font-size: 1.15em;
+					font-weight: 700;
+					line-height: calc(var(--obsidian-reader-line-height) * 0.85);
+					margin-top: 2em;
+					margin-bottom: 0;
+				}
+
+				h5 {
+					font-weight: 600;
+					line-height: calc(var(--obsidian-reader-line-height) * 0.85);
+					text-transform: uppercase;
+					margin-bottom: 1em;
+					letter-spacing: 0.05em;
+					font-size: 1em;
+				}
+
+				h1 + h2,
+				h2 + h2,
+				h2 + h3,
+				h3 + h4 {
+					margin-top: 0;
+				}
+
+				.metadata {
+					margin-bottom: max(2rem, 3vh);
+				}
+
+				.metadata-details {
+					color: var(--obsidian-reader-text-muted);
+					font-size: 0.9em;
+
+					a {
+						color: inherit;
+						text-decoration: none;
+					}
+
+					a:hover {
+						text-decoration: underline;
+					}
+				}
+
+				img, video, figure, svg {
+					max-width: 100%;
+					height: auto;
+					border-radius: 4px;
+					vertical-align: bottom;
+				}
+
+				iframe {
+					max-width: 100%;
+					width: 100%;
+					&[src*="youtube.com"] {
+						aspect-ratio: 16 / 9;
+						height: auto;
+					}
+				}
+
+				figure {
+					margin-inline-start: 0;
+					margin-inline-end: 0;
+					overflow-x: auto;
+				}
+
+				a {
+					color: var(--obsidian-reader-text-accent);
+					&:hover {
+						color: var(--obsidian-reader-text-accent-hover);
+					}
+				}
+
+				blockquote {
+					padding-left: 1.5em;
+					margin: 1.5em 0;
+					border-left: 2px solid var(--obsidian-reader-text-primary);
+				}
+
+				small[class*="caption"],
+				figcaption,
+				caption {
+					color: var(--obsidian-reader-text-muted);
+					font-size: 85%;
+					margin-top: 1em;
+					margin-bottom: 1em;
+					line-height: calc(var(--obsidian-reader-line-height) * 0.9);
+				}
+
+				sup {
+					a {
+						text-decoration: none;
+						color: var(--obsidian-reader-text-muted);
+					}
+				}
+
+				hr {
+					background-color: var(--obsidian-reader-border);
+					width: 100%;
+					border: 0;
+					height: 1px;
+					margin: 1.5em 0;
+				}
+
+				pre, code, kbd, tt {
+					background-color: var(--obsidian-reader-background-primary-alt);
+					border-radius: 6px;
+					border: 1px solid var(--obsidian-reader-border);
+					font-size: 0.8em;
+				}
+
+				code, kbd, tt {
+					padding: 0.1em 0.25em;
+				}
+
+				pre {
+					white-space: pre;
+					max-width: 100%;
+					overflow-x: auto;
+					padding: 12px 16px;
+
+					pre,
+					code {
+						font-size: inherit;
+						border: none;
+						background-color: transparent;
+						padding: 0 !important;
+					}
+				}
+
+				table {
+					overflow-x: auto;
+					font-size: 0.9em;
+					line-height: calc(var(--obsidian-reader-line-height) * 0.9);
+					border-collapse: collapse !important;
+
+					tr {
+						td, th {
+							padding: 0.25em 0.5em !important;
+							border: 1px solid var(--obsidian-reader-border) !important;
+						}
+					}
+				}
+			}
+		`;
 	}
 }
