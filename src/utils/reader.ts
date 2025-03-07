@@ -327,7 +327,13 @@ export class Reader {
 			item.textContent = heading.textContent;
 			
 			item.addEventListener('click', () => {
-				heading.scrollIntoView({ behavior: 'smooth' });
+				const rect = heading.getBoundingClientRect();
+				const scrollTop = window.pageYOffset || doc.documentElement.scrollTop;
+				const targetY = scrollTop + rect.top - window.innerHeight * 0.05;
+				window.scrollTo({
+					top: targetY,
+					behavior: 'smooth'
+				});
 			});
 
 			outline.appendChild(item);
@@ -363,7 +369,7 @@ export class Reader {
 		};
 
 		const observer = new IntersectionObserver(observerCallback, {
-			rootMargin: '-10% 0px -80% 0px', // Triggers when heading is in top 20% of viewport
+			rootMargin: '-5% 0px -85% 0px', // Triggers when heading is in top 20% of viewport
 			threshold: 0
 		});
 
