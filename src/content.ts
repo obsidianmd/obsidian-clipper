@@ -1,6 +1,6 @@
 import browser from './utils/browser-polyfill';
 import * as highlighter from './utils/highlighter';
-import { loadSettings, generalSettings } from './utils/storage-utils';
+import { loadSettings, generalSettings, getLocalStorage, setLocalStorage } from './utils/storage-utils';
 import { Defuddle } from 'defuddle';
 import { Reader } from './utils/reader';
 
@@ -31,6 +31,20 @@ declare global {
 			return true;
 		}
 	});
+
+	// Check for pending reader mode when the page loads
+	async function checkPendingReaderMode() {
+		const pendingReaderMode = await getLocalStorage('pending_reader_mode');
+		if (pendingReaderMode) {
+			// Clear the pending state
+			await setLocalStorage('pending_reader_mode', false);
+			// Wait a bit for the page to be fully ready
+			setTimeout(async () => {
+				const isActive = await Reader.toggle(document);
+				document.documentElement.classList.toggle('obsidian-reader-active', isActive);
+			}, 100);
+		}
+	}
 
 	interface ContentResponse {
 		content: string;
@@ -267,7 +281,8 @@ declare global {
 		browser.runtime.sendMessage({ action: "updateHasHighlights", hasHighlights });
 	}
 
-	async function initializeHighlighter() {
+	// Initialize highlighter and check for pending reader mode
+	async function initialize() {
 		await loadSettings();
 		await highlighter.loadHighlights();
 		
@@ -276,10 +291,11 @@ declare global {
 		}
 		
 		updateHasHighlights();
+		await checkPendingReaderMode();
 	}
 
-	// Initialize highlighter
-	initializeHighlighter();
+	// Initialize
+	initialize();
 
 	// Call updateHasHighlights when the page loads
 	window.addEventListener('load', updateHasHighlights);

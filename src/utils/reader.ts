@@ -334,7 +334,7 @@ export class Reader {
 		domain?: string;
 		extractorType?: string;
 	} {
-		const defuddled = new Defuddle(doc).parse();
+		const defuddled = new Defuddle(doc, { debug: true }).parse();
 		const schemaOrgData = defuddled.schemaOrgData;
 
 		// Try to use a specific extractor first
@@ -352,8 +352,6 @@ export class Reader {
 			};
 		}
 
-		// Fall back to Defuddle if no specific extractor or extraction failed
-		debugLog('Reader', 'Falling back to Defuddle');
 		return {
 			content: defuddled.content,
 			title: defuddled.title,
@@ -553,7 +551,10 @@ export class Reader {
 			if (link && link.href && !link.href.startsWith('#')) {
 				e.preventDefault();
 				if (this.settings.stayInReader) {
-					await this.loadNewPage(link.href, iframeDoc);
+					// Store the setting so we know to enable reader mode after navigation
+					await setLocalStorage('pending_reader_mode', true);
+					// Navigate to the new page
+					window.location.href = link.href;
 				} else {
 					window.location.href = link.href;
 				}
