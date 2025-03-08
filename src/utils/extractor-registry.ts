@@ -4,6 +4,7 @@ import { BaseExtractor } from './extractors/_base';
 import { RedditExtractor } from './extractors/reddit';
 import { TwitterExtractor } from './extractors/twitter';
 import { YoutubeExtractor } from './extractors/youtube';
+import { HackerNewsExtractor } from './extractors/hackernews';
 
 
 type ExtractorConstructor = new (document: Document, url: string, schemaOrgData?: any) => BaseExtractor;
@@ -45,6 +46,13 @@ export class ExtractorRegistry {
 				/youtu\.be\/.*/
 			],
 			extractor: YoutubeExtractor
+		});
+
+		this.register({
+			patterns: [
+				/news\.ycombinator\.com\/item\?id=.*/
+			],
+			extractor: HackerNewsExtractor
 		});
 	}
 
