@@ -418,104 +418,31 @@ export function createMarkdownContent(content: string, url: string) {
 		filter: (node: Node): boolean => {
 			if (node instanceof Element) {
 				return (
-					(node.nodeName === 'SUP' && node.classList.contains('reference')) ||
-					(node.nodeName === 'CITE' && node.classList.contains('ltx_cite')) ||
-					(node.nodeName === 'SUP' && node.id.startsWith('fnref:')) ||
-					(node.nodeName === 'SPAN' && node.classList.contains('footnote-link'))
+					(node.nodeName === 'SUP' && node.id.startsWith('fnref:'))
 				);
 			}
 			return false;
 		},
 		replacement: (content, node) => {
 			if (node instanceof HTMLElement) {
-				if (node.nodeName === 'SUP' && node.classList.contains('reference')) {
-					const links = node.querySelectorAll('a');
-					const footnotes = Array.from(links).map(link => {
-						const href = link.getAttribute('href');
-						if (href) {
-							const match = href.split('/').pop()?.match(/(?:cite_note|cite_ref)-(.+)/);
-							if (match) {
-								return `[^${match[1].toLowerCase()}]`;
-							}
-						}
-						return '';
-					});
-					return footnotes.join('');
-				} else if (node.nodeName === 'CITE' && node.classList.contains('ltx_cite')) {
-					const link = node.querySelector('a');
-					if (link) {
-						const href = link.getAttribute('href');
-						if (href) {
-							const match = href.split('/').pop()?.match(/bib\.bib(\d+)/);
-							if (match) {
-								return `[^${match[1].toLowerCase()}]`;
-							}
-						}
-					}
-				} else if (node.nodeName === 'SUP' && node.id.startsWith('fnref:')) {
+				if (node.nodeName === 'SUP' && node.id.startsWith('fnref:')) {
 					const id = node.id.replace('fnref:', '');
-					return `[^${id.toLowerCase()}]`;
-				} else if (node.nodeName === 'SPAN' && node.classList.contains('footnote-link')) {
-					const footnoteId = node.dataset.footnoteId;
-					if (footnoteId) {
-						return `[^${footnoteId}]`;
-					}
-				}
-			}
-			return content;
-		}
-	});
-	
-	turndownService.addRule('inlineFootnotes', {
-		filter: (node: Node): boolean => {
-			return (
-				node instanceof HTMLElement &&
-				(
-				  (node.nodeName === 'SPAN' && node.classList.contains('footnote-link')) ||
-				  (node.nodeName === 'A' && node.classList.contains('citation'))
-				)
-			  );
-		},
-		replacement: (content, node) => {
-			if (node instanceof HTMLElement) {
-				let footnoteId = undefined;
-				let footnoteContent = undefined;
-
-				if (node.nodeName === 'SPAN' && node.classList.contains('footnote-link')) {
-					footnoteId = node.dataset.footnoteId
-					footnoteContent = node.dataset.footnoteContent
-				} else if (node.nodeName === 'A' && node.classList.contains('citation')) {
-					footnoteId = node.textContent;
-					footnoteContent = node.getAttribute('href');
-				}
-				
-				if (footnoteId && footnoteContent) {
-					// Store the footnote content for later use
-					footnotes[footnoteId] = turndownService.turndown(
-						decodeURIComponent(footnoteContent.replace(/&lt;/g, '<').replace(/&gt;/g, '>'))
-					);
-					
-					// Return the footnote reference
-					return `[^${footnoteId}]`;
+					// Extract only the primary number before any hyphen
+					const primaryNumber = id.split('-')[0];
+					return `[^${primaryNumber}]`;
 				}
 			}
 			return content;
 		}
 	});
 
-	// Update the reference list rule
-	turndownService.addRule('referenceList', {
+	// Footnotes list
+	turndownService.addRule('footnotesList', {
 		filter: (node: Node): boolean => {
 			if (node instanceof HTMLOListElement) {
 				return (
-					node.classList.contains('references') ||
-					node.classList.contains('footnotes-list') ||
-					node.parentElement?.classList?.contains('footnote') === true ||
 					node.parentElement?.classList?.contains('footnotes') === true
 				);
-			}
-			if (node instanceof HTMLUListElement) {
-				return node.classList.contains('ltx_biblist')
 			}
 			return false;
 		},
@@ -523,9 +450,7 @@ export function createMarkdownContent(content: string, url: string) {
 			if (node instanceof HTMLElement) {
 				const references = Array.from(node.children).map(li => {
 					let id;
-					if (li.id.startsWith('bib.bib')) {
-						id = li.id.replace('bib.bib', '');
-					} else if (li.id.startsWith('fn:')) {
+					if (li.id.startsWith('fn:')) {
 						id = li.id.replace('fn:', '');
 					} else {
 						const match = li.id.split('/').pop()?.match(/cite_note-(.+)/);
@@ -553,19 +478,8 @@ export function createMarkdownContent(content: string, url: string) {
 	turndownService.addRule('removals', {
 		filter: function (node) {
 			if (!(node instanceof HTMLElement)) return false;
-			// Back to top links
-			if (node.id.startsWith('back-to-top')) return true;
-			if (node.classList.contains('back-to-top')) return true;
-			// Wikipedia edit buttons
-			if (node.classList.contains('mw-editsection')) return true;
-			// Wikipedia cite backlinks
-			if (node.classList.contains('mw-cite-backlink')) return true;
-			// Reference numbers and anchor links
-			if (node.classList.contains('ltx_role_refnum')) return true;
-			if (node.classList.contains('ltx_tag_bibitem')) return true;
+			// Remove the Defuddle backlink from the footnote content
 			if (node.classList.contains('footnote-backref')) return true;
-			if (node.classList.contains('ref') && (node.getAttribute('href')?.startsWith('#') || /\/#.+$/.test(node.getAttribute('href') || ''))) return true;
-			if (node.classList.contains('anchor') && (node.getAttribute('href')?.startsWith('#') || /\/#.+$/.test(node.getAttribute('href') || ''))) return true;
 			// anchor links within headings
 			if (node.nodeName === 'A' && 
 				node.parentElement && 
