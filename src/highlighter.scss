@@ -381,7 +381,7 @@ html.obsidian-reader-active {
 	blockquote {
 		padding-left: 1.5em;
 		margin: 1.5em 0;
-		border-left: 2px solid var(--obsidian-reader-text-primary);
+		border-left: 2px solid var(--obsidian-reader-text-faint);
 	}
 	small[class*="caption"],
 	figcaption,
@@ -430,7 +430,7 @@ html.obsidian-reader-active {
 	}
 	ul > li {
 		&::marker {
-			font-size: 90%;
+			font-size: 95%;
 		}
 	}
 	pre, code, kbd, tt {
