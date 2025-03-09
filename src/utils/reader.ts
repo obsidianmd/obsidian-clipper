@@ -414,6 +414,117 @@ export class Reader {
 	}
 
 	private static observer: IntersectionObserver | null = null;
+	private static activePopover: HTMLElement | null = null;
+	private static activeFootnoteLink: HTMLAnchorElement | null = null;
+
+	private static initializeFootnotes(doc: Document) {
+		// Create popover container
+		const popover = doc.createElement('div');
+		popover.className = 'footnote-popover';
+		doc.body.appendChild(popover);
+
+		// Handle footnote clicks
+		doc.addEventListener('click', (e) => {
+			const target = e.target as HTMLElement;
+			const footnoteLink = target.closest('a[href^="#fn:"]') as HTMLAnchorElement;
+			
+			// Close active popover if clicking outside
+			if (!footnoteLink && !target.closest('.footnote-popover')) {
+				this.hideFootnotePopover();
+				return;
+			}
+
+			if (footnoteLink) {
+				e.preventDefault();
+				
+				// Toggle if clicking the same footnote
+				if (this.activeFootnoteLink === footnoteLink) {
+					this.hideFootnotePopover();
+					return;
+				}
+
+				const href = footnoteLink.getAttribute('href');
+				if (!href) return;
+				
+				const footnoteId = href.substring(1);
+				const footnote = doc.getElementById(footnoteId);
+				
+				if (footnote) {
+					// Remove the return link from the content
+					const content = footnote.cloneNode(true) as HTMLElement;
+					const returnLink = content.querySelector('a[title="return to article"]');
+					returnLink?.remove();
+
+					// Show popover
+					popover.innerHTML = content.innerHTML;
+					this.showFootnotePopover(popover, footnoteLink);
+
+					// Update active states
+					if (this.activeFootnoteLink) {
+						this.activeFootnoteLink.classList.remove('active');
+					}
+					footnoteLink.classList.add('active');
+					this.activeFootnoteLink = footnoteLink;
+				}
+			}
+		});
+
+		// Handle scroll and resize events
+		const updatePopoverPosition = () => {
+			if (this.activeFootnoteLink && this.activePopover) {
+				this.positionPopover(this.activePopover, this.activeFootnoteLink);
+			}
+		};
+
+		doc.addEventListener('scroll', updatePopoverPosition, { passive: true });
+		window.addEventListener('resize', updatePopoverPosition);
+	}
+
+	private static showFootnotePopover(popover: HTMLElement, link: HTMLAnchorElement) {
+		this.activePopover = popover;
+		this.positionPopover(popover, link);
+		popover.classList.add('active');
+	}
+
+	private static hideFootnotePopover() {
+		if (this.activePopover) {
+			this.activePopover.classList.remove('active');
+		}
+		if (this.activeFootnoteLink) {
+			this.activeFootnoteLink.classList.remove('active');
+		}
+		this.activePopover = null;
+		this.activeFootnoteLink = null;
+	}
+
+	private static positionPopover(popover: HTMLElement, link: HTMLAnchorElement) {
+		const linkRect = link.getBoundingClientRect();
+		const popoverRect = popover.getBoundingClientRect();
+		
+		// Calculate initial position (centered below the link)
+		let left = linkRect.left + (linkRect.width / 2) - (popoverRect.width / 2);
+		let top = linkRect.bottom + 8;
+
+		// Ensure popover stays within viewport
+		const viewportWidth = window.innerWidth;
+		const viewportHeight = window.innerHeight;
+
+		// Adjust horizontal position
+		if (left < 20) {
+			left = 20;
+		} else if (left + popoverRect.width > viewportWidth - 20) {
+			left = viewportWidth - popoverRect.width - 20;
+		}
+
+		// Adjust vertical position if needed
+		if (top + popoverRect.height > viewportHeight - 20) {
+			top = linkRect.top - popoverRect.height - 8;
+		}
+
+		// Apply position
+		popover.style.left = `${left}px`;
+		popover.style.top = `${top}px`;
+	}
 
 	static async apply(doc: Document) {
 		// Load saved settings first
@@ -532,6 +643,8 @@ export class Reader {
 		this.injectSettingsBar(doc);
 		this.observer = this.generateOutline(doc);
 		
+		this.initializeFootnotes(doc);
+		
 		this.isActive = true;
 	}
 
@@ -542,6 +655,9 @@ export class Reader {
 				this.observer.disconnect();
 				this.observer = null;
 			}
+
+			// Hide any active footnote popover
+			this.hideFootnotePopover();
 
 			const parser = new DOMParser();
 			const newDoc = parser.parseFromString(this.originalHTML, 'text/html');

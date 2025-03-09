@@ -214,7 +214,6 @@ html.obsidian-reader-active {
 		--obsidian-reader-border: #363636;
 		--obsidian-reader-text-selection: #3A2D53;
 	}
-
 }
 
 .obsidian-reader-active[data-reader-theme="flexoki"] {
@@ -468,4 +467,99 @@ html.obsidian-reader-active {
 		}
 	}
 
+	.footnotes {
+		font-size: 0.9em;
+		color: var(--obsidian-reader-text-muted);
+
+		ol {
+			padding-left: 1.5em;
+		}
+		li {
+			p {
+				margin: 0.5em 0;
+			}
+			a {
+				color: var(--obsidian-reader-text-muted);
+			}
+			a[title="return to article"] {
+				text-decoration: none;
+				color: var(--obsidian-reader-text-faint);
+			}
+		}
+	}
+
+	sup[id^="fnref"] {
+		margin: 0 0.1em 0 0;
+		
+		a {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			min-width: 1.4em;
+			height: 1.4em;
+			padding: 0 0.25em;
+			border-radius: 1em;
+			background: var(--obsidian-reader-background-primary-alt);
+			color: var(--obsidian-reader-text-muted);
+			text-decoration: none;
+			font-size: 0.75em;
+			font-weight: 500;
+			line-height: 1;
+			cursor: pointer;
+			user-select: none;
+			transition: all 0.15s ease;
+
+			&:hover {
+				background: var(--obsidian-reader-border);
+				color: var(--obsidian-reader-text-primary);
+			}
+
+			&.active {
+				background: var(--obsidian-reader-text-accent);
+				border-color: var(--obsidian-reader-text-accent);
+				color: var(--obsidian-reader-background-primary);
+			}
+		}
+	}
+
+	.footnote-popover {
+		position: fixed;
+		z-index: 9999999999;
+		max-width: min(calc(100vw - 40px), 400px);
+		padding: 12px 16px;
+		background: var(--obsidian-reader-background-primary);
+		border: 1px solid var(--obsidian-reader-border);
+		border-radius: 8px;
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+		font-size: 0.85em;
+		line-height: 1.5;
+		opacity: 0;
+		visibility: hidden;
+		transform: translateY(8px);
+		transition: opacity 0.2s ease, transform 0.2s ease, visibility 0s linear 0.2s;
+
+		.footnote-backref {
+			display: none;
+		}
+		&.active {
+			opacity: 1;
+			visibility: visible;
+			transform: translateY(0);
+			transition: opacity 0.2s ease, transform 0.2s ease;
+		}
+
+		p {
+			margin: 0.5em 0;
+			&:first-child {
+				margin-top: 0;
+			}
+			&:last-child {
+				margin-bottom: 0;
+			}
+		}
+
+		a[title="return to article"] {
+			display: none;
+		}
+	}
 }
