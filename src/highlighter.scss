@@ -316,7 +316,13 @@ html.obsidian-reader-active {
 		margin-bottom: 0;
 	}
 	h5 {
-		font-weight: 600;
+		font-weight: 700;
+		line-height: calc(var(--obsidian-reader-line-height) * 0.85);
+		margin-bottom: 1em;
+		font-size: 1em;
+	}
+	h6 {
+		font-weight: 700;
 		line-height: calc(var(--obsidian-reader-line-height) * 0.85);
 		text-transform: uppercase;
 		margin-bottom: 1em;
@@ -401,6 +407,31 @@ html.obsidian-reader-active {
 		border: 0;
 		height: 1px;
 		margin: 1.5em 0;
+	}
+	ul > li {
+		list-style: disc;
+	}
+	ol, ul {
+		padding: 0.5rem 0 1rem 1em;
+		margin: 0 0 0 0.5em;
+	}
+	ol > li,
+	ul > li {
+		padding: 0.15rem 0;
+		&::marker {
+			color: var(--obsidian-reader-text-faint);
+		}
+		> p:first-child {
+			margin-top: 0;
+		}
+		> p:last-child {
+			margin-bottom: 0;
+		}
+	}
+	ul > li {
+		&::marker {
+			font-size: 90%;
+		}
 	}
 	pre, code, kbd, tt {
 		background-color: var(--obsidian-reader-background-primary-alt);
