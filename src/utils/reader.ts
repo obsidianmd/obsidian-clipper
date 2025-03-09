@@ -498,32 +498,67 @@ export class Reader {
 	}
 
 	private static positionPopover(popover: HTMLElement, link: HTMLAnchorElement) {
-		const linkRect = link.getBoundingClientRect();
-		const popoverRect = popover.getBoundingClientRect();
-		
-		// Calculate initial position (centered below the link)
-		let left = linkRect.left + (linkRect.width / 2) - (popoverRect.width / 2);
-		let top = linkRect.bottom + 8;
+		const ARROW_HEIGHT = 16; // Height of the arrow
+		const VIEWPORT_PADDING = 20; // Minimum distance from viewport edges
+		const VERTICAL_SPACING = 8; // Space between popover and link
 
-		// Ensure popover stays within viewport
+		const linkRect = link.getBoundingClientRect();
 		const viewportWidth = window.innerWidth;
 		const viewportHeight = window.innerHeight;
 
-		// Adjust horizontal position
-		if (left < 20) {
-			left = 20;
-		} else if (left + popoverRect.width > viewportWidth - 20) {
-			left = viewportWidth - popoverRect.width - 20;
+		// Reset position to get actual dimensions
+		popover.style.top = '0';
+		popover.style.left = '0';
+		const popoverRect = popover.getBoundingClientRect();
+
+		// Determine if popover should appear above or below
+		const spaceBelow = viewportHeight - linkRect.bottom - ARROW_HEIGHT - VIEWPORT_PADDING;
+		const spaceAbove = linkRect.top - ARROW_HEIGHT - VIEWPORT_PADDING;
+		const showBelow = spaceBelow >= popoverRect.height || spaceBelow >= spaceAbove;
+
+		// Calculate vertical position
+		let top = showBelow
+			? linkRect.bottom + ARROW_HEIGHT + VERTICAL_SPACING
+			: linkRect.top - popoverRect.height - ARROW_HEIGHT - VERTICAL_SPACING;
+
+		// Calculate horizontal position (centered with link)
+		let left = linkRect.left + (linkRect.width / 2) - (popoverRect.width / 2);
+
+		// Adjust horizontal position if it would overflow
+		if (left < VIEWPORT_PADDING) {
+			left = VIEWPORT_PADDING;
+		} else if (left + popoverRect.width > viewportWidth - VIEWPORT_PADDING) {
+			left = viewportWidth - popoverRect.width - VIEWPORT_PADDING;
 		}
 
-		// Adjust vertical position if needed
-		if (top + popoverRect.height > viewportHeight - 20) {
-			top = linkRect.top - popoverRect.height - 8;
-		}
+		// Position the arrow relative to the link
+		const arrowOffset = Math.max(0, Math.min(
+			linkRect.left + (linkRect.width / 2) - left,
+			popoverRect.width
+		));
 
-		// Apply position
-		popover.style.left = `${left}px`;
+		// Update arrow position with CSS custom property
+		popover.style.setProperty('--arrow-offset', `${arrowOffset}px`);
+
+		// Set position and data attribute for arrow direction
 		popover.style.top = `${top}px`;
+		popover.style.left = `${left}px`;
+		popover.setAttribute('data-position', showBelow ? 'bottom' : 'top');
+
+		// If popover would be outside viewport vertically, adjust its height
+		const currentTop = parseFloat(popover.style.top);
+		if (currentTop < VIEWPORT_PADDING) {
+			const maxHeight = viewportHeight - (VIEWPORT_PADDING * 2);
+			popover.style.top = `${VIEWPORT_PADDING}px`;
+			popover.style.maxHeight = `${maxHeight}px`;
+			popover.style.overflowY = 'auto';
+		} else {
+			const bottomOverflow = currentTop + popoverRect.height - (viewportHeight - VIEWPORT_PADDING);
+			if (bottomOverflow > 0) {
+				popover.style.maxHeight = `${popoverRect.height - bottomOverflow}px`;
+				popover.style.overflowY = 'auto';
+			}
+		}
 	}
 
 	static async apply(doc: Document) {
