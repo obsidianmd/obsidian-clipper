@@ -426,6 +426,9 @@ html.obsidian-reader-active {
 		> p:last-child {
 			margin-bottom: 0;
 		}
+		> div p {
+			margin: 0;
+		}
 	}
 	ul > li {
 		&::marker {
