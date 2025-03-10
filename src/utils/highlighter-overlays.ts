@@ -348,7 +348,7 @@ function watchScrollableElements() {
 	}
 
 	// 200ms duration required for long custom scrolling animations (e.g. Grok)
-	const updateHighlightsEachFrame = toRunEachFrame(updateHighlightOverlayPositions, 200);
+	const updateHighlightsEachFrame = toRunEachFrame(updateHighlightOverlayPositions, 200, 1000);
 
 	const handleScroll = () => {
 		updateHighlightsEachFrame();

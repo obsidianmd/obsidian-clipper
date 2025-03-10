@@ -1,6 +1,6 @@
 // Runs func once (deduplicated) per frame until duration is over
 // Returned function resets timer
-export function toRunEachFrame<T extends (...args: any[]) => any>(func: T, duration: number): (...args: Parameters<T>) => void {
+export function toRunEachFrame<T extends (...args: any[]) => any>(func: T, duration: number, finalCallDelay?: number): (...args: Parameters<T>) => void {
     let endTime: number | null = null;
     let callbackId: number | null = null;
 
@@ -11,6 +11,10 @@ export function toRunEachFrame<T extends (...args: any[]) => any>(func: T, durat
         if (timestamp < endTime) {
             func();
             callbackId = requestAnimationFrame(applyIfNotEnded);
+        } else {
+            if (finalCallDelay !== undefined) {
+                setTimeout(func, finalCallDelay);
+            }
         }
     }
 
