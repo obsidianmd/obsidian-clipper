@@ -366,6 +366,7 @@ html.obsidian-reader-active {
 		width: 100%;
 		border-radius: 4px;
 		overflow: hidden;
+		border: none;
 		&[src*="youtube.com"] {
 			aspect-ratio: 16 / 9;
 			height: auto;
@@ -429,6 +430,10 @@ html.obsidian-reader-active {
 		border: 0;
 		height: 1px;
 		margin: 1.5em 0;
+	}
+	// Maybe confusing but conflicts with user highlights 
+	mark {
+		background-color: transparent;
 	}
 	ul > li {
 		list-style: disc;
