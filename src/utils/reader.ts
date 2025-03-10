@@ -569,12 +569,41 @@ export class Reader {
 		}
 	}
 
+	// Somewhat experimental way to stop scripts from running on the reader mode
+	private static cleanupScripts(doc: Document) {
+		// Store references to native functions that scripts might have modified
+		const nativeClearTimeout = window.clearTimeout;
+		const nativeClearInterval = window.clearInterval;
+		// Clear all timeouts and intervals
+		let id = window.setTimeout(() => {}, 0);
+		while (id--) {
+			nativeClearTimeout(id);
+			nativeClearInterval(id);
+		}
+
+		// Remove all script elements except JSON-LD
+		const scripts = doc.querySelectorAll('script:not([type="application/ld+json"])');
+		scripts.forEach(el => el.remove());
+
+		// Replace body with a clone to remove all event listeners
+		doc.body.replaceWith(doc.body.cloneNode(true));
+
+		// Block common ad/tracking domains
+		const meta = doc.createElement('meta');
+		meta.httpEquiv = 'Content-Security-Policy';
+		meta.content = "script-src 'none'; frame-src 'none'; object-src 'none';";
+		doc.head.appendChild(meta);
+	}
+
 	static async apply(doc: Document) {
 		// Load saved settings first
 		await this.loadSettings();
 
 		// Store original HTML for restoration
 		this.originalHTML = doc.documentElement.outerHTML;
+		
+		// Remove page scripts and their effects
+		this.cleanupScripts(doc);
 		
 		// Clean the html element but preserve lang and dir attributes
 		const htmlElement = doc.documentElement;
