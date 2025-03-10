@@ -18,6 +18,7 @@ export class Reader {
 	private static originalHTML: string | null = null;
 	private static isActive: boolean = false;
 	private static settingsBar: HTMLElement | null = null;
+	private static colorSchemeMediaQuery: MediaQueryList | null = null;
 	private static settings: ReaderSettings = {
 		fontSize: 16,
 		lineHeight: 1.6,
@@ -288,6 +289,13 @@ export class Reader {
 
 		this.settings.themeMode = mode;
 		this.saveSettings();
+	}
+
+	private static handleColorSchemeChange(e: MediaQueryListEvent, doc: Document): void {
+		if (this.settings.themeMode === 'auto') {
+			doc.documentElement.classList.remove('theme-light', 'theme-dark');
+			doc.documentElement.classList.add(e.matches ? 'theme-dark' : 'theme-light');
+		}
 	}
 
 	private static extractContent(doc: Document): { 
@@ -679,6 +687,10 @@ export class Reader {
 		this.observer = this.generateOutline(doc);
 		
 		this.initializeFootnotes(doc);
+
+		// Set up color scheme media query listener
+		this.colorSchemeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+		this.colorSchemeMediaQuery.addEventListener('change', (e) => this.handleColorSchemeChange(e, doc));
 		
 		this.isActive = true;
 	}
@@ -689,6 +701,12 @@ export class Reader {
 			if (this.observer) {
 				this.observer.disconnect();
 				this.observer = null;
+			}
+
+			// Remove color scheme media query listener
+			if (this.colorSchemeMediaQuery) {
+				this.colorSchemeMediaQuery.removeEventListener('change', (e) => this.handleColorSchemeChange(e, doc));
+				this.colorSchemeMediaQuery = null;
 			}
 
 			// Hide any active footnote popover
