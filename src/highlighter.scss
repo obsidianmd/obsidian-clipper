@@ -189,12 +189,11 @@ body.obsidian-highlighter-active {
 
 html.obsidian-reader-active {
 	font-size: 62.5%;
+	color-scheme: light dark;
+	background: var(--obsidian-reader-background-primary) !important;	
 }
 
-
 .obsidian-reader-active {
-	color-scheme: light dark;
-
 	--obsidian-reader-background-primary: #fff;
 	--obsidian-reader-background-primary-alt: #fcfcfc;
 	--obsidian-reader-text-primary: #222222;
@@ -458,14 +457,10 @@ html.obsidian-reader-active {
 		&::marker {
 			color: var(--obsidian-reader-text-faint);
 		}
-		> p:first-child {
-			margin-top: 0;
-		}
-		> p:last-child {
-			margin-bottom: 0;
-		}
+		p,
 		> div p {
-			margin: 0;
+			margin-bottom: 0;
+			margin-top: 0;
 		}
 	}
 	ul > li {
