@@ -462,6 +462,9 @@ export function createMarkdownContent(content: string, url: string) {
 			if (node.classList.contains('footnote-backref')) return true;
 			return false;
 		},
+		replacement: function (content, node) {
+			return '';
+		}
 	});
 
 	turndownService.addRule('handleTextNodesInTables', {
