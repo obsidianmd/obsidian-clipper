@@ -11,6 +11,7 @@ import {
 	updateHighlighterMenu
 } from './highlighter';
 import { throttle } from './throttle';
+import { toRunEachFrame } from './each-frame';
 import { getElementByXPath, isDarkColor } from './dom-utils';
 
 let hoverOverlay: HTMLElement | null = null;
@@ -346,34 +347,8 @@ function watchScrollableElements() {
 		return style.overflowY === 'auto' || style.overflowY === 'scroll' || style.overflowX === 'auto' || style.overflowX === 'scroll';
 	}
 
-	function toApplyEachFrameUntil(fn: () => void, duration: number) {
-		let endTime: number | null = null;
-		let callbackId: number | null = null;
-
-		function applyIfNotEnded(timestamp: number) {
-			if (!endTime) {
-				endTime = timestamp + duration
-			}
-			if (timestamp < endTime) {
-				fn();
-				callbackId = requestAnimationFrame(applyIfNotEnded);
-			}
-		}
-
-		function resetEndTime() {
-			if (callbackId != null) {
-				cancelAnimationFrame(callbackId);
-			}
-			if (endTime != null) {
-				endTime = null;
-			}
-			callbackId = requestAnimationFrame(applyIfNotEnded)
-		}
-
-		return resetEndTime;
-	}
-
-	const updateHighlightsEachFrame = toApplyEachFrameUntil(updateHighlightOverlayPositions, 200)
+	// 200ms duration required for long custom scrolling animations (e.g. Grok)
+	const updateHighlightsEachFrame = toRunEachFrame(updateHighlightOverlayPositions, 200);
 
 	const handleScroll = () => {
 		updateHighlightsEachFrame();
