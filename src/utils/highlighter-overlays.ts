@@ -340,6 +340,79 @@ observer.observe(document.body, {
 	characterData: false
 });
 
+function watchScrollableElements() {
+	const isScrollable = (element: Element) => {
+		const style = window.getComputedStyle(element);
+		return style.overflowY === 'auto' || style.overflowY === 'scroll' || style.overflowX === 'auto' || style.overflowX === 'scroll';
+	}
+
+	function toApplyEachFrameUntil(fn: () => void, duration: number) {
+		let endTime: number | null = null;
+		let callbackId: number | null = null;
+
+		function applyIfNotEnded(timestamp: number) {
+			if (!endTime) {
+				endTime = timestamp + duration
+			}
+			if (timestamp < endTime) {
+				fn();
+				callbackId = requestAnimationFrame(applyIfNotEnded);
+			}
+		}
+
+		function resetEndTime() {
+			if (callbackId != null) {
+				cancelAnimationFrame(callbackId);
+			}
+			if (endTime != null) {
+				endTime = null;
+			}
+			callbackId = requestAnimationFrame(applyIfNotEnded)
+		}
+
+		return resetEndTime;
+	}
+
+	const updateHighlightsEachFrame = toApplyEachFrameUntil(updateHighlightOverlayPositions, 200)
+
+	const handleScroll = () => {
+		updateHighlightsEachFrame();
+	}
+
+	const setupEventListeners = (element: Element) => {
+		element.addEventListener('scroll', handleScroll);
+		element.addEventListener('wheel', handleScroll);
+		element.addEventListener('touchmove', handleScroll);
+	}
+
+	document.querySelectorAll('*').forEach((element: Element) => {
+		if (isScrollable(element)) {
+			setupEventListeners(element);
+		}
+	})
+
+	const scrollableElementsObserver = new MutationObserver((mutations) => {
+		mutations.forEach((mutation) => {
+			if (mutation.type == 'childList') {
+				Array.from(mutation.addedNodes).forEach((node) => {
+					if (node instanceof Element && isScrollable(node)) {
+						setupEventListeners(node);
+					}
+				});
+			} else if (mutation.type == 'attributes') {
+				if (mutation.attributeName == 'style' && mutation.target instanceof Element && isScrollable(mutation.target)) {
+					setupEventListeners(mutation.target);
+				}
+			}
+
+		});
+	});
+
+	scrollableElementsObserver.observe(document.body, { childList: true, attributes: true, subtree: true });
+}
+
+watchScrollableElements()
+
 // Create or update the hover overlay used to indicate which element will be highlighted
 function createOrUpdateHoverOverlay(target: Element) {
 	// Only update if the target has changed
