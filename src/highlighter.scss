@@ -193,6 +193,46 @@ html.obsidian-reader-active {
 	background: var(--obsidian-reader-background-primary) !important;	
 }
 
+.obsidian-reader-active[data-reader-theme="flexoki"] {
+	--obsidian-reader-background-primary: #FFFCF0;
+	--obsidian-reader-background-primary-alt: #F2F0E5;
+	--obsidian-reader-text-primary: #100F0F;
+	--obsidian-reader-text-muted: #5c5c5c;
+	--obsidian-reader-text-faint: #B7B5AC;
+	--obsidian-reader-text-accent: #100F0F;
+	--obsidian-reader-text-accent-hover: #24837B;
+	--obsidian-reader-border: #E6E4D9;
+	--obsidian-reader-text-selection: #DDF1E4;
+	--obsidian-reader-color-red: #AF3029;
+	--obsidian-reader-color-orange: #BC5215;
+	--obsidian-reader-color-yellow: #AD8301;
+	--obsidian-reader-color-green: #66800B;
+	--obsidian-reader-color-cyan: #24837B;
+	--obsidian-reader-color-blue: #205EA6;
+	--obsidian-reader-color-purple: #5E409D;
+	--obsidian-reader-color-pink: #A02F6F;
+
+	&.theme-dark {
+		--obsidian-reader-background-primary: #100F0F;
+		--obsidian-reader-background-primary-alt: #1C1B1A;
+		--obsidian-reader-text-primary: #CECDC3;
+		--obsidian-reader-text-muted: #878580;
+		--obsidian-reader-text-faint: #575653;
+		--obsidian-reader-text-accent: #CECDC3;
+		--obsidian-reader-text-accent-hover: #3AA99F;
+		--obsidian-reader-border: #282726;
+		--obsidian-reader-text-selection: #101F1D;
+		--obsidian-reader-color-red: #D14D41;
+		--obsidian-reader-color-orange: #DA702C;
+		--obsidian-reader-color-yellow: #D0A215;
+		--obsidian-reader-color-green: #879A39;
+		--obsidian-reader-color-cyan: #3AA99F;
+		--obsidian-reader-color-blue: #4385BE;
+		--obsidian-reader-color-purple: #8B7EC8;
+		--obsidian-reader-color-pink: #CE5D97;
+	}
+}
+
 .obsidian-reader-active {
 	--obsidian-reader-background-primary: #fff;
 	--obsidian-reader-background-primary-alt: #fcfcfc;
@@ -208,6 +248,15 @@ html.obsidian-reader-active {
 		0px 3.4px 6.7px rgba(0, 0, 0, .042),
 		0px 15px 30px rgba(0, 0, 0, .07);
 	--obsidian-reader-footnote-popover-background: var(--obsidian-reader-background-primary);
+
+	--obsidian-reader-color-red: #e93147;
+	--obsidian-reader-color-orange: #ec7500;
+	--obsidian-reader-color-yellow: #e0ac00;
+	--obsidian-reader-color-green: #08b94e;
+	--obsidian-reader-color-cyan: #00bfbc;
+	--obsidian-reader-color-blue: #086ddd;
+	--obsidian-reader-color-purple: #7852ee;
+	--obsidian-reader-color-pink: #d53984;
 
 	&.theme-dark {
 		color-scheme: dark;
@@ -225,30 +274,84 @@ html.obsidian-reader-active {
 			0px 3.4px 6.7px rgba(0, 0, 0, 0.179),
 			0px 15px 30px rgba(0, 0, 0, 0.3);
 		--obsidian-reader-footnote-popover-background: var(--obsidian-reader-background-primary-alt);
+		--obsidian-reader-color-red: #fb464c;
+		--obsidian-reader-color-orange: #e9973f;
+		--obsidian-reader-color-yellow: #e0de71;
+		--obsidian-reader-color-green: #44cf6e;
+		--obsidian-reader-color-cyan: #53dfdd;
+		--obsidian-reader-color-blue: #54b3ff;
+		--obsidian-reader-color-purple: #a882ff;
+		--obsidian-reader-color-pink: #fa99cd;
 	}
-}
 
-.obsidian-reader-active[data-reader-theme="flexoki"] {
-	--obsidian-reader-background-primary: #FFFCF0;
-	--obsidian-reader-background-primary-alt: #F2F0E5;
-	--obsidian-reader-text-primary: #100F0F;
-	--obsidian-reader-text-muted: #5c5c5c;
-	--obsidian-reader-text-faint: #B7B5AC;
-	--obsidian-reader-text-accent: #100F0F;
-	--obsidian-reader-text-accent-hover: #24837B;
-	--obsidian-reader-border: #E6E4D9;
-	--obsidian-reader-text-selection: #DDF1E4;
+	// Highlight.js theme
+	// https://highlightjs.readthedocs.io/en/latest/css-classes-reference.html
+	.hljs {
+		color: var(--obsidian-reader-text-primary);
+		color: var(--obsidian-reader-text-primary);
+	}
 
-	&.theme-dark {
-		--obsidian-reader-background-primary: #100F0F;
-		--obsidian-reader-background-primary-alt: #1C1B1A;
-		--obsidian-reader-text-primary: #CECDC3;
-		--obsidian-reader-text-muted: #878580;
-		--obsidian-reader-text-faint: #575653;
-		--obsidian-reader-text-accent: #CECDC3;
-		--obsidian-reader-text-accent-hover: #3AA99F;
-		--obsidian-reader-border: #282726;
-		--obsidian-reader-text-selection: #101F1D;
+	.hljs-operator { color: var(--obsidian-reader-text-muted); }
+	.hljs-punctuation { color: var(--obsidian-reader-text-muted); }
+	.hljs-comment { color: var(--obsidian-reader-text-muted); }
+	
+	.hljs-params { color: var(--obsidian-reader-text-primary); }
+	
+	.hljs-link { color: var(--obsidian-reader-color-blue); }
+
+	.hljs-keyword { color: var(--obsidian-reader-color-cyan); }
+
+	.hljs-name { color: var(--obsidian-reader-color-pink); }
+
+	.hljs-variable.language_ { color: var(--obsidian-reader-color-purple); }
+	.hljs-selector-attr { color: var(--obsidian-reader-color-pink); }
+	.hljs-number { color: var(--obsidian-reader-color-purple); }
+
+	.hljs-type { color: var(--obsidian-reader-color-yellow); }
+	.hljs-title.class_ { color: var(--obsidian-reader-color-yellow); }
+
+	.hljs-selector-tag { color: var(--obsidian-reader-color-yellow); }
+	
+	.hljs-literal { color: var(--obsidian-reader-color-orange); }
+	.hljs-variable { color: var(--obsidian-reader-color-orange); }
+	.hljs-variable.constant_ { color: var(--obsidian-reader-color-orange); }
+	.hljs-meta { color: var(--obsidian-reader-color-orange); }
+	
+	.hljs-title { color: var(--obsidian-reader-color-blue); }
+	.hljs-title.function_ { color: var(--obsidian-reader-color-blue); }
+	.hljs-section { color: var(--obsidian-reader-color-blue); }
+	.hljs-attr { color: var(--obsidian-reader-color-blue); }
+	.hljs-selector-id { color: var(--obsidian-reader-color-blue); }
+	
+	.hljs-property { color: var(--obsidian-reader-color-cyan); }
+	.hljs-tag { color: var(--obsidian-reader-color-cyan); }
+	.hljs-bullet { color: var(--obsidian-reader-color-cyan); }
+	.hljs-formula { color: var(--obsidian-reader-color-cyan); }
+	.hljs-selector-class { color: var(--obsidian-reader-color-cyan); }
+	.hljs-selector-pseudo { color: var(--obsidian-reader-color-cyan); }
+	
+	.hljs-string { color: var(--obsidian-reader-color-green); }
+	.hljs-char.escape_ { color: var(--obsidian-reader-color-green); }
+	.hljs-attribute { color: var(--obsidian-reader-color-green); }
+	.hljs-code { color: var(--obsidian-reader-color-green); }
+	.hljs-quote { color: var(--obsidian-reader-color-green); }
+	.hljs-addition { color: var(--obsidian-reader-color-green); }
+	
+	.hljs-built_in { color: var(--obsidian-reader-color-red); }
+	.hljs-regexp { color: var(--obsidian-reader-color-red); }
+	.hljs-symbol { color: var(--obsidian-reader-color-red); }
+	.hljs-doctag { color: var(--obsidian-reader-color-red); }
+	.hljs-emphasis { color: var(--obsidian-reader-color-red); }
+	.hljs-strong { color: var(--obsidian-reader-color-red); }
+	.hljs-template-tag { color: var(--obsidian-reader-color-red); }
+	.hljs-template-variable { color: var(--obsidian-reader-color-red); }
+	.hljs-deletion { color: var(--obsidian-reader-color-red); }
+
+	.hljs-emphasis {
+		font-style: italic;
+	}
+	.hljs-strong {
+		font-weight: bold;
 	}
 }
 
@@ -503,6 +606,16 @@ html.obsidian-reader-active {
 			background-color: transparent;
 			padding: 0 !important;
 		}
+	}
+	code[class*="language-"],
+	pre[class*="language-"] {
+		color: var(--obsidian-reader-text-normal);
+		word-wrap: break-word;
+		white-space: pre-wrap;
+		word-break: normal;
+		word-spacing: normal;
+		-webkit-hyphens: none;
+		hyphens: none;
 	}
 	table {
 		overflow-x: auto;

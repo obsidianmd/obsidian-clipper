@@ -1,7 +1,7 @@
 import { Defuddle } from 'defuddle';
-import { debugLog } from './debug';
 import { getLocalStorage, setLocalStorage } from './storage-utils';
 import { ExtractorRegistry } from './extractor-registry';
+import hljs from 'highlight.js';
 
 // Mobile viewport settings
 const VIEWPORT = 'width=device-width, initial-scale=1, maximum-scale=1';
@@ -336,7 +336,7 @@ export class Reader {
 		// Try to use a specific extractor first
 		const extractor = ExtractorRegistry.findExtractor(doc, doc.URL, schemaOrgData);
 		if (extractor && extractor.canExtract()) {
-			debugLog('Reader', 'Using custom extractor');
+			console.log('Reader', 'Using custom extractor:', extractor.constructor.name);
 			const result = extractor.extract();
 			return {
 				content: result.contentHtml,
@@ -611,6 +611,46 @@ export class Reader {
 		doc.head.appendChild(meta);
 	}
 
+	private static initializeCodeHighlighting(doc: Document) {
+		// Find all pre > code blocks
+		const codeBlocks = doc.querySelectorAll('pre > code');
+		codeBlocks.forEach(block => {
+			// Try to detect the language from class
+			const classes = block.className.split(' ');
+			const languageClass = classes.find(c => c.startsWith('language-'));
+			const language = languageClass ? languageClass.replace('language-', '') : '';
+
+			if (language) {
+				try {
+					hljs.highlightElement(block as HTMLElement);
+				} catch (e) {
+					console.error('Reader', 'Error highlighting code block:', e);
+				}
+			} else {
+				// If no language specified, try autodetection
+				try {
+					hljs.highlightElement(block as HTMLElement);
+				} catch (e) {
+					console.error('Reader', 'Error highlighting code block:', e);
+				}
+			}
+		});
+
+		// Also highlight inline code with specified language
+		const inlineCode = doc.querySelectorAll('code:not(pre > code)');
+		inlineCode.forEach(code => {
+			const classes = code.className.split(' ');
+			const languageClass = classes.find(c => c.startsWith('language-'));
+			if (languageClass) {
+				try {
+					hljs.highlightElement(code as HTMLElement);
+				} catch (e) {
+					console.error('Reader', 'Error highlighting inline code:', e);
+				}
+			}
+		});
+	}
+
 	static async apply(doc: Document) {
 		// Load saved settings first
 		await this.loadSettings();
@@ -637,7 +677,7 @@ export class Reader {
 		// Extract content using extractors or Defuddle
 		const { content, title, author, published, domain, extractorType } = this.extractContent(doc);
 		if (!content) {
-			debugLog('Reader', 'Failed to extract content');
+			console.error('Reader', 'Failed to extract content');
 			return;
 		}
 
@@ -658,7 +698,7 @@ export class Reader {
 				}
 			} catch (e) {
 				formattedDate = published;
-				debugLog('Reader', 'Error formatting date:', e);
+				console.error('Reader', 'Error formatting date:', e);
 			}
 		}
 
@@ -740,6 +780,7 @@ export class Reader {
 		this.observer = this.generateOutline(doc);
 		
 		this.initializeFootnotes(doc);
+		this.initializeCodeHighlighting(doc);
 
 		// Set up color scheme media query listener
 		this.colorSchemeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
