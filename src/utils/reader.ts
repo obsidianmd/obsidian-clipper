@@ -624,14 +624,14 @@ export class Reader {
 				try {
 					hljs.highlightElement(block as HTMLElement);
 				} catch (e) {
-					console.error('Reader', 'Error highlighting code block:', e);
+					console.log('Reader', 'Error highlighting code block:', e);
 				}
 			} else {
 				// If no language specified, try autodetection
 				try {
 					hljs.highlightElement(block as HTMLElement);
 				} catch (e) {
-					console.error('Reader', 'Error highlighting code block:', e);
+					console.log('Reader', 'Error highlighting code block:', e);
 				}
 			}
 		});
@@ -645,7 +645,7 @@ export class Reader {
 				try {
 					hljs.highlightElement(code as HTMLElement);
 				} catch (e) {
-					console.error('Reader', 'Error highlighting inline code:', e);
+					console.log('Reader', 'Error highlighting inline code:', e);
 				}
 			}
 		});
@@ -677,7 +677,7 @@ export class Reader {
 		// Extract content using extractors or Defuddle
 		const { content, title, author, published, domain, extractorType } = this.extractContent(doc);
 		if (!content) {
-			console.error('Reader', 'Failed to extract content');
+			console.log('Reader', 'Failed to extract content');
 			return;
 		}
 
@@ -698,7 +698,7 @@ export class Reader {
 				}
 			} catch (e) {
 				formattedDate = published;
-				console.error('Reader', 'Error formatting date:', e);
+				console.log('Reader', 'Error formatting date:', e);
 			}
 		}
 
