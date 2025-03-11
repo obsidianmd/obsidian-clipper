@@ -202,7 +202,13 @@ export class Reader {
 				.obsidian-reader-container {
 					grid-template-columns: 1fr;
 				}
-				.obsidian-reader-outline {
+				.obsidian-reader-active body .obsidian-reader-content {
+					max-width: 90%;
+					width: 100%;
+					margin: 0 auto;
+				}
+				.obsidian-left-sidebar,
+				.obsidian-right-sidebar {
 					display: none;
 				}
 			}

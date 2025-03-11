@@ -274,6 +274,8 @@ html.obsidian-reader-active {
 .obsidian-reader-active	body {
 	--obsidian-reader-font-family: system-ui, -apple-system, sans-serif;
 	--obsidian-reader-dynamic-font-size: calc(var(--obsidian-reader-font-size) + 0.25vw);
+	--obsidian-reader-sidebar-width: 240px;
+
 	background: var(--obsidian-reader-background-primary) !important;
 	margin: 0 !important;
 	padding: 0 !important;
@@ -290,16 +292,19 @@ html.obsidian-reader-active {
 	.obsidian-reader-content {
 		padding: max(4rem, 6vh) 0 40vh !important;	
 		width: var(--obsidian-reader-line-width);
+		max-width: calc(100vw - var(--obsidian-reader-sidebar-width));
 		overflow: hidden;
 		> article {
-			
 			margin: 0 auto;
 			max-width: 100%;
 		}
 	}
+	.obsidian-left-sidebar {
+		min-width: 200px;
+	}
 	.obsidian-left-sidebar,
 	.obsidian-right-sidebar {
-		max-width: 240px;
+		max-width: var(--obsidian-reader-sidebar-width);
 	}
 	h1 {
 		margin: 0 0 0.5em 0;
