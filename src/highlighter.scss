@@ -274,13 +274,11 @@ html.obsidian-reader-active {
 .obsidian-reader-active	body {
 	--obsidian-reader-font-family: system-ui, -apple-system, sans-serif;
 	--obsidian-reader-dynamic-font-size: calc(var(--obsidian-reader-font-size) + 0.25vw);
-
-	background: var(--obsidian-reader-background-primary) !important;	
+	background: var(--obsidian-reader-background-primary) !important;
+	margin: 0 !important;
+	padding: 0 !important;
 	color: var(--obsidian-reader-text-primary) !important;
 	font-size: var(--obsidian-reader-dynamic-font-size) !important;
-	width: var(--obsidian-reader-line-width) !important;
-	margin: max(4rem, 6vh) auto 40vh !important;
-	max-width: 90% !important;
 	line-height: var(--obsidian-reader-line-height) !important;
 	font-family: var(--obsidian-reader-font-family) !important;
 	-webkit-font-smoothing: antialiased !important;
@@ -289,8 +287,14 @@ html.obsidian-reader-active {
 		background-color: var(--obsidian-reader-text-selection);
 	}
 
-	article {
+	.obsidian-reader-content {
+		padding: max(4rem, 6vh) 20px 40vh !important;	
 		overflow: hidden;
+		> article {
+			width: var(--obsidian-reader-line-width);
+			margin: 0 auto;
+			max-width: 100%;
+		}
 	}
 	h1 {
 		margin: 0 0 0.5em 0;
@@ -513,7 +517,7 @@ html.obsidian-reader-active {
 		}
 		li {
 			p {
-				margin: 0.5em 0;
+				margin: 0.25em 0;
 			}
 			a {
 				color: var(--obsidian-reader-text-muted);

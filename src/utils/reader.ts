@@ -146,16 +146,21 @@ export class Reader {
 				background: var(--obsidian-reader-background-primary-alt);
 				color: var(--obsidian-reader-text-primary);
 			}
+			.obsidian-reader-container {
+				display: grid;
+				grid-template-columns: 240px 1fr;
+				width: 100%;
+				margin: 0 auto;
+			}
 			.obsidian-reader-outline {
-				position: fixed;
-				left: 0;
+				box-sizing: border-box;
+				background: var(--obsidian-reader-background-primary);
+				position: sticky;
 				top: 0;
-				width: 200px;
-				max-height: 100vh;
+				height: 100vh;
 				padding: max(2rem, 3vh) 20px 20px 20px;
 				overflow-y: auto;
 				font-size: 14px;
-				z-index: 999999998;
 			}
 			.obsidian-reader-outline-item {
 				color: var(--obsidian-reader-text-muted);
@@ -187,6 +192,14 @@ export class Reader {
 			}
 			.obsidian-reader-outline-item.faint:hover {
 				color: var(--obsidian-reader-text-muted);
+			}
+			@media (max-width: 768px) {
+				.obsidian-reader-container {
+					grid-template-columns: 1fr;
+				}
+				.obsidian-reader-outline {
+					display: none;
+				}
 			}
 		`;
 
@@ -306,7 +319,7 @@ export class Reader {
 		domain?: string;
 		extractorType?: string;
 	} {
-		const defuddled = new Defuddle(doc).parse();
+		const defuddled = new Defuddle(doc, {debug: true}).parse();
 		const schemaOrgData = defuddled.schemaOrgData;
 
 		// Try to use a specific extractor first
@@ -324,8 +337,6 @@ export class Reader {
 			};
 		}
 
-		// Fall back to Defuddle if no specific extractor or extraction failed
-		debugLog('Reader', 'Falling back to Defuddle');
 		return {
 			content: defuddled.content,
 			title: defuddled.title,
@@ -339,17 +350,12 @@ export class Reader {
 		const article = doc.querySelector('article');
 		if (!article) return null;
 
-		// Create outline container
-		const outline = doc.createElement('div');
-		outline.className = 'obsidian-reader-outline';
+		// Get the existing outline container
+		const outline = doc.querySelector('.obsidian-reader-outline') as HTMLElement;
+		if (!outline) return null;
 
 		// Find all headings h2-h6
 		const headings = article.querySelectorAll('h2, h3, h4, h5, h6');
-		
-		if (headings.length === 0) {
-			outline.style.display = 'none';
-			return null;
-		}
 
 		// Add unique IDs to headings if they don't have them
 		headings.forEach((heading, index) => {
@@ -417,7 +423,6 @@ export class Reader {
 			observer.observe(heading);
 		});
 
-		doc.body.appendChild(outline);
 		return observer;
 	}
 
@@ -682,19 +687,24 @@ export class Reader {
 		}
 
 		doc.body.innerHTML = `
-			<article>
-			${title ? `<h1>${title}</h1>` : ''}
-				<div class="metadata">
-					<div class="metadata-details">
-						${[
-							author ? `${author}` : '',
-							formattedDate || '',
-							domain ? `<a href="${doc.URL}">${domain}</a>` : ''
-						].filter(Boolean).map(item => `<span>${item}</span>`).join('<span> · </span>')}
-					</div>
+			<div class="obsidian-reader-container">
+				<div class="obsidian-reader-outline"></div>
+				<div class="obsidian-reader-content">
+					<article>
+					${title ? `<h1>${title}</h1>` : ''}
+						<div class="metadata">
+							<div class="metadata-details">
+								${[
+									author ? `${author}` : '',
+									formattedDate || '',
+									domain ? `<a href="${doc.URL}">${domain}</a>` : ''
+								].filter(Boolean).map(item => `<span>${item}</span>`).join('<span> · </span>')}
+							</div>
+						</div>
+						${content}
+					</article>
 				</div>
-				${content}
-			</article>
+			</div>
 		`;
 
 		doc.documentElement.className = 'obsidian-reader-active';
