@@ -97,12 +97,16 @@ export class Reader {
 		style.textContent = `
 			.obsidian-reader-settings {
 				position: fixed;
-				top: 20px;
-				right: 20px;
+				top: 0;
+				right: 0;
 				background: var(--obsidian-reader-background-primary);
-				padding: 4px;
+				padding: 20px;
+				opacity: 0;
 				z-index: 999999999;
 				font-family: var(--obsidian-reader-font-family);
+			}
+			.obsidian-reader-settings:hover {
+				opacity: 1;
 			}
 			.obsidian-reader-settings-controls {
 				display: grid;
@@ -148,7 +152,8 @@ export class Reader {
 			}
 			.obsidian-reader-container {
 				display: grid;
-				grid-template-columns: 240px 1fr;
+				grid-template-columns: 1fr auto 1fr;
+				gap: 20px;
 				width: 100%;
 				margin: 0 auto;
 			}
@@ -688,7 +693,9 @@ export class Reader {
 
 		doc.body.innerHTML = `
 			<div class="obsidian-reader-container">
-				<div class="obsidian-reader-outline"></div>
+				<div class="obsidian-left-sidebar">
+					<div class="obsidian-reader-outline"></div>
+				</div>
 				<div class="obsidian-reader-content">
 					<article>
 					${title ? `<h1>${title}</h1>` : ''}
@@ -704,6 +711,7 @@ export class Reader {
 						${content}
 					</article>
 				</div>
+				<div class="obsidian-reader-right-sidebar"></div>
 			</div>
 		`;
 
