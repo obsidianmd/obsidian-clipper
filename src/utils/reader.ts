@@ -163,7 +163,7 @@ export class Reader {
 				position: sticky;
 				top: 0;
 				height: 100vh;
-				padding: max(2rem, 3vh) 20px 20px 20px;
+				padding: max(4rem, 4vh) 20px 20px 20px;
 				overflow-y: auto;
 				font-size: 14px;
 			}

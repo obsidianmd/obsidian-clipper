@@ -290,7 +290,7 @@ html.obsidian-reader-active {
 	}
 
 	.obsidian-reader-content {
-		padding: max(4rem, 6vh) 0 40vh !important;	
+		padding: max(4rem, 4vh) 0 40vh !important;	
 		width: var(--obsidian-reader-line-width);
 		max-width: calc(100vw - var(--obsidian-reader-sidebar-width));
 		overflow: hidden;
