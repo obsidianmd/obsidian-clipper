@@ -1189,7 +1189,7 @@ function getActionIcon(actionType: string): string {
     switch (actionType) {
         case 'copyToClipboard': return 'copy';
         case 'saveFile': return 'file-down';
-        case 'addToObsidian': return 'book-open';
+        case 'addToObsidian': return 'pen-line';
         default: return 'plus';
     }
 }

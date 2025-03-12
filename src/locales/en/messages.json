@@ -662,7 +662,7 @@
 		"message": "Save behavior"
 	},
 	"saveBehaviorDescription": {
-		"message": "Choose the default save behavior for the extension. When you select \"copy to clipboard\" or \"save file\" it won't add the clipping to Obsidian."
+		"message": "Choose the default option for saving pages. Alternate options appear in the dropdown menu next to the main button."
 	},
 	"saveFile": {
 		"message": "Save file..."

@@ -150,6 +150,21 @@
 								</div>
 								<div class="setting-item mod-horizontal">
 									<div class="setting-item-info">
+										<label for="save-behavior-dropdown" data-i18n="saveBehaviorLabel">Save behavior</label>
+										<div class="setting-item-description" data-i18n="saveBehaviorDescription">
+											Choose the default option for saving pages. Alternate options appear in the dropdown menu next to the main button.
+										</div>
+									</div>
+									<div class="setting-item-control">
+										<select id="save-behavior-dropdown" style="width: 200px;">
+											<option value="addToObsidian" selected data-i18n="addToObsidian">Add to Obsidian</option>
+											<option value="copyToClipboard" data-i18n="copyToClipboard">Copy to clipboard</option>
+											<option value="saveFile" data-i18n="saveFile">Save file</option>
+										</select>
+									</div>
+								</div>
+								<div class="setting-item mod-horizontal">
+									<div class="setting-item-info">
 										<label for="silent-open-toggle" data-i18n="silentOpen">Save clipped note without opening&nbsp;it</label>
 										<div class="setting-item-description" data-i18n="silentOpenDescription">
 											Clipped notes will be saved but will not open as a new tab. Obsidian will still be brought to the foreground.
@@ -199,21 +214,6 @@
 									</div>
 									<div class="setting-item-control">
 										<button type="button" id="import-all-settings-btn" data-i18n="import">Import</button>
-									</div>
-								</div>
-								<div class="setting-item mod-horizontal">
-									<div class="setting-item-info">
-										<label for="save-behavior-dropdown" data-i18n="saveBehaviorLabel">Save behavior</label>
-										<div class="setting-item-description" data-i18n="saveBehaviorDescription">
-											Choose the default save behavior for the extension. When you select "copy to clipboard" or "save file" it won't add the clipping to obsidian.
-										</div>
-									</div>
-									<div class="setting-item-control">
-										<select id="save-behavior-dropdown" style="width: 200px;">
-											<option value="addToObsidian" selected data-i18n="addToObsidian">Add to Obsidian</option>
-											<option value="copyToClipboard" data-i18n="copyToClipboard">Copy to clipboard</option>
-											<option value="saveFile" data-i18n="saveFile">Save file</option>
-										</select>
 									</div>
 								</div>
 							</div>
