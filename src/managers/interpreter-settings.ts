@@ -110,6 +110,21 @@ export const PRESET_PROVIDERS: Record<string, PresetProvider> = {
 			{ id: 'meta-llama/llama-3.2-1b-instruct', name: 'Llama 3.2 1B Instruct' },
 			{ id: 'meta-llama/llama-3.2-3b-instruct', name: 'Llama 3.2 3B Instruct' }
 		]
+	},
+	perplexity: {
+		id: 'perplexity',
+		name: 'Perplexity',
+		baseUrl: 'https://api.perplexity.ai/chat/completions',
+		apiKeyUrl: 'https://www.perplexity.ai/settings/api',
+		apiKeyRequired: true,
+		modelsList: 'https://docs.perplexity.ai/guides/model-cards',
+		popularModels: [
+			{ id: 'sonar', name: 'Sonar' },
+			{ id: 'sonar-pro', name: 'Sonar Pro' },
+			{ id: 'sonar-reasoning', name: 'Sonar Reasoning' },
+			{ id: 'sonar-reasoning-pro', name: 'Sonar Reasoning Pro' },
+			{ id: 'sonar-deep-research', name: 'Sonar Deep Research' }
+		]
 	}
 };
 
