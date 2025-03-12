@@ -561,6 +561,36 @@ export function createMarkdownContent(content: string, url: string) {
 		return tableClone.outerHTML;
 	}
 
+	turndownService.addRule('markdownAlert', {
+		filter: (node) => {
+			return (
+				node.nodeName.toLowerCase() === 'div' && 
+				node.classList.contains('markdown-alert')
+			);
+		},
+		replacement: (content, node) => {
+			const element = node as HTMLElement;
+			
+			// Get alert type from the class (e.g., markdown-alert-note -> NOTE)
+			const alertClasses = Array.from(element.classList);
+			const typeClass = alertClasses.find(c => c.startsWith('markdown-alert-') && c !== 'markdown-alert');
+			const type = typeClass ? typeClass.replace('markdown-alert-', '').toUpperCase() : 'NOTE';
+
+			// Find the title element and content
+			const titleElement = element.querySelector('.markdown-alert-title');
+			const contentElement = element.querySelector('p:not(.markdown-alert-title)');
+			
+			// Extract content, removing the title from it if present
+			let alertContent = content;
+			if (titleElement && titleElement.textContent) {
+				alertContent = contentElement?.textContent || content.replace(titleElement.textContent, '');
+			}
+
+			// Format as Obsidian callout
+			return `\n> [!${type}]\n> ${alertContent.trim().replace(/\n/g, '\n> ')}\n`;
+		}
+	});
+
 	try {
 		let markdown = turndownService.turndown(processedContent);
 		debugLog('Markdown', 'Markdown conversion successful');
