@@ -3,6 +3,7 @@ import { getLocalStorage, setLocalStorage } from './storage-utils';
 import { ExtractorRegistry } from './extractor-registry';
 import hljs from 'highlight.js';
 import browser from './browser-polyfill';
+import { getDomain } from './string-utils';
 
 // Mobile viewport settings
 const VIEWPORT = 'width=device-width, initial-scale=1, maximum-scale=1';
@@ -223,7 +224,7 @@ export class Reader {
 				title: result.variables?.title,
 				author: result.variables?.author,
 				published: result.variables?.published,
-				domain: result.variables?.domain,
+				domain: getDomain(doc.URL),
 				extractorType: extractor.constructor.name.replace('Extractor', '').toLowerCase()
 			};
 		}
@@ -233,7 +234,7 @@ export class Reader {
 			title: defuddled.title,
 			author: defuddled.author,
 			published: defuddled.published,
-			domain: defuddled.domain
+			domain: getDomain(doc.URL)
 		};
 	}
 

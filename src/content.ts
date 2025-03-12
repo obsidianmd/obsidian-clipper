@@ -3,6 +3,7 @@ import * as highlighter from './utils/highlighter';
 import { loadSettings, generalSettings } from './utils/storage-utils';
 import { Defuddle } from 'defuddle';
 import { Reader } from './utils/reader';
+import { getDomain } from './utils/string-utils';
 
 declare global {
 	interface Window {
@@ -113,7 +114,7 @@ declare global {
 				author: defuddled.author,
 				content: defuddled.content,
 				description: defuddled.description,
-				domain: defuddled.domain,
+				domain: getDomain(document.URL),
 				extractedContent: extractedContent,
 				favicon: defuddled.favicon,
 				fullHtml: cleanedHtml,

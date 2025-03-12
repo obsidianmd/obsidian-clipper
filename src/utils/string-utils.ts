@@ -153,3 +153,23 @@ export function formatDuration(ms: number): string {
 		return `${(ms / 1000).toFixed(2)}s`;
 	}
 }
+
+export function getDomain(url: string): string {
+	try {
+		const urlObj = new URL(url);
+		const hostParts = urlObj.hostname.split('.');
+		
+		// Handle special cases like co.uk, com.au, etc.
+		if (hostParts.length > 2) {
+			const lastTwo = hostParts.slice(-2).join('.');
+			if (lastTwo.match(/^(co|com|org|net|edu|gov|mil)\.[a-z]{2}$/)) {
+				return hostParts.slice(-3).join('.');
+			}
+		}
+		
+		return hostParts.slice(-2).join('.');
+	} catch (error) {
+		console.warn('Invalid URL:', url);
+		return '';
+	}
+}

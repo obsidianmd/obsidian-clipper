@@ -1,7 +1,7 @@
 import { ExtractedContent } from '../types/types';
 import { ExtractorRegistry } from './extractor-registry';
 import { createMarkdownContent } from './markdown-converter';
-import { sanitizeFileName } from './string-utils';
+import { sanitizeFileName, getDomain } from './string-utils';
 import { Defuddle } from 'defuddle';
 import browser from './browser-polyfill';
 import { debugLog } from './debug';
@@ -154,7 +154,7 @@ export async function initializePageContent(
 			'{{date}}': dayjs().format('YYYY-MM-DDTHH:mm:ssZ').trim(),
 			'{{time}}': dayjs().format('YYYY-MM-DDTHH:mm:ssZ').trim(),
 			'{{description}}': defuddled.description.trim(),
-			'{{domain}}': defuddled.domain,
+			'{{domain}}': getDomain(currentUrl),
 			'{{favicon}}': defuddled.favicon,
 			'{{fullHtml}}': fullHtml.trim(),
 			'{{image}}': defuddled.image,
