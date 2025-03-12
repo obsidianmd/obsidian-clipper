@@ -585,30 +585,43 @@ export class Reader {
 		}
 	}
 
-	// Somewhat experimental way to stop scripts from running on the reader mode
 	private static cleanupScripts(doc: Document) {
-		// Store references to native functions that scripts might have modified
-		const nativeClearTimeout = window.clearTimeout;
-		const nativeClearInterval = window.clearInterval;
-		// Clear all timeouts and intervals
-		let id = window.setTimeout(() => {}, 0);
-		while (id--) {
-			nativeClearTimeout(id);
-			nativeClearInterval(id);
+		try {
+			// Only attempt to clear timeouts if we have access to these methods
+			if (typeof window !== 'undefined' && window.clearTimeout && window.clearInterval) {
+				const nativeClearTimeout = window.clearTimeout.bind(window);
+				const nativeClearInterval = window.clearInterval.bind(window);
+				
+				// Clear all timeouts and intervals
+				let id = window.setTimeout(() => {}, 0);
+				while (id--) {
+					try {
+						nativeClearTimeout(id);
+						nativeClearInterval(id);
+					} catch (e) {
+						// Ignore errors from clearing individual timeouts
+						console.log('Reader', 'Error clearing timeout/interval:', e);
+					}
+				}
+			}
+
+			// Remove all script elements except JSON-LD
+			const scripts = doc.querySelectorAll('script:not([type="application/ld+json"])');
+			scripts.forEach(el => el.remove());
+
+			// Replace body with a clone to remove all event listeners
+			const newBody = doc.body.cloneNode(true);
+			doc.body.parentNode?.replaceChild(newBody, doc.body);
+
+			// Block common ad/tracking domains
+			const meta = doc.createElement('meta');
+			meta.httpEquiv = 'Content-Security-Policy';
+			meta.content = "script-src 'none'; frame-src 'none'; object-src 'none';";
+			doc.head.appendChild(meta);
+		} catch (e) {
+			console.log('Reader', 'Error during script cleanup:', e);
+			// Continue with reader mode even if script cleanup fails
 		}
-
-		// Remove all script elements except JSON-LD
-		const scripts = doc.querySelectorAll('script:not([type="application/ld+json"])');
-		scripts.forEach(el => el.remove());
-
-		// Replace body with a clone to remove all event listeners
-		doc.body.replaceWith(doc.body.cloneNode(true));
-
-		// Block common ad/tracking domains
-		const meta = doc.createElement('meta');
-		meta.httpEquiv = 'Content-Security-Policy';
-		meta.content = "script-src 'none'; frame-src 'none'; object-src 'none';";
-		doc.head.appendChild(meta);
 	}
 
 	private static initializeCodeHighlighting(doc: Document) {
