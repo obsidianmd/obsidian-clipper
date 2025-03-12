@@ -46,7 +46,8 @@
 	"web_accessible_resources": [
 		{
 			"resources": ["reader.css"],
-			"matches": ["http://*/*", "https://*/*"]
+			"extension_ids": ["*"],
+   			"matches": [ "*://*/*" ]
 		}
 	],
 	"content_security_policy": {
@@ -73,13 +74,6 @@
 				"mac": "Alt+Shift+H"
 			},
 			"description": "Toggle highlighter mode"
-		},
-		"toggle_reader": {
-			"suggested_key": {
-				"default": "Alt+Shift+R",
-				"mac": "Alt+Shift+R"
-			},
-			"description": "Toggle reader mode"
 		}
 	}
 }

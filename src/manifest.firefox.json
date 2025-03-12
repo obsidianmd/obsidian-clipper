@@ -68,13 +68,6 @@
 				"mac": "Alt+Shift+H"
 			},
 			"description": "__MSG_commandToggleHighlighter__"
-		},
-		"toggle_reader": {
-			"suggested_key": {
-				"default": "Alt+Shift+R",
-				"mac": "Alt+Shift+R"
-			},
-			"description": "__MSG_commandToggleReader__"
 		}
 	},
 	"browser_specific_settings": {
