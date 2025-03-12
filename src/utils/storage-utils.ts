@@ -22,7 +22,6 @@ export let generalSettings: Settings = {
 	propertyTypes: [],
 	readerSettings: {
 		fontSize: 1.5,
-		fontFamily: 'system-ui',
 		lineHeight: 1.6,
 		maxWidth: 38,
 		theme: 'default',
@@ -61,7 +60,6 @@ interface StorageData {
 	};
 	reader_settings?: {
 		fontSize?: number;
-		fontFamily?: string;
 		lineHeight?: number;
 		maxWidth?: number;
 		theme?: 'default' | 'flexoki';
@@ -111,7 +109,6 @@ export async function loadSettings(): Promise<Settings> {
 		propertyTypes: [],
 		readerSettings: {
 			fontSize: 1.5,
-			fontFamily: 'system-ui',
 			lineHeight: 1.6,
 			maxWidth: 38,
 			theme: 'default',
@@ -152,7 +149,6 @@ export async function loadSettings(): Promise<Settings> {
 		propertyTypes: data.property_types || defaultSettings.propertyTypes,
 		readerSettings: {
 			fontSize: data.reader_settings?.fontSize ?? defaultSettings.readerSettings.fontSize,
-			fontFamily: data.reader_settings?.fontFamily ?? defaultSettings.readerSettings.fontFamily,
 			lineHeight: data.reader_settings?.lineHeight ?? defaultSettings.readerSettings.lineHeight,
 			maxWidth: data.reader_settings?.maxWidth ?? defaultSettings.readerSettings.maxWidth,
 			theme: data.reader_settings?.theme as 'default' | 'flexoki' ?? defaultSettings.readerSettings.theme,
@@ -197,7 +193,6 @@ export async function saveSettings(settings?: Partial<Settings>): Promise<void> 
 		property_types: generalSettings.propertyTypes,
 		reader_settings: {
 			fontSize: generalSettings.readerSettings.fontSize,
-			fontFamily: generalSettings.readerSettings.fontFamily,
 			lineHeight: generalSettings.readerSettings.lineHeight,
 			maxWidth: generalSettings.readerSettings.maxWidth,
 			theme: generalSettings.readerSettings.theme,

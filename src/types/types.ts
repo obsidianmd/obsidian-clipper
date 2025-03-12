@@ -50,7 +50,6 @@ export interface Rating {
 
 export interface ReaderSettings {
 	fontSize: number;
-	fontFamily: string;
 	lineHeight: number;
 	maxWidth: number;
 	theme: 'default' | 'flexoki';
