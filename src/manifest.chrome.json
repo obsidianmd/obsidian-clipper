@@ -48,7 +48,8 @@
 	"web_accessible_resources": [
 		{
 			"resources": ["reader.css"],
-			"matches": ["http://*/*", "https://*/*"]
+			"extension_ids": ["*"],
+   			"matches": [ "*://*/*" ]
 		}
 	],
 	"content_security_policy": {
