@@ -561,7 +561,7 @@ export function createMarkdownContent(content: string, url: string) {
 		return tableClone.outerHTML;
 	}
 
-	turndownService.addRule('markdownAlert', {
+	turndownService.addRule('callout', {
 		filter: (node) => {
 			return (
 				node.nodeName.toLowerCase() === 'div' && 
