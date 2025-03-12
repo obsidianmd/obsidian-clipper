@@ -118,6 +118,9 @@
 	"commandToggleHighlighter": {
 		"message": "Markeerder in-/uitschakelen"
 	},
+	"commandToggleReader": {
+		"message": "Schakel leesweergave in/uit"
+	},
 	"confirmDeleteTemplate": {
 		"message": "Weet je zeker dat je het sjabloon \"$1\" wilt verwijderen?"
 	},
@@ -162,6 +165,9 @@
 	},
 	"disableHighlighter": {
 		"message": "Markeerder uitschakelen"
+	},
+	"disableReader": {
+		"message": "Schakel leesweergave uit"
 	},
 	"done": {
 		"message": "Klaar"
@@ -220,6 +226,9 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"enableReader": {
+		"message": "Open leesweergave"
 	},
 	"error": {
 		"message": "Fout"
@@ -604,6 +613,9 @@
 	"rateExtensionDescription": {
 		"message": "Geniet u van Web Clipper? Help ons door het een beoordeling te geven."
 	},
+	"reader": {
+		"message": "Lezer"
+	},
 	"recommended": {
 		"message": "aanbevolen"
 	},
@@ -645,6 +657,12 @@
 	},
 	"save": {
 		"message": "Opslaan"
+	},
+	"saveBehaviorDescription": {
+		"message": "Kies de standaardoptie voor het opslaan van pagina's. Alternatieve opties verschijnen in het dropdown-menu naast de hoofdknop."
+	},
+	"saveBehaviorLabel": {
+		"message": "Opslaggedrag"
 	},
 	"saveFile": {
 		"message": "Bestand opslaan..."

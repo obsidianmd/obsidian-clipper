@@ -118,6 +118,9 @@
 	"commandToggleHighlighter": {
 		"message": "ハイライトモードの切り替え"
 	},
+	"commandToggleReader": {
+		"message": "閲覧ビューを切り替える"
+	},
 	"confirmDeleteTemplate": {
 		"message": "テンプレート「$1」を削除してもよろしいですか？"
 	},
@@ -162,6 +165,9 @@
 	},
 	"disableHighlighter": {
 		"message": "ハイライトを無効化"
+	},
+	"disableReader": {
+		"message": "閲覧ビューを無効にする"
 	},
 	"done": {
 		"message": "完了"
@@ -220,6 +226,9 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"enableReader": {
+		"message": "閲覧ビューを開く"
 	},
 	"error": {
 		"message": "エラー"
@@ -604,6 +613,9 @@
 	"rateExtensionDescription": {
 		"message": "Web Clipperを楽しんでいますか？評価をつけることで私たちを支えてください。"
 	},
+	"reader": {
+		"message": "リーダー"
+	},
 	"recommended": {
 		"message": "推奨"
 	},
@@ -645,6 +657,12 @@
 	},
 	"save": {
 		"message": "保存"
+	},
+	"saveBehaviorDescription": {
+		"message": "ページを保存するためのデフォルトオプションを選択します。他のオプションはメインボタンの隣のドロップダウンメニューに表示されます。"
+	},
+	"saveBehaviorLabel": {
+		"message": "保存の動作"
 	},
 	"saveFile": {
 		"message": "ファイルを保存..."

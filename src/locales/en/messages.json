@@ -613,11 +613,11 @@
 	"rateExtensionDescription": {
 		"message": "Are you enjoying Web Clipper? Help us by giving it a rating."
 	},
-	"recommended": {
-		"message": "recommended"
-	},
 	"reader": {
 		"message": "Reader"
+	},
+	"recommended": {
+		"message": "recommended"
 	},
 	"refresh": {
 		"message": "Refresh"
@@ -658,11 +658,11 @@
 	"save": {
 		"message": "Save"
 	},
-	"saveBehaviorLabel": {
-		"message": "Save behavior"
-	},
 	"saveBehaviorDescription": {
 		"message": "Choose the default option for saving pages. Alternate options appear in the dropdown menu next to the main button."
+	},
+	"saveBehaviorLabel": {
+		"message": "Save behavior"
 	},
 	"saveFile": {
 		"message": "Save file..."

@@ -118,6 +118,9 @@
 	"commandToggleHighlighter": {
 		"message": "Alternar modo marcador"
 	},
+	"commandToggleReader": {
+		"message": "Alternar vista de leitura"
+	},
 	"confirmDeleteTemplate": {
 		"message": "Tem certeza que deseja deletar o modelo \"$1\"?"
 	},
@@ -162,6 +165,9 @@
 	},
 	"disableHighlighter": {
 		"message": "Desativar marcador"
+	},
+	"disableReader": {
+		"message": "Desativar vista de leitura"
 	},
 	"done": {
 		"message": "Concluído"
@@ -220,6 +226,9 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"enableReader": {
+		"message": "Abrir vista de leitura"
 	},
 	"error": {
 		"message": "Erro"
@@ -604,6 +613,9 @@
 	"rateExtensionDescription": {
 		"message": "Você está gostando do Web Clipper? Ajude-nos dando uma avaliação."
 	},
+	"reader": {
+		"message": "Leitor"
+	},
 	"recommended": {
 		"message": "recomendado"
 	},
@@ -645,6 +657,12 @@
 	},
 	"save": {
 		"message": "Salvar"
+	},
+	"saveBehaviorDescription": {
+		"message": "Escolha a opção padrão para salvar páginas. Opções alternativas aparecem no menu suspenso ao lado do botão principal."
+	},
+	"saveBehaviorLabel": {
+		"message": "Comportamento de salvamento"
 	},
 	"saveFile": {
 		"message": "Salvar arquivo..."

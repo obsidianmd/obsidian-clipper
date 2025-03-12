@@ -118,6 +118,9 @@
 	"commandToggleHighlighter": {
 		"message": "Skift fremhævning"
 	},
+	"commandToggleReader": {
+		"message": "Skift læsevisning"
+	},
 	"confirmDeleteTemplate": {
 		"message": "Er du sikker på, at du vil slette skabelonen \"$1\"?"
 	},
@@ -162,6 +165,9 @@
 	},
 	"disableHighlighter": {
 		"message": "Deaktiver fremhævning"
+	},
+	"disableReader": {
+		"message": "Deaktiver læsevisning"
 	},
 	"done": {
 		"message": "Færdig"
@@ -220,6 +226,9 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"enableReader": {
+		"message": "Åbn læsevisning"
 	},
 	"error": {
 		"message": "Fejl"
@@ -596,6 +605,9 @@
 	"rateExtensionDescription": {
 		"message": "Kan du lide Web Clipper? Hjælp os ved at give en bedømmelse."
 	},
+	"reader": {
+		"message": "Læser"
+	},
 	"recommended": {
 		"message": "anbefalet"
 	},
@@ -637,6 +649,12 @@
 	},
 	"save": {
 		"message": "Gem"
+	},
+	"saveBehaviorDescription": {
+		"message": "Vælg standardindstillingen for at gemme sider. Alternative muligheder vises i rullemenuen ved siden af hovedknappen."
+	},
+	"saveBehaviorLabel": {
+		"message": "Gem adfærd"
 	},
 	"saveFile": {
 		"message": "Gem fil..."

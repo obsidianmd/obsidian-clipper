@@ -118,6 +118,9 @@
 	"commandToggleHighlighter": {
 		"message": "تبديل وضع التظليل"
 	},
+	"commandToggleReader": {
+		"message": "تبديل وضع القراءة"
+	},
 	"confirmDeleteTemplate": {
 		"message": "هل أنت متأكد من أنك تريد حذف القالب \"$1\"؟"
 	},
@@ -162,6 +165,9 @@
 	},
 	"disableHighlighter": {
 		"message": "تعطيل المظلل"
+	},
+	"disableReader": {
+		"message": "تعطيل وضع القراءة"
 	},
 	"done": {
 		"message": "تم"
@@ -220,6 +226,9 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"enableReader": {
+		"message": "فتح وضع القراءة"
 	},
 	"error": {
 		"message": "خطأ"
@@ -604,6 +613,9 @@
 	"rateExtensionDescription": {
 		"message": "هل تستمتع بـ Web Clipper؟ ساعدنا عن طريق تقييمه."
 	},
+	"reader": {
+		"message": "القارئ"
+	},
 	"recommended": {
 		"message": "موصى به"
 	},
@@ -645,6 +657,12 @@
 	},
 	"save": {
 		"message": "حفظ"
+	},
+	"saveBehaviorDescription": {
+		"message": "اختر الخيار الافتراضي لحفظ الصفحات. تظهر الخيارات البديلة في القائمة المنسدلة بجوار الزر الرئيسي."
+	},
+	"saveBehaviorLabel": {
+		"message": "سلوك الحفظ"
 	},
 	"saveFile": {
 		"message": "حفظ الملف..."

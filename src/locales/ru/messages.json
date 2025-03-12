@@ -118,6 +118,9 @@
 	"commandToggleHighlighter": {
 		"message": "Режим маркера"
 	},
+	"commandToggleReader": {
+		"message": "Переключить режим чтения"
+	},
 	"confirmDeleteTemplate": {
 		"message": "Вы уверены, что хотите удалить шаблон \"$1\"?"
 	},
@@ -162,6 +165,9 @@
 	},
 	"disableHighlighter": {
 		"message": "Выключить маркер"
+	},
+	"disableReader": {
+		"message": "Отключить режим чтения"
 	},
 	"done": {
 		"message": "готово"
@@ -220,6 +226,9 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"enableReader": {
+		"message": "Открыть режим чтения"
 	},
 	"error": {
 		"message": "Ошибка"
@@ -604,6 +613,9 @@
 	"rateExtensionDescription": {
 		"message": "Вам нравится Web Clipper? Помогите нам, оценив его."
 	},
+	"reader": {
+		"message": "Читатель"
+	},
 	"recommended": {
 		"message": "рекомендуется"
 	},
@@ -645,6 +657,12 @@
 	},
 	"save": {
 		"message": "Сохранить"
+	},
+	"saveBehaviorDescription": {
+		"message": "Выберите опцию сохранения страниц по умолчанию. Альтернативные варианты отображаются в выпадающем меню рядом с основной кнопкой."
+	},
+	"saveBehaviorLabel": {
+		"message": "Поведение при сохранении"
 	},
 	"saveFile": {
 		"message": "Сохранить файл..."

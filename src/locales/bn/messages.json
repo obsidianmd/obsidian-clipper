@@ -118,6 +118,9 @@
 	"commandToggleHighlighter": {
 		"message": "হাইলাইটার মোড চালু/বন্ধ করুন"
 	},
+	"commandToggleReader": {
+		"message": "পাঠন দৃশ্য টগল করুন"
+	},
 	"confirmDeleteTemplate": {
 		"message": "আপনি কি নিশ্চিতভাবে \"$1\" টেমপ্লেটটি মুছে ফেলতে চান?"
 	},
@@ -162,6 +165,9 @@
 	},
 	"disableHighlighter": {
 		"message": "হাইলাইটার নিষ্ক্রিয় করুন"
+	},
+	"disableReader": {
+		"message": "পাঠন দৃশ্য অক্ষম করুন"
 	},
 	"done": {
 		"message": "হয়েছে"
@@ -220,6 +226,9 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"enableReader": {
+		"message": "পাঠন দৃশ্য খুলুন"
 	},
 	"error": {
 		"message": "ত্রুটি"
@@ -604,6 +613,9 @@
 	"rateExtensionDescription": {
 		"message": "আপনি কি ওয়েব ক্লিপার উপভোগ করছেন? এটি একটি রেটিং দিয়ে আমাদের সাহায্য করুন।"
 	},
+	"reader": {
+		"message": "পাঠক"
+	},
 	"recommended": {
 		"message": "প্রস্তাবিত"
 	},
@@ -645,6 +657,12 @@
 	},
 	"save": {
 		"message": "সংরক্ষণ করুন"
+	},
+	"saveBehaviorDescription": {
+		"message": "পৃষ্ঠাগুলি সংরক্ষণ করার জন্য ডিফল্ট বিকল্প চয়ন করুন। বিকল্প বিকল্পগুলি প্রধান বোতামের পাশে ড্রপডাউন মেনুতে দেখা যায়।"
+	},
+	"saveBehaviorLabel": {
+		"message": "সংরক্ষণ আচরণ"
 	},
 	"saveFile": {
 		"message": "ফাইল সংরক্ষণ করুন..."

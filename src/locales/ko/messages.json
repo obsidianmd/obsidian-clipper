@@ -118,6 +118,9 @@
 	"commandToggleHighlighter": {
 		"message": "하이라이터 모드 전환"
 	},
+	"commandToggleReader": {
+		"message": "독서 뷰 전환"
+	},
 	"confirmDeleteTemplate": {
 		"message": "템플릿을 삭제하시겠습니까? \"$1\"?"
 	},
@@ -162,6 +165,9 @@
 	},
 	"disableHighlighter": {
 		"message": "하이라이터 끄기"
+	},
+	"disableReader": {
+		"message": "독서 뷰 비활성화"
 	},
 	"done": {
 		"message": "완료"
@@ -220,6 +226,9 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"enableReader": {
+		"message": "독서 뷰 열기"
 	},
 	"error": {
 		"message": "에러"
@@ -604,6 +613,9 @@
 	"rateExtensionDescription": {
 		"message": "웹 클리퍼를 즐기고 계신가요? 평가를 통해 우리를 도와주세요."
 	},
+	"reader": {
+		"message": "리더"
+	},
 	"recommended": {
 		"message": "추천"
 	},
@@ -645,6 +657,12 @@
 	},
 	"save": {
 		"message": "저장"
+	},
+	"saveBehaviorDescription": {
+		"message": "페이지 저장을 위한 기본 옵션을 선택하세요. 대체 옵션은 주 버튼 옆의 드롭다운 메뉴에 표시됩니다."
+	},
+	"saveBehaviorLabel": {
+		"message": "저장 동작"
 	},
 	"saveFile": {
 		"message": "파일 저장..."

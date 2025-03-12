@@ -118,6 +118,9 @@
 	"commandToggleHighlighter": {
 		"message": "Växla markeringsläge"
 	},
+	"commandToggleReader": {
+		"message": "Växla läsvy"
+	},
 	"confirmDeleteTemplate": {
 		"message": "Är du säker på att du vill ta bort mallen \"$1\"?"
 	},
@@ -162,6 +165,9 @@
 	},
 	"disableHighlighter": {
 		"message": "Inaktivera markering"
+	},
+	"disableReader": {
+		"message": "Inaktivera läsvy"
 	},
 	"done": {
 		"message": "Klar"
@@ -220,6 +226,9 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"enableReader": {
+		"message": "Öppna läsvy"
 	},
 	"error": {
 		"message": "Fel"
@@ -604,6 +613,9 @@
 	"rateExtensionDescription": {
 		"message": "Gillar du Web Clipper? Hjälp oss genom att ge det ett betyg."
 	},
+	"reader": {
+		"message": "Läsare"
+	},
 	"recommended": {
 		"message": "rekommenderad"
 	},
@@ -645,6 +657,12 @@
 	},
 	"save": {
 		"message": "Spara"
+	},
+	"saveBehaviorDescription": {
+		"message": "Välj standardalternativet för att spara sidor. Alternativa alternativ visas i rullgardinsmenyn bredvid huvudknappen."
+	},
+	"saveBehaviorLabel": {
+		"message": "Spara beteende"
 	},
 	"saveFile": {
 		"message": "Spara fil..."

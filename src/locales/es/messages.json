@@ -118,6 +118,9 @@
 	"commandToggleHighlighter": {
 		"message": "Alternar modo resaltador"
 	},
+	"commandToggleReader": {
+		"message": "Alternar vista de lectura"
+	},
 	"confirmDeleteTemplate": {
 		"message": "¿Estás seguro de que quieres eliminar la plantilla \"$1\"?"
 	},
@@ -162,6 +165,9 @@
 	},
 	"disableHighlighter": {
 		"message": "Desactivar resaltador"
+	},
+	"disableReader": {
+		"message": "Desactivar vista de lectura"
 	},
 	"done": {
 		"message": "Hecho"
@@ -220,6 +226,9 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"enableReader": {
+		"message": "Abrir vista de lectura"
 	},
 	"error": {
 		"message": "Error"
@@ -604,6 +613,9 @@
 	"rateExtensionDescription": {
 		"message": "¿Estás disfrutando de Web Clipper? Ayúdanos dándole una calificación."
 	},
+	"reader": {
+		"message": "Lector"
+	},
 	"recommended": {
 		"message": "recomendado"
 	},
@@ -646,11 +658,11 @@
 	"save": {
 		"message": "Guardar"
 	},
+	"saveBehaviorDescription": {
+		"message": "Elige la opción predeterminada para guardar páginas. Las opciones alternativas aparecen en el menú desplegable junto al botón principal."
+	},
 	"saveBehaviorLabel": {
 		"message": "Comportamiento de guardado"
-	},
-	"saveBehaviorDescription": {
-		"message": "Elija el comportamiento de guardado predeterminado para la extensión. Cuando seleccione \"copiar al portapapeles\" o \"guardar archivo\", no se añadirá el recorte a Obsidian."
 	},
 	"saveFile": {
 		"message": "Guardar archivo..."

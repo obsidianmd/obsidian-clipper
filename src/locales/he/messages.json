@@ -118,6 +118,9 @@
 	"commandToggleHighlighter": {
 		"message": "הפעל/כבה מסמן"
 	},
+	"commandToggleReader": {
+		"message": "החלף מצב קריאה"
+	},
 	"confirmDeleteTemplate": {
 		"message": "האם את/ה בטוח/ה שברצונך למחוק את התבנית \"$1\"?"
 	},
@@ -162,6 +165,9 @@
 	},
 	"disableHighlighter": {
 		"message": "כבה מסמן"
+	},
+	"disableReader": {
+		"message": "השבת מצב קריאה"
 	},
 	"done": {
 		"message": "סיום"
@@ -220,6 +226,9 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"enableReader": {
+		"message": "פתח מצב קריאה"
 	},
 	"error": {
 		"message": "שגיאה"
@@ -596,6 +605,9 @@
 	"rateExtensionDescription": {
 		"message": "אוהב את Web Clipper? עזור לנו על ידי דירוג."
 	},
+	"reader": {
+		"message": "קורא"
+	},
 	"recommended": {
 		"message": "מומלץ"
 	},
@@ -637,6 +649,12 @@
 	},
 	"save": {
 		"message": "שמור"
+	},
+	"saveBehaviorDescription": {
+		"message": "בחר את האפשרות הברירת המחדל לשמירת דפים. אפשרויות חלופיות מופיעות בתפריט הנפתח ליד הכפתור הראשי."
+	},
+	"saveBehaviorLabel": {
+		"message": "התנהגות שמירה"
 	},
 	"saveFile": {
 		"message": "שמור קובץ..."

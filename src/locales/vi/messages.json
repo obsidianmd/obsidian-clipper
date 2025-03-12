@@ -118,6 +118,9 @@
 	"commandToggleHighlighter": {
 		"message": "Bật/tắt chế độ đánh dấu"
 	},
+	"commandToggleReader": {
+		"message": "Chuyển đổi chế độ đọc"
+	},
 	"confirmDeleteTemplate": {
 		"message": "Bạn có chắc chắn muốn xóa mẫu \"$1\"?"
 	},
@@ -162,6 +165,9 @@
 	},
 	"disableHighlighter": {
 		"message": "Tắt đánh dấu"
+	},
+	"disableReader": {
+		"message": "Tắt chế độ đọc"
 	},
 	"done": {
 		"message": "Xong"
@@ -220,6 +226,9 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"enableReader": {
+		"message": "Mở chế độ đọc"
 	},
 	"error": {
 		"message": "Lỗi"
@@ -604,6 +613,9 @@
 	"rateExtensionDescription": {
 		"message": "Bạn thích Web Clipper? Hãy giúp chúng tôi bằng cách đánh giá nó."
 	},
+	"reader": {
+		"message": "Đọc"
+	},
 	"recommended": {
 		"message": "được đề xuất"
 	},
@@ -645,6 +657,12 @@
 	},
 	"save": {
 		"message": "Lưu"
+	},
+	"saveBehaviorDescription": {
+		"message": "Chọn tùy chọn mặc định để lưu trang. Các tùy chọn khác xuất hiện trong menu dropdown bên cạnh nút chính."
+	},
+	"saveBehaviorLabel": {
+		"message": "Hành vi lưu"
 	},
 	"saveFile": {
 		"message": "Lưu tệp..."

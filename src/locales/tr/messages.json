@@ -118,6 +118,9 @@
 	"commandToggleHighlighter": {
 		"message": "Vurgulayıcı modunu aç/kapat"
 	},
+	"commandToggleReader": {
+		"message": "Okuma görünümünü değiştir"
+	},
 	"confirmDeleteTemplate": {
 		"message": "\"$1\" şablonunu silmek istediğinizden emin misiniz?"
 	},
@@ -162,6 +165,9 @@
 	},
 	"disableHighlighter": {
 		"message": "Vurgulayıcıyı devre dışı bırak"
+	},
+	"disableReader": {
+		"message": "Okuma görünümünü devre dışı bırak"
 	},
 	"done": {
 		"message": "Tamam"
@@ -220,6 +226,9 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"enableReader": {
+		"message": "Okuma görünümünü aç"
 	},
 	"error": {
 		"message": "Hata"
@@ -604,6 +613,9 @@
 	"rateExtensionDescription": {
 		"message": "Web Clipper'ı beğeniyor musunuz? Bize bir puan vererek yardımcı olun."
 	},
+	"reader": {
+		"message": "Okuyucu"
+	},
 	"recommended": {
 		"message": "önerilen"
 	},
@@ -645,6 +657,12 @@
 	},
 	"save": {
 		"message": "Kaydet"
+	},
+	"saveBehaviorDescription": {
+		"message": "Sayfaları kaydetmek için varsayılan seçeneği belirleyin. Ana düğmenin yanındaki açılır menüde alternatif seçenekler görünür."
+	},
+	"saveBehaviorLabel": {
+		"message": "Kaydetme davranışı"
 	},
 	"saveFile": {
 		"message": "Dosyayı kaydet..."

@@ -118,6 +118,9 @@
 	"commandToggleHighlighter": {
 		"message": "Veksle uthever"
 	},
+	"commandToggleReader": {
+		"message": "Bytt lesevisning"
+	},
 	"confirmDeleteTemplate": {
 		"message": "Er du sikker på at du vil slette malen \"$1\"?"
 	},
@@ -162,6 +165,9 @@
 	},
 	"disableHighlighter": {
 		"message": "Deaktiver uthever"
+	},
+	"disableReader": {
+		"message": "Deaktiver lesevisning"
 	},
 	"done": {
 		"message": "Ferdig"
@@ -220,6 +226,9 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"enableReader": {
+		"message": "Åpne lesevisning"
 	},
 	"error": {
 		"message": "Feil"
@@ -596,6 +605,9 @@
 	"rateExtensionDescription": {
 		"message": "Liker du Web Clipper? Hjelp oss ved å gi en vurdering."
 	},
+	"reader": {
+		"message": "Lesevisning"
+	},
 	"recommended": {
 		"message": "anbefalt"
 	},
@@ -637,6 +649,12 @@
 	},
 	"save": {
 		"message": "Lagre"
+	},
+	"saveBehaviorDescription": {
+		"message": "Velg standardalternativet for å lagre sider. Alternative alternativer vises i rullegardinmenyen ved siden av hovedknappen."
+	},
+	"saveBehaviorLabel": {
+		"message": "Lagre oppførsel"
 	},
 	"saveFile": {
 		"message": "Lagre fil..."

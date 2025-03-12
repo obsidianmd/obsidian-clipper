@@ -118,6 +118,9 @@
 	"commandToggleHighlighter": {
 		"message": "Markiermodus umschalten"
 	},
+	"commandToggleReader": {
+		"message": "Leseansicht umschalten"
+	},
 	"confirmDeleteTemplate": {
 		"message": "Möchtest Du die Vorlage \"$1\" wirklich löschen?"
 	},
@@ -162,6 +165,9 @@
 	},
 	"disableHighlighter": {
 		"message": "Marker deaktivieren"
+	},
+	"disableReader": {
+		"message": "Leseansicht deaktivieren"
 	},
 	"done": {
 		"message": "Fertig"
@@ -220,6 +226,9 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"enableReader": {
+		"message": "Leseansicht öffnen"
 	},
 	"error": {
 		"message": "Fehler"
@@ -604,6 +613,9 @@
 	"rateExtensionDescription": {
 		"message": "Gefällt Ihnen der Web Clipper? Helfen Sie uns, indem Sie ihm eine Bewertung geben."
 	},
+	"reader": {
+		"message": "Leser"
+	},
 	"recommended": {
 		"message": "empfohlen"
 	},
@@ -645,6 +657,12 @@
 	},
 	"save": {
 		"message": "Speichern"
+	},
+	"saveBehaviorDescription": {
+		"message": "Wählen Sie die Standardoption zum Speichern von Seiten. Weitere Optionen erscheinen im Dropdown-Menü neben der Haupttaste."
+	},
+	"saveBehaviorLabel": {
+		"message": "Speicherverhalten"
 	},
 	"saveFile": {
 		"message": "Datei speichern..."

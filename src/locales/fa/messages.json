@@ -118,6 +118,9 @@
 	"commandToggleHighlighter": {
 		"message": "حالت جملات روشن را فعال یا نا‌فعال کن"
 	},
+	"commandToggleReader": {
+		"message": "تغییر نمای خواندن"
+	},
 	"confirmDeleteTemplate": {
 		"message": "آیا مطمئنید که می خواهید الگوی \"$1\" را حذف کنید؟"
 	},
@@ -162,6 +165,9 @@
 	},
 	"disableHighlighter": {
 		"message": "مارکر جملات روشن را غیرفعال کن"
+	},
+	"disableReader": {
+		"message": "غیرفعال کردن نمای خواندن"
 	},
 	"done": {
 		"message": "انجام شد"
@@ -220,6 +226,9 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"enableReader": {
+		"message": "باز کردن نمای خواندن"
 	},
 	"error": {
 		"message": "خطا"
@@ -604,6 +613,9 @@
 	"rateExtensionDescription": {
 		"message": "آیا از وب کلیپر لذت می برید؟ با ارزیابی آن به ما کمک کنید."
 	},
+	"reader": {
+		"message": "خواننده"
+	},
 	"recommended": {
 		"message": "توصیه شده"
 	},
@@ -645,6 +657,12 @@
 	},
 	"save": {
 		"message": "ذخیره"
+	},
+	"saveBehaviorDescription": {
+		"message": "گزینه پیش فرض برای ذخیره صفحات را انتخاب کنید. گزینه های جایگزین در منوی کشویی کنار دکمه اصلی ظاهر می شوند."
+	},
+	"saveBehaviorLabel": {
+		"message": "رفتار ذخیره سازی"
 	},
 	"saveFile": {
 		"message": "ذخیره فایل..."

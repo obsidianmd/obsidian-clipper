@@ -118,6 +118,9 @@
 	"commandToggleHighlighter": {
 		"message": "Přepnout režim zvýrazňovače"
 	},
+	"commandToggleReader": {
+		"message": "Přepnout čtecí zobrazení"
+	},
 	"confirmDeleteTemplate": {
 		"message": "Opravdu chcete smazat šablonu \"$1\"?"
 	},
@@ -162,6 +165,9 @@
 	},
 	"disableHighlighter": {
 		"message": "Deaktivovat zvýrazňovač"
+	},
+	"disableReader": {
+		"message": "Zakázat čtecí zobrazení"
 	},
 	"done": {
 		"message": "Hotovo"
@@ -220,6 +226,9 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"enableReader": {
+		"message": "Otevřít čtecí zobrazení"
 	},
 	"error": {
 		"message": "Chyba"
@@ -596,6 +605,9 @@
 	"rateExtensionDescription": {
 		"message": "Líbí se vám Web Clipper? Pomozte nám jeho ohodnocením."
 	},
+	"reader": {
+		"message": "Čtečka"
+	},
 	"recommended": {
 		"message": "doporučeno"
 	},
@@ -637,6 +649,12 @@
 	},
 	"save": {
 		"message": "Uložit"
+	},
+	"saveBehaviorDescription": {
+		"message": "Vyberte výchozí možnost pro ukládání stránek. Alternativní možnosti se zobrazí v rozbalovacím menu vedle hlavního tlačítka."
+	},
+	"saveBehaviorLabel": {
+		"message": "Chování při ukládání"
 	},
 	"saveFile": {
 		"message": "Uložit soubor..."

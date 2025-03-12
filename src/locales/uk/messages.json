@@ -118,6 +118,9 @@
 	"commandToggleHighlighter": {
 		"message": "Перемкнути виділення"
 	},
+	"commandToggleReader": {
+		"message": "Перемкнути режим читання"
+	},
 	"confirmDeleteTemplate": {
 		"message": "Ви впевнені, що хочете видалити шаблон \"$1\"?"
 	},
@@ -162,6 +165,9 @@
 	},
 	"disableHighlighter": {
 		"message": "Вимкнути виділення"
+	},
+	"disableReader": {
+		"message": "Вимкнути режим читання"
 	},
 	"done": {
 		"message": "Готово"
@@ -220,6 +226,9 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"enableReader": {
+		"message": "Відкрити режим читання"
 	},
 	"error": {
 		"message": "Помилка"
@@ -596,6 +605,9 @@
 	"rateExtensionDescription": {
 		"message": "Подобається Web Clipper? Допоможіть нам, поставивши оцінку."
 	},
+	"reader": {
+		"message": "Читач"
+	},
 	"recommended": {
 		"message": "рекомендовано"
 	},
@@ -637,6 +649,12 @@
 	},
 	"save": {
 		"message": "Зберегти"
+	},
+	"saveBehaviorDescription": {
+		"message": "Виберіть типовий варіант для збереження сторінок. Альтернативні варіанти з'являються у випадаючому меню поруч з основною кнопкою."
+	},
+	"saveBehaviorLabel": {
+		"message": "Поведінка збереження"
 	},
 	"saveFile": {
 		"message": "Зберегти файл..."

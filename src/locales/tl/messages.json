@@ -118,6 +118,9 @@
 	"commandToggleHighlighter": {
 		"message": "I-toggle ang highlighter"
 	},
+	"commandToggleReader": {
+		"message": "Palitan ang tanawin ng pagbabasa"
+	},
 	"confirmDeleteTemplate": {
 		"message": "Sigurado ka bang gusto mong tanggalin ang template na \"$1\"?"
 	},
@@ -162,6 +165,9 @@
 	},
 	"disableHighlighter": {
 		"message": "I-disable ang highlighter"
+	},
+	"disableReader": {
+		"message": "Huwag paganahin ang tanawin ng pagbabasa"
 	},
 	"done": {
 		"message": "Tapos na"
@@ -220,6 +226,9 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"enableReader": {
+		"message": "Buksan ang tanawin ng pagbabasa"
 	},
 	"error": {
 		"message": "Error"
@@ -596,6 +605,9 @@
 	"rateExtensionDescription": {
 		"message": "Nagustuhan mo ba ang Web Clipper? Tulungan mo kami sa pamamagitan ng pagbibigay ng rating."
 	},
+	"reader": {
+		"message": "Tagabasa"
+	},
 	"recommended": {
 		"message": "inirerekomenda"
 	},
@@ -637,6 +649,12 @@
 	},
 	"save": {
 		"message": "I-save"
+	},
+	"saveBehaviorDescription": {
+		"message": "Pumili ng default na opsyon para sa pag-save ng mga pahina. Ang mga alternatibong opsyon ay lumilitaw sa dropdown menu na katabi ng pangunahing button."
+	},
+	"saveBehaviorLabel": {
+		"message": "Ugali ng pag-save"
 	},
 	"saveFile": {
 		"message": "I-save ang file..."

@@ -118,6 +118,9 @@
 	"commandToggleHighlighter": {
 		"message": "切換標記模式"
 	},
+	"commandToggleReader": {
+		"message": "切換閱讀視圖"
+	},
 	"confirmDeleteTemplate": {
 		"message": "您確定要刪除範本 \"$1\" 嗎？"
 	},
@@ -162,6 +165,9 @@
 	},
 	"disableHighlighter": {
 		"message": "停用標記"
+	},
+	"disableReader": {
+		"message": "禁用閱讀視圖"
 	},
 	"done": {
 		"message": "完成"
@@ -220,6 +226,9 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"enableReader": {
+		"message": "開啟閱讀視圖"
 	},
 	"error": {
 		"message": "錯誤"
@@ -604,6 +613,9 @@
 	"rateExtensionDescription": {
 		"message": "您喜歡Web Clipper嗎？請幫助我們給它評分。"
 	},
+	"reader": {
+		"message": "閱讀器"
+	},
 	"recommended": {
 		"message": "推薦"
 	},
@@ -645,6 +657,12 @@
 	},
 	"save": {
 		"message": "儲存"
+	},
+	"saveBehaviorDescription": {
+		"message": "選擇保存頁面的預設選項。其他選項將出現在主按鈕旁的下拉菜單中。"
+	},
+	"saveBehaviorLabel": {
+		"message": "保存行為"
 	},
 	"saveFile": {
 		"message": "儲存檔案..."

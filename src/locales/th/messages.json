@@ -118,6 +118,9 @@
 	"commandToggleHighlighter": {
 		"message": "สลับโหมดไฮไลต์"
 	},
+	"commandToggleReader": {
+		"message": "สลับมุมมองการอ่าน"
+	},
 	"confirmDeleteTemplate": {
 		"message": "คุณแน่ใจหรือไม่ว่าต้องการลบเทมเพลต \"$1\"?"
 	},
@@ -162,6 +165,9 @@
 	},
 	"disableHighlighter": {
 		"message": "ปิดใช้งานไฮไลต์"
+	},
+	"disableReader": {
+		"message": "ปิดการใช้งานมุมมองการอ่าน"
 	},
 	"done": {
 		"message": "เสร็จสิ้น"
@@ -220,6 +226,9 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"enableReader": {
+		"message": "เปิดมุมมองการอ่าน"
 	},
 	"error": {
 		"message": "ข้อผิดพลาด"
@@ -604,6 +613,9 @@
 	"rateExtensionDescription": {
 		"message": "ชอบ Web Clipper ไหม? ช่วยเราด้วยการให้คะแนน"
 	},
+	"reader": {
+		"message": "อ่าน"
+	},
 	"recommended": {
 		"message": "แนะนำ"
 	},
@@ -645,6 +657,12 @@
 	},
 	"save": {
 		"message": "บันทึก"
+	},
+	"saveBehaviorDescription": {
+		"message": "เลือกตัวเลือกเริ่มต้นสำหรับการบันทึกหน้า ตัวเลือกทางเลือกปรากฏในเมนูแบบเลื่อนลงถัดจากปุ่มหลัก"
+	},
+	"saveBehaviorLabel": {
+		"message": "พฤติกรรมการบันทึก"
 	},
 	"saveFile": {
 		"message": "บันทึกไฟล์..."

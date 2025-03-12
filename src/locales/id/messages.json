@@ -118,6 +118,9 @@
 	"commandToggleHighlighter": {
 		"message": "Aktifkan/nonaktifkan mode sorotan"
 	},
+	"commandToggleReader": {
+		"message": "Alihkan tampilan baca"
+	},
 	"confirmDeleteTemplate": {
 		"message": "Apakah Anda yakin ingin menghapus template \"$1\"?"
 	},
@@ -162,6 +165,9 @@
 	},
 	"disableHighlighter": {
 		"message": "Nonaktifkan sorotan"
+	},
+	"disableReader": {
+		"message": "Nonaktifkan tampilan baca"
 	},
 	"done": {
 		"message": "selesai"
@@ -220,6 +226,9 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"enableReader": {
+		"message": "Buka tampilan baca"
 	},
 	"error": {
 		"message": "Error"
@@ -604,6 +613,9 @@
 	"rateExtensionDescription": {
 		"message": "Apakah Anda menikmati Web Clipper? Bantu kami dengan memberikan penilaian."
 	},
+	"reader": {
+		"message": "Pembaca"
+	},
 	"recommended": {
 		"message": "direkomendasikan"
 	},
@@ -645,6 +657,12 @@
 	},
 	"save": {
 		"message": "Simpan"
+	},
+	"saveBehaviorDescription": {
+		"message": "Pilih opsi default untuk menyimpan halaman. Opsi alternatif muncul di menu dropdown di sebelah tombol utama."
+	},
+	"saveBehaviorLabel": {
+		"message": "Perilaku penyimpanan"
 	},
 	"saveFile": {
 		"message": "Simpan file..."

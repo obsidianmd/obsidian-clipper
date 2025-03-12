@@ -118,6 +118,9 @@
 	"commandToggleHighlighter": {
 		"message": "Εναλλαγή επισημαντή"
 	},
+	"commandToggleReader": {
+		"message": "Εναλλαγή προβολής ανάγνωσης"
+	},
 	"confirmDeleteTemplate": {
 		"message": "Είστε βέβαιοι ότι θέλετε να διαγράψετε το πρότυπο \"$1\";"
 	},
@@ -162,6 +165,9 @@
 	},
 	"disableHighlighter": {
 		"message": "Απενεργοποίηση επισημαντή"
+	},
+	"disableReader": {
+		"message": "Απενεργοποίηση προβολής ανάγνωσης"
 	},
 	"done": {
 		"message": "Ολοκληρώθηκε"
@@ -220,6 +226,9 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"enableReader": {
+		"message": "Άνοιγμα προβολής ανάγνωσης"
 	},
 	"error": {
 		"message": "Σφάλμα"
@@ -596,6 +605,9 @@
 	"rateExtensionDescription": {
 		"message": "Σας αρέσει το Web Clipper; Βοηθήστε μας δίνοντάς του μια αξιολόγηση."
 	},
+	"reader": {
+		"message": "Αναγνώστης"
+	},
 	"recommended": {
 		"message": "προτεινόμενο"
 	},
@@ -637,6 +649,12 @@
 	},
 	"save": {
 		"message": "Αποθήκευση"
+	},
+	"saveBehaviorDescription": {
+		"message": "Επιλέξτε την προεπιλεγμένη επιλογή για την αποθήκευση σελίδων. Εναλλακτικές επιλογές εμφανίζονται στο αναπτυσσόμενο μενού δίπλα στο κύριο κουμπί."
+	},
+	"saveBehaviorLabel": {
+		"message": "Συμπεριφορά αποθήκευσης"
 	},
 	"saveFile": {
 		"message": "Αποθήκευση αρχείου..."

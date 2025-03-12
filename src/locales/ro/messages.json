@@ -118,6 +118,9 @@
 	"commandToggleHighlighter": {
 		"message": "Comută evidențiatorul"
 	},
+	"commandToggleReader": {
+		"message": "Comutați vizualizarea de citire"
+	},
 	"confirmDeleteTemplate": {
 		"message": "Ești sigur că vrei să ștergi șablonul \"$1\"?"
 	},
@@ -162,6 +165,9 @@
 	},
 	"disableHighlighter": {
 		"message": "Dezactivează evidențiatorul"
+	},
+	"disableReader": {
+		"message": "Dezactivați vizualizarea de citire"
 	},
 	"done": {
 		"message": "Gata"
@@ -220,6 +226,9 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"enableReader": {
+		"message": "Deschideți vizualizarea de citire"
 	},
 	"error": {
 		"message": "Eroare"
@@ -596,6 +605,9 @@
 	"rateExtensionDescription": {
 		"message": "Îți place Web Clipper? Ajută-ne dându-ne o evaluare."
 	},
+	"reader": {
+		"message": "Cititor"
+	},
 	"recommended": {
 		"message": "recomandat"
 	},
@@ -637,6 +649,12 @@
 	},
 	"save": {
 		"message": "Salvează"
+	},
+	"saveBehaviorDescription": {
+		"message": "Alegeți opțiunea implicită pentru salvarea paginilor. Opțiunile alternative apar în meniul derulant alături de butonul principal."
+	},
+	"saveBehaviorLabel": {
+		"message": "Comportamentul de salvare"
 	},
 	"saveFile": {
 		"message": "Salvează fișier..."

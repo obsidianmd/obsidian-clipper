@@ -118,6 +118,9 @@
 	"commandToggleHighlighter": {
 		"message": "Tryb zakreślacza"
 	},
+	"commandToggleReader": {
+		"message": "Przełącz widok czytnika"
+	},
 	"confirmDeleteTemplate": {
 		"message": "Czy na pewno chcesz usunąć szablon \"$1\"?"
 	},
@@ -162,6 +165,9 @@
 	},
 	"disableHighlighter": {
 		"message": "Wyłącz zakreślacz"
+	},
+	"disableReader": {
+		"message": "Wyłącz widok czytnika"
 	},
 	"done": {
 		"message": "Gotowe"
@@ -220,6 +226,9 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"enableReader": {
+		"message": "Otwórz widok czytnika"
 	},
 	"error": {
 		"message": "Błąd"
@@ -604,6 +613,9 @@
 	"rateExtensionDescription": {
 		"message": "Czy podoba Ci się Web Clipper? Pomóż nam, oceniając go."
 	},
+	"reader": {
+		"message": "Czytnik"
+	},
 	"recommended": {
 		"message": "rekomendowane"
 	},
@@ -645,6 +657,12 @@
 	},
 	"save": {
 		"message": "Zapisz"
+	},
+	"saveBehaviorDescription": {
+		"message": "Wybierz domyślną opcję zapisywania stron. Alternatywne opcje pojawiają się w menu rozwijanym obok głównego przycisku."
+	},
+	"saveBehaviorLabel": {
+		"message": "Zachowanie zapisu"
 	},
 	"saveFile": {
 		"message": "Zapisz plik..."

@@ -118,6 +118,9 @@
 	"commandToggleHighlighter": {
 		"message": "Highlighter mode toggle karein"
 	},
+	"commandToggleReader": {
+		"message": "पठन दृश्य टॉगल करें"
+	},
 	"confirmDeleteTemplate": {
 		"message": "Kya aap template \"$1\" ko hatana chahte hain?"
 	},
@@ -162,6 +165,9 @@
 	},
 	"disableHighlighter": {
 		"message": "Highlighter band karein"
+	},
+	"disableReader": {
+		"message": "पठन दृश्य अक्षम करें"
 	},
 	"done": {
 		"message": "Ho gaya"
@@ -220,6 +226,9 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"enableReader": {
+		"message": "पठन दृश्य खोलें"
 	},
 	"error": {
 		"message": "Error"
@@ -604,6 +613,9 @@
 	"rateExtensionDescription": {
 		"message": "क्या आप वेब क्लिपर का आनंद ले रहे हैं? हमारी मदद करें इसे रेटिंग देकर।"
 	},
+	"reader": {
+		"message": "पाठक"
+	},
 	"recommended": {
 		"message": "सिफारिश की गई"
 	},
@@ -645,6 +657,12 @@
 	},
 	"save": {
 		"message": "Save"
+	},
+	"saveBehaviorDescription": {
+		"message": "पेज सहेजने के लिए डिफ़ॉल्ट विकल्प चुनें। वैकल्पिक विकल्प मुख्य बटन के बगल में ड्रॉपडाउन मेनू में दिखाई देते हैं।"
+	},
+	"saveBehaviorLabel": {
+		"message": "सहेजने का व्यवहार"
 	},
 	"saveFile": {
 		"message": "File save karein..."

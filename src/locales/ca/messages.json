@@ -118,6 +118,9 @@
 	"commandToggleHighlighter": {
 		"message": "Alternar el mode de ressaltat"
 	},
+	"commandToggleReader": {
+		"message": "Commuta la vista de lectura"
+	},
 	"confirmDeleteTemplate": {
 		"message": "N'està segur, de voler eliminar la plantilla \"$1\"?"
 	},
@@ -162,6 +165,9 @@
 	},
 	"disableHighlighter": {
 		"message": "Desactivar ressaltador"
+	},
+	"disableReader": {
+		"message": "Deshabilita la vista de lectura"
 	},
 	"done": {
 		"message": "fet"
@@ -220,6 +226,9 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"enableReader": {
+		"message": "Obre la vista de lectura"
 	},
 	"error": {
 		"message": "Error"
@@ -604,6 +613,9 @@
 	"rateExtensionDescription": {
 		"message": "T'està agradant Web Clipper? Ajuda'ns donant-li una valoració."
 	},
+	"reader": {
+		"message": "Lector"
+	},
 	"recommended": {
 		"message": "recomanat"
 	},
@@ -645,6 +657,12 @@
 	},
 	"save": {
 		"message": "Guardar"
+	},
+	"saveBehaviorDescription": {
+		"message": "Trieu l'opció per defecte per guardar pàgines. Les opcions alternatives apareixen al menú desplegable al costat del botó principal."
+	},
+	"saveBehaviorLabel": {
+		"message": "Comportament de guardar"
 	},
 	"saveFile": {
 		"message": "Guardar fitxer..."

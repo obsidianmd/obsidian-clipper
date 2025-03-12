@@ -118,6 +118,9 @@
 	"commandToggleHighlighter": {
 		"message": "Activer/désactiver le mode surlignage"
 	},
+	"commandToggleReader": {
+		"message": "Basculer la vue de lecture"
+	},
 	"confirmDeleteTemplate": {
 		"message": "Êtes-vous sûr de vouloir supprimer le modèle \"$1\" ?"
 	},
@@ -162,6 +165,9 @@
 	},
 	"disableHighlighter": {
 		"message": "Désactiver le surligneur"
+	},
+	"disableReader": {
+		"message": "Désactiver la vue de lecture"
 	},
 	"done": {
 		"message": "Terminé"
@@ -220,6 +226,9 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"enableReader": {
+		"message": "Ouvrir la vue de lecture"
 	},
 	"error": {
 		"message": "Erreur"
@@ -604,6 +613,9 @@
 	"rateExtensionDescription": {
 		"message": "Appréciez-vous Web Clipper? Aidez-nous en lui donnant une note."
 	},
+	"reader": {
+		"message": "Lecteur"
+	},
 	"recommended": {
 		"message": "recommandé"
 	},
@@ -645,6 +657,12 @@
 	},
 	"save": {
 		"message": "Enregistrer"
+	},
+	"saveBehaviorDescription": {
+		"message": "Choisissez l'option par défaut pour enregistrer les pages. Les options alternatives apparaissent dans le menu déroulant à côté du bouton principal."
+	},
+	"saveBehaviorLabel": {
+		"message": "Comportement de sauvegarde"
 	},
 	"saveFile": {
 		"message": "Enregistrer le fichier..."

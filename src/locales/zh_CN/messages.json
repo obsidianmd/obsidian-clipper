@@ -118,6 +118,9 @@
 	"commandToggleHighlighter": {
 		"message": "切换高亮模式"
 	},
+	"commandToggleReader": {
+		"message": "切换阅读视图"
+	},
 	"confirmDeleteTemplate": {
 		"message": "确定要删除模板「$1」吗？"
 	},
@@ -162,6 +165,9 @@
 	},
 	"disableHighlighter": {
 		"message": "禁用高亮"
+	},
+	"disableReader": {
+		"message": "禁用阅读视图"
 	},
 	"done": {
 		"message": "完成"
@@ -220,6 +226,9 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"enableReader": {
+		"message": "打开阅读视图"
 	},
 	"error": {
 		"message": "错误"
@@ -604,6 +613,9 @@
 	"rateExtensionDescription": {
 		"message": "您喜欢使用Web Clipper吗？请帮助我们给它评分。"
 	},
+	"reader": {
+		"message": "阅读器"
+	},
 	"recommended": {
 		"message": "推荐"
 	},
@@ -645,6 +657,12 @@
 	},
 	"save": {
 		"message": "保存"
+	},
+	"saveBehaviorDescription": {
+		"message": "选择保存页面的默认选项。其他选项将出现在主按钮旁边的下拉菜单中。"
+	},
+	"saveBehaviorLabel": {
+		"message": "保存行为"
 	},
 	"saveFile": {
 		"message": "保存文件..."

@@ -118,6 +118,9 @@
 	"commandToggleHighlighter": {
 		"message": "Vaihda korostustila"
 	},
+	"commandToggleReader": {
+		"message": "Vaihda lukunäkymä"
+	},
 	"confirmDeleteTemplate": {
 		"message": "Haluatko varmasti poistaa mallin \"$1\"?"
 	},
@@ -162,6 +165,9 @@
 	},
 	"disableHighlighter": {
 		"message": "Poista korostus käytöstä"
+	},
+	"disableReader": {
+		"message": "Poista lukunäkymä käytöstä"
 	},
 	"done": {
 		"message": "Valmis"
@@ -220,6 +226,9 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"enableReader": {
+		"message": "Avaa lukunäkymä"
 	},
 	"error": {
 		"message": "Virhe"
@@ -612,6 +621,9 @@
 	"rateExtensionDescription": {
 		"message": "Pidätkö Web Clipperista? Auta meitä antamalla sille arvostelu."
 	},
+	"reader": {
+		"message": "Lukija"
+	},
 	"recommended": {
 		"message": "suositeltu"
 	},
@@ -653,6 +665,12 @@
 	},
 	"save": {
 		"message": "Tallenna"
+	},
+	"saveBehaviorDescription": {
+		"message": "Valitse oletusvaihtoehto sivujen tallentamiseksi. Vaihtoehtoiset vaihtoehdot näkyvät pääpainikkeen vieressä olevasta pudotusvalikosta."
+	},
+	"saveBehaviorLabel": {
+		"message": "Tallennuskäyttäytyminen"
 	},
 	"saveFile": {
 		"message": "Tallenna tiedosto..."
