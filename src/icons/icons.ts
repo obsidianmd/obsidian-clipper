@@ -34,7 +34,7 @@ export const icons = {
 	AlertTriangle,
 	AlignLeft,
 	ArrowUpRight,
-	Binary,	
+	Binary,
 	BookOpen,
 	Calendar,
 	ChevronDown,

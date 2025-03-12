@@ -194,6 +194,7 @@ export function initializeGeneralSettings(): void {
 		initializeExportImportAllSettingsButtons();
 		initializeHighlighterSettings();
 		initializeExportHighlightsButton();
+		initializeSaveBehaviorDropdown();
 		await initializeUsageChart();
 
 		// Initialize feedback modal close button
@@ -314,6 +315,17 @@ function initializeResetDefaultTemplateButton(): void {
 	if (resetDefaultTemplateBtn) {
 		resetDefaultTemplateBtn.addEventListener('click', resetDefaultTemplate);
 	}
+}
+
+function initializeSaveBehaviorDropdown(): void {
+    const dropdown = document.getElementById('save-behavior-dropdown') as HTMLSelectElement;
+    if (!dropdown) return;
+
+    dropdown.value = generalSettings.saveBehavior;
+    dropdown.addEventListener('change', () => {
+        const newValue = dropdown.value as 'addToObsidian' | 'copyToClipboard' | 'saveFile';
+        saveSettings({ saveBehavior: newValue });
+    });
 }
 
 export function resetDefaultTemplate(): void {
@@ -443,4 +455,17 @@ async function handleRating(rating: number) {
 		const modal = document.getElementById('feedback-modal');
 		showModal(modal);
 	}
+}
+
+function initializeSettingDropdown(
+	elementId: string,
+	defaultValue: string,
+	onChange: (newValue: string) => void
+): void {
+	const dropdown = document.getElementById(elementId) as HTMLSelectElement;
+	if (!dropdown) return;
+	dropdown.value = defaultValue;
+	dropdown.addEventListener('change', () => {
+		onChange(dropdown.value);
+	});
 }

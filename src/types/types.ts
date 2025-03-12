@@ -48,6 +48,8 @@ export interface Rating {
 	date: string;
 }
 
+export type SaveBehavior = 'addToObsidian' | 'saveFile' | 'copyToClipboard';
+
 export interface ReaderSettings {
 	fontSize: number;
 	lineHeight: number;
@@ -81,6 +83,7 @@ export interface Settings {
 	};
 	history: HistoryEntry[];
 	ratings: Rating[];
+	saveBehavior: 'addToObsidian' | 'saveFile' | 'copyToClipboard';
 }
 
 export interface ModelConfig {
