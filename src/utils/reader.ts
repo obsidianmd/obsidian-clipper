@@ -545,156 +545,166 @@ export class Reader {
 	}
 
 	static async apply(doc: Document) {
-		// Store original HTML for restoration
-		this.originalHTML = doc.documentElement.outerHTML;
-		
-		// Load reader CSS
-		if (!this.readerStyles) {
-			const cssUrl = browser.runtime.getURL('reader.css');
+		try {
+			// Store original HTML for restoration
+			this.originalHTML = doc.documentElement.outerHTML;
 			
-			this.readerStyles = doc.createElement('link');
-			this.readerStyles.id = 'obsidian-reader-styles';
-			this.readerStyles.rel = 'stylesheet';
-			this.readerStyles.href = cssUrl;
+			// Load reader CSS first and wait for it to load
+			if (!this.readerStyles) {
+				const cssUrl = browser.runtime.getURL('reader.css');
 
-			doc.head.appendChild(this.readerStyles);
-		}
-		// Load saved settings
-		await this.loadSettings();
+				const cssLoaded = new Promise((resolve, reject) => {
+					this.readerStyles = doc.createElement('link');
+					this.readerStyles.id = 'obsidian-reader-styles';
+					this.readerStyles.rel = 'stylesheet';
+					this.readerStyles.href = cssUrl;
+					
+					this.readerStyles.onload = () => resolve(true);
+					this.readerStyles.onerror = (e) => reject(e);
+					
+					doc.head.appendChild(this.readerStyles);
+				});
 
-		// Remove page scripts and their effects
-		this.cleanupScripts(doc);
-		
-		// Clean the html element but preserve lang and dir attributes
-		const htmlElement = doc.documentElement;
-		const lang = htmlElement.getAttribute('lang');
-		const dir = htmlElement.getAttribute('dir');
-		
-		Array.from(htmlElement.attributes).forEach(attr => {
-			htmlElement.removeAttribute(attr.name);
-		});
-		
-		// Restore lang and dir if they existed
-		if (lang) htmlElement.setAttribute('lang', lang);
-		if (dir) htmlElement.setAttribute('dir', dir);
-		
-		// Extract content using extractors or Defuddle
-		const { content, title, author, published, domain, extractorType } = this.extractContent(doc);
-		if (!content) {
-			console.log('Reader', 'Failed to extract content');
-			return;
-		}
+				// Wait for CSS to load
+				await cssLoaded;
+			}
 
-		// Format the published date if it exists
-		let formattedDate = '';
-		if (published) {
-			try {
-				const date = new Date(published);
-				if (!isNaN(date.getTime())) {
-					formattedDate = new Intl.DateTimeFormat(undefined, {
-						year: 'numeric',
-						month: 'long',
-						day: 'numeric',
-						timeZone: 'UTC'
-					}).format(date);
-				} else {
+			// Load saved settings
+			await this.loadSettings();
+
+			// Remove page scripts and their effects
+			this.cleanupScripts(doc);
+			
+			// Clean the html element but preserve lang and dir attributes
+			const htmlElement = doc.documentElement;
+			const lang = htmlElement.getAttribute('lang');
+			const dir = htmlElement.getAttribute('dir');
+			
+			// Restore lang and dir if they existed
+			if (lang) htmlElement.setAttribute('lang', lang);
+			if (dir) htmlElement.setAttribute('dir', dir);
+			
+			// Extract content using extractors or Defuddle
+			const { content, title, author, published, domain, extractorType } = this.extractContent(doc);
+			if (!content) {
+				console.log('Reader', 'Failed to extract content');
+				return;
+			}
+
+			// Format the published date if it exists
+			let formattedDate = '';
+			if (published) {
+				try {
+					const date = new Date(published);
+					if (!isNaN(date.getTime())) {
+						formattedDate = new Intl.DateTimeFormat(undefined, {
+							year: 'numeric',
+							month: 'long',
+							day: 'numeric',
+							timeZone: 'UTC'
+						}).format(date);
+					} else {
+						formattedDate = published;
+					}
+				} catch (e) {
 					formattedDate = published;
+					console.log('Reader', 'Error formatting date:', e);
 				}
-			} catch (e) {
-				formattedDate = published;
-				console.log('Reader', 'Error formatting date:', e);
 			}
-		}
 
-		// Clean up head - remove unwanted elements but keep meta tags and non-stylesheet links
-		const head = doc.head;
+			// Clean up head - remove unwanted elements but keep meta tags and non-stylesheet links
+			const head = doc.head;
 
-		// Remove scripts except JSON-LD schema
-		const scripts = head.querySelectorAll('script:not([type="application/ld+json"])');
-		scripts.forEach(el => el.remove());
+			// Remove scripts except JSON-LD schema
+			const scripts = head.querySelectorAll('script:not([type="application/ld+json"])');
+			scripts.forEach(el => el.remove());
 
-		// Remove base tags
-		const baseTags = head.querySelectorAll('base');
-		baseTags.forEach(el => el.remove());
+			// Remove base tags
+			const baseTags = head.querySelectorAll('base');
+			baseTags.forEach(el => el.remove());
 
-		// Remove stylesheet links and style tags, except reader styles
-		const styleElements = head.querySelectorAll('link[rel="stylesheet"], link[as="style"], style');
-		styleElements.forEach(el => {
-			if (el.id !== 'obsidian-reader-styles') {
-				el.remove();
+			// Remove stylesheet links and style tags, except reader styles
+			const styleElements = head.querySelectorAll('link[rel="stylesheet"], link[as="style"], style');
+			styleElements.forEach(el => {
+				if (el.id !== 'obsidian-reader-styles') {
+					el.remove();
+				}
+			});
+
+			// Ensure we have our required meta tags
+			const existingViewport = head.querySelector('meta[name="viewport"]');
+			if (existingViewport) {
+				existingViewport.setAttribute('content', VIEWPORT);
+			} else {
+				const viewport = document.createElement('meta');
+				viewport.setAttribute('name', 'viewport');
+				viewport.setAttribute('content', VIEWPORT);
+				head.appendChild(viewport);
 			}
-		});
 
-		// Ensure we have our required meta tags
-		const existingViewport = head.querySelector('meta[name="viewport"]');
-		if (existingViewport) {
-			existingViewport.setAttribute('content', VIEWPORT);
-		} else {
-			const viewport = document.createElement('meta');
-			viewport.setAttribute('name', 'viewport');
-			viewport.setAttribute('content', VIEWPORT);
-			head.appendChild(viewport);
-		}
+			const existingCharset = head.querySelector('meta[charset]');
+			if (existingCharset) {
+				existingCharset.setAttribute('charset', 'UTF-8');
+			} else {
+				const charset = document.createElement('meta');
+				charset.setAttribute('charset', 'UTF-8');
+				head.insertBefore(charset, head.firstChild);
+			}
 
-		const existingCharset = head.querySelector('meta[charset]');
-		if (existingCharset) {
-			existingCharset.setAttribute('charset', 'UTF-8');
-		} else {
-			const charset = document.createElement('meta');
-			charset.setAttribute('charset', 'UTF-8');
-			head.insertBefore(charset, head.firstChild);
-		}
-
-		doc.body.innerHTML = `
-			<div class="obsidian-reader-container">
-				<div class="obsidian-left-sidebar">
-					<div class="obsidian-reader-outline"></div>
-				</div>
-				<div class="obsidian-reader-content">
-					<article>
-					${title ? `<h1>${title}</h1>` : ''}
-						<div class="metadata">
-							<div class="metadata-details">
-								${[
-									author ? `${author}` : '',
-									formattedDate || '',
-									domain ? `<a href="${doc.URL}">${domain}</a>` : ''
-								].filter(Boolean).map(item => `<span>${item}</span>`).join('<span> · </span>')}
+			doc.body.innerHTML = `
+				<div class="obsidian-reader-container">
+					<div class="obsidian-left-sidebar">
+						<div class="obsidian-reader-outline"></div>
+					</div>
+					<div class="obsidian-reader-content">
+						<article>
+						${title ? `<h1>${title}</h1>` : ''}
+							<div class="metadata">
+								<div class="metadata-details">
+									${[
+										author ? `${author}` : '',
+										formattedDate || '',
+										domain ? `<a href="${doc.URL}">${domain}</a>` : ''
+									].filter(Boolean).map(item => `<span>${item}</span>`).join('<span> · </span>')}
+								</div>
 							</div>
-						</div>
-						${content}
-					</article>
+							${content}
+						</article>
+					</div>
+					<div class="obsidian-reader-right-sidebar"></div>
 				</div>
-				<div class="obsidian-reader-right-sidebar"></div>
-			</div>
-		`;
+			`;
 
-		doc.documentElement.className = 'obsidian-reader-active';
-		if (extractorType) {
-			doc.documentElement.setAttribute('data-reader-extractor', extractorType);
+			// Add reader classes and attributes
+			doc.documentElement.classList.add('obsidian-reader-active');
+			if (extractorType) {
+				doc.documentElement.setAttribute('data-reader-extractor', extractorType);
+			}
+			doc.documentElement.setAttribute('data-reader-theme', this.settings.theme);
+			
+			// Apply theme mode
+			this.updateThemeMode(doc, this.settings.themeMode);
+
+			// Initialize settings from local storage
+			doc.documentElement.style.setProperty('--obsidian-reader-font-size', `${this.settings.fontSize}px`);
+			doc.documentElement.style.setProperty('--obsidian-reader-line-height', this.settings.lineHeight.toString());
+			doc.documentElement.style.setProperty('--obsidian-reader-line-width', `${this.settings.maxWidth}em`);
+
+			// Add settings bar and outline
+			this.injectSettingsBar(doc);
+			this.observer = this.generateOutline(doc);
+			
+			this.initializeFootnotes(doc);
+			this.initializeCodeHighlighting(doc);
+
+			// Set up color scheme media query listener
+			this.colorSchemeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+			this.colorSchemeMediaQuery.addEventListener('change', (e) => this.handleColorSchemeChange(e, doc));
+			
+			this.isActive = true;
+		} catch (e) {
+			console.error('Reader', 'Error during apply:', e);
 		}
-		doc.documentElement.setAttribute('data-reader-theme', this.settings.theme);
-		
-		// Apply theme mode
-		this.updateThemeMode(doc, this.settings.themeMode);
-
-		// Initialize settings from local storage
-		doc.documentElement.style.setProperty('--obsidian-reader-font-size', `${this.settings.fontSize}px`);
-		doc.documentElement.style.setProperty('--obsidian-reader-line-height', this.settings.lineHeight.toString());
-		doc.documentElement.style.setProperty('--obsidian-reader-line-width', `${this.settings.maxWidth}em`);
-
-		// Add settings bar and outline
-		this.injectSettingsBar(doc);
-		this.observer = this.generateOutline(doc);
-		
-		this.initializeFootnotes(doc);
-		this.initializeCodeHighlighting(doc);
-
-		// Set up color scheme media query listener
-		this.colorSchemeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-		this.colorSchemeMediaQuery.addEventListener('change', (e) => this.handleColorSchemeChange(e, doc));
-		
-		this.isActive = true;
 	}
 
 	static restore(doc: Document) {
