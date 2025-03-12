@@ -43,6 +43,12 @@
 			"css": ["highlighter.css"]
 		}
 	],
+	"web_accessible_resources": [
+		{
+			"resources": ["reader.css"],
+			"matches": ["http://*/*", "https://*/*"]
+		}
+	],
 	"content_security_policy": {
 		"extension_pages": "script-src 'self'; object-src 'self'"
 	},

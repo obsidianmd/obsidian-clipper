@@ -1,0 +1,710 @@
+
+.obsidian-reader-active[data-reader-theme="flexoki"] {
+	--obsidian-reader-background-primary: #FFFCF0;
+	--obsidian-reader-background-primary-alt: #F2F0E5;
+	--obsidian-reader-text-primary: #100F0F;
+	--obsidian-reader-text-muted: #5c5c5c;
+	--obsidian-reader-text-faint: #B7B5AC;
+	--obsidian-reader-text-accent: #100F0F;
+	--obsidian-reader-text-accent-hover: #24837B;
+	--obsidian-reader-border: #E6E4D9;
+	--obsidian-reader-text-selection: #DDF1E4;
+	--obsidian-reader-color-red: #AF3029;
+	--obsidian-reader-color-orange: #BC5215;
+	--obsidian-reader-color-yellow: #AD8301;
+	--obsidian-reader-color-green: #66800B;
+	--obsidian-reader-color-cyan: #24837B;
+	--obsidian-reader-color-blue: #205EA6;
+	--obsidian-reader-color-purple: #5E409D;
+	--obsidian-reader-color-pink: #A02F6F;
+
+	&.theme-dark {
+		--obsidian-reader-background-primary: #100F0F;
+		--obsidian-reader-background-primary-alt: #1C1B1A;
+		--obsidian-reader-text-primary: #CECDC3;
+		--obsidian-reader-text-muted: #878580;
+		--obsidian-reader-text-faint: #575653;
+		--obsidian-reader-text-accent: #CECDC3;
+		--obsidian-reader-text-accent-hover: #3AA99F;
+		--obsidian-reader-border: #282726;
+		--obsidian-reader-text-selection: #101F1D;
+		--obsidian-reader-color-red: #D14D41;
+		--obsidian-reader-color-orange: #DA702C;
+		--obsidian-reader-color-yellow: #D0A215;
+		--obsidian-reader-color-green: #879A39;
+		--obsidian-reader-color-cyan: #3AA99F;
+		--obsidian-reader-color-blue: #4385BE;
+		--obsidian-reader-color-purple: #8B7EC8;
+		--obsidian-reader-color-pink: #CE5D97;
+	}
+}
+
+.obsidian-reader-active {
+	--obsidian-reader-background-primary: #fff;
+	--obsidian-reader-background-primary-alt: #fcfcfc;
+	--obsidian-reader-text-primary: #222222;
+	--obsidian-reader-text-muted: #5c5c5c;
+	--obsidian-reader-text-faint: #ababab;
+	--obsidian-reader-text-accent: #222222;
+	--obsidian-reader-text-accent-hover: #8a5cf5;
+	--obsidian-reader-border: #e0e0e0;
+	--obsidian-reader-text-selection: #E8DFFD;
+	--shadow-s:
+		0px 1px 2px rgba(0, 0, 0, .028),
+		0px 3.4px 6.7px rgba(0, 0, 0, .042),
+		0px 15px 30px rgba(0, 0, 0, .07);
+	--obsidian-reader-footnote-popover-background: var(--obsidian-reader-background-primary);
+
+	--obsidian-reader-color-red: #e93147;
+	--obsidian-reader-color-orange: #ec7500;
+	--obsidian-reader-color-yellow: #e0ac00;
+	--obsidian-reader-color-green: #08b94e;
+	--obsidian-reader-color-cyan: #00bfbc;
+	--obsidian-reader-color-blue: #086ddd;
+	--obsidian-reader-color-purple: #7852ee;
+	--obsidian-reader-color-pink: #d53984;
+
+	&.theme-dark {
+		color-scheme: dark;
+		--obsidian-reader-background-primary: #1e1e1e;
+		--obsidian-reader-background-primary-alt: #212121;
+		--obsidian-reader-text-primary: #dadada;
+		--obsidian-reader-text-muted: #b3b3b3;
+		--obsidian-reader-text-faint: #666666;
+		--obsidian-reader-text-accent: #dadada;
+		--obsidian-reader-text-accent-hover: #a68af9;
+		--obsidian-reader-border: #363636;
+		--obsidian-reader-text-selection: #3A2D53;
+		--shadow-s:
+			0px 1px 2px rgba(0, 0, 0, 0.121),
+			0px 3.4px 6.7px rgba(0, 0, 0, 0.179),
+			0px 15px 30px rgba(0, 0, 0, 0.3);
+		--obsidian-reader-footnote-popover-background: var(--obsidian-reader-background-primary-alt);
+		--obsidian-reader-color-red: #fb464c;
+		--obsidian-reader-color-orange: #e9973f;
+		--obsidian-reader-color-yellow: #e0de71;
+		--obsidian-reader-color-green: #44cf6e;
+		--obsidian-reader-color-cyan: #53dfdd;
+		--obsidian-reader-color-blue: #54b3ff;
+		--obsidian-reader-color-purple: #a882ff;
+		--obsidian-reader-color-pink: #fa99cd;
+	}
+
+	// Highlight.js theme
+	// https://highlightjs.readthedocs.io/en/latest/css-classes-reference.html
+	.hljs {
+		color: var(--obsidian-reader-text-primary);
+		color: var(--obsidian-reader-text-primary);
+	}
+
+	.hljs-operator { color: var(--obsidian-reader-text-muted); }
+	.hljs-punctuation { color: var(--obsidian-reader-text-muted); }
+	.hljs-comment { color: var(--obsidian-reader-text-muted); }
+	
+	.hljs-params { color: var(--obsidian-reader-text-primary); }
+	
+	.hljs-link { color: var(--obsidian-reader-color-blue); }
+
+	.hljs-keyword { color: var(--obsidian-reader-color-cyan); }
+
+	.hljs-name { color: var(--obsidian-reader-color-pink); }
+
+	.hljs-variable.language_ { color: var(--obsidian-reader-color-purple); }
+	.hljs-selector-attr { color: var(--obsidian-reader-color-pink); }
+	.hljs-number { color: var(--obsidian-reader-color-purple); }
+
+	.hljs-type { color: var(--obsidian-reader-color-yellow); }
+	.hljs-title.class_ { color: var(--obsidian-reader-color-yellow); }
+
+	.hljs-selector-tag { color: var(--obsidian-reader-color-yellow); }
+	
+	.hljs-literal { color: var(--obsidian-reader-color-orange); }
+	.hljs-variable { color: var(--obsidian-reader-color-orange); }
+	.hljs-variable.constant_ { color: var(--obsidian-reader-color-orange); }
+	.hljs-meta { color: var(--obsidian-reader-color-orange); }
+	
+	.hljs-title { color: var(--obsidian-reader-color-blue); }
+	.hljs-title.function_ { color: var(--obsidian-reader-color-blue); }
+	.hljs-section { color: var(--obsidian-reader-color-blue); }
+	.hljs-attr { color: var(--obsidian-reader-color-blue); }
+	.hljs-selector-id { color: var(--obsidian-reader-color-blue); }
+	
+	.hljs-property { color: var(--obsidian-reader-color-cyan); }
+	.hljs-tag { color: var(--obsidian-reader-color-cyan); }
+	.hljs-bullet { color: var(--obsidian-reader-color-cyan); }
+	.hljs-formula { color: var(--obsidian-reader-color-cyan); }
+	.hljs-selector-class { color: var(--obsidian-reader-color-cyan); }
+	.hljs-selector-pseudo { color: var(--obsidian-reader-color-cyan); }
+	
+	.hljs-string { color: var(--obsidian-reader-color-green); }
+	.hljs-char.escape_ { color: var(--obsidian-reader-color-green); }
+	.hljs-attribute { color: var(--obsidian-reader-color-green); }
+	.hljs-code { color: var(--obsidian-reader-color-green); }
+	.hljs-quote { color: var(--obsidian-reader-color-green); }
+	.hljs-addition { color: var(--obsidian-reader-color-green); }
+	
+	.hljs-built_in { color: var(--obsidian-reader-color-red); }
+	.hljs-regexp { color: var(--obsidian-reader-color-red); }
+	.hljs-symbol { color: var(--obsidian-reader-color-red); }
+	.hljs-doctag { color: var(--obsidian-reader-color-red); }
+	.hljs-emphasis { color: var(--obsidian-reader-color-red); }
+	.hljs-strong { color: var(--obsidian-reader-color-red); }
+	.hljs-template-tag { color: var(--obsidian-reader-color-red); }
+	.hljs-template-variable { color: var(--obsidian-reader-color-red); }
+	.hljs-deletion { color: var(--obsidian-reader-color-red); }
+
+	.hljs-emphasis {
+		font-style: italic;
+	}
+	.hljs-strong {
+		font-weight: bold;
+	}
+}
+
+.obsidian-reader-active {
+	&.theme-light {
+		img, svg {
+			mix-blend-mode: multiply;
+		}
+	}
+	&.theme-dark {
+		.mw-invert {
+			filter: invert(1);
+		}
+		.invert-images {
+			img, svg {
+				filter: invert(1) hue-rotate(180deg);
+				mix-blend-mode: screen;
+			}
+		}
+	}
+}
+
+.obsidian-reader-active	body {
+	--obsidian-reader-font-family: system-ui, -apple-system, sans-serif;
+	--obsidian-reader-dynamic-font-size: calc(var(--obsidian-reader-font-size) + 0.25vw);
+	--obsidian-reader-sidebar-width: 240px;
+
+	background: var(--obsidian-reader-background-primary) !important;
+	margin: 0 !important;
+	padding: 0 !important;
+	color: var(--obsidian-reader-text-primary) !important;
+	font-size: var(--obsidian-reader-dynamic-font-size) !important;
+	line-height: var(--obsidian-reader-line-height) !important;
+	font-family: var(--obsidian-reader-font-family) !important;
+	-webkit-font-smoothing: antialiased !important;
+
+	::selection {
+		background-color: var(--obsidian-reader-text-selection);
+	}
+
+	.obsidian-reader-content {
+		padding: max(4rem, 4vh) 0 40vh !important;	
+		width: var(--obsidian-reader-line-width);
+		max-width: calc(100vw - var(--obsidian-reader-sidebar-width));
+		overflow: hidden;
+		> article {
+			margin: 0 auto;
+			max-width: 100%;
+		}
+	}
+	.obsidian-left-sidebar {
+		min-width: 200px;
+	}
+	.obsidian-left-sidebar,
+	.obsidian-right-sidebar {
+		max-width: var(--obsidian-reader-sidebar-width);
+	}
+	h1 {
+		margin: 0 0 0.5em 0;
+		line-height: calc(var(--obsidian-reader-line-height) * 0.75);
+	}
+
+	h1 { 
+		font-weight: 700;
+		font-size: 1.6em;
+		letter-spacing: -0.02em;
+		line-height: calc(var(--obsidian-reader-line-height) * 0.75);
+		margin-bottom: 0.5em;
+	}
+	h2 {
+		font-weight: 700;
+		font-size: 1.3em;
+		letter-spacing: -0.015em;
+		margin-top: 1.8em;
+		margin-bottom: 0.5em;
+		line-height: calc(var(--obsidian-reader-line-height) * 0.85);
+	}
+	h3 { 
+		font-weight: 700;
+		font-size: 1.225em;
+		line-height: calc(var(--obsidian-reader-line-height) * 0.85);
+		margin-top: 2em;
+		margin-bottom: 0.5em;
+	}
+	h4 { 
+		font-size: 1.15em;
+		font-weight: 700;
+		line-height: calc(var(--obsidian-reader-line-height) * 0.85);
+		margin-top: 2em;
+		margin-bottom: 0;
+	}
+	h5 {
+		font-weight: 700;
+		line-height: calc(var(--obsidian-reader-line-height) * 0.85);
+		margin-bottom: 1em;
+		font-size: 1em;
+	}
+	h6 {
+		font-weight: 700;
+		line-height: calc(var(--obsidian-reader-line-height) * 0.85);
+		text-transform: uppercase;
+		margin-bottom: 1em;
+		letter-spacing: 0.05em;
+		font-size: 1em;
+	}
+
+	h1 + h2,
+	h2 + h2,
+	h2 + h3,
+	h3 + h4 {
+		margin-top: 0em;
+	}
+
+	.metadata {
+		margin-bottom: max(2rem, 3vh);
+	}
+	.metadata-details {
+		color: var(--obsidian-reader-text-muted);
+		font-size: 0.9em;
+
+		a {
+			color: inherit;
+			text-decoration: none;
+			color: var(--obsidian-reader-text-muted);
+		}
+		a:hover {
+			text-decoration: underline;
+		}
+	}
+	img, video, figure, svg {
+		max-width: 100%;
+		height: auto;
+		border-radius: 4px;
+		vertical-align: bottom;
+	}
+	iframe {
+		max-width: 100%;
+		width: 100%;
+		border-radius: 4px;
+		overflow: hidden;
+		border: none;
+		&[src*="youtube.com"] {
+			aspect-ratio: 16 / 9;
+			height: auto;
+		}
+	}
+	figure {
+		margin-inline-start: 0;
+		margin-inline-end: 0;
+		overflow-x: auto;
+	}
+	a {
+		color: var(--obsidian-reader-text-accent);
+		&:hover {
+			color: var(--obsidian-reader-text-accent-hover);
+		}
+	}
+	audio {
+		max-width: 100%;
+		outline: none;
+		width: 100%;
+		height: 42px;
+		&::-webkit-media-controls {
+			color: var(--obsidian-reader-text-primary);
+		}
+		&::-webkit-media-controls-enclosure {
+			border-radius: 8px;
+			border: 1px solid var(--obsidian-reader-border);
+			background-color: var(--obsidian-reader-background-primary-alt);
+		}
+		&::-webkit-media-controls-current-time-display,
+		&::-webkit-media-controls-time-remaining-display {
+			font-family: var(--obsidian-reader-font-family);
+		}
+	}
+	blockquote {
+		padding-left: 1.5em;
+		margin: 1.5em 0;
+		border-left: 2px solid var(--obsidian-reader-text-faint);
+	}
+	small[class*="caption"],
+	figcaption,
+	caption {
+		color: var(--obsidian-reader-text-muted);
+		font-size: 85%;
+		margin-top: 1em;
+		margin-bottom: 1em;
+		line-height: calc(var(--obsidian-reader-line-height) * 0.9);
+		a {
+			color: var(--obsidian-reader-text-muted);
+		}
+	}
+	sup {
+		a {
+			text-decoration: none;
+			color: var(--obsidian-reader-text-muted);
+		}
+	}
+	hr {
+		background-color: var(--obsidian-reader-border);
+		width: 100%;
+		border: 0;
+		height: 1px;
+		margin: 1.5em 0;
+	}
+	// Maybe confusing but conflicts with user highlights 
+	mark {
+		background-color: transparent;
+	}
+	ul > li {
+		list-style: disc;
+	}
+	ol, ul {
+		padding: 0.5rem 0 1rem 1em;
+		margin: 0 0 0 0.5em;
+	}
+	ol > li,
+	ul > li {
+		padding: 0.15rem 0;
+		&::marker {
+			color: var(--obsidian-reader-text-faint);
+		}
+		p,
+		> div p {
+			margin-bottom: 0;
+			margin-top: 0;
+		}
+	}
+	ul > li {
+		&::marker {
+			font-size: 95%;
+		}
+	}
+	pre, code, kbd, tt {
+		background-color: var(--obsidian-reader-background-primary-alt);
+		border-radius: 6px;
+		border: 1px solid var(--obsidian-reader-border);
+		font-size: 0.8em;
+	}
+	code, kbd, tt {
+		padding: 0.1em 0.25em;
+	}
+	pre {
+		white-space: pre;
+		max-width: 100%;
+		overflow-x: auto;
+		padding: 12px 16px;
+		pre,
+		code {
+			font-size: inherit;
+			border: none;
+			background-color: transparent;
+			padding: 0 !important;
+		}
+	}
+	code[class*="language-"],
+	pre[class*="language-"] {
+		color: var(--obsidian-reader-text-normal);
+		word-wrap: break-word;
+		white-space: pre-wrap;
+		word-break: normal;
+		word-spacing: normal;
+		-webkit-hyphens: none;
+		hyphens: none;
+	}
+	table {
+		overflow-x: auto;
+		font-size: 0.9em;
+		line-height: calc(var(--obsidian-reader-line-height) * 0.9);
+		border-collapse: collapse !important;
+		tr {
+			td, th {
+				padding: 0.25em 0.5em !important;
+				border: 1px solid var(--obsidian-reader-border) !important;
+			}
+		}
+	}
+
+	.footnotes {
+		margin-top: 4em;
+		font-size: 0.85em;
+		color: var(--obsidian-reader-text-muted);
+
+		ol {
+			padding-left: 1.5em;
+		}
+		li {
+			p {
+				margin: 0.25em 0;
+			}
+			a {
+				color: var(--obsidian-reader-text-muted);
+			}
+			a.footnote-backref {
+				text-decoration: none;
+				color: var(--obsidian-reader-text-faint);
+				&:hover {
+					color: var(--obsidian-reader-text-accent-hover);
+				}
+			}
+		}
+	}
+
+	sup[id^="fnref"] {
+		margin: 0 0.1em 0 0;
+		
+		a {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			height: 1.4em;
+			padding: 0 0.5em;
+			border-radius: 1em;
+			background: var(--obsidian-reader-background-primary-alt);
+			color: var(--obsidian-reader-text-muted);
+			text-decoration: none;
+			font-size: 0.75em;
+			font-weight: 500;
+			line-height: 1;
+			cursor: pointer;
+			user-select: none;
+
+			&:hover {
+				background: var(--obsidian-reader-border);
+				color: var(--obsidian-reader-text-primary);
+			}
+
+			&.active {
+				background: var(--obsidian-reader-text-accent);
+				border-color: var(--obsidian-reader-text-accent);
+				color: var(--obsidian-reader-background-primary);
+			}
+		}
+	}
+
+	.footnote-popover {
+		position: fixed;
+		z-index: 9999999999;
+		max-width: min(calc(100vw - 40px), 400px);
+		max-height: 80vh;
+		padding: 12px 16px;
+		background: var(--obsidian-reader-footnote-popover-background);
+		border: 1px solid var(--obsidian-reader-border);
+		border-radius: 8px;
+		box-shadow: var(--shadow-s);
+		font-size: 0.80em;
+		line-height: 1.5;
+		opacity: 0;
+		visibility: hidden;
+		transform: translateY(8px);
+		transition:
+			opacity 0.2s ease,
+			transform 0.2s ease,
+			visibility 0s linear 0.2s;
+		overflow-y: auto;
+
+		// Arrow
+		&::before,
+		&::after {
+			content: '';
+			position: absolute;
+			left: var(--arrow-offset, 50%);
+			transform: translateX(-50%);
+			width: 0;
+			height: 0;
+			pointer-events: none;
+		}
+
+		// Arrow border
+		&::before {
+			border: 8px solid transparent;
+		}
+
+		// Arrow background
+		&::after {
+			border: 7px solid transparent;
+		}
+
+		// Top arrow (when popover is below)
+		&[data-position="bottom"] {
+			&::before {
+				top: -16px;
+				border-bottom-color: var(--obsidian-reader-border);
+			}
+			&::after {
+				top: -14px;
+				border-bottom-color: var(--obsidian-reader-background-primary);
+			}
+		}
+
+		// Bottom arrow (when popover is above)
+		&[data-position="top"] {
+			&::before {
+				bottom: -16px;
+				border-top-color: var(--obsidian-reader-border);
+			}
+			&::after {
+				bottom: -14px;
+				border-top-color: var(--obsidian-reader-background-primary);
+			}
+		}
+
+		.footnote-backref {
+			display: none;
+		}
+
+		&.active {
+			opacity: 1;
+			visibility: visible;
+			transform: translateY(0);
+			transition:
+				opacity 0.2s ease,
+				transform 0.2s ease;
+		}
+
+		p {
+			margin: 0.5em 0;
+			&:first-child {
+				margin-top: 0;
+			}
+			&:last-child {
+				margin-bottom: 0;
+			}
+		}
+
+		.footnote-backref {
+			display: none;
+		}
+	}
+}
+
+.obsidian-reader-settings {
+	position: fixed;
+	top: 0;
+	right: 0;
+	background: var(--obsidian-reader-background-primary);
+	padding: 20px;
+	opacity: 0;
+	z-index: 999999999;
+	font-family: var(--obsidian-reader-font-family);
+}
+.obsidian-reader-settings:hover {
+	opacity: 1;
+}
+.obsidian-reader-settings-controls {
+	display: grid;
+	align-items: center;
+	gap: 4px;
+}
+.obsidian-reader-settings-button {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 24px;
+	height: 24px;
+	border: none;
+	background: transparent;
+	border-radius: 12px;
+	color: var(--obsidian-reader-text-muted);
+	cursor: pointer;
+	padding: 0;
+}
+.obsidian-reader-settings-button:hover {
+	background: var(--obsidian-reader-background-primary-alt);
+	color: var(--obsidian-reader-text-primary);
+}
+.obsidian-reader-settings-select {
+	background: transparent;
+	border: none;
+	color: var(--obsidian-reader-text-muted);
+	font-family: var(--obsidian-reader-font-family);
+	font-size: 12px;
+	padding: 4px;
+	border-radius: 12px;
+	cursor: pointer;
+	margin-left: 4px;
+
+	&:hover {
+		background: var(--obsidian-reader-background-primary-alt);
+		color: var(--obsidian-reader-text-primary);
+	}
+	&:focus {
+		outline: none;
+		background: var(--obsidian-reader-background-primary-alt);
+		color: var(--obsidian-reader-text-primary);
+	}
+}
+.obsidian-reader-container {
+	display: grid;
+	grid-template-columns: 1fr auto 1fr;
+	gap: 20px;
+	width: 100%;
+	margin: 0 auto;
+}
+.obsidian-reader-outline {
+	box-sizing: border-box;
+	background: var(--obsidian-reader-background-primary);
+	position: sticky;
+	top: 0;
+	height: 100vh;
+	padding: max(4rem, 4vh) 20px 20px 20px;
+	overflow-y: auto;
+	font-size: 14px;
+}
+.obsidian-reader-outline-item {
+	color: var(--obsidian-reader-text-muted);
+	cursor: pointer;
+	padding: 6px 8px;
+	border-radius: 4px;
+	line-height: 1.15;
+}
+.obsidian-reader-outline-item:hover {
+	color: var(--obsidian-reader-text-primary);
+	background-color: var(--obsidian-reader-background-primary-alt);
+}
+.obsidian-reader-outline-h3 {
+	padding-left: 16px;
+}
+.obsidian-reader-outline-h4 {
+	padding-left: 32px;
+}
+.obsidian-reader-outline-h5,
+.obsidian-reader-outline-h6 {
+	padding-left: 48px;
+}
+.obsidian-reader-outline-item.active {
+	color: var(--obsidian-reader-text-primary);
+	background-color: var(--obsidian-reader-background-primary-alt);
+}
+.obsidian-reader-outline-item.faint {
+	color: var(--obsidian-reader-text-faint);
+}
+.obsidian-reader-outline-item.faint:hover {
+	color: var(--obsidian-reader-text-muted);
+}
+
+@media (max-width: 768px) {
+	.obsidian-reader-container {
+		grid-template-columns: 1fr;
+	}
+	.obsidian-reader-active body .obsidian-reader-content {
+		max-width: 90%;
+		width: 100%;
+		margin: 0 auto;
+	}
+	.obsidian-left-sidebar,
+	.obsidian-right-sidebar {
+		display: none;
+	}
+}
