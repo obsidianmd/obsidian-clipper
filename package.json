@@ -1,8 +1,10 @@
 {
 	"name": "obsidian-clipper",
-	"version": "0.10.8",
+	"version": "0.11.0",
 	"description": "Official web clipper for Obsidian.",
 	"scripts": {
+		"predev": "node scripts/set-defuddle-dev.js",
+		"prebuild": "node scripts/set-defuddle-prod.js",
 		"dev:chrome": "webpack --watch --env BROWSER=chrome --mode development",
 		"dev:firefox": "webpack --watch --env BROWSER=firefox --mode development",
 		"dev:safari": "webpack --watch --env BROWSER=safari --mode development",
@@ -39,11 +41,11 @@
 		"zip-webpack-plugin": "^4.0.1"
 	},
 	"dependencies": {
-		"@mozilla/readability": "^0.5.0",
-		"@types/mozilla-readability": "^0.2.1",
 		"@types/safari-extension": "^0.0.33",
 		"dayjs": "^1.11.13",
+		"defuddle": "0.2.0",
 		"dompurify": "^3.0.9",
+		"highlight.js": "^11.11.1",
 		"lucide": "^0.359.0",
 		"lz-string": "^1.5.0",
 		"mathml-to-latex": "^1.4.1",

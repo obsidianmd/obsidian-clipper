@@ -144,6 +144,10 @@ browser.commands.onCommand.addListener(async (command, tab) => {
 	if (command === "copy_to_clipboard" && tab && tab.id) {
 		await browser.tabs.sendMessage(tab.id, { action: "copyToClipboard" });
 	}
+	if (command === "toggle_reader" && tab && tab.id) {
+		await ensureContentScriptLoaded(tab.id);
+		await browser.tabs.sendMessage(tab.id, { action: "toggleReaderMode" });
+	}
 });
 
 const debouncedUpdateContextMenu = debounce(async (tabId: number) => {
@@ -162,12 +166,17 @@ const debouncedUpdateContextMenu = debounce(async (tabId: number) => {
 		}[] = [
 				{
 					id: "open-obsidian-clipper",
-					title: "Clip this page",
+					title: "Save this page",
 					contexts: ["page", "selection", "image", "video", "audio"]
 				},
+				// {
+				// 	id: "toggle-reader",
+				// 	title: "Reading view",
+				// 	contexts: ["page", "selection"]
+				// },
 				{
 					id: isHighlighterMode ? "exit-highlighter" : "enter-highlighter",
-					title: isHighlighterMode ? "Exit highlighter mode" : "Highlight this page",
+					title: isHighlighterMode ? "Exit highlighter" : "Highligh this page",
 					contexts: ["page","image", "video", "audio"]
 				},
 				{
@@ -212,6 +221,9 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
 		await highlightSelection(tab.id, info);
 	} else if (info.menuItemId === "highlight-element" && tab && tab.id) {
 		await highlightElement(tab.id, info);
+	// } else if (info.menuItemId === "toggle-reader" && tab && tab.id) {
+	// 	await ensureContentScriptLoaded(tab.id);
+	// 	await browser.tabs.sendMessage(tab.id, { action: "toggleReaderMode" });
 	} else if (info.menuItemId === 'open-side-panel' && tab && tab.id && tab.windowId) {
 		chrome.sidePanel.open({ tabId: tab.id });
 		sidePanelOpenWindows.add(tab.windowId);

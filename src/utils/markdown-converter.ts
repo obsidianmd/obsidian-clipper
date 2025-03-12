@@ -5,122 +5,6 @@ import { debugLog } from './debug';
 
 const footnotes: { [key: string]: string } = {};
 
-const SUPPORTED_LANGUAGES = new Set([
-	// Markup & Web
-	'markup', 'html', 'xml', 'svg', 'mathml', 'ssml', 'atom', 'rss',
-	'javascript', 'js', 'jsx', 'typescript', 'ts', 'tsx',
-	'webassembly', 'wasm',
-	
-	// Common Programming Languages
-	'python',
-	'java',
-	'csharp', 'cs', 'dotnet', 'aspnet',
-	'cpp', 'c++', 'c', 'objc',
-	'ruby', 'rb',
-	'php',
-	'golang',
-	'rust',
-	'swift',
-	'kotlin',
-	'scala',
-	'dart',
-	
-	// Shell & Scripting
-	'bash', 'shell', 'sh',
-	'powershell',
-	'batch',
-	
-	// Data & Config
-	'json', 'jsonp',
-	'yaml', 'yml',
-	'toml',
-	'dockerfile',
-	'gitignore',
-	
-	// Query Languages
-	'sql', 'mysql', 'postgresql',
-	'graphql',
-	'mongodb',
-	'sparql',
-	
-	// Markup & Documentation
-	'markdown', 'md',
-	'latex', 'tex',
-	'asciidoc', 'adoc',
-	'jsdoc',
-	
-	// Functional Languages
-	'haskell', 'hs',
-	'elm',
-	'elixir',
-	'erlang',
-	'ocaml',
-	'fsharp',
-	'scheme',
-	'lisp', 'elisp',
-	'clojure',
-	
-	// Other Languages
-	'matlab',
-	'fortran',
-	'cobol',
-	'pascal',
-	'perl',
-	'lua',
-	'julia',
-	'groovy',
-	'crystal',
-	'nim',
-	'zig',
-	
-	// Domain Specific
-	'regex',
-	'gradle',
-	'cmake',
-	'makefile',
-	'nix',
-	'terraform',
-	'solidity',
-	'glsl',
-	'hlsl',
-	
-	// Assembly
-	'nasm',
-	'masm',
-	'armasm',
-	
-	// Game Development
-	'gdscript',
-	'unrealscript',
-	
-	// Others
-	'abap',
-	'actionscript',
-	'ada',
-	'agda',
-	'antlr4',
-	'applescript',
-	'arduino',
-	'coffeescript',
-	'django',
-	'erlang',
-	'fortran',
-	'haxe',
-	'idris',
-	'kotlin',
-	'livescript',
-	'matlab',
-	'nginx',
-	'pascal',
-	'prolog',
-	'puppet',
-	'scala',
-	'scheme',
-	'tcl',
-	'verilog',
-	'vhdl'
-]);
-
 export function createMarkdownContent(content: string, url: string) {
 	debugLog('Markdown', 'Starting markdown conversion for URL:', url);
 	debugLog('Markdown', 'Content length:', content.length);
@@ -272,12 +156,6 @@ export function createMarkdownContent(content: string, url: string) {
 					!!src.match(/(?:youtube\.com|youtu\.be)/) ||
 					!!src.match(/(?:twitter\.com|x\.com)/)
 				);
-			} else if (node instanceof HTMLElement) {
-				if (node.tagName.toLowerCase() === 'lite-youtube') {
-					return true;
-				} else if (node.tagName.toLowerCase() === 'p') {
-					return !!node.querySelector('lite-youtube');
-				}
 			}
 			return false;
 		},
@@ -292,20 +170,6 @@ export function createMarkdownContent(content: string, url: string) {
 					const tweetMatch = src.match(/(?:twitter\.com|x\.com)\/.*?(?:status|statuses)\/(\d+)/);
 					if (tweetMatch && tweetMatch[1]) {
 						return `![](https://x.com/i/status/${tweetMatch[1]})`;
-					}
-				}
-			} else if (node instanceof HTMLElement) {
-				let liteYoutubeElement: HTMLElement | null = null;
-				if (node.tagName.toLowerCase() === 'lite-youtube') {
-					liteYoutubeElement = node;
-				} else if (node.tagName.toLowerCase() === 'p') {
-					liteYoutubeElement = node.querySelector('lite-youtube');
-				}
-				
-				if (liteYoutubeElement) {
-					const videoId = liteYoutubeElement.getAttribute('videoid');
-					if (videoId) {
-						return `![](https://www.youtube.com/watch?v=${videoId})`;
 					}
 				}
 			}
@@ -418,104 +282,31 @@ export function createMarkdownContent(content: string, url: string) {
 		filter: (node: Node): boolean => {
 			if (node instanceof Element) {
 				return (
-					(node.nodeName === 'SUP' && node.classList.contains('reference')) ||
-					(node.nodeName === 'CITE' && node.classList.contains('ltx_cite')) ||
-					(node.nodeName === 'SUP' && node.id.startsWith('fnref:')) ||
-					(node.nodeName === 'SPAN' && node.classList.contains('footnote-link'))
+					(node.nodeName === 'SUP' && node.id.startsWith('fnref:'))
 				);
 			}
 			return false;
 		},
 		replacement: (content, node) => {
 			if (node instanceof HTMLElement) {
-				if (node.nodeName === 'SUP' && node.classList.contains('reference')) {
-					const links = node.querySelectorAll('a');
-					const footnotes = Array.from(links).map(link => {
-						const href = link.getAttribute('href');
-						if (href) {
-							const match = href.split('/').pop()?.match(/(?:cite_note|cite_ref)-(.+)/);
-							if (match) {
-								return `[^${match[1].toLowerCase()}]`;
-							}
-						}
-						return '';
-					});
-					return footnotes.join('');
-				} else if (node.nodeName === 'CITE' && node.classList.contains('ltx_cite')) {
-					const link = node.querySelector('a');
-					if (link) {
-						const href = link.getAttribute('href');
-						if (href) {
-							const match = href.split('/').pop()?.match(/bib\.bib(\d+)/);
-							if (match) {
-								return `[^${match[1].toLowerCase()}]`;
-							}
-						}
-					}
-				} else if (node.nodeName === 'SUP' && node.id.startsWith('fnref:')) {
+				if (node.nodeName === 'SUP' && node.id.startsWith('fnref:')) {
 					const id = node.id.replace('fnref:', '');
-					return `[^${id.toLowerCase()}]`;
-				} else if (node.nodeName === 'SPAN' && node.classList.contains('footnote-link')) {
-					const footnoteId = node.dataset.footnoteId;
-					if (footnoteId) {
-						return `[^${footnoteId}]`;
-					}
-				}
-			}
-			return content;
-		}
-	});
-	
-	turndownService.addRule('inlineFootnotes', {
-		filter: (node: Node): boolean => {
-			return (
-				node instanceof HTMLElement &&
-				(
-				  (node.nodeName === 'SPAN' && node.classList.contains('footnote-link')) ||
-				  (node.nodeName === 'A' && node.classList.contains('citation'))
-				)
-			  );
-		},
-		replacement: (content, node) => {
-			if (node instanceof HTMLElement) {
-				let footnoteId = undefined;
-				let footnoteContent = undefined;
-
-				if (node.nodeName === 'SPAN' && node.classList.contains('footnote-link')) {
-					footnoteId = node.dataset.footnoteId
-					footnoteContent = node.dataset.footnoteContent
-				} else if (node.nodeName === 'A' && node.classList.contains('citation')) {
-					footnoteId = node.textContent;
-					footnoteContent = node.getAttribute('href');
-				}
-				
-				if (footnoteId && footnoteContent) {
-					// Store the footnote content for later use
-					footnotes[footnoteId] = turndownService.turndown(
-						decodeURIComponent(footnoteContent.replace(/&lt;/g, '<').replace(/&gt;/g, '>'))
-					);
-					
-					// Return the footnote reference
-					return `[^${footnoteId}]`;
+					// Extract only the primary number before any hyphen
+					const primaryNumber = id.split('-')[0];
+					return `[^${primaryNumber}]`;
 				}
 			}
 			return content;
 		}
 	});
 
-	// Update the reference list rule
-	turndownService.addRule('referenceList', {
+	// Footnotes list
+	turndownService.addRule('footnotesList', {
 		filter: (node: Node): boolean => {
 			if (node instanceof HTMLOListElement) {
 				return (
-					node.classList.contains('references') ||
-					node.classList.contains('footnotes-list') ||
-					node.parentElement?.classList?.contains('footnote') === true ||
 					node.parentElement?.classList?.contains('footnotes') === true
 				);
-			}
-			if (node instanceof HTMLUListElement) {
-				return node.classList.contains('ltx_biblist')
 			}
 			return false;
 		},
@@ -523,9 +314,7 @@ export function createMarkdownContent(content: string, url: string) {
 			if (node instanceof HTMLElement) {
 				const references = Array.from(node.children).map(li => {
 					let id;
-					if (li.id.startsWith('bib.bib')) {
-						id = li.id.replace('bib.bib', '');
-					} else if (li.id.startsWith('fn:')) {
+					if (li.id.startsWith('fn:')) {
 						id = li.id.replace('fn:', '');
 					} else {
 						const match = li.id.split('/').pop()?.match(/cite_note-(.+)/);
@@ -553,44 +342,11 @@ export function createMarkdownContent(content: string, url: string) {
 	turndownService.addRule('removals', {
 		filter: function (node) {
 			if (!(node instanceof HTMLElement)) return false;
-			// Back to top links
-			if (node.id.startsWith('back-to-top')) return true;
-			if (node.classList.contains('back-to-top')) return true;
-			// Wikipedia edit buttons
-			if (node.classList.contains('mw-editsection')) return true;
-			// Wikipedia cite backlinks
-			if (node.classList.contains('mw-cite-backlink')) return true;
-			// Reference numbers and anchor links
-			if (node.classList.contains('ltx_role_refnum')) return true;
-			if (node.classList.contains('ltx_tag_bibitem')) return true;
+			// Remove the Defuddle backlink from the footnote content
 			if (node.classList.contains('footnote-backref')) return true;
-			if (node.classList.contains('ref') && (node.getAttribute('href')?.startsWith('#') || /\/#.+$/.test(node.getAttribute('href') || ''))) return true;
-			if (node.classList.contains('anchor') && (node.getAttribute('href')?.startsWith('#') || /\/#.+$/.test(node.getAttribute('href') || ''))) return true;
-			// anchor links within headings
-			if (node.nodeName === 'A' && 
-				node.parentElement && 
-				/^H[1-6]$/.test(node.parentElement.nodeName) && 
-				node.getAttribute('href')?.split('/').pop()?.startsWith('#')) {
-				// Only remove if the text content is '#' or it contains an img
-				return (node.textContent?.trim() === '#') || node.querySelector('img') !== null;
-			}
-
-			// Simplify headings with anchor links
-			if (node.nodeName.match(/^H[1-6]$/) && 
-				node.children.length === 1 && 
-				node.firstElementChild?.nodeName === 'A' &&
-				node.firstElementChild.getAttribute('href')?.split('/').pop()?.startsWith('#')) {
-				return true;
-			}
-
 			return false;
 		},
 		replacement: function (content, node) {
-			if (node instanceof HTMLElement && node.nodeName.match(/^H[1-6]$/)) {
-				const level = node.nodeName.charAt(1);
-				const text = node.textContent?.trim() || '';
-				return `\n${'#'.repeat(Number(level))} ${text}\n`;
-			}
 			return '';
 		}
 	});
@@ -612,123 +368,19 @@ export function createMarkdownContent(content: string, url: string) {
 		},
 		replacement: (content, node) => {
 			if (!(node instanceof HTMLElement)) return content;
-
-			// Function to get language from class
-			const getLanguageFromClass = (element: HTMLElement): string => {
-				// Check data-lang attribute first
-				const dataLang = element.getAttribute('data-lang');
-				if (dataLang) {
-					return dataLang.toLowerCase();
-				}
-
-				// Define language patterns
-				const languagePatterns = [
-					/^language-(\w+)$/,          // language-javascript
-					/^lang-(\w+)$/,              // lang-javascript
-					/^(\w+)-code$/,              // javascript-code
-					/^code-(\w+)$/,              // code-javascript
-					/^syntax-(\w+)$/,            // syntax-javascript
-					/^code-snippet__(\w+)$/,     // code-snippet__javascript
-					/^highlight-(\w+)$/,         // highlight-javascript
-					/^(\w+)-snippet$/            // javascript-snippet
-				];
-
-				// Then check the class attribute for patterns
-				if (element.className && typeof element.className === 'string') {
-					for (const pattern of languagePatterns) {
-						const match = element.className.toLowerCase().match(pattern);
-						if (match) {
-							return match[1].toLowerCase();
-						}
-					}
-					// Then check for supported language
-					if (SUPPORTED_LANGUAGES.has(element.className.toLowerCase())) {
-						return element.className.toLowerCase();
-					}
-				}
-
-				const classNames = Array.from(element.classList);
-				
-				for (const className of classNames) {
-					// Check patterns first
-					for (const pattern of languagePatterns) {
-						const match = className.match(pattern);
-						if (match) {
-							return match[1].toLowerCase();
-						}
-					}
-				}
-
-				// Only check bare language names if no patterns were found
-				for (const className of classNames) {
-					if (SUPPORTED_LANGUAGES.has(className.toLowerCase())) {
-						return className.toLowerCase();
-					}
-				}
-
-				return '';
-			};
-
-			// Try to get the language from the element and its ancestors
-			let language = '';
-			let currentElement: HTMLElement | null = node;
 			
-			while (currentElement && !language) {
-				language = getLanguageFromClass(currentElement);
-				
-				// Also check for code elements within the current element
-				if (!language && currentElement.querySelector('code')) {
-					language = getLanguageFromClass(currentElement.querySelector('code')!);
-				}
-				
-				currentElement = currentElement.parentElement;
-			}
-
-			// Extract and clean up code content
-			// ... rest of the existing code block handling ...
-
-			// Function to recursively extract text content while preserving structure
-			const extractStructuredText = (element: Node): string => {
-				if (element.nodeType === Node.TEXT_NODE) {
-					return element.textContent || '';
-				}
-				
-				let text = '';
-				if (element instanceof HTMLElement) {
-					// Handle line breaks
-					if (element.tagName === 'BR') {
-						return '\n';
-					}
-					
-					// Handle code elements and their children
-					element.childNodes.forEach(child => {
-						text += extractStructuredText(child);
-					});
-					
-					// Add newline after each code element
-					if (element.tagName === 'CODE') {
-						text += '\n';
-					}
-				}
-				return text;
-			};
-
-			// Extract all text content
-			let codeContent = extractStructuredText(node);
-
-			// Clean up the content
-			codeContent = codeContent
-				// Remove any extra newlines at the start
-				.replace(/^\n+/, '')
-				// Remove any extra newlines at the end
-				.replace(/\n+$/, '')
-				// Replace multiple consecutive newlines with a single newline
-				.replace(/\n{3,}/g, '\n\n');
-
-			// Escape any backticks in the code
-			const escapedCode = codeContent.replace(/`/g, '\\`');
-
-			return `\n\`\`\`${language}\n${escapedCode}\n\`\`\`\n`;
+			const codeElement = node.querySelector('code');
+			if (!codeElement) return content;
+			
+			const language = codeElement.getAttribute('data-lang') || '';
+			const code = codeElement.textContent || '';
+			
+			// Clean up the content and escape backticks
+			const cleanCode = code
+				.trim()
+				.replace(/`/g, '\\`');
+			
+			return `\n\`\`\`${language}\n${cleanCode}\n\`\`\`\n`;
 		}
 	});
 

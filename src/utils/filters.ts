@@ -23,6 +23,7 @@ import { length } from './filters/length';
 import { lower } from './filters/lower';
 import { map } from './filters/map';
 import { markdown } from './filters/markdown';
+import { merge } from './filters/merge';
 import { nth } from './filters/nth';
 import { number_format } from './filters/number_format';
 import { object } from './filters/object';
@@ -74,6 +75,7 @@ export const filters: { [key: string]: FilterFunction } = {
 	lower,
 	map,
 	markdown,
+	merge,
 	number_format,
 	nth,
 	object,

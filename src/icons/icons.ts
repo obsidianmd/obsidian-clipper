@@ -2,7 +2,7 @@ import {
 	AlertTriangle,
 	AlignLeft, 
 	ArrowUpRight,
-	Binary, 
+	Binary,
 	BookOpen,
 	Calendar, 
 	ChevronDown,

@@ -1,6 +1,8 @@
 import browser from './utils/browser-polyfill';
 import * as highlighter from './utils/highlighter';
 import { loadSettings, generalSettings } from './utils/storage-utils';
+import { Defuddle } from 'defuddle';
+import { Reader } from './utils/reader';
 
 declare global {
 	interface Window {
@@ -37,9 +39,17 @@ declare global {
 		schemaOrgData: any;
 		fullHtml: string;
 		highlights: string[];
+		title: string;
+		description: string;
+		domain: string;
+		favicon: string;
+		image: string;
+		published: string;
+		author: string;
+		site: string;
 	}
 
-	browser.runtime.onMessage.addListener(function(request: any, sender: browser.Runtime.MessageSender, sendResponse: (response?: any) => void) {
+	browser.runtime.onMessage.addListener((request: any, sender: browser.Runtime.MessageSender, sendResponse: (response?: any) => void) => {
 		if (request.action === "getPageContent") {
 			let selectedHtml = '';
 			const selection = window.getSelection();
@@ -54,13 +64,14 @@ declare global {
 
 			const extractedContent: { [key: string]: string } = {};
 
-			const schemaOrgData = extractSchemaOrgData();
+			// Process with Defuddle first while we have access to the document
+			const defuddled = new Defuddle(document).parse();
 
 			// Create a new DOMParser
 			const parser = new DOMParser();
 			// Parse the document's HTML
 			const doc = parser.parseFromString(document.documentElement.outerHTML, 'text/html');
-			
+
 			// Remove all script and style elements
 			doc.querySelectorAll('script, style').forEach(el => el.remove());
 
@@ -98,23 +109,27 @@ declare global {
 			// Get the modified HTML without scripts, styles, and style attributes
 			const cleanedHtml = doc.documentElement.outerHTML;
 
-			const fullHtmlWithoutIndentation = cleanedHtml
-				.replace(/\t/g, '') // Remove tabs
-				.replace(/^[ \t]+/gm, ''); // Remove leading spaces and tabs from each line
-
 			const response: ContentResponse = {
-				content: doc.documentElement.outerHTML,
-				selectedHtml: selectedHtml,
+				author: defuddled.author,
+				content: defuddled.content,
+				description: defuddled.description,
+				domain: defuddled.domain,
 				extractedContent: extractedContent,
-				schemaOrgData: schemaOrgData,
-				fullHtml: fullHtmlWithoutIndentation,
-				highlights: highlighter.getHighlights()
+				favicon: defuddled.favicon,
+				fullHtml: cleanedHtml,
+				highlights: highlighter.getHighlights(),
+				image: defuddled.image,
+				published: defuddled.published,
+				schemaOrgData: defuddled.schemaOrgData,
+				selectedHtml: selectedHtml,
+				site: defuddled.site,
+				title: defuddled.title
 			};
 
 			sendResponse(response);
 		} else if (request.action === "extractContent") {
 			const content = extractContentBySelector(request.selector, request.attribute, request.extractHtml);
-			sendResponse({ content: content, schemaOrgData: extractSchemaOrgData() });
+			sendResponse({ content: content });
 		} else if (request.action === "paintHighlights") {
 			highlighter.loadHighlights().then(() => {
 				if (generalSettings.alwaysShowHighlights) {
@@ -205,6 +220,18 @@ declare global {
 					sendResponse({ isActive: false });
 				});
 			return true;
+		} else if (request.action === "toggleReaderMode") {
+			(async () => {
+				try {
+					const isActive = await Reader.toggle(document);
+					document.documentElement.classList.toggle('obsidian-reader-active', isActive);
+					sendResponse({ success: true, isActive });
+				} catch (error: unknown) {
+					console.error('Error toggling reader mode:', error);
+					sendResponse({ success: false, error: error instanceof Error ? error.message : 'Unknown error' });
+				}
+			})();
+			return true;
 		}
 		return true;
 	});
@@ -233,38 +260,6 @@ declare global {
 			console.error('Error in extractContentBySelector:', error, { selector, attribute, extractHtml });
 			return '';
 		}
-	}
-
-	function extractSchemaOrgData(): any {
-		const schemaScripts = document.querySelectorAll('script[type="application/ld+json"]');
-		const schemaData: any[] = [];
-
-		schemaScripts.forEach(script => {
-			let jsonContent = script.textContent || '';
-			
-			try {
-				// Consolidated regex to clean up the JSON content
-				jsonContent = jsonContent
-					.replace(/\/\*[\s\S]*?\*\/|^\s*\/\/.*$/gm, '') // Remove multi-line and single-line comments
-					.replace(/^\s*<!\[CDATA\[([\s\S]*?)\]\]>\s*$/, '$1') // Remove CDATA wrapper
-					.replace(/^\s*(\*\/|\/\*)\s*|\s*(\*\/|\/\*)\s*$/g, '') // Remove any remaining comment markers at start or end
-					.trim();
-					
-				const jsonData = JSON.parse(jsonContent);
-
-				// If this is a @graph structure, add each item individually
-				if (jsonData['@graph'] && Array.isArray(jsonData['@graph'])) {
-					schemaData.push(...jsonData['@graph']);
-				} else {
-					schemaData.push(jsonData);
-				}
-			} catch (error) {
-				console.error('Error parsing schema.org data:', error);
-				console.error('Problematic JSON content:', jsonContent);
-			}
-		});
-
-		return schemaData;
 	}
 
 	function updateHasHighlights() {

@@ -301,6 +301,15 @@ String literals are supported and automatically wrapped in an object with a `str
 
 Combine `map` with the `template` filter, e.g. `map:item => ({name: ${item.gem}, color: item.color})|template:"- ${name} is ${color}\n"`.
 
+### `merge`
+
+Adds new values to an array.
+
+- For arrays: `["a","b"]|merge:("c","d")` returns `["a","b","c","d"]`.
+- Single value: `["a","b"]|merge:"c"` returns `["a","b","c"]`.
+- If input is not an array, it creates a new array: `"a"|merge:("b","c")` returns `["a","b","c"]`.
+- Values can be quoted: `["a"]|merge:('b,"c,d",e')` returns `["a","b","c,d","e"]`.
+
 ### `nth`
 
 Keeps nth items in an array using CSS-style nth-child syntax and group patterns. All positions are 1-based (first item is position 1).
