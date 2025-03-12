@@ -45,6 +45,13 @@
 			"css": ["highlighter.css"]
 		}
 	],
+	"web_accessible_resources": [
+		{
+			"resources": ["reader.css"],
+			"extension_ids": ["*"],
+   			"matches": [ "*://*/*" ]
+		}
+	],
 	"content_security_policy": {
 		"extension_pages": "script-src 'self'; object-src 'self'"
 	},
@@ -69,6 +76,13 @@
 				"mac": "Alt+Shift+H"
 			},
 			"description": "__MSG_commandToggleHighlighter__"
+		},
+		"toggle_reader": {
+			"suggested_key": {
+				"default": "Alt+Shift+R",
+				"mac": "Alt+Shift+R"
+			},
+			"description": "__MSG_commandToggleReader__"
 		}
 	}
 }

@@ -45,6 +45,13 @@
 			"css": ["highlighter.css"]
 		}
 	],
+	"web_accessible_resources": [
+		{
+			"resources": ["reader.css"],
+			"extension_ids": ["*"],
+   			"matches": [ "*://*/*" ]
+		}
+	],
 	"content_security_policy": {
 		"extension_pages": "script-src 'self'; object-src 'self'"
 	},

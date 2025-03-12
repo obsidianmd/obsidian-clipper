@@ -10,7 +10,7 @@
 	}
 }
 
-/* Hide the clip button on iPadOS because it's not supported  */
+/* Hide the clip button on iPadOS because it's not supported */
 .is-ipad-os {
 	.obsidian-highlighter-menu {
 		#obsidian-clip-button {
@@ -184,86 +184,5 @@ body.obsidian-highlighter-active {
 	z-index: 999999997;
 	&.on-highlight {
 		border-color: transparent;
-	}
-}
-
-html.obsidian-reader-active {
-	font-size: 62.5%;
-}
-
-.obsidian-reader-active	body {
-	--obsidian-reader-background-primary: #fff;
-	--obsidian-reader-background-primary-alt: #fcfcfc;
-	--obsidian-reader-text-primary: #222222;
-	--obsidian-reader-text-muted: #5c5c5c;
-	--obsidian-reader-text-faint: #ababab;
-	--obsidian-reader-text-accent: #222222;
-	--obsidian-reader-text-accent-hover: #222222;
-	--obsidian-reader-border: #e0e0e0;
-
-	@media (prefers-color-scheme: dark) {
-		--obsidian-reader-background-primary: #1e1e1e;
-		--obsidian-reader-background-primary-alt: #212121;
-		--obsidian-reader-text-primary: #dadada;
-		--obsidian-reader-text-muted: #b3b3b3;
-		--obsidian-reader-text-faint: #666666;
-		--obsidian-reader-text-accent: #dadada;
-		--obsidian-reader-text-accent-hover: #dadada;
-		--obsidian-reader-border: #363636;
-
-		.mw-invert {
-			filter: invert(1);
-		}
-	}
-
-	background: var(--obsidian-reader-background-primary) !important;	
-	color: var(--obsidian-reader-text-primary) !important;
-	font-size: calc(1.5rem + 0.25vw) !important;
-	width: 38em !important;
-	margin: 4rem auto 16rem !important;
-	max-width: 90% !important;
-	line-height: 1.6 !important;
-	font-family: system-ui, -apple-system, sans-serif;
-	img, video, figure {
-		max-width: 100%;
-		height: auto;
-	}
-	figure {
-		margin-inline-start: 0;
-		margin-inline-end: 0;
-	}
-	a {
-		color: var(--obsidian-reader-text-primary);
-	}
-	pre {
-		background-color: var(--obsidian-reader-background-primary-alt);
-		font-size: 85%;
-		border-radius: 8px;
-		padding: 12px 16px;
-		white-space: pre;
-		max-width: 100%;
-		overflow-x: auto;
-		border: 1px solid var(--obsidian-reader-border);
-	}
-	.metadata {
-		margin-bottom: 2em;
-		padding-bottom: 1em;
-		border-bottom: 1px solid var(--obsidian-reader-border);
-	}
-	.metadata h1 {
-		margin: 0 0 0.5em 0;
-		line-height: 1.3;
-	}
-	.metadata-details {
-		color: var(--obsidian-reader-text-muted);
-		font-size: 0.9em;
-	}
-	.metadata-details a {
-		color: inherit;
-		text-decoration: none;
-		color: var(--obsidian-reader-text-muted);
-	}
-	.metadata-details a:hover {
-		text-decoration: underline;
 	}
 }
