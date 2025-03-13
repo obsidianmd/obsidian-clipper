@@ -209,6 +209,8 @@ export class Reader {
 		author?: string; 
 		published?: string; 
 		domain?: string;
+		wordCount?: number;
+		parseTime?: number;
 		extractorType?: string;
 	} {
 		const defuddled = new Defuddle(doc, {debug: true}).parse();
@@ -234,7 +236,9 @@ export class Reader {
 			title: defuddled.title,
 			author: defuddled.author,
 			published: defuddled.published,
-			domain: getDomain(doc.URL)
+			domain: getDomain(doc.URL),
+			wordCount: defuddled.wordCount,
+			parseTime: defuddled.parseTime
 		};
 	}
 
@@ -586,7 +590,7 @@ export class Reader {
 			if (dir) htmlElement.setAttribute('dir', dir);
 			
 			// Extract content using extractors or Defuddle
-			const { content, title, author, published, domain, extractorType } = this.extractContent(doc);
+			const { content, title, author, published, domain, extractorType, wordCount, parseTime } = this.extractContent(doc);
 			if (!content) {
 				console.log('Reader', 'Failed to extract content');
 				return;
@@ -671,6 +675,13 @@ export class Reader {
 							</div>
 							${content}
 						</article>
+						<div class="obsidian-reader-footer">
+							${[
+								'Obsidian Reader',
+								wordCount ? new Intl.NumberFormat().format(wordCount) + ' words' : '',
+								(parseTime ? 'parsed in ' + new Intl.NumberFormat().format(parseTime) + ' ms' : '')
+							].filter(Boolean).join(' · ')}
+						</div>
 					</div>
 					<div class="obsidian-reader-right-sidebar"></div>
 				</div>

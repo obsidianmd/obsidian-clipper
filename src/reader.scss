@@ -199,7 +199,7 @@
 	}
 
 	.obsidian-reader-content {
-		padding: max(4rem, 4vh) 0 40vh !important;	
+		padding: max(4rem, 4vh) 0 0 !important;	
 		width: var(--obsidian-reader-line-width);
 		max-width: calc(100vw - var(--obsidian-reader-sidebar-width));
 		overflow: hidden;
@@ -587,6 +587,14 @@
 			display: none;
 		}
 	}
+}
+
+.obsidian-reader-footer {
+	color: var(--obsidian-reader-text-faint);
+	font-size: 0.7em;
+	margin-top: 36vh;
+	padding: 1rem 0 2rem 0;
+	border-top: 1px solid var(--obsidian-reader-border);
 }
 
 .obsidian-reader-settings {
