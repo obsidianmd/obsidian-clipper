@@ -8,7 +8,7 @@
 	--obsidian-reader-text-accent: #100F0F;
 	--obsidian-reader-text-accent-hover: #24837B;
 	--obsidian-reader-border: #E6E4D9;
-	--obsidian-reader-text-selection: #DDF1E4;
+	--obsidian-reader-text-selection: hsla(169,65%,44%,.15);
 	--obsidian-reader-color-red: #AF3029;
 	--obsidian-reader-color-orange: #BC5215;
 	--obsidian-reader-color-yellow: #AD8301;
@@ -606,6 +606,7 @@
 	opacity: 0;
 	z-index: 999999999;
 	font-family: var(--obsidian-reader-font-family);
+	user-select: none;
 }
 .obsidian-reader-settings:hover {
 	opacity: 1;
@@ -669,6 +670,7 @@
 	padding: max(4rem, 4vh) 20px 20px 20px;
 	overflow-y: auto;
 	font-size: 14px;
+	user-select: none;
 }
 .obsidian-reader-outline-item {
 	color: var(--obsidian-reader-text-muted);
