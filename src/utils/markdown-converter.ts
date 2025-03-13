@@ -22,13 +22,6 @@ export function createMarkdownContent(content: string, url: string) {
 		preformattedCode: true,
 	});
 
-	try {
-		var taskListItems = require('turndown-plugin-gfm').taskListItems
-		turndownService.use(taskListItems)
-	} catch (error) {
-		console.error('Error applying GFM plugin:', error);
-	}
-
 	turndownService.addRule('table', {
 		filter: 'table',
 		replacement: function(content, node) {
@@ -81,19 +74,66 @@ export function createMarkdownContent(content: string, url: string) {
 	turndownService.keep(['iframe', 'video', 'audio', 'sup', 'sub', 'svg', 'math']);
 	turndownService.remove(['button']);
 
-	// Custom rule to handle bullet lists without extra spaces
+	turndownService.addRule('list', {
+		filter: ['ul', 'ol'],
+		replacement: function (content: string, node: Node) {
+			// Remove trailing newlines/spaces from content
+			content = content.trim();
+			
+			// Add a newline before the list if it's a top-level list
+			const isTopLevel = !(node.parentNode && (node.parentNode.nodeName === 'UL' || node.parentNode.nodeName === 'OL'));
+			return (isTopLevel ? '\n' : '') + content + '\n';
+		}
+	});
+
+	// Lists with tab indentation
 	turndownService.addRule('listItem', {
 		filter: 'li',
 		replacement: function (content: string, node: Node, options: TurndownService.Options) {
-			content = content.trim();
+			if (!(node instanceof HTMLElement)) return content;
+
+			// Handle task list items
+			const isTaskListItem = node.classList.contains('task-list-item');
+			const checkbox = node.querySelector('input[type="checkbox"]') as HTMLInputElement | null;
+			let taskListMarker = '';
+			
+			if (isTaskListItem && checkbox) {
+				// Remove the checkbox from content since we'll add markdown checkbox
+				content = content.replace(/<input[^>]*>/, '');
+				taskListMarker = checkbox.checked ? '[x] ' : '[ ] ';
+			}
+
+			content = content
+				// Remove trailing newlines
+				.replace(/\n+$/, '')
+				// Split into lines
+				.split('\n')
+				// Remove empty lines
+				.filter(line => line.length > 0)
+				// Add indentation to continued lines
+				.join('\n\t');
+
 			let prefix = options.bulletListMarker + ' ';
 			let parent = node.parentNode;
+
+			// Calculate the nesting level
+			let level = 0;
+			let currentParent = node.parentNode;
+			while (currentParent && (currentParent.nodeName === 'UL' || currentParent.nodeName === 'OL')) {
+				level++;
+				currentParent = currentParent.parentNode;
+			}
+
+			// Add tab indentation based on nesting level
+			prefix = '\t'.repeat(level - 1) + prefix;
+
 			if (parent instanceof HTMLOListElement) {
 				let start = parent.getAttribute('start');
 				let index = Array.from(parent.children).indexOf(node as HTMLElement) + 1;
-				prefix = (start ? Number(start) + index - 1 : index) + '. ';
+				prefix = '\t'.repeat(level - 1) + (start ? Number(start) + index - 1 : index) + '. ';
 			}
-			return prefix + content + '\n';
+
+			return prefix + taskListMarker + content.trim() + (node.nextSibling && !/\n$/.test(content) ? '\n' : '');
 		}
 	});
 
