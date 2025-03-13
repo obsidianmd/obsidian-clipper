@@ -69,7 +69,7 @@ For Firefox:
 ## Third-party libraries
 
 - [webextension-polyfill](https://github.com/mozilla/webextension-polyfill) for browser compatibility
-- [readability](https://github.com/mozilla/readability) for content extraction
+- [defuddle](https://github.com/kepano/defuddle) for content extraction
 - [turndown](https://github.com/mixmark-io/turndown) for HTML to Markdown conversion
 - [dayjs](https://github.com/iamkun/dayjs) for date parsing and formatting
 - [lz-string](https://github.com/pieroxy/lz-string) to compress templates to reduce storage space
