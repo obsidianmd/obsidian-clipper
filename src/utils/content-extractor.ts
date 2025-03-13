@@ -157,13 +157,14 @@ export async function initializePageContent(
 			'{{domain}}': getDomain(currentUrl),
 			'{{favicon}}': defuddled.favicon,
 			'{{fullHtml}}': fullHtml.trim(),
+			'{{highlights}}': highlights.length > 0 ? JSON.stringify(highlightsData) : '',
 			'{{image}}': defuddled.image,
 			'{{noteName}}': noteName.trim(),
 			'{{published}}': defuddled.published.split(',')[0].trim(),
 			'{{site}}': defuddled.site.trim(),
 			'{{title}}': defuddled.title.trim(),
 			'{{url}}': currentUrl.trim(),
-			'{{highlights}}': highlights.length > 0 ? JSON.stringify(highlightsData) : '',
+			'{{words}}': defuddled.wordCount.toString(),
 		};
 
 		// Add extracted content to variables

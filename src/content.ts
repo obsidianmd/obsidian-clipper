@@ -45,9 +45,11 @@ declare global {
 		domain: string;
 		favicon: string;
 		image: string;
+		parseTime: number;
 		published: string;
 		author: string;
 		site: string;
+		wordCount: number;
 	}
 
 	browser.runtime.onMessage.addListener((request: any, sender: browser.Runtime.MessageSender, sendResponse: (response?: any) => void) => {
@@ -120,13 +122,14 @@ declare global {
 				fullHtml: cleanedHtml,
 				highlights: highlighter.getHighlights(),
 				image: defuddled.image,
+				parseTime: defuddled.parseTime,
 				published: defuddled.published,
 				schemaOrgData: defuddled.schemaOrgData,
 				selectedHtml: selectedHtml,
 				site: defuddled.site,
-				title: defuddled.title
+				title: defuddled.title,
+				wordCount: defuddled.wordCount
 			};
-
 			sendResponse(response);
 		} else if (request.action === "extractContent") {
 			const content = extractContentBySelector(request.selector, request.attribute, request.extractHtml);
