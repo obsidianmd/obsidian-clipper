@@ -8,7 +8,7 @@
 	--obsidian-reader-text-accent: #100F0F;
 	--obsidian-reader-text-accent-hover: #24837B;
 	--obsidian-reader-border: #E6E4D9;
-	--obsidian-reader-text-selection: hsla(169,65%,44%,.15);
+	--obsidian-reader-text-selection: #DDF1E4;
 	--obsidian-reader-color-red: #AF3029;
 	--obsidian-reader-color-orange: #BC5215;
 	--obsidian-reader-color-yellow: #AD8301;
@@ -207,9 +207,6 @@
 			margin: 0 auto;
 			max-width: 100%;
 		}
-	}
-	.obsidian-left-sidebar {
-		min-width: 200px;
 	}
 	.obsidian-left-sidebar,
 	.obsidian-right-sidebar {
@@ -667,10 +664,14 @@
 	position: sticky;
 	top: 0;
 	height: 100vh;
+	min-width: 200px;
 	padding: max(4rem, 4vh) 20px 20px 20px;
 	overflow-y: auto;
 	font-size: 14px;
 	user-select: none;
+	&:empty {
+		display: none;
+	}
 }
 .obsidian-reader-outline-item {
 	color: var(--obsidian-reader-text-muted);
