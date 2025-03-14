@@ -643,12 +643,15 @@ export class Reader {
 					<path d="M18 6L6 18M6 6l12 12"/>
 				</svg>
 			</button>
-			<img src="" alt="">
+			<div class="lightbox-image-container"></div>
 		`;
 		doc.body.appendChild(this.lightbox);
 
-		// Get all non-linked images
-		this.images = Array.from(doc.querySelectorAll('img:not(a img)'));
+		// Get all non-linked images in the article
+		const article = doc.querySelector('article');
+		if (article) {
+			this.images = Array.from(article.querySelectorAll('img:not(a img)'));
+		}
 
 		// Add click handlers to images
 		this.images.forEach((img, index) => {
@@ -693,11 +696,16 @@ export class Reader {
 		if (!this.lightbox || !this.images[index]) return;
 
 		this.currentImageIndex = index;
-		const img = this.lightbox.querySelector('img');
-		if (img) {
-			img.src = this.images[index].src;
-			img.alt = this.images[index].alt;
+		const container = this.lightbox.querySelector('.lightbox-image-container');
+		if (container) {
+			// Clear previous image
+			container.innerHTML = '';
+			
+			// Clone the original image to preserve loaded state
+			const img = this.images[index].cloneNode(true) as HTMLImageElement;
+			container.appendChild(img);
 		}
+		
 		this.lightbox.classList.add('active');
 		document.body.style.overflow = 'hidden';
 	}
@@ -710,19 +718,23 @@ export class Reader {
 	}
 
 	private static showPreviousImage() {
-		if (this.currentImageIndex > 0) {
-			this.showLightbox(this.currentImageIndex - 1);
-		} else {
-			this.showLightbox(this.images.length - 1);
-		}
+		if (this.images.length <= 1) return;
+		
+		const newIndex = this.currentImageIndex > 0 
+			? this.currentImageIndex - 1 
+			: this.images.length - 1;
+		
+		this.showLightbox(newIndex);
 	}
 
 	private static showNextImage() {
-		if (this.currentImageIndex < this.images.length - 1) {
-			this.showLightbox(this.currentImageIndex + 1);
-		} else {
-			this.showLightbox(0);
-		}
+		if (this.images.length <= 1) return;
+		
+		const newIndex = this.currentImageIndex < this.images.length - 1 
+			? this.currentImageIndex + 1 
+			: 0;
+		
+		this.showLightbox(newIndex);
 	}
 
 	static async apply(doc: Document) {
