@@ -20,6 +20,9 @@ export class Reader {
 	private static settingsBar: HTMLElement | null = null;
 	private static colorSchemeMediaQuery: MediaQueryList | null = null;
 	private static readerStyles: HTMLLinkElement | null = null;
+	private static lightbox: HTMLElement | null = null;
+	private static currentImageIndex: number = -1;
+	private static images: HTMLImageElement[] = [];
 	private static settings: ReaderSettings = {
 		fontSize: 16,
 		lineHeight: 1.6,
@@ -630,6 +633,98 @@ export class Reader {
 		});
 	}
 
+	private static initializeLightbox(doc: Document) {
+		// Create lightbox container
+		this.lightbox = doc.createElement('div');
+		this.lightbox.className = 'obsidian-reader-lightbox';
+		this.lightbox.innerHTML = `
+			<button class="lightbox-close">
+				<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+					<path d="M18 6L6 18M6 6l12 12"/>
+				</svg>
+			</button>
+			<img src="" alt="">
+		`;
+		doc.body.appendChild(this.lightbox);
+
+		// Get all non-linked images
+		this.images = Array.from(doc.querySelectorAll('img:not(a img)'));
+
+		// Add click handlers to images
+		this.images.forEach((img, index) => {
+			img.addEventListener('click', (e) => {
+				e.preventDefault();
+				this.showLightbox(index);
+			});
+		});
+
+		// Close button handler
+		const closeButton = this.lightbox.querySelector('.lightbox-close');
+		if (closeButton) {
+			closeButton.addEventListener('click', () => this.closeLightbox());
+		}
+
+		// Click outside to close
+		this.lightbox.addEventListener('click', (e) => {
+			if (e.target === this.lightbox) {
+				this.closeLightbox();
+			}
+		});
+
+		// Keyboard navigation
+		doc.addEventListener('keydown', (e) => {
+			if (!this.lightbox?.classList.contains('active')) return;
+
+			switch (e.key) {
+				case 'Escape':
+					this.closeLightbox();
+					break;
+				case 'ArrowLeft':
+					this.showPreviousImage();
+					break;
+				case 'ArrowRight':
+					this.showNextImage();
+					break;
+			}
+		});
+	}
+
+	private static showLightbox(index: number) {
+		if (!this.lightbox || !this.images[index]) return;
+
+		this.currentImageIndex = index;
+		const img = this.lightbox.querySelector('img');
+		if (img) {
+			img.src = this.images[index].src;
+			img.alt = this.images[index].alt;
+		}
+		this.lightbox.classList.add('active');
+		document.body.style.overflow = 'hidden';
+	}
+
+	private static closeLightbox() {
+		if (!this.lightbox) return;
+		this.lightbox.classList.remove('active');
+		document.body.style.overflow = '';
+		this.currentImageIndex = -1;
+	}
+
+	private static showPreviousImage() {
+		if (this.currentImageIndex > 0) {
+			this.showLightbox(this.currentImageIndex - 1);
+		} else {
+			this.showLightbox(this.images.length - 1);
+		}
+	}
+
+	private static showNextImage() {
+		if (this.currentImageIndex < this.images.length - 1) {
+			this.showLightbox(this.currentImageIndex + 1);
+		} else {
+			this.showLightbox(0);
+		}
+	}
+
 	static async apply(doc: Document) {
 		try {
 			// Store original HTML for restoration
@@ -771,7 +866,9 @@ export class Reader {
 			
 			this.initializeFootnotes(doc);
 			this.initializeCodeHighlighting(doc);
+
 			this.initializeCopyButtons(doc);
+			this.initializeLightbox(doc);
 
 			// Set up color scheme media query listener
 			this.colorSchemeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
@@ -799,6 +896,12 @@ export class Reader {
 
 			// Hide any active footnote popover
 			this.hideFootnotePopover();
+
+			// Remove lightbox
+			if (this.lightbox) {
+				this.lightbox.remove();
+				this.lightbox = null;
+			}
 
 			// Remove reader styles
 			if (this.readerStyles) {
