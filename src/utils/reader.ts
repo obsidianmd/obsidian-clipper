@@ -662,7 +662,7 @@ export class Reader {
 						<div class="obsidian-reader-outline"></div>
 					</div>
 					<div class="obsidian-reader-content">
-						<article>
+						<main>
 						${title ? `<h1>${title}</h1>` : ''}
 							<div class="metadata">
 								<div class="metadata-details">
@@ -673,8 +673,10 @@ export class Reader {
 									].filter(Boolean).map(item => `<span>${item}</span>`).join('<span> · </span>')}
 								</div>
 							</div>
-							${content}
-						</article>
+							<article>
+								${content}
+							</article>
+						</main>
 						<div class="obsidian-reader-footer">
 							${[
 								'Obsidian Reader',

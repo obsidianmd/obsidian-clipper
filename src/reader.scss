@@ -435,6 +435,7 @@
 		}
 	}
 
+	footnotes,
 	.footnotes {
 		margin-top: 4em;
 		font-size: 0.85em;
@@ -450,7 +451,7 @@
 			a {
 				color: var(--obsidian-reader-text-muted);
 			}
-			a.footnote-backref {
+			a[href^="#fnref"] {
 				text-decoration: none;
 				color: var(--obsidian-reader-text-faint);
 				&:hover {
