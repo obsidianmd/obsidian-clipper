@@ -637,29 +637,117 @@ export class Reader {
 		// Create lightbox container
 		this.lightbox = doc.createElement('div');
 		this.lightbox.className = 'obsidian-reader-lightbox';
+		this.lightbox.setAttribute('role', 'dialog');
+		this.lightbox.setAttribute('aria-modal', 'true');
 		this.lightbox.innerHTML = `
-			<button class="lightbox-close">
+			<button class="lightbox-close" aria-label="Close image viewer">
 				<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
 					<path d="M18 6L6 18M6 6l12 12"/>
 				</svg>
 			</button>
-			<div class="lightbox-image-container"></div>
+			<div class="lightbox-content">
+				<div class="lightbox-image-container"></div>
+				<div class="lightbox-caption"></div>
+			</div>
 		`;
 		doc.body.appendChild(this.lightbox);
 
-		// Get all non-linked images in the article
+		// Get all images in the article
 		const article = doc.querySelector('article');
 		if (article) {
-			this.images = Array.from(article.querySelectorAll('img:not(a img)'));
-		}
+			// Get standalone images
+			const standaloneImages = Array.from(article.querySelectorAll('img:not(a img):not(figure img)')) as HTMLImageElement[];
+			
+			// Get images in links that point to image files
+			const linkedImages = Array.from(article.querySelectorAll('a:not(figure a) img')).filter(img => {
+				const link = (img as HTMLImageElement).closest('a');
+				if (!link) return false;
+				const href = link.href.toLowerCase();
+				return href.endsWith('.jpg') || href.endsWith('.jpeg') || 
+					   href.endsWith('.png') || href.endsWith('.gif') || 
+					   href.endsWith('.webp') || href.endsWith('.avif');
+			}) as HTMLImageElement[];
 
-		// Add click handlers to images
-		this.images.forEach((img, index) => {
-			img.addEventListener('click', (e) => {
-				e.preventDefault();
-				this.showLightbox(index);
+			// Get figure images
+			const figures = Array.from(article.querySelectorAll('figure'));
+			const figureImages = figures.flatMap(figure => {
+				const images = Array.from(figure.querySelectorAll('img')) as HTMLImageElement[];
+				return images.map(img => {
+					// Store figure reference on the image for caption lookup
+					(img as any).figureElement = figure;
+					return img;
+				});
 			});
-		});
+
+			this.images = [...standaloneImages, ...linkedImages, ...figureImages];
+
+			// Add click handlers
+			this.images.forEach((img, index) => {
+				const figure = (img as any).figureElement;
+				const parentLink = img.closest('a');
+
+				if (figure) {
+					// For figures, wrap both the image and any links
+					const wrapper = doc.createElement('div');
+					wrapper.className = 'image-wrapper';
+					
+					// If image is in a link, handle that first
+					if (parentLink) {
+						parentLink.parentNode?.insertBefore(wrapper, parentLink);
+						wrapper.appendChild(parentLink);
+					} else {
+						img.parentNode?.insertBefore(wrapper, img);
+						wrapper.appendChild(img);
+					}
+
+					// Add expand button
+					const expandButton = doc.createElement('button');
+					expandButton.className = 'image-expand-button';
+					expandButton.setAttribute('aria-label', 'View full size');
+					expandButton.innerHTML = `
+						<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+							<path d="M15 3h6v6M14 10l7-7M9 21H3v-6M10 14l-7 7"/>
+						</svg>
+					`;
+					wrapper.appendChild(expandButton);
+
+					// Handle expand button click
+					expandButton.addEventListener('click', (e) => {
+						e.preventDefault();
+						e.stopPropagation();
+						this.showLightbox(index);
+					});
+				} else if (parentLink) {
+					// Handle linked images as before
+					const wrapper = doc.createElement('div');
+					wrapper.className = 'image-wrapper';
+					parentLink.parentNode?.insertBefore(wrapper, parentLink);
+					wrapper.appendChild(parentLink);
+
+					const expandButton = doc.createElement('button');
+					expandButton.className = 'image-expand-button';
+					expandButton.setAttribute('aria-label', 'View full size');
+					expandButton.innerHTML = `
+						<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+							<path d="M15 3h6v6M14 10l7-7M9 21H3v-6M10 14l-7 7"/>
+						</svg>
+					`;
+					wrapper.appendChild(expandButton);
+
+					expandButton.addEventListener('click', (e) => {
+						e.preventDefault();
+						e.stopPropagation();
+						this.showLightbox(index);
+					});
+				} else {
+					// For standalone images, just add the click handler
+					img.addEventListener('click', (e) => {
+						e.preventDefault();
+						this.showLightbox(index);
+					});
+				}
+			});
+		}
 
 		// Close button handler
 		const closeButton = this.lightbox.querySelector('.lightbox-close');
@@ -697,13 +785,25 @@ export class Reader {
 
 		this.currentImageIndex = index;
 		const container = this.lightbox.querySelector('.lightbox-image-container');
-		if (container) {
-			// Clear previous image
+		const captionContainer = this.lightbox.querySelector('.lightbox-caption');
+		
+		if (container && captionContainer) {
+			// Clear previous content
 			container.innerHTML = '';
+			captionContainer.innerHTML = '';
 			
 			// Clone the original image to preserve loaded state
 			const img = this.images[index].cloneNode(true) as HTMLImageElement;
 			container.appendChild(img);
+
+			// Handle caption if image is part of a figure
+			const figure = (this.images[index] as any).figureElement as HTMLElement;
+			if (figure) {
+				const figcaption = figure.querySelector('figcaption');
+				if (figcaption) {
+					captionContainer.innerHTML = figcaption.innerHTML;
+				}
+			}
 		}
 		
 		this.lightbox.classList.add('active');

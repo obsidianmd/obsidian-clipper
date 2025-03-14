@@ -776,7 +776,7 @@
 	left: 0;
 	width: 100%;
 	height: 100%;
-	background: rgba(0, 0, 0, 0.9);
+	background: var(--obsidian-reader-background-primary);
 	z-index: 9999999999;
 	display: none;
 	align-items: center;
@@ -789,22 +789,63 @@
 		opacity: 1;
 	}
 
-	.lightbox-image-container {
+	.lightbox-content {
 		display: flex;
+		flex-direction: column;
 		align-items: center;
 		justify-content: center;
 		width: 100%;
 		height: 100%;
 		padding: 20px;
 		box-sizing: border-box;
+		overflow-y: auto;
+	}
+
+	.lightbox-image-container {
+		flex: 1;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 100%;
+		min-height: 0;
 
 		img {
 			max-width: 90vw;
-			max-height: 90vh;
+			max-height: calc(90vh - 150px);
+			height: 100%;
+			width: 100%;
 			object-fit: contain;
 			border-radius: 4px;
 			mix-blend-mode: normal !important;
 			filter: none !important;
+		}
+	}
+
+	.lightbox-caption {
+		width: 800px;
+		max-width: 90vw;
+		margin-top: 20px;
+		color: var(--obsidian-reader-text-muted);
+		font-size: 0.8em;
+		line-height: 1.4;
+		text-align: left;
+
+		.caption {
+			font-weight: 500;
+			margin-bottom: 8px;
+		}
+
+		.notes {
+			opacity: 0.8;
+			font-size: 13px;
+		}
+
+		.heading {
+			font-weight: 600;
+		}
+
+		sub, sup {
+			font-size: 11px;
 		}
 	}
 
@@ -814,21 +855,16 @@
 		right: 20px;
 		width: 40px;
 		height: 40px;
-		border-radius: 20px;
-		background: rgba(0, 0, 0, 0.5);
 		border: none;
-		color: #fff;
+		padding: 0;
+		background: transparent;
+		color: var(--obsidian-reader-text-muted);
 		cursor: pointer;
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		transition: background 0.2s ease;
 		z-index: 1;
-
-		&:hover {
-			background: rgba(0, 0, 0, 0.8);
-		}
-
 		svg {
 			width: 20px;
 			height: 20px;
@@ -837,7 +873,7 @@
 }
 
 .obsidian-reader-active {
-	img:not(a img) {
+	img:not(a img):not(figure img) {
 		position: relative;
 		cursor: zoom-in;
 
@@ -849,7 +885,7 @@
 			width: 24px;
 			height: 24px;
 			background: rgba(0, 0, 0, 0.5);
-			border-radius: 12px;
+			border-radius: 4px;
 			opacity: 0;
 			transition: opacity 0.2s ease;
 			background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 3h6v6M14 10l7-7M9 21H3v-6M10 14l-7 7'/%3E%3C/svg%3E");
@@ -860,6 +896,34 @@
 
 		&:hover::after {
 			opacity: 1;
+		}
+	}
+
+	.image-wrapper {
+		position: relative;
+		display: inline-block;
+
+		img {
+			display: block;
+		}
+
+		.image-expand-button {
+			position: absolute;
+			top: 8px;
+			right: 8px;
+			width: 24px;
+			height: 24px;
+			padding: 0;
+			border: none;
+			background: var(--obsidian-reader-text-primary);
+			border-radius: 4px;
+			color: var(--obsidian-reader-background-primary);
+			cursor: pointer;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			z-index: 1;
+			outline: none;
 		}
 	}
 }
