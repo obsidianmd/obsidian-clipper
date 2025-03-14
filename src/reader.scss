@@ -162,6 +162,8 @@
 }
 
 .obsidian-reader-active {
+	background-color: var(--obsidian-reader-background-primary) !important;
+
 	&.theme-light {
 		img, svg {
 			mix-blend-mode: multiply;
