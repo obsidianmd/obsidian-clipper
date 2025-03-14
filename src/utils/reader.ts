@@ -636,7 +636,7 @@ export class Reader {
 	private static initializeLightbox(doc: Document) {
 		// Create lightbox container
 		this.lightbox = doc.createElement('div');
-		this.lightbox.className = 'obsidian-reader-lightbox';
+		this.lightbox.className = 'obsidian-reader-lightbox theme-dark';
 		this.lightbox.setAttribute('role', 'dialog');
 		this.lightbox.setAttribute('aria-modal', 'true');
 		this.lightbox.innerHTML = `

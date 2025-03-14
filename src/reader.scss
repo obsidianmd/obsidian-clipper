@@ -17,7 +17,8 @@
 	--obsidian-reader-color-purple: #5E409D;
 	--obsidian-reader-color-pink: #A02F6F;
 
-	&.theme-dark {
+	&.theme-dark,
+	.theme-dark {
 		--obsidian-reader-background-primary: #100F0F;
 		--obsidian-reader-background-primary-alt: #1C1B1A;
 		--obsidian-reader-text-primary: #CECDC3;
@@ -796,7 +797,6 @@
 		justify-content: center;
 		width: 100%;
 		height: 100%;
-		padding: 20px;
 		box-sizing: border-box;
 		overflow-y: auto;
 	}
@@ -810,7 +810,7 @@
 		min-height: 0;
 
 		img {
-			max-width: 90vw;
+			max-width: 96vw;
 			max-height: calc(90vh - 150px);
 			height: 100%;
 			width: 100%;
@@ -824,29 +824,12 @@
 	.lightbox-caption {
 		width: 800px;
 		max-width: 90vw;
-		margin-top: 20px;
+		margin-top: 10px;
 		color: var(--obsidian-reader-text-muted);
 		font-size: 0.8em;
 		line-height: 1.4;
-		text-align: left;
-
-		.caption {
-			font-weight: 500;
-			margin-bottom: 8px;
-		}
-
-		.notes {
-			opacity: 0.8;
-			font-size: 13px;
-		}
-
-		.heading {
-			font-weight: 600;
-		}
-
-		sub, sup {
-			font-size: 11px;
-		}
+		text-align: center;
+		padding-bottom: 40px;
 	}
 
 	.lightbox-close {
@@ -875,25 +858,6 @@
 .obsidian-reader-active {
 	img:not(a img):not(figure img) {
 		position: relative;
-		cursor: zoom-in;
-
-		&::after {
-			content: '';
-			position: absolute;
-			top: 8px;
-			right: 8px;
-			width: 24px;
-			height: 24px;
-			background: rgba(0, 0, 0, 0.5);
-			border-radius: 4px;
-			opacity: 0;
-			transition: opacity 0.2s ease;
-			background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M15 3h6v6M14 10l7-7M9 21H3v-6M10 14l-7 7'/%3E%3C/svg%3E");
-			background-position: center;
-			background-repeat: no-repeat;
-			background-size: 16px;
-		}
-
 		&:hover::after {
 			opacity: 1;
 		}
@@ -921,9 +885,18 @@
 			cursor: pointer;
 			display: flex;
 			align-items: center;
+			opacity: 0;
 			justify-content: center;
 			z-index: 1;
 			outline: none;
+			svg {
+				mix-blend-mode: normal;
+			}
+		}
+		&:hover {
+			.image-expand-button {
+				opacity: 1;
+			}
 		}
 	}
 }
