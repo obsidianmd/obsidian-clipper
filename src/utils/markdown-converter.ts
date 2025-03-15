@@ -1,5 +1,4 @@
 import TurndownService from 'turndown';
-import { MathMLToLaTeX } from 'mathml-to-latex';
 import { processUrls } from './string-utils';
 import { debugLog } from './debug';
 
@@ -424,155 +423,29 @@ export function createMarkdownContent(content: string, url: string) {
 		}
 	});
 
-	turndownService.addRule('MathJax', {
-		filter: (node) => {
-			const isMjxContainer = node.nodeName.toLowerCase() === 'mjx-container';
-			return isMjxContainer;
-		},
-		replacement: (content, node) => {
-			if (!(node instanceof HTMLElement)) {
-				return content;
-			}
-
-			const assistiveMml = node.querySelector('mjx-assistive-mml');
-			if (!assistiveMml) {
-				return content;
-			}
-
-			const mathElement = assistiveMml.querySelector('math');
-			if (!mathElement) {
-				return content;
-			}
-
-			let latex;
-			try {
-				latex = MathMLToLaTeX.convert(mathElement.outerHTML);
-			} catch (error) {
-				console.error('Error converting MathML to LaTeX:', error);
-				return content;
-			}
-
-			// Check if it's an inline or block math element
-			const isBlock = mathElement.getAttribute('display') === 'block';
-
-			if (isBlock) {
-				return `\n$$\n${latex}\n$$\n`;
-			} else {
-				return `$${latex}$`;
-			}
-		}
-	});
-
 	function extractLatex(element: Element): string {
-		// Check if the element is a <math> element and has an alttext attribute
-		if (element.nodeName.toLowerCase() === 'math') {
-			const alttext = element.getAttribute('alttext');
-			if (alttext) {
-				return alttext.trim();
-			}
+		// Use data-latex attribute if available
+		const latex = element.getAttribute('data-latex');
+		if (latex) {
+			return latex.trim();
 		}
-
-		// If not, look for a nested <math> element with alttext
-		const mathElement = element.querySelector('math[alttext]');
-		if (mathElement) {
-			const alttext = mathElement.getAttribute('alttext');
-			if (alttext) {
-				return alttext.trim();
-			}
-		}
-
-		// Fallback to existing logic
-		const annotation = element.querySelector('annotation[encoding="application/x-tex"]');
-		if (annotation?.textContent) {
-			return annotation.textContent.trim();
-		}
-
-		const mathNode = element.nodeName.toLowerCase() === 'math' ? element : element.querySelector('math');
-		if (mathNode) {
-			return MathMLToLaTeX.convert(mathNode.outerHTML);
-		}
-
-		const imgNode = element.querySelector('img');
-		return imgNode?.getAttribute('alt') || '';
+		return '';
 	}
-
 
 	turndownService.addRule('math', {
 		filter: (node) => {
-			return node.nodeName.toLowerCase() === 'math' || 
-				(node instanceof Element && node.classList && 
-				(node.classList.contains('mwe-math-element') || 
-				node.classList.contains('mwe-math-fallback-image-inline') || 
-				node.classList.contains('mwe-math-fallback-image-display')));
+			return node.nodeName.toLowerCase() === 'math'
 		},
 		replacement: (content, node) => {
 			if (!(node instanceof Element)) return content;
 
-			let latex = extractLatex(node);
+			const latex = extractLatex(node);
+			const isBlock = node.getAttribute('display') === 'block';
 
-			// Remove leading and trailing whitespace
-			latex = latex.trim();
-
-			// Check if the math element is within a table
-			const isInTable = node.closest('table') !== null;
-
-			// Check if it's an inline or block math element
-			if (!isInTable && (
-				node.getAttribute('display') === 'block' || 
-				node.classList.contains('mwe-math-fallback-image-display') || 
-				(node.parentElement && node.parentElement.classList.contains('mwe-math-element') && 
-				node.parentElement.previousElementSibling && 
-				node.parentElement.previousElementSibling.nodeName.toLowerCase() === 'p')
-			)) {
+			if (isBlock) {
 				return `\n$$$\n${latex}\n$$$\n`;
 			} else {
-				// For inline math, ensure there's a space before and after only if needed
-				const prevNode = node.previousSibling;
-				const nextNode = node.nextSibling;
-				const prevChar = prevNode?.textContent?.slice(-1) || '';
-				const nextChar = nextNode?.textContent?.[0] || '';
-
-				const isStartOfLine = !prevNode || (prevNode.nodeType === Node.TEXT_NODE && prevNode.textContent?.trim() === '');
-				const isEndOfLine = !nextNode || (nextNode.nodeType === Node.TEXT_NODE && nextNode.textContent?.trim() === '');
-
-				const leftSpace = (!isStartOfLine && prevChar && !/[\s$]/.test(prevChar)) ? ' ' : '';
-				const rightSpace = (!isEndOfLine && nextChar && !/[\s$]/.test(nextChar)) ? ' ' : '';
-
-				return `${leftSpace}$${latex}$${rightSpace}`;
-			}
-		}
-	});
-
-	turndownService.addRule('katex', {
-		filter: (node) => {
-			return node instanceof HTMLElement && 
-				   (node.classList.contains('math') || node.classList.contains('katex'));
-		},
-		replacement: (content, node) => {
-			if (!(node instanceof HTMLElement)) return content;
-
-			// Try to find the original LaTeX content
-			// 1. Check data-latex attribute
-			let latex = node.getAttribute('data-latex');
-			
-			// 2. If no data-latex, try to get from .katex-mathml
-			if (!latex) {
-				const mathml = node.querySelector('.katex-mathml annotation[encoding="application/x-tex"]');
-				latex = mathml?.textContent || '';
-			}
-
-			// 3. If still no content, use text content as fallback
-			if (!latex) {
-				latex = node.textContent?.trim() || '';
-			}
-
-			// Determine if it's an inline formula
-			const isInline = node.classList.contains('math-inline');
-			
-			if (isInline) {
 				return `$${latex}$`;
-			} else {
-				return `\n$$\n${latex}\n$$\n`;
 			}
 		}
 	});
