@@ -273,21 +273,6 @@ export function createMarkdownContent(content: string, url: string) {
 		}
 	});
 
-	function handleNestedEquations(table: Element): string {
-		const mathElements = table.querySelectorAll('math[alttext]');
-		if (mathElements.length === 0) return '';
-
-		return Array.from(mathElements).map(mathElement => {
-			const alttext = mathElement.getAttribute('alttext');
-			if (alttext) {
-				// Check if it's an inline or block equation
-				const isInline = mathElement.closest('.ltx_eqn_inline') !== null;
-				return isInline ? `$${alttext.trim()}$` : `\n$$$\n${alttext.trim()}\n$$$`;
-			}
-			return '';
-		}).join('\n\n');
-	}
-
 	turndownService.addRule('arXivEnumerate', {
 		filter: (node) => {
 			return node.nodeName === 'OL' && node.classList.contains('ltx_enumerate');
@@ -463,40 +448,6 @@ export function createMarkdownContent(content: string, url: string) {
 		}
 	});
 
-	function extractLatex(element: Element): string {
-		// Check if the element is a <math> element and has an alttext attribute
-		if (element.nodeName.toLowerCase() === 'math') {
-			const alttext = element.getAttribute('alttext');
-			if (alttext) {
-				return alttext.trim();
-			}
-		}
-
-		// If not, look for a nested <math> element with alttext
-		const mathElement = element.querySelector('math[alttext]');
-		if (mathElement) {
-			const alttext = mathElement.getAttribute('alttext');
-			if (alttext) {
-				return alttext.trim();
-			}
-		}
-
-		// Fallback to existing logic
-		const annotation = element.querySelector('annotation[encoding="application/x-tex"]');
-		if (annotation?.textContent) {
-			return annotation.textContent.trim();
-		}
-
-		const mathNode = element.nodeName.toLowerCase() === 'math' ? element : element.querySelector('math');
-		if (mathNode) {
-			return MathMLToLaTeX.convert(mathNode.outerHTML);
-		}
-
-		const imgNode = element.querySelector('img');
-		return imgNode?.getAttribute('alt') || '';
-	}
-
-
 	turndownService.addRule('math', {
 		filter: (node) => {
 			return node.nodeName.toLowerCase() === 'math' || 
@@ -524,7 +475,7 @@ export function createMarkdownContent(content: string, url: string) {
 				node.parentElement.previousElementSibling && 
 				node.parentElement.previousElementSibling.nodeName.toLowerCase() === 'p')
 			)) {
-				return `\n$$$\n${latex}\n$$$\n`;
+				return `\n$$\n${latex}\n$$\n`;
 			} else {
 				// For inline math, ensure there's a space before and after only if needed
 				const prevNode = node.previousSibling;
@@ -567,7 +518,9 @@ export function createMarkdownContent(content: string, url: string) {
 			}
 
 			// Determine if it's an inline formula
-			const isInline = node.classList.contains('math-inline');
+			const mathElement = node.querySelector('.katex-mathml math');
+			const isInline = node.classList.contains('math-inline') || 
+				(mathElement && mathElement.getAttribute('display') !== 'block');
 			
 			if (isInline) {
 				return `$${latex}$`;
@@ -576,30 +529,6 @@ export function createMarkdownContent(content: string, url: string) {
 			}
 		}
 	});
-
-	function cleanupTableHTML(table: HTMLTableElement): string {
-		const allowedAttributes = ['src', 'href', 'style', 'align', 'width', 'height', 'rowspan', 'colspan', 'bgcolor', 'scope', 'valign', 'headers'];
-		
-		const cleanElement = (element: Element) => {
-			Array.from(element.attributes).forEach(attr => {
-				if (!allowedAttributes.includes(attr.name)) {
-					element.removeAttribute(attr.name);
-				}
-			});
-			
-			element.childNodes.forEach(child => {
-				if (child instanceof Element) {
-					cleanElement(child);
-				}
-			});
-		};
-
-		// Create a clone of the table to avoid modifying the original DOM
-		const tableClone = table.cloneNode(true) as HTMLTableElement;
-		cleanElement(tableClone);
-
-		return tableClone.outerHTML;
-	}
 
 	turndownService.addRule('callout', {
 		filter: (node) => {
@@ -630,6 +559,81 @@ export function createMarkdownContent(content: string, url: string) {
 			return `\n> [!${type}]\n> ${alertContent.trim().replace(/\n/g, '\n> ')}\n`;
 		}
 	});
+
+	function handleNestedEquations(table: Element): string {
+		const mathElements = table.querySelectorAll('math[alttext]');
+		if (mathElements.length === 0) return '';
+
+		return Array.from(mathElements).map(mathElement => {
+			const alttext = mathElement.getAttribute('alttext');
+			if (alttext) {
+				// Check if it's an inline or block equation
+				const isInline = mathElement.closest('.ltx_eqn_inline') !== null;
+				return isInline ? `$${alttext.trim()}$` : `\n$$\n${alttext.trim()}\n$$`;
+			}
+			return '';
+		}).join('\n\n');
+	}
+
+	function cleanupTableHTML(table: HTMLTableElement): string {
+		const allowedAttributes = ['src', 'href', 'style', 'align', 'width', 'height', 'rowspan', 'colspan', 'bgcolor', 'scope', 'valign', 'headers'];
+		
+		const cleanElement = (element: Element) => {
+			Array.from(element.attributes).forEach(attr => {
+				if (!allowedAttributes.includes(attr.name)) {
+					element.removeAttribute(attr.name);
+				}
+			});
+			
+			element.childNodes.forEach(child => {
+				if (child instanceof Element) {
+					cleanElement(child);
+				}
+			});
+		};
+
+		// Create a clone of the table to avoid modifying the original DOM
+		const tableClone = table.cloneNode(true) as HTMLTableElement;
+		cleanElement(tableClone);
+
+		return tableClone.outerHTML;
+	}
+
+	function extractLatex(element: Element): string {
+		// Check if the element is a <math> element and has an alttext attribute
+		if (element.nodeName.toLowerCase() === 'math') {
+			let latex = element.getAttribute('data-latex');
+			let alttext = element.getAttribute('alttext');
+			if (latex) {
+				return latex.trim();
+			} else if (alttext) {
+				return alttext.trim();
+			}
+			console.log('No latex or alttext found for math element:', element);
+		}
+
+		// If not, look for a nested <math> element with alttext
+		const mathElement = element.querySelector('math[alttext]');
+		if (mathElement) {
+			const alttext = mathElement.getAttribute('alttext');
+			if (alttext) {
+				return alttext.trim();
+			}
+		}
+
+		const annotation = element.querySelector('annotation[encoding="application/x-tex"]');
+		if (annotation?.textContent) {
+			return annotation.textContent.trim();
+		}
+
+		const mathNode = element.nodeName.toLowerCase() === 'math' ? element : element.querySelector('math');
+		if (mathNode) {
+			return MathMLToLaTeX.convert(mathNode.outerHTML);
+		}
+
+		const imgNode = element.querySelector('img');
+		return imgNode?.getAttribute('alt') || '';
+	}
 
 	try {
 		let markdown = turndownService.turndown(processedContent);
