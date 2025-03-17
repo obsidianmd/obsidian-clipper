@@ -109,8 +109,11 @@ declare global {
 				});
 			});
 
-			// Get the modified HTML without scripts, styles, and style attributes
-			const cleanedHtml = doc.documentElement.outerHTML;
+			// Get the modified HTML without scripts, styles, style attributes, and blank lines (for rendering)
+			const cleanedHtml = doc.documentElement.outerHTML
+				.split('\n')
+				.filter(line => line.trim() !== '')
+				.join('\n');
 
 			const response: ContentResponse = {
 				author: defuddled.author,
