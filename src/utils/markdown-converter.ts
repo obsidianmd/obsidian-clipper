@@ -443,7 +443,7 @@ export function createMarkdownContent(content: string, url: string) {
 			const isBlock = node.getAttribute('display') === 'block';
 
 			if (isBlock) {
-				return `\n$$$\n${latex}\n$$$\n`;
+				return `\n$$\n${latex}\n$$\n`;
 			} else {
 				return `$${latex}$`;
 			}
