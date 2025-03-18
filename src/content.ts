@@ -2,7 +2,6 @@ import browser from './utils/browser-polyfill';
 import * as highlighter from './utils/highlighter';
 import { loadSettings, generalSettings } from './utils/storage-utils';
 import { Defuddle } from 'defuddle';
-import { Reader } from './utils/reader';
 import { getDomain } from './utils/string-utils';
 
 declare global {
@@ -225,16 +224,13 @@ declare global {
 				});
 			return true;
 		} else if (request.action === "toggleReaderMode") {
-			(async () => {
-				try {
-					const isActive = await Reader.toggle(document);
-					document.documentElement.classList.toggle('obsidian-reader-active', isActive);
-					sendResponse({ success: true, isActive });
-				} catch (error: unknown) {
-					console.error('Error toggling reader mode:', error);
+			// Forward the request to the background script to inject reader mode if needed
+			browser.runtime.sendMessage({ action: "toggleReaderMode", tabId: sender.tab?.id })
+				.then(sendResponse)
+				.catch(error => {
+					console.error("Error toggling reader mode:", error);
 					sendResponse({ success: false, error: error instanceof Error ? error.message : 'Unknown error' });
-				}
-			})();
+				});
 			return true;
 		}
 		return true;
