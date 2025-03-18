@@ -213,7 +213,9 @@ export class Reader {
 		parseTime?: number;
 		extractorType?: string;
 	} {
-		const defuddled = new Defuddle(doc, {debug: true}).parse();
+		
+		// const defuddled = new Defuddle(doc, {debug: true}).parse();
+		const defuddled = new Defuddle(doc).parse();
 		const schemaOrgData = defuddled.schemaOrgData;
 
 		// Try to use a specific extractor first
