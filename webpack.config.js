@@ -45,7 +45,8 @@ module.exports = (env, argv) => {
 			background: './src/background.ts',
 			style: './src/style.scss',
 			highlighter: './src/highlighter.scss',
-			reader: './src/reader.scss'
+			reader: './src/reader.scss',
+			'reader-script': './src/reader-script.ts'
 		},
 		output: {
 			path: path.resolve(__dirname, outputDir),
@@ -53,6 +54,39 @@ module.exports = (env, argv) => {
 			module: true,
 		},
 		devtool: isProduction ? false : 'source-map',
+		optimization: {
+			minimize: true,
+			minimizer: [
+				new TerserPlugin({
+					terserOptions: {
+						mangle: false,
+						compress: {
+							defaults: true,
+							global_defs: {
+								DEBUG_MODE: !isProduction
+							},
+							unused: true,
+							dead_code: true,
+							passes: 2,
+							ecma: 2020,
+							module: true
+						},
+						format: {
+							ascii_only: true,
+							comments: false,
+							ecma: 2020
+						},
+						module: true,
+						toplevel: true,
+						keep_classnames: true,
+						keep_fnames: true
+					},
+					extractComments: false
+				})
+			],
+			moduleIds: 'named',
+			chunkIds: 'named'
+		},
 		experiments: {
 			outputModule: true,
 		},
@@ -128,83 +162,5 @@ module.exports = (env, argv) => {
 		]
 	};
 
-	// Separate config for reader script to avoid minification issues
-	// with mangle which causes problems with globals in Firefox and Safari
-	// TODO: see if we can find a better solution
-	const readerConfig = {
-		mode: 'production',
-		entry: {
-			'reader-script': './src/reader-script.ts'
-		},
-		output: {
-			path: path.resolve(__dirname, outputDir),
-			filename: '[name].js',
-			module: true,
-		},
-		devtool: 'source-map',
-		optimization: {
-			minimize: true,
-			minimizer: [
-				new TerserPlugin({
-					terserOptions: {
-						mangle: false,
-						compress: {
-							defaults: true,
-							global_defs: {
-								DEBUG_MODE: !isProduction
-							},
-							unused: true,
-							dead_code: true,
-							passes: 2,
-							ecma: 2020,
-							module: true
-						},
-						format: {
-							ascii_only: true,
-							comments: false,
-							ecma: 2020
-						},
-						module: true,
-						toplevel: true,
-						keep_classnames: true,
-						keep_fnames: true
-					},
-					extractComments: false
-				})
-			],
-			moduleIds: 'named',
-			chunkIds: 'named'
-		},
-		experiments: {
-			outputModule: true,
-		},
-		resolve: {
-			extensions: ['.ts', '.js']
-		},
-		module: {
-			rules: [
-				{
-					test: /\.tsx?$/,
-					use: {
-						loader: 'ts-loader',
-						options: {
-							compilerOptions: {
-								removeComments: false,
-								preserveConstEnums: true
-							}
-						}
-					},
-					exclude: /node_modules/,
-				}
-			]
-		},
-		plugins: [
-			new webpack.DefinePlugin({
-				'process.env.NODE_ENV': JSON.stringify(argv.mode),
-				'DEBUG_MODE': JSON.stringify(!isProduction)
-			})
-		]
-	};
-
-	return [mainConfig, readerConfig];
+	return [mainConfig];
 };

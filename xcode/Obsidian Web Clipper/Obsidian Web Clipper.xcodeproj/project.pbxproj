@@ -46,7 +46,6 @@
 		7AEF05E42CA0F50D005FFBC2 /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05D52CA0F50D005FFBC2 /* manifest.json */; };
 		7AEF05E52CA0F50D005FFBC2 /* content.js in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05D62CA0F50D005FFBC2 /* content.js */; };
 		7AEF05E62CA0F50D005FFBC2 /* settings.html in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05D82CA0F50D005FFBC2 /* settings.html */; };
-		7AEF05E72CA0F50D005FFBC2 /* styles.js in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05D92CA0F50D005FFBC2 /* styles.js */; };
 		7AEF05E82CA0F50D005FFBC2 /* settings.js in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05DA2CA0F50D005FFBC2 /* settings.js */; };
 		7AEF05E92CA0F50D005FFBC2 /* settings.js.LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05CA2CA0F50D005FFBC2 /* settings.js.LICENSE.txt */; };
 		7AEF05EA2CA0F50D005FFBC2 /* background.js in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05CB2CA0F50D005FFBC2 /* background.js */; };
@@ -59,7 +58,6 @@
 		7AEF05F12CA0F50D005FFBC2 /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05D52CA0F50D005FFBC2 /* manifest.json */; };
 		7AEF05F22CA0F50D005FFBC2 /* content.js in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05D62CA0F50D005FFBC2 /* content.js */; };
 		7AEF05F32CA0F50D005FFBC2 /* settings.html in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05D82CA0F50D005FFBC2 /* settings.html */; };
-		7AEF05F42CA0F50D005FFBC2 /* styles.js in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05D92CA0F50D005FFBC2 /* styles.js */; };
 		7AEF05F52CA0F50D005FFBC2 /* settings.js in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05DA2CA0F50D005FFBC2 /* settings.js */; };
 /* End PBXBuildFile section */
 
@@ -143,7 +141,6 @@
 		7AEF05D52CA0F50D005FFBC2 /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = manifest.json; path = ../../../dist_safari/manifest.json; sourceTree = "<group>"; };
 		7AEF05D62CA0F50D005FFBC2 /* content.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = content.js; path = ../../../dist_safari/content.js; sourceTree = "<group>"; };
 		7AEF05D82CA0F50D005FFBC2 /* settings.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = settings.html; path = ../../../dist_safari/settings.html; sourceTree = "<group>"; };
-		7AEF05D92CA0F50D005FFBC2 /* styles.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = styles.js; path = ../../../dist_safari/styles.js; sourceTree = "<group>"; };
 		7AEF05DA2CA0F50D005FFBC2 /* settings.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = settings.js; path = ../../../dist_safari/settings.js; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -289,7 +286,6 @@
 				7AEF05D52CA0F50D005FFBC2 /* manifest.json */,
 				7AEF05D62CA0F50D005FFBC2 /* content.js */,
 				7AEF05D82CA0F50D005FFBC2 /* settings.html */,
-				7AEF05D92CA0F50D005FFBC2 /* styles.js */,
 				7A6535C82D8B530300DDF54C /* reader-script.js */,
 				7AEF05DA2CA0F50D005FFBC2 /* settings.js */,
 			);
@@ -455,7 +451,6 @@
 				7AEF05EA2CA0F50D005FFBC2 /* background.js in Resources */,
 				7AEF05F02CA0F50D005FFBC2 /* style.css in Resources */,
 				7AEF05ED2CA0F50D005FFBC2 /* popup.html in Resources */,
-				7AEF05F42CA0F50D005FFBC2 /* styles.js in Resources */,
 				7AEF05EE2CA0F50D005FFBC2 /* browser-polyfill.min.js in Resources */,
 				7AEF05F22CA0F50D005FFBC2 /* content.js in Resources */,
 				7AEF05F12CA0F50D005FFBC2 /* manifest.json in Resources */,
@@ -478,7 +473,6 @@
 				7AEF05DD2CA0F50D005FFBC2 /* background.js in Resources */,
 				7AEF05E32CA0F50D005FFBC2 /* style.css in Resources */,
 				7AEF05E02CA0F50D005FFBC2 /* popup.html in Resources */,
-				7AEF05E72CA0F50D005FFBC2 /* styles.js in Resources */,
 				7AEF05E12CA0F50D005FFBC2 /* browser-polyfill.min.js in Resources */,
 				7AEF05E52CA0F50D005FFBC2 /* content.js in Resources */,
 				7AEF05E42CA0F50D005FFBC2 /* manifest.json in Resources */,
