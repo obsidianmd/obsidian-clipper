@@ -35,7 +35,7 @@ module.exports = (env, argv) => {
 	const outputDir = getOutputDir();
 	const browserName = isFirefox ? 'firefox' : (isSafari ? 'safari' : 'chrome');
 
-	return {
+	const mainConfig = {
 		mode: argv.mode,
 		entry: {
 			popup: './src/core/popup.ts',
@@ -44,8 +44,7 @@ module.exports = (env, argv) => {
 			background: './src/background.ts',
 			style: './src/style.scss',
 			highlighter: './src/highlighter.scss',
-			reader: './src/reader.scss',
-			'reader-script': './src/reader-script.ts'
+			reader: './src/reader.scss'
 		},
 		output: {
 			path: path.resolve(__dirname, outputDir),
@@ -127,4 +126,51 @@ module.exports = (env, argv) => {
 			] : [])
 		]
 	};
+
+	const readerConfig = {
+		mode: 'development',
+		entry: {
+			'reader-script': './src/reader-script.ts'
+		},
+		output: {
+			path: path.resolve(__dirname, outputDir),
+			filename: '[name].js',
+			module: true,
+		},
+		devtool: isProduction ? false : 'source-map',
+		optimization: {
+			minimize: false // Explicitly disable minification
+		},
+		experiments: {
+			outputModule: true,
+		},
+		resolve: {
+			extensions: ['.ts', '.js']
+		},
+		module: {
+			rules: [
+				{
+					test: /\.tsx?$/,
+					use: {
+						loader: 'ts-loader',
+						options: {
+							compilerOptions: {
+								removeComments: false,
+								preserveConstEnums: true
+							}
+						}
+					},
+					exclude: /node_modules/,
+				}
+			]
+		},
+		plugins: [
+			new webpack.DefinePlugin({
+				'process.env.NODE_ENV': JSON.stringify(argv.mode),
+				'DEBUG_MODE': JSON.stringify(!isProduction)
+			})
+		]
+	};
+
+	return [mainConfig, readerConfig];
 };
