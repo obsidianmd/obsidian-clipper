@@ -370,13 +370,11 @@ async function highlightElement(tabId: number, info: browser.Menus.OnClickData) 
 
 async function injectReaderScript(tabId: number) {
 	try {
-		// First inject the CSS
 		await browser.scripting.insertCSS({
 			target: { tabId },
 			files: ['reader.css']
 		});
 
-		// Then inject the script
 		await browser.scripting.executeScript({
 			target: { tabId },
 			files: ['reader-script.js']

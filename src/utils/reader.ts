@@ -2,7 +2,6 @@ import { Defuddle } from 'defuddle/full';
 import { getLocalStorage, setLocalStorage } from './storage-utils';
 import { ExtractorRegistry } from './extractor-registry';
 import hljs from 'highlight.js';
-import browser from './browser-polyfill';
 import { getDomain } from './string-utils';
 
 // Mobile viewport settings
@@ -555,26 +554,6 @@ export class Reader {
 		try {
 			// Store original HTML for restoration
 			this.originalHTML = doc.documentElement.outerHTML;
-			
-			// Load reader CSS first and wait for it to load
-			if (!this.readerStyles) {
-				const cssUrl = browser.runtime.getURL('reader.css');
-
-				const cssLoaded = new Promise((resolve, reject) => {
-					this.readerStyles = doc.createElement('link');
-					this.readerStyles.id = 'obsidian-reader-styles';
-					this.readerStyles.rel = 'stylesheet';
-					this.readerStyles.href = cssUrl;
-					
-					this.readerStyles.onload = () => resolve(true);
-					this.readerStyles.onerror = (e) => reject(e);
-					
-					doc.head.appendChild(this.readerStyles);
-				});
-
-				// Wait for CSS to load
-				await cssLoaded;
-			}
 
 			// Load saved settings
 			await this.loadSettings();
