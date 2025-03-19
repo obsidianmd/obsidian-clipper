@@ -141,6 +141,7 @@ module.exports = (env, argv) => {
 			filename: '[name].js',
 			module: true,
 		},
+		devtool: 'source-map',
 		optimization: {
 			minimize: true,
 			minimizer: [
@@ -154,12 +155,21 @@ module.exports = (env, argv) => {
 							},
 							unused: true,
 							dead_code: true,
-							passes: 2
+							passes: 2,
+							ecma: 2020,
+							module: true
 						},
 						format: {
-							comments: false
-						}
-					}
+							ascii_only: true,
+							comments: false,
+							ecma: 2020
+						},
+						module: true,
+						toplevel: true,
+						keep_classnames: true,
+						keep_fnames: true
+					},
+					extractComments: false
 				})
 			],
 			moduleIds: 'named',
