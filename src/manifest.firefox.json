@@ -47,7 +47,7 @@
 	],
 	"web_accessible_resources": [
 		{
-			"resources": ["reader.css"],
+			"resources": ["reader.css", "reader-script.js"],
 			"extension_ids": ["*"],
    			"matches": [ "*://*/*" ]
 		}

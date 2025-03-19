@@ -977,8 +977,9 @@ function updateHighlighterModeUI(isActive: boolean) {
 
 async function toggleReaderMode(tabId: number) {
 	try {
-		const response = await browser.tabs.sendMessage(tabId, { 
-			action: "toggleReaderMode"
+		const response = await browser.runtime.sendMessage({ 
+			action: "toggleReaderMode",
+			tabId: tabId
 		}) as ReaderModeResponse;
 
 		if (response && response.success) {

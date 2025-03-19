@@ -5,6 +5,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const ZipPlugin = require('zip-webpack-plugin');
 const package = require('./package.json');
 const webpack = require('webpack');
+const TerserPlugin = require('terser-webpack-plugin');
 
 // Remove .DS_Store files
 function removeDSStore(dir) {
@@ -35,7 +36,7 @@ module.exports = (env, argv) => {
 	const outputDir = getOutputDir();
 	const browserName = isFirefox ? 'firefox' : (isSafari ? 'safari' : 'chrome');
 
-	return {
+	const mainConfig = {
 		mode: argv.mode,
 		entry: {
 			popup: './src/core/popup.ts',
@@ -126,4 +127,74 @@ module.exports = (env, argv) => {
 			] : [])
 		]
 	};
+
+	// Separate config for reader script to avoid minification issues
+	// with mangle which causes problems with globals in Firefox and Safari
+	// TODO: see if we can find a better solution
+	const readerConfig = {
+		mode: 'production',
+		entry: {
+			'reader-script': './src/reader-script.ts'
+		},
+		output: {
+			path: path.resolve(__dirname, outputDir),
+			filename: '[name].js',
+			module: true,
+		},
+		optimization: {
+			minimize: true,
+			minimizer: [
+				new TerserPlugin({
+					terserOptions: {
+						mangle: false,
+						compress: {
+							defaults: true,
+							global_defs: {
+								DEBUG_MODE: !isProduction
+							},
+							unused: true,
+							dead_code: true,
+							passes: 2
+						},
+						format: {
+							comments: false
+						}
+					}
+				})
+			],
+			moduleIds: 'named',
+			chunkIds: 'named'
+		},
+		experiments: {
+			outputModule: true,
+		},
+		resolve: {
+			extensions: ['.ts', '.js']
+		},
+		module: {
+			rules: [
+				{
+					test: /\.tsx?$/,
+					use: {
+						loader: 'ts-loader',
+						options: {
+							compilerOptions: {
+								removeComments: false,
+								preserveConstEnums: true
+							}
+						}
+					},
+					exclude: /node_modules/,
+				}
+			]
+		},
+		plugins: [
+			new webpack.DefinePlugin({
+				'process.env.NODE_ENV': JSON.stringify(argv.mode),
+				'DEBUG_MODE': JSON.stringify(!isProduction)
+			})
+		]
+	};
+
+	return [mainConfig, readerConfig];
 };

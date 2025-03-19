@@ -114,6 +114,14 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 			return true;
 		}
 
+		if (typedRequest.action === "toggleReaderMode" && typedRequest.tabId) {
+			injectReaderScript(typedRequest.tabId).then(() => {
+				browser.tabs.sendMessage(typedRequest.tabId!, { action: "toggleReaderMode" })
+					.then(sendResponse);
+			});
+			return true;
+		}
+
 		// For other actions that use sendResponse
 		if (typedRequest.action === "extractContent" || 
 			typedRequest.action === "ensureContentScriptLoaded" ||
@@ -146,6 +154,7 @@ browser.commands.onCommand.addListener(async (command, tab) => {
 	}
 	if (command === "toggle_reader" && tab && tab.id) {
 		await ensureContentScriptLoaded(tab.id);
+		await injectReaderScript(tab.id);
 		await browser.tabs.sendMessage(tab.id, { action: "toggleReaderMode" });
 	}
 });
@@ -357,6 +366,25 @@ async function highlightElement(tabId: number, info: browser.Menus.OnClickData) 
 	});
 	hasHighlights = true;
 	debouncedUpdateContextMenu(tabId);
+}
+
+async function injectReaderScript(tabId: number) {
+	try {
+		await browser.scripting.insertCSS({
+			target: { tabId },
+			files: ['reader.css']
+		});
+
+		await browser.scripting.executeScript({
+			target: { tabId },
+			files: ['reader-script.js']
+		});
+
+		return true;
+	} catch (error) {
+		console.error('Error injecting reader script:', error);
+		return false;
+	}
 }
 
 // Initialize the tab listeners
