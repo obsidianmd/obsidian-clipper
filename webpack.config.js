@@ -5,6 +5,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const ZipPlugin = require('zip-webpack-plugin');
 const package = require('./package.json');
 const webpack = require('webpack');
+const TerserPlugin = require('terser-webpack-plugin');
 
 // Remove .DS_Store files
 function removeDSStore(dir) {
@@ -127,8 +128,11 @@ module.exports = (env, argv) => {
 		]
 	};
 
+	// Separate config for reader script to avoid minification issues
+	// with mangle which causes problems with globals in Firefox and Safari
+	// TODO: see if we can find a better solution
 	const readerConfig = {
-		mode: 'development',
+		mode: 'production',
 		entry: {
 			'reader-script': './src/reader-script.ts'
 		},
@@ -137,9 +141,29 @@ module.exports = (env, argv) => {
 			filename: '[name].js',
 			module: true,
 		},
-		devtool: isProduction ? false : 'source-map',
 		optimization: {
-			minimize: false // Explicitly disable minification
+			minimize: true,
+			minimizer: [
+				new TerserPlugin({
+					terserOptions: {
+						mangle: false,
+						compress: {
+							defaults: true,
+							global_defs: {
+								DEBUG_MODE: !isProduction
+							},
+							unused: true,
+							dead_code: true,
+							passes: 2
+						},
+						format: {
+							comments: false
+						}
+					}
+				})
+			],
+			moduleIds: 'named',
+			chunkIds: 'named'
 		},
 		experiments: {
 			outputModule: true,
