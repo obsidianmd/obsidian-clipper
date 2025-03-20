@@ -5,6 +5,7 @@ import { RedditExtractor } from './extractors/reddit';
 import { TwitterExtractor } from './extractors/twitter';
 import { YoutubeExtractor } from './extractors/youtube';
 import { HackerNewsExtractor } from './extractors/hackernews';
+import { ChatGPTExtractor } from './extractors/chatgpt';
 
 
 type ExtractorConstructor = new (document: Document, url: string, schemaOrgData?: any) => BaseExtractor;
@@ -53,6 +54,13 @@ export class ExtractorRegistry {
 				/news\.ycombinator\.com\/item\?id=.*/
 			],
 			extractor: HackerNewsExtractor
+		});
+
+		this.register({
+			patterns: [
+				/^https?:\/\/chatgpt\.com\/(c|share)\/.*/
+			],
+			extractor: ChatGPTExtractor
 		});
 	}
 
