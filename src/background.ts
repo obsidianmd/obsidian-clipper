@@ -232,6 +232,7 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
 		await highlightElement(tab.id, info);
 	// } else if (info.menuItemId === "toggle-reader" && tab && tab.id) {
 	// 	await ensureContentScriptLoaded(tab.id);
+	// 	await injectReaderScript(tab.id);
 	// 	await browser.tabs.sendMessage(tab.id, { action: "toggleReaderMode" });
 	} else if (info.menuItemId === 'open-side-panel' && tab && tab.id && tab.windowId) {
 		chrome.sidePanel.open({ tabId: tab.id });

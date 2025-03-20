@@ -1,12 +1,13 @@
 import { BaseExtractor, ExtractorResult } from './_base';
 import { Defuddle } from 'defuddle';
 
-export class ChatGPTExtractor extends BaseExtractor {
+export class ClaudeExtractor extends BaseExtractor {
 	private articles: NodeListOf<Element> | null;
 
 	constructor(document: Document, url: string) {
 		super(document, url);
-		this.articles = document.querySelectorAll('article[data-testid^="conversation-turn-"]');
+		// Find all message blocks - both user and assistant messages
+		this.articles = document.querySelectorAll('div[data-testid="user-message"], div[data-testid="assistant-message"], div.font-claude-message');
 	}
 
 	canExtract(): boolean {
@@ -20,7 +21,7 @@ export class ChatGPTExtractor extends BaseExtractor {
 
 		// Create a temporary document to run Defuddle on our content
 		const tempDoc = document.implementation.createHTMLDocument();
-		const container = tempDoc.createElement('div');
+		const container = tempDoc.createElement('article');
 		container.innerHTML = rawContentHtml;
 		tempDoc.body.appendChild(container);
 
@@ -36,9 +37,9 @@ export class ChatGPTExtractor extends BaseExtractor {
 			},
 			variables: {
 				title: title,
-				site: 'ChatGPT',
-				description: `ChatGPT conversation with ${turns.length} turns`,
-				author: 'ChatGPT',
+				site: 'Claude',
+				description: `Claude conversation with ${turns.length} turns`,
+				author: 'Claude',
 				wordCount: defuddled.wordCount?.toString() || '',
 			}
 		};
@@ -50,13 +51,31 @@ export class ChatGPTExtractor extends BaseExtractor {
 		if (!this.articles) return turns;
 
 		this.articles.forEach((article) => {
-			const role = article.querySelector('h5, h6')?.textContent?.replace(' said:', '') || 'unknown';
-			const content = article.querySelector('.markdown')?.innerHTML || 
-						   article.querySelector('.text-message')?.innerHTML || '';
+			let role: string;
+			let content: string;
+
+			if (article.hasAttribute('data-testid')) {
+				// Handle user messages
+				if (article.getAttribute('data-testid') === 'user-message') {
+					role = 'you';
+					content = article.innerHTML;
+				}
+				// Skip non-message elements
+				else {
+					return;
+				}
+			} else if (article.classList.contains('font-claude-message')) {
+				// Handle Claude messages
+				role = 'assistant';
+				content = article.innerHTML;
+			} else {
+				// Skip unknown elements
+				return;
+			}
 
 			if (content) {
 				turns.push({
-					role: role.toLowerCase(),
+					role,
 					content: content.trim()
 				});
 			}
@@ -67,11 +86,11 @@ export class ChatGPTExtractor extends BaseExtractor {
 
 	private createContentHtml(turns: { role: string; content: string }[]): string {
 		return turns.map((turn, index) => {
-			const displayRole = turn.role === 'you' ? 'You' : 'ChatGPT';
+			const displayRole = turn.role === 'you' ? 'You' : 'Claude';
 			return `
-			<div class="chatgpt-turn chatgpt-${turn.role}">
-				<div class="chatgpt-role"><h2>${displayRole}</h2></div>
-				<div class="chatgpt-content">
+			<div class="claude-turn claude-${turn.role}">
+				<div class="claude-role"><h2>${displayRole}</h2></div>
+				<div class="claude-content">
 					${turn.content}
 				</div>
 			</div>${index < turns.length - 1 ? '\n<hr>' : ''}`;
@@ -81,18 +100,25 @@ export class ChatGPTExtractor extends BaseExtractor {
 	private getTitle(): string {
 		// Try to get the page title first
 		const pageTitle = this.document.title?.trim();
-		if (pageTitle && pageTitle !== 'ChatGPT') {
-			return pageTitle;
+		if (pageTitle && pageTitle !== 'Claude') {
+			// Remove ' - Claude' suffix if present
+			return pageTitle.replace(/ - Claude$/, '');
+		}
+
+		// Try to get title from header
+		const headerTitle = this.document.querySelector('header .font-tiempos')?.textContent?.trim();
+		if (headerTitle) {
+			return headerTitle;
 		}
 
 		// Fall back to first user message
-		const firstUserTurn = this.articles?.item(0)?.querySelector('.text-message');
-		if (firstUserTurn) {
-			const text = firstUserTurn.textContent || '';
+		const firstUserMessage = this.articles?.item(0)?.querySelector('[data-testid="user-message"]');
+		if (firstUserMessage) {
+			const text = firstUserMessage.textContent || '';
 			// Truncate to first 50 characters if longer
 			return text.length > 50 ? text.slice(0, 50) + '...' : text;
 		}
 
-		return 'ChatGPT Conversation';
+		return 'Claude Conversation';
 	}
 } 

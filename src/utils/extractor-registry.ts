@@ -6,6 +6,7 @@ import { TwitterExtractor } from './extractors/twitter';
 import { YoutubeExtractor } from './extractors/youtube';
 import { HackerNewsExtractor } from './extractors/hackernews';
 import { ChatGPTExtractor } from './extractors/chatgpt';
+import { ClaudeExtractor } from './extractors/claude';
 
 
 type ExtractorConstructor = new (document: Document, url: string, schemaOrgData?: any) => BaseExtractor;
@@ -61,6 +62,13 @@ export class ExtractorRegistry {
 				/^https?:\/\/chatgpt\.com\/(c|share)\/.*/
 			],
 			extractor: ChatGPTExtractor
+		});
+
+		this.register({
+			patterns: [
+				/^https?:\/\/claude\.ai\/(chat|share)\/.*/
+			],
+			extractor: ClaudeExtractor
 		});
 	}
 
