@@ -368,6 +368,7 @@ export function createMarkdownContent(content: string, url: string) {
 		filter: function (node) {
 			if (!(node instanceof HTMLElement)) return false;
 			// Remove the Defuddle backlink from the footnote content
+			if (node.getAttribute('href')?.includes('#fnref')) return true;
 			if (node.classList.contains('footnote-backref')) return true;
 			return false;
 		},
