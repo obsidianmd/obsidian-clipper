@@ -28,6 +28,7 @@ import { nth } from './filters/nth';
 import { number_format } from './filters/number_format';
 import { object } from './filters/object';
 import { pascal } from './filters/pascal';
+import { reverse } from './filters/reverse';
 import { remove_attr } from './filters/remove_attr';
 import { remove_html } from './filters/remove_html';
 import { remove_tags } from './filters/remove_tags';
@@ -80,6 +81,7 @@ export const filters: { [key: string]: FilterFunction } = {
 	nth,
 	object,
 	pascal,
+	reverse,
 	remove_attr,
 	remove_html,
 	remove_tags,

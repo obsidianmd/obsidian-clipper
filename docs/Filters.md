@@ -331,6 +331,14 @@ Manipulates object data:
 - `object:values` returns an array of the object's values.
 - Example: `{"a":1,"b":2}|object:array` returns `[["a",1],["b",2]]`.
 
+### `reverse`
+
+Reverses the order of arrays, objects, or characters in a string.
+
+- For arrays: `[1,2,3]|reverse` returns `[3,2,1]`.
+- For objects: `{"a":1,"b":2,"c":3}|reverse` returns `{"c":3,"b":2,"a":1}`.
+- For strings: `"hello"|reverse` returns `"olleh"`.
+
 ### `slice`
 
 Extracts a portion of a string or array.
