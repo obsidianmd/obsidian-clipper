@@ -34,6 +34,7 @@ The main content variable is `{{content}}`, which contains the article content, 
 | `{{title}}`       | Title of the page                                                                      |
 | `{{time}}`        | Current date and time                                                                  |
 | `{{url}}`         | Current URL                                                                            |
+| `{{words}}`       | Word count                                                                             |
 
 ## Prompt variables
 

@@ -187,17 +187,17 @@ Converts strings, arrays, or objects into Obsidian [[Link notes|wikilink]] synta
 Performs basic arithmetic operations on numbers.
 
 - Supports operators: `+`, `-`, `*`, `/`, `**` (or `^`) for exponentiation.
-- Example: `"5"|calc:"+10"` returns `"15"`.
-- Example: `"2"|calc:"**3"` returns `"8"` (2 cubed).
+- Example: `5|calc:"+10"` returns `15`.
+- Example: `2|calc:"**3"` returns `8` (2 cubed).
 - Returns the original string if the input is not a number.
 
 ### `length`
 
 Returns the length of strings, arrays, or number of keys in objects.
 
-- For strings: `"hello"|length` returns `"5".`
-- For arrays: `["a","b","c"]|length` returns `"3".`
-- For objects: `{"a":1,"b":2}|length` returns `"2"`.
+- For strings: `"hello"|length` returns `5`.
+- For arrays: `["a","b","c"]|length` returns `3`.
+- For objects: `{"a":1,"b":2}|length` returns `2`.
 
 ### `round`
 
@@ -320,7 +320,7 @@ Keeps nth items in an array using CSS-style nth-child syntax and group patterns.
 
 Group pattern syntax for repeating structures:
 
-- `array|nth:1,2,3:5` keeps positions 1,2,3 from each group of 5 items. Example: `[1,2,3,4,5,6,7,8,9,10]|nth:1,2,3:5` returns `[1,2,3,6,7,8]`.
+- `array|nth:1,2,3:5` keeps positions 1, 2, 3 from each group of 5 items. Example: `[1,2,3,4,5,6,7,8,9,10]|nth:1,2,3:5` returns `[1,2,3,6,7,8]`.
 
 ### `object`
 
