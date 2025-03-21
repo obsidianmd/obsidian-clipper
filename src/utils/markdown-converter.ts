@@ -330,7 +330,7 @@ export function createMarkdownContent(content: string, url: string) {
 		filter: (node: Node): boolean => {
 			if (node instanceof HTMLOListElement) {
 				return (
-					node.parentElement?.classList?.contains('footnotes') === true
+					node.parentElement?.id === 'footnotes'
 				);
 			}
 			return false;
