@@ -1,4 +1,3 @@
-
 .obsidian-reader-active[data-reader-theme="flexoki"] {
 	--obsidian-reader-background-primary: #FFFCF0;
 	--obsidian-reader-background-primary-alt: #F2F0E5;
@@ -687,20 +686,27 @@
 	padding: 6px 8px;
 	border-radius: 4px;
 	line-height: 1.15;
+
+	// Depth-based indentation
+	&[data-depth="0"] {
+		padding-left: 8px;
+	}
+	&[data-depth="1"] {
+		padding-left: 24px;
+	}
+	&[data-depth="2"] {
+		padding-left: 40px;
+	}
+	&[data-depth="3"] {
+		padding-left: 56px;
+	}
+	&[data-depth="4"] {
+		padding-left: 72px;
+	}
 }
 .obsidian-reader-outline-item:hover {
 	color: var(--obsidian-reader-text-primary);
 	background-color: var(--obsidian-reader-background-primary-alt);
-}
-.obsidian-reader-outline-h3 {
-	padding-left: 16px;
-}
-.obsidian-reader-outline-h4 {
-	padding-left: 32px;
-}
-.obsidian-reader-outline-h5,
-.obsidian-reader-outline-h6 {
-	padding-left: 48px;
 }
 .obsidian-reader-outline-item.active {
 	color: var(--obsidian-reader-text-primary);

@@ -264,9 +264,41 @@ export class Reader {
 		// Create outline items and store references
 		const outlineItems = new Map();
 
+		// Keep track of the last heading at each level and their depths
+		const lastHeadingAtLevel: { [key: number]: { element: Element; depth: number } } = {};
+		
 		headings.forEach((heading) => {
+			const level = parseInt(heading.tagName[1]);
+			const currentRect = heading.getBoundingClientRect();
+			
+			// Calculate depth based on parent headings
+			let depth = 0;
+			let parentFound = false;
+			
+			// Look through all higher levels to find the most recent parent
+			for (let i = level - 1; i >= 2; i--) {
+				const lastHeading = lastHeadingAtLevel[i];
+				if (lastHeading) {
+					const lastRect = lastHeading.element.getBoundingClientRect();
+					if (lastRect.top < currentRect.top) {
+						depth = lastHeading.depth + 1;
+						parentFound = true;
+						break;
+					}
+				}
+			}
+
+			// If no parent found but we have a previous sibling at same level, use its depth
+			if (!parentFound && lastHeadingAtLevel[level]) {
+				const lastRect = lastHeadingAtLevel[level].element.getBoundingClientRect();
+				if (lastRect.top < currentRect.top) {
+					depth = lastHeadingAtLevel[level].depth;
+				}
+			}
+
 			const item = doc.createElement('div');
 			item.className = `obsidian-reader-outline-item obsidian-reader-outline-${heading.tagName.toLowerCase()}`;
+			item.setAttribute('data-depth', depth.toString());
 			item.textContent = heading.textContent;
 			
 			item.addEventListener('click', () => {
@@ -281,6 +313,9 @@ export class Reader {
 
 			outline.appendChild(item);
 			outlineItems.set(heading, item);
+			
+			// Update tracking variables
+			lastHeadingAtLevel[level] = { element: heading, depth };
 		});
 
 		// Set up intersection observer for headings
@@ -319,6 +354,29 @@ export class Reader {
 		headings.forEach(heading => {
 			observer.observe(heading);
 		});
+
+		// Add footnotes link if there are footnotes
+		const footnotes = article.querySelector('#footnotes');
+		if (footnotes) {
+			const item = doc.createElement('div');
+			item.className = 'obsidian-reader-outline-item';
+			item.setAttribute('data-depth', '0');
+			item.textContent = 'Footnotes';
+			
+			item.addEventListener('click', () => {
+				const rect = footnotes.getBoundingClientRect();
+				const scrollTop = window.pageYOffset || doc.documentElement.scrollTop;
+				const targetY = scrollTop + rect.top - window.innerHeight * 0.05;
+				window.scrollTo({
+					top: targetY,
+					behavior: 'smooth'
+				});
+			});
+
+			outline.appendChild(item);
+			outlineItems.set(footnotes, item);
+			observer.observe(footnotes);
+		}
 
 		return observer;
 	}
