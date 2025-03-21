@@ -29,7 +29,7 @@ export class ChatGPTExtractor extends BaseExtractor {
 		tempDoc.body.appendChild(container);
 
 		// Run Defuddle on our formatted content
-		const defuddled = new Defuddle(tempDoc).parse();
+		const defuddled = new Defuddle(tempDoc, {debug: true}).parse();
 		const contentHtml = defuddled.content;
 
 		return {
@@ -99,11 +99,11 @@ export class ChatGPTExtractor extends BaseExtractor {
 				const tempDiv = document.createElement('div');
 				tempDiv.innerHTML = combinedContent;
 				
-				// Find all reference links
-				const references = tempDiv.querySelectorAll('a[href^="http"]');
+				// Find all reference links within their containers
+				const references = tempDiv.querySelectorAll('.relative.inline-flex a[href^="http"]');
 				references.forEach(ref => {
-					const parent = ref.parentElement;
-					if (parent?.classList.contains('relative') || parent?.classList.contains('inline-flex')) {
+					const inlineFlexContainer = ref.closest('.relative.inline-flex');
+					if (inlineFlexContainer) {
 						this.footnoteCounter++;
 						const url = ref.getAttribute('href') || '';
 						let domain = '';
@@ -114,8 +114,56 @@ export class ChatGPTExtractor extends BaseExtractor {
 						}
 						this.footnotes.push({ url, text: domain });
 						
-						// Replace the entire reference container with footnote format
-						parent.outerHTML = `<sup id="fnref:${this.footnoteCounter}"><a href="#fn:${this.footnoteCounter}">${this.footnoteCounter}</a></sup>`;
+						// Create footnote reference
+						const footnoteRef = document.createElement('sup');
+						footnoteRef.id = `fnref:${this.footnoteCounter}`;
+						footnoteRef.innerHTML = `<a href="#fn:${this.footnoteCounter}">${this.footnoteCounter}</a>`;
+						
+						// Find the parent span if it exists
+						const parentSpan = inlineFlexContainer.closest('span[data-state="closed"]');
+						const containerToReplace = parentSpan || inlineFlexContainer;
+						
+						// Get the next sibling text node if it exists
+						const nextSibling = containerToReplace.nextSibling;
+						const textContent = nextSibling?.nodeType === Node.TEXT_NODE ? nextSibling.textContent : '';
+						
+						// Replace the container with the footnote
+						containerToReplace.replaceWith(footnoteRef);
+						
+						// If there was text content after the reference, we need to ensure it stays in the paragraph
+						if (textContent && nextSibling) {
+							const paragraph = footnoteRef.closest('p');
+							if (paragraph) {
+								footnoteRef.after(textContent);
+								nextSibling.remove();
+							}
+						}
+					}
+				});
+
+				// Clean up any ZeroWidthSpace characters that might break flow
+				tempDiv.innerHTML = tempDiv.innerHTML.replace(/\u200B/g, '');
+				
+				// Clean up any empty spans that might have contained references
+				const emptySpans = tempDiv.querySelectorAll('span:empty');
+				emptySpans.forEach(span => span.remove());
+
+				// Normalize paragraph structure
+				const paragraphs = tempDiv.querySelectorAll('p');
+				paragraphs.forEach(p => {
+					// Remove any line breaks or extra spaces between elements
+					p.innerHTML = p.innerHTML.replace(/>\s+</g, '><').trim();
+					
+					// Ensure any text nodes immediately following the paragraph are moved inside
+					let nextSibling = p.nextSibling;
+					while (nextSibling && nextSibling.nodeType === Node.TEXT_NODE) {
+						const textContent = nextSibling.textContent;
+						if (textContent?.trim()) {
+							p.appendChild(document.createTextNode(textContent));
+						}
+						const toRemove = nextSibling;
+						nextSibling = nextSibling.nextSibling;
+						toRemove.remove();
 					}
 				});
 
