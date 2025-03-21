@@ -104,68 +104,70 @@ export class ChatGPTExtractor extends BaseExtractor {
 				references.forEach(ref => {
 					const inlineFlexContainer = ref.closest('.relative.inline-flex');
 					if (inlineFlexContainer) {
-						this.footnoteCounter++;
 						const url = ref.getAttribute('href') || '';
 						let domain = '';
+						let fragmentText = '';
+						
 						try {
-							domain = new URL(url).hostname;
+							// Extract domain without www.
+							domain = new URL(url).hostname.replace(/^www\./, '');
+							
+							// Extract and decode the fragment text if it exists
+							const hashParts = url.split('#:~:text=');
+							if (hashParts.length > 1) {
+								fragmentText = decodeURIComponent(hashParts[1]);
+								// Replace URL-encoded commas and clean up
+								fragmentText = fragmentText.replace(/%2C/g, ',');
+								
+								// Split the fragment into start and end if it contains a comma
+								const parts = fragmentText.split(',');
+								if (parts.length > 1) {
+									// Only show first part with ellipsis
+									fragmentText = ` — ${parts[0].trim()}...`;
+								} else {
+									// If no comma, just wrap the whole text
+									fragmentText = ` — ${fragmentText.trim()}`;
+								}
+							}
 						} catch (e) {
 							domain = url;
 						}
-						this.footnotes.push({ url, text: domain });
+
+						// Check if this URL already exists in our footnotes
+						let footnoteIndex = this.footnotes.findIndex(fn => fn.url === url);
+						if (footnoteIndex === -1) {
+							// Only create new footnote if URL doesn't exist
+							this.footnoteCounter++;
+							footnoteIndex = this.footnoteCounter;  // Keep it 1-based
+							this.footnotes.push({ 
+								url, 
+								text: `<a href="${url}">${domain}</a>${fragmentText}`
+							});
+						} else {
+							// Use existing footnote index (already 1-based since we never subtracted 1)
+							footnoteIndex++;
+						}
 						
-						// Create footnote reference
+						// Create footnote reference using the correct index
 						const footnoteRef = document.createElement('sup');
-						footnoteRef.id = `fnref:${this.footnoteCounter}`;
-						footnoteRef.innerHTML = `<a href="#fn:${this.footnoteCounter}">${this.footnoteCounter}</a>`;
+						footnoteRef.id = `fnref:${footnoteIndex}`;
+						footnoteRef.innerHTML = `<a href="#fn:${footnoteIndex}">${footnoteIndex}</a>`;
 						
 						// Find the parent span if it exists
 						const parentSpan = inlineFlexContainer.closest('span[data-state="closed"]');
 						const containerToReplace = parentSpan || inlineFlexContainer;
-						
-						// Get the next sibling text node if it exists
-						const nextSibling = containerToReplace.nextSibling;
-						const textContent = nextSibling?.nodeType === Node.TEXT_NODE ? nextSibling.textContent : '';
-						
+
 						// Replace the container with the footnote
 						containerToReplace.replaceWith(footnoteRef);
-						
-						// If there was text content after the reference, we need to ensure it stays in the paragraph
-						if (textContent && nextSibling) {
-							const paragraph = footnoteRef.closest('p');
-							if (paragraph) {
-								footnoteRef.after(textContent);
-								nextSibling.remove();
-							}
-						}
 					}
 				});
 
 				// Clean up any ZeroWidthSpace characters that might break flow
 				tempDiv.innerHTML = tempDiv.innerHTML.replace(/\u200B/g, '');
-				
+
 				// Clean up any empty spans that might have contained references
 				const emptySpans = tempDiv.querySelectorAll('span:empty');
 				emptySpans.forEach(span => span.remove());
-
-				// Normalize paragraph structure
-				const paragraphs = tempDiv.querySelectorAll('p');
-				paragraphs.forEach(p => {
-					// Remove any line breaks or extra spaces between elements
-					p.innerHTML = p.innerHTML.replace(/>\s+</g, '><').trim();
-					
-					// Ensure any text nodes immediately following the paragraph are moved inside
-					let nextSibling = p.nextSibling;
-					while (nextSibling && nextSibling.nodeType === Node.TEXT_NODE) {
-						const textContent = nextSibling.textContent;
-						if (textContent?.trim()) {
-							p.appendChild(document.createTextNode(textContent));
-						}
-						const toRemove = nextSibling;
-						nextSibling = nextSibling.nextSibling;
-						toRemove.remove();
-					}
-				});
 
 				turns.push({
 					role: role,
