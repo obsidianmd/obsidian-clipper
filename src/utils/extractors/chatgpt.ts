@@ -95,79 +95,69 @@ export class ChatGPTExtractor extends BaseExtractor {
 
 			// If we have content to add
 			if (combinedContent) {
-				// Process inline references
-				const tempDiv = document.createElement('div');
-				tempDiv.innerHTML = combinedContent;
-				
-				// Find all reference links within their containers
-				const references = tempDiv.querySelectorAll('.relative.inline-flex a[href^="http"]');
-				references.forEach(ref => {
-					const inlineFlexContainer = ref.closest('.relative.inline-flex');
-					if (inlineFlexContainer) {
-						const url = ref.getAttribute('href') || '';
-						let domain = '';
-						let fragmentText = '';
+				// First clean up any ZeroWidthSpace characters
+				combinedContent = combinedContent.replace(/\u200B/g, '');
+
+				// Process inline references using regex to find the containers
+				const containerPattern = /<div class="relative inline-flex[^>]*>.*?<\/div>/g;
+				combinedContent = combinedContent.replace(containerPattern, (match) => {
+					// Extract URL from the match
+					const urlMatch = match.match(/href="([^"]+)"/);
+					if (!urlMatch) return match;
+
+					const url = urlMatch[1];
+					let domain = '';
+					let fragmentText = '';
+					
+					try {
+						// Extract domain without www.
+						domain = new URL(url).hostname.replace(/^www\./, '');
 						
-						try {
-							// Extract domain without www.
-							domain = new URL(url).hostname.replace(/^www\./, '');
+						// Extract and decode the fragment text if it exists
+						const hashParts = url.split('#:~:text=');
+						if (hashParts.length > 1) {
+							fragmentText = decodeURIComponent(hashParts[1]);
+							// Replace URL-encoded commas and clean up
+							fragmentText = fragmentText.replace(/%2C/g, ',');
 							
-							// Extract and decode the fragment text if it exists
-							const hashParts = url.split('#:~:text=');
-							if (hashParts.length > 1) {
-								fragmentText = decodeURIComponent(hashParts[1]);
-								// Replace URL-encoded commas and clean up
-								fragmentText = fragmentText.replace(/%2C/g, ',');
-								
-								// Split the fragment into start and end if it contains a comma
-								const parts = fragmentText.split(',');
-								if (parts.length > 1) {
-									// Only show first part with ellipsis
-									fragmentText = ` — ${parts[0].trim()}...`;
-								} else {
-									// If no comma, just wrap the whole text
-									fragmentText = ` — ${fragmentText.trim()}`;
-								}
+							// Split the fragment into start and end if it contains a comma
+							const parts = fragmentText.split(',');
+							if (parts.length > 1) {
+								// Only show first part with ellipsis
+								fragmentText = ` — ${parts[0].trim()}...`;
+							} else {
+								// If no comma, just wrap the whole text
+								fragmentText = ` — ${fragmentText.trim()}`;
 							}
-						} catch (e) {
-							domain = url;
 						}
-
-						// Check if this URL already exists in our footnotes
-						let footnoteIndex = this.footnotes.findIndex(fn => fn.url === url);
-						if (footnoteIndex === -1) {
-							// Only create new footnote if URL doesn't exist
-							this.footnoteCounter++;
-							footnoteIndex = this.footnoteCounter;  // Keep it 1-based
-							this.footnotes.push({ 
-								url, 
-								text: `<a href="${url}">${domain}</a>${fragmentText}`
-							});
-						} else {
-							// Use existing footnote index (already 1-based since we never subtracted 1)
-							footnoteIndex++;
-						}
-						
-						// Create footnote reference using the correct index
-						const footnoteRef = document.createElement('sup');
-						footnoteRef.id = `fnref:${footnoteIndex}`;
-						footnoteRef.innerHTML = `<a href="#fn:${footnoteIndex}">${footnoteIndex}</a>`;
-						
-						// Find the parent span if it exists
-						const parentSpan = inlineFlexContainer.closest('span[data-state="closed"]');
-						const containerToReplace = parentSpan || inlineFlexContainer;
-
-						// Replace the container with the footnote
-						containerToReplace.replaceWith(footnoteRef);
+					} catch (e) {
+						domain = url;
 					}
+
+					// Check if this URL already exists in our footnotes
+					let footnoteIndex = this.footnotes.findIndex(fn => fn.url === url);
+					if (footnoteIndex === -1) {
+						// Only create new footnote if URL doesn't exist
+						this.footnoteCounter++;
+						footnoteIndex = this.footnoteCounter;  // Keep it 1-based
+						this.footnotes.push({ 
+							url, 
+							text: `<a href="${url}">${domain}</a>${fragmentText}`
+						});
+					} else {
+						// Use existing footnote index (already 1-based since we never subtracted 1)
+						footnoteIndex++;
+					}
+					
+					// Return the footnote reference
+					return `<sup id="fnref:${footnoteIndex}"><a href="#fn:${footnoteIndex}">${footnoteIndex}</a></sup>`;
 				});
 
-				// Clean up any ZeroWidthSpace characters that might break flow
-				tempDiv.innerHTML = tempDiv.innerHTML.replace(/\u200B/g, '');
+				// Clean up any empty spans, but only if they're actually empty
+				combinedContent = combinedContent.replace(/<span[^>]*>\s*<\/span>/g, '');
 
-				// Clean up any empty spans that might have contained references
-				const emptySpans = tempDiv.querySelectorAll('span:empty');
-				emptySpans.forEach(span => span.remove());
+				const tempDiv = document.createElement('div');
+				tempDiv.innerHTML = combinedContent;
 
 				turns.push({
 					role: role,
