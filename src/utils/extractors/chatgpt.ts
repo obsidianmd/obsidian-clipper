@@ -1,5 +1,6 @@
 import { BaseExtractor, ExtractorResult } from './_base';
 import { Defuddle } from 'defuddle';
+import DOMPurify from 'dompurify';
 
 export class ChatGPTExtractor extends BaseExtractor {
 	private articles: NodeListOf<Element> | null;
@@ -99,8 +100,9 @@ export class ChatGPTExtractor extends BaseExtractor {
 				combinedContent = combinedContent.replace(/\u200B/g, '');
 
 				// Process inline references using regex to find the containers
-				const containerPattern = /<div class="relative inline-flex[^>]*>.*?<\/div>/g;
-				combinedContent = combinedContent.replace(containerPattern, (match) => {
+				// Look for the specific div inside a span, and preserve the span
+				const containerPattern = /(<span[^>]*>)<div class="relative inline-flex[^>]*>.*?<\/div><\/span>/g;
+				combinedContent = combinedContent.replace(containerPattern, (match, spanOpen) => {
 					// Extract URL from the match
 					const urlMatch = match.match(/href="([^"]+)"/);
 					if (!urlMatch) return match;
@@ -149,19 +151,19 @@ export class ChatGPTExtractor extends BaseExtractor {
 						footnoteIndex++;
 					}
 					
-					// Return the footnote reference
-					return `<sup id="fnref:${footnoteIndex}"><a href="#fn:${footnoteIndex}">${footnoteIndex}</a></sup>`;
+					// Return the footnote reference wrapped in the original span
+					return `${spanOpen}<sup id="fnref:${footnoteIndex}"><a href="#fn:${footnoteIndex}">${footnoteIndex}</a></sup></span>`;
 				});
 
-				// Clean up any empty spans, but only if they're actually empty
+				// Clean up any empty spans
 				combinedContent = combinedContent.replace(/<span[^>]*>\s*<\/span>/g, '');
 
-				const tempDiv = document.createElement('div');
-				tempDiv.innerHTML = combinedContent;
+				// Final sanitization
+				combinedContent = DOMPurify.sanitize(combinedContent.trim());
 
 				turns.push({
 					role: role,
-					content: tempDiv.innerHTML.trim()
+					content: combinedContent
 				});
 			}
 		});
