@@ -124,8 +124,9 @@ export function createMarkdownContent(content: string, url: string) {
 				currentParent = currentParent.parentNode;
 			}
 
-			// Add tab indentation based on nesting level
-			prefix = '\t'.repeat(level - 1) + prefix;
+			// Add tab indentation based on nesting level, ensuring it's never negative
+			const indentLevel = Math.max(0, level - 1);
+			prefix = '\t'.repeat(indentLevel) + prefix;
 
 			if (parent instanceof HTMLOListElement) {
 				let start = parent.getAttribute('start');
