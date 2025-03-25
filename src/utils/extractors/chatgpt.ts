@@ -30,7 +30,7 @@ export class ChatGPTExtractor extends BaseExtractor {
 		tempDoc.body.appendChild(container);
 
 		// Run Defuddle on our formatted content
-		const defuddled = new Defuddle(tempDoc, {debug: true}).parse();
+		const defuddled = new Defuddle(tempDoc).parse();
 		const contentHtml = defuddled.content;
 
 		return {
@@ -100,8 +100,8 @@ export class ChatGPTExtractor extends BaseExtractor {
 				combinedContent = combinedContent.replace(/\u200B/g, '');
 
 				// Process inline references using regex to find the containers
-				// Look for the specific div inside a span, and preserve the span
-				const containerPattern = /(<span[^>]*>)<div class="relative inline-flex[^>]*>.*?<\/div><\/span>/g;
+				// Look for spans containing citation links
+				const containerPattern = /(<span[^>]*>)(?:<div class="relative inline-flex[^>]*>|<div[^>]*class="[^"]*relative inline-flex[^>]*>).*?<\/div><\/span>/g;
 				combinedContent = combinedContent.replace(containerPattern, (match, spanOpen) => {
 					// Extract URL from the match
 					const urlMatch = match.match(/href="([^"]+)"/);
@@ -124,12 +124,15 @@ export class ChatGPTExtractor extends BaseExtractor {
 							
 							// Split the fragment into start and end if it contains a comma
 							const parts = fragmentText.split(',');
-							if (parts.length > 1) {
-								// Only show first part with ellipsis
+							if (parts.length > 1 && parts[0].trim()) {
+								// Only show first part with ellipsis if it has content
 								fragmentText = ` — ${parts[0].trim()}...`;
-							} else {
-								// If no comma, just wrap the whole text
+							} else if (parts[0].trim()) {
+								// If no comma but has content, wrap the whole text
 								fragmentText = ` — ${fragmentText.trim()}`;
+							} else {
+								// If no content, don't show fragment text at all
+								fragmentText = '';
 							}
 						}
 					} catch (e) {
