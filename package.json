@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-clipper",
-	"version": "0.11.3",
+	"version": "0.11.4",
 	"description": "Official web clipper for Obsidian.",
 	"scripts": {
 		"defuddle-dev": "node scripts/set-defuddle-dev.js",
