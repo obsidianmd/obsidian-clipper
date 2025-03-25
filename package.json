@@ -3,6 +3,8 @@
 	"version": "0.11.3",
 	"description": "Official web clipper for Obsidian.",
 	"scripts": {
+		"defuddle-dev": "node scripts/set-defuddle-dev.js",
+		"defuddle-prod": "node scripts/set-defuddle-prod.js",
 		"dev:chrome": "webpack --watch --env BROWSER=chrome --mode development",
 		"dev:firefox": "webpack --watch --env BROWSER=firefox --mode development",
 		"dev:safari": "webpack --watch --env BROWSER=safari --mode development",
