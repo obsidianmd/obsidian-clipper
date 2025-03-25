@@ -109,13 +109,13 @@ export async function initializePageContent(
 			content = selectedHtml;
 		} else if (extractor) {
 			debugLog('Content', 'Using custom extractor');
-			const extractedResult = extractor.extract();
-			content = extractedResult.contentHtml;
-			if (extractedResult.extractedContent) {
-				extractedContent = { ...extractedContent, ...extractedResult.extractedContent };
+			const extracted = extractor.extract();
+			content = extracted.contentHtml;
+			if (extracted.extractedContent) {
+				extractedContent = { ...extractedContent, ...extracted.extractedContent };
 			}
-			if (extractedResult.variables) {
-				extractorVariables = extractedResult.variables;
+			if (extracted.variables) {
+				extractorVariables = extracted.variables;
 			}
 		}
 

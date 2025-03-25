@@ -221,12 +221,12 @@ export class Reader {
 		const extractor = ExtractorRegistry.findExtractor(doc, doc.URL, schemaOrgData);
 		if (extractor && extractor.canExtract()) {
 			console.log('Reader', 'Using custom extractor:', extractor.constructor.name);
-			const result = extractor.extract();
+			const extracted = extractor.extract();
 			return {
-				content: result.contentHtml,
-				title: result.variables?.title,
-				author: result.variables?.author,
-				published: result.variables?.published,
+				content: extracted.contentHtml,
+				title: extracted.variables?.title,
+				author: extracted.variables?.author,
+				published: extracted.variables?.published,
 				domain: getDomain(doc.URL),
 				extractorType: extractor.constructor.name.replace('Extractor', '').toLowerCase()
 			};

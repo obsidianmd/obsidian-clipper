@@ -100,9 +100,9 @@ export class ChatGPTExtractor extends BaseExtractor {
 				combinedContent = combinedContent.replace(/\u200B/g, '');
 
 				// Process inline references using regex to find the containers
-				// Look for spans containing citation links
-				const containerPattern = /(<span[^>]*>)(?:<div class="relative inline-flex[^>]*>|<div[^>]*class="[^"]*relative inline-flex[^>]*>).*?<\/div><\/span>/g;
-				combinedContent = combinedContent.replace(containerPattern, (match, spanOpen) => {
+				// Look for spans containing citation links, replacing entire structure
+				const containerPattern = /(?:<\/p>)?<div class="relative inline-flex[^>]*>.*?<\/div>|<span[^>]*>(?:<div class="relative inline-flex[^>]*>|<div[^>]*class="[^"]*relative inline-flex[^>]*>).*?<\/div><\/span>/g;
+				combinedContent = combinedContent.replace(containerPattern, (match) => {
 					// Extract URL from the match
 					const urlMatch = match.match(/href="([^"]+)"/);
 					if (!urlMatch) return match;
@@ -154,12 +154,14 @@ export class ChatGPTExtractor extends BaseExtractor {
 						footnoteIndex++;
 					}
 					
-					// Return the footnote reference wrapped in the original span
-					return `${spanOpen}<sup id="fnref:${footnoteIndex}"><a href="#fn:${footnoteIndex}">${footnoteIndex}</a></sup></span>`;
+					// Return just the footnote reference
+					return `<span class="" data-state="closed"><sup id="fnref:${footnoteIndex}"><a href="#fn:${footnoteIndex}">${footnoteIndex}</a></sup></span>`;
 				});
 
-				// Clean up any empty spans
-				combinedContent = combinedContent.replace(/<span[^>]*>\s*<\/span>/g, '');
+				// Clean up any empty spans and stray paragraph tags
+				combinedContent = combinedContent
+					.replace(/<span[^>]*>\s*<\/span>/g, '')
+					.replace(/<p[^>]*>\s*<\/p>/g, '');
 
 				// Final sanitization
 				combinedContent = DOMPurify.sanitize(combinedContent.trim());
@@ -188,7 +190,7 @@ export class ChatGPTExtractor extends BaseExtractor {
 
 		// Add footnotes section if we have any
 		if (this.footnotes.length > 0) {
-			content += '\n<div class="footnotes">\n<ol>';
+			content += '\n<div id="footnotes">\n<ol>';
 			this.footnotes.forEach((footnote, index) => {
 				content += `
     <li class="footnote" id="fn:${index + 1}">
