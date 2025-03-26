@@ -1,7 +1,7 @@
 import browser from './utils/browser-polyfill';
 import * as highlighter from './utils/highlighter';
 import { loadSettings, generalSettings } from './utils/storage-utils';
-import { Defuddle } from 'defuddle';
+import Defuddle from 'defuddle';
 import { getDomain } from './utils/string-utils';
 
 declare global {

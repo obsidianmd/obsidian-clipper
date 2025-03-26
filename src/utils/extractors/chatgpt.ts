@@ -1,5 +1,5 @@
 import { BaseExtractor, ExtractorResult } from './_base';
-import { Defuddle } from 'defuddle';
+import Defuddle from 'defuddle';
 import DOMPurify from 'dompurify';
 
 export class ChatGPTExtractor extends BaseExtractor {

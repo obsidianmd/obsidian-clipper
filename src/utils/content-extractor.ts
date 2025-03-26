@@ -2,7 +2,7 @@ import { ExtractedContent } from '../types/types';
 import { ExtractorRegistry } from './extractor-registry';
 import { createMarkdownContent } from './markdown-converter';
 import { sanitizeFileName, getDomain } from './string-utils';
-import { Defuddle } from 'defuddle';
+import Defuddle from 'defuddle';
 import browser from './browser-polyfill';
 import { debugLog } from './debug';
 import dayjs from 'dayjs';

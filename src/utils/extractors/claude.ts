@@ -1,5 +1,5 @@
 import { BaseExtractor, ExtractorResult } from './_base';
-import { Defuddle } from 'defuddle';
+import Defuddle from 'defuddle';
 
 export class ClaudeExtractor extends BaseExtractor {
 	private articles: NodeListOf<Element> | null;

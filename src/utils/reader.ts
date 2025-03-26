@@ -1,4 +1,4 @@
-import { Defuddle } from 'defuddle/full';
+import Defuddle from 'defuddle/full';
 import { getLocalStorage, setLocalStorage } from './storage-utils';
 import { ExtractorRegistry } from './extractor-registry';
 import hljs from 'highlight.js';
