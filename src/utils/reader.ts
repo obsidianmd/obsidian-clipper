@@ -1,6 +1,5 @@
 import Defuddle from 'defuddle/full';
 import { getLocalStorage, setLocalStorage } from './storage-utils';
-import { ExtractorRegistry } from './extractor-registry';
 import hljs from 'highlight.js';
 import { getDomain } from './string-utils';
 
@@ -215,22 +214,6 @@ export class Reader {
 		
 		// const defuddled = new Defuddle(doc, {debug: true}).parse();
 		const defuddled = new Defuddle(doc).parse();
-		const schemaOrgData = defuddled.schemaOrgData;
-
-		// Try to use a specific extractor first
-		const extractor = ExtractorRegistry.findExtractor(doc, doc.URL, schemaOrgData);
-		if (extractor && extractor.canExtract()) {
-			console.log('Reader', 'Using custom extractor:', extractor.constructor.name);
-			const extracted = extractor.extract();
-			return {
-				content: extracted.contentHtml,
-				title: extracted.variables?.title,
-				author: extracted.variables?.author,
-				published: extracted.variables?.published,
-				domain: getDomain(doc.URL),
-				extractorType: extractor.constructor.name.replace('Extractor', '').toLowerCase()
-			};
-		}
 
 		return {
 			content: defuddled.content,
