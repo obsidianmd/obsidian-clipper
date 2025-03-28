@@ -58,7 +58,7 @@ export abstract class ConversationExtractor extends BaseExtractor {
 			return `
 			<div class="message message-${message.author.toLowerCase()}" ${dataAttributes}>
 				<div class="message-header">
-					<div class="message-author">${message.author}</div>
+					<p class="message-author"><strong>${message.author}</strong></p>
 					${timestampHtml}
 				</div>
 				<div class="message-content">
