@@ -1,5 +1,4 @@
 import { ExtractedContent } from '../types/types';
-import { ExtractorRegistry } from './extractor-registry';
 import { createMarkdownContent } from './markdown-converter';
 import { sanitizeFileName, getDomain } from './string-utils';
 import Defuddle from 'defuddle';
@@ -83,10 +82,6 @@ export async function extractPageContent(tabId: number): Promise<ContentResponse
 	}
 }
 
-interface ExtractorVariables {
-	[key: string]: string;
-}
-
 export async function initializePageContent(
 	content: string, 
 	selectedHtml: string, 
@@ -102,25 +97,12 @@ export async function initializePageContent(
 
 		currentUrl = currentUrl.replace(/#:~:text=[^&]+(&|$)/, '');
 
-		const extractor = ExtractorRegistry.findExtractor(doc, currentUrl, schemaOrgData);
-		let extractorVariables: ExtractorVariables = {};
-		
 		if (selectedHtml) {
 			content = selectedHtml;
-		} else if (extractor) {
-			debugLog('Content', 'Using custom extractor');
-			const extracted = extractor.extract();
-			content = extracted.contentHtml;
-			if (extracted.extractedContent) {
-				extractedContent = { ...extractedContent, ...extracted.extractedContent };
-			}
-			if (extracted.variables) {
-				extractorVariables = extracted.variables;
-			}
 		}
 
 		const defuddled = new Defuddle(doc).parse();
-		const noteName = sanitizeFileName(extractorVariables['title'] || defuddled.title);
+		const noteName = sanitizeFileName(defuddled.title);
 
 		// Process highlights after getting the base content
 		if (generalSettings.highlighterEnabled && generalSettings.highlightBehavior !== 'no-highlights' && highlights && highlights.length > 0) {
@@ -170,14 +152,6 @@ export async function initializePageContent(
 		// Add extracted content to variables
 		Object.entries(extractedContent).forEach(([key, value]) => {
 			currentVariables[`{{${key}}}`] = value;
-		});
-
-		// Override with extractor variables (they take precedence over everything)
-		Object.entries(extractorVariables).forEach(([key, value]: [string, string]) => {
-			const variableKey = `{{${key}}}`;
-			if (value) {
-				currentVariables[variableKey] = value.trim();
-			}
 		});
 
 		// Add all meta tags to variables
