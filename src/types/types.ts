@@ -102,3 +102,25 @@ export interface HistoryEntry {
 	vault?: string;
 	path?: string;
 }
+
+export interface ConversationMessage {
+	author: string;
+	content: string;
+	timestamp?: string;
+	metadata?: Record<string, any>;
+}
+
+export interface ConversationMetadata {
+	title?: string;
+	description?: string;
+	site: string;
+	url: string;
+	messageCount: number;
+	startTime?: string;
+	endTime?: string;
+}
+
+export interface Footnote {
+	url: string;
+	text: string;
+}

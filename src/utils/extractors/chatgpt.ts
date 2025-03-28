@@ -1,10 +1,10 @@
-import { BaseExtractor, ExtractorResult } from './_base';
-import Defuddle from 'defuddle';
+import { ConversationExtractor } from './_conversation';
+import { ConversationMessage, ConversationMetadata, Footnote } from '../../types/types';
 import DOMPurify from 'dompurify';
 
-export class ChatGPTExtractor extends BaseExtractor {
+export class ChatGPTExtractor extends ConversationExtractor {
 	private articles: NodeListOf<Element> | null;
-	private footnotes: { url: string; text: string }[];
+	private footnotes: Footnote[];
 	private footnoteCounter: number;
 
 	constructor(document: Document, url: string) {
@@ -18,191 +18,132 @@ export class ChatGPTExtractor extends BaseExtractor {
 		return !!this.articles && this.articles.length > 0;
 	}
 
-	extract(): ExtractorResult {
-		const turns = this.extractConversationTurns();
-		const title = this.getTitle();
-		const rawContentHtml = this.createContentHtml(turns);
-
-		// Create a temporary document to run Defuddle on our content
-		const tempDoc = document.implementation.createHTMLDocument();
-		const container = tempDoc.createElement('div');
-		container.innerHTML = rawContentHtml;
-		tempDoc.body.appendChild(container);
-
-		// Run Defuddle on our formatted content
-		const defuddled = new Defuddle(tempDoc).parse();
-		const contentHtml = defuddled.content;
-
-		return {
-			content: contentHtml,
-			contentHtml: contentHtml,
-			extractedContent: {
-				turns: turns.length.toString(),
-			},
-			variables: {
-				title: title,
-				site: 'ChatGPT',
-				description: `ChatGPT conversation with ${turns.length} turns`,
-				author: 'ChatGPT',
-				wordCount: defuddled.wordCount?.toString() || '',
-			}
-		};
-	}
-
-	private extractConversationTurns(): { role: string; content: string }[] {
-		const turns: { role: string; content: string }[] = [];
+	protected extractMessages(): ConversationMessage[] {
+		const messages: ConversationMessage[] = [];
 		this.footnotes = [];
 		this.footnoteCounter = 0;
 
-		if (!this.articles) return turns;
+		if (!this.articles) return messages;
 
 		this.articles.forEach((article) => {
-			const roleElement = article.querySelector('h5, h6');
-			const role = roleElement?.textContent?.toLowerCase().replace(' said:', '') || 'unknown';
-			
-			// Find all message containers within this article
-			const messageContainers = article.querySelectorAll('[data-message-author-role]');
-			if (!messageContainers.length) return;
+			// Get the localized author text from the sr-only heading and clean it
+			const authorElement = article.querySelector('h5.sr-only, h6.sr-only');
+			const authorText = authorElement?.textContent
+				?.trim()
+				?.replace(/:\s*$/, '') // Remove colon and any trailing whitespace
+				|| '';
 
-			// For research messages, we need to combine multiple message blocks
-			let combinedContent = '';
+			let currentAuthorRole = '';
 
-			messageContainers.forEach((messageContainer) => {
-				const authorRole = messageContainer.getAttribute('data-message-author-role');
-				let messageContent = '';
+			const authorRole = article.getAttribute('data-message-author-role');
+			if (authorRole) {
+				currentAuthorRole = authorRole;
+			}
 
-				if (authorRole === 'user') {
-					// For user messages, look for the content in the whitespace-pre-wrap div
-					const userContent = messageContainer.querySelector('.whitespace-pre-wrap');
-					messageContent = userContent?.innerHTML || '';
-				} else if (authorRole === 'assistant') {
-					// For assistant messages, look for markdown content
-					const markdownContent = messageContainer.querySelector('.markdown');
-					messageContent = markdownContent?.innerHTML || '';
-				}
+			let messageContent = article.innerHTML || '';
+			messageContent = messageContent.replace(/\u200B/g, '');
 
-				if (messageContent) {
-					// If this is part of a research message, add it to the combined content
-					if (messageContainer.getAttribute('data-message-model-slug') === 'research') {
-						// Add research completion info if present
-						const researchInfo = article.querySelector('.border-token-border-primary');
-						if (researchInfo && !combinedContent.includes(researchInfo.outerHTML)) {
-							combinedContent += researchInfo.outerHTML;
+			// Remove specific elements from the message content
+			const tempDiv = document.createElement('div');
+			tempDiv.innerHTML = messageContent;
+			tempDiv.querySelectorAll('h5.sr-only, h6.sr-only, span[data-state="closed"]').forEach(el => el.remove());
+			messageContent = tempDiv.innerHTML;
+
+			// Process inline references using regex to find the containers
+			// Look for spans containing citation links, replacing entire structure
+			const containerPattern = /(?:<\/p>)?<div class="relative inline-flex[^>]*>.*?<\/div>|<span[^>]*>(?:<div class="relative inline-flex[^>]*>|<div[^>]*class="[^"]*relative inline-flex[^>]*>).*?<\/div><\/span>/g;
+			messageContent = messageContent.replace(containerPattern, (match) => {
+				// Extract URL from the match
+				const urlMatch = match.match(/href="([^"]+)"/);
+				if (!urlMatch) return match;
+
+				const url = urlMatch[1];
+				let domain = '';
+				let fragmentText = '';
+				
+				try {
+					// Extract domain without www.
+					domain = new URL(url).hostname.replace(/^www\./, '');
+					
+					// Extract and decode the fragment text if it exists
+					const hashParts = url.split('#:~:text=');
+					if (hashParts.length > 1) {
+						fragmentText = decodeURIComponent(hashParts[1]);
+						// Replace URL-encoded commas and clean up
+						fragmentText = fragmentText.replace(/%2C/g, ',');
+						
+						// Split the fragment into start and end if it contains a comma
+						const parts = fragmentText.split(',');
+						if (parts.length > 1 && parts[0].trim()) {
+							// Only show first part with ellipsis if it has content
+							fragmentText = ` — ${parts[0].trim()}...`;
+						} else if (parts[0].trim()) {
+							// If no comma but has content, wrap the whole text
+							fragmentText = ` — ${fragmentText.trim()}`;
+						} else {
+							// If no content, don't show fragment text at all
+							fragmentText = '';
 						}
 					}
-					combinedContent += messageContent;
+				} catch (e) {
+					domain = url;
+				}
+
+				// Check if this URL already exists in our footnotes
+				let footnoteIndex = this.footnotes.findIndex(fn => fn.url === url);
+				if (footnoteIndex === -1) {
+					// Only create new footnote if URL doesn't exist
+					this.footnoteCounter++;
+					footnoteIndex = this.footnoteCounter;  // Keep it 1-based
+					this.footnotes.push({ 
+						url, 
+						text: `<a href="${url}">${domain}</a>${fragmentText}`
+					});
+				} else {
+					// Use existing footnote index (already 1-based since we never subtracted 1)
+					footnoteIndex++;
+				}
+				
+				// Return just the footnote reference
+				return `<span class="" data-state="closed"><sup id="fnref:${footnoteIndex}"><a href="#fn:${footnoteIndex}">${footnoteIndex}</a></sup></span>`;
+			});
+
+			// Clean up any empty spans and stray paragraph tags
+			messageContent = messageContent
+				.replace(/<span[^>]*>\s*<\/span>/g, '')
+				.replace(/<p[^>]*>\s*<\/p>/g, '');
+
+			// Final sanitization
+			messageContent = DOMPurify.sanitize(messageContent.trim());
+
+			messages.push({
+				author: authorText,
+				content: messageContent,
+				metadata: {
+					role: currentAuthorRole || 'unknown'
 				}
 			});
 
-			// If we have content to add
-			if (combinedContent) {
-				// First clean up any ZeroWidthSpace characters
-				combinedContent = combinedContent.replace(/\u200B/g, '');
-
-				// Process inline references using regex to find the containers
-				// Look for spans containing citation links, replacing entire structure
-				const containerPattern = /(?:<\/p>)?<div class="relative inline-flex[^>]*>.*?<\/div>|<span[^>]*>(?:<div class="relative inline-flex[^>]*>|<div[^>]*class="[^"]*relative inline-flex[^>]*>).*?<\/div><\/span>/g;
-				combinedContent = combinedContent.replace(containerPattern, (match) => {
-					// Extract URL from the match
-					const urlMatch = match.match(/href="([^"]+)"/);
-					if (!urlMatch) return match;
-
-					const url = urlMatch[1];
-					let domain = '';
-					let fragmentText = '';
-					
-					try {
-						// Extract domain without www.
-						domain = new URL(url).hostname.replace(/^www\./, '');
-						
-						// Extract and decode the fragment text if it exists
-						const hashParts = url.split('#:~:text=');
-						if (hashParts.length > 1) {
-							fragmentText = decodeURIComponent(hashParts[1]);
-							// Replace URL-encoded commas and clean up
-							fragmentText = fragmentText.replace(/%2C/g, ',');
-							
-							// Split the fragment into start and end if it contains a comma
-							const parts = fragmentText.split(',');
-							if (parts.length > 1 && parts[0].trim()) {
-								// Only show first part with ellipsis if it has content
-								fragmentText = ` — ${parts[0].trim()}...`;
-							} else if (parts[0].trim()) {
-								// If no comma but has content, wrap the whole text
-								fragmentText = ` — ${fragmentText.trim()}`;
-							} else {
-								// If no content, don't show fragment text at all
-								fragmentText = '';
-							}
-						}
-					} catch (e) {
-						domain = url;
-					}
-
-					// Check if this URL already exists in our footnotes
-					let footnoteIndex = this.footnotes.findIndex(fn => fn.url === url);
-					if (footnoteIndex === -1) {
-						// Only create new footnote if URL doesn't exist
-						this.footnoteCounter++;
-						footnoteIndex = this.footnoteCounter;  // Keep it 1-based
-						this.footnotes.push({ 
-							url, 
-							text: `<a href="${url}">${domain}</a>${fragmentText}`
-						});
-					} else {
-						// Use existing footnote index (already 1-based since we never subtracted 1)
-						footnoteIndex++;
-					}
-					
-					// Return just the footnote reference
-					return `<span class="" data-state="closed"><sup id="fnref:${footnoteIndex}"><a href="#fn:${footnoteIndex}">${footnoteIndex}</a></sup></span>`;
-				});
-
-				// Clean up any empty spans and stray paragraph tags
-				combinedContent = combinedContent
-					.replace(/<span[^>]*>\s*<\/span>/g, '')
-					.replace(/<p[^>]*>\s*<\/p>/g, '');
-
-				// Final sanitization
-				combinedContent = DOMPurify.sanitize(combinedContent.trim());
-
-				turns.push({
-					role: role,
-					content: combinedContent
-				});
-			}
 		});
 
-		return turns;
+		return messages;
 	}
 
-	private createContentHtml(turns: { role: string; content: string }[]): string {
-		let content = turns.map((turn, index) => {
-			const displayRole = turn.role === 'you' ? 'You' : 'ChatGPT';
-			return `
-			<div class="chatgpt-turn chatgpt-${turn.role}">
-				<div class="chatgpt-role"><h2>${displayRole}</h2></div>
-				<div class="chatgpt-content">
-					${turn.content}
-				</div>
-			</div>${index < turns.length - 1 ? '\n<hr>' : ''}`;
-		}).join('\n').trim();
+	protected getFootnotes(): Footnote[] {
+		return this.footnotes;
+	}
 
-		// Add footnotes section if we have any
-		if (this.footnotes.length > 0) {
-			content += '\n<div id="footnotes">\n<ol>';
-			this.footnotes.forEach((footnote, index) => {
-				content += `
-    <li class="footnote" id="fn:${index + 1}">
-      <p>
-        <a href="${footnote.url}" target="_blank">${footnote.text}</a>&nbsp;<a href="#fnref:${index + 1}" class="footnote-backref">↩</a>
-      </p>
-    </li>`;
-			});
-			content += '\n  </ol>\n</div>';
-		}
+	protected getMetadata(): ConversationMetadata {
+		const title = this.getTitle();
+		const messages = this.extractMessages();
 
-		return content;
+		return {
+			title,
+			site: 'ChatGPT',
+			url: this.url,
+			messageCount: messages.length,
+			description: `ChatGPT conversation with ${messages.length} messages`
+		};
 	}
 
 	private getTitle(): string {

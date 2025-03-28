@@ -403,12 +403,47 @@
 		max-width: 100%;
 		overflow-x: auto;
 		padding: 12px 16px;
+		position: relative;
 		pre,
 		code {
 			font-size: inherit;
 			border: none;
 			background-color: transparent;
 			padding: 0 !important;
+		}
+
+		.copy-button {
+			position: absolute;
+			top: 8px;
+			right: 8px;
+			width: auto;
+			height: auto;
+			padding: 6px;
+			background-color: var(--obsidian-reader-background-primary-alt);
+			border: none;
+			border-radius: 4px;
+			color: var(--obsidian-reader-text-faint);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			opacity: 0;
+
+			svg {
+				width: 16px;
+				height: 16px;
+			}
+			&:hover {
+				background: var(--obsidian-reader-border);
+				color: var(--obsidian-reader-text-primary);
+			}
+
+			&.copied {
+				color: var(--obsidian-reader-color-green);
+			}
+		}
+
+		&:hover .copy-button {
+			opacity: 1;
 		}
 	}
 	code[class*="language-"],

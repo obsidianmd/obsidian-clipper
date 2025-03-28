@@ -1,7 +1,7 @@
-import { BaseExtractor, ExtractorResult } from './_base';
-import Defuddle from 'defuddle';
+import { ConversationExtractor } from './_conversation';
+import { ConversationMessage, ConversationMetadata } from '../../types/types';
 
-export class ClaudeExtractor extends BaseExtractor {
+export class ClaudeExtractor extends ConversationExtractor {
 	private articles: NodeListOf<Element> | null;
 
 	constructor(document: Document, url: string) {
@@ -14,41 +14,10 @@ export class ClaudeExtractor extends BaseExtractor {
 		return !!this.articles && this.articles.length > 0;
 	}
 
-	extract(): ExtractorResult {
-		const turns = this.extractConversationTurns();
-		const title = this.getTitle();
-		const rawContentHtml = this.createContentHtml(turns);
+	protected extractMessages(): ConversationMessage[] {
+		const messages: ConversationMessage[] = [];
 
-		// Create a temporary document to run Defuddle on our content
-		const tempDoc = document.implementation.createHTMLDocument();
-		const container = tempDoc.createElement('article');
-		container.innerHTML = rawContentHtml;
-		tempDoc.body.appendChild(container);
-
-		// Run Defuddle on our formatted content
-		const defuddled = new Defuddle(tempDoc).parse();
-		const contentHtml = defuddled.content;
-
-		return {
-			content: contentHtml,
-			contentHtml: contentHtml,
-			extractedContent: {
-				turns: turns.length.toString(),
-			},
-			variables: {
-				title: title,
-				site: 'Claude',
-				description: `Claude conversation with ${turns.length} turns`,
-				author: 'Claude',
-				wordCount: defuddled.wordCount?.toString() || '',
-			}
-		};
-	}
-
-	private extractConversationTurns(): { role: string; content: string }[] {
-		const turns: { role: string; content: string }[] = [];
-
-		if (!this.articles) return turns;
+		if (!this.articles) return messages;
 
 		this.articles.forEach((article) => {
 			let role: string;
@@ -74,27 +43,30 @@ export class ClaudeExtractor extends BaseExtractor {
 			}
 
 			if (content) {
-				turns.push({
-					role,
-					content: content.trim()
+				messages.push({
+					author: role === 'you' ? 'You' : 'Claude',
+					content: content.trim(),
+					metadata: {
+						role: role
+					}
 				});
 			}
 		});
 
-		return turns;
+		return messages;
 	}
 
-	private createContentHtml(turns: { role: string; content: string }[]): string {
-		return turns.map((turn, index) => {
-			const displayRole = turn.role === 'you' ? 'You' : 'Claude';
-			return `
-			<div class="claude-turn claude-${turn.role}">
-				<div class="claude-role"><h2>${displayRole}</h2></div>
-				<div class="claude-content">
-					${turn.content}
-				</div>
-			</div>${index < turns.length - 1 ? '\n<hr>' : ''}`;
-		}).join('\n').trim();
+	protected getMetadata(): ConversationMetadata {
+		const title = this.getTitle();
+		const messages = this.extractMessages();
+
+		return {
+			title,
+			site: 'Claude',
+			url: this.url,
+			messageCount: messages.length,
+			description: `Claude conversation with ${messages.length} messages`
+		};
 	}
 
 	private getTitle(): string {
