@@ -22,7 +22,7 @@ export abstract class ConversationExtractor extends BaseExtractor {
 		tempDoc.body.appendChild(container);
 
 		// Run Defuddle on our formatted content
-		const defuddled = new Defuddle(tempDoc, { debug: true }).parse();
+		const defuddled = new Defuddle(tempDoc).parse();
 		const contentHtml = defuddled.content;
 
 		return {
@@ -51,6 +51,10 @@ export abstract class ConversationExtractor extends BaseExtractor {
 					.map(([key, value]) => `<div class="message-metadata-${key}">${value}</div>`)
 					.join('') : '';
 
+			// Check if content already has paragraph tags
+			const hasParagraphs = /<p[^>]*>[\s\S]*?<\/p>/i.test(message.content);
+			const contentHtml = hasParagraphs ? message.content : `<p>${message.content}</p>`;
+
 			return `
 			<div class="message message-${message.author.toLowerCase()}">
 				<div class="message-header">
@@ -58,7 +62,7 @@ export abstract class ConversationExtractor extends BaseExtractor {
 					${timestampHtml}
 				</div>
 				<div class="message-content">
-					${message.content}
+					${contentHtml}
 					${metadataHtml}
 				</div>
 			</div>${index < messages.length - 1 ? '\n<hr>' : ''}`;
