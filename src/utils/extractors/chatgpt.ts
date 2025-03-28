@@ -26,8 +26,12 @@ export class ChatGPTExtractor extends ConversationExtractor {
 		if (!this.articles) return messages;
 
 		this.articles.forEach((article) => {
-			const roleElement = article.querySelector('h5, h6');
-			const role = roleElement?.textContent?.toLowerCase().replace(' said:', '') || 'unknown';
+			// Get the localized author text from the sr-only heading and clean it
+			const authorElement = article.querySelector('h5.sr-only, h6.sr-only');
+			const authorText = authorElement?.textContent
+				?.trim()
+				?.replace(/:\s*$/, '') // Remove colon and any trailing whitespace
+				|| '';
 			
 			// Find all message containers within this article
 			const messageContainers = article.querySelectorAll('[data-message-author-role]');
@@ -35,9 +39,13 @@ export class ChatGPTExtractor extends ConversationExtractor {
 
 			// For research messages, we need to combine multiple message blocks
 			let combinedContent = '';
+			let currentAuthorRole = '';
 
 			messageContainers.forEach((messageContainer) => {
 				const authorRole = messageContainer.getAttribute('data-message-author-role');
+				if (authorRole) {
+					currentAuthorRole = authorRole;
+				}
 				let messageContent = '';
 
 				if (authorRole === 'user') {
@@ -136,10 +144,10 @@ export class ChatGPTExtractor extends ConversationExtractor {
 				combinedContent = DOMPurify.sanitize(combinedContent.trim());
 
 				messages.push({
-					author: role === 'you' ? 'You' : 'ChatGPT',
+					author: authorText,
 					content: combinedContent,
 					metadata: {
-						role: role
+						role: currentAuthorRole || 'unknown'
 					}
 				});
 			}

@@ -35,7 +35,6 @@ export abstract class ConversationExtractor extends BaseExtractor {
 				title: metadata.title || 'Conversation',
 				site: metadata.site,
 				description: metadata.description || `${metadata.site} conversation with ${messages.length} messages`,
-				author: messages[0]?.author || metadata.site,
 				wordCount: defuddled.wordCount?.toString() || '',
 			}
 		};
@@ -45,25 +44,25 @@ export abstract class ConversationExtractor extends BaseExtractor {
 		const messagesHtml = messages.map((message, index) => {
 			const timestampHtml = message.timestamp ? 
 				`<div class="message-timestamp">${message.timestamp}</div>` : '';
-			
-			const metadataHtml = message.metadata ? 
-				Object.entries(message.metadata)
-					.map(([key, value]) => `<div class="message-metadata-${key}">${value}</div>`)
-					.join('') : '';
 
 			// Check if content already has paragraph tags
 			const hasParagraphs = /<p[^>]*>[\s\S]*?<\/p>/i.test(message.content);
 			const contentHtml = hasParagraphs ? message.content : `<p>${message.content}</p>`;
 
+			// Add metadata to data attributes
+			const dataAttributes = message.metadata ? 
+				Object.entries(message.metadata)
+					.map(([key, value]) => `data-${key}="${value}"`)
+					.join(' ') : '';
+
 			return `
-			<div class="message message-${message.author.toLowerCase()}">
+			<div class="message message-${message.author.toLowerCase()}" ${dataAttributes}>
 				<div class="message-header">
 					<div class="message-author">${message.author}</div>
 					${timestampHtml}
 				</div>
 				<div class="message-content">
 					${contentHtml}
-					${metadataHtml}
 				</div>
 			</div>${index < messages.length - 1 ? '\n<hr>' : ''}`;
 		}).join('\n').trim();
