@@ -20,6 +20,9 @@ export class Reader {
 	private static settingsBar: HTMLElement | null = null;
 	private static colorSchemeMediaQuery: MediaQueryList | null = null;
 	private static readerStyles: HTMLLinkElement | null = null;
+	private static lightbox: HTMLElement | null = null;
+	private static currentImageIndex: number = -1;
+	private static images: HTMLImageElement[] = [];
 	private static settings: ReaderSettings = {
 		fontSize: 16,
 		lineHeight: 1.6,
@@ -630,6 +633,209 @@ export class Reader {
 		});
 	}
 
+	private static initializeLightbox(doc: Document) {
+		// Create lightbox container
+		this.lightbox = doc.createElement('div');
+		this.lightbox.className = 'obsidian-reader-lightbox theme-dark';
+		this.lightbox.setAttribute('role', 'dialog');
+		this.lightbox.setAttribute('aria-modal', 'true');
+		this.lightbox.innerHTML = `
+			<button class="lightbox-close" aria-label="Close image viewer">
+				<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+					<path d="M18 6L6 18M6 6l12 12"/>
+				</svg>
+			</button>
+			<div class="lightbox-content">
+				<div class="lightbox-image-container"></div>
+				<div class="lightbox-caption"></div>
+			</div>
+		`;
+		doc.body.appendChild(this.lightbox);
+
+		// Get all images in the article
+		const article = doc.querySelector('article');
+		if (article) {
+			// Get standalone images
+			const standaloneImages = Array.from(article.querySelectorAll('img:not(a img):not(figure img)')) as HTMLImageElement[];
+			
+			// Get images in links that point to image files
+			const linkedImages = Array.from(article.querySelectorAll('a:not(figure a) img')).filter(img => {
+				const link = (img as HTMLImageElement).closest('a');
+				if (!link) return false;
+				const href = link.href.toLowerCase();
+				return href.endsWith('.jpg') || href.endsWith('.jpeg') || 
+					   href.endsWith('.png') || href.endsWith('.gif') || 
+					   href.endsWith('.webp') || href.endsWith('.avif');
+			}) as HTMLImageElement[];
+
+			// Get figure images
+			const figures = Array.from(article.querySelectorAll('figure'));
+			const figureImages = figures.flatMap(figure => {
+				const images = Array.from(figure.querySelectorAll('img')) as HTMLImageElement[];
+				return images.map(img => {
+					// Store figure reference on the image for caption lookup
+					(img as any).figureElement = figure;
+					return img;
+				});
+			});
+
+			this.images = [...standaloneImages, ...linkedImages, ...figureImages];
+
+			// Add click handlers
+			this.images.forEach((img, index) => {
+				const figure = (img as any).figureElement;
+				const parentLink = img.closest('a');
+
+				if (figure) {
+					// For figures, wrap both the image and any links
+					const wrapper = doc.createElement('div');
+					wrapper.className = 'image-wrapper';
+					
+					// If image is in a link, handle that first
+					if (parentLink) {
+						parentLink.parentNode?.insertBefore(wrapper, parentLink);
+						wrapper.appendChild(parentLink);
+					} else {
+						img.parentNode?.insertBefore(wrapper, img);
+						wrapper.appendChild(img);
+					}
+
+					const expandButton = doc.createElement('button');
+					expandButton.className = 'image-expand-button';
+					expandButton.setAttribute('aria-label', 'View full size');
+					expandButton.innerHTML = `
+						<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+							<path d="M15 3h6v6M14 10l7-7M9 21H3v-6M10 14l-7 7"/>
+						</svg>
+					`;
+					wrapper.appendChild(expandButton);
+
+					// Handle expand button click
+					expandButton.addEventListener('click', (e) => {
+						e.preventDefault();
+						e.stopPropagation();
+						this.showLightbox(index);
+					});
+				} else if (parentLink) {
+					// Handle linked images as before
+					const wrapper = doc.createElement('div');
+					wrapper.className = 'image-wrapper';
+					parentLink.parentNode?.insertBefore(wrapper, parentLink);
+					wrapper.appendChild(parentLink);
+
+					const expandButton = doc.createElement('button');
+					expandButton.className = 'image-expand-button';
+					expandButton.setAttribute('aria-label', 'View full size');
+					expandButton.innerHTML = `
+						<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+							<path d="M15 3h6v6M14 10l7-7M9 21H3v-6M10 14l-7 7"/>
+						</svg>
+					`;
+					wrapper.appendChild(expandButton);
+
+					expandButton.addEventListener('click', (e) => {
+						e.preventDefault();
+						e.stopPropagation();
+						this.showLightbox(index);
+					});
+				} else {
+					// For standalone images, just add the click handler
+					img.addEventListener('click', (e) => {
+						e.preventDefault();
+						this.showLightbox(index);
+					});
+				}
+			});
+		}
+
+		// Close button handler
+		const closeButton = this.lightbox.querySelector('.lightbox-close');
+		if (closeButton) {
+			closeButton.addEventListener('click', () => this.closeLightbox());
+		}
+
+		// Click outside to close
+		this.lightbox.addEventListener('click', (e) => {
+			if (e.target === this.lightbox) {
+				this.closeLightbox();
+			}
+		});
+
+		// Keyboard navigation
+		doc.addEventListener('keydown', (e) => {
+			if (!this.lightbox?.classList.contains('active')) return;
+
+			switch (e.key) {
+				case 'Escape':
+					this.closeLightbox();
+					break;
+				case 'ArrowLeft':
+					this.showPreviousImage();
+					break;
+				case 'ArrowRight':
+					this.showNextImage();
+					break;
+			}
+		});
+	}
+
+	private static showLightbox(index: number) {
+		if (!this.lightbox || !this.images[index]) return;
+
+		this.currentImageIndex = index;
+		const container = this.lightbox.querySelector('.lightbox-image-container');
+		const captionContainer = this.lightbox.querySelector('.lightbox-caption');
+		
+		if (container && captionContainer) {
+			// Clear previous content
+			container.innerHTML = '';
+			captionContainer.innerHTML = '';
+			
+			// Clone the original image to preserve loaded state
+			const img = this.images[index].cloneNode(true) as HTMLImageElement;
+			container.appendChild(img);
+
+			// Handle caption if image is part of a figure
+			const figure = (this.images[index] as any).figureElement as HTMLElement;
+			if (figure) {
+				const figcaption = figure.querySelector('figcaption');
+				if (figcaption) {
+					captionContainer.innerHTML = figcaption.innerHTML;
+				}
+			}
+		}
+		
+		this.lightbox.classList.add('active');
+		document.body.style.overflow = 'hidden';
+	}
+
+	private static closeLightbox() {
+		if (!this.lightbox) return;
+		this.lightbox.classList.remove('active');
+		document.body.style.overflow = '';
+		this.currentImageIndex = -1;
+	}
+
+	private static showPreviousImage() {
+		if (this.images.length <= 1) return;
+		
+		const newIndex = this.currentImageIndex > 0 
+			? this.currentImageIndex - 1 
+			: this.images.length - 1;
+		
+		this.showLightbox(newIndex);
+	}
+
+	private static showNextImage() {
+		if (this.images.length <= 1) return;
+		
+		const newIndex = this.currentImageIndex < this.images.length - 1 
+			? this.currentImageIndex + 1 
+			: 0;
+		
+		this.showLightbox(newIndex);
+	}
+
 	static async apply(doc: Document) {
 		try {
 			// Store original HTML for restoration
@@ -772,6 +978,7 @@ export class Reader {
 			this.initializeFootnotes(doc);
 			this.initializeCodeHighlighting(doc);
 			this.initializeCopyButtons(doc);
+			this.initializeLightbox(doc);
 
 			// Set up color scheme media query listener
 			this.colorSchemeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
@@ -799,6 +1006,12 @@ export class Reader {
 
 			// Hide any active footnote popover
 			this.hideFootnotePopover();
+
+			// Remove lightbox
+			if (this.lightbox) {
+				this.lightbox.remove();
+				this.lightbox = null;
+			}
 
 			// Remove reader styles
 			if (this.readerStyles) {

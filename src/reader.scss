@@ -17,7 +17,8 @@
 	--obsidian-reader-color-purple: #5E409D;
 	--obsidian-reader-color-pink: #A02F6F;
 
-	&.theme-dark {
+	&.theme-dark,
+	.theme-dark {
 		--obsidian-reader-background-primary: #100F0F;
 		--obsidian-reader-background-primary-alt: #1C1B1A;
 		--obsidian-reader-text-primary: #CECDC3;
@@ -766,5 +767,136 @@
 	.obsidian-left-sidebar,
 	.obsidian-right-sidebar {
 		display: none;
+	}
+}
+
+// Lightbox styles
+.obsidian-reader-lightbox {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: var(--obsidian-reader-background-primary);
+	z-index: 9999999999;
+	display: none;
+	align-items: center;
+	justify-content: center;
+	opacity: 0;
+	transition: opacity 0.2s ease;
+
+	&.active {
+		display: flex;
+		opacity: 1;
+	}
+
+	.lightbox-content {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		width: 100%;
+		height: 100%;
+		box-sizing: border-box;
+		overflow-y: auto;
+	}
+
+	.lightbox-image-container {
+		flex: 1;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 100%;
+		min-height: 0;
+
+		img {
+			max-width: 96vw;
+			max-height: calc(90vh - 150px);
+			height: 100%;
+			width: 100%;
+			object-fit: contain;
+			border-radius: 4px;
+			mix-blend-mode: normal !important;
+			filter: none !important;
+		}
+	}
+
+	.lightbox-caption {
+		width: 800px;
+		max-width: 90vw;
+		margin-top: 10px;
+		color: var(--obsidian-reader-text-muted);
+		font-size: 0.8em;
+		line-height: 1.4;
+		text-align: center;
+		padding-bottom: 40px;
+	}
+
+	.lightbox-close {
+		position: fixed;
+		top: 20px;
+		right: 20px;
+		width: 40px;
+		height: 40px;
+		border: none;
+		padding: 0;
+		background: transparent;
+		color: var(--obsidian-reader-text-muted);
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: background 0.2s ease;
+		z-index: 1;
+		svg {
+			width: 20px;
+			height: 20px;
+		}
+	}
+}
+
+.obsidian-reader-active {
+	img:not(a img):not(figure img) {
+		position: relative;
+		&:hover::after {
+			opacity: 1;
+		}
+	}
+
+	.image-wrapper {
+		position: relative;
+		display: inline-block;
+
+		img {
+			display: block;
+		}
+
+		.image-expand-button {
+			position: absolute;
+			top: 8px;
+			right: 8px;
+			width: 24px;
+			height: 24px;
+			padding: 0;
+			border: none;
+			background: var(--obsidian-reader-text-primary);
+			border-radius: 4px;
+			color: var(--obsidian-reader-background-primary);
+			cursor: pointer;
+			display: flex;
+			align-items: center;
+			opacity: 0;
+			justify-content: center;
+			z-index: 1;
+			outline: none;
+			svg {
+				mix-blend-mode: normal;
+			}
+		}
+		&:hover {
+			.image-expand-button {
+				opacity: 1;
+			}
+		}
 	}
 }
