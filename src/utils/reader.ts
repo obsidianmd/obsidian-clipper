@@ -700,7 +700,6 @@ export class Reader {
 						wrapper.appendChild(img);
 					}
 
-					// Add expand button
 					const expandButton = doc.createElement('button');
 					expandButton.className = 'image-expand-button';
 					expandButton.setAttribute('aria-label', 'View full size');
@@ -978,7 +977,6 @@ export class Reader {
 			
 			this.initializeFootnotes(doc);
 			this.initializeCodeHighlighting(doc);
-
 			this.initializeCopyButtons(doc);
 			this.initializeLightbox(doc);
 
