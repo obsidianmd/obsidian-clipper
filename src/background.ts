@@ -185,7 +185,7 @@ const debouncedUpdateContextMenu = debounce(async (tabId: number) => {
 				// },
 				{
 					id: isHighlighterMode ? "exit-highlighter" : "enter-highlighter",
-					title: isHighlighterMode ? "Exit highlighter" : "Highligh this page",
+					title: isHighlighterMode ? "Exit highlighter" : "Highlight this page",
 					contexts: ["page","image", "video", "audio"]
 				},
 				{
