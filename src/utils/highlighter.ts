@@ -9,10 +9,10 @@ import {
 	removeExistingHighlights,
 	handleTouchStart,
 	handleTouchMove,
-	findTextNodeAtOffset,
-	isVisibleTextNode,
-	findTextInNode,
-	verifyContext
+	findTextInCleanContent,
+	getTextNodesIn,
+	getCleanTextContent,
+	findTextNodeAtPosition
 } from './highlighter-overlays';
 import { detectBrowser, addBrowserClassToHtml } from './browser-detection';
 import { generalSettings, loadSettings } from './storage-utils';
@@ -343,34 +343,13 @@ function createFragmentHighlight(range: Range): FragmentHighlightData | null {
 
 // Test if a highlight can be found reliably
 function testHighlightFindability(highlight: FragmentHighlightData): boolean {
-	let found = false;
-	const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
-		acceptNode: (node: Node) => {
-			return isVisibleTextNode(node) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
-		}
-	});
-
-	const searchText = decodeURIComponent(highlight.textStart);
-	let node = walker.nextNode();
-
-	while (node) {
-		const match = findTextInNode(node, searchText);
-		if (match) {
-			const contextVerified = verifyContext(
-				node,
-				match,
-				highlight.prefix,
-				highlight.suffix
-			);
-			if (contextVerified) {
-				found = true;
-				break;
-			}
-		}
-		node = walker.nextNode();
-	}
-
-	return found;
+	const result = findTextInCleanContent(
+		document.body,
+		decodeURIComponent(highlight.textStart),
+		highlight.prefix,
+		highlight.suffix
+	);
+	return result !== null;
 }
 
 // Type guard to check if a highlight is valid
@@ -416,15 +395,22 @@ function getHighlightRanges(range: Range): TextHighlightData[] {
 
 	const parentElement = getHighlightableParent(range.commonAncestorContainer);
 	const xpath = getElementXPath(parentElement);
-
-	highlights.push({
-		xpath,
-		content: sanitizeAndPreserveFormatting(tempDiv.innerHTML),
-		type: 'text',
-		id: Date.now().toString(),
-		startOffset: getTextOffset(parentElement, range.startContainer, range.startOffset),
-		endOffset: getTextOffset(parentElement, range.endContainer, range.endOffset)
-	});
+	
+	// Get the text content and find the positions
+	const cleanText = getCleanTextContent(parentElement);
+	const startPos = findTextNodeAtPosition(parentElement, range.startOffset);
+	const endPos = findTextNodeAtPosition(parentElement, range.endOffset);
+	
+	if (startPos && endPos) {
+		highlights.push({
+			xpath,
+			content: sanitizeAndPreserveFormatting(tempDiv.innerHTML),
+			type: 'text',
+			id: Date.now().toString(),
+			startOffset: startPos.offset,
+			endOffset: endPos.offset
+		});
+	}
 
 	return highlights;
 }
@@ -700,7 +686,7 @@ function mergeHighlights(highlight1: AnyHighlightData, highlight2: AnyHighlightD
 
 	// If both highlights are in the same element, merge them as a fragment
 	if (highlight1.xpath === highlight2.xpath) {
-		const range = document.createRange();
+		let range = document.createRange();
 		let startNode: Node | null = null;
 		let startOffset = 0;
 		let endNode: Node | null = null;
@@ -709,8 +695,8 @@ function mergeHighlights(highlight1: AnyHighlightData, highlight2: AnyHighlightD
 		// Handle different highlight types
 		if (highlight1.type === 'text') {
 			console.log('Converting text highlight to fragment during merge');
-			const start = findTextNodeAtOffset(mergedElement, highlight1.startOffset);
-			const end = findTextNodeAtOffset(mergedElement, highlight1.endOffset);
+			const start = findTextNodeAtPosition(mergedElement, highlight1.startOffset);
+			const end = findTextNodeAtPosition(mergedElement, highlight1.endOffset);
 			if (start && end) {
 				startNode = start.node;
 				startOffset = start.offset;
@@ -720,19 +706,13 @@ function mergeHighlights(highlight1: AnyHighlightData, highlight2: AnyHighlightD
 		} else if (highlight1.type === 'fragment') {
 			console.log('Merging fragment highlights');
 			const textStart = decodeURIComponent(highlight1.textStart);
-			const walker = document.createTreeWalker(mergedElement, NodeFilter.SHOW_TEXT);
-			let node = walker.nextNode();
-			while (node) {
-				const text = node.textContent || '';
-				const index = text.indexOf(textStart);
-				if (index !== -1) {
-					startNode = node;
-					startOffset = index;
-					endNode = node;
-					endOffset = index + textStart.length;
-					break;
+			const result = findTextInCleanContent(mergedElement, textStart, highlight1.prefix, highlight1.suffix);
+			if (result) {
+				range = result.range;
+				const fragmentHighlight = createFragmentHighlight(range);
+				if (isFragmentHighlight(fragmentHighlight)) {
+					return fragmentHighlight;
 				}
-				node = walker.nextNode();
 			}
 		}
 
@@ -946,7 +926,9 @@ export function highlightElement(element: Element, notes?: string[]) {
 
 function isFragmentHighlight(highlight: FragmentHighlightData | null): highlight is FragmentHighlightData {
 	return highlight !== null && 
-		'text' in highlight && 
-		'prefix' in highlight && 
-		'suffix' in highlight;
+		highlight.type === 'fragment' &&
+		typeof highlight.textStart === 'string' &&
+		typeof highlight.content === 'string' &&
+		typeof highlight.xpath === 'string' &&
+		typeof highlight.id === 'string';
 }

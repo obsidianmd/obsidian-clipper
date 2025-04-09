@@ -98,27 +98,225 @@ export function updateHighlightListeners() {
 	});
 }
 
-// Find a text node at a given offset within an element
-export function findTextNodeAtOffset(element: Element, offset: number): { node: Node, offset: number } | null {
-	let currentOffset = 0;
-	const treeWalker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+// Get clean text content from an element, preserving only relevant content
+export function getCleanTextContent(element: Element): string {
+	// Clone the element to avoid modifying the original
+	const clone = element.cloneNode(true) as Element;
 	
-	let node: Node | null = treeWalker.currentNode;
-	while (node) {
-		const nodeLength = node.textContent?.length || 0;
-		if (currentOffset + nodeLength >= offset) {
-			// Ensure offset is within bounds of the node
-			const adjustedOffset = Math.min(Math.max(0, offset - currentOffset), nodeLength);
-			return { node, offset: adjustedOffset };
+	// Remove script, style, and other non-content elements
+	clone.querySelectorAll('script, style, noscript, iframe').forEach(el => el.remove());
+	
+	// Get text content, preserving spaces and line breaks as needed
+	return clone.textContent || '';
+}
+
+// Helper function to get all visible text nodes in an element
+export function getTextNodesIn(node: Node): Node[] {
+	const textNodes: Node[] = [];
+	const walker = document.createTreeWalker(
+		node,
+		NodeFilter.SHOW_TEXT,
+		{
+			acceptNode: (node: Node) => {
+				// Skip hidden elements and empty text nodes
+				if (node.parentElement) {
+					const style = window.getComputedStyle(node.parentElement);
+					if (style.display === 'none' || 
+						style.visibility === 'hidden' || 
+						style.opacity === '0' ||
+						!node.textContent?.trim()) {
+						return NodeFilter.FILTER_REJECT;
+					}
+				}
+				return NodeFilter.FILTER_ACCEPT;
+			}
 		}
-		currentOffset += nodeLength;
-		node = treeWalker.nextNode();
+	);
+	
+	let currentNode: Node | null;
+	while (currentNode = walker.nextNode()) {
+		textNodes.push(currentNode);
 	}
 	
-	// If we couldn't find the exact offset, return the first text node with offset 0
-	const firstNode = document.createTreeWalker(element, NodeFilter.SHOW_TEXT).firstChild();
-	if (firstNode) {
-		return { node: firstNode, offset: 0 };
+	return textNodes;
+}
+
+// Helper function to map position in normalized text back to original text
+function mapNormalizedPositionToOriginal(originalText: string, normalizedText: string, normalizedPosition: number): number {
+	let originalPos = 0;
+	let normalizedPos = 0;
+	
+	console.log('Mapping position:', {
+		normalizedPosition,
+		originalTextSample: originalText.slice(Math.max(0, normalizedPosition - 20), 
+			Math.min(originalText.length, normalizedPosition + 20)),
+		normalizedTextSample: normalizedText.slice(Math.max(0, normalizedPosition - 20), 
+			Math.min(normalizedText.length, normalizedPosition + 20))
+	});
+	
+	while (normalizedPos < normalizedPosition && originalPos < originalText.length) {
+		// Skip newlines and extra whitespace in original text
+		while (originalPos < originalText.length && 
+			(/[\n\r\t]/.test(originalText[originalPos]) || 
+			(/\s/.test(originalText[originalPos]) && 
+			originalPos > 0 && /\s/.test(originalText[originalPos - 1])))) {
+			originalPos++;
+		}
+		
+		// Move both positions forward for non-whitespace or single whitespace
+		if (originalPos < originalText.length) {
+			if (!/\s/.test(originalText[originalPos]) || 
+				(originalPos === 0 || !/\s/.test(originalText[originalPos - 1]))) {
+				normalizedPos++;
+			}
+			originalPos++;
+		}
+	}
+	
+	// Adjust for trailing position
+	while (originalPos < originalText.length && /[\s\n\r\t]/.test(originalText[originalPos])) {
+		originalPos++;
+	}
+	
+	return originalPos;
+}
+
+// Find position of text in clean content and map back to DOM
+export function findTextInCleanContent(
+	container: Element,
+	searchText: string,
+	prefix?: string,
+	suffix?: string
+): { range: Range, cleanText: string } | null {
+	// Get text nodes and their content
+	const textNodes = getTextNodesIn(container);
+	let fullText = '';
+	const nodePositions: { node: Node, start: number, end: number }[] = [];
+	
+	// Build text content and track node positions
+	for (const node of textNodes) {
+		const nodeText = node.textContent || '';
+		nodePositions.push({
+			node,
+			start: fullText.length,
+			end: fullText.length + nodeText.length
+		});
+		fullText += nodeText;
+	}
+	
+	// Normalize texts
+	const normalizedFullText = normalizeText(fullText);
+	const normalizedSearchText = normalizeText(searchText);
+	
+	console.log('Looking for text in content:', {
+		searchText: normalizedSearchText,
+		prefix: prefix ? normalizeText(decodeURIComponent(prefix)) : undefined,
+		suffix: suffix ? normalizeText(decodeURIComponent(suffix)) : undefined,
+		textLength: normalizedSearchText.length,
+		nodeCount: textNodes.length
+	});
+	
+	// Find the text position in normalized content
+	let startIndex = normalizedFullText.indexOf(normalizedSearchText);
+	if (startIndex === -1) return null;
+	
+	// Verify prefix/suffix if provided
+	if (prefix || suffix) {
+		const prefixText = prefix ? normalizeText(decodeURIComponent(prefix)) : '';
+		const suffixText = suffix ? normalizeText(decodeURIComponent(suffix)) : '';
+		const contextSize = Math.max(prefixText.length, suffixText.length) + 20;
+		
+		const beforeContext = normalizedFullText.slice(Math.max(0, startIndex - contextSize), startIndex);
+		const afterContext = normalizedFullText.slice(startIndex + normalizedSearchText.length, 
+			startIndex + normalizedSearchText.length + contextSize);
+		
+		console.log('Checking context:', {
+			beforeContext,
+			afterContext,
+			prefixText,
+			suffixText,
+			matchStart: startIndex,
+			matchEnd: startIndex + normalizedSearchText.length
+		});
+		
+		if (prefix && !beforeContext.includes(prefixText)) {
+			console.log('Prefix not found in context');
+			return null;
+		}
+		if (suffix && !afterContext.includes(suffixText)) {
+			console.log('Suffix not found in context');
+			return null;
+		}
+	}
+	
+	// Map normalized positions back to original text
+	const originalStartIndex = mapNormalizedPositionToOriginal(fullText, normalizedFullText, startIndex);
+	const originalEndIndex = mapNormalizedPositionToOriginal(fullText, normalizedFullText, 
+		startIndex + normalizedSearchText.length);
+	
+	console.log('Position mapping:', {
+		normalizedStart: startIndex,
+		normalizedEnd: startIndex + normalizedSearchText.length,
+		originalStart: originalStartIndex,
+		originalEnd: originalEndIndex,
+		matchedText: fullText.slice(originalStartIndex, originalEndIndex)
+	});
+	
+	// Find nodes containing start and end positions
+	let startNode: { node: Node, offset: number } | null = null;
+	let endNode: { node: Node, offset: number } | null = null;
+	
+	for (const { node, start, end } of nodePositions) {
+		if (!startNode && start <= originalStartIndex && originalStartIndex <= end) {
+			startNode = {
+				node,
+				offset: originalStartIndex - start
+			};
+		}
+		if (!endNode && start <= originalEndIndex && originalEndIndex <= end) {
+			endNode = {
+				node,
+				offset: originalEndIndex - start
+			};
+			break;
+		}
+	}
+	
+	// Create range if we found both positions
+	if (startNode && endNode) {
+		console.log('Creating range:', {
+			startNodeText: startNode.node.textContent,
+			startOffset: startNode.offset,
+			endNodeText: endNode.node.textContent,
+			endOffset: endNode.offset
+		});
+		
+		const range = document.createRange();
+		range.setStart(startNode.node, startNode.offset);
+		range.setEnd(endNode.node, endNode.offset);
+		return { range, cleanText: fullText };
+	}
+	
+	return null;
+}
+
+// Helper function to find a text node and offset from a character position
+export function findTextNodeAtPosition(container: Element, position: number): { node: Node, offset: number } | null {
+	const textNodes = getTextNodesIn(container);
+	let currentPos = 0;
+	
+	for (const node of textNodes) {
+		const nodeText = node.textContent || '';
+		const nodeLength = nodeText.length;
+		
+		if (currentPos + nodeLength > position) {
+			return {
+				node,
+				offset: position - currentPos
+			};
+		}
+		
+		currentPos += nodeLength;
 	}
 	
 	return null;
@@ -138,12 +336,19 @@ function normalizeText(text: string, preserveSpaces: boolean = false): string {
 		.replace(/[\u2018\u2019]/g, "'")
 		.replace(/[\u201C\u201D]/g, '"')
 		.replace(/\u2026/g, '...')
-		.replace(/\u2013|\u2014/g, '-');
+		.replace(/\u2013|\u2014/g, '-')
+		// Normalize periods and other punctuation that might affect matching
+		.replace(/\s*\.\s*/g, '.')
+		.replace(/\s*,\s*/g, ',')
+		.replace(/\s*;\s*/g, ';')
+		.replace(/\s*:\s*/g, ':');
 	
 	// For non-space-preserving mode, collapse all whitespace to single spaces
-	normalized = normalized
-		.replace(/\s+/g, ' ')
-		.trim();
+	if (!preserveSpaces) {
+		normalized = normalized
+			.replace(/\s+/g, ' ')
+			.trim();
+	}
 	
 	return normalized;
 }
@@ -187,225 +392,37 @@ function findWordBoundaries(text: string, startPos: number, endPos: number): { s
 	return { start, end };
 }
 
-// Find text in a node and its surrounding context
-export function findTextInNode(node: Node, searchText: string): { node: Node, start: number, end: number } | null {
-	const nodeText = node.textContent || '';
-	const normalizedNodeText = normalizeText(nodeText);
-	const normalizedSearchText = normalizeText(searchText);
-	
-	const index = normalizedNodeText.indexOf(normalizedSearchText);
-	if (index === -1) return null;
-	
-	// Map normalized index back to original text
-	let originalStart = 0;
-	let normalizedPos = 0;
-	
-	for (let i = 0; i < nodeText.length && normalizedPos < index; i++) {
-		const char = nodeText[i];
-		if (!/\s/.test(char) || (normalizedPos > 0 && !/\s/.test(nodeText[i - 1]))) {
-			normalizedPos++;
-		}
-		originalStart = i;
-	}
-	
-	// Find end position
-	let originalEnd = originalStart;
-	let remainingLength = normalizedSearchText.length;
-	
-	for (let i = originalStart; i < nodeText.length && remainingLength > 0; i++) {
-		const char = nodeText[i];
-		if (!/\s/.test(char) || (i > 0 && !/\s/.test(nodeText[i - 1]))) {
-			remainingLength--;
-		}
-		originalEnd = i + 1;
-	}
-	
-	return {
-		node,
-		start: originalStart,
-		end: originalEnd
-	};
-}
-
-// Verify context around a match
-export function verifyContext(node: Node, match: { start: number, end: number }, prefix?: string, suffix?: string): boolean {
-	if (!prefix && !suffix) return true;
-	
-	const nodeText = node.textContent || '';
-	const beforeText = nodeText.substring(Math.max(0, match.start - 100), match.start);
-	const afterText = nodeText.substring(match.end, Math.min(nodeText.length, match.end + 100));
-	
-	const normalizedBefore = normalizeText(beforeText);
-	const normalizedAfter = normalizeText(afterText);
-	
-	let prefixMatches = true;
-	let suffixMatches = true;
-	
-	if (prefix) {
-		const normalizedPrefix = normalizeText(decodeURIComponent(prefix));
-		// Look for prefix in the last N characters where N is prefix length + some buffer
-		const searchArea = normalizedBefore.slice(-normalizedPrefix.length - 5);
-		prefixMatches = searchArea.includes(normalizedPrefix);
-		
-		console.log('Prefix verification:', {
-			normalizedPrefix,
-			searchArea,
-			normalizedBefore,
-			prefixMatches
-		});
-	}
-	
-	if (suffix) {
-		const normalizedSuffix = normalizeText(decodeURIComponent(suffix));
-		// Look for suffix in first N characters where N is suffix length + some buffer
-		const searchArea = normalizedAfter.slice(0, normalizedSuffix.length + 5);
-		suffixMatches = searchArea.includes(normalizedSuffix);
-		
-		console.log('Suffix verification:', {
-			normalizedSuffix,
-			searchArea,
-			normalizedAfter,
-			suffixMatches
-		});
-	}
-	
-	return prefixMatches && suffixMatches;
-}
-
-// Helper function to check if a node is likely to contain visible content
-export function isVisibleTextNode(node: Node): boolean {
-	// Skip script, style, and other non-content elements
-	const skipTags = ['SCRIPT', 'STYLE', 'NOSCRIPT', 'CODE', 'TEMPLATE'];
-	let parent = node.parentElement;
-	
-	while (parent) {
-		if (skipTags.includes(parent.tagName)) {
-			return false;
-		}
-		// Check if the element or its parent is hidden
-		const style = window.getComputedStyle(parent);
-		if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') {
-			return false;
-		}
-		parent = parent.parentElement;
-	}
-	
-	// Skip empty or whitespace-only text nodes
-	if (node.nodeType === Node.TEXT_NODE) {
-		const text = node.textContent || '';
-		return text.trim().length > 0;
-	}
-	
-	return true;
-}
-
-// Get text before a node up to maxLength characters
-function getTextBefore(node: Node, maxLength: number = 100): string {
-	let text = '';
-	let current = node;
-	
-	while (current && text.length < maxLength) {
-		if (current.previousSibling) {
-			current = current.previousSibling;
-			if (current.nodeType === Node.TEXT_NODE && isVisibleTextNode(current)) {
-				text = (current.textContent || '') + text;
-			}
-		} else if (current.parentNode) {
-			current = current.parentNode;
-		} else {
-			break;
-		}
-	}
-	
-	return text.slice(-maxLength);
-}
-
-// Get text after a node up to maxLength characters
-function getTextAfter(node: Node, maxLength: number = 100): string {
-	let text = '';
-	let current = node;
-	
-	while (current && text.length < maxLength) {
-		if (current.nextSibling) {
-			current = current.nextSibling;
-			if (current.nodeType === Node.TEXT_NODE && isVisibleTextNode(current)) {
-				text += current.textContent || '';
-			}
-		} else if (current.parentNode) {
-			current = current.parentNode;
-		} else {
-			break;
-		}
-	}
-	
-	return text.slice(0, maxLength);
-}
-
-// Plan out the overlay rectangles depending on the type of highlight
+// Update planHighlightOverlayRects to use findTextNodeAtPosition
 export function planHighlightOverlayRects(target: Element, highlight: AnyHighlightData, index: number) {
 	const existingOverlays = Array.from(document.querySelectorAll(`.obsidian-highlight-overlay[data-highlight-index="${index}"]`));
 	
 	if (highlight.type === 'fragment') {
 		try {
-			// Find all text nodes in the document
-			const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
-				acceptNode: (node: Node) => {
-					return isVisibleTextNode(node) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
-				}
-			});
+			const result = findTextInCleanContent(
+				document.body,
+				decodeURIComponent(highlight.textStart),
+				highlight.prefix,
+				highlight.suffix
+			);
 			
-			const searchText = decodeURIComponent(highlight.textStart);
-			console.log('Looking for text:', {
-				text: searchText,
+			if (result) {
+				const rects = result.range.getClientRects();
+				if (rects.length > 0) {
+					const averageLineHeight = calculateAverageLineHeight(rects);
+					const textRects = Array.from(rects).filter(rect => rect.height <= averageLineHeight * 1.5);
+					
+					if (textRects.length > 0) {
+						mergeHighlightOverlayRects(textRects, highlight.content, existingOverlays, true, index, highlight.notes);
+						return;
+					}
+				}
+			}
+			
+			console.warn('Could not find text match for fragment highlight:', {
+				text: decodeURIComponent(highlight.textStart),
 				prefix: highlight.prefix ? decodeURIComponent(highlight.prefix) : undefined,
 				suffix: highlight.suffix ? decodeURIComponent(highlight.suffix) : undefined
 			});
-			
-			let node = walker.nextNode();
-			let found = false;
-			
-			while (node) {
-				const match = findTextInNode(node, searchText);
-				
-				if (match) {
-					const contextVerified = verifyContext(
-						node,
-						match,
-						highlight.prefix,
-						highlight.suffix
-					);
-					
-					if (contextVerified) {
-						// Create a range for the matched text
-						const range = document.createRange();
-						range.setStart(node, match.start);
-						range.setEnd(node, match.end);
-						
-						const rects = range.getClientRects();
-						if (rects.length > 0) {
-							const averageLineHeight = calculateAverageLineHeight(rects);
-							const textRects = Array.from(rects).filter(rect => rect.height <= averageLineHeight * 1.5);
-							
-							if (textRects.length > 0) {
-								mergeHighlightOverlayRects(textRects, highlight.content, existingOverlays, true, index, highlight.notes);
-								found = true;
-								break;
-							}
-						}
-					} else {
-						console.log('Context verification failed for match:', match);
-					}
-				}
-				node = walker.nextNode();
-			}
-			
-			if (!found) {
-				console.warn('Could not find text match for fragment highlight:', {
-					text: searchText,
-					prefix: highlight.prefix ? decodeURIComponent(highlight.prefix) : undefined,
-					suffix: highlight.suffix ? decodeURIComponent(highlight.suffix) : undefined
-				});
-			}
 		} catch (error) {
 			console.error('Error creating fragment highlight overlay:', error);
 		}
