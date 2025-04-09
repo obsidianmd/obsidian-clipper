@@ -182,7 +182,7 @@ function mapNormalizedPositionToOriginal(originalText: string, normalizedText: s
 }
 
 // Helper function to normalize text consistently
-function normalizeText(text: string, preserveSpaces: boolean = false): string {
+export function normalizeText(text: string, preserveSpaces: boolean = false): string {
 	// First normalize quotes and special characters
 	let normalized = text
 		.replace(/[\u2018\u2019]/g, "'")
