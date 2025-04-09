@@ -181,154 +181,6 @@ function mapNormalizedPositionToOriginal(originalText: string, normalizedText: s
 	return originalPos;
 }
 
-// Find position of text in clean content and map back to DOM
-export function findTextInCleanContent(
-	container: Element,
-	searchText: string,
-	prefix?: string,
-	suffix?: string
-): { range: Range, cleanText: string } | null {
-	// Get text nodes and their content
-	const textNodes = getTextNodesIn(container);
-	let fullText = '';
-	const nodePositions: { node: Node, start: number, end: number }[] = [];
-	
-	// Build text content and track node positions
-	for (const node of textNodes) {
-		const nodeText = node.textContent || '';
-		nodePositions.push({
-			node,
-			start: fullText.length,
-			end: fullText.length + nodeText.length
-		});
-		fullText += nodeText;
-	}
-	
-	// Normalize texts
-	const normalizedFullText = normalizeText(fullText);
-	const normalizedSearchText = normalizeText(searchText);
-	
-	console.log('Looking for text in content:', {
-		searchText: normalizedSearchText,
-		prefix: prefix ? normalizeText(decodeURIComponent(prefix)) : undefined,
-		suffix: suffix ? normalizeText(decodeURIComponent(suffix)) : undefined,
-		textLength: normalizedSearchText.length,
-		nodeCount: textNodes.length
-	});
-	
-	// Find the text position in normalized content
-	let startIndex = normalizedFullText.indexOf(normalizedSearchText);
-	if (startIndex === -1) return null;
-	
-	// Verify prefix/suffix if provided
-	if (prefix || suffix) {
-		const prefixText = prefix ? normalizeText(decodeURIComponent(prefix)) : '';
-		const suffixText = suffix ? normalizeText(decodeURIComponent(suffix)) : '';
-		const contextSize = Math.max(prefixText.length, suffixText.length) + 20;
-		
-		const beforeContext = normalizedFullText.slice(Math.max(0, startIndex - contextSize), startIndex);
-		const afterContext = normalizedFullText.slice(startIndex + normalizedSearchText.length, 
-			startIndex + normalizedSearchText.length + contextSize);
-		
-		console.log('Checking context:', {
-			beforeContext,
-			afterContext,
-			prefixText,
-			suffixText,
-			matchStart: startIndex,
-			matchEnd: startIndex + normalizedSearchText.length
-		});
-		
-		if (prefix && !beforeContext.includes(prefixText)) {
-			console.log('Prefix not found in context');
-			return null;
-		}
-		if (suffix && !afterContext.includes(suffixText)) {
-			console.log('Suffix not found in context');
-			return null;
-		}
-	}
-	
-	// Map normalized positions back to original text
-	const originalStartIndex = mapNormalizedPositionToOriginal(fullText, normalizedFullText, startIndex);
-	const originalEndIndex = mapNormalizedPositionToOriginal(fullText, normalizedFullText, 
-		startIndex + normalizedSearchText.length);
-	
-	console.log('Position mapping:', {
-		normalizedStart: startIndex,
-		normalizedEnd: startIndex + normalizedSearchText.length,
-		originalStart: originalStartIndex,
-		originalEnd: originalEndIndex,
-		matchedText: fullText.slice(originalStartIndex, originalEndIndex)
-	});
-	
-	// Find nodes containing start and end positions
-	let startNode: { node: Node, offset: number } | null = null;
-	let endNode: { node: Node, offset: number } | null = null;
-	
-	for (const { node, start, end } of nodePositions) {
-		if (!startNode && start <= originalStartIndex && originalStartIndex <= end) {
-			startNode = {
-				node,
-				offset: originalStartIndex - start
-			};
-		}
-		if (!endNode && start <= originalEndIndex && originalEndIndex <= end) {
-			endNode = {
-				node,
-				offset: originalEndIndex - start
-			};
-			break;
-		}
-	}
-	
-	// Create range if we found both positions
-	if (startNode && endNode) {
-		console.log('Creating range:', {
-			startNodeText: startNode.node.textContent,
-			startOffset: startNode.offset,
-			endNodeText: endNode.node.textContent,
-			endOffset: endNode.offset
-		});
-		
-		const range = document.createRange();
-		range.setStart(startNode.node, startNode.offset);
-		range.setEnd(endNode.node, endNode.offset);
-		return { range, cleanText: fullText };
-	}
-	
-	return null;
-}
-
-// Helper function to find a text node and offset from a character position
-export function findTextNodeAtPosition(container: Element, position: number): { node: Node, offset: number } | null {
-	const textNodes = getTextNodesIn(container);
-	let currentPos = 0;
-	
-	for (const node of textNodes) {
-		const nodeText = node.textContent || '';
-		const nodeLength = nodeText.length;
-		
-		if (currentPos + nodeLength > position) {
-			return {
-				node,
-				offset: position - currentPos
-			};
-		}
-		
-		currentPos += nodeLength;
-	}
-	
-	return null;
-}
-
-// Calculate the average line height of a set of rectangles
-function calculateAverageLineHeight(rects: DOMRectList): number {
-	const heights = Array.from(rects).map(rect => rect.height);
-	const sum = heights.reduce((a, b) => a + b, 0);
-	return sum / heights.length;
-}
-
 // Helper function to normalize text consistently
 function normalizeText(text: string, preserveSpaces: boolean = false): string {
 	// First normalize quotes and special characters
@@ -337,15 +189,18 @@ function normalizeText(text: string, preserveSpaces: boolean = false): string {
 		.replace(/[\u201C\u201D]/g, '"')
 		.replace(/\u2026/g, '...')
 		.replace(/\u2013|\u2014/g, '-')
-		// Normalize periods and other punctuation that might affect matching
-		.replace(/\s*\.\s*/g, '.')
-		.replace(/\s*,\s*/g, ',')
-		.replace(/\s*;\s*/g, ';')
-		.replace(/\s*:\s*/g, ':');
+		// Normalize punctuation while preserving spaces
+		.replace(/\s*([.,;:!?])\s*/g, '$1 ')
+		// Remove extra spaces around quotes
+		.replace(/"\s+/g, '"')
+		.replace(/\s+"/g, '"')
+		.replace(/'\s+/g, "'")
+		.replace(/\s+'/g, "'");
 	
 	// For non-space-preserving mode, collapse all whitespace to single spaces
 	if (!preserveSpaces) {
 		normalized = normalized
+			.replace(/[\n\r\t]+/g, ' ')
 			.replace(/\s+/g, ' ')
 			.trim();
 	}
@@ -662,4 +517,186 @@ export function removeExistingHighlights() {
 	if (existingHighlights.length > 0) {
 		existingHighlights.forEach(el => el.remove());
 	}
+}
+
+// Find position of text in clean content and map back to DOM
+export function findTextInCleanContent(
+	container: Element,
+	searchText: string,
+	prefix?: string,
+	suffix?: string
+): { range: Range, cleanText: string } | null {
+	// Get text nodes and their content
+	const textNodes = getTextNodesIn(container);
+	const nodesByParagraph = new Map<Element, Node[]>();
+	
+	// Group text nodes by their paragraph
+	for (const node of textNodes) {
+		const paragraph = node.parentElement?.closest('p, div, article, section') || container;
+		if (!nodesByParagraph.has(paragraph)) {
+			nodesByParagraph.set(paragraph, []);
+		}
+		nodesByParagraph.get(paragraph)?.push(node);
+	}
+	
+	// Try to find the text in each paragraph
+	for (const [paragraph, nodes] of nodesByParagraph) {
+		let fullText = '';
+		const nodePositions: { node: Node, start: number, end: number }[] = [];
+		
+		// Build text content for this paragraph
+		for (const node of nodes) {
+			const nodeText = node.textContent || '';
+			nodePositions.push({
+				node,
+				start: fullText.length,
+				end: fullText.length + nodeText.length
+			});
+			fullText += nodeText;
+		}
+		
+		// Skip empty paragraphs
+		if (!fullText.trim()) continue;
+		
+		// Normalize texts
+		const normalizedFullText = normalizeText(fullText);
+		const normalizedSearchText = normalizeText(searchText);
+		
+		console.log('Looking for text in paragraph:', {
+			paragraphTag: paragraph.tagName,
+			searchText: normalizedSearchText,
+			prefix: prefix ? normalizeText(decodeURIComponent(prefix)) : undefined,
+			suffix: suffix ? normalizeText(decodeURIComponent(suffix)) : undefined,
+			textLength: normalizedSearchText.length,
+			nodeCount: nodes.length,
+			paragraphText: normalizedFullText.slice(0, 100) + '...'
+		});
+		
+		// Find the text position in normalized content
+		let startIndex = normalizedFullText.indexOf(normalizedSearchText);
+		if (startIndex === -1) continue;
+		
+		// Verify prefix/suffix if provided
+		if (prefix || suffix) {
+			const prefixText = prefix ? normalizeText(decodeURIComponent(prefix)) : '';
+			const suffixText = suffix ? normalizeText(decodeURIComponent(suffix)) : '';
+			const contextSize = Math.max(prefixText.length, suffixText.length) + 20;
+			
+			const beforeContext = normalizedFullText.slice(Math.max(0, startIndex - contextSize), startIndex);
+			const afterContext = normalizedFullText.slice(startIndex + normalizedSearchText.length, 
+				startIndex + normalizedSearchText.length + contextSize);
+			
+			console.log('Checking context:', {
+				beforeContext,
+				afterContext,
+				prefixText,
+				suffixText,
+				matchStart: startIndex,
+				matchEnd: startIndex + normalizedSearchText.length
+			});
+			
+			if (prefix && !beforeContext.includes(prefixText)) {
+				console.log('Prefix not found in context, trying next occurrence');
+				startIndex = normalizedFullText.indexOf(normalizedSearchText, startIndex + 1);
+				if (startIndex === -1) continue;
+			}
+			if (suffix && !afterContext.includes(suffixText)) {
+				console.log('Suffix not found in context, trying next occurrence');
+				startIndex = normalizedFullText.indexOf(normalizedSearchText, startIndex + 1);
+				if (startIndex === -1) continue;
+			}
+		}
+		
+		// Map normalized positions back to original text
+		const originalStartIndex = mapNormalizedPositionToOriginal(fullText, normalizedFullText, startIndex);
+		const originalEndIndex = mapNormalizedPositionToOriginal(fullText, normalizedFullText, 
+			startIndex + normalizedSearchText.length);
+		
+		console.log('Position mapping:', {
+			normalizedStart: startIndex,
+			normalizedEnd: startIndex + normalizedSearchText.length,
+			originalStart: originalStartIndex,
+			originalEnd: originalEndIndex,
+			matchedText: fullText.slice(originalStartIndex, originalEndIndex)
+		});
+		
+		// Find nodes containing start and end positions
+		let startNode: { node: Node, offset: number } | null = null;
+		let endNode: { node: Node, offset: number } | null = null;
+		
+		for (const { node, start, end } of nodePositions) {
+			if (!startNode && start <= originalStartIndex && originalStartIndex <= end) {
+				startNode = {
+					node,
+					offset: originalStartIndex - start
+				};
+			}
+			if (!endNode && start <= originalEndIndex && originalEndIndex <= end) {
+				endNode = {
+					node,
+					offset: originalEndIndex - start
+				};
+				break;
+			}
+		}
+		
+		// Create range if we found both positions in the same paragraph
+		if (startNode && endNode) {
+			console.log('Creating range:', {
+				startNodeText: startNode.node.textContent,
+				startOffset: startNode.offset,
+				endNodeText: endNode.node.textContent,
+				endOffset: endNode.offset,
+				paragraph: paragraph.tagName
+			});
+			
+			const range = document.createRange();
+			range.setStart(startNode.node, startNode.offset);
+			range.setEnd(endNode.node, endNode.offset);
+			
+			// Verify the range content matches what we expect
+			const rangeText = range.toString();
+			const normalizedRangeText = normalizeText(rangeText);
+			if (normalizedRangeText === normalizedSearchText) {
+				console.log('Range content matches expected text');
+				return { range, cleanText: fullText };
+			} else {
+				console.log('Range content mismatch:', {
+					expected: normalizedSearchText,
+					actual: normalizedRangeText
+				});
+			}
+		}
+	}
+	
+	return null;
+}
+
+// Helper function to find a text node and offset from a character position
+export function findTextNodeAtPosition(container: Element, position: number): { node: Node, offset: number } | null {
+	const textNodes = getTextNodesIn(container);
+	let currentPos = 0;
+	
+	for (const node of textNodes) {
+		const nodeText = node.textContent || '';
+		const nodeLength = nodeText.length;
+		
+		if (currentPos + nodeLength > position) {
+			return {
+				node,
+				offset: position - currentPos
+			};
+		}
+		
+		currentPos += nodeLength;
+	}
+	
+	return null;
+}
+
+// Calculate the average line height of a set of rectangles
+function calculateAverageLineHeight(rects: DOMRectList): number {
+	const heights = Array.from(rects).map(rect => rect.height);
+	const sum = heights.reduce((a, b) => a + b, 0);
+	return sum / heights.length;
 }
