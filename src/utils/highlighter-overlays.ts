@@ -1,6 +1,5 @@
 import { 
 	handleTextSelection, 
-	highlightElement, 
 	AnyHighlightData, 
 	highlights, 
 	isApplyingHighlights,
@@ -38,7 +37,7 @@ export function handleMouseMove(event: MouseEvent | TouchEvent) {
 		target = document.elementFromPoint(touch.clientX, touch.clientY) as Element;
 	}
 
-	if (!isIgnoredElement(target)) {
+	if (target.classList.contains('obsidian-highlight-overlay')) {
 		createOrUpdateHoverOverlay(target);
 	} else {
 		removeHoverOverlay();
@@ -63,12 +62,8 @@ export function handleMouseUp(event: MouseEvent | TouchEvent) {
 	const selection = window.getSelection();
 	if (selection && !selection.isCollapsed) {
 		handleTextSelection(selection);
-	} else {
-		if (target.classList.contains('obsidian-highlight-overlay')) {
-			handleHighlightClick(event);
-		} else if (!isIgnoredElement(target)) {
-			highlightElement(target);
-		}
+	} else if (target.classList.contains('obsidian-highlight-overlay')) {
+		handleHighlightClick(event);
 	}
 }
 
@@ -104,7 +99,7 @@ export function updateHighlightListeners() {
 }
 
 // Find a text node at a given offset within an element
-function findTextNodeAtOffset(element: Element, offset: number): { node: Node, offset: number } | null {
+export function findTextNodeAtOffset(element: Element, offset: number): { node: Node, offset: number } | null {
 	let currentOffset = 0;
 	const treeWalker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
 	
@@ -139,9 +134,77 @@ function calculateAverageLineHeight(rects: DOMRectList): number {
 // Plan out the overlay rectangles depending on the type of highlight
 export function planHighlightOverlayRects(target: Element, highlight: AnyHighlightData, index: number) {
 	const existingOverlays = Array.from(document.querySelectorAll(`.obsidian-highlight-overlay[data-highlight-index="${index}"]`));
-	if (highlight.type === 'complex' || highlight.type === 'element') {
+	if (highlight.type === 'complex') {
 		const rect = target.getBoundingClientRect();
 		mergeHighlightOverlayRects([rect], highlight.content, existingOverlays, false, index, highlight.notes);
+	} else if (highlight.type === 'fragment') {
+		try {
+			// Find the text in the document using text fragments
+			const textStart = decodeURIComponent(highlight.textStart);
+			const prefix = highlight.prefix ? decodeURIComponent(highlight.prefix) : undefined;
+			const suffix = highlight.suffix ? decodeURIComponent(highlight.suffix) : undefined;
+			
+			// Create a TreeWalker to find text nodes
+			const walker = document.createTreeWalker(target, NodeFilter.SHOW_TEXT);
+			let node = walker.nextNode();
+			let found = false;
+			
+			while (node && !found) {
+				const text = node.textContent || '';
+				const startIndex = text.indexOf(textStart);
+				
+				if (startIndex !== -1) {
+					// Check prefix if it exists
+					if (prefix) {
+						const beforeText = text.slice(Math.max(0, startIndex - prefix.length), startIndex);
+						if (!beforeText.includes(prefix)) {
+							node = walker.nextNode();
+							continue;
+						}
+					}
+					
+					// Check suffix if it exists
+					if (suffix) {
+						const afterText = text.slice(startIndex + textStart.length, startIndex + textStart.length + suffix.length);
+						if (!afterText.includes(suffix)) {
+							node = walker.nextNode();
+							continue;
+						}
+					}
+					
+					// Found a match, create a range
+					const range = document.createRange();
+					range.setStart(node, startIndex);
+					range.setEnd(node, startIndex + textStart.length);
+					
+					const rects = range.getClientRects();
+					if (rects.length > 0) {
+						const averageLineHeight = calculateAverageLineHeight(rects);
+						const textRects = Array.from(rects).filter(rect => rect.height <= averageLineHeight * 1.5);
+						const complexRects = Array.from(rects).filter(rect => rect.height > averageLineHeight * 1.5);
+						
+						if (textRects.length > 0) {
+							mergeHighlightOverlayRects(textRects, highlight.content, existingOverlays, true, index, highlight.notes);
+						}
+						if (complexRects.length > 0) {
+							mergeHighlightOverlayRects(complexRects, highlight.content, existingOverlays, false, index, highlight.notes);
+						}
+						found = true;
+					}
+				}
+				node = walker.nextNode();
+			}
+			
+			if (!found) {
+				// Fallback to complex highlight if text not found
+				const rect = target.getBoundingClientRect();
+				mergeHighlightOverlayRects([rect], highlight.content, existingOverlays, false, index, highlight.notes);
+			}
+		} catch (error) {
+			console.error('Error creating fragment highlight:', error);
+			const rect = target.getBoundingClientRect();
+			mergeHighlightOverlayRects([rect], highlight.content, existingOverlays, false, index, highlight.notes);
+		}
 	} else if (highlight.type === 'text') {
 		try {
 			const range = document.createRange();
@@ -185,12 +248,12 @@ export function planHighlightOverlayRects(target: Element, highlight: AnyHighlig
 						mergeHighlightOverlayRects(complexRects, highlight.content, existingOverlays, false, index, highlight.notes);
 					}
 				} catch (error) {
-					// Fallback to element highlight
+					// Fallback to complex highlight
 					const rect = target.getBoundingClientRect();
 					mergeHighlightOverlayRects([rect], highlight.content, existingOverlays, false, index, highlight.notes);
 				}
 			} else {
-				// Fallback to element highlight
+				// Fallback to complex highlight
 				const rect = target.getBoundingClientRect();
 				mergeHighlightOverlayRects([rect], highlight.content, existingOverlays, false, index, highlight.notes);
 			}
@@ -360,26 +423,14 @@ function createOrUpdateHoverOverlay(target: Element) {
 	hoverOverlay.style.width = `${rect.width + 4}px`;
 	hoverOverlay.style.height = `${rect.height + 4}px`;
 	hoverOverlay.style.display = 'block';
+	hoverOverlay.classList.add('on-highlight');
 
-	// Remove 'is-hovering' class from all highlight overlays
-	document.querySelectorAll('.obsidian-highlight-overlay.is-hovering').forEach(el => {
-		el.classList.remove('is-hovering');
-	});
-
-	// Remove 'on-highlight' class from hover overlay
-	hoverOverlay.classList.remove('on-highlight');
-
-	// Check if the target is a highlight overlay
-	if (target.classList.contains('obsidian-highlight-overlay')) {
-		const index = target.getAttribute('data-highlight-index');
-		if (index) {
-			// Add 'is-hovering' class to all highlight overlays with the same index
-			document.querySelectorAll(`.obsidian-highlight-overlay[data-highlight-index="${index}"]`).forEach(el => {
-				el.classList.add('is-hovering');
-			});
-			// Add 'on-highlight' class to hover overlay
-			hoverOverlay.classList.add('on-highlight');
-		}
+	// Add 'is-hovering' class to all highlight overlays with the same index
+	const index = target.getAttribute('data-highlight-index');
+	if (index) {
+		document.querySelectorAll(`.obsidian-highlight-overlay[data-highlight-index="${index}"]`).forEach(el => {
+			el.classList.add('is-hovering');
+		});
 	}
 }
 

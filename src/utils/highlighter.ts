@@ -8,12 +8,13 @@ import {
 	planHighlightOverlayRects,
 	removeExistingHighlights,
 	handleTouchStart,
-	handleTouchMove
+	handleTouchMove,
+	findTextNodeAtOffset
 } from './highlighter-overlays';
 import { detectBrowser, addBrowserClassToHtml } from './browser-detection';
 import { generalSettings, loadSettings } from './storage-utils';
 
-export type AnyHighlightData = TextHighlightData | ElementHighlightData | ComplexHighlightData;
+export type AnyHighlightData = TextHighlightData | ElementHighlightData | ComplexHighlightData | FragmentHighlightData;
 
 export let highlights: AnyHighlightData[] = [];
 export let isApplyingHighlights = false;
@@ -49,6 +50,14 @@ export interface ElementHighlightData extends HighlightData {
 
 export interface ComplexHighlightData extends HighlightData {
 	type: 'complex';
+}
+
+export interface FragmentHighlightData extends HighlightData {
+	type: 'fragment';
+	textStart: string;
+	textEnd?: string;
+	prefix?: string;
+	suffix?: string;
 }
 
 export interface StoredData {
@@ -279,27 +288,55 @@ function enableLinkClicks() {
 	});
 }
 
-// Highlight an entire element
-export function highlightElement(element: Element, notes?: string[]) {
-	const xpath = getElementXPath(element);
-	const content = element.outerHTML;
-	const isBlockElement = window.getComputedStyle(element).display === 'block';
-	addHighlight({ 
-		xpath, 
-		content, 
-		type: isBlockElement ? 'element' : 'text', 
+// Create a fragment highlight from a text selection
+function createFragmentHighlight(range: Range): FragmentHighlightData {
+	const fragment = range.cloneContents();
+	const tempDiv = document.createElement('div');
+	tempDiv.appendChild(fragment);
+	
+	// Get the text content
+	const textContent = tempDiv.textContent || '';
+	
+	// Get prefix and suffix context (up to 20 chars)
+	const prefixNode = range.startContainer.textContent?.slice(Math.max(0, range.startOffset - 20), range.startOffset);
+	const suffixNode = range.endContainer.textContent?.slice(range.endOffset, range.endOffset + 20);
+	
+	// Clean and encode the text fragments
+	const textStart = encodeURIComponent(textContent.trim());
+	const prefix = prefixNode ? encodeURIComponent(prefixNode.trim()) : undefined;
+	const suffix = suffixNode ? encodeURIComponent(suffixNode.trim()) : undefined;
+	
+	const highlight = {
+		type: 'fragment' as const,
+		xpath: getElementXPath(range.commonAncestorContainer as Element),
+		content: sanitizeAndPreserveFormatting(tempDiv.innerHTML),
 		id: Date.now().toString(),
-		startOffset: 0,
-		endOffset: element.textContent?.length || 0
-	}, notes);
+		textStart,
+		prefix,
+		suffix
+	};
+
+	console.log('Created fragment highlight:', {
+		text: decodeURIComponent(textStart),
+		prefix: prefix ? decodeURIComponent(prefix) : undefined,
+		suffix: suffix ? decodeURIComponent(suffix) : undefined,
+		xpath: highlight.xpath
+	});
+	
+	return highlight;
 }
 
 // Handle text selection for highlighting
 export function handleTextSelection(selection: Selection, notes?: string[]) {
 	const range = selection.getRangeAt(0);
-	const highlightRanges = getHighlightRanges(range);
-	highlightRanges.forEach(hr => addHighlight(hr, notes));
-	selection.removeAllRanges();
+	if (range.toString().length > 0) {
+		const highlight = createFragmentHighlight(range);
+		if (notes) {
+			highlight.notes = notes;
+		}
+		addHighlight(highlight);
+		selection.removeAllRanges();
+	}
 }
 
 // Get highlight ranges for a given text selection
@@ -496,10 +533,10 @@ function mergeHighlights(highlight1: AnyHighlightData, highlight2: AnyHighlightD
 		throw new Error("Cannot merge highlights: elements not found");
 	}
 
-	// If one highlight is an element and the other is text, prioritize the element highlight
-	if (highlight1.type === 'element' && highlight2.type === 'text') {
+	// If merging with an element or complex highlight, prioritize that type
+	if (highlight1.type === 'element' || highlight1.type === 'complex') {
 		return highlight1;
-	} else if (highlight2.type === 'element' && highlight1.type === 'text') {
+	} else if (highlight2.type === 'element' || highlight2.type === 'complex') {
 		return highlight2;
 	}
 
@@ -512,8 +549,9 @@ function mergeHighlights(highlight1: AnyHighlightData, highlight2: AnyHighlightD
 		mergedElement = findCommonAncestor(element1, element2);
 	}
 
-	// If the merged element is different from both original elements, or if either highlight is complex, create a complex highlight
-	if (mergedElement !== element1 || mergedElement !== element2 || highlight1.type === 'complex' || highlight2.type === 'complex') {
+	// If the merged element is different from both original elements, create a complex highlight
+	if (mergedElement !== element1 || mergedElement !== element2) {
+		console.log('Converting to complex highlight due to different elements');
 		return {
 			xpath: getElementXPath(mergedElement),
 			content: mergedElement.outerHTML,
@@ -522,20 +560,53 @@ function mergeHighlights(highlight1: AnyHighlightData, highlight2: AnyHighlightD
 		};
 	}
 
-	// If both highlights are text and in the same element, merge them as text
-	if (highlight1.type === 'text' && highlight2.type === 'text' && highlight1.xpath === highlight2.xpath) {
-		return {
-			xpath: highlight1.xpath,
-			content: mergedElement.textContent?.slice(Math.min(highlight1.startOffset, highlight2.startOffset), 
-													  Math.max(highlight1.endOffset, highlight2.endOffset)) || '',
-			type: 'text',
-			id: Date.now().toString(),
-			startOffset: Math.min(highlight1.startOffset, highlight2.startOffset),
-			endOffset: Math.max(highlight1.endOffset, highlight2.endOffset)
-		};
+	// If both highlights are in the same element, merge them as a fragment
+	if (highlight1.xpath === highlight2.xpath) {
+		const range = document.createRange();
+		let startNode: Node | null = null;
+		let startOffset = 0;
+		let endNode: Node | null = null;
+		let endOffset = 0;
+
+		// Handle different highlight types
+		if (highlight1.type === 'text') {
+			console.log('Converting text highlight to fragment during merge');
+			const start = findTextNodeAtOffset(mergedElement, highlight1.startOffset);
+			const end = findTextNodeAtOffset(mergedElement, highlight1.endOffset);
+			if (start && end) {
+				startNode = start.node;
+				startOffset = start.offset;
+				endNode = end.node;
+				endOffset = end.offset;
+			}
+		} else if (highlight1.type === 'fragment') {
+			console.log('Merging fragment highlights');
+			const textStart = decodeURIComponent(highlight1.textStart);
+			const walker = document.createTreeWalker(mergedElement, NodeFilter.SHOW_TEXT);
+			let node = walker.nextNode();
+			while (node) {
+				const text = node.textContent || '';
+				const index = text.indexOf(textStart);
+				if (index !== -1) {
+					startNode = node;
+					startOffset = index;
+					endNode = node;
+					endOffset = index + textStart.length;
+					break;
+				}
+				node = walker.nextNode();
+			}
+		}
+
+		if (startNode && endNode) {
+			range.setStart(startNode, startOffset);
+			range.setEnd(endNode, endOffset);
+			return createFragmentHighlight(range);
+		}
 	}
 
 	// If we get here, treat it as a complex highlight
+	console.log('Converting to complex highlight as fallback');
 	return {
 		xpath: getElementXPath(mergedElement),
 		content: mergedElement.outerHTML,
@@ -712,3 +783,15 @@ function addToHistory(type: 'add' | 'remove', oldHighlights: AnyHighlightData[],
 }
 
 export { getElementXPath } from './dom-utils';
+
+// Highlight an entire element (creates a complex highlight)
+export function highlightElement(element: Element, notes?: string[]) {
+	const xpath = getElementXPath(element);
+	const content = element.outerHTML;
+	addHighlight({ 
+		xpath, 
+		content, 
+		type: 'complex',
+		id: Date.now().toString()
+	}, notes);
+}
