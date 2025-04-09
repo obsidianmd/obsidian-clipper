@@ -293,16 +293,81 @@ function enableLinkClicks() {
 
 // Create a fragment highlight from a text selection
 function createFragmentHighlight(range: Range): FragmentHighlightData | null {
+	// If the range spans multiple paragraphs, split it
+	const startParagraph = range.startContainer.parentElement?.closest('p, div, article, section');
+	const endParagraph = range.endContainer.parentElement?.closest('p, div, article, section');
+	
+	if (startParagraph && endParagraph && startParagraph !== endParagraph) {
+		console.log('Selection spans multiple paragraphs, splitting into separate highlights');
+		
+		const highlights: FragmentHighlightData[] = [];
+		let currentParagraph = startParagraph;
+		
+		while (currentParagraph) {
+			const paragraphRange = document.createRange();
+			
+			// Set range start
+			if (currentParagraph === startParagraph) {
+				paragraphRange.setStart(range.startContainer, range.startOffset);
+			} else {
+				const firstTextNode = getFirstTextNode(currentParagraph);
+				if (!firstTextNode) continue;
+				paragraphRange.setStart(firstTextNode, 0);
+			}
+			
+			// Set range end
+			if (currentParagraph === endParagraph) {
+				paragraphRange.setEnd(range.endContainer, range.endOffset);
+				const highlight = createSingleParagraphHighlight(paragraphRange);
+				if (highlight) highlights.push(highlight);
+				break;
+			} else {
+				const lastTextNode = getLastTextNode(currentParagraph);
+				if (!lastTextNode) continue;
+				paragraphRange.setEnd(lastTextNode, lastTextNode.textContent?.length || 0);
+				const highlight = createSingleParagraphHighlight(paragraphRange);
+				if (highlight) highlights.push(highlight);
+			}
+			
+			// Move to next paragraph
+			const nextParagraph = getNextParagraph(currentParagraph, endParagraph);
+			if (!nextParagraph) break;
+			currentParagraph = nextParagraph;
+		}
+		
+		// Return the first highlight and queue the rest for addition
+		if (highlights.length > 0) {
+			highlights.slice(1).forEach(highlight => {
+				setTimeout(() => addHighlight(highlight), 0);
+			});
+			return highlights[0];
+		}
+		return null;
+	}
+	
+	return createSingleParagraphHighlight(range);
+}
+
+// Helper function to create a highlight within a single paragraph
+function createSingleParagraphHighlight(range: Range): FragmentHighlightData | null {
 	const fragment = range.cloneContents();
 	const tempDiv = document.createElement('div');
 	tempDiv.appendChild(fragment);
 	
 	// Get the text content
 	const textContent = tempDiv.textContent || '';
+	if (!textContent.trim()) return null;
 	
 	// Get prefix and suffix context (up to 20 chars)
 	const prefixNode = range.startContainer.textContent?.slice(Math.max(0, range.startOffset - 20), range.startOffset);
 	const suffixNode = range.endContainer.textContent?.slice(range.endOffset, range.endOffset + 20);
+	
+	// Get the common ancestor that's an Element
+	let commonAncestor: Element | null = range.commonAncestorContainer as Element;
+	if (commonAncestor.nodeType !== Node.ELEMENT_NODE) {
+		commonAncestor = commonAncestor.parentElement;
+	}
+	if (!commonAncestor) return null;
 	
 	// Clean and encode the text fragments
 	const textStart = encodeURIComponent(textContent);
@@ -311,7 +376,7 @@ function createFragmentHighlight(range: Range): FragmentHighlightData | null {
 	
 	const highlight = {
 		type: 'fragment' as const,
-		xpath: getElementXPath(range.commonAncestorContainer as Element),
+		xpath: getElementXPath(commonAncestor),
 		content: textContent,
 		id: Date.now().toString(),
 		textStart,
@@ -339,6 +404,71 @@ function createFragmentHighlight(range: Range): FragmentHighlightData | null {
 	});
 	
 	return highlight;
+}
+
+// Helper function to get the first text node in an element
+function getFirstTextNode(element: Element): Node | null {
+	const walker = document.createTreeWalker(
+		element,
+		NodeFilter.SHOW_TEXT,
+		{
+			acceptNode: (node: Node) => {
+				if (node.textContent?.trim()) {
+					return NodeFilter.FILTER_ACCEPT;
+				}
+				return NodeFilter.FILTER_SKIP;
+			}
+		}
+	);
+	return walker.nextNode();
+}
+
+// Helper function to get the last text node in an element
+function getLastTextNode(element: Element): Node | null {
+	const walker = document.createTreeWalker(
+		element,
+		NodeFilter.SHOW_TEXT,
+		{
+			acceptNode: (node: Node) => {
+				if (node.textContent?.trim()) {
+					return NodeFilter.FILTER_ACCEPT;
+				}
+				return NodeFilter.FILTER_SKIP;
+			}
+		}
+	);
+	
+	let lastNode: Node | null = null;
+	let currentNode: Node | null;
+	while (currentNode = walker.nextNode()) {
+		lastNode = currentNode;
+	}
+	return lastNode;
+}
+
+// Helper function to get the next paragraph element
+function getNextParagraph(current: Element, end: Element): Element | null {
+	let next = current.nextElementSibling;
+	while (next) {
+		if (next.matches('p, div, article, section')) {
+			return next;
+		}
+		next = next.nextElementSibling;
+	}
+	
+	// If not found at same level, try parent's next sibling
+	let parent = current.parentElement;
+	while (parent && parent !== end.parentElement) {
+		next = parent.nextElementSibling;
+		while (next) {
+			const paragraph = next.querySelector('p, div, article, section');
+			if (paragraph) return paragraph;
+			next = next.nextElementSibling;
+		}
+		parent = parent.parentElement;
+	}
+	
+	return null;
 }
 
 // Test if a highlight can be found reliably
