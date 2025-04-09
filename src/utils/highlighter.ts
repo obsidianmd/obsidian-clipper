@@ -487,29 +487,88 @@ function getElementVerticalPosition(element: Element): number {
 
 // Check if two highlights overlap
 function doHighlightsOverlap(highlight1: AnyHighlightData, highlight2: AnyHighlightData): boolean {
-	const element1 = getElementByXPath(highlight1.xpath);
-	const element2 = getElementByXPath(highlight2.xpath);
+	if (highlight1.xpath !== highlight2.xpath) {
+		return false;
+	}
 
-	if (!element1 || !element2) return false;
+	// For fragment highlights, check text position overlap
+	if (highlight1.type === 'fragment' && highlight2.type === 'fragment') {
+		const text = getElementByXPath(highlight1.xpath)?.textContent || '';
+		const normalizedText = text.replace(/[\u2018\u2019]/g, "'")
+			.replace(/[\u201C\u201D]/g, '"')
+			.replace(/\s+/g, ' ');
+		
+		const text1 = decodeURIComponent(highlight1.textStart);
+		const text2 = decodeURIComponent(highlight2.textStart);
+		
+		const start1 = normalizedText.indexOf(text1);
+		const end1 = start1 + text1.length;
+		const start2 = normalizedText.indexOf(text2);
+		const end2 = start2 + text2.length;
+		
+		console.log('Checking overlap:', {
+			text1, text2,
+			start1, end1,
+			start2, end2,
+			overlaps: start1 < end2 && start2 < end1
+		});
+		
+		// Check if the text ranges overlap
+		return start1 < end2 && start2 < end1;
+	}
 
-	if (element1 === element2) {
-		// For text highlights in the same element, check for overlap
-		if (highlight1.type === 'text' && highlight2.type === 'text') {
-			return (highlight1.startOffset < highlight2.endOffset && highlight2.startOffset < highlight1.endOffset);
-		}
-		// For other types, consider them overlapping if they're in the same element
+	// For text highlights, check offset overlap
+	if (highlight1.type === 'text' && highlight2.type === 'text') {
+		return (highlight1.startOffset < highlight2.endOffset && 
+				highlight2.startOffset < highlight1.endOffset);
+	}
+
+	// For complex or element highlights in the same element, consider them overlapping
+	if ((highlight1.type === 'complex' || highlight1.type === 'element') &&
+		(highlight2.type === 'complex' || highlight2.type === 'element')) {
 		return true;
 	}
 
-	// Check if one element contains the other
-	return element1.contains(element2) || element2.contains(element1);
+	return false;
 }
 
 // Check if two highlights are adjacent
 function areHighlightsAdjacent(highlight1: AnyHighlightData, highlight2: AnyHighlightData): boolean {
-	if (highlight1.type === 'text' && highlight2.type === 'text' && highlight1.xpath === highlight2.xpath) {
-		return highlight1.endOffset === highlight2.startOffset || highlight2.endOffset === highlight1.startOffset;
+	if (highlight1.xpath !== highlight2.xpath) {
+		return false;
 	}
+
+	// For fragment highlights, check text position adjacency
+	if (highlight1.type === 'fragment' && highlight2.type === 'fragment') {
+		const text = getElementByXPath(highlight1.xpath)?.textContent || '';
+		const normalizedText = text.replace(/[\u2018\u2019]/g, "'")
+			.replace(/[\u201C\u201D]/g, '"')
+			.replace(/\s+/g, ' ');
+		
+		const text1 = decodeURIComponent(highlight1.textStart);
+		const text2 = decodeURIComponent(highlight2.textStart);
+		
+		const start1 = normalizedText.indexOf(text1);
+		const end1 = start1 + text1.length;
+		const start2 = normalizedText.indexOf(text2);
+		
+		console.log('Checking adjacency:', {
+			text1, text2,
+			start1, end1,
+			start2,
+			adjacent: Math.abs(end1 - start2) <= 1 || Math.abs(start1 - (start2 + text2.length)) <= 1
+		});
+		
+		// Check if the text ranges are immediately adjacent (allowing 1 char for spacing)
+		return Math.abs(end1 - start2) <= 1 || Math.abs(start1 - (start2 + text2.length)) <= 1;
+	}
+
+	// For text highlights, check offset adjacency
+	if (highlight1.type === 'text' && highlight2.type === 'text') {
+		return highlight1.endOffset === highlight2.startOffset || 
+			   highlight2.endOffset === highlight1.startOffset;
+	}
+
 	return false;
 }
 
@@ -521,6 +580,7 @@ function mergeOverlappingHighlights(existingHighlights: AnyHighlightData[], newH
 	for (const existing of existingHighlights) {
 		if (doHighlightsOverlap(existing, newHighlight) || areHighlightsAdjacent(existing, newHighlight)) {
 			if (!merged) {
+				console.log('Merging highlights due to overlap/adjacency');
 				mergedHighlights.push(mergeHighlights(existing, newHighlight));
 				merged = true;
 			} else {
@@ -532,6 +592,7 @@ function mergeOverlappingHighlights(existingHighlights: AnyHighlightData[], newH
 	}
 
 	if (!merged) {
+		console.log('Adding new highlight without merging');
 		mergedHighlights.push(newHighlight);
 	}
 
