@@ -1,0 +1,795 @@
+{
+	"activity": {
+		"message": "Aktivitet"
+	},
+	"addModel": {
+		"message": "+ Tilføj model"
+	},
+	"addModelTitle": {
+		"message": "Tilføj model"
+	},
+	"addProperty": {
+		"message": "+ Tilføj egenskab"
+	},
+	"addProvider": {
+		"message": "+ Tilføj udbyder"
+	},
+	"addProviderTitle": {
+		"message": "Tilføj udbyder"
+	},
+	"addToObsidian": {
+		"message": "Tilføj til Obsidian"
+	},
+	"addVaultPlaceholder": {
+		"message": "Tryk Enter for at tilføje boks"
+	},
+	"advanced": {
+		"message": "Avanceret"
+	},
+	"allProperties": {
+		"message": "Alle egenskaber"
+	},
+	"allTime": {
+		"message": "Al tid"
+	},
+	"alwaysShowHighlights": {
+		"message": "Vis altid fremhævninger"
+	},
+	"alwaysShowHighlightsDescription": {
+		"message": "Vis gemte fremhævninger når siden indlæses. Deaktiver for kun at vise fremhævninger når fremhævningstilstand er aktiv."
+	},
+	"apiKeyMissing": {
+		"message": "API-nøgle mangler"
+	},
+	"apiKeysWarning": {
+		"message": "Ved at bruge en ekstern udbyder accepterer du deres vilkår og betingelser samt privatlivspolitik. Fortolkerforespørgsler sendes direkte til din valgte udbyder. Obsidian indsamler eller gemmer ikke information om dine forespørgsler."
+	},
+	"appendToDaily": {
+		"message": "Tilføj til daglig note, i slutningen"
+	},
+	"appendToExisting": {
+		"message": "Tilføj til eksisterende note, i slutningen"
+	},
+	"autoRunInterpreter": {
+		"message": "Kør automatisk"
+	},
+	"autoRunInterpreterDescription": {
+		"message": "Udfører promptvariabler med det samme, hvis de findes i skabelonen. Bruger API-kreditter fra din modeludbyder. Deaktiver hvis du kun vil køre fortolkeren manuelt."
+	},
+	"behavior": {
+		"message": "Opførsel"
+	},
+	"behaviorWarning": {
+		"message": "Tilføjelse til eksisterende eller daglig note kræver Obsidian 1.7.2 eller nyere."
+	},
+	"byDay": {
+		"message": "Per dag"
+	},
+	"byMonth": {
+		"message": "Per måned"
+	},
+	"byWeek": {
+		"message": "Per uge"
+	},
+	"cancel": {
+		"message": "Annuller"
+	},
+	"cannotDeleteProvider": {
+		"message": "Kan ikke slette udbyderen \"$1\", da den bruges af $2 modeller."
+	},
+	"changelog": {
+		"message": "Ændringslog"
+	},
+	"chooseFile": {
+		"message": "Vælg fil"
+	},
+	"choosePropertiesFile": {
+		"message": "Vælg egenskabsfil"
+	},
+	"chooseSettingsFile": {
+		"message": "Vælg indstillingsfil"
+	},
+	"chooseTemplateFile": {
+		"message": "Vælg skabelonfil"
+	},
+	"clipBehavior": {
+		"message": "Klipningsopførsel"
+	},
+	"clipBehaviorDescription": {
+		"message": "Vælg hvordan det markerede indhold gemmes i Obsidian. Sætter variablen $strong_start${{content}}$strong_end$",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"close": {
+		"message": "Luk"
+	},
+	"commandOpenClipper": {
+		"message": "Åbn Obsidian Clipper"
+	},
+	"commandQuickClip": {
+		"message": "Hurtigklip"
+	},
+	"commandToggleHighlighter": {
+		"message": "Skift fremhævning"
+	},
+	"commandToggleReader": {
+		"message": "Skift læsevisning"
+	},
+	"confirmDeleteTemplate": {
+		"message": "Er du sikker på, at du vil slette skabelonen \"$1\"?"
+	},
+	"confirmReplaceSettings": {
+		"message": "Denne handling vil erstatte alle dine nuværende indstillinger, inklusive skabeloner og egenskaber. Er du sikker på, at du vil fortsætte?"
+	},
+	"copied": {
+		"message": "Kopieret!"
+	},
+	"copyAsJson": {
+		"message": "Kopiér som JSON"
+	},
+	"copyToClipboard": {
+		"message": "Kopiér til udklipsholder"
+	},
+	"createNewNote": {
+		"message": "Opret ny note"
+	},
+	"custom": {
+		"message": "Tilpasset"
+	},
+	"dailyNoteFormat": {
+		"message": "Format for daglig note (f.eks. YYYY-MM-DD)"
+	},
+	"defaultInterpreterContext": {
+		"message": "Standard fortolkerkontekst"
+	},
+	"defaultInterpreterContextDescription": {
+		"message": "Tilsidesætter konteksten der bruges til at fortolke promptvariabler. Du kan bruge variabler her."
+	},
+	"defaultTemplateName": {
+		"message": "Standard"
+	},
+	"delete": {
+		"message": "Slet"
+	},
+	"deleteModelConfirm": {
+		"message": "Er du sikker på, at du vil slette denne model?"
+	},
+	"deleteProviderConfirm": {
+		"message": "Er du sikker på, at du vil slette denne udbyder?"
+	},
+	"disableHighlighter": {
+		"message": "Deaktiver fremhævning"
+	},
+	"disableReader": {
+		"message": "Deaktiver læsevisning"
+	},
+	"done": {
+		"message": "Færdig"
+	},
+	"dragAndDropFile": {
+		"message": "Træk og slip fil her"
+	},
+	"duplicate": {
+		"message": "Duplikér"
+	},
+	"earlyAccessDescription": {
+		"message": "Brug funktioner der kræver den nyeste $link_start$tidlig adgang-version$link_end$ af Obsidian. Kræver i øjeblikket Obsidian 1.7.2 eller nyere.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/Obsidian/Early+access+versions\" target=\"_blank\">"
+			}
+		}
+	},
+	"earlyAccessFeatures": {
+		"message": "Tidlig adgang-funktioner"
+	},
+	"editModel": {
+		"message": "Redigér model"
+	},
+	"editProvider": {
+		"message": "Redigér udbyder"
+	},
+	"editTemplate": {
+		"message": "Redigér skabelon"
+	},
+	"enableHighlighter": {
+		"message": "Aktivér fremhævning"
+	},
+	"enableHighlighterDescription": {
+		"message": "Fremhæv indhold på websider for at gemme i Obsidian"
+	},
+	"enableInterpreter": {
+		"message": "Aktivér fortolker"
+	},
+	"enableInterpreterDescription": {
+		"message": "Brug naturligt sprog til at udtrække information fra sider. For eksempel kan du bruge skabelonsyntaksen $strong_start${{\"opsummér denne side\"}}$strong_end$. Kræver en API-nøgle eller opsætning af en tilpasset model nedenfor. $link_start$Lær mere$link_end$",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/interpreter\" target=\"_blank\">"
+			},
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"enableReader": {
+		"message": "Åbn læsevisning"
+	},
+	"error": {
+		"message": "Fejl"
+	},
+	"export": {
+		"message": "Eksportér"
+	},
+	"exportAllSettings": {
+		"message": "Eksportér alle indstillinger"
+	},
+	"exportAllSettingsDescription": {
+		"message": "Eksportér alle indstillinger, inklusive skabeloner og egenskaber"
+	},
+	"exportHighlights": {
+		"message": "Eksportér fremhævninger"
+	},
+	"exportHighlightsDescription": {
+		"message": "Eksportér dine fremhævninger til en fil"
+	},
+	"exportProperties": {
+		"message": "Eksportér egenskaber"
+	},
+	"exportPropertiesDescription": {
+		"message": "Gem Web Clipper-egenskaber til en $strong_start$types.json$strong_end$-fil, som kan importeres i din Obsidian-boks eller Web Clipper på andre enheder",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"extensionDescription": {
+		"message": "Gem webindhold i et privat og holdbart format, tilgængeligt offline. Den officielle browserudvidelse til Obsidian."
+	},
+	"extensionName": {
+		"message": "Obsidian Web Clipper"
+	},
+	"failedToCopyText": {
+		"message": "Kunne ikke kopiere tekst"
+	},
+	"failedToDeleteTemplate": {
+		"message": "Kunne ikke slette skabelon. Prøv venligst igen."
+	},
+	"failedToDuplicateTemplate": {
+		"message": "Kunne ikke duplikere skabelon. Prøv venligst igen."
+	},
+	"failedToExportHighlights": {
+		"message": "Kunne ikke eksportere fremhævninger. Tjek konsollen for detaljer."
+	},
+	"failedToExportSettings": {
+		"message": "Kunne ikke eksportere indstillinger. Tjek konsollen for detaljer."
+	},
+	"failedToExtractContent": {
+		"message": "Kunne ikke udtrække sideindhold."
+	},
+	"failedToImportTemplate": {
+		"message": "Fejl ved import af skabelon. Tjek filen og prøv igen."
+	},
+	"failedToInitialize": {
+		"message": "Genindlæs venligst udvidelsen."
+	},
+	"failedToInitializeContent": {
+		"message": "Kunne ikke initialisere sideindhold."
+	},
+	"failedToProcessInterpreter": {
+		"message": "Kunne ikke behandle fortolker. Prøv venligst igen."
+	},
+	"failedToResetProviders": {
+		"message": "Kunne ikke nulstille udbydere og modeller"
+	},
+	"failedToResetTemplate": {
+		"message": "Kunne ikke nulstille standardskabelon. Prøv venligst igen."
+	},
+	"failedToSave": {
+		"message": "Kunne ikke gemme fil"
+	},
+	"failedToSaveFile": {
+		"message": "Kunne ikke gemme fil"
+	},
+	"failedToSaveProvider": {
+		"message": "Kunne ikke gemme udbyder. Prøv venligst igen."
+	},
+	"feedback": {
+		"message": "Feedback"
+	},
+	"feedbackDescription": {
+		"message": "Hvordan kan vi forbedre Web Clipper? Besøg vores hjælpeside for at rapportere fejl, foreslå funktioner og få hjælp med almindelige problemer."
+	},
+	"feedbackTitle": {
+		"message": "Tak for din feedback"
+	},
+	"folder": {
+		"message": "Mappe"
+	},
+	"general": {
+		"message": "Generelt"
+	},
+	"generalSettings": {
+		"message": "Generelle indstillinger"
+	},
+	"getApiKeyHere": {
+		"message": "Få $1 API-nøgle her"
+	},
+	"help": {
+		"message": "Hjælp"
+	},
+	"helpDescription": {
+		"message": "Lær hvordan du bruger Web Clipper og få hjælp til fejlfinding"
+	},
+	"highlightInline": {
+		"message": "Fremhæv indhold på siden"
+	},
+	"highlightPage": {
+		"message": "Fremhæv side"
+	},
+	"highlighter": {
+		"message": "Fremhævning"
+	},
+	"highlighterSettings": {
+		"message": "Fremhævning"
+	},
+	"history": {
+		"message": "Historik"
+	},
+	"hotkeys": {
+		"message": "Genvejstaster"
+	},
+	"import": {
+		"message": "Importér"
+	},
+	"importAllSettings": {
+		"message": "Importér alle indstillinger"
+	},
+	"importAllSettingsDescription": {
+		"message": "Importér alle indstillinger, inklusive skabeloner og egenskaber. Dette vil overskrive din nuværende konfiguration."
+	},
+	"importFailed": {
+		"message": "Import mislykkedes. Tjek konsollen for detaljer."
+	},
+	"importModalTitle": {
+		"message": "Importér"
+	},
+	"importProperties": {
+		"message": "Importér egenskaber"
+	},
+	"importPropertiesDescription": {
+		"message": "For at importere egenskaber fra Obsidian, find $strong_1_start$types.json$strong_1_end$-filen i $strong_2_start$.obsidian$strong_2_end$-mappen i din boks. Denne mappe er som standard skjult på de fleste operativsystemer.",
+		"placeholders": {
+			"strong_1_end": {
+				"content": "</strong>"
+			},
+			"strong_1_start": {
+				"content": "<strong>"
+			},
+			"strong_2_end": {
+				"content": "</strong>"
+			},
+			"strong_2_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"importSettings": {
+		"message": "Importér indstillinger"
+	},
+	"importTemplate": {
+		"message": "Importér skabelon"
+	},
+	"interpret": {
+		"message": "Fortolk"
+	},
+	"interpreter": {
+		"message": "Fortolker"
+	},
+	"interpreterContext": {
+		"message": "Fortolkerkontekst"
+	},
+	"interpreterContextDescription": {
+		"message": "Konteksten der bruges til at fortolke promptvariabler. Tilsidesætter standardkonteksten sat i $link_start$fortolkerindstillingerne$link_end$. Du kan bruge variabler her.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=interpreter\">"
+			}
+		}
+	},
+	"language": {
+		"message": "Sprog"
+	},
+	"languageDescription": {
+		"message": "Vælg visningssprog for udvidelsens grænseflade."
+	},
+	"last30Days": {
+		"message": "Sidste 30 dage"
+	},
+	"lastUsed": {
+		"message": "Sidst brugt"
+	},
+	"legacyMode": {
+		"message": "Legacy-tilstand"
+	},
+	"legacyModeDescription": {
+		"message": "Bruger URI-indfangningsmetoden som er kompatibel med Obsidian 1.6.7 og ældre. Bemærk at længden af indfanget indhold er begrænset af browseren og operativsystemet. Nogle sider kan fejle uden fejlmeddelelse."
+	},
+	"modelName": {
+		"message": "Modelnavn"
+	},
+	"modelNameDescription": {
+		"message": "Navnet der vises i modelrullelisten"
+	},
+	"modelProvider": {
+		"message": "Udbyder"
+	},
+	"modelProviderDescription": {
+		"message": "Vælg udbyderen for denne model"
+	},
+	"modelProviderPlaceholder": {
+		"message": "Udbyder"
+	},
+	"modelRequiredFields": {
+		"message": "Modelnavn, udbyder og model-ID er påkrævet."
+	},
+	"models": {
+		"message": "Modeller"
+	},
+	"modelsListFor": {
+		"message": "Modelliste for $1"
+	},
+	"more": {
+		"message": "Mere"
+	},
+	"newTemplate": {
+		"message": "Ny skabelon"
+	},
+	"noHighlights": {
+		"message": "Ingen fremhævninger"
+	},
+	"noTemplates": {
+		"message": "Ingen tilgængelige skabeloner. Tilføj en skabelon i indstillingerne."
+	},
+	"noUnusedProperties": {
+		"message": "Ingen ubrugte egenskaber fundet."
+	},
+	"noteContent": {
+		"message": "Noteindhold"
+	},
+	"noteContentDescription": {
+		"message": "Tilpas notens indhold. Brug variabler til at forudfylde data fra siden."
+	},
+	"noteLocation": {
+		"message": "Noteplacering"
+	},
+	"noteLocationDescription": {
+		"message": "Mappen eller stien til noten."
+	},
+	"noteName": {
+		"message": "Notenavn"
+	},
+	"noteNameFormat": {
+		"message": "Notenavnsformat"
+	},
+	"noteNameFormatDescription": {
+		"message": "Formatet der bruges til at generere notenavne. Du kan bruge variabler."
+	},
+	"notesAboutPage": {
+		"message": "Noter om denne side..."
+	},
+	"onlyHttpSupported": {
+		"message": "Kan ikke klippe denne side. Kun http og https-URL'er understøttes."
+	},
+	"open": {
+		"message": "Åbn"
+	},
+	"optional": {
+		"message": "(valgfrit)"
+	},
+	"orPasteBelow": {
+		"message": "Eller indsæt indholdet nedenfor"
+	},
+	"overwriteNote": {
+		"message": "Overskriv note"
+	},
+	"pageCannotBeClipped": {
+		"message": "Denne side kan ikke klippes."
+	},
+	"pageVariables": {
+		"message": "Sidevariabler"
+	},
+	"pagesSaved": {
+		"message": "Side gemt"
+	},
+	"pagesSavedPlural": {
+		"message": "Sider gemt"
+	},
+	"pasteJsonHere": {
+		"message": "Indsæt JSON her"
+	},
+	"pleaseReload": {
+		"message": "Genindlæs venligst siden."
+	},
+	"popularModels": {
+		"message": "Populære modeller"
+	},
+	"popularModelsDescription": {
+		"message": "Vælg fra ofte brugte modeller eller indtast detaljer for tilpasset model."
+	},
+	"prependToDaily": {
+		"message": "Tilføj til daglig note, i starten"
+	},
+	"prependToExisting": {
+		"message": "Tilføj til eksisterende note, i starten"
+	},
+	"processing": {
+		"message": "behandler"
+	},
+	"properties": {
+		"message": "Egenskaber"
+	},
+	"propertiesSettings": {
+		"message": "Egenskaber"
+	},
+	"propertyName": {
+		"message": "Egenskabsnavn"
+	},
+	"propertyValue": {
+		"message": "Egenskabsværdi"
+	},
+	"provider": {
+		"message": "Udbyder"
+	},
+	"providerApiKey": {
+		"message": "API-nøgle"
+	},
+	"providerApiKeyDescription": {
+		"message": "Din API-nøgle for denne udbyder."
+	},
+	"providerBaseUrl": {
+		"message": "Base-URL"
+	},
+	"providerBaseUrlDescription": {
+		"message": "API-endepunktets URL for denne udbyder."
+	},
+	"providerModelId": {
+		"message": "Model-ID"
+	},
+	"providerModelIdDescription": {
+		"message": "Identifikatoren for modellen fra din udbyder. Typisk et kort navn uden mellemrum."
+	},
+	"providerModelIdPlaceholder": {
+		"message": "Model-ID"
+	},
+	"providerName": {
+		"message": "Udbyderens navn"
+	},
+	"providerNameDescription": {
+		"message": "Visningsnavn for denne udbyder."
+	},
+	"providerPreset": {
+		"message": "Forudindstilling"
+	},
+	"providerPresetDescription": {
+		"message": "Vælg en udbyder eller opret en tilpasset."
+	},
+	"providerRequiredFields": {
+		"message": "Udbyderens navn og base-URL er påkrævet."
+	},
+	"providers": {
+		"message": "Udbydere"
+	},
+	"rateExtensionDescription": {
+		"message": "Kan du lide Web Clipper? Hjælp os ved at give en bedømmelse."
+	},
+	"reader": {
+		"message": "Læser"
+	},
+	"recommended": {
+		"message": "anbefalet"
+	},
+	"refresh": {
+		"message": "Opdater"
+	},
+	"remove": {
+		"message": "Fjern"
+	},
+	"removeProperty": {
+		"message": "Fjern egenskab"
+	},
+	"removeUnusedProperties": {
+		"message": "Fjern ubrugte egenskaber"
+	},
+	"removeUnusedPropertiesDescription": {
+		"message": "Fjern alle egenskaber der ikke bruges i nogen skabeloner."
+	},
+	"removeVault": {
+		"message": "Fjern boks"
+	},
+	"replaceContent": {
+		"message": "Erstat noteindhold"
+	},
+	"reset": {
+		"message": "Nulstil"
+	},
+	"resetDefaultTemplate": {
+		"message": "Nulstil standardskabelon"
+	},
+	"resetDefaultTemplateDescription": {
+		"message": "Fjern alle ændringer foretaget i standardskabelonen."
+	},
+	"resetProvidersAndModels": {
+		"message": "Nulstil modeller til standard"
+	},
+	"resetProvidersAndModelsDescription": {
+		"message": "Nulstil udbydere og modeller til standardindstillingerne."
+	},
+	"save": {
+		"message": "Gem"
+	},
+	"saveBehaviorDescription": {
+		"message": "Vælg standardindstillingen for at gemme sider. Alternative muligheder vises i rullemenuen ved siden af hovedknappen."
+	},
+	"saveBehaviorLabel": {
+		"message": "Gem adfærd"
+	},
+	"saveFile": {
+		"message": "Gem fil..."
+	},
+	"searchVariables": {
+		"message": "Søg i variabler..."
+	},
+	"selectProvider": {
+		"message": "Vælg udbyder"
+	},
+	"selectTemplateToExport": {
+		"message": "Vælg skabelon til eksport"
+	},
+	"settings": {
+		"message": "Indstillinger"
+	},
+	"settingsHeading": {
+		"message": "Indstillinger"
+	},
+	"settingsImportSuccess": {
+		"message": "Alle indstillinger importeret med succes. Genindlæs siden for at se ændringerne."
+	},
+	"share": {
+		"message": "Del..."
+	},
+	"shortcutInstructionsBrave": {
+		"message": "For at ændre genvejstaster, gå til $1"
+	},
+	"shortcutInstructionsChrome": {
+		"message": "For at ændre genvejstaster, gå til $1"
+	},
+	"shortcutInstructionsDefault": {
+		"message": "For at ændre genvejstaster, se din browsers udvidelses-indstillinger."
+	},
+	"shortcutInstructionsEdge": {
+		"message": "For at ændre genvejstaster, gå til $1"
+	},
+	"shortcutInstructionsFirefox": {
+		"message": "For at ændre genvejstaster, gå til $1, klik på tandhjulsikonet og vælg \"Administrer udvidelsesgenveje\""
+	},
+	"shortcutInstructionsIntro": {
+		"message": "Genvejstaster giver hurtig adgang til klippefunktioner."
+	},
+	"shortcutInstructionsSafari": {
+		"message": "Genvejstaster kan ikke konfigureres i Safari."
+	},
+	"shortcutNotSet": {
+		"message": "Ikke indstillet"
+	},
+	"showActionsButton": {
+		"message": "Vis handlingsknap"
+	},
+	"showActionsDescription": {
+		"message": "Lader dig se sidens variabler fra klippermenuen. Nyttigt for at se hvilke variabler der er tilgængelige til brug i skabeloner."
+	},
+	"showPageVariables": {
+		"message": "Vis sidevariabler"
+	},
+	"silentOpen": {
+		"message": "Gem noter uden at åbne dem"
+	},
+	"silentOpenDescription": {
+		"message": "Klippede noter vil blive gemt men ikke åbnet i en ny fane. Obsidian vil stadig blive bragt i forgrunden."
+	},
+	"specificNoteName": {
+		"message": "Specifikt notenavn"
+	},
+	"systemDefault": {
+		"message": "Systemstandard"
+	},
+	"templateCopied": {
+		"message": "Skabelon-JSON kopieret til udklipsholder"
+	},
+	"templateCopyError": {
+		"message": "Kunne ikke kopiere skabelon-JSON til udklipsholder"
+	},
+	"templateName": {
+		"message": "Skabelonnavn"
+	},
+	"templateProperties": {
+		"message": "Egenskaber"
+	},
+	"templatePropertiesDescription": {
+		"message": "Egenskaber der vil blive tilføjet i starten af den klippede note. Brug variabler til at forudfylde data fra siden."
+	},
+	"templateTriggers": {
+		"message": "Skabelonudløsere"
+	},
+	"templateTriggersDescription": {
+		"message": "Definer regler for automatisk at vælge denne skabelon hvis den matcher URL-mønsteret eller indeholder schema.org-data. Én regel per linje."
+	},
+	"templatesHeading": {
+		"message": "Skabeloner"
+	},
+	"thinking": {
+		"message": "tænker"
+	},
+	"unknownProvider": {
+		"message": "Ukendt udbyder"
+	},
+	"updateAvailable": {
+		"message": "Opdatering tilgængelig"
+	},
+	"usingLatestVersion": {
+		"message": "Du bruger den nyeste version"
+	},
+	"vault": {
+		"message": "Boks"
+	},
+	"vaultDescription": {
+		"message": "Vælg standardboks for denne skabelon. Gå til $link_start$generelle indstillinger$link_end$ for at tilføje eller fjerne bokse.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=general\">"
+			}
+		}
+	},
+	"vaults": {
+		"message": "Bokse"
+	},
+	"vaultsDescription": {
+		"message": "Som standard gemmes klippede noter i den åbne boks. Du kan tilføje bokse her hvis du ønsker muligheden for at gemme i forskellige bokse. Boksnavnet skal matche præcist med Obsidian-boksnavnet. Tryk $strong_start$enter$strong_end$ for at tilføje en boks.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"version": {
+		"message": "Version"
+	}
+}

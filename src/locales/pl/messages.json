@@ -1,4 +1,7 @@
 {
+	"activity": {
+		"message": "Aktywność"
+	},
 	"addModel": {
 		"message": "+ Dodaj model"
 	},
@@ -25,6 +28,9 @@
 	},
 	"allProperties": {
 		"message": "Wszystkie atrybuty"
+	},
+	"allTime": {
+		"message": "Cały czas"
 	},
 	"alwaysShowHighlights": {
 		"message": "Zawsze pokazuj wyróżnienia"
@@ -55,6 +61,15 @@
 	},
 	"behaviorWarning": {
 		"message": "Aby zapisać w istniejącej lub codziennej notatce wymagany jest Obsidian w wersji 1.7.2 lub nowszej."
+	},
+	"byDay": {
+		"message": "Dni"
+	},
+	"byMonth": {
+		"message": "Miesiące"
+	},
+	"byWeek": {
+		"message": "Tygodnie"
 	},
 	"cancel": {
 		"message": "Anuluj"
@@ -103,6 +118,9 @@
 	"commandToggleHighlighter": {
 		"message": "Tryb zakreślacza"
 	},
+	"commandToggleReader": {
+		"message": "Przełącz widok czytnika"
+	},
 	"confirmDeleteTemplate": {
 		"message": "Czy na pewno chcesz usunąć szablon \"$1\"?"
 	},
@@ -147,6 +165,9 @@
 	},
 	"disableHighlighter": {
 		"message": "Wyłącz zakreślacz"
+	},
+	"disableReader": {
+		"message": "Wyłącz widok czytnika"
 	},
 	"done": {
 		"message": "Gotowe"
@@ -205,6 +226,9 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"enableReader": {
+		"message": "Otwórz widok czytnika"
 	},
 	"error": {
 		"message": "Błąd"
@@ -289,6 +313,15 @@
 	"failedToSaveProvider": {
 		"message": "Nie udało się zapisać operatora. Spróbuj ponownie."
 	},
+	"feedback": {
+		"message": "Opinia"
+	},
+	"feedbackDescription": {
+		"message": "Jak możemy poprawić Web Clipper? Odwiedź naszą stronę pomocy, gdzie możesz zgłaszać błędy, proponować funkcje i uzyskać pomoc w rozwiązywaniu typowych problemów."
+	},
+	"feedbackTitle": {
+		"message": "Dziękujemy za Twoją opinię"
+	},
 	"folder": {
 		"message": "Folder"
 	},
@@ -318,6 +351,9 @@
 	},
 	"highlighterSettings": {
 		"message": "Zakreślacz"
+	},
+	"history": {
+		"message": "Historia"
 	},
 	"hotkeys": {
 		"message": "Skróty klawiszowe"
@@ -389,6 +425,9 @@
 	"languageDescription": {
 		"message": "Wybierz język interfejsu rozszerzenia."
 	},
+	"last30Days": {
+		"message": "Ostatnie 30 dni"
+	},
 	"lastUsed": {
 		"message": "Ostatnio używane"
 	},
@@ -418,6 +457,9 @@
 	},
 	"models": {
 		"message": "Modele"
+	},
+	"modelsListFor": {
+		"message": "Lista modeli dla $1"
 	},
 	"more": {
 		"message": "Więcej"
@@ -478,17 +520,32 @@
 	"orPasteBelow": {
 		"message": "Możesz też wkleić treść poniżej"
 	},
+	"overwriteNote": {
+		"message": "Nadpisz notatkę"
+	},
 	"pageCannotBeClipped": {
 		"message": "Tej strony nie można przechwycić."
 	},
 	"pageVariables": {
 		"message": "Zmienne strony"
 	},
+	"pagesSaved": {
+		"message": "strona zapisana"
+	},
+	"pagesSavedPlural": {
+		"message": "strony zapisane"
+	},
 	"pasteJsonHere": {
 		"message": "Wklej JSON tutaj"
 	},
 	"pleaseReload": {
 		"message": "Spróbuj odświeżyć stronę."
+	},
+	"popularModels": {
+		"message": "Popularne modele"
+	},
+	"popularModelsDescription": {
+		"message": "Wybierz spośród często używanych modeli lub wprowadź szczegóły niestandardowego modelu."
 	},
 	"prependToDaily": {
 		"message": "Zapisz na górze codziennej notatki"
@@ -553,6 +610,15 @@
 	"providers": {
 		"message": "Operatorzy"
 	},
+	"rateExtensionDescription": {
+		"message": "Czy podoba Ci się Web Clipper? Pomóż nam, oceniając go."
+	},
+	"reader": {
+		"message": "Czytnik"
+	},
+	"recommended": {
+		"message": "rekomendowane"
+	},
 	"refresh": {
 		"message": "Odśwież"
 	},
@@ -591,6 +657,12 @@
 	},
 	"save": {
 		"message": "Zapisz"
+	},
+	"saveBehaviorDescription": {
+		"message": "Wybierz domyślną opcję zapisywania stron. Alternatywne opcje pojawiają się w menu rozwijanym obok głównego przycisku."
+	},
+	"saveBehaviorLabel": {
+		"message": "Zachowanie zapisu"
 	},
 	"saveFile": {
 		"message": "Zapisz plik..."

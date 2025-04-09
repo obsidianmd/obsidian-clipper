@@ -15,7 +15,7 @@ export const replace = (str: string, param?: string): string => {
 	for (let i = 0; i < param.length; i++) {
 		const char = param[i];
 
-		if (char === ',' && !state.inQuote && !state.inRegex && 
+		if (char === ',' && !state.inQuote && !state.inRegex &&
 			state.curlyDepth === 0 && state.parenDepth === 0) {
 			replacements.push(state.current.trim());
 			state.current = '';
@@ -30,7 +30,7 @@ export const replace = (str: string, param?: string): string => {
 
 	// Apply each replacement in sequence
 	return replacements.reduce((acc, replacement) => {
-		let [search, replace] = replacement.split(/(?<!\\):/).map(p => {
+		let [search, replace] = replacement.split(/(?<=[^\\]["']):(?=["'])/).map(p => {
 			// Remove surrounding quotes but preserve escaped characters
 			return p.trim().replace(/^["']|["']$/g, '');
 		});

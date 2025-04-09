@@ -1,4 +1,7 @@
 {
+	"activity": {
+		"message": "Activity"
+	},
 	"addModel": {
 		"message": "+ Add model"
 	},
@@ -25,6 +28,9 @@
 	},
 	"allProperties": {
 		"message": "All properties"
+	},
+	"allTime": {
+		"message": "All time"
 	},
 	"alwaysShowHighlights": {
 		"message": "Always show highlights"
@@ -55,6 +61,15 @@
 	},
 	"behaviorWarning": {
 		"message": "Adding to an existing note or daily note requires Obsidian 1.7.2 or later."
+	},
+	"byDay": {
+		"message": "Days"
+	},
+	"byMonth": {
+		"message": "Months"
+	},
+	"byWeek": {
+		"message": "Weeks"
 	},
 	"cancel": {
 		"message": "Cancel"
@@ -103,6 +118,9 @@
 	"commandToggleHighlighter": {
 		"message": "Toggle highlighter mode"
 	},
+	"commandToggleReader": {
+		"message": "Toggle reading view"
+	},
 	"confirmDeleteTemplate": {
 		"message": "Are you sure you want to delete the template \"$1\"?"
 	},
@@ -147,6 +165,9 @@
 	},
 	"disableHighlighter": {
 		"message": "Disable highlighter"
+	},
+	"disableReader": {
+		"message": "Disable reading view"
 	},
 	"done": {
 		"message": "Done"
@@ -205,6 +226,9 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"enableReader": {
+		"message": "Open reading view"
 	},
 	"error": {
 		"message": "Error"
@@ -289,6 +313,15 @@
 	"failedToSaveProvider": {
 		"message": "Failed to save provider. Please try again."
 	},
+	"feedback": {
+		"message": "Feedback"
+	},
+	"feedbackDescription": {
+		"message": "How can we improve Web Clipper? Please visit our help page, where you can report bugs, suggest features, and get help with common issues."
+	},
+	"feedbackTitle": {
+		"message": "Thanks for your feedback"
+	},
 	"folder": {
 		"message": "Folder"
 	},
@@ -318,6 +351,9 @@
 	},
 	"highlighterSettings": {
 		"message": "Highlighter"
+	},
+	"history": {
+		"message": "History"
 	},
 	"hotkeys": {
 		"message": "Hotkeys"
@@ -389,6 +425,9 @@
 	"languageDescription": {
 		"message": "Choose the display language for the extension interface."
 	},
+	"last30Days": {
+		"message": "Last 30 days"
+	},
 	"lastUsed": {
 		"message": "Last used"
 	},
@@ -418,6 +457,9 @@
 	},
 	"models": {
 		"message": "Models"
+	},
+	"modelsListFor": {
+		"message": "Models list for $1"
 	},
 	"more": {
 		"message": "More"
@@ -478,17 +520,32 @@
 	"orPasteBelow": {
 		"message": "Or paste content below"
 	},
+	"overwriteNote": {
+		"message": "Overwrite note"
+	},
 	"pageCannotBeClipped": {
 		"message": "This page cannot be clipped."
 	},
 	"pageVariables": {
 		"message": "Page variables"
 	},
+	"pagesSaved": {
+		"message": "page saved"
+	},
+	"pagesSavedPlural": {
+		"message": "pages saved"
+	},
 	"pasteJsonHere": {
 		"message": "Paste JSON here"
 	},
 	"pleaseReload": {
 		"message": "Please try reloading the page."
+	},
+	"popularModels": {
+		"message": "Popular models"
+	},
+	"popularModelsDescription": {
+		"message": "Choose from commonly used models or enter custom model details."
 	},
 	"prependToDaily": {
 		"message": "Add to daily note, at the top"
@@ -553,6 +610,15 @@
 	"providers": {
 		"message": "Providers"
 	},
+	"rateExtensionDescription": {
+		"message": "Are you enjoying Web Clipper? Help us by giving it a rating."
+	},
+	"reader": {
+		"message": "Reader"
+	},
+	"recommended": {
+		"message": "recommended"
+	},
 	"refresh": {
 		"message": "Refresh"
 	},
@@ -591,6 +657,12 @@
 	},
 	"save": {
 		"message": "Save"
+	},
+	"saveBehaviorDescription": {
+		"message": "Choose the default option for saving pages. Alternate options appear in the dropdown menu next to the main button."
+	},
+	"saveBehaviorLabel": {
+		"message": "Save behavior"
 	},
 	"saveFile": {
 		"message": "Save file..."

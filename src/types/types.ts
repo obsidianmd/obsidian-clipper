@@ -1,7 +1,7 @@
 export interface Template {
 	id: string;
 	name: string;
-	behavior: 'create' | 'append-specific' | 'append-daily' | 'prepend-specific' | 'prepend-daily';
+	behavior: 'create' | 'append-specific' | 'append-daily' | 'prepend-specific' | 'prepend-daily' | 'overwrite';
 	noteNameFormat: string;
 	path: string;
 	noteContentFormat: string;
@@ -43,6 +43,21 @@ export interface Provider {
 	apiKey: string;
 }
 
+export interface Rating {
+	rating: number;
+	date: string;
+}
+
+export type SaveBehavior = 'addToObsidian' | 'saveFile' | 'copyToClipboard';
+
+export interface ReaderSettings {
+	fontSize: number;
+	lineHeight: number;
+	maxWidth: number;
+	theme: 'default' | 'flexoki';
+	themeMode: 'auto' | 'light' | 'dark';
+}
+
 export interface Settings {
 	vaults: string[];
 	showMoreActionsButton: boolean;
@@ -59,6 +74,7 @@ export interface Settings {
 	interpreterAutoRun: boolean;
 	defaultPromptContext: string;
 	propertyTypes: PropertyType[];
+	readerSettings: ReaderSettings;
 	stats: {
 		addToObsidian: number;
 		saveFile: number;
@@ -66,6 +82,8 @@ export interface Settings {
 		share: number;
 	};
 	history: HistoryEntry[];
+	ratings: Rating[];
+	saveBehavior: 'addToObsidian' | 'saveFile' | 'copyToClipboard';
 }
 
 export interface ModelConfig {
@@ -83,4 +101,26 @@ export interface HistoryEntry {
 	title?: string;
 	vault?: string;
 	path?: string;
+}
+
+export interface ConversationMessage {
+	author: string;
+	content: string;
+	timestamp?: string;
+	metadata?: Record<string, any>;
+}
+
+export interface ConversationMetadata {
+	title?: string;
+	description?: string;
+	site: string;
+	url: string;
+	messageCount: number;
+	startTime?: string;
+	endTime?: string;
+}
+
+export interface Footnote {
+	url: string;
+	text: string;
 }

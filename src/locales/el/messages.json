@@ -1,0 +1,795 @@
+{
+	"activity": {
+		"message": "Δραστηριότητα"
+	},
+	"addModel": {
+		"message": "+ Προσθήκη μοντέλου"
+	},
+	"addModelTitle": {
+		"message": "Προσθήκη μοντέλου"
+	},
+	"addProperty": {
+		"message": "+ Προσθήκη ιδιότητας"
+	},
+	"addProvider": {
+		"message": "+ Προσθήκη παρόχου"
+	},
+	"addProviderTitle": {
+		"message": "Προσθήκη παρόχου"
+	},
+	"addToObsidian": {
+		"message": "Προσθήκη στο Obsidian"
+	},
+	"addVaultPlaceholder": {
+		"message": "Πατήστε Enter για προσθήκη θησαυροφυλακίου"
+	},
+	"advanced": {
+		"message": "Προχωρημένα"
+	},
+	"allProperties": {
+		"message": "Όλες οι ιδιότητες"
+	},
+	"allTime": {
+		"message": "Όλος ο χρόνος"
+	},
+	"alwaysShowHighlights": {
+		"message": "Εμφάνιση επισημάνσεων πάντα"
+	},
+	"alwaysShowHighlightsDescription": {
+		"message": "Εμφάνιση αποθηκευμένων επισημάνσεων κατά τη φόρτωση της σελίδας. Απενεργοποιήστε για εμφάνιση επισημάνσεων μόνο όταν είναι ενεργή η λειτουργία επισήμανσης."
+	},
+	"apiKeyMissing": {
+		"message": "Λείπει το κλειδί API"
+	},
+	"apiKeysWarning": {
+		"message": "Χρησιμοποιώντας έναν εξωτερικό πάροχο, αποδέχεστε τους όρους χρήσης και την πολιτική απορρήτου τους. Τα αιτήματα διερμηνέα αποστέλλονται απευθείας στον επιλεγμένο πάροχό σας. Το Obsidian δεν συλλέγει ούτε αποθηκεύει πληροφορίες για τα αιτήματά σας."
+	},
+	"appendToDaily": {
+		"message": "Προσθήκη στην ημερήσια σημείωση, στο τέλος"
+	},
+	"appendToExisting": {
+		"message": "Προσθήκη σε υπάρχουσα σημείωση, στο τέλος"
+	},
+	"autoRunInterpreter": {
+		"message": "Αυτόματη εκτέλεση"
+	},
+	"autoRunInterpreterDescription": {
+		"message": "Εκτελεί αμέσως τις μεταβλητές προτροπής εάν υπάρχουν στο πρότυπο. Καταναλώνει μονάδες API από τον πάροχο του μοντέλου σας. Απενεργοποιήστε εάν θέλετε να εκτελείτε τον διερμηνέα μόνο χειροκίνητα."
+	},
+	"behavior": {
+		"message": "Συμπεριφορά"
+	},
+	"behaviorWarning": {
+		"message": "Η προσθήκη σε υπάρχουσα ή ημερήσια σημείωση απαιτεί Obsidian 1.7.2 ή νεότερη έκδοση."
+	},
+	"byDay": {
+		"message": "Ημέρα"
+	},
+	"byMonth": {
+		"message": "Μήνας"
+	},
+	"byWeek": {
+		"message": "Εβδομάδα"
+	},
+	"cancel": {
+		"message": "Ακύρωση"
+	},
+	"cannotDeleteProvider": {
+		"message": "Δεν είναι δυνατή η διαγραφή του παρόχου \"$1\" επειδή χρησιμοποιείται από $2 μοντέλα."
+	},
+	"changelog": {
+		"message": "Αρχείο αλλαγών"
+	},
+	"chooseFile": {
+		"message": "Επιλογή αρχείου"
+	},
+	"choosePropertiesFile": {
+		"message": "Επιλογή αρχείου ιδιοτήτων"
+	},
+	"chooseSettingsFile": {
+		"message": "Επιλογή αρχείου ρυθμίσεων"
+	},
+	"chooseTemplateFile": {
+		"message": "Επιλογή αρχείου προτύπου"
+	},
+	"clipBehavior": {
+		"message": "Συμπεριφορά αποκοπής"
+	},
+	"clipBehaviorDescription": {
+		"message": "Επιλέξτε πώς θα αποθηκευτεί το επιλεγμένο περιεχόμενο στο Obsidian. Ορίζει τη μεταβλητή $strong_start${{content}}$strong_end$",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"close": {
+		"message": "Κλείσιμο"
+	},
+	"commandOpenClipper": {
+		"message": "Άνοιγμα Obsidian Clipper"
+	},
+	"commandQuickClip": {
+		"message": "Γρήγορη αποκοπή"
+	},
+	"commandToggleHighlighter": {
+		"message": "Εναλλαγή επισημαντή"
+	},
+	"commandToggleReader": {
+		"message": "Εναλλαγή προβολής ανάγνωσης"
+	},
+	"confirmDeleteTemplate": {
+		"message": "Είστε βέβαιοι ότι θέλετε να διαγράψετε το πρότυπο \"$1\";"
+	},
+	"confirmReplaceSettings": {
+		"message": "Αυτή η ενέργεια θα αντικαταστήσει όλες τις τρέχουσες ρυθμίσεις σας, συμπεριλαμβανομένων των προτύπων και των ιδιοτήτων. Είστε βέβαιοι ότι θέλετε να συνεχίσετε;"
+	},
+	"copied": {
+		"message": "Αντιγράφηκε!"
+	},
+	"copyAsJson": {
+		"message": "Αντιγραφή ως JSON"
+	},
+	"copyToClipboard": {
+		"message": "Αντιγραφή στο πρόχειρο"
+	},
+	"createNewNote": {
+		"message": "Δημιουργία νέας σημείωσης"
+	},
+	"custom": {
+		"message": "Προσαρμοσμένο"
+	},
+	"dailyNoteFormat": {
+		"message": "Μορφή ημερήσιας σημείωσης (π.χ. YYYY-MM-DD)"
+	},
+	"defaultInterpreterContext": {
+		"message": "Προεπιλεγμένο πλαίσιο διερμηνέα"
+	},
+	"defaultInterpreterContextDescription": {
+		"message": "Αντικαθιστά το πλαίσιο που χρησιμοποιείται για την ερμηνεία των μεταβλητών προτροπής. Μπορείτε να χρησιμοποιήσετε μεταβλητές εδώ."
+	},
+	"defaultTemplateName": {
+		"message": "Προεπιλογή"
+	},
+	"delete": {
+		"message": "Διαγραφή"
+	},
+	"deleteModelConfirm": {
+		"message": "Είστε βέβαιοι ότι θέλετε να διαγράψετε αυτό το μοντέλο;"
+	},
+	"deleteProviderConfirm": {
+		"message": "Είστε βέβαιοι ότι θέλετε να διαγράψετε αυτόν τον πάροχο;"
+	},
+	"disableHighlighter": {
+		"message": "Απενεργοποίηση επισημαντή"
+	},
+	"disableReader": {
+		"message": "Απενεργοποίηση προβολής ανάγνωσης"
+	},
+	"done": {
+		"message": "Ολοκληρώθηκε"
+	},
+	"dragAndDropFile": {
+		"message": "Σύρετε και αφήστε το αρχείο εδώ"
+	},
+	"duplicate": {
+		"message": "Αντίγραφο"
+	},
+	"earlyAccessDescription": {
+		"message": "Χρησιμοποιήστε λειτουργίες που απαιτούν την πιο πρόσφατη $link_start$έκδοση πρώιμης πρόσβασης$link_end$ του Obsidian. Αυτή τη στιγμή απαιτείται Obsidian 1.7.2 ή νεότερη έκδοση.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/Obsidian/Early+access+versions\" target=\"_blank\">"
+			}
+		}
+	},
+	"earlyAccessFeatures": {
+		"message": "Λειτουργίες πρώιμης πρόσβασης"
+	},
+	"editModel": {
+		"message": "Επεξεργασία μοντέλου"
+	},
+	"editProvider": {
+		"message": "Επεξεργασία παρόχου"
+	},
+	"editTemplate": {
+		"message": "Επεξεργασία προτύπου"
+	},
+	"enableHighlighter": {
+		"message": "Ενεργοποίηση επισημαντή"
+	},
+	"enableHighlighterDescription": {
+		"message": "Επισημάνετε περιεχόμενο σε ιστοσελίδες που μπορείτε να αποθηκεύσετε στο Obsidian"
+	},
+	"enableInterpreter": {
+		"message": "Ενεργοποίηση διερμηνέα"
+	},
+	"enableInterpreterDescription": {
+		"message": "Χρησιμοποιήστε φυσική γλώσσα για την εξαγωγή πληροφοριών από σελίδες. Για παράδειγμα, μπορείτε να χρησιμοποιήσετε τη σύνταξη προτύπου $strong_start${{\"περίληψη αυτής της σελίδας\"}}$strong_end$. Απαιτεί κλειδί API ή διαμόρφωση προσαρμοσμένου μοντέλου παρακάτω. $link_start$Μάθετε περισσότερα$link_end$",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/interpreter\" target=\"_blank\">"
+			},
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"enableReader": {
+		"message": "Άνοιγμα προβολής ανάγνωσης"
+	},
+	"error": {
+		"message": "Σφάλμα"
+	},
+	"export": {
+		"message": "Εξαγωγή"
+	},
+	"exportAllSettings": {
+		"message": "Εξαγωγή όλων των ρυθμίσεων"
+	},
+	"exportAllSettingsDescription": {
+		"message": "Εξαγωγή όλων των ρυθμίσεων συμπεριλαμβανομένων των προτύπων και των ιδιοτήτων"
+	},
+	"exportHighlights": {
+		"message": "Εξαγωγή επισημάνσεων"
+	},
+	"exportHighlightsDescription": {
+		"message": "Εξαγωγή των επισημάνσεών σας σε αρχείο"
+	},
+	"exportProperties": {
+		"message": "Εξαγωγή ιδιοτήτων"
+	},
+	"exportPropertiesDescription": {
+		"message": "Αποθηκεύστε τις ιδιότητες του Web Clipper σε ένα αρχείο $strong_start$types.json$strong_end$ που μπορεί να εισαχθεί στο θησαυροφυλάκιο Obsidian σας ή στο Web Clipper σε άλλες συσκευές",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"extensionDescription": {
+		"message": "Αποθηκεύστε περιεχόμενο από τον ιστό σε ιδιωτική και βιώσιμη μορφή στην οποία έχετε πρόσβαση εκτός σύνδεσης. Η επίσημη επέκταση περιηγητή για το Obsidian."
+	},
+	"extensionName": {
+		"message": "Obsidian Web Clipper"
+	},
+	"failedToCopyText": {
+		"message": "Αποτυχία αντιγραφής κειμένου"
+	},
+	"failedToDeleteTemplate": {
+		"message": "Αποτυχία διαγραφής προτύπου. Παρακαλώ δοκιμάστε ξανά."
+	},
+	"failedToDuplicateTemplate": {
+		"message": "Αποτυχία δημιουργίας αντιγράφου προτύπου. Παρακαλώ δοκιμάστε ξανά."
+	},
+	"failedToExportHighlights": {
+		"message": "Αποτυχία εξαγωγής επισημάνσεων. Ελέγξτε την κονσόλα για περισσότερες λεπτομέρειες."
+	},
+	"failedToExportSettings": {
+		"message": "Αποτυχία εξαγωγής ρυθμίσεων. Ελέγξτε την κονσόλα για περισσότερες λεπτομέρειες."
+	},
+	"failedToExtractContent": {
+		"message": "Αποτυχία εξαγωγής περιεχομένου σελίδας."
+	},
+	"failedToImportTemplate": {
+		"message": "Σφάλμα κατά την εισαγωγή προτύπου. Ελέγξτε το αρχείο και δοκιμάστε ξανά."
+	},
+	"failedToInitialize": {
+		"message": "Παρακαλώ δοκιμάστε να επαναφορτώσετε την επέκταση."
+	},
+	"failedToInitializeContent": {
+		"message": "Αποτυχία αρχικοποίησης περιεχομένου σελίδας."
+	},
+	"failedToProcessInterpreter": {
+		"message": "Αποτυχία επεξεργασίας διερμηνέα. Παρακαλώ δοκιμάστε ξανά."
+	},
+	"failedToResetProviders": {
+		"message": "Αποτυχία επαναφοράς παρόχων και μοντέλων"
+	},
+	"failedToResetTemplate": {
+		"message": "Αποτυχία επαναφοράς προεπιλεγμένου προτύπου. Παρακαλώ δοκιμάστε ξανά."
+	},
+	"failedToSave": {
+		"message": "Αποτυχία αποθήκευσης αρχείου"
+	},
+	"failedToSaveFile": {
+		"message": "Αποτυχία αποθήκευσης αρχείου"
+	},
+	"failedToSaveProvider": {
+		"message": "Αποτυχία αποθήκευσης παρόχου. Παρακαλώ δοκιμάστε ξανά."
+	},
+	"feedback": {
+		"message": "Ανατροφοδότηση"
+	},
+	"feedbackDescription": {
+		"message": "Πώς μπορούμε να βελτιώσουμε το Web Clipper; Επισκεφθείτε τη σελίδα βοήθειάς μας όπου μπορείτε να αναφέρετε σφάλματα, να προτείνετε λειτουργίες και να λάβετε βοήθεια για κοινά προβλήματα."
+	},
+	"feedbackTitle": {
+		"message": "Ευχαριστούμε για την ανατροφοδότηση"
+	},
+	"folder": {
+		"message": "Φάκελος"
+	},
+	"general": {
+		"message": "Γενικά"
+	},
+	"generalSettings": {
+		"message": "Γενικές ρυθμίσεις"
+	},
+	"getApiKeyHere": {
+		"message": "Αποκτήστε το κλειδί API $1 σας εδώ"
+	},
+	"help": {
+		"message": "Βοήθεια"
+	},
+	"helpDescription": {
+		"message": "Μάθετε πώς να χρησιμοποιείτε το Web Clipper και λάβετε βοήθεια για την αντιμετώπιση προβλημάτων"
+	},
+	"highlightInline": {
+		"message": "Επισήμανση περιεχομένου σελίδας"
+	},
+	"highlightPage": {
+		"message": "Επισήμανση σελίδας"
+	},
+	"highlighter": {
+		"message": "Επισημαντής"
+	},
+	"highlighterSettings": {
+		"message": "Επισημαντής"
+	},
+	"history": {
+		"message": "Ιστορικό"
+	},
+	"hotkeys": {
+		"message": "Συντομεύσεις πληκτρολογίου"
+	},
+	"import": {
+		"message": "Εισαγωγή"
+	},
+	"importAllSettings": {
+		"message": "Εισαγωγή όλων των ρυθμίσεων"
+	},
+	"importAllSettingsDescription": {
+		"message": "Εισαγωγή όλων των ρυθμίσεων συμπεριλαμβανομένων των προτύπων και των ιδιοτήτων. Αυτό θα αντικαταστήσει την τρέχουσα διαμόρφωσή σας."
+	},
+	"importFailed": {
+		"message": "Η εισαγωγή απέτυχε. Ελέγξτε την κονσόλα για περισσότερες πληροφορίες."
+	},
+	"importModalTitle": {
+		"message": "Εισαγωγή"
+	},
+	"importProperties": {
+		"message": "Εισαγωγή ιδιοτήτων"
+	},
+	"importPropertiesDescription": {
+		"message": "Για να εισάγετε ιδιότητες από το Obsidian, βρείτε το αρχείο $strong_1_start$types.json$strong_1_end$ στο φάκελο $strong_2_start$.obsidian$strong_2_end$ του θησαυροφυλακίου σας. Σημειώστε ότι αυτός ο φάκελος είναι κρυφός από προεπιλογή στα περισσότερα λειτουργικά συστήματα.",
+		"placeholders": {
+			"strong_1_end": {
+				"content": "</strong>"
+			},
+			"strong_1_start": {
+				"content": "<strong>"
+			},
+			"strong_2_end": {
+				"content": "</strong>"
+			},
+			"strong_2_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"importSettings": {
+		"message": "Εισαγωγή ρυθμίσεων"
+	},
+	"importTemplate": {
+		"message": "Εισαγωγή προτύπου"
+	},
+	"interpret": {
+		"message": "Ερμηνεία"
+	},
+	"interpreter": {
+		"message": "Διερμηνέας"
+	},
+	"interpreterContext": {
+		"message": "Πλαίσιο διερμηνέα"
+	},
+	"interpreterContextDescription": {
+		"message": "Πλαίσιο που χρησιμοποιείται για την ερμηνεία μεταβλητών προτροπής. Αντικαθιστά το προεπιλεγμένο πλαίσιο που ορίζεται στις $link_start$ρυθμίσεις διερμηνέα$link_end$. Μπορείτε να χρησιμοποιήσετε μεταβλητές εδώ.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=interpreter\">"
+			}
+		}
+	},
+	"language": {
+		"message": "Γλώσσα"
+	},
+	"languageDescription": {
+		"message": "Επιλέξτε τη γλώσσα εμφάνισης για το περιβάλλον της επέκτασης."
+	},
+	"last30Days": {
+		"message": "Τελευταίες 30 ημέρες"
+	},
+	"lastUsed": {
+		"message": "Τελευταία χρήση"
+	},
+	"legacyMode": {
+		"message": "Λειτουργία παλαιού τύπου"
+	},
+	"legacyModeDescription": {
+		"message": "Χρησιμοποιεί τη μέθοδο αποκοπής URI που είναι συμβατή με το Obsidian 1.6.7 ή παλαιότερο. Σημειώστε ότι το μέγεθος του περιεχομένου που μπορεί να αποκοπεί περιορίζεται από τον περιηγητή και το λειτουργικό σύστημα. Ορισμένες σελίδες ενδέχεται να αποτύχουν χωρίς μήνυμα σφάλματος."
+	},
+	"modelName": {
+		"message": "Όνομα μοντέλου"
+	},
+	"modelNameDescription": {
+		"message": "Το όνομα που εμφανίζεται στο αναπτυσσόμενο μενού μοντέλων"
+	},
+	"modelProvider": {
+		"message": "Πάροχος"
+	},
+	"modelProviderDescription": {
+		"message": "Επιλέξτε τον πάροχο για αυτό το μοντέλο."
+	},
+	"modelProviderPlaceholder": {
+		"message": "Πάροχος"
+	},
+	"modelRequiredFields": {
+		"message": "Το όνομα μοντέλου, ο πάροχος και το αναγνωριστικό μοντέλου είναι υποχρεωτικά."
+	},
+	"models": {
+		"message": "Μοντέλα"
+	},
+	"modelsListFor": {
+		"message": "Λίστα μοντέλων για $1"
+	},
+	"more": {
+		"message": "Περισσότερα"
+	},
+	"newTemplate": {
+		"message": "Νέο πρότυπο"
+	},
+	"noHighlights": {
+		"message": "Καμία ενέργεια"
+	},
+	"noTemplates": {
+		"message": "Δεν υπάρχουν διαθέσιμα πρότυπα. Παρακαλώ προσθέστε ένα πρότυπο στις ρυθμίσεις."
+	},
+	"noUnusedProperties": {
+		"message": "Δεν βρέθηκαν αχρησιμοποίητες ιδιότητες."
+	},
+	"noteContent": {
+		"message": "Περιεχόμενο σημείωσης"
+	},
+	"noteContentDescription": {
+		"message": "Προσαρμόστε το περιεχόμενο της σημείωσης. Χρησιμοποιήστε μεταβλητές για να προσυμπληρώσετε δεδομένα από τη σελίδα."
+	},
+	"noteLocation": {
+		"message": "Τοποθεσία σημείωσης"
+	},
+	"noteLocationDescription": {
+		"message": "Ο φάκελος ή η διαδρομή της σημείωσης."
+	},
+	"noteName": {
+		"message": "Όνομα σημείωσης"
+	},
+	"noteNameFormat": {
+		"message": "Μορφή ονόματος σημείωσης"
+	},
+	"noteNameFormatDescription": {
+		"message": "Η μορφή του ονόματος της σημείωσης. Μπορείτε να χρησιμοποιήσετε μεταβλητές."
+	},
+	"notesAboutPage": {
+		"message": "Σημειώσεις για αυτή τη σελίδα..."
+	},
+	"onlyHttpSupported": {
+		"message": "Αυτή η σελίδα δεν μπορεί να αποκοπεί. Υποστηρίζονται μόνο διευθύνσεις URL http και https."
+	},
+	"open": {
+		"message": "Άνοιγμα"
+	},
+	"optional": {
+		"message": "(προαιρετικό)"
+	},
+	"orPasteBelow": {
+		"message": "Ή επικολλήστε το περιεχόμενο παρακάτω"
+	},
+	"overwriteNote": {
+		"message": "Αντικατάσταση σημείωσης"
+	},
+	"pageCannotBeClipped": {
+		"message": "Αυτή η σελίδα δεν μπορεί να αποκοπεί."
+	},
+	"pageVariables": {
+		"message": "Μεταβλητές σελίδας"
+	},
+	"pagesSaved": {
+		"message": "σελίδα αποθηκεύτηκε"
+	},
+	"pagesSavedPlural": {
+		"message": "σελίδες αποθηκεύτηκαν"
+	},
+	"pasteJsonHere": {
+		"message": "Επικολλήστε το JSON εδώ"
+	},
+	"pleaseReload": {
+		"message": "Παρακαλώ δοκιμάστε να επαναφορτώσετε τη σελίδα."
+	},
+	"popularModels": {
+		"message": "Δημοφιλή μοντέλα"
+	},
+	"popularModelsDescription": {
+		"message": "Επιλέξτε από συχνά χρησιμοποιούμενα μοντέλα ή εισάγετε λεπτομέρειες προσαρμοσμένου μοντέλου."
+	},
+	"prependToDaily": {
+		"message": "Προσθήκη στην αρχή της ημερήσιας σημείωσης"
+	},
+	"prependToExisting": {
+		"message": "Προσθήκη στην αρχή υπάρχουσας σημείωσης"
+	},
+	"processing": {
+		"message": "επεξεργασία"
+	},
+	"properties": {
+		"message": "Ιδιότητες"
+	},
+	"propertiesSettings": {
+		"message": "Ιδιότητες"
+	},
+	"propertyName": {
+		"message": "Όνομα ιδιότητας"
+	},
+	"propertyValue": {
+		"message": "Τιμή ιδιότητας"
+	},
+	"provider": {
+		"message": "Πάροχος"
+	},
+	"providerApiKey": {
+		"message": "Κλειδί API"
+	},
+	"providerApiKeyDescription": {
+		"message": "Το κλειδί API σας για αυτόν τον πάροχο."
+	},
+	"providerBaseUrl": {
+		"message": "Βασική διεύθυνση URL"
+	},
+	"providerBaseUrlDescription": {
+		"message": "Η διεύθυνση URL του τελικού σημείου API για αυτόν τον πάροχο."
+	},
+	"providerModelId": {
+		"message": "Αναγνωριστικό μοντέλου"
+	},
+	"providerModelIdDescription": {
+		"message": "Το αναγνωριστικό του μοντέλου από τον πάροχό σας. Συνήθως ένα σύντομο όνομα χωρίς κενά."
+	},
+	"providerModelIdPlaceholder": {
+		"message": "Αναγνωριστικό μοντέλου"
+	},
+	"providerName": {
+		"message": "Όνομα παρόχου"
+	},
+	"providerNameDescription": {
+		"message": "Το εμφανιζόμενο όνομα αυτού του παρόχου."
+	},
+	"providerPreset": {
+		"message": "Προεπιλογή"
+	},
+	"providerPresetDescription": {
+		"message": "Επιλέξτε έναν πάροχο ή δημιουργήστε έναν προσαρμοσμένο."
+	},
+	"providerRequiredFields": {
+		"message": "Το όνομα παρόχου και η βασική διεύθυνση URL είναι υποχρεωτικά."
+	},
+	"providers": {
+		"message": "Πάροχοι"
+	},
+	"rateExtensionDescription": {
+		"message": "Σας αρέσει το Web Clipper; Βοηθήστε μας δίνοντάς του μια αξιολόγηση."
+	},
+	"reader": {
+		"message": "Αναγνώστης"
+	},
+	"recommended": {
+		"message": "προτεινόμενο"
+	},
+	"refresh": {
+		"message": "Ανανέωση"
+	},
+	"remove": {
+		"message": "Αφαίρεση"
+	},
+	"removeProperty": {
+		"message": "Αφαίρεση ιδιότητας"
+	},
+	"removeUnusedProperties": {
+		"message": "Αφαίρεση αχρησιμοποίητων ιδιοτήτων"
+	},
+	"removeUnusedPropertiesDescription": {
+		"message": "Αφαιρέστε όλες τις ιδιότητες που δεν χρησιμοποιούνται σε κανένα πρότυπο."
+	},
+	"removeVault": {
+		"message": "Αφαίρεση θησαυροφυλακίου"
+	},
+	"replaceContent": {
+		"message": "Αντικατάσταση περιεχομένου σημείωσης"
+	},
+	"reset": {
+		"message": "Επαναφορά"
+	},
+	"resetDefaultTemplate": {
+		"message": "Επαναφορά προεπιλεγμένου προτύπου"
+	},
+	"resetDefaultTemplateDescription": {
+		"message": "Αφαιρέστε όλες τις αλλαγές που έχετε κάνει στο προεπιλεγμένο πρότυπο."
+	},
+	"resetProvidersAndModels": {
+		"message": "Επαναφορά προεπιλεγμένων μοντέλων"
+	},
+	"resetProvidersAndModelsDescription": {
+		"message": "Επαναφέρετε τους παρόχους και τα μοντέλα στις προεπιλεγμένες ρυθμίσεις."
+	},
+	"save": {
+		"message": "Αποθήκευση"
+	},
+	"saveBehaviorDescription": {
+		"message": "Επιλέξτε την προεπιλεγμένη επιλογή για την αποθήκευση σελίδων. Εναλλακτικές επιλογές εμφανίζονται στο αναπτυσσόμενο μενού δίπλα στο κύριο κουμπί."
+	},
+	"saveBehaviorLabel": {
+		"message": "Συμπεριφορά αποθήκευσης"
+	},
+	"saveFile": {
+		"message": "Αποθήκευση αρχείου..."
+	},
+	"searchVariables": {
+		"message": "Αναζήτηση μεταβλητών..."
+	},
+	"selectProvider": {
+		"message": "Επιλέξτε πάροχο"
+	},
+	"selectTemplateToExport": {
+		"message": "Επιλέξτε πρότυπο για εξαγωγή"
+	},
+	"settings": {
+		"message": "Ρυθμίσεις"
+	},
+	"settingsHeading": {
+		"message": "Ρυθμίσεις"
+	},
+	"settingsImportSuccess": {
+		"message": "Όλες οι ρυθμίσεις εισήχθησαν με επιτυχία. Ανανεώστε τη σελίδα για να δείτε τις αλλαγές."
+	},
+	"share": {
+		"message": "Κοινοποίηση..."
+	},
+	"shortcutInstructionsBrave": {
+		"message": "Για να αλλάξετε τις αντιστοιχίσεις πλήκτρων, μεταβείτε στο $1"
+	},
+	"shortcutInstructionsChrome": {
+		"message": "Για να αλλάξετε τις αντιστοιχίσεις πλήκτρων, μεταβείτε στο $1"
+	},
+	"shortcutInstructionsDefault": {
+		"message": "Για να αλλάξετε τις αντιστοιχίσεις πλήκτρων, ανατρέξτε στις ρυθμίσεις επεκτάσεων του προγράμματος περιήγησής σας."
+	},
+	"shortcutInstructionsEdge": {
+		"message": "Για να αλλάξετε τις αντιστοιχίσεις πλήκτρων, μεταβείτε στο $1"
+	},
+	"shortcutInstructionsFirefox": {
+		"message": "Για να αλλάξετε τις αντιστοιχίσεις πλήκτρων, μεταβείτε στο $1, κάντε κλικ στο εικονίδιο γραναζιού και επιλέξτε \"Διαχείριση συντομεύσεων επέκτασης\""
+	},
+	"shortcutInstructionsIntro": {
+		"message": "Οι συντομεύσεις πληκτρολογίου σας παρέχουν γρήγορη πρόσβαση στις λειτουργίες του clipper."
+	},
+	"shortcutInstructionsSafari": {
+		"message": "Οι συντομεύσεις πληκτρολογίου δεν μπορούν να προσαρμοστούν στο Safari."
+	},
+	"shortcutNotSet": {
+		"message": "Δεν έχει οριστεί"
+	},
+	"showActionsButton": {
+		"message": "Εμφάνιση κουμπιού ενεργειών"
+	},
+	"showActionsDescription": {
+		"message": "Σας επιτρέπει να προβάλλετε τις μεταβλητές της σελίδας από το μενού του clipper. Χρήσιμο για να δείτε τις διαθέσιμες μεταβλητές για χρήση στα πρότυπα."
+	},
+	"showPageVariables": {
+		"message": "Εμφάνιση μεταβλητών σελίδας"
+	},
+	"silentOpen": {
+		"message": "Αποθήκευση σημειώσεων χωρίς άνοιγμα"
+	},
+	"silentOpenDescription": {
+		"message": "Οι αποκομμένες σημειώσεις θα αποθηκευτούν αλλά δεν θα ανοίξουν σε νέα καρτέλα. Το Obsidian θα εξακολουθεί να έρχεται στο προσκήνιο."
+	},
+	"specificNoteName": {
+		"message": "Συγκεκριμένο όνομα σημείωσης"
+	},
+	"systemDefault": {
+		"message": "Προεπιλογή συστήματος"
+	},
+	"templateCopied": {
+		"message": "Το JSON προτύπου αντιγράφηκε στο πρόχειρο"
+	},
+	"templateCopyError": {
+		"message": "Αποτυχία αντιγραφής του JSON προτύπου στο πρόχειρο"
+	},
+	"templateName": {
+		"message": "Όνομα προτύπου"
+	},
+	"templateProperties": {
+		"message": "Ιδιότητες"
+	},
+	"templatePropertiesDescription": {
+		"message": "Ιδιότητες που θα προστεθούν στην αρχή της αποκομμένης σημείωσης. Χρησιμοποιήστε μεταβλητές για να προσυμπληρώσετε δεδομένα από τη σελίδα."
+	},
+	"templateTriggers": {
+		"message": "Ενεργοποιητές προτύπου"
+	},
+	"templateTriggersDescription": {
+		"message": "Ορίστε κανόνες για την αυτόματη επιλογή αυτού του προτύπου εάν ταιριάζει με το μοτίβο URL ή περιέχει δεδομένα schema.org. Ένας κανόνας ανά γραμμή."
+	},
+	"templatesHeading": {
+		"message": "Πρότυπα"
+	},
+	"thinking": {
+		"message": "σκέφτεται"
+	},
+	"unknownProvider": {
+		"message": "Άγνωστος πάροχος"
+	},
+	"updateAvailable": {
+		"message": "Διαθέσιμη ενημέρωση"
+	},
+	"usingLatestVersion": {
+		"message": "Χρησιμοποιείτε την πιο πρόσφατη έκδοση"
+	},
+	"vault": {
+		"message": "Θησαυροφυλάκιο"
+	},
+	"vaultDescription": {
+		"message": "Επιλέξτε το προεπιλεγμένο θησαυροφυλάκιο για αυτό το πρότυπο. Μεταβείτε στις $link_start$γενικές ρυθμίσεις$link_end$ για να προσθέσετε ή να αφαιρέσετε θησαυροφυλάκια.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=general\">"
+			}
+		}
+	},
+	"vaults": {
+		"message": "Θησαυροφυλάκια"
+	},
+	"vaultsDescription": {
+		"message": "Από προεπιλογή, οι αποκομμένες σημειώσεις αποθηκεύονται στο ανοιχτό θησαυροφυλάκιο. Μπορείτε να προσθέσετε θησαυροφυλάκια εδώ εάν θέλετε την επιλογή να αποθηκεύετε σε διαφορετικά θησαυροφυλάκια. Το όνομα του θησαυροφυλακίου πρέπει να ταιριάζει ακριβώς με το όνομα του θησαυροφυλακίου Obsidian. Πατήστε $strong_start$enter$strong_end$ για να προσθέσετε θησαυροφυλάκιο.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"version": {
+		"message": "Έκδοση"
+	}
+}

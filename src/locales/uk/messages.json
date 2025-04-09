@@ -1,0 +1,795 @@
+{
+	"activity": {
+		"message": "Активність"
+	},
+	"addModel": {
+		"message": "+ Додати модель"
+	},
+	"addModelTitle": {
+		"message": "Додати модель"
+	},
+	"addProperty": {
+		"message": "+ Додати властивість"
+	},
+	"addProvider": {
+		"message": "+ Додати провайдера"
+	},
+	"addProviderTitle": {
+		"message": "Додати провайдера"
+	},
+	"addToObsidian": {
+		"message": "Додати в Obsidian"
+	},
+	"addVaultPlaceholder": {
+		"message": "Натисніть Enter, щоб додати сховище"
+	},
+	"advanced": {
+		"message": "Розширені"
+	},
+	"allProperties": {
+		"message": "Усі властивості"
+	},
+	"allTime": {
+		"message": "За весь час"
+	},
+	"alwaysShowHighlights": {
+		"message": "Завжди показувати виділення"
+	},
+	"alwaysShowHighlightsDescription": {
+		"message": "Показувати збережені виділення при завантаженні сторінки. Вимкніть, щоб показувати виділення лише коли активний режим виділення."
+	},
+	"apiKeyMissing": {
+		"message": "Відсутній API-ключ"
+	},
+	"apiKeysWarning": {
+		"message": "Використовуючи зовнішнього провайдера, ви погоджуєтесь з їхніми умовами використання та політикою конфіденційності. Запити інтерпретатора надсилаються безпосередньо вибраному вами провайдеру. Obsidian не збирає та не зберігає інформацію про ваші запити."
+	},
+	"appendToDaily": {
+		"message": "Додати до щоденної нотатки, в кінець"
+	},
+	"appendToExisting": {
+		"message": "Додати до існуючої нотатки, в кінець"
+	},
+	"autoRunInterpreter": {
+		"message": "Автозапуск"
+	},
+	"autoRunInterpreterDescription": {
+		"message": "Негайно виконує змінні запиту, якщо вони є в шаблоні. Використовує API-кредити від вашого провайдера моделі. Вимкніть, якщо хочете запускати інтерпретатор лише вручну."
+	},
+	"behavior": {
+		"message": "Поведінка"
+	},
+	"behaviorWarning": {
+		"message": "Додавання до існуючої або щоденної нотатки потребує Obsidian 1.7.2 або новішої версії."
+	},
+	"byDay": {
+		"message": "За день"
+	},
+	"byMonth": {
+		"message": "За місяць"
+	},
+	"byWeek": {
+		"message": "За тиждень"
+	},
+	"cancel": {
+		"message": "Скасувати"
+	},
+	"cannotDeleteProvider": {
+		"message": "Неможливо видалити провайдера \"$1\", оскільки він використовується $2 моделями."
+	},
+	"changelog": {
+		"message": "Список змін"
+	},
+	"chooseFile": {
+		"message": "Вибрати файл"
+	},
+	"choosePropertiesFile": {
+		"message": "Вибрати файл властивостей"
+	},
+	"chooseSettingsFile": {
+		"message": "Вибрати файл налаштувань"
+	},
+	"chooseTemplateFile": {
+		"message": "Вибрати файл шаблону"
+	},
+	"clipBehavior": {
+		"message": "Поведінка вирізання"
+	},
+	"clipBehaviorDescription": {
+		"message": "Виберіть, як зберігати вибраний вміст в Obsidian. Встановлює змінну $strong_start${{content}}$strong_end$",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"close": {
+		"message": "Закрити"
+	},
+	"commandOpenClipper": {
+		"message": "Відкрити Obsidian Clipper"
+	},
+	"commandQuickClip": {
+		"message": "Швидке вирізання"
+	},
+	"commandToggleHighlighter": {
+		"message": "Перемкнути виділення"
+	},
+	"commandToggleReader": {
+		"message": "Перемкнути режим читання"
+	},
+	"confirmDeleteTemplate": {
+		"message": "Ви впевнені, що хочете видалити шаблон \"$1\"?"
+	},
+	"confirmReplaceSettings": {
+		"message": "Ця дія замінить усі ваші поточні налаштування, включаючи шаблони та властивості. Ви впевнені, що хочете продовжити?"
+	},
+	"copied": {
+		"message": "Скопійовано!"
+	},
+	"copyAsJson": {
+		"message": "Копіювати як JSON"
+	},
+	"copyToClipboard": {
+		"message": "Копіювати в буфер обміну"
+	},
+	"createNewNote": {
+		"message": "Створити нову нотатку"
+	},
+	"custom": {
+		"message": "Власний"
+	},
+	"dailyNoteFormat": {
+		"message": "Формат щоденної нотатки (напр. YYYY-MM-DD)"
+	},
+	"defaultInterpreterContext": {
+		"message": "Контекст інтерпретатора за замовчуванням"
+	},
+	"defaultInterpreterContextDescription": {
+		"message": "Перевизначає контекст, що використовується для інтерпретації змінних запиту. Тут можна використовувати змінні."
+	},
+	"defaultTemplateName": {
+		"message": "За замовчуванням"
+	},
+	"delete": {
+		"message": "Видалити"
+	},
+	"deleteModelConfirm": {
+		"message": "Ви впевнені, що хочете видалити цю модель?"
+	},
+	"deleteProviderConfirm": {
+		"message": "Ви впевнені, що хочете видалити цього провайдера?"
+	},
+	"disableHighlighter": {
+		"message": "Вимкнути виділення"
+	},
+	"disableReader": {
+		"message": "Вимкнути режим читання"
+	},
+	"done": {
+		"message": "Готово"
+	},
+	"dragAndDropFile": {
+		"message": "Перетягніть файл сюди"
+	},
+	"duplicate": {
+		"message": "Дублювати"
+	},
+	"earlyAccessDescription": {
+		"message": "Використовувати функції, які потребують найновішої $link_start$версії раннього доступу$link_end$ Obsidian. Наразі потрібен Obsidian 1.7.2 або новіший.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/Obsidian/Early+access+versions\" target=\"_blank\">"
+			}
+		}
+	},
+	"earlyAccessFeatures": {
+		"message": "Функції раннього доступу"
+	},
+	"editModel": {
+		"message": "Редагувати модель"
+	},
+	"editProvider": {
+		"message": "Редагувати провайдера"
+	},
+	"editTemplate": {
+		"message": "Редагувати шаблон"
+	},
+	"enableHighlighter": {
+		"message": "Увімкнути виділення"
+	},
+	"enableHighlighterDescription": {
+		"message": "Виділяйте вміст на веб-сторінках для збереження в Obsidian"
+	},
+	"enableInterpreter": {
+		"message": "Увімкнути інтерпретатор"
+	},
+	"enableInterpreterDescription": {
+		"message": "Використовуйте природну мову для витягування інформації зі сторінок. Наприклад, можна використовувати синтаксис шаблону $strong_start${{\"підсумуй цю сторінку\"}}$strong_end$. Потрібен API-ключ або налаштування власної моделі нижче. $link_start$Дізнатися більше$link_end$",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/interpreter\" target=\"_blank\">"
+			},
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"enableReader": {
+		"message": "Відкрити режим читання"
+	},
+	"error": {
+		"message": "Помилка"
+	},
+	"export": {
+		"message": "Експорт"
+	},
+	"exportAllSettings": {
+		"message": "Експортувати всі налаштування"
+	},
+	"exportAllSettingsDescription": {
+		"message": "Експортувати всі налаштування, включаючи шаблони та властивості"
+	},
+	"exportHighlights": {
+		"message": "Експортувати виділення"
+	},
+	"exportHighlightsDescription": {
+		"message": "Експортувати ваші виділення у файл"
+	},
+	"exportProperties": {
+		"message": "Експортувати властивості"
+	},
+	"exportPropertiesDescription": {
+		"message": "Зберегти властивості Web Clipper у файл $strong_start$types.json$strong_end$, який можна імпортувати у ваше сховище Obsidian або Web Clipper на інших пристроях",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"extensionDescription": {
+		"message": "Зберігайте веб-вміст у приватному та довговічному форматі, доступному офлайн. Офіційне браузерне розширення для Obsidian."
+	},
+	"extensionName": {
+		"message": "Obsidian Web Clipper"
+	},
+	"failedToCopyText": {
+		"message": "Не вдалося скопіювати текст"
+	},
+	"failedToDeleteTemplate": {
+		"message": "Не вдалося видалити шаблон. Будь ласка, спробуйте ще раз."
+	},
+	"failedToDuplicateTemplate": {
+		"message": "Не вдалося дублювати шаблон. Будь ласка, спробуйте ще раз."
+	},
+	"failedToExportHighlights": {
+		"message": "Не вдалося експортувати виділення. Перевірте консоль для деталей."
+	},
+	"failedToExportSettings": {
+		"message": "Не вдалося експортувати налаштування. Перевірте консоль для деталей."
+	},
+	"failedToExtractContent": {
+		"message": "Не вдалося витягти вміст сторінки."
+	},
+	"failedToImportTemplate": {
+		"message": "Помилка імпорту шаблону. Перевірте файл і спробуйте ще раз."
+	},
+	"failedToInitialize": {
+		"message": "Будь ласка, перезавантажте розширення."
+	},
+	"failedToInitializeContent": {
+		"message": "Не вдалося ініціалізувати вміст сторінки."
+	},
+	"failedToProcessInterpreter": {
+		"message": "Не вдалося обробити інтерпретатор. Будь ласка, спробуйте ще раз."
+	},
+	"failedToResetProviders": {
+		"message": "Не вдалося скинути провайдерів та моделі"
+	},
+	"failedToResetTemplate": {
+		"message": "Не вдалося скинути шаблон за замовчуванням. Будь ласка, спробуйте ще раз."
+	},
+	"failedToSave": {
+		"message": "Не вдалося зберегти файл"
+	},
+	"failedToSaveFile": {
+		"message": "Не вдалося зберегти файл"
+	},
+	"failedToSaveProvider": {
+		"message": "Не вдалося зберегти провайдера. Будь ласка, спробуйте ще раз."
+	},
+	"feedback": {
+		"message": "Відгук"
+	},
+	"feedbackDescription": {
+		"message": "Як ми можемо покращити Web Clipper? Відвідайте нашу сторінку допомоги, щоб повідомити про помилки, запропонувати функції та отримати допомогу з поширеними проблемами."
+	},
+	"feedbackTitle": {
+		"message": "Дякуємо за відгук"
+	},
+	"folder": {
+		"message": "Папка"
+	},
+	"general": {
+		"message": "Загальні"
+	},
+	"generalSettings": {
+		"message": "Загальні налаштування"
+	},
+	"getApiKeyHere": {
+		"message": "Отримати API-ключ $1 тут"
+	},
+	"help": {
+		"message": "Допомога"
+	},
+	"helpDescription": {
+		"message": "Дізнайтеся, як користуватися Web Clipper та отримайте допомогу з усунення несправностей"
+	},
+	"highlightInline": {
+		"message": "Виділити вміст на сторінці"
+	},
+	"highlightPage": {
+		"message": "Виділити сторінку"
+	},
+	"highlighter": {
+		"message": "Виділення"
+	},
+	"highlighterSettings": {
+		"message": "Виділення"
+	},
+	"history": {
+		"message": "Історія"
+	},
+	"hotkeys": {
+		"message": "Гарячі клавіші"
+	},
+	"import": {
+		"message": "Імпорт"
+	},
+	"importAllSettings": {
+		"message": "Імпортувати всі налаштування"
+	},
+	"importAllSettingsDescription": {
+		"message": "Імпортувати всі налаштування, включаючи шаблони та властивості. Це перезапише вашу поточну конфігурацію."
+	},
+	"importFailed": {
+		"message": "Імпорт не вдався. Перевірте консоль для деталей."
+	},
+	"importModalTitle": {
+		"message": "Імпорт"
+	},
+	"importProperties": {
+		"message": "Імпортувати властивості"
+	},
+	"importPropertiesDescription": {
+		"message": "Щоб імпортувати властивості з Obsidian, знайдіть файл $strong_1_start$types.json$strong_1_end$ у папці $strong_2_start$.obsidian$strong_2_end$ вашого сховища. Ця папка за замовчуванням прихована в більшості операційних систем.",
+		"placeholders": {
+			"strong_1_end": {
+				"content": "</strong>"
+			},
+			"strong_1_start": {
+				"content": "<strong>"
+			},
+			"strong_2_end": {
+				"content": "</strong>"
+			},
+			"strong_2_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"importSettings": {
+		"message": "Імпортувати налаштування"
+	},
+	"importTemplate": {
+		"message": "Імпортувати шаблон"
+	},
+	"interpret": {
+		"message": "Інтерпретувати"
+	},
+	"interpreter": {
+		"message": "Інтерпретатор"
+	},
+	"interpreterContext": {
+		"message": "Контекст інтерпретатора"
+	},
+	"interpreterContextDescription": {
+		"message": "Контекст, що використовується для інтерпретації змінних запиту. Перевизначає контекст за замовчуванням, встановлений у $link_start$налаштуваннях інтерпретатора$link_end$. Тут можна використовувати змінні.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=interpreter\">"
+			}
+		}
+	},
+	"language": {
+		"message": "Мова"
+	},
+	"languageDescription": {
+		"message": "Виберіть мову відображення для інтерфейсу розширення."
+	},
+	"last30Days": {
+		"message": "Останні 30 днів"
+	},
+	"lastUsed": {
+		"message": "Останнє використання"
+	},
+	"legacyMode": {
+		"message": "Застарілий режим"
+	},
+	"legacyModeDescription": {
+		"message": "Використовує метод захоплення URI, сумісний з Obsidian 1.6.7 та старішими версіями. Зауважте, що довжина захопленого вмісту обмежена браузером та операційною системою. Деякі сторінки можуть не вдатися без повідомлення про помилку."
+	},
+	"modelName": {
+		"message": "Назва моделі"
+	},
+	"modelNameDescription": {
+		"message": "Назва, що відображається в випадаючому списку моделей"
+	},
+	"modelProvider": {
+		"message": "Провайдер"
+	},
+	"modelProviderDescription": {
+		"message": "Виберіть провайдера для цієї моделі"
+	},
+	"modelProviderPlaceholder": {
+		"message": "Провайдер"
+	},
+	"modelRequiredFields": {
+		"message": "Назва моделі, провайдер та ID моделі є обов'язковими."
+	},
+	"models": {
+		"message": "Моделі"
+	},
+	"modelsListFor": {
+		"message": "Список моделей для $1"
+	},
+	"more": {
+		"message": "Більше"
+	},
+	"newTemplate": {
+		"message": "Новий шаблон"
+	},
+	"noHighlights": {
+		"message": "Немає виділень"
+	},
+	"noTemplates": {
+		"message": "Немає доступних шаблонів. Додайте шаблон у налаштуваннях."
+	},
+	"noUnusedProperties": {
+		"message": "Невикористаних властивостей не знайдено."
+	},
+	"noteContent": {
+		"message": "Вміст нотатки"
+	},
+	"noteContentDescription": {
+		"message": "Налаштуйте вміст нотатки. Використовуйте змінні для попереднього заповнення даними зі сторінки."
+	},
+	"noteLocation": {
+		"message": "Розташування нотатки"
+	},
+	"noteLocationDescription": {
+		"message": "Папка або шлях до нотатки."
+	},
+	"noteName": {
+		"message": "Назва нотатки"
+	},
+	"noteNameFormat": {
+		"message": "Формат назви нотатки"
+	},
+	"noteNameFormatDescription": {
+		"message": "Формат, що використовується для генерації назв нотаток. Можна використовувати змінні."
+	},
+	"notesAboutPage": {
+		"message": "Нотатки про цю сторінку..."
+	},
+	"onlyHttpSupported": {
+		"message": "Неможливо вирізати цю сторінку. Підтримуються лише http та https URL."
+	},
+	"open": {
+		"message": "Відкрити"
+	},
+	"optional": {
+		"message": "(необов'язково)"
+	},
+	"orPasteBelow": {
+		"message": "Або вставте вміст нижче"
+	},
+	"overwriteNote": {
+		"message": "Перезаписати нотатку"
+	},
+	"pageCannotBeClipped": {
+		"message": "Цю сторінку неможливо вирізати."
+	},
+	"pageVariables": {
+		"message": "Змінні сторінки"
+	},
+	"pagesSaved": {
+		"message": "Сторінку збережено"
+	},
+	"pagesSavedPlural": {
+		"message": "Сторінок збережено"
+	},
+	"pasteJsonHere": {
+		"message": "Вставте JSON тут"
+	},
+	"pleaseReload": {
+		"message": "Будь ласка, спробуйте перезавантажити сторінку."
+	},
+	"popularModels": {
+		"message": "Популярні моделі"
+	},
+	"popularModelsDescription": {
+		"message": "Виберіть з часто використовуваних моделей або введіть деталі власної моделі."
+	},
+	"prependToDaily": {
+		"message": "Додати до щоденної нотатки, на початок"
+	},
+	"prependToExisting": {
+		"message": "Додати до існуючої нотатки, на початок"
+	},
+	"processing": {
+		"message": "обробка"
+	},
+	"properties": {
+		"message": "Властивості"
+	},
+	"propertiesSettings": {
+		"message": "Властивості"
+	},
+	"propertyName": {
+		"message": "Назва властивості"
+	},
+	"propertyValue": {
+		"message": "Значення властивості"
+	},
+	"provider": {
+		"message": "Провайдер"
+	},
+	"providerApiKey": {
+		"message": "API-ключ"
+	},
+	"providerApiKeyDescription": {
+		"message": "Ваш API-ключ для цього провайдера."
+	},
+	"providerBaseUrl": {
+		"message": "Базовий URL"
+	},
+	"providerBaseUrlDescription": {
+		"message": "URL кінцевої точки API для цього провайдера."
+	},
+	"providerModelId": {
+		"message": "ID моделі"
+	},
+	"providerModelIdDescription": {
+		"message": "Ідентифікатор моделі від вашого провайдера. Зазвичай коротка назва без пробілів."
+	},
+	"providerModelIdPlaceholder": {
+		"message": "ID моделі"
+	},
+	"providerName": {
+		"message": "Назва провайдера"
+	},
+	"providerNameDescription": {
+		"message": "Назва для відображення цього провайдера."
+	},
+	"providerPreset": {
+		"message": "Пресет"
+	},
+	"providerPresetDescription": {
+		"message": "Виберіть провайдера або створіть власного."
+	},
+	"providerRequiredFields": {
+		"message": "Назва провайдера та базовий URL є обов'язковими."
+	},
+	"providers": {
+		"message": "Провайдери"
+	},
+	"rateExtensionDescription": {
+		"message": "Подобається Web Clipper? Допоможіть нам, поставивши оцінку."
+	},
+	"reader": {
+		"message": "Читач"
+	},
+	"recommended": {
+		"message": "рекомендовано"
+	},
+	"refresh": {
+		"message": "Оновити"
+	},
+	"remove": {
+		"message": "Видалити"
+	},
+	"removeProperty": {
+		"message": "Видалити властивість"
+	},
+	"removeUnusedProperties": {
+		"message": "Видалити невикористані властивості"
+	},
+	"removeUnusedPropertiesDescription": {
+		"message": "Видалити всі властивості, які не використовуються в жодному шаблоні."
+	},
+	"removeVault": {
+		"message": "Видалити сховище"
+	},
+	"replaceContent": {
+		"message": "Замінити вміст нотатки"
+	},
+	"reset": {
+		"message": "Скинути"
+	},
+	"resetDefaultTemplate": {
+		"message": "Скинути шаблон за замовчуванням"
+	},
+	"resetDefaultTemplateDescription": {
+		"message": "Видалити всі зміни, внесені до шаблону за замовчуванням."
+	},
+	"resetProvidersAndModels": {
+		"message": "Скинути моделі до стандартних"
+	},
+	"resetProvidersAndModelsDescription": {
+		"message": "Скинути провайдерів та моделі до налаштувань за замовчуванням."
+	},
+	"save": {
+		"message": "Зберегти"
+	},
+	"saveBehaviorDescription": {
+		"message": "Виберіть типовий варіант для збереження сторінок. Альтернативні варіанти з'являються у випадаючому меню поруч з основною кнопкою."
+	},
+	"saveBehaviorLabel": {
+		"message": "Поведінка збереження"
+	},
+	"saveFile": {
+		"message": "Зберегти файл..."
+	},
+	"searchVariables": {
+		"message": "Пошук змінних..."
+	},
+	"selectProvider": {
+		"message": "Вибрати провайдера"
+	},
+	"selectTemplateToExport": {
+		"message": "Вибрати шаблон для експорту"
+	},
+	"settings": {
+		"message": "Налаштування"
+	},
+	"settingsHeading": {
+		"message": "Налаштування"
+	},
+	"settingsImportSuccess": {
+		"message": "Всі налаштування успішно імпортовано. Оновіть сторінку, щоб побачити зміни."
+	},
+	"share": {
+		"message": "Поділитися..."
+	},
+	"shortcutInstructionsBrave": {
+		"message": "Щоб змінити комбінації клавіш, перейдіть до $1"
+	},
+	"shortcutInstructionsChrome": {
+		"message": "Щоб змінити комбінації клавіш, перейдіть до $1"
+	},
+	"shortcutInstructionsDefault": {
+		"message": "Щоб змінити комбінації клавіш, перегляньте налаштування розширень вашого браузера."
+	},
+	"shortcutInstructionsEdge": {
+		"message": "Щоб змінити комбінації клавіш, перейдіть до $1"
+	},
+	"shortcutInstructionsFirefox": {
+		"message": "Щоб змінити комбінації клавіш, перейдіть до $1, клацніть на значок шестерні та виберіть \"Керувати комбінаціями клавіш розширення\""
+	},
+	"shortcutInstructionsIntro": {
+		"message": "Комбінації клавіш надають швидкий доступ до функцій вирізки."
+	},
+	"shortcutInstructionsSafari": {
+		"message": "Комбінації клавіш не можна налаштувати в Safari."
+	},
+	"shortcutNotSet": {
+		"message": "Не встановлено"
+	},
+	"showActionsButton": {
+		"message": "Показати кнопку дій"
+	},
+	"showActionsDescription": {
+		"message": "Дозволяє переглядати змінні сторінки з меню вирізки. Корисно для перегляду змінних, доступних для використання в шаблонах."
+	},
+	"showPageVariables": {
+		"message": "Показати змінні сторінки"
+	},
+	"silentOpen": {
+		"message": "Зберігати нотатки без відкриття"
+	},
+	"silentOpenDescription": {
+		"message": "Вирізані нотатки будуть збережені, але не відкриті в новій вкладці. Obsidian все одно буде виведений на передній план."
+	},
+	"specificNoteName": {
+		"message": "Конкретна назва нотатки"
+	},
+	"systemDefault": {
+		"message": "Системна за замовчуванням"
+	},
+	"templateCopied": {
+		"message": "JSON шаблону скопійовано в буфер обміну"
+	},
+	"templateCopyError": {
+		"message": "Не вдалося скопіювати JSON шаблону в буфер обміну"
+	},
+	"templateName": {
+		"message": "Назва шаблону"
+	},
+	"templateProperties": {
+		"message": "Властивості"
+	},
+	"templatePropertiesDescription": {
+		"message": "Властивості, які будуть додані на початку вирізаної нотатки. Використовуйте змінні для попереднього заповнення даними зі сторінки."
+	},
+	"templateTriggers": {
+		"message": "Тригери шаблону"
+	},
+	"templateTriggersDescription": {
+		"message": "Визначте правила для автоматичного вибору цього шаблону, якщо він відповідає шаблону URL або містить дані schema.org. По одному правилу на рядок."
+	},
+	"templatesHeading": {
+		"message": "Шаблони"
+	},
+	"thinking": {
+		"message": "думає"
+	},
+	"unknownProvider": {
+		"message": "Невідомий провайдер"
+	},
+	"updateAvailable": {
+		"message": "Доступне оновлення"
+	},
+	"usingLatestVersion": {
+		"message": "Ви використовуєте найновішу версію"
+	},
+	"vault": {
+		"message": "Сховище"
+	},
+	"vaultDescription": {
+		"message": "Виберіть сховище за замовчуванням для цього шаблону. Перейдіть до $link_start$загальних налаштувань$link_end$ щоб додати або видалити сховища.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=general\">"
+			}
+		}
+	},
+	"vaults": {
+		"message": "Сховища"
+	},
+	"vaultsDescription": {
+		"message": "За замовчуванням вирізані нотатки зберігаються у відкритому сховищі. Ви можете додати сховища тут, якщо хочете мати можливість зберігати в різних сховищах. Назва сховища повинна точно відповідати назві сховища Obsidian. Натисніть $strong_start$enter$strong_end$ щоб додати сховище.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"version": {
+		"message": "Версія"
+	}
+}

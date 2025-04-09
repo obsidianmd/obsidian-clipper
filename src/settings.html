@@ -16,6 +16,7 @@
 						<li data-section="general" class="active" data-i18n="general">General</li>
 						<li data-section="properties" data-i18n="properties">Properties</li>
 						<li data-section="highlighter" data-i18n="highlighter">Highlighter</li>
+						<li data-section="reader" data-i18n="reader" style="display: none;">Reader</li>
 						<li data-section="interpreter" data-i18n="interpreter">Interpreter</li>
 						<li class="sidebar-heading" data-i18n="templatesHeading">Templates</li>
 					</ul>
@@ -39,8 +40,44 @@
 						<div class="settings-section-header">
 							<h2 data-i18n="generalSettings">General settings</h2>
 						</div>
+						<div id="usage-chart-container">
+							<div class="usage-chart-header">
+								<div class="usage-chart-title">
+									<div data-i18n="activity">Activity</div>
+									<div class="setting-item-description"></div>
+								</div>
+								<div class="usage-chart-controls">
+									<select id="usage-period-select" class="dropdown">
+										<option value="30d" data-i18n="last30Days">Last 30 days</option>
+										<option value="all" data-i18n="allTime">All time</option>
+									</select>
+									<select id="usage-aggregation-select" class="dropdown">
+										<option value="day" selected data-i18n="byDay">Days</option>
+										<option value="week" data-i18n="byWeek">Weeks</option>
+									</select>
+								</div>
+							</div>
+							<div id="usage-chart" class="usage-chart"></div>
+						</div>
 						<form id="general-settings-form">
 							<div>
+								<div class="setting-item mod-horizontal is-hidden" id="rate-extension">
+									<div class="setting-item-info">
+										<label data-i18n="feedback">Feedback</label>
+										<div class="setting-item-description" data-i18n="rateExtensionDescription">
+											Are you enjoying Web Clipper? Help us by giving it a rating.
+										</div>
+									</div>
+									<div class="setting-item-control">
+										<div class="star-rating">
+											<span class="star" data-rating="1">★</span>
+											<span class="star" data-rating="2">★</span>
+											<span class="star" data-rating="3">★</span>
+											<span class="star" data-rating="4">★</span>
+											<span class="star" data-rating="5">★</span>
+										</div>
+									</div>
+								</div>
 								<div class="setting-item mod-horizontal">
 									<div class="setting-item-info">
 										<label for="language-select" data-i18n="language">Language</label>
@@ -52,7 +89,6 @@
 										<select id="language-select">
 											<option value="" data-i18n="systemDefault">System default</option>
 											<option value="en">English</option>
-											<option value="es">Español</option>
 										</select>
 									</div>
 								</div>
@@ -110,6 +146,21 @@
 										<div class="checkbox-container">
 											<input type="checkbox" id="beta-features-toggle" />
 										</div>
+									</div>
+								</div>
+								<div class="setting-item mod-horizontal">
+									<div class="setting-item-info">
+										<label for="save-behavior-dropdown" data-i18n="saveBehaviorLabel">Save behavior</label>
+										<div class="setting-item-description" data-i18n="saveBehaviorDescription">
+											Choose the default option for saving pages. Alternate options appear in the dropdown menu next to the main button.
+										</div>
+									</div>
+									<div class="setting-item-control">
+										<select id="save-behavior-dropdown" style="width: 200px;">
+											<option value="addToObsidian" selected data-i18n="addToObsidian">Add to Obsidian</option>
+											<option value="copyToClipboard" data-i18n="copyToClipboard">Copy to clipboard</option>
+											<option value="saveFile" data-i18n="saveFile">Save file</option>
+										</select>
 									</div>
 								</div>
 								<div class="setting-item mod-horizontal">
@@ -230,6 +281,14 @@
 						</form>
 					</div>
 
+					<div id="reader-section" class="settings-section">
+						<div class="settings-section-header">
+							<h2 data-i18n="reader">Reader</h2>
+						</div>
+						<form id="reader-settings-form">
+						</form>
+					</div>
+
 					<div id="interpreter-section" class="settings-section">
 						<div class="settings-section-header">
 							<h2 data-i18n="interpreter">Interpreter</h2>
@@ -292,17 +351,6 @@
 							</div>
 							<div>
 								<h3 data-i18n="advanced">Advanced</h3>
-								<div class="setting-item mod-horizontal">
-									<div class="setting-item-info">
-										<label for="reset-providers-btn" data-i18n="resetProvidersAndModels">Reset default models</label>
-										<div class="setting-item-description" data-i18n="resetProvidersAndModelsDescription">
-											Reset providers and models to the default settings.
-										</div>
-									</div>
-									<div class="setting-item-control">
-										<button type="button" id="reset-providers-btn" class="mod-warning" data-i18n="reset">Reset</button>
-									</div>
-								</div>
 								<div class="setting-item">
 									<label for="default-prompt-context" style="font-weight: 400;" data-i18n="defaultInterpreterContext">Default interpreter context</label>
 									<div class="setting-item-description" data-i18n="defaultInterpreterContextDescription">Override the context used to interpret prompt variables. Variables can be used here.</div>
@@ -431,6 +479,7 @@
 										<option value="prepend-specific" data-i18n="prependToExisting">Add to an existing note, at the top</option>
 										<option value="append-daily" data-i18n="appendToDaily">Add to daily note, at the bottom</option>
 										<option value="prepend-daily" data-i18n="prependToDaily">Add to daily note, at the top</option>
+										<option value="overwrite" data-i18n="overwriteNote">Overwrite note</option>
 									</select>
 								</div>
 								<div id="behavior-warning-container" class="warning-container" style="display: none;">
@@ -529,6 +578,16 @@
 								</select>
 							</div>
 						</div>
+						<div class="setting-item model-selection-container" style="display: none;">
+							<div class="setting-item-info">
+								<label data-i18n="popularModels">Popular models</label>
+								<div class="setting-item-description" data-i18n="popularModelsDescription">Choose from commonly used models or enter custom model details.</div>
+							</div>
+							<div class="setting-item-control">
+								<div class="radio-container" id="model-selection-radios">
+								</div>
+							</div>
+						</div>
 						<div class="setting-item">
 							<div class="setting-item-info">
 								<label for="model-name">
@@ -616,7 +675,24 @@
 			</div>
 		</div>
 
+		<div id="feedback-modal" class="modal-container">
+			<div class="modal-bg"></div>
+			<div class="modal">
+				<div class="modal-header">
+					<div class="modal-title" data-i18n="feedbackTitle">Thanks for your feedback</div>
+				</div>
+				<div class="modal-content">
+					<p data-i18n="feedbackDescription">How can we improve Web Clipper? Please visit our help page, where you can report bugs, suggest features, and get help with common issues.</p>
+				</div>
+				<div class="modal-button-container">
+					<a class="btn mod-cta" href="https://help.obsidian.md/web-clipper/troubleshoot" target="_blank" data-i18n="help">Help</a>
+					<button class="feedback-close-btn" data-i18n="close">Close</button>
+				</div>
+			</div>
+		</div>
+
+		
+
 		<script type="module" src="settings.js"></script>
 </body>
-</html>
 </html>

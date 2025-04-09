@@ -22,13 +22,6 @@ export function createMarkdownContent(content: string, url: string) {
 		preformattedCode: true,
 	});
 
-	try {
-		var taskListItems = require('turndown-plugin-gfm').taskListItems
-		turndownService.use(taskListItems)
-	} catch (error) {
-		console.error('Error applying GFM plugin:', error);
-	}
-
 	turndownService.addRule('table', {
 		filter: 'table',
 		replacement: function(content, node) {
@@ -81,19 +74,67 @@ export function createMarkdownContent(content: string, url: string) {
 	turndownService.keep(['iframe', 'video', 'audio', 'sup', 'sub', 'svg', 'math']);
 	turndownService.remove(['button']);
 
-	// Custom rule to handle bullet lists without extra spaces
+	turndownService.addRule('list', {
+		filter: ['ul', 'ol'],
+		replacement: function (content: string, node: Node) {
+			// Remove trailing newlines/spaces from content
+			content = content.trim();
+			
+			// Add a newline before the list if it's a top-level list
+			const isTopLevel = !(node.parentNode && (node.parentNode.nodeName === 'UL' || node.parentNode.nodeName === 'OL'));
+			return (isTopLevel ? '\n' : '') + content + '\n';
+		}
+	});
+
+	// Lists with tab indentation
 	turndownService.addRule('listItem', {
 		filter: 'li',
 		replacement: function (content: string, node: Node, options: TurndownService.Options) {
-			content = content.trim();
+			if (!(node instanceof HTMLElement)) return content;
+
+			// Handle task list items
+			const isTaskListItem = node.classList.contains('task-list-item');
+			const checkbox = node.querySelector('input[type="checkbox"]') as HTMLInputElement | null;
+			let taskListMarker = '';
+			
+			if (isTaskListItem && checkbox) {
+				// Remove the checkbox from content since we'll add markdown checkbox
+				content = content.replace(/<input[^>]*>/, '');
+				taskListMarker = checkbox.checked ? '[x] ' : '[ ] ';
+			}
+
+			content = content
+				// Remove trailing newlines
+				.replace(/\n+$/, '')
+				// Split into lines
+				.split('\n')
+				// Remove empty lines
+				.filter(line => line.length > 0)
+				// Add indentation to continued lines
+				.join('\n\t');
+
 			let prefix = options.bulletListMarker + ' ';
 			let parent = node.parentNode;
+
+			// Calculate the nesting level
+			let level = 0;
+			let currentParent = node.parentNode;
+			while (currentParent && (currentParent.nodeName === 'UL' || currentParent.nodeName === 'OL')) {
+				level++;
+				currentParent = currentParent.parentNode;
+			}
+
+			// Add tab indentation based on nesting level, ensuring it's never negative
+			const indentLevel = Math.max(0, level - 1);
+			prefix = '\t'.repeat(indentLevel) + prefix;
+
 			if (parent instanceof HTMLOListElement) {
 				let start = parent.getAttribute('start');
 				let index = Array.from(parent.children).indexOf(node as HTMLElement) + 1;
-				prefix = (start ? Number(start) + index - 1 : index) + '. ';
+				prefix = '\t'.repeat(level - 1) + (start ? Number(start) + index - 1 : index) + '. ';
 			}
-			return prefix + content + '\n';
+
+			return prefix + taskListMarker + content.trim() + (node.nextSibling && !/\n$/.test(content) ? '\n' : '');
 		}
 	});
 
@@ -156,12 +197,6 @@ export function createMarkdownContent(content: string, url: string) {
 					!!src.match(/(?:youtube\.com|youtu\.be)/) ||
 					!!src.match(/(?:twitter\.com|x\.com)/)
 				);
-			} else if (node instanceof HTMLElement) {
-				if (node.tagName.toLowerCase() === 'lite-youtube') {
-					return true;
-				} else if (node.tagName.toLowerCase() === 'p') {
-					return !!node.querySelector('lite-youtube');
-				}
 			}
 			return false;
 		},
@@ -176,20 +211,6 @@ export function createMarkdownContent(content: string, url: string) {
 					const tweetMatch = src.match(/(?:twitter\.com|x\.com)\/.*?(?:status|statuses)\/(\d+)/);
 					if (tweetMatch && tweetMatch[1]) {
 						return `![](https://x.com/i/status/${tweetMatch[1]})`;
-					}
-				}
-			} else if (node instanceof HTMLElement) {
-				let liteYoutubeElement: HTMLElement | null = null;
-				if (node.tagName.toLowerCase() === 'lite-youtube') {
-					liteYoutubeElement = node;
-				} else if (node.tagName.toLowerCase() === 'p') {
-					liteYoutubeElement = node.querySelector('lite-youtube');
-				}
-				
-				if (liteYoutubeElement) {
-					const videoId = liteYoutubeElement.getAttribute('videoid');
-					if (videoId) {
-						return `![](https://www.youtube.com/watch?v=${videoId})`;
 					}
 				}
 			}
@@ -253,21 +274,6 @@ export function createMarkdownContent(content: string, url: string) {
 		}
 	});
 
-	function handleNestedEquations(table: Element): string {
-		const mathElements = table.querySelectorAll('math[alttext]');
-		if (mathElements.length === 0) return '';
-
-		return Array.from(mathElements).map(mathElement => {
-			const alttext = mathElement.getAttribute('alttext');
-			if (alttext) {
-				// Check if it's an inline or block equation
-				const isInline = mathElement.closest('.ltx_eqn_inline') !== null;
-				return isInline ? `$${alttext.trim()}$` : `\n$$$\n${alttext.trim()}\n$$$`;
-			}
-			return '';
-		}).join('\n\n');
-	}
-
 	turndownService.addRule('arXivEnumerate', {
 		filter: (node) => {
 			return node.nodeName === 'OL' && node.classList.contains('ltx_enumerate');
@@ -302,88 +308,30 @@ export function createMarkdownContent(content: string, url: string) {
 		filter: (node: Node): boolean => {
 			if (node instanceof Element) {
 				return (
-					(node.nodeName === 'SUP' && node.classList.contains('reference')) ||
-					(node.nodeName === 'CITE' && node.classList.contains('ltx_cite')) ||
-					(node.nodeName === 'SUP' && node.id.startsWith('fnref:')) ||
-					(node.nodeName === 'SPAN' && node.classList.contains('footnote-link'))
+					(node.nodeName === 'SUP' && node.id.startsWith('fnref:'))
 				);
 			}
 			return false;
 		},
 		replacement: (content, node) => {
 			if (node instanceof HTMLElement) {
-				if (node.nodeName === 'SUP' && node.classList.contains('reference')) {
-					const links = node.querySelectorAll('a');
-					const footnotes = Array.from(links).map(link => {
-						const href = link.getAttribute('href');
-						if (href) {
-							const match = href.split('/').pop()?.match(/(?:cite_note|cite_ref)-(.+)/);
-							if (match) {
-								return `[^${match[1].toLowerCase()}]`;
-							}
-						}
-						return '';
-					});
-					return footnotes.join('');
-				} else if (node.nodeName === 'CITE' && node.classList.contains('ltx_cite')) {
-					const link = node.querySelector('a');
-					if (link) {
-						const href = link.getAttribute('href');
-						if (href) {
-							const match = href.split('/').pop()?.match(/bib\.bib(\d+)/);
-							if (match) {
-								return `[^${match[1].toLowerCase()}]`;
-							}
-						}
-					}
-				} else if (node.nodeName === 'SUP' && node.id.startsWith('fnref:')) {
+				if (node.nodeName === 'SUP' && node.id.startsWith('fnref:')) {
 					const id = node.id.replace('fnref:', '');
-					return `[^${id.toLowerCase()}]`;
-				} else if (node.nodeName === 'SPAN' && node.classList.contains('footnote-link')) {
-					const footnoteId = node.dataset.footnoteId;
-					if (footnoteId) {
-						return `[^${footnoteId}]`;
-					}
+					// Extract only the primary number before any hyphen
+					const primaryNumber = id.split('-')[0];
+					return `[^${primaryNumber}]`;
 				}
 			}
 			return content;
 		}
 	});
 
-	turndownService.addRule('inlineFootnotes', {
+	// Footnotes list
+	turndownService.addRule('footnotesList', {
 		filter: (node: Node): boolean => {
-			return node instanceof HTMLElement && 
-					node.nodeName === 'SPAN' && 
-					node.classList.contains('footnote-link');
-		},
-		replacement: (content, node) => {
-			if (node instanceof HTMLElement) {
-				const footnoteId = node.dataset.footnoteId;
-				const footnoteContent = node.dataset.footnoteContent;
-				
-				if (footnoteId && footnoteContent) {
-					// Store the footnote content for later use
-					footnotes[footnoteId] = turndownService.turndown(
-						decodeURIComponent(footnoteContent.replace(/&lt;/g, '<').replace(/&gt;/g, '>'))
-					);
-					
-					// Return the footnote reference
-					return `[^${footnoteId}]`;
-				}
-			}
-			return content;
-		}
-	});
-
-	// Update the reference list rule
-	turndownService.addRule('referenceList', {
-		filter: (node: Node): boolean => {
-			if (node instanceof HTMLElement) {
+			if (node instanceof HTMLOListElement) {
 				return (
-					(node.nodeName === 'OL' && node.classList.contains('references')) ||
-					(node.nodeName === 'OL' && node.classList.contains('footnotes-list')) ||
-					(node.nodeName === 'UL' && node.classList.contains('ltx_biblist')) ||
-					(node.nodeName === 'OL' && node.parentElement?.classList?.contains('footnotes') === true)
+					node.parentElement?.id === 'footnotes'
 				);
 			}
 			return false;
@@ -392,9 +340,7 @@ export function createMarkdownContent(content: string, url: string) {
 			if (node instanceof HTMLElement) {
 				const references = Array.from(node.children).map(li => {
 					let id;
-					if (li.id.startsWith('bib.bib')) {
-						id = li.id.replace('bib.bib', '');
-					} else if (li.id.startsWith('fn:')) {
+					if (li.id.startsWith('fn:')) {
 						id = li.id.replace('fn:', '');
 					} else {
 						const match = li.id.split('/').pop()?.match(/cite_note-(.+)/);
@@ -422,44 +368,12 @@ export function createMarkdownContent(content: string, url: string) {
 	turndownService.addRule('removals', {
 		filter: function (node) {
 			if (!(node instanceof HTMLElement)) return false;
-			// Back to top links
-			if (node.id.startsWith('back-to-top')) return true;
-			if (node.classList.contains('back-to-top')) return true;
-			// Wikipedia edit buttons
-			if (node.classList.contains('mw-editsection')) return true;
-			// Wikipedia cite backlinks
-			if (node.classList.contains('mw-cite-backlink')) return true;
-			// Reference numbers and anchor links
-			if (node.classList.contains('ltx_role_refnum')) return true;
-			if (node.classList.contains('ltx_tag_bibitem')) return true;
+			// Remove the Defuddle backlink from the footnote content
+			if (node.getAttribute('href')?.includes('#fnref')) return true;
 			if (node.classList.contains('footnote-backref')) return true;
-			if (node.classList.contains('ref') && (node.getAttribute('href')?.startsWith('#') || /\/#.+$/.test(node.getAttribute('href') || ''))) return true;
-			if (node.classList.contains('anchor') && (node.getAttribute('href')?.startsWith('#') || /\/#.+$/.test(node.getAttribute('href') || ''))) return true;
-			// anchor links within headings
-			if (node.nodeName === 'A' && 
-				node.parentElement && 
-				/^H[1-6]$/.test(node.parentElement.nodeName) && 
-				node.getAttribute('href')?.split('/').pop()?.startsWith('#')) {
-				// Only remove if the text content is '#' or it contains an img
-				return (node.textContent?.trim() === '#') || node.querySelector('img') !== null;
-			}
-
-			// Simplify headings with anchor links
-			if (node.nodeName.match(/^H[1-6]$/) && 
-				node.children.length === 1 && 
-				node.firstElementChild?.nodeName === 'A' &&
-				node.firstElementChild.getAttribute('href')?.split('/').pop()?.startsWith('#')) {
-				return true;
-			}
-
 			return false;
 		},
 		replacement: function (content, node) {
-			if (node instanceof HTMLElement && node.nodeName.match(/^H[1-6]$/)) {
-				const level = node.nodeName.charAt(1);
-				const text = node.textContent?.trim() || '';
-				return `\n${'#'.repeat(Number(level))} ${text}\n`;
-			}
 			return '';
 		}
 	});
@@ -481,78 +395,19 @@ export function createMarkdownContent(content: string, url: string) {
 		},
 		replacement: (content, node) => {
 			if (!(node instanceof HTMLElement)) return content;
-
+			
 			const codeElement = node.querySelector('code');
-
-			// Function to get language from class
-			const getLanguageFromClass = (classList: DOMTokenList): string => {
-				for (const className of Array.from(classList)) {
-					if (className.startsWith('language-')) {
-						return className.slice(9); // Remove 'language-' prefix
-					}
-				}
-				return '';
-			};
-
-			// Try to get the language from the class attribute
-			let language = '';
+			if (!codeElement) return content;
 			
-			// Check pre element
-			language = getLanguageFromClass(node.classList);
+			const language = codeElement.getAttribute('data-lang') || '';
+			const code = codeElement.textContent || '';
 			
-			// Check code element if language not found
-			if (!language && codeElement) {
-				language = getLanguageFromClass(codeElement.classList);
-			}
+			// Clean up the content and escape backticks
+			const cleanCode = code
+				.trim()
+				.replace(/`/g, '\\`');
 			
-			// Check parent elements if language still not found
-			if (!language) {
-				let parent = node.parentElement;
-				while (parent && !language) {
-					language = getLanguageFromClass(parent.classList);
-					parent = parent.parentElement;
-				}
-			}
-
-			// If no language found in class, fallback to data-language
-			if (!language) {
-				language = node.dataset.language || '';
-			}
-
-			// Function to recursively extract text content while preserving structure
-			const extractStructuredText = (element: Node): string => {
-				if (element.nodeType === Node.TEXT_NODE) {
-					return element.textContent || '';
-				} else if (element instanceof HTMLElement) {
-					let text = '';
-					element.childNodes.forEach(child => {
-						if (child instanceof HTMLElement) {
-							if (child.classList.contains('ec-line')) {
-								text += extractStructuredText(child) + '\n';
-							} else if (child.tagName === 'BR') {
-								text += '\n';
-							} else {
-								text += extractStructuredText(child);
-							}
-						} else {
-							text += extractStructuredText(child);
-						}
-					});
-					return text;
-				}
-				return '';
-			};
-
-			// Extract all text content from the pre element or its code child
-			let codeContent = codeElement ? extractStructuredText(codeElement) : extractStructuredText(node);
-
-			// Remove any extra newlines at the start or end
-			codeContent = codeContent.replace(/^\n+|\n+$/g, '');
-
-			// Escape any backticks in the code
-			const escapedCode = codeContent.replace(/`/g, '\\`');
-
-			return `\n\`\`\`${language}\n${escapedCode}\n\`\`\`\n`;
+			return `\n\`\`\`${language}\n${cleanCode}\n\`\`\`\n`;
 		}
 	});
 
@@ -595,40 +450,6 @@ export function createMarkdownContent(content: string, url: string) {
 		}
 	});
 
-	function extractLatex(element: Element): string {
-		// Check if the element is a <math> element and has an alttext attribute
-		if (element.nodeName.toLowerCase() === 'math') {
-			const alttext = element.getAttribute('alttext');
-			if (alttext) {
-				return alttext.trim();
-			}
-		}
-
-		// If not, look for a nested <math> element with alttext
-		const mathElement = element.querySelector('math[alttext]');
-		if (mathElement) {
-			const alttext = mathElement.getAttribute('alttext');
-			if (alttext) {
-				return alttext.trim();
-			}
-		}
-
-		// Fallback to existing logic
-		const annotation = element.querySelector('annotation[encoding="application/x-tex"]');
-		if (annotation?.textContent) {
-			return annotation.textContent.trim();
-		}
-
-		const mathNode = element.nodeName.toLowerCase() === 'math' ? element : element.querySelector('math');
-		if (mathNode) {
-			return MathMLToLaTeX.convert(mathNode.outerHTML);
-		}
-
-		const imgNode = element.querySelector('img');
-		return imgNode?.getAttribute('alt') || '';
-	}
-
-
 	turndownService.addRule('math', {
 		filter: (node) => {
 			return node.nodeName.toLowerCase() === 'math' || 
@@ -656,7 +477,7 @@ export function createMarkdownContent(content: string, url: string) {
 				node.parentElement.previousElementSibling && 
 				node.parentElement.previousElementSibling.nodeName.toLowerCase() === 'p')
 			)) {
-				return `\n$$$\n${latex}\n$$$\n`;
+				return `\n$$\n${latex}\n$$\n`;
 			} else {
 				// For inline math, ensure there's a space before and after only if needed
 				const prevNode = node.previousSibling;
@@ -674,6 +495,87 @@ export function createMarkdownContent(content: string, url: string) {
 			}
 		}
 	});
+
+	turndownService.addRule('katex', {
+		filter: (node) => {
+			return node instanceof HTMLElement && 
+				   (node.classList.contains('math') || node.classList.contains('katex'));
+		},
+		replacement: (content, node) => {
+			if (!(node instanceof HTMLElement)) return content;
+
+			// Try to find the original LaTeX content
+			// 1. Check data-latex attribute
+			let latex = node.getAttribute('data-latex');
+			
+			// 2. If no data-latex, try to get from .katex-mathml
+			if (!latex) {
+				const mathml = node.querySelector('.katex-mathml annotation[encoding="application/x-tex"]');
+				latex = mathml?.textContent || '';
+			}
+
+			// 3. If still no content, use text content as fallback
+			if (!latex) {
+				latex = node.textContent?.trim() || '';
+			}
+
+			// Determine if it's an inline formula
+			const mathElement = node.querySelector('.katex-mathml math');
+			const isInline = node.classList.contains('math-inline') || 
+				(mathElement && mathElement.getAttribute('display') !== 'block');
+			
+			if (isInline) {
+				return `$${latex}$`;
+			} else {
+				return `\n$$\n${latex}\n$$\n`;
+			}
+		}
+	});
+
+	turndownService.addRule('callout', {
+		filter: (node) => {
+			return (
+				node.nodeName.toLowerCase() === 'div' && 
+				node.classList.contains('markdown-alert')
+			);
+		},
+		replacement: (content, node) => {
+			const element = node as HTMLElement;
+			
+			// Get alert type from the class (e.g., markdown-alert-note -> NOTE)
+			const alertClasses = Array.from(element.classList);
+			const typeClass = alertClasses.find(c => c.startsWith('markdown-alert-') && c !== 'markdown-alert');
+			const type = typeClass ? typeClass.replace('markdown-alert-', '').toUpperCase() : 'NOTE';
+
+			// Find the title element and content
+			const titleElement = element.querySelector('.markdown-alert-title');
+			const contentElement = element.querySelector('p:not(.markdown-alert-title)');
+			
+			// Extract content, removing the title from it if present
+			let alertContent = content;
+			if (titleElement && titleElement.textContent) {
+				alertContent = contentElement?.textContent || content.replace(titleElement.textContent, '');
+			}
+
+			// Format as Obsidian callout
+			return `\n> [!${type}]\n> ${alertContent.trim().replace(/\n/g, '\n> ')}\n`;
+		}
+	});
+
+	function handleNestedEquations(table: Element): string {
+		const mathElements = table.querySelectorAll('math[alttext]');
+		if (mathElements.length === 0) return '';
+
+		return Array.from(mathElements).map(mathElement => {
+			const alttext = mathElement.getAttribute('alttext');
+			if (alttext) {
+				// Check if it's an inline or block equation
+				const isInline = mathElement.closest('.ltx_eqn_inline') !== null;
+				return isInline ? `$${alttext.trim()}$` : `\n$$\n${alttext.trim()}\n$$`;
+			}
+			return '';
+		}).join('\n\n');
+	}
 
 	function cleanupTableHTML(table: HTMLTableElement): string {
 		const allowedAttributes = ['src', 'href', 'style', 'align', 'width', 'height', 'rowspan', 'colspan', 'bgcolor', 'scope', 'valign', 'headers'];
@@ -697,6 +599,42 @@ export function createMarkdownContent(content: string, url: string) {
 		cleanElement(tableClone);
 
 		return tableClone.outerHTML;
+	}
+
+	function extractLatex(element: Element): string {
+		// Check if the element is a <math> element and has an alttext attribute
+		if (element.nodeName.toLowerCase() === 'math') {
+			let latex = element.getAttribute('data-latex');
+			let alttext = element.getAttribute('alttext');
+			if (latex) {
+				return latex.trim();
+			} else if (alttext) {
+				return alttext.trim();
+			}
+			console.log('No latex or alttext found for math element:', element);
+		}
+
+		// If not, look for a nested <math> element with alttext
+		const mathElement = element.querySelector('math[alttext]');
+		if (mathElement) {
+			const alttext = mathElement.getAttribute('alttext');
+			if (alttext) {
+				return alttext.trim();
+			}
+		}
+
+		const annotation = element.querySelector('annotation[encoding="application/x-tex"]');
+		if (annotation?.textContent) {
+			return annotation.textContent.trim();
+		}
+
+		const mathNode = element.nodeName.toLowerCase() === 'math' ? element : element.querySelector('math');
+		if (mathNode) {
+			return MathMLToLaTeX.convert(mathNode.outerHTML);
+		}
+
+		const imgNode = element.querySelector('img');
+		return imgNode?.getAttribute('alt') || '';
 	}
 
 	try {
@@ -723,7 +661,7 @@ export function createMarkdownContent(content: string, url: string) {
 				markdown += `[^${id}]: ${content}\n\n`;
 			}
 		}
-
+		
 		// Clear the footnotes object for the next conversion
 		Object.keys(footnotes).forEach(key => delete footnotes[key]);
 

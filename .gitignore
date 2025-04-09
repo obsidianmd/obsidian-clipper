@@ -13,6 +13,7 @@ dist/
 dist_firefox/
 dist_safari/
 builds/
+assets/shared
 
 # Xcode
 *.xcuserstate

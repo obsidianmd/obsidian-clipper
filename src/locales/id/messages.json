@@ -1,4 +1,7 @@
 {
+	"activity": {
+		"message": "Aktivitas"
+	},
 	"addModel": {
 		"message": "+ Tambah model"
 	},
@@ -25,6 +28,9 @@
 	},
 	"allProperties": {
 		"message": "Semua properti"
+	},
+	"allTime": {
+		"message": "Sepanjang waktu"
 	},
 	"alwaysShowHighlights": {
 		"message": "Selalu tampilkan sorotan"
@@ -55,6 +61,15 @@
 	},
 	"behaviorWarning": {
 		"message": "Perlu Obsidian 1.7.2 atau yang lebih baru untuk dapat menambahkan ke catatan yang telah ada atau catatan harian."
+	},
+	"byDay": {
+		"message": "Hari"
+	},
+	"byMonth": {
+		"message": "Bulan"
+	},
+	"byWeek": {
+		"message": "Minggu"
 	},
 	"cancel": {
 		"message": "Batal"
@@ -103,6 +118,9 @@
 	"commandToggleHighlighter": {
 		"message": "Aktifkan/nonaktifkan mode sorotan"
 	},
+	"commandToggleReader": {
+		"message": "Alihkan tampilan baca"
+	},
 	"confirmDeleteTemplate": {
 		"message": "Apakah Anda yakin ingin menghapus template \"$1\"?"
 	},
@@ -147,6 +165,9 @@
 	},
 	"disableHighlighter": {
 		"message": "Nonaktifkan sorotan"
+	},
+	"disableReader": {
+		"message": "Nonaktifkan tampilan baca"
 	},
 	"done": {
 		"message": "selesai"
@@ -205,6 +226,9 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"enableReader": {
+		"message": "Buka tampilan baca"
 	},
 	"error": {
 		"message": "Error"
@@ -289,6 +313,15 @@
 	"failedToSaveProvider": {
 		"message": "Gagal menyimpan penyedia. Silakan coba lagi."
 	},
+	"feedback": {
+		"message": "Umpan balik"
+	},
+	"feedbackDescription": {
+		"message": "Bagaimana kami bisa meningkatkan Web Clipper? Silakan kunjungi halaman bantuan kami, di mana Anda dapat melaporkan bug, menyarankan fitur, dan mendapatkan bantuan dengan masalah umum."
+	},
+	"feedbackTitle": {
+		"message": "Terima kasih atas umpan balik Anda"
+	},
 	"folder": {
 		"message": "Folder"
 	},
@@ -318,6 +351,9 @@
 	},
 	"highlighterSettings": {
 		"message": "Penyorot"
+	},
+	"history": {
+		"message": "Riwayat"
 	},
 	"hotkeys": {
 		"message": "Tombol pintas"
@@ -389,6 +425,9 @@
 	"languageDescription": {
 		"message": "Pilih bahasa tampilan untuk antarmuka ekstensi."
 	},
+	"last30Days": {
+		"message": "30 hari terakhir"
+	},
 	"lastUsed": {
 		"message": "Terakhir digunakan"
 	},
@@ -418,6 +457,9 @@
 	},
 	"models": {
 		"message": "Model"
+	},
+	"modelsListFor": {
+		"message": "Daftar model untuk $1"
 	},
 	"more": {
 		"message": "Lainnya"
@@ -478,17 +520,32 @@
 	"orPasteBelow": {
 		"message": "Atau tempel konten di bawah ini"
 	},
+	"overwriteNote": {
+		"message": "Timpa catatan"
+	},
 	"pageCannotBeClipped": {
 		"message": "Laman ini tidak dapat diklip."
 	},
 	"pageVariables": {
 		"message": "Variabel laman web"
 	},
+	"pagesSaved": {
+		"message": "halaman tersimpan"
+	},
+	"pagesSavedPlural": {
+		"message": "halaman-halaman tersimpan"
+	},
 	"pasteJsonHere": {
 		"message": "Tempel JSON di sini"
 	},
 	"pleaseReload": {
 		"message": "Silakan coba muat ulang laman web."
+	},
+	"popularModels": {
+		"message": "Model populer"
+	},
+	"popularModelsDescription": {
+		"message": "Pilih dari model yang sering digunakan atau masukkan detail model kustom."
 	},
 	"prependToDaily": {
 		"message": "Tambah ke catatan harian, di bagian awal"
@@ -553,6 +610,15 @@
 	"providers": {
 		"message": "Penyedia"
 	},
+	"rateExtensionDescription": {
+		"message": "Apakah Anda menikmati Web Clipper? Bantu kami dengan memberikan penilaian."
+	},
+	"reader": {
+		"message": "Pembaca"
+	},
+	"recommended": {
+		"message": "direkomendasikan"
+	},
 	"refresh": {
 		"message": "Muat ulang"
 	},
@@ -591,6 +657,12 @@
 	},
 	"save": {
 		"message": "Simpan"
+	},
+	"saveBehaviorDescription": {
+		"message": "Pilih opsi default untuk menyimpan halaman. Opsi alternatif muncul di menu dropdown di sebelah tombol utama."
+	},
+	"saveBehaviorLabel": {
+		"message": "Perilaku penyimpanan"
 	},
 	"saveFile": {
 		"message": "Simpan file..."

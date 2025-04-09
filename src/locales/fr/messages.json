@@ -1,4 +1,7 @@
 {
+	"activity": {
+		"message": "Activité"
+	},
 	"addModel": {
 		"message": "+ Ajouter un modèle"
 	},
@@ -26,6 +29,9 @@
 	"allProperties": {
 		"message": "Toutes les propriétés"
 	},
+	"allTime": {
+		"message": "Tout le temps"
+	},
 	"alwaysShowHighlights": {
 		"message": "Toujours afficher les surlignages"
 	},
@@ -36,7 +42,7 @@
 		"message": "Pas de clé API"
 	},
 	"apiKeysWarning": {
-		"message": "En utilisant un fournisseur externe, vous acceptez leurs conditions d'utilisation et leur politique de confidentialité. Les requêtes de l'interpréteur sont envoyées directement au fournisseur que vous choisissez. Obsidian ne collecte ni ne stocke aucune donnée concernant vos requêtes."
+		"message": "En utilisant un fournisseur externe, vous acceptez leurs conditions d'utilisation et leur politique de confidentialité. Les requêtes de l'interpréteur sont envoyées directement au fournisseur que vous choisissez. Obsidian ne collecte et ne stocke aucune donnée concernant vos requêtes."
 	},
 	"appendToDaily": {
 		"message": "Ajouter à la note quotidienne, à la fin"
@@ -55,6 +61,15 @@
 	},
 	"behaviorWarning": {
 		"message": "L'ajout à une note existante ou à la note quotidienne nécessite Obsidian 1.7.2 ou ultérieur."
+	},
+	"byDay": {
+		"message": "Jours"
+	},
+	"byMonth": {
+		"message": "Mois"
+	},
+	"byWeek": {
+		"message": "Semaines"
 	},
 	"cancel": {
 		"message": "Annuler"
@@ -103,6 +118,9 @@
 	"commandToggleHighlighter": {
 		"message": "Activer/désactiver le mode surlignage"
 	},
+	"commandToggleReader": {
+		"message": "Basculer la vue de lecture"
+	},
 	"confirmDeleteTemplate": {
 		"message": "Êtes-vous sûr de vouloir supprimer le modèle \"$1\" ?"
 	},
@@ -146,10 +164,13 @@
 		"message": "Êtes-vous sûr de vouloir supprimer ce fournisseur ?"
 	},
 	"disableHighlighter": {
-		"message": "Désactiver le surlignageur"
+		"message": "Désactiver le surligneur"
+	},
+	"disableReader": {
+		"message": "Désactiver la vue de lecture"
 	},
 	"done": {
-		"message": "terminé"
+		"message": "Terminé"
 	},
 	"dragAndDropFile": {
 		"message": "Glissez et déposez un fichier ici"
@@ -184,7 +205,7 @@
 		"message": "Activer le surligneur"
 	},
 	"enableHighlighterDescription": {
-		"message": "Surlignez du contenu sur les pages web que vous pouvez sauvegarder dans Obsidian."
+		"message": "Surlignez du contenu sur les pages web que vous pouvez enrengistrer dans Obsidian."
 	},
 	"enableInterpreter": {
 		"message": "Activer l'interpréteur"
@@ -206,6 +227,9 @@
 			}
 		}
 	},
+	"enableReader": {
+		"message": "Ouvrir la vue de lecture"
+	},
 	"error": {
 		"message": "Erreur"
 	},
@@ -216,7 +240,7 @@
 		"message": "Exporter tous les paramètres"
 	},
 	"exportAllSettingsDescription": {
-		"message": "Exporte tous les paramètres, y compris les modèles et les propriétés."
+		"message": "Exporter tous les paramètres, y compris les modèles et les propriétés."
 	},
 	"exportHighlights": {
 		"message": "Exporter les surlignages"
@@ -289,6 +313,15 @@
 	"failedToSaveProvider": {
 		"message": "Échec de l'enregistrement du fournisseur. Veuillez réessayer."
 	},
+	"feedback": {
+		"message": "Retour d'information"
+	},
+	"feedbackDescription": {
+		"message": "Comment pouvons-nous améliorer Web Clipper? Veuillez visiter notre page d'aide, où vous pouvez signaler des bugs, suggérer des fonctionnalités et obtenir de l'aide pour les problèmes courants."
+	},
+	"feedbackTitle": {
+		"message": "Merci pour votre retour"
+	},
 	"folder": {
 		"message": "Dossier"
 	},
@@ -318,6 +351,9 @@
 	},
 	"highlighterSettings": {
 		"message": "Surligneur"
+	},
+	"history": {
+		"message": "Historique"
 	},
 	"hotkeys": {
 		"message": "Raccourcis clavier"
@@ -389,11 +425,14 @@
 	"languageDescription": {
 		"message": "Choisissez la langue d'affichage de l'interface de l'extension."
 	},
+	"last30Days": {
+		"message": "30 derniers jours"
+	},
 	"lastUsed": {
 		"message": "Dernière utilisation"
 	},
 	"legacyMode": {
-		"message": "Mode hérité"
+		"message": "Mode compatibilité"
 	},
 	"legacyModeDescription": {
 		"message": "Utilise la méthode d'enregistrement URI compatible avec Obsidian 1.6.7 ou antérieur. Notez que la longueur du contenu que vous pouvez enregistrer est limitée par votre navigateur et votre système d'exploitation. Certaines pages peuvent échouer sans erreur."
@@ -418,6 +457,9 @@
 	},
 	"models": {
 		"message": "Modèles de langage"
+	},
+	"modelsListFor": {
+		"message": "Liste des modèles pour $1"
 	},
 	"more": {
 		"message": "Plus"
@@ -478,17 +520,32 @@
 	"orPasteBelow": {
 		"message": "Ou collez le contenu ci-dessous"
 	},
+	"overwriteNote": {
+		"message": "Écraser la note"
+	},
 	"pageCannotBeClipped": {
 		"message": "Cette page ne peut pas être enregistrée."
 	},
 	"pageVariables": {
 		"message": "Variables de page"
 	},
+	"pagesSaved": {
+		"message": "page sauvegardée"
+	},
+	"pagesSavedPlural": {
+		"message": "pages sauvegardées"
+	},
 	"pasteJsonHere": {
 		"message": "Collez le JSON ici"
 	},
 	"pleaseReload": {
 		"message": "Veuillez essayer de recharger la page."
+	},
+	"popularModels": {
+		"message": "Modèles populaires"
+	},
+	"popularModelsDescription": {
+		"message": "Choisissez parmi les modèles couramment utilisés ou entrez les détails d'un modèle personnalisé."
 	},
 	"prependToDaily": {
 		"message": "Ajouter à la note quotidienne, au début"
@@ -553,6 +610,15 @@
 	"providers": {
 		"message": "Fournisseurs"
 	},
+	"rateExtensionDescription": {
+		"message": "Appréciez-vous Web Clipper? Aidez-nous en lui donnant une note."
+	},
+	"reader": {
+		"message": "Lecteur"
+	},
+	"recommended": {
+		"message": "recommandé"
+	},
 	"refresh": {
 		"message": "Actualiser"
 	},
@@ -592,6 +658,12 @@
 	"save": {
 		"message": "Enregistrer"
 	},
+	"saveBehaviorDescription": {
+		"message": "Choisissez l'option par défaut pour enregistrer les pages. Les options alternatives apparaissent dans le menu déroulant à côté du bouton principal."
+	},
+	"saveBehaviorLabel": {
+		"message": "Comportement de sauvegarde"
+	},
 	"saveFile": {
 		"message": "Enregistrer le fichier..."
 	},
@@ -617,19 +689,19 @@
 		"message": "Partager..."
 	},
 	"shortcutInstructionsBrave": {
-		"message": "Pour modifier les assignations de touches, allez à $1"
+		"message": "Pour modifier les assignations de touches, rendez-vous sur $1"
 	},
 	"shortcutInstructionsChrome": {
-		"message": "Pour modifier les assignations de touches, allez à $1"
+		"message": "Pour modifier les assignations de touches, rendez-vous sur $1"
 	},
 	"shortcutInstructionsDefault": {
 		"message": "Pour modifier les assignations de touches, consultez les paramètres d'extension de votre navigateur."
 	},
 	"shortcutInstructionsEdge": {
-		"message": "Pour modifier les assignations de touches, allez à $1"
+		"message": "Pour modifier les assignations de touches, rendez-vous sur $1"
 	},
 	"shortcutInstructionsFirefox": {
-		"message": "Pour modifier les assignations de touches, allez à $1, cliquez sur l'icône d'engrenage et sélectionnez \"Gérer les raccourcis d'extension\"."
+		"message": "Pour modifier les assignations de touches, rendez-vous sur $1, cliquez sur l'icône d'engrenage et sélectionnez \"Gérer les raccourcis d'extension\"."
 	},
 	"shortcutInstructionsIntro": {
 		"message": "Les raccourcis clavier vous donnent un accès rapide aux fonctionnalités du clipper."
@@ -653,7 +725,7 @@
 		"message": "Enregistrer la note sans l'ouvrir"
 	},
 	"silentOpenDescription": {
-		"message": "Les notes seront enregistrées mais ne s'ouvriront pas dans un nouvel onglet. Obsidian sera toujours mis au premier plan."
+		"message": "Les notes seront enregistrées mais ne s'ouvriront pas dans un nouvel onglet. Obsidian sera toujours amené au premier plan."
 	},
 	"specificNoteName": {
 		"message": "Nom spécifique de la note"

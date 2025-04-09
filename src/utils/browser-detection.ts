@@ -1,36 +1,58 @@
+interface KagiWindow extends Window {
+	KAGI?: any;
+}
+
 interface NavigatorExtended extends Navigator {
 	brave?: {
 		isBrave: () => Promise<boolean>;
 	};
 }
 
+declare const window: KagiWindow | undefined;
+
 export async function detectBrowser(): Promise<'chrome' | 'firefox' | 'firefox-mobile' | 'brave' | 'edge' | 'safari' | 'mobile-safari' | 'ipad-os' | 'orion' | 'other'> {
-	const userAgent = navigator.userAgent.toLowerCase();
-	
-	// Check for Orion first since it's based on WebKit/Safari
-	if ('KAGI' in window) {
-		return 'orion';
-	}
-	
-	if (userAgent.includes('firefox')) {
-		return userAgent.includes('mobile') ? 'firefox-mobile' : 'firefox';
-	} else if (userAgent.indexOf("edg/") > -1) {
-		return 'edge';
-	} else if (userAgent.indexOf("chrome") > -1) {
-		// Check for Brave
-		const nav = navigator as NavigatorExtended;
-		if (nav.brave && await nav.brave.isBrave()) {
-			return 'brave';
+	try {
+		// Check if we're in a background script context
+		if (typeof window === 'undefined' || !window) {
+			if (typeof browser !== 'undefined') {
+				return 'firefox';
+			}
+			if (typeof chrome !== 'undefined') {
+				return 'chrome';
+			}
+			return 'other';
 		}
-		return 'chrome';
-	} else if (userAgent.includes('safari')) {
-		if (isIPad()) {
-			return 'ipad-os';
-		} else if (userAgent.includes('mobile') || userAgent.includes('iphone')) {
-			return 'mobile-safari';
+		
+		// Check for Orion first since its userAgent is Safari
+		if (typeof window.KAGI !== 'undefined') {
+			return 'orion';
 		}
-		return 'safari';
-	} else {
+
+		const userAgent = navigator.userAgent.toLowerCase();
+		
+		if (userAgent.includes('firefox')) {
+			return userAgent.includes('mobile') ? 'firefox-mobile' : 'firefox';
+		} else if (userAgent.indexOf("edg/") > -1) {
+			return 'edge';
+		} else if (userAgent.indexOf("chrome") > -1) {
+			// Check for Brave
+			const nav = navigator as NavigatorExtended;
+			if (nav.brave && await nav.brave.isBrave()) {
+				return 'brave';
+			}
+			return 'chrome';
+		} else if (userAgent.includes('safari')) {
+			if (isIPad()) {
+				return 'ipad-os';
+			} else if (userAgent.includes('mobile') || userAgent.includes('iphone')) {
+				return 'mobile-safari';
+			}
+			return 'safari';
+		} else {
+			return 'other';
+		}
+	} catch (error) {
+		console.error('Error detecting browser:', error);
 		return 'other';
 	}
 }

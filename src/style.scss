@@ -21,6 +21,7 @@ body {
 @import 'styles/mobile';
 
 @import 'styles/buttons';
+@import 'styles/charts';
 @import 'styles/dragging';
 @import 'styles/dropdowns';
 @import 'styles/icons';
@@ -75,4 +76,8 @@ h4 {
 
 pre, code {
 	font-family: var(--font-monospace-default);
+}
+
+.is-hidden {
+	display: none !important;
 }

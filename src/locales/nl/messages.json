@@ -1,4 +1,7 @@
 {
+	"activity": {
+		"message": "Activiteit"
+	},
 	"addModel": {
 		"message": "+ Model toevoegen"
 	},
@@ -25,6 +28,9 @@
 	},
 	"allProperties": {
 		"message": "Alle eigenschappen"
+	},
+	"allTime": {
+		"message": "Alle tijd"
 	},
 	"alwaysShowHighlights": {
 		"message": "Markeringen altijd tonen"
@@ -55,6 +61,15 @@
 	},
 	"behaviorWarning": {
 		"message": "Toevoegen aan een bestaande notitie of dagelijkse notitie vereist Obsidian 1.7.2 of hoger."
+	},
+	"byDay": {
+		"message": "Dagen"
+	},
+	"byMonth": {
+		"message": "Maanden"
+	},
+	"byWeek": {
+		"message": "Weken"
 	},
 	"cancel": {
 		"message": "Annuleren"
@@ -103,6 +118,9 @@
 	"commandToggleHighlighter": {
 		"message": "Markeerder in-/uitschakelen"
 	},
+	"commandToggleReader": {
+		"message": "Schakel leesweergave in/uit"
+	},
 	"confirmDeleteTemplate": {
 		"message": "Weet je zeker dat je het sjabloon \"$1\" wilt verwijderen?"
 	},
@@ -147,6 +165,9 @@
 	},
 	"disableHighlighter": {
 		"message": "Markeerder uitschakelen"
+	},
+	"disableReader": {
+		"message": "Schakel leesweergave uit"
 	},
 	"done": {
 		"message": "Klaar"
@@ -205,6 +226,9 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"enableReader": {
+		"message": "Open leesweergave"
 	},
 	"error": {
 		"message": "Fout"
@@ -289,6 +313,15 @@
 	"failedToSaveProvider": {
 		"message": "Provider opslaan mislukt. Probeer het opnieuw."
 	},
+	"feedback": {
+		"message": "Feedback"
+	},
+	"feedbackDescription": {
+		"message": "Hoe kunnen we Web Clipper verbeteren? Bezoek alstublieft onze hulppagina, waar u bugs kunt melden, functies kunt voorstellen en hulp kunt krijgen bij veelvoorkomende problemen."
+	},
+	"feedbackTitle": {
+		"message": "Bedankt voor uw feedback"
+	},
 	"folder": {
 		"message": "Map"
 	},
@@ -318,6 +351,9 @@
 	},
 	"highlighterSettings": {
 		"message": "Markeerder"
+	},
+	"history": {
+		"message": "Geschiedenis"
 	},
 	"hotkeys": {
 		"message": "Sneltoetsen"
@@ -389,6 +425,9 @@
 	"languageDescription": {
 		"message": "Kies de weergavetaal voor de extensie-interface."
 	},
+	"last30Days": {
+		"message": "Laatste 30 dagen"
+	},
 	"lastUsed": {
 		"message": "Laatst gebruikt"
 	},
@@ -418,6 +457,9 @@
 	},
 	"models": {
 		"message": "Modellen"
+	},
+	"modelsListFor": {
+		"message": "Modellenlijst voor $1"
 	},
 	"more": {
 		"message": "Meer"
@@ -478,17 +520,32 @@
 	"orPasteBelow": {
 		"message": "Of plak inhoud hieronder"
 	},
+	"overwriteNote": {
+		"message": "Overschrijf notitie"
+	},
 	"pageCannotBeClipped": {
 		"message": "Deze pagina kan niet worden geknipt."
 	},
 	"pageVariables": {
 		"message": "Paginavariabelen"
 	},
+	"pagesSaved": {
+		"message": "pagina opgeslagen"
+	},
+	"pagesSavedPlural": {
+		"message": "pagina's opgeslagen"
+	},
 	"pasteJsonHere": {
 		"message": "Plak JSON hier"
 	},
 	"pleaseReload": {
 		"message": "Probeer de pagina opnieuw te laden."
+	},
+	"popularModels": {
+		"message": "Populaire modellen"
+	},
+	"popularModelsDescription": {
+		"message": "Kies uit veelgebruikte modellen of voer aangepaste modeldetails in."
 	},
 	"prependToDaily": {
 		"message": "Toevoegen aan dagelijkse notitie, bovenaan"
@@ -553,6 +610,15 @@
 	"providers": {
 		"message": "Providers"
 	},
+	"rateExtensionDescription": {
+		"message": "Geniet u van Web Clipper? Help ons door het een beoordeling te geven."
+	},
+	"reader": {
+		"message": "Lezer"
+	},
+	"recommended": {
+		"message": "aanbevolen"
+	},
 	"refresh": {
 		"message": "Vernieuwen"
 	},
@@ -591,6 +657,12 @@
 	},
 	"save": {
 		"message": "Opslaan"
+	},
+	"saveBehaviorDescription": {
+		"message": "Kies de standaardoptie voor het opslaan van pagina's. Alternatieve opties verschijnen in het dropdown-menu naast de hoofdknop."
+	},
+	"saveBehaviorLabel": {
+		"message": "Opslaggedrag"
 	},
 	"saveFile": {
 		"message": "Bestand opslaan..."

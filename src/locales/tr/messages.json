@@ -1,4 +1,7 @@
 {
+	"activity": {
+		"message": "Aktivite"
+	},
 	"addModel": {
 		"message": "+ Model ekle"
 	},
@@ -25,6 +28,9 @@
 	},
 	"allProperties": {
 		"message": "Tüm özellikler"
+	},
+	"allTime": {
+		"message": "Tüm zamanlar"
 	},
 	"alwaysShowHighlights": {
 		"message": "Vurguları her zaman göster"
@@ -55,6 +61,15 @@
 	},
 	"behaviorWarning": {
 		"message": "Mevcut nota veya günlük nota ekleme için Obsidian 1.7.2 veya daha yeni sürüm gereklidir."
+	},
+	"byDay": {
+		"message": "Günler"
+	},
+	"byMonth": {
+		"message": "Aylar"
+	},
+	"byWeek": {
+		"message": "Haftalar"
 	},
 	"cancel": {
 		"message": "İptal"
@@ -103,6 +118,9 @@
 	"commandToggleHighlighter": {
 		"message": "Vurgulayıcı modunu aç/kapat"
 	},
+	"commandToggleReader": {
+		"message": "Okuma görünümünü değiştir"
+	},
 	"confirmDeleteTemplate": {
 		"message": "\"$1\" şablonunu silmek istediğinizden emin misiniz?"
 	},
@@ -147,6 +165,9 @@
 	},
 	"disableHighlighter": {
 		"message": "Vurgulayıcıyı devre dışı bırak"
+	},
+	"disableReader": {
+		"message": "Okuma görünümünü devre dışı bırak"
 	},
 	"done": {
 		"message": "Tamam"
@@ -205,6 +226,9 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"enableReader": {
+		"message": "Okuma görünümünü aç"
 	},
 	"error": {
 		"message": "Hata"
@@ -289,6 +313,15 @@
 	"failedToSaveProvider": {
 		"message": "Sağlayıcı kaydedilemedi. Lütfen tekrar deneyin."
 	},
+	"feedback": {
+		"message": "Geri bildirim"
+	},
+	"feedbackDescription": {
+		"message": "Web Clipper'ı nasıl geliştirebiliriz? Lütfen yardım sayfamızı ziyaret edin, burada hataları bildirebilir, özellikler önerabilir ve yaygın sorunlarla ilgili yardım alabilirsiniz."
+	},
+	"feedbackTitle": {
+		"message": "Geri bildiriminiz için teşekkür ederiz"
+	},
 	"folder": {
 		"message": "Klasör"
 	},
@@ -318,6 +351,9 @@
 	},
 	"highlighterSettings": {
 		"message": "Vurgulayıcı"
+	},
+	"history": {
+		"message": "Geçmiş"
 	},
 	"hotkeys": {
 		"message": "Kısayol tuşları"
@@ -389,6 +425,9 @@
 	"languageDescription": {
 		"message": "Uzantı arayüzü için görüntüleme dilini seçin."
 	},
+	"last30Days": {
+		"message": "Son 30 gün"
+	},
 	"lastUsed": {
 		"message": "Son kullanılan"
 	},
@@ -418,6 +457,9 @@
 	},
 	"models": {
 		"message": "Modeller"
+	},
+	"modelsListFor": {
+		"message": "$1 için modeller listesi"
 	},
 	"more": {
 		"message": "Daha fazla"
@@ -478,17 +520,32 @@
 	"orPasteBelow": {
 		"message": "Veya aşağıya yapıştırın"
 	},
+	"overwriteNote": {
+		"message": "Notu üzerine yaz"
+	},
 	"pageCannotBeClipped": {
 		"message": "Bu sayfa kırpılamaz."
 	},
 	"pageVariables": {
 		"message": "Sayfa değişkenleri"
 	},
+	"pagesSaved": {
+		"message": "sayfa kaydedildi"
+	},
+	"pagesSavedPlural": {
+		"message": "sayfalar kaydedildi"
+	},
 	"pasteJsonHere": {
 		"message": "JSON'u buraya yapıştırın"
 	},
 	"pleaseReload": {
 		"message": "Lütfen sayfayı yeniden yüklemeyi deneyin."
+	},
+	"popularModels": {
+		"message": "Popüler modeller"
+	},
+	"popularModelsDescription": {
+		"message": "Sık kullanılan modellerden seçin veya özel model detaylarını girin."
 	},
 	"prependToDaily": {
 		"message": "Günlük nota, başa ekle"
@@ -553,6 +610,15 @@
 	"providers": {
 		"message": "Sağlayıcılar"
 	},
+	"rateExtensionDescription": {
+		"message": "Web Clipper'ı beğeniyor musunuz? Bize bir puan vererek yardımcı olun."
+	},
+	"reader": {
+		"message": "Okuyucu"
+	},
+	"recommended": {
+		"message": "önerilen"
+	},
 	"refresh": {
 		"message": "Yenile"
 	},
@@ -591,6 +657,12 @@
 	},
 	"save": {
 		"message": "Kaydet"
+	},
+	"saveBehaviorDescription": {
+		"message": "Sayfaları kaydetmek için varsayılan seçeneği belirleyin. Ana düğmenin yanındaki açılır menüde alternatif seçenekler görünür."
+	},
+	"saveBehaviorLabel": {
+		"message": "Kaydetme davranışı"
 	},
 	"saveFile": {
 		"message": "Dosyayı kaydet..."

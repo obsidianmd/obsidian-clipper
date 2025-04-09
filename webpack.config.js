@@ -5,6 +5,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const ZipPlugin = require('zip-webpack-plugin');
 const package = require('./package.json');
 const webpack = require('webpack');
+const TerserPlugin = require('terser-webpack-plugin');
 
 // Remove .DS_Store files
 function removeDSStore(dir) {
@@ -35,7 +36,7 @@ module.exports = (env, argv) => {
 	const outputDir = getOutputDir();
 	const browserName = isFirefox ? 'firefox' : (isSafari ? 'safari' : 'chrome');
 
-	return {
+	const mainConfig = {
 		mode: argv.mode,
 		entry: {
 			popup: './src/core/popup.ts',
@@ -44,6 +45,8 @@ module.exports = (env, argv) => {
 			background: './src/background.ts',
 			style: './src/style.scss',
 			highlighter: './src/highlighter.scss',
+			reader: './src/reader.scss',
+			'reader-script': './src/reader-script.ts'
 		},
 		output: {
 			path: path.resolve(__dirname, outputDir),
@@ -51,6 +54,39 @@ module.exports = (env, argv) => {
 			module: true,
 		},
 		devtool: isProduction ? false : 'source-map',
+		optimization: {
+			minimize: true,
+			minimizer: [
+				new TerserPlugin({
+					terserOptions: {
+						mangle: false,
+						compress: {
+							defaults: true,
+							global_defs: {
+								DEBUG_MODE: !isProduction
+							},
+							unused: true,
+							dead_code: true,
+							passes: 2,
+							ecma: 2020,
+							module: true
+						},
+						format: {
+							ascii_only: true,
+							comments: false,
+							ecma: 2020
+						},
+						module: true,
+						toplevel: true,
+						keep_classnames: true,
+						keep_fnames: true
+					},
+					extractComments: false
+				})
+			],
+			moduleIds: 'named',
+			chunkIds: 'named'
+		},
 		experiments: {
 			outputModule: true,
 		},
@@ -125,4 +161,6 @@ module.exports = (env, argv) => {
 			] : [])
 		]
 	};
+
+	return [mainConfig];
 };

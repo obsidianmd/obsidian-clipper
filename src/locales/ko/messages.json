@@ -1,4 +1,7 @@
 {
+	"activity": {
+		"message": "활동"
+	},
 	"addModel": {
 		"message": "+ 모델 추가"
 	},
@@ -25,6 +28,9 @@
 	},
 	"allProperties": {
 		"message": "모든 속성"
+	},
+	"allTime": {
+		"message": "전체 시간"
 	},
 	"alwaysShowHighlights": {
 		"message": "하이라이트 항상 표시"
@@ -55,6 +61,15 @@
 	},
 	"behaviorWarning": {
 		"message": "기존에 있는 노트나 데일리 노트에 추가하려면 Obsidian 1.7.2 이상이 필요합니다."
+	},
+	"byDay": {
+		"message": "일"
+	},
+	"byMonth": {
+		"message": "월"
+	},
+	"byWeek": {
+		"message": "주"
 	},
 	"cancel": {
 		"message": "취소"
@@ -103,6 +118,9 @@
 	"commandToggleHighlighter": {
 		"message": "하이라이터 모드 전환"
 	},
+	"commandToggleReader": {
+		"message": "독서 뷰 전환"
+	},
 	"confirmDeleteTemplate": {
 		"message": "템플릿을 삭제하시겠습니까? \"$1\"?"
 	},
@@ -147,6 +165,9 @@
 	},
 	"disableHighlighter": {
 		"message": "하이라이터 끄기"
+	},
+	"disableReader": {
+		"message": "독서 뷰 비활성화"
 	},
 	"done": {
 		"message": "완료"
@@ -205,6 +226,9 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"enableReader": {
+		"message": "독서 뷰 열기"
 	},
 	"error": {
 		"message": "에러"
@@ -289,6 +313,15 @@
 	"failedToSaveProvider": {
 		"message": "제공자 저장에 실패했습니다. 다시 시도해 주세요."
 	},
+	"feedback": {
+		"message": "피드백"
+	},
+	"feedbackDescription": {
+		"message": "웹 클리퍼를 어떻게 개선할 수 있을까요? 버그를 보고하고, 기능을 제안하고, 일반적인 문제를 해결하는 데 도움이 되는 도움말 페이지를 방문해 주세요."
+	},
+	"feedbackTitle": {
+		"message": "피드백 감사합니다"
+	},
 	"folder": {
 		"message": "Folder"
 	},
@@ -318,6 +351,9 @@
 	},
 	"highlighterSettings": {
 		"message": "하이라이터 설정"
+	},
+	"history": {
+		"message": "기록"
 	},
 	"hotkeys": {
 		"message": "단축키"
@@ -389,6 +425,9 @@
 	"languageDescription": {
 		"message": "확장 프로그램 인터페이스의 표시 언어를 선택하세요."
 	},
+	"last30Days": {
+		"message": "지난 30일"
+	},
 	"lastUsed": {
 		"message": "마지막으로 사용된 보관소"
 	},
@@ -418,6 +457,9 @@
 	},
 	"models": {
 		"message": "모델"
+	},
+	"modelsListFor": {
+		"message": "$1에 대한 모델 목록"
 	},
 	"more": {
 		"message": "더 보기"
@@ -478,17 +520,32 @@
 	"orPasteBelow": {
 		"message": "아래에 내용을 붙여넣으세요."
 	},
+	"overwriteNote": {
+		"message": "노트 덮어쓰기"
+	},
 	"pageCannotBeClipped": {
 		"message": "이 페이지는 클립할 수 없습니다."
 	},
 	"pageVariables": {
 		"message": "페이지 변수"
 	},
+	"pagesSaved": {
+		"message": "페이지 저장됨"
+	},
+	"pagesSavedPlural": {
+		"message": "페이지들이 저장됨"
+	},
 	"pasteJsonHere": {
 		"message": "여기에 JSON을 붙여넣으세요"
 	},
 	"pleaseReload": {
 		"message": "페이지를 다시 로드해 주세요."
+	},
+	"popularModels": {
+		"message": "인기 모델"
+	},
+	"popularModelsDescription": {
+		"message": "일반적으로 사용되는 모델 중에서 선택하거나 사용자 정의 모델 세부 정보를 입력하세요."
 	},
 	"prependToDaily": {
 		"message": "데일리 노트 맨 위에 추가"
@@ -553,6 +610,15 @@
 	"providers": {
 		"message": "제공자"
 	},
+	"rateExtensionDescription": {
+		"message": "웹 클리퍼를 즐기고 계신가요? 평가를 통해 우리를 도와주세요."
+	},
+	"reader": {
+		"message": "리더"
+	},
+	"recommended": {
+		"message": "추천"
+	},
 	"refresh": {
 		"message": "새로 고침"
 	},
@@ -591,6 +657,12 @@
 	},
 	"save": {
 		"message": "저장"
+	},
+	"saveBehaviorDescription": {
+		"message": "페이지 저장을 위한 기본 옵션을 선택하세요. 대체 옵션은 주 버튼 옆의 드롭다운 메뉴에 표시됩니다."
+	},
+	"saveBehaviorLabel": {
+		"message": "저장 동작"
 	},
 	"saveFile": {
 		"message": "파일 저장..."

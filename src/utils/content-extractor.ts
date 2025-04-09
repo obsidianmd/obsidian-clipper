@@ -1,8 +1,7 @@
 import { ExtractedContent } from '../types/types';
-import { ExtractorRegistry } from './extractor-registry';
 import { createMarkdownContent } from './markdown-converter';
-import { sanitizeFileName } from './string-utils';
-import { Readability } from '@mozilla/readability';
+import { sanitizeFileName, getDomain } from './string-utils';
+import Defuddle from 'defuddle';
 import browser from './browser-polyfill';
 import { debugLog } from './debug';
 import dayjs from 'dayjs';
@@ -40,16 +39,6 @@ function stripHtml(html: string): string {
 	return div.textContent || '';
 }
 
-export function extractReadabilityContent(doc: Document): ReturnType<Readability['parse']> | null {
-	try {
-		const reader = new Readability(doc, {keepClasses:true})
-		return reader.parse();
-	} catch (error) {
-		console.error('Error in extractReadabilityContent:', error);
-		return null;
-	}
-}
-
 interface ContentResponse {
 	content: string;
 	selectedHtml: string;
@@ -63,6 +52,7 @@ export async function extractPageContent(tabId: number): Promise<ContentResponse
 	try {
 		const response = await browser.tabs.sendMessage(tabId, { action: "getPageContent" }) as ContentResponse;
 		if (response && response.content) {
+
 			// Ensure highlights are of the correct type
 			if (response.highlights && Array.isArray(response.highlights)) {
 				response.highlights = response.highlights.map((highlight: string | AnyHighlightData) => {
@@ -92,24 +82,6 @@ export async function extractPageContent(tabId: number): Promise<ContentResponse
 	}
 }
 
-export function getTimeElement(doc: Document): string {
-	const selector = `time`;
-	const element = Array.from(doc.querySelectorAll(selector))[0];
-	return element ? (element.getAttribute("datetime")?.trim() ?? element.textContent?.trim() ?? "") : "";
-}
-
-export function getMetaContent(doc: Document, attr: string, value: string): string {
-	const selector = `meta[${attr}]`;
-	const element = Array.from(doc.querySelectorAll(selector))
-		.find(el => el.getAttribute(attr)?.toLowerCase() === value.toLowerCase());
-	return element ? element.getAttribute("content")?.trim() ?? "" : "";
-}
-
-// At the beginning of the file, add this interface
-interface ExtractorVariables {
-	[key: string]: string;
-}
-
 export async function initializePageContent(
 	content: string, 
 	selectedHtml: string, 
@@ -121,114 +93,20 @@ export async function initializePageContent(
 ) {
 	try {
 		const parser = new DOMParser();
-		const doc = parser.parseFromString(content, 'text/html');
+		const doc = parser.parseFromString(fullHtml, 'text/html');
+
 		currentUrl = currentUrl.replace(/#:~:text=[^&]+(&|$)/, '');
 
-		const extractor = ExtractorRegistry.findExtractor(doc, currentUrl, schemaOrgData);
-		let readabilityArticle = null;
-		let extractorVariables: ExtractorVariables = {};
-		
 		if (selectedHtml) {
 			content = selectedHtml;
-		} else if (extractor) {
-			debugLog('Content', 'Using custom extractor');
-			const extractedResult = extractor.extract();
-			content = extractedResult.contentHtml;
-			if (extractedResult.extractedContent) {
-				extractedContent = { ...extractedContent, ...extractedResult.extractedContent };
-			}
-			if (extractedResult.variables) {
-				extractorVariables = extractedResult.variables;
-			}
-		} else {
-			readabilityArticle = extractReadabilityContent(doc);
-			if (readabilityArticle && readabilityArticle.content) {
-				content = readabilityArticle.content;
-			} else {
-				content = doc.body.innerHTML || fullHtml;
-			}
 		}
 
-		// Define preset variables with fallbacks, using extractor variables first
-		const title =
-			extractorVariables['title'] ||
-			getMetaContent(doc, "property", "og:title") ||
-			getMetaContent(doc, "name", "twitter:title") ||
-			getSchemaProperty(schemaOrgData, 'headline') ||
-			getMetaContent(doc, "name", "title") ||
-			getMetaContent(doc, "name", "sailthru.title") ||
-			doc.querySelector('title')?.textContent?.trim() ||
-			'';
-
-		const noteName = sanitizeFileName(title);
-
-		const authorName =
-			extractorVariables['author'] ||
-			getMetaContent(doc, "name", "sailthru.author") ||
-			getSchemaProperty(schemaOrgData, 'author.name') ||
-			getMetaContent(doc, "property", "author") ||
-			getMetaContent(doc, "name", "byl") ||
-			getMetaContent(doc, "name", "author") ||
-			getMetaContent(doc, "name", "copyright") ||
-			getSchemaProperty(schemaOrgData, 'copyrightHolder.name') ||
-			getMetaContent(doc, "property", "og:site_name") ||
-			getSchemaProperty(schemaOrgData, 'publisher.name') ||
-			getMetaContent(doc, "property", "og:site_name") ||
-			getSchemaProperty(schemaOrgData, 'sourceOrganization.name') ||
-			getSchemaProperty(schemaOrgData, 'isPartOf.name') ||
-			getMetaContent(doc, "name", "twitter:creator") ||
-			getMetaContent(doc, "name", "application-name") ||
-			'';
-
-		const description =
-			extractorVariables['description'] ||
-			getMetaContent(doc, "name", "description") ||
-			getMetaContent(doc, "property", "description") ||
-			getMetaContent(doc, "property", "og:description") ||
-			getSchemaProperty(schemaOrgData, 'description') ||
-			getMetaContent(doc, "name", "twitter:description") ||
-			getMetaContent(doc, "name", "sailthru.description") ||
-			'';
-
-		const domain = new URL(currentUrl).hostname.replace(/^www\./, '');
-
-		const image =
-			extractorVariables['image'] ||
-			getMetaContent(doc, "property", "og:image") ||
-			getMetaContent(doc, "name", "twitter:image") ||
-			getSchemaProperty(schemaOrgData, 'image.url') ||
-			getMetaContent(doc, "name", "sailthru.image.full") ||
-			'';
-
-		const published =
-			extractorVariables['published'] ||
-			getSchemaProperty(schemaOrgData, 'datePublished') ||
-			getMetaContent(doc, "property", "article:published_time") ||
-			getTimeElement(doc) ||
-			getMetaContent(doc, "name", "sailthru.date") ||
-			'';
-
-		const site =
-			extractorVariables['site'] ||
-			getSchemaProperty(schemaOrgData, 'publisher.name') ||
-			getMetaContent(doc, "property", "og:site_name") ||
-			getSchemaProperty(schemaOrgData, 'sourceOrganization.name') ||
-			getMetaContent(doc, "name", "copyright") ||
-			getSchemaProperty(schemaOrgData, 'copyrightHolder.name') ||
-			getSchemaProperty(schemaOrgData, 'isPartOf.name') ||
-			getMetaContent(doc, "name", "application-name") ||
-			'';
-
-		const favicon =
-			extractorVariables['favicon'] ||
-			getMetaContent(doc, "property", "og:image:favicon") ||
-			doc.querySelector("link[rel='icon']")?.getAttribute("href") ||
-			doc.querySelector("link[rel='shortcut icon']")?.getAttribute("href") ||
-			new URL("/favicon.ico", currentUrl).href;
+		const defuddled = new Defuddle(doc).parse();
+		const noteName = sanitizeFileName(defuddled.title);
 
 		// Process highlights after getting the base content
 		if (generalSettings.highlighterEnabled && generalSettings.highlightBehavior !== 'no-highlights' && highlights && highlights.length > 0) {
-			content = processHighlights(content, highlights, readabilityArticle);
+			content = processHighlights(content, highlights);
 		}
 
 		const markdownBody = createMarkdownContent(content, currentUrl);
@@ -252,34 +130,28 @@ export async function initializePageContent(
 		});
 
 		const currentVariables: { [key: string]: string } = {
-			'{{author}}': authorName.trim(),
+			'{{author}}': defuddled.author.trim(),
 			'{{content}}': markdownBody.trim(),
 			'{{contentHtml}}': content.trim(),
 			'{{date}}': dayjs().format('YYYY-MM-DDTHH:mm:ssZ').trim(),
 			'{{time}}': dayjs().format('YYYY-MM-DDTHH:mm:ssZ').trim(),
-			'{{description}}': description.trim(),
-			'{{domain}}': domain.trim(),
-			'{{favicon}}': favicon.trim(),
+			'{{description}}': defuddled.description.trim(),
+			'{{domain}}': getDomain(currentUrl),
+			'{{favicon}}': defuddled.favicon,
 			'{{fullHtml}}': fullHtml.trim(),
-			'{{image}}': image.trim(),
-			'{{noteName}}': noteName.trim(),
-			'{{published}}': published.split(',')[0].trim(),
-			'{{site}}': site.trim(),
-			'{{title}}': title.trim(),
-			'{{url}}': currentUrl.trim(),
 			'{{highlights}}': highlights.length > 0 ? JSON.stringify(highlightsData) : '',
+			'{{image}}': defuddled.image,
+			'{{noteName}}': noteName.trim(),
+			'{{published}}': defuddled.published.split(',')[0].trim(),
+			'{{site}}': defuddled.site.trim(),
+			'{{title}}': defuddled.title.trim(),
+			'{{url}}': currentUrl.trim(),
+			'{{words}}': defuddled.wordCount.toString(),
 		};
 
 		// Add extracted content to variables
 		Object.entries(extractedContent).forEach(([key, value]) => {
 			currentVariables[`{{${key}}}`] = value;
-		});
-
-		// Update the forEach to handle types properly
-		Object.entries(extractorVariables).forEach(([key, value]: [string, string]) => {
-			if (!currentVariables[`{{${key}}}`]) {
-				currentVariables[`{{${key}}}`] = value.trim();
-			}
 		});
 
 		// Add all meta tags to variables
@@ -356,101 +228,7 @@ function addSchemaOrgDataToVariables(schemaData: any, variables: { [key: string]
 	}
 }
 
-function getSchemaProperty(schemaOrgData: any, property: string, defaultValue: string = ''): string {
-	if (!schemaOrgData) return defaultValue;
-
-	const memoKey = JSON.stringify(schemaOrgData) + property;
-	if (getSchemaProperty.memoized.has(memoKey)) {
-		return getSchemaProperty.memoized.get(memoKey) as string;
-	}
-
-	const searchSchema = (data: any, props: string[], fullPath: string, isExactMatch: boolean = true): string[] => {
-		if (typeof data === 'string') {
-			return props.length === 0 ? [data] : [];
-		}
-		
-		if (!data || typeof data !== 'object') {
-			return [];
-		}
-
-		if (Array.isArray(data)) {
-
-			const currentProp = props[0];
-			if (/^\[\d+\]$/.test(currentProp)) {
-				const index = parseInt(currentProp.slice(1, -1));
-				if (data[index]) {
-					return searchSchema(data[index], props.slice(1), fullPath, isExactMatch);
-				}
-				return [];
-			}
-			
-			if (props.length === 0 && data.every(item => typeof item === 'string' || typeof item === 'number')) {
-				return data.map(String);
-			}
-			
-			// Collect all matches from array items
-			const results = data.flatMap(item => 
-				searchSchema(item, props, fullPath, isExactMatch)
-			);
-			return results;
-		}
-
-		const [currentProp, ...remainingProps] = props;
-		
-		if (!currentProp) {
-			if (typeof data === 'string') return [data];
-			if (typeof data === 'object' && data.name) {
-				return [data.name];
-			}
-			return [];
-		}
-
-		// Check for exact path match first
-		if (data.hasOwnProperty(currentProp)) {
-			return searchSchema(data[currentProp], remainingProps, 
-				fullPath ? `${fullPath}.${currentProp}` : currentProp, true);
-		}
-
-		// Only search nested objects if we're allowing non-exact matches
-		if (!isExactMatch) {
-			const nestedResults: string[] = [];
-			for (const key in data) {
-				if (typeof data[key] === 'object') {
-					const results = searchSchema(data[key], props, 
-						fullPath ? `${fullPath}.${key}` : key, false);
-					nestedResults.push(...results);
-				}
-			}
-			if (nestedResults.length > 0) {
-				return nestedResults;
-			}
-		}
-
-		return [];
-	};
-
-	try {
-		// First try exact match
-		let results = searchSchema(schemaOrgData, property.split('.'), '', true);
-		
-		// If no exact match found, try recursive search
-		if (results.length === 0) {
-			results = searchSchema(schemaOrgData, property.split('.'), '', false);
-		}
-		
-		const result = results.length > 0 ? results.filter(Boolean).join(', ') : defaultValue;
-		
-		getSchemaProperty.memoized.set(memoKey, result);
-		return result;
-	} catch (error) {
-		console.error(`Error in getSchemaProperty for ${property}:`, error);
-		return defaultValue;
-	}
-}
-
-getSchemaProperty.memoized = new Map<string, string>();
-
-function processHighlights(content: string, highlights: AnyHighlightData[], readabilityArticle: ReturnType<Readability['parse']> | null): string {
+function processHighlights(content: string, highlights: AnyHighlightData[]): string {
 	// First check if highlighter is enabled and we have highlights
 	if (!generalSettings.highlighterEnabled || !highlights?.length) {
 		return content;
@@ -466,12 +244,10 @@ function processHighlights(content: string, highlights: AnyHighlightData[], read
 	}
 
 	if (generalSettings.highlightBehavior === 'highlight-inline') {
-		// Use readability content if available, otherwise fall back to original content
-		const processedContent = readabilityArticle?.content || content;
-		debugLog('Highlights', 'Using content length:', processedContent.length);
+		debugLog('Highlights', 'Using content length:', content.length);
 
 		const tempDiv = document.createElement('div');
-		tempDiv.innerHTML = processedContent;
+		tempDiv.innerHTML = content;
 
 		const textHighlights = filterAndSortHighlights(highlights);
 		debugLog('Highlights', 'Processing highlights:', textHighlights.length);

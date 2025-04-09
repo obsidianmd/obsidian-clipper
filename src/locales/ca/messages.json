@@ -1,0 +1,803 @@
+{
+	"activity": {
+		"message": "Activitat"
+	},
+	"addModel": {
+		"message": "+ Agregar model"
+	},
+	"addModelTitle": {
+		"message": "Agregar model"
+	},
+	"addProperty": {
+		"message": "+ Agregar propietat"
+	},
+	"addProvider": {
+		"message": "+ Agregar proveïdor"
+	},
+	"addProviderTitle": {
+		"message": "Agregar proveïdor"
+	},
+	"addToObsidian": {
+		"message": "Agregar a Obsidian"
+	},
+	"addVaultPlaceholder": {
+		"message": "Pressiona retorn per afegir una cambra cuirassada"
+	},
+	"advanced": {
+		"message": "Avançat"
+	},
+	"allProperties": {
+		"message": "Totes les propietats"
+	},
+	"allTime": {
+		"message": "Tot el temps"
+	},
+	"alwaysShowHighlights": {
+		"message": "Mostrar sempre els ressaltats"
+	},
+	"alwaysShowHighlightsDescription": {
+		"message": "Mostra els teus ressaltats guardats quan carregues una pàgina. Desactiva per mostrar els ressaltats només quan el mode ressaltador està activat."
+	},
+	"apiKeyMissing": {
+		"message": "Sense clau API"
+	},
+	"apiKeysWarning": {
+		"message": "En usar un proveïdor extern, accepta els seus termes i política de privacitat. Les sol·licituds de l'intèrpret s'envien directament al proveïdor que esculli. Obsidian no recopila ni emmagatzema cap dada sobre les seves sol·licituds."
+	},
+	"appendToDaily": {
+		"message": "Agregar a la nota diària, al final"
+	},
+	"appendToExisting": {
+		"message": "Agregar a una nota existent, al final"
+	},
+	"autoRunInterpreter": {
+		"message": "Executar automàticament"
+	},
+	"autoRunInterpreterDescription": {
+		"message": "Executi les variables de prompt immediatament si la plantilla en conté alguna. Això consumirà crèdits d'API amb el teu proveïdor de model. Desactivi-ho si només vol executar l'intèrpret manualment."
+	},
+	"behavior": {
+		"message": "Comportament"
+	},
+	"behaviorWarning": {
+		"message": "Agregar a una nota existent o nota diària requereix Obsidian 1.7.2 o posterior."
+	},
+	"byDay": {
+		"message": "Dies"
+	},
+	"byMonth": {
+		"message": "Mesos"
+	},
+	"byWeek": {
+		"message": "Setmanes"
+	},
+	"cancel": {
+		"message": "Cancel·lar"
+	},
+	"cannotDeleteProvider": {
+		"message": "No es pot eliminar el proveïdor \"$1\" perquè s'utilitza per $2 model(s)."
+	},
+	"changelog": {
+		"message": "Registre de canvis"
+	},
+	"chooseFile": {
+		"message": "Escollir un fitxer"
+	},
+	"choosePropertiesFile": {
+		"message": "Escollir fitxer de propietats"
+	},
+	"chooseSettingsFile": {
+		"message": "Escollir fitxer de configuració"
+	},
+	"chooseTemplateFile": {
+		"message": "Escollir fitxer de plantilla"
+	},
+	"clipBehavior": {
+		"message": "Comportament de guardat"
+	},
+	"clipBehaviorDescription": {
+		"message": "Escull com es guarda el contingut ressaltat a Obsidian. Defineix la variable $strong_start${{content}}$strong_end$.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"close": {
+		"message": "Tancar"
+	},
+	"commandOpenClipper": {
+		"message": "Obrir Obsidian Clipper"
+	},
+	"commandQuickClip": {
+		"message": "Guardat ràpid"
+	},
+	"commandToggleHighlighter": {
+		"message": "Alternar el mode de ressaltat"
+	},
+	"commandToggleReader": {
+		"message": "Commuta la vista de lectura"
+	},
+	"confirmDeleteTemplate": {
+		"message": "N'està segur, de voler eliminar la plantilla \"$1\"?"
+	},
+	"confirmReplaceSettings": {
+		"message": "Això reemplaçarà totes les seves configuracions actuals, incloses plantilles i propietats. N'està segur, de voler continuar?"
+	},
+	"copied": {
+		"message": "Copiat!"
+	},
+	"copyAsJson": {
+		"message": "Copiar com a JSON"
+	},
+	"copyToClipboard": {
+		"message": "Copiar al porta-retalls"
+	},
+	"createNewNote": {
+		"message": "Crear nova nota"
+	},
+	"custom": {
+		"message": "Personalitzat"
+	},
+	"dailyNoteFormat": {
+		"message": "Format de nota diària (ex., YYYY-MM-DD)"
+	},
+	"defaultInterpreterContext": {
+		"message": "Context predeterminat de l'intèrpret"
+	},
+	"defaultInterpreterContextDescription": {
+		"message": "El model usarà aquest context per interpretar les variables de prompt. Aquí, es poden fer servir variables."
+	},
+	"defaultTemplateName": {
+		"message": "Predeterminat"
+	},
+	"delete": {
+		"message": "Eliminar"
+	},
+	"deleteModelConfirm": {
+		"message": "N'està segur, de voler eliminar aquest model?"
+	},
+	"deleteProviderConfirm": {
+		"message": "N'està segur de voler eliminar aquest proveïdor?"
+	},
+	"disableHighlighter": {
+		"message": "Desactivar ressaltador"
+	},
+	"disableReader": {
+		"message": "Deshabilita la vista de lectura"
+	},
+	"done": {
+		"message": "fet"
+	},
+	"dragAndDropFile": {
+		"message": "Arrossegui i deixi anar el fitxer aquí"
+	},
+	"duplicate": {
+		"message": "Duplicar"
+	},
+	"earlyAccessDescription": {
+		"message": "Utilitzar funcions que requereixen la darrera versió de $link_start$accés anticipat$link_end$ d'Obsidian. Actualment, requereix Obsidian 1.7.2 o posterior.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/Obsidian/Early+access+versions\" target=\"_blank\">"
+			}
+		}
+	},
+	"earlyAccessFeatures": {
+		"message": "Funcions d'accés anticipat"
+	},
+	"editModel": {
+		"message": "Editar model"
+	},
+	"editProvider": {
+		"message": "Editar proveïdor"
+	},
+	"editTemplate": {
+		"message": "Editar plantilla"
+	},
+	"enableHighlighter": {
+		"message": "Activar ressaltador"
+	},
+	"enableHighlighterDescription": {
+		"message": "Ressalti contingut en pàgines web que pot guardar a Obsidian."
+	},
+	"enableInterpreter": {
+		"message": "Habilitar intèrpret"
+	},
+	"enableInterpreterDescription": {
+		"message": "Usi llenguatge natural per extraure dades de les pàgines. Per exemple, pot usar la sintaxi de plantilla $strong_start${{\"un resum de la pàgina\"}}$strong_end$. Requereix una clau API o model personalitzat configurat a sota. $link_start$Més informació$link_end$",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/interpreter\" target=\"_blank\">"
+			},
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"enableReader": {
+		"message": "Obre la vista de lectura"
+	},
+	"error": {
+		"message": "Error"
+	},
+	"export": {
+		"message": "Exportar"
+	},
+	"exportAllSettings": {
+		"message": "Exportar tota la configuració"
+	},
+	"exportAllSettingsDescription": {
+		"message": "Exportar tota la configuració incloent plantilles i propietats."
+	},
+	"exportHighlights": {
+		"message": "Exportar ressaltats"
+	},
+	"exportHighlightsDescription": {
+		"message": "Exporti els seus ressaltats a un fitxer."
+	},
+	"exportProperties": {
+		"message": "Exportar propietats"
+	},
+	"exportPropertiesDescription": {
+		"message": "Guardar les propietats de Web Clipper en un fitxer $strong_start$types.json$strong_end$ que pot ser importat a la cambra cuirassada d'Obsidian o a Web Clipper en altres dispositius.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"extensionDescription": {
+		"message": "Guardar contingut web en un format privat i durador al qual pot accedir sense connexió. L'extensió oficial per a Obsidian."
+	},
+	"extensionName": {
+		"message": "Obsidian Web Clipper"
+	},
+	"failedToCopyText": {
+		"message": "Error en copiar el text"
+	},
+	"failedToDeleteTemplate": {
+		"message": "Error en eliminar la plantilla. Si us plau, torni-ho a intentar."
+	},
+	"failedToDuplicateTemplate": {
+		"message": "Error en duplicar la plantilla. Si us plau, torni-ho a intentar."
+	},
+	"failedToExportHighlights": {
+		"message": "Error en exportar els ressaltats. Si us plau, consulti la consola per obtenir més detalls."
+	},
+	"failedToExportSettings": {
+		"message": "Error en exportar les configuracions. Si us plau, consulti la consola per obtenir més detalls."
+	},
+	"failedToExtractContent": {
+		"message": "No s'ha pogut extraure el contingut de la pàgina."
+	},
+	"failedToImportTemplate": {
+		"message": "Error en importar la plantilla. Si us plau, revisi el fitxer i torni-ho a intentar."
+	},
+	"failedToInitialize": {
+		"message": "Si us plau, intenti recarregar l'extensió."
+	},
+	"failedToInitializeContent": {
+		"message": "No es pot inicialitzar el contingut de la pàgina."
+	},
+	"failedToProcessInterpreter": {
+		"message": "Ha fallat el processament de l’intèrpret. Si us plau, torni-ho a intentar."
+	},
+	"failedToResetProviders": {
+		"message": "Error en restablir els proveïdors i els models"
+	},
+	"failedToResetTemplate": {
+		"message": "No s’ha pogut restablir la plantilla predeterminada. Si us plau, torni-ho a intentar."
+	},
+	"failedToSave": {
+		"message": "Error en guardar el fitxer"
+	},
+	"failedToSaveFile": {
+		"message": "Error en guardar el fitxer"
+	},
+	"failedToSaveProvider": {
+		"message": "Error en guardar el proveïdor. Si us plau, torni-ho a intentar."
+	},
+	"feedback": {
+		"message": "Comentaris"
+	},
+	"feedbackDescription": {
+		"message": "Com podem millorar Web Clipper? Si us plau, visita la nostra pàgina d'ajuda, on pots informar de bugs, suggerir funcionalitats i obtenir ajuda amb problemes comuns."
+	},
+	"feedbackTitle": {
+		"message": "Gràcies pels teus comentaris"
+	},
+	"folder": {
+		"message": "Carpeta"
+	},
+	"general": {
+		"message": "General"
+	},
+	"generalSettings": {
+		"message": "Configuració general"
+	},
+	"getApiKeyHere": {
+		"message": "Obtingui la seva clau API de $1 aquí."
+	},
+	"help": {
+		"message": "Ajuda"
+	},
+	"helpDescription": {
+		"message": "Aprengui a usar Web Clipper i obtingui ajuda per resoldre problemes."
+	},
+	"highlightInline": {
+		"message": "Ressaltar el contingut de la pàgina"
+	},
+	"highlightPage": {
+		"message": "Ressaltar pàgina"
+	},
+	"highlighter": {
+		"message": "Ressaltador"
+	},
+	"highlighterSettings": {
+		"message": "Configuració del ressaltador"
+	},
+	"history": {
+		"message": "Històric"
+	},
+	"hotkeys": {
+		"message": "Dreceres de teclat"
+	},
+	"import": {
+		"message": "Importar"
+	},
+	"importAllSettings": {
+		"message": "Importar tota la configuració"
+	},
+	"importAllSettingsDescription": {
+		"message": "Importar tota la configuració, incloses les plantilles i les propietats. Això substituirà la seva configuració actual."
+	},
+	"importFailed": {
+		"message": "La importació ha fallat. Consulti la consola per obtenir més detalls."
+	},
+	"importModalTitle": {
+		"message": "Importar"
+	},
+	"importProperties": {
+		"message": "Importar propietats"
+	},
+	"importPropertiesDescription": {
+		"message": "Per importar les seves propietats d’Obsidian, localitzi el fitxer $strong_1_start$types.json$strong_1_end$ a la carpeta $strong_2_start$.obsidian$strong_2_end$ dins de la seva cambra cuirassada. Tingui en compte que aquesta carpeta està oculta per defecte a la majoria dels sistemes operatius.",
+		"placeholders": {
+			"strong_1_end": {
+				"content": "</strong>"
+			},
+			"strong_1_start": {
+				"content": "<strong>"
+			},
+			"strong_2_end": {
+				"content": "</strong>"
+			},
+			"strong_2_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"importSettings": {
+		"message": "Importar configuracions"
+	},
+	"importTemplate": {
+		"message": "Importar plantilla"
+	},
+	"interpret": {
+		"message": "interpretar"
+	},
+	"interpreter": {
+		"message": "Intèrpret"
+	},
+	"interpreterContext": {
+		"message": "Context de l'intèrpret"
+	},
+	"interpreterContextDescription": {
+		"message": "El context utilitzat per interpretar variables de prompt. Anul·la el context predeterminat definit a $link_start$Configuració de l'intèrpret$link_end$. Aquí, es poden usar variables.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=interpreter\">"
+			}
+		}
+	},
+	"language": {
+		"message": "Idioma"
+	},
+	"languageDescription": {
+		"message": "Esculli l'idioma de la interfície de l'extensió."
+	},
+	"last30Days": {
+		"message": "Últims 30 dies"
+	},
+	"lastUsed": {
+		"message": "Últim usat"
+	},
+	"legacyMode": {
+		"message": "Mode heretat"
+	},
+	"legacyModeDescription": {
+		"message": "Utilitzi el mètode de retall d'URI compatible amb Obsidian 1.6.7 o anterior. Tingui en compte que la longitud del contingut que pot guardar està limitada pel seu navegador i el seu sistema operatiu. Algunes pàgines poden fallar sense mostrar errors."
+	},
+	"modelName": {
+		"message": "Nom del model"
+	},
+	"modelNameDescription": {
+		"message": "El nom del model que desitgi mostrar a la interfície."
+	},
+	"modelProvider": {
+		"message": "Proveïdor"
+	},
+	"modelProviderDescription": {
+		"message": "Seleccioni el proveïdor d'aquest model."
+	},
+	"modelProviderPlaceholder": {
+		"message": "Proveïdor"
+	},
+	"modelRequiredFields": {
+		"message": "El nom del model, el proveïdor i l'ID del model són obligatoris."
+	},
+	"models": {
+		"message": "Models"
+	},
+	"modelsListFor": {
+		"message": "Llista de models per a $1"
+	},
+	"more": {
+		"message": "Més"
+	},
+	"newTemplate": {
+		"message": "Nova plantilla"
+	},
+	"noHighlights": {
+		"message": "No fer res"
+	},
+	"noTemplates": {
+		"message": "No hi ha plantilles disponibles. Si us plau, afegeixi una plantilla a la configuració."
+	},
+	"noUnusedProperties": {
+		"message": "No s’han trobat propietats no utilitzades."
+	},
+	"noteContent": {
+		"message": "Contingut de la nota"
+	},
+	"noteContentDescription": {
+		"message": "Personalitzi el contingut de la nota. Faci servir variables per emplenar prèviament les dades de la pàgina."
+	},
+	"noteLocation": {
+		"message": "Ubicació de la nota"
+	},
+	"noteLocationDescription": {
+		"message": "La carpeta o el camí de la nota."
+	},
+	"noteName": {
+		"message": "Nom de la nota"
+	},
+	"noteNameFormat": {
+		"message": "Format del nom de la nota"
+	},
+	"noteNameFormatDescription": {
+		"message": "Format per al nombre del fitxer de la nota. Pot usar variables com {{title}}, {{date}} i {{published}} per emplenar prèviament dades de la pàgina. $link_start$Més informació$link_end$.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/variables\" target=\"_blank\">"
+			}
+		}
+	},
+	"notesAboutPage": {
+		"message": "Notes sobre aquesta pàgina..."
+	},
+	"onlyHttpSupported": {
+		"message": "Aquesta pàgina no es pot guardar. Només s'admeten URL HTTP i HTTPS."
+	},
+	"open": {
+		"message": "Obrir"
+	},
+	"optional": {
+		"message": "(opcional)"
+	},
+	"orPasteBelow": {
+		"message": "O enganxi el contingut a continuació"
+	},
+	"overwriteNote": {
+		"message": "Sobreescriu la nota"
+	},
+	"pageCannotBeClipped": {
+		"message": "Aquesta pàgina no es pot guardar."
+	},
+	"pageVariables": {
+		"message": "Variables de pàgina"
+	},
+	"pagesSaved": {
+		"message": "pàgina desada"
+	},
+	"pagesSavedPlural": {
+		"message": "pàgines desades"
+	},
+	"pasteJsonHere": {
+		"message": "Enganxi el JSON aquí"
+	},
+	"pleaseReload": {
+		"message": "Si us plau, intenti recarregar la pàgina."
+	},
+	"popularModels": {
+		"message": "Models populars"
+	},
+	"popularModelsDescription": {
+		"message": "Trieu entre els models més utilitzats o introduïu els detalls del model personalitzat."
+	},
+	"prependToDaily": {
+		"message": "Agregar a la nota diària, al principi"
+	},
+	"prependToExisting": {
+		"message": "Agregar a una nota existent, al principi"
+	},
+	"processing": {
+		"message": "processant"
+	},
+	"properties": {
+		"message": "Propietats"
+	},
+	"propertiesSettings": {
+		"message": "Propietats"
+	},
+	"propertyName": {
+		"message": "Nom de la propietat"
+	},
+	"propertyValue": {
+		"message": "Valor de la propietat"
+	},
+	"provider": {
+		"message": "Proveïdor"
+	},
+	"providerApiKey": {
+		"message": "Clau d'API"
+	},
+	"providerApiKeyDescription": {
+		"message": "La seva clau d'API per a aquest proveïdor."
+	},
+	"providerBaseUrl": {
+		"message": "URL base"
+	},
+	"providerBaseUrlDescription": {
+		"message": "L'URL del punt final de l'API per a aquest proveïdor."
+	},
+	"providerModelId": {
+		"message": "ID del model"
+	},
+	"providerModelIdDescription": {
+		"message": "L'identificador del model del seu proveïdor. Normalment, un nom curt sense espais."
+	},
+	"providerModelIdPlaceholder": {
+		"message": "ID del model"
+	},
+	"providerName": {
+		"message": "Nom del proveïdor."
+	},
+	"providerNameDescription": {
+		"message": "Nom a mostrar d'aquest proveidor."
+	},
+	"providerPreset": {
+		"message": "Preestablert"
+	},
+	"providerPresetDescription": {
+		"message": "Triï un proveïdor o creï'n un de personalitzat."
+	},
+	"providerRequiredFields": {
+		"message": "El nom del proveïdor i l'URL base són obligatoris."
+	},
+	"providers": {
+		"message": "Proveïdors"
+	},
+	"rateExtensionDescription": {
+		"message": "T'està agradant Web Clipper? Ajuda'ns donant-li una valoració."
+	},
+	"reader": {
+		"message": "Lector"
+	},
+	"recommended": {
+		"message": "recomanat"
+	},
+	"refresh": {
+		"message": "Actualitzar"
+	},
+	"remove": {
+		"message": "Eliminar"
+	},
+	"removeProperty": {
+		"message": "Eliminar propietat"
+	},
+	"removeUnusedProperties": {
+		"message": "Eliminar les propietats no utilitzades"
+	},
+	"removeUnusedPropertiesDescription": {
+		"message": "Eliminar totes les propietats que no s'usen a cap plantilla."
+	},
+	"removeVault": {
+		"message": "Eliminar la cambra cuirassada"
+	},
+	"replaceContent": {
+		"message": "Reemplaçar el contingut de la pàgina"
+	},
+	"reset": {
+		"message": "Restablir"
+	},
+	"resetDefaultTemplate": {
+		"message": "Restablir la plantilla predeterminada"
+	},
+	"resetDefaultTemplateDescription": {
+		"message": "Eliminar qualsevol canvi que hagi fet a la plantilla predeterminada."
+	},
+	"resetProvidersAndModels": {
+		"message": "Restablir els models predeterminats"
+	},
+	"resetProvidersAndModelsDescription": {
+		"message": "Restablir els proveïdors i models a la configuració predeterminada."
+	},
+	"save": {
+		"message": "Guardar"
+	},
+	"saveBehaviorDescription": {
+		"message": "Trieu l'opció per defecte per guardar pàgines. Les opcions alternatives apareixen al menú desplegable al costat del botó principal."
+	},
+	"saveBehaviorLabel": {
+		"message": "Comportament de guardar"
+	},
+	"saveFile": {
+		"message": "Guardar fitxer..."
+	},
+	"searchVariables": {
+		"message": "Buscar variables..."
+	},
+	"selectProvider": {
+		"message": "Seleccionar un proveïdor"
+	},
+	"selectTemplateToExport": {
+		"message": "Si us plau, seleccioni una plantilla per exportar."
+	},
+	"settings": {
+		"message": "Configuració"
+	},
+	"settingsHeading": {
+		"message": "Configuració"
+	},
+	"settingsImportSuccess": {
+		"message": "Tota la configuració s’ha importat correctament. Si us plau, actualitzi la pàgina per veure els canvis."
+	},
+	"share": {
+		"message": "Compartir..."
+	},
+	"shortcutInstructionsBrave": {
+		"message": "Per canviar les assignacions de tecles, vagi a $1"
+	},
+	"shortcutInstructionsChrome": {
+		"message": "Per canviar les assignacions de tecles, vagi a $1"
+	},
+	"shortcutInstructionsDefault": {
+		"message": "Per canviar les assignacions de tecles, consulti la configuració d'extensions del seu navegador."
+	},
+	"shortcutInstructionsEdge": {
+		"message": "Per canviar les assignacions de tecles, vagi a $1"
+	},
+	"shortcutInstructionsFirefox": {
+		"message": "Per canviar les assignacions de tecles, vagi a $1, faci clic a la icona d'engranatge i seleccioni \"Gestionar dreceres d'extensió\"."
+	},
+	"shortcutInstructionsIntro": {
+		"message": "Les dreceres de teclat li donen accés ràpid a les funcions del clipper."
+	},
+	"shortcutInstructionsSafari": {
+		"message": "Les dreceres de teclat no són personalitzables a Safari."
+	},
+	"shortcutNotSet": {
+		"message": "No establert"
+	},
+	"showActionsButton": {
+		"message": "Mostrar el botó d'accions"
+	},
+	"showActionsDescription": {
+		"message": "Permet inspeccionar les variables de pàgina des del menú del clipper. Útil per veure les variables disponibles per a usar a les plantilles."
+	},
+	"showPageVariables": {
+		"message": "Mostrar variables de pàgina"
+	},
+	"silentOpen": {
+		"message": "Guardar nota sense obrir-la"
+	},
+	"silentOpenDescription": {
+		"message": "Les notes retallades es guardaran, però no s'obriran en una nova pestanya. Obsidian encara es posarà en primer pla."
+	},
+	"specificNoteName": {
+		"message": "Nom específic de la nota"
+	},
+	"systemDefault": {
+		"message": "Sistema"
+	},
+	"templateCopied": {
+		"message": "El JSON de la plantilla s'ha copiat al porta-retalls"
+	},
+	"templateCopyError": {
+		"message": "Error en copiar el JSON de la plantilla al porta-retalls"
+	},
+	"templateName": {
+		"message": "Nom de la plantilla"
+	},
+	"templateProperties": {
+		"message": "Propietats"
+	},
+	"templatePropertiesDescription": {
+		"message": "Propietats para agregar a la part superior de la nota guardada. Usi variables per emplenar prèviament dades de la pàgina."
+	},
+	"templateTriggers": {
+		"message": "Activadors de plantilla"
+	},
+	"templateTriggersDescription": {
+		"message": "Defineixi regles per seleccionar automàticament aquesta plantilla si coincideix amb un patró d'URL o conté dades de schema.org. Una regla per línia."
+	},
+	"templatesHeading": {
+		"message": "Plantilles"
+	},
+	"thinking": {
+		"message": "pensant"
+	},
+	"unknownProvider": {
+		"message": "Proveïdor desconegut"
+	},
+	"updateAvailable": {
+		"message": "Hi ha una actualització disponible."
+	},
+	"usingLatestVersion": {
+		"message": "Està usant la darrera versió."
+	},
+	"vault": {
+		"message": "Cambra cuirassada"
+	},
+	"vaultDescription": {
+		"message": "Seleccioni la cambra cuirassada predeterminada per a aquesta plantilla. Vagi a $link_start$configuració general$link_end$ per agregar o eliminar cambres cuirassades.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=general\">"
+			}
+		}
+	},
+	"vaults": {
+		"message": "Cambres cuirassades"
+	},
+	"vaultsDescription": {
+		"message": "Per defecte, les notes es guarden a la cambra cuirassada oberta actualment. Pot afegir cambres cuirassades aquí si vol l'opció de guardar a diferents cambres cuirassades. Els noms de les cambres cuirassades han de coincidir exactament amb el nom de la cambra cuirassada d'Obsidian. Pressioni $strong_start$enter$strong_end$ per afegir una cambra cuirassada.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"version": {
+		"message": "Versió"
+	}
+}

@@ -1,4 +1,7 @@
 {
+	"activity": {
+		"message": "アクティビティ"
+	},
 	"addModel": {
 		"message": "+ モデルを追加"
 	},
@@ -25,6 +28,9 @@
 	},
 	"allProperties": {
 		"message": "すべてのプロパティ"
+	},
+	"allTime": {
+		"message": "全期間"
 	},
 	"alwaysShowHighlights": {
 		"message": "常にハイライトを表示"
@@ -55,6 +61,15 @@
 	},
 	"behaviorWarning": {
 		"message": "既存のノートやデイリーノートへの追加にはObsidian 1.7.2以降が必要です。"
+	},
+	"byDay": {
+		"message": "日別"
+	},
+	"byMonth": {
+		"message": "月別"
+	},
+	"byWeek": {
+		"message": "週別"
 	},
 	"cancel": {
 		"message": "キャンセル"
@@ -103,6 +118,9 @@
 	"commandToggleHighlighter": {
 		"message": "ハイライトモードの切り替え"
 	},
+	"commandToggleReader": {
+		"message": "閲覧ビューを切り替える"
+	},
 	"confirmDeleteTemplate": {
 		"message": "テンプレート「$1」を削除してもよろしいですか？"
 	},
@@ -147,6 +165,9 @@
 	},
 	"disableHighlighter": {
 		"message": "ハイライトを無効化"
+	},
+	"disableReader": {
+		"message": "閲覧ビューを無効にする"
 	},
 	"done": {
 		"message": "完了"
@@ -205,6 +226,9 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"enableReader": {
+		"message": "閲覧ビューを開く"
 	},
 	"error": {
 		"message": "エラー"
@@ -289,6 +313,15 @@
 	"failedToSaveProvider": {
 		"message": "\"プロバイダーの保存に失敗しました。もう一度お試しください。\""
 	},
+	"feedback": {
+		"message": "フィードバック"
+	},
+	"feedbackDescription": {
+		"message": "Web Clipperをどのように改善できるでしょうか？バグを報告したり、機能を提案したり、一般的な問題に対するヘルプを得るために、ヘルプページをご覧ください。"
+	},
+	"feedbackTitle": {
+		"message": "フィードバックありがとうございます"
+	},
 	"folder": {
 		"message": "フォルダ"
 	},
@@ -318,6 +351,9 @@
 	},
 	"highlighterSettings": {
 		"message": "ハイライト"
+	},
+	"history": {
+		"message": "履歴"
 	},
 	"hotkeys": {
 		"message": "ホットキー"
@@ -389,6 +425,9 @@
 	"languageDescription": {
 		"message": "拡張機能のインターフェース表示言語を選択します。"
 	},
+	"last30Days": {
+		"message": "過去30日間"
+	},
 	"lastUsed": {
 		"message": "最後に使用"
 	},
@@ -418,6 +457,9 @@
 	},
 	"models": {
 		"message": "モデル"
+	},
+	"modelsListFor": {
+		"message": "$1のモデルリスト"
 	},
 	"more": {
 		"message": "その他"
@@ -478,17 +520,32 @@
 	"orPasteBelow": {
 		"message": "または以下に内容を貼り付けてください"
 	},
+	"overwriteNote": {
+		"message": "ノートを上書きする"
+	},
 	"pageCannotBeClipped": {
 		"message": "このページはクリップできません。"
 	},
 	"pageVariables": {
 		"message": "ページ変数"
 	},
+	"pagesSaved": {
+		"message": "ページが保存されました"
+	},
+	"pagesSavedPlural": {
+		"message": "ページが保存されました"
+	},
 	"pasteJsonHere": {
 		"message": "ここにJSONを貼り付けてください"
 	},
 	"pleaseReload": {
 		"message": "ページの再読み込みをお試しください。"
+	},
+	"popularModels": {
+		"message": "人気のモデル"
+	},
+	"popularModelsDescription": {
+		"message": "よく使用されるモデルから選択するか、カスタムモデルの詳細を入力してください。"
 	},
 	"prependToDaily": {
 		"message": "デイリーノートの先頭に追加"
@@ -553,6 +610,15 @@
 	"providers": {
 		"message": "プロバイダー"
 	},
+	"rateExtensionDescription": {
+		"message": "Web Clipperを楽しんでいますか？評価をつけることで私たちを支えてください。"
+	},
+	"reader": {
+		"message": "リーダー"
+	},
+	"recommended": {
+		"message": "推奨"
+	},
 	"refresh": {
 		"message": "更新"
 	},
@@ -591,6 +657,12 @@
 	},
 	"save": {
 		"message": "保存"
+	},
+	"saveBehaviorDescription": {
+		"message": "ページを保存するためのデフォルトオプションを選択します。他のオプションはメインボタンの隣のドロップダウンメニューに表示されます。"
+	},
+	"saveBehaviorLabel": {
+		"message": "保存の動作"
 	},
 	"saveFile": {
 		"message": "ファイルを保存..."

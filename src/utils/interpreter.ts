@@ -7,6 +7,7 @@ import { adjustNoteNameHeight } from './ui-utils';
 import { debugLog } from './debug';
 import { getMessage } from './i18n';
 import { updateTokenCount } from './token-counter';
+import { PRESET_PROVIDERS, PresetProvider } from '../managers/interpreter-settings';
 
 const RATE_LIMIT_RESET_TIME = 60000; // 1 minute in milliseconds
 let lastRequestTime = 0;
@@ -23,8 +24,13 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 		throw new Error(`Provider not found for model ${model.name}`);
 	}
 
-	// Get API key from provider
-	if (!provider.apiKey) {
+	// Find matching preset provider to check if API key is required
+	const presetProvider = Object.values(PRESET_PROVIDERS).find(
+		(preset: PresetProvider) => preset.name === provider.name
+	);
+
+	// Only check for API key if the provider requires it
+	if (presetProvider?.apiKeyRequired && !provider.apiKey) {
 		throw new Error(`API key is not set for provider ${provider.name}`);
 	}
 
@@ -101,6 +107,26 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 				'anthropic-version': '2023-06-01',
 				'anthropic-dangerous-direct-browser-access': 'true'
 			};
+		} else if (provider.name.toLowerCase().includes('perplexity')) {
+			requestUrl = provider.baseUrl;
+			requestBody = {
+				model: model.providerModelId,
+				max_tokens: 1600,
+				messages: [
+					{ role: 'system', content: systemContent },
+					{ role: 'user', content: `
+						"${promptContext}"
+						"${JSON.stringify(promptContent)}"`
+					}
+				],
+				temperature: 0.3
+			};
+			headers = {
+				...headers,
+				'HTTP-Referer': 'https://obsidian.md/',
+				'X-Title': 'Obsidian Web Clipper',
+				'Authorization': `Bearer ${provider.apiKey}`
+			};
 		} else if (provider.name.toLowerCase().includes('ollama')) {
 			requestUrl = provider.baseUrl;
 			requestBody = {
@@ -111,6 +137,7 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 					{ role: 'user', content: `${JSON.stringify(promptContent)}` }
 				],
 				format: 'json',
+				num_ctx: 120000,
 				temperature: 0.5,
 				stream: false
 			};
@@ -128,8 +155,8 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 			};
 			headers = {
 				...headers,
-				"HTTP-Referer": 'https://obsidian.md/',
-				"X-Title": 'Obsidian Web Clipper',
+				'HTTP-Referer': 'https://obsidian.md/',
+				'X-Title': 'Obsidian Web Clipper',
 				'Authorization': `Bearer ${provider.apiKey}`
 			};
 		}
@@ -145,6 +172,15 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 		if (!response.ok) {
 			const errorText = await response.text();
 			console.error(`${provider.name} error response:`, errorText);
+			
+			// Add specific message for Ollama 403 errors
+			if (provider.name.toLowerCase().includes('ollama') && response.status === 403) {
+				throw new Error(
+					`Ollama cannot process requests originating from a browser extension without setting OLLAMA_ORIGINS. ` +
+					`See instructions at https://help.obsidian.md/web-clipper/interpreter`
+				);
+			}
+			
 			throw new Error(`${provider.name} error: ${response.statusText} ${errorText}`);
 		}
 
@@ -219,25 +255,29 @@ function parseLLMResponse(responseContent: string, promptVariables: PromptVariab
 
 		// Helper function to sanitize JSON string
 		const sanitizeJsonString = (str: string) => {
-			// First, escape all quotes that are part of the content
-			let result = str.replace(/(?<!\\)"/g, '\\"');
+			// First, normalize all newlines to \n
+			let result = str.replace(/\r\n/g, '\n');
+			
+			// Escape newlines properly
+			result = result.replace(/\n/g, '\\n');
+			
+			// Escape quotes that are part of the content
+			result = result.replace(/(?<!\\)"/g, '\\"');
 			
 			// Then unescape the quotes that are JSON structural elements
-			// This regex matches quotes that are preceded by {, [, :, or comma
-			result = result.replace(/(?<=[{[,:]\s*)\\"/g, '"');
-			// This regex matches quotes that are followed by }, ], :, or comma
-			result = result.replace(/\\"(?=\s*[}\],:}])/g, '"');
+			result = result.replace(/(?<=[{[,:]\s*)\\"/g, '"')
+				.replace(/\\"(?=\s*[}\],:}])/g, '"');
 			
 			return result
 				// Replace curly quotes
 				.replace(/[""]/g, '\\"')
 				// Remove any bad control characters
-				.replace(/[\u0000-\u001F\u007F-\u009F]/g, '')
+				.replace(/[\u0000-\u0008\u000B-\u001F\u007F-\u009F]/g, '')
 				// Remove any whitespace between quotes and colons
 				.replace(/"\s*:/g, '":')
 				.replace(/:\s*"/g, ':"')
 				// Fix any triple or more backslashes
-				.replace(/\\{3,}/g, '\\');
+				.replace(/\\{3,}/g, '\\\\');
 		};
 
 		// First try to parse the content directly
@@ -255,7 +295,9 @@ function parseLLMResponse(responseContent: string, promptVariables: PromptVariab
 			// Try parsing with minimal sanitization first
 			try {
 				const minimalSanitized = jsonMatch[0]
-					.replace(/[""]/g, '"');
+					.replace(/[""]/g, '"')
+					.replace(/\r\n/g, '\\n')
+					.replace(/\n/g, '\\n');
 				parsedResponse = JSON.parse(minimalSanitized);
 			} catch (minimalError) {
 				// If minimal sanitization fails, try full sanitization
@@ -266,16 +308,23 @@ function parseLLMResponse(responseContent: string, promptVariables: PromptVariab
 					parsedResponse = JSON.parse(sanitizedMatch);
 				} catch (fullError) {
 					// Last resort: try to manually rebuild the JSON structure
-					const contentMatch = jsonMatch[0].match(/"prompt_1":\s*"([^]*?)(?:"}|"\s*})/);
-					if (!contentMatch) {
-						throw new Error('Could not extract prompt content');
-					}
+					const prompts_responses: { [key: string]: string } = {};
 					
-					const content = contentMatch[1]
-						.replace(/\\/g, '\\\\')
-						.replace(/"/g, '\\"');
-					
-					const rebuiltJson = `{"prompts_responses":{"prompt_1":"${content}"}}`;
+					// Extract each prompt response separately
+					promptVariables.forEach((variable, index) => {
+						const promptKey = `prompt_${index + 1}`;
+						const promptRegex = new RegExp(`"${promptKey}"\\s*:\\s*"([^]*?)(?:"\\s*,|"\\s*})`, 'g');
+						const match = promptRegex.exec(jsonMatch[0]);
+						if (match) {
+							let content = match[1]
+								.replace(/"/g, '\\"')
+								.replace(/\r\n/g, '\\n')
+								.replace(/\n/g, '\\n');
+							prompts_responses[promptKey] = content;
+						}
+					});
+
+					const rebuiltJson = JSON.stringify({ prompts_responses });
 					debugLog('Interpreter', 'Rebuilt JSON:', rebuiltJson);
 					parsedResponse = JSON.parse(rebuiltJson);
 				}
@@ -491,7 +540,12 @@ export async function handleInterpreterUI(
 			throw new Error(`Provider not found for model ${modelConfig.name}`);
 		}
 
-		if (!provider.apiKey) {
+		// Find matching preset provider to check if API key is required
+		const presetProvider = Object.values(PRESET_PROVIDERS).find(
+			(preset: PresetProvider) => preset.name === provider.name
+		);
+
+		if (presetProvider?.apiKeyRequired && !provider.apiKey) {
 			throw new Error(`No API key is set for ${provider.name}. Please set an API key in the extension settings.`);
 		}
 
@@ -536,7 +590,7 @@ export async function handleInterpreterUI(
 		responseTimer.textContent = formatDuration(totalTime);
 
 		// Update button state
-		interpretBtn.textContent = getMessage('done');
+		interpretBtn.textContent = getMessage('done').toLowerCase();
 		interpretBtn.classList.remove('processing');
 		interpretBtn.classList.add('done');
 		interpretBtn.disabled = true;

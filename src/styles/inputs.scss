@@ -119,3 +119,55 @@ input[type=checkbox] {
 		background-color: var(--text-normal);
 	}
 }
+
+.radio-container {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	margin-top: 8px;
+}
+
+.radio-option {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+
+	input { 
+		margin: 0;
+	}
+
+	label {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		cursor: pointer;
+		font-weight: 400;
+		margin: 0;
+		font-size: var(--font-ui-smaller);
+	}
+}
+
+.star-rating {
+	display: flex;
+	gap: 0px;
+	
+	.star {
+		color: var(--background-modifier-border);
+		cursor: pointer;
+		font-size: 24px;
+		user-select: none;
+		
+		&:hover,
+		&.is-active {
+			color: var(--star-color);
+		}
+		
+		&:hover ~ .star {
+			color: var(--background-modifier-border);
+		}
+	}
+	
+	&:hover .star {
+		color: var(--star-color);
+	}
+}

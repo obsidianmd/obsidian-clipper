@@ -1,4 +1,7 @@
 {
+	"activity": {
+		"message": "Attività"
+	},
 	"addModel": {
 		"message": "+ Aggiungi modello"
 	},
@@ -25,6 +28,9 @@
 	},
 	"allProperties": {
 		"message": "Tutte le proprietà"
+	},
+	"allTime": {
+		"message": "Sempre"
 	},
 	"alwaysShowHighlights": {
 		"message": "Mostra sempre gli evidenziatori"
@@ -55,6 +61,15 @@
 	},
 	"behaviorWarning": {
 		"message": "Aggiungere a una nota esistente o a una nota giornaliera richiede Obsidian 1.7.2 o successivo."
+	},
+	"byDay": {
+		"message": "Giorni"
+	},
+	"byMonth": {
+		"message": "Mesi"
+	},
+	"byWeek": {
+		"message": "Settimane"
 	},
 	"cancel": {
 		"message": "Annulla"
@@ -103,6 +118,9 @@
 	"commandToggleHighlighter": {
 		"message": "Attiva/disattiva modalità evidenziatore"
 	},
+	"commandToggleReader": {
+		"message": "Attiva/disattiva vista di lettura"
+	},
 	"confirmDeleteTemplate": {
 		"message": "Sei sicuro di voler eliminare il modello \"$1\"?"
 	},
@@ -147,6 +165,9 @@
 	},
 	"disableHighlighter": {
 		"message": "Disabilita evidenziatore"
+	},
+	"disableReader": {
+		"message": "Disattiva vista di lettura"
 	},
 	"done": {
 		"message": "Fatto"
@@ -205,6 +226,9 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"enableReader": {
+		"message": "Apri vista di lettura"
 	},
 	"error": {
 		"message": "Errore"
@@ -289,6 +313,15 @@
 	"failedToSaveProvider": {
 		"message": "Impossibile salvare il fornitore. Per favore, riprova."
 	},
+	"feedback": {
+		"message": "Feedback"
+	},
+	"feedbackDescription": {
+		"message": "Come possiamo migliorare Web Clipper? Si prega di visitare la nostra pagina di aiuto, dove è possibile segnalare bug, suggerire funzionalità e ottenere aiuto con problemi comuni."
+	},
+	"feedbackTitle": {
+		"message": "Grazie per il tuo feedback"
+	},
 	"folder": {
 		"message": "Cartella"
 	},
@@ -318,6 +351,9 @@
 	},
 	"highlighterSettings": {
 		"message": "Evidenziatore"
+	},
+	"history": {
+		"message": "Cronologia"
 	},
 	"hotkeys": {
 		"message": "Tasti di scelta rapida"
@@ -389,6 +425,9 @@
 	"languageDescription": {
 		"message": "Scegli la lingua di visualizzazione per l'interfaccia dell'estensione."
 	},
+	"last30Days": {
+		"message": "Ultimi 30 giorni"
+	},
 	"lastUsed": {
 		"message": "Ultimo utilizzato"
 	},
@@ -418,6 +457,9 @@
 	},
 	"models": {
 		"message": "Modelli"
+	},
+	"modelsListFor": {
+		"message": "Elenco dei modelli per $1"
 	},
 	"more": {
 		"message": "Più"
@@ -478,17 +520,32 @@
 	"orPasteBelow": {
 		"message": "O incolla il contenuto qui sotto"
 	},
+	"overwriteNote": {
+		"message": "Sovrascrivi nota"
+	},
 	"pageCannotBeClipped": {
 		"message": "Questa pagina non può essere ritagliata."
 	},
 	"pageVariables": {
 		"message": "Variabili della pagina"
 	},
+	"pagesSaved": {
+		"message": "pagina salvata"
+	},
+	"pagesSavedPlural": {
+		"message": "pagine salvate"
+	},
 	"pasteJsonHere": {
 		"message": "Incolla JSON qui"
 	},
 	"pleaseReload": {
 		"message": "Prova a ricaricare la pagina."
+	},
+	"popularModels": {
+		"message": "Modelli popolari"
+	},
+	"popularModelsDescription": {
+		"message": "Scegli tra i modelli comunemente utilizzati o inserisci i dettagli del modello personalizzato."
 	},
 	"prependToDaily": {
 		"message": "Aggiungi alla nota giornaliera, in cima"
@@ -553,6 +610,15 @@
 	"providers": {
 		"message": "Fornitori"
 	},
+	"rateExtensionDescription": {
+		"message": "Ti piace Web Clipper? Aiutaci dandogli una valutazione."
+	},
+	"reader": {
+		"message": "Lettore"
+	},
+	"recommended": {
+		"message": "raccomandato"
+	},
 	"refresh": {
 		"message": "Aggiorna"
 	},
@@ -591,6 +657,12 @@
 	},
 	"save": {
 		"message": "Salva"
+	},
+	"saveBehaviorDescription": {
+		"message": "Scegli l'opzione predefinita per salvare le pagine. Le opzioni alternative appaiono nel menu a discesa accanto al pulsante principale."
+	},
+	"saveBehaviorLabel": {
+		"message": "Comportamento di salvataggio"
 	},
 	"saveFile": {
 		"message": "Salva file..."

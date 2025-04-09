@@ -1,4 +1,7 @@
 {
+	"activity": {
+		"message": "गतिविधि"
+	},
 	"addModel": {
 		"message": "+ Model jodein"
 	},
@@ -25,6 +28,9 @@
 	},
 	"allProperties": {
 		"message": "Sabhi properties"
+	},
+	"allTime": {
+		"message": "सभी समय"
 	},
 	"alwaysShowHighlights": {
 		"message": "Hamesha highlights dikhayein"
@@ -55,6 +61,15 @@
 	},
 	"behaviorWarning": {
 		"message": "Maujuda note ya daily note mein jodne ke liye Obsidian 1.7.2 ya usse naya version chahiye."
+	},
+	"byDay": {
+		"message": "दिनों"
+	},
+	"byMonth": {
+		"message": "महीनों"
+	},
+	"byWeek": {
+		"message": "सप्ताहों"
 	},
 	"cancel": {
 		"message": "Cancel"
@@ -103,6 +118,9 @@
 	"commandToggleHighlighter": {
 		"message": "Highlighter mode toggle karein"
 	},
+	"commandToggleReader": {
+		"message": "पठन दृश्य टॉगल करें"
+	},
 	"confirmDeleteTemplate": {
 		"message": "Kya aap template \"$1\" ko hatana chahte hain?"
 	},
@@ -147,6 +165,9 @@
 	},
 	"disableHighlighter": {
 		"message": "Highlighter band karein"
+	},
+	"disableReader": {
+		"message": "पठन दृश्य अक्षम करें"
 	},
 	"done": {
 		"message": "Ho gaya"
@@ -205,6 +226,9 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"enableReader": {
+		"message": "पठन दृश्य खोलें"
 	},
 	"error": {
 		"message": "Error"
@@ -289,6 +313,15 @@
 	"failedToSaveProvider": {
 		"message": "Provider save karne mein fail. Kripya dobara koshish karein."
 	},
+	"feedback": {
+		"message": "प्रतिक्रिया"
+	},
+	"feedbackDescription": {
+		"message": "हम वेब क्लिपर को कैसे सुधार सकते हैं? कृपया हमारे सहायता पृष्ठ पर जाएं, जहां आप बग्स की रिपोर्ट कर सकते हैं, सुविधाओं का सुझाव दे सकते हैं, और सामान्य समस्याओं की सहायता प्राप्त कर सकते हैं।"
+	},
+	"feedbackTitle": {
+		"message": "आपकी प्रतिक्रिया के लिए धन्यवाद"
+	},
 	"folder": {
 		"message": "Folder"
 	},
@@ -318,6 +351,9 @@
 	},
 	"highlighterSettings": {
 		"message": "Highlighter"
+	},
+	"history": {
+		"message": "इतिहास"
 	},
 	"hotkeys": {
 		"message": "Hotkeys"
@@ -389,6 +425,9 @@
 	"languageDescription": {
 		"message": "Extension interface ke liye display language chunein."
 	},
+	"last30Days": {
+		"message": "अंतिम 30 दिन"
+	},
 	"lastUsed": {
 		"message": "Last used"
 	},
@@ -418,6 +457,9 @@
 	},
 	"models": {
 		"message": "Models"
+	},
+	"modelsListFor": {
+		"message": "$1 के लिए मॉडल सूची"
 	},
 	"more": {
 		"message": "More"
@@ -478,17 +520,32 @@
 	"orPasteBelow": {
 		"message": "Ya niche paste karein"
 	},
+	"overwriteNote": {
+		"message": "नोट को अधिलेखित करें"
+	},
 	"pageCannotBeClipped": {
 		"message": "Is page ko clip nahi kiya ja sakta."
 	},
 	"pageVariables": {
 		"message": "Page variables"
 	},
+	"pagesSaved": {
+		"message": "पृष्ठ सहेजा गया"
+	},
+	"pagesSavedPlural": {
+		"message": "पृष्ठ सहेजे गए"
+	},
 	"pasteJsonHere": {
 		"message": "JSON yahan paste karein"
 	},
 	"pleaseReload": {
 		"message": "Kripya page reload karne ki koshish karein."
+	},
+	"popularModels": {
+		"message": "लोकप्रिय मॉडल"
+	},
+	"popularModelsDescription": {
+		"message": "सामान्य रूप से प्रयुक्त मॉडलों में से चुनें या कस्टम मॉडल विवरण दर्ज करें।"
 	},
 	"prependToDaily": {
 		"message": "Daily note mein, shuruat mein add karein"
@@ -553,6 +610,15 @@
 	"providers": {
 		"message": "Providers"
 	},
+	"rateExtensionDescription": {
+		"message": "क्या आप वेब क्लिपर का आनंद ले रहे हैं? हमारी मदद करें इसे रेटिंग देकर।"
+	},
+	"reader": {
+		"message": "पाठक"
+	},
+	"recommended": {
+		"message": "सिफारिश की गई"
+	},
 	"refresh": {
 		"message": "Refresh"
 	},
@@ -591,6 +657,12 @@
 	},
 	"save": {
 		"message": "Save"
+	},
+	"saveBehaviorDescription": {
+		"message": "पेज सहेजने के लिए डिफ़ॉल्ट विकल्प चुनें। वैकल्पिक विकल्प मुख्य बटन के बगल में ड्रॉपडाउन मेनू में दिखाई देते हैं।"
+	},
+	"saveBehaviorLabel": {
+		"message": "सहेजने का व्यवहार"
 	},
 	"saveFile": {
 		"message": "File save karein..."

@@ -46,7 +46,7 @@ export function sanitizeFileName(fileName: string): string {
 	sanitized = sanitized
 		.replace(/^\.+/, '') // Remove leading periods
 		.trim()
-		.slice(0, 250); // Trim to 250 characters, leaving room to append ' 1.md'
+		.slice(0, 245); // Trim to 245 characters, leaving room to append ' 1.md'
 
 	// Ensure the file name is not empty
 	if (sanitized.length === 0) {
@@ -151,5 +151,32 @@ export function formatDuration(ms: number): string {
 		return `${Math.round(ms)}ms`;
 	} else {
 		return `${(ms / 1000).toFixed(2)}s`;
+	}
+}
+
+export function getDomain(url: string): string {
+	try {
+		const urlObj = new URL(url);
+		const hostname = urlObj.hostname;
+
+		// Handle local development URLs
+		if (hostname === 'localhost' || hostname === '127.0.0.1' || hostname.match(/^(\d{1,3}\.){3}\d{1,3}$/)) {
+			return hostname;
+		}
+
+		const hostParts = hostname.split('.');
+		
+		// Handle special cases like co.uk, com.au, etc.
+		if (hostParts.length > 2) {
+			const lastTwo = hostParts.slice(-2).join('.');
+			if (lastTwo.match(/^(co|com|org|net|edu|gov|mil)\.[a-z]{2}$/)) {
+				return hostParts.slice(-3).join('.');
+			}
+		}
+		
+		return hostParts.slice(-2).join('.');
+	} catch (error) {
+		console.warn('Invalid URL:', url);
+		return '';
 	}
 }

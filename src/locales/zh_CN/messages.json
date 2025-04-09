@@ -1,4 +1,7 @@
 {
+	"activity": {
+		"message": "活动"
+	},
 	"addModel": {
 		"message": "+ 添加模型"
 	},
@@ -25,6 +28,9 @@
 	},
 	"allProperties": {
 		"message": "所有属性"
+	},
+	"allTime": {
+		"message": "全部时间"
 	},
 	"alwaysShowHighlights": {
 		"message": "始终显示高亮"
@@ -55,6 +61,15 @@
 	},
 	"behaviorWarning": {
 		"message": "添加到现有笔记或日记需要 Obsidian 1.7.2 或更高版本。"
+	},
+	"byDay": {
+		"message": "天"
+	},
+	"byMonth": {
+		"message": "月"
+	},
+	"byWeek": {
+		"message": "周"
 	},
 	"cancel": {
 		"message": "取消"
@@ -103,6 +118,9 @@
 	"commandToggleHighlighter": {
 		"message": "切换高亮模式"
 	},
+	"commandToggleReader": {
+		"message": "切换阅读视图"
+	},
 	"confirmDeleteTemplate": {
 		"message": "确定要删除模板「$1」吗？"
 	},
@@ -147,6 +165,9 @@
 	},
 	"disableHighlighter": {
 		"message": "禁用高亮"
+	},
+	"disableReader": {
+		"message": "禁用阅读视图"
 	},
 	"done": {
 		"message": "完成"
@@ -205,6 +226,9 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"enableReader": {
+		"message": "打开阅读视图"
 	},
 	"error": {
 		"message": "错误"
@@ -289,6 +313,15 @@
 	"failedToSaveProvider": {
 		"message": "无法保存提供商。请再试一次。"
 	},
+	"feedback": {
+		"message": "反馈"
+	},
+	"feedbackDescription": {
+		"message": "我们如何改进Web Clipper？请访问我们的帮助页面，您可以在那里报告错误，建议功能，并获得常见问题的帮助。"
+	},
+	"feedbackTitle": {
+		"message": "感谢您的反馈"
+	},
 	"folder": {
 		"message": "文件夹"
 	},
@@ -318,6 +351,9 @@
 	},
 	"highlighterSettings": {
 		"message": "高亮"
+	},
+	"history": {
+		"message": "历史"
 	},
 	"hotkeys": {
 		"message": "快捷键"
@@ -389,6 +425,9 @@
 	"languageDescription": {
 		"message": "选择扩展界面的显示语言。"
 	},
+	"last30Days": {
+		"message": "过去30天"
+	},
 	"lastUsed": {
 		"message": "最近使用"
 	},
@@ -418,6 +457,9 @@
 	},
 	"models": {
 		"message": "模型"
+	},
+	"modelsListFor": {
+		"message": "$1的模型列表"
 	},
 	"more": {
 		"message": "更多"
@@ -478,17 +520,32 @@
 	"orPasteBelow": {
 		"message": "或在下面粘贴内容"
 	},
+	"overwriteNote": {
+		"message": "覆盖笔记"
+	},
 	"pageCannotBeClipped": {
 		"message": "无法剪藏此页面。"
 	},
 	"pageVariables": {
 		"message": "页面变量"
 	},
+	"pagesSaved": {
+		"message": "页面已保存"
+	},
+	"pagesSavedPlural": {
+		"message": "页面已保存"
+	},
 	"pasteJsonHere": {
 		"message": "在此处粘贴 JSON"
 	},
 	"pleaseReload": {
 		"message": "请尝试重新加载页面。"
+	},
+	"popularModels": {
+		"message": "热门模型"
+	},
+	"popularModelsDescription": {
+		"message": "从常用模型中选择，或输入自定义模型详细信息。"
 	},
 	"prependToDaily": {
 		"message": "添加到日记开头"
@@ -553,6 +610,15 @@
 	"providers": {
 		"message": "提供商"
 	},
+	"rateExtensionDescription": {
+		"message": "您喜欢使用Web Clipper吗？请帮助我们给它评分。"
+	},
+	"reader": {
+		"message": "阅读器"
+	},
+	"recommended": {
+		"message": "推荐"
+	},
 	"refresh": {
 		"message": "刷新"
 	},
@@ -591,6 +657,12 @@
 	},
 	"save": {
 		"message": "保存"
+	},
+	"saveBehaviorDescription": {
+		"message": "选择保存页面的默认选项。其他选项将出现在主按钮旁边的下拉菜单中。"
+	},
+	"saveBehaviorLabel": {
+		"message": "保存行为"
 	},
 	"saveFile": {
 		"message": "保存文件..."

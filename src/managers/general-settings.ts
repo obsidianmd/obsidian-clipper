@@ -2,7 +2,7 @@ import { handleDragStart, handleDragOver, handleDrop, handleDragEnd } from '../u
 import { initializeIcons } from '../icons/icons';
 import { getCommands } from '../utils/hotkeys';
 import { initializeToggles, updateToggleState, initializeSettingToggle } from '../utils/ui-utils';
-import { generalSettings, loadSettings, saveSettings } from '../utils/storage-utils';
+import { generalSettings, loadSettings, saveSettings, setLocalStorage, getLocalStorage } from '../utils/storage-utils';
 import { detectBrowser } from '../utils/browser-detection';
 import { createElementWithClass, createElementWithHTML } from '../utils/dom-utils';
 import { createDefaultTemplate, getTemplates, saveTemplateSettings } from '../managers/template-manager';
@@ -13,6 +13,20 @@ import { exportHighlights } from './highlights-manager';
 import { getMessage, setupLanguageAndDirection } from '../utils/i18n';
 import { debounce } from '../utils/debounce';
 import browser from '../utils/browser-polyfill';
+import { createUsageChart, aggregateUsageData } from '../utils/charts';
+import { getClipHistory } from '../utils/storage-utils';
+import dayjs from 'dayjs';
+import weekOfYear from 'dayjs/plugin/weekOfYear';
+import { showModal, hideModal } from '../utils/modal-utils';
+
+dayjs.extend(weekOfYear);
+
+const STORE_URLS = {
+	chrome: 'https://chromewebstore.google.com/detail/obsidian-web-clipper/cnjifjpddelmedmihgijeibhnjfabmlf',
+	firefox: 'https://addons.mozilla.org/en-US/firefox/addon/web-clipper-obsidian/',
+	safari: 'https://apps.apple.com/us/app/obsidian-web-clipper/id6720708363',
+	edge: 'https://microsoftedge.microsoft.com/addons/detail/obsidian-web-clipper/eigdjhmgnaaeaonimdklocfekkaanfme'
+};
 
 export function updateVaultList(): void {
 	const vaultList = document.getElementById('vault-list') as HTMLUListElement;
@@ -130,6 +144,42 @@ export function initializeGeneralSettings(): void {
 		// Add version check initialization
 		await initializeVersionDisplay();
 
+		// Get clip history and ratings
+		const history = await getClipHistory();
+		const totalClips = history.length;
+		const existingRatings = await getLocalStorage('ratings') || [];
+
+		// Show rating section only total clips >= 20 and no previous ratings
+		const rateExtensionSection = document.getElementById('rate-extension');
+		if (rateExtensionSection && totalClips >= 20 && existingRatings.length === 0) {
+			rateExtensionSection.classList.remove('is-hidden');
+		}
+
+		if (totalClips >= 20 && existingRatings.length === 0) {
+			const starRating = document.querySelector('.star-rating');
+			if (starRating) {
+				const stars = starRating.querySelectorAll('.star');
+				stars.forEach(star => {
+					star.addEventListener('click', async () => {
+						const rating = parseInt(star.getAttribute('data-rating') || '0');
+						stars.forEach(s => {
+							if (parseInt(s.getAttribute('data-rating') || '0') <= rating) {
+								s.classList.add('is-active');
+							} else {
+								s.classList.remove('is-active');
+							}
+						});
+						await handleRating(rating);
+						
+						// Hide the rating section after rating
+						if (rateExtensionSection) {
+							rateExtensionSection.style.display = 'none';
+						}
+					});
+				});
+			}
+		}
+
 		updateVaultList();
 		initializeShowMoreActionsToggle();
 		initializeBetaFeaturesToggle();
@@ -144,6 +194,15 @@ export function initializeGeneralSettings(): void {
 		initializeExportImportAllSettingsButtons();
 		initializeHighlighterSettings();
 		initializeExportHighlightsButton();
+		initializeSaveBehaviorDropdown();
+		await initializeUsageChart();
+
+		// Initialize feedback modal close button
+		const feedbackModal = document.getElementById('feedback-modal');
+		const feedbackCloseBtn = feedbackModal?.querySelector('.feedback-close-btn');
+		if (feedbackCloseBtn) {
+			feedbackCloseBtn.addEventListener('click', () => hideModal(feedbackModal));
+		}
 	});
 }
 
@@ -258,6 +317,17 @@ function initializeResetDefaultTemplateButton(): void {
 	}
 }
 
+function initializeSaveBehaviorDropdown(): void {
+    const dropdown = document.getElementById('save-behavior-dropdown') as HTMLSelectElement;
+    if (!dropdown) return;
+
+    dropdown.value = generalSettings.saveBehavior;
+    dropdown.addEventListener('change', () => {
+        const newValue = dropdown.value as 'addToObsidian' | 'copyToClipboard' | 'saveFile';
+        saveSettings({ saveBehavior: newValue });
+    });
+}
+
 export function resetDefaultTemplate(): void {
 	const defaultTemplate = createDefaultTemplate();
 	const currentTemplates = getTemplates();
@@ -313,4 +383,89 @@ function initializeHighlighterSettings(): void {
 			saveSettings({ ...generalSettings, highlightBehavior: highlightBehaviorSelect.value });
 		});
 	}
+}
+
+async function initializeUsageChart(): Promise<void> {
+	const chartContainer = document.getElementById('usage-chart');
+	const periodSelect = document.getElementById('usage-period-select') as HTMLSelectElement;
+	const aggregationSelect = document.getElementById('usage-aggregation-select') as HTMLSelectElement;
+	if (!chartContainer || !periodSelect || !aggregationSelect) return;
+
+	const history = await getClipHistory();
+
+	const updateChart = async () => {
+		const options = {
+			timeRange: periodSelect.value as '30d' | 'all',
+			aggregation: aggregationSelect.value as 'day' | 'week' | 'month'
+		};
+		
+		const chartData = aggregateUsageData(history, options);
+		await createUsageChart(chartContainer, chartData);
+	};
+
+	// Initialize with default selections
+	await updateChart();
+
+	// Update when any selector changes
+	periodSelect.addEventListener('change', updateChart);
+	aggregationSelect.addEventListener('change', updateChart);
+}
+
+async function handleRating(rating: number) {
+	// Get existing ratings from storage
+	const existingRatings = await getLocalStorage('ratings') || [];
+	
+	// Add new rating
+	const newRating = {
+		rating,
+		date: new Date().toISOString()
+	};
+	
+	// Update both storage and generalSettings
+	const updatedRatings = [...existingRatings, newRating];
+	generalSettings.ratings = updatedRatings;
+	
+	// Save to storage
+	await setLocalStorage('ratings', updatedRatings);
+	await saveSettings();
+
+	if (rating >= 4) {
+		// Redirect to appropriate store
+		const browser = await detectBrowser();
+		let storeUrl = STORE_URLS.chrome; // Default to Chrome store
+
+		switch (browser) {
+			case 'firefox':
+			case 'firefox-mobile':
+				storeUrl = STORE_URLS.firefox;
+				break;
+			case 'safari':
+			case 'mobile-safari':
+			case 'ipad-os':
+				storeUrl = STORE_URLS.safari;
+				break;
+			case 'edge':
+				storeUrl = STORE_URLS.edge;
+				break;
+		}
+
+		window.open(storeUrl, '_blank');
+	} else {
+		// Show feedback modal for ratings < 4
+		const modal = document.getElementById('feedback-modal');
+		showModal(modal);
+	}
+}
+
+function initializeSettingDropdown(
+	elementId: string,
+	defaultValue: string,
+	onChange: (newValue: string) => void
+): void {
+	const dropdown = document.getElementById(elementId) as HTMLSelectElement;
+	if (!dropdown) return;
+	dropdown.value = defaultValue;
+	dropdown.addEventListener('change', () => {
+		onChange(dropdown.value);
+	});
 }

@@ -65,7 +65,8 @@
 	gap: 0.5rem;
 	flex-wrap: wrap;
 	font-size: var(--font-ui-medium);
-	button {
+	button,
+	.btn {
 		width: auto;
 	}
 }
@@ -97,4 +98,12 @@
 		height: 100px;
 		resize: vertical;
 	}
+}
+
+.tag {
+	font-size: 0.8em;
+	padding: 2px 6px;
+	border-radius: 50px;
+	background-color: hsla(var(--color-accent-hsl), 0.1);
+	color: var(--text-accent);
 }

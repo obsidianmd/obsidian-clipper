@@ -1,0 +1,795 @@
+{
+	"activity": {
+		"message": "פעילות"
+	},
+	"addModel": {
+		"message": "+ הוסף מודל"
+	},
+	"addModelTitle": {
+		"message": "הוסף מודל"
+	},
+	"addProperty": {
+		"message": "+ הוסף מאפיין"
+	},
+	"addProvider": {
+		"message": "+ הוסף ספק"
+	},
+	"addProviderTitle": {
+		"message": "הוסף ספק"
+	},
+	"addToObsidian": {
+		"message": "הוסף ל-Obsidian"
+	},
+	"addVaultPlaceholder": {
+		"message": "לחץ/י Enter להוספת כספת"
+	},
+	"advanced": {
+		"message": "מתקדם"
+	},
+	"allProperties": {
+		"message": "כל המאפיינים"
+	},
+	"allTime": {
+		"message": "כל הזמן"
+	},
+	"alwaysShowHighlights": {
+		"message": "הצג תמיד סימונים"
+	},
+	"alwaysShowHighlightsDescription": {
+		"message": "הצג סימונים שמורים בעת טעינת הדף. כבה כדי להציג סימונים רק כאשר מצב הסימון פעיל."
+	},
+	"apiKeyMissing": {
+		"message": "חסר מפתח API"
+	},
+	"apiKeysWarning": {
+		"message": "השימוש בספק חיצוני מהווה הסכמה לתנאי השימוש ומדיניות הפרטיות שלהם. בקשות המתרגם נשלחות ישירות לספק שבחרת. Obsidian אינו אוסף או מאחסן מידע על הבקשות שלך."
+	},
+	"appendToDaily": {
+		"message": "הוסף לרשימה היומית, בסוף"
+	},
+	"appendToExisting": {
+		"message": "הוסף לפתק קיים, בסוף"
+	},
+	"autoRunInterpreter": {
+		"message": "הפעלה אוטומטית"
+	},
+	"autoRunInterpreterDescription": {
+		"message": "מפעיל מיד משתני הנחיה אם הם קיימים בתבנית. צורך קרדיט API מספק המודל שלך. כבה אם ברצונך להפעיל את המתרגם ידנית בלבד."
+	},
+	"behavior": {
+		"message": "התנהגות"
+	},
+	"behaviorWarning": {
+		"message": "הוספה לפתק קיים או יומי דורשת Obsidian 1.7.2 ומעלה."
+	},
+	"byDay": {
+		"message": "יום"
+	},
+	"byMonth": {
+		"message": "חודש"
+	},
+	"byWeek": {
+		"message": "שבוע"
+	},
+	"cancel": {
+		"message": "ביטול"
+	},
+	"cannotDeleteProvider": {
+		"message": "לא ניתן למחוק את הספק \"$1\" כי הוא בשימוש על ידי $2 מודלים."
+	},
+	"changelog": {
+		"message": "יומן שינויים"
+	},
+	"chooseFile": {
+		"message": "בחר קובץ"
+	},
+	"choosePropertiesFile": {
+		"message": "בחר קובץ מאפיינים"
+	},
+	"chooseSettingsFile": {
+		"message": "בחר קובץ הגדרות"
+	},
+	"chooseTemplateFile": {
+		"message": "בחר קובץ תבנית"
+	},
+	"clipBehavior": {
+		"message": "אופן השמירה"
+	},
+	"clipBehaviorDescription": {
+		"message": "בחר כיצד התוכן הנבחר נשמר ל-Obsidian. מגדיר את המשתנה $strong_start${{content}}$strong_end$",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"close": {
+		"message": "סגור"
+	},
+	"commandOpenClipper": {
+		"message": "פתח את Obsidian Clipper"
+	},
+	"commandQuickClip": {
+		"message": "גזירה מהירה"
+	},
+	"commandToggleHighlighter": {
+		"message": "הפעל/כבה מסמן"
+	},
+	"commandToggleReader": {
+		"message": "החלף מצב קריאה"
+	},
+	"confirmDeleteTemplate": {
+		"message": "האם את/ה בטוח/ה שברצונך למחוק את התבנית \"$1\"?"
+	},
+	"confirmReplaceSettings": {
+		"message": "האם את/ה בטוח/ה שברצונך להחליף את כל ההגדרות הנוכחיות, כולל תבניות ומאפיינים?"
+	},
+	"copied": {
+		"message": "הועתק!"
+	},
+	"copyAsJson": {
+		"message": "העתק כ-JSON"
+	},
+	"copyToClipboard": {
+		"message": "העתק ללוח"
+	},
+	"createNewNote": {
+		"message": "צור פתק חדש"
+	},
+	"custom": {
+		"message": "מותאם אישית"
+	},
+	"dailyNoteFormat": {
+		"message": "תבנית פתק יומי (למשל YYYY-MM-DD)"
+	},
+	"defaultInterpreterContext": {
+		"message": "הקשר ברירת מחדל למתרגם"
+	},
+	"defaultInterpreterContextDescription": {
+		"message": "מחליף את ההקשר המשמש לפירוש משתני ההנחיה. ניתן להשתמש במשתנים כאן."
+	},
+	"defaultTemplateName": {
+		"message": "ברירת מחדל"
+	},
+	"delete": {
+		"message": "מחק"
+	},
+	"deleteModelConfirm": {
+		"message": "האם את/ה בטוח/ה שברצונך למחוק מודל זה?"
+	},
+	"deleteProviderConfirm": {
+		"message": "האם את/ה בטוח/ה שברצונך למחוק ספק זה?"
+	},
+	"disableHighlighter": {
+		"message": "כבה מסמן"
+	},
+	"disableReader": {
+		"message": "השבת מצב קריאה"
+	},
+	"done": {
+		"message": "סיום"
+	},
+	"dragAndDropFile": {
+		"message": "גרור ושחרר קובץ כאן"
+	},
+	"duplicate": {
+		"message": "שכפל"
+	},
+	"earlyAccessDescription": {
+		"message": "השתמש בתכונות הדורשות את $link_start$גרסת הגישה המוקדמת$link_end$ העדכנית ביותר של Obsidian. כרגע נדרש Obsidian 1.7.2 ומעלה.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/Obsidian/Early+access+versions\" target=\"_blank\">"
+			}
+		}
+	},
+	"earlyAccessFeatures": {
+		"message": "תכונות גישה מוקדמת"
+	},
+	"editModel": {
+		"message": "ערוך מודל"
+	},
+	"editProvider": {
+		"message": "ערוך ספק"
+	},
+	"editTemplate": {
+		"message": "ערוך תבנית"
+	},
+	"enableHighlighter": {
+		"message": "הפעל מסמן"
+	},
+	"enableHighlighterDescription": {
+		"message": "סמן תוכן בדפי אינטרנט שניתן לשמור ב-Obsidian"
+	},
+	"enableInterpreter": {
+		"message": "הפעל מתרגם"
+	},
+	"enableInterpreterDescription": {
+		"message": "השתמש בשפה טבעית לחילוץ מידע מדפים. לדוגמה, תוכל להשתמש בתחביר התבנית $strong_start${{\"סיכום של דף זה\"}}$strong_end$. דורש מפתח API או הגדרת מודל מותאם אישית למטה. $link_start$למד עוד$link_end$",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/interpreter\" target=\"_blank\">"
+			},
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"enableReader": {
+		"message": "פתח מצב קריאה"
+	},
+	"error": {
+		"message": "שגיאה"
+	},
+	"export": {
+		"message": "ייצא"
+	},
+	"exportAllSettings": {
+		"message": "ייצא את כל ההגדרות"
+	},
+	"exportAllSettingsDescription": {
+		"message": "ייצא את כל ההגדרות כולל תבניות ומאפיינים"
+	},
+	"exportHighlights": {
+		"message": "ייצא סימונים"
+	},
+	"exportHighlightsDescription": {
+		"message": "ייצא את הסימונים שלך לקובץ"
+	},
+	"exportProperties": {
+		"message": "ייצא מאפיינים"
+	},
+	"exportPropertiesDescription": {
+		"message": "שמור את מאפייני Web Clipper לקובץ $strong_start$types.json$strong_end$ שניתן לייבא לכספת Obsidian שלך או ל-Web Clipper במכשירים אחרים",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"extensionDescription": {
+		"message": "שמור תוכן מהאינטרנט בפורמט פרטי ובר-קיימא שניתן לגשת אליו במצב לא מקוון. הרחבת הדפדפן הרשמית של Obsidian."
+	},
+	"extensionName": {
+		"message": "Obsidian Web Clipper"
+	},
+	"failedToCopyText": {
+		"message": "נכשל בהעתקת טקסט"
+	},
+	"failedToDeleteTemplate": {
+		"message": "נכשל במחיקת התבנית. אנא נסה/י שוב."
+	},
+	"failedToDuplicateTemplate": {
+		"message": "נכשל בשכפול התבנית. אנא נסה/י שוב."
+	},
+	"failedToExportHighlights": {
+		"message": "נכשל בייצוא הסימונים. בדוק את המסוף לפרטים נוספים."
+	},
+	"failedToExportSettings": {
+		"message": "נכשל בייצוא ההגדרות. בדוק את המסוף לפרטים נוספים."
+	},
+	"failedToExtractContent": {
+		"message": "נכשל בחילוץ תוכן הדף."
+	},
+	"failedToImportTemplate": {
+		"message": "שגיאה בייבוא התבנית. בדוק/י את הקובץ ונסה/י שוב."
+	},
+	"failedToInitialize": {
+		"message": "אנא נסה/י לטעון מחדש את ההרחבה."
+	},
+	"failedToInitializeContent": {
+		"message": "נכשל באתחול תוכן הדף."
+	},
+	"failedToProcessInterpreter": {
+		"message": "עיבוד המתרגם נכשל. אנא נסה/י שוב."
+	},
+	"failedToResetProviders": {
+		"message": "נכשל באיפוס ספקים ומודלים"
+	},
+	"failedToResetTemplate": {
+		"message": "נכשל באיפוס תבנית ברירת המחדל. אנא נסה/י שוב."
+	},
+	"failedToSave": {
+		"message": "נכשל בשמירת הקובץ"
+	},
+	"failedToSaveFile": {
+		"message": "נכשל בשמירת הקובץ"
+	},
+	"failedToSaveProvider": {
+		"message": "נכשל בשמירת הספק. אנא נסה/י שוב."
+	},
+	"feedback": {
+		"message": "משוב"
+	},
+	"feedbackDescription": {
+		"message": "כיצד נוכל לשפר את Web Clipper? בקר/י בדף העזרה שלנו כדי לדווח על באגים, להציע תכונות ולקבל עזרה בבעיות נפוצות."
+	},
+	"feedbackTitle": {
+		"message": "תודה על המשוב"
+	},
+	"folder": {
+		"message": "תיקייה"
+	},
+	"general": {
+		"message": "כללי"
+	},
+	"generalSettings": {
+		"message": "הגדרות כלליות"
+	},
+	"getApiKeyHere": {
+		"message": "קבל את מפתח ה-API של $1 כאן"
+	},
+	"help": {
+		"message": "עזרה"
+	},
+	"helpDescription": {
+		"message": "למד/י כיצד להשתמש ב-Web Clipper וקבל/י עזרה בפתרון בעיות"
+	},
+	"highlightInline": {
+		"message": "סמן תוכן בדף"
+	},
+	"highlightPage": {
+		"message": "סמן דף"
+	},
+	"highlighter": {
+		"message": "מסמן"
+	},
+	"highlighterSettings": {
+		"message": "הגדרות מסמן"
+	},
+	"history": {
+		"message": "היסטוריה"
+	},
+	"hotkeys": {
+		"message": "מקשי קיצור"
+	},
+	"import": {
+		"message": "ייבא"
+	},
+	"importAllSettings": {
+		"message": "ייבא את כל ההגדרות"
+	},
+	"importAllSettingsDescription": {
+		"message": "ייבא את כל ההגדרות כולל תבניות ומאפיינים. פעולה זו תחליף את התצורה הנוכחית שלך."
+	},
+	"importFailed": {
+		"message": "הייבוא נכשל. בדוק את המסוף למידע נוסף."
+	},
+	"importModalTitle": {
+		"message": "ייבא"
+	},
+	"importProperties": {
+		"message": "ייבא מאפיינים"
+	},
+	"importPropertiesDescription": {
+		"message": "כדי לייבא מאפיינים מ-Obsidian, מצא את הקובץ $strong_1_start$types.json$strong_1_end$ בתיקיית $strong_2_start$.obsidian$strong_2_end$ של הכספת שלך. תיקייה זו מוסתרת כברירת מחדל ברוב מערכות ההפעלה.",
+		"placeholders": {
+			"strong_1_end": {
+				"content": "</strong>"
+			},
+			"strong_1_start": {
+				"content": "<strong>"
+			},
+			"strong_2_end": {
+				"content": "</strong>"
+			},
+			"strong_2_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"importSettings": {
+		"message": "ייבא הגדרות"
+	},
+	"importTemplate": {
+		"message": "ייבא תבנית"
+	},
+	"interpret": {
+		"message": "פרש"
+	},
+	"interpreter": {
+		"message": "מתרגם"
+	},
+	"interpreterContext": {
+		"message": "הקשר המתרגם"
+	},
+	"interpreterContextDescription": {
+		"message": "ההקשר המשמש לפירוש משתני הנחיה. מחליף את הקשר ברירת המחדל שנקבע ב$link_start$הגדרות המתרגם$link_end$. ניתן להשתמש במשתנים כאן.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=interpreter\">"
+			}
+		}
+	},
+	"language": {
+		"message": "שפה"
+	},
+	"languageDescription": {
+		"message": "בחר את שפת התצוגה לממשק ההרחבה."
+	},
+	"last30Days": {
+		"message": "30 הימים האחרונים"
+	},
+	"lastUsed": {
+		"message": "שימוש אחרון"
+	},
+	"legacyMode": {
+		"message": "מצב מורשת"
+	},
+	"legacyModeDescription": {
+		"message": "שימוש בשיטת URI המתאימה ל-Obsidian 1.6.7 ומטה. שים/י לב שאורך התוכן מוגבל על ידי הדפדפן ומערכת ההפעלה. חלק מהדפים עלולים להיכשל ללא הודעת שגיאה."
+	},
+	"modelName": {
+		"message": "שם המודל"
+	},
+	"modelNameDescription": {
+		"message": "השם המוצג בתפריט הנפתח של המודל"
+	},
+	"modelProvider": {
+		"message": "ספק"
+	},
+	"modelProviderDescription": {
+		"message": "בחר/י את הספק עבור דגם זה"
+	},
+	"modelProviderPlaceholder": {
+		"message": "ספק"
+	},
+	"modelRequiredFields": {
+		"message": "שם הדגם, הספק, ומזהה הדגם הם נדרשים."
+	},
+	"models": {
+		"message": "דגמים"
+	},
+	"modelsListFor": {
+		"message": "רשימת דגמים עבור $1"
+	},
+	"more": {
+		"message": "עוד"
+	},
+	"newTemplate": {
+		"message": "תבנית חדשה"
+	},
+	"noHighlights": {
+		"message": "אל תעשה כלום"
+	},
+	"noTemplates": {
+		"message": "אין תבניות זמינות. אנא הוסף תבנית בהגדרות."
+	},
+	"noUnusedProperties": {
+		"message": "לא נמצאו מאפיינים שלא בשימוש."
+	},
+	"noteContent": {
+		"message": "תוכן הפתק"
+	},
+	"noteContentDescription": {
+		"message": "התאמה אישית של תוכן ההערה. השתמש במשתנים כדי למלא מראש נתונים מהעמוד."
+	},
+	"noteLocation": {
+		"message": "מיקום ההערה"
+	},
+	"noteLocationDescription": {
+		"message": "התיקיה או הנתיב של ההערה."
+	},
+	"noteName": {
+		"message": "שם הפתק"
+	},
+	"noteNameFormat": {
+		"message": "תבנית שם הפתק"
+	},
+	"noteNameFormatDescription": {
+		"message": "התבנית המשמשת ליצירת שם הפתק. ניתן להשתמש במשתנים."
+	},
+	"notesAboutPage": {
+		"message": "הערות על העמוד הזה..."
+	},
+	"onlyHttpSupported": {
+		"message": "לא ניתן לחתוך את העמוד הזה. רק כתובות URL של http ו-https נתמכות."
+	},
+	"open": {
+		"message": "פתח"
+	},
+	"optional": {
+		"message": "(אופציונלי)"
+	},
+	"orPasteBelow": {
+		"message": "או הדבק תוכן למטה"
+	},
+	"overwriteNote": {
+		"message": "דרוס הערה"
+	},
+	"pageCannotBeClipped": {
+		"message": "לא ניתן לחתוך את העמוד הזה."
+	},
+	"pageVariables": {
+		"message": "משתני עמוד"
+	},
+	"pagesSaved": {
+		"message": "דף נשמר"
+	},
+	"pagesSavedPlural": {
+		"message": "דפים נשמרו"
+	},
+	"pasteJsonHere": {
+		"message": "הדבק JSON כאן"
+	},
+	"pleaseReload": {
+		"message": "אנא נסה/י לטעון את העמוד מחדש."
+	},
+	"popularModels": {
+		"message": "דגמים פופולריים"
+	},
+	"popularModelsDescription": {
+		"message": "בחר מתוך דגמים שנמצאים בשימוש נפוץ או הזן פרטי דגם מותאם אישית."
+	},
+	"prependToDaily": {
+		"message": "הוסף להערה היומית, בחלק העליון"
+	},
+	"prependToExisting": {
+		"message": "הוסף להערה קיימת, בחלק העליון"
+	},
+	"processing": {
+		"message": "מעבד"
+	},
+	"properties": {
+		"message": "מאפיינים"
+	},
+	"propertiesSettings": {
+		"message": "מאפיינים"
+	},
+	"propertyName": {
+		"message": "שם המאפיין"
+	},
+	"propertyValue": {
+		"message": "ערך המאפיין"
+	},
+	"provider": {
+		"message": "ספק"
+	},
+	"providerApiKey": {
+		"message": "מפתח API"
+	},
+	"providerApiKeyDescription": {
+		"message": "מפתח ה-API שלך עבור ספק זה."
+	},
+	"providerBaseUrl": {
+		"message": "URL בסיסי"
+	},
+	"providerBaseUrlDescription": {
+		"message": "כתובת URL של נקודת הסיום של API עבור ספק זה."
+	},
+	"providerModelId": {
+		"message": "מזהה דגם"
+	},
+	"providerModelIdDescription": {
+		"message": "המזהה של הדגם מהספק שלך. בדרך כלל שם קצר ללא רווחים."
+	},
+	"providerModelIdPlaceholder": {
+		"message": "מזהה דגם"
+	},
+	"providerName": {
+		"message": "שם הספק"
+	},
+	"providerNameDescription": {
+		"message": "שם התצוגה עבור ספק זה."
+	},
+	"providerPreset": {
+		"message": "הגדרה מוכנה מראש"
+	},
+	"providerPresetDescription": {
+		"message": "בחר ספק או צור אחד מותאם אישית."
+	},
+	"providerRequiredFields": {
+		"message": "שם הספק ו-URL בסיסי הם נדרשים."
+	},
+	"providers": {
+		"message": "ספקים"
+	},
+	"rateExtensionDescription": {
+		"message": "אוהב את Web Clipper? עזור לנו על ידי דירוג."
+	},
+	"reader": {
+		"message": "קורא"
+	},
+	"recommended": {
+		"message": "מומלץ"
+	},
+	"refresh": {
+		"message": "רענן"
+	},
+	"remove": {
+		"message": "הסר"
+	},
+	"removeProperty": {
+		"message": "הסר מאפיין"
+	},
+	"removeUnusedProperties": {
+		"message": "הסר מאפיינים שאינם בשימוש"
+	},
+	"removeUnusedPropertiesDescription": {
+		"message": "הסר את כל המאפיינים שאינם בשימוש באף תבנית."
+	},
+	"removeVault": {
+		"message": "הסר כספת"
+	},
+	"replaceContent": {
+		"message": "החלף תוכן פתק"
+	},
+	"reset": {
+		"message": "אפס"
+	},
+	"resetDefaultTemplate": {
+		"message": "אפס תבנית ברירת מחדל"
+	},
+	"resetDefaultTemplateDescription": {
+		"message": "הסר את כל השינויים שביצעת בתבנית ברירת המחדל."
+	},
+	"resetProvidersAndModels": {
+		"message": "אפס מודלים לברירת מחדל"
+	},
+	"resetProvidersAndModelsDescription": {
+		"message": "אפס ספקים ומודלים להגדרות ברירת המחדל."
+	},
+	"save": {
+		"message": "שמור"
+	},
+	"saveBehaviorDescription": {
+		"message": "בחר את האפשרות הברירת המחדל לשמירת דפים. אפשרויות חלופיות מופיעות בתפריט הנפתח ליד הכפתור הראשי."
+	},
+	"saveBehaviorLabel": {
+		"message": "התנהגות שמירה"
+	},
+	"saveFile": {
+		"message": "שמור קובץ..."
+	},
+	"searchVariables": {
+		"message": "חפש משתנים..."
+	},
+	"selectProvider": {
+		"message": "בחר ספק"
+	},
+	"selectTemplateToExport": {
+		"message": "בחר תבנית לייצוא"
+	},
+	"settings": {
+		"message": "הגדרות"
+	},
+	"settingsHeading": {
+		"message": "הגדרות"
+	},
+	"settingsImportSuccess": {
+		"message": "כל ההגדרות יובאו בהצלחה. רענן את הדף כדי לראות את השינויים."
+	},
+	"share": {
+		"message": "שתף..."
+	},
+	"shortcutInstructionsBrave": {
+		"message": "כדי לשנות מיפויי מקשים, עבור אל $1"
+	},
+	"shortcutInstructionsChrome": {
+		"message": "כדי לשנות מיפויי מקשים, עבור אל $1"
+	},
+	"shortcutInstructionsDefault": {
+		"message": "כדי לשנות מיפויי מקשים, עיין בהגדרות ההרחבות של הדפדפן שלך."
+	},
+	"shortcutInstructionsEdge": {
+		"message": "כדי לשנות מיפויי מקשים, עבור אל $1"
+	},
+	"shortcutInstructionsFirefox": {
+		"message": "כדי לשנות מיפויי מקשים, עבור אל $1, לחץ על סמל הגלגל שיניים ובחר \"נהל קיצורי הרחבה\""
+	},
+	"shortcutInstructionsIntro": {
+		"message": "קיצורי המקשים מספקים לך גישה מהירה לפונקציות של הקליפר."
+	},
+	"shortcutInstructionsSafari": {
+		"message": "לא ניתן להתאים אישית קיצורי מקשים ב-Safari."
+	},
+	"shortcutNotSet": {
+		"message": "לא הוגדר"
+	},
+	"showActionsButton": {
+		"message": "הצג/י כפתור פעולות"
+	},
+	"showActionsDescription": {
+		"message": "מאפשר לך לצפות במשתני הדף מתפריט הקליפר. שימושי לראות אילו משתנים זמינים לשימוש בתבניות."
+	},
+	"showPageVariables": {
+		"message": "הצג/י משתני דף"
+	},
+	"silentOpen": {
+		"message": "שמור פתקים מבלי לפתוח"
+	},
+	"silentOpenDescription": {
+		"message": "פתקים שנגזרו יישמרו אך לא ייפתחו בכרטיסייה חדשה. Obsidian עדיין יועבר לחזית."
+	},
+	"specificNoteName": {
+		"message": "שם פתק ספציפי"
+	},
+	"systemDefault": {
+		"message": "ברירת מחדל של המערכת"
+	},
+	"templateCopied": {
+		"message": "ה-JSON של התבנית הועתק ללוח"
+	},
+	"templateCopyError": {
+		"message": "נכשל בהעתקת ה-JSON של התבנית ללוח"
+	},
+	"templateName": {
+		"message": "שם התבנית"
+	},
+	"templateProperties": {
+		"message": "מאפיינים"
+	},
+	"templatePropertiesDescription": {
+		"message": "מאפיינים שיתווספו לראש הפתק הנגזר. השתמש במשתנים כדי למלא מראש נתונים מהדף."
+	},
+	"templateTriggers": {
+		"message": "טריגרים לתבנית"
+	},
+	"templateTriggersDescription": {
+		"message": "הגדר כללים לבחירה אוטומטית של תבנית זו אם היא תואמת לתבנית URL או מכילה נתוני schema.org. כלל אחד בכל שורה."
+	},
+	"templatesHeading": {
+		"message": "תבניות"
+	},
+	"thinking": {
+		"message": "חושב"
+	},
+	"unknownProvider": {
+		"message": "ספק לא ידוע"
+	},
+	"updateAvailable": {
+		"message": "עדכון זמין"
+	},
+	"usingLatestVersion": {
+		"message": "את/ה משתמש/ת בגרסה העדכנית ביותר"
+	},
+	"vault": {
+		"message": "כספת"
+	},
+	"vaultDescription": {
+		"message": "בחר את כספת ברירת המחדל עבור תבנית זו. עבור אל $link_start$הגדרות כלליות$link_end$ כדי להוסיף או להסיר כספות.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=general\">"
+			}
+		}
+	},
+	"vaults": {
+		"message": "כספות"
+	},
+	"vaultsDescription": {
+		"message": "כברירת מחדל, פתקים שנגזרו נשמרים בכספת הפתוחה. תוכל/י להוסיף כספות כאן אם תרצה/י את האפשרות לשמור בכספות שונות. שם הכספת חייב להתאים בדיוק לשם כספת ה-Obsidian. לחץ/י $strong_start$enter$strong_end$ כדי להוסיף כספת.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"version": {
+		"message": "גרסה"
+	}
+}

@@ -1,0 +1,795 @@
+{
+	"activity": {
+		"message": "Aktivitet"
+	},
+	"addModel": {
+		"message": "+ Legg til modell"
+	},
+	"addModelTitle": {
+		"message": "Legg til modell"
+	},
+	"addProperty": {
+		"message": "+ Legg til egenskap"
+	},
+	"addProvider": {
+		"message": "+ Legg til leverandør"
+	},
+	"addProviderTitle": {
+		"message": "Legg til leverandør"
+	},
+	"addToObsidian": {
+		"message": "Legg til i Obsidian"
+	},
+	"addVaultPlaceholder": {
+		"message": "Trykk Enter for å legge til hvelv"
+	},
+	"advanced": {
+		"message": "Avansert"
+	},
+	"allProperties": {
+		"message": "Alle egenskaper"
+	},
+	"allTime": {
+		"message": "All tid"
+	},
+	"alwaysShowHighlights": {
+		"message": "Vis alltid uthevinger"
+	},
+	"alwaysShowHighlightsDescription": {
+		"message": "Vis lagrede uthevinger når siden lastes. Deaktiver for å bare vise uthevinger når uthevingsmodus er aktiv."
+	},
+	"apiKeyMissing": {
+		"message": "API-nøkkel mangler"
+	},
+	"apiKeysWarning": {
+		"message": "Ved å bruke en ekstern leverandør godtar du deres vilkår og personvernregler. Tolkningsforespørsler sendes direkte til din valgte leverandør. Obsidian samler ikke inn eller lagrer informasjon om dine forespørsler."
+	},
+	"appendToDaily": {
+		"message": "Legg til i daglig notat, på slutten"
+	},
+	"appendToExisting": {
+		"message": "Legg til i eksisterende notat, på slutten"
+	},
+	"autoRunInterpreter": {
+		"message": "Kjør automatisk"
+	},
+	"autoRunInterpreterDescription": {
+		"message": "Kjører promptvariabler umiddelbart hvis de finnes i malen. Bruker API-kreditter fra modelleverandøren din. Deaktiver hvis du vil kjøre tolken manuelt."
+	},
+	"behavior": {
+		"message": "Oppførsel"
+	},
+	"behaviorWarning": {
+		"message": "Å legge til i eksisterende eller daglig notat krever Obsidian 1.7.2 eller nyere."
+	},
+	"byDay": {
+		"message": "Dag"
+	},
+	"byMonth": {
+		"message": "Måned"
+	},
+	"byWeek": {
+		"message": "Uke"
+	},
+	"cancel": {
+		"message": "Avbryt"
+	},
+	"cannotDeleteProvider": {
+		"message": "Kan ikke slette leverandøren \"$1\" fordi den brukes av $2 modeller."
+	},
+	"changelog": {
+		"message": "Endringslogg"
+	},
+	"chooseFile": {
+		"message": "Velg fil"
+	},
+	"choosePropertiesFile": {
+		"message": "Velg egenskapsfil"
+	},
+	"chooseSettingsFile": {
+		"message": "Velg innstillingsfil"
+	},
+	"chooseTemplateFile": {
+		"message": "Velg malfil"
+	},
+	"clipBehavior": {
+		"message": "Klippoppførsel"
+	},
+	"clipBehaviorDescription": {
+		"message": "Velg hvordan valgt innhold lagres i Obsidian. Setter variabelen $strong_start${{content}}$strong_end$",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"close": {
+		"message": "Lukk"
+	},
+	"commandOpenClipper": {
+		"message": "Åpne Obsidian Clipper"
+	},
+	"commandQuickClip": {
+		"message": "Hurtigklipp"
+	},
+	"commandToggleHighlighter": {
+		"message": "Veksle uthever"
+	},
+	"commandToggleReader": {
+		"message": "Bytt lesevisning"
+	},
+	"confirmDeleteTemplate": {
+		"message": "Er du sikker på at du vil slette malen \"$1\"?"
+	},
+	"confirmReplaceSettings": {
+		"message": "Denne handlingen vil erstatte alle dine nåværende innstillinger, inkludert maler og egenskaper. Er du sikker på at du vil fortsette?"
+	},
+	"copied": {
+		"message": "Kopiert!"
+	},
+	"copyAsJson": {
+		"message": "Kopier som JSON"
+	},
+	"copyToClipboard": {
+		"message": "Kopier til utklippstavle"
+	},
+	"createNewNote": {
+		"message": "Opprett nytt notat"
+	},
+	"custom": {
+		"message": "Tilpasset"
+	},
+	"dailyNoteFormat": {
+		"message": "Daglig notatformat (f.eks. YYYY-MM-DD)"
+	},
+	"defaultInterpreterContext": {
+		"message": "Standard tolkningskontekst"
+	},
+	"defaultInterpreterContextDescription": {
+		"message": "Overstyrer konteksten som brukes for å tolke promptvariabler. Du kan bruke variabler her."
+	},
+	"defaultTemplateName": {
+		"message": "Standard"
+	},
+	"delete": {
+		"message": "Slett"
+	},
+	"deleteModelConfirm": {
+		"message": "Er du sikker på at du vil slette denne modellen?"
+	},
+	"deleteProviderConfirm": {
+		"message": "Er du sikker på at du vil slette denne leverandøren?"
+	},
+	"disableHighlighter": {
+		"message": "Deaktiver uthever"
+	},
+	"disableReader": {
+		"message": "Deaktiver lesevisning"
+	},
+	"done": {
+		"message": "Ferdig"
+	},
+	"dragAndDropFile": {
+		"message": "Dra og slipp fil her"
+	},
+	"duplicate": {
+		"message": "Dupliser"
+	},
+	"earlyAccessDescription": {
+		"message": "Bruk funksjoner som krever den nyeste $link_start$tidlig tilgang-versjonen$link_end$ av Obsidian. Krever for øyeblikket Obsidian 1.7.2 eller nyere.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/Obsidian/Early+access+versions\" target=\"_blank\">"
+			}
+		}
+	},
+	"earlyAccessFeatures": {
+		"message": "Tidlig tilgang-funksjoner"
+	},
+	"editModel": {
+		"message": "Rediger modell"
+	},
+	"editProvider": {
+		"message": "Rediger leverandør"
+	},
+	"editTemplate": {
+		"message": "Rediger mal"
+	},
+	"enableHighlighter": {
+		"message": "Aktiver uthever"
+	},
+	"enableHighlighterDescription": {
+		"message": "Uthev innhold på nettsider for å lagre i Obsidian"
+	},
+	"enableInterpreter": {
+		"message": "Aktiver tolk"
+	},
+	"enableInterpreterDescription": {
+		"message": "Bruk naturlig språk for å trekke ut informasjon fra sider. For eksempel kan du bruke malsyntaksen $strong_start${{\"oppsummer denne siden\"}}$strong_end$. Krever en API-nøkkel eller oppsett av en tilpasset modell nedenfor. $link_start$Lær mer$link_end$",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/interpreter\" target=\"_blank\">"
+			},
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"enableReader": {
+		"message": "Åpne lesevisning"
+	},
+	"error": {
+		"message": "Feil"
+	},
+	"export": {
+		"message": "Eksporter"
+	},
+	"exportAllSettings": {
+		"message": "Eksporter alle innstillinger"
+	},
+	"exportAllSettingsDescription": {
+		"message": "Eksporter alle innstillinger inkludert maler og egenskaper"
+	},
+	"exportHighlights": {
+		"message": "Eksporter uthevinger"
+	},
+	"exportHighlightsDescription": {
+		"message": "Eksporter uthevingene dine til en fil"
+	},
+	"exportProperties": {
+		"message": "Eksporter egenskaper"
+	},
+	"exportPropertiesDescription": {
+		"message": "Lagre Web Clipper-egenskaper til en $strong_start$types.json$strong_end$-fil som kan importeres til ditt Obsidian-hvelv eller Web Clipper på andre enheter",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"extensionDescription": {
+		"message": "Lagre webinnhold i et privat og varig format som kan nås offline. Den offisielle nettleserutvidelsen for Obsidian."
+	},
+	"extensionName": {
+		"message": "Obsidian Web Clipper"
+	},
+	"failedToCopyText": {
+		"message": "Kunne ikke kopiere tekst"
+	},
+	"failedToDeleteTemplate": {
+		"message": "Kunne ikke slette malen. Vennligst prøv igjen."
+	},
+	"failedToDuplicateTemplate": {
+		"message": "Kunne ikke duplisere malen. Vennligst prøv igjen."
+	},
+	"failedToExportHighlights": {
+		"message": "Kunne ikke eksportere uthevinger. Sjekk konsollen for detaljer."
+	},
+	"failedToExportSettings": {
+		"message": "Kunne ikke eksportere innstillinger. Sjekk konsollen for detaljer."
+	},
+	"failedToExtractContent": {
+		"message": "Kunne ikke hente ut sideinnhold."
+	},
+	"failedToImportTemplate": {
+		"message": "Feil ved import av mal. Sjekk filen og prøv igjen."
+	},
+	"failedToInitialize": {
+		"message": "Vennligst last inn utvidelsen på nytt."
+	},
+	"failedToInitializeContent": {
+		"message": "Kunne ikke initialisere sideinnhold."
+	},
+	"failedToProcessInterpreter": {
+		"message": "Tolkeprosessen mislyktes. Vennligst prøv igjen."
+	},
+	"failedToResetProviders": {
+		"message": "Kunne ikke tilbakestille leverandører og modeller"
+	},
+	"failedToResetTemplate": {
+		"message": "Kunne ikke tilbakestille standardmalen. Vennligst prøv igjen."
+	},
+	"failedToSave": {
+		"message": "Kunne ikke lagre filen"
+	},
+	"failedToSaveFile": {
+		"message": "Kunne ikke lagre filen"
+	},
+	"failedToSaveProvider": {
+		"message": "Kunne ikke lagre leverandøren. Vennligst prøv igjen."
+	},
+	"feedback": {
+		"message": "Tilbakemelding"
+	},
+	"feedbackDescription": {
+		"message": "Hvordan kan vi forbedre Web Clipper? Besøk vår hjelpeside for å rapportere feil, foreslå funksjoner og få hjelp med vanlige problemer."
+	},
+	"feedbackTitle": {
+		"message": "Takk for tilbakemeldingen"
+	},
+	"folder": {
+		"message": "Mappe"
+	},
+	"general": {
+		"message": "Generelt"
+	},
+	"generalSettings": {
+		"message": "Generelle innstillinger"
+	},
+	"getApiKeyHere": {
+		"message": "Få $1 API-nøkkel her"
+	},
+	"help": {
+		"message": "Hjelp"
+	},
+	"helpDescription": {
+		"message": "Lær hvordan du bruker Web Clipper og få hjelp med feilsøking"
+	},
+	"highlightInline": {
+		"message": "Uthev innhold på siden"
+	},
+	"highlightPage": {
+		"message": "Uthev side"
+	},
+	"highlighter": {
+		"message": "Uthever"
+	},
+	"highlighterSettings": {
+		"message": "Uthever"
+	},
+	"history": {
+		"message": "Historikk"
+	},
+	"hotkeys": {
+		"message": "Hurtigtaster"
+	},
+	"import": {
+		"message": "Importer"
+	},
+	"importAllSettings": {
+		"message": "Importer alle innstillinger"
+	},
+	"importAllSettingsDescription": {
+		"message": "Importer alle innstillinger inkludert maler og egenskaper. Dette vil overskrive din nåværende konfigurasjon."
+	},
+	"importFailed": {
+		"message": "Import mislyktes. Sjekk konsollen for detaljer."
+	},
+	"importModalTitle": {
+		"message": "Importer"
+	},
+	"importProperties": {
+		"message": "Importer egenskaper"
+	},
+	"importPropertiesDescription": {
+		"message": "For å importere egenskaper fra Obsidian, finn $strong_1_start$types.json$strong_1_end$-filen i $strong_2_start$.obsidian$strong_2_end$-mappen i hvelvet ditt. Denne mappen er skjult som standard på de fleste operativsystemer.",
+		"placeholders": {
+			"strong_1_end": {
+				"content": "</strong>"
+			},
+			"strong_1_start": {
+				"content": "<strong>"
+			},
+			"strong_2_end": {
+				"content": "</strong>"
+			},
+			"strong_2_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"importSettings": {
+		"message": "Importer innstillinger"
+	},
+	"importTemplate": {
+		"message": "Importer mal"
+	},
+	"interpret": {
+		"message": "Tolk"
+	},
+	"interpreter": {
+		"message": "Tolk"
+	},
+	"interpreterContext": {
+		"message": "Tolkningskontekst"
+	},
+	"interpreterContextDescription": {
+		"message": "Konteksten som brukes for å tolke promptvariabler. Overstyrer standardkonteksten satt i $link_start$tolkinnstillingene$link_end$. Du kan bruke variabler her.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=interpreter\">"
+			}
+		}
+	},
+	"language": {
+		"message": "Språk"
+	},
+	"languageDescription": {
+		"message": "Velg visningsspråk for utvidelsens grensesnitt."
+	},
+	"last30Days": {
+		"message": "Siste 30 dager"
+	},
+	"lastUsed": {
+		"message": "Sist brukt"
+	},
+	"legacyMode": {
+		"message": "Eldre modus"
+	},
+	"legacyModeDescription": {
+		"message": "Bruker URI-fangstmetoden som er kompatibel med Obsidian 1.6.7 og eldre. Merk at lengden på fanget innhold er begrenset av nettleseren og operativsystemet. Noen sider kan mislykkes uten feilmelding."
+	},
+	"modelName": {
+		"message": "Modellnavn"
+	},
+	"modelNameDescription": {
+		"message": "Navnet som vises i modellens nedtrekksmeny"
+	},
+	"modelProvider": {
+		"message": "Leverandør"
+	},
+	"modelProviderDescription": {
+		"message": "Velg leverandøren for denne modellen"
+	},
+	"modelProviderPlaceholder": {
+		"message": "Leverandør"
+	},
+	"modelRequiredFields": {
+		"message": "Modellnavn, leverandør og modell-ID er påkrevd."
+	},
+	"models": {
+		"message": "Modeller"
+	},
+	"modelsListFor": {
+		"message": "Modelliste for $1"
+	},
+	"more": {
+		"message": "Mer"
+	},
+	"newTemplate": {
+		"message": "Ny mal"
+	},
+	"noHighlights": {
+		"message": "Ingen uthevinger"
+	},
+	"noTemplates": {
+		"message": "Ingen tilgjengelige maler. Legg til en mal i innstillingene."
+	},
+	"noUnusedProperties": {
+		"message": "Ingen ubrukte egenskaper funnet."
+	},
+	"noteContent": {
+		"message": "Notatinnhold"
+	},
+	"noteContentDescription": {
+		"message": "Tilpass notatets innhold. Bruk variabler for å forhåndsutfylle data fra siden."
+	},
+	"noteLocation": {
+		"message": "Notatplassering"
+	},
+	"noteLocationDescription": {
+		"message": "Mappen eller banen til notatet."
+	},
+	"noteName": {
+		"message": "Notatnavn"
+	},
+	"noteNameFormat": {
+		"message": "Notatnavnformat"
+	},
+	"noteNameFormatDescription": {
+		"message": "Formatet som brukes for å generere notatnavn. Du kan bruke variabler."
+	},
+	"notesAboutPage": {
+		"message": "Noter om denne siden..."
+	},
+	"onlyHttpSupported": {
+		"message": "Kan ikke klippe denne siden. Bare http og https-URLer støttes."
+	},
+	"open": {
+		"message": "Åpne"
+	},
+	"optional": {
+		"message": "(valgfritt)"
+	},
+	"orPasteBelow": {
+		"message": "Eller lim inn innholdet nedenfor"
+	},
+	"overwriteNote": {
+		"message": "Overskriv notat"
+	},
+	"pageCannotBeClipped": {
+		"message": "Denne siden kan ikke klippes."
+	},
+	"pageVariables": {
+		"message": "Sidevariabler"
+	},
+	"pagesSaved": {
+		"message": "Side lagret"
+	},
+	"pagesSavedPlural": {
+		"message": "Sider lagret"
+	},
+	"pasteJsonHere": {
+		"message": "Lim inn JSON her"
+	},
+	"pleaseReload": {
+		"message": "Vennligst prøv å oppdatere siden."
+	},
+	"popularModels": {
+		"message": "Populære modeller"
+	},
+	"popularModelsDescription": {
+		"message": "Velg fra ofte brukte modeller eller skriv inn detaljer om tilpasset modell."
+	},
+	"prependToDaily": {
+		"message": "Legg til i daglig notat, øverst"
+	},
+	"prependToExisting": {
+		"message": "Legg til i et eksisterende notat, øverst"
+	},
+	"processing": {
+		"message": "behandler"
+	},
+	"properties": {
+		"message": "Egenskaper"
+	},
+	"propertiesSettings": {
+		"message": "Egenskaper"
+	},
+	"propertyName": {
+		"message": "Egenskapsnavn"
+	},
+	"propertyValue": {
+		"message": "Egenskapsverdi"
+	},
+	"provider": {
+		"message": "Leverandør"
+	},
+	"providerApiKey": {
+		"message": "API-nøkkel"
+	},
+	"providerApiKeyDescription": {
+		"message": "Din API-nøkkel for denne leverandøren."
+	},
+	"providerBaseUrl": {
+		"message": "Base URL"
+	},
+	"providerBaseUrlDescription": {
+		"message": "API-endepunktets URL for denne leverandøren."
+	},
+	"providerModelId": {
+		"message": "Modell-ID"
+	},
+	"providerModelIdDescription": {
+		"message": "Identifikatoren til modellen fra din leverandør. Vanligvis et kort navn uten mellomrom."
+	},
+	"providerModelIdPlaceholder": {
+		"message": "Modell-ID"
+	},
+	"providerName": {
+		"message": "Leverandørnavn"
+	},
+	"providerNameDescription": {
+		"message": "Visningsnavn for denne leverandøren."
+	},
+	"providerPreset": {
+		"message": "Forhåndsinnstilling"
+	},
+	"providerPresetDescription": {
+		"message": "Velg en leverandør eller opprett en tilpasset en."
+	},
+	"providerRequiredFields": {
+		"message": "Leverandørnavn og Base URL er nødvendig."
+	},
+	"providers": {
+		"message": "Leverandører"
+	},
+	"rateExtensionDescription": {
+		"message": "Liker du Web Clipper? Hjelp oss ved å gi en vurdering."
+	},
+	"reader": {
+		"message": "Lesevisning"
+	},
+	"recommended": {
+		"message": "anbefalt"
+	},
+	"refresh": {
+		"message": "Oppdater"
+	},
+	"remove": {
+		"message": "Fjern"
+	},
+	"removeProperty": {
+		"message": "Fjern egenskap"
+	},
+	"removeUnusedProperties": {
+		"message": "Fjern ubrukte egenskaper"
+	},
+	"removeUnusedPropertiesDescription": {
+		"message": "Fjern alle egenskaper som ikke brukes i noen maler."
+	},
+	"removeVault": {
+		"message": "Fjern hvelv"
+	},
+	"replaceContent": {
+		"message": "Erstatt notatinnhold"
+	},
+	"reset": {
+		"message": "Tilbakestill"
+	},
+	"resetDefaultTemplate": {
+		"message": "Tilbakestill standardmal"
+	},
+	"resetDefaultTemplateDescription": {
+		"message": "Fjern alle endringer gjort til standardmalen."
+	},
+	"resetProvidersAndModels": {
+		"message": "Tilbakestill modeller til standard"
+	},
+	"resetProvidersAndModelsDescription": {
+		"message": "Tilbakestill leverandører og modeller til standardinnstillingene."
+	},
+	"save": {
+		"message": "Lagre"
+	},
+	"saveBehaviorDescription": {
+		"message": "Velg standardalternativet for å lagre sider. Alternative alternativer vises i rullegardinmenyen ved siden av hovedknappen."
+	},
+	"saveBehaviorLabel": {
+		"message": "Lagre oppførsel"
+	},
+	"saveFile": {
+		"message": "Lagre fil..."
+	},
+	"searchVariables": {
+		"message": "Søk i variabler..."
+	},
+	"selectProvider": {
+		"message": "Velg leverandør"
+	},
+	"selectTemplateToExport": {
+		"message": "Velg mal for eksport"
+	},
+	"settings": {
+		"message": "Innstillinger"
+	},
+	"settingsHeading": {
+		"message": "Innstillinger"
+	},
+	"settingsImportSuccess": {
+		"message": "Alle innstillinger ble importert. Oppdater siden for å se endringene."
+	},
+	"share": {
+		"message": "Del..."
+	},
+	"shortcutInstructionsBrave": {
+		"message": "For å endre hurtigtaster, gå til $1"
+	},
+	"shortcutInstructionsChrome": {
+		"message": "For å endre hurtigtaster, gå til $1"
+	},
+	"shortcutInstructionsDefault": {
+		"message": "For å endre hurtigtaster, se nettleserens utvidelsesinnstillinger."
+	},
+	"shortcutInstructionsEdge": {
+		"message": "For å endre hurtigtaster, gå til $1"
+	},
+	"shortcutInstructionsFirefox": {
+		"message": "For å endre hurtigtaster, gå til $1, klikk på tannhjulikonet og velg \"Administrer utvidelsessnarveier\""
+	},
+	"shortcutInstructionsIntro": {
+		"message": "Hurtigtaster gir deg rask tilgang til klipperfunksjonene."
+	},
+	"shortcutInstructionsSafari": {
+		"message": "Hurtigtaster kan ikke tilpasses i Safari."
+	},
+	"shortcutNotSet": {
+		"message": "Ikke satt"
+	},
+	"showActionsButton": {
+		"message": "Vis handlingsknapp"
+	},
+	"showActionsDescription": {
+		"message": "Lar deg se sidens variabler fra klippermenyen. Nyttig for å se hvilke variabler som er tilgjengelige for bruk i maler."
+	},
+	"showPageVariables": {
+		"message": "Vis sidevariabler"
+	},
+	"silentOpen": {
+		"message": "Lagre notater uten å åpne dem"
+	},
+	"silentOpenDescription": {
+		"message": "Klippede notater vil bli lagret men ikke åpnet i en ny fane. Obsidian vil fortsatt bli brakt til forgrunnen."
+	},
+	"specificNoteName": {
+		"message": "Spesifikt notatnavn"
+	},
+	"systemDefault": {
+		"message": "Systemstandard"
+	},
+	"templateCopied": {
+		"message": "Mal-JSON kopiert til utklippstavlen"
+	},
+	"templateCopyError": {
+		"message": "Kunne ikke kopiere mal-JSON til utklippstavlen"
+	},
+	"templateName": {
+		"message": "Malnavn"
+	},
+	"templateProperties": {
+		"message": "Egenskaper"
+	},
+	"templatePropertiesDescription": {
+		"message": "Egenskaper som vil bli lagt til i starten av det klippede notatet. Bruk variabler for å forhåndsutfylle data fra siden."
+	},
+	"templateTriggers": {
+		"message": "Malutløsere"
+	},
+	"templateTriggersDescription": {
+		"message": "Definer regler for automatisk valg av denne malen hvis den matcher URL-mønsteret eller inneholder schema.org-data. Én regel per linje."
+	},
+	"templatesHeading": {
+		"message": "Maler"
+	},
+	"thinking": {
+		"message": "tenker"
+	},
+	"unknownProvider": {
+		"message": "Ukjent leverandør"
+	},
+	"updateAvailable": {
+		"message": "Oppdatering tilgjengelig"
+	},
+	"usingLatestVersion": {
+		"message": "Du bruker den nyeste versjonen"
+	},
+	"vault": {
+		"message": "Hvelv"
+	},
+	"vaultDescription": {
+		"message": "Velg standardhvelvet for denne malen. Gå til $link_start$generelle innstillinger$link_end$ for å legge til eller fjerne hvelv.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=general\">"
+			}
+		}
+	},
+	"vaults": {
+		"message": "Hvelv"
+	},
+	"vaultsDescription": {
+		"message": "Som standard lagres klippede notater i det åpne hvelvet. Du kan legge til hvelv her hvis du ønsker muligheten til å lagre i forskjellige hvelv. Hvelvnavnet må samsvare nøyaktig med Obsidian-hvelvnavnet. Trykk $strong_start$enter$strong_end$ for å legge til et hvelv.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"version": {
+		"message": "Versjon"
+	}
+}

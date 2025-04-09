@@ -1,4 +1,7 @@
 {
+	"activity": {
+		"message": "فعالیت"
+	},
 	"addModel": {
 		"message": "+ افزودن مدل"
 	},
@@ -25,6 +28,9 @@
 	},
 	"allProperties": {
 		"message": "همه خواص"
+	},
+	"allTime": {
+		"message": "کل زمان"
 	},
 	"alwaysShowHighlights": {
 		"message": "همیشه جملات روشن را نشان دهید"
@@ -55,6 +61,15 @@
 	},
 	"behaviorWarning": {
 		"message": "افزودن به یادداشت موجود یا یادداشت روزانه به ابسیدین  ورژن ۱.۷.۲ یا بالاتر نیاز دارد"
+	},
+	"byDay": {
+		"message": "روزها"
+	},
+	"byMonth": {
+		"message": "ماه ها"
+	},
+	"byWeek": {
+		"message": "هفته ها"
 	},
 	"cancel": {
 		"message": "لغو"
@@ -103,6 +118,9 @@
 	"commandToggleHighlighter": {
 		"message": "حالت جملات روشن را فعال یا نا‌فعال کن"
 	},
+	"commandToggleReader": {
+		"message": "تغییر نمای خواندن"
+	},
 	"confirmDeleteTemplate": {
 		"message": "آیا مطمئنید که می خواهید الگوی \"$1\" را حذف کنید؟"
 	},
@@ -147,6 +165,9 @@
 	},
 	"disableHighlighter": {
 		"message": "مارکر جملات روشن را غیرفعال کن"
+	},
+	"disableReader": {
+		"message": "غیرفعال کردن نمای خواندن"
 	},
 	"done": {
 		"message": "انجام شد"
@@ -205,6 +226,9 @@
 				"content": "<strong>"
 			}
 		}
+	},
+	"enableReader": {
+		"message": "باز کردن نمای خواندن"
 	},
 	"error": {
 		"message": "خطا"
@@ -289,6 +313,15 @@
 	"failedToSaveProvider": {
 		"message": "ذخیره سازی ارائه دهنده با شکست مواجه شد. لطفا دوباره تلاش کنید."
 	},
+	"feedback": {
+		"message": "بازخورد"
+	},
+	"feedbackDescription": {
+		"message": "چگونه می توانیم وب کلیپر را بهبود بخشیم؟ لطفا به صفحه کمک ما مراجعه کنید، که در آن می توانید اشکالات را گزارش دهید، ویژگی ها را پیشنهاد دهید و کمک در مورد مسائل رایج دریافت کنید."
+	},
+	"feedbackTitle": {
+		"message": "با تشکر از بازخورد شما"
+	},
 	"folder": {
 		"message": "پوشه"
 	},
@@ -318,6 +351,9 @@
 	},
 	"highlighterSettings": {
 		"message": "مارکر"
+	},
+	"history": {
+		"message": "تاریخچه"
 	},
 	"hotkeys": {
 		"message": "کلیدهای میانبر"
@@ -389,6 +425,9 @@
 	"languageDescription": {
 		"message": "زبان نمایش را برای برنامه انتخاب کنید."
 	},
+	"last30Days": {
+		"message": "30 روز گذشته"
+	},
 	"lastUsed": {
 		"message": "آخرین استفاده"
 	},
@@ -418,6 +457,9 @@
 	},
 	"models": {
 		"message": "مدل‌ها"
+	},
+	"modelsListFor": {
+		"message": "لیست مدل ها برای $1"
 	},
 	"more": {
 		"message": "بیشتر"
@@ -478,17 +520,32 @@
 	"orPasteBelow": {
 		"message": "یا محتوا را در زیر بچسبانید"
 	},
+	"overwriteNote": {
+		"message": "یادداشت را بازنویسی کن"
+	},
 	"pageCannotBeClipped": {
 		"message": "این صفحه را نمی توان کلیپ داد."
 	},
 	"pageVariables": {
 		"message": "متغیرهای صفحه"
 	},
+	"pagesSaved": {
+		"message": "صفحه ذخیره شد"
+	},
+	"pagesSavedPlural": {
+		"message": "صفحات ذخیره شدند"
+	},
 	"pasteJsonHere": {
 		"message": "JSON را اینجا بچسبانید"
 	},
 	"pleaseReload": {
 		"message": "لطفاً صفحه را دوباره بارگیری کنید."
+	},
+	"popularModels": {
+		"message": "مدل‌های محبوب"
+	},
+	"popularModelsDescription": {
+		"message": "از مدل‌هایی که بیشتر استفاده می‌شوند انتخاب کنید یا جزئیات مدل سفارشی را وارد کنید."
 	},
 	"prependToDaily": {
 		"message": "به یادداشت روزانه، از اول اضافه کنید"
@@ -553,6 +610,15 @@
 	"providers": {
 		"message": "ارائه‌دهندگان"
 	},
+	"rateExtensionDescription": {
+		"message": "آیا از وب کلیپر لذت می برید؟ با ارزیابی آن به ما کمک کنید."
+	},
+	"reader": {
+		"message": "خواننده"
+	},
+	"recommended": {
+		"message": "توصیه شده"
+	},
 	"refresh": {
 		"message": "ریفرش"
 	},
@@ -591,6 +657,12 @@
 	},
 	"save": {
 		"message": "ذخیره"
+	},
+	"saveBehaviorDescription": {
+		"message": "گزینه پیش فرض برای ذخیره صفحات را انتخاب کنید. گزینه های جایگزین در منوی کشویی کنار دکمه اصلی ظاهر می شوند."
+	},
+	"saveBehaviorLabel": {
+		"message": "رفتار ذخیره سازی"
 	},
 	"saveFile": {
 		"message": "ذخیره فایل..."
