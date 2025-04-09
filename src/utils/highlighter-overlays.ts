@@ -132,11 +132,14 @@ function calculateAverageLineHeight(rects: DOMRectList): number {
 }
 
 // Helper function to normalize text consistently
-function normalizeText(text: string): string {
-	return text.replace(/[\u2018\u2019]/g, "'")
-		.replace(/[\u201C\u201D]/g, '"')
-		.replace(/\s+/g, ' ')
-		.trim();
+function normalizeText(text: string, preserveSpaces: boolean = false): string {
+	let normalized = text.replace(/[\u2018\u2019]/g, "'")
+		.replace(/[\u201C\u201D]/g, '"');
+	
+	if (!preserveSpaces) {
+		normalized = normalized.replace(/\s+/g, ' ').trim();
+	}
+	return normalized;
 }
 
 // Helper function to check if a node is likely to contain visible content
@@ -269,29 +272,57 @@ function findCompleteTextMatch(node: Node, searchText: string, prefix?: string, 
 		let suffixMatches = true;
 		
 		if (prefix) {
-			const beforeText = normalizedFullText.slice(Math.max(0, match.start - prefix.length * 2), match.start);
-			prefixMatches = beforeText.endsWith(prefix);
+			const beforeText = normalizeText(fullText.slice(Math.max(0, match.start - prefix.length * 2), match.start));
+			const normalizedPrefix = normalizeText(prefix);
+			prefixMatches = beforeText.endsWith(normalizedPrefix);
 			console.log('Checking prefix for match:', {
 				beforeText,
-				prefix,
+				prefix: normalizedPrefix,
 				matches: prefixMatches,
-				matchText: normalizedFullText.slice(match.start, match.end)
+				matchText: normalizedFullText.slice(match.start, match.end),
+				fullContext: fullText.slice(Math.max(0, match.start - prefix.length * 2), match.end + (suffix?.length || 0) * 2)
 			});
 		}
 		
 		if (suffix) {
-			const afterText = normalizedFullText.slice(match.end, match.end + suffix.length * 2);
-			suffixMatches = afterText.startsWith(suffix);
+			const afterText = normalizeText(fullText.slice(match.end, match.end + suffix.length * 2));
+			const normalizedSuffix = normalizeText(suffix);
+			suffixMatches = afterText.startsWith(normalizedSuffix);
 			console.log('Checking suffix for match:', {
 				afterText,
-				suffix,
+				suffix: normalizedSuffix,
 				matches: suffixMatches,
-				matchText: normalizedFullText.slice(match.start, match.end)
+				matchText: normalizedFullText.slice(match.start, match.end),
+				fullContext: fullText.slice(Math.max(0, match.start - (prefix?.length || 0) * 2), match.end + suffix.length * 2)
 			});
 		}
 		
 		if (prefixMatches && suffixMatches) {
-			return match;
+			// Map the normalized position back to the original text
+			const originalText = fullText;
+			let originalStart = 0;
+			let normalizedPos = 0;
+			
+			while (normalizedPos < match.start && originalStart < originalText.length) {
+				if (!/\s/.test(originalText[originalStart]) || 
+					(originalStart > 0 && !/\s/.test(originalText[originalStart - 1]))) {
+					normalizedPos++;
+				}
+				originalStart++;
+			}
+			
+			let originalEnd = originalStart;
+			let remainingLength = searchText.length;
+			
+			while (remainingLength > 0 && originalEnd < originalText.length) {
+				if (!/\s/.test(originalText[originalEnd]) || 
+					(originalEnd > 0 && !/\s/.test(originalText[originalEnd - 1]))) {
+					remainingLength--;
+				}
+				originalEnd++;
+			}
+			
+			return { start: originalStart, end: originalEnd };
 		}
 	}
 	
@@ -319,7 +350,7 @@ export function planHighlightOverlayRects(target: Element, highlight: AnyHighlig
 				text: textStart,
 				prefix,
 				suffix,
-				fullContext: prefix ? prefix + textStart + (suffix || '') : textStart + (suffix || '')
+				fullContext: prefix ? prefix + ' ' + textStart + ' ' + (suffix || '') : textStart + ' ' + (suffix || '')
 			});
 			
 			let node = walker.nextNode();
