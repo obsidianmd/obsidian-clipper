@@ -9,7 +9,10 @@ import {
 	removeExistingHighlights,
 	handleTouchStart,
 	handleTouchMove,
-	findTextNodeAtOffset
+	findTextNodeAtOffset,
+	isVisibleTextNode,
+	findTextInNode,
+	verifyContext
 } from './highlighter-overlays';
 import { detectBrowser, addBrowserClassToHtml } from './browser-detection';
 import { generalSettings, loadSettings } from './storage-utils';
@@ -289,7 +292,7 @@ function enableLinkClicks() {
 }
 
 // Create a fragment highlight from a text selection
-function createFragmentHighlight(range: Range): FragmentHighlightData {
+function createFragmentHighlight(range: Range): FragmentHighlightData | null {
 	const fragment = range.cloneContents();
 	const tempDiv = document.createElement('div');
 	tempDiv.appendChild(fragment);
@@ -302,19 +305,31 @@ function createFragmentHighlight(range: Range): FragmentHighlightData {
 	const suffixNode = range.endContainer.textContent?.slice(range.endOffset, range.endOffset + 20);
 	
 	// Clean and encode the text fragments
-	const textStart = encodeURIComponent(textContent.trim());
-	const prefix = prefixNode ? encodeURIComponent(prefixNode.trim()) : undefined;
-	const suffix = suffixNode ? encodeURIComponent(suffixNode.trim()) : undefined;
+	const textStart = encodeURIComponent(textContent);
+	const prefix = prefixNode ? encodeURIComponent(prefixNode) : undefined;
+	const suffix = suffixNode ? encodeURIComponent(suffixNode) : undefined;
 	
 	const highlight = {
 		type: 'fragment' as const,
 		xpath: getElementXPath(range.commonAncestorContainer as Element),
-		content: sanitizeAndPreserveFormatting(tempDiv.innerHTML),
+		content: textContent,
 		id: Date.now().toString(),
 		textStart,
 		prefix,
 		suffix
 	};
+
+	// Test if we can find this highlight
+	const canFind = testHighlightFindability(highlight);
+	if (!canFind) {
+		console.warn('Created highlight cannot be found reliably:', {
+			text: decodeURIComponent(textStart),
+			prefix: prefix ? decodeURIComponent(prefix) : undefined,
+			suffix: suffix ? decodeURIComponent(suffix) : undefined,
+			xpath: highlight.xpath
+		});
+		return null;
+	}
 
 	console.log('Created fragment highlight:', {
 		text: decodeURIComponent(textStart),
@@ -326,22 +341,70 @@ function createFragmentHighlight(range: Range): FragmentHighlightData {
 	return highlight;
 }
 
+// Test if a highlight can be found reliably
+function testHighlightFindability(highlight: FragmentHighlightData): boolean {
+	let found = false;
+	const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+		acceptNode: (node: Node) => {
+			return isVisibleTextNode(node) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+		}
+	});
+
+	const searchText = decodeURIComponent(highlight.textStart);
+	let node = walker.nextNode();
+
+	while (node) {
+		const match = findTextInNode(node, searchText);
+		if (match) {
+			const contextVerified = verifyContext(
+				node,
+				match,
+				highlight.prefix,
+				highlight.suffix
+			);
+			if (contextVerified) {
+				found = true;
+				break;
+			}
+		}
+		node = walker.nextNode();
+	}
+
+	return found;
+}
+
+// Type guard to check if a highlight is valid
+function isValidHighlight(highlight: FragmentHighlightData | null): highlight is FragmentHighlightData {
+	return highlight !== null;
+}
+
 // Handle text selection for highlighting
 export function handleTextSelection(selection: Selection, notes?: string[]) {
 	console.log('🎯 handleTextSelection called with selection:', selection.toString());
 	const range = selection.getRangeAt(0);
-	if (range.toString().length > 0) {
-		console.log('📝 Creating highlight for text:', range.toString());
-		const highlight = createFragmentHighlight(range);
-		console.log('✨ Created highlight:', highlight);
-		if (notes) {
-			highlight.notes = notes;
-		}
-		addHighlight(highlight);
-		selection.removeAllRanges();
-	} else {
+	if (range.toString().length === 0) {
 		console.log('⚠️ Empty selection, no highlight created');
+		return;
 	}
+
+	console.log('📝 Creating highlight for text:', range.toString());
+	const maybeHighlight = createFragmentHighlight(range);
+	
+	if (!maybeHighlight || !isFragmentHighlight(maybeHighlight)) {
+		console.warn('❌ Failed to create reliable highlight - skipping');
+		selection.removeAllRanges();
+		return;
+	}
+	
+	// Type is now narrowed to FragmentHighlightData
+	const highlight: AnyHighlightData = {
+		...maybeHighlight,
+		notes: notes || []
+	};
+	
+	console.log('✨ Created highlight:', highlight);
+	addHighlight(highlight);
+	selection.removeAllRanges();
 }
 
 // Get highlight ranges for a given text selection
@@ -676,7 +739,17 @@ function mergeHighlights(highlight1: AnyHighlightData, highlight2: AnyHighlightD
 		if (startNode && endNode) {
 			range.setStart(startNode, startOffset);
 			range.setEnd(endNode, endOffset);
-			return createFragmentHighlight(range);
+			const fragmentHighlight = createFragmentHighlight(range);
+			if (isFragmentHighlight(fragmentHighlight)) {
+				return fragmentHighlight;
+			}
+			// Fallback to complex highlight if fragment creation fails
+			return {
+				xpath: getElementXPath(mergedElement),
+				content: mergedElement.outerHTML,
+				type: 'complex',
+				id: Date.now().toString()
+			};
 		}
 	}
 
@@ -869,4 +942,11 @@ export function highlightElement(element: Element, notes?: string[]) {
 		type: 'complex',
 		id: Date.now().toString()
 	}, notes);
+}
+
+function isFragmentHighlight(highlight: FragmentHighlightData | null): highlight is FragmentHighlightData {
+	return highlight !== null && 
+		'text' in highlight && 
+		'prefix' in highlight && 
+		'suffix' in highlight;
 }
