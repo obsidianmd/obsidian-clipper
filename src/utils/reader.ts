@@ -985,6 +985,11 @@ export class Reader {
 			this.colorSchemeMediaQuery.addEventListener('change', (e) => this.handleColorSchemeChange(e, doc));
 			
 			this.isActive = true;
+
+			// Reapply highlights after reader mode is initialized
+			if (typeof window !== 'undefined' && window.hasOwnProperty('applyHighlights')) {
+				(window as any).applyHighlights();
+			}
 		} catch (e) {
 			console.error('Reader', 'Error during apply:', e);
 		}
@@ -1033,6 +1038,11 @@ export class Reader {
 				outline.remove();
 			}
 			this.isActive = false;
+
+			// Reapply highlights after restoring original content
+			if (typeof window !== 'undefined' && window.hasOwnProperty('applyHighlights')) {
+				(window as any).applyHighlights();
+			}
 		}
 	}
 

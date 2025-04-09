@@ -62,6 +62,7 @@ export interface FragmentHighlightData extends HighlightData {
 	textEnd?: string;
 	prefix?: string;
 	suffix?: string;
+	createdInReader?: boolean;
 }
 
 export interface StoredData {
@@ -490,31 +491,55 @@ function isValidHighlight(highlight: FragmentHighlightData | null): highlight is
 
 // Handle text selection for highlighting
 export function handleTextSelection(selection: Selection, notes?: string[]) {
-	console.log('🎯 handleTextSelection called with selection:', selection.toString());
-	const range = selection.getRangeAt(0);
-	if (range.toString().length === 0) {
-		console.log('⚠️ Empty selection, no highlight created');
-		return;
-	}
-
-	console.log('📝 Creating highlight for text:', range.toString());
-	const maybeHighlight = createFragmentHighlight(range);
-	
-	if (!maybeHighlight || !isFragmentHighlight(maybeHighlight)) {
-		console.warn('❌ Failed to create reliable highlight - skipping');
+	try {
+		const range = selection.getRangeAt(0);
+		const isInReader = document.documentElement.classList.contains('obsidian-reader-active');
+		
+		// Get the text content and context
+		const selectedText = range.toString();
+		const container = range.commonAncestorContainer.nodeType === Node.TEXT_NODE
+			? range.commonAncestorContainer.parentElement
+			: range.commonAncestorContainer as Element;
+		
+		if (!container) return;
+		
+		// Get context before and after the selection
+		const contextSize = 100;
+		const fullText = getCleanTextContent(container);
+		const selectionStart = range.startOffset;
+		const selectionEnd = range.endOffset;
+		
+		const prefix = fullText.substring(Math.max(0, selectionStart - contextSize), selectionStart);
+		const suffix = fullText.substring(selectionEnd, Math.min(fullText.length, selectionEnd + contextSize));
+		
+		// Create a fragment highlight
+		const highlight: FragmentHighlightData = {
+			id: Date.now().toString(),
+			type: 'fragment',
+			xpath: getElementXPath(container),
+			content: selectedText,
+			textStart: encodeURIComponent(selectedText),
+			prefix: encodeURIComponent(prefix),
+			suffix: encodeURIComponent(suffix),
+			notes: notes,
+			createdInReader: isInReader
+		};
+		
+		// Test if we can find the highlight reliably
+		if (testHighlightFindability(highlight)) {
+			highlights.push(highlight);
+			sortHighlights();
+			applyHighlights();
+			saveHighlights();
+			updateHighlighterMenu();
+		} else {
+			console.warn('Could not reliably find the selected text for highlighting');
+		}
+		
 		selection.removeAllRanges();
-		return;
+	} catch (error) {
+		console.error('Error handling text selection:', error);
 	}
-	
-	// Type is now narrowed to FragmentHighlightData
-	const highlight: AnyHighlightData = {
-		...maybeHighlight,
-		notes: notes || []
-	};
-	
-	console.log('✨ Created highlight:', highlight);
-	addHighlight(highlight);
-	selection.removeAllRanges();
 }
 
 // Get highlight ranges for a given text selection
@@ -966,29 +991,49 @@ export function saveHighlights() {
 
 // Apply all highlights to the page
 export function applyHighlights() {
-	if (highlights.length === 0) {
-		return; // Don't do anything if there are no highlights
-	}
-
-	if (isApplyingHighlights) return;
-	
-	const currentHighlightsState = JSON.stringify(highlights);
-	if (currentHighlightsState === lastAppliedHighlights) return;
-	
-	isApplyingHighlights = true;
-
-	removeExistingHighlights();
-	
-	highlights.forEach((highlight, index) => {
-		const container = getElementByXPath(highlight.xpath);
-		if (container) {
-			planHighlightOverlayRects(container, highlight, index);
+	try {
+		// Check if we're in reader mode
+		const isInReader = document.documentElement.classList.contains('obsidian-reader-active');
+		
+		// Get the appropriate container based on mode
+		let container: Element;
+		if (isInReader) {
+			container = document.querySelector('.obsidian-reader-content article') || document.body;
+		} else {
+			container = document.body;
 		}
-	});
 
-	lastAppliedHighlights = currentHighlightsState;
-	isApplyingHighlights = false;
-	notifyHighlightsUpdated();
+		if (!container) {
+			console.warn('Could not find container for highlights');
+			return;
+		}
+
+		isApplyingHighlights = true;
+		removeExistingHighlights();
+
+		highlights.forEach((highlight, index) => {
+			try {
+				if (highlight.type === 'fragment') {
+					// For fragment highlights, use the container directly
+					planHighlightOverlayRects(container, highlight, index);
+				} else {
+					// For legacy highlight types, try to find the element by xpath
+					const target = getElementByXPath(highlight.xpath);
+					if (target) {
+						planHighlightOverlayRects(target, highlight, index);
+					}
+				}
+			} catch (error) {
+				console.error('Error applying highlight:', error, highlight);
+			}
+		});
+
+		updateHighlightListeners();
+		isApplyingHighlights = false;
+	} catch (error) {
+		console.error('Error in applyHighlights:', error);
+		isApplyingHighlights = false;
+	}
 }
 
 // Notify that highlights have been updated
