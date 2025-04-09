@@ -134,7 +134,7 @@ function calculateAverageLineHeight(rects: DOMRectList): number {
 // Plan out the overlay rectangles depending on the type of highlight
 export function planHighlightOverlayRects(target: Element, highlight: AnyHighlightData, index: number) {
 	const existingOverlays = Array.from(document.querySelectorAll(`.obsidian-highlight-overlay[data-highlight-index="${index}"]`));
-	if (highlight.type === 'complex') {
+	if (highlight.type === 'complex' || highlight.type === 'element') {
 		const rect = target.getBoundingClientRect();
 		mergeHighlightOverlayRects([rect], highlight.content, existingOverlays, false, index, highlight.notes);
 	} else if (highlight.type === 'fragment') {
@@ -149,61 +149,87 @@ export function planHighlightOverlayRects(target: Element, highlight: AnyHighlig
 			let node = walker.nextNode();
 			let found = false;
 			
+			// Debug: Log the target element's text content
+			console.log('Searching in text:', target.textContent);
+			console.log('Looking for:', { textStart, prefix, suffix });
+			
 			while (node && !found) {
 				const text = node.textContent || '';
-				const startIndex = text.indexOf(textStart);
+				console.log('Checking node:', text);
+				
+				// Normalize quotes and spaces in both the search text and the content
+				const normalizedText = text.replace(/[\u2018\u2019]/g, "'").replace(/[\u201C\u201D]/g, '"').replace(/\s+/g, ' ');
+				const normalizedTextStart = textStart.replace(/[\u2018\u2019]/g, "'").replace(/[\u201C\u201D]/g, '"').replace(/\s+/g, ' ');
+				const normalizedPrefix = prefix?.replace(/[\u2018\u2019]/g, "'").replace(/[\u201C\u201D]/g, '"').replace(/\s+/g, ' ');
+				const normalizedSuffix = suffix?.replace(/[\u2018\u2019]/g, "'").replace(/[\u201C\u201D]/g, '"').replace(/\s+/g, ' ');
+				
+				const startIndex = normalizedText.indexOf(normalizedTextStart);
 				
 				if (startIndex !== -1) {
+					console.log('Found text match at index:', startIndex);
+					
 					// Check prefix if it exists
-					if (prefix) {
-						const beforeText = text.slice(Math.max(0, startIndex - prefix.length), startIndex);
-						if (!beforeText.includes(prefix)) {
-							node = walker.nextNode();
-							continue;
-						}
+					let prefixMatches = true;
+					if (normalizedPrefix) {
+						// Get more context for prefix matching
+						const prefixStart = Math.max(0, startIndex - normalizedPrefix.length * 2);
+						const beforeText = normalizedText.slice(prefixStart, startIndex).trim();
+						prefixMatches = beforeText.endsWith(normalizedPrefix);
+						console.log('Checking prefix:', { 
+							beforeText,
+							normalizedPrefix, 
+							matches: prefixMatches,
+							fullContext: normalizedText.slice(Math.max(0, startIndex - 40), startIndex + 40)
+						});
 					}
 					
 					// Check suffix if it exists
-					if (suffix) {
-						const afterText = text.slice(startIndex + textStart.length, startIndex + textStart.length + suffix.length);
-						if (!afterText.includes(suffix)) {
-							node = walker.nextNode();
-							continue;
-						}
+					let suffixMatches = true;
+					if (normalizedSuffix) {
+						const afterStart = startIndex + normalizedTextStart.length;
+						const afterText = normalizedText.slice(afterStart, afterStart + normalizedSuffix.length * 2).trim();
+						suffixMatches = afterText.startsWith(normalizedSuffix);
+						console.log('Checking suffix:', { 
+							afterText,
+							normalizedSuffix, 
+							matches: suffixMatches,
+							fullContext: normalizedText.slice(afterStart - 40, afterStart + 40)
+						});
 					}
 					
-					// Found a match, create a range
-					const range = document.createRange();
-					range.setStart(node, startIndex);
-					range.setEnd(node, startIndex + textStart.length);
-					
-					const rects = range.getClientRects();
-					if (rects.length > 0) {
-						const averageLineHeight = calculateAverageLineHeight(rects);
-						const textRects = Array.from(rects).filter(rect => rect.height <= averageLineHeight * 1.5);
-						const complexRects = Array.from(rects).filter(rect => rect.height > averageLineHeight * 1.5);
+					if (prefixMatches && suffixMatches) {
+						console.log('Found complete match with prefix/suffix');
+						// Found a match, create a range
+						const range = document.createRange();
+						range.setStart(node, startIndex);
+						range.setEnd(node, startIndex + textStart.length);
 						
-						if (textRects.length > 0) {
-							mergeHighlightOverlayRects(textRects, highlight.content, existingOverlays, true, index, highlight.notes);
+						const rects = range.getClientRects();
+						if (rects.length > 0) {
+							const averageLineHeight = calculateAverageLineHeight(rects);
+							const textRects = Array.from(rects).filter(rect => rect.height <= averageLineHeight * 1.5);
+							
+							if (textRects.length > 0) {
+								mergeHighlightOverlayRects(textRects, highlight.content, existingOverlays, true, index, highlight.notes);
+								found = true;
+							}
 						}
-						if (complexRects.length > 0) {
-							mergeHighlightOverlayRects(complexRects, highlight.content, existingOverlays, false, index, highlight.notes);
-						}
-						found = true;
 					}
 				}
 				node = walker.nextNode();
 			}
 			
 			if (!found) {
-				// Fallback to complex highlight if text not found
-				const rect = target.getBoundingClientRect();
-				mergeHighlightOverlayRects([rect], highlight.content, existingOverlays, false, index, highlight.notes);
+				console.warn('Could not find exact text match for fragment highlight:', {
+					text: textStart,
+					prefix,
+					suffix,
+					xpath: highlight.xpath,
+					elementContent: target.textContent
+				});
 			}
 		} catch (error) {
-			console.error('Error creating fragment highlight:', error);
-			const rect = target.getBoundingClientRect();
-			mergeHighlightOverlayRects([rect], highlight.content, existingOverlays, false, index, highlight.notes);
+			console.error('Error creating fragment highlight overlay:', error);
 		}
 	} else if (highlight.type === 'text') {
 		try {
@@ -213,54 +239,24 @@ export function planHighlightOverlayRects(target: Element, highlight: AnyHighlig
 			
 			if (startNode && endNode) {
 				try {
-					// Try to set start position
-					try {
-						range.setStart(startNode.node, startNode.offset);
-					} catch {
-						// Fallback to node start
-						range.setStart(startNode.node, 0);
-					}
-					
-					// Try to set end position
-					try {
-						range.setEnd(endNode.node, endNode.offset);
-					} catch {
-						// Fallback to node end
-						range.setEnd(endNode.node, endNode.node.textContent?.length || 0);
-					}
+					range.setStart(startNode.node, startNode.offset);
+					range.setEnd(endNode.node, endNode.offset);
 					
 					const rects = range.getClientRects();
-					
-					if (rects.length === 0) {
-						const rect = target.getBoundingClientRect();
-						mergeHighlightOverlayRects([rect], highlight.content, existingOverlays, false, index, highlight.notes);
-						return;
-					}
-					
-					const averageLineHeight = calculateAverageLineHeight(rects);
-					const textRects = Array.from(rects).filter(rect => rect.height <= averageLineHeight * 1.5);
-					const complexRects = Array.from(rects).filter(rect => rect.height > averageLineHeight * 1.5);
-					
-					if (textRects.length > 0) {
-						mergeHighlightOverlayRects(textRects, highlight.content, existingOverlays, true, index, highlight.notes);
-					}
-					if (complexRects.length > 0) {
-						mergeHighlightOverlayRects(complexRects, highlight.content, existingOverlays, false, index, highlight.notes);
+					if (rects.length > 0) {
+						const averageLineHeight = calculateAverageLineHeight(rects);
+						const textRects = Array.from(rects).filter(rect => rect.height <= averageLineHeight * 1.5);
+						
+						if (textRects.length > 0) {
+							mergeHighlightOverlayRects(textRects, highlight.content, existingOverlays, true, index, highlight.notes);
+						}
 					}
 				} catch (error) {
-					// Fallback to complex highlight
-					const rect = target.getBoundingClientRect();
-					mergeHighlightOverlayRects([rect], highlight.content, existingOverlays, false, index, highlight.notes);
+					console.error('Error creating text range:', error);
 				}
-			} else {
-				// Fallback to complex highlight
-				const rect = target.getBoundingClientRect();
-				mergeHighlightOverlayRects([rect], highlight.content, existingOverlays, false, index, highlight.notes);
 			}
 		} catch (error) {
-			console.error('Error creating text highlight:', error);
-			const rect = target.getBoundingClientRect();
-			mergeHighlightOverlayRects([rect], highlight.content, existingOverlays, false, index, highlight.notes);
+			console.error('Error creating text highlight overlay:', error);
 		}
 	}
 }
