@@ -328,14 +328,19 @@ function createFragmentHighlight(range: Range): FragmentHighlightData {
 
 // Handle text selection for highlighting
 export function handleTextSelection(selection: Selection, notes?: string[]) {
+	console.log('🎯 handleTextSelection called with selection:', selection.toString());
 	const range = selection.getRangeAt(0);
 	if (range.toString().length > 0) {
+		console.log('📝 Creating highlight for text:', range.toString());
 		const highlight = createFragmentHighlight(range);
+		console.log('✨ Created highlight:', highlight);
 		if (notes) {
 			highlight.notes = notes;
 		}
 		addHighlight(highlight);
 		selection.removeAllRanges();
+	} else {
+		console.log('⚠️ Empty selection, no highlight created');
 	}
 }
 
@@ -431,10 +436,19 @@ function getTextOffset(container: Element, targetNode: Node, targetOffset: numbe
 
 // Add a new highlight to the page
 function addHighlight(highlight: AnyHighlightData, notes?: string[]) {
+	console.log('➕ Adding new highlight:', {
+		type: highlight.type,
+		content: highlight.content.slice(0, 100) + (highlight.content.length > 100 ? '...' : ''),
+		xpath: highlight.xpath
+	});
+	
 	const oldHighlights = [...highlights];
 	const newHighlight = { ...highlight, notes: notes || [] };
 	const mergedHighlights = mergeOverlappingHighlights(highlights, newHighlight);
 	highlights = mergedHighlights;
+	
+	console.log('📊 Highlights after merge:', highlights.length, 'total highlights');
+	
 	addToHistory('add', oldHighlights, mergedHighlights);
 	sortHighlights();
 	applyHighlights();
