@@ -146,63 +146,74 @@ export function planHighlightOverlayRects(target: Element, highlight: AnyHighlig
 			
 			// Create a TreeWalker to find text nodes
 			const walker = document.createTreeWalker(target, NodeFilter.SHOW_TEXT);
-			let node = walker.nextNode();
 			let found = false;
 			
 			// Debug: Log the target element's text content
 			console.log('Searching in text:', target.textContent);
 			console.log('Looking for:', { textStart, prefix, suffix });
 			
-			while (node && !found) {
-				const text = node.textContent || '';
-				console.log('Checking node:', text);
+			// Collect all text nodes and their contents
+			const textNodes: { node: Node; text: string; start: number; end: number }[] = [];
+			let totalText = '';
+			let node = walker.nextNode();
+			
+			while (node) {
+				const nodeText = node.textContent || '';
+				const start = totalText.length;
+				totalText += nodeText;
+				textNodes.push({
+					node,
+					text: nodeText,
+					start,
+					end: totalText.length
+				});
+				node = walker.nextNode();
+			}
+			
+			// Normalize the complete text
+			const normalizedTotalText = totalText.replace(/[\u2018\u2019]/g, "'")
+				.replace(/[\u201C\u201D]/g, '"')
+				.replace(/\s+/g, ' ');
+			const normalizedTextStart = textStart.replace(/[\u2018\u2019]/g, "'")
+				.replace(/[\u201C\u201D]/g, '"')
+				.replace(/\s+/g, ' ');
+			const normalizedPrefix = prefix?.replace(/[\u2018\u2019]/g, "'")
+				.replace(/[\u201C\u201D]/g, '"')
+				.replace(/\s+/g, ' ');
+			
+			console.log('Normalized text:', { normalizedTotalText, normalizedTextStart });
+			
+			const startIndex = normalizedTotalText.indexOf(normalizedTextStart);
+			if (startIndex !== -1) {
+				console.log('Found text match at index:', startIndex);
 				
-				// Normalize quotes and spaces in both the search text and the content
-				const normalizedText = text.replace(/[\u2018\u2019]/g, "'").replace(/[\u201C\u201D]/g, '"').replace(/\s+/g, ' ');
-				const normalizedTextStart = textStart.replace(/[\u2018\u2019]/g, "'").replace(/[\u201C\u201D]/g, '"').replace(/\s+/g, ' ');
-				const normalizedPrefix = prefix?.replace(/[\u2018\u2019]/g, "'").replace(/[\u201C\u201D]/g, '"').replace(/\s+/g, ' ');
-				const normalizedSuffix = suffix?.replace(/[\u2018\u2019]/g, "'").replace(/[\u201C\u201D]/g, '"').replace(/\s+/g, ' ');
+				// Check prefix if it exists
+				let prefixMatches = true;
+				if (normalizedPrefix) {
+					const prefixStart = Math.max(0, startIndex - normalizedPrefix.length * 2);
+					const beforeText = normalizedTotalText.slice(prefixStart, startIndex).trim();
+					prefixMatches = beforeText.endsWith(normalizedPrefix);
+					console.log('Checking prefix:', {
+						beforeText,
+						normalizedPrefix,
+						matches: prefixMatches
+					});
+				}
 				
-				const startIndex = normalizedText.indexOf(normalizedTextStart);
-				
-				if (startIndex !== -1) {
-					console.log('Found text match at index:', startIndex);
+				if (prefixMatches) {
+					// Find the nodes that contain our text
+					const startNodeInfo = textNodes.find(n => startIndex >= n.start && startIndex < n.end);
+					const endNodeInfo = textNodes.find(n => {
+						const endIndex = startIndex + normalizedTextStart.length;
+						return endIndex > n.start && endIndex <= n.end;
+					});
 					
-					// Check prefix if it exists
-					let prefixMatches = true;
-					if (normalizedPrefix) {
-						// Get more context for prefix matching
-						const prefixStart = Math.max(0, startIndex - normalizedPrefix.length * 2);
-						const beforeText = normalizedText.slice(prefixStart, startIndex).trim();
-						prefixMatches = beforeText.endsWith(normalizedPrefix);
-						console.log('Checking prefix:', { 
-							beforeText,
-							normalizedPrefix, 
-							matches: prefixMatches,
-							fullContext: normalizedText.slice(Math.max(0, startIndex - 40), startIndex + 40)
-						});
-					}
-					
-					// Check suffix if it exists
-					let suffixMatches = true;
-					if (normalizedSuffix) {
-						const afterStart = startIndex + normalizedTextStart.length;
-						const afterText = normalizedText.slice(afterStart, afterStart + normalizedSuffix.length * 2).trim();
-						suffixMatches = afterText.startsWith(normalizedSuffix);
-						console.log('Checking suffix:', { 
-							afterText,
-							normalizedSuffix, 
-							matches: suffixMatches,
-							fullContext: normalizedText.slice(afterStart - 40, afterStart + 40)
-						});
-					}
-					
-					if (prefixMatches && suffixMatches) {
-						console.log('Found complete match with prefix/suffix');
-						// Found a match, create a range
+					if (startNodeInfo && endNodeInfo) {
+						console.log('Found start and end nodes:', { startNodeInfo, endNodeInfo });
+						
 						const range = document.createRange();
-						range.setStart(node, startIndex);
-						range.setEnd(node, startIndex + textStart.length);
+						range.setStart(startNodeInfo.node, startIndex - startNodeInfo.start);
+						range.setEnd(endNodeInfo.node, startIndex + normalizedTextStart.length - endNodeInfo.start);
 						
 						const rects = range.getClientRects();
 						if (rects.length > 0) {
@@ -216,7 +227,6 @@ export function planHighlightOverlayRects(target: Element, highlight: AnyHighlig
 						}
 					}
 				}
-				node = walker.nextNode();
 			}
 			
 			if (!found) {
@@ -225,7 +235,8 @@ export function planHighlightOverlayRects(target: Element, highlight: AnyHighlig
 					prefix,
 					suffix,
 					xpath: highlight.xpath,
-					elementContent: target.textContent
+					elementContent: target.textContent,
+					normalizedContent: normalizedTotalText
 				});
 			}
 		} catch (error) {
