@@ -3,7 +3,6 @@ import { getLocalStorage, setLocalStorage } from './storage-utils';
 import hljs from 'highlight.js';
 import { getDomain } from './string-utils';
 import { applyHighlights } from './highlighter';
-import { throttledUpdateHighlights } from './highlighter-overlays';
 
 // Mobile viewport settings
 const VIEWPORT = 'width=device-width, initial-scale=1, maximum-scale=1';
@@ -987,9 +986,9 @@ export class Reader {
 			this.colorSchemeMediaQuery.addEventListener('change', (e) => this.handleColorSchemeChange(e, doc));
 			
 			applyHighlights();
- 
+
 			this.isActive = true;
- 
+
 		} catch (e) {
 			console.error('Reader', 'Error during apply:', e);
 		}
