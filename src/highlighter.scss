@@ -208,9 +208,9 @@ body.obsidian-highlighter-active {
 		}
 	}
 
-	&:hover .copy-url-button {
-		display: inline-flex;
-	}
+	// &:hover .copy-url-button {
+	// 	display: inline-flex;
+	// }
 
 	&.is-hovering {
 		border: 2px dashed rgb(255, 235, 0, 1);
