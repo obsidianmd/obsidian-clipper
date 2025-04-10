@@ -7,7 +7,8 @@ import {
 	applyHighlights,
 	saveHighlights,
 	updateHighlights,
-	updateHighlighterMenu
+	updateHighlighterMenu,
+	FragmentHighlightData
 } from './highlighter';
 import { throttle } from './throttle';
 import { getElementByXPath, isDarkColor } from './dom-utils';
@@ -17,14 +18,6 @@ let touchStartX: number = 0;
 let touchStartY: number = 0;
 let isTouchMoved: boolean = false;
 let lastHoverTarget: Element | null = null;
-
-// Check if an element should be ignored for highlighting
-function isIgnoredElement(element: Element): boolean {
-	return element.tagName.toLowerCase() === 'html' || 
-		element.tagName.toLowerCase() === 'body' || 
-		element.classList.contains('obsidian-highlighter-menu') ||
-		element.closest('.obsidian-highlighter-menu') !== null;
-}
 
 // Handles mouse move events for hover effects
 export function handleMouseMove(event: MouseEvent | TouchEvent) {
@@ -323,37 +316,54 @@ function mergeHighlightOverlayRects(rects: DOMRect[], content: string, existingO
 	}
 }
 
-// Add helper function to create text fragment URL
-function createTextFragmentURL(text: string, prefix?: string, suffix?: string): string {
-	// Clean and encode the text fragments
-	const cleanText = text.trim().replace(/\s+/g, ' ');
-	
-	// Custom encode function to ensure hyphens are properly encoded
-	const encodeForTextFragment = (str: string) => {
-		return encodeURIComponent(str)
-			.replace(/-/g, '%2D') // Ensure hyphens are always encoded
-			.replace(/'/g, '%27') // Ensure single quotes are encoded
-			.replace(/"/g, '%22') // Ensure double quotes are encoded
-			.replace(/\(/g, '%28') // Ensure parentheses are encoded
-			.replace(/\)/g, '%29')
-			.replace(/\!/g, '%21')
-			.replace(/~/g, '%7E')
-			.replace(/\*/g, '%2A')
-			.replace(/\./g, '%2E')
-			.replace(/'/g, '%E2%80%99') // Smart single quote
-			.replace(/'/g, '%E2%80%99') // Another smart single quote variant
-			.replace(/"/g, '%E2%80%9C') // Smart double quote opening
-			.replace(/"/g, '%E2%80%9D'); // Smart double quote closing
-	};
+// Custom encode function for text fragments
+const encodeForTextFragment = (str: string) => {
+	return encodeURIComponent(str)
+		.replace(/-/g, '%2D') // Ensure hyphens are always encoded
+		.replace(/'/g, '%27') // Ensure single quotes are encoded
+		.replace(/"/g, '%22') // Ensure double quotes are encoded
+		.replace(/\(/g, '%28') // Ensure parentheses are encoded
+		.replace(/\)/g, '%29')
+		.replace(/\!/g, '%21')
+		.replace(/~/g, '%7E')
+		.replace(/\*/g, '%2A')
+		.replace(/\./g, '%2E')
+		.replace(/'/g, '%E2%80%99') // Smart single quote
+		.replace(/'/g, '%E2%80%99') // Another smart single quote variant
+		.replace(/"/g, '%E2%80%9C') // Smart double quote opening
+		.replace(/"/g, '%E2%80%9D'); // Smart double quote closing
+};
 
+// Helper function to generate the text fragment string part for a highlight
+export function generateTextFragmentString(highlight: FragmentHighlightData): string {
+	const cleanText = decodeURIComponent(highlight.textStart).trim().replace(/\s+/g, ' ');
 	const encodedText = encodeForTextFragment(cleanText);
+	const prefix = highlight.prefix ? decodeURIComponent(highlight.prefix) : undefined;
+	const suffix = highlight.suffix ? decodeURIComponent(highlight.suffix) : undefined;
 	const encodedPrefix = prefix ? encodeForTextFragment(prefix.trim()) : '';
 	const encodedSuffix = suffix ? encodeForTextFragment(suffix.trim()) : '';
 
-	// Build the text fragment
-	let fragment = `:~:text=${encodedText}`;
-	if (encodedPrefix) fragment = `:~:text=${encodedPrefix}-,${encodedText}`;
-	if (encodedSuffix) fragment += `,${encodedSuffix}`;
+	// Build the text fragment part (without #:~:)
+	let fragmentPart = `text=${encodedText}`;
+	if (encodedPrefix) fragmentPart = `text=${encodedPrefix}-,${encodedText}`;
+	if (encodedSuffix) fragmentPart += `,${encodedSuffix}`;
+
+	return fragmentPart;
+}
+
+function createTextFragmentURL(textStart: string, prefix?: string, suffix?: string): string {
+	// Generate fragment string using the helper
+	const fragmentPart = generateTextFragmentString({
+		type: 'fragment',
+		textStart: textStart,
+		prefix: prefix ? encodeURIComponent(prefix) : undefined,
+		suffix: suffix ? encodeURIComponent(suffix) : undefined,
+		// Dummy values for other required fields
+		id: '',
+		xpath: '',
+		content: '' 
+	});
+	const fragment = `:~:${fragmentPart}`;
 
 	// Create the full URL
 	const baseUrl = window.location.href.split('#')[0];
@@ -622,7 +632,6 @@ export function removeExistingHighlights() {
 	}
 }
 
-// Add fuzzy matching helper function
 function fuzzyMatch(text1: string, text2: string, threshold: number = 0.8): boolean {
 	if (text1 === text2) return true;
 	
@@ -652,28 +661,6 @@ function fuzzyMatch(text1: string, text2: string, threshold: number = 0.8): bool
 	const similarity = 1 - (dp[m][n] / maxLength);
 	
 	return similarity >= threshold;
-}
-
-// Add helper function to check if text ends with a partial match
-function endsWithPartial(text: string, searchText: string): boolean {
-	// Check if the text ends with any part of the search text
-	for (let i = 1; i <= Math.min(text.length, searchText.length); i++) {
-		if (searchText.startsWith(text.slice(-i))) {
-			return true;
-		}
-	}
-	return false;
-}
-
-// Add helper function to check if text starts with a partial match
-function startsWithPartial(text: string, searchText: string): boolean {
-	// Check if the text starts with any part of the search text
-	for (let i = 1; i <= Math.min(text.length, searchText.length); i++) {
-		if (searchText.endsWith(text.slice(0, i))) {
-			return true;
-		}
-	}
-	return false;
 }
 
 // Enhanced findTextInCleanContent function with improved context matching

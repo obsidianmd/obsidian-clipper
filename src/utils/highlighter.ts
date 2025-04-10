@@ -13,7 +13,8 @@ import {
 	getTextNodesIn,
 	getCleanTextContent,
 	findTextNodeAtPosition,
-	normalizeText
+	normalizeText,
+	generateTextFragmentString
 } from './highlighter-overlays';
 import { detectBrowser, addBrowserClassToHtml } from './browser-detection';
 import { generalSettings, loadSettings } from './storage-utils';
@@ -201,6 +202,7 @@ export function createHighlighterMenu() {
 	menu.innerHTML = `
 		${highlightCount > 0 ? `<button id="obsidian-clip-button" class="mod-cta">Clip highlights</button>` : '<span class="no-highlights">Select elements to highlight</span>'}
 		${highlightCount > 0 ? `<button id="obsidian-clear-highlights">${highlightText} <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg></button>` : ''}
+		${highlightCount > 0 ? `<button id="obsidian-copy-all-links"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></button>` : ''}
 		<button id="obsidian-undo-highlights"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-undo-2"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5v0a5.5 5.5 0 0 1-5.5 5.5H11"/></svg></button>
 		<button id="obsidian-redo-highlights"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-redo-2"><path d="m15 14 5-5-5-5"/><path d="M20 9H9.5A5.5 5.5 0 0 0 4 14.5v0A5.5 5.5 0 0 0 9.5 20H13"/></svg></button>
 		<button id="obsidian-exit-highlighter"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>	
@@ -209,6 +211,7 @@ export function createHighlighterMenu() {
 	if (highlightCount > 0) {
 		const clearButton = document.getElementById('obsidian-clear-highlights');
 		const clipButton = document.getElementById('obsidian-clip-button');
+		const copyAllButton = document.getElementById('obsidian-copy-all-links');
 
 		if (clearButton) {
 			clearButton.addEventListener('click', clearHighlights);
@@ -223,6 +226,14 @@ export function createHighlighterMenu() {
 			clipButton.addEventListener('touchend', (e) => {
 				e.preventDefault();
 				handleClipButtonClick(e);
+			});
+		}
+
+		if (copyAllButton) {
+			copyAllButton.addEventListener('click', handleCopyAllHighlightsLink);
+			copyAllButton.addEventListener('touchend', (e) => {
+				e.preventDefault();
+				handleCopyAllHighlightsLink();
 			});
 		}
 	}
@@ -481,11 +492,6 @@ function testHighlightFindability(highlight: FragmentHighlightData): boolean {
 		highlight.suffix
 	);
 	return result !== null;
-}
-
-// Type guard to check if a highlight is valid
-function isValidHighlight(highlight: FragmentHighlightData | null): highlight is FragmentHighlightData {
-	return highlight !== null;
 }
 
 // Helper function to create and add a highlight for a specific range (within a single block)
@@ -781,103 +787,6 @@ export async function handleTextSelection(selection: Selection, notes?: string[]
 	}
 }
 
-// Get highlight ranges for a given text selection
-function getHighlightRanges(range: Range): TextHighlightData[] {
-	const highlights: TextHighlightData[] = [];
-	const fragment = range.cloneContents();
-	const tempDiv = document.createElement('div');
-	tempDiv.appendChild(fragment);
-
-	const parentElement = getHighlightableParent(range.commonAncestorContainer);
-	const xpath = getElementXPath(parentElement);
-	
-	// Get the text content and find the positions
-	const cleanText = getCleanTextContent(parentElement);
-	const startPos = findTextNodeAtPosition(parentElement, range.startOffset);
-	const endPos = findTextNodeAtPosition(parentElement, range.endOffset);
-	
-	if (startPos && endPos) {
-		highlights.push({
-			xpath,
-			content: sanitizeAndPreserveFormatting(tempDiv.innerHTML),
-			type: 'text',
-			id: Date.now().toString(),
-			startOffset: startPos.offset,
-			endOffset: endPos.offset
-		});
-	}
-
-	return highlights;
-}
-
-// Sanitize HTML content while preserving formatting
-function sanitizeAndPreserveFormatting(html: string): string {
-	const tempDiv = document.createElement('div');
-	tempDiv.innerHTML = html;
-
-	// Remove any script tags
-	tempDiv.querySelectorAll('script').forEach(el => el.remove());
-
-	// Close any unclosed tags
-	return balanceTags(tempDiv.innerHTML);
-}
-
-// Balance HTML tags to ensure proper nesting
-function balanceTags(html: string): string {
-	const openingTags: string[] = [];
-	const regex = /<\/?([a-z]+)[^>]*>/gi;
-	let match;
-
-	while ((match = regex.exec(html)) !== null) {
-		if (match[0].startsWith('</')) {
-			// Closing tag
-			const lastOpenTag = openingTags.pop();
-			if (lastOpenTag !== match[1].toLowerCase()) {
-				// Mismatched tag, add it back
-				if (lastOpenTag) openingTags.push(lastOpenTag);
-			}
-		} else {
-			// Opening tag
-			openingTags.push(match[1].toLowerCase());
-		}
-	}
-
-	// Close any remaining open tags
-	let balancedHtml = html;
-	while (openingTags.length > 0) {
-		const tag = openingTags.pop();
-		balancedHtml += `</${tag}>`;
-	}
-
-	return balancedHtml;
-}
-
-// Find the nearest highlightable parent element
-function getHighlightableParent(node: Node): Element {
-	let current: Node | null = node;
-	while (current && current.nodeType !== Node.ELEMENT_NODE) {
-		current = current.parentNode;
-	}
-	return current as Element;
-}
-
-// Calculate the text offset within a container element
-function getTextOffset(container: Element, targetNode: Node, targetOffset: number): number {
-	let offset = 0;
-	const treeWalker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
-	
-	let node: Node | null = treeWalker.currentNode;
-	while (node) {
-		if (node === targetNode) {
-			return offset + targetOffset;
-		}
-		offset += (node.textContent?.length || 0);
-		node = treeWalker.nextNode();
-	}
-	
-	return offset;
-}
-
 // Add a new highlight to the page
 function addHighlight(highlight: AnyHighlightData) {
 	console.log('➕ Adding new highlight:', {
@@ -1098,11 +1007,6 @@ function mergeHighlights(highlight1: AnyHighlightData, highlight2: AnyHighlightD
 	// Decode texts for range finding
 	const text1 = decodeURIComponent(highlight1.textStart);
 	const text2 = decodeURIComponent(highlight2.textStart);
-	const prefix1 = highlight1.prefix ? decodeURIComponent(highlight1.prefix) : undefined;
-	const suffix1 = highlight1.suffix ? decodeURIComponent(highlight1.suffix) : undefined;
-	const prefix2 = highlight2.prefix ? decodeURIComponent(highlight2.prefix) : undefined;
-	const suffix2 = highlight2.suffix ? decodeURIComponent(highlight2.suffix) : undefined;
-
 
 	// Find the ranges for both highlights first
 	const range1Result = findTextInCleanContent(element, text1, highlight1.prefix, highlight1.suffix);
@@ -1412,17 +1316,6 @@ export function highlightElement(element: Element, notes?: string[]) {
 	addHighlight(highlight);
 }
 
-function isFragmentHighlight(highlight: FragmentHighlightData | null): highlight is FragmentHighlightData {
-	return highlight !== null && 
-		highlight.type === 'fragment' &&
-		typeof highlight.textStart === 'string' &&
-		typeof highlight.content === 'string' &&
-		typeof highlight.xpath === 'string' &&
-		typeof highlight.id === 'string';
-}
-
-// --- Helper function to map normalized position back to original ---
-// This function needs to be accessible by handleTextSelection
 function mapNormalizedPositionToOriginal(originalText: string, normalizedText: string, normalizedPosition: number): number {
 	let originalPos = 0;
 	let normalizedPos = 0;
@@ -1472,4 +1365,39 @@ function mapNormalizedPositionToOriginal(originalText: string, normalizedText: s
 	}
 
 	return originalPos;
+}
+
+// Function to handle copying the link for all highlights
+async function handleCopyAllHighlightsLink() {
+	const fragmentHighlights = highlights.filter((h): h is FragmentHighlightData => h.type === 'fragment');
+
+	if (fragmentHighlights.length === 0) {
+		console.log("No fragment highlights to copy.");
+		return;
+	}
+
+	const baseUrl = window.location.href.split('#')[0];
+	const fragmentStrings = fragmentHighlights.map(generateTextFragmentString);
+	const fullUrl = `${baseUrl}#:~:${fragmentStrings.join('&')}`;
+
+	try {
+		await navigator.clipboard.writeText(fullUrl);
+		
+		// Provide feedback (similar to individual copy button)
+		const copyButton = document.getElementById('obsidian-copy-all-links');
+		if (copyButton) {
+			const originalIcon = copyButton.innerHTML;
+			copyButton.innerHTML = `
+				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check"><path d="M20 6 9 17l-5-5"/></svg>
+			`;
+			copyButton.classList.add('copied');
+			
+			setTimeout(() => {
+				copyButton.innerHTML = originalIcon;
+				copyButton.classList.remove('copied');
+			}, 2000);
+		}
+	} catch (error) {
+		console.error('Error copying all highlight links:', error);
+	}
 }
