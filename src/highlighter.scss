@@ -50,7 +50,8 @@ body.obsidian-highlighter-active {
 	border: 1px solid #424242;
 	background: #353535;
 	color: #fff;
-	padding: 4px;
+	padding: var(--obsidian-highlighter-menu-padding);
+	height: var(--obsidian-highlighter-menu-height);
 	border-radius: var(--obsidian-highlighter-menu-height);
 	display: flex;
 	align-items: center;
@@ -116,6 +117,7 @@ body.obsidian-highlighter-active {
 		box-shadow: var(--obsidian-highlighter-button-border) !important;
 		-webkit-font-smoothing: antialiased !important;
 		svg {
+			mix-blend-mode: normal !important;
 			color: #bebebe;
 			width: 16px;
 			height: 16px;
@@ -185,6 +187,7 @@ body.obsidian-highlighter-active {
 		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
 		
 		svg {
+			mix-blend-mode: normal !important;
 			width: 12px;
 			height: 12px;
 			vertical-align: middle;
