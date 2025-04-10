@@ -35,19 +35,18 @@
 		"128": "icons/icon128.png"
 	},
 	"background": {
-		"scripts": ["background.js"],
-		"type": "module"
+		"scripts": ["background.js"]
 	},
 	"content_scripts": [
 		{
 			"matches": ["http://*/*", "https://*/*"],
-			"js": ["content.js"],
+			"js": ["browser-polyfill.min.js", "content.js"],
 			"css": ["highlighter.css"]
 		}
 	],
 	"web_accessible_resources": [
 		{
-			"resources": ["reader.css", "reader-script.js"],
+			"resources": ["reader.css", "reader-script.js", "browser-polyfill.min.js"],
 			"extension_ids": ["*"],
    			"matches": [ "*://*/*" ]
 		}
@@ -69,6 +68,13 @@
 				"mac": "Alt+Shift+H"
 			},
 			"description": "__MSG_commandToggleHighlighter__"
+		},
+		"toggle_reader": {
+			"suggested_key": {
+				"default": "Alt+Shift+R",
+				"mac": "Alt+Shift+R"
+			},
+			"description": "__MSG_commandToggleReader__"
 		}
 	},
 	"browser_specific_settings": {

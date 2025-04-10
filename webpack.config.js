@@ -51,7 +51,7 @@ module.exports = (env, argv) => {
 		output: {
 			path: path.resolve(__dirname, outputDir),
 			filename: '[name].js',
-			module: true,
+			module: false,
 		},
 		devtool: isProduction ? false : 'source-map',
 		optimization: {
@@ -69,14 +69,14 @@ module.exports = (env, argv) => {
 							dead_code: true,
 							passes: 2,
 							ecma: 2020,
-							module: true
+							module: false
 						},
 						format: {
 							ascii_only: true,
 							comments: false,
 							ecma: 2020
 						},
-						module: true,
+						module: false,
 						toplevel: true,
 						keep_classnames: true,
 						keep_fnames: true
@@ -88,16 +88,29 @@ module.exports = (env, argv) => {
 			chunkIds: 'named'
 		},
 		experiments: {
-			outputModule: true,
+			outputModule: false,
 		},
 		resolve: {
-			extensions: ['.ts', '.js']
+			extensions: ['.ts', '.js'],
+			alias: {
+				'./utils/browser-polyfill': path.resolve(__dirname, 'node_modules/webextension-polyfill/dist/browser-polyfill.min.js'),
+				'../utils/browser-polyfill': path.resolve(__dirname, 'node_modules/webextension-polyfill/dist/browser-polyfill.min.js')
+			}
 		},
 		module: {
 			rules: [
 				{
 					test: /\.tsx?$/,
-					use: 'ts-loader',
+					use: [
+						{
+							loader: 'ts-loader',
+							options: {
+								compilerOptions: {
+									module: 'ES2020'
+								}
+							}
+						}
+					],
 					exclude: /node_modules/,
 				},
 				{
