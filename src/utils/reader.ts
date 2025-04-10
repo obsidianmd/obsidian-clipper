@@ -2,6 +2,8 @@ import Defuddle from 'defuddle/full';
 import { getLocalStorage, setLocalStorage } from './storage-utils';
 import hljs from 'highlight.js';
 import { getDomain } from './string-utils';
+import { applyHighlights } from './highlighter';
+import { throttledUpdateHighlights } from './highlighter-overlays';
 
 // Mobile viewport settings
 const VIEWPORT = 'width=device-width, initial-scale=1, maximum-scale=1';
@@ -984,7 +986,10 @@ export class Reader {
 			this.colorSchemeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 			this.colorSchemeMediaQuery.addEventListener('change', (e) => this.handleColorSchemeChange(e, doc));
 			
+			applyHighlights();
+ 
 			this.isActive = true;
+ 
 		} catch (e) {
 			console.error('Reader', 'Error during apply:', e);
 		}
@@ -1033,6 +1038,11 @@ export class Reader {
 				outline.remove();
 			}
 			this.isActive = false;
+
+			// Reapply highlights after restoring original content
+			if (typeof window !== 'undefined' && window.hasOwnProperty('applyHighlights')) {
+				(window as any).applyHighlights();
+			}
 		}
 	}
 

@@ -156,11 +156,9 @@ declare global {
 			sendResponse({ success: true });
 		} else if (request.action === "highlightSelection") {
 			highlighter.toggleHighlighterMenu(request.isActive);
-			if (request.highlightData && request.highlightData.type === 'text') {
-				const selection = window.getSelection();
-				if (selection && !selection.isCollapsed) {
-					highlighter.handleTextSelection(selection);
-				}
+			const selection = window.getSelection();
+			if (selection && !selection.isCollapsed) {
+				highlighter.handleTextSelection(selection);
 			}
 			updateHasHighlights();
 			sendResponse({ success: true });
