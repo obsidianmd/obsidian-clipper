@@ -269,6 +269,9 @@ function filterAndSortHighlights(highlights: AnyHighlightData[]): (TextHighlight
 			if (h.type === 'text') {
 				return !!(h.xpath?.trim() || h.content?.trim());
 			}
+			if (h.type === 'fragment') {
+				return !!(h.xpath?.trim() || h.content?.trim());
+			}
 			if (h.type === 'element' && h.xpath?.trim()) {
 				const element = getElementByXPath(h.xpath);
 				return element ? canHighlightElement(element) : false;
