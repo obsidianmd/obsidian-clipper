@@ -42,6 +42,7 @@ body.obsidian-highlighter-active {
 }
 
 .obsidian-highlighter-menu {
+	box-sizing: border-box !important;
 	cursor: default;
 	position: fixed;
 	top: 20px;
@@ -51,7 +52,7 @@ body.obsidian-highlighter-active {
 	background: #353535;
 	color: #fff;
 	padding: var(--obsidian-highlighter-menu-padding);
-	height: var(--obsidian-highlighter-menu-height);
+	height: calc(var(--obsidian-highlighter-menu-height) + var(--obsidian-highlighter-menu-padding) * 2);
 	border-radius: var(--obsidian-highlighter-menu-height);
 	display: flex;
 	align-items: center;

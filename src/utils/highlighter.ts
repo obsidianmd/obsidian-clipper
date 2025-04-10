@@ -489,29 +489,26 @@ function isValidHighlight(highlight: FragmentHighlightData | null): highlight is
 	return highlight !== null;
 }
 
-// Handle text selection for highlighting
-export function handleTextSelection(selection: Selection, notes?: string[]) {
-	console.log('🎯 handleTextSelection called with selection:', selection.toString());
-	const range = selection.getRangeAt(0);
-	if (range.collapsed) {
-		console.log('⚠️ Collapsed selection, no highlight created');
-		return;
-	}
+// Helper function to create and add a highlight for a specific range (within a single block)
+async function createAndAddHighlightForRange(range: Range, notes?: string[]): Promise<boolean> {
 	try {
 		const isInReader = document.documentElement.classList.contains('obsidian-reader-active');
-
-		// Get the text content and common ancestor
 		const selectedText = range.toString();
+		if (!selectedText.trim()) {
+			console.log("Skipping empty range for highlight creation.");
+			return false; // Don't create highlights for empty/whitespace ranges
+		}
+
 		let container = range.commonAncestorContainer;
 		if (container.nodeType === Node.TEXT_NODE) {
 			container = container.parentElement!;
 		}
 		if (!container || !(container instanceof Element)) {
-			console.error('Could not find a valid container element for the selection.');
-			return;
+			console.error('Could not find a valid container element for the range.');
+			return false;
 		}
 
-		// --- Recalculate prefix/suffix based on absolute position ---
+		// --- Calculate positions and context within this specific range's container ---
 		const textNodes = getTextNodesIn(container);
 		let fullText = '';
 		const nodePositions: { node: Node, start: number, end: number }[] = [];
@@ -524,49 +521,37 @@ export function handleTextSelection(selection: Selection, notes?: string[]) {
 		let absoluteStart = -1;
 		let absoluteEnd = -1;
 
-		// Find absolute start position by iterating through nodes
-		let cumulativeLength = 0;
+		// Find absolute start position
 		for (const { node, start } of nodePositions) {
 			if (node === range.startContainer) {
 				absoluteStart = start + range.startOffset;
 				break;
 			}
-			// If startContainer is an element, check if the current text node is inside it
 			if (range.startContainer.contains(node) && range.startContainer !== node) {
-				// Find the text node within the start container that contains the offset
 				const walker = document.createTreeWalker(range.startContainer, NodeFilter.SHOW_TEXT);
-				let offsetWithinContainer = 0;
-				let foundNode: Node | null = null;
+				let offsetWithinContainer = 0; let foundNode: Node | null;
 				while (foundNode = walker.nextNode()) {
-					if (node === foundNode) {
-						absoluteStart = start + range.startOffset - offsetWithinContainer;
-						break;
-					}
+					if (node === foundNode) { absoluteStart = start + range.startOffset - offsetWithinContainer; break; }
 					offsetWithinContainer += foundNode.textContent?.length || 0;
 				}
 				if (absoluteStart !== -1) break;
 			}
 		}
 
-		// Find absolute end position similarly
-		cumulativeLength = 0;
+		// Find absolute end position
 		for (const { node, start } of nodePositions) {
 			if (node === range.endContainer) {
 				absoluteEnd = start + range.endOffset;
 				break;
 			}
-			// If endContainer is an element, check if the current text node is inside it
 			if (range.endContainer.contains(node) && range.endContainer !== node) {
 				const walker = document.createTreeWalker(range.endContainer, NodeFilter.SHOW_TEXT);
-				let offsetWithinContainer = 0;
-				let foundNode: Node | null = null;
+				let offsetWithinContainer = 0; let foundNode: Node | null;
 				while (foundNode = walker.nextNode()) {
 					const nodeLength = foundNode.textContent?.length || 0;
 					if (node === foundNode) {
-						// Check if the endOffset falls within this node
 						if (range.endOffset >= offsetWithinContainer && range.endOffset <= offsetWithinContainer + nodeLength) {
-							absoluteEnd = start + range.endOffset - offsetWithinContainer;
-							break;
+							absoluteEnd = start + range.endOffset - offsetWithinContainer; break;
 						}
 					}
 					offsetWithinContainer += nodeLength;
@@ -575,88 +560,242 @@ export function handleTextSelection(selection: Selection, notes?: string[]) {
 			}
 		}
 
-		// Fallback / sanity check if positions couldn't be found directly or seem wrong
-		// Use normalized text search as a robust fallback
+		// Fallback / sanity check
 		if (absoluteStart === -1 || absoluteEnd === -1 || absoluteStart > absoluteEnd || fullText.slice(absoluteStart, absoluteEnd) !== selectedText) {
-			console.warn("Inaccurate absolute positions from node calculation. Using normalized text search fallback.");
+			console.warn("Range Helper: Inaccurate absolute positions. Using normalized text search fallback.");
 			const normalizedFullText = normalizeText(fullText);
 			const normalizedSelectedText = normalizeText(selectedText);
 			const foundIndex = normalizedFullText.indexOf(normalizedSelectedText);
-
 			if (foundIndex !== -1) {
-				 absoluteStart = mapNormalizedPositionToOriginal(fullText, normalizedFullText, foundIndex);
-				 absoluteEnd = mapNormalizedPositionToOriginal(fullText, normalizedFullText, foundIndex + normalizedSelectedText.length);
-				 console.log("Fallback positions:", { absoluteStart, absoluteEnd, text: fullText.slice(absoluteStart, absoluteEnd) });
+				absoluteStart = mapNormalizedPositionToOriginal(fullText, normalizedFullText, foundIndex);
+				absoluteEnd = mapNormalizedPositionToOriginal(fullText, normalizedFullText, foundIndex + normalizedSelectedText.length);
 			} else {
-				 console.error("Fallback failed: Cannot find normalized selection text within container.");
-				 selection.removeAllRanges(); // Clear selection if failed
-				 return; // Cannot proceed without positions
+				console.error("Range Helper Fallback failed: Cannot find normalized selection text within container.");
+				return false;
 			}
 		}
 
 		if (absoluteStart === -1 || absoluteEnd === -1) {
-			 console.error("Critical error: Could not determine highlight position.");
-			 selection.removeAllRanges(); // Clear selection if failed
-			 return;
+			console.error("Range Helper Critical error: Could not determine highlight position.");
+			return false;
 		}
 
-		// Get context with the *correct* absolute positions
-		const contextSize = 20; // Shorter context, like Text Fragments
+		const contextSize = 20;
 		const prefix = fullText.substring(Math.max(0, absoluteStart - contextSize), absoluteStart);
 		const suffix = fullText.substring(absoluteEnd, Math.min(fullText.length, absoluteEnd + contextSize));
-		// --- End of recalculation ---
+		// --- End context calculation ---
 
-		// Normalize the selected text for matching, keep original for content
 		const normalizedSelectedText = normalizeText(selectedText);
 
-		// Create a fragment highlight
 		const highlight: FragmentHighlightData = {
-			id: Date.now().toString(),
+			id: Date.now().toString() + Math.random().toString(16).slice(2), // Add randomness for multi-highlights
 			type: 'fragment',
-			xpath: getElementXPath(container), // XPath of the container element
-			content: selectedText, // Original selected text for display/export
-			textStart: encodeURIComponent(normalizedSelectedText), // Use NORMALIZED text for matching
-			prefix: prefix ? encodeURIComponent(prefix) : undefined, // Use calculated ORIGINAL prefix
-			suffix: suffix ? encodeURIComponent(suffix) : undefined, // Use calculated ORIGINAL suffix
+			xpath: getElementXPath(container),
+			content: selectedText,
+			textStart: encodeURIComponent(normalizedSelectedText),
+			prefix: prefix ? encodeURIComponent(prefix) : undefined,
+			suffix: suffix ? encodeURIComponent(suffix) : undefined,
 			notes: notes,
 			createdInReader: isInReader
 		};
 
-		console.log('Attempting to create fragment highlight:', {
-			 text: selectedText,
-			 normalizedText: normalizedSelectedText,
-			 prefix: prefix,
-			 suffix: suffix,
-			 xpath: highlight.xpath,
-			 containerTag: container.tagName
+		console.log('Attempting to create fragment highlight (Helper):', {
+			text: selectedText.slice(0,50)+'...',
+			normalizedText: normalizedSelectedText.slice(0,50)+'...',
+			prefix: prefix,
+			suffix: suffix,
+			xpath: highlight.xpath,
+			containerTag: container.tagName
 		});
 
-		// Test if we can find the highlight reliably *before* adding it
-		// Search within the whole body for robustness
-		const findResult = findTextInCleanContent(
-			document.body,
-			normalizedSelectedText, // Use normalized text for finding
-			highlight.prefix, // Already encoded original prefix
-			highlight.suffix  // Already encoded original suffix
+		// Pre-check using the specific container first for performance, then fallback to body
+		let findResult = findTextInCleanContent(
+			container, // Search within the specific block first
+			normalizedSelectedText,
+			highlight.prefix,
+			highlight.suffix
 		);
 
+		if (!findResult) {
+			console.warn("Pre-check failed in container, retrying in document.body");
+			findResult = findTextInCleanContent(
+				document.body,
+				normalizedSelectedText,
+				highlight.prefix,
+				highlight.suffix
+			);
+		}
+
+
 		if (findResult) {
-			console.log("✅ Highlight successfully located during pre-check.");
-			// Use the original addHighlight logic which handles merging etc.
-			addHighlight(highlight, notes); // Let addHighlight handle history, merging, sorting, applying, saving
-
-			// Clear selection *after* successful highlight
-			selection.removeAllRanges();
-
+			console.log("✅ Highlight successfully located during pre-check (Helper).");
+			addHighlight(highlight); // Notes are already part of the highlight object
+			return true;
 		} else {
-			console.warn('❌ Could not reliably find the selected text for highlighting. Highlight not created.');
-			// Optionally provide feedback to the user here, e.g., alert(...)
-			selection.removeAllRanges(); // Clear selection if failed
+			console.warn('❌ Could not reliably find the selected text for highlighting (Helper). Highlight not created.');
+			return false;
 		}
 
 	} catch (error) {
+		console.error('Error in createAndAddHighlightForRange:', error);
+		return false;
+	}
+}
+
+// Handle text selection for highlighting
+export async function handleTextSelection(selection: Selection, notes?: string[]) {
+	console.log('🎯 handleTextSelection called with selection:', selection.toString());
+	if (!selection || selection.rangeCount === 0) return; // Ensure selection exists
+
+	const range = selection.getRangeAt(0);
+	if (range.collapsed) {
+		console.log('⚠️ Collapsed selection, no highlight created');
+		return;
+	}
+
+	try {
+		// --- Multi-paragraph splitting logic ---
+		const startNode = range.startContainer;
+		const endNode = range.endContainer;
+		const commonAncestor = range.commonAncestorContainer;
+
+		// Find the nearest block-level ancestors for start and end nodes
+		const blockSelector = 'p, li, blockquote, pre, h1, h2, h3, h4, h5, h6, div:not(.obsidian-highlighter-menu):not(#obsidian-highlight-hover-overlay)'; // Refined selector
+		const startBlock = (startNode.nodeType === Node.ELEMENT_NODE ? startNode as Element : startNode.parentElement)?.closest(blockSelector);
+		const endBlock = (endNode.nodeType === Node.ELEMENT_NODE ? endNode as Element : endNode.parentElement)?.closest(blockSelector);
+
+		// Check if the selection spans multiple block elements
+		if (startBlock && endBlock && startBlock !== endBlock) {
+			console.log("Selection spans multiple blocks. Splitting into multiple highlights.");
+
+			const highlightsToAdd: Range[] = [];
+			// Use Range iterator methods if available, otherwise use TreeWalker
+			// For simplicity and broad compatibility, TreeWalker is used here.
+
+			const walker = document.createTreeWalker(
+				commonAncestor,
+				NodeFilter.SHOW_ELEMENT,
+				// Filter to accept only block elements that intersect the range
+				{ acceptNode: (node) => {
+						if (!(node instanceof Element) || !node.matches(blockSelector)) {
+							return NodeFilter.FILTER_SKIP;
+						}
+						// Check if the block intersects the original selection range
+						const nodeRange = document.createRange();
+						nodeRange.selectNodeContents(node);
+						const intersects = range.compareBoundaryPoints(Range.END_TO_START, nodeRange) === -1 &&
+									  range.compareBoundaryPoints(Range.START_TO_END, nodeRange) === 1;
+						return intersects ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+					}
+				}
+			);
+
+
+			let currentNode: Node | null = walker.currentNode;
+			let isFirstBlock = true;
+
+			// Ensure walker starts within the selection range if possible
+			if (startBlock && commonAncestor.contains(startBlock)) {
+				walker.currentNode = startBlock;
+				currentNode = startBlock;
+			} else {
+				// If startBlock isn't under commonAncestor or is null, start from beginning
+				currentNode = walker.firstChild(); // Move to the first matching block element
+			}
+
+
+			while (currentNode) {
+				const currentBlock = currentNode as Element;
+				const blockRange = document.createRange();
+
+				// Determine start point for this block's range
+				if (currentBlock === startBlock || isFirstBlock) {
+					// If this block contains the start of the selection
+					if (currentBlock.contains(startNode)) {
+						blockRange.setStart(startNode, range.startOffset);
+					} else {
+						// Selection starts before this block, so start at the beginning of the block
+						blockRange.setStart(currentBlock, 0);
+						// Find the first text node to avoid issues with empty elements
+						const firstText = getFirstTextNode(currentBlock);
+						if (firstText) blockRange.setStart(firstText, 0);
+					}
+					isFirstBlock = false; // Mark that we've processed the first relevant block
+				} else {
+					// Start at the beginning of intermediate blocks
+					blockRange.setStart(currentBlock, 0);
+					const firstText = getFirstTextNode(currentBlock);
+					if (firstText) blockRange.setStart(firstText, 0);
+				}
+
+				// Determine end point for this block's range
+				if (currentBlock === endBlock) {
+					// If this block contains the end of the selection
+					if (currentBlock.contains(endNode)) {
+						blockRange.setEnd(endNode, range.endOffset);
+					} else {
+						// Selection ends after this block, so end at the end of the block
+						blockRange.selectNodeContents(currentBlock);
+						blockRange.collapse(false); // Collapse to end
+					}
+				} else {
+					// End at the very end of intermediate blocks
+					blockRange.selectNodeContents(currentBlock);
+					blockRange.collapse(false); // Collapse to end
+				}
+
+
+				// Ensure the created range has content before adding
+				if (!blockRange.collapsed && blockRange.toString().trim().length > 0) {
+					highlightsToAdd.push(blockRange);
+				}
+
+				// Stop processing if we've reached the endBlock
+				if (currentBlock === endBlock) {
+					break;
+				}
+
+				currentNode = walker.nextNode();
+			}
+
+
+			// Add the collected highlights
+			if (highlightsToAdd.length > 0) {
+				let successCount = 0;
+				// Use Promise.all for potentially faster (concurrent) checks, though addHighlight is likely sequential internally
+				const results = await Promise.all(highlightsToAdd.map(hr => createAndAddHighlightForRange(hr, notes)));
+				successCount = results.filter(Boolean).length;
+				// Original sequential loop:
+				// for (const highlightRange of highlightsToAdd) {
+				// 	// Add a small delay between adding highlights if needed, but try without first
+				// 	// await new Promise(resolve => setTimeout(resolve, 10));
+				// 	if (await createAndAddHighlightForRange(highlightRange, notes)) {
+				// 		successCount++;
+				// 	}
+				// }
+				console.log(`Attempted to add ${highlightsToAdd.length} highlights, ${successCount} succeeded.`);
+			} else {
+				console.warn("Multi-block selection detected, but no valid highlight ranges were generated.");
+			}
+
+			// Clear selection after processing
+			selection.removeAllRanges();
+
+		} else {
+			// --- Single block selection: Use the helper function ---
+			console.log("Selection within a single block or failed to identify blocks. Creating one highlight.");
+			if (await createAndAddHighlightForRange(range, notes)) {
+				selection.removeAllRanges(); // Clear selection on success
+			} else {
+				// Handle failure if needed, error already logged by helper
+				selection.removeAllRanges(); // Clear selection even on failure
+			}
+		}
+		// --- End multi-paragraph logic ---
+
+	} catch (error) {
 		console.error('Error handling text selection:', error);
-		selection.removeAllRanges(); // Ensure selection is cleared on error
+		if (selection) selection.removeAllRanges(); // Ensure selection is cleared on error
 	}
 }
 
@@ -758,19 +897,16 @@ function getTextOffset(container: Element, targetNode: Node, targetOffset: numbe
 }
 
 // Add a new highlight to the page
-function addHighlight(highlight: AnyHighlightData, notes?: string[]) {
+function addHighlight(highlight: AnyHighlightData) {
 	console.log('➕ Adding new highlight:', {
 		type: highlight.type,
 		content: highlight.content.slice(0, 100) + (highlight.content.length > 100 ? '...' : ''),
-		xpath: highlight.xpath
+		xpath: highlight.xpath,
+		hasNotes: !!highlight.notes && highlight.notes.length > 0
 	});
-	
+
 	const oldHighlights = [...highlights];
-	// Notes should be handled by the caller (handleTextSelection) before passing here
-	// const newHighlight = { ...highlight, notes: notes || [] };
-	// If mergeOverlappingHighlights modifies the highlight, ensure notes are preserved.
-	// The current merge logic doesn't seem to handle notes propagation well.
-	// Let's adjust merge to preserve notes.
+	// No need to create newHighlight object, notes are already included
 
 	const mergedHighlights = mergeOverlappingHighlights(highlights, highlight);
 	highlights = mergedHighlights;
@@ -856,10 +992,10 @@ function mergeOverlappingHighlights(existingHighlights: AnyHighlightData[], newH
 						if (subsequentMergedResult) subsequentMergedResult.notes = combinedNotes.length > 0 ? combinedNotes : undefined;
 					}
 				} else if (lastAdded.xpath === mergedResult.xpath && (lastAdded.type !== 'fragment' || mergedResult.type !== 'fragment')) {
-					 subsequentOverlap = true;
-					 subsequentMergedResult = mergeComplexHighlights(lastAdded, mergedResult);
-					 const combinedNotes = Array.from(new Set([...(lastAdded.notes || []), ...(mergedResult.notes || [])]));
-					 if (subsequentMergedResult) subsequentMergedResult.notes = combinedNotes.length > 0 ? combinedNotes : undefined;
+					subsequentOverlap = true;
+					subsequentMergedResult = mergeComplexHighlights(lastAdded, mergedResult);
+					const combinedNotes = Array.from(new Set([...(lastAdded.notes || []), ...(mergedResult.notes || [])]));
+					if (subsequentMergedResult) subsequentMergedResult.notes = combinedNotes.length > 0 ? combinedNotes : undefined;
 				}
 
 				if (subsequentOverlap && subsequentMergedResult) {
@@ -1007,9 +1143,9 @@ function mergeHighlights(highlight1: AnyHighlightData, highlight2: AnyHighlightD
 	const endsAfter = range1.compareBoundaryPoints(Range.END_TO_END, range2) >= 0;
 
 	mergedRange.setStart(startsBefore ? range1.startContainer : range2.startContainer,
-						 startsBefore ? range1.startOffset : range2.startOffset);
+						startsBefore ? range1.startOffset : range2.startOffset);
 	mergedRange.setEnd(endsAfter ? range1.endContainer : range2.endContainer,
-					   endsAfter ? range1.endOffset : range2.endOffset);
+					  endsAfter ? range1.endOffset : range2.endOffset);
 
 
 	// Now create a new highlight from this merged range
@@ -1053,15 +1189,15 @@ function mergeComplexHighlights(highlight1: AnyHighlightData, highlight2: AnyHig
 		mergedElement = element2;
 	} else {
 		// Check if one is an ancestor of the other before finding common ancestor
-        const parentCheck1 = getParents(element2).includes(element1);
-        const parentCheck2 = getParents(element1).includes(element2);
-        if (parentCheck1) {
-            mergedElement = element1;
-        } else if (parentCheck2) {
-            mergedElement = element2;
-        } else {
-		    mergedElement = findCommonAncestor(element1, element2);
-        }
+		const parentCheck1 = getParents(element2).includes(element1);
+		const parentCheck2 = getParents(element1).includes(element2);
+		if (parentCheck1) {
+			mergedElement = element1;
+		} else if (parentCheck2) {
+			mergedElement = element2;
+		} else {
+			mergedElement = findCommonAncestor(element1, element2);
+		}
 	}
 
 	const mergedType = (highlight1.type === 'complex' || highlight2.type === 'complex' || mergedElement !== element1 || mergedElement !== element2) ? 'complex' : 'element';
@@ -1271,12 +1407,19 @@ export { getElementXPath } from './dom-utils';
 export function highlightElement(element: Element, notes?: string[]) {
 	const xpath = getElementXPath(element);
 	const content = element.outerHTML;
-	addHighlight({ 
-		xpath, 
-		content, 
+	// Create the highlight object first
+	const highlight: ComplexHighlightData = {
+		xpath,
+		content,
 		type: 'complex',
 		id: Date.now().toString()
-	}, notes);
+	};
+	// Add notes if provided
+	if (notes && notes.length > 0) {
+		highlight.notes = notes;
+	}
+	// Call addHighlight with the single highlight object
+	addHighlight(highlight);
 }
 
 function isFragmentHighlight(highlight: FragmentHighlightData | null): highlight is FragmentHighlightData {
@@ -1327,10 +1470,10 @@ function mapNormalizedPositionToOriginal(originalText: string, normalizedText: s
 			// Assume originalChar was removed/transformed. Skip it.
 			originalPos++;
 		} else {
-            // Should not happen if normalization is consistent, but break defensively
-            console.warn("Normalization mapping encountered unexpected state.");
-            break;
-        }
+			// Should not happen if normalization is consistent, but break defensively
+			console.warn("Normalization mapping encountered unexpected state.");
+			break;
+		}
 	}
 
 	// If we stopped early, try to adjust originalPos
@@ -1340,5 +1483,3 @@ function mapNormalizedPositionToOriginal(originalText: string, normalizedText: s
 
 	return originalPos;
 }
-
-// --- End Helper ---
