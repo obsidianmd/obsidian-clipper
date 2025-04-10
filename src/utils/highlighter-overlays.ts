@@ -146,14 +146,6 @@ function mapNormalizedPositionToOriginal(originalText: string, normalizedText: s
 	let originalPos = 0;
 	let normalizedPos = 0;
 	
-	console.log('Mapping position:', {
-		normalizedPosition,
-		originalTextSample: originalText.slice(Math.max(0, normalizedPosition - 20), 
-			Math.min(originalText.length, normalizedPosition + 20)),
-		normalizedTextSample: normalizedText.slice(Math.max(0, normalizedPosition - 20), 
-			Math.min(normalizedText.length, normalizedPosition + 20))
-	});
-	
 	while (normalizedPos < normalizedPosition && originalPos < originalText.length) {
 		// Skip newlines and extra whitespace in original text
 		while (originalPos < originalText.length && 
@@ -737,16 +729,6 @@ export function findTextInCleanContent(
 		// searchText is already normalized by the caller (handleTextSelection)
 		const normalizedSearchText = searchText;
 
-		console.log('Looking for text in paragraph:', {
-			paragraphTag: paragraph.tagName,
-			searchText: normalizedSearchText,
-			prefix: prefix ? decodeURIComponent(prefix) : undefined, // Decode for logging
-			suffix: suffix ? decodeURIComponent(suffix) : undefined, // Decode for logging
-			fullTextSample: normalizedFullText.length > 100 ? normalizedFullText.substring(0, 100) + '...' : normalizedFullText,
-			textLength: normalizedSearchText.length,
-			nodeCount: nodes.length
-		});
-
 		// Find potential matches using the normalized search text
 		let startIndex = -1;
 		let currentIndex = 0;
@@ -770,17 +752,6 @@ export function findTextInCleanContent(
 					currentIndex + normalizedSearchText.length + contextSize
 				);
 
-				console.log('Checking context:', {
-					beforeContext,
-					afterContext,
-					decodedPrefix,
-					decodedSuffix,
-					matchStart: currentIndex,
-					matchEnd: currentIndex + normalizedSearchText.length
-				});
-
-				// --- Improved Context Matching --- 
-
 				// Check prefix match: The end of the `beforeContext` must match the end of the `decodedPrefix`
 				if (prefix) {
 					const prefixEndMatches = beforeContext.endsWith(decodedPrefix);
@@ -788,7 +759,6 @@ export function findTextInCleanContent(
 					const prefixFuzzyMatches = !prefixEndMatches && fuzzyMatch(beforeContext, decodedPrefix, similarityThreshold);
 
 					if (!prefixEndMatches && !prefixFuzzyMatches) {
-						console.log(`Prefix mismatch: beforeContext("${beforeContext}") does not end with decodedPrefix("${decodedPrefix}") [Exact:${prefixEndMatches}, Fuzzy:${prefixFuzzyMatches}]`);
 						contextMatches = false;
 					}
 				}
@@ -800,15 +770,12 @@ export function findTextInCleanContent(
 					const suffixFuzzyMatches = !suffixStartMatches && fuzzyMatch(afterContext, decodedSuffix, similarityThreshold);
 
 					if (!suffixStartMatches && !suffixFuzzyMatches) {
-						console.log(`Suffix mismatch: afterContext("${afterContext}") does not start with decodedSuffix("${decodedSuffix}") [Exact:${suffixStartMatches}, Fuzzy:${suffixFuzzyMatches}]`);
 						contextMatches = false;
 					}
 				}
-				// --- End Improved Context Matching ---
 			}
 
 			if (contextMatches) {
-				console.log('✅ Found matching context at index:', currentIndex);
 				startIndex = currentIndex;
 				break; // Found the first valid match in this paragraph
 			}
@@ -818,7 +785,6 @@ export function findTextInCleanContent(
 		}
 
 		if (startIndex === -1) {
-			// console.log('No match found in current paragraph'); // Reduce noise
 			continue; // Try next paragraph
 		}
 
@@ -826,14 +792,6 @@ export function findTextInCleanContent(
 		const originalStartIndex = mapNormalizedPositionToOriginal(fullText, normalizedFullText, startIndex);
 		const originalEndIndex = mapNormalizedPositionToOriginal(fullText, normalizedFullText,
 			startIndex + normalizedSearchText.length);
-
-		console.log('Position mapping:', {
-			normalizedStart: startIndex,
-			normalizedEnd: startIndex + normalizedSearchText.length,
-			originalStart: originalStartIndex,
-			originalEnd: originalEndIndex,
-			mappedTextSlice: fullText.slice(originalStartIndex, originalEndIndex)
-		});
 
 		// Find nodes containing start and end positions based on *original* indices
 		let startNodeResult: { node: Node, offset: number } | null = null;
@@ -871,20 +829,10 @@ export function findTextInCleanContent(
 					node: prevNodePos.node,
 					offset: prevNodePos.node.textContent?.length || 0
 				};
-				console.log("Adjusted end node to previous node's end due to zero offset.", endNodeResult);
 			}
 		}
 
-
 		if (startNodeResult && endNodeResult) {
-			console.log('Creating range with nodes:', {
-				startNode: startNodeResult.node.nodeName,
-				startOffset: startNodeResult.offset,
-				endNode: endNodeResult.node.nodeName,
-				endOffset: endNodeResult.offset,
-				paragraph: paragraph.tagName
-			});
-
 			try {
 				const range = document.createRange();
 				range.setStart(startNodeResult.node, startNodeResult.offset);
@@ -895,7 +843,6 @@ export function findTextInCleanContent(
 				const normalizedRangeText = normalizeText(rangeText);
 
 				if (fuzzyMatch(normalizedRangeText, normalizedSearchText, similarityThreshold)) {
-					console.log(`✅ Range content matches search text (Similarity: ${similarityThreshold.toFixed(2)})`);
 					return { range, cleanText: fullText }; // Return the successful match
 				} else {
 					// Log mismatch details
@@ -903,7 +850,7 @@ export function findTextInCleanContent(
 						expectedNormalized: normalizedSearchText,
 						actualNormalized: normalizedRangeText,
 						actualOriginal: rangeText,
-						similarity: fuzzyMatch(normalizedRangeText, normalizedSearchText, 0) // Log actual similarity
+						similarity: fuzzyMatch(normalizedRangeText, normalizedSearchText, 0)
 					});
 					// Don't return yet, allow the loop to continue searching in case of multiple occurrences
 				}
@@ -921,11 +868,11 @@ export function findTextInCleanContent(
 
 	// If no match found and we haven't exceeded max retries, try again with different parameters
 	if (retryCount < MAX_RETRIES) {
-		console.log(`Retry ${retryCount + 1} with larger context and lower threshold`);
+		// console.log(`Retry ${retryCount + 1} with larger context and lower threshold`);
 		return findTextInCleanContent(container, searchText, prefix, suffix, retryCount + 1);
 	}
 
-	console.log('❌ Exhausted retries. Could not find text matching criteria.');
+	// console.log('❌ Exhausted retries. Could not find text matching criteria.');
 	return null; // No match found after all retries
 }
 

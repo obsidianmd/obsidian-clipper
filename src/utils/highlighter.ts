@@ -62,7 +62,6 @@ export interface FragmentHighlightData extends HighlightData {
 	textEnd?: string;
 	prefix?: string;
 	suffix?: string;
-	createdInReader?: boolean;
 }
 
 export interface StoredData {
@@ -601,8 +600,7 @@ async function createAndAddHighlightForRange(range: Range, notes?: string[]): Pr
 			textStart: encodeURIComponent(normalizedSelectedText),
 			prefix: prefix ? encodeURIComponent(prefix) : undefined,
 			suffix: suffix ? encodeURIComponent(suffix) : undefined,
-			notes: notes,
-			createdInReader: isInReader
+			notes: notes
 		};
 
 		console.log('[Helper] Attempting pre-check...');

@@ -840,17 +840,14 @@ export class Reader {
 
 	static async apply(doc: Document) {
 		try {
-			console.log('[Reader] Applying reader mode...');
 			// Store original HTML for restoration
 			this.originalHTML = doc.documentElement.outerHTML;
 
 			// Load saved settings
 			await this.loadSettings();
-			console.log('[Reader] Settings loaded.');
 
 			// Remove page scripts and their effects
 			this.cleanupScripts(doc);
-			console.log('[Reader] Scripts cleaned.');
 			
 			// Clean the html element but preserve lang and dir attributes
 			const htmlElement = doc.documentElement;
@@ -862,13 +859,11 @@ export class Reader {
 			if (dir) htmlElement.setAttribute('dir', dir);
 			
 			// Extract content using extractors or Defuddle
-			console.log('[Reader] Extracting content...');
 			const { content, title, author, published, domain, extractorType, wordCount, parseTime } = this.extractContent(doc);
 			if (!content) {
 				console.log('Reader', 'Failed to extract content');
 				return;
 			}
-			console.log('[Reader] Content extracted.');
 
 			// Format the published date if it exists
 			let formattedDate = '';
@@ -962,7 +957,6 @@ export class Reader {
 					<div class="obsidian-reader-right-sidebar"></div>
 				</div>
 			`;
-			console.log('[Reader] Body populated.');
 
 			// Add reader classes and attributes
 			doc.documentElement.classList.add('obsidian-reader-active');
@@ -980,7 +974,6 @@ export class Reader {
 			doc.documentElement.style.setProperty('--obsidian-reader-line-width', `${this.settings.maxWidth}em`);
 
 			// Add settings bar and outline
-			console.log('[Reader] Initializing UI components (settings, outline, footnotes, etc.)...');
 			this.injectSettingsBar(doc);
 			this.observer = this.generateOutline(doc);
 			
@@ -988,19 +981,14 @@ export class Reader {
 			this.initializeCodeHighlighting(doc);
 			this.initializeCopyButtons(doc);
 			this.initializeLightbox(doc);
-			console.log('[Reader] UI components initialized.');
 
 			// Set up color scheme media query listener
 			this.colorSchemeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 			this.colorSchemeMediaQuery.addEventListener('change', (e) => this.handleColorSchemeChange(e, doc));
 			
-			// First application of highlights based on initial structure
-			console.log('[Reader] Attempting initial applyHighlights()...');
 			applyHighlights();
-			console.log('[Reader] Initial applyHighlights() called.');
  
 			this.isActive = true;
-			console.log('[Reader] Reader mode application complete.');
  
 		} catch (e) {
 			console.error('Reader', 'Error during apply:', e);
