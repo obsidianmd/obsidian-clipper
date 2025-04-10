@@ -493,58 +493,170 @@ function isValidHighlight(highlight: FragmentHighlightData | null): highlight is
 export function handleTextSelection(selection: Selection, notes?: string[]) {
 	console.log('🎯 handleTextSelection called with selection:', selection.toString());
 	const range = selection.getRangeAt(0);
-	if (range.toString().length === 0) {
-		console.log('⚠️ Empty selection, no highlight created');
+	if (range.collapsed) {
+		console.log('⚠️ Collapsed selection, no highlight created');
 		return;
 	}
 	try {
-		const range = selection.getRangeAt(0);
 		const isInReader = document.documentElement.classList.contains('obsidian-reader-active');
-		
-		// Get the text content and context
+
+		// Get the text content and common ancestor
 		const selectedText = range.toString();
-		const container = range.commonAncestorContainer.nodeType === Node.TEXT_NODE
-			? range.commonAncestorContainer.parentElement
-			: range.commonAncestorContainer as Element;
-		
-		if (!container) return;
-		
-		// Get context before and after the selection
-		const contextSize = 100;
-		const fullText = getCleanTextContent(container);
-		const selectionStart = range.startOffset;
-		const selectionEnd = range.endOffset;
-		
-		const prefix = fullText.substring(Math.max(0, selectionStart - contextSize), selectionStart);
-		const suffix = fullText.substring(selectionEnd, Math.min(fullText.length, selectionEnd + contextSize));
-		
+		let container = range.commonAncestorContainer;
+		if (container.nodeType === Node.TEXT_NODE) {
+			container = container.parentElement!;
+		}
+		if (!container || !(container instanceof Element)) {
+			console.error('Could not find a valid container element for the selection.');
+			return;
+		}
+
+		// --- Recalculate prefix/suffix based on absolute position ---
+		const textNodes = getTextNodesIn(container);
+		let fullText = '';
+		const nodePositions: { node: Node, start: number, end: number }[] = [];
+		for (const node of textNodes) {
+			const nodeText = node.textContent || '';
+			nodePositions.push({ node, start: fullText.length, end: fullText.length + nodeText.length });
+			fullText += nodeText;
+		}
+
+		let absoluteStart = -1;
+		let absoluteEnd = -1;
+
+		// Find absolute start position by iterating through nodes
+		let cumulativeLength = 0;
+		for (const { node, start } of nodePositions) {
+			if (node === range.startContainer) {
+				absoluteStart = start + range.startOffset;
+				break;
+			}
+			// If startContainer is an element, check if the current text node is inside it
+			if (range.startContainer.contains(node) && range.startContainer !== node) {
+				// Find the text node within the start container that contains the offset
+				const walker = document.createTreeWalker(range.startContainer, NodeFilter.SHOW_TEXT);
+				let offsetWithinContainer = 0;
+				let foundNode: Node | null = null;
+				while (foundNode = walker.nextNode()) {
+					if (node === foundNode) {
+						absoluteStart = start + range.startOffset - offsetWithinContainer;
+						break;
+					}
+					offsetWithinContainer += foundNode.textContent?.length || 0;
+				}
+				if (absoluteStart !== -1) break;
+			}
+		}
+
+		// Find absolute end position similarly
+		cumulativeLength = 0;
+		for (const { node, start } of nodePositions) {
+			if (node === range.endContainer) {
+				absoluteEnd = start + range.endOffset;
+				break;
+			}
+			// If endContainer is an element, check if the current text node is inside it
+			if (range.endContainer.contains(node) && range.endContainer !== node) {
+				const walker = document.createTreeWalker(range.endContainer, NodeFilter.SHOW_TEXT);
+				let offsetWithinContainer = 0;
+				let foundNode: Node | null = null;
+				while (foundNode = walker.nextNode()) {
+					const nodeLength = foundNode.textContent?.length || 0;
+					if (node === foundNode) {
+						// Check if the endOffset falls within this node
+						if (range.endOffset >= offsetWithinContainer && range.endOffset <= offsetWithinContainer + nodeLength) {
+							absoluteEnd = start + range.endOffset - offsetWithinContainer;
+							break;
+						}
+					}
+					offsetWithinContainer += nodeLength;
+				}
+				if (absoluteEnd !== -1) break;
+			}
+		}
+
+		// Fallback / sanity check if positions couldn't be found directly or seem wrong
+		// Use normalized text search as a robust fallback
+		if (absoluteStart === -1 || absoluteEnd === -1 || absoluteStart > absoluteEnd || fullText.slice(absoluteStart, absoluteEnd) !== selectedText) {
+			console.warn("Inaccurate absolute positions from node calculation. Using normalized text search fallback.");
+			const normalizedFullText = normalizeText(fullText);
+			const normalizedSelectedText = normalizeText(selectedText);
+			const foundIndex = normalizedFullText.indexOf(normalizedSelectedText);
+
+			if (foundIndex !== -1) {
+				 absoluteStart = mapNormalizedPositionToOriginal(fullText, normalizedFullText, foundIndex);
+				 absoluteEnd = mapNormalizedPositionToOriginal(fullText, normalizedFullText, foundIndex + normalizedSelectedText.length);
+				 console.log("Fallback positions:", { absoluteStart, absoluteEnd, text: fullText.slice(absoluteStart, absoluteEnd) });
+			} else {
+				 console.error("Fallback failed: Cannot find normalized selection text within container.");
+				 selection.removeAllRanges(); // Clear selection if failed
+				 return; // Cannot proceed without positions
+			}
+		}
+
+		if (absoluteStart === -1 || absoluteEnd === -1) {
+			 console.error("Critical error: Could not determine highlight position.");
+			 selection.removeAllRanges(); // Clear selection if failed
+			 return;
+		}
+
+		// Get context with the *correct* absolute positions
+		const contextSize = 20; // Shorter context, like Text Fragments
+		const prefix = fullText.substring(Math.max(0, absoluteStart - contextSize), absoluteStart);
+		const suffix = fullText.substring(absoluteEnd, Math.min(fullText.length, absoluteEnd + contextSize));
+		// --- End of recalculation ---
+
+		// Normalize the selected text for matching, keep original for content
+		const normalizedSelectedText = normalizeText(selectedText);
+
 		// Create a fragment highlight
 		const highlight: FragmentHighlightData = {
 			id: Date.now().toString(),
 			type: 'fragment',
-			xpath: getElementXPath(container),
-			content: selectedText,
-			textStart: encodeURIComponent(selectedText),
-			prefix: encodeURIComponent(prefix),
-			suffix: encodeURIComponent(suffix),
+			xpath: getElementXPath(container), // XPath of the container element
+			content: selectedText, // Original selected text for display/export
+			textStart: encodeURIComponent(normalizedSelectedText), // Use NORMALIZED text for matching
+			prefix: prefix ? encodeURIComponent(prefix) : undefined, // Use calculated ORIGINAL prefix
+			suffix: suffix ? encodeURIComponent(suffix) : undefined, // Use calculated ORIGINAL suffix
 			notes: notes,
 			createdInReader: isInReader
 		};
-		
-		// Test if we can find the highlight reliably
-		if (testHighlightFindability(highlight)) {
-			highlights.push(highlight);
-			sortHighlights();
-			applyHighlights();
-			saveHighlights();
-			updateHighlighterMenu();
+
+		console.log('Attempting to create fragment highlight:', {
+			 text: selectedText,
+			 normalizedText: normalizedSelectedText,
+			 prefix: prefix,
+			 suffix: suffix,
+			 xpath: highlight.xpath,
+			 containerTag: container.tagName
+		});
+
+		// Test if we can find the highlight reliably *before* adding it
+		// Search within the whole body for robustness
+		const findResult = findTextInCleanContent(
+			document.body,
+			normalizedSelectedText, // Use normalized text for finding
+			highlight.prefix, // Already encoded original prefix
+			highlight.suffix  // Already encoded original suffix
+		);
+
+		if (findResult) {
+			console.log("✅ Highlight successfully located during pre-check.");
+			// Use the original addHighlight logic which handles merging etc.
+			addHighlight(highlight, notes); // Let addHighlight handle history, merging, sorting, applying, saving
+
+			// Clear selection *after* successful highlight
+			selection.removeAllRanges();
+
 		} else {
-			console.warn('Could not reliably find the selected text for highlighting');
+			console.warn('❌ Could not reliably find the selected text for highlighting. Highlight not created.');
+			// Optionally provide feedback to the user here, e.g., alert(...)
+			selection.removeAllRanges(); // Clear selection if failed
 		}
-		
-		selection.removeAllRanges();
+
 	} catch (error) {
 		console.error('Error handling text selection:', error);
+		selection.removeAllRanges(); // Ensure selection is cleared on error
 	}
 }
 
@@ -654,17 +766,22 @@ function addHighlight(highlight: AnyHighlightData, notes?: string[]) {
 	});
 	
 	const oldHighlights = [...highlights];
-	const newHighlight = { ...highlight, notes: notes || [] };
-	const mergedHighlights = mergeOverlappingHighlights(highlights, newHighlight);
+	// Notes should be handled by the caller (handleTextSelection) before passing here
+	// const newHighlight = { ...highlight, notes: notes || [] };
+	// If mergeOverlappingHighlights modifies the highlight, ensure notes are preserved.
+	// The current merge logic doesn't seem to handle notes propagation well.
+	// Let's adjust merge to preserve notes.
+
+	const mergedHighlights = mergeOverlappingHighlights(highlights, highlight);
 	highlights = mergedHighlights;
-	
+
 	console.log('📊 Highlights after merge:', highlights.length, 'total highlights');
-	
+
 	addToHistory('add', oldHighlights, mergedHighlights);
 	sortHighlights();
-	applyHighlights();
+	applyHighlights(); // This will redraw based on the new `highlights` array
 	saveHighlights();
-	updateHighlighterMenu();
+	updateHighlighterMenu(); // Update UI based on the new state
 }
 
 // Sort highlights based on their vertical position
@@ -699,39 +816,68 @@ function getElementVerticalPosition(element: Element): number {
 // Merge overlapping highlights
 function mergeOverlappingHighlights(existingHighlights: AnyHighlightData[], newHighlight: AnyHighlightData): AnyHighlightData[] {
 	let mergedHighlights: AnyHighlightData[] = [];
-	let merged = false;
+	let consumedNew = false; // Track if the newHighlight has been merged into an existing one
 
-	// First try to merge with any overlapping highlights
 	for (const existing of existingHighlights) {
-		if (existing.type === 'fragment' && newHighlight.type === 'fragment') {
-			const overlap = analyzeHighlightOverlap(existing, newHighlight);
-			if (overlap.overlaps) {
-				if (!merged) {
-					console.log('Merging highlights due to overlap/adjacency');
-					mergedHighlights.push(mergeHighlights(existing, newHighlight));
-					merged = true;
+		// Check if the new highlight overlaps/is adjacent to the current existing highlight
+		let overlap = false;
+		let mergedResult: AnyHighlightData | null = null;
+
+		if (existing.type === 'fragment' && newHighlight.type === 'fragment' && existing.xpath === newHighlight.xpath) {
+			const overlapAnalysis = analyzeHighlightOverlap(existing, newHighlight);
+			if (overlapAnalysis.overlaps) {
+				overlap = true;
+				mergedResult = mergeHighlights(existing, newHighlight);
+				// Preserve notes from both highlights
+				const combinedNotes = Array.from(new Set([...(existing.notes || []), ...(newHighlight.notes || [])]));
+				if (mergedResult) mergedResult.notes = combinedNotes.length > 0 ? combinedNotes : undefined;
+			}
+		} else if (existing.xpath === newHighlight.xpath && (existing.type !== 'fragment' || newHighlight.type !== 'fragment')) {
+			// Simple overlap check for non-fragment or mixed types based on XPath
+			overlap = true;
+			mergedResult = mergeComplexHighlights(existing, newHighlight);
+			const combinedNotes = Array.from(new Set([...(existing.notes || []), ...(newHighlight.notes || [])]));
+			if (mergedResult) mergedResult.notes = combinedNotes.length > 0 ? combinedNotes : undefined;
+		}
+
+		if (overlap && mergedResult) {
+			// If overlap occurred, check if we need to merge this result with the *last* item added to mergedHighlights
+			if (mergedHighlights.length > 0) {
+				const lastAdded = mergedHighlights[mergedHighlights.length - 1];
+				let subsequentOverlap = false;
+				let subsequentMergedResult: AnyHighlightData | null = null;
+
+				if (lastAdded.type === 'fragment' && mergedResult.type === 'fragment' && lastAdded.xpath === mergedResult.xpath) {
+					const subsequentOverlapAnalysis = analyzeHighlightOverlap(lastAdded, mergedResult);
+					if (subsequentOverlapAnalysis.overlaps) {
+						subsequentOverlap = true;
+						subsequentMergedResult = mergeHighlights(lastAdded, mergedResult);
+						const combinedNotes = Array.from(new Set([...(lastAdded.notes || []), ...(mergedResult.notes || [])]));
+						if (subsequentMergedResult) subsequentMergedResult.notes = combinedNotes.length > 0 ? combinedNotes : undefined;
+					}
+				} else if (lastAdded.xpath === mergedResult.xpath && (lastAdded.type !== 'fragment' || mergedResult.type !== 'fragment')) {
+					 subsequentOverlap = true;
+					 subsequentMergedResult = mergeComplexHighlights(lastAdded, mergedResult);
+					 const combinedNotes = Array.from(new Set([...(lastAdded.notes || []), ...(mergedResult.notes || [])]));
+					 if (subsequentMergedResult) subsequentMergedResult.notes = combinedNotes.length > 0 ? combinedNotes : undefined;
+				}
+
+				if (subsequentOverlap && subsequentMergedResult) {
+					mergedHighlights[mergedHighlights.length - 1] = subsequentMergedResult; // Replace last item
 				} else {
-					mergedHighlights[mergedHighlights.length - 1] = mergeHighlights(mergedHighlights[mergedHighlights.length - 1], existing);
+					mergedHighlights.push(mergedResult); // Add the first merge result
 				}
 			} else {
-				mergedHighlights.push(existing);
+				mergedHighlights.push(mergedResult); // Add the first merge result
 			}
+			consumedNew = true; // The new highlight was merged
 		} else {
-			// For non-fragment highlights, use simpler overlap check
-			if (existing.xpath === newHighlight.xpath) {
-				if (!merged) {
-					mergedHighlights.push(mergeHighlights(existing, newHighlight));
-					merged = true;
-				} else {
-					mergedHighlights[mergedHighlights.length - 1] = mergeHighlights(mergedHighlights[mergedHighlights.length - 1], existing);
-				}
-			} else {
-				mergedHighlights.push(existing);
-			}
+			mergedHighlights.push(existing); // No overlap with new highlight, keep existing
 		}
 	}
 
-	if (!merged) {
+	// If the new highlight wasn't merged into any existing highlight, add it now.
+	if (!consumedNew) {
 		console.log('Adding new highlight without merging');
 		mergedHighlights.push(newHighlight);
 	}
@@ -809,141 +955,126 @@ function analyzeHighlightOverlap(highlight1: FragmentHighlightData, highlight2: 
 }
 
 // Merge two highlights based on their overlap type
-function mergeHighlights(highlight1: AnyHighlightData, highlight2: AnyHighlightData): AnyHighlightData {
+function mergeHighlights(highlight1: AnyHighlightData, highlight2: AnyHighlightData): AnyHighlightData | null { // Return null on failure
 	// If either highlight is not a fragment type, use the existing complex merge logic
 	if (highlight1.type !== 'fragment' || highlight2.type !== 'fragment') {
-		return mergeComplexHighlights(highlight1, highlight2);
+		// Ensure notes are preserved in complex merge
+		const merged = mergeComplexHighlights(highlight1, highlight2);
+		const combinedNotes = Array.from(new Set([...(highlight1.notes || []), ...(highlight2.notes || [])]));
+		if (merged) merged.notes = combinedNotes.length > 0 ? combinedNotes : undefined;
+		return merged;
 	}
-	
+
 	const overlap = analyzeHighlightOverlap(highlight1, highlight2);
 	console.log('Merge analysis:', overlap);
-	
+
 	if (!overlap.overlaps) {
-		return highlight2; // No overlap, return the new highlight
+		// This case shouldn't be reached if called from mergeOverlappingHighlights,
+		// but return null defensively.
+		return null;
 	}
-	
+
 	const element = getElementByXPath(highlight1.xpath);
-	if (!element) return highlight2;
-	
-	// Create a range that encompasses both highlights
-	const range = document.createRange();
-	let startNode: Node | null = null;
-	let startOffset = 0;
-	let endNode: Node | null = null;
-	let endOffset = 0;
-	
-	// Get the text nodes and their positions
-	const textNodes = getTextNodesIn(element);
-	let currentPos = 0;
-	
-	// Find the appropriate nodes and offsets based on overlap type
-	switch (overlap.type) {
-		case 'encompasses':
-			// Use the new highlight entirely
-			return highlight2;
-			
-		case 'extends-start':
-			// Use the new start but keep the old end
-			for (const node of textNodes) {
-				const nodeText = node.textContent || '';
-				if (!startNode && currentPos + nodeText.length > overlap.position) {
-					startNode = node;
-					startOffset = overlap.position - currentPos;
-				}
-				if (!endNode && currentPos + nodeText.length > highlight1.content.length) {
-					endNode = node;
-					endOffset = highlight1.content.length - currentPos;
-					break;
-				}
-				currentPos += nodeText.length;
-			}
-			break;
-			
-		case 'extends-end':
-			// Keep the old start but use the new end
-			for (const node of textNodes) {
-				const nodeText = node.textContent || '';
-				if (!startNode && currentPos + nodeText.length > overlap.position) {
-					startNode = node;
-					startOffset = overlap.position - currentPos;
-				}
-				if (!endNode && currentPos + nodeText.length > highlight2.content.length) {
-					endNode = node;
-					endOffset = highlight2.content.length - currentPos;
-					break;
-				}
-				currentPos += nodeText.length;
-			}
-			break;
-			
-		case 'adjacent':
-			// Create a new range that includes both highlights plus the space between
-			const text1 = decodeURIComponent(highlight1.textStart);
-			const text2 = decodeURIComponent(highlight2.textStart);
-			const combinedText = text1 + ' ' + text2;
-			
-			for (const node of textNodes) {
-				const nodeText = node.textContent || '';
-				if (!startNode && currentPos + nodeText.length > overlap.position) {
-					startNode = node;
-					startOffset = overlap.position - currentPos;
-				}
-				if (!endNode && currentPos + nodeText.length > overlap.position + combinedText.length) {
-					endNode = node;
-					endOffset = overlap.position + combinedText.length - currentPos;
-					break;
-				}
-				currentPos += nodeText.length;
-			}
-			break;
+	if (!element) return null; // Cannot merge if element not found
+
+	// Decode texts for range finding
+	const text1 = decodeURIComponent(highlight1.textStart);
+	const text2 = decodeURIComponent(highlight2.textStart);
+	const prefix1 = highlight1.prefix ? decodeURIComponent(highlight1.prefix) : undefined;
+	const suffix1 = highlight1.suffix ? decodeURIComponent(highlight1.suffix) : undefined;
+	const prefix2 = highlight2.prefix ? decodeURIComponent(highlight2.prefix) : undefined;
+	const suffix2 = highlight2.suffix ? decodeURIComponent(highlight2.suffix) : undefined;
+
+
+	// Find the ranges for both highlights first
+	const range1Result = findTextInCleanContent(element, text1, highlight1.prefix, highlight1.suffix);
+	const range2Result = findTextInCleanContent(element, text2, highlight2.prefix, highlight2.suffix);
+
+	if (!range1Result || !range2Result) {
+		console.warn("Could not find original ranges for merging highlights. Aborting merge.");
+		// Return the highlight that seems "larger" or the second one as default
+		return highlight1.content.length > highlight2.content.length ? highlight1 : highlight2;
 	}
-	
-	if (startNode && endNode) {
-		range.setStart(startNode, startOffset);
-		range.setEnd(endNode, endOffset);
-		const mergedHighlight = createSingleParagraphHighlight(range);
-		if (mergedHighlight) {
-			console.log('Created merged highlight:', {
-				type: overlap.type,
-				content: mergedHighlight.content
-			});
-			return mergedHighlight;
+
+	const range1 = range1Result.range;
+	const range2 = range2Result.range;
+
+	// Create a new range that encompasses both original ranges
+	const mergedRange = document.createRange();
+
+	// Determine the overall start and end points
+	const startsBefore = range1.compareBoundaryPoints(Range.START_TO_START, range2) <= 0;
+	const endsAfter = range1.compareBoundaryPoints(Range.END_TO_END, range2) >= 0;
+
+	mergedRange.setStart(startsBefore ? range1.startContainer : range2.startContainer,
+						 startsBefore ? range1.startOffset : range2.startOffset);
+	mergedRange.setEnd(endsAfter ? range1.endContainer : range2.endContainer,
+					   endsAfter ? range1.endOffset : range2.endOffset);
+
+
+	// Now create a new highlight from this merged range
+	const mergedHighlightData = createSingleParagraphHighlight(mergedRange); // Use the helper
+
+	if (mergedHighlightData) {
+		console.log('Created merged highlight:', {
+			type: overlap.type,
+			content: mergedHighlightData.content
+		});
+		// Preserve notes from both original highlights
+		const combinedNotes = Array.from(new Set([...(highlight1.notes || []), ...(highlight2.notes || [])]));
+		mergedHighlightData.notes = combinedNotes.length > 0 ? combinedNotes : undefined;
+		return mergedHighlightData;
+	} else {
+		console.warn("Failed to create merged highlight data from combined range.");
+		// Fallback: return the highlight that encompasses the other, or the second highlight
+		if (overlap.type === 'encompasses') {
+			return highlight1.content.length > highlight2.content.length ? highlight1 : highlight2; // Return the container
 		}
+		return highlight2; // Default fallback
 	}
-	
-	return highlight2;
 }
 
 // Merge complex or element highlights
-function mergeComplexHighlights(highlight1: AnyHighlightData, highlight2: AnyHighlightData): AnyHighlightData {
+function mergeComplexHighlights(highlight1: AnyHighlightData, highlight2: AnyHighlightData): AnyHighlightData | null { // Return null on failure
 	const element1 = getElementByXPath(highlight1.xpath);
 	const element2 = getElementByXPath(highlight2.xpath);
 
 	if (!element1 || !element2) {
-		throw new Error("Cannot merge highlights: elements not found");
+		console.error("Cannot merge highlights: elements not found");
+		return null; // Indicate failure
 	}
 
 	// If merging with an element or complex highlight, prioritize that type
-	if (highlight1.type === 'element' || highlight1.type === 'complex') {
-		return highlight1;
-	} else if (highlight2.type === 'element' || highlight2.type === 'complex') {
-		return highlight2;
-	}
-
+	// Return the one that contains the other, or the common ancestor
 	let mergedElement: Element;
 	if (element1.contains(element2)) {
 		mergedElement = element1;
 	} else if (element2.contains(element1)) {
 		mergedElement = element2;
 	} else {
-		mergedElement = findCommonAncestor(element1, element2);
+		// Check if one is an ancestor of the other before finding common ancestor
+        const parentCheck1 = getParents(element2).includes(element1);
+        const parentCheck2 = getParents(element1).includes(element2);
+        if (parentCheck1) {
+            mergedElement = element1;
+        } else if (parentCheck2) {
+            mergedElement = element2;
+        } else {
+		    mergedElement = findCommonAncestor(element1, element2);
+        }
 	}
+
+	const mergedType = (highlight1.type === 'complex' || highlight2.type === 'complex' || mergedElement !== element1 || mergedElement !== element2) ? 'complex' : 'element';
+
+	// Preserve notes from both original highlights
+	const combinedNotes = Array.from(new Set([...(highlight1.notes || []), ...(highlight2.notes || [])]));
 
 	return {
 		xpath: getElementXPath(mergedElement),
 		content: mergedElement.outerHTML,
-		type: 'complex',
-		id: Date.now().toString()
+		type: mergedType,
+		id: Date.now().toString(), // Generate new ID for merged highlight
+		notes: combinedNotes.length > 0 ? combinedNotes : undefined
 	};
 }
 
@@ -1156,3 +1287,58 @@ function isFragmentHighlight(highlight: FragmentHighlightData | null): highlight
 		typeof highlight.xpath === 'string' &&
 		typeof highlight.id === 'string';
 }
+
+// --- Helper function to map normalized position back to original ---
+// This function needs to be accessible by handleTextSelection
+function mapNormalizedPositionToOriginal(originalText: string, normalizedText: string, normalizedPosition: number): number {
+	let originalPos = 0;
+	let normalizedPos = 0;
+	let originalLen = originalText.length;
+	let normalizedLen = normalizedText.length;
+
+	if (normalizedPosition <= 0) return 0;
+	if (normalizedPosition >= normalizedLen) return originalLen;
+
+	while (normalizedPos < normalizedPosition && originalPos < originalLen) {
+		let originalChar = originalText[originalPos];
+		let normalizedChar = normalizedText[normalizedPos];
+
+		// Simple case: characters match (case-insensitively for robustness)
+		if (originalChar.toLowerCase() === normalizedChar.toLowerCase()) {
+			originalPos++;
+			normalizedPos++;
+		}
+		// Case: Whitespace handling (skip extra whitespace in original)
+		else if (/\s/.test(originalChar)) {
+			if (normalizedPos > 0 && /\s/.test(normalizedText[normalizedPos - 1])) {
+				// Already accounted for one space in normalized, skip extra in original
+				originalPos++;
+			} else if (/\s/.test(normalizedChar)) {
+				// Match single whitespace
+				originalPos++;
+				normalizedPos++;
+			} else {
+				// Skip whitespace in original that doesn't exist in normalized
+				originalPos++;
+			}
+		}
+		// Case: Character was removed during normalization (e.g., soft hyphen)
+		else if (originalChar !== normalizedChar) {
+			// Assume originalChar was removed/transformed. Skip it.
+			originalPos++;
+		} else {
+            // Should not happen if normalization is consistent, but break defensively
+            console.warn("Normalization mapping encountered unexpected state.");
+            break;
+        }
+	}
+
+	// If we stopped early, try to adjust originalPos
+	while (originalPos < originalLen && /\s/.test(originalText[originalPos])) {
+		originalPos++;
+	}
+
+	return originalPos;
+}
+
+// --- End Helper ---

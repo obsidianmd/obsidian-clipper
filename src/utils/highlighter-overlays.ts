@@ -667,36 +667,37 @@ function startsWithPartial(text: string, searchText: string): boolean {
 // Enhanced findTextInCleanContent function with improved context matching
 export function findTextInCleanContent(
 	container: Element,
-	searchText: string,
-	prefix?: string,
-	suffix?: string,
+	searchText: string, // Expects NORMALIZED text for searching
+	prefix?: string,    // Expects ENCODED ORIGINAL prefix
+	suffix?: string,    // Expects ENCODED ORIGINAL suffix
 	retryCount: number = 0
 ): { range: Range, cleanText: string } | null {
 	const MAX_RETRIES = 2;
 	const CONTEXT_SIZES = [20, 40, 60]; // Try different context sizes
 	const SIMILARITY_THRESHOLDS = [0.9, 0.8, 0.7]; // Decrease threshold on retries
-	
+
 	// Get text nodes and their content
 	const textNodes = getTextNodesIn(container);
 	const nodesByParagraph = new Map<Element, Node[]>();
-	
+
 	// Group text nodes by their paragraph
 	for (const node of textNodes) {
-		const paragraph = node.parentElement?.closest('p, div, article, section') || container;
+		// Use closest block-level element as paragraph boundary
+		const paragraph = node.parentElement?.closest('p, div, li, blockquote, pre, h1, h2, h3, h4, h5, h6, article, section') || container;
 		if (!nodesByParagraph.has(paragraph)) {
 			nodesByParagraph.set(paragraph, []);
 		}
 		nodesByParagraph.get(paragraph)?.push(node);
 	}
-	
+
 	const contextSize = CONTEXT_SIZES[Math.min(retryCount, CONTEXT_SIZES.length - 1)];
 	const similarityThreshold = SIMILARITY_THRESHOLDS[Math.min(retryCount, SIMILARITY_THRESHOLDS.length - 1)];
-	
+
 	// Try to find the text in each paragraph
 	for (const [paragraph, nodes] of nodesByParagraph) {
 		let fullText = '';
 		const nodePositions: { node: Node, start: number, end: number }[] = [];
-		
+
 		// Build text content for this paragraph
 		for (const node of nodes) {
 			const nodeText = node.textContent || '';
@@ -707,37 +708,39 @@ export function findTextInCleanContent(
 			});
 			fullText += nodeText;
 		}
-		
+
 		// Skip empty paragraphs
 		if (!fullText.trim()) continue;
-		
+
 		// Normalize texts
 		const normalizedFullText = normalizeText(fullText);
-		const normalizedSearchText = normalizeText(searchText);
-		
+		// searchText is already normalized by the caller (handleTextSelection)
+		const normalizedSearchText = searchText;
+
 		console.log('Looking for text in paragraph:', {
 			paragraphTag: paragraph.tagName,
 			searchText: normalizedSearchText,
-			prefix: prefix ? normalizeText(decodeURIComponent(prefix)) : undefined,
-			suffix: suffix ? normalizeText(decodeURIComponent(suffix)) : undefined,
-			fullText: normalizedFullText,
+			prefix: prefix ? decodeURIComponent(prefix) : undefined, // Decode for logging
+			suffix: suffix ? decodeURIComponent(suffix) : undefined, // Decode for logging
+			fullTextSample: normalizedFullText.length > 100 ? normalizedFullText.substring(0, 100) + '...' : normalizedFullText,
 			textLength: normalizedSearchText.length,
 			nodeCount: nodes.length
 		});
-		
-		// Find potential matches using fuzzy matching
+
+		// Find potential matches using the normalized search text
 		let startIndex = -1;
 		let currentIndex = 0;
-		
+
 		while ((currentIndex = normalizedFullText.indexOf(normalizedSearchText, currentIndex)) !== -1) {
 			// Check context if provided
 			let contextMatches = true;
-			
+
 			if (prefix || suffix) {
-				const prefixText = prefix ? normalizeText(decodeURIComponent(prefix)) : '';
-				const suffixText = suffix ? normalizeText(decodeURIComponent(suffix)) : '';
-				
-				// Get context with variable size
+				// Decode the original prefix/suffix provided for comparison
+				const decodedPrefix = prefix ? normalizeText(decodeURIComponent(prefix)) : '';
+				const decodedSuffix = suffix ? normalizeText(decodeURIComponent(suffix)) : '';
+
+				// Get context from the *normalized* full text around the current match
 				const beforeContext = normalizedFullText.slice(
 					Math.max(0, currentIndex - contextSize),
 					currentIndex
@@ -746,138 +749,164 @@ export function findTextInCleanContent(
 					currentIndex + normalizedSearchText.length,
 					currentIndex + normalizedSearchText.length + contextSize
 				);
-				
+
 				console.log('Checking context:', {
 					beforeContext,
 					afterContext,
-					prefixText,
-					suffixText,
+					decodedPrefix,
+					decodedSuffix,
 					matchStart: currentIndex,
-					matchEnd: currentIndex + normalizedSearchText.length,
-					fullText: normalizedFullText
+					matchEnd: currentIndex + normalizedSearchText.length
 				});
-				
-				// Check prefix match
+
+				// --- Improved Context Matching --- 
+
+				// Check prefix match: The end of the `beforeContext` must match the end of the `decodedPrefix`
 				if (prefix) {
-					const prefixMatches = 
-						fuzzyMatch(beforeContext, prefixText, similarityThreshold) ||
-						endsWithPartial(beforeContext, prefixText) ||
-						beforeContext.endsWith(prefixText);
-					
-					if (!prefixMatches) {
-						console.log('Prefix does not match:', {
-							beforeContext,
-							prefixText,
-							fuzzyScore: fuzzyMatch(beforeContext, prefixText, 0),
-							endsWithPartial: endsWithPartial(beforeContext, prefixText)
-						});
+					const prefixEndMatches = beforeContext.endsWith(decodedPrefix);
+					// Fallback: Fuzzy match if exact end doesn't match
+					const prefixFuzzyMatches = !prefixEndMatches && fuzzyMatch(beforeContext, decodedPrefix, similarityThreshold);
+
+					if (!prefixEndMatches && !prefixFuzzyMatches) {
+						console.log(`Prefix mismatch: beforeContext("${beforeContext}") does not end with decodedPrefix("${decodedPrefix}") [Exact:${prefixEndMatches}, Fuzzy:${prefixFuzzyMatches}]`);
 						contextMatches = false;
 					}
 				}
-				
-				// Check suffix match
+
+				// Check suffix match: The start of the `afterContext` must match the start of the `decodedSuffix`
 				if (suffix && contextMatches) {
-					const suffixMatches = 
-						fuzzyMatch(afterContext, suffixText, similarityThreshold) ||
-						startsWithPartial(afterContext, suffixText) ||
-						afterContext.startsWith(suffixText);
-					
-					if (!suffixMatches) {
-						console.log('Suffix does not match:', {
-							afterContext,
-							suffixText,
-							fuzzyScore: fuzzyMatch(afterContext, suffixText, 0),
-							startsWithPartial: startsWithPartial(afterContext, suffixText)
-						});
+					const suffixStartMatches = afterContext.startsWith(decodedSuffix);
+					// Fallback: Fuzzy match if exact start doesn't match
+					const suffixFuzzyMatches = !suffixStartMatches && fuzzyMatch(afterContext, decodedSuffix, similarityThreshold);
+
+					if (!suffixStartMatches && !suffixFuzzyMatches) {
+						console.log(`Suffix mismatch: afterContext("${afterContext}") does not start with decodedSuffix("${decodedSuffix}") [Exact:${suffixStartMatches}, Fuzzy:${suffixFuzzyMatches}]`);
 						contextMatches = false;
 					}
 				}
+				// --- End Improved Context Matching ---
 			}
-			
+
 			if (contextMatches) {
-				console.log('Found matching context at index:', currentIndex);
+				console.log('✅ Found matching context at index:', currentIndex);
 				startIndex = currentIndex;
-				break;
+				break; // Found the first valid match in this paragraph
 			}
-			
+
+			// Move to the next potential starting position
 			currentIndex += 1;
 		}
-		
+
 		if (startIndex === -1) {
-			console.log('No match found in current paragraph');
-			continue;
+			// console.log('No match found in current paragraph'); // Reduce noise
+			continue; // Try next paragraph
 		}
-		
+
 		// Map normalized positions back to original text
 		const originalStartIndex = mapNormalizedPositionToOriginal(fullText, normalizedFullText, startIndex);
 		const originalEndIndex = mapNormalizedPositionToOriginal(fullText, normalizedFullText,
 			startIndex + normalizedSearchText.length);
-		
+
 		console.log('Position mapping:', {
 			normalizedStart: startIndex,
 			normalizedEnd: startIndex + normalizedSearchText.length,
 			originalStart: originalStartIndex,
 			originalEnd: originalEndIndex,
-			matchedText: fullText.slice(originalStartIndex, originalEndIndex)
+			mappedTextSlice: fullText.slice(originalStartIndex, originalEndIndex)
 		});
-		
-		// Find nodes containing start and end positions
-		let startNode: { node: Node, offset: number } | null = null;
-		let endNode: { node: Node, offset: number } | null = null;
-		
+
+		// Find nodes containing start and end positions based on *original* indices
+		let startNodeResult: { node: Node, offset: number } | null = null;
+		let endNodeResult: { node: Node, offset: number } | null = null;
+
 		for (const { node, start, end } of nodePositions) {
-			if (!startNode && start <= originalStartIndex && originalStartIndex <= end) {
-				startNode = {
+			// Find start node: originalStartIndex must be within [start, end)
+			if (!startNodeResult && originalStartIndex >= start && originalStartIndex < end) {
+				startNodeResult = {
 					node,
 					offset: originalStartIndex - start
 				};
 			}
-			if (!endNode && start <= originalEndIndex && originalEndIndex <= end) {
-				endNode = {
+			// Find end node: originalEndIndex must be within (start, end]
+			if (originalEndIndex > start && originalEndIndex <= end) {
+				endNodeResult = {
 					node,
 					offset: originalEndIndex - start
 				};
-				break;
+				// If start was also in this node, we found both. If start was earlier, we still need to check subsequent nodes for the end.
+				// Optimization: If startNode is found, we only need to look for endNode from that point forward.
+				if (startNodeResult) {
+					break; // Found end node after or within start node's paragraph segment
+				}
 			}
 		}
-		
-		if (startNode && endNode) {
-			console.log('Creating range:', {
-				startNodeText: startNode.node.textContent,
-				startOffset: startNode.offset,
-				endNodeText: endNode.node.textContent,
-				endOffset: endNode.offset,
+
+		// If end offset is 0 and it's not the start node, it likely means the selection ended exactly at the boundary.
+		// Try to place the end position at the end of the previous node.
+		if (endNodeResult && endNodeResult.offset === 0 && (!startNodeResult || startNodeResult.node !== endNodeResult.node)) {
+			const endIndex = nodePositions.findIndex(p => p.node === endNodeResult!.node);
+			if (endIndex > 0) {
+				const prevNodePos = nodePositions[endIndex - 1];
+				endNodeResult = {
+					node: prevNodePos.node,
+					offset: prevNodePos.node.textContent?.length || 0
+				};
+				console.log("Adjusted end node to previous node's end due to zero offset.", endNodeResult);
+			}
+		}
+
+
+		if (startNodeResult && endNodeResult) {
+			console.log('Creating range with nodes:', {
+				startNode: startNodeResult.node.nodeName,
+				startOffset: startNodeResult.offset,
+				endNode: endNodeResult.node.nodeName,
+				endOffset: endNodeResult.offset,
 				paragraph: paragraph.tagName
 			});
-			
-			const range = document.createRange();
-			range.setStart(startNode.node, startNode.offset);
-			range.setEnd(endNode.node, endNode.offset);
-			
-			// Verify the range content
-			const rangeText = range.toString();
-			const normalizedRangeText = normalizeText(rangeText);
-			
-			if (fuzzyMatch(normalizedRangeText, normalizedSearchText, similarityThreshold)) {
-				console.log('Range content matches with similarity threshold:', similarityThreshold);
-				return { range, cleanText: fullText };
-			} else {
-				console.log('Range content mismatch:', {
-					expected: normalizedSearchText,
-					actual: normalizedRangeText,
-					similarity: fuzzyMatch(normalizedRangeText, normalizedSearchText, 0)
+
+			try {
+				const range = document.createRange();
+				range.setStart(startNodeResult.node, startNodeResult.offset);
+				range.setEnd(endNodeResult.node, endNodeResult.offset);
+
+				// Verify the range content against the original expected text (more reliable than normalized)
+				const rangeText = range.toString();
+				const normalizedRangeText = normalizeText(rangeText);
+
+				if (fuzzyMatch(normalizedRangeText, normalizedSearchText, similarityThreshold)) {
+					console.log(`✅ Range content matches search text (Similarity: ${similarityThreshold.toFixed(2)})`);
+					return { range, cleanText: fullText }; // Return the successful match
+				} else {
+					// Log mismatch details
+					console.warn('Range content mismatch after mapping:', {
+						expectedNormalized: normalizedSearchText,
+						actualNormalized: normalizedRangeText,
+						actualOriginal: rangeText,
+						similarity: fuzzyMatch(normalizedRangeText, normalizedSearchText, 0) // Log actual similarity
+					});
+					// Don't return yet, allow the loop to continue searching in case of multiple occurrences
+				}
+			} catch (error) {
+				console.error("Error creating range:", error, {
+					startNode: startNodeResult?.node,
+					startOffset: startNodeResult?.offset,
+					endNode: endNodeResult?.node,
+					endOffset: endNodeResult?.offset
 				});
+				// Continue searching in other paragraphs
 			}
 		}
-	}
-	
+	} // End paragraph loop
+
 	// If no match found and we haven't exceeded max retries, try again with different parameters
 	if (retryCount < MAX_RETRIES) {
 		console.log(`Retry ${retryCount + 1} with larger context and lower threshold`);
 		return findTextInCleanContent(container, searchText, prefix, suffix, retryCount + 1);
 	}
-	
-	return null;
+
+	console.log('❌ Exhausted retries. Could not find text matching criteria.');
+	return null; // No match found after all retries
 }
 
 // Helper function to find a text node and offset from a character position
