@@ -249,13 +249,13 @@ function findWordBoundaries(text: string, startPos: number, endPos: number): { s
 }
 
 // Update planHighlightOverlayRects to use findTextNodeAtPosition
-export function planHighlightOverlayRects(target: Element, highlight: AnyHighlightData, index: number) {
+export function planHighlightOverlayRects(searchContainer: Element, target: Element, highlight: AnyHighlightData, index: number) {
 	const existingOverlays = Array.from(document.querySelectorAll(`.obsidian-highlight-overlay[data-highlight-index="${index}"]`));
 	
 	if (highlight.type === 'fragment') {
 		try {
 			const result = findTextInCleanContent(
-				document.body,
+				searchContainer,
 				decodeURIComponent(highlight.textStart),
 				highlight.prefix,
 				highlight.suffix
@@ -394,7 +394,6 @@ function createHighlightOverlayElement(rect: DOMRect, content: string, isText: b
 		}
 	}
 
-	// Add copy URL button
 	const copyButton = document.createElement('button');
 	copyButton.className = 'copy-url-button';
 	copyButton.innerHTML = `
@@ -470,14 +469,35 @@ function getEffectiveBackgroundColor(element: HTMLElement): string {
 
 // Update positions of all highlight overlays
 function updateHighlightOverlayPositions() {
+	// Determine the current container (reader or body)
+	const isInReader = document.documentElement.classList.contains('obsidian-reader-active');
+	let searchContainer: Element;
+	if (isInReader) {
+		searchContainer = document.querySelector('.obsidian-reader-content article') || document.body;
+	} else {
+		searchContainer = document.body;
+	}
+
+	if (!searchContainer) {
+		console.warn('Could not find container for updating highlight positions');
+		return;
+	}
+
 	highlights.forEach((highlight, index) => {
-		const target = getElementByXPath(highlight.xpath);
-		if (target) {
-			const existingOverlays = document.querySelectorAll(`.obsidian-highlight-overlay[data-highlight-index="${index}"]`);
-			if (existingOverlays.length > 0) {
-				removeExistingHighlightOverlays(index);
-			}
-			planHighlightOverlayRects(target, highlight, index);
+		// Need to determine the target element based on highlight type
+		let targetElement: Element | null = null;
+		if (highlight.type === 'fragment') {
+			targetElement = searchContainer; // Use the main container as the 'target' for fragments
+		} else {
+			targetElement = getElementByXPath(highlight.xpath); // Find specific element for legacy types
+		}
+
+		if (targetElement) {
+			removeExistingHighlightOverlays(index); // Remove old overlays for this index first
+			planHighlightOverlayRects(searchContainer, targetElement, highlight, index); // Replan with correct container and target
+		} else if (highlight.type !== 'fragment') {
+			// Only warn if a specific element (non-fragment) wasn't found
+			console.warn(`Element not found for XPath during update: ${highlight.xpath}`);
 		}
 	});
 }

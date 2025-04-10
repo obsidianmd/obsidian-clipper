@@ -1253,14 +1253,14 @@ export function applyHighlights() {
 		const isInReader = document.documentElement.classList.contains('obsidian-reader-active');
 		
 		// Get the appropriate container based on mode
-		let container: Element;
+		let searchContainer: Element;
 		if (isInReader) {
-			container = document.querySelector('.obsidian-reader-content article') || document.body;
+			searchContainer = document.querySelector('.obsidian-reader-content article') || document.body;
 		} else {
-			container = document.body;
+			searchContainer = document.body;
 		}
 
-		if (!container) {
+		if (!searchContainer) {
 			console.warn('Could not find container for highlights');
 			return;
 		}
@@ -1270,15 +1270,23 @@ export function applyHighlights() {
 
 		highlights.forEach((highlight, index) => {
 			try {
+				// Determine the target element based on highlight type
+				let targetElement: Element | null = null;
 				if (highlight.type === 'fragment') {
-					// For fragment highlights, use the container directly
-					planHighlightOverlayRects(container, highlight, index);
+					// For fragments, the 'target' for planning is the searchContainer itself,
+					// as findTextInCleanContent will locate the specific range within it.
+					targetElement = searchContainer;
 				} else {
-					// For legacy highlight types, try to find the element by xpath
-					const target = getElementByXPath(highlight.xpath);
-					if (target) {
-						planHighlightOverlayRects(target, highlight, index);
-					}
+					// For legacy highlight types, try to find the specific element by xpath
+					targetElement = getElementByXPath(highlight.xpath);
+				}
+
+				if (targetElement) {
+					// Pass both the searchContainer and the specific targetElement (if applicable)
+					planHighlightOverlayRects(searchContainer, targetElement, highlight, index);
+				} else if (highlight.type !== 'fragment') {
+					// Only warn if a specific element (non-fragment) wasn't found
+					console.warn(`Element not found for XPath: ${highlight.xpath}`);
 				}
 			} catch (error) {
 				console.error('Error applying highlight:', error, highlight);
