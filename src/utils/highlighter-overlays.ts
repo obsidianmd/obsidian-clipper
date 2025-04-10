@@ -181,30 +181,31 @@ function mapNormalizedPositionToOriginal(originalText: string, normalizedText: s
 	return originalPos;
 }
 
-// Helper function to normalize text consistently
+// Enhanced text normalization function with more comprehensive handling
 export function normalizeText(text: string, preserveSpaces: boolean = false): string {
 	// First normalize quotes and special characters
 	let normalized = text
-		.replace(/[\u2018\u2019]/g, "'")
-		.replace(/[\u201C\u201D]/g, '"')
-		.replace(/\u2026/g, '...')
-		.replace(/\u2013|\u2014/g, '-')
-		// Normalize punctuation while preserving spaces
+		.replace(/[\u2018\u2019\u201B]/g, "'") // Smart single quotes and reversed
+		.replace(/[\u201C\u201D\u201E\u201F]/g, '"') // Smart double quotes and reversed
+		.replace(/[\u2026]/g, '...') // Ellipsis
+		.replace(/[\u2013\u2014\u2015]/g, '-') // Em dash, en dash, horizontal bar
+		.replace(/[\u2017\u2500-\u2587]/g, '-') // Various dashes and lines
+		.replace(/[\u00A0\u1680\u2000-\u200A\u202F\u205F\u3000]/g, ' ') // Various space characters
+		.replace(/[\u200B-\u200F\u202A-\u202E\uFEFF]/g, ''); // Zero-width spaces and directional marks
+
+	// Normalize punctuation while preserving spaces
+	normalized = normalized
 		.replace(/\s*([.,;:!?])\s*/g, '$1 ')
-		// Remove extra spaces around quotes
-		.replace(/"\s+/g, '"')
-		.replace(/\s+"/g, '"')
-		.replace(/'\s+/g, "'")
-		.replace(/\s+'/g, "'");
-	
-	// For non-space-preserving mode, collapse all whitespace to single spaces
+		.replace(/\s+/g, ' ');
+
+	// For non-space-preserving mode, collapse all whitespace
 	if (!preserveSpaces) {
 		normalized = normalized
 			.replace(/[\n\r\t]+/g, ' ')
 			.replace(/\s+/g, ' ')
 			.trim();
 	}
-	
+
 	return normalized;
 }
 
@@ -330,6 +331,43 @@ function mergeHighlightOverlayRects(rects: DOMRect[], content: string, existingO
 	}
 }
 
+// Add helper function to create text fragment URL
+function createTextFragmentURL(text: string, prefix?: string, suffix?: string): string {
+	// Clean and encode the text fragments
+	const cleanText = text.trim().replace(/\s+/g, ' ');
+	
+	// Custom encode function to ensure hyphens are properly encoded
+	const encodeForTextFragment = (str: string) => {
+		return encodeURIComponent(str)
+			.replace(/-/g, '%2D') // Ensure hyphens are always encoded
+			.replace(/'/g, '%27') // Ensure single quotes are encoded
+			.replace(/"/g, '%22') // Ensure double quotes are encoded
+			.replace(/\(/g, '%28') // Ensure parentheses are encoded
+			.replace(/\)/g, '%29')
+			.replace(/\!/g, '%21')
+			.replace(/~/g, '%7E')
+			.replace(/\*/g, '%2A')
+			.replace(/\./g, '%2E')
+			.replace(/'/g, '%E2%80%99') // Smart single quote
+			.replace(/'/g, '%E2%80%99') // Another smart single quote variant
+			.replace(/"/g, '%E2%80%9C') // Smart double quote opening
+			.replace(/"/g, '%E2%80%9D'); // Smart double quote closing
+	};
+
+	const encodedText = encodeForTextFragment(cleanText);
+	const encodedPrefix = prefix ? encodeForTextFragment(prefix.trim()) : '';
+	const encodedSuffix = suffix ? encodeForTextFragment(suffix.trim()) : '';
+
+	// Build the text fragment
+	let fragment = `:~:text=${encodedText}`;
+	if (encodedPrefix) fragment = `:~:text=${encodedPrefix}-,${encodedText}`;
+	if (encodedSuffix) fragment += `,${encodedSuffix}`;
+
+	// Create the full URL
+	const baseUrl = window.location.href.split('#')[0];
+	return `${baseUrl}#${fragment}`;
+}
+
 // Create an overlay element
 function createHighlightOverlayElement(rect: DOMRect, content: string, isText: boolean = false, index: number, notes?: string[]) {
 	const overlay = document.createElement('div');
@@ -337,7 +375,6 @@ function createHighlightOverlayElement(rect: DOMRect, content: string, isText: b
 	overlay.dataset.highlightIndex = index.toString();
 	
 	overlay.style.position = 'absolute';
-
 	overlay.style.left = `${rect.left + window.scrollX - 2}px`;
 	overlay.style.top = `${rect.top + window.scrollY - 2}px`;
 	overlay.style.width = `${rect.width + 4}px`;
@@ -356,6 +393,60 @@ function createHighlightOverlayElement(rect: DOMRect, content: string, isText: b
 			overlay.classList.add('obsidian-highlight-overlay-dark');
 		}
 	}
+
+	// Add copy URL button
+	const copyButton = document.createElement('button');
+	copyButton.className = 'copy-url-button';
+	copyButton.innerHTML = `
+		<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+			<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+			<path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+		</svg>
+		Copy link
+	`;
+	
+	copyButton.addEventListener('click', async (e) => {
+		e.stopPropagation();
+		e.preventDefault();
+		
+		try {
+			const highlight = highlights[index];
+			if (highlight && highlight.type === 'fragment') {
+				const url = createTextFragmentURL(
+					decodeURIComponent(highlight.textStart),
+					highlight.prefix ? decodeURIComponent(highlight.prefix) : undefined,
+					highlight.suffix ? decodeURIComponent(highlight.suffix) : undefined
+				);
+				
+				await navigator.clipboard.writeText(url);
+				
+				// Show success state
+				copyButton.classList.add('copied');
+				copyButton.innerHTML = `
+					<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M20 6L9 17l-5-5"/>
+					</svg>
+					Copied!
+				`;
+				
+				// Reset after 2 seconds
+				setTimeout(() => {
+					copyButton.classList.remove('copied');
+					copyButton.innerHTML = `
+						<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+							<path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+						</svg>
+						Copy link
+					`;
+				}, 2000);
+			}
+		} catch (error) {
+			console.error('Error copying URL:', error);
+		}
+	});
+	
+	overlay.appendChild(copyButton);
 	
 	overlay.addEventListener('click', handleHighlightClick);
 	overlay.addEventListener('touchend', handleHighlightClick);
@@ -519,13 +610,72 @@ export function removeExistingHighlights() {
 	}
 }
 
-// Find position of text in clean content and map back to DOM
+// Add fuzzy matching helper function
+function fuzzyMatch(text1: string, text2: string, threshold: number = 0.8): boolean {
+	if (text1 === text2) return true;
+	
+	// Convert to lowercase for case-insensitive comparison
+	text1 = text1.toLowerCase();
+	text2 = text2.toLowerCase();
+	
+	// Calculate Levenshtein distance
+	const m = text1.length;
+	const n = text2.length;
+	const dp: number[][] = Array(m + 1).fill(null).map(() => Array(n + 1).fill(0));
+	
+	for (let i = 0; i <= m; i++) dp[i][0] = i;
+	for (let j = 0; j <= n; j++) dp[0][j] = j;
+	
+	for (let i = 1; i <= m; i++) {
+		for (let j = 1; j <= n; j++) {
+			dp[i][j] = Math.min(
+				dp[i-1][j] + 1,
+				dp[i][j-1] + 1,
+				dp[i-1][j-1] + (text1[i-1] === text2[j-1] ? 0 : 1)
+			);
+		}
+	}
+	
+	const maxLength = Math.max(text1.length, text2.length);
+	const similarity = 1 - (dp[m][n] / maxLength);
+	
+	return similarity >= threshold;
+}
+
+// Add helper function to check if text ends with a partial match
+function endsWithPartial(text: string, searchText: string): boolean {
+	// Check if the text ends with any part of the search text
+	for (let i = 1; i <= Math.min(text.length, searchText.length); i++) {
+		if (searchText.startsWith(text.slice(-i))) {
+			return true;
+		}
+	}
+	return false;
+}
+
+// Add helper function to check if text starts with a partial match
+function startsWithPartial(text: string, searchText: string): boolean {
+	// Check if the text starts with any part of the search text
+	for (let i = 1; i <= Math.min(text.length, searchText.length); i++) {
+		if (searchText.endsWith(text.slice(0, i))) {
+			return true;
+		}
+	}
+	return false;
+}
+
+// Enhanced findTextInCleanContent function with improved context matching
 export function findTextInCleanContent(
 	container: Element,
 	searchText: string,
 	prefix?: string,
-	suffix?: string
+	suffix?: string,
+	retryCount: number = 0
 ): { range: Range, cleanText: string } | null {
+	const MAX_RETRIES = 2;
+	const CONTEXT_SIZES = [20, 40, 60]; // Try different context sizes
+	const SIMILARITY_THRESHOLDS = [0.9, 0.8, 0.7]; // Decrease threshold on retries
+	
 	// Get text nodes and their content
 	const textNodes = getTextNodesIn(container);
 	const nodesByParagraph = new Map<Element, Node[]>();
@@ -538,6 +688,9 @@ export function findTextInCleanContent(
 		}
 		nodesByParagraph.get(paragraph)?.push(node);
 	}
+	
+	const contextSize = CONTEXT_SIZES[Math.min(retryCount, CONTEXT_SIZES.length - 1)];
+	const similarityThreshold = SIMILARITY_THRESHOLDS[Math.min(retryCount, SIMILARITY_THRESHOLDS.length - 1)];
 	
 	// Try to find the text in each paragraph
 	for (const [paragraph, nodes] of nodesByParagraph) {
@@ -567,49 +720,97 @@ export function findTextInCleanContent(
 			searchText: normalizedSearchText,
 			prefix: prefix ? normalizeText(decodeURIComponent(prefix)) : undefined,
 			suffix: suffix ? normalizeText(decodeURIComponent(suffix)) : undefined,
+			fullText: normalizedFullText,
 			textLength: normalizedSearchText.length,
-			nodeCount: nodes.length,
-			paragraphText: normalizedFullText.slice(0, 100) + '...'
+			nodeCount: nodes.length
 		});
 		
-		// Find the text position in normalized content
-		let startIndex = normalizedFullText.indexOf(normalizedSearchText);
-		if (startIndex === -1) continue;
+		// Find potential matches using fuzzy matching
+		let startIndex = -1;
+		let currentIndex = 0;
 		
-		// Verify prefix/suffix if provided
-		if (prefix || suffix) {
-			const prefixText = prefix ? normalizeText(decodeURIComponent(prefix)) : '';
-			const suffixText = suffix ? normalizeText(decodeURIComponent(suffix)) : '';
-			const contextSize = Math.max(prefixText.length, suffixText.length) + 20;
+		while ((currentIndex = normalizedFullText.indexOf(normalizedSearchText, currentIndex)) !== -1) {
+			// Check context if provided
+			let contextMatches = true;
 			
-			const beforeContext = normalizedFullText.slice(Math.max(0, startIndex - contextSize), startIndex);
-			const afterContext = normalizedFullText.slice(startIndex + normalizedSearchText.length, 
-				startIndex + normalizedSearchText.length + contextSize);
-			
-			console.log('Checking context:', {
-				beforeContext,
-				afterContext,
-				prefixText,
-				suffixText,
-				matchStart: startIndex,
-				matchEnd: startIndex + normalizedSearchText.length
-			});
-			
-			if (prefix && !beforeContext.includes(prefixText)) {
-				console.log('Prefix not found in context, trying next occurrence');
-				startIndex = normalizedFullText.indexOf(normalizedSearchText, startIndex + 1);
-				if (startIndex === -1) continue;
+			if (prefix || suffix) {
+				const prefixText = prefix ? normalizeText(decodeURIComponent(prefix)) : '';
+				const suffixText = suffix ? normalizeText(decodeURIComponent(suffix)) : '';
+				
+				// Get context with variable size
+				const beforeContext = normalizedFullText.slice(
+					Math.max(0, currentIndex - contextSize),
+					currentIndex
+				);
+				const afterContext = normalizedFullText.slice(
+					currentIndex + normalizedSearchText.length,
+					currentIndex + normalizedSearchText.length + contextSize
+				);
+				
+				console.log('Checking context:', {
+					beforeContext,
+					afterContext,
+					prefixText,
+					suffixText,
+					matchStart: currentIndex,
+					matchEnd: currentIndex + normalizedSearchText.length,
+					fullText: normalizedFullText
+				});
+				
+				// Check prefix match
+				if (prefix) {
+					const prefixMatches = 
+						fuzzyMatch(beforeContext, prefixText, similarityThreshold) ||
+						endsWithPartial(beforeContext, prefixText) ||
+						beforeContext.endsWith(prefixText);
+					
+					if (!prefixMatches) {
+						console.log('Prefix does not match:', {
+							beforeContext,
+							prefixText,
+							fuzzyScore: fuzzyMatch(beforeContext, prefixText, 0),
+							endsWithPartial: endsWithPartial(beforeContext, prefixText)
+						});
+						contextMatches = false;
+					}
+				}
+				
+				// Check suffix match
+				if (suffix && contextMatches) {
+					const suffixMatches = 
+						fuzzyMatch(afterContext, suffixText, similarityThreshold) ||
+						startsWithPartial(afterContext, suffixText) ||
+						afterContext.startsWith(suffixText);
+					
+					if (!suffixMatches) {
+						console.log('Suffix does not match:', {
+							afterContext,
+							suffixText,
+							fuzzyScore: fuzzyMatch(afterContext, suffixText, 0),
+							startsWithPartial: startsWithPartial(afterContext, suffixText)
+						});
+						contextMatches = false;
+					}
+				}
 			}
-			if (suffix && !afterContext.includes(suffixText)) {
-				console.log('Suffix not found in context, trying next occurrence');
-				startIndex = normalizedFullText.indexOf(normalizedSearchText, startIndex + 1);
-				if (startIndex === -1) continue;
+			
+			if (contextMatches) {
+				console.log('Found matching context at index:', currentIndex);
+				startIndex = currentIndex;
+				break;
 			}
+			
+			currentIndex += 1;
+		}
+		
+		if (startIndex === -1) {
+			console.log('No match found in current paragraph');
+			continue;
 		}
 		
 		// Map normalized positions back to original text
 		const originalStartIndex = mapNormalizedPositionToOriginal(fullText, normalizedFullText, startIndex);
-		const originalEndIndex = mapNormalizedPositionToOriginal(fullText, normalizedFullText, 
+		const originalEndIndex = mapNormalizedPositionToOriginal(fullText, normalizedFullText,
 			startIndex + normalizedSearchText.length);
 		
 		console.log('Position mapping:', {
@@ -640,7 +841,6 @@ export function findTextInCleanContent(
 			}
 		}
 		
-		// Create range if we found both positions in the same paragraph
 		if (startNode && endNode) {
 			console.log('Creating range:', {
 				startNodeText: startNode.node.textContent,
@@ -654,19 +854,27 @@ export function findTextInCleanContent(
 			range.setStart(startNode.node, startNode.offset);
 			range.setEnd(endNode.node, endNode.offset);
 			
-			// Verify the range content matches what we expect
+			// Verify the range content
 			const rangeText = range.toString();
 			const normalizedRangeText = normalizeText(rangeText);
-			if (normalizedRangeText === normalizedSearchText) {
-				console.log('Range content matches expected text');
+			
+			if (fuzzyMatch(normalizedRangeText, normalizedSearchText, similarityThreshold)) {
+				console.log('Range content matches with similarity threshold:', similarityThreshold);
 				return { range, cleanText: fullText };
 			} else {
 				console.log('Range content mismatch:', {
 					expected: normalizedSearchText,
-					actual: normalizedRangeText
+					actual: normalizedRangeText,
+					similarity: fuzzyMatch(normalizedRangeText, normalizedSearchText, 0)
 				});
 			}
 		}
+	}
+	
+	// If no match found and we haven't exceeded max retries, try again with different parameters
+	if (retryCount < MAX_RETRIES) {
+		console.log(`Retry ${retryCount + 1} with larger context and lower threshold`);
+		return findTextInCleanContent(container, searchText, prefix, suffix, retryCount + 1);
 	}
 	
 	return null;
