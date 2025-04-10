@@ -491,6 +491,12 @@ function isValidHighlight(highlight: FragmentHighlightData | null): highlight is
 
 // Handle text selection for highlighting
 export function handleTextSelection(selection: Selection, notes?: string[]) {
+	console.log('🎯 handleTextSelection called with selection:', selection.toString());
+	const range = selection.getRangeAt(0);
+	if (range.toString().length === 0) {
+		console.log('⚠️ Empty selection, no highlight created');
+		return;
+	}
 	try {
 		const range = selection.getRangeAt(0);
 		const isInReader = document.documentElement.classList.contains('obsidian-reader-active');
