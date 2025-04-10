@@ -407,13 +407,6 @@ function createSingleParagraphHighlight(range: Range): FragmentHighlightData | n
 		});
 		return null;
 	}
-
-	console.log('Created fragment highlight:', {
-		text: decodeURIComponent(textStart),
-		prefix: prefix ? decodeURIComponent(prefix) : undefined,
-		suffix: suffix ? decodeURIComponent(suffix) : undefined,
-		xpath: highlight.xpath
-	});
 	
 	return highlight;
 }
@@ -496,12 +489,11 @@ function testHighlightFindability(highlight: FragmentHighlightData): boolean {
 
 // Helper function to create and add a highlight for a specific range (within a single block)
 async function createAndAddHighlightForRange(range: Range, notes?: string[]): Promise<boolean> {
-	console.log("[Helper] Attempting highlight for range:", range.toString().slice(0, 100) + '...');
+	// console.log("[Highlighter] Attempting highlight for range:", range.toString().slice(0, 100) + '...');
 	try {
-		const isInReader = document.documentElement.classList.contains('obsidian-reader-active');
 		const selectedText = range.toString();
 		if (!selectedText.trim()) {
-			console.log("[Helper] Skipping empty range.");
+			// console.log("[Highlighter] Skipping empty range.");
 			return false;
 		}
 
@@ -510,10 +502,10 @@ async function createAndAddHighlightForRange(range: Range, notes?: string[]): Pr
 			container = container.parentElement!;
 		}
 		if (!container || !(container instanceof Element)) {
-			console.error('[Helper] Could not find a valid container element.');
+			// console.error('[Highlighter] Could not find a valid container element.');
 			return false;
 		}
-		console.log(`[Helper] Container found: <${container.tagName.toLowerCase()}>`);
+		// console.log(`[Highlighter] Container found: <${container.tagName.toLowerCase()}>`);
 
 		// --- Calculate positions and context within this specific range's container ---
 		const textNodes = getTextNodesIn(container);
@@ -532,14 +524,14 @@ async function createAndAddHighlightForRange(range: Range, notes?: string[]): Pr
 		for (const { node, start } of nodePositions) {
 			if (node === range.startContainer) {
 				absoluteStart = start + range.startOffset;
-				console.log(`[Helper] Start pos found (direct): ${absoluteStart}`);
+				// console.log(`[Highlighter] Start pos found (direct): ${absoluteStart}`);
 				break;
 			}
 			if (range.startContainer.contains(node) && range.startContainer !== node) {
 				const walker = document.createTreeWalker(range.startContainer, NodeFilter.SHOW_TEXT);
 				let offsetWithinContainer = 0; let foundNode: Node | null;
 				while (foundNode = walker.nextNode()) {
-					if (node === foundNode) { absoluteStart = start + range.startOffset - offsetWithinContainer; console.log(`[Helper] Start pos found (within element): ${absoluteStart}`); break; }
+					if (node === foundNode) { absoluteStart = start + range.startOffset - offsetWithinContainer; break; }
 					offsetWithinContainer += foundNode.textContent?.length || 0;
 				}
 				if (absoluteStart !== -1) break;
@@ -550,7 +542,7 @@ async function createAndAddHighlightForRange(range: Range, notes?: string[]): Pr
 		for (const { node, start } of nodePositions) {
 			if (node === range.endContainer) {
 				absoluteEnd = start + range.endOffset;
-				console.log(`[Helper] End pos found (direct): ${absoluteEnd}`);
+				// console.log(`[Highlighter] End pos found (direct): ${absoluteEnd}`);
 				break;
 			}
 			if (range.endContainer.contains(node) && range.endContainer !== node) {
@@ -560,7 +552,7 @@ async function createAndAddHighlightForRange(range: Range, notes?: string[]): Pr
 					const nodeLength = foundNode.textContent?.length || 0;
 					if (node === foundNode) {
 						if (range.endOffset >= offsetWithinContainer && range.endOffset <= offsetWithinContainer + nodeLength) {
-							absoluteEnd = start + range.endOffset - offsetWithinContainer; console.log(`[Helper] End pos found (within element): ${absoluteEnd}`); break;
+							absoluteEnd = start + range.endOffset - offsetWithinContainer; break;
 						}
 					}
 					offsetWithinContainer += nodeLength;
@@ -571,29 +563,29 @@ async function createAndAddHighlightForRange(range: Range, notes?: string[]): Pr
 
 		// Fallback / sanity check (Add logging)
 		if (absoluteStart === -1 || absoluteEnd === -1 || absoluteStart > absoluteEnd || fullText.slice(absoluteStart, absoluteEnd) !== selectedText) {
-			console.warn("[Helper] Inaccurate positions. Using fallback.", { absoluteStart, absoluteEnd, selectedTextLen: selectedText.length, slice: fullText.slice(absoluteStart, absoluteEnd).slice(0,50) });
+			//console.warn("[Highlighter] Inaccurate positions. Using fallback.", { absoluteStart, absoluteEnd, selectedTextLen: selectedText.length, slice: fullText.slice(absoluteStart, absoluteEnd).slice(0,50) });
 			const normalizedFullText = normalizeText(fullText);
 			const normalizedSelectedText = normalizeText(selectedText);
 			const foundIndex = normalizedFullText.indexOf(normalizedSelectedText);
 			if (foundIndex !== -1) {
 				absoluteStart = mapNormalizedPositionToOriginal(fullText, normalizedFullText, foundIndex);
 				absoluteEnd = mapNormalizedPositionToOriginal(fullText, normalizedFullText, foundIndex + normalizedSelectedText.length);
-				console.log("[Helper] Fallback positions calculated:", { absoluteStart, absoluteEnd });
+				// console.log("[Highlighter] Fallback positions calculated:", { absoluteStart, absoluteEnd });
 			} else {
-				console.error("[Helper] Fallback failed: Cannot find normalized text.");
+				// console.error("[Highlighter] Fallback failed: Cannot find normalized text.");
 				return false;
 			}
 		}
 
-		if (absoluteStart === -1 || absoluteEnd === -1) {
-			console.error("[Helper] Critical error: Could not determine positions.");
-			return false;
-		}
+		// if (absoluteStart === -1 || absoluteEnd === -1) {
+		// 	console.error("[Highlighter] Critical error: Could not determine positions.");
+		// 	return false;
+		// }
 
 		const contextSize = 20;
 		const prefix = fullText.substring(Math.max(0, absoluteStart - contextSize), absoluteStart);
 		const suffix = fullText.substring(absoluteEnd, Math.min(fullText.length, absoluteEnd + contextSize));
-		console.log("[Helper] Context extracted:", { prefix: prefix, suffix: suffix });
+		// console.log("[Highlighter] Context extracted:", { prefix: prefix, suffix: suffix });
 		// --- End context calculation ---
 
 		const normalizedSelectedText = normalizeText(selectedText);
@@ -609,7 +601,6 @@ async function createAndAddHighlightForRange(range: Range, notes?: string[]): Pr
 			notes: notes
 		};
 
-		console.log('[Helper] Attempting pre-check...');
 		// Pre-check using the specific container first for performance, then fallback to body
 		let findResult = findTextInCleanContent(
 			container,
@@ -617,45 +608,39 @@ async function createAndAddHighlightForRange(range: Range, notes?: string[]): Pr
 			highlight.prefix,
 			highlight.suffix
 		);
-		console.log(`[Helper] Pre-check in container result: ${findResult ? 'Found' : 'Not found'}`);
 
 		if (!findResult) {
-			console.warn("[Helper] Pre-check failed in container, retrying in document.body");
 			findResult = findTextInCleanContent(
 				document.body,
 				normalizedSelectedText,
 				highlight.prefix,
 				highlight.suffix
 			);
-			console.log(`[Helper] Pre-check in body result: ${findResult ? 'Found' : 'Not found'}`);
 		}
 
 		if (findResult) {
-			console.log("✅ [Helper] Highlight passed pre-check. Adding...");
 			addHighlight(highlight);
 			return true;
 		} else {
-			console.warn('❌ [Helper] Pre-check failed. Highlight not created.');
+			// console.warn('❌ [Highlighter] Pre-check failed. Highlight not created.');
 			return false;
 		}
 
 	} catch (error) {
-		console.error('[Helper] Error in createAndAddHighlightForRange:', error);
 		return false;
 	}
 }
 
-// Handle text selection for highlighting
 export async function handleTextSelection(selection: Selection, notes?: string[]) {
-	console.log('🎯 handleTextSelection called with selection:', selection.toString().slice(0, 100) + '...');
+	console.log('🎯 Selection:', selection.toString().slice(0, 100) + '...');
 	if (!selection || selection.rangeCount === 0) {
-		console.log('No selection or range count is zero.');
+		// console.log('No selection or range count is zero.');
 		return;
 	}
 
 	const range = selection.getRangeAt(0);
 	if (range.collapsed) {
-		console.log('⚠️ Collapsed selection, no highlight created');
+		// console.log('⚠️ Collapsed selection, no highlight created');
 		return;
 	}
 
@@ -664,17 +649,17 @@ export async function handleTextSelection(selection: Selection, notes?: string[]
 		const startNode = range.startContainer;
 		const endNode = range.endContainer;
 		const commonAncestor = range.commonAncestorContainer;
-		console.log("[Main] Selection details:", { startNode: startNode.nodeName, endNode: endNode.nodeName, commonAncestor: commonAncestor.nodeName });
+		// console.log("[Main] Selection details:", { startNode: startNode.nodeName, endNode: endNode.nodeName, commonAncestor: commonAncestor.nodeName });
 
 		// Find the nearest block-level ancestors for start and end nodes
 		const blockSelector = 'p, li, blockquote, pre, h1, h2, h3, h4, h5, h6, div:not(.obsidian-highlighter-menu):not(#obsidian-highlight-hover-overlay)';
 		const startBlock = (startNode.nodeType === Node.ELEMENT_NODE ? startNode as Element : startNode.parentElement)?.closest(blockSelector);
 		const endBlock = (endNode.nodeType === Node.ELEMENT_NODE ? endNode as Element : endNode.parentElement)?.closest(blockSelector);
-		console.log("[Main] Start block:", startBlock?.tagName, "End block:", endBlock?.tagName);
+		// console.log("[Main] Start block:", startBlock?.tagName, "End block:", endBlock?.tagName);
 
 		// Check if the selection spans multiple block elements
 		if (startBlock && endBlock && startBlock !== endBlock) {
-			console.log("[Main] Selection spans multiple blocks. Starting split process...");
+			// console.log("[Main] Selection spans multiple blocks. Splitting highlight...");
 
 			const highlightsToAdd: Range[] = [];
 			const walker = document.createTreeWalker(
@@ -696,7 +681,7 @@ export async function handleTextSelection(selection: Selection, notes?: string[]
 			// Set the TreeWalker's current node to the startBlock if possible
 			if (startBlock && commonAncestor.contains(startBlock)) {
 				walker.currentNode = startBlock;
-				console.log("[Main] Walker starting at startBlock:", startBlock.tagName);
+				//console.log("[Highlighter] Walker starting at startBlock:", startBlock.tagName);
 			} else {
 				// If startBlock isn't valid or not under commonAncestor, we need to manually find the first intersecting block
 				let firstNode = walker.firstChild();
@@ -704,7 +689,7 @@ export async function handleTextSelection(selection: Selection, notes?: string[]
 					firstNode = walker.nextNode();
 				}
 				walker.currentNode = firstNode || commonAncestor; // Fallback to commonAncestor if no intersecting node found
-				console.log("[Main] Walker starting node found via iteration:", walker.currentNode?.nodeName);
+				// console.log("[Highlighter] Walker starting node found via iteration:", walker.currentNode?.nodeName);
 			}
 
 			let currentNode: Node | null = walker.currentNode;
@@ -716,7 +701,7 @@ export async function handleTextSelection(selection: Selection, notes?: string[]
 					continue;
 				}
 				const currentBlock = currentNode as Element;
-				console.log(`[Main] Processing block ${blockIndex}: <${currentBlock.tagName.toLowerCase()}>`);
+				// console.log(`[Highlighter] Processing block ${blockIndex}: <${currentBlock.tagName.toLowerCase()}>`);
 
 				// Calculate the intersection of the original range and the current block
 				const intersectionRange = range.cloneRange();
@@ -725,29 +710,29 @@ export async function handleTextSelection(selection: Selection, notes?: string[]
 
 				// Adjust start: If selection starts before the block, move start to block start
 				if (intersectionRange.compareBoundaryPoints(Range.START_TO_START, blockBoundaryRange) < 0) {
-					console.log(`[Main] Block ${blockIndex}: Adjusting start boundary.`);
+					// console.log(`[Highlighter] Block ${blockIndex}: Adjusting start boundary.`);
 					intersectionRange.setStart(blockBoundaryRange.startContainer, blockBoundaryRange.startOffset);
 				}
 
 				// Adjust end: If selection ends after the block, move end to block end
 				if (intersectionRange.compareBoundaryPoints(Range.END_TO_END, blockBoundaryRange) > 0) {
-					console.log(`[Main] Block ${blockIndex}: Adjusting end boundary.`);
+					// console.log(`[Highlighter] Block ${blockIndex}: Adjusting end boundary.`);
 					intersectionRange.setEnd(blockBoundaryRange.endContainer, blockBoundaryRange.endOffset);
 				}
 
-				console.log(`[Main] Block ${blockIndex} intersection range:`, intersectionRange.toString().slice(0, 50) + '...');
+				// console.log(`[Highlighter] Block ${blockIndex} intersection range:`, intersectionRange.toString().slice(0, 50) + '...');
 
 				// Ensure the created range has content before adding
 				if (!intersectionRange.collapsed && intersectionRange.toString().trim().length > 0) {
 					highlightsToAdd.push(intersectionRange);
-					console.log(`[Main] Block ${blockIndex} range added to list.`);
+					// console.log(`[Highlighter] Block ${blockIndex} range added to list.`);
 				} else {
-					console.log(`[Main] Block ${blockIndex} range was collapsed or empty. Skipping.`);
+					// console.log(`[Highlighter] Block ${blockIndex} range was collapsed or empty. Skipping.`);
 				}
 
 				// Stop processing if we've processed the block containing the end node
 				if (currentBlock === endBlock || currentBlock.contains(endBlock)) {
-					console.log(`[Main] Reached or passed endBlock. Stopping walker.`);
+					// console.log(`[Main] Reached or passed endBlock. Stopping walker.`);
 					break;
 				}
 
@@ -756,14 +741,14 @@ export async function handleTextSelection(selection: Selection, notes?: string[]
 			}
 
 			// Add the collected highlights
-			console.log(`[Main] Attempting to add ${highlightsToAdd.length} collected highlight ranges.`);
+			// console.log(`[Highlighter] Attempting to add ${highlightsToAdd.length} collected highlight ranges.`);
 			if (highlightsToAdd.length > 0) {
 				let successCount = 0;
 				const results = await Promise.all(highlightsToAdd.map(hr => createAndAddHighlightForRange(hr, notes)));
 				successCount = results.filter(Boolean).length;
-				console.log(`[Main] Multi-block addition complete. Succeeded: ${successCount}/${highlightsToAdd.length}.`);
+				//console.log(`[Highlighter] Multi-block addition complete. Succeeded: ${successCount}/${highlightsToAdd.length}.`);
 			} else {
-				console.warn("[Main] Multi-block selection detected, but no valid highlight ranges were generated.");
+				//console.warn("[Highlighter] Multi-block selection detected, but no valid highlight ranges were generated.");
 			}
 
 			// Clear selection after processing
@@ -771,11 +756,11 @@ export async function handleTextSelection(selection: Selection, notes?: string[]
 
 		} else {
 			// --- Single block selection: Use the helper function ---
-			console.log("[Main] Selection appears within a single block. Calling helper...");
+			// console.log("[Highlighter] Selection appears within a single block. Calling helper...");
 			if (await createAndAddHighlightForRange(range, notes)) {
 				selection.removeAllRanges(); // Clear selection on success
 			} else {
-				console.warn("[Main] Single block highlight creation failed.");
+				// console.warn("[Main] Single block highlight creation failed.");
 				selection.removeAllRanges(); // Clear selection even on failure
 			}
 		}
@@ -802,7 +787,7 @@ function addHighlight(highlight: AnyHighlightData) {
 	const mergedHighlights = mergeOverlappingHighlights(highlights, highlight);
 	highlights = mergedHighlights;
 
-	console.log('📊 Highlights after merge:', highlights.length, 'total highlights');
+	// console.log('📊 Highlights after merge:', highlights.length, 'total highlights');
 
 	addToHistory('add', oldHighlights, mergedHighlights);
 	sortHighlights();
