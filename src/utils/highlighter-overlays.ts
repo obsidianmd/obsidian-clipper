@@ -507,7 +507,7 @@ function removeExistingHighlightOverlays(index: number) {
 	document.querySelectorAll(`.obsidian-highlight-overlay[data-highlight-index="${index}"]`).forEach(el => el.remove());
 }
 
-const throttledUpdateHighlights = throttle(() => {
+export const throttledUpdateHighlights = throttle(() => {
 	if (!isApplyingHighlights) {
 		updateHighlightOverlayPositions();
 	}

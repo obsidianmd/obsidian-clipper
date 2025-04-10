@@ -3,6 +3,7 @@ import { getLocalStorage, setLocalStorage } from './storage-utils';
 import hljs from 'highlight.js';
 import { getDomain } from './string-utils';
 import { applyHighlights } from './highlighter';
+import { throttledUpdateHighlights } from './highlighter-overlays';
 
 // Mobile viewport settings
 const VIEWPORT = 'width=device-width, initial-scale=1, maximum-scale=1';
@@ -993,10 +994,10 @@ export class Reader {
 			this.colorSchemeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 			this.colorSchemeMediaQuery.addEventListener('change', (e) => this.handleColorSchemeChange(e, doc));
 			
-			// Reapply highlights after reader mode is initialized
-			console.log('[Reader] Attempting to apply highlights...');
+			// First application of highlights based on initial structure
+			console.log('[Reader] Attempting initial applyHighlights()...');
 			applyHighlights();
-			console.log('[Reader] applyHighlights() called.');
+			console.log('[Reader] Initial applyHighlights() called.');
  
 			this.isActive = true;
 			console.log('[Reader] Reader mode application complete.');
