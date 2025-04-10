@@ -76,6 +76,7 @@ export function updateHighlights(newHighlights: AnyHighlightData[]) {
 	const oldHighlights = [...highlights];
 	highlights = newHighlights;
 	addToHistory('add', oldHighlights, newHighlights);
+	notifyHighlightsUpdated();
 }
 
 // Toggle highlighter mode on or off
@@ -129,6 +130,7 @@ export function undo() {
 			saveHighlights();
 			updateHighlighterMenu();
 			updateUndoRedoButtons();
+			notifyHighlightsUpdated();
 		}
 	}
 }
@@ -143,6 +145,7 @@ export function redo() {
 			saveHighlights();
 			updateHighlighterMenu();
 			updateUndoRedoButtons();
+			notifyHighlightsUpdated();
 		}
 	}
 }
@@ -794,6 +797,7 @@ function addHighlight(highlight: AnyHighlightData) {
 	applyHighlights(); // This will redraw based on the new `highlights` array
 	saveHighlights();
 	updateHighlighterMenu(); // Update UI based on the new state
+	notifyHighlightsUpdated();
 }
 
 // Sort highlights based on their vertical position
@@ -1121,14 +1125,18 @@ export function saveHighlights() {
 		browser.storage.local.get('highlights').then((result: { highlights?: HighlightsStorage }) => {
 			const allHighlights: HighlightsStorage = result.highlights || {};
 			allHighlights[url] = data;
-			browser.storage.local.set({ highlights: allHighlights });
+			browser.storage.local.set({ highlights: allHighlights }).then(() => {
+				notifyHighlightsUpdated();
+			});
 		});
 	} else {
 		// Remove the entry if there are no highlights
 		browser.storage.local.get('highlights').then((result: { highlights?: HighlightsStorage }) => {
 			const allHighlights: HighlightsStorage = result.highlights || {};
 			delete allHighlights[url];
-			browser.storage.local.set({ highlights: allHighlights });
+			browser.storage.local.set({ highlights: allHighlights }).then(() => {
+				notifyHighlightsUpdated();
+			});
 		});
 	}
 }
@@ -1189,7 +1197,7 @@ export function applyHighlights() {
 }
 
 // Notify that highlights have been updated
-function notifyHighlightsUpdated() {
+export function notifyHighlightsUpdated() {
 	browser.runtime.sendMessage({ action: "highlightsUpdated" });
 }
 
@@ -1215,8 +1223,10 @@ export async function loadHighlights() {
 			applyHighlights();
 			document.body.classList.add('obsidian-highlighter-always-show');
 		}
+		notifyHighlightsUpdated();
 	} else {
 		highlights = [];
+		notifyHighlightsUpdated();
 	}
 	lastAppliedHighlights = JSON.stringify(highlights);
 }
