@@ -67,7 +67,7 @@ declare global {
 			const extractedContent: { [key: string]: string } = {};
 
 			// Process with Defuddle first while we have access to the document
-			const defuddled = new Defuddle(document).parse();
+			const defuddled = new Defuddle(document, { url: document.URL }).parse();
 
 			// Create a new DOMParser
 			const parser = new DOMParser();

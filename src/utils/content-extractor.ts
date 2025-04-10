@@ -101,7 +101,7 @@ export async function initializePageContent(
 			content = selectedHtml;
 		}
 
-		const defuddled = new Defuddle(doc).parse();
+		const defuddled = new Defuddle(doc, { url: currentUrl }).parse();
 		const noteName = sanitizeFileName(defuddled.title);
 
 		// Process highlights after getting the base content
