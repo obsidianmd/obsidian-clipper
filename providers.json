@@ -46,18 +46,6 @@
 			{ "id": "gemini-2.0-flash", "name": "Gemini 2.0 Flash" }
 		]
 	},
-	"xai": {
-		"id": "xai",
-		"name": "xAI",
-		"apiKeyUrl": "https://console.x.ai/",
-		"apiKeyRequired": true,
-		"modelsList": "https://docs.x.ai/docs/models",
-		"baseUrl": "https://api.x.ai/v1/chat/completions",
-		"popularModels": [
-			{ "id": "grok-3-latest", "name": "Grok 3" },
-			{ "id": "grok-3-mini-latest", "name": "Grok 3 Mini" }
-		]
-	},
 	"huggingface": {
 		"id": "huggingface",
 		"name": "Hugging Face",
@@ -117,6 +105,18 @@
 			{ "id": "sonar-reasoning", "name": "Sonar Reasoning" },
 			{ "id": "sonar-reasoning-pro", "name": "Sonar Reasoning Pro" },
 			{ "id": "sonar-deep-research", "name": "Sonar Deep Research" }
+		]
+	},
+	"xai": {
+		"id": "xai",
+		"name": "xAI",
+		"apiKeyUrl": "https://console.x.ai/",
+		"apiKeyRequired": true,
+		"modelsList": "https://docs.x.ai/docs/models",
+		"baseUrl": "https://api.x.ai/v1/chat/completions",
+		"popularModels": [
+			{ "id": "grok-3-latest", "name": "Grok 3" },
+			{ "id": "grok-3-mini-latest", "name": "Grok 3 Mini" }
 		]
 	}
 }
