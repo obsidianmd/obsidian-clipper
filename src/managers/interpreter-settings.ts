@@ -113,7 +113,7 @@ export function initializeInterpreterSettings(): void {
 		await getPresetProviders(); 
 
 		// Initialize providers first since models depend on them
-		await initializeProviderList(); // Made async
+		await initializeProviderList();
 		initializeModelList(); // Depends on providers, which are now initialized
 
 		// Initialize toggles and other UI elements
@@ -125,11 +125,10 @@ export function initializeInterpreterSettings(): void {
 		}
 
 		updatePromptContextVisibility();
-		initializeToggles(); // General toggles outside the forms
-		initializeAutoSave(); // Handles specific input auto-saving
+		initializeToggles();
+		initializeAutoSave();
 	}).catch(error => {
 		console.error("Failed to initialize interpreter settings:", error);
-		// Optionally show an error message to the user
 	});
 
 	// Set up button event listeners
@@ -255,8 +254,6 @@ function createProviderListItem(provider: Provider, index: number, presetProvide
 		}
 	});
 
-	// Removed duplicate provider button logic for simplicity, can be re-added if needed
-
 	return providerItem;
 }
 
@@ -264,12 +261,12 @@ async function addProviderToList(event: Event): Promise<void> {
 	event.preventDefault();
 	debugLog('Providers', 'Adding new provider');
 	const newProvider: Provider = {
-		id: Date.now().toString(), // Use a more robust UID method if possible
+		id: Date.now().toString(),
 		name: '',
 		baseUrl: '',
 		apiKey: ''
 	};
-	await showProviderModal(newProvider); // showProviderModal is async
+	await showProviderModal(newProvider);
 }
 
 async function editProvider(index: number): Promise<void> { 
@@ -280,8 +277,6 @@ async function editProvider(index: number): Promise<void> {
 	const providerToEdit = generalSettings.providers[index];
 	await showProviderModal(providerToEdit, index); // Await the async modal
 }
-
-// Removed duplicateProvider function - can be re-added based on createProviderListItem
 
 async function deleteProvider(index: number): Promise<void> { 
 	if (index < 0 || index >= generalSettings.providers.length) {
@@ -318,7 +313,6 @@ async function showProviderModal(provider: Provider, index?: number): Promise<vo
 		return;
 	}
 
-	// Show Modal Immediately
 	showModal(modal);
 
 	// Translate static parts first
@@ -373,17 +367,15 @@ async function showProviderModal(provider: Provider, index?: number): Promise<vo
 	cancelBtn.parentNode?.replaceChild(newCancelBtn, cancelBtn);
 	newCancelBtn.addEventListener('click', () => hideModal(modal)); // Cancel is simple
 
-	// --- Fetch Presets Asynchronously ---
+	// Fetch presets asynchronously
 	let presetProviders: Record<string, PresetProvider> = {};
 	try {
 		presetProviders = await getPresetProviders();
 		debugLog('Providers', 'Presets fetched/cached for modal', presetProviders);
 
-		// --- Populate Presets and Update UI (Runs after presets are ready) ---
 		presetSelect.style.display = ''; // Show select again
 		if(loadingIndicator) loadingIndicator.remove(); // Remove loading indicator
 
-		// --- Preset Select Setup ---
 		const oldPresetSelect = presetSelect;
 		// Create the new select, GUARANTEED non-null if we get here
 		const currentPresetSelect = oldPresetSelect.cloneNode(true) as HTMLSelectElement;
@@ -414,10 +406,8 @@ async function showProviderModal(provider: Provider, index?: number): Promise<vo
 		}
 		currentPresetSelect.value = currentPresetId; 
 
-		// --- Visibility and Pre-fill Logic (Defined to accept non-null select) ---
 		const updateVisibility = (selectElement: HTMLSelectElement) => {
-			// No need for null check on selectElement here
-			if (!nameContainer || !baseUrlContainer || !nameInput || !baseUrlInput || !apiKeyContainer || !apiKeyInput || !apiKeyDescription) return; // Check others
+			if (!nameContainer || !baseUrlContainer || !nameInput || !baseUrlInput || !apiKeyContainer || !apiKeyInput || !apiKeyDescription) return;
 
 			const selectedPresetId = selectElement.value;
 			const isCustom = !selectedPresetId;
@@ -444,7 +434,6 @@ async function showProviderModal(provider: Provider, index?: number): Promise<vo
 				}
 			}
 
-			// Pre-fill logic (remains the same)
 			if (selectedPreset) {
 				if (index === undefined || provider.name === selectedPreset.name) {
 					nameInput.value = selectedPreset.name;
@@ -460,8 +449,7 @@ async function showProviderModal(provider: Provider, index?: number): Promise<vo
 				}
 			}
 		};
-		
-		// --- Initial Values & Event Listener (after presets loaded) ---
+
 		if (index !== undefined) { 
 			nameInput.value = provider.name;
 			baseUrlInput.value = provider.baseUrl;
@@ -475,7 +463,6 @@ async function showProviderModal(provider: Provider, index?: number): Promise<vo
 		// Initial call using the guaranteed non-null currentPresetSelect
 		updateVisibility(currentPresetSelect); 
 
-		// Add Confirm button listener HERE
 		newConfirmBtn.addEventListener('click', async () => { 
 			const selectedPresetId = currentPresetSelect.value;
 			const selectedPreset = (selectedPresetId && presetProviders) ? presetProviders[selectedPresetId] : null;
@@ -536,8 +523,6 @@ async function showProviderModal(provider: Provider, index?: number): Promise<vo
 			loadingIndicator.remove();
 		}
 	}
-
-	// Remove redundant listener attachment here
 }
 
 export function initializeModelList(): void {
@@ -994,7 +979,6 @@ function initializeAutoSave(): void {
 			await saveInterpreterSettingsFromForm(); 
 		}, 500));
 	}
-	// Toggles save immediately via initializeSettingToggle, no need for form-wide listener
 }
 
 // Save only settings managed directly by this specific form part
