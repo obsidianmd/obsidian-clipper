@@ -140,7 +140,7 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 				stream: false
 			};
 		} else {
-			// Default OpenAI-compatible request format
+			// Default request format
 			requestUrl = provider.baseUrl;
 			requestBody = {
 				model: model.providerModelId,
@@ -226,7 +226,6 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 				llmResponseContent = JSON.stringify(data);
 			}
 		} else {
-			// OpenAI and others
 			llmResponseContent = data.choices[0]?.message?.content || JSON.stringify(data);
 		}
 		debugLog('Interpreter', 'Processed LLM response:', llmResponseContent);
