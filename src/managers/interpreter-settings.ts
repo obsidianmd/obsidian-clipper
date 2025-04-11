@@ -673,7 +673,6 @@ async function showModelModal(model: ModelConfig, originalId: string | null): Pr
 
 	const isEditing = originalId !== null;
 
-	// --- Show Modal Immediately ---
 	showModal(modal);
 
 	// Translate static parts first
@@ -727,7 +726,6 @@ async function showModelModal(model: ModelConfig, originalId: string | null): Pr
 	cancelBtn.parentNode?.replaceChild(newCancelBtn, cancelBtn);
 	newCancelBtn.addEventListener('click', () => hideModal(modal));
 
-	// --- Provider Select Setup (Does not depend on async presets) ---
 	const oldProviderSelect = providerSelect;
 	const currentProviderSelect = oldProviderSelect.cloneNode(true) as HTMLSelectElement; // Clone with options
 	oldProviderSelect.parentNode?.replaceChild(currentProviderSelect, oldProviderSelect);
@@ -751,11 +749,10 @@ async function showModelModal(model: ModelConfig, originalId: string | null): Pr
 		currentProviderSelect.value = '';
 	}
 
-	// --- Initial Values ---
 	nameInput.value = model.name;
 	providerModelIdInput.value = model.providerModelId || '';
 
-	// --- Fetch Presets & Setup Model Options Async ---
+	// Fetch presets and set up model options async
 	let presetProviders: Record<string, PresetProvider> = {};
 	try {
 		presetProviders = await getPresetProviders();
