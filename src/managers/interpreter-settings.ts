@@ -12,8 +12,8 @@ export interface PresetProvider {
 	baseUrl: string;
 	apiKeyUrl?: string;
 	apiKeyRequired?: boolean;
-	modelsList?: string;
-	popularModels?: Array<{
+	modelsListUrl?: string;
+	chatModels?: Array<{
 		id: string;
 		name: string;
 		recommended?: boolean;
@@ -829,19 +829,19 @@ async function showModelModal(model: ModelConfig, originalId: string | null): Pr
 
 				// Update model ID description link
 				modelIdDescContainer.innerHTML = getMessage('providerModelIdDescription'); 
-				if (currentPresetProvider?.modelsList) {
+				if (currentPresetProvider?.modelsListUrl) {
 					const link = document.createElement('a');
-					link.href = currentPresetProvider.modelsList;
+					link.href = currentPresetProvider.modelsListUrl;
 					link.target = '_blank';
 					link.textContent = ` ${getMessage('modelsListFor', selectedProvider.name)}`;
 					modelIdDescContainer.appendChild(link);
 				}
 
 				// Populate popular models if available
-				if (currentPresetProvider?.popularModels?.length) {
+				if (currentPresetProvider?.chatModels?.length) {
 					modelSelectionContainer.style.display = 'block';
 					
-					currentPresetProvider.popularModels.forEach((popModel, idx) => {
+					currentPresetProvider.chatModels.forEach((popModel, idx) => {
 						const radioId = `pop-model-${idx}`;
 						const radioDiv = document.createElement('div');
 						radioDiv.className = 'radio-option';
@@ -866,7 +866,7 @@ async function showModelModal(model: ModelConfig, originalId: string | null): Pr
 					// Add change handler to the new container
 					currentRadioContainer.addEventListener('change', (e) => {
 						const target = e.target as HTMLInputElement;
-						if (target.name !== 'model-selection' || !currentPresetProvider?.popularModels) return;
+						if (target.name !== 'model-selection' || !currentPresetProvider?.chatModels) return;
 						if (!nameInput || !providerModelIdInput) return;
 
 						if (target.value === 'other') {
@@ -878,7 +878,7 @@ async function showModelModal(model: ModelConfig, originalId: string | null): Pr
 							nameInput.disabled = false;
 							providerModelIdInput.disabled = false;
 						} else {
-							const selectedPopModel = currentPresetProvider.popularModels.find(m => m.id === target.value);
+							const selectedPopModel = currentPresetProvider.chatModels.find(m => m.id === target.value);
 							if (selectedPopModel) {
 								nameInput.value = selectedPopModel.name;
 								providerModelIdInput.value = selectedPopModel.id;

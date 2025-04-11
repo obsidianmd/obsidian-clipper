@@ -5,9 +5,9 @@
 		"name": "Anthropic",
 		"apiKeyUrl": "https://console.anthropic.com/settings/keys",
 		"apiKeyRequired": true,
-		"modelsList": "https://docs.anthropic.com/en/docs/about-claude/models",
+		"modelsListUrl": "https://docs.anthropic.com/en/docs/about-claude/models",
 		"baseUrl": "https://api.anthropic.com/v1/messages",
-		"popularModels": [
+		"chatModels": [
 			{ "id": "claude-3-5-haiku-latest", "name": "Claude 3.5 Haiku" },
 			{ "id": "claude-3-5-sonnet-latest", "name": "Claude 3.5 Sonnet" }
 		]
@@ -17,9 +17,9 @@
 		"name": "Azure OpenAI",
 		"apiKeyUrl": "https://oai.azure.com/portal/",
 		"apiKeyRequired": true,
-		"modelsList": "https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models",
+		"modelsListUrl": "https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models",
 		"baseUrl": "https://{resource-name}.openai.azure.com/openai/deployments/{deployment-id}/chat/completions?api-version=2024-10-21",
-		"popularModels": [
+		"chatModels": [
 			{ "id": "gpt-4o-mini", "name": "GPT-4o Mini" },
 			{ "id": "gpt-4o", "name": "GPT-4o" }
 		]
@@ -29,9 +29,9 @@
 		"name": "DeepSeek",
 		"apiKeyUrl": "https://platform.deepseek.com/api_keys",
 		"apiKeyRequired": true,
-		"modelsList": "https://api-docs.deepseek.com/quick_start/pricing",
+		"modelsListUrl": "https://api-docs.deepseek.com/quick_start/pricing",
 		"baseUrl": "https://api.deepseek.com/v1/chat/completions",
-		"popularModels": [
+		"chatModels": [
 			{ "id": "deepseek-chat", "name": "DeepSeek Chat" },
 			{ "id": "deepseek-reasoner", "name": "DeepSeek Reasoner" }
 		]
@@ -41,9 +41,9 @@
 		"name": "Google Gemini",
 		"apiKeyUrl": "https://aistudio.google.com/apikey",
 		"apiKeyRequired": true,
-		"modelsList": "https://generativelanguage.googleapis.com/v1beta/chat/completions",
+		"modelsListUrlUrl": "https://generativelanguage.googleapis.com/v1beta/chat/completions",
 		"baseUrl": "https://generativelanguage.googleapis.com/v1beta/chat/completions",
-		"popularModels": [
+		"chatModels": [
 			{ "id": "gemini-2.0-flash", "name": "Gemini 2.0 Flash" }
 		]
 	},
@@ -51,16 +51,16 @@
 		"id": "huggingface",
 		"name": "Hugging Face",
 		"apiKeyUrl": "https://huggingface.co/settings/tokens",
-		"modelsList": "https://huggingface.co/models",
+		"modelsListUrl": "https://huggingface.co/models",
 		"baseUrl": "https://api-inference.huggingface.co/models/{model-id}/chat/completions"
 	},
 	"ollama": {
 		"id": "ollama",
 		"name": "Ollama",
 		"apiKeyRequired": false,
-		"modelsList": "https://ollama.com/models",
+		"modelsListUrl": "https://ollama.com/models",
 		"baseUrl": "http://127.0.0.1:11434/api/chat",
-		"popularModels": [
+		"chatModels": [
 			{ "id": "llama3.2:1b", "name": "Llama 3.2 1B" },
 			{ "id": "llama3.2", "name": "Llama 3.2 3B" },
 			{ "id": "llama3.3", "name": "Llama 3.3 70B" }
@@ -71,9 +71,9 @@
 		"name": "OpenAI",
 		"apiKeyUrl": "https://platform.openai.com/api-keys",
 		"apiKeyRequired": true,
-		"modelsList": "https://platform.openai.com/docs/models",
+		"modelsListUrl": "https://platform.openai.com/docs/models",
 		"baseUrl": "https://api.openai.com/v1/chat/completions",
-		"popularModels": [
+		"chatModels": [
 			{ "id": "gpt-4o-mini", "name": "GPT-4o Mini" },
 			{ "id": "gpt-4o", "name": "GPT-4o" },
 			{ "id": "o1-2024-12-17", "name": "o1" },
@@ -86,9 +86,9 @@
 		"name": "OpenRouter",
 		"apiKeyUrl": "https://openrouter.ai/settings/keys",
 		"apiKeyRequired": true,
-		"modelsList": "https://openrouter.ai/models",
+		"modelsListUrl": "https://openrouter.ai/models",
 		"baseUrl": "https://openrouter.ai/api/v1/chat/completions",
-		"popularModels": [
+		"chatModels": [
 			{ "id": "meta-llama/llama-3.2-1b-instruct", "name": "Llama 3.2 1B Instruct" },
 			{ "id": "meta-llama/llama-3.2-3b-instruct", "name": "Llama 3.2 3B Instruct" }
 		]
@@ -98,9 +98,9 @@
 		"name": "Perplexity",
 		"apiKeyUrl": "https://www.perplexity.ai/settings/api",
 		"apiKeyRequired": true,
-		"modelsList": "https://docs.perplexity.ai/guides/model-cards",
+		"modelsListUrl": "https://docs.perplexity.ai/guides/model-cards",
 		"baseUrl": "https://api.perplexity.ai/chat/completions",
-		"popularModels": [
+		"chatModels": [
 			{ "id": "sonar", "name": "Sonar" },
 			{ "id": "sonar-pro", "name": "Sonar Pro" },
 			{ "id": "sonar-reasoning", "name": "Sonar Reasoning" },
@@ -113,9 +113,9 @@
 		"name": "xAI",
 		"apiKeyUrl": "https://console.x.ai/",
 		"apiKeyRequired": true,
-		"modelsList": "https://docs.x.ai/docs/models",
+		"modelsListUrl": "https://docs.x.ai/docs/models",
 		"baseUrl": "https://api.x.ai/v1/chat/completions",
-		"popularModels": [
+		"chatModels": [
 			{ "id": "grok-3-latest", "name": "Grok 3" },
 			{ "id": "grok-3-mini-latest", "name": "Grok 3 Mini" }
 		]
