@@ -41,6 +41,8 @@ export interface Provider {
 	name: string;
 	baseUrl: string;
 	apiKey: string;
+	apiKeyRequired?: boolean;
+	presetId?: string;
 }
 
 export interface Rating {

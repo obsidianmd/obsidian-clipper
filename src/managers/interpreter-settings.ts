@@ -20,113 +20,68 @@ export interface PresetProvider {
 	}>;
 }
 
-export const PRESET_PROVIDERS: Record<string, PresetProvider> = {
-	anthropic: {
-		id: 'anthropic',
-		name: 'Anthropic',
-		baseUrl: 'https://api.anthropic.com/v1/messages',
-		apiKeyUrl: 'https://console.anthropic.com/settings/keys',
-		apiKeyRequired: true,
-		modelsList: 'https://docs.anthropic.com/en/docs/about-claude/models',
-		popularModels: [
-			{ id: 'claude-3-5-haiku-latest', name: 'Claude 3.5 Haiku', recommended: true },
-			{ id: 'claude-3-5-sonnet-latest', name: 'Claude 3.5 Sonnet' }
-		]
-	},
-	azure: {
-		id: 'azure-openai',
-		name: 'Azure OpenAI',
-		baseUrl: 'https://{resource-name}.openai.azure.com/openai/deployments/{deployment-id}/chat/completions?api-version=2024-10-21',
-		apiKeyUrl: 'https://oai.azure.com/portal/',
-		apiKeyRequired: true,
-		modelsList: 'https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models',
-		popularModels: [
-			{ id: 'gpt-4o-mini', name: 'GPT-4o Mini', recommended: true },
-			{ id: 'gpt-4o', name: 'GPT-4o' },
-		]
-	},
-	deepseek: {
-		id: 'deepseek',
-		name: 'DeepSeek',
-		baseUrl: 'https://api.deepseek.com/v1/chat/completions',
-		apiKeyUrl: 'https://platform.deepseek.com/api_keys',
-		apiKeyRequired: true,
-		modelsList: 'https://api-docs.deepseek.com/quick_start/pricing',
-		popularModels: [
-			{ id: 'deepseek-chat', name: 'DeepSeek Chat' }
-		]
-	},
-	google: {
-		id: 'google',
-		name: 'Google Gemini',
-		baseUrl: 'https://generativelanguage.googleapis.com/v1beta/chat/completions',
-		apiKeyUrl: 'https://aistudio.google.com/apikey',
-		apiKeyRequired: true,
-		modelsList: 'https://ai.google.dev/gemini-api/docs/models/gemini',
-		popularModels: [
-			{ id: 'gemini-2.0-flash-exp', name: 'Gemini 2.0 Flash', recommended: true },
-		]
-	},
-	huggingface: {
-		id: 'huggingface',
-		name: 'Hugging Face',
-		baseUrl: 'https://api-inference.huggingface.co/models/{model-id}/chat/completions',
-		apiKeyUrl: 'https://huggingface.co/settings/tokens',
-		apiKeyRequired: true,
-		modelsList: 'https://huggingface.co/models?pipeline_tag=text-generation&sort=trending'
-	},
-	ollama: {
-		id: 'ollama',
-		name: 'Ollama',
-		baseUrl: 'http://127.0.0.1:11434/api/chat',
-		apiKeyRequired: false,
-		modelsList: 'https://ollama.com/search',
-		popularModels: [
-			{ id: 'llama3.2:1b', name: 'Llama 3.2 1B' },
-			{ id: 'llama3.2', name: 'Llama 3.2 3B' },
-			{ id: 'llama3.3', name: 'Llama 3.3 70B' }
-		]
-	},
-	openai: {
-		id: 'openai',
-		name: 'OpenAI',
-		baseUrl: 'https://api.openai.com/v1/chat/completions',
-		apiKeyUrl: 'https://platform.openai.com/api-keys',
-		apiKeyRequired: true,
-		modelsList: 'https://platform.openai.com/docs/models',
-		popularModels: [
-			{ id: 'gpt-4o-mini', name: 'GPT-4o Mini', recommended: true },
-			{ id: 'gpt-4o', name: 'GPT-4o' },
-		]
-	},
-	openrouter: {
-		id: 'openrouter',
-		name: 'OpenRouter',
-		baseUrl: 'https://openrouter.ai/api/v1/chat/completions',
-		apiKeyUrl: 'https://openrouter.ai/settings/keys',
-		apiKeyRequired: true,
-		modelsList: 'https://openrouter.ai/models',
-		popularModels: [
-			{ id: 'meta-llama/llama-3.2-1b-instruct', name: 'Llama 3.2 1B Instruct' },
-			{ id: 'meta-llama/llama-3.2-3b-instruct', name: 'Llama 3.2 3B Instruct' }
-		]
-	},
-	perplexity: {
-		id: 'perplexity',
-		name: 'Perplexity',
-		baseUrl: 'https://api.perplexity.ai/chat/completions',
-		apiKeyUrl: 'https://www.perplexity.ai/settings/api',
-		apiKeyRequired: true,
-		modelsList: 'https://docs.perplexity.ai/guides/model-cards',
-		popularModels: [
-			{ id: 'sonar', name: 'Sonar' },
-			{ id: 'sonar-pro', name: 'Sonar Pro' },
-			{ id: 'sonar-reasoning', name: 'Sonar Reasoning' },
-			{ id: 'sonar-reasoning-pro', name: 'Sonar Reasoning Pro' },
-			{ id: 'sonar-deep-research', name: 'Sonar Deep Research' }
-		]
+const PROVIDERS_URL = 'https://raw.githubusercontent.com/obsidianmd/obsidian-clipper/refs/heads/main/providers.json';
+const PRESET_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const PRESET_RETRY_DELAY = 60 * 1000; // 1 minute
+
+let cachedPresets: Record<string, PresetProvider> | null = null;
+let lastFetchTime = 0;
+let lastErrorTime = 0;
+let isFetching = false;
+
+async function fetchPresetProviders(): Promise<Record<string, PresetProvider>> {
+	debugLog('Providers', 'Fetching preset providers from URL:', PROVIDERS_URL);
+	try {
+		const response = await fetch(PROVIDERS_URL);
+		if (!response.ok) {
+			throw new Error(`HTTP error! status: ${response.status}`);
+		}
+		const data = await response.json();
+		// Add the preset ID to each provider object
+		for (const key in data) {
+			if (Object.prototype.hasOwnProperty.call(data, key)) {
+				data[key].id = key;
+			}
+		}
+		debugLog('Providers', 'Successfully fetched presets:', data);
+		return data as Record<string, PresetProvider>;
+	} catch (error) {
+		console.error('Failed to fetch preset providers:', error);
+		throw error; // Re-throw to be handled by getPresetProviders
 	}
-};
+}
+
+export async function getPresetProviders(): Promise<Record<string, PresetProvider>> {
+	const now = Date.now();
+
+	if (cachedPresets && (now - lastFetchTime < PRESET_CACHE_DURATION)) {
+		debugLog('Providers', 'Returning cached presets');
+		return cachedPresets;
+	}
+
+	// Prevent concurrent fetches and retry immediately after an error only after delay
+	if (isFetching || (lastErrorTime > 0 && now - lastErrorTime < PRESET_RETRY_DELAY)) {
+		debugLog('Providers', 'Fetching is already in progress or recently failed, returning cached (possibly stale) presets or empty object');
+		return cachedPresets || {}; // Return potentially stale cache or empty if first fetch failed
+	}
+
+	isFetching = true;
+	try {
+		const presets = await fetchPresetProviders();
+		cachedPresets = presets;
+		lastFetchTime = Date.now();
+		lastErrorTime = 0; // Reset error time on success
+		debugLog('Providers', 'Presets cached successfully');
+		return cachedPresets;
+	} catch (error) {
+		console.error('Failed to load or cache preset providers:', error);
+		lastErrorTime = Date.now();
+		// Return the potentially stale cache if available, otherwise an empty object
+		return cachedPresets || {}; 
+	} finally {
+		isFetching = false;
+	}
+}
 
 export function updatePromptContextVisibility(): void {
 	const interpreterToggle = document.getElementById('interpreter-toggle') as HTMLInputElement;
@@ -145,16 +100,21 @@ export function updatePromptContextVisibility(): void {
 export function initializeInterpreterSettings(): void {
 	const interpreterSettingsForm = document.getElementById('interpreter-settings-form');
 	if (interpreterSettingsForm) {
-		interpreterSettingsForm.addEventListener('input', debounce(saveInterpreterSettingsFromForm, 500));
+		// Note: input event might not be ideal for the whole form if it triggers too often.
+		// Consider attaching debounced savers only to specific inputs like textareas.
+		// Toggles save immediately via their own handlers.
 	}
 
 	// First load settings and initialize everything
-	loadSettings().then(() => {
+	loadSettings().then(async () => {
 		debugLog('Interpreter', 'Loaded settings:', generalSettings);
 
+		// Fetch presets before initializing lists that depend on them
+		await getPresetProviders(); 
+
 		// Initialize providers first since models depend on them
-		initializeProviderList();
-		initializeModelList();
+		await initializeProviderList(); // Made async
+		initializeModelList(); // Depends on providers, which are now initialized
 
 		// Initialize toggles and other UI elements
 		initializeInterpreterToggles();
@@ -165,19 +125,24 @@ export function initializeInterpreterSettings(): void {
 		}
 
 		updatePromptContextVisibility();
-		initializeToggles();
-		initializeAutoSave();
+		initializeToggles(); // General toggles outside the forms
+		initializeAutoSave(); // Handles specific input auto-saving
+	}).catch(error => {
+		console.error("Failed to initialize interpreter settings:", error);
+		// Optionally show an error message to the user
 	});
 
 	// Set up button event listeners
 	const addModelBtn = document.getElementById('add-model-btn');
 	if (addModelBtn) {
-		addModelBtn.addEventListener('click', (event) => addModelToList(event));
+		// Use async void for event handlers calling async functions
+		addModelBtn.addEventListener('click', async (event) => { await addModelToList(event); }); 
 	}
 
 	const addProviderBtn = document.getElementById('add-provider-btn');
 	if (addProviderBtn) {
-		addProviderBtn.addEventListener('click', (event) => addProviderToList(event));
+		// Use async void for event handlers calling async functions
+		addProviderBtn.addEventListener('click', async (event) => { await addProviderToList(event); }); 
 	}
 }
 
@@ -192,7 +157,7 @@ function initializeInterpreterToggles(): void {
 	});
 }
 
-function initializeProviderList() {
+async function initializeProviderList(): Promise<void> { 
 	debugLog('Providers', 'Initializing provider list with:', generalSettings.providers);
 	const providerList = document.getElementById('provider-list');
 	if (!providerList) {
@@ -200,33 +165,43 @@ function initializeProviderList() {
 		return;
 	}
 
+	// Fetch presets needed for list item creation
+	const presetProviders = await getPresetProviders();
+
 	// Sort providers alphabetically by name
 	const sortedProviders = [...generalSettings.providers].sort((a, b) => 
 		a.name.toLowerCase().localeCompare(b.name.toLowerCase())
 	);
 
-	providerList.innerHTML = '';
+	providerList.innerHTML = ''; // Clear existing list
 	sortedProviders.forEach((provider, index) => {
-		const providerItem = createProviderListItem(provider, index);
-		providerList.appendChild(providerItem);
+		try {
+			// Pass presets to avoid fetching multiple times inside the loop
+			const providerItem = createProviderListItem(provider, index, presetProviders); 
+			providerList.appendChild(providerItem);
+		} catch (error) {
+			console.error(`Failed to create list item for provider ${provider.name}:`, error);
+		}
 	});
 
 	initializeIcons(providerList);
 	debugLog('Providers', 'Provider list initialized');
 }
 
-function createProviderListItem(provider: Provider, index: number): HTMLElement {
+function createProviderListItem(provider: Provider, index: number, presetProviders: Record<string, PresetProvider>): HTMLElement { 
 	const providerItem = document.createElement('div');
 	providerItem.className = 'provider-list-item';
-	providerItem.dataset.index = index.toString();
-	providerItem.dataset.providerId = provider.id;
+	providerItem.dataset.index = index.toString(); // Store original index if needed for edits/deletes
+	providerItem.dataset.providerId = provider.id; // Use stable provider ID
 
-	// Find matching preset provider to check if API key is required
-	const presetProvider = Object.values(PRESET_PROVIDERS).find(
-		preset => preset.name === provider.name
+	// Find matching preset provider by name and URL to check if API key is required
+	const presetProvider = Object.values(presetProviders).find( 
+		preset => preset.name === provider.name && preset.baseUrl === provider.baseUrl
 	);
 
-	const hasNoKey = presetProvider?.apiKeyRequired && !provider.apiKey;
+	// API key is considered required if apiKeyRequired is true or undefined (default)
+	const isApiKeyRequired = presetProvider?.apiKeyRequired !== false; 
+	const hasNoKey = isApiKeyRequired && !provider.apiKey;
 
 	providerItem.innerHTML = `
 		<div class="provider-list-item-info">
@@ -241,100 +216,78 @@ function createProviderListItem(provider: Provider, index: number): HTMLElement 
 			${hasNoKey ? `<span class="provider-no-key"><i data-lucide="alert-triangle"></i> <span class="mh">${getMessage('apiKeyMissing')}</span></span>` : ''}
 		</div>
 		<div class="provider-list-item-actions">
-			<button class="edit-provider-btn clickable-icon" data-provider-id="${provider.id}" aria-label="Edit provider">
+			<button class="edit-provider-btn clickable-icon" data-provider-id="${provider.id}" aria-label="${getMessage('editProvider')}">
 				<i data-lucide="pen-line"></i>
 			</button>
-			<button class="delete-provider-btn clickable-icon" data-provider-id="${provider.id}" aria-label="Delete provider">
+			<button class="delete-provider-btn clickable-icon" data-provider-id="${provider.id}" aria-label="${getMessage('deleteProvider')}">
 				<i data-lucide="trash-2"></i>
 			</button>
 		</div>
 	`;
 
 	const editBtn = providerItem.querySelector('.edit-provider-btn');
-	if (editBtn) {
-		editBtn.addEventListener('click', (e) => {
-			e.preventDefault();
-			e.stopPropagation();
-			const providerId = editBtn.getAttribute('data-provider-id');
-			if (providerId) {
-				const providerIndex = generalSettings.providers.findIndex(p => p.id === providerId);
-				if (providerIndex !== -1) {
-					editProvider(providerIndex);
-				}
+	editBtn?.addEventListener('click', async (e) => { // Async handler
+		e.preventDefault();
+		e.stopPropagation();
+		const providerId = (e.currentTarget as HTMLElement).getAttribute('data-provider-id');
+		if (providerId) {
+			const providerIndex = generalSettings.providers.findIndex(p => p.id === providerId);
+			if (providerIndex !== -1) {
+				await editProvider(providerIndex); // Call async function
+			} else {
+				console.error(`Provider with ID ${providerId} not found for editing.`);
 			}
-		});
-	}
-
-	const duplicateBtn = providerItem.querySelector('.duplicate-provider-btn');
-	if (duplicateBtn) {
-		duplicateBtn.addEventListener('click', (e) => {
-			e.preventDefault();
-			e.stopPropagation();
-			const providerId = duplicateBtn.getAttribute('data-provider-id');
-			if (providerId) {
-				const providerIndex = generalSettings.providers.findIndex(p => p.id === providerId);
-				if (providerIndex !== -1) {
-					duplicateProvider(providerIndex);
-				}
-			}
-		});
-	}
+		}
+	});
 
 	const deleteBtn = providerItem.querySelector('.delete-provider-btn');
-	if (deleteBtn) {
-		deleteBtn.addEventListener('click', (e) => {
-			e.preventDefault();
-			e.stopPropagation();
-			const providerId = deleteBtn.getAttribute('data-provider-id');
-			if (providerId) {
-				const providerIndex = generalSettings.providers.findIndex(p => p.id === providerId);
-				if (providerIndex !== -1) {
-					deleteProvider(providerIndex);
-				}
+	deleteBtn?.addEventListener('click', async (e) => { // Async handler
+		e.preventDefault();
+		e.stopPropagation();
+		const providerId = (e.currentTarget as HTMLElement).getAttribute('data-provider-id');
+		if (providerId) {
+			const providerIndex = generalSettings.providers.findIndex(p => p.id === providerId);
+			if (providerIndex !== -1) {
+				await deleteProvider(providerIndex); // Call async function
+			} else {
+				console.error(`Provider with ID ${providerId} not found for deletion.`);
 			}
-		});
-	}
+		}
+	});
+
+	// Removed duplicate provider button logic for simplicity, can be re-added if needed
 
 	return providerItem;
 }
 
-// Add provider management functions
-function addProviderToList(event: Event) {
+async function addProviderToList(event: Event): Promise<void> { 
 	event.preventDefault();
 	debugLog('Providers', 'Adding new provider');
 	const newProvider: Provider = {
-		id: Date.now().toString(),
+		id: Date.now().toString(), // Use a more robust UID method if possible
 		name: '',
 		baseUrl: '',
 		apiKey: ''
 	};
-	showProviderModal(newProvider);
+	await showProviderModal(newProvider); // showProviderModal is async
 }
 
-function editProvider(index: number) {
+async function editProvider(index: number): Promise<void> { 
+	if (index < 0 || index >= generalSettings.providers.length) {
+		console.error("Invalid index for editProvider:", index);
+		return;
+	}
 	const providerToEdit = generalSettings.providers[index];
-	showProviderModal(providerToEdit, index);
+	await showProviderModal(providerToEdit, index); // Await the async modal
 }
 
-function duplicateProvider(index: number) {
-	const providerToDuplicate = generalSettings.providers[index];
-	const duplicatedProvider: Provider = {
-		...providerToDuplicate,
-		id: Date.now().toString(),
-		name: `${providerToDuplicate.name} (copy)`,
-		apiKey: ''
-	};
+// Removed duplicateProvider function - can be re-added based on createProviderListItem
 
-	generalSettings.providers.push(duplicatedProvider);
-	saveSettings();
-	initializeProviderList();
-
-	// Show edit modal for the new provider
-	const newIndex = generalSettings.providers.length - 1;
-	showProviderModal(duplicatedProvider, newIndex);
-}
-
-function deleteProvider(index: number): void {
+async function deleteProvider(index: number): Promise<void> { 
+	if (index < 0 || index >= generalSettings.providers.length) {
+		console.error("Invalid index for deleteProvider:", index);
+		return;
+	}
 	const providerToDelete = generalSettings.providers[index];
 	
 	// Check if any models are using this provider
@@ -344,172 +297,259 @@ function deleteProvider(index: number): void {
 		return;
 	}
 
-	if (confirm(getMessage('deleteProviderConfirm'))) {
+	if (confirm(getMessage('deleteProviderConfirm', providerToDelete.name))) { // Pass name to confirm message
 		generalSettings.providers.splice(index, 1);
-		saveSettings();
-		initializeProviderList();
+		try {
+			await saveSettings();
+			await initializeProviderList(); // Await the async list initialization
+			initializeModelList(); // Refresh model list in case providers changed
+		} catch (error) {
+			console.error("Failed to save settings after deleting provider:", error);
+			alert(getMessage('failedToDeleteProvider')); // Provide feedback
+		}
 	}
 }
 
-async function showProviderModal(provider: Provider, index?: number) {
+async function showProviderModal(provider: Provider, index?: number): Promise<void> { 
 	debugLog('Providers', 'Showing provider modal:', { provider, index });
 	const modal = document.getElementById('provider-modal');
-	if (!modal) return;
+	if (!modal) {
+		console.error("Provider modal element not found");
+		return;
+	}
 
-	await translatePage();
-	initializeIcons(modal);
+	// Fetch presets before showing the modal
+	const presetProviders = await getPresetProviders();
+
+	await translatePage(); // Ensure translations are ready
+	initializeIcons(modal); // Initialize icons within the modal
 
 	const titleElement = modal.querySelector('.modal-title');
 	if (titleElement) {
-		titleElement.setAttribute('data-i18n', index !== undefined ? 'editProvider' : 'addProviderTitle');
+		titleElement.textContent = getMessage(index !== undefined ? 'editProvider' : 'addProviderTitle');
 	}
 
 	const form = modal.querySelector('#provider-form') as HTMLFormElement;
-	if (form) {
-		const nameInput = form.querySelector('[name="name"]') as HTMLInputElement;
-		const baseUrlInput = form.querySelector('[name="baseUrl"]') as HTMLInputElement;
-		const apiKeyInput = form.querySelector('[name="apiKey"]') as HTMLInputElement;
-		const presetSelect = form.querySelector('[name="preset"]') as HTMLSelectElement;
-		const nameContainer = nameInput.closest('.setting-item') as HTMLElement;
-		const apiKeyContainer = apiKeyInput.closest('.setting-item') as HTMLElement;
-		const apiKeyDescription = form.querySelector('.setting-item:has([name="apiKey"]) .setting-item-description') as HTMLElement;
+	const nameInput = form?.querySelector('[name="name"]') as HTMLInputElement;
+	const baseUrlInput = form?.querySelector('[name="baseUrl"]') as HTMLInputElement;
+	const apiKeyInput = form?.querySelector('[name="apiKey"]') as HTMLInputElement;
+	const presetSelect = form?.querySelector('[name="preset"]') as HTMLSelectElement;
+	const nameContainer = nameInput?.closest('.setting-item') as HTMLElement;
+	const baseUrlContainer = baseUrlInput?.closest('.setting-item') as HTMLElement;
+	const apiKeyContainer = apiKeyInput?.closest('.setting-item') as HTMLElement;
+	const apiKeyDescription = apiKeyContainer?.querySelector('.setting-item-description') as HTMLElement;
 
-		if (!apiKeyContainer || !apiKeyDescription) {
-			console.error('API key containers not found');
-			return;
-		}
-
-		if (presetSelect) {
-			presetSelect.innerHTML = `<option value="">${getMessage('custom')}</option>`;
-			Object.entries(PRESET_PROVIDERS).forEach(([id, preset]) => {
-				presetSelect.innerHTML += `<option value="${id}">${preset.name}</option>`;
-			});
-
-			// When editing, try to find matching preset
-			if (index !== undefined) {
-				const matchingPreset = Object.entries(PRESET_PROVIDERS).find(([_, preset]) => 
-					preset.name === provider.name
-				);
-				presetSelect.value = matchingPreset ? matchingPreset[0] : '';
-			} else {
-				// Set Anthropic as default for new providers
-				presetSelect.value = 'anthropic';
-			}
-
-			// Hide/show name field and update API key visibility based on preset selection
-			const updateVisibility = () => {
-				nameContainer.style.display = presetSelect.value ? 'none' : 'block';
-				if (presetSelect.value) {
-					const selectedPreset = PRESET_PROVIDERS[presetSelect.value as keyof typeof PRESET_PROVIDERS];
-					nameInput.value = selectedPreset.name;
-					baseUrlInput.value = selectedPreset.baseUrl;
-
-					// Show/hide API key field based on whether it's required
-					apiKeyContainer.style.display = selectedPreset.apiKeyRequired === false ? 'none' : 'block';
-
-					// Update API key link if available
-					if (selectedPreset.apiKeyRequired !== false && selectedPreset.apiKeyUrl) {
-						const message = getMessage('getApiKeyHere').replace('$1', selectedPreset.name);
-						apiKeyDescription.innerHTML = `${getMessage('providerApiKeyDescription')} <a href="${selectedPreset.apiKeyUrl}" target="_blank">${message}</a>`;
-					} else {
-						apiKeyDescription.innerHTML = getMessage('providerApiKeyDescription');
-					}
-				} else {
-					// For custom providers, show API key field by default
-					apiKeyContainer.style.display = 'block';
-					apiKeyDescription.innerHTML = getMessage('providerApiKeyDescription');
-				}
-			};
-
-			presetSelect.addEventListener('change', updateVisibility);
-			updateVisibility();
-			
-			// Only set these values if editing an existing provider
-			if (index !== undefined) {
-				nameInput.value = provider.name;
-				baseUrlInput.value = provider.baseUrl;
-				apiKeyInput.value = provider.apiKey;
-			}
-		}
+	if (!form || !nameInput || !baseUrlInput || !apiKeyInput || !presetSelect || !nameContainer || !baseUrlContainer || !apiKeyContainer || !apiKeyDescription) {
+		console.error('Required form elements not found in provider modal');
+		return;
 	}
 
+	// --- Preset Select Setup ---
+	// Clone to remove old listeners before adding new ones
+	const oldPresetSelect = presetSelect;
+	const newPresetSelect = oldPresetSelect.cloneNode(true) as HTMLSelectElement;
+	oldPresetSelect.parentNode?.replaceChild(newPresetSelect, oldPresetSelect);
+	const currentPresetSelect = newPresetSelect; // Use the new element
+
+	currentPresetSelect.innerHTML = `<option value="">${getMessage('custom')}</option>`; // Add custom option first
+	Object.entries(presetProviders).forEach(([id, preset]) => {
+		const option = document.createElement('option');
+		option.value = id; // Use the key (preset ID) as the value
+		option.textContent = preset.name;
+		currentPresetSelect.appendChild(option);
+	});
+
+	// Determine initial preset selection
+	let currentPresetId = '';
+	if (index !== undefined) { // Editing existing provider
+		const matchingPreset = Object.entries(presetProviders).find(([_, preset]) => 
+			preset.name === provider.name && preset.baseUrl === provider.baseUrl
+		);
+		currentPresetId = matchingPreset ? matchingPreset[0] : ''; // Found preset ID or empty (custom)
+	} else { // Adding new provider
+		const anthropicPreset = Object.entries(presetProviders).find(([_, p]) => p.id === 'anthropic');
+		currentPresetId = anthropicPreset ? anthropicPreset[0] : ''; // Default to Anthropic ID if found
+	}
+	currentPresetSelect.value = currentPresetId; // Set initial selection
+
+	// --- Visibility and Pre-fill Logic ---
+	const updateVisibility = () => {
+		const selectedPresetId = currentPresetSelect.value;
+		const isCustom = !selectedPresetId;
+		const selectedPreset = isCustom ? null : presetProviders[selectedPresetId];
+
+		nameContainer.style.display = isCustom ? 'block' : 'none';
+		baseUrlContainer.style.display = isCustom ? 'block' : 'none'; 
+		nameInput.disabled = !isCustom;
+		baseUrlInput.disabled = !isCustom;
+
+		if (selectedPreset) {
+			// Pre-fill ONLY if adding new OR if existing name/URL match the selected preset
+			if (index === undefined || provider.name === selectedPreset.name) {
+				nameInput.value = selectedPreset.name;
+			}
+			if (index === undefined || provider.baseUrl === selectedPreset.baseUrl) {
+				baseUrlInput.value = selectedPreset.baseUrl;
+			}
+
+			const apiKeyRequired = selectedPreset.apiKeyRequired !== false;
+			apiKeyContainer.style.display = apiKeyRequired ? 'block' : 'none';
+			if (apiKeyRequired) {
+				apiKeyDescription.innerHTML = getMessage('providerApiKeyDescription'); // Base description
+				if (selectedPreset.apiKeyUrl) {
+					const link = document.createElement('a');
+					link.href = selectedPreset.apiKeyUrl;
+					link.target = '_blank';
+					link.textContent = ` ${getMessage('getApiKeyHere', selectedPreset.name)}`; // Use specific message
+					apiKeyDescription.appendChild(link);
+				}
+			}
+		} else { // Custom Provider
+			apiKeyContainer.style.display = 'block'; // API key always possible for custom
+			apiKeyDescription.innerHTML = getMessage('providerApiKeyDescription'); 
+			// Don't clear fields when switching back to custom if editing
+			if (index === undefined) { 
+				nameInput.value = '';
+				baseUrlInput.value = '';
+			}
+		}
+	};
+
+	// --- Initial Values & Event Listener ---
+	if (index !== undefined) { // Editing: Set values from the provider object
+		nameInput.value = provider.name;
+		baseUrlInput.value = provider.baseUrl;
+		apiKeyInput.value = provider.apiKey || ''; 
+	} else { // Adding: Ensure fields are clear or defaulted
+		apiKeyInput.value = ''; 
+		// updateVisibility handles name/URL based on default preset selection
+	}
+
+	currentPresetSelect.addEventListener('change', updateVisibility);
+	updateVisibility(); // Initial call
+
+	// --- Buttons ---
 	const confirmBtn = modal.querySelector('.provider-confirm-btn');
 	const cancelBtn = modal.querySelector('.provider-cancel-btn');
 
-	// Remove existing event listeners
-	const newConfirmBtn = confirmBtn?.cloneNode(true);
-	const newCancelBtn = cancelBtn?.cloneNode(true);
-	if (confirmBtn && newConfirmBtn) {
-		confirmBtn.parentNode?.replaceChild(newConfirmBtn, confirmBtn);
-	}
-	if (cancelBtn && newCancelBtn) {
-		cancelBtn.parentNode?.replaceChild(newCancelBtn, cancelBtn);
+	if (!confirmBtn || !cancelBtn) {
+		console.error("Provider modal buttons not found");
+		return;
 	}
 
-	// Add new event listeners
-	newConfirmBtn?.addEventListener('click', () => {
-		const formData = new FormData(form);
-		const updatedProvider: Provider = {
-			id: provider.id,
-			name: formData.get('name') as string,
-			baseUrl: formData.get('baseUrl') as string,
-			apiKey: formData.get('apiKey') as string
-		};
+	// Clone buttons to remove previous listeners
+	const newConfirmBtn = confirmBtn.cloneNode(true);
+	confirmBtn.parentNode?.replaceChild(newConfirmBtn, confirmBtn);
+	const newCancelBtn = cancelBtn.cloneNode(true);
+	cancelBtn.parentNode?.replaceChild(newCancelBtn, cancelBtn);
 
-		debugLog('Providers', 'Saving provider:', updatedProvider);
+	newConfirmBtn.addEventListener('click', async () => { 
+		const selectedPresetId = currentPresetSelect.value;
+		const selectedPreset = selectedPresetId ? presetProviders[selectedPresetId] : null;
 
-		if (!updatedProvider.name || !updatedProvider.baseUrl) {
+		let finalName = selectedPreset ? selectedPreset.name : nameInput.value.trim();
+		let finalBaseUrl = selectedPreset ? selectedPreset.baseUrl : baseUrlInput.value.trim();
+		const finalApiKey = apiKeyInput.value.trim();
+
+		if (!finalName || !finalBaseUrl) {
 			alert(getMessage('providerRequiredFields'));
 			return;
 		}
 
-		if (index !== undefined) {
-			generalSettings.providers[index] = updatedProvider;
-		} else {
-			generalSettings.providers.push(updatedProvider);
+		// Check API key requirement
+		const isApiKeyRequired = selectedPreset ? selectedPreset.apiKeyRequired !== false : true; // Assume required for custom
+		if (isApiKeyRequired && !finalApiKey) {
+			const confirmMsg = getMessage('apiKeyMissingConfirm', finalName);
+			if (!confirm(confirmMsg)) {
+				return; // Stop saving if user cancels
+			}
 		}
 
-		debugLog('Providers', 'Updated providers list:', generalSettings.providers);
+		let finalApiKeyRequired: boolean | undefined;
+		let finalPresetId: string | undefined;
+		if (selectedPreset) {
+			finalApiKeyRequired = selectedPreset.apiKeyRequired === false ? false : undefined;
+			finalPresetId = selectedPresetId; // Store the selected preset ID
+		} else {
+			finalApiKeyRequired = undefined; 
+			finalPresetId = undefined; // No preset ID for custom providers
+		}
 
-		saveSettings().then(() => {
+		const updatedProvider: Provider = {
+			id: provider.id, 
+			name: finalName,
+			baseUrl: finalBaseUrl,
+			apiKey: finalApiKey,
+			apiKeyRequired: finalApiKeyRequired,
+			presetId: finalPresetId // Add the preset ID
+		};
+
+		debugLog('Providers', 'Saving provider:', updatedProvider);
+
+		try {
+			if (index !== undefined) { // Editing existing
+				if (index < 0 || index >= generalSettings.providers.length) {
+					throw new Error("Invalid index during provider save.");
+				}
+				generalSettings.providers[index] = updatedProvider;
+			} else { // Adding new
+				generalSettings.providers.push(updatedProvider);
+			}
+			await saveSettings(); 
 			debugLog('Providers', 'Settings saved');
-			initializeProviderList();
+			await initializeProviderList(); // Refresh provider list
+			initializeModelList(); // Refresh model list (uses providers)
 			hideModal(modal);
-		}).catch(error => {
-			console.error('Failed to save settings:', error);
+		} catch (error) {
+			console.error('Failed to save provider settings:', error);
 			alert(getMessage('failedToSaveProvider'));
-		});
+		}
 	});
 
-	newCancelBtn?.addEventListener('click', () => {
+	newCancelBtn.addEventListener('click', () => {
 		hideModal(modal);
 	});
 
 	showModal(modal);
 }
 
-export function initializeModelList() {
+export function initializeModelList(): void {
 	const modelList = document.getElementById('model-list');
-	if (!modelList) return;
+	if (!modelList) {
+		console.error("Model list element not found");
+		return;
+	}
 
-	modelList.innerHTML = '';
+	// Ensure providers are loaded and sorted before creating model items
+	const sortedProviders = [...generalSettings.providers].sort((a, b) => 
+		a.name.toLowerCase().localeCompare(b.name.toLowerCase())
+	);
+
+	modelList.innerHTML = ''; // Clear existing list
 	generalSettings.models.forEach((model, index) => {
-		const modelItem = createModelListItem(model, index);
-		modelList.appendChild(modelItem);
+		try {
+			// Pass sorted providers if needed by createModelListItem in the future
+			const modelItem = createModelListItem(model, index); 
+			modelList.appendChild(modelItem);
+		} catch (error) {
+			console.error(`Failed to create list item for model ${model.name}:`, error);
+		}
 	});
 
 	initializeIcons(modelList);
+	debugLog('Models', 'Model list initialized');
 }
 
 function createModelListItem(model: ModelConfig, index: number): HTMLElement {
 	const modelItem = document.createElement('div');
 	modelItem.className = 'model-list-item';
-	modelItem.draggable = true;
-	modelItem.dataset.index = index.toString();
+	modelItem.draggable = true; // Re-enable drag maybe later
+	modelItem.dataset.modelId = model.id; // Use stable model ID
 
 	const provider = generalSettings.providers.find(p => p.id === model.providerId);
 	const providerName = provider?.name || `<span class="model-provider-unknown"><i data-lucide="alert-triangle"></i> ${getMessage('unknownProvider')}</span>`;
 
+	// Note: Using data-model-id for buttons now, index is less reliable if list reorders
 	modelItem.innerHTML = `
 		<div class="drag-handle">
 			<i data-lucide="grip-vertical"></i>
@@ -519,330 +559,427 @@ function createModelListItem(model: ModelConfig, index: number): HTMLElement {
 			<div class="model-provider mh">${providerName}</div>
 		</div>
 		<div class="model-list-item-actions">
-			<button class="edit-model-btn clickable-icon" data-index="${index}" aria-label="Edit model">
+			<button class="edit-model-btn clickable-icon" data-model-id="${model.id}" aria-label="${getMessage('editModel')}">
 				<i data-lucide="pen-line"></i>
 			</button>
-			<button class="duplicate-model-btn clickable-icon" data-index="${index}" aria-label="Duplicate model">
+			<button class="duplicate-model-btn clickable-icon" data-model-id="${model.id}" aria-label="${getMessage('duplicateModel')}">
 				<i data-lucide="copy-plus"></i>
 			</button>
-			<button class="delete-model-btn clickable-icon" data-index="${index}" aria-label="Delete model">
+			<button class="delete-model-btn clickable-icon" data-model-id="${model.id}" aria-label="${getMessage('deleteModel')}">
 				<i data-lucide="trash-2"></i>
 			</button>
 			<div class="checkbox-container mod-small">
-				<input type="checkbox" id="model-${index}" ${model.enabled ? 'checked' : ''}>
+				<input type="checkbox" id="model-${model.id}" ${model.enabled ? 'checked' : ''}>
 			</div>
 		</div>
 	`;
 
-	const checkbox = modelItem.querySelector(`#model-${index}`) as HTMLInputElement;
+	const checkbox = modelItem.querySelector(`#model-${model.id}`) as HTMLInputElement;
 	const checkboxContainer = modelItem.querySelector('.checkbox-container') as HTMLElement;
 	
 	if (checkbox && checkboxContainer) {
-		initializeToggles(modelItem);
-		checkbox.addEventListener('change', () => {
-			generalSettings.models[index].enabled = checkbox.checked;
-			saveSettings();
+		initializeToggles(modelItem); 
+		checkbox.addEventListener('change', async () => { 
+			const modelId = model.id; // Capture id
+			const modelIndex = generalSettings.models.findIndex(m => m.id === modelId);
+			if (modelIndex === -1) {
+				console.error("Model not found for toggle:", modelId);
+				return;
+			}
+			generalSettings.models[modelIndex].enabled = checkbox.checked;
+			try {
+				await saveSettings(); 
+			} catch (error) {
+				console.error("Failed to save model enabled state:", error);
+				// Optionally revert checkbox state visually
+				checkbox.checked = !checkbox.checked; 
+			}
 		});
 	}
+
+	// Use modelId for button actions
+	const editBtn = modelItem.querySelector('.edit-model-btn');
+	editBtn?.addEventListener('click', async (e) => {
+		e.preventDefault(); e.stopPropagation();
+		const modelId = (e.currentTarget as HTMLElement).getAttribute('data-model-id');
+		if (modelId) await editModel(modelId); // Pass ID
+	});
 
 	const duplicateBtn = modelItem.querySelector('.duplicate-model-btn');
-	if (duplicateBtn) {
-		duplicateBtn.addEventListener('click', (e) => {
-			e.preventDefault();
-			e.stopPropagation();
-			duplicateModel(index);
-		});
-	}
-
-	const editBtn = modelItem.querySelector('.edit-model-btn');
-	if (editBtn) {
-		editBtn.addEventListener('click', (e) => {
-			e.preventDefault();
-			e.stopPropagation();
-			editModel(index);
-		});
-	}
+	duplicateBtn?.addEventListener('click', async (e) => {
+		e.preventDefault(); e.stopPropagation();
+		const modelId = (e.currentTarget as HTMLElement).getAttribute('data-model-id');
+		if (modelId) await duplicateModel(modelId); // Pass ID
+	});
 
 	const deleteBtn = modelItem.querySelector('.delete-model-btn');
-	if (deleteBtn) {
-		deleteBtn.addEventListener('click', (e) => {
-			e.preventDefault();
-			e.stopPropagation();
-			deleteModel(index);
-		});
-	}
+	deleteBtn?.addEventListener('click', async (e) => {
+		e.preventDefault(); e.stopPropagation();
+		const modelId = (e.currentTarget as HTMLElement).getAttribute('data-model-id');
+		if (modelId) await deleteModel(modelId); // Pass ID
+	});
 
 	initializeIcons(modelItem);
 
 	return modelItem;
 }
 
-function addModelToList(event: Event) {
+async function addModelToList(event: Event): Promise<void> { 
 	event.preventDefault();
 	const newModel: ModelConfig = {
-		id: Date.now().toString(),
+		id: Date.now().toString(), // Use better UID if possible
 		providerId: '',
 		providerModelId: '',
 		name: '',
 		enabled: true
 	};
-	showModelModal(newModel);
+	// Pass null for modelId to indicate creation
+	await showModelModal(newModel, null); 
 }
 
-function editModel(index: number) {
-	const modelToEdit = generalSettings.models[index];
-	showModelModal(modelToEdit, index);
+// Edit using modelId instead of index
+async function editModel(modelId: string): Promise<void> { 
+	const modelIndex = generalSettings.models.findIndex(m => m.id === modelId);
+	if (modelIndex === -1) {
+		console.error("Model not found for edit:", modelId);
+		alert(getMessage('failedToEditModel')); // Or a more specific message
+		return;
+	}
+	const modelToEdit = generalSettings.models[modelIndex];
+	// Pass model object and its original ID
+	await showModelModal(modelToEdit, modelId); 
 }
 
-async function showModelModal(model: ModelConfig, index?: number) {
-	debugLog('Providers', 'Showing model modal:', { model, index });
+// Accept model object and optional originalId (null if creating)
+async function showModelModal(model: ModelConfig, originalId: string | null): Promise<void> { 
+	debugLog('Models', 'Showing model modal:', { model, originalId });
 	const modal = document.getElementById('model-modal');
-	if (!modal) return;
+	if (!modal) {
+		console.error("Model modal element not found");
+		return;
+	}
+
+	const isEditing = originalId !== null;
+
+	// Fetch presets before showing modal
+	const presetProviders = await getPresetProviders();
 
 	await translatePage();
 	initializeIcons(modal);
 
 	const titleElement = modal.querySelector('.modal-title');
 	if (titleElement) {
-		titleElement.setAttribute('data-i18n', index !== undefined ? 'editModel' : 'addModelTitle');
+		titleElement.textContent = getMessage(isEditing ? 'editModel' : 'addModelTitle');
 	}
 
 	const form = modal.querySelector('#model-form') as HTMLFormElement;
-	if (form) {
-		const providerSelect = form.querySelector('[name="providerId"]') as HTMLSelectElement;
-		const modelIdContainer = form.querySelector('.setting-item:has([name="providerModelId"]) .setting-item-description') as HTMLElement;
-		const modelSelectionContainer = form.querySelector('.model-selection-container') as HTMLElement;
-		const modelSelectionRadios = form.querySelector('#model-selection-radios') as HTMLElement;
-		const nameInput = form.querySelector('[name="name"]') as HTMLInputElement;
-		const providerModelIdInput = form.querySelector('[name="providerModelId"]') as HTMLInputElement;
+	const providerSelect = form?.querySelector('[name="providerId"]') as HTMLSelectElement;
+	const modelIdDescContainer = form?.querySelector('.setting-item:has([name="providerModelId"]) .setting-item-description') as HTMLElement;
+	const modelSelectionContainer = form?.querySelector('.model-selection-container') as HTMLElement;
+	const modelSelectionRadios = form?.querySelector('#model-selection-radios') as HTMLElement;
+	const nameInput = form?.querySelector('[name="name"]') as HTMLInputElement;
+	const providerModelIdInput = form?.querySelector('[name="providerModelId"]') as HTMLInputElement;
+	const nameContainer = nameInput?.closest('.setting-item') as HTMLElement;
+	const providerModelIdContainer = providerModelIdInput?.closest('.setting-item') as HTMLElement;
 
-		if (!modelIdContainer || !modelSelectionContainer || !modelSelectionRadios || !nameInput || !providerModelIdInput) {
-			console.error('Required form elements not found');
-			return;
-		}
+	if (!form || !providerSelect || !modelIdDescContainer || !modelSelectionContainer || !modelSelectionRadios || !nameInput || !providerModelIdInput || !nameContainer || !providerModelIdContainer) {
+		console.error('Required form elements not found in model modal');
+		return;
+	}
 
-		// Add change handler for provider select
-		providerSelect.addEventListener('change', () => {
-			const selectedProviderId = providerSelect.value;
-			const provider = generalSettings.providers.find(p => p.id === selectedProviderId);
-			
-			if (provider) {
-				// Find matching preset provider to get modelsList URL and popular models
-				const presetProvider = Object.values(PRESET_PROVIDERS).find(
-					preset => preset.name === provider.name
-				);
+	// --- Provider Select Setup ---
+	const oldProviderSelect = providerSelect;
+	const newProviderSelect = oldProviderSelect.cloneNode(true) as HTMLSelectElement; // Clone with options
+	oldProviderSelect.parentNode?.replaceChild(newProviderSelect, oldProviderSelect);
+	const currentProviderSelect = newProviderSelect;
 
-				if (presetProvider?.modelsList) {
-					modelIdContainer.innerHTML = `${getMessage('providerModelIdDescription')} <a href="${presetProvider.modelsList}" target="_blank">${getMessage('modelsListFor', provider.name)}</a>.`;
-				} else {
-					modelIdContainer.textContent = getMessage('providerModelIdDescription');
-				}
+	const sortedProviders = [...generalSettings.providers].sort((a, b) => 
+		a.name.toLowerCase().localeCompare(b.name.toLowerCase())
+	);
 
-				// Update popular models radio buttons
-				modelSelectionRadios.innerHTML = '';
-				if (presetProvider?.popularModels?.length) {
-					modelSelectionContainer.style.display = 'block';
-					
-					// Add popular models
-					presetProvider.popularModels.forEach((model, idx) => {
-						const radio = document.createElement('div');
-						radio.className = 'radio-option';
-						radio.innerHTML = `
-							<input type="radio" name="model-selection" id="pop-model-${idx}" value="${model.id}">
-							<label for="pop-model-${idx}">
-								${model.name}${model.recommended ? ` <span class="tag">${getMessage('recommended')}</span>` : ''}
-							</label>
-						`;
-						modelSelectionRadios.appendChild(radio);
-					});
+	currentProviderSelect.innerHTML = `<option value="">${getMessage('selectProvider')}</option>`; // Default option
+	sortedProviders.forEach(p => {
+		const option = document.createElement('option');
+		option.value = p.id;
+		option.textContent = p.name;
+		currentProviderSelect.appendChild(option);
+	});
 
-					// Add "Other" option
-					const otherRadio = document.createElement('div');
-					otherRadio.className = 'radio-option';
-					otherRadio.innerHTML = `
-						<input type="radio" name="model-selection" id="model-other" value="other">
-						<label for="model-other">${getMessage('custom')}</label>
-					`;
-					modelSelectionRadios.appendChild(otherRadio);
+	// Set initial provider selection
+	if (isEditing) {
+		currentProviderSelect.value = model.providerId || ''; 
+	} else if (sortedProviders.length > 0) {
+		// Default to the first provider when adding a new model
+		currentProviderSelect.value = sortedProviders[0].id;
+	} else {
+		// No providers available
+		currentProviderSelect.value = '';
+	}
 
-					// Add change handler for radio buttons
-					modelSelectionRadios.addEventListener('change', (e) => {
-						const target = e.target as HTMLInputElement;
-						if (target.value === 'other') {
-							nameInput.value = '';
-							providerModelIdInput.value = '';
-							nameInput.disabled = false;
-							providerModelIdInput.disabled = false;
-						} else {
-							const selectedModel = presetProvider.popularModels?.find(m => m.id === target.value);
-							if (selectedModel) {
-								nameInput.value = selectedModel.name;
-								providerModelIdInput.value = selectedModel.id;
-								nameInput.disabled = false;
-								providerModelIdInput.disabled = false;
-							}
-						}
-					});
-				} else {
-					modelSelectionContainer.style.display = 'none';
-				}
+	// --- Model Options Logic ---
+	const updateModelOptions = () => {
+		const selectedProviderId = currentProviderSelect.value;
+		const selectedProvider = generalSettings.providers.find(p => p.id === selectedProviderId);
+		let currentPresetProvider: PresetProvider | undefined = undefined;
+		
+		// Clear previous radio state & listeners
+		const oldRadioContainer = modelSelectionRadios;
+		const newRadioContainer = oldRadioContainer.cloneNode(false) as HTMLElement; // Clone empty
+		oldRadioContainer.parentNode?.replaceChild(newRadioContainer, oldRadioContainer);
+		const currentRadioContainer = newRadioContainer;
+		modelSelectionContainer.style.display = 'none'; // Hide by default
+
+		if (selectedProvider) {
+			// Find matching preset provider using the stored presetId if available
+			if (selectedProvider.presetId && presetProviders[selectedProvider.presetId]) {
+				currentPresetProvider = presetProviders[selectedProvider.presetId];
+				debugLog('Models', 'Found preset via presetId:', currentPresetProvider);
 			} else {
-				modelSelectionContainer.style.display = 'none';
-				modelIdContainer.textContent = getMessage('providerModelIdDescription');
-			}
-		});
-
-		// If editing, trigger change event to update description
-		if (index !== undefined && model.providerId) {
-			providerSelect.value = model.providerId;
-			providerSelect.dispatchEvent(new Event('change'));
-		}
-
-		// Set form values
-		nameInput.value = model.name;
-		providerModelIdInput.value = model.providerModelId || '';
-
-		// Populate provider select with alphabetically sorted providers
-		providerSelect.innerHTML = ''; // Clear first
-		const defaultOption = document.createElement('option');
-		defaultOption.value = '';
-		defaultOption.setAttribute('data-i18n', 'selectProvider');
-		providerSelect.appendChild(defaultOption);
-
-		const sortedProviders = [...generalSettings.providers].sort((a, b) => 
-			a.name.toLowerCase().localeCompare(b.name.toLowerCase())
-		);
-		sortedProviders.forEach(provider => {
-			const option = document.createElement('option');
-			option.value = provider.id;
-			option.textContent = provider.name;
-			providerSelect.appendChild(option);
-		});
-		providerSelect.value = model.providerId;
-
-		// Translate the select options
-		translatePage();
-
-		// Handle buttons
-		const confirmBtn = modal.querySelector('.model-confirm-btn');
-		const cancelBtn = modal.querySelector('.model-cancel-btn');
-
-		if (!confirmBtn || !cancelBtn) {
-			console.error('Modal buttons not found');
-			return;
-		}
-
-		// Remove existing event listeners
-		const newConfirmBtn = confirmBtn.cloneNode(true);
-		const newCancelBtn = cancelBtn.cloneNode(true);
-		confirmBtn.parentNode?.replaceChild(newConfirmBtn, confirmBtn);
-		cancelBtn.parentNode?.replaceChild(newCancelBtn, cancelBtn);
-
-		// Add new event listeners
-		newConfirmBtn.addEventListener('click', () => {
-			const formData = new FormData(form);
-			const modelSelection = form.querySelector('input[name="model-selection"]:checked') as HTMLInputElement;
-			
-			let updatedModel: ModelConfig = {
-				id: model.id,
-				providerId: formData.get('providerId') as string,
-				providerModelId: '',
-				name: '',
-				enabled: model.enabled
-			};
-
-			// If a popular model is selected, use those values
-			if (modelSelection && modelSelection.value !== 'other') {
-				const provider = generalSettings.providers.find(p => p.id === updatedModel.providerId);
-				const presetProvider = Object.values(PRESET_PROVIDERS).find(
-					preset => preset.name === provider?.name
+				// Fallback: Try matching by name and URL (less reliable)
+				currentPresetProvider = Object.values(presetProviders).find(
+					preset => preset.name === selectedProvider.name && preset.baseUrl === selectedProvider.baseUrl
 				);
-				const selectedModel = presetProvider?.popularModels?.find(m => m.id === modelSelection.value);
+				if (currentPresetProvider) {
+					debugLog('Models', 'Found preset via name/URL fallback:', currentPresetProvider);
+				}
+			}
+
+			// Update model ID description link
+			modelIdDescContainer.innerHTML = getMessage('providerModelIdDescription'); // Reset description
+			if (currentPresetProvider?.modelsList) {
+				const link = document.createElement('a');
+				link.href = currentPresetProvider.modelsList;
+				link.target = '_blank';
+				link.textContent = ` ${getMessage('modelsListFor', selectedProvider.name)}`;
+				modelIdDescContainer.appendChild(link);
+			}
+
+			// Populate popular models if available
+			if (currentPresetProvider?.popularModels?.length) {
+				modelSelectionContainer.style.display = 'block';
 				
-				if (selectedModel) {
-					updatedModel.name = selectedModel.name;
-					updatedModel.providerModelId = selectedModel.id;
+				currentPresetProvider.popularModels.forEach((popModel, idx) => {
+					const radioId = `pop-model-${idx}`;
+					const radioDiv = document.createElement('div');
+					radioDiv.className = 'radio-option';
+					radioDiv.innerHTML = `
+						<input type="radio" name="model-selection" id="${radioId}" value="${popModel.id}">
+						<label for="${radioId}">
+							${popModel.name}${popModel.recommended ? ` <span class="tag">${getMessage('recommended')}</span>` : ''}
+						</label>
+					`;
+					currentRadioContainer.appendChild(radioDiv);
+				});
+
+				// Add "Other" option
+				const otherRadioDiv = document.createElement('div');
+				otherRadioDiv.className = 'radio-option';
+				otherRadioDiv.innerHTML = `
+					<input type="radio" name="model-selection" id="model-other" value="other">
+					<label for="model-other">${getMessage('custom')}</label>
+				`;
+				currentRadioContainer.appendChild(otherRadioDiv);
+
+				// Add change handler to the new container
+				currentRadioContainer.addEventListener('change', (e) => {
+					const target = e.target as HTMLInputElement;
+					if (target.name !== 'model-selection' || !currentPresetProvider?.popularModels) return;
+
+					if (target.value === 'other') {
+						// Don't clear fields automatically, let user manage custom input
+						nameInput.disabled = false;
+						providerModelIdInput.disabled = false;
+					} else {
+						const selectedPopModel = currentPresetProvider.popularModels.find(m => m.id === target.value);
+						if (selectedPopModel) {
+							nameInput.value = selectedPopModel.name;
+							providerModelIdInput.value = selectedPopModel.id;
+							// Keep fields enabled even when selecting popular
+							nameInput.disabled = false; 
+							providerModelIdInput.disabled = false;
+						}
+					}
+				});
+
+				// Set initial radio state
+				const matchingPopModelRadio = currentRadioContainer.querySelector(`input[value="${CSS.escape(model.providerModelId || '')}"]`) as HTMLInputElement;
+				if (matchingPopModelRadio && isEditing) {
+					matchingPopModelRadio.checked = true;
+				} else {
+					(currentRadioContainer.querySelector('#model-other') as HTMLInputElement).checked = true;
 				}
-			} else {
-				// Use form values for custom model
-				updatedModel.name = formData.get('name') as string;
-				updatedModel.providerModelId = formData.get('providerModelId') as string;
-			}
+			} 
+		} 
+		// Always ensure Name and Model ID fields are visible and enabled if a provider is selected
+		const providerSelected = !!selectedProviderId;
+		nameContainer.style.display = providerSelected ? 'block' : 'none';
+		providerModelIdContainer.style.display = providerSelected ? 'block' : 'none';
+		nameInput.disabled = !providerSelected;
+		providerModelIdInput.disabled = !providerSelected;
 
-			if (!updatedModel.name || !updatedModel.providerId || !updatedModel.providerModelId) {
-				alert(getMessage('modelRequiredFields'));
-				return;
-			}
+	};
 
-			if (index !== undefined) {
-				generalSettings.models[index] = updatedModel;
-			} else {
+	// --- Initial Values & Event Listeners ---
+	nameInput.value = model.name;
+	providerModelIdInput.value = model.providerModelId || '';
+
+	currentProviderSelect.addEventListener('change', updateModelOptions);
+	updateModelOptions(); // Initial call - this will now use the default provider if adding
+
+
+	// --- Buttons ---
+	const confirmBtn = modal.querySelector('.model-confirm-btn');
+	const cancelBtn = modal.querySelector('.model-cancel-btn');
+
+	if (!confirmBtn || !cancelBtn) {
+		console.error("Model modal buttons not found");
+		return;
+	}
+
+	// Clone buttons to remove listeners
+	const newConfirmBtn = confirmBtn.cloneNode(true);
+	confirmBtn.parentNode?.replaceChild(newConfirmBtn, confirmBtn);
+	const newCancelBtn = cancelBtn.cloneNode(true);
+	cancelBtn.parentNode?.replaceChild(newCancelBtn, cancelBtn);
+
+	newConfirmBtn.addEventListener('click', async () => { 
+		const finalProviderId = currentProviderSelect.value;
+		const finalName = nameInput.value.trim();
+		const finalProviderModelId = providerModelIdInput.value.trim();
+		
+		if (!finalName || !finalProviderId || !finalProviderModelId) {
+			alert(getMessage('modelRequiredFields'));
+			return;
+		}
+
+		const updatedModel: ModelConfig = {
+			id: originalId || model.id, // Use original ID if editing, new ID was already set if creating
+			providerId: finalProviderId,
+			providerModelId: finalProviderModelId,
+			name: finalName,
+			enabled: model.enabled // Preserve original enabled state
+		};
+
+		debugLog('Models', 'Saving model:', updatedModel);
+
+		try {
+			if (isEditing) { // Editing existing
+				const modelIndex = generalSettings.models.findIndex(m => m.id === originalId);
+				if (modelIndex === -1) {
+					throw new Error("Original model not found during save.");
+				}
+				generalSettings.models[modelIndex] = updatedModel;
+			} else { // Adding new
 				generalSettings.models.push(updatedModel);
 			}
-
-			saveSettings();
-			initializeModelList();
+			await saveSettings();
+			initializeModelList(); // Refresh list
 			hideModal(modal);
-		});
+		} catch (error) {
+			console.error('Failed to save model settings:', error);
+			alert(getMessage('failedToSaveModel')); 
+		}
+	});
 
-		newCancelBtn.addEventListener('click', () => {
-			hideModal(modal);
-		});
+	newCancelBtn.addEventListener('click', () => {
+		hideModal(modal);
+	});
 
-		showModal(modal);
-	}
+	showModal(modal);
 }
 
-function deleteModel(index: number) {
-	if (confirm(getMessage('deleteModelConfirm'))) {
-		generalSettings.models.splice(index, 1);
-		saveSettings();
-		initializeModelList();
+// Delete using modelId
+async function deleteModel(modelId: string): Promise<void> { 
+	const modelIndex = generalSettings.models.findIndex(m => m.id === modelId);
+	if (modelIndex === -1) {
+		console.error("Model not found for delete:", modelId);
+		alert(getMessage('failedToDeleteModel')); // Or specific message
+		return;
+	}
+	const modelToDelete = generalSettings.models[modelIndex];
+
+	if (confirm(getMessage('deleteModelConfirm', modelToDelete.name))) { // Pass name
+		generalSettings.models.splice(modelIndex, 1);
+		try {
+			await saveSettings();
+			initializeModelList(); // Refresh list
+		} catch (error) {
+			console.error("Failed to save settings after deleting model:", error);
+			alert(getMessage('failedToDeleteModel')); // Provide feedback
+		}
 	}
 }
 
 function initializeAutoSave(): void {
-	const interpreterSettingsForm = document.getElementById('interpreter-settings-form');
-	if (interpreterSettingsForm) {
-		interpreterSettingsForm.addEventListener('input', debounce(saveInterpreterSettingsFromForm, 500));
+	const defaultPromptContextInput = document.getElementById('default-prompt-context') as HTMLTextAreaElement;
+	if (defaultPromptContextInput) {
+		// Use the generic debounce function
+		defaultPromptContextInput.addEventListener('input', debounce(async () => { 
+			await saveInterpreterSettingsFromForm(); 
+		}, 500));
 	}
+	// Toggles save immediately via initializeSettingToggle, no need for form-wide listener
 }
 
-function saveInterpreterSettingsFromForm(): void {
-	const interpreterToggle = document.getElementById('interpreter-toggle') as HTMLInputElement;
-	const interpreterAutoRunToggle = document.getElementById('interpreter-auto-run-toggle') as HTMLInputElement;
+// Save only settings managed directly by this specific form part
+async function saveInterpreterSettingsFromForm(): Promise<void> { 
 	const defaultPromptContextInput = document.getElementById('default-prompt-context') as HTMLTextAreaElement;
 
+	if (!defaultPromptContextInput) return; // Element might not exist
+
+	// Only save fields actually present and managed here
 	const updatedSettings = {
-		interpreterEnabled: interpreterToggle.checked,
-		interpreterAutoRun: interpreterAutoRunToggle.checked,
 		defaultPromptContext: defaultPromptContextInput.value
 	};
 
-	saveSettings(updatedSettings);
+	try {
+		await saveSettings(updatedSettings); 
+		debugLog('Interpreter Settings', 'Auto-saved settings', updatedSettings);
+	} catch (error) {
+		console.error("Failed to auto-save interpreter settings:", error);
+	}
 }
 
-function debounce(func: Function, delay: number): (...args: any[]) => void {
-	let timeoutId: NodeJS.Timeout;
-	return (...args: any[]) => {
-		clearTimeout(timeoutId);
+// Debounce utility function
+function debounce<T extends (...args: any[]) => any>(
+	func: T, 
+	delay: number
+): (...args: Parameters<T>) => void {
+	let timeoutId: ReturnType<typeof setTimeout> | null = null;
+	return (...args: Parameters<T>) => {
+		if (timeoutId) {
+			clearTimeout(timeoutId);
+		}
 		timeoutId = setTimeout(() => func(...args), delay);
 	};
 }
 
-function duplicateModel(index: number) {
-	const modelToDuplicate = generalSettings.models[index];
+// Duplicate using modelId
+async function duplicateModel(modelId: string): Promise<void> { 
+	const modelIndex = generalSettings.models.findIndex(m => m.id === modelId);
+	if (modelIndex === -1) {
+		console.error("Model not found for duplicate:", modelId);
+		alert(getMessage('failedToDuplicateModel')); // Or specific message
+		return;
+	}
+	const modelToDuplicate = generalSettings.models[modelIndex];
+
 	const duplicatedModel: ModelConfig = {
 		...modelToDuplicate,
-		id: Date.now().toString(),
-		name: `${modelToDuplicate.name} (copy)`
+		id: Date.now().toString(), // New unique ID
+		name: `${modelToDuplicate.name} (copy)`,
+		enabled: true // Default new duplicated model to enabled
 	};
 
 	generalSettings.models.push(duplicatedModel);
-	saveSettings();
-	initializeModelList();
+	try {
+		await saveSettings();
+		initializeModelList(); // Refresh list
 
-	// Show edit modal for the new model
-	const newIndex = generalSettings.models.length - 1;
-	showModelModal(duplicatedModel, newIndex);
+		// Show edit modal for the *newly created* duplicated model (pass null for originalId)
+		await showModelModal(duplicatedModel, null); 
+	} catch(error) {
+		console.error("Failed to save settings after duplicating model:", error);
+		alert(getMessage('failedToDuplicateModel')); // Provide feedback
+	}
 }
