@@ -23,13 +23,11 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 		throw new Error(`Provider not found for model ${model.name}`);
 	}
 
-	// Check API key requirement directly from the provider object
-	// Assume key is required if apiKeyRequired is true or undefined (missing)
-	// Only skip check if apiKeyRequired is explicitly false.
-	const isApiKeyRequired = provider.apiKeyRequired !== false;
+	// Check API key requirement ONLY if it's explicitly set to true
+	const isApiKeyRequired = provider.apiKeyRequired === true;
 
 	if (isApiKeyRequired && !provider.apiKey) {
-		throw new Error(`API key is not set for provider ${provider.name}. Please add it in the extension settings.`);
+		throw new Error(`API key is required for provider ${provider.name} but is missing. Please add it in the extension settings.`);
 	}
 
 	const now = Date.now();
@@ -537,11 +535,11 @@ export async function handleInterpreterUI(
 			throw new Error(`Provider not found for model ${modelConfig.name}`);
 		}
 
-		// Check API key requirement directly from the provider object
-		const isApiKeyRequired = provider.apiKeyRequired !== false;
+		// Check API key requirement ONLY if it's explicitly set to true
+		const isApiKeyRequired = provider.apiKeyRequired === true;
 
 		if (isApiKeyRequired && !provider.apiKey) {
-			throw new Error(`No API key is set for ${provider.name}. Please set an API key in the extension settings.`);
+			throw new Error(`No API key is set for ${provider.name}, which requires one. Please set an API key in the extension settings.`);
 		}
 
 		const promptVariables = collectPromptVariables(template);

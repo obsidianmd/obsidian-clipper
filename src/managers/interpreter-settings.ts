@@ -428,6 +428,23 @@ async function showProviderModal(provider: Provider, index?: number): Promise<vo
 			nameInput.disabled = !isCustom;
 			baseUrlInput.disabled = !isCustom;
 
+			// API Key Field Visibility:
+			// Show ONLY if a preset is selected AND that preset explicitly requires a key.
+			const apiKeyRequiredByPreset = selectedPreset?.apiKeyRequired === true;
+			apiKeyContainer.style.display = apiKeyRequiredByPreset ? 'block' : 'none';
+
+			if (apiKeyRequiredByPreset) {
+				apiKeyDescription.innerHTML = getMessage('providerApiKeyDescription'); 
+				if (selectedPreset?.apiKeyUrl) { // Add null check for selectedPreset
+					const link = document.createElement('a');
+					link.href = selectedPreset.apiKeyUrl;
+					link.target = '_blank';
+					link.textContent = ` ${getMessage('getApiKeyHere', selectedPreset.name)}`; 
+					apiKeyDescription.appendChild(link);
+				}
+			}
+
+			// Pre-fill logic (remains the same)
 			if (selectedPreset) {
 				if (index === undefined || provider.name === selectedPreset.name) {
 					nameInput.value = selectedPreset.name;
@@ -435,22 +452,8 @@ async function showProviderModal(provider: Provider, index?: number): Promise<vo
 				if (index === undefined || provider.baseUrl === selectedPreset.baseUrl) {
 					baseUrlInput.value = selectedPreset.baseUrl;
 				}
-
-				const apiKeyRequired = selectedPreset.apiKeyRequired !== false;
-				apiKeyContainer.style.display = apiKeyRequired ? 'block' : 'none';
-				if (apiKeyRequired) {
-					apiKeyDescription.innerHTML = getMessage('providerApiKeyDescription'); 
-					if (selectedPreset.apiKeyUrl) {
-						const link = document.createElement('a');
-						link.href = selectedPreset.apiKeyUrl;
-						link.target = '_blank';
-						link.textContent = ` ${getMessage('getApiKeyHere', selectedPreset.name)}`; 
-						apiKeyDescription.appendChild(link);
-					}
-				}
 			} else { 
-				apiKeyContainer.style.display = 'block'; 
-				apiKeyDescription.innerHTML = getMessage('providerApiKeyDescription'); 
+				// Custom: Don't clear name/URL if editing
 				if (index === undefined) { 
 					nameInput.value = '';
 					baseUrlInput.value = '';
@@ -474,7 +477,6 @@ async function showProviderModal(provider: Provider, index?: number): Promise<vo
 
 		// Add Confirm button listener HERE
 		newConfirmBtn.addEventListener('click', async () => { 
-			// Use the guaranteed non-null currentPresetSelect from this scope
 			const selectedPresetId = currentPresetSelect.value;
 			const selectedPreset = (selectedPresetId && presetProviders) ? presetProviders[selectedPresetId] : null;
 	
@@ -487,30 +489,19 @@ async function showProviderModal(provider: Provider, index?: number): Promise<vo
 				return;
 			}
 	
-			const isApiKeyRequired = selectedPreset ? selectedPreset.apiKeyRequired !== false : true;
-			if (isApiKeyRequired && !finalApiKey) {
-				const confirmMsg = getMessage('apiKeyMissingConfirm', finalName);
-				if (!confirm(confirmMsg)) {
-					return; 
-				}
+			// Determine apiKeyRequired status to save: true only if preset explicitly requires it.
+			let finalApiKeyRequired: boolean | undefined = undefined;
+			if (selectedPreset?.apiKeyRequired === true) {
+				finalApiKeyRequired = true;
 			}
-	
-			let finalApiKeyRequired: boolean | undefined;
-			let finalPresetId: string | undefined;
-			if (selectedPreset) {
-				finalApiKeyRequired = selectedPreset.apiKeyRequired === false ? false : undefined;
-				finalPresetId = selectedPresetId; 
-			} else {
-				finalApiKeyRequired = undefined; 
-				finalPresetId = undefined; 
-			}
+			let finalPresetId: string | undefined = selectedPreset ? selectedPresetId : undefined;
 	
 			const updatedProvider: Provider = {
 				id: provider.id, 
 				name: finalName,
 				baseUrl: finalBaseUrl,
 				apiKey: finalApiKey,
-				apiKeyRequired: finalApiKeyRequired,
+				apiKeyRequired: finalApiKeyRequired, // Save explicit requirement or undefined
 				presetId: finalPresetId
 			};
 	
