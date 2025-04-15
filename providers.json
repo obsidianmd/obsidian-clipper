@@ -1,4 +1,5 @@
 {
+	"version": "2025.04.15",
 	"anthropic": {
 		"id": "anthropic",
 		"name": "Anthropic",
