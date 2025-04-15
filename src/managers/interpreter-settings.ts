@@ -192,10 +192,73 @@ export async function initializeInterpreterSettings(): Promise<void> {
 
 		// Fetch presets before initializing lists that depend on them
 		try {
-			cachedPresetProviders = await getPresetProviders();
-			debugLog('Interpreter', 'Presets cached during initialization:', cachedPresetProviders);
+			// Check if we have providers in local storage and get their version
+			const localData = await getLocalStorage(LOCAL_STORAGE_KEY) as ProviderPresets | null;
+			const localVersion = localData?.version;
+			console.log('🔄 Interpreter: Local providers version:', localVersion || 'none');
+
+			// Try to fetch remote version first
+			try {
+				const response = await fetch(PROVIDERS_URL);
+				if (!response.ok) {
+					throw new Error(`HTTP error! status: ${response.status}`);
+				}
+				const remoteData = await response.json() as ProviderPresets;
+				console.log('🔄 Interpreter: Remote providers version:', remoteData.version);
+
+				// If versions differ or no local version, use the fetched remote data
+				if (!localVersion || localVersion !== remoteData.version) {
+					console.log('🔄 Interpreter: Versions differ, using fetched providers');
+					
+					// Store the fetched data in local storage
+					await setLocalStorage(LOCAL_STORAGE_KEY, remoteData);
+					console.log('💾 Interpreter: Saved new providers to local storage');
+
+					// Extract providers (excluding version field)
+					const providers: Record<string, PresetProvider> = {};
+					for (const key in remoteData) {
+						if (key !== 'version' && Object.prototype.hasOwnProperty.call(remoteData, key)) {
+							const provider = remoteData[key] as PresetProvider;
+							provider.id = key;
+							providers[key] = provider;
+						}
+					}
+					cachedPresetProviders = providers;
+					console.log('✅ Interpreter: Successfully cached new providers');
+				} else {
+					console.log('✅ Interpreter: Using cached providers (versions match)');
+					// Use local providers if versions match
+					const providers: Record<string, PresetProvider> = {};
+					for (const key in localData) {
+						if (key !== 'version' && Object.prototype.hasOwnProperty.call(localData, key)) {
+							const provider = localData[key] as PresetProvider;
+							provider.id = key;
+							providers[key] = provider;
+						}
+					}
+					cachedPresetProviders = providers;
+				}
+			} catch (remoteError) {
+				console.error('❌ Interpreter: Failed to fetch remote providers:', remoteError);
+				// If remote fetch fails but we have local data, use it
+				if (localData) {
+					console.log('⚠️ Interpreter: Using local providers as fallback');
+					const providers: Record<string, PresetProvider> = {};
+					for (const key in localData) {
+						if (key !== 'version' && Object.prototype.hasOwnProperty.call(localData, key)) {
+							const provider = localData[key] as PresetProvider;
+							provider.id = key;
+							providers[key] = provider;
+						}
+					}
+					cachedPresetProviders = providers;
+				} else {
+					console.error('❌ Interpreter: No local providers available for fallback');
+					cachedPresetProviders = null;
+				}
+			}
 		} catch (error) {
-			console.error('Failed to fetch preset providers during initialization:', error);
+			console.error('❌ Interpreter: Failed to initialize providers:', error);
 			cachedPresetProviders = null;
 		}
 
@@ -215,7 +278,7 @@ export async function initializeInterpreterSettings(): Promise<void> {
 		initializeToggles();
 		initializeAutoSave();
 	}).catch(error => {
-		console.error("Failed to initialize interpreter settings:", error);
+		console.error("❌ Failed to initialize interpreter settings:", error);
 	});
 
 	// Set up button event listeners
@@ -264,7 +327,7 @@ async function initializeProviderList(): Promise<void> {
 		try {
 			// Pass presets to avoid fetching multiple times inside the loop
 			const providerItem = createProviderListItem(provider, index, presetProviders); 
-			providerList.appendChild(providerItem);
+		providerList.appendChild(providerItem);
 		} catch (error) {
 			console.error(`Failed to create list item for provider ${provider.name}:`, error);
 		}
@@ -313,33 +376,33 @@ function createProviderListItem(provider: Provider, index: number, presetProvide
 
 	const editBtn = providerItem.querySelector('.edit-provider-btn');
 	editBtn?.addEventListener('click', async (e) => { // Async handler
-		e.preventDefault();
-		e.stopPropagation();
+			e.preventDefault();
+			e.stopPropagation();
 		const providerId = (e.currentTarget as HTMLElement).getAttribute('data-provider-id');
-		if (providerId) {
-			const providerIndex = generalSettings.providers.findIndex(p => p.id === providerId);
-			if (providerIndex !== -1) {
+			if (providerId) {
+				const providerIndex = generalSettings.providers.findIndex(p => p.id === providerId);
+				if (providerIndex !== -1) {
 				await editProvider(providerIndex); // Call async function
 			} else {
 				console.error(`Provider with ID ${providerId} not found for editing.`);
+				}
 			}
-		}
-	});
+		});
 
 	const deleteBtn = providerItem.querySelector('.delete-provider-btn');
 	deleteBtn?.addEventListener('click', async (e) => { // Async handler
-		e.preventDefault();
-		e.stopPropagation();
+			e.preventDefault();
+			e.stopPropagation();
 		const providerId = (e.currentTarget as HTMLElement).getAttribute('data-provider-id');
-		if (providerId) {
-			const providerIndex = generalSettings.providers.findIndex(p => p.id === providerId);
-			if (providerIndex !== -1) {
+			if (providerId) {
+				const providerIndex = generalSettings.providers.findIndex(p => p.id === providerId);
+				if (providerIndex !== -1) {
 				await deleteProvider(providerIndex); // Call async function
 			} else {
 				console.error(`Provider with ID ${providerId} not found for deletion.`);
+				}
 			}
-		}
-	});
+		});
 
 	return providerItem;
 }
@@ -403,15 +466,15 @@ async function showProviderModal(provider: Provider, index?: number): Promise<vo
 	showModal(modal);
 
 	// Translate static parts first
-	await translatePage(); 
-	initializeIcons(modal); 
+	await translatePage();
+	initializeIcons(modal);
 
 	const titleElement = modal.querySelector('.modal-title');
 	if (titleElement) {
 		titleElement.textContent = getMessage(index !== undefined ? 'editProvider' : 'addProviderTitle');
 	}
 
-	// Get form elements (check modal exists first)
+	// Get form elements
 	const form = modal.querySelector('#provider-form') as HTMLFormElement;
 	const nameInput = form?.querySelector('[name="name"]') as HTMLInputElement;
 	const baseUrlInput = form?.querySelector('[name="baseUrl"]') as HTMLInputElement;
@@ -424,197 +487,169 @@ async function showProviderModal(provider: Provider, index?: number): Promise<vo
 	const presetContainer = presetSelect?.closest('.setting-item') as HTMLElement;
 
 	if (!form || !nameInput || !baseUrlInput || !apiKeyInput || !presetSelect || !nameContainer || !baseUrlContainer || !apiKeyContainer || !apiKeyDescription || !presetContainer) {
-		console.error('Required form elements not found in provider modal for async setup');
-		hideModal(modal); 
+		console.error('Required form elements not found in provider modal');
+		hideModal(modal);
 		return;
 	}
 
-	// Add loading indicator placeholder if we don't have cached providers
-	let loadingIndicator: HTMLElement | null = null;
-	if (!cachedPresetProviders) {
-		loadingIndicator = document.createElement('div');
-		loadingIndicator.className = 'loading-indicator mh';
-		loadingIndicator.textContent = getMessage('loadingPresets'); 
-		presetContainer.appendChild(loadingIndicator);
-		presetSelect.style.display = 'none'; // Hide select while loading
-	}
-
-	// Setup confirm/cancel buttons (listeners will be attached later)
+	// Setup confirm/cancel buttons
 	const confirmBtn = modal.querySelector('.provider-confirm-btn');
 	const cancelBtn = modal.querySelector('.provider-cancel-btn');
 	if (!confirmBtn || !cancelBtn) {
 		console.error("Provider modal buttons not found");
-		hideModal(modal); 
+		hideModal(modal);
 		return;
 	}
-	// Clone buttons now to remove any old listeners immediately
+
+	// Clone buttons to remove old listeners
 	const newConfirmBtn = confirmBtn.cloneNode(true);
 	confirmBtn.parentNode?.replaceChild(newConfirmBtn, confirmBtn);
 	const newCancelBtn = cancelBtn.cloneNode(true);
 	cancelBtn.parentNode?.replaceChild(newCancelBtn, cancelBtn);
-	newCancelBtn.addEventListener('click', () => hideModal(modal)); // Cancel is simple
+	newCancelBtn.addEventListener('click', () => hideModal(modal));
 
-	// Use cached providers or fetch if not available
-	try {
-		let presetProviders = cachedPresetProviders;
-		if (!presetProviders) {
-			presetProviders = await getPresetProviders();
-			cachedPresetProviders = presetProviders; // Cache for future use
+	// Use cached providers
+	if (!cachedPresetProviders) {
+		console.error('No preset providers available');
+		hideModal(modal);
+		return;
+	}
+
+	const presetProviders = cachedPresetProviders;
+	debugLog('Providers', 'Using cached providers for modal:', presetProviders);
+
+	const oldPresetSelect = presetSelect;
+	const currentPresetSelect = oldPresetSelect.cloneNode(true) as HTMLSelectElement;
+	oldPresetSelect.parentNode?.replaceChild(currentPresetSelect, oldPresetSelect);
+
+	currentPresetSelect.innerHTML = `<option value="">${getMessage('custom')}</option>`;
+	Object.entries(presetProviders).forEach(([id, preset]) => {
+		const option = document.createElement('option');
+		option.value = id;
+		option.textContent = preset.name;
+		currentPresetSelect.appendChild(option);
+	});
+
+	// Determine initial preset selection
+	let currentPresetId = '';
+	if (index !== undefined) {
+		if (provider.presetId && presetProviders[provider.presetId]) {
+			currentPresetId = provider.presetId;
+		} else {
+			const matchingPreset = Object.entries(presetProviders).find(([_, preset]) =>
+				preset.name === provider.name && preset.baseUrl === provider.baseUrl
+			);
+			currentPresetId = matchingPreset ? matchingPreset[0] : '';
 		}
-		debugLog('Providers', 'Using providers for modal:', presetProviders);
+	} else {
+		const anthropicPreset = Object.entries(presetProviders).find(([_, p]) => p.id === 'anthropic');
+		currentPresetId = anthropicPreset ? anthropicPreset[0] : '';
+	}
+	currentPresetSelect.value = currentPresetId;
 
-		if (loadingIndicator) {
-			presetSelect.style.display = ''; // Show select again
-			loadingIndicator.remove(); // Remove loading indicator
+	const updateVisibility = (selectElement: HTMLSelectElement) => {
+		if (!nameContainer || !baseUrlContainer || !nameInput || !baseUrlInput || !apiKeyContainer || !apiKeyInput || !apiKeyDescription) return;
+
+		const selectedPresetId = selectElement.value;
+		const isCustom = !selectedPresetId;
+		const selectedPreset = isCustom ? null : presetProviders[selectedPresetId];
+
+		nameContainer.style.display = isCustom ? 'block' : 'none';
+		baseUrlContainer.style.display = isCustom ? 'block' : 'none';
+		nameInput.disabled = !isCustom;
+		baseUrlInput.disabled = !isCustom;
+
+		// API Key Field Visibility
+		const apiKeyRequiredByPreset = selectedPreset?.apiKeyRequired === true;
+		apiKeyContainer.style.display = apiKeyRequiredByPreset ? 'block' : 'none';
+
+		if (apiKeyRequiredByPreset) {
+			apiKeyDescription.innerHTML = getMessage('providerApiKeyDescription');
+			if (selectedPreset?.apiKeyUrl) {
+				const link = document.createElement('a');
+				link.href = selectedPreset.apiKeyUrl;
+				link.target = '_blank';
+				link.textContent = ` ${getMessage('getApiKeyHere', selectedPreset.name)}`;
+				apiKeyDescription.appendChild(link);
+			}
 		}
 
-		const oldPresetSelect = presetSelect;
-		// Create the new select, GUARANTEED non-null if we get here
-		const currentPresetSelect = oldPresetSelect.cloneNode(true) as HTMLSelectElement;
-		oldPresetSelect.parentNode?.replaceChild(currentPresetSelect, oldPresetSelect);
-		
-		currentPresetSelect.innerHTML = `<option value="">${getMessage('custom')}</option>`; 
-		Object.entries(presetProviders).forEach(([id, preset]) => {
-			const option = document.createElement('option');
-			option.value = id; 
-			option.textContent = preset.name;
-			currentPresetSelect.appendChild(option);
-		});
-		
-		// Determine initial preset selection
-		let currentPresetId = '';
-		if (index !== undefined) { 
-			if (provider.presetId && presetProviders[provider.presetId]) {
-				currentPresetId = provider.presetId;
-			} else {
-				const matchingPreset = Object.entries(presetProviders).find(([_, preset]) => 
-					preset.name === provider.name && preset.baseUrl === provider.baseUrl
-				);
-				currentPresetId = matchingPreset ? matchingPreset[0] : ''; 
+		if (selectedPreset) {
+			if (index === undefined || provider.name === selectedPreset.name) {
+				nameInput.value = selectedPreset.name;
 			}
-		} else { 
-			const anthropicPreset = Object.entries(presetProviders).find(([_, p]) => p.id === 'anthropic');
-			currentPresetId = anthropicPreset ? anthropicPreset[0] : ''; 
+			if (index === undefined || provider.baseUrl === selectedPreset.baseUrl) {
+				baseUrlInput.value = selectedPreset.baseUrl;
+			}
+		} else {
+			if (index === undefined) {
+				nameInput.value = '';
+				baseUrlInput.value = '';
+			}
 		}
-		currentPresetSelect.value = currentPresetId; 
+	};
 
-		const updateVisibility = (selectElement: HTMLSelectElement) => {
-			if (!nameContainer || !baseUrlContainer || !nameInput || !baseUrlInput || !apiKeyContainer || !apiKeyInput || !apiKeyDescription) return;
+	if (index !== undefined) {
+		nameInput.value = provider.name;
+		baseUrlInput.value = provider.baseUrl;
+		apiKeyInput.value = provider.apiKey || '';
+	} else {
+		apiKeyInput.value = '';
+	}
 
-			const selectedPresetId = selectElement.value;
-			const isCustom = !selectedPresetId;
-			const selectedPreset = isCustom ? null : presetProviders[selectedPresetId];
+	currentPresetSelect.addEventListener('change', () => updateVisibility(currentPresetSelect));
+	updateVisibility(currentPresetSelect);
 
-			nameContainer.style.display = isCustom ? 'block' : 'none';
-			baseUrlContainer.style.display = isCustom ? 'block' : 'none'; 
-			nameInput.disabled = !isCustom;
-			baseUrlInput.disabled = !isCustom;
+	// Add confirm button handler
+	newConfirmBtn.addEventListener('click', async () => {
+		const selectedPresetId = currentPresetSelect.value;
+		const selectedPreset = selectedPresetId ? presetProviders[selectedPresetId] : null;
 
-			// API Key Field Visibility:
-			// Show ONLY if a preset is selected AND that preset explicitly requires a key.
-			const apiKeyRequiredByPreset = selectedPreset?.apiKeyRequired === true;
-			apiKeyContainer.style.display = apiKeyRequiredByPreset ? 'block' : 'none';
+		let finalName = selectedPreset ? selectedPreset.name : nameInput.value.trim();
+		let finalBaseUrl = selectedPreset ? selectedPreset.baseUrl : baseUrlInput.value.trim();
+		const finalApiKey = apiKeyInput.value.trim();
 
-			if (apiKeyRequiredByPreset) {
-				apiKeyDescription.innerHTML = getMessage('providerApiKeyDescription'); 
-				if (selectedPreset?.apiKeyUrl) { // Add null check for selectedPreset
-					const link = document.createElement('a');
-					link.href = selectedPreset.apiKeyUrl;
-					link.target = '_blank';
-					link.textContent = ` ${getMessage('getApiKeyHere', selectedPreset.name)}`; 
-					apiKeyDescription.appendChild(link);
-				}
-			}
+		if (!finalName || !finalBaseUrl) {
+			alert(getMessage('providerRequiredFields'));
+			return;
+		}
 
-			if (selectedPreset) {
-				if (index === undefined || provider.name === selectedPreset.name) {
-					nameInput.value = selectedPreset.name;
-				}
-				if (index === undefined || provider.baseUrl === selectedPreset.baseUrl) {
-					baseUrlInput.value = selectedPreset.baseUrl;
-				}
-			} else { 
-				// Custom: Don't clear name/URL if editing
-				if (index === undefined) { 
-					nameInput.value = '';
-					baseUrlInput.value = '';
-				}
-			}
+		let finalApiKeyRequired: boolean | undefined = undefined;
+		if (selectedPreset?.apiKeyRequired === true) {
+			finalApiKeyRequired = true;
+		}
+		let finalPresetId: string | undefined = selectedPreset ? selectedPresetId : undefined;
+
+		const updatedProvider: Provider = {
+			id: provider.id,
+			name: finalName,
+			baseUrl: finalBaseUrl,
+			apiKey: finalApiKey,
+			apiKeyRequired: finalApiKeyRequired,
+			presetId: finalPresetId
 		};
 
-		if (index !== undefined) { 
-			nameInput.value = provider.name;
-			baseUrlInput.value = provider.baseUrl;
-			apiKeyInput.value = provider.apiKey || ''; 
-		} else { 
-			apiKeyInput.value = ''; 
-		}
-		
-		// Add listener using the guaranteed non-null currentPresetSelect
-		currentPresetSelect.addEventListener('change', () => updateVisibility(currentPresetSelect));
-		// Initial call using the guaranteed non-null currentPresetSelect
-		updateVisibility(currentPresetSelect); 
+		debugLog('Providers', 'Saving provider:', updatedProvider);
 
-		newConfirmBtn.addEventListener('click', async () => { 
-			const selectedPresetId = currentPresetSelect.value;
-			const selectedPreset = (selectedPresetId && presetProviders) ? presetProviders[selectedPresetId] : null;
-	
-			let finalName = selectedPreset ? selectedPreset.name : nameInput.value.trim();
-			let finalBaseUrl = selectedPreset ? selectedPreset.baseUrl : baseUrlInput.value.trim();
-			const finalApiKey = apiKeyInput.value.trim();
-	
-			if (!finalName || !finalBaseUrl) {
-				alert(getMessage('providerRequiredFields'));
-				return;
-			}
-	
-			// Determine apiKeyRequired status to save: true only if preset explicitly requires it.
-			let finalApiKeyRequired: boolean | undefined = undefined;
-			if (selectedPreset?.apiKeyRequired === true) {
-				finalApiKeyRequired = true;
-			}
-			let finalPresetId: string | undefined = selectedPreset ? selectedPresetId : undefined;
-	
-			const updatedProvider: Provider = {
-				id: provider.id, 
-				name: finalName,
-				baseUrl: finalBaseUrl,
-				apiKey: finalApiKey,
-				apiKeyRequired: finalApiKeyRequired, // Save explicit requirement or undefined
-				presetId: finalPresetId
-			};
-	
-			debugLog('Providers', 'Saving provider:', updatedProvider);
-	
-			try {
-				if (index !== undefined) { 
-					if (index < 0 || index >= generalSettings.providers.length) {
-						throw new Error("Invalid index during provider save.");
-					}
-					generalSettings.providers[index] = updatedProvider;
-				} else { 
-					generalSettings.providers.push(updatedProvider);
+		try {
+			if (index !== undefined) {
+				if (index < 0 || index >= generalSettings.providers.length) {
+					throw new Error("Invalid index during provider save.");
 				}
-				await saveSettings(); 
-				debugLog('Providers', 'Settings saved');
-				await initializeProviderList(); 
-				initializeModelList(); 
-				hideModal(modal); 
-			} catch (error) {
-				console.error('Failed to save provider settings:', error);
-				alert(getMessage('failedToSaveProvider'));
+				generalSettings.providers[index] = updatedProvider;
+			} else {
+				generalSettings.providers.push(updatedProvider);
 			}
-		});
-
-	} catch (error) {
-		console.error("Failed to fetch preset providers for modal:", error);
-		if(loadingIndicator) loadingIndicator.textContent = getMessage('failedToLoadPresets'); 
-		if (presetSelect) presetSelect.disabled = true;
-	} finally {
-		if (loadingIndicator && loadingIndicator.parentNode) {
-			loadingIndicator.remove();
+			await saveSettings();
+			debugLog('Providers', 'Settings saved');
+			await initializeProviderList();
+			initializeModelList();
+			hideModal(modal);
+		} catch (error) {
+			console.error('Failed to save provider settings:', error);
+			alert(getMessage('failedToSaveProvider'));
 		}
-	}
+	});
 }
 
 export function initializeModelList(): void {
@@ -633,8 +668,8 @@ export function initializeModelList(): void {
 	generalSettings.models.forEach((model, index) => {
 		try {
 			// Pass sorted providers if needed by createModelListItem in the future
-			const modelItem = createModelListItem(model, index); 
-			modelList.appendChild(modelItem);
+		const modelItem = createModelListItem(model, index);
+		modelList.appendChild(modelItem);
 		} catch (error) {
 			console.error(`Failed to create list item for model ${model.name}:`, error);
 		}
@@ -682,7 +717,7 @@ function createModelListItem(model: ModelConfig, index: number): HTMLElement {
 	const checkboxContainer = modelItem.querySelector('.checkbox-container') as HTMLElement;
 	
 	if (checkbox && checkboxContainer) {
-		initializeToggles(modelItem); 
+		initializeToggles(modelItem);
 		checkbox.addEventListener('change', async () => { 
 			const modelId = model.id; // Capture id
 			const modelIndex = generalSettings.models.findIndex(m => m.id === modelId);
@@ -756,14 +791,14 @@ async function editModel(modelId: string): Promise<void> {
 
 // Accept model object and optional originalId (null if creating)
 async function showModelModal(model: ModelConfig, originalId: string | null): Promise<void> { 
+	const isEditing = originalId !== null;
 	debugLog('Models', 'Showing model modal:', { model, originalId });
+	
 	const modal = document.getElementById('model-modal');
 	if (!modal) {
 		console.error("Model modal element not found");
 		return;
 	}
-
-	const isEditing = originalId !== null;
 
 	showModal(modal);
 
@@ -793,18 +828,7 @@ async function showModelModal(model: ModelConfig, originalId: string | null): Pr
 		return;
 	}
 
-	// Add loading indicator for popular models
-	let popularModelsLoadingIndicator: HTMLElement | null = null;
-	if (modelSelectionContainer) {
-		popularModelsLoadingIndicator = document.createElement('div');
-		popularModelsLoadingIndicator.className = 'loading-indicator mh';
-		popularModelsLoadingIndicator.textContent = getMessage('loadingModels'); // Add specific message
-		// Append inside the container, but maybe hide the radios placeholder initially
-		modelSelectionContainer.appendChild(popularModelsLoadingIndicator);
-		modelSelectionRadios.style.display = 'none'; // Hide radios container while loading
-	}
-
-	// Setup buttons (listeners added later)
+	// Setup buttons
 	const confirmBtn = modal.querySelector('.model-confirm-btn');
 	const cancelBtn = modal.querySelector('.model-cancel-btn');
 	if (!confirmBtn || !cancelBtn) {
@@ -818,11 +842,18 @@ async function showModelModal(model: ModelConfig, originalId: string | null): Pr
 	cancelBtn.parentNode?.replaceChild(newCancelBtn, cancelBtn);
 	newCancelBtn.addEventListener('click', () => hideModal(modal));
 
+	// Use cached providers
+	if (!cachedPresetProviders) {
+		console.error('No preset providers available');
+		hideModal(modal);
+		return;
+	}
+
 	const oldProviderSelect = providerSelect;
-	const currentProviderSelect = oldProviderSelect.cloneNode(true) as HTMLSelectElement; // Clone with options
+	const currentProviderSelect = oldProviderSelect.cloneNode(true) as HTMLSelectElement;
 	oldProviderSelect.parentNode?.replaceChild(currentProviderSelect, oldProviderSelect);
 
-	currentProviderSelect.innerHTML = `<option value="">${getMessage('selectProvider')}</option>`; // Default option
+	currentProviderSelect.innerHTML = `<option value="">${getMessage('selectProvider')}</option>`;
 	const sortedProviders = [...generalSettings.providers].sort((a, b) => 
 		a.name.toLowerCase().localeCompare(b.name.toLowerCase())
 	);
@@ -832,9 +863,10 @@ async function showModelModal(model: ModelConfig, originalId: string | null): Pr
 		option.textContent = p.name;
 		currentProviderSelect.appendChild(option);
 	});
+
 	// Set initial provider selection
 	if (isEditing) {
-		currentProviderSelect.value = model.providerId || ''; 
+		currentProviderSelect.value = model.providerId || '';
 	} else if (sortedProviders.length > 0) {
 		currentProviderSelect.value = sortedProviders[0].id;
 	} else {
@@ -844,198 +876,150 @@ async function showModelModal(model: ModelConfig, originalId: string | null): Pr
 	nameInput.value = model.name;
 	providerModelIdInput.value = model.providerModelId || '';
 
-	// Fetch presets and set up model options async
-	let presetProviders: Record<string, PresetProvider> = {};
-	try {
-		presetProviders = await getPresetProviders();
-		debugLog('Models', 'Presets fetched/cached for model modal', presetProviders);
+	// Define the function that updates model options based on provider selection
+	const updateModelOptions = () => {
+		const selectedProviderId = currentProviderSelect.value;
+		const selectedProvider = generalSettings.providers.find(p => p.id === selectedProviderId);
+		let currentPresetProvider: PresetProvider | undefined = undefined;
 
-		// Define the function that updates model options based on provider selection
-		const updateModelOptions = () => {
-			// Re-query elements inside the function to ensure fresh references
-			const currentProviderSelect = modal.querySelector('[name="providerId"]') as HTMLSelectElement;
-			const modelSelectionContainer = modal.querySelector('.model-selection-container') as HTMLElement;
-			const modelIdDescContainer = modal.querySelector('.setting-item:has([name="providerModelId"]) .setting-item-description') as HTMLElement;
-			const nameContainer = modal.querySelector('.setting-item:has([name="name"])') as HTMLElement;
-			const providerModelIdContainer = modal.querySelector('.setting-item:has([name="providerModelId"]) ') as HTMLElement;
-			const nameInput = modal.querySelector('[name="name"]') as HTMLInputElement;
-			const providerModelIdInput = modal.querySelector('[name="providerModelId"]') as HTMLInputElement;
-			let modelSelectionRadios = modal.querySelector('#model-selection-radios') as HTMLElement;
+		// Clear previous radio state & listeners - Clone radios container
+		const oldRadioContainer = modelSelectionRadios;
+		const currentRadioContainer = oldRadioContainer.cloneNode(false) as HTMLElement;
+		oldRadioContainer.parentNode?.replaceChild(currentRadioContainer, oldRadioContainer);
 
-			if (!currentProviderSelect || !modelSelectionContainer || !modelIdDescContainer || !nameContainer || !providerModelIdContainer || !nameInput || !providerModelIdInput || !modelSelectionRadios) {
-				console.error("Required elements not found inside updateModelOptions");
-				return; // Stop if elements aren't found
+		modelSelectionContainer.style.display = 'none'; // Hide by default
+
+		if (selectedProvider) {
+			if (selectedProvider.presetId && cachedPresetProviders && cachedPresetProviders[selectedProvider.presetId]) {
+				currentPresetProvider = cachedPresetProviders[selectedProvider.presetId];
+			} else if (cachedPresetProviders) {
+				currentPresetProvider = Object.values(cachedPresetProviders).find(
+					preset => preset.name === selectedProvider.name && preset.baseUrl === selectedProvider.baseUrl
+				);
 			}
-			
-			const selectedProviderId = currentProviderSelect.value;
-			const selectedProvider = generalSettings.providers.find(p => p.id === selectedProviderId);
-			let currentPresetProvider: PresetProvider | undefined = undefined;
-			
-			// Clear previous radio state & listeners - Clone radios container
-			const oldRadioContainer = modelSelectionRadios;
-			const currentRadioContainer = oldRadioContainer.cloneNode(false) as HTMLElement; // Clone empty
-			oldRadioContainer.parentNode?.replaceChild(currentRadioContainer, oldRadioContainer);
-			// Update the reference to the new container for subsequent logic within this call
-			modelSelectionRadios = currentRadioContainer;
-			
-			modelSelectionContainer.style.display = 'none'; // Hide by default
-			if(popularModelsLoadingIndicator) popularModelsLoadingIndicator.style.display = 'none'; // Hide loading indicator now
-			// Ensure the container for radios is visible (it might have been hidden if prev provider had no models)
-			modelSelectionRadios.style.display = ''; // Show radios container
 
-			if (selectedProvider) {
-				if (selectedProvider.presetId && presetProviders[selectedProvider.presetId]) {
-					currentPresetProvider = presetProviders[selectedProvider.presetId];
-				} else {
-					currentPresetProvider = Object.values(presetProviders).find(
-						preset => preset.name === selectedProvider.name && preset.baseUrl === selectedProvider.baseUrl
-					);
-				}
+			// Update model ID description link
+			modelIdDescContainer.innerHTML = getMessage('providerModelIdDescription');
+			if (currentPresetProvider?.modelsListUrl) {
+				const link = document.createElement('a');
+				link.href = currentPresetProvider.modelsListUrl;
+				link.target = '_blank';
+				link.textContent = ` ${getMessage('modelsListFor', selectedProvider.name)}`;
+				modelIdDescContainer.appendChild(link);
+			}
 
-				// Update model ID description link
-				modelIdDescContainer.innerHTML = getMessage('providerModelIdDescription'); 
-				if (currentPresetProvider?.modelsListUrl) {
-					const link = document.createElement('a');
-					link.href = currentPresetProvider.modelsListUrl;
-					link.target = '_blank';
-					link.textContent = ` ${getMessage('modelsListFor', selectedProvider.name)}`;
-					modelIdDescContainer.appendChild(link);
-				}
+			// Populate popular models if available
+			if (currentPresetProvider?.chatModels?.length) {
+				modelSelectionContainer.style.display = 'block';
+				currentRadioContainer.style.display = 'block';
 
-				// Populate popular models if available
-				if (currentPresetProvider?.chatModels?.length) {
-					modelSelectionContainer.style.display = 'block';
-					
-					currentPresetProvider.chatModels.forEach((popModel, idx) => {
-						const radioId = `pop-model-${idx}`;
-						const radioDiv = document.createElement('div');
-						radioDiv.className = 'radio-option';
-						radioDiv.innerHTML = `
-							<input type="radio" name="model-selection" id="${radioId}" value="${popModel.id}">
-							<label for="${radioId}">
-								${popModel.name}${popModel.recommended ? ` <span class="tag">${getMessage('recommended')}</span>` : ''}
-							</label>
-						`;
-						currentRadioContainer.appendChild(radioDiv);
-					});
-
-					// Add "Other" option
-					const otherRadioDiv = document.createElement('div');
-					otherRadioDiv.className = 'radio-option';
-					otherRadioDiv.innerHTML = `
-						<input type="radio" name="model-selection" id="model-other" value="other">
-						<label for="model-other">${getMessage('custom')}</label>
+				currentPresetProvider.chatModels.forEach((popModel, idx) => {
+					const radioId = `pop-model-${idx}`;
+					const radioDiv = document.createElement('div');
+					radioDiv.className = 'radio-option';
+					radioDiv.innerHTML = `
+						<input type="radio" name="model-selection" id="${radioId}" value="${popModel.id}">
+						<label for="${radioId}">
+							${popModel.name}${popModel.recommended ? ` <span class="tag">${getMessage('recommended')}</span>` : ''}
+						</label>
 					`;
-					currentRadioContainer.appendChild(otherRadioDiv);
+					currentRadioContainer.appendChild(radioDiv);
+				});
 
-					// Add change handler to the new container
-					currentRadioContainer.addEventListener('change', (e) => {
-						const target = e.target as HTMLInputElement;
-						if (target.name !== 'model-selection' || !currentPresetProvider?.chatModels) return;
-						if (!nameInput || !providerModelIdInput) return;
+				// Add "Other" option
+				const otherRadioDiv = document.createElement('div');
+				otherRadioDiv.className = 'radio-option';
+				otherRadioDiv.innerHTML = `
+					<input type="radio" name="model-selection" id="model-other" value="other">
+					<label for="model-other">${getMessage('custom')}</label>
+				`;
+				currentRadioContainer.appendChild(otherRadioDiv);
 
-						if (target.value === 'other') {
-							// Don't clear fields if editing and switching back to other
-							if (!isEditing) {
-								nameInput.value = '';
-								providerModelIdInput.value = '';
-							}
+				// Add change handler to the new container
+				currentRadioContainer.addEventListener('change', (e) => {
+					const target = e.target as HTMLInputElement;
+					if (target.name !== 'model-selection' || !currentPresetProvider?.chatModels) return;
+
+					if (target.value === 'other') {
+						if (!isEditing) {
+							nameInput.value = '';
+							providerModelIdInput.value = '';
+						}
+						nameInput.disabled = false;
+						providerModelIdInput.disabled = false;
+					} else {
+						const selectedPopModel = currentPresetProvider.chatModels.find(m => m.id === target.value);
+						if (selectedPopModel) {
+							nameInput.value = selectedPopModel.name;
+							providerModelIdInput.value = selectedPopModel.id;
 							nameInput.disabled = false;
 							providerModelIdInput.disabled = false;
-						} else {
-							const selectedPopModel = currentPresetProvider.chatModels.find(m => m.id === target.value);
-							if (selectedPopModel) {
-								nameInput.value = selectedPopModel.name;
-								providerModelIdInput.value = selectedPopModel.id;
-								nameInput.disabled = false; 
-								providerModelIdInput.disabled = false;
-							}
 						}
-					});
-
-					// Set initial radio state
-					const matchingPopModelRadio = currentRadioContainer.querySelector(`input[value="${CSS.escape(model.providerModelId || '')}"]`) as HTMLInputElement;
-					if (matchingPopModelRadio && isEditing) {
-						matchingPopModelRadio.checked = true;
-					} else {
-						(currentRadioContainer.querySelector('#model-other') as HTMLInputElement).checked = true;
 					}
-				} 
-			} 
-			// Always ensure Name and Model ID fields are visible and enabled if a provider is selected
-			const providerSelected = !!selectedProviderId;
-			nameContainer.style.display = providerSelected ? 'block' : 'none';
-			providerModelIdContainer.style.display = providerSelected ? 'block' : 'none';
-			nameInput.disabled = !providerSelected;
-			providerModelIdInput.disabled = !providerSelected;
+				});
+
+				// Set initial radio state
+				const matchingPopModelRadio = currentRadioContainer.querySelector(`input[value="${CSS.escape(model.providerModelId || '')}"]`) as HTMLInputElement;
+				if (matchingPopModelRadio && isEditing) {
+					matchingPopModelRadio.checked = true;
+				} else {
+					(currentRadioContainer.querySelector('#model-other') as HTMLInputElement).checked = true;
+				}
+			}
+		}
+
+		// Always ensure Name and Model ID fields are visible and enabled if a provider is selected
+		const providerSelected = !!selectedProviderId;
+		nameContainer.style.display = providerSelected ? 'block' : 'none';
+		providerModelIdContainer.style.display = providerSelected ? 'block' : 'none';
+		nameInput.disabled = !providerSelected;
+		providerModelIdInput.disabled = !providerSelected;
+	};
+
+	// Add listener to the provider select
+	currentProviderSelect.addEventListener('change', updateModelOptions);
+	// Call initial update
+	updateModelOptions();
+
+	// Add confirm button handler
+	newConfirmBtn.addEventListener('click', async () => {
+		const finalProviderId = currentProviderSelect.value;
+		const finalName = nameInput.value.trim();
+		const finalProviderModelId = providerModelIdInput.value.trim();
+
+		if (!finalName || !finalProviderId || !finalProviderModelId) {
+			alert(getMessage('modelRequiredFields'));
+			return;
+		}
+
+		const updatedModel: ModelConfig = {
+			id: originalId || model.id,
+			providerId: finalProviderId,
+			providerModelId: finalProviderModelId,
+			name: finalName,
+			enabled: model.enabled
 		};
 
-		// Add listener to the provider select (use the initially found, cloned one)
-		currentProviderSelect.addEventListener('change', updateModelOptions);
-		// Call initial update
-		updateModelOptions(); 
+		debugLog('Models', 'Saving model:', updatedModel);
 
-		// Add Confirm button listener HERE (uses the same initially found, cloned provider select)
-		newConfirmBtn.addEventListener('click', async () => {
-			// Re-query providerSelect here too just to be safe?
-			const currentProviderSelectForSave = modal.querySelector('[name="providerId"]') as HTMLSelectElement;
-			if (!currentProviderSelectForSave || !nameInput || !providerModelIdInput) return; // Guard
-
-			const finalProviderId = currentProviderSelectForSave.value;
-			const finalName = nameInput.value.trim();
-			const finalProviderModelId = providerModelIdInput.value.trim();
-			
-			if (!finalName || !finalProviderId || !finalProviderModelId) {
-				alert(getMessage('modelRequiredFields'));
-				return;
-			}
-	
-			const updatedModel: ModelConfig = {
-				id: originalId || model.id, 
-				providerId: finalProviderId,
-				providerModelId: finalProviderModelId,
-				name: finalName,
-				enabled: model.enabled 
-			};
-	
-			debugLog('Models', 'Saving model:', updatedModel);
-	
-			try {
-				if (isEditing) { 
-					const modelIndex = generalSettings.models.findIndex(m => m.id === originalId);
-					if (modelIndex === -1) {
-						throw new Error("Original model not found during save.");
-					}
-					generalSettings.models[modelIndex] = updatedModel;
-				} else { 
-					generalSettings.models.push(updatedModel);
+		try {
+			if (isEditing) {
+				const modelIndex = generalSettings.models.findIndex(m => m.id === originalId);
+				if (modelIndex === -1) {
+					throw new Error("Original model not found during save.");
 				}
-				await saveSettings();
-				initializeModelList(); 
-				hideModal(modal);
-			} catch (error) {
-				console.error('Failed to save model settings:', error);
-				alert(getMessage('failedToSaveModel')); 
+				generalSettings.models[modelIndex] = updatedModel;
+			} else {
+				generalSettings.models.push(updatedModel);
 			}
-		});
-
-	} catch (error) {
-		console.error("Failed to fetch presets for model modal:", error);
-		// Show error in the loading indicator area
-		if (popularModelsLoadingIndicator) {
-			popularModelsLoadingIndicator.textContent = getMessage('failedToLoadModels');
-			popularModelsLoadingIndicator.style.display = 'block'; // Ensure it's visible
+			await saveSettings();
+			initializeModelList();
+			hideModal(modal);
+		} catch (error) {
+			console.error('Failed to save model settings:', error);
+			alert(getMessage('failedToSaveModel'));
 		}
-		// Disable provider select if presets failed to load?
-		if (currentProviderSelect) currentProviderSelect.disabled = true;
-	} finally {
-		// Ensure loading indicator is removed if presets loaded successfully
-		// (Error case handled above)
-		// Note: This might be redundant if hidden in updateModelOptions, but safe
-		 if (presetProviders && popularModelsLoadingIndicator && popularModelsLoadingIndicator.parentNode) {
-		 	popularModelsLoadingIndicator.remove();
-		 }
-	}
+	});
 }
 
 // Delete using modelId
@@ -1097,7 +1081,7 @@ function debounce<T extends (...args: any[]) => any>(
 	let timeoutId: ReturnType<typeof setTimeout> | null = null;
 	return (...args: Parameters<T>) => {
 		if (timeoutId) {
-			clearTimeout(timeoutId);
+		clearTimeout(timeoutId);
 		}
 		timeoutId = setTimeout(() => func(...args), delay);
 	};
