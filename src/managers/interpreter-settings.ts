@@ -1,4 +1,4 @@
-import { initializeToggles, updateToggleState, initializeSettingToggle } from '../utils/ui-utils';
+import { initializeToggles, initializeSettingToggle } from '../utils/ui-utils';
 import { ModelConfig, Provider } from '../types/types';
 import { generalSettings, loadSettings, saveSettings, getLocalStorage, setLocalStorage } from '../utils/storage-utils';
 import { initializeIcons } from '../icons/icons';
@@ -186,7 +186,7 @@ export async function initializeInterpreterSettings(): Promise<void> {
 	debugLog('Interpreter', 'Loaded general settings:', generalSettings);
 
 	cachedPresetProviders = await getPresetProviders();
-	debugLog('Interpreter', 'Loaded/Fetched preset providers:', cachedPresetProviders);
+	debugLog('Interpreter', 'Fetched preset providers:', cachedPresetProviders);
 
 	initializeProviderList();
 	initializeModelList();
