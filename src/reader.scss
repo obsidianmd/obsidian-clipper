@@ -364,6 +364,7 @@
 	}
 	// Maybe confusing but conflicts with user highlights 
 	mark {
+		color: var(--obsidian-reader-text-primary);
 		background-color: transparent;
 	}
 	ul > li {
@@ -449,7 +450,7 @@
 	}
 	code[class*="language-"],
 	pre[class*="language-"] {
-		color: var(--obsidian-reader-text-normal);
+		color: var(--obsidian-reader-text-primary);
 		word-wrap: break-word;
 		white-space: pre-wrap;
 		word-break: normal;
