@@ -1,6 +1,6 @@
 import { initializeToggles, updateToggleState, initializeSettingToggle } from '../utils/ui-utils';
 import { ModelConfig, Provider } from '../types/types';
-import { generalSettings, loadSettings, saveSettings } from '../utils/storage-utils';
+import { generalSettings, loadSettings, saveSettings, getLocalStorage, setLocalStorage } from '../utils/storage-utils';
 import { initializeIcons } from '../icons/icons';
 import { showModal, hideModal } from '../utils/modal-utils';
 import { getMessage, translatePage } from '../utils/i18n';
@@ -20,14 +20,23 @@ export interface PresetProvider {
 	}>;
 }
 
+interface ProviderPresets {
+	version: string;
+	[key: string]: PresetProvider | string;
+}
+
 const PROVIDERS_URL = 'https://raw.githubusercontent.com/obsidianmd/obsidian-clipper/refs/heads/main/providers.json';
 const PRESET_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 const PRESET_RETRY_DELAY = 60 * 1000; // 1 minute
+const LOCAL_STORAGE_KEY = 'provider_presets';
 
 let cachedPresets: Record<string, PresetProvider> | null = null;
 let lastFetchTime = 0;
 let lastErrorTime = 0;
 let isFetching = false;
+
+// Add module-level variable to store presets
+let cachedPresetProviders: Record<string, PresetProvider> | null = null;
 
 async function fetchPresetProviders(): Promise<Record<string, PresetProvider>> {
 	debugLog('Providers', 'Fetching preset providers from URL:', PROVIDERS_URL);
@@ -36,48 +45,120 @@ async function fetchPresetProviders(): Promise<Record<string, PresetProvider>> {
 		if (!response.ok) {
 			throw new Error(`HTTP error! status: ${response.status}`);
 		}
-		const data = await response.json();
-		// Add the preset ID to each provider object
+		const data = await response.json() as ProviderPresets;
+		
+		// Store the fetched data in local storage
+		await setLocalStorage(LOCAL_STORAGE_KEY, data);
+		debugLog('Providers', 'Stored providers in local storage:', data);
+
+		// Extract providers (excluding version field)
+		const providers: Record<string, PresetProvider> = {};
 		for (const key in data) {
-			if (Object.prototype.hasOwnProperty.call(data, key)) {
-				data[key].id = key;
+			if (key !== 'version' && Object.prototype.hasOwnProperty.call(data, key)) {
+				const provider = data[key] as PresetProvider;
+				provider.id = key;
+				providers[key] = provider;
 			}
 		}
-		debugLog('Providers', 'Successfully fetched presets:', data);
-		return data as Record<string, PresetProvider>;
+
+		debugLog('Providers', 'Successfully fetched presets:', providers);
+		return providers;
 	} catch (error) {
 		console.error('Failed to fetch preset providers:', error);
-		throw error; // Re-throw to be handled by getPresetProviders
+		throw error;
+	}
+}
+
+async function getLocalPresets(): Promise<Record<string, PresetProvider> | null> {
+	try {
+		const data = await getLocalStorage(LOCAL_STORAGE_KEY) as ProviderPresets | null;
+		if (!data) return null;
+
+		// Extract providers (excluding version field)
+		const providers: Record<string, PresetProvider> = {};
+		for (const key in data) {
+			if (key !== 'version' && Object.prototype.hasOwnProperty.call(data, key)) {
+				const provider = data[key] as PresetProvider;
+				provider.id = key;
+				providers[key] = provider;
+			}
+		}
+		return providers;
+	} catch (error) {
+		console.error('Failed to get providers from local storage:', error);
+		return null;
+	}
+}
+
+async function shouldUpdatePresets(): Promise<boolean> {
+	try {
+		// Get local version
+		const localData = await getLocalStorage(LOCAL_STORAGE_KEY) as ProviderPresets | null;
+		if (!localData) return true;
+
+		const localVersion = localData.version;
+		
+		// Get remote version
+		const response = await fetch(PROVIDERS_URL);
+		if (!response.ok) return false;
+		
+		const remoteData = await response.json() as ProviderPresets;
+		const remoteVersion = remoteData.version;
+
+		return localVersion !== remoteVersion;
+	} catch (error) {
+		console.error('Failed to check provider versions:', error);
+		return false;
 	}
 }
 
 export async function getPresetProviders(): Promise<Record<string, PresetProvider>> {
 	const now = Date.now();
 
+	// First, try to return cached in-memory presets if they're fresh
 	if (cachedPresets && (now - lastFetchTime < PRESET_CACHE_DURATION)) {
-		debugLog('Providers', 'Returning cached presets');
+		debugLog('Providers', 'Returning in-memory cached presets');
 		return cachedPresets;
 	}
 
-	// Prevent concurrent fetches and retry immediately after an error only after delay
+	// Prevent concurrent fetches and respect retry delay
 	if (isFetching || (lastErrorTime > 0 && now - lastErrorTime < PRESET_RETRY_DELAY)) {
-		debugLog('Providers', 'Fetching is already in progress or recently failed, returning cached (possibly stale) presets or empty object');
-		return cachedPresets || {}; // Return potentially stale cache or empty if first fetch failed
+		debugLog('Providers', 'Fetching is already in progress or recently failed');
+		// Try to return local storage presets as fallback
+		const localPresets = await getLocalPresets();
+		return localPresets || cachedPresets || {};
 	}
 
 	isFetching = true;
 	try {
+		// Check if we need to update from remote
+		const needsUpdate = await shouldUpdatePresets();
+		
+		if (!needsUpdate) {
+			// Use local storage version if it exists and is up to date
+			const localPresets = await getLocalPresets();
+			if (localPresets) {
+				cachedPresets = localPresets;
+				lastFetchTime = now;
+				debugLog('Providers', 'Using up-to-date local storage presets');
+				return localPresets;
+			}
+		}
+
+		// Fetch fresh data if needed
 		const presets = await fetchPresetProviders();
 		cachedPresets = presets;
-		lastFetchTime = Date.now();
-		lastErrorTime = 0; // Reset error time on success
-		debugLog('Providers', 'Presets cached successfully');
+		lastFetchTime = now;
+		lastErrorTime = 0;
+		debugLog('Providers', 'Fetched and cached new presets');
 		return cachedPresets;
 	} catch (error) {
 		console.error('Failed to load or cache preset providers:', error);
-		lastErrorTime = Date.now();
-		// Return the potentially stale cache if available, otherwise an empty object
-		return cachedPresets || {}; 
+		lastErrorTime = now;
+		
+		// Try to return local storage presets as fallback
+		const localPresets = await getLocalPresets();
+		return localPresets || cachedPresets || {};
 	} finally {
 		isFetching = false;
 	}
@@ -97,7 +178,7 @@ export function updatePromptContextVisibility(): void {
 	}
 }
 
-export function initializeInterpreterSettings(): void {
+export async function initializeInterpreterSettings(): Promise<void> {
 	const interpreterSettingsForm = document.getElementById('interpreter-settings-form');
 	if (interpreterSettingsForm) {
 		// Note: input event might not be ideal for the whole form if it triggers too often.
@@ -110,7 +191,13 @@ export function initializeInterpreterSettings(): void {
 		debugLog('Interpreter', 'Loaded settings:', generalSettings);
 
 		// Fetch presets before initializing lists that depend on them
-		await getPresetProviders(); 
+		try {
+			cachedPresetProviders = await getPresetProviders();
+			debugLog('Interpreter', 'Presets cached during initialization:', cachedPresetProviders);
+		} catch (error) {
+			console.error('Failed to fetch preset providers during initialization:', error);
+			cachedPresetProviders = null;
+		}
 
 		// Initialize providers first since models depend on them
 		await initializeProviderList();
@@ -336,21 +423,21 @@ async function showProviderModal(provider: Provider, index?: number): Promise<vo
 	const apiKeyDescription = apiKeyContainer?.querySelector('.setting-item-description') as HTMLElement;
 	const presetContainer = presetSelect?.closest('.setting-item') as HTMLElement;
 
-	// Define currentPresetSelect here so it's accessible later
-	// let currentPresetSelect: HTMLSelectElement | null = presetSelect; 
-
-	if (!form || !nameInput || !baseUrlInput || !apiKeyInput || !presetSelect /* Check initial element existence */ || !nameContainer || !baseUrlContainer || !apiKeyContainer || !apiKeyDescription || !presetContainer) {
+	if (!form || !nameInput || !baseUrlInput || !apiKeyInput || !presetSelect || !nameContainer || !baseUrlContainer || !apiKeyContainer || !apiKeyDescription || !presetContainer) {
 		console.error('Required form elements not found in provider modal for async setup');
 		hideModal(modal); 
 		return;
 	}
 
-	// Add loading indicator placeholder
-	let loadingIndicator: HTMLElement | null = document.createElement('div');
-	loadingIndicator.className = 'loading-indicator mh';
-	loadingIndicator.textContent = getMessage('loadingPresets'); 
-	presetContainer.appendChild(loadingIndicator);
-	presetSelect.style.display = 'none'; // Hide select while loading
+	// Add loading indicator placeholder if we don't have cached providers
+	let loadingIndicator: HTMLElement | null = null;
+	if (!cachedPresetProviders) {
+		loadingIndicator = document.createElement('div');
+		loadingIndicator.className = 'loading-indicator mh';
+		loadingIndicator.textContent = getMessage('loadingPresets'); 
+		presetContainer.appendChild(loadingIndicator);
+		presetSelect.style.display = 'none'; // Hide select while loading
+	}
 
 	// Setup confirm/cancel buttons (listeners will be attached later)
 	const confirmBtn = modal.querySelector('.provider-confirm-btn');
@@ -367,14 +454,19 @@ async function showProviderModal(provider: Provider, index?: number): Promise<vo
 	cancelBtn.parentNode?.replaceChild(newCancelBtn, cancelBtn);
 	newCancelBtn.addEventListener('click', () => hideModal(modal)); // Cancel is simple
 
-	// Fetch presets asynchronously
-	let presetProviders: Record<string, PresetProvider> = {};
+	// Use cached providers or fetch if not available
 	try {
-		presetProviders = await getPresetProviders();
-		debugLog('Providers', 'Presets fetched/cached for modal', presetProviders);
+		let presetProviders = cachedPresetProviders;
+		if (!presetProviders) {
+			presetProviders = await getPresetProviders();
+			cachedPresetProviders = presetProviders; // Cache for future use
+		}
+		debugLog('Providers', 'Using providers for modal:', presetProviders);
 
-		presetSelect.style.display = ''; // Show select again
-		if(loadingIndicator) loadingIndicator.remove(); // Remove loading indicator
+		if (loadingIndicator) {
+			presetSelect.style.display = ''; // Show select again
+			loadingIndicator.remove(); // Remove loading indicator
+		}
 
 		const oldPresetSelect = presetSelect;
 		// Create the new select, GUARANTEED non-null if we get here
