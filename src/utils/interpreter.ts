@@ -7,7 +7,6 @@ import { adjustNoteNameHeight } from './ui-utils';
 import { debugLog } from './debug';
 import { getMessage } from './i18n';
 import { updateTokenCount } from './token-counter';
-import { PRESET_PROVIDERS, PresetProvider } from '../managers/interpreter-settings';
 
 const RATE_LIMIT_RESET_TIME = 60000; // 1 minute in milliseconds
 let lastRequestTime = 0;
@@ -24,13 +23,8 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 		throw new Error(`Provider not found for model ${model.name}`);
 	}
 
-	// Find matching preset provider to check if API key is required
-	const presetProvider = Object.values(PRESET_PROVIDERS).find(
-		(preset: PresetProvider) => preset.name === provider.name
-	);
-
 	// Only check for API key if the provider requires it
-	if (presetProvider?.apiKeyRequired && !provider.apiKey) {
+	if (provider.apiKeyRequired && !provider.apiKey) {
 		throw new Error(`API key is not set for provider ${provider.name}`);
 	}
 
@@ -540,13 +534,9 @@ export async function handleInterpreterUI(
 			throw new Error(`Provider not found for model ${modelConfig.name}`);
 		}
 
-		// Find matching preset provider to check if API key is required
-		const presetProvider = Object.values(PRESET_PROVIDERS).find(
-			(preset: PresetProvider) => preset.name === provider.name
-		);
-
-		if (presetProvider?.apiKeyRequired && !provider.apiKey) {
-			throw new Error(`No API key is set for ${provider.name}. Please set an API key in the extension settings.`);
+		// Only check for API key if the provider requires it
+		if (provider.apiKeyRequired && !provider.apiKey) {
+			throw new Error(`API key is not set for provider ${provider.name}`);
 		}
 
 		const promptVariables = collectPromptVariables(template);

@@ -1,6 +1,6 @@
 import { initializeToggles, updateToggleState, initializeSettingToggle } from '../utils/ui-utils';
 import { ModelConfig, Provider } from '../types/types';
-import { generalSettings, loadSettings, saveSettings } from '../utils/storage-utils';
+import { generalSettings, loadSettings, saveSettings, getLocalStorage, setLocalStorage } from '../utils/storage-utils';
 import { initializeIcons } from '../icons/icons';
 import { showModal, hideModal } from '../utils/modal-utils';
 import { getMessage, translatePage } from '../utils/i18n';
@@ -20,113 +20,147 @@ export interface PresetProvider {
 	}>;
 }
 
-export const PRESET_PROVIDERS: Record<string, PresetProvider> = {
-	anthropic: {
-		id: 'anthropic',
-		name: 'Anthropic',
-		baseUrl: 'https://api.anthropic.com/v1/messages',
-		apiKeyUrl: 'https://console.anthropic.com/settings/keys',
-		apiKeyRequired: true,
-		modelsList: 'https://docs.anthropic.com/en/docs/about-claude/models',
-		popularModels: [
-			{ id: 'claude-3-5-haiku-latest', name: 'Claude 3.5 Haiku', recommended: true },
-			{ id: 'claude-3-5-sonnet-latest', name: 'Claude 3.5 Sonnet' }
-		]
-	},
-	azure: {
-		id: 'azure-openai',
-		name: 'Azure OpenAI',
-		baseUrl: 'https://{resource-name}.openai.azure.com/openai/deployments/{deployment-id}/chat/completions?api-version=2024-10-21',
-		apiKeyUrl: 'https://oai.azure.com/portal/',
-		apiKeyRequired: true,
-		modelsList: 'https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models',
-		popularModels: [
-			{ id: 'gpt-4o-mini', name: 'GPT-4o Mini', recommended: true },
-			{ id: 'gpt-4o', name: 'GPT-4o' },
-		]
-	},
-	deepseek: {
-		id: 'deepseek',
-		name: 'DeepSeek',
-		baseUrl: 'https://api.deepseek.com/v1/chat/completions',
-		apiKeyUrl: 'https://platform.deepseek.com/api_keys',
-		apiKeyRequired: true,
-		modelsList: 'https://api-docs.deepseek.com/quick_start/pricing',
-		popularModels: [
-			{ id: 'deepseek-chat', name: 'DeepSeek Chat' }
-		]
-	},
-	google: {
-		id: 'google',
-		name: 'Google Gemini',
-		baseUrl: 'https://generativelanguage.googleapis.com/v1beta/chat/completions',
-		apiKeyUrl: 'https://aistudio.google.com/apikey',
-		apiKeyRequired: true,
-		modelsList: 'https://ai.google.dev/gemini-api/docs/models/gemini',
-		popularModels: [
-			{ id: 'gemini-2.0-flash-exp', name: 'Gemini 2.0 Flash', recommended: true },
-		]
-	},
-	huggingface: {
-		id: 'huggingface',
-		name: 'Hugging Face',
-		baseUrl: 'https://api-inference.huggingface.co/models/{model-id}/chat/completions',
-		apiKeyUrl: 'https://huggingface.co/settings/tokens',
-		apiKeyRequired: true,
-		modelsList: 'https://huggingface.co/models?pipeline_tag=text-generation&sort=trending'
-	},
-	ollama: {
-		id: 'ollama',
-		name: 'Ollama',
-		baseUrl: 'http://127.0.0.1:11434/api/chat',
-		apiKeyRequired: false,
-		modelsList: 'https://ollama.com/search',
-		popularModels: [
-			{ id: 'llama3.2:1b', name: 'Llama 3.2 1B' },
-			{ id: 'llama3.2', name: 'Llama 3.2 3B' },
-			{ id: 'llama3.3', name: 'Llama 3.3 70B' }
-		]
-	},
-	openai: {
-		id: 'openai',
-		name: 'OpenAI',
-		baseUrl: 'https://api.openai.com/v1/chat/completions',
-		apiKeyUrl: 'https://platform.openai.com/api-keys',
-		apiKeyRequired: true,
-		modelsList: 'https://platform.openai.com/docs/models',
-		popularModels: [
-			{ id: 'gpt-4o-mini', name: 'GPT-4o Mini', recommended: true },
-			{ id: 'gpt-4o', name: 'GPT-4o' },
-		]
-	},
-	openrouter: {
-		id: 'openrouter',
-		name: 'OpenRouter',
-		baseUrl: 'https://openrouter.ai/api/v1/chat/completions',
-		apiKeyUrl: 'https://openrouter.ai/settings/keys',
-		apiKeyRequired: true,
-		modelsList: 'https://openrouter.ai/models',
-		popularModels: [
-			{ id: 'meta-llama/llama-3.2-1b-instruct', name: 'Llama 3.2 1B Instruct' },
-			{ id: 'meta-llama/llama-3.2-3b-instruct', name: 'Llama 3.2 3B Instruct' }
-		]
-	},
-	perplexity: {
-		id: 'perplexity',
-		name: 'Perplexity',
-		baseUrl: 'https://api.perplexity.ai/chat/completions',
-		apiKeyUrl: 'https://www.perplexity.ai/settings/api',
-		apiKeyRequired: true,
-		modelsList: 'https://docs.perplexity.ai/guides/model-cards',
-		popularModels: [
-			{ id: 'sonar', name: 'Sonar' },
-			{ id: 'sonar-pro', name: 'Sonar Pro' },
-			{ id: 'sonar-reasoning', name: 'Sonar Reasoning' },
-			{ id: 'sonar-reasoning-pro', name: 'Sonar Reasoning Pro' },
-			{ id: 'sonar-deep-research', name: 'Sonar Deep Research' }
-		]
+interface ProviderPresets {
+	version: string;
+	[key: string]: PresetProvider | string;
+}
+
+const PROVIDERS_URL = 'https://raw.githubusercontent.com/obsidianmd/obsidian-clipper/refs/heads/main/providers.json';
+const PRESET_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const PRESET_RETRY_DELAY = 60 * 1000; // 1 minute
+const LOCAL_STORAGE_KEY = 'provider_presets';
+
+let cachedPresets: Record<string, PresetProvider> | null = null;
+let lastFetchTime = 0;
+let lastErrorTime = 0;
+let isFetching = false;
+
+let cachedPresetProviders: Record<string, PresetProvider> | null = null;
+
+async function fetchPresetProviders(): Promise<Record<string, PresetProvider>> {
+	debugLog('Providers', 'Fetching preset providers from URL:', PROVIDERS_URL);
+	try {
+		const response = await fetch(PROVIDERS_URL);
+		if (!response.ok) {
+			throw new Error(`HTTP error! status: ${response.status}`);
+		}
+		const data = await response.json() as ProviderPresets;
+		
+		await setLocalStorage(LOCAL_STORAGE_KEY, data);
+		debugLog('Providers', 'Stored providers in local storage:', data);
+
+		const providers: Record<string, PresetProvider> = {};
+		for (const key in data) {
+			if (key !== 'version' && Object.prototype.hasOwnProperty.call(data, key)) {
+				const provider = data[key] as PresetProvider;
+				provider.id = key;
+				providers[key] = provider;
+			}
+		}
+
+		debugLog('Providers', 'Successfully fetched presets:', providers);
+		return providers;
+	} catch (error) {
+		console.error('Failed to fetch preset providers:', error);
+		throw error;
 	}
-};
+}
+
+async function getLocalPresets(): Promise<Record<string, PresetProvider> | null> {
+	try {
+		const data = await getLocalStorage(LOCAL_STORAGE_KEY) as ProviderPresets | null;
+		if (!data) return null;
+
+		const providers: Record<string, PresetProvider> = {};
+		for (const key in data) {
+			if (key !== 'version' && Object.prototype.hasOwnProperty.call(data, key)) {
+				const provider = data[key] as PresetProvider;
+				provider.id = key;
+				providers[key] = provider;
+			}
+		}
+		return providers;
+	} catch (error) {
+		console.error('Failed to get providers from local storage:', error);
+		return null;
+	}
+}
+
+async function shouldUpdatePresets(): Promise<boolean> {
+	try {
+		const localData = await getLocalStorage(LOCAL_STORAGE_KEY) as ProviderPresets | null;
+		
+		const response = await fetch(PROVIDERS_URL);
+		if (!response.ok) return false;
+		
+		const remoteData = await response.json() as ProviderPresets;
+		const remoteVersion = remoteData.version;
+
+		if (!localData) return true;
+		const localVersion = localData.version;
+
+		return localVersion !== remoteVersion; 
+	} catch (error) {
+		console.error('Failed to check provider versions:', error);
+		return false;
+	}
+}
+
+export async function getPresetProviders(): Promise<Record<string, PresetProvider>> {
+	const now = Date.now();
+
+	if (cachedPresets && (now - lastFetchTime < PRESET_CACHE_DURATION)) {
+		debugLog('Providers', 'Returning in-memory cached presets');
+		return cachedPresets;
+	}
+
+	if (isFetching || (lastErrorTime > 0 && now - lastErrorTime < PRESET_RETRY_DELAY)) {
+		debugLog('Providers', 'Fetching is already in progress or recently failed');
+		const localPresets = await getLocalPresets();
+		if (localPresets) {
+			cachedPresets = localPresets;
+		}
+		debugLog('Providers', 'Returning fallback presets (local or previous cache)');
+		return localPresets || cachedPresets || {};
+	}
+
+	isFetching = true;
+	try {
+		const needsUpdate = await shouldUpdatePresets();
+		
+		if (!needsUpdate) {
+			const localPresets = await getLocalPresets();
+			if (localPresets) {
+				cachedPresets = localPresets;
+				lastFetchTime = now;
+				lastErrorTime = 0;
+				debugLog('Providers', 'Using up-to-date local storage presets');
+				return localPresets;
+			}
+			debugLog('Providers', 'Local presets missing despite version match or failed check, fetching fresh.');
+		}
+
+		debugLog('Providers', 'Fetching fresh presets from remote.');
+		const presets = await fetchPresetProviders();
+		cachedPresets = presets;
+		lastFetchTime = now;
+		lastErrorTime = 0;
+		debugLog('Providers', 'Fetched and cached new presets');
+		return cachedPresets;
+	} catch (error) {
+		console.error('Failed to load or cache preset providers:', error);
+		lastErrorTime = now;
+		
+		const localPresets = await getLocalPresets();
+		if (localPresets) {
+			cachedPresets = localPresets;
+		}
+		debugLog('Providers', 'Fetch failed, returning fallback presets (local or previous cache)');
+		return localPresets || cachedPresets || {};
+	} finally {
+		isFetching = false;
+	}
+}
 
 export function updatePromptContextVisibility(): void {
 	const interpreterToggle = document.getElementById('interpreter-toggle') as HTMLInputElement;
@@ -142,34 +176,32 @@ export function updatePromptContextVisibility(): void {
 	}
 }
 
-export function initializeInterpreterSettings(): void {
+export async function initializeInterpreterSettings(): Promise<void> {
 	const interpreterSettingsForm = document.getElementById('interpreter-settings-form');
 	if (interpreterSettingsForm) {
 		interpreterSettingsForm.addEventListener('input', debounce(saveInterpreterSettingsFromForm, 500));
 	}
 
-	// First load settings and initialize everything
-	loadSettings().then(() => {
-		debugLog('Interpreter', 'Loaded settings:', generalSettings);
+	await loadSettings();
+	debugLog('Interpreter', 'Loaded general settings:', generalSettings);
 
-		// Initialize providers first since models depend on them
-		initializeProviderList();
-		initializeModelList();
+	cachedPresetProviders = await getPresetProviders();
+	debugLog('Interpreter', 'Loaded/Fetched preset providers:', cachedPresetProviders);
 
-		// Initialize toggles and other UI elements
-		initializeInterpreterToggles();
+	initializeProviderList();
+	initializeModelList();
 
-		const defaultPromptContextInput = document.getElementById('default-prompt-context') as HTMLTextAreaElement;
-		if (defaultPromptContextInput) {
-			defaultPromptContextInput.value = generalSettings.defaultPromptContext;
-		}
+	initializeInterpreterToggles();
 
-		updatePromptContextVisibility();
-		initializeToggles();
-		initializeAutoSave();
-	});
+	const defaultPromptContextInput = document.getElementById('default-prompt-context') as HTMLTextAreaElement;
+	if (defaultPromptContextInput) {
+		defaultPromptContextInput.value = generalSettings.defaultPromptContext;
+	}
 
-	// Set up button event listeners
+	updatePromptContextVisibility();
+	initializeToggles();
+	initializeAutoSave();
+	
 	const addModelBtn = document.getElementById('add-model-btn');
 	if (addModelBtn) {
 		addModelBtn.addEventListener('click', (event) => addModelToList(event));
@@ -200,14 +232,14 @@ function initializeProviderList() {
 		return;
 	}
 
-	// Sort providers alphabetically by name
 	const sortedProviders = [...generalSettings.providers].sort((a, b) => 
 		a.name.toLowerCase().localeCompare(b.name.toLowerCase())
 	);
 
 	providerList.innerHTML = '';
 	sortedProviders.forEach((provider, index) => {
-		const providerItem = createProviderListItem(provider, index);
+		const originalIndex = generalSettings.providers.findIndex(p => p.id === provider.id);
+		const providerItem = createProviderListItem(provider, originalIndex);
 		providerList.appendChild(providerItem);
 	});
 
@@ -221,8 +253,7 @@ function createProviderListItem(provider: Provider, index: number): HTMLElement 
 	providerItem.dataset.index = index.toString();
 	providerItem.dataset.providerId = provider.id;
 
-	// Find matching preset provider to check if API key is required
-	const presetProvider = Object.values(PRESET_PROVIDERS).find(
+	const presetProvider = Object.values(cachedPresetProviders || {}).find(
 		preset => preset.name === provider.name
 	);
 
@@ -265,21 +296,6 @@ function createProviderListItem(provider: Provider, index: number): HTMLElement 
 		});
 	}
 
-	const duplicateBtn = providerItem.querySelector('.duplicate-provider-btn');
-	if (duplicateBtn) {
-		duplicateBtn.addEventListener('click', (e) => {
-			e.preventDefault();
-			e.stopPropagation();
-			const providerId = duplicateBtn.getAttribute('data-provider-id');
-			if (providerId) {
-				const providerIndex = generalSettings.providers.findIndex(p => p.id === providerId);
-				if (providerIndex !== -1) {
-					duplicateProvider(providerIndex);
-				}
-			}
-		});
-	}
-
 	const deleteBtn = providerItem.querySelector('.delete-provider-btn');
 	if (deleteBtn) {
 		deleteBtn.addEventListener('click', (e) => {
@@ -298,7 +314,6 @@ function createProviderListItem(provider: Provider, index: number): HTMLElement 
 	return providerItem;
 }
 
-// Add provider management functions
 function addProviderToList(event: Event) {
 	event.preventDefault();
 	debugLog('Providers', 'Adding new provider');
@@ -329,7 +344,6 @@ function duplicateProvider(index: number) {
 	saveSettings();
 	initializeProviderList();
 
-	// Show edit modal for the new provider
 	const newIndex = generalSettings.providers.length - 1;
 	showProviderModal(duplicatedProvider, newIndex);
 }
@@ -337,7 +351,6 @@ function duplicateProvider(index: number) {
 function deleteProvider(index: number): void {
 	const providerToDelete = generalSettings.providers[index];
 	
-	// Check if any models are using this provider
 	const modelsUsingProvider = generalSettings.models.filter(m => m.providerId === providerToDelete.id);
 	if (modelsUsingProvider.length > 0) {
 		alert(getMessage('cannotDeleteProvider', [providerToDelete.name, modelsUsingProvider.length.toString()]));
@@ -355,6 +368,10 @@ async function showProviderModal(provider: Provider, index?: number) {
 	debugLog('Providers', 'Showing provider modal:', { provider, index });
 	const modal = document.getElementById('provider-modal');
 	if (!modal) return;
+
+	if (!cachedPresetProviders) {
+		cachedPresetProviders = await getPresetProviders();
+	}
 
 	await translatePage();
 	initializeIcons(modal);
@@ -374,69 +391,83 @@ async function showProviderModal(provider: Provider, index?: number) {
 		const apiKeyContainer = apiKeyInput.closest('.setting-item') as HTMLElement;
 		const apiKeyDescription = form.querySelector('.setting-item:has([name="apiKey"]) .setting-item-description') as HTMLElement;
 
-		if (!apiKeyContainer || !apiKeyDescription) {
-			console.error('API key containers not found');
+		if (!apiKeyContainer || !apiKeyDescription || !nameContainer || !presetSelect || !nameInput || !baseUrlInput || !apiKeyInput) {
+			console.error('Required provider modal elements not found');
 			return;
 		}
 
-		if (presetSelect) {
-			presetSelect.innerHTML = `<option value="">${getMessage('custom')}</option>`;
-			Object.entries(PRESET_PROVIDERS).forEach(([id, preset]) => {
-				presetSelect.innerHTML += `<option value="${id}">${preset.name}</option>`;
-			});
+		presetSelect.innerHTML = `<option value="">${getMessage('custom')}</option>`;
+		Object.entries(cachedPresetProviders || {}).forEach(([id, preset]) => {
+			presetSelect.innerHTML += `<option value="${id}">${preset.name}</option>`;
+		});
 
-			// When editing, try to find matching preset
-			if (index !== undefined) {
-				const matchingPreset = Object.entries(PRESET_PROVIDERS).find(([_, preset]) => 
-					preset.name === provider.name
-				);
-				presetSelect.value = matchingPreset ? matchingPreset[0] : '';
-			} else {
-				// Set Anthropic as default for new providers
-				presetSelect.value = 'anthropic';
+		nameInput.value = '';
+		baseUrlInput.value = '';
+		apiKeyInput.value = '';
+		presetSelect.value = '';
+
+		let currentPresetId: string | null = null;
+		if (index !== undefined) {
+			nameInput.value = provider.name;
+			baseUrlInput.value = provider.baseUrl;
+			apiKeyInput.value = provider.apiKey;
+
+			const matchingPreset = Object.entries(cachedPresetProviders || {}).find(([_, p]) => p.baseUrl === provider.baseUrl);
+			currentPresetId = matchingPreset ? matchingPreset[0] : null;
+			
+			if (!currentPresetId) {
+				const nameMatchingPreset = Object.entries(cachedPresetProviders || {}).find(([_, p]) => p.name === provider.name);
+				currentPresetId = nameMatchingPreset ? nameMatchingPreset[0] : null;
 			}
+			
+			presetSelect.value = currentPresetId || '';
+		} else {
+			const anthropicPreset = Object.entries(cachedPresetProviders || {}).find(([_, p]) => p.name === 'Anthropic');
+			presetSelect.value = anthropicPreset ? anthropicPreset[0] : '';
+		}
 
-			// Hide/show name field and update API key visibility based on preset selection
-			const updateVisibility = () => {
-				nameContainer.style.display = presetSelect.value ? 'none' : 'block';
-				if (presetSelect.value) {
-					const selectedPreset = PRESET_PROVIDERS[presetSelect.value as keyof typeof PRESET_PROVIDERS];
-					nameInput.value = selectedPreset.name;
-					baseUrlInput.value = selectedPreset.baseUrl;
+		const updateVisibility = () => {
+			const selectedPresetId = presetSelect.value;
+			const selectedPreset = selectedPresetId ? (cachedPresetProviders || {})[selectedPresetId] : null;
 
-					// Show/hide API key field based on whether it's required
-					apiKeyContainer.style.display = selectedPreset.apiKeyRequired === false ? 'none' : 'block';
+			nameContainer.style.display = selectedPreset ? 'none' : 'block';
+			
+			if (selectedPreset) {
+				nameInput.value = selectedPreset.name;
+				baseUrlInput.value = selectedPreset.baseUrl;
+				apiKeyInput.value = (index !== undefined && selectedPresetId === currentPresetId) ? provider.apiKey : '';
 
-					// Update API key link if available
-					if (selectedPreset.apiKeyRequired !== false && selectedPreset.apiKeyUrl) {
-						const message = getMessage('getApiKeyHere').replace('$1', selectedPreset.name);
-						apiKeyDescription.innerHTML = `${getMessage('providerApiKeyDescription')} <a href="${selectedPreset.apiKeyUrl}" target="_blank">${message}</a>`;
-					} else {
-						apiKeyDescription.innerHTML = getMessage('providerApiKeyDescription');
-					}
+				apiKeyContainer.style.display = selectedPreset.apiKeyRequired === false ? 'none' : 'block';
+
+				if (selectedPreset.apiKeyRequired !== false && selectedPreset.apiKeyUrl) {
+					const message = getMessage('getApiKeyHere').replace('$1', selectedPreset.name);
+					apiKeyDescription.innerHTML = `${getMessage('providerApiKeyDescription')} <a href="${selectedPreset.apiKeyUrl}" target="_blank">${message}</a>`;
 				} else {
-					// For custom providers, show API key field by default
-					apiKeyContainer.style.display = 'block';
 					apiKeyDescription.innerHTML = getMessage('providerApiKeyDescription');
 				}
-			};
-
-			presetSelect.addEventListener('change', updateVisibility);
-			updateVisibility();
-			
-			// Only set these values if editing an existing provider
-			if (index !== undefined) {
-				nameInput.value = provider.name;
-				baseUrlInput.value = provider.baseUrl;
-				apiKeyInput.value = provider.apiKey;
+			} else {
+				if (index === undefined || (index !== undefined && currentPresetId)) {
+					nameInput.value = '';
+					baseUrlInput.value = '';
+					apiKeyInput.value = '';
+				} else if (index !== undefined && !currentPresetId) {
+					nameInput.value = provider.name;
+					baseUrlInput.value = provider.baseUrl;
+					apiKeyInput.value = provider.apiKey;
+				}
+				
+				apiKeyContainer.style.display = 'block';
+				apiKeyDescription.innerHTML = getMessage('providerApiKeyDescription');
 			}
-		}
+		};
+
+		presetSelect.addEventListener('change', updateVisibility);
+		updateVisibility();
 	}
 
 	const confirmBtn = modal.querySelector('.provider-confirm-btn');
 	const cancelBtn = modal.querySelector('.provider-cancel-btn');
 
-	// Remove existing event listeners
 	const newConfirmBtn = confirmBtn?.cloneNode(true);
 	const newCancelBtn = cancelBtn?.cloneNode(true);
 	if (confirmBtn && newConfirmBtn) {
@@ -446,14 +477,19 @@ async function showProviderModal(provider: Provider, index?: number) {
 		cancelBtn.parentNode?.replaceChild(newCancelBtn, cancelBtn);
 	}
 
-	// Add new event listeners
-	newConfirmBtn?.addEventListener('click', () => {
+	newConfirmBtn?.addEventListener('click', async () => {
 		const formData = new FormData(form);
+		const name = formData.get('name') as string;
+		const baseUrl = formData.get('baseUrl') as string;
+		const apiKey = formData.get('apiKey') as string;
+		const presetId = (form.querySelector('[name="preset"]') as HTMLSelectElement).value;
+		
 		const updatedProvider: Provider = {
 			id: provider.id,
-			name: formData.get('name') as string,
-			baseUrl: formData.get('baseUrl') as string,
-			apiKey: formData.get('apiKey') as string
+			name: name,
+			baseUrl: baseUrl,
+			apiKey: apiKey,
+			apiKeyRequired: true
 		};
 
 		debugLog('Providers', 'Saving provider:', updatedProvider);
@@ -461,6 +497,12 @@ async function showProviderModal(provider: Provider, index?: number) {
 		if (!updatedProvider.name || !updatedProvider.baseUrl) {
 			alert(getMessage('providerRequiredFields'));
 			return;
+		}
+
+		if (presetId && cachedPresetProviders && cachedPresetProviders[presetId]) {
+			updatedProvider.name = cachedPresetProviders[presetId].name;
+			updatedProvider.baseUrl = cachedPresetProviders[presetId].baseUrl;
+			updatedProvider.apiKeyRequired = cachedPresetProviders[presetId].apiKeyRequired !== false;
 		}
 
 		if (index !== undefined) {
@@ -471,14 +513,15 @@ async function showProviderModal(provider: Provider, index?: number) {
 
 		debugLog('Providers', 'Updated providers list:', generalSettings.providers);
 
-		saveSettings().then(() => {
+		try {
+			await saveSettings();
 			debugLog('Providers', 'Settings saved');
 			initializeProviderList();
 			hideModal(modal);
-		}).catch(error => {
+		} catch (error) {
 			console.error('Failed to save settings:', error);
 			alert(getMessage('failedToSaveProvider'));
-		});
+		}
 	});
 
 	newCancelBtn?.addEventListener('click', () => {
@@ -493,9 +536,16 @@ export function initializeModelList() {
 	if (!modelList) return;
 
 	modelList.innerHTML = '';
-	generalSettings.models.forEach((model, index) => {
-		const modelItem = createModelListItem(model, index);
-		modelList.appendChild(modelItem);
+	const sortedModels = [...generalSettings.models].sort((a, b) => 
+		a.name.toLowerCase().localeCompare(b.name.toLowerCase())
+	);
+	
+	sortedModels.forEach((model) => {
+		const originalIndex = generalSettings.models.findIndex(m => m.id === model.id);
+		if (originalIndex !== -1) {
+			const modelItem = createModelListItem(model, originalIndex);
+			modelList.appendChild(modelItem);
+		}
 	});
 
 	initializeIcons(modelList);
@@ -506,6 +556,7 @@ function createModelListItem(model: ModelConfig, index: number): HTMLElement {
 	modelItem.className = 'model-list-item';
 	modelItem.draggable = true;
 	modelItem.dataset.index = index.toString();
+	modelItem.dataset.modelId = model.id;
 
 	const provider = generalSettings.providers.find(p => p.id === model.providerId);
 	const providerName = provider?.name || `<span class="model-provider-unknown"><i data-lucide="alert-triangle"></i> ${getMessage('unknownProvider')}</span>`;
@@ -519,29 +570,31 @@ function createModelListItem(model: ModelConfig, index: number): HTMLElement {
 			<div class="model-provider mh">${providerName}</div>
 		</div>
 		<div class="model-list-item-actions">
-			<button class="edit-model-btn clickable-icon" data-index="${index}" aria-label="Edit model">
+			<button class="edit-model-btn clickable-icon" data-model-id="${model.id}" aria-label="Edit model">
 				<i data-lucide="pen-line"></i>
 			</button>
-			<button class="duplicate-model-btn clickable-icon" data-index="${index}" aria-label="Duplicate model">
+			<button class="duplicate-model-btn clickable-icon" data-model-id="${model.id}" aria-label="Duplicate model">
 				<i data-lucide="copy-plus"></i>
 			</button>
-			<button class="delete-model-btn clickable-icon" data-index="${index}" aria-label="Delete model">
+			<button class="delete-model-btn clickable-icon" data-model-id="${model.id}" aria-label="Delete model">
 				<i data-lucide="trash-2"></i>
 			</button>
 			<div class="checkbox-container mod-small">
-				<input type="checkbox" id="model-${index}" ${model.enabled ? 'checked' : ''}>
+				<input type="checkbox" id="model-${model.id}" ${model.enabled ? 'checked' : ''}>
 			</div>
 		</div>
 	`;
 
-	const checkbox = modelItem.querySelector(`#model-${index}`) as HTMLInputElement;
-	const checkboxContainer = modelItem.querySelector('.checkbox-container') as HTMLElement;
+	const checkbox = modelItem.querySelector(`#model-${model.id}`) as HTMLInputElement;
 	
-	if (checkbox && checkboxContainer) {
+	if (checkbox) {
 		initializeToggles(modelItem);
 		checkbox.addEventListener('change', () => {
-			generalSettings.models[index].enabled = checkbox.checked;
-			saveSettings();
+			const modelIndex = generalSettings.models.findIndex(m => m.id === model.id);
+			if (modelIndex !== -1) {
+				generalSettings.models[modelIndex].enabled = checkbox.checked;
+				saveSettings();
+			}
 		});
 	}
 
@@ -550,7 +603,11 @@ function createModelListItem(model: ModelConfig, index: number): HTMLElement {
 		duplicateBtn.addEventListener('click', (e) => {
 			e.preventDefault();
 			e.stopPropagation();
-			duplicateModel(index);
+			const modelId = duplicateBtn.getAttribute('data-model-id');
+			const modelIndex = generalSettings.models.findIndex(m => m.id === modelId);
+			if (modelIndex !== -1) {
+				duplicateModel(modelIndex);
+			}
 		});
 	}
 
@@ -559,7 +616,11 @@ function createModelListItem(model: ModelConfig, index: number): HTMLElement {
 		editBtn.addEventListener('click', (e) => {
 			e.preventDefault();
 			e.stopPropagation();
-			editModel(index);
+			const modelId = editBtn.getAttribute('data-model-id');
+			const modelIndex = generalSettings.models.findIndex(m => m.id === modelId);
+			if (modelIndex !== -1) {
+				editModel(modelIndex);
+			}
 		});
 	}
 
@@ -568,7 +629,11 @@ function createModelListItem(model: ModelConfig, index: number): HTMLElement {
 		deleteBtn.addEventListener('click', (e) => {
 			e.preventDefault();
 			e.stopPropagation();
-			deleteModel(index);
+			const modelId = deleteBtn.getAttribute('data-model-id');
+			const modelIndex = generalSettings.models.findIndex(m => m.id === modelId);
+			if (modelIndex !== -1) {
+				deleteModel(modelIndex);
+			}
 		});
 	}
 
@@ -595,9 +660,13 @@ function editModel(index: number) {
 }
 
 async function showModelModal(model: ModelConfig, index?: number) {
-	debugLog('Providers', 'Showing model modal:', { model, index });
+	debugLog('Models', 'Showing model modal:', { model, index });
 	const modal = document.getElementById('model-modal');
 	if (!modal) return;
+
+	if (!cachedPresetProviders) {
+		cachedPresetProviders = await getPresetProviders();
+	}
 
 	await translatePage();
 	initializeIcons(modal);
@@ -610,103 +679,23 @@ async function showModelModal(model: ModelConfig, index?: number) {
 	const form = modal.querySelector('#model-form') as HTMLFormElement;
 	if (form) {
 		const providerSelect = form.querySelector('[name="providerId"]') as HTMLSelectElement;
-		const modelIdContainer = form.querySelector('.setting-item:has([name="providerModelId"]) .setting-item-description') as HTMLElement;
+		const modelIdDescriptionContainer = form.querySelector('.setting-item:has([name="providerModelId"]) .setting-item-description') as HTMLElement;
 		const modelSelectionContainer = form.querySelector('.model-selection-container') as HTMLElement;
 		const modelSelectionRadios = form.querySelector('#model-selection-radios') as HTMLElement;
 		const nameInput = form.querySelector('[name="name"]') as HTMLInputElement;
 		const providerModelIdInput = form.querySelector('[name="providerModelId"]') as HTMLInputElement;
 
-		if (!modelIdContainer || !modelSelectionContainer || !modelSelectionRadios || !nameInput || !providerModelIdInput) {
-			console.error('Required form elements not found');
+		if (!modelIdDescriptionContainer || !modelSelectionContainer || !modelSelectionRadios || !nameInput || !providerModelIdInput || !providerSelect) {
+			console.error('Required model modal form elements not found');
 			return;
 		}
 
-		// Add change handler for provider select
-		providerSelect.addEventListener('change', () => {
-			const selectedProviderId = providerSelect.value;
-			const provider = generalSettings.providers.find(p => p.id === selectedProviderId);
-			
-			if (provider) {
-				// Find matching preset provider to get modelsList URL and popular models
-				const presetProvider = Object.values(PRESET_PROVIDERS).find(
-					preset => preset.name === provider.name
-				);
-
-				if (presetProvider?.modelsList) {
-					modelIdContainer.innerHTML = `${getMessage('providerModelIdDescription')} <a href="${presetProvider.modelsList}" target="_blank">${getMessage('modelsListFor', provider.name)}</a>.`;
-				} else {
-					modelIdContainer.textContent = getMessage('providerModelIdDescription');
-				}
-
-				// Update popular models radio buttons
-				modelSelectionRadios.innerHTML = '';
-				if (presetProvider?.popularModels?.length) {
-					modelSelectionContainer.style.display = 'block';
-					
-					// Add popular models
-					presetProvider.popularModels.forEach((model, idx) => {
-						const radio = document.createElement('div');
-						radio.className = 'radio-option';
-						radio.innerHTML = `
-							<input type="radio" name="model-selection" id="pop-model-${idx}" value="${model.id}">
-							<label for="pop-model-${idx}">
-								${model.name}${model.recommended ? ` <span class="tag">${getMessage('recommended')}</span>` : ''}
-							</label>
-						`;
-						modelSelectionRadios.appendChild(radio);
-					});
-
-					// Add "Other" option
-					const otherRadio = document.createElement('div');
-					otherRadio.className = 'radio-option';
-					otherRadio.innerHTML = `
-						<input type="radio" name="model-selection" id="model-other" value="other">
-						<label for="model-other">${getMessage('custom')}</label>
-					`;
-					modelSelectionRadios.appendChild(otherRadio);
-
-					// Add change handler for radio buttons
-					modelSelectionRadios.addEventListener('change', (e) => {
-						const target = e.target as HTMLInputElement;
-						if (target.value === 'other') {
-							nameInput.value = '';
-							providerModelIdInput.value = '';
-							nameInput.disabled = false;
-							providerModelIdInput.disabled = false;
-						} else {
-							const selectedModel = presetProvider.popularModels?.find(m => m.id === target.value);
-							if (selectedModel) {
-								nameInput.value = selectedModel.name;
-								providerModelIdInput.value = selectedModel.id;
-								nameInput.disabled = false;
-								providerModelIdInput.disabled = false;
-							}
-						}
-					});
-				} else {
-					modelSelectionContainer.style.display = 'none';
-				}
-			} else {
-				modelSelectionContainer.style.display = 'none';
-				modelIdContainer.textContent = getMessage('providerModelIdDescription');
-			}
-		});
-
-		// If editing, trigger change event to update description
-		if (index !== undefined && model.providerId) {
-			providerSelect.value = model.providerId;
-			providerSelect.dispatchEvent(new Event('change'));
-		}
-
-		// Set form values
-		nameInput.value = model.name;
-		providerModelIdInput.value = model.providerModelId || '';
-
-		// Populate provider select with alphabetically sorted providers
-		providerSelect.innerHTML = ''; // Clear first
+		providerSelect.innerHTML = '';
 		const defaultOption = document.createElement('option');
 		defaultOption.value = '';
-		defaultOption.setAttribute('data-i18n', 'selectProvider');
+		defaultOption.textContent = getMessage('selectProvider');
+		defaultOption.disabled = true;
+		defaultOption.selected = true;
 		providerSelect.appendChild(defaultOption);
 
 		const sortedProviders = [...generalSettings.providers].sort((a, b) => 
@@ -718,12 +707,122 @@ async function showModelModal(model: ModelConfig, index?: number) {
 			option.textContent = provider.name;
 			providerSelect.appendChild(option);
 		});
-		providerSelect.value = model.providerId;
 
-		// Translate the select options
+		nameInput.value = '';
+		providerModelIdInput.value = '';
+		nameInput.disabled = true;
+		providerModelIdInput.disabled = true;
+		modelSelectionContainer.style.display = 'none';
+		modelSelectionRadios.innerHTML = '';
+		modelIdDescriptionContainer.textContent = getMessage('providerModelIdDescription');
+
+		const updateModelOptions = () => {
+			const selectedProviderId = providerSelect.value;
+			const provider = generalSettings.providers.find(p => p.id === selectedProviderId);
+			
+			nameInput.value = (index !== undefined && model.providerId === selectedProviderId) ? model.name : '';
+			providerModelIdInput.value = (index !== undefined && model.providerId === selectedProviderId) ? model.providerModelId || '' : '';
+			nameInput.disabled = false;
+			providerModelIdInput.disabled = false;
+			modelSelectionRadios.innerHTML = '';
+			modelSelectionContainer.style.display = 'none';
+			modelIdDescriptionContainer.textContent = getMessage('providerModelIdDescription');
+
+			if (provider && cachedPresetProviders) {
+				const presetProvider = Object.values(cachedPresetProviders).find(
+					preset => preset.name === provider.name 
+				);
+
+				if (presetProvider?.modelsList) {
+					modelIdDescriptionContainer.innerHTML = `${getMessage('providerModelIdDescription')} <a href="${presetProvider.modelsList}" target="_blank">${getMessage('modelsListFor', provider.name)}</a>.`;
+				}
+
+				if (presetProvider?.popularModels?.length) {
+					modelSelectionContainer.style.display = 'block';
+					
+					presetProvider.popularModels.forEach((popModel, idx) => {
+						const radioId = `pop-model-${idx}`;
+						const radio = document.createElement('div');
+						radio.className = 'radio-option';
+						radio.innerHTML = `
+							<input type="radio" name="model-selection" id="${radioId}" value="${popModel.id}">
+							<label for="${radioId}">
+								${popModel.name}${popModel.recommended ? ` <span class="tag">${getMessage('recommended')}</span>` : ''}
+							</label>
+						`;
+						modelSelectionRadios.appendChild(radio);
+
+						if (index !== undefined && model.providerId === selectedProviderId && popModel.id === model.providerModelId) {
+							const input = radio.querySelector('input') as HTMLInputElement;
+							if (input) input.checked = true;
+						}
+					});
+
+					const otherRadio = document.createElement('div');
+					otherRadio.className = 'radio-option';
+					otherRadio.innerHTML = `
+						<input type="radio" name="model-selection" id="model-other" value="other">
+						<label for="model-other">${getMessage('custom')}</label>
+					`;
+					modelSelectionRadios.appendChild(otherRadio);
+
+					const popularMatch = presetProvider.popularModels.some(pm => pm.id === model.providerModelId);
+					if (index !== undefined && model.providerId === selectedProviderId && !popularMatch) {
+						const otherInput = otherRadio.querySelector('input') as HTMLInputElement;
+						if (otherInput) otherInput.checked = true;
+					} else if (index === undefined) {
+						const recommended = presetProvider.popularModels.find(pm => pm.recommended);
+						if (!recommended) {
+							const otherInput = otherRadio.querySelector('input') as HTMLInputElement;
+							if (otherInput) otherInput.checked = true;
+						}
+					}
+
+					modelSelectionRadios.addEventListener('change', (e) => {
+						const target = e.target as HTMLInputElement;
+						if (!target || target.name !== 'model-selection') return;
+
+						if (target.value === 'other') {
+							if (!(index !== undefined && model.providerId === selectedProviderId && !popularMatch && target.id === 'model-other')) {
+								nameInput.value = '';
+								providerModelIdInput.value = '';
+							}
+							nameInput.disabled = false;
+							providerModelIdInput.disabled = false;
+						} else {
+							const selectedPopModel = presetProvider.popularModels?.find(m => m.id === target.value);
+							if (selectedPopModel) {
+								nameInput.value = selectedPopModel.name;
+								providerModelIdInput.value = selectedPopModel.id;
+								nameInput.disabled = false; 
+								providerModelIdInput.disabled = false; 
+							}
+						}
+					});
+				}
+			}
+		};
+
+		providerSelect.addEventListener('change', updateModelOptions);
+
+		if (index !== undefined) {
+			providerSelect.value = model.providerId;
+			updateModelOptions(); 
+			nameInput.value = model.name;
+			providerModelIdInput.value = model.providerModelId || '';
+		} else {
+			if (sortedProviders.length > 0) {
+				// Maybe default to first provider? Or leave blank? Let's leave blank for now.
+				// providerSelect.value = sortedProviders[0].id; 
+				// updateModelOptions();
+			} else {
+				console.warn("No providers configured. Cannot add models.");
+				// Consider disabling the confirm button or showing a message.
+			}
+		}
+
 		translatePage();
 
-		// Handle buttons
 		const confirmBtn = modal.querySelector('.model-confirm-btn');
 		const cancelBtn = modal.querySelector('.model-cancel-btn');
 
@@ -732,42 +831,26 @@ async function showModelModal(model: ModelConfig, index?: number) {
 			return;
 		}
 
-		// Remove existing event listeners
 		const newConfirmBtn = confirmBtn.cloneNode(true);
 		const newCancelBtn = cancelBtn.cloneNode(true);
 		confirmBtn.parentNode?.replaceChild(newConfirmBtn, confirmBtn);
 		cancelBtn.parentNode?.replaceChild(newCancelBtn, cancelBtn);
 
-		// Add new event listeners
-		newConfirmBtn.addEventListener('click', () => {
+		newConfirmBtn.addEventListener('click', async () => {
 			const formData = new FormData(form);
-			const modelSelection = form.querySelector('input[name="model-selection"]:checked') as HTMLInputElement;
+			const selectedProviderId = formData.get('providerId') as string;
+			const modelSelectionRadio = form.querySelector('input[name="model-selection"]:checked') as HTMLInputElement;
 			
 			let updatedModel: ModelConfig = {
 				id: model.id,
-				providerId: formData.get('providerId') as string,
+				providerId: selectedProviderId,
 				providerModelId: '',
 				name: '',
 				enabled: model.enabled
 			};
 
-			// If a popular model is selected, use those values
-			if (modelSelection && modelSelection.value !== 'other') {
-				const provider = generalSettings.providers.find(p => p.id === updatedModel.providerId);
-				const presetProvider = Object.values(PRESET_PROVIDERS).find(
-					preset => preset.name === provider?.name
-				);
-				const selectedModel = presetProvider?.popularModels?.find(m => m.id === modelSelection.value);
-				
-				if (selectedModel) {
-					updatedModel.name = selectedModel.name;
-					updatedModel.providerModelId = selectedModel.id;
-				}
-			} else {
-				// Use form values for custom model
-				updatedModel.name = formData.get('name') as string;
-				updatedModel.providerModelId = formData.get('providerModelId') as string;
-			}
+			updatedModel.name = formData.get('name') as string;
+			updatedModel.providerModelId = formData.get('providerModelId') as string;
 
 			if (!updatedModel.name || !updatedModel.providerId || !updatedModel.providerModelId) {
 				alert(getMessage('modelRequiredFields'));
@@ -780,12 +863,17 @@ async function showModelModal(model: ModelConfig, index?: number) {
 				generalSettings.models.push(updatedModel);
 			}
 
-			saveSettings();
-			initializeModelList();
-			hideModal(modal);
+			try {
+				await saveSettings();
+				initializeModelList();
+				hideModal(modal);
+			} catch (error) {
+				console.error('Failed to save model settings:', error);
+				alert(getMessage('failedToSaveModel'));
+			}
 		});
 
-		newCancelBtn.addEventListener('click', () => {
+		newCancelBtn?.addEventListener('click', () => {
 			hideModal(modal);
 		});
 
@@ -813,17 +901,24 @@ function saveInterpreterSettingsFromForm(): void {
 	const interpreterAutoRunToggle = document.getElementById('interpreter-auto-run-toggle') as HTMLInputElement;
 	const defaultPromptContextInput = document.getElementById('default-prompt-context') as HTMLTextAreaElement;
 
-	const updatedSettings = {
-		interpreterEnabled: interpreterToggle.checked,
-		interpreterAutoRun: interpreterAutoRunToggle.checked,
-		defaultPromptContext: defaultPromptContextInput.value
-	};
+	const updatedSettings: Partial<typeof generalSettings> = {}; 
+	if (interpreterToggle) {
+		updatedSettings.interpreterEnabled = interpreterToggle.checked;
+	}
+	if (interpreterAutoRunToggle) {
+		updatedSettings.interpreterAutoRun = interpreterAutoRunToggle.checked;
+	}
+	if (defaultPromptContextInput) {
+		updatedSettings.defaultPromptContext = defaultPromptContextInput.value;
+	}
 
-	saveSettings(updatedSettings);
+	if (Object.keys(updatedSettings).length > 0) {
+		saveSettings(updatedSettings);
+	}
 }
 
 function debounce(func: Function, delay: number): (...args: any[]) => void {
-	let timeoutId: NodeJS.Timeout;
+	let timeoutId: ReturnType<typeof setTimeout> | undefined;
 	return (...args: any[]) => {
 		clearTimeout(timeoutId);
 		timeoutId = setTimeout(() => func(...args), delay);
@@ -838,11 +933,11 @@ function duplicateModel(index: number) {
 		name: `${modelToDuplicate.name} (copy)`
 	};
 
-	generalSettings.models.push(duplicatedModel);
+	generalSettings.models.splice(index + 1, 0, duplicatedModel); 
+	
 	saveSettings();
 	initializeModelList();
 
-	// Show edit modal for the new model
-	const newIndex = generalSettings.models.length - 1;
+	const newIndex = index + 1;
 	showModelModal(duplicatedModel, newIndex);
 }
