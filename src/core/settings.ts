@@ -42,7 +42,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 		await translatePage();
 		
 		await initializeGeneralSettings();
-		await initializeInterpreterSettings();
 		await initializeReaderSettings();
 		const loadedTemplates = await loadTemplates();
 		updateTemplateList(loadedTemplates);
