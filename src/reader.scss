@@ -63,6 +63,8 @@
 	--obsidian-reader-color-blue: #086ddd;
 	--obsidian-reader-color-purple: #7852ee;
 	--obsidian-reader-color-pink: #d53984;
+	--obsidian-reader-dropdown-background-position: right .5em top 50%, 0 0;
+	--obsidian-reader-dropdown-background-size: 1em auto, 100%;
 
 	&.theme-dark {
 		color-scheme: dark;
@@ -644,7 +646,7 @@
 	right: 0;
 	background: var(--obsidian-reader-background-primary);
 	padding: 20px;
-	opacity: 0;
+//	opacity: 0;
 	z-index: 999999999;
 	font-family: var(--obsidian-reader-font-family);
 	user-select: none;
@@ -655,9 +657,27 @@
 .obsidian-reader-settings-controls {
 	display: grid;
 	align-items: center;
-	gap: 4px;
+	gap: 6px;
+	.obsidian-reader-settings-select {
+		width: 100%;
+	}
+}
+.obsidian-reader-settings-controls-group {
+	display: flex;
+	align-items: center;
+	border: 1px solid var(--obsidian-reader-border);
+	border-radius: 6px;
+	overflow: hidden;
+	> .obsidian-reader-settings-button {
+		flex: 1;
+		border-radius: 0;
+		&:not(:first-child) {
+			border-left: 1px solid var(--obsidian-reader-border);
+		}
+	}
 }
 .obsidian-reader-settings-button {
+	box-sizing: border-box;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -666,6 +686,7 @@
 	border: none;
 	background: transparent;
 	border-radius: 12px;
+	height: 26px;
 	color: var(--obsidian-reader-text-muted);
 	cursor: pointer;
 	padding: 0;
@@ -675,25 +696,38 @@
 	color: var(--obsidian-reader-text-primary);
 }
 .obsidian-reader-settings-select {
-	background: transparent;
-	border: none;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+	background-color: transparent;
+	border: 1px solid var(--obsidian-reader-border);
 	color: var(--obsidian-reader-text-muted);
 	font-family: var(--obsidian-reader-font-family);
-	font-size: 12px;
-	padding: 4px;
-	border-radius: 12px;
+	font-size: 13px;
+	height: 28px;
+	padding: 4px 30px 4px 8px;
+	border-radius: 6px;
 	cursor: pointer;
-	margin-left: 4px;
+	background-repeat: no-repeat, repeat;
+	/* arrow icon position (1em from the right, 50% vertical) , then gradient position*/
+	background-position: var(--obsidian-reader-dropdown-background-position);
+	/* icon size, then gradient */
+	background-size: var(--obsidian-reader-dropdown-background-size);
+	background-blend-mode: hard-light;
 
 	&:hover {
-		background: var(--obsidian-reader-background-primary-alt);
+		background-color: var(--obsidian-reader-background-primary-alt);
 		color: var(--obsidian-reader-text-primary);
 	}
 	&:focus {
 		outline: none;
-		background: var(--obsidian-reader-background-primary-alt);
+		background-color: var(--obsidian-reader-background-primary-alt);
 		color: var(--obsidian-reader-text-primary);
 	}
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23000' opacity='0.9' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' %3E%3Cpath d='m7 15 5 5 5-5'/%3E%3Cpath d='m7 9 5-5 5 5'/%3E%3C/svg%3E");
+}
+.theme-dark .obsidian-reader-settings-select {
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23FFF' opacity='0.6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' %3E%3Cpath d='m7 15 5 5 5-5'/%3E%3Cpath d='m7 9 5-5 5 5'/%3E%3C/svg%3E");
 }
 .obsidian-reader-container {
 	display: grid;
