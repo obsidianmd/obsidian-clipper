@@ -79,6 +79,14 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 			return true;
 		}
 
+		if (typedRequest.action === "ensureContentScriptLoaded") {
+			if (sender.tab?.id) {
+				ensureContentScriptLoaded(sender.tab.id)
+					.then(() => sendResponse({ tabId: sender.tab?.id }));
+				return true;
+			}
+		}
+
 		if (typedRequest.action === "sidePanelOpened") {
 			if (sender.tab && sender.tab.windowId) {
 				sidePanelOpenWindows.add(sender.tab.windowId);

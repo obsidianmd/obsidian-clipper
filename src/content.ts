@@ -293,4 +293,38 @@ declare global {
 
 	window.addEventListener('beforeunload', handlePageUnload);
 
+	// Listen for custom events from the reader script
+	document.addEventListener('obsidian-reader-init', async () => {
+		// Find the highlighter button
+		const button = document.querySelector('[data-action="toggle-highlighter"]');
+		if (button) {
+			// Handle highlighter button clicks
+			button.addEventListener('click', async (e) => {
+				try {
+					// First try to get the tab ID from the background script
+					const response = await browser.runtime.sendMessage({ action: "ensureContentScriptLoaded" });
+					
+					let tabId: number | undefined;
+					if (response && typeof response === 'object') {
+						tabId = (response as { tabId: number }).tabId;
+					}
+
+					// If we didn't get a tab ID, try to get it from the current tab
+					if (!tabId) {
+						const tabs = await browser.tabs.query({ active: true, currentWindow: true });
+						tabId = tabs[0]?.id;
+					}
+
+					if (tabId) {
+						await browser.runtime.sendMessage({ action: "toggleHighlighterMode", tabId });
+					} else {
+						console.error('[Content]','Could not determine tab ID');
+					}
+				} catch (error) {
+					console.error('[Content]','Error in toggle flow:', error);
+				}
+			});
+		}
+	});
+
 })();
