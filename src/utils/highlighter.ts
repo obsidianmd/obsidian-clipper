@@ -495,7 +495,7 @@ function testHighlightFindability(highlight: FragmentHighlightData): boolean {
 }
 
 // Helper function to create and add a highlight for a specific range (within a single block)
-async function createAndAddHighlightForRange(range: Range, notes?: string[]): Promise<boolean> {
+export async function createAndAddHighlightForRange(range: Range, notes?: string[]): Promise<boolean> {
 	// console.log("[Highlighter] Attempting highlight for range:", range.toString().slice(0, 100) + '...');
 	try {
 		const selectedText = range.toString();

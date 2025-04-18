@@ -10,7 +10,8 @@ import {
 	updateHighlighterMenu,
 	FragmentHighlightData,
 	notifyHighlightsUpdated,
-	addHighlight
+	addHighlight,
+	createAndAddHighlightForRange
 } from './highlighter';
 import { throttle } from './throttle';
 import { getElementByXPath, isDarkColor, getElementRelativeXPath, evaluateXPath, getElementXPath } from './dom-utils';
@@ -114,7 +115,8 @@ export function handleMouseUp(event: MouseEvent | TouchEvent) {
 	}
 	// Case 3: Click on Specific Block Elements (Original Correct Logic)
 	else {
-		const blockSelector = 'TABLE, UL, OL, PRE, BLOCKQUOTE, FIGURE'; // Keep this selector for *clicking*
+		// Add P to the selector for single-click paragraph highlighting
+		const blockSelector = 'P, TABLE, UL, OL, PRE, BLOCKQUOTE, FIGURE';
 		const clickedBlock = target.closest(blockSelector);
 
 		if (clickedBlock) {
@@ -132,34 +134,54 @@ export function handleMouseUp(event: MouseEvent | TouchEvent) {
 				return; // Don't highlight if the block isn't in the main content area
 			}
 
-			const relativeXpath = getElementRelativeXPath(clickedBlock, searchContainer);
-			const fullXpath = getElementXPath(clickedBlock); // Use correct function from dom-utils
+			// Special handling for P tags: treat as full text selection
+			if (clickedBlock.tagName === 'P') {
+				console.log("[handleMouseUp] P element clicked. Treating as text selection.");
+				const range = document.createRange();
+				try {
+					// Select the entire content of the paragraph
+					range.selectNodeContents(clickedBlock);
+					if (!range.collapsed && range.toString().trim().length > 0) {
+						// Call the helper function directly with the range
+						// We need to import createAndAddHighlightForRange from highlighter.ts
+						createAndAddHighlightForRange(range); // Pass the created range
+					} else {
+						console.warn("[handleMouseUp] Clicked P element is empty or range collapsed.");
+					}
+				} catch (error) {
+					console.error("[handleMouseUp] Error creating range for P element:", error);
+				}
+			} 
+			// Handle other block elements as before (UL, TABLE, etc.)
+			else {
+				const relativeXpath = getElementRelativeXPath(clickedBlock, searchContainer);
+				const fullXpath = getElementXPath(clickedBlock); // Use correct function from dom-utils
 
-			if (!relativeXpath) {
-				console.error("Could not generate relative XPath for block element:", clickedBlock);
-				return;
+				if (!relativeXpath) {
+					console.error("Could not generate relative XPath for block element:", clickedBlock);
+					return;
+				}
+
+				const highlightData: FragmentHighlightData = {
+					id: Date.now().toString() + Math.random().toString(16).slice(2),
+					type: 'fragment',
+					xpath: fullXpath || '', // Store original full xpath potentially
+					content: clickedBlock.outerHTML, // Store the outer HTML for block content
+					textStart: '', // Minimal text details for block highlights
+					prefix: undefined,
+					suffix: undefined,
+					isBlock: true, // Mark as a block highlight
+					relativeXpath: relativeXpath, // Store the relative XPath
+				};
+				console.log("[handleMouseUp] Block element clicked. Creating highlight:", { 
+					clickedElement: clickedBlock.tagName,
+					relativeXpath: relativeXpath,
+					data: highlightData 
+				});
+				addHighlight(highlightData); // Call the correct addHighlight function
 			}
-
-			const highlightData: FragmentHighlightData = {
-				id: Date.now().toString() + Math.random().toString(16).slice(2),
-				type: 'fragment',
-				xpath: fullXpath || '', // Store original full xpath potentially
-				content: clickedBlock.outerHTML, // Store the outer HTML for block content
-				textStart: '', // Minimal text details for block highlights
-				prefix: undefined,
-				suffix: undefined,
-				isBlock: true, // Mark as a block highlight
-				relativeXpath: relativeXpath, // Store the relative XPath
-			};
-			// Add the logging here before calling addHighlight
-			console.log("[handleMouseUp] Block element clicked. Creating highlight:", { 
-				clickedElement: clickedBlock.tagName,
-				relativeXpath: relativeXpath,
-				data: highlightData 
-			});
-			addHighlight(highlightData); // Call the correct addHighlight function
 		}
-		// Else: Clicked on something else (e.g., plain paragraph, div) - do nothing on click
+		// Else: Clicked on something else not in the selector - do nothing on click
 	}
 }
 
