@@ -1,5 +1,5 @@
 {
-	"version": "2025.04.16",
+	"version": "2025.04.17",
 	"anthropic": {
 		"id": "anthropic",
 		"name": "Anthropic",
@@ -111,13 +111,15 @@
 	"xai": {
 		"id": "xai",
 		"name": "xAI",
-		"apiKeyUrl": "https://console.x.ai/",
+		"apiKeyUrl": "https://console.x.ai/team/default/api-keys",
 		"apiKeyRequired": true,
 		"modelsList": "https://docs.x.ai/docs/models",
 		"baseUrl": "https://api.x.ai/v1/chat/completions",
 		"popularModels": [
 			{ "id": "grok-3-latest", "name": "Grok 3" },
-			{ "id": "grok-3-mini-latest", "name": "Grok 3 Mini" }
+			{ "id": "grok-3-fast-latest", "name": "Grok 3 Fast" },
+			{ "id": "grok-3-mini-latest", "name": "Grok 3 Mini" },
+			{ "id": "grok-3-mini-fast-latest", "name": "Grok 3 Mini Fast" }
 		]
 	}
 }
