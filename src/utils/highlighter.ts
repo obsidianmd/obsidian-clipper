@@ -52,8 +52,12 @@ export interface TextHighlightData extends HighlightData {
 export interface ElementHighlightData extends HighlightData {
 	type: 'element';
 	tagName: string; // e.g., 'IMG', 'TABLE', 'PRE'
-	// outerHTML is stored in 'content'
-	readerContextText?: string; // Surrounding text for Reader Mode location fallback
+	readerContextText?: string; // DEPRECATED: Keep for fallback, but prefer prefix/suffix
+	
+	// Content-specific identifiers (Optional)
+	contentHash?: string; // Hash for TABLE content verification
+	contextPrefix?: string; // Normalized text preceding the element
+	contextSuffix?: string; // Normalized text succeeding the element
 }
 
 export interface ComplexHighlightData extends HighlightData {
@@ -1501,29 +1505,157 @@ function calculateReaderContext(element: Element, maxLength: number = 60): strin
 	return context ? normalizeText(context) : undefined;
 }
 
+// Simple hashing function (replace with a more robust one like SHA-1 if needed via library)
+export function simpleHash(str: string): string {
+	let hash = 0;
+	for (let i = 0; i < str.length; i++) {
+		const char = str.charCodeAt(i);
+		hash = ((hash << 5) - hash) + char;
+		hash |= 0; // Convert to 32bit integer
+	}
+	return hash.toString(16); // Return as hex string
+}
+
+// Helper function to calculate prefix/suffix context text
+function calculateElementContext(element: Element, maxLength: number = 40): { prefix?: string, suffix?: string } {
+	const maxCharsPerSide = Math.floor(maxLength / 2);
+	let prefixText = '';
+	let suffixText = '';
+
+	// Function to get text content, prioritizing meaningful blocks
+	const getText = (el: Element | null): string => {
+		if (!el) return '';
+		// Avoid grabbing text from known non-content blocks if possible
+		if (el.closest('nav, header, footer, aside')) return '';
+		return (el.textContent || '').trim();
+	};
+
+	// Look backwards for prefix
+	let current: Element | null = element;
+	while (prefixText.length < maxCharsPerSide) {
+		let sibling: Element | null = current?.previousElementSibling;
+		if (sibling) {
+			const text = getText(sibling);
+			if (text) prefixText = text + ' ' + prefixText;
+			current = sibling;
+		} else if (current?.parentElement) {
+			// Move up and try parent's previous sibling
+			const parentSibling = current.parentElement.previousElementSibling;
+			const text = getText(parentSibling);
+			if (text) prefixText = text + ' ' + prefixText;
+			 // Stop if we went up, to avoid grabbing too much unrelated context
+			if (parentSibling || !current.parentElement.previousElementSibling) break;
+			current = current.parentElement;
+		} else {
+			break; // Reached top or no more siblings
+		}
+	}
+
+	// Look forwards for suffix
+	current = element;
+	while (suffixText.length < maxCharsPerSide) {
+		let sibling: Element | null = current?.nextElementSibling;
+		 if (sibling) {
+			const text = getText(sibling);
+			if (text) suffixText += ' ' + text;
+			current = sibling;
+		} else if (current?.parentElement) {
+			const parentSibling = current.parentElement.nextElementSibling;
+			const text = getText(parentSibling);
+			if (text) suffixText += ' ' + text;
+			if (parentSibling || !current.parentElement.nextElementSibling) break;
+			current = current.parentElement;
+		} else {
+			break;
+		}
+	}
+
+	// Trim and normalize
+	const finalPrefix = prefixText.trim().slice(-maxCharsPerSide);
+	const finalSuffix = suffixText.trim().slice(0, maxCharsPerSide);
+
+	return {
+		prefix: finalPrefix ? normalizeText(finalPrefix) : undefined,
+		suffix: finalSuffix ? normalizeText(finalSuffix) : undefined
+	};
+}
+
 // Handle highlighting a specific block element (IMG, TABLE, PRE, etc.)
 export function handleElementHighlight(element: Element, notes?: string[]) {
 	const xpath = getElementXPath(element);
-	// Use outerHTML for most elements, but just src for images for conciseness
-	const content = element.tagName === 'IMG' ? (element as HTMLImageElement).src : element.outerHTML;
+	const tagName = element.tagName;
+	let content = element.outerHTML; // Default content
+	let specificData: Partial<ElementHighlightData> = {}; // To hold tagName-specific fields
+
 	try {
+		const context = calculateElementContext(element);
+		specificData.contextPrefix = context.prefix;
+		specificData.contextSuffix = context.suffix;
+
+		if (tagName === 'TABLE') {
+			// Calculate hash based on normalized text content for TABLE
+			const normalizedTableText = normalizeText(element.textContent || '');
+			specificData.contentHash = simpleHash(normalizedTableText);
+			// Keep outerHTML in content for TABLE as fallback display
+		}
+
 		const highlight: ElementHighlightData = {
 			xpath,
-			content,
+			content, // outerHTML or src
 			type: 'element',
 			id: Date.now().toString() + Math.random().toString(16).slice(2),
-			tagName: element.tagName,
-			readerContextText: calculateReaderContext(element)
+			tagName: tagName,
+			notes: notes,
+			// Merge specific data
+			...specificData
+			// readerContextText can be removed or kept as ultimate fallback if needed
 		};
-
-		if (notes && notes.length > 0) {
-			highlight.notes = notes;
-		}
 
 		// console.log('Creating element highlight:', highlight);
 		addHighlight(highlight);
 
 	} catch (error) {
 		console.error('Error creating element highlight:', error, element);
+	}
+}
+
+// Handle highlighting a paragraph element by creating a text fragment highlight
+export function handleParagraphAsFragmentHighlight(element: Element, notes?: string[]) {
+	if (element.tagName !== 'P') {
+		console.warn('handleParagraphAsFragmentHighlight called on non-P element:', element);
+		return;
+	}
+
+	try {
+		const fullText = element.textContent || '';
+		if (!fullText.trim()) return; // Don't highlight empty paragraphs
+
+		const normalizedText = normalizeText(fullText);
+		const context = calculateElementContext(element); // Get context around the P element
+		const xpath = getElementXPath(element);
+
+		const highlight: FragmentHighlightData = {
+			id: Date.now().toString() + Math.random().toString(16).slice(2),
+			type: 'fragment',
+			xpath: xpath, // Store XPath for potential reference
+			content: fullText, // Store original text content
+			textStart: encodeURIComponent(normalizedText),
+			// textEnd is omitted for full paragraph selection
+			prefix: context.prefix ? encodeURIComponent(context.prefix) : undefined,
+			suffix: context.suffix ? encodeURIComponent(context.suffix) : undefined,
+			notes: notes
+		};
+
+		// Test findability before adding
+		const findResult = findTextInCleanContent(document.body, normalizedText, highlight.prefix, highlight.suffix);
+		if (findResult) {
+			// console.log('Creating paragraph fragment highlight:', highlight);
+			addHighlight(highlight);
+		} else {
+			console.warn('❌ Paragraph fragment pre-check failed. Highlight not created.', { normalizedText, prefix: context.prefix, suffix: context.suffix });
+		}
+
+	} catch (error) {
+		console.error('Error creating paragraph fragment highlight:', error, element);
 	}
 }

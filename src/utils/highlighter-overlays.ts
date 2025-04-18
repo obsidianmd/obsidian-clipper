@@ -11,7 +11,9 @@ import {
 	updateHighlighterMenu,
 	FragmentHighlightData,
 	notifyHighlightsUpdated,
-	handleElementHighlight
+	handleElementHighlight,
+	handleParagraphAsFragmentHighlight,
+	simpleHash
 } from './highlighter';
 import { throttle } from './throttle';
 import { getElementByXPath, isDarkColor } from './dom-utils';
@@ -22,8 +24,8 @@ let touchStartY: number = 0;
 let isTouchMoved: boolean = false;
 let lastHoverTarget: Element | null = null;
 
-// Define highlightable block element tag names
-const HIGHLIGHTABLE_BLOCK_TAGS = new Set(['P', 'IMG', 'TABLE', 'PRE', 'FIGURE', 'VIDEO', 'CANVAS']);
+// Define highlightable block element tag names (removing FIGURE, VIDEO, CANVAS)
+const HIGHLIGHTABLE_BLOCK_TAGS = new Set(['P', 'TABLE', 'PRE']);
 
 // Define disallowed structural container tags
 const NON_HIGHLIGHTABLE_CONTAINER_TAGS = new Set(['ARTICLE', 'SECTION', 'MAIN', 'HEADER', 'FOOTER', 'NAV', 'ASIDE']);
@@ -114,14 +116,22 @@ export function handleMouseUp(event: MouseEvent | TouchEvent) {
 		target = document.elementFromPoint(touch.clientX, touch.clientY) as Element;
 	}
 
+	if (!target) return; // Exit if no target found
+
 	const selection = window.getSelection();
 	if (selection && !selection.isCollapsed) {
 		handleTextSelection(selection);
 	} else if (target.classList.contains('obsidian-highlight-overlay')) {
 		handleHighlightClick(event);
 	} else if (isHighlightableBlockElement(target)) {
-		handleElementHighlight(target);
-	}
+		// Differentiate based on tag type
+		if (target.tagName === 'P') {
+			handleParagraphAsFragmentHighlight(target); // Use new fragment logic for paragraphs
+		} else {
+			handleElementHighlight(target); // Use element logic for TABLE, PRE
+		}
+	} 
+	// We no longer automatically highlight any clicked element, only specific block types or text selections.
 }
 
 // Add touch start handler
@@ -354,7 +364,76 @@ function findElementInReaderByContext(searchContainer: Element, highlight: Eleme
 	return null;
 }
 
-// Update planHighlightOverlayRects to use findTextNodeAtPosition
+// Helper function to find a table by content hash
+function findTableByHash(container: Element, highlight: ElementHighlightData): HTMLTableElement | null {
+	if (!highlight.contentHash || highlight.tagName !== 'TABLE') return null;
+
+	const tables = Array.from(container.querySelectorAll<HTMLTableElement>('table'));
+	for (const table of tables) {
+		const normalizedTableText = normalizeText(table.textContent || '');
+		const currentHash = simpleHash(normalizedTableText);
+		if (currentHash === highlight.contentHash) {
+			return table; // Found match
+		}
+	}
+	return null; // Not found
+}
+
+// Helper function to find an element between prefix/suffix context
+function findElementByContext(container: Element, highlight: ElementHighlightData): Element | null {
+	if (!highlight.contextPrefix && !highlight.contextSuffix) return null;
+
+	// Find prefix range
+	const prefixResult = highlight.contextPrefix ? findTextInCleanContent(container, highlight.contextPrefix) : null;
+	// Find suffix range
+	const suffixResult = highlight.contextSuffix ? findTextInCleanContent(container, highlight.contextSuffix, highlight.contextPrefix) : null; // Use prefix as context for suffix
+
+	let searchStartNode: Node | null = prefixResult ? prefixResult.range.endContainer : null;
+	let searchEndNode: Node | null = suffixResult ? suffixResult.range.startContainer : null;
+
+	// If only one context found, use that as the anchor
+	if (!searchStartNode && suffixResult) searchStartNode = suffixResult.range.startContainer;
+	if (!searchEndNode && prefixResult) searchEndNode = prefixResult.range.endContainer;
+	if (!searchStartNode || !searchEndNode) return null; // Need at least one anchor
+
+	// Define the search boundary (common ancestor or container)
+	const range = document.createRange();
+	try {
+		range.setStart(searchStartNode, 0); // Offset doesn't matter here
+		range.setEnd(searchEndNode, 0);   // Offset doesn't matter here
+	} catch (e) {
+		console.warn("Error setting range for context search", e);
+		return null; // Cannot establish search range
+	}
+	const searchRoot = range.commonAncestorContainer;
+
+	if (!(searchRoot instanceof Element)) return null; // Should be an element
+
+	// Look for the element with the correct tag name within the search root
+	const candidates = Array.from(searchRoot.querySelectorAll(highlight.tagName));
+	for (const candidate of candidates) {
+		// Check if candidate is between prefix and suffix (if both exist)
+		const candidateRange = document.createRange();
+		candidateRange.selectNode(candidate);
+
+		const isAfterPrefix = !prefixResult || prefixResult.range.compareBoundaryPoints(Range.END_TO_START, candidateRange) <= 0;
+		const isBeforeSuffix = !suffixResult || suffixResult.range.compareBoundaryPoints(Range.START_TO_END, candidateRange) >= 0;
+
+		if (isAfterPrefix && isBeforeSuffix) {
+			// More specific checks?
+			if (highlight.tagName === 'TABLE') {
+				if (findTableByHash(candidate.parentElement || container, highlight) === candidate) return candidate;
+			} else {
+				// For other element types, position might be enough
+				return candidate;
+			}
+		}
+	}
+
+	return null; // Not found between context markers
+}
+
+// Update planHighlightOverlayRects to handle new element finding logic
 export function planHighlightOverlayRects(searchContainer: Element, target: Element, highlight: AnyHighlightData, index: number) {
 	const existingOverlays = Array.from(document.querySelectorAll(`.obsidian-highlight-overlay[data-highlight-index="${index}"]`));
 	const isInReader = document.documentElement.classList.contains('obsidian-reader-active');
@@ -367,20 +446,20 @@ export function planHighlightOverlayRects(searchContainer: Element, target: Elem
 				highlight.prefix,
 				highlight.suffix
 			);
-			
+
 			if (result) {
 				const rects = result.range.getClientRects();
 				if (rects.length > 0) {
 					const averageLineHeight = calculateAverageLineHeight(rects);
 					const textRects = Array.from(rects).filter(rect => rect.height <= averageLineHeight * 1.5);
-					
+
 					if (textRects.length > 0) {
 						mergeHighlightOverlayRects(textRects, highlight.content, existingOverlays, true, index, highlight.notes);
 						return;
 					}
 				}
 			}
-			
+
 			console.warn('Could not find text match for fragment highlight:', {
 				text: decodeURIComponent(highlight.textStart),
 				prefix: highlight.prefix ? decodeURIComponent(highlight.prefix) : undefined,
@@ -390,35 +469,63 @@ export function planHighlightOverlayRects(searchContainer: Element, target: Elem
 			console.error('Error creating fragment highlight overlay:', error);
 		}
 	} else if (highlight.type === 'element' || highlight.type === 'complex') {
-		// Handle Element and Complex highlights (Complex treated similar to Element)
+		// Handle Element and Complex highlights
 		try {
 			let finalTargetElement: Element | null = null;
+			const isElementHighlight = highlight.type === 'element'; // Type guard check
 
 			if (!isInReader) {
-				// Standard View: Target should be the element found by XPath in applyHighlights
-				finalTargetElement = target; // Target was already found by XPath
-			} else {
-				// Reader View:
-				// 1. Try direct XPath within the reader container (searchContainer)
-				const elementByXpath = getElementByXPath(highlight.xpath); // Find globally first
-				if (elementByXpath && searchContainer.contains(elementByXpath)) {
-					finalTargetElement = elementByXpath; // Found within reader container
+				// --- Standard View --- 
+				// Priority: XPath -> Content Match
+				finalTargetElement = getElementByXPath(highlight.xpath);
+
+				if (!finalTargetElement && isElementHighlight) {
+					if (highlight.tagName === 'TABLE') {
+						finalTargetElement = findTableByHash(document.body, highlight);
+					}
+					// Add finders for other types if needed
 				}
 
-				// 2. If XPath fails or not in container, try context search (only for ElementHighlightData)
-				if (!finalTargetElement && highlight.type === 'element' && highlight.readerContextText) {
+			} else {
+				// --- Reader View ---
+				// Priority: Content Match -> Context Match -> XPath -> Old Context
+				if (isElementHighlight) {
+					// 1. Content-specific match (TABLE hash)
+					if (highlight.tagName === 'TABLE') {
+						finalTargetElement = findTableByHash(searchContainer, highlight);
+					}
+					 // Add finders for other types if needed
+
+					// 2. Prefix/Suffix Context Match
+					if (!finalTargetElement && (highlight.contextPrefix || highlight.contextSuffix)) {
+						finalTargetElement = findElementByContext(searchContainer, highlight);
+					}
+				}
+
+				// 3. XPath Match (within reader container)
+				if (!finalTargetElement) {
+					const elementByXpath = getElementByXPath(highlight.xpath);
+					if (elementByXpath && searchContainer.contains(elementByXpath)) {
+						finalTargetElement = elementByXpath;
+					}
+				}
+
+				// 4. Old readerContextText Fallback (if it exists and others failed)
+				if (!finalTargetElement && isElementHighlight && highlight.readerContextText) {
+					console.log("Attempting old context fallback for:", highlight.tagName, highlight.xpath);
 					finalTargetElement = findElementInReaderByContext(searchContainer, highlight);
 				}
 			}
 
+			// Draw overlay if found
 			if (finalTargetElement) {
 				const rect = finalTargetElement.getBoundingClientRect();
+				// Use highlight.content (src for IMG, outerHTML for TABLE) for the overlay data
 				mergeHighlightOverlayRects([rect], highlight.content, existingOverlays, false, index, highlight.notes);
 			} else {
-				// Only log warning if in Reader mode, as standard view failure is logged in applyHighlights
-				if (isInReader) {
-					console.warn(`Element highlight ${highlight.type} (XPath: ${highlight.xpath}) could not be located in Reader Mode.`);
-				}
+				// Add type check for accessing tagName in warning
+				const tagName = highlight.type === 'element' ? highlight.tagName : 'N/A';
+				console.warn(`Element highlight ${highlight.type} (XPath: ${highlight.xpath}, Tag: ${tagName}) could not be located in ${isInReader ? 'Reader' : 'Standard'} Mode.`);
 			}
 		} catch (error) {
 			console.error(`Error creating ${highlight.type} highlight overlay:`, error);
@@ -426,7 +533,6 @@ export function planHighlightOverlayRects(searchContainer: Element, target: Elem
 	} else if (highlight.type === 'text') {
 		// Handle legacy text highlight type (should ideally be migrated)
 		try {
-			// Treat legacy text highlight similar to element highlight - using XPath target
 			const finalTargetElement = getElementByXPath(highlight.xpath); // Search globally
 			if (finalTargetElement) {
 				const rect = finalTargetElement.getBoundingClientRect();
@@ -862,6 +968,9 @@ export function findTextInCleanContent(
 	const similarityThreshold = SIMILARITY_THRESHOLDS[Math.min(retryCount, SIMILARITY_THRESHOLDS.length - 1)];
 
 	// Try to find the text in each paragraph
+	let bestMatch: { range: Range, cleanText: string } | null = null;
+	let matchFoundWithoutContext = false;
+
 	for (const [paragraph, nodes] of nodesByParagraph) {
 		let fullText = '';
 		const nodePositions: { node: Node, start: number, end: number }[] = [];
@@ -885,144 +994,108 @@ export function findTextInCleanContent(
 		// searchText is already normalized by the caller (handleTextSelection)
 		const normalizedSearchText = searchText;
 
-		// Find potential matches using the normalized search text
-		let startIndex = -1;
 		let currentIndex = 0;
 
 		while ((currentIndex = normalizedFullText.indexOf(normalizedSearchText, currentIndex)) !== -1) {
-			// Check context if provided
-			let contextMatches = true;
+			let currentMatchIsPotential = true;
 
-			if (prefix || suffix) {
-				// Decode the original prefix/suffix provided for comparison
-				const decodedPrefix = prefix ? normalizeText(decodeURIComponent(prefix)) : '';
-				const decodedSuffix = suffix ? normalizeText(decodeURIComponent(suffix)) : '';
+			// --- Map positions for this potential match --- 
+			const startIndex = currentIndex;
+			const matchedNormalizedText = normalizedFullText.substring(startIndex, startIndex + normalizedSearchText.length);
+			const originalStartIndex = mapNormalizedPositionToOriginal(fullText, normalizedFullText, startIndex);
+			const originalEndIndex = mapNormalizedPositionToOriginal(fullText, normalizedFullText, startIndex + normalizedSearchText.length);
 
-				// Get context from the *normalized* full text around the current match
-				const beforeContext = normalizedFullText.slice(
-					Math.max(0, currentIndex - contextSize),
-					currentIndex
-				);
-				const afterContext = normalizedFullText.slice(
-					currentIndex + normalizedSearchText.length,
-					currentIndex + normalizedSearchText.length + contextSize
-				);
+			// --- Find corresponding nodes --- 
+			let startNodeResult: { node: Node, offset: number } | null = null;
+			let endNodeResult: { node: Node, offset: number } | null = null;
 
-				// Check prefix match: The end of the `beforeContext` must match the end of the `decodedPrefix`
-				if (prefix) {
-					const prefixEndMatches = beforeContext.endsWith(decodedPrefix);
-					// Fallback: Fuzzy match if exact end doesn't match
-					const prefixFuzzyMatches = !prefixEndMatches && fuzzyMatch(beforeContext, decodedPrefix, similarityThreshold);
-
-					if (!prefixEndMatches && !prefixFuzzyMatches) {
-						contextMatches = false;
-					}
+			for (const { node, start, end } of nodePositions) {
+				if (!startNodeResult && originalStartIndex >= start && originalStartIndex < end) {
+					startNodeResult = { node, offset: originalStartIndex - start };
 				}
-
-				// Check suffix match: The start of the `afterContext` must match the start of the `decodedSuffix`
-				if (suffix && contextMatches) {
-					const suffixStartMatches = afterContext.startsWith(decodedSuffix);
-					// Fallback: Fuzzy match if exact start doesn't match
-					const suffixFuzzyMatches = !suffixStartMatches && fuzzyMatch(afterContext, decodedSuffix, similarityThreshold);
-
-					if (!suffixStartMatches && !suffixFuzzyMatches) {
-						contextMatches = false;
-					}
+				if (originalEndIndex > start && originalEndIndex <= end) {
+					endNodeResult = { node, offset: originalEndIndex - start };
+					if (startNodeResult) break; 
 				}
 			}
 
-			if (contextMatches) {
-				startIndex = currentIndex;
-				break; // Found the first valid match in this paragraph
+			if (endNodeResult && endNodeResult.offset === 0 && (!startNodeResult || startNodeResult.node !== endNodeResult.node)) {
+				const endIndex = nodePositions.findIndex(p => p.node === endNodeResult!.node);
+				if (endIndex > 0) {
+					const prevNodePos = nodePositions[endIndex - 1];
+					endNodeResult = { node: prevNodePos.node, offset: prevNodePos.node.textContent?.length || 0 };
+				}
 			}
 
-			// Move to the next potential starting position
+			// --- Verify Content of the Range --- 
+			if (startNodeResult && endNodeResult) {
+				try {
+					const range = document.createRange();
+					range.setStart(startNodeResult.node, startNodeResult.offset);
+					range.setEnd(endNodeResult.node, endNodeResult.offset);
+
+					const rangeText = range.toString();
+					const normalizedRangeText = normalizeText(rangeText);
+
+					const contentMatches = fuzzyMatch(normalizedRangeText, normalizedSearchText, similarityThreshold);
+					const foundTextMatches = fuzzyMatch(normalizedRangeText, matchedNormalizedText, similarityThreshold);
+					const verificationPassed = contentMatches || foundTextMatches;
+
+					if (verificationPassed) {
+						// Content matches! Now, optionally check context for disambiguation.
+						let contextCheckPassed = !prefix && !suffix; // Pass if no context provided
+						if (prefix || suffix) {
+							const decodedPrefix = prefix ? normalizeText(decodeURIComponent(prefix)) : '';
+							const decodedSuffix = suffix ? normalizeText(decodeURIComponent(suffix)) : '';
+							const beforeContext = normalizedFullText.slice(Math.max(0, startIndex - contextSize), startIndex);
+							const afterContext = normalizedFullText.slice(startIndex + normalizedSearchText.length, startIndex + normalizedSearchText.length + contextSize);
+							
+							const prefixEndMatches = !prefix || beforeContext.endsWith(decodedPrefix);
+							const prefixFuzzyMatches = !prefix || fuzzyMatch(beforeContext, decodedPrefix, similarityThreshold * 0.8); // Lower threshold for context
+							const suffixStartMatches = !suffix || afterContext.startsWith(decodedSuffix);
+							const suffixFuzzyMatches = !suffix || fuzzyMatch(afterContext, decodedSuffix, similarityThreshold * 0.8); // Lower threshold for context
+
+							if ((prefixEndMatches || prefixFuzzyMatches) && (suffixStartMatches || suffixFuzzyMatches)) {
+								contextCheckPassed = true;
+							}
+						}
+
+						if (contextCheckPassed) {
+							// Both content and (relevant) context match - this is the best possible match.
+							return { range, cleanText: fullText }; 
+						} else {
+							// Content matched, but context didn't strongly match. Store as potential best match.
+							if (!bestMatch) { // Only store the first content match if context fails
+								bestMatch = { range, cleanText: fullText };
+								matchFoundWithoutContext = true;
+							}
+						}
+					} else {
+						// Content verification failed for this occurrence
+						// console.warn('Skipping occurrence due to content mismatch');
+					}
+				} catch (error) {
+					console.error("Error creating/verifying range:", error, { startNode: startNodeResult?.node, startOffset: startNodeResult?.offset, endNode: endNodeResult?.node, endOffset: endNodeResult?.offset });
+				}
+			}
+			// Move to the next potential starting position in this paragraph
 			currentIndex += 1;
-		}
+		} // End while loop for occurrences within paragraph
 
-		if (startIndex === -1) {
-			continue; // Try next paragraph
-		}
-
-		// Map normalized positions back to original text
-		const originalStartIndex = mapNormalizedPositionToOriginal(fullText, normalizedFullText, startIndex);
-		const originalEndIndex = mapNormalizedPositionToOriginal(fullText, normalizedFullText,
-			startIndex + normalizedSearchText.length);
-
-		// Find nodes containing start and end positions based on *original* indices
-		let startNodeResult: { node: Node, offset: number } | null = null;
-		let endNodeResult: { node: Node, offset: number } | null = null;
-
-		for (const { node, start, end } of nodePositions) {
-			// Find start node: originalStartIndex must be within [start, end)
-			if (!startNodeResult && originalStartIndex >= start && originalStartIndex < end) {
-				startNodeResult = {
-					node,
-					offset: originalStartIndex - start
-				};
-			}
-			// Find end node: originalEndIndex must be within (start, end]
-			if (originalEndIndex > start && originalEndIndex <= end) {
-				endNodeResult = {
-					node,
-					offset: originalEndIndex - start
-				};
-				// If start was also in this node, we found both. If start was earlier, we still need to check subsequent nodes for the end.
-				// Optimization: If startNode is found, we only need to look for endNode from that point forward.
-				if (startNodeResult) {
-					break; // Found end node after or within start node's paragraph segment
-				}
-			}
-		}
-
-		// If end offset is 0 and it's not the start node, it likely means the selection ended exactly at the boundary.
-		// Try to place the end position at the end of the previous node.
-		if (endNodeResult && endNodeResult.offset === 0 && (!startNodeResult || startNodeResult.node !== endNodeResult.node)) {
-			const endIndex = nodePositions.findIndex(p => p.node === endNodeResult!.node);
-			if (endIndex > 0) {
-				const prevNodePos = nodePositions[endIndex - 1];
-				endNodeResult = {
-					node: prevNodePos.node,
-					offset: prevNodePos.node.textContent?.length || 0
-				};
-			}
-		}
-
-		if (startNodeResult && endNodeResult) {
-			try {
-				const range = document.createRange();
-				range.setStart(startNodeResult.node, startNodeResult.offset);
-				range.setEnd(endNodeResult.node, endNodeResult.offset);
-
-				// Verify the range content against the original expected text (more reliable than normalized)
-				const rangeText = range.toString();
-				const normalizedRangeText = normalizeText(rangeText);
-
-				if (fuzzyMatch(normalizedRangeText, normalizedSearchText, similarityThreshold)) {
-					return { range, cleanText: fullText }; // Return the successful match
-				} else {
-					// Log mismatch details
-					console.warn('Range content mismatch after mapping:', {
-						expectedNormalized: normalizedSearchText,
-						actualNormalized: normalizedRangeText,
-						actualOriginal: rangeText,
-						similarity: fuzzyMatch(normalizedRangeText, normalizedSearchText, 0)
-					});
-					// Don't return yet, allow the loop to continue searching in case of multiple occurrences
-				}
-			} catch (error) {
-				console.error("Error creating range:", error, {
-					startNode: startNodeResult?.node,
-					startOffset: startNodeResult?.offset,
-					endNode: endNodeResult?.node,
-					endOffset: endNodeResult?.offset
-				});
-				// Continue searching in other paragraphs
-			}
-		}
+		// If a perfect match (content + context) was found in this paragraph, we would have returned already.
+		// If we found a content-only match, bestMatch would be set. We keep iterating paragraphs
+		// in case a later paragraph yields a perfect content+context match.
+		
 	} // End paragraph loop
 
-	// If no match found and we haven't exceeded max retries, try again with different parameters
+	// After checking all paragraphs:
+	// If we found a match where content verified but context didn't strongly match, return it now.
+	if (bestMatch && matchFoundWithoutContext) {
+		// console.log('✅ Returning best match based on content verification (context mismatch ignored).');
+		return bestMatch;
+	}
+
+	// Retry logic or final failure
 	if (retryCount < MAX_RETRIES) {
 		// console.log(`Retry ${retryCount + 1} with larger context and lower threshold`);
 		return findTextInCleanContent(container, searchText, prefix, suffix, retryCount + 1);
