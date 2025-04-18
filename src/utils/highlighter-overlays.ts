@@ -12,7 +12,7 @@ import {
 	FragmentHighlightData,
 	notifyHighlightsUpdated,
 	handleElementHighlight,
-	handleParagraphAsFragmentHighlight,
+	handleBlockElementAsFragmentHighlight,
 	simpleHash
 } from './highlighter';
 import { throttle } from './throttle';
@@ -24,8 +24,8 @@ let touchStartY: number = 0;
 let isTouchMoved: boolean = false;
 let lastHoverTarget: Element | null = null;
 
-// Define highlightable block element tag names (removing FIGURE, VIDEO, CANVAS)
-const HIGHLIGHTABLE_BLOCK_TAGS = new Set(['P', 'TABLE', 'PRE']);
+// Define highlightable block element tag names (Adding OL, UL)
+const HIGHLIGHTABLE_BLOCK_TAGS = new Set(['P', 'TABLE', 'PRE', 'OL', 'UL']);
 
 // Define disallowed structural container tags
 const NON_HIGHLIGHTABLE_CONTAINER_TAGS = new Set(['ARTICLE', 'SECTION', 'MAIN', 'HEADER', 'FOOTER', 'NAV', 'ASIDE']);
@@ -103,9 +103,9 @@ export function handleMouseMove(event: MouseEvent | TouchEvent) {
 
 // Handle mouse up events for highlighting
 export function handleMouseUp(event: MouseEvent | TouchEvent) {
-	let target: Element;
+	let initialTarget: Element;
 	if (event instanceof MouseEvent) {
-		target = event.target as Element;
+		initialTarget = event.target as Element;
 	} else {
 		// Touch event
 		if (isTouchMoved) {
@@ -113,25 +113,51 @@ export function handleMouseUp(event: MouseEvent | TouchEvent) {
 			return; // Don't highlight if the touch moved (scrolling)
 		}
 		const touch = event.changedTouches[0];
-		target = document.elementFromPoint(touch.clientX, touch.clientY) as Element;
+		initialTarget = document.elementFromPoint(touch.clientX, touch.clientY) as Element;
 	}
 
-	if (!target) return; // Exit if no target found
+	if (!initialTarget) return; // Exit if no target found
+
+	// Determine the actual element to potentially highlight (direct target or closest highlightable parent)
+	let highlightTarget: Element | null = null;
+	if (isHighlightableBlockElement(initialTarget)) {
+		highlightTarget = initialTarget;
+	} else if (!initialTarget.classList.contains('obsidian-highlight-overlay')) {
+		// If not directly highlightable and not an overlay, check closest highlightable ancestor
+		highlightTarget = initialTarget.closest(HIGHLIGHTABLE_BLOCK_SELECTOR);
+		// Ensure the found parent isn't ignored
+		if (highlightTarget && isIgnoredElement(highlightTarget)) {
+			highlightTarget = null;
+		}
+	}
+
+	console.log(`[Highlighter] MouseUp: initialTarget=<${initialTarget?.tagName}>, highlightTarget=<${highlightTarget?.tagName}>`);
 
 	const selection = window.getSelection();
 	if (selection && !selection.isCollapsed) {
+		console.log(`[Highlighter] Handling text selection.`);
 		handleTextSelection(selection);
-	} else if (target.classList.contains('obsidian-highlight-overlay')) {
-		handleHighlightClick(event);
-	} else if (isHighlightableBlockElement(target)) {
-		// Differentiate based on tag type
-		if (target.tagName === 'P') {
-			handleParagraphAsFragmentHighlight(target); // Use new fragment logic for paragraphs
+	} else if (initialTarget.classList.contains('obsidian-highlight-overlay')) {
+		console.log(`[Highlighter] Handling click on existing overlay.`);
+		handleHighlightClick(event); // Use initialTarget here as it IS the overlay
+	} else if (highlightTarget) { // Check the determined highlightTarget
+		// Differentiate based on tag type of the highlightTarget
+		const tagName = highlightTarget.tagName;
+		console.log(`[Highlighter] Handling click on highlightable block: <${tagName}>`, highlightTarget);
+		if (tagName === 'P') { 
+			console.log(`[Highlighter] Calling handleBlockElementAsFragmentHighlight for <P>`);
+			handleBlockElementAsFragmentHighlight(highlightTarget);
+		} else if (tagName === 'TABLE' || tagName === 'PRE' || tagName === 'OL' || tagName === 'UL') {
+			console.log(`[Highlighter] Calling handleElementHighlight for <${tagName}>`);
+			handleElementHighlight(highlightTarget);
 		} else {
-			handleElementHighlight(target); // Use element logic for TABLE, PRE
+			// Optional: Handle other unexpected highlightable block types if necessary
+			console.warn(`[Highlighter] Unhandled highlightable block type clicked: <${tagName}>. Defaulting to Element Highlight.`);
+			handleElementHighlight(highlightTarget);
 		}
-	} 
-	// We no longer automatically highlight any clicked element, only specific block types or text selections.
+	} else {
+		console.log(`[Highlighter] Click did not target a highlightable element, overlay, or text selection.`);
+	}
 }
 
 // Add touch start handler
@@ -379,6 +405,24 @@ function findTableByHash(container: Element, highlight: ElementHighlightData): H
 	return null; // Not found
 }
 
+// Helper function to find an element by content hash (generalizes findTableByHash)
+function findElementByHash(container: Element, highlight: ElementHighlightData): Element | null {
+	if (!highlight.contentHash || !highlight.tagName) return null;
+
+	const elements = Array.from(container.querySelectorAll<Element>(highlight.tagName.toLowerCase()));
+	for (const element of elements) {
+		// Ensure the found element has the correct tag name (case-insensitive check)
+		if (element.tagName === highlight.tagName) { 
+			const normalizedElementText = normalizeText(element.textContent || '');
+			const currentHash = simpleHash(normalizedElementText);
+			if (currentHash === highlight.contentHash) {
+				return element; // Found match
+			}
+		}
+	}
+	return null; // Not found
+}
+
 // Helper function to find an element between prefix/suffix context
 function findElementByContext(container: Element, highlight: ElementHighlightData): Element | null {
 	if (!highlight.contextPrefix && !highlight.contextSuffix) return null;
@@ -480,23 +524,18 @@ export function planHighlightOverlayRects(searchContainer: Element, target: Elem
 				finalTargetElement = getElementByXPath(highlight.xpath);
 
 				if (!finalTargetElement && isElementHighlight) {
-					if (highlight.tagName === 'TABLE') {
-						finalTargetElement = findTableByHash(document.body, highlight);
-					}
-					// Add finders for other types if needed
+					// Use generic hash finder for standard view fallback
+					finalTargetElement = findElementByHash(document.body, highlight);
 				}
 
 			} else {
 				// --- Reader View ---
 				// Priority: Content Match -> Context Match -> XPath -> Old Context
 				if (isElementHighlight) {
-					// 1. Content-specific match (TABLE hash)
-					if (highlight.tagName === 'TABLE') {
-						finalTargetElement = findTableByHash(searchContainer, highlight);
-					}
-					 // Add finders for other types if needed
+					// 1. Content-specific match (Hash for TABLE, OL, UL, PRE)
+					finalTargetElement = findElementByHash(searchContainer, highlight);
 
-					// 2. Prefix/Suffix Context Match
+					// 2. Prefix/Suffix Context Match (Fallback if hash fails or isn't present)
 					if (!finalTargetElement && (highlight.contextPrefix || highlight.contextSuffix)) {
 						finalTargetElement = findElementByContext(searchContainer, highlight);
 					}
@@ -754,20 +793,31 @@ function updateHighlightOverlayPositions() {
 	}
 
 	highlights.forEach((highlight, index) => {
-		// Need to determine the target element based on highlight type
-		let targetElement: Element | null = null;
-		if (highlight.type === 'fragment') {
-			targetElement = searchContainer; // Use the main container as the 'target' for fragments
-		} else {
-			targetElement = getElementByXPath(highlight.xpath); // Find specific element for legacy types
-		}
+		// Remove old overlays for this index first
+		removeExistingHighlightOverlays(index); 
+		
+		// Let planHighlightOverlayRects handle finding the actual element
+		// For fragments and elements/complex, we pass the appropriate container
+		// planHighlightOverlayRects will use XPath or fallbacks as needed.
+		let initialTargetForPlanning: Element = searchContainer;
 
-		if (targetElement) {
-			removeExistingHighlightOverlays(index); // Remove old overlays for this index first
-			planHighlightOverlayRects(searchContainer, targetElement, highlight, index); // Replan with correct container and target
-		} else if (highlight.type !== 'fragment') {
-			// Only warn if a specific element (non-fragment) wasn't found
-			console.warn(`Element not found for XPath during update: ${highlight.xpath}`);
+		// In standard mode, for element highlights, we can sometimes optimize by passing the 
+		// directly found element IF it exists, but primarily rely on planHighlightOverlayRects
+		if (!isInReader && (highlight.type === 'element' || highlight.type === 'complex')) {
+			const element = getElementByXPath(highlight.xpath);
+			if (element) {
+				initialTargetForPlanning = element;
+			} else {
+				// If XPath fails even in standard view, still let planHighlightOverlayRects try fallbacks
+				initialTargetForPlanning = searchContainer; 
+			}
+		}
+		// In Reader mode, or for fragments, initial target is always searchContainer
+
+		try {
+			planHighlightOverlayRects(searchContainer, initialTargetForPlanning, highlight, index); 
+		} catch (error) {
+			console.error("[updateHighlightOverlayPositions] Error planning overlay:", error, highlight);
 		}
 	});
 }

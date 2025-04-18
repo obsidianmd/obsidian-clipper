@@ -58,6 +58,7 @@ export interface ElementHighlightData extends HighlightData {
 	contentHash?: string; // Hash for TABLE content verification
 	contextPrefix?: string; // Normalized text preceding the element
 	contextSuffix?: string; // Normalized text succeeding the element
+	normalizedTextContent?: string; // Normalized text content of the element
 }
 
 export interface ComplexHighlightData extends HighlightData {
@@ -1580,52 +1581,8 @@ function calculateElementContext(element: Element, maxLength: number = 40): { pr
 	};
 }
 
-// Handle highlighting a specific block element (IMG, TABLE, PRE, etc.)
-export function handleElementHighlight(element: Element, notes?: string[]) {
-	const xpath = getElementXPath(element);
-	const tagName = element.tagName;
-	let content = element.outerHTML; // Default content
-	let specificData: Partial<ElementHighlightData> = {}; // To hold tagName-specific fields
-
-	try {
-		const context = calculateElementContext(element);
-		specificData.contextPrefix = context.prefix;
-		specificData.contextSuffix = context.suffix;
-
-		if (tagName === 'TABLE') {
-			// Calculate hash based on normalized text content for TABLE
-			const normalizedTableText = normalizeText(element.textContent || '');
-			specificData.contentHash = simpleHash(normalizedTableText);
-			// Keep outerHTML in content for TABLE as fallback display
-		}
-
-		const highlight: ElementHighlightData = {
-			xpath,
-			content, // outerHTML or src
-			type: 'element',
-			id: Date.now().toString() + Math.random().toString(16).slice(2),
-			tagName: tagName,
-			notes: notes,
-			// Merge specific data
-			...specificData
-			// readerContextText can be removed or kept as ultimate fallback if needed
-		};
-
-		// console.log('Creating element highlight:', highlight);
-		addHighlight(highlight);
-
-	} catch (error) {
-		console.error('Error creating element highlight:', error, element);
-	}
-}
-
-// Handle highlighting a paragraph element by creating a text fragment highlight
-export function handleParagraphAsFragmentHighlight(element: Element, notes?: string[]) {
-	if (element.tagName !== 'P') {
-		console.warn('handleParagraphAsFragmentHighlight called on non-P element:', element);
-		return;
-	}
-
+// Handle highlighting a block element (P, OL, UL) by creating a text fragment highlight
+export function handleBlockElementAsFragmentHighlight(element: Element, notes?: string[]) {
 	try {
 		const fullText = element.textContent || '';
 		if (!fullText.trim()) return; // Don't highlight empty paragraphs
@@ -1646,16 +1603,62 @@ export function handleParagraphAsFragmentHighlight(element: Element, notes?: str
 			notes: notes
 		};
 
-		// Test findability before adding
-		const findResult = findTextInCleanContent(document.body, normalizedText, highlight.prefix, highlight.suffix);
-		if (findResult) {
-			// console.log('Creating paragraph fragment highlight:', highlight);
-			addHighlight(highlight);
-		} else {
-			console.warn('❌ Paragraph fragment pre-check failed. Highlight not created.', { normalizedText, prefix: context.prefix, suffix: context.suffix });
-		}
+		// REMOVED: Pre-check findability - rely on findTextInCleanContent during applyHighlights
+		// const findResult = findTextInCleanContent(document.body, normalizedText, highlight.prefix, highlight.suffix);
+		// if (findResult) { 
+			// console.log('Creating block fragment highlight:', highlight);
+			addHighlight(highlight); // Add directly
+		// } else {
+		// 	console.warn('❌ Block fragment pre-check failed. Highlight not created.', { normalizedText, prefix: context.prefix, suffix: context.suffix });
+		// }
 
 	} catch (error) {
-		console.error('Error creating paragraph fragment highlight:', error, element);
+		console.error('Error creating block fragment highlight:', error, element);
+	}
+}
+
+// Handle highlighting specific element types (TABLE, PRE) that are NOT stored as fragments
+export function handleElementHighlight(element: Element, notes?: string[]) {
+	console.log(`[Highlighter] handleElementHighlight called for <${element.tagName}>`, element);
+	const xpath = getElementXPath(element);
+	const tagName = element.tagName;
+	let content = element.outerHTML; // Default content
+	let specificData: Partial<ElementHighlightData> = {}; // To hold tagName-specific fields
+
+	try {
+		const context = calculateElementContext(element);
+		specificData.contextPrefix = context.prefix;
+		specificData.contextSuffix = context.suffix;
+		// Always calculate normalized text content for potential matching
+		specificData.normalizedTextContent = normalizeText(element.textContent || '');
+
+		if (tagName === 'TABLE' || tagName === 'OL' || tagName === 'UL') {
+			// Calculate hash based on normalized text content for TABLE, OL, UL
+			specificData.contentHash = simpleHash(specificData.normalizedTextContent);
+			// Keep outerHTML in content for these elements as fallback display/content
+		} else if (tagName === 'PRE') {
+			// For PRE, maybe just use normalized text content hash, or keep outerHTML?
+			// Let's stick with outerHTML for now for consistency, but add hash.
+			specificData.contentHash = simpleHash(specificData.normalizedTextContent);
+		}
+		// Add other specific logic if needed (e.g., for IMG using src)
+
+		const highlight: ElementHighlightData = {
+			xpath,
+			content, // outerHTML or src
+			type: 'element',
+			id: Date.now().toString() + Math.random().toString(16).slice(2),
+			tagName: tagName,
+			notes: notes,
+			// Merge specific data
+			...specificData
+			// readerContextText can be removed or kept as ultimate fallback if needed
+		};
+
+		console.log('[Highlighter] Creating element highlight object:', highlight);
+		addHighlight(highlight);
+
+	} catch (error) {
+		console.error('Error creating element highlight:', error, element);
 	}
 }
