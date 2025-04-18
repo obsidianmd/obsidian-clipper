@@ -38,8 +38,8 @@ const MAX_HISTORY_LENGTH = 30;
 
 export interface HighlightData {
 	id: string;
-	xpath: string;
-	content: string;
+	xpath: string; // Primary locator for standard view
+	content: string; // outerHTML or key attributes for elements, selected text for fragments
 	notes?: string[]; // Annotations
 }
 
@@ -51,6 +51,9 @@ export interface TextHighlightData extends HighlightData {
 
 export interface ElementHighlightData extends HighlightData {
 	type: 'element';
+	tagName: string; // e.g., 'IMG', 'TABLE', 'PRE'
+	// outerHTML is stored in 'content'
+	readerContextText?: string; // Surrounding text for Reader Mode location fallback
 }
 
 export interface ComplexHighlightData extends HighlightData {
@@ -839,22 +842,37 @@ function mergeOverlappingHighlights(existingHighlights: AnyHighlightData[], newH
 		let overlap = false;
 		let mergedResult: AnyHighlightData | null = null;
 
-		if (existing.type === 'fragment' && newHighlight.type === 'fragment' && existing.xpath === newHighlight.xpath) {
-			const overlapAnalysis = analyzeHighlightOverlap(existing, newHighlight);
-			if (overlapAnalysis.overlaps) {
-				overlap = true;
-				mergedResult = mergeHighlights(existing, newHighlight);
-				// Preserve notes from both highlights
-				const combinedNotes = Array.from(new Set([...(existing.notes || []), ...(newHighlight.notes || [])]));
-				if (mergedResult) mergedResult.notes = combinedNotes.length > 0 ? combinedNotes : undefined;
+		// --- Start Merge Logic --- 
+		// Case 1: Both are Fragments
+		if (existing.type === 'fragment' && newHighlight.type === 'fragment') {
+			if (existing.xpath === newHighlight.xpath) { // Only merge fragments within the same container XPath
+				const overlapAnalysis = analyzeHighlightOverlap(existing, newHighlight);
+				if (overlapAnalysis.overlaps) {
+					overlap = true;
+					mergedResult = mergeHighlights(existing, newHighlight);
+					// Preserve notes (handled inside mergeHighlights for fragments)
+				}
 			}
-		} else if (existing.xpath === newHighlight.xpath && (existing.type !== 'fragment' || newHighlight.type !== 'fragment')) {
-			// Simple overlap check for non-fragment or mixed types based on XPath
-			overlap = true;
-			mergedResult = mergeComplexHighlights(existing, newHighlight);
-			const combinedNotes = Array.from(new Set([...(existing.notes || []), ...(newHighlight.notes || [])]));
-			if (mergedResult) mergedResult.notes = combinedNotes.length > 0 ? combinedNotes : undefined;
+		} 
+		// Case 2: Both are Elements (or Complex treated as Element)
+		else if ((existing.type === 'element' || existing.type === 'complex') && 
+				 (newHighlight.type === 'element' || newHighlight.type === 'complex')) 
+		{ 
+			// Check for XPath equality or containment for potential merge
+			const element1 = getElementByXPath(existing.xpath);
+			const element2 = getElementByXPath(newHighlight.xpath);
+			if (element1 && element2 && (element1 === element2 || element1.contains(element2) || element2.contains(element1) || findCommonAncestor(element1, element2))) {
+				overlap = true; // Considered overlapping if related elements
+				mergedResult = mergeComplexHighlights(existing, newHighlight);
+				// Preserve notes (handled inside mergeComplexHighlights)
+			}
 		}
+		// Case 3: Mixed types (Fragment + Element/Complex) -> NO MERGE
+		else {
+			// Do not merge highlights of fundamentally different types (text range vs. block element)
+			overlap = false;
+		}
+		// --- End Merge Logic ---
 
 		if (overlap && mergedResult) {
 			// If overlap occurred, check if we need to merge this result with the *last* item added to mergedHighlights
@@ -863,19 +881,27 @@ function mergeOverlappingHighlights(existingHighlights: AnyHighlightData[], newH
 				let subsequentOverlap = false;
 				let subsequentMergedResult: AnyHighlightData | null = null;
 
+				// Check subsequent merge only if types are compatible for merging
+				// Subsequent Fragment + Fragment merge
 				if (lastAdded.type === 'fragment' && mergedResult.type === 'fragment' && lastAdded.xpath === mergedResult.xpath) {
 					const subsequentOverlapAnalysis = analyzeHighlightOverlap(lastAdded, mergedResult);
 					if (subsequentOverlapAnalysis.overlaps) {
 						subsequentOverlap = true;
 						subsequentMergedResult = mergeHighlights(lastAdded, mergedResult);
-						const combinedNotes = Array.from(new Set([...(lastAdded.notes || []), ...(mergedResult.notes || [])]));
-						if (subsequentMergedResult) subsequentMergedResult.notes = combinedNotes.length > 0 ? combinedNotes : undefined;
+						// Notes handled within mergeHighlights
 					}
-				} else if (lastAdded.xpath === mergedResult.xpath && (lastAdded.type !== 'fragment' || mergedResult.type !== 'fragment')) {
-					subsequentOverlap = true;
-					subsequentMergedResult = mergeComplexHighlights(lastAdded, mergedResult);
-					const combinedNotes = Array.from(new Set([...(lastAdded.notes || []), ...(mergedResult.notes || [])]));
-					if (subsequentMergedResult) subsequentMergedResult.notes = combinedNotes.length > 0 ? combinedNotes : undefined;
+				} 
+				// Subsequent Element/Complex + Element/Complex merge
+				else if ((lastAdded.type === 'element' || lastAdded.type === 'complex') && 
+						 (mergedResult.type === 'element' || mergedResult.type === 'complex'))
+				{ 
+					const element1 = getElementByXPath(lastAdded.xpath);
+					const element2 = getElementByXPath(mergedResult.xpath);
+					if (element1 && element2 && (element1 === element2 || element1.contains(element2) || element2.contains(element1) || findCommonAncestor(element1, element2))) {
+						subsequentOverlap = true;
+						subsequentMergedResult = mergeComplexHighlights(lastAdded, mergedResult);
+						// Notes handled within mergeComplexHighlights
+					}
 				}
 
 				if (subsequentOverlap && subsequentMergedResult) {
@@ -888,13 +914,13 @@ function mergeOverlappingHighlights(existingHighlights: AnyHighlightData[], newH
 			}
 			consumedNew = true; // The new highlight was merged
 		} else {
-			mergedHighlights.push(existing); // No overlap with new highlight, keep existing
+			mergedHighlights.push(existing); // No overlap or incompatible types, keep existing
 		}
 	}
 
 	// If the new highlight wasn't merged into any existing highlight, add it now.
 	if (!consumedNew) {
-		console.log('Adding new highlight without merging');
+		// console.log('Adding new highlight without merging');
 		mergedHighlights.push(newHighlight);
 	}
 
@@ -1080,13 +1106,27 @@ function mergeComplexHighlights(highlight1: AnyHighlightData, highlight2: AnyHig
 	// Preserve notes from both original highlights
 	const combinedNotes = Array.from(new Set([...(highlight1.notes || []), ...(highlight2.notes || [])]));
 
-	return {
+	// Create the base object
+	const mergedHighlightBase = {
 		xpath: getElementXPath(mergedElement),
 		content: mergedElement.outerHTML,
-		type: mergedType,
 		id: Date.now().toString(), // Generate new ID for merged highlight
 		notes: combinedNotes.length > 0 ? combinedNotes : undefined
 	};
+
+	if (mergedType === 'element') {
+		return {
+			...mergedHighlightBase,
+			type: 'element',
+			tagName: mergedElement.tagName // Add tagName for element type
+			// readerContextText will be calculated when the element is first highlighted
+		};
+	} else { // mergedType === 'complex'
+		return {
+			...mergedHighlightBase,
+			type: 'complex'
+		};
+	}
 }
 
 // Find the common ancestor of two elements
@@ -1165,23 +1205,35 @@ export function applyHighlights() {
 
 		highlights.forEach((highlight, index) => {
 			try {
-				// Determine the target element based on highlight type
+				// Determine the target element based on highlight type and mode
 				let targetElement: Element | null = null;
+
 				if (highlight.type === 'fragment') {
-					// For fragments, the 'target' for planning is the searchContainer itself,
-					// as findTextInCleanContent will locate the specific range within it.
+					// For fragments, the 'target' for planning is always the searchContainer.
+					// findTextInCleanContent will locate the range within this container.
 					targetElement = searchContainer;
+				} else if (highlight.type === 'element' || highlight.type === 'complex') {
+					// For element/complex, the target finding depends on the mode.
+					if (!isInReader) {
+						// Standard View: Use XPath on the document body
+						targetElement = getElementByXPath(highlight.xpath);
+					} else {
+						// Reader View: This is complex and will be handled inside planHighlightOverlayRects
+						// For now, we pass the searchContainer as the initial target.
+						// planHighlightOverlayRects will attempt context search if direct XPath fails.
+						targetElement = searchContainer; // Initial container for reader element search
+					}
 				} else {
-					// For legacy highlight types, try to find the specific element by xpath
+					// Handle legacy text highlights if they still exist (treat like complex)
 					targetElement = getElementByXPath(highlight.xpath);
 				}
 
 				if (targetElement) {
-					// Pass both the searchContainer and the specific targetElement (if applicable)
+					// Pass both the searchContainer and the determined targetElement
 					planHighlightOverlayRects(searchContainer, targetElement, highlight, index);
-				} else if (highlight.type !== 'fragment') {
-					// Only warn if a specific element (non-fragment) wasn't found
-					console.warn(`Element not found for XPath: ${highlight.xpath}`);
+				} else if (highlight.type !== 'fragment' && !isInReader) {
+					// Only warn if a specific element wasn't found in standard view
+					console.warn(`Element not found for XPath (standard view): ${highlight.xpath}`);
 				}
 			} catch (error) {
 				console.error('Error applying highlight:', error, highlight);
@@ -1394,5 +1446,84 @@ async function handleCopyAllHighlightsLink() {
 		}
 	} catch (error) {
 		console.error('Error copying all highlight links:', error);
+	}
+}
+
+// Helper function to calculate context text for Reader Mode fallback
+function calculateReaderContext(element: Element, maxLength: number = 60): string | undefined {
+	let context = '';
+	const maxCharsPerSide = Math.floor(maxLength / 2);
+
+	// Look for preceding text siblings/parents
+	let previousText = '';
+	let sibling = element.previousElementSibling;
+	while (sibling && previousText.length < maxCharsPerSide) {
+		previousText = (sibling.textContent || '').trim() + ' ' + previousText;
+		sibling = sibling.previousElementSibling;
+	}
+	if (previousText.length < maxCharsPerSide && element.parentElement) {
+		let parentSibling = element.parentElement.previousElementSibling;
+		while (parentSibling && previousText.length < maxCharsPerSide) {
+			previousText = (parentSibling.textContent || '').trim() + ' ' + previousText;
+			parentSibling = parentSibling.previousElementSibling;
+		}
+	}
+	previousText = previousText.trim().slice(-maxCharsPerSide); // Get the end part
+
+	// Look for succeeding text siblings/parents
+	let nextText = '';
+	sibling = element.nextElementSibling;
+	while (sibling && nextText.length < maxCharsPerSide) {
+		nextText += ' ' + (sibling.textContent || '').trim();
+		sibling = sibling.nextElementSibling;
+	}
+	if (nextText.length < maxCharsPerSide && element.parentElement) {
+		let parentSibling = element.parentElement.nextElementSibling;
+		while (parentSibling && nextText.length < maxCharsPerSide) {
+			nextText += ' ' + (parentSibling.textContent || '').trim();
+			parentSibling = parentSibling.nextElementSibling;
+		}
+	}
+	nextText = nextText.trim().slice(0, maxCharsPerSide); // Get the start part
+
+	// Combine context, prioritizing the element's own text if minimal
+	const elementText = (element.textContent || '').trim();
+	if (elementText.length < 10 && (previousText || nextText)) {
+		context = `${previousText} ${nextText}`.trim();
+	} else if (elementText.length > 0 && elementText.length <= maxLength) {
+		// If element has short text, use it directly
+		context = elementText;
+	} else {
+		context = `${previousText} ${nextText}`.trim();
+	}
+
+	// Normalize the context text
+	return context ? normalizeText(context) : undefined;
+}
+
+// Handle highlighting a specific block element (IMG, TABLE, PRE, etc.)
+export function handleElementHighlight(element: Element, notes?: string[]) {
+	const xpath = getElementXPath(element);
+	// Use outerHTML for most elements, but just src for images for conciseness
+	const content = element.tagName === 'IMG' ? (element as HTMLImageElement).src : element.outerHTML;
+	try {
+		const highlight: ElementHighlightData = {
+			xpath,
+			content,
+			type: 'element',
+			id: Date.now().toString() + Math.random().toString(16).slice(2),
+			tagName: element.tagName,
+			readerContextText: calculateReaderContext(element)
+		};
+
+		if (notes && notes.length > 0) {
+			highlight.notes = notes;
+		}
+
+		// console.log('Creating element highlight:', highlight);
+		addHighlight(highlight);
+
+	} catch (error) {
+		console.error('Error creating element highlight:', error, element);
 	}
 }

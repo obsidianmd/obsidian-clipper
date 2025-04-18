@@ -4,18 +4,19 @@ import { sanitizeFileName, getDomain } from './string-utils';
 import browser from './browser-polyfill';
 import { debugLog } from './debug';
 import dayjs from 'dayjs';
-import { AnyHighlightData, TextHighlightData, HighlightData } from './highlighter';
+import { 
+	AnyHighlightData, 
+	TextHighlightData, 
+	ElementHighlightData,
+	FragmentHighlightData,
+	HighlightData
+} from './highlighter';
 import { generalSettings } from './storage-utils';
 import { 
 	getElementByXPath,
 	wrapElementWithMark,
 	wrapTextWithMark 
 } from './dom-utils';
-
-// Define ElementHighlightData type inline since it's not exported from highlighter.ts
-interface ElementHighlightData extends HighlightData {
-	type: 'element';
-}
 
 function canHighlightElement(element: Element): boolean {
 	// List of elements that can't be nested inside mark
@@ -255,7 +256,8 @@ function processHighlights(content: string, highlights: AnyHighlightData[]): str
 	}
 
 	if (generalSettings.highlightBehavior === 'replace-content') {
-		return highlights.map(highlight => highlight.content).join('');
+		// For replace-content, just join the content strings
+		return highlights.map(highlight => highlight.content).join('\n\n'); // Add newline separation
 	}
 
 	if (generalSettings.highlightBehavior === 'highlight-inline') {
@@ -264,10 +266,11 @@ function processHighlights(content: string, highlights: AnyHighlightData[]): str
 		const tempDiv = document.createElement('div');
 		tempDiv.innerHTML = content;
 
-		const textHighlights = filterAndSortHighlights(highlights);
-		debugLog('Highlights', 'Processing highlights:', textHighlights.length);
+		// Filter and sort highlights suitable for inline marking
+		const processableHighlights = filterAndSortHighlights(highlights);
+		debugLog('Highlights', 'Processing highlights:', processableHighlights.length);
 
-		for (const highlight of textHighlights) {
+		for (const highlight of processableHighlights) {
 			processHighlight(highlight, tempDiv);
 		}
 
@@ -278,39 +281,64 @@ function processHighlights(content: string, highlights: AnyHighlightData[]): str
 	return content;
 }
 
-function filterAndSortHighlights(highlights: AnyHighlightData[]): (TextHighlightData | ElementHighlightData)[] {
+function filterAndSortHighlights(highlights: AnyHighlightData[]): (TextHighlightData | ElementHighlightData | FragmentHighlightData)[] {
 	return highlights
-		.filter((h): h is (TextHighlightData | ElementHighlightData) => {
+		.filter((h): h is (TextHighlightData | ElementHighlightData | FragmentHighlightData) => {
 			if (h.type === 'text') {
+				// Keep text highlights with content or xpath
 				return !!(h.xpath?.trim() || h.content?.trim());
 			}
 			if (h.type === 'fragment') {
-				return !!(h.xpath?.trim() || h.content?.trim());
+				// Keep fragment highlights (they always have content/textStart)
+				return true;
 			}
-			if (h.type === 'element' && h.xpath?.trim()) {
+			if (h.type === 'element') {
+				// Keep element highlights if the element exists and can be highlighted
+				if (!h.xpath?.trim()) return false;
 				const element = getElementByXPath(h.xpath);
 				return element ? canHighlightElement(element) : false;
 			}
+			// Ignore complex highlights for inline processing for now
 			return false;
 		})
+		// Sort primarily to handle nested text/fragment highlights correctly
+		// Process inner highlights before outer ones by sorting descending by start offset/position
 		.sort((a, b) => {
-			if (a.xpath && b.xpath) {
-				const elementA = getElementByXPath(a.xpath);
-				const elementB = getElementByXPath(b.xpath);
-				if (elementA === elementB && a.type === 'text' && b.type === 'text') {
+			const elementA = a.xpath ? getElementByXPath(a.xpath) : null;
+			const elementB = b.xpath ? getElementByXPath(b.xpath) : null;
+
+			// If elements differ, sort by DOM order (or lack of element last)
+			if (elementA !== elementB) {
+				if (!elementA) return 1;
+				if (!elementB) return -1;
+				// Compare position returns bitmask: 2 = preceding, 4 = following
+				const comparison = elementA.compareDocumentPosition(elementB);
+				if (comparison & Node.DOCUMENT_POSITION_FOLLOWING) return -1;
+				if (comparison & Node.DOCUMENT_POSITION_PRECEDING) return 1;
+				return 0;
+			}
+
+			// If elements are the same, sort text/fragments by start offset (descending)
+			if ((a.type === 'text' || a.type === 'fragment') && (b.type === 'text' || b.type === 'fragment')) {
+				// Need a way to get start position for fragments - approximate using content search?
+				// For now, just sort text highlights by offset descending.
+				if (a.type === 'text' && b.type === 'text') {
 					return b.startOffset - a.startOffset;
 				}
 			}
+			// Keep relative order for elements or mixed types within the same parent
 			return 0;
-		});
+		}) as (TextHighlightData | ElementHighlightData | FragmentHighlightData)[]; // Cast needed after filter/sort
 }
 
-function processHighlight(highlight: TextHighlightData | ElementHighlightData, tempDiv: HTMLDivElement) {
+function processHighlight(highlight: TextHighlightData | ElementHighlightData | FragmentHighlightData, tempDiv: HTMLDivElement) {
 	try {
-		if (highlight.xpath) {
-			processXPathHighlight(highlight, tempDiv);
-		} else {
-			processContentBasedHighlight(highlight, tempDiv);
+		if (highlight.xpath && (highlight.type === 'element' || highlight.type === 'text')) {
+			// Use XPath for elements and legacy text highlights
+			processXPathHighlight(highlight as (ElementHighlightData | TextHighlightData), tempDiv);
+		} else if (highlight.type === 'fragment' || (highlight.type === 'text' && !highlight.xpath)) {
+			// Use content-based search for fragments and text highlights without XPath
+			processContentBasedHighlight(highlight as (FragmentHighlightData | TextHighlightData) , tempDiv);
 		}
 	} catch (error) {
 		debugLog('Highlights', 'Error processing highlight:', error);
@@ -333,25 +361,48 @@ function processXPathHighlight(highlight: TextHighlightData | ElementHighlightDa
 
 	if (highlight.type === 'element') {
 		wrapElementWithMark(element);
-	} else {
+	} else { // Must be TextHighlightData here
 		wrapTextWithMark(element, highlight as TextHighlightData);
 	}
 }
 
-function processContentBasedHighlight(highlight: TextHighlightData | ElementHighlightData, tempDiv: HTMLDivElement) {
-	const contentDiv = document.createElement('div');
-	contentDiv.innerHTML = highlight.content;
+function processContentBasedHighlight(highlight: FragmentHighlightData | TextHighlightData, tempDiv: HTMLDivElement) {
+	// Use highlight.content (for text) or decode textStart (for fragment) as the search term
+	const searchText = highlight.type === 'fragment' ? decodeURIComponent(highlight.textStart) : highlight.content;
+	
+	// Simple text search and wrap - less precise than fragment logic but works for inline marking
+	const simplifiedSearchText = stripHtml(searchText).trim();
+	if (!simplifiedSearchText) return; // Don't search for empty strings
 
-	const innerContent = contentDiv.children.length === 1 && 
-		contentDiv.firstElementChild?.tagName === 'DIV' ? 
-		contentDiv.firstElementChild.innerHTML : 
-		contentDiv.innerHTML;
+	debugLog('Highlights', 'Searching for content:', simplifiedSearchText);
+	
+	const walker = document.createTreeWalker(tempDiv, NodeFilter.SHOW_TEXT);
+	let node;
+	const rangesToWrap: Range[] = [];
 
-	const paragraphs = Array.from(contentDiv.querySelectorAll('p'));
-	if (paragraphs.length) {
-		processContentParagraphs(paragraphs, tempDiv);
-	} else {
-		processInlineContent(innerContent, tempDiv);
+	// Find all occurrences
+	while (node = walker.nextNode() as Text) {
+		const nodeText = node.textContent || '';
+		let index = nodeText.indexOf(simplifiedSearchText);
+		while (index !== -1) {
+			const range = document.createRange();
+			range.setStart(node, index);
+			range.setEnd(node, index + simplifiedSearchText.length);
+			rangesToWrap.push(range);
+			index = nodeText.indexOf(simplifiedSearchText, index + 1); // Find next occurrence
+		}
+	}
+
+	// Wrap ranges in reverse order to avoid index issues
+	for (let i = rangesToWrap.length - 1; i >= 0; i--) {
+		try {
+			const mark = document.createElement('mark');
+			rangesToWrap[i].surroundContents(mark);
+			debugLog('Highlights', 'Created mark element:', mark.outerHTML);
+		} catch (error) {
+			// Ignore errors during wrapping (e.g., trying to wrap across invalid boundaries)
+			debugLog('Highlights', 'Could not wrap range:', rangesToWrap[i].toString(), error);
+		}
 	}
 }
 
