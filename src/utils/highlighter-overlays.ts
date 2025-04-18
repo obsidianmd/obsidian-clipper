@@ -9,10 +9,11 @@ import {
 	updateHighlights,
 	updateHighlighterMenu,
 	FragmentHighlightData,
-	notifyHighlightsUpdated
+	notifyHighlightsUpdated,
+	addHighlight
 } from './highlighter';
 import { throttle } from './throttle';
-import { getElementByXPath, isDarkColor } from './dom-utils';
+import { getElementByXPath, isDarkColor, getElementRelativeXPath, evaluateXPath, getElementXPath } from './dom-utils';
 
 let hoverOverlay: HTMLElement | null = null;
 let touchStartX: number = 0;
@@ -22,42 +23,143 @@ let lastHoverTarget: Element | null = null;
 
 // Handles mouse move events for hover effects
 export function handleMouseMove(event: MouseEvent | TouchEvent) {
-	let target: Element;
+	let target: Element | null = null;
 	if (event instanceof MouseEvent) {
 		target = event.target as Element;
 	} else {
-		// Touch event
+		// Touch event - less relevant for hover, but handle consistently
 		const touch = event.changedTouches[0];
 		target = document.elementFromPoint(touch.clientX, touch.clientY) as Element;
 	}
 
-	if (target.classList.contains('obsidian-highlight-overlay')) {
-		createOrUpdateHoverOverlay(target);
-	} else {
-		removeHoverOverlay();
+	if (!target) return; // Exit if no target found
+
+	// Ignore clicks on the menu itself or the hover overlay
+	if (target.closest('.obsidian-highlighter-menu') || target.id === 'obsidian-highlight-hover-overlay') {
+		// If hovering over the menu or the hover overlay itself, do nothing/remove existing hover
+		if (lastHoverTarget) removeHoverOverlay();
+		return;
 	}
+
+	// Case 1: Hovering over an existing highlight overlay
+	if (target.classList.contains('obsidian-highlight-overlay')) {
+		drawHoverOverlayForElement(target, true); // true indicates it's an existing highlight
+		return;
+	}
+
+	// Case 2: Hovering over a potential target block element
+	// Define the selectors for elements we want to show hover for
+	const hoverTargetSelectors = 'P, UL, OL, MATH, PRE, TABLE, BLOCKQUOTE, FIGURE, LI, DD, DT';
+	const potentialTarget = target.closest(hoverTargetSelectors);
+
+	if (potentialTarget) {
+		// Ensure the potential target is within the main content area (not toolbar, etc.)
+		// This check might need adjustment based on your specific UI structure
+		if (potentialTarget.closest('body')) { // Simple check: is it in the body?
+			drawHoverOverlayForElement(potentialTarget, false); // false indicates it's a potential new target
+			return;
+		}
+	}
+
+	// Case 3: Hovering over something else - remove the overlay
+	removeHoverOverlay();
 }
 
 // Handle mouse up events for highlighting
 export function handleMouseUp(event: MouseEvent | TouchEvent) {
 	let target: Element;
+	let isTouchEvent = false;
+
 	if (event instanceof MouseEvent) {
 		target = event.target as Element;
 	} else {
 		// Touch event
+		isTouchEvent = true;
 		if (isTouchMoved) {
 			isTouchMoved = false;
 			return; // Don't highlight if the touch moved (scrolling)
 		}
 		const touch = event.changedTouches[0];
-		target = document.elementFromPoint(touch.clientX, touch.clientY) as Element;
+		// Use elementFromPoint for touch events to get the element under the touch point
+		const elementUnderTouch = document.elementFromPoint(touch.clientX, touch.clientY);
+		// Important: If the element is an overlay, try to find the element *below* it
+		if (elementUnderTouch?.classList.contains('obsidian-highlight-overlay')) {
+			// Temporarily hide overlays to find the element underneath
+			const overlays = document.querySelectorAll('.obsidian-highlight-overlay');
+			overlays.forEach(o => (o as HTMLElement).style.pointerEvents = 'none');
+			target = document.elementFromPoint(touch.clientX, touch.clientY) as Element;
+			overlays.forEach(o => (o as HTMLElement).style.pointerEvents = ''); // Restore pointer events
+		} else {
+			target = elementUnderTouch as Element;
+		}
+
+		// If target is still null after checks, exit
+		if (!target) {
+			console.warn("Could not determine target element for touch event.");
+			return;
+		}
 	}
 
 	const selection = window.getSelection();
-	if (selection && !selection.isCollapsed) {
+
+	// Case 1: Text Selection Exists
+	if (selection && !selection.isCollapsed && selection.toString().trim().length > 0) {
 		handleTextSelection(selection);
-	} else if (target.classList.contains('obsidian-highlight-overlay')) {
-		handleHighlightClick(event);
+	}
+	// Case 2: Click on an Existing Highlight Overlay
+	else if (target.classList.contains('obsidian-highlight-overlay')) {
+		if (!isTouchEvent || (isTouchEvent && event.currentTarget !== target)) {
+			handleHighlightClick(event);
+		}
+	}
+	// Case 3: Click on Specific Block Elements (Original Correct Logic)
+	else {
+		const blockSelector = 'TABLE, UL, OL, PRE, BLOCKQUOTE, FIGURE'; // Keep this selector for *clicking*
+		const clickedBlock = target.closest(blockSelector);
+
+		if (clickedBlock) {
+			// Determine the search container (reader or body)
+			const isInReader = document.documentElement.classList.contains('obsidian-reader-active');
+			let searchContainer: Element;
+			if (isInReader) {
+				searchContainer = document.querySelector('.obsidian-reader-content article') || document.body;
+			} else {
+				searchContainer = document.body;
+			}
+
+			if (!searchContainer.contains(clickedBlock)) {
+				console.warn("Clicked block is not within the expected search container.");
+				return; // Don't highlight if the block isn't in the main content area
+			}
+
+			const relativeXpath = getElementRelativeXPath(clickedBlock, searchContainer);
+			const fullXpath = getElementXPath(clickedBlock); // Use correct function from dom-utils
+
+			if (!relativeXpath) {
+				console.error("Could not generate relative XPath for block element:", clickedBlock);
+				return;
+			}
+
+			const highlightData: FragmentHighlightData = {
+				id: Date.now().toString() + Math.random().toString(16).slice(2),
+				type: 'fragment',
+				xpath: fullXpath || '', // Store original full xpath potentially
+				content: clickedBlock.outerHTML, // Store the outer HTML for block content
+				textStart: '', // Minimal text details for block highlights
+				prefix: undefined,
+				suffix: undefined,
+				isBlock: true, // Mark as a block highlight
+				relativeXpath: relativeXpath, // Store the relative XPath
+			};
+			// Add the logging here before calling addHighlight
+			console.log("[handleMouseUp] Block element clicked. Creating highlight:", { 
+				clickedElement: clickedBlock.tagName,
+				relativeXpath: relativeXpath,
+				data: highlightData 
+			});
+			addHighlight(highlightData); // Call the correct addHighlight function
+		}
+		// Else: Clicked on something else (e.g., plain paragraph, div) - do nothing on click
 	}
 }
 
@@ -234,45 +336,112 @@ function findWordBoundaries(text: string, startPos: number, endPos: number): { s
 	return { start, end };
 }
 
-// Update planHighlightOverlayRects to use findTextNodeAtPosition
+// Update planHighlightOverlayRects to handle block vs text fragments
 export function planHighlightOverlayRects(searchContainer: Element, target: Element, highlight: AnyHighlightData, index: number) {
 	const existingOverlays = Array.from(document.querySelectorAll(`.obsidian-highlight-overlay[data-highlight-index="${index}"]`));
 	
+	console.log(`[planHighlightOverlayRects] Processing highlight index ${index}, type: ${highlight.type}, isBlock: ${(highlight as FragmentHighlightData).isBlock}`);
+
 	if (highlight.type === 'fragment') {
-		try {
-			const result = findTextInCleanContent(
-				searchContainer,
-				decodeURIComponent(highlight.textStart),
-				highlight.prefix,
-				highlight.suffix
-			);
-			
-			if (result) {
-				const rects = result.range.getClientRects();
-				if (rects.length > 0) {
-					const averageLineHeight = calculateAverageLineHeight(rects);
-					const textRects = Array.from(rects).filter(rect => rect.height <= averageLineHeight * 1.5);
-					
-					if (textRects.length > 0) {
-						mergeHighlightOverlayRects(textRects, highlight.content, existingOverlays, true, index, highlight.notes);
-						return;
+		// Case 1: Highlight represents a block element
+		if (highlight.isBlock && highlight.relativeXpath) {
+			console.log(`[planHighlightOverlayRects] Handling block highlight. Relative XPath: ${highlight.relativeXpath}`);
+			try {
+				const blockElement = evaluateXPath(highlight.relativeXpath, searchContainer);
+				console.log(`[planHighlightOverlayRects] Found block element via relative XPath:`, blockElement);
+				
+				if (blockElement) {
+					const rect = blockElement.getBoundingClientRect();
+					console.log(`[planHighlightOverlayRects] Block element rect:`, rect);
+					if (rect.width > 0 && rect.height > 0) { // Ensure the element is visible
+						mergeHighlightOverlayRects([rect], highlight.content, existingOverlays, false, index, highlight.notes);
+						console.log(`[planHighlightOverlayRects] Rendered block highlight.`);
+						return; // Successfully rendered block
+					} else {
+						console.warn('Block element found but has no dimensions:', { xpath: highlight.relativeXpath, element: blockElement });
+					}
+				} else {
+					console.warn('Could not find block element using relative XPath:', highlight.relativeXpath);
+				}
+			} catch (error) {
+				console.error('Error finding/rendering block highlight using relative XPath:', { xpath: highlight.relativeXpath, error });
+			}
+			// Fallback for block highlights if relative XPath fails (e.g., render nothing or log error)
+			console.error('Failed to render block highlight:', highlight.id);
+			return; // Stop processing this highlight if block rendering failed
+		}
+
+		// Case 2: Highlight represents text (isBlock is false or undefined)
+		else {
+			console.log(`[planHighlightOverlayRects] Handling text fragment highlight.`);
+			let textFound = false;
+			try {
+				// Attempt 1: Find using text content (Primary)
+				const result = findTextInCleanContent(
+					searchContainer,
+					decodeURIComponent(highlight.textStart),
+					highlight.prefix,
+					highlight.suffix
+				);
+				
+				if (result) {
+					const rects = result.range.getClientRects();
+					if (rects.length > 0) {
+						const averageLineHeight = calculateAverageLineHeight(rects);
+						// Filter out rects that are likely entire blocks rather than lines of text
+						const textRects = Array.from(rects).filter(rect => rect.height <= averageLineHeight * 1.5 && rect.width > 0 && rect.height > 0);
+						
+						if (textRects.length > 0) {
+							mergeHighlightOverlayRects(textRects, highlight.content, existingOverlays, true, index, highlight.notes);
+							textFound = true; // Mark success
+						}
 					}
 				}
+			} catch (error) {
+				console.error('Error finding text for fragment highlight:', error);
 			}
-			
-			console.warn('Could not find text match for fragment highlight:', {
-				text: decodeURIComponent(highlight.textStart),
-				prefix: highlight.prefix ? decodeURIComponent(highlight.prefix) : undefined,
-				suffix: highlight.suffix ? decodeURIComponent(highlight.suffix) : undefined
-			});
-		} catch (error) {
-			console.error('Error creating fragment highlight overlay:', error);
+
+			// Attempt 2: Fallback using relative XPath if text search failed and XPath exists
+			if (!textFound && highlight.relativeXpath) {
+				console.warn('Text fragment not found, attempting fallback using relative XPath:', { id: highlight.id, xpath: highlight.relativeXpath });
+				try {
+					const fallbackElement = evaluateXPath(highlight.relativeXpath, searchContainer);
+					if (fallbackElement) {
+						const rect = fallbackElement.getBoundingClientRect();
+						if (rect.width > 0 && rect.height > 0) {
+							mergeHighlightOverlayRects([rect], highlight.content, existingOverlays, false, index, highlight.notes);
+							console.log('Fallback rendering successful using relative XPath.');
+							return; // Successfully rendered fallback
+						}
+					}
+				} catch (error) {
+					console.error('Error during fallback rendering with relative XPath:', error);
+				}
+			}
+
+			// If text wasn't found (and fallback didn't work/apply), log the failure
+			if (!textFound) {
+				console.warn('Could not find text match OR fallback element for fragment highlight:', {
+					id: highlight.id,
+					text: decodeURIComponent(highlight.textStart),
+					prefix: highlight.prefix ? decodeURIComponent(highlight.prefix) : undefined,
+					suffix: highlight.suffix ? decodeURIComponent(highlight.suffix) : undefined,
+					relativeXpath: highlight.relativeXpath
+				});
+			}
+			return; // Done processing text fragment
 		}
+
 	} else if (highlight.type === 'text' || highlight.type === 'complex' || highlight.type === 'element') {
-		// Handle legacy highlight types
+		// Handle legacy highlight types (Keep for now, might remove later)
 		try {
-			const rect = target.getBoundingClientRect();
-			mergeHighlightOverlayRects([rect], highlight.content, existingOverlays, false, index, highlight.notes);
+			// Legacy types relied on the `target` passed in, which was found using the absolute `highlight.xpath`
+			const rect = target.getBoundingClientRect(); 
+			if (rect.width > 0 && rect.height > 0) {
+				mergeHighlightOverlayRects([rect], highlight.content, existingOverlays, false, index, highlight.notes);
+			} else {
+				console.warn('Legacy highlight target element has no dimensions:', { xpath: highlight.xpath, target });
+			}
 		} catch (error) {
 			console.error('Error creating legacy highlight overlay:', error);
 		}
@@ -362,7 +531,9 @@ function createTextFragmentURL(textStart: string, prefix?: string, suffix?: stri
 		// Dummy values for other required fields
 		id: '',
 		xpath: '',
-		content: '' 
+		content: '',
+		isBlock: false,
+		relativeXpath: null
 	});
 	const fragment = `:~:${fragmentPart}`;
 
@@ -544,11 +715,11 @@ observer.observe(document.body, {
 	characterData: false
 });
 
-// Create or update the hover overlay used to indicate which element will be highlighted
-function createOrUpdateHoverOverlay(target: Element) {
-	// Only update if the target has changed
-	if (target === lastHoverTarget) return;
-	lastHoverTarget = target;
+// Draw the hover overlay around a specific element
+function drawHoverOverlayForElement(element: Element, isOnHighlight: boolean) {
+	// Only update if the target element itself has changed
+	if (element === lastHoverTarget) return;
+	lastHoverTarget = element;
 
 	if (!hoverOverlay) {
 		hoverOverlay = document.createElement('div');
@@ -556,7 +727,13 @@ function createOrUpdateHoverOverlay(target: Element) {
 		document.body.appendChild(hoverOverlay);
 	}
 	
-	const rect = target.getBoundingClientRect();
+	const rect = element.getBoundingClientRect();
+
+	// Ensure element is visible and has dimensions
+	if (rect.width === 0 || rect.height === 0) {
+		removeHoverOverlay(); // Hide if target is not visible
+		return;
+	}
 
 	hoverOverlay.style.position = 'absolute';
 	hoverOverlay.style.left = `${rect.left + window.scrollX - 2}px`;
@@ -564,21 +741,31 @@ function createOrUpdateHoverOverlay(target: Element) {
 	hoverOverlay.style.width = `${rect.width + 4}px`;
 	hoverOverlay.style.height = `${rect.height + 4}px`;
 	hoverOverlay.style.display = 'block';
-	hoverOverlay.classList.add('on-highlight');
 
-	// Add 'is-hovering' class to all highlight overlays with the same index
-	const index = target.getAttribute('data-highlight-index');
-	if (index) {
-		document.querySelectorAll(`.obsidian-highlight-overlay[data-highlight-index="${index}"]`).forEach(el => {
-			el.classList.add('is-hovering');
-		});
+	// Manage classes based on whether we are hovering a potential new target or an existing highlight
+	hoverOverlay.classList.toggle('on-highlight', isOnHighlight);
+
+	// Remove specific hover effect from previously hovered highlights
+	document.querySelectorAll('.obsidian-highlight-overlay.is-hovering').forEach(el => {
+		el.classList.remove('is-hovering');
+	});
+
+	// If hovering an existing highlight, add hover class to *all* parts of that highlight
+	if (isOnHighlight && element.classList.contains('obsidian-highlight-overlay')) {
+		const index = element.getAttribute('data-highlight-index');
+		if (index) {
+			document.querySelectorAll(`.obsidian-highlight-overlay[data-highlight-index="${index}"]`).forEach(el => {
+				el.classList.add('is-hovering');
+			});
+		}
 	}
 }
 
-// Modify the removeHoverOverlay function to also remove the 'is-hovering' class
+// Modify the removeHoverOverlay function to also remove the 'is-hovering' class and on-highlight
 export function removeHoverOverlay() {
 	if (hoverOverlay) {
 		hoverOverlay.style.display = 'none';
+		hoverOverlay.classList.remove('on-highlight'); // Ensure this is removed
 	}
 	lastHoverTarget = null;
 

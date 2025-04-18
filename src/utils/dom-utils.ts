@@ -1,3 +1,5 @@
+import { debugLog } from './debug';
+
 export function createElementWithClass(tagName: string, className: string): HTMLElement {
 	const element = document.createElement(tagName);
 	element.className = className;
@@ -94,5 +96,71 @@ export function wrapTextWithMark(element: Element, highlight: { startOffset: num
 		
 		const mark = document.createElement('mark');
 		range.surroundContents(mark);
+	}
+}
+
+// Get XPath relative to a specific root element
+export function getElementRelativeXPath(element: Element, root: Element): string | null {
+	try {
+		if (element === root) {
+			return '.'; // XPath for the root itself relative to itself
+		}
+
+		const parts: string[] = [];
+		let currentElement: Element | null = element;
+
+		while (currentElement && currentElement !== root) {
+			let part = currentElement.tagName.toLowerCase();
+			const parent: Element | null = currentElement.parentElement; // Explicitly type parent
+
+			if (!parent) {
+				// Reached document root before hitting the specified root
+				console.error("Element is not a descendant of the specified root.");
+				return null;
+			}
+
+			// Get siblings of the same tag name
+			const siblings = Array.from(parent.children)
+				.filter((sibling): sibling is Element => sibling instanceof Element && sibling.tagName === currentElement?.tagName); // Type guard for Element
+
+			if (siblings.length > 1) {
+				const index = siblings.indexOf(currentElement) + 1; // XPath indices are 1-based
+				part += `[${index}]`;
+			}
+
+			parts.unshift(part);
+			currentElement = parent;
+
+			// Safety break if we somehow miss the root
+			if (currentElement === document.body && root !== document.body) {
+				console.error("Element path does not lead to the specified root element.");
+				return null;
+			}
+		}
+
+		if (currentElement !== root) {
+			// This should theoretically not happen if the initial checks pass,
+			// but serves as a final validation.
+			console.error("Failed to construct relative XPath: Element not within root.");
+			return null;
+		}
+
+		// The path starts from the root, so we prepend './' to indicate relative path
+		return './' + parts.join('/');
+
+	} catch (error) {
+		console.error('Error generating relative XPath:', error);
+		return null;
+	}
+}
+
+// Evaluate an XPath expression relative to a root node
+export function evaluateXPath(xpath: string, root: Node): Element | null {
+	try {
+		const result = document.evaluate(xpath, root, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null);
+		return result.singleNodeValue as Element | null;
+	} catch (error) {
+		console.error('Error evaluating XPath:', { xpath, root, error });
+		return null;
 	}
 }

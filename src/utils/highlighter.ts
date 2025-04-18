@@ -1,5 +1,5 @@
 import browser from './browser-polyfill';
-import { getElementXPath, getElementByXPath } from './dom-utils';
+import { getElementXPath, getElementByXPath, getElementRelativeXPath } from './dom-utils';
 import {
 	handleMouseUp,
 	handleMouseMove,
@@ -63,6 +63,8 @@ export interface FragmentHighlightData extends HighlightData {
 	textEnd?: string;
 	prefix?: string;
 	suffix?: string;
+	isBlock: boolean;
+	relativeXpath: string | null;
 }
 
 export interface StoredData {
@@ -396,7 +398,9 @@ function createSingleParagraphHighlight(range: Range): FragmentHighlightData | n
 		id: Date.now().toString(),
 		textStart,
 		prefix,
-		suffix
+		suffix,
+		isBlock: false,
+		relativeXpath: null
 	};
 
 	// Test if we can find this highlight
@@ -500,6 +504,15 @@ async function createAndAddHighlightForRange(range: Range, notes?: string[]): Pr
 			return false;
 		}
 
+		// Determine the search container (reader or body)
+		const isInReader = document.documentElement.classList.contains('obsidian-reader-active');
+		let searchContainer: Element;
+		if (isInReader) {
+			searchContainer = document.querySelector('.obsidian-reader-content article') || document.body;
+		} else {
+			searchContainer = document.body;
+		}
+
 		let container = range.commonAncestorContainer;
 		if (container.nodeType === Node.TEXT_NODE) {
 			container = container.parentElement!;
@@ -509,6 +522,32 @@ async function createAndAddHighlightForRange(range: Range, notes?: string[]): Pr
 			return false;
 		}
 		// console.log(`[Highlighter] Container found: <${container.tagName.toLowerCase()}>`);
+
+		// Find the closest block-level element containing the selection's container
+		const blockSelector = 'P, LI, BLOCKQUOTE, PRE, H1, H2, H3, H4, H5, H6, DIV:not(.obsidian-highlighter-menu):not(#obsidian-highlight-hover-overlay), TD, TH, DD, DT';
+		const containingBlock = container.closest(blockSelector);
+		let relativeXpath: string | null = null;
+		let fullXpath: string | null = getElementXPath(container); // Keep original full path as backup
+
+		if (containingBlock && searchContainer.contains(containingBlock)) {
+			relativeXpath = getElementRelativeXPath(containingBlock, searchContainer);
+			if (!relativeXpath) {
+				console.warn("[Highlighter] Could not get relative XPath for containing block, using full path as fallback:", containingBlock);
+				relativeXpath = getElementXPath(containingBlock); // Fallback to full path if relative fails
+			}
+		} else {
+			console.warn("[Highlighter] Could not find suitable containing block or it's outside searchContainer. Using container's XPath.");
+			// Fallback to the container's path if no block is found or block is outside searchContainer
+			relativeXpath = getElementRelativeXPath(container, searchContainer);
+			if (!relativeXpath) {
+				console.warn("[Highlighter] Could not get relative XPath for container either, using full path.");
+				relativeXpath = fullXpath; // Last resort: use container's full path
+			}
+		}
+		if (!relativeXpath) {
+			console.error("[Highlighter] CRITICAL: Failed to determine any valid XPath for the highlight.");
+			return false; // Cannot proceed without some path
+		}
 
 		// --- Calculate positions and context within this specific range's container ---
 		const textNodes = getTextNodesIn(container);
@@ -523,11 +562,10 @@ async function createAndAddHighlightForRange(range: Range, notes?: string[]): Pr
 		let absoluteStart = -1;
 		let absoluteEnd = -1;
 
-		// Find absolute start position (Add logging)
+		// Find absolute start position
 		for (const { node, start } of nodePositions) {
 			if (node === range.startContainer) {
 				absoluteStart = start + range.startOffset;
-				// console.log(`[Highlighter] Start pos found (direct): ${absoluteStart}`);
 				break;
 			}
 			if (range.startContainer.contains(node) && range.startContainer !== node) {
@@ -541,11 +579,10 @@ async function createAndAddHighlightForRange(range: Range, notes?: string[]): Pr
 			}
 		}
 
-		// Find absolute end position (Add logging)
+		// Find absolute end position
 		for (const { node, start } of nodePositions) {
 			if (node === range.endContainer) {
 				absoluteEnd = start + range.endOffset;
-				// console.log(`[Highlighter] End pos found (direct): ${absoluteEnd}`);
 				break;
 			}
 			if (range.endContainer.contains(node) && range.endContainer !== node) {
@@ -564,31 +601,22 @@ async function createAndAddHighlightForRange(range: Range, notes?: string[]): Pr
 			}
 		}
 
-		// Fallback / sanity check (Add logging)
+		// Fallback / sanity check
 		if (absoluteStart === -1 || absoluteEnd === -1 || absoluteStart > absoluteEnd || fullText.slice(absoluteStart, absoluteEnd) !== selectedText) {
-			//console.warn("[Highlighter] Inaccurate positions. Using fallback.", { absoluteStart, absoluteEnd, selectedTextLen: selectedText.length, slice: fullText.slice(absoluteStart, absoluteEnd).slice(0,50) });
 			const normalizedFullText = normalizeText(fullText);
 			const normalizedSelectedText = normalizeText(selectedText);
 			const foundIndex = normalizedFullText.indexOf(normalizedSelectedText);
 			if (foundIndex !== -1) {
 				absoluteStart = mapNormalizedPositionToOriginal(fullText, normalizedFullText, foundIndex);
 				absoluteEnd = mapNormalizedPositionToOriginal(fullText, normalizedFullText, foundIndex + normalizedSelectedText.length);
-				// console.log("[Highlighter] Fallback positions calculated:", { absoluteStart, absoluteEnd });
 			} else {
-				// console.error("[Highlighter] Fallback failed: Cannot find normalized text.");
 				return false;
 			}
 		}
 
-		// if (absoluteStart === -1 || absoluteEnd === -1) {
-		// 	console.error("[Highlighter] Critical error: Could not determine positions.");
-		// 	return false;
-		// }
-
 		const contextSize = 20;
 		const prefix = fullText.substring(Math.max(0, absoluteStart - contextSize), absoluteStart);
 		const suffix = fullText.substring(absoluteEnd, Math.min(fullText.length, absoluteEnd + contextSize));
-		// console.log("[Highlighter] Context extracted:", { prefix: prefix, suffix: suffix });
 		// --- End context calculation ---
 
 		const normalizedSelectedText = normalizeText(selectedText);
@@ -596,17 +624,19 @@ async function createAndAddHighlightForRange(range: Range, notes?: string[]): Pr
 		const highlight: FragmentHighlightData = {
 			id: Date.now().toString() + Math.random().toString(16).slice(2),
 			type: 'fragment',
-			xpath: getElementXPath(container),
+			xpath: fullXpath || relativeXpath, // Store original full xpath, fallback to relative if needed
 			content: selectedText,
-			textStart: encodeURIComponent(normalizedSelectedText),
+			textStart: encodeURIComponent(normalizedSelectedText), // Use normalized text for matching
 			prefix: prefix ? encodeURIComponent(prefix) : undefined,
 			suffix: suffix ? encodeURIComponent(suffix) : undefined,
-			notes: notes
+			notes: notes,
+			isBlock: false, // Mark as text highlight
+			relativeXpath: relativeXpath // Store the relative XPath
 		};
 
-		// Pre-check using the specific container first for performance, then fallback to body
+		// Pre-check findability: Use searchContainer for broader check if container check fails
 		let findResult = findTextInCleanContent(
-			container,
+			container, // Check within specific container first
 			normalizedSelectedText,
 			highlight.prefix,
 			highlight.suffix
@@ -614,7 +644,7 @@ async function createAndAddHighlightForRange(range: Range, notes?: string[]): Pr
 
 		if (!findResult) {
 			findResult = findTextInCleanContent(
-				document.body,
+				searchContainer, // Fallback to the main search container
 				normalizedSelectedText,
 				highlight.prefix,
 				highlight.suffix
@@ -622,7 +652,7 @@ async function createAndAddHighlightForRange(range: Range, notes?: string[]): Pr
 		}
 
 		if (findResult) {
-			addHighlight(highlight);
+			addHighlight(highlight); // Call the exported addHighlight function
 			return true;
 		} else {
 			// console.warn('❌ [Highlighter] Pre-check failed. Highlight not created.');
@@ -630,6 +660,7 @@ async function createAndAddHighlightForRange(range: Range, notes?: string[]): Pr
 		}
 
 	} catch (error) {
+		console.error("[Highlighter] Error in createAndAddHighlightForRange:", error);
 		return false;
 	}
 }
@@ -776,11 +807,13 @@ export async function handleTextSelection(selection: Selection, notes?: string[]
 }
 
 // Add a new highlight to the page
-function addHighlight(highlight: AnyHighlightData) {
+export function addHighlight(highlight: AnyHighlightData) {
 	console.log('➕ Adding new highlight:', {
 		type: highlight.type,
 		content: highlight.content.slice(0, 100) + (highlight.content.length > 100 ? '...' : ''),
-		xpath: highlight.xpath,
+		xpath: highlight.xpath, // Keep logging original xpath for now
+		relativeXpath: (highlight as FragmentHighlightData).relativeXpath, // Log relative path if available
+		isBlock: (highlight as FragmentHighlightData).isBlock,
 		hasNotes: !!highlight.notes && highlight.notes.length > 0
 	});
 
