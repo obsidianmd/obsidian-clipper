@@ -498,9 +498,16 @@ function testHighlightFindability(highlight: FragmentHighlightData): boolean {
 export async function createAndAddHighlightForRange(range: Range, notes?: string[]): Promise<boolean> {
 	// console.log("[Highlighter] Attempting highlight for range:", range.toString().slice(0, 100) + '...');
 	try {
-		const selectedText = range.toString();
-		if (!selectedText.trim()) {
-			// console.log("[Highlighter] Skipping empty range.");
+		// Get HTML content from the range
+		const fragment = range.cloneContents();
+		const tempDiv = document.createElement('div');
+		tempDiv.appendChild(fragment);
+		const selectedHtml = tempDiv.innerHTML; // Keep the HTML for storage
+
+		// Get plain text for matching and context generation
+		const selectedTextForMatching = tempDiv.textContent || range.toString(); // Prefer textContent
+		if (!selectedTextForMatching.trim()) {
+			 console.log("[Highlighter] Skipping empty range based on text content.");
 			return false;
 		}
 
@@ -549,9 +556,9 @@ export async function createAndAddHighlightForRange(range: Range, notes?: string
 			return false; // Cannot proceed without some path
 		}
 
-		// --- Calculate positions and context within this specific range's container ---
+		// --- Calculate positions and context within the *containing block's plain text* ---
 		const textNodes = getTextNodesIn(container);
-		let fullText = '';
+		let fullText = ''; // Plain text of the container
 		const nodePositions: { node: Node, start: number, end: number }[] = [];
 		for (const node of textNodes) {
 			const nodeText = node.textContent || '';
@@ -562,7 +569,7 @@ export async function createAndAddHighlightForRange(range: Range, notes?: string
 		let absoluteStart = -1;
 		let absoluteEnd = -1;
 
-		// Find absolute start position
+		// Find absolute start position within container's plain text
 		for (const { node, start } of nodePositions) {
 			if (node === range.startContainer) {
 				absoluteStart = start + range.startOffset;
@@ -579,7 +586,7 @@ export async function createAndAddHighlightForRange(range: Range, notes?: string
 			}
 		}
 
-		// Find absolute end position
+		// Find absolute end position within container's plain text
 		for (const { node, start } of nodePositions) {
 			if (node === range.endContainer) {
 				absoluteEnd = start + range.endOffset;
@@ -601,61 +608,65 @@ export async function createAndAddHighlightForRange(range: Range, notes?: string
 			}
 		}
 
-		// Fallback / sanity check
-		if (absoluteStart === -1 || absoluteEnd === -1 || absoluteStart > absoluteEnd || fullText.slice(absoluteStart, absoluteEnd) !== selectedText) {
+		// Fallback / sanity check using the *plain text* selected for matching
+		if (absoluteStart === -1 || absoluteEnd === -1 || absoluteStart > absoluteEnd || fullText.slice(absoluteStart, absoluteEnd) !== selectedTextForMatching) {
 			const normalizedFullText = normalizeText(fullText);
-			const normalizedSelectedText = normalizeText(selectedText);
-			const foundIndex = normalizedFullText.indexOf(normalizedSelectedText);
+			// Use the normalized version of the plain text we extracted
+			const normalizedSelectedTextForMatching = normalizeText(selectedTextForMatching);
+			const foundIndex = normalizedFullText.indexOf(normalizedSelectedTextForMatching);
 			if (foundIndex !== -1) {
 				absoluteStart = mapNormalizedPositionToOriginal(fullText, normalizedFullText, foundIndex);
-				absoluteEnd = mapNormalizedPositionToOriginal(fullText, normalizedFullText, foundIndex + normalizedSelectedText.length);
+				absoluteEnd = mapNormalizedPositionToOriginal(fullText, normalizedFullText, foundIndex + normalizedSelectedTextForMatching.length);
 			} else {
+				console.error("[Highlighter] Fallback failed: Cannot find normalized text within container.");
 				return false;
 			}
 		}
 
+		// Calculate prefix/suffix based on absolute positions within container's plain text
 		const contextSize = 20;
 		const prefix = fullText.substring(Math.max(0, absoluteStart - contextSize), absoluteStart);
 		const suffix = fullText.substring(absoluteEnd, Math.min(fullText.length, absoluteEnd + contextSize));
 		// --- End context calculation ---
 
-		const normalizedSelectedText = normalizeText(selectedText);
+		// Normalize the plain text for the text fragment locator
+		const normalizedSelectedText = normalizeText(selectedTextForMatching);
 
 		const highlight: FragmentHighlightData = {
 			id: Date.now().toString() + Math.random().toString(16).slice(2),
 			type: 'fragment',
-			xpath: fullXpath || relativeXpath, // Store original full xpath, fallback to relative if needed
-			content: selectedText,
-			textStart: encodeURIComponent(normalizedSelectedText), // Use normalized text for matching
-			prefix: prefix ? encodeURIComponent(prefix) : undefined,
-			suffix: suffix ? encodeURIComponent(suffix) : undefined,
+			xpath: fullXpath || relativeXpath,
+			content: selectedHtml, // *** Store the original HTML content ***
+			textStart: encodeURIComponent(normalizedSelectedText), // *** Use normalized plain text for locator ***
+			prefix: prefix ? encodeURIComponent(prefix) : undefined, // Plain text context
+			suffix: suffix ? encodeURIComponent(suffix) : undefined, // Plain text context
 			notes: notes,
-			isBlock: false, // Mark as text highlight
-			relativeXpath: relativeXpath // Store the relative XPath
+			isBlock: false,
+			relativeXpath: relativeXpath
 		};
 
-		// Pre-check findability: Use searchContainer for broader check if container check fails
+		// Pre-check findability using the normalized plain text and context
 		let findResult = findTextInCleanContent(
-			container, // Check within specific container first
-			normalizedSelectedText,
+			container,
+			normalizedSelectedText, // Use normalized plain text
 			highlight.prefix,
 			highlight.suffix
 		);
 
 		if (!findResult) {
 			findResult = findTextInCleanContent(
-				searchContainer, // Fallback to the main search container
-				normalizedSelectedText,
+				searchContainer,
+				normalizedSelectedText, // Use normalized plain text
 				highlight.prefix,
 				highlight.suffix
 			);
 		}
 
 		if (findResult) {
-			addHighlight(highlight); // Call the exported addHighlight function
+			addHighlight(highlight);
 			return true;
 		} else {
-			// console.warn('❌ [Highlighter] Pre-check failed. Highlight not created.');
+			console.warn('❌ [Highlighter] Pre-check failed (Text fragment locator). Highlight not created.');
 			return false;
 		}
 
