@@ -859,6 +859,11 @@ export class Reader {
 
 			// Remove page scripts and their effects
 			this.cleanupScripts(doc);
+
+			// Clear body attributes
+			while (doc.body.attributes.length > 0) {
+				doc.body.removeAttribute(doc.body.attributes[0].name);
+			}
 			
 			// Clean the html element but preserve lang and dir attributes
 			const htmlElement = doc.documentElement;
