@@ -147,13 +147,13 @@ export async function initializeI18n() {
 export function getMessage(messageName: string, substitutions?: string | string[]): string {
 	try {
 		// Load messages for the current language
-		const messages = require(`../locales/${currentLanguage || 'en'}/messages.json`);
+		const messages = require(`../_locales/${currentLanguage || 'en'}/messages.json`);
 		const messageObj = messages[messageName];
 
 		if (!messageObj) {
 			// If message not found in current language, try English
 			if (currentLanguage !== 'en') {
-				const enMessages = require('../locales/en/messages.json');
+				const enMessages = require('../_locales/en/messages.json');
 				const enMessageObj = enMessages[messageName];
 				if (enMessageObj) {
 					let text = enMessageObj.message;

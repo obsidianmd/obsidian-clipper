@@ -147,7 +147,7 @@ module.exports = (env, argv) => {
 					{ from: "src/icons", to: "icons" },
 					{ from: "node_modules/webextension-polyfill/dist/browser-polyfill.min.js", to: "browser-polyfill.min.js" },
 					{
-						from: 'src/locales',
+						from: 'src/_locales',
 						to: '_locales'
 					}
 				],
