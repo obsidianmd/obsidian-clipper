@@ -253,6 +253,14 @@ export class Reader {
 		// Find all headings h2-h6
 		const headings = article.querySelectorAll('h2, h3, h4, h5, h6');
 
+		// Only show outline if there are 2 or more headings
+		if (headings.length < 2) {
+			outline.style.display = 'none';
+			return null;
+		} else {
+			outline.style.display = ''; 
+		}
+
 		// Add unique IDs to headings if they don't have them
 		headings.forEach((heading, index) => {
 			if (!heading.id) {
