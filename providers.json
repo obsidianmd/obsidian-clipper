@@ -9,7 +9,8 @@
 		"baseUrl": "https://api.anthropic.com/v1/messages",
 		"popularModels": [
 			{ "id": "claude-3-5-haiku-latest", "name": "Claude 3.5 Haiku" },
-			{ "id": "claude-3-5-sonnet-latest", "name": "Claude 3.5 Sonnet" }
+			{ "id": "claude-3-5-sonnet-latest", "name": "Claude 3.5 Sonnet" },
+			{ "id": "claude-3-7-sonnet-latest", "name": "Claude 3.7 Sonnet" }
 		]
 	},
 	"azure-openai": {
@@ -44,7 +45,8 @@
 		"modelsList": "https://ai.google.dev/gemini-api/docs/models",
 		"baseUrl": "https://generativelanguage.googleapis.com/v1beta/chat/completions",
 		"popularModels": [
-			{ "id": "gemini-2.0-flash", "name": "Gemini 2.0 Flash" }
+			{ "id": "gemini-2.0-flash", "name": "Gemini 2.0 Flash" },
+			{ "id": "gemini-2.5-flash-preview-04-17", "name": "Gemini 2.5 Flash Preview" }
 		]
 	},
 	"huggingface": {
@@ -53,6 +55,17 @@
 		"apiKeyUrl": "https://huggingface.co/settings/tokens",
 		"modelsList": "https://huggingface.co/models",
 		"baseUrl": "https://api-inference.huggingface.co/models/{model-id}/chat/completions"
+	},
+	"meta": {
+		"id": "meta",
+		"name": "Meta",
+		"apiKeyUrl": "https://llama.developer.meta.com",
+		"modelsList": "https://llama.developer.meta.com/docs/models",
+		"baseUrl": "https://api.llama.com/v1/chat/completions",
+		"popularModels": [
+			{ "id": "Llama-3.3-8B-Instruct", "name": "Llama 3.3 8B" },
+			{ "id": "Llama-3.3-70B-Instruct", "name": "Llama 3.3 70B" }
+		]
 	},
 	"ollama": {
 		"id": "ollama",
