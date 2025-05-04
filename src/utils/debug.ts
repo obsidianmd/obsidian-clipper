@@ -7,7 +7,7 @@ let debugMode: boolean = DEBUG_MODE;
 // Initialize debug mode from storage only in debug mode
 if (DEBUG_MODE) {
 	browser.storage.local.get('debugMode').then((result: { debugMode?: boolean }) => {
-		debugMode = true;
+		debugMode = result.debugMode ?? false;
 		console.log(`Debug mode initialized to: ${debugMode ? 'ON' : 'OFF'}`);
 	}).catch((error) => {
 		console.error('Error initializing debug mode:', error);
@@ -37,6 +37,5 @@ export const isDebugMode = () => DEBUG_MODE && debugMode;
 
 // Expose toggleDebug to the global scope only in debug mode
 if (DEBUG_MODE) {
-	console.log('Expsing toggleDebug function');
 	(window as any).toggleDebug = toggleDebug;
 }
