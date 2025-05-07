@@ -13,7 +13,6 @@ describe('table filter', () => {
         expect(table('["one", "two", "three"]')).toBe('| Value |\n| - |\n| one |\n| two |\n| three |');
     });
     it('can convert an array with headers', () => {
-        // Fails right now, the headers are `| ("Column 1" | Column 2 |` 
-        //expect(table('["one", "two", "three", "four"]', '("Column 1", "Column 2"')).toBe('| Column 1 | Column 2 |\n| - | - |\n| one | two |\n| three | four |');
+        expect(table('["one", "two", "three", "four"]', '("Column 1", "Column 2")')).toBe('| Column 1 | Column 2 |\n| - | - |\n| one | two |\n| three | four |');
     });
 });
