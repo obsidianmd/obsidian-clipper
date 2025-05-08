@@ -434,8 +434,10 @@ async function showProviderModal(provider: Provider, index?: number) {
 			
 			if (selectedPreset) {
 				nameInput.value = selectedPreset.name;
-				baseUrlInput.value = selectedPreset.baseUrl;
-				apiKeyInput.value = (index !== undefined && selectedPresetId === currentPresetId) ? provider.apiKey : '';
+				
+				const editingOriginalPreset = index !== undefined && selectedPresetId === currentPresetId;
+				baseUrlInput.value = editingOriginalPreset ? provider.baseUrl : selectedPreset.baseUrl;
+				apiKeyInput.value = editingOriginalPreset ? provider.apiKey : '';
 
 				apiKeyContainer.style.display = selectedPreset.apiKeyRequired === false ? 'none' : 'block';
 
@@ -500,9 +502,14 @@ async function showProviderModal(provider: Provider, index?: number) {
 		}
 
 		if (presetId && cachedPresetProviders && cachedPresetProviders[presetId]) {
-			updatedProvider.name = cachedPresetProviders[presetId].name;
-			updatedProvider.baseUrl = cachedPresetProviders[presetId].baseUrl;
-			updatedProvider.apiKeyRequired = cachedPresetProviders[presetId].apiKeyRequired !== false;
+			const providerPreset = cachedPresetProviders[presetId];
+			
+			updatedProvider.name = providerPreset.name;
+			
+			const providerPresetBaseUrl = providerPreset.baseUrl;
+			// Use the user-provided baseUrl if it's different from the preset baseUrl
+			updatedProvider.baseUrl = baseUrl !== providerPresetBaseUrl ? baseUrl : providerPresetBaseUrl;
+			updatedProvider.apiKeyRequired = providerPreset.apiKeyRequired !== false;
 		}
 
 		if (index !== undefined) {
