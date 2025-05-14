@@ -21,7 +21,7 @@ Documentation is available on the [Obsidian Help site](https://help.obsidian.md/
 
 ### Translations
 
-You can help translate Web Clipper into your language. Submit your translation via pull request using the format found in the [/locales](/src/locales) folder.
+You can help translate Web Clipper into your language. Submit your translation via pull request using the format found in the [/_locales](/src/_locales) folder.
 
 ### Features and bug fixes
 
