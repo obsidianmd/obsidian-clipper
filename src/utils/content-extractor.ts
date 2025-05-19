@@ -9,8 +9,9 @@ import { generalSettings } from './storage-utils';
 import { 
 	getElementByXPath,
 	wrapElementWithMark,
-	wrapTextWithMark 
+	wrapTextWithMark
 } from './dom-utils';
+import { getTextNodesIn } from './highlighter-overlays';
 
 // Define ElementHighlightData type inline since it's not exported from highlighter.ts
 interface ElementHighlightData extends HighlightData {
@@ -377,27 +378,72 @@ function processInlineContent(content: string, tempDiv: HTMLDivElement) {
 	const searchText = stripHtml(content).trim();
 	debugLog('Highlights', 'Searching for text:', searchText);
 	
-	const walker = document.createTreeWalker(tempDiv, NodeFilter.SHOW_TEXT);
+	// Create a range to search through the entire tempDiv
+	const range = document.createRange();
+	range.selectNodeContents(tempDiv);
 	
-	let node;
-	while (node = walker.nextNode() as Text) {
+	// Get all text nodes and their content
+	const textNodes = getTextNodesIn(tempDiv);
+	let fullText = '';
+	const nodePositions: { node: Node, start: number, end: number }[] = [];
+	
+	// Build text content and node positions
+	for (const node of textNodes) {
 		const nodeText = node.textContent || '';
-		const index = nodeText.indexOf(searchText);
+		nodePositions.push({
+			node,
+			start: fullText.length,
+			end: fullText.length + nodeText.length
+		});
+		fullText += nodeText;
+	}
+	
+	// Find the text in the full content
+	const startIndex = fullText.indexOf(searchText);
+	if (startIndex === -1) return;
+	
+	// Find the nodes that contain our target text
+	let startNode: Node | null = null;
+	let endNode: Node | null = null;
+	let startOffset = 0;
+	let endOffset = 0;
+	
+	for (const { node, start, end } of nodePositions) {
+		// Find start node and offset
+		if (!startNode && start <= startIndex && end > startIndex) {
+			startNode = node;
+			startOffset = startIndex - start;
+		}
 		
-		if (index !== -1) {
-			debugLog('Highlights', 'Found matching text in node:', {
-				text: nodeText,
-				index: index
-			});
-			
+		// Find end node and offset
+		if (!endNode && start < startIndex + searchText.length && end >= startIndex + searchText.length) {
+			endNode = node;
+			endOffset = startIndex + searchText.length - start;
+			break;
+		}
+	}
+	
+	if (startNode && endNode) {
+		try {
 			const range = document.createRange();
-			range.setStart(node, index);
-			range.setEnd(node, index + searchText.length);
+			range.setStart(startNode, startOffset);
+			range.setEnd(endNode, endOffset);
 			
 			const mark = document.createElement('mark');
-			range.surroundContents(mark);
+			try {
+				// First try the simple case
+				range.surroundContents(mark);
+			} catch (e) {
+				// If surroundContents fails, the range likely crosses element boundaries
+				// Extract the contents and preserve the structure
+				const fragment = range.extractContents();
+				mark.appendChild(fragment);
+				range.insertNode(mark);
+			}
+			
 			debugLog('Highlights', 'Created mark element:', mark.outerHTML);
-			break;
+		} catch (error) {
+			console.error('Error creating highlight:', error);
 		}
 	}
 }

@@ -90,12 +90,25 @@ export function wrapTextWithMark(element: Element, highlight: { startOffset: num
 	}
 	
 	if (startNode && endNode) {
-		const range = document.createRange();
-		range.setStart(startNode, startOffset);
-		range.setEnd(endNode, endOffset);
-		
-		const mark = document.createElement('mark');
-		range.surroundContents(mark);
+		try {
+			const range = document.createRange();
+			range.setStart(startNode, startOffset);
+			range.setEnd(endNode, endOffset);
+			
+			const mark = document.createElement('mark');
+			try {
+				// First try the simple case
+				range.surroundContents(mark);
+			} catch (e) {
+				// If surroundContents fails, the range likely crosses element boundaries
+				// Extract the contents and preserve the structure
+				const fragment = range.extractContents();
+				mark.appendChild(fragment);
+				range.insertNode(mark);
+			}
+		} catch (error) {
+			console.error('Error wrapping text with mark:', error);
+		}
 	}
 }
 
