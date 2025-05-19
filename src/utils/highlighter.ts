@@ -30,6 +30,11 @@ let highlightHistory: HistoryAction[] = [];
 let redoHistory: HistoryAction[] = [];
 const MAX_HISTORY_LENGTH = 30;
 
+const ALLOWED_HIGHLIGHT_TAGS = [
+	'SPAN', 'P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6',
+	'MATH', 'FIGURE', 'UL', 'OL', 'TABLE', 'LI', 'CODE', 'PRE', 'BLOCKQUOTE', 'EM', 'STRONG', 'A'
+];
+
 export interface HighlightData {
 	id: string;
 	xpath: string;
@@ -281,16 +286,44 @@ function enableLinkClicks() {
 
 // Highlight an entire element
 export function highlightElement(element: Element, notes?: string[]) {
-	const xpath = getElementXPath(element);
-	const content = element.outerHTML;
-	const isBlockElement = window.getComputedStyle(element).display === 'block';
+	let targetElement = element;
+	const originalTagName = element.tagName.toUpperCase();
+
+	// If a table cell or row is targeted, try to highlight the parent table instead
+	if (['TD', 'TH', 'TR'].includes(originalTagName)) {
+		const parentTable = element.closest('table');
+		if (parentTable) {
+			targetElement = parentTable;
+		} else {
+			// If a cell/row is not within a table, do not highlight.
+			console.log('Table cell/row targeted, but no parent table found. Not highlighting:', originalTagName);
+			return;
+		}
+	}
+
+	// Now, check if the determined targetElement (which could be the original element or a table) is allowed.
+	const finalTagName = targetElement.tagName.toUpperCase();
+	if (!ALLOWED_HIGHLIGHT_TAGS.includes(finalTagName)) {
+		// If the targetElement itself is not allowed, try its parent.
+		// This primarily applies to cases where the original element was not a table cell/row.
+		if (targetElement.parentElement && ALLOWED_HIGHLIGHT_TAGS.includes(targetElement.parentElement.tagName.toUpperCase())) {
+			targetElement = targetElement.parentElement;
+		} else {
+			console.log('Element type not allowed for highlighting:', finalTagName);
+			return;
+		}
+	}
+
+	const xpath = getElementXPath(targetElement);
+	const content = targetElement.outerHTML;
+	const isBlockElement = window.getComputedStyle(targetElement).display === 'block';
 	addHighlight({ 
 		xpath, 
 		content, 
 		type: isBlockElement ? 'element' : 'text', 
 		id: Date.now().toString(),
 		startOffset: 0,
-		endOffset: element.textContent?.length || 0
+		endOffset: targetElement.textContent?.length || 0
 	}, notes);
 }
 

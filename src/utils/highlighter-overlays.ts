@@ -21,10 +21,17 @@ let lastHoverTarget: Element | null = null;
 
 // Check if an element should be ignored for highlighting
 function isIgnoredElement(element: Element): boolean {
+	const tagName = element.tagName.toUpperCase();
+	const isDisallowedTag = ![
+		'SPAN', 'P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6',
+		'MATH', 'FIGURE', 'UL', 'OL', 'TABLE', 'LI', 'TR', 'TD', 'TH', 'CODE', 'PRE', 'BLOCKQUOTE', 'EM', 'STRONG', 'A'
+	].includes(tagName);
+
 	return element.tagName.toLowerCase() === 'html' || 
 		element.tagName.toLowerCase() === 'body' || 
 		element.classList.contains('obsidian-highlighter-menu') ||
-		element.closest('.obsidian-highlighter-menu') !== null;
+		element.closest('.obsidian-highlighter-menu') !== null ||
+		isDisallowedTag;
 }
 
 // Handles mouse move events for hover effects
@@ -66,8 +73,36 @@ export function handleMouseUp(event: MouseEvent | TouchEvent) {
 	} else {
 		if (target.classList.contains('obsidian-highlight-overlay')) {
 			handleHighlightClick(event);
-		} else if (!isIgnoredElement(target)) {
-			highlightElement(target);
+		} else {
+			let elementToProcess: Element | null = target;
+			const targetTagName = target.tagName.toUpperCase();
+
+			if (['TD', 'TH', 'TR'].includes(targetTagName)) {
+				elementToProcess = target.closest('table');
+				if (!elementToProcess) {
+					// Clicked table cell/row not in a table, so do nothing.
+					return; 
+				}
+				// If a table is found, elementToProcess is now the table.
+				// highlightElement will verify if 'TABLE' is an allowed tag.
+			} else {
+				// Original target was not a table cell/row.
+				// isIgnoredElement returns true if element is NOT allowed.
+				if (isIgnoredElement(target)) {
+					// If target is ignored, check its parent.
+					if (target.parentElement && !isIgnoredElement(target.parentElement)) {
+						elementToProcess = target.parentElement;
+					} else {
+						// Target is ignored, and parent is also ignored or doesn't exist.
+						return;
+					}
+				}
+				// If target was not ignored, elementToProcess remains target.
+			}
+
+			if (elementToProcess) {
+				highlightElement(elementToProcess);
+			}
 		}
 	}
 }
@@ -346,13 +381,43 @@ function createOrUpdateHoverOverlay(target: Element) {
 	if (target === lastHoverTarget) return;
 	lastHoverTarget = target;
 
+	let elementForHoverRect: Element | null = target;
+	const eventTargetTagName = target.tagName.toUpperCase();
+
+	if (['TD', 'TH', 'TR'].includes(eventTargetTagName)) {
+		elementForHoverRect = target.closest('table');
+	}
+
+	// Now, elementForHoverRect is either the table, the original target, or null.
+	// Check if this elementForHoverRect itself is valid (i.e., not ignored).
+	// isIgnoredElement returns true if the element's tag is NOT in the allowed list for hover
+	// (or if it's html, body etc.).
+	if (elementForHoverRect && !isIgnoredElement(elementForHoverRect)) {
+		// This is a valid element to get bounds from.
+	} else if (target.parentElement && !isIgnoredElement(target.parentElement) && !['TD', 'TH', 'TR'].includes(eventTargetTagName)) {
+		// If the primary elementForHoverRect (table or original target) was not valid (null or ignored),
+		// AND the original event target was not a table cell (because for cells, we only care about the table's validity),
+		// THEN consider the original event target's parent as the element for the hover rectangle.
+		elementForHoverRect = target.parentElement;
+	} else {
+		// Otherwise (no valid candidate found after checking primary and parent (for non-cells))
+		removeHoverOverlay();
+		return;
+	}
+
+	// If, after all logic, elementForHoverRect is null (e.g. a TD not in a table, or other unhandled cases), remove overlay.
+	if (!elementForHoverRect) {
+		removeHoverOverlay();
+		return;
+	}
+
 	if (!hoverOverlay) {
 		hoverOverlay = document.createElement('div');
 		hoverOverlay.id = 'obsidian-highlight-hover-overlay';
 		document.body.appendChild(hoverOverlay);
 	}
 	
-	const rect = target.getBoundingClientRect();
+	const rect = elementForHoverRect.getBoundingClientRect();
 
 	hoverOverlay.style.position = 'absolute';
 	hoverOverlay.style.left = `${rect.left + window.scrollX - 2}px`;
