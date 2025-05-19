@@ -595,7 +595,16 @@ async function refreshFields(tabId: number, checkTemplateTriggers: boolean = tru
 				currentUrl,
 				extractedData.schemaOrgData,
 				extractedData.fullHtml,
-				extractedData.highlights || []
+				extractedData.highlights || [],
+				extractedData.title,
+				extractedData.author,
+				extractedData.description,
+				extractedData.favicon,
+				extractedData.image,
+				extractedData.published,
+				extractedData.site,
+				extractedData.wordCount,
+				extractedData.metaTags
 			);
 			if (initializedContent) {
 				setupMetadataToggle();

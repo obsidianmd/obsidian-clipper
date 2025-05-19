@@ -49,6 +49,7 @@ declare global {
 		author: string;
 		site: string;
 		wordCount: number;
+		metaTags: { name?: string | null; property?: string | null; content: string | null }[];
 	}
 
 	browser.runtime.onMessage.addListener((request: any, sender: browser.Runtime.MessageSender, sendResponse: (response?: any) => void) => {
@@ -127,7 +128,8 @@ declare global {
 				selectedHtml: selectedHtml,
 				site: defuddled.site,
 				title: defuddled.title,
-				wordCount: defuddled.wordCount
+				wordCount: defuddled.wordCount,
+				metaTags: defuddled.metaTags || []
 			};
 			sendResponse(response);
 		} else if (request.action === "extractContent") {
