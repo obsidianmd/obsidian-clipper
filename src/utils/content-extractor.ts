@@ -1,7 +1,6 @@
 import { ExtractedContent } from '../types/types';
 import { createMarkdownContent } from './markdown-converter';
 import { sanitizeFileName, getDomain } from './string-utils';
-import Defuddle from 'defuddle';
 import browser from './browser-polyfill';
 import { debugLog } from './debug';
 import dayjs from 'dayjs';
@@ -46,6 +45,17 @@ interface ContentResponse {
 	schemaOrgData: any;
 	fullHtml: string;
 	highlights: AnyHighlightData[];
+	title: string;
+	author: string;
+	description: string;
+	domain: string;
+	favicon: string;
+	image: string;
+	parseTime: number;
+	published: string;
+	site: string;
+	wordCount: number;
+	metaTags: { name?: string | null; property?: string | null; content: string | null }[];
 }
 
 export async function extractPageContent(tabId: number): Promise<ContentResponse | null> {
@@ -83,26 +93,31 @@ export async function extractPageContent(tabId: number): Promise<ContentResponse
 }
 
 export async function initializePageContent(
-	content: string, 
-	selectedHtml: string, 
-	extractedContent: ExtractedContent, 
-	currentUrl: string, 
+	content: string,
+	selectedHtml: string,
+	extractedContent: ExtractedContent,
+	currentUrl: string,
 	schemaOrgData: any,
-	fullHtml: string, 
-	highlights: AnyHighlightData[]
+	fullHtml: string,
+	highlights: AnyHighlightData[],
+	title: string,
+	author: string,
+	description: string,
+	favicon: string,
+	image: string,
+	published: string,
+	site: string,
+	wordCount: number,
+	metaTags: { name?: string | null; property?: string | null; content: string | null }[]
 ) {
 	try {
-		const parser = new DOMParser();
-		const doc = parser.parseFromString(fullHtml, 'text/html');
-
 		currentUrl = currentUrl.replace(/#:~:text=[^&]+(&|$)/, '');
 
 		if (selectedHtml) {
 			content = selectedHtml;
 		}
 
-		const defuddled = new Defuddle(doc, { url: currentUrl }).parse();
-		const noteName = sanitizeFileName(defuddled.title);
+		const noteName = sanitizeFileName(title);
 
 		// Process highlights after getting the base content
 		if (generalSettings.highlighterEnabled && generalSettings.highlightBehavior !== 'no-highlights' && highlights && highlights.length > 0) {
@@ -130,23 +145,23 @@ export async function initializePageContent(
 		});
 
 		const currentVariables: { [key: string]: string } = {
-			'{{author}}': defuddled.author.trim(),
+			'{{author}}': author.trim(),
 			'{{content}}': markdownBody.trim(),
 			'{{contentHtml}}': content.trim(),
 			'{{date}}': dayjs().format('YYYY-MM-DDTHH:mm:ssZ').trim(),
 			'{{time}}': dayjs().format('YYYY-MM-DDTHH:mm:ssZ').trim(),
-			'{{description}}': defuddled.description.trim(),
+			'{{description}}': description.trim(),
 			'{{domain}}': getDomain(currentUrl),
-			'{{favicon}}': defuddled.favicon,
+			'{{favicon}}': favicon,
 			'{{fullHtml}}': fullHtml.trim(),
 			'{{highlights}}': highlights.length > 0 ? JSON.stringify(highlightsData) : '',
-			'{{image}}': defuddled.image,
+			'{{image}}': image,
 			'{{noteName}}': noteName.trim(),
-			'{{published}}': defuddled.published.split(',')[0].trim(),
-			'{{site}}': defuddled.site.trim(),
-			'{{title}}': defuddled.title.trim(),
+			'{{published}}': published.split(',')[0].trim(),
+			'{{site}}': site.trim(),
+			'{{title}}': title.trim(),
 			'{{url}}': currentUrl.trim(),
-			'{{words}}': defuddled.wordCount.toString(),
+			'{{words}}': wordCount.toString(),
 		};
 
 		// Add extracted content to variables
@@ -155,10 +170,10 @@ export async function initializePageContent(
 		});
 
 		// Add all meta tags to variables
-		doc.querySelectorAll('meta').forEach(meta => {
-			const name = meta.getAttribute('name');
-			const property = meta.getAttribute('property');
-			const content = meta.getAttribute('content');
+		metaTags.forEach(meta => {
+			const name = meta.name;
+			const property = meta.property;
+			const content = meta.content;
 
 			if (name && content) {
 				currentVariables[`{{meta:name:${name}}}`] = content;
