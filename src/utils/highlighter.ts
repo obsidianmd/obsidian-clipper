@@ -311,8 +311,8 @@ function enableLinkClicks() {
 // Create a fragment highlight from a text selection
 function createFragmentHighlight(range: Range): FragmentHighlightData | null {
 	// If the range spans multiple paragraphs, split it
-	const startParagraph = range.startContainer.parentElement?.closest('p, div, article, section');
-	const endParagraph = range.endContainer.parentElement?.closest('p, div, article, section');
+	const startParagraph = range.startContainer.parentElement?.closest('p, h1, h2, h3, h4, h5, h6, div, article, section');
+	const endParagraph = range.endContainer.parentElement?.closest('p, h1, h2, h3, h4, h5, h6, div, article, section');
 	
 	if (startParagraph && endParagraph && startParagraph !== endParagraph) {
 		console.log('Selection spans multiple paragraphs, splitting into separate highlights');
@@ -462,7 +462,7 @@ function getLastTextNode(element: Element): Node | null {
 function getNextParagraph(current: Element, end: Element): Element | null {
 	let next = current.nextElementSibling;
 	while (next) {
-		if (next.matches('p, div, article, section')) {
+		if (next.matches('p, h1, h2, h3, h4, h5, h6, div, article, section')) {
 			return next;
 		}
 		next = next.nextElementSibling;
@@ -473,7 +473,7 @@ function getNextParagraph(current: Element, end: Element): Element | null {
 	while (parent && parent !== end.parentElement) {
 		next = parent.nextElementSibling;
 		while (next) {
-			const paragraph = next.querySelector('p, div, article, section');
+			const paragraph = next.querySelector('p, h1, h2, h3, h4, h5, h6, div, article, section');
 			if (paragraph) return paragraph;
 			next = next.nextElementSibling;
 		}

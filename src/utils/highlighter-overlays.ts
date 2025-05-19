@@ -50,7 +50,7 @@ export function handleMouseMove(event: MouseEvent | TouchEvent) {
 
 	// Case 2: Hovering over a potential target block element
 	// Define the selectors for elements we want to show hover for
-	const hoverTargetSelectors = 'P, UL, OL, MATH, PRE, TABLE, BLOCKQUOTE, FIGURE, LI, DD, DT';
+	const hoverTargetSelectors = 'P, H1, H2, H3, H4, H5, H6, UL, OL, MATH, PRE, TABLE, BLOCKQUOTE, FIGURE, LI, DD, DT';
 	const potentialTarget = target.closest(hoverTargetSelectors);
 
 	if (potentialTarget) {
@@ -103,20 +103,20 @@ export function handleMouseUp(event: MouseEvent | TouchEvent) {
 
 	const selection = window.getSelection();
 
-	// Case 1: Text Selection Exists
+	// Case 1: Text selection exists
 	if (selection && !selection.isCollapsed && selection.toString().trim().length > 0) {
 		handleTextSelection(selection);
 	}
-	// Case 2: Click on an Existing Highlight Overlay
+	// Case 2: Click on an existing highlight overlay
 	else if (target.classList.contains('obsidian-highlight-overlay')) {
 		if (!isTouchEvent || (isTouchEvent && event.currentTarget !== target)) {
 			handleHighlightClick(event);
 		}
 	}
-	// Case 3: Click on Specific Block Elements (Original Correct Logic)
+	// Case 3: Click on specific block elements
 	else {
 		// Add P to the selector for single-click paragraph highlighting
-		const blockSelector = 'P, TABLE, UL, OL, PRE, BLOCKQUOTE, FIGURE';
+		const blockSelector = 'P, H1, H2, H3, H4, H5, H6, TABLE, UL, OL, PRE, BLOCKQUOTE, FIGURE';
 		const clickedBlock = target.closest(blockSelector);
 
 		if (clickedBlock) {
@@ -134,22 +134,22 @@ export function handleMouseUp(event: MouseEvent | TouchEvent) {
 				return; // Don't highlight if the block isn't in the main content area
 			}
 
-			// Special handling for P tags: treat as full text selection
-			if (clickedBlock.tagName === 'P') {
-				console.log("[handleMouseUp] P element clicked. Treating as text selection.");
+			// Special handling for P and heading tags: treat as full text selection
+			if (clickedBlock.tagName === 'P' || /^H[1-6]$/.test(clickedBlock.tagName)) {
+				console.log(`[handleMouseUp] ${clickedBlock.tagName} element clicked. Treating as text selection.`);
 				const range = document.createRange();
 				try {
-					// Select the entire content of the paragraph
+					// Select the entire content of the paragraph or heading
 					range.selectNodeContents(clickedBlock);
 					if (!range.collapsed && range.toString().trim().length > 0) {
 						// Call the helper function directly with the range
 						// We need to import createAndAddHighlightForRange from highlighter.ts
 						createAndAddHighlightForRange(range); // Pass the created range
 					} else {
-						console.warn("[handleMouseUp] Clicked P element is empty or range collapsed.");
+						console.warn(`[handleMouseUp] Clicked ${clickedBlock.tagName} element is empty or range collapsed.`);
 					}
 				} catch (error) {
-					console.error("[handleMouseUp] Error creating range for P element:", error);
+					console.error(`[handleMouseUp] Error creating range for ${clickedBlock.tagName} element:`, error);
 				}
 			} 
 			// Handle other block elements as before (UL, TABLE, etc.)
