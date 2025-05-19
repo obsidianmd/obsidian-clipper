@@ -19,6 +19,8 @@ let touchStartY: number = 0;
 let isTouchMoved: boolean = false;
 let lastHoverTarget: Element | null = null;
 
+const LINE_BY_LINE_OVERLAY_TAGS = ['P'];
+
 // Check if an element should be ignored for highlighting
 function isIgnoredElement(element: Element): boolean {
 	const tagName = element.tagName.toUpperCase();
@@ -171,68 +173,100 @@ function calculateAverageLineHeight(rects: DOMRectList): number {
 	return sum / heights.length;
 }
 
+function processRangeForOverlayRects(
+	range: Range,
+	content: string,
+	existingOverlays: Element[],
+	index: number,
+	notes: string[] | undefined,
+	targetElementForFallback: Element
+) {
+	const rects = range.getClientRects();
+
+	if (rects.length === 0) {
+		const rect = targetElementForFallback.getBoundingClientRect();
+		mergeHighlightOverlayRects([rect], content, existingOverlays, false, index, notes);
+		return;
+	}
+
+	const averageLineHeight = calculateAverageLineHeight(rects);
+	const textRects = Array.from(rects).filter(rect => rect.height <= averageLineHeight * 1.5);
+	const complexRects = Array.from(rects).filter(rect => rect.height > averageLineHeight * 1.5);
+
+	if (textRects.length > 0) {
+		mergeHighlightOverlayRects(textRects, content, existingOverlays, true, index, notes);
+	}
+	if (complexRects.length > 0) {
+		mergeHighlightOverlayRects(complexRects, content, existingOverlays, false, index, notes);
+	}
+}
+
 // Plan out the overlay rectangles depending on the type of highlight
 export function planHighlightOverlayRects(target: Element, highlight: AnyHighlightData, index: number) {
 	const existingOverlays = Array.from(document.querySelectorAll(`.obsidian-highlight-overlay[data-highlight-index="${index}"]`));
+	const tagName = target.tagName.toUpperCase(); // Get tagName early for P check
+	
 	if (highlight.type === 'complex' || highlight.type === 'element') {
-		const rect = target.getBoundingClientRect();
-		mergeHighlightOverlayRects([rect], highlight.content, existingOverlays, false, index, highlight.notes);
-	} else if (highlight.type === 'text') {
-		try {
+		if (LINE_BY_LINE_OVERLAY_TAGS.includes(tagName)) { // LINE_BY_LINE_OVERLAY_TAGS is now just ['P']
 			const range = document.createRange();
-			const startNode = findTextNodeAtOffset(target, highlight.startOffset);
-			const endNode = findTextNodeAtOffset(target, highlight.endOffset);
+			try {
+				range.selectNodeContents(target);
+				processRangeForOverlayRects(range, highlight.content, existingOverlays, index, highlight.notes, target);
+			} catch (error) {
+				console.error('Error creating line-by-line highlight for element:', target, error);
+				const rect = target.getBoundingClientRect(); // Fallback
+				mergeHighlightOverlayRects([rect], highlight.content, existingOverlays, false, index, highlight.notes);
+			} finally {
+				range.detach();
+			}
+		} else {
+			// Original logic for other element/complex types (single box)
+			const rect = target.getBoundingClientRect();
+			mergeHighlightOverlayRects([rect], highlight.content, existingOverlays, false, index, highlight.notes);
+		}
+	} else if (highlight.type === 'text') {
+		const range = document.createRange();
+		try {
+			const startNodeResult = findTextNodeAtOffset(target, highlight.startOffset);
+			const endNodeResult = findTextNodeAtOffset(target, highlight.endOffset);
 			
-			if (startNode && endNode) {
+			if (startNodeResult && endNodeResult) {
 				try {
 					// Try to set start position
 					try {
-						range.setStart(startNode.node, startNode.offset);
+						range.setStart(startNodeResult.node, startNodeResult.offset);
 					} catch {
 						// Fallback to node start
-						range.setStart(startNode.node, 0);
+						range.setStart(startNodeResult.node, 0);
 					}
 					
 					// Try to set end position
 					try {
-						range.setEnd(endNode.node, endNode.offset);
+						range.setEnd(endNodeResult.node, endNodeResult.offset);
 					} catch {
 						// Fallback to node end
-						range.setEnd(endNode.node, endNode.node.textContent?.length || 0);
+						range.setEnd(endNodeResult.node, endNodeResult.node.textContent?.length || 0);
 					}
 					
-					const rects = range.getClientRects();
-					
-					if (rects.length === 0) {
-						const rect = target.getBoundingClientRect();
-						mergeHighlightOverlayRects([rect], highlight.content, existingOverlays, false, index, highlight.notes);
-						return;
-					}
-					
-					const averageLineHeight = calculateAverageLineHeight(rects);
-					const textRects = Array.from(rects).filter(rect => rect.height <= averageLineHeight * 1.5);
-					const complexRects = Array.from(rects).filter(rect => rect.height > averageLineHeight * 1.5);
-					
-					if (textRects.length > 0) {
-						mergeHighlightOverlayRects(textRects, highlight.content, existingOverlays, true, index, highlight.notes);
-					}
-					if (complexRects.length > 0) {
-						mergeHighlightOverlayRects(complexRects, highlight.content, existingOverlays, false, index, highlight.notes);
-					}
-				} catch (error) {
-					// Fallback to element highlight
-					const rect = target.getBoundingClientRect();
+					processRangeForOverlayRects(range, highlight.content, existingOverlays, index, highlight.notes, target);
+
+				} catch (error) { // Catch errors from setStart/setEnd or processRange itself
+					console.warn('Error setting range or processing rects for text highlight:', error);
+					const rect = target.getBoundingClientRect(); // Fallback
 					mergeHighlightOverlayRects([rect], highlight.content, existingOverlays, false, index, highlight.notes);
 				}
 			} else {
-				// Fallback to element highlight
+				// Fallback to element highlight if start/end nodes not found
+				console.warn('Could not find start/end node for text highlight, falling back to element bounds.');
 				const rect = target.getBoundingClientRect();
 				mergeHighlightOverlayRects([rect], highlight.content, existingOverlays, false, index, highlight.notes);
 			}
-		} catch (error) {
+		} catch (error) { // Outer catch for findTextNodeAtOffset or other unexpected issues
 			console.error('Error creating text highlight:', error);
 			const rect = target.getBoundingClientRect();
 			mergeHighlightOverlayRects([rect], highlight.content, existingOverlays, false, index, highlight.notes);
+		} finally {
+			range.detach();
 		}
 	}
 }
