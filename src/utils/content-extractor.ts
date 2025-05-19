@@ -96,7 +96,7 @@ export async function initializePageContent(
 	content: string,
 	selectedHtml: string,
 	extractedContent: ExtractedContent,
-	pageUrl: string,
+	currentUrl: string,
 	schemaOrgData: any,
 	fullHtml: string,
 	highlights: AnyHighlightData[],
@@ -111,21 +111,20 @@ export async function initializePageContent(
 	metaTags: { name?: string | null; property?: string | null; content: string | null }[]
 ) {
 	try {
-		let currentUrl = pageUrl.replace(/#:~:text=[^&]+(&|$)/, '');
+		currentUrl = currentUrl.replace(/#:~:text=[^&]+(&|$)/, '');
 
-		let finalContent = content;
 		if (selectedHtml) {
-			finalContent = selectedHtml;
+			content = selectedHtml;
 		}
 
 		const noteName = sanitizeFileName(title);
 
 		// Process highlights after getting the base content
 		if (generalSettings.highlighterEnabled && generalSettings.highlightBehavior !== 'no-highlights' && highlights && highlights.length > 0) {
-			finalContent = processHighlights(finalContent, highlights);
+			content = processHighlights(content, highlights);
 		}
 
-		const markdownBody = createMarkdownContent(finalContent, currentUrl);
+		const markdownBody = createMarkdownContent(content, currentUrl);
 
 		// Convert each highlight to markdown individually and create an object with text, timestamp, and notes (if not empty)
 		const highlightsData = highlights.map(highlight => {
@@ -148,7 +147,7 @@ export async function initializePageContent(
 		const currentVariables: { [key: string]: string } = {
 			'{{author}}': author.trim(),
 			'{{content}}': markdownBody.trim(),
-			'{{contentHtml}}': finalContent.trim(),
+			'{{contentHtml}}': content.trim(),
 			'{{date}}': dayjs().format('YYYY-MM-DDTHH:mm:ssZ').trim(),
 			'{{time}}': dayjs().format('YYYY-MM-DDTHH:mm:ssZ').trim(),
 			'{{description}}': description.trim(),
