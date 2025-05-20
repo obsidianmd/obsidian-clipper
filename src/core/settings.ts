@@ -12,7 +12,6 @@ import {
 import { updateTemplateList, showTemplateEditor, initializeAddPropertyButton } from '../managers/template-ui';
 import { initializeGeneralSettings } from '../managers/general-settings';
 import { showSettingsSection, initializeSidebar } from '../managers/settings-section-ui';
-import { initializeInterpreterSettings } from '../managers/interpreter-settings';
 import { initializeReaderSettings } from '../managers/reader-settings';
 import { initializeAutoSave } from '../utils/auto-save';
 import { handleTemplateDrag, initializeDragAndDrop } from '../utils/drag-and-drop';
@@ -42,7 +41,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 		await translatePage();
 		
 		await initializeGeneralSettings();
-		await initializeInterpreterSettings();
 		await initializeReaderSettings();
 		const loadedTemplates = await loadTemplates();
 		updateTemplateList(loadedTemplates);

@@ -42,6 +42,7 @@ body.obsidian-highlighter-active {
 }
 
 .obsidian-highlighter-menu {
+	box-sizing: border-box !important;
 	cursor: default;
 	position: fixed;
 	top: 20px;
@@ -50,7 +51,8 @@ body.obsidian-highlighter-active {
 	border: 1px solid #424242;
 	background: #353535;
 	color: #fff;
-	padding: 4px;
+	padding: var(--obsidian-highlighter-menu-padding);
+	height: calc(var(--obsidian-highlighter-menu-height) + var(--obsidian-highlighter-menu-padding) * 2);
 	border-radius: var(--obsidian-highlighter-menu-height);
 	display: flex;
 	align-items: center;
@@ -116,6 +118,7 @@ body.obsidian-highlighter-active {
 		box-shadow: var(--obsidian-highlighter-button-border) !important;
 		-webkit-font-smoothing: antialiased !important;
 		svg {
+			mix-blend-mode: normal !important;
 			color: #bebebe;
 			width: 16px;
 			height: 16px;
@@ -164,14 +167,72 @@ body.obsidian-highlighter-active {
 	mix-blend-mode: multiply;
 	pointer-events: none;
 	z-index: 999999998;
+
+	.copy-url-button {
+		display: none;
+		position: absolute;
+		top: -16px;
+		right: -2px;
+		background: #353535 !important;
+		border: 1px solid #424242 !important;
+		border-radius: 4px !important;
+		color: #bebebe !important;
+		padding: 2px 6px !important;
+		font-size: 12px !important;
+		font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", sans-serif !important;
+		cursor: pointer !important;
+		pointer-events: all;
+		white-space: nowrap;
+		gap: 4px;
+		align-items: center;
+		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+		
+		svg {
+			mix-blend-mode: normal !important;
+			width: 12px;
+			height: 12px;
+			vertical-align: middle;
+			margin-right: 4px;
+		}
+
+		@media (hover: hover) {
+			&:hover {
+				background: #424242 !important;
+				color: white !important;
+			}
+		}
+
+		&.copied {
+			background: #4CAF50 !important;
+			color: white !important;
+		}
+	}
+
+	// &:hover .copy-url-button {
+	// 	display: inline-flex;
+	// }
+
 	&.is-hovering {
 		border: 2px dashed rgb(255, 235, 0, 1);
+		pointer-events: all;
 	}
+
 	&.obsidian-highlight-overlay-dark {
 		mix-blend-mode: screen;
 		background-color: rgba(255, 235, 0, 0.25);
 		&.is-hovering {
 			border: 2px dashed rgb(255, 235, 0, 0.5);
+		}
+
+		.copy-url-button {
+			background: #1a1a1a !important;
+			border-color: #2a2a2a !important;
+			
+			@media (hover: hover) {
+				&:hover {
+					background: #2a2a2a !important;
+				}
+			}
 		}
 	}
 }

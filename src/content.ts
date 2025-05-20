@@ -49,6 +49,7 @@ declare global {
 		author: string;
 		site: string;
 		wordCount: number;
+		metaTags: { name?: string | null; property?: string | null; content: string | null }[];
 	}
 
 	browser.runtime.onMessage.addListener((request: any, sender: browser.Runtime.MessageSender, sendResponse: (response?: any) => void) => {
@@ -67,7 +68,7 @@ declare global {
 			const extractedContent: { [key: string]: string } = {};
 
 			// Process with Defuddle first while we have access to the document
-			const defuddled = new Defuddle(document).parse();
+			const defuddled = new Defuddle(document, { url: document.URL }).parse();
 
 			// Create a new DOMParser
 			const parser = new DOMParser();
@@ -127,7 +128,8 @@ declare global {
 				selectedHtml: selectedHtml,
 				site: defuddled.site,
 				title: defuddled.title,
-				wordCount: defuddled.wordCount
+				wordCount: defuddled.wordCount,
+				metaTags: defuddled.metaTags || []
 			};
 			sendResponse(response);
 		} else if (request.action === "extractContent") {
@@ -156,11 +158,9 @@ declare global {
 			sendResponse({ success: true });
 		} else if (request.action === "highlightSelection") {
 			highlighter.toggleHighlighterMenu(request.isActive);
-			if (request.highlightData && request.highlightData.type === 'text') {
-				const selection = window.getSelection();
-				if (selection && !selection.isCollapsed) {
-					highlighter.handleTextSelection(selection);
-				}
+			const selection = window.getSelection();
+			if (selection && !selection.isCollapsed) {
+				highlighter.handleTextSelection(selection);
 			}
 			updateHasHighlights();
 			sendResponse({ success: true });
@@ -294,5 +294,39 @@ declare global {
 	}
 
 	window.addEventListener('beforeunload', handlePageUnload);
+
+	// Listen for custom events from the reader script
+	document.addEventListener('obsidian-reader-init', async () => {
+		// Find the highlighter button
+		const button = document.querySelector('[data-action="toggle-highlighter"]');
+		if (button) {
+			// Handle highlighter button clicks
+			button.addEventListener('click', async (e) => {
+				try {
+					// First try to get the tab ID from the background script
+					const response = await browser.runtime.sendMessage({ action: "ensureContentScriptLoaded" });
+					
+					let tabId: number | undefined;
+					if (response && typeof response === 'object') {
+						tabId = (response as { tabId: number }).tabId;
+					}
+
+					// If we didn't get a tab ID, try to get it from the current tab
+					if (!tabId) {
+						const tabs = await browser.tabs.query({ active: true, currentWindow: true });
+						tabId = tabs[0]?.id;
+					}
+
+					if (tabId) {
+						await browser.runtime.sendMessage({ action: "toggleHighlighterMode", tabId });
+					} else {
+						console.error('[Content]','Could not determine tab ID');
+					}
+				} catch (error) {
+					console.error('[Content]','Error in toggle flow:', error);
+				}
+			});
+		}
+	});
 
 })();

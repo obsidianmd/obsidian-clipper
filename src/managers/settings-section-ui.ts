@@ -1,9 +1,11 @@
 import { updateUrl } from '../utils/routing';
 import { generalSettings } from '../utils/storage-utils';
-import { updatePromptContextVisibility } from './interpreter-settings';
+import { updatePromptContextVisibility, initializeInterpreterSettings } from './interpreter-settings';
 import { initializePropertyTypesManager } from './property-types-manager';
 
 export type SettingsSection = 'general' | 'properties' | 'highlighter' | 'interpreter' | 'reader' | 'templates';
+
+let interpreterSettingsInitialized = false;
 
 export function showSettingsSection(section: SettingsSection, templateId?: string): void {
 	const sections = document.querySelectorAll('.settings-section');
@@ -25,7 +27,10 @@ export function showSettingsSection(section: SettingsSection, templateId?: strin
 	updateUrl(section, templateId);
 
 	if (section === 'interpreter') {
-		updateInterpreterSettings();
+		if (!interpreterSettingsInitialized) {
+			initializeInterpreterSettings();
+			interpreterSettingsInitialized = true;
+		}
 	}
 
 	if (section === 'properties') {
@@ -56,18 +61,6 @@ function updateTemplateListActiveState(templateId: string): void {
 			item.classList.add('active');
 		}
 	});
-}
-
-export function updateInterpreterSettings(): void {
-	const interpreterToggle = document.getElementById('interpreter-toggle') as HTMLInputElement;
-	const interpreterAutoRunToggle = document.getElementById('interpreter-auto-run-toggle') as HTMLInputElement;
-
-	if (interpreterToggle) {
-		interpreterToggle.checked = generalSettings.interpreterEnabled;
-	}
-	if (interpreterAutoRunToggle) {
-		interpreterAutoRunToggle.checked = generalSettings.interpreterAutoRun;
-	}
 }
 
 export function initializeSidebar(): void {

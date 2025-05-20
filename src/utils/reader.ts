@@ -2,6 +2,7 @@ import Defuddle from 'defuddle/full';
 import { getLocalStorage, setLocalStorage } from './storage-utils';
 import hljs from 'highlight.js';
 import { getDomain } from './string-utils';
+import { applyHighlights } from './highlighter';
 
 // Mobile viewport settings
 const VIEWPORT = 'width=device-width, initial-scale=1, maximum-scale=1';
@@ -51,38 +52,40 @@ export class Reader {
 		settingsBar.className = 'obsidian-reader-settings';
 		settingsBar.innerHTML = `
 			<div class="obsidian-reader-settings-controls">
-				<button class="obsidian-reader-settings-button" data-action="decrease-font">
-					<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-						<path d="M19 13H5"/>
-					</svg>
-				</button>
-				<button class="obsidian-reader-settings-button" data-action="increase-font">
-					<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-						<path d="M12 5v14M5 12h14"/>
-					</svg>
-				</button>
-
-				<button class="obsidian-reader-settings-button" data-action="decrease-width">
-					<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-						<path d="M21 3H3M21 21H3M16 12H8M3 12V3M3 21v-9M21 12V3M21 21v-9"/>
-					</svg>
-				</button>
-				<button class="obsidian-reader-settings-button" data-action="increase-width">
-					<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-						<path d="M21 3H3M21 21H3M21 12H3M3 12V3M3 21v-9M21 12V3M21 21v-9"/>
-					</svg>
-				</button>
-
-				<button class="obsidian-reader-settings-button" data-action="decrease-line-height">
-					<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-						<path d="M3 6h18M3 12h18M3 18h18"/>
-					</svg>
-				</button>
-				<button class="obsidian-reader-settings-button" data-action="increase-line-height">
-					<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-						<path d="M3 5h18M3 10h18M3 15h18M3 20h18"/>
-					</svg>
-				</button>
+				<div class="obsidian-reader-settings-controls-group">
+					<button class="obsidian-reader-settings-button" data-action="decrease-font">
+						<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-minus-icon lucide-minus"><path d="M5 12h14"/></svg>
+					</button>
+					<button class="obsidian-reader-settings-button" data-action="increase-font">
+						<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus-icon lucide-plus"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+					</button>
+				</div>
+				<div class="obsidian-reader-settings-controls-group">
+					<button class="obsidian-reader-settings-button" data-action="decrease-width">
+						<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M18 16L14 12L18 8"/>
+							<path d="M1 12L10 12"/>
+							<path d="M14 12H23"/>
+							<path d="M6 16L10 12L6 8"/>
+						</svg>
+					</button>
+					<button class="obsidian-reader-settings-button" data-action="increase-width">
+						<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-move-horizontal-icon lucide-move-horizontal"><path d="m18 8 4 4-4 4"/><path d="M2 12h20"/><path d="m6 8-4 4 4 4"/></svg>
+					</button>
+				</div>
+				<div class="obsidian-reader-settings-controls-group">
+					<button class="obsidian-reader-settings-button" data-action="decrease-line-height">
+						<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"  stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M4 10H20"/>
+							<path d="M4 6H20"/>
+							<path d="M4 18H20"/>
+							<path d="M4 14H20"/>
+						</svg>
+					</button>
+					<button class="obsidian-reader-settings-button" data-action="increase-line-height">
+						<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu-icon lucide-menu"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+					</button>
+				</div>
 
 				<select class="obsidian-reader-settings-select" data-action="change-theme">
 					<option value="default">Default</option>
@@ -94,6 +97,12 @@ export class Reader {
 					<option value="light">Light</option>
 					<option value="dark">Dark</option>
 				</select>
+
+				<div class="obsidian-reader-settings-controls-group">
+					<button class="obsidian-reader-settings-button" data-action="toggle-highlighter">
+						<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-highlighter-icon lucide-highlighter"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg>
+					</button>
+				</div>
 			</div>
 		`;
 
@@ -153,6 +162,10 @@ export class Reader {
 				this.updateThemeMode(doc, themeModeSelect.value as 'auto' | 'light' | 'dark');
 			});
 		}
+
+		// Notify content script to listen for highlighter button
+		document.dispatchEvent(new CustomEvent('obsidian-reader-init'));
+		
 	}
 
 	private static updateFontSize(doc: Document, size: number) {
@@ -239,6 +252,14 @@ export class Reader {
 
 		// Find all headings h2-h6
 		const headings = article.querySelectorAll('h2, h3, h4, h5, h6');
+
+		// Only show outline if there are 2 or more headings
+		if (headings.length < 2) {
+			outline.style.display = 'none';
+			return null;
+		} else {
+			outline.style.display = ''; 
+		}
 
 		// Add unique IDs to headings if they don't have them
 		headings.forEach((heading, index) => {
@@ -603,7 +624,7 @@ export class Reader {
 			const button = doc.createElement('button');
 			button.className = 'copy-button';
 			button.innerHTML = `
-				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy-icon lucide-copy"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy-icon lucide-copy"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
 			`;
 
 			button.addEventListener('click', async () => {
@@ -615,14 +636,14 @@ export class Reader {
 					// Show success state
 					button.classList.add('copied');
 					button.innerHTML = `
-						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check-icon lucide-check"><path d="M20 6 9 17l-5-5"/></svg>
+						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check-icon lucide-check"><path d="M20 6 9 17l-5-5"/></svg>
 					`;
 					
 					// Reset after 2 seconds
 					setTimeout(() => {
 						button.classList.remove('copied');
 						button.innerHTML = `
-							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy-icon lucide-copy"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy-icon lucide-copy"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
 						`;
 					}, 2000);
 				} catch (err) {
@@ -641,7 +662,7 @@ export class Reader {
 		this.lightbox.setAttribute('aria-modal', 'true');
 		this.lightbox.innerHTML = `
 			<button class="lightbox-close" aria-label="Close image viewer">
-				<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+				<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
 					<path d="M18 6L6 18M6 6l12 12"/>
 				</svg>
 			</button>
@@ -704,7 +725,7 @@ export class Reader {
 					expandButton.className = 'image-expand-button';
 					expandButton.setAttribute('aria-label', 'View full size');
 					expandButton.innerHTML = `
-						<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
 							<path d="M15 3h6v6M14 10l7-7M9 21H3v-6M10 14l-7 7"/>
 						</svg>
 					`;
@@ -727,7 +748,7 @@ export class Reader {
 					expandButton.className = 'image-expand-button';
 					expandButton.setAttribute('aria-label', 'View full size');
 					expandButton.innerHTML = `
-						<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
 							<path d="M15 3h6v6M14 10l7-7M9 21H3v-6M10 14l-7 7"/>
 						</svg>
 					`;
@@ -846,6 +867,11 @@ export class Reader {
 
 			// Remove page scripts and their effects
 			this.cleanupScripts(doc);
+
+			// Clear body attributes
+			while (doc.body.attributes.length > 0) {
+				doc.body.removeAttribute(doc.body.attributes[0].name);
+			}
 			
 			// Clean the html element but preserve lang and dir attributes
 			const htmlElement = doc.documentElement;
@@ -984,7 +1010,10 @@ export class Reader {
 			this.colorSchemeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 			this.colorSchemeMediaQuery.addEventListener('change', (e) => this.handleColorSchemeChange(e, doc));
 			
+			applyHighlights();
+
 			this.isActive = true;
+
 		} catch (e) {
 			console.error('Reader', 'Error during apply:', e);
 		}
@@ -1033,6 +1062,11 @@ export class Reader {
 				outline.remove();
 			}
 			this.isActive = false;
+
+			// Reapply highlights after restoring original content
+			if (typeof window !== 'undefined' && window.hasOwnProperty('applyHighlights')) {
+				(window as any).applyHighlights();
+			}
 		}
 	}
 

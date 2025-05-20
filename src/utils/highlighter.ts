@@ -30,6 +30,15 @@ let highlightHistory: HistoryAction[] = [];
 let redoHistory: HistoryAction[] = [];
 const MAX_HISTORY_LENGTH = 30;
 
+const ALLOWED_HIGHLIGHT_TAGS = [
+	'SPAN', 'P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6',
+	'MATH', 'FIGURE', 'UL', 'OL', 'TABLE', 'LI', 'CODE', 'PRE', 'BLOCKQUOTE', 'EM', 'STRONG', 'A'
+];
+
+const BLOCK_LEVEL_TAGS_FOR_SPLIT = [
+	'P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'LI', 'PRE', 'BLOCKQUOTE', 'FIGURE', 'TABLE'
+];
+
 export interface HighlightData {
 	id: string;
 	xpath: string;
@@ -281,47 +290,195 @@ function enableLinkClicks() {
 
 // Highlight an entire element
 export function highlightElement(element: Element, notes?: string[]) {
-	const xpath = getElementXPath(element);
-	const content = element.outerHTML;
-	const isBlockElement = window.getComputedStyle(element).display === 'block';
+	let targetElement = element;
+	const originalTagName = element.tagName.toUpperCase();
+
+	// If a table cell or row is targeted, try to highlight the parent table instead
+	if (['TD', 'TH', 'TR'].includes(originalTagName)) {
+		const parentTable = element.closest('table');
+		if (parentTable) {
+			targetElement = parentTable;
+		} else {
+			// If a cell/row is not within a table, do not highlight.
+			console.log('Table cell/row targeted, but no parent table found. Not highlighting:', originalTagName);
+			return;
+		}
+	}
+
+	// Now, check if the determined targetElement (which could be the original element or a table) is allowed.
+	const finalTagName = targetElement.tagName.toUpperCase();
+	if (!ALLOWED_HIGHLIGHT_TAGS.includes(finalTagName)) {
+		// If the targetElement itself is not allowed, try its parent.
+		// This primarily applies to cases where the original element was not a table cell/row.
+		if (targetElement.parentElement && ALLOWED_HIGHLIGHT_TAGS.includes(targetElement.parentElement.tagName.toUpperCase())) {
+			targetElement = targetElement.parentElement;
+		} else {
+			console.log('Element type not allowed for highlighting:', finalTagName);
+			return;
+		}
+	}
+
+	const xpath = getElementXPath(targetElement);
+	const content = targetElement.outerHTML;
+	const isBlockElement = window.getComputedStyle(targetElement).display === 'block';
 	addHighlight({ 
 		xpath, 
 		content, 
 		type: isBlockElement ? 'element' : 'text', 
 		id: Date.now().toString(),
 		startOffset: 0,
-		endOffset: element.textContent?.length || 0
+		endOffset: targetElement.textContent?.length || 0
 	}, notes);
 }
 
 // Handle text selection for highlighting
 export function handleTextSelection(selection: Selection, notes?: string[]) {
+	if (selection.isCollapsed) return;
 	const range = selection.getRangeAt(0);
-	const highlightRanges = getHighlightRanges(range);
-	highlightRanges.forEach(hr => addHighlight(hr, notes));
+	const newHighlightDatas = getHighlightRanges(range);
+
+	if (newHighlightDatas.length > 0) {
+		const oldGlobalHighlights = [...highlights]; // Save global state BEFORE this operation
+		let currentBatchHighlights = [...highlights]; // Start with global state for merging
+
+		for (const highlightData of newHighlightDatas) {
+			const newHighlightWithNotes = { ...highlightData, notes: notes || [] };
+			// Merge current new highlight with the accumulating batch from this selection + pre-existing ones
+			currentBatchHighlights = mergeOverlappingHighlights(currentBatchHighlights, newHighlightWithNotes);
+		}
+		
+		highlights = currentBatchHighlights; // Update global highlights with the final merged result
+		
+		// Only add to history if something actually changed from the initial global state
+		if (JSON.stringify(oldGlobalHighlights) !== JSON.stringify(highlights)) {
+			addToHistory('add', oldGlobalHighlights, highlights); 
+		}
+		
+		sortHighlights(); // Sort once after all additions
+		applyHighlights(); // Apply once
+		saveHighlights();  // Save once
+		updateHighlighterMenu(); // Update menu once
+	}
 	selection.removeAllRanges();
 }
 
 // Get highlight ranges for a given text selection
 function getHighlightRanges(range: Range): TextHighlightData[] {
-	const highlights: TextHighlightData[] = [];
-	const fragment = range.cloneContents();
-	const tempDiv = document.createElement('div');
-	tempDiv.appendChild(fragment);
+	const newHighlights: TextHighlightData[] = [];
+	if (range.collapsed) return newHighlights;
 
-	const parentElement = getHighlightableParent(range.commonAncestorContainer);
-	const xpath = getElementXPath(parentElement);
+	const uniqueParentBlocks = new Set<Element>();
+	const textNodeIterator = document.createNodeIterator(
+		range.commonAncestorContainer,
+		NodeFilter.SHOW_TEXT,
+		{
+			acceptNode: (node) => {
+				return range.intersectsNode(node) && node.nodeValue && node.nodeValue.trim().length > 0
+					? NodeFilter.FILTER_ACCEPT
+					: NodeFilter.FILTER_REJECT;
+			}
+		}
+	);
 
-	highlights.push({
-		xpath,
-		content: sanitizeAndPreserveFormatting(tempDiv.innerHTML),
-		type: 'text',
-		id: Date.now().toString(),
-		startOffset: getTextOffset(parentElement, range.startContainer, range.startOffset),
-		endOffset: getTextOffset(parentElement, range.endContainer, range.endOffset)
+	let currentTextNode;
+	while ((currentTextNode = textNodeIterator.nextNode())) {
+		const block = getClosestAllowedBlock(currentTextNode);
+		if (block) {
+			uniqueParentBlocks.add(block);
+		}
+	}
+
+	// Sort the blocks in document order to process them correctly
+	const sortedBlocks = Array.from(uniqueParentBlocks).sort((a, b) => {
+		const pos = a.compareDocumentPosition(b);
+		if (pos & Node.DOCUMENT_POSITION_FOLLOWING) return -1;
+		if (pos & Node.DOCUMENT_POSITION_PRECEDING) return 1;
+		return 0;
 	});
 
-	return highlights;
+	for (let i = 0; i < sortedBlocks.length; i++) {
+		const blockElement = sortedBlocks[i];
+		const currentBlockSelectionRange = document.createRange();
+
+		// Determine the portion of the selection that is within this blockElement
+		let startContainer = range.startContainer;
+		let startOffset = range.startOffset;
+		let endContainer = range.endContainer;
+		let endOffset = range.endOffset;
+
+		// Clip start to the current block if selection starts before it
+		if (!blockElement.contains(startContainer) && !(blockElement === startContainer)) {
+			const firstText = findFirstTextNode(blockElement);
+			if (firstText) {
+				startContainer = firstText;
+				startOffset = 0;
+			} else continue; // No text in this block to highlight
+		}
+
+		// Clip end to the current block if selection ends after it
+		if (!blockElement.contains(endContainer) && !(blockElement === endContainer)) {
+			const lastText = findLastTextNode(blockElement);
+			if (lastText) {
+				endContainer = lastText;
+				endOffset = lastText.textContent?.length || 0;
+			} else continue; // No text in this block
+		}
+
+		try {
+			currentBlockSelectionRange.setStart(startContainer, startOffset);
+			currentBlockSelectionRange.setEnd(endContainer, endOffset);
+
+			// Final check: ensure the created range is actually within the current blockElement
+			// and not collapsed.
+			if (!currentBlockSelectionRange.collapsed && 
+				(blockElement.contains(currentBlockSelectionRange.commonAncestorContainer) || blockElement === currentBlockSelectionRange.commonAncestorContainer)) {
+				
+				const contentFragment = currentBlockSelectionRange.cloneContents();
+				const tempDivForBlock = document.createElement('div');
+				tempDivForBlock.appendChild(contentFragment);
+				const selectedTextContent = sanitizeAndPreserveFormatting(tempDivForBlock.innerHTML);
+
+				if (selectedTextContent.trim() === "") continue; // Skip empty highlights
+
+				newHighlights.push({
+					xpath: getElementXPath(blockElement),
+					content: selectedTextContent,
+					type: 'text',
+					id: Date.now().toString() + "_" + i, // Unique ID for the batch
+					startOffset: getTextOffset(blockElement, currentBlockSelectionRange.startContainer, currentBlockSelectionRange.startOffset),
+					endOffset: getTextOffset(blockElement, currentBlockSelectionRange.endContainer, currentBlockSelectionRange.endOffset)
+				});
+			}
+		} catch (e) {
+			console.warn("Error creating range for block element:", blockElement, e);
+		}
+	}
+
+	// Fallback: If no block-level highlights were created but there was a selection,
+	// try to create a single highlight based on the closest highlightable parent.
+	if (newHighlights.length === 0 && !range.collapsed) {
+		console.warn("Splitting selection by block failed or no suitable blocks found, falling back to single highlight for selection.");
+		const parentElement = getHighlightableParent(range.commonAncestorContainer);
+		if (ALLOWED_HIGHLIGHT_TAGS.includes(parentElement.tagName.toUpperCase())) {
+			const tempDivSingle = document.createElement('div');
+			tempDivSingle.appendChild(range.cloneContents());
+			const content = sanitizeAndPreserveFormatting(tempDivSingle.innerHTML);
+			if (content.trim() !== "") {
+				newHighlights.push({
+					xpath: getElementXPath(parentElement),
+					content: content,
+					type: 'text',
+					id: Date.now().toString(),
+					startOffset: getTextOffset(parentElement, range.startContainer, range.startOffset),
+					endOffset: getTextOffset(parentElement, range.endContainer, range.endOffset)
+				});
+			}
+		} else {
+			console.log("Fallback highlight's parent is not in ALLOWED_HIGHLIGHT_TAGS, skipping highlight:", parentElement.tagName);
+		}
+	}
+
+	return newHighlights;
 }
 
 // Sanitize HTML content while preserving formatting
@@ -709,6 +866,44 @@ function addToHistory(type: 'add' | 'remove', oldHighlights: AnyHighlightData[],
 	// Clear redo history when a new action is performed
 	redoHistory = [];
 	updateUndoRedoButtons();
+}
+
+function isConsideredBlockElement(element: Element): boolean {
+	if (!element || typeof element.tagName !== 'string') return false;
+	const tagName = element.tagName.toUpperCase();
+	// Element must be an allowed highlight target AND a block tag we split by.
+	return ALLOWED_HIGHLIGHT_TAGS.includes(tagName) && BLOCK_LEVEL_TAGS_FOR_SPLIT.includes(tagName);
+}
+
+// Helper to find the closest ancestor that is an allowed highlightable block
+function getClosestAllowedBlock(node: Node | null): Element | null {
+	let current: Node | null = node;
+	while (current) {
+		if (current.nodeType === Node.ELEMENT_NODE) {
+			const el = current as Element;
+			// Check if it's an allowed tag overall and if it's a block element we use for splitting text selections.
+			if (ALLOWED_HIGHLIGHT_TAGS.includes(el.tagName.toUpperCase()) && isConsideredBlockElement(el)) {
+				return el;
+			}
+		}
+		current = current.parentElement;
+	}
+	return null;
+}
+
+function findFirstTextNode(element: Element): Text | null {
+	const treeWalker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+	return treeWalker.firstChild() as Text | null;
+}
+
+function findLastTextNode(element: Element): Text | null {
+	const treeWalker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+	let lastNode = null;
+	let currentNode;
+	while(currentNode = treeWalker.nextNode()) {
+		lastNode = currentNode;
+	}
+	return lastNode as Text | null;
 }
 
 export { getElementXPath } from './dom-utils';

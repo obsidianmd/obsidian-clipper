@@ -1,4 +1,4 @@
-import browser from './utils/browser-polyfill';
+import browser from 'webextension-polyfill';
 import { ensureContentScriptLoaded } from './utils/content-script-utils';
 import { detectBrowser } from './utils/browser-detection';
 import { updateCurrentActiveTab, isValidUrl, isBlankPage } from './utils/active-tab-manager';
@@ -10,6 +10,24 @@ let isHighlighterMode = false;
 let hasHighlights = false;
 let isContextMenuCreating = false;
 let popupPorts: { [tabId: number]: browser.Runtime.Port } = {};
+
+async function initialize() {
+	try {
+		// Initialize the global highlighter state
+		const result = await browser.storage.local.get('isHighlighterMode') as { isHighlighterMode?: boolean };
+		isHighlighterMode = result.isHighlighterMode ?? false;
+		
+		// Set up tab listeners
+		await setupTabListeners();
+		
+		// Initialize context menu
+		await debouncedUpdateContextMenu(-1);
+		
+		console.log('Background script initialized successfully');
+	} catch (error) {
+		console.error('Error initializing background script:', error);
+	}
+}
 
 // Check if a popup is open for a given tab
 function isPopupOpen(tabId: number): boolean {
@@ -59,6 +77,14 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 		if (typedRequest.action === "ensureContentScriptLoaded" && typedRequest.tabId) {
 			ensureContentScriptLoaded(typedRequest.tabId).then(sendResponse);
 			return true;
+		}
+
+		if (typedRequest.action === "ensureContentScriptLoaded") {
+			if (sender.tab?.id) {
+				ensureContentScriptLoaded(sender.tab.id)
+					.then(() => sendResponse({ tabId: sender.tab?.id }));
+				return true;
+			}
 		}
 
 		if (typedRequest.action === "sidePanelOpened") {
@@ -376,6 +402,11 @@ async function injectReaderScript(tabId: number) {
 			files: ['reader.css']
 		});
 
+		// Inject scripts in sequence for all browsers
+		await browser.scripting.executeScript({
+			target: { tabId },
+			files: ['browser-polyfill.min.js']
+		});
 		await browser.scripting.executeScript({
 			target: { tabId },
 			files: ['reader-script.js']
@@ -388,10 +419,7 @@ async function injectReaderScript(tabId: number) {
 	}
 }
 
-// Initialize the tab listeners
-setupTabListeners();
-
-// Initialize the global highlighter state when the extension starts
-browser.storage.local.get('isHighlighterMode').then((result: { isHighlighterMode?: boolean }) => {
-	isHighlighterMode = result.isHighlighterMode ?? false;
+// Initialize the extension
+initialize().catch(error => {
+	console.error('Failed to initialize background script:', error);
 });
