@@ -125,7 +125,7 @@ export async function initializePageContent(
 		}
 
 		const markdownBody = createMarkdownContent(content, currentUrl);
-		const selectedMarkdown = selectedHtml ? markdownBody : createMarkdownContent(selectedHtml, currentUrl)
+		const selectedMarkdown = createMarkdownContent(selectedHtml, currentUrl)
 
 		// Convert each highlight to markdown individually and create an object with text, timestamp, and notes (if not empty)
 		const highlightsData = highlights.map(highlight => {
