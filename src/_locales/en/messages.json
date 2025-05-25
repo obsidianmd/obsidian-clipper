@@ -106,6 +106,18 @@
 			}
 		}
 	},
+	"clipperOpenMode": {
+		"message": "Clipper UI open mode"
+	},
+	"clipperOpenModeDescription": {
+		"message": "Choose how the clipper UI opens. The default is to open in a new tab, but you can also open it in a popup window or in the current tab."
+	},
+	"clipperOpenModePopup": {
+		"message": "Popup (default)"
+	},
+	"clipperOpenModeSidePanel": {
+		"message": "Side panel (Chromium only)"
+	},
 	"close": {
 		"message": "Close"
 	},
@@ -312,6 +324,9 @@
 	},
 	"failedToSaveProvider": {
 		"message": "Failed to save provider. Please try again."
+	},
+	"firefoxPermissionRequired": {
+		"message": "Additional permissions required. To open Web Clipper from the highlighter, go to about:config and set this to true:\\n\\nextensions.openPopupWithoutUserGesture.enabled"
 	},
 	"feedback": {
 		"message": "Feedback"
