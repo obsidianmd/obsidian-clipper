@@ -139,7 +139,6 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 				});
 			return true;
 		}
-
 		if (typedRequest.action === "openSidePanel") {
 			// Use Chrome API directly for side panel
 			if (typeof chrome !== 'undefined' && chrome.windows && chrome.sidePanel && chrome.sidePanel.open) {
@@ -159,6 +158,24 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 				return true; // Indicates async response
 			} else {
 				sendResponse({ success: false, error: 'Side panel API not available' });
+				return true;
+			}
+		}
+
+		if (typedRequest.action === "openFirefoxSidebar") {
+			// Firefox sidebar support
+			if (browser.sidebarAction && typeof browser.sidebarAction.open === 'function') {
+				browser.sidebarAction.open()
+					.then(() => {
+						sendResponse({ success: true });
+					})
+					.catch((error: unknown) => {
+						console.error('Error opening Firefox sidebar:', error);
+						sendResponse({ success: false, error: error instanceof Error ? error.message : String(error) });
+					});
+				return true;
+			} else {
+				sendResponse({ success: false, error: 'Firefox sidebar API not available' });
 				return true;
 			}
 		}
@@ -247,13 +264,17 @@ const debouncedUpdateContextMenu = debounce(async (tabId: number) => {
 					title: "Add to highlights",
 					contexts: ["image", "video", "audio"]
 				}
-			];
-
-			const browserType = await detectBrowser();
+			];			const browserType = await detectBrowser();
 		if (browserType === 'chrome') {
 			menuItems.push({
 				id: 'open-side-panel',
 				title: 'Open side panel',
+				contexts: ["page", "selection"]
+			});
+		} else if (browserType === 'firefox') {
+			menuItems.push({
+				id: 'open-firefox-sidebar',
+				title: 'Open sidebar',
 				contexts: ["page", "selection"]
 			});
 		}
@@ -282,11 +303,19 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
 	// } else if (info.menuItemId === "toggle-reader" && tab && tab.id) {
 	// 	await ensureContentScriptLoaded(tab.id);
 	// 	await injectReaderScript(tab.id);
-	// 	await browser.tabs.sendMessage(tab.id, { action: "toggleReaderMode" });
-	} else if (info.menuItemId === 'open-side-panel' && tab && tab.id && tab.windowId) {
-		chrome.sidePanel.open({ tabId: tab.id });
-		sidePanelOpenWindows.add(tab.windowId);
+	// 	await browser.tabs.sendMessage(tab.id, { action: "toggleReaderMode" });	} else if (info.menuItemId === 'open-side-panel' && tab && tab.id && tab.windowId) {
+		chrome.sidePanel.open({ tabId: tab.id! });				if (tab.windowId !== undefined) {
+					sidePanelOpenWindows.add(tab.windowId);
+				}
 		await ensureContentScriptLoaded(tab.id);
+	} else if (info.menuItemId === 'open-firefox-sidebar' && tab && tab.id) {
+		if (browser.sidebarAction && typeof browser.sidebarAction.open === 'function') {
+			try {
+				await browser.sidebarAction.open();
+			} catch (error) {
+				console.error('Error opening Firefox sidebar from context menu:', error);
+			}
+		}
 	}
 });
 

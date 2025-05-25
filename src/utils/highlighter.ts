@@ -179,8 +179,7 @@ async function handleClipButtonClick(e: Event) {
 				} else {
 					throw new Error('Invalid response from background script');
 				}
-			}
-			// Firefox sidebarAction support
+			}			// Firefox sidebarAction support
 			else if (
 				browserType === 'firefox' &&
 				browser.sidebarAction &&
