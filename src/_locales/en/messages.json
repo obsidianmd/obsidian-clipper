@@ -326,7 +326,7 @@
 		"message": "Failed to save provider. Please try again."
 	},
 	"firefoxPermissionRequired": {
-		"message": "Additional permissions required. To open Web Clipper from the highlighter, go to about:config and set this to true:\\n\\nextensions.openPopupWithoutUserGesture.enabled"
+		"message": "Additional permissions required. To open Web Clipper from the highlighter, go to about:config and set this to true: extensions.openPopupWithoutUserGesture.enabled"
 	},
 	"feedback": {
 		"message": "Feedback"
