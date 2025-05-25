@@ -60,6 +60,20 @@
 							<div id="usage-chart" class="usage-chart"></div>
 						</div>
 						<form id="general-settings-form">
+							<div class="setting-item mod-horizontal">
+								<div class="setting-item-info">
+									<label for="clipper-open-mode-dropdown" data-i18n="clipperOpenMode">Clipper UI open mode</label>
+									<div class="setting-item-description" data-i18n="clipperOpenModeDescription">
+										Choose how the Clipper UI opens when you use the highlighter: as a popup window (default) or in the Chrome side panel (Chrome only).
+									</div>
+								</div>
+								<div class="setting-item-control">
+									<select id="clipper-open-mode-dropdown">
+										<option value="popup" data-i18n="clipperOpenModePopup">Popup (default)</option>
+										<option value="sidepanel" data-i18n="clipperOpenModeSidepanel">Chrome side panel</option>
+									</select>
+								</div>
+							</div>
 							<div>
 								<div class="setting-item mod-horizontal is-hidden" id="rate-extension">
 									<div class="setting-item-info">

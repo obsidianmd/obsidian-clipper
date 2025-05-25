@@ -36,6 +36,7 @@ export let generalSettings: Settings = {
 	},
 	history: [],
 	ratings: [],
+	clipperOpenMode: 'popup',
 	saveBehavior: 'addToObsidian'
 };
 
@@ -48,13 +49,14 @@ export function getLocalStorage(key: string): Promise<any> {
 }
 
 interface StorageData {
-	general_settings?: {
-		showMoreActionsButton?: boolean;
-		betaFeatures?: boolean;
-		legacyMode?: boolean;
-		silentOpen?: boolean;
-		saveBehavior?: 'addToObsidian' | 'copyToClipboard' | 'saveFile';
-	};
+   general_settings?: {
+	   showMoreActionsButton?: boolean;
+	   betaFeatures?: boolean;
+	   legacyMode?: boolean;
+	   silentOpen?: boolean;
+	   saveBehavior?: 'addToObsidian' | 'copyToClipboard' | 'saveFile';
+	   clipperOpenMode?: 'popup' | 'sidepanel';
+   };
 	vaults?: string[];
 	highlighter_settings?: {
 		highlighterEnabled?: boolean;
@@ -125,7 +127,8 @@ export async function loadSettings(): Promise<Settings> {
 			share: 0
 		},
 		history: [],
-		ratings: [],
+	   ratings: [],
+	   clipperOpenMode: 'popup',
 	};
 
 	// Update migration version if needed
@@ -161,7 +164,8 @@ export async function loadSettings(): Promise<Settings> {
 		stats: data.stats || defaultSettings.stats,
 		history: data.history || defaultSettings.history,
 		ratings: data.ratings || defaultSettings.ratings,
-		saveBehavior: data.general_settings?.saveBehavior ?? defaultSettings.saveBehavior
+	   saveBehavior: data.general_settings?.saveBehavior ?? defaultSettings.saveBehavior,
+	   clipperOpenMode: data.general_settings?.clipperOpenMode ?? defaultSettings.clipperOpenMode
 	};
 
 	generalSettings = loadedSettings;
@@ -174,15 +178,16 @@ export async function saveSettings(settings?: Partial<Settings>): Promise<void> 
 		generalSettings = { ...generalSettings, ...settings };
 	}
 
-	await browser.storage.sync.set({
-		vaults: generalSettings.vaults,
-		general_settings: {
-			showMoreActionsButton: generalSettings.showMoreActionsButton,
-			betaFeatures: generalSettings.betaFeatures,
-			legacyMode: generalSettings.legacyMode,
-			silentOpen: generalSettings.silentOpen,
-			saveBehavior: generalSettings.saveBehavior,
-		},
+   await browser.storage.sync.set({
+	   vaults: generalSettings.vaults,
+	   general_settings: {
+		   showMoreActionsButton: generalSettings.showMoreActionsButton,
+		   betaFeatures: generalSettings.betaFeatures,
+		   legacyMode: generalSettings.legacyMode,
+		   silentOpen: generalSettings.silentOpen,
+		   saveBehavior: generalSettings.saveBehavior,
+		   clipperOpenMode: generalSettings.clipperOpenMode,
+	   },
 		highlighter_settings: {
 			highlighterEnabled: generalSettings.highlighterEnabled,
 			alwaysShowHighlights: generalSettings.alwaysShowHighlights,

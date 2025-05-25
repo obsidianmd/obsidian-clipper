@@ -140,6 +140,29 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 			return true;
 		}
 
+		if (typedRequest.action === "openSidePanel") {
+			// Use Chrome API directly for side panel
+			if (typeof chrome !== 'undefined' && chrome.windows && chrome.sidePanel && chrome.sidePanel.open) {
+				chrome.windows.getCurrent({}, (window) => {
+					if (window && window.id !== undefined) {
+						chrome.sidePanel.open({ windowId: window.id }, () => {
+							if (chrome.runtime.lastError) {
+								sendResponse({ success: false, error: chrome.runtime.lastError.message });
+							} else {
+								sendResponse({ success: true });
+							}
+						});
+					} else {
+						sendResponse({ success: false, error: 'No current window found' });
+					}
+				});
+				return true; // Indicates async response
+			} else {
+				sendResponse({ success: false, error: 'Side panel API not available' });
+				return true;
+			}
+		}
+
 		if (typedRequest.action === "toggleReaderMode" && typedRequest.tabId) {
 			injectReaderScript(typedRequest.tabId).then(() => {
 				browser.tabs.sendMessage(typedRequest.tabId!, { action: "toggleReaderMode" })
