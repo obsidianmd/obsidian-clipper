@@ -27,6 +27,9 @@ body:
 
 ---
 
+IMPORTANT: If your issue is related to missing content on page, please review the Troubleshooting instructions and open your issue on the Defuddle repo.
+https://help.obsidian.md/web-clipper/troubleshoot
+
 **Version (please complete the following information):**
 
 - OS: [e.g. Windows]
