@@ -440,7 +440,7 @@ browser.runtime.onMessage.addListener(async (message: any) => {
 				data: response.ok ? responseData : undefined
 			};
 		} catch (error) {
-			console.error('Error in Hoarder request:', error);
+			console.error('Hoarder request failed');
 			return {
 				ok: false,
 				error: error instanceof Error ? error.message : 'Unknown error'
