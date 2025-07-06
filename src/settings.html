@@ -18,6 +18,7 @@
 						<li data-section="highlighter" data-i18n="highlighter">Highlighter</li>
 						<li data-section="reader" data-i18n="reader" style="display: none;">Reader</li>
 						<li data-section="interpreter" data-i18n="interpreter">Interpreter</li>
+						<li data-section="hoarder" data-i18n="hoarder">Hoarder</li>
 						<li class="sidebar-heading" data-i18n="templatesHeading">Templates</li>
 					</ul>
 					<button type="button" id="new-template-btn" class="mod-cta" data-i18n="newTemplate">New&nbsp;template</button>
@@ -160,6 +161,7 @@
 											<option value="addToObsidian" selected data-i18n="addToObsidian">Add to Obsidian</option>
 											<option value="copyToClipboard" data-i18n="copyToClipboard">Copy to clipboard</option>
 											<option value="saveFile" data-i18n="saveFile">Save file</option>
+											<option value="addToHoarder" data-i18n="addToHoarder">Add to Hoarder</option>
 										</select>
 									</div>
 								</div>
@@ -409,6 +411,57 @@
 								<div id="property-types-list" class="properties-list"></div>
 							</div>
 							
+						</form>
+					</div>
+
+					<div id="hoarder-section" class="settings-section">
+						<div class="settings-section-header">
+							<h2 data-i18n="hoarder">Hoarder</h2>
+						</div>
+						<form id="hoarder-settings-form">
+							<div class="setting-item mod-horizontal">
+								<div class="setting-item-info">
+									<label for="hoarder-enabled-toggle" data-i18n="enableHoarder">Enable Hoarder</label>
+								</div>
+								<div class="setting-item-control">
+									<div class="checkbox-container">
+										<input type="checkbox" id="hoarder-enabled-toggle" />
+									</div>
+								</div>
+							</div>
+							<div class="setting-item">
+								<div class="setting-item-info">
+									<div class="setting-item-name" data-i18n="hoarderServerUrl">Server URL</div>
+									<div class="setting-item-description" data-i18n="hoarderServerUrlDescription">The URL of your Hoarder server.</div>
+								</div>
+								<div class="setting-item-control">
+									<input type="text" id="hoarder-server-url" placeholder="http://localhost:3000">
+								</div>
+							</div>
+							<div class="setting-item">
+								<div class="setting-item-info">
+									<div class="setting-item-name" data-i18n="hoarderApiKey">API Key</div>
+									<div class="setting-item-description" data-i18n="hoarderApiKeyDescription">Your Hoarder API key.</div>
+								</div>
+								<div class="setting-item-control">
+									<input type="password" id="hoarder-api-key">
+								</div>
+							</div>
+							<div class="setting-item">
+								<div class="setting-item-info">
+									<div class="setting-item-name" data-i18n="connectionStatus">Connection Status</div>
+								</div>
+								<div class="setting-item-control">
+									<div id="hoarder-connection-status"></div>
+								</div>
+							</div>
+							<div class="setting-item mod-horizontal">
+								<div class="setting-item-info">
+								</div>
+								<div class="setting-item-control">
+									<button type="button" id="save-hoarder-settings" class="mod-cta" data-i18n="save">Save</button>
+								</div>
+							</div>
 						</form>
 					</div>
 

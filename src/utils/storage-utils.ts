@@ -1,5 +1,5 @@
 import browser from './browser-polyfill';
-import { Settings, ModelConfig, PropertyType, HistoryEntry, Provider, Rating } from '../types/types';
+import { Settings, ModelConfig, PropertyType, HistoryEntry, Provider, Rating, SaveBehavior } from '../types/types';
 import { debugLog } from './debug';
 import { copyToClipboard } from 'core/popup';
 
@@ -7,13 +7,13 @@ export type { Settings, ModelConfig, PropertyType, HistoryEntry, Provider, Ratin
 
 export let generalSettings: Settings = {
 	vaults: [],
+	showMoreActionsButton: false,
 	betaFeatures: false,
 	legacyMode: false,
 	silentOpen: false,
 	highlighterEnabled: true,
-	alwaysShowHighlights: false,
-	highlightBehavior: 'highlight-inline',
-	showMoreActionsButton: false,
+	alwaysShowHighlights: true,
+	highlightBehavior: 'no-highlights',
 	interpreterModel: '',
 	models: [],
 	providers: [],
@@ -22,9 +22,9 @@ export let generalSettings: Settings = {
 	defaultPromptContext: '',
 	propertyTypes: [],
 	readerSettings: {
-		fontSize: 1.5,
+		fontSize: 16,
 		lineHeight: 1.6,
-		maxWidth: 38,
+		maxWidth: 800,
 		theme: 'default',
 		themeMode: 'auto'
 	},
@@ -32,11 +32,15 @@ export let generalSettings: Settings = {
 		addToObsidian: 0,
 		saveFile: 0,
 		copyToClipboard: 0,
-		share: 0
+		share: 0,
+		addToHoarder: 0
 	},
 	history: [],
 	ratings: [],
-	saveBehavior: 'addToObsidian'
+	saveBehavior: 'addToObsidian',
+	hoarderEnabled: false,
+	hoarderServerUrl: '',
+	hoarderApiKey: ''
 };
 
 export function setLocalStorage(key: string, value: any): Promise<void> {
@@ -53,7 +57,10 @@ interface StorageData {
 		betaFeatures?: boolean;
 		legacyMode?: boolean;
 		silentOpen?: boolean;
-		saveBehavior?: 'addToObsidian' | 'copyToClipboard' | 'saveFile';
+		saveBehavior?: SaveBehavior;
+		hoarderEnabled?: boolean;
+		hoarderServerUrl?: string;
+		hoarderApiKey?: string;
 	};
 	vaults?: string[];
 	highlighter_settings?: {
@@ -82,6 +89,7 @@ interface StorageData {
 		saveFile: number;
 		copyToClipboard: number;
 		share: number;
+		addToHoarder: number;
 	};
 	history?: HistoryEntry[];
 	ratings?: Rating[];
@@ -102,7 +110,7 @@ export async function loadSettings(): Promise<Settings> {
 		silentOpen: false,
 		highlighterEnabled: true,
 		alwaysShowHighlights: true,
-		highlightBehavior: 'highlight-inline',
+		highlightBehavior: 'no-highlights',
 		interpreterModel: '',
 		models: [],
 		providers: [],
@@ -112,9 +120,9 @@ export async function loadSettings(): Promise<Settings> {
 		propertyTypes: [],
 		saveBehavior: 'addToObsidian',
 		readerSettings: {
-			fontSize: 1.5,
+			fontSize: 16,
 			lineHeight: 1.6,
-			maxWidth: 38,
+			maxWidth: 800,
 			theme: 'default',
 			themeMode: 'auto'
 		},
@@ -122,10 +130,14 @@ export async function loadSettings(): Promise<Settings> {
 			addToObsidian: 0,
 			saveFile: 0,
 			copyToClipboard: 0,
-			share: 0
+			share: 0,
+			addToHoarder: 0
 		},
 		history: [],
 		ratings: [],
+		hoarderEnabled: false,
+		hoarderServerUrl: '',
+		hoarderApiKey: ''
 	};
 
 	// Update migration version if needed
@@ -161,7 +173,10 @@ export async function loadSettings(): Promise<Settings> {
 		stats: data.stats || defaultSettings.stats,
 		history: data.history || defaultSettings.history,
 		ratings: data.ratings || defaultSettings.ratings,
-		saveBehavior: data.general_settings?.saveBehavior ?? defaultSettings.saveBehavior
+		saveBehavior: data.general_settings?.saveBehavior ?? defaultSettings.saveBehavior,
+		hoarderEnabled: data.general_settings?.hoarderEnabled ?? defaultSettings.hoarderEnabled,
+		hoarderServerUrl: data.general_settings?.hoarderServerUrl ?? defaultSettings.hoarderServerUrl,
+		hoarderApiKey: data.general_settings?.hoarderApiKey ?? defaultSettings.hoarderApiKey
 	};
 
 	generalSettings = loadedSettings;
@@ -182,6 +197,9 @@ export async function saveSettings(settings?: Partial<Settings>): Promise<void> 
 			legacyMode: generalSettings.legacyMode,
 			silentOpen: generalSettings.silentOpen,
 			saveBehavior: generalSettings.saveBehavior,
+			hoarderEnabled: generalSettings.hoarderEnabled,
+			hoarderServerUrl: generalSettings.hoarderServerUrl,
+			hoarderApiKey: generalSettings.hoarderApiKey
 		},
 		highlighter_settings: {
 			highlighterEnabled: generalSettings.highlighterEnabled,

@@ -799,5 +799,32 @@
 	},
 	"version": {
 		"message": "Version"
+	},
+	"addToHoarder": {
+		"message": "Add to Hoarder"
+	},
+	"hoarder": {
+		"message": "Hoarder"
+	},
+	"hoarderServerUrl": {
+		"message": "Server URL"
+	},
+	"hoarderApiKey": {
+		"message": "API Key"
+	},
+	"hoarderApiKeyDescription": {
+		"message": "Your Hoarder API key"
+	},
+	"connectionStatus": {
+		"message": "Connection Status"
+	},
+	"hoarderConnectionFailed": {
+		"message": "Failed to connect to Hoarder server. Please check your settings."
+	},
+	"enableHoarder": {
+		"message": "Enable Hoarder"
+	},
+	"savedToHoarder": {
+		"message": "Successfully saved to Hoarder"
 	}
 }

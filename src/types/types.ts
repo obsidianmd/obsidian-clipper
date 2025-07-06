@@ -50,7 +50,7 @@ export interface Rating {
 	date: string;
 }
 
-export type SaveBehavior = 'addToObsidian' | 'saveFile' | 'copyToClipboard';
+export type SaveBehavior = 'addToObsidian' | 'saveFile' | 'copyToClipboard' | 'addToHoarder';
 
 export interface ReaderSettings {
 	fontSize: number;
@@ -82,10 +82,14 @@ export interface Settings {
 		saveFile: number;
 		copyToClipboard: number;
 		share: number;
+		addToHoarder: number;
 	};
 	history: HistoryEntry[];
 	ratings: Rating[];
-	saveBehavior: 'addToObsidian' | 'saveFile' | 'copyToClipboard';
+	saveBehavior: 'addToObsidian' | 'saveFile' | 'copyToClipboard' | 'addToHoarder';
+	hoarderEnabled: boolean;
+	hoarderServerUrl: string;
+	hoarderApiKey: string;
 }
 
 export interface ModelConfig {
@@ -99,7 +103,7 @@ export interface ModelConfig {
 export interface HistoryEntry {
 	datetime: string;
 	url: string;
-	action: 'addToObsidian' | 'saveFile' | 'copyToClipboard' | 'share';
+	action: 'addToObsidian' | 'saveFile' | 'copyToClipboard' | 'share' | 'addToHoarder';
 	title?: string;
 	vault?: string;
 	path?: string;

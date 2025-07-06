@@ -23,6 +23,8 @@ import { addBrowserClassToHtml } from '../utils/browser-detection';
 import { initializeMenu } from '../managers/menu';
 import { addMenuItemListener } from '../managers/menu';
 import { translatePage, getCurrentLanguage, setLanguage, getAvailableLanguages, getMessage, setupLanguageAndDirection } from '../utils/i18n';
+import { generalSettings, saveSettings } from '../utils/storage-utils';
+import { testConnection } from '../utils/hoarder-api';
 
 declare global {
 	interface Window {
@@ -56,6 +58,79 @@ document.addEventListener('DOMContentLoaded', async () => {
 		const languageSelect = document.getElementById('language-select') as HTMLSelectElement;
 		if (languageSelect) {
 			await initializeLanguageSelector(languageSelect);
+		}
+
+		// Hoarder settings
+		const hoarderServerUrl = document.getElementById('hoarder-server-url') as HTMLInputElement;
+		const hoarderApiKey = document.getElementById('hoarder-api-key') as HTMLInputElement;
+		const hoarderEnabledToggle = document.getElementById('hoarder-enabled-toggle') as HTMLInputElement;
+		const hoarderConnectionStatus = document.getElementById('hoarder-connection-status');
+
+		async function updateHoarderConnectionStatus() {
+			if (!hoarderConnectionStatus) return;
+			
+			try {
+				const { ok, user } = await testConnection();
+				if (ok && user) {
+					hoarderConnectionStatus.innerHTML = `
+						<div class="connection-status success">
+							<span class="status-icon">✓</span>
+							Connected as ${user.email}
+						</div>
+					`;
+					hoarderConnectionStatus.classList.remove('error');
+					hoarderConnectionStatus.classList.add('success');
+				} else {
+					hoarderConnectionStatus.innerHTML = `
+						<div class="connection-status error">
+							<span class="status-icon">✗</span>
+							Not connected
+						</div>
+					`;
+					hoarderConnectionStatus.classList.remove('success');
+					hoarderConnectionStatus.classList.add('error');
+				}
+			} catch (error) {
+				hoarderConnectionStatus.innerHTML = `
+					<div class="connection-status error">
+						<span class="status-icon">✗</span>
+						Connection error
+					</div>
+				`;
+				hoarderConnectionStatus.classList.remove('success');
+				hoarderConnectionStatus.classList.add('error');
+			}
+		}
+
+		if (hoarderServerUrl) {
+			hoarderServerUrl.value = generalSettings.hoarderServerUrl;
+			hoarderServerUrl.addEventListener('change', async () => {
+				await saveSettings({ hoarderServerUrl: hoarderServerUrl.value });
+				await updateHoarderConnectionStatus();
+			});
+		}
+
+		if (hoarderApiKey) {
+			hoarderApiKey.value = generalSettings.hoarderApiKey;
+			hoarderApiKey.addEventListener('change', async () => {
+				await saveSettings({ hoarderApiKey: hoarderApiKey.value });
+				await updateHoarderConnectionStatus();
+			});
+		}
+
+		if (hoarderEnabledToggle) {
+			hoarderEnabledToggle.checked = generalSettings.hoarderEnabled;
+			hoarderEnabledToggle.addEventListener('change', async () => {
+				await saveSettings({ hoarderEnabled: hoarderEnabledToggle.checked });
+				if (hoarderEnabledToggle.checked) {
+					await updateHoarderConnectionStatus();
+				}
+			});
+		}
+
+		// Initial connection status check
+		if (generalSettings.hoarderEnabled) {
+			updateHoarderConnectionStatus();
 		}
 	}
 

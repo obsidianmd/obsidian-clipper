@@ -1,0 +1,33 @@
+#hoarder-section {
+    .connection-status {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-size: 14px;
+
+        &.success {
+            background-color: var(--color-green-100);
+            color: var(--color-green-900);
+
+            .status-icon {
+                color: var(--color-green-600);
+            }
+        }
+
+        &.error {
+            background-color: var(--color-red-100);
+            color: var(--color-red-900);
+
+            .status-icon {
+                color: var(--color-red-600);
+            }
+        }
+
+        .status-icon {
+            font-size: 16px;
+            line-height: 1;
+        }
+    }
+} 

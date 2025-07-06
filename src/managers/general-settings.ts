@@ -18,6 +18,7 @@ import { getClipHistory } from '../utils/storage-utils';
 import dayjs from 'dayjs';
 import weekOfYear from 'dayjs/plugin/weekOfYear';
 import { showModal, hideModal } from '../utils/modal-utils';
+import { testConnection } from '../utils/hoarder-api';
 
 dayjs.extend(weekOfYear);
 
@@ -137,6 +138,54 @@ async function initializeVersionDisplay(): Promise<void> {
 	}
 }
 
+async function initializeHoarderSettings(): Promise<void> {
+	const hoarderServerUrl = document.getElementById('hoarder-server-url') as HTMLInputElement;
+	const hoarderApiKey = document.getElementById('hoarder-api-key') as HTMLInputElement;
+	const hoarderEnabledToggle = document.getElementById('hoarder-enabled-toggle') as HTMLInputElement;
+	const saveHoarderSettingsBtn = document.getElementById('save-hoarder-settings') as HTMLButtonElement;
+
+	if (hoarderEnabledToggle) {
+		hoarderEnabledToggle.checked = generalSettings.hoarderEnabled;
+	}
+
+	if (hoarderServerUrl) {
+		hoarderServerUrl.value = generalSettings.hoarderServerUrl || '';
+	}
+
+	if (hoarderApiKey) {
+		hoarderApiKey.value = generalSettings.hoarderApiKey || '';
+	}
+
+	if (saveHoarderSettingsBtn) {
+		saveHoarderSettingsBtn.addEventListener('click', async () => {
+			try {
+				// Save settings first
+				await saveSettings({
+					...generalSettings,
+					hoarderEnabled: hoarderEnabledToggle?.checked || false,
+					hoarderServerUrl: hoarderServerUrl?.value || '',
+					hoarderApiKey: hoarderApiKey?.value || ''
+				});
+
+				// Test connection if Hoarder is enabled
+				if (hoarderEnabledToggle?.checked) {
+					const isConnected = await testConnection();
+					if (isConnected) {
+						alert(getMessage('settingsSaved'));
+					} else {
+						alert(getMessage('hoarderConnectionFailed'));
+					}
+				} else {
+					alert(getMessage('settingsSaved'));
+				}
+			} catch (error) {
+				console.error('Failed to save Hoarder settings:', error);
+				alert(getMessage('failedToSaveSettings'));
+			}
+		});
+	}
+}
+
 export function initializeGeneralSettings(): void {
 	loadSettings().then(async () => {
 		await setupLanguageAndDirection();
@@ -195,6 +244,7 @@ export function initializeGeneralSettings(): void {
 		initializeHighlighterSettings();
 		initializeExportHighlightsButton();
 		initializeSaveBehaviorDropdown();
+		initializeHoarderSettings();
 		await initializeUsageChart();
 
 		// Initialize feedback modal close button

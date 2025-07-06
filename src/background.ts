@@ -419,6 +419,36 @@ async function injectReaderScript(tabId: number) {
 	}
 }
 
+// Handle Hoarder API requests
+browser.runtime.onMessage.addListener(async (message: any) => {
+	if (message.action === 'hoarderRequest') {
+		try {
+			const { method, url, headers, body } = message;
+			const response = await fetch(url, {
+				method,
+				headers,
+				...(body && { body: JSON.stringify(body) })
+			});
+
+			const responseData = await response.json().catch(() => null);
+			
+			return {
+				ok: response.ok,
+				status: response.status,
+				statusText: response.statusText,
+				error: !response.ok ? (responseData?.error || response.statusText) : undefined,
+				data: response.ok ? responseData : undefined
+			};
+		} catch (error) {
+			console.error('Error in Hoarder request:', error);
+			return {
+				ok: false,
+				error: error instanceof Error ? error.message : 'Unknown error'
+			};
+		}
+	}
+});
+
 // Initialize the extension
 initialize().catch(error => {
 	console.error('Failed to initialize background script:', error);
