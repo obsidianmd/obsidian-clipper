@@ -73,7 +73,7 @@ export async function saveToHoarder(
         type: 'link',
         archived: false,
         favourited: false,
-        // note: content,
+        note: content,
         // summary: content.slice(0, 500) // Use first 500 chars as summary
     };
 
