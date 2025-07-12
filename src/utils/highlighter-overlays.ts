@@ -11,6 +11,7 @@ import {
 	updateHighlighterMenu
 } from './highlighter';
 import { throttle } from './throttle';
+import { toRunEachFrame } from './each-frame';
 import { getElementByXPath, isDarkColor } from './dom-utils';
 
 let hoverOverlay: HTMLElement | null = null;
@@ -408,6 +409,53 @@ observer.observe(document.body, {
 	attributeFilter: ['style', 'class'],
 	characterData: false
 });
+
+function watchScrollableElements() {
+	const isScrollable = (element: Element) => {
+		const style = window.getComputedStyle(element);
+		return style.overflowY === 'auto' || style.overflowY === 'scroll' || style.overflowX === 'auto' || style.overflowX === 'scroll';
+	}
+
+	// 200ms duration required for long custom scrolling animations (e.g. Grok)
+	const updateHighlightsEachFrame = toRunEachFrame(updateHighlightOverlayPositions, 200, 1000);
+
+	const handleScroll = () => {
+		updateHighlightsEachFrame();
+	}
+
+	const setupEventListeners = (element: Element) => {
+		element.addEventListener('scroll', handleScroll);
+		element.addEventListener('wheel', handleScroll);
+		element.addEventListener('touchmove', handleScroll);
+	}
+
+	document.querySelectorAll('*').forEach((element: Element) => {
+		if (isScrollable(element)) {
+			setupEventListeners(element);
+		}
+	})
+
+	const scrollableElementsObserver = new MutationObserver((mutations) => {
+		mutations.forEach((mutation) => {
+			if (mutation.type == 'childList') {
+				Array.from(mutation.addedNodes).forEach((node) => {
+					if (node instanceof Element && isScrollable(node)) {
+						setupEventListeners(node);
+					}
+				});
+			} else if (mutation.type == 'attributes') {
+				if (mutation.attributeName == 'style' && mutation.target instanceof Element && isScrollable(mutation.target)) {
+					setupEventListeners(mutation.target);
+				}
+			}
+
+		});
+	});
+
+	scrollableElementsObserver.observe(document.body, { childList: true, attributes: true, subtree: true });
+}
+
+watchScrollableElements()
 
 // Create or update the hover overlay used to indicate which element will be highlighted
 function createOrUpdateHoverOverlay(target: Element) {
