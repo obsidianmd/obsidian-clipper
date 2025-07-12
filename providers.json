@@ -1,5 +1,5 @@
 {
-	"version": "2025.05.01",
+	"version": "2025.07.12",
 	"anthropic": {
 		"id": "anthropic",
 		"name": "Anthropic",
@@ -89,9 +89,7 @@
 		"popularModels": [
 			{ "id": "gpt-4o-mini", "name": "GPT-4o Mini" },
 			{ "id": "gpt-4o", "name": "GPT-4o" },
-			{ "id": "o1-2024-12-17", "name": "o1" },
-			{ "id": "o1-mini-2024-09-12", "name": "o1 Mini" },
-			{ "id": "o3-mini-2025-01-31", "name": "o3 Mini" }
+			{ "id": "gpt-4.1-2025-04-14", "name": "GPT-4.1" }
 		]
 	},
 	"openrouter": {
