@@ -73,35 +73,57 @@ export async function saveToObsidian(
 ): Promise<void> {
 	let obsidianUrl: string;
 
-	const isDailyNote = behavior === 'append-daily' || behavior === 'prepend-daily';
-
-	if (isDailyNote) {
-		obsidianUrl = `obsidian://daily?`;
-	} else {
-		// Ensure path ends with a slash
-		if (path && !path.endsWith('/')) {
-			path += '/';
-		}
-
-		const formattedNoteName = sanitizeFileName(noteName);
-		obsidianUrl = `obsidian://new?file=${encodeURIComponent(path + formattedNoteName)}`;
+	// Exit if no vault is specified
+	if (!vault) {
+		console.error('No vault specified. Cannot create note.');
+		return;
 	}
 
+	// Ensure path ends with a slash
+	if (path && !path.endsWith('/')) {
+		path += '/';
+	}
+
+	// Ensure correct route for the given behavior
 	if (behavior.startsWith('append')) {
-		obsidianUrl += '&append=true';
+		obsidianUrl = `obsidian://actions-uri/note/append?`
 	} else if (behavior.startsWith('prepend')) {
-		obsidianUrl += '&prepend=true';
-	} else if (behavior === 'overwrite') {
-		obsidianUrl += '&overwrite=true';
+		obsidianUrl = `obsidian://actions-uri/note/prepend?`
+	} else {
+		obsidianUrl = `obsidian://actions-uri/note/create?`
 	}
 
-	const vaultParam = vault ? `&vault=${encodeURIComponent(vault)}` : '';
-	obsidianUrl += vaultParam;
+	// Set the vault property
+	obsidianUrl += `&vault=${encodeURIComponent(vault)}`
+
+	// Ensure the file name parameter is set
+	if (behavior.endsWith('daily')) {
+		obsidianUrl += `&periodic-note=daily`
+	} else {
+		// Sanitise the note name and encode it for the URL
+		const formattedNoteName = sanitizeFileName(noteName);
+		const fileName = encodeURIComponent(path + formattedNoteName);
+
+		obsidianUrl += `&file=${fileName}`;
+	}
+
+	// Overwrite existing note if behavior is set to overwrite
+	if (behavior === 'overwrite') {
+		obsidianUrl += '&if-exists=overwrite';
+	}
 
 	// Add silent parameter if silentOpen is enabled
 	if (generalSettings.silentOpen) {
 		obsidianUrl += '&silent=true';
 	}
+
+	// Add the content to the URL
+	obsidianUrl += `&content=${encodeURIComponent(fileContent)}`;
+
+	/*
+	openObsidianUrl(obsidianUrl);
+	console.log('Obsidian URL:', obsidianUrl);
+	*/
 
 	if (generalSettings.legacyMode) {
 		// Use the URI method
