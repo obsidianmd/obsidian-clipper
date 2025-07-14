@@ -139,6 +139,14 @@ async function initializeVersionDisplay(): Promise<void> {
 
 export function initializeGeneralSettings(): void {
 	loadSettings().then(async () => {
+		// Initialize clipper open mode dropdown
+		const clipperOpenModeDropdown = document.getElementById('clipper-open-mode-dropdown') as HTMLSelectElement;
+		if (clipperOpenModeDropdown) {
+			clipperOpenModeDropdown.value = generalSettings.clipperOpenMode || 'popup';
+			clipperOpenModeDropdown.addEventListener('change', () => {
+				saveSettings({ ...generalSettings, clipperOpenMode: clipperOpenModeDropdown.value as 'popup' | 'sidepanel' });
+			});
+		}
 		await setupLanguageAndDirection();
 
 		// Add version check initialization
@@ -216,26 +224,28 @@ function initializeAutoSave(): void {
 }
 
 function saveSettingsFromForm(): void {
-	const showMoreActionsToggle = document.getElementById('show-more-actions-toggle') as HTMLInputElement;
-	const betaFeaturesToggle = document.getElementById('beta-features-toggle') as HTMLInputElement;
-	const legacyModeToggle = document.getElementById('legacy-mode-toggle') as HTMLInputElement;
-	const silentOpenToggle = document.getElementById('silent-open-toggle') as HTMLInputElement;
-	const highlighterToggle = document.getElementById('highlighter-toggle') as HTMLInputElement;
-	const alwaysShowHighlightsToggle = document.getElementById('highlighter-visibility') as HTMLInputElement;
-	const highlightBehaviorSelect = document.getElementById('highlighter-behavior') as HTMLSelectElement;
+const showMoreActionsToggle = document.getElementById('show-more-actions-toggle') as HTMLInputElement;
+const betaFeaturesToggle = document.getElementById('beta-features-toggle') as HTMLInputElement;
+const legacyModeToggle = document.getElementById('legacy-mode-toggle') as HTMLInputElement;
+const silentOpenToggle = document.getElementById('silent-open-toggle') as HTMLInputElement;
+const highlighterToggle = document.getElementById('highlighter-toggle') as HTMLInputElement;
+const alwaysShowHighlightsToggle = document.getElementById('highlighter-visibility') as HTMLInputElement;
+const highlightBehaviorSelect = document.getElementById('highlighter-behavior') as HTMLSelectElement;
+const clipperOpenModeDropdown = document.getElementById('clipper-open-mode-dropdown') as HTMLSelectElement;
 
-	const updatedSettings = {
-		...generalSettings, // Keep existing settings
-		showMoreActionsButton: showMoreActionsToggle?.checked ?? generalSettings.showMoreActionsButton,
-		betaFeatures: betaFeaturesToggle?.checked ?? generalSettings.betaFeatures,
-		legacyMode: legacyModeToggle?.checked ?? generalSettings.legacyMode,
-		silentOpen: silentOpenToggle?.checked ?? generalSettings.silentOpen,
-		highlighterEnabled: highlighterToggle?.checked ?? generalSettings.highlighterEnabled,
-		alwaysShowHighlights: alwaysShowHighlightsToggle?.checked ?? generalSettings.alwaysShowHighlights,
-		highlightBehavior: highlightBehaviorSelect?.value ?? generalSettings.highlightBehavior
-	};
+const updatedSettings = {
+	...generalSettings, // Keep existing settings
+	showMoreActionsButton: showMoreActionsToggle?.checked ?? generalSettings.showMoreActionsButton,
+	betaFeatures: betaFeaturesToggle?.checked ?? generalSettings.betaFeatures,
+	legacyMode: legacyModeToggle?.checked ?? generalSettings.legacyMode,
+	silentOpen: silentOpenToggle?.checked ?? generalSettings.silentOpen,
+	highlighterEnabled: highlighterToggle?.checked ?? generalSettings.highlighterEnabled,
+	alwaysShowHighlights: alwaysShowHighlightsToggle?.checked ?? generalSettings.alwaysShowHighlights,
+	highlightBehavior: highlightBehaviorSelect?.value ?? generalSettings.highlightBehavior,
+	clipperOpenMode: clipperOpenModeDropdown?.value as 'popup' | 'sidepanel' ?? generalSettings.clipperOpenMode,
+};
 
-	saveSettings(updatedSettings);
+saveSettings(updatedSettings);
 }
 
 function initializeShowMoreActionsToggle(): void {
@@ -318,14 +328,14 @@ function initializeResetDefaultTemplateButton(): void {
 }
 
 function initializeSaveBehaviorDropdown(): void {
-    const dropdown = document.getElementById('save-behavior-dropdown') as HTMLSelectElement;
-    if (!dropdown) return;
+	const dropdown = document.getElementById('save-behavior-dropdown') as HTMLSelectElement;
+	if (!dropdown) return;
 
-    dropdown.value = generalSettings.saveBehavior;
-    dropdown.addEventListener('change', () => {
-        const newValue = dropdown.value as 'addToObsidian' | 'copyToClipboard' | 'saveFile';
-        saveSettings({ saveBehavior: newValue });
-    });
+	dropdown.value = generalSettings.saveBehavior;
+	dropdown.addEventListener('change', () => {
+		const newValue = dropdown.value as 'addToObsidian' | 'copyToClipboard' | 'saveFile';
+		saveSettings({ saveBehavior: newValue });
+	});
 }
 
 export function resetDefaultTemplate(): void {

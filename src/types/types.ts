@@ -86,6 +86,11 @@ export interface Settings {
 	history: HistoryEntry[];
 	ratings: Rating[];
 	saveBehavior: 'addToObsidian' | 'saveFile' | 'copyToClipboard';
+
+	/**
+	 * Determines how the clipper UI is opened: 'popup' (default) or 'sidepanel'.
+	 */
+	clipperOpenMode?: 'popup' | 'sidepanel';
 }
 
 export interface ModelConfig {

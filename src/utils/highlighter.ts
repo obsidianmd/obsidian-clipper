@@ -160,22 +160,60 @@ function updateUndoRedoButtons() {
 async function handleClipButtonClick(e: Event) {
 	e.preventDefault();
 	const browserType = await detectBrowser();
-
+	await loadSettings();
+	const openMode = generalSettings.clipperOpenMode || 'popup';
+	
 	try {
-		const response = await browser.runtime.sendMessage({action: "openPopup"});
-		if (response && typeof response === 'object' && 'success' in response) {
-			if (!response.success) {
-				throw new Error((response as { error?: string }).error || 'Unknown error');
+		if (openMode === 'sidepanel') {
+			// Chrome / Edge / Brave and other Chromium browsers (like Vivaldi) sidePanel support
+			if (
+				browserType === 'chrome' ||
+				browserType === 'edge' ||
+				browserType === 'brave'
+			) {
+				const response = await browser.runtime.sendMessage({ action: "openSidePanel" });
+				if (response && typeof response === 'object' && 'success' in response) {
+					if (!response.success) {
+						throw new Error((response as { error?: string }).error || 'Unknown error');
+					}
+				} else {
+					throw new Error('Invalid response from background script');
+				}
+			}			// Firefox sidebarAction support
+			else if (
+				browserType === 'firefox' &&
+				browser.sidebarAction &&
+				typeof browser.sidebarAction.open === 'function'
+			) {
+				await browser.sidebarAction.open();
+			}
+			// Fallback to popup
+			else {
+				const response = await browser.runtime.sendMessage({ action: "openPopup" });
+				if (response && typeof response === 'object' && 'success' in response) {
+					if (!response.success) {
+						throw new Error((response as { error?: string }).error || 'Unknown error');
+					}
+				} else {
+					throw new Error('Invalid response from background script');
+				}
 			}
 		} else {
-			throw new Error('Invalid response from background script');
+			const response = await browser.runtime.sendMessage({ action: "openPopup" });
+			if (response && typeof response === 'object' && 'success' in response) {
+				if (!response.success) {
+					throw new Error((response as { error?: string }).error || 'Unknown error');
+				}
+			} else {
+				throw new Error('Invalid response from background script');
+			}
 		}
 	} catch (error) {
-		console.error('Error opening popup:', error);
+		console.error('Error opening clipper UI:', error);
 		if (browserType === 'firefox') {
-			alert("Additional permissions required. To open Web Clipper from the highlighter, go to about:config and set this to true:\n\nextensions.openPopupWithoutUserGesture.enabled");
+			alert(browser.i18n.getMessage('firefoxPermissionRequired'));
 		} else {
-			console.error('Failed to open popup:', error);
+			console.error('Failed to open clipper UI:', error);
 		}
 	}
 }
