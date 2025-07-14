@@ -17,24 +17,26 @@ Preset variables are automatically generated based on the page content. These ty
 
 The main content variable is `{{content}}`, which contains the article content, or the [[Highlight web pages|highlights]], or the selection if there is any selected text on the page. Note that `{{content}}` attempts to extract the main content of the page, which may not always be what you want. In that case, you can use other preset variables or selector variables to extract the content you need.
 
-| Variable          | Description                                                                            |
-| ----------------- | -------------------------------------------------------------------------------------- |
-| `{{author}}`      | Author of the page                                                                     |
-| `{{content}}`     | Article content, [[Highlight web pages\|highlights]], or selection, in Markdown format |
-| `{{contentHtml}}` | Article content, [[Highlight web pages\|highlights]], or selection, in HTML format     |
-| `{{date}}`        | Current date, can be formatted using the `date` filter                                 |
-| `{{description}}` | Description or excerpt                                                                 |
-| `{{domain}}`      | Domain                                                                                 |
-| `{{favicon}}`     | Favicon URL                                                                            |
-| `{{fullHtml}}`    | Unprocessed HTML for the full page content                                             |
-| `{{highlights}}`  | [[Highlight web pages\|Highlights]] with text and timestamps                           |
-| `{{image}}`       | Social share image URL                                                                 |
-| `{{published}}`   | Published date, can be formatted using the `date` filter                               |
-| `{{site}}`        | Site name or publisher                                                                 |
-| `{{title}}`       | Title of the page                                                                      |
-| `{{time}}`        | Current date and time                                                                  |
-| `{{url}}`         | Current URL                                                                            |
-| `{{words}}`       | Word count                                                                             |
+| Variable            | Description                                                                            |
+| ------------------- | -------------------------------------------------------------------------------------- |
+| `{{author}}`        | Author of the page                                                                     |
+| `{{content}}`       | Article content, [[Highlight web pages\|highlights]], or selection, in Markdown format |
+| `{{contentHtml}}`   | Article content, [[Highlight web pages\|highlights]], or selection, in HTML format     |
+| `{{selection}}`     | Selection in Markdown format                                                           |
+| `{{selectionHtml}}` | Selection in HTML format                                                               |
+| `{{date}}`          | Current date, can be formatted using the `date` filter                                 |
+| `{{description}}`   | Description or excerpt                                                                 |
+| `{{domain}}`        | Domain                                                                                 |
+| `{{favicon}}`       | Favicon URL                                                                            |
+| `{{fullHtml}}`      | Unprocessed HTML for the full page content                                             |
+| `{{highlights}}`    | [[Highlight web pages\|Highlights]] with text and timestamps                           |
+| `{{image}}`         | Social share image URL                                                                 |
+| `{{published}}`     | Published date, can be formatted using the `date` filter                               |
+| `{{site}}`          | Site name or publisher                                                                 |
+| `{{title}}`         | Title of the page                                                                      |
+| `{{time}}`          | Current date and time                                                                  |
+| `{{url}}`           | Current URL                                                                            |
+| `{{words}}`         | Word count                                                                             |
 
 ## Prompt variables
 
