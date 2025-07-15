@@ -125,11 +125,13 @@ export async function saveToObsidian(
 	console.log('Obsidian URL:', obsidianUrl);
 
 	function openObsidianUrl(url: string): void {
+		console.log('Opening Obsidian URL:', url);
 		browser.tabs.query({active: true, currentWindow: true}).then((tabs) => {
+			console.log('Current tabs:', tabs);
 			const currentTab = tabs[0];
-			if (currentTab && currentTab.id) {
+			/*if (currentTab && currentTab.id) {
 				browser.tabs.update(currentTab.id, { url: url });
-			}
+			}*/
 		});
 	}
 }
