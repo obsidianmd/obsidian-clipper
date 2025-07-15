@@ -121,11 +121,10 @@ export async function saveToObsidian(
 	// Add the content to the URL
 	obsidianUrl += `&content=${encodeURIComponent(fileContent)}`;
 
-	/*
 	openObsidianUrl(obsidianUrl);
 	console.log('Obsidian URL:', obsidianUrl);
-	*/
-
+	
+	/*
 	if (generalSettings.legacyMode) {
 		// Use the URI method
 		obsidianUrl += `&content=${encodeURIComponent(fileContent)}`;
@@ -144,14 +143,18 @@ export async function saveToObsidian(
 			obsidianUrl += `&content=${encodeURIComponent("There was an error creating the content. Make sure you are using Obsidian 1.7.2 or above.")}`;
 			openObsidianUrl(obsidianUrl);
 		});
+		
 	}
+	*/
 
 	function openObsidianUrl(url: string): void {
+		console.log('Opening Obsidian URL:', url);
 		browser.tabs.query({active: true, currentWindow: true}).then((tabs) => {
+			console.log('Current tabs:', tabs);
 			const currentTab = tabs[0];
-			if (currentTab && currentTab.id) {
+			/*if (currentTab && currentTab.id) {
 				browser.tabs.update(currentTab.id, { url: url });
-			}
+			}*/
 		});
 	}
 }
