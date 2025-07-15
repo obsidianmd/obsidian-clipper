@@ -95,7 +95,7 @@ export async function saveToObsidian(
 
 	// Set the vault property
 	// TODO: Set correct vault if empty
-	obsidianUrl += `&vault=${encodeURIComponent(vault)}`
+	obsidianUrl += `vault=${encodeURIComponent(vault)}`
 
 	// Ensure the file name parameter is set
 	if (behavior.endsWith('daily')) {
