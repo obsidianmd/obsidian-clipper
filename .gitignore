@@ -21,3 +21,5 @@ assets/shared
 .cursorrules
 .env
 context/
+*.crx
+*.pem
