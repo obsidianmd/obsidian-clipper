@@ -95,7 +95,7 @@ export async function saveToObsidian(
 
 	// Set the vault property
 	// TODO: Set correct vault if empty
-	obsidianUrl += `&vault=${encodeURIComponent(vault)}`
+	obsidianUrl += `vault=${encodeURIComponent(vault)}`
 
 	// Ensure the file name parameter is set
 	if (behavior.endsWith('daily')) {
@@ -121,30 +121,8 @@ export async function saveToObsidian(
 	// Add the content to the URL
 	obsidianUrl += `&content=${encodeURIComponent(fileContent)}`;
 
-	/*
 	openObsidianUrl(obsidianUrl);
 	console.log('Obsidian URL:', obsidianUrl);
-	*/
-
-	if (generalSettings.legacyMode) {
-		// Use the URI method
-		obsidianUrl += `&content=${encodeURIComponent(fileContent)}`;
-		console.log('Obsidian URL:', obsidianUrl);
-		openObsidianUrl(obsidianUrl);
-	} else {
-		// Use clipboard
-		navigator.clipboard.writeText(fileContent).then(() => {
-			obsidianUrl += `&clipboard`;
-			openObsidianUrl(obsidianUrl);
-			console.log('Obsidian URL:', obsidianUrl);
-		}).catch(err => {
-			console.log('Obsidian URL:', obsidianUrl);
-			console.error('Failed to copy content to clipboard:', err);
-			obsidianUrl += `&clipboard`;
-			obsidianUrl += `&content=${encodeURIComponent("There was an error creating the content. Make sure you are using Obsidian 1.7.2 or above.")}`;
-			openObsidianUrl(obsidianUrl);
-		});
-	}
 
 	function openObsidianUrl(url: string): void {
 		browser.tabs.query({active: true, currentWindow: true}).then((tabs) => {
