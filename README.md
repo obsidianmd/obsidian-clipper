@@ -1,43 +1,18 @@
-Obsidian Web Clipper helps you highlight and capture the web in your favorite browser. Anything you save is stored as durable Markdown files that you can read offline, and preserve for the long term.
+# Obsidian Web Clipper+
+This updated Web Clipper makes use of the Actions URI plugin in Obsidian to append and prepend to files better. Note that you will have to specify the correct vault as it cannot currently calculate the last-used vault. You must have the [Actions URI Plugin](https://github.com/czottmann/obsidian-actions-uri) installed and enabled to make use of the updater clipper.
+I made this because I was sick of my appends having a newline between them and the list elements above them when clipping to list items.
 
-- **[Download Web Clipper](https://obsidian.md/clipper)**
-- **[Documentation](https://help.obsidian.md/web-clipper)**
-- **[Troubleshooting](https://help.obsidian.md/web-clipper/troubleshoot)**
+Open to requests. Below the line is [the original README from obsidianmd's Web Clipper repo](https://github.com/obsidianmd/obsidian-clipper).
 
-## Get started
+---
+Obsidian Web Clipper+ helps you highlight and capture the web in your favorite browser. Anything you save is stored as durable Markdown files that you can read offline, and preserve for the long term.
 
-Install the extension by downloading it from the official directory for your browser:
-
-- **[Chrome Web Store](https://chromewebstore.google.com/detail/obsidian-web-clipper/cnjifjpddelmedmihgijeibhnjfabmlf)** for Chrome, Brave, Arc, Orion, and other Chromium-based browsers.
-- **[Firefox Add-Ons](https://addons.mozilla.org/en-US/firefox/addon/web-clipper-obsidian/)** for Firefox and Firefox Mobile.
-- **[Safari Extensions](https://apps.apple.com/us/app/obsidian-web-clipper/id6720708363)** for macOS, iOS, and iPadOS.
-- **[Edge Add-Ons](https://microsoftedge.microsoft.com/addons/detail/obsidian-web-clipper/eigdjhmgnaaeaonimdklocfekkaanfme)** for Microsoft Edge.
+- **[Official Obsidian Documentation](https://help.obsidian.md/web-clipper)**
+- **[Official Obsidian Troubleshooting](https://help.obsidian.md/web-clipper/troubleshoot)**
 
 ## Use the extension
 
-Documentation is available on the [Obsidian Help site](https://help.obsidian.md/web-clipper), which covers how to use [highlighting](https://help.obsidian.md/web-clipper/highlight), [templates](https://help.obsidian.md/web-clipper/templates), [variables](https://help.obsidian.md/web-clipper/variables), [filters](https://help.obsidian.md/web-clipper/filters), and more.
-
-## Contribute
-
-### Translations
-
-You can help translate Web Clipper into your language. Submit your translation via pull request using the format found in the [/_locales](/src/_locales) folder.
-
-### Features and bug fixes
-
-See the [help wanted](https://github.com/obsidianmd/obsidian-clipper/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22) tag for issues where contributions are welcome.
-
-## Roadmap
-
-In no particular order:
-
-- [ ] A separate icon for Web Clipper
-- [ ] Translate UI into more languages — help is welcomed
-- [ ] Annotate highlights
-- [ ] Template directory
-- [ ] Template validation
-- [ ] Template logic (if/for)
-- [x] Save images locally, [added in Obsidian 1.8.0](https://obsidian.md/changelog/2024-12-18-desktop-v1.8.0/)
+Documentation for the official Obsidian Web Clipper is available on the [Obsidian Help site](https://help.obsidian.md/web-clipper), which covers how to use [highlighting](https://help.obsidian.md/web-clipper/highlight), [templates](https://help.obsidian.md/web-clipper/templates), [variables](https://help.obsidian.md/web-clipper/variables), [filters](https://help.obsidian.md/web-clipper/filters), and more.
 
 ## Developers
 
