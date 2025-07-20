@@ -663,7 +663,6 @@ export function createMarkdownContent(content: string, url: string) {
 	}
 
 	try {
-
 		let markdown = turndownService.turndown(processedContent);
 		debugLog('Markdown', 'Markdown conversion successful');
 
