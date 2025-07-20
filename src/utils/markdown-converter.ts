@@ -143,7 +143,6 @@ export function createMarkdownContent(content: string, url: string) {
 		replacement: function(content, node) {
 			const figure = node as HTMLElement;
 			const img = figure.querySelector('img');
-			console.log(img)
 			const figcaption = figure.querySelector('figcaption');
 			
 			if (!img) return content;
@@ -159,7 +158,7 @@ export function createMarkdownContent(content: string, url: string) {
 				// deconstruct the srcset urls
 				const srcsetUrls = srcset.split(",%20");
 				for (let url of srcsetUrls) {
-					
+
 					const split = url.split("%20");
 					const srcUrl = split[0];
 					const width = parseInt(split[1]);
@@ -174,10 +173,7 @@ export function createMarkdownContent(content: string, url: string) {
 				src = images[0].src;
 			}
 
-			
-
-
-			console.log({alt, src, srcset})
+		
 			let caption = '';
 
 			if (figcaption) {
@@ -667,10 +663,8 @@ export function createMarkdownContent(content: string, url: string) {
 	}
 
 	try {
-		console.log(processedContent)
-		
+
 		let markdown = turndownService.turndown(processedContent);
-		console.log(markdown)
 		debugLog('Markdown', 'Markdown conversion successful');
 
 		// Remove the title from the beginning of the content if it exists
@@ -696,7 +690,6 @@ export function createMarkdownContent(content: string, url: string) {
 		
 		// Clear the footnotes object for the next conversion
 		Object.keys(footnotes).forEach(key => delete footnotes[key]);
-		console.log(markdown)
 
 		return markdown.trim();
 	} catch (error) {
