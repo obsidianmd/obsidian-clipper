@@ -75,7 +75,7 @@
 		"message": "Anuluj"
 	},
 	"cannotDeleteProvider": {
-		"message": "Nie można usunąć dostawcy \"$1\", ponieważ jest używany przez $2 model(e)."
+		"message": "Nie można usunąć operatora \"$1\", ponieważ jest używany przez $2 model(e)."
 	},
 	"changelog": {
 		"message": "Dziennik zmian"
@@ -128,7 +128,7 @@
 		"message": "Spowoduje to zastąpienie wszystkich bieżących ustawień, w tym szablonów i atrybutów. Czy na pewno chcesz kontynuować?"
 	},
 	"copied": {
-		"message": "Skopiowane!"
+		"message": "Skopiowano!"
 	},
 	"copyAsJson": {
 		"message": "Skopiuj jako JSON"
@@ -299,7 +299,7 @@
 		"message": "Przetwarzanie zapytania nie powiodło się. Spróbuj ponownie."
 	},
 	"failedToResetProviders": {
-		"message": "Nie udało się zresetować dostawców i modeli"
+		"message": "Nie udało się zresetować operatorów i modeli"
 	},
 	"failedToResetTemplate": {
 		"message": "Nie udało się zresetować domyślnego szablonu. Spróbuj ponownie."
