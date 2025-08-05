@@ -1,5 +1,5 @@
 {
-	"version": "2025.07.12",
+	"version": "2025.08.05",
 	"anthropic": {
 		"id": "anthropic",
 		"name": "Anthropic",
@@ -74,6 +74,7 @@
 		"modelsList": "https://ollama.com/models",
 		"baseUrl": "http://127.0.0.1:11434/api/chat",
 		"popularModels": [
+			{ "id": "gpt-oss:20b", "name": "GPT OSS 20B" },
 			{ "id": "llama3.2:1b", "name": "Llama 3.2 1B" },
 			{ "id": "llama3.2", "name": "Llama 3.2 3B" },
 			{ "id": "llama3.3", "name": "Llama 3.3 70B" }
