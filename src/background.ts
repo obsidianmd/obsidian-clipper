@@ -64,55 +64,27 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 		const typedRequest = request as { action: string; isActive?: boolean; hasHighlights?: boolean; tabId?: number, text?: string };
 		
 		if (typedRequest.action === 'copy-to-clipboard' && typedRequest.text) {
-			if ((browser as any).offscreen) {
-				// Use offscreen document if available
-				(browser as any).offscreen.createDocument({
-					url: 'clipboard.html',
-					reasons: ['CLIPBOARD'],
-					justification: 'Copying text to the clipboard'
-				}).then(async () => {
+			// Use content script to copy to clipboard
+			browser.tabs.query({active: true, currentWindow: true}).then(async (tabs) => {
+				const currentTab = tabs[0];
+				if (currentTab && currentTab.id) {
 					try {
-						const response = await browser.runtime.sendMessage({
-							action: 'copy',
+						const response = await browser.tabs.sendMessage(currentTab.id, {
+							action: 'copy-text-to-clipboard',
 							text: typedRequest.text
 						});
-
 						if ((response as any) && (response as any).success) {
-							sendResponse({ success: true });
+							sendResponse({success: true});
 						} else {
-							sendResponse({ success: false, error: 'Failed to copy' });
+							sendResponse({success: false, error: 'Failed to copy from content script'});
 						}
 					} catch (err) {
 						sendResponse({ success: false, error: (err as Error).message });
-					} finally {
-						await (browser as any).offscreen.closeDocument();
 					}
-				}).catch((err: Error) => {
-					sendResponse({ success: false, error: err.message });
-				});
-			} else {
-				// Fallback to content script
-				browser.tabs.query({active: true, currentWindow: true}).then(async (tabs) => {
-					const currentTab = tabs[0];
-					if (currentTab && currentTab.id) {
-						try {
-							const response = await browser.tabs.sendMessage(currentTab.id, {
-								action: 'copy-text-to-clipboard',
-								text: typedRequest.text
-							});
-							if ((response as any) && (response as any).success) {
-								sendResponse({success: true});
-							} else {
-								sendResponse({success: false, error: 'Failed to copy from content script'});
-							}
-						} catch (err) {
-							sendResponse({ success: false, error: (err as Error).message });
-						}
-					} else {
-						sendResponse({success: false, error: 'No active tab found'});
-					}
-				});
-			}
+				} else {
+					sendResponse({success: false, error: 'No active tab found'});
+				}
+			});
 			return true;
 		}
 

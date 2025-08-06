@@ -46,7 +46,7 @@
 	],
 	"web_accessible_resources": [
 		{
-			"resources": ["reader.css", "reader-script.js", "browser-polyfill.min.js", "popup.html", "style.css", "clipboard.html", "clipboard.js"],
+			"resources": ["reader.css", "reader-script.js", "browser-polyfill.min.js", "popup.html", "style.css"],
 			"extension_ids": ["*"],
    			"matches": [ "*://*/*" ]
 		}
