@@ -1027,7 +1027,10 @@ async function toggleReaderMode(tabId: number) {
 
 export async function copyToClipboard(content: string) {
 	try {
-		await navigator.clipboard.writeText(content);
+		await browser.runtime.sendMessage({
+			action: 'copy-to-clipboard',
+			text: content
+		});
 		
 		const pathField = document.getElementById('path-name-field') as HTMLInputElement;
 		const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement;

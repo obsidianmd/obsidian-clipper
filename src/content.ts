@@ -72,6 +72,21 @@ declare global {
 	}
 
 	browser.runtime.onMessage.addListener((request: any, sender: browser.Runtime.MessageSender, sendResponse: (response?: any) => void) => {
+		if (request.action === "copy-text-to-clipboard") {
+			const textArea = document.createElement("textarea");
+			textArea.value = request.text;
+			document.body.appendChild(textArea);
+			textArea.select();
+			try {
+				document.execCommand('copy');
+				sendResponse({success: true});
+			} catch (err) {
+				sendResponse({success: false});
+			}
+			document.body.removeChild(textArea);
+			return true;
+		}
+
 		if (request.action === "getPageContent") {
 			let selectedHtml = '';
 			const selection = window.getSelection();
