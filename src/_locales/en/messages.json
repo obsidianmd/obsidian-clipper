@@ -661,9 +661,15 @@
 	"saveBehaviorDescription": {
 		"message": "Choose the default option for saving pages. Alternate options appear in the dropdown menu next to the main button."
 	},
-	"saveBehaviorLabel": {
-		"message": "Save behavior"
-	},
+	    "saveBehaviorLabel": {
+        "message": "Save behavior"
+    },
+    "openInPage": {
+        "message": "Open in page"
+    },
+    "openInPageDescription": {
+        "message": "Instead of a popup, open the clipper in the page."
+    },
 	"saveFile": {
 		"message": "Save file..."
 	},

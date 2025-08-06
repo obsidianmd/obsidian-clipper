@@ -42,7 +42,7 @@ declare global {
 
 		const iframe = document.createElement('iframe');
 		iframe.id = iframeId;
-		iframe.src = browser.runtime.getURL('popup.html');
+		iframe.src = browser.runtime.getURL('popup.html?context=iframe');
 		// The styles will be handled by the stylesheet
 		document.body.appendChild(iframe);
 

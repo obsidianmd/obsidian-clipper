@@ -251,6 +251,20 @@ function setupMessageListeners() {
 }
 
 document.addEventListener('DOMContentLoaded', async function() {
+	const settings = await loadSettings();
+	const urlParams = new URLSearchParams(window.location.search);
+	const isIframe = urlParams.get('context') === 'iframe';
+
+	if (settings.openInPage && !isIframe) {
+		const tabs = await browser.tabs.query({active: true, currentWindow: true});
+		const currentTab = tabs[0];
+		if (currentTab && currentTab.id) {
+			await browser.tabs.sendMessage(currentTab.id, { action: "toggle-iframe" });
+			window.close();
+		}
+		return;
+	}
+
 	browser.runtime.connect({ name: 'popup' });
 
 	const refreshButton = document.getElementById('refresh-pane');

@@ -4,6 +4,7 @@ import { detectBrowser } from './utils/browser-detection';
 import { updateCurrentActiveTab, isValidUrl, isBlankPage } from './utils/active-tab-manager';
 import { TextHighlightData } from './utils/highlighter';
 import { debounce } from './utils/debounce';
+import { loadSettings } from './utils/storage-utils';
 
 let sidePanelOpenWindows: Set<number> = new Set();
 let isHighlighterMode = false;
@@ -56,11 +57,7 @@ async function sendMessageToPopup(tabId: number, message: any): Promise<void> {
 	}
 }
 
-browser.action.onClicked.addListener((tab) => {
-	if (tab.id) {
-		browser.tabs.sendMessage(tab.id, { action: "toggle-iframe" });
-	}
-});
+
 
 browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime.MessageSender, sendResponse: (response?: any) => void): true | undefined => {
 	if (typeof request === 'object' && request !== null) {
