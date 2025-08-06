@@ -254,6 +254,9 @@ document.addEventListener('DOMContentLoaded', async function() {
 	const settings = await loadSettings();
 	const urlParams = new URLSearchParams(window.location.search);
 	const isIframe = urlParams.get('context') === 'iframe';
+	if (isIframe) {
+		document.documentElement.classList.add('is-embedded');
+	}
 
 	const isSidePanel = document.documentElement.classList.contains('is-side-panel');
 
