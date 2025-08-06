@@ -24,19 +24,10 @@ declare global {
 	let isHighlighterMode = false;
 	const iframeId = 'obsidian-clipper-iframe';
 
-	function clickOutsideIframeHandler(event: MouseEvent) {
-		const iframe = document.getElementById(iframeId);
-		if (iframe && !iframe.contains(event.target as Node)) {
-			iframe.remove();
-			document.removeEventListener('click', clickOutsideIframeHandler);
-		}
-	}
-
 	function toggleIframe() {
 		const existingIframe = document.getElementById(iframeId);
 		if (existingIframe) {
 			existingIframe.remove();
-			document.removeEventListener('click', clickOutsideIframeHandler);
 			return;
 		}
 
@@ -45,11 +36,6 @@ declare global {
 		iframe.src = browser.runtime.getURL('popup.html?context=iframe');
 		// The styles will be handled by the stylesheet
 		document.body.appendChild(iframe);
-
-		// Close the iframe when clicking outside of it
-		setTimeout(() => {
-			document.addEventListener('click', clickOutsideIframeHandler);
-		}, 100);
 	}
 
 	// Firefox
