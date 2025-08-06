@@ -18,7 +18,6 @@
 		"https://*/*"
 	],
 	"action": {
-		"default_popup": "popup.html",
 		"default_icon": {
 			"16": "icons/icon16.png",
 			"48": "icons/icon48.png",
@@ -45,7 +44,7 @@
 	],
 	"web_accessible_resources": [
 		{
-			"resources": ["reader.css", "reader-script.js", "browser-polyfill.min.js"],
+			"resources": ["reader.css", "reader-script.js", "browser-polyfill.min.js", "popup.html", "style.css"],
 			"extension_ids": ["*"],
 			"matches": [ "*://*/*" ]
 		}

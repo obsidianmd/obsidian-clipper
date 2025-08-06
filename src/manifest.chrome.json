@@ -20,7 +20,6 @@
 		"https://*/*"
 	],
 	"action": {
-		"default_popup": "popup.html"
 	},
 	"side_panel": {
 		"default_path": "side-panel.html"
@@ -46,7 +45,7 @@
 	],
 	"web_accessible_resources": [
 		{
-			"resources": ["reader.css", "reader-script.js", "browser-polyfill.min.js"],
+			"resources": ["reader.css", "reader-script.js", "browser-polyfill.min.js", "popup.html", "style.css"],
 			"extension_ids": ["*"],
 			"matches": [ "*://*/*" ]
 		}

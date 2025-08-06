@@ -10,6 +10,19 @@
 	}
 }
 
+#obsidian-clipper-iframe {
+	position: fixed;
+	top: 20px;
+	right: 20px;
+	width: 350px;
+	height: calc(100% - 40px);
+	max-height: 800px;
+	border: none;
+	z-index: 2147483647;
+	box-shadow: 0 0 10px rgba(0,0,0,0.1);
+	border-radius: 8px;
+}
+
 /* Hide the clip button on iPadOS because it's not supported */
 .is-ipad-os {
 	.obsidian-highlighter-menu {

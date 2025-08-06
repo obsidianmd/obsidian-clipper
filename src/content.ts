@@ -22,12 +22,45 @@ declare global {
 	window.obsidianHighlighterInitialized = true;
 
 	let isHighlighterMode = false;
+	const iframeId = 'obsidian-clipper-iframe';
+
+	function clickOutsideIframeHandler(event: MouseEvent) {
+		const iframe = document.getElementById(iframeId);
+		if (iframe && !iframe.contains(event.target as Node)) {
+			iframe.remove();
+			document.removeEventListener('click', clickOutsideIframeHandler);
+		}
+	}
+
+	function toggleIframe() {
+		const existingIframe = document.getElementById(iframeId);
+		if (existingIframe) {
+			existingIframe.remove();
+			document.removeEventListener('click', clickOutsideIframeHandler);
+			return;
+		}
+
+		const iframe = document.createElement('iframe');
+		iframe.id = iframeId;
+		iframe.src = browser.runtime.getURL('popup.html');
+		// The styles will be handled by the stylesheet
+		document.body.appendChild(iframe);
+
+		// Close the iframe when clicking outside of it
+		setTimeout(() => {
+			document.addEventListener('click', clickOutsideIframeHandler);
+		}, 100);
+	}
 
 	// Firefox
 	browser.runtime.sendMessage({ action: "contentScriptLoaded" });
 	browser.runtime.onMessage.addListener((request: any, sender, sendResponse) => {
 		if (request.action === "ping") {
 			sendResponse({});
+			return true;
+		} else if (request.action === "toggle-iframe") {
+			toggleIframe();
+			sendResponse({ success: true });
 			return true;
 		}
 	});

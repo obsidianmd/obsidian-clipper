@@ -58,10 +58,7 @@ async function sendMessageToPopup(tabId: number, message: any): Promise<void> {
 
 browser.action.onClicked.addListener((tab) => {
 	if (tab.id) {
-		browser.scripting.executeScript({
-			target: { tabId: tab.id },
-			files: ['content.js']
-		});
+		browser.tabs.sendMessage(tab.id, { action: "toggle-iframe" });
 	}
 });
 
