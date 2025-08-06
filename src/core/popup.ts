@@ -255,7 +255,9 @@ document.addEventListener('DOMContentLoaded', async function() {
 	const urlParams = new URLSearchParams(window.location.search);
 	const isIframe = urlParams.get('context') === 'iframe';
 
-	if (settings.openInPage && !isIframe) {
+	const isSidePanel = document.documentElement.classList.contains('is-side-panel');
+
+	if (settings.openInPage && !isIframe && !isSidePanel) {
 		const tabs = await browser.tabs.query({active: true, currentWindow: true});
 		const currentTab = tabs[0];
 		if (currentTab && currentTab.id) {
