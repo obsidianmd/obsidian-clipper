@@ -27,6 +27,10 @@
 	height: max(var(--chromium-popup-height), 100vh);
 }
 
+#popup.is-embedded {
+	--popup-max-height: none;
+}
+
 #popup {
 	scrollbar-width: none;
 	height: max(var(--popup-height), 100vh);
