@@ -190,6 +190,7 @@ export function initializeGeneralSettings(): void {
 		initializeKeyboardShortcuts();
 		initializeToggles();
 		setShortcutInstructions();
+		initializeAutoSave();
 		initializeResetDefaultTemplateButton();
 		initializeExportImportAllSettingsButtons();
 		initializeHighlighterSettings();
@@ -206,7 +207,39 @@ export function initializeGeneralSettings(): void {
 	});
 }
 
+function initializeAutoSave(): void {
+	const generalSettingsForm = document.getElementById('general-settings-form');
+	if (generalSettingsForm) {
+		// Listen for both input and change events
+		generalSettingsForm.addEventListener('input', debounce(saveSettingsFromForm, 500));
+		generalSettingsForm.addEventListener('change', debounce(saveSettingsFromForm, 500));
+	}
+}
 
+function saveSettingsFromForm(): void {
+	const openInPageToggle = document.getElementById('open-in-page-toggle') as HTMLInputElement;
+	const showMoreActionsToggle = document.getElementById('show-more-actions-toggle') as HTMLInputElement;
+	const betaFeaturesToggle = document.getElementById('beta-features-toggle') as HTMLInputElement;
+	const legacyModeToggle = document.getElementById('legacy-mode-toggle') as HTMLInputElement;
+	const silentOpenToggle = document.getElementById('silent-open-toggle') as HTMLInputElement;
+	const highlighterToggle = document.getElementById('highlighter-toggle') as HTMLInputElement;
+	const alwaysShowHighlightsToggle = document.getElementById('highlighter-visibility') as HTMLInputElement;
+	const highlightBehaviorSelect = document.getElementById('highlighter-behavior') as HTMLSelectElement;
+
+	const updatedSettings = {
+		...generalSettings, // Keep existing settings
+		openInPage: openInPageToggle?.checked ?? generalSettings.openInPage,
+		showMoreActionsButton: showMoreActionsToggle?.checked ?? generalSettings.showMoreActionsButton,
+		betaFeatures: betaFeaturesToggle?.checked ?? generalSettings.betaFeatures,
+		legacyMode: legacyModeToggle?.checked ?? generalSettings.legacyMode,
+		silentOpen: silentOpenToggle?.checked ?? generalSettings.silentOpen,
+		highlighterEnabled: highlighterToggle?.checked ?? generalSettings.highlighterEnabled,
+		alwaysShowHighlights: alwaysShowHighlightsToggle?.checked ?? generalSettings.alwaysShowHighlights,
+		highlightBehavior: highlightBehaviorSelect?.value ?? generalSettings.highlightBehavior
+	};
+
+	saveSettings(updatedSettings);
+}
 
 function initializeShowMoreActionsToggle(): void {
 	initializeSettingToggle('show-more-actions-toggle', generalSettings.showMoreActionsButton, (checked) => {
