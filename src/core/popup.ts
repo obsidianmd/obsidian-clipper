@@ -60,16 +60,25 @@ const memoizedGenerateFrontmatter = memoizeWithExpiration(
 	{ expirationMs: 50 }
 );
 
+// Helper function to get tab info from background script
+async function getTabInfo(tabId: number): Promise<{ id: number; url: string }> {
+	const response = await browser.runtime.sendMessage({ action: "getTabInfo", tabId }) as { success?: boolean; tab?: { id: number; url: string }; error?: string };
+	if (!response || !response.success || !response.tab) {
+		throw new Error((response && response.error) || 'Failed to get tab info');
+	}
+	return response.tab;
+}
+
 // Memoize extractPageContent with URL-sensitive key and short expiration
 const memoizedExtractPageContent = memoizeWithExpiration(
 	async (tabId: number) => {
-		const tab = await browser.tabs.get(tabId);
+		await getTabInfo(tabId);
 		return extractPageContent(tabId);
 	},
 	{ 
 		expirationMs: 50, 
 		keyFn: async (tabId: number) => {
-			const tab = await browser.tabs.get(tabId);
+			const tab = await getTabInfo(tabId);
 			return `${tabId}-${tab.url}`;
 		}
 	}
@@ -152,7 +161,7 @@ async function initializeExtension(tabId: number) {
 
 		updateVaultDropdown(loadedSettings.vaults);
 
-		const tab = await browser.tabs.get(tabId);
+		const tab = await getTabInfo(tabId);
 		if (!tab.url || isBlankPage(tab.url)) {
 			showError('pageCannotBeClipped');
 			return;
@@ -261,11 +270,15 @@ document.addEventListener('DOMContentLoaded', async function() {
 	const isSidePanel = document.documentElement.classList.contains('is-side-panel');
 
 	if (settings.openInPage && !isIframe && !isSidePanel) {
-		const tabs = await browser.tabs.query({active: true, currentWindow: true});
-		const currentTab = tabs[0];
-		if (currentTab && currentTab.id) {
-			await browser.tabs.sendMessage(currentTab.id, { action: "toggle-iframe" });
-			window.close();
+		try {
+			const response = await browser.runtime.sendMessage({ action: "getActiveTabAndToggleIframe" }) as { success?: boolean; error?: string };
+			if (response && response.success) {
+				window.close();
+			} else if (response && response.error) {
+				console.error('Error toggling iframe:', response.error);
+			}
+		} catch (error) {
+			console.error('Error toggling iframe:', error);
 		}
 		return;
 	}
@@ -283,47 +296,61 @@ document.addEventListener('DOMContentLoaded', async function() {
 	const settingsButton = document.getElementById('open-settings');
 	if (settingsButton) {
 		settingsButton.addEventListener('click', async function() {
-			browser.runtime.openOptionsPage();
-			setTimeout(() => window.close(), 50);
+			try {
+				// Firefox doesn't support openOptionsPage directly, so we send a message to the background script
+				await browser.runtime.sendMessage({ action: "openOptionsPage" });
+				setTimeout(() => window.close(), 50);
+			} catch (error) {
+				console.error('Error opening options page:', error);
+			}
 		});
 		initializeIcons(settingsButton);
 	}
 
-	const tabs = await browser.tabs.query({active: true, currentWindow: true});
-	const currentTab = tabs[0];
-	currentTabId = currentTab?.id;
-
-	if (currentTabId) {
-		try {		
+	try {
+		// Get the active tab via background script to handle Firefox compatibility
+		const response = await browser.runtime.sendMessage({ action: "getActiveTab" }) as { tabId?: number; error?: string };
+		if (!response || response.error || !response.tabId) {
+			showError(getMessage('pleaseReloadPage'));
+			return;
+		}
+		
+		currentTabId = response.tabId;
+		if (currentTabId) {
 			const initialized = await initializeExtension(currentTabId);
 			if (!initialized) {
 				showError(getMessage('pageCannotBeClipped'));
 				return;
 			}
 
-			// DOM-dependent initializations
-			updateVaultDropdown(loadedSettings.vaults);
-			populateTemplateDropdown();
-			setupEventListeners(currentTabId);
-			await initializeUI();
-			setupMetadataToggle();
+			try {
+				// DOM-dependent initializations
+				updateVaultDropdown(loadedSettings.vaults);
+				populateTemplateDropdown();
+				setupEventListeners(currentTabId);
+				await initializeUI();
+				setupMetadataToggle();
 
-			// Initial content load
-			await refreshFields(currentTabId);
+				// Initial content load
+				await refreshFields(currentTabId);
 
-			const showMoreActionsButton = document.getElementById('show-variables');
-			if (showMoreActionsButton) {
+				const showMoreActionsButton = document.getElementById('show-variables');
+				if (showMoreActionsButton) {
 					showMoreActionsButton.addEventListener('click', (e) => {
 						e.preventDefault();
 						showVariables();
 					});
 				}
-			determineMainAction();
-		} catch (error) {
-			console.error('Error initializing popup:', error);
+				determineMainAction();
+			} catch (error) {
+				console.error('Error initializing popup:', error);
+				showError(getMessage('pleaseReloadPage'));
+			}
+		} else {
 			showError(getMessage('pleaseReloadPage'));
 		}
-	} else {
+	} catch (error) {
+		console.error('Error getting active tab:', error);
 		showError(getMessage('pleaseReloadPage'));
 	}
 });
@@ -579,7 +606,7 @@ async function refreshFields(tabId: number, checkTemplateTriggers: boolean = tru
 	}
 
 	try {
-		const tab = await browser.tabs.get(tabId);
+		const tab = await getTabInfo(tabId);
 		if (!tab.url || isBlankPage(tab.url)) {
 			showError('pageCannotBeClipped');
 			return;
@@ -705,7 +732,7 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 
 	for (const property of template.properties) {
 		const propertyDiv = createElementWithClass('div', 'metadata-property');
-		let value = await memoizedCompileTemplate(currentTabId!, unescapeValue(property.value), variables, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
+		let value = await memoizedCompileTemplate(currentTabId!, unescapeValue(property.value), variables, currentTabId ? await getTabInfo(currentTabId).then(tab => tab.url || '') : '');
 
 		const propertyType = generalSettings.propertyTypes.find(p => p.name === property.name)?.type || 'text';
 
@@ -762,7 +789,7 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 
 	const noteNameField = document.getElementById('note-name-field') as HTMLTextAreaElement;
 	if (noteNameField) {
-		let formattedNoteName = await memoizedCompileTemplate(currentTabId!, template.noteNameFormat, variables, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
+		let formattedNoteName = await memoizedCompileTemplate(currentTabId!, template.noteNameFormat, variables, currentTabId ? await getTabInfo(currentTabId).then(tab => tab.url || '') : '');
 		noteNameField.setAttribute('data-template-value', template.noteNameFormat);
 		noteNameField.value = formattedNoteName.trim();
 		adjustNoteNameHeight(noteNameField);
@@ -778,7 +805,7 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 			pathField.style.display = 'none';
 		} else {
 			pathContainer.style.display = 'flex';
-			let formattedPath = await memoizedCompileTemplate(currentTabId!, template.path, variables, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
+			let formattedPath = await memoizedCompileTemplate(currentTabId!, template.path, variables, currentTabId ? await getTabInfo(currentTabId).then(tab => tab.url || '') : '');
 			pathField.value = formattedPath;
 			pathField.setAttribute('data-template-value', template.path);
 		}
@@ -787,7 +814,7 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 	const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
 	if (noteContentField) {
 		if (template.noteContentFormat) {
-			let content = await memoizedCompileTemplate(currentTabId!, template.noteContentFormat, variables, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
+			let content = await memoizedCompileTemplate(currentTabId!, template.noteContentFormat, variables, currentTabId ? await getTabInfo(currentTabId).then(tab => tab.url || '') : '');
 			noteContentField.value = content;
 			noteContentField.setAttribute('data-template-value', template.noteContentFormat);
 		} else {
@@ -798,7 +825,7 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 
 	if (template) {
 		if (generalSettings.interpreterEnabled) {
-			await initializeInterpreter(template, variables, currentTabId!, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
+			await initializeInterpreter(template, variables, currentTabId!, currentTabId ? await getTabInfo(currentTabId).then(tab => tab.url || '') : '');
 
 			// Check if there are any prompt variables
 			const promptVariables = collectPromptVariables(template);
@@ -813,7 +840,7 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 					if (!modelConfig) {
 						throw new Error(`Model configuration not found for ${selectedModelId}`);
 					}
-					await handleInterpreterUI(template, variables, currentTabId!, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '', modelConfig);
+					await handleInterpreterUI(template, variables, currentTabId!, currentTabId ? await getTabInfo(currentTabId).then(tab => tab.url || '') : '', modelConfig);
 					
 					// Ensure the button shows the completed state after auto-run
 					if (interpretBtn) {
@@ -830,7 +857,7 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 			}
 		}
 
-		const replacedTemplate = await getReplacedTemplate(template, variables, currentTabId!, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
+		const replacedTemplate = await getReplacedTemplate(template, variables, currentTabId!, currentTabId ? await getTabInfo(currentTabId).then(tab => tab.url || '') : '');
 		debugLog('Variables', 'Current template with replaced variables:', JSON.stringify(replacedTemplate, null, 2));
 	}
 }

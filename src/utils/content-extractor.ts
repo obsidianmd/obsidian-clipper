@@ -60,7 +60,12 @@ interface ContentResponse {
 
 export async function extractPageContent(tabId: number): Promise<ContentResponse | null> {
 	try {
-		const response = await browser.tabs.sendMessage(tabId, { action: "getPageContent" }) as ContentResponse;
+		// Send message through background script for Firefox compatibility
+		const response = await browser.runtime.sendMessage({ 
+			action: "sendMessageToTab", 
+			tabId: tabId, 
+			message: { action: "getPageContent" }
+		}) as ContentResponse;
 		if (response && response.content) {
 
 			// Ensure highlights are of the correct type
