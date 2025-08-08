@@ -661,15 +661,15 @@
 	"saveBehaviorDescription": {
 		"message": "Choose the default option for saving pages. Alternate options appear in the dropdown menu next to the main button."
 	},
-    "saveBehaviorLabel": {
-        "message": "Save behavior"
-    },
-    "openInPage": {
-        "message": "Sidebar mode"
-    },
-    "openInPageDescription": {
-        "message": "Open as a sidebar within the page."
-    },
+	"saveBehaviorLabel": {
+		"message": "Save behavior"
+	},
+	"openInPage": {
+		"message": "Sidebar mode"
+	},
+	"openInPageDescription": {
+		"message": "Open as a sidebar within the page."
+	},
 	"saveFile": {
 		"message": "Save file..."
 	},
