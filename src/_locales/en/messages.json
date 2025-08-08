@@ -110,7 +110,7 @@
 		"message": "Clipper UI open mode"
 	},
 	"clipperOpenModeDescription": {
-		"message": "Choose how the clipper UI opens. The default is to open in a new tab, but you can also open it in a popup window or in the current tab."
+    "message": "Choose how the Clipper UI opens across the extension. Defaults to a popup, or open in the side panel (Chromium) / sidebar (Firefox)."
 	},
 	"clipperOpenModePopup": {
 		"message": "Popup (default)"

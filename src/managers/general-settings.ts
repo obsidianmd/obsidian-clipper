@@ -139,14 +139,7 @@ async function initializeVersionDisplay(): Promise<void> {
 
 export function initializeGeneralSettings(): void {
 	loadSettings().then(async () => {
-		// Initialize clipper open mode dropdown
-		const clipperOpenModeDropdown = document.getElementById('clipper-open-mode-dropdown') as HTMLSelectElement;
-		if (clipperOpenModeDropdown) {
-			clipperOpenModeDropdown.value = generalSettings.clipperOpenMode || 'popup';
-			clipperOpenModeDropdown.addEventListener('change', () => {
-				saveSettings({ ...generalSettings, clipperOpenMode: clipperOpenModeDropdown.value as 'popup' | 'sidepanel' });
-			});
-		}
+    // Initialize toggles and UI
 		await setupLanguageAndDirection();
 
 		// Add version check initialization
@@ -203,6 +196,7 @@ export function initializeGeneralSettings(): void {
 		initializeHighlighterSettings();
 		initializeExportHighlightsButton();
 		initializeSaveBehaviorDropdown();
+    	initializeClipperOpenModeToggle();
 		await initializeUsageChart();
 
 		// Initialize feedback modal close button
@@ -231,7 +225,7 @@ const silentOpenToggle = document.getElementById('silent-open-toggle') as HTMLIn
 const highlighterToggle = document.getElementById('highlighter-toggle') as HTMLInputElement;
 const alwaysShowHighlightsToggle = document.getElementById('highlighter-visibility') as HTMLInputElement;
 const highlightBehaviorSelect = document.getElementById('highlighter-behavior') as HTMLSelectElement;
-const clipperOpenModeDropdown = document.getElementById('clipper-open-mode-dropdown') as HTMLSelectElement;
+const clipperOpenModeToggle = document.getElementById('clipper-open-mode-toggle') as HTMLInputElement;
 
 const updatedSettings = {
 	...generalSettings, // Keep existing settings
@@ -242,7 +236,7 @@ const updatedSettings = {
 	highlighterEnabled: highlighterToggle?.checked ?? generalSettings.highlighterEnabled,
 	alwaysShowHighlights: alwaysShowHighlightsToggle?.checked ?? generalSettings.alwaysShowHighlights,
 	highlightBehavior: highlightBehaviorSelect?.value ?? generalSettings.highlightBehavior,
-	clipperOpenMode: clipperOpenModeDropdown?.value as 'popup' | 'sidepanel' ?? generalSettings.clipperOpenMode,
+  	clipperOpenMode: (clipperOpenModeToggle?.checked ? 'sidepanel' : 'popup') as 'popup' | 'sidepanel',
 };
 
 saveSettings(updatedSettings);
@@ -336,6 +330,16 @@ function initializeSaveBehaviorDropdown(): void {
 		const newValue = dropdown.value as 'addToObsidian' | 'copyToClipboard' | 'saveFile';
 		saveSettings({ saveBehavior: newValue });
 	});
+}
+
+function initializeClipperOpenModeToggle(): void {
+  initializeSettingToggle(
+    'clipper-open-mode-toggle',
+    (generalSettings.clipperOpenMode ?? 'popup') === 'sidepanel',
+    (checked) => {
+      saveSettings({ ...generalSettings, clipperOpenMode: checked ? 'sidepanel' : 'popup' });
+    }
+  );
 }
 
 export function resetDefaultTemplate(): void {

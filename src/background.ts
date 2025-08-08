@@ -20,9 +20,19 @@ async function initialize() {
 		// Set up tab listeners
 		await setupTabListeners();
 		
-		// Initialize context menu
+    // Initialize context menu
 		await debouncedUpdateContextMenu(-1);
 		
+    // Configure action click behavior based on user preference (Chromium)
+    await updateActionClickBehavior();
+
+    // React to settings changes to keep action behavior in sync
+    browser.storage.onChanged.addListener(async (changes, area) => {
+      if (area === 'sync' && changes.general_settings) {
+        await updateActionClickBehavior();
+      }
+    });
+
 		console.log('Background script initialized successfully');
 	} catch (error) {
 		console.error('Error initializing background script:', error);
@@ -180,6 +190,19 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 			}
 		}
 
+    if (typedRequest.action === "openClipperUI") {
+      (async () => {
+        try {
+          const tab = sender.tab?.id ? await browser.tabs.get(sender.tab.id) : undefined;
+          await openClipperUI(tab);
+          sendResponse({ success: true });
+        } catch (e: unknown) {
+          sendResponse({ success: false, error: e instanceof Error ? e.message : String(e) });
+        }
+      })();
+      return true;
+    }
+
 		if (typedRequest.action === "toggleReaderMode" && typedRequest.tabId) {
 			injectReaderScript(typedRequest.tabId).then(() => {
 				browser.tabs.sendMessage(typedRequest.tabId!, { action: "toggleReaderMode" })
@@ -201,15 +224,13 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 
 browser.commands.onCommand.addListener(async (command, tab) => {
 	if (command === 'quick_clip') {
-		browser.tabs.query({active: true, currentWindow: true}).then((tabs) => {
-			if (tabs[0]?.id) {
-				browser.action.openPopup();
-				setTimeout(() => {
-					browser.runtime.sendMessage({action: "triggerQuickClip"})
-						.catch(error => console.error("Failed to send quick clip message:", error));
-				}, 500);
-			}
-		});
+    const tabs = await browser.tabs.query({ active: true, currentWindow: true });
+    const activeTab = tabs[0];
+    await openClipperUI(activeTab);
+    setTimeout(() => {
+      browser.runtime.sendMessage({ action: "triggerQuickClip" })
+        .catch(error => console.error("Failed to send quick clip message:", error));
+    }, 500);
 	}
 	if (command === "toggle_highlighter" && tab && tab.id) {
 		await ensureContentScriptLoaded(tab.id);
@@ -321,7 +342,7 @@ const debouncedUpdateContextMenu = debounce(async (tabId: number) => {
 
 browser.contextMenus.onClicked.addListener(async (info, tab) => {
 	if (info.menuItemId === "open-obsidian-clipper") {
-		browser.action.openPopup();
+    await openClipperUI(tab);
 	} else if (info.menuItemId === "enter-highlighter" && tab && tab.id) {
 		await setHighlighterMode(tab.id, true);
 	} else if (info.menuItemId === "exit-highlighter" && tab && tab.id) {
@@ -499,6 +520,60 @@ async function injectReaderScript(tabId: number) {
 		console.error('Error injecting reader script:', error);
 		return false;
 	}
+}
+
+// Open the clipper UI respecting the user's preferred mode
+async function openClipperUI(tab?: browser.Tabs.Tab) {
+  try {
+    const cfg = await browser.storage.sync.get('general_settings') as { general_settings?: { clipperOpenMode?: 'popup' | 'sidepanel' } };
+    const preferredMode = cfg.general_settings?.clipperOpenMode ?? 'popup';
+    const browserType = await detectBrowser();
+
+    if (preferredMode === 'sidepanel') {
+      // Firefox sidebar
+      if (browserType === 'firefox' && browser.sidebarAction && typeof browser.sidebarAction.open === 'function') {
+        await browser.sidebarAction.open();
+        return;
+      }
+      // Chromium side panel
+      if (typeof chrome !== 'undefined' && chrome.sidePanel && typeof chrome.sidePanel.open === 'function') {
+        if (tab?.id) {
+          chrome.sidePanel.open({ tabId: tab.id });
+          if (tab.windowId !== undefined) {
+            sidePanelOpenWindows.add(tab.windowId);
+          }
+        } else {
+          chrome.windows.getCurrent({}, (window) => {
+            if (window && window.id !== undefined) {
+              chrome.sidePanel.open({ windowId: window.id });
+            }
+          });
+        }
+        return;
+      }
+    }
+
+    // Fallback to popup
+    await browser.action.openPopup();
+  } catch (error) {
+    console.error('Error opening clipper UI:', error);
+    // As a last resort try opening the popup
+    try { await browser.action.openPopup(); } catch {}
+  }
+}
+
+// Ensure the action button opens the correct surface on Chromium
+async function updateActionClickBehavior() {
+  try {
+    if (typeof chrome === 'undefined' || !chrome.sidePanel || typeof chrome.sidePanel.setPanelBehavior !== 'function') {
+      return;
+    }
+    const cfg = await browser.storage.sync.get('general_settings') as { general_settings?: { clipperOpenMode?: 'popup' | 'sidepanel' } };
+    const preferredMode = cfg.general_settings?.clipperOpenMode ?? 'popup';
+    chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: preferredMode === 'sidepanel' });
+  } catch (error) {
+    // Non-fatal; ignore
+  }
 }
 
 // Initialize the extension
