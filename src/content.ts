@@ -23,19 +23,167 @@ declare global {
 
 	let isHighlighterMode = false;
 	const iframeId = 'obsidian-clipper-iframe';
+	const containerId = 'obsidian-clipper-container';
 
 	function toggleIframe() {
-		const existingIframe = document.getElementById(iframeId);
-		if (existingIframe) {
-			existingIframe.remove();
+		const existingContainer = document.getElementById(containerId);
+		if (existingContainer) {
+			existingContainer.remove();
 			return;
 		}
+
+		const container = document.createElement('div');
+		container.id = containerId;
+
+		const header = document.createElement('div');
+		header.id = 'obsidian-clipper-header';
+		container.appendChild(header);
+
+		const moveHandle = document.createElement('div');
+		moveHandle.id = 'obsidian-clipper-move-handle';
+		header.appendChild(moveHandle);
+
+		const closeButton = document.createElement('button');
+		closeButton.id = 'obsidian-clipper-close-button';
+		closeButton.textContent = 'X';
+		closeButton.onclick = () => container.remove();
+		header.appendChild(closeButton);
 
 		const iframe = document.createElement('iframe');
 		iframe.id = iframeId;
 		iframe.src = browser.runtime.getURL('popup.html?context=iframe');
-		// The styles will be handled by the stylesheet
-		document.body.appendChild(iframe);
+		container.appendChild(iframe);
+
+		// Add resize handles
+		const resizeHandles = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw'];
+		resizeHandles.forEach(dir => {
+			const handle = document.createElement('div');
+			handle.className = `resize-handle ${dir}`;
+			container.appendChild(handle);
+			addResizeListener(container, handle, dir);
+		});
+
+		document.body.appendChild(container);
+
+		// Drag functionality
+		let isDragging = false;
+		let offsetX: number, offsetY: number;
+
+		header.onmousedown = (e) => {
+			isDragging = true;
+			offsetX = e.clientX - container.offsetLeft;
+			offsetY = e.clientY - container.offsetTop;
+			container.style.right = 'auto';
+			container.style.cursor = 'grabbing';
+		};
+
+		document.onmousemove = (e) => {
+			if (!isDragging) return;
+			let newLeft = e.clientX - offsetX;
+			let newTop = e.clientY - offsetY;
+			
+			const containerWidth = container.offsetWidth;
+			const containerHeight = container.offsetHeight;
+			const windowWidth = window.innerWidth;
+			const windowHeight = window.innerHeight;
+
+			if (newLeft < 0) newLeft = 0;
+			if (newTop < 0) newTop = 0;
+			if (newLeft + containerWidth > windowWidth) newLeft = windowWidth - containerWidth;
+			if (newTop + containerHeight > windowHeight) newTop = windowHeight - containerHeight;
+
+			container.style.left = `${newLeft}px`;
+			container.style.top = `${newTop}px`;
+		};
+
+		document.onmouseup = () => {
+			isDragging = false;
+			container.style.cursor = 'default';
+		};
+
+		window.onresize = () => ensureInBounds(container);
+	}
+
+	function ensureInBounds(container: HTMLElement) {
+		const containerWidth = container.offsetWidth;
+		const containerHeight = container.offsetHeight;
+		const windowWidth = window.innerWidth;
+		const windowHeight = window.innerHeight;
+
+		let currentLeft = container.offsetLeft;
+		let currentTop = container.offsetTop;
+
+		if (currentLeft < 0) currentLeft = 0;
+		if (currentTop < 0) currentTop = 0;
+		if (currentLeft + containerWidth > windowWidth) currentLeft = windowWidth - containerWidth;
+		if (currentTop + containerHeight > windowHeight) currentTop = windowHeight - containerHeight;
+
+		container.style.left = `${currentLeft}px`;
+		container.style.top = `${currentTop}px`;
+	}
+
+	function addResizeListener(container: HTMLElement, handle: HTMLElement, direction: string) {
+		let isResizing = false;
+		let startX: number, startY: number, startWidth: number, startHeight: number, startLeft: number, startTop: number;
+	
+		handle.onmousedown = (e) => {
+			e.stopPropagation();
+			isResizing = true;
+			startX = e.clientX;
+			startY = e.clientY;
+			startWidth = container.offsetWidth;
+			startHeight = container.offsetHeight;
+			startLeft = container.offsetLeft;
+			startTop = container.offsetTop;
+	
+			document.onmousemove = (moveEvent) => {
+				if (!isResizing) return;
+	
+				const dx = moveEvent.clientX - startX;
+				const dy = moveEvent.clientY - startY;
+
+				const minWidth = parseInt(container.style.minWidth) || 200;
+				const minHeight = parseInt(container.style.minHeight) || 200;
+	
+				if (direction.includes('e')) {
+					let newWidth = startWidth + dx;
+					if (newWidth < minWidth) newWidth = minWidth;
+					container.style.width = `${newWidth}px`;
+				}
+				if (direction.includes('w')) {
+					let newWidth = startWidth - dx;
+					let newLeft = startLeft + dx;
+					if (newWidth < minWidth) {
+						newWidth = minWidth;
+						newLeft = startLeft + startWidth - minWidth;
+					}
+					container.style.width = `${newWidth}px`;
+					container.style.left = `${newLeft}px`;
+				}
+				if (direction.includes('s')) {
+					let newHeight = startHeight + dy;
+					if (newHeight < minHeight) newHeight = minHeight;
+					container.style.height = `${newHeight}px`;
+				}
+				if (direction.includes('n')) {
+					let newHeight = startHeight - dy;
+					let newTop = startTop + dy;
+					if (newHeight < minHeight) {
+						newHeight = minHeight;
+						newTop = startTop + startHeight - minHeight;
+					}
+					container.style.height = `${newHeight}px`;
+					container.style.top = `${newTop}px`;
+				}
+				ensureInBounds(container);
+			};
+	
+			document.onmouseup = () => {
+				isResizing = false;
+				document.onmousemove = null;
+				document.onmouseup = null;
+			};
+		};
 	}
 
 	// Firefox
