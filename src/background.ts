@@ -223,6 +223,36 @@ browser.commands.onCommand.addListener(async (command, tab) => {
 		await injectReaderScript(tab.id);
 		await browser.tabs.sendMessage(tab.id, { action: "toggleReaderMode" });
 	}
+	if (command === "open_sidebar") {
+		// Firefox sidebar
+		if (browser.sidebarAction && typeof browser.sidebarAction.open === 'function') {
+			try {
+				await browser.sidebarAction.open();
+			} catch (error) {
+				console.error('Error opening sidebar via command (Firefox):', error);
+			}
+		// Chromium side panel
+		} else if (typeof chrome !== 'undefined' && chrome.sidePanel && typeof chrome.sidePanel.open === 'function') {
+			try {
+				if (tab && tab.id) {
+					chrome.sidePanel.open({ tabId: tab.id });
+					if (tab.windowId !== undefined) {
+						sidePanelOpenWindows.add(tab.windowId);
+					}
+					await ensureContentScriptLoaded(tab.id);
+                } else {
+                    // Fallback: open side panel on the current window
+                    chrome.windows.getCurrent({}, (window) => {
+                        if (window && window.id !== undefined) {
+                            chrome.sidePanel.open({ windowId: window.id });
+                        }
+                    });
+                }
+			} catch (error) {
+				console.error('Error opening side panel via command (Chromium):', error);
+			}
+		}
+	}
 });
 
 const debouncedUpdateContextMenu = debounce(async (tabId: number) => {

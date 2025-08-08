@@ -8,7 +8,6 @@
 	"permissions": [
 		"activeTab",
 		"clipboardWrite",
-		"commands",
 		"contextMenus",
 		"sidePanel",
 		"storage",
@@ -82,6 +81,9 @@
 				"mac": "Alt+Shift+R"
 			},
 			"description": "__MSG_commandToggleReader__"
+		},
+		"open_sidebar": {
+			"description": "__MSG_commandOpenSidebar__"
 		}
 	}
 }

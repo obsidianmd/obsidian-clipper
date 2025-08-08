@@ -83,6 +83,13 @@
 				"mac": "Alt+Shift+R"
 			},
 			"description": "__MSG_commandToggleReader__"
+		},
+		"open_sidebar": {
+			"suggested_key": {
+				"default": "Alt+Shift+U",
+				"mac": "Alt+Shift+U"
+			},
+			"description": "__MSG_commandOpenSidebar__"
 		}
 	},
 	"browser_specific_settings": {
