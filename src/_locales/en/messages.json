@@ -107,16 +107,10 @@
 		}
 	},
 	"clipperOpenMode": {
-		"message": "Clipper UI open mode"
+    "message": "Always open in side panel"
 	},
 	"clipperOpenModeDescription": {
-    "message": "Choose how the Clipper UI opens across the extension. Defaults to a popup, or open in the side panel (Chromium) / sidebar (Firefox)."
-	},
-	"clipperOpenModePopup": {
-		"message": "Popup (default)"
-	},
-	"clipperOpenModeSidePanel": {
-		"message": "Side panel (Chromium only)"
+    "message": "When enabled, the Clipper UI (highlighter, quick clip, etc.) opens in the side panel (Chromium). Firefox limitation: the toolbar button cannot open the sidebar automatically; use the \"Open sidebar\" shortcut or context menu."
 	},
 	"close": {
 		"message": "Close"

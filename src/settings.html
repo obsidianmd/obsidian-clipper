@@ -149,19 +149,6 @@
 										</div>
 									</div>
 								</div>
-								<div class="setting-item mod-horizontal">
-									<div class="setting-item-info">
-										<label for="clipper-open-mode-toggle" data-i18n="clipperOpenMode">Clipper UI open mode</label>
-										<div class="setting-item-description" data-i18n="clipperOpenModeDescription">
-											Choose how the Clipper UI opens across the extension. Defaults to a popup, or open in the side panel (Chromium) / sidebar (Firefox).
-										</div>
-									</div>
-									<div class="setting-item-control">
-										<div class="checkbox-container">
-											<input type="checkbox" id="clipper-open-mode-toggle" />
-										</div>
-									</div>
-								</div>
 								<div class="setting-item">
 									<div class="setting-item-info">
 										<label for="save-behavior-dropdown" data-i18n="saveBehaviorLabel">Save behavior</label>
@@ -175,6 +162,19 @@
 											<option value="copyToClipboard" data-i18n="copyToClipboard">Copy to clipboard</option>
 											<option value="saveFile" data-i18n="saveFile">Save file</option>
 										</select>
+									</div>
+								</div>
+								<div class="setting-item mod-horizontal">
+									<div class="setting-item-info">
+										<label for="clipper-open-mode-toggle" data-i18n="clipperOpenMode">Always open in side panel</label>
+										<div class="setting-item-description" data-i18n="clipperOpenModeDescription">
+											When enabled, the Clipper UI (highlighter, quick clip, etc.) opens in the side panel (Chromium). Firefox limitation: the toolbar button cannot open the sidebar automatically; use the \"Open sidebar\" shortcut or context menu.
+										</div>
+									</div>
+									<div class="setting-item-control">
+										<div class="checkbox-container">
+											<input type="checkbox" id="clipper-open-mode-toggle" />
+										</div>
 									</div>
 								</div>
 								<div class="setting-item mod-horizontal">
