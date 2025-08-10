@@ -10,58 +10,45 @@
 	}
 }
 
-/*
-#obsidian-clipper-iframe {
-	position: fixed;
-	top: 20px;
-	right: 20px;
-	width: 350px;
-	height: calc(100% - 40px);
-	max-height: 800px;
-	border: none;
-	z-index: 2147483647;
-	box-shadow: 0 0 10px rgba(0,0,0,0.1);
-	border-radius: 8px;
-	background-color: white;
-}*/
 
 #obsidian-clipper-iframe {
 	flex-grow: 1;
 	border: none;
+	&.is-resizing {
+		cursor: ew-resize;
+		user-select: none;
+		pointer-events: none;
+	}
 }
 
 #obsidian-clipper-container {
 	position: fixed;
-	top: 20px;
-	right: 20px;
-	z-index: 2147483647; /* Ensure it's on top of other content */
+	top: 10px;
+	right: 10px;
+	z-index: 9999999999;
 	background-color: #fff;
-	border: 1px solid rgba(0,0,0,0.15);
 	border-radius: 8px;
-	box-shadow: 0 0 10px rgba(0,0,0,0.1);
+	box-shadow: 0 0 0 1px rgba(0,0,0,0.1), 0 0 10px rgba(0,0,0,0.1);
 	display: flex;
 	flex-direction: column;
 	overflow: hidden;
 	user-select: none;
-	width: 350px; /* Default width */
-	height: 540px; /* Default height */
-	min-width: 200px; /* Minimum width */
-	min-height: 200px; /* Minimum height */
+	height: calc(100% - 20px);
+	width: 350px;
 }
 
 .resize-handle {
 	position: absolute;
-	width: 10px;
-	height: 10px;
 }
-.resize-handle.n { top: -5px; left: 10px; right: 10px; height: 10px; cursor: ns-resize; }
-.resize-handle.e { top: 10px; right: -5px; bottom: 10px; width: 10px; cursor: ew-resize; }
-.resize-handle.s { bottom: -5px; left: 10px; right: 10px; height: 10px; cursor: ns-resize; }
-.resize-handle.w { top: 10px; left: -5px; bottom: 10px; width: 10px; cursor: ew-resize; }
-.resize-handle.ne { top: -5px; right: -5px; width: 10px; height: 10px; cursor: nesw-resize; }
-.resize-handle.se { bottom: -5px; right: -5px; width: 10px; height: 10px; cursor: nwse-resize; }
-.resize-handle.sw { bottom: -5px; left: -5px; width: 10px; height: 10px; cursor: nesw-resize; }
-.resize-handle.nw { top: -5px; left: -5px; width: 10px; height: 10px; cursor: nwse-resize; }
+
+.resize-handle.w {
+	top: 10px;
+	left: -5px;
+	bottom: 10px;
+	width: 10px;
+	cursor: ew-resize;
+	z-index: 99999999999;
+}
 
 #obsidian-clipper-header {
 	display: flex;
@@ -69,7 +56,6 @@
 	align-items: center;
 	background-color: #fff;
 	padding: 4px;
-	cursor: move;
 	height: 20px;
 }
 
