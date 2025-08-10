@@ -6,7 +6,10 @@ import { generalSettings, incrementStat } from './storage-utils';
 export async function generateFrontmatter(properties: Property[]): Promise<string> {
 	let frontmatter = '---\n';
 	for (const property of properties) {
-		frontmatter += `${property.name}:`;
+		// Wrap property name in quotes if it contains special characters (colon, space, etc.)
+		const needsQuotes = /[:\s]/.test(property.name);
+		const propertyKey = needsQuotes ? `"${property.name}"` : property.name;
+		frontmatter += `${propertyKey}:`;
 
 		const propertyType = generalSettings.propertyTypes.find(p => p.name === property.name)?.type || 'text';
 
