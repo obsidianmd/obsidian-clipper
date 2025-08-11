@@ -185,8 +185,7 @@ export function initializeGeneralSettings(): void {
 		initializeBetaFeaturesToggle();
 		initializeLegacyModeToggle();
 		initializeSilentOpenToggle();
-		initializeOpenInPageToggle();
-		initializeVaultInput();
+		initializeOpenBehaviorDropdown();
 		initializeKeyboardShortcuts();
 		initializeToggles();
 		setShortcutInstructions();
@@ -217,7 +216,7 @@ function initializeAutoSave(): void {
 }
 
 function saveSettingsFromForm(): void {
-	const openInPageToggle = document.getElementById('open-in-page-toggle') as HTMLInputElement;
+	const openBehaviorDropdown = document.getElementById('open-behavior-dropdown') as HTMLSelectElement;
 	const showMoreActionsToggle = document.getElementById('show-more-actions-toggle') as HTMLInputElement;
 	const betaFeaturesToggle = document.getElementById('beta-features-toggle') as HTMLInputElement;
 	const legacyModeToggle = document.getElementById('legacy-mode-toggle') as HTMLInputElement;
@@ -228,7 +227,7 @@ function saveSettingsFromForm(): void {
 
 	const updatedSettings = {
 		...generalSettings, // Keep existing settings
-		openInPage: openInPageToggle?.checked ?? generalSettings.openInPage,
+		openBehavior: (openBehaviorDropdown?.value as 'popup' | 'embedded') ?? generalSettings.openBehavior,
 		showMoreActionsButton: showMoreActionsToggle?.checked ?? generalSettings.showMoreActionsButton,
 		betaFeatures: betaFeaturesToggle?.checked ?? generalSettings.betaFeatures,
 		legacyMode: legacyModeToggle?.checked ?? generalSettings.legacyMode,
@@ -245,22 +244,6 @@ function initializeShowMoreActionsToggle(): void {
 	initializeSettingToggle('show-more-actions-toggle', generalSettings.showMoreActionsButton, (checked) => {
 		saveSettings({ ...generalSettings, showMoreActionsButton: checked });
 	});
-}
-
-function initializeVaultInput(): void {
-	const vaultInput = document.getElementById('vault-input') as HTMLInputElement;
-	if (vaultInput) {
-		vaultInput.addEventListener('keypress', (e) => {
-			if (e.key === 'Enter') {
-				e.preventDefault();
-				const newVault = vaultInput.value.trim();
-				if (newVault) {
-					addVault(newVault);
-					vaultInput.value = '';
-				}
-			}
-		});
-	}
 }
 
 async function initializeKeyboardShortcuts(): Promise<void> {
@@ -313,10 +296,14 @@ function initializeSilentOpenToggle(): void {
 	});
 }
 
-function initializeOpenInPageToggle(): void {
-	initializeSettingToggle('open-in-page-toggle', generalSettings.openInPage, (checked) => {
-		saveSettings({ ...generalSettings, openInPage: checked });
-	});
+function initializeOpenBehaviorDropdown(): void {
+	initializeSettingDropdown(
+		'open-behavior-dropdown',
+		generalSettings.openBehavior,
+		(value) => {
+			saveSettings({ ...generalSettings, openBehavior: value as 'popup' | 'embedded' });
+		}
+	);
 }
 
 function initializeResetDefaultTemplateButton(): void {

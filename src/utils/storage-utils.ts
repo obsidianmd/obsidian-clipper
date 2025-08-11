@@ -10,7 +10,7 @@ export let generalSettings: Settings = {
 	betaFeatures: false,
 	legacyMode: false,
 	silentOpen: false,
-	openInPage: false,
+	openBehavior: 'popup',
 	highlighterEnabled: true,
 	alwaysShowHighlights: false,
 	highlightBehavior: 'highlight-inline',
@@ -54,7 +54,7 @@ interface StorageData {
 		betaFeatures?: boolean;
 		legacyMode?: boolean;
 		silentOpen?: boolean;
-		openInPage?: boolean;
+		openBehavior?: boolean | 'popup' | 'embedded';
 		saveBehavior?: 'addToObsidian' | 'copyToClipboard' | 'saveFile';
 	};
 	vaults?: string[];
@@ -102,7 +102,7 @@ export async function loadSettings(): Promise<Settings> {
 		betaFeatures: false,
 		legacyMode: false,
 		silentOpen: false,
-		openInPage: false,
+		openBehavior: 'popup',
 		highlighterEnabled: true,
 		alwaysShowHighlights: true,
 		highlightBehavior: 'highlight-inline',
@@ -144,7 +144,9 @@ export async function loadSettings(): Promise<Settings> {
 		betaFeatures: data.general_settings?.betaFeatures ?? defaultSettings.betaFeatures,
 		legacyMode: data.general_settings?.legacyMode ?? defaultSettings.legacyMode,
 		silentOpen: data.general_settings?.silentOpen ?? defaultSettings.silentOpen,
-		openInPage: data.general_settings?.openInPage ?? defaultSettings.openInPage,
+		openBehavior: typeof data.general_settings?.openBehavior === 'boolean' 
+			? (data.general_settings.openBehavior ? 'embedded' : 'popup') 
+			: (data.general_settings?.openBehavior ?? defaultSettings.openBehavior),
 		highlighterEnabled: data.highlighter_settings?.highlighterEnabled ?? defaultSettings.highlighterEnabled,
 		alwaysShowHighlights: data.highlighter_settings?.alwaysShowHighlights ?? defaultSettings.alwaysShowHighlights,
 		highlightBehavior: data.highlighter_settings?.highlightBehavior ?? defaultSettings.highlightBehavior,
@@ -185,7 +187,7 @@ export async function saveSettings(settings?: Partial<Settings>): Promise<void> 
 			betaFeatures: generalSettings.betaFeatures,
 			legacyMode: generalSettings.legacyMode,
 			silentOpen: generalSettings.silentOpen,
-			openInPage: generalSettings.openInPage,
+			openBehavior: generalSettings.openBehavior,
 			saveBehavior: generalSettings.saveBehavior,
 		},
 		highlighter_settings: {

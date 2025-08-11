@@ -285,7 +285,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 		const tab = await getTabInfo(currentTabId);
 
 		// Check if we should open in an iframe, but only if the URL is valid
-		if (isValidUrl(tab.url) && !isBlankPage(tab.url) && settings.openInPage && !isIframe && !isSidePanel) {
+		if (isValidUrl(tab.url) && !isBlankPage(tab.url) && settings.openBehavior === 'embedded' && !isIframe && !isSidePanel) {
 			try {
 				const response = await browser.runtime.sendMessage({ action: "getActiveTabAndToggleIframe" }) as { success?: boolean; error?: string };
 				if (response && response.success) {

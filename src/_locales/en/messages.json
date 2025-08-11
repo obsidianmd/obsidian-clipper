@@ -514,6 +514,12 @@
 	"open": {
 		"message": "Open"
 	},
+	"openBehaviorTitle": {
+		"message": "Open behavior"
+	},
+	"openBehaviorDescription": {
+		"message": "Choose how Web Clipper opens by default."
+	},
 	"optional": {
 		"message": "(optional)"
 	},
@@ -540,6 +546,12 @@
 	},
 	"pleaseReload": {
 		"message": "Please try reloading the page."
+	},
+	"popup": {
+		"message": "Popup"
+	},
+	"embedded": {
+		"message": "Embedded"
 	},
 	"popularModels": {
 		"message": "Popular models"
@@ -663,12 +675,6 @@
 	},
 	"saveBehaviorLabel": {
 		"message": "Save behavior"
-	},
-	"openInPage": {
-		"message": "Sidebar mode"
-	},
-	"openInPageDescription": {
-		"message": "Open as a sidebar within the page."
 	},
 	"saveFile": {
 		"message": "Save file..."
