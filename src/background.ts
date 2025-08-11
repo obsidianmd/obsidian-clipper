@@ -18,12 +18,17 @@ async function ensureContentScriptLoadedInBackground(tabId: number): Promise<voi
 		// Check if the URL is valid before proceeding
 		if (!tab.url || !isValidUrl(tab.url)) {
 			console.log(`Skipping content script injection for invalid URL: ${tab.url}`);
-			return;
+			throw new Error(`Cannot inject content script into invalid URL: ${tab.url}`);
 		}
 
 		// Attempt to send a message to the content script
 		await browser.tabs.sendMessage(tabId, { action: "ping" });
 	} catch (error) {
+		// If the error is about invalid URL, re-throw it
+		if (error instanceof Error && error.message.includes('invalid URL')) {
+			throw error;
+		}
+		
 		// If the message fails, the content script is not loaded, so inject it
 		console.log('Content script not loaded, injecting...');
 		try {
@@ -211,6 +216,14 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 				const currentTab = tabs[0];
 				if (currentTab && currentTab.id) {
 					try {
+						// Check if the URL is valid before trying to inject content script
+						if (!currentTab.url || !isValidUrl(currentTab.url) || isBlankPage(currentTab.url)) {
+							sendResponse({success: false, error: 'Cannot open iframe on this page'});
+							return;
+						}
+						
+						// Ensure content script is loaded first
+						await ensureContentScriptLoadedInBackground(currentTab.id);
 						await browser.tabs.sendMessage(currentTab.id, { action: "toggle-iframe" });
 						sendResponse({success: true});
 					} catch (error) {

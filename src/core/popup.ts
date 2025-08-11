@@ -17,7 +17,6 @@ import { initializeInterpreter, handleInterpreterUI, collectPromptVariables } fr
 import { adjustNoteNameHeight } from '../utils/ui-utils';
 import { debugLog } from '../utils/debug';
 import { showVariables, initializeVariablesPanel, updateVariablesPanel } from '../managers/inspect-variables';
-import { ensureContentScriptLoaded } from '../utils/content-script-utils';
 import { isBlankPage, isValidUrl } from '../utils/active-tab-manager';
 import { memoizeWithExpiration } from '../utils/memoize';
 import { debounce } from '../utils/debounce';
@@ -170,7 +169,6 @@ async function initializeExtension(tabId: number) {
 			showError('onlyHttpSupported');
 			return;
 		}
-		await ensureContentScriptLoaded(tabId);
 
 		await loadAndSetupTemplates();
 
@@ -234,15 +232,21 @@ function setupMessageListeners() {
 				}
 			}
 		} else if (request.action === "activeTabChanged") {
-			currentTabId = request.tabId;
-			if (request.isValidUrl) {
-				if (currentTabId !== undefined) {
-					refreshFields(currentTabId); // Force template check when URL changes
+			// Only handle active tab changes if we're in side panel mode, not iframe mode
+			const urlParams = new URLSearchParams(window.location.search);
+			const isIframe = urlParams.get('context') === 'iframe';
+			
+			if (!isIframe) {
+				currentTabId = request.tabId;
+				if (request.isValidUrl) {
+					if (currentTabId !== undefined) {
+						refreshFields(currentTabId); // Force template check when URL changes
+					}
+				} else if (request.isBlankPage) {
+					showError(getMessage('pageCannotBeClipped'));
+				} else {
+					showError(getMessage('onlyHttpSupported'));
 				}
-			} else if (request.isBlankPage) {
-				showError(getMessage('pageCannotBeClipped'));
-			} else {
-				showError(getMessage('onlyHttpSupported'));
 			}
 		} else if (request.action === "highlightsUpdated") {
 			// Refresh fields when highlights are updated
