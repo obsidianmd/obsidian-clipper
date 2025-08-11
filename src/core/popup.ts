@@ -269,44 +269,6 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 	const isSidePanel = document.documentElement.classList.contains('is-side-panel');
 
-	if (settings.openInPage && !isIframe && !isSidePanel) {
-		try {
-			const response = await browser.runtime.sendMessage({ action: "getActiveTabAndToggleIframe" }) as { success?: boolean; error?: string };
-			if (response && response.success) {
-				window.close();
-			} else if (response && response.error) {
-				console.error('Error toggling iframe:', response.error);
-			}
-		} catch (error) {
-			console.error('Error toggling iframe:', error);
-		}
-		return;
-	}
-
-	browser.runtime.connect({ name: 'popup' });
-
-	const refreshButton = document.getElementById('refresh-pane');
-	if (refreshButton) {
-		refreshButton.addEventListener('click', (e) => {
-			e.preventDefault();
-			refreshPopup();
-			initializeIcons(refreshButton);
-		});
-	}
-	const settingsButton = document.getElementById('open-settings');
-	if (settingsButton) {
-		settingsButton.addEventListener('click', async function() {
-			try {
-				// Firefox doesn't support openOptionsPage directly, so we send a message to the background script
-				await browser.runtime.sendMessage({ action: "openOptionsPage" });
-				setTimeout(() => window.close(), 50);
-			} catch (error) {
-				console.error('Error opening options page:', error);
-			}
-		});
-		initializeIcons(settingsButton);
-	}
-
 	try {
 		// Get the active tab via background script to handle Firefox compatibility
 		const response = await browser.runtime.sendMessage({ action: "getActiveTab" }) as { tabId?: number; error?: string };
@@ -316,10 +278,54 @@ document.addEventListener('DOMContentLoaded', async function() {
 		}
 		
 		currentTabId = response.tabId;
+		const tab = await getTabInfo(currentTabId);
+
+		// Check if we should open in an iframe, but only if the URL is valid
+		if (isValidUrl(tab.url) && !isBlankPage(tab.url) && settings.openInPage && !isIframe && !isSidePanel) {
+			try {
+				const response = await browser.runtime.sendMessage({ action: "getActiveTabAndToggleIframe" }) as { success?: boolean; error?: string };
+				if (response && response.success) {
+					window.close();
+					return; // Exit script after closing the window
+				} else if (response && response.error) {
+					console.error('Error toggling iframe:', response.error);
+					// If there's an error, we'll fall through and open the normal popup.
+				}
+			} catch (error) {
+				console.error('Error toggling iframe:', error);
+				// If there's an error, we'll fall through and open the normal popup.
+			}
+		}
+
+		// Connect to the background script for communication
+		browser.runtime.connect({ name: 'popup' });
+
+		// Setup event listeners for popup buttons
+		const refreshButton = document.getElementById('refresh-pane');
+		if (refreshButton) {
+			refreshButton.addEventListener('click', (e) => {
+				e.preventDefault();
+				refreshPopup();
+				initializeIcons(refreshButton);
+			});
+		}
+		const settingsButton = document.getElementById('open-settings');
+		if (settingsButton) {
+			settingsButton.addEventListener('click', async function() {
+				try {
+					await browser.runtime.sendMessage({ action: "openOptionsPage" });
+					setTimeout(() => window.close(), 50);
+				} catch (error) {
+					console.error('Error opening options page:', error);
+				}
+			});
+			initializeIcons(settingsButton);
+		}
+
+		// Initialize the rest of the popup
 		if (currentTabId) {
 			const initialized = await initializeExtension(currentTabId);
 			if (!initialized) {
-				showError(getMessage('pageCannotBeClipped'));
 				return;
 			}
 
