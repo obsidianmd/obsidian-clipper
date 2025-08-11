@@ -385,14 +385,19 @@ const debouncedUpdateContextMenu = debounce(async (tabId: number) => {
 					id: "highlight-element",
 					title: "Add to highlights",
 					contexts: ["image", "video", "audio"]
+				},
+				{
+					id: 'open-embedded',
+					title: browser.i18n.getMessage('openEmbedded'),
+					contexts: ["page", "selection"]
 				}
 			];
 
-			const browserType = await detectBrowser();
+		const browserType = await detectBrowser();
 		if (browserType === 'chrome') {
 			menuItems.push({
 				id: 'open-side-panel',
-				title: 'Open side panel',
+				title: browser.i18n.getMessage('openSidePanel'),
 				contexts: ["page", "selection"]
 			});
 		}
@@ -422,6 +427,9 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
 	// 	await ensureContentScriptLoadedInBackground(tab.id);
 	// 	await injectReaderScript(tab.id);
 	// 	await browser.tabs.sendMessage(tab.id, { action: "toggleReaderMode" });
+	} else if (info.menuItemId === 'open-embedded' && tab && tab.id) {
+		await ensureContentScriptLoadedInBackground(tab.id);
+		await browser.tabs.sendMessage(tab.id, { action: "toggle-iframe" });
 	} else if (info.menuItemId === 'open-side-panel' && tab && tab.id && tab.windowId) {
 		chrome.sidePanel.open({ tabId: tab.id });
 		sidePanelOpenWindows.add(tab.windowId);

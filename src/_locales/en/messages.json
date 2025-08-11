@@ -511,6 +511,12 @@
 	"onlyHttpSupported": {
 		"message": "This page cannot be clipped. Only http and https URLs are supported."
 	},
+	"openEmbedded": {
+		"message": "Open in page"
+	},
+	"openSidePanel": {
+		"message": "Open side panel"
+	},
 	"open": {
 		"message": "Open"
 	},
