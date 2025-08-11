@@ -25,7 +25,7 @@ declare global {
 	const iframeId = 'obsidian-clipper-iframe';
 	const containerId = 'obsidian-clipper-container';
 
-	function toggleIframe() {
+	async function toggleIframe() {
 		const existingContainer = document.getElementById(containerId);
 		if (existingContainer) {
 			existingContainer.remove();
@@ -34,6 +34,11 @@ declare global {
 
 		const container = document.createElement('div');
 		container.id = containerId;
+
+		const { clipperIframeWidth } = await browser.storage.local.get('clipperIframeWidth');
+		if (clipperIframeWidth) {
+			container.style.width = `${clipperIframeWidth}px`;
+		}
 
 		const header = document.createElement('div');
 		header.id = 'obsidian-clipper-header';
@@ -122,6 +127,10 @@ declare global {
 				isResizing = false;
 				const iframe = container.querySelector('#obsidian-clipper-iframe');
 				if (iframe) iframe.classList.remove('is-resizing');
+				
+				const newWidth = container.offsetWidth;
+				browser.storage.local.set({ clipperIframeWidth: newWidth });
+
 				document.onmousemove = null;
 				document.onmouseup = null;
 			};
@@ -135,8 +144,9 @@ declare global {
 			sendResponse({});
 			return true;
 		} else if (request.action === "toggle-iframe") {
-			toggleIframe();
-			sendResponse({ success: true });
+			toggleIframe().then(() => {
+				sendResponse({ success: true });
+			});
 			return true;
 		}
 	});
