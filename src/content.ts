@@ -41,17 +41,6 @@ declare global {
 			container.style.width = `${clipperIframeWidth}px`;
 		}
 
-		const header = document.createElement('div');
-		header.id = 'obsidian-clipper-header';
-		container.appendChild(header);
-
-		const closeButton = document.createElement('button');
-		closeButton.id = 'obsidian-clipper-close-button';
-		closeButton.innerHTML = `<i data-lucide="x"></i>`;
-		closeButton.onclick = () => container.remove();
-		header.appendChild(closeButton);
-		initializeIcons(closeButton);
-
 		const iframe = document.createElement('iframe');
 		iframe.id = iframeId;
 		iframe.src = browser.runtime.getURL('side-panel.html?context=iframe');
@@ -137,17 +126,6 @@ declare global {
 
 	// Firefox
 	browser.runtime.sendMessage({ action: "contentScriptLoaded" });
-	browser.runtime.onMessage.addListener((request: any, sender, sendResponse) => {
-		if (request.action === "ping") {
-			sendResponse({});
-			return true;
-		} else if (request.action === "toggle-iframe") {
-			toggleIframe().then(() => {
-				sendResponse({ success: true });
-			});
-			return true;
-		}
-	});
 
 	interface ContentResponse {
 		content: string;
@@ -169,7 +147,27 @@ declare global {
 		metaTags: { name?: string | null; property?: string | null; content: string | null }[];
 	}
 
-	browser.runtime.onMessage.addListener((request: any, sender: browser.Runtime.MessageSender, sendResponse: (response?: any) => void) => {
+	browser.runtime.onMessage.addListener((request: any, sender, sendResponse) => {
+		if (request.action === "ping") {
+			sendResponse({});
+			return true;
+		}
+
+		if (request.action === "toggle-iframe") {
+			toggleIframe().then(() => {
+				sendResponse({ success: true });
+			});
+			return true;
+		}
+
+		if (request.action === "close-iframe") {
+			const existingContainer = document.getElementById(containerId);
+			if (existingContainer) {
+				existingContainer.remove();
+			}
+			return;
+		}
+
 		if (request.action === "copy-text-to-clipboard") {
 			const textArea = document.createElement("textarea");
 			textArea.value = request.text;

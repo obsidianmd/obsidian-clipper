@@ -286,6 +286,15 @@
 	gap: 2px;
 }
 
+.is-embedded #embedded-header {
+	display: flex;
+}
+
+#embedded-header {
+	display: none;
+	border-bottom: 1px solid var(--divider-color);
+}
+
 #template-container {
 	flex-grow: 1;
 	select {
@@ -331,12 +340,12 @@
 
 .is-mobile-safari,
 .is-chromium {
-	#popup-header {
+	.popup-actions {
 		--radius-m: 40px;
 	}
 }
 
-#popup-actions {
+.popup-actions {
 	z-index: 100;
 	justify-self: flex-end;
 	align-items: center;
