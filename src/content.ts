@@ -3,6 +3,7 @@ import * as highlighter from './utils/highlighter';
 import { loadSettings, generalSettings } from './utils/storage-utils';
 import Defuddle from 'defuddle';
 import { getDomain } from './utils/string-utils';
+import { initializeIcons } from './icons/icons';
 
 declare global {
 	interface Window {
@@ -44,15 +45,12 @@ declare global {
 		header.id = 'obsidian-clipper-header';
 		container.appendChild(header);
 
-		const moveHandle = document.createElement('div');
-		moveHandle.id = 'obsidian-clipper-move-handle';
-		header.appendChild(moveHandle);
-
 		const closeButton = document.createElement('button');
 		closeButton.id = 'obsidian-clipper-close-button';
-		closeButton.textContent = 'X';
+		closeButton.innerHTML = `<i data-lucide="x"></i>`;
 		closeButton.onclick = () => container.remove();
 		header.appendChild(closeButton);
+		initializeIcons(closeButton);
 
 		const iframe = document.createElement('iframe');
 		iframe.id = iframeId;

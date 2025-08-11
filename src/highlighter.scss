@@ -59,18 +59,21 @@
 	height: 20px;
 }
 
-#obsidian-clipper-move-handle {
-	flex-grow: 1;
-	height: 100%;
-}
-
 #obsidian-clipper-close-button {
 	background: none;
 	color: #000;
 	border: none;
-	font-size: 16px;
 	cursor: pointer;
-	padding: 0 8px;
+	padding: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 28px;
+	width: 28px;
+	svg {
+		width: 16px;
+		height: 16px;
+	}
 }
 
 /* Hide the clip button on iPadOS because it's not supported */
