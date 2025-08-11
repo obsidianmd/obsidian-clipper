@@ -1,5 +1,5 @@
 {
-	"version": "2025.08.05",
+	"version": "2025.08.11",
 	"anthropic": {
 		"id": "anthropic",
 		"name": "Anthropic",
@@ -45,8 +45,7 @@
 		"modelsList": "https://ai.google.dev/gemini-api/docs/models",
 		"baseUrl": "https://generativelanguage.googleapis.com/v1beta/chat/completions",
 		"popularModels": [
-			{ "id": "gemini-2.0-flash", "name": "Gemini 2.0 Flash" },
-			{ "id": "gemini-2.5-flash-preview-04-17", "name": "Gemini 2.5 Flash Preview" }
+			{ "id": "gemini-2.5-flash", "name": "Gemini 2.5 Flash" }
 		]
 	},
 	"huggingface": {
