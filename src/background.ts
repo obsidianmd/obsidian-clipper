@@ -3,7 +3,6 @@ import { detectBrowser } from './utils/browser-detection';
 import { updateCurrentActiveTab, isValidUrl, isBlankPage } from './utils/active-tab-manager';
 import { TextHighlightData } from './utils/highlighter';
 import { debounce } from './utils/debounce';
-import { loadSettings } from './utils/storage-utils';
 
 let sidePanelOpenWindows: Set<number> = new Set();
 let isHighlighterMode = false;
@@ -181,8 +180,10 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 		}
 
 		if (typedRequest.action === "toggleHighlighterMode" && typedRequest.tabId) {
-			toggleHighlighterMode(typedRequest.tabId);
-			sendResponse({ success: true });
+			toggleHighlighterMode(typedRequest.tabId)
+				.then(newMode => sendResponse({ success: true, isActive: newMode }))
+				.catch(error => sendResponse({ success: false, error: error.message }));
+			return true;
 		}
 
 		if (typedRequest.action === "openPopup") {
@@ -495,7 +496,7 @@ async function setHighlighterMode(tabId: number, activate: boolean) {
 	}
 }
 
-async function toggleHighlighterMode(tabId: number) {
+async function toggleHighlighterMode(tabId: number): Promise<boolean> {
 	try {
 		const result = await browser.storage.local.get('isHighlighterMode');
 		const currentMode = result.isHighlighterMode || false;
@@ -504,8 +505,10 @@ async function toggleHighlighterMode(tabId: number) {
 		await browser.tabs.sendMessage(tabId, { action: "setHighlighterMode", isActive: newMode });
 		debouncedUpdateContextMenu(tabId);
 		await sendMessageToPopup(tabId, { action: "updatePopupHighlighterUI", isActive: newMode });
+		return newMode;
 	} catch (error) {
 		console.error('Error toggling highlighter mode:', error);
+		throw error;
 	}
 }
 

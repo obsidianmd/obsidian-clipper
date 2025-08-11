@@ -997,28 +997,26 @@ async function checkHighlighterModeState(tabId: number) {
 }
 
 async function toggleHighlighterMode(tabId: number) {
-	const result = await browser.storage.local.get('isHighlighterMode');
-	const wasHighlighterModeActive = result.isHighlighterMode as boolean;
-	isHighlighterMode = !wasHighlighterModeActive;
-	await setLocalStorage('isHighlighterMode', isHighlighterMode);
+	try {
+		const response = await browser.runtime.sendMessage({
+			action: "toggleHighlighterMode",
+			tabId: tabId
+		}) as { success: boolean, isActive: boolean, error?: string };
 
-	// Send a message to the content script to toggle the highlighter mode
-	await browser.tabs.sendMessage(tabId, { 
-		action: "setHighlighterMode", 
-		isActive: isHighlighterMode 
-	});
+		if (response && response.success) {
+			const isNowActive = response.isActive;
+			updateHighlighterModeUI(isNowActive);
 
-	// Notify the background script about the change
-	browser.runtime.sendMessage({ 
-		action: "highlighterModeChanged", 
-		isActive: isHighlighterMode 
-	});
-
-	// Close the popup if highlighter mode is turned on and not in side panel
-	if (isHighlighterMode && !wasHighlighterModeActive && !isSidePanel) {
-		window.close();
-	} else {
-		updateHighlighterModeUI(isHighlighterMode);
+			// Close the popup if highlighter mode is turned on and not in side panel
+			if (isNowActive && !isSidePanel) {
+				setTimeout(() => window.close(), 50);
+			}
+		} else {
+			throw new Error(response.error || "Failed to toggle highlighter mode.");
+		}
+	} catch (error) {
+		console.error('Error toggling highlighter mode:', error);
+		showError('failedToToggleHighlighter');
 	}
 }
 
