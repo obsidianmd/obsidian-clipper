@@ -476,10 +476,16 @@ declare global {
 						tabId = (response as { tabId: number }).tabId;
 					}
 
-					// If we didn't get a tab ID, try to get it from the current tab
+					// If we didn't get a tab ID, try to get it from the background script
 					if (!tabId) {
-						const tabs = await browser.tabs.query({ active: true, currentWindow: true });
-						tabId = tabs[0]?.id;
+						try {
+							const response = await browser.runtime.sendMessage({ action: "getActiveTab" }) as { tabId?: number; error?: string };
+							if (response && !response.error && response.tabId) {
+								tabId = response.tabId;
+							}
+						} catch (error) {
+							console.error('[Content] Failed to get tab ID from background script:', error);
+						}
 					}
 
 					if (tabId) {

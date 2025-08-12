@@ -310,11 +310,50 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 			}
 		}
 
+		if (typedRequest.action === "openObsidianUrl") {
+			const url = (typedRequest as any).url;
+			if (url) {
+				browser.tabs.query({active: true, currentWindow: true}).then((tabs) => {
+					const currentTab = tabs[0];
+					if (currentTab && currentTab.id) {
+						browser.tabs.update(currentTab.id, { url: url }).then(() => {
+							sendResponse({ success: true });
+						}).catch((error) => {
+							console.error('Error opening Obsidian URL:', error);
+							sendResponse({
+								success: false,
+								error: error instanceof Error ? error.message : String(error)
+							});
+						});
+					} else {
+						sendResponse({
+							success: false,
+							error: 'No active tab found'
+						});
+					}
+				}).catch((error) => {
+					console.error('Error querying tabs:', error);
+					sendResponse({
+						success: false,
+						error: error instanceof Error ? error.message : String(error)
+					});
+				});
+				return true;
+			} else {
+				sendResponse({
+					success: false,
+					error: 'Missing URL'
+				});
+				return true;
+			}
+		}
+
 		// For other actions that use sendResponse
 		if (typedRequest.action === "extractContent" || 
 			typedRequest.action === "ensureContentScriptLoaded" ||
 			typedRequest.action === "getHighlighterMode" ||
-			typedRequest.action === "toggleHighlighterMode") {
+			typedRequest.action === "toggleHighlighterMode" ||
+			typedRequest.action === "openObsidianUrl") {
 			return true;
 		}
 	}

@@ -68,6 +68,26 @@ async function getTabInfo(tabId: number): Promise<{ id: number; url: string }> {
 	return response.tab;
 }
 
+// Helper function to get current tab URL and title for stats
+async function getCurrentTabInfo(): Promise<{ url: string; title?: string }> {
+	if (!currentTabId) {
+		return { url: '' };
+	}
+	
+	try {
+		const tab = await getTabInfo(currentTabId);
+		// Try to get the title from the extracted content if available
+		const extractedData = await memoizedExtractPageContent(currentTabId);
+		return { 
+			url: tab.url, 
+			title: extractedData?.title || document.title 
+		};
+	} catch (error) {
+		console.warn('Failed to get current tab info for stats:', error);
+		return { url: '' };
+	}
+}
+
 // Memoize extractPageContent with URL-sensitive key and short expiration
 const memoizedExtractPageContent = memoizeWithExpiration(
 	async (tabId: number) => {
@@ -277,7 +297,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 		// Get the active tab via background script to handle Firefox compatibility
 		const response = await browser.runtime.sendMessage({ action: "getActiveTab" }) as { tabId?: number; error?: string };
 		if (!response || response.error || !response.tabId) {
-			showError(getMessage('pleaseReloadPage'));
+			showError(getMessage('pleaseReload'));
 			return;
 		}
 		
@@ -354,14 +374,14 @@ document.addEventListener('DOMContentLoaded', async function() {
 				determineMainAction();
 			} catch (error) {
 				console.error('Error initializing popup:', error);
-				showError(getMessage('pleaseReloadPage'));
+				showError(getMessage('pleaseReload'));
 			}
 		} else {
-			showError(getMessage('pleaseReloadPage'));
+			showError(getMessage('pleaseReload'));
 		}
 	} catch (error) {
 		console.error('Error getting active tab:', error);
-		showError(getMessage('pleaseReloadPage'));
+		showError(getMessage('pleaseReload'));
 	}
 });
 
@@ -495,7 +515,8 @@ function setupEventListeners(tabId: number) {
 
 							navigator.share(shareData)
 								.then(async () => {
-									await incrementStat('share', vault, path);
+									const tabInfo = await getCurrentTabInfo();
+									await incrementStat('share', vault, path, tabInfo.url, tabInfo.title);
 									const moreDropdown = document.getElementById('more-dropdown');
 									if (moreDropdown) {
 											moreDropdown.classList.remove('show');
@@ -1093,7 +1114,8 @@ export async function copyToClipboard(content: string) {
 		const path = pathField?.value || '';
 		const vault = vaultDropdown?.value || '';
 		
-		await incrementStat('copyToClipboard', vault, path);
+		const tabInfo = await getCurrentTabInfo();
+		await incrementStat('copyToClipboard', vault, path, tabInfo.url, tabInfo.title);
 
 		// Change the main button text temporarily
 		const clipButton = document.getElementById('clip-btn');
@@ -1143,7 +1165,8 @@ async function handleSaveToDownloads() {
 			onError: (error) => showError('failedToSaveFile')
 		});
 
-		await incrementStat('saveFile', vault, path);
+		const tabInfo = await getCurrentTabInfo();
+		await incrementStat('saveFile', vault, path, tabInfo.url, tabInfo.title);
 
 		const moreDropdown = document.getElementById('more-dropdown');
 		if (moreDropdown) {
@@ -1189,7 +1212,6 @@ function determineMainAction() {
     }
 }
 
-// New function specifically for Obsidian operations
 async function handleClipObsidian(): Promise<void> {
     if (!currentTemplate) return;
 
@@ -1235,7 +1257,8 @@ async function handleClipObsidian(): Promise<void> {
         const path = isDailyNote ? '' : pathField?.value || '';
 
         await saveToObsidian(fileContent, noteName, path, selectedVault, currentTemplate.behavior);
-        await incrementStat('addToObsidian', selectedVault, path);
+        const tabInfo = await getCurrentTabInfo();
+        await incrementStat('addToObsidian', selectedVault, path, tabInfo.url, tabInfo.title);
 
         if (!currentTemplate.vault) {
             lastSelectedVault = selectedVault;

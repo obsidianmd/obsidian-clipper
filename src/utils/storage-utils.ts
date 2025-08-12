@@ -223,16 +223,17 @@ export async function setLegacyMode(enabled: boolean): Promise<void> {
 export async function incrementStat(
 	action: keyof Settings['stats'],
 	vault?: string,
-	path?: string
+	path?: string,
+	url?: string,
+	title?: string
 ): Promise<void> {
 	const settings = await loadSettings();
 	settings.stats[action]++;
 	await saveSettings(settings);
 
-	// Get the current tab's URL and title
-	const tabs = await browser.tabs.query({ active: true, currentWindow: true });
-	if (tabs[0]?.url) {
-		await addHistoryEntry(action, tabs[0].url, tabs[0].title, vault, path);
+	// Add history entry if URL is provided
+	if (url) {
+		await addHistoryEntry(action, url, title, vault, path);
 	}
 }
 
