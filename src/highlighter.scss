@@ -49,13 +49,13 @@
 	transform: scale(0.95);
 
 	&.is-open {
-		animation: 50ms ease 60ms 1 normal forwards running clipperOpenAnimation;
+		animation: 80ms ease 60ms 1 normal forwards running clipperOpenAnimation;
 		#obsidian-clipper-iframe {
 			opacity: 1;
 		}
 	}
 	&.is-closing {
-		animation: 50ms ease 1 normal forwards running clipperCloseAnimation;
+		animation: 80ms ease 1 normal forwards running clipperCloseAnimation;
 	}
 }
 
