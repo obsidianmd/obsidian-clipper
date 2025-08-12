@@ -48,6 +48,25 @@
 	}
 }
 
+#popup:not(.is-side-panel) {
+	::-webkit-scrollbar{
+		width: 8px;
+	}
+	::-webkit-scrollbar-track-piece {
+		background-color: var(--background-primary);
+	}
+	::-webkit-scrollbar-thumb {
+		background-color: var(--background-modifier-border-hover);
+		outline: 2px solid var(--background-primary);
+		outline-offset: -2px;
+		border: 1px solid var(--background-primary);
+		border-radius: 10px;
+	}
+	::-webkit-scrollbar-thumb:hover {
+		background-color: var(--background-modifier-border-focus);
+	}
+}
+
 #popup-container:has(.variables-panel.show) {
 	width: var(--popup-width-expanded);
 	transition: width 0.1s ease-in-out;
@@ -75,7 +94,6 @@
 		justify-content: center;
 		height: 100%;
 	}
-
 
 }
 
@@ -148,19 +166,6 @@
 			min-width: 100px;
 			cursor: default;
 		}
-	}
-}
-
-// Scrollbar styles for Chromium
-.is-safari,
-.is-chromium {
-	.metadata-properties {
-		margin-inline-end: 2px;
-	}
-	#note-content-container {
-		padding-top: 2px;
-		padding-bottom: 2px;
-		padding-inline-end: 2px;
 	}
 }
 
@@ -294,8 +299,8 @@
 
 .has-error {
 	#highlighter-mode,
+	#embedded-mode,
 	#show-variables,
-	#open-embedded,
 	#template-select {
 		display: none;
 	}

@@ -408,21 +408,17 @@ function setupEventListeners(tabId: number) {
 		highlighterModeButton.addEventListener('click', () => toggleHighlighterMode(tabId));
 	}
 
-	const openEmbeddedButton = document.getElementById('open-embedded');
-	if (openEmbeddedButton) {
-		openEmbeddedButton.addEventListener('click', async () => {
-			try {
-				const response = await browser.runtime.sendMessage({ action: "getActiveTabAndToggleIframe" }) as { success?: boolean; error?: string };
-				if (response && response.success) {
-					window.close();
-				} else if (response && response.error) {
-					console.error('Error toggling iframe:', response.error);
+	const embeddedModeButton = document.getElementById('embedded-mode');
+		if (embeddedModeButton) {
+			embeddedModeButton.addEventListener('click', async function() {
+				try {
+					await browser.runtime.sendMessage({ action: "getActiveTabAndToggleIframe" });
+					setTimeout(() => window.close(), 50);
+				} catch (error) {
+					console.error('Error toggling emedded iframe:', error);
 				}
-			} catch (error) {
-				console.error('Error toggling iframe:', error);
-			}
-		});
-	}
+			});
+		}
 
 	const moreButton = document.getElementById('more-btn');
 	const moreDropdown = document.getElementById('more-dropdown');
