@@ -26,15 +26,23 @@ declare global {
 	const iframeId = 'obsidian-clipper-iframe';
 	const containerId = 'obsidian-clipper-container';
 
+	function removeContainer(container: HTMLElement) {
+		container.classList.add('is-closing');
+		container.addEventListener('animationend', () => {
+			container.remove();
+		}, { once: true });
+	}
+
 	async function toggleIframe() {
 		const existingContainer = document.getElementById(containerId);
 		if (existingContainer) {
-			existingContainer.remove();
+			removeContainer(existingContainer);
 			return;
 		}
 
 		const container = document.createElement('div');
 		container.id = containerId;
+		container.classList.add('is-open');
 
 		const { clipperIframeWidth, clipperIframeHeight } = await browser.storage.local.get(['clipperIframeWidth', 'clipperIframeHeight']);
 		if (clipperIframeWidth) {
@@ -51,7 +59,7 @@ declare global {
 		const closeButton = document.createElement('button');
 		closeButton.id = 'obsidian-clipper-close-button';
 		closeButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class=""><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
-		closeButton.onclick = () => container.remove();
+		closeButton.onclick = () => removeContainer(container);
 		header.appendChild(closeButton);
 
 		const iframe = document.createElement('iframe');
@@ -190,7 +198,7 @@ declare global {
 		if (request.action === "close-iframe") {
 			const existingContainer = document.getElementById(containerId);
 			if (existingContainer) {
-				existingContainer.remove();
+				removeContainer(existingContainer);
 			}
 			return;
 		}
