@@ -15,7 +15,6 @@
 	flex-grow: 1;
 	border: none;
 	&.is-resizing {
-		cursor: ew-resize;
 		user-select: none;
 		pointer-events: none;
 	}
@@ -26,6 +25,7 @@
 	position: fixed;
 	top: 10px;
 	right: 10px;
+	max-height: calc(100% - 20px);
 	z-index: 9999999999;
 	background-color: var(--obsidian-clipper-background-primary);
 	border-radius: 8px;
@@ -61,13 +61,33 @@
 	z-index: 99999999999;
 }
 
+.resize-handle.s {
+	position: absolute;
+	bottom: -5px;
+	left: 10px;
+	right: 10px;
+	height: 10px;
+	cursor: ns-resize;
+	z-index: 99999999999;
+}
+
+.resize-handle.sw {
+	position: absolute;
+	bottom: -5px;
+	left: -5px;
+	width: 16px;
+	height: 16px;
+	cursor: nesw-resize;
+	z-index: 99999999999;
+}
+
 #obsidian-clipper-header {
 	display: flex;
 	justify-content: space-between;
 	background-color: transparent;
 	align-items: center;
-	padding: 4px;
-	height: 28px;
+	padding: 0 12px;
+	height: 24px;
 	justify-content: flex-end;
 	border-bottom: 1px solid var(--obsidian-clipper-divider-color);
 }
@@ -81,8 +101,8 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	height: 28px;
-	width: 28px;
+	height: 24px;
+	width: 24px;
 	svg {
 		width: 16px;
 		height: 16px;

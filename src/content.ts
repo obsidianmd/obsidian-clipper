@@ -36,9 +36,12 @@ declare global {
 		const container = document.createElement('div');
 		container.id = containerId;
 
-		const { clipperIframeWidth } = await browser.storage.local.get('clipperIframeWidth');
+		const { clipperIframeWidth, clipperIframeHeight } = await browser.storage.local.get(['clipperIframeWidth', 'clipperIframeHeight']);
 		if (clipperIframeWidth) {
 			container.style.width = `${clipperIframeWidth}px`;
+		}
+		if (clipperIframeHeight) {
+			container.style.height = `${clipperIframeHeight}px`;
 		}
 
 		const header = document.createElement('div');
@@ -62,6 +65,16 @@ declare global {
 		container.appendChild(handle);
 		addResizeListener(container, handle, 'w');
 
+		const southHandle = document.createElement('div');
+		southHandle.className = `resize-handle s`;
+		container.appendChild(southHandle);
+		addResizeListener(container, southHandle, 's');
+
+		const southWestHandle = document.createElement('div');
+		southWestHandle.className = 'resize-handle sw';
+		container.appendChild(southWestHandle);
+		addResizeListener(container, southWestHandle, 'sw');
+
 		document.body.appendChild(container);
 	}
 
@@ -79,6 +92,8 @@ declare global {
 			startLeft = container.offsetLeft;
 			startTop = container.offsetTop;
 
+			document.body.style.cursor = window.getComputedStyle(handle).cursor;
+	
 			const iframe = container.querySelector('#obsidian-clipper-iframe');
 			if (iframe) iframe.classList.add('is-resizing');
 	
@@ -124,9 +139,11 @@ declare global {
 				isResizing = false;
 				const iframe = container.querySelector('#obsidian-clipper-iframe');
 				if (iframe) iframe.classList.remove('is-resizing');
+				document.body.style.cursor = '';
 				
 				const newWidth = container.offsetWidth;
-				browser.storage.local.set({ clipperIframeWidth: newWidth });
+				const newHeight = container.offsetHeight;
+				browser.storage.local.set({ clipperIframeWidth: newWidth, clipperIframeHeight: newHeight });
 
 				document.onmousemove = null;
 				document.onmouseup = null;
