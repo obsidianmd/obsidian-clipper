@@ -34,6 +34,7 @@
 	--popup-height: 100%;
 	--popup-max-height: none;
 	--chromium-popup-height: auto;
+	--background-primary:transparent;
 }
 
 #popup {
@@ -76,16 +77,13 @@
 	}
 
 	::-webkit-scrollbar{
-		width: 8px;
+		width: 4px;
 	}
 	::-webkit-scrollbar-track-piece {
-		background-color: var(--background-primary);
+		background-color: var(--scrollbar-background-primary);
 	}
 	::-webkit-scrollbar-thumb {
 		background-color: var(--background-modifier-border-hover);
-		outline: 2px solid var(--background-primary);
-		outline-offset: -2px;
-		border: 1px solid var(--background-primary);
 		border-radius: 10px;
 	}
 	::-webkit-scrollbar-thumb:hover {
@@ -121,13 +119,13 @@
 	}
 
 	#note-content-container {
+		border-top: 1px solid var(--divider-color);
 		display: flex;
 		flex-grow: 1;
 		#note-content-field {
 			background-color: transparent;
 			border-radius: 0;
 			border: none;
-			border-top: 1px solid var(--divider-color);
 			padding: 10px var(--popup-padding);
 			resize: none;
 			&:active,
@@ -162,6 +160,18 @@
 			min-width: 100px;
 			cursor: default;
 		}
+	}
+}
+
+// Scrollbar styles for Chromium
+.is-chromium {
+	.metadata-properties {
+		margin-inline-end: 2px;
+	}
+	#note-content-container {
+		padding-top: 2px;
+		padding-bottom: 2px;
+		padding-inline-end: 2px;
 	}
 }
 
@@ -284,15 +294,6 @@
 	padding: calc(var(--popup-padding) * 0.5) calc(var(--popup-padding) * 0.5) 0;
 	align-items: center;
 	gap: 2px;
-}
-
-.is-embedded #embedded-header {
-	display: flex;
-}
-
-#embedded-header {
-	display: none;
-	border-bottom: 1px solid var(--divider-color);
 }
 
 #template-container {
