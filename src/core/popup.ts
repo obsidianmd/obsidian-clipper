@@ -35,7 +35,6 @@ let templates: Template[] = [];
 let currentVariables: { [key: string]: string } = {};
 let currentTabId: number | undefined;
 let lastSelectedVault: string | null = null;
-let isHighlighterMode = false;
 
 const isSidePanel = window.location.pathname.includes('side-panel.html');
 
@@ -269,16 +268,16 @@ function setupMessageListeners() {
 				}
 			}
 		} else if (request.action === "highlightsUpdated") {
-			// Refresh fields when highlights are updated
-			if (currentTabId !== undefined) {
-				refreshFields(currentTabId);
+			if (request.tabId === currentTabId) {
+				// Refresh fields when highlights are updated
+				if (currentTabId !== undefined) {
+					refreshFields(currentTabId);
+				}
 			}
 		} else if (request.action === "updatePopupHighlighterUI") {
-			isHighlighterMode = request.isActive;
-			updateHighlighterModeUI(request.isActive);
+			// This message is now handled by checkHighlighterModeState
 		} else if (request.action === "highlighterModeChanged") {
-			isHighlighterMode = request.isActive;
-			updateHighlighterModeUI(isHighlighterMode);
+			// This message is now handled by checkHighlighterModeState
 		}
 	});
 }
@@ -1019,8 +1018,12 @@ function handleTemplateChange(templateId: string) {
 
 async function checkHighlighterModeState(tabId: number) {
 	try {
-		const result = await browser.storage.local.get('isHighlighterMode');
-		isHighlighterMode = result.isHighlighterMode as boolean;
+		const response = await browser.runtime.sendMessage({
+			action: "getHighlighterMode",
+			tabId: tabId
+		}) as { isActive: boolean };
+
+		const isHighlighterMode = response.isActive;
 		
 		loadedSettings = await loadSettings();
 		
@@ -1028,7 +1031,6 @@ async function checkHighlighterModeState(tabId: number) {
 	} catch (error) {
 		console.error('Error checking highlighter mode state:', error);
 		// If there's an error, assume highlighter mode is off
-		isHighlighterMode = false;
 		updateHighlighterModeUI(false);
 	}
 }

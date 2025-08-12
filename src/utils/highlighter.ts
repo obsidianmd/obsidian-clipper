@@ -777,8 +777,11 @@ export function applyHighlights() {
 }
 
 // Notify that highlights have been updated
-function notifyHighlightsUpdated() {
-	browser.runtime.sendMessage({ action: "highlightsUpdated" });
+async function notifyHighlightsUpdated() {
+	const response = await browser.runtime.sendMessage({ action: "getActiveTab" }) as { tabId?: number; error?: string };
+	if (response.tabId) {
+		browser.runtime.sendMessage({ action: "highlightsUpdated", tabId: response.tabId });
+	}
 }
 
 // Get all highlight contents
