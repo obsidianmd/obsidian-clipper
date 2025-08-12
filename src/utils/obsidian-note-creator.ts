@@ -64,24 +64,6 @@ export async function generateFrontmatter(properties: Property[]): Promise<strin
 	return frontmatter;
 }
 
-async function copyToClipboard(text: string): Promise<void> {
-	try {
-		const response: any = await browser.runtime.sendMessage({
-			action: 'copy-to-clipboard',
-			text: text
-		});
-
-		if (response && response.success) {
-			return;
-		} else {
-			throw new Error(response?.error || 'Failed to copy to clipboard');
-		}
-	} catch (err) {
-		console.error("Error sending message to background script:", err);
-		throw err;
-	}
-}
-
 export async function saveToObsidian(
 	fileContent: string,
 	noteName: string,
@@ -128,18 +110,17 @@ export async function saveToObsidian(
 		openObsidianUrl(obsidianUrl);
 	} else {
 		// Use clipboard
-		try {
-			await copyToClipboard(fileContent);
+		navigator.clipboard.writeText(fileContent).then(() => {
 			obsidianUrl += `&clipboard`;
 			openObsidianUrl(obsidianUrl);
 			console.log('Obsidian URL:', obsidianUrl);
-		} catch (err) {
+		}).catch(err => {
 			console.log('Obsidian URL:', obsidianUrl);
 			console.error('Failed to copy content to clipboard:', err);
 			obsidianUrl += `&clipboard`;
 			obsidianUrl += `&content=${encodeURIComponent("There was an error creating the content. Make sure you are using Obsidian 1.7.2 or above.")}`;
 			openObsidianUrl(obsidianUrl);
-		}
+		});
 	}
 
 	function openObsidianUrl(url: string): void {
