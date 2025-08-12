@@ -76,19 +76,7 @@
 		height: 100%;
 	}
 
-	::-webkit-scrollbar{
-		width: 4px;
-	}
-	::-webkit-scrollbar-track-piece {
-		background-color: var(--scrollbar-background-primary);
-	}
-	::-webkit-scrollbar-thumb {
-		background-color: var(--background-modifier-border-hover);
-		border-radius: 10px;
-	}
-	::-webkit-scrollbar-thumb:hover {
-		background-color: var(--background-modifier-border-focus);
-	}
+
 }
 
 .clipper {
@@ -164,6 +152,7 @@
 }
 
 // Scrollbar styles for Chromium
+.is-safari,
 .is-chromium {
 	.metadata-properties {
 		margin-inline-end: 2px;
