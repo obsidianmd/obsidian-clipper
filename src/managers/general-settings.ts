@@ -185,6 +185,7 @@ export function initializeGeneralSettings(): void {
 		initializeBetaFeaturesToggle();
 		initializeLegacyModeToggle();
 		initializeSilentOpenToggle();
+		initializeVaultInput();
 		initializeOpenBehaviorDropdown();
 		initializeKeyboardShortcuts();
 		initializeToggles();
@@ -244,6 +245,22 @@ function initializeShowMoreActionsToggle(): void {
 	initializeSettingToggle('show-more-actions-toggle', generalSettings.showMoreActionsButton, (checked) => {
 		saveSettings({ ...generalSettings, showMoreActionsButton: checked });
 	});
+}
+
+function initializeVaultInput(): void {
+	const vaultInput = document.getElementById('vault-input') as HTMLInputElement;
+	if (vaultInput) {
+		vaultInput.addEventListener('keypress', (e) => {
+			if (e.key === 'Enter') {
+				e.preventDefault();
+				const newVault = vaultInput.value.trim();
+				if (newVault) {
+					addVault(newVault);
+					vaultInput.value = '';
+				}
+			}
+		});
+	}
 }
 
 async function initializeKeyboardShortcuts(): Promise<void> {
