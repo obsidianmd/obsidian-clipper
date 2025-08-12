@@ -12,8 +12,7 @@
 		"contextMenus",
 		"sidePanel",
 		"storage",
-		"scripting",
-		"tabs"
+		"scripting"
 	],
 	"host_permissions": [
 		"<all_urls>",
