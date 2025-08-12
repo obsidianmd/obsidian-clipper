@@ -11,6 +11,7 @@
 }
 
 #obsidian-clipper-iframe {
+	color-scheme: light dark;
 	flex-grow: 1;
 	border: none;
 	&.is-resizing {
@@ -21,11 +22,12 @@
 }
 
 #obsidian-clipper-container {
+	color-scheme: light dark;
 	position: fixed;
 	top: 10px;
 	right: 10px;
 	z-index: 9999999999;
-	background-color: var(--obsidian-clipper-background-color);
+	background-color: var(--obsidian-clipper-background-primary);
 	border-radius: 8px;
 	box-shadow: 0 0 0 1px rgba(0,0,0,0.1), 0 0 10px rgba(0,0,0,0.1);
 	display: flex;
@@ -37,11 +39,12 @@
 }
 
 :root {
-	--obsidian-clipper-background-color: #fff;
+	--obsidian-clipper-background-primary: #fff;
+	--obsidian-clipper-text-muted: #5c5c5c;
 }
 @media (prefers-color-scheme: dark) {
 	:root {
-		--obsidian-clipper-background-color: #1e1e1e;
+		--obsidian-clipper-background-primary: #1e1e1e;
 	}
 }
 
@@ -64,12 +67,14 @@
 	background-color: transparent;
 	align-items: center;
 	padding: 4px;
-	height: 20px;
+	height: 28px;
+	justify-content: flex-end;
+	border-bottom: 1px solid var(--obsidian-clipper-divider-color);
 }
 
 #obsidian-clipper-close-button {
 	background: none;
-	color: #000;
+	color: var(--obsidian-clipper-text-muted);
 	border: none;
 	cursor: pointer;
 	padding: 0;

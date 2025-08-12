@@ -543,16 +543,6 @@ function setupEventListeners(tabId: number) {
 	if (readerModeButton) {
 		readerModeButton.addEventListener('click', () => toggleReaderMode(tabId));
 	}
-
-	if (isSidePanel) {
-		const closeButton = document.getElementById('obsidian-clipper-close-button');
-		if (closeButton) {
-			closeButton.addEventListener('click', () => {
-				const port = browser.runtime.connect({ name: "close-iframe-port" });
-				port.postMessage({ action: "close-iframe-from-popup", tabId });
-			});
-		}
-	}
 }
 
 async function initializeUI() {

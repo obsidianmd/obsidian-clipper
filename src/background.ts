@@ -86,16 +86,6 @@ browser.runtime.onConnect.addListener((port) => {
 	}
 });
 
-browser.runtime.onConnect.addListener(port => {
-	if (port.name === "close-iframe-port") {
-		port.onMessage.addListener((msg: any) => {
-			if (msg.action === "close-iframe-from-popup" && msg.tabId) {
-				browser.tabs.sendMessage(msg.tabId, { action: "close-iframe" });
-			}
-		});
-	}
-});
-
 async function sendMessageToPopup(tabId: number, message: any): Promise<void> {
 	if (isPopupOpen(tabId)) {
 		try {

@@ -41,6 +41,16 @@ declare global {
 			container.style.width = `${clipperIframeWidth}px`;
 		}
 
+		const header = document.createElement('div');
+		header.id = 'obsidian-clipper-header';
+		container.appendChild(header);
+
+		const closeButton = document.createElement('button');
+		closeButton.id = 'obsidian-clipper-close-button';
+		closeButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class=""><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>`;
+		closeButton.onclick = () => container.remove();
+		header.appendChild(closeButton);
+
 		const iframe = document.createElement('iframe');
 		iframe.id = iframeId;
 		iframe.src = browser.runtime.getURL('side-panel.html?context=iframe');
