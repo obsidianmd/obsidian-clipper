@@ -60,7 +60,6 @@ interface ContentResponse {
 
 export async function extractPageContent(tabId: number): Promise<ContentResponse | null> {
 	try {
-		// Send message through background script for Firefox compatibility
 		const response = await browser.runtime.sendMessage({ 
 			action: "sendMessageToTab", 
 			tabId: tabId, 
