@@ -517,7 +517,9 @@ async function setupTabListeners() {
 }
 
 const debouncedPaintHighlights = debounce(async (tabId: number) => {
-	await setHighlighterMode(tabId, false);
+	if (!getHighlighterModeForTab(tabId)) {
+		await setHighlighterMode(tabId, false);
+	}
 	await paintHighlights(tabId);
 }, 250);
 

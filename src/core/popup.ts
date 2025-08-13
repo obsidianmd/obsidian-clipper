@@ -37,6 +37,8 @@ let currentTabId: number | undefined;
 let lastSelectedVault: string | null = null;
 
 const isSidePanel = window.location.pathname.includes('side-panel.html');
+const urlParams = new URLSearchParams(window.location.search);
+const isIframe = urlParams.get('context') === 'iframe';
 
 // Memoize compileTemplate with a short expiration and URL-sensitive key
 const memoizedCompileTemplate = memoizeWithExpiration(
@@ -252,9 +254,6 @@ function setupMessageListeners() {
 			}
 		} else if (request.action === "activeTabChanged") {
 			// Only handle active tab changes if we're in side panel mode, not iframe mode
-			const urlParams = new URLSearchParams(window.location.search);
-			const isIframe = urlParams.get('context') === 'iframe';
-			
 			if (!isIframe) {
 				currentTabId = request.tabId;
 				if (request.isValidUrl) {
@@ -284,8 +283,6 @@ function setupMessageListeners() {
 
 document.addEventListener('DOMContentLoaded', async function() {
 	const settings = await loadSettings();
-	const urlParams = new URLSearchParams(window.location.search);
-	const isIframe = urlParams.get('context') === 'iframe';
 	if (isIframe) {
 		document.documentElement.classList.add('is-embedded');
 	}
@@ -1047,7 +1044,7 @@ async function toggleHighlighterMode(tabId: number) {
 			updateHighlighterModeUI(isNowActive);
 
 			// Close the popup if highlighter mode is turned on and not in side panel
-			if (isNowActive && !isSidePanel) {
+			if (isNowActive && !isSidePanel && !isIframe) {
 				setTimeout(() => window.close(), 50);
 			}
 		} else {

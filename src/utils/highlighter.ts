@@ -853,7 +853,6 @@ function exitHighlighterMode() {
 	console.log('Exiting highlighter mode');
 	toggleHighlighterMenu(false);
 	browser.runtime.sendMessage({ action: "setHighlighterMode", isActive: false });
-	browser.storage.local.set({ isHighlighterMode: false });
 
 	// Remove highlight overlays if "Always show highlights" is off
 	if (!generalSettings.alwaysShowHighlights) {
