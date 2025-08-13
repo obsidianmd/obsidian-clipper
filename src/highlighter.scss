@@ -42,7 +42,6 @@
 		0px 8px 16px -4px rgba(0, 0, 0, 0.06);
 	display: flex;
 	flex-direction: column;
-	overflow: hidden;
 	user-select: none;
 	transform-origin: right top;
 	opacity: 0;
@@ -103,36 +102,6 @@
 	height: 16px;
 	cursor: nesw-resize;
 	z-index: 99999999999;
-}
-
-#obsidian-clipper-header {
-	display: flex;
-	justify-content: space-between;
-	background-color: transparent;
-	align-items: center;
-	margin-top: 8px;
-	padding: 4px 8px;
-	height: 20px;
-	justify-content: flex-end;
-	border-bottom: 1px solid var(--obsidian-clipper-divider-color);
-}
-
-#obsidian-clipper-close-button {
-	background: none !important;
-	color: var(--obsidian-clipper-text-muted);
-	box-shadow: none !important;
-	cursor: default;
-	border: none;
-	padding: 0;
-	display: flex !important;
-	align-items: center;
-	justify-content: center;
-	height: 24px !important;
-	width: 24px !important;
-	svg {
-		width: 16px;
-		height: 16px;
-	}
 }
 
 /* Hide the clip button on iPadOS because it's not supported */

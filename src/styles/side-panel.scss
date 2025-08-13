@@ -1,3 +1,6 @@
 .is-side-panel:not(.is-embedded) {
-    --divider-color: rgba(var(--mono-rgb-100), .04);
+	--divider-color: rgba(var(--mono-rgb-100), .04);
+	#embedded-mode {
+		display: none;
+	}
 }
