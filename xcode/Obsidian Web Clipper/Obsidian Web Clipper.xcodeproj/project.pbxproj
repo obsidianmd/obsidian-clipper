@@ -13,6 +13,8 @@
 		7A64805A2D820A9800A5924D /* reader.css in Resources */ = {isa = PBXBuildFile; fileRef = 7A6480582D820A9800A5924D /* reader.css */; };
 		7A6535C92D8B530300DDF54C /* reader-script.js in Resources */ = {isa = PBXBuildFile; fileRef = 7A6535C82D8B530300DDF54C /* reader-script.js */; };
 		7A6535CA2D8B530300DDF54C /* reader-script.js in Resources */ = {isa = PBXBuildFile; fileRef = 7A6535C82D8B530300DDF54C /* reader-script.js */; };
+		7AC138872E4B9C8E00B6F4CF /* side-panel.html in Resources */ = {isa = PBXBuildFile; fileRef = 7AC138862E4B9C8E00B6F4CF /* side-panel.html */; };
+		7AC138882E4B9C8F00B6F4CF /* side-panel.html in Resources */ = {isa = PBXBuildFile; fileRef = 7AC138862E4B9C8E00B6F4CF /* side-panel.html */; };
 		7AEF057F2CA0F50D005FFBC2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AEF057E2CA0F50D005FFBC2 /* AppDelegate.swift */; };
 		7AEF05812CA0F50D005FFBC2 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AEF05802CA0F50D005FFBC2 /* SceneDelegate.swift */; };
 		7AEF05842CA0F50D005FFBC2 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05832CA0F50D005FFBC2 /* Base */; };
@@ -103,6 +105,7 @@
 		7A15D46F2CB5D97B00BC4F99 /* highlighter.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; name = highlighter.css; path = ../../../dist_safari/highlighter.css; sourceTree = "<group>"; };
 		7A6480582D820A9800A5924D /* reader.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; name = reader.css; path = ../../../dist_safari/reader.css; sourceTree = "<group>"; };
 		7A6535C82D8B530300DDF54C /* reader-script.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = "reader-script.js"; path = "../../../dist_safari/reader-script.js"; sourceTree = "<group>"; };
+		7AC138862E4B9C8E00B6F4CF /* side-panel.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = "side-panel.html"; path = "/Users/kepano/Documents/Git/obsidian-clipper/dist_safari/side-panel.html"; sourceTree = "<absolute>"; };
 		7AEF056F2CA0F50D005FFBC2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = ../Base.lproj/Main.html; sourceTree = "<group>"; };
 		7AEF05702CA0F50D005FFBC2 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
 		7AEF05712CA0F50D005FFBC2 /* Style.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = Style.css; sourceTree = "<group>"; };
@@ -270,6 +273,7 @@
 				7AEF05CB2CA0F50D005FFBC2 /* background.js */,
 				7AEF05CC2CA0F50D005FFBC2 /* popup.js */,
 				7A15D46F2CB5D97B00BC4F99 /* highlighter.css */,
+				7AC138862E4B9C8E00B6F4CF /* side-panel.html */,
 				7AEF05CF2CA0F50D005FFBC2 /* popup.html */,
 				7AEF05D02CA0F50D005FFBC2 /* browser-polyfill.min.js */,
 				7AEF05D32CA0F50D005FFBC2 /* icons */,
@@ -437,6 +441,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7AC138872E4B9C8E00B6F4CF /* side-panel.html in Resources */,
 				7A6535C92D8B530300DDF54C /* reader-script.js in Resources */,
 				7AEF05F32CA0F50D005FFBC2 /* settings.html in Resources */,
 				7A15D4712CB5D97B00BC4F99 /* highlighter.css in Resources */,
@@ -457,6 +462,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7AC138882E4B9C8F00B6F4CF /* side-panel.html in Resources */,
 				7A6535CA2D8B530300DDF54C /* reader-script.js in Resources */,
 				7AEF05E62CA0F50D005FFBC2 /* settings.html in Resources */,
 				7A15D4702CB5D97B00BC4F99 /* highlighter.css in Resources */,

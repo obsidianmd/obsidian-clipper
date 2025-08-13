@@ -13,13 +13,13 @@
 					<option value=""></option>
 				</select>
 			</div>
-			<div id="popup-actions">
+			<div class="popup-actions">
 				<a href="#" id="show-variables" class="clickable-icon" 
 					data-i18n-title="showPageVariables">
 					<i data-lucide="ellipsis"></i>
 				</a>
-				<a href="#" id="reader-mode" class="clickable-icon" style="display: none;
-					data-i18n-title="reader"">
+				<a href="#" id="reader-mode" class="clickable-icon" style="display: none;"
+					data-i18n-title="reader">
 					<i data-lucide="book-open"></i>
 				</a>
 				<a href="#" id="highlighter-mode" class="clickable-icon" 
@@ -33,14 +33,18 @@
 				<a href="#" id="open-settings" class="clickable-icon" 
 					data-i18n-title="settings">
 					<i data-lucide="settings"></i>
-				</a>		
+				</a>
+				<a href="#" id="embedded-mode" class="clickable-icon" 
+					data-i18n-title="embeddedMode">
+					<i data-lucide="x"></i>
+				</a>
 			</div>
 		</div>
 		<p class="error-message" style="display: none;"></p>
 		<div class="clipper">
 			<textarea id="note-name-field" type="text" data-i18n="noteName" rows="1"></textarea>
 			<div class="metadata-properties-header">
-				<span data-i18n="properties">Properties</span>
+				<span data-i18n="properties"></span>
 				<i data-lucide="chevron-down"></i>
 			</div>
 			<div class="metadata-properties"></div>
@@ -58,7 +62,7 @@
 					<textarea id="prompt-context" rows="3"></textarea>
 					<div class="interpreter-controls">
 						<select id="model-select" style="display: none;"></select>
-						<button id="interpret-btn" data-i18n="interpret">interpret</button>
+						<button id="interpret-btn" data-i18n="interpret"></button>
 						<span id="interpreter-timer" style="display: none;"></span>
 					</div>
 					<div id="token-counter" class="token-counter"></div>

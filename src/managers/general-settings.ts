@@ -186,6 +186,7 @@ export function initializeGeneralSettings(): void {
 		initializeLegacyModeToggle();
 		initializeSilentOpenToggle();
 		initializeVaultInput();
+		initializeOpenBehaviorDropdown();
 		initializeKeyboardShortcuts();
 		initializeToggles();
 		setShortcutInstructions();
@@ -216,6 +217,7 @@ function initializeAutoSave(): void {
 }
 
 function saveSettingsFromForm(): void {
+	const openBehaviorDropdown = document.getElementById('open-behavior-dropdown') as HTMLSelectElement;
 	const showMoreActionsToggle = document.getElementById('show-more-actions-toggle') as HTMLInputElement;
 	const betaFeaturesToggle = document.getElementById('beta-features-toggle') as HTMLInputElement;
 	const legacyModeToggle = document.getElementById('legacy-mode-toggle') as HTMLInputElement;
@@ -226,6 +228,7 @@ function saveSettingsFromForm(): void {
 
 	const updatedSettings = {
 		...generalSettings, // Keep existing settings
+		openBehavior: (openBehaviorDropdown?.value as 'popup' | 'embedded') ?? generalSettings.openBehavior,
 		showMoreActionsButton: showMoreActionsToggle?.checked ?? generalSettings.showMoreActionsButton,
 		betaFeatures: betaFeaturesToggle?.checked ?? generalSettings.betaFeatures,
 		legacyMode: legacyModeToggle?.checked ?? generalSettings.legacyMode,
@@ -308,6 +311,16 @@ function initializeSilentOpenToggle(): void {
 	initializeSettingToggle('silent-open-toggle', generalSettings.silentOpen, (checked) => {
 		saveSettings({ ...generalSettings, silentOpen: checked });
 	});
+}
+
+function initializeOpenBehaviorDropdown(): void {
+	initializeSettingDropdown(
+		'open-behavior-dropdown',
+		generalSettings.openBehavior,
+		(value) => {
+			saveSettings({ ...generalSettings, openBehavior: value as 'popup' | 'embedded' });
+		}
+	);
 }
 
 function initializeResetDefaultTemplateButton(): void {

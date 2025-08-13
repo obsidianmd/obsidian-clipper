@@ -17,7 +17,6 @@ import { initializeInterpreter, handleInterpreterUI, collectPromptVariables } fr
 import { adjustNoteNameHeight } from '../utils/ui-utils';
 import { debugLog } from '../utils/debug';
 import { showVariables, initializeVariablesPanel, updateVariablesPanel } from '../managers/inspect-variables';
-import { ensureContentScriptLoaded } from '../utils/content-script-utils';
 import { isBlankPage, isValidUrl } from '../utils/active-tab-manager';
 import { memoizeWithExpiration } from '../utils/memoize';
 import { debounce } from '../utils/debounce';
@@ -36,9 +35,10 @@ let templates: Template[] = [];
 let currentVariables: { [key: string]: string } = {};
 let currentTabId: number | undefined;
 let lastSelectedVault: string | null = null;
-let isHighlighterMode = false;
 
 const isSidePanel = window.location.pathname.includes('side-panel.html');
+const urlParams = new URLSearchParams(window.location.search);
+const isIframe = urlParams.get('context') === 'iframe';
 
 // Memoize compileTemplate with a short expiration and URL-sensitive key
 const memoizedCompileTemplate = memoizeWithExpiration(
@@ -60,16 +60,45 @@ const memoizedGenerateFrontmatter = memoizeWithExpiration(
 	{ expirationMs: 50 }
 );
 
+// Helper function to get tab info from background script
+async function getTabInfo(tabId: number): Promise<{ id: number; url: string }> {
+	const response = await browser.runtime.sendMessage({ action: "getTabInfo", tabId }) as { success?: boolean; tab?: { id: number; url: string }; error?: string };
+	if (!response || !response.success || !response.tab) {
+		throw new Error((response && response.error) || 'Failed to get tab info');
+	}
+	return response.tab;
+}
+
+// Helper function to get current tab URL and title for stats
+async function getCurrentTabInfo(): Promise<{ url: string; title?: string }> {
+	if (!currentTabId) {
+		return { url: '' };
+	}
+	
+	try {
+		const tab = await getTabInfo(currentTabId);
+		// Try to get the title from the extracted content if available
+		const extractedData = await memoizedExtractPageContent(currentTabId);
+		return { 
+			url: tab.url, 
+			title: extractedData?.title || document.title 
+		};
+	} catch (error) {
+		console.warn('Failed to get current tab info for stats:', error);
+		return { url: '' };
+	}
+}
+
 // Memoize extractPageContent with URL-sensitive key and short expiration
 const memoizedExtractPageContent = memoizeWithExpiration(
 	async (tabId: number) => {
-		const tab = await browser.tabs.get(tabId);
+		await getTabInfo(tabId);
 		return extractPageContent(tabId);
 	},
 	{ 
 		expirationMs: 50, 
 		keyFn: async (tabId: number) => {
-			const tab = await browser.tabs.get(tabId);
+			const tab = await getTabInfo(tabId);
 			return `${tabId}-${tab.url}`;
 		}
 	}
@@ -152,7 +181,7 @@ async function initializeExtension(tabId: number) {
 
 		updateVaultDropdown(loadedSettings.vaults);
 
-		const tab = await browser.tabs.get(tabId);
+		const tab = await getTabInfo(tabId);
 		if (!tab.url || isBlankPage(tab.url)) {
 			showError('pageCannotBeClipped');
 			return;
@@ -161,7 +190,6 @@ async function initializeExtension(tabId: number) {
 			showError('onlyHttpSupported');
 			return;
 		}
-		await ensureContentScriptLoaded(tabId);
 
 		await loadAndSetupTemplates();
 
@@ -225,87 +253,131 @@ function setupMessageListeners() {
 				}
 			}
 		} else if (request.action === "activeTabChanged") {
-			currentTabId = request.tabId;
-			if (request.isValidUrl) {
-				if (currentTabId !== undefined) {
-					refreshFields(currentTabId); // Force template check when URL changes
+			// Only handle active tab changes if we're in side panel mode, not iframe mode
+			if (!isIframe) {
+				currentTabId = request.tabId;
+				if (request.isValidUrl) {
+					if (currentTabId !== undefined) {
+						refreshFields(currentTabId); // Force template check when URL changes
+					}
+				} else if (request.isBlankPage) {
+					showError(getMessage('pageCannotBeClipped'));
+				} else {
+					showError(getMessage('onlyHttpSupported'));
 				}
-			} else if (request.isBlankPage) {
-				showError(getMessage('pageCannotBeClipped'));
-			} else {
-				showError(getMessage('onlyHttpSupported'));
 			}
 		} else if (request.action === "highlightsUpdated") {
-			// Refresh fields when highlights are updated
-			if (currentTabId !== undefined) {
-				refreshFields(currentTabId);
+			if (request.tabId === currentTabId) {
+				// Refresh fields when highlights are updated
+				if (currentTabId !== undefined) {
+					refreshFields(currentTabId);
+				}
 			}
 		} else if (request.action === "updatePopupHighlighterUI") {
-			isHighlighterMode = request.isActive;
-			updateHighlighterModeUI(request.isActive);
+			// This message is now handled by checkHighlighterModeState
 		} else if (request.action === "highlighterModeChanged") {
-			isHighlighterMode = request.isActive;
-			updateHighlighterModeUI(isHighlighterMode);
+			// This message is now handled by checkHighlighterModeState
 		}
 	});
 }
 
 document.addEventListener('DOMContentLoaded', async function() {
-	browser.runtime.connect({ name: 'popup' });
-
-	const refreshButton = document.getElementById('refresh-pane');
-	if (refreshButton) {
-		refreshButton.addEventListener('click', (e) => {
-			e.preventDefault();
-			refreshPopup();
-			initializeIcons(refreshButton);
-		});
-	}
-	const settingsButton = document.getElementById('open-settings');
-	if (settingsButton) {
-		settingsButton.addEventListener('click', async function() {
-			browser.runtime.openOptionsPage();
-			setTimeout(() => window.close(), 50);
-		});
-		initializeIcons(settingsButton);
+	const settings = await loadSettings();
+	if (isIframe) {
+		document.documentElement.classList.add('is-embedded');
 	}
 
-	const tabs = await browser.tabs.query({active: true, currentWindow: true});
-	const currentTab = tabs[0];
-	currentTabId = currentTab?.id;
+	const isSidePanel = document.documentElement.classList.contains('is-side-panel');
 
-	if (currentTabId) {
-		try {		
+	try {
+		// Get the active tab via background script to handle Firefox compatibility
+		const response = await browser.runtime.sendMessage({ action: "getActiveTab" }) as { tabId?: number; error?: string };
+		if (!response || response.error || !response.tabId) {
+			showError(getMessage('pleaseReload'));
+			return;
+		}
+		
+		currentTabId = response.tabId;
+		const tab = await getTabInfo(currentTabId);
+
+		// Check if we should open in an iframe, but only if the URL is valid
+		if (isValidUrl(tab.url) && !isBlankPage(tab.url) && settings.openBehavior === 'embedded' && !isIframe && !isSidePanel) {
+			try {
+				const response = await browser.runtime.sendMessage({ action: "getActiveTabAndToggleIframe" }) as { success?: boolean; error?: string };
+				if (response && response.success) {
+					window.close();
+					return; // Exit script after closing the window
+				} else if (response && response.error) {
+					console.error('Error toggling iframe:', response.error);
+					// If there's an error, we'll fall through and open the normal popup.
+				}
+			} catch (error) {
+				console.error('Error toggling iframe:', error);
+				// If there's an error, we'll fall through and open the normal popup.
+			}
+		}
+
+		// Connect to the background script for communication
+		browser.runtime.connect({ name: 'popup' });
+
+		// Setup event listeners for popup buttons
+		const refreshButton = document.getElementById('refresh-pane');
+		if (refreshButton) {
+			refreshButton.addEventListener('click', (e) => {
+				e.preventDefault();
+				refreshPopup();
+				initializeIcons(refreshButton);
+			});
+		}
+		const settingsButton = document.getElementById('open-settings');
+		if (settingsButton) {
+			settingsButton.addEventListener('click', async function() {
+				try {
+					await browser.runtime.sendMessage({ action: "openOptionsPage" });
+					setTimeout(() => window.close(), 50);
+				} catch (error) {
+					console.error('Error opening options page:', error);
+				}
+			});
+			initializeIcons(settingsButton);
+		}
+
+		// Initialize the rest of the popup
+		if (currentTabId) {
 			const initialized = await initializeExtension(currentTabId);
 			if (!initialized) {
-				showError(getMessage('pageCannotBeClipped'));
 				return;
 			}
 
-			// DOM-dependent initializations
-			updateVaultDropdown(loadedSettings.vaults);
-			populateTemplateDropdown();
-			setupEventListeners(currentTabId);
-			await initializeUI();
-			setupMetadataToggle();
+			try {
+				// DOM-dependent initializations
+				updateVaultDropdown(loadedSettings.vaults);
+				populateTemplateDropdown();
+				setupEventListeners(currentTabId);
+				await initializeUI();
+				setupMetadataToggle();
 
-			// Initial content load
-			await refreshFields(currentTabId);
+				// Initial content load
+				await refreshFields(currentTabId);
 
-			const showMoreActionsButton = document.getElementById('show-variables');
-			if (showMoreActionsButton) {
+				const showMoreActionsButton = document.getElementById('show-variables');
+				if (showMoreActionsButton) {
 					showMoreActionsButton.addEventListener('click', (e) => {
 						e.preventDefault();
 						showVariables();
 					});
 				}
-			determineMainAction();
-		} catch (error) {
-			console.error('Error initializing popup:', error);
-			showError(getMessage('pleaseReloadPage'));
+				determineMainAction();
+			} catch (error) {
+				console.error('Error initializing popup:', error);
+				showError(getMessage('pleaseReload'));
+			}
+		} else {
+			showError(getMessage('pleaseReload'));
 		}
-	} else {
-		showError(getMessage('pleaseReloadPage'));
+	} catch (error) {
+		console.error('Error getting active tab:', error);
+		showError(getMessage('pleaseReload'));
 	}
 });
 
@@ -331,6 +403,18 @@ function setupEventListeners(tabId: number) {
 	if (highlighterModeButton) {
 		highlighterModeButton.addEventListener('click', () => toggleHighlighterMode(tabId));
 	}
+
+	const embeddedModeButton = document.getElementById('embedded-mode');
+		if (embeddedModeButton) {
+			embeddedModeButton.addEventListener('click', async function() {
+				try {
+					await browser.runtime.sendMessage({ action: "getActiveTabAndToggleIframe" });
+					setTimeout(() => window.close(), 50);
+				} catch (error) {
+					console.error('Error toggling emedded iframe:', error);
+				}
+			});
+		}
 
 	const moreButton = document.getElementById('more-btn');
 	const moreDropdown = document.getElementById('more-dropdown');
@@ -423,7 +507,8 @@ function setupEventListeners(tabId: number) {
 
 							navigator.share(shareData)
 								.then(async () => {
-									await incrementStat('share', vault, path);
+									const tabInfo = await getCurrentTabInfo();
+									await incrementStat('share', vault, path, tabInfo.url, tabInfo.title);
 									const moreDropdown = document.getElementById('more-dropdown');
 									if (moreDropdown) {
 											moreDropdown.classList.remove('show');
@@ -560,7 +645,7 @@ async function refreshFields(tabId: number, checkTemplateTriggers: boolean = tru
 	}
 
 	try {
-		const tab = await browser.tabs.get(tabId);
+		const tab = await getTabInfo(tabId);
 		if (!tab.url || isBlankPage(tab.url)) {
 			showError('pageCannotBeClipped');
 			return;
@@ -686,7 +771,7 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 
 	for (const property of template.properties) {
 		const propertyDiv = createElementWithClass('div', 'metadata-property');
-		let value = await memoizedCompileTemplate(currentTabId!, unescapeValue(property.value), variables, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
+		let value = await memoizedCompileTemplate(currentTabId!, unescapeValue(property.value), variables, currentTabId ? await getTabInfo(currentTabId).then(tab => tab.url || '') : '');
 
 		const propertyType = generalSettings.propertyTypes.find(p => p.name === property.name)?.type || 'text';
 
@@ -743,7 +828,7 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 
 	const noteNameField = document.getElementById('note-name-field') as HTMLTextAreaElement;
 	if (noteNameField) {
-		let formattedNoteName = await memoizedCompileTemplate(currentTabId!, template.noteNameFormat, variables, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
+		let formattedNoteName = await memoizedCompileTemplate(currentTabId!, template.noteNameFormat, variables, currentTabId ? await getTabInfo(currentTabId).then(tab => tab.url || '') : '');
 		noteNameField.setAttribute('data-template-value', template.noteNameFormat);
 		noteNameField.value = formattedNoteName.trim();
 		adjustNoteNameHeight(noteNameField);
@@ -759,7 +844,7 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 			pathField.style.display = 'none';
 		} else {
 			pathContainer.style.display = 'flex';
-			let formattedPath = await memoizedCompileTemplate(currentTabId!, template.path, variables, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
+			let formattedPath = await memoizedCompileTemplate(currentTabId!, template.path, variables, currentTabId ? await getTabInfo(currentTabId).then(tab => tab.url || '') : '');
 			pathField.value = formattedPath;
 			pathField.setAttribute('data-template-value', template.path);
 		}
@@ -768,7 +853,7 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 	const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
 	if (noteContentField) {
 		if (template.noteContentFormat) {
-			let content = await memoizedCompileTemplate(currentTabId!, template.noteContentFormat, variables, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
+			let content = await memoizedCompileTemplate(currentTabId!, template.noteContentFormat, variables, currentTabId ? await getTabInfo(currentTabId).then(tab => tab.url || '') : '');
 			noteContentField.value = content;
 			noteContentField.setAttribute('data-template-value', template.noteContentFormat);
 		} else {
@@ -779,7 +864,7 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 
 	if (template) {
 		if (generalSettings.interpreterEnabled) {
-			await initializeInterpreter(template, variables, currentTabId!, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
+			await initializeInterpreter(template, variables, currentTabId!, currentTabId ? await getTabInfo(currentTabId).then(tab => tab.url || '') : '');
 
 			// Check if there are any prompt variables
 			const promptVariables = collectPromptVariables(template);
@@ -794,7 +879,7 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 					if (!modelConfig) {
 						throw new Error(`Model configuration not found for ${selectedModelId}`);
 					}
-					await handleInterpreterUI(template, variables, currentTabId!, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '', modelConfig);
+					await handleInterpreterUI(template, variables, currentTabId!, currentTabId ? await getTabInfo(currentTabId).then(tab => tab.url || '') : '', modelConfig);
 					
 					// Ensure the button shows the completed state after auto-run
 					if (interpretBtn) {
@@ -811,7 +896,7 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 			}
 		}
 
-		const replacedTemplate = await getReplacedTemplate(template, variables, currentTabId!, currentTabId ? await browser.tabs.get(currentTabId).then(tab => tab.url || '') : '');
+		const replacedTemplate = await getReplacedTemplate(template, variables, currentTabId!, currentTabId ? await getTabInfo(currentTabId).then(tab => tab.url || '') : '');
 		debugLog('Variables', 'Current template with replaced variables:', JSON.stringify(replacedTemplate, null, 2));
 	}
 }
@@ -930,8 +1015,12 @@ function handleTemplateChange(templateId: string) {
 
 async function checkHighlighterModeState(tabId: number) {
 	try {
-		const result = await browser.storage.local.get('isHighlighterMode');
-		isHighlighterMode = result.isHighlighterMode as boolean;
+		const response = await browser.runtime.sendMessage({
+			action: "getHighlighterMode",
+			tabId: tabId
+		}) as { isActive: boolean };
+
+		const isHighlighterMode = response.isActive;
 		
 		loadedSettings = await loadSettings();
 		
@@ -939,34 +1028,31 @@ async function checkHighlighterModeState(tabId: number) {
 	} catch (error) {
 		console.error('Error checking highlighter mode state:', error);
 		// If there's an error, assume highlighter mode is off
-		isHighlighterMode = false;
 		updateHighlighterModeUI(false);
 	}
 }
 
 async function toggleHighlighterMode(tabId: number) {
-	const result = await browser.storage.local.get('isHighlighterMode');
-	const wasHighlighterModeActive = result.isHighlighterMode as boolean;
-	isHighlighterMode = !wasHighlighterModeActive;
-	await setLocalStorage('isHighlighterMode', isHighlighterMode);
+	try {
+		const response = await browser.runtime.sendMessage({
+			action: "toggleHighlighterMode",
+			tabId: tabId
+		}) as { success: boolean, isActive: boolean, error?: string };
 
-	// Send a message to the content script to toggle the highlighter mode
-	await browser.tabs.sendMessage(tabId, { 
-		action: "setHighlighterMode", 
-		isActive: isHighlighterMode 
-	});
+		if (response && response.success) {
+			const isNowActive = response.isActive;
+			updateHighlighterModeUI(isNowActive);
 
-	// Notify the background script about the change
-	browser.runtime.sendMessage({ 
-		action: "highlighterModeChanged", 
-		isActive: isHighlighterMode 
-	});
-
-	// Close the popup if highlighter mode is turned on and not in side panel
-	if (isHighlighterMode && !wasHighlighterModeActive && !isSidePanel) {
-		window.close();
-	} else {
-		updateHighlighterModeUI(isHighlighterMode);
+			// Close the popup if highlighter mode is turned on and not in side panel
+			if (isNowActive && !isSidePanel && !isIframe) {
+				setTimeout(() => window.close(), 50);
+			}
+		} else {
+			throw new Error(response.error || "Failed to toggle highlighter mode.");
+		}
+	} catch (error) {
+		console.error('Error toggling highlighter mode:', error);
+		showError('failedToToggleHighlighter');
 	}
 }
 
@@ -1013,14 +1099,18 @@ async function toggleReaderMode(tabId: number) {
 
 export async function copyToClipboard(content: string) {
 	try {
-		await navigator.clipboard.writeText(content);
+		await browser.runtime.sendMessage({
+			action: 'copy-to-clipboard',
+			text: content
+		});
 		
 		const pathField = document.getElementById('path-name-field') as HTMLInputElement;
 		const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement;
 		const path = pathField?.value || '';
 		const vault = vaultDropdown?.value || '';
 		
-		await incrementStat('copyToClipboard', vault, path);
+		const tabInfo = await getCurrentTabInfo();
+		await incrementStat('copyToClipboard', vault, path, tabInfo.url, tabInfo.title);
 
 		// Change the main button text temporarily
 		const clipButton = document.getElementById('clip-btn');
@@ -1070,7 +1160,8 @@ async function handleSaveToDownloads() {
 			onError: (error) => showError('failedToSaveFile')
 		});
 
-		await incrementStat('saveFile', vault, path);
+		const tabInfo = await getCurrentTabInfo();
+		await incrementStat('saveFile', vault, path, tabInfo.url, tabInfo.title);
 
 		const moreDropdown = document.getElementById('more-dropdown');
 		if (moreDropdown) {
@@ -1116,7 +1207,6 @@ function determineMainAction() {
     }
 }
 
-// New function specifically for Obsidian operations
 async function handleClipObsidian(): Promise<void> {
     if (!currentTemplate) return;
 
@@ -1162,7 +1252,8 @@ async function handleClipObsidian(): Promise<void> {
         const path = isDailyNote ? '' : pathField?.value || '';
 
         await saveToObsidian(fileContent, noteName, path, selectedVault, currentTemplate.behavior);
-        await incrementStat('addToObsidian', selectedVault, path);
+        const tabInfo = await getCurrentTabInfo();
+        await incrementStat('addToObsidian', selectedVault, path, tabInfo.url, tabInfo.title);
 
         if (!currentTemplate.vault) {
             lastSelectedVault = selectedVault;

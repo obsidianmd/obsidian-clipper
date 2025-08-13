@@ -34,7 +34,7 @@
 	flex-direction: column;
 	flex-shrink: 1;
 	gap: var(--metadata-gap);
-	max-height: 46%;;
+	max-height: 46%;
 	overflow-y: scroll;
 	&:empty {
 		display: none;

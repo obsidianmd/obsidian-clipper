@@ -66,6 +66,7 @@ export interface Settings {
 	betaFeatures: boolean;
 	legacyMode: boolean;
 	silentOpen: boolean;
+	openBehavior: 'popup' | 'embedded';
 	highlighterEnabled: boolean;
 	alwaysShowHighlights: boolean;
 	highlightBehavior: string;

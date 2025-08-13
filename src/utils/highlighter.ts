@@ -777,8 +777,11 @@ export function applyHighlights() {
 }
 
 // Notify that highlights have been updated
-function notifyHighlightsUpdated() {
-	browser.runtime.sendMessage({ action: "highlightsUpdated" });
+async function notifyHighlightsUpdated() {
+	const response = await browser.runtime.sendMessage({ action: "getActiveTab" }) as { tabId?: number; error?: string };
+	if (response.tabId) {
+		browser.runtime.sendMessage({ action: "highlightsUpdated", tabId: response.tabId });
+	}
 }
 
 // Get all highlight contents
@@ -850,7 +853,6 @@ function exitHighlighterMode() {
 	console.log('Exiting highlighter mode');
 	toggleHighlighterMenu(false);
 	browser.runtime.sendMessage({ action: "setHighlighterMode", isActive: false });
-	browser.storage.local.set({ isHighlighterMode: false });
 
 	// Remove highlight overlays if "Always show highlights" is off
 	if (!generalSettings.alwaysShowHighlights) {

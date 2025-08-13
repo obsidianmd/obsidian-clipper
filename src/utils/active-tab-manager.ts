@@ -1,5 +1,4 @@
 import browser from './browser-polyfill';
-import { ensureContentScriptLoaded } from './content-script-utils';
 
 let currentActiveTabId: number | undefined;
 let currentWindowId: number | undefined;
@@ -9,7 +8,6 @@ export async function updateCurrentActiveTab(windowId: number) {
 	if (tabs[0] && tabs[0].id && tabs[0].url) {
 		currentActiveTabId = tabs[0].id;
 		currentWindowId = windowId;
-		await ensureContentScriptLoaded(currentActiveTabId);
 		browser.runtime.sendMessage({
 			action: "activeTabChanged",
 			tabId: currentActiveTabId,

@@ -124,11 +124,12 @@ export async function saveToObsidian(
 	}
 
 	function openObsidianUrl(url: string): void {
-		browser.tabs.query({active: true, currentWindow: true}).then((tabs) => {
-			const currentTab = tabs[0];
-			if (currentTab && currentTab.id) {
-				browser.tabs.update(currentTab.id, { url: url });
-			}
+		browser.runtime.sendMessage({
+			action: "openObsidianUrl",
+			url: url
+		}).catch((error) => {
+			console.error('Error opening Obsidian URL via background script:', error);
+			window.open(url, '_blank');
 		});
 	}
 }
