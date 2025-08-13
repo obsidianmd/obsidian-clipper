@@ -75,7 +75,6 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 					{ role: 'user', content: `${promptContext}` },
 					{ role: 'user', content: `${JSON.stringify(promptContent)}` }
 				],
-				temperature: 0.5,
 				max_tokens: 1600,
 				stream: false
 			};
@@ -112,8 +111,7 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 						"${promptContext}"
 						"${JSON.stringify(promptContent)}"`
 					}
-				],
-				temperature: 0.3
+				]
 			};
 			headers = {
 				...headers,
@@ -144,8 +142,7 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 					{ role: 'system', content: systemContent },
 					{ role: 'user', content: `${promptContext}` },
 					{ role: 'user', content: `${JSON.stringify(promptContent)}` }
-				],
-				temperature: 0.7
+				]
 			};
 			headers = {
 				...headers,
