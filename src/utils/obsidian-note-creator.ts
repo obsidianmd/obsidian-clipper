@@ -83,11 +83,12 @@ async function tryClipboardWrite(fileContent: string, obsidianUrl: string): Prom
 		openObsidianUrl(obsidianUrl);
 		console.log('Obsidian URL:', obsidianUrl);
 	} else {
-		console.error('All clipboard methods failed');
-		// Final fallback: use URI method with error message
-		obsidianUrl += `&clipboard`;
-		obsidianUrl += `&content=${encodeURIComponent("There was an error copying content to clipboard. Consider enabling Legacy mode in Web Clipper Settings → General if this issue persists.")}`;
+		console.error('All clipboard methods failed, falling back to URI method');
+		// Final fallback: use URI method with actual content (same as legacy mode)
+		// Note: We don't add &clipboard here since we're bypassing the clipboard entirely
+		obsidianUrl += `&content=${encodeURIComponent(fileContent)}`;
 		openObsidianUrl(obsidianUrl);
+		console.log('Obsidian URL (URI fallback):', obsidianUrl);
 	}
 }
 
