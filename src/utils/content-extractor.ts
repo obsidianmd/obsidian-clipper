@@ -113,8 +113,10 @@ export async function initializePageContent(
 	try {
 		currentUrl = currentUrl.replace(/#:~:text=[^&]+(&|$)/, '');
 
+		let selectedMarkdown = '';
 		if (selectedHtml) {
 			content = selectedHtml;
+			selectedMarkdown = createMarkdownContent(selectedHtml, currentUrl);
 		}
 
 		const noteName = sanitizeFileName(title);
@@ -125,7 +127,6 @@ export async function initializePageContent(
 		}
 
 		const markdownBody = createMarkdownContent(content, currentUrl);
-		const selectedMarkdown = createMarkdownContent(selectedHtml, currentUrl)
 
 		// Convert each highlight to markdown individually and create an object with text, timestamp, and notes (if not empty)
 		const highlightsData = highlights.map(highlight => {
@@ -150,7 +151,7 @@ export async function initializePageContent(
 			'{{content}}': markdownBody.trim(),
 			'{{contentHtml}}': content.trim(),
 			'{{selection}}': selectedMarkdown.trim(),
-			'{{selectionHtml}}': selectionHtml.trim(),
+			'{{selectionHtml}}': selectedHtml.trim(),
 			'{{date}}': dayjs().format('YYYY-MM-DDTHH:mm:ssZ').trim(),
 			'{{time}}': dayjs().format('YYYY-MM-DDTHH:mm:ssZ').trim(),
 			'{{description}}': description.trim(),
