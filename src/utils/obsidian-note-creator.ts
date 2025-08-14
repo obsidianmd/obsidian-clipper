@@ -7,7 +7,10 @@ import { copyToClipboard } from './clipboard-utils';
 export async function generateFrontmatter(properties: Property[]): Promise<string> {
 	let frontmatter = '---\n';
 	for (const property of properties) {
-		frontmatter += `${property.name}:`;
+		// Wrap property name in quotes if it contains YAML-ambiguous characters
+		const needsQuotes = /[:\s\{\}\[\],&*#?|<>=!%@\\-]/.test(property.name) || /^[\d]/.test(property.name) || /^(true|false|null|yes|no|on|off)$/i.test(property.name.trim());
+		const propertyKey = needsQuotes ? (property.name.includes('"') ? `'${property.name.replace(/'/g, "''")}'` : `"${property.name}"`) : property.name;
+		frontmatter += `${propertyKey}:`;
 
 		const propertyType = generalSettings.propertyTypes.find(p => p.name === property.name)?.type || 'text';
 
