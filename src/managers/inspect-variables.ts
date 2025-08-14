@@ -3,6 +3,7 @@ import { debounce } from '../utils/debounce';
 import { formatVariables } from '../utils/string-utils';
 import { Template } from '../types/types';
 import { getMessage } from '../utils/i18n';
+import { copyToClipboard } from '../utils/clipboard-utils';
 
 let variablesPanel: HTMLElement;
 let currentTemplate: Template | null;
@@ -128,14 +129,16 @@ function handleVariableSearch() {
 		key.addEventListener('click', function() {
 			const variableName = this.getAttribute('data-variable');
 			if (variableName) {
-				navigator.clipboard.writeText(variableName).then(() => {
-					const originalText = this.textContent;
-					this.textContent = getMessage('copied');
-					setTimeout(() => {
-						this.textContent = originalText;
-					}, 1000);
-				}).catch(err => {
-					console.error('Failed to copy text: ', err);
+				copyToClipboard(variableName).then(success => {
+					if (success) {
+						const originalText = this.textContent;
+						this.textContent = getMessage('copied');
+						setTimeout(() => {
+							this.textContent = originalText;
+						}, 1000);
+					} else {
+						console.error('Failed to copy text');
+					}
 				});
 			}
 		});
