@@ -148,7 +148,32 @@ export function createMarkdownContent(content: string, url: string) {
 			if (!img) return content;
 
 			const alt = img.getAttribute('alt') || '';
-			const src = img.getAttribute('src') || '';
+			let src = img.getAttribute('src') || '';
+			const srcset = img.getAttribute('srcset') || '';
+
+			if (srcset) {
+
+				let images: {src: string, width: number}[] = [];
+
+				// deconstruct the srcset urls
+				const srcsetUrls = srcset.split(",%20");
+				for (let url of srcsetUrls) {
+
+					const split = url.split("%20");
+					const srcUrl = split[0];
+					const width = parseInt(split[1]);
+
+					images.push({src: srcUrl, width});
+				}
+
+				// we need to choose one of the images to use from the srcset
+				// for convenience, simply grab the first one
+				// this could be updated to take width into account
+
+				src = images[0].src;
+			}
+
+		
 			let caption = '';
 
 			if (figcaption) {
