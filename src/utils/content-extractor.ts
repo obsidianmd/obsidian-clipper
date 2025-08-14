@@ -117,8 +117,10 @@ export async function initializePageContent(
 	try {
 		currentUrl = currentUrl.replace(/#:~:text=[^&]+(&|$)/, '');
 
+		let selectedMarkdown = '';
 		if (selectedHtml) {
 			content = selectedHtml;
+			selectedMarkdown = createMarkdownContent(selectedHtml, currentUrl);
 		}
 
 		const noteName = sanitizeFileName(title);
@@ -152,6 +154,8 @@ export async function initializePageContent(
 			'{{author}}': author.trim(),
 			'{{content}}': markdownBody.trim(),
 			'{{contentHtml}}': content.trim(),
+			'{{selection}}': selectedMarkdown.trim(),
+			'{{selectionHtml}}': selectedHtml.trim(),
 			'{{date}}': dayjs().format('YYYY-MM-DDTHH:mm:ssZ').trim(),
 			'{{time}}': dayjs().format('YYYY-MM-DDTHH:mm:ssZ').trim(),
 			'{{description}}': description.trim(),
