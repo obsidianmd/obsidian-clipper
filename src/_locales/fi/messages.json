@@ -201,6 +201,9 @@
 	"editTemplate": {
 		"message": "Muokkaa mallia"
 	},
+	"embedded": {
+		"message": "Upotettu"
+	},
 	"enableHighlighter": {
 		"message": "Ota korostustyökalu käyttöön"
 	},
@@ -514,6 +517,18 @@
 	"open": {
 		"message": "Avaa"
 	},
+	"openBehaviorDescription": {
+		"message": "Valitse, miten Web Clipper avautuu oletuksena."
+	},
+	"openBehaviorTitle": {
+		"message": "Avautumiskäyttäytyminen"
+	},
+	"openEmbedded": {
+		"message": "Avaa sivulla"
+	},
+	"openSidePanel": {
+		"message": "Avaa sivupaneeli"
+	},
 	"optional": {
 		"message": "(valinnainen)"
 	},
@@ -546,6 +561,9 @@
 	},
 	"popularModelsDescription": {
 		"message": "Valitse yleisesti käytettyjä malleja tai syötä mukautetut mallin tiedot."
+	},
+	"popup": {
+		"message": "Ponnahdusikkuna"
 	},
 	"prependToDaily": {
 		"message": "Lisää päivittäiseen muistiinpanoon, yläosaan"

@@ -201,6 +201,9 @@
 	"editTemplate": {
 		"message": "Ubah template"
 	},
+	"embedded": {
+		"message": "Tersemat"
+	},
 	"enableHighlighter": {
 		"message": "Aktifkan sorotan"
 	},
@@ -514,6 +517,18 @@
 	"open": {
 		"message": "Buka"
 	},
+	"openBehaviorDescription": {
+		"message": "Pilih bagaimana Web Clipper dibuka secara default."
+	},
+	"openBehaviorTitle": {
+		"message": "Perilaku buka"
+	},
+	"openEmbedded": {
+		"message": "Buka di halaman"
+	},
+	"openSidePanel": {
+		"message": "Buka panel samping"
+	},
 	"optional": {
 		"message": "(opsional)"
 	},
@@ -546,6 +561,9 @@
 	},
 	"popularModelsDescription": {
 		"message": "Pilih dari model yang sering digunakan atau masukkan detail model kustom."
+	},
+	"popup": {
+		"message": "Popup"
 	},
 	"prependToDaily": {
 		"message": "Tambah ke catatan harian, di bagian awal"

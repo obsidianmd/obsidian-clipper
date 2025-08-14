@@ -201,6 +201,9 @@
 	"editTemplate": {
 		"message": "Επεξεργασία προτύπου"
 	},
+	"embedded": {
+		"message": "Ενσωματωμένο"
+	},
 	"enableHighlighter": {
 		"message": "Ενεργοποίηση επισημαντή"
 	},
@@ -506,6 +509,18 @@
 	"open": {
 		"message": "Άνοιγμα"
 	},
+	"openBehaviorDescription": {
+		"message": "Επιλέξτε πώς θα ανοίγει από προεπιλογή το Web Clipper."
+	},
+	"openBehaviorTitle": {
+		"message": "Συμπεριφορά ανοίγματος"
+	},
+	"openEmbedded": {
+		"message": "Άνοιγμα στη σελίδα"
+	},
+	"openSidePanel": {
+		"message": "Άνοιγμα πλευρικού πίνακα"
+	},
 	"optional": {
 		"message": "(προαιρετικό)"
 	},
@@ -538,6 +553,9 @@
 	},
 	"popularModelsDescription": {
 		"message": "Επιλέξτε από συχνά χρησιμοποιούμενα μοντέλα ή εισάγετε λεπτομέρειες προσαρμοσμένου μοντέλου."
+	},
+	"popup": {
+		"message": "Αναδυόμενο παράθυρο"
 	},
 	"prependToDaily": {
 		"message": "Προσθήκη στην αρχή της ημερήσιας σημείωσης"

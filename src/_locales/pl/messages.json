@@ -201,6 +201,9 @@
 	"editTemplate": {
 		"message": "Edytuj szablon"
 	},
+	"embedded": {
+		"message": "Osadzone"
+	},
 	"enableHighlighter": {
 		"message": "Włącz zakreślacz"
 	},
@@ -514,6 +517,18 @@
 	"open": {
 		"message": "Otwórz"
 	},
+	"openBehaviorDescription": {
+		"message": "Wybierz, jak domyślnie otwiera się Web Clipper."
+	},
+	"openBehaviorTitle": {
+		"message": "Zachowanie przy otwieraniu"
+	},
+	"openEmbedded": {
+		"message": "Otwórz na stronie"
+	},
+	"openSidePanel": {
+		"message": "Otwórz panel boczny"
+	},
 	"optional": {
 		"message": "(opcjonalne)"
 	},
@@ -546,6 +561,9 @@
 	},
 	"popularModelsDescription": {
 		"message": "Wybierz spośród często używanych modeli lub wprowadź szczegóły niestandardowego modelu."
+	},
+	"popup": {
+		"message": "Wyskakujące okienko"
 	},
 	"prependToDaily": {
 		"message": "Zapisz na górze codziennej notatki"

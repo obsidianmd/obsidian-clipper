@@ -201,6 +201,9 @@
 	"editTemplate": {
 		"message": "Edit template"
 	},
+	"embedded": {
+		"message": "Embedded"
+	},
 	"enableHighlighter": {
 		"message": "Enable highlighter"
 	},
@@ -511,20 +514,20 @@
 	"onlyHttpSupported": {
 		"message": "This page cannot be clipped. Only http and https URLs are supported."
 	},
+	"open": {
+		"message": "Open"
+	},
+	"openBehaviorDescription": {
+		"message": "Choose how Web Clipper opens by default."
+	},
+	"openBehaviorTitle": {
+		"message": "Open behavior"
+	},
 	"openEmbedded": {
 		"message": "Open in page"
 	},
 	"openSidePanel": {
 		"message": "Open side panel"
-	},
-	"open": {
-		"message": "Open"
-	},
-	"openBehaviorTitle": {
-		"message": "Open behavior"
-	},
-	"openBehaviorDescription": {
-		"message": "Choose how Web Clipper opens by default."
 	},
 	"optional": {
 		"message": "(optional)"
@@ -553,17 +556,14 @@
 	"pleaseReload": {
 		"message": "Please try reloading the page."
 	},
-	"popup": {
-		"message": "Popup"
-	},
-	"embedded": {
-		"message": "Embedded"
-	},
 	"popularModels": {
 		"message": "Popular models"
 	},
 	"popularModelsDescription": {
 		"message": "Choose from commonly used models or enter custom model details."
+	},
+	"popup": {
+		"message": "Popup"
 	},
 	"prependToDaily": {
 		"message": "Add to daily note, at the top"

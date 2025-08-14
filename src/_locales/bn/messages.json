@@ -201,6 +201,9 @@
 	"editTemplate": {
 		"message": "টেমপ্লেট সম্পাদনা করুন"
 	},
+	"embedded": {
+		"message": "এম্বেডেড"
+	},
 	"enableHighlighter": {
 		"message": "হাইলাইটার সক্রিয় করুন"
 	},
@@ -514,6 +517,18 @@
 	"open": {
 		"message": "খুলুন"
 	},
+	"openBehaviorDescription": {
+		"message": "ডিফল্ট হিসেবে ওয়েব ক্লিপার কীভাবে খুলবে তা নির্বাচন করুন।"
+	},
+	"openBehaviorTitle": {
+		"message": "খোলার আচরণ"
+	},
+	"openEmbedded": {
+		"message": "পৃষ্ঠায় খুলুন"
+	},
+	"openSidePanel": {
+		"message": "পাশের প্যানেল খুলুন"
+	},
 	"optional": {
 		"message": "(ঐচ্ছিক)"
 	},
@@ -546,6 +561,9 @@
 	},
 	"popularModelsDescription": {
 		"message": "সাধারণত ব্যবহৃত মডেলগুলি থেকে চয়ন করুন বা কাস্টম মডেলের বিশদ লিখুন।"
+	},
+	"popup": {
+		"message": "পপআপ"
 	},
 	"prependToDaily": {
 		"message": "ডেইলি নোটে উপরের দিকে যোগ করুন"

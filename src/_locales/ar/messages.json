@@ -201,6 +201,9 @@
 	"editTemplate": {
 		"message": "تعديل القالب"
 	},
+	"embedded": {
+		"message": "مضمن"
+	},
 	"enableHighlighter": {
 		"message": "تفعيل المظلل"
 	},
@@ -514,6 +517,18 @@
 	"open": {
 		"message": "فتح"
 	},
+	"openBehaviorDescription": {
+		"message": "اختر كيف يفتح Web Clipper بشكل افتراضي."
+	},
+	"openBehaviorTitle": {
+		"message": "سلوك الفتح"
+	},
+	"openEmbedded": {
+		"message": "افتح في الصفحة"
+	},
+	"openSidePanel": {
+		"message": "افتح اللوحة الجانبية"
+	},
 	"optional": {
 		"message": "(اختياري)"
 	},
@@ -546,6 +561,9 @@
 	},
 	"popularModelsDescription": {
 		"message": "اختر من النماذج المستخدمة بشكل شائع أو أدخل تفاصيل النموذج المخصص."
+	},
+	"popup": {
+		"message": "القائمة المنبثقة"
 	},
 	"prependToDaily": {
 		"message": "إضافة إلى الملاحظة اليومية، في البداية"

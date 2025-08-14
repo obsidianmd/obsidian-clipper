@@ -201,6 +201,9 @@
 	"editTemplate": {
 		"message": "Vorlage bearbeiten"
 	},
+	"embedded": {
+		"message": "Eingebettet"
+	},
 	"enableHighlighter": {
 		"message": "Marker aktivieren"
 	},
@@ -514,6 +517,18 @@
 	"open": {
 		"message": "Öffnen"
 	},
+	"openBehaviorDescription": {
+		"message": "Wählen Sie, wie der Web Clipper standardmäßig geöffnet wird."
+	},
+	"openBehaviorTitle": {
+		"message": "Öffnungsverhalten"
+	},
+	"openEmbedded": {
+		"message": "In Seite öffnen"
+	},
+	"openSidePanel": {
+		"message": "Seitenleiste öffnen"
+	},
 	"optional": {
 		"message": "(optional)"
 	},
@@ -546,6 +561,9 @@
 	},
 	"popularModelsDescription": {
 		"message": "Wählen Sie aus häufig verwendeten Modellen oder geben Sie benutzerdefinierte Modellinformationen ein."
+	},
+	"popup": {
+		"message": "Popup"
 	},
 	"prependToDaily": {
 		"message": "Zur Tagesnotiz am Anfang hinzufügen"

@@ -201,6 +201,9 @@
 	"editTemplate": {
 		"message": "Редагувати шаблон"
 	},
+	"embedded": {
+		"message": "Вбудований"
+	},
 	"enableHighlighter": {
 		"message": "Увімкнути виділення"
 	},
@@ -506,6 +509,18 @@
 	"open": {
 		"message": "Відкрити"
 	},
+	"openBehaviorDescription": {
+		"message": "Виберіть, як за замовчуванням відкривається Web Clipper."
+	},
+	"openBehaviorTitle": {
+		"message": "Поведінка при відкритті"
+	},
+	"openEmbedded": {
+		"message": "Відкрити на сторінці"
+	},
+	"openSidePanel": {
+		"message": "Відкрити бічну панель"
+	},
 	"optional": {
 		"message": "(необов'язково)"
 	},
@@ -538,6 +553,9 @@
 	},
 	"popularModelsDescription": {
 		"message": "Виберіть з часто використовуваних моделей або введіть деталі власної моделі."
+	},
+	"popup": {
+		"message": "Спливаюче вікно"
 	},
 	"prependToDaily": {
 		"message": "Додати до щоденної нотатки, на початок"

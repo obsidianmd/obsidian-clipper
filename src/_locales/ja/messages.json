@@ -201,6 +201,9 @@
 	"editTemplate": {
 		"message": "テンプレートを編集"
 	},
+	"embedded": {
+		"message": "埋め込み"
+	},
 	"enableHighlighter": {
 		"message": "ハイライトを有効化"
 	},
@@ -514,6 +517,18 @@
 	"open": {
 		"message": "開く"
 	},
+	"openBehaviorDescription": {
+		"message": "Web Clipperがデフォルトでどのように開くかを選択します。"
+	},
+	"openBehaviorTitle": {
+		"message": "開く動作"
+	},
+	"openEmbedded": {
+		"message": "ページ内で開く"
+	},
+	"openSidePanel": {
+		"message": "サイドパネルを開く"
+	},
 	"optional": {
 		"message": "(オプション)"
 	},
@@ -546,6 +561,9 @@
 	},
 	"popularModelsDescription": {
 		"message": "よく使用されるモデルから選択するか、カスタムモデルの詳細を入力してください。"
+	},
+	"popup": {
+		"message": "ポップアップ"
 	},
 	"prependToDaily": {
 		"message": "デイリーノートの先頭に追加"

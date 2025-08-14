@@ -201,6 +201,9 @@
 	"editTemplate": {
 		"message": "Template edit karein"
 	},
+	"embedded": {
+		"message": "सम्मिलित"
+	},
 	"enableHighlighter": {
 		"message": "Highlighter chalu karein"
 	},
@@ -514,6 +517,18 @@
 	"open": {
 		"message": "Open"
 	},
+	"openBehaviorDescription": {
+		"message": "चुनें कि वेब क्लिपर डिफ़ॉल्ट रूप से कैसे खुलता है।"
+	},
+	"openBehaviorTitle": {
+		"message": "खुलने का व्यवहार"
+	},
+	"openEmbedded": {
+		"message": "पृष्ठ में खोलें"
+	},
+	"openSidePanel": {
+		"message": "साइड पैनल खोलें"
+	},
 	"optional": {
 		"message": "(optional)"
 	},
@@ -546,6 +561,9 @@
 	},
 	"popularModelsDescription": {
 		"message": "सामान्य रूप से प्रयुक्त मॉडलों में से चुनें या कस्टम मॉडल विवरण दर्ज करें।"
+	},
+	"popup": {
+		"message": "पॉपअप"
 	},
 	"prependToDaily": {
 		"message": "Daily note mein, shuruat mein add karein"

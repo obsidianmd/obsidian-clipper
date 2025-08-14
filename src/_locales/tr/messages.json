@@ -201,6 +201,9 @@
 	"editTemplate": {
 		"message": "Şablonu düzenle"
 	},
+	"embedded": {
+		"message": "Gömülü"
+	},
 	"enableHighlighter": {
 		"message": "Vurgulayıcıyı etkinleştir"
 	},
@@ -514,6 +517,18 @@
 	"open": {
 		"message": "Aç"
 	},
+	"openBehaviorDescription": {
+		"message": "Web Clipper'ın varsayılan olarak nasıl açılacağını seçin."
+	},
+	"openBehaviorTitle": {
+		"message": "Açma davranışı"
+	},
+	"openEmbedded": {
+		"message": "Sayfada aç"
+	},
+	"openSidePanel": {
+		"message": "Yan paneli aç"
+	},
 	"optional": {
 		"message": "(isteğe bağlı)"
 	},
@@ -546,6 +561,9 @@
 	},
 	"popularModelsDescription": {
 		"message": "Sık kullanılan modellerden seçin veya özel model detaylarını girin."
+	},
+	"popup": {
+		"message": "Açılır Pencere"
 	},
 	"prependToDaily": {
 		"message": "Günlük nota, başa ekle"

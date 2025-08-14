@@ -201,6 +201,9 @@
 	"editTemplate": {
 		"message": "템플릿 편집"
 	},
+	"embedded": {
+		"message": "임베디드"
+	},
 	"enableHighlighter": {
 		"message": "하이라이터 켜기"
 	},
@@ -514,6 +517,18 @@
 	"open": {
 		"message": "열기"
 	},
+	"openBehaviorDescription": {
+		"message": "웹 클리퍼가 기본적으로 어떻게 열리는지 선택하십시오."
+	},
+	"openBehaviorTitle": {
+		"message": "열기 동작"
+	},
+	"openEmbedded": {
+		"message": "페이지에서 열기"
+	},
+	"openSidePanel": {
+		"message": "사이드 패널 열기"
+	},
 	"optional": {
 		"message": "(선택사항)"
 	},
@@ -546,6 +561,9 @@
 	},
 	"popularModelsDescription": {
 		"message": "일반적으로 사용되는 모델 중에서 선택하거나 사용자 정의 모델 세부 정보를 입력하세요."
+	},
+	"popup": {
+		"message": "팝업"
 	},
 	"prependToDaily": {
 		"message": "데일리 노트 맨 위에 추가"
