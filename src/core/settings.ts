@@ -11,6 +11,7 @@ import {
 } from '../managers/template-manager';
 import { updateTemplateList, showTemplateEditor, initializeAddPropertyButton } from '../managers/template-ui';
 import { initializeGeneralSettings } from '../managers/general-settings';
+import { initializeInterpreterSettings } from '../managers/interpreter-settings';
 import { showSettingsSection, initializeSidebar } from '../managers/settings-section-ui';
 import { initializeReaderSettings } from '../managers/reader-settings';
 import { initializeAutoSave } from '../utils/auto-save';
@@ -42,6 +43,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 		
 		await initializeGeneralSettings();
 		await initializeReaderSettings();
+		await initializeInterpreterSettings();
 		const loadedTemplates = await loadTemplates();
 		updateTemplateList(loadedTemplates);
 		initializeTemplateListeners();
