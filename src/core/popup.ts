@@ -355,7 +355,6 @@ document.addEventListener('DOMContentLoaded', async function() {
 				populateTemplateDropdown();
 				setupEventListeners(currentTabId);
 				await initializeUI();
-				setupMetadataToggle();
 
 				// Initial content load
 				await refreshFields(currentTabId);
@@ -692,7 +691,6 @@ async function refreshFields(tabId: number, checkTemplateTriggers: boolean = tru
 				extractedData.metaTags
 			);
 			if (initializedContent) {
-				setupMetadataToggle();
 				currentVariables = initializedContent.currentVariables;
 				console.log('Updated currentVariables:', currentVariables);
 				await initializeTemplateFields(
@@ -702,6 +700,7 @@ async function refreshFields(tabId: number, checkTemplateTriggers: boolean = tru
 					initializedContent.noteName,
 					extractedData.schemaOrgData
 				);
+				setupMetadataToggle();
 
 				// Update variables panel if it's open
 				updateVariablesPanel(currentTemplate, currentVariables);
@@ -911,7 +910,12 @@ function setupMetadataToggle() {
 
 		// Set initial state
 		getLocalStorage('propertiesCollapsed').then((isCollapsed) => {
-			updateMetadataToggleState(isCollapsed);
+			if (isCollapsed === undefined) {
+				// If the value is not set, default to not collapsed
+				updateMetadataToggleState(false); 
+			} else {
+				updateMetadataToggleState(isCollapsed);
+			}
 		});
 	}
 }
