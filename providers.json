@@ -1,5 +1,5 @@
 {
-	"version": "2025.08.11",
+	"version": "2025.08.16",
 	"anthropic": {
 		"id": "anthropic",
 		"name": "Anthropic",
@@ -9,8 +9,8 @@
 		"baseUrl": "https://api.anthropic.com/v1/messages",
 		"popularModels": [
 			{ "id": "claude-3-5-haiku-latest", "name": "Claude 3.5 Haiku" },
-			{ "id": "claude-3-5-sonnet-latest", "name": "Claude 3.5 Sonnet" },
-			{ "id": "claude-3-7-sonnet-latest", "name": "Claude 3.7 Sonnet" }
+			{ "id": "claude-3-7-sonnet-latest", "name": "Claude 3.7 Sonnet" },
+			{ "id": "claude-sonnet-4-0", "name": "Claude 4.0 Sonnet" }
 		]
 	},
 	"azure-openai": {
@@ -91,7 +91,9 @@
 		"popularModels": [
 			{ "id": "gpt-4o-mini", "name": "GPT-4o Mini" },
 			{ "id": "gpt-4o", "name": "GPT-4o" },
-			{ "id": "gpt-4.1-2025-04-14", "name": "GPT-4.1" }
+			{ "id": "gpt-5", "name": "GPT 5" },
+			{ "id": "gpt-5-mini", "name": "GPT 5 Mini" },
+			{ "id": "gpt-5-nano", "name": "GPT 5 Nano" }
 		]
 	},
 	"openrouter": {
@@ -129,10 +131,9 @@
 		"modelsList": "https://docs.x.ai/docs/models",
 		"baseUrl": "https://api.x.ai/v1/chat/completions",
 		"popularModels": [
-			{ "id": "grok-3-latest", "name": "Grok 3" },
-			{ "id": "grok-3-fast-latest", "name": "Grok 3 Fast" },
-			{ "id": "grok-3-mini-latest", "name": "Grok 3 Mini" },
-			{ "id": "grok-3-mini-fast-latest", "name": "Grok 3 Mini Fast" }
+			{ "id": "grok-4", "name": "Grok 4" },
+			{ "id": "grok-3", "name": "Grok 3" },
+			{ "id": "grok-3-mini", "name": "Grok 3 Mini" }
 		]
 	}
 }
