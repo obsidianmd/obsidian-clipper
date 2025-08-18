@@ -13,8 +13,9 @@
 #obsidian-clipper-iframe {
 	color-scheme: light dark;
 	flex-grow: 1;
-	border: none;
+	border: none !important;
 	opacity: 0;
+	margin: 0 !important;
 	&.is-resizing {
 		user-select: none;
 		-webkit-user-select: none;
