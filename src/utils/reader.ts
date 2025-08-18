@@ -867,6 +867,9 @@ export class Reader {
 			// Store original HTML for restoration
 			this.originalHTML = doc.documentElement.outerHTML;
 
+			// Clipper iframe container
+			const clipperIframeContainer = doc.getElementById('obsidian-clipper-container');
+
 			// Load saved settings
 			await this.loadSettings();
 
@@ -1010,6 +1013,11 @@ export class Reader {
 			this.initializeCodeHighlighting(doc);
 			this.initializeCopyButtons(doc);
 			this.initializeLightbox(doc);
+
+			// Re-attach the clipper iframe container if it exists
+			if (clipperIframeContainer) {
+				doc.body.appendChild(clipperIframeContainer);
+			}
 
 			// Set up color scheme media query listener
 			this.colorSchemeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
