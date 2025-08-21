@@ -69,7 +69,9 @@ export async function showImportModal(
 		e.stopPropagation();
 		const files = e.dataTransfer?.files;
 		if (files && files.length > 0) {
-			handleFile(files[0]);
+			Array.prototype.forEach.call(files, (file) => {
+				handleFile(file)
+			})
 		}
 	}
 
@@ -78,15 +80,18 @@ export async function showImportModal(
 		e.stopPropagation();
 		fileInput = document.createElement('input');
 		fileInput.type = 'file';
+		fileInput.multiple = true
 		fileInput.accept = fileExtension;
 		fileInput.onchange = handleFileInputChange;
 		fileInput.click();
 	}
 
 	function handleFileInputChange(event: Event): void {
-		const file = (event.target as HTMLInputElement).files?.[0];
-		if (file) {
-			handleFile(file);
+		const files = (event.target as HTMLInputElement).files
+		if (files && files.length > 0) {
+			Array.prototype.forEach.call(files, (file) => {
+				handleFile(file)
+			})
 		}
 		// Clean up the file input
 		if (fileInput) {
