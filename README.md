@@ -66,6 +66,13 @@ For Firefox:
 2. Click **Load Temporary Add-on**
 3. Navigate to the `dist_firefox` directory and select the `manifest.json` file
 
+If you want to run the extension permanently you can do so with the Nightly or Developer versions of Firefox.
+
+1. Type `about:config` in the URL bar
+2. In the Search box type `xpinstall.signatures.required`
+3. Double-click the preference, or right-click and select "Toggle", to set it to `false`.
+4. Go to `about:addons` > gear icon > **Install Add-on From File…**
+
 ## Third-party libraries
 
 - [webextension-polyfill](https://github.com/mozilla/webextension-polyfill) for browser compatibility
