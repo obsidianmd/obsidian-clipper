@@ -232,7 +232,7 @@ function initializeProviderList() {
 		return;
 	}
 
-	const sortedProviders = [...generalSettings.providers].sort((a, b) => 
+	const sortedProviders = [...generalSettings.providers].filter(p => p).sort((a, b) => 
 		a.name.toLowerCase().localeCompare(b.name.toLowerCase())
 	);
 
@@ -543,7 +543,7 @@ export function initializeModelList() {
 	if (!modelList) return;
 
 	modelList.innerHTML = '';
-	const sortedModels = [...generalSettings.models].sort((a, b) => 
+	const sortedModels = [...generalSettings.models].filter(m => m).sort((a, b) => 
 		a.name.toLowerCase().localeCompare(b.name.toLowerCase())
 	);
 	
@@ -705,7 +705,7 @@ async function showModelModal(model: ModelConfig, index?: number) {
 		defaultOption.selected = true;
 		providerSelect.appendChild(defaultOption);
 
-		const sortedProviders = [...generalSettings.providers].sort((a, b) => 
+		const sortedProviders = [...generalSettings.providers].filter(p => p).sort((a, b) => 
 			a.name.toLowerCase().localeCompare(b.name.toLowerCase())
 		);
 		sortedProviders.forEach(provider => {
