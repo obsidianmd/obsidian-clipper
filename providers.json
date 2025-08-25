@@ -68,6 +68,18 @@
 			{ "id": "Llama-3.3-70B-Instruct", "name": "Llama 3.3 70B" }
 		]
 	},
+  "ollamaturbo": {
+		"id": "ollamaturbo",
+		"name": "Ollama Turbo",
+    "apiKeyUrl": "https://ollama.com/settings/keys",
+		"apiKeyRequired": true,
+		"modelsList": "https://ollama.com/models",
+		"baseUrl": "https://ollama.com/api/chat",
+		"popularModels": [
+			{ "id": "gpt-oss:20b", "name": "GPT OSS 20B" },
+			{ "id": "gpt-oss:120b", "name": "GPT OSS 120B" }
+		]
+	},
 	"ollama": {
 		"id": "ollama",
 		"name": "Ollama",

@@ -110,16 +110,36 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 					{ role: 'user', content: `
 						"${promptContext}"
 						"${JSON.stringify(promptContent)}"`
-					}
-				]
-			};
-			headers = {
-				...headers,
-				'HTTP-Referer': 'https://obsidian.md/',
-				'X-Title': 'Obsidian Web Clipper',
-				'Authorization': `Bearer ${provider.apiKey}`
-			};
-		} else if (provider.name.toLowerCase().includes('ollama')) {
+          }
+        ]
+      };
+      headers = {
+        ...headers,
+        'HTTP-Referer': 'https://obsidian.md/',
+        'X-Title': 'Obsidian Web Clipper',
+        'Authorization': `Bearer ${provider.apiKey}`
+      };
+    } else if (provider.name.toLowerCase().includes("turbo")) {
+      requestUrl = provider.baseUrl;
+      requestBody = {
+        model: model.providerModelId,
+        messages: [
+          { role: 'system', content: systemContent },
+          { role: 'user', content: `${promptContext}` },
+          { role: 'user', content: `${JSON.stringify(promptContent)}` }
+        ],
+        format: 'json',
+        num_ctx: 120000,
+        temperature: 0.5,
+        stream: false
+      };
+      headers = {
+        ...headers, 
+        'HTTP-Referer': 'https://obsidian.md/', 
+        'X-Title': 'Obsidian Web Clipper', 
+        'Authorization': `Bearer ${provider.apiKey}`
+      };
+		} else if (provider.name.toLowerCase().includes('ollama') && !provider.name.toLowerCase().includes("turbo")) {
 			requestUrl = provider.baseUrl;
 			requestBody = {
 				model: model.providerModelId,
