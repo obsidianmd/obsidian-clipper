@@ -56,16 +56,32 @@ export function sanitizeFileName(fileName: string): string {
 	return sanitized;
 }
 
-export function formatVariables(variables: { [key: string]: string }): string {
+export function formatVariables(variables: { [key: string]: any }): string {
 	return Object.entries(variables)
 		.map(([key, value]) => {
 			// Remove the outer curly braces from the key
 			const cleanKey = key.replace(/^{{|}}$/g, '');
 
+			// Coerce non-string values to a readable string
+			let displayValue: string;
+			if (value === null || value === undefined) {
+				displayValue = '';
+			} else if (typeof value === 'string') {
+				displayValue = value;
+			} else if (typeof value === 'object') {
+				try {
+					displayValue = JSON.stringify(value);
+				} catch {
+					displayValue = String(value);
+				}
+			} else {
+				displayValue = String(value);
+			}
+
 			return `
 				<div class="variable-item is-collapsed">
 					<span class="variable-key" data-variable="${escapeHtml(key)}">${escapeHtml(cleanKey)}</span>
-					<span class="variable-value">${escapeHtml(value)}</span>
+					<span class="variable-value">${escapeHtml(displayValue)}</span>
 					<span class="chevron-icon" aria-label="Expand">
 						<i data-lucide="chevron-right"></i>
 					</span>
@@ -75,8 +91,9 @@ export function formatVariables(variables: { [key: string]: string }): string {
 		.join('');
 }
 
-export function escapeHtml(unsafe: string): string {
-	return unsafe
+export function escapeHtml(unsafe: any): string {
+	const str = String(unsafe ?? '');
+	return str
 		.replace(/&/g, "&amp;")
 		.replace(/</g, "&lt;")
 		.replace(/>/g, "&gt;")

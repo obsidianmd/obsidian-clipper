@@ -1,5 +1,5 @@
-import { processSchema } from '../variables/schema';
 import { processVariables } from '../template-compiler';
+import { evaluateExpression } from '../expression-evaluator';
 
 export async function processVariableAssignment(
 	match: RegExpExecArray,
@@ -32,33 +32,8 @@ async function evaluateAssignmentValue(
 ): Promise<any> {
 	expression = expression.trim();
 
-	// Handle quoted strings
-	if ((expression.startsWith('"') && expression.endsWith('"')) ||
-		(expression.startsWith("'") && expression.endsWith("'"))) {
-		return expression.slice(1, -1);
-	}
-
-	// Handle numbers
-	if (!isNaN(Number(expression))) {
-		return Number(expression);
-	}
-
-	// Handle boolean literals
-	if (expression === 'true') return true;
-	if (expression === 'false') return false;
-
-	// Handle schema variables
-	if (expression.startsWith('schema:')) {
-		const schemaValue = await processSchema(`{{${expression}}}`, variables, currentUrl);
-		try {
-			return JSON.parse(schemaValue);
-		} catch (error) {
-			console.error(`Error parsing schema result for ${expression}:`, error);
-			return null;
-		}
-	}
-
-	// Handle expressions with filters (e.g., content|length, title|upper)
+	// Handle expressions with filters (e.g., content|length, title|upper):
+	// defer to variable processor, which returns a string
 	if (expression.includes('|')) {
 		// Create a temporary template to process the expression with filters
 		const tempTemplate = `{{${expression}}}`;
@@ -66,24 +41,6 @@ async function evaluateAssignmentValue(
 		return processed;
 	}
 
-	// Handle nested properties like "variable.property"
-	if (expression.includes('.')) {
-		const value = expression.split('.').reduce((obj: any, key: string) => {
-			if (obj && typeof obj === 'object' && key in obj) {
-				return obj[key];
-			}
-			console.error(`Cannot access property ${key} of`, obj);
-			return undefined;
-		}, variables);
-		return value;
-	}
-
-	// Handle simple variable references
-	if (variables.hasOwnProperty(expression)) {
-		return variables[expression];
-	}
-
-	// If nothing matches, return the expression as a string literal
-	console.warn(`Treating "${expression}" as string literal in assignment`);
-	return expression;
+	// General expression evaluation (supports parentheses, comparisons, not/and/or)
+	return await evaluateExpression(expression, variables, currentUrl);
 }
