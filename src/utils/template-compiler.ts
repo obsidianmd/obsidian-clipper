@@ -2,7 +2,6 @@ import { processSimpleVariable } from './variables/simple';
 import { processSelector } from './variables/selector';
 import { processSchema } from './variables/schema';
 import { processPrompt } from './variables/prompt';
-
 import { processForLoop } from './tags/for';
 import { evaluateBoolean } from './expression-evaluator';
 import { processVariableAssignment } from './tags/set';
@@ -46,12 +45,15 @@ const logicHandlers: LogicHandler[] = [
 
 // Main function to compile the template
 export async function compileTemplate(tabId: number, text: string, variables: { [key: string]: any }, currentUrl: string): Promise<string> {
-	currentUrl = currentUrl.replace(/#:~:text=[^&]+(&|$)/, '');
+    currentUrl = currentUrl.replace(/#:~:text=[^&]+(&|$)/, '');
 
-	// Process logic
-	const processedText = await processLogic(text, variables, currentUrl);
-	// Process other variables and filters
-	return await processVariables(tabId, processedText, variables, currentUrl);
+    // Process logic
+    const processedText = await processLogic(text, variables, currentUrl);
+    // Process other variables and filters
+    let rendered = await processVariables(tabId, processedText, variables, currentUrl);
+    // Simple whitespace cleanup: strip trailing spaces/tabs on each line
+    rendered = rendered.replace(/[ \t]+$/gm, '');
+    return rendered;
 }
 
 // Process assignments first (they define variables for later use)
@@ -113,8 +115,10 @@ async function processIfBlocks(text: string, variables: { [key: string]: any }, 
   let m: RegExpExecArray | null;
   while ((m = startRe.exec(text)) !== null) {
     const start = m.index;
-    // append preceding text
-    const before = text.slice(idx, start);
+    // Append preceding text, trimming indentation of a tag-only line
+    const lineStart = text.lastIndexOf('\n', start - 1) + 1;
+    const isTagAtLineStart = text.slice(lineStart, start).trim() === '';
+    const before = text.slice(idx, isTagAtLineStart ? lineStart : start);
     // Process assignments in the chunk before the IF
     const beforeAfterAssign = await processAssignments(before, variables, currentUrl);
     const beforeRendered = await processVariables(0, beforeAfterAssign, variables, currentUrl);
@@ -186,7 +190,20 @@ async function processIfBlocks(text: string, variables: { [key: string]: any }, 
       pos = tagFullEnd;
     }
 
-    const endIndex = pos;
+    // Extend end to consume trailing whitespace/newline if endif closes a tag-only line
+    let endIndex = pos;
+    const newlineIdx = text.indexOf('\n', pos);
+    if (newlineIdx !== -1) {
+      const trailing = text.slice(pos, newlineIdx);
+      if (trailing.trim() === '') {
+        endIndex = newlineIdx + 1; // consume the newline too
+      }
+    } else {
+      const trailing = text.slice(pos);
+      if (trailing.trim() === '') {
+        endIndex = text.length;
+      }
+    }
 
     // If we never matched a proper endif at depth 1, treat the whole block as literal text to avoid content loss
     if (!matchedEnd) {
@@ -221,7 +238,13 @@ async function processIfBlocks(text: string, variables: { [key: string]: any }, 
     // Recurse into selected branch first (so nested IFs are resolved),
     // then variable rendering happens afterwards.
     const processed = await processLogic(selected, variables, currentUrl);
-    const processedRendered = await processVariables(0, processed, variables, currentUrl);
+    let processedRendered = await processVariables(0, processed, variables, currentUrl);
+    // If the IF tag started at the beginning of a line (tag-only line),
+    // trim a single leading and trailing blank line from the selected output
+    // to avoid introducing unwanted spacing.
+    if (isTagAtLineStart) {
+      processedRendered = processedRendered.replace(/^\s*\n/, '').replace(/\n\s*$/, '');
+    }
     result += processedRendered;
     idx = endIndex;
     startRe.lastIndex = idx;
