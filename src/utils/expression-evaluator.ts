@@ -334,7 +334,10 @@ export async function evaluateExpression(
   currentUrl: string
 ): Promise<any> {
   // If expression contains any boolean/logical/comparison syntax, use full parser
-  const hasLogic = /(\b(?:and|or|not)\b|&&|\|\||!|==|!=|>=|<=|>|<|\(|\))/.test(expression);
+  // But first check if it's a quoted string - if so, skip logic parsing
+  const exprTrimmed = expression.trim();
+  const isQuotedString = (exprTrimmed.startsWith('"') && exprTrimmed.endsWith('"')) || (exprTrimmed.startsWith("'") && exprTrimmed.endsWith("'"));
+  const hasLogic = !isQuotedString && /(\b(?:and|or|not)\b|&&|\|\||!|==|!=|>=|<=|>|<|\(|\))/.test(expression);
   if (hasLogic) {
     const tokens = tokenize(expression);
     const parser = new Parser(tokens);

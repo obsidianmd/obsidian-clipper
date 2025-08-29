@@ -285,19 +285,8 @@ export async function processVariables(tabId: number, text: string, variables: {
 				replacement = literalContent;
 			}
 		} else {
-			// Check if it's a custom variable first, then fall back to simple variable processing
-			if (variables.hasOwnProperty(trimmedMatch)) {
-				// Handle custom variables set with {% set %}
-				const customValue = variables[trimmedMatch];
-				if (trimmedMatch.includes('|')) {
-					// Apply filters to custom variables
-					replacement = await processSimpleVariable(trimmedMatch, variables, currentUrl);
-				} else {
-					replacement = String(customValue ?? '');
-				}
-			} else {
-				replacement = await processSimpleVariable(trimmedMatch, variables, currentUrl);
-			}
+			// Always use processSimpleVariable for consistent filter handling
+			replacement = await processSimpleVariable(trimmedMatch, variables, currentUrl);
 		}
 
 		result = result.substring(0, match.index) + replacement + result.substring(match.index + fullMatch.length);

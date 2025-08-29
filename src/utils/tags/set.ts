@@ -6,7 +6,7 @@ export async function processVariableAssignment(
 	variables: { [key: string]: any },
 	currentUrl: string
 ): Promise<void> {
-	const [fullMatch, variableName, valueExpression] = match;
+	const [, variableName, valueExpression] = match;
 
 	console.log(`Setting variable: ${variableName} = ${valueExpression}`);
 
@@ -34,7 +34,26 @@ async function evaluateAssignmentValue(
 
 	// Handle expressions with filters (e.g., content|length, title|upper):
 	// defer to variable processor, which returns a string
-	if (expression.includes('|')) {
+	// Only treat as filter if | is not inside quotes and not part of ||
+	function hasFilterPipe(expr: string): boolean {
+		let inQuotes = false;
+		let quoteChar = '';
+		for (let i = 0; i < expr.length; i++) {
+			const char = expr[i];
+			if (!inQuotes && (char === '"' || char === "'")) {
+				inQuotes = true;
+				quoteChar = char;
+			} else if (inQuotes && char === quoteChar && expr[i - 1] !== '\\') {
+				inQuotes = false;
+				quoteChar = '';
+			} else if (!inQuotes && char === '|' && expr[i + 1] !== '|' && expr[i - 1] !== '|') {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	if (hasFilterPipe(expression)) {
 		// Create a temporary template to process the expression with filters
 		const tempTemplate = `{{${expression}}}`;
 		const processed = await processVariables(0, tempTemplate, variables, currentUrl);

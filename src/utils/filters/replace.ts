@@ -30,12 +30,15 @@ export const replace = (str: string, param?: string): string => {
 
 	// Apply each replacement in sequence
 	return replacements.reduce((acc, replacement) => {
+		// Handle the case where replacement is in parentheses like ("old":"new")
+		if (replacement.match(/^\s*\(\s*".*"\s*:\s*".*"\s*\)\s*$/)) {
+			replacement = replacement.replace(/^\s*\(\s*|\s*\)\s*$/g, '');
+		}
+		
 		let [search, replace] = replacement.split(/(?<=[^\\]["']):(?=["'])/).map(p => {
-			// Remove surrounding quotes but preserve escaped characters
 			return p.trim().replace(/^["']|["']$/g, '');
 		});
 
-		// Use an empty string if replace is undefined
 		replace = replace || '';
 
 		// Check if this is a regex pattern
@@ -73,7 +76,7 @@ export const replace = (str: string, param?: string): string => {
 };
 
 function processEscapedCharacters(str: string): string {
-	return str.replace(/\\([nrt]|[^nrt])/g, (match, char) => {
+	return str.replace(/\\([nrt]|[^nrt])/g, (char) => {
 		switch (char) {
 			case 'n': return '\n';
 			case 'r': return '\r';
