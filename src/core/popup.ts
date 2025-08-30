@@ -5,7 +5,6 @@ import { generateFrontmatter, saveToObsidian } from '../utils/obsidian-note-crea
 import { extractPageContent, initializePageContent } from '../utils/content-extractor';
 import { compileTemplate } from '../utils/template-compiler';
 import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
-import { decompressFromUTF16 } from 'lz-string';
 import { findMatchingTemplate, initializeTriggers } from '../utils/triggers';
 import { getLocalStorage, setLocalStorage, loadSettings, generalSettings, Settings } from '../utils/storage-utils';
 import { escapeHtml, unescapeValue } from '../utils/string-utils';
@@ -207,27 +206,8 @@ async function initializeExtension(tabId: number) {
 }
 
 async function loadAndSetupTemplates() {
-	const data = await browser.storage.sync.get(['template_list']);
-	const templateIds = data.template_list || [];
-	const loadedTemplates = await Promise.all((templateIds as string[]).map(async (id: string) => {
-		try {
-			const result = await browser.storage.sync.get(`template_${id}`);
-			const compressedChunks = result[`template_${id}`] as string[];
-			if (compressedChunks) {
-				const decompressedData = decompressFromUTF16(compressedChunks.join(''));
-				const template = JSON.parse(decompressedData);
-				if (template && Array.isArray(template.properties)) {
-					return template;
-				}
-			}
-		} catch (error) {
-			console.error(`Error parsing template ${id}:`, error);
-		}
-		return null;
-	}));
-
-	templates = loadedTemplates.filter((t: Template | null): t is Template => t !== null);
-
+	templates = await loadTemplates();
+	
 	if (templates.length === 0) {
 		currentTemplate = createDefaultTemplate();
 		templates = [currentTemplate];

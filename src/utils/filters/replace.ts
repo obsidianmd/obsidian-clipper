@@ -36,9 +36,11 @@ export const replace = (str: string, param?: string): string => {
 		}
 		
 		let [search, replace] = replacement.split(/(?<=[^\\]["']):(?=["'])/).map(p => {
+			// Remove surrounding quotes but preserve escaped characters
 			return p.trim().replace(/^["']|["']$/g, '');
 		});
 
+		// Use an empty string if replace is undefined
 		replace = replace || '';
 
 		// Check if this is a regex pattern
@@ -76,7 +78,7 @@ export const replace = (str: string, param?: string): string => {
 };
 
 function processEscapedCharacters(str: string): string {
-	return str.replace(/\\([nrt]|[^nrt])/g, (char) => {
+	return str.replace(/\\([nrt]|[^nrt])/g, (match, char) => {
 		switch (char) {
 			case 'n': return '\n';
 			case 'r': return '\r';

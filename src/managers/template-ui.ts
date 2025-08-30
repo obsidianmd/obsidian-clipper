@@ -6,6 +6,7 @@ import { generalSettings } from '../utils/storage-utils';
 import { updateUrl } from '../utils/routing';
 import { handleDragStart, handleDragOver, handleDrop, handleDragEnd } from '../utils/drag-and-drop';
 import { createElementWithClass, createElementWithHTML } from '../utils/dom-utils';
+import { updateToggleState } from '../utils/ui-utils';
 import { updatePromptContextVisibility } from './interpreter-settings';
 import { showSettingsSection } from './settings-section-ui';
 import { updatePropertyType } from './property-types-manager';
@@ -148,7 +149,8 @@ export function showTemplateEditor(template: Template | null): void {
 			noteContentFormat: '{{content}}',
 			properties: [],
 			triggers: [],
-			context: ''
+			context: '',
+			isLocalOnly: false
 		};
 		templates.unshift(editingTemplate);
 		setEditingTemplateIndex(0);
@@ -243,6 +245,28 @@ export function showTemplateEditor(template: Template | null): void {
 		});
 		vaultSelect.value = editingTemplate.vault || '';
 	}
+
+    const localOnlyCheckbox = document.getElementById('template-local-only') as HTMLInputElement;
+    if (localOnlyCheckbox) {
+        // Set the checkbox state based on the template's isLocalOnly property
+        localOnlyCheckbox.checked = editingTemplate.isLocalOnly === true;
+
+        // Keep the toggle's visual state in sync with the checkbox
+        const container = localOnlyCheckbox.closest('.checkbox-container') as HTMLElement | null;
+        if (container) updateToggleState(container, localOnlyCheckbox);
+
+        // Bind a stable change handler (avoid cloning/breaking toggle wiring)
+        localOnlyCheckbox.onchange = () => {
+            if (editingTemplateIndex !== -1 && templates[editingTemplateIndex]) {
+                templates[editingTemplateIndex].isLocalOnly = localOnlyCheckbox.checked;
+
+                // Auto-save when checkbox changes
+                saveTemplateSettings().catch(error => {
+                    console.error('Auto-save failed:', error);
+                });
+            }
+        };
+    }
 
 	updateUrl('templates', editingTemplate.id);
 	updatePromptContextVisibility();
@@ -527,6 +551,9 @@ export function updateTemplateFromForm(): void {
 
 	const vaultSelect = document.getElementById('template-vault') as HTMLSelectElement;
 	if (vaultSelect) template.vault = vaultSelect.value || undefined;
+
+	const localOnlyCheckbox = document.getElementById('template-local-only') as HTMLInputElement;
+	if (localOnlyCheckbox) template.isLocalOnly = localOnlyCheckbox.checked;
 
 	hasUnsavedChanges = true;
 }
