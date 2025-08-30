@@ -327,12 +327,14 @@ function parseLLMResponse(responseContent: string, promptVariables: PromptVariab
 			return { promptResponses: [] };
 		}
 
-		// Convert escaped newlines to actual newlines in the responses
+		// Convert escaped newlines to actual newlines and clean up code blocks in responses
 		Object.keys(parsedResponse.prompts_responses).forEach(key => {
 			if (typeof parsedResponse.prompts_responses[key] === 'string') {
 				parsedResponse.prompts_responses[key] = parsedResponse.prompts_responses[key]
 					.replace(/\\n/g, '\n')
-					.replace(/\r/g, '');
+					.replace(/\r/g, '')
+					.replace(/^```(?:json|markdown)?\n?/, '') // Remove opening code blocks
+					.replace(/\n?```$/, ''); // Remove closing code blocks
 			}
 		});
 
@@ -355,42 +357,138 @@ function parseLLMResponse(responseContent: string, promptVariables: PromptVariab
 	}
 }
 
-export function collectPromptVariables(template: Template | null): PromptVariable[] {
+// Map raw placeholder (quoted text or unquoted var name) -> prompt key
+const placeholderKeyMap = new Map<string, string>();
+
+// Track issues found while collecting prompts (e.g., missing variables for unquoted references)
+export type PromptCollectionError = {
+    type: 'missingVariable';
+    variable: string; // the unquoted var name
+    placeholder: string; // the literal placeholder to search for (e.g., {{prompt:var}})
+    withFilters?: string; // the placeholder including any filters for better location
+};
+
+export let lastPromptCollectionErrors: PromptCollectionError[] = [];
+
+export function collectPromptVariables(
+    template: Template | null,
+    variables?: { [key: string]: any },
+    currentUrl?: string
+): PromptVariable[] {
 	const promptMap = new Map<string, PromptVariable>();
-	const promptRegex = /{{(?:prompt:)?"(.*?)"(\|.*?)?}}/g;
-	let match;
+    // Allow optional whitespace before filters and before closing braces
+    const promptRegex = /{{(?:prompt:)?(?:"((?:\\.|[^"\\])*)"|([^|}]+))\s*(\|[\s\S]*?)?\s*}}/g;
+	let match: RegExpExecArray | null;
 
-	function addPrompt(prompt: string, filters: string) {
-		if (!promptMap.has(prompt)) {
+	placeholderKeyMap.clear();
+	lastPromptCollectionErrors = [];
+	const seenMissing = new Set<string>();
+
+	function resolveVariable(path: string): { value: string | undefined; found: boolean } {
+		if (!variables) return { value: path, found: false };
+		const getNestedValue = (obj: any, p: string): any => {
+			const keys = p.split('.');
+			return keys.reduce((value, key) => {
+				if (value === undefined || value === null) return undefined;
+				if (key.includes('[') && key.includes(']')) {
+					const [arrayKey, indexStr] = key.split(/[\[\]]/);
+					const index = parseInt(indexStr, 10);
+					const arr = (value as any)[arrayKey];
+					return Array.isArray(arr) ? arr[index] : undefined;
+				}
+				return (value as any)[key];
+			}, obj);
+		};
+		let value: any;
+		const trimmed = path.trim();
+		if (trimmed.includes('.') || trimmed.includes('[')) {
+			value = getNestedValue(variables, trimmed);
+		} else {
+			value = (variables as any)[`{{${trimmed}}}`];
+			if (value === undefined) value = (variables as any)[trimmed];
+		}
+		if (value === undefined) return { value: undefined, found: false };
+		
+		const str = value === null
+			? ''
+			: typeof value === 'object'
+				? JSON.stringify(value)
+				: String(value);
+		
+		
+		return { value: str, found: true };
+	}
+
+	function addPrompt(placeholder: string, finalPrompt: string, filters: string) {
+		if (!promptMap.has(finalPrompt)) {
 			const key = `prompt_${promptMap.size + 1}`;
-			promptMap.set(prompt, { key, prompt, filters });
+			promptMap.set(finalPrompt, { key, prompt: finalPrompt, filters });
+			placeholderKeyMap.set(placeholder, key);
+		} else {
+			const existing = promptMap.get(finalPrompt)!;
+			placeholderKeyMap.set(placeholder, existing.key);
 		}
 	}
 
-	if (template?.noteContentFormat) {
-		while ((match = promptRegex.exec(template.noteContentFormat)) !== null) {
-			addPrompt(match[1], match[2] || '');
-		}
-	}
+    const scanText = (text: string) => {
+        while ((match = promptRegex.exec(text)) !== null) {
+            const quoted = match[1];
+            const unquoted = match[2];
+            const filters = match[3] || '';
+            const placeholder = (quoted ?? unquoted ?? '').trim();
+            let finalPrompt = quoted ? quoted.trim().replace(/\\\"/g, '"') : '';
+            if (!finalPrompt && unquoted) {
+                const { value, found } = resolveVariable(unquoted);
+                if (!found) {
+                    const trimmed = unquoted.trim();
+                    if (!seenMissing.has(trimmed)) {
+                        seenMissing.add(trimmed);
+                        const literal = `{{prompt:${trimmed}}}`;
+                        const literalWithFilters = `{{prompt:${trimmed}${filters}}}`;
+                        lastPromptCollectionErrors.push({ type: 'missingVariable', variable: trimmed, placeholder: literal, withFilters: literalWithFilters });
+                    }
+                    // Still register a prompt so the interpreter UI is available;
+                    // we'll abort before sending to LLM and show errors.
+                    finalPrompt = trimmed;
+                } else {
+                    finalPrompt = (value ?? '').toString();
+                }
+            }
+            // If a quoted prompt was empty or an unquoted var was missing, we may need a fallback.
+            // But if an unquoted var was FOUND and resolves to an empty string, treat it as a valid (empty) prompt
+            // so it doesn't get replaced by the raw placeholder name.
+            if (!finalPrompt) {
+                if (unquoted) {
+                    // finalPrompt is empty. If unquoted existed, it means we either resolved to empty string
+                    // or we already recorded a missing variable (handled above). Keep empty string when resolved.
+                    // Only fallback for the case where we never had a usable placeholder (should be rare).
+                    // Do nothing: keep empty string as the final prompt to avoid inserting the var name.
+                } else {
+                    finalPrompt = placeholder; // fallback for empty quoted prompt edge-case
+                }
+            }
+            addPrompt(placeholder, finalPrompt, filters);
+        }
+    };
 
-	if (template?.properties) {
-		for (const property of template.properties) {
-			let propertyValue = property.value;
-			while ((match = promptRegex.exec(propertyValue)) !== null) {
-				addPrompt(match[1], match[2] || '');
-			}
-		}
-	}
+    // Prefer current UI state first — scan all inputs/textarea for up-to-date prompts
+    const allInputs = document.querySelectorAll('input, textarea');
+    allInputs.forEach((input) => {
+        if (input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement) {
+            scanText(input.value);
+        }
+    });
 
-	const allInputs = document.querySelectorAll('input, textarea');
-	allInputs.forEach((input) => {
-		if (input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement) {
-			let inputValue = input.value;
-			while ((match = promptRegex.exec(inputValue)) !== null) {
-				addPrompt(match[1], match[2] || '');
-			}
-		}
-	});
+    // If no prompts were found in the UI, fall back to the template definition
+    if (promptMap.size === 0) {
+        if (template?.noteContentFormat) scanText(template.noteContentFormat);
+
+        if (template?.properties) {
+            for (const property of template.properties) {
+                scanText(property.value);
+            }
+        }
+    }
 
 	return Array.from(promptMap.values());
 }
@@ -419,7 +517,7 @@ export async function initializeInterpreter(template: Template, variables: { [ke
 		element.addEventListener(eventType, listener);
 	}
 
-	const promptVariables = collectPromptVariables(template);
+	const promptVariables = collectPromptVariables(template, variables, currentUrl);
 
 	// Hide interpreter if it's disabled or there are no prompt variables
 	if (!generalSettings.interpreterEnabled || promptVariables.length === 0) {
@@ -523,6 +621,20 @@ export async function handleInterpreterUI(
 
 		// Remove any previous done or error classes
 		interpreterContainer?.classList.remove('done', 'error');
+		(interpretBtn as HTMLButtonElement).classList.remove('done', 'error', 'processing');
+		// Ensure the interpret button is enabled for a fresh run (important when coming from Retry)
+		interpretBtn.disabled = false;
+
+		// Hide any existing retry button at the start of a run
+		let retryBtn = document.getElementById('interpreter-retry-btn') as HTMLButtonElement | null;
+		if (retryBtn) {
+			retryBtn.style.display = 'none';
+			retryBtn.disabled = true;
+			// reset any inline margins from prior runs
+			retryBtn.style.marginLeft = '4px';
+			// make sure it doesn't inherit disabled styles on next show
+			retryBtn.classList.remove('done', 'processing');
+		}
 
 		// Find the provider for this model
 		const provider = generalSettings.providers.find(p => p.id === modelConfig.providerId);
@@ -535,10 +647,58 @@ export async function handleInterpreterUI(
 			throw new Error(`API key is not set for provider ${provider.name}`);
 		}
 
-		const promptVariables = collectPromptVariables(template);
+		const promptVariables = collectPromptVariables(template, variables, currentUrl);
 
 		if (promptVariables.length === 0) {
 			throw new Error('No prompt variables found. Please add at least one prompt variable to your template.');
+		}
+
+		// If there are collection errors (e.g., missing variables), show an error and abort
+		if (lastPromptCollectionErrors.length > 0) {
+			const details = lastPromptCollectionErrors.map(err => err.placeholder);
+
+			// Set error state UI and show Retry button (with separator)
+			interpretBtn.textContent = `${getMessage('error')} |`;
+			interpretBtn.classList.remove('processing');
+			interpretBtn.classList.add('error');
+			interpretBtn.disabled = true;
+
+			interpreterContainer?.classList.add('error');
+			responseTimer.style.display = 'none';
+			interpreterErrorMessage.textContent = `Missing variables in prompts:\n${details.join('\n')}`;
+			interpreterErrorMessage.style.display = 'block';
+
+			// Ensure a Retry button exists, styled like Interpret, placed next to it, and wired
+			if (!retryBtn) {
+				retryBtn = document.createElement('button');
+				retryBtn.id = 'interpreter-retry-btn';
+				retryBtn.setAttribute('data-i18n', 'retry');
+				retryBtn.textContent = (typeof getMessage === 'function') ? getMessage('Retry') : 'retry';
+				// Copy classes/styles from interpret button for consistent look
+				retryBtn.className = (interpretBtn as HTMLButtonElement).className;
+				retryBtn.classList.remove('error', 'done', 'processing');
+				// tighter spacing next to error label
+				retryBtn.style.marginLeft = '4px';
+				// ensure retry remains enabled/clickable even if interpret is disabled
+				retryBtn.disabled = false;
+				const parent = interpretBtn.parentElement;
+				if (parent) {
+					parent.insertBefore(retryBtn, interpretBtn.nextSibling);
+				} else {
+					(interpreterContainer as HTMLElement)?.appendChild(retryBtn);
+				}
+			}
+			retryBtn.onclick = async () => {
+				// Re-run the full interpreter flow
+				await handleInterpreterUI(template, variables, tabId, currentUrl, modelConfig);
+			};
+			retryBtn.style.display = 'inline-block';
+			retryBtn.disabled = false;
+
+			// Re-enable clip buttons to allow user to fix and retry
+			clipButton.disabled = false;
+			moreButton.disabled = false;
+			return; // Abort sending to LLM
 		}
 
 		const contextToUse = promptContextTextarea.value;
@@ -548,7 +708,9 @@ export async function handleInterpreterUI(
 		const startTime = performance.now();
 		let timerInterval: number;
 
-		// Change button text and add class
+		// Change button text and add class (ensure non-error state for purple accent)
+		(interpretBtn as HTMLButtonElement).classList.remove('error', 'done');
+		interpreterContainer?.classList.remove('error', 'done');
 		interpretBtn.textContent = getMessage('thinking');
 		interpretBtn.classList.add('processing');
 
@@ -600,8 +762,8 @@ export async function handleInterpreterUI(
 	} catch (error) {
 		console.error('Error processing LLM:', error);
 		
-		// Revert button text and remove class in case of error
-		interpretBtn.textContent = getMessage('error');
+		// Revert button text and remove class in case of error (with separator)
+		interpretBtn.textContent = `${getMessage('error')} |`;
 		interpretBtn.classList.remove('processing');
 		interpretBtn.classList.add('error');
 		interpretBtn.disabled = true;
@@ -615,6 +777,27 @@ export async function handleInterpreterUI(
 		// Display the error message
 		interpreterErrorMessage.textContent = error instanceof Error ? error.message : 'An unknown error occurred while processing the interpreter request.';
 		interpreterErrorMessage.style.display = 'block';
+
+		// Offer a Retry button after generic errors as well
+		let retryBtn = document.getElementById('interpreter-retry-btn') as HTMLButtonElement | null;
+		if (!retryBtn) {
+			retryBtn = document.createElement('button');
+			retryBtn.id = 'interpreter-retry-btn';
+			retryBtn.setAttribute('data-i18n', 'retry');
+			retryBtn.textContent = (typeof getMessage === 'function') ? getMessage('retry') : 'Retry';
+			// Match Interpret button styling and placement
+			retryBtn.className = (interpretBtn as HTMLButtonElement).className;
+			retryBtn.classList.remove('error', 'done', 'processing');
+			retryBtn.style.marginLeft = '8px';
+			const parent = interpretBtn.parentElement;
+			if (parent) parent.insertBefore(retryBtn, interpretBtn.nextSibling);
+			else (interpreterContainer as HTMLElement)?.appendChild(retryBtn);
+		}
+		retryBtn.onclick = async () => {
+			await handleInterpreterUI(template, variables, tabId, currentUrl, modelConfig);
+		};
+		retryBtn.style.display = 'inline-block';
+		retryBtn.disabled = false;
 
 		// Re-enable the clip button
 		clipButton.disabled = false;
@@ -633,11 +816,21 @@ export function replacePromptVariables(promptVariables: PromptVariable[], prompt
 	const allInputs = document.querySelectorAll('input, textarea');
 	allInputs.forEach((input) => {
 		if (input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement) {
-			input.value = input.value.replace(/{{(?:prompt:)?"(.*?)"(\|.*?)?}}/g, (match, promptText, filters) => {
-				const variable = promptVariables.find(v => v.prompt === promptText);
-				if (!variable) return match;
+					input.value = input.value.replace(/{{(?:prompt:)?(?:"((?:\\.|[^"\\])*)"|([^|}]+))\s*(\|[\s\S]*?)?\s*}}/g, (match, quotedText, unquotedVar, filters) => {
+					let key: string | undefined;
+					if (quotedText) {
+						const variable = promptVariables.find(v => v.prompt === quotedText);
+						key = variable?.key;
+						if (!key) {
+							key = placeholderKeyMap.get(quotedText);
+						}
+					} else if (unquotedVar) {
+						key = placeholderKeyMap.get(unquotedVar.trim());
+					}
 
-				const response = promptResponses.find(r => r.key === variable.key);
+					if (!key) return match;
+
+					const response = promptResponses.find(r => r.key === key);
 				if (response && response.user_response !== undefined) {
 					let value = response.user_response;
 					
