@@ -1,5 +1,3 @@
-import { debugLog } from "./debug";
-
 export function escapeRegExp(value: string): string {
 	return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
@@ -101,7 +99,7 @@ export function makeUrlAbsolute(element: Element, attributeName: string, baseUrl
 		try {
 			// Create a new URL object from the base URL
 			const resolvedBaseUrl = new URL(baseUrl.href);
-
+			
 			const url = new URL(attributeValue, resolvedBaseUrl);
 			
 			if (!['http:', 'https:'].includes(url.protocol)) {

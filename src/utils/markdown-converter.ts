@@ -2,7 +2,6 @@ import TurndownService from 'turndown';
 import { MathMLToLaTeX } from 'mathml-to-latex';
 import { processUrls } from './string-utils';
 import { debugLog } from './debug';
-import { clipboard } from 'webextension-polyfill';
 
 const footnotes: { [key: string]: string } = {};
 
