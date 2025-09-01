@@ -10,6 +10,8 @@ export function createMarkdownContent(content: string, url: string) {
 	debugLog('Markdown', 'Content length:', content.length);
 
 	const baseUrl = new URL(url);
+	// normalise even after header links have been clicked
+	baseUrl.hash = '';
 	// Process all URLs at the beginning
 	const processedContent = processUrls(content, baseUrl);
 
@@ -682,7 +684,7 @@ export function createMarkdownContent(content: string, url: string) {
 			String.raw`\[([^\]]+)\]\(` + url.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + String.raw`(#[-\w]+)\)`, // make sure to escape the url characters
 			"g"
 		);
-		markdown = markdown.replace(headingLinkPattern, (_, title, hash) => `[[${title}|${hash}]]`);
+		markdown = markdown.replace(headingLinkPattern, (_, title, hash) => `[[${hash}|${title}]]`);
 
 		// Remove any consecutive newlines more than two
 		markdown = markdown.replace(/\n{3,}/g, '\n\n');
