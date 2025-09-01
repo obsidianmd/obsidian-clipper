@@ -101,6 +101,8 @@ export function makeUrlAbsolute(element: Element, attributeName: string, baseUrl
 		try {
 			// Create a new URL object from the base URL
 			const resolvedBaseUrl = new URL(baseUrl.href);
+			// ensure that the clipper clips the same even if the user has clicked on a heading link
+			resolvedBaseUrl.hash = '';
 
 			const url = new URL(attributeValue, resolvedBaseUrl);
 			
