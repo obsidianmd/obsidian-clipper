@@ -676,6 +676,14 @@ export function createMarkdownContent(content: string, url: string) {
 		// But don't affect image links like ![](image.jpg)
 		markdown = markdown.replace(/\n*(?<!!)\[]\([^)]+\)\n*/g, '');
 
+		// convert any heading links pointing to the current page e.g [Example](example.com#heading) into Obsidian relative links
+		// e.g. [[Example|#heading]]
+		const headingLinkPattern = new RegExp(
+			String.raw`\[([^\]]+)\]\(` + url.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + String.raw`(#[-\w]+)\)`, // make sure to escape the url characters
+			"g"
+		);
+		markdown = markdown.replace(headingLinkPattern, (_, title, hash) => `[[${title}|${hash}]]`);
+
 		// Remove any consecutive newlines more than two
 		markdown = markdown.replace(/\n{3,}/g, '\n\n');
 
