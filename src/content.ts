@@ -4,6 +4,7 @@ import { loadSettings, generalSettings } from './utils/storage-utils';
 import Defuddle from 'defuddle';
 import { getDomain } from './utils/string-utils';
 import { initializeIcons } from './icons/icons';
+import { isWeiboDetailPage, extractWeiboContent, convertWeiboToDefuddleFormat } from './utils/weibo-extractor';
 
 declare global {
 	interface Window {
@@ -211,7 +212,7 @@ declare global {
 		if (request.action === "getPageContent") {
 			let selectedHtml = '';
 			const selection = window.getSelection();
-			
+
 			if (selection && selection.rangeCount > 0) {
 				const range = selection.getRangeAt(0);
 				const clonedSelection = range.cloneContents();
@@ -222,8 +223,33 @@ declare global {
 
 			const extractedContent: { [key: string]: string } = {};
 
-			// Process with Defuddle first while we have access to the document
-			const defuddled = new Defuddle(document, { url: document.URL }).parse();
+			// Check if this is a Weibo page and use specialized extraction
+			let defuddled: any;
+			if (isWeiboDetailPage(document.URL)) {
+				try {
+					const weiboData = extractWeiboContent(document);
+					defuddled = convertWeiboToDefuddleFormat(weiboData);
+
+					// Add additional properties that Defuddle normally provides
+					defuddled.favicon = document.querySelector('link[rel*="icon"]')?.getAttribute('href') || '';
+					defuddled.parseTime = Date.now();
+					defuddled.schemaOrgData = null;
+					defuddled.metaTags = Array.from(document.querySelectorAll('meta')).map(meta => ({
+						name: meta.getAttribute('name'),
+						property: meta.getAttribute('property'),
+						content: meta.getAttribute('content')
+					}));
+
+					console.log('Used Weibo extractor for content extraction');
+				} catch (error) {
+					console.warn('Weibo extraction failed, falling back to Defuddle:', error);
+					// Fall back to Defuddle if Weibo extraction fails
+					defuddled = new Defuddle(document, { url: document.URL }).parse();
+				}
+			} else {
+				// Process with Defuddle for non-Weibo pages
+				defuddled = new Defuddle(document, { url: document.URL }).parse();
+			}
 
 			// Create a new DOMParser
 			const parser = new DOMParser();
