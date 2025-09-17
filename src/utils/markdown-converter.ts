@@ -679,6 +679,12 @@ export function createMarkdownContent(content: string, url: string) {
 		// Remove any consecutive newlines more than two
 		markdown = markdown.replace(/\n{3,}/g, '\n\n');
 
+		// Remove trailing backslashes due to youtube nested span tags
+		if (baseUrl.hostname.startsWith("www.youtube.com")) {
+			markdown = markdown.replace(/^\\(?=[#>*+\-\[])/gm, '');
+			console.log(markdown)
+		}
+
 		// Append footnotes at the end of the document
 		if (Object.keys(footnotes).length > 0) {
 			markdown += '\n\n---\n\n';
