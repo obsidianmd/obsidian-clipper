@@ -215,6 +215,7 @@ export async function initializePageContent(
 function addSchemaOrgDataToVariables(schemaData: any, variables: { [key: string]: string }, prefix: string = '') {
 	if (Array.isArray(schemaData)) {
 		schemaData.forEach((item, index) => {
+			if (!item || typeof item !== 'object') return;
 			if (item['@type']) {
 				if (Array.isArray(item['@type'])) {
 					item['@type'].forEach((type: string) => {
