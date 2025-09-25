@@ -344,7 +344,7 @@
 		"message": "Web Clipperの使い方とトラブルシューティングのヘルプを参照してください。"
 	},
 	"highlightInline": {
-		"message": "ページ内容を高亮表示"
+		"message": "ページ内容をハイライトする"
 	},
 	"highlightPage": {
 		"message": "ページをハイライト"
