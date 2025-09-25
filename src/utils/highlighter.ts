@@ -13,6 +13,56 @@ import {
 import { detectBrowser, addBrowserClassToHtml } from './browser-detection';
 import { generalSettings, loadSettings } from './storage-utils';
 
+/**
+ * Helper function to create SVG elements
+ */
+function createSVG(config: {
+	width?: string;
+	height?: string;
+	viewBox?: string;
+	className?: string;
+	paths?: string[];
+	lines?: Array<{x1: string, y1: string, x2: string, y2: string}>;
+}): SVGElement {
+	const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+	svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+	
+	if (config.width) svg.setAttribute('width', config.width);
+	if (config.height) svg.setAttribute('height', config.height);
+	if (config.viewBox) svg.setAttribute('viewBox', config.viewBox);
+	if (config.className) svg.setAttribute('class', config.className);
+	
+	// Default attributes for all SVGs
+	svg.setAttribute('fill', 'none');
+	svg.setAttribute('stroke', 'currentColor');
+	svg.setAttribute('stroke-width', '2');
+	svg.setAttribute('stroke-linecap', 'round');
+	svg.setAttribute('stroke-linejoin', 'round');
+	
+	// Add paths
+	if (config.paths) {
+		config.paths.forEach(pathData => {
+			const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+			path.setAttribute('d', pathData);
+			svg.appendChild(path);
+		});
+	}
+	
+	// Add lines
+	if (config.lines) {
+		config.lines.forEach(lineData => {
+			const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+			line.setAttribute('x1', lineData.x1);
+			line.setAttribute('y1', lineData.y1);
+			line.setAttribute('x2', lineData.x2);
+			line.setAttribute('y2', lineData.y2);
+			svg.appendChild(line);
+		});
+	}
+	
+	return svg;
+}
+
 export type AnyHighlightData = TextHighlightData | ElementHighlightData | ComplexHighlightData;
 
 export let highlights: AnyHighlightData[] = [];
@@ -193,59 +243,142 @@ export function createHighlighterMenu() {
 	
 	const highlightCount = highlights.length;
 	const highlightText = `${highlightCount}`;
+
+	menu.textContent = '';
 	
-	menu.innerHTML = `
-		${highlightCount > 0 ? `<button id="obsidian-clip-button" class="mod-cta">Clip highlights</button>` : '<span class="no-highlights">Select elements to highlight</span>'}
-		${highlightCount > 0 ? `<button id="obsidian-clear-highlights">${highlightText} <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg></button>` : ''}
-		<button id="obsidian-undo-highlights"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-undo-2"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5v0a5.5 5.5 0 0 1-5.5 5.5H11"/></svg></button>
-		<button id="obsidian-redo-highlights"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-redo-2"><path d="m15 14 5-5-5-5"/><path d="M20 9H9.5A5.5 5.5 0 0 0 4 14.5v0A5.5 5.5 0 0 0 9.5 20H13"/></svg></button>
-		<button id="obsidian-exit-highlighter"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></button>	
-	`;
-
+	// Add clip button or no highlights message
 	if (highlightCount > 0) {
-		const clearButton = document.getElementById('obsidian-clear-highlights');
-		const clipButton = document.getElementById('obsidian-clip-button');
+		const clipButton = document.createElement('button');
+		clipButton.id = 'obsidian-clip-button';
+		clipButton.className = 'mod-cta';
+		clipButton.textContent = 'Clip highlights';
+		menu.appendChild(clipButton);
+		
+		// Add clear highlights button
+		const clearButton = document.createElement('button');
+		clearButton.id = 'obsidian-clear-highlights';
+		clearButton.textContent = highlightText + ' ';
+		
+		// Add trash icon
+		const trashSvg = createSVG({
+			width: '16',
+			height: '16',
+			viewBox: '0 0 24 24',
+			className: 'lucide lucide-trash-2',
+			paths: [
+				'M3 6h18',
+				'M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6',
+				'M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2'
+			],
+			lines: [
+				{x1: '10', y1: '11', x2: '10', y2: '17'},
+				{x1: '14', y1: '11', x2: '14', y2: '17'}
+			]
+		});
+		clearButton.appendChild(trashSvg);
+		menu.appendChild(clearButton);
+	} else {
+		const noHighlights = document.createElement('span');
+		noHighlights.className = 'no-highlights';
+		noHighlights.textContent = 'Select elements to highlight';
+		menu.appendChild(noHighlights);
+	}
+	
+	// Add undo button
+	const undoButton = document.createElement('button');
+	undoButton.id = 'obsidian-undo-highlights';
+	const undoSvg = createSVG({
+		width: '16',
+		height: '16',
+		viewBox: '0 0 24 24',
+		className: 'lucide lucide-undo-2',
+		paths: [
+			'M9 14 4 9l5-5',
+			'M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5v0a5.5 5.5 0 0 1-5.5 5.5H11'
+		]
+	});
+	undoButton.appendChild(undoSvg);
+	menu.appendChild(undoButton);
+	
+	// Add redo button
+	const redoButton = document.createElement('button');
+	redoButton.id = 'obsidian-redo-highlights';
+	const redoSvg = createSVG({
+		width: '16',
+		height: '16',
+		viewBox: '0 0 24 24',
+		className: 'lucide lucide-redo-2',
+		paths: [
+			'm15 14 5-5-5-5',
+			'M20 9H9.5A5.5 5.5 0 0 0 4 14.5v0A5.5 5.5 0 0 0 9.5 20H13'
+		]
+	});
+	redoButton.appendChild(redoSvg);
+	menu.appendChild(redoButton);
+	
+	// Add exit button
+	const exitButton = document.createElement('button');
+	exitButton.id = 'obsidian-exit-highlighter';
+	const exitSvg = createSVG({
+		width: '16',
+		height: '16',
+		viewBox: '0 0 24 24',
+		className: 'lucide lucide-x',
+		paths: [
+			'M18 6 6 18',
+			'm6 6 12 12'
+		]
+	});
+	exitButton.appendChild(exitSvg);
+	menu.appendChild(exitButton);
 
-		if (clearButton) {
-			clearButton.addEventListener('click', clearHighlights);
-			clearButton.addEventListener('touchend', (e) => {
+	// Add event listeners to the buttons we just created
+	if (highlightCount > 0) {
+		// Use the clearButton and clipButton we already created
+		const clearButtonEl = menu.querySelector('#obsidian-clear-highlights') as HTMLButtonElement;
+		const clipButtonEl = menu.querySelector('#obsidian-clip-button') as HTMLButtonElement;
+
+		if (clearButtonEl) {
+			clearButtonEl.addEventListener('click', clearHighlights);
+			clearButtonEl.addEventListener('touchend', (e) => {
 				e.preventDefault();
 				clearHighlights();
 			});
 		}
 
-		if (clipButton) {
-			clipButton.addEventListener('click', handleClipButtonClick);
-			clipButton.addEventListener('touchend', (e) => {
+		if (clipButtonEl) {
+			clipButtonEl.addEventListener('click', handleClipButtonClick);
+			clipButtonEl.addEventListener('touchend', (e) => {
 				e.preventDefault();
 				handleClipButtonClick(e);
 			});
 		}
 	}
 
-	const exitButton = document.getElementById('obsidian-exit-highlighter');
-	const undoButton = document.getElementById('obsidian-undo-highlights');
-	const redoButton = document.getElementById('obsidian-redo-highlights');
+	// Use the buttons we already created
+	const exitButtonEl = menu.querySelector('#obsidian-exit-highlighter') as HTMLButtonElement;
+	const undoButtonEl = menu.querySelector('#obsidian-undo-highlights') as HTMLButtonElement;
+	const redoButtonEl = menu.querySelector('#obsidian-redo-highlights') as HTMLButtonElement;
 
-	if (exitButton) {
-		exitButton.addEventListener('click', exitHighlighterMode);
-		exitButton.addEventListener('touchend', (e) => {
+	if (exitButtonEl) {
+		exitButtonEl.addEventListener('click', exitHighlighterMode);
+		exitButtonEl.addEventListener('touchend', (e) => {
 			e.preventDefault();
 			exitHighlighterMode();
 		});
 	}
 
-	if (undoButton) {
-		undoButton.addEventListener('click', undo);
-		undoButton.addEventListener('touchend', (e) => {
+	if (undoButtonEl) {
+		undoButtonEl.addEventListener('click', undo);
+		undoButtonEl.addEventListener('touchend', (e) => {
 			e.preventDefault();
 			undo();
 		});
 	}
 
-	if (redoButton) {
-		redoButton.addEventListener('click', redo);
-		redoButton.addEventListener('touchend', (e) => {
+	if (redoButtonEl) {
+		redoButtonEl.addEventListener('click', redo);
+		redoButtonEl.addEventListener('touchend', (e) => {
 			e.preventDefault();
 			redo();
 		});
@@ -436,7 +569,17 @@ function getHighlightRanges(range: Range): TextHighlightData[] {
 				const contentFragment = currentBlockSelectionRange.cloneContents();
 				const tempDivForBlock = document.createElement('div');
 				tempDivForBlock.appendChild(contentFragment);
-				const selectedTextContent = sanitizeAndPreserveFormatting(tempDivForBlock.innerHTML);
+
+				const serializer = new XMLSerializer();
+				let htmlContent = '';
+				Array.from(tempDivForBlock.childNodes).forEach(node => {
+					if (node.nodeType === Node.ELEMENT_NODE) {
+						htmlContent += serializer.serializeToString(node);
+					} else if (node.nodeType === Node.TEXT_NODE) {
+						htmlContent += node.textContent;
+					}
+				});
+				const selectedTextContent = sanitizeAndPreserveFormatting(htmlContent);
 
 				if (selectedTextContent.trim() === "") continue; // Skip empty highlights
 
@@ -462,7 +605,17 @@ function getHighlightRanges(range: Range): TextHighlightData[] {
 		if (ALLOWED_HIGHLIGHT_TAGS.includes(parentElement.tagName.toUpperCase())) {
 			const tempDivSingle = document.createElement('div');
 			tempDivSingle.appendChild(range.cloneContents());
-			const content = sanitizeAndPreserveFormatting(tempDivSingle.innerHTML);
+
+			const serializer = new XMLSerializer();
+			let htmlContent = '';
+			Array.from(tempDivSingle.childNodes).forEach(node => {
+				if (node.nodeType === Node.ELEMENT_NODE) {
+					htmlContent += serializer.serializeToString(node);
+				} else if (node.nodeType === Node.TEXT_NODE) {
+					htmlContent += node.textContent;
+				}
+			});
+			const content = sanitizeAndPreserveFormatting(htmlContent);
 			if (content.trim() !== "") {
 				newHighlights.push({
 					xpath: getElementXPath(parentElement),
@@ -483,14 +636,28 @@ function getHighlightRanges(range: Range): TextHighlightData[] {
 
 // Sanitize HTML content while preserving formatting
 function sanitizeAndPreserveFormatting(html: string): string {
-	const tempDiv = document.createElement('div');
-	tempDiv.innerHTML = html;
-
+	// Use DOMParser for safer HTML parsing
+	const parser = new DOMParser();
+	const doc = parser.parseFromString(html, 'text/html');
+	
 	// Remove any script tags
-	tempDiv.querySelectorAll('script').forEach(el => el.remove());
+	doc.querySelectorAll('script').forEach(el => el.remove());
 
+	// Get the body content and serialize it back
+	const serializer = new XMLSerializer();
+	let result = '';
+	
+	// Serialize all child nodes of the body
+	Array.from(doc.body.childNodes).forEach(node => {
+		if (node.nodeType === Node.ELEMENT_NODE) {
+			result += serializer.serializeToString(node);
+		} else if (node.nodeType === Node.TEXT_NODE) {
+			result += node.textContent;
+		}
+	});
+	
 	// Close any unclosed tags
-	return balanceTags(tempDiv.innerHTML);
+	return balanceTags(result);
 }
 
 // Balance HTML tags to ensure proper nesting
