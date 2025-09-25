@@ -137,9 +137,18 @@ export async function loadSettings(): Promise<Settings> {
 		debugLog('Settings', `Updated migration version to ${CURRENT_MIGRATION_VERSION}`);
 	}
 
+	// Validate and sanitize data to prevent corruption
+	const sanitizedVaults = Array.isArray(data.vaults) ? data.vaults.filter(v => typeof v === 'string') : [];
+	const sanitizedModels = Array.isArray(data.interpreter_settings?.models) 
+		? data.interpreter_settings.models.filter(m => m && typeof m === 'object' && typeof m.id === 'string') 
+		: [];
+	const sanitizedProviders = Array.isArray(data.interpreter_settings?.providers) 
+		? data.interpreter_settings.providers.filter(p => p && typeof p === 'object' && typeof p.id === 'string') 
+		: [];
+
 	// Load user settings
 	const loadedSettings: Settings = {
-		vaults: data.vaults || defaultSettings.vaults,
+		vaults: sanitizedVaults.length > 0 ? sanitizedVaults : defaultSettings.vaults,
 		showMoreActionsButton: data.general_settings?.showMoreActionsButton ?? defaultSettings.showMoreActionsButton,
 		betaFeatures: data.general_settings?.betaFeatures ?? defaultSettings.betaFeatures,
 		legacyMode: data.general_settings?.legacyMode ?? defaultSettings.legacyMode,
@@ -151,8 +160,8 @@ export async function loadSettings(): Promise<Settings> {
 		alwaysShowHighlights: data.highlighter_settings?.alwaysShowHighlights ?? defaultSettings.alwaysShowHighlights,
 		highlightBehavior: data.highlighter_settings?.highlightBehavior ?? defaultSettings.highlightBehavior,
 		interpreterModel: data.interpreter_settings?.interpreterModel || defaultSettings.interpreterModel,
-		models: data.interpreter_settings?.models || defaultSettings.models,
-		providers: data.interpreter_settings?.providers || defaultSettings.providers,
+		models: sanitizedModels,
+		providers: sanitizedProviders,
 		interpreterEnabled: data.interpreter_settings?.interpreterEnabled ?? defaultSettings.interpreterEnabled,
 		interpreterAutoRun: data.interpreter_settings?.interpreterAutoRun ?? defaultSettings.interpreterAutoRun,
 		defaultPromptContext: data.interpreter_settings?.defaultPromptContext || defaultSettings.defaultPromptContext,

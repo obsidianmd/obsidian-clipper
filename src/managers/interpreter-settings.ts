@@ -177,39 +177,70 @@ export function updatePromptContextVisibility(): void {
 }
 
 export async function initializeInterpreterSettings(): Promise<void> {
-	const interpreterSettingsForm = document.getElementById('interpreter-settings-form');
-	if (interpreterSettingsForm) {
-		interpreterSettingsForm.addEventListener('input', debounce(saveInterpreterSettingsFromForm, 500));
-	}
+	try {
+		const interpreterSettingsForm = document.getElementById('interpreter-settings-form');
+		if (interpreterSettingsForm) {
+			interpreterSettingsForm.addEventListener('input', debounce(saveInterpreterSettingsFromForm, 500));
+		}
 
-	await loadSettings();
-	debugLog('Interpreter', 'Loaded general settings:', generalSettings);
+		await loadSettings();
+		debugLog('Interpreter', 'Loaded general settings:', generalSettings);
 
-	cachedPresetProviders = await getPresetProviders();
-	debugLog('Interpreter', 'Fetched preset providers:', cachedPresetProviders);
+		// Ensure models and providers are valid arrays
+		if (!Array.isArray(generalSettings.models)) {
+			console.warn('Invalid models data, resetting to empty array');
+			generalSettings.models = [];
+		}
+		if (!Array.isArray(generalSettings.providers)) {
+			console.warn('Invalid providers data, resetting to empty array');
+			generalSettings.providers = [];
+		}
 
-	initializeProviderList();
-	initializeModelList();
+		cachedPresetProviders = await getPresetProviders();
+		debugLog('Interpreter', 'Fetched preset providers:', cachedPresetProviders);
 
-	initializeInterpreterToggles();
+		// Initialize lists with error handling
+		try {
+			initializeProviderList();
+		} catch (error) {
+			console.error('Error initializing provider list:', error);
+			generalSettings.providers = [];
+		}
 
-	const defaultPromptContextInput = document.getElementById('default-prompt-context') as HTMLTextAreaElement;
-	if (defaultPromptContextInput) {
-		defaultPromptContextInput.value = generalSettings.defaultPromptContext;
-	}
+		try {
+			initializeModelList();
+		} catch (error) {
+			console.error('Error initializing model list:', error);
+			generalSettings.models = [];
+		}
 
-	updatePromptContextVisibility();
-	initializeToggles();
-	initializeAutoSave();
-	
-	const addModelBtn = document.getElementById('add-model-btn');
-	if (addModelBtn) {
-		addModelBtn.addEventListener('click', (event) => addModelToList(event));
-	}
+		initializeInterpreterToggles();
 
-	const addProviderBtn = document.getElementById('add-provider-btn');
-	if (addProviderBtn) {
-		addProviderBtn.addEventListener('click', (event) => addProviderToList(event));
+		const defaultPromptContextInput = document.getElementById('default-prompt-context') as HTMLTextAreaElement;
+		if (defaultPromptContextInput) {
+			defaultPromptContextInput.value = generalSettings.defaultPromptContext;
+		}
+
+		updatePromptContextVisibility();
+		initializeToggles();
+		initializeAutoSave();
+		
+		const addModelBtn = document.getElementById('add-model-btn');
+		if (addModelBtn) {
+			addModelBtn.addEventListener('click', (event) => addModelToList(event));
+		}
+
+		const addProviderBtn = document.getElementById('add-provider-btn');
+		if (addProviderBtn) {
+			addProviderBtn.addEventListener('click', (event) => addProviderToList(event));
+		}
+	} catch (error) {
+		console.error('Error in initializeInterpreterSettings:', error);
+		// Reset to safe defaults and re-throw to be handled by caller
+		generalSettings.models = [];
+		generalSettings.providers = [];
+		generalSettings.interpreterEnabled = false;
+		throw error;
 	}
 }
 
