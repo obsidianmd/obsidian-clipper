@@ -53,7 +53,8 @@ export async function createUsageChart(container: HTMLElement, data: WeeklyUsage
 		description.textContent = `${totalClips} ${message}`;
 	}
 
-	container.innerHTML = '';
+	// Clear existing chart content
+	container.textContent = '';
 	container.classList.add('usage-chart');
 
 	const maxCount = Math.max(...data.map(d => d.count));
@@ -152,8 +153,17 @@ export async function createUsageChart(container: HTMLElement, data: WeeklyUsage
 			return currDist < prevDist ? curr : prev;
 		});
 
-		// Update tooltip content
-		tooltip.innerHTML = `<div class="tooltip-date">${closestPoint.date}</div><div class="tooltip-count">${closestPoint.count}</div>`;
+		tooltip.textContent = '';
+		
+		const dateDiv = document.createElement('div');
+		dateDiv.className = 'tooltip-date';
+		dateDiv.textContent = closestPoint.date;
+		tooltip.appendChild(dateDiv);
+		
+		const countDiv = document.createElement('div');
+		countDiv.className = 'tooltip-count';
+		countDiv.textContent = closestPoint.count.toString();
+		tooltip.appendChild(countDiv);
 		tooltip.style.display = 'flex';
 
 		// Calculate smooth transform offset based on position
@@ -244,6 +254,6 @@ export function aggregateUsageData(history: HistoryEntry[], options: ChartOption
 	return Array.from(periodsData.entries()).map(([period, count]) => ({
 		period,
 		count,
-		totalCount: options.timeRange === 'all' ? sortedHistory.length : undefined
+		totalCount: sortedHistory.length
 	}));
 } 

@@ -111,7 +111,8 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 						"${promptContext}"
 						"${JSON.stringify(promptContent)}"`
 					}
-				]
+				],
+				temperature: 0.3
 			};
 			headers = {
 				...headers,
@@ -482,10 +483,16 @@ export async function initializeInterpreter(template: Template, variables: { [ke
 			// Filter enabled models
 			const enabledModels = generalSettings.models.filter(model => model.enabled);
 			
-			modelSelect.innerHTML = enabledModels
-				.map(model => 
-					`<option value="${model.id}">${model.name}</option>`
-				).join('');
+			// Clear existing options
+			modelSelect.textContent = '';
+			
+			// Add model options
+			enabledModels.forEach(model => {
+				const option = document.createElement('option');
+				option.value = model.id;
+				option.textContent = model.name;
+				modelSelect.appendChild(option);
+			});
 
 			// Check if last selected model exists and is enabled
 			const lastSelectedModel = enabledModels.find(model => model.id === generalSettings.interpreterModel);
