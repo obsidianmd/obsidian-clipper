@@ -5,6 +5,22 @@ import { debugLog } from './debug';
 
 const footnotes: { [key: string]: string } = {};
 
+/**
+ * Helper function to safely get HTML content from an element
+ */
+function getElementHTML(element: Element): string {
+	const serializer = new XMLSerializer();
+	let result = '';
+	Array.from(element.childNodes).forEach(node => {
+		if (node.nodeType === Node.ELEMENT_NODE) {
+			result += serializer.serializeToString(node);
+		} else if (node.nodeType === Node.TEXT_NODE) {
+			result += node.textContent;
+		}
+	});
+	return result;
+}
+
 export function createMarkdownContent(content: string, url: string) {
 	debugLog('Markdown', 'Starting markdown conversion for URL:', url);
 	debugLog('Markdown', 'Content length:', content.length);
@@ -47,7 +63,7 @@ export function createMarkdownContent(content: string, url: string) {
 			const rows = Array.from(node.rows).map(row => {
 				const cells = Array.from(row.cells).map(cell => {
 					// Remove newlines and trim the content
-					let cellContent = turndownService.turndown(cell.innerHTML)
+					let cellContent = turndownService.turndown(getElementHTML(cell))
 						.replace(/\n/g, ' ')
 						.trim();
 					// Escape pipe characters
@@ -181,7 +197,7 @@ export function createMarkdownContent(content: string, url: string) {
 				const tagText = tagSpan ? tagSpan.textContent?.trim() : '';
 				
 				// Process the caption content, including math elements
-				let captionContent = figcaption.innerHTML;
+				let captionContent = getElementHTML(figcaption);
 				captionContent = captionContent.replace(/<math.*?>(.*?)<\/math>/g, (match, mathContent, offset, string) => {
 					const mathElement = new DOMParser().parseFromString(match, 'text/html').body.firstChild as Element;
 					const latex = extractLatex(mathElement);
@@ -276,7 +292,7 @@ export function createMarkdownContent(content: string, url: string) {
 			
 			// Extract the heading
 			const headingNode = node.querySelector('h1, h2, h3, h4, h5, h6');
-			const headingContent = headingNode ? turndownService.turndown(headingNode.innerHTML) : '';
+			const headingContent = headingNode ? turndownService.turndown(getElementHTML(headingNode)) : '';
 			
 			// Remove the heading from the content
 			if (headingNode) {
@@ -284,7 +300,7 @@ export function createMarkdownContent(content: string, url: string) {
 			}
 			
 			// Convert the remaining content
-			const remainingContent = turndownService.turndown(node.innerHTML);
+			const remainingContent = turndownService.turndown(getElementHTML(node));
 			
 			// Construct the new markdown
 			let markdown = `${headingContent}\n\n${remainingContent}\n\n`;
@@ -308,7 +324,7 @@ export function createMarkdownContent(content: string, url: string) {
 			
 			const items = Array.from(node.children).map((item, index) => {
 				if (item instanceof HTMLElement) {
-					const itemContent = item.innerHTML.replace(/^<span class="ltx_tag ltx_tag_item">\d+\.<\/span>\s*/, '');
+					const itemContent = getElementHTML(item).replace(/^<span class="ltx_tag ltx_tag_item">\d+\.<\/span>\s*/, '');
 					return `${index + 1}. ${turndownService.turndown(itemContent)}`;
 				}
 				return '';
@@ -378,7 +394,7 @@ export function createMarkdownContent(content: string, url: string) {
 						supElement.remove();
 					}
 					
-					const referenceContent = turndownService.turndown(li.innerHTML);
+					const referenceContent = turndownService.turndown(getElementHTML(li));
 					// Remove the backlink from the footnote content
 					const cleanedContent = referenceContent.replace(/\s*↩︎$/, '').trim();
 					return `[^${id.toLowerCase()}]: ${cleanedContent}`;

@@ -21,28 +21,36 @@ export const remove_html = (html: string, params: string = ''): string => {
 		return html;
 	}
 
-	// Create a temporary DOM element
-	const tempDiv = document.createElement('div');
-	tempDiv.innerHTML = html;
+	const parser = new DOMParser();
+	const doc = parser.parseFromString(html, 'text/html');
 
 	elementsToRemove.forEach(elem => {
 		let elements: NodeListOf<Element> | HTMLCollectionOf<Element>;
 		if (elem.startsWith('.')) {
 			// Class selector
-			elements = tempDiv.querySelectorAll(`[class*="${elem.slice(1)}"]`);
+			elements = doc.querySelectorAll(`[class*="${elem.slice(1)}"]`);
 		} else if (elem.startsWith('#')) {
 			// ID selector
-			elements = tempDiv.querySelectorAll(`[id="${elem.slice(1)}"]`);
+			elements = doc.querySelectorAll(`[id="${elem.slice(1)}"]`);
 		} else {
 			// Tag selector
-			elements = tempDiv.getElementsByTagName(elem);
+			elements = doc.getElementsByTagName(elem);
 		}
 
 		// Convert HTMLCollection to Array if necessary
 		Array.from(elements).forEach(el => el.parentNode?.removeChild(el));
 	});
 
-	const result = tempDiv.innerHTML;
+	// Serialize back to HTML
+	const serializer = new XMLSerializer();
+	let result = '';
+	Array.from(doc.body.childNodes).forEach(node => {
+		if (node.nodeType === Node.ELEMENT_NODE) {
+			result += serializer.serializeToString(node);
+		} else if (node.nodeType === Node.TEXT_NODE) {
+			result += node.textContent;
+		}
+	});
 	debugLog('RemoveHTML', 'Output:', result);
 
 	return result;

@@ -135,15 +135,26 @@ export function makeUrlAbsolute(element: Element, attributeName: string, baseUrl
 }
 
 export function processUrls(htmlContent: string, baseUrl: URL): string {
-	const tempDiv = document.createElement('div');
-	tempDiv.innerHTML = htmlContent;
+	const parser = new DOMParser();
+	const doc = parser.parseFromString(htmlContent, 'text/html');
 	
 	// Handle relative URLs for both images and links
-	tempDiv.querySelectorAll('img').forEach(img => makeUrlAbsolute(img, 'srcset', baseUrl));
-	tempDiv.querySelectorAll('img').forEach(img => makeUrlAbsolute(img, 'src', baseUrl));
-	tempDiv.querySelectorAll('a').forEach(link => makeUrlAbsolute(link, 'href', baseUrl));
+	doc.querySelectorAll('img').forEach(img => makeUrlAbsolute(img, 'srcset', baseUrl));
+	doc.querySelectorAll('img').forEach(img => makeUrlAbsolute(img, 'src', baseUrl));
+	doc.querySelectorAll('a').forEach(link => makeUrlAbsolute(link, 'href', baseUrl));
 	
-	return tempDiv.innerHTML;
+	// Serialize back to HTML
+	const serializer = new XMLSerializer();
+	let result = '';
+	Array.from(doc.body.childNodes).forEach(node => {
+		if (node.nodeType === Node.ELEMENT_NODE) {
+			result += serializer.serializeToString(node);
+		} else if (node.nodeType === Node.TEXT_NODE) {
+			result += node.textContent;
+		}
+	});
+	
+	return result;
 }
 
 export function formatDuration(ms: number): string {

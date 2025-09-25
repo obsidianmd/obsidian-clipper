@@ -33,9 +33,9 @@ function canHighlightElement(element: Element): boolean {
 }
 
 function stripHtml(html: string): string {
-	const div = document.createElement('div');
-	div.innerHTML = html;
-	return div.textContent || '';
+	const parser = new DOMParser();
+	const doc = parser.parseFromString(html, 'text/html');
+	return doc.body.textContent || '';
 }
 
 interface ContentResponse {
@@ -269,17 +269,29 @@ function processHighlights(content: string, highlights: AnyHighlightData[]): str
 	if (generalSettings.highlightBehavior === 'highlight-inline') {
 		debugLog('Highlights', 'Using content length:', content.length);
 
-		const tempDiv = document.createElement('div');
-		tempDiv.innerHTML = content;
+		const parser = new DOMParser();
+		const doc = parser.parseFromString(content, 'text/html');
+		const tempDiv = doc.body;
 
 		const textHighlights = filterAndSortHighlights(highlights);
 		debugLog('Highlights', 'Processing highlights:', textHighlights.length);
 
 		for (const highlight of textHighlights) {
-			processHighlight(highlight, tempDiv);
+			processHighlight(highlight, tempDiv as HTMLDivElement);
 		}
 
-		return tempDiv.innerHTML;
+		// Serialize back to HTML
+		const serializer = new XMLSerializer();
+		let result = '';
+		Array.from(tempDiv.childNodes).forEach(node => {
+			if (node.nodeType === Node.ELEMENT_NODE) {
+				result += serializer.serializeToString(node);
+			} else if (node.nodeType === Node.TEXT_NODE) {
+				result += node.textContent;
+			}
+		});
+		
+		return result;
 	}
 
 	// Default fallback
@@ -344,13 +356,31 @@ function processXPathHighlight(highlight: TextHighlightData | ElementHighlightDa
 }
 
 function processContentBasedHighlight(highlight: TextHighlightData | ElementHighlightData, tempDiv: HTMLDivElement) {
-	const contentDiv = document.createElement('div');
-	contentDiv.innerHTML = highlight.content;
+	const parser = new DOMParser();
+	const doc = parser.parseFromString(highlight.content, 'text/html');
+	const contentDiv = doc.body;
 
-	const innerContent = contentDiv.children.length === 1 && 
-		contentDiv.firstElementChild?.tagName === 'DIV' ? 
-		contentDiv.firstElementChild.innerHTML : 
-		contentDiv.innerHTML;
+	// Serialize the inner content
+	const serializer = new XMLSerializer();
+	let innerContent = '';
+	
+	if (contentDiv.children.length === 1 && contentDiv.firstElementChild?.tagName === 'DIV') {
+		Array.from(contentDiv.firstElementChild.childNodes).forEach(node => {
+			if (node.nodeType === Node.ELEMENT_NODE) {
+				innerContent += serializer.serializeToString(node);
+			} else if (node.nodeType === Node.TEXT_NODE) {
+				innerContent += node.textContent;
+			}
+		});
+	} else {
+		Array.from(contentDiv.childNodes).forEach(node => {
+			if (node.nodeType === Node.ELEMENT_NODE) {
+				innerContent += serializer.serializeToString(node);
+			} else if (node.nodeType === Node.TEXT_NODE) {
+				innerContent += node.textContent;
+			}
+		});
+	}
 
 	const paragraphs = Array.from(contentDiv.querySelectorAll('p'));
 	if (paragraphs.length) {
