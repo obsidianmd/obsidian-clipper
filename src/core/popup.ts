@@ -523,7 +523,6 @@ function setupEventListeners(tabId: number) {
 		});
 	}
 
-	// Update the visibility check for share buttons
 	const shareButtonElements = document.querySelectorAll('.share-content');
 	if (shareButtonElements.length > 0) {
 		detectBrowser().then(browser => {
@@ -727,7 +726,8 @@ function updateTemplateDropdown() {
 function populateTemplateDropdown() {
 	const templateDropdown = document.getElementById('template-select') as HTMLSelectElement;
 	if (templateDropdown && currentTemplate) {
-		templateDropdown.innerHTML = '';
+		// Clear existing options
+		templateDropdown.textContent = '';
 		templates.forEach((template: Template) => {
 			const option = document.createElement('option');
 			option.value = template.id;
@@ -797,18 +797,51 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 				break;
 		}
 
-		propertyDiv.innerHTML = `
-			<div class="metadata-property-key">
-				<span class="metadata-property-icon"><i data-lucide="${getPropertyTypeIcon(propertyType)}"></i></span>
-				<label for="${property.name}">${property.name}</label>
-			</div>
-			<div class="metadata-property-value">
-				${propertyType === 'checkbox' 
-					? `<input id="${property.name}" type="checkbox" ${value === 'true' ? 'checked' : ''} data-type="${propertyType}" data-template-value="${escapeHtml(property.value)}" />`
-					: `<input id="${property.name}" type="text" value="${escapeHtml(value)}" data-type="${propertyType}" data-template-value="${escapeHtml(property.value)}" />`
-				}
-			</div>
-		`;
+		// Create metadata property key container
+		const metadataPropertyKey = document.createElement('div');
+		metadataPropertyKey.className = 'metadata-property-key';
+		
+		// Create property icon
+		const propertyIconSpan = document.createElement('span');
+		propertyIconSpan.className = 'metadata-property-icon';
+		const iconElement = document.createElement('i');
+		iconElement.setAttribute('data-lucide', getPropertyTypeIcon(propertyType));
+		propertyIconSpan.appendChild(iconElement);
+		
+		// Create property label
+		const propertyLabel = document.createElement('label');
+		propertyLabel.setAttribute('for', property.name);
+		propertyLabel.textContent = property.name;
+		
+		// Assemble key container
+		metadataPropertyKey.appendChild(propertyIconSpan);
+		metadataPropertyKey.appendChild(propertyLabel);
+		
+		// Create metadata property value container
+		const metadataPropertyValue = document.createElement('div');
+		metadataPropertyValue.className = 'metadata-property-value';
+		
+		// Create input element based on type
+		const inputElement = document.createElement('input');
+		inputElement.id = property.name;
+		inputElement.setAttribute('data-type', propertyType);
+		inputElement.setAttribute('data-template-value', property.value);
+		
+		if (propertyType === 'checkbox') {
+			inputElement.type = 'checkbox';
+			if (value === 'true') {
+				inputElement.checked = true;
+			}
+		} else {
+			inputElement.type = 'text';
+			inputElement.value = value;
+		}
+		
+		metadataPropertyValue.appendChild(inputElement);
+		
+		// Assemble property div
+		propertyDiv.appendChild(metadataPropertyKey);
+		propertyDiv.appendChild(metadataPropertyValue);
 		newTemplateProperties.appendChild(propertyDiv);
 	}
 
@@ -980,7 +1013,8 @@ function updateVaultDropdown(vaults: string[]) {
 
 	if (!vaultDropdown || !vaultContainer) return;
 
-	vaultDropdown.innerHTML = '';
+	// Clear existing options
+	vaultDropdown.textContent = '';
 	
 	vaults.forEach(vault => {
 		const option = document.createElement('option');
@@ -1178,141 +1212,152 @@ async function handleSaveToDownloads() {
 }
 
 function determineMainAction() {
-    const mainButton = document.getElementById('clip-btn');
-    const moreDropdown = document.getElementById('more-dropdown');
-    const secondaryActions = moreDropdown?.querySelector('.secondary-actions');
-    if (!mainButton || !secondaryActions) return;
+	const mainButton = document.getElementById('clip-btn');
+	const moreDropdown = document.getElementById('more-dropdown');
+	const secondaryActions = moreDropdown?.querySelector('.secondary-actions');
+	if (!mainButton || !secondaryActions) return;
 
-    // Clear existing secondary actions
-    secondaryActions.innerHTML = '';
+	// Clear existing secondary actions
+	secondaryActions.textContent = '';
 
-    // Set up actions based on saved behavior
-    switch (loadedSettings.saveBehavior) {
-        case 'copyToClipboard':
-            mainButton.textContent = getMessage('copyToClipboard');
-            mainButton.onclick = () => copyContent();
-            // Add direct actions to secondary
-            addSecondaryAction(secondaryActions, 'addToObsidian', () => handleClipObsidian());
-            addSecondaryAction(secondaryActions, 'saveFile', handleSaveToDownloads);
-            break;
-        case 'saveFile':
-            mainButton.textContent = getMessage('saveFile');
-            mainButton.onclick = () => handleSaveToDownloads();
-            // Add direct actions to secondary
-            addSecondaryAction(secondaryActions, 'addToObsidian', () => handleClipObsidian());
-            addSecondaryAction(secondaryActions, 'copyToClipboard', copyContent);
-            break;
-        default: // 'addToObsidian'
-            mainButton.textContent = getMessage('addToObsidian');
-            mainButton.onclick = () => handleClipObsidian();
-            // Add direct actions to secondary
-            addSecondaryAction(secondaryActions, 'copyToClipboard', copyContent);
-            addSecondaryAction(secondaryActions, 'saveFile', handleSaveToDownloads);
-    }
+	// Set up actions based on saved behavior
+	switch (loadedSettings.saveBehavior) {
+		case 'copyToClipboard':
+			mainButton.textContent = getMessage('copyToClipboard');
+			mainButton.onclick = () => copyContent();
+			// Add direct actions to secondary
+			addSecondaryAction(secondaryActions, 'addToObsidian', () => handleClipObsidian());
+			addSecondaryAction(secondaryActions, 'saveFile', handleSaveToDownloads);
+			break;
+		case 'saveFile':
+			mainButton.textContent = getMessage('saveFile');
+			mainButton.onclick = () => handleSaveToDownloads();
+			// Add direct actions to secondary
+			addSecondaryAction(secondaryActions, 'addToObsidian', () => handleClipObsidian());
+			addSecondaryAction(secondaryActions, 'copyToClipboard', copyContent);
+			break;
+		default: // 'addToObsidian'
+			mainButton.textContent = getMessage('addToObsidian');
+			mainButton.onclick = () => handleClipObsidian();
+			// Add direct actions to secondary
+			addSecondaryAction(secondaryActions, 'copyToClipboard', copyContent);
+			addSecondaryAction(secondaryActions, 'saveFile', handleSaveToDownloads);
+	}
 }
 
 async function handleClipObsidian(): Promise<void> {
-    if (!currentTemplate) return;
+	if (!currentTemplate) return;
 
-    const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement;
-    const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
-    const noteNameField = document.getElementById('note-name-field') as HTMLInputElement;
-    const pathField = document.getElementById('path-name-field') as HTMLInputElement;
-    const interpretBtn = document.getElementById('interpret-btn') as HTMLButtonElement;
+	const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement;
+	const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
+	const noteNameField = document.getElementById('note-name-field') as HTMLInputElement;
+	const pathField = document.getElementById('path-name-field') as HTMLInputElement;
+	const interpretBtn = document.getElementById('interpret-btn') as HTMLButtonElement;
 
-    if (!vaultDropdown || !noteContentField) {
-        showError('Some required fields are missing. Please try reloading the extension.');
-        return;
-    }
+	if (!vaultDropdown || !noteContentField) {
+		showError('Some required fields are missing. Please try reloading the extension.');
+		return;
+	}
 
-    try {
-        // Handle interpreter if needed
-        if (generalSettings.interpreterEnabled && interpretBtn && collectPromptVariables(currentTemplate).length > 0) {
-            if (interpretBtn.classList.contains('processing')) {
-                await waitForInterpreter(interpretBtn);
-            } else if (!interpretBtn.classList.contains('done')) {
-                interpretBtn.click();
-                await waitForInterpreter(interpretBtn);
-            }
-        }
+	try {
+		// Handle interpreter if needed
+		if (generalSettings.interpreterEnabled && interpretBtn && collectPromptVariables(currentTemplate).length > 0) {
+			if (interpretBtn.classList.contains('processing')) {
+				await waitForInterpreter(interpretBtn);
+			} else if (!interpretBtn.classList.contains('done')) {
+				interpretBtn.click();
+				await waitForInterpreter(interpretBtn);
+			}
+		}
 
-        // Gather content
-        const properties = Array.from(document.querySelectorAll('.metadata-property input')).map(input => {
-            const inputElement = input as HTMLInputElement;
-            return {
-                id: inputElement.dataset.id || Date.now().toString() + Math.random().toString(36).slice(2, 11),
-                name: inputElement.id,
-                value: inputElement.type === 'checkbox' ? inputElement.checked : inputElement.value
-            };
-        }) as Property[];
+		// Gather content
+		const properties = Array.from(document.querySelectorAll('.metadata-property input')).map(input => {
+			const inputElement = input as HTMLInputElement;
+			return {
+				id: inputElement.dataset.id || Date.now().toString() + Math.random().toString(36).slice(2, 11),
+				name: inputElement.id,
+				value: inputElement.type === 'checkbox' ? inputElement.checked : inputElement.value
+			};
+		}) as Property[];
 
-        const frontmatter = await generateFrontmatter(properties);
-        const fileContent = frontmatter + noteContentField.value;
+		const frontmatter = await generateFrontmatter(properties);
+		const fileContent = frontmatter + noteContentField.value;
 
-        // Save to Obsidian
-        const selectedVault = currentTemplate.vault || vaultDropdown.value;
-        const isDailyNote = currentTemplate.behavior === 'append-daily' || currentTemplate.behavior === 'prepend-daily';
-        const noteName = isDailyNote ? '' : noteNameField?.value || '';
-        const path = isDailyNote ? '' : pathField?.value || '';
+		// Save to Obsidian
+		const selectedVault = currentTemplate.vault || vaultDropdown.value;
+		const isDailyNote = currentTemplate.behavior === 'append-daily' || currentTemplate.behavior === 'prepend-daily';
+		const noteName = isDailyNote ? '' : noteNameField?.value || '';
+		const path = isDailyNote ? '' : pathField?.value || '';
 
-        await saveToObsidian(fileContent, noteName, path, selectedVault, currentTemplate.behavior);
-        const tabInfo = await getCurrentTabInfo();
-        await incrementStat('addToObsidian', selectedVault, path, tabInfo.url, tabInfo.title);
+		await saveToObsidian(fileContent, noteName, path, selectedVault, currentTemplate.behavior);
+		const tabInfo = await getCurrentTabInfo();
+		await incrementStat('addToObsidian', selectedVault, path, tabInfo.url, tabInfo.title);
 
-        if (!currentTemplate.vault) {
-            lastSelectedVault = selectedVault;
-            await setLocalStorage('lastSelectedVault', lastSelectedVault);
-        }
+		if (!currentTemplate.vault) {
+			lastSelectedVault = selectedVault;
+			await setLocalStorage('lastSelectedVault', lastSelectedVault);
+		}
 
-        if (!isSidePanel) {
-            setTimeout(() => window.close(), 500);
-        }
-    } catch (error) {
-        console.error('Error in handleClipObsidian:', error);
-        showError('failedToSaveFile');
-        throw error;
-    }
+		if (!isSidePanel) {
+			setTimeout(() => window.close(), 500);
+		}
+	} catch (error) {
+		console.error('Error in handleClipObsidian:', error);
+		showError('failedToSaveFile');
+		throw error;
+	}
 }
 
 function addSecondaryAction(container: Element, actionType: string, handler: () => void) {
-    const menuItem = document.createElement('div');
-    menuItem.className = 'menu-item';
-    menuItem.innerHTML = `
-        <div class="menu-item-icon">
-            <i data-lucide="${getActionIcon(actionType)}"></i>
-        </div>
-        <div class="menu-item-title" data-i18n="${actionType}">
-            ${getMessage(actionType)}
-        </div>
-    `;
-    menuItem.addEventListener('click', handler);
-    container.appendChild(menuItem);
-    initializeIcons(menuItem);
+	const menuItem = document.createElement('div');
+	menuItem.className = 'menu-item';
+	
+	// Create menu item icon container
+	const menuItemIcon = document.createElement('div');
+	menuItemIcon.className = 'menu-item-icon';
+	
+	const iconElement = document.createElement('i');
+	iconElement.setAttribute('data-lucide', getActionIcon(actionType));
+	menuItemIcon.appendChild(iconElement);
+	
+	// Create menu item title
+	const menuItemTitle = document.createElement('div');
+	menuItemTitle.className = 'menu-item-title';
+	menuItemTitle.setAttribute('data-i18n', actionType);
+	menuItemTitle.textContent = getMessage(actionType);
+	
+	// Assemble menu item
+	menuItem.appendChild(menuItemIcon);
+	menuItem.appendChild(menuItemTitle);
+	
+	menuItem.addEventListener('click', handler);
+	container.appendChild(menuItem);
+	initializeIcons(menuItem);
 }
 
 function getActionIcon(actionType: string): string {
-    switch (actionType) {
-        case 'copyToClipboard': return 'copy';
-        case 'saveFile': return 'file-down';
-        case 'addToObsidian': return 'pen-line';
-        default: return 'plus';
-    }
+	switch (actionType) {
+		case 'copyToClipboard': return 'copy';
+		case 'saveFile': return 'file-down';
+		case 'addToObsidian': return 'pen-line';
+		default: return 'plus';
+	}
 }
 
 async function copyContent() {
-    const properties = Array.from(document.querySelectorAll('.metadata-property input')).map(input => {
-        const inputElement = input as HTMLInputElement;
-        return {
-            id: inputElement.dataset.id || Date.now().toString() + Math.random().toString(36).slice(2, 11),
-            name: inputElement.id,
-            value: inputElement.type === 'checkbox' ? inputElement.checked : inputElement.value
-        };
-    }) as Property[];
+	const properties = Array.from(document.querySelectorAll('.metadata-property input')).map(input => {
+		const inputElement = input as HTMLInputElement;
+		return {
+			id: inputElement.dataset.id || Date.now().toString() + Math.random().toString(36).slice(2, 11),
+			name: inputElement.id,
+			value: inputElement.type === 'checkbox' ? inputElement.checked : inputElement.value
+		};
+	}) as Property[];
 
-    const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
-    const frontmatter = await generateFrontmatter(properties);
-    const fileContent = frontmatter + noteContentField.value;
-    await copyToClipboard(fileContent);
+	const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
+	const frontmatter = await generateFrontmatter(properties);
+	const fileContent = frontmatter + noteContentField.value;
+	await copyToClipboard(fileContent);
 }
 
 // Update the resize event listener to use the debounced version
