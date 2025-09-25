@@ -70,10 +70,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 			const languages = getAvailableLanguages();
 			const currentLanguage = await getCurrentLanguage();
 			
-			languageSelect.innerHTML = languages.map((lang: { code: string; name: string }) => {
-				const displayName = lang.code === '' ? getMessage('systemDefault') : lang.name;
-				return `<option value="${lang.code}" ${lang.code === currentLanguage ? 'selected' : ''}>${displayName}</option>`;
-			}).join('');
+			// Clear existing options
+			languageSelect.textContent = '';
+			
+			// Add language options
+			languages.forEach((lang: { code: string; name: string }) => {
+				const option = document.createElement('option');
+				option.value = lang.code;
+				option.textContent = lang.code === '' ? getMessage('systemDefault') : lang.name;
+				if (lang.code === currentLanguage) {
+					option.selected = true;
+				}
+				languageSelect.appendChild(option);
+			});
 
 			// Add change listener
 			languageSelect.addEventListener('change', async () => {

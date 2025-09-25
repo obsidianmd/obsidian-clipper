@@ -236,7 +236,8 @@ function initializeProviderList() {
 		a.name.toLowerCase().localeCompare(b.name.toLowerCase())
 	);
 
-	providerList.innerHTML = '';
+	// Clear existing providers
+	providerList.textContent = '';
 	sortedProviders.forEach((provider, index) => {
 		const originalIndex = generalSettings.providers.findIndex(p => p.id === provider.id);
 		const providerItem = createProviderListItem(provider, originalIndex);
@@ -259,57 +260,102 @@ function createProviderListItem(provider: Provider, index: number): HTMLElement 
 
 	const hasNoKey = presetProvider?.apiKeyRequired && !provider.apiKey;
 
-	providerItem.innerHTML = `
-		<div class="provider-list-item-info">
-			<div class="provider-name">
-				<div class="provider-icon-container">
-					<span class="provider-icon icon-${provider.name.toLowerCase().replace(/\s+/g, '-')}"></span>
-				</div>
-				<div class="provider-name-text">
-					${provider.name}
-				</div>
-			</div>
-			${hasNoKey ? `<span class="provider-no-key"><i data-lucide="alert-triangle"></i> <span class="mh">${getMessage('apiKeyMissing')}</span></span>` : ''}
-		</div>
-		<div class="provider-list-item-actions">
-			<button class="edit-provider-btn clickable-icon" data-provider-id="${provider.id}" aria-label="Edit provider">
-				<i data-lucide="pen-line"></i>
-			</button>
-			<button class="delete-provider-btn clickable-icon" data-provider-id="${provider.id}" aria-label="Delete provider">
-				<i data-lucide="trash-2"></i>
-			</button>
-		</div>
-	`;
-
-	const editBtn = providerItem.querySelector('.edit-provider-btn');
-	if (editBtn) {
-		editBtn.addEventListener('click', (e) => {
-			e.preventDefault();
-			e.stopPropagation();
-			const providerId = editBtn.getAttribute('data-provider-id');
-			if (providerId) {
-				const providerIndex = generalSettings.providers.findIndex(p => p.id === providerId);
-				if (providerIndex !== -1) {
-					editProvider(providerIndex);
-				}
-			}
-		});
+	// Create provider list item info container
+	const providerListItemInfo = document.createElement('div');
+	providerListItemInfo.className = 'provider-list-item-info';
+	
+	// Create provider name container
+	const providerName = document.createElement('div');
+	providerName.className = 'provider-name';
+	
+	// Create provider icon container
+	const providerIconContainer = document.createElement('div');
+	providerIconContainer.className = 'provider-icon-container';
+	const providerIconSpan = document.createElement('span');
+	providerIconSpan.className = `provider-icon icon-${provider.name.toLowerCase().replace(/\s+/g, '-')}`;
+	providerIconContainer.appendChild(providerIconSpan);
+	
+	// Create provider name text
+	const providerNameText = document.createElement('div');
+	providerNameText.className = 'provider-name-text';
+	providerNameText.textContent = provider.name;
+	
+	providerName.appendChild(providerIconContainer);
+	providerName.appendChild(providerNameText);
+	providerListItemInfo.appendChild(providerName);
+	
+	// Add no-key warning if needed
+	if (hasNoKey) {
+		const providerNoKey = document.createElement('span');
+		providerNoKey.className = 'provider-no-key';
+		
+		const alertIcon = document.createElement('i');
+		alertIcon.setAttribute('data-lucide', 'alert-triangle');
+		providerNoKey.appendChild(alertIcon);
+		
+		providerNoKey.appendChild(document.createTextNode(' '));
+		
+		const messageSpan = document.createElement('span');
+		messageSpan.className = 'mh';
+		messageSpan.textContent = getMessage('apiKeyMissing');
+		providerNoKey.appendChild(messageSpan);
+		
+		providerListItemInfo.appendChild(providerNoKey);
 	}
+	
+	// Create provider list item actions container
+	const providerListItemActions = document.createElement('div');
+	providerListItemActions.className = 'provider-list-item-actions';
+	
+	// Create edit button
+	const editProviderBtn = document.createElement('button');
+	editProviderBtn.className = 'edit-provider-btn clickable-icon';
+	editProviderBtn.setAttribute('data-provider-id', provider.id);
+	editProviderBtn.setAttribute('aria-label', 'Edit provider');
+	const editIcon = document.createElement('i');
+	editIcon.setAttribute('data-lucide', 'pen-line');
+	editProviderBtn.appendChild(editIcon);
+	
+	// Create delete button
+	const deleteProviderBtn = document.createElement('button');
+	deleteProviderBtn.className = 'delete-provider-btn clickable-icon';
+	deleteProviderBtn.setAttribute('data-provider-id', provider.id);
+	deleteProviderBtn.setAttribute('aria-label', 'Delete provider');
+	const deleteIcon = document.createElement('i');
+	deleteIcon.setAttribute('data-lucide', 'trash-2');
+	deleteProviderBtn.appendChild(deleteIcon);
+	
+	providerListItemActions.appendChild(editProviderBtn);
+	providerListItemActions.appendChild(deleteProviderBtn);
+	
+	// Assemble provider item
+	providerItem.appendChild(providerListItemInfo);
+	providerItem.appendChild(providerListItemActions);
 
-	const deleteBtn = providerItem.querySelector('.delete-provider-btn');
-	if (deleteBtn) {
-		deleteBtn.addEventListener('click', (e) => {
-			e.preventDefault();
-			e.stopPropagation();
-			const providerId = deleteBtn.getAttribute('data-provider-id');
-			if (providerId) {
-				const providerIndex = generalSettings.providers.findIndex(p => p.id === providerId);
-				if (providerIndex !== -1) {
-					deleteProvider(providerIndex);
-				}
+	// Add event listeners using direct element references
+	editProviderBtn.addEventListener('click', (e) => {
+		e.preventDefault();
+		e.stopPropagation();
+		const providerId = editProviderBtn.getAttribute('data-provider-id');
+		if (providerId) {
+			const providerIndex = generalSettings.providers.findIndex(p => p.id === providerId);
+			if (providerIndex !== -1) {
+				editProvider(providerIndex);
 			}
-		});
-	}
+		}
+	});
+
+	deleteProviderBtn.addEventListener('click', (e) => {
+		e.preventDefault();
+		e.stopPropagation();
+		const providerId = deleteProviderBtn.getAttribute('data-provider-id');
+		if (providerId) {
+			const providerIndex = generalSettings.providers.findIndex(p => p.id === providerId);
+			if (providerIndex !== -1) {
+				deleteProvider(providerIndex);
+			}
+		}
+	});
 
 	return providerItem;
 }
@@ -396,9 +442,21 @@ async function showProviderModal(provider: Provider, index?: number) {
 			return;
 		}
 
-		presetSelect.innerHTML = `<option value="">${getMessage('custom')}</option>`;
+		// Clear and populate preset select
+		presetSelect.textContent = '';
+		
+		// Add custom option
+		const customOption = document.createElement('option');
+		customOption.value = '';
+		customOption.textContent = getMessage('custom');
+		presetSelect.appendChild(customOption);
+		
+		// Add preset options
 		Object.entries(cachedPresetProviders || {}).forEach(([id, preset]) => {
-			presetSelect.innerHTML += `<option value="${id}">${preset.name}</option>`;
+			const option = document.createElement('option');
+			option.value = id;
+			option.textContent = preset.name;
+			presetSelect.appendChild(option);
 		});
 
 		nameInput.value = '';
@@ -443,9 +501,14 @@ async function showProviderModal(provider: Provider, index?: number) {
 
 				if (selectedPreset.apiKeyRequired !== false && selectedPreset.apiKeyUrl) {
 					const message = getMessage('getApiKeyHere').replace('$1', selectedPreset.name);
-					apiKeyDescription.innerHTML = `${getMessage('providerApiKeyDescription')} <a href="${selectedPreset.apiKeyUrl}" target="_blank">${message}</a>`;
+					apiKeyDescription.textContent = getMessage('providerApiKeyDescription') + ' ';
+					const linkElement = document.createElement('a');
+					linkElement.href = selectedPreset.apiKeyUrl;
+					linkElement.target = '_blank';
+					linkElement.textContent = message;
+					apiKeyDescription.appendChild(linkElement);
 				} else {
-					apiKeyDescription.innerHTML = getMessage('providerApiKeyDescription');
+					apiKeyDescription.textContent = getMessage('providerApiKeyDescription');
 				}
 			} else {
 				if (index === undefined || (index !== undefined && currentPresetId)) {
@@ -459,7 +522,7 @@ async function showProviderModal(provider: Provider, index?: number) {
 				}
 				
 				apiKeyContainer.style.display = 'block';
-				apiKeyDescription.innerHTML = getMessage('providerApiKeyDescription');
+				apiKeyDescription.textContent = getMessage('providerApiKeyDescription');
 			}
 		};
 
@@ -542,7 +605,8 @@ export function initializeModelList() {
 	const modelList = document.getElementById('model-list');
 	if (!modelList) return;
 
-	modelList.innerHTML = '';
+	// Clear existing models
+	modelList.textContent = '';
 	const sortedModels = [...generalSettings.models].filter(m => m).sort((a, b) => 
 		a.name.toLowerCase().localeCompare(b.name.toLowerCase())
 	);
@@ -566,83 +630,129 @@ function createModelListItem(model: ModelConfig, index: number): HTMLElement {
 	modelItem.dataset.modelId = model.id;
 
 	const provider = generalSettings.providers.find(p => p.id === model.providerId);
-	const providerName = provider?.name || `<span class="model-provider-unknown"><i data-lucide="alert-triangle"></i> ${getMessage('unknownProvider')}</span>`;
 
-	modelItem.innerHTML = `
-		<div class="drag-handle">
-			<i data-lucide="grip-vertical"></i>
-		</div>
-		<div class="model-list-item-info">
-			<div class="model-name">${model.name}</div>
-			<div class="model-provider mh">${providerName}</div>
-		</div>
-		<div class="model-list-item-actions">
-			<button class="edit-model-btn clickable-icon" data-model-id="${model.id}" aria-label="Edit model">
-				<i data-lucide="pen-line"></i>
-			</button>
-			<button class="duplicate-model-btn clickable-icon" data-model-id="${model.id}" aria-label="Duplicate model">
-				<i data-lucide="copy-plus"></i>
-			</button>
-			<button class="delete-model-btn clickable-icon" data-model-id="${model.id}" aria-label="Delete model">
-				<i data-lucide="trash-2"></i>
-			</button>
-			<div class="checkbox-container mod-small">
-				<input type="checkbox" id="model-${model.id}" ${model.enabled ? 'checked' : ''}>
-			</div>
-		</div>
-	`;
-
-	const checkbox = modelItem.querySelector(`#model-${model.id}`) as HTMLInputElement;
+	// Create drag handle
+	const dragHandle = document.createElement('div');
+	dragHandle.className = 'drag-handle';
+	const gripIcon = document.createElement('i');
+	gripIcon.setAttribute('data-lucide', 'grip-vertical');
+	dragHandle.appendChild(gripIcon);
 	
-	if (checkbox) {
-		initializeToggles(modelItem);
-		checkbox.addEventListener('change', () => {
-			const modelIndex = generalSettings.models.findIndex(m => m.id === model.id);
-			if (modelIndex !== -1) {
-				generalSettings.models[modelIndex].enabled = checkbox.checked;
-				saveSettings();
-			}
-		});
+	// Create model list item info
+	const modelListItemInfo = document.createElement('div');
+	modelListItemInfo.className = 'model-list-item-info';
+	
+	const modelNameDiv = document.createElement('div');
+	modelNameDiv.className = 'model-name';
+	modelNameDiv.textContent = model.name;
+	
+	const modelProviderDiv = document.createElement('div');
+	modelProviderDiv.className = 'model-provider mh';
+	
+	// Handle provider name with potential HTML content
+	if (provider?.name) {
+		modelProviderDiv.textContent = provider.name;
+	} else {
+		// Create unknown provider warning
+		const alertIcon = document.createElement('i');
+		alertIcon.setAttribute('data-lucide', 'alert-triangle');
+		modelProviderDiv.appendChild(alertIcon);
+		modelProviderDiv.appendChild(document.createTextNode(' ' + getMessage('unknownProvider')));
 	}
+	
+	modelListItemInfo.appendChild(modelNameDiv);
+	modelListItemInfo.appendChild(modelProviderDiv);
+	
+	// Create model list item actions
+	const modelListItemActions = document.createElement('div');
+	modelListItemActions.className = 'model-list-item-actions';
+	
+	// Create edit button
+	const editModelBtn = document.createElement('button');
+	editModelBtn.className = 'edit-model-btn clickable-icon';
+	editModelBtn.setAttribute('data-model-id', model.id);
+	editModelBtn.setAttribute('aria-label', 'Edit model');
+	const editIcon = document.createElement('i');
+	editIcon.setAttribute('data-lucide', 'pen-line');
+	editModelBtn.appendChild(editIcon);
+	
+	// Create duplicate button
+	const duplicateModelBtn = document.createElement('button');
+	duplicateModelBtn.className = 'duplicate-model-btn clickable-icon';
+	duplicateModelBtn.setAttribute('data-model-id', model.id);
+	duplicateModelBtn.setAttribute('aria-label', 'Duplicate model');
+	const duplicateIcon = document.createElement('i');
+	duplicateIcon.setAttribute('data-lucide', 'copy-plus');
+	duplicateModelBtn.appendChild(duplicateIcon);
+	
+	// Create delete button
+	const deleteModelBtn = document.createElement('button');
+	deleteModelBtn.className = 'delete-model-btn clickable-icon';
+	deleteModelBtn.setAttribute('data-model-id', model.id);
+	deleteModelBtn.setAttribute('aria-label', 'Delete model');
+	const deleteIcon = document.createElement('i');
+	deleteIcon.setAttribute('data-lucide', 'trash-2');
+	deleteModelBtn.appendChild(deleteIcon);
+	
+	// Create checkbox container
+	const checkboxContainer = document.createElement('div');
+	checkboxContainer.className = 'checkbox-container mod-small';
+	const checkbox = document.createElement('input');
+	checkbox.type = 'checkbox';
+	checkbox.id = `model-${model.id}`;
+	checkbox.checked = model.enabled;
+	checkboxContainer.appendChild(checkbox);
+	
+	// Assemble actions
+	modelListItemActions.appendChild(editModelBtn);
+	modelListItemActions.appendChild(duplicateModelBtn);
+	modelListItemActions.appendChild(deleteModelBtn);
+	modelListItemActions.appendChild(checkboxContainer);
+	
+	// Assemble model item
+	modelItem.appendChild(dragHandle);
+	modelItem.appendChild(modelListItemInfo);
+	modelItem.appendChild(modelListItemActions);
 
-	const duplicateBtn = modelItem.querySelector('.duplicate-model-btn');
-	if (duplicateBtn) {
-		duplicateBtn.addEventListener('click', (e) => {
-			e.preventDefault();
-			e.stopPropagation();
-			const modelId = duplicateBtn.getAttribute('data-model-id');
-			const modelIndex = generalSettings.models.findIndex(m => m.id === modelId);
-			if (modelIndex !== -1) {
-				duplicateModel(modelIndex);
-			}
-		});
-	}
+	// Add event listeners using direct element references
+	initializeToggles(modelItem);
+	checkbox.addEventListener('change', () => {
+		const modelIndex = generalSettings.models.findIndex(m => m.id === model.id);
+		if (modelIndex !== -1) {
+			generalSettings.models[modelIndex].enabled = checkbox.checked;
+			saveSettings();
+		}
+	});
 
-	const editBtn = modelItem.querySelector('.edit-model-btn');
-	if (editBtn) {
-		editBtn.addEventListener('click', (e) => {
-			e.preventDefault();
-			e.stopPropagation();
-			const modelId = editBtn.getAttribute('data-model-id');
-			const modelIndex = generalSettings.models.findIndex(m => m.id === modelId);
-			if (modelIndex !== -1) {
-				editModel(modelIndex);
-			}
-		});
-	}
+	duplicateModelBtn.addEventListener('click', (e) => {
+		e.preventDefault();
+		e.stopPropagation();
+		const modelId = duplicateModelBtn.getAttribute('data-model-id');
+		const modelIndex = generalSettings.models.findIndex(m => m.id === modelId);
+		if (modelIndex !== -1) {
+			duplicateModel(modelIndex);
+		}
+	});
 
-	const deleteBtn = modelItem.querySelector('.delete-model-btn');
-	if (deleteBtn) {
-		deleteBtn.addEventListener('click', (e) => {
-			e.preventDefault();
-			e.stopPropagation();
-			const modelId = deleteBtn.getAttribute('data-model-id');
-			const modelIndex = generalSettings.models.findIndex(m => m.id === modelId);
-			if (modelIndex !== -1) {
-				deleteModel(modelIndex);
-			}
-		});
-	}
+	editModelBtn.addEventListener('click', (e) => {
+		e.preventDefault();
+		e.stopPropagation();
+		const modelId = editModelBtn.getAttribute('data-model-id');
+		const modelIndex = generalSettings.models.findIndex(m => m.id === modelId);
+		if (modelIndex !== -1) {
+			editModel(modelIndex);
+		}
+	});
+
+	deleteModelBtn.addEventListener('click', (e) => {
+		e.preventDefault();
+		e.stopPropagation();
+		const modelId = deleteModelBtn.getAttribute('data-model-id');
+		const modelIndex = generalSettings.models.findIndex(m => m.id === modelId);
+		if (modelIndex !== -1) {
+			deleteModel(modelIndex);
+		}
+	});
 
 	initializeIcons(modelItem);
 
@@ -697,7 +807,8 @@ async function showModelModal(model: ModelConfig, index?: number) {
 			return;
 		}
 
-		providerSelect.innerHTML = '';
+		// Clear existing provider options
+		providerSelect.textContent = '';
 		const defaultOption = document.createElement('option');
 		defaultOption.value = '';
 		defaultOption.textContent = getMessage('selectProvider');
@@ -720,7 +831,8 @@ async function showModelModal(model: ModelConfig, index?: number) {
 		nameInput.disabled = true;
 		providerModelIdInput.disabled = true;
 		modelSelectionContainer.style.display = 'none';
-		modelSelectionRadios.innerHTML = '';
+		// Clear model selection radios
+		modelSelectionRadios.textContent = '';
 		modelIdDescriptionContainer.textContent = getMessage('providerModelIdDescription');
 
 		const updateModelOptions = () => {
@@ -731,7 +843,8 @@ async function showModelModal(model: ModelConfig, index?: number) {
 			providerModelIdInput.value = (index !== undefined && model.providerId === selectedProviderId) ? model.providerModelId || '' : '';
 			nameInput.disabled = false;
 			providerModelIdInput.disabled = false;
-			modelSelectionRadios.innerHTML = '';
+			// Clear model selection radios
+			modelSelectionRadios.textContent = '';
 			modelSelectionContainer.style.display = 'none';
 			modelIdDescriptionContainer.textContent = getMessage('providerModelIdDescription');
 
@@ -741,7 +854,13 @@ async function showModelModal(model: ModelConfig, index?: number) {
 				);
 
 				if (presetProvider?.modelsList) {
-					modelIdDescriptionContainer.innerHTML = `${getMessage('providerModelIdDescription')} <a href="${presetProvider.modelsList}" target="_blank">${getMessage('modelsListFor', provider.name)}</a>.`;
+					modelIdDescriptionContainer.textContent = getMessage('providerModelIdDescription') + ' ';
+					const linkElement = document.createElement('a');
+					linkElement.href = presetProvider.modelsList;
+					linkElement.target = '_blank';
+					linkElement.textContent = getMessage('modelsListFor', provider.name);
+					modelIdDescriptionContainer.appendChild(linkElement);
+					modelIdDescriptionContainer.appendChild(document.createTextNode('.'));
 				}
 
 				if (presetProvider?.popularModels?.length) {
@@ -751,37 +870,63 @@ async function showModelModal(model: ModelConfig, index?: number) {
 						const radioId = `pop-model-${idx}`;
 						const radio = document.createElement('div');
 						radio.className = 'radio-option';
-						radio.innerHTML = `
-							<input type="radio" name="model-selection" id="${radioId}" value="${popModel.id}">
-							<label for="${radioId}">
-								${popModel.name}${popModel.recommended ? ` <span class="tag">${getMessage('recommended')}</span>` : ''}
-							</label>
-						`;
+						
+						// Create radio input
+						const radioInput = document.createElement('input');
+						radioInput.type = 'radio';
+						radioInput.name = 'model-selection';
+						radioInput.id = radioId;
+						radioInput.value = popModel.id;
+						
+						// Create label
+						const label = document.createElement('label');
+						label.setAttribute('for', radioId);
+						label.textContent = popModel.name;
+						
+						// Add recommended tag if applicable
+						if (popModel.recommended) {
+							label.appendChild(document.createTextNode(' '));
+							const tagSpan = document.createElement('span');
+							tagSpan.className = 'tag';
+							tagSpan.textContent = getMessage('recommended');
+							label.appendChild(tagSpan);
+						}
+						
+						radio.appendChild(radioInput);
+						radio.appendChild(label);
 						modelSelectionRadios.appendChild(radio);
 
 						if (index !== undefined && model.providerId === selectedProviderId && popModel.id === model.providerModelId) {
-							const input = radio.querySelector('input') as HTMLInputElement;
-							if (input) input.checked = true;
+							radioInput.checked = true;
 						}
 					});
 
 					const otherRadio = document.createElement('div');
 					otherRadio.className = 'radio-option';
-					otherRadio.innerHTML = `
-						<input type="radio" name="model-selection" id="model-other" value="other">
-						<label for="model-other">${getMessage('custom')}</label>
-					`;
+					
+					// Create other radio input
+					const otherRadioInput = document.createElement('input');
+					otherRadioInput.type = 'radio';
+					otherRadioInput.name = 'model-selection';
+					otherRadioInput.id = 'model-other';
+					otherRadioInput.value = 'other';
+					
+					// Create other label
+					const otherLabel = document.createElement('label');
+					otherLabel.setAttribute('for', 'model-other');
+					otherLabel.textContent = getMessage('custom');
+					
+					otherRadio.appendChild(otherRadioInput);
+					otherRadio.appendChild(otherLabel);
 					modelSelectionRadios.appendChild(otherRadio);
 
 					const popularMatch = presetProvider.popularModels.some(pm => pm.id === model.providerModelId);
 					if (index !== undefined && model.providerId === selectedProviderId && !popularMatch) {
-						const otherInput = otherRadio.querySelector('input') as HTMLInputElement;
-						if (otherInput) otherInput.checked = true;
+						otherRadioInput.checked = true;
 					} else if (index === undefined) {
 						const recommended = presetProvider.popularModels.find(pm => pm.recommended);
 						if (!recommended) {
-							const otherInput = otherRadio.querySelector('input') as HTMLInputElement;
-							if (otherInput) otherInput.checked = true;
+							otherRadioInput.checked = true;
 						}
 					}
 
@@ -846,7 +991,6 @@ async function showModelModal(model: ModelConfig, index?: number) {
 		newConfirmBtn.addEventListener('click', async () => {
 			const formData = new FormData(form);
 			const selectedProviderId = formData.get('providerId') as string;
-			const modelSelectionRadio = form.querySelector('input[name="model-selection"]:checked') as HTMLInputElement;
 			
 			let updatedModel: ModelConfig = {
 				id: model.id,

@@ -31,7 +31,8 @@ export function updatePropertyTypesList(): void {
 	const deleteUnusedButton = document.getElementById('delete-unused-properties-btn');
 	if (!propertyTypesList || !deleteUnusedButton) return;
 
-	propertyTypesList.innerHTML = '';
+	// Clear existing property types
+	propertyTypesList.textContent = '';
 
 	const propertyUsageCounts = countPropertyUsage();
 
@@ -155,7 +156,7 @@ function updateSelectedOption(value: string, propertySelected: HTMLElement): voi
 	const iconName = getPropertyTypeIcon(value);
 	
 	// Clear existing content
-	propertySelected.innerHTML = '';
+	propertySelected.textContent = '';
 	
 	// Create and append the new icon element
 	const iconElement = createElementWithHTML('i', '', { 'data-lucide': iconName });
