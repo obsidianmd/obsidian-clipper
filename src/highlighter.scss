@@ -74,39 +74,35 @@
 	}
 }
 
-.resize-handle {
+.obsidian-clipper-resize-handle {
 	position: absolute;
+	&.obsidian-clipper-resize-handle-w {
+		top: 10px;
+		left: -5px;
+		bottom: 10px;
+		width: 10px;
+		cursor: ew-resize;
+		z-index: 99999999999;
+	}
+	&.obsidian-clipper-resize-handle-s {
+		position: absolute;
+		bottom: -5px;
+		left: 10px;
+		right: 10px;
+		height: 10px;
+		cursor: ns-resize;
+		z-index: 99999999999;
+	}
+	&.obsidian-clipper-resize-handle-sw {
+		position: absolute;
+		bottom: -5px;
+		left: -5px;
+		width: 16px;
+		height: 16px;
+		cursor: nesw-resize;
+		z-index: 99999999999;
+	}
 }
-
-.resize-handle.w {
-	top: 10px;
-	left: -5px;
-	bottom: 10px;
-	width: 10px;
-	cursor: ew-resize;
-	z-index: 99999999999;
-}
-
-.resize-handle.s {
-	position: absolute;
-	bottom: -5px;
-	left: 10px;
-	right: 10px;
-	height: 10px;
-	cursor: ns-resize;
-	z-index: 99999999999;
-}
-
-.resize-handle.sw {
-	position: absolute;
-	bottom: -5px;
-	left: -5px;
-	width: 16px;
-	height: 16px;
-	cursor: nesw-resize;
-	z-index: 99999999999;
-}
-
 /* Hide the clip button on iPadOS because it's not supported */
 .is-ipad-os {
 	.obsidian-highlighter-menu {

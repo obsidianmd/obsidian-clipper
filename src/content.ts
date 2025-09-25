@@ -3,7 +3,6 @@ import * as highlighter from './utils/highlighter';
 import { loadSettings, generalSettings } from './utils/storage-utils';
 import Defuddle from 'defuddle';
 import { getDomain } from './utils/string-utils';
-import { initializeIcons } from './icons/icons';
 
 declare global {
 	interface Window {
@@ -59,17 +58,17 @@ declare global {
 
 		// Add resize handle (left side only)
 		const handle = document.createElement('div');
-		handle.className = `resize-handle w`;
+		handle.className = `obsidian-clipper-resize-handle obsidian-clipper-resize-handle-w`;
 		container.appendChild(handle);
 		addResizeListener(container, handle, 'w');
 
 		const southHandle = document.createElement('div');
-		southHandle.className = `resize-handle s`;
+		southHandle.className = `obsidian-clipper-resize-handle obsidian-clipper-resize-handle-s`;
 		container.appendChild(southHandle);
 		addResizeListener(container, southHandle, 's');
 
 		const southWestHandle = document.createElement('div');
-		southWestHandle.className = 'resize-handle sw';
+		southWestHandle.className = 'obsidian-clipper-resize-handle obsidian-clipper-resize-handle-sw';
 		container.appendChild(southWestHandle);
 		addResizeListener(container, southWestHandle, 'sw');
 
