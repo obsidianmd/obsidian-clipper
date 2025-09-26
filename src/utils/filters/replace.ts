@@ -30,6 +30,11 @@ export const replace = (str: string, param?: string): string => {
 
 	// Apply each replacement in sequence
 	return replacements.reduce((acc, replacement) => {
+		// Handle the case where replacement is in parentheses like ("old":"new")
+		if (replacement.match(/^\s*\(\s*".*"\s*:\s*".*"\s*\)\s*$/)) {
+			replacement = replacement.replace(/^\s*\(\s*|\s*\)\s*$/g, '');
+		}
+		
 		let [search, replace] = replacement.split(/(?<=[^\\]["']):(?=["'])/).map(p => {
 			// Remove surrounding quotes but preserve escaped characters
 			return p.trim().replace(/^["']|["']$/g, '');
