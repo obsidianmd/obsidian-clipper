@@ -583,6 +583,24 @@
 	"propertyName": {
 		"message": "Tên thuộc tính"
 	},
+	"propertyTypeCheckbox": {
+		"message": "Hộp kiểm"
+	},
+	"propertyTypeDate": {
+		"message": "Ngày"
+	},
+	"propertyTypeDatetime": {
+		"message": "Ngày & giờ"
+	},
+	"propertyTypeMultitext": {
+		"message": "Danh sách"
+	},
+	"propertyTypeNumber": {
+		"message": "Số"
+	},
+	"propertyTypeText": {
+		"message": "Văn bản"
+	},
 	"propertyValue": {
 		"message": "Giá trị thuộc tính"
 	},

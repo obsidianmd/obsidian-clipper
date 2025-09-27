@@ -583,6 +583,24 @@
 	"propertyName": {
 		"message": "Property name"
 	},
+	"propertyTypeCheckbox": {
+		"message": "चेकबॉक्स"
+	},
+	"propertyTypeDate": {
+		"message": "तारीख"
+	},
+	"propertyTypeDatetime": {
+		"message": "तारीख और समय"
+	},
+	"propertyTypeMultitext": {
+		"message": "सूची"
+	},
+	"propertyTypeNumber": {
+		"message": "संख्या"
+	},
+	"propertyTypeText": {
+		"message": "पाठ"
+	},
 	"propertyValue": {
 		"message": "Property value"
 	},

@@ -583,6 +583,24 @@
 	"propertyName": {
 		"message": "属性名称"
 	},
+	"propertyTypeCheckbox": {
+		"message": "复选框"
+	},
+	"propertyTypeDate": {
+		"message": "日期"
+	},
+	"propertyTypeDatetime": {
+		"message": "日期和时间"
+	},
+	"propertyTypeMultitext": {
+		"message": "列表"
+	},
+	"propertyTypeNumber": {
+		"message": "数字"
+	},
+	"propertyTypeText": {
+		"message": "文本"
+	},
 	"propertyValue": {
 		"message": "属性值"
 	},

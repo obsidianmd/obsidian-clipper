@@ -583,6 +583,24 @@
 	"propertyName": {
 		"message": "Eigenschaftsname"
 	},
+	"propertyTypeCheckbox": {
+		"message": "Kontrollkästchen"
+	},
+	"propertyTypeDate": {
+		"message": "Datum"
+	},
+	"propertyTypeDatetime": {
+		"message": "Datum & Uhrzeit"
+	},
+	"propertyTypeMultitext": {
+		"message": "Liste"
+	},
+	"propertyTypeNumber": {
+		"message": "Nummer"
+	},
+	"propertyTypeText": {
+		"message": "Text"
+	},
 	"propertyValue": {
 		"message": "Eigenschaftswert"
 	},

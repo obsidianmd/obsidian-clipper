@@ -575,6 +575,24 @@
 	"propertyName": {
 		"message": "Όνομα ιδιότητας"
 	},
+	"propertyTypeCheckbox": {
+		"message": "Πλαίσιο ελέγχου"
+	},
+	"propertyTypeDate": {
+		"message": "Ημερομηνία"
+	},
+	"propertyTypeDatetime": {
+		"message": "Ημερομηνία & ώρα"
+	},
+	"propertyTypeMultitext": {
+		"message": "Λίστα"
+	},
+	"propertyTypeNumber": {
+		"message": "Αριθμός"
+	},
+	"propertyTypeText": {
+		"message": "Κείμενο"
+	},
 	"propertyValue": {
 		"message": "Τιμή ιδιότητας"
 	},

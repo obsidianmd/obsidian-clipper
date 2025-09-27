@@ -583,6 +583,24 @@
 	"propertyName": {
 		"message": "Ominaisuuden nimi"
 	},
+	"propertyTypeCheckbox": {
+		"message": "Valintaruutu"
+	},
+	"propertyTypeDate": {
+		"message": "Päivämäärä"
+	},
+	"propertyTypeDatetime": {
+		"message": "Päivämäärä & aika"
+	},
+	"propertyTypeMultitext": {
+		"message": "Lista"
+	},
+	"propertyTypeNumber": {
+		"message": "Numero"
+	},
+	"propertyTypeText": {
+		"message": "Teksti"
+	},
 	"propertyValue": {
 		"message": "Ominaisuuden arvo"
 	},

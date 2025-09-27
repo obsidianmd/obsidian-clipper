@@ -583,6 +583,24 @@
 	"propertyName": {
 		"message": "Nama properti"
 	},
+	"propertyTypeCheckbox": {
+		"message": "Kotak centang"
+	},
+	"propertyTypeDate": {
+		"message": "Tanggal"
+	},
+	"propertyTypeDatetime": {
+		"message": "Tanggal & waktu"
+	},
+	"propertyTypeMultitext": {
+		"message": "Daftar"
+	},
+	"propertyTypeNumber": {
+		"message": "Nomor"
+	},
+	"propertyTypeText": {
+		"message": "Teks"
+	},
 	"propertyValue": {
 		"message": "Value properti"
 	},

@@ -575,6 +575,24 @@
 	"propertyName": {
 		"message": "Egenskabsnavn"
 	},
+	"propertyTypeCheckbox": {
+		"message": "Afkrydsningsfelt"
+	},
+	"propertyTypeDate": {
+		"message": "Dato"
+	},
+	"propertyTypeDatetime": {
+		"message": "Dato & tid"
+	},
+	"propertyTypeMultitext": {
+		"message": "Liste"
+	},
+	"propertyTypeNumber": {
+		"message": "Nummer"
+	},
+	"propertyTypeText": {
+		"message": "Tekst"
+	},
 	"propertyValue": {
 		"message": "Egenskabsværdi"
 	},

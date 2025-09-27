@@ -575,6 +575,24 @@
 	"propertyName": {
 		"message": "Назва властивості"
 	},
+	"propertyTypeCheckbox": {
+		"message": "Прапорець"
+	},
+	"propertyTypeDate": {
+		"message": "Дата"
+	},
+	"propertyTypeDatetime": {
+		"message": "Дата та час"
+	},
+	"propertyTypeMultitext": {
+		"message": "Список"
+	},
+	"propertyTypeNumber": {
+		"message": "Номер"
+	},
+	"propertyTypeText": {
+		"message": "Текст"
+	},
 	"propertyValue": {
 		"message": "Значення властивості"
 	},

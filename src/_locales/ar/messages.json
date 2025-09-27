@@ -583,6 +583,24 @@
 	"propertyName": {
 		"message": "اسم الخاصية"
 	},
+	"propertyTypeCheckbox": {
+		"message": "مربع الاختيار"
+	},
+	"propertyTypeDate": {
+		"message": "تاريخ"
+	},
+	"propertyTypeDatetime": {
+		"message": "التاريخ والوقت"
+	},
+	"propertyTypeMultitext": {
+		"message": "قائمة"
+	},
+	"propertyTypeNumber": {
+		"message": "رقم"
+	},
+	"propertyTypeText": {
+		"message": "نص"
+	},
 	"propertyValue": {
 		"message": "قيمة الخاصية"
 	},

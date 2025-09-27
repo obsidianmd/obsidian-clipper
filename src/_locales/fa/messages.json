@@ -583,6 +583,24 @@
 	"propertyName": {
 		"message": "نام خاص"
 	},
+	"propertyTypeCheckbox": {
+		"message": "چک‌باکس"
+	},
+	"propertyTypeDate": {
+		"message": "تاریخ"
+	},
+	"propertyTypeDatetime": {
+		"message": "تاریخ و زمان"
+	},
+	"propertyTypeMultitext": {
+		"message": "لیست"
+	},
+	"propertyTypeNumber": {
+		"message": "عدد"
+	},
+	"propertyTypeText": {
+		"message": "متن"
+	},
 	"propertyValue": {
 		"message": "مقدار خاص"
 	},

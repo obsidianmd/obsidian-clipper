@@ -583,6 +583,24 @@
 	"propertyName": {
 		"message": "속성 이름"
 	},
+	"propertyTypeCheckbox": {
+		"message": "체크박스"
+	},
+	"propertyTypeDate": {
+		"message": "날짜"
+	},
+	"propertyTypeDatetime": {
+		"message": "날짜 & 시간"
+	},
+	"propertyTypeMultitext": {
+		"message": "목록"
+	},
+	"propertyTypeNumber": {
+		"message": "번호"
+	},
+	"propertyTypeText": {
+		"message": "텍스트"
+	},
 	"propertyValue": {
 		"message": "속성 값"
 	},

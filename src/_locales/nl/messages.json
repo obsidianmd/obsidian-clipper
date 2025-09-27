@@ -583,6 +583,24 @@
 	"propertyName": {
 		"message": "Eigenschapnaam"
 	},
+	"propertyTypeCheckbox": {
+		"message": "Selectievakje"
+	},
+	"propertyTypeDate": {
+		"message": "Datum"
+	},
+	"propertyTypeDatetime": {
+		"message": "Datum & tijd"
+	},
+	"propertyTypeMultitext": {
+		"message": "Lijst"
+	},
+	"propertyTypeNumber": {
+		"message": "Nummer"
+	},
+	"propertyTypeText": {
+		"message": "Tekst"
+	},
 	"propertyValue": {
 		"message": "Eigenschapwaarde"
 	},

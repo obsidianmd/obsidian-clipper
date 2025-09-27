@@ -583,6 +583,24 @@
 	"propertyName": {
 		"message": "প্রোপার্টির নাম"
 	},
+	"propertyTypeCheckbox": {
+		"message": "চেকবক্স"
+	},
+	"propertyTypeDate": {
+		"message": "তারিখ"
+	},
+	"propertyTypeDatetime": {
+		"message": "তারিখ এবং সময়"
+	},
+	"propertyTypeMultitext": {
+		"message": "তালিকা"
+	},
+	"propertyTypeNumber": {
+		"message": "সংখ্যা"
+	},
+	"propertyTypeText": {
+		"message": "পাঠ্য"
+	},
 	"propertyValue": {
 		"message": "প্রোপার্টির মান"
 	},

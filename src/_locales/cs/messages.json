@@ -575,6 +575,24 @@
 	"propertyName": {
 		"message": "Název vlastnosti"
 	},
+	"propertyTypeCheckbox": {
+		"message": "Zaškrtávací políčko"
+	},
+	"propertyTypeDate": {
+		"message": "Datum"
+	},
+	"propertyTypeDatetime": {
+		"message": "Datum a čas"
+	},
+	"propertyTypeMultitext": {
+		"message": "Seznam"
+	},
+	"propertyTypeNumber": {
+		"message": "Číslo"
+	},
+	"propertyTypeText": {
+		"message": "Text"
+	},
 	"propertyValue": {
 		"message": "Hodnota vlastnosti"
 	},

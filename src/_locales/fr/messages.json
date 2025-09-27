@@ -583,6 +583,24 @@
 	"propertyName": {
 		"message": "Nom de la propriété"
 	},
+	"propertyTypeCheckbox": {
+		"message": "Case à cocher"
+	},
+	"propertyTypeDate": {
+		"message": "Date"
+	},
+	"propertyTypeDatetime": {
+		"message": "Date & heure"
+	},
+	"propertyTypeMultitext": {
+		"message": "Liste"
+	},
+	"propertyTypeNumber": {
+		"message": "Nombre"
+	},
+	"propertyTypeText": {
+		"message": "Texte"
+	},
 	"propertyValue": {
 		"message": "Valeur de la propriété"
 	},

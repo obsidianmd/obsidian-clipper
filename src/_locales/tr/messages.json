@@ -583,6 +583,24 @@
 	"propertyName": {
 		"message": "Özellik adı"
 	},
+	"propertyTypeCheckbox": {
+		"message": "Onay Kutusu"
+	},
+	"propertyTypeDate": {
+		"message": "Tarih"
+	},
+	"propertyTypeDatetime": {
+		"message": "Tarih & Saat"
+	},
+	"propertyTypeMultitext": {
+		"message": "Liste"
+	},
+	"propertyTypeNumber": {
+		"message": "Numara"
+	},
+	"propertyTypeText": {
+		"message": "Metin"
+	},
 	"propertyValue": {
 		"message": "Özellik değeri"
 	},

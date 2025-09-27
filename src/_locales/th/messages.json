@@ -583,6 +583,24 @@
 	"propertyName": {
 		"message": "ชื่อคุณสมบัติ"
 	},
+	"propertyTypeCheckbox": {
+		"message": "ช่องทำเครื่องหมาย"
+	},
+	"propertyTypeDate": {
+		"message": "วันที่"
+	},
+	"propertyTypeDatetime": {
+		"message": "วันที่ & เวลา"
+	},
+	"propertyTypeMultitext": {
+		"message": "รายการ"
+	},
+	"propertyTypeNumber": {
+		"message": "จำนวน"
+	},
+	"propertyTypeText": {
+		"message": "ข้อความ"
+	},
 	"propertyValue": {
 		"message": "ค่าคุณสมบัติ"
 	},

@@ -575,6 +575,24 @@
 	"propertyName": {
 		"message": "Nume proprietate"
 	},
+	"propertyTypeCheckbox": {
+		"message": "Caseta de selectare"
+	},
+	"propertyTypeDate": {
+		"message": "Data"
+	},
+	"propertyTypeDatetime": {
+		"message": "Data & ora"
+	},
+	"propertyTypeMultitext": {
+		"message": "Lista"
+	},
+	"propertyTypeNumber": {
+		"message": "Număr"
+	},
+	"propertyTypeText": {
+		"message": "Text"
+	},
 	"propertyValue": {
 		"message": "Valoare proprietate"
 	},

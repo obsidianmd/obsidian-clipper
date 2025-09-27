@@ -583,6 +583,24 @@
 	"propertyName": {
 		"message": "プロパティ名"
 	},
+	"propertyTypeCheckbox": {
+		"message": "チェックボックス"
+	},
+	"propertyTypeDate": {
+		"message": "日付"
+	},
+	"propertyTypeDatetime": {
+		"message": "日付＆時間"
+	},
+	"propertyTypeMultitext": {
+		"message": "リスト"
+	},
+	"propertyTypeNumber": {
+		"message": "番号"
+	},
+	"propertyTypeText": {
+		"message": "テキスト"
+	},
 	"propertyValue": {
 		"message": "プロパティ値"
 	},

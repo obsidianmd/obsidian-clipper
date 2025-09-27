@@ -575,6 +575,24 @@
 	"propertyName": {
 		"message": "שם המאפיין"
 	},
+	"propertyTypeCheckbox": {
+		"message": "תיבת סימון"
+	},
+	"propertyTypeDate": {
+		"message": "תאריך"
+	},
+	"propertyTypeDatetime": {
+		"message": "תאריך ושעה"
+	},
+	"propertyTypeMultitext": {
+		"message": "רשימה"
+	},
+	"propertyTypeNumber": {
+		"message": "מספר"
+	},
+	"propertyTypeText": {
+		"message": "טקסט"
+	},
 	"propertyValue": {
 		"message": "ערך המאפיין"
 	},

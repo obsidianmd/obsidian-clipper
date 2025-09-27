@@ -575,6 +575,24 @@
 	"propertyName": {
 		"message": "Pangalan ng property"
 	},
+	"propertyTypeCheckbox": {
+		"message": "Checkbox"
+	},
+	"propertyTypeDate": {
+		"message": "Petsa"
+	},
+	"propertyTypeDatetime": {
+		"message": "Petsa & oras"
+	},
+	"propertyTypeMultitext": {
+		"message": "Listahan"
+	},
+	"propertyTypeNumber": {
+		"message": "Numero"
+	},
+	"propertyTypeText": {
+		"message": "Teksto"
+	},
 	"propertyValue": {
 		"message": "Value ng property"
 	},

@@ -583,6 +583,24 @@
 	"propertyName": {
 		"message": "Nom de la propietat"
 	},
+	"propertyTypeCheckbox": {
+		"message": "Casella de verificació"
+	},
+	"propertyTypeDate": {
+		"message": "Data"
+	},
+	"propertyTypeDatetime": {
+		"message": "Data i hora"
+	},
+	"propertyTypeMultitext": {
+		"message": "Llista"
+	},
+	"propertyTypeNumber": {
+		"message": "Número"
+	},
+	"propertyTypeText": {
+		"message": "Text"
+	},
 	"propertyValue": {
 		"message": "Valor de la propietat"
 	},
