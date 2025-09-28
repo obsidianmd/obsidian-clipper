@@ -78,7 +78,7 @@
 		}
 	}
 
-	#interpret-btn {
+	#interpret-btn, #interpreter-retry-btn {
 		cursor: default;
 		user-select: none;
 		-webkit-user-select: none;
@@ -131,15 +131,24 @@
 					color: var(--text-error);
 				}
 			}
-			~ {
-				#interpreter-timer {
-					color: var(--text-error);
-				}
-			}
 		}
 		@media (hover: hover) {
 			&:hover {
 				color: var(--color-accent-3);
+			}
+		}
+	}
+
+	/* Retry button specific tweaks: red text, right-aligned */
+	#interpreter-retry-btn {
+		color: var(--text-error);
+		flex-grow: 0;
+		text-align: end;
+		margin-inline: 0;
+		font-weight: 600;
+		@media (hover: hover) {
+			&:hover {
+				color: var(--text-error-hover);
 			}
 		}
 	}
