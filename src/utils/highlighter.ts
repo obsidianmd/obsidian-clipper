@@ -209,36 +209,15 @@ function updateUndoRedoButtons() {
 
 async function handleClipButtonClick(e: Event) {
 	e.preventDefault();
-	const browserType = await detectBrowser();
+	const openRequest = browser.runtime.sendMessage({ action: "openClipperUI" }) as Promise<{ success?: boolean; error?: string }>;
 
 	try {
-		await loadSettings();
-
-		const openBehavior = generalSettings.openBehavior ?? 'popup';
-
-		if (openBehavior === 'embedded') {
-			const embeddedResponse = await browser.runtime.sendMessage({ action: "getActiveTabAndToggleIframe" }) as { success?: boolean; error?: string };
-			if (embeddedResponse && embeddedResponse.success) {
-				return;
-			}
-			if (embeddedResponse && embeddedResponse.error) {
-				console.warn('Embedded mode not available:', embeddedResponse.error);
-			}
-		} else if (openBehavior === 'sidepanel') {
-			const sidePanelResponse = await browser.runtime.sendMessage({ action: "openSidePanel" }) as { success?: boolean; error?: string };
-			if (sidePanelResponse && sidePanelResponse.success) {
-				return;
-			}
-			if (sidePanelResponse && sidePanelResponse.error) {
-				console.warn('Side panel not available:', sidePanelResponse.error);
-			}
-		}
-
-		const popupResponse = await browser.runtime.sendMessage({ action: "openPopup" }) as { success?: boolean; error?: string };
-		if (popupResponse && 'success' in popupResponse && popupResponse.success === false) {
-			throw new Error(popupResponse.error || 'Unknown error');
+		const response = await openRequest;
+		if (response && 'success' in response && response.success === false) {
+			throw new Error(response.error || 'Unknown error');
 		}
 	} catch (error) {
+		const browserType = await detectBrowser();
 		console.error('Error opening clipper UI:', error);
 		if (browserType === 'firefox') {
 			alert("Additional permissions required. To open Web Clipper from the highlighter, go to about:config and set this to true:\n\nextensions.openPopupWithoutUserGesture.enabled");

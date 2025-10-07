@@ -319,18 +319,6 @@ document.addEventListener('DOMContentLoaded', async function() {
 				console.error('Error toggling iframe:', error);
 				// If there's an error, we'll fall through and open the normal popup.
 			}
-		} else if (openBehavior === 'sidepanel' && !isIframe && !isSidePanel) {
-			try {
-				const response = await browser.runtime.sendMessage({ action: "openSidePanel", tabId: currentTabId }) as { success?: boolean; error?: string };
-				if (response && response.success) {
-					window.close();
-					return;
-				} else if (response && response.error) {
-					console.error('Error opening side panel:', response.error);
-				}
-			} catch (error) {
-				console.error('Error opening side panel:', error);
-			}
 		}
 
 		// Connect to the background script for communication
