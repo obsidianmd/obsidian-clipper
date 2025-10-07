@@ -304,7 +304,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 		const openBehavior: Settings['openBehavior'] = isMobile ? 'popup' : settings.openBehavior;
 
-		// Check if we should open in an iframe, but only if the URL is valid
+		// Check if we should open in an iframe or side panel, but only if the URL is valid
 		if (isValidUrl(tab.url) && !isBlankPage(tab.url) && openBehavior === 'embedded' && !isIframe && !isSidePanel) {
 			try {
 				const response = await browser.runtime.sendMessage({ action: "getActiveTabAndToggleIframe" }) as { success?: boolean; error?: string };
@@ -318,6 +318,18 @@ document.addEventListener('DOMContentLoaded', async function() {
 			} catch (error) {
 				console.error('Error toggling iframe:', error);
 				// If there's an error, we'll fall through and open the normal popup.
+			}
+		} else if (openBehavior === 'sidepanel' && !isIframe && !isSidePanel) {
+			try {
+				const response = await browser.runtime.sendMessage({ action: "openSidePanel", tabId: currentTabId }) as { success?: boolean; error?: string };
+				if (response && response.success) {
+					window.close();
+					return;
+				} else if (response && response.error) {
+					console.error('Error opening side panel:', response.error);
+				}
+			} catch (error) {
+				console.error('Error opening side panel:', error);
 			}
 		}
 

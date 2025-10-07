@@ -212,20 +212,38 @@ async function handleClipButtonClick(e: Event) {
 	const browserType = await detectBrowser();
 
 	try {
-		const response = await browser.runtime.sendMessage({action: "openPopup"});
-		if (response && typeof response === 'object' && 'success' in response) {
-			if (!response.success) {
-				throw new Error((response as { error?: string }).error || 'Unknown error');
+		await loadSettings();
+
+		const openBehavior = generalSettings.openBehavior ?? 'popup';
+
+		if (openBehavior === 'embedded') {
+			const embeddedResponse = await browser.runtime.sendMessage({ action: "getActiveTabAndToggleIframe" }) as { success?: boolean; error?: string };
+			if (embeddedResponse && embeddedResponse.success) {
+				return;
 			}
-		} else {
-			throw new Error('Invalid response from background script');
+			if (embeddedResponse && embeddedResponse.error) {
+				console.warn('Embedded mode not available:', embeddedResponse.error);
+			}
+		} else if (openBehavior === 'sidepanel') {
+			const sidePanelResponse = await browser.runtime.sendMessage({ action: "openSidePanel" }) as { success?: boolean; error?: string };
+			if (sidePanelResponse && sidePanelResponse.success) {
+				return;
+			}
+			if (sidePanelResponse && sidePanelResponse.error) {
+				console.warn('Side panel not available:', sidePanelResponse.error);
+			}
+		}
+
+		const popupResponse = await browser.runtime.sendMessage({ action: "openPopup" }) as { success?: boolean; error?: string };
+		if (popupResponse && 'success' in popupResponse && popupResponse.success === false) {
+			throw new Error(popupResponse.error || 'Unknown error');
 		}
 	} catch (error) {
-		console.error('Error opening popup:', error);
+		console.error('Error opening clipper UI:', error);
 		if (browserType === 'firefox') {
 			alert("Additional permissions required. To open Web Clipper from the highlighter, go to about:config and set this to true:\n\nextensions.openPopupWithoutUserGesture.enabled");
 		} else {
-			console.error('Failed to open popup:', error);
+			console.error('Failed to open clipper UI:', error);
 		}
 	}
 }

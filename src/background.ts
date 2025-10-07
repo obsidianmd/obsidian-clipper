@@ -213,6 +213,34 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 			return true;
 		}
 
+		if (typedRequest.action === "openSidePanel") {
+			(async () => {
+				try {
+					let targetTab: browser.Tabs.Tab | undefined;
+					if (typeof typedRequest.tabId === 'number') {
+						try {
+							targetTab = await browser.tabs.get(typedRequest.tabId);
+						} catch (error) {
+							console.warn('Unable to resolve tab from provided tabId:', error);
+						}
+					}
+					if (!targetTab && sender.tab?.id) {
+						try {
+							targetTab = await browser.tabs.get(sender.tab.id);
+						} catch (error) {
+							console.warn('Unable to resolve sender tab:', error);
+						}
+					}
+					await openSidePanelForTab(targetTab);
+					sendResponse({ success: true });
+				} catch (error) {
+					console.error('Error opening side panel:', error);
+					sendResponse({ success: false, error: error instanceof Error ? error.message : String(error) });
+				}
+			})();
+			return true;
+		}
+
 		if (typedRequest.action === "toggleReaderMode" && typedRequest.tabId) {
 			injectReaderScript(typedRequest.tabId).then(() => {
 				browser.tabs.sendMessage(typedRequest.tabId!, { action: "toggleReaderMode" })
@@ -222,28 +250,31 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 		}
 
 		if (typedRequest.action === "getActiveTabAndToggleIframe") {
-			browser.tabs.query({active: true, currentWindow: true}).then(async (tabs) => {
-				const currentTab = tabs[0];
-				if (currentTab && currentTab.id) {
-					try {
-						// Check if the URL is valid before trying to inject content script
-						if (!currentTab.url || !isValidUrl(currentTab.url) || isBlankPage(currentTab.url)) {
-							sendResponse({success: false, error: 'Cannot open iframe on this page'});
-							return;
+			(async () => {
+				try {
+					let targetTab: browser.Tabs.Tab | undefined;
+					if (typeof typedRequest.tabId === 'number') {
+						try {
+							targetTab = await browser.tabs.get(typedRequest.tabId);
+						} catch (error) {
+							console.warn('Unable to resolve tab from provided tabId:', error);
 						}
-						
-						// Ensure content script is loaded first
-						await ensureContentScriptLoadedInBackground(currentTab.id);
-						await browser.tabs.sendMessage(currentTab.id, { action: "toggle-iframe" });
-						sendResponse({success: true});
-					} catch (error) {
-						console.error('Error sending toggle-iframe message:', error);
-						sendResponse({success: false, error: error instanceof Error ? error.message : String(error)});
 					}
-				} else {
-					sendResponse({success: false, error: 'No active tab found'});
+					if (!targetTab) {
+						targetTab = await getActiveTabSafe();
+					}
+					if (!targetTab) {
+						sendResponse({ success: false, error: 'No active tab found' });
+						return;
+					}
+
+					await toggleEmbeddedMode(targetTab);
+					sendResponse({ success: true });
+				} catch (error) {
+					console.error('Error sending toggle-iframe message:', error);
+					sendResponse({ success: false, error: error instanceof Error ? error.message : String(error) });
 				}
-			});
+			})();
 			return true;
 		}
 
@@ -453,7 +484,7 @@ const debouncedUpdateContextMenu = debounce(async (tabId: number) => {
 			];
 
 		const browserType = await detectBrowser();
-		if (browserType === 'chrome') {
+		if (['chrome', 'brave', 'edge', 'firefox'].includes(browserType)) {
 			menuItems.push({
 				id: 'open-side-panel',
 				title: browser.i18n.getMessage('openSidePanel'),
@@ -473,7 +504,19 @@ const debouncedUpdateContextMenu = debounce(async (tabId: number) => {
 
 browser.contextMenus.onClicked.addListener(async (info, tab) => {
 	if (info.menuItemId === "open-obsidian-clipper") {
-		browser.action.openPopup();
+		try {
+			const openBehavior = await getPreferredOpenBehavior();
+			if (openBehavior === 'embedded' && tab) {
+				await toggleEmbeddedMode(tab);
+			} else if (openBehavior === 'sidepanel') {
+				await openSidePanelForTab(tab);
+			} else {
+				await browser.action.openPopup();
+			}
+		} catch (error) {
+			console.error('Error handling open behavior from context menu:', error);
+			await browser.action.openPopup();
+		}
 	} else if (info.menuItemId === "enter-highlighter" && tab && tab.id) {
 		await setHighlighterMode(tab.id, true);
 	} else if (info.menuItemId === "exit-highlighter" && tab && tab.id) {
@@ -486,13 +529,18 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
 	// 	await ensureContentScriptLoadedInBackground(tab.id);
 	// 	await injectReaderScript(tab.id);
 	// 	await browser.tabs.sendMessage(tab.id, { action: "toggleReaderMode" });
-	} else if (info.menuItemId === 'open-embedded' && tab && tab.id) {
-		await ensureContentScriptLoadedInBackground(tab.id);
-		await browser.tabs.sendMessage(tab.id, { action: "toggle-iframe" });
-	} else if (info.menuItemId === 'open-side-panel' && tab && tab.id && tab.windowId) {
-		chrome.sidePanel.open({ tabId: tab.id });
-		sidePanelOpenWindows.add(tab.windowId);
-		await ensureContentScriptLoadedInBackground(tab.id);
+	} else if (info.menuItemId === 'open-embedded' && tab) {
+		try {
+			await toggleEmbeddedMode(tab);
+		} catch (error) {
+			console.error('Error toggling embedded mode from context menu:', error);
+		}
+	} else if (info.menuItemId === 'open-side-panel') {
+		try {
+			await openSidePanelForTab(tab);
+		} catch (error) {
+			console.error('Error opening side panel from context menu:', error);
+		}
 	}
 });
 
@@ -647,6 +695,102 @@ async function injectReaderScript(tabId: number) {
 		console.error('Error injecting reader script:', error);
 		return false;
 	}
+}
+
+async function getPreferredOpenBehavior(): Promise<'popup' | 'embedded' | 'sidepanel'> {
+	try {
+		const storage = await browser.storage.sync.get('general_settings') as { general_settings?: { openBehavior?: boolean | string } };
+		const stored = storage.general_settings?.openBehavior;
+		if (typeof stored === 'boolean') {
+			return stored ? 'embedded' : 'popup';
+		}
+		if (stored === 'popup' || stored === 'embedded' || stored === 'sidepanel') {
+			return stored;
+		}
+	} catch (error) {
+		console.error('Error retrieving preferred open behavior:', error);
+	}
+	return 'popup';
+}
+
+async function getActiveTabSafe(): Promise<browser.Tabs.Tab | undefined> {
+	const tabs = await browser.tabs.query({ active: true, currentWindow: true });
+	return tabs[0];
+}
+
+async function toggleEmbeddedMode(tab: browser.Tabs.Tab): Promise<void> {
+	if (!tab.id || !tab.url || !isValidUrl(tab.url) || isBlankPage(tab.url)) {
+		throw new Error('Cannot open iframe on this page');
+	}
+	await ensureContentScriptLoadedInBackground(tab.id);
+	await browser.tabs.sendMessage(tab.id, { action: "toggle-iframe" });
+}
+
+async function openSidePanelForTab(tab?: browser.Tabs.Tab): Promise<void> {
+	let targetTab = tab;
+	if (!targetTab) {
+		targetTab = await getActiveTabSafe();
+	}
+	if (!targetTab) {
+		throw new Error('No active tab found');
+	}
+
+	const browserType = await detectBrowser();
+
+	if (browserType === 'firefox') {
+		const sidebarAction = (browser as any).sidebarAction;
+		if (sidebarAction && typeof sidebarAction.open === 'function') {
+			await sidebarAction.open();
+			if (typeof targetTab.id === 'number') {
+				await ensureContentScriptLoadedInBackground(targetTab.id);
+			}
+			return;
+		}
+		throw new Error('Firefox sidebar API not available');
+	}
+
+	const sidePanelApi = (browser as any).sidePanel;
+	if (sidePanelApi && typeof sidePanelApi.open === 'function') {
+		const safariOptions = typeof targetTab.windowId === 'number' ? { windowId: targetTab.windowId } : {};
+		await sidePanelApi.open(safariOptions);
+		if (typeof targetTab.id === 'number') {
+			await ensureContentScriptLoadedInBackground(targetTab.id);
+		}
+		return;
+	}
+
+	if (typeof chrome !== 'undefined' && chrome.sidePanel && typeof chrome.sidePanel.open === 'function') {
+		const options: any = {};
+		if (typeof targetTab.id === 'number') {
+			options.tabId = targetTab.id;
+		} else if (typeof targetTab.windowId === 'number') {
+			options.windowId = targetTab.windowId;
+		}
+
+		await new Promise<void>((resolve, reject) => {
+			chrome.sidePanel.open(options, () => {
+				const err = chrome.runtime.lastError;
+				if (err) {
+					reject(new Error(err.message));
+					return;
+				}
+				resolve();
+			});
+		});
+
+		if (typeof targetTab.windowId === 'number') {
+			sidePanelOpenWindows.add(targetTab.windowId);
+		} else if (typeof options.windowId === 'number') {
+			sidePanelOpenWindows.add(options.windowId);
+		}
+
+		if (typeof targetTab.id === 'number') {
+			await ensureContentScriptLoadedInBackground(targetTab.id);
+		}
+		return;
+	}
+
+	throw new Error('Side panel API not available');
 }
 
 // Initialize the extension
