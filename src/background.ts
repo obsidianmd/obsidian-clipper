@@ -726,6 +726,20 @@ async function toggleEmbeddedMode(tab: browser.Tabs.Tab): Promise<void> {
 	await browser.tabs.sendMessage(tab.id, { action: "toggle-iframe" });
 }
 
+async function tryEnsureContentScript(tab: browser.Tabs.Tab): Promise<void> {
+	if (!tab.id) {
+		return;
+	}
+	try {
+		if (!tab.url || !isValidUrl(tab.url) || isBlankPage(tab.url)) {
+			return;
+		}
+		await ensureContentScriptLoadedInBackground(tab.id);
+	} catch (error) {
+		console.warn('Unable to ensure content script before opening side panel:', error);
+	}
+}
+
 async function openSidePanelForTab(tab?: browser.Tabs.Tab): Promise<void> {
 	let targetTab = tab;
 	if (!targetTab) {
@@ -741,9 +755,7 @@ async function openSidePanelForTab(tab?: browser.Tabs.Tab): Promise<void> {
 		const sidebarAction = (browser as any).sidebarAction;
 		if (sidebarAction && typeof sidebarAction.open === 'function') {
 			await sidebarAction.open();
-			if (typeof targetTab.id === 'number') {
-				await ensureContentScriptLoadedInBackground(targetTab.id);
-			}
+			await tryEnsureContentScript(targetTab);
 			return;
 		}
 		throw new Error('Firefox sidebar API not available');
@@ -753,9 +765,7 @@ async function openSidePanelForTab(tab?: browser.Tabs.Tab): Promise<void> {
 	if (sidePanelApi && typeof sidePanelApi.open === 'function') {
 		const safariOptions = typeof targetTab.windowId === 'number' ? { windowId: targetTab.windowId } : {};
 		await sidePanelApi.open(safariOptions);
-		if (typeof targetTab.id === 'number') {
-			await ensureContentScriptLoadedInBackground(targetTab.id);
-		}
+		await tryEnsureContentScript(targetTab);
 		return;
 	}
 
@@ -784,9 +794,7 @@ async function openSidePanelForTab(tab?: browser.Tabs.Tab): Promise<void> {
 			sidePanelOpenWindows.add(options.windowId);
 		}
 
-		if (typeof targetTab.id === 'number') {
-			await ensureContentScriptLoadedInBackground(targetTab.id);
-		}
+		await tryEnsureContentScript(targetTab);
 		return;
 	}
 
