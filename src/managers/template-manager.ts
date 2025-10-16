@@ -9,9 +9,14 @@ export let templates: Template[] = [];
 export let editingTemplateIndex = -1;
 
 const STORAGE_KEY_PREFIX = 'template_';
+const LOCAL_STORAGE_KEY_PREFIX = 'template_local_';
 const TEMPLATE_LIST_KEY = 'template_list';
+const LOCAL_TEMPLATE_LIST_KEY = 'template_local_list';
 const CHUNK_SIZE = 8000;
+const LOCAL_CHUNK_SIZE = 1500000;
+const SYNC_SIZE_LIMIT = 7000;
 const SIZE_WARNING_THRESHOLD = 6000;
+const LOCAL_SIZE_WARNING_THRESHOLD = 800000;
 
 export function setEditingTemplateIndex(index: number): void {
 	editingTemplateIndex = index;
@@ -19,14 +24,29 @@ export function setEditingTemplateIndex(index: number): void {
 
 export async function loadTemplates(): Promise<Template[]> {
 	try {
-		const data = await browser.storage.sync.get(['template_list']);
-		let templateIds = data.template_list as string[] || [];
+		const syncData = await browser.storage.sync.get([TEMPLATE_LIST_KEY, LOCAL_TEMPLATE_LIST_KEY]);
+		const syncTemplateIds = syncData[TEMPLATE_LIST_KEY] as string[] || [];
+		let localTemplateIds = syncData[LOCAL_TEMPLATE_LIST_KEY] as string[] || [];
+
+		// Fallback: if local template list is missing from sync, check local storage
+		if (localTemplateIds.length === 0) {
+			try {
+				const localData = await browser.storage.local.get([LOCAL_TEMPLATE_LIST_KEY]);
+				localTemplateIds = localData[LOCAL_TEMPLATE_LIST_KEY] as string[] || [];
+			} catch (error) {
+				console.warn('Failed to load local template list from local storage:', error);
+			}
+		}
 
 		// Filter out any null or undefined values
-		templateIds = templateIds.filter(id => id != null);
+		const filteredSyncIds = syncTemplateIds.filter(id => id != null);
+		const filteredLocalIds = localTemplateIds.filter(id => id != null);
 
-		if (templateIds.length > 0) {
-			const loadedTemplates = await Promise.all(templateIds.map(async (id: string) => {
+		const loadedTemplates: Template[] = [];
+
+		// Load sync templates
+		if (filteredSyncIds.length > 0) {
+			const syncTemplates = await Promise.all(filteredSyncIds.map(async (id: string) => {
 				try {
 					const result = await browser.storage.sync.get(`template_${id}`);
 					const compressedChunks = result[`template_${id}`] as string[];
@@ -34,19 +54,45 @@ export async function loadTemplates(): Promise<Template[]> {
 						const decompressedData = decompressFromUTF16(compressedChunks.join(''));
 						const template = JSON.parse(decompressedData);
 						if (template && Array.isArray(template.properties)) {
+							template.isLocalOnly = false;
 							return template;
 						}
 					}
-					console.warn(`Template ${id} is invalid or missing`);
+					console.warn(`Sync template ${id} is invalid or missing`);
 					return null;
 				} catch (error) {
-					console.error(`Error parsing template ${id}:`, error);
+					console.error(`Error parsing sync template ${id}:`, error);
 					return null;
 				}
 			}));
-
-			templates = loadedTemplates.filter((t: Template | null): t is Template => t !== null);
+			loadedTemplates.push(...syncTemplates.filter((t: Template | null): t is Template => t !== null));
 		}
+
+		// Load local templates
+		if (filteredLocalIds.length > 0) {
+			const localTemplates = await Promise.all(filteredLocalIds.map(async (id: string) => {
+				try {
+					const result = await browser.storage.local.get(`template_local_${id}`);
+					const compressedChunks = result[`template_local_${id}`] as string[];
+					if (compressedChunks) {
+						const decompressedData = decompressFromUTF16(compressedChunks.join(''));
+						const template = JSON.parse(decompressedData);
+						if (template && Array.isArray(template.properties)) {
+							template.isLocalOnly = true;
+							return template;
+						}
+					}
+					console.warn(`Local template ${id} is invalid or missing`);
+					return null;
+				} catch (error) {
+					console.error(`Error parsing local template ${id}:`, error);
+					return null;
+				}
+			}));
+			loadedTemplates.push(...localTemplates.filter((t: Template | null): t is Template => t !== null));
+		}
+
+		templates = loadedTemplates;
 
 		if (templates.length === 0) {
 			console.log('No valid templates found, creating default template');
@@ -69,9 +115,11 @@ export async function loadTemplates(): Promise<Template[]> {
 }
 
 export async function saveTemplateSettings(): Promise<string[]> {
-	const templateIds = templates.map(t => t.id);
+	const syncTemplateIds: string[] = [];
+	const localTemplateIds: string[] = [];
 	const warnings: string[] = [];
-	const templateChunks: { [key: string]: string[] } = {};
+	const syncTemplateChunks: { [key: string]: string[] } = {};
+	const localTemplateChunks: { [key: string]: string[] } = {};
 
 	for (const template of templates) {
 		if (!template.noteNameFormat || template.noteNameFormat.trim() === '') {
@@ -79,15 +127,47 @@ export async function saveTemplateSettings(): Promise<string[]> {
 			template.noteNameFormat = '{{title}}';
 		}
 
-		const [chunks, warning] = await prepareTemplateForSave(template);
-		templateChunks[STORAGE_KEY_PREFIX + template.id] = chunks;
+		const [chunks, warning, useLocalStorage] = await prepareTemplateForSave(template);
+		// Decide storage target
+		if (useLocalStorage || template.isLocalOnly) {
+			// Save to local storage and ensure any old sync copy is removed
+			localTemplateChunks[LOCAL_STORAGE_KEY_PREFIX + template.id] = chunks;
+			localTemplateIds.push(template.id);
+			try {
+				await browser.storage.sync.remove(`template_${template.id}`);
+			} catch (error) {
+				console.warn(`Failed to remove sync version of template ${template.id}:`, error);
+			}
+		} else {
+			// Save to sync storage and ensure any old local copy is removed
+			syncTemplateChunks[STORAGE_KEY_PREFIX + template.id] = chunks;
+			syncTemplateIds.push(template.id);
+			try {
+				await browser.storage.local.remove(`template_local_${template.id}`);
+			} catch (error) {
+				console.warn(`Failed to remove local version of template ${template.id}:`, error);
+			}
+			// Ensure flag is false when saved to sync
+			template.isLocalOnly = false;
+		}
 		if (warning) {
 			warnings.push(warning);
 		}
 	}
 
 	try {
-		await browser.storage.sync.set({ ...templateChunks, [TEMPLATE_LIST_KEY]: templateIds });
+		// Save sync templates and both template lists (always write lists to avoid stale data)
+		await browser.storage.sync.set({
+			...syncTemplateChunks,
+			[TEMPLATE_LIST_KEY]: syncTemplateIds,
+			[LOCAL_TEMPLATE_LIST_KEY]: localTemplateIds
+		});
+
+		// Save local templates separately
+		if (Object.keys(localTemplateChunks).length > 0) {
+			await browser.storage.local.set(localTemplateChunks);
+		}
+		
 		console.log('Template settings saved');
 		return warnings;
 	} catch (error) {
@@ -96,18 +176,32 @@ export async function saveTemplateSettings(): Promise<string[]> {
 	}
 }
 
-async function prepareTemplateForSave(template: Template): Promise<[string[], string | null]> {
-	const compressedData = compressToUTF16(JSON.stringify(template));
+async function prepareTemplateForSave(template: Template): Promise<[string[], string | null, boolean]> {
+	// Ensure isLocalOnly property is preserved during serialization
+	const templateToSave = { ...template };
+	if (template.isLocalOnly) {
+		templateToSave.isLocalOnly = true;
+	}
+	const compressedData = compressToUTF16(JSON.stringify(templateToSave));
+	const useLocalStorage = compressedData.length > SYNC_SIZE_LIMIT;
+	const chunkSize = useLocalStorage ? LOCAL_CHUNK_SIZE : CHUNK_SIZE;
 	const chunks = [];
-	for (let i = 0; i < compressedData.length; i += CHUNK_SIZE) {
-		chunks.push(compressedData.slice(i, i + CHUNK_SIZE));
+	for (let i = 0; i < compressedData.length; i += chunkSize) {
+		chunks.push(compressedData.slice(i, i + chunkSize));
 	}
 
 	// Check if the template size is approaching the limit
-	if (compressedData.length > SIZE_WARNING_THRESHOLD) {
-		return [chunks, `Warning: Template "${template.name}" is ${(compressedData.length / 1024).toFixed(2)}KB, which is approaching the storage limit.`];
+	let warning = null;
+	if (useLocalStorage) {
+		if (compressedData.length > LOCAL_SIZE_WARNING_THRESHOLD) {
+			warning = `Warning: Template "${template.name}" (${(compressedData.length / 1024).toFixed(2)}KB) is very large and stored locally.`;
+		} else {
+			warning = `Info: Template "${template.name}" (${(compressedData.length / 1024).toFixed(2)}KB) is stored locally and won't sync across devices.`;
+		}
+	} else if (compressedData.length > SIZE_WARNING_THRESHOLD) {
+		warning = `Warning: Template "${template.name}" is ${(compressedData.length / 1024).toFixed(2)}KB, approaching sync storage limit.`;
 	}
-	return [chunks, null];
+	return [chunks, warning, useLocalStorage];
 }
 
 export function createDefaultTemplate(): Template {
@@ -119,6 +213,7 @@ export function createDefaultTemplate(): Template {
 		path: 'Clippings',
 		noteContentFormat: '{{content}}',
 		context: "",
+		isLocalOnly: false,
 		properties: [
 			{ id: Date.now().toString() + Math.random().toString(36).slice(2, 11), name: 'title', value: '{{title}}' },
 			{ id: Date.now().toString() + Math.random().toString(36).slice(2, 11), name: 'source', value: '{{url}}' },
@@ -176,23 +271,23 @@ export async function deleteTemplate(templateId: string): Promise<boolean> {
 	const index = templates.findIndex(t => t.id === templateId);
 	console.log('Deleting template:', templateId);
 	if (index !== -1) {
+		const template = templates[index];
+		const isLocalOnly = template.isLocalOnly;
+		
 		// Remove from the templates array
 		templates.splice(index, 1);
 		setEditingTemplateIndex(-1);
 
 		try {
-			// Remove the template from storage
+			// Remove both copies to be safe (handles forced-local cases)
+			await browser.storage.local.remove(`template_local_${templateId}`);
 			await browser.storage.sync.remove(`template_${templateId}`);
 
-			// Get the current template_list
-			const data = await browser.storage.sync.get('template_list');
-			let templateIds = data.template_list as string[] || [];
-
-			// Remove the deleted template ID from the list
-			templateIds = templateIds.filter(id => id !== templateId);
-
-			// Update the template_list in storage
-			await browser.storage.sync.set({ 'template_list': templateIds });
+			// Update both template lists in sync storage
+			const syncData = await browser.storage.sync.get([TEMPLATE_LIST_KEY, LOCAL_TEMPLATE_LIST_KEY]);
+			let localTemplateIds = (syncData[LOCAL_TEMPLATE_LIST_KEY] as string[] || []).filter(id => id !== templateId);
+			let templateIds = (syncData[TEMPLATE_LIST_KEY] as string[] || []).filter(id => id !== templateId);
+			await browser.storage.sync.set({ [LOCAL_TEMPLATE_LIST_KEY]: localTemplateIds, [TEMPLATE_LIST_KEY]: templateIds });
 
 			console.log(`Template ${templateId} deleted successfully`);
 			return true;
