@@ -38,6 +38,9 @@ export function createMarkdownContent(content: string, url: string) {
 		preformattedCode: true,
 	});
 
+	// disable markdown escaping by overriding the escape function
+	turndownService.escape = (str: string) => str;
+
 	turndownService.addRule('table', {
 		filter: 'table',
 		replacement: function(content, node) {
