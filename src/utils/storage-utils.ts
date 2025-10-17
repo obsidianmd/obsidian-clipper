@@ -54,7 +54,7 @@ interface StorageData {
 		betaFeatures?: boolean;
 		legacyMode?: boolean;
 		silentOpen?: boolean;
-		openBehavior?: boolean | 'popup' | 'embedded';
+		openBehavior?: boolean | 'popup' | 'embedded' | 'sidepanel';
 		saveBehavior?: 'addToObsidian' | 'copyToClipboard' | 'saveFile';
 	};
 	vaults?: string[];
@@ -153,9 +153,16 @@ export async function loadSettings(): Promise<Settings> {
 		betaFeatures: data.general_settings?.betaFeatures ?? defaultSettings.betaFeatures,
 		legacyMode: data.general_settings?.legacyMode ?? defaultSettings.legacyMode,
 		silentOpen: data.general_settings?.silentOpen ?? defaultSettings.silentOpen,
-		openBehavior: typeof data.general_settings?.openBehavior === 'boolean' 
-			? (data.general_settings.openBehavior ? 'embedded' : 'popup') 
-			: (data.general_settings?.openBehavior ?? defaultSettings.openBehavior),
+		openBehavior: (() => {
+			const storedValue = data.general_settings?.openBehavior;
+			if (typeof storedValue === 'boolean') {
+				return storedValue ? 'embedded' : 'popup';
+			}
+			if (storedValue === 'popup' || storedValue === 'embedded' || storedValue === 'sidepanel') {
+				return storedValue;
+			}
+			return defaultSettings.openBehavior;
+		})(),
 		highlighterEnabled: data.highlighter_settings?.highlighterEnabled ?? defaultSettings.highlighterEnabled,
 		alwaysShowHighlights: data.highlighter_settings?.alwaysShowHighlights ?? defaultSettings.alwaysShowHighlights,
 		highlightBehavior: data.highlighter_settings?.highlightBehavior ?? defaultSettings.highlightBehavior,

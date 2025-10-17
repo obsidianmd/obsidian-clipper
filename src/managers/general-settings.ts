@@ -259,7 +259,7 @@ function saveSettingsFromForm(): void {
 
 	const updatedSettings = {
 		...generalSettings, // Keep existing settings
-		openBehavior: (openBehaviorDropdown?.value as 'popup' | 'embedded') ?? generalSettings.openBehavior,
+		openBehavior: (openBehaviorDropdown?.value as 'popup' | 'embedded' | 'sidepanel') ?? generalSettings.openBehavior,
 		showMoreActionsButton: showMoreActionsToggle?.checked ?? generalSettings.showMoreActionsButton,
 		betaFeatures: betaFeaturesToggle?.checked ?? generalSettings.betaFeatures,
 		legacyMode: legacyModeToggle?.checked ?? generalSettings.legacyMode,
@@ -349,7 +349,7 @@ function initializeOpenBehaviorDropdown(): void {
 		'open-behavior-dropdown',
 		generalSettings.openBehavior,
 		(value) => {
-			saveSettings({ ...generalSettings, openBehavior: value as 'popup' | 'embedded' });
+			saveSettings({ ...generalSettings, openBehavior: value as 'popup' | 'embedded' | 'sidepanel' });
 		}
 	);
 }
