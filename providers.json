@@ -132,6 +132,7 @@
 		"modelsList": "https://docs.x.ai/docs/models",
 		"baseUrl": "https://api.x.ai/v1/chat/completions",
 		"popularModels": [
+			{ "id": "grok-4-fast-non-reasoning", "name": "Grok 4 Fast" },
 			{ "id": "grok-4", "name": "Grok 4" },
 			{ "id": "grok-3", "name": "Grok 3" },
 			{ "id": "grok-3-mini", "name": "Grok 3 Mini" }
