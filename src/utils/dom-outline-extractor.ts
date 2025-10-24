@@ -100,7 +100,7 @@ function extractSemanticSections(doc: Document): string[] {
 	// Common semantic section patterns
 	const sectionPatterns = [
 		{ selector: 'article', name: 'article' },
-		{ selector: '.abstract, #abstract, [class*="abstract"]', name: 'abstract' },
+		{ selector: '.abstract, #abstract', name: 'abstract' },
 		{ selector: '.introduction, #introduction, #intro', name: 'introduction' },
 		{ selector: '.methodology, #methodology, .methods, #methods', name: 'methodology' },
 		{ selector: '.results, #results', name: 'results' },
@@ -110,7 +110,7 @@ function extractSemanticSections(doc: Document): string[] {
 		{ selector: '.content, #content, .main-content, #main-content', name: 'main-content' },
 		{ selector: '.post, .article-body, .post-content', name: 'post-content' },
 		{ selector: '.recipe, .ingredients, .instructions', name: 'recipe-section' }
-	};
+	];
 
 	sectionPatterns.forEach(({ selector, name }) => {
 		try {
@@ -137,7 +137,7 @@ function extractSemanticSections(doc: Document): string[] {
  * Extract simplified structure from DOM element
  */
 function extractStructure(element: Element, depth: number = 0): DOMStructureNode {
-	const MAX_DEPTH = 4; // Limit recursion depth
+	const MAX_DEPTH = 4;
 
 	if (depth > MAX_DEPTH) {
 		return { tag: element.tagName.toLowerCase() };
@@ -162,7 +162,7 @@ function extractStructure(element: Element, depth: number = 0): DOMStructureNode
 	}
 
 	// Only process semantic tags
-	if (!SEMANTIC_TAGS.includes(node.tag)) {
+	if (!node.tag || !SEMANTIC_TAGS.includes(node.tag)) {
 		return node;
 	}
 
@@ -193,7 +193,7 @@ function extractStructure(element: Element, depth: number = 0): DOMStructureNode
  * Convert DOM outline to compact JSON string for LLM
  */
 export function serializeDOMOutline(outline: DOMOutline): string {
-	return JSON.stringify(outline, null, 0); // No pretty printing to save tokens
+	return JSON.stringify(outline, null, 0);
 }
 
 /**
