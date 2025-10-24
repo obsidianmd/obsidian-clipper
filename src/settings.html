@@ -338,6 +338,62 @@
 								</div>
 							</div>
 							<div>
+								<h3>Intelligent Template Generation (Beta)</h3>
+								<div class="setting-item mod-horizontal">
+									<div class="setting-item-info">
+										<label for="intelligent-template-generation-toggle">Enable AI template generation</label>
+										<div class="setting-item-description">
+											Automatically generate optimal extraction templates for each page using AI. The generated template is customized for the page's structure and discarded after clipping. <strong>Note:</strong> This feature is experimental and uses additional API credits.
+										</div>
+									</div>
+									<div class="setting-item-control">
+										<div class="checkbox-container">
+											<input type="checkbox" id="intelligent-template-generation-toggle" />
+										</div>
+									</div>
+								</div>
+								<div id="intelligent-generation-options" style="display: none;">
+									<div class="setting-item">
+										<label for="template-generation-mode-select" style="font-weight: 400;">Generation mode</label>
+										<div class="setting-item-description">Control when templates are generated automatically.</div>
+										<select id="template-generation-mode-select" class="dropdown">
+											<option value="always">Always generate</option>
+											<option value="ask">Ask before generating</option>
+											<option value="manual">Manual only</option>
+										</select>
+									</div>
+									<div class="setting-item">
+										<label for="template-generation-model-select" style="font-weight: 400;">Model (optional)</label>
+										<div class="setting-item-description">Use a specific model for template generation, or leave blank to use the default interpreter model.</div>
+										<select id="template-generation-model-select" class="dropdown">
+											<option value="">Use Interpreter Model</option>
+										</select>
+									</div>
+									<div class="setting-item mod-horizontal">
+										<div class="setting-item-info">
+											<label for="show-template-info-toggle">Show generation info</label>
+											<div class="setting-item-description">Display details about what the AI extracted after template generation.</div>
+										</div>
+										<div class="setting-item-control">
+											<div class="checkbox-container">
+												<input type="checkbox" id="show-template-info-toggle" />
+											</div>
+										</div>
+									</div>
+									<div class="setting-item mod-horizontal">
+										<div class="setting-item-info">
+											<label for="allow-template-regeneration-toggle">Allow regeneration</label>
+											<div class="setting-item-description">Show a button to regenerate the template if the first attempt doesn't extract content optimally.</div>
+										</div>
+										<div class="setting-item-control">
+											<div class="checkbox-container">
+												<input type="checkbox" id="allow-template-regeneration-toggle" />
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div>
 								<h3 data-i18n="providers">Providers</h3>
 								<div id="api-keys-warning-container" class="warning-container" style="margin-bottom: 0.5rem;">
 									<div class="warning-icon">

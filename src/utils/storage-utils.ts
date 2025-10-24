@@ -21,6 +21,11 @@ export let generalSettings: Settings = {
 	interpreterEnabled: false,
 	interpreterAutoRun: false,
 	defaultPromptContext: '',
+	intelligentTemplateGenerationEnabled: false,
+	intelligentTemplateGenerationMode: 'always',
+	templateGenerationModel: '',
+	showGeneratedTemplateInfo: true,
+	allowTemplateRegeneration: true,
 	propertyTypes: [],
 	readerSettings: {
 		fontSize: 1.5,
@@ -77,6 +82,11 @@ interface StorageData {
 		interpreterEnabled?: boolean;
 		interpreterAutoRun?: boolean;
 		defaultPromptContext?: string;
+		intelligentTemplateGenerationEnabled?: boolean;
+		intelligentTemplateGenerationMode?: 'always' | 'ask' | 'manual';
+		templateGenerationModel?: string;
+		showGeneratedTemplateInfo?: boolean;
+		allowTemplateRegeneration?: boolean;
 	};
 	property_types?: PropertyType[];
 	stats?: {
@@ -112,6 +122,11 @@ export async function loadSettings(): Promise<Settings> {
 		interpreterEnabled: false,
 		interpreterAutoRun: false,
 		defaultPromptContext: '',
+		intelligentTemplateGenerationEnabled: false,
+		intelligentTemplateGenerationMode: 'always',
+		templateGenerationModel: '',
+		showGeneratedTemplateInfo: true,
+		allowTemplateRegeneration: true,
 		propertyTypes: [],
 		saveBehavior: 'addToObsidian',
 		readerSettings: {
@@ -165,6 +180,11 @@ export async function loadSettings(): Promise<Settings> {
 		interpreterEnabled: data.interpreter_settings?.interpreterEnabled ?? defaultSettings.interpreterEnabled,
 		interpreterAutoRun: data.interpreter_settings?.interpreterAutoRun ?? defaultSettings.interpreterAutoRun,
 		defaultPromptContext: data.interpreter_settings?.defaultPromptContext || defaultSettings.defaultPromptContext,
+		intelligentTemplateGenerationEnabled: data.interpreter_settings?.intelligentTemplateGenerationEnabled ?? defaultSettings.intelligentTemplateGenerationEnabled,
+		intelligentTemplateGenerationMode: data.interpreter_settings?.intelligentTemplateGenerationMode || defaultSettings.intelligentTemplateGenerationMode,
+		templateGenerationModel: data.interpreter_settings?.templateGenerationModel || defaultSettings.templateGenerationModel,
+		showGeneratedTemplateInfo: data.interpreter_settings?.showGeneratedTemplateInfo ?? defaultSettings.showGeneratedTemplateInfo,
+		allowTemplateRegeneration: data.interpreter_settings?.allowTemplateRegeneration ?? defaultSettings.allowTemplateRegeneration,
 		propertyTypes: data.property_types || defaultSettings.propertyTypes,
 		readerSettings: {
 			fontSize: data.reader_settings?.fontSize ?? defaultSettings.readerSettings.fontSize,
@@ -210,7 +230,12 @@ export async function saveSettings(settings?: Partial<Settings>): Promise<void> 
 			providers: generalSettings.providers,
 			interpreterEnabled: generalSettings.interpreterEnabled,
 			interpreterAutoRun: generalSettings.interpreterAutoRun,
-			defaultPromptContext: generalSettings.defaultPromptContext
+			defaultPromptContext: generalSettings.defaultPromptContext,
+			intelligentTemplateGenerationEnabled: generalSettings.intelligentTemplateGenerationEnabled,
+			intelligentTemplateGenerationMode: generalSettings.intelligentTemplateGenerationMode,
+			templateGenerationModel: generalSettings.templateGenerationModel,
+			showGeneratedTemplateInfo: generalSettings.showGeneratedTemplateInfo,
+			allowTemplateRegeneration: generalSettings.allowTemplateRegeneration
 		},
 		property_types: generalSettings.propertyTypes,
 		reader_settings: {

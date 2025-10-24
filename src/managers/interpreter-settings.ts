@@ -176,6 +176,15 @@ export function updatePromptContextVisibility(): void {
 	}
 }
 
+function updateIntelligentGenerationVisibility(): void {
+	const intelligentToggle = document.getElementById('intelligent-template-generation-toggle') as HTMLInputElement;
+	const intelligentOptionsContainer = document.getElementById('intelligent-generation-options');
+
+	if (intelligentOptionsContainer) {
+		intelligentOptionsContainer.style.display = intelligentToggle && intelligentToggle.checked ? 'block' : 'none';
+	}
+}
+
 export async function initializeInterpreterSettings(): Promise<void> {
 	try {
 		const interpreterSettingsForm = document.getElementById('interpreter-settings-form');
@@ -253,6 +262,52 @@ function initializeInterpreterToggles(): void {
 	initializeSettingToggle('interpreter-auto-run-toggle', generalSettings.interpreterAutoRun, (checked) => {
 		saveSettings({ ...generalSettings, interpreterAutoRun: checked });
 	});
+
+	// Intelligent Template Generation toggles
+	initializeSettingToggle('intelligent-template-generation-toggle', generalSettings.intelligentTemplateGenerationEnabled, (checked) => {
+		saveSettings({ ...generalSettings, intelligentTemplateGenerationEnabled: checked });
+		updateIntelligentGenerationVisibility();
+	});
+
+	initializeSettingToggle('show-template-info-toggle', generalSettings.showGeneratedTemplateInfo, (checked) => {
+		saveSettings({ ...generalSettings, showGeneratedTemplateInfo: checked });
+	});
+
+	initializeSettingToggle('allow-template-regeneration-toggle', generalSettings.allowTemplateRegeneration, (checked) => {
+		saveSettings({ ...generalSettings, allowTemplateRegeneration: checked });
+	});
+
+	// Initialize mode selector
+	const modeSelect = document.getElementById('template-generation-mode-select') as HTMLSelectElement;
+	if (modeSelect) {
+		modeSelect.value = generalSettings.intelligentTemplateGenerationMode || 'always';
+		modeSelect.addEventListener('change', () => {
+			const mode = modeSelect.value as 'always' | 'ask' | 'manual';
+			saveSettings({ ...generalSettings, intelligentTemplateGenerationMode: mode });
+		});
+	}
+
+	// Initialize model selector (if different from main interpreter model)
+	const modelSelect = document.getElementById('template-generation-model-select') as HTMLSelectElement;
+	if (modelSelect) {
+		// Populate with available models
+		modelSelect.innerHTML = '<option value="">Use Interpreter Model</option>';
+		generalSettings.models.filter(m => m.enabled).forEach(model => {
+			const option = document.createElement('option');
+			option.value = model.id;
+			option.textContent = model.name;
+			if (model.id === generalSettings.templateGenerationModel) {
+				option.selected = true;
+			}
+			modelSelect.appendChild(option);
+		});
+
+		modelSelect.addEventListener('change', () => {
+			saveSettings({ ...generalSettings, templateGenerationModel: modelSelect.value });
+		});
+	}
+
+	updateIntelligentGenerationVisibility();
 }
 
 function initializeProviderList() {

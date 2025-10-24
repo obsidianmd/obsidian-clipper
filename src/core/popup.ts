@@ -14,6 +14,7 @@ import browser from '../utils/browser-polyfill';
 import { addBrowserClassToHtml, detectBrowser } from '../utils/browser-detection';
 import { createElementWithClass } from '../utils/dom-utils';
 import { initializeInterpreter, handleInterpreterUI, collectPromptVariables } from '../utils/interpreter';
+import { generateTemplateForPage } from '../utils/interpreter-template-generation';
 import { adjustNoteNameHeight } from '../utils/ui-utils';
 import { debugLog } from '../utils/debug';
 import { showVariables, initializeVariablesPanel, updateVariablesPanel } from '../managers/inspect-variables';
@@ -620,6 +621,75 @@ function logError(message: string, error?: any): void {
 	showError(message);
 }
 
+// Intelligent Template Generation UI Functions
+function showIntelligentGenerationUI(message: string): void {
+	const templateContainer = document.querySelector('.template-container') as HTMLElement;
+	if (!templateContainer) return;
+
+	// Create or get generation status element
+	let statusEl = document.getElementById('template-generation-status');
+	if (!statusEl) {
+		statusEl = document.createElement('div');
+		statusEl.id = 'template-generation-status';
+		statusEl.className = 'template-generation-status';
+		templateContainer.insertBefore(statusEl, templateContainer.firstChild);
+	}
+
+	statusEl.innerHTML = `
+		<div class="generation-badge">
+			<span class="generation-icon">🤖</span>
+			<span class="generation-text">${message}</span>
+		</div>
+	`;
+	statusEl.style.display = 'flex';
+}
+
+function hideIntelligentGenerationUI(): void {
+	const statusEl = document.getElementById('template-generation-status');
+	if (statusEl) {
+		statusEl.style.display = 'none';
+	}
+}
+
+function showGeneratedTemplateInfo(template: Template): void {
+	const templateContainer = document.querySelector('.template-container') as HTMLElement;
+	if (!templateContainer) return;
+
+	// Create or get info element
+	let infoEl = document.getElementById('template-generation-info');
+	if (!infoEl) {
+		infoEl = document.createElement('div');
+		infoEl.id = 'template-generation-info';
+		infoEl.className = 'template-generation-info';
+		templateContainer.insertBefore(infoEl, templateContainer.firstChild);
+	}
+
+	// Count selectors in template
+	const selectorCount = (template.noteContentFormat.match(/{{selector/g) || []).length;
+	const schemaCount = (template.noteContentFormat.match(/{{schema/g) || []).length;
+	const propertyCount = template.properties.length;
+
+	infoEl.innerHTML = `
+		<div class="generation-info-badge">
+			<span class="info-icon">✓</span>
+			<span class="info-text">AI Generated Template</span>
+			<div class="info-details">
+				${selectorCount > 0 ? `<span>${selectorCount} selector${selectorCount !== 1 ? 's' : ''}</span>` : ''}
+				${schemaCount > 0 ? `<span>${schemaCount} schema field${schemaCount !== 1 ? 's' : ''}</span>` : ''}
+				${propertyCount > 0 ? `<span>${propertyCount} propert${propertyCount !== 1 ? 'ies' : 'y'}</span>` : ''}
+			</div>
+		</div>
+	`;
+	infoEl.style.display = 'block';
+
+	// Auto-hide after 5 seconds
+	setTimeout(() => {
+		if (infoEl) {
+			infoEl.style.display = 'none';
+		}
+	}, 5000);
+}
+
 async function waitForInterpreter(interpretBtn: HTMLButtonElement): Promise<void> {
 	return new Promise((resolve, reject) => {
 		const checkProcessing = () => {
@@ -661,8 +731,56 @@ async function refreshFields(tabId: number, checkTemplateTriggers: boolean = tru
 		if (extractedData) {
 			const currentUrl = tab.url;
 
-			// Only check for the correct template if checkTemplateTriggers is true
-			if (checkTemplateTriggers) {
+			// Check if intelligent template generation is enabled
+			if (checkTemplateTriggers && generalSettings.intelligentTemplateGenerationEnabled) {
+				try {
+					// Show loading UI
+					showIntelligentGenerationUI('Generating optimal template...');
+
+					// Get the model to use (use template generation model if specified, otherwise use interpreter model)
+					const modelId = generalSettings.templateGenerationModel || generalSettings.interpreterModel;
+					const model = generalSettings.models.find(m => m.id === modelId);
+
+					if (model && model.enabled) {
+						// Generate template
+						const generatedTemplate = await generateTemplateForPage({
+							...extractedData,
+							url: currentUrl
+						}, model);
+
+						// Use generated template
+						currentTemplate = generatedTemplate;
+						console.log('Generated template:', generatedTemplate);
+
+						// Show info if enabled
+						if (generalSettings.showGeneratedTemplateInfo) {
+							showGeneratedTemplateInfo(generatedTemplate);
+						}
+					} else {
+						console.warn('No valid model found for template generation, falling back to trigger matching');
+						throw new Error('No model configured');
+					}
+
+					// Hide loading UI
+					hideIntelligentGenerationUI();
+				} catch (error) {
+					console.error('Template generation failed, falling back to trigger matching:', error);
+					hideIntelligentGenerationUI();
+
+					// Fall back to trigger matching
+					const getSchemaOrgData = async () => {
+						return extractedData.schemaOrgData;
+					};
+
+					const matchedTemplate = await findMatchingTemplate(currentUrl, getSchemaOrgData);
+					if (matchedTemplate) {
+						console.log('Matched template:', matchedTemplate);
+						currentTemplate = matchedTemplate;
+						updateTemplateDropdown();
+					}
+				}
+			} else if (checkTemplateTriggers) {
+				// Use traditional trigger matching
 				const getSchemaOrgData = async () => {
 					return extractedData.schemaOrgData;
 				};

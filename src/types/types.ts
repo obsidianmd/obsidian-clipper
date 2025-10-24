@@ -76,6 +76,11 @@ export interface Settings {
 	interpreterEnabled: boolean;
 	interpreterAutoRun: boolean;
 	defaultPromptContext: string;
+	intelligentTemplateGenerationEnabled: boolean;
+	intelligentTemplateGenerationMode: 'always' | 'ask' | 'manual';
+	templateGenerationModel?: string;
+	showGeneratedTemplateInfo: boolean;
+	allowTemplateRegeneration: boolean;
 	propertyTypes: PropertyType[];
 	readerSettings: ReaderSettings;
 	stats: {
