@@ -809,7 +809,7 @@
 		"message": "Vault"
 	},
 	"vaultDescription": {
-		"message": "Wähle den Standard-Vault für diese Vorlage aus. Gehen zu $link_start$allgemeinen Einstellungen$link_end$, um Vaulte hinzuzufügen oder zu entfernen.",
+		"message": "Wähle den Standard-Vault für diese Vorlage aus. Gehen zu $link_start$allgemeinen Einstellungen$link_end$, um Vaults hinzuzufügen oder zu entfernen.",
 		"placeholders": {
 			"link_end": {
 				"content": "</a>"
@@ -820,7 +820,7 @@
 		}
 	},
 	"vaults": {
-		"message": "Vaulte"
+		"message": "Vaults"
 	},
 	"vaultsDescription": {
 		"message": "Standardmäßig werden ausgeschnittene Notizen im aktuell geöffneten Vault gespeichert. Du kannst hier Vaults hinzufügen, wenn Du die Option haben möchtest, in verschiedenen Vaults zu speichern. Vaultnamen müssen exakt mit dem Namen des Obsidian-Vaults übereinstimmen. Drücke $strong_start$Enter$strong_end$, um einen Vault hinzuzufügen.",
