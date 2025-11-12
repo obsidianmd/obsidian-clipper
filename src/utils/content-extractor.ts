@@ -58,6 +58,19 @@ interface ContentResponse {
 	metaTags: { name?: string | null; property?: string | null; content: string | null }[];
 }
 
+export async function preloadImages(tabId: number): Promise<void> {
+	try {
+		await browser.runtime.sendMessage({ 
+			action: "sendMessageToTab", 
+			tabId: tabId, 
+			message: { action: "preloadImages" }
+		});
+	} catch (error) {
+		console.error('Error preloading images:', error);
+		// Don't throw, just log - we can still proceed with clipping
+	}
+}
+
 export async function extractPageContent(tabId: number): Promise<ContentResponse | null> {
 	try {
 		const response = await browser.runtime.sendMessage({ 

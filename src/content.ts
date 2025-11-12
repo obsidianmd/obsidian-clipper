@@ -207,6 +207,209 @@ declare global {
 			return true;
 		}
 
+		if (request.action === "preloadImages") {
+			// Handle async preload images
+			(async () => {
+				// Show loading indicator on page
+				const loadingIndicator = document.createElement('div');
+				loadingIndicator.id = 'obsidian-clipper-loading';
+				loadingIndicator.textContent = browser.i18n.getMessage('loadingImages') || 'Loading images';
+				loadingIndicator.style.cssText = `
+					position: fixed;
+					top: 10px;
+					left: 10px;
+					z-index: 999999;
+					background: rgba(0, 0, 0, 0.8);
+					color: white;
+					padding: 10px 20px;
+					border-radius: 5px;
+					font-family: Arial, sans-serif;
+					font-size: 14px;
+					pointer-events: none;
+				`;
+				document.body.appendChild(loadingIndicator);
+
+				// Scroll to top first
+				window.scrollTo({ top: 0, behavior: 'instant' });
+				
+				// Wait a bit for scroll to complete
+				await new Promise(resolve => setTimeout(resolve, 100));
+
+				// Get page dimensions
+				const scrollHeight = Math.max(
+					document.body.scrollHeight,
+					document.documentElement.scrollHeight,
+					document.body.offsetHeight,
+					document.documentElement.offsetHeight,
+					document.body.clientHeight,
+					document.documentElement.clientHeight
+				);
+				const viewportHeight = window.innerHeight;
+				
+				// Use smaller scroll steps to simulate real user scrolling
+				// Scroll in smaller increments (about 100-200px at a time)
+				const scrollStep = Math.min(150, viewportHeight * 0.3); // Smaller steps, more realistic
+				let currentScroll = 0;
+
+				// Scroll down step by step, simulating real user behavior
+				while (currentScroll < scrollHeight) {
+					// Increment scroll position
+					currentScroll = Math.min(currentScroll + scrollStep, scrollHeight);
+					
+					// Use instant scroll to simulate smooth continuous scrolling
+					window.scrollTo({ top: currentScroll, behavior: 'instant' });
+					
+					// Trigger scroll event manually to ensure lazy loading triggers
+					const scrollEvent = new Event('scroll', { bubbles: true });
+					window.dispatchEvent(scrollEvent);
+					document.dispatchEvent(scrollEvent);
+					
+					// Small delay to simulate real scrolling speed
+					await new Promise(resolve => setTimeout(resolve, 50));
+					
+					// Check for images in viewport and wait for them to load
+					const images = document.querySelectorAll('img');
+					const imagePromises: Promise<void>[] = [];
+					const viewportTop = window.scrollY;
+					const viewportBottom = viewportTop + window.innerHeight;
+					
+					images.forEach((img: HTMLImageElement) => {
+						// Check if image is in viewport (with some margin for lazy loading)
+						const rect = img.getBoundingClientRect();
+						const imgTop = rect.top + viewportTop;
+						const imgBottom = imgTop + rect.height;
+						// Include a margin below viewport for lazy loading triggers
+						const margin = viewportHeight * 0.5;
+						
+						const isInViewport = (imgTop < viewportBottom + margin && imgBottom > viewportTop - margin);
+						
+						if (isInViewport && !img.complete) {
+							imagePromises.push(
+								new Promise((resolve) => {
+									let resolved = false;
+									const doResolve = () => {
+										if (!resolved) {
+											resolved = true;
+											resolve();
+										}
+									};
+									
+									// If image already has src, wait for it to load
+									if (img.src && img.src !== '') {
+										// Declare timeoutId first so it's accessible in handlers
+										let timeoutId: ReturnType<typeof setTimeout> | null = null;
+										
+										// Use addEventListener to avoid overwriting existing handlers
+										const loadHandler = () => {
+											if (timeoutId) {
+												clearTimeout(timeoutId);
+												timeoutId = null;
+											}
+											doResolve();
+										};
+										const errorHandler = () => {
+											if (timeoutId) {
+												clearTimeout(timeoutId);
+												timeoutId = null;
+											}
+											doResolve(); // Resolve even on error to not block
+										};
+										
+										img.addEventListener('load', loadHandler, { once: true });
+										img.addEventListener('error', errorHandler, { once: true });
+										
+										// Timeout after 2 seconds, but clear it if image loads first
+										timeoutId = setTimeout(() => {
+											img.removeEventListener('load', loadHandler);
+											img.removeEventListener('error', errorHandler);
+											timeoutId = null;
+											doResolve();
+										}, 2000);
+									} else {
+										// Image might be lazy loaded, wait a bit
+										setTimeout(() => doResolve(), 500);
+									}
+								})
+							);
+						}
+					});
+					
+					// Wait for images to start loading (don't wait too long)
+					await Promise.race([
+						Promise.all(imagePromises),
+						new Promise(resolve => setTimeout(resolve, 300)) // Max wait 300ms per step
+					]);
+				}
+
+				// Ensure we're at the bottom
+				window.scrollTo({ top: scrollHeight, behavior: 'instant' });
+				await new Promise(resolve => setTimeout(resolve, 200));
+				
+				// Wait for any final images at the bottom
+				const finalImages = document.querySelectorAll('img');
+				const finalImagePromises: Promise<void>[] = [];
+				finalImages.forEach((img: HTMLImageElement) => {
+					if (!img.complete) {
+						finalImagePromises.push(
+							new Promise((resolve) => {
+								let resolved = false;
+								const doResolve = () => {
+									if (!resolved) {
+										resolved = true;
+										resolve();
+									}
+								};
+								
+								// Declare timeoutId first so it's accessible in handlers
+								let timeoutId: ReturnType<typeof setTimeout> | null = null;
+								
+								// Use addEventListener to avoid overwriting existing handlers
+								const loadHandler = () => {
+									if (timeoutId) {
+										clearTimeout(timeoutId);
+										timeoutId = null;
+									}
+									doResolve();
+								};
+								const errorHandler = () => {
+									if (timeoutId) {
+										clearTimeout(timeoutId);
+										timeoutId = null;
+									}
+									doResolve();
+								};
+								
+								img.addEventListener('load', loadHandler, { once: true });
+								img.addEventListener('error', errorHandler, { once: true });
+								
+								// Timeout after 2 seconds, but clear it if image loads first
+								timeoutId = setTimeout(() => {
+									img.removeEventListener('load', loadHandler);
+									img.removeEventListener('error', errorHandler);
+									timeoutId = null;
+									doResolve();
+								}, 2000);
+							})
+						);
+					}
+				});
+				await Promise.race([
+					Promise.all(finalImagePromises),
+					new Promise(resolve => setTimeout(resolve, 1000))
+				]);
+
+				// Scroll back to top
+				window.scrollTo({ top: 0, behavior: 'instant' });
+				await new Promise(resolve => setTimeout(resolve, 100));
+
+				// Remove loading indicator
+				loadingIndicator.remove();
+
+				sendResponse({ success: true });
+			})();
+			return true;
+		}
+
 		if (request.action === "getPageContent") {
 			let selectedHtml = '';
 			const selection = window.getSelection();
