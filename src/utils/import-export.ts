@@ -329,24 +329,39 @@ export async function exportAllSettings(): Promise<void> {
 	console.log('Starting exportAllSettings function');
 	try {
 		console.log('Fetching all data from browser storage');
-		const allData = await browser.storage.sync.get(null) as StorageData;
-		console.log('All data fetched:', allData);
+		const allSyncData = await browser.storage.sync.get(null) as StorageData;
+		const allLocalData = await browser.storage.local.get(null) as StorageData;
+		console.log('All data fetched - sync:', allSyncData, 'local:', allLocalData);
 
 		// Create a copy of the data to modify
-		const exportData: StorageData = { ...allData };
+		const exportData: StorageData = { ...allSyncData };
 
-		// Decompress all templates
-		const templateIds = exportData.template_list || [];
-		for (const id of templateIds) {
+		// Decompress sync templates
+		const syncTemplateIds = exportData.template_list || [];
+		for (const id of syncTemplateIds) {
 			const key = `template_${id}`;
 			if (exportData[key] && Array.isArray(exportData[key])) {
 				try {
-					// Join chunks and decompress
 					const compressedData = (exportData[key] as string[]).join('');
 					const decompressedData = decompressFromUTF16(compressedData);
 					exportData[key] = JSON.parse(decompressedData);
 				} catch (error) {
-					console.error(`Failed to decompress template ${id}:`, error);
+					console.error(`Failed to decompress sync template ${id}:`, error);
+				}
+			}
+		}
+
+		// Decompress local templates  
+		const localTemplateIds = exportData.template_local_list || [];
+		for (const id of localTemplateIds) {
+			const key = `template_local_${id}`;
+			if (allLocalData[key] && Array.isArray(allLocalData[key])) {
+				try {
+					const compressedData = (allLocalData[key] as string[]).join('');
+					const decompressedData = decompressFromUTF16(compressedData);
+					exportData[key] = JSON.parse(decompressedData);
+				} catch (error) {
+					console.error(`Failed to decompress local template ${id}:`, error);
 				}
 			}
 		}
@@ -388,6 +403,38 @@ async function importAllSettingsFromJson(jsonContent: string): Promise<void> {
 		if (confirm(getMessage('confirmReplaceSettings'))) {
 			// Create a copy of the settings to modify
 			const importData: StorageData = { ...settings };
+
+			// Handle local templates: compress and write to local storage; keep only the ID list in sync
+			const localTemplateIds: string[] = (importData.template_local_list as string[]) || [];
+			if (localTemplateIds.length > 0) {
+				const localChunks: Record<string, string[]> = {};
+				for (const id of localTemplateIds) {
+					const key = `template_local_${id}`;
+					const value = (settings as any)[key];
+					if (!value) continue;
+					try {
+						const isAlreadyCompressed = Array.isArray(value) && (value as any[]).every(v => typeof v === 'string');
+						if (isAlreadyCompressed) {
+							localChunks[key] = value as string[];
+						} else {
+							const templateStr = JSON.stringify(value);
+							const compressedData = compressToUTF16(templateStr);
+							const chunkSize = 1500000; // align with LOCAL_CHUNK_SIZE
+							const chunks: string[] = [];
+							for (let i = 0; i < compressedData.length; i += chunkSize) {
+								chunks.push(compressedData.slice(i, i + chunkSize));
+							}
+							localChunks[key] = chunks;
+						}
+					} catch (error) {
+						console.error(`Failed to process local template ${id}:`, error);
+					}
+					// Remove the blob from importData to avoid storing JSON in sync
+					delete (importData as any)[key];
+				}
+				// Write all local templates
+				await browser.storage.local.set(localChunks);
+			}
 			
 			// Compress all templates
 			const templateIds = importData.template_list || [];
@@ -419,6 +466,9 @@ async function importAllSettingsFromJson(jsonContent: string): Promise<void> {
 			}
 
 			await browser.storage.sync.clear();
+			// Always write both template ID lists, even if empty, to avoid stale state
+			if (!importData.template_list) (importData as any).template_list = [];
+			if (!importData.template_local_list) (importData as any).template_local_list = [];
 			await browser.storage.sync.set(importData);
 			await loadSettings();
 			await loadTemplates();
