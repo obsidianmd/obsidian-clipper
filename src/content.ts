@@ -24,12 +24,146 @@ declare global {
 	let isHighlighterMode = false;
 	const iframeId = 'obsidian-clipper-iframe';
 	const containerId = 'obsidian-clipper-container';
+	const IMAGE_ENSURE_TIMEOUT_MS = 6000;
+	const SCROLL_STEP_DELAY_MS = 500;
+	const SCROLL_TOTAL_TIMEOUT_MS = 5500;
+	const SCROLL_REST_DELAY_MS = 750;
 
 	function removeContainer(container: HTMLElement) {
 		container.classList.add('is-closing');
 		container.addEventListener('animationend', () => {
 			container.remove();
 		}, { once: true });
+	}
+
+	// Common lazy-loading attributes
+	const lazySrcAttrs = ['data-src', 'data-original', 'data-lazy-src', 'data-url', 'data-image', 'data-img', 'data-actualsrc'];
+	const lazySrcsetAttrs = ['data-srcset', 'data-lazy-srcset', 'data-original-set'];
+
+	function resolveLazyImageSources(img: HTMLImageElement) {
+		// Resolve lazy src attributes
+		for (const attr of lazySrcAttrs) {
+			const value = img.getAttribute(attr);
+			if (value && !img.src) {
+				img.src = value;
+			}
+		}
+
+		// Resolve lazy srcset attributes
+		for (const attr of lazySrcsetAttrs) {
+			const value = img.getAttribute(attr);
+			if (value && !img.srcset) {
+				img.srcset = value;
+			}
+		}
+
+		// Handle picture element sources
+		const parent = img.parentElement;
+		if (parent?.tagName.toLowerCase() === 'picture') {
+			parent.querySelectorAll('source').forEach(source => {
+				for (const attr of lazySrcsetAttrs) {
+					const value = source.getAttribute(attr);
+					if (value && !source.srcset) {
+						source.srcset = value;
+					}
+				}
+			});
+		}
+
+		// Force eager loading
+		try {
+			img.loading = 'eager';
+		} catch {
+			img.setAttribute('loading', 'eager');
+		}
+
+		// Trigger load by reassigning src if needed
+		if (img.src) {
+			img.src = img.src;
+		}
+	}
+
+	function sleep(durationMs: number): Promise<void> {
+		return new Promise(resolve => setTimeout(resolve, durationMs));
+	}
+
+	function getScroller(): Element | Document {
+		return document.scrollingElement || document.documentElement || document.body;
+	}
+
+	async function scrollPageToBottomForImages(): Promise<void> {
+		const scroller = getScroller() as Element & { scrollTop?: number };
+		const startingTop = window.scrollY || scroller.scrollTop || 0;
+		const startingLeft = window.scrollX || 0;
+		const startTime = Date.now();
+		let lastScrollTop = -1;
+
+		try {
+			while (Date.now() - startTime < SCROLL_TOTAL_TIMEOUT_MS) {
+				const currentScrollTop = window.scrollY || scroller.scrollTop || 0;
+				const scrollHeight = document.documentElement.scrollHeight;
+				const maxScrollTop = Math.max(0, scrollHeight - window.innerHeight);
+
+				if (maxScrollTop <= 0 || Math.abs(currentScrollTop - maxScrollTop) < 2) {
+					break;
+				}
+
+				const nextScrollTop = Math.min(maxScrollTop, currentScrollTop + Math.max(200, window.innerHeight * 0.8));
+				window.scrollTo({ top: nextScrollTop, left: 0, behavior: 'auto' });
+				await sleep(SCROLL_STEP_DELAY_MS);
+
+				const newScrollTop = window.scrollY || scroller.scrollTop || 0;
+				if (Math.abs(newScrollTop - lastScrollTop) < 2) {
+					break; // Stuck, bail out
+				}
+				lastScrollTop = newScrollTop;
+			}
+			await sleep(SCROLL_REST_DELAY_MS);
+		} finally {
+			window.scrollTo({ top: startingTop, left: startingLeft, behavior: 'auto' });
+		}
+	}
+
+	function waitForImage(img: HTMLImageElement, timeoutMs = 4000): Promise<void> {
+		resolveLazyImageSources(img);
+		if (img.complete && img.naturalWidth > 0) {
+			return Promise.resolve();
+		}
+
+		return new Promise<void>((resolve) => {
+			const cleanup = () => {
+				img.removeEventListener('load', onLoad);
+				img.removeEventListener('error', onError);
+				resolve();
+			};
+			const onLoad = () => cleanup();
+			const onError = () => cleanup();
+			img.addEventListener('load', onLoad, { once: true });
+			img.addEventListener('error', onError, { once: true });
+			setTimeout(() => cleanup(), timeoutMs);
+		});
+	}
+
+	async function ensureAllImagesLoaded(): Promise<void> {
+		const images = Array.from(document.images) as HTMLImageElement[];
+		if (!images.length) return;
+
+		// Trigger lazy-loading libraries
+		['scroll', 'resize', 'orientationchange'].forEach(eventName => {
+			window.dispatchEvent(new Event(eventName));
+			document.dispatchEvent(new Event(eventName));
+		});
+
+		// Scroll to bottom to trigger lazy-loaded images
+		await scrollPageToBottomForImages().catch(error => {
+			console.warn('[Content] Failed to scroll page for images:', error);
+		});
+
+		// Collect all images (including newly loaded ones)
+		const allImages = Array.from(new Set([...images, ...Array.from(document.images) as HTMLImageElement[]]));
+
+		// Force load all images
+		await Promise.all(allImages.map(img => waitForImage(img)));
 	}
 
 	async function toggleIframe() {
@@ -208,84 +342,104 @@ declare global {
 		}
 
 		if (request.action === "getPageContent") {
-			let selectedHtml = '';
-			const selection = window.getSelection();
-			
-			if (selection && selection.rangeCount > 0) {
-				const range = selection.getRangeAt(0);
-				const clonedSelection = range.cloneContents();
-				const div = document.createElement('div');
-				div.appendChild(clonedSelection);
-				selectedHtml = div.innerHTML;
-			}
+			(async () => {
+				try {
+					const ensurePromise = ensureAllImagesLoaded().catch(error => {
+						console.warn('[Content] ensureAllImagesLoaded failed:', error);
+					});
+					await Promise.race([
+						ensurePromise,
+						new Promise<void>((resolve) => setTimeout(resolve, IMAGE_ENSURE_TIMEOUT_MS))
+					]);
+				} catch (error) {
+					console.warn('[Content] Unexpected error while waiting for images:', error);
+				}
 
-			const extractedContent: { [key: string]: string } = {};
-
-			// Process with Defuddle first while we have access to the document
-			const defuddled = new Defuddle(document, { url: document.URL }).parse();
-
-			// Create a new DOMParser
-			const parser = new DOMParser();
-			// Parse the document's HTML
-			const doc = parser.parseFromString(document.documentElement.outerHTML, 'text/html');
-
-			// Remove all script and style elements
-			doc.querySelectorAll('script, style').forEach(el => el.remove());
-
-			// Remove style attributes from all elements
-			doc.querySelectorAll('*').forEach(el => el.removeAttribute('style'));
-
-			// Convert all relative URLs to absolute
-			doc.querySelectorAll('[src], [href]').forEach(element => {
-				['src', 'href', 'srcset'].forEach(attr => {
-					const value = element.getAttribute(attr);
-					if (!value) return;
+				try {
+					let selectedHtml = '';
+					const selection = window.getSelection();
 					
-					if (attr === 'srcset') {
-						const newSrcset = value.split(',').map(src => {
-							const [url, size] = src.trim().split(' ');
-							try {
-								const absoluteUrl = new URL(url, document.baseURI).href;
-								return `${absoluteUrl}${size ? ' ' + size : ''}`;
-							} catch (e) {
-								return src;
-							}
-						}).join(', ');
-						element.setAttribute(attr, newSrcset);
-					} else if (!value.startsWith('http') && !value.startsWith('data:') && !value.startsWith('#') && !value.startsWith('//')) {
-						try {
-							const absoluteUrl = new URL(value, document.baseURI).href;
-							element.setAttribute(attr, absoluteUrl);
-						} catch (e) {
-							console.warn(`Failed to process ${attr} URL:`, value);
-						}
+					if (selection && selection.rangeCount > 0) {
+						const range = selection.getRangeAt(0);
+						const clonedSelection = range.cloneContents();
+						const div = document.createElement('div');
+						div.appendChild(clonedSelection);
+						selectedHtml = div.innerHTML;
 					}
-				});
-			});
 
-			// Get the modified HTML without scripts, styles, and style attributes
-			const cleanedHtml = doc.documentElement.outerHTML;
+					const extractedContent: { [key: string]: string } = {};
 
-			const response: ContentResponse = {
-				author: defuddled.author,
-				content: defuddled.content,
-				description: defuddled.description,
-				domain: getDomain(document.URL),
-				extractedContent: extractedContent,
-				favicon: defuddled.favicon,
-				fullHtml: cleanedHtml,
-				highlights: highlighter.getHighlights(),
-				image: defuddled.image,
-				parseTime: defuddled.parseTime,
-				published: defuddled.published,
-				schemaOrgData: defuddled.schemaOrgData,
-				selectedHtml: selectedHtml,
-				site: defuddled.site,
-				title: defuddled.title,
-				wordCount: defuddled.wordCount,
-				metaTags: defuddled.metaTags || []
-			};
-			sendResponse(response);
+					// Process with Defuddle first while we have access to the document
+					const defuddled = new Defuddle(document, { url: document.URL }).parse();
+
+					// Create a new DOMParser
+					const parser = new DOMParser();
+					// Parse the document's HTML
+					const doc = parser.parseFromString(document.documentElement.outerHTML, 'text/html');
+
+					// Remove all script and style elements
+					doc.querySelectorAll('script, style').forEach(el => el.remove());
+
+					// Remove style attributes from all elements
+					doc.querySelectorAll('*').forEach(el => el.removeAttribute('style'));
+
+					// Convert all relative URLs to absolute
+					doc.querySelectorAll('[src], [href]').forEach(element => {
+						['src', 'href', 'srcset'].forEach(attr => {
+							const value = element.getAttribute(attr);
+							if (!value) return;
+							
+							if (attr === 'srcset') {
+								const newSrcset = value.split(',').map(src => {
+									const [url, size] = src.trim().split(' ');
+									try {
+										const absoluteUrl = new URL(url, document.baseURI).href;
+										return `${absoluteUrl}${size ? ' ' + size : ''}`;
+									} catch (e) {
+										return src;
+									}
+								}).join(', ');
+								element.setAttribute(attr, newSrcset);
+							} else if (!value.startsWith('http') && !value.startsWith('data:') && !value.startsWith('#') && !value.startsWith('//')) {
+								try {
+									const absoluteUrl = new URL(value, document.baseURI).href;
+									element.setAttribute(attr, absoluteUrl);
+								} catch (e) {
+									console.warn(`Failed to process ${attr} URL:`, value);
+								}
+							}
+						});
+					});
+
+					// Get the modified HTML without scripts, styles, and style attributes
+					const cleanedHtml = doc.documentElement.outerHTML;
+
+					const response: ContentResponse = {
+						author: defuddled.author,
+						content: defuddled.content,
+						description: defuddled.description,
+						domain: getDomain(document.URL),
+						extractedContent: extractedContent,
+						favicon: defuddled.favicon,
+						fullHtml: cleanedHtml,
+						highlights: highlighter.getHighlights(),
+						image: defuddled.image,
+						parseTime: defuddled.parseTime,
+						published: defuddled.published,
+						schemaOrgData: defuddled.schemaOrgData,
+						selectedHtml: selectedHtml,
+						site: defuddled.site,
+						title: defuddled.title,
+						wordCount: defuddled.wordCount,
+						metaTags: defuddled.metaTags || []
+					};
+					sendResponse(response);
+				} catch (error) {
+					console.error('[Content] Failed to build page content response:', error);
+					sendResponse({ error: error instanceof Error ? error.message : 'Unknown error' });
+				}
+			})();
+			return true;
 		} else if (request.action === "extractContent") {
 			const content = extractContentBySelector(request.selector, request.attribute, request.extractHtml);
 			sendResponse({ content: content });
@@ -488,5 +642,4 @@ declare global {
 			});
 		}
 	});
-
 })();
