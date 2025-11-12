@@ -518,7 +518,7 @@
 		"message": "Open"
 	},
 	"openBehaviorDescription": {
-		"message": "Choose how Web Clipper opens by default."
+		"message": "Choose how Web Clipper opens by default: Popup, embedded in-page, or the browser side panel."
 	},
 	"openBehaviorTitle": {
 		"message": "Open behavior"
