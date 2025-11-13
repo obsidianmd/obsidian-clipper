@@ -20,6 +20,9 @@
 	"addToObsidian": {
 		"message": "Add to Obsidian"
 	},
+	"addToObsidianWithLoadingImages": {
+		"message": "Add to Obsidian with Loading Images"
+	},
 	"addVaultPlaceholder": {
 		"message": "Press enter to add a vault"
 	},
@@ -433,6 +436,9 @@
 	},
 	"lastUsed": {
 		"message": "Last used"
+	},
+	"loadingImages": {
+		"message": "Loading images"
 	},
 	"legacyMode": {
 		"message": "Legacy mode"
