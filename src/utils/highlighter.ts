@@ -209,23 +209,20 @@ function updateUndoRedoButtons() {
 
 async function handleClipButtonClick(e: Event) {
 	e.preventDefault();
-	const browserType = await detectBrowser();
+	const openRequest = browser.runtime.sendMessage({ action: "openClipperUI" }) as Promise<{ success?: boolean; error?: string }>;
 
 	try {
-		const response = await browser.runtime.sendMessage({action: "openPopup"});
-		if (response && typeof response === 'object' && 'success' in response) {
-			if (!response.success) {
-				throw new Error((response as { error?: string }).error || 'Unknown error');
-			}
-		} else {
-			throw new Error('Invalid response from background script');
+		const response = await openRequest;
+		if (response && 'success' in response && response.success === false) {
+			throw new Error(response.error || 'Unknown error');
 		}
 	} catch (error) {
-		console.error('Error opening popup:', error);
+		const browserType = await detectBrowser();
+		console.error('Error opening clipper UI:', error);
 		if (browserType === 'firefox') {
 			alert("Additional permissions required. To open Web Clipper from the highlighter, go to about:config and set this to true:\n\nextensions.openPopupWithoutUserGesture.enabled");
 		} else {
-			console.error('Failed to open popup:', error);
+			console.error('Failed to open clipper UI:', error);
 		}
 	}
 }
