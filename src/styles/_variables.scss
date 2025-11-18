@@ -186,6 +186,12 @@
 				calc(var(--accent-s) * 0.96),
 				calc(var(--accent-l) * 0.85));
 
+		--text-error-hover: 
+			hsl(
+				calc(var(--accent-h) + 10),
+				calc(var(--accent-s) * 0.9),
+				calc(var(--accent-l) * 1.1));
+
 		--color-base-00: #ffffff;
 		--color-base-05: #fcfcfc;
 		--color-base-10: #fafafa;
@@ -276,6 +282,12 @@
 				calc(var(--accent-h) - 3),
 				calc(var(--accent-s) * 1.02),
 				calc(var(--accent-l) * 1.29));
+
+		--text-error-hover: 
+			hsl(
+				calc(var(--accent-h) + 10),
+				calc(var(--accent-s) * 0.9),
+				calc(var(--accent-l) * 1.3));
 
 		--color-base-00: #1e1e1e;
 		--color-base-05: #212121;
