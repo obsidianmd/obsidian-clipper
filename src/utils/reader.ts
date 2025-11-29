@@ -347,18 +347,43 @@ export class Reader {
 		}
 	}
 
-	private static extractContent(doc: Document): { 
-		content: string; 
-		title?: string; 
-		author?: string; 
-		published?: string; 
+	private static extractContent(doc: Document): {
+		content: string;
+		title?: string;
+		author?: string;
+		published?: string;
 		domain?: string;
 		wordCount?: number;
 		parseTime?: number;
 		extractorType?: string;
 	} {
-		
-		// const defuddled = new Defuddle(doc, {debug: true}).parse();
+
+		doc.querySelectorAll('[class*="tooltip"]').forEach(element => {
+			const classList = element.getAttribute('class');
+			if (classList) {
+				const filteredClasses = classList.split(/\s+/).filter(cls =>
+					!cls.toLowerCase().includes('tooltip')
+				).join(' ');
+
+				if (filteredClasses) {
+					element.setAttribute('class', filteredClasses);
+				} else {
+					element.removeAttribute('class');
+				}
+			}
+		});
+
+		doc.querySelectorAll('aside').forEach(aside => {
+			const div = doc.createElement('div');
+			Array.from(aside.attributes).forEach(attr => {
+				div.setAttribute(attr.name, attr.value);
+			});
+			while (aside.firstChild) {
+				div.appendChild(aside.firstChild);
+			}
+			aside.parentNode?.replaceChild(div, aside);
+		});
+
 		const defuddled = new Defuddle(doc).parse();
 
 		return {

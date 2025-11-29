@@ -210,7 +210,7 @@ declare global {
 		if (request.action === "getPageContent") {
 			let selectedHtml = '';
 			const selection = window.getSelection();
-			
+
 			if (selection && selection.rangeCount > 0) {
 				const range = selection.getRangeAt(0);
 				const clonedSelection = range.cloneContents();
@@ -221,8 +221,35 @@ declare global {
 
 			const extractedContent: { [key: string]: string } = {};
 
-			// Process with Defuddle first while we have access to the document
-			const defuddled = new Defuddle(document, { url: document.URL }).parse();
+			document.querySelectorAll('[class*="tooltip"]').forEach(element => {
+				const classList = element.getAttribute('class');
+				if (classList) {
+					const filteredClasses = classList.split(/\s+/).filter(cls =>
+						!cls.toLowerCase().includes('tooltip')
+					).join(' ');
+
+					if (filteredClasses) {
+						element.setAttribute('class', filteredClasses);
+					} else {
+						element.removeAttribute('class');
+					}
+				}
+			});
+
+			document.querySelectorAll('aside').forEach(aside => {
+				const div = document.createElement('div');
+				Array.from(aside.attributes).forEach(attr => {
+					div.setAttribute(attr.name, attr.value);
+				});
+				while (aside.firstChild) {
+					div.appendChild(aside.firstChild);
+				}
+				aside.parentNode?.replaceChild(div, aside);
+			});
+
+			const defuddled = new Defuddle(document, {
+				url: document.URL
+			}).parse();
 
 			// Create a new DOMParser
 			const parser = new DOMParser();
