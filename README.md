@@ -66,6 +66,22 @@ For Firefox:
 2. Click **Load Temporary Add-on**
 3. Navigate to the `dist_firefox` directory and select the `manifest.json` file
 
+If you want to run the extension permanently you can do so with the Nightly or Developer versions of Firefox.
+
+1. Type `about:config` in the URL bar
+2. In the Search box type `xpinstall.signatures.required`
+3. Double-click the preference, or right-click and select "Toggle", to set it to `false`.
+4. Go to `about:addons` > gear icon > **Install Add-on From File…**
+
+For iOS Simulator testing on macOS:
+
+1. Run `npm run build` to build the extension
+2. Open `xcode/Obsidian Web Clipper/Obsidian Web Clipper.xcodeproj` in Xcode
+3. Select the **Obsidian Web Clipper (iOS)** scheme from the scheme selector
+4. Choose an iOS Simulator device and click **Run** to build and launch the app
+5. Once the app is running on the simulator, open **Safari**
+6. Navigate to a webpage and tap the **Extensions** button in Safari to access the Web Clipper extension
+
 ## Third-party libraries
 
 - [webextension-polyfill](https://github.com/mozilla/webextension-polyfill) for browser compatibility

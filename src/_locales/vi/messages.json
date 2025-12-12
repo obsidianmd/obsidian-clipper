@@ -201,6 +201,9 @@
 	"editTemplate": {
 		"message": "Chỉnh sửa mẫu"
 	},
+	"embedded": {
+		"message": "Được nhúng"
+	},
 	"enableHighlighter": {
 		"message": "Bật đánh dấu"
 	},
@@ -514,6 +517,18 @@
 	"open": {
 		"message": "Mở"
 	},
+	"openBehaviorDescription": {
+		"message": "Chọn cách mở Web Clipper mặc định."
+	},
+	"openBehaviorTitle": {
+		"message": "Hành vi mở"
+	},
+	"openEmbedded": {
+		"message": "Mở trong trang"
+	},
+	"openSidePanel": {
+		"message": "Mở bảng bên"
+	},
 	"optional": {
 		"message": "(tùy chọn)"
 	},
@@ -547,6 +562,9 @@
 	"popularModelsDescription": {
 		"message": "Chọn từ các mô hình thường được sử dụng hoặc nhập chi tiết mô hình tùy chỉnh."
 	},
+	"popup": {
+		"message": "Popup"
+	},
 	"prependToDaily": {
 		"message": "Thêm vào ghi chú hàng ngày, ở đầu"
 	},
@@ -564,6 +582,24 @@
 	},
 	"propertyName": {
 		"message": "Tên thuộc tính"
+	},
+	"propertyTypeCheckbox": {
+		"message": "Hộp kiểm"
+	},
+	"propertyTypeDate": {
+		"message": "Ngày"
+	},
+	"propertyTypeDatetime": {
+		"message": "Ngày & giờ"
+	},
+	"propertyTypeMultitext": {
+		"message": "Danh sách"
+	},
+	"propertyTypeNumber": {
+		"message": "Số"
+	},
+	"propertyTypeText": {
+		"message": "Văn bản"
 	},
 	"propertyValue": {
 		"message": "Giá trị thuộc tính"

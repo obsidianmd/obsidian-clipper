@@ -201,6 +201,9 @@
 	"editTemplate": {
 		"message": "Editar plantilla"
 	},
+	"embedded": {
+		"message": "Incrustat"
+	},
 	"enableHighlighter": {
 		"message": "Activar ressaltador"
 	},
@@ -514,6 +517,18 @@
 	"open": {
 		"message": "Obrir"
 	},
+	"openBehaviorDescription": {
+		"message": "Trieu com s'obre Web Clipper per defecte."
+	},
+	"openBehaviorTitle": {
+		"message": "Comportament d'obertura"
+	},
+	"openEmbedded": {
+		"message": "Obre a la pàgina"
+	},
+	"openSidePanel": {
+		"message": "Obre el plafó lateral"
+	},
 	"optional": {
 		"message": "(opcional)"
 	},
@@ -547,6 +562,9 @@
 	"popularModelsDescription": {
 		"message": "Trieu entre els models més utilitzats o introduïu els detalls del model personalitzat."
 	},
+	"popup": {
+		"message": "Finestra emergent"
+	},
 	"prependToDaily": {
 		"message": "Agregar a la nota diària, al principi"
 	},
@@ -564,6 +582,24 @@
 	},
 	"propertyName": {
 		"message": "Nom de la propietat"
+	},
+	"propertyTypeCheckbox": {
+		"message": "Casella de verificació"
+	},
+	"propertyTypeDate": {
+		"message": "Data"
+	},
+	"propertyTypeDatetime": {
+		"message": "Data i hora"
+	},
+	"propertyTypeMultitext": {
+		"message": "Llista"
+	},
+	"propertyTypeNumber": {
+		"message": "Número"
+	},
+	"propertyTypeText": {
+		"message": "Text"
 	},
 	"propertyValue": {
 		"message": "Valor de la propietat"

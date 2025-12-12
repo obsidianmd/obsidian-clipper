@@ -201,6 +201,9 @@
 	"editTemplate": {
 		"message": "Sjabloon bewerken"
 	},
+	"embedded": {
+		"message": "Ingesloten"
+	},
 	"enableHighlighter": {
 		"message": "Markeerder inschakelen"
 	},
@@ -514,6 +517,18 @@
 	"open": {
 		"message": "Openen"
 	},
+	"openBehaviorDescription": {
+		"message": "Kies hoe Web Clipper standaard wordt geopend."
+	},
+	"openBehaviorTitle": {
+		"message": "Open gedrag"
+	},
+	"openEmbedded": {
+		"message": "Open in pagina"
+	},
+	"openSidePanel": {
+		"message": "Open zijpaneel"
+	},
 	"optional": {
 		"message": "(optioneel)"
 	},
@@ -547,6 +562,9 @@
 	"popularModelsDescription": {
 		"message": "Kies uit veelgebruikte modellen of voer aangepaste modeldetails in."
 	},
+	"popup": {
+		"message": "Pop-up"
+	},
 	"prependToDaily": {
 		"message": "Toevoegen aan dagelijkse notitie, bovenaan"
 	},
@@ -564,6 +582,24 @@
 	},
 	"propertyName": {
 		"message": "Eigenschapnaam"
+	},
+	"propertyTypeCheckbox": {
+		"message": "Selectievakje"
+	},
+	"propertyTypeDate": {
+		"message": "Datum"
+	},
+	"propertyTypeDatetime": {
+		"message": "Datum & tijd"
+	},
+	"propertyTypeMultitext": {
+		"message": "Lijst"
+	},
+	"propertyTypeNumber": {
+		"message": "Nummer"
+	},
+	"propertyTypeText": {
+		"message": "Tekst"
 	},
 	"propertyValue": {
 		"message": "Eigenschapwaarde"

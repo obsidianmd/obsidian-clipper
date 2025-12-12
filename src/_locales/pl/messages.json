@@ -21,7 +21,7 @@
 		"message": "Zapisz w Obsidian"
 	},
 	"addVaultPlaceholder": {
-		"message": "Kliknij Enter, aby dodać sejf"
+		"message": "Kliknij enter, aby dodać sejf"
 	},
 	"advanced": {
 		"message": "Zaawansowane"
@@ -45,10 +45,10 @@
 		"message": "Korzystając z usług zewnętrznego operatora, użytkownik akceptuje jego regulamin i politykę prywatności. Zapytania użytkowników wysyłane są bezpośrednio do wybranego operatora. Obsidian nie gromadzi ani nie przechowuje żadnych danych dotyczących zapytań."
 	},
 	"appendToDaily": {
-		"message": "Zapisz na dole codziennej notatki"
+		"message": "Zapisz na końcu w dzienniku"
 	},
 	"appendToExisting": {
-		"message": "Zapisz na dole istniejącej notatki"
+		"message": "Zapisz na końcu istniejącej notatki"
 	},
 	"autoRunInterpreter": {
 		"message": "Uruchom automatycznie"
@@ -60,7 +60,7 @@
 		"message": "Sposób działania"
 	},
 	"behaviorWarning": {
-		"message": "Aby zapisać w istniejącej lub codziennej notatce wymagany jest Obsidian w wersji 1.7.2 lub nowszej."
+		"message": "Aby zapisać w dzienniku lub istniejącej notatce wymagany jest Obsidian w wersji 1.7.2 lub nowszej."
 	},
 	"byDay": {
 		"message": "Dni"
@@ -119,7 +119,7 @@
 		"message": "Tryb zakreślacza"
 	},
 	"commandToggleReader": {
-		"message": "Przełącz widok czytnika"
+		"message": "Włącz lub wyłącz czytnik"
 	},
 	"confirmDeleteTemplate": {
 		"message": "Czy na pewno chcesz usunąć szablon \"$1\"?"
@@ -137,13 +137,13 @@
 		"message": "Skopiuj do schowka"
 	},
 	"createNewNote": {
-		"message": "Utwórz nową notatkę"
+		"message": "Stwórz nową notatkę"
 	},
 	"custom": {
 		"message": "Niestandardowe"
 	},
 	"dailyNoteFormat": {
-		"message": "Format codziennej notatki (np. YYYY-MM-DD)"
+		"message": "Format dziennika (np. YYYY-MM-DD)"
 	},
 	"defaultInterpreterContext": {
 		"message": "Domyślny kontekst zapytania"
@@ -167,7 +167,7 @@
 		"message": "Wyłącz zakreślacz"
 	},
 	"disableReader": {
-		"message": "Wyłącz widok czytnika"
+		"message": "Wyłącz czytnik"
 	},
 	"done": {
 		"message": "Gotowe"
@@ -201,6 +201,9 @@
 	"editTemplate": {
 		"message": "Edytuj szablon"
 	},
+	"embedded": {
+		"message": "Osadzone"
+	},
 	"enableHighlighter": {
 		"message": "Włącz zakreślacz"
 	},
@@ -208,10 +211,10 @@
 		"message": "Wyróżniaj treści na stronach, które możesz zapisać w Obsidian."
 	},
 	"enableInterpreter": {
-		"message": "Włącz interpreter"
+		"message": "Włącz tłumacza"
 	},
 	"enableInterpreterDescription": {
-		"message": "Użyj języka naturalnego, aby wyodrębnić dane ze stron. Można na przykład użyć szablonu $strong_start${{\"a summary of the page\"}}$strong_end$. Wymaga klucza API lub niestandardowego modelu skonfigurowanego poniżej. $link_start$Dowiedz się więcej$link_end$.",
+		"message": "Użyj języka naturalnego, aby wyodrębnić dane ze stron. Można na przykład użyć szablonu $strong_start${{\"podsumowanie strony\"}}$strong_end$. Wymaga klucza API lub niestandardowego modelu skonfigurowanego poniżej. $link_start$Dowiedz się więcej$link_end$.",
 		"placeholders": {
 			"link_end": {
 				"content": "</a>"
@@ -228,7 +231,7 @@
 		}
 	},
 	"enableReader": {
-		"message": "Otwórz widok czytnika"
+		"message": "Włącz czytnik"
 	},
 	"error": {
 		"message": "Błąd"
@@ -365,7 +368,7 @@
 		"message": "Importuj wszystkie ustawienia"
 	},
 	"importAllSettingsDescription": {
-		"message": "Zaimportuj wszystkie ustawienia, w tym szablony i atrybuty. Zastąpi to obecną konfigurację."
+		"message": "Importuj wszystkie ustawienia, w tym szablony i atrybuty. Zastąpi to obecną konfigurację."
 	},
 	"importFailed": {
 		"message": "Import nie powiódł się. Sprawdź konsolę, aby uzyskać więcej informacji."
@@ -403,13 +406,13 @@
 		"message": "wyślij zapytanie"
 	},
 	"interpreter": {
-		"message": "Interpreter"
+		"message": "Tłumacz"
 	},
 	"interpreterContext": {
 		"message": "Kontekst zapytania"
 	},
 	"interpreterContextDescription": {
-		"message": "Kontekst używany do przetwarzania zapytań. Zastępuje domyślny kontekst zdefiniowany w $link_start$ustawieniach interpretera$link_end$. Można tu używać zmiennych.",
+		"message": "Kontekst używany do przetwarzania zapytań. Zastępuje domyślny kontekst zdefiniowany w $link_start$ustawieniach tłumacza$link_end$. Można tu używać zmiennych.",
 		"placeholders": {
 			"link_end": {
 				"content": "</a>"
@@ -447,13 +450,13 @@
 		"message": "Operator"
 	},
 	"modelProviderDescription": {
-		"message": "Operator modelu, na przykład Ollama, OpenRouter, Google, itp."
+		"message": "Wybierz operatora tego modelu."
 	},
 	"modelProviderPlaceholder": {
 		"message": "Operator"
 	},
 	"modelRequiredFields": {
-		"message": "Nazwa modelu, Dostawca i ID modelu są wymagane."
+		"message": "Nazwa modelu, operator i ID modelu są wymagane."
 	},
 	"models": {
 		"message": "Modele"
@@ -486,7 +489,7 @@
 		"message": "Lokalizacja notatki"
 	},
 	"noteLocationDescription": {
-		"message": "Folder lub ścieżka do notatki."
+		"message": "Folder lub ścieżka notatki."
 	},
 	"noteName": {
 		"message": "Nazwa notatki"
@@ -513,6 +516,18 @@
 	},
 	"open": {
 		"message": "Otwórz"
+	},
+	"openBehaviorDescription": {
+		"message": "Wybierz, jak domyślnie otwiera się Web Clipper."
+	},
+	"openBehaviorTitle": {
+		"message": "Zachowanie przy otwieraniu"
+	},
+	"openEmbedded": {
+		"message": "Otwórz na stronie"
+	},
+	"openSidePanel": {
+		"message": "Otwórz panel boczny"
 	},
 	"optional": {
 		"message": "(opcjonalne)"
@@ -547,11 +562,14 @@
 	"popularModelsDescription": {
 		"message": "Wybierz spośród często używanych modeli lub wprowadź szczegóły niestandardowego modelu."
 	},
+	"popup": {
+		"message": "Wyskakujące okienko"
+	},
 	"prependToDaily": {
-		"message": "Zapisz na górze codziennej notatki"
+		"message": "Zapisz na początku w dzienniku"
 	},
 	"prependToExisting": {
-		"message": "Zapisz na górze istniejącej notatki"
+		"message": "Zapisz na początku istniejącej notatki"
 	},
 	"processing": {
 		"message": "przetwarzanie"
@@ -564,6 +582,24 @@
 	},
 	"propertyName": {
 		"message": "Nazwa atrybutu"
+	},
+	"propertyTypeCheckbox": {
+		"message": "Pole wyboru"
+	},
+	"propertyTypeDate": {
+		"message": "Data"
+	},
+	"propertyTypeDatetime": {
+		"message": "Data i czas"
+	},
+	"propertyTypeMultitext": {
+		"message": "Lista"
+	},
+	"propertyTypeNumber": {
+		"message": "Numer"
+	},
+	"propertyTypeText": {
+		"message": "Tekst"
 	},
 	"propertyValue": {
 		"message": "Wartość atrybutu"
@@ -602,7 +638,7 @@
 		"message": "Ustawienie wstępne"
 	},
 	"providerPresetDescription": {
-		"message": "Wybierz operatora lub utwórz niestandardowego."
+		"message": "Wybierz operatora lub stwórz niestandardowego."
 	},
 	"providerRequiredFields": {
 		"message": "Nazwa operatora i adres URL są wymagane."
@@ -653,7 +689,7 @@
 		"message": "Zresetuj domyślne modele"
 	},
 	"resetProvidersAndModelsDescription": {
-		"message": "Zresetuj dostawców i modele do ustawień domyślnych."
+		"message": "Zresetuj operatorów i modele do ustawień domyślnych."
 	},
 	"save": {
 		"message": "Zapisz"
@@ -787,7 +823,7 @@
 		"message": "Sejfy"
 	},
 	"vaultsDescription": {
-		"message": "Domyślnie notatki są zapisywane w obecnie otwartym sejfie. Jeśli chcesz mieć możliwość zapisywania w różnych sejfach, możesz je dodawać w tym miejscu. Nazwy sejfów muszą dokładnie odpowiadać tym w Obsidian. Kliknij $strong_start$Enter$strong_end$, aby dodać sejf.",
+		"message": "Domyślnie notatki są zapisywane w obecnie otwartym sejfie. Jeśli chcesz mieć możliwość zapisywania w różnych sejfach, możesz je dodawać w tym miejscu. Nazwy sejfów muszą dokładnie odpowiadać tym w Obsidian. Kliknij $strong_start$enter$strong_end$, aby dodać sejf.",
 		"placeholders": {
 			"strong_end": {
 				"content": "</strong>"

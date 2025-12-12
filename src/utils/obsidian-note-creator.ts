@@ -2,11 +2,15 @@ import browser from './browser-polyfill';
 import { escapeDoubleQuotes, sanitizeFileName } from '../utils/string-utils';
 import { Template, Property } from '../types/types';
 import { generalSettings, incrementStat } from './storage-utils';
+import { copyToClipboard } from './clipboard-utils';
 
 export async function generateFrontmatter(properties: Property[]): Promise<string> {
 	let frontmatter = '---\n';
 	for (const property of properties) {
-		frontmatter += `${property.name}:`;
+		// Wrap property name in quotes if it contains YAML-ambiguous characters
+		const needsQuotes = /[:\s\{\}\[\],&*#?|<>=!%@\\-]/.test(property.name) || /^[\d]/.test(property.name) || /^(true|false|null|yes|no|on|off)$/i.test(property.name.trim());
+		const propertyKey = needsQuotes ? (property.name.includes('"') ? `'${property.name.replace(/'/g, "''")}'` : `"${property.name}"`) : property.name;
+		frontmatter += `${propertyKey}:`;
 
 		const propertyType = generalSettings.propertyTypes.find(p => p.name === property.name)?.type || 'text';
 
@@ -64,6 +68,33 @@ export async function generateFrontmatter(properties: Property[]): Promise<strin
 	return frontmatter;
 }
 
+function openObsidianUrl(url: string): void {
+	browser.runtime.sendMessage({
+		action: "openObsidianUrl",
+		url: url
+	}).catch((error) => {
+		console.error('Error opening Obsidian URL via background script:', error);
+		window.open(url, '_blank');
+	});
+}
+
+async function tryClipboardWrite(fileContent: string, obsidianUrl: string): Promise<void> {
+	const success = await copyToClipboard(fileContent);
+	
+	if (success) {
+		obsidianUrl += `&clipboard`;
+		openObsidianUrl(obsidianUrl);
+		console.log('Obsidian URL:', obsidianUrl);
+	} else {
+		console.error('All clipboard methods failed, falling back to URI method');
+		// Final fallback: use URI method with actual content (same as legacy mode)
+		// Note: We don't add &clipboard here since we're bypassing the clipboard entirely
+		obsidianUrl += `&content=${encodeURIComponent(fileContent)}`;
+		openObsidianUrl(obsidianUrl);
+		console.log('Obsidian URL (URI fallback):', obsidianUrl);
+	}
+}
+
 export async function saveToObsidian(
 	fileContent: string,
 	noteName: string,
@@ -109,26 +140,7 @@ export async function saveToObsidian(
 		console.log('Obsidian URL:', obsidianUrl);
 		openObsidianUrl(obsidianUrl);
 	} else {
-		// Use clipboard
-		navigator.clipboard.writeText(fileContent).then(() => {
-			obsidianUrl += `&clipboard`;
-			openObsidianUrl(obsidianUrl);
-			console.log('Obsidian URL:', obsidianUrl);
-		}).catch(err => {
-			console.log('Obsidian URL:', obsidianUrl);
-			console.error('Failed to copy content to clipboard:', err);
-			obsidianUrl += `&clipboard`;
-			obsidianUrl += `&content=${encodeURIComponent("There was an error creating the content. Make sure you are using Obsidian 1.7.2 or above.")}`;
-			openObsidianUrl(obsidianUrl);
-		});
-	}
-
-	function openObsidianUrl(url: string): void {
-		browser.tabs.query({active: true, currentWindow: true}).then((tabs) => {
-			const currentTab = tabs[0];
-			if (currentTab && currentTab.id) {
-				browser.tabs.update(currentTab.id, { url: url });
-			}
-		});
+		// Try to copy to clipboard with fallback mechanisms
+		await tryClipboardWrite(fileContent, obsidianUrl);
 	}
 }

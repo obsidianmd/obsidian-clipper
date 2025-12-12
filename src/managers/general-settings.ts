@@ -32,7 +32,8 @@ export function updateVaultList(): void {
 	const vaultList = document.getElementById('vault-list') as HTMLUListElement;
 	if (!vaultList) return;
 
-	vaultList.innerHTML = '';
+	// Clear existing vaults
+	vaultList.textContent = '';
 	generalSettings.vaults.forEach((vault, index) => {
 		const li = document.createElement('li');
 		li.dataset.index = index.toString();
@@ -82,28 +83,58 @@ export async function setShortcutInstructions() {
 	const shortcutInstructionsElement = document.querySelector('.shortcut-instructions');
 	if (shortcutInstructionsElement) {
 		const browser = await detectBrowser();
-		let instructions = '';
+		// Clear content
+		shortcutInstructionsElement.textContent = '';
+		shortcutInstructionsElement.appendChild(document.createTextNode(getMessage('shortcutInstructionsIntro') + ' '));
+		
+		// Browser-specific instructions
+		let instructionsText = '';
+		let url = '';
+		
 		switch (browser) {
 			case 'chrome':
-				instructions = getMessage('shortcutInstructionsChrome', ['<strong>chrome://extensions/shortcuts</strong>']);
+				instructionsText = getMessage('shortcutInstructionsChrome', ['$URL']);
+				url = 'chrome://extensions/shortcuts';
 				break;
 			case 'brave':
-				instructions = getMessage('shortcutInstructionsBrave', ['<strong>brave://extensions/shortcuts</strong>']);
+				instructionsText = getMessage('shortcutInstructionsBrave', ['$URL']);
+				url = 'brave://extensions/shortcuts';
 				break;
 			case 'firefox':
-				instructions = getMessage('shortcutInstructionsFirefox', ['<strong>about:addons</strong>']);
+				instructionsText = getMessage('shortcutInstructionsFirefox', ['$URL']);
+				url = 'about:addons';
 				break;
 			case 'edge':
-				instructions = getMessage('shortcutInstructionsEdge', ['<strong>edge://extensions/shortcuts</strong>']);
+				instructionsText = getMessage('shortcutInstructionsEdge', ['$URL']);
+				url = 'edge://extensions/shortcuts';
 				break;
 			case 'safari':
 			case 'mobile-safari':
-				instructions = getMessage('shortcutInstructionsSafari');
+				instructionsText = getMessage('shortcutInstructionsSafari');
 				break;
 			default:
-				instructions = getMessage('shortcutInstructionsDefault');
+				instructionsText = getMessage('shortcutInstructionsDefault');
 		}
-		shortcutInstructionsElement.innerHTML = getMessage('shortcutInstructionsIntro') + ' ' + instructions;
+		
+		if (url) {
+			// Split text around the URL placeholder and add strong element
+			const parts = instructionsText.split('$URL');
+			if (parts.length === 2) {
+				shortcutInstructionsElement.appendChild(document.createTextNode(parts[0]));
+				
+				const strongElement = document.createElement('strong');
+				strongElement.textContent = url;
+				shortcutInstructionsElement.appendChild(strongElement);
+				
+				shortcutInstructionsElement.appendChild(document.createTextNode(parts[1]));
+			} else {
+				// Fallback if no placeholder found
+				shortcutInstructionsElement.appendChild(document.createTextNode(instructionsText));
+			}
+		} else {
+			// Safari and default cases (no URL needed)
+			shortcutInstructionsElement.appendChild(document.createTextNode(instructionsText));
+		}
 	}
 }
 
@@ -186,6 +217,7 @@ export function initializeGeneralSettings(): void {
 		initializeLegacyModeToggle();
 		initializeSilentOpenToggle();
 		initializeVaultInput();
+		initializeOpenBehaviorDropdown();
 		initializeKeyboardShortcuts();
 		initializeToggles();
 		setShortcutInstructions();
@@ -216,6 +248,7 @@ function initializeAutoSave(): void {
 }
 
 function saveSettingsFromForm(): void {
+	const openBehaviorDropdown = document.getElementById('open-behavior-dropdown') as HTMLSelectElement;
 	const showMoreActionsToggle = document.getElementById('show-more-actions-toggle') as HTMLInputElement;
 	const betaFeaturesToggle = document.getElementById('beta-features-toggle') as HTMLInputElement;
 	const legacyModeToggle = document.getElementById('legacy-mode-toggle') as HTMLInputElement;
@@ -226,6 +259,7 @@ function saveSettingsFromForm(): void {
 
 	const updatedSettings = {
 		...generalSettings, // Keep existing settings
+		openBehavior: (openBehaviorDropdown?.value as 'popup' | 'embedded') ?? generalSettings.openBehavior,
 		showMoreActionsButton: showMoreActionsToggle?.checked ?? generalSettings.showMoreActionsButton,
 		betaFeatures: betaFeaturesToggle?.checked ?? generalSettings.betaFeatures,
 		legacyMode: legacyModeToggle?.checked ?? generalSettings.legacyMode,
@@ -308,6 +342,16 @@ function initializeSilentOpenToggle(): void {
 	initializeSettingToggle('silent-open-toggle', generalSettings.silentOpen, (checked) => {
 		saveSettings({ ...generalSettings, silentOpen: checked });
 	});
+}
+
+function initializeOpenBehaviorDropdown(): void {
+	initializeSettingDropdown(
+		'open-behavior-dropdown',
+		generalSettings.openBehavior,
+		(value) => {
+			saveSettings({ ...generalSettings, openBehavior: value as 'popup' | 'embedded' });
+		}
+	);
 }
 
 function initializeResetDefaultTemplateButton(): void {

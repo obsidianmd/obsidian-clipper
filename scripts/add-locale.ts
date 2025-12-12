@@ -77,7 +77,7 @@ async function addLocale(locale: string) {
 	
 	const ROOT_DIR = path.join(__dirname, '..');
 	const I18N_FILE = path.join(ROOT_DIR, 'src/utils/i18n.ts');
-	const LOCALES_DIR = path.join(ROOT_DIR, 'src/locales');
+	const LOCALES_DIR = path.join(ROOT_DIR, 'src/_locales');
 
 	// Validate locale format
 	if (!/^[a-z]{2}(-[A-Z]{2})?$/.test(locale)) {

@@ -160,6 +160,7 @@ function matchSchemaPattern(pattern: string, schemaOrgData: any): boolean {
 		}
 		return [schema];
 	}).filter((schema: any) => {
+		if (!schema || typeof schema !== 'object') return false;
 		if (!schemaType) return true;
 		const types = Array.isArray(schema['@type']) ? schema['@type'] : [schema['@type']];
 		return types.includes(schemaType.slice(1));

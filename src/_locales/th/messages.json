@@ -201,6 +201,9 @@
 	"editTemplate": {
 		"message": "แก้ไขเทมเพลต"
 	},
+	"embedded": {
+		"message": "ฝัง"
+	},
 	"enableHighlighter": {
 		"message": "เปิดใช้งานไฮไลต์"
 	},
@@ -514,6 +517,18 @@
 	"open": {
 		"message": "เปิด"
 	},
+	"openBehaviorDescription": {
+		"message": "เลือกวิธีการเปิด Web Clipper โดยค่าเริ่มต้น"
+	},
+	"openBehaviorTitle": {
+		"message": "พฤติกรรมการเปิด"
+	},
+	"openEmbedded": {
+		"message": "เปิดในหน้า"
+	},
+	"openSidePanel": {
+		"message": "เปิดแผงด้านข้าง"
+	},
 	"optional": {
 		"message": "(ไม่บังคับ)"
 	},
@@ -547,6 +562,9 @@
 	"popularModelsDescription": {
 		"message": "เลือกจากโมเดลที่ใช้บ่อยหรือป้อนรายละเอียดโมเดลที่กำหนดเอง"
 	},
+	"popup": {
+		"message": "ป๊อปอัป"
+	},
 	"prependToDaily": {
 		"message": "เพิ่มไปยังบันทึกประจำวัน ที่ต้น"
 	},
@@ -564,6 +582,24 @@
 	},
 	"propertyName": {
 		"message": "ชื่อคุณสมบัติ"
+	},
+	"propertyTypeCheckbox": {
+		"message": "ช่องทำเครื่องหมาย"
+	},
+	"propertyTypeDate": {
+		"message": "วันที่"
+	},
+	"propertyTypeDatetime": {
+		"message": "วันที่ & เวลา"
+	},
+	"propertyTypeMultitext": {
+		"message": "รายการ"
+	},
+	"propertyTypeNumber": {
+		"message": "จำนวน"
+	},
+	"propertyTypeText": {
+		"message": "ข้อความ"
 	},
 	"propertyValue": {
 		"message": "ค่าคุณสมบัติ"

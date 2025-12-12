@@ -156,6 +156,7 @@ input[type=checkbox] {
 		cursor: pointer;
 		font-size: 24px;
 		user-select: none;
+		-webkit-user-select: none;
 		
 		&:hover,
 		&.is-active {

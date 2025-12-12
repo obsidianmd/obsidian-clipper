@@ -201,6 +201,9 @@
 	"editTemplate": {
 		"message": "ערוך תבנית"
 	},
+	"embedded": {
+		"message": "משולב"
+	},
 	"enableHighlighter": {
 		"message": "הפעל מסמן"
 	},
@@ -506,6 +509,18 @@
 	"open": {
 		"message": "פתח"
 	},
+	"openBehaviorDescription": {
+		"message": "בחר איך תוסף הקיצוץ נפתח כברירת מחדל."
+	},
+	"openBehaviorTitle": {
+		"message": "התנהגות פתיחה"
+	},
+	"openEmbedded": {
+		"message": "פתח בעמוד"
+	},
+	"openSidePanel": {
+		"message": "פתח חלונית צדדית"
+	},
 	"optional": {
 		"message": "(אופציונלי)"
 	},
@@ -539,6 +554,9 @@
 	"popularModelsDescription": {
 		"message": "בחר מתוך דגמים שנמצאים בשימוש נפוץ או הזן פרטי דגם מותאם אישית."
 	},
+	"popup": {
+		"message": "חלון קופץ"
+	},
 	"prependToDaily": {
 		"message": "הוסף להערה היומית, בחלק העליון"
 	},
@@ -556,6 +574,24 @@
 	},
 	"propertyName": {
 		"message": "שם המאפיין"
+	},
+	"propertyTypeCheckbox": {
+		"message": "תיבת סימון"
+	},
+	"propertyTypeDate": {
+		"message": "תאריך"
+	},
+	"propertyTypeDatetime": {
+		"message": "תאריך ושעה"
+	},
+	"propertyTypeMultitext": {
+		"message": "רשימה"
+	},
+	"propertyTypeNumber": {
+		"message": "מספר"
+	},
+	"propertyTypeText": {
+		"message": "טקסט"
 	},
 	"propertyValue": {
 		"message": "ערך המאפיין"

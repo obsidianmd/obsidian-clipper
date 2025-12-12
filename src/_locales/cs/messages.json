@@ -201,6 +201,9 @@
 	"editTemplate": {
 		"message": "Upravit šablonu"
 	},
+	"embedded": {
+		"message": "Vložené"
+	},
 	"enableHighlighter": {
 		"message": "Aktivovat zvýrazňovač"
 	},
@@ -506,6 +509,18 @@
 	"open": {
 		"message": "Otevřít"
 	},
+	"openBehaviorDescription": {
+		"message": "Vyberte, jak se Web Clipper otevírá jako výchozí."
+	},
+	"openBehaviorTitle": {
+		"message": "Chování při otevírání"
+	},
+	"openEmbedded": {
+		"message": "Otevřít na stránce"
+	},
+	"openSidePanel": {
+		"message": "Otevřít postranní panel"
+	},
 	"optional": {
 		"message": "(volitelné)"
 	},
@@ -539,6 +554,9 @@
 	"popularModelsDescription": {
 		"message": "Vyberte z běžně používaných modelů nebo zadejte detaily vlastního modelu."
 	},
+	"popup": {
+		"message": "Vyskakovací okno"
+	},
 	"prependToDaily": {
 		"message": "Přidat na vrchol denní poznámky"
 	},
@@ -556,6 +574,24 @@
 	},
 	"propertyName": {
 		"message": "Název vlastnosti"
+	},
+	"propertyTypeCheckbox": {
+		"message": "Zaškrtávací políčko"
+	},
+	"propertyTypeDate": {
+		"message": "Datum"
+	},
+	"propertyTypeDatetime": {
+		"message": "Datum a čas"
+	},
+	"propertyTypeMultitext": {
+		"message": "Seznam"
+	},
+	"propertyTypeNumber": {
+		"message": "Číslo"
+	},
+	"propertyTypeText": {
+		"message": "Text"
 	},
 	"propertyValue": {
 		"message": "Hodnota vlastnosti"

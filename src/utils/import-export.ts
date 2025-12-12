@@ -8,6 +8,7 @@ import { hideModal } from '../utils/modal-utils';
 import { showImportModal } from './import-modal';
 import browser from '../utils/browser-polyfill';
 import { saveFile } from './file-utils';
+import { copyToClipboardWithFeedback } from './clipboard-utils';
 import { compressToUTF16, decompressFromUTF16 } from 'lz-string';
 import { getMessage } from './i18n';
 
@@ -311,11 +312,16 @@ export function copyTemplateToClipboard(template: Template): void {
 
 	const jsonContent = JSON.stringify(orderedTemplate, null, 2);
 	
-	navigator.clipboard.writeText(jsonContent).then(() => {
-		alert(getMessage('templateCopied'));
-	}).catch(err => {
-		console.error('Failed to copy template JSON: ', err);
-		alert(getMessage('templateCopyError'));
+	copyToClipboardWithFeedback(
+		jsonContent,
+		getMessage('templateCopied'),
+		getMessage('templateCopyError')
+	).then(success => {
+		if (success) {
+			alert(getMessage('templateCopied'));
+		} else {
+			alert(getMessage('templateCopyError'));
+		}
 	});
 }
 

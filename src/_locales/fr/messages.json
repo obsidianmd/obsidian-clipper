@@ -201,6 +201,9 @@
 	"editTemplate": {
 		"message": "Modifier le modèle"
 	},
+	"embedded": {
+		"message": "Intégré"
+	},
 	"enableHighlighter": {
 		"message": "Activer le surligneur"
 	},
@@ -514,6 +517,18 @@
 	"open": {
 		"message": "Ouvrir"
 	},
+	"openBehaviorDescription": {
+		"message": "Choisissez comment le Web Clipper s'ouvre par défaut."
+	},
+	"openBehaviorTitle": {
+		"message": "Comportement à l'ouverture"
+	},
+	"openEmbedded": {
+		"message": "Ouvrir dans la page"
+	},
+	"openSidePanel": {
+		"message": "Ouvrir le panneau latéral"
+	},
 	"optional": {
 		"message": "(optionnel)"
 	},
@@ -547,6 +562,9 @@
 	"popularModelsDescription": {
 		"message": "Choisissez parmi les modèles couramment utilisés ou entrez les détails d'un modèle personnalisé."
 	},
+	"popup": {
+		"message": "Popup"
+	},
 	"prependToDaily": {
 		"message": "Ajouter à la note quotidienne, au début"
 	},
@@ -564,6 +582,24 @@
 	},
 	"propertyName": {
 		"message": "Nom de la propriété"
+	},
+	"propertyTypeCheckbox": {
+		"message": "Case à cocher"
+	},
+	"propertyTypeDate": {
+		"message": "Date"
+	},
+	"propertyTypeDatetime": {
+		"message": "Date & heure"
+	},
+	"propertyTypeMultitext": {
+		"message": "Liste"
+	},
+	"propertyTypeNumber": {
+		"message": "Nombre"
+	},
+	"propertyTypeText": {
+		"message": "Texte"
 	},
 	"propertyValue": {
 		"message": "Valeur de la propriété"

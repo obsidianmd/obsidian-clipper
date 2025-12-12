@@ -30,7 +30,8 @@ export function updateTemplateList(loadedTemplates?: Template[]): void {
 		template != null && typeof template === 'object' && 'id' in template && 'name' in template
 	);
 
-	templateList.innerHTML = '';
+	// Clear existing templates
+	templateList.textContent = '';
 	validTemplates.forEach((template, index) => {
 		const li = document.createElement('li');
 		
@@ -173,7 +174,7 @@ export function showTemplateEditor(template: Template | null): void {
 
 	if (templateEditorTitle) templateEditorTitle.textContent = getMessage('editTemplate');
 	if (templateName) templateName.value = editingTemplate.name;
-	if (templateProperties) templateProperties.innerHTML = '';
+	if (templateProperties) templateProperties.textContent = '';
 
 	const pathInput = document.getElementById('template-path-name') as HTMLInputElement;
 	if (pathInput) pathInput.value = editingTemplate.path || '';
@@ -230,7 +231,8 @@ export function showTemplateEditor(template: Template | null): void {
 
 	const vaultSelect = document.getElementById('template-vault') as HTMLSelectElement;
 	if (vaultSelect) {
-		vaultSelect.innerHTML = '';
+		// Clear existing vault options
+		vaultSelect.textContent = '';
 		const lastUsedOption = document.createElement('option');
 		lastUsedOption.value = '';
 		lastUsedOption.textContent = getMessage('lastUsed');
@@ -317,7 +319,8 @@ export function addPropertyToEditor(name: string = '', value: string = '', id: s
 	['text', 'multitext', 'number', 'checkbox', 'date', 'datetime'].forEach(optionValue => {
 		const option = document.createElement('option');
 		option.value = optionValue;
-		option.textContent = optionValue.charAt(0).toUpperCase() + optionValue.slice(1);
+		const messageKey = `propertyType${optionValue.charAt(0).toUpperCase() + optionValue.slice(1)}`;
+		option.textContent = getMessage(messageKey);
 		select.appendChild(option);
 	});
 	select.value = propertyType;
@@ -463,7 +466,7 @@ function updateSelectedOption(value: string, propertySelected: HTMLElement): voi
 	const iconName = getPropertyTypeIcon(value);
 	
 	// Clear existing content
-	propertySelected.innerHTML = '';
+	propertySelected.textContent = '';
 	
 	// Create and append the new icon element
 	const iconElement = createElementWithHTML('i', '', { 'data-lucide': iconName });
@@ -538,7 +541,7 @@ function clearTemplateEditor(): void {
 	const templateProperties = document.getElementById('template-properties');
 	if (templateEditorTitle) templateEditorTitle.textContent = getMessage('newTemplate');
 	if (templateName) templateName.value = '';
-	if (templateProperties) templateProperties.innerHTML = '';
+	if (templateProperties) templateProperties.textContent = '';
 	const pathInput = document.getElementById('template-path-name') as HTMLInputElement;
 	if (pathInput) pathInput.value = 'Clippings';
 	const triggersTextarea = document.getElementById('url-patterns') as HTMLTextAreaElement;
@@ -594,7 +597,8 @@ function getUniqueTemplateName(baseName: string): string {
 function updatePropertyNameSuggestions(): void {
 	const datalist = document.getElementById('property-name-suggestions');
 	if (datalist) {
-		datalist.innerHTML = '';
+		// Clear existing suggestions
+		datalist.textContent = '';
 		generalSettings.propertyTypes.forEach(pt => {
 			const option = document.createElement('option');
 			option.value = pt.name;

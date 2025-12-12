@@ -519,6 +519,7 @@
 			line-height: 1;
 			cursor: pointer;
 			user-select: none;
+			-webkit-user-select: none;
 
 			&:hover {
 				background: var(--obsidian-reader-border);
@@ -650,6 +651,7 @@
 	z-index: 999999999;
 	font-family: var(--obsidian-reader-font-family);
 	user-select: none;
+	-webkit-user-select: none;
 }
 .obsidian-reader-settings:hover {
 	opacity: 1;
@@ -749,6 +751,7 @@
 	overflow-y: auto;
 	font-size: 14px;
 	user-select: none;
+	-webkit-user-select: none;
 	&:empty {
 		display: none;
 	}

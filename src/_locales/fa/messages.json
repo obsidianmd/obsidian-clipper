@@ -201,6 +201,9 @@
 	"editTemplate": {
 		"message": "ویرایش قالب"
 	},
+	"embedded": {
+		"message": "درون خطی"
+	},
 	"enableHighlighter": {
 		"message": "مارکر جملات روشن را فعال کن"
 	},
@@ -514,6 +517,18 @@
 	"open": {
 		"message": "باز کردن"
 	},
+	"openBehaviorDescription": {
+		"message": "انتخاب کنید که وب کلیپر به طور پیش فرض چگونه باز می شود."
+	},
+	"openBehaviorTitle": {
+		"message": "رفتار باز کردن"
+	},
+	"openEmbedded": {
+		"message": "باز کردن در صفحه"
+	},
+	"openSidePanel": {
+		"message": "باز کردن پنل کناری"
+	},
 	"optional": {
 		"message": "(اختیاری)"
 	},
@@ -547,6 +562,9 @@
 	"popularModelsDescription": {
 		"message": "از مدل‌هایی که بیشتر استفاده می‌شوند انتخاب کنید یا جزئیات مدل سفارشی را وارد کنید."
 	},
+	"popup": {
+		"message": "پاپ آپ"
+	},
 	"prependToDaily": {
 		"message": "به یادداشت روزانه، از اول اضافه کنید"
 	},
@@ -564,6 +582,24 @@
 	},
 	"propertyName": {
 		"message": "نام خاص"
+	},
+	"propertyTypeCheckbox": {
+		"message": "چک‌باکس"
+	},
+	"propertyTypeDate": {
+		"message": "تاریخ"
+	},
+	"propertyTypeDatetime": {
+		"message": "تاریخ و زمان"
+	},
+	"propertyTypeMultitext": {
+		"message": "لیست"
+	},
+	"propertyTypeNumber": {
+		"message": "عدد"
+	},
+	"propertyTypeText": {
+		"message": "متن"
 	},
 	"propertyValue": {
 		"message": "مقدار خاص"

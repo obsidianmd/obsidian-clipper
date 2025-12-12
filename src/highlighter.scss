@@ -10,6 +10,99 @@
 	}
 }
 
+#obsidian-clipper-iframe {
+	color-scheme: light dark;
+	flex-grow: 1;
+	border: none !important;
+	opacity: 0;
+	margin: 0 !important;
+	&.is-resizing {
+		user-select: none;
+		-webkit-user-select: none;
+		pointer-events: none;
+	}
+}
+
+#obsidian-clipper-container {
+	color-scheme: light dark;
+	position: fixed;
+	top: 12px;
+	right: 12px;
+	max-width: calc(100% - 24px);
+	min-width: 240px;
+	max-height: calc(100% - 24px);
+	min-height: 320px;
+	height: calc(100% - 24px);
+	width: 350px;
+	z-index: 9999999999;
+	background-color: var(--obsidian-clipper-background-primary);
+	background-color: rgba(var(--obsidian-clipper-background-primary-rgb), var(--obsidian-clipper-background-opacity));
+	backdrop-filter: saturate(1.5) blur(32px);
+	border-radius: 12px;
+	box-shadow: 0 0 0 1px rgba(0,0,0,0.1), 
+		0px 16px 28px -4px rgba(0, 0, 0, 0.15), 
+		0px 8px 16px -4px rgba(0, 0, 0, 0.06);
+	display: flex;
+	flex-direction: column;
+	user-select: none;
+	-webkit-user-select: none;
+	transform-origin: right top;
+	opacity: 0;
+	transform: scale(0.95);
+
+	&.is-open {
+		animation: 80ms ease 60ms 1 normal forwards running clipperOpenAnimation;
+		#obsidian-clipper-iframe {
+			opacity: 1;
+		}
+	}
+	&.is-closing {
+		animation: 80ms ease 1 normal forwards running clipperCloseAnimation;
+	}
+}
+
+:root {
+	--obsidian-clipper-background-primary: #fff;
+	--obsidian-clipper-background-primary-rgb: 255, 255, 255;
+	--obsidian-clipper-background-opacity: 0.9;
+	--obsidian-clipper-text-muted: #5c5c5c;
+}
+@media (prefers-color-scheme: dark) {
+	:root {
+		--obsidian-clipper-background-primary: #1e1e1e;
+		--obsidian-clipper-background-primary-rgb: 12, 12, 12;
+	}
+}
+
+.obsidian-clipper-resize-handle {
+	position: absolute;
+	&.obsidian-clipper-resize-handle-w {
+		top: 10px;
+		left: -5px;
+		bottom: 10px;
+		width: 10px;
+		cursor: ew-resize;
+		z-index: 99999999999;
+	}
+	&.obsidian-clipper-resize-handle-s {
+		position: absolute;
+		bottom: -5px;
+		left: 10px;
+		right: 10px;
+		height: 10px;
+		cursor: ns-resize;
+		z-index: 99999999999;
+	}
+	&.obsidian-clipper-resize-handle-sw {
+		position: absolute;
+		bottom: -5px;
+		left: -5px;
+		width: 16px;
+		height: 16px;
+		cursor: nesw-resize;
+		z-index: 99999999999;
+	}
+}
 /* Hide the clip button on iPadOS because it's not supported */
 .is-ipad-os {
 	.obsidian-highlighter-menu {
@@ -245,5 +338,23 @@ body.obsidian-highlighter-active {
 	z-index: 999999997;
 	&.on-highlight {
 		border-color: transparent;
+	}
+}
+
+@keyframes clipperOpenAnimation {
+	to {
+		opacity: 1;
+		transform: scale(1);
+	}
+}
+
+@keyframes clipperCloseAnimation {
+	from {
+		opacity: 1;
+		transform: scale(1);
+	}
+	to {
+		opacity: 0;
+		transform: scale(0.96);
 	}
 }

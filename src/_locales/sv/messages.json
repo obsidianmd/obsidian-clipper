@@ -201,6 +201,9 @@
 	"editTemplate": {
 		"message": "Redigera mall"
 	},
+	"embedded": {
+		"message": "Inbäddad"
+	},
 	"enableHighlighter": {
 		"message": "Aktivera markering"
 	},
@@ -514,6 +517,18 @@
 	"open": {
 		"message": "Öppna"
 	},
+	"openBehaviorDescription": {
+		"message": "Välj hur Web Clipper öppnas som standard."
+	},
+	"openBehaviorTitle": {
+		"message": "Öppningsbeteende"
+	},
+	"openEmbedded": {
+		"message": "Öppna på sidan"
+	},
+	"openSidePanel": {
+		"message": "Öppna sidopanel"
+	},
 	"optional": {
 		"message": "(valfritt)"
 	},
@@ -547,6 +562,9 @@
 	"popularModelsDescription": {
 		"message": "Välj bland vanligt använda modeller eller ange anpassade modelldetaljer."
 	},
+	"popup": {
+		"message": "Popup"
+	},
 	"prependToDaily": {
 		"message": "Lägg till i daglig anteckning, i början"
 	},
@@ -564,6 +582,24 @@
 	},
 	"propertyName": {
 		"message": "Egenskapsnamn"
+	},
+	"propertyTypeCheckbox": {
+		"message": "Kryssruta"
+	},
+	"propertyTypeDate": {
+		"message": "Datum"
+	},
+	"propertyTypeDatetime": {
+		"message": "Datum & tid"
+	},
+	"propertyTypeMultitext": {
+		"message": "Lista"
+	},
+	"propertyTypeNumber": {
+		"message": "Nummer"
+	},
+	"propertyTypeText": {
+		"message": "Text"
 	},
 	"propertyValue": {
 		"message": "Egenskapsvärde"

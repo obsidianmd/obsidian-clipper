@@ -11,6 +11,7 @@ import {
 } from '../managers/template-manager';
 import { updateTemplateList, showTemplateEditor, initializeAddPropertyButton } from '../managers/template-ui';
 import { initializeGeneralSettings } from '../managers/general-settings';
+import { initializeInterpreterSettings } from '../managers/interpreter-settings';
 import { showSettingsSection, initializeSidebar } from '../managers/settings-section-ui';
 import { initializeReaderSettings } from '../managers/reader-settings';
 import { initializeAutoSave } from '../utils/auto-save';
@@ -38,24 +39,70 @@ document.addEventListener('DOMContentLoaded', async () => {
 	const newTemplateBtn = document.getElementById('new-template-btn') as HTMLButtonElement;
 
 	async function initializeSettings(): Promise<void> {
-		await translatePage();
-		
-		await initializeGeneralSettings();
-		await initializeReaderSettings();
-		const loadedTemplates = await loadTemplates();
-		updateTemplateList(loadedTemplates);
-		initializeTemplateListeners();
-		await handleUrlParameters();
-		initializeSidebar();
-		initializeAutoSave();
-		initializeMenu('more-actions-btn', 'template-actions-menu');
+		try {
+			await translatePage();
+			
+			await initializeGeneralSettings();
+			await initializeReaderSettings();
+			
+			// Initialize interpreter settings with error handling
+			try {
+				await initializeInterpreterSettings();
+			} catch (error) {
+				console.error('Error initializing interpreter settings, continuing with defaults:', error);
+			}
+			
+			// Load templates with error handling
+			let loadedTemplates;
+			try {
+				loadedTemplates = await loadTemplates();
+				updateTemplateList(loadedTemplates);
+			} catch (error) {
+				console.error('Error loading templates:', error);
+				// Continue with empty template list
+				updateTemplateList([]);
+			}
+			initializeTemplateListeners();
+			await handleUrlParameters();
+			initializeSidebar();
+			initializeAutoSave();
+			initializeMenu('more-actions-btn', 'template-actions-menu');
 
-		createIcons({ icons });
+			createIcons({ icons });
 
-		// Initialize language selector
-		const languageSelect = document.getElementById('language-select') as HTMLSelectElement;
-		if (languageSelect) {
-			await initializeLanguageSelector(languageSelect);
+			// Initialize language selector
+			const languageSelect = document.getElementById('language-select') as HTMLSelectElement;
+			if (languageSelect) {
+				await initializeLanguageSelector(languageSelect);
+			}
+		} catch (error) {
+			console.error('Error during settings initialization:', error);
+			// Show a basic error message but continue with minimal functionality
+			const errorContainer = document.querySelector('#content');
+			if (errorContainer) {
+				errorContainer.textContent = '';
+
+				const errorDiv = document.createElement('div');
+				errorDiv.style.padding = '20px';
+				errorDiv.style.textAlign = 'center';
+				
+				const heading = document.createElement('h2');
+				heading.textContent = 'Settings error';
+				errorDiv.appendChild(heading);
+				
+				const message = document.createElement('p');
+				message.textContent = 'There was an error loading your settings. This may be due to corrupted data.';
+				errorDiv.appendChild(message);
+				
+				errorContainer.appendChild(errorDiv);
+			}
+			
+			// Try to initialize at least the sidebar for navigation
+			try {
+				initializeSidebar();
+			} catch (sidebarError) {
+				console.error('Failed to initialize sidebar:', sidebarError);
+			}
 		}
 	}
 
@@ -68,10 +115,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 			const languages = getAvailableLanguages();
 			const currentLanguage = await getCurrentLanguage();
 			
-			languageSelect.innerHTML = languages.map((lang: { code: string; name: string }) => {
-				const displayName = lang.code === '' ? getMessage('systemDefault') : lang.name;
-				return `<option value="${lang.code}" ${lang.code === currentLanguage ? 'selected' : ''}>${displayName}</option>`;
-			}).join('');
+			// Clear existing options
+			languageSelect.textContent = '';
+			
+			// Add language options
+			languages.forEach((lang: { code: string; name: string }) => {
+				const option = document.createElement('option');
+				option.value = lang.code;
+				option.textContent = lang.code === '' ? getMessage('systemDefault') : lang.name;
+				if (lang.code === currentLanguage) {
+					option.selected = true;
+				}
+				languageSelect.appendChild(option);
+			});
 
 			// Add change listener
 			languageSelect.addEventListener('change', async () => {

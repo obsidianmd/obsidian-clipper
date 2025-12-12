@@ -201,6 +201,9 @@
 	"editTemplate": {
 		"message": "Изменить шаблон"
 	},
+	"embedded": {
+		"message": "Встроенный"
+	},
 	"enableHighlighter": {
 		"message": "Включить маркер"
 	},
@@ -514,6 +517,18 @@
 	"open": {
 		"message": "Открыть"
 	},
+	"openBehaviorDescription": {
+		"message": "Выберите, как по умолчанию открывается Web Clipper."
+	},
+	"openBehaviorTitle": {
+		"message": "Поведение при открытии"
+	},
+	"openEmbedded": {
+		"message": "Открыть на странице"
+	},
+	"openSidePanel": {
+		"message": "Открыть боковую панель"
+	},
 	"optional": {
 		"message": "(необязательно)"
 	},
@@ -547,6 +562,9 @@
 	"popularModelsDescription": {
 		"message": "Выберите из часто используемых моделей или введите данные пользовательской модели."
 	},
+	"popup": {
+		"message": "Всплывающее окно"
+	},
 	"prependToDaily": {
 		"message": "Добавить в начало ежедневной заметки"
 	},
@@ -564,6 +582,24 @@
 	},
 	"propertyName": {
 		"message": "Название свойства"
+	},
+	"propertyTypeCheckbox": {
+		"message": "Флажок"
+	},
+	"propertyTypeDate": {
+		"message": "Дата"
+	},
+	"propertyTypeDatetime": {
+		"message": "Дата и время"
+	},
+	"propertyTypeMultitext": {
+		"message": "Список"
+	},
+	"propertyTypeNumber": {
+		"message": "Число"
+	},
+	"propertyTypeText": {
+		"message": "Текст"
 	},
 	"propertyValue": {
 		"message": "Значение свойства"

@@ -201,6 +201,9 @@
 	"editTemplate": {
 		"message": "Muokkaa mallia"
 	},
+	"embedded": {
+		"message": "Upotettu"
+	},
 	"enableHighlighter": {
 		"message": "Ota korostustyökalu käyttöön"
 	},
@@ -514,6 +517,18 @@
 	"open": {
 		"message": "Avaa"
 	},
+	"openBehaviorDescription": {
+		"message": "Valitse, miten Web Clipper avautuu oletuksena."
+	},
+	"openBehaviorTitle": {
+		"message": "Avautumiskäyttäytyminen"
+	},
+	"openEmbedded": {
+		"message": "Avaa sivulla"
+	},
+	"openSidePanel": {
+		"message": "Avaa sivupaneeli"
+	},
 	"optional": {
 		"message": "(valinnainen)"
 	},
@@ -547,6 +562,9 @@
 	"popularModelsDescription": {
 		"message": "Valitse yleisesti käytettyjä malleja tai syötä mukautetut mallin tiedot."
 	},
+	"popup": {
+		"message": "Ponnahdusikkuna"
+	},
 	"prependToDaily": {
 		"message": "Lisää päivittäiseen muistiinpanoon, yläosaan"
 	},
@@ -564,6 +582,24 @@
 	},
 	"propertyName": {
 		"message": "Ominaisuuden nimi"
+	},
+	"propertyTypeCheckbox": {
+		"message": "Valintaruutu"
+	},
+	"propertyTypeDate": {
+		"message": "Päivämäärä"
+	},
+	"propertyTypeDatetime": {
+		"message": "Päivämäärä & aika"
+	},
+	"propertyTypeMultitext": {
+		"message": "Lista"
+	},
+	"propertyTypeNumber": {
+		"message": "Numero"
+	},
+	"propertyTypeText": {
+		"message": "Teksti"
 	},
 	"propertyValue": {
 		"message": "Ominaisuuden arvo"

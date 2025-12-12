@@ -201,6 +201,9 @@
 	"editTemplate": {
 		"message": "I-edit ang template"
 	},
+	"embedded": {
+		"message": "Naka-embed"
+	},
 	"enableHighlighter": {
 		"message": "I-enable ang highlighter"
 	},
@@ -506,6 +509,18 @@
 	"open": {
 		"message": "Buksan"
 	},
+	"openBehaviorDescription": {
+		"message": "Pumili kung paano magbubukas ang Web Clipper bilang default."
+	},
+	"openBehaviorTitle": {
+		"message": "Pag-uugali ng pagbubukas"
+	},
+	"openEmbedded": {
+		"message": "Bukas sa pahina"
+	},
+	"openSidePanel": {
+		"message": "Bukas na panel sa gilid"
+	},
 	"optional": {
 		"message": "(opsyonal)"
 	},
@@ -539,6 +554,9 @@
 	"popularModelsDescription": {
 		"message": "Pumili mula sa mga karaniwang ginagamit na model o maglagay ng mga detalye para sa custom model."
 	},
+	"popup": {
+		"message": "Popup"
+	},
 	"prependToDaily": {
 		"message": "Idagdag sa daily note, sa simula"
 	},
@@ -556,6 +574,24 @@
 	},
 	"propertyName": {
 		"message": "Pangalan ng property"
+	},
+	"propertyTypeCheckbox": {
+		"message": "Checkbox"
+	},
+	"propertyTypeDate": {
+		"message": "Petsa"
+	},
+	"propertyTypeDatetime": {
+		"message": "Petsa & oras"
+	},
+	"propertyTypeMultitext": {
+		"message": "Listahan"
+	},
+	"propertyTypeNumber": {
+		"message": "Numero"
+	},
+	"propertyTypeText": {
+		"message": "Teksto"
 	},
 	"propertyValue": {
 		"message": "Value ng property"

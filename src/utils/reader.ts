@@ -3,6 +3,7 @@ import { getLocalStorage, setLocalStorage } from './storage-utils';
 import hljs from 'highlight.js';
 import { getDomain } from './string-utils';
 import { applyHighlights } from './highlighter';
+import { copyToClipboard } from './clipboard-utils';
 
 // Mobile viewport settings
 const VIEWPORT = 'width=device-width, initial-scale=1, maximum-scale=1';
@@ -18,6 +19,58 @@ interface ReaderSettings {
 export class Reader {
 	private static originalHTML: string | null = null;
 	private static isActive: boolean = false;
+
+	/**
+	 * Helper function to create SVG elements
+	 */
+	private static createSVG(config: {
+		width?: string;
+		height?: string;
+		viewBox?: string;
+		className?: string;
+		paths?: string[];
+		rects?: Array<{x: string, y: string, width: string, height: string, rx?: string, ry?: string}>;
+	}): SVGElement {
+		const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+		svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+		
+		if (config.width) svg.setAttribute('width', config.width);
+		if (config.height) svg.setAttribute('height', config.height);
+		if (config.viewBox) svg.setAttribute('viewBox', config.viewBox);
+		if (config.className) svg.setAttribute('class', config.className);
+		
+		// Default attributes for all SVGs
+		svg.setAttribute('fill', 'none');
+		svg.setAttribute('stroke', 'currentColor');
+		svg.setAttribute('stroke-width', '1.5');
+		svg.setAttribute('stroke-linecap', 'round');
+		svg.setAttribute('stroke-linejoin', 'round');
+		
+		// Add paths
+		if (config.paths) {
+			config.paths.forEach(pathData => {
+				const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+				path.setAttribute('d', pathData);
+				svg.appendChild(path);
+			});
+		}
+		
+		// Add rects
+		if (config.rects) {
+			config.rects.forEach(rectData => {
+				const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+				rect.setAttribute('x', rectData.x);
+				rect.setAttribute('y', rectData.y);
+				rect.setAttribute('width', rectData.width);
+				rect.setAttribute('height', rectData.height);
+				if (rectData.rx) rect.setAttribute('rx', rectData.rx);
+				if (rectData.ry) rect.setAttribute('ry', rectData.ry);
+				svg.appendChild(rect);
+			});
+		}
+		
+		return svg;
+	}
 	private static settingsBar: HTMLElement | null = null;
 	private static colorSchemeMediaQuery: MediaQueryList | null = null;
 	private static readerStyles: HTMLLinkElement | null = null;
@@ -50,61 +103,144 @@ export class Reader {
 		// Create settings bar
 		const settingsBar = doc.createElement('div');
 		settingsBar.className = 'obsidian-reader-settings';
-		settingsBar.innerHTML = `
-			<div class="obsidian-reader-settings-controls">
-				<div class="obsidian-reader-settings-controls-group">
-					<button class="obsidian-reader-settings-button" data-action="decrease-font">
-						<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-minus-icon lucide-minus"><path d="M5 12h14"/></svg>
-					</button>
-					<button class="obsidian-reader-settings-button" data-action="increase-font">
-						<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus-icon lucide-plus"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
-					</button>
-				</div>
-				<div class="obsidian-reader-settings-controls-group">
-					<button class="obsidian-reader-settings-button" data-action="decrease-width">
-						<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-							<path d="M18 16L14 12L18 8"/>
-							<path d="M1 12L10 12"/>
-							<path d="M14 12H23"/>
-							<path d="M6 16L10 12L6 8"/>
-						</svg>
-					</button>
-					<button class="obsidian-reader-settings-button" data-action="increase-width">
-						<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-move-horizontal-icon lucide-move-horizontal"><path d="m18 8 4 4-4 4"/><path d="M2 12h20"/><path d="m6 8-4 4 4 4"/></svg>
-					</button>
-				</div>
-				<div class="obsidian-reader-settings-controls-group">
-					<button class="obsidian-reader-settings-button" data-action="decrease-line-height">
-						<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"  stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-							<path d="M4 10H20"/>
-							<path d="M4 6H20"/>
-							<path d="M4 18H20"/>
-							<path d="M4 14H20"/>
-						</svg>
-					</button>
-					<button class="obsidian-reader-settings-button" data-action="increase-line-height">
-						<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu-icon lucide-menu"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
-					</button>
-				</div>
+		// Create settings controls container
+		const controlsContainer = doc.createElement('div');
+		controlsContainer.className = 'obsidian-reader-settings-controls';
 
-				<select class="obsidian-reader-settings-select" data-action="change-theme">
-					<option value="default">Default</option>
-					<option value="flexoki">Flexoki</option>
-				</select>
+		// Font size controls group
+		const fontGroup = doc.createElement('div');
+		fontGroup.className = 'obsidian-reader-settings-controls-group';
 
-				<select class="obsidian-reader-settings-select" data-action="change-theme-mode">
-					<option value="auto">Automatic</option>
-					<option value="light">Light</option>
-					<option value="dark">Dark</option>
-				</select>
+		const decreaseFontBtn = doc.createElement('button');
+		decreaseFontBtn.className = 'obsidian-reader-settings-button';
+		decreaseFontBtn.dataset.action = 'decrease-font';
+		decreaseFontBtn.appendChild(this.createSVG({
+			width: '20', height: '20', viewBox: '0 0 24 24',
+			className: 'lucide lucide-minus-icon lucide-minus',
+			paths: ['M5 12h14']
+		}));
 
-				<div class="obsidian-reader-settings-controls-group">
-					<button class="obsidian-reader-settings-button" data-action="toggle-highlighter">
-						<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-highlighter-icon lucide-highlighter"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg>
-					</button>
-				</div>
-			</div>
-		`;
+		const increaseFontBtn = doc.createElement('button');
+		increaseFontBtn.className = 'obsidian-reader-settings-button';
+		increaseFontBtn.dataset.action = 'increase-font';
+		increaseFontBtn.appendChild(this.createSVG({
+			width: '20', height: '20', viewBox: '0 0 24 24',
+			className: 'lucide lucide-plus-icon lucide-plus',
+			paths: ['M5 12h14', 'M12 5v14']
+		}));
+
+		fontGroup.appendChild(decreaseFontBtn);
+		fontGroup.appendChild(increaseFontBtn);
+
+		// Width controls group
+		const widthGroup = doc.createElement('div');
+		widthGroup.className = 'obsidian-reader-settings-controls-group';
+
+		const decreaseWidthBtn = doc.createElement('button');
+		decreaseWidthBtn.className = 'obsidian-reader-settings-button';
+		decreaseWidthBtn.dataset.action = 'decrease-width';
+		decreaseWidthBtn.appendChild(this.createSVG({
+			width: '20', height: '20', viewBox: '0 0 24 24',
+			paths: ['M18 16L14 12L18 8', 'M1 12L10 12', 'M14 12H23', 'M6 16L10 12L6 8']
+		}));
+
+		const increaseWidthBtn = doc.createElement('button');
+		increaseWidthBtn.className = 'obsidian-reader-settings-button';
+		increaseWidthBtn.dataset.action = 'increase-width';
+		increaseWidthBtn.appendChild(this.createSVG({
+			width: '20', height: '20', viewBox: '0 0 24 24',
+			className: 'lucide lucide-move-horizontal-icon lucide-move-horizontal',
+			paths: ['m18 8 4 4-4 4', 'M2 12h20', 'm6 8-4 4 4 4']
+		}));
+
+		widthGroup.appendChild(decreaseWidthBtn);
+		widthGroup.appendChild(increaseWidthBtn);
+
+		// Line height controls group
+		const lineHeightGroup = doc.createElement('div');
+		lineHeightGroup.className = 'obsidian-reader-settings-controls-group';
+
+		const decreaseLineHeightBtn = doc.createElement('button');
+		decreaseLineHeightBtn.className = 'obsidian-reader-settings-button';
+		decreaseLineHeightBtn.dataset.action = 'decrease-line-height';
+		decreaseLineHeightBtn.appendChild(this.createSVG({
+			width: '20', height: '20', viewBox: '0 0 24 24',
+			paths: ['M4 10H20', 'M4 6H20', 'M4 18H20', 'M4 14H20']
+		}));
+
+		const increaseLineHeightBtn = doc.createElement('button');
+		increaseLineHeightBtn.className = 'obsidian-reader-settings-button';
+		increaseLineHeightBtn.dataset.action = 'increase-line-height';
+		increaseLineHeightBtn.appendChild(this.createSVG({
+			width: '20', height: '20', viewBox: '0 0 24 24',
+			className: 'lucide lucide-menu-icon lucide-menu',
+			paths: ['M4 12h16', 'M4 6h16', 'M4 18h16'] // Simplified line elements as paths
+		}));
+
+		lineHeightGroup.appendChild(decreaseLineHeightBtn);
+		lineHeightGroup.appendChild(increaseLineHeightBtn);
+
+		// Theme select
+		const themeSelect = doc.createElement('select');
+		themeSelect.className = 'obsidian-reader-settings-select';
+		themeSelect.dataset.action = 'change-theme';
+
+		const defaultThemeOption = doc.createElement('option');
+		defaultThemeOption.value = 'default';
+		defaultThemeOption.textContent = 'Default';
+
+		const flexokiThemeOption = doc.createElement('option');
+		flexokiThemeOption.value = 'flexoki';
+		flexokiThemeOption.textContent = 'Flexoki';
+
+		themeSelect.appendChild(defaultThemeOption);
+		themeSelect.appendChild(flexokiThemeOption);
+
+		// Theme mode select
+		const themeModeSelect = doc.createElement('select');
+		themeModeSelect.className = 'obsidian-reader-settings-select';
+		themeModeSelect.dataset.action = 'change-theme-mode';
+
+		const autoModeOption = doc.createElement('option');
+		autoModeOption.value = 'auto';
+		autoModeOption.textContent = 'Automatic';
+
+		const lightModeOption = doc.createElement('option');
+		lightModeOption.value = 'light';
+		lightModeOption.textContent = 'Light';
+
+		const darkModeOption = doc.createElement('option');
+		darkModeOption.value = 'dark';
+		darkModeOption.textContent = 'Dark';
+
+		themeModeSelect.appendChild(autoModeOption);
+		themeModeSelect.appendChild(lightModeOption);
+		themeModeSelect.appendChild(darkModeOption);
+
+		// Highlighter controls group
+		const highlighterGroup = doc.createElement('div');
+		highlighterGroup.className = 'obsidian-reader-settings-controls-group';
+
+		const highlighterBtn = doc.createElement('button');
+		highlighterBtn.className = 'obsidian-reader-settings-button';
+		highlighterBtn.dataset.action = 'toggle-highlighter';
+		highlighterBtn.appendChild(this.createSVG({
+			width: '20', height: '20', viewBox: '0 0 24 24',
+			className: 'lucide lucide-highlighter-icon lucide-highlighter',
+			paths: ['m9 11-6 6v3h9l3-3', 'm22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4']
+		}));
+
+		highlighterGroup.appendChild(highlighterBtn);
+
+		// Assemble everything
+		controlsContainer.appendChild(fontGroup);
+		controlsContainer.appendChild(widthGroup);
+		controlsContainer.appendChild(lineHeightGroup);
+		controlsContainer.appendChild(themeSelect);
+		controlsContainer.appendChild(themeModeSelect);
+		controlsContainer.appendChild(highlighterGroup);
+
+		settingsBar.appendChild(controlsContainer);
 
 		doc.body.appendChild(settingsBar);
 		this.settingsBar = settingsBar;
@@ -146,22 +282,16 @@ export class Reader {
 		});
 
 		// Add theme select event listener
-		const themeSelect = settingsBar.querySelector('[data-action="change-theme"]') as HTMLSelectElement;
-		if (themeSelect) {
-			themeSelect.value = this.settings.theme;
-			themeSelect.addEventListener('change', () => {
-				this.updateTheme(doc, themeSelect.value as 'default' | 'flexoki');
-			});
-		}
+		themeSelect.value = this.settings.theme;
+		themeSelect.addEventListener('change', () => {
+			this.updateTheme(doc, themeSelect.value as 'default' | 'flexoki');
+		});
 
 		// Add theme mode select event listener
-		const themeModeSelect = settingsBar.querySelector('[data-action="change-theme-mode"]') as HTMLSelectElement;
-		if (themeModeSelect) {
-			themeModeSelect.value = this.settings.themeMode;
-			themeModeSelect.addEventListener('change', () => {
-				this.updateThemeMode(doc, themeModeSelect.value as 'auto' | 'light' | 'dark');
-			});
-		}
+		themeModeSelect.value = this.settings.themeMode;
+		themeModeSelect.addEventListener('change', () => {
+			this.updateThemeMode(doc, themeModeSelect.value as 'auto' | 'light' | 'dark');
+		});
 
 		// Notify content script to listen for highlighter button
 		document.dispatchEvent(new CustomEvent('obsidian-reader-init'));
@@ -431,7 +561,9 @@ export class Reader {
 					returnLink?.remove();
 
 					// Show popover
-					popover.innerHTML = content.innerHTML;
+					popover.textContent = '';
+					const clonedContent = content.cloneNode(true) as HTMLElement;
+					popover.appendChild(clonedContent);
 					this.showFootnotePopover(popover, footnoteLink);
 
 					// Update active states
@@ -623,29 +755,48 @@ export class Reader {
 			
 			const button = doc.createElement('button');
 			button.className = 'copy-button';
-			button.innerHTML = `
-				<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy-icon lucide-copy"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
-			`;
+			
+			// Create copy SVG
+			const svg = this.createSVG({
+				width: '16',
+				height: '16',
+				viewBox: '0 0 24 24',
+				className: 'lucide lucide-copy-icon lucide-copy',
+				paths: ['M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2'],
+				rects: [{x: '8', y: '8', width: '14', height: '14', rx: '2', ry: '2'}]
+			});
+			button.appendChild(svg);
 
 			button.addEventListener('click', async () => {
 				try {
 					// Get the raw text content without HTML tags
 					const text = block.textContent || '';
-					await navigator.clipboard.writeText(text);
+					const success = await copyToClipboard(text);
 					
-					// Show success state
-					button.classList.add('copied');
-					button.innerHTML = `
-						<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check-icon lucide-check"><path d="M20 6 9 17l-5-5"/></svg>
-					`;
-					
-					// Reset after 2 seconds
-					setTimeout(() => {
-						button.classList.remove('copied');
-						button.innerHTML = `
-							<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-copy-icon lucide-copy"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
-						`;
-					}, 2000);
+					if (success) {
+						// Show success state
+						button.classList.add('copied');
+						button.textContent = '';
+						
+						// Create check icon
+						const checkSvg = this.createSVG({
+							width: '16',
+							height: '16',
+							viewBox: '0 0 24 24',
+							className: 'lucide lucide-check-icon lucide-check',
+							paths: ['M20 6 9 17l-5-5']
+						});
+						button.appendChild(checkSvg);
+						
+						// Reset after 2 seconds
+						setTimeout(() => {
+							button.classList.remove('copied');
+							button.textContent = '';
+							button.appendChild(svg); // Re-add original SVG
+						}, 2000);
+					} else {
+						console.log('Reader', 'Error copying code: clipboard operation failed');
+					}
 				} catch (err) {
 					console.log('Reader', 'Error copying code:', err);
 				}
@@ -660,17 +811,35 @@ export class Reader {
 		this.lightbox.className = 'obsidian-reader-lightbox theme-dark';
 		this.lightbox.setAttribute('role', 'dialog');
 		this.lightbox.setAttribute('aria-modal', 'true');
-		this.lightbox.innerHTML = `
-			<button class="lightbox-close" aria-label="Close image viewer">
-				<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-					<path d="M18 6L6 18M6 6l12 12"/>
-				</svg>
-			</button>
-			<div class="lightbox-content">
-				<div class="lightbox-image-container"></div>
-				<div class="lightbox-caption"></div>
-			</div>
-		`;
+		// Create lightbox
+		const closeButton = doc.createElement('button');
+		closeButton.className = 'lightbox-close';
+		closeButton.setAttribute('aria-label', 'Close image viewer');
+		
+		// Create close button SVG
+		const closeSvg = this.createSVG({
+			width: '20',
+			height: '20',
+			viewBox: '0 0 24 24',
+			paths: ['M18 6L6 18M6 6l12 12']
+		});
+		closeButton.appendChild(closeSvg);
+		
+		// Create content structure
+		const lightboxContent = doc.createElement('div');
+		lightboxContent.className = 'lightbox-content';
+		
+		const imageContainer = doc.createElement('div');
+		imageContainer.className = 'lightbox-image-container';
+		
+		const captionContainer = doc.createElement('div');
+		captionContainer.className = 'lightbox-caption';
+		
+		lightboxContent.appendChild(imageContainer);
+		lightboxContent.appendChild(captionContainer);
+		
+		this.lightbox.appendChild(closeButton);
+		this.lightbox.appendChild(lightboxContent);
 		doc.body.appendChild(this.lightbox);
 
 		// Get all images in the article
@@ -724,11 +893,15 @@ export class Reader {
 					const expandButton = doc.createElement('button');
 					expandButton.className = 'image-expand-button';
 					expandButton.setAttribute('aria-label', 'View full size');
-					expandButton.innerHTML = `
-						<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-							<path d="M15 3h6v6M14 10l7-7M9 21H3v-6M10 14l-7 7"/>
-						</svg>
-					`;
+					
+					// Create expand SVG
+					const expandSvg = this.createSVG({
+						width: '16',
+						height: '16',
+						viewBox: '0 0 24 24',
+						paths: ['M15 3h6v6', 'M14 10l7-7', 'M9 21H3v-6', 'M10 14l-7 7']
+					});
+					expandButton.appendChild(expandSvg);
 					wrapper.appendChild(expandButton);
 
 					// Handle expand button click
@@ -747,11 +920,15 @@ export class Reader {
 					const expandButton = doc.createElement('button');
 					expandButton.className = 'image-expand-button';
 					expandButton.setAttribute('aria-label', 'View full size');
-					expandButton.innerHTML = `
-						<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-							<path d="M15 3h6v6M14 10l7-7M9 21H3v-6M10 14l-7 7"/>
-						</svg>
-					`;
+					
+					// Create expand SVG
+					const expandSvg = this.createSVG({
+						width: '16',
+						height: '16',
+						viewBox: '0 0 24 24',
+						paths: ['M15 3h6v6', 'M14 10l7-7', 'M9 21H3v-6', 'M10 14l-7 7']
+					});
+					expandButton.appendChild(expandSvg);
 					wrapper.appendChild(expandButton);
 
 					expandButton.addEventListener('click', (e) => {
@@ -769,11 +946,8 @@ export class Reader {
 			});
 		}
 
-		// Close button handler
-		const closeButton = this.lightbox.querySelector('.lightbox-close');
-		if (closeButton) {
-			closeButton.addEventListener('click', () => this.closeLightbox());
-		}
+		// Close button handler - use the closeButton we already created
+		closeButton.addEventListener('click', () => this.closeLightbox());
 
 		// Click outside to close
 		this.lightbox.addEventListener('click', (e) => {
@@ -809,8 +983,8 @@ export class Reader {
 		
 		if (container && captionContainer) {
 			// Clear previous content
-			container.innerHTML = '';
-			captionContainer.innerHTML = '';
+			container.textContent = '';
+			captionContainer.textContent = '';
 			
 			// Clone the original image to preserve loaded state
 			const img = this.images[index].cloneNode(true) as HTMLImageElement;
@@ -821,7 +995,8 @@ export class Reader {
 			if (figure) {
 				const figcaption = figure.querySelector('figcaption');
 				if (figcaption) {
-					captionContainer.innerHTML = figcaption.innerHTML;
+					const clonedCaption = figcaption.cloneNode(true) as HTMLElement;
+					captionContainer.appendChild(clonedCaption);
 				}
 			}
 		}
@@ -861,6 +1036,9 @@ export class Reader {
 		try {
 			// Store original HTML for restoration
 			this.originalHTML = doc.documentElement.outerHTML;
+
+			// Clipper iframe container
+			const clipperIframeContainer = doc.getElementById('obsidian-clipper-container');
 
 			// Load saved settings
 			await this.loadSettings();
@@ -949,38 +1127,105 @@ export class Reader {
 				head.insertBefore(charset, head.firstChild);
 			}
 
-			doc.body.innerHTML = `
-				<div class="obsidian-reader-container">
-					<div class="obsidian-left-sidebar">
-						<div class="obsidian-reader-outline"></div>
-					</div>
-					<div class="obsidian-reader-content">
-						<main>
-						${title ? `<h1>${title}</h1>` : ''}
-							<div class="metadata">
-								<div class="metadata-details">
-									${[
-										author ? `${author}` : '',
-										formattedDate || '',
-										domain ? `<a href="${doc.URL}">${domain}</a>` : ''
-									].filter(Boolean).map(item => `<span>${item}</span>`).join('<span> · </span>')}
-								</div>
-							</div>
-							<article>
-								${content}
-							</article>
-						</main>
-						<div class="obsidian-reader-footer">
-							${[
-								'Obsidian Reader',
-								wordCount ? new Intl.NumberFormat().format(wordCount) + ' words' : '',
-								(parseTime ? 'parsed in ' + new Intl.NumberFormat().format(parseTime) + ' ms' : '')
-							].filter(Boolean).join(' · ')}
-						</div>
-					</div>
-					<div class="obsidian-reader-right-sidebar"></div>
-				</div>
-			`;
+			doc.body.textContent = '';
+			
+			// Create main container
+			const readerContainer = doc.createElement('div');
+			readerContainer.className = 'obsidian-reader-container';
+			
+			// Create left sidebar
+			const leftSidebar = doc.createElement('div');
+			leftSidebar.className = 'obsidian-left-sidebar';
+			const outline = doc.createElement('div');
+			outline.className = 'obsidian-reader-outline';
+			leftSidebar.appendChild(outline);
+			
+			// Create content area
+			const readerContent = doc.createElement('div');
+			readerContent.className = 'obsidian-reader-content';
+			
+			// Create main element
+			const main = doc.createElement('main');
+			
+			// Add title if present
+			if (title) {
+				const h1 = doc.createElement('h1');
+				h1.textContent = title;
+				main.appendChild(h1);
+			}
+			
+			// Create metadata section
+			const metadata = doc.createElement('div');
+			metadata.className = 'metadata';
+			const metadataDetails = doc.createElement('div');
+			metadataDetails.className = 'metadata-details';
+			
+			// Build metadata items
+			const metadataItems = [
+				author ? author : '',
+				formattedDate || '',
+				domain ? domain : ''
+			].filter(Boolean);
+			
+			metadataItems.forEach((item, index) => {
+				if (index > 0) {
+					// Add separator
+					const separator = doc.createElement('span');
+					separator.textContent = ' · ';
+					metadataDetails.appendChild(separator);
+				}
+				
+				const span = doc.createElement('span');
+				if (item === domain && domain) {
+					// Create link for domain
+					const link = doc.createElement('a');
+					link.href = doc.URL;
+					link.textContent = domain;
+					span.appendChild(link);
+				} else {
+					span.textContent = item;
+				}
+				metadataDetails.appendChild(span);
+			});
+			
+			metadata.appendChild(metadataDetails);
+			main.appendChild(metadata);
+			
+			// Create article with content (content is already processed HTML from Defuddle)
+			const article = doc.createElement('article');
+			// Use DOMParser for extra safety even though content comes from Defuddle parser
+			const parser = new DOMParser();
+			const contentDoc = parser.parseFromString(content, 'text/html');
+			const contentBody = contentDoc.body;
+			
+			// Move all child nodes from parsed content to article
+			while (contentBody.firstChild) {
+				article.appendChild(contentBody.firstChild);
+			}
+			main.appendChild(article);
+			
+			readerContent.appendChild(main);
+			
+			// Create footer
+			const footer = doc.createElement('div');
+			footer.className = 'obsidian-reader-footer';
+			const footerItems = [
+				'Obsidian Reader',
+				wordCount ? new Intl.NumberFormat().format(wordCount) + ' words' : '',
+				(parseTime ? 'parsed in ' + new Intl.NumberFormat().format(parseTime) + ' ms' : '')
+			].filter(Boolean);
+			footer.textContent = footerItems.join(' · ');
+			readerContent.appendChild(footer);
+			
+			// Create right sidebar
+			const rightSidebar = doc.createElement('div');
+			rightSidebar.className = 'obsidian-reader-right-sidebar';
+			
+			// Assemble everything
+			readerContainer.appendChild(leftSidebar);
+			readerContainer.appendChild(readerContent);
+			readerContainer.appendChild(rightSidebar);
+			doc.body.appendChild(readerContainer);
 
 			// Add reader classes and attributes
 			doc.documentElement.classList.add('obsidian-reader-active');
@@ -1005,6 +1250,11 @@ export class Reader {
 			this.initializeCodeHighlighting(doc);
 			this.initializeCopyButtons(doc);
 			this.initializeLightbox(doc);
+
+			// Re-attach the clipper iframe container if it exists
+			if (clipperIframeContainer) {
+				doc.body.appendChild(clipperIframeContainer);
+			}
 
 			// Set up color scheme media query listener
 			this.colorSchemeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');

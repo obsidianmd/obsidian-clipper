@@ -27,6 +27,16 @@
 	height: max(var(--chromium-popup-height), 100vh);
 }
 
+#popup.is-embedded {
+	--popup-max-height: none;
+	--popup-width: auto;
+	--popup-width-expanded: auto;
+	--popup-height: 100%;
+	--popup-max-height: none;
+	--chromium-popup-height: auto;
+	--background-primary:transparent;
+}
+
 #popup {
 	scrollbar-width: none;
 	height: max(var(--popup-height), 100vh);
@@ -35,6 +45,25 @@
 	font-family: var(--font-default);
 	&::-webkit-scrollbar {
 		display: none;
+	}
+}
+
+#popup:not(.is-side-panel) {
+	::-webkit-scrollbar{
+		width: 8px;
+	}
+	::-webkit-scrollbar-track-piece {
+		background-color: var(--background-primary);
+	}
+	::-webkit-scrollbar-thumb {
+		background-color: var(--background-modifier-border-hover);
+		outline: 2px solid var(--background-primary);
+		outline-offset: -2px;
+		border: 1px solid var(--background-primary);
+		border-radius: 10px;
+	}
+	::-webkit-scrollbar-thumb:hover {
+		background-color: var(--background-modifier-border-focus);
 	}
 }
 
@@ -66,22 +95,6 @@
 		height: 100%;
 	}
 
-	::-webkit-scrollbar{
-		width: 8px;
-	}
-	::-webkit-scrollbar-track-piece {
-		background-color: var(--background-primary);
-	}
-	::-webkit-scrollbar-thumb {
-		background-color: var(--background-modifier-border-hover);
-		outline: 2px solid var(--background-primary);
-		outline-offset: -2px;
-		border: 1px solid var(--background-primary);
-		border-radius: 10px;
-	}
-	::-webkit-scrollbar-thumb:hover {
-		background-color: var(--background-modifier-border-focus);
-	}
 }
 
 .clipper {
@@ -112,13 +125,13 @@
 	}
 
 	#note-content-container {
+		border-top: 1px solid var(--divider-color);
 		display: flex;
 		flex-grow: 1;
 		#note-content-field {
 			background-color: transparent;
 			border-radius: 0;
 			border: none;
-			border-top: 1px solid var(--divider-color);
 			padding: 10px var(--popup-padding);
 			resize: none;
 			&:active,
@@ -286,6 +299,7 @@
 
 .has-error {
 	#highlighter-mode,
+	#embedded-mode,
 	#show-variables,
 	#template-select {
 		display: none;
@@ -321,12 +335,12 @@
 
 .is-mobile-safari,
 .is-chromium {
-	#popup-header {
+	.popup-actions {
 		--radius-m: 40px;
 	}
 }
 
-#popup-actions {
+.popup-actions {
 	z-index: 100;
 	justify-self: flex-end;
 	align-items: center;

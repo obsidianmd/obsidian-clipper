@@ -201,6 +201,9 @@
 	"editTemplate": {
 		"message": "Edit template"
 	},
+	"embedded": {
+		"message": "Embedded"
+	},
 	"enableHighlighter": {
 		"message": "Enable highlighter"
 	},
@@ -514,6 +517,18 @@
 	"open": {
 		"message": "Open"
 	},
+	"openBehaviorDescription": {
+		"message": "Choose how Web Clipper opens by default."
+	},
+	"openBehaviorTitle": {
+		"message": "Open behavior"
+	},
+	"openEmbedded": {
+		"message": "Open in page"
+	},
+	"openSidePanel": {
+		"message": "Open side panel"
+	},
 	"optional": {
 		"message": "(optional)"
 	},
@@ -547,6 +562,9 @@
 	"popularModelsDescription": {
 		"message": "Choose from commonly used models or enter custom model details."
 	},
+	"popup": {
+		"message": "Popup"
+	},
 	"prependToDaily": {
 		"message": "Add to daily note, at the top"
 	},
@@ -564,6 +582,24 @@
 	},
 	"propertyName": {
 		"message": "Property name"
+	},
+	"propertyTypeCheckbox": {
+		"message": "Checkbox"
+	},
+	"propertyTypeDate": {
+		"message": "Date"
+	},
+	"propertyTypeDatetime": {
+		"message": "Date & time"
+	},
+	"propertyTypeMultitext": {
+		"message": "List"
+	},
+	"propertyTypeNumber": {
+		"message": "Number"
+	},
+	"propertyTypeText": {
+		"message": "Text"
 	},
 	"propertyValue": {
 		"message": "Property value"

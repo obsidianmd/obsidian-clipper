@@ -75,6 +75,7 @@
 			color: var(--text-muted);
 			font-size: 0.72rem;
 			user-select: none;
+			-webkit-user-select: none;
 		}
 
 		.chart-overlay {
@@ -101,6 +102,7 @@
 			align-items: center;
 			gap: 1.5em;
 			user-select: none;
+			-webkit-user-select: none;
 			
 			.tooltip-date {
 				color: var(--text-muted);

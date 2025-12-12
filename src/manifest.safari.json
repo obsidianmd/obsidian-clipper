@@ -1,9 +1,8 @@
 {
 	"manifest_version": 3,
-	"default_locale": "en",
 	"name": "Obsidian Web Clipper",
 	"homepage_url": "https://obsidian.md/",
-	"version": "0.11.8",
+	"version": "0.12.0",
 	"description": "Save content from the web to Obsidian, in a private and durable format you can always access offline.",
 	"permissions": [
 		"activeTab",
@@ -45,7 +44,7 @@
 	],
 	"web_accessible_resources": [
 		{
-			"resources": ["reader.css", "reader-script.js", "browser-polyfill.min.js"],
+			"resources": ["reader.css", "reader-script.js", "browser-polyfill.min.js", "style.css", "side-panel.html"],
 			"extension_ids": ["*"],
 			"matches": [ "*://*/*" ]
 		}

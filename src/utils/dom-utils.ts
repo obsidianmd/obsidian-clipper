@@ -4,9 +4,17 @@ export function createElementWithClass(tagName: string, className: string): HTML
 	return element;
 }
 
-export function createElementWithHTML(tagName: string, innerHTML: string, attributes: Record<string, string> = {}): HTMLElement {
+export function createElementWithHTML(tagName: string, htmlContent: string, attributes: Record<string, string> = {}): HTMLElement {
 	const element = document.createElement(tagName);
-	element.innerHTML = innerHTML;
+
+	const parser = new DOMParser();
+	const doc = parser.parseFromString(htmlContent, 'text/html');
+	
+	// Move all child nodes from parsed content to the element
+	Array.from(doc.body.childNodes).forEach(node => {
+		element.appendChild(node.cloneNode(true));
+	});
+	
 	Object.entries(attributes).forEach(([key, value]) => element.setAttribute(key, value));
 	return element;
 }
@@ -56,8 +64,11 @@ export function isDarkColor(color: string): boolean {
 
 export function wrapElementWithMark(element: Element): void {
 	const mark = document.createElement('mark');
-	mark.innerHTML = element.innerHTML;
-	element.innerHTML = '';
+
+	while (element.firstChild) {
+		mark.appendChild(element.firstChild);
+	}
+	
 	element.appendChild(mark);
 }
 

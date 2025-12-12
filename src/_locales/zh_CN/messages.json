@@ -201,6 +201,9 @@
 	"editTemplate": {
 		"message": "编辑模板"
 	},
+	"embedded": {
+		"message": "嵌入式"
+	},
 	"enableHighlighter": {
 		"message": "启用高亮"
 	},
@@ -514,6 +517,18 @@
 	"open": {
 		"message": "打开"
 	},
+	"openBehaviorDescription": {
+		"message": "选择Web Clipper默认的打开方式。"
+	},
+	"openBehaviorTitle": {
+		"message": "打开行为"
+	},
+	"openEmbedded": {
+		"message": "在页面中打开"
+	},
+	"openSidePanel": {
+		"message": "打开侧面板"
+	},
 	"optional": {
 		"message": "(可选)"
 	},
@@ -547,6 +562,9 @@
 	"popularModelsDescription": {
 		"message": "从常用模型中选择，或输入自定义模型详细信息。"
 	},
+	"popup": {
+		"message": "弹出窗口"
+	},
 	"prependToDaily": {
 		"message": "添加到日记开头"
 	},
@@ -564,6 +582,24 @@
 	},
 	"propertyName": {
 		"message": "属性名称"
+	},
+	"propertyTypeCheckbox": {
+		"message": "复选框"
+	},
+	"propertyTypeDate": {
+		"message": "日期"
+	},
+	"propertyTypeDatetime": {
+		"message": "日期和时间"
+	},
+	"propertyTypeMultitext": {
+		"message": "列表"
+	},
+	"propertyTypeNumber": {
+		"message": "数字"
+	},
+	"propertyTypeText": {
+		"message": "文本"
 	},
 	"propertyValue": {
 		"message": "属性值"

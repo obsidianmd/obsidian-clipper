@@ -201,6 +201,9 @@
 	"editTemplate": {
 		"message": "Editează șablon"
 	},
+	"embedded": {
+		"message": "Încorporat"
+	},
 	"enableHighlighter": {
 		"message": "Activează evidențiatorul"
 	},
@@ -506,6 +509,18 @@
 	"open": {
 		"message": "Deschide"
 	},
+	"openBehaviorDescription": {
+		"message": "Alegeți modul în care Web Clipper se deschide în mod implicit."
+	},
+	"openBehaviorTitle": {
+		"message": "Comportament la deschidere"
+	},
+	"openEmbedded": {
+		"message": "Deschide în pagină"
+	},
+	"openSidePanel": {
+		"message": "Deschide panoul lateral"
+	},
 	"optional": {
 		"message": "(opțional)"
 	},
@@ -539,6 +554,9 @@
 	"popularModelsDescription": {
 		"message": "Alege dintre modelele folosite frecvent sau introdu detaliile unui model personalizat."
 	},
+	"popup": {
+		"message": "Fereastră pop-up"
+	},
 	"prependToDaily": {
 		"message": "Adaugă la nota zilnică, la început"
 	},
@@ -556,6 +574,24 @@
 	},
 	"propertyName": {
 		"message": "Nume proprietate"
+	},
+	"propertyTypeCheckbox": {
+		"message": "Caseta de selectare"
+	},
+	"propertyTypeDate": {
+		"message": "Data"
+	},
+	"propertyTypeDatetime": {
+		"message": "Data & ora"
+	},
+	"propertyTypeMultitext": {
+		"message": "Lista"
+	},
+	"propertyTypeNumber": {
+		"message": "Număr"
+	},
+	"propertyTypeText": {
+		"message": "Text"
 	},
 	"propertyValue": {
 		"message": "Valoare proprietate"

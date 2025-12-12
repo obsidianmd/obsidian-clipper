@@ -201,6 +201,9 @@
 	"editTemplate": {
 		"message": "Vorlage bearbeiten"
 	},
+	"embedded": {
+		"message": "Eingebettet"
+	},
 	"enableHighlighter": {
 		"message": "Marker aktivieren"
 	},
@@ -514,6 +517,18 @@
 	"open": {
 		"message": "Öffnen"
 	},
+	"openBehaviorDescription": {
+		"message": "Wählen Sie, wie der Web Clipper standardmäßig geöffnet wird."
+	},
+	"openBehaviorTitle": {
+		"message": "Öffnungsverhalten"
+	},
+	"openEmbedded": {
+		"message": "In Seite öffnen"
+	},
+	"openSidePanel": {
+		"message": "Seitenleiste öffnen"
+	},
 	"optional": {
 		"message": "(optional)"
 	},
@@ -547,6 +562,9 @@
 	"popularModelsDescription": {
 		"message": "Wählen Sie aus häufig verwendeten Modellen oder geben Sie benutzerdefinierte Modellinformationen ein."
 	},
+	"popup": {
+		"message": "Popup"
+	},
 	"prependToDaily": {
 		"message": "Zur Tagesnotiz am Anfang hinzufügen"
 	},
@@ -564,6 +582,24 @@
 	},
 	"propertyName": {
 		"message": "Eigenschaftsname"
+	},
+	"propertyTypeCheckbox": {
+		"message": "Kontrollkästchen"
+	},
+	"propertyTypeDate": {
+		"message": "Datum"
+	},
+	"propertyTypeDatetime": {
+		"message": "Datum & Uhrzeit"
+	},
+	"propertyTypeMultitext": {
+		"message": "Liste"
+	},
+	"propertyTypeNumber": {
+		"message": "Nummer"
+	},
+	"propertyTypeText": {
+		"message": "Text"
 	},
 	"propertyValue": {
 		"message": "Eigenschaftswert"
@@ -773,7 +809,7 @@
 		"message": "Vault"
 	},
 	"vaultDescription": {
-		"message": "Wähle den Standard-Vault für diese Vorlage aus. Gehen zu $link_start$allgemeinen Einstellungen$link_end$, um Vaulte hinzuzufügen oder zu entfernen.",
+		"message": "Wähle den Standard-Vault für diese Vorlage aus. Gehen zu $link_start$allgemeinen Einstellungen$link_end$, um Vaults hinzuzufügen oder zu entfernen.",
 		"placeholders": {
 			"link_end": {
 				"content": "</a>"
@@ -784,7 +820,7 @@
 		}
 	},
 	"vaults": {
-		"message": "Vaulte"
+		"message": "Vaults"
 	},
 	"vaultsDescription": {
 		"message": "Standardmäßig werden ausgeschnittene Notizen im aktuell geöffneten Vault gespeichert. Du kannst hier Vaults hinzufügen, wenn Du die Option haben möchtest, in verschiedenen Vaults zu speichern. Vaultnamen müssen exakt mit dem Namen des Obsidian-Vaults übereinstimmen. Drücke $strong_start$Enter$strong_end$, um einen Vault hinzuzufügen.",

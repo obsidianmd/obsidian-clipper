@@ -201,6 +201,9 @@
 	"editTemplate": {
 		"message": "Redigér skabelon"
 	},
+	"embedded": {
+		"message": "Indlejret"
+	},
 	"enableHighlighter": {
 		"message": "Aktivér fremhævning"
 	},
@@ -506,6 +509,18 @@
 	"open": {
 		"message": "Åbn"
 	},
+	"openBehaviorDescription": {
+		"message": "Vælg hvordan Web Clipper åbner som standard."
+	},
+	"openBehaviorTitle": {
+		"message": "Åbn adfærd"
+	},
+	"openEmbedded": {
+		"message": "Åbn på side"
+	},
+	"openSidePanel": {
+		"message": "Åbn sidepanel"
+	},
 	"optional": {
 		"message": "(valgfrit)"
 	},
@@ -539,6 +554,9 @@
 	"popularModelsDescription": {
 		"message": "Vælg fra ofte brugte modeller eller indtast detaljer for tilpasset model."
 	},
+	"popup": {
+		"message": "Popup"
+	},
 	"prependToDaily": {
 		"message": "Tilføj til daglig note, i starten"
 	},
@@ -556,6 +574,24 @@
 	},
 	"propertyName": {
 		"message": "Egenskabsnavn"
+	},
+	"propertyTypeCheckbox": {
+		"message": "Afkrydsningsfelt"
+	},
+	"propertyTypeDate": {
+		"message": "Dato"
+	},
+	"propertyTypeDatetime": {
+		"message": "Dato & tid"
+	},
+	"propertyTypeMultitext": {
+		"message": "Liste"
+	},
+	"propertyTypeNumber": {
+		"message": "Nummer"
+	},
+	"propertyTypeText": {
+		"message": "Tekst"
 	},
 	"propertyValue": {
 		"message": "Egenskabsværdi"

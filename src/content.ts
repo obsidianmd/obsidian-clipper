@@ -22,15 +22,134 @@ declare global {
 	window.obsidianHighlighterInitialized = true;
 
 	let isHighlighterMode = false;
+	const iframeId = 'obsidian-clipper-iframe';
+	const containerId = 'obsidian-clipper-container';
+
+	function removeContainer(container: HTMLElement) {
+		container.classList.add('is-closing');
+		container.addEventListener('animationend', () => {
+			container.remove();
+		}, { once: true });
+	}
+
+	async function toggleIframe() {
+		const existingContainer = document.getElementById(containerId);
+		if (existingContainer) {
+			removeContainer(existingContainer);
+			return;
+		}
+
+		const container = document.createElement('div');
+		container.id = containerId;
+		container.classList.add('is-open');
+
+		const { clipperIframeWidth, clipperIframeHeight } = await browser.storage.local.get(['clipperIframeWidth', 'clipperIframeHeight']);
+		if (clipperIframeWidth) {
+			container.style.width = `${clipperIframeWidth}px`;
+		}
+		if (clipperIframeHeight) {
+			container.style.height = `${clipperIframeHeight}px`;
+		}
+
+		const iframe = document.createElement('iframe');
+		iframe.id = iframeId;
+		iframe.src = browser.runtime.getURL('side-panel.html?context=iframe');
+		container.appendChild(iframe);
+
+		// Add resize handle (left side only)
+		const handle = document.createElement('div');
+		handle.className = `obsidian-clipper-resize-handle obsidian-clipper-resize-handle-w`;
+		container.appendChild(handle);
+		addResizeListener(container, handle, 'w');
+
+		const southHandle = document.createElement('div');
+		southHandle.className = `obsidian-clipper-resize-handle obsidian-clipper-resize-handle-s`;
+		container.appendChild(southHandle);
+		addResizeListener(container, southHandle, 's');
+
+		const southWestHandle = document.createElement('div');
+		southWestHandle.className = 'obsidian-clipper-resize-handle obsidian-clipper-resize-handle-sw';
+		container.appendChild(southWestHandle);
+		addResizeListener(container, southWestHandle, 'sw');
+
+		document.body.appendChild(container);
+	}
+
+	function addResizeListener(container: HTMLElement, handle: HTMLElement, direction: string) {
+		let isResizing = false;
+		let startX: number, startY: number, startWidth: number, startHeight: number, startLeft: number, startTop: number;
+	
+		handle.onmousedown = (e) => {
+			e.stopPropagation();
+			isResizing = true;
+			startX = e.clientX;
+			startY = e.clientY;
+			startWidth = container.offsetWidth;
+			startHeight = container.offsetHeight;
+			startLeft = container.offsetLeft;
+			startTop = container.offsetTop;
+
+			document.body.style.cursor = window.getComputedStyle(handle).cursor;
+	
+			const iframe = container.querySelector('#obsidian-clipper-iframe');
+			if (iframe) iframe.classList.add('is-resizing');
+	
+			document.onmousemove = (moveEvent) => {
+				if (!isResizing) return;
+	
+				const dx = moveEvent.clientX - startX;
+				const dy = moveEvent.clientY - startY;
+
+				const minWidth = parseInt(container.style.minWidth) || 200;
+				const minHeight = parseInt(container.style.minHeight) || 200;
+	
+				if (direction.includes('e')) {
+					let newWidth = startWidth + dx;
+					if (newWidth < minWidth) newWidth = minWidth;
+					container.style.width = `${newWidth}px`;
+				}
+				if (direction.includes('w')) {
+					let newWidth = startWidth - dx;
+					if (newWidth < minWidth) {
+						newWidth = minWidth;
+					}
+					container.style.width = `${newWidth}px`;
+				}
+				if (direction.includes('s')) {
+					let newHeight = startHeight + dy;
+					if (newHeight < minHeight) newHeight = minHeight;
+					container.style.height = `${newHeight}px`;
+				}
+				if (direction.includes('n')) {
+					let newHeight = startHeight - dy;
+					let newTop = startTop + dy;
+					if (newHeight < minHeight) {
+						newHeight = minHeight;
+						newTop = startTop + startHeight - minHeight;
+					}
+					container.style.height = `${newHeight}px`;
+					container.style.top = `${newTop}px`;
+				}
+			};
+	
+			document.onmouseup = () => {
+				isResizing = false;
+				const iframe = container.querySelector('#obsidian-clipper-iframe');
+				if (iframe) iframe.classList.remove('is-resizing');
+				document.body.style.cursor = '';
+				
+				const newWidth = container.offsetWidth;
+				const newHeight = container.offsetHeight;
+				browser.storage.local.set({ clipperIframeWidth: newWidth, clipperIframeHeight: newHeight });
+
+				document.onmousemove = null;
+				document.onmouseup = null;
+			};
+		};
+	}
 
 	// Firefox
 	browser.runtime.sendMessage({ action: "contentScriptLoaded" });
-	browser.runtime.onMessage.addListener((request: any, sender, sendResponse) => {
-		if (request.action === "ping") {
-			sendResponse({});
-			return true;
-		}
-	});
 
 	interface ContentResponse {
 		content: string;
@@ -52,7 +171,42 @@ declare global {
 		metaTags: { name?: string | null; property?: string | null; content: string | null }[];
 	}
 
-	browser.runtime.onMessage.addListener((request: any, sender: browser.Runtime.MessageSender, sendResponse: (response?: any) => void) => {
+	browser.runtime.onMessage.addListener((request: any, sender, sendResponse) => {
+		if (request.action === "ping") {
+			sendResponse({});
+			return true;
+		}
+
+		if (request.action === "toggle-iframe") {
+			toggleIframe().then(() => {
+				sendResponse({ success: true });
+			});
+			return true;
+		}
+
+		if (request.action === "close-iframe") {
+			const existingContainer = document.getElementById(containerId);
+			if (existingContainer) {
+				removeContainer(existingContainer);
+			}
+			return;
+		}
+
+		if (request.action === "copy-text-to-clipboard") {
+			const textArea = document.createElement("textarea");
+			textArea.value = request.text;
+			document.body.appendChild(textArea);
+			textArea.select();
+			try {
+				document.execCommand('copy');
+				sendResponse({success: true});
+			} catch (err) {
+				sendResponse({success: false});
+			}
+			document.body.removeChild(textArea);
+			return true;
+		}
+
 		if (request.action === "getPageContent") {
 			let selectedHtml = '';
 			const selection = window.getSelection();
@@ -311,10 +465,16 @@ declare global {
 						tabId = (response as { tabId: number }).tabId;
 					}
 
-					// If we didn't get a tab ID, try to get it from the current tab
+					// If we didn't get a tab ID, try to get it from the background script
 					if (!tabId) {
-						const tabs = await browser.tabs.query({ active: true, currentWindow: true });
-						tabId = tabs[0]?.id;
+						try {
+							const response = await browser.runtime.sendMessage({ action: "getActiveTab" }) as { tabId?: number; error?: string };
+							if (response && !response.error && response.tabId) {
+								tabId = response.tabId;
+							}
+						} catch (error) {
+							console.error('[Content] Failed to get tab ID from background script:', error);
+						}
 					}
 
 					if (tabId) {

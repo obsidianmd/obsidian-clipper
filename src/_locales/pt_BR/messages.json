@@ -201,6 +201,9 @@
 	"editTemplate": {
 		"message": "Editar modelo"
 	},
+	"embedded": {
+		"message": "Embutido"
+	},
 	"enableHighlighter": {
 		"message": "Ativar marcador"
 	},
@@ -514,6 +517,18 @@
 	"open": {
 		"message": "Abrir"
 	},
+	"openBehaviorDescription": {
+		"message": "Escolha como o Web Clipper abre por padrão."
+	},
+	"openBehaviorTitle": {
+		"message": "Comportamento de abertura"
+	},
+	"openEmbedded": {
+		"message": "Abrir na página"
+	},
+	"openSidePanel": {
+		"message": "Abrir painel lateral"
+	},
 	"optional": {
 		"message": "(opcional)"
 	},
@@ -547,6 +562,9 @@
 	"popularModelsDescription": {
 		"message": "Escolha entre os modelos comumente usados ou insira os detalhes do modelo personalizado."
 	},
+	"popup": {
+		"message": "Popup"
+	},
 	"prependToDaily": {
 		"message": "Adicionar à nota diária, no início"
 	},
@@ -564,6 +582,24 @@
 	},
 	"propertyName": {
 		"message": "nome da propriedade"
+	},
+	"propertyTypeCheckbox": {
+		"message": "Caixa de seleção"
+	},
+	"propertyTypeDate": {
+		"message": "Data"
+	},
+	"propertyTypeDatetime": {
+		"message": "Data & hora"
+	},
+	"propertyTypeMultitext": {
+		"message": "Lista"
+	},
+	"propertyTypeNumber": {
+		"message": "Número"
+	},
+	"propertyTypeText": {
+		"message": "Texto"
 	},
 	"propertyValue": {
 		"message": "valor da propriedade"
