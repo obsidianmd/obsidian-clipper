@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "進階"
 	},
+	"advancedSettings": {
+		"message": "進階設定"
+	},
 	"allProperties": {
 		"message": "所有屬性"
 	},
@@ -454,6 +457,42 @@
 	},
 	"modelRequiredFields": {
 		"message": "模型名稱、提供者和模型 ID 是必填的。"
+	},
+	"modelSettingsMaxTokens": {
+		"message": "最大 Token 數"
+	},
+	"modelSettingsMaxTokensDescription": {
+		"message": "回應的最大 Token 數。"
+	},
+	"modelSettingsMaxTokensDescriptionWithLimit": {
+		"message": "回應的最大 Token 數。模型上限：$1"
+	},
+	"modelSettingsReasoning": {
+		"message": "推理模式"
+	},
+	"modelSettingsReasoningDescription": {
+		"message": "覆寫模型預設的推理行為。設定後，模型會以延伸式思考逐步處理複雜問題。"
+	},
+	"modelSettingsReasoningEffort": {
+		"message": "推理強度"
+	},
+	"modelSettingsReasoningEffortDescription": {
+		"message": "模型在回應前投入於內部推理的時間長短。"
+	},
+	"modelSettingsReasoningEffortHigh": {
+		"message": "高"
+	},
+	"modelSettingsReasoningEffortLow": {
+		"message": "低"
+	},
+	"modelSettingsReasoningEffortMedium": {
+		"message": "中"
+	},
+	"modelSettingsTemperature": {
+		"message": "溫度"
+	},
+	"modelSettingsTemperatureDescription": {
+		"message": "控制回應的隨機性。數值越高輸出越有創意，越低則越集中。"
 	},
 	"models": {
 		"message": "模型"

@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Avançado"
 	},
+	"advancedSettings": {
+		"message": "Configurações avançadas"
+	},
 	"allProperties": {
 		"message": "Todas as propriedades"
 	},
@@ -454,6 +457,42 @@
 	},
 	"modelRequiredFields": {
 		"message": "Nome do modelo, Provedor e ID do modelo são obrigatórios."
+	},
+	"modelSettingsMaxTokens": {
+		"message": "Tokens máximos"
+	},
+	"modelSettingsMaxTokensDescription": {
+		"message": "Número máximo de tokens na resposta."
+	},
+	"modelSettingsMaxTokensDescriptionWithLimit": {
+		"message": "Número máximo de tokens na resposta. Limite do modelo: $1"
+	},
+	"modelSettingsReasoning": {
+		"message": "Modo de raciocínio"
+	},
+	"modelSettingsReasoningDescription": {
+		"message": "Substitui o comportamento padrão de raciocínio do modelo. Quando ativado, o modelo usará um pensamento estendido para resolver problemas complexos passo a passo."
+	},
+	"modelSettingsReasoningEffort": {
+		"message": "Esforço de raciocínio"
+	},
+	"modelSettingsReasoningEffortDescription": {
+		"message": "Quanto tempo o modelo dedica ao raciocínio interno antes de responder."
+	},
+	"modelSettingsReasoningEffortHigh": {
+		"message": "Alto"
+	},
+	"modelSettingsReasoningEffortLow": {
+		"message": "Baixo"
+	},
+	"modelSettingsReasoningEffortMedium": {
+		"message": "Médio"
+	},
+	"modelSettingsTemperature": {
+		"message": "Temperatura"
+	},
+	"modelSettingsTemperatureDescription": {
+		"message": "Controla a aleatoriedade das respostas. Valores mais altos tornam a saída mais criativa; valores mais baixos, mais focada."
 	},
 	"models": {
 		"message": "Modelos"

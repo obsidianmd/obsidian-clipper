@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Advanced"
 	},
+	"advancedSettings": {
+		"message": "Mga advanced na setting"
+	},
 	"allProperties": {
 		"message": "Lahat ng katangian"
 	},
@@ -454,6 +457,42 @@
 	},
 	"modelRequiredFields": {
 		"message": "Ang pangalan ng model, provider, at model ID ay kinakailangan."
+	},
+	"modelSettingsMaxTokens": {
+		"message": "Pinakamataas na token"
+	},
+	"modelSettingsMaxTokensDescription": {
+		"message": "Pinakamataas na bilang ng token sa sagot."
+	},
+	"modelSettingsMaxTokensDescriptionWithLimit": {
+		"message": "Pinakamataas na bilang ng token sa sagot. Limit ng modelo: $1"
+	},
+	"modelSettingsReasoning": {
+		"message": "Modo ng pangangatwiran"
+	},
+	"modelSettingsReasoningDescription": {
+		"message": "Papalitan ang default na pag-uugali ng pangangatwiran ng modelo. Kung naka-enable, gagamit ang modelo ng mas malalim na pag-iisip para hakbang-hakbang lutasin ang mga kumplikadong problema."
+	},
+	"modelSettingsReasoningEffort": {
+		"message": "Pagsisikap ng pangangatwiran"
+	},
+	"modelSettingsReasoningEffortDescription": {
+		"message": "Gaano katagal gumugol ang modelo sa panloob na pangangatwiran bago sumagot."
+	},
+	"modelSettingsReasoningEffortHigh": {
+		"message": "Mataas"
+	},
+	"modelSettingsReasoningEffortLow": {
+		"message": "Mababa"
+	},
+	"modelSettingsReasoningEffortMedium": {
+		"message": "Katamtaman"
+	},
+	"modelSettingsTemperature": {
+		"message": "Temperatura"
+	},
+	"modelSettingsTemperatureDescription": {
+		"message": "Kinokontrol ang pagiging random ng mga sagot. Mas mataas na halaga ay nagiging mas malikhain ang output; mas mababa ay mas naka-focus."
 	},
 	"models": {
 		"message": "Mga model"

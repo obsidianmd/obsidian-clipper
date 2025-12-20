@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Advanced"
 	},
+	"advancedSettings": {
+		"message": "उन्नत सेटिंग्स"
+	},
 	"allProperties": {
 		"message": "Sabhi properties"
 	},
@@ -454,6 +457,42 @@
 	},
 	"modelRequiredFields": {
 		"message": "Model name, Provider, aur Model ID jaruri hain."
+	},
+	"modelSettingsMaxTokens": {
+		"message": "अधिकतम टोकन"
+	},
+	"modelSettingsMaxTokensDescription": {
+		"message": "प्रतिक्रिया में अधिकतम टोकन की संख्या।"
+	},
+	"modelSettingsMaxTokensDescriptionWithLimit": {
+		"message": "प्रतिक्रिया में अधिकतम टोकन की संख्या। मॉडल सीमा: $1"
+	},
+	"modelSettingsReasoning": {
+		"message": "तर्क मोड"
+	},
+	"modelSettingsReasoningDescription": {
+		"message": "मॉडल के डिफ़ॉल्ट तर्क व्यवहार को ओवरराइड करें। सेट करने पर मॉडल जटिल समस्याओं को चरण-दर-चरण हल करने के लिए विस्तारित सोच का उपयोग करेगा।"
+	},
+	"modelSettingsReasoningEffort": {
+		"message": "तर्क प्रयास"
+	},
+	"modelSettingsReasoningEffortDescription": {
+		"message": "प्रतिक्रिया देने से पहले मॉडल कितनी देर आंतरिक तर्क पर खर्च करता है।"
+	},
+	"modelSettingsReasoningEffortHigh": {
+		"message": "उच्च"
+	},
+	"modelSettingsReasoningEffortLow": {
+		"message": "कम"
+	},
+	"modelSettingsReasoningEffortMedium": {
+		"message": "मध्यम"
+	},
+	"modelSettingsTemperature": {
+		"message": "टेम्परेचर"
+	},
+	"modelSettingsTemperatureDescription": {
+		"message": "प्रतिक्रियाओं में यादृच्छिकता नियंत्रित करता है। उच्च मान आउटपुट को अधिक रचनात्मक बनाते हैं; कम मान इसे अधिक फोकस्ड बनाते हैं।"
 	},
 	"models": {
 		"message": "Models"

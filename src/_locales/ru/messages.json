@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Расширенные настройки"
 	},
+	"advancedSettings": {
+		"message": "Расширенные настройки"
+	},
 	"allProperties": {
 		"message": "Все свойства"
 	},
@@ -454,6 +457,42 @@
 	},
 	"modelRequiredFields": {
 		"message": "Требуются имя модели, провайдер и ID модели."
+	},
+	"modelSettingsMaxTokens": {
+		"message": "Макс. токенов"
+	},
+	"modelSettingsMaxTokensDescription": {
+		"message": "Максимальное количество токенов в ответе."
+	},
+	"modelSettingsMaxTokensDescriptionWithLimit": {
+		"message": "Максимальное количество токенов в ответе. Лимит модели: $1"
+	},
+	"modelSettingsReasoning": {
+		"message": "Режим рассуждений"
+	},
+	"modelSettingsReasoningDescription": {
+		"message": "Переопределяет поведение модели при рассуждениях. При включении модель будет использовать расширенное размышление для пошагового решения сложных задач."
+	},
+	"modelSettingsReasoningEffort": {
+		"message": "Интенсивность рассуждений"
+	},
+	"modelSettingsReasoningEffortDescription": {
+		"message": "Сколько времени модель тратит на внутренние рассуждения перед ответом."
+	},
+	"modelSettingsReasoningEffortHigh": {
+		"message": "Высокая"
+	},
+	"modelSettingsReasoningEffortLow": {
+		"message": "Низкая"
+	},
+	"modelSettingsReasoningEffortMedium": {
+		"message": "Средняя"
+	},
+	"modelSettingsTemperature": {
+		"message": "Температура"
+	},
+	"modelSettingsTemperatureDescription": {
+		"message": "Контролирует степень случайности в ответах. Более высокие значения делают выводы более креативными, более низкие — более сфокусированными."
 	},
 	"models": {
 		"message": "Модели"

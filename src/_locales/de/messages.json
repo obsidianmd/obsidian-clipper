@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Erweitert"
 	},
+	"advancedSettings": {
+		"message": "Erweiterte Einstellungen"
+	},
 	"allProperties": {
 		"message": "Alle Eigenschaften"
 	},
@@ -454,6 +457,42 @@
 	},
 	"modelRequiredFields": {
 		"message": "Modellname, Anbieter und Modell-ID sind erforderlich."
+	},
+	"modelSettingsMaxTokens": {
+		"message": "Max. Tokens"
+	},
+	"modelSettingsMaxTokensDescription": {
+		"message": "Maximale Anzahl von Tokens in der Antwort."
+	},
+	"modelSettingsMaxTokensDescriptionWithLimit": {
+		"message": "Maximale Anzahl von Tokens in der Antwort. Modelllimit: $1"
+	},
+	"modelSettingsReasoning": {
+		"message": "Denkmodus"
+	},
+	"modelSettingsReasoningDescription": {
+		"message": "Überschreibt das standardmäßige Denkverhalten des Modells. Ist diese Option aktiviert, denkt das Modell ausführlicher und löst komplexe Probleme schrittweise."
+	},
+	"modelSettingsReasoningEffort": {
+		"message": "Denkaufwand"
+	},
+	"modelSettingsReasoningEffortDescription": {
+		"message": "Wie viel Zeit das Modell für interne Überlegungen vor der Antwort verwendet."
+	},
+	"modelSettingsReasoningEffortHigh": {
+		"message": "Hoch"
+	},
+	"modelSettingsReasoningEffortLow": {
+		"message": "Niedrig"
+	},
+	"modelSettingsReasoningEffortMedium": {
+		"message": "Mittel"
+	},
+	"modelSettingsTemperature": {
+		"message": "Temperatur"
+	},
+	"modelSettingsTemperatureDescription": {
+		"message": "Steuert die Zufälligkeit der Antworten. Höhere Werte machen die Ausgabe kreativer, niedrigere fokussierter."
 	},
 	"models": {
 		"message": "Modelle"

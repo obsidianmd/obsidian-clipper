@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "מתקדם"
 	},
+	"advancedSettings": {
+		"message": "הגדרות מתקדמות"
+	},
 	"allProperties": {
 		"message": "כל המאפיינים"
 	},
@@ -454,6 +457,42 @@
 	},
 	"modelRequiredFields": {
 		"message": "שם הדגם, הספק, ומזהה הדגם הם נדרשים."
+	},
+	"modelSettingsMaxTokens": {
+		"message": "מקסימום טוקנים"
+	},
+	"modelSettingsMaxTokensDescription": {
+		"message": "מספר מרבי של טוקנים בתגובה."
+	},
+	"modelSettingsMaxTokensDescriptionWithLimit": {
+		"message": "מספר מרבי של טוקנים בתגובה. מגבלת המודל: $1"
+	},
+	"modelSettingsReasoning": {
+		"message": "מצב הסקה"
+	},
+	"modelSettingsReasoningDescription": {
+		"message": "עקוף את התנהגות ההסקה המוגדרת של המודל. כשמופעל, המודל יבצע חשיבה מורחבת ויעבוד על בעיות מורכבות שלב אחר שלב."
+	},
+	"modelSettingsReasoningEffort": {
+		"message": "מאמץ הסקה"
+	},
+	"modelSettingsReasoningEffortDescription": {
+		"message": "כמה זמן המודל מקדיש להסקה פנימית לפני התגובה."
+	},
+	"modelSettingsReasoningEffortHigh": {
+		"message": "גבוה"
+	},
+	"modelSettingsReasoningEffortLow": {
+		"message": "נמוך"
+	},
+	"modelSettingsReasoningEffortMedium": {
+		"message": "בינוני"
+	},
+	"modelSettingsTemperature": {
+		"message": "טמפרטורה"
+	},
+	"modelSettingsTemperatureDescription": {
+		"message": "שולט במידת האקראיות בתגובות. ערכים גבוהים יוצרים פלט יצירתי יותר, ערכים נמוכים יוצרים פלט ממוקד יותר."
 	},
 	"models": {
 		"message": "דגמים"

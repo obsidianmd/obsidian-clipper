@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Pengaturan Lanjutan"
 	},
+	"advancedSettings": {
+		"message": "Pengaturan lanjutan"
+	},
 	"allProperties": {
 		"message": "Semua properti"
 	},
@@ -454,6 +457,42 @@
 	},
 	"modelRequiredFields": {
 		"message": "Nama model, Penyedia, dan ID Model diperlukan."
+	},
+	"modelSettingsMaxTokens": {
+		"message": "Token maksimum"
+	},
+	"modelSettingsMaxTokensDescription": {
+		"message": "Jumlah maksimum token dalam respons."
+	},
+	"modelSettingsMaxTokensDescriptionWithLimit": {
+		"message": "Jumlah maksimum token dalam respons. Batas model: $1"
+	},
+	"modelSettingsReasoning": {
+		"message": "Mode penalaran"
+	},
+	"modelSettingsReasoningDescription": {
+		"message": "Timpa perilaku penalaran bawaan model. Saat diatur, model akan menggunakan pemikiran yang diperluas untuk menyelesaikan masalah kompleks langkah demi langkah."
+	},
+	"modelSettingsReasoningEffort": {
+		"message": "Upaya penalaran"
+	},
+	"modelSettingsReasoningEffortDescription": {
+		"message": "Seberapa lama model menghabiskan waktu untuk penalaran internal sebelum merespons."
+	},
+	"modelSettingsReasoningEffortHigh": {
+		"message": "Tinggi"
+	},
+	"modelSettingsReasoningEffortLow": {
+		"message": "Rendah"
+	},
+	"modelSettingsReasoningEffortMedium": {
+		"message": "Sedang"
+	},
+	"modelSettingsTemperature": {
+		"message": "Temperatur"
+	},
+	"modelSettingsTemperatureDescription": {
+		"message": "Mengontrol keacakan respons. Nilai lebih tinggi membuat keluaran lebih kreatif, nilai lebih rendah membuat keluaran lebih fokus."
 	},
 	"models": {
 		"message": "Model"

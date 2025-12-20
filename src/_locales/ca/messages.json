@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Avançat"
 	},
+	"advancedSettings": {
+		"message": "Configuració avançada"
+	},
 	"allProperties": {
 		"message": "Totes les propietats"
 	},
@@ -454,6 +457,42 @@
 	},
 	"modelRequiredFields": {
 		"message": "El nom del model, el proveïdor i l'ID del model són obligatoris."
+	},
+	"modelSettingsMaxTokens": {
+		"message": "Tokens màxims"
+	},
+	"modelSettingsMaxTokensDescription": {
+		"message": "Nombre màxim de tokens en la resposta."
+	},
+	"modelSettingsMaxTokensDescriptionWithLimit": {
+		"message": "Nombre màxim de tokens en la resposta. Límit del model: $1"
+	},
+	"modelSettingsReasoning": {
+		"message": "Mode de raonament"
+	},
+	"modelSettingsReasoningDescription": {
+		"message": "Anul·la el comportament de raonament predeterminat del model. Quan s'activa, el model farà un raonament més extens per resoldre problemes complexos pas a pas."
+	},
+	"modelSettingsReasoningEffort": {
+		"message": "Esforç de raonament"
+	},
+	"modelSettingsReasoningEffortDescription": {
+		"message": "Quant de temps dedica el model al raonament intern abans de respondre."
+	},
+	"modelSettingsReasoningEffortHigh": {
+		"message": "Alt"
+	},
+	"modelSettingsReasoningEffortLow": {
+		"message": "Baix"
+	},
+	"modelSettingsReasoningEffortMedium": {
+		"message": "Mitjà"
+	},
+	"modelSettingsTemperature": {
+		"message": "Temperatura"
+	},
+	"modelSettingsTemperatureDescription": {
+		"message": "Controla l'atzar en les respostes. Valors més alts fan la sortida més creativa, valors més baixos la fan més centrada."
 	},
 	"models": {
 		"message": "Models"

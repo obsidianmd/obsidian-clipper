@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "অ্যাডভান্সড"
 	},
+	"advancedSettings": {
+		"message": "উন্নত সেটিংস"
+	},
 	"allProperties": {
 		"message": "সমস্ত প্রপার্টি"
 	},
@@ -454,6 +457,42 @@
 	},
 	"modelRequiredFields": {
 		"message": "মডেলের নাম, প্রোভাইডার এবং মডেল আইডি আবশ্যক।"
+	},
+	"modelSettingsMaxTokens": {
+		"message": "সর্বোচ্চ টোকেন"
+	},
+	"modelSettingsMaxTokensDescription": {
+		"message": "প্রতিক্রিয়ায় টোকেনের সর্বোচ্চ সংখ্যা।"
+	},
+	"modelSettingsMaxTokensDescriptionWithLimit": {
+		"message": "প্রতিক্রিয়ায় টোকেনের সর্বোচ্চ সংখ্যা। মডেলের সীমা: $1"
+	},
+	"modelSettingsReasoning": {
+		"message": "যুক্তি মোড"
+	},
+	"modelSettingsReasoningDescription": {
+		"message": "মডেলের ডিফল্ট যুক্তি-ব্যবহার ওভাররাইড করুন। এটি সেট করলে মডেল জটিল সমস্যা ধাপে ধাপে সমাধান করতে দীর্ঘতর চিন্তা ব্যবহার করবে।"
+	},
+	"modelSettingsReasoningEffort": {
+		"message": "যুক্তি প্রচেষ্টা"
+	},
+	"modelSettingsReasoningEffortDescription": {
+		"message": "উত্তর দেওয়ার আগে মডেলটি অভ্যন্তরীণ যুক্তি/চিন্তায় কতটা সময় ব্যয় করবে।"
+	},
+	"modelSettingsReasoningEffortHigh": {
+		"message": "উচ্চ"
+	},
+	"modelSettingsReasoningEffortLow": {
+		"message": "কম"
+	},
+	"modelSettingsReasoningEffortMedium": {
+		"message": "মধ্যম"
+	},
+	"modelSettingsTemperature": {
+		"message": "টেম্পারেচার"
+	},
+	"modelSettingsTemperatureDescription": {
+		"message": "উত্তরে এলোমেলোতা নিয়ন্ত্রণ করে। উচ্চ মান আউটপুটকে বেশি সৃজনশীল করে, কম মানকে বেশি লক্ষ্যভিত্তিক করে।"
 	},
 	"models": {
 		"message": "মডেলসমূহ"

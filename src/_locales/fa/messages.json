@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "پیشرفته"
 	},
+	"advancedSettings": {
+		"message": "تنظیمات پیشرفته"
+	},
 	"allProperties": {
 		"message": "همه خواص"
 	},
@@ -454,6 +457,42 @@
 	},
 	"modelRequiredFields": {
 		"message": "نام مدل، ارائه دهنده، و شناسه مدل الزامی است."
+	},
+	"modelSettingsMaxTokens": {
+		"message": "حداکثر توکن‌ها"
+	},
+	"modelSettingsMaxTokensDescription": {
+		"message": "حداکثر تعداد توکن‌ها در پاسخ."
+	},
+	"modelSettingsMaxTokensDescriptionWithLimit": {
+		"message": "حداکثر تعداد توکن‌ها در پاسخ. محدودیت مدل: $1"
+	},
+	"modelSettingsReasoning": {
+		"message": "حالت استدلال"
+	},
+	"modelSettingsReasoningDescription": {
+		"message": "رفتار استدلال پیش‌فرض مدل را بازنویسی می‌کند. وقتی فعال باشد، مدل با تفکر گسترده‌تر مسائل پیچیده را گام‌به‌گام بررسی می‌کند."
+	},
+	"modelSettingsReasoningEffort": {
+		"message": "میزان تلاش استدلال"
+	},
+	"modelSettingsReasoningEffortDescription": {
+		"message": "مدت زمانی که مدل قبل از پاسخ برای استدلال داخلی صرف می‌کند."
+	},
+	"modelSettingsReasoningEffortHigh": {
+		"message": "زیاد"
+	},
+	"modelSettingsReasoningEffortLow": {
+		"message": "کم"
+	},
+	"modelSettingsReasoningEffortMedium": {
+		"message": "متوسط"
+	},
+	"modelSettingsTemperature": {
+		"message": "دما"
+	},
+	"modelSettingsTemperatureDescription": {
+		"message": "کنترل میزان تصادفی بودن پاسخ‌ها. مقادیر بالاتر خروجی را خلاقانه‌تر و مقادیر پایین‌تر متمرکزتر می‌کنند."
 	},
 	"models": {
 		"message": "مدل‌ها"

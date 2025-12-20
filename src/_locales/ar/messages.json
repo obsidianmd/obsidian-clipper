@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "متقدم"
 	},
+	"advancedSettings": {
+		"message": "إعدادات متقدمة"
+	},
 	"allProperties": {
 		"message": "جميع الخصائص"
 	},
@@ -454,6 +457,42 @@
 	},
 	"modelRequiredFields": {
 		"message": "اسم النموذج، المزود، ومعرف النموذج مطلوبين."
+	},
+	"modelSettingsMaxTokens": {
+		"message": "الحد الأقصى للتوكنات"
+	},
+	"modelSettingsMaxTokensDescription": {
+		"message": "الحد الأقصى لعدد التوكنات في الاستجابة."
+	},
+	"modelSettingsMaxTokensDescriptionWithLimit": {
+		"message": "الحد الأقصى لعدد التوكنات في الاستجابة. حد النموذج: $1"
+	},
+	"modelSettingsReasoning": {
+		"message": "وضع الاستدلال"
+	},
+	"modelSettingsReasoningDescription": {
+		"message": "تجاوز سلوك الاستدلال الافتراضي للنموذج. عند التفعيل، سيستخدم النموذج تفكيرًا موسعًا لمعالجة المشكلات المعقدة خطوة بخطوة."
+	},
+	"modelSettingsReasoningEffort": {
+		"message": "جهد الاستدلال"
+	},
+	"modelSettingsReasoningEffortDescription": {
+		"message": "مقدار الوقت الذي يقضيه النموذج في الاستدلال الداخلي قبل الرد."
+	},
+	"modelSettingsReasoningEffortHigh": {
+		"message": "عالي"
+	},
+	"modelSettingsReasoningEffortLow": {
+		"message": "منخفض"
+	},
+	"modelSettingsReasoningEffortMedium": {
+		"message": "متوسط"
+	},
+	"modelSettingsTemperature": {
+		"message": "درجة الحرارة"
+	},
+	"modelSettingsTemperatureDescription": {
+		"message": "يتحكم بعشوائية الاستجابات. القيم الأعلى تجعل المخرجات أكثر إبداعًا، والقيم الأدنى تجعلها أكثر تركيزًا."
 	},
 	"models": {
 		"message": "النماذج"

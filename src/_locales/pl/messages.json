@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Zaawansowane"
 	},
+	"advancedSettings": {
+		"message": "Ustawienia zaawansowane"
+	},
 	"allProperties": {
 		"message": "Wszystkie atrybuty"
 	},
@@ -454,6 +457,42 @@
 	},
 	"modelRequiredFields": {
 		"message": "Nazwa modelu, operator i ID modelu są wymagane."
+	},
+	"modelSettingsMaxTokens": {
+		"message": "Maks. tokenów"
+	},
+	"modelSettingsMaxTokensDescription": {
+		"message": "Maksymalna liczba tokenów w odpowiedzi."
+	},
+	"modelSettingsMaxTokensDescriptionWithLimit": {
+		"message": "Maksymalna liczba tokenów w odpowiedzi. Limit modelu: $1"
+	},
+	"modelSettingsReasoning": {
+		"message": "Tryb rozumowania"
+	},
+	"modelSettingsReasoningDescription": {
+		"message": "Zastąp domyślne zachowanie modelu dotyczące rozumowania. Po włączeniu model będzie stosować rozszerzone myślenie, aby krok po kroku rozwiązywać złożone problemy."
+	},
+	"modelSettingsReasoningEffort": {
+		"message": "Wysiłek rozumowania"
+	},
+	"modelSettingsReasoningEffortDescription": {
+		"message": "Ile czasu model poświęca na wewnętrzne rozumowanie przed udzieleniem odpowiedzi."
+	},
+	"modelSettingsReasoningEffortHigh": {
+		"message": "Wysoki"
+	},
+	"modelSettingsReasoningEffortLow": {
+		"message": "Niski"
+	},
+	"modelSettingsReasoningEffortMedium": {
+		"message": "Średni"
+	},
+	"modelSettingsTemperature": {
+		"message": "Temperatura"
+	},
+	"modelSettingsTemperatureDescription": {
+		"message": "Kontroluje losowość odpowiedzi. Wyższe wartości zwiększają kreatywność, niższe — skupienie."
 	},
 	"models": {
 		"message": "Modele"
