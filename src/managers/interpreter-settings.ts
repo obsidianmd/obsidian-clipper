@@ -5,7 +5,56 @@ import { initializeIcons } from '../icons/icons';
 import { showModal, hideModal } from '../utils/modal-utils';
 import { getMessage, translatePage } from '../utils/i18n';
 import { debugLog } from '../utils/debug';
+import { initializeRegistry, getProviderDetails, isInitialized as isRegistryInitialized, getModel as getModelFromRegistry, getModelCapabilityHints } from '../ai-sdk/model-registry';
+import { getDefaultBaseUrl } from '../ai-sdk/provider-factory';
+import { ModelSettings, ReasoningEffort } from '../types/types';
 
+/**
+ * Pretty display names for provider IDs
+ * Maps models.dev provider IDs to human-friendly names
+ */
+const PROVIDER_DISPLAY_NAMES: Record<string, string> = {
+	'anthropic': 'Anthropic',
+	'azure': 'Azure OpenAI',
+	'azure-openai': 'Azure OpenAI',
+	'deepseek': 'DeepSeek',
+	'google': 'Google Gemini',
+	'google-gemini': 'Google Gemini',
+	'huggingface': 'Hugging Face',
+	'meta': 'Meta',
+	'openai': 'OpenAI',
+	'openrouter': 'OpenRouter',
+	'perplexity': 'Perplexity',
+	'xai': 'xAI',
+};
+
+/**
+ * Get pretty display name for a provider ID
+ */
+function getProviderDisplayName(providerId: string, fallbackName?: string): string {
+	return PROVIDER_DISPLAY_NAMES[providerId] || fallbackName || providerId.charAt(0).toUpperCase() + providerId.slice(1);
+}
+
+/**
+ * Simplified preset data from providers.json (only contains what models.dev doesn't have)
+ */
+interface ProviderPresetData {
+	apiKeyUrl?: string;
+	apiKeyRequired?: boolean;
+	baseUrl?: string; // Only for providers not in models.dev (e.g., Ollama local)
+	fallbackModels?: Record<string, {
+		name: string;
+		tool_call?: boolean;
+		reasoning?: boolean;
+		temperature?: boolean;
+		limit?: { context: number; output: number };
+		cost?: { input: number; output: number };
+	}>;
+}
+
+/**
+ * Full provider preset with merged data from models.dev + providers.json
+ */
 export interface PresetProvider {
 	id: string;
 	name: string;
@@ -20,9 +69,10 @@ export interface PresetProvider {
 	}>;
 }
 
-interface ProviderPresets {
+interface ProviderPresetsFile {
 	version: string;
-	[key: string]: PresetProvider | string;
+	_comment?: string;
+	[key: string]: ProviderPresetData | string | undefined;
 }
 
 const PROVIDERS_URL = 'https://raw.githubusercontent.com/obsidianmd/obsidian-clipper/refs/heads/main/providers.json';
@@ -37,28 +87,66 @@ let isFetching = false;
 
 let cachedPresetProviders: Record<string, PresetProvider> | null = null;
 
+/**
+ * Merge providers.json data with models.dev data to create full PresetProvider objects
+ */
+function mergeProviderData(providerId: string, presetData: ProviderPresetData): PresetProvider {
+	// Get data from models.dev registry
+	const modelsDevData = getProviderDetails(providerId);
+
+	// Determine base URL: preset override > models.dev > centralized defaults
+	const baseUrl = presetData.baseUrl || modelsDevData?.baseUrl || getDefaultBaseUrl(providerId);
+
+	// Derive popularModels from fallbackModels keys (ordered by price, most expensive first)
+	const popularModels = presetData.fallbackModels 
+		? Object.entries(presetData.fallbackModels).map(([modelId, modelData], index) => {
+			// Try to get display name from models.dev, fallback to provided name or ID
+			const modelsDevModel = getModelFromRegistry(providerId, modelId);
+			return {
+				id: modelId,
+				name: modelsDevModel?.name || modelData.name || modelId,
+				recommended: index === 0 // First model is recommended
+			};
+		})
+		: undefined;
+
+	return {
+		id: providerId,
+		name: getProviderDisplayName(providerId, modelsDevData?.name),
+		baseUrl: baseUrl,
+		apiKeyUrl: presetData.apiKeyUrl,
+		apiKeyRequired: presetData.apiKeyRequired !== false, // Default to true
+		modelsList: modelsDevData?.docUrl,
+		popularModels
+	};
+}
+
 async function fetchPresetProviders(): Promise<Record<string, PresetProvider>> {
 	debugLog('Providers', 'Fetching preset providers from URL:', PROVIDERS_URL);
 	try {
+		// Ensure models.dev registry is initialized
+		if (!isRegistryInitialized()) {
+			await initializeRegistry();
+		}
+
 		const response = await fetch(PROVIDERS_URL);
 		if (!response.ok) {
 			throw new Error(`HTTP error! status: ${response.status}`);
 		}
-		const data = await response.json() as ProviderPresets;
+		const data = await response.json() as ProviderPresetsFile;
 		
 		await setLocalStorage(LOCAL_STORAGE_KEY, data);
 		debugLog('Providers', 'Stored providers in local storage:', data);
 
 		const providers: Record<string, PresetProvider> = {};
 		for (const key in data) {
-			if (key !== 'version' && Object.prototype.hasOwnProperty.call(data, key)) {
-				const provider = data[key] as PresetProvider;
-				provider.id = key;
-				providers[key] = provider;
+			if (key !== 'version' && key !== '_comment' && Object.prototype.hasOwnProperty.call(data, key)) {
+				const presetData = data[key] as ProviderPresetData;
+				providers[key] = mergeProviderData(key, presetData);
 			}
 		}
 
-		debugLog('Providers', 'Successfully fetched presets:', providers);
+		debugLog('Providers', 'Successfully fetched and merged presets:', providers);
 		return providers;
 	} catch (error) {
 		console.error('Failed to fetch preset providers:', error);
@@ -68,15 +156,19 @@ async function fetchPresetProviders(): Promise<Record<string, PresetProvider>> {
 
 async function getLocalPresets(): Promise<Record<string, PresetProvider> | null> {
 	try {
-		const data = await getLocalStorage(LOCAL_STORAGE_KEY) as ProviderPresets | null;
+		// Ensure models.dev registry is initialized
+		if (!isRegistryInitialized()) {
+			await initializeRegistry();
+		}
+
+		const data = await getLocalStorage(LOCAL_STORAGE_KEY) as ProviderPresetsFile | null;
 		if (!data) return null;
 
 		const providers: Record<string, PresetProvider> = {};
 		for (const key in data) {
-			if (key !== 'version' && Object.prototype.hasOwnProperty.call(data, key)) {
-				const provider = data[key] as PresetProvider;
-				provider.id = key;
-				providers[key] = provider;
+			if (key !== 'version' && key !== '_comment' && Object.prototype.hasOwnProperty.call(data, key)) {
+				const presetData = data[key] as ProviderPresetData;
+				providers[key] = mergeProviderData(key, presetData);
 			}
 		}
 		return providers;
@@ -88,12 +180,12 @@ async function getLocalPresets(): Promise<Record<string, PresetProvider> | null>
 
 async function shouldUpdatePresets(): Promise<boolean> {
 	try {
-		const localData = await getLocalStorage(LOCAL_STORAGE_KEY) as ProviderPresets | null;
+		const localData = await getLocalStorage(LOCAL_STORAGE_KEY) as ProviderPresetsFile | null;
 		
 		const response = await fetch(PROVIDERS_URL);
 		if (!response.ok) return false;
 		
-		const remoteData = await response.json() as ProviderPresets;
+		const remoteData = await response.json() as ProviderPresetsFile;
 		const remoteVersion = remoteData.version;
 
 		if (!localData) return true;
@@ -269,7 +361,7 @@ function initializeProviderList() {
 
 	// Clear existing providers
 	providerList.textContent = '';
-	sortedProviders.forEach((provider, index) => {
+	sortedProviders.forEach((provider) => {
 		const originalIndex = generalSettings.providers.findIndex(p => p.id === provider.id);
 		const providerItem = createProviderListItem(provider, originalIndex);
 		providerList.appendChild(providerItem);
@@ -459,6 +551,9 @@ async function showProviderModal(provider: Provider, index?: number) {
 	}
 
 	const form = modal.querySelector('#provider-form') as HTMLFormElement;
+	// Track cleanup function for event listeners
+	let cleanupProviderModal: (() => void) | null = null;
+	
 	if (form) {
 		const nameInput = form.querySelector('[name="name"]') as HTMLInputElement;
 		const baseUrlInput = form.querySelector('[name="baseUrl"]') as HTMLInputElement;
@@ -466,7 +561,7 @@ async function showProviderModal(provider: Provider, index?: number) {
 		const presetSelect = form.querySelector('[name="preset"]') as HTMLSelectElement;
 		const nameContainer = nameInput.closest('.setting-item') as HTMLElement;
 		const apiKeyContainer = apiKeyInput.closest('.setting-item') as HTMLElement;
-		const apiKeyDescription = form.querySelector('.setting-item:has([name="apiKey"]) .setting-item-description') as HTMLElement;
+		const apiKeyDescription = apiKeyInput.closest('.setting-item')?.querySelector('.setting-item-description') as HTMLElement;
 
 		if (!apiKeyContainer || !apiKeyDescription || !nameContainer || !presetSelect || !nameInput || !baseUrlInput || !apiKeyInput) {
 			console.error('Required provider modal elements not found');
@@ -559,6 +654,11 @@ async function showProviderModal(provider: Provider, index?: number) {
 
 		presetSelect.addEventListener('change', updateVisibility);
 		updateVisibility();
+		
+		// Set cleanup function to remove event listeners when modal closes
+		cleanupProviderModal = () => {
+			presetSelect.removeEventListener('change', updateVisibility);
+		};
 	}
 
 	const confirmBtn = modal.querySelector('.provider-confirm-btn');
@@ -599,6 +699,7 @@ async function showProviderModal(provider: Provider, index?: number) {
 			const providerPreset = cachedPresetProviders[presetId];
 			
 			updatedProvider.name = providerPreset.name;
+			updatedProvider.presetId = presetId; // Save the models.dev provider ID for model lookups
 			
 			const providerPresetBaseUrl = providerPreset.baseUrl;
 			// Use the user-provided baseUrl if it's different from the preset baseUrl
@@ -618,6 +719,7 @@ async function showProviderModal(provider: Provider, index?: number) {
 			await saveSettings();
 			debugLog('Providers', 'Settings saved');
 			initializeProviderList();
+			cleanupProviderModal?.();
 			hideModal(modal);
 		} catch (error) {
 			console.error('Failed to save settings:', error);
@@ -626,6 +728,7 @@ async function showProviderModal(provider: Provider, index?: number) {
 	});
 
 	newCancelBtn?.addEventListener('click', () => {
+		cleanupProviderModal?.();
 		hideModal(modal);
 	});
 
@@ -827,11 +930,21 @@ async function showModelModal(model: ModelConfig, index?: number) {
 	const form = modal.querySelector('#model-form') as HTMLFormElement;
 	if (form) {
 		const providerSelect = form.querySelector('[name="providerId"]') as HTMLSelectElement;
-		const modelIdDescriptionContainer = form.querySelector('.setting-item:has([name="providerModelId"]) .setting-item-description') as HTMLElement;
-		const modelSelectionContainer = form.querySelector('.model-selection-container') as HTMLElement;
-		const modelSelectionRadios = form.querySelector('#model-selection-radios') as HTMLElement;
 		const nameInput = form.querySelector('[name="name"]') as HTMLInputElement;
 		const providerModelIdInput = form.querySelector('[name="providerModelId"]') as HTMLInputElement;
+		const modelIdDescriptionContainer = providerModelIdInput.closest('.setting-item')?.querySelector('.setting-item-description') as HTMLElement;
+		const modelSelectionContainer = form.querySelector('.model-selection-container') as HTMLElement;
+		const modelSelectionRadios = form.querySelector('#model-selection-radios') as HTMLElement;
+
+		// Advanced settings elements
+		const temperatureInput = form.querySelector('[name="temperature"]') as HTMLInputElement;
+		const maxTokensInput = form.querySelector('[name="maxTokens"]') as HTMLInputElement;
+		const maxTokensDescription = form.querySelector('#model-max-tokens-description') as HTMLElement;
+		const reasoningSetting = form.querySelector('#model-reasoning-setting') as HTMLElement;
+		const reasoningToggle = form.querySelector('[name="reasoningEnabled"]') as HTMLInputElement;
+		const reasoningEffortSetting = form.querySelector('#model-reasoning-effort-setting') as HTMLElement;
+		const reasoningEffortSelect = form.querySelector('[name="reasoningEffort"]') as HTMLSelectElement;
+		const temperatureSetting = form.querySelector('#model-temperature-setting') as HTMLElement;
 
 		if (!modelIdDescriptionContainer || !modelSelectionContainer || !modelSelectionRadios || !nameInput || !providerModelIdInput || !providerSelect) {
 			console.error('Required model modal form elements not found');
@@ -865,6 +978,103 @@ async function showModelModal(model: ModelConfig, index?: number) {
 		// Clear model selection radios
 		modelSelectionRadios.textContent = '';
 		modelIdDescriptionContainer.textContent = getMessage('providerModelIdDescription');
+
+		// Reset advanced settings to defaults
+		if (temperatureInput) temperatureInput.value = '';
+		if (maxTokensInput) maxTokensInput.value = '';
+		if (reasoningToggle) reasoningToggle.checked = false;
+		if (reasoningEffortSelect) reasoningEffortSelect.value = 'medium';
+		// Set default max tokens description (without model limit)
+		if (maxTokensDescription) {
+			maxTokensDescription.textContent = getMessage('modelSettingsMaxTokensDescription');
+		}
+
+		/**
+		 * Update advanced settings UI based on model capabilities
+		 */
+		const updateAdvancedSettings = (presetId: string | undefined, modelId: string) => {
+			if (!presetId || !modelId) {
+				// Hide reasoning settings if we can't determine capabilities
+				if (reasoningSetting) reasoningSetting.style.display = 'none';
+				if (reasoningEffortSetting) reasoningEffortSetting.style.display = 'none';
+				if (temperatureSetting) temperatureSetting.style.display = 'block';
+				return;
+			}
+
+			const capabilities = getModelCapabilityHints(presetId, modelId);
+			debugLog('Models', 'Model capabilities:', { presetId, modelId, capabilities });
+
+			// Update temperature visibility
+			if (temperatureSetting) {
+				temperatureSetting.style.display = capabilities.supportsTemperature ? 'block' : 'none';
+			}
+
+			// Update max tokens description with model limit
+			if (maxTokensDescription) {
+				if (capabilities.maxOutputTokens) {
+					const limitText = getMessage('modelSettingsMaxTokensDescriptionWithLimit', capabilities.maxOutputTokens.toLocaleString());
+					maxTokensDescription.textContent = limitText;
+				} else {
+					maxTokensDescription.textContent = getMessage('modelSettingsMaxTokensDescription');
+				}
+				if (maxTokensInput && capabilities.maxOutputTokens) {
+					maxTokensInput.max = capabilities.maxOutputTokens.toString();
+					maxTokensInput.placeholder = Math.min(4096, capabilities.maxOutputTokens).toString();
+				}
+			}
+
+			// Update reasoning settings visibility
+			if (reasoningSetting) {
+				reasoningSetting.style.display = capabilities.supportsReasoning ? 'flex' : 'none';
+			}
+			if (reasoningEffortSetting) {
+				const showEffort = capabilities.supportsReasoning && reasoningToggle?.checked;
+				reasoningEffortSetting.style.display = showEffort ? 'block' : 'none';
+			}
+		};
+
+		// Track event listeners for cleanup when modal closes
+		const cleanupListeners: Array<() => void> = [];
+		let modelIdInputTimeout: ReturnType<typeof setTimeout> | undefined;
+		// Track the current model selection handler to avoid stacking listeners
+		let currentModelSelectionHandler: ((e: Event) => void) | null = null;
+
+		// Handle reasoning toggle change to show/hide effort selector
+		if (reasoningToggle) {
+			const handleReasoningToggle = () => {
+				if (reasoningEffortSetting) {
+					reasoningEffortSetting.style.display = reasoningToggle.checked ? 'block' : 'none';
+				}
+			};
+			reasoningToggle.addEventListener('change', handleReasoningToggle);
+			cleanupListeners.push(() => reasoningToggle.removeEventListener('change', handleReasoningToggle));
+		}
+
+		// Handle model ID input change to update capabilities
+		if (providerModelIdInput) {
+			const handleModelIdInput = () => {
+				clearTimeout(modelIdInputTimeout);
+				modelIdInputTimeout = setTimeout(() => {
+					const selectedProviderId = providerSelect.value;
+					const provider = generalSettings.providers.find(p => p.id === selectedProviderId);
+					const presetId = provider?.presetId;
+					updateAdvancedSettings(presetId, providerModelIdInput.value);
+				}, 300);
+			};
+			providerModelIdInput.addEventListener('input', handleModelIdInput);
+			cleanupListeners.push(() => providerModelIdInput.removeEventListener('input', handleModelIdInput));
+		}
+
+		// Cleanup function to remove all event listeners and clear timeouts
+		const cleanupModelModal = () => {
+			clearTimeout(modelIdInputTimeout);
+			cleanupListeners.forEach(cleanup => cleanup());
+			// Remove model selection handler if it exists
+			if (currentModelSelectionHandler) {
+				modelSelectionRadios.removeEventListener('change', currentModelSelectionHandler);
+				currentModelSelectionHandler = null;
+			}
+		};
 
 		const updateModelOptions = () => {
 			const selectedProviderId = providerSelect.value;
@@ -961,7 +1171,13 @@ async function showModelModal(model: ModelConfig, index?: number) {
 						}
 					}
 
-					modelSelectionRadios.addEventListener('change', (e) => {
+					// Remove previous listener before adding new one to prevent stacking
+					if (currentModelSelectionHandler) {
+						modelSelectionRadios.removeEventListener('change', currentModelSelectionHandler);
+					}
+
+					// Create and track the model selection handler
+					currentModelSelectionHandler = (e: Event) => {
 						const target = e.target as HTMLInputElement;
 						if (!target || target.name !== 'model-selection') return;
 
@@ -972,6 +1188,8 @@ async function showModelModal(model: ModelConfig, index?: number) {
 							}
 							nameInput.disabled = false;
 							providerModelIdInput.disabled = false;
+							// Update capabilities for custom model
+							updateAdvancedSettings(provider?.presetId, providerModelIdInput.value);
 						} else {
 							const selectedPopModel = presetProvider.popularModels?.find(m => m.id === target.value);
 							if (selectedPopModel) {
@@ -979,20 +1197,55 @@ async function showModelModal(model: ModelConfig, index?: number) {
 								providerModelIdInput.value = selectedPopModel.id;
 								nameInput.disabled = false; 
 								providerModelIdInput.disabled = false; 
+								// Update capabilities for selected model
+								updateAdvancedSettings(provider?.presetId, selectedPopModel.id);
 							}
 						}
-					});
+					};
+					modelSelectionRadios.addEventListener('change', currentModelSelectionHandler);
 				}
+			}
+
+			// Update advanced settings for initial model selection
+			const currentModelId = providerModelIdInput.value;
+			if (currentModelId) {
+				updateAdvancedSettings(provider?.presetId, currentModelId);
 			}
 		};
 
 		providerSelect.addEventListener('change', updateModelOptions);
+		cleanupListeners.push(() => providerSelect.removeEventListener('change', updateModelOptions));
 
 		if (index !== undefined) {
 			providerSelect.value = model.providerId;
 			updateModelOptions(); 
 			nameInput.value = model.name;
 			providerModelIdInput.value = model.providerModelId || '';
+
+			// Populate advanced settings from existing model
+			if (model.settings) {
+				if (temperatureInput && model.settings.temperature !== undefined) {
+					temperatureInput.value = model.settings.temperature.toString();
+				}
+				if (maxTokensInput && model.settings.maxTokens !== undefined) {
+					maxTokensInput.value = model.settings.maxTokens.toString();
+				}
+				if (reasoningToggle && model.settings.reasoningEnabled !== undefined) {
+					reasoningToggle.checked = model.settings.reasoningEnabled;
+				}
+				if (reasoningEffortSelect && model.settings.reasoningEffort) {
+					reasoningEffortSelect.value = model.settings.reasoningEffort;
+				}
+			}
+
+			// Update advanced settings UI based on model capabilities
+			const provider = generalSettings.providers.find(p => p.id === model.providerId);
+			updateAdvancedSettings(provider?.presetId, model.providerModelId);
+
+			// Ensure reasoning effort is visible if reasoning is enabled
+			if (reasoningToggle?.checked && reasoningEffortSetting) {
+				reasoningEffortSetting.style.display = 'block';
+			}
 		} else {
 			if (sortedProviders.length > 0) {
 				// Maybe default to first provider? Or leave blank? Let's leave blank for now.
@@ -1039,6 +1292,43 @@ async function showModelModal(model: ModelConfig, index?: number) {
 				return;
 			}
 
+			// Collect advanced settings
+			const settings: ModelSettings = {};
+			
+			const temperatureValue = temperatureInput?.value;
+			if (temperatureValue && temperatureValue.trim() !== '') {
+				const temp = parseFloat(temperatureValue);
+				if (!isNaN(temp) && temp >= 0 && temp <= 2) {
+					settings.temperature = temp;
+				}
+			}
+
+			const maxTokensValue = maxTokensInput?.value;
+			if (maxTokensValue && maxTokensValue.trim() !== '') {
+				const tokens = parseInt(maxTokensValue, 10);
+				if (!isNaN(tokens) && tokens > 0) {
+					settings.maxTokens = tokens;
+				}
+			}
+
+			// Only save reasoning settings if the model supports it
+			const provider = generalSettings.providers.find(p => p.id === selectedProviderId);
+			const capabilities = getModelCapabilityHints(provider?.presetId || '', updatedModel.providerModelId);
+			
+			if (capabilities.supportsReasoning) {
+				settings.reasoningEnabled = reasoningToggle?.checked || false;
+				if (settings.reasoningEnabled && reasoningEffortSelect?.value) {
+					settings.reasoningEffort = reasoningEffortSelect.value as ReasoningEffort;
+				}
+			}
+
+			// Only add settings if any were set
+			if (Object.keys(settings).length > 0) {
+				updatedModel.settings = settings;
+			}
+
+			debugLog('Models', 'Saving model with settings:', { model: updatedModel, settings });
+
 			if (index !== undefined) {
 				generalSettings.models[index] = updatedModel;
 			} else {
@@ -1048,6 +1338,7 @@ async function showModelModal(model: ModelConfig, index?: number) {
 			try {
 				await saveSettings();
 				initializeModelList();
+				cleanupModelModal();
 				hideModal(modal);
 			} catch (error) {
 				console.error('Failed to save model settings:', error);
@@ -1056,6 +1347,7 @@ async function showModelModal(model: ModelConfig, index?: number) {
 		});
 
 		newCancelBtn?.addEventListener('click', () => {
+			cleanupModelModal();
 			hideModal(modal);
 		});
 
