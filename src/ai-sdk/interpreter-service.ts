@@ -332,7 +332,7 @@ export async function interpret(options: InterpreterOptions): Promise<Interprete
 					finishReason?: string;
 				};
 
-				debugLog('InterpreterService', 'generateObject failed', {
+				debugLog('InterpreterService', 'generateObject failed, falling back to generateText', {
 					error: aiError.message || String(genError),
 					errorName: aiError.name || 'unknown',
 					cause: aiError.cause,
@@ -342,7 +342,31 @@ export async function interpret(options: InterpreterOptions): Promise<Interprete
 					response: aiError.response,
 					usage: aiError.usage,
 				});
-				throw genError;
+
+				// Fallback: try generateText with manual JSON parsing
+				// This handles models that claim tool_call support but fail in practice
+				const generateText = await getGenerateText();
+
+				const fallbackResult = await generateText({
+					model,
+					system: systemPrompt,
+					messages: [
+						{ role: 'user', content: options.context },
+						{ role: 'user', content: JSON.stringify(promptContent) },
+					],
+					maxOutputTokens: maxTokens,
+					temperature,
+					...(providerOptions && { providerOptions }),
+				});
+
+				// Parse JSON from the text response
+				parsedResponse = parseJsonFromText(fallbackResult.text);
+				usage = fallbackResult.usage;
+
+				debugLog('InterpreterService', 'Fallback generateText succeeded', {
+					responseKeys: getResponseKeys(parsedResponse),
+					rawTextLength: fallbackResult.text.length,
+				});
 			}
 
 			debugLog('InterpreterService', 'Received structured response', {

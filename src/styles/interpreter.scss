@@ -157,12 +157,16 @@
 	}
 
 	.token-counter {
-		display: none;
+		display: block;
 		padding: 0.5rem 0.5rem;
 		font-size: 0.6875rem;
 		color: var(--text-muted);
 		font-family: var(--font-monospace-default);
 		border-top: 1px solid var(--interpreter-border-color);
+		
+		&:empty {
+			display: none;
+		}
 		
 		&.warning {
 			color: var(--text-warning);
@@ -170,6 +174,10 @@
 		
 		&.error {
 			color: var(--text-error);
+		}
+		
+		&.usage-complete {
+			color: var(--text-success);
 		}
 	}
 

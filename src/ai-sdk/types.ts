@@ -6,22 +6,22 @@
  * Supported provider types that map to AI SDK implementations
  */
 export type SupportedProvider =
-	| 'openai'            // api.openai.com
-	| 'anthropic'         // api.anthropic.com
+	| 'openai'            // api.openai.com (chat/completions API)
+	| 'openai-responses'  // OpenAI responses API (v1/responses)
+	| 'anthropic'         // api.anthropic.com (v1/messages API)
 	| 'google'            // generativelanguage.googleapis.com
 	| 'azure'             // *.openai.azure.com
-	| 'ollama'            // Local Ollama (uses ollama-ai-provider)
-	| 'openai-compatible'; // DeepSeek, Perplexity, OpenRouter, xAI, Meta, etc.
+	| 'openai-compatible'; // DeepSeek, Perplexity, OpenRouter, xAI, Meta, Ollama, etc.
 
 /**
  * Array of all valid provider types for runtime validation
  */
 export const SUPPORTED_PROVIDERS: readonly SupportedProvider[] = [
 	'openai',
+	'openai-responses',
 	'anthropic',
 	'google',
 	'azure',
-	'ollama',
 	'openai-compatible'
 ] as const;
 

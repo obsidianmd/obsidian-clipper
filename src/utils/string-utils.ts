@@ -191,3 +191,21 @@ export function getDomain(url: string): string {
 		return '';
 	}
 }
+
+/**
+ * Format a cost value for display
+ * Shows "< $0.001" for very small costs, otherwise shows 3-4 decimal places
+ * 
+ * @param cost - Cost in USD
+ * @param approximate - Whether to prefix with ~ for estimates (default: false)
+ */
+export function formatCost(cost: number, approximate: boolean = false): string {
+	const prefix = approximate ? '~' : '';
+	if (cost < 0.001) {
+		return '< $0.001';
+	}
+	if (cost < 0.01) {
+		return `${prefix}$${cost.toFixed(4)}`;
+	}
+	return `${prefix}$${cost.toFixed(3)}`;
+}

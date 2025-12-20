@@ -64,7 +64,6 @@ const DEFAULT_BASE_URLS: Record<string, string> = {
 	'perplexity': 'https://api.perplexity.ai/chat/completions',
 	'deepseek': 'https://api.deepseek.com/v1/chat/completions',
 	'openrouter': 'https://openrouter.ai/api/v1/chat/completions',
-	'ollama': 'http://127.0.0.1:11434/v1',
 	'meta': 'https://api.llama.com/v1/chat/completions',
 };
 
@@ -81,8 +80,8 @@ export function getDefaultBaseUrl(providerId: string): string {
  * Dynamically load a provider factory
  */
 async function loadProviderFactory(providerType: SupportedProvider): Promise<unknown> {
-	// Normalize provider type - ollama uses openai-compatible
-	const cacheKey = providerType === 'ollama' ? 'openai' : providerType;
+	// Normalize provider type for caching
+	const cacheKey = providerType === 'openai-responses' ? 'openai' : providerType;
 	
 	if (providerCache.has(cacheKey)) {
 		return providerCache.get(cacheKey)!;
@@ -108,13 +107,13 @@ async function loadProviderFactory(providerType: SupportedProvider): Promise<unk
 			break;
 		}
 		// All OpenAI-compatible providers use the same factory:
-		// - OpenAI (native)
+		// - OpenAI (native chat/completions)
+		// - OpenAI responses API (v1/responses)
 		// - Azure OpenAI (with custom headers)
-		// - Ollama (local, exposes /v1 endpoint)
-		// - OpenAI-compatible (DeepSeek, Perplexity, OpenRouter, xAI, etc.)
+		// - OpenAI-compatible (DeepSeek, Perplexity, OpenRouter, xAI, Ollama, etc.)
 		case 'openai':
+		case 'openai-responses':
 		case 'azure':
-		case 'ollama':
 		case 'openai-compatible':
 		default: {
 			const { createOpenAI } = await import(
@@ -131,30 +130,57 @@ async function loadProviderFactory(providerType: SupportedProvider): Promise<unk
 }
 
 /**
+ * Detect API type from URL path
+ * This enables custom providers to work with different API formats based on their URL
+ */
+function detectApiTypeFromPath(baseUrl: string): SupportedProvider | null {
+	const url = (baseUrl || '').toLowerCase();
+	
+	// Check for specific API paths
+	if (url.includes('/v1/messages') || url.includes('/messages')) {
+		return 'anthropic';
+	}
+	if (url.includes('/v1/responses') || url.includes('/responses')) {
+		return 'openai-responses';
+	}
+	if (url.includes('/v1/chat/completions') || url.includes('/chat/completions')) {
+		return 'openai-compatible';
+	}
+	
+	return null;
+}
+
+/**
  * Detect provider type from URL and name
+ * 
+ * Detection priority:
+ * 1. Well-known provider domains (api.anthropic.com, api.openai.com, etc.)
+ * 2. URL path patterns (/v1/messages -> anthropic, /v1/responses -> openai-responses, /v1/chat/completions -> openai-compatible)
+ * 3. Provider name matching
+ * 4. Default to openai-compatible
  */
 export function detectProviderType(baseUrl: string, name: string): SupportedProvider {
 	const url = (baseUrl || '').toLowerCase();
 	const n = name.toLowerCase();
 
-	// Check URL patterns first (more reliable)
+	// Check well-known provider domains first (most reliable)
 	if (url.includes('api.anthropic.com')) return 'anthropic';
 	if (url.includes('openai.azure.com')) return 'azure';
 	if (url.includes('generativelanguage.googleapis.com')) return 'google';
-	if (url.includes('127.0.0.1:11434') || url.includes('localhost:11434')) return 'ollama';
-	
-	// Check for OpenAI specifically (not just openai-compatible)
 	if (url.includes('api.openai.com')) return 'openai';
+
+	// Check URL path for API type detection (for custom providers)
+	const pathBasedType = detectApiTypeFromPath(baseUrl);
+	if (pathBasedType) return pathBasedType;
 
 	// Fall back to name-based detection
 	if (n.includes('anthropic') || n.includes('claude')) return 'anthropic';
 	if (n.includes('gemini') || n.includes('google')) return 'google';
-	if (n.includes('ollama')) return 'ollama';
 	if (n.includes('azure')) return 'azure';
 	if (n === 'openai') return 'openai';
 
 	// Default to OpenAI-compatible for everything else
-	// (DeepSeek, Perplexity, OpenRouter, xAI, Meta, Hugging Face, etc.)
+	// (DeepSeek, Perplexity, OpenRouter, xAI, Meta, Hugging Face, Ollama, etc.)
 	return 'openai-compatible';
 }
 
@@ -179,10 +205,8 @@ export async function createLanguageModel(
 			return createGoogleModel(config, modelId);
 		case 'azure':
 			return createAzureModel(config, modelId);
-		case 'ollama':
-			// Ollama supports OpenAI-compatible API
-			return createOllamaModel(config, modelId);
 		case 'openai':
+		case 'openai-responses':
 		case 'openai-compatible':
 		default:
 			return createOpenAIModel(config, modelId);
@@ -191,16 +215,30 @@ export async function createLanguageModel(
 
 /**
  * Create Anthropic model instance
+ * Also used for custom providers using the Anthropic /v1/messages API
  */
 async function createAnthropicModel(config: ProviderConfig, modelId: string): Promise<LanguageModel> {
 	const createAnthropic = await loadProviderFactory('anthropic') as typeof import('@ai-sdk/anthropic').createAnthropic;
-	const anthropic = createAnthropic({
+	
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const options: any = {
 		apiKey: config.apiKey,
 		headers: {
 			'anthropic-dangerous-direct-browser-access': 'true',
 			...config.headers
 		}
-	});
+	};
+	
+	// Support custom base URL for Anthropic-compatible providers
+	if (config.baseUrl && !config.baseUrl.includes('api.anthropic.com')) {
+		// Clean up URL - remove /messages suffix as the SDK adds it
+		let baseUrl = config.baseUrl.replace(/\/messages\/?$/, '');
+		// Also handle /v1/messages -> /v1
+		baseUrl = baseUrl.replace(/\/v1\/messages\/?$/, '/v1');
+		options.baseURL = baseUrl;
+	}
+	
+	const anthropic = createAnthropic(options);
 	return anthropic(modelId);
 }
 
@@ -238,34 +276,8 @@ async function createAzureModel(config: ProviderConfig, modelId: string): Promis
 }
 
 /**
- * Create Ollama model instance using OpenAI-compatible API
- * Ollama exposes an OpenAI-compatible endpoint at /v1
- */
-async function createOllamaModel(config: ProviderConfig, modelId: string): Promise<LanguageModel> {
-	const createOpenAI = await loadProviderFactory('ollama') as typeof import('@ai-sdk/openai').createOpenAI;
-	
-	// Default to standard Ollama URL if not provided
-	let baseUrl = config.baseUrl || 'http://127.0.0.1:11434';
-	
-	// Clean up the URL - remove old API paths if present
-	baseUrl = baseUrl
-		.replace(/\/api\/chat\/?$/, '')
-		.replace(/\/api\/?$/, '')
-		.replace(/\/v1\/?$/, '');
-	
-	// Ollama's OpenAI-compatible endpoint is at /v1
-	const openaiCompatibleUrl = `${baseUrl}/v1`;
-	
-	const ollama = createOpenAI({
-		baseURL: openaiCompatibleUrl,
-		apiKey: 'ollama', // Ollama doesn't require an API key, but the SDK needs something
-	});
-	
-	return ollama(modelId);
-}
-
-/**
  * Create OpenAI or OpenAI-compatible model instance
+ * Handles both chat/completions and responses API endpoints
  */
 async function createOpenAIModel(config: ProviderConfig, modelId: string): Promise<LanguageModel> {
 	const createOpenAI = await loadProviderFactory('openai') as typeof import('@ai-sdk/openai').createOpenAI;
@@ -275,8 +287,13 @@ async function createOpenAIModel(config: ProviderConfig, modelId: string): Promi
 
 	// Only set baseURL if it's different from default OpenAI
 	if (config.baseUrl && !config.baseUrl.includes('api.openai.com')) {
-		// Clean up the URL - remove /chat/completions suffix as the SDK adds it
-		const baseUrl = config.baseUrl.replace(/\/chat\/completions\/?$/, '');
+		// Clean up the URL - remove API-specific suffixes as the SDK adds them
+		// Supports: /chat/completions, /responses, /messages
+		let baseUrl = config.baseUrl
+			.replace(/\/chat\/completions\/?$/, '')
+			.replace(/\/responses\/?$/, '')
+			.replace(/\/messages\/?$/, '');
+		
 		options.baseURL = baseUrl;
 	}
 
@@ -289,7 +306,26 @@ async function createOpenAIModel(config: ProviderConfig, modelId: string): Promi
 		};
 	}
 
+	// For local servers without API key (like Ollama), use a placeholder
+	if (!config.apiKey && config.baseUrl && (
+		config.baseUrl.includes('127.0.0.1') || 
+		config.baseUrl.includes('localhost')
+	)) {
+		options.apiKey = 'local';
+	}
+
 	const openai = createOpenAI(options);
+	
+	// Use the appropriate API based on provider type:
+	// - 'openai-responses': Use the Responses API (/v1/responses)
+	// - 'openai': Use the Responses API for official OpenAI (default in SDK 2.x)
+	// - 'openai-compatible': Use the Chat Completions API (/v1/chat/completions)
+	//   This is critical for third-party providers like Ollama, llamacpp, LM Studio, etc.
+	if (config.type === 'openai-compatible') {
+		return openai.chat(modelId);
+	}
+	
+	// For official OpenAI and openai-responses, use the default (Responses API)
 	return openai(modelId);
 }
 
