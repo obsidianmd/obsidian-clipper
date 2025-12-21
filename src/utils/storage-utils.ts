@@ -1,7 +1,7 @@
 import browser from './browser-polyfill';
 import { Settings, ModelConfig, PropertyType, HistoryEntry, Provider, Rating } from '../types/types';
 import { debugLog } from './debug';
-import { copyToClipboard } from 'core/popup';
+import { cleanupApiUrl } from '../ai-sdk/provider-factory';
 
 export type { Settings, ModelConfig, PropertyType, HistoryEntry, Provider, Rating };
 
@@ -90,7 +90,122 @@ interface StorageData {
 	migrationVersion?: number;
 }
 
-const CURRENT_MIGRATION_VERSION = 1;
+const CURRENT_MIGRATION_VERSION = 2;
+
+/**
+ * Map of provider display names to their models.dev presetId
+ * Used to backfill presetId for providers created before we started saving it
+ */
+const PROVIDER_NAME_TO_PRESET_ID: Record<string, string> = {
+	'Anthropic': 'anthropic',
+	'OpenAI': 'openai',
+	'Google': 'google',
+	'Google Gemini': 'google', // Legacy name mapping
+	'Azure OpenAI': 'azure',
+	'DeepSeek': 'deepseek',
+	'Perplexity': 'perplexity',
+	'xAI': 'xai',
+	'OpenRouter': 'openrouter',
+	'Hugging Face': 'huggingface',
+	'Meta': 'meta',
+};
+
+/**
+ * Backfill presetId for providers that are missing it
+ * This runs on every load to ensure providers always have presetId set
+ */
+function backfillProviderPresetIds(providers: Provider[]): Provider[] {
+	return providers.map(provider => {
+		if (!provider.presetId && provider.name) {
+			const inferredPresetId = PROVIDER_NAME_TO_PRESET_ID[provider.name];
+			if (inferredPresetId) {
+				return { ...provider, presetId: inferredPresetId };
+			}
+		}
+		return provider;
+	});
+}
+
+/**
+ * Migrate provider IDs that have been renamed
+ * All migrations run in version 2:
+ *   - azure-openai → azure
+ *   - google-gemini → google
+ *   - Backfill presetId from provider name for existing providers
+ *   - Migrate Ollama providers to Custom (Ollama removed as preset)
+ */
+function migrateProviders(providers: Provider[]): Provider[] {
+	return providers.map(provider => {
+		let migrated = { ...provider };
+		
+		// Migrate azure-openai to azure
+		if (provider.id === 'azure-openai' || provider.presetId === 'azure-openai') {
+			migrated = {
+				...migrated,
+				id: provider.id === 'azure-openai' ? 'azure' : provider.id,
+				presetId: provider.presetId === 'azure-openai' ? 'azure' : provider.presetId
+			};
+		}
+		
+		// Migrate google-gemini to google
+		if (provider.id === 'google-gemini' || provider.presetId === 'google-gemini') {
+			migrated = {
+				...migrated,
+				id: provider.id === 'google-gemini' ? 'google' : provider.id,
+				presetId: provider.presetId === 'google-gemini' ? 'google' : provider.presetId
+			};
+		}
+		
+		// Migrate Ollama providers to Custom
+		// Ollama is no longer a preset - users should use Custom with their Ollama URL
+		if (provider.presetId === 'ollama' || provider.name === 'Ollama' || provider.name?.toLowerCase().includes('ollama')) {
+			// Ensure the base URL is set to Ollama's OpenAI-compatible endpoint
+			const rawUrl = migrated.baseUrl || 'http://127.0.0.1:11434';
+			// Clean up old API paths and ensure /v1/chat/completions format
+			const baseUrl = `${cleanupApiUrl(rawUrl)}/v1/chat/completions`;
+			
+			migrated = {
+				...migrated,
+				name: migrated.name || 'Ollama (Local)',
+				baseUrl: baseUrl,
+				presetId: undefined, // Remove preset association - now a custom provider
+				apiKeyRequired: false
+			};
+			debugLog('Migration', `Migrated Ollama provider "${provider.name}" to Custom with URL "${baseUrl}"`);
+		}
+		
+		// Backfill presetId from provider name if not set
+		if (!migrated.presetId && migrated.name) {
+			const inferredPresetId = PROVIDER_NAME_TO_PRESET_ID[migrated.name];
+			if (inferredPresetId) {
+				migrated.presetId = inferredPresetId;
+			}
+		}
+		
+		return migrated;
+	});
+}
+
+/**
+ * Migrate model configurations that reference renamed providers
+ */
+function migrateModels(models: ModelConfig[]): ModelConfig[] {
+	return models.map(model => {
+		let migrated = { ...model };
+		
+		// Migrate azure-openai to azure
+		if (model.providerId === 'azure-openai') {
+			migrated.providerId = 'azure';
+		}
+		
+		// Migrate google-gemini to google
+		if (model.providerId === 'google-gemini') {
+			migrated.providerId = 'google';
+		}
+		
+		return migrated;
+	});
+}
 
 export async function loadSettings(): Promise<Settings> {
 	const data = await browser.storage.sync.get(null) as StorageData;
@@ -131,20 +246,37 @@ export async function loadSettings(): Promise<Settings> {
 		ratings: [],
 	};
 
-	// Update migration version if needed
-	if (!data.migrationVersion || data.migrationVersion < CURRENT_MIGRATION_VERSION) {
-		await browser.storage.sync.set({ migrationVersion: CURRENT_MIGRATION_VERSION });
-		debugLog('Settings', `Updated migration version to ${CURRENT_MIGRATION_VERSION}`);
-	}
-
 	// Validate and sanitize data to prevent corruption
 	const sanitizedVaults = Array.isArray(data.vaults) ? data.vaults.filter(v => typeof v === 'string') : [];
-	const sanitizedModels = Array.isArray(data.interpreter_settings?.models) 
+	let sanitizedModels = Array.isArray(data.interpreter_settings?.models) 
 		? data.interpreter_settings.models.filter(m => m && typeof m === 'object' && typeof m.id === 'string') 
 		: [];
-	const sanitizedProviders = Array.isArray(data.interpreter_settings?.providers) 
+	let sanitizedProviders = Array.isArray(data.interpreter_settings?.providers) 
 		? data.interpreter_settings.providers.filter(p => p && typeof p === 'object' && typeof p.id === 'string') 
 		: [];
+
+	// Run migrations if needed (check BEFORE updating version)
+	const needsMigration = !data.migrationVersion || data.migrationVersion < CURRENT_MIGRATION_VERSION;
+	if (needsMigration) {
+		sanitizedProviders = migrateProviders(sanitizedProviders);
+		sanitizedModels = migrateModels(sanitizedModels);
+		debugLog('Settings', 'Migrated providers and models to version', CURRENT_MIGRATION_VERSION);
+		
+		// Persist migrated data and update version atomically to prevent data loss
+		await browser.storage.sync.set({
+			interpreter_settings: {
+				...data.interpreter_settings,
+				providers: sanitizedProviders,
+				models: sanitizedModels
+			},
+			migrationVersion: CURRENT_MIGRATION_VERSION
+		});
+		debugLog('Settings', `Persisted migrations and updated version to ${CURRENT_MIGRATION_VERSION}`);
+	}
+	
+	// Always backfill presetId for providers that are missing it
+	// This handles cases where migration ran but wasn't persisted, or providers created before presetId was added
+	sanitizedProviders = backfillProviderPresetIds(sanitizedProviders);
 
 	// Load user settings
 	const loadedSettings: Settings = {

@@ -18,15 +18,17 @@ export default class I18nAutomation {
 	private sourceLocale = 'en';
 	private localesDir: string;
 	private apiKey?: string;
+	private model: string;
 	private chatHistories: { [locale: string]: { role: string, content: string }[] } = {};
 	private lastRequestTime = 0;
 	private requestInterval = 2000; // 2 seconds between requests
 	private maxRetries = 3;
 	private batchSize = 20;
 
-	constructor(localesDir: string, openaiApiKey?: string) {
+	constructor(localesDir: string, openaiApiKey?: string, model: string = 'gpt-4') {
 		this.localesDir = localesDir;
 		this.apiKey = openaiApiKey;
+		this.model = model;
 	}
 
 	private initializeChatHistory(targetLanguage: string) {
@@ -77,22 +79,32 @@ Example response:
 		}
 
 		try {
+			// Some models don't support custom temperature (gpt-5, o1, o3 series)
+			const noTemperatureModels = ['gpt-5', 'o1', 'o3'];
+			const supportsTemperature = !noTemperatureModels.some(prefix => this.model.startsWith(prefix));
+			const requestBody: Record<string, unknown> = {
+				model: this.model,
+				messages: messages
+			};
+			if (supportsTemperature) {
+				requestBody.temperature = 0.3;
+			}
+
 			const response = await fetch('https://api.openai.com/v1/chat/completions', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
 					'Authorization': `Bearer ${this.apiKey}`
 				},
-				body: JSON.stringify({
-					model: "gpt-4",
-					messages: messages,
-					temperature: 0.3
-				})
+				body: JSON.stringify(requestBody)
 			});
 
 			this.lastRequestTime = Date.now();
 
 			if (!response.ok) {
+				const errorBody = await response.json().catch(() => ({}));
+				const errorMessage = errorBody.error?.message || response.statusText;
+				
 				if (response.status === 429) {
 					const retryAfter = response.headers.get('retry-after');
 					const waitTime = retryAfter ? parseInt(retryAfter) * 1000 : this.requestInterval * Math.pow(2, retryCount);
@@ -100,7 +112,7 @@ Example response:
 					await this.sleep(waitTime);
 					return this.makeRequestWithRetry(messages, retryCount + 1);
 				}
-				throw new Error(`OpenAI API error: ${response.statusText}`);
+				throw new Error(`OpenAI API error (${response.status}): ${errorMessage}`);
 			}
 
 			// Reset the request interval on successful response

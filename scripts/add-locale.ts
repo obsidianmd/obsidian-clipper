@@ -142,7 +142,9 @@ async function addLocale(locale: string) {
 
 	// 3. Run translation
 	console.log('🤖 Starting translation...');
-	const automation = new I18nAutomation(LOCALES_DIR, process.env.OPENAI_API_KEY);
+	const model = process.env.OPENAI_MODEL || 'gpt-4';
+	console.log(`Using model: ${model}`);
+	const automation = new I18nAutomation(LOCALES_DIR, process.env.OPENAI_API_KEY, model);
 	
 	try {
 		await automation.processLocales(path.join(ROOT_DIR, 'src'), locale);
