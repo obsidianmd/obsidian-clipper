@@ -1,4 +1,5 @@
 import { applyFilters } from '../filters';
+import { resolveVariables as resolveNestedVariables } from './resolve';
 
 // Function to process a simple variable (without special prefixes)
 export async function processSimpleVariable(variableString: string, variables: { [key: string]: any }, currentUrl: string): Promise<string> {
@@ -25,7 +26,22 @@ export async function processSimpleVariable(variableString: string, variables: {
 			: String(value);
 
 	const filtersString = filterParts.join('|');
-	return applyFilters(stringValue, filtersString, currentUrl);
+	let resolvedValue = stringValue;
+	try {
+		resolvedValue = resolveNestedVariables({
+			text: stringValue,
+			presetVars: variables,
+			globalCustomVars: {},
+			clipCustomVars: {},
+		});
+	} catch (error) {
+		if (error instanceof Error && error.message.includes('Circular reference')) {
+			// Propagate circular reference errors so the UI can notify the user
+			throw error;
+		}
+		console.error('Error resolving nested variables:', error);
+	}
+	return applyFilters(resolvedValue, filtersString, currentUrl);
 }
 
 // Helper function to get nested value from an object

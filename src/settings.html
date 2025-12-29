@@ -18,6 +18,7 @@
 						<li data-section="highlighter" data-i18n="highlighter">Highlighter</li>
 						<li data-section="reader" data-i18n="reader" style="display: none;">Reader</li>
 						<li data-section="interpreter" data-i18n="interpreter">Interpreter</li>
+						<li data-section="custom-variables">Custom Variables</li>
 						<li class="sidebar-heading" data-i18n="templatesHeading">Templates</li>
 					</ul>
 					<button type="button" id="new-template-btn" class="mod-cta" data-i18n="newTemplate">New&nbsp;template</button>
@@ -230,6 +231,20 @@
 										<button type="button" id="import-all-settings-btn" data-i18n="import">Import</button>
 									</div>
 								</div>
+							</div>
+						</form>
+					</div>
+
+					<div id="custom-variables-section" class="settings-section">
+						<div class="settings-section-header">
+							<h2>Custom Variables</h2>
+						</div>
+						<form id="custom-variables-form">
+							<div class="setting-item-description">Define global custom variables that can be used in any template.</div>
+							<h3 data-i18n="variables">Variables</h3>
+							<div id="custom-variables-list" class="properties-list"></div>
+							<div class="add-btn">
+								<a id="add-custom-variable-btn">+ Add variable</a>
 							</div>
 						</form>
 					</div>
@@ -502,6 +517,14 @@
 									</div>
 									<div class="warning-text" data-i18n="behaviorWarning">
 										Adding to an existing note or daily note requires Obsidian 1.7.2 or later.
+									</div>
+								</div>
+								<div id="template-custom-variables-container" class="setting-item">
+									<label>Custom Variables</label>
+									<div class="setting-item-description">Variables defined here override global ones when using this template.</div>
+									<div id="template-custom-variables-list" class="properties-list"></div>
+									<div class="add-btn">
+										<a id="add-template-custom-variable-btn">+ Add variable</a>
 									</div>
 								</div>
 								<div class="setting-item" id="note-name-format-container" style="display: none;">

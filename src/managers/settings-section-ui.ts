@@ -3,14 +3,18 @@ import { generalSettings } from '../utils/storage-utils';
 import { updatePromptContextVisibility } from './interpreter-settings';
 import { initializePropertyTypesManager } from './property-types-manager';
 
-export type SettingsSection = 'general' | 'properties' | 'highlighter' | 'interpreter' | 'reader' | 'templates';
+export type SettingsSection = 'general' | 'properties' | 'highlighter' | 'interpreter' | 'reader' | 'templates' | 'custom-variables';
 
 export function showSettingsSection(section: SettingsSection, templateId?: string): void {
 	const sections = document.querySelectorAll('.settings-section');
 	const sidebarItems = document.querySelectorAll('#sidebar li[data-section]');
+	const templateItems = document.querySelectorAll('#template-list li');
 
 	sections.forEach(s => s.classList.remove('active'));
 	sidebarItems.forEach(item => item.classList.remove('active'));
+	if (section !== 'templates') {
+		templateItems.forEach(item => item.classList.remove('active'));
+	}
 
 	const selectedSection = document.getElementById(`${section}-section`);
 	const selectedSidebarItem = document.querySelector(`#sidebar li[data-section="${section}"]`);
@@ -67,8 +71,9 @@ export function initializeSidebar(): void {
 				|| target.dataset.section === 'properties'
 				|| target.dataset.section === 'highlighter'
 				|| target.dataset.section === 'interpreter'
-				|| target.dataset.section === 'reader') {
-				showSettingsSection(target.dataset.section as 'general' | 'properties' | 'highlighter' | 'interpreter' | 'reader');
+				|| target.dataset.section === 'reader'
+				|| target.dataset.section === 'custom-variables') {
+				showSettingsSection(target.dataset.section as SettingsSection);
 			}
 			if (settingsContainer) {
 				settingsContainer.classList.remove('sidebar-open');

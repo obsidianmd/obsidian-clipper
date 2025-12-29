@@ -29,6 +29,9 @@
 	"allProperties": {
 		"message": "All properties"
 	},
+	"variables": {
+		"message": "Variables"
+	},
 	"allTime": {
 		"message": "All time"
 	},
