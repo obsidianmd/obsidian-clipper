@@ -238,27 +238,27 @@ interface LLMResponse {
 function parseLLMResponse(responseContent: string, promptVariables: PromptVariable[]): { promptResponses: any[] } {
 	try {
 		let parsedResponse: LLMResponse;
-		
+
 		// If responseContent is already an object, convert to string
 		if (typeof responseContent === 'object') {
 			responseContent = JSON.stringify(responseContent);
 		}
 
-		// Helper function to sanitize JSON string
+		// Helper function to sanitize JSON string (only used as fallback)
 		const sanitizeJsonString = (str: string) => {
 			// First, normalize all newlines to \n
 			let result = str.replace(/\r\n/g, '\n');
-			
+
 			// Escape newlines properly
 			result = result.replace(/\n/g, '\\n');
-			
+
 			// Escape quotes that are part of the content
 			result = result.replace(/(?<!\\)"/g, '\\"');
-			
+
 			// Then unescape the quotes that are JSON structural elements
 			result = result.replace(/(?<=[{[,:]\s*)\\"/g, '"')
 				.replace(/\\"(?=\s*[}\],:}])/g, '"');
-			
+
 			return result
 				// Replace curly quotes
 				.replace(/[""]/g, '\\"')
@@ -271,53 +271,73 @@ function parseLLMResponse(responseContent: string, promptVariables: PromptVariab
 				.replace(/\\{3,}/g, '\\\\');
 		};
 
-		// First try to parse the content directly
+		// Helper function to unescape over-escaped characters in parsed response
+		const unescapeContent = (str: string): string => {
+			// Handle over-escaped sequences that LLMs sometimes produce
+			// Process in order: first handle escaped backslashes, then escaped quotes
+			return str
+				.replace(/\\n/g, '\n')       // Convert literal \n to newline
+				.replace(/\r/g, '')          // Remove carriage returns
+				.replace(/\\\\/g, '\\')      // Convert \\\\ to \\ (over-escaped backslash)
+				.replace(/\\"/g, '"');       // Convert \" to " (over-escaped quote)
+		};
+
+		// First try to parse the content directly without any sanitization
+		// This preserves the original content when the JSON is already valid
 		try {
-			const sanitizedContent = sanitizeJsonString(responseContent);
-			debugLog('Interpreter', 'Sanitized content:', sanitizedContent);
-			parsedResponse = JSON.parse(sanitizedContent);
-		} catch (e) {
+			parsedResponse = JSON.parse(responseContent);
+			debugLog('Interpreter', 'Direct parse successful');
+		} catch (directParseError) {
+			debugLog('Interpreter', 'Direct parse failed, trying with sanitization');
+
 			// If direct parsing fails, try to extract and parse the JSON content
 			const jsonMatch = responseContent.match(/\{[\s\S]*\}/);
 			if (!jsonMatch) {
 				throw new Error('No JSON object found in response');
 			}
 
-			// Try parsing with minimal sanitization first
+			// Try parsing the extracted JSON directly first
 			try {
-				const minimalSanitized = jsonMatch[0]
-					.replace(/[""]/g, '"')
-					.replace(/\r\n/g, '\\n')
-					.replace(/\n/g, '\\n');
-				parsedResponse = JSON.parse(minimalSanitized);
-			} catch (minimalError) {
-				// If minimal sanitization fails, try full sanitization
-				const sanitizedMatch = sanitizeJsonString(jsonMatch[0]);
-				debugLog('Interpreter', 'Fully sanitized match:', sanitizedMatch);
-				
+				parsedResponse = JSON.parse(jsonMatch[0]);
+				debugLog('Interpreter', 'Extracted JSON parse successful');
+			} catch (extractedParseError) {
+				// Try parsing with minimal sanitization
 				try {
-					parsedResponse = JSON.parse(sanitizedMatch);
-				} catch (fullError) {
-					// Last resort: try to manually rebuild the JSON structure
-					const prompts_responses: { [key: string]: string } = {};
-					
-					// Extract each prompt response separately
-					promptVariables.forEach((variable, index) => {
-						const promptKey = `prompt_${index + 1}`;
-						const promptRegex = new RegExp(`"${promptKey}"\\s*:\\s*"([^]*?)(?:"\\s*,|"\\s*})`, 'g');
-						const match = promptRegex.exec(jsonMatch[0]);
-						if (match) {
-							let content = match[1]
-								.replace(/"/g, '\\"')
-								.replace(/\r\n/g, '\\n')
-								.replace(/\n/g, '\\n');
-							prompts_responses[promptKey] = content;
-						}
-					});
+					const minimalSanitized = jsonMatch[0]
+						.replace(/[""]/g, '"')
+						.replace(/\r\n/g, '\\n')
+						.replace(/\n/g, '\\n');
+					parsedResponse = JSON.parse(minimalSanitized);
+					debugLog('Interpreter', 'Minimal sanitization parse successful');
+				} catch (minimalError) {
+					// If minimal sanitization fails, try full sanitization
+					const sanitizedMatch = sanitizeJsonString(jsonMatch[0]);
+					debugLog('Interpreter', 'Fully sanitized match:', sanitizedMatch);
 
-					const rebuiltJson = JSON.stringify({ prompts_responses });
-					debugLog('Interpreter', 'Rebuilt JSON:', rebuiltJson);
-					parsedResponse = JSON.parse(rebuiltJson);
+					try {
+						parsedResponse = JSON.parse(sanitizedMatch);
+					} catch (fullError) {
+						// Last resort: try to manually rebuild the JSON structure
+						const prompts_responses: { [key: string]: string } = {};
+
+						// Extract each prompt response separately
+						promptVariables.forEach((variable, index) => {
+							const promptKey = `prompt_${index + 1}`;
+							const promptRegex = new RegExp(`"${promptKey}"\\s*:\\s*"([^]*?)(?:"\\s*,|"\\s*})`, 'g');
+							const match = promptRegex.exec(jsonMatch[0]);
+							if (match) {
+								let content = match[1]
+									.replace(/"/g, '\\"')
+									.replace(/\r\n/g, '\\n')
+									.replace(/\n/g, '\\n');
+								prompts_responses[promptKey] = content;
+							}
+						});
+
+						const rebuiltJson = JSON.stringify({ prompts_responses });
+						debugLog('Interpreter', 'Rebuilt JSON:', rebuiltJson);
+						parsedResponse = JSON.parse(rebuiltJson);
+					}
 				}
 			}
 		}
@@ -328,12 +348,11 @@ function parseLLMResponse(responseContent: string, promptVariables: PromptVariab
 			return { promptResponses: [] };
 		}
 
-		// Convert escaped newlines to actual newlines in the responses
+		// Unescape over-escaped characters in the responses
+		// LLMs sometimes return content with extra escaping (e.g., \\" instead of ")
 		Object.keys(parsedResponse.prompts_responses).forEach(key => {
 			if (typeof parsedResponse.prompts_responses[key] === 'string') {
-				parsedResponse.prompts_responses[key] = parsedResponse.prompts_responses[key]
-					.replace(/\\n/g, '\n')
-					.replace(/\r/g, '');
+				parsedResponse.prompts_responses[key] = unescapeContent(parsedResponse.prompts_responses[key]);
 			}
 		});
 
