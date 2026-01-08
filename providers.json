@@ -5,13 +5,14 @@
 		"name": "Anthropic",
 		"apiKeyUrl": "https://console.anthropic.com/settings/keys",
 		"apiKeyRequired": true,
-		"modelsList": "https://docs.anthropic.com/en/docs/about-claude/models",
+		"modelsList": "https://platform.claude.com/docs/en/about-claude/models/overview",
 		"baseUrl": "https://api.anthropic.com/v1/messages",
 		"popularModels": [
 			{ "id": "claude-3-5-haiku-latest", "name": "Claude 3.5 Haiku" },
 			{ "id": "claude-haiku-4-5", "name": "Claude 4.5 Haiku" },
 			{ "id": "claude-sonnet-4-0", "name": "Claude 4.0 Sonnet" },
-			{ "id": "claude-sonnet-4-5", "name": "Claude 4.5 Sonnet" }
+			{ "id": "claude-sonnet-4-5", "name": "Claude 4.5 Sonnet" },
+			{ "id": "claude-opus-4-5", "name": "Claude 4.5 Opus" }
 		]
 	},
 	"azure-openai": {
@@ -115,7 +116,7 @@
 		"name": "Perplexity",
 		"apiKeyUrl": "https://www.perplexity.ai/settings/api",
 		"apiKeyRequired": true,
-		"modelsList": "https://docs.perplexity.ai/guides/model-cards",
+		"modelsList": "https://docs.perplexity.ai/getting-started/models",
 		"baseUrl": "https://api.perplexity.ai/chat/completions",
 		"popularModels": [
 			{ "id": "sonar", "name": "Sonar" },
