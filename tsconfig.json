@@ -7,8 +7,8 @@
 			"utils/*": ["utils/*"],
 			"icons": ["icons"]
 		},
-		"target": "es6",
-		"module": "es6",
+		"target": "ES2020",
+		"module": "ES2020",
 		"strict": true,
 		"esModuleInterop": true,
 		"skipLibCheck": true,
@@ -16,6 +16,7 @@
 		"outDir": "./dist",
 		"rootDir": "./src",
 		"sourceMap": true,
+		"resolveJsonModule": true,
 		"typeRoots": ["./node_modules/@types", "./src/types"],
 		"moduleResolution": "node",
 		"types": ["chrome", "webextension-polyfill", "node", "webpack-env"],
@@ -23,7 +24,8 @@
 	},
 	"include": [
 		"src/**/*",
-		"turndown-plugin-gfm.d.ts"
+		"turndown-plugin-gfm.d.ts",
+		"providers.json"
 	],
 	"exclude": ["node_modules", "dist"]
 }

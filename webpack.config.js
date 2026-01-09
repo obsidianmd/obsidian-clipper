@@ -52,6 +52,9 @@ module.exports = (env, argv) => {
 			path: path.resolve(__dirname, outputDir),
 			filename: '[name].js',
 			module: false,
+			// For browser extension dynamic imports, chunks are loaded relative to extension root
+			publicPath: '',
+			chunkFilename: '[name].js',
 		},
 		devtool: isProduction ? false : 'source-map',
 		optimization: {

@@ -24,10 +24,29 @@ export interface ExtractedContent {
 
 export type FilterFunction = (value: string, param?: string) => string | any[];
 
+/**
+ * Obsidian property types that map to different Zod schema types
+ */
+export type ObsidianPropertyType = 'text' | 'multitext' | 'number' | 'checkbox' | 'date' | 'datetime';
+
+/**
+ * Location of a prompt variable in the template structure
+ * - note_name: In the note name/filename field
+ * - properties: In a property value
+ * - note_content: In the note body/content
+ */
+export type PromptLocation = 'note_name' | 'properties' | 'note_content';
+
 export interface PromptVariable {
 	key: string;
 	prompt: string;
 	filters?: string;
+	/** Where in the template this prompt appears */
+	location: PromptLocation;
+	/** The property name this prompt is associated with (only for location='properties') */
+	propertyName?: string;
+	/** The Obsidian property type (text, multitext, number, checkbox, date, datetime) */
+	propertyType?: ObsidianPropertyType;
 }
 
 export interface PropertyType {
@@ -36,9 +55,12 @@ export interface PropertyType {
 	defaultValue?: string;
 }
 
+import type { SupportedProvider } from '../ai-sdk/types';
+
 export interface Provider {
 	id: string;
 	name: string;
+	type?: SupportedProvider;  // Optional for backwards compatibility; auto-detected if not set
 	baseUrl: string;
 	apiKey: string;
 	apiKeyRequired?: boolean;
@@ -89,12 +111,43 @@ export interface Settings {
 	saveBehavior: 'addToObsidian' | 'saveFile' | 'copyToClipboard';
 }
 
+/**
+ * Reasoning effort level for models that support extended thinking
+ * - OpenAI o1/o3/GPT-5: 'low' | 'medium' | 'high'
+ * - Anthropic Claude: maps to budgetTokens
+ * - Google Gemini: 'low' | 'high'
+ */
+export type ReasoningEffort = 'low' | 'medium' | 'high';
+
+/**
+ * Model-specific settings that can be configured per model
+ * These settings are applied when calling the LLM
+ */
+export interface ModelSettings {
+	/** Temperature for response randomness (0-2, default varies by model) */
+	temperature?: number;
+	/** Maximum output tokens (capped by model's limit) */
+	maxTokens?: number;
+	/** Enable extended thinking/reasoning for supported models */
+	reasoningEnabled?: boolean;
+	/** Reasoning effort level when reasoning is enabled */
+	reasoningEffort?: ReasoningEffort;
+}
+
 export interface ModelConfig {
 	id: string;
 	providerId: string;
 	providerModelId: string;
 	name: string;
 	enabled: boolean;
+	/** Model-specific settings (temperature, reasoning, etc.) */
+	settings?: ModelSettings;
+	capabilities?: {
+		contextWindow: number;
+		maxOutput: number;
+		supportsVision: boolean;
+		supportsToolCalls: boolean;
+	};
 }
 
 export interface HistoryEntry {
