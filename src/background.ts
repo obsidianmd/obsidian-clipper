@@ -425,6 +425,11 @@ const debouncedUpdateContextMenu = debounce(async (tabId: number) => {
 					title: "Save this page",
 					contexts: ["page", "selection", "image", "video", "audio"]
 				},
+				{
+					id: 'copy-markdown-to-clipboard',
+					title: browser.i18n.getMessage('copyToClipboard'),
+					contexts: ["page", "selection"]
+				},
 				// {
 				// 	id: "toggle-reader",
 				// 	title: "Reading view",
@@ -493,6 +498,9 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
 		chrome.sidePanel.open({ tabId: tab.id });
 		sidePanelOpenWindows.add(tab.windowId);
 		await ensureContentScriptLoadedInBackground(tab.id);
+	} else if (info.menuItemId === 'copy-markdown-to-clipboard' && tab && tab.id) {
+		await ensureContentScriptLoadedInBackground(tab.id);
+		await browser.tabs.sendMessage(tab.id, { action: "copyMarkdownToClipboard" });
 	}
 });
 

@@ -3,6 +3,7 @@ import * as highlighter from './utils/highlighter';
 import { loadSettings, generalSettings } from './utils/storage-utils';
 import Defuddle from 'defuddle';
 import { getDomain } from './utils/string-utils';
+import { createMarkdownContent } from './utils/markdown-converter';
 
 declare global {
 	interface Window {
@@ -204,6 +205,30 @@ declare global {
 				sendResponse({success: false});
 			}
 			document.body.removeChild(textArea);
+			return true;
+		}
+
+		if (request.action === "copyMarkdownToClipboard") {
+			try {
+				// Extract page content using Defuddle
+				const defuddled = new Defuddle(document, { url: document.URL }).parse();
+
+				// Convert HTML content to markdown
+				const markdown = createMarkdownContent(defuddled.content, document.URL);
+
+				// Copy to clipboard
+				const textArea = document.createElement("textarea");
+				textArea.value = markdown;
+				document.body.appendChild(textArea);
+				textArea.select();
+				document.execCommand('copy');
+				document.body.removeChild(textArea);
+
+				sendResponse({ success: true });
+			} catch (err) {
+				console.error('Failed to copy markdown to clipboard:', err);
+				sendResponse({ success: false, error: (err as Error).message });
+			}
 			return true;
 		}
 
