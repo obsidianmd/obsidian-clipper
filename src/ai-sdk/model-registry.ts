@@ -26,6 +26,7 @@ const ModelSchema = z.object({
 	id: z.string(),
 	name: z.string(),
 	tool_call: z.boolean().optional(),
+	structured_output: z.boolean().optional(),
 	reasoning: z.boolean().optional(),
 	temperature: z.boolean().optional(),
 	attachment: z.boolean().optional(),
@@ -81,6 +82,7 @@ interface ProviderPreset {
 		{
 			name: string;
 			tool_call?: boolean;
+			structured_output?: boolean;
 			reasoning?: boolean;
 			temperature?: boolean;
 			limit?: { context: number; output: number };
@@ -116,6 +118,7 @@ function buildFallbackProviders(): ModelsDevApiResponse {
 				id: modelId,
 				name: modelData.name,
 				tool_call: modelData.tool_call ?? false,
+				structured_output: modelData.structured_output ?? modelData.tool_call ?? false,
 				reasoning: modelData.reasoning ?? false,
 				temperature: modelData.temperature ?? true,
 				modalities: { input: ["text"], output: ["text"] },
@@ -253,6 +256,7 @@ function mapApiModelToCapabilities(
 		name: model.name,
 		provider: providerId,
 		tool_call: model.tool_call ?? false,
+		structured_output: model.structured_output ?? model.tool_call ?? false,
 		reasoning: model.reasoning ?? false,
 		temperature: model.temperature ?? true,
 		attachment: model.attachment ?? false,
@@ -543,18 +547,16 @@ export function getEffectiveProviderId(
 }
 
 /**
- * Check if a model supports structured output (via tool calling or JSON mode)
+ * Check if a model supports structured output (via JSON mode or tool calling)
  *
- * The AI SDK's generateObject() requires either:
- * 1. Native JSON mode support (OpenAI json_schema, Anthropic structured output)
- * 2. Tool calling support (uses a synthetic "json" tool)
+ * The ModelCapabilities.structured_output field is computed during model loading
+ * with fallback logic: structured_output ?? tool_call ?? false
  *
- * Models without tool_call support in models.dev cannot use generateObject()
- * and need to fall back to generateText() with manual JSON parsing.
+ * This means a model supports structured output if it has either:
+ * 1. Native JSON mode support (structured_output: true in models.dev)
+ * 2. Tool calling support (AI SDK uses a synthetic "json" tool)
  *
  * For unknown models, we're conservative and return false to use text fallback.
- * The interpreter service will still try generateObject() first if the provider
- * is known to support it, with automatic fallback on failure.
  *
  * @returns true if model supports structured output, false if fallback needed
  */
@@ -578,9 +580,8 @@ export function supportsStructuredOutput(
 		return false;
 	}
 
-	// tool_call: true in models.dev means the model supports tool calling,
-	// which is what AI SDK uses for generateObject() when native JSON isn't available
-	return model.tool_call;
+	// structured_output already includes tool_call fallback from mapApiModelToCapabilities
+	return model.structured_output;
 }
 
 /**

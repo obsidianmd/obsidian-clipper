@@ -40,6 +40,7 @@ export interface ModelCapabilities {
 	name: string;
 	provider: string;
 	tool_call: boolean;
+	structured_output: boolean;
 	reasoning: boolean;
 	temperature: boolean;
 	attachment: boolean;
@@ -83,6 +84,7 @@ export interface ModelsDevApiResponse {
 				id: string;
 				name: string;
 				tool_call?: boolean;
+				structured_output?: boolean;
 				reasoning?: boolean;
 				temperature?: boolean;
 				attachment?: boolean;
