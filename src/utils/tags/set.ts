@@ -1,5 +1,5 @@
 import { applyFilters } from '../filters';
-import { getNestedValue, resolveValue } from '../expression-evaluator';
+import { resolveValue } from '../expression-evaluator';
 
 // Process {% set variable = expression %} tags
 export async function processSetStatement(
@@ -31,32 +31,9 @@ async function evaluateSetExpression(
 	const valuePart = parts[0].trim();
 	const filterParts = parts.slice(1);
 
-	// Resolve the base value
-	let value: any;
-
-	// String literal
-	if ((valuePart.startsWith('"') && valuePart.endsWith('"')) ||
-		(valuePart.startsWith("'") && valuePart.endsWith("'"))) {
-		value = valuePart.slice(1, -1).replace(/\\(.)/g, '$1');
-	}
-	// Number literal
-	else if (/^-?\d+(\.\d+)?$/.test(valuePart)) {
-		value = parseFloat(valuePart);
-	}
-	// Boolean literal
-	else if (valuePart === 'true') {
-		value = true;
-	} else if (valuePart === 'false') {
-		value = false;
-	}
-	// Variable reference
-	else {
-		value = getNestedValue(variables, valuePart);
-		// Fallback: check direct key
-		if (value === undefined && variables[valuePart] !== undefined) {
-			value = variables[valuePart];
-		}
-	}
+	// Resolve the base value using the expression evaluator
+	// This handles literals, variables with {{}} wrapper, and nested paths
+	let value = resolveValue(valuePart, { variables });
 
 	// Apply filters if present
 	if (filterParts.length > 0) {

@@ -247,6 +247,39 @@ export function resolveValue(operand: string, context: EvaluationContext): any {
 	if (trimmed === 'undefined') return undefined;
 
 	// Variable reference - resolve from context
+
+	// Handle schema: prefix - look up as {{schema:key}}
+	if (trimmed.startsWith('schema:')) {
+		const schemaKey = trimmed; // e.g., "schema:@type" or "schema:author"
+
+		// Try direct lookup first
+		let value = context.variables[`{{${schemaKey}}}`];
+		if (value !== undefined) {
+			return value;
+		}
+
+		// Try shorthand notation (without @type prefix)
+		// e.g., schema:author might be stored as {{schema:Article:author}}
+		const shortKey = schemaKey.replace('schema:', '');
+		if (!shortKey.includes('@')) {
+			const matchingKey = Object.keys(context.variables).find(key =>
+				key.includes('@') && key.endsWith(`:${shortKey}}}`));
+			if (matchingKey) {
+				return context.variables[matchingKey];
+			}
+		}
+
+		return undefined;
+	}
+
+	// Try with {{}} wrapper first (how variables are stored), then plain key
+	if (!trimmed.includes('.') && !trimmed.includes('[')) {
+		const wrappedValue = context.variables[`{{${trimmed}}}`];
+		if (wrappedValue !== undefined) {
+			return wrappedValue;
+		}
+	}
+
 	return getNestedValue(context.variables, trimmed);
 }
 

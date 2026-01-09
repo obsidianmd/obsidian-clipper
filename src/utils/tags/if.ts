@@ -26,44 +26,49 @@ export async function processIfBlock(
 	const openTagLength = startMatch[0].length;
 	const startIndex = startMatch.index + openTagLength;
 
-	// Parse the if/elseif/else/endif structure
-	const parsed = parseIfStructure(text, startIndex);
-	if (!parsed) {
-		console.error('Unmatched {% if %} tag');
-		return { result: startMatch[0], length: openTagLength };
-	}
+	try {
+		// Parse the if/elseif/else/endif structure
+		const parsed = parseIfStructure(text, startIndex);
+		if (!parsed) {
+			console.error('Unmatched {% if %} tag at:', startMatch[0]);
+			return { result: startMatch[0], length: openTagLength };
+		}
 
-	// Evaluate conditions and select content
-	const context = { variables };
-	let selectedContent: string | null = null;
+		// Evaluate conditions and select content
+		const context = { variables };
+		let selectedContent: string | null = null;
 
-	// Check main if condition
-	if (evaluateCondition(condition, context)) {
-		selectedContent = parsed.ifBlock.content;
-	} else {
-		// Check elseif conditions
-		for (const elseif of parsed.elseifBlocks) {
-			if (evaluateCondition(elseif.condition, context)) {
-				selectedContent = elseif.content;
-				break;
+		// Check main if condition
+		if (evaluateCondition(condition, context)) {
+			selectedContent = parsed.ifBlock.content;
+		} else {
+			// Check elseif conditions
+			for (const elseif of parsed.elseifBlocks) {
+				if (evaluateCondition(elseif.condition, context)) {
+					selectedContent = elseif.content;
+					break;
+				}
+			}
+
+			// Fall back to else if no condition matched
+			if (selectedContent === null) {
+				selectedContent = parsed.elseContent || '';
 			}
 		}
 
-		// Fall back to else if no condition matched
-		if (selectedContent === null) {
-			selectedContent = parsed.elseContent || '';
-		}
+		// Recursively process nested logic in selected content
+		let processedContent = await processLogic(selectedContent, variables, currentUrl);
+		// Process variables
+		processedContent = await processVariables(0, processedContent, variables, currentUrl);
+
+		return {
+			result: processedContent,
+			length: openTagLength + parsed.fullLength
+		};
+	} catch (error) {
+		console.error('Error processing {% if %} block:', error, 'Condition:', condition);
+		return { result: startMatch[0], length: openTagLength };
 	}
-
-	// Recursively process nested logic in selected content
-	let processedContent = await processLogic(selectedContent, variables, currentUrl);
-	// Process variables
-	processedContent = await processVariables(0, processedContent, variables, currentUrl);
-
-	return {
-		result: processedContent,
-		length: openTagLength + parsed.fullLength
-	};
 }
 
 // Parse the if/elseif/else/endif structure with proper nesting support
@@ -81,8 +86,8 @@ function parseIfStructure(text: string, startIndex: number): ParsedIf | null {
 	let currentSection: Section = 'if';
 	let currentElseifCondition = '';
 
-	// Regex patterns for tags
-	const tagPattern = /{%\s*(if|elseif|else|endif)(?:\s+(.+?))?\s*%}/g;
+	// Regex patterns for tags - use [^%]* to avoid matching across %} boundaries
+	const tagPattern = /{%\s*(if|elseif|else|endif)(?:\s+([^%]*?))?\s*%}/g;
 
 	while (depth > 0 && currentIndex < text.length) {
 		tagPattern.lastIndex = currentIndex;
