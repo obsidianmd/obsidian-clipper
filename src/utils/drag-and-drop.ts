@@ -1,5 +1,5 @@
 import { Template, Property } from '../types/types';
-import { templates, getTemplates, saveTemplateSettings, getEditingTemplateIndex } from '../managers/template-manager';
+import { getTemplates, saveTemplateSettings, getEditingTemplateIndex } from '../managers/template-manager';
 import { updateTemplateList } from '../managers/template-ui';
 import { updateVaultList } from '../managers/general-settings';
 import { generalSettings, saveSettings } from './storage-utils';
@@ -12,8 +12,10 @@ export function initializeDragAndDrop(): void {
 	const draggableLists = [
 		document.getElementById('template-list'),
 		document.getElementById('template-properties'),
+		document.getElementById('template-custom-variables-list'),
 		document.getElementById('vault-list'),
-		document.getElementById('model-list')
+		document.getElementById('model-list'),
+		document.getElementById('custom-variables-list')
 	];
 
 	draggableLists.forEach(list => {
@@ -59,7 +61,7 @@ export function handleDrop(e: DragEvent): void {
 	e.preventDefault();
 	if (!e.dataTransfer) return;
 	const draggedItemId = e.dataTransfer.getData('text/plain');
-	const list = (e.target as HTMLElement).closest('ul, #template-properties, #model-list');
+	const list = (e.target as HTMLElement).closest('ul, #template-properties, #template-custom-variables-list, #model-list, #custom-variables-list');
 	
 	if (list && draggedElement) {
 		const items = Array.from(list.children);
@@ -73,6 +75,10 @@ export function handleDrop(e: DragEvent): void {
 			handleVaultReorder(newIndex);
 		} else if (list.id === 'model-list') {
 			handleModelReorder(newIndex);
+		} else if (list.id === 'custom-variables-list') {
+			handleCustomVariablesReorder(list as HTMLElement);
+		} else if (list.id === 'template-custom-variables-list') {
+			handleTemplateCustomVariablesReorder(list as HTMLElement);
 		}
 		
 		draggedElement.classList.remove('dragging');
@@ -89,11 +95,11 @@ export function handleDragEnd(): void {
 }
 
 function handleTemplateReorder(draggedItemId: string, newIndex: number): void {
-	const templates = getTemplates();
-	const oldIndex = templates.findIndex(t => (t as Template).id === draggedItemId);
+	const _templates = getTemplates();
+	const oldIndex = _templates.findIndex(t => (t as Template).id === draggedItemId);
 	if (oldIndex !== -1 && oldIndex !== newIndex) {
-		const [movedTemplate] = templates.splice(oldIndex, 1);
-		templates.splice(newIndex, 0, movedTemplate);
+		const [movedTemplate] = _templates.splice(oldIndex, 1);
+		_templates.splice(newIndex, 0, movedTemplate);
 		saveTemplateSettings().then(() => {
 			updateTemplateList();
 		}).catch(error => {
@@ -174,6 +180,47 @@ function handleModelReorder(newIndex: number): void {
 			initializeIcons(modelList);
 		}
 	}
+}
+
+function handleCustomVariablesReorder(list: HTMLElement): void {
+	// Persist order of custom variables based on current DOM order
+	const rows = Array.from(list.querySelectorAll('.property-editor')) as HTMLElement[];
+	const orderedEntries: Array<[string, string]> = rows.map((row) => {
+		const nameInput = row.querySelector('.property-name') as HTMLInputElement | null;
+		const valueInput = row.querySelector('.property-value') as HTMLInputElement | null;
+		const name = nameInput?.value?.trim() || '';
+		const value = valueInput?.value ?? '';
+		return [name, value];
+	}).filter((tuple): tuple is [string, string] => tuple[0].length > 0);
+
+	// Rebuild customVariables in the new order
+	const newMap: Record<string, string> = {};
+	orderedEntries.forEach(([k, v]) => {
+		newMap[k] = v;
+	});
+	generalSettings.customVariables = newMap;
+	saveSettings();
+}
+
+function handleTemplateCustomVariablesReorder(list: HTMLElement): void {
+	// Persist order for per-template custom variables
+	const rows = Array.from(list.querySelectorAll('.property-editor')) as HTMLElement[];
+	const orderedEntries: Array<[string, string]> = rows.map((row) => {
+		const nameInput = row.querySelector('.property-name') as HTMLInputElement | null;
+		const valueInput = row.querySelector('.property-value') as HTMLInputElement | null;
+		const name = nameInput?.value?.trim() || '';
+		const value = valueInput?.value ?? '';
+		return [name, value];
+	}).filter((tuple): tuple is [string, string] => tuple[0].length > 0);
+
+	const templates = getTemplates();
+	const idx = getEditingTemplateIndex();
+	if (idx < 0 || !templates[idx]) return;
+	const t = templates[idx] as Template;
+	const newMap: Record<string, string> = {};
+	orderedEntries.forEach(([k, v]) => { newMap[k] = v; });
+	t.customVariables = newMap;
+	saveTemplateSettings();
 }
 
 export function moveItem<T>(array: T[], fromIndex: number, toIndex: number): T[] {

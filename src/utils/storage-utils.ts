@@ -1,7 +1,6 @@
 import browser from './browser-polyfill';
 import { Settings, ModelConfig, PropertyType, HistoryEntry, Provider, Rating } from '../types/types';
 import { debugLog } from './debug';
-import { copyToClipboard } from 'core/popup';
 
 export type { Settings, ModelConfig, PropertyType, HistoryEntry, Provider, Rating };
 
@@ -37,7 +36,8 @@ export let generalSettings: Settings = {
 	},
 	history: [],
 	ratings: [],
-	saveBehavior: 'addToObsidian'
+	saveBehavior: 'addToObsidian',
+	customVariables: {} // Global custom variables
 };
 
 export function setLocalStorage(key: string, value: any): Promise<void> {
@@ -88,6 +88,7 @@ interface StorageData {
 	history?: HistoryEntry[];
 	ratings?: Rating[];
 	migrationVersion?: number;
+	customVariables?: Record<string, any>;
 }
 
 const CURRENT_MIGRATION_VERSION = 1;
@@ -113,7 +114,6 @@ export async function loadSettings(): Promise<Settings> {
 		interpreterAutoRun: false,
 		defaultPromptContext: '',
 		propertyTypes: [],
-		saveBehavior: 'addToObsidian',
 		readerSettings: {
 			fontSize: 1.5,
 			lineHeight: 1.6,
@@ -129,6 +129,8 @@ export async function loadSettings(): Promise<Settings> {
 		},
 		history: [],
 		ratings: [],
+		saveBehavior: 'addToObsidian',
+		customVariables: {} // Global custom variables
 	};
 
 	// Update migration version if needed
@@ -176,7 +178,8 @@ export async function loadSettings(): Promise<Settings> {
 		stats: data.stats || defaultSettings.stats,
 		history: data.history || defaultSettings.history,
 		ratings: data.ratings || defaultSettings.ratings,
-		saveBehavior: data.general_settings?.saveBehavior ?? defaultSettings.saveBehavior
+		saveBehavior: data.general_settings?.saveBehavior ?? defaultSettings.saveBehavior,
+		customVariables: data.customVariables || defaultSettings.customVariables
 	};
 
 	generalSettings = loadedSettings;
@@ -220,6 +223,7 @@ export async function saveSettings(settings?: Partial<Settings>): Promise<void> 
 			theme: generalSettings.readerSettings.theme,
 			themeMode: generalSettings.readerSettings.themeMode
 		},
+		customVariables: generalSettings.customVariables,
 		stats: generalSettings.stats
 	});
 }

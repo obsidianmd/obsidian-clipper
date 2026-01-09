@@ -772,9 +772,24 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 		return;
 	}
 
+	// Merge custom variables: per-template overrides global
+	const mergedVariables: { [key: string]: string } = { ...variables };
+	if (generalSettings.customVariables) {
+		Object.entries(generalSettings.customVariables).forEach(([key, value]) => {
+			mergedVariables[`{{${key}}}`] = value ?? '';
+			mergedVariables[key] = value ?? '';
+		});
+	}
+	if (template.customVariables) {
+		Object.entries(template.customVariables).forEach(([key, value]) => {
+			mergedVariables[`{{${key}}}`] = value ?? '';
+			mergedVariables[key] = value ?? '';
+		});
+	}
+
 	for (const property of template.properties) {
 		const propertyDiv = createElementWithClass('div', 'metadata-property');
-		let value = await memoizedCompileTemplate(currentTabId!, unescapeValue(property.value), variables, currentTabId ? await getTabInfo(currentTabId).then(tab => tab.url || '') : '');
+		let value = await memoizedCompileTemplate(currentTabId!, unescapeValue(property.value), mergedVariables, currentTabId ? await getTabInfo(currentTabId).then(tab => tab.url || '') : '');
 
 		const propertyType = generalSettings.propertyTypes.find(p => p.name === property.name)?.type || 'text';
 
@@ -864,7 +879,7 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 
 	const noteNameField = document.getElementById('note-name-field') as HTMLTextAreaElement;
 	if (noteNameField) {
-		let formattedNoteName = await memoizedCompileTemplate(currentTabId!, template.noteNameFormat, variables, currentTabId ? await getTabInfo(currentTabId).then(tab => tab.url || '') : '');
+		let formattedNoteName = await memoizedCompileTemplate(currentTabId!, template.noteNameFormat, mergedVariables, currentTabId ? await getTabInfo(currentTabId).then(tab => tab.url || '') : '');
 		noteNameField.setAttribute('data-template-value', template.noteNameFormat);
 		noteNameField.value = formattedNoteName.trim();
 		adjustNoteNameHeight(noteNameField);
@@ -880,7 +895,7 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 			pathField.style.display = 'none';
 		} else {
 			pathContainer.style.display = 'flex';
-			let formattedPath = await memoizedCompileTemplate(currentTabId!, template.path, variables, currentTabId ? await getTabInfo(currentTabId).then(tab => tab.url || '') : '');
+			let formattedPath = await memoizedCompileTemplate(currentTabId!, template.path, mergedVariables, currentTabId ? await getTabInfo(currentTabId).then(tab => tab.url || '') : '');
 			pathField.value = formattedPath;
 			pathField.setAttribute('data-template-value', template.path);
 		}
@@ -889,7 +904,7 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 	const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
 	if (noteContentField) {
 		if (template.noteContentFormat) {
-			let content = await memoizedCompileTemplate(currentTabId!, template.noteContentFormat, variables, currentTabId ? await getTabInfo(currentTabId).then(tab => tab.url || '') : '');
+			let content = await memoizedCompileTemplate(currentTabId!, template.noteContentFormat, mergedVariables, currentTabId ? await getTabInfo(currentTabId).then(tab => tab.url || '') : '');
 			noteContentField.value = content;
 			noteContentField.setAttribute('data-template-value', template.noteContentFormat);
 		} else {
@@ -900,7 +915,7 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 
 	if (template) {
 		if (generalSettings.interpreterEnabled) {
-			await initializeInterpreter(template, variables, currentTabId!, currentTabId ? await getTabInfo(currentTabId).then(tab => tab.url || '') : '');
+			await initializeInterpreter(template, mergedVariables, currentTabId!, currentTabId ? await getTabInfo(currentTabId).then(tab => tab.url || '') : '');
 
 			// Check if there are any prompt variables
 			const promptVariables = collectPromptVariables(template);
@@ -915,7 +930,7 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 					if (!modelConfig) {
 						throw new Error(`Model configuration not found for ${selectedModelId}`);
 					}
-					await handleInterpreterUI(template, variables, currentTabId!, currentTabId ? await getTabInfo(currentTabId).then(tab => tab.url || '') : '', modelConfig);
+					await handleInterpreterUI(template, mergedVariables, currentTabId!, currentTabId ? await getTabInfo(currentTabId).then(tab => tab.url || '') : '', modelConfig);
 					
 					// Ensure the button shows the completed state after auto-run
 					if (interpretBtn) {
@@ -932,7 +947,7 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 			}
 		}
 
-		const replacedTemplate = await getReplacedTemplate(template, variables, currentTabId!, currentTabId ? await getTabInfo(currentTabId).then(tab => tab.url || '') : '');
+		const replacedTemplate = await getReplacedTemplate(template, mergedVariables, currentTabId!, currentTabId ? await getTabInfo(currentTabId).then(tab => tab.url || '') : '');
 		debugLog('Variables', 'Current template with replaced variables:', JSON.stringify(replacedTemplate, null, 2));
 	}
 }

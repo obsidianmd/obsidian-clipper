@@ -73,7 +73,7 @@ export async function processVariables(tabId: number, text: string, variables: {
 		}
 
 		result = result.substring(0, match.index) + replacement + result.substring(match.index + fullMatch.length);
-		regex.lastIndex = match.index + replacement.length;
+		regex.lastIndex = 0;
 	}
 
 	return result;
