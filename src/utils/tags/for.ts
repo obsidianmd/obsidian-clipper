@@ -1,16 +1,108 @@
 import { processSchema } from '../variables/schema';
 import { processVariables } from '../template-compiler';
+import { resolveVariable } from '../resolver';
 
+// Process {% for %} blocks with proper nesting support
+export async function processForBlock(
+	text: string,
+	startMatch: RegExpExecArray,
+	variables: { [key: string]: any },
+	currentUrl: string,
+	processLogic: (text: string, variables: { [key: string]: any }, currentUrl: string) => Promise<string>
+): Promise<{ result: string; length: number }> {
+	const [, iteratorName, arrayName] = startMatch;
+	const openTagLength = startMatch[0].length;
+	const startIndex = startMatch.index + openTagLength;
+
+	// Find matching endfor with proper nesting
+	const loopContent = findMatchingEndfor(text, startIndex);
+	if (loopContent === null) {
+		console.error('Unmatched {% for %} tag');
+		return { result: startMatch[0], length: openTagLength };
+	}
+
+	// Resolve the array value
+	let arrayValue: any;
+	if (arrayName.startsWith('schema:')) {
+		arrayValue = await processSchema(`{{${arrayName}}}`, variables, currentUrl);
+		try {
+			arrayValue = JSON.parse(arrayValue);
+		} catch (error) {
+			console.error(`Error parsing schema result for ${arrayName}:`, error);
+			return { result: '', length: openTagLength + loopContent.length };
+		}
+	} else {
+		// Use unified resolver for array lookup
+		arrayValue = resolveVariable(arrayName, variables);
+	}
+
+	if (!arrayValue || !Array.isArray(arrayValue)) {
+		console.error(`Invalid array value for ${arrayName}:`, arrayValue);
+		return { result: '', length: openTagLength + loopContent.length };
+	}
+
+	const processedContent = await Promise.all(arrayValue.map(async (item: any, index: number) => {
+		const localVariables = { ...variables, [iteratorName]: item, [`${iteratorName}_index`]: index };
+		// Process nested logic structures recursively
+		let itemContent = await processLogic(loopContent.content, localVariables, currentUrl);
+		// Process variables after nested loops
+		itemContent = await processVariables(0, itemContent, localVariables, currentUrl);
+		return itemContent.trim();
+	}));
+
+	return {
+		result: processedContent.join('\n'),
+		length: openTagLength + loopContent.length
+	};
+}
+
+// Find the matching {% endfor %} with proper nesting support
+function findMatchingEndfor(text: string, startIndex: number): { content: string; length: number } | null {
+	let depth = 1;
+	let currentIndex = startIndex;
+
+	// Regex to find for/endfor tags - use [^%]* to avoid matching across %} boundaries
+	const tagPattern = /{%\s*(for|endfor)(?:\s+([^%]*?))?\s*%}/g;
+
+	while (depth > 0 && currentIndex < text.length) {
+		tagPattern.lastIndex = currentIndex;
+		const match = tagPattern.exec(text);
+
+		if (!match) {
+			// No more tags found
+			return null;
+		}
+
+		const tagType = match[1];
+
+		if (tagType === 'for') {
+			depth++;
+		} else if (tagType === 'endfor') {
+			depth--;
+			if (depth === 0) {
+				// Found matching endfor
+				const content = text.slice(startIndex, match.index);
+				const length = match.index + match[0].length - startIndex;
+				return { content, length };
+			}
+		}
+
+		currentIndex = match.index + match[0].length;
+	}
+
+	return null;
+}
+
+// Legacy export for backwards compatibility (if anything uses it)
 export async function processForLoop(
-	match: RegExpExecArray, 
-	variables: { [key: string]: any }, 
+	match: RegExpExecArray,
+	variables: { [key: string]: any },
 	currentUrl: string,
 	processLogic: (text: string, variables: { [key: string]: any }, currentUrl: string) => Promise<string>
 ): Promise<string> {
-	console.log('Processing loop:', match[0]);
-	
-	const [fullMatch, iteratorName, arrayName, loopContent] = match;
-	
+	// This is the old interface - content was captured by regex
+	const [, iteratorName, arrayName, loopContent] = match;
+
 	let arrayValue: any;
 	if (arrayName.startsWith('schema:')) {
 		arrayValue = await processSchema(`{{${arrayName}}}`, variables, currentUrl);
@@ -20,34 +112,21 @@ export async function processForLoop(
 			console.error(`Error parsing schema result for ${arrayName}:`, error);
 			return '';
 		}
-	} else if (arrayName.includes('.')) {
-		arrayValue = arrayName.split('.').reduce((obj: any, key: string) => {
-			if (obj && typeof obj === 'object' && key in obj) {
-				return obj[key];
-			}
-			console.error(`Cannot access property ${key} of`, obj);
-			return undefined;
-		}, variables);
 	} else {
-		arrayValue = variables[arrayName];
+		arrayValue = resolveVariable(arrayName, variables);
 	}
-	
-	console.log(`Array value for ${arrayName}:`, arrayValue);
-	
+
 	if (!arrayValue || !Array.isArray(arrayValue)) {
 		console.error(`Invalid array value for ${arrayName}:`, arrayValue);
-		return ''; // Remove the loop if array is invalid
+		return '';
 	}
-	
+
 	const processedContent = await Promise.all(arrayValue.map(async (item: any, index: number) => {
-		console.log(`Processing item ${index} of ${arrayName}:`, item);
-		const localVariables = { ...variables, [`${iteratorName}`]: item };
-		// Process nested loops and other logic structures recursively
+		const localVariables = { ...variables, [iteratorName]: item, [`${iteratorName}_index`]: index };
 		let itemContent = await processLogic(loopContent, localVariables, currentUrl);
-		// Process variables after nested loops, using both global and local variables
 		itemContent = await processVariables(0, itemContent, localVariables, currentUrl);
 		return itemContent.trim();
 	}));
-	
+
 	return processedContent.join('\n');
 }

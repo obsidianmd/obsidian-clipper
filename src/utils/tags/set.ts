@@ -1,5 +1,6 @@
 import { applyFilters } from '../filters';
-import { resolveValue } from '../expression-evaluator';
+import { resolveVariable, valueToString } from '../resolver';
+import { createParserState, processCharacter } from '../parser-utils';
 
 // Process {% set variable = expression %} tags
 export async function processSetStatement(
@@ -26,23 +27,17 @@ async function evaluateSetExpression(
 	const trimmed = expression.trim();
 
 	// Split by pipe to separate value from filters
-	// Need to be careful not to split inside quotes
-	const parts = splitExpressionAndFilters(trimmed);
+	const parts = splitByPipe(trimmed);
 	const valuePart = parts[0].trim();
 	const filterParts = parts.slice(1);
 
-	// Resolve the base value using the expression evaluator
-	// This handles literals, variables with {{}} wrapper, and nested paths
-	let value = resolveValue(valuePart, { variables });
+	// Resolve the base value using the unified resolver
+	let value = resolveVariable(valuePart, variables);
 
 	// Apply filters if present
 	if (filterParts.length > 0) {
 		const filtersString = filterParts.join('|');
-		const stringValue = value === undefined || value === null
-			? ''
-			: typeof value === 'object'
-				? JSON.stringify(value)
-				: String(value);
+		const stringValue = valueToString(value);
 		const filtered = applyFilters(stringValue, filtersString, currentUrl);
 
 		// Try to parse back to original type if it looks like JSON
@@ -56,54 +51,27 @@ async function evaluateSetExpression(
 	return value;
 }
 
-// Split expression into value and filter parts, respecting quotes
-function splitExpressionAndFilters(expression: string): string[] {
+// Split expression by pipe, respecting quotes and parentheses
+// Uses shared parser-utils state machine
+function splitByPipe(expression: string): string[] {
 	const parts: string[] = [];
-	let current = '';
-	let inQuote = false;
-	let quoteChar = '';
-	let parenDepth = 0;
+	const state = createParserState();
 
 	for (let i = 0; i < expression.length; i++) {
 		const char = expression[i];
-		const prevChar = i > 0 ? expression[i - 1] : '';
 
-		// Handle escape sequences
-		if (prevChar === '\\') {
-			current += char;
-			continue;
+		// Split on pipe when not in quotes, regex, or nested structures
+		if (char === '|' && !state.inQuote && !state.inRegex &&
+			state.curlyDepth === 0 && state.parenDepth === 0) {
+			parts.push(state.current.trim());
+			state.current = '';
+		} else {
+			processCharacter(char, state);
 		}
-
-		// Track quotes
-		if ((char === '"' || char === "'") && !inQuote) {
-			inQuote = true;
-			quoteChar = char;
-			current += char;
-			continue;
-		}
-		if (char === quoteChar && inQuote) {
-			inQuote = false;
-			quoteChar = '';
-			current += char;
-			continue;
-		}
-
-		// Track parentheses
-		if (char === '(' && !inQuote) parenDepth++;
-		if (char === ')' && !inQuote) parenDepth--;
-
-		// Split on pipe when not in quotes or parentheses
-		if (char === '|' && !inQuote && parenDepth === 0) {
-			parts.push(current);
-			current = '';
-			continue;
-		}
-
-		current += char;
 	}
 
-	if (current) {
-		parts.push(current);
+	if (state.current) {
+		parts.push(state.current.trim());
 	}
 
 	return parts;

@@ -2,6 +2,8 @@
 // Supports comparison operators (==, !=, >, <, >=, <=, contains)
 // and logical operators (and/&&, or/||, not/!)
 
+import { resolveVariable } from './resolver';
+
 export interface EvaluationContext {
 	variables: { [key: string]: any };
 }
@@ -223,91 +225,13 @@ function parsePrimary(tokens: Token[], context: EvaluationContext, state: ParseS
 }
 
 // Resolve a value token to its actual value
+// Delegates to the unified resolver
 export function resolveValue(operand: string, context: EvaluationContext): any {
-	const trimmed = operand.trim();
-
-	// String literal (single or double quotes)
-	if ((trimmed.startsWith('"') && trimmed.endsWith('"')) ||
-		(trimmed.startsWith("'") && trimmed.endsWith("'"))) {
-		// Handle escape sequences
-		return trimmed.slice(1, -1).replace(/\\(.)/g, '$1');
-	}
-
-	// Number literal
-	if (/^-?\d+(\.\d+)?$/.test(trimmed)) {
-		return parseFloat(trimmed);
-	}
-
-	// Boolean literal
-	if (trimmed === 'true') return true;
-	if (trimmed === 'false') return false;
-
-	// Null/undefined literal
-	if (trimmed === 'null') return null;
-	if (trimmed === 'undefined') return undefined;
-
-	// Variable reference - resolve from context
-
-	// Handle schema: prefix - look up as {{schema:key}}
-	if (trimmed.startsWith('schema:')) {
-		const schemaKey = trimmed; // e.g., "schema:@type" or "schema:author"
-
-		// Try direct lookup first
-		let value = context.variables[`{{${schemaKey}}}`];
-		if (value !== undefined) {
-			return value;
-		}
-
-		// Try shorthand notation (without @type prefix)
-		// e.g., schema:author might be stored as {{schema:Article:author}}
-		const shortKey = schemaKey.replace('schema:', '');
-		if (!shortKey.includes('@')) {
-			const matchingKey = Object.keys(context.variables).find(key =>
-				key.includes('@') && key.endsWith(`:${shortKey}}}`));
-			if (matchingKey) {
-				return context.variables[matchingKey];
-			}
-		}
-
-		return undefined;
-	}
-
-	// Try with {{}} wrapper first (how variables are stored), then plain key
-	if (!trimmed.includes('.') && !trimmed.includes('[')) {
-		const wrappedValue = context.variables[`{{${trimmed}}}`];
-		if (wrappedValue !== undefined) {
-			return wrappedValue;
-		}
-	}
-
-	return getNestedValue(context.variables, trimmed);
+	return resolveVariable(operand, context.variables);
 }
 
-// Get nested value from object using dot notation and bracket notation
-export function getNestedValue(obj: any, path: string): any {
-	if (!path) return undefined;
-
-	const keys = path.split('.');
-	return keys.reduce((value, key) => {
-		if (value === undefined || value === null) return undefined;
-
-		// Handle bracket notation for array access
-		if (key.includes('[') && key.includes(']')) {
-			const match = key.match(/^([^\[]*)\[([^\]]+)\]/);
-			if (match) {
-				const [, arrayKey, indexStr] = match;
-				const baseValue = arrayKey ? value[arrayKey] : value;
-				if (Array.isArray(baseValue)) {
-					const index = parseInt(indexStr, 10);
-					return baseValue[index];
-				}
-				return undefined;
-			}
-		}
-
-		return value[key];
-	}, obj);
-}
+// Re-export getNestedValue for backwards compatibility
+export { getNestedValue } from './resolver';
 
 // Compare two values with the given operator
 export function compareValues(left: any, operator: ComparisonOperator, right: any): boolean {

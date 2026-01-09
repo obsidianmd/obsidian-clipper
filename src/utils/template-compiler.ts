@@ -3,7 +3,7 @@ import { processSelector } from './variables/selector';
 import { processSchema } from './variables/schema';
 import { processPrompt } from './variables/prompt';
 
-import { processForLoop } from './tags/for';
+import { processForBlock } from './tags/for';
 import { processSetStatement } from './tags/set';
 import { processIfBlock } from './tags/if';
 
@@ -46,9 +46,10 @@ const logicHandlers: LogicHandler[] = [
 	},
 	{
 		type: 'for',
-		regex: /{%\s*for\s+(\w+)\s+in\s+([\w:@.]+)\s*%}([\s\S]*?){%\s*endfor\s*%}/g,
-		process: async (match, variables, currentUrl, processLogic) => {
-			return processForLoop(match, variables, currentUrl, processLogic);
+		regex: /{%\s*for\s+(\w+)\s+in\s+([\w:@.]+)\s*%}/g,
+		needsFullText: true,
+		process: async (match, variables, currentUrl, processLogic, fullText) => {
+			return processForBlock(fullText!, match, variables, currentUrl, processLogic);
 		}
 	},
 ];
