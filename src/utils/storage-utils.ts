@@ -93,21 +93,27 @@ interface StorageData {
 const CURRENT_MIGRATION_VERSION = 2;
 
 /**
- * Map of provider display names to their models.dev presetId
+ * Map of provider display names (lowercase) to their models.dev presetId
  * Used to backfill presetId for providers created before we started saving it
+ * All keys are lowercase for case-insensitive matching
  */
 const PROVIDER_NAME_TO_PRESET_ID: Record<string, string> = {
-	'Anthropic': 'anthropic',
-	'OpenAI': 'openai',
-	'Google': 'google',
-	'Google Gemini': 'google', // Legacy name mapping
-	'Azure OpenAI': 'azure',
-	'DeepSeek': 'deepseek',
-	'Perplexity': 'perplexity',
-	'xAI': 'xai',
-	'OpenRouter': 'openrouter',
-	'Hugging Face': 'huggingface',
-	'Meta': 'meta',
+	'anthropic': 'anthropic',
+	'openai': 'openai',
+	'google': 'google',
+	'google gemini': 'google', // Legacy name mapping
+	'gemini': 'google', // Alias for Google Gemini
+	'azure openai': 'azure',
+	'azure': 'azure',
+	'deepseek': 'deepseek',
+	'perplexity': 'perplexity',
+	'xai': 'xai',
+	'openrouter': 'openrouter',
+	'hugging face': 'huggingface',
+	'huggingface': 'huggingface',
+	'meta': 'meta',
+	'mistral': 'mistral',
+	'cohere': 'cohere',
 };
 
 /**
@@ -117,7 +123,7 @@ const PROVIDER_NAME_TO_PRESET_ID: Record<string, string> = {
 function backfillProviderPresetIds(providers: Provider[]): Provider[] {
 	return providers.map(provider => {
 		if (!provider.presetId && provider.name) {
-			const inferredPresetId = PROVIDER_NAME_TO_PRESET_ID[provider.name];
+			const inferredPresetId = PROVIDER_NAME_TO_PRESET_ID[provider.name.toLowerCase()];
 			if (inferredPresetId) {
 				return { ...provider, presetId: inferredPresetId };
 			}

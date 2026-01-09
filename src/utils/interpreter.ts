@@ -9,7 +9,7 @@ import { getMessage } from './i18n';
 import { updateTokenCountWithLimit } from './token-counter';
 import { interpret } from '../ai-sdk/interpreter-service';
 import { detectProviderType } from '../ai-sdk/provider-factory';
-import { getContextLimit, getModelCost, initializeRegistry } from '../ai-sdk/model-registry';
+import { getContextLimit, getModelCost, initializeRegistry, getEffectiveProviderId } from '../ai-sdk/model-registry';
 import { SupportedProvider, UsageInfo, PromptResponse, isSupportedProvider } from '../ai-sdk/types';
 
 // Store event listeners for cleanup
@@ -212,7 +212,7 @@ export async function initializeInterpreter(template: Template, variables: { [ke
 		
 		// Use presetId (the models.dev provider ID) for model lookups
 		// presetId is required for models.dev providers, undefined for custom OpenAI-compatible providers
-		const modelsDevProviderId = provider.presetId;
+		const modelsDevProviderId = getEffectiveProviderId(provider.presetId, modelConfig.providerModelId);
 		if (!modelsDevProviderId) return {};
 		
 		// Get info from models.dev registry

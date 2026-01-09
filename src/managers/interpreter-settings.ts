@@ -5,7 +5,7 @@ import { initializeIcons } from '../icons/icons';
 import { showModal, hideModal } from '../utils/modal-utils';
 import { getMessage, translatePage } from '../utils/i18n';
 import { debugLog } from '../utils/debug';
-import { initializeRegistry, getProviderDetails, isInitialized as isRegistryInitialized, getModel as getModelFromRegistry, getModelCapabilityHints } from '../ai-sdk/model-registry';
+import { initializeRegistry, getProviderDetails, isInitialized as isRegistryInitialized, getModel as getModelFromRegistry, getModelCapabilityHints, getEffectiveProviderId } from '../ai-sdk/model-registry';
 import { getDefaultBaseUrl } from '../ai-sdk/provider-factory';
 import { ModelSettings, ReasoningEffort } from '../types/types';
 
@@ -993,7 +993,9 @@ async function showModelModal(model: ModelConfig, index?: number) {
 		 * Update advanced settings UI based on model capabilities
 		 */
 		const updateAdvancedSettings = (presetId: string | undefined, modelId: string) => {
-			if (!presetId || !modelId) {
+			const effectivePresetId = getEffectiveProviderId(presetId, modelId);
+			
+			if (!effectivePresetId || !modelId) {
 				// Hide reasoning settings if we can't determine capabilities
 				if (reasoningSetting) reasoningSetting.style.display = 'none';
 				if (reasoningEffortSetting) reasoningEffortSetting.style.display = 'none';
@@ -1001,8 +1003,8 @@ async function showModelModal(model: ModelConfig, index?: number) {
 				return;
 			}
 
-			const capabilities = getModelCapabilityHints(presetId, modelId);
-			debugLog('Models', 'Model capabilities:', { presetId, modelId, capabilities });
+			const capabilities = getModelCapabilityHints(effectivePresetId, modelId);
+			debugLog('Models', 'Model capabilities:', { originalPresetId: presetId, effectivePresetId, modelId, capabilities });
 
 			// Update temperature visibility
 			if (temperatureSetting) {
