@@ -2,10 +2,11 @@
 // Supports comparison operators (==, !=, >, <, >=, <=, contains)
 // and logical operators (and/&&, or/||, not/!)
 
-import { resolveVariable } from './resolver';
+import { resolveVariable, resolveVariableAsync, ResolverContext } from './resolver';
 
 export interface EvaluationContext {
 	variables: { [key: string]: any };
+	tabId?: number;
 }
 
 type ComparisonOperator = '==' | '!=' | '>' | '<' | '>=' | '<=' | 'contains';
@@ -18,14 +19,14 @@ interface Token {
 	value: string;
 }
 
-// Main entry point: evaluate a condition string
-export function evaluateCondition(condition: string, context: EvaluationContext): boolean {
+// Main entry point: evaluate a condition string (async for selector support)
+export async function evaluateCondition(condition: string, context: EvaluationContext): Promise<boolean> {
 	const trimmed = condition.trim();
 	if (!trimmed) return false;
 
 	try {
 		const tokens = tokenize(trimmed);
-		const result = parseExpression(tokens, context);
+		const result = await parseExpression(tokens, context);
 		return evaluateTruthiness(result);
 	} catch (error) {
 		console.error(`Error evaluating condition "${condition}":`, error);
@@ -143,7 +144,7 @@ function tokenize(condition: string): Token[] {
 
 // Parse expression with operator precedence
 // Precedence (lowest to highest): or, and, not, comparison, value
-function parseExpression(tokens: Token[], context: EvaluationContext): any {
+async function parseExpression(tokens: Token[], context: EvaluationContext): Promise<any> {
 	return parseOr(tokens, context, { index: 0 });
 }
 
@@ -151,54 +152,54 @@ interface ParseState {
 	index: number;
 }
 
-function parseOr(tokens: Token[], context: EvaluationContext, state: ParseState): any {
-	let left = parseAnd(tokens, context, state);
+async function parseOr(tokens: Token[], context: EvaluationContext, state: ParseState): Promise<any> {
+	let left = await parseAnd(tokens, context, state);
 
 	while (state.index < tokens.length && tokens[state.index]?.type === 'or') {
 		state.index++; // consume 'or'
-		const right = parseAnd(tokens, context, state);
+		const right = await parseAnd(tokens, context, state);
 		left = evaluateTruthiness(left) || evaluateTruthiness(right);
 	}
 
 	return left;
 }
 
-function parseAnd(tokens: Token[], context: EvaluationContext, state: ParseState): any {
-	let left = parseNot(tokens, context, state);
+async function parseAnd(tokens: Token[], context: EvaluationContext, state: ParseState): Promise<any> {
+	let left = await parseNot(tokens, context, state);
 
 	while (state.index < tokens.length && tokens[state.index]?.type === 'and') {
 		state.index++; // consume 'and'
-		const right = parseNot(tokens, context, state);
+		const right = await parseNot(tokens, context, state);
 		left = evaluateTruthiness(left) && evaluateTruthiness(right);
 	}
 
 	return left;
 }
 
-function parseNot(tokens: Token[], context: EvaluationContext, state: ParseState): any {
+async function parseNot(tokens: Token[], context: EvaluationContext, state: ParseState): Promise<any> {
 	if (state.index < tokens.length && tokens[state.index]?.type === 'not') {
 		state.index++; // consume 'not'
-		const value = parseNot(tokens, context, state);
+		const value = await parseNot(tokens, context, state);
 		return !evaluateTruthiness(value);
 	}
 
 	return parseComparison(tokens, context, state);
 }
 
-function parseComparison(tokens: Token[], context: EvaluationContext, state: ParseState): any {
-	const left = parsePrimary(tokens, context, state);
+async function parseComparison(tokens: Token[], context: EvaluationContext, state: ParseState): Promise<any> {
+	const left = await parsePrimary(tokens, context, state);
 
 	if (state.index < tokens.length && tokens[state.index]?.type === 'comparison') {
 		const operator = tokens[state.index].value as ComparisonOperator;
 		state.index++; // consume operator
-		const right = parsePrimary(tokens, context, state);
+		const right = await parsePrimary(tokens, context, state);
 		return compareValues(left, operator, right);
 	}
 
 	return left;
 }
 
-function parsePrimary(tokens: Token[], context: EvaluationContext, state: ParseState): any {
+async function parsePrimary(tokens: Token[], context: EvaluationContext, state: ParseState): Promise<any> {
 	const token = tokens[state.index];
 
 	if (!token) {
@@ -208,7 +209,7 @@ function parsePrimary(tokens: Token[], context: EvaluationContext, state: ParseS
 	// Parenthesized expression
 	if (token.type === 'lparen') {
 		state.index++; // consume '('
-		const result = parseOr(tokens, context, state);
+		const result = await parseOr(tokens, context, state);
 		if (tokens[state.index]?.type === 'rparen') {
 			state.index++; // consume ')'
 		}
@@ -218,16 +219,25 @@ function parsePrimary(tokens: Token[], context: EvaluationContext, state: ParseS
 	// Value
 	if (token.type === 'value') {
 		state.index++;
-		return resolveValue(token.value, context);
+		return resolveValueAsync(token.value, context);
 	}
 
 	return undefined;
 }
 
-// Resolve a value token to its actual value
+// Resolve a value token to its actual value (sync version)
 // Delegates to the unified resolver
 export function resolveValue(operand: string, context: EvaluationContext): any {
 	return resolveVariable(operand, context.variables);
+}
+
+// Async version that supports selector variables
+async function resolveValueAsync(operand: string, context: EvaluationContext): Promise<any> {
+	const resolverContext: ResolverContext = {
+		variables: context.variables,
+		tabId: context.tabId
+	};
+	return resolveVariableAsync(operand, resolverContext);
 }
 
 // Re-export getNestedValue for backwards compatibility

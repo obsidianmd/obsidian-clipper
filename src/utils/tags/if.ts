@@ -16,11 +16,12 @@ interface ParsedIf {
 // Process {% if %} blocks
 // This is called by the template compiler when it finds an opening {% if %} tag
 export async function processIfBlock(
+	tabId: number,
 	text: string,
 	startMatch: RegExpExecArray,
 	variables: { [key: string]: any },
 	currentUrl: string,
-	processLogic: (text: string, variables: { [key: string]: any }, currentUrl: string) => Promise<string>
+	processLogic: (tabId: number, text: string, variables: { [key: string]: any }, currentUrl: string) => Promise<string>
 ): Promise<{ result: string; length: number }> {
 	const condition = startMatch[1];
 	const openTagLength = startMatch[0].length;
@@ -35,16 +36,16 @@ export async function processIfBlock(
 		}
 
 		// Evaluate conditions and select content
-		const context = { variables };
+		const context = { variables, tabId };
 		let selectedContent: string | null = null;
 
 		// Check main if condition
-		if (evaluateCondition(condition, context)) {
+		if (await evaluateCondition(condition, context)) {
 			selectedContent = parsed.ifBlock.content;
 		} else {
 			// Check elseif conditions
 			for (const elseif of parsed.elseifBlocks) {
-				if (evaluateCondition(elseif.condition, context)) {
+				if (await evaluateCondition(elseif.condition, context)) {
 					selectedContent = elseif.content;
 					break;
 				}
@@ -57,9 +58,9 @@ export async function processIfBlock(
 		}
 
 		// Recursively process nested logic in selected content
-		let processedContent = await processLogic(selectedContent, variables, currentUrl);
+		let processedContent = await processLogic(tabId, selectedContent, variables, currentUrl);
 		// Process variables
-		processedContent = await processVariables(0, processedContent, variables, currentUrl);
+		processedContent = await processVariables(tabId, processedContent, variables, currentUrl);
 
 		return {
 			result: processedContent,

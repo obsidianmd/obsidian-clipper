@@ -1,14 +1,15 @@
 import { processSchema } from '../variables/schema';
 import { processVariables } from '../template-compiler';
-import { resolveVariable } from '../resolver';
+import { resolveVariable, resolveVariableAsync, ResolverContext } from '../resolver';
 
 // Process {% for %} blocks with proper nesting support
 export async function processForBlock(
+	tabId: number,
 	text: string,
 	startMatch: RegExpExecArray,
 	variables: { [key: string]: any },
 	currentUrl: string,
-	processLogic: (text: string, variables: { [key: string]: any }, currentUrl: string) => Promise<string>
+	processLogic: (tabId: number, text: string, variables: { [key: string]: any }, currentUrl: string) => Promise<string>
 ): Promise<{ result: string; length: number }> {
 	const [, iteratorName, arrayName] = startMatch;
 	const openTagLength = startMatch[0].length;
@@ -31,8 +32,12 @@ export async function processForBlock(
 			console.error(`Error parsing schema result for ${arrayName}:`, error);
 			return { result: '', length: openTagLength + loopContent.length };
 		}
+	} else if (arrayName.startsWith('selector:') || arrayName.startsWith('selectorHtml:')) {
+		// Use async resolver for selector variables
+		const context: ResolverContext = { variables, tabId };
+		arrayValue = await resolveVariableAsync(arrayName, context);
 	} else {
-		// Use unified resolver for array lookup
+		// Use sync resolver for regular variables
 		arrayValue = resolveVariable(arrayName, variables);
 	}
 
@@ -44,9 +49,9 @@ export async function processForBlock(
 	const processedContent = await Promise.all(arrayValue.map(async (item: any, index: number) => {
 		const localVariables = { ...variables, [iteratorName]: item, [`${iteratorName}_index`]: index };
 		// Process nested logic structures recursively
-		let itemContent = await processLogic(loopContent.content, localVariables, currentUrl);
+		let itemContent = await processLogic(tabId, loopContent.content, localVariables, currentUrl);
 		// Process variables after nested loops
-		itemContent = await processVariables(0, itemContent, localVariables, currentUrl);
+		itemContent = await processVariables(tabId, itemContent, localVariables, currentUrl);
 		return itemContent.trim();
 	}));
 
@@ -95,10 +100,11 @@ function findMatchingEndfor(text: string, startIndex: number): { content: string
 
 // Legacy export for backwards compatibility (if anything uses it)
 export async function processForLoop(
+	tabId: number,
 	match: RegExpExecArray,
 	variables: { [key: string]: any },
 	currentUrl: string,
-	processLogic: (text: string, variables: { [key: string]: any }, currentUrl: string) => Promise<string>
+	processLogic: (tabId: number, text: string, variables: { [key: string]: any }, currentUrl: string) => Promise<string>
 ): Promise<string> {
 	// This is the old interface - content was captured by regex
 	const [, iteratorName, arrayName, loopContent] = match;
@@ -112,6 +118,9 @@ export async function processForLoop(
 			console.error(`Error parsing schema result for ${arrayName}:`, error);
 			return '';
 		}
+	} else if (arrayName.startsWith('selector:') || arrayName.startsWith('selectorHtml:')) {
+		const context: ResolverContext = { variables, tabId };
+		arrayValue = await resolveVariableAsync(arrayName, context);
 	} else {
 		arrayValue = resolveVariable(arrayName, variables);
 	}
@@ -123,8 +132,8 @@ export async function processForLoop(
 
 	const processedContent = await Promise.all(arrayValue.map(async (item: any, index: number) => {
 		const localVariables = { ...variables, [iteratorName]: item, [`${iteratorName}_index`]: index };
-		let itemContent = await processLogic(loopContent, localVariables, currentUrl);
-		itemContent = await processVariables(0, itemContent, localVariables, currentUrl);
+		let itemContent = await processLogic(tabId, loopContent, localVariables, currentUrl);
+		itemContent = await processVariables(tabId, itemContent, localVariables, currentUrl);
 		return itemContent.trim();
 	}));
 

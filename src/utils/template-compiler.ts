@@ -8,7 +8,7 @@ import { processSetStatement } from './tags/set';
 import { processIfBlock } from './tags/if';
 
 // Define a type for logic handlers
-type ProcessLogicFn = (text: string, variables: { [key: string]: any }, currentUrl: string) => Promise<string>;
+type ProcessLogicFn = (tabId: number, text: string, variables: { [key: string]: any }, currentUrl: string) => Promise<string>;
 
 type LogicHandlerResult = string | { result: string; length: number };
 
@@ -18,6 +18,7 @@ type LogicHandler = {
 	// needsFullText: if true, handler receives full text and returns {result, length}
 	needsFullText?: boolean;
 	process: (
+		tabId: number,
 		match: RegExpExecArray,
 		variables: { [key: string]: any },
 		currentUrl: string,
@@ -32,24 +33,24 @@ const logicHandlers: LogicHandler[] = [
 	{
 		type: 'set',
 		regex: /{%\s*set\s+(\w+)\s*=\s*(.+?)\s*%}/g,
-		process: async (match, variables, currentUrl) => {
-			return processSetStatement(match, variables, currentUrl);
+		process: async (tabId, match, variables, currentUrl) => {
+			return processSetStatement(tabId, match, variables, currentUrl);
 		}
 	},
 	{
 		type: 'if',
 		regex: /{%\s*if\s+(.+?)\s*%}/g,
 		needsFullText: true,
-		process: async (match, variables, currentUrl, processLogic, fullText) => {
-			return processIfBlock(fullText!, match, variables, currentUrl, processLogic);
+		process: async (tabId, match, variables, currentUrl, processLogic, fullText) => {
+			return processIfBlock(tabId, fullText!, match, variables, currentUrl, processLogic);
 		}
 	},
 	{
 		type: 'for',
 		regex: /{%\s*for\s+(\w+)\s+in\s+([\w:@.]+)\s*%}/g,
 		needsFullText: true,
-		process: async (match, variables, currentUrl, processLogic, fullText) => {
-			return processForBlock(fullText!, match, variables, currentUrl, processLogic);
+		process: async (tabId, match, variables, currentUrl, processLogic, fullText) => {
+			return processForBlock(tabId, fullText!, match, variables, currentUrl, processLogic);
 		}
 	},
 ];
@@ -59,13 +60,13 @@ export async function compileTemplate(tabId: number, text: string, variables: { 
 	currentUrl = currentUrl.replace(/#:~:text=[^&]+(&|$)/, '');
 
 	// Process logic
-	const processedText = await processLogic(text, variables, currentUrl);
+	const processedText = await processLogic(tabId, text, variables, currentUrl);
 	// Process other variables and filters
 	return await processVariables(tabId, processedText, variables, currentUrl);
 }
 
 // Process logic structures
-export async function processLogic(text: string, variables: { [key: string]: any }, currentUrl: string): Promise<string> {
+export async function processLogic(tabId: number, text: string, variables: { [key: string]: any }, currentUrl: string): Promise<string> {
 	let processedText = text;
 
 	for (const handler of logicHandlers) {
@@ -73,6 +74,7 @@ export async function processLogic(text: string, variables: { [key: string]: any
 		handler.regex.lastIndex = 0; // Reset regex state
 		while ((match = handler.regex.exec(processedText)) !== null) {
 			const handlerResult = await handler.process(
+				tabId,
 				match,
 				variables,
 				currentUrl,

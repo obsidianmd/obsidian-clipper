@@ -1,9 +1,10 @@
 import { applyFilters } from '../filters';
-import { resolveVariable, valueToString } from '../resolver';
+import { resolveVariable, resolveVariableAsync, valueToString, ResolverContext } from '../resolver';
 import { createParserState, processCharacter } from '../parser-utils';
 
 // Process {% set variable = expression %} tags
 export async function processSetStatement(
+	tabId: number,
 	match: RegExpExecArray,
 	variables: { [key: string]: any },
 	currentUrl: string
@@ -11,7 +12,7 @@ export async function processSetStatement(
 	const [, variableName, expression] = match;
 
 	// Evaluate the expression and assign to variables
-	const value = await evaluateSetExpression(expression, variables, currentUrl);
+	const value = await evaluateSetExpression(tabId, expression, variables, currentUrl);
 	variables[variableName] = value;
 
 	// Set tags produce no output
@@ -20,6 +21,7 @@ export async function processSetStatement(
 
 // Evaluate an expression that may include filters
 async function evaluateSetExpression(
+	tabId: number,
 	expression: string,
 	variables: { [key: string]: any },
 	currentUrl: string
@@ -32,7 +34,14 @@ async function evaluateSetExpression(
 	const filterParts = parts.slice(1);
 
 	// Resolve the base value using the unified resolver
-	let value = resolveVariable(valuePart, variables);
+	// Use async resolver for selector support
+	let value: any;
+	if (valuePart.startsWith('selector:') || valuePart.startsWith('selectorHtml:')) {
+		const context: ResolverContext = { variables, tabId };
+		value = await resolveVariableAsync(valuePart, context);
+	} else {
+		value = resolveVariable(valuePart, variables);
+	}
 
 	// Apply filters if present
 	if (filterParts.length > 0) {
