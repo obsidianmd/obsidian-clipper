@@ -29,17 +29,18 @@ type LogicHandler = {
 
 // Define logic handlers
 // Order matters: set should be processed first to define variables
+// Regex patterns support whitespace control: {%- strips before, -%} strips after
 const logicHandlers: LogicHandler[] = [
 	{
 		type: 'set',
-		regex: /{%\s*set\s+(\w+)\s*=\s*(.+?)\s*%}/g,
+		regex: /{%-?\s*set\s+(\w+)\s*=\s*(.+?)\s*-?%}/g,
 		process: async (tabId, match, variables, currentUrl) => {
 			return processSetStatement(tabId, match, variables, currentUrl);
 		}
 	},
 	{
 		type: 'if',
-		regex: /{%\s*if\s+(.+?)\s*%}/g,
+		regex: /{%-?\s*if\s+(.+?)\s*-?%}/g,
 		needsFullText: true,
 		process: async (tabId, match, variables, currentUrl, processLogic, fullText) => {
 			return processIfBlock(tabId, fullText!, match, variables, currentUrl, processLogic);
@@ -47,7 +48,7 @@ const logicHandlers: LogicHandler[] = [
 	},
 	{
 		type: 'for',
-		regex: /{%\s*for\s+(\w+)\s+in\s+([\w:@.]+)\s*%}/g,
+		regex: /{%-?\s*for\s+(\w+)\s+in\s+([\w:@.]+)\s*-?%}/g,
 		needsFullText: true,
 		process: async (tabId, match, variables, currentUrl, processLogic, fullText) => {
 			return processForBlock(tabId, fullText!, match, variables, currentUrl, processLogic);
@@ -94,8 +95,48 @@ export async function processLogic(tabId: number, text: string, variables: { [ke
 				consumedLength = handlerResult.length;
 			}
 
-			processedText = processedText.substring(0, match.index) + result + processedText.substring(match.index + consumedLength);
-			handler.regex.lastIndex = match.index + result.length;
+			// Handle whitespace control: {%- strips before, -%} strips after
+			let startIndex = match.index;
+			let endIndex = match.index + consumedLength;
+
+			// Check for {%- (strip whitespace before)
+			if (match[0].startsWith('{%-')) {
+				// Find preceding whitespace/newlines to strip
+				while (startIndex > 0 && /[\t ]/.test(processedText[startIndex - 1])) {
+					startIndex--;
+				}
+				// Also strip one preceding newline if present
+				if (startIndex > 0 && processedText[startIndex - 1] === '\n') {
+					startIndex--;
+					// Handle \r\n
+					if (startIndex > 0 && processedText[startIndex - 1] === '\r') {
+						startIndex--;
+					}
+				}
+			}
+
+			// Check for -%} (strip whitespace after)
+			// Need to check the actual end of the consumed content for block tags
+			const tagEnd = processedText.substring(match.index, endIndex);
+			const endsWithStripMarker = tagEnd.endsWith('-%}') ||
+				(handler.needsFullText && processedText.substring(endIndex - 4, endIndex).match(/-\s*%}/));
+
+			if (match[0].endsWith('-%}') || endsWithStripMarker) {
+				// Find following whitespace/newlines to strip
+				while (endIndex < processedText.length && /[\t ]/.test(processedText[endIndex])) {
+					endIndex++;
+				}
+				// Also strip one following newline if present
+				if (endIndex < processedText.length && processedText[endIndex] === '\r') {
+					endIndex++;
+				}
+				if (endIndex < processedText.length && processedText[endIndex] === '\n') {
+					endIndex++;
+				}
+			}
+
+			processedText = processedText.substring(0, startIndex) + result + processedText.substring(endIndex);
+			handler.regex.lastIndex = startIndex + result.length;
 		}
 	}
 

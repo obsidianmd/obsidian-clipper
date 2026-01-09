@@ -88,7 +88,8 @@ function parseIfStructure(text: string, startIndex: number): ParsedIf | null {
 	let currentElseifCondition = '';
 
 	// Regex patterns for tags - use [^%]* to avoid matching across %} boundaries
-	const tagPattern = /{%\s*(if|elseif|else|endif)(?:\s+([^%]*?))?\s*%}/g;
+	// Support whitespace control: {%- and -%}
+	const tagPattern = /{%-?\s*(if|elseif|else|endif)(?:\s+([^%]*?))?\s*-?%}/g;
 
 	while (depth > 0 && currentIndex < text.length) {
 		tagPattern.lastIndex = currentIndex;

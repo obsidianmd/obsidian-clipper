@@ -67,7 +67,8 @@ function findMatchingEndfor(text: string, startIndex: number): { content: string
 	let currentIndex = startIndex;
 
 	// Regex to find for/endfor tags - use [^%]* to avoid matching across %} boundaries
-	const tagPattern = /{%\s*(for|endfor)(?:\s+([^%]*?))?\s*%}/g;
+	// Support whitespace control: {%- and -%}
+	const tagPattern = /{%-?\s*(for|endfor)(?:\s+([^%]*?))?\s*-?%}/g;
 
 	while (depth > 0 && currentIndex < text.length) {
 		tagPattern.lastIndex = currentIndex;
