@@ -485,6 +485,9 @@
 	"noteContentDescription": {
 		"message": "Customize the content of the note. Use variables to pre-populate data from the page."
 	},
+	"templateValid": {
+		"message": "Template syntax is valid"
+	},
 	"noteLocation": {
 		"message": "Note location"
 	},

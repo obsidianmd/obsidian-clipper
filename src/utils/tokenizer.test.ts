@@ -407,7 +407,7 @@ test('tokenizes selectorHtml with brackets', () => {
 test('reports unterminated string', () => {
 	const result = tokenize('{% set x = "unterminated %}');
 	expect(result.errors.length > 0).toBe(true);
-	const hasUnterminatedError = result.errors.some(e => e.message.includes('Unterminated string'));
+	const hasUnterminatedError = result.errors.some(e => e.message.includes('Unclosed string'));
 	expect(hasUnterminatedError).toBe(true);
 });
 

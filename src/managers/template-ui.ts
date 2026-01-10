@@ -10,6 +10,7 @@ import { updatePromptContextVisibility } from './interpreter-settings';
 import { showSettingsSection } from './settings-section-ui';
 import { updatePropertyType } from './property-types-manager';
 import { getMessage } from '../utils/i18n';
+import { parse, validateVariables } from '../utils/parser';
 let hasUnsavedChanges = false;
 
 export function resetUnsavedChanges(): void {
@@ -188,7 +189,10 @@ export function showTemplateEditor(template: Template | null): void {
 	}
 
 	const noteContentFormat = document.getElementById('note-content-format') as HTMLTextAreaElement;
-	if (noteContentFormat) noteContentFormat.value = editingTemplate.noteContentFormat || '';
+	if (noteContentFormat) {
+		noteContentFormat.value = editingTemplate.noteContentFormat || '';
+		validateNoteContent(noteContentFormat);
+	}
 
 	const promptContextTextarea = document.getElementById('prompt-context') as HTMLTextAreaElement;
 	if (promptContextTextarea) promptContextTextarea.value = editingTemplate.context || '';
@@ -609,4 +613,83 @@ function updatePropertyNameSuggestions(): void {
 
 export function refreshPropertyNameSuggestions(): void {
 	updatePropertyNameSuggestions();
+}
+
+/**
+ * Validate the note content template and display results.
+ */
+function validateNoteContent(textarea: HTMLTextAreaElement): void {
+	const content = textarea.value;
+
+	// Find or create the validation result element
+	let validationEl = document.getElementById('note-content-validation');
+	if (!validationEl) {
+		validationEl = createElementWithClass('div', 'template-validation');
+		validationEl.id = 'note-content-validation';
+		textarea.parentNode?.insertBefore(validationEl, textarea.nextSibling);
+	}
+
+	// Clear previous content
+	validationEl.textContent = '';
+	validationEl.className = 'template-validation';
+
+	// Skip validation for empty content
+	if (!content.trim()) {
+		validationEl.style.display = 'none';
+		return;
+	}
+
+	// Parse and check for errors
+	const result = parse(content);
+
+	// Also validate variable names
+	const warnings = validateVariables(result.ast);
+
+	// Combine errors and warnings into a single list
+	const issues: { line: number; message: string; isError: boolean }[] = [
+		...result.errors.map(e => ({ line: e.line || 0, message: e.message, isError: true })),
+		...warnings.map(w => ({ line: w.line || 0, message: w.message, isError: false })),
+	].sort((a, b) => a.line - b.line);
+
+	const hasErrors = result.errors.length > 0;
+	const hasWarnings = warnings.length > 0;
+
+	if (!hasErrors && !hasWarnings) {
+		// Valid template - show nothing
+		validationEl.style.display = 'none';
+		return;
+	} else {
+		// Has errors and/or warnings - use error styling if any errors, warning styling if only warnings
+		validationEl.classList.add(hasErrors ? 'invalid' : 'warning');
+		const icon = createElementWithHTML('i', '', { 'data-lucide': hasErrors ? 'alert-circle' : 'alert-triangle' });
+		validationEl.appendChild(icon);
+
+		const issueList = document.createElement('div');
+		issueList.className = 'validation-errors';
+
+		issues.forEach(issue => {
+			const issueItem = document.createElement('div');
+			issueItem.className = issue.isError ? 'validation-error' : 'validation-warning';
+			const location = issue.line ? `Line ${issue.line}: ` : '';
+			issueItem.textContent = `${location}${issue.message}`;
+			issueList.appendChild(issueItem);
+		});
+
+		validationEl.appendChild(issueList);
+		initializeIcons(validationEl);
+	}
+
+	validationEl.style.display = 'flex';
+}
+
+/**
+ * Initialize template validation on the note content field.
+ */
+export function initializeTemplateValidation(): void {
+	const noteContentFormat = document.getElementById('note-content-format') as HTMLTextAreaElement;
+	if (noteContentFormat) {
+		noteContentFormat.addEventListener('blur', () => {
+			validateNoteContent(noteContentFormat);
+		});
+	}
 }

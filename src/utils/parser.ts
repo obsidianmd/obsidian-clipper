@@ -226,7 +226,7 @@ function parseNode(state: ParserState): ASTNode | null {
 		default:
 			// Unexpected token - skip and report error
 			state.errors.push({
-				message: `Unexpected token: ${token.type}`,
+				message: `Unexpected "${token.value}" in template`,
 				line: token.line,
 				column: token.column,
 			});
@@ -260,7 +260,7 @@ function parseVariable(state: ParserState): VariableNode | null {
 	const expression = parseExpression(state);
 	if (!expression) {
 		state.errors.push({
-			message: 'Expected expression in variable',
+			message: 'Empty variable - add a variable name between {{ and }}',
 			line: startToken.line,
 			column: startToken.column,
 		});
@@ -275,7 +275,7 @@ function parseVariable(state: ParserState): VariableNode | null {
 		trimRight = endToken.trimRight || false;
 	} else {
 		state.errors.push({
-			message: 'Expected }}',
+			message: 'Missing closing }}',
 			line: peek(state).line,
 			column: peek(state).column,
 		});
@@ -318,7 +318,7 @@ function parseTag(state: ParserState): ASTNode | null {
 			// These are handled by their parent parsers
 			// If we encounter them here, it's an error
 			state.errors.push({
-				message: `Unexpected ${keywordToken.value} without matching opening tag`,
+				message: `Unexpected {% ${keywordToken.value} %} - no matching opening tag`,
 				line: keywordToken.line,
 				column: keywordToken.column,
 			});
@@ -327,7 +327,7 @@ function parseTag(state: ParserState): ASTNode | null {
 
 		default:
 			state.errors.push({
-				message: `Unknown tag keyword: ${keywordToken.value}`,
+				message: `Unknown tag: {% ${keywordToken.value} %}`,
 				line: keywordToken.line,
 				column: keywordToken.column,
 			});
@@ -346,7 +346,7 @@ function parseIfStatement(state: ParserState, startToken: Token, trimLeft: boole
 	const condition = parseExpression(state);
 	if (!condition) {
 		state.errors.push({
-			message: 'Expected condition after if',
+			message: '{% if %} requires a condition',
 			line: startToken.line,
 			column: startToken.column,
 		});
@@ -360,7 +360,7 @@ function parseIfStatement(state: ParserState, startToken: Token, trimLeft: boole
 		trimRight = advance(state).trimRight || false;
 	} else {
 		state.errors.push({
-			message: 'Expected %} after if condition',
+			message: 'Missing %} to close {% if %}',
 			line: peek(state).line,
 			column: peek(state).column,
 		});
@@ -378,7 +378,7 @@ function parseIfStatement(state: ParserState, startToken: Token, trimLeft: boole
 		const elseifCondition = parseExpression(state);
 		if (!elseifCondition) {
 			state.errors.push({
-				message: 'Expected condition after elseif',
+				message: '{% elseif %} requires a condition',
 				line: peek(state).line,
 				column: peek(state).column,
 			});
@@ -407,7 +407,7 @@ function parseIfStatement(state: ParserState, startToken: Token, trimLeft: boole
 		consumeTagEnd(state);
 	} else {
 		state.errors.push({
-			message: 'Expected endif',
+			message: 'Missing {% endif %} to close {% if %}',
 			line: peek(state).line,
 			column: peek(state).column,
 		});
@@ -436,7 +436,7 @@ function parseForStatement(state: ParserState, startToken: Token, trimLeft: bool
 	// Parse iterator name
 	if (!check(state, 'identifier')) {
 		state.errors.push({
-			message: 'Expected iterator name after for',
+			message: '{% for %} requires a variable name, e.g. {% for item in items %}',
 			line: peek(state).line,
 			column: peek(state).column,
 		});
@@ -448,7 +448,7 @@ function parseForStatement(state: ParserState, startToken: Token, trimLeft: bool
 	// Parse 'in' keyword
 	if (!check(state, 'keyword_in')) {
 		state.errors.push({
-			message: 'Expected "in" after iterator name',
+			message: '{% for %} requires "in" keyword, e.g. {% for item in items %}',
 			line: peek(state).line,
 			column: peek(state).column,
 		});
@@ -461,7 +461,7 @@ function parseForStatement(state: ParserState, startToken: Token, trimLeft: bool
 	const iterable = parseExpression(state);
 	if (!iterable) {
 		state.errors.push({
-			message: 'Expected iterable after "in"',
+			message: '{% for %} requires something to loop over after "in"',
 			line: peek(state).line,
 			column: peek(state).column,
 		});
@@ -475,7 +475,7 @@ function parseForStatement(state: ParserState, startToken: Token, trimLeft: bool
 		trimRight = advance(state).trimRight || false;
 	} else {
 		state.errors.push({
-			message: 'Expected %} after for',
+			message: 'Missing %} to close {% for %}',
 			line: peek(state).line,
 			column: peek(state).column,
 		});
@@ -491,7 +491,7 @@ function parseForStatement(state: ParserState, startToken: Token, trimLeft: bool
 		consumeTagEnd(state);
 	} else {
 		state.errors.push({
-			message: 'Expected endfor',
+			message: 'Missing {% endfor %} to close {% for %}',
 			line: peek(state).line,
 			column: peek(state).column,
 		});
@@ -519,7 +519,7 @@ function parseSetStatement(state: ParserState, startToken: Token, trimLeft: bool
 	// Parse variable name
 	if (!check(state, 'identifier')) {
 		state.errors.push({
-			message: 'Expected variable name after set',
+			message: '{% set %} requires a variable name, e.g. {% set name = value %}',
 			line: peek(state).line,
 			column: peek(state).column,
 		});
@@ -531,7 +531,7 @@ function parseSetStatement(state: ParserState, startToken: Token, trimLeft: bool
 	// Parse '=' operator
 	if (!check(state, 'op_assign')) {
 		state.errors.push({
-			message: 'Expected "=" after variable name in set',
+			message: '{% set %} requires "=" after variable name',
 			line: peek(state).line,
 			column: peek(state).column,
 		});
@@ -544,7 +544,7 @@ function parseSetStatement(state: ParserState, startToken: Token, trimLeft: bool
 	const value = parseExpression(state);
 	if (!value) {
 		state.errors.push({
-			message: 'Expected value after "=" in set',
+			message: '{% set %} requires a value after "="',
 			line: peek(state).line,
 			column: peek(state).column,
 		});
@@ -558,7 +558,7 @@ function parseSetStatement(state: ParserState, startToken: Token, trimLeft: bool
 		trimRight = advance(state).trimRight || false;
 	} else {
 		state.errors.push({
-			message: 'Expected %} after set',
+			message: 'Missing %} to close {% set %}',
 			line: peek(state).line,
 			column: peek(state).column,
 		});
@@ -615,7 +615,7 @@ function parseNullishExpression(state: ParserState): Expression | null {
 		const right = parseFilterExpression(state);
 		if (!right) {
 			state.errors.push({
-				message: 'Expected expression after "??"',
+				message: 'Missing fallback value after ??',
 				line: opToken.line,
 				column: opToken.column,
 			});
@@ -644,7 +644,7 @@ function parseFilterExpression(state: ParserState): Expression | null {
 
 		if (!check(state, 'identifier')) {
 			state.errors.push({
-				message: 'Expected filter name after |',
+				message: 'Missing filter name after |',
 				line: peek(state).line,
 				column: peek(state).column,
 			});
@@ -703,7 +703,7 @@ function parseOrExpression(state: ParserState): Expression | null {
 		const right = parseAndExpression(state);
 		if (!right) {
 			state.errors.push({
-				message: 'Expected expression after "or"',
+				message: 'Missing value after "or"',
 				line: opToken.line,
 				column: opToken.column,
 			});
@@ -732,7 +732,7 @@ function parseAndExpression(state: ParserState): Expression | null {
 		const right = parseNotExpression(state);
 		if (!right) {
 			state.errors.push({
-				message: 'Expected expression after "and"',
+				message: 'Missing value after "and"',
 				line: opToken.line,
 				column: opToken.column,
 			});
@@ -758,7 +758,7 @@ function parseNotExpression(state: ParserState): Expression | null {
 		const argument = parseNotExpression(state);
 		if (!argument) {
 			state.errors.push({
-				message: 'Expected expression after "not"',
+				message: 'Missing value after "not"',
 				line: opToken.line,
 				column: opToken.column,
 			});
@@ -788,7 +788,7 @@ function parseComparisonExpression(state: ParserState): Expression | null {
 		const right = parsePostfixExpression(state);
 		if (!right) {
 			state.errors.push({
-				message: `Expected expression after "${opToken.value}"`,
+				message: `Missing value after "${opToken.value}"`,
 				line: opToken.line,
 				column: opToken.column,
 			});
@@ -830,7 +830,7 @@ function parsePostfixExpression(state: ParserState): Expression | null {
 		const property = parseOrExpression(state);
 		if (!property) {
 			state.errors.push({
-				message: 'Expected expression inside brackets',
+				message: 'Empty brackets [] - add an index or key',
 				line: bracketToken.line,
 				column: bracketToken.column,
 			});
@@ -841,7 +841,7 @@ function parsePostfixExpression(state: ParserState): Expression | null {
 			advance(state); // consume ']'
 		} else {
 			state.errors.push({
-				message: 'Expected "]" after bracket expression',
+				message: 'Missing closing ]',
 				line: peek(state).line,
 				column: peek(state).column,
 			});
@@ -870,7 +870,7 @@ function parsePrimaryExpression(state: ParserState): Expression | null {
 		const expr = parseOrExpression(state);
 		if (!expr) {
 			state.errors.push({
-				message: 'Expected expression after "("',
+				message: 'Empty parentheses () - add an expression',
 				line: token.line,
 				column: token.column,
 			});
@@ -880,7 +880,7 @@ function parsePrimaryExpression(state: ParserState): Expression | null {
 			advance(state); // consume ')'
 		} else {
 			state.errors.push({
-				message: 'Expected ")"',
+				message: 'Missing closing )',
 				line: peek(state).line,
 				column: peek(state).column,
 			});
@@ -1019,7 +1019,7 @@ function consumeTagEnd(state: ParserState): Token | null {
 		return advance(state);
 	}
 	state.errors.push({
-		message: 'Expected %}',
+		message: 'Missing closing %}',
 		line: peek(state).line,
 		column: peek(state).column,
 	});
@@ -1144,4 +1144,270 @@ function formatExpression(expr: Expression, indent: number): string {
  */
 export function formatParserError(error: ParserError): string {
 	return `Error at line ${error.line}, column ${error.column}: ${error.message}`;
+}
+
+// ============================================================================
+// Variable Validation
+// ============================================================================
+
+/**
+ * Known preset variables that are always available
+ */
+const PRESET_VARIABLES = new Set([
+	'author',
+	'content',
+	'contentHtml',
+	'date',
+	'description',
+	'domain',
+	'favicon',
+	'fullHtml',
+	'highlights',
+	'image',
+	'published',
+	'selection',
+	'selectionHtml',
+	'site',
+	'title',
+	'time',
+	'url',
+	'words',
+]);
+
+/**
+ * Special variable prefixes that indicate dynamic variables
+ */
+const SPECIAL_PREFIXES = [
+	'schema:',
+	'selector:',
+	'selectorHtml:',
+	'meta:',
+];
+
+/**
+ * Calculate Levenshtein distance between two strings (for fuzzy matching)
+ */
+function levenshteinDistance(a: string, b: string): number {
+	const matrix: number[][] = [];
+
+	for (let i = 0; i <= b.length; i++) {
+		matrix[i] = [i];
+	}
+	for (let j = 0; j <= a.length; j++) {
+		matrix[0][j] = j;
+	}
+
+	for (let i = 1; i <= b.length; i++) {
+		for (let j = 1; j <= a.length; j++) {
+			if (b.charAt(i - 1) === a.charAt(j - 1)) {
+				matrix[i][j] = matrix[i - 1][j - 1];
+			} else {
+				matrix[i][j] = Math.min(
+					matrix[i - 1][j - 1] + 1,
+					matrix[i][j - 1] + 1,
+					matrix[i - 1][j] + 1
+				);
+			}
+		}
+	}
+
+	return matrix[b.length][a.length];
+}
+
+/**
+ * Find the closest matching preset variable
+ */
+function findSimilarVariable(name: string): string | null {
+	let bestMatch: string | null = null;
+	let bestDistance = Infinity;
+
+	for (const preset of PRESET_VARIABLES) {
+		const distance = levenshteinDistance(name.toLowerCase(), preset.toLowerCase());
+		// Only suggest if the distance is reasonable (less than half the length)
+		if (distance < Math.max(name.length, preset.length) / 2 && distance < bestDistance) {
+			bestDistance = distance;
+			bestMatch = preset;
+		}
+	}
+
+	return bestMatch;
+}
+
+/**
+ * Check if a variable name is valid
+ */
+function isValidVariable(name: string, definedVariables: Set<string>): boolean {
+	// Prompt variables start with "
+	if (name.startsWith('"')) {
+		return true;
+	}
+
+	// Special prefix variables
+	for (const prefix of SPECIAL_PREFIXES) {
+		if (name.startsWith(prefix)) {
+			return true;
+		}
+	}
+
+	// Check if it's a preset variable
+	if (PRESET_VARIABLES.has(name)) {
+		return true;
+	}
+
+	// Check if it's a defined variable (via {% set %})
+	if (definedVariables.has(name)) {
+		return true;
+	}
+
+	// Check for nested property access on known variables (e.g., loop.index)
+	const baseName = name.split('.')[0].split('[')[0];
+	if (PRESET_VARIABLES.has(baseName) || definedVariables.has(baseName) || baseName === 'loop') {
+		return true;
+	}
+
+	return false;
+}
+
+/**
+ * Extract the base variable name from an expression
+ */
+function getVariableNameFromExpression(expr: Expression): { name: string; line: number; column: number } | null {
+	switch (expr.type) {
+		case 'identifier':
+			return { name: expr.name, line: expr.line, column: expr.column };
+		case 'filter':
+			return getVariableNameFromExpression(expr.value);
+		case 'member':
+			return getVariableNameFromExpression(expr.object);
+		case 'binary':
+			// For nullish coalescing, check the left side
+			if (expr.operator === '??') {
+				return getVariableNameFromExpression(expr.left);
+			}
+			return null;
+		default:
+			return null;
+	}
+}
+
+/**
+ * Reference with its scope - stores defined variables at the point of reference
+ */
+interface ScopedReference {
+	name: string;
+	line: number;
+	column: number;
+	scope: Set<string>;
+}
+
+/**
+ * Collect all variable references and set definitions from the AST
+ */
+function collectVariables(
+	nodes: ASTNode[],
+	definedVariables: Set<string>,
+	references: ScopedReference[]
+): void {
+	for (const node of nodes) {
+		switch (node.type) {
+			case 'variable': {
+				const varInfo = getVariableNameFromExpression(node.expression);
+				if (varInfo) {
+					references.push({ ...varInfo, scope: new Set(definedVariables) });
+				}
+				break;
+			}
+			case 'set':
+				// Add to defined variables
+				definedVariables.add(node.variable);
+				// Also check the value expression
+				collectExpression(node.value, definedVariables, references);
+				break;
+			case 'if':
+				collectExpression(node.condition, definedVariables, references);
+				collectVariables(node.consequent, definedVariables, references);
+				for (const elseif of node.elseifs) {
+					collectExpression(elseif.condition, definedVariables, references);
+					collectVariables(elseif.body, definedVariables, references);
+				}
+				if (node.alternate) {
+					collectVariables(node.alternate, definedVariables, references);
+				}
+				break;
+			case 'for':
+				// The iterator is defined within the loop
+				const loopVariables = new Set(definedVariables);
+				loopVariables.add(node.iterator);
+				loopVariables.add(`${node.iterator}_index`);
+				collectExpression(node.iterable, definedVariables, references);
+				collectVariables(node.body, loopVariables, references);
+				break;
+		}
+	}
+}
+
+/**
+ * Collect variable references from an expression
+ */
+function collectExpression(
+	expr: Expression,
+	definedVariables: Set<string>,
+	references: ScopedReference[]
+): void {
+	switch (expr.type) {
+		case 'identifier': {
+			references.push({ name: expr.name, line: expr.line, column: expr.column, scope: new Set(definedVariables) });
+			break;
+		}
+		case 'filter':
+			collectExpression(expr.value, definedVariables, references);
+			for (const arg of expr.args) {
+				collectExpression(arg, definedVariables, references);
+			}
+			break;
+		case 'binary':
+			collectExpression(expr.left, definedVariables, references);
+			collectExpression(expr.right, definedVariables, references);
+			break;
+		case 'unary':
+			collectExpression(expr.argument, definedVariables, references);
+			break;
+		case 'member':
+			collectExpression(expr.object, definedVariables, references);
+			collectExpression(expr.property, definedVariables, references);
+			break;
+		case 'group':
+			collectExpression(expr.expression, definedVariables, references);
+			break;
+	}
+}
+
+/**
+ * Validate all variable references in the AST
+ */
+export function validateVariables(ast: ASTNode[]): ParserError[] {
+	const warnings: ParserError[] = [];
+	const definedVariables = new Set<string>();
+	const references: ScopedReference[] = [];
+
+	// Collect all defined variables and references
+	collectVariables(ast, definedVariables, references);
+
+	// Check each reference against its scope
+	for (const ref of references) {
+		if (!isValidVariable(ref.name, ref.scope)) {
+			const similar = findSimilarVariable(ref.name);
+			let message = `Unknown variable "${ref.name}"`;
+			if (similar) {
+				message += `. Did you mean "${similar}"?`;
+			}
+			warnings.push({
+				message,
+				line: ref.line,
+				column: ref.column,
+			});
+		}
+	}
+
+	return warnings;
 }

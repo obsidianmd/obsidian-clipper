@@ -273,6 +273,49 @@ function tokenizeVariable(state: TokenizerState): void {
 		return;
 	}
 
+	// Check for malformed variable end: } without another } (common typo)
+	// This prevents the tokenizer from consuming subsequent lines
+	if (state.input[state.pos] === '}' && state.input[state.pos + 1] !== '}') {
+		state.errors.push({
+			message: `Malformed variable: expected '}}' but found '}'. Did you forget a '}'?`,
+			line: state.line,
+			column: state.column,
+		});
+		// Emit a variable_end anyway to prevent cascading errors
+		state.tokens.push({
+			type: 'variable_end',
+			value: '}',
+			line: state.line,
+			column: state.column,
+			trimRight: false,
+		});
+		advanceChar(state);
+		state.mode = 'text';
+		return;
+	}
+
+	// Check for new tag/variable starting - indicates unclosed variable
+	// This handles cases like: {{titl\n{% set...
+	if (lookAhead(state, '{%') || lookAhead(state, '{{')) {
+		// Find the line where the variable started for better error reporting
+		const varStartIndex = [...state.tokens].reverse().findIndex(t => t.type === 'variable_start');
+		const actualIndex = varStartIndex >= 0 ? state.tokens.length - 1 - varStartIndex : -1;
+		const varStartToken = actualIndex >= 0 ? state.tokens[actualIndex] : null;
+		const startLine = varStartToken?.line || state.line;
+		state.errors.push({
+			message: `Missing closing '}}' for variable`,
+			line: startLine,
+			column: varStartToken?.column || state.column,
+		});
+		// Remove the variable_start and any tokens after it to avoid cascading errors
+		// The malformed variable content will be discarded
+		if (actualIndex >= 0) {
+			state.tokens.splice(actualIndex);
+		}
+		state.mode = 'text';
+		return;
+	}
+
 	// Tokenize expression content
 	tokenizeExpression(state, 'variable');
 }
@@ -298,6 +341,63 @@ function tokenizeTag(state: TokenizerState): void {
 		return;
 	}
 
+	// Check for trimming tag end: -%}
+	if (lookAhead(state, '-%}')) {
+		state.tokens.push({
+			type: 'tag_end',
+			value: '-%}',
+			line: state.line,
+			column: state.column,
+			trimRight: true,
+		});
+		advance(state, 3);
+		state.mode = 'text';
+		return;
+	}
+
+	// Check for malformed tag end: } without % (common typo)
+	// This prevents the tokenizer from consuming subsequent lines
+	if (state.input[state.pos] === '}' && state.pos > 0 && state.input[state.pos - 1] !== '%') {
+		state.errors.push({
+			message: `Malformed tag: expected '%}' but found '}'. Did you forget the '%'?`,
+			line: state.line,
+			column: state.column,
+		});
+		// Emit a tag_end anyway to prevent cascading errors
+		state.tokens.push({
+			type: 'tag_end',
+			value: '}',
+			line: state.line,
+			column: state.column,
+			trimRight: true,
+		});
+		advanceChar(state);
+		state.mode = 'text';
+		return;
+	}
+
+	// Check for new tag/variable starting - indicates unclosed tag
+	// This handles cases like: {% if x\n{% set...
+	if (lookAhead(state, '{%') || lookAhead(state, '{{')) {
+		// Find the line where the tag started for better error reporting
+		const tagStartIndex = [...state.tokens].reverse().findIndex(t => t.type === 'tag_start');
+		const actualIndex = tagStartIndex >= 0 ? state.tokens.length - 1 - tagStartIndex : -1;
+		const tagStartToken = actualIndex >= 0 ? state.tokens[actualIndex] : null;
+		const startLine = tagStartToken?.line || state.line;
+		state.errors.push({
+			message: `Missing closing '%}' for tag`,
+			line: startLine,
+			column: tagStartToken?.column || state.column,
+		});
+		// Remove the tag_start and any tokens after it to avoid cascading errors
+		// The malformed tag content will be discarded
+		if (actualIndex >= 0) {
+			state.tokens.splice(actualIndex);
+		}
+		state.mode = 'text';
+		return;
+	}
+
 	// Tokenize expression content
 	tokenizeExpression(state, 'tag');
 }
@@ -311,7 +411,9 @@ function tokenizeExpression(state: TokenizerState, mode: 'variable' | 'tag'): vo
 
 	if (state.pos >= state.input.length) {
 		state.errors.push({
-			message: `Unexpected end of input in ${mode}`,
+			message: mode === 'variable'
+				? `Unclosed variable - missing '}}'`
+				: `Unclosed tag - missing '%}'`,
 			line: state.line,
 			column: state.column,
 		});
@@ -437,7 +539,7 @@ function tokenizeExpression(state: TokenizerState, mode: 'variable' | 'tag'): vo
 
 	// Unknown character - skip and report error
 	state.errors.push({
-		message: `Unexpected character '${char}'`,
+		message: `Unexpected character '${char}' in template`,
 		line: state.line,
 		column: state.column,
 	});
@@ -458,9 +560,27 @@ function tokenizeString(state: TokenizerState): void {
 
 	while (state.pos < state.input.length) {
 		const char = state.input[state.pos];
+		const nextChar = state.input[state.pos + 1] || '';
 
 		if (char === quote) {
 			advanceChar(state); // Skip closing quote
+			state.tokens.push({
+				type: 'string',
+				value,
+				line: startLine,
+				column: startColumn,
+			});
+			return;
+		}
+
+		// Check for }} or %} inside string - likely a missing closing quote
+		if ((char === '}' && nextChar === '}') || (char === '%' && nextChar === '}')) {
+			state.errors.push({
+				message: `Unclosed string - missing ${quote} before ${char}${nextChar}`,
+				line: startLine,
+				column: startColumn,
+			});
+			// Emit the partial string and let the tokenizer continue
 			state.tokens.push({
 				type: 'string',
 				value,
@@ -493,9 +613,9 @@ function tokenizeString(state: TokenizerState): void {
 
 	// Unterminated string
 	state.errors.push({
-		message: `Unterminated string starting at line ${startLine}, column ${startColumn}`,
-		line: state.line,
-		column: state.column,
+		message: `Unclosed string - missing closing ${quote}`,
+		line: startLine,
+		column: startColumn,
 	});
 	state.tokens.push({
 		type: 'string',
@@ -668,10 +788,15 @@ function tokenizeCssSelector(state: TokenizerState, value: string): string {
 			if (char === '}' && nextChar === '}') {
 				break;
 			}
-			if (char === '+' && nextChar === '%') {
+			if (char === '-' && nextChar === '%') {
 				break;
 			}
-			if (char === '+' && nextChar === '}') {
+			if (char === '-' && nextChar === '}') {
+				break;
+			}
+			// Stop at lone } (likely malformed tag ending)
+			// This prevents consuming } as part of the selector
+			if (char === '}' && nextChar !== '}') {
 				break;
 			}
 		}
