@@ -102,13 +102,21 @@ export interface GroupExpression extends BaseNode {
 	expression: Expression;
 }
 
+export interface MemberExpression extends BaseNode {
+	type: 'member';
+	object: Expression;
+	property: Expression;
+	computed: true; // Always true for bracket notation
+}
+
 export type Expression =
 	| LiteralExpression
 	| IdentifierExpression
 	| BinaryExpression
 	| UnaryExpression
 	| FilterExpression
-	| GroupExpression;
+	| GroupExpression
+	| MemberExpression;
 
 // ============================================================================
 // Parser Result
@@ -741,14 +749,14 @@ function parseNotExpression(state: ParserState): Expression | null {
 
 // Comparison: ==, !=, >, <, >=, <=, contains
 function parseComparisonExpression(state: ParserState): Expression | null {
-	let left = parsePrimaryExpression(state);
+	let left = parsePostfixExpression(state);
 	if (!left) return null;
 
 	const comparisonOps: TokenType[] = ['op_eq', 'op_neq', 'op_gt', 'op_lt', 'op_gte', 'op_lte', 'op_contains'];
 
 	if (comparisonOps.some(op => check(state, op))) {
 		const opToken = advance(state);
-		const right = parsePrimaryExpression(state);
+		const right = parsePostfixExpression(state);
 		if (!right) {
 			state.errors.push({
 				message: `Expected expression after "${opToken.value}"`,
@@ -775,6 +783,48 @@ function parseComparisonExpression(state: ParserState): Expression | null {
 			right,
 			line: opToken.line,
 			column: opToken.column,
+		};
+	}
+
+	return left;
+}
+
+// Postfix: primary followed by bracket access [index]
+function parsePostfixExpression(state: ParserState): Expression | null {
+	let left = parsePrimaryExpression(state);
+	if (!left) return null;
+
+	// Handle bracket notation: expr[index]
+	while (check(state, 'lbracket')) {
+		const bracketToken = advance(state); // consume '['
+
+		const property = parseOrExpression(state);
+		if (!property) {
+			state.errors.push({
+				message: 'Expected expression inside brackets',
+				line: bracketToken.line,
+				column: bracketToken.column,
+			});
+			break;
+		}
+
+		if (check(state, 'rbracket')) {
+			advance(state); // consume ']'
+		} else {
+			state.errors.push({
+				message: 'Expected "]" after bracket expression',
+				line: peek(state).line,
+				column: peek(state).column,
+			});
+		}
+
+		left = {
+			type: 'member',
+			object: left,
+			property,
+			computed: true,
+			line: bracketToken.line,
+			column: bracketToken.column,
 		};
 	}
 

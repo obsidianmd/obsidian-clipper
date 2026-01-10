@@ -178,14 +178,56 @@ You can loop over:
 
 #### Loop variables
 
-Inside a loop, you have access to:
-- The iterator variable (e.g., `item` in `for item in array`)
-- An index variable with `_index` suffix (e.g., `item_index`, starting from 0)
+Inside a loop, you have access to a `loop` object with the following properties:
+
+| Variable | Description |
+|----------|-------------|
+| `loop.index` | Current iteration (1-indexed) |
+| `loop.index0` | Current iteration (0-indexed) |
+| `loop.first` | `true` if first iteration |
+| `loop.last` | `true` if last iteration |
+| `loop.length` | Total number of items |
+
+```
+{% for tag in tags %}
+{{loop.index}}. {{tag}}
+{% if loop.last %} (end of list){% endif %}
+{% endfor %}
+```
+
+For backwards compatibility, you can also use `item_index` (where `item` is your iterator variable name) to get the 0-indexed position:
 
 ```
 {% for tag in tags %}
 {{tag_index}}. {{tag}}
 {% endfor %}
+```
+
+#### Accessing array items by index
+
+Use bracket notation to access array elements by index:
+
+```
+{{items[0]}}
+{{items[loop.index0]}}
+```
+
+This is useful when you need to access items from multiple arrays in parallel:
+
+```
+{% set transcripts = selector:.transcript-text %}
+{% set timestamps = selector:.timestamp %}
+
+{% for line in transcripts %}
+{{timestamps[loop.index0]}} - {{line}}
+{% endfor %}
+```
+
+Bracket notation also works with object properties:
+
+```
+{{user["name"]}}
+{{data["my-key"]}}
 ```
 
 #### Nested loops

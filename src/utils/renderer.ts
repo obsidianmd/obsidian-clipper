@@ -22,6 +22,7 @@ import {
 	UnaryExpression,
 	FilterExpression,
 	GroupExpression,
+	MemberExpression,
 	parse,
 } from './parser';
 
@@ -303,9 +304,19 @@ async function renderFor(node: ForNode, state: RenderState): Promise<string> {
 		}
 
 		const results: string[] = [];
+		const length = iterableValue.length;
 
-		for (let i = 0; i < iterableValue.length; i++) {
+		for (let i = 0; i < length; i++) {
 			const item = iterableValue[i];
+
+			// Create loop object with Twig-compatible properties
+			const loop = {
+				index: i + 1,       // 1-indexed
+				index0: i,          // 0-indexed
+				first: i === 0,
+				last: i === length - 1,
+				length: length,
+			};
 
 			// Create new context with loop variables
 			const loopContext: RenderContext = {
@@ -313,7 +324,8 @@ async function renderFor(node: ForNode, state: RenderState): Promise<string> {
 				variables: {
 					...state.context.variables,
 					[node.iterator]: item,
-					[`${node.iterator}_index`]: i,
+					[`${node.iterator}_index`]: i,  // Keep for backwards compatibility
+					loop,
 				},
 			};
 
@@ -405,6 +417,9 @@ async function evaluateExpression(expr: Expression, state: RenderState): Promise
 		case 'group':
 			return evaluateExpression(expr.expression, state);
 
+		case 'member':
+			return evaluateMember(expr, state);
+
 		default:
 			throw new Error(`Unknown expression type: ${(expr as any).type}`);
 	}
@@ -444,6 +459,32 @@ async function evaluateIdentifier(expr: IdentifierExpression, state: RenderState
 
 	// Regular variable lookup
 	return resolveVariable(name, state.context.variables);
+}
+
+async function evaluateMember(expr: MemberExpression, state: RenderState): Promise<any> {
+	const object = await evaluateExpression(expr.object, state);
+	const property = await evaluateExpression(expr.property, state);
+
+	if (object === undefined || object === null) {
+		return undefined;
+	}
+
+	// Array access with numeric index
+	if (Array.isArray(object) && typeof property === 'number') {
+		return object[property];
+	}
+
+	// Array access with string that's a number
+	if (Array.isArray(object) && typeof property === 'string' && /^\d+$/.test(property)) {
+		return object[parseInt(property, 10)];
+	}
+
+	// Object property access
+	if (typeof object === 'object' && property !== undefined) {
+		return object[property];
+	}
+
+	return undefined;
 }
 
 async function evaluateBinary(expr: BinaryExpression, state: RenderState): Promise<any> {
