@@ -1,150 +1,81 @@
+// Template compiler for the Web Clipper template engine
+// This module provides the main entry point for template compilation,
+// integrating the new AST-based renderer with the existing variable processors.
+
+import { render, RenderContext, setFilterImplementation } from './renderer';
+import { applyFilters } from './filters';
 import { processSimpleVariable } from './variables/simple';
-import { processSelector } from './variables/selector';
+import { processSelector, resolveSelector } from './variables/selector';
 import { processSchema } from './variables/schema';
 import { processPrompt } from './variables/prompt';
 
-import { processForBlock } from './tags/for';
-import { processSetStatement } from './tags/set';
-import { processIfBlock } from './tags/if';
+// Initialize the filter implementation for the renderer
+setFilterImplementation(applyFilters);
 
-// Define a type for logic handlers
-type ProcessLogicFn = (tabId: number, text: string, variables: { [key: string]: any }, currentUrl: string) => Promise<string>;
-
-type LogicHandlerResult = string | { result: string; length: number };
-
-type LogicHandler = {
-	type: string;
-	regex: RegExp;
-	// needsFullText: if true, handler receives full text and returns {result, length}
-	needsFullText?: boolean;
-	process: (
-		tabId: number,
-		match: RegExpExecArray,
-		variables: { [key: string]: any },
-		currentUrl: string,
-		processLogic: ProcessLogicFn,
-		fullText?: string
-	) => Promise<LogicHandlerResult>;
-};
-
-// Define logic handlers
-// Order matters: set should be processed first to define variables
-// Regex patterns support whitespace control: {%- strips before, -%} strips after
-const logicHandlers: LogicHandler[] = [
-	{
-		type: 'set',
-		regex: /{%-?\s*set\s+(\w+)\s*=\s*(.+?)\s*-?%}/g,
-		process: async (tabId, match, variables, currentUrl) => {
-			return processSetStatement(tabId, match, variables, currentUrl);
-		}
-	},
-	{
-		type: 'if',
-		regex: /{%-?\s*if\s+(.+?)\s*-?%}/g,
-		needsFullText: true,
-		process: async (tabId, match, variables, currentUrl, processLogic, fullText) => {
-			return processIfBlock(tabId, fullText!, match, variables, currentUrl, processLogic);
-		}
-	},
-	{
-		type: 'for',
-		regex: /{%-?\s*for\s+(\w+)\s+in\s+([\w:@.]+)\s*-?%}/g,
-		needsFullText: true,
-		process: async (tabId, match, variables, currentUrl, processLogic, fullText) => {
-			return processForBlock(tabId, fullText!, match, variables, currentUrl, processLogic);
-		}
-	},
-];
-
-// Main function to compile the template
-export async function compileTemplate(tabId: number, text: string, variables: { [key: string]: any }, currentUrl: string): Promise<string> {
+/**
+ * Main function to compile a template with the given variables.
+ * This is the primary entry point used by the extension.
+ *
+ * @param tabId - Browser tab ID for selector resolution
+ * @param text - Template string to compile
+ * @param variables - Variables available in the template
+ * @param currentUrl - Current page URL for filter processing
+ * @returns Compiled template string
+ */
+export async function compileTemplate(
+	tabId: number,
+	text: string,
+	variables: { [key: string]: any },
+	currentUrl: string
+): Promise<string> {
+	// Strip text fragment from URL
 	currentUrl = currentUrl.replace(/#:~:text=[^&]+(&|$)/, '');
 
-	// Process logic
-	const processedText = await processLogic(tabId, text, variables, currentUrl);
-	// Process other variables and filters
-	return await processVariables(tabId, processedText, variables, currentUrl);
-}
-
-// Process logic structures
-export async function processLogic(tabId: number, text: string, variables: { [key: string]: any }, currentUrl: string): Promise<string> {
-	let processedText = text;
-
-	for (const handler of logicHandlers) {
-		let match;
-		handler.regex.lastIndex = 0; // Reset regex state
-		while ((match = handler.regex.exec(processedText)) !== null) {
-			const handlerResult = await handler.process(
-				tabId,
-				match,
-				variables,
-				currentUrl,
-				processLogic,
-				handler.needsFullText ? processedText : undefined
-			);
-
-			// Handle both string and {result, length} return types
-			let result: string;
-			let consumedLength: number;
-
-			if (typeof handlerResult === 'string') {
-				result = handlerResult;
-				consumedLength = match[0].length;
-			} else {
-				result = handlerResult.result;
-				consumedLength = handlerResult.length;
-			}
-
-			// Handle whitespace control: {%- strips before, -%} strips after
-			let startIndex = match.index;
-			let endIndex = match.index + consumedLength;
-
-			// Check for {%- (strip whitespace before)
-			if (match[0].startsWith('{%-')) {
-				// Find preceding whitespace/newlines to strip
-				while (startIndex > 0 && /[\t ]/.test(processedText[startIndex - 1])) {
-					startIndex--;
-				}
-				// Also strip one preceding newline if present
-				if (startIndex > 0 && processedText[startIndex - 1] === '\n') {
-					startIndex--;
-					// Handle \r\n
-					if (startIndex > 0 && processedText[startIndex - 1] === '\r') {
-						startIndex--;
-					}
-				}
-			}
-
-			// Check for -%} (strip whitespace after)
-			// Need to check the actual end of the consumed content for block tags
-			const tagEnd = processedText.substring(match.index, endIndex);
-			const endsWithStripMarker = tagEnd.endsWith('-%}') ||
-				(handler.needsFullText && processedText.substring(endIndex - 4, endIndex).match(/-\s*%}/));
-
-			if (match[0].endsWith('-%}') || endsWithStripMarker) {
-				// Find following whitespace/newlines to strip
-				while (endIndex < processedText.length && /[\t ]/.test(processedText[endIndex])) {
-					endIndex++;
-				}
-				// Also strip one following newline if present
-				if (endIndex < processedText.length && processedText[endIndex] === '\r') {
-					endIndex++;
-				}
-				if (endIndex < processedText.length && processedText[endIndex] === '\n') {
-					endIndex++;
-				}
-			}
-
-			processedText = processedText.substring(0, startIndex) + result + processedText.substring(endIndex);
-			handler.regex.lastIndex = startIndex + result.length;
+	// Create async resolver for selectors
+	const asyncResolver = async (name: string, ctx: RenderContext): Promise<any> => {
+		if (name.startsWith('selector:') || name.startsWith('selectorHtml:')) {
+			return resolveSelector(ctx.tabId!, name);
 		}
+		return undefined;
+	};
+
+	// Create render context with custom variable resolver
+	const context: RenderContext = {
+		variables,
+		currentUrl,
+		tabId,
+		applyFilters,
+		asyncResolver,
+	};
+
+	// Render the template using the AST-based renderer
+	const result = await render(text, context);
+
+	// Log any errors (but don't fail - return partial output)
+	if (result.errors.length > 0) {
+		console.error('Template compilation errors:', result.errors);
 	}
+
+	// Post-process: handle special variable types that weren't processed by the renderer
+	// The renderer handles basic variables, but special prefixes need custom processing
+	const processedText = await processVariables(tabId, result.output, variables, currentUrl);
 
 	return processedText;
 }
 
-// Process variables and apply filters
-export async function processVariables(tabId: number, text: string, variables: { [key: string]: any }, currentUrl: string): Promise<string> {
+/**
+ * Process variables and apply filters.
+ * Handles special variable types: selector, schema, prompt.
+ *
+ * This is called after the AST-based renderer to handle any remaining
+ * variable interpolations that need special processing.
+ */
+export async function processVariables(
+	tabId: number,
+	text: string,
+	variables: { [key: string]: any },
+	currentUrl: string
+): Promise<string> {
 	const regex = /{{([\s\S]*?)}}/g;
 	let result = text;
 	let match;
@@ -152,7 +83,7 @@ export async function processVariables(tabId: number, text: string, variables: {
 	while ((match = regex.exec(result)) !== null) {
 		const fullMatch = match[0];
 		const trimmedMatch = match[1].trim();
-		
+
 		let replacement: string;
 
 		if (trimmedMatch.startsWith('selector:') || trimmedMatch.startsWith('selectorHtml:')) {
@@ -171,3 +102,4 @@ export async function processVariables(tabId: number, text: string, variables: {
 
 	return result;
 }
+
