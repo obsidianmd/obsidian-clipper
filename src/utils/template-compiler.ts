@@ -1,6 +1,6 @@
 // Template compiler for the Web Clipper template engine
 // This module provides the main entry point for template compilation,
-// integrating the new AST-based renderer with the existing variable processors.
+// integrating the AST-based renderer with the variable processors.
 
 import { render, RenderContext, setFilterImplementation } from './renderer';
 import { applyFilters } from './filters';
