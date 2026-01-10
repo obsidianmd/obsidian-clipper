@@ -358,7 +358,7 @@ function parseLLMResponse(responseContent: string, promptVariables: PromptVariab
 
 export function collectPromptVariables(template: Template | null): PromptVariable[] {
 	const promptMap = new Map<string, PromptVariable>();
-	const promptRegex = /{{(?:prompt:)?"(.*?)"(\|.*?)?}}/g;
+	const promptRegex = /{{(?:prompt:)?"([\s\S]*?)"(\|.*?)?}}/g;
 	let match;
 
 	function addPrompt(prompt: string, filters: string) {
@@ -640,7 +640,7 @@ export function replacePromptVariables(promptVariables: PromptVariable[], prompt
 	const allInputs = document.querySelectorAll('input, textarea');
 	allInputs.forEach((input) => {
 		if (input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement) {
-			input.value = input.value.replace(/{{(?:prompt:)?"(.*?)"(\|.*?)?}}/g, (match, promptText, filters) => {
+			input.value = input.value.replace(/{{(?:prompt:)?"([\s\S]*?)"(\|[\s\S]*?)?}}/g, (match, promptText, filters) => {
 				const variable = promptVariables.find(v => v.prompt === promptText);
 				if (!variable) return match;
 
