@@ -602,10 +602,39 @@ function parseBody(state: ParserState, stopKeywords: TokenType[]): ASTNode[] {
 // ============================================================================
 
 function parseExpression(state: ParserState): Expression | null {
-	return parseFilterExpression(state);
+	return parseNullishExpression(state);
 }
 
-// Filter has lowest precedence: value | filter | filter
+// Nullish coalescing has lowest precedence: value ?? fallback
+function parseNullishExpression(state: ParserState): Expression | null {
+	let left = parseFilterExpression(state);
+	if (!left) return null;
+
+	while (check(state, 'op_nullish')) {
+		const opToken = advance(state);
+		const right = parseFilterExpression(state);
+		if (!right) {
+			state.errors.push({
+				message: 'Expected expression after "??"',
+				line: opToken.line,
+				column: opToken.column,
+			});
+			break;
+		}
+		left = {
+			type: 'binary',
+			operator: '??',
+			left,
+			right,
+			line: opToken.line,
+			column: opToken.column,
+		};
+	}
+
+	return left;
+}
+
+// Filter: value | filter | filter
 function parseFilterExpression(state: ParserState): Expression | null {
 	let left = parseOrExpression(state);
 	if (!left) return null;

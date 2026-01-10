@@ -39,6 +39,7 @@ export type TokenType =
 	| 'op_or'             // or, ||
 	| 'op_not'            // not, !
 	| 'op_contains'       // contains
+	| 'op_nullish'        // ??
 	| 'op_assign'         // =
 
 	// Literals and identifiers
@@ -361,6 +362,11 @@ function tokenizeExpression(state: TokenizerState, mode: 'variable' | 'tag'): vo
 	}
 	if (lookAhead(state, '||')) {
 		state.tokens.push({ type: 'op_or', value: '||', line: startLine, column: startColumn });
+		advance(state, 2);
+		return;
+	}
+	if (lookAhead(state, '??')) {
+		state.tokens.push({ type: 'op_nullish', value: '??', line: startLine, column: startColumn });
 		advance(state, 2);
 		return;
 	}

@@ -95,6 +95,48 @@ Variables can be set to:
 
 Variables set with `{% set %}` can be used in subsequent template logic and in `{{variable}}` output.
 
+## Fallback values
+
+Use the `??` operator to provide fallback values when a variable is empty or undefined:
+
+```
+{{title ?? "Untitled"}}
+```
+
+If `title` is empty, undefined, or falsy, the fallback value `"Untitled"` will be used instead.
+
+This is a shorthand for the equivalent `if` statement:
+
+```
+{% if title %}{{title}}{% else %}Untitled{% endif %}
+```
+
+### Chaining fallbacks
+
+You can chain multiple fallbacks:
+
+```
+{{title ?? headline ?? "No title"}}
+```
+
+This will use `title` if available, otherwise `headline`, otherwise the string `"No title"`.
+
+### With filters
+
+Filters bind more tightly than `??`, so filters are applied before the fallback check:
+
+```
+{{title|upper ?? "UNTITLED"}}
+```
+
+This applies `upper` to `title` first, then falls back to `"UNTITLED"` if the result is empty. To apply filters to the fallback value, use parentheses or separate expressions:
+
+```
+{{title ?? "Untitled"|lower}}
+```
+
+This will use `title` if available, otherwise apply `lower` to the fallback, resulting in `"untitled"`.
+
 ## Loops
 
 Use `{% for %}` to iterate over arrays:
@@ -190,3 +232,12 @@ Conditionals and loops can be combined:
 {% endif %}
 {% endfor %}
 ```
+
+## Evaluation order
+
+Template logic is processed in the following order:
+
+1. **Template logic** — `{% if %}`, `{% for %}`, `{% set %}`, and `{{variables}}` are evaluated first
+2. **Prompt variables** — [[Variables#Prompt variables|Prompt variables]] like `{{"summarize this"|prompt}}` are sent to the Interpreter after template logic is complete
+
+This means you can use template logic to construct prompts dynamically, but prompt results are not available for use in conditionals or loops.

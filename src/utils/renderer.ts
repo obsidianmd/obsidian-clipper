@@ -501,6 +501,16 @@ async function evaluateMember(expr: MemberExpression, state: RenderState): Promi
 }
 
 async function evaluateBinary(expr: BinaryExpression, state: RenderState): Promise<any> {
+	// Handle nullish coalescing with short-circuit evaluation
+	if (expr.operator === '??') {
+		const left = await evaluateExpression(expr.left, state);
+		// Return left if it's truthy, otherwise evaluate and return right
+		if (isTruthy(left)) {
+			return left;
+		}
+		return evaluateExpression(expr.right, state);
+	}
+
 	const left = await evaluateExpression(expr.left, state);
 	const right = await evaluateExpression(expr.right, state);
 
