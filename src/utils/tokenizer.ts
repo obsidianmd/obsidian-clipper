@@ -229,7 +229,7 @@ function tokenizeText(state: TokenizerState): void {
 				value: '{%',
 				line: state.line,
 				column: state.column - 2,
-				trimLeft: true,  // Tags always trim whitespace
+				trimLeft: false,  // Preserve whitespace before tags
 			});
 
 			state.mode = 'tag';

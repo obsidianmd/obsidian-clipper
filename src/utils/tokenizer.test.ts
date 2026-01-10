@@ -162,11 +162,11 @@ test('tokenizes set tag', () => {
 });
 
 test('tokenizes tag with whitespace trimming', () => {
-	// Tags always trim whitespace
+	// Tags trim whitespace after (trimRight) but preserve before (trimLeft)
 	const result = tokenize('{% if x %}');
 	expect(result.errors).toHaveLength(0);
-	expect(result.tokens[0].trimLeft).toBe(true);
-	expect(result.tokens[3].trimRight).toBe(true);
+	expect(result.tokens[0].trimLeft).toBe(false);  // Preserve whitespace before
+	expect(result.tokens[3].trimRight).toBe(true);   // Trim whitespace after
 });
 
 // --- Comparison Operators ---

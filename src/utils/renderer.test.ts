@@ -335,10 +335,10 @@ async function runTests() {
 	// --- Whitespace Control ---
 
 	test('renders tags with whitespace trimming', async () => {
-		// Tags always trim surrounding whitespace
-		const result = await render('{% set x = 1 %}\nHello', createContext());
+		// Tags trim whitespace after but preserve before
+		const result = await render('Hello\n{% set x = 1 %}\nWorld', createContext());
 		expect(result.errors).toHaveLength(0);
-		expect(result.output).toBe('Hello');
+		expect(result.output).toBe('Hello\nWorld');  // Newline before set preserved, newline after trimmed
 	});
 
 	test('renders variables preserving whitespace', async () => {

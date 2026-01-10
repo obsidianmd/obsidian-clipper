@@ -401,12 +401,12 @@ test('parses set with filter', () => {
 });
 
 test('parses set with whitespace trimming', () => {
-	// Tags always trim whitespace
+	// Tags trim whitespace after (trimRight) but preserve before (trimLeft)
 	const result = parse('{% set x = 1 %}');
 	expect(result.errors).toHaveLength(0);
 	const setNode = result.ast[0] as SetNode;
-	expect(setNode.trimLeft).toBe(true);
-	expect(setNode.trimRight).toBe(true);
+	expect(setNode.trimLeft).toBe(false);  // Preserve whitespace before
+	expect(setNode.trimRight).toBe(true);   // Trim whitespace after
 });
 
 // --- Mixed Content ---
