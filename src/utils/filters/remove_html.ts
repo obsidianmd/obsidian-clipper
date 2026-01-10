@@ -44,7 +44,7 @@ export const remove_html = (html: string, params: string = ''): string => {
 	// Serialize back to HTML
 	const serializer = new XMLSerializer();
 	let result = '';
-	Array.from(doc.body.childNodes).forEach(node => {
+	Array.from(doc.body?.childNodes ?? []).forEach(node => {
 		if (node.nodeType === Node.ELEMENT_NODE) {
 			result += serializer.serializeToString(node);
 		} else if (node.nodeType === Node.TEXT_NODE) {
