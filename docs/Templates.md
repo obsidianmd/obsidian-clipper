@@ -16,7 +16,7 @@ Templates make use of [[Variables]] and [[Filters]], which allow you to tailor h
 
 To import a template:
 
-1. Open the extension and click the **Settings** cog icon.
+1. Open the extension and click the **[[Settings]]** cog icon.
 2. Go to any template in the list.
 3. Click **Import** in the top right or drag and drop your `.json` template file(s) anywhere in the template area.
 
@@ -62,4 +62,186 @@ Schema.org values can also be used to [[Variables#Schema.org variables|pre-popul
 
 ### Interpreter context
 
-When [[Interpret web pages|Interpreter]] is enabled, you can use [[Variables#Prompt variables|prompt variables]] to extract page content with natural language. For each template you can define the [[Interpret web pages#Context|context]] that Interpreter has access too. 
+When [[Interpret web pages|Interpreter]] is enabled, you can use [[Variables#Prompt variables|prompt variables]] to extract page content with natural language. For each template you can define the [[Interpret web pages#Context|context]] that Interpreter has access too.
+
+## Template logic
+
+Web Clipper supports template logic for conditionals, loops, and variable assignment. This syntax is inspired by [Twig](https://twig.symfony.com/) and [Liquid](https://shopify.github.io/liquid/) templating languages.
+
+### Conditionals
+
+Use `{% if %}` to conditionally include content based on variables or expressions.
+
+```
+{% if author %}
+Author: {{author}}
+{% endif %}
+```
+
+#### Else and elseif
+
+Use `{% else %}` to provide fallback content, and `{% elseif %}` to chain multiple conditions:
+
+```
+{% if status == "published" %}
+Live article
+{% elseif status == "draft" %}
+Draft article
+{% else %}
+Unknown status
+{% endif %}
+```
+
+#### Comparison operators
+
+The following comparison operators are supported:
+
+| Operator | Description |
+|----------|-------------|
+| `==` | Equal to |
+| `!=` | Not equal to |
+| `>` | Greater than |
+| `<` | Less than |
+| `>=` | Greater than or equal to |
+| `<=` | Less than or equal to |
+| `contains` | Check if string contains substring, or array contains value |
+
+Examples:
+- `{% if title == "Home" %}` — string equality
+- `{% if price >= 100 %}` — numeric comparison
+- `{% if title contains "Review" %}` — substring check
+- `{% if tags contains "important" %}` — array membership
+
+#### Logical operators
+
+Combine conditions using logical operators:
+
+| Operator | Alternative | Description |
+|----------|-------------|-------------|
+| `and` | `&&` | Both conditions must be true |
+| `or` | `\|\|` | At least one condition must be true |
+| `not` | `!` | Negates a condition |
+
+Examples:
+- `{% if author and published %}` — both must exist
+- `{% if draft or archived %}` — either condition
+- `{% if not hidden %}` — negation
+- `{% if (premium or featured) and published %}` — grouped conditions
+
+#### Truthiness
+
+When a variable is used without a comparison operator, it's evaluated for "truthiness":
+
+- `false`, `null`, `undefined`, empty string `""`, and `0` are considered **falsy**
+- Empty arrays `[]` are considered **falsy**
+- Everything else is **truthy**
+
+```
+{% if content %}
+Has content
+{% endif %}
+```
+
+### Variable assignment
+
+Use `{% set %}` to create or modify variables within your template:
+
+```
+{% set slug = title|lower|replace:" ":"-" %}
+File: {{slug}}.md
+```
+
+Variables can be set to:
+- Other variables: `{% set name = author %}`
+- Literals: `{% set count = 5 %}` or `{% set label = "Draft" %}`
+- Expressions with filters: `{% set excerpt = content|truncate:100 %}`
+- Selector results: `{% set comments = selector:.comment %}`
+
+Variables set with `{% set %}` can be used in subsequent template logic and in `{{variable}}` output.
+
+### Loops
+
+Use `{% for %}` to iterate over arrays:
+
+```
+{% for item in schema:author %}
+- {{item.name}}
+{% endfor %}
+```
+
+#### Loop sources
+
+You can loop over:
+- Schema arrays: `{% for item in schema:author %}`
+- Selector results: `{% for comment in selector:.comment %}`
+- Variables set earlier: `{% set items = selector:.item %}{% for item in items %}`
+
+#### Loop variables
+
+Inside a loop, you have access to:
+- The iterator variable (e.g., `item` in `for item in array`)
+- An index variable with `_index` suffix (e.g., `item_index`, starting from 0)
+
+```
+{% for tag in tags %}
+{{tag_index}}. {{tag}}
+{% endfor %}
+```
+
+#### Nested loops
+
+Loops can be nested for complex data structures:
+
+```
+{% for section in sections %}
+## {{section.title}}
+{% for item in section.items %}
+- {{item}}
+{% endfor %}
+{% endfor %}
+```
+
+### Combining logic
+
+Conditionals and loops can be combined:
+
+```
+{% for item in items %}
+{% if item.active %}
+- {{item.name}}
+{% endif %}
+{% endfor %}
+```
+
+### Whitespace control
+
+By default, template tags produce line breaks in the output. Use the `-` modifier to strip whitespace:
+
+| Syntax | Effect |
+|--------|--------|
+| `{%- ... %}` | Strip whitespace and newline **before** the tag |
+| `{% ... -%}` | Strip whitespace and newline **after** the tag |
+| `{%- ... -%}` | Strip both |
+
+This is useful for inline output or avoiding extra blank lines:
+
+```
+{%- set name = author -%}
+{%- if name -%}
+By {{name}}
+{%- endif -%}
+```
+
+Without the `-` modifiers, this would produce extra blank lines. With them, the output is clean:
+
+```
+By Author Name
+```
+
+Another example for inline conditions:
+
+```
+Status: {% if published -%}Live{%- else -%}Draft{%- endif %}
+```
+
+Output: `Status: Live`

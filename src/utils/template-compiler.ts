@@ -1,57 +1,81 @@
+// Template compiler for the Web Clipper template engine
+// This module provides the main entry point for template compilation,
+// integrating the AST-based renderer with the variable processors.
+
+import { render, RenderContext, setFilterImplementation } from './renderer';
+import { applyFilters } from './filters';
 import { processSimpleVariable } from './variables/simple';
-import { processSelector } from './variables/selector';
+import { processSelector, resolveSelector } from './variables/selector';
 import { processSchema } from './variables/schema';
 import { processPrompt } from './variables/prompt';
 
-import { processForLoop } from './tags/for';
+// Initialize the filter implementation for the renderer
+setFilterImplementation(applyFilters);
 
-// Define a type for logic handlers
-type LogicHandler = {
-	type: string;
-	regex: RegExp;
-	process: (match: RegExpExecArray, variables: { [key: string]: any }, currentUrl: string, processLogic: (text: string, variables: { [key: string]: any }, currentUrl: string) => Promise<string>) => Promise<string>;
-};
-
-// Define logic handlers
-const logicHandlers: LogicHandler[] = [
-	{
-		type: 'for',
-		regex: /{%\s*for\s+(\w+)\s+in\s+([\w:@]+)\s*%}([\s\S]*?){%\s*endfor\s*%}/g,
-		process: async (match, variables, currentUrl, processLogic) => {
-			return processForLoop(match, variables, currentUrl, processLogic);
-		}
-	},
-	// Add more logic handlers
-];
-
-// Main function to compile the template
-export async function compileTemplate(tabId: number, text: string, variables: { [key: string]: any }, currentUrl: string): Promise<string> {
+/**
+ * Main function to compile a template with the given variables.
+ * This is the primary entry point used by the extension.
+ *
+ * @param tabId - Browser tab ID for selector resolution
+ * @param text - Template string to compile
+ * @param variables - Variables available in the template
+ * @param currentUrl - Current page URL for filter processing
+ * @returns Compiled template string
+ */
+export async function compileTemplate(
+	tabId: number,
+	text: string,
+	variables: { [key: string]: any },
+	currentUrl: string
+): Promise<string> {
+	// Strip text fragment from URL
 	currentUrl = currentUrl.replace(/#:~:text=[^&]+(&|$)/, '');
 
-	// Process logic
-	const processedText = await processLogic(text, variables, currentUrl);
-	// Process other variables and filters
-	return await processVariables(tabId, processedText, variables, currentUrl);
-}
-
-// Process logic structures
-export async function processLogic(text: string, variables: { [key: string]: any }, currentUrl: string): Promise<string> {
-	let processedText = text;
-	
-	for (const handler of logicHandlers) {
-		let match;
-		while ((match = handler.regex.exec(processedText)) !== null) {
-			const result = await handler.process(match, variables, currentUrl, processLogic);
-			processedText = processedText.substring(0, match.index) + result + processedText.substring(match.index + match[0].length);
-			handler.regex.lastIndex = match.index + result.length;
+	// Create async resolver for selectors
+	const asyncResolver = async (name: string, ctx: RenderContext): Promise<any> => {
+		if (name.startsWith('selector:') || name.startsWith('selectorHtml:')) {
+			return resolveSelector(ctx.tabId!, name);
 		}
+		return undefined;
+	};
+
+	// Create render context with custom variable resolver
+	const context: RenderContext = {
+		variables,
+		currentUrl,
+		tabId,
+		applyFilters,
+		asyncResolver,
+	};
+
+	// Render the template using the AST-based renderer
+	const result = await render(text, context);
+
+	// Log any errors (but don't fail - return partial output)
+	if (result.errors.length > 0) {
+		console.error('Template compilation errors:', result.errors);
 	}
+
+	// Post-process: handle special variable types that weren't processed by the renderer
+	// The renderer handles basic variables, but special prefixes need custom processing
+	const processedText = await processVariables(tabId, result.output, variables, currentUrl);
 
 	return processedText;
 }
 
-// Process variables and apply filters
-export async function processVariables(tabId: number, text: string, variables: { [key: string]: any }, currentUrl: string): Promise<string> {
+/**
+ * Process variables and apply filters.
+ * Handles special variable types: selector, schema, prompt.
+ *
+ * This is called after the AST-based renderer to handle any remaining
+ * variable interpolations that need special processing.
+ */
+export async function processVariables(
+	tabId: number,
+	text: string,
+	variables: { [key: string]: any },
+	currentUrl: string
+): Promise<string> {
 	const regex = /{{([\s\S]*?)}}/g;
 	let result = text;
 	let match;
@@ -59,7 +83,7 @@ export async function processVariables(tabId: number, text: string, variables: {
 	while ((match = regex.exec(result)) !== null) {
 		const fullMatch = match[0];
 		const trimmedMatch = match[1].trim();
-		
+
 		let replacement: string;
 
 		if (trimmedMatch.startsWith('selector:') || trimmedMatch.startsWith('selectorHtml:')) {
@@ -78,3 +102,4 @@ export async function processVariables(tabId: number, text: string, variables: {
 
 	return result;
 }
+
