@@ -663,8 +663,14 @@ function tokenizeIdentifier(state: TokenizerState): void {
 
 /**
  * Continue tokenizing a CSS selector after the selector: or selectorHtml: prefix.
- * CSS selectors can contain brackets, quotes, and other special characters.
- * We need to handle balanced brackets and quoted strings properly.
+ * CSS selectors can contain:
+ * - Spaces (descendant combinator)
+ * - Combinators: +, >, ~
+ * - Brackets for attribute selectors: [attr="value"]
+ * - Parentheses for pseudo-classes: :nth-child(2)
+ * - Quotes inside attribute selectors
+ *
+ * We only stop at actual template delimiters: |, }}, %}, -}}, -%}
  */
 function tokenizeCssSelector(state: TokenizerState, value: string): string {
 	let bracketDepth = 0;
@@ -675,12 +681,9 @@ function tokenizeCssSelector(state: TokenizerState, value: string): string {
 		const char = state.input[state.pos];
 		const nextChar = state.input[state.pos + 1] || '';
 
-		// Check for end of tag/variable (but not inside brackets or strings)
+		// Check for end of tag/variable (but not inside brackets, parens, or strings)
 		if (!inString && bracketDepth === 0 && parenDepth === 0) {
-			// Stop at whitespace, pipe (filter), or tag/variable end
-			if (char === ' ' || char === '\t' || char === '\n' || char === '\r') {
-				break;
-			}
+			// Stop at pipe (filter) or tag/variable end markers
 			if (char === '|') {
 				break;
 			}
@@ -722,7 +725,7 @@ function tokenizeCssSelector(state: TokenizerState, value: string): string {
 			continue;
 		}
 
-		// Track bracket depth (but not inside strings)
+		// Track bracket and paren depth (but not inside strings)
 		if (!inString) {
 			if (char === '[') {
 				bracketDepth++;
@@ -739,7 +742,8 @@ function tokenizeCssSelector(state: TokenizerState, value: string): string {
 		advanceChar(state);
 	}
 
-	return value;
+	// Trim trailing whitespace from the selector
+	return value.trimEnd();
 }
 
 // ============================================================================
