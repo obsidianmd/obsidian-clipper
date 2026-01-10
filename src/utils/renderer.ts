@@ -455,9 +455,9 @@ async function evaluateIdentifier(expr: IdentifierExpression, state: RenderState
 		return `{{${name}}}`;
 	}
 
-	// Schema variables - preserve for post-processing
+	// Schema variables - resolve with shorthand support
 	if (name.startsWith('schema:')) {
-		const value = resolveVariable(name, state.context.variables);
+		const value = resolveSchemaVariable(name, state.context.variables);
 		if (value === undefined) {
 			// Not in variables, preserve for post-processor
 			return `{{${name}}}`;
@@ -605,6 +605,57 @@ function evaluateContains(left: any, right: any): boolean {
 // ============================================================================
 // Variable Resolution
 // ============================================================================
+
+/**
+ * Resolve a schema variable with shorthand support.
+ * Schema variables can be stored with full keys like {{schema:@Movie.genre}}
+ * but referenced with shorthand like schema:genre.
+ */
+function resolveSchemaVariable(name: string, variables: Record<string, any>): any {
+	// name is like "schema:genre" or "schema:@Movie.genre"
+	const schemaKey = name.slice('schema:'.length);
+
+	// Try exact match first with {{ }} wrapper
+	const exactValue = variables[`{{${name}}}`];
+	if (exactValue !== undefined) {
+		return parseSchemaValue(exactValue);
+	}
+
+	// Try plain key
+	if (variables[name] !== undefined) {
+		return parseSchemaValue(variables[name]);
+	}
+
+	// If no @ in key, try shorthand resolution
+	// Look for keys like {{schema:@Type.genre}} that end with the shorthand
+	if (!schemaKey.includes('@')) {
+		const matchingKey = Object.keys(variables).find(key =>
+			key.includes('@') && key.endsWith(`:${schemaKey}}}`)
+		);
+		if (matchingKey) {
+			return parseSchemaValue(variables[matchingKey]);
+		}
+	}
+
+	return undefined;
+}
+
+/**
+ * Parse a schema value - if it's a JSON string, parse it to get the actual value.
+ */
+function parseSchemaValue(value: any): any {
+	if (typeof value === 'string') {
+		// Try to parse as JSON to get arrays/objects
+		if (value.startsWith('[') || value.startsWith('{')) {
+			try {
+				return JSON.parse(value);
+			} catch {
+				return value;
+			}
+		}
+	}
+	return value;
+}
 
 function resolveVariable(name: string, variables: Record<string, any>): any {
 	const trimmed = name.trim();
