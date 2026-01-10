@@ -254,36 +254,3 @@ Conditionals and loops can be combined:
 {% endif %}
 {% endfor %}
 ```
-
-### Whitespace control
-
-By default, template tags produce line breaks in the output. Use the `-` modifier to strip whitespace:
-
-| Syntax | Effect |
-|--------|--------|
-| `{%- ... %}` | Strip whitespace and newline **before** the tag |
-| `{% ... -%}` | Strip whitespace and newline **after** the tag |
-| `{%- ... -%}` | Strip both |
-
-This is useful for inline output or avoiding extra blank lines:
-
-```
-{%- set name = author -%}
-{%- if name -%}
-By {{name}}
-{%- endif -%}
-```
-
-Without the `-` modifiers, this would produce extra blank lines. With them, the output is clean:
-
-```
-By Author Name
-```
-
-Another example for inline conditions:
-
-```
-Status: {% if published -%}Live{%- else -%}Draft{%- endif %}
-```
-
-Output: `Status: Live`

@@ -107,12 +107,12 @@ test('tokenizes variable with whitespace', () => {
 	expect(types).toEqual(['variable_start', 'identifier', 'pipe', 'identifier', 'variable_end', 'eof']);
 });
 
-test('tokenizes variable with trim markers', () => {
-	const result = tokenize('{{- title -}}');
+test('tokenizes variable whitespace control', () => {
+	// Variables preserve whitespace by default (unlike tags)
+	const result = tokenize('{{ title }}');
 	expect(result.errors).toHaveLength(0);
-	expect(result.tokens[0].trimLeft).toBe(true);
-	// Token 0: variable_start, Token 1: identifier, Token 2: variable_end, Token 3: eof
-	expect(result.tokens[2].trimRight).toBe(true);
+	expect(result.tokens[0].trimLeft).toBe(false);
+	expect(result.tokens[2].trimRight).toBe(false);
 });
 
 test('tokenizes nested property access', () => {
@@ -161,8 +161,9 @@ test('tokenizes set tag', () => {
 	expect(result.tokens[4].value).toBe('John');
 });
 
-test('tokenizes tag with trim markers', () => {
-	const result = tokenize('{%- if x -%}');
+test('tokenizes tag with whitespace trimming', () => {
+	// Tags always trim whitespace
+	const result = tokenize('{% if x %}');
 	expect(result.errors).toHaveLength(0);
 	expect(result.tokens[0].trimLeft).toBe(true);
 	expect(result.tokens[3].trimRight).toBe(true);

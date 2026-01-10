@@ -147,12 +147,20 @@ export async function renderAST(
 
 	for (let i = 0; i < ast.length; i++) {
 		const node = ast[i];
+
+		// Handle trimLeft - trim trailing whitespace from previous output
+		// Logic tags always have trimLeft: true
+		if ('trimLeft' in node && (node as any).trimLeft && output.length > 0) {
+			output = output.replace(/[\t ]*\r?\n?$/, '');
+		}
+
 		const nodeOutput = await renderNode(node, state);
 
-		// Handle whitespace trimming
+		// Handle trimRight - trim leading whitespace from next output
+		// Note: Text nodes handle this in renderText, but other nodes might need it here
 		if (state.pendingTrimRight && nodeOutput.length > 0) {
 			// Trim leading whitespace from this output
-			output += nodeOutput.replace(/^[\t ]*\r?\n?/, '');
+			output += nodeOutput.replace(/^[\t ]*\r?\n/, '');
 			state.pendingTrimRight = false;
 		} else {
 			output += nodeOutput;
@@ -203,9 +211,9 @@ async function renderNode(node: ASTNode, state: RenderState): Promise<string> {
 function renderText(node: TextNode, state: RenderState): string {
 	let text = node.value;
 
-	// If previous node had trimRight, trim leading whitespace
+	// If previous node had trimRight, trim leading whitespace and newlines
 	if (state.pendingTrimRight) {
-		text = text.replace(/^[\t ]*\r?\n?/, '');
+		text = text.replace(/^[\t ]*\r?\n/, '');
 		state.pendingTrimRight = false;
 	}
 
@@ -380,6 +388,11 @@ async function renderNodes(nodes: ASTNode[], state: RenderState): Promise<string
 	let output = '';
 
 	for (const node of nodes) {
+		// Handle trimLeft - trim trailing whitespace from previous output
+		if ('trimLeft' in node && (node as any).trimLeft && output.length > 0) {
+			output = output.replace(/[\t ]*\r?\n?$/, '');
+		}
+
 		const nodeOutput = await renderNode(node, state);
 
 		if (state.pendingTrimRight && nodeOutput.length > 0) {

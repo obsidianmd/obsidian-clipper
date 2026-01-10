@@ -3,9 +3,8 @@
 //
 // This tokenizer handles:
 // - Text content
-// - Variable tags: {{ variable|filter }}
-// - Logic tags: {% if condition %}, {% for item in array %}, etc.
-// - Whitespace control: {%- and -%}
+// - Variable tags: {{ variable|filter }} (preserves whitespace)
+// - Logic tags: {% if condition %}, {% for item in array %}, etc. (trims whitespace)
 
 // ============================================================================
 // Token Types
@@ -60,7 +59,6 @@ export type TokenType =
 	| 'dot'               // .
 
 	// Special
-	| 'whitespace_trim'   // The - in {%- or -%}
 	| 'eof';              // End of input
 
 // ============================================================================
@@ -197,16 +195,15 @@ function tokenizeText(state: TokenizerState): void {
 				});
 			}
 
-			// Check for whitespace trim: {{-
-			const trimLeft = lookAhead(state, '{{-');
-			advance(state, trimLeft ? 3 : 2);
+			// Variables preserve whitespace by default (unlike tags which trim by default)
+			advance(state, 2);
 
 			state.tokens.push({
 				type: 'variable_start',
-				value: trimLeft ? '{{-' : '{{',
+				value: '{{',
 				line: state.line,
-				column: state.column - (trimLeft ? 3 : 2),
-				trimLeft,
+				column: state.column - 2,
+				trimLeft: false,  // Variables preserve whitespace by default
 			});
 
 			state.mode = 'variable';
@@ -225,16 +222,14 @@ function tokenizeText(state: TokenizerState): void {
 				});
 			}
 
-			// Check for whitespace trim: {%-
-			const trimLeft = lookAhead(state, '{%-');
-			advance(state, trimLeft ? 3 : 2);
+			advance(state, 2);
 
 			state.tokens.push({
 				type: 'tag_start',
-				value: trimLeft ? '{%-' : '{%',
+				value: '{%',
 				line: state.line,
-				column: state.column - (trimLeft ? 3 : 2),
-				trimLeft,
+				column: state.column - 2,
+				trimLeft: true,  // Tags always trim whitespace
 			});
 
 			state.mode = 'tag';
@@ -263,27 +258,14 @@ function tokenizeText(state: TokenizerState): void {
 function tokenizeVariable(state: TokenizerState): void {
 	skipWhitespace(state);
 
-	// Check for variable end: }} or -}}
-	if (lookAhead(state, '-}}')) {
-		state.tokens.push({
-			type: 'variable_end',
-			value: '-}}',
-			line: state.line,
-			column: state.column,
-			trimRight: true,
-		});
-		advance(state, 3);
-		state.mode = 'text';
-		return;
-	}
-
+	// Variables preserve whitespace by default (unlike tags which trim by default)
 	if (lookAhead(state, '}}')) {
 		state.tokens.push({
 			type: 'variable_end',
 			value: '}}',
 			line: state.line,
 			column: state.column,
-			trimRight: false,
+			trimRight: false,  // Variables preserve whitespace by default
 		});
 		advance(state, 2);
 		state.mode = 'text';
@@ -301,27 +283,14 @@ function tokenizeVariable(state: TokenizerState): void {
 function tokenizeTag(state: TokenizerState): void {
 	skipWhitespace(state);
 
-	// Check for tag end: %} or -%}
-	if (lookAhead(state, '-%}')) {
-		state.tokens.push({
-			type: 'tag_end',
-			value: '-%}',
-			line: state.line,
-			column: state.column,
-			trimRight: true,
-		});
-		advance(state, 3);
-		state.mode = 'text';
-		return;
-	}
-
+	// Check for tag end: %}
 	if (lookAhead(state, '%}')) {
 		state.tokens.push({
 			type: 'tag_end',
 			value: '%}',
 			line: state.line,
 			column: state.column,
-			trimRight: false,
+			trimRight: true,  // Tags always trim whitespace
 		});
 		advance(state, 2);
 		state.mode = 'text';
@@ -548,7 +517,7 @@ function tokenizeEscapedArgument(state: TokenizerState): void {
 		if (char === '|' || char === '%' || char === '}' || char === ')') {
 			break;
 		}
-		if (char === '-' && (nextChar === '%' || nextChar === '}')) {
+		if (char === '+' && (nextChar === '%' || nextChar === '}')) {
 			break;
 		}
 
@@ -693,10 +662,10 @@ function tokenizeCssSelector(state: TokenizerState, value: string): string {
 			if (char === '}' && nextChar === '}') {
 				break;
 			}
-			if (char === '-' && nextChar === '%') {
+			if (char === '+' && nextChar === '%') {
 				break;
 			}
-			if (char === '-' && nextChar === '}') {
+			if (char === '+' && nextChar === '}') {
 				break;
 			}
 		}

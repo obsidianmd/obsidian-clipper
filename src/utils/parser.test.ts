@@ -187,13 +187,13 @@ test('parses chained filters', () => {
 	expect(innerFilter.name).toBe('lower');
 });
 
-test('parses variable with trim markers', () => {
-	const result = parse('{{- title -}}');
+test('parses variable with whitespace control', () => {
+	// Variables preserve whitespace by default (unlike tags)
+	const result = parse('{{ title }}');
 	expect(result.errors).toHaveLength(0);
-
 	const varNode = result.ast[0] as VariableNode;
-	expect(varNode.trimLeft).toBe(true);
-	expect(varNode.trimRight).toBe(true);
+	expect(varNode.trimLeft).toBe(false);
+	expect(varNode.trimRight).toBe(false);
 });
 
 test('parses nested property access', () => {
@@ -400,10 +400,10 @@ test('parses set with filter', () => {
 	expect((setNode.value as FilterExpression).name).toBe('lower');
 });
 
-test('parses set with trim markers', () => {
-	const result = parse('{%- set x = 1 -%}');
+test('parses set with whitespace trimming', () => {
+	// Tags always trim whitespace
+	const result = parse('{% set x = 1 %}');
 	expect(result.errors).toHaveLength(0);
-
 	const setNode = result.ast[0] as SetNode;
 	expect(setNode.trimLeft).toBe(true);
 	expect(setNode.trimRight).toBe(true);

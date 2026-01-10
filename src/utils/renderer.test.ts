@@ -334,18 +334,19 @@ async function runTests() {
 
 	// --- Whitespace Control ---
 
-	test('renders with trim right', async () => {
-		const result = await render('{% set x = 1 -%}\nHello', createContext());
+	test('renders tags with whitespace trimming', async () => {
+		// Tags always trim surrounding whitespace
+		const result = await render('{% set x = 1 %}\nHello', createContext());
 		expect(result.errors).toHaveLength(0);
 		expect(result.output).toBe('Hello');
 	});
 
-	test('renders with trim left on variable', async () => {
+	test('renders variables preserving whitespace', async () => {
 		const ctx = createContext({ name: 'World' });
-		const result = await render('Hello {{- name }}', ctx);
+		// Variables preserve surrounding whitespace
+		const result = await render('Hello {{ name }}!', ctx);
 		expect(result.errors).toHaveLength(0);
-		// trimLeft is handled by the caller stripping trailing whitespace from previous node
-		expect(result.output).toBe('Hello World');
+		expect(result.output).toBe('Hello World!');
 	});
 
 	// --- Complex Templates ---
