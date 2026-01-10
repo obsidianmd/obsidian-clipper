@@ -20,8 +20,8 @@ export async function resolveSelector(tabId: number, selectorExpr: string): Prom
 	const [, selectorType, rawSelector, attribute] = matches;
 	const extractHtml = selectorType === 'selectorHtml';
 
-	// Unescape any escaped quotes in the selector
-	const selector = rawSelector.replace(/\\"/g, '"');
+	// Unescape any escaped quotes and normalize whitespace in the selector
+	const selector = rawSelector.replace(/\\"/g, '"').replace(/\s+/g, ' ').trim();
 
 	try {
 		const response = await browser.tabs.sendMessage(tabId, {
@@ -50,8 +50,8 @@ export async function processSelector(tabId: number, match: string, currentUrl: 
 	const [, selectorType, rawSelector, attribute, filtersString] = matches;
 	const extractHtml = selectorType === 'selectorHtml';
 
-	// Unescape any escaped quotes in the selector
-	const selector = rawSelector.replace(/\\"/g, '"');
+	// Unescape any escaped quotes and normalize whitespace in the selector
+	const selector = rawSelector.replace(/\\"/g, '"').replace(/\s+/g, ' ').trim();
 
 	try {
 		const response = await browser.tabs.sendMessage(tabId, { 
