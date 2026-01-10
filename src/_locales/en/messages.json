@@ -488,6 +488,12 @@
 	"templateValid": {
 		"message": "Template syntax is valid"
 	},
+	"templateErrorCount": {
+		"message": "There is $1 error in your template."
+	},
+	"templateErrorsCount": {
+		"message": "There are $1 errors in your template."
+	},
 	"noteLocation": {
 		"message": "Note location"
 	},

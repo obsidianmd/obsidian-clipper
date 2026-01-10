@@ -120,10 +120,11 @@
 	display: none;
 	align-items: flex-start;
 	gap: 0.5rem;
-	padding: 0.5rem 0.75rem;
 	border-radius: var(--radius-s);
 	font-size: var(--font-ui-smaller);
 	margin-top: 0.5rem;
+	padding: 0.5rem 0.75rem;
+	border-radius: var(--radius-s);
 
 	svg {
 		width: 16px;
@@ -133,8 +134,9 @@
 	}
 
 	&.invalid {
-		background-color: var(--background-modifier-error);
+		background-color: hsla(var(--color-red-hsl), 0.1);
 		color: var(--text-error);
+		border: 1px solid hsla(var(--color-red-hsl), 0.15);
 	}
 
 	&.warning {
@@ -156,5 +158,26 @@
 	// When in error state, style warnings differently
 	&.invalid .validation-warning {
 		opacity: 0.8;
+	}
+}
+
+.template-error-summary {
+	display: none;
+	align-items: center;
+	border-radius: var(--radius-s);
+	font-size: var(--font-ui-small);
+	margin-bottom: 1rem;
+	padding: 0.5rem 0.75rem;
+
+	svg {
+		width: 16px;
+		height: 16px;
+		flex-shrink: 0;
+	}
+
+	&.has-errors {
+		background-color: hsla(var(--color-red-hsl), 0.1);
+		border: 1px solid hsla(var(--color-red-hsl), 0.15);
+		color: var(--text-error);
 	}
 }
