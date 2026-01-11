@@ -775,6 +775,12 @@
 	"templateCopyError": {
 		"message": "کپی کردن قالب JSON به کلیپ بورد با شکست مواجه شد"
 	},
+	"templateErrorCount": {
+		"message": "یک خطا در قالب شما وجود دارد."
+	},
+	"templateErrorsCount": {
+		"message": "$1 خطا در قالب شما وجود دارد."
+	},
 	"templateName": {
 		"message": "نام قالب"
 	},
@@ -789,6 +795,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "قوانینی را تعریف کنید که وقتی URL با آن مطابق باشد این قالب انتخاب شود. فقط یک قانون در هر خط."
+	},
+	"templateValid": {
+		"message": "نحو قالب معتبر است"
 	},
 	"templatesHeading": {
 		"message": "قالب‌ها"

@@ -485,15 +485,6 @@
 	"noteContentDescription": {
 		"message": "Customize the content of the note. Use variables to pre-populate data from the page."
 	},
-	"templateValid": {
-		"message": "Template syntax is valid"
-	},
-	"templateErrorCount": {
-		"message": "There is an error in your template."
-	},
-	"templateErrorsCount": {
-		"message": "There are $1 errors in your template."
-	},
 	"noteLocation": {
 		"message": "Note location"
 	},
@@ -784,6 +775,12 @@
 	"templateCopyError": {
 		"message": "Failed to copy template JSON to clipboard"
 	},
+	"templateErrorCount": {
+		"message": "There is an error in your template."
+	},
+	"templateErrorsCount": {
+		"message": "There are $1 errors in your template."
+	},
 	"templateName": {
 		"message": "Template name"
 	},
@@ -798,6 +795,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "Define rules to automatically select this template if it matches a URL pattern or contains schema.org data. One rule per line."
+	},
+	"templateValid": {
+		"message": "Template syntax is valid"
 	},
 	"templatesHeading": {
 		"message": "Templates"

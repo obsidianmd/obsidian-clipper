@@ -775,6 +775,12 @@
 	"templateCopyError": {
 		"message": "無法將模板 JSON 複製到剪貼簿"
 	},
+	"templateErrorCount": {
+		"message": "您的範本中有一個錯誤。"
+	},
+	"templateErrorsCount": {
+		"message": "您的範本中有 $1 個錯誤。"
+	},
 	"templateName": {
 		"message": "範本名稱"
 	},
@@ -789,6 +795,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "定義規則以自動選擇此範本，如果它符合 URL 模式或包含 schema.org 資料。每行一個規則。"
+	},
+	"templateValid": {
+		"message": "範本語法有效"
 	},
 	"templatesHeading": {
 		"message": "範本"

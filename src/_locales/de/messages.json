@@ -775,6 +775,12 @@
 	"templateCopyError": {
 		"message": "Vorlagen-JSON konnte nicht in Zwischenablage kopiert werden"
 	},
+	"templateErrorCount": {
+		"message": "In deiner Vorlage ist ein Fehler."
+	},
+	"templateErrorsCount": {
+		"message": "In deiner Vorlage sind $1 Fehler."
+	},
 	"templateName": {
 		"message": "Vorlagenname"
 	},
@@ -789,6 +795,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "Definiere Regeln, um diese Vorlage automatisch auszuwählen, wenn sie mit einem URL-Muster übereinstimmt oder schema.org-Daten enthält. Eine Regel pro Zeile."
+	},
+	"templateValid": {
+		"message": "Die Vorlagensyntax ist gültig"
 	},
 	"templatesHeading": {
 		"message": "Vorlagen"

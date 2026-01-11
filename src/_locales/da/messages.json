@@ -767,6 +767,12 @@
 	"templateCopyError": {
 		"message": "Kunne ikke kopiere skabelon-JSON til udklipsholder"
 	},
+	"templateErrorCount": {
+		"message": "Der er en fejl i din skabelon."
+	},
+	"templateErrorsCount": {
+		"message": "Der er $1 fejl i din skabelon."
+	},
 	"templateName": {
 		"message": "Skabelonnavn"
 	},
@@ -781,6 +787,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "Definer regler for automatisk at vælge denne skabelon hvis den matcher URL-mønsteret eller indeholder schema.org-data. Én regel per linje."
+	},
+	"templateValid": {
+		"message": "Skabelonsyntaksen er gyldig"
 	},
 	"templatesHeading": {
 		"message": "Skabeloner"

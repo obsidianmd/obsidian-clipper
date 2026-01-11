@@ -767,6 +767,12 @@
 	"templateCopyError": {
 		"message": "Αποτυχία αντιγραφής του JSON προτύπου στο πρόχειρο"
 	},
+	"templateErrorCount": {
+		"message": "Υπάρχει ένα σφάλμα στο πρότυπό σας."
+	},
+	"templateErrorsCount": {
+		"message": "Υπάρχουν $1 σφάλματα στο πρότυπό σας."
+	},
 	"templateName": {
 		"message": "Όνομα προτύπου"
 	},
@@ -781,6 +787,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "Ορίστε κανόνες για την αυτόματη επιλογή αυτού του προτύπου εάν ταιριάζει με το μοτίβο URL ή περιέχει δεδομένα schema.org. Ένας κανόνας ανά γραμμή."
+	},
+	"templateValid": {
+		"message": "Η σύνταξη του προτύπου είναι έγκυρη"
 	},
 	"templatesHeading": {
 		"message": "Πρότυπα"

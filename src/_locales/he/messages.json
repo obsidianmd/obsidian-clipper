@@ -767,6 +767,12 @@
 	"templateCopyError": {
 		"message": "נכשל בהעתקת ה-JSON של התבנית ללוח"
 	},
+	"templateErrorCount": {
+		"message": "יש שגיאה בתבנית שלך."
+	},
+	"templateErrorsCount": {
+		"message": "יש $1 שגיאות בתבנית שלך."
+	},
 	"templateName": {
 		"message": "שם התבנית"
 	},
@@ -781,6 +787,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "הגדר כללים לבחירה אוטומטית של תבנית זו אם היא תואמת לתבנית URL או מכילה נתוני schema.org. כלל אחד בכל שורה."
+	},
+	"templateValid": {
+		"message": "תחביר התבנית תקין"
 	},
 	"templatesHeading": {
 		"message": "תבניות"

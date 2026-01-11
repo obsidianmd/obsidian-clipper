@@ -775,6 +775,12 @@
 	"templateCopyError": {
 		"message": "টেমপ্লেট JSON ক্লিপবোর্ডে কপি করতে ব্যর্থ হয়েছে"
 	},
+	"templateErrorCount": {
+		"message": "আপনার টেমপ্লেটে একটি ত্রুটি আছে।"
+	},
+	"templateErrorsCount": {
+		"message": "আপনার টেমপ্লেটে $1টি ত্রুটি আছে।"
+	},
 	"templateName": {
 		"message": "টেমপ্লেটের নাম"
 	},
@@ -789,6 +795,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "যদি কোনো URL প্যাটার্নের সাথে মেলে অথবা schema.org এর ডেটা থাকে, তবে এই টেমপ্লেটটি স্বয়ংক্রিয়ভাবে নির্বাচন করার জন্য নিয়ম তৈরি করুন। প্রতিটি নিয়ম এক লাইনে লিখুন।"
+	},
+	"templateValid": {
+		"message": "টেমপ্লেট সিনট্যাক্স বৈধ"
 	},
 	"templatesHeading": {
 		"message": "টেমপ্লেটস"

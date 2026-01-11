@@ -775,6 +775,12 @@
 	"templateCopyError": {
 		"message": "无法将模板 JSON 复制到剪贴板"
 	},
+	"templateErrorCount": {
+		"message": "你的模板中有一个错误。"
+	},
+	"templateErrorsCount": {
+		"message": "你的模板中有 $1 个错误。"
+	},
 	"templateName": {
 		"message": "模板名称"
 	},
@@ -789,6 +795,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "定义规则以在匹配 URL 模式或包含 schema.org 数据时自动选择此模板。每行一个规则。"
+	},
+	"templateValid": {
+		"message": "模板语法有效"
 	},
 	"templatesHeading": {
 		"message": "模板"

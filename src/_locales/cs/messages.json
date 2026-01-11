@@ -767,6 +767,12 @@
 	"templateCopyError": {
 		"message": "Nepodařilo se zkopírovat šablonu JSON do schránky"
 	},
+	"templateErrorCount": {
+		"message": "Ve vaší šabloně je chyba."
+	},
+	"templateErrorsCount": {
+		"message": "Ve vaší šabloně jsou $1 chyby."
+	},
 	"templateName": {
 		"message": "Název šablony"
 	},
@@ -781,6 +787,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "Definujte pravidla pro automatický výběr této šablony, pokud odpovídá vzoru URL nebo obsahuje data schema.org. Jedno pravidlo na řádek."
+	},
+	"templateValid": {
+		"message": "Syntaxe šablony je platná"
 	},
 	"templatesHeading": {
 		"message": "Šablony"

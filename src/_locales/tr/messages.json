@@ -775,6 +775,12 @@
 	"templateCopyError": {
 		"message": "Şablon JSON'u panoya kopyalanamadı"
 	},
+	"templateErrorCount": {
+		"message": "Şablonunuzda bir hata var."
+	},
+	"templateErrorsCount": {
+		"message": "Şablonunuzda $1 hata var."
+	},
 	"templateName": {
 		"message": "Şablon adı"
 	},
@@ -789,6 +795,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "URL deseni eşleştiğinde veya schema.org verisi içerdiğinde bu şablonu otomatik olarak seçmek için kurallar tanımlayın. Her satıra bir kural."
+	},
+	"templateValid": {
+		"message": "Şablon sözdizimi geçerli"
 	},
 	"templatesHeading": {
 		"message": "Şablonlar"

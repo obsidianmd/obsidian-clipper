@@ -775,6 +775,12 @@
 	"templateCopyError": {
 		"message": "Sjabloon-JSON kopiëren naar klembord mislukt"
 	},
+	"templateErrorCount": {
+		"message": "Er staat een fout in je sjabloon."
+	},
+	"templateErrorsCount": {
+		"message": "Er staan $1 fouten in je sjabloon."
+	},
 	"templateName": {
 		"message": "Sjabloonnaam"
 	},
@@ -789,6 +795,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "Definieer regels om dit sjabloon automatisch te selecteren als het overeenkomt met een URL-patroon of schema.org-gegevens bevat. Één regel per regel."
+	},
+	"templateValid": {
+		"message": "Sjabloonsyntaxis is geldig"
 	},
 	"templatesHeading": {
 		"message": "Sjablonen"

@@ -775,6 +775,12 @@
 	"templateCopyError": {
 		"message": "Không thể sao chép JSON mẫu vào bộ nhớ tạm"
 	},
+	"templateErrorCount": {
+		"message": "Có lỗi trong mẫu của bạn."
+	},
+	"templateErrorsCount": {
+		"message": "Có $1 lỗi trong mẫu của bạn."
+	},
 	"templateName": {
 		"message": "Tên mẫu"
 	},
@@ -789,6 +795,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "Xác định quy tắc để tự động chọn mẫu này nếu nó khớp với mẫu URL hoặc chứa dữ liệu schema.org. Một quy tắc mỗi dòng."
+	},
+	"templateValid": {
+		"message": "Cú pháp mẫu hợp lệ"
 	},
 	"templatesHeading": {
 		"message": "Mẫu"

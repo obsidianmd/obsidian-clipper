@@ -775,6 +775,12 @@
 	"templateCopyError": {
 		"message": "Template JSON ko clipboard par copy karne mein fail"
 	},
+	"templateErrorCount": {
+		"message": "आपके टेम्पलेट में एक त्रुटि है।"
+	},
+	"templateErrorsCount": {
+		"message": "आपके टेम्पलेट में $1 त्रुटियाँ हैं।"
+	},
 	"templateName": {
 		"message": "Template name"
 	},
@@ -789,6 +795,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "URL pattern se match hone ya schema.org data hone par is template ko automatically select karne ke liye rules define karein. Ek line mein ek rule."
+	},
+	"templateValid": {
+		"message": "टेम्पलेट सिंटैक्स मान्य है"
 	},
 	"templatesHeading": {
 		"message": "Templates"

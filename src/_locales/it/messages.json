@@ -775,6 +775,12 @@
 	"templateCopyError": {
 		"message": "Impossibile copiare il modello JSON negli appunti"
 	},
+	"templateErrorCount": {
+		"message": "C'è un errore nel tuo modello."
+	},
+	"templateErrorsCount": {
+		"message": "Ci sono $1 errori nel tuo modello."
+	},
 	"templateName": {
 		"message": "Nome del modello"
 	},
@@ -789,6 +795,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "Definisci regole per selezionare automaticamente questo modello se corrisponde a un pattern URL o contiene dati schema.org. Una regola per riga."
+	},
+	"templateValid": {
+		"message": "La sintassi del modello è valida"
 	},
 	"templatesHeading": {
 		"message": "Modelli"
