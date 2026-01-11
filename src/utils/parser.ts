@@ -283,7 +283,7 @@ function parseVariable(state: ParserState): VariableNode | null {
 
 		if (extraWords > 0) {
 			state.errors.push({
-				message: 'Multiple words without quotes - if this is a prompt, wrap it in quotes: {{"your prompt here"}}',
+				message: 'Unknown variable. If this is a prompt, wrap it in quotes: {{"your prompt here"}}',
 				line: startToken.line,
 				column: startToken.column,
 			});
