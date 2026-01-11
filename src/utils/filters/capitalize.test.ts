@@ -1,4 +1,4 @@
-import { describe, test, expect, summary } from './test-utils';
+import { describe, test, expect } from 'vitest';
 import { capitalize } from './capitalize';
 
 describe('capitalize filter', () => {
@@ -27,4 +27,3 @@ describe('capitalize filter', () => {
 	});
 });
 
-summary();

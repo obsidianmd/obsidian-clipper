@@ -1,4 +1,4 @@
-import { describe, test, expect, summary } from './test-utils';
+import { describe, test, expect } from 'vitest';
 import { camel } from './camel';
 
 describe('camel filter', () => {
@@ -32,4 +32,3 @@ describe('camel filter', () => {
 	});
 });
 
-summary();

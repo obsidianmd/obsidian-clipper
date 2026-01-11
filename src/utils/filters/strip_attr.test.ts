@@ -1,4 +1,4 @@
-import { describe, test, expect, summary } from './test-utils';
+import { describe, test, expect } from 'vitest';
 import { strip_attr } from './strip_attr';
 
 describe('strip_attr filter', () => {
@@ -27,4 +27,3 @@ describe('strip_attr filter', () => {
 	});
 });
 
-summary();

@@ -1,4 +1,4 @@
-import { describe, test, expect, summary } from './test-utils';
+import { describe, test, expect } from 'vitest';
 import { kebab } from './kebab';
 
 describe('kebab filter', () => {
@@ -27,4 +27,3 @@ describe('kebab filter', () => {
 	});
 });
 
-summary();

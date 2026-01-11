@@ -1,4 +1,4 @@
-import { describe, test, expect, summary } from './test-utils';
+import { describe, test, expect } from 'vitest';
 import { strip_md } from './strip_md';
 
 describe('strip_md filter', () => {
@@ -43,4 +43,3 @@ describe('strip_md filter', () => {
 	});
 });
 
-summary();

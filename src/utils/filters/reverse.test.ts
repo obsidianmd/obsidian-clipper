@@ -1,4 +1,4 @@
-import { describe, test, expect, summary } from './test-utils';
+import { describe, test, expect } from 'vitest';
 import { reverse } from './reverse';
 
 describe('reverse filter', () => {
@@ -33,4 +33,3 @@ describe('reverse filter', () => {
 	});
 });
 
-summary();

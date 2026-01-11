@@ -1,4 +1,4 @@
-import { describe, test, expect, summary } from './test-utils';
+import { describe, test, expect } from 'vitest';
 import { uncamel } from './uncamel';
 
 describe('uncamel filter', () => {
@@ -28,4 +28,3 @@ describe('uncamel filter', () => {
 	});
 });
 
-summary();

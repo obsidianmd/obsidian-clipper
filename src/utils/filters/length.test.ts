@@ -1,4 +1,4 @@
-import { describe, test, expect, summary } from './test-utils';
+import { describe, test, expect } from 'vitest';
 import { length } from './length';
 
 describe('length filter', () => {
@@ -31,4 +31,3 @@ describe('length filter', () => {
 	});
 });
 
-summary();

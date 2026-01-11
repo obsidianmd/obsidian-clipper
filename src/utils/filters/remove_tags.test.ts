@@ -1,4 +1,4 @@
-import { describe, test, expect, summary } from './test-utils';
+import { describe, test, expect } from 'vitest';
 import { remove_tags } from './remove_tags';
 
 describe('remove_tags filter', () => {
@@ -29,4 +29,3 @@ describe('remove_tags filter', () => {
 	});
 });
 
-summary();

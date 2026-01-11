@@ -1,4 +1,4 @@
-import { describe, test, expect, summary } from './test-utils';
+import { describe, test, expect } from 'vitest';
 import { image } from './image';
 
 describe('image filter', () => {
@@ -12,14 +12,14 @@ describe('image filter', () => {
 
 	test('handles array of images', () => {
 		const result = image('["img1.jpg","img2.jpg"]', 'alt');
-		expect(Array.isArray(result)).toBeTrue();
+		expect(Array.isArray(result)).toBe(true);
 		expect((result as string[])[0]).toBe('![alt](img1.jpg)');
 		expect((result as string[])[1]).toBe('![alt](img2.jpg)');
 	});
 
 	test('handles object with alt text values', () => {
 		const result = image('{"img1.jpg": "Alt 1", "img2.jpg": "Alt 2"}');
-		expect(Array.isArray(result)).toBeTrue();
+		expect(Array.isArray(result)).toBe(true);
 	});
 
 	test('handles empty string', () => {
@@ -32,4 +32,3 @@ describe('image filter', () => {
 	});
 });
 
-summary();

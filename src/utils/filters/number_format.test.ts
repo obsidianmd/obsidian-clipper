@@ -1,4 +1,4 @@
-import { describe, test, expect, summary } from './test-utils';
+import { describe, test, expect } from 'vitest';
 import { number_format } from './number_format';
 
 describe('number_format filter', () => {
@@ -31,4 +31,3 @@ describe('number_format filter', () => {
 	});
 });
 
-summary();

@@ -1,4 +1,4 @@
-import { describe, test, expect, summary } from './test-utils';
+import { describe, test, expect } from 'vitest';
 import { replace } from './replace';
 
 describe('replace filter', () => {
@@ -47,4 +47,3 @@ describe('replace filter', () => {
 	});
 });
 
-summary();

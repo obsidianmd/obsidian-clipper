@@ -1,4 +1,4 @@
-import { describe, test, expect, summary } from './test-utils';
+import { describe, test, expect } from 'vitest';
 import { wikilink } from './wikilink';
 
 describe('wikilink filter', () => {
@@ -38,4 +38,3 @@ describe('wikilink filter', () => {
 	});
 });
 
-summary();

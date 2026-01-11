@@ -1,10 +1,10 @@
-import { describe, test, expect, summary } from './test-utils';
+import { describe, test, expect } from 'vitest';
 import { fragment_link } from './fragment_link';
 
 describe('fragment_link filter', () => {
 	test('creates text fragment link from array', () => {
 		const result = fragment_link('["text content"]', 'https://example.com');
-		expect(Array.isArray(result)).toBeTrue();
+		expect(Array.isArray(result)).toBe(true);
 		expect(result[0]).toContain('text content');
 		expect(result[0]).toContain('https://example.com');
 	});
@@ -35,4 +35,3 @@ describe('fragment_link filter', () => {
 	});
 });
 
-summary();

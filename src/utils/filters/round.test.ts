@@ -1,4 +1,4 @@
-import { describe, test, expect, summary } from './test-utils';
+import { describe, test, expect } from 'vitest';
 import { round } from './round';
 
 describe('round filter', () => {
@@ -32,4 +32,3 @@ describe('round filter', () => {
 	});
 });
 
-summary();

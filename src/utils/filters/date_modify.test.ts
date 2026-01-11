@@ -1,4 +1,4 @@
-import { describe, test, expect, summary } from './test-utils';
+import { describe, test, expect } from 'vitest';
 import { date_modify } from './date_modify';
 
 describe('date_modify filter', () => {
@@ -35,4 +35,3 @@ describe('date_modify filter', () => {
 	});
 });
 
-summary();

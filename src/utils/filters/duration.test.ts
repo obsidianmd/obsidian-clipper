@@ -1,4 +1,4 @@
-import { describe, test, expect, summary } from './test-utils';
+import { describe, test, expect } from 'vitest';
 import { duration } from './duration';
 
 describe('duration filter', () => {
@@ -40,4 +40,3 @@ describe('duration filter', () => {
 	});
 });
 
-summary();

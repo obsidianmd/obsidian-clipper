@@ -1,4 +1,4 @@
-import { describe, test, expect, summary } from './test-utils';
+import { describe, test, expect } from 'vitest';
 import { pascal } from './pascal';
 
 describe('pascal filter', () => {
@@ -27,4 +27,3 @@ describe('pascal filter', () => {
 	});
 });
 
-summary();

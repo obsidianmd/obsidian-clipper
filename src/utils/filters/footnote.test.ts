@@ -1,4 +1,4 @@
-import { describe, test, expect, summary } from './test-utils';
+import { describe, test, expect } from 'vitest';
 import { footnote } from './footnote';
 
 describe('footnote filter', () => {
@@ -32,4 +32,3 @@ describe('footnote filter', () => {
 	});
 });
 
-summary();

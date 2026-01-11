@@ -1,4 +1,4 @@
-import { describe, test, expect, summary } from './test-utils';
+import { describe, test, expect } from 'vitest';
 import { upper } from './upper';
 
 describe('upper filter', () => {
@@ -23,4 +23,3 @@ describe('upper filter', () => {
 	});
 });
 
-summary();

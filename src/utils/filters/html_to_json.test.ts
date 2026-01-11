@@ -1,4 +1,4 @@
-import { describe, test, expect, summary } from './test-utils';
+import { describe, test, expect } from 'vitest';
 import { html_to_json } from './html_to_json';
 
 describe('html_to_json filter', () => {
@@ -28,4 +28,3 @@ describe('html_to_json filter', () => {
 	});
 });
 
-summary();

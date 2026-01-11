@@ -1,20 +1,20 @@
-import { describe, test, expect, summary } from './test-utils';
+import { describe, test, expect } from 'vitest';
 import { safe_name } from './safe_name';
 
 describe('safe_name filter', () => {
 	test('removes forward slashes', () => {
 		const result = safe_name('file/name');
-		expect(result.includes('/')).toBeFalse();
+		expect(result.includes('/')).toBe(false);
 	});
 
 	test('removes colons', () => {
 		const result = safe_name('file:name');
-		expect(result.includes(':')).toBeFalse();
+		expect(result.includes(':')).toBe(false);
 	});
 
 	test('removes backslashes', () => {
 		const result = safe_name('file\\name');
-		expect(result.includes('\\')).toBeFalse();
+		expect(result.includes('\\')).toBe(false);
 	});
 
 	test('preserves valid characters', () => {
@@ -32,17 +32,16 @@ describe('safe_name filter', () => {
 
 	test('handles multiple invalid characters', () => {
 		const result = safe_name('file/name:test?query');
-		expect(result.includes('/')).toBeFalse();
-		expect(result.includes(':')).toBeFalse();
-		expect(result.includes('?')).toBeFalse();
+		expect(result.includes('/')).toBe(false);
+		expect(result.includes(':')).toBe(false);
+		expect(result.includes('?')).toBe(false);
 	});
 
 	test('windows mode removes windows-specific characters', () => {
 		const result = safe_name('file<>:"/\\|?*name', 'windows');
-		expect(result.includes('<')).toBeFalse();
-		expect(result.includes('>')).toBeFalse();
-		expect(result.includes('|')).toBeFalse();
+		expect(result.includes('<')).toBe(false);
+		expect(result.includes('>')).toBe(false);
+		expect(result.includes('|')).toBe(false);
 	});
 });
 
-summary();

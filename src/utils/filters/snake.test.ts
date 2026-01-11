@@ -1,4 +1,4 @@
-import { describe, test, expect, summary } from './test-utils';
+import { describe, test, expect } from 'vitest';
 import { snake } from './snake';
 
 describe('snake filter', () => {
@@ -27,4 +27,3 @@ describe('snake filter', () => {
 	});
 });
 
-summary();

@@ -1,4 +1,4 @@
-import { describe, test, expect, summary } from './test-utils';
+import { describe, test, expect } from 'vitest';
 import { last } from './last';
 
 describe('last filter', () => {
@@ -24,4 +24,3 @@ describe('last filter', () => {
 	});
 });
 
-summary();

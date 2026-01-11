@@ -1,4 +1,4 @@
-import { describe, test, expect, summary } from './test-utils';
+import { describe, test, expect } from 'vitest';
 import { replace_tags } from './replace_tags';
 
 describe('replace_tags filter', () => {
@@ -29,4 +29,3 @@ describe('replace_tags filter', () => {
 	});
 });
 
-summary();

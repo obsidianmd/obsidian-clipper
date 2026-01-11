@@ -1,4 +1,4 @@
-import { describe, test, expect, summary } from './test-utils';
+import { describe, test, expect } from 'vitest';
 import { unique } from './unique';
 
 describe('unique filter', () => {
@@ -35,4 +35,3 @@ describe('unique filter', () => {
 	});
 });
 
-summary();

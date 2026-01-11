@@ -1,4 +1,4 @@
-import { describe, test, expect, summary } from './test-utils';
+import { describe, test, expect } from 'vitest';
 import { merge } from './merge';
 
 describe('merge filter', () => {
@@ -35,4 +35,3 @@ describe('merge filter', () => {
 	});
 });
 
-summary();
