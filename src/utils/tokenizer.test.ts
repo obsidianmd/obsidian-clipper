@@ -402,6 +402,46 @@ test('tokenizes selectorHtml with brackets', () => {
 	expect(result.tokens).toContainTokenTypes(['pipe', 'identifier']);
 });
 
+// --- Filter Arguments with Empty String ---
+
+test('tokenizes filter with empty string argument', () => {
+	const result = tokenize('{{"test"|replace:"%":""}}');
+	expect(result.errors).toHaveLength(0);
+	expect(result.tokens).toContainTokenTypes([
+		'variable_start', 'string', 'pipe', 'identifier', 'colon', 'string', 'colon', 'string', 'variable_end'
+	]);
+	// Verify the empty string token
+	const stringTokens = result.tokens.filter(t => t.type === 'string');
+	expect(stringTokens).toHaveLength(3);
+	expect(stringTokens[0].value).toBe('test');
+	expect(stringTokens[1].value).toBe('%');
+	expect(stringTokens[2].value).toBe(''); // Empty string
+});
+
+test('tokenizes string with spaces and empty string argument', () => {
+	const result = tokenize('{{"cacao percentage of this chocolate"|replace:"%":""}}');
+	expect(result.errors).toHaveLength(0);
+	expect(result.tokens).toContainTokenTypes([
+		'variable_start', 'string', 'pipe', 'identifier', 'colon', 'string', 'colon', 'string', 'variable_end'
+	]);
+	// Verify the string tokens
+	const stringTokens = result.tokens.filter(t => t.type === 'string');
+	expect(stringTokens).toHaveLength(3);
+	expect(stringTokens[0].value).toBe('cacao percentage of this chocolate');
+	expect(stringTokens[1].value).toBe('%');
+	expect(stringTokens[2].value).toBe(''); // Empty string
+});
+
+test('handles curly quotes as unexpected characters', () => {
+	// Curly quotes should not be recognized as string delimiters
+	// Use Unicode escape to ensure we get actual curly quotes
+	const input = '{{\u201Ctest\u201D}}';
+	const result = tokenize(input);
+	// This should produce errors because " and " are not valid string delimiters
+	expect(result.errors.length).toBe(2);
+	expect(result.errors[0].message.includes('Unexpected character')).toBe(true);
+});
+
 // --- Error Handling ---
 
 test('reports unterminated string', () => {

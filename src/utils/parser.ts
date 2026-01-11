@@ -8,6 +8,7 @@
 // - Expressions with operators and literals
 
 import { Token, TokenType, tokenize, TokenizerResult } from './tokenizer';
+import { filterMetadata, validFilterNames } from './filters';
 
 // ============================================================================
 // AST Node Types
@@ -1586,4 +1587,143 @@ export function validateVariables(ast: ASTNode[]): ParserError[] {
 	}
 
 	return warnings;
+}
+
+// ============================================================================
+// Filter Validation
+// ============================================================================
+
+interface FilterUsage {
+	name: string;
+	hasArgs: boolean;
+	line: number;
+	column: number;
+}
+
+/**
+ * Find the closest matching filter name for suggestions
+ */
+function findSimilarFilter(name: string): string | null {
+	let bestMatch: string | null = null;
+	let bestDistance = Infinity;
+
+	for (const filterName of validFilterNames) {
+		const distance = levenshteinDistance(name.toLowerCase(), filterName.toLowerCase());
+		if (distance < Math.max(name.length, filterName.length) / 2 && distance < bestDistance) {
+			bestDistance = distance;
+			bestMatch = filterName;
+		}
+	}
+
+	return bestMatch;
+}
+
+/**
+ * Collect filter usages from an expression
+ */
+function collectFiltersFromExpression(expr: Expression, usages: FilterUsage[]): void {
+	switch (expr.type) {
+		case 'filter':
+			usages.push({
+				name: expr.name,
+				hasArgs: expr.args.length > 0,
+				line: expr.line,
+				column: expr.column,
+			});
+			collectFiltersFromExpression(expr.value, usages);
+			for (const arg of expr.args) {
+				collectFiltersFromExpression(arg, usages);
+			}
+			break;
+		case 'binary':
+			collectFiltersFromExpression(expr.left, usages);
+			collectFiltersFromExpression(expr.right, usages);
+			break;
+		case 'unary':
+			collectFiltersFromExpression(expr.argument, usages);
+			break;
+		case 'member':
+			collectFiltersFromExpression(expr.object, usages);
+			collectFiltersFromExpression(expr.property, usages);
+			break;
+		case 'group':
+			collectFiltersFromExpression(expr.expression, usages);
+			break;
+	}
+}
+
+/**
+ * Collect all filter usages from the AST
+ */
+function collectFilters(nodes: ASTNode[]): FilterUsage[] {
+	const usages: FilterUsage[] = [];
+
+	function processNode(node: ASTNode): void {
+		switch (node.type) {
+			case 'variable':
+				collectFiltersFromExpression(node.expression, usages);
+				break;
+			case 'set':
+				collectFiltersFromExpression(node.value, usages);
+				break;
+			case 'if':
+				collectFiltersFromExpression(node.condition, usages);
+				node.consequent.forEach(processNode);
+				node.elseifs.forEach(elseif => {
+					collectFiltersFromExpression(elseif.condition, usages);
+					elseif.body.forEach(processNode);
+				});
+				node.alternate?.forEach(processNode);
+				break;
+			case 'for':
+				collectFiltersFromExpression(node.iterable, usages);
+				node.body.forEach(processNode);
+				break;
+		}
+	}
+
+	nodes.forEach(processNode);
+	return usages;
+}
+
+/**
+ * Validate filter usage in the AST.
+ * Checks: 1) filter exists, 2) required params present
+ */
+export function validateFilters(ast: ASTNode[]): ParserError[] {
+	const errors: ParserError[] = [];
+	const usages = collectFilters(ast);
+
+	for (const usage of usages) {
+		// Check if filter exists
+		if (!validFilterNames.has(usage.name)) {
+			const similar = findSimilarFilter(usage.name);
+			let message = `Unknown filter "${usage.name}"`;
+			if (similar) {
+				message += `. Did you mean "${similar}"?`;
+			}
+			errors.push({
+				message,
+				line: usage.line,
+				column: usage.column,
+			});
+			continue;
+		}
+
+		// Check if filter requires parameters
+		const meta = filterMetadata[usage.name];
+		if (meta?.requiresParams && !usage.hasArgs) {
+			let message = `Filter "${usage.name}" requires parameters`;
+			if (meta.example) {
+				message += ` (e.g., ${meta.example})`;
+			}
+			errors.push({
+				message,
+				line: usage.line,
+				column: usage.column,
+			});
+		}
+	}
+
+	return errors;
 }

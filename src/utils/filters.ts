@@ -53,6 +53,74 @@ import { upper } from './filters/upper';
 import { wikilink } from './filters/wikilink';
 import { duration } from './filters/duration';
 
+// ============================================================================
+// Filter Metadata for Validation
+// ============================================================================
+
+export interface FilterMetadata {
+	requiresParams: boolean;
+	example?: string;
+}
+
+export const filterMetadata: Record<string, FilterMetadata> = {
+	// Filters requiring parameters
+	calc: { requiresParams: true, example: 'calc:"+10"' },
+	date_modify: { requiresParams: true, example: 'date_modify:"+1 day"' },
+	map: { requiresParams: true, example: 'map:x => x.name' },
+	replace: { requiresParams: true, example: 'replace:"old":"new"' },
+	slice: { requiresParams: true, example: 'slice:0,5' },
+	template: { requiresParams: true, example: 'template:"${name}"' },
+
+	// Filters with optional parameters
+	blockquote: { requiresParams: false },
+	callout: { requiresParams: false, example: 'callout:info' },
+	camel: { requiresParams: false },
+	capitalize: { requiresParams: false },
+	date: { requiresParams: false, example: 'date:"YYYY-MM-DD"' },
+	duration: { requiresParams: false },
+	first: { requiresParams: false },
+	footnote: { requiresParams: false },
+	fragment_link: { requiresParams: false },
+	html_to_json: { requiresParams: false },
+	image: { requiresParams: false },
+	join: { requiresParams: false, example: 'join:", "' },
+	kebab: { requiresParams: false },
+	last: { requiresParams: false },
+	length: { requiresParams: false },
+	link: { requiresParams: false },
+	list: { requiresParams: false, example: 'list:numbered' },
+	lower: { requiresParams: false },
+	markdown: { requiresParams: false },
+	merge: { requiresParams: false },
+	nth: { requiresParams: false, example: 'nth:2' },
+	number_format: { requiresParams: false },
+	object: { requiresParams: false },
+	pascal: { requiresParams: false },
+	remove_attr: { requiresParams: false },
+	remove_html: { requiresParams: false },
+	remove_tags: { requiresParams: false },
+	replace_tags: { requiresParams: false },
+	reverse: { requiresParams: false },
+	round: { requiresParams: false },
+	safe_name: { requiresParams: false },
+	snake: { requiresParams: false },
+	split: { requiresParams: false, example: 'split:","' },
+	strip_attr: { requiresParams: false },
+	strip_md: { requiresParams: false },
+	strip_tags: { requiresParams: false },
+	stripmd: { requiresParams: false },
+	table: { requiresParams: false },
+	title: { requiresParams: false },
+	trim: { requiresParams: false },
+	uncamel: { requiresParams: false },
+	unescape: { requiresParams: false },
+	unique: { requiresParams: false },
+	upper: { requiresParams: false },
+	wikilink: { requiresParams: false },
+};
+
+export const validFilterNames = new Set(Object.keys(filterMetadata));
+
 export const filters: { [key: string]: FilterFunction } = {
 	blockquote,
 	calc,

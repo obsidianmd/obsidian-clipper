@@ -10,7 +10,7 @@ import { updatePromptContextVisibility } from './interpreter-settings';
 import { showSettingsSection } from './settings-section-ui';
 import { updatePropertyType } from './property-types-manager';
 import { getMessage } from '../utils/i18n';
-import { parse, validateVariables } from '../utils/parser';
+import { parse, validateVariables, validateFilters } from '../utils/parser';
 let hasUnsavedChanges = false;
 
 export function resetUnsavedChanges(): void {
@@ -716,17 +716,19 @@ function validateTemplateField(field: HTMLInputElement | HTMLTextAreaElement, sh
 	// Parse and check for errors
 	const result = parse(content);
 
-	// Also validate variable names
-	const warnings = validateVariables(result.ast);
+	// Validate variable names and filter usage
+	const variableWarnings = validateVariables(result.ast);
+	const filterWarnings = validateFilters(result.ast);
 
 	// Combine errors and warnings into a single list
 	const issues: { line: number; message: string; isError: boolean }[] = [
 		...result.errors.map(e => ({ line: e.line || 0, message: e.message, isError: true })),
-		...warnings.map(w => ({ line: w.line || 0, message: w.message, isError: false })),
+		...variableWarnings.map(w => ({ line: w.line || 0, message: w.message, isError: false })),
+		...filterWarnings.map(w => ({ line: w.line || 0, message: w.message, isError: false })),
 	].sort((a, b) => a.line - b.line);
 
 	const hasErrors = result.errors.length > 0;
-	const hasWarnings = warnings.length > 0;
+	const hasWarnings = variableWarnings.length > 0 || filterWarnings.length > 0;
 
 	if (!hasErrors && !hasWarnings) {
 		// Valid template - show nothing
