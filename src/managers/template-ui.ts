@@ -669,7 +669,7 @@ function updateErrorSummary(): void {
 
 	summaryEl.classList.add('has-errors');
 	const icon = createElementWithHTML('i', '', { 'data-lucide': 'alert-triangle' });
-		summaryEl.appendChild(icon);
+	summaryEl.appendChild(icon);
 
 	const text = document.createElement('span');
 	const messageKey = totalErrors === 1 ? 'templateErrorCount' : 'templateErrorsCount';
@@ -736,7 +736,7 @@ function validateTemplateField(field: HTMLInputElement | HTMLTextAreaElement, sh
 	} else {
 		// Has errors and/or warnings - use error styling if any errors, warning styling if only warnings
 		validationEl.classList.add(hasErrors ? 'invalid' : 'warning');
-		const icon = createElementWithHTML('i', '', { 'data-lucide': hasErrors ? 'alert-triangle' : 'alert-triangle' });
+		const icon = createElementWithHTML('i', '', { 'data-lucide': 'alert-triangle' });
 		validationEl.appendChild(icon);
 
 		const issueList = document.createElement('div');

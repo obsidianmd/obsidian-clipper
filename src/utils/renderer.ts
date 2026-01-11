@@ -270,57 +270,37 @@ function getPromptBase(expr: Expression): string | null {
 }
 
 /**
+ * Format filter arguments as a colon-separated string.
+ */
+function formatFilterArgs(args: Expression[]): string {
+	return args.map(arg => {
+		if (arg.type === 'literal') {
+			const val = (arg as LiteralExpression).value;
+			return typeof val === 'string' ? `"${val}"` : String(val);
+		}
+		return String((arg as any).value || (arg as any).name || '');
+	}).join(':');
+}
+
+/**
  * Reconstruct template syntax for a prompt expression.
  * e.g., FilterExpression{name:'title', value:Literal{"prompt"}} -> {{"prompt"|title}}
  */
 function reconstructPromptTemplate(expr: Expression): string {
-	if (expr.type === 'literal') {
-		const value = (expr as LiteralExpression).value;
-		if (typeof value === 'string') {
-			return `{{"${value}"}}`;
-		}
-		return `{{${value}}}`;
-	}
-	if (expr.type === 'filter') {
-		const filter = expr as FilterExpression;
-		const inner = reconstructPromptTemplateInner(filter.value);
-		let filterStr = `${inner}|${filter.name}`;
-		if (filter.args.length > 0) {
-			const argsStr = filter.args.map(arg => {
-				if (arg.type === 'literal') {
-					const val = (arg as LiteralExpression).value;
-					return typeof val === 'string' ? `"${val}"` : String(val);
-				}
-				return String((arg as any).value || (arg as any).name || '');
-			}).join(':');
-			filterStr += `:${argsStr}`;
-		}
-		return `{{${filterStr}}}`;
-	}
-	return `{{${expr}}}`;
+	return `{{${reconstructPromptTemplateInner(expr)}}}`;
 }
 
 function reconstructPromptTemplateInner(expr: Expression): string {
 	if (expr.type === 'literal') {
 		const value = (expr as LiteralExpression).value;
-		if (typeof value === 'string') {
-			return `"${value}"`;
-		}
-		return String(value);
+		return typeof value === 'string' ? `"${value}"` : String(value);
 	}
 	if (expr.type === 'filter') {
 		const filter = expr as FilterExpression;
 		const inner = reconstructPromptTemplateInner(filter.value);
 		let filterStr = `${inner}|${filter.name}`;
 		if (filter.args.length > 0) {
-			const argsStr = filter.args.map(arg => {
-				if (arg.type === 'literal') {
-					const val = (arg as LiteralExpression).value;
-					return typeof val === 'string' ? `"${val}"` : String(val);
-				}
-				return String((arg as any).value || (arg as any).name || '');
-			}).join(':');
-			filterStr += `:${argsStr}`;
+			filterStr += `:${formatFilterArgs(filter.args)}`;
 		}
 		return filterStr;
 	}
