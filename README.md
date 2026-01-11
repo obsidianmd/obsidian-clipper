@@ -84,12 +84,14 @@ For iOS Simulator testing on macOS:
 
 ### Run tests
 
-The template engine has unit tests for the tokenizer, parser, and renderer:
+```
+npm test
+```
+
+Or run in watch mode during development:
 
 ```
-npx ts-node --compilerOptions '{"module":"CommonJS"}' src/utils/tokenizer.test.ts
-npx ts-node --compilerOptions '{"module":"CommonJS"}' src/utils/parser.test.ts
-npx ts-node --compilerOptions '{"module":"CommonJS"}' src/utils/renderer.test.ts
+npm run test:watch
 ```
 
 ## Third-party libraries
