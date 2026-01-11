@@ -144,7 +144,7 @@
 	border-radius: var(--radius-s);
 	font-size: var(--font-ui-smaller);
 	margin-top: 0.5rem;
-	padding: 0.5rem 0.75rem;
+	padding: 12px;
 	border-radius: var(--radius-s);
 
 	svg {
@@ -155,13 +155,19 @@
 	}
 
 	&.invalid {
-		background-color: hsla(var(--color-red-hsl), 0.1);
-		color: var(--text-error);
+		background-color: var(--background-modifier-error);
+		border: 1px solid var(--background-modifier-error-border);
+		svg {
+			color: var(--text-error);
+		}
 	}
 
 	&.warning {
 		background-color: var(--background-modifier-warning);
-		color: var(--text-warning);
+		border: 1px solid var(--background-modifier-warning-border);
+		svg {
+			color: var(--text-warning);
+		}
 	}
 
 	.validation-errors {
@@ -192,7 +198,10 @@
 	}
 
 	&.has-errors {
-		background-color: hsla(var(--color-red-hsl), 0.1);
-		color: var(--text-error);
+		background-color: var(--background-modifier-error);
+		border: 1px solid var(--background-modifier-error-border);
+		svg {
+			color: var(--text-error);
+		}
 	}
 }

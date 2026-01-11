@@ -3,6 +3,7 @@
 }
 .warning-container {
 	background-color: var(--background-modifier-warning);
+	border: 1px solid var(--background-modifier-warning-border);
 	padding: 12px;
 	border-radius: var(--radius-m);
 	margin: 8px 0 0;
