@@ -140,8 +140,9 @@
 	}
 
 	&.warning {
-		background-color: var(--background-modifier-warning, hsl(40, 80%, 90%));
-		color: var(--text-warning, hsl(35, 80%, 30%));
+		background-color: var(--background-modifier-warning);
+		border: 1px solid var(--background-modifier-warning-border);
+		color: var(--text-warning);
 	}
 
 	.validation-errors {
@@ -154,11 +155,11 @@
 	.validation-warning {
 		font-family: var(--font-monospace);
 	}
+}
 
-	// When in error state, style warnings differently
-	&.invalid .validation-warning {
-		opacity: 0.8;
-	}
+.property-editor + .template-validation {
+	margin-top: 0;
+	margin-bottom: 0.5rem;
 }
 
 .template-error-summary {
@@ -168,6 +169,7 @@
 	font-size: var(--font-ui-small);
 	margin-bottom: 1rem;
 	padding: 0.5rem 0.75rem;
+	gap: 0.5rem;
 
 	svg {
 		width: 16px;

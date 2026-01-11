@@ -2,7 +2,7 @@
 	fill: var(--color-accent-1);
 }
 .warning-container {
-	background-color: rgba(var(--color-orange-rgb), 0.1);
+	background-color: var(--background-modifier-warning);
 	padding: 12px;
 	border-radius: var(--radius-m);
 	margin: 8px 0 0;

@@ -370,11 +370,12 @@ export function addPropertyToEditor(name: string = '', value: string = '', id: s
 	}) as HTMLInputElement;
 	propertyDiv.appendChild(valueInput);
 
-	// Add validation for property value
-	valueInput.addEventListener('blur', () => validateTemplateField(valueInput, false));
+	// Add validation for property value (insert after the property-editor div, not inside it)
+	valueInput.addEventListener('blur', () => validateTemplateField(valueInput, false, propertyDiv));
 	// Validate on load if there's a value
 	if (value) {
-		validateTemplateField(valueInput, false);
+		// Defer validation until propertyDiv is added to the DOM
+		setTimeout(() => validateTemplateField(valueInput, false, propertyDiv), 0);
 	}
 
 	const removeBtn = createElementWithClass('button', 'remove-property-btn clickable-icon');
@@ -662,8 +663,8 @@ function updateErrorSummary(): void {
 	}
 
 	summaryEl.classList.add('has-errors');
-	const icon = createElementWithHTML('i', '', { 'data-lucide': 'alert-circle' });
-	summaryEl.appendChild(icon);
+	const icon = createElementWithHTML('i', '', { 'data-lucide': 'alert-triangle' });
+		summaryEl.appendChild(icon);
 
 	const text = document.createElement('span');
 	const messageKey = totalErrors === 1 ? 'templateErrorCount' : 'templateErrorsCount';
@@ -678,17 +679,21 @@ function updateErrorSummary(): void {
  * Validate a template field and display results.
  * @param field The input or textarea element to validate
  * @param showLineNumbers Whether to show line numbers in error messages (for multiline fields)
+ * @param insertAfter Optional element to insert the validation after (defaults to the field itself)
  */
-function validateTemplateField(field: HTMLInputElement | HTMLTextAreaElement, showLineNumbers: boolean = false): void {
+function validateTemplateField(field: HTMLInputElement | HTMLTextAreaElement, showLineNumbers: boolean = false, insertAfter?: HTMLElement): void {
 	const content = field.value;
 	const validationId = `${field.id}-validation`;
+
+	// Determine where to insert the validation element
+	const targetEl = insertAfter || field;
 
 	// Find or create the validation result element
 	let validationEl = document.getElementById(validationId);
 	if (!validationEl) {
 		validationEl = createElementWithClass('div', 'template-validation');
 		validationEl.id = validationId;
-		field.parentNode?.insertBefore(validationEl, field.nextSibling);
+		targetEl.parentNode?.insertBefore(validationEl, targetEl.nextSibling);
 	}
 
 	// Clear previous content
@@ -725,7 +730,7 @@ function validateTemplateField(field: HTMLInputElement | HTMLTextAreaElement, sh
 	} else {
 		// Has errors and/or warnings - use error styling if any errors, warning styling if only warnings
 		validationEl.classList.add(hasErrors ? 'invalid' : 'warning');
-		const icon = createElementWithHTML('i', '', { 'data-lucide': hasErrors ? 'alert-circle' : 'alert-triangle' });
+		const icon = createElementWithHTML('i', '', { 'data-lucide': hasErrors ? 'alert-triangle' : 'alert-triangle' });
 		validationEl.appendChild(icon);
 
 		const issueList = document.createElement('div');
