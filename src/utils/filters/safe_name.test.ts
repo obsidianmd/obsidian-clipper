@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest';
-import { safe_name } from './safe_name';
+import { safe_name, validateSafeNameParams } from './safe_name';
 
 describe('safe_name filter', () => {
 	test('removes forward slashes', () => {
@@ -42,6 +42,25 @@ describe('safe_name filter', () => {
 		expect(result.includes('<')).toBe(false);
 		expect(result.includes('>')).toBe(false);
 		expect(result.includes('|')).toBe(false);
+	});
+});
+
+describe('safe_name param validation', () => {
+	test('no param is valid (defaults to most conservative)', () => {
+		expect(validateSafeNameParams(undefined).valid).toBe(true);
+	});
+
+	test('valid OS params return valid', () => {
+		expect(validateSafeNameParams('windows').valid).toBe(true);
+		expect(validateSafeNameParams('mac').valid).toBe(true);
+		expect(validateSafeNameParams('linux').valid).toBe(true);
+		expect(validateSafeNameParams('Windows').valid).toBe(true); // case insensitive
+	});
+
+	test('invalid OS returns error', () => {
+		const result = validateSafeNameParams('unix');
+		expect(result.valid).toBe(false);
+		expect(result.error).toContain('invalid OS');
 	});
 });
 

@@ -1,4 +1,29 @@
 import { createParserState, processCharacter, parseRegexPattern } from '../parser-utils';
+import type { ParamValidationResult } from '../filters';
+
+export const validateReplaceParams = (param: string | undefined): ParamValidationResult => {
+	if (!param) {
+		return { valid: false, error: 'requires search and replacement (e.g., replace:"old":"new")' };
+	}
+
+	// Remove outer parentheses if present
+	const cleanParam = param.replace(/^\((.*)\)$/, '$1');
+
+	// Check for at least one quoted string pattern
+	// Valid formats: "search":"replace" or 'search':'replace' or /regex/:"replace"
+	const hasQuotedPair = /["'][^"']*["']\s*:\s*["'][^"']*["']/.test(cleanParam) ||
+		/["'][^"']*["']\s*:/.test(cleanParam) || // "search": with implicit empty replacement
+		/\/[^/]+\/[gimsuy]*\s*:/.test(cleanParam); // regex pattern
+
+	if (!hasQuotedPair) {
+		return {
+			valid: false,
+			error: 'values must be quoted (e.g., replace:"old":"new" or replace:"text":"")'
+		};
+	}
+
+	return { valid: true };
+};
 
 export const replace = (str: string, param?: string): string => {
 	if (!param) {

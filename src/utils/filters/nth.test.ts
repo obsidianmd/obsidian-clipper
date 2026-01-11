@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest';
-import { nth } from './nth';
+import { nth, validateNthParams } from './nth';
 
 describe('nth filter', () => {
 	test('keeps nth element (1-based)', () => {
@@ -33,6 +33,31 @@ describe('nth filter', () => {
 
 	test('returns original for non-JSON', () => {
 		expect(nth('hello', '3')).toBe('hello');
+	});
+});
+
+describe('nth param validation', () => {
+	test('no param is valid (optional)', () => {
+		expect(validateNthParams(undefined).valid).toBe(true);
+	});
+
+	test('valid params return valid', () => {
+		expect(validateNthParams('3').valid).toBe(true);
+		expect(validateNthParams('5n').valid).toBe(true);
+		expect(validateNthParams('n+7').valid).toBe(true);
+		expect(validateNthParams('1,2,3:5').valid).toBe(true);
+	});
+
+	test('invalid syntax returns error', () => {
+		const result = validateNthParams('abc');
+		expect(result.valid).toBe(false);
+		expect(result.error).toContain('invalid syntax');
+	});
+
+	test('invalid basis pattern returns error', () => {
+		const result = validateNthParams('1,2:abc');
+		expect(result.valid).toBe(false);
+		expect(result.error).toContain('basis');
 	});
 });
 

@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest';
-import { object } from './object';
+import { object, validateObjectParams } from './object';
 
 describe('object filter', () => {
 	test('converts object to array of pairs', () => {
@@ -27,6 +27,26 @@ describe('object filter', () => {
 
 	test('returns original for non-JSON', () => {
 		expect(object('hello', 'keys')).toBe('hello');
+	});
+});
+
+describe('object param validation', () => {
+	test('missing param returns error', () => {
+		const result = validateObjectParams(undefined);
+		expect(result.valid).toBe(false);
+		expect(result.error).toContain('requires a parameter');
+	});
+
+	test('valid params return valid', () => {
+		expect(validateObjectParams('array').valid).toBe(true);
+		expect(validateObjectParams('keys').valid).toBe(true);
+		expect(validateObjectParams('values').valid).toBe(true);
+	});
+
+	test('invalid param returns error', () => {
+		const result = validateObjectParams('entries');
+		expect(result.valid).toBe(false);
+		expect(result.error).toContain('invalid parameter');
 	});
 });
 

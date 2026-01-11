@@ -1596,8 +1596,43 @@ export function validateVariables(ast: ASTNode[]): ParserError[] {
 interface FilterUsage {
 	name: string;
 	hasArgs: boolean;
+	args: Expression[];
 	line: number;
 	column: number;
+}
+
+/**
+ * Reconstruct a parameter string from parsed Expression arguments
+ */
+function expressionToString(expr: Expression): string {
+	switch (expr.type) {
+		case 'literal':
+			if (typeof expr.value === 'string') {
+				return `"${expr.value}"`;
+			}
+			return String(expr.value);
+		case 'identifier':
+			return expr.name;
+		case 'filter':
+			const base = expressionToString(expr.value);
+			const filterArgs = expr.args.map(expressionToString).join(':');
+			return filterArgs ? `${base}|${expr.name}:${filterArgs}` : `${base}|${expr.name}`;
+		case 'binary':
+			return `${expressionToString(expr.left)} ${expr.operator} ${expressionToString(expr.right)}`;
+		case 'unary':
+			return `${expr.operator} ${expressionToString(expr.argument)}`;
+		case 'group':
+			return `(${expressionToString(expr.expression)})`;
+		case 'member':
+			return `${expressionToString(expr.object)}.${expressionToString(expr.property)}`;
+		default:
+			return '';
+	}
+}
+
+function argsToParamString(args: Expression[]): string | undefined {
+	if (args.length === 0) return undefined;
+	return args.map(expressionToString).join(':');
 }
 
 /**
@@ -1627,6 +1662,7 @@ function collectFiltersFromExpression(expr: Expression, usages: FilterUsage[]): 
 			usages.push({
 				name: expr.name,
 				hasArgs: expr.args.length > 0,
+				args: expr.args,
 				line: expr.line,
 				column: expr.column,
 			});
@@ -1688,7 +1724,7 @@ function collectFilters(nodes: ASTNode[]): FilterUsage[] {
 
 /**
  * Validate filter usage in the AST.
- * Checks: 1) filter exists, 2) required params present
+ * Checks: 1) filter exists, 2) params are valid (via validator)
  */
 export function validateFilters(ast: ASTNode[]): ParserError[] {
 	const errors: ParserError[] = [];
@@ -1710,18 +1746,18 @@ export function validateFilters(ast: ASTNode[]): ParserError[] {
 			continue;
 		}
 
-		// Check if filter requires parameters
+		// Run param validator if available
 		const meta = filterMetadata[usage.name];
-		if (meta?.requiresParams && !usage.hasArgs) {
-			let message = `Filter "${usage.name}" requires parameters`;
-			if (meta.example) {
-				message += ` (e.g., ${meta.example})`;
+		if (meta?.validateParams) {
+			const paramString = usage.hasArgs ? argsToParamString(usage.args) : undefined;
+			const result = meta.validateParams(paramString);
+			if (!result.valid && result.error) {
+				errors.push({
+					message: `Filter "${usage.name}" ${result.error}`,
+					line: usage.line,
+					column: usage.column,
+				});
 			}
-			errors.push({
-				message,
-				line: usage.line,
-				column: usage.column,
-			});
 		}
 	}
 

@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest';
-import { date_modify } from './date_modify';
+import { date_modify, validateDateModifyParams } from './date_modify';
 
 describe('date_modify filter', () => {
 	test('adds years', () => {
@@ -32,6 +32,41 @@ describe('date_modify filter', () => {
 	test('returns original without params', () => {
 		const result = date_modify('2024-12-01');
 		expect(result).toContain('2024');
+	});
+});
+
+describe('date_modify param validation', () => {
+	test('valid params return valid', () => {
+		expect(validateDateModifyParams('+1 day').valid).toBe(true);
+		expect(validateDateModifyParams('-2 weeks').valid).toBe(true);
+		expect(validateDateModifyParams('+3 months').valid).toBe(true);
+		expect(validateDateModifyParams('-1 year').valid).toBe(true);
+		expect(validateDateModifyParams('+5 hours').valid).toBe(true);
+		expect(validateDateModifyParams('"-1 day"').valid).toBe(true);
+	});
+
+	test('missing params returns error', () => {
+		const result = validateDateModifyParams(undefined);
+		expect(result.valid).toBe(false);
+		expect(result.error).toContain('requires');
+	});
+
+	test('invalid format returns error', () => {
+		const result = validateDateModifyParams('tomorrow');
+		expect(result.valid).toBe(false);
+		expect(result.error).toContain('invalid format');
+	});
+
+	test('invalid unit returns error', () => {
+		const result = validateDateModifyParams('+5 parsecs');
+		expect(result.valid).toBe(false);
+		expect(result.error).toContain('invalid unit');
+	});
+
+	test('missing sign returns error', () => {
+		const result = validateDateModifyParams('5 days');
+		expect(result.valid).toBe(false);
+		expect(result.error).toContain('invalid format');
 	});
 });
 

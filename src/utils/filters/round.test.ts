@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest';
-import { round } from './round';
+import { round, validateRoundParams } from './round';
 
 describe('round filter', () => {
 	test('rounds to nearest integer by default', () => {
@@ -29,6 +29,30 @@ describe('round filter', () => {
 
 	test('handles zero decimal places', () => {
 		expect(round('3.14159', '0')).toBe('3');
+	});
+});
+
+describe('round param validation', () => {
+	test('no param is valid (optional)', () => {
+		expect(validateRoundParams(undefined).valid).toBe(true);
+	});
+
+	test('valid params return valid', () => {
+		expect(validateRoundParams('0').valid).toBe(true);
+		expect(validateRoundParams('2').valid).toBe(true);
+		expect(validateRoundParams('10').valid).toBe(true);
+	});
+
+	test('non-numeric param returns error', () => {
+		const result = validateRoundParams('abc');
+		expect(result.valid).toBe(false);
+		expect(result.error).toContain('must be a number');
+	});
+
+	test('negative param returns error', () => {
+		const result = validateRoundParams('-2');
+		expect(result.valid).toBe(false);
+		expect(result.error).toContain('non-negative');
 	});
 });
 

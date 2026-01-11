@@ -1,4 +1,18 @@
 import { debugLog } from '../debug';
+import type { ParamValidationResult } from '../filters';
+
+export const validateMapParams = (param: string | undefined): ParamValidationResult => {
+	if (!param) {
+		return { valid: false, error: 'requires an arrow function (e.g., map:x => x.name)' };
+	}
+
+	const match = param.match(/^\s*(\w+)\s*=>\s*(.+)$/);
+	if (!match) {
+		return { valid: false, error: 'invalid syntax. Use arrow function format (e.g., x => x.name)' };
+	}
+
+	return { valid: true };
+};
 
 export const map = (str: string, param?: string): string => {
 	debugLog('Map', 'map input:', str);

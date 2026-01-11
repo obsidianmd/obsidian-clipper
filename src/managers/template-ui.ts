@@ -313,7 +313,6 @@ export function addPropertyToEditor(name: string = '', value: string = '', id: s
 	const propertyDiv = createElementWithClass('div', 'property-editor');
 	propertyDiv.dataset.id = propertyId;
 
-	// Create a row wrapper for the inline elements
 	const propertyRow = createElementWithClass('div', 'property-row');
 
 	const dragHandle = createElementWithClass('div', 'drag-handle');
@@ -378,8 +377,6 @@ export function addPropertyToEditor(name: string = '', value: string = '', id: s
 	removeBtn.setAttribute('aria-label', getMessage('removeProperty'));
 	removeBtn.appendChild(createElementWithHTML('i', '', { 'data-lucide': 'trash-2' }));
 	propertyRow.appendChild(removeBtn);
-
-	// Add the row to the property editor
 	propertyDiv.appendChild(propertyRow);
 
 	// Add validation for property value (will appear after the row, inside propertyDiv)

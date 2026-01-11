@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest';
-import { replace } from './replace';
+import { replace, validateReplaceParams } from './replace';
 
 describe('replace filter', () => {
 	test('simple replacement', () => {
@@ -44,6 +44,33 @@ describe('replace filter', () => {
 
 	test('handles special characters in replacement', () => {
 		expect(replace('hello:world', '"\\:":"-"')).toBe('hello-world');
+	});
+});
+
+describe('replace param validation', () => {
+	test('valid params return valid', () => {
+		expect(validateReplaceParams('"old":"new"').valid).toBe(true);
+		expect(validateReplaceParams('"a":"b","c":"d"').valid).toBe(true);
+		expect(validateReplaceParams('"/regex/g":"text"').valid).toBe(true);
+		expect(validateReplaceParams('"text":').valid).toBe(true);
+	});
+
+	test('missing params returns error', () => {
+		const result = validateReplaceParams(undefined);
+		expect(result.valid).toBe(false);
+		expect(result.error).toContain('requires');
+	});
+
+	test('unquoted params returns error', () => {
+		const result = validateReplaceParams('old:new');
+		expect(result.valid).toBe(false);
+		expect(result.error).toContain('quoted');
+	});
+
+	test('missing colon separator returns error', () => {
+		const result = validateReplaceParams('"old""new"');
+		expect(result.valid).toBe(false);
+		expect(result.error).toContain('quoted');
 	});
 });
 

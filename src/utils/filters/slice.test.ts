@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest';
-import { slice } from './slice';
+import { slice, validateSliceParams } from './slice';
 
 describe('slice filter', () => {
 	test('extracts portion of string', () => {
@@ -36,6 +36,33 @@ describe('slice filter', () => {
 		const result = slice('[1,2,3,4,5]', '1,4');
 		const parsed = JSON.parse(result);
 		expect(parsed).toEqual([2, 3, 4]);
+	});
+});
+
+describe('slice param validation', () => {
+	test('valid params return valid', () => {
+		expect(validateSliceParams('0,5').valid).toBe(true);
+		expect(validateSliceParams('0').valid).toBe(true);
+		expect(validateSliceParams('-3').valid).toBe(true);
+		expect(validateSliceParams('1,-1').valid).toBe(true);
+	});
+
+	test('missing params returns error', () => {
+		const result = validateSliceParams(undefined);
+		expect(result.valid).toBe(false);
+		expect(result.error).toContain('requires');
+	});
+
+	test('non-numeric params returns error', () => {
+		const result = validateSliceParams('abc');
+		expect(result.valid).toBe(false);
+		expect(result.error).toContain('not a valid number');
+	});
+
+	test('too many params returns error', () => {
+		const result = validateSliceParams('1,2,3');
+		expect(result.valid).toBe(false);
+		expect(result.error).toContain('at most 2');
 	});
 });
 
