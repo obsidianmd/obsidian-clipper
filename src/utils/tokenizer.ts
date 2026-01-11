@@ -801,6 +801,45 @@ function tokenizeCssSelector(state: TokenizerState, value: string): string {
 			}
 		}
 
+		// Detect unclosed brackets/parens/strings when hitting end delimiters
+		// This catches cases like: selector:p[attr='value'|filter}} (missing ])
+		if ((char === '}' && nextChar === '}') || (char === '%' && nextChar === '}')) {
+			if (inString) {
+				state.errors.push({
+					message: `Unclosed string in selector - missing closing ${inString}`,
+					line: state.line,
+					column: state.column,
+				});
+				break;
+			}
+			if (bracketDepth > 0) {
+				state.errors.push({
+					message: `Unclosed '[' in selector - missing ']'`,
+					line: state.line,
+					column: state.column,
+				});
+				break;
+			}
+			if (parenDepth > 0) {
+				state.errors.push({
+					message: `Unclosed '(' in selector - missing ')'`,
+					line: state.line,
+					column: state.column,
+				});
+				break;
+			}
+		}
+
+		// Handle escaped quotes outside strings (e.g., [attr=\"value\"])
+		// The backslash-quote should not start a string
+		if (!inString && char === '\\' && (nextChar === '"' || nextChar === "'")) {
+			value += char;
+			advanceChar(state);
+			value += state.input[state.pos];
+			advanceChar(state);
+			continue;
+		}
+
 		// Handle string quotes in CSS attribute selectors
 		if (!inString && (char === '"' || char === "'")) {
 			inString = char;

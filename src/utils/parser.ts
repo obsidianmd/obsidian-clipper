@@ -659,6 +659,64 @@ function parseNullishExpression(state: ParserState): Expression | null {
 	return left;
 }
 
+/**
+ * Parse a filter argument that may contain colon-separated parts (for ranges).
+ * e.g., "7" or "7:10" or "start:end"
+ * Returns a string literal containing the full argument value.
+ */
+function parseFilterArgument(state: ParserState): Expression | null {
+	const startToken = peek(state);
+
+	// Parse the first part
+	const first = parsePrimaryExpression(state);
+	if (!first) return null;
+
+	// If this is a quoted string, return it as-is without consuming colons
+	// Colons after quoted strings are argument separators (e.g., replace:"old":"new")
+	if (first.type === 'literal' && startToken.type === 'string') {
+		return first;
+	}
+
+	// For unquoted values (numbers, identifiers), check for colon-separated continuation
+	// e.g., nth:1,2,3,5,7:7 where "7:7" is a range
+	let value = '';
+	if (first.type === 'literal') {
+		value = String(first.value);
+	} else if (first.type === 'identifier') {
+		value = first.name;
+	} else {
+		return first; // Return as-is for other types
+	}
+
+	// Only consume colons for unquoted values (range notation like 5:7)
+	while (check(state, 'colon') && !isAtEnd(state)) {
+		advance(state); // consume ':'
+		value += ':';
+
+		// Parse the next part
+		const next = parsePrimaryExpression(state);
+		if (next) {
+			if (next.type === 'literal') {
+				value += String(next.value);
+			} else if (next.type === 'identifier') {
+				value += next.name;
+			}
+		} else {
+			// No valid expression after colon - might be end of argument
+			break;
+		}
+	}
+
+	// Return as a string literal containing the full value
+	return {
+		type: 'literal',
+		value: value,
+		raw: value,
+		line: startToken.line,
+		column: startToken.column,
+	};
+}
+
 // Filter: value | filter | filter
 function parseFilterExpression(state: ParserState): Expression | null {
 	let left = parseOrExpression(state);
@@ -679,7 +737,7 @@ function parseFilterExpression(state: ParserState): Expression | null {
 		const filterToken = advance(state);
 		const args: Expression[] = [];
 
-		// Parse filter arguments: filter:arg or filter:(arg1, arg2)
+		// Parse filter arguments: filter:arg or filter:arg1,arg2 or filter:(arg1, arg2)
 		if (check(state, 'colon')) {
 			advance(state); // consume ':'
 
@@ -699,9 +757,17 @@ function parseFilterExpression(state: ParserState): Expression | null {
 					advance(state); // consume ')'
 				}
 			} else {
-				// Single argument
-				const arg = parsePrimaryExpression(state);
+				// Arguments without parentheses
+				// Supports: filter:arg, filter:arg1,arg2, filter:"str1":"str2"
+				const arg = parseFilterArgument(state);
 				if (arg) args.push(arg);
+				// Continue parsing comma-separated or colon-separated arguments
+				// Colon separates quoted string args (e.g., replace:"old":"new")
+				while (check(state, 'comma') || check(state, 'colon')) {
+					advance(state); // consume ',' or ':'
+					const nextArg = parseFilterArgument(state);
+					if (nextArg) args.push(nextArg);
+				}
 			}
 		}
 
