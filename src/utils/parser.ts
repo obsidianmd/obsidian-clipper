@@ -268,6 +268,31 @@ function parseVariable(state: ParserState): VariableNode | null {
 		return null;
 	}
 
+	// Check for multiple consecutive identifiers (likely a prompt without quotes)
+	// e.g., {{a summary of the page}} instead of {{"a summary of the page"}}
+	if (check(state, 'identifier')) {
+		// Count how many identifiers follow
+		let extraWords = 0;
+		const savedPos = state.pos;
+		while (check(state, 'identifier') && extraWords < 10) {
+			advance(state);
+			extraWords++;
+		}
+		// Reset position
+		state.pos = savedPos;
+
+		if (extraWords > 0) {
+			state.errors.push({
+				message: 'Multiple words without quotes - if this is a prompt, wrap it in quotes: {{"your prompt here"}}',
+				line: startToken.line,
+				column: startToken.column,
+			});
+			// Skip to end of variable to avoid cascading errors
+			skipToEndOfVariable(state);
+			return null;
+		}
+	}
+
 	// Consume variable_end
 	let trimRight = false;
 	if (check(state, 'variable_end')) {

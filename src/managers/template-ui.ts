@@ -313,9 +313,12 @@ export function addPropertyToEditor(name: string = '', value: string = '', id: s
 	const propertyDiv = createElementWithClass('div', 'property-editor');
 	propertyDiv.dataset.id = propertyId;
 
+	// Create a row wrapper for the inline elements
+	const propertyRow = createElementWithClass('div', 'property-row');
+
 	const dragHandle = createElementWithClass('div', 'drag-handle');
 	dragHandle.appendChild(createElementWithHTML('i', '', { 'data-lucide': 'grip-vertical' }));
-	propertyDiv.appendChild(dragHandle);
+	propertyRow.appendChild(dragHandle);
 
 	const propertySelectDiv = createElementWithClass('div', 'property-select');
 	const propertySelectedDiv = createElementWithClass('div', 'property-selected');
@@ -336,7 +339,7 @@ export function addPropertyToEditor(name: string = '', value: string = '', id: s
 	});
 	select.value = propertyType;
 	propertySelectDiv.appendChild(select);
-	propertyDiv.appendChild(propertySelectDiv);
+	propertyRow.appendChild(propertySelectDiv);
 
 	const nameInput = createElementWithHTML('input', '', {
 		type: 'text',
@@ -348,7 +351,7 @@ export function addPropertyToEditor(name: string = '', value: string = '', id: s
 		autocomplete: 'off',
 		list: 'property-name-suggestions'
 	});
-	propertyDiv.appendChild(nameInput);
+	propertyRow.appendChild(nameInput);
 
 	// Create datalist for autocomplete if it doesn't exist
 	let datalist = document.getElementById('property-name-suggestions');
@@ -368,21 +371,23 @@ export function addPropertyToEditor(name: string = '', value: string = '', id: s
 		value: unescapeValue(value),
 		placeholder: getMessage('propertyValue')
 	}) as HTMLInputElement;
-	propertyDiv.appendChild(valueInput);
-
-	// Add validation for property value (insert after the property-editor div, not inside it)
-	valueInput.addEventListener('blur', () => validateTemplateField(valueInput, false, propertyDiv));
-	// Validate on load if there's a value
-	if (value) {
-		// Defer validation until propertyDiv is added to the DOM
-		setTimeout(() => validateTemplateField(valueInput, false, propertyDiv), 0);
-	}
+	propertyRow.appendChild(valueInput);
 
 	const removeBtn = createElementWithClass('button', 'remove-property-btn clickable-icon');
 	removeBtn.setAttribute('type', 'button');
 	removeBtn.setAttribute('aria-label', getMessage('removeProperty'));
 	removeBtn.appendChild(createElementWithHTML('i', '', { 'data-lucide': 'trash-2' }));
-	propertyDiv.appendChild(removeBtn);
+	propertyRow.appendChild(removeBtn);
+
+	// Add the row to the property editor
+	propertyDiv.appendChild(propertyRow);
+
+	// Add validation for property value (will appear after the row, inside propertyDiv)
+	valueInput.addEventListener('blur', () => validateTemplateField(valueInput, false, propertyDiv));
+	// Validate on load if there's a value
+	if (value) {
+		validateTemplateField(valueInput, false, propertyDiv);
+	}
 
 	templateProperties.appendChild(propertyDiv);
 
@@ -679,21 +684,22 @@ function updateErrorSummary(): void {
  * Validate a template field and display results.
  * @param field The input or textarea element to validate
  * @param showLineNumbers Whether to show line numbers in error messages (for multiline fields)
- * @param insertAfter Optional element to insert the validation after (defaults to the field itself)
+ * @param appendTo Optional element to append the validation to (defaults to inserting after the field)
  */
-function validateTemplateField(field: HTMLInputElement | HTMLTextAreaElement, showLineNumbers: boolean = false, insertAfter?: HTMLElement): void {
+function validateTemplateField(field: HTMLInputElement | HTMLTextAreaElement, showLineNumbers: boolean = false, appendTo?: HTMLElement): void {
 	const content = field.value;
 	const validationId = `${field.id}-validation`;
-
-	// Determine where to insert the validation element
-	const targetEl = insertAfter || field;
 
 	// Find or create the validation result element
 	let validationEl = document.getElementById(validationId);
 	if (!validationEl) {
 		validationEl = createElementWithClass('div', 'template-validation');
 		validationEl.id = validationId;
-		targetEl.parentNode?.insertBefore(validationEl, targetEl.nextSibling);
+		if (appendTo) {
+			appendTo.appendChild(validationEl);
+		} else {
+			field.parentNode?.insertBefore(validationEl, field.nextSibling);
+		}
 	}
 
 	// Clear previous content

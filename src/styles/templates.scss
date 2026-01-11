@@ -33,6 +33,27 @@
 	}
 }
 
+// Template properties use nested structure for validation
+#template-properties.properties-list {
+	> .property-editor {
+		flex-direction: column;
+		align-items: stretch;
+		height: auto;
+		gap: 0.25rem;
+	}
+	.property-row {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		gap: 0.375rem;
+		height: var(--input-height);
+	}
+	.template-validation {
+		margin-top: 0;
+		margin-left: 4rem;
+	}
+}
+
 #property-types-list.properties-list {
 	.property-editor {
 		border-radius: var(--radius-s);
@@ -136,12 +157,10 @@
 	&.invalid {
 		background-color: hsla(var(--color-red-hsl), 0.1);
 		color: var(--text-error);
-		border: 1px solid hsla(var(--color-red-hsl), 0.15);
 	}
 
 	&.warning {
 		background-color: var(--background-modifier-warning);
-		border: 1px solid var(--background-modifier-warning-border);
 		color: var(--text-warning);
 	}
 
@@ -155,11 +174,6 @@
 	.validation-warning {
 		font-family: var(--font-monospace);
 	}
-}
-
-.property-editor + .template-validation {
-	margin-top: 0;
-	margin-bottom: 0.5rem;
 }
 
 .template-error-summary {
@@ -179,7 +193,6 @@
 
 	&.has-errors {
 		background-color: hsla(var(--color-red-hsl), 0.1);
-		border: 1px solid hsla(var(--color-red-hsl), 0.15);
 		color: var(--text-error);
 	}
 }
