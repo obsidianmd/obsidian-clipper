@@ -775,6 +775,12 @@
 	"templateCopyError": {
 		"message": "テンプレートのJSONのクリップボードへのコピーに失敗しました"
 	},
+	"templateErrorCount": {
+		"message": "テンプレートにエラーがあります。"
+	},
+	"templateErrorsCount": {
+		"message": "テンプレートに$1件のエラーがあります。"
+	},
 	"templateName": {
 		"message": "テンプレート名"
 	},
@@ -789,6 +795,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "URLパターンやschema.orgデータに一致する場合に、このテンプレートを自動的に択するルールを定義します。1行に1つのルールを述してください。"
+	},
+	"templateValid": {
+		"message": "テンプレート構文は有効です"
 	},
 	"templatesHeading": {
 		"message": "テンプレート"

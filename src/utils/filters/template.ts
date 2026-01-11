@@ -1,4 +1,13 @@
 import { debugLog } from '../debug';
+import type { ParamValidationResult } from '../filters';
+
+export const validateTemplateParams = (param: string | undefined): ParamValidationResult => {
+	if (!param) {
+		return { valid: false, error: 'requires a template string (e.g., template:"${name}")' };
+	}
+
+	return { valid: true };
+};
 
 export const template = (input: string | any[], param?: string): string => {
 	debugLog('Template', 'Template input:', input);

@@ -13,6 +13,8 @@
 		"build:safari": "webpack --env BROWSER=safari --mode production",
 		"build": "npm run build:chrome && npm run build:firefox && npm run build:safari",
 		"dev": "npm run dev:chrome",
+		"test": "vitest run",
+		"test:watch": "vitest",
 		"update-locales": "ts-node --project scripts/tsconfig.json scripts/update-locales.ts",
 		"check-strings": "ts-node --project scripts/tsconfig.json scripts/check-unused-strings.ts",
 		"add-locale": "ts-node --project scripts/tsconfig.json scripts/add-locale.ts"
@@ -33,6 +35,7 @@
 		"ts-loader": "^9.5.1",
 		"ts-node": "^10.9.2",
 		"typescript": "^5.5.4",
+		"vitest": "^2.1.9",
 		"webextension-polyfill": "^0.12.0",
 		"webpack": "^5.97.1",
 		"webpack-cli": "^5.1.4",

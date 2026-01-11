@@ -775,6 +775,12 @@
 	"templateCopyError": {
 		"message": "Error en copiar el JSON de la plantilla al porta-retalls"
 	},
+	"templateErrorCount": {
+		"message": "Hi ha un error a la teva plantilla."
+	},
+	"templateErrorsCount": {
+		"message": "Hi ha $1 errors a la teva plantilla."
+	},
 	"templateName": {
 		"message": "Nom de la plantilla"
 	},
@@ -789,6 +795,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "Defineixi regles per seleccionar automàticament aquesta plantilla si coincideix amb un patró d'URL o conté dades de schema.org. Una regla per línia."
+	},
+	"templateValid": {
+		"message": "La sintaxi de la plantilla és vàlida"
 	},
 	"templatesHeading": {
 		"message": "Plantilles"

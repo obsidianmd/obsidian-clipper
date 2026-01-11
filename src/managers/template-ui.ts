@@ -10,6 +10,7 @@ import { updatePromptContextVisibility } from './interpreter-settings';
 import { showSettingsSection } from './settings-section-ui';
 import { updatePropertyType } from './property-types-manager';
 import { getMessage } from '../utils/i18n';
+import { parse, validateVariables, validateFilters } from '../utils/parser';
 let hasUnsavedChanges = false;
 
 export function resetUnsavedChanges(): void {
@@ -177,21 +178,31 @@ export function showTemplateEditor(template: Template | null): void {
 	if (templateProperties) templateProperties.textContent = '';
 
 	const pathInput = document.getElementById('template-path-name') as HTMLInputElement;
-	if (pathInput) pathInput.value = editingTemplate.path || '';
+	if (pathInput) {
+		pathInput.value = editingTemplate.path || '';
+		validateTemplateField(pathInput, false);
+	}
 
 	const behaviorSelect = document.getElementById('template-behavior') as HTMLSelectElement;
 	if (behaviorSelect) behaviorSelect.value = editingTemplate.behavior || 'create';
-	
+
 	const noteNameFormat = document.getElementById('note-name-format') as HTMLInputElement;
 	if (noteNameFormat) {
 		noteNameFormat.value = editingTemplate.noteNameFormat || '{{title}}';
+		validateTemplateField(noteNameFormat, false);
 	}
 
 	const noteContentFormat = document.getElementById('note-content-format') as HTMLTextAreaElement;
-	if (noteContentFormat) noteContentFormat.value = editingTemplate.noteContentFormat || '';
+	if (noteContentFormat) {
+		noteContentFormat.value = editingTemplate.noteContentFormat || '';
+		validateTemplateField(noteContentFormat, true);
+	}
 
 	const promptContextTextarea = document.getElementById('prompt-context') as HTMLTextAreaElement;
-	if (promptContextTextarea) promptContextTextarea.value = editingTemplate.context || '';
+	if (promptContextTextarea) {
+		promptContextTextarea.value = editingTemplate.context || '';
+		validateTemplateField(promptContextTextarea, true);
+	}
 
 	updateBehaviorFields();
 
@@ -302,9 +313,11 @@ export function addPropertyToEditor(name: string = '', value: string = '', id: s
 	const propertyDiv = createElementWithClass('div', 'property-editor');
 	propertyDiv.dataset.id = propertyId;
 
+	const propertyRow = createElementWithClass('div', 'property-row');
+
 	const dragHandle = createElementWithClass('div', 'drag-handle');
 	dragHandle.appendChild(createElementWithHTML('i', '', { 'data-lucide': 'grip-vertical' }));
-	propertyDiv.appendChild(dragHandle);
+	propertyRow.appendChild(dragHandle);
 
 	const propertySelectDiv = createElementWithClass('div', 'property-select');
 	const propertySelectedDiv = createElementWithClass('div', 'property-selected');
@@ -325,7 +338,7 @@ export function addPropertyToEditor(name: string = '', value: string = '', id: s
 	});
 	select.value = propertyType;
 	propertySelectDiv.appendChild(select);
-	propertyDiv.appendChild(propertySelectDiv);
+	propertyRow.appendChild(propertySelectDiv);
 
 	const nameInput = createElementWithHTML('input', '', {
 		type: 'text',
@@ -337,7 +350,7 @@ export function addPropertyToEditor(name: string = '', value: string = '', id: s
 		autocomplete: 'off',
 		list: 'property-name-suggestions'
 	});
-	propertyDiv.appendChild(nameInput);
+	propertyRow.appendChild(nameInput);
 
 	// Create datalist for autocomplete if it doesn't exist
 	let datalist = document.getElementById('property-name-suggestions');
@@ -357,13 +370,21 @@ export function addPropertyToEditor(name: string = '', value: string = '', id: s
 		value: unescapeValue(value),
 		placeholder: getMessage('propertyValue')
 	}) as HTMLInputElement;
-	propertyDiv.appendChild(valueInput);
+	propertyRow.appendChild(valueInput);
 
 	const removeBtn = createElementWithClass('button', 'remove-property-btn clickable-icon');
 	removeBtn.setAttribute('type', 'button');
 	removeBtn.setAttribute('aria-label', getMessage('removeProperty'));
 	removeBtn.appendChild(createElementWithHTML('i', '', { 'data-lucide': 'trash-2' }));
-	propertyDiv.appendChild(removeBtn);
+	propertyRow.appendChild(removeBtn);
+	propertyDiv.appendChild(propertyRow);
+
+	// Add validation for property value (will appear after the row, inside propertyDiv)
+	valueInput.addEventListener('blur', () => validateTemplateField(valueInput, false, propertyDiv));
+	// Validate on load if there's a value
+	if (value) {
+		validateTemplateField(valueInput, false, propertyDiv);
+	}
 
 	templateProperties.appendChild(propertyDiv);
 
@@ -609,4 +630,159 @@ function updatePropertyNameSuggestions(): void {
 
 export function refreshPropertyNameSuggestions(): void {
 	updatePropertyNameSuggestions();
+}
+
+/**
+ * Update the error summary at the top of the template editor.
+ */
+function updateErrorSummary(): void {
+	const templateEditor = document.getElementById('template-editor');
+	if (!templateEditor) return;
+
+	// Find or create the summary element
+	let summaryEl = document.getElementById('template-error-summary');
+	if (!summaryEl) {
+		summaryEl = createElementWithClass('div', 'template-error-summary');
+		summaryEl.id = 'template-error-summary';
+		templateEditor.insertBefore(summaryEl, templateEditor.firstChild);
+	}
+
+	// Count errors from all validation elements
+	const validationEls = document.querySelectorAll('.template-validation.invalid');
+	let totalErrors = 0;
+	validationEls.forEach(el => {
+		const errorItems = el.querySelectorAll('.validation-error');
+		totalErrors += errorItems.length;
+	});
+
+	// Clear and update summary
+	summaryEl.textContent = '';
+	summaryEl.className = 'template-error-summary';
+
+	if (totalErrors === 0) {
+		summaryEl.style.display = 'none';
+		return;
+	}
+
+	summaryEl.classList.add('has-errors');
+	const icon = createElementWithHTML('i', '', { 'data-lucide': 'alert-triangle' });
+	summaryEl.appendChild(icon);
+
+	const text = document.createElement('span');
+	const messageKey = totalErrors === 1 ? 'templateErrorCount' : 'templateErrorsCount';
+	text.textContent = getMessage(messageKey, totalErrors.toString());
+	summaryEl.appendChild(text);
+
+	summaryEl.style.display = 'flex';
+	initializeIcons(summaryEl);
+}
+
+/**
+ * Validate a template field and display results.
+ * @param field The input or textarea element to validate
+ * @param showLineNumbers Whether to show line numbers in error messages (for multiline fields)
+ * @param appendTo Optional element to append the validation to (defaults to inserting after the field)
+ */
+function validateTemplateField(field: HTMLInputElement | HTMLTextAreaElement, showLineNumbers: boolean = false, appendTo?: HTMLElement): void {
+	const content = field.value;
+	const validationId = `${field.id}-validation`;
+
+	// Find or create the validation result element
+	let validationEl = document.getElementById(validationId);
+	if (!validationEl) {
+		validationEl = createElementWithClass('div', 'template-validation');
+		validationEl.id = validationId;
+		if (appendTo) {
+			appendTo.appendChild(validationEl);
+		} else {
+			field.parentNode?.insertBefore(validationEl, field.nextSibling);
+		}
+	}
+
+	// Clear previous content
+	validationEl.textContent = '';
+	validationEl.className = 'template-validation';
+
+	// Skip validation for empty content
+	if (!content.trim()) {
+		validationEl.style.display = 'none';
+		updateErrorSummary();
+		return;
+	}
+
+	// Parse and check for errors
+	const result = parse(content);
+
+	// Validate variable names and filter usage
+	const variableWarnings = validateVariables(result.ast);
+	const filterWarnings = validateFilters(result.ast);
+
+	// Combine errors and warnings into a single list
+	const issues: { line: number; message: string; isError: boolean }[] = [
+		...result.errors.map(e => ({ line: e.line || 0, message: e.message, isError: true })),
+		...variableWarnings.map(w => ({ line: w.line || 0, message: w.message, isError: false })),
+		...filterWarnings.map(w => ({ line: w.line || 0, message: w.message, isError: false })),
+	].sort((a, b) => a.line - b.line);
+
+	const hasErrors = result.errors.length > 0;
+	const hasWarnings = variableWarnings.length > 0 || filterWarnings.length > 0;
+
+	if (!hasErrors && !hasWarnings) {
+		// Valid template - show nothing
+		validationEl.style.display = 'none';
+		updateErrorSummary();
+		return;
+	} else {
+		// Has errors and/or warnings - use error styling if any errors, warning styling if only warnings
+		validationEl.classList.add(hasErrors ? 'invalid' : 'warning');
+		const icon = createElementWithHTML('i', '', { 'data-lucide': 'alert-triangle' });
+		validationEl.appendChild(icon);
+
+		const issueList = document.createElement('div');
+		issueList.className = 'validation-errors';
+
+		issues.forEach(issue => {
+			const issueItem = document.createElement('div');
+			issueItem.className = issue.isError ? 'validation-error' : 'validation-warning';
+			const location = showLineNumbers && issue.line ? `Line ${issue.line}: ` : '';
+			issueItem.textContent = `${location}${issue.message}`;
+			issueList.appendChild(issueItem);
+		});
+
+		validationEl.appendChild(issueList);
+		initializeIcons(validationEl);
+	}
+
+	validationEl.style.display = 'flex';
+	updateErrorSummary();
+}
+
+/**
+ * Add validation listener to a template field.
+ */
+function addValidationListener(field: HTMLInputElement | HTMLTextAreaElement | null, showLineNumbers: boolean = false): void {
+	if (field) {
+		field.addEventListener('blur', () => validateTemplateField(field, showLineNumbers));
+	}
+}
+
+/**
+ * Initialize template validation on all template fields.
+ */
+export function initializeTemplateValidation(): void {
+	// Note content (multiline, show line numbers)
+	const noteContentFormat = document.getElementById('note-content-format') as HTMLTextAreaElement;
+	addValidationListener(noteContentFormat, true);
+
+	// Note name format (single line)
+	const noteNameFormat = document.getElementById('note-name-format') as HTMLInputElement;
+	addValidationListener(noteNameFormat, false);
+
+	// Path/folder (single line)
+	const pathInput = document.getElementById('template-path-name') as HTMLInputElement;
+	addValidationListener(pathInput, false);
+
+	// Prompt context (multiline, show line numbers)
+	const promptContext = document.getElementById('prompt-context') as HTMLTextAreaElement;
+	addValidationListener(promptContext, true);
 }

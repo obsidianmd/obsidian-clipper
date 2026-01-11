@@ -1,3 +1,24 @@
+import type { ParamValidationResult } from '../filters';
+
+export const validateSliceParams = (param: string | undefined): ParamValidationResult => {
+	if (!param) {
+		return { valid: false, error: 'requires at least a start index (e.g., slice:0,5)' };
+	}
+
+	const parts = param.split(',').map(p => p.trim());
+	if (parts.length > 2) {
+		return { valid: false, error: 'accepts at most 2 parameters: start and end' };
+	}
+
+	for (const part of parts) {
+		if (part !== '' && isNaN(parseInt(part, 10))) {
+			return { valid: false, error: `"${part}" is not a valid number` };
+		}
+	}
+
+	return { valid: true };
+};
+
 export const slice = (str: string, param?: string): string => {
 	if (!param) {
 		console.error('Slice filter requires parameters');

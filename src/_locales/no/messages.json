@@ -767,6 +767,12 @@
 	"templateCopyError": {
 		"message": "Kunne ikke kopiere mal-JSON til utklippstavlen"
 	},
+	"templateErrorCount": {
+		"message": "Det er en feil i malen din."
+	},
+	"templateErrorsCount": {
+		"message": "Det er $1 feil i malen din."
+	},
 	"templateName": {
 		"message": "Malnavn"
 	},
@@ -781,6 +787,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "Definer regler for automatisk valg av denne malen hvis den matcher URL-mønsteret eller inneholder schema.org-data. Én regel per linje."
+	},
+	"templateValid": {
+		"message": "Malsyntaksen er gyldig"
 	},
 	"templatesHeading": {
 		"message": "Maler"

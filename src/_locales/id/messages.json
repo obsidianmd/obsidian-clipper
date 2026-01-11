@@ -775,6 +775,12 @@
 	"templateCopyError": {
 		"message": "Gagal menyalin template JSON ke papan klip"
 	},
+	"templateErrorCount": {
+		"message": "Ada kesalahan dalam template Anda."
+	},
+	"templateErrorsCount": {
+		"message": "Ada $1 kesalahan dalam template Anda."
+	},
 	"templateName": {
 		"message": "Nama template"
 	},
@@ -789,6 +795,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "Tentukan aturan untuk memilih template ini secara otomatis jika sesuai dengan pola URL yang ditentukan atau memiliki data schema.org. Tuliskan satu aturan per baris."
+	},
+	"templateValid": {
+		"message": "Sintaks template valid"
 	},
 	"templatesHeading": {
 		"message": "Template"

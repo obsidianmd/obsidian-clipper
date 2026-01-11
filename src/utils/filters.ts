@@ -3,12 +3,12 @@ import { debugLog } from './debug';
 import { createParserState, processCharacter } from './parser-utils';
 
 import { blockquote } from './filters/blockquote';
-import { calc } from './filters/calc';
+import { calc, validateCalcParams } from './filters/calc';
 import { callout } from './filters/callout';
 import { camel } from './filters/camel';
 import { capitalize } from './filters/capitalize';
 import { date } from './filters/date';
-import { date_modify } from './filters/date_modify';
+import { date_modify, validateDateModifyParams } from './filters/date_modify';
 import { first } from './filters/first';
 import { footnote } from './filters/footnote';
 import { fragment_link } from './filters/fragment_link';
@@ -17,33 +17,33 @@ import { image } from './filters/image';
 import { join } from './filters/join';
 import { kebab } from './filters/kebab';
 import { last } from './filters/last';
-import { list } from './filters/list';
+import { list, validateListParams } from './filters/list';
 import { link } from './filters/link';
 import { length } from './filters/length';
 import { lower } from './filters/lower';
-import { map } from './filters/map';
+import { map, validateMapParams } from './filters/map';
 import { markdown } from './filters/markdown';
 import { merge } from './filters/merge';
-import { nth } from './filters/nth';
+import { nth, validateNthParams } from './filters/nth';
 import { number_format } from './filters/number_format';
-import { object } from './filters/object';
+import { object, validateObjectParams } from './filters/object';
 import { pascal } from './filters/pascal';
 import { reverse } from './filters/reverse';
 import { remove_attr } from './filters/remove_attr';
 import { remove_html } from './filters/remove_html';
 import { remove_tags } from './filters/remove_tags';
-import { replace } from './filters/replace';
+import { replace, validateReplaceParams } from './filters/replace';
 import { replace_tags } from './filters/replace_tags';
-import { round } from './filters/round';
-import { safe_name } from './filters/safe_name';
-import { slice } from './filters/slice';
+import { round, validateRoundParams } from './filters/round';
+import { safe_name, validateSafeNameParams } from './filters/safe_name';
+import { slice, validateSliceParams } from './filters/slice';
 import { snake } from './filters/snake';
 import { split } from './filters/split';
 import { strip_attr } from './filters/strip_attr';
 import { strip_md } from './filters/strip_md';
 import { strip_tags } from './filters/strip_tags';
 import { table } from './filters/table';
-import { template } from './filters/template';
+import { template, validateTemplateParams } from './filters/template';
 import { title } from './filters/title';
 import { trim } from './filters/trim';
 import { uncamel } from './filters/uncamel';
@@ -52,6 +52,81 @@ import { unique } from './filters/unique';
 import { upper } from './filters/upper';
 import { wikilink } from './filters/wikilink';
 import { duration } from './filters/duration';
+
+// ============================================================================
+// Filter Metadata for Validation
+// ============================================================================
+
+export interface ParamValidationResult {
+	valid: boolean;
+	error?: string;
+}
+
+export type ParamValidator = (param: string | undefined) => ParamValidationResult;
+
+export interface FilterMetadata {
+	example?: string;
+	validateParams?: ParamValidator;
+}
+
+export const filterMetadata: Record<string, FilterMetadata> = {
+	// Filters with validators
+	calc: { example: 'calc:"+10"', validateParams: validateCalcParams },
+	date_modify: { example: 'date_modify:"+1 day"', validateParams: validateDateModifyParams },
+	map: { example: 'map:x => x.name', validateParams: validateMapParams },
+	replace: { example: 'replace:"old":"new"', validateParams: validateReplaceParams },
+	slice: { example: 'slice:0,5', validateParams: validateSliceParams },
+	template: { example: 'template:"${name}"', validateParams: validateTemplateParams },
+
+	// Filters with optional parameters (examples for documentation)
+	blockquote: {},
+	callout: { example: 'callout:info' },
+	camel: {},
+	capitalize: {},
+	date: { example: 'date:"YYYY-MM-DD"' },
+	duration: {},
+	first: {},
+	footnote: {},
+	fragment_link: {},
+	html_to_json: {},
+	image: {},
+	join: { example: 'join:", "' },
+	kebab: {},
+	last: {},
+	length: {},
+	link: {},
+	list: { example: 'list:numbered', validateParams: validateListParams },
+	lower: {},
+	markdown: {},
+	merge: {},
+	nth: { example: 'nth:2', validateParams: validateNthParams },
+	number_format: {},
+	object: { example: 'object:keys', validateParams: validateObjectParams },
+	pascal: {},
+	remove_attr: {},
+	remove_html: {},
+	remove_tags: {},
+	replace_tags: {},
+	reverse: {},
+	round: { example: 'round:2', validateParams: validateRoundParams },
+	safe_name: { example: 'safe_name:windows', validateParams: validateSafeNameParams },
+	snake: {},
+	split: { example: 'split:","' },
+	strip_attr: {},
+	strip_md: {},
+	strip_tags: {},
+	stripmd: {},
+	table: {},
+	title: {},
+	trim: {},
+	uncamel: {},
+	unescape: {},
+	unique: {},
+	upper: {},
+	wikilink: {},
+};
+
+export const validFilterNames = new Set(Object.keys(filterMetadata));
 
 export const filters: { [key: string]: FilterFunction } = {
 	blockquote,

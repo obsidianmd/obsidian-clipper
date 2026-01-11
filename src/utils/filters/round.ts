@@ -1,3 +1,23 @@
+import type { ParamValidationResult } from '../filters';
+
+export const validateRoundParams = (param: string | undefined): ParamValidationResult => {
+	// Param is optional - no param means round to integer
+	if (!param) {
+		return { valid: true };
+	}
+
+	const num = parseInt(param, 10);
+	if (isNaN(num)) {
+		return { valid: false, error: 'decimal places must be a number (e.g., round:2)' };
+	}
+
+	if (num < 0) {
+		return { valid: false, error: 'decimal places must be non-negative (e.g., round:2)' };
+	}
+
+	return { valid: true };
+};
+
 export const round = (input: string, param?: string): string => {
 	const roundNumber = (num: number, decimalPlaces?: number): number => {
 		if (decimalPlaces === undefined) {
