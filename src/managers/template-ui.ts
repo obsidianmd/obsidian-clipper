@@ -266,18 +266,10 @@ function updateBehaviorFields(): void {
 	const noteNameFormatContainer = document.getElementById('note-name-format-container');
 	const pathContainer = document.getElementById('path-name-container');
 	const noteNameFormat = document.getElementById('note-name-format') as HTMLInputElement;
-	const behaviorWarningContainer = document.getElementById('behavior-warning-container');
 
 	if (behaviorSelect) {
 		const selectedBehavior = behaviorSelect.value;
 		const isDailyNote = selectedBehavior === 'append-daily' || selectedBehavior === 'prepend-daily';
-		const needsWarning = selectedBehavior !== 'create' && selectedBehavior !== 'overwrite';
-
-		if (needsWarning) {
-			if (behaviorWarningContainer) behaviorWarningContainer.style.display = 'flex';
-		} else {
-			if (behaviorWarningContainer) behaviorWarningContainer.style.display = 'none';
-		}
 
 		if (noteNameFormatContainer) noteNameFormatContainer.style.display = isDailyNote ? 'none' : 'block';
 		if (pathContainer) pathContainer.style.display = isDailyNote ? 'none' : 'block';

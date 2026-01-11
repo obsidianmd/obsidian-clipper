@@ -59,9 +59,6 @@
 	"behavior": {
 		"message": "Gedrag"
 	},
-	"behaviorWarning": {
-		"message": "Toevoegen aan een bestaande notitie of dagelijkse notitie vereist Obsidian 1.7.2 of hoger."
-	},
 	"byDay": {
 		"message": "Dagen"
 	},

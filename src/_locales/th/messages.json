@@ -59,9 +59,6 @@
 	"behavior": {
 		"message": "พฤติกรรม"
 	},
-	"behaviorWarning": {
-		"message": "การเพิ่มไปยังบันทึกที่มีอยู่หรือบันทึกประจำวันต้องใช้ Obsidian 1.7.2 หรือใหม่กว่า"
-	},
 	"byDay": {
 		"message": "วัน"
 	},

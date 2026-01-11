@@ -59,9 +59,6 @@
 	"behavior": {
 		"message": "Käyttäytyminen"
 	},
-	"behaviorWarning": {
-		"message": "Olemassa olevaan muistiinpanoon tai päivittäiseen muistiinpanoon lisääminen vaatii Obsidian 1.7.2 tai uudemman version."
-	},
 	"byDay": {
 		"message": "Päivät"
 	},

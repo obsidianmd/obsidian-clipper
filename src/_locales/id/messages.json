@@ -59,9 +59,6 @@
 	"behavior": {
 		"message": "Perilaku"
 	},
-	"behaviorWarning": {
-		"message": "Perlu Obsidian 1.7.2 atau yang lebih baru untuk dapat menambahkan ke catatan yang telah ada atau catatan harian."
-	},
 	"byDay": {
 		"message": "Hari"
 	},

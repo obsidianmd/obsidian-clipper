@@ -59,9 +59,6 @@
 	"behavior": {
 		"message": "동작 방식"
 	},
-	"behaviorWarning": {
-		"message": "기존에 있는 노트나 데일리 노트에 추가하려면 Obsidian 1.7.2 이상이 필요합니다."
-	},
 	"byDay": {
 		"message": "일"
 	},

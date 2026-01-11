@@ -59,9 +59,6 @@
 	"behavior": {
 		"message": "Comportement"
 	},
-	"behaviorWarning": {
-		"message": "L'ajout à une note existante ou à la note quotidienne nécessite Obsidian 1.7.2 ou ultérieur."
-	},
 	"byDay": {
 		"message": "Jours"
 	},

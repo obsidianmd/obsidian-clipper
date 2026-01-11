@@ -59,9 +59,6 @@
 	"behavior": {
 		"message": "Beteende"
 	},
-	"behaviorWarning": {
-		"message": "Att lägga till i en befintlig anteckning eller daglig anteckning kräver Obsidian 1.7.2 eller senare."
-	},
 	"byDay": {
 		"message": "Dagar"
 	},

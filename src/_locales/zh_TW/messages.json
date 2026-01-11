@@ -59,9 +59,6 @@
 	"behavior": {
 		"message": "行為"
 	},
-	"behaviorWarning": {
-		"message": "新增到現有筆記或每日筆記需要 Obsidian 1.7.2 或更高版本。"
-	},
 	"byDay": {
 		"message": "天"
 	},

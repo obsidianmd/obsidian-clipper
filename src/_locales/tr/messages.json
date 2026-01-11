@@ -59,9 +59,6 @@
 	"behavior": {
 		"message": "Davranış"
 	},
-	"behaviorWarning": {
-		"message": "Mevcut nota veya günlük nota ekleme için Obsidian 1.7.2 veya daha yeni sürüm gereklidir."
-	},
 	"byDay": {
 		"message": "Günler"
 	},

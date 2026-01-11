@@ -59,9 +59,6 @@
 	"behavior": {
 		"message": "Chování"
 	},
-	"behaviorWarning": {
-		"message": "Připojování k existující nebo denní poznámce vyžaduje Obsidian 1.7.2 nebo novější."
-	},
 	"byDay": {
 		"message": "Den"
 	},

@@ -59,9 +59,6 @@
 	"behavior": {
 		"message": "Συμπεριφορά"
 	},
-	"behaviorWarning": {
-		"message": "Η προσθήκη σε υπάρχουσα ή ημερήσια σημείωση απαιτεί Obsidian 1.7.2 ή νεότερη έκδοση."
-	},
 	"byDay": {
 		"message": "Ημέρα"
 	},

@@ -59,9 +59,6 @@
 	"behavior": {
 		"message": "Sposób działania"
 	},
-	"behaviorWarning": {
-		"message": "Aby zapisać w dzienniku lub istniejącej notatce wymagany jest Obsidian w wersji 1.7.2 lub nowszej."
-	},
 	"byDay": {
 		"message": "Dni"
 	},

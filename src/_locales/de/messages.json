@@ -59,9 +59,6 @@
 	"behavior": {
 		"message": "Verhalten"
 	},
-	"behaviorWarning": {
-		"message": "Das Hinzufügen zu einer bestehenden Notiz oder Tagesnotiz erfordert Obsidian 1.7.2 oder höher."
-	},
 	"byDay": {
 		"message": "Tage"
 	},

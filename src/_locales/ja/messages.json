@@ -59,9 +59,6 @@
 	"behavior": {
 		"message": "動作"
 	},
-	"behaviorWarning": {
-		"message": "既存のノートやデイリーノートへの追加にはObsidian 1.7.2以降が必要です。"
-	},
 	"byDay": {
 		"message": "日別"
 	},

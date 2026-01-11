@@ -59,9 +59,6 @@
 	"behavior": {
 		"message": "Pag-uugali"
 	},
-	"behaviorWarning": {
-		"message": "Ang pagdagdag sa umiiral o daily note ay nangangailangan ng Obsidian 1.7.2 o mas bago."
-	},
 	"byDay": {
 		"message": "Ayon sa araw"
 	},

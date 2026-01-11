@@ -59,9 +59,6 @@
 	"behavior": {
 		"message": "Oppførsel"
 	},
-	"behaviorWarning": {
-		"message": "Å legge til i eksisterende eller daglig notat krever Obsidian 1.7.2 eller nyere."
-	},
 	"byDay": {
 		"message": "Dag"
 	},

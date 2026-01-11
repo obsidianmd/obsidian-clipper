@@ -59,9 +59,6 @@
 	"behavior": {
 		"message": "התנהגות"
 	},
-	"behaviorWarning": {
-		"message": "הוספה לפתק קיים או יומי דורשת Obsidian 1.7.2 ומעלה."
-	},
 	"byDay": {
 		"message": "יום"
 	},

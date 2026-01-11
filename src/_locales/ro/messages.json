@@ -59,9 +59,6 @@
 	"behavior": {
 		"message": "Comportament"
 	},
-	"behaviorWarning": {
-		"message": "Adăugarea la o notă existentă sau zilnică necesită Obsidian 1.7.2 sau mai nou."
-	},
 	"byDay": {
 		"message": "Zi"
 	},

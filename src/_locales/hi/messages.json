@@ -59,9 +59,6 @@
 	"behavior": {
 		"message": "Behavior"
 	},
-	"behaviorWarning": {
-		"message": "Maujuda note ya daily note mein jodne ke liye Obsidian 1.7.2 ya usse naya version chahiye."
-	},
 	"byDay": {
 		"message": "दिनों"
 	},

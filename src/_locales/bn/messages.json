@@ -59,9 +59,6 @@
 	"behavior": {
 		"message": "আচরণ"
 	},
-	"behaviorWarning": {
-		"message": "বিদ্যমান নোট বা ডেইলি নোটে যোগ করতে হলে Obsidian 1.7.2 বা তার পরের সংস্করণ প্রয়োজন।"
-	},
 	"byDay": {
 		"message": "দিন"
 	},

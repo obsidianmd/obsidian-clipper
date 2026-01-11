@@ -59,9 +59,6 @@
 	"behavior": {
 		"message": "Hành vi"
 	},
-	"behaviorWarning": {
-		"message": "Thêm vào ghi chú hiện có hoặc ghi chú hàng ngày yêu cầu Obsidian 1.7.2 trở lên."
-	},
 	"byDay": {
 		"message": "Ngày"
 	},
