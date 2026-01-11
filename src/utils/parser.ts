@@ -667,6 +667,71 @@ function parseNullishExpression(state: ParserState): Expression | null {
 function parseFilterArgument(state: ParserState): Expression | null {
 	const startToken = peek(state);
 
+	// Handle simple delimiter tokens that can be used as filter arguments
+	// e.g., split:/ or split:-
+	if (check(state, 'slash') || check(state, 'star')) {
+		const token = advance(state);
+		return {
+			type: 'literal',
+			value: token.value,
+			raw: token.value,
+			line: token.line,
+			column: token.column,
+		};
+	}
+
+	// Check for arrow function: identifier => expression
+	// e.g., map:tweet => ({text: tweet.text})
+	if (check(state, 'identifier')) {
+		const savedPos = state.pos;
+		const idToken = advance(state);
+
+		if (check(state, 'arrow')) {
+			// This is an arrow function - consume everything until | or }}
+			let value = idToken.value + ' ';
+			value += advance(state).value + ' '; // consume '=>'
+
+			// Consume everything until pipe or variable_end, tracking brace/paren depth
+			let braceDepth = 0;
+			let parenDepth = 0;
+
+			while (!isAtEnd(state)) {
+				const token = peek(state);
+
+				// Stop at pipe or variable_end when not inside braces/parens
+				if (braceDepth === 0 && parenDepth === 0) {
+					if (token.type === 'pipe' || token.type === 'variable_end' || token.type === 'tag_end') {
+						break;
+					}
+				}
+
+				if (token.type === 'lbrace' || token.type === 'lparen') {
+					if (token.type === 'lbrace') braceDepth++;
+					else parenDepth++;
+				} else if (token.type === 'rbrace' || token.type === 'rparen') {
+					if (token.type === 'rbrace') braceDepth--;
+					else parenDepth--;
+					// If we close more than we opened, stop
+					if (braceDepth < 0 || parenDepth < 0) break;
+				}
+
+				value += token.value;
+				advance(state);
+			}
+
+			return {
+				type: 'literal',
+				value: value.trim(),
+				raw: value.trim(),
+				line: startToken.line,
+				column: startToken.column,
+			};
+		}
+
+		// Not an arrow function - restore position
+		state.pos = savedPos;
+	}
+
 	// Parse the first part
 	const first = parsePrimaryExpression(state);
 	if (!first) return null;
@@ -679,6 +744,14 @@ function parseFilterArgument(state: ParserState): Expression | null {
 
 	// For unquoted values (numbers, identifiers), check for colon-separated continuation
 	// e.g., nth:1,2,3,5,7:7 where "7:7" is a range
+
+	// If there's no colon following, return the original expression to preserve its type
+	// This is important for numeric args like slice:3,4 where we need actual numbers
+	if (!check(state, 'colon')) {
+		return first;
+	}
+
+	// Build a string value for colon-separated range notation
 	let value = '';
 	if (first.type === 'literal') {
 		value = String(first.value);
@@ -688,7 +761,7 @@ function parseFilterArgument(state: ParserState): Expression | null {
 		return first; // Return as-is for other types
 	}
 
-	// Only consume colons for unquoted values (range notation like 5:7)
+	// Consume colons for range notation like 5:7
 	while (check(state, 'colon') && !isAtEnd(state)) {
 		advance(state); // consume ':'
 		value += ':';
@@ -707,7 +780,7 @@ function parseFilterArgument(state: ParserState): Expression | null {
 		}
 	}
 
-	// Return as a string literal containing the full value
+	// Return as a string literal containing the full colon-separated value
 	return {
 		type: 'literal',
 		value: value,
@@ -747,7 +820,9 @@ function parseFilterExpression(state: ParserState): Expression | null {
 				while (!check(state, 'rparen') && !isAtEnd(state)) {
 					const arg = parseOrExpression(state);
 					if (arg) args.push(arg);
-					if (check(state, 'comma')) {
+					// Handle both comma and colon separators inside parentheses
+					// e.g., replace:("old":"new","foo":"bar")
+					if (check(state, 'comma') || check(state, 'colon')) {
 						advance(state);
 					} else {
 						break;
@@ -1044,8 +1119,18 @@ function parsePrimaryExpression(state: ParserState): Expression | null {
 			advance(state); // consume ':'
 
 			// Build the full identifier including the prefix
+			// This handles: schema:[0].prop, selector:div.class, schema:director[*].name, etc.
 			let rest = '';
-			while (check(state, 'identifier') || check(state, 'dot') || check(state, 'colon')) {
+			while (
+				check(state, 'identifier') ||
+				check(state, 'dot') ||
+				check(state, 'colon') ||
+				check(state, 'lbracket') ||
+				check(state, 'rbracket') ||
+				check(state, 'number') ||
+				check(state, 'string') ||
+				check(state, 'star')
+			) {
 				rest += advance(state).value;
 			}
 			name = name + ':' + rest;

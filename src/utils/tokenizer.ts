@@ -55,9 +55,15 @@ export type TokenType =
 	| 'rparen'            // )
 	| 'lbracket'          // [
 	| 'rbracket'          // ]
+	| 'lbrace'            // {
+	| 'rbrace'            // }
 	| 'colon'             // :
 	| 'comma'             // ,
 	| 'dot'               // .
+	| 'star'              // *
+	| 'slash'             // /
+	| 'arrow'             // =>
+	| 'dollar'            // $
 
 	// Special
 	| 'eof';              // End of input
@@ -274,24 +280,30 @@ function tokenizeVariable(state: TokenizerState): void {
 	}
 
 	// Check for malformed variable end: } without another } (common typo)
-	// This prevents the tokenizer from consuming subsequent lines
-	if (state.input[state.pos] === '}' && state.input[state.pos + 1] !== '}') {
-		state.errors.push({
-			message: `Malformed variable: expected '}}' but found '}'. Did you forget a '}'?`,
-			line: state.line,
-			column: state.column,
-		});
-		// Emit a variable_end anyway to prevent cascading errors
-		state.tokens.push({
-			type: 'variable_end',
-			value: '}',
-			line: state.line,
-			column: state.column,
-			trimRight: false,
-		});
-		advanceChar(state);
-		state.mode = 'text';
-		return;
+	// But NOT if followed by characters that indicate it's part of an expression
+	// (e.g., }| for object literal followed by filter, }, for object property separator)
+	const nextChar = state.input[state.pos + 1];
+	if (state.input[state.pos] === '}' && nextChar !== '}') {
+		// These characters after } indicate it's a valid rbrace in an expression
+		const validAfterBrace = ['|', ',', ')', ']', ' ', '\t', '\n', '\r'];
+		if (!validAfterBrace.includes(nextChar)) {
+			state.errors.push({
+				message: `Malformed variable: expected '}}' but found '}'. Did you forget a '}'?`,
+				line: state.line,
+				column: state.column,
+			});
+			// Emit a variable_end anyway to prevent cascading errors
+			state.tokens.push({
+				type: 'variable_end',
+				value: '}',
+				line: state.line,
+				column: state.column,
+				trimRight: false,
+			});
+			advanceChar(state);
+			state.mode = 'text';
+			return;
+		}
 	}
 
 	// Check for new tag/variable starting - indicates unclosed variable
@@ -472,6 +484,11 @@ function tokenizeExpression(state: TokenizerState, mode: 'variable' | 'tag'): vo
 		advance(state, 2);
 		return;
 	}
+	if (lookAhead(state, '=>')) {
+		state.tokens.push({ type: 'arrow', value: '=>', line: startLine, column: startColumn });
+		advance(state, 2);
+		return;
+	}
 
 	// Single-character operators and punctuation
 	switch (char) {
@@ -521,6 +538,26 @@ function tokenizeExpression(state: TokenizerState, mode: 'variable' | 'tag'): vo
 			return;
 		case '.':
 			state.tokens.push({ type: 'dot', value: '.', line: startLine, column: startColumn });
+			advanceChar(state);
+			return;
+		case '*':
+			state.tokens.push({ type: 'star', value: '*', line: startLine, column: startColumn });
+			advanceChar(state);
+			return;
+		case '/':
+			state.tokens.push({ type: 'slash', value: '/', line: startLine, column: startColumn });
+			advanceChar(state);
+			return;
+		case '{':
+			state.tokens.push({ type: 'lbrace', value: '{', line: startLine, column: startColumn });
+			advanceChar(state);
+			return;
+		case '}':
+			state.tokens.push({ type: 'rbrace', value: '}', line: startLine, column: startColumn });
+			advanceChar(state);
+			return;
+		case '$':
+			state.tokens.push({ type: 'dollar', value: '$', line: startLine, column: startColumn });
 			advanceChar(state);
 			return;
 	}
@@ -870,10 +907,26 @@ function tokenizeCssSelector(state: TokenizerState, value: string): string {
 				bracketDepth++;
 			} else if (char === ']') {
 				bracketDepth--;
+				if (bracketDepth < 0) {
+					state.errors.push({
+						message: `Extra ']' in selector - no matching '['`,
+						line: state.line,
+						column: state.column,
+					});
+					bracketDepth = 0; // Reset to prevent cascading
+				}
 			} else if (char === '(') {
 				parenDepth++;
 			} else if (char === ')') {
 				parenDepth--;
+				if (parenDepth < 0) {
+					state.errors.push({
+						message: `Extra ')' in selector - no matching '('`,
+						line: state.line,
+						column: state.column,
+					});
+					parenDepth = 0; // Reset to prevent cascading
+				}
 			}
 		}
 

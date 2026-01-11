@@ -179,10 +179,10 @@
 .template-error-summary {
 	display: none;
 	align-items: center;
-	border-radius: var(--radius-s);
-	font-size: var(--font-ui-small);
+	border-radius: var(--radius-m);
+	font-size: var(--font-ui-smaller);
 	margin-bottom: 1rem;
-	padding: 0.5rem 0.75rem;
+	padding: 12px;
 	gap: 0.5rem;
 
 	svg {

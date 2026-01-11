@@ -225,15 +225,16 @@ async function renderVariable(node: VariableNode, state: RenderState): Promise<s
 	// For now, we handle trimRight by setting a flag for the next node
 
 	try {
-		// Special case: string literals in variable position are prompt placeholders
-		// Preserve them as {{"..."}} for the prompt post-processor
-		if (node.expression.type === 'literal' && typeof (node.expression as LiteralExpression).value === 'string') {
-			const value = (node.expression as LiteralExpression).value as string;
+		// Special case: string literals (prompts) need to be preserved for post-processing
+		// This includes filter chains where the base value is a string literal
+		// e.g., {{"prompt text"|title}} should become {{"prompt text"|title}} not "Prompt Text"
+		const promptInfo = getPromptBase(node.expression);
+		if (promptInfo) {
 			if (node.trimRight) {
 				state.pendingTrimRight = true;
 			}
-			// Output as quoted string for prompt processing
-			return `{{"${value}"}}`;
+			// Reconstruct the template syntax for prompt post-processor
+			return reconstructPromptTemplate(node.expression);
 		}
 
 		const value = await evaluateExpression(node.expression, state);
@@ -252,6 +253,78 @@ async function renderVariable(node: VariableNode, state: RenderState): Promise<s
 		});
 		return '';
 	}
+}
+
+/**
+ * Check if an expression is a prompt (string literal or filter chain with string literal base).
+ * Returns the prompt string if found, null otherwise.
+ */
+function getPromptBase(expr: Expression): string | null {
+	if (expr.type === 'literal' && typeof (expr as LiteralExpression).value === 'string') {
+		return (expr as LiteralExpression).value as string;
+	}
+	if (expr.type === 'filter') {
+		return getPromptBase((expr as FilterExpression).value);
+	}
+	return null;
+}
+
+/**
+ * Reconstruct template syntax for a prompt expression.
+ * e.g., FilterExpression{name:'title', value:Literal{"prompt"}} -> {{"prompt"|title}}
+ */
+function reconstructPromptTemplate(expr: Expression): string {
+	if (expr.type === 'literal') {
+		const value = (expr as LiteralExpression).value;
+		if (typeof value === 'string') {
+			return `{{"${value}"}}`;
+		}
+		return `{{${value}}}`;
+	}
+	if (expr.type === 'filter') {
+		const filter = expr as FilterExpression;
+		const inner = reconstructPromptTemplateInner(filter.value);
+		let filterStr = `${inner}|${filter.name}`;
+		if (filter.args.length > 0) {
+			const argsStr = filter.args.map(arg => {
+				if (arg.type === 'literal') {
+					const val = (arg as LiteralExpression).value;
+					return typeof val === 'string' ? `"${val}"` : String(val);
+				}
+				return String((arg as any).value || (arg as any).name || '');
+			}).join(':');
+			filterStr += `:${argsStr}`;
+		}
+		return `{{${filterStr}}}`;
+	}
+	return `{{${expr}}}`;
+}
+
+function reconstructPromptTemplateInner(expr: Expression): string {
+	if (expr.type === 'literal') {
+		const value = (expr as LiteralExpression).value;
+		if (typeof value === 'string') {
+			return `"${value}"`;
+		}
+		return String(value);
+	}
+	if (expr.type === 'filter') {
+		const filter = expr as FilterExpression;
+		const inner = reconstructPromptTemplateInner(filter.value);
+		let filterStr = `${inner}|${filter.name}`;
+		if (filter.args.length > 0) {
+			const argsStr = filter.args.map(arg => {
+				if (arg.type === 'literal') {
+					const val = (arg as LiteralExpression).value;
+					return typeof val === 'string' ? `"${val}"` : String(val);
+				}
+				return String((arg as any).value || (arg as any).name || '');
+			}).join(':');
+			filterStr += `:${argsStr}`;
+		}
+		return filterStr;
+	}
+	return String(expr);
 }
 
 async function renderIf(node: IfNode, state: RenderState): Promise<string> {
@@ -564,12 +637,18 @@ async function evaluateFilter(expr: FilterExpression, state: RenderState): Promi
 	}
 
 	// Use built-in filters via applyFilters
-	// Build filter string: filtername:arg1:arg2
+	// Build filter string with appropriate separators:
+	// - String args use colons: replace:"old":"new"
+	// - Numeric/other args use commas: slice:3,4
 	let filterString = expr.name;
 	if (args.length > 0) {
-		filterString += ':' + args.map(a =>
+		const formattedArgs = args.map(a =>
 			typeof a === 'string' ? `"${a}"` : String(a)
-		).join(':');
+		);
+		// Check if all args are non-strings (numeric) - use comma separator
+		const allNumeric = args.every(a => typeof a === 'number');
+		const separator = allNumeric ? ',' : ':';
+		filterString += ':' + formattedArgs.join(separator);
 	}
 
 	const stringValue = valueToString(value);
