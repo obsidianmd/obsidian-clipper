@@ -59,9 +59,6 @@
 	"behavior": {
 		"message": "Pag-uugali"
 	},
-	"behaviorWarning": {
-		"message": "Ang pagdagdag sa umiiral o daily note ay nangangailangan ng Obsidian 1.7.2 o mas bago."
-	},
 	"byDay": {
 		"message": "Ayon sa araw"
 	},
@@ -767,6 +764,12 @@
 	"templateCopyError": {
 		"message": "Hindi ma-copy ang template JSON sa clipboard"
 	},
+	"templateErrorCount": {
+		"message": "May error sa template mo."
+	},
+	"templateErrorsCount": {
+		"message": "May $1 error sa template mo."
+	},
 	"templateName": {
 		"message": "Pangalan ng template"
 	},
@@ -781,6 +784,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "Magtakda ng mga patakaran para awtomatikong piliin ang template na ito kung tumutugma sa URL pattern o naglalaman ng schema.org data. Isang patakaran bawat linya."
+	},
+	"templateValid": {
+		"message": "Valid ang syntax ng template"
 	},
 	"templatesHeading": {
 		"message": "Mga Template"

@@ -8,6 +8,7 @@
 // - Expressions with operators and literals
 
 import { Token, TokenType, tokenize, TokenizerResult } from './tokenizer';
+import { filterMetadata, validFilterNames } from './filters';
 
 // ============================================================================
 // AST Node Types
@@ -226,7 +227,7 @@ function parseNode(state: ParserState): ASTNode | null {
 		default:
 			// Unexpected token - skip and report error
 			state.errors.push({
-				message: `Unexpected token: ${token.type}`,
+				message: `Unexpected "${token.value}" in template`,
 				line: token.line,
 				column: token.column,
 			});
@@ -260,12 +261,37 @@ function parseVariable(state: ParserState): VariableNode | null {
 	const expression = parseExpression(state);
 	if (!expression) {
 		state.errors.push({
-			message: 'Expected expression in variable',
+			message: 'Empty variable - add a variable name between {{ and }}',
 			line: startToken.line,
 			column: startToken.column,
 		});
 		skipToEndOfVariable(state);
 		return null;
+	}
+
+	// Check for multiple consecutive identifiers (likely a prompt without quotes)
+	// e.g., {{a summary of the page}} instead of {{"a summary of the page"}}
+	if (check(state, 'identifier')) {
+		// Count how many identifiers follow
+		let extraWords = 0;
+		const savedPos = state.pos;
+		while (check(state, 'identifier') && extraWords < 10) {
+			advance(state);
+			extraWords++;
+		}
+		// Reset position
+		state.pos = savedPos;
+
+		if (extraWords > 0) {
+			state.errors.push({
+				message: 'Unknown variable. If this is a prompt, wrap it in quotes: {{"your prompt here"}}',
+				line: startToken.line,
+				column: startToken.column,
+			});
+			// Skip to end of variable to avoid cascading errors
+			skipToEndOfVariable(state);
+			return null;
+		}
 	}
 
 	// Consume variable_end
@@ -275,7 +301,7 @@ function parseVariable(state: ParserState): VariableNode | null {
 		trimRight = endToken.trimRight || false;
 	} else {
 		state.errors.push({
-			message: 'Expected }}',
+			message: 'Missing closing }}',
 			line: peek(state).line,
 			column: peek(state).column,
 		});
@@ -318,7 +344,7 @@ function parseTag(state: ParserState): ASTNode | null {
 			// These are handled by their parent parsers
 			// If we encounter them here, it's an error
 			state.errors.push({
-				message: `Unexpected ${keywordToken.value} without matching opening tag`,
+				message: `Unexpected {% ${keywordToken.value} %} - no matching opening tag`,
 				line: keywordToken.line,
 				column: keywordToken.column,
 			});
@@ -327,7 +353,7 @@ function parseTag(state: ParserState): ASTNode | null {
 
 		default:
 			state.errors.push({
-				message: `Unknown tag keyword: ${keywordToken.value}`,
+				message: `Unknown tag: {% ${keywordToken.value} %}`,
 				line: keywordToken.line,
 				column: keywordToken.column,
 			});
@@ -346,7 +372,7 @@ function parseIfStatement(state: ParserState, startToken: Token, trimLeft: boole
 	const condition = parseExpression(state);
 	if (!condition) {
 		state.errors.push({
-			message: 'Expected condition after if',
+			message: '{% if %} requires a condition',
 			line: startToken.line,
 			column: startToken.column,
 		});
@@ -360,7 +386,7 @@ function parseIfStatement(state: ParserState, startToken: Token, trimLeft: boole
 		trimRight = advance(state).trimRight || false;
 	} else {
 		state.errors.push({
-			message: 'Expected %} after if condition',
+			message: 'Missing %} to close {% if %}',
 			line: peek(state).line,
 			column: peek(state).column,
 		});
@@ -378,7 +404,7 @@ function parseIfStatement(state: ParserState, startToken: Token, trimLeft: boole
 		const elseifCondition = parseExpression(state);
 		if (!elseifCondition) {
 			state.errors.push({
-				message: 'Expected condition after elseif',
+				message: '{% elseif %} requires a condition',
 				line: peek(state).line,
 				column: peek(state).column,
 			});
@@ -407,7 +433,7 @@ function parseIfStatement(state: ParserState, startToken: Token, trimLeft: boole
 		consumeTagEnd(state);
 	} else {
 		state.errors.push({
-			message: 'Expected endif',
+			message: 'Missing {% endif %} to close {% if %}',
 			line: peek(state).line,
 			column: peek(state).column,
 		});
@@ -436,7 +462,7 @@ function parseForStatement(state: ParserState, startToken: Token, trimLeft: bool
 	// Parse iterator name
 	if (!check(state, 'identifier')) {
 		state.errors.push({
-			message: 'Expected iterator name after for',
+			message: '{% for %} requires a variable name, e.g. {% for item in items %}',
 			line: peek(state).line,
 			column: peek(state).column,
 		});
@@ -448,7 +474,7 @@ function parseForStatement(state: ParserState, startToken: Token, trimLeft: bool
 	// Parse 'in' keyword
 	if (!check(state, 'keyword_in')) {
 		state.errors.push({
-			message: 'Expected "in" after iterator name',
+			message: '{% for %} requires "in" keyword, e.g. {% for item in items %}',
 			line: peek(state).line,
 			column: peek(state).column,
 		});
@@ -461,7 +487,7 @@ function parseForStatement(state: ParserState, startToken: Token, trimLeft: bool
 	const iterable = parseExpression(state);
 	if (!iterable) {
 		state.errors.push({
-			message: 'Expected iterable after "in"',
+			message: '{% for %} requires something to loop over after "in"',
 			line: peek(state).line,
 			column: peek(state).column,
 		});
@@ -475,7 +501,7 @@ function parseForStatement(state: ParserState, startToken: Token, trimLeft: bool
 		trimRight = advance(state).trimRight || false;
 	} else {
 		state.errors.push({
-			message: 'Expected %} after for',
+			message: 'Missing %} to close {% for %}',
 			line: peek(state).line,
 			column: peek(state).column,
 		});
@@ -491,7 +517,7 @@ function parseForStatement(state: ParserState, startToken: Token, trimLeft: bool
 		consumeTagEnd(state);
 	} else {
 		state.errors.push({
-			message: 'Expected endfor',
+			message: 'Missing {% endfor %} to close {% for %}',
 			line: peek(state).line,
 			column: peek(state).column,
 		});
@@ -519,7 +545,7 @@ function parseSetStatement(state: ParserState, startToken: Token, trimLeft: bool
 	// Parse variable name
 	if (!check(state, 'identifier')) {
 		state.errors.push({
-			message: 'Expected variable name after set',
+			message: '{% set %} requires a variable name, e.g. {% set name = value %}',
 			line: peek(state).line,
 			column: peek(state).column,
 		});
@@ -531,7 +557,7 @@ function parseSetStatement(state: ParserState, startToken: Token, trimLeft: bool
 	// Parse '=' operator
 	if (!check(state, 'op_assign')) {
 		state.errors.push({
-			message: 'Expected "=" after variable name in set',
+			message: '{% set %} requires "=" after variable name',
 			line: peek(state).line,
 			column: peek(state).column,
 		});
@@ -544,7 +570,7 @@ function parseSetStatement(state: ParserState, startToken: Token, trimLeft: bool
 	const value = parseExpression(state);
 	if (!value) {
 		state.errors.push({
-			message: 'Expected value after "=" in set',
+			message: '{% set %} requires a value after "="',
 			line: peek(state).line,
 			column: peek(state).column,
 		});
@@ -558,7 +584,7 @@ function parseSetStatement(state: ParserState, startToken: Token, trimLeft: bool
 		trimRight = advance(state).trimRight || false;
 	} else {
 		state.errors.push({
-			message: 'Expected %} after set',
+			message: 'Missing %} to close {% set %}',
 			line: peek(state).line,
 			column: peek(state).column,
 		});
@@ -615,7 +641,7 @@ function parseNullishExpression(state: ParserState): Expression | null {
 		const right = parseFilterExpression(state);
 		if (!right) {
 			state.errors.push({
-				message: 'Expected expression after "??"',
+				message: 'Missing fallback value after ??',
 				line: opToken.line,
 				column: opToken.column,
 			});
@@ -634,6 +660,223 @@ function parseNullishExpression(state: ParserState): Expression | null {
 	return left;
 }
 
+/**
+ * Parse a filter argument that may contain colon-separated parts (for ranges).
+ * e.g., "7" or "7:10" or "start:end"
+ * Returns a string literal containing the full argument value.
+ */
+function parseFilterArgument(state: ParserState): Expression | null {
+	const startToken = peek(state);
+
+	// Handle simple delimiter tokens that can be used as filter arguments
+	// e.g., split:/ or split:-
+	if (check(state, 'slash') || check(state, 'star')) {
+		const token = advance(state);
+		return {
+			type: 'literal',
+			value: token.value,
+			raw: token.value,
+			line: token.line,
+			column: token.column,
+		};
+	}
+
+	// Handle bracket patterns like [0-9] as literal regex character classes
+	// e.g., split:[0-9] or split:[a-zA-Z]
+	if (check(state, 'lbracket')) {
+		let value = '';
+		let bracketDepth = 0;
+		const startLine = peek(state).line;
+		const startColumn = peek(state).column;
+
+		// Consume everything from [ to matching ]
+		while (!isAtEnd(state)) {
+			const token = peek(state);
+
+			if (token.type === 'lbracket') {
+				bracketDepth++;
+			} else if (token.type === 'rbracket') {
+				bracketDepth--;
+				if (bracketDepth === 0) {
+					value += token.value;
+					advance(state);
+					break;
+				}
+			}
+
+			// Stop if we hit pipe or variable_end without closing bracket
+			if (bracketDepth === 0 && (token.type === 'pipe' || token.type === 'variable_end' || token.type === 'comma')) {
+				break;
+			}
+
+			value += token.value;
+			advance(state);
+		}
+
+		return {
+			type: 'literal',
+			value: value,
+			raw: value,
+			line: startLine,
+			column: startColumn,
+		};
+	}
+
+	// Check for arrow function: identifier => expression
+	// e.g., map:tweet => ({text: tweet.text})
+	if (check(state, 'identifier')) {
+		const savedPos = state.pos;
+		const idToken = advance(state);
+
+		if (check(state, 'arrow')) {
+			// This is an arrow function - consume everything until | or }}
+			let value = idToken.value + ' ';
+			value += advance(state).value + ' '; // consume '=>'
+
+			// Consume everything until pipe or variable_end, tracking brace/paren depth
+			let braceDepth = 0;
+			let parenDepth = 0;
+
+			while (!isAtEnd(state)) {
+				const token = peek(state);
+
+				// Stop at pipe or variable_end when not inside braces/parens
+				if (braceDepth === 0 && parenDepth === 0) {
+					if (token.type === 'pipe' || token.type === 'variable_end' || token.type === 'tag_end') {
+						break;
+					}
+				}
+
+				if (token.type === 'lbrace' || token.type === 'lparen') {
+					if (token.type === 'lbrace') braceDepth++;
+					else parenDepth++;
+				} else if (token.type === 'rbrace' || token.type === 'rparen') {
+					if (token.type === 'rbrace') braceDepth--;
+					else parenDepth--;
+					// If we close more than we opened, stop
+					if (braceDepth < 0 || parenDepth < 0) break;
+				}
+
+				value += token.value;
+				advance(state);
+			}
+
+			return {
+				type: 'literal',
+				value: value.trim(),
+				raw: value.trim(),
+				line: startToken.line,
+				column: startToken.column,
+			};
+		}
+
+		// Not an arrow function - restore position
+		state.pos = savedPos;
+	}
+
+	// Parse the first part
+	const first = parsePrimaryExpression(state);
+	if (!first) return null;
+
+	// For quoted strings, chain together :string patterns as a single argument
+	// e.g., replace:"old":"new" should be one arg "old":"new", not two args
+	if (first.type === 'literal' && startToken.type === 'string') {
+		// Format string with quotes preserved
+		const formatString = (val: any) => `"${val}"`;
+		let combined = formatString(first.value);
+
+		// Check if followed by :string pattern - chain them together
+		while (check(state, 'colon')) {
+			const savedPos = state.pos;
+			advance(state); // consume ':'
+
+			if (check(state, 'string')) {
+				const next = parsePrimaryExpression(state);
+				if (next && next.type === 'literal') {
+					combined += ':' + formatString(next.value);
+				}
+			} else {
+				// Not a string after colon, restore position
+				state.pos = savedPos;
+				break;
+			}
+		}
+
+		return {
+			type: 'literal',
+			value: combined,
+			raw: combined,
+			line: first.line,
+			column: first.column,
+		};
+	}
+
+	// For unquoted values (numbers, identifiers), check for colon-separated continuation
+	// e.g., nth:1,2,3,5,7:7 where "7:7" is a range
+
+	// Handle number+identifier patterns like "2n" for nth filter
+	// The tokenizer splits "2n" into number "2" and identifier "n"
+	if (first.type === 'literal' && startToken.type === 'number' && check(state, 'identifier')) {
+		const idToken = peek(state);
+		// Only consume single-letter identifiers that follow numbers (like 2n, 3n)
+		if (idToken.value.length === 1 && /^[a-z]$/i.test(idToken.value)) {
+			advance(state);
+			const combined = String(first.value) + idToken.value;
+			return {
+				type: 'literal',
+				value: combined,
+				raw: combined,
+				line: first.line,
+				column: first.column,
+			};
+		}
+	}
+
+	// If there's no colon following, return the original expression to preserve its type
+	// This is important for numeric args like slice:3,4 where we need actual numbers
+	if (!check(state, 'colon')) {
+		return first;
+	}
+
+	// Build a string value for colon-separated range notation
+	let value = '';
+	if (first.type === 'literal') {
+		value = String(first.value);
+	} else if (first.type === 'identifier') {
+		value = first.name;
+	} else {
+		return first; // Return as-is for other types
+	}
+
+	// Consume colons for range notation like 5:7
+	while (check(state, 'colon') && !isAtEnd(state)) {
+		advance(state); // consume ':'
+		value += ':';
+
+		// Parse the next part
+		const next = parsePrimaryExpression(state);
+		if (next) {
+			if (next.type === 'literal') {
+				value += String(next.value);
+			} else if (next.type === 'identifier') {
+				value += next.name;
+			}
+		} else {
+			// No valid expression after colon - might be end of argument
+			break;
+		}
+	}
+
+	// Return as a string literal containing the full colon-separated value
+	return {
+		type: 'literal',
+		value: value,
+		raw: value,
+		line: startToken.line,
+		column: startToken.column,
+	};
+}
+
 // Filter: value | filter | filter
 function parseFilterExpression(state: ParserState): Expression | null {
 	let left = parseOrExpression(state);
@@ -644,7 +887,7 @@ function parseFilterExpression(state: ParserState): Expression | null {
 
 		if (!check(state, 'identifier')) {
 			state.errors.push({
-				message: 'Expected filter name after |',
+				message: 'Missing filter name after |',
 				line: peek(state).line,
 				column: peek(state).column,
 			});
@@ -654,7 +897,7 @@ function parseFilterExpression(state: ParserState): Expression | null {
 		const filterToken = advance(state);
 		const args: Expression[] = [];
 
-		// Parse filter arguments: filter:arg or filter:(arg1, arg2)
+		// Parse filter arguments: filter:arg or filter:arg1,arg2 or filter:(arg1, arg2)
 		if (check(state, 'colon')) {
 			advance(state); // consume ':'
 
@@ -664,7 +907,9 @@ function parseFilterExpression(state: ParserState): Expression | null {
 				while (!check(state, 'rparen') && !isAtEnd(state)) {
 					const arg = parseOrExpression(state);
 					if (arg) args.push(arg);
-					if (check(state, 'comma')) {
+					// Handle both comma and colon separators inside parentheses
+					// e.g., replace:("old":"new","foo":"bar")
+					if (check(state, 'comma') || check(state, 'colon')) {
 						advance(state);
 					} else {
 						break;
@@ -674,9 +919,18 @@ function parseFilterExpression(state: ParserState): Expression | null {
 					advance(state); // consume ')'
 				}
 			} else {
-				// Single argument
-				const arg = parsePrimaryExpression(state);
+				// Arguments without parentheses
+				// Supports: filter:arg, filter:arg1,arg2, filter:"str1":"str2"
+				const arg = parseFilterArgument(state);
 				if (arg) args.push(arg);
+				// Continue parsing comma-separated arguments
+				// Note: colons within quoted string pairs (e.g., "old":"new") are
+				// handled by parseFilterArgument, not as separators here
+				while (check(state, 'comma')) {
+					advance(state); // consume ','
+					const nextArg = parseFilterArgument(state);
+					if (nextArg) args.push(nextArg);
+				}
 			}
 		}
 
@@ -703,7 +957,7 @@ function parseOrExpression(state: ParserState): Expression | null {
 		const right = parseAndExpression(state);
 		if (!right) {
 			state.errors.push({
-				message: 'Expected expression after "or"',
+				message: 'Missing value after "or"',
 				line: opToken.line,
 				column: opToken.column,
 			});
@@ -732,7 +986,7 @@ function parseAndExpression(state: ParserState): Expression | null {
 		const right = parseNotExpression(state);
 		if (!right) {
 			state.errors.push({
-				message: 'Expected expression after "and"',
+				message: 'Missing value after "and"',
 				line: opToken.line,
 				column: opToken.column,
 			});
@@ -758,7 +1012,7 @@ function parseNotExpression(state: ParserState): Expression | null {
 		const argument = parseNotExpression(state);
 		if (!argument) {
 			state.errors.push({
-				message: 'Expected expression after "not"',
+				message: 'Missing value after "not"',
 				line: opToken.line,
 				column: opToken.column,
 			});
@@ -788,7 +1042,7 @@ function parseComparisonExpression(state: ParserState): Expression | null {
 		const right = parsePostfixExpression(state);
 		if (!right) {
 			state.errors.push({
-				message: `Expected expression after "${opToken.value}"`,
+				message: `Missing value after "${opToken.value}"`,
 				line: opToken.line,
 				column: opToken.column,
 			});
@@ -830,7 +1084,7 @@ function parsePostfixExpression(state: ParserState): Expression | null {
 		const property = parseOrExpression(state);
 		if (!property) {
 			state.errors.push({
-				message: 'Expected expression inside brackets',
+				message: 'Empty brackets [] - add an index or key',
 				line: bracketToken.line,
 				column: bracketToken.column,
 			});
@@ -841,7 +1095,7 @@ function parsePostfixExpression(state: ParserState): Expression | null {
 			advance(state); // consume ']'
 		} else {
 			state.errors.push({
-				message: 'Expected "]" after bracket expression',
+				message: 'Missing closing ]',
 				line: peek(state).line,
 				column: peek(state).column,
 			});
@@ -870,7 +1124,7 @@ function parsePrimaryExpression(state: ParserState): Expression | null {
 		const expr = parseOrExpression(state);
 		if (!expr) {
 			state.errors.push({
-				message: 'Expected expression after "("',
+				message: 'Empty parentheses () - add an expression',
 				line: token.line,
 				column: token.column,
 			});
@@ -880,7 +1134,7 @@ function parsePrimaryExpression(state: ParserState): Expression | null {
 			advance(state); // consume ')'
 		} else {
 			state.errors.push({
-				message: 'Expected ")"',
+				message: 'Missing closing )',
 				line: peek(state).line,
 				column: peek(state).column,
 			});
@@ -953,8 +1207,18 @@ function parsePrimaryExpression(state: ParserState): Expression | null {
 			advance(state); // consume ':'
 
 			// Build the full identifier including the prefix
+			// This handles: schema:[0].prop, selector:div.class, schema:director[*].name, etc.
 			let rest = '';
-			while (check(state, 'identifier') || check(state, 'dot') || check(state, 'colon')) {
+			while (
+				check(state, 'identifier') ||
+				check(state, 'dot') ||
+				check(state, 'colon') ||
+				check(state, 'lbracket') ||
+				check(state, 'rbracket') ||
+				check(state, 'number') ||
+				check(state, 'string') ||
+				check(state, 'star')
+			) {
 				rest += advance(state).value;
 			}
 			name = name + ':' + rest;
@@ -1019,7 +1283,7 @@ function consumeTagEnd(state: ParserState): Token | null {
 		return advance(state);
 	}
 	state.errors.push({
-		message: 'Expected %}',
+		message: 'Missing closing %}',
 		line: peek(state).line,
 		column: peek(state).column,
 	});
@@ -1144,4 +1408,456 @@ function formatExpression(expr: Expression, indent: number): string {
  */
 export function formatParserError(error: ParserError): string {
 	return `Error at line ${error.line}, column ${error.column}: ${error.message}`;
+}
+
+// ============================================================================
+// Variable Validation
+// ============================================================================
+
+/**
+ * Known preset variables that are always available
+ */
+const PRESET_VARIABLES = new Set([
+	'author',
+	'content',
+	'contentHtml',
+	'date',
+	'description',
+	'domain',
+	'favicon',
+	'fullHtml',
+	'highlights',
+	'image',
+	'published',
+	'selection',
+	'selectionHtml',
+	'site',
+	'title',
+	'time',
+	'url',
+	'words',
+]);
+
+/**
+ * Special variable prefixes that indicate dynamic variables
+ */
+const SPECIAL_PREFIXES = [
+	'schema:',
+	'selector:',
+	'selectorHtml:',
+	'meta:',
+];
+
+/**
+ * Calculate Levenshtein distance between two strings (for fuzzy matching)
+ */
+function levenshteinDistance(a: string, b: string): number {
+	const matrix: number[][] = [];
+
+	for (let i = 0; i <= b.length; i++) {
+		matrix[i] = [i];
+	}
+	for (let j = 0; j <= a.length; j++) {
+		matrix[0][j] = j;
+	}
+
+	for (let i = 1; i <= b.length; i++) {
+		for (let j = 1; j <= a.length; j++) {
+			if (b.charAt(i - 1) === a.charAt(j - 1)) {
+				matrix[i][j] = matrix[i - 1][j - 1];
+			} else {
+				matrix[i][j] = Math.min(
+					matrix[i - 1][j - 1] + 1,
+					matrix[i][j - 1] + 1,
+					matrix[i - 1][j] + 1
+				);
+			}
+		}
+	}
+
+	return matrix[b.length][a.length];
+}
+
+/**
+ * Find the closest matching preset variable
+ */
+function findSimilarVariable(name: string): string | null {
+	let bestMatch: string | null = null;
+	let bestDistance = Infinity;
+
+	for (const preset of PRESET_VARIABLES) {
+		const distance = levenshteinDistance(name.toLowerCase(), preset.toLowerCase());
+		// Only suggest if the distance is reasonable (less than half the length)
+		if (distance < Math.max(name.length, preset.length) / 2 && distance < bestDistance) {
+			bestDistance = distance;
+			bestMatch = preset;
+		}
+	}
+
+	return bestMatch;
+}
+
+/**
+ * Check if a variable name is valid
+ */
+function isValidVariable(name: string, definedVariables: Set<string>): boolean {
+	// Prompt variables start with "
+	if (name.startsWith('"')) {
+		return true;
+	}
+
+	// Special prefix variables
+	for (const prefix of SPECIAL_PREFIXES) {
+		if (name.startsWith(prefix)) {
+			return true;
+		}
+	}
+
+	// Check if it's a preset variable
+	if (PRESET_VARIABLES.has(name)) {
+		return true;
+	}
+
+	// Check if it's a defined variable (via {% set %})
+	if (definedVariables.has(name)) {
+		return true;
+	}
+
+	// Check for nested property access on known variables (e.g., loop.index)
+	const baseName = name.split('.')[0].split('[')[0];
+	if (PRESET_VARIABLES.has(baseName) || definedVariables.has(baseName) || baseName === 'loop') {
+		return true;
+	}
+
+	return false;
+}
+
+/**
+ * Extract the base variable name from an expression
+ */
+function getVariableNameFromExpression(expr: Expression): { name: string; line: number; column: number } | null {
+	switch (expr.type) {
+		case 'identifier':
+			return { name: expr.name, line: expr.line, column: expr.column };
+		case 'filter':
+			return getVariableNameFromExpression(expr.value);
+		case 'member':
+			return getVariableNameFromExpression(expr.object);
+		case 'binary':
+			// For nullish coalescing, check the left side
+			if (expr.operator === '??') {
+				return getVariableNameFromExpression(expr.left);
+			}
+			return null;
+		default:
+			return null;
+	}
+}
+
+/**
+ * Reference with its scope - stores defined variables at the point of reference
+ */
+interface ScopedReference {
+	name: string;
+	line: number;
+	column: number;
+	scope: Set<string>;
+}
+
+/**
+ * Collect all variable references and set definitions from the AST
+ */
+function collectVariables(
+	nodes: ASTNode[],
+	definedVariables: Set<string>,
+	references: ScopedReference[]
+): void {
+	for (const node of nodes) {
+		switch (node.type) {
+			case 'variable': {
+				const varInfo = getVariableNameFromExpression(node.expression);
+				if (varInfo) {
+					references.push({ ...varInfo, scope: new Set(definedVariables) });
+				}
+				break;
+			}
+			case 'set':
+				// Add to defined variables
+				definedVariables.add(node.variable);
+				// Also check the value expression
+				collectExpression(node.value, definedVariables, references);
+				break;
+			case 'if':
+				collectExpression(node.condition, definedVariables, references);
+				collectVariables(node.consequent, definedVariables, references);
+				for (const elseif of node.elseifs) {
+					collectExpression(elseif.condition, definedVariables, references);
+					collectVariables(elseif.body, definedVariables, references);
+				}
+				if (node.alternate) {
+					collectVariables(node.alternate, definedVariables, references);
+				}
+				break;
+			case 'for':
+				// The iterator is defined within the loop
+				const loopVariables = new Set(definedVariables);
+				loopVariables.add(node.iterator);
+				loopVariables.add(`${node.iterator}_index`);
+				collectExpression(node.iterable, definedVariables, references);
+				collectVariables(node.body, loopVariables, references);
+				break;
+		}
+	}
+}
+
+/**
+ * Collect variable references from an expression
+ */
+function collectExpression(
+	expr: Expression,
+	definedVariables: Set<string>,
+	references: ScopedReference[]
+): void {
+	switch (expr.type) {
+		case 'identifier': {
+			references.push({ name: expr.name, line: expr.line, column: expr.column, scope: new Set(definedVariables) });
+			break;
+		}
+		case 'filter':
+			collectExpression(expr.value, definedVariables, references);
+			for (const arg of expr.args) {
+				collectExpression(arg, definedVariables, references);
+			}
+			break;
+		case 'binary':
+			collectExpression(expr.left, definedVariables, references);
+			collectExpression(expr.right, definedVariables, references);
+			break;
+		case 'unary':
+			collectExpression(expr.argument, definedVariables, references);
+			break;
+		case 'member':
+			collectExpression(expr.object, definedVariables, references);
+			collectExpression(expr.property, definedVariables, references);
+			break;
+		case 'group':
+			collectExpression(expr.expression, definedVariables, references);
+			break;
+	}
+}
+
+/**
+ * Validate all variable references in the AST
+ */
+export function validateVariables(ast: ASTNode[]): ParserError[] {
+	const warnings: ParserError[] = [];
+	const definedVariables = new Set<string>();
+	const references: ScopedReference[] = [];
+
+	// Collect all defined variables and references
+	collectVariables(ast, definedVariables, references);
+
+	// Check each reference against its scope
+	for (const ref of references) {
+		if (!isValidVariable(ref.name, ref.scope)) {
+			const similar = findSimilarVariable(ref.name);
+			let message = `Unknown variable "${ref.name}"`;
+			if (similar) {
+				message += `. Did you mean "${similar}"?`;
+			}
+			warnings.push({
+				message,
+				line: ref.line,
+				column: ref.column,
+			});
+		}
+	}
+
+	return warnings;
+}
+
+// ============================================================================
+// Filter Validation
+// ============================================================================
+
+interface FilterUsage {
+	name: string;
+	hasArgs: boolean;
+	args: Expression[];
+	line: number;
+	column: number;
+}
+
+/**
+ * Reconstruct a parameter string from parsed Expression arguments
+ */
+function expressionToString(expr: Expression): string {
+	switch (expr.type) {
+		case 'literal':
+			if (typeof expr.value === 'string') {
+				// Don't double-quote strings that already contain quotes
+				// e.g., '"h":"H"' should stay as-is
+				if (/^["'].*["']$/.test(expr.value) || expr.value.includes('":"') || expr.value.includes("':'")) {
+					return expr.value;
+				}
+				// Don't quote simple values like "2n", "3:4", etc.
+				// Only quote strings with spaces or special chars that need protection
+				if (/^[\w.:+\-*/]+$/.test(expr.value)) {
+					return expr.value;
+				}
+				return `"${expr.value}"`;
+			}
+			return String(expr.value);
+		case 'identifier':
+			return expr.name;
+		case 'filter':
+			const base = expressionToString(expr.value);
+			const filterArgs = expr.args.map(expressionToString).join(':');
+			return filterArgs ? `${base}|${expr.name}:${filterArgs}` : `${base}|${expr.name}`;
+		case 'binary':
+			return `${expressionToString(expr.left)} ${expr.operator} ${expressionToString(expr.right)}`;
+		case 'unary':
+			return `${expr.operator} ${expressionToString(expr.argument)}`;
+		case 'group':
+			return `(${expressionToString(expr.expression)})`;
+		case 'member':
+			return `${expressionToString(expr.object)}.${expressionToString(expr.property)}`;
+		default:
+			return '';
+	}
+}
+
+function argsToParamString(args: Expression[]): string | undefined {
+	if (args.length === 0) return undefined;
+	// Join args with comma - this matches how the parser now separates args
+	return args.map(expressionToString).join(',');
+}
+
+/**
+ * Find the closest matching filter name for suggestions
+ */
+function findSimilarFilter(name: string): string | null {
+	let bestMatch: string | null = null;
+	let bestDistance = Infinity;
+
+	for (const filterName of validFilterNames) {
+		const distance = levenshteinDistance(name.toLowerCase(), filterName.toLowerCase());
+		if (distance < Math.max(name.length, filterName.length) / 2 && distance < bestDistance) {
+			bestDistance = distance;
+			bestMatch = filterName;
+		}
+	}
+
+	return bestMatch;
+}
+
+/**
+ * Collect filter usages from an expression
+ */
+function collectFiltersFromExpression(expr: Expression, usages: FilterUsage[]): void {
+	switch (expr.type) {
+		case 'filter':
+			usages.push({
+				name: expr.name,
+				hasArgs: expr.args.length > 0,
+				args: expr.args,
+				line: expr.line,
+				column: expr.column,
+			});
+			collectFiltersFromExpression(expr.value, usages);
+			for (const arg of expr.args) {
+				collectFiltersFromExpression(arg, usages);
+			}
+			break;
+		case 'binary':
+			collectFiltersFromExpression(expr.left, usages);
+			collectFiltersFromExpression(expr.right, usages);
+			break;
+		case 'unary':
+			collectFiltersFromExpression(expr.argument, usages);
+			break;
+		case 'member':
+			collectFiltersFromExpression(expr.object, usages);
+			collectFiltersFromExpression(expr.property, usages);
+			break;
+		case 'group':
+			collectFiltersFromExpression(expr.expression, usages);
+			break;
+	}
+}
+
+/**
+ * Collect all filter usages from the AST
+ */
+function collectFilters(nodes: ASTNode[]): FilterUsage[] {
+	const usages: FilterUsage[] = [];
+
+	function processNode(node: ASTNode): void {
+		switch (node.type) {
+			case 'variable':
+				collectFiltersFromExpression(node.expression, usages);
+				break;
+			case 'set':
+				collectFiltersFromExpression(node.value, usages);
+				break;
+			case 'if':
+				collectFiltersFromExpression(node.condition, usages);
+				node.consequent.forEach(processNode);
+				node.elseifs.forEach(elseif => {
+					collectFiltersFromExpression(elseif.condition, usages);
+					elseif.body.forEach(processNode);
+				});
+				node.alternate?.forEach(processNode);
+				break;
+			case 'for':
+				collectFiltersFromExpression(node.iterable, usages);
+				node.body.forEach(processNode);
+				break;
+		}
+	}
+
+	nodes.forEach(processNode);
+	return usages;
+}
+
+/**
+ * Validate filter usage in the AST.
+ * Checks: 1) filter exists, 2) params are valid (via validator)
+ */
+export function validateFilters(ast: ASTNode[]): ParserError[] {
+	const errors: ParserError[] = [];
+	const usages = collectFilters(ast);
+
+	for (const usage of usages) {
+		// Check if filter exists
+		if (!validFilterNames.has(usage.name)) {
+			const similar = findSimilarFilter(usage.name);
+			let message = `Unknown filter "${usage.name}"`;
+			if (similar) {
+				message += `. Did you mean "${similar}"?`;
+			}
+			errors.push({
+				message,
+				line: usage.line,
+				column: usage.column,
+			});
+			continue;
+		}
+
+		// Run param validator if available
+		const meta = filterMetadata[usage.name];
+		if (meta?.validateParams) {
+			const paramString = usage.hasArgs ? argsToParamString(usage.args) : undefined;
+			const result = meta.validateParams(paramString);
+			if (!result.valid && result.error) {
+				errors.push({
+					message: `Filter "${usage.name}" ${result.error}`,
+					line: usage.line,
+					column: usage.column,
+				});
+			}
+		}
+	}
+
+	return errors;
 }

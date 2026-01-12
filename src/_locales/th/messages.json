@@ -59,9 +59,6 @@
 	"behavior": {
 		"message": "พฤติกรรม"
 	},
-	"behaviorWarning": {
-		"message": "การเพิ่มไปยังบันทึกที่มีอยู่หรือบันทึกประจำวันต้องใช้ Obsidian 1.7.2 หรือใหม่กว่า"
-	},
 	"byDay": {
 		"message": "วัน"
 	},
@@ -775,6 +772,12 @@
 	"templateCopyError": {
 		"message": "ไม่สามารถคัดลอก JSON เทมเพลตไปยังคลิปบอร์ด"
 	},
+	"templateErrorCount": {
+		"message": "มีข้อผิดพลาดในเทมเพลตของคุณ"
+	},
+	"templateErrorsCount": {
+		"message": "มีข้อผิดพลาด $1 รายการในเทมเพลตของคุณ"
+	},
 	"templateName": {
 		"message": "ชื่อเทมเพลต"
 	},
@@ -789,6 +792,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "กำหนดกฎเพื่อเลือกเทมเพลตนี้โดยอัตโนมัติถ้าตรงกับรูปแบบ URL หรือมีข้อมูล schema.org หนึ่งกฎต่อบรรทัด"
+	},
+	"templateValid": {
+		"message": "ไวยากรณ์เทมเพลตถูกต้อง"
 	},
 	"templatesHeading": {
 		"message": "เทมเพลต"

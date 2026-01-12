@@ -59,6 +59,7 @@
 		--input-height: 2.5rem;
 		border: 0;
 		box-shadow: none;
+		border-radius: 2rem;
 	}
 	input,
 	input[type="password"],
@@ -80,9 +81,6 @@
 	--toggle-thumb-height: 1.5rem;
 	--toggle-thumb-width: 1.5rem;
 
-	button {
-		border-radius: 2rem;
-	}
 	.clipper {
 		max-height: 100dvh;
 		width: 100%;

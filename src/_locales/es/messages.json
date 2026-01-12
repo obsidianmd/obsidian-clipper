@@ -59,9 +59,6 @@
 	"behavior": {
 		"message": "Comportamiento"
 	},
-	"behaviorWarning": {
-		"message": "Agregar a una nota existente o nota diaria requiere Obsidian 1.7.2 o posterior."
-	},
 	"byDay": {
 		"message": "Días"
 	},
@@ -775,6 +772,12 @@
 	"templateCopyError": {
 		"message": "Error al copiar el JSON de la plantilla al portapapeles"
 	},
+	"templateErrorCount": {
+		"message": "Hay un error en tu plantilla."
+	},
+	"templateErrorsCount": {
+		"message": "Hay $1 errores en tu plantilla."
+	},
 	"templateName": {
 		"message": "Nombre de la plantilla"
 	},
@@ -789,6 +792,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "Define reglas para seleccionar automáticamente esta plantilla si coincide con un patrón de URL o contiene datos de schema.org. Una regla por línea."
+	},
+	"templateValid": {
+		"message": "La sintaxis de la plantilla es válida"
 	},
 	"templatesHeading": {
 		"message": "Plantillas"

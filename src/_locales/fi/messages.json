@@ -59,9 +59,6 @@
 	"behavior": {
 		"message": "Käyttäytyminen"
 	},
-	"behaviorWarning": {
-		"message": "Olemassa olevaan muistiinpanoon tai päivittäiseen muistiinpanoon lisääminen vaatii Obsidian 1.7.2 tai uudemman version."
-	},
 	"byDay": {
 		"message": "Päivät"
 	},
@@ -783,6 +780,12 @@
 	"templateCopyError": {
 		"message": "Mallin JSON:n kopiointi leikepöydälle epäonnistui"
 	},
+	"templateErrorCount": {
+		"message": "Mallissasi on virhe."
+	},
+	"templateErrorsCount": {
+		"message": "Mallissasi on $1 virhettä."
+	},
 	"templateName": {
 		"message": "Mallin nimi"
 	},
@@ -797,6 +800,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "Määritä säännöt tämän mallin automaattiselle valinnalle, jos se vastaa URL-kaavaa tai sisältää schema.org-tietoja. Yksi sääntö per rivi."
+	},
+	"templateValid": {
+		"message": "Mallin syntaksi on kelvollinen"
 	},
 	"templatesHeading": {
 		"message": "Mallit"

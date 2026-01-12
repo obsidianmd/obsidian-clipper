@@ -21,25 +21,16 @@ import {
 	BinaryExpression,
 	UnaryExpression,
 	FilterExpression,
-	GroupExpression,
 	MemberExpression,
 	parse,
 } from './parser';
+import { applyFilterDirect as builtInApplyFilterDirect } from './filters';
 
-// Filter application function type
-type ApplyFiltersFn = (value: string, filters: string, currentUrl: string) => string;
+// Filter application function type for direct invocation (already-parsed filter name and params)
+type ApplyFilterDirectFn = (value: string, filterName: string, paramString: string | undefined, currentUrl: string) => string;
 
-// Default filter implementation (just returns value unchanged)
-// In the browser extension, this will be replaced with the real implementation
-let defaultApplyFilters: ApplyFiltersFn = (value: string) => value;
-
-/**
- * Set the default filter implementation.
- * Call this once at startup with the real applyFilters function.
- */
-export function setFilterImplementation(impl: ApplyFiltersFn): void {
-	defaultApplyFilters = impl;
-}
+// Default filter implementation using the built-in filters
+const defaultApplyFilterDirect: ApplyFilterDirectFn = builtInApplyFilterDirect;
 
 // ============================================================================
 // Render Context
@@ -69,8 +60,8 @@ export interface RenderContext {
 	/** Custom filter functions (optional, merged with built-in filters) */
 	filters?: Record<string, (...args: any[]) => any>;
 
-	/** Custom applyFilters implementation (optional, uses default if not provided) */
-	applyFilters?: ApplyFiltersFn;
+	/** Custom applyFilterDirect implementation (optional, uses built-in if not provided) */
+	applyFilterDirect?: ApplyFilterDirectFn;
 }
 
 /**
@@ -87,6 +78,8 @@ export interface RenderOptions {
 export interface RenderResult {
 	output: string;
 	errors: RenderError[];
+	/** True if output contains deferred variables that need post-processing (prompts, unresolved selectors, etc.) */
+	hasDeferredVariables: boolean;
 }
 
 export interface RenderError {
@@ -122,6 +115,7 @@ export async function render(
 				line: e.line,
 				column: e.column,
 			})),
+			hasDeferredVariables: false,
 		};
 	}
 
@@ -141,37 +135,22 @@ export async function renderAST(
 		context,
 		errors,
 		pendingTrimRight: false,
+		hasDeferredVariables: false,
 	};
 
 	let output = '';
 
 	for (let i = 0; i < ast.length; i++) {
 		const node = ast[i];
-
-		// Handle trimLeft - trim trailing whitespace from previous output
-		// Logic tags always have trimLeft: true
-		if ('trimLeft' in node && (node as any).trimLeft && output.length > 0) {
-			output = output.replace(/[\t ]*\r?\n?$/, '');
-		}
-
 		const nodeOutput = await renderNode(node, state);
-
-		// Handle trimRight - trim leading whitespace from next output
-		// Note: Text nodes handle this in renderText, but other nodes might need it here
-		if (state.pendingTrimRight && nodeOutput.length > 0) {
-			// Trim leading whitespace from this output
-			output += nodeOutput.replace(/^[\t ]*\r?\n/, '');
-			state.pendingTrimRight = false;
-		} else {
-			output += nodeOutput;
-		}
+		output = appendNodeOutput(output, nodeOutput, node, state);
 	}
 
 	if (options.trimOutput) {
 		output = output.trim();
 	}
 
-	return { output, errors };
+	return { output, errors, hasDeferredVariables: state.hasDeferredVariables };
 }
 
 // ============================================================================
@@ -182,6 +161,8 @@ interface RenderState {
 	context: RenderContext;
 	errors: RenderError[];
 	pendingTrimRight: boolean;
+	/** Tracks whether any deferred variables (prompts, unresolved selectors, etc.) were output */
+	hasDeferredVariables: boolean;
 }
 
 // ============================================================================
@@ -213,7 +194,7 @@ function renderText(node: TextNode, state: RenderState): string {
 
 	// If previous node had trimRight, trim leading whitespace and newlines
 	if (state.pendingTrimRight) {
-		text = text.replace(/^[\t ]*\r?\n/, '');
+		text = trimLeadingWhitespace(text);
 		state.pendingTrimRight = false;
 	}
 
@@ -225,15 +206,18 @@ async function renderVariable(node: VariableNode, state: RenderState): Promise<s
 	// For now, we handle trimRight by setting a flag for the next node
 
 	try {
-		// Special case: string literals in variable position are prompt placeholders
-		// Preserve them as {{"..."}} for the prompt post-processor
-		if (node.expression.type === 'literal' && typeof (node.expression as LiteralExpression).value === 'string') {
-			const value = (node.expression as LiteralExpression).value as string;
+		// Special case: string literals (prompts) need to be preserved for post-processing
+		// This includes filter chains where the base value is a string literal
+		// e.g., {{"prompt text"|title}} should become {{"prompt text"|title}} not "Prompt Text"
+		const promptInfo = getPromptBase(node.expression);
+		if (promptInfo) {
 			if (node.trimRight) {
 				state.pendingTrimRight = true;
 			}
-			// Output as quoted string for prompt processing
-			return `{{"${value}"}}`;
+			// Mark that we have deferred variables that need post-processing
+			state.hasDeferredVariables = true;
+			// Reconstruct the template syntax for prompt post-processor
+			return reconstructPromptTemplate(node.expression);
 		}
 
 		const value = await evaluateExpression(node.expression, state);
@@ -252,6 +236,58 @@ async function renderVariable(node: VariableNode, state: RenderState): Promise<s
 		});
 		return '';
 	}
+}
+
+/**
+ * Check if an expression is a prompt (string literal or filter chain with string literal base).
+ * Returns the prompt string if found, null otherwise.
+ */
+function getPromptBase(expr: Expression): string | null {
+	if (expr.type === 'literal' && typeof (expr as LiteralExpression).value === 'string') {
+		return (expr as LiteralExpression).value as string;
+	}
+	if (expr.type === 'filter') {
+		return getPromptBase((expr as FilterExpression).value);
+	}
+	return null;
+}
+
+/**
+ * Format filter arguments as a colon-separated string.
+ */
+function formatFilterArgs(args: Expression[]): string {
+	return args.map(arg => {
+		if (arg.type === 'literal') {
+			const val = (arg as LiteralExpression).value;
+			return typeof val === 'string' ? `"${val}"` : String(val);
+		}
+		return String((arg as any).value || (arg as any).name || '');
+	}).join(':');
+}
+
+/**
+ * Reconstruct template syntax for a prompt expression.
+ * e.g., FilterExpression{name:'title', value:Literal{"prompt"}} -> {{"prompt"|title}}
+ */
+function reconstructPromptTemplate(expr: Expression): string {
+	return `{{${reconstructPromptTemplateInner(expr)}}}`;
+}
+
+function reconstructPromptTemplateInner(expr: Expression): string {
+	if (expr.type === 'literal') {
+		const value = (expr as LiteralExpression).value;
+		return typeof value === 'string' ? `"${value}"` : String(value);
+	}
+	if (expr.type === 'filter') {
+		const filter = expr as FilterExpression;
+		const inner = reconstructPromptTemplateInner(filter.value);
+		let filterStr = `${inner}|${filter.name}`;
+		if (filter.args.length > 0) {
+			filterStr += `:${formatFilterArgs(filter.args)}`;
+		}
+		return filterStr;
+	}
+	return String(expr);
 }
 
 async function renderIf(node: IfNode, state: RenderState): Promise<string> {
@@ -386,21 +422,29 @@ async function renderSet(node: SetNode, state: RenderState): Promise<string> {
 
 async function renderNodes(nodes: ASTNode[], state: RenderState): Promise<string> {
 	let output = '';
-
 	for (const node of nodes) {
-		// Handle trimLeft - trim trailing whitespace from previous output
-		if ('trimLeft' in node && (node as any).trimLeft && output.length > 0) {
-			output = output.replace(/[\t ]*\r?\n?$/, '');
-		}
-
 		const nodeOutput = await renderNode(node, state);
+		output = appendNodeOutput(output, nodeOutput, node, state);
+	}
+	return output;
+}
 
-		if (state.pendingTrimRight && nodeOutput.length > 0) {
-			output += nodeOutput.replace(/^[\t ]*\r?\n?/, '');
-			state.pendingTrimRight = false;
-		} else {
-			output += nodeOutput;
-		}
+/**
+ * Append node output to accumulated output, handling whitespace trimming.
+ * Handles both trimLeft (trim trailing from previous) and trimRight (trim leading from current).
+ */
+function appendNodeOutput(output: string, nodeOutput: string, node: ASTNode, state: RenderState): string {
+	// Handle trimLeft - trim trailing whitespace from previous output
+	if ('trimLeft' in node && (node as any).trimLeft && output.length > 0) {
+		output = trimTrailingWhitespace(output);
+	}
+
+	// Handle trimRight from previous node - trim leading whitespace from this output
+	if (state.pendingTrimRight && nodeOutput.length > 0) {
+		output += trimLeadingWhitespace(nodeOutput);
+		state.pendingTrimRight = false;
+	} else {
+		output += nodeOutput;
 	}
 
 	return output;
@@ -452,6 +496,7 @@ async function evaluateIdentifier(expr: IdentifierExpression, state: RenderState
 		}
 		// Return placeholder syntax for post-processor to handle
 		// This allows selectors to be used in templates and resolved later
+		state.hasDeferredVariables = true;
 		return `{{${name}}}`;
 	}
 
@@ -460,6 +505,7 @@ async function evaluateIdentifier(expr: IdentifierExpression, state: RenderState
 		const value = resolveSchemaVariable(name, state.context.variables);
 		if (value === undefined) {
 			// Not in variables, preserve for post-processor
+			state.hasDeferredVariables = true;
 			return `{{${name}}}`;
 		}
 		return value;
@@ -467,6 +513,7 @@ async function evaluateIdentifier(expr: IdentifierExpression, state: RenderState
 
 	// Prompt variables - preserve for post-processing
 	if (name.startsWith('prompt:') || name.startsWith('"')) {
+		state.hasDeferredVariables = true;
 		return `{{${name}}}`;
 	}
 
@@ -563,20 +610,33 @@ async function evaluateFilter(expr: FilterExpression, state: RenderState): Promi
 		return state.context.filters[expr.name](value, ...args);
 	}
 
-	// Use built-in filters via applyFilters
-	// Build filter string: filtername:arg1:arg2
-	let filterString = expr.name;
-	if (args.length > 0) {
-		filterString += ':' + args.map(a =>
-			typeof a === 'string' ? `"${a}"` : String(a)
-		).join(':');
-	}
-
 	const stringValue = valueToString(value);
 
-	// Use context's applyFilters if provided, otherwise use default
-	const applyFiltersFn = state.context.applyFilters || defaultApplyFilters;
-	return applyFiltersFn(stringValue, filterString, state.context.currentUrl);
+	// Build parameter string from args (already parsed by AST)
+	// This avoids the round-trip of building "filterName:args" then re-parsing it
+	let paramString: string | undefined;
+	if (args.length > 0) {
+		const formattedArgs = args.map(a => {
+			if (typeof a === 'string') {
+				// Don't double-quote strings that are already quoted
+				if (isQuotedString(a)) {
+					return a;
+				}
+				// Don't quote simple values that don't need quoting
+				// e.g., "3:4", "2n", "abc" should stay unquoted
+				if (/^[\w.:+\-*/]+$/.test(a)) {
+					return a;
+				}
+				return `"${a}"`;
+			}
+			return String(a);
+		});
+		paramString = formattedArgs.join(',');
+	}
+
+	// Use direct filter invocation (optimized path - no re-parsing needed)
+	const applyFilterDirectFn = state.context.applyFilterDirect || defaultApplyFilterDirect;
+	return applyFilterDirectFn(stringValue, expr.name, paramString, state.context.currentUrl);
 }
 
 function evaluateContains(left: any, right: any): boolean {
@@ -720,6 +780,31 @@ function getNestedValue(obj: any, path: string): any {
 // ============================================================================
 // Utility Functions
 // ============================================================================
+
+/**
+ * Trim trailing whitespace and optional newline from a string.
+ * Used for trimLeft handling (removes whitespace at end of previous output).
+ */
+function trimTrailingWhitespace(str: string): string {
+	return str.replace(/[\t ]*\r?\n?$/, '');
+}
+
+/**
+ * Trim leading whitespace and optional newline from a string.
+ * Used for trimRight handling (removes whitespace at start of next output).
+ */
+function trimLeadingWhitespace(str: string): string {
+	return str.replace(/^[\t ]*\r?\n?/, '');
+}
+
+/**
+ * Check if a string is already quoted or contains quoted pairs.
+ * Used to avoid double-quoting filter arguments.
+ * Examples: "value", 'value', "old":"new"
+ */
+function isQuotedString(str: string): boolean {
+	return /^["'].*["']$/.test(str) || str.includes('":"') || str.includes("':'");
+}
 
 /**
  * Check if a value is "truthy" for template conditionals

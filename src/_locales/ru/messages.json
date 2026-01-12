@@ -59,9 +59,6 @@
 	"behavior": {
 		"message": "Поведение"
 	},
-	"behaviorWarning": {
-		"message": "Для добавления в существующую заметку или ежедневную заметку требуется Obsidian 1.7.2 или более поздняя версия."
-	},
 	"byDay": {
 		"message": "Дни"
 	},
@@ -775,6 +772,12 @@
 	"templateCopyError": {
 		"message": "Не удалось скопировать шаблон JSON в буфер обмена"
 	},
+	"templateErrorCount": {
+		"message": "В вашем шаблоне есть ошибка."
+	},
+	"templateErrorsCount": {
+		"message": "В вашем шаблоне есть $1 ошибок."
+	},
 	"templateName": {
 		"message": "Название шаблона"
 	},
@@ -789,6 +792,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "Определите правила для автоматического выбора этого шаблона, если он соответствует шаблону URL или содержит данные schema.org. По одному правилу на строку."
+	},
+	"templateValid": {
+		"message": "Синтаксис шаблона корректен"
 	},
 	"templatesHeading": {
 		"message": "Шаблоны"

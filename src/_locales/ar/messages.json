@@ -59,9 +59,6 @@
 	"behavior": {
 		"message": "السلوك"
 	},
-	"behaviorWarning": {
-		"message": "الإضافة إلى ملاحظة موجودة أو ملاحظة يومية تتطلب أوبسيديان 1.7.2 أو أحدث."
-	},
 	"byDay": {
 		"message": "أيام"
 	},
@@ -775,6 +772,12 @@
 	"templateCopyError": {
 		"message": "فشل في نسخ قالب JSON إلى الحافظة"
 	},
+	"templateErrorCount": {
+		"message": "يوجد خطأ في قالبك."
+	},
+	"templateErrorsCount": {
+		"message": "يوجد $1 أخطاء في قالبك."
+	},
 	"templateName": {
 		"message": "اسم القالب"
 	},
@@ -789,6 +792,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "تحديد قواعد لاختيار هذا القالب تلقائياً إذا كان يتطابق مع نمط URL أو يحتوي على بيانات schema.org. قاعدة واحدة لكل سطر."
+	},
+	"templateValid": {
+		"message": "صياغة القالب صحيحة"
 	},
 	"templatesHeading": {
 		"message": "القوالب"

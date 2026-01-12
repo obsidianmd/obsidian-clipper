@@ -59,9 +59,6 @@
 	"behavior": {
 		"message": "Comportament"
 	},
-	"behaviorWarning": {
-		"message": "Adăugarea la o notă existentă sau zilnică necesită Obsidian 1.7.2 sau mai nou."
-	},
 	"byDay": {
 		"message": "Zi"
 	},
@@ -767,6 +764,12 @@
 	"templateCopyError": {
 		"message": "Nu s-a putut copia JSON-ul șablonului în clipboard"
 	},
+	"templateErrorCount": {
+		"message": "Există o eroare în șablonul tău."
+	},
+	"templateErrorsCount": {
+		"message": "Există $1 erori în șablonul tău."
+	},
 	"templateName": {
 		"message": "Nume șablon"
 	},
@@ -781,6 +784,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "Definește reguli pentru selectarea automată a acestui șablon dacă se potrivește cu modelul URL sau conține date schema.org. O regulă pe linie."
+	},
+	"templateValid": {
+		"message": "Sintaxa șablonului este validă"
 	},
 	"templatesHeading": {
 		"message": "Șabloane"

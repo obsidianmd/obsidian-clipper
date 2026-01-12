@@ -59,9 +59,6 @@
 	"behavior": {
 		"message": "동작 방식"
 	},
-	"behaviorWarning": {
-		"message": "기존에 있는 노트나 데일리 노트에 추가하려면 Obsidian 1.7.2 이상이 필요합니다."
-	},
 	"byDay": {
 		"message": "일"
 	},
@@ -775,6 +772,12 @@
 	"templateCopyError": {
 		"message": "템플릿 JSON을 클립보드에 복사하는 데 실패했습니다."
 	},
+	"templateErrorCount": {
+		"message": "템플릿에 오류가 있습니다."
+	},
+	"templateErrorsCount": {
+		"message": "템플릿에 오류가 $1개 있습니다."
+	},
 	"templateName": {
 		"message": "템플릿 이름"
 	},
@@ -789,6 +792,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "이 템플릿을 자동으로 선택하도록 URL 패턴과 schema.org 데이터를 포함하는 경우에 대한 규칙을 정의하세요. 한 줄에 하나의 규칙을 작성하세요."
+	},
+	"templateValid": {
+		"message": "템플릿 구문이 유효합니다"
 	},
 	"templatesHeading": {
 		"message": "템플릿"

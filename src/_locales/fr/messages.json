@@ -59,9 +59,6 @@
 	"behavior": {
 		"message": "Comportement"
 	},
-	"behaviorWarning": {
-		"message": "L'ajout à une note existante ou à la note quotidienne nécessite Obsidian 1.7.2 ou ultérieur."
-	},
 	"byDay": {
 		"message": "Jours"
 	},
@@ -775,6 +772,12 @@
 	"templateCopyError": {
 		"message": "Échec de la copie du modèle dans le presse-papiers"
 	},
+	"templateErrorCount": {
+		"message": "Il y a une erreur dans votre modèle."
+	},
+	"templateErrorsCount": {
+		"message": "Il y a $1 erreurs dans votre modèle."
+	},
 	"templateName": {
 		"message": "Nom du modèle"
 	},
@@ -789,6 +792,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "Définissez des règles pour sélectionner automatiquement ce modèle s'il correspond à un modèle d'URL ou contient des données schema.org. Une règle par ligne."
+	},
+	"templateValid": {
+		"message": "La syntaxe du modèle est valide"
 	},
 	"templatesHeading": {
 		"message": "Modèles"

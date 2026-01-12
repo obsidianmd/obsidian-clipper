@@ -1,3 +1,23 @@
+import type { ParamValidationResult } from '../filters';
+
+const validOsParams = ['windows', 'mac', 'linux'];
+
+export const validateSafeNameParams = (param: string | undefined): ParamValidationResult => {
+	// No param is valid (defaults to most conservative)
+	if (!param) {
+		return { valid: true };
+	}
+
+	if (!validOsParams.includes(param.toLowerCase().trim())) {
+		return {
+			valid: false,
+			error: `invalid OS "${param}". Use "windows", "mac", or "linux"`
+		};
+	}
+
+	return { valid: true };
+};
+
 export const safe_name = (str: string, param?: string): string => {
 	const os = param ? param.toLowerCase().trim() : 'default';
 

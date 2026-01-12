@@ -59,9 +59,6 @@
 	"behavior": {
 		"message": "Beteende"
 	},
-	"behaviorWarning": {
-		"message": "Att lägga till i en befintlig anteckning eller daglig anteckning kräver Obsidian 1.7.2 eller senare."
-	},
 	"byDay": {
 		"message": "Dagar"
 	},
@@ -775,6 +772,12 @@
 	"templateCopyError": {
 		"message": "Det gick inte att kopiera mall-JSON till urklipp"
 	},
+	"templateErrorCount": {
+		"message": "Det finns ett fel i din mall."
+	},
+	"templateErrorsCount": {
+		"message": "Det finns $1 fel i din mall."
+	},
 	"templateName": {
 		"message": "Mallnamn"
 	},
@@ -789,6 +792,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "Definiera regler för att automatiskt välja denna mall om den matchar ett URL-mönster eller innehåller schema.org-data. En regel per rad."
+	},
+	"templateValid": {
+		"message": "Mallens syntax är giltig"
 	},
 	"templatesHeading": {
 		"message": "Mallar"
