@@ -5,7 +5,6 @@ import { generateFrontmatter, saveToObsidian } from '../utils/obsidian-note-crea
 import { extractPageContent, initializePageContent } from '../utils/content-extractor';
 import { compileTemplate } from '../utils/template-compiler';
 import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
-import { decompressFromUTF16 } from 'lz-string';
 import { findMatchingTemplate, initializeTriggers } from '../utils/triggers';
 import { getLocalStorage, setLocalStorage, loadSettings, generalSettings, Settings } from '../utils/storage-utils';
 import { escapeHtml, unescapeValue } from '../utils/string-utils';
@@ -200,36 +199,6 @@ async function initializeExtension(tabId: number) {
 		console.error('Error initializing extension:', error);
 		showError('failedToInitialize');
 		return false;
-	}
-}
-
-async function loadAndSetupTemplates() {
-	const data = await browser.storage.sync.get(['template_list']);
-	const templateIds = data.template_list || [];
-	const loadedTemplates = await Promise.all((templateIds as string[]).map(async (id: string) => {
-		try {
-			const result = await browser.storage.sync.get(`template_${id}`);
-			const compressedChunks = result[`template_${id}`] as string[];
-			if (compressedChunks) {
-				const decompressedData = decompressFromUTF16(compressedChunks.join(''));
-				const template = JSON.parse(decompressedData);
-				if (template && Array.isArray(template.properties)) {
-					return template;
-				}
-			}
-		} catch (error) {
-			console.error(`Error parsing template ${id}:`, error);
-		}
-		return null;
-	}));
-
-	templates = loadedTemplates.filter((t: Template | null): t is Template => t !== null);
-
-	if (templates.length === 0) {
-		currentTemplate = createDefaultTemplate();
-		templates = [currentTemplate];
-	} else {
-		currentTemplate = templates[0];
 	}
 }
 
@@ -745,6 +714,9 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 		return;
 	}
 
+	// Cache the current URL once at the start to avoid repeated getTabInfo calls
+	const currentUrl = currentTabId ? (await getTabInfo(currentTabId)).url || '' : '';
+
 	// Handle vault selection
 	const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement;
 	if (vaultDropdown) {
@@ -769,9 +741,27 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 		return;
 	}
 
-	for (const property of template.properties) {
+	// Compile all templates in parallel for better performance
+	const [compiledPropertyValues, formattedNoteName, formattedPath, formattedContent] = await Promise.all([
+		// Compile all property values in parallel
+		Promise.all(template.properties.map(property =>
+			memoizedCompileTemplate(currentTabId!, unescapeValue(property.value), variables, currentUrl)
+		)),
+		// Compile note name
+		memoizedCompileTemplate(currentTabId!, template.noteNameFormat, variables, currentUrl),
+		// Compile path
+		memoizedCompileTemplate(currentTabId!, template.path, variables, currentUrl),
+		// Compile content
+		template.noteContentFormat
+			? memoizedCompileTemplate(currentTabId!, template.noteContentFormat, variables, currentUrl)
+			: Promise.resolve('')
+	]);
+
+	// Build DOM elements with pre-compiled values
+	for (let i = 0; i < template.properties.length; i++) {
+		const property = template.properties[i];
 		const propertyDiv = createElementWithClass('div', 'metadata-property');
-		let value = await memoizedCompileTemplate(currentTabId!, unescapeValue(property.value), variables, currentTabId ? await getTabInfo(currentTabId).then(tab => tab.url || '') : '');
+		let value = compiledPropertyValues[i];
 
 		const propertyType = generalSettings.propertyTypes.find(p => p.name === property.name)?.type || 'text';
 
@@ -801,33 +791,33 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 		// Create metadata property key container
 		const metadataPropertyKey = document.createElement('div');
 		metadataPropertyKey.className = 'metadata-property-key';
-		
+
 		// Create property icon
 		const propertyIconSpan = document.createElement('span');
 		propertyIconSpan.className = 'metadata-property-icon';
 		const iconElement = document.createElement('i');
 		iconElement.setAttribute('data-lucide', getPropertyTypeIcon(propertyType));
 		propertyIconSpan.appendChild(iconElement);
-		
+
 		// Create property label
 		const propertyLabel = document.createElement('label');
 		propertyLabel.setAttribute('for', property.name);
 		propertyLabel.textContent = property.name;
-		
+
 		// Assemble key container
 		metadataPropertyKey.appendChild(propertyIconSpan);
 		metadataPropertyKey.appendChild(propertyLabel);
-		
+
 		// Create metadata property value container
 		const metadataPropertyValue = document.createElement('div');
 		metadataPropertyValue.className = 'metadata-property-value';
-		
+
 		// Create input element based on type
 		const inputElement = document.createElement('input');
 		inputElement.id = property.name;
 		inputElement.setAttribute('data-type', propertyType);
 		inputElement.setAttribute('data-template-value', property.value);
-		
+
 		if (propertyType === 'checkbox') {
 			inputElement.type = 'checkbox';
 			if (value === 'true') {
@@ -837,9 +827,9 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 			inputElement.type = 'text';
 			inputElement.value = value;
 		}
-		
+
 		metadataPropertyValue.appendChild(inputElement);
-		
+
 		// Assemble property div
 		propertyDiv.appendChild(metadataPropertyKey);
 		propertyDiv.appendChild(metadataPropertyValue);
@@ -861,7 +851,6 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 
 	const noteNameField = document.getElementById('note-name-field') as HTMLTextAreaElement;
 	if (noteNameField) {
-		let formattedNoteName = await memoizedCompileTemplate(currentTabId!, template.noteNameFormat, variables, currentTabId ? await getTabInfo(currentTabId).then(tab => tab.url || '') : '');
 		noteNameField.setAttribute('data-template-value', template.noteNameFormat);
 		noteNameField.value = formattedNoteName.trim();
 		adjustNoteNameHeight(noteNameField);
@@ -869,15 +858,14 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 
 	const pathField = document.getElementById('path-name-field') as HTMLInputElement;
 	const pathContainer = document.querySelector('.vault-path-container') as HTMLElement;
-	
+
 	if (pathField && pathContainer) {
 		const isDailyNote = template.behavior === 'append-daily' || template.behavior === 'prepend-daily';
-		
+
 		if (isDailyNote) {
 			pathField.style.display = 'none';
 		} else {
 			pathContainer.style.display = 'flex';
-			let formattedPath = await memoizedCompileTemplate(currentTabId!, template.path, variables, currentTabId ? await getTabInfo(currentTabId).then(tab => tab.url || '') : '');
 			pathField.value = formattedPath;
 			pathField.setAttribute('data-template-value', template.path);
 		}
@@ -886,8 +874,7 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 	const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
 	if (noteContentField) {
 		if (template.noteContentFormat) {
-			let content = await memoizedCompileTemplate(currentTabId!, template.noteContentFormat, variables, currentTabId ? await getTabInfo(currentTabId).then(tab => tab.url || '') : '');
-			noteContentField.value = content;
+			noteContentField.value = formattedContent;
 			noteContentField.setAttribute('data-template-value', template.noteContentFormat);
 		} else {
 			noteContentField.value = '';
@@ -897,7 +884,7 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 
 	if (template) {
 		if (generalSettings.interpreterEnabled) {
-			await initializeInterpreter(template, variables, currentTabId!, currentTabId ? await getTabInfo(currentTabId).then(tab => tab.url || '') : '');
+			await initializeInterpreter(template, variables, currentTabId!, currentUrl);
 
 			// Check if there are any prompt variables
 			const promptVariables = collectPromptVariables(template);
@@ -912,8 +899,8 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 					if (!modelConfig) {
 						throw new Error(`Model configuration not found for ${selectedModelId}`);
 					}
-					await handleInterpreterUI(template, variables, currentTabId!, currentTabId ? await getTabInfo(currentTabId).then(tab => tab.url || '') : '', modelConfig);
-					
+					await handleInterpreterUI(template, variables, currentTabId!, currentUrl, modelConfig);
+
 					// Ensure the button shows the completed state after auto-run
 					if (interpretBtn) {
 						interpretBtn.classList.add('done');
@@ -929,7 +916,7 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 			}
 		}
 
-		const replacedTemplate = await getReplacedTemplate(template, variables, currentTabId!, currentTabId ? await getTabInfo(currentTabId).then(tab => tab.url || '') : '');
+		const replacedTemplate = await getReplacedTemplate(template, variables, currentTabId!, currentUrl);
 		debugLog('Variables', 'Current template with replaced variables:', JSON.stringify(replacedTemplate, null, 2));
 	}
 }
