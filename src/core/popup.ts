@@ -46,8 +46,8 @@ const memoizedCompileTemplate = memoizeWithExpiration(
 		return compileTemplate(tabId, template, variables, currentUrl);
 	},
 	{
-		expirationMs: 50,
-		keyFn: (tabId: number, template: string, variables: { [key: string]: string }, currentUrl: string) => 
+		expirationMs: 5000,
+		keyFn: (tabId: number, template: string, variables: { [key: string]: string }, currentUrl: string) =>
 			`${tabId}-${template}-${currentUrl}`
 	}
 );
@@ -57,7 +57,7 @@ const memoizedGenerateFrontmatter = memoizeWithExpiration(
 	async (properties: Property[]) => {
 		return generateFrontmatter(properties);
 	},
-	{ expirationMs: 50 }
+	{ expirationMs: 5000 }
 );
 
 // Helper function to get tab info from background script
@@ -89,14 +89,14 @@ async function getCurrentTabInfo(): Promise<{ url: string; title?: string }> {
 	}
 }
 
-// Memoize extractPageContent with URL-sensitive key and short expiration
+// Memoize extractPageContent with URL-sensitive key
 const memoizedExtractPageContent = memoizeWithExpiration(
 	async (tabId: number) => {
 		await getTabInfo(tabId);
 		return extractPageContent(tabId);
 	},
-	{ 
-		expirationMs: 50, 
+	{
+		expirationMs: 5000,
 		keyFn: async (tabId: number) => {
 			const tab = await getTabInfo(tabId);
 			return `${tabId}-${tab.url}`;
@@ -155,7 +155,6 @@ async function initializeExtension(tabId: number) {
 			setPopupDimensions();
 		}, 0);
 
-		loadedSettings = await loadSettings();
 		debugLog('Settings', 'General settings:', loadedSettings);
 
 		templates = await loadTemplates();
@@ -190,8 +189,6 @@ async function initializeExtension(tabId: number) {
 			showError('onlyHttpSupported');
 			return;
 		}
-
-		await loadAndSetupTemplates();
 
 		// Setup message listeners
 		setupMessageListeners();
@@ -282,7 +279,7 @@ function setupMessageListeners() {
 }
 
 document.addEventListener('DOMContentLoaded', async function() {
-	const settings = await loadSettings();
+	loadedSettings = await loadSettings();
 	if (isIframe) {
 		document.documentElement.classList.add('is-embedded');
 	}
@@ -302,7 +299,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 		const currentBrowser = await detectBrowser();
 		const isMobile = currentBrowser === 'mobile-safari';
 
-		const openBehavior: Settings['openBehavior'] = isMobile ? 'popup' : settings.openBehavior;
+		const openBehavior: Settings['openBehavior'] = isMobile ? 'popup' : loadedSettings.openBehavior;
 
 		// Check if we should open in an iframe, but only if the URL is valid
 		if (isValidUrl(tab.url) && !isBlankPage(tab.url) && openBehavior === 'embedded' && !isIframe && !isSidePanel) {
