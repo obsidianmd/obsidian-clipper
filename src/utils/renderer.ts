@@ -628,6 +628,12 @@ async function evaluateFilter(expr: FilterExpression, state: RenderState): Promi
 				if (/^["'].*["']$/.test(a) || a.includes('":"') || a.includes("':'")) {
 					return a;
 				}
+				// Don't quote simple values that don't need quoting
+				// e.g., "3:4", "2n", "abc" should stay unquoted
+				// Only quote strings with spaces or that look like they need protection
+				if (/^[\w.:+\-*/]+$/.test(a)) {
+					return a;
+				}
 				return `"${a}"`;
 			}
 			return String(a);

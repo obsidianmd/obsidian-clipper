@@ -814,6 +814,24 @@ function parseFilterArgument(state: ParserState): Expression | null {
 	// For unquoted values (numbers, identifiers), check for colon-separated continuation
 	// e.g., nth:1,2,3,5,7:7 where "7:7" is a range
 
+	// Handle number+identifier patterns like "2n" for nth filter
+	// The tokenizer splits "2n" into number "2" and identifier "n"
+	if (first.type === 'literal' && startToken.type === 'number' && check(state, 'identifier')) {
+		const idToken = peek(state);
+		// Only consume single-letter identifiers that follow numbers (like 2n, 3n)
+		if (idToken.value.length === 1 && /^[a-z]$/i.test(idToken.value)) {
+			advance(state);
+			const combined = String(first.value) + idToken.value;
+			return {
+				type: 'literal',
+				value: combined,
+				raw: combined,
+				line: first.line,
+				column: first.column,
+			};
+		}
+	}
+
 	// If there's no colon following, return the original expression to preserve its type
 	// This is important for numeric args like slice:3,4 where we need actual numbers
 	if (!check(state, 'colon')) {
@@ -1677,6 +1695,16 @@ function expressionToString(expr: Expression): string {
 	switch (expr.type) {
 		case 'literal':
 			if (typeof expr.value === 'string') {
+				// Don't double-quote strings that already contain quotes
+				// e.g., '"h":"H"' should stay as-is
+				if (/^["'].*["']$/.test(expr.value) || expr.value.includes('":"') || expr.value.includes("':'")) {
+					return expr.value;
+				}
+				// Don't quote simple values like "2n", "3:4", etc.
+				// Only quote strings with spaces or special chars that need protection
+				if (/^[\w.:+\-*/]+$/.test(expr.value)) {
+					return expr.value;
+				}
 				return `"${expr.value}"`;
 			}
 			return String(expr.value);
@@ -1701,7 +1729,8 @@ function expressionToString(expr: Expression): string {
 
 function argsToParamString(args: Expression[]): string | undefined {
 	if (args.length === 0) return undefined;
-	return args.map(expressionToString).join(':');
+	// Join args with comma - this matches how the parser now separates args
+	return args.map(expressionToString).join(',');
 }
 
 /**

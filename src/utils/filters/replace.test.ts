@@ -2,6 +2,7 @@ import { describe, test, expect } from 'vitest';
 import { replace, validateReplaceParams } from './replace';
 import { render } from '../renderer';
 import { applyFilters } from '../filters';
+import { parse, validateFilters } from '../parser';
 
 describe('replace filter', () => {
 	test('simple replacement', () => {
@@ -96,6 +97,13 @@ describe('replace param validation', () => {
 		const result = validateReplaceParams('"old""new"');
 		expect(result.valid).toBe(false);
 		expect(result.error).toContain('quoted');
+	});
+
+	test('validates multiple pairs without errors via parser', () => {
+		const result = parse('{{msg|replace:"h":"H","d":"D"}}');
+		expect(result.errors).toHaveLength(0);
+		const filterWarnings = validateFilters(result.ast);
+		expect(filterWarnings).toHaveLength(0);
 	});
 });
 
