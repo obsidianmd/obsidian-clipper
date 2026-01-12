@@ -681,6 +681,47 @@ function parseFilterArgument(state: ParserState): Expression | null {
 		};
 	}
 
+	// Handle bracket patterns like [0-9] as literal regex character classes
+	// e.g., split:[0-9] or split:[a-zA-Z]
+	if (check(state, 'lbracket')) {
+		let value = '';
+		let bracketDepth = 0;
+		const startLine = peek(state).line;
+		const startColumn = peek(state).column;
+
+		// Consume everything from [ to matching ]
+		while (!isAtEnd(state)) {
+			const token = peek(state);
+
+			if (token.type === 'lbracket') {
+				bracketDepth++;
+			} else if (token.type === 'rbracket') {
+				bracketDepth--;
+				if (bracketDepth === 0) {
+					value += token.value;
+					advance(state);
+					break;
+				}
+			}
+
+			// Stop if we hit pipe or variable_end without closing bracket
+			if (bracketDepth === 0 && (token.type === 'pipe' || token.type === 'variable_end' || token.type === 'comma')) {
+				break;
+			}
+
+			value += token.value;
+			advance(state);
+		}
+
+		return {
+			type: 'literal',
+			value: value,
+			raw: value,
+			line: startLine,
+			column: startColumn,
+		};
+	}
+
 	// Check for arrow function: identifier => expression
 	// e.g., map:tweet => ({text: tweet.text})
 	if (check(state, 'identifier')) {
@@ -737,10 +778,37 @@ function parseFilterArgument(state: ParserState): Expression | null {
 	const first = parsePrimaryExpression(state);
 	if (!first) return null;
 
-	// If this is a quoted string, return it as-is without consuming colons
-	// Colons after quoted strings are argument separators (e.g., replace:"old":"new")
+	// For quoted strings, chain together :string patterns as a single argument
+	// e.g., replace:"old":"new" should be one arg "old":"new", not two args
 	if (first.type === 'literal' && startToken.type === 'string') {
-		return first;
+		// Format string with quotes preserved
+		const formatString = (val: any) => `"${val}"`;
+		let combined = formatString(first.value);
+
+		// Check if followed by :string pattern - chain them together
+		while (check(state, 'colon')) {
+			const savedPos = state.pos;
+			advance(state); // consume ':'
+
+			if (check(state, 'string')) {
+				const next = parsePrimaryExpression(state);
+				if (next && next.type === 'literal') {
+					combined += ':' + formatString(next.value);
+				}
+			} else {
+				// Not a string after colon, restore position
+				state.pos = savedPos;
+				break;
+			}
+		}
+
+		return {
+			type: 'literal',
+			value: combined,
+			raw: combined,
+			line: first.line,
+			column: first.column,
+		};
 	}
 
 	// For unquoted values (numbers, identifiers), check for colon-separated continuation
@@ -837,10 +905,11 @@ function parseFilterExpression(state: ParserState): Expression | null {
 				// Supports: filter:arg, filter:arg1,arg2, filter:"str1":"str2"
 				const arg = parseFilterArgument(state);
 				if (arg) args.push(arg);
-				// Continue parsing comma-separated or colon-separated arguments
-				// Colon separates quoted string args (e.g., replace:"old":"new")
-				while (check(state, 'comma') || check(state, 'colon')) {
-					advance(state); // consume ',' or ':'
+				// Continue parsing comma-separated arguments
+				// Note: colons within quoted string pairs (e.g., "old":"new") are
+				// handled by parseFilterArgument, not as separators here
+				while (check(state, 'comma')) {
+					advance(state); // consume ','
 					const nextArg = parseFilterArgument(state);
 					if (nextArg) args.push(nextArg);
 				}

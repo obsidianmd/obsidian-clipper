@@ -127,6 +127,34 @@ describe('Parser', () => {
 			expect(innerFilter.name).toBe('lower');
 		});
 
+		test('parses filter with multiple quoted string pairs', () => {
+			// replace:"h":"H","d":"D" should be parsed as 2 args, not 4
+			const result = parse('{{title|replace:"h":"H","d":"D"}}');
+			expect(result.errors).toHaveLength(0);
+
+			const varNode = result.ast[0] as VariableNode;
+			const filterExpr = varNode.expression as FilterExpression;
+			expect(filterExpr.name).toBe('replace');
+			expect(filterExpr.args).toHaveLength(2);
+			// Each arg should be the full "search":"replace" pair
+			expect(isLiteral(filterExpr.args[0])).toBe(true);
+			expect((filterExpr.args[0] as LiteralExpression).value).toBe('"h":"H"');
+			expect(isLiteral(filterExpr.args[1])).toBe(true);
+			expect((filterExpr.args[1] as LiteralExpression).value).toBe('"d":"D"');
+		});
+
+		test('parses filter with single quoted string pair', () => {
+			const result = parse('{{title|replace:"old":"new"}}');
+			expect(result.errors).toHaveLength(0);
+
+			const varNode = result.ast[0] as VariableNode;
+			const filterExpr = varNode.expression as FilterExpression;
+			expect(filterExpr.name).toBe('replace');
+			expect(filterExpr.args).toHaveLength(1);
+			expect(isLiteral(filterExpr.args[0])).toBe(true);
+			expect((filterExpr.args[0] as LiteralExpression).value).toBe('"old":"new"');
+		});
+
 		test('parses variable with whitespace control', () => {
 			const result = parse('{{ title }}');
 			expect(result.errors).toHaveLength(0);

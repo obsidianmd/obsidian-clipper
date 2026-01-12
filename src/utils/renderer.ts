@@ -617,18 +617,22 @@ async function evaluateFilter(expr: FilterExpression, state: RenderState): Promi
 	}
 
 	// Use built-in filters via applyFilters
-	// Build filter string with appropriate separators:
-	// - String args use colons: replace:"old":"new"
-	// - Numeric/other args use commas: slice:3,4
+	// Build filter string - args are comma-separated
+	// Quoted string pairs like "old":"new" come through as single args already quoted
 	let filterString = expr.name;
 	if (args.length > 0) {
-		const formattedArgs = args.map(a =>
-			typeof a === 'string' ? `"${a}"` : String(a)
-		);
-		// Check if all args are non-strings (numeric) - use comma separator
-		const allNumeric = args.every(a => typeof a === 'number');
-		const separator = allNumeric ? ',' : ':';
-		filterString += ':' + formattedArgs.join(separator);
+		const formattedArgs = args.map(a => {
+			if (typeof a === 'string') {
+				// Don't double-quote strings that already contain quoted pairs
+				// e.g., "old":"new" should stay as-is, not become ""old":"new""
+				if (/^["'].*["']$/.test(a) || a.includes('":"') || a.includes("':'")) {
+					return a;
+				}
+				return `"${a}"`;
+			}
+			return String(a);
+		});
+		filterString += ':' + formattedArgs.join(',');
 	}
 
 	const stringValue = valueToString(value);
