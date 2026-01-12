@@ -1,5 +1,7 @@
 import { describe, test, expect } from 'vitest';
 import { replace, validateReplaceParams } from './replace';
+import { render } from '../renderer';
+import { applyFilters } from '../filters';
 
 describe('replace filter', () => {
 	test('simple replacement', () => {
@@ -44,6 +46,29 @@ describe('replace filter', () => {
 
 	test('handles special characters in replacement', () => {
 		expect(replace('hello:world', '"\\:":"-"')).toBe('hello-world');
+	});
+});
+
+describe('replace filter via renderer', () => {
+	// These tests verify the full parser → renderer → filter pipeline
+	const createContext = (variables: Record<string, any> = {}) => ({
+		variables,
+		currentUrl: 'https://example.com',
+		applyFilters,
+	});
+
+	test('applies multiple replacements through template', async () => {
+		const ctx = createContext({ msg: 'hello world' });
+		const result = await render('{{msg|replace:"e":"a","o":"0"}}', ctx);
+		expect(result.errors).toHaveLength(0);
+		expect(result.output).toBe('hall0 w0rld');
+	});
+
+	test('applies three replacements through template', async () => {
+		const ctx = createContext({ msg: 'hello world' });
+		const result = await render('{{msg|replace:"h":"H"," ":"-","d":"D"}}', ctx);
+		expect(result.errors).toHaveLength(0);
+		expect(result.output).toBe('Hello-worlD');
 	});
 });
 
