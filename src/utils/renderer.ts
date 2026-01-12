@@ -25,21 +25,13 @@ import {
 	MemberExpression,
 	parse,
 } from './parser';
+import { applyFilterDirect as builtInApplyFilterDirect } from './filters';
 
-// Filter application function type
-type ApplyFiltersFn = (value: string, filters: string, currentUrl: string) => string;
+// Filter application function type for direct invocation (already-parsed filter name and params)
+type ApplyFilterDirectFn = (value: string, filterName: string, paramString: string | undefined, currentUrl: string) => string;
 
-// Default filter implementation (just returns value unchanged)
-// In the browser extension, this will be replaced with the real implementation
-let defaultApplyFilters: ApplyFiltersFn = (value: string) => value;
-
-/**
- * Set the default filter implementation.
- * Call this once at startup with the real applyFilters function.
- */
-export function setFilterImplementation(impl: ApplyFiltersFn): void {
-	defaultApplyFilters = impl;
-}
+// Default filter implementation using the built-in filters
+const defaultApplyFilterDirect: ApplyFilterDirectFn = builtInApplyFilterDirect;
 
 // ============================================================================
 // Render Context
@@ -69,8 +61,8 @@ export interface RenderContext {
 	/** Custom filter functions (optional, merged with built-in filters) */
 	filters?: Record<string, (...args: any[]) => any>;
 
-	/** Custom applyFilters implementation (optional, uses default if not provided) */
-	applyFilters?: ApplyFiltersFn;
+	/** Custom applyFilterDirect implementation (optional, uses built-in if not provided) */
+	applyFilterDirect?: ApplyFilterDirectFn;
 }
 
 /**
@@ -87,6 +79,8 @@ export interface RenderOptions {
 export interface RenderResult {
 	output: string;
 	errors: RenderError[];
+	/** True if output contains deferred variables that need post-processing (prompts, unresolved selectors, etc.) */
+	hasDeferredVariables: boolean;
 }
 
 export interface RenderError {
@@ -122,6 +116,7 @@ export async function render(
 				line: e.line,
 				column: e.column,
 			})),
+			hasDeferredVariables: false,
 		};
 	}
 
@@ -141,6 +136,7 @@ export async function renderAST(
 		context,
 		errors,
 		pendingTrimRight: false,
+		hasDeferredVariables: false,
 	};
 
 	let output = '';
@@ -171,7 +167,7 @@ export async function renderAST(
 		output = output.trim();
 	}
 
-	return { output, errors };
+	return { output, errors, hasDeferredVariables: state.hasDeferredVariables };
 }
 
 // ============================================================================
@@ -182,6 +178,8 @@ interface RenderState {
 	context: RenderContext;
 	errors: RenderError[];
 	pendingTrimRight: boolean;
+	/** Tracks whether any deferred variables (prompts, unresolved selectors, etc.) were output */
+	hasDeferredVariables: boolean;
 }
 
 // ============================================================================
@@ -233,6 +231,8 @@ async function renderVariable(node: VariableNode, state: RenderState): Promise<s
 			if (node.trimRight) {
 				state.pendingTrimRight = true;
 			}
+			// Mark that we have deferred variables that need post-processing
+			state.hasDeferredVariables = true;
 			// Reconstruct the template syntax for prompt post-processor
 			return reconstructPromptTemplate(node.expression);
 		}
@@ -505,6 +505,7 @@ async function evaluateIdentifier(expr: IdentifierExpression, state: RenderState
 		}
 		// Return placeholder syntax for post-processor to handle
 		// This allows selectors to be used in templates and resolved later
+		state.hasDeferredVariables = true;
 		return `{{${name}}}`;
 	}
 
@@ -513,6 +514,7 @@ async function evaluateIdentifier(expr: IdentifierExpression, state: RenderState
 		const value = resolveSchemaVariable(name, state.context.variables);
 		if (value === undefined) {
 			// Not in variables, preserve for post-processor
+			state.hasDeferredVariables = true;
 			return `{{${name}}}`;
 		}
 		return value;
@@ -520,6 +522,7 @@ async function evaluateIdentifier(expr: IdentifierExpression, state: RenderState
 
 	// Prompt variables - preserve for post-processing
 	if (name.startsWith('prompt:') || name.startsWith('"')) {
+		state.hasDeferredVariables = true;
 		return `{{${name}}}`;
 	}
 
@@ -616,10 +619,11 @@ async function evaluateFilter(expr: FilterExpression, state: RenderState): Promi
 		return state.context.filters[expr.name](value, ...args);
 	}
 
-	// Use built-in filters via applyFilters
-	// Build filter string - args are comma-separated
-	// Quoted string pairs like "old":"new" come through as single args already quoted
-	let filterString = expr.name;
+	const stringValue = valueToString(value);
+
+	// Build parameter string from args (already parsed by AST)
+	// This avoids the round-trip of building "filterName:args" then re-parsing it
+	let paramString: string | undefined;
 	if (args.length > 0) {
 		const formattedArgs = args.map(a => {
 			if (typeof a === 'string') {
@@ -638,14 +642,12 @@ async function evaluateFilter(expr: FilterExpression, state: RenderState): Promi
 			}
 			return String(a);
 		});
-		filterString += ':' + formattedArgs.join(',');
+		paramString = formattedArgs.join(',');
 	}
 
-	const stringValue = valueToString(value);
-
-	// Use context's applyFilters if provided, otherwise use default
-	const applyFiltersFn = state.context.applyFilters || defaultApplyFilters;
-	return applyFiltersFn(stringValue, filterString, state.context.currentUrl);
+	// Use direct filter invocation (optimized path - no re-parsing needed)
+	const applyFilterDirectFn = state.context.applyFilterDirect || defaultApplyFilterDirect;
+	return applyFilterDirectFn(stringValue, expr.name, paramString, state.context.currentUrl);
 }
 
 function evaluateContains(left: any, right: any): boolean {

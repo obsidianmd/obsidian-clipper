@@ -1,37 +1,24 @@
 import { describe, test, expect } from 'vitest';
 import { render, renderTemplate, RenderContext } from './renderer';
 
-// Simple filter implementation for testing
-function testApplyFilters(value: string, filters: string, _currentUrl: string): string {
-	if (!filters) return value;
-
-	const filterParts = filters.split('|');
-	let result = value;
-
-	for (const part of filterParts) {
-		const [filterName] = part.split(':');
-		switch (filterName.trim()) {
-			case 'lower':
-				result = result.toLowerCase();
-				break;
-			case 'upper':
-				result = result.toUpperCase();
-				break;
-			case 'trim':
-				result = result.trim();
-				break;
-			case 'default':
-				if (!result) {
-					const match = part.match(/default:"([^"]+)"/);
-					if (match) result = match[1];
-				}
-				break;
-			default:
-				break;
-		}
+// Simple filter implementation for testing (direct invocation)
+function testApplyFilterDirect(value: string, filterName: string, _paramString: string | undefined, _currentUrl: string): string {
+	switch (filterName) {
+		case 'lower':
+			return value.toLowerCase();
+		case 'upper':
+			return value.toUpperCase();
+		case 'trim':
+			return value.trim();
+		case 'default':
+			if (!value && _paramString) {
+				const match = _paramString.match(/^"([^"]+)"$/);
+				if (match) return match[1];
+			}
+			return value;
+		default:
+			return value;
 	}
-
-	return result;
 }
 
 // Helper to create a basic context
@@ -39,7 +26,7 @@ function createContext(variables: Record<string, any> = {}): RenderContext {
 	return {
 		variables,
 		currentUrl: 'https://example.com',
-		applyFilters: testApplyFilters,
+		applyFilterDirect: testApplyFilterDirect,
 	};
 }
 

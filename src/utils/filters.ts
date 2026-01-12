@@ -237,6 +237,71 @@ function parseFilterString(filterString: string): string[] {
 	return parts;
 }
 
+/**
+ * Apply a single filter by name with a pre-formatted parameter string.
+ * Use this when you already have the filter name and parameters separated.
+ * For filter strings like "filter1:arg|filter2", use applyFilters() instead.
+ *
+ * @param value - The input value to filter
+ * @param filterName - The name of the filter to apply (e.g., "replace", "slice")
+ * @param paramString - The parameter string without the filter name (e.g., "0,5" for slice:0,5)
+ * @param currentUrl - Optional current URL for filters that need it
+ * @returns The filtered value as a string
+ */
+export function applyFilterDirect(
+	value: string | any[],
+	filterName: string,
+	paramString: string | undefined,
+	currentUrl?: string
+): string {
+	debugLog('Filters', 'applyFilterDirect called with:', { value, filterName, paramString, currentUrl });
+
+	const filter = filters[filterName];
+	if (!filter) {
+		console.error(`Invalid filter: ${filterName}`);
+		debugLog('Filters', `Available filters:`, Object.keys(filters));
+		return typeof value === 'string' ? value : JSON.stringify(value);
+	}
+
+	// Convert the input to a string if it's not already
+	const stringInput = typeof value === 'string' ? value : JSON.stringify(value);
+
+	// Build params array for special case handling
+	let params = paramString ? [paramString] : [];
+
+	// Special case for markdown filter: use currentUrl if no params provided
+	if (filterName === 'markdown' && !paramString && currentUrl) {
+		params = [currentUrl];
+	}
+
+	// Special case for fragment_link filter: append currentUrl
+	if (filterName === 'fragment_link' && currentUrl) {
+		params.push(currentUrl);
+	}
+
+	// Apply the filter
+	const output = filter(stringInput, params.join(':'));
+
+	debugLog('Filters', `Filter ${filterName} output:`, output);
+
+	// If the output is a string that looks like JSON, try to parse it
+	if (typeof output === 'string' && (output.startsWith('[') || output.startsWith('{'))) {
+		try {
+			const parsed = JSON.parse(output);
+			return JSON.stringify(parsed);
+		} catch {
+			return output;
+		}
+	}
+
+	return typeof output === 'string' ? output : JSON.stringify(output);
+}
+
+/**
+ * Apply filters from a filter string (legacy path).
+ * Used when filters are specified as a string like "filter1:arg|filter2".
+ * For the optimized path with pre-parsed filters, use applyFilterDirect.
+ */
 export function applyFilters(value: string | any[], filterString: string, currentUrl?: string): string {
 	debugLog('Filters', 'applyFilters called with:', { value, filterString, currentUrl });
 
@@ -262,7 +327,7 @@ export function applyFilters(value: string | any[], filterString: string, curren
 			if (filter) {
 				// Convert the input to a string if it's not already
 				const stringInput = typeof result === 'string' ? result : JSON.stringify(result);
-				
+
 				// Special case for markdown filter: use currentUrl if no params provided
 				if (name === 'markdown' && params.length === 0 && currentUrl) {
 					params.push(currentUrl);
@@ -271,11 +336,11 @@ export function applyFilters(value: string | any[], filterString: string, curren
 				// Special case for fragment filter: use currentUrl if no params provided
 				if (name === 'fragment_link' && currentUrl) {
 					params.push(currentUrl);
-				} 
-				
+				}
+
 				// Apply the filter and get the output
 				const output = filter(stringInput, params.join(':'));
-				
+
 				debugLog('Filters', `Filter ${name} output:`, output);
 
 				// If the output is a string that looks like JSON, try to parse it

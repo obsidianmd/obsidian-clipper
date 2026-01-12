@@ -2,15 +2,12 @@
 // This module provides the main entry point for template compilation,
 // integrating the AST-based renderer with the variable processors.
 
-import { render, RenderContext, setFilterImplementation } from './renderer';
-import { applyFilters } from './filters';
+import { render, RenderContext } from './renderer';
+import { applyFilterDirect } from './filters';
 import { processSimpleVariable } from './variables/simple';
 import { processSelector, resolveSelector } from './variables/selector';
 import { processSchema } from './variables/schema';
 import { processPrompt } from './variables/prompt';
-
-// Initialize the filter implementation for the renderer
-setFilterImplementation(applyFilters);
 
 /**
  * Main function to compile a template with the given variables.
@@ -44,7 +41,7 @@ export async function compileTemplate(
 		variables,
 		currentUrl,
 		tabId,
-		applyFilters,
+		applyFilterDirect,
 		asyncResolver,
 	};
 
@@ -54,6 +51,12 @@ export async function compileTemplate(
 	// Log any errors (but don't fail - return partial output)
 	if (result.errors.length > 0) {
 		console.error('Template compilation errors:', result.errors);
+	}
+
+	// Skip post-processing if no deferred variables were output
+	// This optimization avoids regex-parsing the entire output when not needed
+	if (!result.hasDeferredVariables) {
+		return result.output;
 	}
 
 	// Post-process: handle special variable types that weren't processed by the renderer
