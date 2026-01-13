@@ -50,7 +50,7 @@ export async function compileTemplate(
 
 	// Log any errors (but don't fail - return partial output)
 	if (result.errors.length > 0) {
-		console.error('Template compilation errors:', result.errors);
+		console.error('Template compilation errors:', result.errors.map(e => `Line ${e.line}: ${e.message}`).join('; '));
 	}
 
 	// Skip post-processing if no deferred variables were output

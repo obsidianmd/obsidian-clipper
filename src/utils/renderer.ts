@@ -290,24 +290,6 @@ function reconstructPromptTemplateInner(expr: Expression): string {
 	return String(expr);
 }
 
-/**
- * Reconstruct a filter expression with a deferred placeholder value.
- * Takes a placeholder like {{schema:uploadDate}} and a filter expression,
- * returns the full template syntax like {{schema:uploadDate|date:"YYYY-MM-DD"}}
- */
-function reconstructFilterExpression(placeholder: string, expr: FilterExpression): string {
-	// Extract the inner variable name from the placeholder (remove {{ and }})
-	const innerVar = placeholder.slice(2, -2);
-
-	// Build the filter string
-	let filterStr = `|${expr.name}`;
-	if (expr.args.length > 0) {
-		filterStr += `:${formatFilterArgs(expr.args)}`;
-	}
-
-	return `{{${innerVar}${filterStr}}}`;
-}
-
 async function renderIf(node: IfNode, state: RenderState): Promise<string> {
 	try {
 		// Evaluate main condition
@@ -352,6 +334,14 @@ async function renderIf(node: IfNode, state: RenderState): Promise<string> {
 async function renderFor(node: ForNode, state: RenderState): Promise<string> {
 	try {
 		const iterableValue = await evaluateExpression(node.iterable, state);
+
+		// Silently handle undefined/null - this is expected when optional data doesn't exist
+		if (iterableValue === undefined || iterableValue === null) {
+			if (node.trimRight) {
+				state.pendingTrimRight = true;
+			}
+			return '';
+		}
 
 		if (!Array.isArray(iterableValue)) {
 			state.errors.push({
@@ -521,11 +511,8 @@ async function evaluateIdentifier(expr: IdentifierExpression, state: RenderState
 	// Schema variables - resolve with shorthand support
 	if (name.startsWith('schema:')) {
 		const value = resolveSchemaVariable(name, state.context.variables);
-		if (value === undefined) {
-			// Not in variables, preserve for post-processor
-			state.hasDeferredVariables = true;
-			return `{{${name}}}`;
-		}
+		// Return undefined if not found - schema variables are resolved at render time,
+		// not in post-processing, so there's no benefit to preserving a placeholder
 		return value;
 	}
 
@@ -616,14 +603,6 @@ async function evaluateUnary(expr: UnaryExpression, state: RenderState): Promise
 
 async function evaluateFilter(expr: FilterExpression, state: RenderState): Promise<any> {
 	const value = await evaluateExpression(expr.value, state);
-
-	// Check if value is a deferred placeholder (unresolved variable like {{schema:uploadDate}})
-	// If so, preserve the filter chain for post-processing instead of applying filters now
-	if (typeof value === 'string' && value.startsWith('{{') && value.endsWith('}}')) {
-		state.hasDeferredVariables = true;
-		// Reconstruct the full filter expression for post-processing
-		return reconstructFilterExpression(value, expr);
-	}
 
 	// Evaluate filter arguments
 	const args: any[] = [];
