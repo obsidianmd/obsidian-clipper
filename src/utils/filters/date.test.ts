@@ -29,7 +29,7 @@ describe('date filter', () => {
 
 	test('handles empty string', () => {
 		const result = date('');
-		expect(result).toBe('Invalid Date');
+		expect(result).toBe('');
 	});
 });
 

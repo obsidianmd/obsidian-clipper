@@ -21,6 +21,11 @@ export const validateListParams = (param: string | undefined): ParamValidationRe
 };
 
 export const list = (input: string | any[], param?: string): string => {
+	// Return empty string as-is without attempting to parse
+	if (input === '') {
+		return input;
+	}
+
 	const processListItem = (item: any, type: ListType, depth: number = 0): string => {
 		const indent = '\t'.repeat(depth);
 		let prefix: string;

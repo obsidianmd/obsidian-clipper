@@ -25,6 +25,11 @@ export const slice = (str: string, param?: string): string => {
 		return str;
 	}
 
+	// Return empty string as-is without attempting to parse
+	if (str === '') {
+		return str;
+	}
+
 	const [start, end] = param.split(',').map(p => p.trim()).map(p => {
 		if (p === '') return undefined;
 		const num = parseInt(p, 10);
@@ -35,7 +40,10 @@ export const slice = (str: string, param?: string): string => {
 	try {
 		value = JSON.parse(str);
 	} catch (error) {
-		console.error('Error parsing JSON in slice filter:', error);
+		// Only log error for non-trivial parse failures (not plain strings)
+		if (str.startsWith('[') || str.startsWith('{')) {
+			console.error('Error parsing JSON in slice filter:', error);
+		}
 		value = str;
 	}
 

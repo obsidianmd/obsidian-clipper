@@ -44,6 +44,11 @@ export const date_modify = (str: string, param?: string): string => {
 		return str;
 	}
 
+	// Return empty string as-is without attempting to parse
+	if (str === '') {
+		return str;
+	}
+
 	let date = dayjs(str);
 	if (!date.isValid()) {
 		console.error('Invalid date for date_modify filter:', str);

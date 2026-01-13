@@ -10,6 +10,11 @@ dayjs.extend(weekOfYear);
 dayjs.extend(advancedFormat);
 
 export const date = (str: string, param?: string): string => {
+	// Return empty string as-is without attempting to parse
+	if (str === '') {
+		return str;
+	}
+
 	// If the input is 'now' used in shorthands {{date}} and {{time}}, use the current date and time
 	const inputDate = str === 'now' ? new Date() : str;
 
