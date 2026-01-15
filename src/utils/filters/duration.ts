@@ -11,7 +11,7 @@ export const duration = (str: string, param?: string): string => {
 
 	try {
 		// Remove outer quotes if present
-		str = str.replace(/^["'](.*)["']$/, '$1');
+		str = str.replace(/^["'](.*)["']$/g, '$1');
 
 		// Parse ISO 8601 duration string
 		const matches = str.match(/^P(?:(\d+)Y)?(?:(\d+)M)?(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?)?$/);
@@ -26,14 +26,18 @@ export const duration = (str: string, param?: string): string => {
 
 		const [, years, months, days, hours, minutes, seconds] = matches;
 		
-		const dur = dayjs.duration({
-			years: years ? parseInt(years) : 0,
-			months: months ? parseInt(months) : 0,
-			days: days ? parseInt(days) : 0,
-			hours: hours ? parseInt(hours) : 0,
-			minutes: minutes ? parseInt(minutes) : 0,
-			seconds: seconds ? parseInt(seconds) : 0
-		});
+		// Convert all components to total seconds to ensure proper normalization
+		// Using dayjs.duration({ seconds: 1868 }) does NOT normalize (keeps 1868 in seconds field)
+		// Using dayjs.duration(1868, 'seconds') DOES normalize (converts to 31m 8s)
+		const totalSeconds = 
+			(years ? parseInt(years) * 365 * 24 * 3600 : 0) +
+			(months ? parseInt(months) * 30 * 24 * 3600 : 0) +
+			(days ? parseInt(days) * 24 * 3600 : 0) +
+			(hours ? parseInt(hours) * 3600 : 0) +
+			(minutes ? parseInt(minutes) * 60 : 0) +
+			(seconds ? parseInt(seconds) : 0);
+
+		const dur = dayjs.duration(totalSeconds, 'seconds');
 
 		return formatDuration(dur, param);
 	} catch (error) {
@@ -53,7 +57,7 @@ function formatDuration(dur: Duration, format?: string): string {
 	}
 
 	// Remove outer quotes and parentheses if present
-	format = format.replace(/^["'(](.*)["')]$/, '$1');
+	format = format.replace(/^["'(](.*)["')]$/g, '$1');
 
 	const hours = Math.floor(dur.asHours());
 	const minutes = dur.minutes();
@@ -73,4 +77,4 @@ function formatDuration(dur: Duration, format?: string): string {
 
 function padZero(num: number): string {
 	return num.toString().padStart(2, '0');
-} 
+}
