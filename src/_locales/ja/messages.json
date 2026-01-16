@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "詳細設定"
 	},
+	"advancedSettings": {
+		"message": "詳細設定"
+	},
 	"allProperties": {
 		"message": "すべてのプロパティ"
 	},
@@ -454,6 +457,42 @@
 	},
 	"modelRequiredFields": {
 		"message": "モデル名、プロバイダー、モデルIDは必須です。"
+	},
+	"modelSettingsMaxTokens": {
+		"message": "最大トークン数"
+	},
+	"modelSettingsMaxTokensDescription": {
+		"message": "応答の最大トークン数。"
+	},
+	"modelSettingsMaxTokensDescriptionWithLimit": {
+		"message": "応答の最大トークン数。モデルの上限: $1"
+	},
+	"modelSettingsReasoning": {
+		"message": "推論モード"
+	},
+	"modelSettingsReasoningDescription": {
+		"message": "モデルの既定の推論動作を上書きします。有効にすると、モデルは複雑な問題を段階的に解くためにより深く思考します。"
+	},
+	"modelSettingsReasoningEffort": {
+		"message": "推論の強度"
+	},
+	"modelSettingsReasoningEffortDescription": {
+		"message": "モデルが応答する前に内部推論にどれだけ時間をかけるか。"
+	},
+	"modelSettingsReasoningEffortHigh": {
+		"message": "高"
+	},
+	"modelSettingsReasoningEffortLow": {
+		"message": "低"
+	},
+	"modelSettingsReasoningEffortMedium": {
+		"message": "中"
+	},
+	"modelSettingsTemperature": {
+		"message": "温度"
+	},
+	"modelSettingsTemperatureDescription": {
+		"message": "応答のランダム性を制御します。値が高いほど創造的になり、低いほどより集中した出力になります。"
 	},
 	"models": {
 		"message": "モデル"

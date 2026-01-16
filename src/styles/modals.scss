@@ -107,3 +107,73 @@
 	background-color: hsla(var(--color-accent-hsl), 0.1);
 	color: var(--text-accent);
 }
+
+/* Collapsible advanced settings section */
+details.setting-item-group {
+	margin-top: 1rem;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-m);
+
+	summary.setting-item-group-header {
+		padding: 0.75rem 1rem;
+		cursor: pointer;
+		font-weight: 500;
+		font-size: var(--font-ui-small);
+		color: var(--text-muted);
+		list-style: none;
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+
+		&::-webkit-details-marker {
+			display: none;
+		}
+
+		&::before {
+			content: '';
+			width: 0;
+			height: 0;
+			border-style: solid;
+			border-width: 4px 0 4px 6px;
+			border-color: transparent transparent transparent var(--text-muted);
+			transition: transform var(--duration-fast) ease;
+		}
+
+		&:hover {
+			color: var(--text-normal);
+
+			&::before {
+				border-color: transparent transparent transparent var(--text-normal);
+			}
+		}
+	}
+
+	&[open] {
+		summary.setting-item-group-header::before {
+			transform: rotate(90deg);
+		}
+	}
+
+	.setting-item-group-content {
+		padding: 0 1rem 1rem;
+		border-top: 1px solid var(--background-modifier-border);
+
+		.setting-item {
+			padding-top: 0.75rem;
+
+			&:first-child {
+				margin-top: 0;
+			}
+		}
+	}
+}
+
+/* Model settings specific styles */
+#model-temperature,
+#model-max-tokens {
+	width: 100%;
+}
+
+#model-reasoning-effort {
+	width: 100%;
+}

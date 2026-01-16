@@ -42,7 +42,11 @@
 		"zip-webpack-plugin": "^4.0.1"
 	},
 	"dependencies": {
+		"@ai-sdk/anthropic": "^2.0.56",
+		"@ai-sdk/google": "^2.0.51",
+		"@ai-sdk/openai": "^2.0.88",
 		"@types/safari-extension": "^0.0.33",
+		"ai": "^5.0.116",
 		"dayjs": "^1.11.13",
 		"defuddle": "^0.6.6",
 		"dompurify": "^3.0.9",
@@ -51,6 +55,7 @@
 		"lz-string": "^1.5.0",
 		"mathml-to-latex": "^1.4.1",
 		"turndown": "^7.2.0",
-		"turndown-plugin-gfm": "^1.0.2"
+		"turndown-plugin-gfm": "^1.0.2",
+		"zod": "^4.1.8"
 	}
 }

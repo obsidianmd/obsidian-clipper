@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Pokročilé"
 	},
+	"advancedSettings": {
+		"message": "Pokročilá nastavení"
+	},
 	"allProperties": {
 		"message": "Všechny vlastnosti"
 	},
@@ -454,6 +457,42 @@
 	},
 	"modelRequiredFields": {
 		"message": "Název modelu, Poskytovatel a ID modelu jsou povinné."
+	},
+	"modelSettingsMaxTokens": {
+		"message": "Max. tokenů"
+	},
+	"modelSettingsMaxTokensDescription": {
+		"message": "Maximální počet tokenů v odpovědi."
+	},
+	"modelSettingsMaxTokensDescriptionWithLimit": {
+		"message": "Maximální počet tokenů v odpovědi. Limit modelu: $1"
+	},
+	"modelSettingsReasoning": {
+		"message": "Režim uvažování"
+	},
+	"modelSettingsReasoningDescription": {
+		"message": "Přepište výchozí způsob uvažování modelu. Po zapnutí bude model používat rozšířené uvažování a krok za krokem řešit složité problémy."
+	},
+	"modelSettingsReasoningEffort": {
+		"message": "Intenzita uvažování"
+	},
+	"modelSettingsReasoningEffortDescription": {
+		"message": "Kolik času model věnuje vnitřnímu uvažování před odpovědí."
+	},
+	"modelSettingsReasoningEffortHigh": {
+		"message": "Vysoké"
+	},
+	"modelSettingsReasoningEffortLow": {
+		"message": "Nízké"
+	},
+	"modelSettingsReasoningEffortMedium": {
+		"message": "Střední"
+	},
+	"modelSettingsTemperature": {
+		"message": "Teplota"
+	},
+	"modelSettingsTemperatureDescription": {
+		"message": "Řídí náhodnost odpovědí. Vyšší hodnoty zvyšují kreativitu výstupu, nižší ho činí cílenějším."
 	},
 	"models": {
 		"message": "Modely"

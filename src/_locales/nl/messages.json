@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Geavanceerd"
 	},
+	"advancedSettings": {
+		"message": "Geavanceerde instellingen"
+	},
 	"allProperties": {
 		"message": "Alle eigenschappen"
 	},
@@ -454,6 +457,42 @@
 	},
 	"modelRequiredFields": {
 		"message": "Modelnaam, Provider en Model-ID zijn verplicht."
+	},
+	"modelSettingsMaxTokens": {
+		"message": "Maximale tokens"
+	},
+	"modelSettingsMaxTokensDescription": {
+		"message": "Maximaal aantal tokens in de reactie."
+	},
+	"modelSettingsMaxTokensDescriptionWithLimit": {
+		"message": "Maximaal aantal tokens in de reactie. Modellimiet: $1"
+	},
+	"modelSettingsReasoning": {
+		"message": "Redeneermodus"
+	},
+	"modelSettingsReasoningDescription": {
+		"message": "Overschrijf het standaard redeneergedrag van het model. Als ingeschakeld gebruikt het model uitgebreid nadenken om complexe problemen stap voor stap te doorlopen."
+	},
+	"modelSettingsReasoningEffort": {
+		"message": "Redeneerinspanning"
+	},
+	"modelSettingsReasoningEffortDescription": {
+		"message": "Hoeveel tijd het model besteedt aan intern redeneren voordat het antwoord geeft."
+	},
+	"modelSettingsReasoningEffortHigh": {
+		"message": "Hoog"
+	},
+	"modelSettingsReasoningEffortLow": {
+		"message": "Laag"
+	},
+	"modelSettingsReasoningEffortMedium": {
+		"message": "Gemiddeld"
+	},
+	"modelSettingsTemperature": {
+		"message": "Temperatuur"
+	},
+	"modelSettingsTemperatureDescription": {
+		"message": "Beïnvloedt de willekeur in reacties. Hogere waarden maken de output creatiever, lagere waarden meer gericht."
 	},
 	"models": {
 		"message": "Modellen"

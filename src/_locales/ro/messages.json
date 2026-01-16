@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Avansat"
 	},
+	"advancedSettings": {
+		"message": "Setări avansate"
+	},
 	"allProperties": {
 		"message": "Toate proprietățile"
 	},
@@ -454,6 +457,42 @@
 	},
 	"modelRequiredFields": {
 		"message": "Numele modelului, furnizorul și ID-ul modelului sunt obligatorii."
+	},
+	"modelSettingsMaxTokens": {
+		"message": "Număr maxim de tokeni"
+	},
+	"modelSettingsMaxTokensDescription": {
+		"message": "Numărul maxim de tokeni în răspuns."
+	},
+	"modelSettingsMaxTokensDescriptionWithLimit": {
+		"message": "Numărul maxim de tokeni în răspuns. Limita modelului: $1"
+	},
+	"modelSettingsReasoning": {
+		"message": "Mod de raționare"
+	},
+	"modelSettingsReasoningDescription": {
+		"message": "Suprascrie comportamentul implicit de raționare al modelului. Când este activat, modelul va utiliza o gândire extinsă pentru a rezolva probleme complexe pas cu pas."
+	},
+	"modelSettingsReasoningEffort": {
+		"message": "Efort de raționare"
+	},
+	"modelSettingsReasoningEffortDescription": {
+		"message": "Cât timp petrece modelul pe raționamentul intern înainte de a răspunde."
+	},
+	"modelSettingsReasoningEffortHigh": {
+		"message": "Ridicat"
+	},
+	"modelSettingsReasoningEffortLow": {
+		"message": "Scăzut"
+	},
+	"modelSettingsReasoningEffortMedium": {
+		"message": "Mediu"
+	},
+	"modelSettingsTemperature": {
+		"message": "Temperatură"
+	},
+	"modelSettingsTemperatureDescription": {
+		"message": "Controlează aleatorietatea răspunsurilor. Valorile mai mari fac ieșirile mai creative, cele mai mici le fac mai concentrate."
 	},
 	"models": {
 		"message": "Modele"

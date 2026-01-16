@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Розширені"
 	},
+	"advancedSettings": {
+		"message": "Розширені налаштування"
+	},
 	"allProperties": {
 		"message": "Усі властивості"
 	},
@@ -454,6 +457,42 @@
 	},
 	"modelRequiredFields": {
 		"message": "Назва моделі, провайдер та ID моделі є обов'язковими."
+	},
+	"modelSettingsMaxTokens": {
+		"message": "Макс. токенів"
+	},
+	"modelSettingsMaxTokensDescription": {
+		"message": "Максимальна кількість токенів у відповіді."
+	},
+	"modelSettingsMaxTokensDescriptionWithLimit": {
+		"message": "Максимальна кількість токенів у відповіді. Ліміт моделі: $1"
+	},
+	"modelSettingsReasoning": {
+		"message": "Режим міркувань"
+	},
+	"modelSettingsReasoningDescription": {
+		"message": "Перевизначає стандартну поведінку моделі під час міркувань. Якщо ввімкнено, модель застосовуватиме розширене мислення для поетапного розв'язання складних задач."
+	},
+	"modelSettingsReasoningEffort": {
+		"message": "Зусилля міркувань"
+	},
+	"modelSettingsReasoningEffortDescription": {
+		"message": "Скільки часу модель витрачає на внутрішні міркування перед відповіддю."
+	},
+	"modelSettingsReasoningEffortHigh": {
+		"message": "Високе"
+	},
+	"modelSettingsReasoningEffortLow": {
+		"message": "Низьке"
+	},
+	"modelSettingsReasoningEffortMedium": {
+		"message": "Середнє"
+	},
+	"modelSettingsTemperature": {
+		"message": "Температура"
+	},
+	"modelSettingsTemperatureDescription": {
+		"message": "Контролює випадковість у відповідях. Вищі значення роблять відповіді більш креативними, нижчі — більш сфокусованими."
 	},
 	"models": {
 		"message": "Моделі"

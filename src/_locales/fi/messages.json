@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Lisäasetukset"
 	},
+	"advancedSettings": {
+		"message": "Lisäasetukset"
+	},
 	"allProperties": {
 		"message": "Kaikki ominaisuudet"
 	},
@@ -454,6 +457,42 @@
 	},
 	"modelRequiredFields": {
 		"message": "Mallin nimi, tarjoaja ja mallin tunnus ovat pakollisia."
+	},
+	"modelSettingsMaxTokens": {
+		"message": "Tokenien enimmäismäärä"
+	},
+	"modelSettingsMaxTokensDescription": {
+		"message": "Vastauksen tokenien enimmäismäärä."
+	},
+	"modelSettingsMaxTokensDescriptionWithLimit": {
+		"message": "Vastauksen tokenien enimmäismäärä. Mallin raja: $1"
+	},
+	"modelSettingsReasoning": {
+		"message": "Päättelytila"
+	},
+	"modelSettingsReasoningDescription": {
+		"message": "Ohittaa mallin oletuspäättelykäytöksen. Kun käytössä, malli käyttää laajennettua ajattelua ratkaistakseen monimutkaisia ongelmia askel askeleelta."
+	},
+	"modelSettingsReasoningEffort": {
+		"message": "Päättelyn intensiteetti"
+	},
+	"modelSettingsReasoningEffortDescription": {
+		"message": "Kuinka paljon aikaa malli käyttää sisäiseen päättelyyn ennen vastaamista."
+	},
+	"modelSettingsReasoningEffortHigh": {
+		"message": "Korkea"
+	},
+	"modelSettingsReasoningEffortLow": {
+		"message": "Matala"
+	},
+	"modelSettingsReasoningEffortMedium": {
+		"message": "Keskitaso"
+	},
+	"modelSettingsTemperature": {
+		"message": "Satunnaisuus"
+	},
+	"modelSettingsTemperatureDescription": {
+		"message": "Säätelee vastausten satunnaisuutta. Korkeammat arvot tekevät tuloksesta luovempaa, matalammat tekevät siitä tarkempaa."
 	},
 	"models": {
 		"message": "Mallit"

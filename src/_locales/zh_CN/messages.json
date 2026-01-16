@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "高级"
 	},
+	"advancedSettings": {
+		"message": "高级设置"
+	},
 	"allProperties": {
 		"message": "所有属性"
 	},
@@ -454,6 +457,42 @@
 	},
 	"modelRequiredFields": {
 		"message": "模型名称、提供商和模型 ID 是必需的。"
+	},
+	"modelSettingsMaxTokens": {
+		"message": "最大令牌数"
+	},
+	"modelSettingsMaxTokensDescription": {
+		"message": "响应中的最大令牌数。"
+	},
+	"modelSettingsMaxTokensDescriptionWithLimit": {
+		"message": "响应中的最大令牌数。模型限制：$1"
+	},
+	"modelSettingsReasoning": {
+		"message": "推理模式"
+	},
+	"modelSettingsReasoningDescription": {
+		"message": "覆盖模型的默认推理行为。启用后，模型会进行扩展思考，逐步解决复杂问题。"
+	},
+	"modelSettingsReasoningEffort": {
+		"message": "推理强度"
+	},
+	"modelSettingsReasoningEffortDescription": {
+		"message": "模型在响应前用于内部推理的时间量。"
+	},
+	"modelSettingsReasoningEffortHigh": {
+		"message": "高"
+	},
+	"modelSettingsReasoningEffortLow": {
+		"message": "低"
+	},
+	"modelSettingsReasoningEffortMedium": {
+		"message": "中"
+	},
+	"modelSettingsTemperature": {
+		"message": "温度"
+	},
+	"modelSettingsTemperatureDescription": {
+		"message": "控制响应的随机性。较高的数值使输出更具创造性，较低的数值使输出更集中。"
 	},
 	"models": {
 		"message": "模型"

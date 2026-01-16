@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Avanceret"
 	},
+	"advancedSettings": {
+		"message": "Avancerede indstillinger"
+	},
 	"allProperties": {
 		"message": "Alle egenskaber"
 	},
@@ -454,6 +457,42 @@
 	},
 	"modelRequiredFields": {
 		"message": "Modelnavn, udbyder og model-ID er påkrævet."
+	},
+	"modelSettingsMaxTokens": {
+		"message": "Maks. tokens"
+	},
+	"modelSettingsMaxTokensDescription": {
+		"message": "Maksimalt antal tokens i svaret."
+	},
+	"modelSettingsMaxTokensDescriptionWithLimit": {
+		"message": "Maksimalt antal tokens i svaret. Modelgrænse: $1"
+	},
+	"modelSettingsReasoning": {
+		"message": "Resonneringstilstand"
+	},
+	"modelSettingsReasoningDescription": {
+		"message": "Overskriv modellens standardresonering. Når aktiveret vil modellen bruge udvidet tænkning til at arbejde sig gennem komplekse problemer trin for trin."
+	},
+	"modelSettingsReasoningEffort": {
+		"message": "Resonneringsindsats"
+	},
+	"modelSettingsReasoningEffortDescription": {
+		"message": "Hvor meget tid modellen bruger på intern resonnering, før den svarer."
+	},
+	"modelSettingsReasoningEffortHigh": {
+		"message": "Høj"
+	},
+	"modelSettingsReasoningEffortLow": {
+		"message": "Lav"
+	},
+	"modelSettingsReasoningEffortMedium": {
+		"message": "Mellem"
+	},
+	"modelSettingsTemperature": {
+		"message": "Temperatur"
+	},
+	"modelSettingsTemperatureDescription": {
+		"message": "Styrer tilfældigheden i svarene. Højere værdier gør output mere kreativt, lavere værdier mere fokuseret."
 	},
 	"models": {
 		"message": "Modeller"

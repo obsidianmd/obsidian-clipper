@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "ขั้นสูง"
 	},
+	"advancedSettings": {
+		"message": "การตั้งค่าขั้นสูง"
+	},
 	"allProperties": {
 		"message": "คุณสมบัติทั้งหมด"
 	},
@@ -454,6 +457,42 @@
 	},
 	"modelRequiredFields": {
 		"message": "ต้องระบุชื่อโมเดล ผู้ให้บริการ และ ID โมเดล"
+	},
+	"modelSettingsMaxTokens": {
+		"message": "โทเค็นสูงสุด"
+	},
+	"modelSettingsMaxTokensDescription": {
+		"message": "จำนวนโทเค็นสูงสุดในคำตอบ"
+	},
+	"modelSettingsMaxTokensDescriptionWithLimit": {
+		"message": "จำนวนโทเค็นสูงสุดในคำตอบ ขีดจำกัดของโมเดล: $1"
+	},
+	"modelSettingsReasoning": {
+		"message": "โหมดการให้เหตุผล"
+	},
+	"modelSettingsReasoningDescription": {
+		"message": "เขียนทับพฤติกรรมการให้เหตุผลเริ่มต้นของโมเดล เมื่อเปิดใช้งาน โมเดลจะใช้การคิดเชิงลึกเพื่อแก้ปัญหาซับซ้อนทีละขั้น"
+	},
+	"modelSettingsReasoningEffort": {
+		"message": "ความพยายามในการให้เหตุผล"
+	},
+	"modelSettingsReasoningEffortDescription": {
+		"message": "ระยะเวลาที่โมเดลใช้ในการคิดภายในก่อนตอบ"
+	},
+	"modelSettingsReasoningEffortHigh": {
+		"message": "สูง"
+	},
+	"modelSettingsReasoningEffortLow": {
+		"message": "ต่ำ"
+	},
+	"modelSettingsReasoningEffortMedium": {
+		"message": "ปานกลาง"
+	},
+	"modelSettingsTemperature": {
+		"message": "อุณหภูมิ"
+	},
+	"modelSettingsTemperatureDescription": {
+		"message": "ควบคุมความสุ่มของคำตอบ ค่ายิ่งสูงจะทำให้ผลลัพธ์สร้างสรรค์มากขึ้น ค่ายิ่งต่ำจะทำให้ผลลัพธ์มีความสอดคล้องและตรงประเด็นมากขึ้น"
 	},
 	"models": {
 		"message": "โมเดล"

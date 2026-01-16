@@ -614,7 +614,53 @@
 								<input type="text" id="provider-model-id" name="providerModelId" data-i18n="providerModelId" placeholder="Model ID" required>
 							</div>
 						</div>
-						
+						<details id="model-advanced-settings" class="setting-item-group">
+							<summary class="setting-item-group-header" data-i18n="advancedSettings">Advanced settings</summary>
+							<div class="setting-item-group-content">
+								<div class="setting-item" id="model-temperature-setting">
+									<div class="setting-item-info">
+										<label for="model-temperature" data-i18n="modelSettingsTemperature">Temperature</label>
+										<div class="setting-item-description" data-i18n="modelSettingsTemperatureDescription">Controls randomness in responses. Higher values make output more creative, lower values more focused.</div>
+									</div>
+									<div class="setting-item-control">
+										<input type="number" id="model-temperature" name="temperature" min="0" max="2" step="0.1" placeholder="0.7">
+									</div>
+								</div>
+								<div class="setting-item" id="model-max-tokens-setting">
+									<div class="setting-item-info">
+										<label for="model-max-tokens" data-i18n="modelSettingsMaxTokens">Max tokens</label>
+										<div class="setting-item-description" id="model-max-tokens-description">Maximum number of tokens in the response.</div>
+									</div>
+									<div class="setting-item-control">
+										<input type="number" id="model-max-tokens" name="maxTokens" min="1" step="1" placeholder="4096">
+									</div>
+								</div>
+								<div class="setting-item mod-horizontal" id="model-reasoning-setting" style="display: none;">
+									<div class="setting-item-info">
+										<label for="model-reasoning-toggle" data-i18n="modelSettingsReasoning">Enable reasoning</label>
+										<div class="setting-item-description" data-i18n="modelSettingsReasoningDescription">Allow the model to think through complex problems step by step. Uses more tokens but can improve response quality.</div>
+									</div>
+									<div class="setting-item-control">
+										<div class="checkbox-container">
+											<input type="checkbox" id="model-reasoning-toggle" name="reasoningEnabled">
+										</div>
+									</div>
+								</div>
+								<div class="setting-item" id="model-reasoning-effort-setting" style="display: none;">
+									<div class="setting-item-info">
+										<label for="model-reasoning-effort" data-i18n="modelSettingsReasoningEffort">Reasoning effort</label>
+										<div class="setting-item-description" data-i18n="modelSettingsReasoningEffortDescription">How much time the model spends on internal reasoning before responding.</div>
+									</div>
+									<div class="setting-item-control">
+										<select id="model-reasoning-effort" name="reasoningEffort">
+											<option value="low" data-i18n="modelSettingsReasoningEffortLow">Low</option>
+											<option value="medium" selected data-i18n="modelSettingsReasoningEffortMedium">Medium</option>
+											<option value="high" data-i18n="modelSettingsReasoningEffortHigh">High</option>
+										</select>
+									</div>
+								</div>
+							</div>
+						</details>
 					</form>
 				</div>
 				<div class="modal-button-container">

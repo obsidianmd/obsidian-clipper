@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Avancerat"
 	},
+	"advancedSettings": {
+		"message": "Avancerade inställningar"
+	},
 	"allProperties": {
 		"message": "Alla egenskaper"
 	},
@@ -454,6 +457,42 @@
 	},
 	"modelRequiredFields": {
 		"message": "Modellnamn, Leverantör och Modell-ID krävs."
+	},
+	"modelSettingsMaxTokens": {
+		"message": "Max antal token"
+	},
+	"modelSettingsMaxTokensDescription": {
+		"message": "Maximalt antal token i svaret."
+	},
+	"modelSettingsMaxTokensDescriptionWithLimit": {
+		"message": "Maximalt antal token i svaret. Modellgräns: $1"
+	},
+	"modelSettingsReasoning": {
+		"message": "Resoneringsläge"
+	},
+	"modelSettingsReasoningDescription": {
+		"message": "Åsidosätt modellens standardbeteende för resonering. När det är aktiverat använder modellen förlängd tankegång för att lösa komplexa problem steg för steg."
+	},
+	"modelSettingsReasoningEffort": {
+		"message": "Resoneringsinsats"
+	},
+	"modelSettingsReasoningEffortDescription": {
+		"message": "Hur mycket tid modellen ägnar åt intern resonering innan den svarar."
+	},
+	"modelSettingsReasoningEffortHigh": {
+		"message": "Hög"
+	},
+	"modelSettingsReasoningEffortLow": {
+		"message": "Låg"
+	},
+	"modelSettingsReasoningEffortMedium": {
+		"message": "Medel"
+	},
+	"modelSettingsTemperature": {
+		"message": "Temperatur"
+	},
+	"modelSettingsTemperatureDescription": {
+		"message": "Styr slumpmässigheten i svaren. Högre värden ger mer kreativa svar, lägre värden ger mer fokuserade."
 	},
 	"models": {
 		"message": "Modeller"

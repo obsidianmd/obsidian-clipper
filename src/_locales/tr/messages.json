@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Gelişmiş"
 	},
+	"advancedSettings": {
+		"message": "Gelişmiş ayarlar"
+	},
 	"allProperties": {
 		"message": "Tüm özellikler"
 	},
@@ -454,6 +457,42 @@
 	},
 	"modelRequiredFields": {
 		"message": "Model adı, Sağlayıcı ve Model ID gereklidir."
+	},
+	"modelSettingsMaxTokens": {
+		"message": "Maks token"
+	},
+	"modelSettingsMaxTokensDescription": {
+		"message": "Yanıttaki maksimum token sayısı."
+	},
+	"modelSettingsMaxTokensDescriptionWithLimit": {
+		"message": "Yanıttaki maksimum token sayısı. Model limiti: $1"
+	},
+	"modelSettingsReasoning": {
+		"message": "Akıl yürütme modu"
+	},
+	"modelSettingsReasoningDescription": {
+		"message": "Modelin varsayılan akıl yürütme davranışını geçersiz kılar. Etkinleştirildiğinde model, karmaşık problemleri adım adım çözmek için daha kapsamlı düşünme kullanır."
+	},
+	"modelSettingsReasoningEffort": {
+		"message": "Akıl yürütme çabası"
+	},
+	"modelSettingsReasoningEffortDescription": {
+		"message": "Modelin yanıtlamadan önce dahili akıl yürütmeye ne kadar zaman ayırdığı."
+	},
+	"modelSettingsReasoningEffortHigh": {
+		"message": "Yüksek"
+	},
+	"modelSettingsReasoningEffortLow": {
+		"message": "Düşük"
+	},
+	"modelSettingsReasoningEffortMedium": {
+		"message": "Orta"
+	},
+	"modelSettingsTemperature": {
+		"message": "Sıcaklık"
+	},
+	"modelSettingsTemperatureDescription": {
+		"message": "Yanıtlardaki rastgeleliği kontrol eder. Daha yüksek değerler çıktıyı daha yaratıcı, daha düşük değerler daha odaklı yapar."
 	},
 	"models": {
 		"message": "Modeller"

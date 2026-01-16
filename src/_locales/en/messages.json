@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Advanced"
 	},
+	"advancedSettings": {
+		"message": "Advanced settings"
+	},
 	"allProperties": {
 		"message": "All properties"
 	},
@@ -454,6 +457,42 @@
 	},
 	"modelRequiredFields": {
 		"message": "Model name, Provider, and Model ID are required."
+	},
+	"modelSettingsMaxTokens": {
+		"message": "Max tokens"
+	},
+	"modelSettingsMaxTokensDescription": {
+		"message": "Maximum number of tokens in the response."
+	},
+	"modelSettingsMaxTokensDescriptionWithLimit": {
+		"message": "Maximum number of tokens in the response. Model limit: $1"
+	},
+	"modelSettingsReasoning": {
+		"message": "Reasoning mode"
+	},
+	"modelSettingsReasoningDescription": {
+		"message": "Override the model's default reasoning behavior. When set, the model will use extended thinking to work through complex problems step by step."
+	},
+	"modelSettingsReasoningEffort": {
+		"message": "Reasoning effort"
+	},
+	"modelSettingsReasoningEffortDescription": {
+		"message": "How much time the model spends on internal reasoning before responding."
+	},
+	"modelSettingsReasoningEffortHigh": {
+		"message": "High"
+	},
+	"modelSettingsReasoningEffortLow": {
+		"message": "Low"
+	},
+	"modelSettingsReasoningEffortMedium": {
+		"message": "Medium"
+	},
+	"modelSettingsTemperature": {
+		"message": "Temperature"
+	},
+	"modelSettingsTemperatureDescription": {
+		"message": "Controls randomness in responses. Higher values make output more creative, lower values more focused."
 	},
 	"models": {
 		"message": "Models"

@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Nâng cao"
 	},
+	"advancedSettings": {
+		"message": "Cài đặt nâng cao"
+	},
 	"allProperties": {
 		"message": "Tất cả thuộc tính"
 	},
@@ -454,6 +457,42 @@
 	},
 	"modelRequiredFields": {
 		"message": "Tên mô hình, Nhà cung cấp và ID mô hình là bắt buộc."
+	},
+	"modelSettingsMaxTokens": {
+		"message": "Số token tối đa"
+	},
+	"modelSettingsMaxTokensDescription": {
+		"message": "Số token tối đa trong phản hồi."
+	},
+	"modelSettingsMaxTokensDescriptionWithLimit": {
+		"message": "Số token tối đa trong phản hồi. Giới hạn mô hình: $1"
+	},
+	"modelSettingsReasoning": {
+		"message": "Chế độ suy luận"
+	},
+	"modelSettingsReasoningDescription": {
+		"message": "Ghi đè hành vi suy luận mặc định của mô hình. Khi bật, mô hình sẽ suy nghĩ sâu hơn và giải quyết vấn đề phức tạp theo từng bước."
+	},
+	"modelSettingsReasoningEffort": {
+		"message": "Mức độ suy luận"
+	},
+	"modelSettingsReasoningEffortDescription": {
+		"message": "Thời lượng mô hình dành cho suy luận nội bộ trước khi phản hồi."
+	},
+	"modelSettingsReasoningEffortHigh": {
+		"message": "Cao"
+	},
+	"modelSettingsReasoningEffortLow": {
+		"message": "Thấp"
+	},
+	"modelSettingsReasoningEffortMedium": {
+		"message": "Trung bình"
+	},
+	"modelSettingsTemperature": {
+		"message": "Nhiệt độ"
+	},
+	"modelSettingsTemperatureDescription": {
+		"message": "Điều khiển mức độ ngẫu nhiên trong phản hồi. Giá trị cao hơn làm nội dung sáng tạo hơn, giá trị thấp hơn làm nội dung tập trung hơn."
 	},
 	"models": {
 		"message": "Mô hình"

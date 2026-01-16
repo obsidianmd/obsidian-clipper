@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Προχωρημένα"
 	},
+	"advancedSettings": {
+		"message": "Προχωρημένες ρυθμίσεις"
+	},
 	"allProperties": {
 		"message": "Όλες οι ιδιότητες"
 	},
@@ -454,6 +457,42 @@
 	},
 	"modelRequiredFields": {
 		"message": "Το όνομα μοντέλου, ο πάροχος και το αναγνωριστικό μοντέλου είναι υποχρεωτικά."
+	},
+	"modelSettingsMaxTokens": {
+		"message": "Μέγιστος αριθμός tokens"
+	},
+	"modelSettingsMaxTokensDescription": {
+		"message": "Μέγιστος αριθμός tokens στην απάντηση."
+	},
+	"modelSettingsMaxTokensDescriptionWithLimit": {
+		"message": "Μέγιστος αριθμός tokens στην απάντηση. Όριο μοντέλου: $1"
+	},
+	"modelSettingsReasoning": {
+		"message": "Λειτουργία συλλογισμού"
+	},
+	"modelSettingsReasoningDescription": {
+		"message": "Παράκαμψη της προεπιλεγμένης συμπεριφοράς συλλογισμού του μοντέλου. Όταν ενεργοποιηθεί, το μοντέλο θα χρησιμοποιεί εκτεταμένο στοχασμό για να επεξεργάζεται σύνθετα προβλήματα βήμα προς βήμα."
+	},
+	"modelSettingsReasoningEffort": {
+		"message": "Ένταση συλλογισμού"
+	},
+	"modelSettingsReasoningEffortDescription": {
+		"message": "Πόσο χρόνο ξοδεύει το μοντέλο σε εσωτερικό συλλογισμό πριν απαντήσει."
+	},
+	"modelSettingsReasoningEffortHigh": {
+		"message": "Υψηλό"
+	},
+	"modelSettingsReasoningEffortLow": {
+		"message": "Χαμηλό"
+	},
+	"modelSettingsReasoningEffortMedium": {
+		"message": "Μεσαίο"
+	},
+	"modelSettingsTemperature": {
+		"message": "Θερμοκρασία"
+	},
+	"modelSettingsTemperatureDescription": {
+		"message": "Ελέγχει την τυχαιότητα στις απαντήσεις. Με υψηλότερες τιμές το αποτέλεσμα γίνεται πιο δημιουργικό, με χαμηλότερες πιο στοχευμένο."
 	},
 	"models": {
 		"message": "Μοντέλα"

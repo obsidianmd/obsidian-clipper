@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Avanzado"
 	},
+	"advancedSettings": {
+		"message": "Ajustes avanzados"
+	},
 	"allProperties": {
 		"message": "Todas las propiedades"
 	},
@@ -454,6 +457,42 @@
 	},
 	"modelRequiredFields": {
 		"message": "El nombre del modelo, el proveedor y la ID del modelo son obligatorios."
+	},
+	"modelSettingsMaxTokens": {
+		"message": "Tokens máximos"
+	},
+	"modelSettingsMaxTokensDescription": {
+		"message": "Número máximo de tokens en la respuesta."
+	},
+	"modelSettingsMaxTokensDescriptionWithLimit": {
+		"message": "Número máximo de tokens en la respuesta. Límite del modelo: $1"
+	},
+	"modelSettingsReasoning": {
+		"message": "Modo de razonamiento"
+	},
+	"modelSettingsReasoningDescription": {
+		"message": "Anular el comportamiento de razonamiento predeterminado del modelo. Al activarlo, el modelo empleará un pensamiento extendido para resolver problemas complejos paso a paso."
+	},
+	"modelSettingsReasoningEffort": {
+		"message": "Esfuerzo de razonamiento"
+	},
+	"modelSettingsReasoningEffortDescription": {
+		"message": "Cuánto tiempo dedica el modelo al razonamiento interno antes de responder."
+	},
+	"modelSettingsReasoningEffortHigh": {
+		"message": "Alto"
+	},
+	"modelSettingsReasoningEffortLow": {
+		"message": "Bajo"
+	},
+	"modelSettingsReasoningEffortMedium": {
+		"message": "Medio"
+	},
+	"modelSettingsTemperature": {
+		"message": "Temperatura"
+	},
+	"modelSettingsTemperatureDescription": {
+		"message": "Controla la aleatoriedad de las respuestas. Valores más altos hacen la salida más creativa; valores más bajos la hacen más enfocada."
 	},
 	"models": {
 		"message": "Modelos"

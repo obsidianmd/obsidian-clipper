@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Avancé"
 	},
+	"advancedSettings": {
+		"message": "Paramètres avancés"
+	},
 	"allProperties": {
 		"message": "Toutes les propriétés"
 	},
@@ -454,6 +457,42 @@
 	},
 	"modelRequiredFields": {
 		"message": "Le nom du modèle, le fournisseur et l'ID du modèle sont requis."
+	},
+	"modelSettingsMaxTokens": {
+		"message": "Nombre maximal de jetons"
+	},
+	"modelSettingsMaxTokensDescription": {
+		"message": "Nombre maximal de jetons dans la réponse."
+	},
+	"modelSettingsMaxTokensDescriptionWithLimit": {
+		"message": "Nombre maximal de jetons dans la réponse. Limite du modèle : $1"
+	},
+	"modelSettingsReasoning": {
+		"message": "Mode de raisonnement"
+	},
+	"modelSettingsReasoningDescription": {
+		"message": "Remplace le comportement de raisonnement par défaut du modèle. Lorsqu'il est activé, le modèle utilisera une réflexion approfondie pour résoudre des problèmes complexes étape par étape."
+	},
+	"modelSettingsReasoningEffort": {
+		"message": "Effort de raisonnement"
+	},
+	"modelSettingsReasoningEffortDescription": {
+		"message": "Temps que le modèle consacre au raisonnement interne avant de répondre."
+	},
+	"modelSettingsReasoningEffortHigh": {
+		"message": "Élevé"
+	},
+	"modelSettingsReasoningEffortLow": {
+		"message": "Faible"
+	},
+	"modelSettingsReasoningEffortMedium": {
+		"message": "Moyen"
+	},
+	"modelSettingsTemperature": {
+		"message": "Température"
+	},
+	"modelSettingsTemperatureDescription": {
+		"message": "Contrôle l'aléa des réponses. Des valeurs plus élevées rendent la sortie plus créative, des valeurs plus faibles la rendent plus ciblée."
 	},
 	"models": {
 		"message": "Modèles de langage"

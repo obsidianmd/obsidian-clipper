@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "고급 설정"
 	},
+	"advancedSettings": {
+		"message": "고급 설정"
+	},
 	"allProperties": {
 		"message": "모든 속성"
 	},
@@ -454,6 +457,42 @@
 	},
 	"modelRequiredFields": {
 		"message": "모델 이름, 제공자, 그리고 모델 ID가 필요합니다."
+	},
+	"modelSettingsMaxTokens": {
+		"message": "최대 토큰 수"
+	},
+	"modelSettingsMaxTokensDescription": {
+		"message": "응답의 최대 토큰 수."
+	},
+	"modelSettingsMaxTokensDescriptionWithLimit": {
+		"message": "응답의 최대 토큰 수. 모델 제한: $1"
+	},
+	"modelSettingsReasoning": {
+		"message": "추론 모드"
+	},
+	"modelSettingsReasoningDescription": {
+		"message": "모델의 기본 추론 동작을 재정의합니다. 설정하면 모델이 복잡한 문제를 단계별로 확장된 사고로 해결합니다."
+	},
+	"modelSettingsReasoningEffort": {
+		"message": "추론 노력"
+	},
+	"modelSettingsReasoningEffortDescription": {
+		"message": "응답하기 전에 모델이 내부 추론에 할애하는 시간의 정도."
+	},
+	"modelSettingsReasoningEffortHigh": {
+		"message": "높음"
+	},
+	"modelSettingsReasoningEffortLow": {
+		"message": "낮음"
+	},
+	"modelSettingsReasoningEffortMedium": {
+		"message": "중간"
+	},
+	"modelSettingsTemperature": {
+		"message": "온도"
+	},
+	"modelSettingsTemperatureDescription": {
+		"message": "응답의 무작위성을 제어합니다. 값이 높을수록 출력이 더 창의적이며, 낮을수록 더 집중됩니다."
 	},
 	"models": {
 		"message": "모델"
