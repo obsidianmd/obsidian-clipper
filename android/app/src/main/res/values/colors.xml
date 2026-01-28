@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Obsidian brand colors -->
+    <color name="obsidian_purple">#7C3AED</color>
+    <color name="obsidian_purple_dark">#5B21B6</color>
+    <color name="obsidian_purple_light">#A78BFA</color>
+
+    <!-- Light theme -->
+    <color name="md_theme_light_primary">#7C3AED</color>
+    <color name="md_theme_light_onPrimary">#FFFFFF</color>
+    <color name="md_theme_light_primaryContainer">#EDE9FE</color>
+    <color name="md_theme_light_onPrimaryContainer">#1E1B4B</color>
+    <color name="md_theme_light_secondary">#6B7280</color>
+    <color name="md_theme_light_onSecondary">#FFFFFF</color>
+    <color name="md_theme_light_secondaryContainer">#F3F4F6</color>
+    <color name="md_theme_light_onSecondaryContainer">#1F2937</color>
+    <color name="md_theme_light_background">#FFFFFF</color>
+    <color name="md_theme_light_onBackground">#1F2937</color>
+    <color name="md_theme_light_surface">#FFFFFF</color>
+    <color name="md_theme_light_onSurface">#1F2937</color>
+    <color name="md_theme_light_surfaceVariant">#F9FAFB</color>
+    <color name="md_theme_light_onSurfaceVariant">#4B5563</color>
+    <color name="md_theme_light_error">#DC2626</color>
+    <color name="md_theme_light_onError">#FFFFFF</color>
+
+    <!-- Dark theme -->
+    <color name="md_theme_dark_primary">#A78BFA</color>
+    <color name="md_theme_dark_onPrimary">#1E1B4B</color>
+    <color name="md_theme_dark_primaryContainer">#5B21B6</color>
+    <color name="md_theme_dark_onPrimaryContainer">#EDE9FE</color>
+    <color name="md_theme_dark_secondary">#9CA3AF</color>
+    <color name="md_theme_dark_onSecondary">#1F2937</color>
+    <color name="md_theme_dark_secondaryContainer">#374151</color>
+    <color name="md_theme_dark_onSecondaryContainer">#F3F4F6</color>
+    <color name="md_theme_dark_background">#111827</color>
+    <color name="md_theme_dark_onBackground">#F9FAFB</color>
+    <color name="md_theme_dark_surface">#1F2937</color>
+    <color name="md_theme_dark_onSurface">#F9FAFB</color>
+    <color name="md_theme_dark_surfaceVariant">#374151</color>
+    <color name="md_theme_dark_onSurfaceVariant">#D1D5DB</color>
+    <color name="md_theme_dark_error">#F87171</color>
+    <color name="md_theme_dark_onError">#7F1D1D</color>
+</resources>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Background -->
+    <path
+        android:fillColor="#7C3AED"
+        android:pathData="M0,0h108v108h-108z" />
+
+    <!-- Obsidian-style diamond/gem shape -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,24L74,54L54,84L34,54Z" />
+
+    <!-- Inner detail -->
+    <path
+        android:fillColor="#A78BFA"
+        android:pathData="M54,32L66,54L54,76L42,54Z" />
+
+    <!-- Clip icon overlay -->
+    <path
+        android:fillColor="#1E1B4B"
+        android:strokeWidth="2"
+        android:strokeColor="#1E1B4B"
+        android:pathData="M50,48L58,48L58,60L50,60Z" />
+
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M52,51L56,51L56,54L52,54Z" />
+
+</vector>

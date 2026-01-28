@@ -23,7 +23,83 @@ function removeDSStore(dir) {
 module.exports = (env, argv) => {
 	const isFirefox = env.BROWSER === 'firefox';
 	const isSafari = env.BROWSER === 'safari';
+	const isAndroid = env.BROWSER === 'android';
 	const isProduction = argv.mode === 'production';
+
+	// Android-specific build
+	if (isAndroid) {
+		return {
+			mode: argv.mode,
+			entry: {
+				'clipper-bundle': './src/android-bundle.ts'
+			},
+			output: {
+				path: path.resolve(__dirname, 'android/app/src/main/assets'),
+				filename: '[name].js',
+				library: {
+					type: 'window'
+				}
+			},
+			devtool: isProduction ? false : 'source-map',
+			optimization: {
+				minimize: isProduction,
+				minimizer: [
+					new TerserPlugin({
+						terserOptions: {
+							mangle: false,
+							compress: {
+								defaults: true,
+								unused: true,
+								dead_code: true,
+								passes: 2,
+								ecma: 2020
+							},
+							format: {
+								ascii_only: true,
+								comments: false,
+								ecma: 2020
+							},
+							keep_classnames: true,
+							keep_fnames: true
+						},
+						extractComments: false
+					})
+				]
+			},
+			resolve: {
+				extensions: ['.ts', '.js'],
+				alias: {
+					'./utils/browser-polyfill': path.resolve(__dirname, 'src/utils/browser-polyfill-stub.ts'),
+					'../utils/browser-polyfill': path.resolve(__dirname, 'src/utils/browser-polyfill-stub.ts'),
+					'webextension-polyfill': path.resolve(__dirname, 'src/utils/browser-polyfill-stub.ts')
+				}
+			},
+			module: {
+				rules: [
+					{
+						test: /\.tsx?$/,
+						use: [
+							{
+								loader: 'ts-loader',
+								options: {
+									compilerOptions: {
+										module: 'ES2020'
+									}
+								}
+							}
+						],
+						exclude: /node_modules/
+					}
+				]
+			},
+			plugins: [
+				new webpack.DefinePlugin({
+					'process.env.NODE_ENV': JSON.stringify(argv.mode),
+					'DEBUG_MODE': JSON.stringify(!isProduction)
+				})
+			]
+		};
+	}
 
 	const getOutputDir = () => {
 		if (isProduction) {

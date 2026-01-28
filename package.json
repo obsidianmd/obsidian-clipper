@@ -11,6 +11,8 @@
 		"build:chrome": "webpack --env BROWSER=chrome --mode production",
 		"build:firefox": "webpack --env BROWSER=firefox --mode production",
 		"build:safari": "webpack --env BROWSER=safari --mode production",
+		"build:android": "webpack --env BROWSER=android --mode production",
+		"dev:android": "webpack --watch --env BROWSER=android --mode development",
 		"build": "npm run build:chrome && npm run build:firefox && npm run build:safari",
 		"dev": "npm run dev:chrome",
 		"test": "vitest run",
