@@ -366,6 +366,64 @@ Tags:
 		});
 	});
 
+	describe('Schema Variables', () => {
+		test('schema array access with [*] extracts property from all items', async () => {
+			const ctx = createContext({
+				'{{schema:director}}': JSON.stringify([
+					{ name: 'Christopher Nolan' },
+					{ name: 'Denis Villeneuve' },
+				]),
+			});
+			const result = await render('{% for d in schema:director[*].name %}{{d}}{% endfor %}', ctx);
+			expect(result.output).toBe('Christopher Nolan\nDenis Villeneuve');
+		});
+
+		test('schema array access with [0] extracts property from specific index', async () => {
+			const ctx = createContext({
+				'{{schema:director}}': JSON.stringify([
+					{ name: 'Christopher Nolan' },
+					{ name: 'Denis Villeneuve' },
+				]),
+			});
+			const result = await render('{{schema:director[0].name}}', ctx);
+			expect(result.output).toBe('Christopher Nolan');
+		});
+
+		test('schema array access with [*] without property returns full array', async () => {
+			const ctx = createContext({
+				'{{schema:director}}': JSON.stringify(['Nolan', 'Villeneuve']),
+			});
+			const result = await render('{% for d in schema:director[*] %}{{d}}{% endfor %}', ctx);
+			expect(result.output).toBe('Nolan\nVilleneuve');
+		});
+
+		test('schema shorthand resolution with array access', async () => {
+			const ctx = createContext({
+				'{{schema:@Movie:director}}': JSON.stringify([
+					{ name: 'Christopher Nolan' },
+				]),
+			});
+			const result = await render('{{schema:director[0].name}}', ctx);
+			expect(result.output).toBe('Christopher Nolan');
+		});
+
+		test('schema simple variable', async () => {
+			const ctx = createContext({
+				'{{schema:genre}}': 'Science Fiction',
+			});
+			const result = await render('{{schema:genre}}', ctx);
+			expect(result.output).toBe('Science Fiction');
+		});
+
+		test('schema JSON array is parsed', async () => {
+			const ctx = createContext({
+				'{{schema:genre}}': JSON.stringify(['Sci-Fi', 'Action']),
+			});
+			const result = await render('{% for g in schema:genre %}{{g}}{% endfor %}', ctx);
+			expect(result.output).toBe('Sci-Fi\nAction');
+		});
+	});
+
 	describe('Convenience Function', () => {
 		test('renderTemplate convenience function works', async () => {
 			const output = await renderTemplate('Hello {{name}}!', { name: 'World' });

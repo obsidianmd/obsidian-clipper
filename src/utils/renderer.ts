@@ -677,18 +677,53 @@ function evaluateContains(left: any, right: any): boolean {
  * but referenced with shorthand like schema:genre.
  */
 function resolveSchemaVariable(name: string, variables: Record<string, any>): any {
-	// name is like "schema:genre" or "schema:@Movie.genre"
+	// name is like "schema:genre" or "schema:@Movie.genre" or "schema:director[*].name"
 	const schemaKey = name.slice('schema:'.length);
+
+	// Check for nested array access: key[*].prop or key[0].prop
+	const nestedArrayMatch = schemaKey.match(/^(.*?)\[(\*|\d+)\](\.(.*))?$/);
+	if (nestedArrayMatch) {
+		const [, arrayKey, indexOrStar, , propertyPath] = nestedArrayMatch;
+		const arrayValue = resolveSchemaKey(arrayKey, variables);
+		if (arrayValue === undefined) return undefined;
+
+		const parsed = parseSchemaValue(arrayValue);
+		if (!Array.isArray(parsed)) return undefined;
+
+		if (indexOrStar === '*') {
+			if (propertyPath) {
+				return parsed.map(item => getNestedValue(item, propertyPath)).filter(v => v != null);
+			}
+			return parsed;
+		} else {
+			const index = parseInt(indexOrStar, 10);
+			const item = parsed[index];
+			if (item === undefined) return undefined;
+			return propertyPath ? getNestedValue(item, propertyPath) : item;
+		}
+	}
+
+	const rawValue = resolveSchemaKey(schemaKey, variables);
+	if (rawValue === undefined) return undefined;
+	return parseSchemaValue(rawValue);
+}
+
+/**
+ * Resolve a schema key to its raw value from variables (before parsing).
+ * Handles exact match, plain key, and shorthand resolution.
+ */
+function resolveSchemaKey(schemaKey: string, variables: Record<string, any>): any {
+	const name = `schema:${schemaKey}`;
 
 	// Try exact match first with {{ }} wrapper
 	const exactValue = variables[`{{${name}}}`];
 	if (exactValue !== undefined) {
-		return parseSchemaValue(exactValue);
+		return exactValue;
 	}
 
 	// Try plain key
 	if (variables[name] !== undefined) {
-		return parseSchemaValue(variables[name]);
+		return variables[name];
 	}
 
 	// If no @ in key, try shorthand resolution
@@ -698,7 +733,7 @@ function resolveSchemaVariable(name: string, variables: Record<string, any>): an
 			key.includes('@') && key.endsWith(`:${schemaKey}}}`)
 		);
 		if (matchingKey) {
-			return parseSchemaValue(variables[matchingKey]);
+			return variables[matchingKey];
 		}
 	}
 
