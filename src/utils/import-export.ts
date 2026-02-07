@@ -12,7 +12,7 @@ import { copyToClipboardWithFeedback } from './clipboard-utils';
 import { compressToUTF16, decompressFromUTF16 } from 'lz-string';
 import { getMessage } from './i18n';
 
-const SCHEMA_VERSION = '0.1.0';
+export const SCHEMA_VERSION = '0.1.1';
 
 // Add these type definitions at the top
 interface StorageData {
