@@ -1,7 +1,6 @@
 import { Template, Property } from '../types/types';
 import { deleteTemplate, templates, editingTemplateIndex, saveTemplateSettings, setEditingTemplateIndex, loadTemplates } from './template-manager';
 import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
-import { escapeValue, unescapeValue } from '../utils/string-utils';
 import { generalSettings } from '../utils/storage-utils';
 import { updateUrl } from '../utils/routing';
 import { handleDragStart, handleDragOver, handleDrop, handleDragEnd } from '../utils/drag-and-drop';
@@ -359,7 +358,7 @@ export function addPropertyToEditor(name: string = '', value: string = '', id: s
 		type: 'text',
 		class: 'property-value',
 		id: `${propertyId}-value`,
-		value: unescapeValue(value),
+		value: value,
 		placeholder: getMessage('propertyValue')
 	}) as HTMLInputElement;
 	propertyRow.appendChild(valueInput);
@@ -533,7 +532,7 @@ export function updateTemplateFromForm(): void {
 		return {
 			id: (prop as HTMLElement).dataset.id || Date.now().toString() + Math.random().toString(36).slice(2, 11),
 			name: nameInput.value,
-			value: escapeValue(valueInput.value),
+			value: valueInput.value,
 			type: typeSelect.getAttribute('data-value') || 'text'
 		};
 	}).filter(prop => prop.name.trim() !== ''); // Filter out properties with empty names
