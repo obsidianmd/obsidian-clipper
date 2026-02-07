@@ -1,5 +1,5 @@
 import { Template } from '../types/types';
-import { templates, saveTemplateSettings, editingTemplateIndex, loadTemplates } from '../managers/template-manager';
+import { templates, saveTemplateSettings, editingTemplateIndex, loadTemplates, patchAndUpdateTemplateVersion } from '../managers/template-manager';
 import { showTemplateEditor, updateTemplateList } from '../managers/template-ui';
 import { sanitizeFileName } from './string-utils';
 import { generalSettings, loadSettings } from '../utils/storage-utils';
@@ -193,6 +193,11 @@ async function processImportedTemplate(importedTemplate: Partial<Template>): Pro
 
 	if (!validateImportedTemplate(importedTemplate)) {
 		throw new Error('Invalid template file');
+	}
+
+	// Apply patch before futher processing
+	if(!importedTemplate.schemaVersion || importedTemplate.schemaVersion !== SCHEMA_VERSION) {
+		importedTemplate = patchAndUpdateTemplateVersion(importedTemplate as Template);
 	}
 
 	importedTemplate.id = Date.now().toString() + Math.random().toString(36).slice(2, 9);
