@@ -10,6 +10,7 @@ import { showSettingsSection } from './settings-section-ui';
 import { updatePropertyType } from './property-types-manager';
 import { getMessage } from '../utils/i18n';
 import { parse, validateVariables, validateFilters } from '../utils/parser';
+import { SCHEMA_VERSION } from '../utils/import-export';
 let hasUnsavedChanges = false;
 
 export function resetUnsavedChanges(): void {
@@ -141,6 +142,7 @@ export function showTemplateEditor(template: Template | null): void {
 	if (!template) {
 		const newTemplateName = getUniqueTemplateName(getMessage('newTemplate'));
 		editingTemplate = {
+			schemaVersion: SCHEMA_VERSION,
 			id: Date.now().toString() + Math.random().toString(36).slice(2, 11),
 			name: newTemplateName,
 			behavior: 'create',

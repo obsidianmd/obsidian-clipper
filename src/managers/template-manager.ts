@@ -127,6 +127,7 @@ async function prepareTemplateForSave(template: Template): Promise<[string[], st
 
 export function createDefaultTemplate(): Template {
 	return {
+		schemaVersion: SCHEMA_VERSION,
 		id: Date.now().toString() + Math.random().toString(36).slice(2, 11),
 		name: getMessage('defaultTemplateName'),
 		behavior: 'create',

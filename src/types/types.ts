@@ -1,4 +1,5 @@
 export interface Template {
+	schemaVersion: string;
 	id: string;
 	name: string;
 	behavior: 'create' | 'append-specific' | 'append-daily' | 'prepend-specific' | 'prepend-daily' | 'overwrite';
