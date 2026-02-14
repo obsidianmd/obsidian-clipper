@@ -138,10 +138,13 @@ export function processUrls(htmlContent: string, baseUrl: URL): string {
 	const parser = new DOMParser();
 	const doc = parser.parseFromString(htmlContent, 'text/html');
 	
-	// Handle relative URLs for both images and links
+	// Handle relative URLs for images, links, videos, and audio embeds.
 	doc.querySelectorAll('img').forEach(img => makeUrlAbsolute(img, 'srcset', baseUrl));
 	doc.querySelectorAll('img').forEach(img => makeUrlAbsolute(img, 'src', baseUrl));
 	doc.querySelectorAll('a').forEach(link => makeUrlAbsolute(link, 'href', baseUrl));
+	doc.querySelectorAll('video').forEach(video => makeUrlAbsolute(video, 'src', baseUrl));
+	doc.querySelectorAll('audio').forEach(audio => makeUrlAbsolute(audio, 'src', baseUrl));
+	doc.querySelectorAll(':is(video, audio) :is(source, track)').forEach(sourceOrTrack => makeUrlAbsolute(sourceOrTrack, 'src', baseUrl));
 	
 	// Serialize back to HTML
 	const serializer = new XMLSerializer();
