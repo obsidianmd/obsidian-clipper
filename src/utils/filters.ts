@@ -9,6 +9,7 @@ import { camel } from './filters/camel';
 import { capitalize } from './filters/capitalize';
 import { date } from './filters/date';
 import { date_modify, validateDateModifyParams } from './filters/date_modify';
+import { decode_uri } from './filters/decode_uri';
 import { first } from './filters/first';
 import { footnote } from './filters/footnote';
 import { fragment_link } from './filters/fragment_link';
@@ -84,6 +85,7 @@ export const filterMetadata: Record<string, FilterMetadata> = {
 	camel: {},
 	capitalize: {},
 	date: { example: 'date:"YYYY-MM-DD"' },
+	decode_uri: {},
 	duration: {},
 	first: {},
 	footnote: {},
@@ -136,6 +138,7 @@ export const filters: { [key: string]: FilterFunction } = {
 	capitalize,
 	date_modify,
 	date,
+	decode_uri,
 	duration,
 	first,
 	footnote,
