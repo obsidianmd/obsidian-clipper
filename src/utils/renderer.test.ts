@@ -128,6 +128,30 @@ describe('Renderer', () => {
 		});
 	});
 
+	describe('Prompt Templates', () => {
+		test('prompt with split filter preserves quoted arg in reconstruction', async () => {
+			const ctx = createContext({});
+			const result = await render('{{"prompt text"|split:","}}', ctx);
+			// Prompt templates are deferred — output should reconstruct the template correctly
+			expect(result.hasDeferredVariables).toBe(true);
+			expect(result.output).toBe('{{"prompt text"|split:","}}');
+		});
+
+		test('prompt with chained filters preserves args in reconstruction', async () => {
+			const ctx = createContext({});
+			const result = await render('{{"prompt text"|split:","|title|wikilink|join}}', ctx);
+			expect(result.hasDeferredVariables).toBe(true);
+			expect(result.output).toBe('{{"prompt text"|split:","|title|wikilink|join}}');
+		});
+
+		test('prompt with replace filter preserves quoted pairs in reconstruction', async () => {
+			const ctx = createContext({});
+			const result = await render('{{"prompt text"|replace:"old":"new"}}', ctx);
+			expect(result.hasDeferredVariables).toBe(true);
+			expect(result.output).toBe('{{"prompt text"|replace:"old":"new"}}');
+		});
+	});
+
 	describe('If Statements', () => {
 		test('renders if with truthy condition', async () => {
 			const ctx = createContext({ show: true });

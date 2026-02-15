@@ -259,7 +259,14 @@ function formatFilterArgs(args: Expression[]): string {
 	return args.map(arg => {
 		if (arg.type === 'literal') {
 			const val = (arg as LiteralExpression).value;
-			return typeof val === 'string' ? `"${val}"` : String(val);
+			if (typeof val === 'string') {
+				// Don't double-wrap values that are already quoted or contain quoted pairs
+				if (/^["'].*["']$/.test(val) || val.includes('":"') || val.includes("':'")) {
+					return val;
+				}
+				return `"${val}"`;
+			}
+			return String(val);
 		}
 		return String((arg as any).value || (arg as any).name || '');
 	}).join(':');
