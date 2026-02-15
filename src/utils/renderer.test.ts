@@ -16,6 +16,8 @@ function testApplyFilterDirect(value: string, filterName: string, _paramString: 
 				if (match) return match[1];
 			}
 			return value;
+		case 'echo_param':
+			return _paramString ?? '';
 		default:
 			return value;
 	}
@@ -101,6 +103,28 @@ describe('Renderer', () => {
 			const result = await render('{{title|trim|lower}}', ctx);
 			expect(result.errors).toHaveLength(0);
 			expect(result.output).toBe('hello');
+		});
+
+		test('unquoted identifier filter arg falls back to string literal', async () => {
+			const ctx = createContext({ title: 'test' });
+			const result = await render('{{title|echo_param:YYYY-MM-DD}}', ctx);
+			expect(result.errors).toHaveLength(0);
+			expect(result.output).toBe('YYYY-MM-DD');
+		});
+
+		test('unquoted identifier filter arg uses variable value when defined', async () => {
+			const ctx = createContext({ title: 'test', fmt: 'custom-format' });
+			ctx.variables['fmt'] = 'custom-format';
+			const result = await render('{{title|echo_param:fmt}}', ctx);
+			expect(result.errors).toHaveLength(0);
+			expect(result.output).toBe('custom-format');
+		});
+
+		test('quoted string filter arg still works', async () => {
+			const ctx = createContext({ title: 'test' });
+			const result = await render('{{title|echo_param:"YYYY-MM-DD"}}', ctx);
+			expect(result.errors).toHaveLength(0);
+			expect(result.output).toBe('"YYYY-MM-DD"');
 		});
 	});
 

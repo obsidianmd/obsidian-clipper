@@ -607,7 +607,13 @@ async function evaluateFilter(expr: FilterExpression, state: RenderState): Promi
 	// Evaluate filter arguments
 	const args: any[] = [];
 	for (const arg of expr.args) {
-		args.push(await evaluateExpression(arg, state));
+		let argValue = await evaluateExpression(arg, state);
+		// If a filter argument is an identifier that resolved to undefined,
+		// treat it as a string literal (e.g., date:YYYY-MM-DD, callout:info)
+		if (argValue === undefined && arg.type === 'identifier') {
+			argValue = arg.name;
+		}
+		args.push(argValue);
 	}
 
 	// Check for custom filters first
