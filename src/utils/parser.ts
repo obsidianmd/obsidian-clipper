@@ -906,10 +906,34 @@ function parseFilterExpression(state: ParserState): Expression | null {
 				advance(state); // consume '('
 				while (!check(state, 'rparen') && !isAtEnd(state)) {
 					const arg = parseOrExpression(state);
-					if (arg) args.push(arg);
-					// Handle both comma and colon separators inside parentheses
-					// e.g., replace:("old":"new","foo":"bar")
-					if (check(state, 'comma') || check(state, 'colon')) {
+					if (!arg) break;
+
+					// Chain string:string pairs into a single arg
+					// e.g., replace:("old":"new","foo":"bar") → two args: "old":"new" and "foo":"bar"
+					if (arg.type === 'literal' && typeof arg.value === 'string' && check(state, 'colon')) {
+						const formatStr = (val: any) => `"${val}"`;
+						let combined = formatStr(arg.value);
+						while (check(state, 'colon')) {
+							advance(state); // consume ':'
+							const next = parseOrExpression(state);
+							if (next && next.type === 'literal' && typeof next.value === 'string') {
+								combined += ':' + formatStr(next.value);
+							} else {
+								break;
+							}
+						}
+						args.push({
+							type: 'literal',
+							value: combined,
+							raw: combined,
+							line: arg.line,
+							column: arg.column,
+						});
+					} else {
+						args.push(arg);
+					}
+
+					if (check(state, 'comma')) {
 						advance(state);
 					} else {
 						break;
