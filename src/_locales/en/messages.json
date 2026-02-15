@@ -538,6 +538,9 @@
 	"pageCannotBeClipped": {
 		"message": "This page cannot be clipped."
 	},
+	"restrictedPage": {
+		"message": "This page cannot be clipped. Browser extension pages are protected."
+	},
 	"pageVariables": {
 		"message": "Page variables"
 	},
