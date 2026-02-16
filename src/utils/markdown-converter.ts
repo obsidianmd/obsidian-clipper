@@ -26,6 +26,8 @@ export function createMarkdownContent(content: string, url: string) {
 	debugLog('Markdown', 'Content length:', content.length);
 
 	const baseUrl = new URL(url);
+	// normalise even after header links have been clicked
+	baseUrl.hash = '';
 	// Process all URLs at the beginning
 	const processedContent = processUrls(content, baseUrl);
 
@@ -691,6 +693,42 @@ export function createMarkdownContent(content: string, url: string) {
 		// Remove any empty links e.g. [](example.com) that remain, along with surrounding newlines
 		// But don't affect image links like ![](image.jpg)
 		markdown = markdown.replace(/\n*(?<!!)\[]\([^)]+\)\n*/g, '');
+
+		// convert any heading links pointing to the current page e.g [Example](example.com#heading) into Obsidian relative links
+		// e.g. [[Example|#heading]]
+
+		// Regex to match markdown links that point to the clipped page with a #heading fragment
+		const headingLinkPattern = new RegExp(
+			"\\[([^\\]]+)\\]\\(" +
+				baseUrl.toString().replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + // escape URL
+				"(#[-\\w]+)\\)",
+			"g"
+		);
+
+		// Because at this point, defuddle has already done its job and stripped the id tags in headings
+		// that these heading links use to navigate, we have to do the next best thing:
+		// Assume that links to the headings have the same text as the heading itself.
+		// If not, we'll just leave the full link, rather than giving a nice Obsidian-compatible heading link
+		// If there was a good way to get the full page html without a major refactor
+		// passing it through all these functions, then this could be modified to handle everything perfectly. 
+		// Alas, I couldn't find one.
+
+
+		// Replace links if the link title matches a heading text
+		markdown = markdown.replace(headingLinkPattern, (_, linkTitle, hash) => {
+			// escape regex chars in the linkTitle
+			const escaped = linkTitle.trim().replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+			// match against markdown headings: # Title, ## Title, etc.
+			const headingRegex = new RegExp(`^#+\\s+${escaped}\\s*$`, "m");
+			if (headingRegex.test(markdown)) {
+				// make a heading link
+				return `[[#${linkTitle}|${linkTitle}]]`;
+			} else {
+				// Leave link untouched if no matching heading exists
+				return `[${linkTitle}](${baseUrl}${hash})`;
+			}
+		});
+
 
 		// Remove any consecutive newlines more than two
 		markdown = markdown.replace(/\n{3,}/g, '\n\n');

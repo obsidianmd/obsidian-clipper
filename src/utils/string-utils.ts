@@ -100,11 +100,6 @@ export function makeUrlAbsolute(element: Element, attributeName: string, baseUrl
 			// Create a new URL object from the base URL
 			const resolvedBaseUrl = new URL(baseUrl.href);
 			
-			// If the base URL points to a file, remove the filename to get the directory
-			if (!resolvedBaseUrl.pathname.endsWith('/')) {
-				resolvedBaseUrl.pathname = resolvedBaseUrl.pathname.substring(0, resolvedBaseUrl.pathname.lastIndexOf('/') + 1);
-			}
-			
 			const url = new URL(attributeValue, resolvedBaseUrl);
 			
 			if (!['http:', 'https:'].includes(url.protocol)) {
