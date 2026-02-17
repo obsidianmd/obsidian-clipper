@@ -394,7 +394,7 @@ browser.commands.onCommand.addListener(async (command, tab) => {
 	}
 	if (command === "toggle_highlighter" && tab && tab.id) {
 		await ensureContentScriptLoadedInBackground(tab.id);
-		toggleHighlighterMode(tab.id);
+		await toggleHighlighterMode(tab.id, { captureSelectionOnEnable: true });
 	}
 	if (command === "copy_to_clipboard" && tab && tab.id) {
 		await browser.tabs.sendMessage(tab.id, { action: "copyToClipboard" });
@@ -594,12 +594,18 @@ async function setHighlighterMode(tabId: number, activate: boolean) {
 	}
 }
 
-async function toggleHighlighterMode(tabId: number): Promise<boolean> {
+async function toggleHighlighterMode(
+	tabId: number,
+	options: { captureSelectionOnEnable?: boolean } = {}
+): Promise<boolean> {
 	try {
 		const currentMode = getHighlighterModeForTab(tabId);
 		const newMode = !currentMode;
 		highlighterModeState[tabId] = newMode;
 		await browser.tabs.sendMessage(tabId, { action: "setHighlighterMode", isActive: newMode });
+		if (newMode && options.captureSelectionOnEnable) {
+			await browser.tabs.sendMessage(tabId, { action: "highlightSelection", isActive: true });
+		}
 		debouncedUpdateContextMenu(tabId);
 		await sendMessageToPopup(tabId, { action: "updatePopupHighlighterUI", isActive: newMode });
 		return newMode;
