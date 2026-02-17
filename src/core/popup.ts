@@ -7,7 +7,7 @@ import { compileTemplate } from '../utils/template-compiler';
 import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
 import { findMatchingTemplate, initializeTriggers } from '../utils/triggers';
 import { getLocalStorage, setLocalStorage, loadSettings, generalSettings, Settings } from '../utils/storage-utils';
-import { escapeHtml, unescapeValue } from '../utils/string-utils';
+import { escapeHtml } from '../utils/string-utils';
 import { loadTemplates, createDefaultTemplate } from '../managers/template-manager';
 import browser from '../utils/browser-polyfill';
 import { addBrowserClassToHtml, detectBrowser } from '../utils/browser-detection';
@@ -745,7 +745,7 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 	const [compiledPropertyValues, formattedNoteName, formattedPath, formattedContent] = await Promise.all([
 		// Compile all property values in parallel
 		Promise.all(template.properties.map(property =>
-			memoizedCompileTemplate(currentTabId!, unescapeValue(property.value), variables, currentUrl)
+			memoizedCompileTemplate(currentTabId!, property.value, variables, currentUrl)
 		)),
 		// Compile note name
 		memoizedCompileTemplate(currentTabId!, template.noteNameFormat, variables, currentUrl),

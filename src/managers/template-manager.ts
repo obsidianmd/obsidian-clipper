@@ -4,6 +4,7 @@ import browser from '../utils/browser-polyfill';
 import { generalSettings } from '../utils/storage-utils';
 import { addPropertyType } from './property-types-manager';
 import { getMessage } from '../utils/i18n';
+import { SCHEMA_VERSION } from '../utils/import-export';
 
 export let templates: Template[] = [];
 export let editingTemplateIndex = -1;
@@ -52,6 +53,20 @@ export async function loadTemplates(): Promise<Template[]> {
 			console.log('No valid templates found, creating default template');
 			const defaultTemplate = createDefaultTemplate();
 			templates = [defaultTemplate];
+			await saveTemplateSettings();
+		}
+
+		let shouldSaveAfterPatch = false;
+		// Apply patch to any template with different schemaVersion
+		templates = templates.map((template) => {
+			if(!template.schemaVersion || template.schemaVersion !== SCHEMA_VERSION) {
+				shouldSaveAfterPatch = true;
+				return patchAndUpdateTemplateVersion(template);
+			}
+			return template;
+		});
+
+		if(shouldSaveAfterPatch) {
 			await saveTemplateSettings();
 		}
 
@@ -112,6 +127,7 @@ async function prepareTemplateForSave(template: Template): Promise<[string[], st
 
 export function createDefaultTemplate(): Template {
 	return {
+		schemaVersion: SCHEMA_VERSION,
 		id: Date.now().toString() + Math.random().toString(36).slice(2, 11),
 		name: getMessage('defaultTemplateName'),
 		behavior: 'create',
@@ -268,4 +284,27 @@ export async function cleanupTemplateStorage(): Promise<void> {
 	await rebuildTemplateList();
 	await loadTemplates();
 	console.log('Template storage cleaned up and rebuilt');
+}
+
+export function patchAndUpdateTemplateVersion(template: Template): Template {
+	console.log(`Patching template "${template.name}" from schema version ${template.schemaVersion}`);
+
+	if(!template.schemaVersion || template.schemaVersion === "0.1.0") {
+		template.properties = patchBackslashBeforeDoublequotesInProperties(template.properties);
+	}
+
+	template.schemaVersion = SCHEMA_VERSION;
+
+	return template;
+}
+
+// Fix https://github.com/obsidianmd/obsidian-clipper/issues/598
+export function patchBackslashBeforeDoublequotesInProperties(properties: Property[]): Property[] {
+	if(!properties.length) return properties;
+
+	for(const property of properties) {
+		property.value = property.value.replace(/\\"/g, '"');
+	}
+
+	return properties;
 }
