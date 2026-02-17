@@ -12,6 +12,7 @@ import {
 } from './highlighter-overlays';
 import { detectBrowser, addBrowserClassToHtml } from './browser-detection';
 import { generalSettings, loadSettings } from './storage-utils';
+import { normalizeUrlForMatching } from './string-utils';
 
 /**
  * Helper function to create SVG elements
@@ -116,6 +117,29 @@ export interface StoredData {
 }
 
 type HighlightsStorage = Record<string, StoredData>;
+
+/**
+ * Resolve which storage key should be used for reading highlights for the current page.
+ * Intended use: read-path fallback when the same page URL differs only by query/hash.
+ */
+function findHighlightStorageKey(allHighlights: HighlightsStorage, currentUrl: string): string | null {
+	if (allHighlights[currentUrl]) {
+		return currentUrl;
+	}
+
+	const normalizedCurrentUrl = normalizeUrlForMatching(currentUrl);
+	if (allHighlights[normalizedCurrentUrl]) {
+		return normalizedCurrentUrl;
+	}
+
+	for (const storedUrl of Object.keys(allHighlights)) {
+		if (normalizeUrlForMatching(storedUrl) === normalizedCurrentUrl) {
+			return storedUrl;
+		}
+	}
+
+	return null;
+}
 
 export function updateHighlights(newHighlights: AnyHighlightData[]) {
 	const oldHighlights = [...highlights];
@@ -961,7 +985,8 @@ export async function loadHighlights() {
 	const url = window.location.href;
 	const result = await browser.storage.local.get('highlights');
 	const allHighlights = (result.highlights || {}) as HighlightsStorage;
-	const storedData = allHighlights[url];
+	const storageKey = findHighlightStorageKey(allHighlights, url);
+	const storedData = storageKey ? allHighlights[storageKey] : undefined;
 	
 	if (storedData && Array.isArray(storedData.highlights) && storedData.highlights.length > 0) {
 		highlights = storedData.highlights;
