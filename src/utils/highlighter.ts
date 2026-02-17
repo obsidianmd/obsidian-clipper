@@ -12,6 +12,7 @@ import {
 } from './highlighter-overlays';
 import { detectBrowser, addBrowserClassToHtml } from './browser-detection';
 import { generalSettings, loadSettings } from './storage-utils';
+import { normalizeUrlForMatching } from './string-utils';
 
 /**
  * Helper function to create SVG elements
@@ -116,6 +117,31 @@ export interface StoredData {
 }
 
 type HighlightsStorage = Record<string, StoredData>;
+
+/**
+ * Finds all storage keys that map to the current logical page URL.
+ * Intended use: read-path only fallback for query/hash URL decorations.
+ */
+function getMatchingHighlightStorageKeys(allHighlights: HighlightsStorage, currentUrl: string): string[] {
+	const normalizedCurrentUrl = normalizeUrlForMatching(currentUrl);
+	return Object.keys(allHighlights).filter((storedUrl) => normalizeUrlForMatching(storedUrl) === normalizedCurrentUrl);
+}
+
+/**
+ * Reads and merges highlights for every matching URL key.
+ * Intended use: preserve compatibility with legacy datasets split across base/hash/query keys.
+ */
+function collectHighlightsForCurrentPage(allHighlights: HighlightsStorage, currentUrl: string): AnyHighlightData[] {
+	const matchingKeys = getMatchingHighlightStorageKeys(allHighlights, currentUrl);
+
+	return matchingKeys
+		// Resolve matching URL keys to storage records.
+		.map((storageKey) => allHighlights[storageKey])
+		// Merge every record's highlight array into one read dataset.
+		.flatMap((storedData) => (Array.isArray(storedData?.highlights) ? storedData.highlights : []))
+		// Ignore malformed entries that are not highlight objects.
+		.filter((highlight): highlight is AnyHighlightData => Boolean(highlight && typeof highlight === 'object'));
+}
 
 export function updateHighlights(newHighlights: AnyHighlightData[]) {
 	const oldHighlights = [...highlights];
@@ -961,10 +987,10 @@ export async function loadHighlights() {
 	const url = window.location.href;
 	const result = await browser.storage.local.get('highlights');
 	const allHighlights = (result.highlights || {}) as HighlightsStorage;
-	const storedData = allHighlights[url];
+	const mergedHighlights = collectHighlightsForCurrentPage(allHighlights, url);
 	
-	if (storedData && Array.isArray(storedData.highlights) && storedData.highlights.length > 0) {
-		highlights = storedData.highlights;
+	if (mergedHighlights.length > 0) {
+		highlights = mergedHighlights;
 		
 		// Load settings to check if "Always show highlights" is enabled
 		await loadSettings();

@@ -168,6 +168,26 @@ export function formatDuration(ms: number): string {
 	}
 }
 
+/**
+ * Removes trailing URL decorations (`?query` and `#hash`) for page-URL matching.
+ * Intended use: keep highlights visible even when the same page is opened with different anchors/queries.
+ * Example: both
+ * `https://en.wikipedia.org/wiki/Obsidian_(software)#History`
+ * and
+ * `https://en.wikipedia.org/wiki/Obsidian_(software)?utm_source=test#Features`
+ * match the same stored page key.
+ */
+export function normalizeUrlForMatching(url: string): string {
+	try {
+		const parsedUrl = new URL(url);
+		parsedUrl.search = '';
+		parsedUrl.hash = '';
+		return parsedUrl.href;
+	} catch (_error) {
+		return url;
+	}
+}
+
 export function getDomain(url: string): string {
 	try {
 		const urlObj = new URL(url);
