@@ -70,6 +70,8 @@ export interface Settings {
 	highlighterEnabled: boolean;
 	alwaysShowHighlights: boolean;
 	highlightBehavior: string;
+	highlightPalette: string[];
+	defaultHighlightColor: string;
 	interpreterModel?: string;
 	models: ModelConfig[];
 	providers: Provider[];

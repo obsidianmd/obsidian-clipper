@@ -205,6 +205,22 @@
 	}
 }
 
+.highlight-color-palette-settings {
+	display: flex;
+	gap: 6px;
+	align-items: center;
+
+	input[type="color"] {
+		width: 28px;
+		height: 28px;
+		border: 1px solid var(--background-modifier-border);
+		border-radius: 50%;
+		padding: 0;
+		cursor: pointer;
+		background: transparent;
+	}
+}
+
 #sidebar {
 	background-color: var(--background-secondary);
 	width: 25%;

@@ -249,6 +249,8 @@ body.obsidian-highlighter-always-show,
 body.obsidian-highlighter-active {
 	.obsidian-highlight-overlay {
 		display: block;
+		cursor: pointer;
+		pointer-events: auto;
 	}
 }
 
@@ -329,6 +331,8 @@ body.obsidian-highlighter-active {
 		}
 	}
 }
+
+@import './styles/highlighter-widget';
 
 #obsidian-highlight-hover-overlay {
 	position: absolute;

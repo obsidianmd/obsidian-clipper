@@ -11,8 +11,9 @@ declare global {
 	}
 }
 
-// Use a self-executing function to create a closure
-// This allows the script to be re-executed without redeclaring variables
+// Use a self-executing function + initialization guard because this content script
+// can be injected multiple times (for example by `ensureContentScriptLoaded` in background).
+// This prevents duplicate listeners and duplicated UI state.
 (function() {
 	// Check if the script has already been initialized
 	if (window.hasOwnProperty('obsidianHighlighterInitialized')) {
@@ -158,7 +159,7 @@ declare global {
 		extractedContent: { [key: string]: string };
 		schemaOrgData: any;
 		fullHtml: string;
-		highlights: string[];
+		highlights: highlighter.AnyHighlightData[];
 		title: string;
 		description: string;
 		domain: string;
@@ -299,7 +300,8 @@ declare global {
 				extractedContent: extractedContent,
 				favicon: defuddled.favicon,
 				fullHtml: cleanedHtml,
-				highlights: highlighter.getHighlights(),
+				// Return full highlight metadata (color/notes/etc.), not only text strings.
+				highlights: highlighter.getHighlightsData(),
 				image: defuddled.image,
 				parseTime: defuddled.parseTime,
 				published: defuddled.published,
