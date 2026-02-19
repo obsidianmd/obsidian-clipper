@@ -11,7 +11,7 @@ import {
 	handleTouchMove
 } from './highlighter-overlays';
 import { detectBrowser, addBrowserClassToHtml } from './browser-detection';
-import { generalSettings, loadSettings } from './storage-utils';
+import { generalSettings, loadSettings, DEFAULT_HIGHLIGHT_COLOR } from './storage-utils';
 import { normalizeUrlForMatching } from './string-utils';
 
 /**
@@ -70,6 +70,7 @@ export let highlights: AnyHighlightData[] = [];
 export let isApplyingHighlights = false;
 let lastAppliedHighlights: string = '';
 let originalLinkClickHandlers: WeakMap<HTMLElement, (event: MouseEvent) => void> = new WeakMap();
+let sessionHighlightColor: string | null = null;
 
 interface HistoryAction {
 	type: 'add' | 'remove';
@@ -94,6 +95,9 @@ export interface HighlightData {
 	id: string;
 	xpath: string;
 	content: string;
+	// Stable creation timestamp used by UI (tooltip/date) and debugging; persisted with highlights.
+	createdAt?: number;
+	color?: string;
 	notes?: string[]; // Annotations
 }
 
@@ -143,10 +147,66 @@ function collectHighlightsForCurrentPage(allHighlights: HighlightsStorage, curre
 		.filter((highlight): highlight is AnyHighlightData => Boolean(highlight && typeof highlight === 'object'));
 }
 
+function getDefaultHighlightColor(): string {
+	const paletteColor = Array.isArray(generalSettings.highlightPalette)
+		? generalSettings.highlightPalette[0]
+		: undefined;
+	if (sessionHighlightColor && Array.isArray(generalSettings.highlightPalette) && generalSettings.highlightPalette.includes(sessionHighlightColor)) {
+		return sessionHighlightColor;
+	}
+	return paletteColor || DEFAULT_HIGHLIGHT_COLOR;
+}
+
+/**
+ * Updates the in-memory default highlight color for this content-script session only.
+ * Why: future highlights should follow the latest widget color choice without persisting preference to settings.
+ */
+export function setLastUsedHighlightColor(color: string): void {
+	if (!color || !Array.isArray(generalSettings.highlightPalette) || generalSettings.highlightPalette.length === 0) {
+		return;
+	}
+	if (!generalSettings.highlightPalette.includes(color)) {
+		return;
+	}
+	if (sessionHighlightColor === color) {
+		return;
+	}
+	sessionHighlightColor = color;
+}
+
+// Picks the first valid timestamp candidate, used when loading legacy data and merging highlights.
+function resolveHighlightCreatedAt(...candidates: Array<number | undefined>): number {
+	for (const candidate of candidates) {
+		if (typeof candidate === 'number' && Number.isFinite(candidate) && candidate > 0) {
+			return candidate;
+		}
+	}
+	return Date.now();
+}
+
+function normalizeHighlightData(highlight: AnyHighlightData): AnyHighlightData {
+	const parsedIdTimestamp = Number.parseInt(highlight.id, 10);
+	// `createdAt` was added later; legacy highlights often used Date.now()-style IDs.
+	// Use parsed ID timestamp before falling back to Date.now().
+	const createdAt = resolveHighlightCreatedAt(
+		highlight.createdAt,
+		Number.isFinite(parsedIdTimestamp) && parsedIdTimestamp > 0 ? parsedIdTimestamp : undefined
+	);
+
+	// Preserve legacy color semantics: pre-color highlights stay yellow instead of inheriting the current default.
+	return {
+		...highlight,
+		createdAt,
+		color: highlight.color || DEFAULT_HIGHLIGHT_COLOR,
+		notes: Array.isArray(highlight.notes) ? highlight.notes.filter((note): note is string => typeof note === 'string') : []
+	};
+}
+
 export function updateHighlights(newHighlights: AnyHighlightData[]) {
 	const oldHighlights = [...highlights];
-	highlights = newHighlights;
-	addToHistory('add', oldHighlights, newHighlights);
+	const normalizedHighlights = newHighlights.map(normalizeHighlightData);
+	highlights = normalizedHighlights;
+	addToHistory('add', oldHighlights, normalizedHighlights);
 }
 
 // Toggle highlighter mode on or off
@@ -238,7 +298,7 @@ async function handleClipButtonClick(e: Event) {
 	const browserType = await detectBrowser();
 
 	try {
-		const response = await browser.runtime.sendMessage({action: "openPopup"});
+		const response = await browser.runtime.sendMessage({ action: "openPopup" });
 		if (response && typeof response === 'object' && 'success' in response) {
 			if (!response.success) {
 				throw new Error((response as { error?: string }).error || 'Unknown error');
@@ -480,11 +540,14 @@ export function highlightElement(element: Element, notes?: string[]) {
 	const xpath = getElementXPath(targetElement);
 	const content = targetElement.outerHTML;
 	const isBlockElement = window.getComputedStyle(targetElement).display === 'block';
+	const createdAt = Date.now();
 	addHighlight({ 
 		xpath, 
 		content, 
 		type: isBlockElement ? 'element' : 'text', 
-		id: Date.now().toString(),
+		id: createdAt.toString(),
+		createdAt,
+		color: getDefaultHighlightColor(),
 		startOffset: 0,
 		endOffset: targetElement.textContent?.length || 0
 	}, notes);
@@ -501,7 +564,11 @@ export function handleTextSelection(selection: Selection, notes?: string[]) {
 		let currentBatchHighlights = [...highlights]; // Start with global state for merging
 
 		for (const highlightData of newHighlightDatas) {
-			const newHighlightWithNotes = { ...highlightData, notes: notes || [] };
+			const newHighlightWithNotes = {
+				...highlightData,
+				color: highlightData.color || getDefaultHighlightColor(),
+				notes: notes || []
+			};
 			// Merge current new highlight with the accumulating batch from this selection + pre-existing ones
 			currentBatchHighlights = mergeOverlappingHighlights(currentBatchHighlights, newHighlightWithNotes);
 		}
@@ -525,6 +592,7 @@ export function handleTextSelection(selection: Selection, notes?: string[]) {
 function getHighlightRanges(range: Range): TextHighlightData[] {
 	const newHighlights: TextHighlightData[] = [];
 	if (range.collapsed) return newHighlights;
+	const batchCreatedAt = Date.now();
 
 	const uniqueParentBlocks = new Set<Element>();
 	const textNodeIterator = document.createNodeIterator(
@@ -613,7 +681,9 @@ function getHighlightRanges(range: Range): TextHighlightData[] {
 					xpath: getElementXPath(blockElement),
 					content: selectedTextContent,
 					type: 'text',
-					id: Date.now().toString() + "_" + i, // Unique ID for the batch
+					id: `${batchCreatedAt}_${i}`, // Unique ID for the batch
+					createdAt: batchCreatedAt,
+					color: getDefaultHighlightColor(),
 					startOffset: getTextOffset(blockElement, currentBlockSelectionRange.startContainer, currentBlockSelectionRange.startOffset),
 					endOffset: getTextOffset(blockElement, currentBlockSelectionRange.endContainer, currentBlockSelectionRange.endOffset)
 				});
@@ -643,11 +713,14 @@ function getHighlightRanges(range: Range): TextHighlightData[] {
 			});
 			const content = sanitizeAndPreserveFormatting(htmlContent);
 			if (content.trim() !== "") {
+				const createdAt = Date.now();
 				newHighlights.push({
 					xpath: getElementXPath(parentElement),
 					content: content,
 					type: 'text',
-					id: Date.now().toString(),
+					id: createdAt.toString(),
+					createdAt,
+					color: getDefaultHighlightColor(),
 					startOffset: getTextOffset(parentElement, range.startContainer, range.startOffset),
 					endOffset: getTextOffset(parentElement, range.endContainer, range.endOffset)
 				});
@@ -745,7 +818,11 @@ function getTextOffset(container: Element, targetNode: Node, targetOffset: numbe
 // Add a new highlight to the page
 function addHighlight(highlight: AnyHighlightData, notes?: string[]) {
 	const oldHighlights = [...highlights];
-	const newHighlight = { ...highlight, notes: notes || [] };
+	const newHighlight = normalizeHighlightData({
+		...highlight,
+		color: highlight.color || getDefaultHighlightColor(),
+		notes: notes || []
+	});
 	const mergedHighlights = mergeOverlappingHighlights(highlights, newHighlight);
 	highlights = mergedHighlights;
 	addToHistory('add', oldHighlights, mergedHighlights);
@@ -818,6 +895,7 @@ function mergeOverlappingHighlights(existingHighlights: AnyHighlightData[], newH
 	let merged = false;
 
 	for (const existing of existingHighlights) {
+		// Overlapping or directly-adjacent highlights are intentionally merged into one contiguous highlight.
 		if (doHighlightsOverlap(existing, newHighlight) || areHighlightsAdjacent(existing, newHighlight)) {
 			if (!merged) {
 				mergedHighlights.push(mergeHighlights(existing, newHighlight));
@@ -841,6 +919,18 @@ function mergeOverlappingHighlights(existingHighlights: AnyHighlightData[], newH
 function mergeHighlights(highlight1: AnyHighlightData, highlight2: AnyHighlightData): AnyHighlightData {
 	const element1 = getElementByXPath(highlight1.xpath);
 	const element2 = getElementByXPath(highlight2.xpath);
+	const notes = Array.from(new Set([
+		...(Array.isArray(highlight1.notes) ? highlight1.notes.filter((note): note is string => typeof note === 'string') : []),
+		...(Array.isArray(highlight2.notes) ? highlight2.notes.filter((note): note is string => typeof note === 'string') : [])
+	]));
+	const color = highlight2.color || highlight1.color || DEFAULT_HIGHLIGHT_COLOR;
+	const createdAt = resolveHighlightCreatedAt(
+		highlight1.createdAt && highlight2.createdAt
+			? Math.min(highlight1.createdAt, highlight2.createdAt)
+			: undefined,
+		highlight1.createdAt,
+		highlight2.createdAt
+	);
 
 	if (!element1 || !element2) {
 		throw new Error("Cannot merge highlights: elements not found");
@@ -848,9 +938,9 @@ function mergeHighlights(highlight1: AnyHighlightData, highlight2: AnyHighlightD
 
 	// If one highlight is an element and the other is text, prioritize the element highlight
 	if (highlight1.type === 'element' && highlight2.type === 'text') {
-		return highlight1;
+		return { ...highlight1, notes, color, createdAt };
 	} else if (highlight2.type === 'element' && highlight1.type === 'text') {
-		return highlight2;
+		return { ...highlight2, notes, color, createdAt };
 	}
 
 	let mergedElement: Element;
@@ -868,7 +958,10 @@ function mergeHighlights(highlight1: AnyHighlightData, highlight2: AnyHighlightD
 			xpath: getElementXPath(mergedElement),
 			content: mergedElement.outerHTML,
 			type: 'complex',
-			id: Date.now().toString()
+			id: Date.now().toString(),
+			createdAt,
+			color,
+			notes
 		};
 	}
 
@@ -880,8 +973,11 @@ function mergeHighlights(highlight1: AnyHighlightData, highlight2: AnyHighlightD
 													  Math.max(highlight1.endOffset, highlight2.endOffset)) || '',
 			type: 'text',
 			id: Date.now().toString(),
+			createdAt,
 			startOffset: Math.min(highlight1.startOffset, highlight2.startOffset),
-			endOffset: Math.max(highlight1.endOffset, highlight2.endOffset)
+			endOffset: Math.max(highlight1.endOffset, highlight2.endOffset),
+			color,
+			notes
 		};
 	}
 
@@ -890,7 +986,10 @@ function mergeHighlights(highlight1: AnyHighlightData, highlight2: AnyHighlightD
 		xpath: getElementXPath(mergedElement),
 		content: mergedElement.outerHTML,
 		type: 'complex',
-		id: Date.now().toString()
+		id: Date.now().toString(),
+		createdAt,
+		color,
+		notes
 	};
 }
 
@@ -925,27 +1024,28 @@ function getParents(element: Element): Element[] {
 // Save highlights to browser storage
 export function saveHighlights() {
 	const url = window.location.href;
-	if (highlights.length > 0) {
-		const data: StoredData = { highlights, url };
-		browser.storage.local.get('highlights').then((result: { highlights?: HighlightsStorage }) => {
+	browser.storage.local.get('highlights')
+		.then((result: { highlights?: HighlightsStorage }) => {
 			const allHighlights: HighlightsStorage = result.highlights || {};
-			allHighlights[url] = data;
-			browser.storage.local.set({ highlights: allHighlights });
+			if (highlights.length > 0) {
+				allHighlights[url] = { highlights: highlights.map(normalizeHighlightData), url };
+			} else {
+				delete allHighlights[url];
+			}
+			return browser.storage.local.set({ highlights: allHighlights });
+		})
+		.catch((error) => {
+			console.error('Failed to persist highlights:', error);
 		});
-	} else {
-		// Remove the entry if there are no highlights
-		browser.storage.local.get('highlights').then((result: { highlights?: HighlightsStorage }) => {
-			const allHighlights: HighlightsStorage = result.highlights || {};
-			delete allHighlights[url];
-			browser.storage.local.set({ highlights: allHighlights });
-		});
-	}
 }
 
 // Apply all highlights to the page
 export function applyHighlights() {
 	if (highlights.length === 0) {
-		return; // Don't do anything if there are no highlights
+		// Clearing the final highlight must also clear any already-rendered overlays.
+		removeExistingHighlights();
+		lastAppliedHighlights = JSON.stringify(highlights);
+		return;
 	}
 
 	if (isApplyingHighlights) return;
@@ -982,6 +1082,11 @@ export function getHighlights(): string[] {
 	return highlights.map(h => h.content);
 }
 
+export function getHighlightsData(): AnyHighlightData[] {
+	// Always expose normalized data to downstream exporters/templates.
+	return highlights.map(normalizeHighlightData);
+}
+
 // Load highlights from browser storage
 export async function loadHighlights() {
 	const url = window.location.href;
@@ -990,7 +1095,7 @@ export async function loadHighlights() {
 	const mergedHighlights = collectHighlightsForCurrentPage(allHighlights, url);
 	
 	if (mergedHighlights.length > 0) {
-		highlights = mergedHighlights;
+		highlights = mergedHighlights.map(normalizeHighlightData);
 		
 		// Load settings to check if "Always show highlights" is enabled
 		await loadSettings();

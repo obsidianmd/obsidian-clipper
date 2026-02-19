@@ -1,0 +1,39 @@
+$highlight-color-swatch-selected-ring-color: rgba(255, 255, 255, 0.95);
+
+@mixin highlight-color-swatch-base($size: 18px, $border-width: 2px) {
+	width: $size;
+	height: $size;
+	border: $border-width solid transparent;
+	border-radius: 50%;
+	cursor: pointer;
+	box-sizing: border-box;
+}
+
+@mixin highlight-color-swatch-selected(
+	$ring-color: $highlight-color-swatch-selected-ring-color
+) {
+	border-color: $ring-color;
+}
+
+@mixin highlight-color-input-reset {
+	appearance: none;
+	-webkit-appearance: none;
+	padding: 0;
+	background: transparent;
+	overflow: hidden;
+
+	&::-webkit-color-swatch-wrapper {
+		padding: 0;
+		border-radius: 50%;
+	}
+
+	&::-webkit-color-swatch {
+		border: none;
+		border-radius: 50%;
+	}
+
+	&::-moz-color-swatch {
+		border: none;
+		border-radius: 50%;
+	}
+}

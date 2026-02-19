@@ -132,21 +132,32 @@ export async function initializePageContent(
 
 		const markdownBody = createMarkdownContent(content, currentUrl);
 
-		// Convert each highlight to markdown individually and create an object with text, timestamp, and notes (if not empty)
+		// Convert each highlight to markdown and include optional metadata for templates
 		const highlightsData = highlights.map(highlight => {
 			const highlightData: {
 				text: string;
-				timestamp: string;
+				timestamp?: string;
+				color?: string;
 				notes?: string[];
+				comment?: string;
 			} = {
-				text: createMarkdownContent(highlight.content, currentUrl),
-				timestamp: dayjs(parseInt(highlight.id)).toISOString(), // Convert to ISO format
+				text: createMarkdownContent(highlight.content, currentUrl)
 			};
-			
-			if (highlight.notes && highlight.notes.length > 0) {
-				highlightData.notes = highlight.notes;
+
+			// Timestamp is sourced from explicit highlight metadata, never inferred from IDs.
+			if (typeof highlight.createdAt === 'number' && Number.isFinite(highlight.createdAt) && highlight.createdAt > 0) {
+				highlightData.timestamp = dayjs(highlight.createdAt).toISOString();
 			}
 			
+			if (highlight.color) {
+				highlightData.color = highlight.color;
+			}
+
+			if (highlight.notes && highlight.notes.length > 0) {
+				highlightData.notes = highlight.notes;
+				highlightData.comment = highlight.notes[0];
+			}
+
 			return highlightData;
 		});
 
