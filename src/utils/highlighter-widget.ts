@@ -433,7 +433,7 @@ export function openHighlightWidgetForOverlay(overlay: HTMLElement): void {
 
 	const removeButton = document.createElement('button');
 	removeButton.type = 'button';
-	removeButton.className = `${HIGHLIGHT_WIDGET_ICON_BUTTON_CLASS} mod-danger`;
+	removeButton.className = HIGHLIGHT_WIDGET_ICON_BUTTON_CLASS;
 	removeButton.title = 'Remove highlight';
 	removeButton.setAttribute('aria-label', 'Remove highlight');
 	removeButton.appendChild(createActionIcon(Trash2));
