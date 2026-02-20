@@ -108,6 +108,17 @@ export function initializeHighlightWidget(nextBindings: HighlightWidgetBindings)
 		closeHighlightWidget();
 	}, { capture: true, passive: true });
 
+	document.addEventListener('keydown', (event: KeyboardEvent) => {
+		// Keyboard dismiss parity with the top highlighter toolbar.
+		if (event.key !== 'Escape') {
+			return;
+		}
+		if (!highlightActionMenu?.classList.contains(HIGHLIGHT_WIDGET_STATE_OPEN)) {
+			return;
+		}
+		closeHighlightWidget();
+	}, true);
+
 	document.addEventListener('mousemove', (event: MouseEvent) => {
 		// Keep tooltip strictly hover-bound: if pointer leaves all overlays, close it.
 		if (!highlightCommentTooltip?.classList.contains(HIGHLIGHT_WIDGET_STATE_OPEN)) {
@@ -463,8 +474,21 @@ export function openHighlightWidgetForOverlay(overlay: HTMLElement): void {
 		closeHighlightWidget();
 	});
 
+	const closeButton = document.createElement('button');
+	closeButton.type = 'button';
+	closeButton.className = HIGHLIGHT_WIDGET_ICON_BUTTON_CLASS;
+	closeButton.title = 'Close';
+	closeButton.setAttribute('aria-label', 'Close');
+	closeButton.appendChild(createActionIcon(X));
+	closeButton.addEventListener('click', (event) => {
+		event.preventDefault();
+		event.stopPropagation();
+		closeHighlightWidget();
+	});
+
 	actionsRow.appendChild(noteButton);
 	actionsRow.appendChild(removeButton);
+	actionsRow.appendChild(closeButton);
 
 	menuRow.appendChild(colorsRow);
 	menuRow.appendChild(divider);
