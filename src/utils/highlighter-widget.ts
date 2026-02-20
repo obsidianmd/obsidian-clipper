@@ -64,6 +64,11 @@ export function initializeHighlightWidget(nextBindings: HighlightWidgetBindings)
 	}
 	dismissListenersInstalled = true;
 
+	// Viewport movement can recreate/reposition overlays without a matching mouseleave.
+	// Reset tooltip state so it never lingers after scroll/resize.
+	window.addEventListener('scroll', hideHighlightWidgetTooltip, { passive: true });
+	window.addEventListener('resize', hideHighlightWidgetTooltip);
+
 	document.addEventListener('click', (event: MouseEvent) => {
 		// Modified clicks are treated as non-dismiss interactions to avoid interfering with browser/OS shortcuts.
 		if (event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) {
@@ -102,6 +107,20 @@ export function initializeHighlightWidget(nextBindings: HighlightWidgetBindings)
 		}
 		closeHighlightWidget();
 	}, { capture: true, passive: true });
+
+	document.addEventListener('mousemove', (event: MouseEvent) => {
+		// Keep tooltip strictly hover-bound: if pointer leaves all overlays, close it.
+		if (!highlightCommentTooltip?.classList.contains(HIGHLIGHT_WIDGET_STATE_OPEN)) {
+			return;
+		}
+
+		const target = event.target instanceof Element ? event.target : null;
+		if (target?.closest(OVERLAY_SELECTOR)) {
+			return;
+		}
+
+		hideHighlightWidgetTooltip();
+	}, true);
 }
 
 /**
