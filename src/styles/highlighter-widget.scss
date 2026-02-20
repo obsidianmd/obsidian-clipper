@@ -227,6 +227,7 @@
 
 .obsidian-highlight-widget-comment-input {
 	all: unset;
+	display: block;
 	width: 100%;
 	min-height: 40px;
 	padding: 8px;
@@ -236,7 +237,11 @@
 	background: rgba(255, 255, 255, 0.08);
 	color: #fff;
 	font-size: 12px;
-	line-height: 1;
+	line-height: 1.25;
+	font-family: inherit;
+	resize: none;
+	white-space: pre-wrap;
+	overflow-y: hidden;
 
 	&::placeholder {
 		color: rgba(255, 255, 255, 0.6);

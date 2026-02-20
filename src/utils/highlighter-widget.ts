@@ -26,6 +26,7 @@ const HIGHLIGHT_WIDGET_STATE_OPEN = 'is-open';
 const HIGHLIGHT_WIDGET_STATE_EDITOR_OPEN = 'is-comment-editor-open';
 const HIGHLIGHT_WIDGET_STATE_NO_COMMENT = 'is-no-comment';
 const DEFAULT_HIGHLIGHT_COLOR = DEFAULT_HIGHLIGHT_PALETTE[0];
+const MAX_COMMENT_EDITOR_HEIGHT_PX = 180;
 
 type Point = { clientX: number; clientY: number };
 
@@ -389,11 +390,20 @@ export function openHighlightWidgetForOverlay(overlay: HTMLElement): void {
 		const editor = document.createElement('div');
 		editor.className = HIGHLIGHT_WIDGET_COMMENT_EDITOR_CLASS;
 
-		const commentInput = document.createElement('input');
-		commentInput.type = 'text';
+		const commentInput = document.createElement('textarea');
 		commentInput.className = HIGHLIGHT_WIDGET_COMMENT_INPUT_CLASS;
 		commentInput.placeholder = 'Add comment';
 		commentInput.value = currentComment;
+		commentInput.rows = 2;
+
+		// Autosize keeps multiline comments readable when reopening existing annotations.
+		const resizeCommentInput = () => {
+			commentInput.style.height = 'auto';
+			const nextHeight = Math.min(commentInput.scrollHeight, MAX_COMMENT_EDITOR_HEIGHT_PX);
+			commentInput.style.height = `${nextHeight}px`;
+			commentInput.style.overflowY = commentInput.scrollHeight > MAX_COMMENT_EDITOR_HEIGHT_PX ? 'auto' : 'hidden';
+			positionHighlightWidget(overlay);
+		};
 
 		const editorActions = document.createElement('div');
 		editorActions.className = HIGHLIGHT_WIDGET_COMMENT_EDITOR_ACTIONS_CLASS;
@@ -423,15 +433,18 @@ export function openHighlightWidgetForOverlay(overlay: HTMLElement): void {
 		});
 
 		commentInput.addEventListener('keydown', (inputEvent) => {
-			if (inputEvent.key === 'Enter') {
+			// Plain Enter should stay in the textarea; use Mod+Enter for keyboard save.
+			if (inputEvent.key === 'Enter' && (inputEvent.metaKey || inputEvent.ctrlKey)) {
 				inputEvent.preventDefault();
 				saveComment(commentInput.value);
 			}
 			if (inputEvent.key === 'Escape') {
 				inputEvent.preventDefault();
+				inputEvent.stopPropagation();
 				closeCommentEditor();
 			}
 		});
+		commentInput.addEventListener('input', resizeCommentInput);
 
 		editorActions.appendChild(saveButton);
 		editorActions.appendChild(cancelButton);
@@ -443,6 +456,7 @@ export function openHighlightWidgetForOverlay(overlay: HTMLElement): void {
 		if (menuRowWidth > 0) {
 			menu.style.minWidth = `${menuRowWidth}px`;
 		}
+		resizeCommentInput();
 		positionHighlightWidget(overlay);
 		if (focusInput) {
 			commentInput.focus();
