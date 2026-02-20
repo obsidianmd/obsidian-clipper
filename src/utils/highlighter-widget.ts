@@ -37,6 +37,7 @@ type HighlightTooltipData = {
 export interface HighlightWidgetBindings {
 	getHighlights: () => AnyHighlightData[];
 	persistHighlights: (nextHighlights: AnyHighlightData[]) => void;
+	rememberColorPreference: (color: string) => void;
 }
 
 interface OverlayDecorationOptions {
@@ -261,7 +262,7 @@ export function openHighlightWidgetForOverlay(overlay: HTMLElement): void {
 	menu.dataset.highlightIndex = String(highlightIndex);
 
 	const palette = getHighlightPalette();
-	const selectedColor = normalizeHexColor(highlight.color || generalSettings.defaultHighlightColor || DEFAULT_HIGHLIGHT_COLOR);
+	const selectedColor = normalizeHexColor(highlight.color || palette[0] || DEFAULT_HIGHLIGHT_COLOR);
 	const hasComment = Array.isArray(highlight.notes) && highlight.notes.length > 0;
 
 	menu.textContent = '';
@@ -288,6 +289,8 @@ export function openHighlightWidgetForOverlay(overlay: HTMLElement): void {
 				...item,
 				color
 			}));
+			// Persist this swatch as the default for subsequent highlights.
+			bindings?.rememberColorPreference(color);
 			closeHighlightWidget();
 		});
 		colorsRow.appendChild(colorButton);

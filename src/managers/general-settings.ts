@@ -426,24 +426,6 @@ function getHighlightPaletteFromInputs(): string[] {
 	});
 }
 
-function updateDefaultHighlightColorOptions(palette: string[], selectedColor: string): void {
-	const defaultColorSelect = document.getElementById('default-highlight-color') as HTMLSelectElement | null;
-	if (!defaultColorSelect) {
-		return;
-	}
-
-	defaultColorSelect.textContent = '';
-	palette.forEach((color, index) => {
-		const option = document.createElement('option');
-		option.value = color;
-		option.textContent = `Color ${index + 1}`;
-		defaultColorSelect.appendChild(option);
-	});
-
-	const fallbackColor = palette[0] || DEFAULT_HIGHLIGHT_PALETTE[0];
-	defaultColorSelect.value = palette.includes(selectedColor) ? selectedColor : fallbackColor;
-}
-
 function initializeHighlighterSettings(): void {
 	initializeSettingToggle('highlighter-toggle', generalSettings.highlighterEnabled, (checked) => {
 		saveSettings({ ...generalSettings, highlighterEnabled: checked });
@@ -478,26 +460,9 @@ function initializeHighlighterSettings(): void {
 				return;
 			}
 			const palette = getHighlightPaletteFromInputs();
-			const currentDefault = (document.getElementById('default-highlight-color') as HTMLSelectElement | null)?.value
-				|| generalSettings.defaultHighlightColor;
-			const nextDefault = palette.includes(currentDefault) ? currentDefault : palette[0];
-			updateDefaultHighlightColorOptions(palette, nextDefault);
 			saveSettings({
 				...generalSettings,
-				highlightPalette: palette,
-				defaultHighlightColor: nextDefault
-			});
-		});
-	}
-
-	updateDefaultHighlightColorOptions(generalSettings.highlightPalette, generalSettings.defaultHighlightColor);
-	const defaultHighlightColorSelect = document.getElementById('default-highlight-color') as HTMLSelectElement | null;
-	if (defaultHighlightColorSelect) {
-		defaultHighlightColorSelect.addEventListener('change', () => {
-			saveSettings({
-				...generalSettings,
-				highlightPalette: getHighlightPaletteFromInputs(),
-				defaultHighlightColor: defaultHighlightColorSelect.value
+				highlightPalette: palette
 			});
 		});
 	}

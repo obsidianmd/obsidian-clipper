@@ -8,7 +8,8 @@ import {
 	applyHighlights,
 	saveHighlights,
 	updateHighlights,
-	updateHighlighterMenu
+	updateHighlighterMenu,
+	setLastUsedHighlightColor
 } from './highlighter';
 import { throttle } from './throttle';
 import { getElementByXPath, isDarkColor } from './dom-utils';
@@ -40,6 +41,9 @@ initializeHighlightWidget({
 		applyHighlights();
 		saveHighlights();
 		updateHighlighterMenu();
+	},
+	rememberColorPreference: (color: string) => {
+		setLastUsedHighlightColor(color);
 	}
 });
 

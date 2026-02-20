@@ -69,6 +69,7 @@ export let highlights: AnyHighlightData[] = [];
 export let isApplyingHighlights = false;
 let lastAppliedHighlights: string = '';
 let originalLinkClickHandlers: WeakMap<HTMLElement, (event: MouseEvent) => void> = new WeakMap();
+let sessionHighlightColor: string | null = null;
 
 interface HistoryAction {
 	type: 'add' | 'remove';
@@ -121,7 +122,30 @@ export interface StoredData {
 type HighlightsStorage = Record<string, StoredData>;
 
 function getDefaultHighlightColor(): string {
-	return generalSettings.defaultHighlightColor || DEFAULT_HIGHLIGHT_COLOR;
+	const paletteColor = Array.isArray(generalSettings.highlightPalette)
+		? generalSettings.highlightPalette[0]
+		: undefined;
+	if (sessionHighlightColor && Array.isArray(generalSettings.highlightPalette) && generalSettings.highlightPalette.includes(sessionHighlightColor)) {
+		return sessionHighlightColor;
+	}
+	return paletteColor || DEFAULT_HIGHLIGHT_COLOR;
+}
+
+/**
+ * Updates the in-memory default highlight color for this content-script session only.
+ * Why: future highlights should follow the latest widget color choice without persisting preference to settings.
+ */
+export function setLastUsedHighlightColor(color: string): void {
+	if (!color || !Array.isArray(generalSettings.highlightPalette) || generalSettings.highlightPalette.length === 0) {
+		return;
+	}
+	if (!generalSettings.highlightPalette.includes(color)) {
+		return;
+	}
+	if (sessionHighlightColor === color) {
+		return;
+	}
+	sessionHighlightColor = color;
 }
 
 // Picks the first valid timestamp candidate, used when loading legacy data and merging highlights.

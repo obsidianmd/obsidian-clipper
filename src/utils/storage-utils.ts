@@ -18,7 +18,6 @@ export let generalSettings: Settings = {
 	alwaysShowHighlights: false,
 	highlightBehavior: 'highlight-inline',
 	highlightPalette: [...DEFAULT_HIGHLIGHT_PALETTE],
-	defaultHighlightColor: DEFAULT_HIGHLIGHT_COLOR,
 	showMoreActionsButton: false,
 	interpreterModel: '',
 	models: [],
@@ -68,6 +67,7 @@ interface StorageData {
 		alwaysShowHighlights?: boolean;
 		highlightBehavior?: string;
 		highlightPalette?: string[];
+		// Legacy field kept for backward-compatible parsing; runtime now derives default color from highlightPalette[0].
 		defaultHighlightColor?: string;
 	};
 	reader_settings?: {
@@ -123,7 +123,6 @@ export async function loadSettings(): Promise<Settings> {
 		alwaysShowHighlights: true,
 		highlightBehavior: 'highlight-inline',
 		highlightPalette: [...DEFAULT_HIGHLIGHT_PALETTE],
-		defaultHighlightColor: DEFAULT_HIGHLIGHT_COLOR,
 		interpreterModel: '',
 		models: [],
 		providers: [],
@@ -168,14 +167,10 @@ export async function loadSettings(): Promise<Settings> {
 			.map(sanitizeHexColor)
 			.filter((color): color is string => color !== null)
 		: [];
-	// Ensure at least one configured color exists and default color always belongs to the palette.
+	// Ensure at least one configured color exists so highlightPalette[0] can always be used as the runtime default.
 	const highlightPalette = sanitizedHighlightPalette.length > 0
 		? sanitizedHighlightPalette
 		: defaultSettings.highlightPalette;
-	const defaultHighlightColor = sanitizeHexColor(data.highlighter_settings?.defaultHighlightColor)
-		?? highlightPalette[0]
-		?? defaultSettings.defaultHighlightColor;
-
 	// Load user settings
 	const loadedSettings: Settings = {
 		vaults: sanitizedVaults.length > 0 ? sanitizedVaults : defaultSettings.vaults,
@@ -190,9 +185,6 @@ export async function loadSettings(): Promise<Settings> {
 		alwaysShowHighlights: data.highlighter_settings?.alwaysShowHighlights ?? defaultSettings.alwaysShowHighlights,
 		highlightBehavior: data.highlighter_settings?.highlightBehavior ?? defaultSettings.highlightBehavior,
 		highlightPalette: highlightPalette,
-		defaultHighlightColor: highlightPalette.includes(defaultHighlightColor)
-			? defaultHighlightColor
-			: highlightPalette[0],
 		interpreterModel: data.interpreter_settings?.interpreterModel || defaultSettings.interpreterModel,
 		models: sanitizedModels,
 		providers: sanitizedProviders,
@@ -237,8 +229,7 @@ export async function saveSettings(settings?: Partial<Settings>): Promise<void> 
 			highlighterEnabled: generalSettings.highlighterEnabled,
 			alwaysShowHighlights: generalSettings.alwaysShowHighlights,
 			highlightBehavior: generalSettings.highlightBehavior,
-			highlightPalette: generalSettings.highlightPalette,
-			defaultHighlightColor: generalSettings.defaultHighlightColor
+			highlightPalette: generalSettings.highlightPalette
 		},
 		interpreter_settings: {
 			interpreterModel: generalSettings.interpreterModel,

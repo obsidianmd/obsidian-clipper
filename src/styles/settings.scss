@@ -1,3 +1,5 @@
+@import 'highlight-color-swatch';
+
 .logo {
 	fill: var(--color-accent-1);
 }
@@ -211,13 +213,13 @@
 	align-items: center;
 
 	input[type="color"] {
-		width: 28px;
-		height: 28px;
-		border: 1px solid var(--background-modifier-border);
-		border-radius: 50%;
-		padding: 0;
-		cursor: pointer;
-		background: transparent;
+		@include highlight-color-swatch-base();
+		@include highlight-color-input-reset();
+
+		&:focus-visible {
+			outline: 2px solid var(--interactive-accent);
+			outline-offset: 2px;
+		}
 	}
 }
 

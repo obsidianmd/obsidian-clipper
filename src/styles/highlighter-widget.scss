@@ -1,3 +1,5 @@
+@import 'highlight-color-swatch';
+
 // Highlight widget component (tooltip + action menu + inline comment editor)
 .obsidian-highlight-overlay.obsidian-highlight-overlay-dark .obsidian-highlight-widget-badge {
 	background: rgba(29, 29, 34, 0.95);
@@ -126,15 +128,10 @@
 .obsidian-highlight-widget-color-swatch {
 	all: unset;
 	appearance: none;
-	border: 2px solid transparent;
-	width: 18px;
-	height: 18px;
-	border-radius: 999px;
-	cursor: pointer;
-	box-sizing: border-box;
+	@include highlight-color-swatch-base();
 
 	&.is-selected {
-		border-color: rgba(255, 255, 255, 0.95);
+		@include highlight-color-swatch-selected();
 	}
 }
 
