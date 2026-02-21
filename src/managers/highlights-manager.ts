@@ -11,9 +11,16 @@ export async function exportHighlights(): Promise<void> {
 
 		const exportData = Object.entries(allHighlights).map(([url, data]) => ({
 			url,
+			// Mirror template metadata shape so manual export matches clipping output.
 			highlights: (data.highlights as AnyHighlightData[]).map(highlight => ({
 				text: highlight.content,
-				timestamp: dayjs(parseInt(highlight.id)).toISOString()
+				// Timestamp comes from explicit persisted metadata (createdAt).
+				timestamp: (typeof highlight.createdAt === 'number' && Number.isFinite(highlight.createdAt) && highlight.createdAt > 0)
+					? dayjs(highlight.createdAt).toISOString()
+					: undefined,
+				color: highlight.color,
+				notes: highlight.notes,
+				comment: highlight.notes && highlight.notes.length > 0 ? highlight.notes[0] : undefined
 			}))
 		}));
 

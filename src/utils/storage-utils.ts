@@ -5,6 +5,9 @@ import { copyToClipboard } from 'core/popup';
 
 export type { Settings, ModelConfig, PropertyType, HistoryEntry, Provider, Rating };
 
+export const DEFAULT_HIGHLIGHT_PALETTE = ['#ffeb3b', '#86d26f', '#6db6ff', '#f66d9b', '#bb86fc'];
+export const DEFAULT_HIGHLIGHT_COLOR = DEFAULT_HIGHLIGHT_PALETTE[0];
+
 export let generalSettings: Settings = {
 	vaults: [],
 	betaFeatures: false,
@@ -14,6 +17,7 @@ export let generalSettings: Settings = {
 	highlighterEnabled: true,
 	alwaysShowHighlights: false,
 	highlightBehavior: 'highlight-inline',
+	highlightPalette: [...DEFAULT_HIGHLIGHT_PALETTE],
 	showMoreActionsButton: false,
 	interpreterModel: '',
 	models: [],
@@ -62,6 +66,9 @@ interface StorageData {
 		highlighterEnabled?: boolean;
 		alwaysShowHighlights?: boolean;
 		highlightBehavior?: string;
+		highlightPalette?: string[];
+		// Legacy field kept for backward-compatible parsing; runtime now derives default color from highlightPalette[0].
+		defaultHighlightColor?: string;
 	};
 	reader_settings?: {
 		fontSize?: number;
@@ -92,6 +99,15 @@ interface StorageData {
 
 const CURRENT_MIGRATION_VERSION = 1;
 
+function sanitizeHexColor(value: unknown): string | null {
+	if (typeof value !== 'string') {
+		return null;
+	}
+
+	const normalized = value.trim().toLowerCase();
+	return /^#[0-9a-f]{6}$/.test(normalized) ? normalized : null;
+}
+
 export async function loadSettings(): Promise<Settings> {
 	const data = await browser.storage.sync.get(null) as StorageData;
 	
@@ -106,6 +122,7 @@ export async function loadSettings(): Promise<Settings> {
 		highlighterEnabled: true,
 		alwaysShowHighlights: true,
 		highlightBehavior: 'highlight-inline',
+		highlightPalette: [...DEFAULT_HIGHLIGHT_PALETTE],
 		interpreterModel: '',
 		models: [],
 		providers: [],
@@ -145,7 +162,15 @@ export async function loadSettings(): Promise<Settings> {
 	const sanitizedProviders = Array.isArray(data.interpreter_settings?.providers) 
 		? data.interpreter_settings.providers.filter(p => p && typeof p === 'object' && typeof p.id === 'string') 
 		: [];
-
+	const sanitizedHighlightPalette = Array.isArray(data.highlighter_settings?.highlightPalette)
+		? data.highlighter_settings.highlightPalette
+			.map(sanitizeHexColor)
+			.filter((color): color is string => color !== null)
+		: [];
+	// Ensure at least one configured color exists so highlightPalette[0] can always be used as the runtime default.
+	const highlightPalette = sanitizedHighlightPalette.length > 0
+		? sanitizedHighlightPalette
+		: defaultSettings.highlightPalette;
 	// Load user settings
 	const loadedSettings: Settings = {
 		vaults: sanitizedVaults.length > 0 ? sanitizedVaults : defaultSettings.vaults,
@@ -159,6 +184,7 @@ export async function loadSettings(): Promise<Settings> {
 		highlighterEnabled: data.highlighter_settings?.highlighterEnabled ?? defaultSettings.highlighterEnabled,
 		alwaysShowHighlights: data.highlighter_settings?.alwaysShowHighlights ?? defaultSettings.alwaysShowHighlights,
 		highlightBehavior: data.highlighter_settings?.highlightBehavior ?? defaultSettings.highlightBehavior,
+		highlightPalette: highlightPalette,
 		interpreterModel: data.interpreter_settings?.interpreterModel || defaultSettings.interpreterModel,
 		models: sanitizedModels,
 		providers: sanitizedProviders,
@@ -202,7 +228,8 @@ export async function saveSettings(settings?: Partial<Settings>): Promise<void> 
 		highlighter_settings: {
 			highlighterEnabled: generalSettings.highlighterEnabled,
 			alwaysShowHighlights: generalSettings.alwaysShowHighlights,
-			highlightBehavior: generalSettings.highlightBehavior
+			highlightBehavior: generalSettings.highlightBehavior,
+			highlightPalette: generalSettings.highlightPalette
 		},
 		interpreter_settings: {
 			interpreterModel: generalSettings.interpreterModel,

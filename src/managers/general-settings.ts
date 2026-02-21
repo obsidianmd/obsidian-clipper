@@ -2,7 +2,7 @@ import { handleDragStart, handleDragOver, handleDrop, handleDragEnd } from '../u
 import { initializeIcons } from '../icons/icons';
 import { getCommands } from '../utils/hotkeys';
 import { initializeToggles, updateToggleState, initializeSettingToggle } from '../utils/ui-utils';
-import { generalSettings, loadSettings, saveSettings, setLocalStorage, getLocalStorage } from '../utils/storage-utils';
+import { generalSettings, loadSettings, saveSettings, setLocalStorage, getLocalStorage, DEFAULT_HIGHLIGHT_PALETTE } from '../utils/storage-utils';
 import { detectBrowser } from '../utils/browser-detection';
 import { createElementWithClass, createElementWithHTML } from '../utils/dom-utils';
 import { createDefaultTemplate, getTemplates, saveTemplateSettings } from '../managers/template-manager';
@@ -27,6 +27,14 @@ const STORE_URLS = {
 	safari: 'https://apps.apple.com/us/app/obsidian-web-clipper/id6720708363',
 	edge: 'https://microsoftedge.microsoft.com/addons/detail/obsidian-web-clipper/eigdjhmgnaaeaonimdklocfekkaanfme'
 };
+
+const HIGHLIGHT_COLOR_INPUT_IDS = [
+	'highlight-color-0',
+	'highlight-color-1',
+	'highlight-color-2',
+	'highlight-color-3',
+	'highlight-color-4'
+] as const;
 
 export function updateVaultList(): void {
 	const vaultList = document.getElementById('vault-list') as HTMLUListElement;
@@ -411,6 +419,13 @@ function initializeExportHighlightsButton(): void {
 	}
 }
 
+function getHighlightPaletteFromInputs(): string[] {
+	return HIGHLIGHT_COLOR_INPUT_IDS.map((id, index) => {
+		const input = document.getElementById(id) as HTMLInputElement | null;
+		return input?.value || generalSettings.highlightPalette[index] || DEFAULT_HIGHLIGHT_PALETTE[index];
+	});
+}
+
 function initializeHighlighterSettings(): void {
 	initializeSettingToggle('highlighter-toggle', generalSettings.highlighterEnabled, (checked) => {
 		saveSettings({ ...generalSettings, highlighterEnabled: checked });
@@ -425,6 +440,30 @@ function initializeHighlighterSettings(): void {
 		highlightBehaviorSelect.value = generalSettings.highlightBehavior;
 		highlightBehaviorSelect.addEventListener('change', () => {
 			saveSettings({ ...generalSettings, highlightBehavior: highlightBehaviorSelect.value });
+		});
+	}
+
+	// Initialize color inputs from saved settings; changes are handled via one delegated listener below.
+	HIGHLIGHT_COLOR_INPUT_IDS.forEach((id, index) => {
+		const input = document.getElementById(id) as HTMLInputElement | null;
+		if (!input) {
+			return;
+		}
+		input.value = generalSettings.highlightPalette[index] || DEFAULT_HIGHLIGHT_PALETTE[index];
+	});
+
+	const highlightPaletteContainer = document.getElementById('highlight-color-palette');
+	if (highlightPaletteContainer) {
+		// Delegated handler keeps wiring simple and avoids one listener per swatch.
+		highlightPaletteContainer.addEventListener('change', (event) => {
+			if (!(event.target instanceof HTMLInputElement) || event.target.type !== 'color') {
+				return;
+			}
+			const palette = getHighlightPaletteFromInputs();
+			saveSettings({
+				...generalSettings,
+				highlightPalette: palette
+			});
 		});
 	}
 }
