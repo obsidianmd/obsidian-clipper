@@ -623,12 +623,38 @@ function ensureHighlightActionMenu(): HTMLElement {
 	return highlightActionMenu;
 }
 
+function findCurrentWidgetAnchorOverlay(): HTMLElement | null {
+	if (!highlightActionMenu) {
+		return null;
+	}
+
+	const highlightId = highlightActionMenu.dataset.highlightId || '';
+	const rawIndex = Number.parseInt(highlightActionMenu.dataset.highlightIndex || '', 10);
+	const highlightIndex = Number.isInteger(rawIndex) ? rawIndex : -1;
+	return findOverlayByHighlightRef(highlightId, highlightIndex) ?? null;
+}
+
 function positionHighlightWidget(anchorElement: HTMLElement): void {
 	if (!highlightActionMenu) {
 		return;
 	}
 
-	const rect = anchorElement.getBoundingClientRect();
+	// Overlay nodes are frequently recreated during repaint cycles.
+	// Re-resolve the current anchor by highlight id/index to avoid stale detached nodes
+	// snapping the widget to viewport origin.
+	let resolvedAnchor = anchorElement;
+	if (!resolvedAnchor.isConnected) {
+		const currentAnchor = findCurrentWidgetAnchorOverlay();
+		if (!currentAnchor) {
+			return;
+		}
+		resolvedAnchor = currentAnchor;
+	}
+
+	const rect = resolvedAnchor.getBoundingClientRect();
+	if (rect.width <= 0 && rect.height <= 0) {
+		return;
+	}
 	const menuRect = highlightActionMenu.getBoundingClientRect();
 	const preferredTop = rect.bottom + window.scrollY + 8;
 	const fallbackTop = rect.top + window.scrollY - menuRect.height - 8;
