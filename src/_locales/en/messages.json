@@ -360,6 +360,21 @@
 	"highlighterSettings": {
 		"message": "Highlighter"
 	},
+	"highlightsPaneAudio": {
+		"message": "Audio highlight"
+	},
+	"highlightsPaneElement": {
+		"message": "Element highlight"
+	},
+	"highlightsPaneEmpty": {
+		"message": "No highlights on this page yet."
+	},
+	"highlightsPaneImage": {
+		"message": "Image highlight"
+	},
+	"highlightsPaneVideo": {
+		"message": "Video highlight"
+	},
 	"history": {
 		"message": "History"
 	},

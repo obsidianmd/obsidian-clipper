@@ -312,11 +312,23 @@ body.obsidian-highlighter-active {
 		pointer-events: all;
 	}
 
+	&.is-selected {
+		display: block;
+		pointer-events: all;
+		border: 2px solid rgba(255, 255, 255, 0.95);
+		box-shadow: 0 0 0 2px rgba(255, 235, 0, 0.95);
+	}
+
 	&.obsidian-highlight-overlay-dark {
 		mix-blend-mode: screen;
 		background-color: rgba(255, 235, 0, 0.25);
 		&.is-hovering {
 			border: 2px dashed rgb(255, 235, 0, 0.5);
+		}
+
+		&.is-selected {
+			border: 2px solid rgba(255, 255, 255, 0.9);
+			box-shadow: 0 0 0 2px rgba(255, 235, 0, 0.7);
 		}
 
 		.copy-url-button {

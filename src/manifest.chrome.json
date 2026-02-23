@@ -23,7 +23,7 @@
 		"default_popup": "popup.html"
 	},
 	"side_panel": {
-		"default_path": "side-panel.html"
+		"default_path": "highlights-panel.html"
 	},
 	"options_ui": {
 		"page": "settings.html",

@@ -1,0 +1,141 @@
+.is-highlights-panel {
+	height: 100vh;
+}
+
+#highlights-panel-container {
+	height: 100vh;
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	background-color: var(--background-primary);
+}
+
+.highlights-panel-list {
+	flex: 1 1 auto;
+	overflow-y: auto;
+	padding: 12px;
+}
+
+.highlights-panel-empty {
+	margin: 0;
+	padding: 14px;
+	border: 1px dashed var(--background-modifier-border);
+	border-radius: var(--radius-m);
+	background-color: var(--background-primary-alt);
+	color: var(--text-muted);
+	font-size: var(--font-ui-small);
+	text-align: center;
+}
+
+.highlights-panel-item {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	margin-bottom: 10px;
+	padding: 10px;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-m);
+	background-color: var(--background-primary-alt);
+	cursor: pointer;
+	transition: border-color 120ms ease, box-shadow 120ms ease, background-color 120ms ease;
+
+	&:last-child {
+		margin-bottom: 0;
+	}
+}
+
+.highlights-panel-item:focus-visible {
+	outline: 2px solid var(--interactive-accent);
+	outline-offset: 2px;
+}
+
+.highlights-panel-item.is-selected {
+	border-color: var(--interactive-accent);
+	box-shadow: 0 0 0 1px var(--interactive-accent);
+	background-color: var(--background-secondary-alt, var(--background-primary-alt));
+}
+
+.highlights-panel-item-meta {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.highlights-panel-item-date {
+	margin: 0;
+	margin-inline-start: auto;
+	font-size: 11px;
+	line-height: 1.25;
+	color: var(--text-muted);
+	text-align: right;
+	white-space: nowrap;
+	font-variant-numeric: tabular-nums;
+}
+
+.highlights-panel-tree-node {
+	margin: 0 0 8px;
+	padding: 0;
+}
+
+.highlights-panel-tree-summary {
+	margin: 0;
+	padding: 2px 0;
+	color: var(--text-muted);
+	font-size: 11px;
+	line-height: 1.35;
+	white-space: normal;
+	word-break: break-word;
+	cursor: pointer;
+
+	&::marker {
+		color: var(--text-faint);
+	}
+}
+
+/* Tree bodies are spacing-only containers: no inherited indentation for highlight cards. */
+.highlights-panel-tree-body {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	margin: 4px 0 0;
+}
+
+/* Indent only nested heading groups (not highlight items) to keep cards aligned with their parent heading. */
+.highlights-panel-tree-body > .highlights-panel-tree-node {
+	margin-inline-start: 8px;
+	padding-inline-start: 10px;
+	border-inline-start: 1px solid var(--background-modifier-border);
+}
+
+/* Flatten the first semantic level: no extra offset/guide line directly under the top heading. */
+.highlights-panel-tree-node[data-node-depth='0'] > .highlights-panel-tree-body > .highlights-panel-tree-node {
+	margin-inline-start: 0;
+	padding-inline-start: 0;
+	border-inline-start: none;
+}
+
+/* Cards are already separated by tree body gap; remove card-level stacking margin in this context. */
+.highlights-panel-tree-body > .highlights-panel-item {
+	margin-bottom: 0;
+}
+
+.highlights-panel-item-excerpt {
+	margin: 0;
+	padding-inline-start: 10px;
+	border-inline-start: 3px solid var(--highlight-accent-color, #f4d35e);
+	font-size: var(--font-ui-small);
+	line-height: 1.4;
+	color: var(--text-normal);
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+.highlights-panel-item-annotation {
+	margin: 0;
+	font-size: var(--font-ui-small);
+	line-height: 1.4;
+	color: var(--text-normal);
+	white-space: pre-wrap;
+	word-break: break-word;
+}

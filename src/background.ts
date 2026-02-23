@@ -1,5 +1,4 @@
 import browser from 'webextension-polyfill';
-import { detectBrowser } from './utils/browser-detection';
 import { updateCurrentActiveTab, isValidUrl, isBlankPage } from './utils/active-tab-manager';
 import { TextHighlightData } from './utils/highlighter';
 import { debounce } from './utils/debounce';
@@ -55,6 +54,18 @@ function getHighlighterModeForTab(tabId: number): boolean {
 	return highlighterModeState[tabId] ?? false;
 }
 
+async function openHighlightsSidePanel(tabId: number, windowId: number): Promise<void> {
+	const sidePanelApi = (globalThis as typeof globalThis & { chrome?: typeof chrome }).chrome?.sidePanel;
+	if (!sidePanelApi || typeof sidePanelApi.open !== 'function') {
+		throw new Error('Side panel API unavailable');
+	}
+
+	// open() must happen immediately in the user-gesture call stack.
+	sidePanelApi.open({ tabId });
+	sidePanelOpenWindows.add(windowId);
+	await ensureContentScriptLoadedInBackground(tabId);
+}
+
 async function initialize() {
 	try {
 		// Set up tab listeners
@@ -104,7 +115,15 @@ async function sendMessageToPopup(tabId: number, message: any): Promise<void> {
 
 browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime.MessageSender, sendResponse: (response?: any) => void): true | undefined => {
 	if (typeof request === 'object' && request !== null) {
-		const typedRequest = request as { action: string; isActive?: boolean; hasHighlights?: boolean; tabId?: number; text?: string };
+		const typedRequest = request as {
+			action: string;
+			isActive?: boolean;
+			hasHighlights?: boolean;
+			tabId?: number;
+			text?: string;
+			highlightId?: string;
+			origin?: 'panel' | 'page';
+		};
 		
 		if (typedRequest.action === 'copy-to-clipboard' && typedRequest.text) {
 			// Use content script to copy to clipboard
@@ -194,12 +213,79 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 			return true;
 		}
 
-		if (typedRequest.action === "toggleHighlighterMode" && typedRequest.tabId) {
-			toggleHighlighterMode(typedRequest.tabId)
-				.then(newMode => sendResponse({ success: true, isActive: newMode }))
-				.catch(error => sendResponse({ success: false, error: error.message }));
-			return true;
-		}
+			if (typedRequest.action === "toggleHighlighterMode" && typedRequest.tabId) {
+				toggleHighlighterMode(typedRequest.tabId)
+					.then(newMode => sendResponse({ success: true, isActive: newMode }))
+					.catch(error => sendResponse({ success: false, error: error.message }));
+				return true;
+			}
+
+			if (typedRequest.action === "openHighlightsSidePanel") {
+				const senderTab = sender.tab;
+				if (senderTab?.id && senderTab.windowId) {
+					openHighlightsSidePanel(senderTab.id, senderTab.windowId)
+						.then(() => sendResponse({ success: true }))
+						.catch((error) => sendResponse({ success: false, error: error instanceof Error ? error.message : String(error) }));
+					return true;
+				}
+
+				browser.tabs.query({ active: true, currentWindow: true }).then(async (tabs) => {
+					const activeTab = tabs[0];
+					if (!activeTab?.id || activeTab.windowId === undefined) {
+						sendResponse({ success: false, error: 'No active tab found' });
+						return;
+					}
+
+					try {
+						await openHighlightsSidePanel(activeTab.id, activeTab.windowId);
+						sendResponse({ success: true });
+					} catch (error) {
+						sendResponse({ success: false, error: error instanceof Error ? error.message : String(error) });
+					}
+				});
+				return true;
+			}
+
+			if (typedRequest.action === "selectHighlightById") {
+				const tabId = typedRequest.tabId;
+				const highlightId = typedRequest.highlightId;
+				if (!tabId || !highlightId) {
+					sendResponse({ success: false, error: 'Missing tabId or highlightId' });
+					return true;
+				}
+
+				ensureContentScriptLoadedInBackground(tabId)
+					.then(() => browser.tabs.sendMessage(tabId, {
+						action: "selectHighlightById",
+						highlightId,
+						origin: "panel"
+					}))
+					.then((response) => {
+						if (response && typeof response === 'object' && 'success' in response) {
+							sendResponse(response);
+							return;
+						}
+						sendResponse({ success: true });
+					})
+					.catch((error) => {
+						sendResponse({
+							success: false,
+							error: error instanceof Error ? error.message : String(error)
+						});
+					});
+				return true;
+			}
+
+			if (typedRequest.action === "highlightSelectedInPage" && sender.tab?.id && typedRequest.highlightId) {
+				browser.runtime.sendMessage({
+					action: "highlightSelected",
+					tabId: sender.tab.id,
+					highlightId: typedRequest.highlightId,
+					origin: "page"
+				}).catch((error) => {
+					console.warn('Failed to sync selected highlight to panel:', error);
+				});
+			}
 
 		if (typedRequest.action === "openPopup") {
 			browser.action.openPopup()
@@ -467,8 +553,8 @@ const debouncedUpdateContextMenu = debounce(async (tabId: number) => {
 				}
 			];
 
-		const browserType = await detectBrowser();
-		if (browserType === 'chrome') {
+		const sidePanelApi = (globalThis as typeof globalThis & { chrome?: typeof chrome }).chrome?.sidePanel;
+		if (sidePanelApi && typeof sidePanelApi.open === 'function') {
 			menuItems.push({
 				id: 'open-side-panel',
 				title: browser.i18n.getMessage('openSidePanel'),
@@ -501,17 +587,15 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
 	// 	await ensureContentScriptLoadedInBackground(tab.id);
 	// 	await injectReaderScript(tab.id);
 	// 	await browser.tabs.sendMessage(tab.id, { action: "toggleReaderMode" });
-	} else if (info.menuItemId === 'open-embedded' && tab && tab.id) {
-		await ensureContentScriptLoadedInBackground(tab.id);
-		await browser.tabs.sendMessage(tab.id, { action: "toggle-iframe" });
-	} else if (info.menuItemId === 'open-side-panel' && tab && tab.id && tab.windowId) {
-		chrome.sidePanel.open({ tabId: tab.id });
-		sidePanelOpenWindows.add(tab.windowId);
-		await ensureContentScriptLoadedInBackground(tab.id);
-	} else if (info.menuItemId === 'copy-markdown-to-clipboard' && tab && tab.id) {
-		await ensureContentScriptLoadedInBackground(tab.id);
-		await browser.tabs.sendMessage(tab.id, { action: "copyMarkdownToClipboard" });
-	}
+		} else if (info.menuItemId === 'open-embedded' && tab && tab.id) {
+			await ensureContentScriptLoadedInBackground(tab.id);
+			await browser.tabs.sendMessage(tab.id, { action: "toggle-iframe" });
+		} else if (info.menuItemId === 'open-side-panel' && tab && tab.id && tab.windowId) {
+			await openHighlightsSidePanel(tab.id, tab.windowId);
+		} else if (info.menuItemId === 'copy-markdown-to-clipboard' && tab && tab.id) {
+			await ensureContentScriptLoadedInBackground(tab.id);
+			await browser.tabs.sendMessage(tab.id, { action: "copyMarkdownToClipboard" });
+		}
 });
 
 browser.runtime.onInstalled.addListener(() => {
@@ -523,15 +607,12 @@ async function isSidePanelOpen(windowId: number): Promise<boolean> {
 }
 
 async function setupTabListeners() {
-	const browserType = await detectBrowser();
-	if (['chrome', 'brave', 'edge'].includes(browserType)) {
-		browser.tabs.onActivated.addListener(handleTabChange);
-		browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-			if (changeInfo.status === 'complete') {
-				handleTabChange({ tabId, windowId: tab.windowId });
-			}
-		});
-	}
+	browser.tabs.onActivated.addListener(handleTabChange);
+	browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+		if (changeInfo.status === 'complete') {
+			handleTabChange({ tabId, windowId: tab.windowId });
+		}
+	});
 }
 
 const debouncedPaintHighlights = debounce(async (tabId: number) => {
@@ -542,8 +623,12 @@ const debouncedPaintHighlights = debounce(async (tabId: number) => {
 }, 250);
 
 async function handleTabChange(activeInfo: { tabId: number; windowId?: number }) {
-	if (activeInfo.windowId && await isSidePanelOpen(activeInfo.windowId)) {
-		updateCurrentActiveTab(activeInfo.windowId);
+	if (activeInfo.windowId === undefined) {
+		return;
+	}
+
+	updateCurrentActiveTab(activeInfo.windowId);
+	if (await isSidePanelOpen(activeInfo.windowId)) {
 		await debouncedPaintHighlights(activeInfo.tabId);
 	}
 }

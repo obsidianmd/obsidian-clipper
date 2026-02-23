@@ -11,6 +11,7 @@ import {
 	updateHighlighterMenu,
 	setLastUsedHighlightColor
 } from './highlighter';
+import browser from './browser-polyfill';
 import { throttle } from './throttle';
 import { getElementByXPath, isDarkColor } from './dom-utils';
 import {
@@ -31,6 +32,18 @@ let isTouchMoved: boolean = false;
 let lastHoverTarget: Element | null = null;
 
 const LINE_BY_LINE_OVERLAY_TAGS = ['P'];
+const SELECTED_OVERLAY_CLASS = 'is-selected';
+const OVERLAY_SELECTOR = '.obsidian-highlight-overlay';
+const HIGHLIGHT_SELECTION_MESSAGE = 'highlightSelectedInPage';
+
+let selectedHighlightId: string | null = null;
+let selectedHighlightIndex: string | null = null;
+
+interface OverlaySelectionOptions {
+	openWidget?: boolean;
+	scrollIntoView?: boolean;
+	notifyPanel?: boolean;
+}
 
 // Wire overlay-owned widget callbacks once for this content-script context.
 initializeHighlightWidget({
@@ -133,6 +146,135 @@ function findOverlayFromEvent(event: MouseEvent | TouchEvent | Event): HTMLEleme
 	}
 
 	return findOverlayAtPoint(point.clientX, point.clientY);
+}
+
+function notifyPanelSelection(highlightId: string): void {
+	if (!highlightId) {
+		return;
+	}
+	browser.runtime.sendMessage({
+		action: HIGHLIGHT_SELECTION_MESSAGE,
+		highlightId
+	}).catch(() => {
+		// Panel might be closed; selection still applies locally.
+	});
+}
+
+function getMatchingOverlays(highlightId: string | null, highlightIndex: string | null): HTMLElement[] {
+	const overlays = Array.from(document.querySelectorAll(OVERLAY_SELECTOR)) as HTMLElement[];
+	let matches: HTMLElement[] = [];
+
+	if (highlightId) {
+		matches = overlays.filter((overlay) => overlay.dataset.highlightId === highlightId);
+		if (matches.length > 0) {
+			return matches.sort((a, b) => {
+				const aRect = a.getBoundingClientRect();
+				const bRect = b.getBoundingClientRect();
+				if (Math.abs(aRect.top - bRect.top) > 1) {
+					return aRect.top - bRect.top;
+				}
+				return aRect.left - bRect.left;
+			});
+		}
+	}
+
+	if (highlightIndex) {
+		matches = overlays.filter((overlay) => overlay.dataset.highlightIndex === highlightIndex);
+	}
+
+	return matches.sort((a, b) => {
+		const aRect = a.getBoundingClientRect();
+		const bRect = b.getBoundingClientRect();
+		if (Math.abs(aRect.top - bRect.top) > 1) {
+			return aRect.top - bRect.top;
+		}
+		return aRect.left - bRect.left;
+	});
+}
+
+function clearSelectedOverlays(): void {
+	document.querySelectorAll(`${OVERLAY_SELECTOR}.${SELECTED_OVERLAY_CLASS}`).forEach((overlay) => {
+		overlay.classList.remove(SELECTED_OVERLAY_CLASS);
+	});
+}
+
+function applySelectedOverlayState(): HTMLElement | null {
+	clearSelectedOverlays();
+
+	const matches = getMatchingOverlays(selectedHighlightId, selectedHighlightIndex);
+	if (matches.length === 0) {
+		return null;
+	}
+
+	matches.forEach((overlay) => {
+		overlay.classList.add(SELECTED_OVERLAY_CLASS);
+	});
+
+	return matches[0];
+}
+
+function rememberSelectedOverlayReference(overlay: HTMLElement): void {
+	selectedHighlightId = overlay.dataset.highlightId || null;
+	selectedHighlightIndex = overlay.dataset.highlightIndex || null;
+}
+
+function selectOverlay(
+	overlay: HTMLElement,
+	options: OverlaySelectionOptions = {}
+): boolean {
+	rememberSelectedOverlayReference(overlay);
+	const primaryOverlay = applySelectedOverlayState();
+	if (!primaryOverlay) {
+		return false;
+	}
+
+	if (options.scrollIntoView) {
+		primaryOverlay.scrollIntoView({
+			block: 'center',
+			inline: 'nearest',
+			behavior: 'auto'
+		});
+	}
+
+	if (options.openWidget !== false) {
+		openHighlightWidgetForOverlay(primaryOverlay);
+	}
+
+	if (options.notifyPanel !== false && selectedHighlightId) {
+		notifyPanelSelection(selectedHighlightId);
+	}
+
+	return true;
+}
+
+function ensureHighlightOverlaysPresent(): void {
+	if (document.querySelector(OVERLAY_SELECTOR) || highlights.length === 0) {
+		return;
+	}
+
+	highlights.forEach((highlight, index) => {
+		const target = getElementByXPath(highlight.xpath);
+		if (target) {
+			planHighlightOverlayRects(target, highlight, index);
+		}
+	});
+}
+
+export function selectHighlightOverlayById(
+	highlightId: string,
+	options: OverlaySelectionOptions = {}
+): boolean {
+	if (!highlightId) {
+		return false;
+	}
+
+	ensureHighlightOverlaysPresent();
+	const matches = getMatchingOverlays(highlightId, null);
+	if (matches.length === 0) {
+		return false;
+	}
+
+	return selectOverlay(matches[0], options);
 }
 
 // Handles mouse move events for hover effects
@@ -451,6 +593,12 @@ function createHighlightOverlayElement(
 	if (highlightId) {
 		overlay.dataset.highlightId = highlightId;
 	}
+	if (
+		(selectedHighlightId && overlay.dataset.highlightId === selectedHighlightId) ||
+		(!selectedHighlightId && selectedHighlightIndex && overlay.dataset.highlightIndex === selectedHighlightIndex)
+	) {
+		overlay.classList.add(SELECTED_OVERLAY_CLASS);
+	}
 	
 	overlay.style.position = 'absolute';
 
@@ -514,6 +662,7 @@ function updateHighlightOverlayPositions() {
 			planHighlightOverlayRects(target, highlight, index);
 		}
 	});
+	applySelectedOverlayState();
 	syncHighlightWidgetPosition();
 }
 
@@ -664,7 +813,11 @@ function handleHighlightClick(event: Event) {
 	if (!overlay) {
 		return;
 	}
-	openHighlightWidgetForOverlay(overlay);
+	selectOverlay(overlay, {
+		openWidget: true,
+		scrollIntoView: false,
+		notifyPanel: true
+	});
 }
 
 // Remove all existing highlight overlays from the page
@@ -673,6 +826,8 @@ export function removeExistingHighlights() {
 	if (existingHighlights.length > 0) {
 		existingHighlights.forEach(el => el.remove());
 	}
+	selectedHighlightId = null;
+	selectedHighlightIndex = null;
 	hideHighlightWidgetTooltip();
 	closeHighlightWidget();
 }

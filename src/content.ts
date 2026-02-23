@@ -179,6 +179,22 @@ declare global {
 			return true;
 		}
 
+		if (request.action === "selectHighlightById") {
+			const highlightId = typeof request.highlightId === 'string' ? request.highlightId : '';
+			if (!highlightId) {
+				sendResponse({ success: false, error: 'Missing highlightId' });
+				return true;
+			}
+
+			const selected = highlighter.selectHighlightById(highlightId, {
+				openWidget: true,
+				scrollIntoView: true,
+				notifyPanel: false
+			});
+			sendResponse({ success: selected });
+			return true;
+		}
+
 		if (request.action === "toggle-iframe") {
 			toggleIframe().then(() => {
 				sendResponse({ success: true });

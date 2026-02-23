@@ -1,5 +1,6 @@
 import browser from './browser-polyfill';
 import { getElementXPath, getElementByXPath } from './dom-utils';
+import { createElement as createLucideElement, PanelRightOpen } from 'lucide';
 import {
 	handleMouseUp,
 	handleMouseMove,
@@ -7,6 +8,7 @@ import {
 	updateHighlightListeners,
 	planHighlightOverlayRects,
 	removeExistingHighlights,
+	selectHighlightOverlayById,
 	handleTouchStart,
 	handleTouchMove
 } from './highlighter-overlays';
@@ -118,6 +120,12 @@ export interface ComplexHighlightData extends HighlightData {
 export interface StoredData {
 	highlights: AnyHighlightData[];
 	url: string;
+}
+
+interface HighlightSelectionOptions {
+	openWidget?: boolean;
+	scrollIntoView?: boolean;
+	notifyPanel?: boolean;
 }
 
 type HighlightsStorage = Record<string, StoredData>;
@@ -316,6 +324,23 @@ async function handleClipButtonClick(e: Event) {
 	}
 }
 
+async function handleOpenHighlightsPanelClick(e: Event) {
+	e.preventDefault();
+
+	try {
+		const response = await browser.runtime.sendMessage({ action: "openHighlightsSidePanel" });
+		if (response && typeof response === 'object' && 'success' in response) {
+			if (!response.success) {
+				throw new Error((response as { error?: string }).error || 'Unknown error');
+			}
+		} else {
+			throw new Error('Invalid response from background script');
+		}
+	} catch (error) {
+		console.error('Failed to open highlights side panel:', error);
+	}
+}
+
 export function createHighlighterMenu() {
 	// Check if the menu already exists
 	let menu = document.querySelector('.obsidian-highlighter-menu');
@@ -401,6 +426,15 @@ export function createHighlighterMenu() {
 	});
 	redoButton.appendChild(redoSvg);
 	menu.appendChild(redoButton);
+
+	// Add open highlights panel button
+	const openPanelButton = document.createElement('button');
+	openPanelButton.id = 'obsidian-open-highlights-panel';
+	openPanelButton.title = 'Open highlights panel';
+	openPanelButton.setAttribute('aria-label', 'Open highlights panel');
+	const openPanelSvg = createLucideElement(PanelRightOpen) as SVGElement;
+	openPanelButton.appendChild(openPanelSvg);
+	menu.appendChild(openPanelButton);
 	
 	// Add exit button
 	const exitButton = document.createElement('button');
@@ -445,6 +479,7 @@ export function createHighlighterMenu() {
 	const exitButtonEl = menu.querySelector('#obsidian-exit-highlighter') as HTMLButtonElement;
 	const undoButtonEl = menu.querySelector('#obsidian-undo-highlights') as HTMLButtonElement;
 	const redoButtonEl = menu.querySelector('#obsidian-redo-highlights') as HTMLButtonElement;
+	const openPanelButtonEl = menu.querySelector('#obsidian-open-highlights-panel') as HTMLButtonElement;
 
 	if (exitButtonEl) {
 		exitButtonEl.addEventListener('click', exitHighlighterMode);
@@ -467,6 +502,14 @@ export function createHighlighterMenu() {
 		redoButtonEl.addEventListener('touchend', (e) => {
 			e.preventDefault();
 			redo();
+		});
+	}
+
+	if (openPanelButtonEl) {
+		openPanelButtonEl.addEventListener('click', handleOpenHighlightsPanelClick);
+		openPanelButtonEl.addEventListener('touchend', (e) => {
+			e.preventDefault();
+			handleOpenHighlightsPanelClick(e);
 		});
 	}
 
@@ -1045,6 +1088,7 @@ export function applyHighlights() {
 		// Clearing the final highlight must also clear any already-rendered overlays.
 		removeExistingHighlights();
 		lastAppliedHighlights = JSON.stringify(highlights);
+		notifyHighlightsUpdated();
 		return;
 	}
 
@@ -1082,9 +1126,122 @@ export function getHighlights(): string[] {
 	return highlights.map(h => h.content);
 }
 
+function isElementHiddenForExport(element: Element): boolean {
+	if (!(element instanceof HTMLElement)) {
+		return false;
+	}
+	const style = window.getComputedStyle(element);
+	return style.display === 'none';
+}
+
+function buildBlockTagIndex(root: Element): WeakMap<Element, number> {
+	const blockIndexByElement = new WeakMap<Element, number>();
+	const blockElements = root.querySelectorAll('p,li,blockquote,pre,td,th,figcaption,h1,h2,h3,h4,h5,h6');
+	const counters = new Map<string, number>();
+
+	for (let index = 0; index < blockElements.length; index++) {
+		const blockElement = blockElements[index];
+		if (isElementHiddenForExport(blockElement)) {
+			continue;
+		}
+		const tagName = blockElement.tagName.toLowerCase();
+		const current = counters.get(tagName) || 0;
+		const next = current + 1;
+		counters.set(tagName, next);
+		blockIndexByElement.set(blockElement, next);
+	}
+
+	return blockIndexByElement;
+}
+
+function getNearestSemanticBlockTag(element: Element): string | undefined {
+	const semanticBlock = element.closest('p,li,blockquote,pre,td,th,figcaption,h1,h2,h3,h4,h5,h6');
+	return semanticBlock?.tagName.toLowerCase();
+}
+
+function getSectionPathForElement(element: Element): string | undefined {
+	const root = element.closest('article,main,[role="main"]') || document.body;
+	const headings = root.querySelectorAll<HTMLElement>('h1,h2,h3,h4,h5,h6');
+	if (headings.length === 0) {
+		return undefined;
+	}
+
+	const headingStack: string[] = [];
+	for (let index = 0; index < headings.length; index++) {
+		const heading = headings[index];
+		const position = heading.compareDocumentPosition(element);
+		if (position & Node.DOCUMENT_POSITION_PRECEDING) {
+			break;
+		}
+
+		const headingText = heading.textContent?.replace(/\s+/g, ' ').trim();
+		if (!headingText) {
+			continue;
+		}
+
+		const headingLevel = Number(heading.tagName.slice(1));
+		if (!Number.isFinite(headingLevel) || headingLevel < 1 || headingLevel > 6) {
+			continue;
+		}
+
+		headingStack[headingLevel - 1] = headingText;
+		headingStack.length = headingLevel;
+	}
+
+	if (headingStack.length === 0) {
+		return undefined;
+	}
+
+	return headingStack.join(' > ');
+}
+
 export function getHighlightsData(): AnyHighlightData[] {
 	// Always expose normalized data to downstream exporters/templates.
-	return highlights.map(normalizeHighlightData);
+	const semanticRoot = document.querySelector('article,main,[role="main"]') || document.body;
+	const blockTagIndex = buildBlockTagIndex(semanticRoot);
+
+	return highlights.map((highlight) => {
+		const normalizedHighlight = normalizeHighlightData(highlight);
+		const element = getElementByXPath(normalizedHighlight.xpath);
+		if (!element) {
+			return normalizedHighlight;
+		}
+
+		const blockElement = element.closest('p,li,blockquote,pre,td,th,figcaption,h1,h2,h3,h4,h5,h6');
+		const blockTag = blockElement?.tagName.toLowerCase() || getNearestSemanticBlockTag(element);
+		const blockOrdinal = blockElement ? blockTagIndex.get(blockElement) : undefined;
+		const sectionPath = getSectionPathForElement(element);
+		if (!blockTag && !sectionPath && blockOrdinal === undefined) {
+			return normalizedHighlight;
+		}
+
+		return {
+			...normalizedHighlight,
+			blockTag,
+			blockOrdinal,
+			sectionPath
+		};
+	});
+}
+
+export function selectHighlightById(
+	highlightId: string,
+	options: HighlightSelectionOptions = {}
+): boolean {
+	if (!highlightId) {
+		return false;
+	}
+
+	if (document.querySelectorAll('.obsidian-highlight-overlay').length === 0 && highlights.length > 0) {
+		highlights.forEach((highlight, index) => {
+			const container = getElementByXPath(highlight.xpath);
+			if (container) {
+				planHighlightOverlayRects(container, highlight, index);
+			}
+		});
+	}
+
+	return selectHighlightOverlayById(highlightId, options);
 }
 
 // Load highlights from browser storage

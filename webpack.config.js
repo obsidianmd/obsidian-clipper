@@ -38,10 +38,11 @@ module.exports = (env, argv) => {
 
 	const mainConfig = {
 		mode: argv.mode,
-		entry: {
-			popup: './src/core/popup.ts',
-			settings: './src/core/settings.ts',
-			content: './src/content.ts',
+			entry: {
+				popup: './src/core/popup.ts',
+				'highlights-panel': './src/core/highlights-panel.ts',
+				settings: './src/core/settings.ts',
+				content: './src/content.ts',
 			background: './src/background.ts',
 			style: './src/style.scss',
 			highlighter: './src/highlighter.scss',
@@ -141,8 +142,9 @@ module.exports = (env, argv) => {
 							  (isSafari ? "src/manifest.safari.json" : "src/manifest.chrome.json"), 
 						to: "manifest.json" 
 					},
-					{ from: "src/popup.html", to: "popup.html" },
-					{ from: "src/side-panel.html", to: "side-panel.html" },
+						{ from: "src/popup.html", to: "popup.html" },
+						{ from: "src/highlights-panel.html", to: "highlights-panel.html" },
+						{ from: "src/side-panel.html", to: "side-panel.html" },
 					{ from: "src/settings.html", to: "settings.html" },
 					{ from: "src/icons", to: "icons" },
 					{ from: "node_modules/webextension-polyfill/dist/browser-polyfill.min.js", to: "browser-polyfill.min.js" },
