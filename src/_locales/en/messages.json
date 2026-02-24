@@ -375,6 +375,51 @@
 	"highlightsPaneVideo": {
 		"message": "Video highlight"
 	},
+	"highlightsPaneTabPage": {
+		"message": "Page"
+	},
+	"highlightsPaneTabSummary": {
+		"message": "Browse"
+	},
+	"highlightsSummaryAnnotationsCount": {
+		"message": "$1 annotations"
+	},
+	"highlightsSummaryCreatedAt": {
+		"message": "First: $1"
+	},
+	"highlightsSummaryEmpty": {
+		"message": "No annotations saved yet."
+	},
+	"highlightsSummaryLastAnnotated": {
+		"message": "Last annotation: $1"
+	},
+	"highlightsSummaryLoadMore": {
+		"message": "Load more"
+	},
+	"highlightsSummaryMostHeading": {
+		"message": "Pages with most annotations"
+	},
+	"highlightsSummaryRecentHeading": {
+		"message": "Last pages annotated"
+	},
+	"highlightsSummarySortMost": {
+		"message": "Sorted by annotation count"
+	},
+	"highlightsSummarySortRecent": {
+		"message": "Sorted by last highlight date"
+	},
+	"highlightsSummaryShownCount": {
+		"message": "$1 of $2"
+	},
+	"highlightsSummaryStatsAnnotations": {
+		"message": "Annotations"
+	},
+	"highlightsSummaryStatsPages": {
+		"message": "Pages"
+	},
+	"highlightsSummaryUpdatedAt": {
+		"message": "Last: $1"
+	},
 	"history": {
 		"message": "History"
 	},

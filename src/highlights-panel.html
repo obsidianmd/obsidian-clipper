@@ -7,7 +7,34 @@
 		<script src="browser-polyfill.min.js"></script>
 	</head>
 	<body id="highlights-panel-container">
-		<main id="highlights-panel-list" class="highlights-panel-list"></main>
+		<header class="highlights-panel-header">
+			<nav class="highlights-panel-tabs" role="tablist" aria-label="Highlights panel views">
+				<button
+					id="highlights-panel-tab-page"
+					class="highlights-panel-tab is-active"
+					type="button"
+					role="tab"
+					aria-selected="true"
+					aria-controls="highlights-panel-view-page"
+					data-i18n="highlightsPaneTabPage"
+				></button>
+				<button
+					id="highlights-panel-tab-browse"
+					class="highlights-panel-tab"
+					type="button"
+					role="tab"
+					aria-selected="false"
+					aria-controls="highlights-panel-view-browse"
+					data-i18n="highlightsPaneTabSummary"
+				></button>
+			</nav>
+		</header>
+		<section id="highlights-panel-view-page" class="highlights-panel-view is-active" role="tabpanel" aria-labelledby="highlights-panel-tab-page">
+			<main id="highlights-panel-list" class="highlights-panel-list"></main>
+		</section>
+		<section id="highlights-panel-view-browse" class="highlights-panel-view" role="tabpanel" aria-labelledby="highlights-panel-tab-browse" hidden>
+			<main id="annotation-browser-panel" class="annotation-browser-panel"></main>
+		</section>
 		<script type="module" src="highlights-panel.js"></script>
 	</body>
 </html>

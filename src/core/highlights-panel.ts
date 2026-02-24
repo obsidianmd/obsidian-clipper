@@ -3,6 +3,7 @@ import browser from '../utils/browser-polyfill';
 import { extractPageContent } from '../utils/content-extractor';
 import { isBlankPage, isValidUrl } from '../utils/active-tab-manager';
 import { getMessage, setupLanguageAndDirection, translatePage } from '../utils/i18n';
+import { createAnnotationBrowserPanelController, type AnnotationBrowserPanelController } from './annotation-browser-panel';
 
 interface HighlightPanelData {
 	id: string;
@@ -21,9 +22,13 @@ interface TabInfoResponse {
 	error?: string;
 }
 
+type HighlightsPanelView = 'page' | 'browse';
+
 let currentTabId: number | undefined;
 let selectedHighlightId: string | null = null;
 let refreshSequence = 0;
+let activePanelView: HighlightsPanelView = 'page';
+let annotationBrowserPanel: AnnotationBrowserPanelController | null = null;
 
 function updateSelectedPanelItem(highlightId: string | null, shouldScroll = false): void {
 	const listElement = document.getElementById('highlights-panel-list');
@@ -116,6 +121,57 @@ function truncateText(text: string, maxLength: number): string {
 	}
 	const truncated = text.slice(0, Math.max(0, maxLength - 3)).trimEnd();
 	return `${truncated}...`;
+}
+function setActivePanelView(view: HighlightsPanelView): void {
+	activePanelView = view;
+	const isPageView = view === 'page';
+
+	const pageTab = document.getElementById('highlights-panel-tab-page');
+	const browseTab = document.getElementById('highlights-panel-tab-browse');
+	const pageView = document.getElementById('highlights-panel-view-page');
+	const browseView = document.getElementById('highlights-panel-view-browse');
+
+	if (pageTab instanceof HTMLButtonElement) {
+		pageTab.classList.toggle('is-active', isPageView);
+		pageTab.setAttribute('aria-selected', isPageView ? 'true' : 'false');
+	}
+	if (browseTab instanceof HTMLButtonElement) {
+		browseTab.classList.toggle('is-active', !isPageView);
+		browseTab.setAttribute('aria-selected', isPageView ? 'false' : 'true');
+	}
+	if (pageView instanceof HTMLElement) {
+		pageView.classList.toggle('is-active', isPageView);
+		pageView.hidden = !isPageView;
+	}
+	if (browseView instanceof HTMLElement) {
+		browseView.classList.toggle('is-active', !isPageView);
+		browseView.hidden = isPageView;
+	}
+}
+
+function setupPanelTabs(): void {
+	const pageTab = document.getElementById('highlights-panel-tab-page');
+	const browseTab = document.getElementById('highlights-panel-tab-browse');
+
+	if (pageTab instanceof HTMLButtonElement) {
+		pageTab.addEventListener('click', () => {
+			if (activePanelView === 'page') {
+				return;
+			}
+			setActivePanelView('page');
+			refreshHighlights();
+		});
+	}
+
+	if (browseTab instanceof HTMLButtonElement) {
+		browseTab.addEventListener('click', () => {
+			if (activePanelView === 'browse') {
+				return;
+			}
+			setActivePanelView('browse');
+			annotationBrowserPanel?.refresh();
+		});
+	}
 }
 
 interface SemanticPathSegment {
@@ -408,8 +464,14 @@ function setupMessageListeners(): void {
 				refreshSequence++;
 				renderHighlights([]);
 			}
-		} else if (request.action === 'highlightsUpdated' && request.tabId === currentTabId) {
+		} else if (request.action === 'highlightsUpdated') {
+			if (request.tabId === currentTabId) {
+				refreshHighlights();
+			}
+			annotationBrowserPanel?.refresh();
+		} else if (request.action === 'highlightsCleared') {
 			refreshHighlights();
+			annotationBrowserPanel?.refresh();
 		} else if (
 			request.action === 'highlightSelected' &&
 			request.tabId === currentTabId &&
@@ -425,26 +487,35 @@ function setupMessageListeners(): void {
 async function initialize(): Promise<void> {
 	await translatePage();
 	await setupLanguageAndDirection();
+	annotationBrowserPanel = createAnnotationBrowserPanelController();
+	setupPanelTabs();
+	setActivePanelView('page');
 	setupMessageListeners();
 
 	const activeTabResponse = await browser.runtime.sendMessage({ action: 'getActiveTab' }) as { tabId?: number; error?: string };
 	if (!activeTabResponse || activeTabResponse.error || !activeTabResponse.tabId) {
 		renderHighlights([]);
+		await annotationBrowserPanel.refresh();
 		return;
 	}
 
 	currentTabId = activeTabResponse.tabId;
 	browser.runtime.sendMessage({ action: 'sidePanelOpened' });
 	window.addEventListener('unload', () => {
+		annotationBrowserPanel?.destroy();
 		browser.runtime.sendMessage({ action: 'sidePanelClosed' });
 	});
 
-	await refreshHighlights();
+	await Promise.all([
+		refreshHighlights(),
+		annotationBrowserPanel.refresh()
+	]);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
 	initialize().catch((error) => {
 		console.error('Failed to initialize highlights panel:', error);
 		renderHighlights([]);
+		annotationBrowserPanel?.renderEmpty();
 	});
 });

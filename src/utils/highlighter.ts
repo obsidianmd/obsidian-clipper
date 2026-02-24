@@ -15,6 +15,7 @@ import {
 import { detectBrowser, addBrowserClassToHtml } from './browser-detection';
 import { generalSettings, loadSettings, DEFAULT_HIGHLIGHT_COLOR } from './storage-utils';
 import { normalizeUrlForMatching } from './string-utils';
+import { normalizeHighlightCreatedAt, resolveHighlightCreatedAt } from './highlight-timestamp-utils';
 
 /**
  * Helper function to create SVG elements
@@ -182,24 +183,10 @@ export function setLastUsedHighlightColor(color: string): void {
 	sessionHighlightColor = color;
 }
 
-// Picks the first valid timestamp candidate, used when loading legacy data and merging highlights.
-function resolveHighlightCreatedAt(...candidates: Array<number | undefined>): number {
-	for (const candidate of candidates) {
-		if (typeof candidate === 'number' && Number.isFinite(candidate) && candidate > 0) {
-			return candidate;
-		}
-	}
-	return Date.now();
-}
-
 function normalizeHighlightData(highlight: AnyHighlightData): AnyHighlightData {
-	const parsedIdTimestamp = Number.parseInt(highlight.id, 10);
 	// `createdAt` was added later; legacy highlights often used Date.now()-style IDs.
-	// Use parsed ID timestamp before falling back to Date.now().
-	const createdAt = resolveHighlightCreatedAt(
-		highlight.createdAt,
-		Number.isFinite(parsedIdTimestamp) && parsedIdTimestamp > 0 ? parsedIdTimestamp : undefined
-	);
+	// Use shared timestamp normalization so all consumers resolve legacy values the same way.
+	const createdAt = normalizeHighlightCreatedAt(highlight.createdAt, highlight.id);
 
 	// Preserve legacy color semantics: pre-color highlights stay yellow instead of inheriting the current default.
 	return {
