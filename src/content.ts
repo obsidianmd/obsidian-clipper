@@ -27,6 +27,12 @@ declare global {
 	const iframeId = 'obsidian-clipper-iframe';
 	const containerId = 'obsidian-clipper-container';
 
+	function sendRuntimeMessageSafely(message: unknown): void {
+		browser.runtime.sendMessage(message).catch(() => {
+			// Background/service worker may not be reachable during reload/navigation.
+		});
+	}
+
 	function removeContainer(container: HTMLElement) {
 		container.classList.add('is-closing');
 		container.addEventListener('animationend', () => {
@@ -151,7 +157,7 @@ declare global {
 	}
 
 	// Firefox
-	browser.runtime.sendMessage({ action: "contentScriptLoaded" });
+	sendRuntimeMessageSafely({ action: "contentScriptLoaded" });
 
 	interface ContentResponse {
 		content: string;
@@ -340,15 +346,19 @@ declare global {
 				sendResponse({ success: true });
 			});
 			return true;
-		} else if (request.action === "setHighlighterMode") {
-			isHighlighterMode = request.isActive;
-			highlighter.toggleHighlighterMenu(isHighlighterMode);
-			updateHasHighlights();
-			sendResponse({ success: true });
-			return true;
-		} else if (request.action === "getHighlighterMode") {
-			browser.runtime.sendMessage({ action: "getHighlighterMode" }).then(sendResponse);
-			return true;
+			} else if (request.action === "setHighlighterMode") {
+				isHighlighterMode = request.isActive;
+				highlighter.toggleHighlighterMenu(isHighlighterMode);
+				updateHasHighlights();
+				sendResponse({ success: true });
+				return true;
+			} else if (request.action === "getHighlighterMode") {
+				browser.runtime.sendMessage({ action: "getHighlighterMode" })
+					.then(sendResponse)
+					.catch(() => {
+						sendResponse({ isActive: false });
+					});
+				return true;
 		} else if (request.action === "toggleHighlighter") {
 			highlighter.toggleHighlighterMenu(request.isActive);
 			updateHasHighlights();
@@ -406,20 +416,19 @@ declare global {
 			}
 			updateHasHighlights();
 			sendResponse({ success: true });
-		} else if (request.action === "clearHighlights") {
-			highlighter.clearHighlights();
-			updateHasHighlights();
-			sendResponse({ success: true });
-		} else if (request.action === "getHighlighterState") {
-			browser.runtime.sendMessage({ action: "getHighlighterMode" })
-				.then(response => {
-					sendResponse(response);
-				})
-				.catch(error => {
-					console.error("Error getting highlighter mode:", error);
-					sendResponse({ isActive: false });
-				});
-			return true;
+			} else if (request.action === "clearHighlights") {
+				highlighter.clearHighlights();
+				updateHasHighlights();
+				sendResponse({ success: true });
+			} else if (request.action === "getHighlighterState") {
+				browser.runtime.sendMessage({ action: "getHighlighterMode" })
+					.then(response => {
+						sendResponse(response);
+					})
+					.catch(() => {
+						sendResponse({ isActive: false });
+					});
+				return true;
 		} else if (request.action === "toggleReaderMode") {
 			// Forward the request to the background script to inject reader mode if needed
 			browser.runtime.sendMessage({ action: "toggleReaderMode", tabId: sender.tab?.id })
@@ -461,7 +470,7 @@ declare global {
 
 	function updateHasHighlights() {
 		const hasHighlights = highlighter.getHighlights().length > 0;
-		browser.runtime.sendMessage({ action: "updateHasHighlights", hasHighlights });
+		sendRuntimeMessageSafely({ action: "updateHasHighlights", hasHighlights });
 	}
 
 	async function initializeHighlighter() {
@@ -485,7 +494,7 @@ declare global {
 	function handlePageUnload() {
 		if (isHighlighterMode) {
 			highlighter.toggleHighlighterMenu(false);
-			browser.runtime.sendMessage({ action: "highlighterModeChanged", isActive: false });
+			sendRuntimeMessageSafely({ action: "highlighterModeChanged", isActive: false });
 			browser.storage.local.set({ isHighlighterMode: false });
 		}
 	}

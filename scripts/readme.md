@@ -45,3 +45,17 @@ npm run add-locale fr
 - Reads the version from `package.json`
 - Commits starting with "fix" are grouped under an **Improved** section
 - Version bump commits are excluded
+
+### Playwright Regression
+
+```bash
+python3 scripts/pw_resize_roundtrip_middle_word.py
+```
+
+- Verifies resize round-trip on overlapping text highlights:
+  - small middle-word highlight (`Clerk`)
+  - larger surrounding highlight (`James Clerk Maxwell`)
+  - per-character expansion samples while dragging the end handle
+  - grow selected small highlight to full range
+  - shrink it back to small range
+- Exits non-zero if any assertion fails.

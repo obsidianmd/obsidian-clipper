@@ -66,6 +66,7 @@
 	--obsidian-clipper-background-primary-rgb: 255, 255, 255;
 	--obsidian-clipper-background-opacity: 0.9;
 	--obsidian-clipper-text-muted: #5c5c5c;
+	--obsidian-highlight-selection-color: rgba(255, 235, 0, 0.35);
 }
 @media (prefers-color-scheme: dark) {
 	:root {
@@ -125,12 +126,30 @@ body.obsidian-highlighter-active {
 	a {
 		cursor: crosshair !important;
 	}
-	*::selection {
-		background-color: rgba(255, 235, 0, 0.35) !important;
+	// Keep overlays click-through in active mode so native drag-selection
+	// still works when text is already highlighted.
+	.obsidian-highlight-overlay,
+	.obsidian-highlight-overlay.is-hovering,
+	.obsidian-highlight-overlay.is-selected {
+		cursor: text;
+		pointer-events: none;
 	}
+}
+
+body.obsidian-highlighter-active,
+body.obsidian-highlighter-always-show {
+	*::selection {
+		background-color: var(--obsidian-highlight-selection-color, rgba(255, 235, 0, 0.35)) !important;
+	}
+}
+
+html.obsidian-offset-handle-dragging {
+	*::selection {
+		background-color: var(--obsidian-highlight-selection-color, rgba(255, 235, 0, 0.35)) !important;
+	}
+
 	.obsidian-highlight-overlay {
-		cursor: pointer;
-		pointer-events: auto;
+		opacity: 0 !important;
 	}
 }
 
@@ -245,12 +264,17 @@ body.obsidian-highlighter-active {
 	}
 }
 
-body.obsidian-highlighter-always-show,
-body.obsidian-highlighter-active {
+body.obsidian-highlighter-always-show {
 	.obsidian-highlight-overlay {
 		display: block;
 		cursor: pointer;
 		pointer-events: auto;
+	}
+}
+
+body.obsidian-highlighter-active {
+	.obsidian-highlight-overlay {
+		display: block;
 	}
 }
 
@@ -340,6 +364,60 @@ body.obsidian-highlighter-active {
 					background: #2a2a2a !important;
 				}
 			}
+		}
+	}
+}
+
+.obsidian-highlight-offset-handle {
+	--obsidian-offset-handle-accent: #2d5eff;
+	--obsidian-offset-handle-bar-length: 16px;
+	--obsidian-offset-handle-size: 12px;
+	position: absolute;
+	box-sizing: border-box;
+	width: var(--obsidian-offset-handle-size);
+	height: var(--obsidian-offset-handle-size);
+	border-radius: 999px;
+	border: 2px solid var(--obsidian-offset-handle-accent);
+	background: rgba(255, 255, 255, 0.96);
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+	color: transparent;
+	padding: 0;
+	margin: 0;
+	pointer-events: auto;
+	z-index: 999999999;
+	touch-action: none;
+	display: none;
+	align-items: center;
+	justify-content: center;
+	mix-blend-mode: normal;
+	overflow: visible;
+
+	&::before {
+		content: '';
+		position: absolute;
+		left: 50%;
+		transform: translateX(-50%);
+		width: 2px;
+		background: var(--obsidian-offset-handle-accent);
+		border-radius: 999px;
+		pointer-events: none;
+	}
+
+	&.obsidian-highlight-offset-handle-start {
+		cursor: w-resize;
+
+		&::before {
+			top: 100%;
+			height: var(--obsidian-offset-handle-bar-length);
+		}
+	}
+
+	&.obsidian-highlight-offset-handle-end {
+		cursor: e-resize;
+
+		&::before {
+			bottom: 100%;
+			height: var(--obsidian-offset-handle-bar-length);
 		}
 	}
 }

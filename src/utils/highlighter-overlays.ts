@@ -2,6 +2,7 @@ import {
 	handleTextSelection, 
 	highlightElement, 
 	AnyHighlightData, 
+	TextHighlightData,
 	highlights, 
 	isApplyingHighlights,
 	sortHighlights,
@@ -35,14 +36,101 @@ const LINE_BY_LINE_OVERLAY_TAGS = ['P'];
 const SELECTED_OVERLAY_CLASS = 'is-selected';
 const OVERLAY_SELECTOR = '.obsidian-highlight-overlay';
 const HIGHLIGHT_SELECTION_MESSAGE = 'highlightSelectedInPage';
+const OFFSET_HANDLE_CLASS = 'obsidian-highlight-offset-handle';
+const OFFSET_HANDLE_SIZE_PX = 12;
+const OFFSET_HANDLE_EDGE_START = 'start';
+const OFFSET_HANDLE_EDGE_END = 'end';
+const OFFSET_HANDLE_DRAG_THRESHOLD_PX = 2;
+const OFFSET_HANDLE_DRAGGING_CLASS = 'obsidian-offset-handle-dragging';
+const HIGHLIGHT_SELECTION_COLOR_VAR = '--obsidian-highlight-selection-color';
+const DEFAULT_SELECTION_PREVIEW_ALPHA = 0.35;
+const DRAG_SELECTION_PREVIEW_ALPHA = 0.72;
+const DEFAULT_HIGHLIGHT_SELECTION_COLOR = 'rgba(255, 235, 0, 0.35)';
+const CARET_HIT_TEST_OFFSETS_PX: ReadonlyArray<readonly [number, number]> = [
+	[0, 0],
+	[-1, 0],
+	[1, 0],
+	[0, -1],
+	[0, 1],
+	[-2, 0],
+	[2, 0],
+	[0, -2],
+	[0, 2]
+];
 
 let selectedHighlightId: string | null = null;
 let selectedHighlightIndex: string | null = null;
+let startOffsetHandle: HTMLElement | null = null;
+let endOffsetHandle: HTMLElement | null = null;
+let suppressNextMouseUpHighlight: boolean = false;
+let activeOffsetHandleDrag: OffsetHandleDragState | null = null;
+
+type OffsetHandleDragInputType = 'pointer' | 'mouse';
+
+interface OffsetHandleDragState {
+	anchorNode: Node;
+	anchorOffset: number;
+	target: Element;
+	edge: 'start' | 'end';
+	pointerId: number | null;
+	inputType: OffsetHandleDragInputType;
+	handle: HTMLElement;
+	startClientX: number;
+	startClientY: number;
+	hasMoved: boolean;
+	initialSelectionText: string;
+	disabledOverlayPointerEvents: Array<{ overlay: HTMLElement; value: string }>;
+}
 
 interface OverlaySelectionOptions {
 	openWidget?: boolean;
 	scrollIntoView?: boolean;
 	notifyPanel?: boolean;
+	openPoint?: { clientX: number; clientY: number } | null;
+}
+
+function normalizeSelectionColor(color?: string, alpha: number = DEFAULT_SELECTION_PREVIEW_ALPHA): string {
+	if (typeof color !== 'string') {
+		return DEFAULT_HIGHLIGHT_SELECTION_COLOR;
+	}
+
+	const normalized = color.trim().toLowerCase();
+	if (/^#[0-9a-f]{3}$/.test(normalized)) {
+		const r = parseInt(normalized[1] + normalized[1], 16);
+		const g = parseInt(normalized[2] + normalized[2], 16);
+		const b = parseInt(normalized[3] + normalized[3], 16);
+		return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+	}
+
+	if (/^#[0-9a-f]{6}$/.test(normalized)) {
+		const r = parseInt(normalized.slice(1, 3), 16);
+		const g = parseInt(normalized.slice(3, 5), 16);
+		const b = parseInt(normalized.slice(5, 7), 16);
+		return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+	}
+
+	const rgbMatch = normalized.match(/^rgba?\(([^)]+)\)$/);
+	if (rgbMatch) {
+		const parts = rgbMatch[1]
+			.split(',')
+			.map((part) => Number.parseFloat(part.trim()))
+			.filter((value) => Number.isFinite(value));
+		if (parts.length >= 3) {
+			const r = Math.max(0, Math.min(255, Math.round(parts[0])));
+			const g = Math.max(0, Math.min(255, Math.round(parts[1])));
+			const b = Math.max(0, Math.min(255, Math.round(parts[2])));
+			return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+		}
+	}
+
+	return DEFAULT_HIGHLIGHT_SELECTION_COLOR;
+}
+
+function setSelectionPreviewColor(color?: string, alpha: number = DEFAULT_SELECTION_PREVIEW_ALPHA): void {
+	document.documentElement.style.setProperty(
+		HIGHLIGHT_SELECTION_COLOR_VAR,
+		normalizeSelectionColor(color, alpha)
+	);
 }
 
 // Wire overlay-owned widget callbacks once for this content-script context.
@@ -72,6 +160,8 @@ function isIgnoredElement(element: Element): boolean {
 		element.tagName.toLowerCase() === 'body' || 
 		element.classList.contains('obsidian-highlighter-menu') ||
 		element.closest('.obsidian-highlighter-menu') !== null ||
+		element.classList.contains(OFFSET_HANDLE_CLASS) ||
+		element.closest(`.${OFFSET_HANDLE_CLASS}`) !== null ||
 		isHighlightWidgetElement(element) ||
 		isDisallowedTag;
 }
@@ -83,6 +173,7 @@ function isHighlighterManagedElement(element: Element): boolean {
 	return (
 		element.id.startsWith('obsidian-highlight') ||
 		element.classList.contains('obsidian-highlight-overlay') ||
+		element.classList.contains(OFFSET_HANDLE_CLASS) ||
 		isHighlightWidgetElement(element) ||
 		element.classList.contains('obsidian-highlighter-menu') ||
 		element.closest('.obsidian-highlighter-menu') !== null
@@ -192,6 +283,637 @@ function getMatchingOverlays(highlightId: string | null, highlightIndex: string 
 	});
 }
 
+function resolveSelectedTextHighlight(): { highlight: TextHighlightData; target: Element } | null {
+	let selectedHighlight: AnyHighlightData | undefined;
+
+	if (selectedHighlightId) {
+		selectedHighlight = highlights.find((item) => item.id === selectedHighlightId);
+	}
+
+	if (!selectedHighlight && selectedHighlightIndex) {
+		const parsedIndex = Number.parseInt(selectedHighlightIndex, 10);
+		if (Number.isInteger(parsedIndex) && parsedIndex >= 0 && parsedIndex < highlights.length) {
+			selectedHighlight = highlights[parsedIndex];
+		}
+	}
+
+	if (!selectedHighlight || selectedHighlight.type !== 'text') {
+		return null;
+	}
+
+	const target = getElementByXPath(selectedHighlight.xpath);
+	if (!target) {
+		return null;
+	}
+
+	return {
+		highlight: selectedHighlight,
+		target
+	};
+}
+
+function ensureOffsetHandle(edge: 'start' | 'end'): HTMLElement {
+	const existing = edge === OFFSET_HANDLE_EDGE_START ? startOffsetHandle : endOffsetHandle;
+	if (existing) {
+		return existing;
+	}
+
+	const handle = document.createElement('div');
+	handle.className = `${OFFSET_HANDLE_CLASS} ${OFFSET_HANDLE_CLASS}-${edge}`;
+	handle.dataset.edge = edge;
+	handle.title = edge === OFFSET_HANDLE_EDGE_START ? 'Adjust highlight start' : 'Adjust highlight end';
+	handle.setAttribute('role', 'button');
+	handle.setAttribute('aria-label', handle.title);
+	handle.style.display = 'none';
+
+	handle.addEventListener('pointerdown', handleOffsetHandleDown);
+	handle.addEventListener('mousedown', handleOffsetHandleMouseDown);
+	document.body.appendChild(handle);
+
+	if (edge === OFFSET_HANDLE_EDGE_START) {
+		startOffsetHandle = handle;
+	} else {
+		endOffsetHandle = handle;
+	}
+
+	return handle;
+}
+
+// Toggles a global "dragging offset handle" UI mode on the root element.
+// Why: drag-specific selection styling should stay stable without triggering body-class mutation repaint paths.
+function setOffsetHandleDraggingState(isDragging: boolean): void {
+	document.documentElement.classList.toggle(OFFSET_HANDLE_DRAGGING_CLASS, isDragging);
+}
+
+function hideOffsetHandles(): void {
+	if (activeOffsetHandleDrag) {
+		teardownOffsetHandleDrag();
+	}
+	setOffsetHandleDraggingState(false);
+
+	setSelectionPreviewColor();
+
+	if (startOffsetHandle) {
+		startOffsetHandle.style.display = 'none';
+	}
+	if (endOffsetHandle) {
+		endOffsetHandle.style.display = 'none';
+	}
+}
+
+function positionOffsetHandle(handle: HTMLElement, rect: DOMRect, edge: 'start' | 'end'): void {
+	const left = edge === OFFSET_HANDLE_EDGE_START
+		? rect.left + window.scrollX - OFFSET_HANDLE_SIZE_PX / 2
+		: rect.right + window.scrollX - OFFSET_HANDLE_SIZE_PX / 2;
+	const top = edge === OFFSET_HANDLE_EDGE_START
+		? rect.top + window.scrollY - OFFSET_HANDLE_SIZE_PX
+		: rect.bottom + window.scrollY;
+	handle.style.left = `${left}px`;
+	handle.style.top = `${top}px`;
+	handle.style.display = 'flex';
+	applyOffsetHandleLineHeight(handle, rect.height);
+}
+
+// Returns a caret-like rect for a text boundary so dragged handles can follow text rows/characters.
+// Why: during resize we want handle movement tied to selection/caret geometry, not raw pointer pixels.
+function getCaretRectAtPoint(node: Node, offset: number): DOMRect | null {
+	const range = document.createRange();
+	try {
+		range.setStart(node, offset);
+		range.setEnd(node, offset);
+	} catch {
+		return null;
+	}
+
+	let rect = range.getBoundingClientRect();
+	if ((rect.width > 0 || rect.height > 0) && Number.isFinite(rect.left) && Number.isFinite(rect.top)) {
+		return rect;
+	}
+
+	// Fallback: use an adjacent glyph rect to recover line metrics when collapsed ranges are zero-sized.
+	if (node.nodeType === Node.TEXT_NODE) {
+		const textLength = node.textContent?.length || 0;
+		if (textLength > 0) {
+			const from = Math.max(0, Math.min(offset, textLength - 1));
+			const to = Math.max(from + 1, Math.min(textLength, from + 1));
+			try {
+				range.setStart(node, from);
+				range.setEnd(node, to);
+				rect = range.getBoundingClientRect();
+				if ((rect.width > 0 || rect.height > 0) && Number.isFinite(rect.left) && Number.isFinite(rect.top)) {
+					return rect;
+				}
+			} catch {
+				// Ignore fallback failure; caller will keep previous handle position.
+			}
+		}
+	}
+
+	return null;
+}
+
+// Updates handle bar length to match nearby text line-height.
+// Why: the vertical stem should align with text rows, not stay a fixed pixel length.
+function applyOffsetHandleLineHeight(handle: HTMLElement, lineHeightPx: number): void {
+	const normalizedHeight = Number.isFinite(lineHeightPx) ? lineHeightPx : OFFSET_HANDLE_SIZE_PX;
+	const stemLength = Math.max(1, Math.round(normalizedHeight));
+	handle.style.setProperty('--obsidian-offset-handle-bar-length', `${stemLength}px`);
+}
+
+function updateOffsetHandles(): void {
+	const selectedTextHighlight = resolveSelectedTextHighlight();
+	if (!selectedTextHighlight) {
+		hideOffsetHandles();
+		return;
+	}
+
+	setSelectionPreviewColor(selectedTextHighlight.highlight.color);
+
+	const overlays = getMatchingOverlays(selectedHighlightId, selectedHighlightIndex);
+	if (overlays.length === 0) {
+		hideOffsetHandles();
+		return;
+	}
+
+	const startHandle = ensureOffsetHandle(OFFSET_HANDLE_EDGE_START);
+	const endHandle = ensureOffsetHandle(OFFSET_HANDLE_EDGE_END);
+	const startOverlay = overlays[0];
+	const endOverlay = overlays[overlays.length - 1];
+	if (!startOverlay || !endOverlay) {
+		hideOffsetHandles();
+		return;
+	}
+
+	positionOffsetHandle(startHandle, startOverlay.getBoundingClientRect(), OFFSET_HANDLE_EDGE_START);
+	positionOffsetHandle(endHandle, endOverlay.getBoundingClientRect(), OFFSET_HANDLE_EDGE_END);
+}
+
+function applyNativeSelection(anchor: { node: Node; offset: number }, focus: { node: Node; offset: number }): void {
+	const selection = window.getSelection();
+	if (!selection) {
+		return;
+	}
+
+	selection.removeAllRanges();
+	try {
+		selection.setBaseAndExtent(anchor.node, anchor.offset, focus.node, focus.offset);
+		return;
+	} catch {
+		// Fall back to a range in either direction when setBaseAndExtent is unavailable.
+	}
+
+	const range = document.createRange();
+	try {
+		range.setStart(anchor.node, anchor.offset);
+		range.setEnd(focus.node, focus.offset);
+		selection.addRange(range);
+		return;
+	} catch {
+		// Try reverse order if focus is before anchor.
+	}
+
+	try {
+		range.setStart(focus.node, focus.offset);
+		range.setEnd(anchor.node, anchor.offset);
+		selection.addRange(range);
+	} catch {
+		selection.removeAllRanges();
+	}
+}
+
+function getLegacyTextOffset(container: Element, targetNode: Node, targetOffset: number): number {
+	let offset = 0;
+	const treeWalker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
+	let node: Node | null = treeWalker.currentNode;
+
+	while (node) {
+		if (node === targetNode) {
+			return offset + targetOffset;
+		}
+		offset += node.textContent?.length || 0;
+		node = treeWalker.nextNode();
+	}
+
+	return offset;
+}
+
+function shouldUseCanonicalOffsetDecoding(target: Element, startOffset: number, endOffset: number): boolean {
+	const totalTextLength = target.textContent?.length || 0;
+	if (totalTextLength <= 0) {
+		return false;
+	}
+
+	// Legacy encoding stores offsets as (totalTextLength + actualOffset).
+	// Canonical encoding stores raw offsets from the first text node.
+	return startOffset < totalTextLength || endOffset < totalTextLength;
+}
+
+function updateSelectedTextHighlightFromSelection(selection: Selection): boolean {
+	if (selection.rangeCount === 0 || selection.isCollapsed) {
+		return false;
+	}
+
+	const selectedTextHighlight = resolveSelectedTextHighlight();
+	if (!selectedTextHighlight) {
+		return false;
+	}
+
+	const range = selection.getRangeAt(0);
+	const { target } = selectedTextHighlight;
+	const rawStart = getLegacyTextOffset(target, range.startContainer, range.startOffset);
+	const rawEnd = getLegacyTextOffset(target, range.endContainer, range.endOffset);
+	const startOffset = Math.min(rawStart, rawEnd);
+	const endOffset = Math.max(rawStart, rawEnd);
+	if (startOffset === endOffset) {
+		return false;
+	}
+
+	const selectedContent = selection.toString();
+	const mappedHighlights = highlights.map((item, index) => {
+		const itemMatchesById = Boolean(selectedHighlightId && item.id === selectedHighlightId);
+		const itemMatchesByIndex = selectedHighlightIndex === String(index);
+		const isTargetHighlight = itemMatchesById || itemMatchesByIndex;
+		if (!isTargetHighlight || item.type !== 'text') {
+			return item;
+		}
+
+		return {
+			...item,
+			startOffset,
+			endOffset,
+			content: selectedContent
+		};
+	});
+
+	updateHighlights(mappedHighlights);
+	sortHighlights();
+	applyHighlights();
+	saveHighlights();
+	updateHighlighterMenu();
+	return true;
+}
+
+function getRawCaretPointAtClientPosition(
+	clientX: number,
+	clientY: number
+): { node: Node; offset: number } | null {
+	const documentWithCaret = document as Document & {
+		caretRangeFromPoint?: (x: number, y: number) => Range | null;
+		caretPositionFromPoint?: (x: number, y: number) => { offsetNode: Node; offset: number } | null;
+	};
+
+	let node: Node | null = null;
+	let offset = 0;
+
+	if (typeof documentWithCaret.caretRangeFromPoint === 'function') {
+		const caretRange = documentWithCaret.caretRangeFromPoint(clientX, clientY);
+		if (caretRange) {
+			node = caretRange.startContainer;
+			offset = caretRange.startOffset;
+		}
+	} else if (typeof documentWithCaret.caretPositionFromPoint === 'function') {
+		const caretPosition = documentWithCaret.caretPositionFromPoint(clientX, clientY);
+		if (caretPosition) {
+			node = caretPosition.offsetNode;
+			offset = caretPosition.offset;
+		}
+	}
+
+	if (!node) {
+		return null;
+	}
+
+	return { node, offset };
+}
+
+function getCaretPointAtClientPosition(
+	clientX: number,
+	clientY: number,
+	target: Element
+): { node: Node; offset: number } | null {
+	for (const [dx, dy] of CARET_HIT_TEST_OFFSETS_PX) {
+		const rawPoint = getRawCaretPointAtClientPosition(clientX + dx, clientY + dy);
+		if (!rawPoint || !target.contains(rawPoint.node)) {
+			continue;
+		}
+
+		return resolveCaretPointToTextNode(target, rawPoint.node, rawPoint.offset);
+	}
+
+	return null;
+}
+
+// Converts caret hit-test output to a concrete text-node point.
+// Why: drag-resize depends on text-node anchors; some engines return element-boundary carets.
+function resolveCaretPointToTextNode(
+	target: Element,
+	node: Node,
+	offset: number
+): { node: Node; offset: number } | null {
+	if (node.nodeType === Node.TEXT_NODE) {
+		const length = node.textContent?.length || 0;
+		return {
+			node,
+			offset: Math.max(0, Math.min(offset, length))
+		};
+	}
+
+	const boundaryRange = document.createRange();
+	try {
+		boundaryRange.selectNodeContents(target);
+		boundaryRange.setEnd(node, offset);
+	} catch {
+		return null;
+	}
+
+	const canonicalOffset = boundaryRange.toString().length;
+	const resolved = findTextNodeAtOffset(target, canonicalOffset, true);
+	if (!resolved) {
+		return null;
+	}
+
+	const length = resolved.node.textContent?.length || 0;
+	return {
+		node: resolved.node,
+		offset: Math.max(0, Math.min(resolved.offset, length))
+	};
+}
+
+function teardownOffsetHandleDrag(): void {
+	if (!activeOffsetHandleDrag) {
+		return;
+	}
+
+	activeOffsetHandleDrag.disabledOverlayPointerEvents.forEach(({ overlay, value }) => {
+		overlay.style.pointerEvents = value;
+	});
+
+	document.removeEventListener('pointermove', handleOffsetHandleDragMove, true);
+	document.removeEventListener('pointerup', handleOffsetHandlePointerUp, true);
+	document.removeEventListener('pointercancel', handleOffsetHandlePointerCancel, true);
+	document.removeEventListener('mousemove', handleOffsetHandleDragMove, true);
+	document.removeEventListener('mouseup', handleOffsetHandleMouseUp, true);
+
+	if (activeOffsetHandleDrag.pointerId !== null) {
+		try {
+			activeOffsetHandleDrag.handle.releasePointerCapture(activeOffsetHandleDrag.pointerId);
+		} catch {
+			// Pointer capture may not be available or currently active.
+		}
+	}
+
+	setOffsetHandleDraggingState(false);
+	const selectedTextHighlight = resolveSelectedTextHighlight();
+	setSelectionPreviewColor(selectedTextHighlight?.highlight.color);
+	activeOffsetHandleDrag = null;
+}
+
+function handleOffsetHandleDragMove(event: PointerEvent | MouseEvent): void {
+	if (!activeOffsetHandleDrag) {
+		return;
+	}
+
+	if (activeOffsetHandleDrag.inputType === 'pointer') {
+		if (!(event instanceof PointerEvent) || activeOffsetHandleDrag.pointerId === null) {
+			return;
+		}
+		if (event.pointerId !== activeOffsetHandleDrag.pointerId) {
+			return;
+		}
+	} else if (event instanceof PointerEvent) {
+		return;
+	}
+
+	event.preventDefault();
+	event.stopPropagation();
+
+	// Keep caret hit-testing on page text, not on the dragged handle itself.
+	const handle = activeOffsetHandleDrag.handle;
+	const previousPointerEvents = handle.style.pointerEvents;
+	handle.style.pointerEvents = 'none';
+
+	if (
+		Math.abs(event.clientX - activeOffsetHandleDrag.startClientX) > OFFSET_HANDLE_DRAG_THRESHOLD_PX ||
+		Math.abs(event.clientY - activeOffsetHandleDrag.startClientY) > OFFSET_HANDLE_DRAG_THRESHOLD_PX
+	) {
+		activeOffsetHandleDrag.hasMoved = true;
+	}
+
+	const focus = getCaretPointAtClientPosition(event.clientX, event.clientY, activeOffsetHandleDrag.target);
+	handle.style.pointerEvents = previousPointerEvents;
+	if (!focus) {
+		return;
+	}
+
+	applyNativeSelection(
+		{
+			node: activeOffsetHandleDrag.anchorNode,
+			offset: activeOffsetHandleDrag.anchorOffset
+		},
+		focus
+	);
+
+	const caretRect = getCaretRectAtPoint(focus.node, focus.offset);
+	if (caretRect) {
+		positionOffsetHandle(handle, caretRect, activeOffsetHandleDrag.edge);
+	}
+}
+
+// Finalizes a resize drag by committing the current native selection to the selected highlight.
+// Why: pointer and mouse paths share the same completion semantics and widget reopening behavior.
+function finalizeOffsetHandleDrag(clientX: number, clientY: number): void {
+	if (!activeOffsetHandleDrag) {
+		return;
+	}
+
+	const selection = window.getSelection();
+	const currentSelectionText = selection?.toString() || '';
+	const didChangeSelection = activeOffsetHandleDrag.hasMoved || currentSelectionText !== activeOffsetHandleDrag.initialSelectionText;
+
+	teardownOffsetHandleDrag();
+	suppressNextMouseUpHighlight = true;
+
+	if (!didChangeSelection || !selection || selection.isCollapsed) {
+		return;
+	}
+
+	if (updateSelectedTextHighlightFromSelection(selection)) {
+		selection.removeAllRanges();
+		scheduleHighlightWidgetOpenFromPoint({ clientX, clientY });
+	}
+}
+
+function handleOffsetHandlePointerUp(event: PointerEvent): void {
+	if (!activeOffsetHandleDrag) {
+		return;
+	}
+	if (activeOffsetHandleDrag.inputType !== 'pointer' || activeOffsetHandleDrag.pointerId === null) {
+		return;
+	}
+	if (event.pointerId !== activeOffsetHandleDrag.pointerId) {
+		return;
+	}
+
+	event.preventDefault();
+	event.stopPropagation();
+	finalizeOffsetHandleDrag(event.clientX, event.clientY);
+}
+
+function handleOffsetHandlePointerCancel(event: PointerEvent): void {
+	if (!activeOffsetHandleDrag) {
+		return;
+	}
+	if (activeOffsetHandleDrag.inputType !== 'pointer' || activeOffsetHandleDrag.pointerId === null) {
+		return;
+	}
+	if (event.pointerId !== activeOffsetHandleDrag.pointerId) {
+		return;
+	}
+
+	event.preventDefault();
+	event.stopPropagation();
+	teardownOffsetHandleDrag();
+	suppressNextMouseUpHighlight = true;
+}
+
+function handleOffsetHandleMouseUp(event: MouseEvent): void {
+	if (!activeOffsetHandleDrag || activeOffsetHandleDrag.inputType !== 'mouse') {
+		return;
+	}
+
+	event.preventDefault();
+	event.stopPropagation();
+	finalizeOffsetHandleDrag(event.clientX, event.clientY);
+}
+
+// Starts a text-highlight resize drag from either pointer or mouse initiation.
+// Why: some environments do not deliver pointer events consistently, but resize must stay fluent.
+function beginOffsetHandleDrag(
+	handle: HTMLElement,
+	edge: 'start' | 'end',
+	clientX: number,
+	clientY: number,
+	inputType: OffsetHandleDragInputType,
+	pointerId: number | null
+): void {
+	hideHighlightWidgetTooltip();
+
+	const selectedRange = selectHighlightTextFromOpposingEdge(edge);
+	if (!selectedRange) {
+		return;
+	}
+
+	if (activeOffsetHandleDrag) {
+		teardownOffsetHandleDrag();
+	}
+
+	// Disable pointer events on all overlays during drag so overlapping highlights
+	// cannot block caret hit-testing while resizing the selected highlight.
+	const overlaysForDrag = Array.from(
+		document.querySelectorAll(OVERLAY_SELECTOR)
+	) as HTMLElement[];
+	const disabledOverlayPointerEvents = overlaysForDrag.map((overlay) => {
+		const value = overlay.style.pointerEvents;
+		overlay.style.pointerEvents = 'none';
+		return { overlay, value };
+	});
+
+	activeOffsetHandleDrag = {
+		anchorNode: selectedRange.anchorNode,
+		anchorOffset: selectedRange.anchorOffset,
+		target: selectedRange.target,
+		edge,
+		pointerId,
+		inputType,
+		handle,
+		startClientX: clientX,
+		startClientY: clientY,
+		hasMoved: false,
+		initialSelectionText: window.getSelection()?.toString() || '',
+		disabledOverlayPointerEvents
+	};
+	setOffsetHandleDraggingState(true);
+	const selectedTextHighlight = resolveSelectedTextHighlight();
+	setSelectionPreviewColor(selectedTextHighlight?.highlight.color, DRAG_SELECTION_PREVIEW_ALPHA);
+
+	if (inputType === 'pointer' && pointerId !== null) {
+		try {
+			handle.setPointerCapture(pointerId);
+		} catch {
+			// Pointer capture can fail on some engines; document listeners still handle drag.
+		}
+	}
+
+	document.addEventListener('pointermove', handleOffsetHandleDragMove, true);
+	document.addEventListener('pointerup', handleOffsetHandlePointerUp, true);
+	document.addEventListener('pointercancel', handleOffsetHandlePointerCancel, true);
+	document.addEventListener('mousemove', handleOffsetHandleDragMove, true);
+	document.addEventListener('mouseup', handleOffsetHandleMouseUp, true);
+}
+
+function selectHighlightTextFromOpposingEdge(edge: 'start' | 'end'): {
+	target: Element;
+	anchorNode: Node;
+	anchorOffset: number;
+} | null {
+	const selectedTextHighlight = resolveSelectedTextHighlight();
+	if (!selectedTextHighlight) {
+		return null;
+	}
+
+	const { highlight, target } = selectedTextHighlight;
+	const useCanonicalOffsets = shouldUseCanonicalOffsetDecoding(target, highlight.startOffset, highlight.endOffset);
+	const startNodeResult = findTextNodeAtOffset(target, highlight.startOffset, useCanonicalOffsets);
+	const endNodeResult = findTextNodeAtOffset(target, highlight.endOffset, useCanonicalOffsets);
+	if (!startNodeResult || !endNodeResult) {
+		return null;
+	}
+
+	// Anchor at the opposite edge so dragging behaves like extending a native selection.
+	const anchor = edge === OFFSET_HANDLE_EDGE_START ? endNodeResult : startNodeResult;
+	const focus = edge === OFFSET_HANDLE_EDGE_START ? startNodeResult : endNodeResult;
+	applyNativeSelection(anchor, focus);
+
+	return {
+		target,
+		anchorNode: anchor.node,
+		anchorOffset: anchor.offset
+	};
+}
+
+function handleOffsetHandleDown(event: PointerEvent): void {
+	if (event.button !== 0) {
+		return;
+	}
+
+	const handle = event.currentTarget instanceof HTMLElement ? event.currentTarget : null;
+	if (!handle) {
+		return;
+	}
+
+	event.preventDefault();
+	event.stopPropagation();
+	const edge = handle.dataset.edge === OFFSET_HANDLE_EDGE_START ? OFFSET_HANDLE_EDGE_START : OFFSET_HANDLE_EDGE_END;
+	beginOffsetHandleDrag(handle, edge, event.clientX, event.clientY, 'pointer', event.pointerId);
+}
+
+function handleOffsetHandleMouseDown(event: MouseEvent): void {
+	event.preventDefault();
+	event.stopPropagation();
+
+	if (event.button !== 0 || activeOffsetHandleDrag) {
+		return;
+	}
+
+	const handle = event.currentTarget instanceof HTMLElement ? event.currentTarget : null;
+	if (!handle) {
+		return;
+	}
+
+	const edge = handle.dataset.edge === OFFSET_HANDLE_EDGE_START ? OFFSET_HANDLE_EDGE_START : OFFSET_HANDLE_EDGE_END;
+	beginOffsetHandleDrag(handle, edge, event.clientX, event.clientY, 'mouse', null);
+}
+
 function clearSelectedOverlays(): void {
 	document.querySelectorAll(`${OVERLAY_SELECTOR}.${SELECTED_OVERLAY_CLASS}`).forEach((overlay) => {
 		overlay.classList.remove(SELECTED_OVERLAY_CLASS);
@@ -203,6 +925,7 @@ function applySelectedOverlayState(): HTMLElement | null {
 
 	const matches = getMatchingOverlays(selectedHighlightId, selectedHighlightIndex);
 	if (matches.length === 0) {
+		hideOffsetHandles();
 		return null;
 	}
 
@@ -210,6 +933,7 @@ function applySelectedOverlayState(): HTMLElement | null {
 		overlay.classList.add(SELECTED_OVERLAY_CLASS);
 	});
 
+	updateOffsetHandles();
 	return matches[0];
 }
 
@@ -237,7 +961,7 @@ function selectOverlay(
 	}
 
 	if (options.openWidget !== false) {
-		openHighlightWidgetForOverlay(primaryOverlay);
+		openHighlightWidgetForOverlay(primaryOverlay, options.openPoint ?? null);
 	}
 
 	if (options.notifyPanel !== false && selectedHighlightId) {
@@ -297,6 +1021,11 @@ export function handleMouseMove(event: MouseEvent | TouchEvent) {
 
 // Handle mouse up events for highlighting
 export function handleMouseUp(event: MouseEvent | TouchEvent) {
+	if (suppressNextMouseUpHighlight) {
+		suppressNextMouseUpHighlight = false;
+		return;
+	}
+
 	const eventPoint = getEventPoint(event);
 	let target: Element;
 	if (event instanceof MouseEvent) {
@@ -318,7 +1047,7 @@ export function handleMouseUp(event: MouseEvent | TouchEvent) {
 	} else {
 		const overlayFromEvent = findOverlayFromEvent(event);
 		if (overlayFromEvent) {
-			openHighlightWidgetForOverlay(overlayFromEvent);
+			openHighlightWidgetForOverlay(overlayFromEvent, eventPoint);
 		} else {
 			let elementToProcess: Element | null = target;
 			const targetTagName = target.tagName.toUpperCase();
@@ -386,26 +1115,35 @@ export function updateHighlightListeners() {
 }
 
 // Find a text node at a given offset within an element
-function findTextNodeAtOffset(element: Element, offset: number): { node: Node, offset: number } | null {
+function findTextNodeAtOffset(
+	element: Element,
+	offset: number,
+	useCanonicalOffsets: boolean = false
+): { node: Node, offset: number } | null {
 	let currentOffset = 0;
 	const treeWalker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
 	
-	let node: Node | null = treeWalker.currentNode;
+	let node: Node | null = useCanonicalOffsets ? treeWalker.nextNode() : treeWalker.currentNode;
+	let firstTextNode: Node | null = null;
 	while (node) {
 		const nodeLength = node.textContent?.length || 0;
-		if (currentOffset + nodeLength >= offset) {
-			// Ensure offset is within bounds of the node
-			const adjustedOffset = Math.min(Math.max(0, offset - currentOffset), nodeLength);
-			return { node, offset: adjustedOffset };
-		}
+			if (node.nodeType === Node.TEXT_NODE) {
+				if (!firstTextNode) {
+					firstTextNode = node;
+				}
+				if (currentOffset + nodeLength >= offset) {
+					// Ensure offset is within bounds of the node
+					const adjustedOffset = Math.min(Math.max(0, offset - currentOffset), nodeLength);
+					return { node, offset: adjustedOffset };
+				}
+			}
 		currentOffset += nodeLength;
 		node = treeWalker.nextNode();
 	}
 	
 	// If we couldn't find the exact offset, return the first text node with offset 0
-	const firstNode = document.createTreeWalker(element, NodeFilter.SHOW_TEXT).firstChild();
-	if (firstNode) {
-		return { node: firstNode, offset: 0 };
+	if (firstTextNode) {
+		return { node: firstTextNode, offset: 0 };
 	}
 	
 	return null;
@@ -475,8 +1213,9 @@ export function planHighlightOverlayRects(target: Element, highlight: AnyHighlig
 	} else if (highlight.type === 'text') {
 		const range = document.createRange();
 		try {
-			const startNodeResult = findTextNodeAtOffset(target, highlight.startOffset);
-			const endNodeResult = findTextNodeAtOffset(target, highlight.endOffset);
+			const useCanonicalOffsets = shouldUseCanonicalOffsetDecoding(target, highlight.startOffset, highlight.endOffset);
+			const startNodeResult = findTextNodeAtOffset(target, highlight.startOffset, useCanonicalOffsets);
+			const endNodeResult = findTextNodeAtOffset(target, highlight.endOffset, useCanonicalOffsets);
 
 			if (startNodeResult && endNodeResult) {
 				try {
@@ -813,10 +1552,12 @@ function handleHighlightClick(event: Event) {
 	if (!overlay) {
 		return;
 	}
+	const eventPoint = getEventPoint(event);
 	selectOverlay(overlay, {
 		openWidget: true,
 		scrollIntoView: false,
-		notifyPanel: true
+		notifyPanel: true,
+		openPoint: eventPoint
 	});
 }
 
@@ -828,6 +1569,7 @@ export function removeExistingHighlights() {
 	}
 	selectedHighlightId = null;
 	selectedHighlightIndex = null;
+	hideOffsetHandles();
 	hideHighlightWidgetTooltip();
 	closeHighlightWidget();
 }
