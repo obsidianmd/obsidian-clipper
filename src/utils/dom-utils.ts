@@ -46,8 +46,57 @@ export function getElementXPath(element: Node): string {
 	return '';
 }
 
+/**
+ * Converts a tag/index XPath into a namespace-agnostic version.
+ * Why: some sites (for example embedded XHTML islands) expose namespaced element nodes,
+ * and plain tag steps like `/html[1]/body[1]` will not match in XPath without prefixes.
+ */
+function buildNamespaceAgnosticXPath(xpath: string): string {
+	if (!xpath) {
+		return xpath;
+	}
+
+	return xpath
+		.split('/')
+		.map((segment) => {
+			if (!segment || segment === '.' || segment === '..') {
+				return segment;
+			}
+
+			const stepMatch = segment.match(/^([a-zA-Z_][\w:.-]*)(\[(\d+)\])?$/);
+			if (!stepMatch) {
+				return segment;
+			}
+
+			const tagName = stepMatch[1].toLowerCase();
+			const index = stepMatch[3];
+			return index
+				? `*[local-name()="${tagName}"][${index}]`
+				: `*[local-name()="${tagName}"]`;
+		})
+		.join('/');
+}
+
 export function getElementByXPath(xpath: string): Element | null {
-	return document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue as Element | null;
+	const directMatch = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+	if (directMatch instanceof Element) {
+		return directMatch;
+	}
+
+	const namespaceAgnosticXPath = buildNamespaceAgnosticXPath(xpath);
+	if (!namespaceAgnosticXPath || namespaceAgnosticXPath === xpath) {
+		return null;
+	}
+
+	const fallbackMatch = document.evaluate(
+		namespaceAgnosticXPath,
+		document,
+		null,
+		XPathResult.FIRST_ORDERED_NODE_TYPE,
+		null
+	).singleNodeValue;
+
+	return fallbackMatch instanceof Element ? fallbackMatch : null;
 }
 
 export function isDarkColor(color: string): boolean {
