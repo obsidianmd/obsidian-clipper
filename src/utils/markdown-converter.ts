@@ -642,13 +642,26 @@ export function createMarkdownContent(content: string, url: string) {
 		return tableClone.outerHTML;
 	}
 
+	function cleanLatex(raw: string): string {
+		let result = raw.trim();
+		if (!result) return '';
+		try {
+			if (/%[0-9A-Fa-f]{2}/.test(result)) {
+				result = decodeURIComponent(result);
+			}
+		} catch { /* not URI-encoded */ }
+		result = result.replace(/^\\(?:small|displaystyle|textstyle|normalsize)\s+/, '');
+		result = result.replace(/\u00A0/g, ' ').trim();
+		return result;
+	}
+
 	function extractLatex(element: Element): string {
 		// Check if the element is a <math> element and has an alttext attribute
 		if (element.nodeName.toLowerCase() === 'math') {
 			let latex = element.getAttribute('data-latex');
 			let alttext = element.getAttribute('alttext');
 			if (latex) {
-				return latex.trim();
+				return cleanLatex(latex);
 			} else if (alttext) {
 				return alttext.trim();
 			}
