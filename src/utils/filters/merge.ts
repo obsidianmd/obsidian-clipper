@@ -30,7 +30,7 @@ export const merge = (str: string, param?: string): string => {
 		// Process each item to remove quotes
 		const processedItems = additionalItems.map(item => {
 			item = item.trim();
-			return item.replace(/^(['"])(.*)\1$/, '$2');
+			return item.replace(/^(['"])([\s\S]*)\1$/, '$2');
 		});
 
 		return JSON.stringify([...array, ...processedItems]);

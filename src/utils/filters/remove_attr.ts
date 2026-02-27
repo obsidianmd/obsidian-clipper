@@ -8,7 +8,7 @@ export const remove_attr = (html: string, removeAttributes: string = ''): string
 	removeAttributes = removeAttributes.replace(/^\((.*)\)$/, '$1');
 	
 	// Remove any surrounding quotes (both single and double) and unescape internal quotes
-	removeAttributes = removeAttributes.replace(/^(['"])(.*)\1$/, '$2').replace(/\\(['"])/g, '$1');
+	removeAttributes = removeAttributes.replace(/^(['"])([\s\S]*)\1$/, '$2').replace(/\\(['"])/g, '$1');
 	
 	const removeAttributesList = removeAttributes.split(',').map(attr => attr.trim().toLowerCase()).filter(Boolean);
 

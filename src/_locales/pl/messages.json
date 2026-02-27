@@ -59,9 +59,6 @@
 	"behavior": {
 		"message": "Sposób działania"
 	},
-	"behaviorWarning": {
-		"message": "Aby zapisać w dzienniku lub istniejącej notatce wymagany jest Obsidian w wersji 1.7.2 lub nowszej."
-	},
 	"byDay": {
 		"message": "Dni"
 	},
@@ -103,6 +100,14 @@
 			},
 			"strong_start": {
 				"content": "<strong>"
+			}
+		}
+	},
+	"clipboardError": {
+		"message": "Obsidian nie ma dostępu do Twojego schowka. Wypróbuj instrukcje rozwiązywania problemów tutaj: $1",
+		"placeholders": {
+			"1": {
+				"content": "$1"
 			}
 		}
 	},
@@ -775,6 +780,12 @@
 	"templateCopyError": {
 		"message": "Nie udało się skopiować szablonu JSON do schowka"
 	},
+	"templateErrorCount": {
+		"message": "W Twoim szablonie występuje błąd."
+	},
+	"templateErrorsCount": {
+		"message": "W Twoim szablonie występuje $1 błędów."
+	},
 	"templateName": {
 		"message": "Nazwa szablonu"
 	},
@@ -789,6 +800,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "Zdefiniuj reguły umożliwiające automatyczne wybieranie tego szablonu, jeśli pasuje on do wzorca adresu URL lub zawiera dane schema.org. Jedna reguła na linię."
+	},
+	"templateValid": {
+		"message": "Składnia szablonu jest poprawna"
 	},
 	"templatesHeading": {
 		"message": "Szablony"

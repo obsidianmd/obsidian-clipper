@@ -3,7 +3,7 @@ export const strip_tags = (html: string, keepTags: string = ''): string => {
 	keepTags = keepTags.replace(/^\((.*)\)$/, '$1');
 	
 	// Remove any surrounding quotes (both single and double) and unescape internal quotes
-	keepTags = keepTags.replace(/^(['"])(.*)\1$/, '$2').replace(/\\(['"])/g, '$1');
+	keepTags = keepTags.replace(/^(['"])([\s\S]*)\1$/, '$2').replace(/\\(['"])/g, '$1');
 	
 	const keepTagsList = keepTags.split(',').map(tag => tag.trim()).filter(Boolean);
 

@@ -21,6 +21,13 @@
 	--background-modifier-form-field: var(--background-primary);
 	--background-modifier-hover: rgba(var(--mono-rgb-100), .075);
 
+	--background-modifier-error: hsla(var(--color-red-hsl), 0.1);
+	--background-modifier-error-border: hsla(var(--color-red-hsl), 0.15);
+	--background-modifier-success: hsla(var(--color-green-hsl), 0.1);
+	--background-modifier-success-border: hsla(var(--color-green-hsl), 0.15);
+	--background-modifier-warning: rgb(var(--color-orange-rgb), 0.1);
+	--background-modifier-warning-border: rgb(var(--color-orange-rgb), 0.15);
+
 	--chart-line-color: var(--color-accent-1);
 
 	/* Checkboxes */

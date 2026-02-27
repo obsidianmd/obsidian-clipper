@@ -7,7 +7,7 @@ export const remove_html = (html: string, params: string = ''): string => {
 	params = params.replace(/^\((.*)\)$/, '$1');
 
 	// Remove any surrounding quotes (both single and double) and unescape internal quotes
-	params = params.replace(/^(['"])(.*)\1$/, '$2').replace(/\\(['"])/g, '$1');
+	params = params.replace(/^(['"])([\s\S]*)\1$/, '$2').replace(/\\(['"])/g, '$1');
 
 	// Split by comma, but respect both single and double quoted strings
 	const elementsToRemove = params.split(/,(?=(?:(?:[^"']*["'][^"']*["'])*[^"']*$))/)

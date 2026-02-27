@@ -59,9 +59,6 @@
 	"behavior": {
 		"message": "Behavior"
 	},
-	"behaviorWarning": {
-		"message": "Adding to an existing note or daily note requires Obsidian 1.7.2 or later."
-	},
 	"byDay": {
 		"message": "Days"
 	},
@@ -103,6 +100,14 @@
 			},
 			"strong_start": {
 				"content": "<strong>"
+			}
+		}
+	},
+	"clipboardError": {
+		"message": "Obsidian is not able to access your clipboard. Try the troubleshooting instructions here: $1",
+		"placeholders": {
+			"1": {
+				"content": "$1"
 			}
 		}
 	},
@@ -775,6 +780,12 @@
 	"templateCopyError": {
 		"message": "Failed to copy template JSON to clipboard"
 	},
+	"templateErrorCount": {
+		"message": "There is an error in your template."
+	},
+	"templateErrorsCount": {
+		"message": "There are $1 errors in your template."
+	},
 	"templateName": {
 		"message": "Template name"
 	},
@@ -789,6 +800,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "Define rules to automatically select this template if it matches a URL pattern or contains schema.org data. One rule per line."
+	},
+	"templateValid": {
+		"message": "Template syntax is valid"
 	},
 	"templatesHeading": {
 		"message": "Templates"

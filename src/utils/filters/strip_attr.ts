@@ -3,7 +3,7 @@ export const strip_attr = (html: string, keepAttributes: string = ''): string =>
 	keepAttributes = keepAttributes.replace(/^\((.*)\)$/, '$1');
 	
 	// Remove any surrounding quotes (both single and double) and unescape internal quotes
-	keepAttributes = keepAttributes.replace(/^(['"])(.*)\1$/, '$2').replace(/\\(['"])/g, '$1');
+	keepAttributes = keepAttributes.replace(/^(['"])([\s\S]*)\1$/, '$2').replace(/\\(['"])/g, '$1');
 	
 	const keepAttributesList = keepAttributes.split(',').map(attr => attr.trim()).filter(Boolean);
 

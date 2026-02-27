@@ -9,7 +9,7 @@ import {
 	cleanupTemplateStorage,
 	rebuildTemplateList
 } from '../managers/template-manager';
-import { updateTemplateList, showTemplateEditor, initializeAddPropertyButton } from '../managers/template-ui';
+import { updateTemplateList, showTemplateEditor, initializeAddPropertyButton, initializeTemplateValidation } from '../managers/template-ui';
 import { initializeGeneralSettings } from '../managers/general-settings';
 import { initializeInterpreterSettings } from '../managers/interpreter-settings';
 import { showSettingsSection, initializeSidebar } from '../managers/settings-section-ui';
@@ -224,6 +224,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 	const templateForm = document.getElementById('template-settings-form');
 	if (templateForm) {
 		initializeAddPropertyButton();
+		initializeTemplateValidation();
 		initializeDragAndDrop();
 		handleTemplateDrag();
 	}

@@ -8,7 +8,7 @@ export const wikilink = (str: string, param?: string): string => {
 		// Remove outer parentheses if present
 		param = param.replace(/^\((.*)\)$/, '$1');
 		// Remove surrounding quotes (both single and double)
-		alias = param.replace(/^(['"])(.*)\1$/, '$2');
+		alias = param.replace(/^(['"])([\s\S]*)\1$/, '$2');
 	}
 
 	try {

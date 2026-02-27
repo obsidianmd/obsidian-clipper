@@ -8,7 +8,7 @@ export const remove_tags = (html: string, removeTags: string = ''): string => {
 	removeTags = removeTags.replace(/^\((.*)\)$/, '$1');
 	
 	// Remove any surrounding quotes (both single and double) and unescape internal quotes
-	removeTags = removeTags.replace(/^(['"])(.*)\1$/, '$2').replace(/\\(['"])/g, '$1');
+	removeTags = removeTags.replace(/^(['"])([\s\S]*)\1$/, '$2').replace(/\\(['"])/g, '$1');
 	
 	const removeTagsList = removeTags.split(',').map(tag => tag.trim()).filter(Boolean);
 

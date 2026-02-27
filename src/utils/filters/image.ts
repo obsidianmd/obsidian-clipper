@@ -10,7 +10,7 @@ export const image = (str: string, param?: string): string | string[] => {
 		// Remove outer parentheses if present
 		param = param.replace(/^\((.*)\)$/, '$1');
 		// Remove surrounding quotes (both single and double)
-		altText = param.replace(/^(['"])(.*)\1$/, '$2');
+		altText = param.replace(/^(['"])([\s\S]*)\1$/, '$2');
 	}
 
 	try {

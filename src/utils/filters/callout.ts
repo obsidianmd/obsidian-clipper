@@ -10,7 +10,7 @@ export const callout = (str: string, param?: string): string => {
 		// Split by comma, but respect both single and double quoted strings
 		const params = param.split(/,(?=(?:(?:[^"']*["'][^"']*["'])*[^"']*$))/).map(p => {
 			// Trim whitespace and remove surrounding quotes (both single and double)
-			return p.trim().replace(/^(['"])(.*)\1$/, '$2');
+			return p.trim().replace(/^(['"])([\s\S]*)\1$/, '$2');
 		});
 		
 		if (params.length > 0) type = params[0] || type;

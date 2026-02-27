@@ -13,11 +13,14 @@ dist/
 dist_firefox/
 dist_safari/
 builds/
+changelogs/
 assets/shared
 
 # Xcode
 *.xcuserstate
+*.xcuserdatad
 
 .cursorrules
 .env
 context/
+MERGE_PLAN.md

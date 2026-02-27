@@ -231,7 +231,7 @@ browser.runtime.onMessage.addListener(((request: unknown, sender: browser.Runtim
 							sendResponse({success: false, error: 'Cannot open iframe on this page'});
 							return;
 						}
-						
+
 						// Ensure content script is loaded first
 						await ensureContentScriptLoadedInBackground(currentTab.id);
 						await browser.tabs.sendMessage(currentTab.id, { action: "toggle-iframe" });
@@ -248,8 +248,15 @@ browser.runtime.onMessage.addListener(((request: unknown, sender: browser.Runtim
 		}
 
 		if (typedRequest.action === "getActiveTab") {
-			browser.tabs.query({active: true, currentWindow: true}).then((tabs) => {
-				const currentTab = tabs[0];
+			browser.tabs.query({active: true, currentWindow: true}).then(async (tabs) => {
+				let currentTab = tabs[0];
+				// Fallback for when currentWindow has no tabs (e.g., debugging popup in DevTools)
+				if (!currentTab || !currentTab.id) {
+					const allActiveTabs = await browser.tabs.query({active: true});
+					currentTab = allActiveTabs.find(tab =>
+						tab.id && tab.url && !tab.url.startsWith('chrome-extension://') && !tab.url.startsWith('moz-extension://')
+					) || allActiveTabs[0];
+				}
 				if (currentTab && currentTab.id) {
 					sendResponse({tabId: currentTab.id});
 				} else {
@@ -301,7 +308,10 @@ browser.runtime.onMessage.addListener(((request: unknown, sender: browser.Runtim
 			const tabId = (typedRequest as any).tabId;
 			const message = (typedRequest as any).message;
 			if (tabId && message) {
-				browser.tabs.sendMessage(tabId, message).then((response) => {
+				// Ensure content script is loaded before sending message
+				ensureContentScriptLoadedInBackground(tabId).then(() => {
+					return browser.tabs.sendMessage(tabId, message);
+				}).then((response) => {
 					sendResponse(response);
 				}).catch((error) => {
 					console.error('Error sending message to tab:', error);
@@ -425,6 +435,11 @@ const debouncedUpdateContextMenu = debounce(async (tabId: number) => {
 					title: "Save this page",
 					contexts: ["page", "selection", "image", "video", "audio"]
 				},
+				{
+					id: 'copy-markdown-to-clipboard',
+					title: browser.i18n.getMessage('copyToClipboard'),
+					contexts: ["page", "selection"]
+				},
 				// {
 				// 	id: "toggle-reader",
 				// 	title: "Reading view",
@@ -493,6 +508,9 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
 		chrome.sidePanel.open({ tabId: tab.id });
 		sidePanelOpenWindows.add(tab.windowId);
 		await ensureContentScriptLoadedInBackground(tab.id);
+	} else if (info.menuItemId === 'copy-markdown-to-clipboard' && tab && tab.id) {
+		await ensureContentScriptLoadedInBackground(tab.id);
+		await browser.tabs.sendMessage(tab.id, { action: "copyMarkdownToClipboard" });
 	}
 });
 

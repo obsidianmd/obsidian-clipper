@@ -59,9 +59,6 @@
 	"behavior": {
 		"message": "Συμπεριφορά"
 	},
-	"behaviorWarning": {
-		"message": "Η προσθήκη σε υπάρχουσα ή ημερήσια σημείωση απαιτεί Obsidian 1.7.2 ή νεότερη έκδοση."
-	},
 	"byDay": {
 		"message": "Ημέρα"
 	},
@@ -103,6 +100,14 @@
 			},
 			"strong_start": {
 				"content": "<strong>"
+			}
+		}
+	},
+	"clipboardError": {
+		"message": "Το Obsidian δεν μπορεί να αποκτήσει πρόσβαση στο πρόχειρό σας. Δοκιμάστε τις οδηγίες αντιμετώπισης προβλημάτων εδώ: $1",
+		"placeholders": {
+			"1": {
+				"content": "$1"
 			}
 		}
 	},
@@ -767,6 +772,12 @@
 	"templateCopyError": {
 		"message": "Αποτυχία αντιγραφής του JSON προτύπου στο πρόχειρο"
 	},
+	"templateErrorCount": {
+		"message": "Υπάρχει ένα σφάλμα στο πρότυπό σας."
+	},
+	"templateErrorsCount": {
+		"message": "Υπάρχουν $1 σφάλματα στο πρότυπό σας."
+	},
 	"templateName": {
 		"message": "Όνομα προτύπου"
 	},
@@ -781,6 +792,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "Ορίστε κανόνες για την αυτόματη επιλογή αυτού του προτύπου εάν ταιριάζει με το μοτίβο URL ή περιέχει δεδομένα schema.org. Ένας κανόνας ανά γραμμή."
+	},
+	"templateValid": {
+		"message": "Η σύνταξη του προτύπου είναι έγκυρη"
 	},
 	"templatesHeading": {
 		"message": "Πρότυπα"

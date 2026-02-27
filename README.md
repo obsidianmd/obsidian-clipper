@@ -36,7 +36,7 @@ In no particular order:
 - [ ] Annotate highlights
 - [ ] Template directory
 - [ ] Template validation
-- [ ] Template logic (if/for)
+- [x] Template logic (if/for)
 - [x] Save images locally, [added in Obsidian 1.8.0](https://obsidian.md/changelog/2024-12-18-desktop-v1.8.0/)
 
 ## Developers
@@ -81,6 +81,18 @@ For iOS Simulator testing on macOS:
 4. Choose an iOS Simulator device and click **Run** to build and launch the app
 5. Once the app is running on the simulator, open **Safari**
 6. Navigate to a webpage and tap the **Extensions** button in Safari to access the Web Clipper extension
+
+### Run tests
+
+```
+npm test
+```
+
+Or run in watch mode during development:
+
+```
+npm run test:watch
+```
 
 ## Third-party libraries
 

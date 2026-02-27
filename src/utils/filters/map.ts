@@ -1,4 +1,18 @@
 import { debugLog } from '../debug';
+import type { ParamValidationResult } from '../filters';
+
+export const validateMapParams = (param: string | undefined): ParamValidationResult => {
+	if (!param) {
+		return { valid: false, error: 'requires an arrow function (e.g., map:x => x.name)' };
+	}
+
+	const match = param.match(/^\s*(\w+)\s*=>\s*(.+)$/);
+	if (!match) {
+		return { valid: false, error: 'invalid syntax. Use arrow function format (e.g., x => x.name)' };
+	}
+
+	return { valid: true };
+};
 
 export const map = (str: string, param?: string): string => {
 	debugLog('Map', 'map input:', str);
@@ -24,16 +38,23 @@ export const map = (str: string, param?: string): string => {
 
 		const mappedArray = array.map((item, index) => {
 			debugLog('Map', `Processing item ${index}:`, JSON.stringify(item, null, 2));
+
+			// Strip outer parentheses for object literal syntax: ({key: value})
+			let expr = expression.trim();
+			if (expr.startsWith('(') && expr.endsWith(')')) {
+				expr = expr.slice(1, -1).trim();
+			}
+
 			// Check if the expression is an object literal or a string literal
-			if ((expression.trim().startsWith('{') && expression.trim().endsWith('}')) ||
-				(expression.trim().startsWith('"') && expression.trim().endsWith('"')) ||
-				(expression.trim().startsWith("'") && expression.trim().endsWith("'"))) {
+			if ((expr.startsWith('{') && expr.endsWith('}')) ||
+				(expr.startsWith('"') && expr.endsWith('"')) ||
+				(expr.startsWith("'") && expr.endsWith("'"))) {
 				// Use a simple object to store the mapped properties
 				const mappedItem: { [key: string]: any } = {};
 
 				// Parse the expression to extract property assignments or string literal
-				if (expression.trim().startsWith('{')) {
-					const assignments = expression.match(/\{(.+)\}/)?.[1].split(',') || [];
+				if (expr.startsWith('{')) {
+					const assignments = expr.match(/\{(.+)\}/)?.[1].split(',') || [];
 
 					assignments.forEach((assignment) => {
 						const [key, value] = assignment.split(':').map(s => s.trim());
@@ -47,9 +68,9 @@ export const map = (str: string, param?: string): string => {
 						debugLog('Map', `Assigned ${cleanKey}:`, mappedItem[cleanKey]);
 					});
 				} else {
-					// Handle string literal
-					const stringLiteral = expression.trim().slice(1, -1);
-					mappedItem.str = stringLiteral.replace(new RegExp(`\\$\\{${argName}\\}`, 'g'), item);
+					// Handle string literal — return plain string
+					const stringLiteral = expr.slice(1, -1);
+					return stringLiteral.replace(new RegExp(`\\$\\{${argName}\\}`, 'g'), item);
 				}
 
 				debugLog('Map', 'Mapped item:', mappedItem);

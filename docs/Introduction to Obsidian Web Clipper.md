@@ -41,6 +41,8 @@ Get the Obsidian Web Clipper extension from the official directory for your brow
 	- Pre-populate page data in your template.
 - [[Filters]]
 	- Modify the output of template variables.
+- [[Logic]]
+	- Add conditionals and loops to templates.
 
 ## Privacy
 

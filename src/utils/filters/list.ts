@@ -1,6 +1,31 @@
+import type { ParamValidationResult } from '../filters';
+
 type ListType = 'bullet' | 'numbered' | 'task' | 'numbered-task';
 
+const validListTypes = ['numbered', 'task', 'numbered-task'];
+
+export const validateListParams = (param: string | undefined): ParamValidationResult => {
+	// No param is valid (defaults to bullet)
+	if (!param) {
+		return { valid: true };
+	}
+
+	if (!validListTypes.includes(param)) {
+		return {
+			valid: false,
+			error: `invalid list type "${param}". Use "numbered", "task", or "numbered-task"`
+		};
+	}
+
+	return { valid: true };
+};
+
 export const list = (input: string | any[], param?: string): string => {
+	// Return empty string as-is without attempting to parse
+	if (input === '') {
+		return input;
+	}
+
 	const processListItem = (item: any, type: ListType, depth: number = 0): string => {
 		const indent = '\t'.repeat(depth);
 		let prefix: string;
