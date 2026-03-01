@@ -30,7 +30,7 @@ IMPROVED=""
 FIXES=""
 
 while IFS= read -r subject; do
-	if echo "$subject" | grep -qiE '^bump version|^version bump'; then
+	if echo "$subject" | grep -qiE '^bump version|^version bump|^docs:'; then
 		continue
 	elif echo "$subject" | grep -qiE '^fix'; then
 		subject=$(echo "$subject" | sed -E 's/^fix: /Fix /i;s/^fix/Fix/')
