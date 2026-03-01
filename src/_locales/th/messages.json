@@ -241,6 +241,9 @@
 	"error": {
 		"message": "ข้อผิดพลาด"
 	},
+	"retry": {
+		"message": "ลองใหม่"
+	},
 	"export": {
 		"message": "ส่งออก"
 	},

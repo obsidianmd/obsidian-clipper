@@ -241,6 +241,9 @@
 	"error": {
 		"message": "Errore"
 	},
+	"retry": {
+		"message": "Riprova"
+	},
 	"export": {
 		"message": "Esporta"
 	},

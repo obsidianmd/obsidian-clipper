@@ -241,6 +241,9 @@
 	"error": {
 		"message": "Fel"
 	},
+	"retry": {
+		"message": "Försök igen"
+	},
 	"export": {
 		"message": "Exportera"
 	},

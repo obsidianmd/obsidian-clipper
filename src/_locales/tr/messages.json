@@ -241,6 +241,9 @@
 	"error": {
 		"message": "Hata"
 	},
+	"retry": {
+		"message": "Tekrar dene"
+	},
 	"export": {
 		"message": "Dışa aktar"
 	},

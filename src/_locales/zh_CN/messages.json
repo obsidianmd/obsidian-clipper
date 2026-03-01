@@ -241,6 +241,9 @@
 	"error": {
 		"message": "错误"
 	},
+	"retry": {
+		"message": "重试"
+	},
 	"export": {
 		"message": "导出"
 	},

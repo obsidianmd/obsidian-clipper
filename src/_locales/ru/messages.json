@@ -241,6 +241,9 @@
 	"error": {
 		"message": "Ошибка"
 	},
+	"retry": {
+		"message": "Повторить"
+	},
 	"export": {
 		"message": "Экспорт"
 	},

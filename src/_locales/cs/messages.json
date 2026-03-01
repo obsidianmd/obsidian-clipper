@@ -241,6 +241,9 @@
 	"error": {
 		"message": "Chyba"
 	},
+	"retry": {
+		"message": "Opakovat"
+	},
 	"export": {
 		"message": "Exportovat"
 	},

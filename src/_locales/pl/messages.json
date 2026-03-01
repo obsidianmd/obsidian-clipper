@@ -241,6 +241,9 @@
 	"error": {
 		"message": "Błąd"
 	},
+	"retry": {
+		"message": "Ponów"
+	},
 	"export": {
 		"message": "Eksportuj"
 	},

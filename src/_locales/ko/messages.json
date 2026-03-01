@@ -241,6 +241,9 @@
 	"error": {
 		"message": "에러"
 	},
+	"retry": {
+		"message": "다시 시도"
+	},
 	"export": {
 		"message": "내보내기"
 	},

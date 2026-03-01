@@ -241,6 +241,9 @@
 	"error": {
 		"message": "Error"
 	},
+	"retry": {
+		"message": "Subukan muli"
+	},
 	"export": {
 		"message": "I-export"
 	},

@@ -241,6 +241,9 @@
 	"error": {
 		"message": "Σφάλμα"
 	},
+	"retry": {
+		"message": "Επανάληψη"
+	},
 	"export": {
 		"message": "Εξαγωγή"
 	},
