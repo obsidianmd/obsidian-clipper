@@ -241,6 +241,9 @@
 	"error": {
 		"message": "שגיאה"
 	},
+	"retry": {
+		"message": "נסה שוב"
+	},
 	"export": {
 		"message": "ייצא"
 	},

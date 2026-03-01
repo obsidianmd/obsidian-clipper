@@ -241,6 +241,9 @@
 	"error": {
 		"message": "Fejl"
 	},
+	"retry": {
+		"message": "Prøv igen"
+	},
 	"export": {
 		"message": "Eksportér"
 	},

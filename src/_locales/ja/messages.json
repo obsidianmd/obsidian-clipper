@@ -241,6 +241,9 @@
 	"error": {
 		"message": "エラー"
 	},
+	"retry": {
+		"message": "再試行"
+	},
 	"export": {
 		"message": "エクスポート"
 	},

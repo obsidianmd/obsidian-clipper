@@ -241,6 +241,9 @@
 	"error": {
 		"message": "Virhe"
 	},
+	"retry": {
+		"message": "Yritä uudelleen"
+	},
 	"export": {
 		"message": "Vie"
 	},

@@ -122,8 +122,7 @@
 			}
 		}
 		&.error {
-			pointer-events: none;
-			cursor: default;
+			cursor: pointer;
 			color: var(--text-error);
 			opacity: 1;
 			@media (hover: hover) {

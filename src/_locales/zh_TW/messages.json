@@ -241,6 +241,9 @@
 	"error": {
 		"message": "錯誤"
 	},
+	"retry": {
+		"message": "重試"
+	},
 	"export": {
 		"message": "匯出"
 	},

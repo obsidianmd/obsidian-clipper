@@ -241,6 +241,9 @@
 	"error": {
 		"message": "Fout"
 	},
+	"retry": {
+		"message": "Opnieuw"
+	},
 	"export": {
 		"message": "Exporteren"
 	},

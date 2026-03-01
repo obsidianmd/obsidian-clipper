@@ -241,6 +241,9 @@
 	"error": {
 		"message": "Lỗi"
 	},
+	"retry": {
+		"message": "Thử lại"
+	},
 	"export": {
 		"message": "Xuất"
 	},

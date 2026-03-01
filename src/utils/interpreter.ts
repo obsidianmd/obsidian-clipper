@@ -523,6 +523,8 @@ export async function handleInterpreterUI(
 	const moreButton = document.getElementById('more-btn') as HTMLButtonElement;
 	const promptContextTextarea = document.getElementById('prompt-context') as HTMLTextAreaElement;
 
+	let timerInterval: number | undefined;
+
 	try {
 		// Hide any previous error message
 		interpreterErrorMessage.style.display = 'none';
@@ -530,6 +532,7 @@ export async function handleInterpreterUI(
 
 		// Remove any previous done or error classes
 		interpreterContainer?.classList.remove('done', 'error');
+		interpretBtn.classList.remove('done', 'error');
 
 		// Find the provider for this model
 		const provider = generalSettings.providers.find(p => p.id === modelConfig.providerId);
@@ -553,7 +556,6 @@ export async function handleInterpreterUI(
 
 		// Start the timer
 		const startTime = performance.now();
-		let timerInterval: number;
 
 		// Change button text and add class
 		interpretBtn.textContent = getMessage('thinking');
@@ -606,12 +608,18 @@ export async function handleInterpreterUI(
 
 	} catch (error) {
 		console.error('Error processing LLM:', error);
-		
-		// Revert button text and remove class in case of error
-		interpretBtn.textContent = getMessage('error');
+
+		// Stop the timer if it was started
+		if (timerInterval) {
+			clearInterval(timerInterval);
+		}
+
+		// Show retry button instead of disabled error state
+		interpretBtn.textContent = getMessage('retry');
 		interpretBtn.classList.remove('processing');
 		interpretBtn.classList.add('error');
-		interpretBtn.disabled = true;
+		// Keep button enabled for retry
+		interpretBtn.disabled = false;
 
 		// Add error class to interpreter container
 		interpreterContainer?.classList.add('error');

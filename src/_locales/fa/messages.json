@@ -241,6 +241,9 @@
 	"error": {
 		"message": "خطا"
 	},
+	"retry": {
+		"message": "تلاش مجدد"
+	},
 	"export": {
 		"message": "استخراج"
 	},
