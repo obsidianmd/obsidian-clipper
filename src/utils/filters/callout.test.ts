@@ -55,5 +55,14 @@ describe('callout filter via renderer', () => {
 		expect(result.errors).toHaveLength(0);
 		expect(result.output).toContain('[!warning]');
 	});
+
+	test('prompt string literal with callout filter is reconstructed correctly', async () => {
+		const ctx = createContext();
+		const result = await render('{{"prompt text"|callout:("info","Summary",false)}}', ctx);
+		// Prompt expressions are deferred (reconstructed as template syntax)
+		// The reconstructed template must preserve the parenthesized argument format
+		expect(result.output).not.toContain('[!"info":"Summary":false]');
+		expect(result.output).toContain('|callout:("info","Summary",false)');
+	});
 });
 

@@ -256,7 +256,7 @@ function getPromptBase(expr: Expression): string | null {
  * Format filter arguments as a colon-separated string.
  */
 function formatFilterArgs(args: Expression[]): string {
-	return args.map(arg => {
+	const formatted = args.map(arg => {
 		if (arg.type === 'literal') {
 			const val = (arg as LiteralExpression).value;
 			if (typeof val === 'string') {
@@ -269,7 +269,11 @@ function formatFilterArgs(args: Expression[]): string {
 			return String(val);
 		}
 		return String((arg as any).value || (arg as any).name || '');
-	}).join(':');
+	});
+	if (formatted.length > 1) {
+		return `(${formatted.join(',')})`;
+	}
+	return formatted[0] || '';
 }
 
 /**
