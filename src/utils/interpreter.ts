@@ -523,6 +523,8 @@ export async function handleInterpreterUI(
 	const moreButton = document.getElementById('more-btn') as HTMLButtonElement;
 	const promptContextTextarea = document.getElementById('prompt-context') as HTMLTextAreaElement;
 
+	let timerInterval: number | undefined;
+
 	try {
 		// Hide any previous error message
 		interpreterErrorMessage.style.display = 'none';
@@ -554,7 +556,6 @@ export async function handleInterpreterUI(
 
 		// Start the timer
 		const startTime = performance.now();
-		let timerInterval: number;
 
 		// Change button text and add class
 		interpretBtn.textContent = getMessage('thinking');
@@ -607,6 +608,11 @@ export async function handleInterpreterUI(
 
 	} catch (error) {
 		console.error('Error processing LLM:', error);
+
+		// Stop the timer if it was started
+		if (timerInterval) {
+			clearInterval(timerInterval);
+		}
 
 		// Show retry button instead of disabled error state
 		interpretBtn.textContent = getMessage('retry');
