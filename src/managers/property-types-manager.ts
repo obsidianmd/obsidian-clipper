@@ -4,7 +4,6 @@ import { createElementWithClass, createElementWithHTML } from '../utils/dom-util
 import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
 import { templates } from './template-manager';
 import { refreshPropertyNameSuggestions } from './template-ui';
-import { unescapeValue } from '../utils/string-utils';
 import { showImportModal } from '../utils/import-modal';
 import { saveFile } from '../utils/file-utils';
 import { getMessage } from '../utils/i18n';
@@ -105,7 +104,7 @@ function createPropertyTypeListItem(propertyType: PropertyType, usageCount: numb
 
 	const defaultValueInput = createElementWithHTML('input', '', {
 		type: 'text',
-		value: unescapeValue(propertyType.defaultValue || ''),
+		value: propertyType.defaultValue || '',
 		class: 'property-default-value',
 		placeholder: 'Default value'
 	}) as HTMLInputElement;
