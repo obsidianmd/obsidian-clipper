@@ -137,7 +137,22 @@ export function makeUrlAbsolute(element: Element, attributeName: string, baseUrl
 export function processUrls(htmlContent: string, baseUrl: URL): string {
 	const parser = new DOMParser();
 	const doc = parser.parseFromString(htmlContent, 'text/html');
-	
+
+	// Promote lazy-loaded src before absolutizing URLs
+	doc.querySelectorAll('img').forEach(img => {
+		const dataSrc = img.getAttribute('data-src')
+			|| img.getAttribute('data-original')
+			|| img.getAttribute('data-actualsrc');
+		const src = img.getAttribute('src');
+		if (dataSrc && (!src || !src.trim() || src.startsWith('data:image/') || src === 'about:blank')) {
+			img.setAttribute('src', dataSrc);
+		}
+		const dataSrcset = img.getAttribute('data-srcset');
+		if (dataSrcset && !img.getAttribute('srcset')) {
+			img.setAttribute('srcset', dataSrcset);
+		}
+	});
+
 	// Handle relative URLs for images, links, videos, and audio embeds.
 	doc.querySelectorAll('img').forEach(img => makeUrlAbsolute(img, 'srcset', baseUrl));
 	doc.querySelectorAll('img').forEach(img => makeUrlAbsolute(img, 'src', baseUrl));

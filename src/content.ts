@@ -26,6 +26,14 @@ declare global {
 	const iframeId = 'obsidian-clipper-iframe';
 	const containerId = 'obsidian-clipper-container';
 
+	function promoteFormulaAttributes() {
+		document.querySelectorAll('[data-formula]').forEach(el => {
+			if (!el.hasAttribute('data-latex')) {
+				el.setAttribute('data-latex', el.getAttribute('data-formula') || '');
+			}
+		});
+	}
+
 	function removeContainer(container: HTMLElement) {
 		container.classList.add('is-closing');
 		container.addEventListener('animationend', () => {
@@ -210,6 +218,9 @@ declare global {
 
 		if (request.action === "copyMarkdownToClipboard") {
 			try {
+				// Promote data-formula to data-latex before Defuddle strips it
+				promoteFormulaAttributes();
+
 				// Extract page content using Defuddle
 				const defuddled = new Defuddle(document, { url: document.URL }).parse();
 
@@ -245,6 +256,9 @@ declare global {
 			}
 
 			const extractedContent: { [key: string]: string } = {};
+
+			// Promote data-formula to data-latex before Defuddle strips it
+			promoteFormulaAttributes();
 
 			// Process with Defuddle first while we have access to the document
 			const defuddled = new Defuddle(document, { url: document.URL }).parse();
