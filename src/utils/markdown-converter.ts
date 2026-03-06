@@ -90,6 +90,88 @@ export function createMarkdownContent(content: string, url: string) {
 	turndownService.keep(['iframe', 'video', 'audio', 'sup', 'sub', 'svg', 'math']);
 	turndownService.remove(['button']);
 
+	function getLatexFromImage(node: Element): string {
+		if (!(node instanceof HTMLImageElement)) return '';
+
+		return (
+			node.getAttribute('data-latex')
+			|| node.getAttribute('alt')
+			|| node.getAttribute('title')
+			|| ''
+		).trim();
+	}
+
+	function hasObviousTexContent(latex: string): boolean {
+		return /\\(?:begin|text|frac|alpha|beta|gamma|sum|int|ge|le|left|right)\b/.test(latex);
+	}
+
+	function hasLatexImageHelper(node: HTMLImageElement): boolean {
+		if (isStandaloneNode(node)) return true;
+
+		const src = node.getAttribute('src') || '';
+		if (/(?:latex|mathtex|codecogs|equation|renderer=latex|[?&]tex=)/i.test(src)) {
+			return true;
+		}
+
+		const parentClassName = node.parentElement?.className || '';
+		if (typeof parentClassName === 'string' && /\b(?:equation|math|formula)\b/i.test(parentClassName)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	function isLatexImage(node: Node): boolean {
+		if (!(node instanceof HTMLImageElement)) return false;
+
+		const latex = getLatexFromImage(node);
+		if (!latex) return false;
+
+		if (node.hasAttribute('data-latex')) {
+			return true;
+		}
+
+		if (node.classList.contains('latex') || node.classList.contains('tex')) {
+			return true;
+		}
+
+		if (!hasObviousTexContent(latex)) {
+			return false;
+		}
+
+		return hasLatexImageHelper(node);
+	}
+
+	function isStandaloneNode(node: Node): boolean {
+		const parent = node.parentNode;
+		if (!parent) return false;
+
+		const significantChildren = Array.from(parent.childNodes).filter(child => {
+			if (child === node) return true;
+			if (child.nodeType !== Node.TEXT_NODE) return true;
+
+			return (child.textContent || '').trim().length > 0;
+		});
+
+		return significantChildren.length === 1 && significantChildren[0] === node;
+	}
+
+	turndownService.addRule('latexImage', {
+		filter: (node) => isLatexImage(node),
+		replacement: (content, node) => {
+			if (!(node instanceof HTMLImageElement)) return content;
+
+			const latex = getLatexFromImage(node);
+			if (!latex) return content;
+
+			if (isStandaloneNode(node)) {
+				return `\n$$\n${latex}\n$$\n`;
+			}
+
+			return `$${latex}$`;
+		}
+	});
+
 	turndownService.addRule('list', {
 		filter: ['ul', 'ol'],
 		replacement: function (content: string, node: Node) {
