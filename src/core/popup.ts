@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import { Template, Property, PromptVariable } from '../types/types';
 import { incrementStat, addHistoryEntry, getClipHistory } from '../utils/storage-utils';
-import { generateFrontmatter, saveToObsidian } from '../utils/obsidian-note-creator';
+import { generateLogseqProperties, saveToLogseq } from '../utils/logseq-note-creator';
 import { extractPageContent, initializePageContent } from '../utils/content-extractor';
 import { compileTemplate } from '../utils/template-compiler';
 import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
@@ -33,7 +33,7 @@ let currentTemplate: Template | null = null;
 let templates: Template[] = [];
 let currentVariables: { [key: string]: string } = {};
 let currentTabId: number | undefined;
-let lastSelectedVault: string | null = null;
+let lastSelectedGraph: string | null = null;
 
 const isSidePanel = window.location.pathname.includes('side-panel.html');
 const urlParams = new URLSearchParams(window.location.search);
@@ -51,10 +51,10 @@ const memoizedCompileTemplate = memoizeWithExpiration(
 	}
 );
 
-// Memoize generateFrontmatter with a longer expiration
-const memoizedGenerateFrontmatter = memoizeWithExpiration(
+// Memoize generateLogseqProperties with a longer expiration
+const memoizedGenerateLogseqProperties = memoizeWithExpiration(
 	async (properties: Property[]) => {
-		return generateFrontmatter(properties);
+		return generateLogseqProperties(properties);
 	},
 	{ expirationMs: 5000 }
 );
@@ -170,14 +170,14 @@ async function initializeExtension(tabId: number) {
 		currentTemplate = templates[0];
 		debugLog('Templates', 'Current template set to:', currentTemplate);
 
-		// Load last selected vault
-		lastSelectedVault = await getLocalStorage('lastSelectedVault');
-		if (!lastSelectedVault && loadedSettings.vaults.length > 0) {
-			lastSelectedVault = loadedSettings.vaults[0];
+		// Load last selected graph
+		lastSelectedGraph = await getLocalStorage('lastSelectedGraph');
+		if (!lastSelectedGraph && loadedSettings.graphs.length > 0) {
+			lastSelectedGraph = loadedSettings.graphs[0];
 		}
-		debugLog('Vaults', 'Last selected vault:', lastSelectedVault);
+		debugLog('Graphs', 'Last selected graph:', lastSelectedGraph);
 
-		updateVaultDropdown(loadedSettings.vaults);
+		updateGraphDropdown(loadedSettings.graphs);
 
 		const tab = await getTabInfo(tabId);
 		if (!tab.url || isBlankPage(tab.url)) {
@@ -321,7 +321,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
 			try {
 				// DOM-dependent initializations
-				updateVaultDropdown(loadedSettings.vaults);
+				updateGraphDropdown(loadedSettings.graphs);
 				populateTemplateDropdown();
 				setupEventListeners(currentTabId);
 				await initializeUI();
@@ -417,9 +417,9 @@ function setupEventListeners(tabId: number) {
 			}) as Property[];
 
 			const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
-			const frontmatter = await generateFrontmatter(properties);
-			const fileContent = frontmatter + noteContentField.value;
-			
+			const logseqProperties = generateLogseqProperties(properties);
+			const fileContent = logseqProperties + noteContentField.value;
+
 			await copyToClipboard(fileContent);
 		});
 	}
@@ -446,11 +446,11 @@ function setupEventListeners(tabId: number) {
 				
 				// Use Promise.all to prepare the data
 				Promise.all([
-					generateFrontmatter(properties),
+					Promise.resolve(generateLogseqProperties(properties)),
 					Promise.resolve(noteContentField.value)
-				]).then(([frontmatter, noteContent]) => {
-					const fileContent = frontmatter + noteContent;
-					
+				]).then(([logseqProperties, noteContent]) => {
+					const fileContent = logseqProperties + noteContent;
+
 					// Call share directly from the click handler
 					const noteNameField = document.getElementById('note-name-field') as HTMLInputElement;
 					let fileName = noteNameField?.value || 'untitled';
@@ -462,22 +462,22 @@ function setupEventListeners(tabId: number) {
 					if (navigator.share && navigator.canShare) {
 						const blob = new Blob([fileContent], { type: 'text/markdown;charset=utf-8' });
 						const file = new File([blob], fileName, { type: 'text/markdown;charset=utf-8' });
-						
+
 						const shareData = {
 							files: [file],
-							text: 'Shared from Obsidian Web Clipper'
+							text: 'Shared from LogSeq Cupertino Clipper'
 						};
 
 						if (navigator.canShare(shareData)) {
 							const pathField = document.getElementById('path-name-field') as HTMLInputElement;
-							const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement;
+							const graphDropdown = document.getElementById('graph-select') as HTMLSelectElement;
 							const path = pathField?.value || '';
-							const vault = vaultDropdown?.value || '';
+							const graph = graphDropdown?.value || '';
 
 							navigator.share(shareData)
 								.then(async () => {
 									const tabInfo = await getCurrentTabInfo();
-									await incrementStat('share', vault, path, tabInfo.url, tabInfo.title);
+									await incrementStat('share', graph, path, tabInfo.url, tabInfo.title);
 									const moreDropdown = document.getElementById('more-dropdown');
 									if (moreDropdown) {
 											moreDropdown.classList.remove('show');
@@ -717,13 +717,13 @@ async function initializeTemplateFields(currentTabId: number, template: Template
 	// Cache the current URL once at the start to avoid repeated getTabInfo calls
 	const currentUrl = currentTabId ? (await getTabInfo(currentTabId)).url || '' : '';
 
-	// Handle vault selection
-	const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement;
-	if (vaultDropdown) {
-		if (template.vault) {
-			vaultDropdown.value = template.vault;
-		} else if (lastSelectedVault) {
-			vaultDropdown.value = lastSelectedVault;
+	// Handle graph selection
+	const graphDropdown = document.getElementById('graph-select') as HTMLSelectElement;
+	if (graphDropdown) {
+		if (template.graph) {
+			graphDropdown.value = template.graph;
+		} else if (lastSelectedGraph) {
+			graphDropdown.value = lastSelectedGraph;
 		}
 	}
 
@@ -995,38 +995,38 @@ async function getReplacedTemplate(template: Template, variables: { [key: string
 	return replacedTemplate;
 }
 
-function updateVaultDropdown(vaults: string[]) {
-	const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement | null;
-	const vaultContainer = document.getElementById('vault-container');
+function updateGraphDropdown(graphs: string[]) {
+	const graphDropdown = document.getElementById('graph-select') as HTMLSelectElement | null;
+	const graphContainer = document.getElementById('graph-container');
 
-	if (!vaultDropdown || !vaultContainer) return;
+	if (!graphDropdown || !graphContainer) return;
 
 	// Clear existing options
-	vaultDropdown.textContent = '';
-	
-	vaults.forEach(vault => {
+	graphDropdown.textContent = '';
+
+	graphs.forEach(graph => {
 		const option = document.createElement('option');
-		option.value = vault;
-		option.textContent = vault;
-		vaultDropdown.appendChild(option);
+		option.value = graph;
+		option.textContent = graph;
+		graphDropdown.appendChild(option);
 	});
 
-	// Only show vault selector if vaults are defined
-	if (vaults.length > 0) {
-		vaultContainer.style.display = 'block';
-		if (lastSelectedVault && vaults.includes(lastSelectedVault)) {
-			vaultDropdown.value = lastSelectedVault;
+	// Only show graph selector if graphs are defined
+	if (graphs.length > 0) {
+		graphContainer.style.display = 'block';
+		if (lastSelectedGraph && graphs.includes(lastSelectedGraph)) {
+			graphDropdown.value = lastSelectedGraph;
 		} else {
-			vaultDropdown.value = vaults[0];
+			graphDropdown.value = graphs[0];
 		}
 	} else {
-		vaultContainer.style.display = 'none';
+		graphContainer.style.display = 'none';
 	}
 
-	// Add event listener to update lastSelectedVault when changed
-	vaultDropdown.addEventListener('change', () => {
-		lastSelectedVault = vaultDropdown.value;
-		setLocalStorage('lastSelectedVault', lastSelectedVault);
+	// Add event listener to update lastSelectedGraph when changed
+	graphDropdown.addEventListener('change', () => {
+		lastSelectedGraph = graphDropdown.value;
+		setLocalStorage('lastSelectedGraph', lastSelectedGraph);
 	});
 }
 
@@ -1131,17 +1131,17 @@ export async function copyToClipboard(content: string) {
 		});
 		
 		const pathField = document.getElementById('path-name-field') as HTMLInputElement;
-		const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement;
+		const graphDropdown = document.getElementById('graph-select') as HTMLSelectElement;
 		const path = pathField?.value || '';
-		const vault = vaultDropdown?.value || '';
-		
+		const graph = graphDropdown?.value || '';
+
 		const tabInfo = await getCurrentTabInfo();
-		await incrementStat('copyToClipboard', vault, path, tabInfo.url, tabInfo.title);
+		await incrementStat('copyToClipboard', graph, path, tabInfo.url, tabInfo.title);
 
 		// Change the main button text temporarily
 		const clipButton = document.getElementById('clip-btn');
 		if (clipButton) {
-			const originalText = clipButton.textContent || getMessage('addToObsidian');
+			const originalText = clipButton.textContent || getMessage('addToLogseq');
 			clipButton.textContent = getMessage('copied');
 			
 			// Reset the text after 1.5 seconds
@@ -1159,12 +1159,12 @@ async function handleSaveToDownloads() {
 	try {
 		const noteNameField = document.getElementById('note-name-field') as HTMLInputElement;
 		const pathField = document.getElementById('path-name-field') as HTMLInputElement;
-		const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement;
-		
+
 		let fileName = noteNameField?.value || 'untitled';
 		const path = pathField?.value || '';
-		const vault = vaultDropdown?.value || '';
-		
+		const graphDropdown2 = document.getElementById('graph-select') as HTMLSelectElement;
+		const graph = graphDropdown2?.value || '';
+
 		const properties = Array.from(document.querySelectorAll('.metadata-property input')).map(input => {
 			const inputElement = input as HTMLInputElement;
 			return {
@@ -1175,8 +1175,8 @@ async function handleSaveToDownloads() {
 		}) as Property[];
 
 		const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
-		const frontmatter = await generateFrontmatter(properties);
-		const fileContent = frontmatter + noteContentField.value;
+		const logseqProperties = generateLogseqProperties(properties);
+		const fileContent = logseqProperties + noteContentField.value;
 
 		await saveFile({
 			content: fileContent,
@@ -1187,7 +1187,7 @@ async function handleSaveToDownloads() {
 		});
 
 		const tabInfo = await getCurrentTabInfo();
-		await incrementStat('saveFile', vault, path, tabInfo.url, tabInfo.title);
+		await incrementStat('saveFile', graph, path, tabInfo.url, tabInfo.title);
 
 		const moreDropdown = document.getElementById('more-dropdown');
 		if (moreDropdown) {
@@ -1214,35 +1214,35 @@ function determineMainAction() {
 			mainButton.textContent = getMessage('copyToClipboard');
 			mainButton.onclick = () => copyContent();
 			// Add direct actions to secondary
-			addSecondaryAction(secondaryActions, 'addToObsidian', () => handleClipObsidian());
+			addSecondaryAction(secondaryActions, 'addToLogseq', () => handleClipLogseq());
 			addSecondaryAction(secondaryActions, 'saveFile', handleSaveToDownloads);
 			break;
 		case 'saveFile':
 			mainButton.textContent = getMessage('saveFile');
 			mainButton.onclick = () => handleSaveToDownloads();
 			// Add direct actions to secondary
-			addSecondaryAction(secondaryActions, 'addToObsidian', () => handleClipObsidian());
+			addSecondaryAction(secondaryActions, 'addToLogseq', () => handleClipLogseq());
 			addSecondaryAction(secondaryActions, 'copyToClipboard', copyContent);
 			break;
-		default: // 'addToObsidian'
-			mainButton.textContent = getMessage('addToObsidian');
-			mainButton.onclick = () => handleClipObsidian();
+		default: // 'addToLogseq'
+			mainButton.textContent = getMessage('addToLogseq');
+			mainButton.onclick = () => handleClipLogseq();
 			// Add direct actions to secondary
 			addSecondaryAction(secondaryActions, 'copyToClipboard', copyContent);
 			addSecondaryAction(secondaryActions, 'saveFile', handleSaveToDownloads);
 	}
 }
 
-async function handleClipObsidian(): Promise<void> {
+async function handleClipLogseq(): Promise<void> {
 	if (!currentTemplate) return;
 
-	const vaultDropdown = document.getElementById('vault-select') as HTMLSelectElement;
+	const graphDropdown = document.getElementById('graph-select') as HTMLSelectElement;
 	const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
 	const noteNameField = document.getElementById('note-name-field') as HTMLInputElement;
 	const pathField = document.getElementById('path-name-field') as HTMLInputElement;
 	const interpretBtn = document.getElementById('interpret-btn') as HTMLButtonElement;
 
-	if (!vaultDropdown || !noteContentField) {
+	if (!noteContentField) {
 		showError('Some required fields are missing. Please try reloading the extension.');
 		return;
 	}
@@ -1268,29 +1268,29 @@ async function handleClipObsidian(): Promise<void> {
 			};
 		}) as Property[];
 
-		const frontmatter = await generateFrontmatter(properties);
-		const fileContent = frontmatter + noteContentField.value;
+		const logseqProperties = generateLogseqProperties(properties);
+		const noteContent = noteContentField.value;
 
-		// Save to Obsidian
-		const selectedVault = currentTemplate.vault || vaultDropdown.value;
+		// Save to LogSeq
+		const selectedGraph = currentTemplate.graph || graphDropdown?.value || '';
 		const isDailyNote = currentTemplate.behavior === 'append-daily' || currentTemplate.behavior === 'prepend-daily';
 		const noteName = isDailyNote ? '' : noteNameField?.value || '';
 		const path = isDailyNote ? '' : pathField?.value || '';
 
-		await saveToObsidian(fileContent, noteName, path, selectedVault, currentTemplate.behavior);
+		await saveToLogseq(logseqProperties, noteContent, noteName, path, selectedGraph, currentTemplate.behavior);
 		const tabInfo = await getCurrentTabInfo();
-		await incrementStat('addToObsidian', selectedVault, path, tabInfo.url, tabInfo.title);
+		await incrementStat('addToLogseq', selectedGraph, path, tabInfo.url, tabInfo.title);
 
-		if (!currentTemplate.vault) {
-			lastSelectedVault = selectedVault;
-			await setLocalStorage('lastSelectedVault', lastSelectedVault);
+		if (!currentTemplate.graph) {
+			lastSelectedGraph = selectedGraph;
+			await setLocalStorage('lastSelectedGraph', lastSelectedGraph);
 		}
 
 		if (!isSidePanel) {
 			setTimeout(() => window.close(), 500);
 		}
 	} catch (error) {
-		console.error('Error in handleClipObsidian:', error);
+		console.error('Error in handleClipLogseq:', error);
 		showError('failedToSaveFile');
 		throw error;
 	}
@@ -1327,7 +1327,7 @@ function getActionIcon(actionType: string): string {
 	switch (actionType) {
 		case 'copyToClipboard': return 'copy';
 		case 'saveFile': return 'file-down';
-		case 'addToObsidian': return 'pen-line';
+		case 'addToLogseq': return 'pen-line';
 		default: return 'plus';
 	}
 }
@@ -1343,8 +1343,8 @@ async function copyContent() {
 	}) as Property[];
 
 	const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
-	const frontmatter = await generateFrontmatter(properties);
-	const fileContent = frontmatter + noteContentField.value;
+	const logseqProperties = generateLogseqProperties(properties);
+	const fileContent = logseqProperties + noteContentField.value;
 	await copyToClipboard(fileContent);
 }
 

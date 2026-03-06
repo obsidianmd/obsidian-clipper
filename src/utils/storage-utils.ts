@@ -6,10 +6,8 @@ import { copyToClipboard } from 'core/popup';
 export type { Settings, ModelConfig, PropertyType, HistoryEntry, Provider, Rating };
 
 export let generalSettings: Settings = {
-	vaults: [],
+	graphs: [],
 	betaFeatures: false,
-	legacyMode: false,
-	silentOpen: false,
 	openBehavior: 'popup',
 	highlighterEnabled: true,
 	alwaysShowHighlights: false,
@@ -22,6 +20,9 @@ export let generalSettings: Settings = {
 	interpreterAutoRun: false,
 	defaultPromptContext: '',
 	propertyTypes: [],
+	logseqApiToken: '',
+	logseqApiPort: 12315,
+	logseqJournalFormat: 'MMM Do, YYYY',
 	readerSettings: {
 		fontSize: 1.5,
 		lineHeight: 1.6,
@@ -30,14 +31,14 @@ export let generalSettings: Settings = {
 		themeMode: 'auto'
 	},
 	stats: {
-		addToObsidian: 0,
+		addToLogseq: 0,
 		saveFile: 0,
 		copyToClipboard: 0,
 		share: 0
 	},
 	history: [],
 	ratings: [],
-	saveBehavior: 'addToObsidian'
+	saveBehavior: 'addToLogseq'
 };
 
 export function setLocalStorage(key: string, value: any): Promise<void> {
@@ -52,12 +53,10 @@ interface StorageData {
 	general_settings?: {
 		showMoreActionsButton?: boolean;
 		betaFeatures?: boolean;
-		legacyMode?: boolean;
-		silentOpen?: boolean;
 		openBehavior?: boolean | 'popup' | 'embedded';
-		saveBehavior?: 'addToObsidian' | 'copyToClipboard' | 'saveFile';
+		saveBehavior?: 'addToLogseq' | 'copyToClipboard' | 'saveFile';
 	};
-	vaults?: string[];
+	graphs?: string[];
 	highlighter_settings?: {
 		highlighterEnabled?: boolean;
 		alwaysShowHighlights?: boolean;
@@ -78,9 +77,14 @@ interface StorageData {
 		interpreterAutoRun?: boolean;
 		defaultPromptContext?: string;
 	};
+	logseq_api_settings?: {
+		logseqApiToken?: string;
+		logseqApiPort?: number;
+		logseqJournalFormat?: string;
+	};
 	property_types?: PropertyType[];
 	stats?: {
-		addToObsidian: number;
+		addToLogseq: number;
 		saveFile: number;
 		copyToClipboard: number;
 		share: number;
@@ -90,18 +94,16 @@ interface StorageData {
 	migrationVersion?: number;
 }
 
-const CURRENT_MIGRATION_VERSION = 1;
+const CURRENT_MIGRATION_VERSION = 2;
 
 export async function loadSettings(): Promise<Settings> {
 	const data = await browser.storage.sync.get(null) as StorageData;
-	
+
 	// Load default settings first
 	const defaultSettings: Settings = {
-		vaults: [],
+		graphs: [],
 		showMoreActionsButton: false,
 		betaFeatures: false,
-		legacyMode: false,
-		silentOpen: false,
 		openBehavior: 'popup',
 		highlighterEnabled: true,
 		alwaysShowHighlights: true,
@@ -113,7 +115,10 @@ export async function loadSettings(): Promise<Settings> {
 		interpreterAutoRun: false,
 		defaultPromptContext: '',
 		propertyTypes: [],
-		saveBehavior: 'addToObsidian',
+		logseqApiToken: '',
+		logseqApiPort: 12315,
+		logseqJournalFormat: 'MMM Do, YYYY',
+		saveBehavior: 'addToLogseq',
 		readerSettings: {
 			fontSize: 1.5,
 			lineHeight: 1.6,
@@ -122,7 +127,7 @@ export async function loadSettings(): Promise<Settings> {
 			themeMode: 'auto'
 		},
 		stats: {
-			addToObsidian: 0,
+			addToLogseq: 0,
 			saveFile: 0,
 			copyToClipboard: 0,
 			share: 0
@@ -138,23 +143,21 @@ export async function loadSettings(): Promise<Settings> {
 	}
 
 	// Validate and sanitize data to prevent corruption
-	const sanitizedVaults = Array.isArray(data.vaults) ? data.vaults.filter(v => typeof v === 'string') : [];
-	const sanitizedModels = Array.isArray(data.interpreter_settings?.models) 
-		? data.interpreter_settings.models.filter(m => m && typeof m === 'object' && typeof m.id === 'string') 
+	const sanitizedGraphs = Array.isArray(data.graphs) ? data.graphs.filter(v => typeof v === 'string') : [];
+	const sanitizedModels = Array.isArray(data.interpreter_settings?.models)
+		? data.interpreter_settings.models.filter(m => m && typeof m === 'object' && typeof m.id === 'string')
 		: [];
-	const sanitizedProviders = Array.isArray(data.interpreter_settings?.providers) 
-		? data.interpreter_settings.providers.filter(p => p && typeof p === 'object' && typeof p.id === 'string') 
+	const sanitizedProviders = Array.isArray(data.interpreter_settings?.providers)
+		? data.interpreter_settings.providers.filter(p => p && typeof p === 'object' && typeof p.id === 'string')
 		: [];
 
 	// Load user settings
 	const loadedSettings: Settings = {
-		vaults: sanitizedVaults.length > 0 ? sanitizedVaults : defaultSettings.vaults,
+		graphs: sanitizedGraphs.length > 0 ? sanitizedGraphs : defaultSettings.graphs,
 		showMoreActionsButton: data.general_settings?.showMoreActionsButton ?? defaultSettings.showMoreActionsButton,
 		betaFeatures: data.general_settings?.betaFeatures ?? defaultSettings.betaFeatures,
-		legacyMode: data.general_settings?.legacyMode ?? defaultSettings.legacyMode,
-		silentOpen: data.general_settings?.silentOpen ?? defaultSettings.silentOpen,
-		openBehavior: typeof data.general_settings?.openBehavior === 'boolean' 
-			? (data.general_settings.openBehavior ? 'embedded' : 'popup') 
+		openBehavior: typeof data.general_settings?.openBehavior === 'boolean'
+			? (data.general_settings.openBehavior ? 'embedded' : 'popup')
 			: (data.general_settings?.openBehavior ?? defaultSettings.openBehavior),
 		highlighterEnabled: data.highlighter_settings?.highlighterEnabled ?? defaultSettings.highlighterEnabled,
 		alwaysShowHighlights: data.highlighter_settings?.alwaysShowHighlights ?? defaultSettings.alwaysShowHighlights,
@@ -166,6 +169,9 @@ export async function loadSettings(): Promise<Settings> {
 		interpreterAutoRun: data.interpreter_settings?.interpreterAutoRun ?? defaultSettings.interpreterAutoRun,
 		defaultPromptContext: data.interpreter_settings?.defaultPromptContext || defaultSettings.defaultPromptContext,
 		propertyTypes: data.property_types || defaultSettings.propertyTypes,
+		logseqApiToken: data.logseq_api_settings?.logseqApiToken || defaultSettings.logseqApiToken,
+		logseqApiPort: data.logseq_api_settings?.logseqApiPort ?? defaultSettings.logseqApiPort,
+		logseqJournalFormat: data.logseq_api_settings?.logseqJournalFormat || defaultSettings.logseqJournalFormat,
 		readerSettings: {
 			fontSize: data.reader_settings?.fontSize ?? defaultSettings.readerSettings.fontSize,
 			lineHeight: data.reader_settings?.lineHeight ?? defaultSettings.readerSettings.lineHeight,
@@ -190,12 +196,10 @@ export async function saveSettings(settings?: Partial<Settings>): Promise<void> 
 	}
 
 	await browser.storage.sync.set({
-		vaults: generalSettings.vaults,
+		graphs: generalSettings.graphs,
 		general_settings: {
 			showMoreActionsButton: generalSettings.showMoreActionsButton,
 			betaFeatures: generalSettings.betaFeatures,
-			legacyMode: generalSettings.legacyMode,
-			silentOpen: generalSettings.silentOpen,
 			openBehavior: generalSettings.openBehavior,
 			saveBehavior: generalSettings.saveBehavior,
 		},
@@ -212,6 +216,11 @@ export async function saveSettings(settings?: Partial<Settings>): Promise<void> 
 			interpreterAutoRun: generalSettings.interpreterAutoRun,
 			defaultPromptContext: generalSettings.defaultPromptContext
 		},
+		logseq_api_settings: {
+			logseqApiToken: generalSettings.logseqApiToken,
+			logseqApiPort: generalSettings.logseqApiPort,
+			logseqJournalFormat: generalSettings.logseqJournalFormat,
+		},
 		property_types: generalSettings.propertyTypes,
 		reader_settings: {
 			fontSize: generalSettings.readerSettings.fontSize,
@@ -224,14 +233,9 @@ export async function saveSettings(settings?: Partial<Settings>): Promise<void> 
 	});
 }
 
-export async function setLegacyMode(enabled: boolean): Promise<void> {
-	await saveSettings({ legacyMode: enabled });
-	console.log(`Legacy mode ${enabled ? 'enabled' : 'disabled'}`);
-}
-
 export async function incrementStat(
 	action: keyof Settings['stats'],
-	vault?: string,
+	graph?: string,
 	path?: string,
 	url?: string,
 	title?: string
@@ -242,15 +246,15 @@ export async function incrementStat(
 
 	// Add history entry if URL is provided
 	if (url) {
-		await addHistoryEntry(action, url, title, vault, path);
+		await addHistoryEntry(action, url, title, graph, path);
 	}
 }
 
 export async function addHistoryEntry(
-	action: keyof Settings['stats'], 
-	url: string, 
+	action: keyof Settings['stats'],
+	url: string,
 	title?: string,
-	vault?: string,
+	graph?: string,
 	path?: string
 ): Promise<void> {
 	const entry: HistoryEntry = {
@@ -258,7 +262,7 @@ export async function addHistoryEntry(
 		url,
 		action,
 		title,
-		vault,
+		graph,
 		path
 	};
 

@@ -18,23 +18,24 @@ import { getClipHistory } from '../utils/storage-utils';
 import dayjs from 'dayjs';
 import weekOfYear from 'dayjs/plugin/weekOfYear';
 import { showModal, hideModal } from '../utils/modal-utils';
+import { logseqClient } from '../utils/logseq-api-client';
 
 dayjs.extend(weekOfYear);
 
 const STORE_URLS = {
-	chrome: 'https://chromewebstore.google.com/detail/obsidian-web-clipper/cnjifjpddelmedmihgijeibhnjfabmlf',
-	firefox: 'https://addons.mozilla.org/en-US/firefox/addon/web-clipper-obsidian/',
-	safari: 'https://apps.apple.com/us/app/obsidian-web-clipper/id6720708363',
-	edge: 'https://microsoftedge.microsoft.com/addons/detail/obsidian-web-clipper/eigdjhmgnaaeaonimdklocfekkaanfme'
+	chrome: 'https://chromewebstore.google.com/detail/logseq-cupertino-clipper',
+	firefox: 'https://addons.mozilla.org/en-US/firefox/addon/logseq-cupertino-clipper/',
+	safari: '#',
+	edge: '#'
 };
 
-export function updateVaultList(): void {
-	const vaultList = document.getElementById('vault-list') as HTMLUListElement;
-	if (!vaultList) return;
+export function updateGraphList(): void {
+	const graphList = document.getElementById('graph-list') as HTMLUListElement;
+	if (!graphList) return;
 
-	// Clear existing vaults
-	vaultList.textContent = '';
-	generalSettings.vaults.forEach((vault, index) => {
+	// Clear existing graphs
+	graphList.textContent = '';
+	generalSettings.graphs.forEach((graph, index) => {
 		const li = document.createElement('li');
 		li.dataset.index = index.toString();
 		li.draggable = true;
@@ -44,12 +45,12 @@ export function updateVaultList(): void {
 		li.appendChild(dragHandle);
 
 		const span = document.createElement('span');
-		span.textContent = vault;
+		span.textContent = graph;
 		li.appendChild(span);
 
 		const removeBtn = createElementWithClass('button', 'remove-vault-btn clickable-icon');
 		removeBtn.setAttribute('type', 'button');
-		removeBtn.setAttribute('aria-label', getMessage('removeVault'));
+		removeBtn.setAttribute('aria-label', getMessage('removeGraph'));
 		removeBtn.appendChild(createElementWithHTML('i', '', { 'data-lucide': 'trash-2' }));
 		li.appendChild(removeBtn);
 
@@ -59,24 +60,24 @@ export function updateVaultList(): void {
 		li.addEventListener('dragend', handleDragEnd);
 		removeBtn.addEventListener('click', (e) => {
 			e.stopPropagation();
-			removeVault(index);
+			removeGraph(index);
 		});
-		vaultList.appendChild(li);
+		graphList.appendChild(li);
 	});
 
-	initializeIcons(vaultList);
+	initializeIcons(graphList);
 }
 
-export function addVault(vault: string): void {
-	generalSettings.vaults.push(vault);
+export function addGraph(graph: string): void {
+	generalSettings.graphs.push(graph);
 	saveSettings();
-	updateVaultList();
+	updateGraphList();
 }
 
-export function removeVault(index: number): void {
-	generalSettings.vaults.splice(index, 1);
+export function removeGraph(index: number): void {
+	generalSettings.graphs.splice(index, 1);
 	saveSettings();
-	updateVaultList();
+	updateGraphList();
 }
 
 export async function setShortcutInstructions() {
@@ -86,11 +87,11 @@ export async function setShortcutInstructions() {
 		// Clear content
 		shortcutInstructionsElement.textContent = '';
 		shortcutInstructionsElement.appendChild(document.createTextNode(getMessage('shortcutInstructionsIntro') + ' '));
-		
+
 		// Browser-specific instructions
 		let instructionsText = '';
 		let url = '';
-		
+
 		switch (browser) {
 			case 'chrome':
 				instructionsText = getMessage('shortcutInstructionsChrome', ['$URL']);
@@ -115,24 +116,21 @@ export async function setShortcutInstructions() {
 			default:
 				instructionsText = getMessage('shortcutInstructionsDefault');
 		}
-		
+
 		if (url) {
-			// Split text around the URL placeholder and add strong element
 			const parts = instructionsText.split('$URL');
 			if (parts.length === 2) {
 				shortcutInstructionsElement.appendChild(document.createTextNode(parts[0]));
-				
+
 				const strongElement = document.createElement('strong');
 				strongElement.textContent = url;
 				shortcutInstructionsElement.appendChild(strongElement);
-				
+
 				shortcutInstructionsElement.appendChild(document.createTextNode(parts[1]));
 			} else {
-				// Fallback if no placeholder found
 				shortcutInstructionsElement.appendChild(document.createTextNode(instructionsText));
 			}
 		} else {
-			// Safari and default cases (no URL needed)
 			shortcutInstructionsElement.appendChild(document.createTextNode(instructionsText));
 		}
 	}
@@ -148,7 +146,6 @@ async function initializeVersionDisplay(): Promise<void> {
 		versionNumber.textContent = manifest.version;
 	}
 
-	// Only add update listener for browsers that support it
 	const currentBrowser = await detectBrowser();
 	if (currentBrowser !== 'safari' && currentBrowser !== 'mobile-safari' && browser.runtime.onUpdateAvailable) {
 		browser.runtime.onUpdateAvailable.addListener((details) => {
@@ -158,7 +155,6 @@ async function initializeVersionDisplay(): Promise<void> {
 			}
 		});
 	} else {
-		// For Safari, just hide the update status elements
 		if (updateAvailable) {
 			updateAvailable.style.display = 'none';
 		}
@@ -172,15 +168,12 @@ export function initializeGeneralSettings(): void {
 	loadSettings().then(async () => {
 		await setupLanguageAndDirection();
 
-		// Add version check initialization
 		await initializeVersionDisplay();
 
-		// Get clip history and ratings
 		const history = await getClipHistory();
 		const totalClips = history.length;
 		const existingRatings = await getLocalStorage('ratings') || [];
 
-		// Show rating section only total clips >= 20 and no previous ratings
 		const rateExtensionSection = document.getElementById('rate-extension');
 		if (rateExtensionSection && totalClips >= 20 && existingRatings.length === 0) {
 			rateExtensionSection.classList.remove('is-hidden');
@@ -201,8 +194,7 @@ export function initializeGeneralSettings(): void {
 							}
 						});
 						await handleRating(rating);
-						
-						// Hide the rating section after rating
+
 						if (rateExtensionSection) {
 							rateExtensionSection.style.display = 'none';
 						}
@@ -211,12 +203,10 @@ export function initializeGeneralSettings(): void {
 			}
 		}
 
-		updateVaultList();
+		updateGraphList();
 		initializeShowMoreActionsToggle();
 		initializeBetaFeaturesToggle();
-		initializeLegacyModeToggle();
-		initializeSilentOpenToggle();
-		initializeVaultInput();
+		initializeGraphInput();
 		initializeOpenBehaviorDropdown();
 		initializeKeyboardShortcuts();
 		initializeToggles();
@@ -227,9 +217,9 @@ export function initializeGeneralSettings(): void {
 		initializeHighlighterSettings();
 		initializeExportHighlightsButton();
 		initializeSaveBehaviorDropdown();
+		initializeLogseqApiSettings();
 		await initializeUsageChart();
 
-		// Initialize feedback modal close button
 		const feedbackModal = document.getElementById('feedback-modal');
 		const feedbackCloseBtn = feedbackModal?.querySelector('.feedback-close-btn');
 		if (feedbackCloseBtn) {
@@ -241,7 +231,6 @@ export function initializeGeneralSettings(): void {
 function initializeAutoSave(): void {
 	const generalSettingsForm = document.getElementById('general-settings-form');
 	if (generalSettingsForm) {
-		// Listen for both input and change events
 		generalSettingsForm.addEventListener('input', debounce(saveSettingsFromForm, 500));
 		generalSettingsForm.addEventListener('change', debounce(saveSettingsFromForm, 500));
 	}
@@ -251,19 +240,15 @@ function saveSettingsFromForm(): void {
 	const openBehaviorDropdown = document.getElementById('open-behavior-dropdown') as HTMLSelectElement;
 	const showMoreActionsToggle = document.getElementById('show-more-actions-toggle') as HTMLInputElement;
 	const betaFeaturesToggle = document.getElementById('beta-features-toggle') as HTMLInputElement;
-	const legacyModeToggle = document.getElementById('legacy-mode-toggle') as HTMLInputElement;
-	const silentOpenToggle = document.getElementById('silent-open-toggle') as HTMLInputElement;
 	const highlighterToggle = document.getElementById('highlighter-toggle') as HTMLInputElement;
 	const alwaysShowHighlightsToggle = document.getElementById('highlighter-visibility') as HTMLInputElement;
 	const highlightBehaviorSelect = document.getElementById('highlighter-behavior') as HTMLSelectElement;
 
 	const updatedSettings = {
-		...generalSettings, // Keep existing settings
+		...generalSettings,
 		openBehavior: (openBehaviorDropdown?.value as 'popup' | 'embedded') ?? generalSettings.openBehavior,
 		showMoreActionsButton: showMoreActionsToggle?.checked ?? generalSettings.showMoreActionsButton,
 		betaFeatures: betaFeaturesToggle?.checked ?? generalSettings.betaFeatures,
-		legacyMode: legacyModeToggle?.checked ?? generalSettings.legacyMode,
-		silentOpen: silentOpenToggle?.checked ?? generalSettings.silentOpen,
 		highlighterEnabled: highlighterToggle?.checked ?? generalSettings.highlighterEnabled,
 		alwaysShowHighlights: alwaysShowHighlightsToggle?.checked ?? generalSettings.alwaysShowHighlights,
 		highlightBehavior: highlightBehaviorSelect?.value ?? generalSettings.highlightBehavior
@@ -278,16 +263,16 @@ function initializeShowMoreActionsToggle(): void {
 	});
 }
 
-function initializeVaultInput(): void {
-	const vaultInput = document.getElementById('vault-input') as HTMLInputElement;
-	if (vaultInput) {
-		vaultInput.addEventListener('keypress', (e) => {
+function initializeGraphInput(): void {
+	const graphInput = document.getElementById('graph-input') as HTMLInputElement;
+	if (graphInput) {
+		graphInput.addEventListener('keypress', (e) => {
 			if (e.key === 'Enter') {
 				e.preventDefault();
-				const newVault = vaultInput.value.trim();
-				if (newVault) {
-					addVault(newVault);
-					vaultInput.value = '';
+				const newGraph = graphInput.value.trim();
+				if (newGraph) {
+					addGraph(newGraph);
+					graphInput.value = '';
 				}
 			}
 		});
@@ -301,17 +286,15 @@ async function initializeKeyboardShortcuts(): Promise<void> {
 	const browser = await detectBrowser();
 
 	if (browser === 'mobile-safari') {
-		// For Safari, display a message about keyboard shortcuts not being available
 		const messageItem = document.createElement('div');
 		messageItem.className = 'shortcut-item';
 		messageItem.textContent = getMessage('shortcutInstructionsSafari');
 		shortcutsList.appendChild(messageItem);
 	} else {
-		// For other browsers, proceed with displaying the shortcuts
 		getCommands().then(commands => {
 			commands.forEach(command => {
 				const shortcutItem = createElementWithClass('div', 'shortcut-item');
-				
+
 				const descriptionSpan = document.createElement('span');
 				descriptionSpan.textContent = command.description;
 				shortcutItem.appendChild(descriptionSpan);
@@ -329,18 +312,6 @@ async function initializeKeyboardShortcuts(): Promise<void> {
 function initializeBetaFeaturesToggle(): void {
 	initializeSettingToggle('beta-features-toggle', generalSettings.betaFeatures, (checked) => {
 		saveSettings({ ...generalSettings, betaFeatures: checked });
-	});
-}
-
-function initializeLegacyModeToggle(): void {
-	initializeSettingToggle('legacy-mode-toggle', generalSettings.legacyMode, (checked) => {
-		saveSettings({ ...generalSettings, legacyMode: checked });
-	});
-}
-
-function initializeSilentOpenToggle(): void {
-	initializeSettingToggle('silent-open-toggle', generalSettings.silentOpen, (checked) => {
-		saveSettings({ ...generalSettings, silentOpen: checked });
 	});
 }
 
@@ -362,21 +333,69 @@ function initializeResetDefaultTemplateButton(): void {
 }
 
 function initializeSaveBehaviorDropdown(): void {
-    const dropdown = document.getElementById('save-behavior-dropdown') as HTMLSelectElement;
-    if (!dropdown) return;
+	const dropdown = document.getElementById('save-behavior-dropdown') as HTMLSelectElement;
+	if (!dropdown) return;
 
-    dropdown.value = generalSettings.saveBehavior;
-    dropdown.addEventListener('change', () => {
-        const newValue = dropdown.value as 'addToObsidian' | 'copyToClipboard' | 'saveFile';
-        saveSettings({ saveBehavior: newValue });
-    });
+	dropdown.value = generalSettings.saveBehavior;
+	dropdown.addEventListener('change', () => {
+		const newValue = dropdown.value as 'addToLogseq' | 'copyToClipboard' | 'saveFile';
+		saveSettings({ saveBehavior: newValue });
+	});
+}
+
+function initializeLogseqApiSettings(): void {
+	const tokenInput = document.getElementById('logseq-api-token') as HTMLInputElement;
+	const portInput = document.getElementById('logseq-api-port') as HTMLInputElement;
+	const testBtn = document.getElementById('test-logseq-connection-btn') as HTMLButtonElement;
+	const statusEl = document.getElementById('logseq-connection-status');
+
+	if (tokenInput) {
+		tokenInput.value = generalSettings.logseqApiToken || '';
+		tokenInput.addEventListener('change', () => {
+			saveSettings({ ...generalSettings, logseqApiToken: tokenInput.value });
+		});
+	}
+
+	if (portInput) {
+		portInput.value = String(generalSettings.logseqApiPort || 12315);
+		portInput.addEventListener('change', () => {
+			const port = parseInt(portInput.value, 10);
+			if (port > 0 && port < 65536) {
+				saveSettings({ ...generalSettings, logseqApiPort: port });
+			}
+		});
+	}
+
+	if (testBtn && statusEl) {
+		testBtn.addEventListener('click', async () => {
+			// Save current values before testing
+			if (tokenInput) saveSettings({ ...generalSettings, logseqApiToken: tokenInput.value });
+			if (portInput) {
+				const port = parseInt(portInput.value, 10);
+				if (port > 0 && port < 65536) saveSettings({ ...generalSettings, logseqApiPort: port });
+			}
+
+			statusEl.textContent = getMessage('testConnection') + '...';
+			statusEl.className = 'setting-item-description';
+
+			const available = await logseqClient.isAvailable();
+			if (available) {
+				const graphName = await logseqClient.getCurrentGraph();
+				statusEl.textContent = getMessage('connectionSuccess') || `Connected${graphName ? ' to graph: ' + graphName : ''}`;
+				statusEl.style.color = 'var(--color-green)';
+			} else {
+				statusEl.textContent = getMessage('connectionFailed') || 'Could not connect to LogSeq. Make sure the desktop app is running and HTTP API is enabled.';
+				statusEl.style.color = 'var(--color-red)';
+			}
+		});
+	}
 }
 
 export function resetDefaultTemplate(): void {
 	const defaultTemplate = createDefaultTemplate();
 	const currentTemplates = getTemplates();
 	const defaultIndex = currentTemplates.findIndex((t: Template) => t.name === getMessage('defaultTemplateName'));
-	
+
 	if (defaultIndex !== -1) {
 		currentTemplates[defaultIndex] = defaultTemplate;
 	} else {
@@ -442,41 +461,34 @@ async function initializeUsageChart(): Promise<void> {
 			timeRange: periodSelect.value as '30d' | 'all',
 			aggregation: aggregationSelect.value as 'day' | 'week' | 'month'
 		};
-		
+
 		const chartData = aggregateUsageData(history, options);
 		await createUsageChart(chartContainer, chartData);
 	};
 
-	// Initialize with default selections
 	await updateChart();
 
-	// Update when any selector changes
 	periodSelect.addEventListener('change', updateChart);
 	aggregationSelect.addEventListener('change', updateChart);
 }
 
 async function handleRating(rating: number) {
-	// Get existing ratings from storage
 	const existingRatings = await getLocalStorage('ratings') || [];
-	
-	// Add new rating
+
 	const newRating = {
 		rating,
 		date: new Date().toISOString()
 	};
-	
-	// Update both storage and generalSettings
+
 	const updatedRatings = [...existingRatings, newRating];
 	generalSettings.ratings = updatedRatings;
-	
-	// Save to storage
+
 	await setLocalStorage('ratings', updatedRatings);
 	await saveSettings();
 
 	if (rating >= 4) {
-		// Redirect to appropriate store
 		const browser = await detectBrowser();
-		let storeUrl = STORE_URLS.chrome; // Default to Chrome store
+		let storeUrl = STORE_URLS.chrome;
 
 		switch (browser) {
 			case 'firefox':
@@ -495,7 +507,6 @@ async function handleRating(rating: number) {
 
 		window.open(storeUrl, '_blank');
 	} else {
-		// Show feedback modal for ratings < 4
 		const modal = document.getElementById('feedback-modal');
 		showModal(modal);
 	}
