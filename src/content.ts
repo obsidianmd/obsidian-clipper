@@ -3,7 +3,7 @@ import * as highlighter from './utils/highlighter';
 import { loadSettings, generalSettings } from './utils/storage-utils';
 import Defuddle from 'defuddle';
 import { getDomain } from './utils/string-utils';
-import { createMarkdownContent } from './utils/markdown-converter';
+import { createMarkdownContent } from 'defuddle/full';
 
 declare global {
 	interface Window {
