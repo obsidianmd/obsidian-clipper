@@ -18,6 +18,7 @@
 						<li data-section="highlighter" data-i18n="highlighter">Highlighter</li>
 						<li data-section="reader" data-i18n="reader" style="display: none;">Reader</li>
 						<li data-section="interpreter" data-i18n="interpreter">Interpreter</li>
+						<li data-section="ocr">PDF OCR</li>
 						<li class="sidebar-heading" data-i18n="templatesHeading">Templates</li>
 					</ul>
 					<button type="button" id="new-template-btn" class="mod-cta" data-i18n="newTemplate">New&nbsp;template</button>
@@ -371,6 +372,55 @@
 									<textarea id="default-prompt-context" rows="4" placeholder="{{fullHtml}}" spellcheck="false"></textarea>
 								</div>
 								
+							</div>
+						</form>
+					</div>
+
+					<div id="ocr-section" class="settings-section">
+						<div class="settings-section-header">
+							<h2>PDF OCR</h2>
+						</div>
+						<form id="ocr-settings-form">
+							<div class="setting-item-group">
+								<div class="setting-item mod-horizontal">
+									<div class="setting-item-info">
+										<label for="ocr-toggle">Enable PDF OCR</label>
+										<div class="setting-item-description">
+											Automatically extract text and images from PDF files using <a href="https://mistral.ai/news/mistral-ocr-3" target="_blank">Mistral OCR</a>. When enabled, opening the clipper on a PDF page will send it to the Mistral API for processing.
+										</div>
+									</div>
+									<div class="setting-item-control">
+										<div class="checkbox-container">
+											<input type="checkbox" id="ocr-toggle" />
+										</div>
+									</div>
+								</div>
+							</div>
+							<div>
+								<h3>API key</h3>
+								<div class="setting-item">
+									<div class="setting-item-info">
+										<label for="ocr-api-key">Mistral API key</label>
+										<div class="setting-item-description">
+											Get your API key from <a href="https://console.mistral.ai/api-keys" target="_blank">console.mistral.ai</a>. The key is stored locally and requests are sent directly to Mistral.
+										</div>
+									</div>
+									<input type="password" id="ocr-api-key" placeholder="Enter your Mistral API key" spellcheck="false" autocomplete="off" />
+								</div>
+							</div>
+							<div>
+								<h3>Options</h3>
+								<div class="setting-item mod-horizontal">
+									<div class="setting-item-info">
+										<label for="ocr-include-images-toggle">Include images</label>
+										<div class="setting-item-description">Extract and embed images from the PDF as base64 data URIs in the markdown output.</div>
+									</div>
+									<div class="setting-item-control">
+										<div class="checkbox-container">
+											<input type="checkbox" id="ocr-include-images-toggle" />
+										</div>
+									</div>
+								</div>
 							</div>
 						</form>
 					</div>

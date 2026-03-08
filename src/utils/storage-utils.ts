@@ -1,9 +1,9 @@
 import browser from './browser-polyfill';
-import { Settings, ModelConfig, PropertyType, HistoryEntry, Provider, Rating } from '../types/types';
+import { Settings, ModelConfig, PropertyType, HistoryEntry, Provider, Rating, OcrSettings } from '../types/types';
 import { debugLog } from './debug';
 import { copyToClipboard } from 'core/popup';
 
-export type { Settings, ModelConfig, PropertyType, HistoryEntry, Provider, Rating };
+export type { Settings, ModelConfig, PropertyType, HistoryEntry, Provider, Rating, OcrSettings };
 
 export let generalSettings: Settings = {
 	vaults: [],
@@ -37,7 +37,12 @@ export let generalSettings: Settings = {
 	},
 	history: [],
 	ratings: [],
-	saveBehavior: 'addToObsidian'
+	saveBehavior: 'addToObsidian',
+	ocrSettings: {
+		enabled: false,
+		apiKey: '',
+		includeImages: true
+	}
 };
 
 export function setLocalStorage(key: string, value: any): Promise<void> {
@@ -77,6 +82,11 @@ interface StorageData {
 		interpreterEnabled?: boolean;
 		interpreterAutoRun?: boolean;
 		defaultPromptContext?: string;
+	};
+	ocr_settings?: {
+		enabled?: boolean;
+		apiKey?: string;
+		includeImages?: boolean;
 	};
 	property_types?: PropertyType[];
 	stats?: {
@@ -129,6 +139,11 @@ export async function loadSettings(): Promise<Settings> {
 		},
 		history: [],
 		ratings: [],
+		ocrSettings: {
+			enabled: false,
+			apiKey: '',
+			includeImages: true
+		}
 	};
 
 	// Update migration version if needed
@@ -176,7 +191,12 @@ export async function loadSettings(): Promise<Settings> {
 		stats: data.stats || defaultSettings.stats,
 		history: data.history || defaultSettings.history,
 		ratings: data.ratings || defaultSettings.ratings,
-		saveBehavior: data.general_settings?.saveBehavior ?? defaultSettings.saveBehavior
+		saveBehavior: data.general_settings?.saveBehavior ?? defaultSettings.saveBehavior,
+		ocrSettings: {
+			enabled: data.ocr_settings?.enabled ?? defaultSettings.ocrSettings.enabled,
+			apiKey: data.ocr_settings?.apiKey ?? defaultSettings.ocrSettings.apiKey,
+			includeImages: data.ocr_settings?.includeImages ?? defaultSettings.ocrSettings.includeImages
+		}
 	};
 
 	generalSettings = loadedSettings;
@@ -220,7 +240,12 @@ export async function saveSettings(settings?: Partial<Settings>): Promise<void> 
 			theme: generalSettings.readerSettings.theme,
 			themeMode: generalSettings.readerSettings.themeMode
 		},
-		stats: generalSettings.stats
+		stats: generalSettings.stats,
+		ocr_settings: {
+			enabled: generalSettings.ocrSettings.enabled,
+			apiKey: generalSettings.ocrSettings.apiKey,
+			includeImages: generalSettings.ocrSettings.includeImages
+		}
 	});
 }
 

@@ -6,6 +6,7 @@ import { debugLog } from './debug';
 import dayjs from 'dayjs';
 import { AnyHighlightData, TextHighlightData, HighlightData } from './highlighter';
 import { generalSettings } from './storage-utils';
+import { OcrResult } from './ocr-processor';
 import { 
 	getElementByXPath,
 	wrapElementWithMark,
@@ -208,6 +209,51 @@ export async function initializePageContent(
 			throw new Error(`Unable to initialize page content: ${error.message}`);
 		} else {
 			throw new Error('Unable to initialize page content: Unknown error');
+		}
+	}
+}
+
+export function initializePdfContent(
+	ocrResult: OcrResult,
+	currentUrl: string
+) {
+	try {
+		const noteName = sanitizeFileName(ocrResult.title);
+
+		const currentVariables: { [key: string]: string } = {
+			'{{author}}': '',
+			'{{content}}': ocrResult.markdown.trim(),
+			'{{contentHtml}}': '',
+			'{{selection}}': '',
+			'{{selectionHtml}}': '',
+			'{{date}}': dayjs().format('YYYY-MM-DDTHH:mm:ssZ').trim(),
+			'{{time}}': dayjs().format('YYYY-MM-DDTHH:mm:ssZ').trim(),
+			'{{description}}': `PDF document (${ocrResult.pageCount} pages)`,
+			'{{domain}}': getDomain(currentUrl),
+			'{{favicon}}': '',
+			'{{fullHtml}}': '',
+			'{{highlights}}': '',
+			'{{image}}': '',
+			'{{noteName}}': noteName.trim(),
+			'{{published}}': '',
+			'{{site}}': getDomain(currentUrl),
+			'{{title}}': ocrResult.title.trim(),
+			'{{url}}': currentUrl.trim(),
+			'{{words}}': ocrResult.markdown.split(/\s+/).length.toString(),
+		};
+
+		debugLog('Variables', 'Available PDF variables:', currentVariables);
+
+		return {
+			noteName,
+			currentVariables
+		};
+	} catch (error: unknown) {
+		console.error('Error in initializePdfContent:', error);
+		if (error instanceof Error) {
+			throw new Error(`Unable to initialize PDF content: ${error.message}`);
+		} else {
+			throw new Error('Unable to initialize PDF content: Unknown error');
 		}
 	}
 }

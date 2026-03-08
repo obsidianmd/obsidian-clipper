@@ -2,7 +2,8 @@ import dayjs from 'dayjs';
 import { Template, Property, PromptVariable } from '../types/types';
 import { incrementStat, addHistoryEntry, getClipHistory } from '../utils/storage-utils';
 import { generateFrontmatter, saveToObsidian } from '../utils/obsidian-note-creator';
-import { extractPageContent, initializePageContent } from '../utils/content-extractor';
+import { extractPageContent, initializePageContent, initializePdfContent } from '../utils/content-extractor';
+import { isPdfUrl, processPdfWithOcr } from '../utils/ocr-processor';
 import { compileTemplate } from '../utils/template-compiler';
 import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
 import { findMatchingTemplate, initializeTriggers } from '../utils/triggers';
@@ -623,10 +624,43 @@ async function refreshFields(tabId: number, checkTemplateTriggers: boolean = tru
 			return;
 		}
 
+		const currentUrl = tab.url;
+
+		// Check if this is a PDF and OCR is configured
+		if (isPdfUrl(currentUrl)) {
+			const { ocrSettings } = generalSettings;
+			if (!ocrSettings.enabled || !ocrSettings.apiKey) {
+				showError('PDF OCR is not configured. Enable it and add your Mistral API key in Settings → PDF OCR.');
+				return;
+			}
+
+			const ocrResult = await processPdfWithOcr(
+				currentUrl,
+				ocrSettings.apiKey,
+				ocrSettings.includeImages
+			);
+
+			const initializedContent = initializePdfContent(ocrResult, currentUrl);
+			if (initializedContent) {
+				currentVariables = initializedContent.currentVariables;
+				console.log('Updated currentVariables (PDF):', currentVariables);
+				await initializeTemplateFields(
+					tabId,
+					currentTemplate,
+					initializedContent.currentVariables,
+					initializedContent.noteName,
+					null
+				);
+				setupMetadataToggle();
+				updateVariablesPanel(currentTemplate, currentVariables);
+			} else {
+				throw new Error('Unable to initialize PDF content.');
+			}
+			return;
+		}
+
 		const extractedData = await memoizedExtractPageContent(tabId);
 		if (extractedData) {
-			const currentUrl = tab.url;
-
 			// Only check for the correct template if checkTemplateTriggers is true
 			if (checkTemplateTriggers) {
 				const getSchemaOrgData = async () => {

@@ -87,6 +87,7 @@ export interface Settings {
 	history: HistoryEntry[];
 	ratings: Rating[];
 	saveBehavior: 'addToObsidian' | 'saveFile' | 'copyToClipboard';
+	ocrSettings: OcrSettings;
 }
 
 export interface ModelConfig {
@@ -126,4 +127,10 @@ export interface ConversationMetadata {
 export interface Footnote {
 	url: string;
 	text: string;
+}
+
+export interface OcrSettings {
+	enabled: boolean;
+	apiKey: string;
+	includeImages: boolean;
 }
