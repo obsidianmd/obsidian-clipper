@@ -239,7 +239,7 @@ export function initializePdfContent(
 			'{{site}}': getDomain(currentUrl),
 			'{{title}}': ocrResult.title.trim(),
 			'{{url}}': currentUrl.trim(),
-			'{{words}}': ocrResult.markdown.split(/\s+/).length.toString(),
+			'{{words}}': (ocrResult.markdown.trim() ? ocrResult.markdown.trim().split(/\s+/).length : 0).toString(),
 		};
 
 		debugLog('Variables', 'Available PDF variables:', currentVariables);
