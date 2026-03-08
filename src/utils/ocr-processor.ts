@@ -109,9 +109,10 @@ export async function processPdfWithOcr(
 				`!\\[([^\\]]*)\\]\\(${escapeRegex(imageId)}\\)`,
 				'g'
 			);
+			const dataUri = toDataUri(base64Data);
 			markdown = markdown.replace(
 				imagePattern,
-				(_, alt) => `![${alt}](data:image/png;base64,${base64Data})`
+				(_, alt) => `![${alt}](${dataUri})`
 			);
 		}
 	}
@@ -127,4 +128,23 @@ export async function processPdfWithOcr(
 
 function escapeRegex(str: string): string {
 	return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function toDataUri(base64Data: string): string {
+	// If already a data URI, return as-is
+	if (base64Data.startsWith('data:')) {
+		return base64Data;
+	}
+	// Detect MIME type from base64 magic bytes
+	const mimeType = detectImageMimeType(base64Data);
+	return `data:${mimeType};base64,${base64Data}`;
+}
+
+function detectImageMimeType(base64Data: string): string {
+	const header = base64Data.substring(0, 16);
+	if (header.startsWith('/9j/')) return 'image/jpeg';
+	if (header.startsWith('iVBOR')) return 'image/png';
+	if (header.startsWith('R0lGO')) return 'image/gif';
+	if (header.startsWith('UklGR')) return 'image/webp';
+	return 'image/png'; // fallback
 }

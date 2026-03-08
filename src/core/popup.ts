@@ -634,28 +634,48 @@ async function refreshFields(tabId: number, checkTemplateTriggers: boolean = tru
 				return;
 			}
 
-			const ocrResult = await processPdfWithOcr(
-				currentUrl,
-				ocrSettings.apiKey,
-				ocrSettings.includeImages
-			);
+			// Check for template triggers on PDF URLs
+			if (checkTemplateTriggers) {
+				const matchedTemplate = await findMatchingTemplate(currentUrl, async () => null);
+				if (matchedTemplate) {
+					console.log('Matched template:', matchedTemplate);
+					currentTemplate = matchedTemplate;
+					updateTemplateDropdown();
+				}
+			}
+
+			// Show loading state while OCR processes
+			const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
+			if (noteContentField) {
+				noteContentField.value = 'Processing PDF with OCR...';
+				noteContentField.disabled = true;
+			}
+
+			let ocrResult;
+			try {
+				ocrResult = await processPdfWithOcr(
+					currentUrl,
+					ocrSettings.apiKey,
+					ocrSettings.includeImages
+				);
+			} finally {
+				if (noteContentField) {
+					noteContentField.disabled = false;
+				}
+			}
 
 			const initializedContent = initializePdfContent(ocrResult, currentUrl);
-			if (initializedContent) {
-				currentVariables = initializedContent.currentVariables;
-				console.log('Updated currentVariables (PDF):', currentVariables);
-				await initializeTemplateFields(
-					tabId,
-					currentTemplate,
-					initializedContent.currentVariables,
-					initializedContent.noteName,
-					null
-				);
-				setupMetadataToggle();
-				updateVariablesPanel(currentTemplate, currentVariables);
-			} else {
-				throw new Error('Unable to initialize PDF content.');
-			}
+			currentVariables = initializedContent.currentVariables;
+			console.log('Updated currentVariables (PDF):', currentVariables);
+			await initializeTemplateFields(
+				tabId,
+				currentTemplate,
+				initializedContent.currentVariables,
+				initializedContent.noteName,
+				null
+			);
+			setupMetadataToggle();
+			updateVariablesPanel(currentTemplate, currentVariables);
 			return;
 		}
 
