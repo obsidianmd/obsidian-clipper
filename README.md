@@ -27,6 +27,21 @@ You can help translate Web Clipper into your language. Submit your translation v
 
 See the [help wanted](https://github.com/obsidianmd/obsidian-clipper/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22) tag for issues where contributions are welcome.
 
+## PDF OCR
+
+Web Clipper can extract text and images from PDF files using the [Mistral OCR 3](https://mistral.ai/news/mistral-ocr-3) API. When you open the clipper on a `.pdf` URL, the PDF is sent to Mistral for processing and the extracted markdown content flows through the regular clipping pipeline (templates, interpreter, etc.).
+
+### Setup
+
+1. Go to **Settings → PDF OCR**
+2. Enable the **PDF OCR** toggle
+3. Enter your [Mistral API key](https://console.mistral.ai/api-keys)
+4. Optionally toggle **Include images** to embed extracted images as base64 in your notes
+
+### Usage
+
+Navigate to any publicly accessible PDF URL in your browser and open the clipper as usual. The extension will detect the PDF and automatically use OCR instead of the standard page extraction.
+
 ## Roadmap
 
 In no particular order:
