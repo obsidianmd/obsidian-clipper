@@ -628,6 +628,11 @@ async function refreshFields(tabId: number, checkTemplateTriggers: boolean = tru
 
 		// Check if this is a PDF and OCR is configured
 		if (isPdfUrl(currentUrl)) {
+			if (currentUrl.startsWith('file:///')) {
+				showError('Local PDF files are not supported. Open a PDF from a public URL (http/https) to use OCR.');
+				return;
+			}
+
 			const { ocrSettings } = generalSettings;
 			if (!ocrSettings.enabled || !ocrSettings.apiKey) {
 				showError('PDF OCR is not configured. Enable it and add your Mistral API key in Settings → PDF OCR.');
