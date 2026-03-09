@@ -101,6 +101,10 @@ export async function processPdfWithOcr(
 		throw new Error('Unexpected response from Mistral OCR API');
 	}
 
+	if (data.pages.length === 0) {
+		throw new Error('No text could be extracted from the PDF. The document may be blank, encrypted, or in an unsupported format.');
+	}
+
 	const pagesProcessed = data.usage_info?.pages_processed ?? data.pages.length;
 	debugLog('OCR', `Processed ${pagesProcessed} pages`);
 
@@ -108,7 +112,7 @@ export async function processPdfWithOcr(
 	const imageMap = new Map<string, string>();
 	if (includeImages) {
 		for (const page of data.pages) {
-			for (const img of page.images) {
+			for (const img of (page.images || [])) {
 				if (img.image_base64) {
 					imageMap.set(img.id, img.image_base64);
 				}
@@ -118,7 +122,7 @@ export async function processPdfWithOcr(
 
 	// Concatenate all page markdown with page separators
 	let markdown = data.pages
-		.map(page => page.markdown)
+		.map(page => page.markdown || '')
 		.join('\n\n---\n\n');
 
 	// Replace image references with base64 data URIs
