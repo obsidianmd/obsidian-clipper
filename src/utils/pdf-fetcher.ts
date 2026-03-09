@@ -8,11 +8,12 @@ export async function fetchPdfAsBase64(url: string): Promise<{ base64: string; s
 	const bytes = new Uint8Array(arrayBuffer);
 
 	// Convert to base64 in chunks to avoid stack overflow with large PDFs
-	let binary = '';
-	for (let i = 0; i < bytes.length; i++) {
-		binary += String.fromCharCode(bytes[i]);
+	const chunks: string[] = [];
+	const chunkSize = 1024;
+	for (let i = 0; i < bytes.length; i += chunkSize) {
+		chunks.push(String.fromCharCode.apply(null, bytes.subarray(i, i + chunkSize) as unknown as number[]));
 	}
-	const base64 = btoa(binary);
+	const base64 = btoa(chunks.join(''));
 
 	return { base64, sizeBytes: arrayBuffer.byteLength };
 }

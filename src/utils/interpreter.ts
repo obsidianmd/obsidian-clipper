@@ -227,7 +227,7 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 		let llmResponseContent: string;
 		if (provider.name.toLowerCase().includes('anthropic')) {
 			// Handle Anthropic's nested content structure
-			const textContent = data.content[0]?.text;
+			const textContent = data.content?.[0]?.text;
 			if (textContent) {
 				try {
 					// Try to parse the inner content first
@@ -253,7 +253,7 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 				llmResponseContent = JSON.stringify(data);
 			}
 		} else {
-			llmResponseContent = data.choices[0]?.message?.content || JSON.stringify(data);
+			llmResponseContent = data.choices?.[0]?.message?.content || JSON.stringify(data);
 		}
 		debugLog('Interpreter', 'Processed LLM response:', llmResponseContent);
 
