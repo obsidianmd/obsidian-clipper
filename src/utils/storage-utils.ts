@@ -213,7 +213,7 @@ export async function saveSettings(settings?: Partial<Settings>): Promise<void> 
 		generalSettings = { ...generalSettings, ...settings };
 	}
 
-	await browser.storage.sync.set({
+	const settingsGroups: Record<string, unknown> = {
 		vaults: generalSettings.vaults,
 		general_settings: {
 			showMoreActionsButton: generalSettings.showMoreActionsButton,
@@ -251,7 +251,23 @@ export async function saveSettings(settings?: Partial<Settings>): Promise<void> 
 			includeImages: generalSettings.ocrSettings.includeImages,
 			pdfMode: generalSettings.ocrSettings.pdfMode
 		}
-	});
+	};
+
+	try {
+		await browser.storage.sync.set(settingsGroups);
+	} catch (error) {
+		console.error('Failed to save all settings at once, saving individually:', error);
+		// If the bulk save fails (e.g. sync quota exceeded), save each group individually
+		// so that small items like ocr_settings still persist even if large items like
+		// interpreter_settings exceed the per-item size limit.
+		for (const [key, value] of Object.entries(settingsGroups)) {
+			try {
+				await browser.storage.sync.set({ [key]: value });
+			} catch (itemError) {
+				console.error(`Failed to save ${key}:`, itemError);
+			}
+		}
+	}
 }
 
 export async function setLegacyMode(enabled: boolean): Promise<void> {

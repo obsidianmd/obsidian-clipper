@@ -28,19 +28,19 @@ export function initializeOcrSettings() {
 		if (ocrContainer) {
 			updateToggleState(ocrContainer, ocrToggle);
 		}
-		ocrToggle.addEventListener('change', () => {
+		ocrToggle.addEventListener('change', async () => {
 			generalSettings.ocrSettings.enabled = ocrToggle.checked;
-			saveSettings();
+			await saveSettings();
 		});
 	}
 
 	if (pdfModeSelect) {
 		pdfModeSelect.value = generalSettings.ocrSettings.pdfMode || 'ocr';
 		updateModeVisibility(pdfModeSelect.value);
-		pdfModeSelect.addEventListener('change', () => {
+		pdfModeSelect.addEventListener('change', async () => {
 			generalSettings.ocrSettings.pdfMode = pdfModeSelect.value as 'ocr' | 'llm-summary';
 			updateModeVisibility(pdfModeSelect.value);
-			saveSettings();
+			await saveSettings();
 		});
 	}
 
@@ -59,9 +59,9 @@ export function initializeOcrSettings() {
 		if (imagesContainer) {
 			updateToggleState(imagesContainer, includeImagesToggle);
 		}
-		includeImagesToggle.addEventListener('change', () => {
+		includeImagesToggle.addEventListener('change', async () => {
 			generalSettings.ocrSettings.includeImages = includeImagesToggle.checked;
-			saveSettings();
+			await saveSettings();
 		});
 	}
 }
