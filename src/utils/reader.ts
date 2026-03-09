@@ -1,4 +1,5 @@
 import Defuddle from 'defuddle/full';
+import browser from './browser-polyfill';
 import { getLocalStorage, setLocalStorage } from './storage-utils';
 import hljs from 'highlight.js';
 import { getDomain } from './string-utils';
@@ -347,19 +348,45 @@ export class Reader {
 		}
 	}
 
-	private static extractContent(doc: Document): { 
-		content: string; 
-		title?: string; 
-		author?: string; 
-		published?: string; 
+	private static flattenShadowDom(doc: Document): Promise<void> {
+		let found = false;
+		const all = doc.querySelectorAll('*');
+		for (let i = 0; i < all.length; i++) {
+			if (all[i].shadowRoot) {
+				found = true;
+				break;
+			}
+		}
+		if (!found) return Promise.resolve();
+
+		return new Promise((resolve) => {
+			const script = doc.createElement('script');
+			script.src = browser.runtime.getURL('flatten-shadow-dom.js');
+			script.onload = () => {
+				script.remove();
+				resolve();
+			};
+			script.onerror = () => {
+				script.remove();
+				resolve();
+			};
+			(doc.head || doc.documentElement).appendChild(script);
+		});
+	}
+
+	private static async extractContent(doc: Document): Promise<{
+		content: string;
+		title?: string;
+		author?: string;
+		published?: string;
 		domain?: string;
 		wordCount?: number;
 		parseTime?: number;
 		extractorType?: string;
-	} {
-		
-		// const defuddled = new Defuddle(doc, {debug: true}).parse();
-		const defuddled = new Defuddle(doc).parse();
+	}> {
+
+		const defuddle = new Defuddle(doc, { url: doc.URL });
+		const defuddled = await defuddle.parseAsync();
 
 		return {
 			content: defuddled.content,
@@ -1043,6 +1070,9 @@ export class Reader {
 			// Load saved settings
 			await this.loadSettings();
 
+			// Flatten shadow DOM content before cleanup removes scripts
+			await this.flattenShadowDom(doc);
+
 			// Remove page scripts and their effects
 			this.cleanupScripts(doc);
 
@@ -1061,7 +1091,7 @@ export class Reader {
 			if (dir) htmlElement.setAttribute('dir', dir);
 			
 			// Extract content using extractors or Defuddle
-			const { content, title, author, published, domain, extractorType, wordCount, parseTime } = this.extractContent(doc);
+			const { content, title, author, published, domain, extractorType, wordCount, parseTime } = await this.extractContent(doc);
 			if (!content) {
 				console.log('Reader', 'Failed to extract content');
 				return;

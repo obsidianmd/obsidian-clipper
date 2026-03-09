@@ -5,6 +5,37 @@ import Defuddle from 'defuddle';
 import { getDomain } from './utils/string-utils';
 import { createMarkdownContent } from 'defuddle/full';
 
+function flattenShadowDom(): Promise<void> {
+	// Check if any shadow roots exist on the page
+	const hasShadowRoots = document.querySelector('*');
+	let found = false;
+	if (hasShadowRoots) {
+		const all = document.querySelectorAll('*');
+		for (let i = 0; i < all.length; i++) {
+			if (all[i].shadowRoot) {
+				found = true;
+				break;
+			}
+		}
+	}
+	if (!found) return Promise.resolve();
+
+	return new Promise((resolve) => {
+		// Inject main-world script via web-accessible resource
+		const script = document.createElement('script');
+		script.src = browser.runtime.getURL('flatten-shadow-dom.js');
+		script.onload = () => {
+			script.remove();
+			resolve();
+		};
+		script.onerror = () => {
+			script.remove();
+			resolve(); // Continue even if injection fails
+		};
+		(document.head || document.documentElement).appendChild(script);
+	});
+}
+
 declare global {
 	interface Window {
 		obsidianHighlighterInitialized?: boolean;
@@ -209,33 +240,37 @@ declare global {
 		}
 
 		if (request.action === "copyMarkdownToClipboard") {
-			try {
-				// Extract page content using Defuddle
-				const defuddled = new Defuddle(document, { url: document.URL }).parse();
+			flattenShadowDom().then(() => {
+				try {
+					// Extract page content using Defuddle
+					const defuddled = new Defuddle(document, { url: document.URL }).parse();
 
-				// Convert HTML content to markdown
-				const markdown = createMarkdownContent(defuddled.content, document.URL);
+					// Convert HTML content to markdown
+					const markdown = createMarkdownContent(defuddled.content, document.URL);
 
-				// Copy to clipboard
-				const textArea = document.createElement("textarea");
-				textArea.value = markdown;
-				document.body.appendChild(textArea);
-				textArea.select();
-				document.execCommand('copy');
-				document.body.removeChild(textArea);
+					// Copy to clipboard
+					const textArea = document.createElement("textarea");
+					textArea.value = markdown;
+					document.body.appendChild(textArea);
+					textArea.select();
+					document.execCommand('copy');
+					document.body.removeChild(textArea);
 
-				sendResponse({ success: true });
-			} catch (err) {
-				console.error('Failed to copy markdown to clipboard:', err);
-				sendResponse({ success: false, error: (err as Error).message });
-			}
+					sendResponse({ success: true });
+				} catch (err) {
+					console.error('Failed to copy markdown to clipboard:', err);
+					sendResponse({ success: false, error: (err as Error).message });
+				}
+			});
 			return true;
 		}
 
 		if (request.action === "getPageContent") {
+			// Flatten shadow DOM before extraction (async, needs main world)
+			flattenShadowDom().then(async () => {
 			let selectedHtml = '';
 			const selection = window.getSelection();
-			
+
 			if (selection && selection.rangeCount > 0) {
 				const range = selection.getRangeAt(0);
 				const clonedSelection = range.cloneContents();
@@ -244,10 +279,12 @@ declare global {
 				selectedHtml = div.innerHTML;
 			}
 
-			const extractedContent: { [key: string]: string } = {};
-
-			// Process with Defuddle first while we have access to the document
-			const defuddled = new Defuddle(document, { url: document.URL }).parse();
+			// Use parseAsync to ensure async variables like {{transcript}} are available
+			const defuddle = new Defuddle(document, { url: document.URL });
+			const defuddled = await defuddle.parseAsync();
+			const extractedContent: { [key: string]: string } = {
+				...defuddled.variables,
+			};
 
 			// Create a new DOMParser
 			const parser = new DOMParser();
@@ -311,6 +348,8 @@ declare global {
 				metaTags: defuddled.metaTags || []
 			};
 			sendResponse(response);
+			}); // end flattenShadowDom().then()
+			return true;
 		} else if (request.action === "extractContent") {
 			const content = extractContentBySelector(request.selector, request.attribute, request.extractHtml);
 			sendResponse({ content: content });
