@@ -571,8 +571,10 @@ export async function handleInterpreterUI(
 
 	try {
 		// Hide any previous error message
-		interpreterErrorMessage.style.display = 'none';
-		interpreterErrorMessage.textContent = '';
+		if (interpreterErrorMessage) {
+			interpreterErrorMessage.style.display = 'none';
+			interpreterErrorMessage.textContent = '';
+		}
 
 		// Remove any previous done or error classes
 		interpreterContainer?.classList.remove('done', 'error');
@@ -652,8 +654,7 @@ export async function handleInterpreterUI(
 				variables['{{content}}'] = summaryResponse.user_response;
 				const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
 				if (noteContentField) {
-					// Replace {{content}} in the compiled template or set directly
-					noteContentField.value = noteContentField.value.replace('{{content}}', summaryResponse.user_response) || summaryResponse.user_response;
+					noteContentField.value = summaryResponse.user_response;
 				}
 			}
 			if (titleResponse?.user_response) {
@@ -681,26 +682,30 @@ export async function handleInterpreterUI(
 
 	} catch (error) {
 		console.error('Error processing LLM:', error);
-		
+
 		// Revert button text and remove class in case of error
-		interpretBtn.textContent = getMessage('error');
-		interpretBtn.classList.remove('processing');
-		interpretBtn.classList.add('error');
-		interpretBtn.disabled = true;
+		if (interpretBtn) {
+			interpretBtn.textContent = getMessage('error');
+			interpretBtn.classList.remove('processing');
+			interpretBtn.classList.add('error');
+			interpretBtn.disabled = true;
+		}
 
 		// Add error class to interpreter container
 		interpreterContainer?.classList.add('error');
 
 		// Hide the timer
-		responseTimer.style.display = 'none';
+		if (responseTimer) responseTimer.style.display = 'none';
 
 		// Display the error message
-		interpreterErrorMessage.textContent = error instanceof Error ? error.message : 'An unknown error occurred while processing the interpreter request.';
-		interpreterErrorMessage.style.display = 'block';
+		if (interpreterErrorMessage) {
+			interpreterErrorMessage.textContent = error instanceof Error ? error.message : 'An unknown error occurred while processing the interpreter request.';
+			interpreterErrorMessage.style.display = 'block';
+		}
 
 		// Re-enable the clip button
-		clipButton.disabled = false;
-		moreButton.disabled = false;
+		if (clipButton) clipButton.disabled = false;
+		if (moreButton) moreButton.disabled = false;
 
 		if (error instanceof Error) {
 			throw new Error(`${error.message}`);
