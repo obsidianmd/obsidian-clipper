@@ -258,6 +258,38 @@ export function initializePdfContent(
 	}
 }
 
+export function initializePdfContentMinimal(title: string, currentUrl: string) {
+	const noteName = sanitizeFileName(title);
+	const currentVariables: { [key: string]: string } = {
+		'{{author}}': '',
+		'{{content}}': '',
+		'{{contentHtml}}': '',
+		'{{selection}}': '',
+		'{{selectionHtml}}': '',
+		'{{date}}': dayjs().format('YYYY-MM-DDTHH:mm:ssZ').trim(),
+		'{{time}}': dayjs().format('YYYY-MM-DDTHH:mm:ssZ').trim(),
+		'{{description}}': 'PDF document',
+		'{{domain}}': getDomain(currentUrl),
+		'{{favicon}}': '',
+		'{{fullHtml}}': '',
+		'{{highlights}}': '',
+		'{{image}}': '',
+		'{{noteName}}': noteName.trim(),
+		'{{published}}': '',
+		'{{site}}': getDomain(currentUrl),
+		'{{title}}': title.trim(),
+		'{{url}}': currentUrl.trim(),
+		'{{words}}': '0',
+	};
+
+	debugLog('Variables', 'Available PDF variables (minimal):', currentVariables);
+
+	return {
+		noteName,
+		currentVariables
+	};
+}
+
 function addSchemaOrgDataToVariables(schemaData: any, variables: { [key: string]: string }, prefix: string = '') {
 	if (Array.isArray(schemaData)) {
 		schemaData.forEach((item, index) => {

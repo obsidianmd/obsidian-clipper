@@ -2,8 +2,9 @@ import dayjs from 'dayjs';
 import { Template, Property, PromptVariable } from '../types/types';
 import { incrementStat, addHistoryEntry, getClipHistory } from '../utils/storage-utils';
 import { generateFrontmatter, saveToObsidian } from '../utils/obsidian-note-creator';
-import { extractPageContent, initializePageContent, initializePdfContent } from '../utils/content-extractor';
+import { extractPageContent, initializePageContent, initializePdfContent, initializePdfContentMinimal } from '../utils/content-extractor';
 import { isPdfUrl, processPdfWithOcr } from '../utils/ocr-processor';
+import { fetchPdfAsBase64 } from '../utils/pdf-fetcher';
 import { compileTemplate } from '../utils/template-compiler';
 import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
 import { findMatchingTemplate, initializeTriggers } from '../utils/triggers';
@@ -626,16 +627,16 @@ async function refreshFields(tabId: number, checkTemplateTriggers: boolean = tru
 
 		const currentUrl = tab.url;
 
-		// Check if this is a PDF and OCR is configured
+		// Check if this is a PDF and processing is configured
 		if (isPdfUrl(currentUrl)) {
 			if (currentUrl.startsWith('file:///')) {
-				showError('Local PDF files are not supported. Open a PDF from a public URL (http/https) to use OCR.');
+				showError('Local PDF files are not supported. Open a PDF from a public URL (http/https).');
 				return;
 			}
 
 			const { ocrSettings } = generalSettings;
-			if (!ocrSettings.enabled || !ocrSettings.apiKey) {
-				showError('PDF OCR is not configured. Enable it and add your Mistral API key in Settings → PDF OCR.');
+			if (!ocrSettings.enabled) {
+				showError('PDF processing is not enabled. Enable it in Settings → PDF processing.');
 				return;
 			}
 
@@ -649,8 +650,82 @@ async function refreshFields(tabId: number, checkTemplateTriggers: boolean = tru
 				}
 			}
 
-			// Show loading state while OCR processes
 			const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
+
+			if (ocrSettings.pdfMode === 'llm-summary') {
+				// LLM Summary mode: send PDF directly to interpreter LLM
+				if (!generalSettings.interpreterEnabled) {
+					showError('LLM Summary mode requires the Interpreter to be enabled. Configure it in Settings → Interpreter.');
+					return;
+				}
+
+				const enabledModels = generalSettings.models.filter(m => m.enabled);
+				if (enabledModels.length === 0) {
+					showError('LLM Summary mode requires at least one enabled interpreter model. Configure it in Settings → Interpreter.');
+					return;
+				}
+
+				if (noteContentField) {
+					noteContentField.value = 'Fetching PDF and sending to LLM...';
+					noteContentField.disabled = true;
+				}
+
+				try {
+					// Fetch PDF as base64
+					const { base64 } = await fetchPdfAsBase64(currentUrl);
+
+					// Extract title from URL
+					const titleFromUrl = decodeURIComponent(
+						currentUrl.split('/').pop()?.replace(/\.pdf$/i, '') || 'PDF Document'
+					).replace(/[-_]/g, ' ');
+
+					// Initialize minimal PDF variables
+					const initializedContent = initializePdfContentMinimal(titleFromUrl, currentUrl);
+					currentVariables = initializedContent.currentVariables;
+					console.log('Updated currentVariables (PDF LLM):', currentVariables);
+
+					await initializeTemplateFields(
+						tabId,
+						currentTemplate,
+						initializedContent.currentVariables,
+						initializedContent.noteName,
+						null
+					);
+
+					// Find the model to use
+					const selectedModelId = generalSettings.interpreterModel || enabledModels[0].id;
+					const modelConfig = generalSettings.models.find(m => m.id === selectedModelId) || enabledModels[0];
+
+					// Run interpreter with PDF
+					await handleInterpreterUI(
+						currentTemplate!,
+						currentVariables,
+						tabId,
+						currentUrl,
+						modelConfig,
+						base64
+					);
+				} catch (error) {
+					console.error('Error processing PDF with LLM:', error);
+					showError(error instanceof Error ? error.message : 'Failed to process PDF with LLM.');
+				} finally {
+					if (noteContentField) {
+						noteContentField.disabled = false;
+					}
+				}
+
+				setupMetadataToggle();
+				updateVariablesPanel(currentTemplate, currentVariables);
+				return;
+			}
+
+			// Mistral OCR mode (default)
+			if (!ocrSettings.apiKey) {
+				showError('Mistral OCR requires an API key. Add your Mistral API key in Settings → PDF processing.');
+				return;
+			}
+
+			// Show loading state while OCR processes
 			if (noteContentField) {
 				noteContentField.value = 'Processing PDF with OCR...';
 				noteContentField.disabled = true;

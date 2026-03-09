@@ -14,7 +14,7 @@ let lastRequestTime = 0;
 // Store event listeners for cleanup
 const eventListeners = new WeakMap<HTMLElement, { [key: string]: EventListener }>();
 
-export async function sendToLLM(promptContext: string, content: string, promptVariables: PromptVariable[], model: ModelConfig): Promise<{ promptResponses: any[] }> {
+export async function sendToLLM(promptContext: string, content: string, promptVariables: PromptVariable[], model: ModelConfig, pdfBase64?: string): Promise<{ promptResponses: any[] }> {
 	debugLog('Interpreter', 'Sending request to LLM...');
 	
 	// Find the provider for this model
@@ -34,15 +34,39 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 	}
 
 	try {
-		const systemContent = 
+		let systemContent =
 			`You are a helpful assistant. Please respond with one JSON object named \`prompts_responses\` — no explanatory text before or after. Use the keys provided, e.g. \`prompt_1\`, \`prompt_2\`, and fill in the values. Values should be Markdown strings unless otherwise specified. Make your responses concise. For example, your response should look like: {"prompts_responses":{"prompt_1":"tag1, tag2, tag3","prompt_2":"- bullet1\n- bullet 2\n- bullet3"}}`;
-		
-		const promptContent = {	
+
+		if (pdfBase64) {
+			systemContent += `\n\nIn addition to any prompt keys, also include a key called "content_summary" with a comprehensive, detailed summary of the document in Markdown format, and a key called "extracted_title" with the document's title.`;
+		}
+
+		const promptContent = {
 			prompts: promptVariables.reduce((acc, { key, prompt }) => {
 				acc[key] = prompt;
 				return acc;
 			}, {} as { [key: string]: string })
 		};
+
+		const maxTokens = pdfBase64 ? 4096 : 1600;
+
+		// Build Anthropic-style user message with PDF
+		function buildAnthropicPdfMessage(text: string): any {
+			if (!pdfBase64) return text;
+			return [
+				{ type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: pdfBase64 } },
+				{ type: 'text', text }
+			];
+		}
+
+		// Build OpenAI-style user message with PDF
+		function buildOpenAIPdfMessage(text: string): any {
+			if (!pdfBase64) return text;
+			return [
+				{ type: 'file', file: { filename: 'document.pdf', file_data: `data:application/pdf;base64,${pdfBase64}` } },
+				{ type: 'text', text }
+			];
+		}
 
 		let requestUrl: string;
 		let requestBody: any;
@@ -51,6 +75,9 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 		};
 
 		if (provider.name.toLowerCase().includes('hugging')) {
+			if (pdfBase64) {
+				throw new Error(`Provider "${provider.name}" does not support direct PDF input. Switch to Mistral OCR mode or use an Anthropic/OpenAI provider.`);
+			}
 			// Replace {model-id} in baseUrl with the actual model ID
 			requestUrl = provider.baseUrl.replace('{model-id}', model.providerModelId);
 			requestBody = {
@@ -60,9 +87,9 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 					{ role: 'user', content: `${promptContext}` },
 					{ role: 'user', content: `${JSON.stringify(promptContent)}` }
 				],
-				max_tokens: 1600,
+				max_tokens: maxTokens,
 				stream: false
-			};					
+			};
 			headers = {
 				...headers,
 				'Authorization': `Bearer ${provider.apiKey}`
@@ -72,10 +99,10 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 			requestBody = {
 				messages: [
 					{ role: 'system', content: systemContent },
-					{ role: 'user', content: `${promptContext}` },
+					{ role: 'user', content: pdfBase64 ? buildOpenAIPdfMessage(promptContext) : `${promptContext}` },
 					{ role: 'user', content: `${JSON.stringify(promptContent)}` }
 				],
-				max_tokens: 1600,
+				max_tokens: maxTokens,
 				stream: false
 			};
 			headers = {
@@ -86,9 +113,9 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 			requestUrl = provider.baseUrl;
 			requestBody = {
 				model: model.providerModelId,
-				max_tokens: 1600,
+				max_tokens: maxTokens,
 				messages: [
-					{ role: 'user', content: `${promptContext}` },
+					{ role: 'user', content: buildAnthropicPdfMessage(promptContext) },
 					{ role: 'user', content: `${JSON.stringify(promptContent)}` }
 				],
 				temperature: 0.5,
@@ -101,10 +128,13 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 				'anthropic-dangerous-direct-browser-access': 'true'
 			};
 		} else if (provider.name.toLowerCase().includes('perplexity')) {
+			if (pdfBase64) {
+				throw new Error(`Provider "${provider.name}" does not support direct PDF input. Switch to Mistral OCR mode or use an Anthropic/OpenAI provider.`);
+			}
 			requestUrl = provider.baseUrl;
 			requestBody = {
 				model: model.providerModelId,
-				max_tokens: 1600,
+				max_tokens: maxTokens,
 				messages: [
 					{ role: 'system', content: systemContent },
 					{ role: 'user', content: `
@@ -121,6 +151,9 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 				'Authorization': `Bearer ${provider.apiKey}`
 			};
 		} else if (provider.name.toLowerCase().includes('ollama')) {
+			if (pdfBase64) {
+				throw new Error(`Provider "${provider.name}" does not support direct PDF input. Switch to Mistral OCR mode or use an Anthropic/OpenAI provider.`);
+			}
 			requestUrl = provider.baseUrl;
 			requestBody = {
 				model: model.providerModelId,
@@ -135,13 +168,13 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 				stream: false
 			};
 		} else {
-			// Default request format
+			// Default request format (OpenAI-compatible)
 			requestUrl = provider.baseUrl;
 			requestBody = {
 				model: model.providerModelId,
 				messages: [
 					{ role: 'system', content: systemContent },
-					{ role: 'user', content: `${promptContext}` },
+					{ role: 'user', content: pdfBase64 ? buildOpenAIPdfMessage(promptContext) : `${promptContext}` },
 					{ role: 'user', content: `${JSON.stringify(promptContent)}` }
 				]
 			};
@@ -344,6 +377,18 @@ function parseLLMResponse(responseContent: string, promptVariables: PromptVariab
 			user_response: parsedResponse.prompts_responses[variable.key] || ''
 		}));
 
+		// Include built-in PDF summary keys if present
+		const builtInKeys = ['content_summary', 'extracted_title'];
+		for (const key of builtInKeys) {
+			if (parsedResponse.prompts_responses[key]) {
+				promptResponses.push({
+					key,
+					prompt: key,
+					user_response: parsedResponse.prompts_responses[key]
+				});
+			}
+		}
+
 		debugLog('Interpreter', 'Successfully mapped prompt responses:', promptResponses);
 		return { promptResponses };
 	} catch (parseError) {
@@ -513,7 +558,8 @@ export async function handleInterpreterUI(
 	variables: { [key: string]: string },
 	tabId: number,
 	currentUrl: string,
-	modelConfig: ModelConfig
+	modelConfig: ModelConfig,
+	pdfBase64?: string
 ): Promise<void> {
 	const interpreterContainer = document.getElementById('interpreter');
 	const interpretBtn = document.getElementById('interpret-btn') as HTMLButtonElement;
@@ -544,11 +590,11 @@ export async function handleInterpreterUI(
 
 		const promptVariables = collectPromptVariables(template);
 
-		if (promptVariables.length === 0) {
+		if (promptVariables.length === 0 && !pdfBase64) {
 			throw new Error('No prompt variables found. Please add at least one prompt variable to your template.');
 		}
 
-		const contextToUse = promptContextTextarea.value;
+		const contextToUse = pdfBase64 ? 'Please analyze the attached PDF document.' : promptContextTextarea.value;
 		const contentToProcess = variables.content || '';
 
 		// Start the timer
@@ -556,47 +602,76 @@ export async function handleInterpreterUI(
 		let timerInterval: number;
 
 		// Change button text and add class
-		interpretBtn.textContent = getMessage('thinking');
-		interpretBtn.classList.add('processing');
+		if (interpretBtn) {
+			interpretBtn.textContent = getMessage('thinking');
+			interpretBtn.classList.add('processing');
+		}
 
 		// Disable the clip button
-		clipButton.disabled = true;
-		moreButton.disabled = true;
+		if (clipButton) clipButton.disabled = true;
+		if (moreButton) moreButton.disabled = true;
 
 		// Show and update the timer
-		responseTimer.style.display = 'inline';
-		responseTimer.textContent = '0ms';
+		if (responseTimer) {
+			responseTimer.style.display = 'inline';
+			responseTimer.textContent = '0ms';
+		}
 
 		// Update the timer text with elapsed time
 		timerInterval = window.setInterval(() => {
 			const elapsedTime = performance.now() - startTime;
-			responseTimer.textContent = formatDuration(elapsedTime);
+			if (responseTimer) responseTimer.textContent = formatDuration(elapsedTime);
 		}, 10);
 
-		const { promptResponses } = await sendToLLM(contextToUse, contentToProcess, promptVariables, modelConfig);
+		const { promptResponses } = await sendToLLM(contextToUse, contentToProcess, promptVariables, modelConfig, pdfBase64);
 		debugLog('Interpreter', 'LLM response:', { promptResponses });
 
 		// Stop the timer and update UI
 		clearInterval(timerInterval);
 		const endTime = performance.now();
 		const totalTime = endTime - startTime;
-		responseTimer.textContent = formatDuration(totalTime);
+		if (responseTimer) responseTimer.textContent = formatDuration(totalTime);
 
 		// Update button state
-		interpretBtn.textContent = getMessage('done').toLowerCase();
-		interpretBtn.classList.remove('processing');
-		interpretBtn.classList.add('done');
-		interpretBtn.disabled = true;
+		if (interpretBtn) {
+			interpretBtn.textContent = getMessage('done').toLowerCase();
+			interpretBtn.classList.remove('processing');
+			interpretBtn.classList.add('done');
+			interpretBtn.disabled = true;
+		}
 
 		// Add done class to container
 		interpreterContainer?.classList.add('done');
-		
-		// Update fields with responses
+
+		// For PDF LLM summary mode, extract built-in fields and update variables/DOM
+		if (pdfBase64) {
+			const summaryResponse = promptResponses.find((r: any) => r.key === 'content_summary');
+			const titleResponse = promptResponses.find((r: any) => r.key === 'extracted_title');
+
+			if (summaryResponse?.user_response) {
+				variables['{{content}}'] = summaryResponse.user_response;
+				const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
+				if (noteContentField) {
+					// Replace {{content}} in the compiled template or set directly
+					noteContentField.value = noteContentField.value.replace('{{content}}', summaryResponse.user_response) || summaryResponse.user_response;
+				}
+			}
+			if (titleResponse?.user_response) {
+				variables['{{title}}'] = titleResponse.user_response;
+				const noteNameField = document.getElementById('note-name-field') as HTMLTextAreaElement;
+				if (noteNameField) {
+					noteNameField.value = titleResponse.user_response;
+					adjustNoteNameHeight(noteNameField);
+				}
+			}
+		}
+
+		// Update fields with responses (for template prompt variables)
 		replacePromptVariables(promptVariables, promptResponses);
 
 		// Re-enable clip button
-		clipButton.disabled = false;
-		moreButton.disabled = false;
+		if (clipButton) clipButton.disabled = false;
+		if (moreButton) moreButton.disabled = false;
 
 		// Adjust height for noteNameField after content is replaced
 		const noteNameField = document.getElementById('note-name-field') as HTMLTextAreaElement | null;

@@ -133,4 +133,5 @@ export interface OcrSettings {
 	enabled: boolean;
 	apiKey: string;
 	includeImages: boolean;
+	pdfMode: 'ocr' | 'llm-summary';
 }

@@ -41,7 +41,8 @@ export let generalSettings: Settings = {
 	ocrSettings: {
 		enabled: false,
 		apiKey: '',
-		includeImages: true
+		includeImages: true,
+		pdfMode: 'ocr' as const
 	}
 };
 
@@ -87,6 +88,7 @@ interface StorageData {
 		enabled?: boolean;
 		apiKey?: string;
 		includeImages?: boolean;
+		pdfMode?: 'ocr' | 'llm-summary';
 	};
 	property_types?: PropertyType[];
 	stats?: {
@@ -142,7 +144,8 @@ export async function loadSettings(): Promise<Settings> {
 		ocrSettings: {
 			enabled: false,
 			apiKey: '',
-			includeImages: true
+			includeImages: true,
+			pdfMode: 'ocr'
 		}
 	};
 
@@ -195,7 +198,8 @@ export async function loadSettings(): Promise<Settings> {
 		ocrSettings: {
 			enabled: data.ocr_settings?.enabled ?? defaultSettings.ocrSettings.enabled,
 			apiKey: data.ocr_settings?.apiKey ?? defaultSettings.ocrSettings.apiKey,
-			includeImages: data.ocr_settings?.includeImages ?? defaultSettings.ocrSettings.includeImages
+			includeImages: data.ocr_settings?.includeImages ?? defaultSettings.ocrSettings.includeImages,
+			pdfMode: data.ocr_settings?.pdfMode ?? defaultSettings.ocrSettings.pdfMode
 		}
 	};
 
@@ -244,7 +248,8 @@ export async function saveSettings(settings?: Partial<Settings>): Promise<void> 
 		ocr_settings: {
 			enabled: generalSettings.ocrSettings.enabled,
 			apiKey: generalSettings.ocrSettings.apiKey,
-			includeImages: generalSettings.ocrSettings.includeImages
+			includeImages: generalSettings.ocrSettings.includeImages,
+			pdfMode: generalSettings.ocrSettings.pdfMode
 		}
 	});
 }

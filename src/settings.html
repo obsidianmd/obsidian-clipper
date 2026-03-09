@@ -18,7 +18,7 @@
 						<li data-section="highlighter" data-i18n="highlighter">Highlighter</li>
 						<li data-section="reader" data-i18n="reader" style="display: none;">Reader</li>
 						<li data-section="interpreter" data-i18n="interpreter">Interpreter</li>
-						<li data-section="ocr" data-i18n="pdfOcr">PDF OCR</li>
+						<li data-section="ocr" data-i18n="pdfOcr">PDF processing</li>
 						<li class="sidebar-heading" data-i18n="templatesHeading">Templates</li>
 					</ul>
 					<button type="button" id="new-template-btn" class="mod-cta" data-i18n="newTemplate">New&nbsp;template</button>
@@ -378,15 +378,15 @@
 
 					<div id="ocr-section" class="settings-section">
 						<div class="settings-section-header">
-							<h2>PDF OCR</h2>
+							<h2>PDF processing</h2>
 						</div>
 						<form id="ocr-settings-form">
 							<div class="setting-item-group">
 								<div class="setting-item mod-horizontal">
 									<div class="setting-item-info">
-										<label for="ocr-toggle">Enable PDF OCR</label>
+										<label for="ocr-toggle">Enable PDF processing</label>
 										<div class="setting-item-description">
-											Automatically extract text and images from PDF files using <a href="https://mistral.ai/news/mistral-ocr-3" target="_blank">Mistral OCR</a>. When enabled, opening the clipper on a PDF page will send it to the Mistral API for processing.
+											Process PDF files when opening the clipper on a PDF page.
 										</div>
 									</div>
 									<div class="setting-item-control">
@@ -397,6 +397,21 @@
 								</div>
 							</div>
 							<div>
+								<h3>Processing mode</h3>
+								<div class="setting-item">
+									<div class="setting-item-info">
+										<label for="pdf-mode-select">PDF processing mode</label>
+										<div class="setting-item-description">
+											Choose how to process PDF files. Mistral OCR extracts the full text and images. LLM Summary sends the PDF to your configured interpreter model for a detailed summary.
+										</div>
+									</div>
+									<select id="pdf-mode-select">
+										<option value="ocr">Mistral OCR</option>
+										<option value="llm-summary">LLM Summary</option>
+									</select>
+								</div>
+							</div>
+							<div id="ocr-mistral-settings">
 								<h3>API key</h3>
 								<div class="setting-item">
 									<div class="setting-item-info">
@@ -407,8 +422,6 @@
 									</div>
 									<input type="password" id="ocr-api-key" placeholder="Enter your Mistral API key" spellcheck="false" autocomplete="off" />
 								</div>
-							</div>
-							<div>
 								<h3>Options</h3>
 								<div class="setting-item mod-horizontal">
 									<div class="setting-item-info">
@@ -418,6 +431,15 @@
 									<div class="setting-item-control">
 										<div class="checkbox-container">
 											<input type="checkbox" id="ocr-include-images-toggle" />
+										</div>
+									</div>
+								</div>
+							</div>
+							<div id="llm-summary-settings" style="display: none;">
+								<div class="setting-item">
+									<div class="setting-item-info">
+										<div class="setting-item-description">
+											Uses your configured interpreter model to process the PDF. Make sure you have an interpreter provider and model configured in the Interpreter settings. Works best with providers that support PDF input (Anthropic, OpenAI).
 										</div>
 									</div>
 								</div>
