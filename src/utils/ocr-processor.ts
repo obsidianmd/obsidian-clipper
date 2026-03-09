@@ -67,14 +67,28 @@ export async function processPdfWithOcr(
 		table_format: 'html'
 	};
 
-	const response = await fetch('https://api.mistral.ai/v1/ocr', {
-		method: 'POST',
-		headers: {
-			'Authorization': `Bearer ${apiKey}`,
-			'Content-Type': 'application/json'
-		},
-		body: JSON.stringify(requestBody)
-	});
+	const controller = new AbortController();
+	const timeoutId = setTimeout(() => controller.abort(), 120000);
+
+	let response: Response;
+	try {
+		response = await fetch('https://api.mistral.ai/v1/ocr', {
+			method: 'POST',
+			headers: {
+				'Authorization': `Bearer ${apiKey}`,
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(requestBody),
+			signal: controller.signal
+		});
+	} catch (error) {
+		clearTimeout(timeoutId);
+		if (error instanceof DOMException && error.name === 'AbortError') {
+			throw new Error('OCR request timed out. The PDF may be too large.');
+		}
+		throw error;
+	}
+	clearTimeout(timeoutId);
 
 	if (!response.ok) {
 		const errorText = await response.text();
@@ -82,7 +96,13 @@ export async function processPdfWithOcr(
 	}
 
 	const data: OcrResponse = await response.json();
-	debugLog('OCR', `Processed ${data.usage_info.pages_processed} pages`);
+
+	if (!data.pages || !Array.isArray(data.pages)) {
+		throw new Error('Unexpected response from Mistral OCR API');
+	}
+
+	const pagesProcessed = data.usage_info?.pages_processed ?? data.pages.length;
+	debugLog('OCR', `Processed ${pagesProcessed} pages`);
 
 	// Build image lookup from all pages
 	const imageMap = new Map<string, string>();
@@ -122,7 +142,7 @@ export async function processPdfWithOcr(
 	return {
 		markdown,
 		title,
-		pageCount: data.usage_info.pages_processed
+		pageCount: pagesProcessed
 	};
 }
 

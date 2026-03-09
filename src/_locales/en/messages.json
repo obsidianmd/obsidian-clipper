@@ -413,6 +413,9 @@
 	"interpreter": {
 		"message": "Interpreter"
 	},
+	"pdfOcr": {
+		"message": "PDF OCR"
+	},
 	"interpreterContext": {
 		"message": "Interpreter context"
 	},
