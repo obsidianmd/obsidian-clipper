@@ -229,6 +229,19 @@ export function createMarkdownContent(content: string, url: string) {
 		}
 	});
 
+	turndownService.addRule('objectImage', {
+		filter: function(node: Node): boolean {
+			return node.nodeName === 'OBJECT' &&
+				((node as Element).getAttribute('type') || '').startsWith('image/');
+		},
+		replacement: function(content, node) {
+			const el = node as Element;
+			const data = el.getAttribute('data') || '';
+			const alt = el.getAttribute('aria-label') || el.getAttribute('name') || '';
+			return data ? `![${alt}](${data})` : '';
+		}
+	});
+
 	// Use Obsidian format for YouTube embeds and tweets
 	turndownService.addRule('embedToMarkdown', {
 		filter: function (node: Node): boolean {

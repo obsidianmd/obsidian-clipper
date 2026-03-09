@@ -233,9 +233,19 @@ declare global {
 		}
 
 		if (request.action === "getPageContent") {
+			// Convert <object> image elements to <img> for content extraction
+			document.querySelectorAll('object[type^="image/"]').forEach(obj => {
+				const data = obj.getAttribute('data');
+				if (!data) return;
+				const img = document.createElement('img');
+				img.src = data;
+				img.alt = obj.getAttribute('aria-label') || obj.getAttribute('name') || '';
+				obj.replaceWith(img);
+			});
+
 			let selectedHtml = '';
 			const selection = window.getSelection();
-			
+
 			if (selection && selection.rangeCount > 0) {
 				const range = selection.getRangeAt(0);
 				const clonedSelection = range.cloneContents();

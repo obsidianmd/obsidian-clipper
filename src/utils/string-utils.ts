@@ -145,6 +145,7 @@ export function processUrls(htmlContent: string, baseUrl: URL): string {
 	doc.querySelectorAll('video').forEach(video => makeUrlAbsolute(video, 'src', baseUrl));
 	doc.querySelectorAll('audio').forEach(audio => makeUrlAbsolute(audio, 'src', baseUrl));
 	doc.querySelectorAll(':is(video, audio) :is(source, track)').forEach(sourceOrTrack => makeUrlAbsolute(sourceOrTrack, 'src', baseUrl));
+	doc.querySelectorAll('object[data]').forEach(obj => makeUrlAbsolute(obj, 'data', baseUrl));
 	
 	// Serialize back to HTML
 	const serializer = new XMLSerializer();
