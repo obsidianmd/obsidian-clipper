@@ -168,74 +168,73 @@ async function initializeVersionDisplay(): Promise<void> {
 	}
 }
 
-export function initializeGeneralSettings(): void {
-	loadSettings().then(async () => {
-		await setupLanguageAndDirection();
+export async function initializeGeneralSettings(): Promise<void> {
+	await loadSettings();
+	await setupLanguageAndDirection();
 
-		// Add version check initialization
-		await initializeVersionDisplay();
+	// Add version check initialization
+	await initializeVersionDisplay();
 
-		// Get clip history and ratings
-		const history = await getClipHistory();
-		const totalClips = history.length;
-		const existingRatings = await getLocalStorage('ratings') || [];
+	// Get clip history and ratings
+	const history = await getClipHistory();
+	const totalClips = history.length;
+	const existingRatings = await getLocalStorage('ratings') || [];
 
-		// Show rating section only total clips >= 20 and no previous ratings
-		const rateExtensionSection = document.getElementById('rate-extension');
-		if (rateExtensionSection && totalClips >= 20 && existingRatings.length === 0) {
-			rateExtensionSection.classList.remove('is-hidden');
-		}
+	// Show rating section only total clips >= 20 and no previous ratings
+	const rateExtensionSection = document.getElementById('rate-extension');
+	if (rateExtensionSection && totalClips >= 20 && existingRatings.length === 0) {
+		rateExtensionSection.classList.remove('is-hidden');
+	}
 
-		if (totalClips >= 20 && existingRatings.length === 0) {
-			const starRating = document.querySelector('.star-rating');
-			if (starRating) {
-				const stars = starRating.querySelectorAll('.star');
-				stars.forEach(star => {
-					star.addEventListener('click', async () => {
-						const rating = parseInt(star.getAttribute('data-rating') || '0');
-						stars.forEach(s => {
-							if (parseInt(s.getAttribute('data-rating') || '0') <= rating) {
-								s.classList.add('is-active');
-							} else {
-								s.classList.remove('is-active');
-							}
-						});
-						await handleRating(rating);
-						
-						// Hide the rating section after rating
-						if (rateExtensionSection) {
-							rateExtensionSection.style.display = 'none';
+	if (totalClips >= 20 && existingRatings.length === 0) {
+		const starRating = document.querySelector('.star-rating');
+		if (starRating) {
+			const stars = starRating.querySelectorAll('.star');
+			stars.forEach(star => {
+				star.addEventListener('click', async () => {
+					const rating = parseInt(star.getAttribute('data-rating') || '0');
+					stars.forEach(s => {
+						if (parseInt(s.getAttribute('data-rating') || '0') <= rating) {
+							s.classList.add('is-active');
+						} else {
+							s.classList.remove('is-active');
 						}
 					});
+					await handleRating(rating);
+
+					// Hide the rating section after rating
+					if (rateExtensionSection) {
+						rateExtensionSection.style.display = 'none';
+					}
 				});
-			}
+			});
 		}
+	}
 
-		updateVaultList();
-		initializeShowMoreActionsToggle();
-		initializeBetaFeaturesToggle();
-		initializeLegacyModeToggle();
-		initializeSilentOpenToggle();
-		initializeVaultInput();
-		initializeOpenBehaviorDropdown();
-		initializeKeyboardShortcuts();
-		initializeToggles();
-		setShortcutInstructions();
-		initializeAutoSave();
-		initializeResetDefaultTemplateButton();
-		initializeExportImportAllSettingsButtons();
-		initializeHighlighterSettings();
-		initializeExportHighlightsButton();
-		initializeSaveBehaviorDropdown();
-		await initializeUsageChart();
+	updateVaultList();
+	initializeShowMoreActionsToggle();
+	initializeBetaFeaturesToggle();
+	initializeLegacyModeToggle();
+	initializeSilentOpenToggle();
+	initializeVaultInput();
+	initializeOpenBehaviorDropdown();
+	initializeKeyboardShortcuts();
+	initializeToggles();
+	setShortcutInstructions();
+	initializeAutoSave();
+	initializeResetDefaultTemplateButton();
+	initializeExportImportAllSettingsButtons();
+	initializeHighlighterSettings();
+	initializeExportHighlightsButton();
+	initializeSaveBehaviorDropdown();
+	await initializeUsageChart();
 
-		// Initialize feedback modal close button
-		const feedbackModal = document.getElementById('feedback-modal');
-		const feedbackCloseBtn = feedbackModal?.querySelector('.feedback-close-btn');
-		if (feedbackCloseBtn) {
-			feedbackCloseBtn.addEventListener('click', () => hideModal(feedbackModal));
-		}
-	});
+	// Initialize feedback modal close button
+	const feedbackModal = document.getElementById('feedback-modal');
+	const feedbackCloseBtn = feedbackModal?.querySelector('.feedback-close-btn');
+	if (feedbackCloseBtn) {
+		feedbackCloseBtn.addEventListener('click', () => hideModal(feedbackModal));
+	}
 }
 
 function initializeAutoSave(): void {
