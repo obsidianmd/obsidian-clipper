@@ -1,4 +1,5 @@
 import { saveSettings, generalSettings } from '../utils/storage-utils';
+import { updateToggleState } from '../utils/ui-utils';
 import { debounce } from '../utils/debounce';
 
 function updateModeVisibility(pdfMode: string) {
@@ -23,6 +24,10 @@ export function initializeOcrSettings() {
 
 	if (ocrToggle) {
 		ocrToggle.checked = generalSettings.ocrSettings.enabled;
+		const ocrContainer = ocrToggle.closest('.checkbox-container') as HTMLElement;
+		if (ocrContainer) {
+			updateToggleState(ocrContainer, ocrToggle);
+		}
 		ocrToggle.addEventListener('change', () => {
 			generalSettings.ocrSettings.enabled = ocrToggle.checked;
 			saveSettings();
@@ -50,6 +55,10 @@ export function initializeOcrSettings() {
 
 	if (includeImagesToggle) {
 		includeImagesToggle.checked = generalSettings.ocrSettings.includeImages;
+		const imagesContainer = includeImagesToggle.closest('.checkbox-container') as HTMLElement;
+		if (imagesContainer) {
+			updateToggleState(imagesContainer, includeImagesToggle);
+		}
 		includeImagesToggle.addEventListener('change', () => {
 			generalSettings.ocrSettings.includeImages = includeImagesToggle.checked;
 			saveSettings();
