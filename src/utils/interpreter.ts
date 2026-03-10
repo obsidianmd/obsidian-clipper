@@ -479,31 +479,29 @@ export async function initializeInterpreter(template: Template, variables: { [ke
 			storeListener(modelSelect, 'change', changeListener);
 
 			modelSelect.style.display = 'inline-block';
-			
-			// Filter enabled models
-			const enabledModels = generalSettings.models.filter(model => model.enabled);
-			
-			// Clear existing options
-			modelSelect.textContent = '';
-			
-			// Add model options
-			enabledModels.forEach(model => {
-				const option = document.createElement('option');
-				option.value = model.id;
-				option.textContent = model.name;
-				modelSelect.appendChild(option);
-			});
 
-			// Check if last selected model exists and is enabled
-			const lastSelectedModel = enabledModels.find(model => model.id === generalSettings.interpreterModel);
-			
-			if (!lastSelectedModel && enabledModels.length > 0) {
-				// If last selected model is not available/enabled, use first enabled model
-				generalSettings.interpreterModel = enabledModels[0].id;
-				await saveSettings();
+			// Only repopulate if the skeleton hasn't already done it
+			if (modelSelect.options.length === 0) {
+				const enabledModels = generalSettings.models.filter(model => model.enabled);
+				modelSelect.textContent = '';
+				enabledModels.forEach(model => {
+					const option = document.createElement('option');
+					option.value = model.id;
+					option.textContent = model.name;
+					modelSelect.appendChild(option);
+				});
+				modelSelect.value = generalSettings.interpreterModel || (enabledModels[0]?.id ?? '');
 			}
 
-			modelSelect.value = generalSettings.interpreterModel || (enabledModels[0]?.id ?? '');
+			// Validate that the selected model is still enabled
+			const enabledModels = generalSettings.models.filter(model => model.enabled);
+			const lastSelectedModel = enabledModels.find(model => model.id === generalSettings.interpreterModel);
+
+			if (!lastSelectedModel && enabledModels.length > 0) {
+				generalSettings.interpreterModel = enabledModels[0].id;
+				await saveSettings();
+				modelSelect.value = generalSettings.interpreterModel;
+			}
 		}
 	}
 }
