@@ -241,7 +241,6 @@ export class Reader {
 		controlsContainer.appendChild(lineHeightGroup);
 		controlsContainer.appendChild(themeSelect);
 		controlsContainer.appendChild(themeModeSelect);
-		controlsContainer.appendChild(highlighterGroup);
 
 		settingsBar.appendChild(controlsContainer);
 
