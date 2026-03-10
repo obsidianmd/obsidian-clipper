@@ -555,11 +555,47 @@ export class Reader {
 		popover.className = 'footnote-popover';
 		doc.body.appendChild(popover);
 
+		// Ensure each footnote item has a backref link
+		const footnoteItems = doc.querySelectorAll('#footnotes ol > li[id^="fn:"]');
+		footnoteItems.forEach((li) => {
+			const existingBackref = li.querySelector('a.footnote-backref');
+			if (existingBackref) return;
+
+			const fnNumber = li.id.replace('fn:', '');
+			const refTarget = doc.getElementById(`fnref:${fnNumber}`);
+			if (!refTarget) return;
+
+			const lastParagraph = li.querySelector('p:last-of-type') || li;
+			const backlink = doc.createElement('a');
+			backlink.href = `#fnref:${fnNumber}`;
+			backlink.title = 'return to article';
+			backlink.className = 'footnote-backref';
+			backlink.textContent = '\u21A9';
+			lastParagraph.appendChild(backlink);
+		});
+
 		// Handle footnote clicks
 		doc.addEventListener('click', (e) => {
 			const target = e.target as HTMLElement;
-			const footnoteLink = target.closest('a[href^="#fn:"]') as HTMLAnchorElement;
-			
+
+			// Handle backref clicks — scroll to the inline reference
+			const backrefLink = target.closest('a.footnote-backref') as HTMLAnchorElement;
+			if (backrefLink) {
+				e.preventDefault();
+				const href = backrefLink.getAttribute('href');
+				if (!href) return;
+				const hashIndex = href.indexOf('#');
+				if (hashIndex === -1) return;
+				const refId = href.substring(hashIndex + 1);
+				const refElement = doc.getElementById(refId);
+				if (refElement) {
+					refElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+				}
+				return;
+			}
+
+			const footnoteLink = target.closest('a[href*="#fn:"]') as HTMLAnchorElement;
+
 			// Close active popover if clicking outside
 			if (!footnoteLink && !target.closest('.footnote-popover')) {
 				this.hideFootnotePopover();
@@ -568,7 +604,7 @@ export class Reader {
 
 			if (footnoteLink) {
 				e.preventDefault();
-				
+
 				// Toggle if clicking the same footnote
 				if (this.activeFootnoteLink === footnoteLink) {
 					this.hideFootnotePopover();
@@ -577,10 +613,12 @@ export class Reader {
 
 				const href = footnoteLink.getAttribute('href');
 				if (!href) return;
-				
-				const footnoteId = href.substring(1);
+
+				const hashIndex = href.indexOf('#');
+				if (hashIndex === -1) return;
+				const footnoteId = href.substring(hashIndex + 1);
 				const footnote = doc.getElementById(footnoteId);
-				
+
 				if (footnote) {
 					// Remove the return link from the content
 					const content = footnote.cloneNode(true) as HTMLElement;

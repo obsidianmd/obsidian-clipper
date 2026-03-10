@@ -491,7 +491,7 @@
 			a {
 				color: var(--obsidian-reader-text-muted);
 			}
-			a[href^="#fnref"] {
+			a.footnote-backref {
 				text-decoration: none;
 				color: var(--obsidian-reader-text-faint);
 				&:hover {
@@ -575,6 +575,10 @@
 		// Arrow background
 		&::after {
 			border: 7px solid transparent;
+		}
+
+		li {
+			list-style: none;
 		}
 
 		// Top arrow (when popover is below)
