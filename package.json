@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-clipper",
-	"version": "1.0.3",
+	"version": "1.1.0",
 	"description": "Official web clipper for Obsidian.",
 	"scripts": {
 		"defuddle-dev": "node scripts/set-defuddle-dev.js",
@@ -22,7 +22,7 @@
 	"devDependencies": {
 		"@types/chrome": "^0.0.270",
 		"@types/dompurify": "^3.0.5",
-		"@types/node": "^22.5.4",
+		"@types/node": "^25.4.0",
 		"@types/webextension-polyfill": "^0.12.1",
 		"@types/webpack-env": "^1.18.5",
 		"copy-webpack-plugin": "^14.0.0",
