@@ -637,6 +637,23 @@
 	
 }
 
+.obsidian-reader-loading {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	width: 20px;
+	height: 20px;
+	margin: -20px 0 0 -10px;
+	border: 2px solid var(--obsidian-reader-border);
+	border-top-color: var(--obsidian-reader-text-muted);
+	border-radius: 50%;
+	animation: obsidian-reader-spin 0.6s linear infinite;
+}
+
+@keyframes obsidian-reader-spin {
+	to { transform: rotate(360deg); }
+}
+
 .obsidian-reader-footer {
 	color: var(--obsidian-reader-text-faint);
 	font-size: 0.7em;

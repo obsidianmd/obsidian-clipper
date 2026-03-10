@@ -1128,40 +1128,15 @@ export class Reader {
 			if (lang) htmlElement.setAttribute('lang', lang);
 			if (dir) htmlElement.setAttribute('dir', dir);
 			
-			// Extract content using extractors or Defuddle
-			const { content, title, author, published, domain, extractorType, wordCount, parseTime } = await this.extractContent(doc);
-			if (!content) {
-				console.log('Reader', 'Failed to extract content');
-				return;
-			}
-
-			// Format the published date if it exists
-			let formattedDate = '';
-			if (published) {
-				try {
-					const date = new Date(published);
-					if (!isNaN(date.getTime())) {
-						formattedDate = new Intl.DateTimeFormat(undefined, {
-							year: 'numeric',
-							month: 'long',
-							day: 'numeric',
-							timeZone: 'UTC'
-						}).format(date);
-					} else {
-						formattedDate = published;
-					}
-				} catch (e) {
-					formattedDate = published;
-					console.log('Reader', 'Error formatting date:', e);
-				}
-			}
+			// Clone document for Defuddle before we clear the body
+			const docClone = doc.cloneNode(true) as Document;
+			// Preserve the URL for Defuddle's extractors
+			Object.defineProperty(docClone, 'URL', { value: doc.URL });
+			// Start content extraction on the clone (don't await yet)
+			const contentPromise = this.extractContent(docClone);
 
 			// Clean up head - remove unwanted elements but keep meta tags and non-stylesheet links
 			const head = doc.head;
-
-			// Remove scripts except JSON-LD schema
-			const scripts = head.querySelectorAll('script:not([type="application/ld+json"])');
-			scripts.forEach(el => el.remove());
 
 			// Remove base tags
 			const baseTags = head.querySelectorAll('base');
@@ -1196,109 +1171,45 @@ export class Reader {
 			}
 
 			doc.body.textContent = '';
-			
+
 			// Create main container
 			const readerContainer = doc.createElement('div');
 			readerContainer.className = 'obsidian-reader-container';
-			
+
 			// Create left sidebar
 			const leftSidebar = doc.createElement('div');
 			leftSidebar.className = 'obsidian-left-sidebar';
 			const outline = doc.createElement('div');
 			outline.className = 'obsidian-reader-outline';
 			leftSidebar.appendChild(outline);
-			
+
 			// Create content area
 			const readerContent = doc.createElement('div');
 			readerContent.className = 'obsidian-reader-content';
-			
+
 			// Create main element
 			const main = doc.createElement('main');
-			
-			// Add title if present
-			if (title) {
-				const h1 = doc.createElement('h1');
-				h1.textContent = title;
-				main.appendChild(h1);
-			}
-			
-			// Create metadata section
-			const metadata = doc.createElement('div');
-			metadata.className = 'metadata';
-			const metadataDetails = doc.createElement('div');
-			metadataDetails.className = 'metadata-details';
-			
-			// Build metadata items
-			const metadataItems = [
-				author ? author : '',
-				formattedDate || '',
-				domain ? domain : ''
-			].filter(Boolean);
-			
-			metadataItems.forEach((item, index) => {
-				if (index > 0) {
-					// Add separator
-					const separator = doc.createElement('span');
-					separator.textContent = ' · ';
-					metadataDetails.appendChild(separator);
-				}
-				
-				const span = doc.createElement('span');
-				if (item === domain && domain) {
-					// Create link for domain
-					const link = doc.createElement('a');
-					link.href = doc.URL;
-					link.textContent = domain;
-					span.appendChild(link);
-				} else {
-					span.textContent = item;
-				}
-				metadataDetails.appendChild(span);
-			});
-			
-			metadata.appendChild(metadataDetails);
-			main.appendChild(metadata);
-			
-			// Create article with content (content is already processed HTML from Defuddle)
-			const article = doc.createElement('article');
-			// Use DOMParser for extra safety even though content comes from Defuddle parser
-			const parser = new DOMParser();
-			const contentDoc = parser.parseFromString(content, 'text/html');
-			const contentBody = contentDoc.body;
-			
-			// On YouTube, rewrite the embed referer via background script
-			// so YouTube doesn't block same-site embeds (error 152)
-			const pageHost = doc.URL ? new URL(doc.URL).hostname : '';
-			if (pageHost.includes('youtube.com') || pageHost.includes('youtu.be')) {
-				await browser.runtime.sendMessage({
-					action: 'enableYouTubeEmbedRule'
-				}).catch(() => {});
-			}
 
-			// Move all child nodes from parsed content to article
-			while (contentBody.firstChild) {
-				article.appendChild(contentBody.firstChild);
-			}
+			// Create article placeholder with loading spinner
+			const article = doc.createElement('article');
+			const spinner = doc.createElement('div');
+			spinner.className = 'obsidian-reader-loading';
+			article.appendChild(spinner);
 			main.appendChild(article);
-			
+
 			readerContent.appendChild(main);
-			
-			// Create footer
+
+			// Create footer (hidden until content loads)
 			const footer = doc.createElement('div');
 			footer.className = 'obsidian-reader-footer';
-			const footerItems = [
-				'Obsidian Reader',
-				wordCount ? new Intl.NumberFormat().format(wordCount) + ' words' : '',
-				(parseTime ? 'parsed in ' + new Intl.NumberFormat().format(parseTime) + ' ms' : '')
-			].filter(Boolean);
-			footer.textContent = footerItems.join(' · ');
+			footer.style.display = 'none';
 			readerContent.appendChild(footer);
-			
+
 			// Create right sidebar
 			const rightSidebar = doc.createElement('div');
 			rightSidebar.className = 'obsidian-reader-right-sidebar';
-			
-			// Assemble everything
+
+			// Assemble and display the shell immediately
 			readerContainer.appendChild(leftSidebar);
 			readerContainer.appendChild(readerContent);
 			readerContainer.appendChild(rightSidebar);
@@ -1306,11 +1217,8 @@ export class Reader {
 
 			// Add reader classes and attributes
 			doc.documentElement.classList.add('obsidian-reader-active');
-			if (extractorType) {
-				doc.documentElement.setAttribute('data-reader-extractor', extractorType);
-			}
 			doc.documentElement.setAttribute('data-reader-theme', this.settings.theme);
-			
+
 			// Apply theme mode
 			this.updateThemeMode(doc, this.settings.themeMode);
 
@@ -1319,14 +1227,8 @@ export class Reader {
 			doc.documentElement.style.setProperty('--obsidian-reader-line-height', this.settings.lineHeight.toString());
 			doc.documentElement.style.setProperty('--obsidian-reader-line-width', `${this.settings.maxWidth}em`);
 
-			// Add settings bar and outline
+			// Add settings bar
 			this.injectSettingsBar(doc);
-			this.observer = this.generateOutline(doc);
-			
-			this.initializeFootnotes(doc);
-			this.initializeCodeHighlighting(doc);
-			this.initializeCopyButtons(doc);
-			this.initializeLightbox(doc);
 
 			// Re-attach the clipper iframe container if it exists
 			if (clipperIframeContainer) {
@@ -1336,10 +1238,127 @@ export class Reader {
 			// Set up color scheme media query listener
 			this.colorSchemeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 			this.colorSchemeMediaQuery.addEventListener('change', (e) => this.handleColorSchemeChange(e, doc));
-			
-			applyHighlights();
 
 			this.isActive = true;
+
+			// Now await content extraction and populate the page
+			const { content, title, author, published, domain, extractorType, wordCount, parseTime } = await contentPromise;
+
+			// If reader was toggled off while waiting, abort
+			if (!this.isActive) return;
+
+			// Remove loading spinner
+			spinner.remove();
+
+			if (!content) {
+				console.log('Reader', 'Failed to extract content');
+				article.textContent = 'Failed to extract content.';
+				return;
+			}
+
+			// Add title
+			if (title) {
+				const h1 = doc.createElement('h1');
+				h1.textContent = title;
+				main.insertBefore(h1, article);
+			}
+
+			// Format and add metadata
+			let formattedDate = '';
+			if (published) {
+				try {
+					const date = new Date(published);
+					if (!isNaN(date.getTime())) {
+						formattedDate = new Intl.DateTimeFormat(undefined, {
+							year: 'numeric',
+							month: 'long',
+							day: 'numeric',
+							timeZone: 'UTC'
+						}).format(date);
+					} else {
+						formattedDate = published;
+					}
+				} catch (e) {
+					formattedDate = published;
+					console.log('Reader', 'Error formatting date:', e);
+				}
+			}
+
+			const metadataItems = [
+				author ? author : '',
+				formattedDate || '',
+				domain ? domain : ''
+			].filter(Boolean);
+
+			if (metadataItems.length > 0) {
+				const metadata = doc.createElement('div');
+				metadata.className = 'metadata';
+				const metadataDetails = doc.createElement('div');
+				metadataDetails.className = 'metadata-details';
+
+				metadataItems.forEach((item, index) => {
+					if (index > 0) {
+						const separator = doc.createElement('span');
+						separator.textContent = ' · ';
+						metadataDetails.appendChild(separator);
+					}
+
+					const span = doc.createElement('span');
+					if (item === domain && domain) {
+						const link = doc.createElement('a');
+						link.href = doc.URL;
+						link.textContent = domain;
+						span.appendChild(link);
+					} else {
+						span.textContent = item;
+					}
+					metadataDetails.appendChild(span);
+				});
+
+				metadata.appendChild(metadataDetails);
+				main.insertBefore(metadata, article);
+			}
+
+			// Insert article content
+			const parser = new DOMParser();
+			const contentDoc = parser.parseFromString(content, 'text/html');
+			const contentBody = contentDoc.body;
+
+			// On YouTube, rewrite the embed referer via background script
+			// so YouTube doesn't block same-site embeds (error 152)
+			const pageHost = doc.URL ? new URL(doc.URL).hostname : '';
+			if (pageHost.includes('youtube.com') || pageHost.includes('youtu.be')) {
+				await browser.runtime.sendMessage({
+					action: 'enableYouTubeEmbedRule'
+				}).catch(() => {});
+			}
+
+			while (contentBody.firstChild) {
+				article.appendChild(contentBody.firstChild);
+			}
+
+			// Set extractor type
+			if (extractorType) {
+				doc.documentElement.setAttribute('data-reader-extractor', extractorType);
+			}
+
+			// Show footer with stats
+			const footerItems = [
+				'Obsidian Reader',
+				wordCount ? new Intl.NumberFormat().format(wordCount) + ' words' : '',
+				(parseTime ? 'parsed in ' + new Intl.NumberFormat().format(parseTime) + ' ms' : '')
+			].filter(Boolean);
+			footer.textContent = footerItems.join(' · ');
+			footer.style.display = '';
+
+			// Initialize content-dependent features
+			this.observer = this.generateOutline(doc);
+			this.initializeFootnotes(doc);
+			this.initializeCodeHighlighting(doc);
+			this.initializeCopyButtons(doc);
+			this.initializeLightbox(doc);
+
+			applyHighlights();
 
 		} catch (e) {
 			console.error('Reader', 'Error during apply:', e);
