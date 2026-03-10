@@ -1207,6 +1207,10 @@ export class Reader {
 			const article = doc.createElement('article');
 			const spinner = doc.createElement('div');
 			spinner.className = 'obsidian-reader-loading';
+			const spinnerText = doc.createElement('div');
+			spinnerText.className = 'obsidian-reader-loading-text';
+			spinnerText.textContent = 'Defuddling\u2026';
+			spinner.appendChild(spinnerText);
 			article.appendChild(spinner);
 			main.appendChild(article);
 
