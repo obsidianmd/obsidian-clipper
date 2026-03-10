@@ -4,37 +4,7 @@ import { loadSettings, generalSettings } from './utils/storage-utils';
 import Defuddle from 'defuddle';
 import { getDomain } from './utils/string-utils';
 import { createMarkdownContent } from 'defuddle/full';
-
-function flattenShadowDom(): Promise<void> {
-	// Check if any shadow roots exist on the page
-	const hasShadowRoots = document.querySelector('*');
-	let found = false;
-	if (hasShadowRoots) {
-		const all = document.querySelectorAll('*');
-		for (let i = 0; i < all.length; i++) {
-			if (all[i].shadowRoot) {
-				found = true;
-				break;
-			}
-		}
-	}
-	if (!found) return Promise.resolve();
-
-	return new Promise((resolve) => {
-		// Inject main-world script via web-accessible resource
-		const script = document.createElement('script');
-		script.src = browser.runtime.getURL('flatten-shadow-dom.js');
-		script.onload = () => {
-			script.remove();
-			resolve();
-		};
-		script.onerror = () => {
-			script.remove();
-			resolve(); // Continue even if injection fails
-		};
-		(document.head || document.documentElement).appendChild(script);
-	});
-}
+import { flattenShadowDom } from './utils/flatten-shadow-dom';
 
 declare global {
 	interface Window {
@@ -240,7 +210,7 @@ declare global {
 		}
 
 		if (request.action === "copyMarkdownToClipboard") {
-			flattenShadowDom().then(() => {
+			flattenShadowDom(document).then(() => {
 				try {
 					// Extract page content using Defuddle
 					const defuddled = new Defuddle(document, { url: document.URL }).parse();
@@ -267,88 +237,88 @@ declare global {
 
 		if (request.action === "getPageContent") {
 			// Flatten shadow DOM before extraction (async, needs main world)
-			flattenShadowDom().then(async () => {
-			let selectedHtml = '';
-			const selection = window.getSelection();
+			flattenShadowDom(document).then(async () => {
+				let selectedHtml = '';
+				const selection = window.getSelection();
 
-			if (selection && selection.rangeCount > 0) {
-				const range = selection.getRangeAt(0);
-				const clonedSelection = range.cloneContents();
-				const div = document.createElement('div');
-				div.appendChild(clonedSelection);
-				selectedHtml = div.innerHTML;
-			}
+				if (selection && selection.rangeCount > 0) {
+					const range = selection.getRangeAt(0);
+					const clonedSelection = range.cloneContents();
+					const div = document.createElement('div');
+					div.appendChild(clonedSelection);
+					selectedHtml = div.innerHTML;
+				}
 
-			// Use parseAsync to ensure async variables like {{transcript}} are available
-			const defuddle = new Defuddle(document, { url: document.URL });
-			const defuddled = await defuddle.parseAsync();
-			const extractedContent: { [key: string]: string } = {
-				...defuddled.variables,
-			};
+				// Use parseAsync to ensure async variables like {{transcript}} are available
+				const defuddle = new Defuddle(document, { url: document.URL });
+				const defuddled = await defuddle.parseAsync();
+				const extractedContent: { [key: string]: string } = {
+					...defuddled.variables,
+				};
 
-			// Create a new DOMParser
-			const parser = new DOMParser();
-			// Parse the document's HTML
-			const doc = parser.parseFromString(document.documentElement.outerHTML, 'text/html');
+				// Create a new DOMParser
+				const parser = new DOMParser();
+				// Parse the document's HTML
+				const doc = parser.parseFromString(document.documentElement.outerHTML, 'text/html');
 
-			// Remove all script and style elements
-			doc.querySelectorAll('script, style').forEach(el => el.remove());
+				// Remove all script and style elements
+				doc.querySelectorAll('script, style').forEach(el => el.remove());
 
-			// Remove style attributes from all elements
-			doc.querySelectorAll('*').forEach(el => el.removeAttribute('style'));
+				// Remove style attributes from all elements
+				doc.querySelectorAll('*').forEach(el => el.removeAttribute('style'));
 
-			// Convert all relative URLs to absolute
-			doc.querySelectorAll('[src], [href]').forEach(element => {
-				['src', 'href', 'srcset'].forEach(attr => {
-					const value = element.getAttribute(attr);
-					if (!value) return;
-					
-					if (attr === 'srcset') {
-						const newSrcset = value.split(',').map(src => {
-							const [url, size] = src.trim().split(' ');
+				// Convert all relative URLs to absolute
+				doc.querySelectorAll('[src], [href]').forEach(element => {
+					['src', 'href', 'srcset'].forEach(attr => {
+						const value = element.getAttribute(attr);
+						if (!value) return;
+
+						if (attr === 'srcset') {
+							const newSrcset = value.split(',').map(src => {
+								const [url, size] = src.trim().split(' ');
+								try {
+									const absoluteUrl = new URL(url, document.baseURI).href;
+									return `${absoluteUrl}${size ? ' ' + size : ''}`;
+								} catch (e) {
+									return src;
+								}
+							}).join(', ');
+							element.setAttribute(attr, newSrcset);
+						} else if (!value.startsWith('http') && !value.startsWith('data:') && !value.startsWith('#') && !value.startsWith('//')) {
 							try {
-								const absoluteUrl = new URL(url, document.baseURI).href;
-								return `${absoluteUrl}${size ? ' ' + size : ''}`;
+								const absoluteUrl = new URL(value, document.baseURI).href;
+								element.setAttribute(attr, absoluteUrl);
 							} catch (e) {
-								return src;
+								console.warn(`Failed to process ${attr} URL:`, value);
 							}
-						}).join(', ');
-						element.setAttribute(attr, newSrcset);
-					} else if (!value.startsWith('http') && !value.startsWith('data:') && !value.startsWith('#') && !value.startsWith('//')) {
-						try {
-							const absoluteUrl = new URL(value, document.baseURI).href;
-							element.setAttribute(attr, absoluteUrl);
-						} catch (e) {
-							console.warn(`Failed to process ${attr} URL:`, value);
 						}
-					}
+					});
 				});
+
+				// Get the modified HTML without scripts, styles, and style attributes
+				const cleanedHtml = doc.documentElement.outerHTML;
+
+				const response: ContentResponse = {
+					author: defuddled.author,
+					content: defuddled.content,
+					description: defuddled.description,
+					domain: getDomain(document.URL),
+					extractedContent: extractedContent,
+					favicon: defuddled.favicon,
+					fullHtml: cleanedHtml,
+					highlights: highlighter.getHighlights(),
+					image: defuddled.image,
+					parseTime: defuddled.parseTime,
+					published: defuddled.published,
+					schemaOrgData: defuddled.schemaOrgData,
+					selectedHtml: selectedHtml,
+					site: defuddled.site,
+					title: defuddled.title,
+					wordCount: defuddled.wordCount,
+					metaTags: defuddled.metaTags || []
+				};
+				sendResponse(response);
 			});
-
-			// Get the modified HTML without scripts, styles, and style attributes
-			const cleanedHtml = doc.documentElement.outerHTML;
-
-			const response: ContentResponse = {
-				author: defuddled.author,
-				content: defuddled.content,
-				description: defuddled.description,
-				domain: getDomain(document.URL),
-				extractedContent: extractedContent,
-				favicon: defuddled.favicon,
-				fullHtml: cleanedHtml,
-				highlights: highlighter.getHighlights(),
-				image: defuddled.image,
-				parseTime: defuddled.parseTime,
-				published: defuddled.published,
-				schemaOrgData: defuddled.schemaOrgData,
-				selectedHtml: selectedHtml,
-				site: defuddled.site,
-				title: defuddled.title,
-				wordCount: defuddled.wordCount,
-				metaTags: defuddled.metaTags || []
-			};
-			sendResponse(response);
-			}); // end flattenShadowDom().then()
 			return true;
 		} else if (request.action === "extractContent") {
 			const content = extractContentBySelector(request.selector, request.attribute, request.extractHtml);

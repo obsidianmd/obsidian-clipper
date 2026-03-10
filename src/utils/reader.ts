@@ -1,5 +1,6 @@
 import Defuddle from 'defuddle/full';
 import browser from './browser-polyfill';
+import { flattenShadowDom as flattenShadowDomUtil } from './flatten-shadow-dom';
 import { getLocalStorage, setLocalStorage } from './storage-utils';
 import hljs from 'highlight.js';
 import { getDomain } from './string-utils';
@@ -349,29 +350,7 @@ export class Reader {
 	}
 
 	private static flattenShadowDom(doc: Document): Promise<void> {
-		let found = false;
-		const all = doc.querySelectorAll('*');
-		for (let i = 0; i < all.length; i++) {
-			if (all[i].shadowRoot) {
-				found = true;
-				break;
-			}
-		}
-		if (!found) return Promise.resolve();
-
-		return new Promise((resolve) => {
-			const script = doc.createElement('script');
-			script.src = browser.runtime.getURL('flatten-shadow-dom.js');
-			script.onload = () => {
-				script.remove();
-				resolve();
-			};
-			script.onerror = () => {
-				script.remove();
-				resolve();
-			};
-			(doc.head || doc.documentElement).appendChild(script);
-		});
+		return flattenShadowDomUtil(doc);
 	}
 
 	private static async extractContent(doc: Document): Promise<{
@@ -1144,7 +1123,7 @@ export class Reader {
 			// Clone document for Defuddle before we clear the body
 			const docClone = doc.cloneNode(true) as Document;
 			// Preserve the URL for Defuddle's extractors
-			Object.defineProperty(docClone, 'URL', { value: doc.URL });
+			Object.defineProperty(docClone, 'URL', { value: doc.URL, configurable: true });
 			// Start content extraction on the clone (don't await yet)
 			const contentPromise = this.extractContent(docClone);
 
@@ -1341,23 +1320,47 @@ export class Reader {
 			const contentDoc = parser.parseFromString(content, 'text/html');
 			const contentBody = contentDoc.body;
 
-			// On YouTube, rewrite the embed referer and resume playback state
+			// On YouTube, fix embed self-referrer blocking and resume playback state
 			if (isYouTube) {
-				await browser.runtime.sendMessage({
-					action: 'enableYouTubeEmbedRule'
-				}).catch(() => {});
-
-				// Apply timestamp/autoplay before appending to DOM to avoid double-load
 				const iframe = contentBody.querySelector('iframe[src*="youtube.com/embed/"]') as HTMLIFrameElement;
-				if (iframe && (videoTimestamp > 0 || videoWasPlaying)) {
-					const src = new URL(iframe.src);
-					if (videoTimestamp > 0) {
-						src.searchParams.set('start', String(videoTimestamp));
+				if (iframe) {
+					const embedUrl = new URL(iframe.src);
+					const videoId = embedUrl.pathname.split('/').pop();
+					const isSafari = browser.runtime.getURL('').startsWith('safari-web-extension://');
+
+					if (isSafari && videoId) {
+						// Safari can't modify request headers, so YouTube blocks
+						// self-referrer embeds. Show a clickable thumbnail instead.
+						const watchUrl = 'https://www.youtube.com/watch?v=' + videoId
+							+ (videoTimestamp > 0 ? '&t=' + videoTimestamp : '');
+						const thumbnail = doc.createElement('a');
+						thumbnail.href = watchUrl;
+						thumbnail.target = '_blank';
+						thumbnail.rel = 'noopener';
+						thumbnail.style.cssText = 'display:block;position:relative;aspect-ratio:16/9;max-width:100%;background:#000;border-radius:8px;overflow:hidden;';
+						thumbnail.innerHTML =
+							'<img src="https://img.youtube.com/vi/' + videoId + '/hqdefault.jpg" style="width:100%;height:100%;object-fit:cover;mix-blend-mode:normal!important;">'
+							+ '<svg style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:68px;height:48px;mix-blend-mode:normal!important;" viewBox="0 0 68 48">'
+							+ '<path d="M66.52 7.74c-.78-2.93-2.49-5.41-5.42-6.19C55.79.13 34 0 34 0S12.21.13 6.9 1.55c-2.93.78-4.63 3.26-5.42 6.19C.06 13.05 0 24 0 24s.06 10.95 1.48 16.26c.78 2.93 2.49 5.41 5.42 6.19C12.21 47.87 34 48 34 48s21.79-.13 27.1-1.55c2.93-.78 4.64-3.26 5.42-6.19C67.94 34.95 68 24 68 24s-.06-10.95-1.48-16.26z" fill="red"/>'
+							+ '<path d="M45 24L27 14v20" fill="white"/></svg>';
+						iframe.replaceWith(thumbnail);
+					} else {
+						// Chrome/Firefox: use direct embed with header modification
+						await browser.runtime.sendMessage({
+							action: 'enableYouTubeEmbedRule'
+						}).catch(() => {});
+
+						if (videoTimestamp > 0 || videoWasPlaying) {
+							const src = new URL(iframe.src);
+							if (videoTimestamp > 0) {
+								src.searchParams.set('start', String(videoTimestamp));
+							}
+							if (videoWasPlaying) {
+								src.searchParams.set('autoplay', '1');
+							}
+							iframe.src = src.toString();
+						}
 					}
-					if (videoWasPlaying) {
-						src.searchParams.set('autoplay', '1');
-					}
-					iframe.src = src.toString();
 				}
 			}
 

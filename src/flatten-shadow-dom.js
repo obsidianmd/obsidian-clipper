@@ -7,6 +7,4 @@
 			el.setAttribute('data-defuddle-shadow', el.shadowRoot.innerHTML);
 		}
 	});
-	// Signal completion
-	document.documentElement.setAttribute('data-defuddle-shadow-done', 'true');
 })();
