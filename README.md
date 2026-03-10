@@ -97,10 +97,8 @@ npm run test:watch
 ## Third-party libraries
 
 - [webextension-polyfill](https://github.com/mozilla/webextension-polyfill) for browser compatibility
-- [defuddle](https://github.com/kepano/defuddle) for content extraction
-- [turndown](https://github.com/mixmark-io/turndown) for HTML to Markdown conversion
+- [defuddle](https://github.com/kepano/defuddle) for content extraction and Markdown conversion
 - [dayjs](https://github.com/iamkun/dayjs) for date parsing and formatting
 - [lz-string](https://github.com/pieroxy/lz-string) to compress templates to reduce storage space
 - [lucide](https://github.com/lucide-icons/lucide) for icons
-- [mathml-to-latex](https://github.com/asnunes/mathml-to-latex) for MathML to LaTeX conversion
 - [dompurify](https://github.com/cure53/DOMPurify) for sanitizing HTML
