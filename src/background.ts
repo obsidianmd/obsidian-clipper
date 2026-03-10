@@ -221,6 +221,52 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 			return true;
 		}
 
+		if (typedRequest.action === "enableYouTubeEmbedRule") {
+			const tabId = sender.tab?.id;
+			if (tabId) {
+				chrome.declarativeNetRequest.updateSessionRules({
+					removeRuleIds: [1],
+					addRules: [{
+						id: 1,
+						priority: 1,
+						action: {
+							type: chrome.declarativeNetRequest.RuleActionType.MODIFY_HEADERS as any,
+							requestHeaders: [{
+								header: 'Referer',
+								operation: chrome.declarativeNetRequest.HeaderOperation.SET as any,
+								value: 'https://obsidian.md/'
+							}]
+						},
+						condition: {
+							urlFilter: '||youtube.com/embed/',
+							resourceTypes: [chrome.declarativeNetRequest.ResourceType.SUB_FRAME as any],
+							tabIds: [tabId]
+						}
+					}]
+				}).then(() => {
+					sendResponse({ success: true });
+				}).catch((e: unknown) => {
+					console.error('Error adding YouTube embed rule:', e);
+					sendResponse({ success: true });
+				});
+			} else {
+				sendResponse({ success: true });
+			}
+			return true;
+		}
+
+		if (typedRequest.action === "disableYouTubeEmbedRule") {
+			chrome.declarativeNetRequest.updateSessionRules({
+				removeRuleIds: [1]
+			}).then(() => {
+				sendResponse({ success: true });
+			}).catch((e: unknown) => {
+				console.error('Error removing YouTube embed rule:', e);
+				sendResponse({ success: true });
+			});
+			return true;
+		}
+
 		if (typedRequest.action === "getActiveTabAndToggleIframe") {
 			browser.tabs.query({active: true, currentWindow: true}).then(async (tabs) => {
 				const currentTab = tabs[0];

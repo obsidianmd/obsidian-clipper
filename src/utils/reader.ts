@@ -764,7 +764,7 @@ export class Reader {
 			// Block common ad/tracking domains
 			const meta = doc.createElement('meta');
 			meta.httpEquiv = 'Content-Security-Policy';
-			meta.content = "script-src 'none'; frame-src 'none'; object-src 'none';";
+			meta.content = "script-src 'none'; object-src 'none';";
 			doc.head.appendChild(meta);
 		} catch (e) {
 			console.log('Reader', 'Error during script cleanup:', e);
@@ -1266,6 +1266,15 @@ export class Reader {
 			const contentDoc = parser.parseFromString(content, 'text/html');
 			const contentBody = contentDoc.body;
 			
+			// On YouTube, rewrite the embed referer via background script
+			// so YouTube doesn't block same-site embeds (error 152)
+			const pageHost = doc.URL ? new URL(doc.URL).hostname : '';
+			if (pageHost.includes('youtube.com') || pageHost.includes('youtu.be')) {
+				await browser.runtime.sendMessage({
+					action: 'enableYouTubeEmbedRule'
+				}).catch(() => {});
+			}
+
 			// Move all child nodes from parsed content to article
 			while (contentBody.firstChild) {
 				article.appendChild(contentBody.firstChild);
@@ -1353,6 +1362,9 @@ export class Reader {
 
 			// Hide any active footnote popover
 			this.hideFootnotePopover();
+
+			// Clean up YouTube embed referer rule
+			browser.runtime.sendMessage({ action: 'disableYouTubeEmbedRule' }).catch(() => {});
 
 			// Remove lightbox
 			if (this.lightbox) {

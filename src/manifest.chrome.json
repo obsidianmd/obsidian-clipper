@@ -12,7 +12,8 @@
 		"contextMenus",
 		"sidePanel",
 		"storage",
-		"scripting"
+		"scripting",
+		"declarativeNetRequest"
 	],
 	"host_permissions": [
 		"<all_urls>",
