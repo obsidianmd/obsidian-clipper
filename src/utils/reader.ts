@@ -1108,6 +1108,19 @@ export class Reader {
 			// Load saved settings
 			await this.loadSettings();
 
+			// Capture YouTube video state before cleanup destroys the player
+			let videoTimestamp = 0;
+			let videoWasPlaying = false;
+			const host = doc.URL ? new URL(doc.URL).hostname : '';
+			const isYouTube = host.includes('youtube.com') || host.includes('youtu.be');
+			if (isYouTube) {
+				const videoElement = doc.querySelector('video');
+				if (videoElement) {
+					videoTimestamp = Math.floor(videoElement.currentTime);
+					videoWasPlaying = !videoElement.paused;
+				}
+			}
+
 			// Flatten shadow DOM content before cleanup removes scripts
 			await this.flattenShadowDom(doc);
 
@@ -1324,13 +1337,24 @@ export class Reader {
 			const contentDoc = parser.parseFromString(content, 'text/html');
 			const contentBody = contentDoc.body;
 
-			// On YouTube, rewrite the embed referer via background script
-			// so YouTube doesn't block same-site embeds (error 152)
-			const pageHost = doc.URL ? new URL(doc.URL).hostname : '';
-			if (pageHost.includes('youtube.com') || pageHost.includes('youtu.be')) {
+			// On YouTube, rewrite the embed referer and resume playback state
+			if (isYouTube) {
 				await browser.runtime.sendMessage({
 					action: 'enableYouTubeEmbedRule'
 				}).catch(() => {});
+
+				// Apply timestamp/autoplay before appending to DOM to avoid double-load
+				const iframe = contentBody.querySelector('iframe[src*="youtube.com/embed/"]') as HTMLIFrameElement;
+				if (iframe && (videoTimestamp > 0 || videoWasPlaying)) {
+					const src = new URL(iframe.src);
+					if (videoTimestamp > 0) {
+						src.searchParams.set('start', String(videoTimestamp));
+					}
+					if (videoWasPlaying) {
+						src.searchParams.set('autoplay', '1');
+					}
+					iframe.src = src.toString();
+				}
 			}
 
 			while (contentBody.firstChild) {
