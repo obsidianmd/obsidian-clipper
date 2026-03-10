@@ -4,6 +4,58 @@ import { updateCurrentActiveTab, isValidUrl, isBlankPage } from './utils/active-
 import { TextHighlightData } from './utils/highlighter';
 import { debounce } from './utils/debounce';
 
+const YOUTUBE_EMBED_RULE_ID = 9001;
+
+// Firefox: always-active webRequest listener to rewrite Referer on YouTube embeds.
+// Chrome MV3 doesn't support blocking webRequest, so this is a no-op there.
+// Safari can't modify headers at all; reader.ts shows a thumbnail fallback instead.
+if (browser.webRequest?.onBeforeSendHeaders) {
+	browser.webRequest.onBeforeSendHeaders.addListener(
+		(details) => {
+			const headers = (details.requestHeaders || []).filter(
+				h => h.name.toLowerCase() !== 'referer'
+			);
+			headers.push({ name: 'Referer', value: 'https://obsidian.md/' });
+			return { requestHeaders: headers };
+		},
+		{
+			urls: ['*://*.youtube.com/embed/*'],
+			types: ['sub_frame' as browser.WebRequest.ResourceType]
+		},
+		['blocking', 'requestHeaders']
+	);
+}
+
+// Chrome: declarativeNetRequest to rewrite Referer on YouTube embeds.
+async function enableYouTubeEmbedRule(tabId: number): Promise<void> {
+	await chrome.declarativeNetRequest.updateSessionRules({
+		removeRuleIds: [YOUTUBE_EMBED_RULE_ID],
+		addRules: [{
+			id: YOUTUBE_EMBED_RULE_ID,
+			priority: 1,
+			action: {
+				type: 'modifyHeaders' as any,
+				requestHeaders: [{
+					header: 'Referer',
+					operation: 'set' as any,
+					value: 'https://obsidian.md/'
+				}]
+			},
+			condition: {
+				urlFilter: '||youtube.com/embed/',
+				resourceTypes: ['sub_frame' as any],
+				tabIds: [tabId]
+			}
+		}]
+	});
+}
+
+async function disableYouTubeEmbedRule(): Promise<void> {
+	await chrome.declarativeNetRequest.updateSessionRules({
+		removeRuleIds: [YOUTUBE_EMBED_RULE_ID]
+	});
+}
+
 let sidePanelOpenWindows: Set<number> = new Set();
 let highlighterModeState: { [tabId: number]: boolean } = {};
 let hasHighlights = false;
@@ -150,6 +202,29 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 				sendResponse({ success: false, error: 'No tab ID provided' });
 				return true;
 			}
+		}
+
+		if (typedRequest.action === "enableYouTubeEmbedRule") {
+			const tabId = sender.tab?.id;
+			if (tabId) {
+				enableYouTubeEmbedRule(tabId).then(() => {
+					sendResponse({ success: true });
+				}).catch(() => {
+					sendResponse({ success: true });
+				});
+			} else {
+				sendResponse({ success: true });
+			}
+			return true;
+		}
+
+		if (typedRequest.action === "disableYouTubeEmbedRule") {
+			disableYouTubeEmbedRule().then(() => {
+				sendResponse({ success: true });
+			}).catch(() => {
+				sendResponse({ success: true });
+			});
+			return true;
 		}
 
 		if (typedRequest.action === "sidePanelOpened") {

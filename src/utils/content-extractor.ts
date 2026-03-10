@@ -1,5 +1,5 @@
 import { ExtractedContent } from '../types/types';
-import { createMarkdownContent } from './markdown-converter';
+import { createMarkdownContent } from 'defuddle/full';
 import { sanitizeFileName, getDomain } from './string-utils';
 import browser from './browser-polyfill';
 import { debugLog } from './debug';

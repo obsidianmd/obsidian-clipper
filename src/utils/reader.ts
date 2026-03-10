@@ -1,4 +1,7 @@
 import Defuddle from 'defuddle/full';
+import browser from './browser-polyfill';
+import { detectBrowser } from './browser-detection';
+import { flattenShadowDom as flattenShadowDomUtil } from './flatten-shadow-dom';
 import { getLocalStorage, setLocalStorage } from './storage-utils';
 import hljs from 'highlight.js';
 import { getDomain } from './string-utils';
@@ -347,19 +350,20 @@ export class Reader {
 		}
 	}
 
-	private static extractContent(doc: Document): { 
-		content: string; 
-		title?: string; 
-		author?: string; 
-		published?: string; 
+
+	private static async extractContent(doc: Document): Promise<{
+		content: string;
+		title?: string;
+		author?: string;
+		published?: string;
 		domain?: string;
 		wordCount?: number;
 		parseTime?: number;
 		extractorType?: string;
-	} {
-		
-		// const defuddled = new Defuddle(doc, {debug: true}).parse();
-		const defuddled = new Defuddle(doc).parse();
+	}> {
+
+		const defuddle = new Defuddle(doc, { url: doc.URL });
+		const defuddled = await defuddle.parseAsync();
 
 		return {
 			content: defuddled.content,
@@ -528,11 +532,47 @@ export class Reader {
 		popover.className = 'footnote-popover';
 		doc.body.appendChild(popover);
 
+		// Ensure each footnote item has a backref link
+		const footnoteItems = doc.querySelectorAll('#footnotes ol > li[id^="fn:"]');
+		footnoteItems.forEach((li) => {
+			const existingBackref = li.querySelector('a.footnote-backref');
+			if (existingBackref) return;
+
+			const fnNumber = li.id.replace('fn:', '');
+			const refTarget = doc.getElementById(`fnref:${fnNumber}`);
+			if (!refTarget) return;
+
+			const lastParagraph = li.querySelector('p:last-of-type') || li;
+			const backlink = doc.createElement('a');
+			backlink.href = `#fnref:${fnNumber}`;
+			backlink.title = 'return to article';
+			backlink.className = 'footnote-backref';
+			backlink.textContent = '\u21A9';
+			lastParagraph.appendChild(backlink);
+		});
+
 		// Handle footnote clicks
 		doc.addEventListener('click', (e) => {
 			const target = e.target as HTMLElement;
-			const footnoteLink = target.closest('a[href^="#fn:"]') as HTMLAnchorElement;
-			
+
+			// Handle backref clicks — scroll to the inline reference
+			const backrefLink = target.closest('a.footnote-backref') as HTMLAnchorElement;
+			if (backrefLink) {
+				e.preventDefault();
+				const href = backrefLink.getAttribute('href');
+				if (!href) return;
+				const hashIndex = href.indexOf('#');
+				if (hashIndex === -1) return;
+				const refId = href.substring(hashIndex + 1);
+				const refElement = doc.getElementById(refId);
+				if (refElement) {
+					refElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+				}
+				return;
+			}
+
+			const footnoteLink = target.closest('a[href*="#fn:"]') as HTMLAnchorElement;
+
 			// Close active popover if clicking outside
 			if (!footnoteLink && !target.closest('.footnote-popover')) {
 				this.hideFootnotePopover();
@@ -541,7 +581,7 @@ export class Reader {
 
 			if (footnoteLink) {
 				e.preventDefault();
-				
+
 				// Toggle if clicking the same footnote
 				if (this.activeFootnoteLink === footnoteLink) {
 					this.hideFootnotePopover();
@@ -550,10 +590,12 @@ export class Reader {
 
 				const href = footnoteLink.getAttribute('href');
 				if (!href) return;
-				
-				const footnoteId = href.substring(1);
+
+				const hashIndex = href.indexOf('#');
+				if (hashIndex === -1) return;
+				const footnoteId = href.substring(hashIndex + 1);
 				const footnote = doc.getElementById(footnoteId);
-				
+
 				if (footnote) {
 					// Remove the return link from the content
 					const content = footnote.cloneNode(true) as HTMLElement;
@@ -699,7 +741,7 @@ export class Reader {
 			// Block common ad/tracking domains
 			const meta = doc.createElement('meta');
 			meta.httpEquiv = 'Content-Security-Policy';
-			meta.content = "script-src 'none'; frame-src 'none'; object-src 'none';";
+			meta.content = "script-src 'none'; object-src 'none';";
 			doc.head.appendChild(meta);
 		} catch (e) {
 			console.log('Reader', 'Error during script cleanup:', e);
@@ -1043,6 +1085,22 @@ export class Reader {
 			// Load saved settings
 			await this.loadSettings();
 
+			// Capture YouTube video state before cleanup destroys the player
+			let videoTimestamp = 0;
+			let videoWasPlaying = false;
+			const host = doc.URL ? new URL(doc.URL).hostname : '';
+			const isYouTube = host.includes('youtube.com') || host.includes('youtu.be');
+			if (isYouTube) {
+				const videoElement = doc.querySelector('video');
+				if (videoElement) {
+					videoTimestamp = Math.floor(videoElement.currentTime);
+					videoWasPlaying = !videoElement.paused;
+				}
+			}
+
+			// Flatten shadow DOM content before cleanup removes scripts
+			await flattenShadowDomUtil(doc);
+
 			// Remove page scripts and their effects
 			this.cleanupScripts(doc);
 
@@ -1060,40 +1118,15 @@ export class Reader {
 			if (lang) htmlElement.setAttribute('lang', lang);
 			if (dir) htmlElement.setAttribute('dir', dir);
 			
-			// Extract content using extractors or Defuddle
-			const { content, title, author, published, domain, extractorType, wordCount, parseTime } = this.extractContent(doc);
-			if (!content) {
-				console.log('Reader', 'Failed to extract content');
-				return;
-			}
-
-			// Format the published date if it exists
-			let formattedDate = '';
-			if (published) {
-				try {
-					const date = new Date(published);
-					if (!isNaN(date.getTime())) {
-						formattedDate = new Intl.DateTimeFormat(undefined, {
-							year: 'numeric',
-							month: 'long',
-							day: 'numeric',
-							timeZone: 'UTC'
-						}).format(date);
-					} else {
-						formattedDate = published;
-					}
-				} catch (e) {
-					formattedDate = published;
-					console.log('Reader', 'Error formatting date:', e);
-				}
-			}
+			// Clone document for Defuddle before we clear the body
+			const docClone = doc.cloneNode(true) as Document;
+			// Preserve the URL for Defuddle's extractors
+			Object.defineProperty(docClone, 'URL', { value: doc.URL, configurable: true });
+			// Start content extraction on the clone (don't await yet)
+			const contentPromise = this.extractContent(docClone);
 
 			// Clean up head - remove unwanted elements but keep meta tags and non-stylesheet links
 			const head = doc.head;
-
-			// Remove scripts except JSON-LD schema
-			const scripts = head.querySelectorAll('script:not([type="application/ld+json"])');
-			scripts.forEach(el => el.remove());
 
 			// Remove base tags
 			const baseTags = head.querySelectorAll('base');
@@ -1128,100 +1161,49 @@ export class Reader {
 			}
 
 			doc.body.textContent = '';
-			
+
 			// Create main container
 			const readerContainer = doc.createElement('div');
 			readerContainer.className = 'obsidian-reader-container';
-			
+
 			// Create left sidebar
 			const leftSidebar = doc.createElement('div');
 			leftSidebar.className = 'obsidian-left-sidebar';
 			const outline = doc.createElement('div');
 			outline.className = 'obsidian-reader-outline';
 			leftSidebar.appendChild(outline);
-			
+
 			// Create content area
 			const readerContent = doc.createElement('div');
 			readerContent.className = 'obsidian-reader-content';
-			
+
 			// Create main element
 			const main = doc.createElement('main');
-			
-			// Add title if present
-			if (title) {
-				const h1 = doc.createElement('h1');
-				h1.textContent = title;
-				main.appendChild(h1);
-			}
-			
-			// Create metadata section
-			const metadata = doc.createElement('div');
-			metadata.className = 'metadata';
-			const metadataDetails = doc.createElement('div');
-			metadataDetails.className = 'metadata-details';
-			
-			// Build metadata items
-			const metadataItems = [
-				author ? author : '',
-				formattedDate || '',
-				domain ? domain : ''
-			].filter(Boolean);
-			
-			metadataItems.forEach((item, index) => {
-				if (index > 0) {
-					// Add separator
-					const separator = doc.createElement('span');
-					separator.textContent = ' · ';
-					metadataDetails.appendChild(separator);
-				}
-				
-				const span = doc.createElement('span');
-				if (item === domain && domain) {
-					// Create link for domain
-					const link = doc.createElement('a');
-					link.href = doc.URL;
-					link.textContent = domain;
-					span.appendChild(link);
-				} else {
-					span.textContent = item;
-				}
-				metadataDetails.appendChild(span);
-			});
-			
-			metadata.appendChild(metadataDetails);
-			main.appendChild(metadata);
-			
-			// Create article with content (content is already processed HTML from Defuddle)
+
+			// Create article placeholder with loading spinner
 			const article = doc.createElement('article');
-			// Use DOMParser for extra safety even though content comes from Defuddle parser
-			const parser = new DOMParser();
-			const contentDoc = parser.parseFromString(content, 'text/html');
-			const contentBody = contentDoc.body;
-			
-			// Move all child nodes from parsed content to article
-			while (contentBody.firstChild) {
-				article.appendChild(contentBody.firstChild);
-			}
+			const spinner = doc.createElement('div');
+			spinner.className = 'obsidian-reader-loading';
+			const spinnerText = doc.createElement('div');
+			spinnerText.className = 'obsidian-reader-loading-text';
+			spinnerText.textContent = 'Defuddling\u2026';
+			spinner.appendChild(spinnerText);
+			article.appendChild(spinner);
 			main.appendChild(article);
-			
+
 			readerContent.appendChild(main);
-			
-			// Create footer
+
+			// Create footer (hidden until content loads)
 			const footer = doc.createElement('div');
 			footer.className = 'obsidian-reader-footer';
-			const footerItems = [
-				'Obsidian Reader',
-				wordCount ? new Intl.NumberFormat().format(wordCount) + ' words' : '',
-				(parseTime ? 'parsed in ' + new Intl.NumberFormat().format(parseTime) + ' ms' : '')
-			].filter(Boolean);
-			footer.textContent = footerItems.join(' · ');
+			footer.style.display = 'none';
 			readerContent.appendChild(footer);
-			
+
 			// Create right sidebar
 			const rightSidebar = doc.createElement('div');
 			rightSidebar.className = 'obsidian-reader-right-sidebar';
-			
-			// Assemble everything
+
+			// Assemble and display the shell immediately
 			readerContainer.appendChild(leftSidebar);
 			readerContainer.appendChild(readerContent);
 			readerContainer.appendChild(rightSidebar);
@@ -1229,11 +1211,8 @@ export class Reader {
 
 			// Add reader classes and attributes
 			doc.documentElement.classList.add('obsidian-reader-active');
-			if (extractorType) {
-				doc.documentElement.setAttribute('data-reader-extractor', extractorType);
-			}
 			doc.documentElement.setAttribute('data-reader-theme', this.settings.theme);
-			
+
 			// Apply theme mode
 			this.updateThemeMode(doc, this.settings.themeMode);
 
@@ -1242,14 +1221,8 @@ export class Reader {
 			doc.documentElement.style.setProperty('--obsidian-reader-line-height', this.settings.lineHeight.toString());
 			doc.documentElement.style.setProperty('--obsidian-reader-line-width', `${this.settings.maxWidth}em`);
 
-			// Add settings bar and outline
+			// Add settings bar
 			this.injectSettingsBar(doc);
-			this.observer = this.generateOutline(doc);
-			
-			this.initializeFootnotes(doc);
-			this.initializeCodeHighlighting(doc);
-			this.initializeCopyButtons(doc);
-			this.initializeLightbox(doc);
 
 			// Re-attach the clipper iframe container if it exists
 			if (clipperIframeContainer) {
@@ -1259,10 +1232,163 @@ export class Reader {
 			// Set up color scheme media query listener
 			this.colorSchemeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 			this.colorSchemeMediaQuery.addEventListener('change', (e) => this.handleColorSchemeChange(e, doc));
-			
-			applyHighlights();
 
 			this.isActive = true;
+
+			// Now await content extraction and populate the page
+			const { content, title, author, published, domain, extractorType, wordCount, parseTime } = await contentPromise;
+
+			// If reader was toggled off while waiting, abort
+			if (!this.isActive) return;
+
+			// Remove loading spinner
+			spinner.remove();
+
+			if (!content) {
+				console.log('Reader', 'Failed to extract content');
+				article.textContent = 'Failed to extract content.';
+				return;
+			}
+
+			// Add title
+			if (title) {
+				const h1 = doc.createElement('h1');
+				h1.textContent = title;
+				main.insertBefore(h1, article);
+			}
+
+			// Format and add metadata
+			let formattedDate = '';
+			if (published) {
+				try {
+					const date = new Date(published);
+					if (!isNaN(date.getTime())) {
+						formattedDate = new Intl.DateTimeFormat(undefined, {
+							year: 'numeric',
+							month: 'long',
+							day: 'numeric',
+							timeZone: 'UTC'
+						}).format(date);
+					} else {
+						formattedDate = published;
+					}
+				} catch (e) {
+					formattedDate = published;
+					console.log('Reader', 'Error formatting date:', e);
+				}
+			}
+
+			const metadataItems = [
+				author ? author : '',
+				formattedDate || '',
+				domain ? domain : ''
+			].filter(Boolean);
+
+			if (metadataItems.length > 0) {
+				const metadata = doc.createElement('div');
+				metadata.className = 'metadata';
+				const metadataDetails = doc.createElement('div');
+				metadataDetails.className = 'metadata-details';
+
+				metadataItems.forEach((item, index) => {
+					if (index > 0) {
+						const separator = doc.createElement('span');
+						separator.textContent = ' · ';
+						metadataDetails.appendChild(separator);
+					}
+
+					const span = doc.createElement('span');
+					if (item === domain && domain) {
+						const link = doc.createElement('a');
+						link.href = doc.URL;
+						link.textContent = domain;
+						span.appendChild(link);
+					} else {
+						span.textContent = item;
+					}
+					metadataDetails.appendChild(span);
+				});
+
+				metadata.appendChild(metadataDetails);
+				main.insertBefore(metadata, article);
+			}
+
+			// Insert article content
+			const parser = new DOMParser();
+			const contentDoc = parser.parseFromString(content, 'text/html');
+			const contentBody = contentDoc.body;
+
+			// On YouTube, fix embed self-referrer blocking and resume playback state
+			if (isYouTube) {
+				const iframe = contentBody.querySelector('iframe[src*="youtube.com/embed/"]') as HTMLIFrameElement;
+				if (iframe) {
+					const embedUrl = new URL(iframe.src);
+					const videoId = embedUrl.pathname.split('/').pop();
+					const browserType = await detectBrowser();
+					const isSafari = ['safari', 'mobile-safari', 'ipad-os'].includes(browserType);
+
+					if (isSafari && videoId) {
+						// Safari can't modify request headers, so YouTube blocks
+						// self-referrer embeds. Show a clickable thumbnail instead.
+						const watchUrl = 'https://www.youtube.com/watch?v=' + videoId
+							+ (videoTimestamp > 0 ? '&t=' + videoTimestamp : '');
+						const thumbnail = doc.createElement('a');
+						thumbnail.href = watchUrl;
+						thumbnail.target = '_blank';
+						thumbnail.rel = 'noopener';
+						thumbnail.style.cssText = 'display:block;position:relative;aspect-ratio:16/9;max-width:100%;background:#000;border-radius:8px;overflow:hidden;';
+						thumbnail.innerHTML =
+							'<img src="https://img.youtube.com/vi/' + videoId + '/hqdefault.jpg" style="width:100%;height:100%;object-fit:cover;mix-blend-mode:normal!important;">'
+							+ '<svg style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:68px;height:48px;mix-blend-mode:normal!important;" viewBox="0 0 68 48">'
+							+ '<path d="M66.52 7.74c-.78-2.93-2.49-5.41-5.42-6.19C55.79.13 34 0 34 0S12.21.13 6.9 1.55c-2.93.78-4.63 3.26-5.42 6.19C.06 13.05 0 24 0 24s.06 10.95 1.48 16.26c.78 2.93 2.49 5.41 5.42 6.19C12.21 47.87 34 48 34 48s21.79-.13 27.1-1.55c2.93-.78 4.64-3.26 5.42-6.19C67.94 34.95 68 24 68 24s-.06-10.95-1.48-16.26z" fill="red"/>'
+							+ '<path d="M45 24L27 14v20" fill="white"/></svg>';
+						iframe.replaceWith(thumbnail);
+					} else {
+						// Chrome/Firefox: use direct embed with header modification
+						await browser.runtime.sendMessage({
+							action: 'enableYouTubeEmbedRule'
+						}).catch(() => {});
+
+						if (videoTimestamp > 0 || videoWasPlaying) {
+							const src = new URL(iframe.src);
+							if (videoTimestamp > 0) {
+								src.searchParams.set('start', String(videoTimestamp));
+							}
+							if (videoWasPlaying) {
+								src.searchParams.set('autoplay', '1');
+							}
+							iframe.src = src.toString();
+						}
+					}
+				}
+			}
+
+			while (contentBody.firstChild) {
+				article.appendChild(contentBody.firstChild);
+			}
+
+			// Set extractor type
+			if (extractorType) {
+				doc.documentElement.setAttribute('data-reader-extractor', extractorType);
+			}
+
+			// Show footer with stats
+			const footerItems = [
+				'Obsidian Reader',
+				wordCount ? new Intl.NumberFormat().format(wordCount) + ' words' : '',
+				(parseTime ? 'parsed in ' + new Intl.NumberFormat().format(parseTime) + ' ms' : '')
+			].filter(Boolean);
+			footer.textContent = footerItems.join(' · ');
+			footer.style.display = '';
+
+			// Initialize content-dependent features
+			this.observer = this.generateOutline(doc);
+			this.initializeFootnotes(doc);
+			this.initializeCodeHighlighting(doc);
+			this.initializeCopyButtons(doc);
+			this.initializeLightbox(doc);
+
+			applyHighlights();
 
 		} catch (e) {
 			console.error('Reader', 'Error during apply:', e);
@@ -1285,6 +1411,12 @@ export class Reader {
 
 			// Hide any active footnote popover
 			this.hideFootnotePopover();
+
+			// Clean up YouTube embed referer rule if it was enabled
+			const host = doc.URL ? new URL(doc.URL).hostname : '';
+			if (host.includes('youtube.com') || host.includes('youtu.be')) {
+				browser.runtime.sendMessage({ action: 'disableYouTubeEmbedRule' }).catch(() => {});
+			}
 
 			// Remove lightbox
 			if (this.lightbox) {

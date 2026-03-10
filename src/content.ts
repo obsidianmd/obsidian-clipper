@@ -3,7 +3,8 @@ import * as highlighter from './utils/highlighter';
 import { loadSettings, generalSettings } from './utils/storage-utils';
 import Defuddle from 'defuddle';
 import { getDomain } from './utils/string-utils';
-import { createMarkdownContent } from './utils/markdown-converter';
+import { createMarkdownContent } from 'defuddle/full';
+import { flattenShadowDom } from './utils/flatten-shadow-dom';
 
 declare global {
 	interface Window {
@@ -209,108 +210,116 @@ declare global {
 		}
 
 		if (request.action === "copyMarkdownToClipboard") {
-			try {
-				// Extract page content using Defuddle
-				const defuddled = new Defuddle(document, { url: document.URL }).parse();
+			flattenShadowDom(document).then(() => {
+				try {
+					// Extract page content using Defuddle
+					const defuddled = new Defuddle(document, { url: document.URL }).parse();
 
-				// Convert HTML content to markdown
-				const markdown = createMarkdownContent(defuddled.content, document.URL);
+					// Convert HTML content to markdown
+					const markdown = createMarkdownContent(defuddled.content, document.URL);
 
-				// Copy to clipboard
-				const textArea = document.createElement("textarea");
-				textArea.value = markdown;
-				document.body.appendChild(textArea);
-				textArea.select();
-				document.execCommand('copy');
-				document.body.removeChild(textArea);
+					// Copy to clipboard
+					const textArea = document.createElement("textarea");
+					textArea.value = markdown;
+					document.body.appendChild(textArea);
+					textArea.select();
+					document.execCommand('copy');
+					document.body.removeChild(textArea);
 
-				sendResponse({ success: true });
-			} catch (err) {
-				console.error('Failed to copy markdown to clipboard:', err);
-				sendResponse({ success: false, error: (err as Error).message });
-			}
+					sendResponse({ success: true });
+				} catch (err) {
+					console.error('Failed to copy markdown to clipboard:', err);
+					sendResponse({ success: false, error: (err as Error).message });
+				}
+			});
 			return true;
 		}
 
 		if (request.action === "getPageContent") {
-			let selectedHtml = '';
-			const selection = window.getSelection();
-			
-			if (selection && selection.rangeCount > 0) {
-				const range = selection.getRangeAt(0);
-				const clonedSelection = range.cloneContents();
-				const div = document.createElement('div');
-				div.appendChild(clonedSelection);
-				selectedHtml = div.innerHTML;
-			}
+			// Flatten shadow DOM before extraction (async, needs main world)
+			flattenShadowDom(document).then(async () => {
+				let selectedHtml = '';
+				const selection = window.getSelection();
 
-			const extractedContent: { [key: string]: string } = {};
+				if (selection && selection.rangeCount > 0) {
+					const range = selection.getRangeAt(0);
+					const clonedSelection = range.cloneContents();
+					const div = document.createElement('div');
+					div.appendChild(clonedSelection);
+					selectedHtml = div.innerHTML;
+				}
 
-			// Process with Defuddle first while we have access to the document
-			const defuddled = new Defuddle(document, { url: document.URL }).parse();
+				// Use parseAsync to ensure async variables like {{transcript}} are available
+				const defuddle = new Defuddle(document, { url: document.URL });
+				const defuddled = await defuddle.parseAsync();
+				const extractedContent: { [key: string]: string } = {
+					...defuddled.variables,
+				};
 
-			// Create a new DOMParser
-			const parser = new DOMParser();
-			// Parse the document's HTML
-			const doc = parser.parseFromString(document.documentElement.outerHTML, 'text/html');
+				// Create a new DOMParser
+				const parser = new DOMParser();
+				// Parse the document's HTML
+				const doc = parser.parseFromString(document.documentElement.outerHTML, 'text/html');
 
-			// Remove all script and style elements
-			doc.querySelectorAll('script, style').forEach(el => el.remove());
+				// Remove all script and style elements
+				doc.querySelectorAll('script, style').forEach(el => el.remove());
 
-			// Remove style attributes from all elements
-			doc.querySelectorAll('*').forEach(el => el.removeAttribute('style'));
+				// Remove style attributes from all elements
+				doc.querySelectorAll('*').forEach(el => el.removeAttribute('style'));
 
-			// Convert all relative URLs to absolute
-			doc.querySelectorAll('[src], [href]').forEach(element => {
-				['src', 'href', 'srcset'].forEach(attr => {
-					const value = element.getAttribute(attr);
-					if (!value) return;
-					
-					if (attr === 'srcset') {
-						const newSrcset = value.split(',').map(src => {
-							const [url, size] = src.trim().split(' ');
+				// Convert all relative URLs to absolute
+				doc.querySelectorAll('[src], [href]').forEach(element => {
+					['src', 'href', 'srcset'].forEach(attr => {
+						const value = element.getAttribute(attr);
+						if (!value) return;
+
+						if (attr === 'srcset') {
+							const newSrcset = value.split(',').map(src => {
+								const [url, size] = src.trim().split(' ');
+								try {
+									const absoluteUrl = new URL(url, document.baseURI).href;
+									return `${absoluteUrl}${size ? ' ' + size : ''}`;
+								} catch (e) {
+									return src;
+								}
+							}).join(', ');
+							element.setAttribute(attr, newSrcset);
+						} else if (!value.startsWith('http') && !value.startsWith('data:') && !value.startsWith('#') && !value.startsWith('//')) {
 							try {
-								const absoluteUrl = new URL(url, document.baseURI).href;
-								return `${absoluteUrl}${size ? ' ' + size : ''}`;
+								const absoluteUrl = new URL(value, document.baseURI).href;
+								element.setAttribute(attr, absoluteUrl);
 							} catch (e) {
-								return src;
+								console.warn(`Failed to process ${attr} URL:`, value);
 							}
-						}).join(', ');
-						element.setAttribute(attr, newSrcset);
-					} else if (!value.startsWith('http') && !value.startsWith('data:') && !value.startsWith('#') && !value.startsWith('//')) {
-						try {
-							const absoluteUrl = new URL(value, document.baseURI).href;
-							element.setAttribute(attr, absoluteUrl);
-						} catch (e) {
-							console.warn(`Failed to process ${attr} URL:`, value);
 						}
-					}
+					});
 				});
+
+				// Get the modified HTML without scripts, styles, and style attributes
+				const cleanedHtml = doc.documentElement.outerHTML;
+
+				const response: ContentResponse = {
+					author: defuddled.author,
+					content: defuddled.content,
+					description: defuddled.description,
+					domain: getDomain(document.URL),
+					extractedContent: extractedContent,
+					favicon: defuddled.favicon,
+					fullHtml: cleanedHtml,
+					highlights: highlighter.getHighlights(),
+					image: defuddled.image,
+					parseTime: defuddled.parseTime,
+					published: defuddled.published,
+					schemaOrgData: defuddled.schemaOrgData,
+					selectedHtml: selectedHtml,
+					site: defuddled.site,
+					title: defuddled.title,
+					wordCount: defuddled.wordCount,
+					metaTags: defuddled.metaTags || []
+				};
+				sendResponse(response);
 			});
-
-			// Get the modified HTML without scripts, styles, and style attributes
-			const cleanedHtml = doc.documentElement.outerHTML;
-
-			const response: ContentResponse = {
-				author: defuddled.author,
-				content: defuddled.content,
-				description: defuddled.description,
-				domain: getDomain(document.URL),
-				extractedContent: extractedContent,
-				favicon: defuddled.favicon,
-				fullHtml: cleanedHtml,
-				highlights: highlighter.getHighlights(),
-				image: defuddled.image,
-				parseTime: defuddled.parseTime,
-				published: defuddled.published,
-				schemaOrgData: defuddled.schemaOrgData,
-				selectedHtml: selectedHtml,
-				site: defuddled.site,
-				title: defuddled.title,
-				wordCount: defuddled.wordCount,
-				metaTags: defuddled.metaTags || []
-			};
-			sendResponse(response);
+			return true;
 		} else if (request.action === "extractContent") {
 			const content = extractContentBySelector(request.selector, request.attribute, request.extractHtml);
 			sendResponse({ content: content });

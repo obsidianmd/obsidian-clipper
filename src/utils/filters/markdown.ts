@@ -1,4 +1,4 @@
-import { createMarkdownContent } from '../markdown-converter';
+import { createMarkdownContent } from 'defuddle/full';
 
 export const markdown = (str: string, param?: string): string => {
 	const baseUrl = param || 'about:blank';

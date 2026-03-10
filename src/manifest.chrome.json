@@ -12,7 +12,8 @@
 		"contextMenus",
 		"sidePanel",
 		"storage",
-		"scripting"
+		"scripting",
+		"declarativeNetRequest"
 	],
 	"host_permissions": [
 		"<all_urls>",
@@ -46,7 +47,7 @@
 	],
 	"web_accessible_resources": [
 		{
-			"resources": ["reader.css", "reader-script.js", "browser-polyfill.min.js", "style.css", "side-panel.html"],
+			"resources": ["reader.css", "reader-script.js", "browser-polyfill.min.js", "style.css", "side-panel.html", "flatten-shadow-dom.js"],
 			"extension_ids": ["*"],
 			"matches": [ "*://*/*" ]
 		}

@@ -108,26 +108,27 @@ const memoizedFindMatchingTemplate = memoizeWithExpiration(
 			return undefined;
 		}
 
-		const schemaOrgData = await getSchemaOrgData();
-
-		// Check URL trie first
-		const urlMatch = urlTrie.findLongestMatch(url, schemaOrgData);
+		// Check URL trie first (without awaiting schema data)
+		const urlMatch = urlTrie.findLongestMatch(url, null);
 		if (urlMatch) {
 			return urlMatch.template;
 		}
 
-		// Check schema triggers
-		for (const { template, pattern } of schemaTriggers) {
-			if (matchSchemaPattern(pattern, schemaOrgData)) {
-				console.log('Schema match found:', template);
+		// Then check regex triggers (no schema data needed)
+		for (const { template, regex } of regexTriggers) {
+			if (regex.test(url)) {
 				return template;
 			}
 		}
 
-		// Then check regex triggers
-		for (const { template, regex } of regexTriggers) {
-			if (regex.test(url)) {
-				return template;
+		// Only fetch schema data if there are schema triggers to check
+		if (schemaTriggers.length > 0) {
+			const schemaOrgData = await getSchemaOrgData();
+			for (const { template, pattern } of schemaTriggers) {
+				if (matchSchemaPattern(pattern, schemaOrgData)) {
+					console.log('Schema match found:', template);
+					return template;
+				}
 			}
 		}
 
