@@ -1,5 +1,6 @@
 import Defuddle from 'defuddle/full';
 import browser from './browser-polyfill';
+import { detectBrowser } from './browser-detection';
 import { flattenShadowDom as flattenShadowDomUtil } from './flatten-shadow-dom';
 import { getLocalStorage, setLocalStorage } from './storage-utils';
 import hljs from 'highlight.js';
@@ -349,9 +350,6 @@ export class Reader {
 		}
 	}
 
-	private static flattenShadowDom(doc: Document): Promise<void> {
-		return flattenShadowDomUtil(doc);
-	}
 
 	private static async extractContent(doc: Document): Promise<{
 		content: string;
@@ -1101,7 +1099,7 @@ export class Reader {
 			}
 
 			// Flatten shadow DOM content before cleanup removes scripts
-			await this.flattenShadowDom(doc);
+			await flattenShadowDomUtil(doc);
 
 			// Remove page scripts and their effects
 			this.cleanupScripts(doc);
@@ -1326,7 +1324,8 @@ export class Reader {
 				if (iframe) {
 					const embedUrl = new URL(iframe.src);
 					const videoId = embedUrl.pathname.split('/').pop();
-					const isSafari = browser.runtime.getURL('').startsWith('safari-web-extension://');
+					const browserType = await detectBrowser();
+					const isSafari = ['safari', 'mobile-safari', 'ipad-os'].includes(browserType);
 
 					if (isSafari && videoId) {
 						// Safari can't modify request headers, so YouTube blocks
@@ -1413,8 +1412,11 @@ export class Reader {
 			// Hide any active footnote popover
 			this.hideFootnotePopover();
 
-			// Clean up YouTube embed referer rule
-			browser.runtime.sendMessage({ action: 'disableYouTubeEmbedRule' }).catch(() => {});
+			// Clean up YouTube embed referer rule if it was enabled
+			const host = doc.URL ? new URL(doc.URL).hostname : '';
+			if (host.includes('youtube.com') || host.includes('youtu.be')) {
+				browser.runtime.sendMessage({ action: 'disableYouTubeEmbedRule' }).catch(() => {});
+			}
 
 			// Remove lightbox
 			if (this.lightbox) {
