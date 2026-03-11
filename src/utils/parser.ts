@@ -1458,6 +1458,7 @@ const PRESET_VARIABLES = new Set([
 	'fullHtml',
 	'highlights',
 	'image',
+	'language',
 	'published',
 	'selection',
 	'selectionHtml',

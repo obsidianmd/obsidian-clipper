@@ -666,6 +666,7 @@ async function refreshFields(tabId: number, checkTemplateTriggers: boolean = tru
 				extractedData.published,
 				extractedData.site,
 				extractedData.wordCount,
+				extractedData.language || '',
 				extractedData.metaTags
 			);
 			if (initializedContent) {

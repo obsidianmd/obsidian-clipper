@@ -55,6 +55,7 @@ interface ContentResponse {
 	published: string;
 	site: string;
 	wordCount: number;
+	language: string;
 	metaTags: { name?: string | null; property?: string | null; content: string | null }[];
 }
 
@@ -112,6 +113,7 @@ export async function initializePageContent(
 	published: string,
 	site: string,
 	wordCount: number,
+	language: string,
 	metaTags: { name?: string | null; property?: string | null; content: string | null }[]
 ) {
 	try {
@@ -169,6 +171,7 @@ export async function initializePageContent(
 			'{{site}}': site.trim(),
 			'{{title}}': title.trim(),
 			'{{url}}': currentUrl.trim(),
+			'{{language}}': language.trim(),
 			'{{words}}': wordCount.toString(),
 		};
 

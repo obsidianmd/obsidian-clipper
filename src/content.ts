@@ -170,6 +170,7 @@ declare global {
 		author: string;
 		site: string;
 		wordCount: number;
+		language: string;
 		metaTags: { name?: string | null; property?: string | null; content: string | null }[];
 	}
 
@@ -308,6 +309,7 @@ declare global {
 					fullHtml: cleanedHtml,
 					highlights: highlighter.getHighlights(),
 					image: defuddled.image,
+					language: defuddled.language || '',
 					parseTime: defuddled.parseTime,
 					published: defuddled.published,
 					schemaOrgData: defuddled.schemaOrgData,
