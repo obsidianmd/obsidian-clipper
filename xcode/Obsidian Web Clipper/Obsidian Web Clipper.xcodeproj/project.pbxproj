@@ -57,6 +57,10 @@
 		7AEF05F22CA0F50D005FFBC2 /* content.js in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05D62CA0F50D005FFBC2 /* content.js */; };
 		7AEF05F32CA0F50D005FFBC2 /* settings.html in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05D82CA0F50D005FFBC2 /* settings.html */; };
 		7AEF05F52CA0F50D005FFBC2 /* settings.js in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05DA2CA0F50D005FFBC2 /* settings.js */; };
+		AFA233A52F63522E00F39577 /* flatten-shadow-dom.js in Resources */ = {isa = PBXBuildFile; fileRef = AFA233A42F63522E00F39577 /* flatten-shadow-dom.js */; };
+		AFA233A62F63522E00F39577 /* flatten-shadow-dom.js in Resources */ = {isa = PBXBuildFile; fileRef = AFA233A42F63522E00F39577 /* flatten-shadow-dom.js */; };
+		AFA233A72F63522E00F39577 /* flatten-shadow-dom.js in Resources */ = {isa = PBXBuildFile; fileRef = AFA233A42F63522E00F39577 /* flatten-shadow-dom.js */; };
+		AFA233A82F63522E00F39577 /* flatten-shadow-dom.js in Resources */ = {isa = PBXBuildFile; fileRef = AFA233A42F63522E00F39577 /* flatten-shadow-dom.js */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -139,6 +143,7 @@
 		7AEF05D62CA0F50D005FFBC2 /* content.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = content.js; path = ../../../dist_safari/content.js; sourceTree = "<group>"; };
 		7AEF05D82CA0F50D005FFBC2 /* settings.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = settings.html; path = ../../../dist_safari/settings.html; sourceTree = "<group>"; };
 		7AEF05DA2CA0F50D005FFBC2 /* settings.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = settings.js; path = ../../../dist_safari/settings.js; sourceTree = "<group>"; };
+		AFA233A42F63522E00F39577 /* flatten-shadow-dom.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = "flatten-shadow-dom.js"; path = "../../../dist_safari/flatten-shadow-dom.js"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -284,6 +289,7 @@
 				7AEF05D82CA0F50D005FFBC2 /* settings.html */,
 				7A6535C82D8B530300DDF54C /* reader-script.js */,
 				7AEF05DA2CA0F50D005FFBC2 /* settings.js */,
+				AFA233A42F63522E00F39577 /* flatten-shadow-dom.js */,
 			);
 			name = Resources;
 			path = "Shared (Extension)";
@@ -420,6 +426,7 @@
 				7AEF05B12CA0F50D005FFBC2 /* Script.js in Resources */,
 				7AEF05B52CA0F50D005FFBC2 /* Assets.xcassets in Resources */,
 				7AEF05872CA0F50D005FFBC2 /* Base in Resources */,
+				AFA233A52F63522E00F39577 /* flatten-shadow-dom.js in Resources */,
 				7AEF05AF2CA0F50D005FFBC2 /* Style.css in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -431,6 +438,7 @@
 				7AEF05AE2CA0F50D005FFBC2 /* Icon.png in Resources */,
 				7AEF05B02CA0F50D005FFBC2 /* Style.css in Resources */,
 				7AEF05932CA0F50D005FFBC2 /* Base in Resources */,
+				AFA233A72F63522E00F39577 /* flatten-shadow-dom.js in Resources */,
 				7AEF05B22CA0F50D005FFBC2 /* Script.js in Resources */,
 				7AEF05B62CA0F50D005FFBC2 /* Assets.xcassets in Resources */,
 				7AEF05AC2CA0F50D005FFBC2 /* Base in Resources */,
@@ -453,6 +461,7 @@
 				7AEF05F12CA0F50D005FFBC2 /* manifest.json in Resources */,
 				7AEF05EB2CA0F50D005FFBC2 /* popup.js in Resources */,
 				7A64805A2D820A9800A5924D /* reader.css in Resources */,
+				AFA233A82F63522E00F39577 /* flatten-shadow-dom.js in Resources */,
 				7AEF05EF2CA0F50D005FFBC2 /* icons in Resources */,
 				7AEF05F52CA0F50D005FFBC2 /* settings.js in Resources */,
 			);
@@ -474,6 +483,7 @@
 				7AEF05E42CA0F50D005FFBC2 /* manifest.json in Resources */,
 				7AEF05DE2CA0F50D005FFBC2 /* popup.js in Resources */,
 				7A6480592D820A9800A5924D /* reader.css in Resources */,
+				AFA233A62F63522E00F39577 /* flatten-shadow-dom.js in Resources */,
 				7AEF05E22CA0F50D005FFBC2 /* icons in Resources */,
 				7AEF05E82CA0F50D005FFBC2 /* settings.js in Resources */,
 			);
