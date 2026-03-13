@@ -22,6 +22,7 @@ import { debounce } from '../utils/debounce';
 import { sanitizeFileName } from '../utils/string-utils';
 import { saveFile } from '../utils/file-utils';
 import { translatePage, getMessage, setupLanguageAndDirection } from '../utils/i18n';
+import { formatPropertyValue } from '../utils/shared';
 
 interface ReaderModeResponse {
 	success: boolean;
@@ -860,25 +861,7 @@ async function fillTemplateFieldValues(currentTabId: number, template: Template 
 		const propertyType = inputElement.getAttribute('data-type') || 'text';
 
 		// Apply type-specific parsing
-		switch (propertyType) {
-			case 'number':
-				const numericValue = value.replace(/[^\d.-]/g, '');
-				value = numericValue ? parseFloat(numericValue).toString() : value;
-				break;
-			case 'checkbox':
-				value = (value.toLowerCase() === 'true' || value === '1').toString();
-				break;
-			case 'date':
-				if (!property.value.includes('|date:')) {
-					value = dayjs(value).isValid() ? dayjs(value).format('YYYY-MM-DD') : value;
-				}
-				break;
-			case 'datetime':
-				if (!property.value.includes('|date:')) {
-					value = dayjs(value).isValid() ? dayjs(value).format('YYYY-MM-DDTHH:mm:ssZ') : value;
-				}
-				break;
-		}
+		value = formatPropertyValue(value, propertyType, property.value);
 
 		if (propertyType === 'checkbox') {
 			inputElement.checked = value === 'true';

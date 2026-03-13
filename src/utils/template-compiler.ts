@@ -2,7 +2,7 @@
 // This module provides the main entry point for template compilation,
 // integrating the AST-based renderer with the variable processors.
 
-import { render, RenderContext } from './renderer';
+import { render, RenderContext, AsyncResolver } from './renderer';
 import { applyFilterDirect } from './filters';
 import { processSimpleVariable } from './variables/simple';
 import { processSelector, resolveSelector } from './variables/selector';
@@ -10,31 +10,40 @@ import { processSchema } from './variables/schema';
 import { processPrompt } from './variables/prompt';
 
 /**
+ * A function that processes a selector match string and returns the result.
+ * Used to inject different selector implementations (browser vs CLI).
+ */
+export type SelectorProcessor = (match: string, currentUrl: string) => Promise<string>;
+
+/**
  * Main function to compile a template with the given variables.
- * This is the primary entry point used by the extension.
  *
- * @param tabId - Browser tab ID for selector resolution
+ * @param tabId - Browser tab ID for selector resolution (0 if not applicable)
  * @param text - Template string to compile
  * @param variables - Variables available in the template
  * @param currentUrl - Current page URL for filter processing
+ * @param customAsyncResolver - Optional async resolver override (defaults to browser selector resolver)
+ * @param customSelectorProcessor - Optional selector processor override for post-processing
  * @returns Compiled template string
  */
 export async function compileTemplate(
 	tabId: number,
 	text: string,
 	variables: { [key: string]: any },
-	currentUrl: string
+	currentUrl: string,
+	customAsyncResolver?: AsyncResolver,
+	customSelectorProcessor?: SelectorProcessor
 ): Promise<string> {
 	// Strip text fragment from URL
 	currentUrl = currentUrl.replace(/#:~:text=[^&]+(&|$)/, '');
 
-	// Create async resolver for selectors
-	const asyncResolver = async (name: string, ctx: RenderContext): Promise<any> => {
+	// Use provided resolver or default browser-based one
+	const asyncResolver = customAsyncResolver ?? (async (name: string, ctx: RenderContext): Promise<any> => {
 		if (name.startsWith('selector:') || name.startsWith('selectorHtml:')) {
 			return resolveSelector(ctx.tabId!, name);
 		}
 		return undefined;
-	};
+	});
 
 	// Create render context with custom variable resolver
 	const context: RenderContext = {
@@ -61,7 +70,7 @@ export async function compileTemplate(
 
 	// Post-process: handle special variable types that weren't processed by the renderer
 	// The renderer handles basic variables, but special prefixes need custom processing
-	const processedText = await processVariables(tabId, result.output, variables, currentUrl);
+	const processedText = await processVariables(tabId, result.output, variables, currentUrl, customSelectorProcessor);
 
 	return processedText;
 }
@@ -77,7 +86,8 @@ export async function processVariables(
 	tabId: number,
 	text: string,
 	variables: { [key: string]: any },
-	currentUrl: string
+	currentUrl: string,
+	customSelectorProcessor?: SelectorProcessor
 ): Promise<string> {
 	const regex = /{{([\s\S]*?)}}/g;
 	let result = text;
@@ -90,7 +100,11 @@ export async function processVariables(
 		let replacement: string;
 
 		if (trimmedMatch.startsWith('selector:') || trimmedMatch.startsWith('selectorHtml:')) {
-			replacement = await processSelector(tabId, fullMatch, currentUrl);
+			if (customSelectorProcessor) {
+				replacement = await customSelectorProcessor(fullMatch, currentUrl);
+			} else {
+				replacement = await processSelector(tabId, fullMatch, currentUrl);
+			}
 		} else if (trimmedMatch.startsWith('schema:')) {
 			replacement = await processSchema(fullMatch, variables, currentUrl);
 		} else if (trimmedMatch.startsWith('"') || trimmedMatch.startsWith('prompt:')) {

@@ -1,15 +1,16 @@
 import { ExtractedContent } from '../types/types';
 import { createMarkdownContent } from 'defuddle/full';
-import { sanitizeFileName, getDomain } from './string-utils';
+import { sanitizeFileName } from './string-utils';
+import { buildVariables, addSchemaOrgDataToVariables } from './shared';
 import browser from './browser-polyfill';
 import { debugLog } from './debug';
 import dayjs from 'dayjs';
 import { AnyHighlightData, TextHighlightData, HighlightData } from './highlighter';
 import { generalSettings } from './storage-utils';
-import { 
+import {
 	getElementByXPath,
 	wrapElementWithMark,
-	wrapTextWithMark 
+	wrapTextWithMark
 } from './dom-utils';
 
 // Define ElementHighlightData type inline since it's not exported from highlighter.ts
@@ -125,8 +126,6 @@ export async function initializePageContent(
 			selectedMarkdown = createMarkdownContent(selectedHtml, currentUrl);
 		}
 
-		const noteName = sanitizeFileName(title);
-
 		// Process highlights after getting the base content
 		if (generalSettings.highlighterEnabled && generalSettings.highlightBehavior !== 'no-highlights' && highlights && highlights.length > 0) {
 			content = processHighlights(content, highlights);
@@ -134,7 +133,7 @@ export async function initializePageContent(
 
 		const markdownBody = createMarkdownContent(content, currentUrl);
 
-		// Convert each highlight to markdown individually and create an object with text, timestamp, and notes (if not empty)
+		// Convert each highlight to markdown individually
 		const highlightsData = highlights.map(highlight => {
 			const highlightData: {
 				text: string;
@@ -142,62 +141,39 @@ export async function initializePageContent(
 				notes?: string[];
 			} = {
 				text: createMarkdownContent(highlight.content, currentUrl),
-				timestamp: dayjs(parseInt(highlight.id)).toISOString(), // Convert to ISO format
+				timestamp: dayjs(parseInt(highlight.id)).toISOString(),
 			};
-			
+
 			if (highlight.notes && highlight.notes.length > 0) {
 				highlightData.notes = highlight.notes;
 			}
-			
+
 			return highlightData;
 		});
 
-		const currentVariables: { [key: string]: string } = {
-			'{{author}}': author.trim(),
-			'{{content}}': markdownBody.trim(),
-			'{{contentHtml}}': content.trim(),
-			'{{selection}}': selectedMarkdown.trim(),
-			'{{selectionHtml}}': selectedHtml.trim(),
-			'{{date}}': dayjs().format('YYYY-MM-DDTHH:mm:ssZ').trim(),
-			'{{time}}': dayjs().format('YYYY-MM-DDTHH:mm:ssZ').trim(),
-			'{{description}}': description.trim(),
-			'{{domain}}': getDomain(currentUrl),
-			'{{favicon}}': favicon,
-			'{{fullHtml}}': fullHtml.trim(),
-			'{{highlights}}': highlights.length > 0 ? JSON.stringify(highlightsData) : '',
-			'{{image}}': image,
-			'{{noteName}}': noteName.trim(),
-			'{{published}}': published.split(',')[0].trim(),
-			'{{site}}': site.trim(),
-			'{{title}}': title.trim(),
-			'{{url}}': currentUrl.trim(),
-			'{{language}}': language.trim(),
-			'{{words}}': wordCount.toString(),
-		};
+		const noteName = sanitizeFileName(title);
 
-		// Add extracted content to variables
-		Object.entries(extractedContent).forEach(([key, value]) => {
-			currentVariables[`{{${key}}}`] = value;
+		const currentVariables = buildVariables({
+			title,
+			author,
+			content: markdownBody,
+			contentHtml: content,
+			url: currentUrl,
+			fullHtml,
+			description,
+			favicon,
+			image,
+			published,
+			site,
+			language,
+			wordCount,
+			selection: selectedMarkdown,
+			selectionHtml: selectedHtml,
+			highlights: highlights.length > 0 ? JSON.stringify(highlightsData) : '',
+			schemaOrgData,
+			metaTags,
+			extractedContent,
 		});
-
-		// Add all meta tags to variables
-		metaTags.forEach(meta => {
-			const name = meta.name;
-			const property = meta.property;
-			const content = meta.content;
-
-			if (name && content) {
-				currentVariables[`{{meta:name:${name}}}`] = content;
-			}
-			if (property && content) {
-				currentVariables[`{{meta:property:${property}}}`] = content;
-			}
-		});
-
-		// Add schema.org data to variables
-		if (schemaOrgData) {
-			addSchemaOrgDataToVariables(schemaOrgData, currentVariables);
-		}
 
 		debugLog('Variables', 'Available variables:', currentVariables);
 
@@ -212,46 +188,6 @@ export async function initializePageContent(
 		} else {
 			throw new Error('Unable to initialize page content: Unknown error');
 		}
-	}
-}
-
-function addSchemaOrgDataToVariables(schemaData: any, variables: { [key: string]: string }, prefix: string = '') {
-	if (Array.isArray(schemaData)) {
-		schemaData.forEach((item, index) => {
-			if (!item || typeof item !== 'object') return;
-			if (item['@type']) {
-				if (Array.isArray(item['@type'])) {
-					item['@type'].forEach((type: string) => {
-						addSchemaOrgDataToVariables(item, variables, `@${type}:`);
-					});
-				} else {
-					addSchemaOrgDataToVariables(item, variables, `@${item['@type']}:`);
-				}
-			} else {
-				addSchemaOrgDataToVariables(item, variables, `[${index}]:`);
-			}
-		});
-	} else if (typeof schemaData === 'object' && schemaData !== null) {
-		// Store the entire object as JSON
-		const objectKey = `{{schema:${prefix.replace(/\.$/, '')}}}`;
-		variables[objectKey] = JSON.stringify(schemaData);
-
-		// Process individual properties
-		Object.entries(schemaData).forEach(([key, value]) => {
-			if (key === '@type') return;
-			
-			const variableKey = `{{schema:${prefix}${key}}}`;
-			if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
-				variables[variableKey] = String(value);
-			} else if (Array.isArray(value)) {
-				variables[variableKey] = JSON.stringify(value);
-				value.forEach((item, index) => {
-					addSchemaOrgDataToVariables(item, variables, `${prefix}${key}[${index}].`);
-				});
-			} else if (typeof value === 'object' && value !== null) {
-				addSchemaOrgDataToVariables(value, variables, `${prefix}${key}.`);
-			}
-		});
 	}
 }
 
