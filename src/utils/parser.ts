@@ -1460,6 +1460,7 @@ const PRESET_VARIABLES = new Set([
 	'image',
 	'language',
 	'published',
+	'transcript',
 	'selection',
 	'selectionHtml',
 	'site',
