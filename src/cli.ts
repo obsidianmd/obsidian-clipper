@@ -9,6 +9,7 @@ import { applyFilters } from './utils/filters';
 import { buildVariables, generateFrontmatter, extractContentBySelector } from './utils/shared';
 import { openInObsidian } from './utils/cli-utils';
 import { sanitizeFileName } from './utils/string-utils';
+import dayjs from 'dayjs';
 import { Template, Property } from './types/types';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -249,21 +250,56 @@ async function main(): Promise<void> {
 	const noteName = sanitizeFileName(compiledNoteName) || 'Untitled';
 
 	// Compile each property value (independent, so run in parallel)
+	// Then apply type-aware formatting (same as the extension's popup.ts)
 	const compiledProperties: Property[] = await Promise.all(
-		template.properties.map(async (prop) => ({
-			name: prop.name,
-			value: await compile(prop.value),
-		}))
+		template.properties.map(async (prop) => {
+			let value = await compile(prop.value);
+			const propType = prop.type || 'text';
+
+			switch (propType) {
+				case 'number': {
+					const numericValue = value.replace(/[^\d.-]/g, '');
+					value = numericValue ? parseFloat(numericValue).toString() : value;
+					break;
+				}
+				case 'checkbox':
+					value = (value.toLowerCase() === 'true' || value === '1').toString();
+					break;
+				case 'date':
+					if (!prop.value.includes('|date:')) {
+						value = dayjs(value).isValid() ? dayjs(value).format('YYYY-MM-DD') : value;
+					}
+					break;
+				case 'datetime':
+					if (!prop.value.includes('|date:')) {
+						value = dayjs(value).isValid() ? dayjs(value).format('YYYY-MM-DDTHH:mm:ssZ') : value;
+					}
+					break;
+			}
+
+			return { name: prop.name, value };
+		})
 	);
 
+	// Build property type map: --property-types overrides, then fall back to template's own types
+	const typeMap: Record<string, string> = {};
+	for (const prop of template.properties) {
+		if (prop.type) {
+			typeMap[prop.name] = prop.type;
+		}
+	}
+	if (propertyTypes) {
+		Object.assign(typeMap, propertyTypes);
+	}
+
 	// Generate frontmatter
-	const frontmatter = generateFrontmatter(compiledProperties, propertyTypes || {});
+	const frontmatter = generateFrontmatter(compiledProperties, typeMap);
 
 	// Compile note content
 	const compiledContent = await compile(template.noteContentFormat);
 
 	// Combine
-	const fullContent = frontmatter ? frontmatter + '\n' + compiledContent : compiledContent;
+	const fullContent = frontmatter ? frontmatter + compiledContent : compiledContent;
 
 	// Output
 	if (args.open) {
