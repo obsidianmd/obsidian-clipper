@@ -5,6 +5,10 @@
 	"bin": {
 		"obsidian-clipper": "./dist/cli.cjs"
 	},
+	"exports": {
+		".": "./dist/cli.cjs",
+		"./api": "./dist/api.mjs"
+	},
 	"scripts": {
 		"defuddle-dev": "node scripts/set-defuddle-dev.js",
 		"defuddle-prod": "node scripts/set-defuddle-prod.js",
@@ -16,6 +20,7 @@
 		"build:safari": "webpack --env BROWSER=safari --mode production",
 		"build": "npm run build:chrome && npm run build:firefox && npm run build:safari",
 		"build:cli": "node scripts/build-cli.mjs",
+		"build:api": "node scripts/build-api.mjs",
 		"dev": "npm run dev:chrome",
 		"test": "vitest run",
 		"test:watch": "vitest",

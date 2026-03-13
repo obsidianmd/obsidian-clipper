@@ -2,13 +2,11 @@ import { describe, test, expect, vi, beforeAll, afterAll } from 'vitest';
 import { readdirSync, readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
 import { join, basename, extname } from 'path';
 import { parseHTML } from 'linkedom';
-import dayjs from 'dayjs';
 import DefuddleClass from 'defuddle';
 import { createMarkdownContent } from 'defuddle/full';
-import { buildVariables, generateFrontmatter, extractContentBySelector } from './shared';
-import { compileTemplate, SelectorProcessor } from './template-compiler';
-import { AsyncResolver } from './renderer';
-import { applyFilters } from './filters';
+import { buildVariables, generateFrontmatter, formatPropertyValue } from './shared';
+import { compileTemplate } from './template-compiler';
+import { createAsyncResolver, createSelectorProcessor } from '../api';
 
 // ---------------------------------------------------------------------------
 // Freeze time so {{date}} is deterministic in expected output
@@ -27,73 +25,6 @@ interface FixtureTemplate {
 	noteNameFormat: string;
 	noteContentFormat: string;
 	properties: { name: string; value: string; type: string }[];
-}
-
-// ---------------------------------------------------------------------------
-// Resolver helpers (same as CLI — exercises shared code paths)
-// ---------------------------------------------------------------------------
-
-type DocLike = { querySelectorAll: (selector: string) => any };
-
-function createAsyncResolver(doc: DocLike): AsyncResolver {
-	return async (name: string): Promise<any> => {
-		if (name.startsWith('selector:') || name.startsWith('selectorHtml:')) {
-			const extractHtml = name.startsWith('selectorHtml:');
-			const prefix = extractHtml ? 'selectorHtml:' : 'selector:';
-			const selectorPart = name.slice(prefix.length);
-			const attrMatch = selectorPart.match(/^(.+?)\?(.+)$/);
-			const selector = attrMatch ? attrMatch[1] : selectorPart;
-			const attribute = attrMatch ? attrMatch[2] : undefined;
-			return extractContentBySelector(
-				doc,
-				selector.replace(/\\"/g, '"'),
-				attribute,
-				extractHtml
-			);
-		}
-		return undefined;
-	};
-}
-
-function createSelectorProcessor(doc: DocLike): SelectorProcessor {
-	return async (match: string, currentUrl: string): Promise<string> => {
-		const selectorRegex = /{{(selector|selectorHtml):(.*?)(?:\?(.*?))?(?:\|(.*?))?}}/;
-		const matches = match.match(selectorRegex);
-		if (!matches) return match;
-		const [, selectorType, rawSelector, attribute, filtersString] = matches;
-		const extractHtml = selectorType === 'selectorHtml';
-		const selector = rawSelector.replace(/\\"/g, '"').replace(/\s+/g, ' ').trim();
-		const content = extractContentBySelector(doc, selector, attribute, extractHtml);
-		const contentString = Array.isArray(content) ? JSON.stringify(content) : content;
-		return filtersString ? applyFilters(contentString, filtersString, currentUrl) : contentString;
-	};
-}
-
-// ---------------------------------------------------------------------------
-// Pipeline — mirrors CLI: parse HTML → defuddle → build variables → compile
-// ---------------------------------------------------------------------------
-
-function formatPropertyValue(value: string, type: string, rawTemplate: string): string {
-	switch (type) {
-		case 'number': {
-			const numericValue = value.replace(/[^\d.-]/g, '');
-			return numericValue ? parseFloat(numericValue).toString() : value;
-		}
-		case 'checkbox':
-			return (value.toLowerCase() === 'true' || value === '1').toString();
-		case 'date':
-			if (!rawTemplate.includes('|date:')) {
-				return dayjs(value).isValid() ? dayjs(value).format('YYYY-MM-DD') : value;
-			}
-			return value;
-		case 'datetime':
-			if (!rawTemplate.includes('|date:')) {
-				return dayjs(value).isValid() ? dayjs(value).format('YYYY-MM-DDTHH:mm:ssZ') : value;
-			}
-			return value;
-		default:
-			return value;
-	}
 }
 
 async function runFixture(html: string, url: string, template: FixtureTemplate): Promise<string> {

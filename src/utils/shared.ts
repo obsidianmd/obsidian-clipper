@@ -211,6 +211,41 @@ export function generateFrontmatter(
 }
 
 // ---------------------------------------------------------------------------
+// Property type formatting
+// ---------------------------------------------------------------------------
+
+/**
+ * Apply type-aware formatting to a compiled property value.
+ * Shared by CLI, API, and browser extension.
+ *
+ * @param value - The compiled template value
+ * @param type - Property type (text, number, checkbox, date, datetime, multitext)
+ * @param templateValue - The raw template string (used to check for existing |date: filters)
+ */
+export function formatPropertyValue(value: string, type: string, templateValue: string): string {
+	switch (type) {
+		case 'number': {
+			const numericValue = value.replace(/[^\d.-]/g, '');
+			return numericValue ? parseFloat(numericValue).toString() : value;
+		}
+		case 'checkbox':
+			return (value.toLowerCase() === 'true' || value === '1').toString();
+		case 'date':
+			if (!templateValue.includes('|date:')) {
+				return dayjs(value).isValid() ? dayjs(value).format('YYYY-MM-DD') : value;
+			}
+			return value;
+		case 'datetime':
+			if (!templateValue.includes('|date:')) {
+				return dayjs(value).isValid() ? dayjs(value).format('YYYY-MM-DDTHH:mm:ssZ') : value;
+			}
+			return value;
+		default:
+			return value;
+	}
+}
+
+// ---------------------------------------------------------------------------
 // CSS selector content extraction
 // ---------------------------------------------------------------------------
 

@@ -1,16 +1,9 @@
 // Browser globals (DOMParser, window, document) are provided by the esbuild
 // banner in scripts/build-cli.mjs. They must run before any bundled module code.
 import { parseHTML } from 'linkedom';
-import DefuddleClass from 'defuddle';
-import { createMarkdownContent } from 'defuddle/full';
-import { compileTemplate, SelectorProcessor } from './utils/template-compiler';
-import { AsyncResolver } from './utils/renderer';
-import { applyFilters } from './utils/filters';
-import { buildVariables, generateFrontmatter, extractContentBySelector } from './utils/shared';
+import { clip, matchTemplate, DocumentParser } from './api';
 import { openInObsidian } from './utils/cli-utils';
-import { sanitizeFileName } from './utils/string-utils';
-import dayjs from 'dayjs';
-import { Template, Property } from './types/types';
+import { Template } from './types/types';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -127,7 +120,7 @@ function parseArgs(argv: string[]): CliArgs {
 }
 
 // ---------------------------------------------------------------------------
-// Template loading and trigger matching
+// Template loading
 // ---------------------------------------------------------------------------
 
 function loadTemplatesFromDir(dirPath: string): Template[] {
@@ -141,128 +134,15 @@ function loadTemplatesFromDir(dirPath: string): Template[] {
 	});
 }
 
-function matchTriggerPattern(pattern: string, url: string): boolean {
-	if (pattern.startsWith('/') && pattern.endsWith('/')) {
-		try {
-			return new RegExp(pattern.slice(1, -1)).test(url);
-		} catch {
-			return false;
-		}
-	}
-	return url.startsWith(pattern);
-}
-
-function matchSchemaPattern(pattern: string, schemaOrgData: any): boolean {
-	const match = pattern.match(/^schema:(@\w+)?(?:\.(.+?))?(?:=(.+))?$/);
-	if (!match) return false;
-	const [, schemaType, schemaKey, expectedValue] = match;
-	if (!schemaType && !schemaKey) return false;
-
-	const schemaArray = Array.isArray(schemaOrgData) ? schemaOrgData : [schemaOrgData];
-	const flattened = schemaArray.flatMap((s: any) => Array.isArray(s) ? s : [s]);
-
-	for (const schema of flattened) {
-		if (!schema || typeof schema !== 'object') continue;
-		if (schemaType) {
-			const types = Array.isArray(schema['@type']) ? schema['@type'] : [schema['@type']];
-			if (!types.includes(schemaType.slice(1))) continue;
-		}
-		if (schemaKey) {
-			const keys = schemaKey.split('.');
-			let val = schema;
-			for (const k of keys) {
-				val = val && typeof val === 'object' && k in val ? val[k] : undefined;
-			}
-			if (expectedValue) {
-				if (Array.isArray(val) ? val.includes(expectedValue) : val === expectedValue) return true;
-			} else if (val !== undefined) {
-				return true;
-			}
-		} else {
-			return true;
-		}
-	}
-	return false;
-}
-
-function findMatchingTemplate(templates: Template[], url: string, schemaOrgData?: any): Template | undefined {
-	// First pass: URL prefix and regex triggers (no schema data needed)
-	for (const template of templates) {
-		if (!template.triggers) continue;
-		for (const trigger of template.triggers) {
-			if (!trigger.startsWith('schema:') && matchTriggerPattern(trigger, url)) {
-				return template;
-			}
-		}
-	}
-
-	// Second pass: schema triggers (only if schema data is available)
-	if (schemaOrgData) {
-		for (const template of templates) {
-			if (!template.triggers) continue;
-			for (const trigger of template.triggers) {
-				if (trigger.startsWith('schema:') && matchSchemaPattern(trigger, schemaOrgData)) {
-					return template;
-				}
-			}
-		}
-	}
-
-	return undefined;
-}
-
 // ---------------------------------------------------------------------------
-// CLI-specific resolvers for template compilation
+// linkedom-based DocumentParser for the API
 // ---------------------------------------------------------------------------
 
-/**
- * Create an AsyncResolver that runs CSS selectors on the linkedom document.
- * Used by the AST renderer for selector variables in for-loops / conditionals.
- */
-type DocLike = { querySelectorAll: (selector: string) => any };
-
-function createCliAsyncResolver(linkedomDocument: DocLike): AsyncResolver {
-	return async (name: string): Promise<any> => {
-		if (name.startsWith('selector:') || name.startsWith('selectorHtml:')) {
-			const extractHtml = name.startsWith('selectorHtml:');
-			const prefix = extractHtml ? 'selectorHtml:' : 'selector:';
-			const selectorPart = name.slice(prefix.length);
-
-			const attrMatch = selectorPart.match(/^(.+?)\?(.+)$/);
-			const selector = attrMatch ? attrMatch[1] : selectorPart;
-			const attribute = attrMatch ? attrMatch[2] : undefined;
-
-			return extractContentBySelector(
-				linkedomDocument,
-				selector.replace(/\\"/g, '"'),
-				attribute,
-				extractHtml
-			);
-		}
-		return undefined;
-	};
-}
-
-/**
- * Create a SelectorProcessor that resolves selectors on the linkedom document.
- * Used by processVariables for deferred selector variables in post-processing.
- */
-function createCliSelectorProcessor(linkedomDocument: DocLike): SelectorProcessor {
-	return async (match: string, currentUrl: string): Promise<string> => {
-		const selectorRegex = /{{(selector|selectorHtml):(.*?)(?:\?(.*?))?(?:\|(.*?))?}}/;
-		const matches = match.match(selectorRegex);
-		if (!matches) return match;
-
-		const [, selectorType, rawSelector, attribute, filtersString] = matches;
-		const extractHtml = selectorType === 'selectorHtml';
-		const selector = rawSelector.replace(/\\"/g, '"').replace(/\s+/g, ' ').trim();
-
-		const content = extractContentBySelector(linkedomDocument, selector, attribute, extractHtml);
-		const contentString = Array.isArray(content) ? JSON.stringify(content) : content;
-
-		return filtersString ? applyFilters(contentString, filtersString, currentUrl) : contentString;
-	};
-}
+const linkedomParser: DocumentParser = {
+	parseFromString(html: string, _mimeType: string) {
+		return parseHTML(html).document;
+	}
+};
 
 // ---------------------------------------------------------------------------
 // Main
@@ -312,21 +192,25 @@ async function main(): Promise<void> {
 		html = await response.text();
 	}
 
-	// Parse with linkedom
-	const { document } = parseHTML(html);
-
-	if (!document.documentElement) {
-		console.error('Error: Could not parse HTML (empty or invalid document)');
-		process.exit(1);
-	}
-
-	// Run defuddle to extract content as HTML
-	const defuddle = new DefuddleClass(document as unknown as Document, { url: args.url });
-	const defuddleResult = defuddle.parse();
-
-	// If using a template directory, match triggers now (after defuddle for schema triggers)
+	// If using a template directory, match template by triggers.
+	// Try URL triggers first (no parsing needed). Only parse for schema if required.
+	let parsedDocument: any;
 	if (templates) {
-		const matched = findMatchingTemplate(templates, args.url, defuddleResult.schemaOrgData);
+		// First try URL-only matching (no HTML parsing needed)
+		let matched = matchTemplate(templates, args.url);
+
+		// If no URL match, check if any templates have schema triggers
+		if (!matched) {
+			const hasSchemaTrigs = templates.some(t => t.triggers?.some(tr => tr.startsWith('schema:')));
+			if (hasSchemaTrigs) {
+				const DefuddleClass = (await import('defuddle')).default;
+				parsedDocument = linkedomParser.parseFromString(html, 'text/html');
+				const defuddle = new DefuddleClass((parsedDocument.documentElement || parsedDocument) as unknown as Document, { url: args.url });
+				const defuddleResult = defuddle.parse();
+				matched = matchTemplate(templates, args.url, defuddleResult.schemaOrgData);
+			}
+		}
+
 		if (!matched) {
 			console.error(`Error: No template matched URL ${args.url}`);
 			console.error(`Searched ${templates.length} templates in ${args.templatePath}`);
@@ -336,111 +220,34 @@ async function main(): Promise<void> {
 		console.error(`Matched template: ${(template as any)._filePath || 'unknown'}`);
 	}
 
-	// Convert HTML content to markdown using defuddle's Turndown wrapper
-	const markdownContent = createMarkdownContent(defuddleResult.content, args.url);
-
-	// Build template variables — markdown for {{content}}, HTML for {{contentHtml}}
-	const variables = buildVariables({
-		title: defuddleResult.title,
-		author: defuddleResult.author,
-		content: markdownContent,
-		contentHtml: defuddleResult.content,
+	// Call the API (reuse pre-parsed document if available)
+	const result = await clip({
+		html,
 		url: args.url,
-		fullHtml: html,
-		description: defuddleResult.description,
-		favicon: defuddleResult.favicon,
-		image: defuddleResult.image,
-		published: defuddleResult.published,
-		site: defuddleResult.site,
-		language: defuddleResult.language,
-		wordCount: defuddleResult.wordCount,
-		schemaOrgData: defuddleResult.schemaOrgData,
-		metaTags: defuddleResult.metaTags,
-		extractedContent: defuddleResult.variables,
+		template,
+		documentParser: linkedomParser,
+		propertyTypes,
+		parsedDocument,
 	});
-
-	// Create CLI-specific resolvers for selector variables
-	const asyncResolver = createCliAsyncResolver(document);
-	const selectorProcessor = createCliSelectorProcessor(document);
-
-	// Helper to compile a template string with CLI resolvers
-	const compile = (text: string) =>
-		compileTemplate(0, text, variables, args.url, asyncResolver, selectorProcessor);
-
-	// Compile note name
-	const compiledNoteName = await compile(template.noteNameFormat);
-	const noteName = sanitizeFileName(compiledNoteName) || 'Untitled';
-
-	// Compile each property value (independent, so run in parallel)
-	// Then apply type-aware formatting (same as the extension's popup.ts)
-	const compiledProperties: Property[] = await Promise.all(
-		template.properties.map(async (prop) => {
-			let value = await compile(prop.value);
-			const propType = prop.type || 'text';
-
-			switch (propType) {
-				case 'number': {
-					const numericValue = value.replace(/[^\d.-]/g, '');
-					value = numericValue ? parseFloat(numericValue).toString() : value;
-					break;
-				}
-				case 'checkbox':
-					value = (value.toLowerCase() === 'true' || value === '1').toString();
-					break;
-				case 'date':
-					if (!prop.value.includes('|date:')) {
-						value = dayjs(value).isValid() ? dayjs(value).format('YYYY-MM-DD') : value;
-					}
-					break;
-				case 'datetime':
-					if (!prop.value.includes('|date:')) {
-						value = dayjs(value).isValid() ? dayjs(value).format('YYYY-MM-DDTHH:mm:ssZ') : value;
-					}
-					break;
-			}
-
-			return { name: prop.name, value };
-		})
-	);
-
-	// Build property type map: --property-types overrides, then fall back to template's own types
-	const typeMap: Record<string, string> = {};
-	for (const prop of template.properties) {
-		if (prop.type) {
-			typeMap[prop.name] = prop.type;
-		}
-	}
-	if (propertyTypes) {
-		Object.assign(typeMap, propertyTypes);
-	}
-
-	// Generate frontmatter
-	const frontmatter = generateFrontmatter(compiledProperties, typeMap);
-
-	// Compile note content
-	const compiledContent = await compile(template.noteContentFormat);
-
-	// Combine
-	const fullContent = frontmatter ? frontmatter + compiledContent : compiledContent;
 
 	// Output
 	if (args.open) {
 		const vault = args.vault || template.vault || '';
-		const result = await openInObsidian(
-			fullContent,
-			noteName,
+		const obsResult = await openInObsidian(
+			result.fullContent,
+			result.noteName,
 			template.path || '',
 			vault,
 			template.behavior || 'create',
 			args.silent,
 			args.uri
 		);
-		console.error(result);
+		console.error(obsResult);
 	} else if (args.outputPath) {
-		fs.writeFileSync(path.resolve(args.outputPath), fullContent, 'utf-8');
+		fs.writeFileSync(path.resolve(args.outputPath), result.fullContent, 'utf-8');
 		console.error(`Written to ${args.outputPath}`);
 	} else {
-		process.stdout.write(fullContent);
+		process.stdout.write(result.fullContent);
 	}
 }
 
