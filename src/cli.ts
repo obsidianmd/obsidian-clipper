@@ -3,16 +3,11 @@
 import { parseHTML } from 'linkedom';
 import DefuddleClass from 'defuddle';
 import { createMarkdownContent } from 'defuddle/full';
-import { render, RenderContext, AsyncResolver } from './utils/renderer';
-import { applyFilterDirect, applyFilters } from './utils/filters';
-import { processSimpleVariable } from './utils/variables/simple';
-import { processSchema } from './utils/variables/schema';
-import {
-	buildVariables,
-	generateFrontmatterCLI,
-	extractContentBySelector,
-	openInObsidian,
-} from './utils/cli-utils';
+import { compileTemplate, SelectorProcessor } from './utils/template-compiler';
+import { AsyncResolver } from './utils/renderer';
+import { applyFilters } from './utils/filters';
+import { buildVariables, generateFrontmatter, extractContentBySelector } from './utils/shared';
+import { openInObsidian } from './utils/cli-utils';
 import { sanitizeFileName } from './utils/string-utils';
 import { Template, Property } from './types/types';
 import * as fs from 'fs';
@@ -112,19 +107,15 @@ function parseArgs(argv: string[]): CliArgs {
 }
 
 // ---------------------------------------------------------------------------
-// Template compilation (CLI-specific, avoids browser imports)
+// CLI-specific resolvers for template compilation
 // ---------------------------------------------------------------------------
 
-async function compileTemplateCLI(
-	text: string,
-	variables: Record<string, any>,
-	currentUrl: string,
-	linkedomDocument: any
-): Promise<string> {
-	currentUrl = currentUrl.replace(/#:~:text=[^&]+(&|$)/, '');
-
-	// Async resolver that runs selectors directly on the linkedom document
-	const asyncResolver: AsyncResolver = async (name: string): Promise<any> => {
+/**
+ * Create an AsyncResolver that runs CSS selectors on the linkedom document.
+ * Used by the AST renderer for selector variables in for-loops / conditionals.
+ */
+function createCliAsyncResolver(linkedomDocument: any): AsyncResolver {
+	return async (name: string): Promise<any> => {
 		if (name.startsWith('selector:') || name.startsWith('selectorHtml:')) {
 			const extractHtml = name.startsWith('selectorHtml:');
 			const prefix = extractHtml ? 'selectorHtml:' : 'selector:';
@@ -143,91 +134,27 @@ async function compileTemplateCLI(
 		}
 		return undefined;
 	};
-
-	const context: RenderContext = {
-		variables,
-		currentUrl,
-		tabId: 0,
-		applyFilterDirect,
-		asyncResolver,
-	};
-
-	const result = await render(text, context);
-
-	if (result.errors.length > 0) {
-		console.error('Template compilation errors:', result.errors.map(e => `Line ${e.line}: ${e.message}`).join('; '));
-	}
-
-	if (!result.hasDeferredVariables) {
-		return result.output;
-	}
-
-	// Post-process deferred variables (schema, prompts become empty)
-	return processVariablesCLI(result.output, variables, currentUrl, linkedomDocument);
 }
 
 /**
- * CLI version of processVariables that handles selectors locally
- * and skips prompt variables (returns empty string for prompts).
+ * Create a SelectorProcessor that resolves selectors on the linkedom document.
+ * Used by processVariables for deferred selector variables in post-processing.
  */
-async function processVariablesCLI(
-	text: string,
-	variables: Record<string, any>,
-	currentUrl: string,
-	linkedomDocument: any
-): Promise<string> {
-	const regex = /{{([\s\S]*?)}}/g;
-	let result = text;
-	let match;
+function createCliSelectorProcessor(linkedomDocument: any): SelectorProcessor {
+	return async (match: string, currentUrl: string): Promise<string> => {
+		const selectorRegex = /{{(selector|selectorHtml):(.*?)(?:\?(.*?))?(?:\|(.*?))?}}/;
+		const matches = match.match(selectorRegex);
+		if (!matches) return match;
 
-	while ((match = regex.exec(result)) !== null) {
-		const fullMatch = match[0];
-		const trimmedMatch = match[1].trim();
+		const [, selectorType, rawSelector, attribute, filtersString] = matches;
+		const extractHtml = selectorType === 'selectorHtml';
+		const selector = rawSelector.replace(/\\"/g, '"').replace(/\s+/g, ' ').trim();
 
-		let replacement = '';
+		const content = extractContentBySelector(linkedomDocument, selector, attribute, extractHtml);
+		const contentString = Array.isArray(content) ? JSON.stringify(content) : content;
 
-		if (trimmedMatch.startsWith('selector:') || trimmedMatch.startsWith('selectorHtml:')) {
-			// Resolve selectors directly on linkedom document
-			const extractHtml = trimmedMatch.startsWith('selectorHtml:');
-			const prefix = extractHtml ? 'selectorHtml:' : 'selector:';
-			const rest = trimmedMatch.slice(prefix.length);
-
-			// Split off filters
-			const pipeIndex = rest.indexOf('|');
-			const selectorPart = pipeIndex >= 0 ? rest.slice(0, pipeIndex) : rest;
-			const filtersString = pipeIndex >= 0 ? rest.slice(pipeIndex + 1) : undefined;
-
-			const attrMatch = selectorPart.match(/^(.+?)\?(.+)$/);
-			const selector = attrMatch ? attrMatch[1] : selectorPart;
-			const attribute = attrMatch ? attrMatch[2] : undefined;
-
-			const content = extractContentBySelector(
-				linkedomDocument,
-				selector.replace(/\\"/g, '"'),
-				attribute,
-				extractHtml
-			);
-			const contentString = Array.isArray(content) ? JSON.stringify(content) : content;
-
-			if (filtersString) {
-				replacement = applyFilters(contentString, filtersString, currentUrl);
-			} else {
-				replacement = contentString;
-			}
-		} else if (trimmedMatch.startsWith('schema:')) {
-			replacement = await processSchema(fullMatch, variables, currentUrl);
-		} else if (trimmedMatch.startsWith('"') || trimmedMatch.startsWith('prompt:')) {
-			// Prompts are not supported in CLI — return empty string
-			replacement = '';
-		} else {
-			replacement = await processSimpleVariable(trimmedMatch, variables, currentUrl);
-		}
-
-		result = result.substring(0, match.index) + replacement + result.substring(match.index + fullMatch.length);
-		regex.lastIndex = match.index + replacement.length;
-	}
-
-	return result;
+		return filtersString ? applyFilters(contentString, filtersString, currentUrl) : contentString;
+	};
 }
 
 // ---------------------------------------------------------------------------
@@ -267,31 +194,41 @@ async function main(): Promise<void> {
 	const markdownContent = createMarkdownContent(defuddleResult.content, args.url);
 
 	// Build template variables — markdown for {{content}}, HTML for {{contentHtml}}
-	const variables = buildVariables(
-		{ ...defuddleResult, content: markdownContent } as any,
-		args.url,
-		html,
-		defuddleResult.content
-	);
+	const variables = buildVariables({
+		title: defuddleResult.title,
+		author: defuddleResult.author,
+		content: markdownContent,
+		contentHtml: defuddleResult.content,
+		url: args.url,
+		fullHtml: html,
+		description: defuddleResult.description,
+		favicon: defuddleResult.favicon,
+		image: defuddleResult.image,
+		published: defuddleResult.published,
+		site: defuddleResult.site,
+		language: defuddleResult.language,
+		wordCount: defuddleResult.wordCount,
+		schemaOrgData: defuddleResult.schemaOrgData,
+		metaTags: defuddleResult.metaTags,
+		extractedContent: defuddleResult.variables,
+	});
+
+	// Create CLI-specific resolvers for selector variables
+	const asyncResolver = createCliAsyncResolver(document);
+	const selectorProcessor = createCliSelectorProcessor(document);
+
+	// Helper to compile a template string with CLI resolvers
+	const compile = (text: string) =>
+		compileTemplate(0, text, variables, args.url, asyncResolver, selectorProcessor);
 
 	// Compile note name
-	const compiledNoteName = await compileTemplateCLI(
-		template.noteNameFormat,
-		variables,
-		args.url,
-		document
-	);
+	const compiledNoteName = await compile(template.noteNameFormat);
 	const noteName = sanitizeFileName(compiledNoteName) || 'Untitled';
 
 	// Compile each property value
 	const compiledProperties: Property[] = [];
 	for (const prop of template.properties) {
-		const compiledValue = await compileTemplateCLI(
-			prop.value,
-			variables,
-			args.url,
-			document
-		);
+		const compiledValue = await compile(prop.value);
 		compiledProperties.push({
 			name: prop.name,
 			value: compiledValue,
@@ -299,15 +236,10 @@ async function main(): Promise<void> {
 	}
 
 	// Generate frontmatter
-	const frontmatter = generateFrontmatterCLI(compiledProperties, propertyTypes);
+	const frontmatter = generateFrontmatter(compiledProperties, propertyTypes || {});
 
 	// Compile note content
-	const compiledContent = await compileTemplateCLI(
-		template.noteContentFormat,
-		variables,
-		args.url,
-		document
-	);
+	const compiledContent = await compile(template.noteContentFormat);
 
 	// Combine
 	const fullContent = frontmatter ? frontmatter + '\n' + compiledContent : compiledContent;

@@ -3,6 +3,7 @@ import * as highlighter from './utils/highlighter';
 import { loadSettings, generalSettings } from './utils/storage-utils';
 import Defuddle from 'defuddle';
 import { getDomain } from './utils/string-utils';
+import { extractContentBySelector as extractContentBySelectorShared } from './utils/shared';
 import { createMarkdownContent } from 'defuddle/full';
 import { flattenShadowDom } from './utils/flatten-shadow-dom';
 
@@ -427,29 +428,7 @@ declare global {
 	});
 
 	function extractContentBySelector(selector: string, attribute?: string, extractHtml: boolean = false): string | string[] {
-		try {
-			const elements = document.querySelectorAll(selector);
-			
-			if (elements.length > 1) {
-				return Array.from(elements).map(el => {
-					if (attribute) {
-						return el.getAttribute(attribute) || '';
-					}
-					return extractHtml ? el.outerHTML : el.textContent?.trim() || '';
-				});
-			} else if (elements.length === 1) {
-				if (attribute) {
-					return elements[0].getAttribute(attribute) || '';
-				}
-				return extractHtml ? elements[0].outerHTML : elements[0].textContent?.trim() || '';
-			} else {
-				console.log(`No elements found for selector: ${selector}`);
-				return '';
-			}
-		} catch (error) {
-			console.error('Error in extractContentBySelector:', error, { selector, attribute, extractHtml });
-			return '';
-		}
+		return extractContentBySelectorShared(document, selector, attribute, extractHtml);
 	}
 
 	function updateHasHighlights() {
