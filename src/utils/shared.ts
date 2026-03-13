@@ -148,9 +148,10 @@ export function generateFrontmatter(
 ): string {
 	let frontmatter = '---\n';
 	for (const property of properties) {
-		const needsQuotes = /[:\s\{\}\[\],&*#?|<>=!%@\\-]/.test(property.name)
-			|| /^[\d]/.test(property.name)
-			|| /^(true|false|null|yes|no|on|off)$/i.test(property.name.trim());
+		const trimmedName = property.name.trim();
+		const needsQuotes = /[:\s\{\}\[\],&*#?|<>=!%@\\-]/.test(trimmedName)
+			|| /^\d/.test(trimmedName)
+			|| /^(true|false|null|yes|no|on|off)$/i.test(trimmedName);
 		const propertyKey = needsQuotes
 			? (property.name.includes('"')
 				? `'${property.name.replace(/'/g, "''")}'`
@@ -231,15 +232,15 @@ export function formatPropertyValue(value: string, type: string, templateValue: 
 		case 'checkbox':
 			return (value.toLowerCase() === 'true' || value === '1').toString();
 		case 'date':
+		case 'datetime': {
 			if (!templateValue.includes('|date:')) {
-				return dayjs(value).isValid() ? dayjs(value).format('YYYY-MM-DD') : value;
+				const d = dayjs(value);
+				if (d.isValid()) {
+					return d.format(type === 'date' ? 'YYYY-MM-DD' : 'YYYY-MM-DDTHH:mm:ssZ');
+				}
 			}
 			return value;
-		case 'datetime':
-			if (!templateValue.includes('|date:')) {
-				return dayjs(value).isValid() ? dayjs(value).format('YYYY-MM-DDTHH:mm:ssZ') : value;
-			}
-			return value;
+		}
 		default:
 			return value;
 	}

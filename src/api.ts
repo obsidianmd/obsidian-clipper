@@ -5,7 +5,7 @@
 import DefuddleClass from 'defuddle';
 import { createMarkdownContent } from 'defuddle/full';
 import { compileTemplate, SelectorProcessor } from './utils/template-compiler';
-import { AsyncResolver } from './utils/renderer';
+import { AsyncResolver, RenderContext } from './utils/renderer';
 import { applyFilters } from './utils/filters';
 import { buildVariables, generateFrontmatter, extractContentBySelector, formatPropertyValue } from './utils/shared';
 import { sanitizeFileName } from './utils/string-utils';
@@ -45,7 +45,7 @@ export interface ClipResult {
 type DocLike = { querySelectorAll: (selector: string) => any };
 
 export function createAsyncResolver(doc: DocLike): AsyncResolver {
-	return async (name: string): Promise<any> => {
+	return async (name: string, _context: RenderContext): Promise<any> => {
 		if (name.startsWith('selector:') || name.startsWith('selectorHtml:')) {
 			const extractHtml = name.startsWith('selectorHtml:');
 			const prefix = extractHtml ? 'selectorHtml:' : 'selector:';

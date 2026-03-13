@@ -1,13 +1,14 @@
+import { execFile } from 'child_process';
+import { promisify } from 'util';
 import { sanitizeFileName } from './string-utils';
 import { Template } from '../types/types';
+
+const execFileAsync = promisify(execFile);
 
 /**
  * Check if the `obsidian` CLI is available on PATH.
  */
 async function hasObsidianCli(): Promise<boolean> {
-	const { execFile } = await import('child_process');
-	const { promisify } = await import('util');
-	const execFileAsync = promisify(execFile);
 	try {
 		await execFileAsync('obsidian', ['version']);
 		return true;
@@ -27,10 +28,6 @@ async function openViaObsidianCli(
 	behavior: Template['behavior'],
 	silent: boolean
 ): Promise<string> {
-	const { execFile } = await import('child_process');
-	const { promisify } = await import('util');
-	const execFileAsync = promisify(execFile);
-
 	const isDailyNote = behavior === 'append-daily' || behavior === 'prepend-daily';
 	const vaultArgs = vault ? [`vault=${vault}`] : [];
 
@@ -86,10 +83,6 @@ async function openViaUri(
 	behavior: Template['behavior'],
 	silent: boolean
 ): Promise<void> {
-	const { execFile } = await import('child_process');
-	const { promisify } = await import('util');
-	const execFileAsync = promisify(execFile);
-
 	const isDailyNote = behavior === 'append-daily' || behavior === 'prepend-daily';
 
 	let obsidianUrl: string;
