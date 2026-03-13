@@ -60,6 +60,17 @@ const memoizedGenerateFrontmatter = memoizeWithExpiration(
 	{ expirationMs: 5000 }
 );
 
+function getPropertiesFromDOM(): Property[] {
+	return Array.from(document.querySelectorAll('.metadata-property input')).map(input => {
+		const inputElement = input as HTMLInputElement;
+		return {
+			id: inputElement.dataset.id || Date.now().toString() + Math.random().toString(36).slice(2, 11),
+			name: inputElement.id,
+			value: inputElement.type === 'checkbox' ? inputElement.checked : inputElement.value
+		};
+	}) as Property[];
+}
+
 // Helper function to get tab info from background script
 async function getTabInfo(tabId: number): Promise<{ id: number; url: string }> {
 	const response = await browser.runtime.sendMessage({ action: "getTabInfo", tabId }) as { success?: boolean; tab?: { id: number; url: string }; error?: string };
@@ -409,14 +420,7 @@ function setupEventListeners(tabId: number) {
 
 	if (copyContentButton) {
 		copyContentButton.addEventListener('click', async () => {
-			const properties = Array.from(document.querySelectorAll('.metadata-property input')).map(input => {
-				const inputElement = input as HTMLInputElement;
-				return {
-					id: inputElement.dataset.id || Date.now().toString() + Math.random().toString(36).slice(2, 11),
-					name: inputElement.id,
-					value: inputElement.type === 'checkbox' ? inputElement.checked : inputElement.value
-				};
-			}) as Property[];
+			const properties = getPropertiesFromDOM();
 
 			const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
 			const frontmatter = await generateFrontmatter(properties);
@@ -435,14 +439,7 @@ function setupEventListeners(tabId: number) {
 		shareButtons.forEach(button => {
 			button.addEventListener('click', async (e) => {
 				// Get content synchronously
-				const properties = Array.from(document.querySelectorAll('.metadata-property input')).map(input => {
-					const inputElement = input as HTMLInputElement;
-					return {
-						id: inputElement.dataset.id || Date.now().toString() + Math.random().toString(36).slice(2, 11),
-						name: inputElement.id,
-						value: inputElement.type === 'checkbox' ? inputElement.checked : inputElement.value
-					};
-				}) as Property[];
+				const properties = getPropertiesFromDOM();
 
 				const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
 				
@@ -1164,14 +1161,7 @@ async function handleSaveToDownloads() {
 		const path = pathField?.value || '';
 		const vault = vaultDropdown?.value || '';
 		
-		const properties = Array.from(document.querySelectorAll('.metadata-property input')).map(input => {
-			const inputElement = input as HTMLInputElement;
-			return {
-				id: inputElement.dataset.id || Date.now().toString() + Math.random().toString(36).slice(2, 11),
-				name: inputElement.id,
-				value: inputElement.type === 'checkbox' ? inputElement.checked : inputElement.value
-			};
-		}) as Property[];
+		const properties = getPropertiesFromDOM();
 
 		const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
 		const frontmatter = await generateFrontmatter(properties);
@@ -1258,14 +1248,7 @@ async function handleClipObsidian(): Promise<void> {
 		}
 
 		// Gather content
-		const properties = Array.from(document.querySelectorAll('.metadata-property input')).map(input => {
-			const inputElement = input as HTMLInputElement;
-			return {
-				id: inputElement.dataset.id || Date.now().toString() + Math.random().toString(36).slice(2, 11),
-				name: inputElement.id,
-				value: inputElement.type === 'checkbox' ? inputElement.checked : inputElement.value
-			};
-		}) as Property[];
+		const properties = getPropertiesFromDOM();
 
 		const frontmatter = await generateFrontmatter(properties);
 		const fileContent = frontmatter + noteContentField.value;
@@ -1332,14 +1315,7 @@ function getActionIcon(actionType: string): string {
 }
 
 async function copyContent() {
-	const properties = Array.from(document.querySelectorAll('.metadata-property input')).map(input => {
-		const inputElement = input as HTMLInputElement;
-		return {
-			id: inputElement.dataset.id || Date.now().toString() + Math.random().toString(36).slice(2, 11),
-			name: inputElement.id,
-			value: inputElement.type === 'checkbox' ? inputElement.checked : inputElement.value
-		};
-	}) as Property[];
+	const properties = getPropertiesFromDOM();
 
 	const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
 	const frontmatter = await generateFrontmatter(properties);
