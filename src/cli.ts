@@ -25,6 +25,7 @@ interface CliArgs {
 	open: boolean;
 	silent: boolean;
 	propertyTypesPath?: string;
+	htmlPath?: string;
 }
 
 function printUsage(): void {
@@ -34,6 +35,7 @@ Usage: obsidian-clipper <url> [options]
 Options:
   -t, --template <path>        Path to template JSON file (required)
   -o, --output <path>          Output .md file path (default: stdout)
+      --html <path>            Read HTML from file instead of fetching URL (use - for stdin)
       --vault <name>           Obsidian vault name (for URI mode)
       --open                   Open in Obsidian via URI instead of writing file
       --silent                 Add silent=true to Obsidian URI
@@ -52,6 +54,7 @@ function parseArgs(argv: string[]): CliArgs {
 	let open = false;
 	let silent = false;
 	let propertyTypesPath: string | undefined;
+	let htmlPath: string | undefined;
 
 	for (let i = 0; i < args.length; i++) {
 		const arg = args[i];
@@ -60,15 +63,19 @@ function parseArgs(argv: string[]): CliArgs {
 			case '--help':
 				printUsage();
 				process.exit(0);
+				break;
 			case '-t':
 			case '--template':
+				if (i + 1 >= args.length) { console.error('Error: --template requires a value'); process.exit(1); }
 				templatePath = args[++i];
 				break;
 			case '-o':
 			case '--output':
+				if (i + 1 >= args.length) { console.error('Error: --output requires a value'); process.exit(1); }
 				outputPath = args[++i];
 				break;
 			case '--vault':
+				if (i + 1 >= args.length) { console.error('Error: --vault requires a value'); process.exit(1); }
 				vault = args[++i];
 				break;
 			case '--open':
@@ -77,7 +84,12 @@ function parseArgs(argv: string[]): CliArgs {
 			case '--silent':
 				silent = true;
 				break;
+			case '--html':
+				if (i + 1 >= args.length) { console.error('Error: --html requires a value'); process.exit(1); }
+				htmlPath = args[++i];
+				break;
 			case '--property-types':
+				if (i + 1 >= args.length) { console.error('Error: --property-types requires a value'); process.exit(1); }
 				propertyTypesPath = args[++i];
 				break;
 			default:
@@ -103,7 +115,7 @@ function parseArgs(argv: string[]): CliArgs {
 		process.exit(1);
 	}
 
-	return { url, templatePath, outputPath, vault, open, silent, propertyTypesPath };
+	return { url, templatePath, outputPath, vault, open, silent, propertyTypesPath, htmlPath };
 }
 
 // ---------------------------------------------------------------------------
@@ -114,7 +126,9 @@ function parseArgs(argv: string[]): CliArgs {
  * Create an AsyncResolver that runs CSS selectors on the linkedom document.
  * Used by the AST renderer for selector variables in for-loops / conditionals.
  */
-function createCliAsyncResolver(linkedomDocument: any): AsyncResolver {
+type DocLike = { querySelectorAll: (selector: string) => any };
+
+function createCliAsyncResolver(linkedomDocument: DocLike): AsyncResolver {
 	return async (name: string): Promise<any> => {
 		if (name.startsWith('selector:') || name.startsWith('selectorHtml:')) {
 			const extractHtml = name.startsWith('selectorHtml:');
@@ -140,7 +154,7 @@ function createCliAsyncResolver(linkedomDocument: any): AsyncResolver {
  * Create a SelectorProcessor that resolves selectors on the linkedom document.
  * Used by processVariables for deferred selector variables in post-processing.
  */
-function createCliSelectorProcessor(linkedomDocument: any): SelectorProcessor {
+function createCliSelectorProcessor(linkedomDocument: DocLike): SelectorProcessor {
 	return async (match: string, currentUrl: string): Promise<string> => {
 		const selectorRegex = /{{(selector|selectorHtml):(.*?)(?:\?(.*?))?(?:\|(.*?))?}}/;
 		const matches = match.match(selectorRegex);
@@ -175,13 +189,22 @@ async function main(): Promise<void> {
 		propertyTypes = JSON.parse(raw);
 	}
 
-	// Fetch URL
-	const response = await fetch(args.url);
-	if (!response.ok) {
-		console.error(`Failed to fetch ${args.url}: ${response.status} ${response.statusText}`);
-		process.exit(1);
+	// Get HTML: from file/stdin (--html) or by fetching URL
+	let html: string;
+	if (args.htmlPath) {
+		if (args.htmlPath === '-') {
+			html = fs.readFileSync(0, 'utf-8'); // stdin
+		} else {
+			html = fs.readFileSync(path.resolve(args.htmlPath), 'utf-8');
+		}
+	} else {
+		const response = await fetch(args.url);
+		if (!response.ok) {
+			console.error(`Failed to fetch ${args.url}: ${response.status} ${response.statusText}`);
+			process.exit(1);
+		}
+		html = await response.text();
 	}
-	const html = await response.text();
 
 	// Parse with linkedom
 	const { document } = parseHTML(html);

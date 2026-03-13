@@ -22,11 +22,9 @@ export async function openInObsidian(
 	if (isDailyNote) {
 		obsidianUrl = `obsidian://daily?`;
 	} else {
-		if (path && !path.endsWith('/')) {
-			path += '/';
-		}
+		const normalizedPath = path && !path.endsWith('/') ? path + '/' : path;
 		const formattedNoteName = sanitizeFileName(noteName);
-		obsidianUrl = `obsidian://new?file=${encodeURIComponent(path + formattedNoteName)}`;
+		obsidianUrl = `obsidian://new?file=${encodeURIComponent(normalizedPath + formattedNoteName)}`;
 	}
 
 	if (behavior.startsWith('append')) {
@@ -51,7 +49,7 @@ export async function openInObsidian(
 	if (platform === 'darwin') {
 		await execFileAsync('open', [obsidianUrl]);
 	} else if (platform === 'win32') {
-		await execFileAsync('cmd', ['/c', 'start', '', obsidianUrl]);
+		await execFileAsync('powershell', ['-Command', `Start-Process '${obsidianUrl.replace(/'/g, "''")}'`]);
 	} else {
 		await execFileAsync('xdg-open', [obsidianUrl]);
 	}
