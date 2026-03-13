@@ -25,6 +25,7 @@ interface CliArgs {
 	vault?: string;
 	open: boolean;
 	silent: boolean;
+	uri: boolean;
 	propertyTypesPath?: string;
 	htmlPath?: string;
 }
@@ -37,9 +38,10 @@ Options:
   -t, --template <path>        Path to template JSON file (required)
   -o, --output <path>          Output .md file path (default: stdout)
       --html <path>            Read HTML from file instead of fetching URL (use - for stdin)
-      --vault <name>           Obsidian vault name (for URI mode)
-      --open                   Open in Obsidian via URI instead of writing file
-      --silent                 Add silent=true to Obsidian URI
+      --vault <name>           Obsidian vault name
+      --open                   Send to Obsidian instead of writing file
+      --uri                    Use URI scheme instead of Obsidian CLI
+      --silent                 Suppress Obsidian focus (URI mode)
       --property-types <path>  JSON mapping property names to types
   -h, --help                   Show this help message
 `.trim();
@@ -54,6 +56,7 @@ function parseArgs(argv: string[]): CliArgs {
 	let vault: string | undefined;
 	let open = false;
 	let silent = false;
+	let uri = false;
 	let propertyTypesPath: string | undefined;
 	let htmlPath: string | undefined;
 
@@ -84,6 +87,9 @@ function parseArgs(argv: string[]): CliArgs {
 				break;
 			case '--silent':
 				silent = true;
+				break;
+			case '--uri':
+				uri = true;
 				break;
 			case '--html':
 				if (i + 1 >= args.length) { console.error('Error: --html requires a value'); process.exit(1); }
@@ -116,7 +122,7 @@ function parseArgs(argv: string[]): CliArgs {
 		process.exit(1);
 	}
 
-	return { url, templatePath, outputPath, vault, open, silent, propertyTypesPath, htmlPath };
+	return { url, templatePath, outputPath, vault, open, silent, uri, propertyTypesPath, htmlPath };
 }
 
 // ---------------------------------------------------------------------------
@@ -209,6 +215,11 @@ async function main(): Promise<void> {
 
 	// Parse with linkedom
 	const { document } = parseHTML(html);
+
+	if (!document.documentElement) {
+		console.error('Error: Could not parse HTML (empty or invalid document)');
+		process.exit(1);
+	}
 
 	// Run defuddle to extract content as HTML
 	const defuddle = new DefuddleClass(document as unknown as Document, { url: args.url });
@@ -304,15 +315,16 @@ async function main(): Promise<void> {
 	// Output
 	if (args.open) {
 		const vault = args.vault || template.vault || '';
-		await openInObsidian(
+		const result = await openInObsidian(
 			fullContent,
 			noteName,
 			template.path || '',
 			vault,
 			template.behavior || 'create',
-			args.silent
+			args.silent,
+			args.uri
 		);
-		console.error(`Opened in Obsidian${vault ? ` (vault: ${vault})` : ''}`);
+		console.error(result);
 	} else if (args.outputPath) {
 		fs.writeFileSync(path.resolve(args.outputPath), fullContent, 'utf-8');
 		console.error(`Written to ${args.outputPath}`);
