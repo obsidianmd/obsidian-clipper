@@ -35,7 +35,8 @@ function printUsage(): void {
 Usage: obsidian-clipper <url> [options]
 
 Options:
-  -t, --template <path>        Path to template JSON file (required)
+  -t, --template <path>        Path to template JSON file or directory (required)
+                               If a directory, auto-matches template by URL triggers
   -o, --output <path>          Output .md file path (default: stdout)
       --html <path>            Read HTML from file instead of fetching URL (use - for stdin)
       --vault <name>           Obsidian vault name
@@ -126,6 +127,91 @@ function parseArgs(argv: string[]): CliArgs {
 }
 
 // ---------------------------------------------------------------------------
+// Template loading and trigger matching
+// ---------------------------------------------------------------------------
+
+function loadTemplatesFromDir(dirPath: string): Template[] {
+	const resolved = path.resolve(dirPath);
+	const files = fs.readdirSync(resolved).filter(f => f.endsWith('.json'));
+	return files.map(f => {
+		const raw = fs.readFileSync(path.join(resolved, f), 'utf-8');
+		const template: Template = JSON.parse(raw);
+		(template as any)._filePath = path.join(resolved, f);
+		return template;
+	});
+}
+
+function matchTriggerPattern(pattern: string, url: string): boolean {
+	if (pattern.startsWith('/') && pattern.endsWith('/')) {
+		try {
+			return new RegExp(pattern.slice(1, -1)).test(url);
+		} catch {
+			return false;
+		}
+	}
+	return url.startsWith(pattern);
+}
+
+function matchSchemaPattern(pattern: string, schemaOrgData: any): boolean {
+	const match = pattern.match(/^schema:(@\w+)?(?:\.(.+?))?(?:=(.+))?$/);
+	if (!match) return false;
+	const [, schemaType, schemaKey, expectedValue] = match;
+	if (!schemaType && !schemaKey) return false;
+
+	const schemaArray = Array.isArray(schemaOrgData) ? schemaOrgData : [schemaOrgData];
+	const flattened = schemaArray.flatMap((s: any) => Array.isArray(s) ? s : [s]);
+
+	for (const schema of flattened) {
+		if (!schema || typeof schema !== 'object') continue;
+		if (schemaType) {
+			const types = Array.isArray(schema['@type']) ? schema['@type'] : [schema['@type']];
+			if (!types.includes(schemaType.slice(1))) continue;
+		}
+		if (schemaKey) {
+			const keys = schemaKey.split('.');
+			let val = schema;
+			for (const k of keys) {
+				val = val && typeof val === 'object' && k in val ? val[k] : undefined;
+			}
+			if (expectedValue) {
+				if (Array.isArray(val) ? val.includes(expectedValue) : val === expectedValue) return true;
+			} else if (val !== undefined) {
+				return true;
+			}
+		} else {
+			return true;
+		}
+	}
+	return false;
+}
+
+function findMatchingTemplate(templates: Template[], url: string, schemaOrgData?: any): Template | undefined {
+	// First pass: URL prefix and regex triggers (no schema data needed)
+	for (const template of templates) {
+		if (!template.triggers) continue;
+		for (const trigger of template.triggers) {
+			if (!trigger.startsWith('schema:') && matchTriggerPattern(trigger, url)) {
+				return template;
+			}
+		}
+	}
+
+	// Second pass: schema triggers (only if schema data is available)
+	if (schemaOrgData) {
+		for (const template of templates) {
+			if (!template.triggers) continue;
+			for (const trigger of template.triggers) {
+				if (trigger.startsWith('schema:') && matchSchemaPattern(trigger, schemaOrgData)) {
+					return template;
+				}
+			}
+		}
+	}
+
+	return undefined;
+}
+
+// ---------------------------------------------------------------------------
 // CLI-specific resolvers for template compilation
 // ---------------------------------------------------------------------------
 
@@ -185,9 +271,22 @@ function createCliSelectorProcessor(linkedomDocument: DocLike): SelectorProcesso
 async function main(): Promise<void> {
 	const args = parseArgs(process.argv);
 
-	// Load template
-	const templateRaw = fs.readFileSync(path.resolve(args.templatePath), 'utf-8');
-	const template: Template = JSON.parse(templateRaw);
+	// Determine if template path is a file or directory
+	const resolvedTemplatePath = path.resolve(args.templatePath);
+	const isDir = fs.statSync(resolvedTemplatePath).isDirectory();
+	let templates: Template[] | undefined;
+	let template!: Template;
+
+	if (isDir) {
+		templates = loadTemplatesFromDir(resolvedTemplatePath);
+		if (templates.length === 0) {
+			console.error(`Error: No .json template files found in ${args.templatePath}`);
+			process.exit(1);
+		}
+	} else {
+		const templateRaw = fs.readFileSync(resolvedTemplatePath, 'utf-8');
+		template = JSON.parse(templateRaw);
+	}
 
 	// Load optional property types
 	let propertyTypes: Record<string, string> | undefined;
@@ -224,6 +323,18 @@ async function main(): Promise<void> {
 	// Run defuddle to extract content as HTML
 	const defuddle = new DefuddleClass(document as unknown as Document, { url: args.url });
 	const defuddleResult = defuddle.parse();
+
+	// If using a template directory, match triggers now (after defuddle for schema triggers)
+	if (templates) {
+		const matched = findMatchingTemplate(templates, args.url, defuddleResult.schemaOrgData);
+		if (!matched) {
+			console.error(`Error: No template matched URL ${args.url}`);
+			console.error(`Searched ${templates.length} templates in ${args.templatePath}`);
+			process.exit(1);
+		}
+		template = matched;
+		console.error(`Matched template: ${(template as any)._filePath || 'unknown'}`);
+	}
 
 	// Convert HTML content to markdown using defuddle's Turndown wrapper
 	const markdownContent = createMarkdownContent(defuddleResult.content, args.url);
