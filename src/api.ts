@@ -181,6 +181,7 @@ export async function clip(options: ClipOptions): Promise<ClipResult> {
 	const documentElement = doc.documentElement || doc;
 
 	// Extract content with defuddle
+	// Cast through unknown: linkedom's Document is structurally compatible but not nominally typed as DOM Document
 	const defuddle = new DefuddleClass(documentElement as unknown as Document, { url });
 	const defuddleResult = defuddle.parse();
 

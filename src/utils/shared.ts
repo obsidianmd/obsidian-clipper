@@ -62,7 +62,7 @@ export function buildVariables(params: BuildVariablesParams): Record<string, str
 		'{{title}}': (params.title || '').trim(),
 		'{{url}}': currentUrl.trim(),
 		'{{language}}': (params.language || '').trim(),
-		'{{words}}': (params.wordCount || 0).toString(),
+		'{{words}}': (params.wordCount ?? 0).toString(),
 	};
 
 	// Add extracted content (e.g. defuddle variables like transcript)

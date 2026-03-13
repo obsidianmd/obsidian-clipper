@@ -123,7 +123,7 @@ async function openViaUri(
 	if (platform === 'darwin') {
 		await execFileAsync('open', [obsidianUrl]);
 	} else if (platform === 'win32') {
-		await execFileAsync('powershell', ['-Command', `Start-Process '${obsidianUrl.replace(/'/g, "''")}'`]);
+		await execFileAsync('powershell', ['-Command', 'Start-Process', '-Uri', obsidianUrl]);
 	} else {
 		await execFileAsync('xdg-open', [obsidianUrl]);
 	}

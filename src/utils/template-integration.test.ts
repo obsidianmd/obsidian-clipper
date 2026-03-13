@@ -139,9 +139,15 @@ describe('Template fixtures', () => {
 		const expected = loadExpected(name);
 
 		if (!expected) {
-			console.log(`Creating baseline expected result for ${name}`);
-			saveExpected(name, result);
-			return;
+			if (process.env.UPDATE_FIXTURES) {
+				saveExpected(name, result);
+				console.log(`Created baseline for ${name}`);
+				return;
+			}
+			throw new Error(
+				`No expected output for fixture "${name}". ` +
+				`Run with UPDATE_FIXTURES=1 to create it.`
+			);
 		}
 
 		expect(result.trim()).toEqual(expected.trim());

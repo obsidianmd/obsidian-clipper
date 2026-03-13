@@ -123,13 +123,15 @@ function parseArgs(argv: string[]): CliArgs {
 // Template loading
 // ---------------------------------------------------------------------------
 
+const templateFilePaths = new Map<Template, string>();
+
 function loadTemplatesFromDir(dirPath: string): Template[] {
 	const resolved = path.resolve(dirPath);
 	const files = fs.readdirSync(resolved).filter(f => f.endsWith('.json'));
 	return files.map(f => {
 		const raw = fs.readFileSync(path.join(resolved, f), 'utf-8');
 		const template: Template = JSON.parse(raw);
-		(template as any)._filePath = path.join(resolved, f);
+		templateFilePaths.set(template, path.join(resolved, f));
 		return template;
 	});
 }
@@ -155,7 +157,7 @@ async function main(): Promise<void> {
 	const resolvedTemplatePath = path.resolve(args.templatePath);
 	const isDir = fs.statSync(resolvedTemplatePath).isDirectory();
 	let templates: Template[] | undefined;
-	let template!: Template;
+	let template: Template | undefined;
 
 	if (isDir) {
 		templates = loadTemplatesFromDir(resolvedTemplatePath);
@@ -217,7 +219,12 @@ async function main(): Promise<void> {
 			process.exit(1);
 		}
 		template = matched;
-		console.error(`Matched template: ${(template as any)._filePath || 'unknown'}`);
+		console.error(`Matched template: ${templateFilePaths.get(template) || 'unknown'}`);
+	}
+
+	if (!template) {
+		console.error('Error: No template resolved');
+		process.exit(1);
 	}
 
 	// Call the API (reuse pre-parsed document if available)
