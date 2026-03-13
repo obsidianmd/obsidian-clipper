@@ -86,8 +86,16 @@ const ALLOWED_HIGHLIGHT_TAGS = [
 ];
 
 const BLOCK_LEVEL_TAGS_FOR_SPLIT = [
-	'P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'LI', 'PRE', 'BLOCKQUOTE', 'FIGURE', 'TABLE'
+	'P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'LI', 'PRE', 'BLOCKQUOTE', 'FIGURE', 'TABLE', 'DIV'
 ];
+
+// Text selections frequently live inside div-based article layouts even when element-highlighting
+// should remain constrained to tighter semantic tags (paragraphs, list items, etc).
+const ALLOWED_TEXT_HIGHLIGHT_CONTAINER_TAGS = [...ALLOWED_HIGHLIGHT_TAGS, 'DIV'];
+
+function isAllowedTextHighlightContainerTag(tagName: string): boolean {
+	return ALLOWED_TEXT_HIGHLIGHT_CONTAINER_TAGS.includes(tagName.toUpperCase());
+}
 
 export interface HighlightData {
 	id: string;
@@ -602,7 +610,7 @@ function getHighlightRanges(range: Range): TextHighlightData[] {
 	if (newHighlights.length === 0 && !range.collapsed) {
 		console.warn("Splitting selection by block failed or no suitable blocks found, falling back to single highlight for selection.");
 		const parentElement = getHighlightableParent(range.commonAncestorContainer);
-		if (ALLOWED_HIGHLIGHT_TAGS.includes(parentElement.tagName.toUpperCase())) {
+		if (isAllowedTextHighlightContainerTag(parentElement.tagName)) {
 			const tempDivSingle = document.createElement('div');
 			tempDivSingle.appendChild(range.cloneContents());
 
@@ -627,7 +635,7 @@ function getHighlightRanges(range: Range): TextHighlightData[] {
 				});
 			}
 		} else {
-			console.log("Fallback highlight's parent is not in ALLOWED_HIGHLIGHT_TAGS, skipping highlight:", parentElement.tagName);
+			console.log("Fallback highlight's parent is not in ALLOWED_TEXT_HIGHLIGHT_CONTAINER_TAGS, skipping highlight:", parentElement.tagName);
 		}
 	}
 
@@ -1040,8 +1048,8 @@ function addToHistory(type: 'add' | 'remove', oldHighlights: AnyHighlightData[],
 function isConsideredBlockElement(element: Element): boolean {
 	if (!element || typeof element.tagName !== 'string') return false;
 	const tagName = element.tagName.toUpperCase();
-	// Element must be an allowed highlight target AND a block tag we split by.
-	return ALLOWED_HIGHLIGHT_TAGS.includes(tagName) && BLOCK_LEVEL_TAGS_FOR_SPLIT.includes(tagName);
+	// A text-selection split target must be a block-like ancestor; semantic allow-list checks happen separately.
+	return BLOCK_LEVEL_TAGS_FOR_SPLIT.includes(tagName);
 }
 
 // Helper to find the closest ancestor that is an allowed highlightable block
@@ -1051,7 +1059,7 @@ function getClosestAllowedBlock(node: Node | null): Element | null {
 		if (current.nodeType === Node.ELEMENT_NODE) {
 			const el = current as Element;
 			// Check if it's an allowed tag overall and if it's a block element we use for splitting text selections.
-			if (ALLOWED_HIGHLIGHT_TAGS.includes(el.tagName.toUpperCase()) && isConsideredBlockElement(el)) {
+			if (isAllowedTextHighlightContainerTag(el.tagName) && isConsideredBlockElement(el)) {
 				return el;
 			}
 		}
