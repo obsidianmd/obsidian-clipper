@@ -225,15 +225,13 @@ async function main(): Promise<void> {
 	const compiledNoteName = await compile(template.noteNameFormat);
 	const noteName = sanitizeFileName(compiledNoteName) || 'Untitled';
 
-	// Compile each property value
-	const compiledProperties: Property[] = [];
-	for (const prop of template.properties) {
-		const compiledValue = await compile(prop.value);
-		compiledProperties.push({
+	// Compile each property value (independent, so run in parallel)
+	const compiledProperties: Property[] = await Promise.all(
+		template.properties.map(async (prop) => ({
 			name: prop.name,
-			value: compiledValue,
-		});
-	}
+			value: await compile(prop.value),
+		}))
+	);
 
 	// Generate frontmatter
 	const frontmatter = generateFrontmatter(compiledProperties, propertyTypes || {});

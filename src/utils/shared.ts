@@ -41,14 +41,15 @@ export function buildVariables(params: BuildVariablesParams): Record<string, str
 	const currentUrl = params.url.replace(/#:~:text=[^&]+(&|$)/, '');
 	const noteName = sanitizeFileName(params.title);
 
+	const timestamp = dayjs().format('YYYY-MM-DDTHH:mm:ssZ');
 	const variables: Record<string, string> = {
 		'{{author}}': (params.author || '').trim(),
 		'{{content}}': (params.content || '').trim(),
 		'{{contentHtml}}': (params.contentHtml || '').trim(),
 		'{{selection}}': (params.selection || '').trim(),
 		'{{selectionHtml}}': (params.selectionHtml || '').trim(),
-		'{{date}}': dayjs().format('YYYY-MM-DDTHH:mm:ssZ'),
-		'{{time}}': dayjs().format('YYYY-MM-DDTHH:mm:ssZ'),
+		'{{date}}': timestamp,
+		'{{time}}': timestamp,
 		'{{description}}': (params.description || '').trim(),
 		'{{domain}}': getDomain(currentUrl),
 		'{{favicon}}': params.favicon || '',

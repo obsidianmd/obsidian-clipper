@@ -1,4 +1,5 @@
 import { sanitizeFileName } from './string-utils';
+import { Template } from '../types/types';
 
 /**
  * Open a note in Obsidian via URI scheme.
@@ -8,12 +9,12 @@ export async function openInObsidian(
 	noteName: string,
 	path: string,
 	vault: string,
-	behavior: string,
+	behavior: Template['behavior'],
 	silent: boolean
 ): Promise<void> {
-	const { exec } = await import('child_process');
+	const { execFile } = await import('child_process');
 	const { promisify } = await import('util');
-	const execAsync = promisify(exec);
+	const execFileAsync = promisify(execFile);
 
 	const isDailyNote = behavior === 'append-daily' || behavior === 'prepend-daily';
 
@@ -47,14 +48,11 @@ export async function openInObsidian(
 	obsidianUrl += `&content=${encodeURIComponent(fileContent)}`;
 
 	const platform = process.platform;
-	let command: string;
 	if (platform === 'darwin') {
-		command = `open "${obsidianUrl}"`;
+		await execFileAsync('open', [obsidianUrl]);
 	} else if (platform === 'win32') {
-		command = `start "" "${obsidianUrl}"`;
+		await execFileAsync('cmd', ['/c', 'start', '', obsidianUrl]);
 	} else {
-		command = `xdg-open "${obsidianUrl}"`;
+		await execFileAsync('xdg-open', [obsidianUrl]);
 	}
-
-	await execAsync(command);
 }
