@@ -7,7 +7,7 @@ import { createMarkdownContent } from 'defuddle/full';
 import { compileTemplate, SelectorProcessor } from './utils/template-compiler';
 import { AsyncResolver, RenderContext } from './utils/renderer';
 import { applyFilters } from './utils/filters';
-import { buildVariables, generateFrontmatter, extractContentBySelector, formatPropertyValue } from './utils/shared';
+import { buildVariables, generateFrontmatter, extractContentBySelector, selectorContentToString, formatPropertyValue } from './utils/shared';
 import { sanitizeFileName } from './utils/string-utils';
 import { Template, Property } from './types/types';
 
@@ -77,10 +77,7 @@ export function createSelectorProcessor(doc: DocLike): SelectorProcessor {
 		const selector = rawSelector.replace(/\\"/g, '"').replace(/\s+/g, ' ').trim();
 
 		const content = extractContentBySelector(doc, selector, attribute, extractHtml);
-		// Unwrap single-element arrays for interpolation output
-		const contentString = Array.isArray(content)
-			? (content.length === 1 ? String(content[0]) : JSON.stringify(content))
-			: content;
+		const contentString = selectorContentToString(content);
 
 		return filtersString ? applyFilters(contentString, filtersString, currentUrl) : contentString;
 	};

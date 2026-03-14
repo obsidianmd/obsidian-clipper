@@ -278,3 +278,14 @@ export function extractContentBySelector(
 		return '';
 	}
 }
+
+/**
+ * Convert selector content (string or string[]) to a display string.
+ * Single-element arrays are unwrapped to a plain string.
+ */
+export function selectorContentToString(content: string | string[]): string {
+	if (Array.isArray(content)) {
+		return content.length === 1 ? String(content[0]) : JSON.stringify(content);
+	}
+	return content;
+}

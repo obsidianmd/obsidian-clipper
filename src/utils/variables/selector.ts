@@ -1,5 +1,6 @@
 import browser from '../browser-polyfill';
 import { applyFilters } from '../filters';
+import { selectorContentToString } from '../shared';
 import { debugLog } from '../debug';
 
 /**
@@ -63,10 +64,7 @@ export async function processSelector(tabId: number, match: string, currentUrl: 
 
 		let content = response ? response.content : '';
 	
-		// Convert content to string if it's an array (unwrap single-element arrays)
-		const contentString = Array.isArray(content)
-			? (content.length === 1 ? String(content[0]) : JSON.stringify(content))
-			: content;
+		const contentString = selectorContentToString(content);
 	
 		debugLog('ContentExtractor', 'Applying filters:', { selector, filterString: filtersString });
 		const filteredContent = applyFilters(contentString, filtersString, currentUrl);

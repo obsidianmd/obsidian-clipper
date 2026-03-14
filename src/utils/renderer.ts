@@ -899,7 +899,7 @@ function valueToString(value: any): string {
 	if (value === undefined || value === null) {
 		return '';
 	}
-	if (Array.isArray(value) && value.length === 1) {
+	if (Array.isArray(value) && value.length === 1 && typeof value[0] !== 'object') {
 		return String(value[0]);
 	}
 	if (typeof value === 'object') {
