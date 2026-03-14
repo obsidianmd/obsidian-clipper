@@ -77,7 +77,10 @@ export function createSelectorProcessor(doc: DocLike): SelectorProcessor {
 		const selector = rawSelector.replace(/\\"/g, '"').replace(/\s+/g, ' ').trim();
 
 		const content = extractContentBySelector(doc, selector, attribute, extractHtml);
-		const contentString = Array.isArray(content) ? JSON.stringify(content) : content;
+		// Unwrap single-element arrays for interpolation output
+		const contentString = Array.isArray(content)
+			? (content.length === 1 ? String(content[0]) : JSON.stringify(content))
+			: content;
 
 		return filtersString ? applyFilters(contentString, filtersString, currentUrl) : contentString;
 	};

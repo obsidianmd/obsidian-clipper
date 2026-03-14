@@ -354,9 +354,22 @@ async function renderFor(node: ForNode, state: RenderState): Promise<string> {
 			return '';
 		}
 
-		if (!Array.isArray(iterableValue)) {
+		// If the iterable is a JSON string (e.g. from split filter), parse it into an array
+		let iterableArray = iterableValue;
+		if (!Array.isArray(iterableArray) && typeof iterableArray === 'string') {
+			try {
+				const parsed = JSON.parse(iterableArray);
+				if (Array.isArray(parsed)) {
+					iterableArray = parsed;
+				}
+			} catch {
+				// Not valid JSON, fall through to error below
+			}
+		}
+
+		if (!Array.isArray(iterableArray)) {
 			state.errors.push({
-				message: `For loop iterable is not an array: ${typeof iterableValue}`,
+				message: `For loop iterable is not an array: ${typeof iterableArray}`,
 				line: node.line,
 				column: node.column,
 			});
@@ -367,10 +380,10 @@ async function renderFor(node: ForNode, state: RenderState): Promise<string> {
 		}
 
 		const results: string[] = [];
-		const length = iterableValue.length;
+		const length = iterableArray.length;
 
 		for (let i = 0; i < length; i++) {
-			const item = iterableValue[i];
+			const item = iterableArray[i];
 
 			// Create loop object with Twig-compatible properties
 			const loop = {
@@ -885,6 +898,9 @@ function isTruthy(value: any): boolean {
 function valueToString(value: any): string {
 	if (value === undefined || value === null) {
 		return '';
+	}
+	if (Array.isArray(value) && value.length === 1) {
+		return String(value[0]);
 	}
 	if (typeof value === 'object') {
 		return JSON.stringify(value);

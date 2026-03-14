@@ -263,21 +263,16 @@ export function extractContentBySelector(
 	try {
 		const elements = doc.querySelectorAll(selector);
 
-		if (elements.length > 1) {
-			return Array.from(elements).map((el: any) => {
-				if (attribute) {
-					return el.getAttribute(attribute) || '';
-				}
-				return extractHtml ? el.outerHTML : el.textContent?.trim() || '';
-			});
-		} else if (elements.length === 1) {
-			if (attribute) {
-				return elements[0].getAttribute(attribute) || '';
-			}
-			return extractHtml ? elements[0].outerHTML : elements[0].textContent?.trim() || '';
-		} else {
+		if (elements.length === 0) {
 			return '';
 		}
+
+		return Array.from(elements).map((el: any) => {
+			if (attribute) {
+				return el.getAttribute(attribute) || '';
+			}
+			return extractHtml ? el.outerHTML : el.textContent?.trim() || '';
+		});
 	} catch (error) {
 		console.error('Error in extractContentBySelector:', error);
 		return '';

@@ -277,6 +277,13 @@ describe('Renderer', () => {
 			expect(result.output).toBe('');
 		});
 
+		test('renders for loop with JSON array string parses it', async () => {
+			const ctx = createContext({ items: '["a","b","c"]' });
+			const result = await render('{% for item in items %}{{item}}{% endfor %}', ctx);
+			expect(result.output).toBe('a\nb\nc');
+			expect(result.errors.length).toBe(0);
+		});
+
 		test('renders for loop with non-array produces error', async () => {
 			const ctx = createContext({ items: 'not-an-array' });
 			const result = await render('{% for item in items %}{{item}}{% endfor %}', ctx);

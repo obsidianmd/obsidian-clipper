@@ -406,22 +406,22 @@ describe('extractContentBySelector', () => {
 		expect(result).toBe('');
 	});
 
-	test('returns text content for single element', () => {
+	test('returns array for single element', () => {
 		const el = mockElement('Hello', '<p>Hello</p>');
 		const result = extractContentBySelector(mockDoc([el]), 'p');
-		expect(result).toBe('Hello');
+		expect(result).toEqual(['Hello']);
 	});
 
-	test('returns outerHTML for single element with extractHtml', () => {
+	test('returns array of HTML for single element with extractHtml', () => {
 		const el = mockElement('Hello', '<p>Hello</p>');
 		const result = extractContentBySelector(mockDoc([el]), 'p', undefined, true);
-		expect(result).toBe('<p>Hello</p>');
+		expect(result).toEqual(['<p>Hello</p>']);
 	});
 
-	test('returns attribute value for single element', () => {
+	test('returns array of attribute for single element', () => {
 		const el = mockElement('', '', { href: 'https://example.com' });
 		const result = extractContentBySelector(mockDoc([el]), 'a', 'href');
-		expect(result).toBe('https://example.com');
+		expect(result).toEqual(['https://example.com']);
 	});
 
 	test('returns array for multiple elements', () => {

@@ -63,8 +63,10 @@ export async function processSelector(tabId: number, match: string, currentUrl: 
 
 		let content = response ? response.content : '';
 	
-		// Convert content to string if it's an array
-		const contentString = Array.isArray(content) ? JSON.stringify(content) : content;
+		// Convert content to string if it's an array (unwrap single-element arrays)
+		const contentString = Array.isArray(content)
+			? (content.length === 1 ? String(content[0]) : JSON.stringify(content))
+			: content;
 	
 		debugLog('ContentExtractor', 'Applying filters:', { selector, filterString: filtersString });
 		const filteredContent = applyFilters(contentString, filtersString, currentUrl);
