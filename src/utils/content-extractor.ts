@@ -60,41 +60,57 @@ interface ContentResponse {
 	metaTags: { name?: string | null; property?: string | null; content: string | null }[];
 }
 
+async function sendExtractRequest(tabId: number): Promise<ContentResponse> {
+	const response = await browser.runtime.sendMessage({
+		action: "sendMessageToTab",
+		tabId: tabId,
+		message: { action: "getPageContent" }
+	}) as ContentResponse & { success?: boolean; error?: string };
+
+	// Check for explicit error from background script
+	if (response && 'success' in response && !response.success && response.error) {
+		throw new Error(response.error);
+	}
+
+	if (response && response.content) {
+		// Ensure highlights are of the correct type
+		if (response.highlights && Array.isArray(response.highlights)) {
+			response.highlights = response.highlights.map((highlight: string | AnyHighlightData) => {
+				if (typeof highlight === 'string') {
+					return {
+						type: 'text',
+						id: Date.now().toString(),
+						xpath: '',
+						content: `<div>` + highlight + `</div>`,
+						startOffset: 0,
+						endOffset: highlight.length
+					};
+				}
+				return highlight as AnyHighlightData;
+			});
+		} else {
+			response.highlights = [];
+		}
+		return response;
+	}
+
+	throw new Error('No content received from page');
+}
+
 export async function extractPageContent(tabId: number): Promise<ContentResponse | null> {
 	try {
-		const response = await browser.runtime.sendMessage({ 
-			action: "sendMessageToTab", 
-			tabId: tabId, 
-			message: { action: "getPageContent" }
-		}) as ContentResponse;
-		if (response && response.content) {
-
-			// Ensure highlights are of the correct type
-			if (response.highlights && Array.isArray(response.highlights)) {
-				response.highlights = response.highlights.map((highlight: string | AnyHighlightData) => {
-					if (typeof highlight === 'string') {
-						// Convert string to AnyHighlightData
-						return {
-							type: 'text',
-							id: Date.now().toString(),
-							xpath: '',
-							content: `<div>` + highlight + `</div>`,
-							startOffset: 0,
-							endOffset: highlight.length
-						};
-					}
-					return highlight as AnyHighlightData;
-				});
-			} else {
-				response.highlights = [];
-			}
-			return response;
+		return await sendExtractRequest(tabId);
+	} catch (firstError) {
+		// First attempt failed — this commonly happens on Safari after an
+		// extension update when the old content script context is invalidated.
+		// Retry once; the background script will re-inject if needed.
+		console.log('[Obsidian Clipper] First extraction attempt failed, retrying...', firstError);
+		try {
+			return await sendExtractRequest(tabId);
+		} catch (retryError) {
+			console.error('[Obsidian Clipper] Extraction failed after retry:', retryError);
+			throw new Error('Web Clipper was not able to start. Please try reloading the page.');
 		}
-		// Content script was unable to load
-		throw new Error('Web Clipper was not able to start. Try restarting your browser.');
-	} catch (error) {
-		console.error('Error extracting page content:', error);
-		throw error;
 	}
 }
 

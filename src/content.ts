@@ -9,20 +9,32 @@ import { flattenShadowDom } from './utils/flatten-shadow-dom';
 
 declare global {
 	interface Window {
-		obsidianHighlighterInitialized?: boolean;
+		obsidianClipperRuntimeCheck?: () => string | undefined;
 	}
 }
 
-// Use a self-executing function to create a closure
-// This allows the script to be re-executed without redeclaring variables
+// IIFE to scope variables and allow safe re-execution
 (function() {
-	// Check if the script has already been initialized
-	if (window.hasOwnProperty('obsidianHighlighterInitialized')) {
-		return;  // Exit if already initialized
+	// Prevent duplicate initialization on the same page. After an extension
+	// update the previous content script's runtime context is invalidated,
+	// but window-level flags persist. We detect this by calling a function
+	// stored during the last initialization — it closes over that script's
+	// `browser` reference, so it will return undefined (or throw) once the
+	// old context is gone.
+	try {
+		const runtimeId = window.obsidianClipperRuntimeCheck?.();
+		console.log('[Obsidian Clipper] Re-init guard: runtimeCheck returned', runtimeId);
+		if (runtimeId) {
+			console.log('[Obsidian Clipper] Previous runtime still alive, skipping init');
+			return;
+		}
+	} catch (e) {
+		console.log('[Obsidian Clipper] Previous runtime threw, re-initializing', e);
 	}
 
-	// Mark as initialized
-	window.obsidianHighlighterInitialized = true;
+	console.log('[Obsidian Clipper] Initializing content script');
+
+	window.obsidianClipperRuntimeCheck = () => browser.runtime?.id;
 
 	let isHighlighterMode = false;
 	const iframeId = 'obsidian-clipper-iframe';
