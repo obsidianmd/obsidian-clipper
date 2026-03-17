@@ -5,7 +5,9 @@
 	"bin": {
 		"obsidian-clipper": "./dist/cli.cjs"
 	},
-	"files": ["dist"],
+	"files": [
+		"dist"
+	],
 	"exports": {
 		".": "./dist/cli.cjs",
 		"./api": "./dist/api.mjs"
@@ -39,6 +41,7 @@
 		"copy-webpack-plugin": "^14.0.0",
 		"css-loader": "^7.1.2",
 		"dotenv": "^16.4.1",
+		"esbuild": "^0.25.0",
 		"mini-css-extract-plugin": "^2.9.1",
 		"sass": "^1.77.8",
 		"sass-loader": "^16.0.1",
@@ -49,13 +52,12 @@
 		"webextension-polyfill": "^0.12.0",
 		"webpack": "^5.97.1",
 		"webpack-cli": "^5.1.4",
-		"zip-webpack-plugin": "^4.0.1",
-		"esbuild": "^0.25.0"
+		"zip-webpack-plugin": "^4.0.1"
 	},
 	"dependencies": {
 		"@types/safari-extension": "^0.0.33",
 		"dayjs": "^1.11.13",
-		"defuddle": "^0.13.0",
+		"defuddle": "^0.14.0",
 		"dompurify": "^3.0.9",
 		"highlight.js": "^11.11.1",
 		"linkedom": "^0.18.0",
