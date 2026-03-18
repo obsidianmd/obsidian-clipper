@@ -1260,7 +1260,7 @@ export class Reader {
 			let formattedDate = '';
 			if (published) {
 				try {
-					const date = new Date(published);
+					const date = new Date(published.split(',')[0].trim());
 					if (!isNaN(date.getTime())) {
 						formattedDate = new Intl.DateTimeFormat(undefined, {
 							year: 'numeric',
