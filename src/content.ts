@@ -9,32 +9,20 @@ import { flattenShadowDom } from './utils/flatten-shadow-dom';
 
 declare global {
 	interface Window {
-		obsidianClipperRuntimeCheck?: () => string | undefined;
+		obsidianClipperGeneration?: number;
 	}
 }
 
 // IIFE to scope variables and allow safe re-execution
 (function() {
-	// Prevent duplicate initialization on the same page. After an extension
-	// update the previous content script's runtime context is invalidated,
-	// but window-level flags persist. We detect this by calling a function
-	// stored during the last initialization — it closes over that script's
-	// `browser` reference, so it will return undefined (or throw) once the
-	// old context is gone.
-	try {
-		const runtimeId = window.obsidianClipperRuntimeCheck?.();
-		console.log('[Obsidian Clipper] Re-init guard: runtimeCheck returned', runtimeId);
-		if (runtimeId) {
-			console.log('[Obsidian Clipper] Previous runtime still alive, skipping init');
-			return;
-		}
-	} catch (e) {
-		console.log('[Obsidian Clipper] Previous runtime threw, re-initializing', e);
-	}
+	// Bump the generation counter on every injection. Older listeners close
+	// over their own generation value and bail out when they see a newer one,
+	// so a zombie content script (runtime invalidated after extension update)
+	// will silently yield to the freshly-injected instance.
+	window.obsidianClipperGeneration = (window.obsidianClipperGeneration ?? 0) + 1;
+	const myGeneration = window.obsidianClipperGeneration;
 
-	console.log('[Obsidian Clipper] Initializing content script');
-
-	window.obsidianClipperRuntimeCheck = () => browser.runtime?.id;
+	console.log('[Obsidian Clipper] Initializing content script, generation', myGeneration);
 
 	let isHighlighterMode = false;
 	const iframeId = 'obsidian-clipper-iframe';
@@ -188,6 +176,12 @@ declare global {
 	}
 
 	browser.runtime.onMessage.addListener((request: any, sender, sendResponse) => {
+		// If a newer generation of this content script has been injected,
+		// yield to it rather than responding from a potentially stale context.
+		if (window.obsidianClipperGeneration !== myGeneration) {
+			return;
+		}
+
 		if (request.action === "ping") {
 			sendResponse({});
 			return true;
@@ -333,6 +327,9 @@ declare global {
 					metaTags: defuddled.metaTags || []
 				};
 				sendResponse(response);
+			}).catch((error: unknown) => {
+				console.error('[Obsidian Clipper] getPageContent error:', error);
+				sendResponse({ success: false, error: error instanceof Error ? error.message : String(error) });
 			});
 			return true;
 		} else if (request.action === "extractContent") {

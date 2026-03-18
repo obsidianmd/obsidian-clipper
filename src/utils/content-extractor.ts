@@ -102,9 +102,15 @@ export async function extractPageContent(tabId: number): Promise<ContentResponse
 		return await sendExtractRequest(tabId);
 	} catch (firstError) {
 		// First attempt failed — this commonly happens on Safari after an
-		// extension update when the old content script context is invalidated.
-		// Retry once; the background script will re-inject if needed.
+		// extension update when a zombie content script (runtime invalidated)
+		// responded to ping, preventing re-injection. Force a fresh injection
+		// so the new generation's listener takes over, then retry.
 		console.log('[Obsidian Clipper] First extraction attempt failed, retrying...', firstError);
+		try {
+			await browser.runtime.sendMessage({ action: "forceInjectContentScript", tabId });
+		} catch {
+			// If force-inject fails, proceed anyway — the retry may still work.
+		}
 		try {
 			return await sendExtractRequest(tabId);
 		} catch (retryError) {
