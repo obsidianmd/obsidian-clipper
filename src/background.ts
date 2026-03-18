@@ -75,10 +75,10 @@ async function injectContentScript(tabId: number): Promise<void> {
 	}
 	console.log('[Obsidian Clipper] Injection completed, waiting for init...');
 
-	// Poll until the content script responds, rather than a fixed delay
+	// Poll until the content script responds, rather than a fixed delay.
+	// Try immediately after injection, then back off with 50ms sleeps.
 	let ready = false;
 	for (let i = 0; i < 8; i++) {
-		await new Promise(resolve => setTimeout(resolve, 50));
 		try {
 			await browser.tabs.sendMessage(tabId, { action: "ping" });
 			ready = true;
@@ -86,6 +86,7 @@ async function injectContentScript(tabId: number): Promise<void> {
 		} catch {
 			// Not ready yet
 		}
+		await new Promise(resolve => setTimeout(resolve, 50));
 	}
 	if (!ready) {
 		throw new Error('Content script did not respond after injection');
@@ -115,12 +116,7 @@ async function ensureContentScriptLoadedInBackground(tabId: number): Promise<voi
 
 		// If the message fails, the content script is not loaded, so inject it
 		console.log('[Obsidian Clipper] Ping failed, injecting content script...', error);
-		try {
-			await injectContentScript(tabId);
-		} catch (injectError) {
-			console.error('[Obsidian Clipper] Injection or post-injection ping failed:', injectError);
-			throw injectError;
-		}
+		await injectContentScript(tabId);
 	}
 }
 
@@ -401,7 +397,7 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 		}
 
 		if (typedRequest.action === "forceInjectContentScript") {
-			const tabId = (typedRequest as any).tabId;
+			const tabId = typedRequest.tabId;
 			if (tabId) {
 				injectContentScript(tabId)
 					.then(() => sendResponse({ success: true }))

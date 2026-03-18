@@ -245,7 +245,8 @@ declare global {
 
 		if (request.action === "getPageContent") {
 			// Flatten shadow DOM before extraction (async, needs main world)
-			flattenShadowDom(document).then(async () => {
+			const flattenTimeout = new Promise<void>(resolve => setTimeout(resolve, 3000));
+			Promise.race([flattenShadowDom(document), flattenTimeout]).then(async () => {
 				let selectedHtml = '';
 				const selection = window.getSelection();
 
@@ -257,9 +258,14 @@ declare global {
 					selectedHtml = div.innerHTML;
 				}
 
-				// Use parseAsync to ensure async variables like {{transcript}} are available
+				// Use parseAsync to ensure async variables like {{transcript}} are available.
+				// If it hangs (e.g. another extension has corrupted fetch), fall back to sync parse.
 				const defuddle = new Defuddle(document, { url: document.URL });
-				const defuddled = await defuddle.parseAsync();
+				const parseTimeout = new Promise<never>((_, reject) =>
+					setTimeout(() => reject(new Error('parseAsync timeout')), 8000)
+				);
+				const defuddled = await Promise.race([defuddle.parseAsync(), parseTimeout])
+					.catch(() => defuddle.parse());
 				const extractedContent: { [key: string]: string } = {
 					...defuddled.variables,
 				};
