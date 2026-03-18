@@ -538,11 +538,11 @@ const debouncedUpdateContextMenu = debounce(async (tabId: number) => {
 					title: browser.i18n.getMessage('copyToClipboard'),
 					contexts: ["page", "selection"]
 				},
-				// {
-				// 	id: "toggle-reader",
-				// 	title: "Reading view",
-				// 	contexts: ["page", "selection"]
-				// },
+				{
+					id: "toggle-reader",
+					title: browser.i18n.getMessage('commandToggleReader'),
+					contexts: ["page", "selection"]
+				},
 				{
 					id: isHighlighterMode ? "exit-highlighter" : "enter-highlighter",
 					title: isHighlighterMode ? "Exit highlighter" : "Highlight this page",
@@ -595,10 +595,10 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
 		await highlightSelection(tab.id, info);
 	} else if (info.menuItemId === "highlight-element" && tab && tab.id) {
 		await highlightElement(tab.id, info);
-	// } else if (info.menuItemId === "toggle-reader" && tab && tab.id) {
-	// 	await ensureContentScriptLoadedInBackground(tab.id);
-	// 	await injectReaderScript(tab.id);
-	// 	await browser.tabs.sendMessage(tab.id, { action: "toggleReaderMode" });
+	} else if (info.menuItemId === "toggle-reader" && tab && tab.id) {
+		await ensureContentScriptLoadedInBackground(tab.id);
+		await injectReaderScript(tab.id);
+		await browser.tabs.sendMessage(tab.id, { action: "toggleReaderMode" });
 	} else if (info.menuItemId === 'open-embedded' && tab && tab.id) {
 		await ensureContentScriptLoadedInBackground(tab.id);
 		await browser.tabs.sendMessage(tab.id, { action: "toggle-iframe" });
