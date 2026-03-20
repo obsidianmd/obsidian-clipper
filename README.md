@@ -27,6 +27,8 @@ You can help translate Web Clipper into your language. Submit your translation v
 
 See the [help wanted](https://github.com/obsidianmd/obsidian-clipper/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22) tag for issues where contributions are welcome.
 
+For branch and merge policy in this fork, see [docs/development-workflow.md](docs/development-workflow.md).
+
 ## Roadmap
 
 In no particular order:
