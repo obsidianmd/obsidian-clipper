@@ -1,15 +1,21 @@
-// Programmatic API for Obsidian Web Clipper.
+// Programmatic API for clipper for AppFlowy.
 // Environment-agnostic — no Node.js or browser dependencies.
 // The caller provides a DocumentParser for their environment.
 
-import DefuddleClass from 'defuddle';
-import { createMarkdownContent } from 'defuddle/full';
-import { compileTemplate, SelectorProcessor } from './utils/template-compiler';
-import { AsyncResolver, RenderContext } from './utils/renderer';
-import { applyFilters } from './utils/filters';
-import { buildVariables, generateFrontmatter, extractContentBySelector, selectorContentToString, formatPropertyValue } from './utils/shared';
-import { sanitizeFileName } from './utils/string-utils';
-import { Template, Property } from './types/types';
+import DefuddleClass from "defuddle";
+import { createMarkdownContent } from "defuddle/full";
+import { compileTemplate, SelectorProcessor } from "./utils/template-compiler";
+import { AsyncResolver, RenderContext } from "./utils/renderer";
+import { applyFilters } from "./utils/filters";
+import {
+	buildVariables,
+	generateFrontmatter,
+	extractContentBySelector,
+	selectorContentToString,
+	formatPropertyValue,
+} from "./utils/shared";
+import { sanitizeFileName } from "./utils/string-utils";
+import { Template, Property } from "./types/types";
 
 // ---------------------------------------------------------------------------
 // Public types
@@ -46,9 +52,9 @@ type DocLike = { querySelectorAll: (selector: string) => any };
 
 export function createAsyncResolver(doc: DocLike): AsyncResolver {
 	return async (name: string, _context: RenderContext): Promise<any> => {
-		if (name.startsWith('selector:') || name.startsWith('selectorHtml:')) {
-			const extractHtml = name.startsWith('selectorHtml:');
-			const prefix = extractHtml ? 'selectorHtml:' : 'selector:';
+		if (name.startsWith("selector:") || name.startsWith("selectorHtml:")) {
+			const extractHtml = name.startsWith("selectorHtml:");
+			const prefix = extractHtml ? "selectorHtml:" : "selector:";
 			const selectorPart = name.slice(prefix.length);
 
 			const attrMatch = selectorPart.match(/^(.+?)\?(.+)$/);
@@ -59,7 +65,7 @@ export function createAsyncResolver(doc: DocLike): AsyncResolver {
 				doc,
 				selector.replace(/\\"/g, '"'),
 				attribute,
-				extractHtml
+				extractHtml,
 			);
 		}
 		return undefined;
@@ -68,18 +74,29 @@ export function createAsyncResolver(doc: DocLike): AsyncResolver {
 
 export function createSelectorProcessor(doc: DocLike): SelectorProcessor {
 	return async (match: string, currentUrl: string): Promise<string> => {
-		const selectorRegex = /{{(selector|selectorHtml):(.*?)(?:\?(.*?))?(?:\|(.*?))?}}/;
+		const selectorRegex =
+			/{{(selector|selectorHtml):(.*?)(?:\?(.*?))?(?:\|(.*?))?}}/;
 		const matches = match.match(selectorRegex);
 		if (!matches) return match;
 
 		const [, selectorType, rawSelector, attribute, filtersString] = matches;
-		const extractHtml = selectorType === 'selectorHtml';
-		const selector = rawSelector.replace(/\\"/g, '"').replace(/\s+/g, ' ').trim();
+		const extractHtml = selectorType === "selectorHtml";
+		const selector = rawSelector
+			.replace(/\\"/g, '"')
+			.replace(/\s+/g, " ")
+			.trim();
 
-		const content = extractContentBySelector(doc, selector, attribute, extractHtml);
+		const content = extractContentBySelector(
+			doc,
+			selector,
+			attribute,
+			extractHtml,
+		);
 		const contentString = selectorContentToString(content);
 
-		return filtersString ? applyFilters(contentString, filtersString, currentUrl) : contentString;
+		return filtersString
+			? applyFilters(contentString, filtersString, currentUrl)
+			: contentString;
 	};
 }
 
@@ -88,7 +105,7 @@ export function createSelectorProcessor(doc: DocLike): SelectorProcessor {
 // ---------------------------------------------------------------------------
 
 function matchTriggerPattern(pattern: string, url: string): boolean {
-	if (pattern.startsWith('/') && pattern.endsWith('/')) {
+	if (pattern.startsWith("/") && pattern.endsWith("/")) {
 		try {
 			return new RegExp(pattern.slice(1, -1)).test(url);
 		} catch {
@@ -104,23 +121,37 @@ function matchSchemaPattern(pattern: string, schemaOrgData: any): boolean {
 	const [, schemaType, schemaKey, expectedValue] = match;
 	if (!schemaType && !schemaKey) return false;
 
-	const schemaArray = Array.isArray(schemaOrgData) ? schemaOrgData : [schemaOrgData];
-	const flattened = schemaArray.flatMap((s: any) => Array.isArray(s) ? s : [s]);
+	const schemaArray = Array.isArray(schemaOrgData)
+		? schemaOrgData
+		: [schemaOrgData];
+	const flattened = schemaArray.flatMap((s: any) =>
+		Array.isArray(s) ? s : [s],
+	);
 
 	for (const schema of flattened) {
-		if (!schema || typeof schema !== 'object') continue;
+		if (!schema || typeof schema !== "object") continue;
 		if (schemaType) {
-			const types = Array.isArray(schema['@type']) ? schema['@type'] : [schema['@type']];
+			const types = Array.isArray(schema["@type"])
+				? schema["@type"]
+				: [schema["@type"]];
 			if (!types.includes(schemaType.slice(1))) continue;
 		}
 		if (schemaKey) {
-			const keys = schemaKey.split('.');
+			const keys = schemaKey.split(".");
 			let val = schema;
 			for (const k of keys) {
-				val = val && typeof val === 'object' && k in val ? val[k] : undefined;
+				val =
+					val && typeof val === "object" && k in val
+						? val[k]
+						: undefined;
 			}
 			if (expectedValue) {
-				if (Array.isArray(val) ? val.includes(expectedValue) : val === expectedValue) return true;
+				if (
+					Array.isArray(val)
+						? val.includes(expectedValue)
+						: val === expectedValue
+				)
+					return true;
 			} else if (val !== undefined) {
 				return true;
 			}
@@ -135,12 +166,19 @@ function matchSchemaPattern(pattern: string, schemaOrgData: any): boolean {
  * Find the first template whose triggers match the given URL (and optionally schema data).
  * URL prefix and regex triggers are checked first, then schema triggers.
  */
-export function matchTemplate(templates: Template[], url: string, schemaOrgData?: any): Template | undefined {
+export function matchTemplate(
+	templates: Template[],
+	url: string,
+	schemaOrgData?: any,
+): Template | undefined {
 	// First pass: URL prefix and regex triggers
 	for (const template of templates) {
 		if (!template.triggers) continue;
 		for (const trigger of template.triggers) {
-			if (!trigger.startsWith('schema:') && matchTriggerPattern(trigger, url)) {
+			if (
+				!trigger.startsWith("schema:") &&
+				matchTriggerPattern(trigger, url)
+			) {
 				return template;
 			}
 		}
@@ -151,7 +189,10 @@ export function matchTemplate(templates: Template[], url: string, schemaOrgData?
 		for (const template of templates) {
 			if (!template.triggers) continue;
 			for (const trigger of template.triggers) {
-				if (trigger.startsWith('schema:') && matchSchemaPattern(trigger, schemaOrgData)) {
+				if (
+					trigger.startsWith("schema:") &&
+					matchSchemaPattern(trigger, schemaOrgData)
+				) {
 					return template;
 				}
 			}
@@ -174,15 +215,25 @@ export function matchTemplate(templates: Template[], url: string, schemaOrgData?
  * - Writing the output (file, vault API, etc.)
  */
 export async function clip(options: ClipOptions): Promise<ClipResult> {
-	const { html, url, template, documentParser, propertyTypes, parsedDocument } = options;
+	const {
+		html,
+		url,
+		template,
+		documentParser,
+		propertyTypes,
+		parsedDocument,
+	} = options;
 
 	// Use pre-parsed document if provided, otherwise parse
-	const doc = parsedDocument ?? documentParser.parseFromString(html, 'text/html');
+	const doc =
+		parsedDocument ?? documentParser.parseFromString(html, "text/html");
 	const documentElement = doc.documentElement || doc;
 
 	// Extract content with defuddle
 	// Cast through unknown: linkedom's Document is structurally compatible but not nominally typed as DOM Document
-	const defuddle = new DefuddleClass(documentElement as unknown as Document, { url });
+	const defuddle = new DefuddleClass(documentElement as unknown as Document, {
+		url,
+	});
 	const defuddleResult = defuddle.parse();
 
 	// Convert to markdown
@@ -213,20 +264,27 @@ export async function clip(options: ClipOptions): Promise<ClipResult> {
 	const selectorProcessor = createSelectorProcessor(doc);
 
 	const compile = (text: string) =>
-		compileTemplate(0, text, variables, url, asyncResolver, selectorProcessor);
+		compileTemplate(
+			0,
+			text,
+			variables,
+			url,
+			asyncResolver,
+			selectorProcessor,
+		);
 
 	// Compile note name
 	const compiledNoteName = await compile(template.noteNameFormat);
-	const noteName = sanitizeFileName(compiledNoteName) || 'Untitled';
+	const noteName = sanitizeFileName(compiledNoteName) || "Untitled";
 
 	// Compile and format each property
 	const compiledProperties: Property[] = await Promise.all(
 		template.properties.map(async (prop) => {
 			let value = await compile(prop.value);
-			const propType = prop.type || 'text';
+			const propType = prop.type || "text";
 			value = formatPropertyValue(value, propType, prop.value);
 			return { name: prop.name, value, type: prop.type };
-		})
+		}),
 	);
 
 	// Build property type map
@@ -260,4 +318,4 @@ export async function clip(options: ClipOptions): Promise<ClipResult> {
 }
 
 // Re-export types that consumers may need
-export type { Template, Property } from './types/types';
+export type { Template, Property } from "./types/types";

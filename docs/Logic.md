@@ -2,7 +2,8 @@
 permalink: web-clipper/logic
 description: Use conditionals, loops, and variable assignment in Web Clipper templates.
 ---
-[[Introduction to Obsidian Web Clipper|Web Clipper]] supports template logic for conditionals, loops, and variable assignment. This syntax is inspired by [Twig](https://twig.symfony.com/) and [Liquid](https://shopify.github.io/liquid/) templating languages.
+
+[[Introduction to AppFlowy Web Clipper|Web Clipper]] supports template logic for conditionals, loops, and variable assignment. This syntax is inspired by [Twig](https://twig.symfony.com/) and [Liquid](https://shopify.github.io/liquid/) templating languages.
 
 ## Conditionals
 
@@ -32,17 +33,18 @@ Unknown status
 
 The following comparison operators are supported:
 
-| Operator | Description |
-|----------|-------------|
-| `==` | Equal to |
-| `!=` | Not equal to |
-| `>` | Greater than |
-| `<` | Less than |
-| `>=` | Greater than or equal to |
-| `<=` | Less than or equal to |
+| Operator   | Description                                                 |
+| ---------- | ----------------------------------------------------------- |
+| `==`       | Equal to                                                    |
+| `!=`       | Not equal to                                                |
+| `>`        | Greater than                                                |
+| `<`        | Less than                                                   |
+| `>=`       | Greater than or equal to                                    |
+| `<=`       | Less than or equal to                                       |
 | `contains` | Check if string contains substring, or array contains value |
 
 Examples:
+
 - `{% if title == "Home" %}` — string equality
 - `{% if price >= 100 %}` — numeric comparison
 - `{% if title contains "Review" %}` — substring check
@@ -52,13 +54,14 @@ Examples:
 
 Combine conditions using logical operators:
 
-| Operator | Alternative | Description |
-|----------|-------------|-------------|
-| `and` | `&&` | Both conditions must be true |
-| `or` | `\|\|` | At least one condition must be true |
-| `not` | `!` | Negates a condition |
+| Operator | Alternative | Description                         |
+| -------- | ----------- | ----------------------------------- |
+| `and`    | `&&`        | Both conditions must be true        |
+| `or`     | `\|\|`      | At least one condition must be true |
+| `not`    | `!`         | Negates a condition                 |
 
 Examples:
+
 - `{% if author and published %}` — both must exist
 - `{% if draft or archived %}` — either condition
 - `{% if not hidden %}` — negation
@@ -94,6 +97,7 @@ File: {{slug}}.md
 ```
 
 Variables can be set to:
+
 - Other variables: `{% set name = author %}`
 - Literals: `{% set count = 5 %}` or `{% set label = "Draft" %}`
 - Expressions with filters: `{% set excerpt = content|truncate:100 %}`
@@ -156,6 +160,7 @@ Use `{% for %}` to iterate over arrays:
 ### Loop sources
 
 You can loop over:
+
 - Schema arrays: `{% for item in schema:author %}`
 - Selector results: `{% for comment in selector:.comment %}`
 - Variables set earlier: `{% set items = selector:.item %}{% for item in items %}`
@@ -164,13 +169,13 @@ You can loop over:
 
 Inside a loop, you have access to a `loop` object with the following properties:
 
-| Variable | Description |
-|----------|-------------|
-| `loop.index` | Current iteration (1-indexed) |
+| Variable      | Description                   |
+| ------------- | ----------------------------- |
+| `loop.index`  | Current iteration (1-indexed) |
 | `loop.index0` | Current iteration (0-indexed) |
-| `loop.first` | `true` if first iteration |
-| `loop.last` | `true` if last iteration |
-| `loop.length` | Total number of items |
+| `loop.first`  | `true` if first iteration     |
+| `loop.last`   | `true` if last iteration      |
+| `loop.length` | Total number of items         |
 
 ```twig
 {% for tag in tags %}

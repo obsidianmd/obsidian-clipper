@@ -2,7 +2,8 @@
 permalink: web-clipper/templates
 description: Learn to create templates that capture and organize web page metadata automatically with Web Clipper.
 ---
-[[Introduction to Obsidian Web Clipper|Web Clipper]] allows you to create templates that automatically capture and organize metadata from web pages. Example templates are available in the [clipper-templates repo](https://github.com/kepano/clipper-templates). 
+
+[[Introduction to clipper for AppFlowy|Web Clipper]] allows you to create templates that automatically capture and organize metadata from web pages.
 
 ## Create or edit a template
 
@@ -26,7 +27,7 @@ To export a template click **Export** in the top right. This will download the t
 
 ### Behavior
 
-Define how content from Web Clipper will be added to Obsidian:
+Define how content from Web Clipper will be added to AppFlowy:
 
 - **Create a new note**
 - **Add to an existing note**, at the top or bottom
@@ -37,12 +38,6 @@ Define how content from Web Clipper will be added to Obsidian:
 Template triggers allow you to automatically select a template based on the current page URL or [schema.org](https://schema.org/) data. You can define multiple rules for each template, separated by a new line.
 
 The first match in your template list determines which template is used. You can drag templates up and down in Web Clipper settings to change the order in which templates are matched.
-
-#### Simple URL matching
-
-Simple matching triggers a template if the current page URL *starts with* the given pattern. For example:
-
-- `https://obsidian.md` will match any URL that starts with this text.
 
 #### Regular expression matching
 

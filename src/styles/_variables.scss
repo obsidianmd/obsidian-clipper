@@ -6,9 +6,9 @@
 	--safe-area-inset-left: env(safe-area-inset-left);
 	--safe-area-inset-right: env(safe-area-inset-right);
 
-	--accent-h: 258;
-	--accent-s: 88%;
-	--accent-l: 66%;
+	--accent-h: 270;
+	--accent-s: 75%;
+	--accent-l: 52%;
 
 	--background-primary: var(--color-base-00);
 	--background-primary-alt: var(--color-base-10);
@@ -19,7 +19,7 @@
 	--background-modifier-border-focus: var(--color-base-40);
 
 	--background-modifier-form-field: var(--background-primary);
-	--background-modifier-hover: rgba(var(--mono-rgb-100), .075);
+	--background-modifier-hover: rgba(var(--mono-rgb-100), 0.075);
 
 	--background-modifier-error: hsla(var(--color-red-hsl), 0.1);
 	--background-modifier-error-border: hsla(var(--color-red-hsl), 0.15);
@@ -52,9 +52,9 @@
 
 	--dropdown-background: transparent;
 	--dropdown-background-hover: var(--interactive-hover);
-	--dropdown-background-position: right .25rem top 50%, 0 0;
+	--dropdown-background-position: right 0.25rem top 50%, 0 0;
 	--dropdown-background-size: 1rem auto, 100%;
-	--dropdown-padding: 0 1.75rem 0 .5rem;
+	--dropdown-padding: 0 1.75rem 0 0.5rem;
 
 	--divider-color: var(--background-modifier-border);
 
@@ -68,8 +68,14 @@
 	--font-smaller: var(--font-ui-smaller);
 	--font-small: var(--font-ui-small);
 
-	--font-default: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
-	--font-monospace-default: ui-monospace, SFMono-Regular, "Cascadia Mono", "Roboto Mono", "DejaVu Sans Mono", "Liberation Mono", Menlo, Monaco, "Consolas", "Source Code Pro", monospace;
+	--font-default:
+		ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+		"Inter", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+		sans-serif;
+	--font-monospace-default:
+		ui-monospace, SFMono-Regular, "Cascadia Mono", "Roboto Mono",
+		"DejaVu Sans Mono", "Liberation Mono", Menlo, Monaco, "Consolas",
+		"Source Code Pro", monospace;
 
 	--interactive-accent: var(--color-accent-1);
 	--interactive-accent-hover: var(--color-accent-2);
@@ -122,7 +128,10 @@
 	--modal-max-width-narrow: 800px;
 	--modal-padding: 1rem;
 	--modal-border-width: 1px;
-	--modal-border-color: var(--color-base-40, var(--background-modifier-border-focus));
+	--modal-border-color: var(
+		--color-base-40,
+		var(--background-modifier-border-focus)
+	);
 	--modal-radius: var(--radius-l);
 	--modal-community-sidebar-width: 280px;
 
@@ -140,13 +149,13 @@
 	--text-normal: var(--color-base-100);
 	--text-muted: var(--color-base-70);
 	--text-faint: var(--color-base-50);
-	
+
 	--text-accent: var(--color-accent);
 	--text-accent-hover: var(--color-accent-2);
 	--text-on-accent: white;
 
 	--text-highlight-bg-rgb: 255, 208, 0;
-	--text-highlight-bg: rgba(var(--text-highlight-bg-rgb), .4);
+	--text-highlight-bg: rgba(var(--text-highlight-bg-rgb), 0.4);
 
 	/* Toggles */
 	--toggle-border-width: 2px;
@@ -164,34 +173,27 @@
 	:root {
 		--background-modifier-cover: rgba(220, 220, 220, 0.4);
 
-		--color-accent-hsl:
-				var(--accent-h),
-				var(--accent-s),
-				var(--accent-l);
+		--color-accent-hsl: var(--accent-h), var(--accent-s), var(--accent-l);
 
-		--color-accent:
-			hsl(
-				var(--accent-h),
-				var(--accent-s),
-				var(--accent-l));
+		--color-accent: hsl(var(--accent-h), var(--accent-s), var(--accent-l));
 
-		--color-accent-1:
-			hsl(
-				calc(var(--accent-h) - 1),
-				calc(var(--accent-s) * 1.01),
-				calc(var(--accent-l) * 1.075));
+		--color-accent-1: hsl(
+			calc(var(--accent-h) - 1),
+			calc(var(--accent-s) * 1.01),
+			calc(var(--accent-l) * 1.075)
+		);
 
-		--color-accent-2:
-			hsl(
-				calc(var(--accent-h) - 3),
-				calc(var(--accent-s) * 1.02),
-				calc(var(--accent-l) * 1.15));
-		
-		--color-accent-3:
-			hsl(
-				calc(var(--accent-h) + 3),
-				calc(var(--accent-s) * 0.96),
-				calc(var(--accent-l) * 0.85));
+		--color-accent-2: hsl(
+			calc(var(--accent-h) - 3),
+			calc(var(--accent-s) * 1.02),
+			calc(var(--accent-l) * 1.15)
+		);
+
+		--color-accent-3: hsl(
+			calc(var(--accent-h) + 3),
+			calc(var(--accent-s) * 0.96),
+			calc(var(--accent-l) * 0.85)
+		);
 
 		--color-base-00: #ffffff;
 		--color-base-05: #fcfcfc;
@@ -223,26 +225,22 @@
 
 		--text-selection: hsla(var(--color-accent-hsl), 0.2);
 		--input-shadow:
-			inset 0 0 0 1px rgba(0,0,0,.12),
-			0 2px 3px 0 rgba(0,0,0,.05),
-			0 1px 1.5px 0 rgba(0,0,0,.03),
-			0 1px 2px 0 rgba(0,0,0,.04),
-			0 0 0 0 transparent;
+			inset 0 0 0 1px rgba(0, 0, 0, 0.12),
+			0 2px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 1.5px 0 rgba(0, 0, 0, 0.03),
+			0 1px 2px 0 rgba(0, 0, 0, 0.04), 0 0 0 0 transparent;
 
 		--input-shadow-hover:
-			inset 0 0 0 1px rgba(0,0,0,.17),
-			0 2px 3px 0 rgba(0,0,0,.1),
-			0 1px 1.5px 0 rgba(0,0,0,.03),
-			0 1px 2px 0 rgba(0,0,0,.04),
+			inset 0 0 0 1px rgba(0, 0, 0, 0.17), 0 2px 3px 0 rgba(0, 0, 0, 0.1),
+			0 1px 1.5px 0 rgba(0, 0, 0, 0.03), 0 1px 2px 0 rgba(0, 0, 0, 0.04),
 			0 0 0 0 transparent;
 
 		--interactive-normal: var(--color-base-00);
 		--interactive-hover: var(--color-base-10);
 
 		--shadow-s:
-			0px 1px 2px rgba(0, 0, 0, .028),
-			0px 3.4px 6.7px rgba(0, 0, 0, .042),
-			0px 15px 30px rgba(0, 0, 0, .07);
+			0px 1px 2px rgba(0, 0, 0, 0.028),
+			0px 3.4px 6.7px rgba(0, 0, 0, 0.042),
+			0px 15px 30px rgba(0, 0, 0, 0.07);
 		--shadow-l:
 			0px 1.8px 7.3px rgba(0, 0, 0, 0.071),
 			0px 6.3px 24.7px rgba(0, 0, 0, 0.112),
@@ -252,37 +250,30 @@
 
 @media (prefers-color-scheme: dark) {
 	:root {
-		--background-modifier-cover: rgba(10, 10, 10, .4);
-		--background-modifier-hover: rgba(var(--mono-rgb-100), .15);
+		--background-modifier-cover: rgba(10, 10, 10, 0.4);
+		--background-modifier-hover: rgba(var(--mono-rgb-100), 0.15);
 
-		--color-accent-hsl:
-				var(--accent-h),
-				var(--accent-s),
-				var(--accent-l);
+		--color-accent-hsl: var(--accent-h), var(--accent-s), var(--accent-l);
 
-		--color-accent:
-			hsl(
-				var(--accent-h),
-				var(--accent-s),
-				var(--accent-l));
+		--color-accent: hsl(var(--accent-h), var(--accent-s), var(--accent-l));
 
-		--color-accent-1:
-			hsl(
-				calc(var(--accent-h) - 3),
-				calc(var(--accent-s) * 1.02),
-				calc(var(--accent-l) * 1.15));
+		--color-accent-1: hsl(
+			calc(var(--accent-h) - 3),
+			calc(var(--accent-s) * 1.02),
+			calc(var(--accent-l) * 1.15)
+		);
 
-		--color-accent-2:
-			hsl(
-				calc(var(--accent-h) - 5),
-				calc(var(--accent-s) * 1.05),
-				calc(var(--accent-l) * 1.29));
+		--color-accent-2: hsl(
+			calc(var(--accent-h) - 5),
+			calc(var(--accent-s) * 1.05),
+			calc(var(--accent-l) * 1.29)
+		);
 
-		--color-accent-3:
-			hsl(
-				calc(var(--accent-h) - 3),
-				calc(var(--accent-s) * 1.02),
-				calc(var(--accent-l) * 1.29));
+		--color-accent-3: hsl(
+			calc(var(--accent-h) - 3),
+			calc(var(--accent-s) * 1.02),
+			calc(var(--accent-l) * 1.29)
+		);
 
 		--color-base-00: #1e1e1e;
 		--color-base-05: #212121;
@@ -298,7 +289,7 @@
 		--color-base-60: #999999;
 		--color-base-70: #b3b3b3;
 		--color-base-100: #dadada;
-		
+
 		--color-orange-rgb: 233, 151, 63;
 
 		--color-red-hsl: 358, 96%, 63%;
@@ -311,18 +302,14 @@
 		--interactive-accent-hover: var(--color-accent-1);
 
 		--input-shadow:
-			inset 0 .5px .5px .5px rgba(255, 255, 255, 0.09),
-			0 2px 4px 0 rgba(0,0,0,.15),
-			0 1px 1.5px 0 rgba(0,0,0,.1),
-			0 1px 2px 0 rgba(0,0,0,.2),
-			0 0 0 0 transparent;
+			inset 0 0.5px 0.5px 0.5px rgba(255, 255, 255, 0.09),
+			0 2px 4px 0 rgba(0, 0, 0, 0.15), 0 1px 1.5px 0 rgba(0, 0, 0, 0.1),
+			0 1px 2px 0 rgba(0, 0, 0, 0.2), 0 0 0 0 transparent;
 
 		--input-shadow-hover:
-			inset 0 .5px 1px .5px rgba(255, 255, 255, 0.16),
-			0 2px 3px 0 rgba(0,0,0,.3),
-			0 1px 1.5px 0 rgba(0,0,0,.2),
-			0 1px 2px 0 rgba(0,0,0,.4),
-			0 0 0 0 transparent;
+			inset 0 0.5px 1px 0.5px rgba(255, 255, 255, 0.16),
+			0 2px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 1.5px 0 rgba(0, 0, 0, 0.2),
+			0 1px 2px 0 rgba(0, 0, 0, 0.4), 0 0 0 0 transparent;
 
 		--mono-rgb-0: 0, 0, 0;
 		--mono-rgb-100: 255, 255, 255;

@@ -1,9 +1,9 @@
 {
 	"manifest_version": 3,
-	"name": "Obsidian Web Clipper",
-	"homepage_url": "https://obsidian.md/",
-	"version": "1.2.1",
-	"description": "Save content from the web to Obsidian, in a private and durable format you can always access offline.",
+	"name": "Clipper for AppFlowy",
+	"homepage_url": "https://github.com/alexrosepizant/clipper-for-appflowy",
+	"version": "0.1.0",
+	"description": "Unofficial community web clipper browser extension for AppFlowy",
 	"permissions": [
 		"activeTab",
 		"clipboardWrite",
@@ -11,11 +11,7 @@
 		"storage",
 		"scripting"
 	],
-	"host_permissions": [
-		"<all_urls>",
-		"http://*/*",
-		"https://*/*"
-	],
+	"host_permissions": ["<all_urls>", "http://*/*", "https://*/*"],
 	"action": {
 		"default_popup": "popup.html",
 		"default_icon": {
@@ -44,9 +40,16 @@
 	],
 	"web_accessible_resources": [
 		{
-			"resources": ["reader.css", "reader-script.js", "browser-polyfill.min.js", "style.css", "side-panel.html", "flatten-shadow-dom.js"],
+			"resources": [
+				"reader.css",
+				"reader-script.js",
+				"browser-polyfill.min.js",
+				"style.css",
+				"side-panel.html",
+				"flatten-shadow-dom.js"
+			],
 			"extension_ids": ["*"],
-			"matches": [ "*://*/*" ]
+			"matches": ["*://*/*"]
 		}
 	],
 	"content_security_policy": {
@@ -58,7 +61,7 @@
 				"default": "Ctrl+Shift+O",
 				"mac": "Command+Shift+O"
 			},
-			"description": "Open Obsidian Clipper"
+			"description": "Open Clipper for AppFlowy"
 		},
 		"quick_clip": {
 			"suggested_key": {

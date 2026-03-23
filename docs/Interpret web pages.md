@@ -1,16 +1,17 @@
 ---
 permalink: web-clipper/interpreter
 aliases:
-  - Interpreter
+    - Interpreter
 ---
-Interpreter is a [[Introduction to Obsidian Web Clipper|Web Clipper]] feature that lets you interact with web pages using natural language. Interpreter helps you capture and modify data that you want to save to Obsidian. For example:
+
+Interpreter is a [[Introduction to AppFlowy Web Clipper|Web Clipper]] feature that lets you interact with web pages using natural language. Interpreter helps you capture and modify data that you want to save to AppFlowy. For example:
 
 - Extract specific text fragments.
 - Summarize or explain information.
 - Convert text from one format to another.
 - Translate text to a different language.
 
-Interpreter leverages language models to process information on a web page, and return results using [[Variables]] that you can add to your [[Obsidian Web Clipper/Templates|Web Clipper Templates]].
+Interpreter leverages language models to process information on a web page, and return results using [[Variables]] that you can add to your [[Templates|Web Clipper Templates]].
 
 ![[web-clipper-interpreter-demo.mp4#interface]]
 
@@ -31,24 +32,24 @@ Interpreter works with almost any language model provider, including options tha
 1. Go to the **Interpreter** section in Web Clipper settings.
 2. Toggle on **Enable Interpreter**.
 3. Configure your provider and model, see [[Interpret web pages#Models|models]] section below.
-4. Add [[Variables|prompt variables]] to your [[Obsidian Web Clipper/Templates|templates]].
+4. Add [[Variables|prompt variables]] to your [[Templates|templates]].
 5. If your template includes prompt variables, the Interpreter section will be visible when you [[Clip web pages|clip a page]]. Click **interpret** to process the prompt variables.
 
 ## How it works
 
-When Interpreter is enabled *and* your template contains [[Variables#Prompt variables|prompt variables]], a new Interpreter section is displayed in the extension window, above the **Add to Obsidian** button. This section lets you select a model and run Interpreter for the current page.
+When Interpreter is enabled _and_ your template contains [[Variables#Prompt variables|prompt variables]], a new Interpreter section is displayed in the extension window, above the **Add to AppFlowy** button. This section lets you select a model and run Interpreter for the current page.
 
-When you click **interpret**, Interpreter sends the page context to your selected model, along with *all* the prompts in your template in one request. Depending on the model provider you choose, this can be an external call or local to your device. The model evaluates your prompts against the page context, and returns its responses. Interpreter then replaces the prompt variables with the response data.
+When you click **interpret**, Interpreter sends the page context to your selected model, along with _all_ the prompts in your template in one request. Depending on the model provider you choose, this can be an external call or local to your device. The model evaluates your prompts against the page context, and returns its responses. Interpreter then replaces the prompt variables with the response data.
 
 The whole process can take milliseconds or more than 30 seconds depending on the model you use and the amount of data you are processing.
 
 ## Context
 
-The term *context* refers to the page data that Interpreter uses to process prompts. The smaller the context, the faster Interpreter runs. 
+The term _context_ refers to the page data that Interpreter uses to process prompts. The smaller the context, the faster Interpreter runs.
 
 By default, Interpreter uses the entire page HTML as its context, however this can make prompts slower and more expensive than necessary.
 
-You can override the default context in Interpreter **Advanced settings** and define context per [[Obsidian Web Clipper/Templates|template]].
+You can override the default context in Interpreter **Advanced settings** and define context per [[Templates|template]].
 
 To define a more targeted context use [[Variables#Selector variables|selector variables]] (or other variable types) to interpret a section of the page. For example, you could use the following selector variable in your template's Interpreter context:
 
@@ -56,12 +57,12 @@ To define a more targeted context use [[Variables#Selector variables|selector va
 {{selectorHtml:#main}}
 ```
 
- This would only run Interpreter on the `#main` element of a web page, if it exists. [[Filters#HTML processing|HTML processing filters]] like `remove_html`, `strip_tags` and `strip_attr` can be useful to further reduce the context length and speed up processing.
+This would only run Interpreter on the `#main` element of a web page, if it exists. [[Filters#HTML processing|HTML processing filters]] like `remove_html`, `strip_tags` and `strip_attr` can be useful to further reduce the context length and speed up processing.
 
 ## Models
 
 > [!warning] Privacy
-> By using a third-party model provider you agree to their terms and privacy policy. Interpreter requests are sent directly to the provider you choose. Obsidian does not gather or store any data about your requests.
+> By using a third-party model provider you agree to their terms and privacy policy. Interpreter requests are sent directly to the provider you choose. This extension does not gather or store any data about your requests.
 
 ### Preset providers
 
@@ -100,7 +101,7 @@ Interpreter can use local models which offer greater privacy and offline compati
 
 #### Ollama
 
-[Ollama](https://ollama.com/) lets you run language models locally and privately on your device. 
+[Ollama](https://ollama.com/) lets you run language models locally and privately on your device.
 
 Once you have downloaded and installed Ollama, add Ollama using **Add provider** in Interpreter settings. Ollama does not require an API key. Then choose a model from the [model list](https://ollama.com/search). For example if you want to use [Llama 3.2](https://ollama.com/library/llama3.2), click **Add model**, then:
 
@@ -110,7 +111,7 @@ Once you have downloaded and installed Ollama, add Ollama using **Add provider**
 
 **Start the Ollama server**
 
-To allow a browser extension to interact with Ollama you must [give it explicit instruction](https://github.com/ollama/ollama/issues/2308) when running the server, or else you will see a `403` error. 
+To allow a browser extension to interact with Ollama you must [give it explicit instruction](https://github.com/ollama/ollama/issues/2308) when running the server, or else you will see a `403` error.
 
 Close the Ollama app, and run the following command in your terminal. The protocol should be changed to your browser's extension protocol if you don't use Chrome or Firefox.
 

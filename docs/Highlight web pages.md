@@ -1,12 +1,13 @@
 ---
 permalink: web-clipper/highlight
 aliases:
-  - highlights
-  - Highlighter
+    - highlights
+    - Highlighter
 ---
-[[Introduction to Obsidian Web Clipper|Web Clipper]] lets you highlight text on web pages, and select the elements you want to save to Obsidian. Your highlights are saved, so you can revisit them when you return to a page.
 
-Highlights can be [[Clip web pages|captured]] and saved to Obsidian when you open the extension.
+[[Introduction to AppFlowy Web Clipper|Web Clipper]] lets you highlight text on web pages, and select the elements you want to save to AppFlowy. Your highlights are saved, so you can revisit them when you return to a page.
+
+Highlights can be [[Clip web pages|captured]] and saved to AppFlowy when you open the extension.
 
 ## Turn on highlighter
 
@@ -24,7 +25,7 @@ You can change the highlighter behavior by going to Web Clipper settings. Here y
 
 There are three options for highlights to be inserted into your clipped note via the `{{content}}` [[Variables|variable]]:
 
-- **Highlight the page content** — adds highlights directly to the text with the [[Obsidian Flavored Markdown|syntax]] `==highlight==`.
+- **Highlight the page content** — adds highlights directly to the text with the syntax `==highlight==`.
 - **Replace the page content** — returns a list of highlights, without any of the page content.
 - **Do nothing** — returns the original content without highlights.
 

@@ -21,8 +21,8 @@
 		7AEF05872CA0F50D005FFBC2 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05862CA0F50D005FFBC2 /* Base */; };
 		7AEF05902CA0F50D005FFBC2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AEF058F2CA0F50D005FFBC2 /* AppDelegate.swift */; };
 		7AEF05932CA0F50D005FFBC2 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05922CA0F50D005FFBC2 /* Base */; };
-		7AEF059B2CA0F50D005FFBC2 /* Obsidian Web Clipper Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 7AEF059A2CA0F50D005FFBC2 /* Obsidian Web Clipper Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		7AEF05A52CA0F50D005FFBC2 /* Obsidian Web Clipper Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 7AEF05A42CA0F50D005FFBC2 /* Obsidian Web Clipper Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		7AEF059B2CA0F50D005FFBC2 /* AppFlowy Web Clipper Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 7AEF059A2CA0F50D005FFBC2 /* AppFlowy Web Clipper Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		7AEF05A52CA0F50D005FFBC2 /* AppFlowy Web Clipper Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 7AEF05A42CA0F50D005FFBC2 /* AppFlowy Web Clipper Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		7AEF05AB2CA0F50D005FFBC2 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF056F2CA0F50D005FFBC2 /* Base */; };
 		7AEF05AC2CA0F50D005FFBC2 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF056F2CA0F50D005FFBC2 /* Base */; };
 		7AEF05AD2CA0F50D005FFBC2 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05702CA0F50D005FFBC2 /* Icon.png */; };
@@ -69,14 +69,14 @@
 			containerPortal = 7AEF05682CA0F50C005FFBC2 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 7AEF05992CA0F50D005FFBC2;
-			remoteInfo = "Obsidian Web Clipper Extension (iOS)";
+			remoteInfo = "AppFlowy Web Clipper Extension (iOS)";
 		};
 		7AEF05A62CA0F50D005FFBC2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 7AEF05682CA0F50C005FFBC2 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = 7AEF05A32CA0F50D005FFBC2;
-			remoteInfo = "Obsidian Web Clipper Extension (macOS)";
+			remoteInfo = "AppFlowy Web Clipper Extension (macOS)";
 		};
 /* End PBXContainerItemProxy section */
 
@@ -87,7 +87,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				7AEF059B2CA0F50D005FFBC2 /* Obsidian Web Clipper Extension.appex in Embed Foundation Extensions */,
+				7AEF059B2CA0F50D005FFBC2 /* AppFlowy Web Clipper Extension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -98,7 +98,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				7AEF05A52CA0F50D005FFBC2 /* Obsidian Web Clipper Extension.appex in Embed Foundation Extensions */,
+				7AEF05A52CA0F50D005FFBC2 /* AppFlowy Web Clipper Extension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -117,22 +117,22 @@
 		7AEF05732CA0F50D005FFBC2 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		7AEF05742CA0F50D005FFBC2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7AEF05762CA0F50D005FFBC2 /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
-		7AEF057B2CA0F50D005FFBC2 /* Obsidian Web Clipper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Obsidian Web Clipper.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7AEF057B2CA0F50D005FFBC2 /* AppFlowy Web Clipper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "AppFlowy Web Clipper.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7AEF057E2CA0F50D005FFBC2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7AEF05802CA0F50D005FFBC2 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		7AEF05832CA0F50D005FFBC2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		7AEF05862CA0F50D005FFBC2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		7AEF05882CA0F50D005FFBC2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		7AEF058D2CA0F50D005FFBC2 /* Obsidian Web Clipper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Obsidian Web Clipper.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7AEF058D2CA0F50D005FFBC2 /* AppFlowy Web Clipper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "AppFlowy Web Clipper.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7AEF058F2CA0F50D005FFBC2 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7AEF05922CA0F50D005FFBC2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		7AEF05942CA0F50D005FFBC2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		7AEF05952CA0F50D005FFBC2 /* Obsidian Web Clipper.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Obsidian Web Clipper.entitlements"; sourceTree = "<group>"; };
-		7AEF059A2CA0F50D005FFBC2 /* Obsidian Web Clipper Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Obsidian Web Clipper Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7AEF05952CA0F50D005FFBC2 /* AppFlowy Web Clipper.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "AppFlowy Web Clipper.entitlements"; sourceTree = "<group>"; };
+		7AEF059A2CA0F50D005FFBC2 /* AppFlowy Web Clipper Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "AppFlowy Web Clipper Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7AEF059F2CA0F50D005FFBC2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		7AEF05A42CA0F50D005FFBC2 /* Obsidian Web Clipper Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Obsidian Web Clipper Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7AEF05A42CA0F50D005FFBC2 /* AppFlowy Web Clipper Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "AppFlowy Web Clipper Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7AEF05A92CA0F50D005FFBC2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		7AEF05AA2CA0F50D005FFBC2 /* Obsidian Web Clipper.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Obsidian Web Clipper.entitlements"; sourceTree = "<group>"; };
+		7AEF05AA2CA0F50D005FFBC2 /* AppFlowy Web Clipper.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "AppFlowy Web Clipper.entitlements"; sourceTree = "<group>"; };
 		7AEF05CB2CA0F50D005FFBC2 /* background.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = background.js; path = ../../../dist_safari/background.js; sourceTree = "<group>"; };
 		7AEF05CC2CA0F50D005FFBC2 /* popup.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = popup.js; path = ../../../dist_safari/popup.js; sourceTree = "<group>"; };
 		7AEF05CF2CA0F50D005FFBC2 /* popup.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = popup.html; path = ../../../dist_safari/popup.html; sourceTree = "<group>"; };
@@ -224,10 +224,10 @@
 		7AEF057C2CA0F50D005FFBC2 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				7AEF057B2CA0F50D005FFBC2 /* Obsidian Web Clipper.app */,
-				7AEF058D2CA0F50D005FFBC2 /* Obsidian Web Clipper.app */,
-				7AEF059A2CA0F50D005FFBC2 /* Obsidian Web Clipper Extension.appex */,
-				7AEF05A42CA0F50D005FFBC2 /* Obsidian Web Clipper Extension.appex */,
+				7AEF057B2CA0F50D005FFBC2 /* AppFlowy Web Clipper.app */,
+				7AEF058D2CA0F50D005FFBC2 /* AppFlowy Web Clipper.app */,
+				7AEF059A2CA0F50D005FFBC2 /* AppFlowy Web Clipper Extension.appex */,
+				7AEF05A42CA0F50D005FFBC2 /* AppFlowy Web Clipper Extension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -250,7 +250,7 @@
 				7AEF058F2CA0F50D005FFBC2 /* AppDelegate.swift */,
 				7AEF05912CA0F50D005FFBC2 /* Main.storyboard */,
 				7AEF05942CA0F50D005FFBC2 /* Info.plist */,
-				7AEF05952CA0F50D005FFBC2 /* Obsidian Web Clipper.entitlements */,
+				7AEF05952CA0F50D005FFBC2 /* AppFlowy Web Clipper.entitlements */,
 			);
 			path = "macOS (App)";
 			sourceTree = "<group>";
@@ -267,7 +267,7 @@
 			isa = PBXGroup;
 			children = (
 				7AEF05A92CA0F50D005FFBC2 /* Info.plist */,
-				7AEF05AA2CA0F50D005FFBC2 /* Obsidian Web Clipper.entitlements */,
+				7AEF05AA2CA0F50D005FFBC2 /* AppFlowy Web Clipper.entitlements */,
 			);
 			path = "macOS (Extension)";
 			sourceTree = "<group>";
@@ -298,9 +298,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		7AEF057A2CA0F50D005FFBC2 /* Obsidian Web Clipper (iOS) */ = {
+		7AEF057A2CA0F50D005FFBC2 /* AppFlowy Web Clipper (iOS) */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 7AEF05BF2CA0F50D005FFBC2 /* Build configuration list for PBXNativeTarget "Obsidian Web Clipper (iOS)" */;
+			buildConfigurationList = 7AEF05BF2CA0F50D005FFBC2 /* Build configuration list for PBXNativeTarget "AppFlowy Web Clipper (iOS)" */;
 			buildPhases = (
 				7AEF05772CA0F50D005FFBC2 /* Sources */,
 				7AEF05782CA0F50D005FFBC2 /* Frameworks */,
@@ -312,14 +312,14 @@
 			dependencies = (
 				7AEF059D2CA0F50D005FFBC2 /* PBXTargetDependency */,
 			);
-			name = "Obsidian Web Clipper (iOS)";
-			productName = "Obsidian Web Clipper (iOS)";
-			productReference = 7AEF057B2CA0F50D005FFBC2 /* Obsidian Web Clipper.app */;
+			name = "AppFlowy Web Clipper (iOS)";
+			productName = "AppFlowy Web Clipper (iOS)";
+			productReference = 7AEF057B2CA0F50D005FFBC2 /* AppFlowy Web Clipper.app */;
 			productType = "com.apple.product-type.application";
 		};
-		7AEF058C2CA0F50D005FFBC2 /* Obsidian Web Clipper (macOS) */ = {
+		7AEF058C2CA0F50D005FFBC2 /* AppFlowy Web Clipper (macOS) */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 7AEF05C62CA0F50D005FFBC2 /* Build configuration list for PBXNativeTarget "Obsidian Web Clipper (macOS)" */;
+			buildConfigurationList = 7AEF05C62CA0F50D005FFBC2 /* Build configuration list for PBXNativeTarget "AppFlowy Web Clipper (macOS)" */;
 			buildPhases = (
 				7AEF05892CA0F50D005FFBC2 /* Sources */,
 				7AEF058A2CA0F50D005FFBC2 /* Frameworks */,
@@ -331,14 +331,14 @@
 			dependencies = (
 				7AEF05A72CA0F50D005FFBC2 /* PBXTargetDependency */,
 			);
-			name = "Obsidian Web Clipper (macOS)";
-			productName = "Obsidian Web Clipper (macOS)";
-			productReference = 7AEF058D2CA0F50D005FFBC2 /* Obsidian Web Clipper.app */;
+			name = "AppFlowy Web Clipper (macOS)";
+			productName = "AppFlowy Web Clipper (macOS)";
+			productReference = 7AEF058D2CA0F50D005FFBC2 /* AppFlowy Web Clipper.app */;
 			productType = "com.apple.product-type.application";
 		};
-		7AEF05992CA0F50D005FFBC2 /* Obsidian Web Clipper Extension (iOS) */ = {
+		7AEF05992CA0F50D005FFBC2 /* AppFlowy Web Clipper Extension (iOS) */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 7AEF05BB2CA0F50D005FFBC2 /* Build configuration list for PBXNativeTarget "Obsidian Web Clipper Extension (iOS)" */;
+			buildConfigurationList = 7AEF05BB2CA0F50D005FFBC2 /* Build configuration list for PBXNativeTarget "AppFlowy Web Clipper Extension (iOS)" */;
 			buildPhases = (
 				7AEF05962CA0F50D005FFBC2 /* Sources */,
 				7AEF05972CA0F50D005FFBC2 /* Frameworks */,
@@ -348,14 +348,14 @@
 			);
 			dependencies = (
 			);
-			name = "Obsidian Web Clipper Extension (iOS)";
-			productName = "Obsidian Web Clipper Extension (iOS)";
-			productReference = 7AEF059A2CA0F50D005FFBC2 /* Obsidian Web Clipper Extension.appex */;
+			name = "AppFlowy Web Clipper Extension (iOS)";
+			productName = "AppFlowy Web Clipper Extension (iOS)";
+			productReference = 7AEF059A2CA0F50D005FFBC2 /* AppFlowy Web Clipper Extension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
-		7AEF05A32CA0F50D005FFBC2 /* Obsidian Web Clipper Extension (macOS) */ = {
+		7AEF05A32CA0F50D005FFBC2 /* AppFlowy Web Clipper Extension (macOS) */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 7AEF05C22CA0F50D005FFBC2 /* Build configuration list for PBXNativeTarget "Obsidian Web Clipper Extension (macOS)" */;
+			buildConfigurationList = 7AEF05C22CA0F50D005FFBC2 /* Build configuration list for PBXNativeTarget "AppFlowy Web Clipper Extension (macOS)" */;
 			buildPhases = (
 				7AEF05A02CA0F50D005FFBC2 /* Sources */,
 				7AEF05A12CA0F50D005FFBC2 /* Frameworks */,
@@ -365,9 +365,9 @@
 			);
 			dependencies = (
 			);
-			name = "Obsidian Web Clipper Extension (macOS)";
-			productName = "Obsidian Web Clipper Extension (macOS)";
-			productReference = 7AEF05A42CA0F50D005FFBC2 /* Obsidian Web Clipper Extension.appex */;
+			name = "AppFlowy Web Clipper Extension (macOS)";
+			productName = "AppFlowy Web Clipper Extension (macOS)";
+			productReference = 7AEF05A42CA0F50D005FFBC2 /* AppFlowy Web Clipper Extension.appex */;
 			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
@@ -394,7 +394,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 7AEF056B2CA0F50C005FFBC2 /* Build configuration list for PBXProject "Obsidian Web Clipper" */;
+			buildConfigurationList = 7AEF056B2CA0F50C005FFBC2 /* Build configuration list for PBXProject "AppFlowy Web Clipper" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -407,10 +407,10 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				7AEF057A2CA0F50D005FFBC2 /* Obsidian Web Clipper (iOS) */,
-				7AEF058C2CA0F50D005FFBC2 /* Obsidian Web Clipper (macOS) */,
-				7AEF05992CA0F50D005FFBC2 /* Obsidian Web Clipper Extension (iOS) */,
-				7AEF05A32CA0F50D005FFBC2 /* Obsidian Web Clipper Extension (macOS) */,
+				7AEF057A2CA0F50D005FFBC2 /* AppFlowy Web Clipper (iOS) */,
+				7AEF058C2CA0F50D005FFBC2 /* AppFlowy Web Clipper (macOS) */,
+				7AEF05992CA0F50D005FFBC2 /* AppFlowy Web Clipper Extension (iOS) */,
+				7AEF05A32CA0F50D005FFBC2 /* AppFlowy Web Clipper Extension (macOS) */,
 			);
 		};
 /* End PBXProject section */
@@ -532,12 +532,12 @@
 /* Begin PBXTargetDependency section */
 		7AEF059D2CA0F50D005FFBC2 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 7AEF05992CA0F50D005FFBC2 /* Obsidian Web Clipper Extension (iOS) */;
+			target = 7AEF05992CA0F50D005FFBC2 /* AppFlowy Web Clipper Extension (iOS) */;
 			targetProxy = 7AEF059C2CA0F50D005FFBC2 /* PBXContainerItemProxy */;
 		};
 		7AEF05A72CA0F50D005FFBC2 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 7AEF05A32CA0F50D005FFBC2 /* Obsidian Web Clipper Extension (macOS) */;
+			target = 7AEF05A32CA0F50D005FFBC2 /* AppFlowy Web Clipper Extension (macOS) */;
 			targetProxy = 7AEF05A62CA0F50D005FFBC2 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -705,7 +705,7 @@
 				CURRENT_PROJECT_VERSION = 44;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "iOS (Extension)/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "Obsidian Web Clipper Extension";
+				INFOPLIST_KEY_CFBundleDisplayName = "AppFlowy Web Clipper Extension";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -718,8 +718,8 @@
 					"-framework",
 					SafariServices,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "md.obsidian.Obsidian-Web-Clipper.Extension";
-				PRODUCT_NAME = "Obsidian Web Clipper Extension";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.alexrosepizant.clipper-for-appflowy.Extension";
+				PRODUCT_NAME = "AppFlowy Web Clipper Extension";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -735,7 +735,7 @@
 				CURRENT_PROJECT_VERSION = 44;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "iOS (Extension)/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "Obsidian Web Clipper Extension";
+				INFOPLIST_KEY_CFBundleDisplayName = "AppFlowy Web Clipper Extension";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -748,8 +748,8 @@
 					"-framework",
 					SafariServices,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "md.obsidian.Obsidian-Web-Clipper.Extension";
-				PRODUCT_NAME = "Obsidian Web Clipper Extension";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.alexrosepizant.clipper-for-appflowy.Extension";
+				PRODUCT_NAME = "AppFlowy Web Clipper Extension";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -769,7 +769,7 @@
 				CURRENT_PROJECT_VERSION = 44;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "iOS (App)/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "Obsidian Web Clipper";
+				INFOPLIST_KEY_CFBundleDisplayName = "AppFlowy Web Clipper";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
@@ -788,8 +788,8 @@
 					"-framework",
 					WebKit,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "md.obsidian.Obsidian-Web-Clipper";
-				PRODUCT_NAME = "Obsidian Web Clipper";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.alexrosepizant.clipper-for-appflowy";
+				PRODUCT_NAME = "AppFlowy Web Clipper";
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -807,7 +807,7 @@
 				CURRENT_PROJECT_VERSION = 44;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "iOS (App)/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "Obsidian Web Clipper";
+				INFOPLIST_KEY_CFBundleDisplayName = "AppFlowy Web Clipper";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
@@ -826,8 +826,8 @@
 					"-framework",
 					WebKit,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "md.obsidian.Obsidian-Web-Clipper";
-				PRODUCT_NAME = "Obsidian Web Clipper";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.alexrosepizant.clipper-for-appflowy";
+				PRODUCT_NAME = "AppFlowy Web Clipper";
 				SDKROOT = iphoneos;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -839,7 +839,7 @@
 		7AEF05C32CA0F50D005FFBC2 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = "macOS (Extension)/Obsidian Web Clipper.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "macOS (Extension)/AppFlowy Web Clipper.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 44;
@@ -850,7 +850,7 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "macOS (Extension)/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "Obsidian Web Clipper Extension";
+				INFOPLIST_KEY_CFBundleDisplayName = "AppFlowy Web Clipper Extension";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -863,8 +863,8 @@
 					"-framework",
 					SafariServices,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "md.obsidian.Obsidian-Web-Clipper.Extension";
-				PRODUCT_NAME = "Obsidian Web Clipper Extension";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.alexrosepizant.clipper-for-appflowy.Extension";
+				PRODUCT_NAME = "AppFlowy Web Clipper Extension";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -875,7 +875,7 @@
 		7AEF05C42CA0F50D005FFBC2 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CODE_SIGN_ENTITLEMENTS = "macOS (Extension)/Obsidian Web Clipper.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "macOS (Extension)/AppFlowy Web Clipper.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 44;
@@ -886,7 +886,7 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "macOS (Extension)/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "Obsidian Web Clipper Extension";
+				INFOPLIST_KEY_CFBundleDisplayName = "AppFlowy Web Clipper Extension";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -899,8 +899,8 @@
 					"-framework",
 					SafariServices,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "md.obsidian.Obsidian-Web-Clipper.Extension";
-				PRODUCT_NAME = "Obsidian Web Clipper Extension";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.alexrosepizant.clipper-for-appflowy.Extension";
+				PRODUCT_NAME = "AppFlowy Web Clipper Extension";
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -914,7 +914,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
-				CODE_SIGN_ENTITLEMENTS = "macOS (App)/Obsidian Web Clipper.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "macOS (App)/AppFlowy Web Clipper.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 44;
@@ -925,7 +925,7 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "macOS (App)/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "Obsidian Web Clipper";
+				INFOPLIST_KEY_CFBundleDisplayName = "AppFlowy Web Clipper";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSMainStoryboardFile = Main;
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
@@ -941,8 +941,8 @@
 					"-framework",
 					WebKit,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "md.obsidian.Obsidian-Web-Clipper";
-				PRODUCT_NAME = "Obsidian Web Clipper";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.alexrosepizant.clipper-for-appflowy";
+				PRODUCT_NAME = "AppFlowy Web Clipper";
 				SDKROOT = macosx;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -955,7 +955,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
-				CODE_SIGN_ENTITLEMENTS = "macOS (App)/Obsidian Web Clipper.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "macOS (App)/AppFlowy Web Clipper.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 44;
@@ -966,7 +966,7 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "macOS (App)/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "Obsidian Web Clipper";
+				INFOPLIST_KEY_CFBundleDisplayName = "AppFlowy Web Clipper";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSMainStoryboardFile = Main;
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
@@ -982,8 +982,8 @@
 					"-framework",
 					WebKit,
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "md.obsidian.Obsidian-Web-Clipper";
-				PRODUCT_NAME = "Obsidian Web Clipper";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.alexrosepizant.clipper-for-appflowy";
+				PRODUCT_NAME = "AppFlowy Web Clipper";
 				SDKROOT = macosx;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -993,7 +993,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		7AEF056B2CA0F50C005FFBC2 /* Build configuration list for PBXProject "Obsidian Web Clipper" */ = {
+		7AEF056B2CA0F50C005FFBC2 /* Build configuration list for PBXProject "AppFlowy Web Clipper" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				7AEF05B92CA0F50D005FFBC2 /* Debug */,
@@ -1002,7 +1002,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		7AEF05BB2CA0F50D005FFBC2 /* Build configuration list for PBXNativeTarget "Obsidian Web Clipper Extension (iOS)" */ = {
+		7AEF05BB2CA0F50D005FFBC2 /* Build configuration list for PBXNativeTarget "AppFlowy Web Clipper Extension (iOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				7AEF05BC2CA0F50D005FFBC2 /* Debug */,
@@ -1011,7 +1011,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		7AEF05BF2CA0F50D005FFBC2 /* Build configuration list for PBXNativeTarget "Obsidian Web Clipper (iOS)" */ = {
+		7AEF05BF2CA0F50D005FFBC2 /* Build configuration list for PBXNativeTarget "AppFlowy Web Clipper (iOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				7AEF05C02CA0F50D005FFBC2 /* Debug */,
@@ -1020,7 +1020,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		7AEF05C22CA0F50D005FFBC2 /* Build configuration list for PBXNativeTarget "Obsidian Web Clipper Extension (macOS)" */ = {
+		7AEF05C22CA0F50D005FFBC2 /* Build configuration list for PBXNativeTarget "AppFlowy Web Clipper Extension (macOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				7AEF05C32CA0F50D005FFBC2 /* Debug */,
@@ -1029,7 +1029,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		7AEF05C62CA0F50D005FFBC2 /* Build configuration list for PBXNativeTarget "Obsidian Web Clipper (macOS)" */ = {
+		7AEF05C62CA0F50D005FFBC2 /* Build configuration list for PBXNativeTarget "AppFlowy Web Clipper (macOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				7AEF05C72CA0F50D005FFBC2 /* Debug */,

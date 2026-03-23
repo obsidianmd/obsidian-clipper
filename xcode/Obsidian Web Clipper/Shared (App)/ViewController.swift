@@ -16,7 +16,7 @@ import SafariServices
 typealias PlatformViewController = NSViewController
 #endif
 
-let extensionBundleIdentifier = "md.obsidian.Obsidian-Web-Clipper.Extension"
+let extensionBundleIdentifier = "com.alexrosepizant.clipper-for-appflowy.Extension"
 
 class ViewController: PlatformViewController, WKNavigationDelegate, WKScriptMessageHandler {
 

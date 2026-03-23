@@ -1,7 +1,8 @@
 ---
 permalink: web-clipper/filters
 ---
-Filters allow you to modify [[variables]] in [[Obsidian Web Clipper/Templates|Web Clipper templates]]. Filters are applied to variables using the syntax `{{variable|filter}}`.
+
+Filters allow you to modify [[variables]] in [[Templates|Web Clipper templates]]. Filters are applied to variables using the syntax `{{variable|filter}}`.
 
 - Filters work for any kind of [[Variables|variable]] including `prompt`, `meta`, `selector`, and `schema` variables.
 - Filters can be chained, e.g. `{{variable|filter1|filter2}}`, and are applied in the order they are added.
@@ -17,7 +18,7 @@ Converts a date to the specified format, [see reference](https://day.js.org/docs
 - `{{date|date:"YYYY-MM-DD"}}` converts the current date to "YYYY-MM-DD".
 - Use `date:("outputFormat", "inputFormat")` to specify the input format, e.g. `"12/01/2024"|date:("YYYY-MM-DD", "MM/DD/YYYY")` parses "12/01/2024" and returns `"2024-12-01"`.
 
-### `date_modify` 
+### `date_modify`
 
 Modifies a date by adding or subtracting a specified amount of time, [see reference](https://day.js.org/docs/en/manipulate/add).
 
@@ -117,7 +118,7 @@ Converts a value to uppercase, e.g. `"hello world"|upper` returns `"HELLO WORLD"
 
 Apply [[Basic formatting syntax]] and [[Advanced formatting syntax]] to text.
 
-### `blockquote` 
+### `blockquote`
 
 Adds a Markdown quote prefix (`> `) to each line of the input.
 
@@ -143,7 +144,7 @@ Converts strings and arrays into [text fragment](https://developer.mozilla.org/e
 - `highlights|fragment_link` returns `Highlight content [link](text-fragment-url)`
 - `highlights|fragment_link:"custom title"` returns `Highlight content [custom title](text-fragment-url)`
 
-### `image` 
+### `image`
 
 Converts strings, arrays, or objects into Markdown image syntax.
 
@@ -179,7 +180,7 @@ Converts an array or array of objects into a [[Advanced formatting syntax#Tables
 
 ### `wikilink`
 
-Converts strings, arrays, or objects into Obsidian [[Link notes|wikilink]] syntax.
+Converts strings, arrays, or objects into [[Link notes|wikilink]] syntax.
 
 - For strings: `"page"|wikilink` returns `[[page]]`.
 - For strings with alias: `"page"|wikilink:"alias"` returns `[[page|alias]]`.
@@ -217,13 +218,13 @@ Rounds a number to the nearest integer or to a specified number of decimal place
 
 Process HTML content and convert HTML to Markdown. Note that your input [[Variables|variable]] must contain HTML content, e.g. using `{{fullHtml}}`, `{{contentHtml}}` or a `{{selectorHtml:}}` variable.
 
-### `markdown` 
+### `markdown`
 
-Converts a string to an [[Obsidian Flavored Markdown]] formatted string.
+Converts a string to a Markdown formatted string.
 
 - Useful when combined with variables that return HTML such as `{{contentHtml}}`, `{{fullHtml}}`, and selector variables like `{{selectorHtml:cssSelector}}`.
 
-### `remove_attr` 
+### `remove_attr`
 
 Removes only the specified HTML attributes from tags.
 
@@ -237,7 +238,7 @@ Removes the specified HTML elements and their content from a string.
 - Supports tag name, class, or id, e.g. `{{fullHtml|remove_html:("img,.class-name,#element-id")}}`
 - To remove only HTML tags or attributes without removing the content use the `strip_tags` or `strip_attr` filters.
 
-### `remove_tags` 
+### `remove_tags`
 
 Removes only the specified HTML tags. Keeps the content of the tags.
 
@@ -275,7 +276,7 @@ Removes **all** HTML tags from a string. Content within the tag is preserved.
 
 Process arrays and objects.
 
-### `first` 
+### `first`
 
 Returns the first element of an array as a string.
 
@@ -302,7 +303,7 @@ Returns the last element of an array as a string.
 Applies a transformation to each element of an array using the syntax `map:item => item.property` or `map:item => item.nested.property` for nested properties.
 
 - `[{gem: "obsidian", color: "black"}, {gem: "amethyst", color: "purple"}]|map:item => item.gem` returns `["obsidian", "amethyst"]`.
-- Use parentheses for object literals and complex expressions: `map:item => ({key: value})`, e.g.: `[{gem: "obsidian", color: "black"}, {gem: "amethyst", color: "purple"}]|map:item => ({name: item.gem, color: item.color})`  returns `[{name: "obsidian", color: "black"}, {name: "amethyst", color: "purple"}]`.
+- Use parentheses for object literals and complex expressions: `map:item => ({key: value})`, e.g.: `[{gem: "obsidian", color: "black"}, {gem: "amethyst", color: "purple"}]|map:item => ({name: item.gem, color: item.color})` returns `[{name: "obsidian", color: "black"}, {name: "amethyst", color: "purple"}]`.
 
 String literals are also supported, e.g. `["rock", "pop"]|map:item => "genres/${item}"` returns `["genres/rock", "genres/pop"]`.
 

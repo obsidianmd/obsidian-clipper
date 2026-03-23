@@ -1,10 +1,10 @@
 {
 	"manifest_version": 3,
 	"default_locale": "en",
-	"name": "Obsidian Web Clipper",
-	"homepage_url": "https://obsidian.md/",
-	"version": "1.2.1",
-	"description": "Save and highlight web pages in a private and durable format that you can access offline. The official extension for Obsidian.",
+	"name": "Clipper for AppFlowy",
+	"homepage_url": "https://github.com/alexrosepizant/clipper-for-appflowy",
+	"version": "0.1.0",
+	"description": "Unofficial community web clipper browser extension for AppFlowy",
 	"permissions": [
 		"activeTab",
 		"clipboardWrite",
@@ -15,11 +15,7 @@
 		"scripting",
 		"declarativeNetRequest"
 	],
-	"host_permissions": [
-		"<all_urls>",
-		"http://*/*",
-		"https://*/*"
-	],
+	"host_permissions": ["<all_urls>", "http://*/*", "https://*/*"],
 	"action": {
 		"default_popup": "popup.html"
 	},
@@ -47,9 +43,16 @@
 	],
 	"web_accessible_resources": [
 		{
-			"resources": ["reader.css", "reader-script.js", "browser-polyfill.min.js", "style.css", "side-panel.html", "flatten-shadow-dom.js"],
+			"resources": [
+				"reader.css",
+				"reader-script.js",
+				"browser-polyfill.min.js",
+				"style.css",
+				"side-panel.html",
+				"flatten-shadow-dom.js"
+			],
 			"extension_ids": ["*"],
-			"matches": [ "*://*/*" ]
+			"matches": ["*://*/*"]
 		}
 	],
 	"content_security_policy": {

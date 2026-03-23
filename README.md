@@ -1,43 +1,32 @@
-Obsidian Web Clipper helps you highlight and capture the web in your favorite browser. Anything you save is stored as durable Markdown files that you can read offline, and preserve for the long term.
+<p align="center">
+  <img src="assets/logo.svg" width="64" height="64" alt="Clipper for AppFlowy">
+</p>
 
-- **[Download Web Clipper](https://obsidian.md/clipper)**
-- **[Documentation](https://help.obsidian.md/web-clipper)**
-- **[Troubleshooting](https://help.obsidian.md/web-clipper/troubleshoot)**
+# Clipper for AppFlowy
+
+> A community fork of [obsidian-clipper](https://github.com/obsidianmd/obsidian-clipper), adapted for [AppFlowy](https://github.com/AppFlowy-IO/AppFlowy).
+
+> ⚠️ This is an unofficial community project, not affiliated with or endorsed by the AppFlowy team.
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 ## Get started
 
-Install the extension by downloading it from the official directory for your browser:
-
-- **[Chrome Web Store](https://chromewebstore.google.com/detail/obsidian-web-clipper/cnjifjpddelmedmihgijeibhnjfabmlf)** for Chrome, Brave, Arc, Orion, and other Chromium-based browsers.
-- **[Firefox Add-Ons](https://addons.mozilla.org/en-US/firefox/addon/web-clipper-obsidian/)** for Firefox and Firefox Mobile.
-- **[Safari Extensions](https://apps.apple.com/us/app/obsidian-web-clipper/id6720708363)** for macOS, iOS, and iPadOS.
-- **[Edge Add-Ons](https://microsoftedge.microsoft.com/addons/detail/obsidian-web-clipper/eigdjhmgnaaeaonimdklocfekkaanfme)** for Microsoft Edge.
+The extension is not yet published to browser stores. To use it, install it locally by following the [developer instructions](#install-the-extension-locally) below.
 
 ## Use the extension
 
-Documentation is available on the [Obsidian Help site](https://help.obsidian.md/web-clipper), which covers how to use [highlighting](https://help.obsidian.md/web-clipper/highlight), [templates](https://help.obsidian.md/web-clipper/templates), [variables](https://help.obsidian.md/web-clipper/variables), [filters](https://help.obsidian.md/web-clipper/filters), and more.
+Documentation is available in the [`docs/`](./docs) folder, covering how to use [highlighting](./docs/Highlight%20web%20pages.md), [templates](./docs/Templates.md), [variables](./docs/Variables.md), [filters](./docs/Filters.md), and more.
 
 ## Contribute
 
 ### Translations
 
-You can help translate Web Clipper into your language. Submit your translation via pull request using the format found in the [/_locales](/src/_locales) folder.
+You can help translate Clipper for AppFlowy into your language. Submit your translation via pull request using the format found in the [/\_locales](/src/_locales) folder.
 
 ### Features and bug fixes
 
-See the [help wanted](https://github.com/obsidianmd/obsidian-clipper/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22) tag for issues where contributions are welcome.
-
-## Roadmap
-
-In no particular order:
-
-- [ ] A separate icon for Web Clipper
-- [ ] Annotate highlights
-- [ ] Template directory
-- [x] Template validation
-- [x] Template logic (if/for)
-- [x] Save images locally, [added in Obsidian 1.8.0](https://obsidian.md/changelog/2024-12-18-desktop-v1.8.0/)
-- [x] Translate UI into more languages — help is welcomed
+See the [issues](https://github.com/alexrosepizant/clipper-for-appflowy/issues) for open tasks where contributions are welcome. Feel free to **[report a bug or request a feature](https://github.com/alexrosepizant/clipper-for-appflowy/issues)** as well.
 
 ## Developers
 
@@ -48,6 +37,7 @@ npm run build
 ```
 
 This will create three directories:
+
 - `dist/` for the Chromium version
 - `dist_firefox/` for the Firefox version
 - `dist_safari/` for the Safari version
@@ -76,11 +66,11 @@ If you want to run the extension permanently you can do so with the Nightly or D
 For iOS Simulator testing on macOS:
 
 1. Run `npm run build` to build the extension
-2. Open `xcode/Obsidian Web Clipper/Obsidian Web Clipper.xcodeproj` in Xcode
-3. Select the **Obsidian Web Clipper (iOS)** scheme from the scheme selector
+2. Open `xcode/Clipper for AppFlowy/Clipper for AppFlowy.xcodeproj` in Xcode
+3. Select the **Clipper for AppFlowy (iOS)** scheme from the scheme selector
 4. Choose an iOS Simulator device and click **Run** to build and launch the app
 5. Once the app is running on the simulator, open **Safari**
-6. Navigate to a webpage and tap the **Extensions** button in Safari to access the Web Clipper extension
+6. Navigate to a webpage and tap the **Extensions** button in Safari to access the extension
 
 ### Run tests
 
@@ -102,3 +92,10 @@ npm run test:watch
 - [lz-string](https://github.com/pieroxy/lz-string) to compress templates to reduce storage space
 - [lucide](https://github.com/lucide-icons/lucide) for icons
 - [dompurify](https://github.com/cure53/DOMPurify) for sanitizing HTML
+
+## License
+
+MIT License — see [LICENSE](./LICENSE).
+
+Original work Copyright (c) 2024 Obsidian ([obsidian-clipper](https://github.com/obsidianmd/obsidian-clipper)).
+Modifications Copyright (c) 2026 clipper-for-appflowy contributors.
