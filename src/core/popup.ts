@@ -9,7 +9,11 @@ import {
 	generateFrontmatter,
 	saveToObsidian,
 } from "../utils/obsidian-note-creator";
-import { saveToAppFlowy } from "../utils/appflowy-note-creator";
+import {
+	saveToAppFlowy,
+	fetchAppflowySpaces,
+	fetchAppflowyFolders,
+} from "../utils/appflowy-note-creator";
 import {
 	extractPageContent,
 	initializePageContent,
@@ -70,6 +74,8 @@ let templates: Template[] = [];
 let currentVariables: { [key: string]: string } = {};
 let currentTabId: number | undefined;
 let lastSelectedVault: string | null = null;
+let lastSelectedSpace: string | null = null;
+let lastSelectedFolder: string | null = null;
 
 const isSidePanel = window.location.pathname.includes("side-panel.html");
 const urlParams = new URLSearchParams(window.location.search);
@@ -255,7 +261,10 @@ async function initializeExtension(tabId: number) {
 		if (!lastSelectedVault && loadedSettings.vaults.length > 0) {
 			lastSelectedVault = loadedSettings.vaults[0];
 		}
-		debugLog("Vaults", "Last selected vault:", lastSelectedVault);
+
+		// Load last selected AppFlowy space and folder
+		lastSelectedSpace = await getLocalStorage("lastSelectedSpace");
+		lastSelectedFolder = await getLocalStorage("lastSelectedFolder");
 
 		updateVaultDropdown(loadedSettings.vaults);
 
@@ -425,6 +434,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 			try {
 				// DOM-dependent initializations
 				updateVaultDropdown(loadedSettings.vaults);
+				updateSpaceDropdown(loadedSettings);
 				populateTemplateDropdown();
 				setupEventListeners(currentTabId);
 				await initializeUI();
@@ -1318,6 +1328,103 @@ async function getReplacedTemplate(
 	return replacedTemplate;
 }
 
+function updateSpaceDropdown(settings: Settings) {
+	const spaceContainer = document.getElementById("space-container");
+	const spaceDropdown = document.getElementById(
+		"space-select",
+	) as HTMLSelectElement | null;
+	const pathField = document.getElementById(
+		"path-name-field",
+	) as HTMLInputElement | null;
+
+	if (!spaceDropdown || !spaceContainer) return;
+
+	const { serverUrl, apiToken, workspaceId } = settings.appflowyConfig;
+	const isAppFlowy = settings.saveBehavior === "addToAppFlowy";
+
+	if (!isAppFlowy || !serverUrl || !apiToken || !workspaceId) {
+		spaceContainer.style.display = "none";
+		if (pathField) pathField.style.display = "";
+		return;
+	}
+
+	spaceContainer.style.display = "block";
+	if (pathField) pathField.style.display = "none";
+
+	fetchAppflowySpaces(serverUrl, apiToken, workspaceId)
+		.then((spaces) => {
+			spaceDropdown.textContent = "";
+			spaces.forEach((s) => {
+				const opt = document.createElement("option");
+				opt.value = s.view_id;
+				opt.textContent = s.name;
+				spaceDropdown.appendChild(opt);
+			});
+			if (spaces.length > 0) {
+				const savedId =
+					lastSelectedSpace || settings.appflowyConfig.parentViewId;
+				spaceDropdown.value =
+					savedId && spaces.some((s) => s.view_id === savedId)
+						? savedId
+						: spaces[0].view_id;
+				updateFolderDropdown(settings, spaceDropdown.value);
+			}
+		})
+		.catch(() => {
+			spaceContainer.style.display = "none";
+			if (pathField) pathField.style.display = "";
+		});
+
+	spaceDropdown.onchange = () => {
+		lastSelectedSpace = spaceDropdown.value;
+		setLocalStorage("lastSelectedSpace", lastSelectedSpace);
+		updateFolderDropdown(settings, spaceDropdown.value);
+	};
+}
+
+function updateFolderDropdown(settings: Settings, spaceId: string) {
+	const folderContainer = document.getElementById("folder-container");
+	const folderDropdown = document.getElementById(
+		"folder-select",
+	) as HTMLSelectElement | null;
+
+	if (!folderDropdown || !folderContainer) return;
+
+	const { serverUrl, apiToken, workspaceId } = settings.appflowyConfig;
+
+	folderContainer.style.display = "block";
+
+	fetchAppflowyFolders(serverUrl, apiToken, workspaceId, spaceId)
+		.then((folders) => {
+			folderDropdown.textContent = "";
+			// Option to save at the root of the space
+			const rootOpt = document.createElement("option");
+			rootOpt.value = spaceId;
+			rootOpt.textContent = getMessage("appflowyRootFolder");
+			folderDropdown.appendChild(rootOpt);
+			folders.forEach((f) => {
+				const opt = document.createElement("option");
+				opt.value = f.view_id;
+				opt.textContent = f.name;
+				folderDropdown.appendChild(opt);
+			});
+			if (lastSelectedFolder) {
+				const exists = Array.from(folderDropdown.options).some(
+					(o) => o.value === lastSelectedFolder,
+				);
+				if (exists) folderDropdown.value = lastSelectedFolder;
+			}
+		})
+		.catch(() => {
+			folderContainer.style.display = "none";
+		});
+
+	folderDropdown.onchange = () => {
+		lastSelectedFolder = folderDropdown.value;
+		setLocalStorage("lastSelectedFolder", lastSelectedFolder);
+	};
+}
+
 function updateVaultDropdown(vaults: string[]) {
 	const vaultDropdown = document.getElementById(
 		"vault-select",
@@ -1566,10 +1673,6 @@ function determineMainAction() {
 		case "copyToClipboard":
 			mainButton.textContent = getMessage("copyToClipboard");
 			mainButton.onclick = () => copyContent();
-			// Add direct actions to secondary
-			addSecondaryAction(secondaryActions, "addToObsidian", () =>
-				handleClipObsidian(),
-			);
 			addSecondaryAction(secondaryActions, "addToAppFlowy", () =>
 				handleClipAppFlowy(),
 			);
@@ -1582,10 +1685,6 @@ function determineMainAction() {
 		case "saveFile":
 			mainButton.textContent = getMessage("saveFile");
 			mainButton.onclick = () => handleSaveToDownloads();
-			// Add direct actions to secondary
-			addSecondaryAction(secondaryActions, "addToObsidian", () =>
-				handleClipObsidian(),
-			);
 			addSecondaryAction(secondaryActions, "addToAppFlowy", () =>
 				handleClipAppFlowy(),
 			);
@@ -1595,31 +1694,9 @@ function determineMainAction() {
 				copyContent,
 			);
 			break;
-		case "addToAppFlowy":
+		default: // 'addToAppFlowy'
 			mainButton.textContent = getMessage("addToAppFlowy");
 			mainButton.onclick = () => handleClipAppFlowy();
-			// Add direct actions to secondary
-			addSecondaryAction(secondaryActions, "addToObsidian", () =>
-				handleClipObsidian(),
-			);
-			addSecondaryAction(
-				secondaryActions,
-				"copyToClipboard",
-				copyContent,
-			);
-			addSecondaryAction(
-				secondaryActions,
-				"saveFile",
-				handleSaveToDownloads,
-			);
-			break;
-		default: // 'addToObsidian'
-			mainButton.textContent = getMessage("addToObsidian");
-			mainButton.onclick = () => handleClipObsidian();
-			// Add direct actions to secondary
-			addSecondaryAction(secondaryActions, "addToAppFlowy", () =>
-				handleClipAppFlowy(),
-			);
 			addSecondaryAction(
 				secondaryActions,
 				"copyToClipboard",
@@ -1769,7 +1846,29 @@ async function handleClipAppFlowy(): Promise<void> {
 		const fileContent = frontmatter + noteContentField.value;
 		const noteName = noteNameField?.value || "Clipped Page";
 
-		await saveToAppFlowy(fileContent, noteName, config);
+		// Use selected folder as parentViewId, falling back to space, then config
+		const spaceDropdown = document.getElementById(
+			"space-select",
+		) as HTMLSelectElement | null;
+		const folderDropdown = document.getElementById(
+			"folder-select",
+		) as HTMLSelectElement | null;
+		const selectedParent =
+			folderDropdown?.value ||
+			spaceDropdown?.value ||
+			config.parentViewId;
+		const configWithParent = { ...config, parentViewId: selectedParent };
+
+		await saveToAppFlowy(fileContent, noteName, configWithParent);
+
+		if (spaceDropdown?.value) {
+			lastSelectedSpace = spaceDropdown.value;
+			setLocalStorage("lastSelectedSpace", lastSelectedSpace);
+		}
+		if (folderDropdown?.value) {
+			lastSelectedFolder = folderDropdown.value;
+			setLocalStorage("lastSelectedFolder", lastSelectedFolder);
+		}
 
 		const tabInfo = await getCurrentTabInfo();
 		await incrementStat(

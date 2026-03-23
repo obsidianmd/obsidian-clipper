@@ -849,5 +849,8 @@
 	},
 	"version": {
 		"message": "Versão"
+	},
+	"appflowyRootFolder": {
+		"message": "Salvar na raiz"
 	}
 }

@@ -849,5 +849,8 @@
 	},
 	"version": {
 		"message": "نسخه"
+	},
+	"appflowyRootFolder": {
+		"message": "ذخیره در ریشه"
 	}
 }

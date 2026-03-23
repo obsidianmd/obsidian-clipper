@@ -841,5 +841,8 @@
 	},
 	"version": {
 		"message": "Bersyon"
+	},
+	"appflowyRootFolder": {
+		"message": "I-save sa ugat"
 	}
 }

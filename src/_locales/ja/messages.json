@@ -849,5 +849,8 @@
 	},
 	"version": {
 		"message": "バージョン"
+	},
+	"appflowyRootFolder": {
+		"message": "ルートに保存"
 	}
 }

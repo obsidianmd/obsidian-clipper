@@ -841,5 +841,8 @@
 	},
 	"version": {
 		"message": "גרסה"
+	},
+	"appflowyRootFolder": {
+		"message": "שמור בשורש"
 	}
 }

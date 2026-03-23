@@ -849,5 +849,8 @@
 	},
 	"version": {
 		"message": "Versie"
+	},
+	"appflowyRootFolder": {
+		"message": "Opslaan in de root"
 	}
 }

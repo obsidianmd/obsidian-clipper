@@ -849,5 +849,8 @@
 	},
 	"version": {
 		"message": "버전"
+	},
+	"appflowyRootFolder": {
+		"message": "루트에 저장"
 	}
 }

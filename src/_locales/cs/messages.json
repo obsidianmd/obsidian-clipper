@@ -841,5 +841,8 @@
 	},
 	"version": {
 		"message": "Verze"
+	},
+	"appflowyRootFolder": {
+		"message": "Uložit do kořene"
 	}
 }

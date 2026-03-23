@@ -841,5 +841,8 @@
 	},
 	"version": {
 		"message": "Versiune"
+	},
+	"appflowyRootFolder": {
+		"message": "Salvați în rădăcină"
 	}
 }

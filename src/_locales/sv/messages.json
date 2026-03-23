@@ -849,5 +849,8 @@
 	},
 	"version": {
 		"message": "Version"
+	},
+	"appflowyRootFolder": {
+		"message": "Spara i roten"
 	}
 }

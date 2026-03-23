@@ -849,5 +849,8 @@
 	},
 	"version": {
 		"message": "সংস্করণ"
+	},
+	"appflowyRootFolder": {
+		"message": "স্পেসের মূলে সংরক্ষণ করুন"
 	}
 }

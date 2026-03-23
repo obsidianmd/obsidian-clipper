@@ -849,5 +849,8 @@
 	},
 	"version": {
 		"message": "Phiên bản"
+	},
+	"appflowyRootFolder": {
+		"message": "Lưu tại thư mục gốc"
 	}
 }

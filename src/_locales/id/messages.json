@@ -849,5 +849,8 @@
 	},
 	"version": {
 		"message": "Versi"
+	},
+	"appflowyRootFolder": {
+		"message": "Simpan di root"
 	}
 }

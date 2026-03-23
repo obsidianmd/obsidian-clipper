@@ -550,7 +550,6 @@ function initializeSaveBehaviorDropdown(): void {
 	dropdown.value = generalSettings.saveBehavior;
 	dropdown.addEventListener("change", () => {
 		const newValue = dropdown.value as
-			| "addToObsidian"
 			| "addToAppFlowy"
 			| "copyToClipboard"
 			| "saveFile";
@@ -588,9 +587,6 @@ function initializeAppflowySettings(): void {
 	) as HTMLButtonElement;
 	const fetchBtn = document.getElementById(
 		"appflowy-fetch-workspaces-btn",
-	) as HTMLButtonElement;
-	const fetchSpacesBtn = document.getElementById(
-		"appflowy-fetch-spaces-btn",
 	) as HTMLButtonElement;
 
 	if (serverUrlInput)
@@ -716,7 +712,6 @@ function initializeAppflowySettings(): void {
 				}
 
 				await saveAppflowyConfigNow();
-				fetchAndPopulateSpaces();
 				verifyOtpBtn.textContent = "✓ Connected!";
 				if (otpRow) otpRow.style.display = "none";
 				if (otpCodeInput) otpCodeInput.value = "";
@@ -746,9 +741,7 @@ function initializeAppflowySettings(): void {
 			workspaceId:
 				workspaceIdInput?.value ||
 				generalSettings.appflowyConfig.workspaceId,
-			parentViewId:
-				spaceSelect?.value ||
-				generalSettings.appflowyConfig.parentViewId,
+			parentViewId: generalSettings.appflowyConfig.parentViewId,
 		};
 		try {
 			await browser.storage.sync.set({ appflowy_config: values });
@@ -769,72 +762,8 @@ function initializeAppflowySettings(): void {
 	});
 	if (workspaceIdInput) {
 		workspaceIdInput.addEventListener("input", saveAppflowyConfig);
-		workspaceIdInput.addEventListener("blur", async () => {
-			await saveAppflowyConfigNow();
-			fetchAndPopulateSpaces();
-		});
+		workspaceIdInput.addEventListener("blur", saveAppflowyConfigNow);
 	}
-	spaceSelect?.addEventListener("change", saveAppflowyConfigNow);
-
-	const populateSpaceSelect = (
-		spaces: Array<{ view_id: string; name: string }>,
-		savedId?: string,
-	) => {
-		if (!spaceSelect) return;
-		spaceSelect.innerHTML = "";
-		if (spaces.length === 0) {
-			const opt = document.createElement("option");
-			opt.value = "";
-			opt.textContent = "—";
-			spaceSelect.appendChild(opt);
-			spaceSelect.disabled = true;
-			return;
-		}
-		spaces.forEach((s) => {
-			const opt = document.createElement("option");
-			opt.value = s.view_id;
-			opt.textContent = s.name;
-			spaceSelect.appendChild(opt);
-		});
-		spaceSelect.disabled = false;
-		const idToSelect =
-			savedId && spaces.some((s) => s.view_id === savedId)
-				? savedId
-				: spaces[0].view_id;
-		spaceSelect.value = idToSelect;
-		if (idToSelect !== savedId) {
-			saveAppflowyConfigNow();
-		}
-	};
-
-	const fetchAndPopulateSpaces = async () => {
-		const serverUrl = serverUrlInput?.value?.trim();
-		const apiToken = apiTokenInput?.value?.trim();
-		const workspaceId = workspaceIdInput?.value?.trim();
-		if (!serverUrl || !apiToken || !workspaceId) return;
-		if (fetchSpacesBtn) {
-			fetchSpacesBtn.disabled = true;
-			fetchSpacesBtn.textContent = "…";
-		}
-		try {
-			const spaces = await fetchAppflowySpaces(
-				serverUrl,
-				apiToken,
-				workspaceId,
-			);
-			populateSpaceSelect(
-				spaces,
-				generalSettings.appflowyConfig.parentViewId,
-			);
-		} catch (e) {
-			console.warn("[AppFlowy] Could not fetch spaces:", e);
-		} finally {
-			if (fetchSpacesBtn) {
-				fetchSpacesBtn.disabled = false;
-				fetchSpacesBtn.textContent = "↻";
-			}
-		}
-	};
 
 	if (fetchBtn) {
 		fetchBtn.addEventListener("click", async () => {
@@ -857,7 +786,6 @@ function initializeAppflowySettings(): void {
 					if (workspaceIdInput)
 						workspaceIdInput.value = workspaces[0].workspace_id;
 					await saveAppflowyConfigNow();
-					fetchAndPopulateSpaces();
 					alert(
 						`Workspace: ${workspaces[0].workspace_name} (${workspaces[0].workspace_id})`,
 					);
@@ -872,7 +800,6 @@ function initializeAppflowySettings(): void {
 					if (selected && workspaceIdInput) {
 						workspaceIdInput.value = selected.trim();
 						await saveAppflowyConfigNow();
-						fetchAndPopulateSpaces();
 					}
 				}
 			} catch (err) {
@@ -884,17 +811,6 @@ function initializeAppflowySettings(): void {
 				fetchBtn.textContent = getMessage("appflowyFetchWorkspaces");
 			}
 		});
-	}
-
-	if (fetchSpacesBtn) {
-		fetchSpacesBtn.addEventListener("click", () =>
-			fetchAndPopulateSpaces(),
-		);
-	}
-
-	// Auto-fetch spaces on init if workspace is already configured
-	if (generalSettings.appflowyConfig.workspaceId) {
-		fetchAndPopulateSpaces();
 	}
 }
 

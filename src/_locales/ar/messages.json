@@ -849,5 +849,8 @@
 	},
 	"version": {
 		"message": "الإصدار"
+	},
+	"appflowyRootFolder": {
+		"message": "حفظ في جذر المساحة"
 	}
 }

@@ -849,5 +849,8 @@
 	},
 	"version": {
 		"message": "Wersja"
+	},
+	"appflowyRootFolder": {
+		"message": "Zapisz w katalogu głównym"
 	}
 }

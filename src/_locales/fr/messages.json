@@ -855,5 +855,8 @@
 	},
 	"version": {
 		"message": "Version"
+	},
+	"appflowyRootFolder": {
+		"message": "Placer à la racine"
 	}
 }

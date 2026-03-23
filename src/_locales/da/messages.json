@@ -841,5 +841,8 @@
 	},
 	"version": {
 		"message": "Version"
+	},
+	"appflowyRootFolder": {
+		"message": "Gem i roden"
 	}
 }

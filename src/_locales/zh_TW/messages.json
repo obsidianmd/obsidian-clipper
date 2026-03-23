@@ -849,5 +849,8 @@
 	},
 	"version": {
 		"message": "版本"
+	},
+	"appflowyRootFolder": {
+		"message": "儲存至根目錄"
 	}
 }

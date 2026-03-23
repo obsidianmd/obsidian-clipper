@@ -34,7 +34,7 @@
 	--popup-height: 100%;
 	--popup-max-height: none;
 	--chromium-popup-height: auto;
-	--background-primary:transparent;
+	--background-primary: transparent;
 }
 
 #popup {
@@ -49,7 +49,7 @@
 }
 
 #popup:not(.is-side-panel) {
-	::-webkit-scrollbar{
+	::-webkit-scrollbar {
 		width: 8px;
 	}
 	::-webkit-scrollbar-track-piece {
@@ -94,7 +94,6 @@
 		justify-content: center;
 		height: 100%;
 	}
-
 }
 
 .clipper {
@@ -166,6 +165,14 @@
 			min-width: 100px;
 			cursor: default;
 		}
+		#space-container,
+		#folder-container {
+			flex: 1;
+			min-width: 0;
+			select {
+				width: 100%;
+			}
+		}
 	}
 }
 
@@ -186,7 +193,7 @@
 	align-items: center;
 	position: relative;
 	width: 100%;
-	
+
 	#clip-btn {
 		flex: 1;
 		cursor: default;
@@ -243,16 +250,17 @@
 
 @media (prefers-color-scheme: dark) {
 	.action-buttons {
-
 		#more-btn {
 			box-shadow: inset 0 1px 0 0px rgba(var(--mono-rgb-100), 0.12);
 			border: none;
 			border-inline-start: 1px solid rgba(var(--mono-rgb-100), 0.12);
 			@media (hover: hover) {
 				&:hover {
-					box-shadow: inset 0 1px 0 0px rgba(var(--mono-rgb-100), 0.16);
+					box-shadow: inset 0 1px 0 0px
+						rgba(var(--mono-rgb-100), 0.16);
 					border: none;
-					border-inline-start: 1px solid rgba(var(--mono-rgb-100), 0.16);
+					border-inline-start: 1px solid
+						rgba(var(--mono-rgb-100), 0.16);
 				}
 			}
 		}

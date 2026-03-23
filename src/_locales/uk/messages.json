@@ -841,5 +841,8 @@
 	},
 	"version": {
 		"message": "Версія"
+	},
+	"appflowyRootFolder": {
+		"message": "Зберегти в корені"
 	}
 }

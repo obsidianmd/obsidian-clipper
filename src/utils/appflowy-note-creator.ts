@@ -261,8 +261,52 @@ export async function fetchAppflowySpaces(
 	}
 
 	const data = (await res.json()) as {
-		data?: { children?: Array<{ view_id: string; name: string }> };
+		data?: {
+			children?: Array<{
+				view_id: string;
+				name: string;
+				is_deleted?: boolean;
+			}>;
+		};
 	};
 	// Top-level children of the workspace folder are the spaces / root folders
-	return data?.data?.children || [];
+	return (data?.data?.children || []).filter((s) => !s.is_deleted);
+}
+
+export async function fetchAppflowyFolders(
+	serverUrl: string,
+	apiToken: string,
+	workspaceId: string,
+	spaceViewId: string,
+): Promise<Array<{ view_id: string; name: string }>> {
+	const baseUrl = serverUrl.replace(/\/$/, "");
+	const res = await fetch(
+		`${baseUrl}/api/workspace/${workspaceId}/folder?depth=2`,
+		{
+			headers: { Authorization: `Bearer ${apiToken}` },
+		},
+	);
+
+	if (!res.ok) {
+		throw new Error(`AppFlowy: Failed to fetch folders (${res.status})`);
+	}
+
+	const data = (await res.json()) as {
+		data?: {
+			children?: Array<{
+				view_id: string;
+				name: string;
+				is_deleted?: boolean;
+				children?: Array<{
+					view_id: string;
+					name: string;
+					is_deleted?: boolean;
+				}>;
+			}>;
+		};
+	};
+	const spaces = data?.data?.children || [];
+	const space = spaces.find((s) => s.view_id === spaceViewId);
+	const folders = space?.children || [];
+	return folders.filter((f) => f.name.trim() !== "");
 }

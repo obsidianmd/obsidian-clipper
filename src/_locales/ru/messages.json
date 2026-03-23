@@ -849,5 +849,8 @@
 	},
 	"version": {
 		"message": "Версия"
+	},
+	"appflowyRootFolder": {
+		"message": "Сохранить в корне"
 	}
 }

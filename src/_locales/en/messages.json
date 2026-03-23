@@ -65,6 +65,9 @@
 	"appflowyFetchSpaces": {
 		"message": "Fetch spaces"
 	},
+	"appflowyRootFolder": {
+		"message": "Save at root"
+	},
 	"appflowyMissingCredentials": {
 		"message": "Please enter a server URL and API token first."
 	},

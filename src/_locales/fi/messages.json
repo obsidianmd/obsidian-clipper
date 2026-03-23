@@ -857,5 +857,8 @@
 	},
 	"version": {
 		"message": "Versio"
+	},
+	"appflowyRootFolder": {
+		"message": "Tallenna juureen"
 	}
 }

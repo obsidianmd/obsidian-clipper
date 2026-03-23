@@ -849,5 +849,8 @@
 	},
 	"version": {
 		"message": "เวอร์ชัน"
+	},
+	"appflowyRootFolder": {
+		"message": "บันทึกที่ root"
 	}
 }

@@ -849,5 +849,8 @@
 	},
 	"version": {
 		"message": "Sürüm"
+	},
+	"appflowyRootFolder": {
+		"message": "Kök dizine kaydet"
 	}
 }
