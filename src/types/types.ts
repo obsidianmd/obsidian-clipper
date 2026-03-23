@@ -1,7 +1,13 @@
 export interface Template {
 	id: string;
 	name: string;
-	behavior: 'create' | 'append-specific' | 'append-daily' | 'prepend-specific' | 'prepend-daily' | 'overwrite';
+	behavior:
+		| "create"
+		| "append-specific"
+		| "append-daily"
+		| "prepend-specific"
+		| "prepend-daily"
+		| "overwrite";
 	noteNameFormat: string;
 	path: string;
 	noteContentFormat: string;
@@ -50,14 +56,25 @@ export interface Rating {
 	date: string;
 }
 
-export type SaveBehavior = 'addToObsidian' | 'saveFile' | 'copyToClipboard';
+export type SaveBehavior =
+	| "addToObsidian"
+	| "addToAppFlowy"
+	| "saveFile"
+	| "copyToClipboard";
+
+export interface AppflowyConfig {
+	serverUrl: string;
+	apiToken: string;
+	workspaceId: string;
+	parentViewId: string;
+}
 
 export interface ReaderSettings {
 	fontSize: number;
 	lineHeight: number;
 	maxWidth: number;
-	theme: 'default' | 'flexoki';
-	themeMode: 'auto' | 'light' | 'dark';
+	theme: "default" | "flexoki";
+	themeMode: "auto" | "light" | "dark";
 }
 
 export interface Settings {
@@ -66,7 +83,7 @@ export interface Settings {
 	betaFeatures: boolean;
 	legacyMode: boolean;
 	silentOpen: boolean;
-	openBehavior: 'popup' | 'embedded';
+	openBehavior: "popup" | "embedded";
 	highlighterEnabled: boolean;
 	alwaysShowHighlights: boolean;
 	highlightBehavior: string;
@@ -80,13 +97,19 @@ export interface Settings {
 	readerSettings: ReaderSettings;
 	stats: {
 		addToObsidian: number;
+		addToAppFlowy: number;
 		saveFile: number;
 		copyToClipboard: number;
 		share: number;
 	};
 	history: HistoryEntry[];
 	ratings: Rating[];
-	saveBehavior: 'addToObsidian' | 'saveFile' | 'copyToClipboard';
+	saveBehavior:
+		| "addToObsidian"
+		| "addToAppFlowy"
+		| "saveFile"
+		| "copyToClipboard";
+	appflowyConfig: AppflowyConfig;
 }
 
 export interface ModelConfig {
@@ -100,7 +123,12 @@ export interface ModelConfig {
 export interface HistoryEntry {
 	datetime: string;
 	url: string;
-	action: 'addToObsidian' | 'saveFile' | 'copyToClipboard' | 'share';
+	action:
+		| "addToObsidian"
+		| "addToAppFlowy"
+		| "saveFile"
+		| "copyToClipboard"
+		| "share";
 	title?: string;
 	vault?: string;
 	path?: string;

@@ -17,6 +17,9 @@
 	"addProviderTitle": {
 		"message": "Ajouter un fournisseur"
 	},
+	"addToAppFlowy": {
+		"message": "Ajouter à AppFlowy"
+	},
 	"addToObsidian": {
 		"message": "Ajouter à Obsidian"
 	},
@@ -46,6 +49,9 @@
 	},
 	"appendToDaily": {
 		"message": "Ajouter à la note quotidienne, à la fin"
+	},
+	"appflowyNotConfigured": {
+		"message": "AppFlowy n'est pas configuré. Veuillez définir l'URL du serveur, le jeton API et l'ID du workspace dans les réglages."
 	},
 	"appendToExisting": {
 		"message": "Ajouter à une note existante, à la fin"

@@ -17,6 +17,69 @@
 	"addProviderTitle": {
 		"message": "Add provider"
 	},
+	"addToAppFlowy": {
+		"message": "Add to AppFlowy"
+	},
+	"appflowySettings": {
+		"message": "AppFlowy"
+	},
+	"appflowyDescription": {
+		"message": "Configure AppFlowy Cloud to save clipped pages directly to your AppFlowy workspace."
+	},
+	"appflowyConnect": {
+		"message": "Connect AppFlowy"
+	},
+	"appflowyConnectDescription": {
+		"message": "Sign in to AppFlowy Cloud in your browser, then click to retrieve your token automatically."
+	},
+	"appflowyConnectBtn": {
+		"message": "Connect AppFlowy"
+	},
+	"appflowyServerUrl": {
+		"message": "Server URL"
+	},
+	"appflowyServerUrlDescription": {
+		"message": "Your AppFlowy Cloud URL (e.g. https://beta.appflowy.cloud)."
+	},
+	"appflowyApiToken": {
+		"message": "API Token"
+	},
+	"appflowyApiTokenDescription": {
+		"message": "Your AppFlowy API token. Find it in AppFlowy Settings → Account."
+	},
+	"appflowyWorkspaceId": {
+		"message": "Workspace ID"
+	},
+	"appflowyWorkspaceIdDescription": {
+		"message": "The ID of your AppFlowy workspace where pages will be saved."
+	},
+	"appflowyParentViewId": {
+		"message": "Space"
+	},
+	"appflowyParentViewIdDescription": {
+		"message": "Space or folder where clipped pages will be saved."
+	},
+	"appflowyFetchWorkspaces": {
+		"message": "Fetch workspaces"
+	},
+	"appflowyFetchSpaces": {
+		"message": "Fetch spaces"
+	},
+	"appflowyMissingCredentials": {
+		"message": "Please enter a server URL and API token first."
+	},
+	"appflowyNoWorkspaces": {
+		"message": "No workspaces found for this account."
+	},
+	"appflowySelectWorkspace": {
+		"message": "Multiple workspaces found. Enter the workspace ID to use:"
+	},
+	"appflowyFetchError": {
+		"message": "Failed to fetch workspaces:"
+	},
+	"appflowyNotConfigured": {
+		"message": "AppFlowy is not configured. Please set your server URL, API token, and workspace ID in settings."
+	},
 	"addToObsidian": {
 		"message": "Add to Obsidian"
 	},

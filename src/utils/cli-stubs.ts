@@ -2,7 +2,7 @@
 // These are aliased by esbuild so that transitive imports
 // of browser-polyfill and storage-utils resolve without error.
 
-import type { Settings } from '../types/types';
+import type { Settings } from "../types/types";
 
 export default {} as any;
 
@@ -11,34 +11,41 @@ export const generalSettings: Settings = {
 	betaFeatures: false,
 	legacyMode: false,
 	silentOpen: false,
-	openBehavior: 'popup',
+	openBehavior: "popup",
 	highlighterEnabled: false,
 	alwaysShowHighlights: false,
-	highlightBehavior: 'no-highlights',
+	highlightBehavior: "no-highlights",
 	showMoreActionsButton: false,
-	interpreterModel: '',
+	interpreterModel: "",
 	models: [],
 	providers: [],
 	interpreterEnabled: false,
 	interpreterAutoRun: false,
-	defaultPromptContext: '',
+	defaultPromptContext: "",
 	propertyTypes: [],
 	readerSettings: {
 		fontSize: 16,
 		lineHeight: 1.5,
 		maxWidth: 700,
-		theme: 'default',
-		themeMode: 'auto',
+		theme: "default",
+		themeMode: "auto",
 	},
 	stats: {
 		addToObsidian: 0,
+		addToAppFlowy: 0,
 		saveFile: 0,
 		copyToClipboard: 0,
 		share: 0,
 	},
 	history: [],
 	ratings: [],
-	saveBehavior: 'addToObsidian',
+	saveBehavior: "addToObsidian",
+	appflowyConfig: {
+		serverUrl: "https://beta.appflowy.cloud",
+		apiToken: "",
+		workspaceId: "",
+		parentViewId: "",
+	},
 };
 
 export const loadSettings = async () => {};
