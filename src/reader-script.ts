@@ -18,6 +18,10 @@ import browser from './utils/browser-polyfill';
 				try {
 					const isActive = await Reader.toggle(document);
 					document.documentElement.classList.toggle('obsidian-reader-active', isActive);
+					// Sync highlighter off in background so Alt+Shift+H correctly sends setHighlighterMode:true
+					if (isActive) {
+						browser.runtime.sendMessage({ action: 'highlighterModeChanged', isActive: false }).catch(() => {});
+					}
 					sendResponse({ success: true, isActive });
 				} catch (error: unknown) {
 					console.error('Error toggling reader mode:', error);

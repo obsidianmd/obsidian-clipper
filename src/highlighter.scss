@@ -1,3 +1,5 @@
+@import 'katex/dist/katex.min.css';
+
 @media (max-width: 769px) {
 	.obsidian-highlighter-menu {
 		--obsidian-highlighter-menu-font-size: 15px;
@@ -121,7 +123,11 @@ body.obsidian-highlighter-active {
 
 	// Disable pinch zoom on mobile
 	touch-action: pan-x pan-y;
-	cursor: crosshair;
+	cursor: crosshair !important;
+	// Force crosshair on all children so reader-mode element cursors don't override it
+	*:not(.obsidian-highlighter-menu):not(.obsidian-highlighter-menu *):not(.obsidian-highlight-overlay) {
+		cursor: crosshair !important;
+	}
 	a {
 		cursor: crosshair !important;
 	}
@@ -306,7 +312,7 @@ body.obsidian-highlighter-active {
 	// }
 
 	&.is-hovering {
-		border: 2px dashed rgb(255, 235, 0, 1);
+		border: 2px dashed rgba(150, 150, 150, 0.8);
 		pointer-events: all;
 	}
 
@@ -314,7 +320,7 @@ body.obsidian-highlighter-active {
 		mix-blend-mode: screen;
 		background-color: rgba(255, 235, 0, 0.25);
 		&.is-hovering {
-			border: 2px dashed rgb(255, 235, 0, 0.5);
+			border: 2px dashed rgba(150, 150, 150, 0.8);
 		}
 
 		.copy-url-button {
@@ -333,7 +339,7 @@ body.obsidian-highlighter-active {
 #obsidian-highlight-hover-overlay {
 	position: absolute;
 	border-radius: 4px;
-	border: 2px dashed rgb(255, 235, 0, 0.8);
+	border: 2px dashed rgba(150, 150, 150, 0.8);
 	pointer-events: none;
 	z-index: 999999997;
 	&.on-highlight {
@@ -357,4 +363,179 @@ body.obsidian-highlighter-active {
 		opacity: 0;
 		transform: scale(0.96);
 	}
+}
+
+// "N" badge shown on hover overlay when hovering an existing highlight
+#obsidian-highlight-hover-overlay.on-highlight[data-note-badge]::after {
+	content: attr(data-note-badge);
+	position: absolute;
+	top: -8px;
+	right: -8px;
+	width: 18px;
+	height: 18px;
+	border-radius: 50%;
+	background: #4a90d9;
+	color: #fff;
+	font-size: 11px;
+	font-family: system-ui, sans-serif;
+	font-weight: 600;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	pointer-events: none;
+	z-index: 99999;
+}
+
+// Color swatches in highlighter menu
+.obsidian-highlighter-colors {
+	display: flex;
+	gap: 6px;
+	align-items: center;
+	padding: 2px 0;
+}
+
+.obsidian-highlighter-swatch {
+	width: 20px;
+	height: 20px;
+	border-radius: 50%;
+	border: 2px solid transparent;
+	background-color: var(--swatch-color);
+	cursor: pointer;
+	padding: 0;
+	transition: transform 0.1s, border-color 0.1s;
+	&:hover { transform: scale(1.2); }
+	&.is-active { border-color: #fff; box-shadow: 0 0 0 2px #555; }
+}
+
+// Margin notes column — inside reader right sidebar or body
+#obsidian-margin-notes-col {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	pointer-events: none;
+	z-index: 9999;
+}
+
+.obsidian-margin-note-card {
+	position: absolute;
+	width: 220px;
+	pointer-events: all;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.obsidian-margin-note-text {
+	position: relative;
+	background: color-mix(in srgb, var(--note-color, #fef08a) 20%, transparent);
+	border-left: 3px solid var(--note-color, #fef08a);
+	border-radius: 4px;
+	padding: 10px 12px 10px 12px;
+	font-size: 13px;
+	font-family: system-ui, sans-serif;
+	line-height: 1.5;
+	color: #111;
+	word-wrap: break-word;
+	.is-dark & { color: #e8e8e8; }
+}
+
+.obsidian-margin-note-actions {
+	display: flex;
+	gap: 4px;
+	justify-content: flex-end;
+	margin-top: 6px;
+}
+
+.obsidian-margin-note-edit,
+.obsidian-margin-note-remove {
+	border: none;
+	background: transparent;
+	color: #888;
+	cursor: pointer;
+	font-size: 14px;
+	padding: 2px 5px;
+	border-radius: 3px;
+	&:hover { background: rgba(0,0,0,0.08); color: #333; }
+}
+
+// Inline note editor
+#obsidian-margin-note-editor {
+	position: absolute;
+	width: 240px;
+	background: color-mix(in srgb, var(--note-color, #fef08a) 15%, #fff);
+	border: 1.5px solid var(--note-color, #fef08a);
+	border-radius: 8px;
+	padding: 12px;
+	box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+	z-index: 99999;
+	font-family: system-ui, sans-serif;
+	color: #111;
+	&.is-dark {
+		background: color-mix(in srgb, var(--note-color, #fef08a) 12%, #1e1e1e);
+		color: #e8e8e8;
+	}
+}
+
+.obsidian-margin-note-textarea {
+	width: 100%;
+	box-sizing: border-box;
+	border: 1px solid rgba(0,0,0,0.15);
+	border-radius: 5px;
+	padding: 8px 10px;
+	font-size: 13px;
+	font-family: inherit;
+	line-height: 1.5;
+	resize: vertical;
+	outline: none;
+	background: rgba(255,255,255,0.7);
+	color: #111;
+	min-height: 80px;
+	&:focus { border-color: var(--note-color, #fef08a); background: #fff; }
+	.is-dark & {
+		background: rgba(255,255,255,0.08);
+		color: #e8e8e8;
+		border-color: rgba(255,255,255,0.2);
+		&:focus { background: rgba(255,255,255,0.12); }
+	}
+}
+
+.obsidian-margin-note-buttons {
+	display: flex;
+	gap: 8px;
+	margin-top: 10px;
+	justify-content: flex-end;
+}
+
+.obsidian-margin-note-save,
+.obsidian-margin-note-cancel {
+	border: none;
+	border-radius: 5px;
+	padding: 5px 14px;
+	font-size: 12px;
+	cursor: pointer;
+	font-family: inherit;
+}
+
+.obsidian-margin-note-save {
+	background: color-mix(in srgb, var(--note-color, #fef08a) 80%, #000 10%);
+	color: #222;
+	&:hover { filter: brightness(0.9); }
+}
+
+.obsidian-margin-note-cancel {
+	background: rgba(0,0,0,0.06);
+	color: #555;
+	&:hover { background: rgba(0,0,0,0.12); }
+}
+.obsidian-margin-note-save {
+	background: #4a90d9;
+	color: #fff;
+	&:hover { background: #357abd; }
+}
+
+.obsidian-margin-note-cancel {
+	background: #eee;
+	color: #555;
+	&:hover { background: #ddd; }
 }

@@ -177,8 +177,8 @@ async function sendMessageToPopup(tabId: number, message: any): Promise<void> {
 
 browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime.MessageSender, sendResponse: (response?: any) => void): true | undefined => {
 	if (typeof request === 'object' && request !== null) {
-		const typedRequest = request as { action: string; isActive?: boolean; hasHighlights?: boolean; tabId?: number; text?: string };
-		
+		const typedRequest = request as { action: string; isActive?: boolean; hasHighlights?: boolean; tabId?: number; text?: string; message?: string };
+
 		if (typedRequest.action === 'copy-to-clipboard' && typedRequest.text) {
 			// Use content script to copy to clipboard
 			browser.tabs.query({active: true, currentWindow: true}).then(async (tabs) => {
@@ -491,13 +491,19 @@ browser.commands.onCommand.addListener(async (command, tab) => {
 		});
 	}
 	if (command === "toggle_highlighter" && tab && tab.id) {
-		await ensureContentScriptLoadedInBackground(tab.id);
+		try {
+			await ensureContentScriptLoadedInBackground(tab.id);
+		} catch (e) {
+			console.error('ensureContentScript threw:', e);
+		}
 		toggleHighlighterMode(tab.id);
 	}
 	if (command === "copy_to_clipboard" && tab && tab.id) {
 		await browser.tabs.sendMessage(tab.id, { action: "copyToClipboard" });
 	}
 	if (command === "toggle_reader" && tab && tab.id) {
+		// Reset highlighter state so the Alt+Shift+H shortcut sends 'true' after reader activates
+		highlighterModeState[tab.id] = false;
 		await ensureContentScriptLoadedInBackground(tab.id);
 		await injectReaderScript(tab.id);
 		await browser.tabs.sendMessage(tab.id, { action: "toggleReaderMode" });
@@ -596,6 +602,7 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
 	} else if (info.menuItemId === "highlight-element" && tab && tab.id) {
 		await highlightElement(tab.id, info);
 	} else if (info.menuItemId === "toggle-reader" && tab && tab.id) {
+		highlighterModeState[tab.id] = false;
 		await ensureContentScriptLoadedInBackground(tab.id);
 		await injectReaderScript(tab.id);
 		await browser.tabs.sendMessage(tab.id, { action: "toggleReaderMode" });
@@ -746,6 +753,11 @@ async function injectReaderScript(tabId: number) {
 		await browser.scripting.insertCSS({
 			target: { tabId },
 			files: ['reader.css']
+		});
+		// Re-inject highlighter CSS so it survives reader mode's stylesheet cleanup
+		await browser.scripting.insertCSS({
+			target: { tabId },
+			files: ['highlighter.css']
 		});
 
 		// Inject scripts in sequence for all browsers

@@ -8,7 +8,10 @@ import {
 	planHighlightOverlayRects,
 	removeExistingHighlights,
 	handleTouchStart,
-	handleTouchMove
+	handleTouchMove,
+	renderMarginNotes,
+	openNoteEditor,
+	lastHoverTarget
 } from './highlighter-overlays';
 import { detectBrowser, addBrowserClassToHtml } from './browser-detection';
 import { generalSettings, loadSettings } from './storage-utils';
@@ -80,6 +83,11 @@ let highlightHistory: HistoryAction[] = [];
 let redoHistory: HistoryAction[] = [];
 const MAX_HISTORY_LENGTH = 30;
 
+const HIGHLIGHT_COLORS = ['#fef08a', '#bbf7d0', '#bfdbfe', '#fecdd3', '#fed7aa'];
+let activeHighlightColor = HIGHLIGHT_COLORS[0];
+export function setActiveHighlightColor(color: string) { activeHighlightColor = color; }
+export function getActiveHighlightColor(): string { return activeHighlightColor; }
+
 const ALLOWED_HIGHLIGHT_TAGS = [
 	'SPAN', 'P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6',
 	'MATH', 'FIGURE', 'UL', 'OL', 'TABLE', 'LI', 'CODE', 'PRE', 'BLOCKQUOTE', 'EM', 'STRONG', 'A'
@@ -94,6 +102,7 @@ export interface HighlightData {
 	xpath: string;
 	content: string;
 	notes?: string[]; // Annotations
+	color?: string; // Highlight color hex
 }
 
 export interface TextHighlightData extends HighlightData {
@@ -126,6 +135,8 @@ export function updateHighlights(newHighlights: AnyHighlightData[]) {
 // Toggle highlighter mode on or off
 export function toggleHighlighterMenu(isActive: boolean) {
 	document.body.classList.toggle('obsidian-highlighter-active', isActive);
+	// Inline cursor as fallback — CSS may not apply in reader mode (Firefox)
+	document.body.style.setProperty('cursor', isActive ? 'crosshair' : '', isActive ? 'important' : '');
 	if (isActive) {
 		document.addEventListener('mouseup', handleMouseUp);
 		document.addEventListener('mousemove', handleMouseMove);
@@ -137,6 +148,9 @@ export function toggleHighlighterMenu(isActive: boolean) {
 		createHighlighterMenu();
 		addBrowserClassToHtml();
 		browser.runtime.sendMessage({ action: "highlighterModeChanged", isActive: true });
+		// Force full re-render — the DOM may have been rebuilt (reader toggle)
+		// or overlays removed on deactivation, so the dedup cache is stale.
+		lastAppliedHighlights = '';
 		applyHighlights();
 	} else {
 		document.removeEventListener('mouseup', handleMouseUp);
@@ -149,6 +163,8 @@ export function toggleHighlighterMenu(isActive: boolean) {
 		enableLinkClicks();
 		removeHighlighterMenu();
 		browser.runtime.sendMessage({ action: "highlighterModeChanged", isActive: false });
+		document.getElementById('obsidian-margin-notes-col')?.remove();
+		document.getElementById('obsidian-margin-note-editor')?.remove();
 		if (!generalSettings.alwaysShowHighlights) {
 			removeExistingHighlights();
 		}
@@ -233,14 +249,41 @@ async function handleClipButtonClick(e: Event) {
 export function createHighlighterMenu() {
 	// Check if the menu already exists
 	let menu = document.querySelector('.obsidian-highlighter-menu');
-	
+
 	// If the menu doesn't exist, create it
 	if (!menu) {
 		menu = document.createElement('div');
 		menu.className = 'obsidian-highlighter-menu';
 		document.body.appendChild(menu);
 	}
-	
+
+	// Critical inline styles — the stylesheet may not apply in reader mode
+	// (Firefox injects manifest CSS at engine-level, but reader mode DOM
+	// manipulation can sometimes break the association)
+	const s = (menu as HTMLElement).style;
+	s.setProperty('position', 'fixed', 'important');
+	s.setProperty('top', '20px', 'important');
+	s.setProperty('left', '50%', 'important');
+	s.setProperty('transform', 'translateX(-50%)', 'important');
+	s.setProperty('z-index', '2147483647', 'important');
+	s.setProperty('display', 'flex', 'important');
+	s.setProperty('align-items', 'center', 'important');
+	s.setProperty('gap', '4px', 'important');
+	s.setProperty('background', '#353535', 'important');
+	s.setProperty('color', '#fff', 'important');
+	s.setProperty('border', '1px solid #424242', 'important');
+	s.setProperty('border-radius', '24px', 'important');
+	s.setProperty('padding', '4px', 'important');
+	s.setProperty('height', '32px', 'important');
+	s.setProperty('box-sizing', 'border-box', 'important');
+	s.setProperty('font-family', 'system-ui, -apple-system, BlinkMacSystemFont, sans-serif', 'important');
+	s.setProperty('font-size', '13px', 'important');
+	s.setProperty('font-weight', '600', 'important');
+	s.setProperty('box-shadow', '0 2px 10px rgba(0,0,0,0.3)', 'important');
+	s.setProperty('white-space', 'nowrap', 'important');
+	s.setProperty('user-select', 'none', 'important');
+	s.setProperty('-webkit-font-smoothing', 'antialiased', 'important');
+
 	const highlightCount = highlights.length;
 	const highlightText = `${highlightCount}`;
 
@@ -284,6 +327,24 @@ export function createHighlighterMenu() {
 		menu.appendChild(noHighlights);
 	}
 	
+	// Color swatches
+	const colorGroup = document.createElement('div');
+	colorGroup.className = 'obsidian-highlighter-colors';
+	HIGHLIGHT_COLORS.forEach(color => {
+		const swatch = document.createElement('button');
+		swatch.className = 'obsidian-highlighter-swatch';
+		if (color === activeHighlightColor) swatch.classList.add('is-active');
+		swatch.style.setProperty('background-color', color, 'important');
+		swatch.style.setProperty('--swatch-color', color);
+		swatch.addEventListener('click', () => {
+			setActiveHighlightColor(color);
+			colorGroup.querySelectorAll('.obsidian-highlighter-swatch').forEach(s => s.classList.remove('is-active'));
+			swatch.classList.add('is-active');
+		});
+		colorGroup.appendChild(swatch);
+	});
+	menu.appendChild(colorGroup);
+
 	// Add undo button
 	const undoButton = document.createElement('button');
 	undoButton.id = 'obsidian-undo-highlights';
@@ -460,7 +521,8 @@ export function highlightElement(element: Element, notes?: string[]) {
 		type: isBlockElement ? 'element' : 'text', 
 		id: Date.now().toString(),
 		startOffset: 0,
-		endOffset: targetElement.textContent?.length || 0
+		endOffset: targetElement.textContent?.length || 0,
+		color: activeHighlightColor
 	}, notes);
 }
 
@@ -475,7 +537,7 @@ export function handleTextSelection(selection: Selection, notes?: string[]) {
 		let currentBatchHighlights = [...highlights]; // Start with global state for merging
 
 		for (const highlightData of newHighlightDatas) {
-			const newHighlightWithNotes = { ...highlightData, notes: notes || [] };
+			const newHighlightWithNotes = { ...highlightData, notes: notes || [], color: activeHighlightColor };
 			// Merge current new highlight with the accumulating batch from this selection + pre-existing ones
 			currentBatchHighlights = mergeOverlappingHighlights(currentBatchHighlights, newHighlightWithNotes);
 		}
@@ -842,7 +904,8 @@ function mergeHighlights(highlight1: AnyHighlightData, highlight2: AnyHighlightD
 			xpath: getElementXPath(mergedElement),
 			content: mergedElement.outerHTML,
 			type: 'complex',
-			id: Date.now().toString()
+			id: Date.now().toString(),
+			color: highlight1.color ?? highlight2.color
 		};
 	}
 
@@ -855,7 +918,8 @@ function mergeHighlights(highlight1: AnyHighlightData, highlight2: AnyHighlightD
 			type: 'text',
 			id: Date.now().toString(),
 			startOffset: Math.min(highlight1.startOffset, highlight2.startOffset),
-			endOffset: Math.max(highlight1.endOffset, highlight2.endOffset)
+			endOffset: Math.max(highlight1.endOffset, highlight2.endOffset),
+			color: highlight1.color ?? highlight2.color
 		};
 	}
 
@@ -864,7 +928,8 @@ function mergeHighlights(highlight1: AnyHighlightData, highlight2: AnyHighlightD
 		xpath: getElementXPath(mergedElement),
 		content: mergedElement.outerHTML,
 		type: 'complex',
-		id: Date.now().toString()
+		id: Date.now().toString(),
+		color: highlight1.color ?? highlight2.color
 	};
 }
 
@@ -919,7 +984,8 @@ export function saveHighlights() {
 // Apply all highlights to the page
 export function applyHighlights() {
 	if (highlights.length === 0) {
-		return; // Don't do anything if there are no highlights
+		renderMarginNotes();
+		return;
 	}
 
 	if (isApplyingHighlights) return;
@@ -940,6 +1006,7 @@ export function applyHighlights() {
 
 	lastAppliedHighlights = currentHighlightsState;
 	isApplyingHighlights = false;
+	renderMarginNotes();
 	notifyHighlightsUpdated();
 }
 
@@ -951,9 +1018,9 @@ async function notifyHighlightsUpdated() {
 	}
 }
 
-// Get all highlight contents
-export function getHighlights(): string[] {
-	return highlights.map(h => h.content);
+// Get all highlights with full data (including notes and color)
+export function getHighlights(): AnyHighlightData[] {
+	return highlights;
 }
 
 // Load highlights from browser storage
@@ -1012,6 +1079,14 @@ function handleKeyDown(event: KeyboardEvent) {
 			redo();
 		} else {
 			undo();
+		}
+	} else if (event.key === 'n' || event.key === 'N') {
+		const active = document.activeElement;
+		if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || (active as HTMLElement).isContentEditable)) return;
+		if (lastHoverTarget?.classList.contains('obsidian-highlight-overlay')) {
+			event.preventDefault();
+			const idx = parseInt((lastHoverTarget as HTMLElement).dataset.highlightIndex ?? '-1');
+			if (idx >= 0) openNoteEditor(idx);
 		}
 	}
 }

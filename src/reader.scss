@@ -188,6 +188,7 @@
 	--obsidian-reader-font-family: system-ui, -apple-system, sans-serif;
 	--obsidian-reader-dynamic-font-size: calc(var(--obsidian-reader-font-size) + 0.25vw);
 	--obsidian-reader-sidebar-width: 240px;
+	--obsidian-reader-text-align: left;
 
 	background: var(--obsidian-reader-background-primary) !important;
 	margin: 0 !important;
@@ -196,6 +197,7 @@
 	font-size: var(--obsidian-reader-dynamic-font-size) !important;
 	line-height: var(--obsidian-reader-line-height) !important;
 	font-family: var(--obsidian-reader-font-family) !important;
+	text-align: var(--obsidian-reader-text-align) !important;
 	-webkit-font-smoothing: antialiased !important;
 
 	::selection {
@@ -727,7 +729,8 @@
 	cursor: pointer;
 	padding: 0;
 }
-.obsidian-reader-settings-button:hover {
+.obsidian-reader-settings-button:hover,
+.obsidian-reader-settings-button.is-active {
 	background: var(--obsidian-reader-background-primary-alt);
 	color: var(--obsidian-reader-text-primary);
 }
@@ -766,6 +769,23 @@
 }
 .theme-dark .obsidian-reader-settings-select {
 	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23FFF' opacity='0.6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' %3E%3Cpath d='m7 15 5 5 5-5'/%3E%3Cpath d='m7 9 5-5 5 5'/%3E%3C/svg%3E");
+}
+.obsidian-reader-font-input {
+	box-sizing: border-box;
+	width: 100%;
+	height: 28px;
+	padding: 4px 8px;
+	border: 1px solid var(--obsidian-reader-border);
+	border-radius: 6px;
+	background: transparent;
+	color: var(--obsidian-reader-text-muted);
+	font-family: var(--obsidian-reader-font-family);
+	font-size: 13px;
+	outline: none;
+	&:focus {
+		border-color: var(--obsidian-reader-text-muted);
+		color: var(--obsidian-reader-text-primary);
+	}
 }
 .obsidian-reader-container {
 	display: grid;

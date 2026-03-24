@@ -1,8 +1,8 @@
-import { 
-	handleTextSelection, 
-	highlightElement, 
-	AnyHighlightData, 
-	highlights, 
+import {
+	handleTextSelection,
+	highlightElement,
+	AnyHighlightData,
+	highlights,
 	isApplyingHighlights,
 	sortHighlights,
 	applyHighlights,
@@ -12,12 +12,32 @@ import {
 } from './highlighter';
 import { throttle } from './throttle';
 import { getElementByXPath, isDarkColor } from './dom-utils';
+import katex from 'katex';
 
 let hoverOverlay: HTMLElement | null = null;
+
+// Convert hex color to rgba string
+function hexToRgba(hex: string, alpha: number): string {
+	const r = parseInt(hex.slice(1, 3), 16);
+	const g = parseInt(hex.slice(3, 5), 16);
+	const b = parseInt(hex.slice(5, 7), 16);
+	return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+// Saturated equivalents for dark backgrounds — pastel colors become
+// indistinguishable when blended at low alpha onto near-black surfaces.
+// Maps Tailwind 200-level pastels → Tailwind 500-level saturated tones.
+const DARK_BG_COLORS: Record<string, string> = {
+	'#fef08a': '#eab308',
+	'#bbf7d0': '#22c55e',
+	'#bfdbfe': '#3b82f6',
+	'#fecdd3': '#f43f5e',
+	'#fed7aa': '#f97316',
+};
 let touchStartX: number = 0;
 let touchStartY: number = 0;
 let isTouchMoved: boolean = false;
-let lastHoverTarget: Element | null = null;
+export let lastHoverTarget: Element | null = null;
 
 const LINE_BY_LINE_OVERLAY_TAGS = ['P'];
 
@@ -38,6 +58,7 @@ function isIgnoredElement(element: Element): boolean {
 
 // Handles mouse move events for hover effects
 export function handleMouseMove(event: MouseEvent | TouchEvent) {
+	if (!document.body.classList.contains('obsidian-highlighter-active')) return;
 	let target: Element;
 	if (event instanceof MouseEvent) {
 		target = event.target as Element;
@@ -47,7 +68,9 @@ export function handleMouseMove(event: MouseEvent | TouchEvent) {
 		target = document.elementFromPoint(touch.clientX, touch.clientY) as Element;
 	}
 
-	if (!isIgnoredElement(target)) {
+	// Highlight overlays are divs and would be filtered by isIgnoredElement;
+	// pass them through so lastHoverTarget is set and the 'N' badge shows.
+	if (target.classList.contains('obsidian-highlight-overlay') || !isIgnoredElement(target)) {
 		createOrUpdateHoverOverlay(target);
 	} else {
 		removeHoverOverlay();
@@ -56,6 +79,7 @@ export function handleMouseMove(event: MouseEvent | TouchEvent) {
 
 // Handle mouse up events for highlighting
 export function handleMouseUp(event: MouseEvent | TouchEvent) {
+	if (!document.body.classList.contains('obsidian-highlighter-active')) return;
 	let target: Element;
 	if (event instanceof MouseEvent) {
 		target = event.target as Element;
@@ -179,13 +203,14 @@ function processRangeForOverlayRects(
 	existingOverlays: Element[],
 	index: number,
 	notes: string[] | undefined,
-	targetElementForFallback: Element
+	targetElementForFallback: Element,
+	color?: string
 ) {
 	const rects = range.getClientRects();
 
 	if (rects.length === 0) {
 		const rect = targetElementForFallback.getBoundingClientRect();
-		mergeHighlightOverlayRects([rect], content, existingOverlays, false, index, notes);
+		mergeHighlightOverlayRects([rect], content, existingOverlays, false, index, notes, color);
 		return;
 	}
 
@@ -194,10 +219,10 @@ function processRangeForOverlayRects(
 	const complexRects = Array.from(rects).filter(rect => rect.height > averageLineHeight * 1.5);
 
 	if (textRects.length > 0) {
-		mergeHighlightOverlayRects(textRects, content, existingOverlays, true, index, notes);
+		mergeHighlightOverlayRects(textRects, content, existingOverlays, true, index, notes, color);
 	}
 	if (complexRects.length > 0) {
-		mergeHighlightOverlayRects(complexRects, content, existingOverlays, false, index, notes);
+		mergeHighlightOverlayRects(complexRects, content, existingOverlays, false, index, notes, color);
 	}
 }
 
@@ -211,18 +236,18 @@ export function planHighlightOverlayRects(target: Element, highlight: AnyHighlig
 			const range = document.createRange();
 			try {
 				range.selectNodeContents(target);
-				processRangeForOverlayRects(range, highlight.content, existingOverlays, index, highlight.notes, target);
+				processRangeForOverlayRects(range, highlight.content, existingOverlays, index, highlight.notes, target, highlight.color);
 			} catch (error) {
 				console.error('Error creating line-by-line highlight for element:', target, error);
 				const rect = target.getBoundingClientRect(); // Fallback
-				mergeHighlightOverlayRects([rect], highlight.content, existingOverlays, false, index, highlight.notes);
+				mergeHighlightOverlayRects([rect], highlight.content, existingOverlays, false, index, highlight.notes, highlight.color);
 			} finally {
 				range.detach();
 			}
 		} else {
 			// Original logic for other element/complex types (single box)
 			const rect = target.getBoundingClientRect();
-			mergeHighlightOverlayRects([rect], highlight.content, existingOverlays, false, index, highlight.notes);
+			mergeHighlightOverlayRects([rect], highlight.content, existingOverlays, false, index, highlight.notes, highlight.color);
 		}
 	} else if (highlight.type === 'text') {
 		const range = document.createRange();
@@ -248,23 +273,23 @@ export function planHighlightOverlayRects(target: Element, highlight: AnyHighlig
 						range.setEnd(endNodeResult.node, endNodeResult.node.textContent?.length || 0);
 					}
 					
-					processRangeForOverlayRects(range, highlight.content, existingOverlays, index, highlight.notes, target);
+					processRangeForOverlayRects(range, highlight.content, existingOverlays, index, highlight.notes, target, highlight.color);
 
 				} catch (error) { // Catch errors from setStart/setEnd or processRange itself
 					console.warn('Error setting range or processing rects for text highlight:', error);
 					const rect = target.getBoundingClientRect(); // Fallback
-					mergeHighlightOverlayRects([rect], highlight.content, existingOverlays, false, index, highlight.notes);
+					mergeHighlightOverlayRects([rect], highlight.content, existingOverlays, false, index, highlight.notes, highlight.color);
 				}
 			} else {
 				// Fallback to element highlight if start/end nodes not found
 				console.warn('Could not find start/end node for text highlight, falling back to element bounds.');
 				const rect = target.getBoundingClientRect();
-				mergeHighlightOverlayRects([rect], highlight.content, existingOverlays, false, index, highlight.notes);
+				mergeHighlightOverlayRects([rect], highlight.content, existingOverlays, false, index, highlight.notes, highlight.color);
 			}
 		} catch (error) { // Outer catch for findTextNodeAtOffset or other unexpected issues
 			console.error('Error creating text highlight:', error);
 			const rect = target.getBoundingClientRect();
-			mergeHighlightOverlayRects([rect], highlight.content, existingOverlays, false, index, highlight.notes);
+			mergeHighlightOverlayRects([rect], highlight.content, existingOverlays, false, index, highlight.notes, highlight.color);
 		} finally {
 			range.detach();
 		}
@@ -272,7 +297,7 @@ export function planHighlightOverlayRects(target: Element, highlight: AnyHighlig
 }
 
 // Merge a set of rectangles, to avoid adjacent and overlapping highlights where possible
-function mergeHighlightOverlayRects(rects: DOMRect[], content: string, existingOverlays: Element[], isText: boolean = false, index: number, notes?: string[]) {
+function mergeHighlightOverlayRects(rects: DOMRect[], content: string, existingOverlays: Element[], isText: boolean = false, index: number, notes?: string[], color?: string) {
 	let mergedRects: DOMRect[] = [];
 	let currentRect: DOMRect | null = null;
 
@@ -304,38 +329,46 @@ function mergeHighlightOverlayRects(rects: DOMRect[], content: string, existingO
 		});
 
 		if (!isDuplicate) {
-			createHighlightOverlayElement(rect, content, isText, index, notes);
+			createHighlightOverlayElement(rect, content, isText, index, notes, color);
 		}
 	}
 }
 
 // Create an overlay element
-function createHighlightOverlayElement(rect: DOMRect, content: string, isText: boolean = false, index: number, notes?: string[]) {
+function createHighlightOverlayElement(rect: DOMRect, content: string, isText: boolean = false, index: number, notes?: string[], color?: string) {
 	const overlay = document.createElement('div');
 	overlay.className = 'obsidian-highlight-overlay';
 	overlay.dataset.highlightIndex = index.toString();
-	
-	overlay.style.position = 'absolute';
 
+	overlay.style.position = 'absolute';
 	overlay.style.left = `${rect.left + window.scrollX - 2}px`;
 	overlay.style.top = `${rect.top + window.scrollY - 2}px`;
 	overlay.style.width = `${rect.width + 4}px`;
 	overlay.style.height = `${rect.height + 4}px`;
-	
+
+	// Detect dark background before choosing colors
+	const elementAtPoint = document.elementFromPoint(rect.left, rect.top);
+	const isDark = elementAtPoint ? isDarkColor(getEffectiveBackgroundColor(elementAtPoint as HTMLElement)) : false;
+	if (isDark) overlay.classList.add('obsidian-highlight-overlay-dark');
+
+	if (color) {
+		// On dark backgrounds use saturated palette + screen blend; on light use pastel + multiply
+		const effectiveColor = isDark ? (DARK_BG_COLORS[color] ?? color) : color;
+		const alpha = isDark ? 0.35 : 0.35;
+		const blendMode = isDark ? 'screen' : 'multiply';
+		const bgValue = hexToRgba(effectiveColor, alpha);
+		overlay.style.backgroundColor = bgValue;
+		overlay.style.mixBlendMode = blendMode;
+		overlay.style.setProperty('--highlight-color', effectiveColor);
+		// Subtle glow reinforces color identity on dark backgrounds
+		if (isDark) overlay.style.boxShadow = `0 0 4px 1px ${hexToRgba(effectiveColor, 0.4)}`;
+	}
+
 	overlay.setAttribute('data-content', content);
 	if (notes && notes.length > 0) {
 		overlay.setAttribute('data-notes', JSON.stringify(notes));
 	}
-	
-	// Get the background color of the element under the highlight
-	const elementAtPoint = document.elementFromPoint(rect.left, rect.top);
-	if (elementAtPoint) {
-		const bgColor = getEffectiveBackgroundColor(elementAtPoint as HTMLElement);
-		if (isDarkColor(bgColor)) {
-			overlay.classList.add('obsidian-highlight-overlay-dark');
-		}
-	}
-	
+
 	overlay.addEventListener('click', handleHighlightClick);
 	overlay.addEventListener('touchend', handleHighlightClick);
 	document.body.appendChild(overlay);
@@ -415,6 +448,25 @@ function createOrUpdateHoverOverlay(target: Element) {
 	if (target === lastHoverTarget) return;
 	lastHoverTarget = target;
 
+	// Highlight overlays are valid hover targets — track them and show the 'N' badge,
+	// but skip the normal element-bounds logic.
+	if (target.classList.contains('obsidian-highlight-overlay')) {
+		const index = target.getAttribute('data-highlight-index');
+		document.querySelectorAll('.obsidian-highlight-overlay.is-hovering').forEach(el => {
+			el.classList.remove('is-hovering');
+		});
+		if (index) {
+			document.querySelectorAll(`.obsidian-highlight-overlay[data-highlight-index="${index}"]`).forEach(el => {
+				el.classList.add('is-hovering');
+			});
+		}
+		if (hoverOverlay) {
+			hoverOverlay.classList.add('on-highlight');
+			hoverOverlay.dataset.noteBadge = 'N';
+		}
+		return;
+	}
+
 	let elementForHoverRect: Element | null = target;
 	const eventTargetTagName = target.tagName.toUpperCase();
 
@@ -476,9 +528,12 @@ function createOrUpdateHoverOverlay(target: Element) {
 			document.querySelectorAll(`.obsidian-highlight-overlay[data-highlight-index="${index}"]`).forEach(el => {
 				el.classList.add('is-hovering');
 			});
-			// Add 'on-highlight' class to hover overlay
+			// Add 'on-highlight' class to hover overlay and show "N" badge
 			hoverOverlay.classList.add('on-highlight');
+			hoverOverlay.dataset.noteBadge = 'N';
 		}
+	} else {
+		delete hoverOverlay.dataset.noteBadge;
 	}
 }
 
@@ -538,4 +593,201 @@ export function removeExistingHighlights() {
 	if (existingHighlights.length > 0) {
 		existingHighlights.forEach(el => el.remove());
 	}
+}
+
+// Render note text, converting $...$ and $$...$$ to KaTeX HTML
+function renderNoteWithKatex(text: string): string {
+	// Match $$...$$ (display math) before $...$ (inline math) to avoid partial matches
+	const parts = text.split(/(\$\$[\s\S]+?\$\$|\$[^$\n]+?\$)/g);
+	return parts.map(part => {
+		if (part.startsWith('$$') && part.endsWith('$$') && part.length > 4) {
+			try {
+				return katex.renderToString(part.slice(2, -2), { displayMode: true, throwOnError: false });
+			} catch { return part; }
+		}
+		if (part.startsWith('$') && part.endsWith('$') && part.length > 2) {
+			try {
+				return katex.renderToString(part.slice(1, -1), { throwOnError: false });
+			} catch { return part; }
+		}
+		return part.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+	}).join('');
+}
+
+// Render (or re-render) the margin notes column
+export function renderMarginNotes() {
+	document.getElementById('obsidian-margin-notes-col')?.remove();
+	const notedHighlights = highlights.filter(h => h.notes?.length);
+	if (!notedHighlights.length) return;
+
+	// Prefer the reader's right sidebar as container; fall back to body
+	const sidebar = document.querySelector('.obsidian-reader-right-sidebar') as HTMLElement | null;
+	const container = sidebar ?? document.body;
+	const sidebarDocTop = sidebar
+		? sidebar.getBoundingClientRect().top + window.scrollY
+		: 0;
+	if (sidebar) sidebar.style.position = 'relative';
+
+	const col = document.createElement('div');
+	col.id = 'obsidian-margin-notes-col';
+	if (isDarkColor(getComputedStyle(document.body).backgroundColor)) col.classList.add('is-dark');
+	if (!sidebar) {
+		// When outside reader, find the right edge of the content and position there
+		const readerContent = document.querySelector('.obsidian-reader-content') as HTMLElement | null;
+		if (readerContent) {
+			const rect = readerContent.getBoundingClientRect();
+			col.style.left = `${rect.right + window.scrollX + 16}px`;
+			col.style.right = 'auto';
+		}
+	}
+	container.appendChild(col);
+
+	notedHighlights.forEach(h => {
+		const idx = highlights.findIndex(hl => hl.id === h.id);
+		const firstOverlay = document.querySelector(
+			`.obsidian-highlight-overlay[data-highlight-index="${idx}"]`
+		) as HTMLElement | null;
+		if (!firstOverlay) return;
+
+		const top = parseFloat(firstOverlay.style.top) - sidebarDocTop;
+		const noteColor = h.color ?? '#fef08a';
+
+		const card = document.createElement('div');
+		card.className = 'obsidian-margin-note-card';
+		card.style.top = `${top}px`;
+		card.style.setProperty('--note-color', noteColor);
+
+		h.notes!.forEach((note, noteIdx) => {
+			const noteEl = document.createElement('div');
+			noteEl.className = 'obsidian-margin-note-text';
+			noteEl.innerHTML = renderNoteWithKatex(note);
+
+			const actions = document.createElement('div');
+			actions.className = 'obsidian-margin-note-actions';
+
+			const editBtn = document.createElement('button');
+			editBtn.className = 'obsidian-margin-note-edit';
+			editBtn.textContent = '✎';
+			editBtn.title = 'Edit note';
+			editBtn.addEventListener('click', (e) => {
+				e.stopPropagation();
+				openNoteEditor(idx, note, noteIdx);
+			});
+
+			const removeBtn = document.createElement('button');
+			removeBtn.className = 'obsidian-margin-note-remove';
+			removeBtn.textContent = '×';
+			removeBtn.title = 'Delete note';
+			removeBtn.addEventListener('click', (e) => {
+				e.stopPropagation();
+				h.notes!.splice(noteIdx, 1);
+				saveHighlights();
+				renderMarginNotes();
+			});
+
+			actions.appendChild(editBtn);
+			actions.appendChild(removeBtn);
+			noteEl.appendChild(actions);
+			card.appendChild(noteEl);
+		});
+
+		col.appendChild(card);
+	});
+
+	// Collision avoidance: push overlapping cards downward
+	const cards = Array.from(col.querySelectorAll<HTMLElement>('.obsidian-margin-note-card'));
+	for (let i = 1; i < cards.length; i++) {
+		const prev = cards[i - 1];
+		const curr = cards[i];
+		const prevBottom = parseFloat(prev.style.top) + prev.offsetHeight;
+		const currTop = parseFloat(curr.style.top);
+		if (prevBottom + 8 > currTop) {
+			curr.style.top = `${prevBottom + 8}px`;
+		}
+	}
+}
+
+
+// Open an inline textarea to add or edit a margin note on the highlight at `index`.
+// Pass `existingText` and `noteIdx` to edit an existing note.
+export function openNoteEditor(index: number, existingText?: string, noteIdx?: number) {
+	document.getElementById('obsidian-margin-note-editor')?.remove();
+
+	const h = highlights[index];
+	if (!h) return;
+
+	const noteColor = h.color ?? '#fef08a';
+
+	const firstOverlay = document.querySelector(
+		`.obsidian-highlight-overlay[data-highlight-index="${index}"]`
+	) as HTMLElement | null;
+
+	// Position: prefer sidebar, fall back to body right edge
+	const sidebar = document.querySelector('.obsidian-reader-right-sidebar') as HTMLElement | null;
+	const sidebarDocTop = sidebar
+		? sidebar.getBoundingClientRect().top + window.scrollY
+		: 0;
+	const top = firstOverlay
+		? parseFloat(firstOverlay.style.top) - sidebarDocTop
+		: 100;
+
+	const editor = document.createElement('div');
+	editor.id = 'obsidian-margin-note-editor';
+	editor.style.top = `${top}px`;
+	editor.style.setProperty('--note-color', noteColor);
+	if (isDarkColor(getComputedStyle(document.body).backgroundColor)) editor.classList.add('is-dark');
+
+	const textarea = document.createElement('textarea');
+	textarea.className = 'obsidian-margin-note-textarea';
+	textarea.placeholder = 'Note… (LaTeX: $E=mc^2$, $$\\frac{a}{b}$$)';
+	textarea.rows = 4;
+	if (existingText) textarea.value = existingText;
+
+	const close = () => editor.remove();
+
+	const save = () => {
+		const text = textarea.value.trim();
+		if (text) {
+			if (noteIdx !== undefined) {
+				h.notes![noteIdx] = text;
+			} else {
+				h.notes = [...(h.notes ?? []), text];
+			}
+			saveHighlights();
+			renderMarginNotes();
+		}
+		close();
+	};
+
+	const btns = document.createElement('div');
+	btns.className = 'obsidian-margin-note-buttons';
+
+	const saveBtn = document.createElement('button');
+	saveBtn.className = 'obsidian-margin-note-save';
+	saveBtn.textContent = existingText ? 'Update' : 'Save';
+	saveBtn.addEventListener('click', save);
+
+	const cancelBtn = document.createElement('button');
+	cancelBtn.className = 'obsidian-margin-note-cancel';
+	cancelBtn.textContent = 'Cancel';
+	cancelBtn.addEventListener('click', close);
+
+	textarea.addEventListener('keydown', (e) => {
+		if (e.key === 'Escape') { e.stopPropagation(); close(); }
+		if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); save(); }
+	});
+
+	btns.appendChild(saveBtn);
+	btns.appendChild(cancelBtn);
+	editor.appendChild(textarea);
+	editor.appendChild(btns);
+
+	// Mount inside sidebar if available, else body
+	if (sidebar) {
+		sidebar.style.position = 'relative';
+		sidebar.appendChild(editor);
+	} else {
+		document.body.appendChild(editor);
+	}
+	textarea.focus();
 }

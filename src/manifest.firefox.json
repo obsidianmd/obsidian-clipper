@@ -12,7 +12,8 @@
 		"storage",
 		"scripting",
 		"webRequest",
-		"webRequestBlocking"
+		"webRequestBlocking",
+		"downloads"
 	],
 	"host_permissions": [
 		"<all_urls>",

@@ -1,4 +1,5 @@
 import browser from './utils/browser-polyfill';
+import type { AnyHighlightData } from './utils/highlighter';
 import * as highlighter from './utils/highlighter';
 import { loadSettings, generalSettings } from './utils/storage-utils';
 import Defuddle from 'defuddle';
@@ -172,7 +173,7 @@ declare global {
 		extractedContent: { [key: string]: string };
 		schemaOrgData: any;
 		fullHtml: string;
-		highlights: string[];
+		highlights: AnyHighlightData[];
 		title: string;
 		description: string;
 		domain: string;

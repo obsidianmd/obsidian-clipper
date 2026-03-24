@@ -219,7 +219,12 @@ function processHighlights(content: string, highlights: AnyHighlightData[]): str
 	}
 
 	if (generalSettings.highlightBehavior === 'replace-content') {
-		return highlights.map(highlight => highlight.content).join('');
+		return highlights.map(h => {
+			const noteHtml = h.notes?.length
+				? h.notes.map(n => `<blockquote><p>${n}</p></blockquote>`).join('')
+				: '';
+			return h.content + noteHtml;
+		}).join('');
 	}
 
 	if (generalSettings.highlightBehavior === 'highlight-inline') {

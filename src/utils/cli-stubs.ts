@@ -29,6 +29,8 @@ export const generalSettings: Settings = {
 		maxWidth: 700,
 		theme: 'default',
 		themeMode: 'auto',
+		fontFamily: null,
+		textAlign: 'left',
 	},
 	stats: {
 		addToObsidian: 0,

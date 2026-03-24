@@ -17,6 +17,8 @@ interface ReaderSettings {
 	maxWidth: number;
 	theme: string;
 	themeMode: 'auto' | 'light' | 'dark';
+	fontFamily: string | null;
+	textAlign: 'left' | 'justify';
 }
 
 export class Reader {
@@ -85,7 +87,9 @@ export class Reader {
 		lineHeight: 1.6,
 		maxWidth: 38,
 		theme: 'default',
-		themeMode: 'auto'
+		themeMode: 'auto',
+		fontFamily: null,
+		textAlign: 'left'
 	};
 
 	private static async loadSettings(): Promise<void> {
@@ -183,6 +187,53 @@ export class Reader {
 		lineHeightGroup.appendChild(decreaseLineHeightBtn);
 		lineHeightGroup.appendChild(increaseLineHeightBtn);
 
+		// Text align toggle group
+		const alignGroup = doc.createElement('div');
+		alignGroup.className = 'obsidian-reader-settings-controls-group';
+
+		const alignLeftBtn = doc.createElement('button');
+		alignLeftBtn.className = 'obsidian-reader-settings-button';
+		alignLeftBtn.dataset.action = 'align-left';
+		alignLeftBtn.appendChild(this.createSVG({
+			width: '20', height: '20', viewBox: '0 0 24 24',
+			paths: ['M3 6h18', 'M3 12h12', 'M3 18h15']
+		}));
+
+		const alignJustifyBtn = doc.createElement('button');
+		alignJustifyBtn.className = 'obsidian-reader-settings-button';
+		alignJustifyBtn.dataset.action = 'align-justify';
+		alignJustifyBtn.appendChild(this.createSVG({
+			width: '20', height: '20', viewBox: '0 0 24 24',
+			paths: ['M3 6h18', 'M3 12h18', 'M3 18h18']
+		}));
+
+		alignGroup.appendChild(alignLeftBtn);
+		alignGroup.appendChild(alignJustifyBtn);
+
+		// Font family select
+		const fontFamilySelect = doc.createElement('select');
+		fontFamilySelect.className = 'obsidian-reader-settings-select';
+		fontFamilySelect.dataset.action = 'change-font-family';
+
+		[
+			{ value: '', text: 'System' },
+			{ value: 'Georgia, serif', text: 'Serif' },
+			{ value: "'Courier New', monospace", text: 'Mono' },
+			{ value: '__custom__', text: 'Custom' },
+		].forEach(({ value, text }) => {
+			const opt = doc.createElement('option');
+			opt.value = value;
+			opt.textContent = text;
+			fontFamilySelect.appendChild(opt);
+		});
+
+		// Custom font name text input (shown when 'Custom' is selected)
+		const fontInput = doc.createElement('input');
+		fontInput.type = 'text';
+		fontInput.className = 'obsidian-reader-font-input';
+		fontInput.placeholder = 'Font name…';
+		fontInput.style.display = 'none';
+
 		// Theme select
 		const themeSelect = doc.createElement('select');
 		themeSelect.className = 'obsidian-reader-settings-select';
@@ -239,6 +290,9 @@ export class Reader {
 		controlsContainer.appendChild(fontGroup);
 		controlsContainer.appendChild(widthGroup);
 		controlsContainer.appendChild(lineHeightGroup);
+		controlsContainer.appendChild(alignGroup);
+		controlsContainer.appendChild(fontFamilySelect);
+		controlsContainer.appendChild(fontInput);
 		controlsContainer.appendChild(themeSelect);
 		controlsContainer.appendChild(themeModeSelect);
 
@@ -280,6 +334,16 @@ export class Reader {
 				case 'increase-line-height':
 					this.updateLineHeight(doc, parseFloat(style.getPropertyValue('--obsidian-reader-line-height')) + 0.1);
 					break;
+				case 'align-left':
+					this.updateTextAlign(doc, 'left');
+					alignLeftBtn.classList.add('is-active');
+					alignJustifyBtn.classList.remove('is-active');
+					break;
+				case 'align-justify':
+					this.updateTextAlign(doc, 'justify');
+					alignJustifyBtn.classList.add('is-active');
+					alignLeftBtn.classList.remove('is-active');
+					break;
 			}
 		});
 
@@ -293,6 +357,50 @@ export class Reader {
 		themeModeSelect.value = this.settings.themeMode;
 		themeModeSelect.addEventListener('change', () => {
 			this.updateThemeMode(doc, themeModeSelect.value as 'auto' | 'light' | 'dark');
+		});
+
+		// Initialize align button active state
+		if (this.settings.textAlign === 'justify') {
+			alignJustifyBtn.classList.add('is-active');
+		} else {
+			alignLeftBtn.classList.add('is-active');
+		}
+		this.updateTextAlign(doc, this.settings.textAlign);
+
+		// Font family select + custom input event listeners
+		const PRESET_FONTS = new Set(['', 'Georgia, serif', "'Courier New', monospace"]);
+		const savedFont = this.settings.fontFamily;
+		if (savedFont !== null && !PRESET_FONTS.has(savedFont)) {
+			fontFamilySelect.value = '__custom__';
+			fontInput.value = savedFont;
+			fontInput.style.display = '';
+		} else {
+			fontFamilySelect.value = savedFont ?? '';
+		}
+		fontFamilySelect.addEventListener('change', () => {
+			if (fontFamilySelect.value === '__custom__') {
+				fontInput.style.display = '';
+				fontInput.focus();
+				this.updateFontFamily(doc, fontInput.value || null);
+			} else {
+				fontInput.style.display = 'none';
+				this.updateFontFamily(doc, fontFamilySelect.value || null);
+			}
+		});
+		fontInput.addEventListener('input', () => {
+			this.updateFontFamily(doc, fontInput.value || null);
+		});
+		fontInput.addEventListener('keydown', (e) => {
+			if (e.key === 'Enter' || e.key === 'Escape') {
+				e.preventDefault();
+				fontInput.blur();
+			}
+		});
+		this.updateFontFamily(doc, savedFont);
+
+		// Blur font input when cursor leaves the settings bar, so extension shortcuts work
+		settingsBar.addEventListener('mouseleave', () => {
+			if (doc.activeElement === fontInput) fontInput.blur();
 		});
 
 		// Notify content script to listen for highlighter button
@@ -339,6 +447,21 @@ export class Reader {
 		}
 
 		this.settings.themeMode = mode;
+		this.saveSettings();
+	}
+
+	private static updateTextAlign(doc: Document, align: 'left' | 'justify'): void {
+		doc.body.style.setProperty('--obsidian-reader-text-align', align);
+		this.settings.textAlign = align;
+		this.saveSettings();
+	}
+
+	private static updateFontFamily(doc: Document, family: string | null): void {
+		doc.body.style.setProperty(
+			'--obsidian-reader-font-family',
+			family ?? 'system-ui, -apple-system, sans-serif'
+		);
+		this.settings.fontFamily = family;
 		this.saveSettings();
 	}
 
