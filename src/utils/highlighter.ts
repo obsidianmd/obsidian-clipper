@@ -11,7 +11,8 @@ import {
 	handleTouchMove,
 	renderMarginNotes,
 	openNoteEditor,
-	lastHoverTarget
+	lastHoverTarget,
+	hexToRgba
 } from './highlighter-overlays';
 import { detectBrowser, addBrowserClassToHtml } from './browser-detection';
 import { generalSettings, loadSettings } from './storage-utils';
@@ -85,8 +86,26 @@ const MAX_HISTORY_LENGTH = 30;
 
 const HIGHLIGHT_COLORS = ['#fef08a', '#bbf7d0', '#bfdbfe', '#fecdd3', '#fed7aa'];
 let activeHighlightColor = HIGHLIGHT_COLORS[0];
-export function setActiveHighlightColor(color: string) { activeHighlightColor = color; }
+export function setActiveHighlightColor(color: string) {
+	activeHighlightColor = color;
+	updateSelectionColor(color);
+}
 export function getActiveHighlightColor(): string { return activeHighlightColor; }
+
+function updateSelectionColor(hex: string) {
+	const rgba = hexToRgba(hex, 0.35);
+	// The SCSS ::selection rule reads this CSS variable (works when manifest/
+	// scripting CSS is active); the injected <style> provides the rule directly
+	// as fallback (works when manifest CSS isn't active, e.g. first reader entry).
+	document.body.style.setProperty('--obsidian-highlight-selection-color', rgba);
+	let el = document.getElementById('obsidian-highlight-selection-style') as HTMLStyleElement | null;
+	if (!el || !el.isConnected) {
+		el = document.createElement('style');
+		el.id = 'obsidian-highlight-selection-style';
+		document.body.appendChild(el);
+	}
+	el.textContent = `body.obsidian-highlighter-active *::selection { background-color: ${rgba} !important; }`;
+}
 
 const ALLOWED_HIGHLIGHT_TAGS = [
 	'SPAN', 'P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6',
@@ -147,6 +166,7 @@ export function toggleHighlighterMenu(isActive: boolean) {
 		disableLinkClicks();
 		createHighlighterMenu();
 		addBrowserClassToHtml();
+		updateSelectionColor(activeHighlightColor);
 		browser.runtime.sendMessage({ action: "highlighterModeChanged", isActive: true });
 		// Force full re-render — the DOM may have been rebuilt (reader toggle)
 		// or overlays removed on deactivation, so the dedup cache is stale.
@@ -165,6 +185,8 @@ export function toggleHighlighterMenu(isActive: boolean) {
 		browser.runtime.sendMessage({ action: "highlighterModeChanged", isActive: false });
 		document.getElementById('obsidian-margin-notes-col')?.remove();
 		document.getElementById('obsidian-margin-note-editor')?.remove();
+		document.getElementById('obsidian-highlight-selection-style')?.remove();
+		document.body.style.removeProperty('--obsidian-highlight-selection-color');
 		if (!generalSettings.alwaysShowHighlights) {
 			removeExistingHighlights();
 		}

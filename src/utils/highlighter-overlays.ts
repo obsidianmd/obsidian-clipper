@@ -17,7 +17,7 @@ import katex from 'katex';
 let hoverOverlay: HTMLElement | null = null;
 
 // Convert hex color to rgba string
-function hexToRgba(hex: string, alpha: number): string {
+export function hexToRgba(hex: string, alpha: number): string {
 	const r = parseInt(hex.slice(1, 3), 16);
 	const g = parseInt(hex.slice(3, 5), 16);
 	const b = parseInt(hex.slice(5, 7), 16);
@@ -354,7 +354,7 @@ function createHighlightOverlayElement(rect: DOMRect, content: string, isText: b
 	if (color) {
 		// On dark backgrounds use saturated palette + screen blend; on light use pastel + multiply
 		const effectiveColor = isDark ? (DARK_BG_COLORS[color] ?? color) : color;
-		const alpha = isDark ? 0.35 : 0.35;
+		const alpha = 0.35;
 		const blendMode = isDark ? 'screen' : 'multiply';
 		const bgValue = hexToRgba(effectiveColor, alpha);
 		overlay.style.backgroundColor = bgValue;
@@ -497,9 +497,13 @@ function createOrUpdateHoverOverlay(target: Element) {
 		return;
 	}
 
-	if (!hoverOverlay) {
+	if (!hoverOverlay || !hoverOverlay.isConnected) {
 		hoverOverlay = document.createElement('div');
 		hoverOverlay.id = 'obsidian-highlight-hover-overlay';
+		hoverOverlay.style.setProperty('border', '2px dashed rgba(150, 150, 150, 0.8)', 'important');
+		hoverOverlay.style.borderRadius = '4px';
+		hoverOverlay.style.pointerEvents = 'none';
+		hoverOverlay.style.zIndex = '999999997';
 		document.body.appendChild(hoverOverlay);
 	}
 	
@@ -512,29 +516,13 @@ function createOrUpdateHoverOverlay(target: Element) {
 	hoverOverlay.style.height = `${rect.height + 4}px`;
 	hoverOverlay.style.display = 'block';
 
-	// Remove 'is-hovering' class from all highlight overlays
+	// Remove 'is-hovering' from all overlays and reset hover overlay state
+	// (overlay targets are handled by the early return above)
 	document.querySelectorAll('.obsidian-highlight-overlay.is-hovering').forEach(el => {
 		el.classList.remove('is-hovering');
 	});
-
-	// Remove 'on-highlight' class from hover overlay
 	hoverOverlay.classList.remove('on-highlight');
-
-	// Check if the target is a highlight overlay
-	if (target.classList.contains('obsidian-highlight-overlay')) {
-		const index = target.getAttribute('data-highlight-index');
-		if (index) {
-			// Add 'is-hovering' class to all highlight overlays with the same index
-			document.querySelectorAll(`.obsidian-highlight-overlay[data-highlight-index="${index}"]`).forEach(el => {
-				el.classList.add('is-hovering');
-			});
-			// Add 'on-highlight' class to hover overlay and show "N" badge
-			hoverOverlay.classList.add('on-highlight');
-			hoverOverlay.dataset.noteBadge = 'N';
-		}
-	} else {
-		delete hoverOverlay.dataset.noteBadge;
-	}
+	delete hoverOverlay.dataset.noteBadge;
 }
 
 // Modify the removeHoverOverlay function to also remove the 'is-hovering' class
