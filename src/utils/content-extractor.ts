@@ -223,7 +223,7 @@ function processHighlights(content: string, highlights: AnyHighlightData[]): str
 			const noteHtml = h.notes?.length
 				? h.notes.map(n => `<blockquote><p>${n}</p></blockquote>`).join('')
 				: '';
-			return h.content + noteHtml;
+			return `<div>${h.content}${noteHtml}</div>`;
 		}).join('');
 	}
 

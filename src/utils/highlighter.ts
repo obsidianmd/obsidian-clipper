@@ -11,7 +11,7 @@ import {
 	handleTouchMove,
 	renderMarginNotes,
 	openNoteEditor,
-	lastHoverTarget,
+	getLastHoverTarget,
 	hexToRgba
 } from './highlighter-overlays';
 import { detectBrowser, addBrowserClassToHtml } from './browser-detection';
@@ -90,7 +90,9 @@ export function setActiveHighlightColor(color: string) {
 	activeHighlightColor = color;
 	updateSelectionColor(color);
 }
-export function getActiveHighlightColor(): string { return activeHighlightColor; }
+export function getActiveHighlightColor(): string {
+	return activeHighlightColor;
+}
 
 function updateSelectionColor(hex: string) {
 	const rgba = hexToRgba(hex, 0.35);
@@ -279,32 +281,27 @@ export function createHighlighterMenu() {
 		document.body.appendChild(menu);
 	}
 
-	// Critical inline styles — the stylesheet may not apply in reader mode
-	// (Firefox injects manifest CSS at engine-level, but reader mode DOM
-	// manipulation can sometimes break the association)
-	const s = (menu as HTMLElement).style;
-	s.setProperty('position', 'fixed', 'important');
-	s.setProperty('top', '20px', 'important');
-	s.setProperty('left', '50%', 'important');
-	s.setProperty('transform', 'translateX(-50%)', 'important');
-	s.setProperty('z-index', '2147483647', 'important');
-	s.setProperty('display', 'flex', 'important');
-	s.setProperty('align-items', 'center', 'important');
-	s.setProperty('gap', '4px', 'important');
-	s.setProperty('background', '#353535', 'important');
-	s.setProperty('color', '#fff', 'important');
-	s.setProperty('border', '1px solid #424242', 'important');
-	s.setProperty('border-radius', '24px', 'important');
-	s.setProperty('padding', '4px', 'important');
-	s.setProperty('height', '32px', 'important');
-	s.setProperty('box-sizing', 'border-box', 'important');
-	s.setProperty('font-family', 'system-ui, -apple-system, BlinkMacSystemFont, sans-serif', 'important');
-	s.setProperty('font-size', '13px', 'important');
-	s.setProperty('font-weight', '600', 'important');
-	s.setProperty('box-shadow', '0 2px 10px rgba(0,0,0,0.3)', 'important');
-	s.setProperty('white-space', 'nowrap', 'important');
-	s.setProperty('user-select', 'none', 'important');
-	s.setProperty('-webkit-font-smoothing', 'antialiased', 'important');
+	// Inject a DOM-level <style> for the menu — manifest CSS can lose
+	// association with new DOM nodes after reader mode's heavy rebuild.
+	// A <style> in the DOM stays connected to its sibling elements.
+	if (!document.getElementById('obsidian-highlighter-menu-styles')) {
+		const style = document.createElement('style');
+		style.id = 'obsidian-highlighter-menu-styles';
+		style.textContent = `.obsidian-highlighter-menu {
+			position: fixed !important; top: 20px !important; left: 50% !important;
+			transform: translateX(-50%) !important; z-index: 2147483647 !important;
+			display: flex !important; align-items: center !important; gap: 4px !important;
+			background: #353535 !important; color: #fff !important;
+			border: 1px solid #424242 !important; border-radius: 24px !important;
+			padding: 4px !important; height: 32px !important; box-sizing: border-box !important;
+			font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif !important;
+			font-size: 13px !important; font-weight: 600 !important;
+			box-shadow: 0 2px 10px rgba(0,0,0,0.3) !important;
+			white-space: nowrap !important; user-select: none !important;
+			-webkit-font-smoothing: antialiased !important;
+		}`;
+		document.body.appendChild(style);
+	}
 
 	const highlightCount = highlights.length;
 	const highlightText = `${highlightCount}`;
@@ -471,10 +468,8 @@ export function createHighlighterMenu() {
 }
 
 function removeHighlighterMenu() {
-	const menu = document.querySelector('.obsidian-highlighter-menu');
-	if (menu) {
-		menu.remove();
-	}
+	document.querySelector('.obsidian-highlighter-menu')?.remove();
+	document.getElementById('obsidian-highlighter-menu-styles')?.remove();
 }
 
 // Disable clicking on links when highlighter is active
@@ -1105,9 +1100,10 @@ function handleKeyDown(event: KeyboardEvent) {
 	} else if (event.key === 'n' || event.key === 'N') {
 		const active = document.activeElement;
 		if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || (active as HTMLElement).isContentEditable)) return;
-		if (lastHoverTarget?.classList.contains('obsidian-highlight-overlay')) {
+		const hoverTarget = getLastHoverTarget();
+		if (hoverTarget?.classList.contains('obsidian-highlight-overlay')) {
 			event.preventDefault();
-			const idx = parseInt((lastHoverTarget as HTMLElement).dataset.highlightIndex ?? '-1');
+			const idx = parseInt((hoverTarget as HTMLElement).dataset.highlightIndex ?? '-1');
 			if (idx >= 0) openNoteEditor(idx);
 		}
 	}

@@ -1,3 +1,4 @@
+import katex from 'katex';
 import {
 	handleTextSelection,
 	highlightElement,
@@ -12,7 +13,6 @@ import {
 } from './highlighter';
 import { throttle } from './throttle';
 import { getElementByXPath, isDarkColor } from './dom-utils';
-import katex from 'katex';
 
 let hoverOverlay: HTMLElement | null = null;
 
@@ -37,7 +37,8 @@ const DARK_BG_COLORS: Record<string, string> = {
 let touchStartX: number = 0;
 let touchStartY: number = 0;
 let isTouchMoved: boolean = false;
-export let lastHoverTarget: Element | null = null;
+let lastHoverTarget: Element | null = null;
+export function getLastHoverTarget(): Element | null { return lastHoverTarget; }
 
 const LINE_BY_LINE_OVERLAY_TAGS = ['P'];
 
@@ -591,12 +592,12 @@ function renderNoteWithKatex(text: string): string {
 		if (part.startsWith('$$') && part.endsWith('$$') && part.length > 4) {
 			try {
 				return katex.renderToString(part.slice(2, -2), { displayMode: true, throwOnError: false });
-			} catch { return part; }
+			} catch (error) { return part; }
 		}
 		if (part.startsWith('$') && part.endsWith('$') && part.length > 2) {
 			try {
 				return katex.renderToString(part.slice(1, -1), { throwOnError: false });
-			} catch { return part; }
+			} catch (error) { return part; }
 		}
 		return part.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 	}).join('');
@@ -695,7 +696,6 @@ export function renderMarginNotes() {
 	}
 }
 
-
 // Open an inline textarea to add or edit a margin note on the highlight at `index`.
 // Pass `existingText` and `noteIdx` to edit an existing note.
 export function openNoteEditor(index: number, existingText?: string, noteIdx?: number) {
@@ -761,8 +761,14 @@ export function openNoteEditor(index: number, existingText?: string, noteIdx?: n
 	cancelBtn.addEventListener('click', close);
 
 	textarea.addEventListener('keydown', (e) => {
-		if (e.key === 'Escape') { e.stopPropagation(); close(); }
-		if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); save(); }
+		if (e.key === 'Escape') {
+			e.stopPropagation();
+			close();
+		}
+		if (e.key === 'Enter' && !e.shiftKey) {
+			e.preventDefault();
+			save();
+		}
 	});
 
 	btns.appendChild(saveBtn);

@@ -20,7 +20,7 @@ import browser from './utils/browser-polyfill';
 					document.documentElement.classList.toggle('obsidian-reader-active', isActive);
 					// Sync highlighter off in background so Alt+Shift+H correctly sends setHighlighterMode:true
 					if (isActive) {
-						browser.runtime.sendMessage({ action: 'highlighterModeChanged', isActive: false }).catch(() => {});
+						browser.runtime.sendMessage({ action: 'highlighterModeChanged', isActive: false }).catch(error => console.warn('Failed to sync highlighter state:', error));
 					}
 					sendResponse({ success: true, isActive });
 				} catch (error: unknown) {
