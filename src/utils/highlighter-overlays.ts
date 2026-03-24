@@ -589,17 +589,18 @@ function renderNoteWithKatex(text: string): string {
 	// Match $$...$$ (display math) before $...$ (inline math) to avoid partial matches
 	const parts = text.split(/(\$\$[\s\S]+?\$\$|\$[^$\n]+?\$)/g);
 	return parts.map(part => {
+		const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 		if (part.startsWith('$$') && part.endsWith('$$') && part.length > 4) {
 			try {
 				return katex.renderToString(part.slice(2, -2), { displayMode: true, throwOnError: false });
-			} catch (error) { return part; }
+			} catch (error) { return esc(part); }
 		}
 		if (part.startsWith('$') && part.endsWith('$') && part.length > 2) {
 			try {
 				return katex.renderToString(part.slice(1, -1), { throwOnError: false });
-			} catch (error) { return part; }
+			} catch (error) { return esc(part); }
 		}
-		return part.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+		return esc(part);
 	}).join('');
 }
 

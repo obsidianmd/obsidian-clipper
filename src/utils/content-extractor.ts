@@ -1,6 +1,6 @@
 import { ExtractedContent } from '../types/types';
 import { createMarkdownContent } from 'defuddle/full';
-import { sanitizeFileName } from './string-utils';
+import { sanitizeFileName, escapeHtml } from './string-utils';
 import { buildVariables, addSchemaOrgDataToVariables } from './shared';
 import browser from './browser-polyfill';
 import { debugLog } from './debug';
@@ -221,7 +221,7 @@ function processHighlights(content: string, highlights: AnyHighlightData[]): str
 	if (generalSettings.highlightBehavior === 'replace-content') {
 		return highlights.map(h => {
 			const noteHtml = h.notes?.length
-				? h.notes.map(n => `<blockquote><p>${n}</p></blockquote>`).join('')
+				? h.notes.map(n => `<blockquote><p>${escapeHtml(n)}</p></blockquote>`).join('')
 				: '';
 			return `<div>${h.content}${noteHtml}</div>`;
 		}).join('');
