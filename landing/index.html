@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clipper for AppFlowy — Web Clipper Browser Extension</title>
+  <meta name="description" content="Save web pages directly to your AppFlowy workspace. Clip articles, highlights, and full pages with one click." />
+  <meta property="og:title" content="Clipper for AppFlowy" />
+  <meta property="og:description" content="Save web pages directly to your AppFlowy workspace. Clip articles, highlights, and full pages with one click." />
+  <meta property="og:image" content="assets/screenshot-clip.png" />
+  <meta property="og:type" content="website" />
+
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml" />
+
+  <style>
+    :root {
+      --bg: #0f0f10;
+      --bg-card: #1a1a1e;
+      --bg-card-hover: #222228;
+      --border: #2a2a32;
+      --purple: #7c3aed;
+      --purple-light: #9b5cf6;
+      --purple-glow: rgba(124, 58, 237, 0.25);
+      --text: #e8e8f0;
+      --text-muted: #9090a8;
+      --text-dim: #5a5a72;
+      --radius: 12px;
+      --radius-lg: 20px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Inter, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: var(--purple-light); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ─── Layout ─── */
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ─── Nav ─── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(15, 15, 16, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    nav .inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .nav-brand img { width: 28px; height: 28px; }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      list-style: none;
+      font-size: 0.9rem;
+    }
+
+    .nav-links a { color: var(--text-muted); transition: color .2s; }
+    .nav-links a:hover { color: var(--text); text-decoration: none; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 22px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+      border: 1px solid transparent;
+    }
+
+    .btn-primary {
+      background: var(--purple);
+      color: #fff;
+      border-color: var(--purple);
+    }
+    .btn-primary:hover { background: var(--purple-light); border-color: var(--purple-light); text-decoration: none; }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--text);
+      border-color: var(--border);
+    }
+    .btn-outline:hover { border-color: var(--text-muted); background: var(--bg-card); text-decoration: none; }
+
+    /* ─── Hero ─── */
+    .hero {
+      padding: 96px 0 72px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -200px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 700px;
+      height: 700px;
+      background: radial-gradient(circle, var(--purple-glow) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 14px;
+      background: rgba(124, 58, 237, 0.15);
+      border: 1px solid rgba(124, 58, 237, 0.35);
+      border-radius: 999px;
+      font-size: 0.8rem;
+      color: var(--purple-light);
+      margin-bottom: 28px;
+    }
+
+    .hero-logo {
+      width: 72px;
+      height: 72px;
+      margin: 0 auto 24px;
+      display: block;
+      filter: drop-shadow(0 0 24px var(--purple-glow));
+    }
+
+    .hero h1 {
+      font-size: clamp(2.2rem, 5vw, 3.4rem);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 span {
+      background: linear-gradient(135deg, #a78bfa, #7c3aed);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero p {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      max-width: 560px;
+      margin: 0 auto 36px;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .hero-note {
+      margin-top: 32px !important;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+
+    .hero-note a { color: var(--text-dim); }
+
+    .section-label {
+      text-align: center;
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--purple-light);
+      margin-bottom: 14px;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: clamp(1.6rem, 3.5vw, 2.2rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+    }
+
+    .section-sub {
+      text-align: center;
+      color: var(--text-muted);
+      max-width: 500px;
+      margin: 0 auto 56px;
+      font-size: 1rem;
+    }
+
+    /* ─── Download ─── */
+    .download {
+      padding: 80px 0;
+    }
+
+    .download-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+    }
+
+    .download-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      transition: border-color .2s;
+    }
+
+    .download-card:hover { border-color: rgba(124,58,237,.4); }
+
+    .browser-icon {
+      width: 40px;
+      height: 40px;
+    }
+
+    .download-card h3 {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .download-card .version {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+
+    .download-card .btn {
+      margin-top: auto;
+      justify-content: center;
+      font-size: 0.85rem;
+      padding: 9px 16px;
+    }
+
+    /* ─── CTA ─── */
+    .cta {
+      padding: 0 0 96px 0;
+      text-align: center;
+    }
+
+    .cta-box {
+      background: linear-gradient(135deg, rgba(124,58,237,.18) 0%, rgba(99,40,210,.08) 100%);
+      border: 1px solid rgba(124,58,237,.3);
+      border-radius: 24px;
+      padding: 64px 48px;
+    }
+
+    .cta h2 {
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+
+    .cta p {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      max-width: 480px;
+      margin: 0 auto 36px;
+    }
+
+    /* ─── Footer ─── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 0;
+    }
+
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      font-size: 0.85rem;
+      color: var(--text-dim);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 20px;
+      list-style: none;
+    }
+
+    .footer-links a { color: var(--text-dim); transition: color .2s; }
+    .footer-links a:hover { color: var(--text-muted); text-decoration: none; }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 640px) {
+      .hero { padding: 64px 0 48px; }
+      .nav-links { display: none; }
+      .cta-box { padding: 40px 24px; }
+      .footer-inner { flex-direction: column; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="inner">
+    <a class="nav-brand" href="#">
+      <img src="assets/logo.svg" alt="Clipper for AppFlowy logo" />
+      Clipper for AppFlowy
+    </a>
+    <ul class="nav-links">
+      <li><a href="#download">Download</a></li>
+      <li><a href="https://github.com/alexrosepizant/clipper-for-appflowy" target="_blank" rel="noopener">GitHub</a></li>
+    </ul>
+    <a class="btn btn-primary" href="#download">Get the extension</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="container">
+    <div class="hero-badge">
+      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" fill="#7c3aed"/><circle cx="6" cy="6" r="3" fill="#a78bfa"/></svg>
+      Community project · v0.1.0
+    </div>
+
+    <img class="hero-logo" src="assets/logo.svg" alt="Clipper for AppFlowy" />
+
+    <h1>Clip the web into<br /><span>your AppFlowy workspace</span></h1>
+
+    <p>Save articles, highlights, and full pages from any website directly into AppFlowy — with one click, from your browser.</p>
+
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="#download">
+        <svg width="16" height="16" fill="none" viewBox="0 0 16 16"><path stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M8 2v8m0 0-3-3m3 3 3-3M3 12h10"/></svg>
+        Download free
+      </a>
+      <a class="btn btn-outline" href="https://github.com/alexrosepizant/clipper-for-appflowy" target="_blank" rel="noopener">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+        View on GitHub
+      </a>
+    </div>
+
+    <p class="hero-note">
+      Unofficial community fork of <a href="https://github.com/obsidianmd/obsidian-clipper" target="_blank" rel="noopener">obsidian-clipper</a>.
+      Not affiliated with the AppFlowy team.
+    </p>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+  <div class="container">
+    <div class="cta-box">
+      <h2>Open source &amp; community-driven</h2>
+      <p>Clipper for AppFlowy is free, open source, and lives on GitHub. Contributions, translations, and feedback are welcome.</p>
+      <div style="display:flex; gap:14px; justify-content:center; flex-wrap:wrap;">
+        <a class="btn btn-primary"
+           href="https://github.com/alexrosepizant/clipper-for-appflowy"
+           target="_blank" rel="noopener">
+          Stars on GitHub
+        </a>
+        <a class="btn btn-outline"
+           href="https://github.com/alexrosepizant/clipper-for-appflowy/issues"
+           target="_blank" rel="noopener">
+          Report an issue
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <span>© 2026 Clipper for AppFlowy — MIT License</span>
+      <ul class="footer-links">
+        <li><a href="https://github.com/alexrosepizant/clipper-for-appflowy" target="_blank" rel="noopener">GitHub</a></li>
+        <li><a href="https://github.com/alexrosepizant/clipper-for-appflowy/releases" target="_blank" rel="noopener">Releases</a></li>
+        <li><a href="https://github.com/alexrosepizant/clipper-for-appflowy/issues" target="_blank" rel="noopener">Issues</a></li>
+        <li><a href="https://github.com/alexrosepizant/clipper-for-appflowy/blob/main/LICENSE" target="_blank" rel="noopener">License</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
