@@ -153,6 +153,31 @@ function markdownToBlocks(markdown: string): Block[] {
 			continue;
 		}
 
+		// Image — standalone line with image markdown
+		// Also handles linked images: [![alt](src)](href) — extract src
+		const linkedImageMatch = line.match(
+			/^\s*\[!\[([^\]]*)\]\(([^)]+)\)\]\([^)]+\)\s*$/,
+		);
+		if (linkedImageMatch) {
+			blocks.push({
+				type: "image",
+				data: { url: linkedImageMatch[2] },
+				children: [],
+			});
+			i++;
+			continue;
+		}
+		const imageMatch = line.match(/^\s*!\[([^\]]*)\]\(([^)]+)\)\s*$/);
+		if (imageMatch) {
+			blocks.push({
+				type: "image",
+				data: { url: imageMatch[2] },
+				children: [],
+			});
+			i++;
+			continue;
+		}
+
 		// Regular paragraph (including empty lines)
 		blocks.push({
 			type: "paragraph",
