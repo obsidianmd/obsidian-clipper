@@ -12,7 +12,15 @@
 
 ## Get started
 
-The extension is not yet published to browser stores. To use it, install it locally by following the [developer instructions](#install-the-extension-locally) below.
+Download the latest release for your browser:
+
+| Browser           | Download                                                                                                             |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------- |
+| Chrome / Chromium | [clipper-for-appflowy-0.1.0-chrome.zip](https://github.com/alexrosepizant/clipper-for-appflowy/releases/tag/v0.1.0)  |
+| Firefox           | [clipper-for-appflowy-0.1.0-firefox.zip](https://github.com/alexrosepizant/clipper-for-appflowy/releases/tag/v0.1.0) |
+| Safari            | [clipper-for-appflowy-0.1.0-safari.zip](https://github.com/alexrosepizant/clipper-for-appflowy/releases/tag/v0.1.0)  |
+
+Once downloaded, install it locally by following the [developer instructions](#install-the-extension-locally) below.
 
 ## Use the extension
 
