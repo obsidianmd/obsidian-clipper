@@ -59,6 +59,59 @@
 						</div>
 						<form id="general-settings-form">
 							<div>
+								<h3 data-i18n="appflowySettings">AppFlowy</h3>
+								<div class="setting-item-description" data-i18n="appflowyDescription">Configure AppFlowy Cloud to save clipped pages directly to your AppFlowy workspace.</div>
+								<div class="setting-item">
+									<div class="setting-item-info">
+										<label>Sign in with email code</label>
+										<div class="setting-item-description">Enter your AppFlowy account email. AppFlowy will send a 6-digit code to that address.</div>
+									</div>
+									<div class="setting-item-control">
+										<input type="email" id="appflowy-email-input" placeholder="your@email.com" autocomplete="off" spellcheck="false" style="width: 100%;" />
+										<button type="button" id="appflowy-send-otp-btn" class="btn mod-cta" style="width: 100%; margin-top: 0.5rem;">Send code</button>
+									</div>
+								</div>
+								<div class="setting-item" id="appflowy-otp-row" style="display: none;">
+									<div class="setting-item-info">
+										<label>Verification code</label>
+										<div class="setting-item-description">Enter the 6-digit code sent to your email, then click Verify.</div>
+									</div>
+									<div class="setting-item-control">
+										<input type="text" id="appflowy-otp-code" placeholder="123456" maxlength="6" autocomplete="off" spellcheck="false" style="width: 100%;" />
+										<button type="button" id="appflowy-verify-otp-btn" class="btn mod-cta" style="width: 100%; margin-top: 0.5rem;">Verify &amp; connect</button>
+									</div>
+								</div>
+								<div class="setting-item mod-horizontal" style="display: none;">
+									<div class="setting-item-info">
+										<label for="appflowy-server-url" data-i18n="appflowyServerUrl">Server URL</label>
+										<div class="setting-item-description" data-i18n="appflowyServerUrlDescription">Your AppFlowy Cloud URL (e.g. https://beta.appflowy.cloud).</div>
+									</div>
+									<div class="setting-item-control">
+										<input type="url" id="appflowy-server-url" placeholder="https://beta.appflowy.cloud" autocomplete="off" spellcheck="false" />
+									</div>
+								</div>
+								<div class="setting-item mod-horizontal">
+									<div class="setting-item-info">
+										<label for="appflowy-api-token" data-i18n="appflowyApiToken">API Token</label>
+										<div class="setting-item-description" data-i18n="appflowyApiTokenDescription">Your AppFlowy API token. Find it in AppFlowy Settings → Account.</div>
+									</div>
+									<div class="setting-item-control">
+										<input type="password" id="appflowy-api-token" placeholder="••••••••" autocomplete="off" spellcheck="false" />
+									</div>
+								</div>
+								<div class="setting-item mod-horizontal">
+									<div class="setting-item-info">
+										<label for="appflowy-workspace-id" data-i18n="appflowyWorkspaceId">Workspace ID</label>
+										<div class="setting-item-description" data-i18n="appflowyWorkspaceIdDescription">The ID of your AppFlowy workspace where pages will be saved.</div>
+									</div>
+									<div class="setting-item-control">
+										<input type="text" id="appflowy-workspace-id" placeholder="workspace-uuid" autocomplete="off" spellcheck="false" />
+										<button type="button" id="appflowy-fetch-workspaces-btn" class="btn" data-i18n="appflowyFetchWorkspaces">Fetch workspaces</button>
+									</div>
+								</div>
+
+							</div>
+							<div>
 								<div class="setting-item mod-horizontal is-hidden" id="rate-extension">
 									<div class="setting-item-info">
 										<label data-i18n="feedback">Feedback</label>
@@ -118,60 +171,6 @@
 										<a href="https://github.com/alexrosepizant/clipper-for-appflowy" id="help-open-btn" class="btn" target="_blank" data-i18n="open">Open</a>
 									</div>
 								</div>
-							</div>
-
-							<div>
-								<h3 data-i18n="appflowySettings">AppFlowy</h3>
-								<div class="setting-item-description" data-i18n="appflowyDescription">Configure AppFlowy Cloud to save clipped pages directly to your AppFlowy workspace.</div>
-								<div class="setting-item mod-horizontal">
-									<div class="setting-item-info">
-										<label>Sign in with email code</label>
-										<div class="setting-item-description">Enter your AppFlowy account email. AppFlowy will send a 6-digit code to that address.</div>
-									</div>
-									<div class="setting-item-control">
-										<input type="email" id="appflowy-email-input" placeholder="your@email.com" autocomplete="off" spellcheck="false" />
-										<button type="button" id="appflowy-send-otp-btn" class="btn mod-cta">Send code</button>
-									</div>
-								</div>
-								<div class="setting-item mod-horizontal" id="appflowy-otp-row" style="display: none;">
-									<div class="setting-item-info">
-										<label>Verification code</label>
-										<div class="setting-item-description">Enter the 6-digit code sent to your email, then click Verify.</div>
-									</div>
-									<div class="setting-item-control">
-										<input type="text" id="appflowy-otp-code" placeholder="123456" maxlength="6" autocomplete="off" spellcheck="false" style="width: 8em;" />
-										<button type="button" id="appflowy-verify-otp-btn" class="btn mod-cta">Verify &amp; connect</button>
-									</div>
-								</div>
-								<div class="setting-item mod-horizontal">
-									<div class="setting-item-info">
-										<label for="appflowy-server-url" data-i18n="appflowyServerUrl">Server URL</label>
-										<div class="setting-item-description" data-i18n="appflowyServerUrlDescription">Your AppFlowy Cloud URL (e.g. https://beta.appflowy.cloud).</div>
-									</div>
-									<div class="setting-item-control">
-										<input type="url" id="appflowy-server-url" placeholder="https://beta.appflowy.cloud" autocomplete="off" spellcheck="false" />
-									</div>
-								</div>
-								<div class="setting-item mod-horizontal">
-									<div class="setting-item-info">
-										<label for="appflowy-api-token" data-i18n="appflowyApiToken">API Token</label>
-										<div class="setting-item-description" data-i18n="appflowyApiTokenDescription">Your AppFlowy API token. Find it in AppFlowy Settings → Account.</div>
-									</div>
-									<div class="setting-item-control">
-										<input type="password" id="appflowy-api-token" placeholder="••••••••" autocomplete="off" spellcheck="false" />
-									</div>
-								</div>
-								<div class="setting-item mod-horizontal">
-									<div class="setting-item-info">
-										<label for="appflowy-workspace-id" data-i18n="appflowyWorkspaceId">Workspace ID</label>
-										<div class="setting-item-description" data-i18n="appflowyWorkspaceIdDescription">The ID of your AppFlowy workspace where pages will be saved.</div>
-									</div>
-									<div class="setting-item-control">
-										<input type="text" id="appflowy-workspace-id" placeholder="workspace-uuid" autocomplete="off" spellcheck="false" />
-										<button type="button" id="appflowy-fetch-workspaces-btn" class="btn" data-i18n="appflowyFetchWorkspaces">Fetch workspaces</button>
-									</div>
-								</div>
-
 							</div>
 							<div>
 								<h3 data-i18n="advanced">Advanced</h3>

@@ -350,6 +350,34 @@ document.addEventListener("DOMContentLoaded", async function () {
 		document.documentElement.classList.add("is-embedded");
 	}
 
+	// If AppFlowy is the save target but the user hasn't connected yet, show the inline auth screen
+	if (
+		loadedSettings.saveBehavior === "addToAppFlowy" &&
+		!loadedSettings.appflowyConfig.apiToken
+	) {
+		await setupLanguageAndDirection();
+		await addBrowserClassToHtml();
+
+		// Keep the settings button functional so the user can reach full settings
+		const settingsButton = document.getElementById("open-settings");
+		if (settingsButton) {
+			settingsButton.addEventListener("click", async function () {
+				try {
+					await browser.runtime.sendMessage({
+						action: "openOptionsPage",
+					});
+					setTimeout(() => window.close(), 50);
+				} catch (error) {
+					console.error("Error opening options page:", error);
+				}
+			});
+			initializeIcons(settingsButton);
+		}
+
+		initializePopupAuthScreen();
+		return;
+	}
+
 	const isSidePanel =
 		document.documentElement.classList.contains("is-side-panel");
 
@@ -464,6 +492,34 @@ document.addEventListener("DOMContentLoaded", async function () {
 		showError(getMessage("pleaseReload"));
 	}
 });
+
+function initializePopupAuthScreen(): void {
+	const authScreen = document.getElementById("auth-screen");
+	const clipper = document.querySelector(".clipper") as HTMLElement | null;
+	if (!authScreen) return;
+
+	// Show auth screen and hide main clipper UI + toolbar
+	authScreen.style.display = "block";
+	if (clipper) clipper.style.display = "none";
+	const popupHeader = document.getElementById("popup-header");
+	if (popupHeader) popupHeader.style.display = "none";
+
+	const btn = document.getElementById(
+		"auth-open-settings-btn",
+	) as HTMLButtonElement;
+	if (btn) {
+		btn.addEventListener("click", async () => {
+			try {
+				await browser.runtime.sendMessage({
+					action: "openOptionsPage",
+				});
+				setTimeout(() => window.close(), 50);
+			} catch (error) {
+				console.error("Error opening options page:", error);
+			}
+		});
+	}
+}
 
 function setupEventListeners(tabId: number) {
 	const templateDropdown = document.getElementById(
