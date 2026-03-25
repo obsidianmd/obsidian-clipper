@@ -63,22 +63,22 @@
 								<div class="setting-item-description" data-i18n="appflowyDescription">Configure AppFlowy Cloud to save clipped pages directly to your AppFlowy workspace.</div>
 								<div class="setting-item">
 									<div class="setting-item-info">
-										<label>Sign in with email code</label>
-										<div class="setting-item-description">Enter your AppFlowy account email. AppFlowy will send a 6-digit code to that address.</div>
+										<label data-i18n="appflowySignInWithEmail">Sign in with email code</label>
+										<div class="setting-item-description" data-i18n="appflowySignInWithEmailDescription">Enter your AppFlowy account email. AppFlowy will send a 6-digit code to that address.</div>
 									</div>
 									<div class="setting-item-control">
 										<input type="email" id="appflowy-email-input" placeholder="your@email.com" autocomplete="off" spellcheck="false" style="width: 100%;" />
-										<button type="button" id="appflowy-send-otp-btn" class="btn mod-cta" style="width: 100%; margin-top: 0.5rem;">Send code</button>
+										<button type="button" id="appflowy-send-otp-btn" class="btn mod-cta" style="width: 100%; margin-top: 0.5rem;" data-i18n="appflowySendCode">Send code</button>
 									</div>
 								</div>
 								<div class="setting-item" id="appflowy-otp-row" style="display: none;">
 									<div class="setting-item-info">
-										<label>Verification code</label>
-										<div class="setting-item-description">Enter the 6-digit code sent to your email, then click Verify.</div>
+										<label data-i18n="appflowyVerificationCode">Verification code</label>
+										<div class="setting-item-description" data-i18n="appflowyVerificationCodeDescription">Enter the 6-digit code sent to your email, then click Verify.</div>
 									</div>
 									<div class="setting-item-control">
 										<input type="text" id="appflowy-otp-code" placeholder="123456" maxlength="6" autocomplete="off" spellcheck="false" style="width: 100%;" />
-										<button type="button" id="appflowy-verify-otp-btn" class="btn mod-cta" style="width: 100%; margin-top: 0.5rem;">Verify &amp; connect</button>
+										<button type="button" id="appflowy-verify-otp-btn" class="btn mod-cta" style="width: 100%; margin-top: 0.5rem;" data-i18n="appflowyVerifyAndConnect">Verify &amp; connect</button>
 									</div>
 								</div>
 								<div class="setting-item mod-horizontal" style="display: none;">
