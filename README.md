@@ -10,6 +10,17 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
+## Screenshots
+
+<p align="center">
+  <img src="assets/screenshot-clip.png" width="49%" alt="Clip an article" />
+  <img src="assets/screenshot-highlights.png" width="49%" alt="Clip with highlights" />
+</p>
+<p align="center">
+  <img src="assets/screenshot-appflowy.png" width="49%" alt="Result in AppFlowy" />
+  <img src="assets/screenshot-settings.png" width="49%" alt="Settings & configuration" />
+</p>
+
 ## Get started
 
 Download the latest release for your browser:
