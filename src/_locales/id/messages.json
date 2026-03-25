@@ -852,5 +852,23 @@
 	},
 	"appflowyRootFolder": {
 		"message": "Simpan di root"
+	},
+	"appflowySendCode": {
+		"message": "Kirim kode"
+	},
+	"appflowySignInWithEmail": {
+		"message": "Masuk dengan kode email"
+	},
+	"appflowySignInWithEmailDescription": {
+		"message": "Masukkan email akun AppFlowy Anda. AppFlowy akan mengirimkan kode 6 digit ke alamat tersebut."
+	},
+	"appflowyVerificationCode": {
+		"message": "Kode verifikasi"
+	},
+	"appflowyVerificationCodeDescription": {
+		"message": "Masukkan kode 6 digit yang dikirim ke email Anda, lalu klik Verifikasi."
+	},
+	"appflowyVerifyAndConnect": {
+		"message": "Verifikasi & hubungkan"
 	}
 }

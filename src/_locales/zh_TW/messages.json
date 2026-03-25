@@ -852,5 +852,23 @@
 	},
 	"appflowyRootFolder": {
 		"message": "儲存至根目錄"
+	},
+	"appflowySendCode": {
+		"message": "發送驗證碼"
+	},
+	"appflowySignInWithEmail": {
+		"message": "使用郵件驗證碼登入"
+	},
+	"appflowySignInWithEmailDescription": {
+		"message": "輸入您的 AppFlowy 帳戶郵件。AppFlowy 將向該地址發送一個6位驗證碼。"
+	},
+	"appflowyVerificationCode": {
+		"message": "驗證碼"
+	},
+	"appflowyVerificationCodeDescription": {
+		"message": "輸入發送到您郵件的6位驗證碼，然後點擊確認。"
+	},
+	"appflowyVerifyAndConnect": {
+		"message": "驗證並連接"
 	}
 }

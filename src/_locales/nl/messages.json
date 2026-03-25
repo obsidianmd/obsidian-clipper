@@ -852,5 +852,23 @@
 	},
 	"appflowyRootFolder": {
 		"message": "Opslaan in de root"
+	},
+	"appflowySendCode": {
+		"message": "Code verzenden"
+	},
+	"appflowySignInWithEmail": {
+		"message": "Inloggen met e-mailcode"
+	},
+	"appflowySignInWithEmailDescription": {
+		"message": "Voer het e-mailadres van je AppFlowy-account in. AppFlowy stuurt een 6-cijferige code naar dat adres."
+	},
+	"appflowyVerificationCode": {
+		"message": "Verificatiecode"
+	},
+	"appflowyVerificationCodeDescription": {
+		"message": "Voer de 6-cijferige code in die naar je e-mail is gestuurd en klik op Verifiëren."
+	},
+	"appflowyVerifyAndConnect": {
+		"message": "Verifiëren en verbinden"
 	}
 }

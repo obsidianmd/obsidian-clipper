@@ -844,5 +844,23 @@
 	},
 	"appflowyRootFolder": {
 		"message": "שמור בשורש"
+	},
+	"appflowySendCode": {
+		"message": "שלח קוד"
+	},
+	"appflowySignInWithEmail": {
+		"message": "התחבר עם קוד מייל"
+	},
+	"appflowySignInWithEmailDescription": {
+		"message": "הזן את כתובת האימייל של חשבון AppFlowy שלך. AppFlowy ישלח קוד בן 6 ספרות לאותה כתובת."
+	},
+	"appflowyVerificationCode": {
+		"message": "קוד אימות"
+	},
+	"appflowyVerificationCodeDescription": {
+		"message": "הזן את הקוד בן 6 הספרות שנשלח לאימייל שלך ולחץ על אמת."
+	},
+	"appflowyVerifyAndConnect": {
+		"message": "אמת וחבר"
 	}
 }

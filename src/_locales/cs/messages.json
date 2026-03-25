@@ -844,5 +844,23 @@
 	},
 	"appflowyRootFolder": {
 		"message": "Uložit do kořene"
+	},
+	"appflowySendCode": {
+		"message": "Odeslat kód"
+	},
+	"appflowySignInWithEmail": {
+		"message": "Přihlásit se e-mailovým kódem"
+	},
+	"appflowySignInWithEmailDescription": {
+		"message": "Zadejte e-mail svého účtu AppFlowy. AppFlowy odešle 6místný kód na tuto adresu."
+	},
+	"appflowyVerificationCode": {
+		"message": "Ověřovací kód"
+	},
+	"appflowyVerificationCodeDescription": {
+		"message": "Zadejte 6místný kód zaslaný na váš e-mail a klikněte na Ověřit."
+	},
+	"appflowyVerifyAndConnect": {
+		"message": "Ověřit a připojit"
 	}
 }

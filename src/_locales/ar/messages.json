@@ -852,5 +852,23 @@
 	},
 	"appflowyRootFolder": {
 		"message": "حفظ في جذر المساحة"
+	},
+	"appflowySendCode": {
+		"message": "إرسال الرمز"
+	},
+	"appflowySignInWithEmail": {
+		"message": "تسجيل الدخول برمز البريد الإلكتروني"
+	},
+	"appflowySignInWithEmailDescription": {
+		"message": "أدخل بريدك الإلكتروني لحساب AppFlowy. سيرسل AppFlowy رمزاً مكوناً من 6 أرقام إلى هذا العنوان."
+	},
+	"appflowyVerificationCode": {
+		"message": "رمز التحقق"
+	},
+	"appflowyVerificationCodeDescription": {
+		"message": "أدخل الرمز المكون من 6 أرقام المرسل إلى بريدك الإلكتروني، ثم انقر على تحقق."
+	},
+	"appflowyVerifyAndConnect": {
+		"message": "تحقق وتوصيل"
 	}
 }

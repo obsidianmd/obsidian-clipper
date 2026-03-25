@@ -852,5 +852,23 @@
 	},
 	"appflowyRootFolder": {
 		"message": "रूट में सहेजें"
+	},
+	"appflowySendCode": {
+		"message": "कोड भेजें"
+	},
+	"appflowySignInWithEmail": {
+		"message": "ईमेल कोड से साइन इन करें"
+	},
+	"appflowySignInWithEmailDescription": {
+		"message": "अपना AppFlowy खाता ईमेल दर्ज करें। AppFlowy उस पते पर 6 अंकों का कोड भेजेगा।"
+	},
+	"appflowyVerificationCode": {
+		"message": "सत्यापन कोड"
+	},
+	"appflowyVerificationCodeDescription": {
+		"message": "अपने ईमेल पर भेजा गया 6 अंकों का कोड दर्ज करें, फिर सत्यापित करें पर क्लिक करें।"
+	},
+	"appflowyVerifyAndConnect": {
+		"message": "सत्यापित करें और कनेक्ट करें"
 	}
 }

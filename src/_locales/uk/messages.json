@@ -844,5 +844,23 @@
 	},
 	"appflowyRootFolder": {
 		"message": "Зберегти в корені"
+	},
+	"appflowySendCode": {
+		"message": "Надіслати код"
+	},
+	"appflowySignInWithEmail": {
+		"message": "Увійти за кодом з листа"
+	},
+	"appflowySignInWithEmailDescription": {
+		"message": "Введіть email вашого облікового запису AppFlowy. AppFlowy надішле 6-значний код на цю адресу."
+	},
+	"appflowyVerificationCode": {
+		"message": "Код підтвердження"
+	},
+	"appflowyVerificationCodeDescription": {
+		"message": "Введіть 6-значний код, надісланий на вашу пошту, потім натисніть «Підтвердити»."
+	},
+	"appflowyVerifyAndConnect": {
+		"message": "Підтвердити і підключити"
 	}
 }

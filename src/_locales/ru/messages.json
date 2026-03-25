@@ -852,5 +852,23 @@
 	},
 	"appflowyRootFolder": {
 		"message": "Сохранить в корне"
+	},
+	"appflowySendCode": {
+		"message": "Отправить код"
+	},
+	"appflowySignInWithEmail": {
+		"message": "Войти с кодом из письма"
+	},
+	"appflowySignInWithEmailDescription": {
+		"message": "Введите email вашего аккаунта AppFlowy. AppFlowy отправит 6-значный код на этот адрес."
+	},
+	"appflowyVerificationCode": {
+		"message": "Код подтверждения"
+	},
+	"appflowyVerificationCodeDescription": {
+		"message": "Введите 6-значный код, отправленный на ваш email, затем нажмите «Подтвердить»."
+	},
+	"appflowyVerifyAndConnect": {
+		"message": "Подтвердить и подключить"
 	}
 }

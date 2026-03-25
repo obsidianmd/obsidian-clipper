@@ -860,5 +860,23 @@
 	},
 	"appflowyRootFolder": {
 		"message": "Tallenna juureen"
+	},
+	"appflowySendCode": {
+		"message": "Lähetä koodi"
+	},
+	"appflowySignInWithEmail": {
+		"message": "Kirjaudu sähköpostikoodilla"
+	},
+	"appflowySignInWithEmailDescription": {
+		"message": "Syötä AppFlowy-tilisi sähköpostiosoite. AppFlowy lähettää 6-numeroisen koodin kyseiseen osoitteeseen."
+	},
+	"appflowyVerificationCode": {
+		"message": "Vahvistuskoodi"
+	},
+	"appflowyVerificationCodeDescription": {
+		"message": "Syötä sähköpostiisi lähetetty 6-numeroinen koodi ja napsauta Vahvista."
+	},
+	"appflowyVerifyAndConnect": {
+		"message": "Vahvista ja yhdistä"
 	}
 }

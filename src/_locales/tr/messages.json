@@ -852,5 +852,23 @@
 	},
 	"appflowyRootFolder": {
 		"message": "Kök dizine kaydet"
+	},
+	"appflowySendCode": {
+		"message": "Kod gönder"
+	},
+	"appflowySignInWithEmail": {
+		"message": "E-posta koduyla giriş yap"
+	},
+	"appflowySignInWithEmailDescription": {
+		"message": "AppFlowy hesap e-posta adresinizi girin. AppFlowy o adrese 6 haneli bir kod gönderecek."
+	},
+	"appflowyVerificationCode": {
+		"message": "Doğrulama kodu"
+	},
+	"appflowyVerificationCodeDescription": {
+		"message": "E-postanıza gönderilen 6 haneli kodu girin, ardından Doğrula'ya tıklayın."
+	},
+	"appflowyVerifyAndConnect": {
+		"message": "Doğrula ve bağlan"
 	}
 }

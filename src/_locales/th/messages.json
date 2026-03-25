@@ -852,5 +852,23 @@
 	},
 	"appflowyRootFolder": {
 		"message": "บันทึกที่ root"
+	},
+	"appflowySendCode": {
+		"message": "ส่งรหัส"
+	},
+	"appflowySignInWithEmail": {
+		"message": "ลงชื่อเข้าใช้ด้วยรหัสอีเมล"
+	},
+	"appflowySignInWithEmailDescription": {
+		"message": "ป้อนอีเมลบัญชี AppFlowy ของคุณ AppFlowy จะส่งรหัส 6 หลักไปยังที่อยู่นั้น"
+	},
+	"appflowyVerificationCode": {
+		"message": "รหัสยืนยัน"
+	},
+	"appflowyVerificationCodeDescription": {
+		"message": "ป้อนรหัส 6 หลักที่ส่งไปยังอีเมลของคุณ จากนั้นคลิกยืนยัน"
+	},
+	"appflowyVerifyAndConnect": {
+		"message": "ยืนยันและเชื่อมต่อ"
 	}
 }

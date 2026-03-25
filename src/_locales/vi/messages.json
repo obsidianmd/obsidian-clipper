@@ -852,5 +852,23 @@
 	},
 	"appflowyRootFolder": {
 		"message": "Lưu tại thư mục gốc"
+	},
+	"appflowySendCode": {
+		"message": "Gửi mã"
+	},
+	"appflowySignInWithEmail": {
+		"message": "Đăng nhập bằng mã email"
+	},
+	"appflowySignInWithEmailDescription": {
+		"message": "Nhập email tài khoản AppFlowy của bạn. AppFlowy sẽ gửi mã 6 chữ số đến địa chỉ đó."
+	},
+	"appflowyVerificationCode": {
+		"message": "Mã xác minh"
+	},
+	"appflowyVerificationCodeDescription": {
+		"message": "Nhập mã 6 chữ số được gửi đến email của bạn, sau đó nhấn Xác minh."
+	},
+	"appflowyVerifyAndConnect": {
+		"message": "Xác minh & kết nối"
 	}
 }

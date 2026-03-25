@@ -844,5 +844,23 @@
 	},
 	"appflowyRootFolder": {
 		"message": "Αποθήκευση στο ριζικό φάκελο"
+	},
+	"appflowySendCode": {
+		"message": "Αποστολή κωδικού"
+	},
+	"appflowySignInWithEmail": {
+		"message": "Σύνδεση με κωδικό email"
+	},
+	"appflowySignInWithEmailDescription": {
+		"message": "Εισάγετε το email του λογαριασμού σας στο AppFlowy. Το AppFlowy θα σας στείλει έναν 6ψήφιο κωδικό σε αυτή τη διεύθυνση."
+	},
+	"appflowyVerificationCode": {
+		"message": "Κωδικός επαλήθευσης"
+	},
+	"appflowyVerificationCodeDescription": {
+		"message": "Εισάγετε τον 6ψήφιο κωδικό που στάλθηκε στο email σας και κάντε κλικ στο Επαλήθευση."
+	},
+	"appflowyVerifyAndConnect": {
+		"message": "Επαλήθευση και σύνδεση"
 	}
 }

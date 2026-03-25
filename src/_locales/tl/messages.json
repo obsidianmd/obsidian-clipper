@@ -844,5 +844,23 @@
 	},
 	"appflowyRootFolder": {
 		"message": "I-save sa ugat"
+	},
+	"appflowySendCode": {
+		"message": "Ipadala ang code"
+	},
+	"appflowySignInWithEmail": {
+		"message": "Mag-sign in gamit ang email code"
+	},
+	"appflowySignInWithEmailDescription": {
+		"message": "Ilagay ang email ng iyong AppFlowy account. Magpapadala ang AppFlowy ng 6-digit na code sa address na iyon."
+	},
+	"appflowyVerificationCode": {
+		"message": "Verification code"
+	},
+	"appflowyVerificationCodeDescription": {
+		"message": "Ilagay ang 6-digit na code na ipinadala sa iyong email, pagkatapos ay i-click ang I-verify."
+	},
+	"appflowyVerifyAndConnect": {
+		"message": "I-verify at ikonekta"
 	}
 }

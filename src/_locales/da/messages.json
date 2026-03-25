@@ -844,5 +844,23 @@
 	},
 	"appflowyRootFolder": {
 		"message": "Gem i roden"
+	},
+	"appflowySendCode": {
+		"message": "Send kode"
+	},
+	"appflowySignInWithEmail": {
+		"message": "Log ind med e-mailkode"
+	},
+	"appflowySignInWithEmailDescription": {
+		"message": "Indtast din AppFlowy-konto e-mail. AppFlowy sender en 6-cifret kode til den adresse."
+	},
+	"appflowyVerificationCode": {
+		"message": "Bekræftelseskode"
+	},
+	"appflowyVerificationCodeDescription": {
+		"message": "Indtast den 6-cifrede kode sendt til din e-mail, og klik derefter på Bekræft."
+	},
+	"appflowyVerifyAndConnect": {
+		"message": "Bekræft og forbind"
 	}
 }

@@ -844,5 +844,23 @@
 	},
 	"appflowyRootFolder": {
 		"message": "Lagre i roten"
+	},
+	"appflowySendCode": {
+		"message": "Send kode"
+	},
+	"appflowySignInWithEmail": {
+		"message": "Logg inn med e-postkode"
+	},
+	"appflowySignInWithEmailDescription": {
+		"message": "Skriv inn e-postadressen til AppFlowy-kontoen din. AppFlowy sender en 6-sifret kode til den adressen."
+	},
+	"appflowyVerificationCode": {
+		"message": "Bekreftelseskode"
+	},
+	"appflowyVerificationCodeDescription": {
+		"message": "Skriv inn den 6-sifrede koden sendt til e-posten din, og klikk deretter Bekreft."
+	},
+	"appflowyVerifyAndConnect": {
+		"message": "Bekreft og koble til"
 	}
 }

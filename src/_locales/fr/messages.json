@@ -858,5 +858,23 @@
 	},
 	"appflowyRootFolder": {
 		"message": "Placer à la racine"
+	},
+	"appflowySendCode": {
+		"message": "Envoyer le code"
+	},
+	"appflowySignInWithEmail": {
+		"message": "Se connecter avec un code email"
+	},
+	"appflowySignInWithEmailDescription": {
+		"message": "Entrez l'adresse email de votre compte AppFlowy. AppFlowy enverra un code à 6 chiffres à cette adresse."
+	},
+	"appflowyVerificationCode": {
+		"message": "Code de vérification"
+	},
+	"appflowyVerificationCodeDescription": {
+		"message": "Entrez le code à 6 chiffres envoyé à votre email, puis cliquez sur Vérifier."
+	},
+	"appflowyVerifyAndConnect": {
+		"message": "Vérifier et connecter"
 	}
 }

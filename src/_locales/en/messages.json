@@ -59,6 +59,24 @@
 	"appflowyParentViewIdDescription": {
 		"message": "Space or folder where clipped pages will be saved."
 	},
+	"appflowySignInWithEmail": {
+		"message": "Sign in with email code"
+	},
+	"appflowySignInWithEmailDescription": {
+		"message": "Enter your AppFlowy account email. AppFlowy will send a 6-digit code to that address."
+	},
+	"appflowySendCode": {
+		"message": "Send code"
+	},
+	"appflowyVerificationCode": {
+		"message": "Verification code"
+	},
+	"appflowyVerificationCodeDescription": {
+		"message": "Enter the 6-digit code sent to your email, then click Verify."
+	},
+	"appflowyVerifyAndConnect": {
+		"message": "Verify & connect"
+	},
 	"appflowyFetchWorkspaces": {
 		"message": "Fetch workspaces"
 	},

@@ -852,5 +852,23 @@
 	},
 	"appflowyRootFolder": {
 		"message": "ذخیره در ریشه"
+	},
+	"appflowySendCode": {
+		"message": "ارسال کد"
+	},
+	"appflowySignInWithEmail": {
+		"message": "ورود با کد ایمیل"
+	},
+	"appflowySignInWithEmailDescription": {
+		"message": "ایمیل حساب AppFlowy خود را وارد کنید. AppFlowy یک کد ۶ رقمی به آن آدرس ارسال می‌کند."
+	},
+	"appflowyVerificationCode": {
+		"message": "کد تأیید"
+	},
+	"appflowyVerificationCodeDescription": {
+		"message": "کد ۶ رقمی ارسال شده به ایمیل خود را وارد کنید و سپس روی تأیید کلیک کنید."
+	},
+	"appflowyVerifyAndConnect": {
+		"message": "تأیید و اتصال"
 	}
 }

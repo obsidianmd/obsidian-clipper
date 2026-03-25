@@ -852,5 +852,23 @@
 	},
 	"appflowyRootFolder": {
 		"message": "স্পেসের মূলে সংরক্ষণ করুন"
+	},
+	"appflowySendCode": {
+		"message": "কোড পাঠান"
+	},
+	"appflowySignInWithEmail": {
+		"message": "ইমেল কোড দিয়ে সাইন ইন করুন"
+	},
+	"appflowySignInWithEmailDescription": {
+		"message": "আপনার AppFlowy অ্যাকাউন্ট ইমেল লিখুন। AppFlowy সেই ঠিকানায় একটি ৬-সংখ্যার কোড পাঠাবে।"
+	},
+	"appflowyVerificationCode": {
+		"message": "যাচাই কোড"
+	},
+	"appflowyVerificationCodeDescription": {
+		"message": "আপনার ইমেলে পাঠানো ৬-সংখ্যার কোডটি লিখুন, তারপর যাচাই করুনে ক্লিক করুন।"
+	},
+	"appflowyVerifyAndConnect": {
+		"message": "যাচাই করুন এবং সংযুক্ত করুন"
 	}
 }

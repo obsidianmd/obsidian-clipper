@@ -852,5 +852,23 @@
 	},
 	"appflowyRootFolder": {
 		"message": "Desa a l'arrel"
+	},
+	"appflowySendCode": {
+		"message": "Envia el codi"
+	},
+	"appflowySignInWithEmail": {
+		"message": "Inicia sessió amb codi de correu"
+	},
+	"appflowySignInWithEmailDescription": {
+		"message": "Introdueix el correu del teu compte AppFlowy. AppFlowy enviarà un codi de 6 dígits a aquella adreça."
+	},
+	"appflowyVerificationCode": {
+		"message": "Codi de verificació"
+	},
+	"appflowyVerificationCodeDescription": {
+		"message": "Introdueix el codi de 6 dígits enviat al teu correu i fes clic a Verifica."
+	},
+	"appflowyVerifyAndConnect": {
+		"message": "Verifica i connecta"
 	}
 }

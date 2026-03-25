@@ -852,5 +852,23 @@
 	},
 	"appflowyRootFolder": {
 		"message": "ルートに保存"
+	},
+	"appflowySendCode": {
+		"message": "コードを送信"
+	},
+	"appflowySignInWithEmail": {
+		"message": "メールコードでサインイン"
+	},
+	"appflowySignInWithEmailDescription": {
+		"message": "AppFlowy アカウントのメールアドレスを入力してください。そのアドレスに6桁のコードが送信されます。"
+	},
+	"appflowyVerificationCode": {
+		"message": "確認コード"
+	},
+	"appflowyVerificationCodeDescription": {
+		"message": "メールに送信された6桁のコードを入力し、確認ボタンをクリックしてください。"
+	},
+	"appflowyVerifyAndConnect": {
+		"message": "確認して接続"
 	}
 }

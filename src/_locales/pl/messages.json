@@ -852,5 +852,23 @@
 	},
 	"appflowyRootFolder": {
 		"message": "Zapisz w katalogu głównym"
+	},
+	"appflowySendCode": {
+		"message": "Wyślij kod"
+	},
+	"appflowySignInWithEmail": {
+		"message": "Zaloguj się kodem e-mail"
+	},
+	"appflowySignInWithEmailDescription": {
+		"message": "Podaj adres e-mail swojego konta AppFlowy. AppFlowy wyśle 6-cyfrowy kod na ten adres."
+	},
+	"appflowyVerificationCode": {
+		"message": "Kod weryfikacyjny"
+	},
+	"appflowyVerificationCodeDescription": {
+		"message": "Wpisz 6-cyfrowy kod wysłany na Twój adres e-mail, a następnie kliknij Zweryfikuj."
+	},
+	"appflowyVerifyAndConnect": {
+		"message": "Zweryfikuj i połącz"
 	}
 }

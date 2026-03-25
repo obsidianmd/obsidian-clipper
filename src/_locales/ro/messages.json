@@ -844,5 +844,23 @@
 	},
 	"appflowyRootFolder": {
 		"message": "Salvați în rădăcină"
+	},
+	"appflowySendCode": {
+		"message": "Trimite codul"
+	},
+	"appflowySignInWithEmail": {
+		"message": "Conectați-vă cu codul prin email"
+	},
+	"appflowySignInWithEmailDescription": {
+		"message": "Introduceți adresa de email a contului AppFlowy. AppFlowy va trimite un cod de 6 cifre la acea adresă."
+	},
+	"appflowyVerificationCode": {
+		"message": "Cod de verificare"
+	},
+	"appflowyVerificationCodeDescription": {
+		"message": "Introduceți codul de 6 cifre trimis la adresa dvs. de email și faceți clic pe Verificare."
+	},
+	"appflowyVerifyAndConnect": {
+		"message": "Verificați și conectați"
 	}
 }

@@ -852,5 +852,23 @@
 	},
 	"appflowyRootFolder": {
 		"message": "루트에 저장"
+	},
+	"appflowySendCode": {
+		"message": "코드 보내기"
+	},
+	"appflowySignInWithEmail": {
+		"message": "이메일 코드로 로그인"
+	},
+	"appflowySignInWithEmailDescription": {
+		"message": "AppFlowy 계정 이메일을 입력하세요. AppFlowy가 해당 주소로 6자리 코드를 보냅니다."
+	},
+	"appflowyVerificationCode": {
+		"message": "인증 코드"
+	},
+	"appflowyVerificationCodeDescription": {
+		"message": "이메일로 발송된 6자리 코드를 입력한 후 확인을 클릭하세요."
+	},
+	"appflowyVerifyAndConnect": {
+		"message": "확인 및 연결"
 	}
 }

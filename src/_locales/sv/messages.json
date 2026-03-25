@@ -852,5 +852,23 @@
 	},
 	"appflowyRootFolder": {
 		"message": "Spara i roten"
+	},
+	"appflowySendCode": {
+		"message": "Skicka kod"
+	},
+	"appflowySignInWithEmail": {
+		"message": "Logga in med e-postkod"
+	},
+	"appflowySignInWithEmailDescription": {
+		"message": "Ange e-postadressen till ditt AppFlowy-konto. AppFlowy skickar en 6-siffrig kod till den adressen."
+	},
+	"appflowyVerificationCode": {
+		"message": "Verifieringskod"
+	},
+	"appflowyVerificationCodeDescription": {
+		"message": "Ange den 6-siffriga koden som skickats till din e-post och klicka sedan på Verifiera."
+	},
+	"appflowyVerifyAndConnect": {
+		"message": "Verifiera och anslut"
 	}
 }

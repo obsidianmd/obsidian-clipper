@@ -852,5 +852,23 @@
 	},
 	"appflowyRootFolder": {
 		"message": "Salva nella radice"
+	},
+	"appflowySendCode": {
+		"message": "Invia codice"
+	},
+	"appflowySignInWithEmail": {
+		"message": "Accedi con codice email"
+	},
+	"appflowySignInWithEmailDescription": {
+		"message": "Inserisci l'email del tuo account AppFlowy. AppFlowy invierà un codice a 6 cifre a quell'indirizzo."
+	},
+	"appflowyVerificationCode": {
+		"message": "Codice di verifica"
+	},
+	"appflowyVerificationCodeDescription": {
+		"message": "Inserisci il codice a 6 cifre inviato alla tua email, poi clicca su Verifica."
+	},
+	"appflowyVerifyAndConnect": {
+		"message": "Verifica e connetti"
 	}
 }
