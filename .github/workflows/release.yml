@@ -1,0 +1,53 @@
+name: Release
+
+on:
+    push:
+        tags:
+            - "v*"
+
+permissions:
+    contents: write
+
+jobs:
+    release:
+        name: Build & Release
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "20"
+                  cache: "npm"
+
+            - name: Install dependencies
+              run: npm ci
+
+            - name: Build extensions
+              run: npm run build
+
+            - name: Get version from tag
+              id: version
+              run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
+
+            - name: Read changelog
+              id: changelog
+              run: |
+                  CHANGELOG_FILE="changelogs/${{ steps.version.outputs.VERSION }}.md"
+                  if [ -f "$CHANGELOG_FILE" ]; then
+                    echo "BODY<<EOF" >> $GITHUB_OUTPUT
+                    cat "$CHANGELOG_FILE" >> $GITHUB_OUTPUT
+                    echo "EOF" >> $GITHUB_OUTPUT
+                  else
+                    echo "BODY=Release ${{ github.ref_name }}" >> $GITHUB_OUTPUT
+                  fi
+
+            - name: Create GitHub Release
+              uses: softprops/action-gh-release@v2
+              with:
+                  name: ${{ github.ref_name }}
+                  body: ${{ steps.changelog.outputs.BODY }}
+                  files: builds/*.zip
