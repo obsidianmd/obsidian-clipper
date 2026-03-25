@@ -1,4 +1,5 @@
-@import 'styles/_variables';
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap");
+@import "styles/_variables";
 
 * {
 	box-sizing: border-box;
@@ -18,27 +19,26 @@ body {
 	font-size: var(--font-ui-medium);
 }
 
-@import 'styles/mobile';
-
-@import 'styles/buttons';
-@import 'styles/charts';
-@import 'styles/dragging';
-@import 'styles/dropdowns';
-@import 'styles/icons';
-@import 'styles/inputs';
-@import 'styles/inspect-variables';
-@import 'styles/interpreter';
-@import 'styles/menu';
-@import 'styles/modals';
-@import 'styles/popup';
-@import 'styles/properties';
-@import 'styles/rtl';
-@import 'styles/safari';
-@import 'styles/settings';
-@import 'styles/side-panel';
-@import 'styles/templates';
-@import 'styles/tree-items';
-@import 'styles/toggles';
+@import "styles/mobile";
+@import "styles/buttons";
+@import "styles/charts";
+@import "styles/dragging";
+@import "styles/dropdowns";
+@import "styles/icons";
+@import "styles/inputs";
+@import "styles/inspect-variables";
+@import "styles/interpreter";
+@import "styles/menu";
+@import "styles/modals";
+@import "styles/popup";
+@import "styles/properties";
+@import "styles/rtl";
+@import "styles/safari";
+@import "styles/settings";
+@import "styles/side-panel";
+@import "styles/templates";
+@import "styles/tree-items";
+@import "styles/toggles";
 
 a.text-muted,
 .text-muted {
@@ -74,7 +74,8 @@ h4 {
 	font-size: var(--font-ui-medium);
 }
 
-pre, code {
+pre,
+code {
 	font-family: var(--font-monospace-default);
 }
 

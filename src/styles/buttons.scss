@@ -7,17 +7,23 @@ button,
 	width: 100%;
 	color: var(--text-normal);
 	background-color: var(--background-primary);
-	border-radius: var(--radius-s);
+	border-radius: var(--radius-m);
 	box-shadow: 0 0 0 1px var(--background-modifier-border);
 	font-size: var(--font-ui-smaller);
+	font-weight: 500;
+	letter-spacing: 0.01em;
 	height: var(--input-height);
 	user-select: none;
 	-webkit-user-select: none;
-	padding: 0.25rem 0.75rem;
+	padding: 0.25rem 0.875rem;
 	white-space: nowrap;
 	outline: none;
 	border: none;
 	text-decoration: none;
+	transition:
+		background-color 0.15s ease,
+		box-shadow 0.15s ease,
+		opacity 0.15s ease;
 
 	&:disabled {
 		opacity: 0.67;
@@ -39,22 +45,25 @@ button,
 	&:active,
 	&:focus {
 		box-shadow: 0 0 0 2px var(--background-modifier-border-focus);
-		transition:
-			box-shadow .15s ease-in-out;
+		transition: box-shadow 0.15s ease-in-out;
 	}
 	&.mod-cta {
 		background-color: var(--interactive-accent);
 		color: var(--text-on-accent);
+		border-radius: var(--radius-l);
+		font-weight: 600;
+		letter-spacing: 0.02em;
+		box-shadow: 0 2px 8px hsla(var(--color-accent-hsl), 0.35);
 		@media (hover: hover) {
 			&:hover {
 				background-color: var(--interactive-accent-hover);
+				box-shadow: 0 4px 12px hsla(var(--color-accent-hsl), 0.45);
 			}
 		}
 		&:active,
 		&:focus {
 			box-shadow: 0 0 0 2px var(--background-modifier-border-focus);
-			transition:
-				box-shadow .15s ease-in-out;
+			transition: box-shadow 0.15s ease-in-out;
 		}
 	}
 }

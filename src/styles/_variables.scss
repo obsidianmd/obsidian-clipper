@@ -6,9 +6,9 @@
 	--safe-area-inset-left: env(safe-area-inset-left);
 	--safe-area-inset-right: env(safe-area-inset-right);
 
-	--accent-h: 270;
-	--accent-s: 75%;
-	--accent-l: 52%;
+	--accent-h: 273;
+	--accent-s: 74%;
+	--accent-l: 51%;
 
 	--background-primary: var(--color-base-00);
 	--background-primary-alt: var(--color-base-10);
@@ -60,7 +60,7 @@
 
 	--duration-fast: 0.15s;
 
-	--font-ui-smaller: 0.8125rem;
+	--font-ui-smaller: 0.75rem;
 	--font-ui-small: 0.875rem;
 	--font-ui-medium: 0.9375rem;
 	--font-ui-large: 1.125rem;
@@ -69,9 +69,10 @@
 	--font-small: var(--font-ui-small);
 
 	--font-default:
-		ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-		"Inter", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
+		"Inter", ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI",
+		Roboto, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
 		sans-serif;
+	--font-display: "Poppins", "Inter", ui-sans-serif, sans-serif;
 	--font-monospace-default:
 		ui-monospace, SFMono-Regular, "Cascadia Mono", "Roboto Mono",
 		"DejaVu Sans Mono", "Liberation Mono", Menlo, Monaco, "Consolas",
@@ -81,7 +82,7 @@
 	--interactive-accent-hover: var(--color-accent-2);
 
 	--icon-size: 1rem;
-	--input-height: 1.875rem;
+	--input-height: 2rem;
 
 	/* Metadata */
 	--metadata-background: transparent;
@@ -138,9 +139,9 @@
 	--popup-padding: 0.75rem;
 	--popup-properties-padding: 2px 0.5rem 0.5rem;
 
-	--radius-s: 0.25rem;
-	--radius-m: 0.5rem;
-	--radius-l: 1rem;
+	--radius-s: 0.375rem;
+	--radius-m: 0.625rem;
+	--radius-l: 0.875rem;
 
 	--text-error: hsl(var(--color-red-hsl));
 	--text-success: hsl(var(--color-green-hsl));
@@ -171,7 +172,8 @@
 
 @media (prefers-color-scheme: light) {
 	:root {
-		--background-modifier-cover: rgba(220, 220, 220, 0.4);
+		--background-modifier-cover: rgba(220, 216, 240, 0.55);
+		--background-modifier-hover: rgba(132, 39, 224, 0.06);
 
 		--color-accent-hsl: var(--accent-h), var(--accent-s), var(--accent-l);
 
@@ -196,19 +198,19 @@
 		);
 
 		--color-base-00: #ffffff;
-		--color-base-05: #fcfcfc;
-		--color-base-10: #fafafa;
-		--color-base-20: #f6f6f6;
-		--color-base-25: #e3e3e3;
+		--color-base-05: #faf9fd;
+		--color-base-10: #f5f5fa;
+		--color-base-20: #eeecf7;
+		--color-base-25: #ddd8f0;
 
-		--color-base-30: #e0e0e0;
-		--color-base-35: #d4d4d4;
-		--color-base-40: #bdbdbd;
+		--color-base-30: #d5ceea;
+		--color-base-35: #c8c0e2;
+		--color-base-40: #b5aad6;
 
-		--color-base-50: #ababab;
-		--color-base-60: #707070;
-		--color-base-70: #5c5c5c;
-		--color-base-100: #222222;
+		--color-base-50: #9e95b8;
+		--color-base-60: #6b6085;
+		--color-base-70: #564c6e;
+		--color-base-100: #200e34;
 
 		--color-orange-rgb: 236, 117, 0;
 		--color-red: #e93147;
