@@ -862,5 +862,62 @@
 	},
 	"appflowyVerifyAndConnect": {
 		"message": "Ověřit a připojit"
+	},
+	"appflowySettings": {
+		"message": "AppFlowy"
+	},
+	"appflowyDescription": {
+		"message": "Nakonfigurujte AppFlowy Cloud pro ukládání oříznutých stránek přímo do vašeho pracovního prostoru AppFlowy."
+	},
+	"appflowyConnect": {
+		"message": "Připojit AppFlowy"
+	},
+	"appflowyConnectDescription": {
+		"message": "Přihlaste se do AppFlowy Cloud v prohlížeči a kliknutím automaticky načtěte svůj token."
+	},
+	"appflowyConnectBtn": {
+		"message": "Připojit AppFlowy"
+	},
+	"appflowyServerUrl": {
+		"message": "URL serveru"
+	},
+	"appflowyServerUrlDescription": {
+		"message": "Adresa URL vašeho AppFlowy Cloud (např. https://beta.appflowy.cloud)."
+	},
+	"appflowyApiToken": {
+		"message": "API token"
+	},
+	"appflowyApiTokenDescription": {
+		"message": "Váš API token AppFlowy. Najdete ho v Nastavení AppFlowy → Účet."
+	},
+	"appflowyWorkspaceId": {
+		"message": "ID pracovního prostoru"
+	},
+	"appflowyWorkspaceIdDescription": {
+		"message": "ID pracovního prostoru AppFlowy, kam budou stránky ukládány."
+	},
+	"appflowyParentViewId": {
+		"message": "Prostor"
+	},
+	"appflowyParentViewIdDescription": {
+		"message": "Prostor nebo složka, kam budou uloženy oříznuté stránky."
+	},
+	"appflowyFetchWorkspaces": {
+		"message": "Načíst pracovní prostory"
+	},
+	"appflowyFetchSpaces": {
+		"message": "Načíst prostory"
+	},
+	"appflowyMissingCredentials": {
+		"message": "Nejprve zadejte URL serveru a API token."
+	},
+	"appflowyNoWorkspaces": {
+		"message": "Pro tento účet nebyly nalezeny žádné pracovní prostory."
+	},
+	"appflowySelectWorkspace": {
+		"message": "Bylo nalezeno více pracovních prostorů. Zadejte ID pracovního prostoru, který chcete použít:"
+	},
+	"appflowyFetchError": {
+		"message": "Načtení pracovních prostorů se nezdařilo:"
 	}
 }

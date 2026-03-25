@@ -870,5 +870,62 @@
 	},
 	"appflowyVerifyAndConnect": {
 		"message": "Zweryfikuj i połącz"
+	},
+	"appflowySettings": {
+		"message": "AppFlowy"
+	},
+	"appflowyDescription": {
+		"message": "Skonfiguruj AppFlowy Cloud, aby zapisywać przycięte strony bezpośrednio w obszarze roboczym AppFlowy."
+	},
+	"appflowyConnect": {
+		"message": "Połącz AppFlowy"
+	},
+	"appflowyConnectDescription": {
+		"message": "Zaloguj się do AppFlowy Cloud w przeglądarce, a następnie kliknij, aby automatycznie pobrać token."
+	},
+	"appflowyConnectBtn": {
+		"message": "Połącz AppFlowy"
+	},
+	"appflowyServerUrl": {
+		"message": "URL serwera"
+	},
+	"appflowyServerUrlDescription": {
+		"message": "Twój adres URL AppFlowy Cloud (np. https://beta.appflowy.cloud)."
+	},
+	"appflowyApiToken": {
+		"message": "Token API"
+	},
+	"appflowyApiTokenDescription": {
+		"message": "Twój token API AppFlowy. Znajdziesz go w Ustawieniach AppFlowy → Konto."
+	},
+	"appflowyWorkspaceId": {
+		"message": "ID obszaru roboczego"
+	},
+	"appflowyWorkspaceIdDescription": {
+		"message": "ID obszaru roboczego AppFlowy, w którym będą zapisywane strony."
+	},
+	"appflowyParentViewId": {
+		"message": "Przestrzeń"
+	},
+	"appflowyParentViewIdDescription": {
+		"message": "Przestrzeń lub folder, w którym będą zapisywane przycięte strony."
+	},
+	"appflowyFetchWorkspaces": {
+		"message": "Pobierz obszary robocze"
+	},
+	"appflowyFetchSpaces": {
+		"message": "Pobierz przestrzenie"
+	},
+	"appflowyMissingCredentials": {
+		"message": "Najpierw podaj URL serwera i token API."
+	},
+	"appflowyNoWorkspaces": {
+		"message": "Nie znaleziono obszarów roboczych dla tego konta."
+	},
+	"appflowySelectWorkspace": {
+		"message": "Znaleziono wiele obszarów roboczych. Podaj ID obszaru roboczego do użycia:"
+	},
+	"appflowyFetchError": {
+		"message": "Pobieranie obszarów roboczych nie powiodło się:"
 	}
 }

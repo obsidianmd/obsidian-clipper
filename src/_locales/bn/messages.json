@@ -870,5 +870,62 @@
 	},
 	"appflowyVerifyAndConnect": {
 		"message": "যাচাই করুন এবং সংযুক্ত করুন"
+	},
+	"appflowySettings": {
+		"message": "AppFlowy"
+	},
+	"appflowyDescription": {
+		"message": "ক্লিপ করা পৃষ্ঠাগুলি সরাসরি আপনার AppFlowy ওয়ার্কস্পেসে সংরক্ষণ করতে AppFlowy Cloud কনফিগার করুন।"
+	},
+	"appflowyConnect": {
+		"message": "AppFlowy সংযুক্ত করুন"
+	},
+	"appflowyConnectDescription": {
+		"message": "আপনার ব্রাউজারে AppFlowy Cloud-এ সাইন ইন করুন, তারপর আপনার টোকেন স্বয়ংক্রিয়ভাবে পুনরুদ্ধার করতে ক্লিক করুন।"
+	},
+	"appflowyConnectBtn": {
+		"message": "AppFlowy সংযুক্ত করুন"
+	},
+	"appflowyServerUrl": {
+		"message": "সার্ভার URL"
+	},
+	"appflowyServerUrlDescription": {
+		"message": "আপনার AppFlowy Cloud URL (যেমন: https://beta.appflowy.cloud)।"
+	},
+	"appflowyApiToken": {
+		"message": "API টোকেন"
+	},
+	"appflowyApiTokenDescription": {
+		"message": "আপনার AppFlowy API টোকেন। AppFlowy Settings → Account-এ খুঁজুন।"
+	},
+	"appflowyWorkspaceId": {
+		"message": "ওয়ার্কস্পেস আইডি"
+	},
+	"appflowyWorkspaceIdDescription": {
+		"message": "আপনার AppFlowy ওয়ার্কস্পেসের আইডি যেখানে পৃষ্ঠাগুলি সংরক্ষিত হবে।"
+	},
+	"appflowyParentViewId": {
+		"message": "স্পেস"
+	},
+	"appflowyParentViewIdDescription": {
+		"message": "স্পেস বা ফোল্ডার যেখানে ক্লিপ করা পৃষ্ঠাগুলি সংরক্ষিত হবে।"
+	},
+	"appflowyFetchWorkspaces": {
+		"message": "ওয়ার্কস্পেস আনুন"
+	},
+	"appflowyFetchSpaces": {
+		"message": "স্পেস আনুন"
+	},
+	"appflowyMissingCredentials": {
+		"message": "অনুগ্রহ করে আগে সার্ভার URL এবং API টোকেন লিখুন।"
+	},
+	"appflowyNoWorkspaces": {
+		"message": "এই অ্যাকাউন্টের জন্য কোনো ওয়ার্কস্পেস পাওয়া যায়নি।"
+	},
+	"appflowySelectWorkspace": {
+		"message": "একাধিক ওয়ার্কস্পেস পাওয়া গেছে। ব্যবহার করার ওয়ার্কস্পেস আইডি লিখুন:"
+	},
+	"appflowyFetchError": {
+		"message": "ওয়ার্কস্পেস আনতে ব্যর্থ:"
 	}
 }

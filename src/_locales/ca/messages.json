@@ -870,5 +870,62 @@
 	},
 	"appflowyVerifyAndConnect": {
 		"message": "Verifica i connecta"
+	},
+	"appflowySettings": {
+		"message": "AppFlowy"
+	},
+	"appflowyDescription": {
+		"message": "Configura AppFlowy Cloud per desar les pàgines retallades directament al teu espai de treball d'AppFlowy."
+	},
+	"appflowyConnect": {
+		"message": "Connecta AppFlowy"
+	},
+	"appflowyConnectDescription": {
+		"message": "Inicia sessió a AppFlowy Cloud al teu navegador, després fes clic per recuperar el teu token automàticament."
+	},
+	"appflowyConnectBtn": {
+		"message": "Connecta AppFlowy"
+	},
+	"appflowyServerUrl": {
+		"message": "URL del servidor"
+	},
+	"appflowyServerUrlDescription": {
+		"message": "La URL d'AppFlowy Cloud (ex.: https://beta.appflowy.cloud)."
+	},
+	"appflowyApiToken": {
+		"message": "Token API"
+	},
+	"appflowyApiTokenDescription": {
+		"message": "El teu token API d'AppFlowy. Troba'l a Configuració d'AppFlowy → Compte."
+	},
+	"appflowyWorkspaceId": {
+		"message": "ID de l'espai de treball"
+	},
+	"appflowyWorkspaceIdDescription": {
+		"message": "L'ID de l'espai de treball d'AppFlowy on es desaran les pàgines."
+	},
+	"appflowyParentViewId": {
+		"message": "Espai"
+	},
+	"appflowyParentViewIdDescription": {
+		"message": "Espai o carpeta on es desaran les pàgines retallades."
+	},
+	"appflowyFetchWorkspaces": {
+		"message": "Obtenir espais de treball"
+	},
+	"appflowyFetchSpaces": {
+		"message": "Obtenir espais"
+	},
+	"appflowyMissingCredentials": {
+		"message": "Si us plau, introdueix primer la URL del servidor i el token API."
+	},
+	"appflowyNoWorkspaces": {
+		"message": "No s'han trobat espais de treball per a aquest compte."
+	},
+	"appflowySelectWorkspace": {
+		"message": "S'han trobat diversos espais de treball. Introdueix l'ID de l'espai de treball que vols usar:"
+	},
+	"appflowyFetchError": {
+		"message": "Error en obtenir els espais de treball:"
 	}
 }

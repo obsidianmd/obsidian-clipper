@@ -862,5 +862,62 @@
 	},
 	"appflowyVerifyAndConnect": {
 		"message": "Verificați și conectați"
+	},
+	"appflowySettings": {
+		"message": "AppFlowy"
+	},
+	"appflowyDescription": {
+		"message": "Configurați AppFlowy Cloud pentru a salva paginile tăiate direct în spațiul dvs. de lucru AppFlowy."
+	},
+	"appflowyConnect": {
+		"message": "Conectați AppFlowy"
+	},
+	"appflowyConnectDescription": {
+		"message": "Autentificați-vă în AppFlowy Cloud în browser, apoi faceți clic pentru a prelua automat tokenul."
+	},
+	"appflowyConnectBtn": {
+		"message": "Conectați AppFlowy"
+	},
+	"appflowyServerUrl": {
+		"message": "URL server"
+	},
+	"appflowyServerUrlDescription": {
+		"message": "URL-ul AppFlowy Cloud (ex.: https://beta.appflowy.cloud)."
+	},
+	"appflowyApiToken": {
+		"message": "Token API"
+	},
+	"appflowyApiTokenDescription": {
+		"message": "Tokenul dvs. API AppFlowy. Găsiți-l în Setări AppFlowy → Cont."
+	},
+	"appflowyWorkspaceId": {
+		"message": "ID spațiu de lucru"
+	},
+	"appflowyWorkspaceIdDescription": {
+		"message": "ID-ul spațiului de lucru AppFlowy unde vor fi salvate paginile."
+	},
+	"appflowyParentViewId": {
+		"message": "Spațiu"
+	},
+	"appflowyParentViewIdDescription": {
+		"message": "Spațiu sau folder unde vor fi salvate paginile tăiate."
+	},
+	"appflowyFetchWorkspaces": {
+		"message": "Obțineți spații de lucru"
+	},
+	"appflowyFetchSpaces": {
+		"message": "Obțineți spații"
+	},
+	"appflowyMissingCredentials": {
+		"message": "Introduceți mai întâi URL-ul serverului și tokenul API."
+	},
+	"appflowyNoWorkspaces": {
+		"message": "Nu s-au găsit spații de lucru pentru acest cont."
+	},
+	"appflowySelectWorkspace": {
+		"message": "Au fost găsite mai multe spații de lucru. Introduceți ID-ul spațiului de lucru de utilizat:"
+	},
+	"appflowyFetchError": {
+		"message": "Obținerea spațiilor de lucru a eșuat:"
 	}
 }

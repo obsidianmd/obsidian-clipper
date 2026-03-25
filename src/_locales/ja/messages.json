@@ -870,5 +870,62 @@
 	},
 	"appflowyVerifyAndConnect": {
 		"message": "確認して接続"
+	},
+	"appflowySettings": {
+		"message": "AppFlowy"
+	},
+	"appflowyDescription": {
+		"message": "AppFlowy Cloud を設定して、クリップしたページを AppFlowy ワークスペースに直接保存します。"
+	},
+	"appflowyConnect": {
+		"message": "AppFlowy に接続"
+	},
+	"appflowyConnectDescription": {
+		"message": "ブラウザで AppFlowy Cloud にサインインし、クリックしてトークンを自動的に取得します。"
+	},
+	"appflowyConnectBtn": {
+		"message": "AppFlowy に接続"
+	},
+	"appflowyServerUrl": {
+		"message": "サーバー URL"
+	},
+	"appflowyServerUrlDescription": {
+		"message": "AppFlowy Cloud の URL (例: https://beta.appflowy.cloud)。"
+	},
+	"appflowyApiToken": {
+		"message": "API トークン"
+	},
+	"appflowyApiTokenDescription": {
+		"message": "AppFlowy の API トークン。AppFlowy の設定 → アカウントで確認できます。"
+	},
+	"appflowyWorkspaceId": {
+		"message": "ワークスペース ID"
+	},
+	"appflowyWorkspaceIdDescription": {
+		"message": "ページが保存される AppFlowy ワークスペースの ID。"
+	},
+	"appflowyParentViewId": {
+		"message": "スペース"
+	},
+	"appflowyParentViewIdDescription": {
+		"message": "クリップしたページが保存されるスペースまたはフォルダ。"
+	},
+	"appflowyFetchWorkspaces": {
+		"message": "ワークスペースを取得"
+	},
+	"appflowyFetchSpaces": {
+		"message": "スペースを取得"
+	},
+	"appflowyMissingCredentials": {
+		"message": "最初にサーバー URL と API トークンを入力してください。"
+	},
+	"appflowyNoWorkspaces": {
+		"message": "このアカウントのワークスペースが見つかりませんでした。"
+	},
+	"appflowySelectWorkspace": {
+		"message": "複数のワークスペースが見つかりました。使用するワークスペース ID を入力してください。"
+	},
+	"appflowyFetchError": {
+		"message": "ワークスペースの取得に失敗しました："
 	}
 }

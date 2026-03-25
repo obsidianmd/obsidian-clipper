@@ -870,5 +870,62 @@
 	},
 	"appflowyVerifyAndConnect": {
 		"message": "확인 및 연결"
+	},
+	"appflowySettings": {
+		"message": "AppFlowy"
+	},
+	"appflowyDescription": {
+		"message": "AppFlowy Cloud를 구성하여 클리핑한 페이지를 AppFlowy 작업 공간에 직접 저장합니다."
+	},
+	"appflowyConnect": {
+		"message": "AppFlowy 연결"
+	},
+	"appflowyConnectDescription": {
+		"message": "브라우저에서 AppFlowy Cloud에 로그인한 후 클릭하여 토큰을 자동으로 가져옵니다."
+	},
+	"appflowyConnectBtn": {
+		"message": "AppFlowy 연결"
+	},
+	"appflowyServerUrl": {
+		"message": "서버 URL"
+	},
+	"appflowyServerUrlDescription": {
+		"message": "AppFlowy Cloud URL (예: https://beta.appflowy.cloud)."
+	},
+	"appflowyApiToken": {
+		"message": "API 토큰"
+	},
+	"appflowyApiTokenDescription": {
+		"message": "AppFlowy API 토큰입니다. AppFlowy 설정 → 계정에서 찾을 수 있습니다."
+	},
+	"appflowyWorkspaceId": {
+		"message": "작업 공간 ID"
+	},
+	"appflowyWorkspaceIdDescription": {
+		"message": "페이지가 저장될 AppFlowy 작업 공간의 ID입니다."
+	},
+	"appflowyParentViewId": {
+		"message": "스페이스"
+	},
+	"appflowyParentViewIdDescription": {
+		"message": "클리핑한 페이지가 저장될 스페이스 또는 폴더."
+	},
+	"appflowyFetchWorkspaces": {
+		"message": "작업 공간 가져오기"
+	},
+	"appflowyFetchSpaces": {
+		"message": "스페이스 가져오기"
+	},
+	"appflowyMissingCredentials": {
+		"message": "먼저 서버 URL과 API 토큰을 입력하세요."
+	},
+	"appflowyNoWorkspaces": {
+		"message": "이 계정에서 작업 공간을 찾을 수 없습니다."
+	},
+	"appflowySelectWorkspace": {
+		"message": "여러 작업 공간이 발견되었습니다. 사용할 작업 공간 ID를 입력하세요:"
+	},
+	"appflowyFetchError": {
+		"message": "작업 공간 가져오기 실패:"
 	}
 }

@@ -862,5 +862,62 @@
 	},
 	"appflowyVerifyAndConnect": {
 		"message": "Bekreft og koble til"
+	},
+	"appflowySettings": {
+		"message": "AppFlowy"
+	},
+	"appflowyDescription": {
+		"message": "Konfigurer AppFlowy Cloud for å lagre klipte sider direkte i AppFlowy-arbeidsområdet ditt."
+	},
+	"appflowyConnect": {
+		"message": "Koble til AppFlowy"
+	},
+	"appflowyConnectDescription": {
+		"message": "Logg inn på AppFlowy Cloud i nettleseren din, og klikk for å hente tokenet ditt automatisk."
+	},
+	"appflowyConnectBtn": {
+		"message": "Koble til AppFlowy"
+	},
+	"appflowyServerUrl": {
+		"message": "Server-URL"
+	},
+	"appflowyServerUrlDescription": {
+		"message": "AppFlowy Cloud URL-en din (f.eks. https://beta.appflowy.cloud)."
+	},
+	"appflowyApiToken": {
+		"message": "API-token"
+	},
+	"appflowyApiTokenDescription": {
+		"message": "AppFlowy API-tokenet ditt. Finn det i AppFlowy Innstillinger → Konto."
+	},
+	"appflowyWorkspaceId": {
+		"message": "Arbeidsområde-ID"
+	},
+	"appflowyWorkspaceIdDescription": {
+		"message": "ID-en til AppFlowy-arbeidsområdet der sider vil lagres."
+	},
+	"appflowyParentViewId": {
+		"message": "Plass"
+	},
+	"appflowyParentViewIdDescription": {
+		"message": "Plass eller mappe der klipte sider vil lagres."
+	},
+	"appflowyFetchWorkspaces": {
+		"message": "Hent arbeidsområder"
+	},
+	"appflowyFetchSpaces": {
+		"message": "Hent plasser"
+	},
+	"appflowyMissingCredentials": {
+		"message": "Skriv inn server-URL og API-token først."
+	},
+	"appflowyNoWorkspaces": {
+		"message": "Ingen arbeidsområder funnet for denne kontoen."
+	},
+	"appflowySelectWorkspace": {
+		"message": "Flere arbeidsområder funnet. Oppgi arbeidsområde-ID-en som skal brukes:"
+	},
+	"appflowyFetchError": {
+		"message": "Henting av arbeidsområder mislyktes:"
 	}
 }

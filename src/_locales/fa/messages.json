@@ -870,5 +870,62 @@
 	},
 	"appflowyVerifyAndConnect": {
 		"message": "تأیید و اتصال"
+	},
+	"appflowySettings": {
+		"message": "AppFlowy"
+	},
+	"appflowyDescription": {
+		"message": "AppFlowy Cloud را برای ذخیره صفحات کلیپ شده مستقیماً در فضای کاری AppFlowy خود پیکربندی کنید."
+	},
+	"appflowyConnect": {
+		"message": "اتصال AppFlowy"
+	},
+	"appflowyConnectDescription": {
+		"message": "در مرورگر خود وارد AppFlowy Cloud شوید، سپس برای دریافت خودکار توکن کلیک کنید."
+	},
+	"appflowyConnectBtn": {
+		"message": "اتصال AppFlowy"
+	},
+	"appflowyServerUrl": {
+		"message": "آدرس سرور"
+	},
+	"appflowyServerUrlDescription": {
+		"message": "آدرس AppFlowy Cloud شما (مثلاً https://beta.appflowy.cloud)."
+	},
+	"appflowyApiToken": {
+		"message": "توکن API"
+	},
+	"appflowyApiTokenDescription": {
+		"message": "توکن API AppFlowy شما. در تنظیمات AppFlowy → حساب کاربری پیدا کنید."
+	},
+	"appflowyWorkspaceId": {
+		"message": "شناسه فضای کاری"
+	},
+	"appflowyWorkspaceIdDescription": {
+		"message": "شناسه فضای کاری AppFlowy که صفحات در آن ذخیره خواهند شد."
+	},
+	"appflowyParentViewId": {
+		"message": "فضا"
+	},
+	"appflowyParentViewIdDescription": {
+		"message": "فضا یا پوشه‌ای که صفحات کلیپ شده در آن ذخیره خواهند شد."
+	},
+	"appflowyFetchWorkspaces": {
+		"message": "دریافت فضاهای کاری"
+	},
+	"appflowyFetchSpaces": {
+		"message": "دریافت فضاها"
+	},
+	"appflowyMissingCredentials": {
+		"message": "لطفاً ابتدا آدرس سرور و توکن API را وارد کنید."
+	},
+	"appflowyNoWorkspaces": {
+		"message": "هیچ فضای کاری برای این حساب یافت نشد."
+	},
+	"appflowySelectWorkspace": {
+		"message": "چندین فضای کاری یافت شد. شناسه فضای کاری مورد نظر را وارد کنید:"
+	},
+	"appflowyFetchError": {
+		"message": "دریافت فضاهای کاری ناموفق بود:"
 	}
 }

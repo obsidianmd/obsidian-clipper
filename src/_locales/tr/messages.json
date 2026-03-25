@@ -870,5 +870,62 @@
 	},
 	"appflowyVerifyAndConnect": {
 		"message": "Doğrula ve bağlan"
+	},
+	"appflowySettings": {
+		"message": "AppFlowy"
+	},
+	"appflowyDescription": {
+		"message": "Kırpılan sayfaları doğrudan AppFlowy çalışma alanınıza kaydetmek için AppFlowy Cloud'u yapılandırın."
+	},
+	"appflowyConnect": {
+		"message": "AppFlowy'yi Bağla"
+	},
+	"appflowyConnectDescription": {
+		"message": "Tarayıcınızda AppFlowy Cloud'a giriş yapın, ardından tokenınızı otomatik almak için tıklayın."
+	},
+	"appflowyConnectBtn": {
+		"message": "AppFlowy'yi Bağla"
+	},
+	"appflowyServerUrl": {
+		"message": "Sunucu URL"
+	},
+	"appflowyServerUrlDescription": {
+		"message": "AppFlowy Cloud URL'niz (örn. https://beta.appflowy.cloud)."
+	},
+	"appflowyApiToken": {
+		"message": "API Tokeni"
+	},
+	"appflowyApiTokenDescription": {
+		"message": "AppFlowy API tokenınız. AppFlowy Ayarları → Hesap bölümünde bulabilirsiniz."
+	},
+	"appflowyWorkspaceId": {
+		"message": "Çalışma Alanı Kimliği"
+	},
+	"appflowyWorkspaceIdDescription": {
+		"message": "Sayfaların kaydedileceği AppFlowy çalışma alanının kimliği."
+	},
+	"appflowyParentViewId": {
+		"message": "Alan"
+	},
+	"appflowyParentViewIdDescription": {
+		"message": "Kırpılan sayfaların kaydedileceği alan veya klasör."
+	},
+	"appflowyFetchWorkspaces": {
+		"message": "Çalışma alanlarını getir"
+	},
+	"appflowyFetchSpaces": {
+		"message": "Alanları getir"
+	},
+	"appflowyMissingCredentials": {
+		"message": "Lütfen önce sunucu URL'sini ve API tokenını girin."
+	},
+	"appflowyNoWorkspaces": {
+		"message": "Bu hesap için çalışma alanı bulunamadı."
+	},
+	"appflowySelectWorkspace": {
+		"message": "Birden fazla çalışma alanı bulundu. Kullanılacak çalışma alanı kimliğini girin:"
+	},
+	"appflowyFetchError": {
+		"message": "Çalışma alanları getirilemedi:"
 	}
 }

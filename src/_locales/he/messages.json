@@ -862,5 +862,62 @@
 	},
 	"appflowyVerifyAndConnect": {
 		"message": "אמת וחבר"
+	},
+	"appflowySettings": {
+		"message": "AppFlowy"
+	},
+	"appflowyDescription": {
+		"message": "הגדר את AppFlowy Cloud לשמירת דפים שנגזרו ישירות לסביבת העבודה שלך ב-AppFlowy."
+	},
+	"appflowyConnect": {
+		"message": "חיבור AppFlowy"
+	},
+	"appflowyConnectDescription": {
+		"message": "התחבר ל-AppFlowy Cloud בדפדפן שלך, ואז לחץ לאחזור הטוקן שלך אוטומטית."
+	},
+	"appflowyConnectBtn": {
+		"message": "חיבור AppFlowy"
+	},
+	"appflowyServerUrl": {
+		"message": "כתובת URL של השרת"
+	},
+	"appflowyServerUrlDescription": {
+		"message": "כתובת URL של AppFlowy Cloud שלך (למשל https://beta.appflowy.cloud)."
+	},
+	"appflowyApiToken": {
+		"message": "טוקן API"
+	},
+	"appflowyApiTokenDescription": {
+		"message": "טוקן ה-API של AppFlowy שלך. מצא אותו בהגדרות AppFlowy → חשבון."
+	},
+	"appflowyWorkspaceId": {
+		"message": "מזהה סביבת העבודה"
+	},
+	"appflowyWorkspaceIdDescription": {
+		"message": "מזהה סביבת העבודה ב-AppFlowy שבה הדפים יישמרו."
+	},
+	"appflowyParentViewId": {
+		"message": "מרחב"
+	},
+	"appflowyParentViewIdDescription": {
+		"message": "מרחב או תיקייה שבה יישמרו הדפים שנגזרו."
+	},
+	"appflowyFetchWorkspaces": {
+		"message": "טעינת סביבות עבודה"
+	},
+	"appflowyFetchSpaces": {
+		"message": "טעינת מרחבים"
+	},
+	"appflowyMissingCredentials": {
+		"message": "הזן תחילה את כתובת URL של השרת ואת טוקן ה-API."
+	},
+	"appflowyNoWorkspaces": {
+		"message": "לא נמצאו סביבות עבודה עבור חשבון זה."
+	},
+	"appflowySelectWorkspace": {
+		"message": "נמצאו מספר סביבות עבודה. הזן את מזהה סביבת העבודה שבה ברצונך להשתמש:"
+	},
+	"appflowyFetchError": {
+		"message": "טעינת סביבות עבודה נכשלה:"
 	}
 }

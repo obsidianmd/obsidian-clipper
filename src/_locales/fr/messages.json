@@ -876,5 +876,62 @@
 	},
 	"appflowyVerifyAndConnect": {
 		"message": "Vérifier et connecter"
+	},
+	"appflowySettings": {
+		"message": "AppFlowy"
+	},
+	"appflowyDescription": {
+		"message": "Configurez AppFlowy Cloud pour enregistrer les pages clippées directement dans votre espace de travail AppFlowy."
+	},
+	"appflowyConnect": {
+		"message": "Connecter AppFlowy"
+	},
+	"appflowyConnectDescription": {
+		"message": "Connectez-vous à AppFlowy Cloud dans votre navigateur, puis cliquez pour récupérer votre token automatiquement."
+	},
+	"appflowyConnectBtn": {
+		"message": "Connecter AppFlowy"
+	},
+	"appflowyServerUrl": {
+		"message": "URL du serveur"
+	},
+	"appflowyServerUrlDescription": {
+		"message": "L'URL de votre AppFlowy Cloud (ex. : https://beta.appflowy.cloud)."
+	},
+	"appflowyApiToken": {
+		"message": "Token API"
+	},
+	"appflowyApiTokenDescription": {
+		"message": "Votre token API AppFlowy. Trouvez-le dans Paramètres AppFlowy → Compte."
+	},
+	"appflowyWorkspaceId": {
+		"message": "ID de l'espace de travail"
+	},
+	"appflowyWorkspaceIdDescription": {
+		"message": "L'ID de votre espace de travail AppFlowy où les pages seront enregistrées."
+	},
+	"appflowyParentViewId": {
+		"message": "Espace"
+	},
+	"appflowyParentViewIdDescription": {
+		"message": "Espace ou dossier où les pages clippées seront enregistrées."
+	},
+	"appflowyFetchWorkspaces": {
+		"message": "Récupérer les espaces de travail"
+	},
+	"appflowyFetchSpaces": {
+		"message": "Récupérer les espaces"
+	},
+	"appflowyMissingCredentials": {
+		"message": "Veuillez d'abord saisir l'URL du serveur et le token API."
+	},
+	"appflowyNoWorkspaces": {
+		"message": "Aucun espace de travail trouvé pour ce compte."
+	},
+	"appflowySelectWorkspace": {
+		"message": "Plusieurs espaces de travail trouvés. Entrez l'ID de l'espace de travail à utiliser :"
+	},
+	"appflowyFetchError": {
+		"message": "Échec de la récupération des espaces de travail :"
 	}
 }

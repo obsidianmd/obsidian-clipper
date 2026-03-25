@@ -870,5 +870,62 @@
 	},
 	"appflowyVerifyAndConnect": {
 		"message": "Verifikasi & hubungkan"
+	},
+	"appflowySettings": {
+		"message": "AppFlowy"
+	},
+	"appflowyDescription": {
+		"message": "Konfigurasikan AppFlowy Cloud untuk menyimpan halaman yang diclip langsung ke ruang kerja AppFlowy Anda."
+	},
+	"appflowyConnect": {
+		"message": "Hubungkan AppFlowy"
+	},
+	"appflowyConnectDescription": {
+		"message": "Masuk ke AppFlowy Cloud di browser Anda, lalu klik untuk mengambil token Anda secara otomatis."
+	},
+	"appflowyConnectBtn": {
+		"message": "Hubungkan AppFlowy"
+	},
+	"appflowyServerUrl": {
+		"message": "URL Server"
+	},
+	"appflowyServerUrlDescription": {
+		"message": "URL AppFlowy Cloud Anda (mis. https://beta.appflowy.cloud)."
+	},
+	"appflowyApiToken": {
+		"message": "Token API"
+	},
+	"appflowyApiTokenDescription": {
+		"message": "Token API AppFlowy Anda. Temukan di Pengaturan AppFlowy → Akun."
+	},
+	"appflowyWorkspaceId": {
+		"message": "ID Ruang Kerja"
+	},
+	"appflowyWorkspaceIdDescription": {
+		"message": "ID ruang kerja AppFlowy tempat halaman akan disimpan."
+	},
+	"appflowyParentViewId": {
+		"message": "Ruang"
+	},
+	"appflowyParentViewIdDescription": {
+		"message": "Ruang atau folder tempat halaman yang diclip akan disimpan."
+	},
+	"appflowyFetchWorkspaces": {
+		"message": "Ambil ruang kerja"
+	},
+	"appflowyFetchSpaces": {
+		"message": "Ambil ruang"
+	},
+	"appflowyMissingCredentials": {
+		"message": "Masukkan URL server dan token API terlebih dahulu."
+	},
+	"appflowyNoWorkspaces": {
+		"message": "Tidak ada ruang kerja yang ditemukan untuk akun ini."
+	},
+	"appflowySelectWorkspace": {
+		"message": "Beberapa ruang kerja ditemukan. Masukkan ID ruang kerja yang akan digunakan:"
+	},
+	"appflowyFetchError": {
+		"message": "Gagal mengambil ruang kerja:"
 	}
 }

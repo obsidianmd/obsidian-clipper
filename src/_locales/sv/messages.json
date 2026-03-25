@@ -870,5 +870,62 @@
 	},
 	"appflowyVerifyAndConnect": {
 		"message": "Verifiera och anslut"
+	},
+	"appflowySettings": {
+		"message": "AppFlowy"
+	},
+	"appflowyDescription": {
+		"message": "Konfigurera AppFlowy Cloud för att spara klippta sidor direkt i din AppFlowy-arbetsyta."
+	},
+	"appflowyConnect": {
+		"message": "Anslut AppFlowy"
+	},
+	"appflowyConnectDescription": {
+		"message": "Logga in på AppFlowy Cloud i din webbläsare och klicka sedan för att hämta ditt token automatiskt."
+	},
+	"appflowyConnectBtn": {
+		"message": "Anslut AppFlowy"
+	},
+	"appflowyServerUrl": {
+		"message": "Server-URL"
+	},
+	"appflowyServerUrlDescription": {
+		"message": "Din AppFlowy Cloud URL (t.ex. https://beta.appflowy.cloud)."
+	},
+	"appflowyApiToken": {
+		"message": "API-token"
+	},
+	"appflowyApiTokenDescription": {
+		"message": "Ditt AppFlowy API-token. Hittar du i AppFlowy Inställningar → Konto."
+	},
+	"appflowyWorkspaceId": {
+		"message": "Arbetsyte-ID"
+	},
+	"appflowyWorkspaceIdDescription": {
+		"message": "ID för din AppFlowy-arbetsyta där sidor kommer att sparas."
+	},
+	"appflowyParentViewId": {
+		"message": "Utrymme"
+	},
+	"appflowyParentViewIdDescription": {
+		"message": "Utrymme eller mapp där klippta sidor kommer att sparas."
+	},
+	"appflowyFetchWorkspaces": {
+		"message": "Hämta arbetsytor"
+	},
+	"appflowyFetchSpaces": {
+		"message": "Hämta utrymmen"
+	},
+	"appflowyMissingCredentials": {
+		"message": "Ange server-URL och API-token först."
+	},
+	"appflowyNoWorkspaces": {
+		"message": "Inga arbetsytor hittades för det här kontot."
+	},
+	"appflowySelectWorkspace": {
+		"message": "Flera arbetsytor hittades. Ange det arbetsyte-ID som ska användas:"
+	},
+	"appflowyFetchError": {
+		"message": "Det gick inte att hämta arbetsytor:"
 	}
 }

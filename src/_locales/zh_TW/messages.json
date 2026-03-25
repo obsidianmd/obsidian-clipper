@@ -870,5 +870,62 @@
 	},
 	"appflowyVerifyAndConnect": {
 		"message": "驗證並連接"
+	},
+	"appflowySettings": {
+		"message": "AppFlowy"
+	},
+	"appflowyDescription": {
+		"message": "設定 AppFlowy Cloud，將剪輯的頁面直接儲存到您的 AppFlowy 工作區。"
+	},
+	"appflowyConnect": {
+		"message": "連接 AppFlowy"
+	},
+	"appflowyConnectDescription": {
+		"message": "在瀏覽器中登入 AppFlowy Cloud，然後點擊自動取得您的令牌。"
+	},
+	"appflowyConnectBtn": {
+		"message": "連接 AppFlowy"
+	},
+	"appflowyServerUrl": {
+		"message": "伺服器 URL"
+	},
+	"appflowyServerUrlDescription": {
+		"message": "您的 AppFlowy Cloud URL（例如 https://beta.appflowy.cloud）。"
+	},
+	"appflowyApiToken": {
+		"message": "API 令牌"
+	},
+	"appflowyApiTokenDescription": {
+		"message": "您的 AppFlowy API 令牌。在 AppFlowy 設定 → 帳戶中查找。"
+	},
+	"appflowyWorkspaceId": {
+		"message": "工作區 ID"
+	},
+	"appflowyWorkspaceIdDescription": {
+		"message": "您的 AppFlowy 工作區 ID，頁面將儲存到該工作區。"
+	},
+	"appflowyParentViewId": {
+		"message": "空間"
+	},
+	"appflowyParentViewIdDescription": {
+		"message": "剪輯頁面將儲存到的空間或資料夾。"
+	},
+	"appflowyFetchWorkspaces": {
+		"message": "取得工作區"
+	},
+	"appflowyFetchSpaces": {
+		"message": "取得空間"
+	},
+	"appflowyMissingCredentials": {
+		"message": "請先輸入伺服器 URL 和 API 令牌。"
+	},
+	"appflowyNoWorkspaces": {
+		"message": "找不到此帳戶的工作區。"
+	},
+	"appflowySelectWorkspace": {
+		"message": "找到多個工作區。請輸入要使用的工作區 ID："
+	},
+	"appflowyFetchError": {
+		"message": "取得工作區失敗："
 	}
 }

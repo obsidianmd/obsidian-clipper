@@ -870,5 +870,62 @@
 	},
 	"appflowyVerifyAndConnect": {
 		"message": "सत्यापित करें और कनेक्ट करें"
+	},
+	"appflowySettings": {
+		"message": "AppFlowy"
+	},
+	"appflowyDescription": {
+		"message": "क्लिप की गई पेजों को सीधे अपने AppFlowy वर्कस्पेस में सहेजने के लिए AppFlowy Cloud कॉन्फ़िगर करें।"
+	},
+	"appflowyConnect": {
+		"message": "AppFlowy कनेक्ट करें"
+	},
+	"appflowyConnectDescription": {
+		"message": "अपने ब्राउज़र में AppFlowy Cloud में साइन इन करें, फिर अपना टोकन स्वचालित रूप से प्राप्त करने के लिए क्लिक करें।"
+	},
+	"appflowyConnectBtn": {
+		"message": "AppFlowy कनेक्ट करें"
+	},
+	"appflowyServerUrl": {
+		"message": "सर्वर URL"
+	},
+	"appflowyServerUrlDescription": {
+		"message": "आपका AppFlowy Cloud URL (जैसे: https://beta.appflowy.cloud)।"
+	},
+	"appflowyApiToken": {
+		"message": "API टोकन"
+	},
+	"appflowyApiTokenDescription": {
+		"message": "आपका AppFlowy API टोकन। इसे AppFlowy Settings → Account में खोजें।"
+	},
+	"appflowyWorkspaceId": {
+		"message": "वर्कस्पेस ID"
+	},
+	"appflowyWorkspaceIdDescription": {
+		"message": "आपके AppFlowy वर्कस्पेस की ID जहाँ पेज सहेजे जाएंगे।"
+	},
+	"appflowyParentViewId": {
+		"message": "स्पेस"
+	},
+	"appflowyParentViewIdDescription": {
+		"message": "स्पेस या फ़ोल्डर जहाँ क्लिप की गई पेजें सहेजी जाएंगी।"
+	},
+	"appflowyFetchWorkspaces": {
+		"message": "वर्कस्पेस लाएं"
+	},
+	"appflowyFetchSpaces": {
+		"message": "स्पेस लाएं"
+	},
+	"appflowyMissingCredentials": {
+		"message": "कृपया पहले सर्वर URL और API टोकन दर्ज करें।"
+	},
+	"appflowyNoWorkspaces": {
+		"message": "इस खाते के लिए कोई वर्कस्पेस नहीं मिला।"
+	},
+	"appflowySelectWorkspace": {
+		"message": "कई वर्कस्पेस मिले। उपयोग करने के लिए वर्कस्पेस ID दर्ज करें:"
+	},
+	"appflowyFetchError": {
+		"message": "वर्कस्पेस लोड करने में विफल:"
 	}
 }

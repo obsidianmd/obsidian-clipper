@@ -870,5 +870,62 @@
 	},
 	"appflowyVerifyAndConnect": {
 		"message": "Verificar e conectar"
+	},
+	"appflowySettings": {
+		"message": "AppFlowy"
+	},
+	"appflowyDescription": {
+		"message": "Configure o AppFlowy Cloud para salvar páginas recortadas diretamente no seu espaço de trabalho do AppFlowy."
+	},
+	"appflowyConnect": {
+		"message": "Conectar AppFlowy"
+	},
+	"appflowyConnectDescription": {
+		"message": "Faça login no AppFlowy Cloud no seu navegador e clique para recuperar seu token automaticamente."
+	},
+	"appflowyConnectBtn": {
+		"message": "Conectar AppFlowy"
+	},
+	"appflowyServerUrl": {
+		"message": "URL do servidor"
+	},
+	"appflowyServerUrlDescription": {
+		"message": "Sua URL do AppFlowy Cloud (ex.: https://beta.appflowy.cloud)."
+	},
+	"appflowyApiToken": {
+		"message": "Token de API"
+	},
+	"appflowyApiTokenDescription": {
+		"message": "Seu token de API do AppFlowy. Encontre em Configurações do AppFlowy → Conta."
+	},
+	"appflowyWorkspaceId": {
+		"message": "ID do espaço de trabalho"
+	},
+	"appflowyWorkspaceIdDescription": {
+		"message": "O ID do seu espaço de trabalho no AppFlowy onde as páginas serão salvas."
+	},
+	"appflowyParentViewId": {
+		"message": "Espaço"
+	},
+	"appflowyParentViewIdDescription": {
+		"message": "Espaço ou pasta onde as páginas recortadas serão salvas."
+	},
+	"appflowyFetchWorkspaces": {
+		"message": "Buscar espaços de trabalho"
+	},
+	"appflowyFetchSpaces": {
+		"message": "Buscar espaços"
+	},
+	"appflowyMissingCredentials": {
+		"message": "Insira primeiro a URL do servidor e o token de API."
+	},
+	"appflowyNoWorkspaces": {
+		"message": "Nenhum espaço de trabalho encontrado para esta conta."
+	},
+	"appflowySelectWorkspace": {
+		"message": "Vários espaços de trabalho encontrados. Insira o ID do espaço de trabalho a ser usado:"
+	},
+	"appflowyFetchError": {
+		"message": "Falha ao buscar espaços de trabalho:"
 	}
 }

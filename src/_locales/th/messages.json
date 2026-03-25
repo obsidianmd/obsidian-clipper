@@ -870,5 +870,62 @@
 	},
 	"appflowyVerifyAndConnect": {
 		"message": "ยืนยันและเชื่อมต่อ"
+	},
+	"appflowySettings": {
+		"message": "AppFlowy"
+	},
+	"appflowyDescription": {
+		"message": "กำหนดค่า AppFlowy Cloud เพื่อบันทึกหน้าที่คลิปไว้โดยตรงในพื้นที่ทำงาน AppFlowy ของคุณ"
+	},
+	"appflowyConnect": {
+		"message": "เชื่อมต่อ AppFlowy"
+	},
+	"appflowyConnectDescription": {
+		"message": "ลงชื่อเข้าใช้ AppFlowy Cloud ในเบราว์เซอร์ จากนั้นคลิกเพื่อดึงโทเค็นของคุณโดยอัตโนมัติ"
+	},
+	"appflowyConnectBtn": {
+		"message": "เชื่อมต่อ AppFlowy"
+	},
+	"appflowyServerUrl": {
+		"message": "URL เซิร์ฟเวอร์"
+	},
+	"appflowyServerUrlDescription": {
+		"message": "URL ของ AppFlowy Cloud (เช่น https://beta.appflowy.cloud)"
+	},
+	"appflowyApiToken": {
+		"message": "โทเค็น API"
+	},
+	"appflowyApiTokenDescription": {
+		"message": "โทเค็น API AppFlowy ของคุณ พบได้ที่การตั้งค่า AppFlowy → บัญชี"
+	},
+	"appflowyWorkspaceId": {
+		"message": "ID พื้นที่ทำงาน"
+	},
+	"appflowyWorkspaceIdDescription": {
+		"message": "ID ของพื้นที่ทำงาน AppFlowy ที่จะบันทึกหน้า"
+	},
+	"appflowyParentViewId": {
+		"message": "พื้นที่"
+	},
+	"appflowyParentViewIdDescription": {
+		"message": "พื้นที่หรือโฟลเดอร์ที่จะบันทึกหน้าที่คลิปไว้"
+	},
+	"appflowyFetchWorkspaces": {
+		"message": "ดึงพื้นที่ทำงาน"
+	},
+	"appflowyFetchSpaces": {
+		"message": "ดึงพื้นที่"
+	},
+	"appflowyMissingCredentials": {
+		"message": "กรุณาป้อน URL เซิร์ฟเวอร์และโทเค็น API ก่อน"
+	},
+	"appflowyNoWorkspaces": {
+		"message": "ไม่พบพื้นที่ทำงานสำหรับบัญชีนี้"
+	},
+	"appflowySelectWorkspace": {
+		"message": "พบพื้นที่ทำงานหลายแห่ง ป้อน ID พื้นที่ทำงานที่จะใช้:"
+	},
+	"appflowyFetchError": {
+		"message": "การดึงพื้นที่ทำงานล้มเหลว:"
 	}
 }

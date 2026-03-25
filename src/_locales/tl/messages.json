@@ -862,5 +862,62 @@
 	},
 	"appflowyVerifyAndConnect": {
 		"message": "I-verify at ikonekta"
+	},
+	"appflowySettings": {
+		"message": "AppFlowy"
+	},
+	"appflowyDescription": {
+		"message": "I-configure ang AppFlowy Cloud para i-save ang mga na-clip na pahina nang direkta sa iyong AppFlowy workspace."
+	},
+	"appflowyConnect": {
+		"message": "Ikonekta ang AppFlowy"
+	},
+	"appflowyConnectDescription": {
+		"message": "Mag-sign in sa AppFlowy Cloud sa iyong browser, pagkatapos ay i-click para awtomatikong makuha ang iyong token."
+	},
+	"appflowyConnectBtn": {
+		"message": "Ikonekta ang AppFlowy"
+	},
+	"appflowyServerUrl": {
+		"message": "Server URL"
+	},
+	"appflowyServerUrlDescription": {
+		"message": "Ang iyong AppFlowy Cloud URL (hal. https://beta.appflowy.cloud)."
+	},
+	"appflowyApiToken": {
+		"message": "API Token"
+	},
+	"appflowyApiTokenDescription": {
+		"message": "Ang iyong AppFlowy API token. Hanapin sa AppFlowy Settings → Account."
+	},
+	"appflowyWorkspaceId": {
+		"message": "Workspace ID"
+	},
+	"appflowyWorkspaceIdDescription": {
+		"message": "Ang ID ng iyong AppFlowy workspace kung saan ile-save ang mga pahina."
+	},
+	"appflowyParentViewId": {
+		"message": "Space"
+	},
+	"appflowyParentViewIdDescription": {
+		"message": "Space o folder kung saan ile-save ang mga na-clip na pahina."
+	},
+	"appflowyFetchWorkspaces": {
+		"message": "Kunin ang mga workspace"
+	},
+	"appflowyFetchSpaces": {
+		"message": "Kunin ang mga space"
+	},
+	"appflowyMissingCredentials": {
+		"message": "Mangyaring ilagay muna ang server URL at API token."
+	},
+	"appflowyNoWorkspaces": {
+		"message": "Walang nahanap na workspace para sa account na ito."
+	},
+	"appflowySelectWorkspace": {
+		"message": "Nahanap ang maraming workspace. Ilagay ang workspace ID na gagamitin:"
+	},
+	"appflowyFetchError": {
+		"message": "Nabigo ang pagkuha ng mga workspace:"
 	}
 }

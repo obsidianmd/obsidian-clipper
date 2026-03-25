@@ -870,5 +870,62 @@
 	},
 	"appflowyVerifyAndConnect": {
 		"message": "Verifiëren en verbinden"
+	},
+	"appflowySettings": {
+		"message": "AppFlowy"
+	},
+	"appflowyDescription": {
+		"message": "Configureer AppFlowy Cloud om geknippe pagina's direct op te slaan in je AppFlowy-werkruimte."
+	},
+	"appflowyConnect": {
+		"message": "AppFlowy verbinden"
+	},
+	"appflowyConnectDescription": {
+		"message": "Log in bij AppFlowy Cloud in je browser en klik vervolgens om je token automatisch op te halen."
+	},
+	"appflowyConnectBtn": {
+		"message": "AppFlowy verbinden"
+	},
+	"appflowyServerUrl": {
+		"message": "Server-URL"
+	},
+	"appflowyServerUrlDescription": {
+		"message": "Je AppFlowy Cloud URL (bijv. https://beta.appflowy.cloud)."
+	},
+	"appflowyApiToken": {
+		"message": "API-token"
+	},
+	"appflowyApiTokenDescription": {
+		"message": "Je AppFlowy API-token. Vind het in AppFlowy Instellingen → Account."
+	},
+	"appflowyWorkspaceId": {
+		"message": "Werkruimte-ID"
+	},
+	"appflowyWorkspaceIdDescription": {
+		"message": "De ID van je AppFlowy-werkruimte waar pagina's worden opgeslagen."
+	},
+	"appflowyParentViewId": {
+		"message": "Ruimte"
+	},
+	"appflowyParentViewIdDescription": {
+		"message": "Ruimte of map waar geknippe pagina's worden opgeslagen."
+	},
+	"appflowyFetchWorkspaces": {
+		"message": "Werkruimten ophalen"
+	},
+	"appflowyFetchSpaces": {
+		"message": "Ruimten ophalen"
+	},
+	"appflowyMissingCredentials": {
+		"message": "Voer eerst de server-URL en het API-token in."
+	},
+	"appflowyNoWorkspaces": {
+		"message": "Geen werkruimten gevonden voor dit account."
+	},
+	"appflowySelectWorkspace": {
+		"message": "Meerdere werkruimten gevonden. Voer de te gebruiken werkruimte-ID in:"
+	},
+	"appflowyFetchError": {
+		"message": "Ophalen van werkruimten mislukt:"
 	}
 }

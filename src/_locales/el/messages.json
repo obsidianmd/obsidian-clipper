@@ -862,5 +862,62 @@
 	},
 	"appflowyVerifyAndConnect": {
 		"message": "Επαλήθευση και σύνδεση"
+	},
+	"appflowySettings": {
+		"message": "AppFlowy"
+	},
+	"appflowyDescription": {
+		"message": "Ρυθμίστε το AppFlowy Cloud για αποθήκευση αποκομμένων σελίδων απευθείας στον χώρο εργασίας σας στο AppFlowy."
+	},
+	"appflowyConnect": {
+		"message": "Σύνδεση AppFlowy"
+	},
+	"appflowyConnectDescription": {
+		"message": "Συνδεθείτε στο AppFlowy Cloud στο πρόγραμμα περιήγησής σας και κάντε κλικ για αυτόματη ανάκτηση του token σας."
+	},
+	"appflowyConnectBtn": {
+		"message": "Σύνδεση AppFlowy"
+	},
+	"appflowyServerUrl": {
+		"message": "URL διακομιστή"
+	},
+	"appflowyServerUrlDescription": {
+		"message": "Η URL του AppFlowy Cloud σας (π.χ. https://beta.appflowy.cloud)."
+	},
+	"appflowyApiToken": {
+		"message": "Token API"
+	},
+	"appflowyApiTokenDescription": {
+		"message": "Το token API του AppFlowy σας. Βρείτε το στις Ρυθμίσεις AppFlowy → Λογαριασμός."
+	},
+	"appflowyWorkspaceId": {
+		"message": "ID χώρου εργασίας"
+	},
+	"appflowyWorkspaceIdDescription": {
+		"message": "Το ID του χώρου εργασίας AppFlowy όπου θα αποθηκεύονται οι σελίδες."
+	},
+	"appflowyParentViewId": {
+		"message": "Χώρος"
+	},
+	"appflowyParentViewIdDescription": {
+		"message": "Χώρος ή φάκελος όπου θα αποθηκεύονται οι αποκομμένες σελίδες."
+	},
+	"appflowyFetchWorkspaces": {
+		"message": "Φόρτωση χώρων εργασίας"
+	},
+	"appflowyFetchSpaces": {
+		"message": "Φόρτωση χώρων"
+	},
+	"appflowyMissingCredentials": {
+		"message": "Εισάγετε πρώτα το URL διακομιστή και το token API."
+	},
+	"appflowyNoWorkspaces": {
+		"message": "Δεν βρέθηκαν χώροι εργασίας για αυτόν τον λογαριασμό."
+	},
+	"appflowySelectWorkspace": {
+		"message": "Βρέθηκαν πολλοί χώροι εργασίας. Εισάγετε το ID του χώρου εργασίας που θα χρησιμοποιήσετε:"
+	},
+	"appflowyFetchError": {
+		"message": "Αποτυχία φόρτωσης χώρων εργασίας:"
 	}
 }

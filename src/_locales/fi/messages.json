@@ -878,5 +878,62 @@
 	},
 	"appflowyVerifyAndConnect": {
 		"message": "Vahvista ja yhdistä"
+	},
+	"appflowySettings": {
+		"message": "AppFlowy"
+	},
+	"appflowyDescription": {
+		"message": "Määritä AppFlowy Cloud tallentamaan leikatut sivut suoraan AppFlowy-työtilaan."
+	},
+	"appflowyConnect": {
+		"message": "Yhdistä AppFlowy"
+	},
+	"appflowyConnectDescription": {
+		"message": "Kirjaudu AppFlowy Cloudiin selaimessasi, ja napsauta hakeaksesi tunnuksesi automaattisesti."
+	},
+	"appflowyConnectBtn": {
+		"message": "Yhdistä AppFlowy"
+	},
+	"appflowyServerUrl": {
+		"message": "Palvelimen URL"
+	},
+	"appflowyServerUrlDescription": {
+		"message": "AppFlowy Cloud URL (esim. https://beta.appflowy.cloud)."
+	},
+	"appflowyApiToken": {
+		"message": "API-tunnus"
+	},
+	"appflowyApiTokenDescription": {
+		"message": "AppFlowy API-tunnuksesi. Löydät sen AppFlowy-asetuksista → Tili."
+	},
+	"appflowyWorkspaceId": {
+		"message": "Työtilan tunnus"
+	},
+	"appflowyWorkspaceIdDescription": {
+		"message": "AppFlowy-työtilasi tunnus, johon sivut tallennetaan."
+	},
+	"appflowyParentViewId": {
+		"message": "Tila"
+	},
+	"appflowyParentViewIdDescription": {
+		"message": "Tila tai kansio, johon leikatut sivut tallennetaan."
+	},
+	"appflowyFetchWorkspaces": {
+		"message": "Hae työtilat"
+	},
+	"appflowyFetchSpaces": {
+		"message": "Hae tilat"
+	},
+	"appflowyMissingCredentials": {
+		"message": "Syötä ensin palvelimen URL ja API-tunnus."
+	},
+	"appflowyNoWorkspaces": {
+		"message": "Tälle tilille ei löytynyt työtiloja."
+	},
+	"appflowySelectWorkspace": {
+		"message": "Löydettiin useita työtiloja. Anna käytettävän työtilan tunnus:"
+	},
+	"appflowyFetchError": {
+		"message": "Työtilojen haku epäonnistui:"
 	}
 }

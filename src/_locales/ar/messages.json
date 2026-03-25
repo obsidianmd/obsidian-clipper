@@ -870,5 +870,62 @@
 	},
 	"appflowyVerifyAndConnect": {
 		"message": "تحقق وتوصيل"
+	},
+	"appflowySettings": {
+		"message": "AppFlowy"
+	},
+	"appflowyDescription": {
+		"message": "قم بتكوين AppFlowy Cloud لحفظ الصفحات المقصوصة مباشرة في مساحة عمل AppFlowy الخاصة بك."
+	},
+	"appflowyConnect": {
+		"message": "ربط AppFlowy"
+	},
+	"appflowyConnectDescription": {
+		"message": "سجّل الدخول إلى AppFlowy Cloud في متصفحك، ثم انقر لاسترداد رمزك تلقائيًا."
+	},
+	"appflowyConnectBtn": {
+		"message": "ربط AppFlowy"
+	},
+	"appflowyServerUrl": {
+		"message": "عنوان URL الخادم"
+	},
+	"appflowyServerUrlDescription": {
+		"message": "عنوان URL لـ AppFlowy Cloud (مثال: https://beta.appflowy.cloud)."
+	},
+	"appflowyApiToken": {
+		"message": "رمز API"
+	},
+	"appflowyApiTokenDescription": {
+		"message": "رمز API الخاص بـ AppFlowy. ابحث عنه في إعدادات AppFlowy ← الحساب."
+	},
+	"appflowyWorkspaceId": {
+		"message": "معرّف مساحة العمل"
+	},
+	"appflowyWorkspaceIdDescription": {
+		"message": "معرّف مساحة عمل AppFlowy حيث ستُحفظ الصفحات."
+	},
+	"appflowyParentViewId": {
+		"message": "المساحة"
+	},
+	"appflowyParentViewIdDescription": {
+		"message": "المساحة أو المجلد حيث ستُحفظ الصفحات المقصوصة."
+	},
+	"appflowyFetchWorkspaces": {
+		"message": "جلب مساحات العمل"
+	},
+	"appflowyFetchSpaces": {
+		"message": "جلب المساحات"
+	},
+	"appflowyMissingCredentials": {
+		"message": "يرجى إدخال عنوان URL للخادم ورمز API أولاً."
+	},
+	"appflowyNoWorkspaces": {
+		"message": "لم يتم العثور على مساحات عمل لهذا الحساب."
+	},
+	"appflowySelectWorkspace": {
+		"message": "تم العثور على مساحات عمل متعددة. أدخل معرّف مساحة العمل المراد استخدامها:"
+	},
+	"appflowyFetchError": {
+		"message": "فشل جلب مساحات العمل:"
 	}
 }

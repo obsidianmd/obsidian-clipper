@@ -870,5 +870,62 @@
 	},
 	"appflowyVerifyAndConnect": {
 		"message": "Xác minh & kết nối"
+	},
+	"appflowySettings": {
+		"message": "AppFlowy"
+	},
+	"appflowyDescription": {
+		"message": "Cấu hình AppFlowy Cloud để lưu các trang đã cắt trực tiếp vào không gian làm việc AppFlowy của bạn."
+	},
+	"appflowyConnect": {
+		"message": "Kết nối AppFlowy"
+	},
+	"appflowyConnectDescription": {
+		"message": "Đăng nhập vào AppFlowy Cloud trên trình duyệt, sau đó nhấp để tự động lấy token của bạn."
+	},
+	"appflowyConnectBtn": {
+		"message": "Kết nối AppFlowy"
+	},
+	"appflowyServerUrl": {
+		"message": "URL máy chủ"
+	},
+	"appflowyServerUrlDescription": {
+		"message": "URL AppFlowy Cloud của bạn (ví dụ: https://beta.appflowy.cloud)."
+	},
+	"appflowyApiToken": {
+		"message": "Token API"
+	},
+	"appflowyApiTokenDescription": {
+		"message": "Token API AppFlowy của bạn. Tìm trong Cài đặt AppFlowy → Tài khoản."
+	},
+	"appflowyWorkspaceId": {
+		"message": "ID không gian làm việc"
+	},
+	"appflowyWorkspaceIdDescription": {
+		"message": "ID của không gian làm việc AppFlowy nơi các trang sẽ được lưu."
+	},
+	"appflowyParentViewId": {
+		"message": "Không gian"
+	},
+	"appflowyParentViewIdDescription": {
+		"message": "Không gian hoặc thư mục nơi các trang đã cắt sẽ được lưu."
+	},
+	"appflowyFetchWorkspaces": {
+		"message": "Lấy không gian làm việc"
+	},
+	"appflowyFetchSpaces": {
+		"message": "Lấy không gian"
+	},
+	"appflowyMissingCredentials": {
+		"message": "Vui lòng nhập URL máy chủ và token API trước."
+	},
+	"appflowyNoWorkspaces": {
+		"message": "Không tìm thấy không gian làm việc nào cho tài khoản này."
+	},
+	"appflowySelectWorkspace": {
+		"message": "Tìm thấy nhiều không gian làm việc. Nhập ID không gian làm việc cần dùng:"
+	},
+	"appflowyFetchError": {
+		"message": "Không thể lấy không gian làm việc:"
 	}
 }

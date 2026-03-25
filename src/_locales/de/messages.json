@@ -870,5 +870,62 @@
 	},
 	"appflowyVerifyAndConnect": {
 		"message": "Bestätigen & verbinden"
+	},
+	"appflowySettings": {
+		"message": "AppFlowy"
+	},
+	"appflowyDescription": {
+		"message": "AppFlowy Cloud konfigurieren, um geklippte Seiten direkt in deinen AppFlowy-Arbeitsbereich zu speichern."
+	},
+	"appflowyConnect": {
+		"message": "AppFlowy verbinden"
+	},
+	"appflowyConnectDescription": {
+		"message": "Melde dich in deinem Browser bei AppFlowy Cloud an und klicke dann, um dein Token automatisch abzurufen."
+	},
+	"appflowyConnectBtn": {
+		"message": "AppFlowy verbinden"
+	},
+	"appflowyServerUrl": {
+		"message": "Server-URL"
+	},
+	"appflowyServerUrlDescription": {
+		"message": "Deine AppFlowy Cloud URL (z.B. https://beta.appflowy.cloud)."
+	},
+	"appflowyApiToken": {
+		"message": "API-Token"
+	},
+	"appflowyApiTokenDescription": {
+		"message": "Dein AppFlowy API-Token. Du findest ihn in AppFlowy Einstellungen → Konto."
+	},
+	"appflowyWorkspaceId": {
+		"message": "Arbeitsbereich-ID"
+	},
+	"appflowyWorkspaceIdDescription": {
+		"message": "Die ID deines AppFlowy-Arbeitsbereichs, in dem Seiten gespeichert werden."
+	},
+	"appflowyParentViewId": {
+		"message": "Bereich"
+	},
+	"appflowyParentViewIdDescription": {
+		"message": "Bereich oder Ordner, in dem geklippte Seiten gespeichert werden."
+	},
+	"appflowyFetchWorkspaces": {
+		"message": "Arbeitsbereiche laden"
+	},
+	"appflowyFetchSpaces": {
+		"message": "Bereiche laden"
+	},
+	"appflowyMissingCredentials": {
+		"message": "Bitte zuerst Server-URL und API-Token eingeben."
+	},
+	"appflowyNoWorkspaces": {
+		"message": "Keine Arbeitsbereiche für dieses Konto gefunden."
+	},
+	"appflowySelectWorkspace": {
+		"message": "Mehrere Arbeitsbereiche gefunden. Gib die ID des zu verwendenden Arbeitsbereichs ein:"
+	},
+	"appflowyFetchError": {
+		"message": "Arbeitsbereiche konnten nicht geladen werden:"
 	}
 }

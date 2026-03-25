@@ -862,5 +862,62 @@
 	},
 	"appflowyVerifyAndConnect": {
 		"message": "Підтвердити і підключити"
+	},
+	"appflowySettings": {
+		"message": "AppFlowy"
+	},
+	"appflowyDescription": {
+		"message": "Налаштуйте AppFlowy Cloud для збереження скопійованих сторінок безпосередньо у робочий простір AppFlowy."
+	},
+	"appflowyConnect": {
+		"message": "Підключити AppFlowy"
+	},
+	"appflowyConnectDescription": {
+		"message": "Увійдіть до AppFlowy Cloud у браузері, потім натисніть для автоматичного отримання токена."
+	},
+	"appflowyConnectBtn": {
+		"message": "Підключити AppFlowy"
+	},
+	"appflowyServerUrl": {
+		"message": "URL сервера"
+	},
+	"appflowyServerUrlDescription": {
+		"message": "URL вашого AppFlowy Cloud (наприклад, https://beta.appflowy.cloud)."
+	},
+	"appflowyApiToken": {
+		"message": "API-токен"
+	},
+	"appflowyApiTokenDescription": {
+		"message": "Ваш API-токен AppFlowy. Знайдіть його в Налаштуваннях AppFlowy → Акаунт."
+	},
+	"appflowyWorkspaceId": {
+		"message": "ID робочого простору"
+	},
+	"appflowyWorkspaceIdDescription": {
+		"message": "ID робочого простору AppFlowy, куди зберігатимуться сторінки."
+	},
+	"appflowyParentViewId": {
+		"message": "Простір"
+	},
+	"appflowyParentViewIdDescription": {
+		"message": "Простір або папка, куди зберігатимуться скопійовані сторінки."
+	},
+	"appflowyFetchWorkspaces": {
+		"message": "Завантажити робочі простори"
+	},
+	"appflowyFetchSpaces": {
+		"message": "Завантажити простори"
+	},
+	"appflowyMissingCredentials": {
+		"message": "Будь ласка, спочатку введіть URL сервера та API-токен."
+	},
+	"appflowyNoWorkspaces": {
+		"message": "Для цього акаунту не знайдено робочих просторів."
+	},
+	"appflowySelectWorkspace": {
+		"message": "Знайдено кілька робочих просторів. Введіть ID робочого простору для використання:"
+	},
+	"appflowyFetchError": {
+		"message": "Не вдалося завантажити робочі простори:"
 	}
 }
