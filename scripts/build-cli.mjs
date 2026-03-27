@@ -27,6 +27,15 @@ const polyfillBanner = `
   if (typeof globalThis.document === "undefined") {
     globalThis.document = _parseHTML("<!DOCTYPE html><html><head></head><body></body></html>").document;
   }
+  if (typeof globalThis.navigator === "undefined") {
+    var _platform = process.platform === "win32" ? "Win32" : process.platform === "darwin" ? "MacIntel" : "Linux x86_64";
+    globalThis.navigator = { userAgent: "Node.js/" + process.version, platform: _platform, userAgentData: null };
+  }
+  if (typeof globalThis.getComputedStyle === "undefined") {
+    globalThis.getComputedStyle = function() {
+      return { display: "block", visibility: "visible", getPropertyValue: function() { return ""; } };
+    };
+  }
 })();
 `.trim();
 
