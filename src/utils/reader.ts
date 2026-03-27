@@ -7,6 +7,7 @@ import hljs from 'highlight.js';
 import { getDomain } from './string-utils';
 import { applyHighlights } from './highlighter';
 import { copyToClipboard } from './clipboard-utils';
+import { getMessage } from './i18n';
 
 // Mobile viewport settings
 const VIEWPORT = 'width=device-width, initial-scale=1, maximum-scale=1';
@@ -17,6 +18,9 @@ interface ReaderSettings {
 	maxWidth: number;
 	theme: string;
 	themeMode: 'auto' | 'light' | 'dark';
+	fontFamily: 'system' | 'custom';
+	customFont: string;
+	blendImages: boolean;
 }
 
 export class Reader {
@@ -85,11 +89,15 @@ export class Reader {
 		lineHeight: 1.6,
 		maxWidth: 38,
 		theme: 'default',
-		themeMode: 'auto'
+		themeMode: 'auto',
+		fontFamily: 'system',
+		customFont: '',
+		blendImages: true
 	};
 
 	private static async loadSettings(): Promise<void> {
-		const savedSettings = await getLocalStorage('reader_settings');
+		const savedSettings = await browser.storage.sync.get('reader_settings')
+			.then((data: Record<string, any>) => data['reader_settings']);
 		if (savedSettings) {
 			this.settings = {
 				...this.settings,
@@ -99,7 +107,7 @@ export class Reader {
 	}
 
 	private static async saveSettings(): Promise<void> {
-		await setLocalStorage('reader_settings', this.settings);
+		await browser.storage.sync.set({ reader_settings: this.settings });
 	}
 
 	private static injectSettingsBar(doc: Document) {
@@ -190,11 +198,11 @@ export class Reader {
 
 		const defaultThemeOption = doc.createElement('option');
 		defaultThemeOption.value = 'default';
-		defaultThemeOption.textContent = 'Default';
+		defaultThemeOption.textContent = getMessage('readerColorSchemeDefault');
 
 		const flexokiThemeOption = doc.createElement('option');
 		flexokiThemeOption.value = 'flexoki';
-		flexokiThemeOption.textContent = 'Flexoki';
+		flexokiThemeOption.textContent = getMessage('readerColorSchemeFlexoki');
 
 		themeSelect.appendChild(defaultThemeOption);
 		themeSelect.appendChild(flexokiThemeOption);
@@ -206,19 +214,35 @@ export class Reader {
 
 		const autoModeOption = doc.createElement('option');
 		autoModeOption.value = 'auto';
-		autoModeOption.textContent = 'Automatic';
+		autoModeOption.textContent = getMessage('readerThemeModeAuto');
 
 		const lightModeOption = doc.createElement('option');
 		lightModeOption.value = 'light';
-		lightModeOption.textContent = 'Light';
+		lightModeOption.textContent = getMessage('readerThemeModeLight');
 
 		const darkModeOption = doc.createElement('option');
 		darkModeOption.value = 'dark';
-		darkModeOption.textContent = 'Dark';
+		darkModeOption.textContent = getMessage('readerThemeModeDark');
 
 		themeModeSelect.appendChild(autoModeOption);
 		themeModeSelect.appendChild(lightModeOption);
 		themeModeSelect.appendChild(darkModeOption);
+
+		// Font family select
+		const fontFamilySelect = doc.createElement('select');
+		fontFamilySelect.className = 'obsidian-reader-settings-select';
+		fontFamilySelect.dataset.action = 'change-font-family';
+
+		const systemFontOption = doc.createElement('option');
+		systemFontOption.value = 'system';
+		systemFontOption.textContent = getMessage('readerFontSystem');
+
+		const customFontOption = doc.createElement('option');
+		customFontOption.value = 'custom';
+		customFontOption.textContent = getMessage('readerFontCustom');
+
+		fontFamilySelect.appendChild(systemFontOption);
+		fontFamilySelect.appendChild(customFontOption);
 
 		// Highlighter controls group
 		const highlighterGroup = doc.createElement('div');
@@ -241,6 +265,7 @@ export class Reader {
 		controlsContainer.appendChild(lineHeightGroup);
 		controlsContainer.appendChild(themeSelect);
 		controlsContainer.appendChild(themeModeSelect);
+		controlsContainer.appendChild(fontFamilySelect);
 
 		settingsBar.appendChild(controlsContainer);
 
@@ -295,6 +320,12 @@ export class Reader {
 			this.updateThemeMode(doc, themeModeSelect.value as 'auto' | 'light' | 'dark');
 		});
 
+		// Add font family select event listener
+		fontFamilySelect.value = this.settings.fontFamily;
+		fontFamilySelect.addEventListener('change', () => {
+			this.updateFontFamily(doc, fontFamilySelect.value as 'system' | 'custom');
+		});
+
 		// Notify content script to listen for highlighter button
 		document.dispatchEvent(new CustomEvent('obsidian-reader-init'));
 		
@@ -340,6 +371,30 @@ export class Reader {
 
 		this.settings.themeMode = mode;
 		this.saveSettings();
+	}
+
+	private static updateFontFamily(doc: Document, fontFamily: 'system' | 'custom'): void {
+		this.settings.fontFamily = fontFamily;
+		this.applyFontFamily(doc, fontFamily, this.settings.customFont);
+		this.saveSettings();
+	}
+
+	private static applyFontFamily(doc: Document, fontFamily: 'system' | 'custom', customFont: string): void {
+		if (fontFamily === 'custom' && customFont) {
+			doc.body.style.setProperty('--obsidian-reader-font-family', customFont);
+		} else {
+			doc.body.style.removeProperty('--obsidian-reader-font-family');
+		}
+	}
+
+	private static updateBlendImages(doc: Document, blend: boolean): void {
+		this.settings.blendImages = blend;
+		this.applyBlendImages(doc, blend);
+		this.saveSettings();
+	}
+
+	private static applyBlendImages(doc: Document, blend: boolean): void {
+		doc.documentElement.classList.toggle('no-blend-images', !blend);
 	}
 
 	private static handleColorSchemeChange(e: MediaQueryListEvent, doc: Document): void {
@@ -1219,6 +1274,8 @@ export class Reader {
 			doc.documentElement.style.setProperty('--obsidian-reader-font-size', `${this.settings.fontSize}px`);
 			doc.documentElement.style.setProperty('--obsidian-reader-line-height', this.settings.lineHeight.toString());
 			doc.documentElement.style.setProperty('--obsidian-reader-line-width', `${this.settings.maxWidth}em`);
+			this.applyFontFamily(doc, this.settings.fontFamily, this.settings.customFont);
+			this.applyBlendImages(doc, this.settings.blendImages);
 
 			// Add settings bar
 			this.injectSettingsBar(doc);

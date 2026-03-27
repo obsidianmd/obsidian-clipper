@@ -58,6 +58,9 @@ export interface ReaderSettings {
 	maxWidth: number;
 	theme: 'default' | 'flexoki';
 	themeMode: 'auto' | 'light' | 'dark';
+	fontFamily: 'system' | 'custom';
+	customFont: string;
+	blendImages: boolean;
 }
 
 export interface Settings {

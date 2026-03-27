@@ -166,7 +166,7 @@
 .obsidian-reader-active {
 	background-color: var(--obsidian-reader-background-primary) !important;
 
-	&.theme-light {
+	&.theme-light:not(.no-blend-images) {
 		img, svg {
 			mix-blend-mode: multiply;
 		}
@@ -175,7 +175,7 @@
 		.mw-invert {
 			filter: invert(1);
 		}
-		.invert-images {
+		&:not(.no-blend-images) .invert-images {
 			img, svg {
 				filter: invert(1) hue-rotate(180deg);
 				mix-blend-mode: screen;

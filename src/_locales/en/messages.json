@@ -2,6 +2,12 @@
 	"activity": {
 		"message": "Activity"
 	},
+	"preview": {
+		"message": "Preview"
+	},
+	"readerPreviewDescription": {
+		"message": "Additional typography settings can be found by opening a page in Reader mode."
+	},
 	"addModel": {
 		"message": "+ Add model"
 	},
@@ -656,6 +662,57 @@
 	},
 	"reader": {
 		"message": "Reader"
+	},
+	"readerBlendImages": {
+		"message": "Blend images"
+	},
+	"readerBlendImagesDescription": {
+		"message": "Blend images with the page background in reader mode."
+	},
+	"readerColorScheme": {
+		"message": "Color scheme"
+	},
+	"readerColorSchemeDefault": {
+		"message": "Default"
+	},
+	"readerColorSchemeDescription": {
+		"message": "Choose the color scheme for reader mode."
+	},
+	"readerColorSchemeFlexoki": {
+		"message": "Flexoki"
+	},
+	"readerCustomFont": {
+		"message": "Custom font"
+	},
+	"readerCustomFontDescription": {
+		"message": "Enter a font name installed on your system."
+	},
+	"readerFont": {
+		"message": "Font"
+	},
+	"readerFontCustom": {
+		"message": "Custom"
+	},
+	"readerFontDescription": {
+		"message": "Choose the font used in reader mode."
+	},
+	"readerFontSystem": {
+		"message": "System"
+	},
+	"readerThemeMode": {
+		"message": "Theme"
+	},
+	"readerThemeModeAuto": {
+		"message": "Automatic"
+	},
+	"readerThemeModeDark": {
+		"message": "Dark"
+	},
+	"readerThemeModeDescription": {
+		"message": "Choose the light or dark theme for reader mode."
+	},
+	"readerThemeModeLight": {
+		"message": "Light"
 	},
 	"recommended": {
 		"message": "recommended"

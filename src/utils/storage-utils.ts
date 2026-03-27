@@ -27,7 +27,10 @@ export let generalSettings: Settings = {
 		lineHeight: 1.6,
 		maxWidth: 38,
 		theme: 'default',
-		themeMode: 'auto'
+		themeMode: 'auto',
+		fontFamily: 'system',
+		customFont: '',
+		blendImages: true
 	},
 	stats: {
 		addToObsidian: 0,
@@ -69,6 +72,9 @@ interface StorageData {
 		maxWidth?: number;
 		theme?: 'default' | 'flexoki';
 		themeMode?: 'auto' | 'light' | 'dark';
+		fontFamily?: 'system' | 'custom';
+		customFont?: string;
+		blendImages?: boolean;
 	};
 	interpreter_settings?: {
 		interpreterModel?: string;
@@ -119,7 +125,10 @@ export async function loadSettings(): Promise<Settings> {
 			lineHeight: 1.6,
 			maxWidth: 38,
 			theme: 'default',
-			themeMode: 'auto'
+			themeMode: 'auto',
+			fontFamily: 'system',
+			customFont: '',
+			blendImages: true
 		},
 		stats: {
 			addToObsidian: 0,
@@ -171,7 +180,10 @@ export async function loadSettings(): Promise<Settings> {
 			lineHeight: data.reader_settings?.lineHeight ?? defaultSettings.readerSettings.lineHeight,
 			maxWidth: data.reader_settings?.maxWidth ?? defaultSettings.readerSettings.maxWidth,
 			theme: data.reader_settings?.theme as 'default' | 'flexoki' ?? defaultSettings.readerSettings.theme,
-			themeMode: data.reader_settings?.themeMode as 'auto' | 'light' | 'dark' ?? defaultSettings.readerSettings.themeMode
+			themeMode: data.reader_settings?.themeMode as 'auto' | 'light' | 'dark' ?? defaultSettings.readerSettings.themeMode,
+			fontFamily: data.reader_settings?.fontFamily as 'system' | 'custom' ?? defaultSettings.readerSettings.fontFamily,
+			customFont: data.reader_settings?.customFont ?? defaultSettings.readerSettings.customFont,
+			blendImages: data.reader_settings?.blendImages ?? defaultSettings.readerSettings.blendImages
 		},
 		stats: data.stats || defaultSettings.stats,
 		history: data.history || defaultSettings.history,
@@ -218,7 +230,10 @@ export async function saveSettings(settings?: Partial<Settings>): Promise<void> 
 			lineHeight: generalSettings.readerSettings.lineHeight,
 			maxWidth: generalSettings.readerSettings.maxWidth,
 			theme: generalSettings.readerSettings.theme,
-			themeMode: generalSettings.readerSettings.themeMode
+			themeMode: generalSettings.readerSettings.themeMode,
+			fontFamily: generalSettings.readerSettings.fontFamily,
+			customFont: generalSettings.readerSettings.customFont,
+			blendImages: generalSettings.readerSettings.blendImages
 		},
 		stats: generalSettings.stats
 	});

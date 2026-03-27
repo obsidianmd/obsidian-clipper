@@ -29,6 +29,9 @@ export const generalSettings: Settings = {
 		maxWidth: 700,
 		theme: 'default',
 		themeMode: 'auto',
+		fontFamily: 'system',
+		customFont: '',
+		blendImages: true,
 	},
 	stats: {
 		addToObsidian: 0,

@@ -15,8 +15,8 @@
 						<li class="sidebar-heading" data-i18n="settingsHeading">Settings</li>
 						<li data-section="general" class="active" data-i18n="general">General</li>
 						<li data-section="properties" data-i18n="properties">Properties</li>
+						<li data-section="reader" data-i18n="reader">Reader</li>
 						<li data-section="highlighter" data-i18n="highlighter">Highlighter</li>
-						<li data-section="reader" data-i18n="reader" style="display: none;">Reader</li>
 						<li data-section="interpreter" data-i18n="interpreter">Interpreter</li>
 						<li class="sidebar-heading" data-i18n="templatesHeading">Templates</li>
 					</ul>
@@ -299,7 +299,75 @@
 						<div class="settings-section-header">
 							<h2 data-i18n="reader">Reader</h2>
 						</div>
-						<form id="reader-settings-form">
+						<div class="usage-chart-header">
+						<div class="usage-chart-title">
+							<div data-i18n="preview">Preview</div>
+							<div class="setting-item-description" data-i18n="readerPreviewDescription">Additional typography settings can be found by opening a page in Reader mode.</div>
+						</div>
+					</div>
+					<div id="reader-preview">
+						<p class="reader-preview-title">File over app</p>
+						<p class="reader-preview-meta">Steph Ango · July 1, 2023 · <a class="reader-preview-meta-link" href="https://stephango.com/file-over-app" target="_blank">stephango.com</a></p>
+						<p class="reader-preview-body"><em>File over app</em> is a philosophy: if you want to create <strong>digital artifacts that last</strong>, they must be files you can control, in formats that are easy to retrieve and read. Use tools that give you this <a class="reader-preview-link" href="https://stephango.com/file-over-app" target="_blank">freedom</a>.</p>
+					</div>
+					<form id="reader-settings-form">
+							<div class="setting-item mod-horizontal">
+								<div class="setting-item-info">
+									<label for="reader-font-family" data-i18n="readerFont">Font</label>
+									<div class="setting-item-description" data-i18n="readerFontDescription">Choose the font used in reader mode.</div>
+								</div>
+								<div class="setting-item-control">
+									<select id="reader-font-family">
+										<option value="system" data-i18n="readerFontSystem">System</option>
+										<option value="custom" data-i18n="readerFontCustom">Custom</option>
+									</select>
+								</div>
+							</div>
+							<div class="setting-item mod-horizontal" id="reader-custom-font-setting">
+								<div class="setting-item-info">
+									<label for="reader-custom-font" data-i18n="readerCustomFont">Custom font</label>
+									<div class="setting-item-description" data-i18n="readerCustomFontDescription">Enter a font name installed on your system.</div>
+								</div>
+								<div class="setting-item-control">
+									<input type="text" id="reader-custom-font" />
+								</div>
+							</div>
+							<div class="setting-item mod-horizontal">
+								<div class="setting-item-info">
+									<label for="reader-blend-images" data-i18n="readerBlendImages">Blend images</label>
+									<div class="setting-item-description" data-i18n="readerBlendImagesDescription">Blend images with the page background in reader mode.</div>
+								</div>
+								<div class="setting-item-control">
+									<div class="checkbox-container">
+										<input type="checkbox" id="reader-blend-images" checked />
+									</div>
+								</div>
+							</div>
+							<div class="setting-item mod-horizontal">
+								<div class="setting-item-info">
+									<label for="reader-color-scheme" data-i18n="readerColorScheme">Color scheme</label>
+									<div class="setting-item-description" data-i18n="readerColorSchemeDescription">Choose the color scheme for reader mode.</div>
+								</div>
+								<div class="setting-item-control">
+									<select id="reader-color-scheme">
+										<option value="default" data-i18n="readerColorSchemeDefault">Default</option>
+										<option value="flexoki" data-i18n="readerColorSchemeFlexoki">Flexoki</option>
+									</select>
+								</div>
+							</div>
+							<div class="setting-item mod-horizontal">
+								<div class="setting-item-info">
+									<label for="reader-theme-mode" data-i18n="readerThemeMode">Theme</label>
+									<div class="setting-item-description" data-i18n="readerThemeModeDescription">Choose the light or dark theme for reader mode.</div>
+								</div>
+								<div class="setting-item-control">
+									<select id="reader-theme-mode">
+										<option value="auto" data-i18n="readerThemeModeAuto">Automatic</option>
+										<option value="light" data-i18n="readerThemeModeLight">Light</option>
+										<option value="dark" data-i18n="readerThemeModeDark">Dark</option>
+									</select>
+								</div>
+							</div>
 						</form>
 					</div>
 
