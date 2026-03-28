@@ -305,7 +305,7 @@
 							<div class="setting-item-description" data-i18n="readerPreviewDescription">Additional typography settings can be found by opening a page in Reader mode.</div>
 						</div>
 					</div>
-					<div id="reader-preview">
+					<div id="reader-preview" class="obsidian-reader-active">
 						<p class="reader-preview-title">File over app</p>
 						<p class="reader-preview-meta">Steph Ango · July 1, 2023 · <a class="reader-preview-meta-link" href="https://stephango.com/file-over-app" target="_blank">stephango.com</a></p>
 						<p class="reader-preview-body"><em>File over app</em> is a philosophy: if you want to create <strong>digital artifacts that last</strong>, they must be files you can control, in formats that are easy to retrieve and read. Use tools that give you this <a class="reader-preview-link" href="https://stephango.com/file-over-app" target="_blank">freedom</a>.</p>
@@ -330,6 +330,7 @@
 								</div>
 								<div class="setting-item-control">
 									<input type="text" id="reader-custom-font" />
+								<span id="reader-custom-font-error" class="reader-font-error mod-warning" style="display:none" data-i18n="readerCustomFontError">Font not found</span>
 								</div>
 							</div>
 							<div class="setting-item mod-horizontal">
@@ -345,18 +346,6 @@
 							</div>
 							<div class="setting-item mod-horizontal">
 								<div class="setting-item-info">
-									<label for="reader-color-scheme" data-i18n="readerColorScheme">Color scheme</label>
-									<div class="setting-item-description" data-i18n="readerColorSchemeDescription">Choose the color scheme for reader mode.</div>
-								</div>
-								<div class="setting-item-control">
-									<select id="reader-color-scheme">
-										<option value="default" data-i18n="readerColorSchemeDefault">Default</option>
-										<option value="flexoki" data-i18n="readerColorSchemeFlexoki">Flexoki</option>
-									</select>
-								</div>
-							</div>
-							<div class="setting-item mod-horizontal">
-								<div class="setting-item-info">
 									<label for="reader-theme-mode" data-i18n="readerThemeMode">Theme</label>
 									<div class="setting-item-description" data-i18n="readerThemeModeDescription">Choose the light or dark theme for reader mode.</div>
 								</div>
@@ -367,6 +356,27 @@
 										<option value="dark" data-i18n="readerThemeModeDark">Dark</option>
 									</select>
 								</div>
+							</div>
+							<div class="setting-item setting-item-stacked">
+								<div class="setting-item-info">
+									<div data-i18n="readerColorScheme">Color scheme</div>
+									<div class="setting-item-description" data-i18n="readerColorSchemeDescription">Choose the color scheme for reader mode.</div>
+								</div>
+								<div id="reader-color-scheme-grid-light" class="reader-color-scheme-grid"></div>
+							</div>
+							<div class="setting-item mod-horizontal">
+								<div class="setting-item-info">
+									<label for="reader-dark-same-as-light" data-i18n="readerDarkColorScheme">Dark mode color scheme</label>
+									<div class="setting-item-description" data-i18n="readerDarkColorSchemeDescription">Use a different color scheme in dark mode.</div>
+								</div>
+								<div class="setting-item-control">
+									<div class="checkbox-container">
+										<input type="checkbox" id="reader-dark-same-as-light" />
+									</div>
+								</div>
+							</div>
+							<div id="reader-color-scheme-dark-section">
+								<div id="reader-color-scheme-grid-dark" class="reader-color-scheme-grid"></div>
 							</div>
 						</form>
 					</div>

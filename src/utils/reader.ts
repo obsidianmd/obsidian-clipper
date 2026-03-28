@@ -16,7 +16,8 @@ interface ReaderSettings {
 	fontSize: number;
 	lineHeight: number;
 	maxWidth: number;
-	theme: string;
+	themeLight: string;
+	themeDark: string;
 	themeMode: 'auto' | 'light' | 'dark';
 	fontFamily: 'system' | 'custom';
 	customFont: string;
@@ -88,7 +89,8 @@ export class Reader {
 		fontSize: 16,
 		lineHeight: 1.6,
 		maxWidth: 38,
-		theme: 'default',
+		themeLight: 'default',
+		themeDark: 'same',
 		themeMode: 'auto',
 		fontFamily: 'system',
 		customFont: '',
@@ -204,8 +206,43 @@ export class Reader {
 		flexokiThemeOption.value = 'flexoki';
 		flexokiThemeOption.textContent = getMessage('readerColorSchemeFlexoki');
 
+		const ayuThemeOption = doc.createElement('option');
+		ayuThemeOption.value = 'ayu';
+		ayuThemeOption.textContent = getMessage('readerColorSchemeAyu');
+
+		const catppuccinThemeOption = doc.createElement('option');
+		catppuccinThemeOption.value = 'catppuccin';
+		catppuccinThemeOption.textContent = getMessage('readerColorSchemeCatppuccin');
+
+		const everforestThemeOption = doc.createElement('option');
+		everforestThemeOption.value = 'everforest';
+		everforestThemeOption.textContent = getMessage('readerColorSchemeEverforest');
+
+		const gruvboxThemeOption = doc.createElement('option');
+		gruvboxThemeOption.value = 'gruvbox';
+		gruvboxThemeOption.textContent = getMessage('readerColorSchemeGruvbox');
+
+		const nordThemeOption = doc.createElement('option');
+		nordThemeOption.value = 'nord';
+		nordThemeOption.textContent = getMessage('readerColorSchemeNord');
+
+		const rosePineThemeOption = doc.createElement('option');
+		rosePineThemeOption.value = 'rose-pine';
+		rosePineThemeOption.textContent = getMessage('readerColorSchemeRosePine');
+
+		const solarizedThemeOption = doc.createElement('option');
+		solarizedThemeOption.value = 'solarized';
+		solarizedThemeOption.textContent = getMessage('readerColorSchemeSolarized');
+
 		themeSelect.appendChild(defaultThemeOption);
 		themeSelect.appendChild(flexokiThemeOption);
+		themeSelect.appendChild(ayuThemeOption);
+		themeSelect.appendChild(catppuccinThemeOption);
+		themeSelect.appendChild(everforestThemeOption);
+		themeSelect.appendChild(gruvboxThemeOption);
+		themeSelect.appendChild(nordThemeOption);
+		themeSelect.appendChild(rosePineThemeOption);
+		themeSelect.appendChild(solarizedThemeOption);
 
 		// Theme mode select
 		const themeModeSelect = doc.createElement('select');
@@ -309,9 +346,9 @@ export class Reader {
 		});
 
 		// Add theme select event listener
-		themeSelect.value = this.settings.theme;
+		themeSelect.value = this.getEffectiveTheme();
 		themeSelect.addEventListener('change', () => {
-			this.updateTheme(doc, themeSelect.value as 'default' | 'flexoki');
+			this.updateTheme(doc, themeSelect.value);
 		});
 
 		// Add theme mode select event listener
@@ -352,9 +389,29 @@ export class Reader {
 		this.saveSettings();
 	}
 
-	private static updateTheme(doc: Document, theme: 'default' | 'flexoki'): void {
-		doc.documentElement.setAttribute('data-reader-theme', theme);
-		this.settings.theme = theme;
+	private static getEffectiveTheme(): string {
+		const { themeLight, themeDark, themeMode } = this.settings;
+		const isDark = themeMode === 'dark' || (themeMode === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+		return isDark && themeDark !== 'same' ? themeDark : themeLight;
+	}
+
+	private static applyTheme(doc: Document): void {
+		const theme = this.getEffectiveTheme();
+		if (theme === 'default') {
+			doc.documentElement.removeAttribute('data-reader-theme');
+		} else {
+			doc.documentElement.setAttribute('data-reader-theme', theme);
+		}
+	}
+
+	private static updateTheme(doc: Document, theme: string): void {
+		const isDark = doc.documentElement.classList.contains('theme-dark');
+		if (isDark) {
+			this.settings.themeDark = theme;
+		} else {
+			this.settings.themeLight = theme;
+		}
+		this.applyTheme(doc);
 		this.saveSettings();
 	}
 
@@ -370,6 +427,7 @@ export class Reader {
 		}
 
 		this.settings.themeMode = mode;
+		this.applyTheme(doc);
 		this.saveSettings();
 	}
 
@@ -401,6 +459,7 @@ export class Reader {
 		if (this.settings.themeMode === 'auto') {
 			doc.documentElement.classList.remove('theme-light', 'theme-dark');
 			doc.documentElement.classList.add(e.matches ? 'theme-dark' : 'theme-light');
+			this.applyTheme(doc);
 		}
 	}
 
@@ -1265,9 +1324,8 @@ export class Reader {
 
 			// Add reader classes and attributes
 			doc.documentElement.classList.add('obsidian-reader-active');
-			doc.documentElement.setAttribute('data-reader-theme', this.settings.theme);
 
-			// Apply theme mode
+			// Apply theme mode (sets theme-light/dark), then effective theme
 			this.updateThemeMode(doc, this.settings.themeMode);
 
 			// Initialize settings from local storage
@@ -1284,6 +1342,16 @@ export class Reader {
 			if (clipperIframeContainer) {
 				doc.body.appendChild(clipperIframeContainer);
 			}
+
+			// Toggle dark mode with D key
+			doc.addEventListener('keydown', (e) => {
+				if (!this.isActive) return;
+				if ((e.key !== 'd' && e.key !== 'D') || e.ctrlKey || e.metaKey) return;
+				const tag = (document.activeElement as HTMLElement)?.tagName;
+				if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+				const newMode = doc.documentElement.classList.contains('theme-dark') ? 'light' : 'dark';
+				this.updateThemeMode(doc, newMode);
+			});
 
 			// Set up color scheme media query listener
 			this.colorSchemeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');

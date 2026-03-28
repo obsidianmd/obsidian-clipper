@@ -5,6 +5,9 @@
 	"preview": {
 		"message": "Preview"
 	},
+	"readerCustomFontError": {
+		"message": "Font not found"
+	},
 	"readerPreviewDescription": {
 		"message": "Additional typography settings can be found by opening a page in Reader mode."
 	},
@@ -667,19 +670,49 @@
 		"message": "Blend images"
 	},
 	"readerBlendImagesDescription": {
-		"message": "Blend images with the page background in reader mode."
+		"message": "Blend images with the page background."
 	},
 	"readerColorScheme": {
 		"message": "Color scheme"
+	},
+	"readerColorSchemeAyu": {
+		"message": "Ayu"
+	},
+	"readerColorSchemeCatppuccin": {
+		"message": "Catppuccin"
 	},
 	"readerColorSchemeDefault": {
 		"message": "Default"
 	},
 	"readerColorSchemeDescription": {
-		"message": "Choose the color scheme for reader mode."
+		"message": "Choose the color scheme."
+	},
+	"readerDarkColorScheme": {
+		"message": "Dark mode color scheme"
+	},
+	"readerDarkColorSchemeDescription": {
+		"message": "Use a different color scheme in dark mode."
+	},
+	"readerColorSchemeDracula": {
+		"message": "Dracula"
+	},
+	"readerColorSchemeEverforest": {
+		"message": "Everforest"
 	},
 	"readerColorSchemeFlexoki": {
 		"message": "Flexoki"
+	},
+	"readerColorSchemeGruvbox": {
+		"message": "Gruvbox"
+	},
+	"readerColorSchemeNord": {
+		"message": "Nord"
+	},
+	"readerColorSchemeRosePine": {
+		"message": "Rosé Pine"
+	},
+	"readerColorSchemeSolarized": {
+		"message": "Solarized"
 	},
 	"readerCustomFont": {
 		"message": "Custom font"
@@ -694,7 +727,7 @@
 		"message": "Custom"
 	},
 	"readerFontDescription": {
-		"message": "Choose the font used in reader mode."
+		"message": "Choose the font."
 	},
 	"readerFontSystem": {
 		"message": "System"
@@ -709,7 +742,7 @@
 		"message": "Dark"
 	},
 	"readerThemeModeDescription": {
-		"message": "Choose the light or dark theme for reader mode."
+		"message": "Choose the light or dark theme."
 	},
 	"readerThemeModeLight": {
 		"message": "Light"

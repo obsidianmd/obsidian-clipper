@@ -2,7 +2,6 @@
 
 * {
 	box-sizing: border-box;
-	font-family: var(--font-default);
 }
 
 html {
@@ -34,6 +33,7 @@ body {
 @import 'styles/properties';
 @import 'styles/rtl';
 @import 'styles/safari';
+@import 'styles/reader-themes';
 @import 'styles/settings';
 @import 'styles/side-panel';
 @import 'styles/templates';

@@ -26,7 +26,8 @@ export let generalSettings: Settings = {
 		fontSize: 1.5,
 		lineHeight: 1.6,
 		maxWidth: 38,
-		theme: 'default',
+		themeLight: 'default',
+		themeDark: 'same',
 		themeMode: 'auto',
 		fontFamily: 'system',
 		customFont: '',
@@ -70,7 +71,8 @@ interface StorageData {
 		fontSize?: number;
 		lineHeight?: number;
 		maxWidth?: number;
-		theme?: 'default' | 'flexoki';
+		themeLight?: string;
+		themeDark?: string;
 		themeMode?: 'auto' | 'light' | 'dark';
 		fontFamily?: 'system' | 'custom';
 		customFont?: string;
@@ -124,7 +126,8 @@ export async function loadSettings(): Promise<Settings> {
 			fontSize: 1.5,
 			lineHeight: 1.6,
 			maxWidth: 38,
-			theme: 'default',
+			themeLight: 'default',
+			themeDark: 'same',
 			themeMode: 'auto',
 			fontFamily: 'system',
 			customFont: '',
@@ -179,7 +182,8 @@ export async function loadSettings(): Promise<Settings> {
 			fontSize: data.reader_settings?.fontSize ?? defaultSettings.readerSettings.fontSize,
 			lineHeight: data.reader_settings?.lineHeight ?? defaultSettings.readerSettings.lineHeight,
 			maxWidth: data.reader_settings?.maxWidth ?? defaultSettings.readerSettings.maxWidth,
-			theme: data.reader_settings?.theme as 'default' | 'flexoki' ?? defaultSettings.readerSettings.theme,
+			themeLight: data.reader_settings?.themeLight ?? defaultSettings.readerSettings.themeLight,
+			themeDark: data.reader_settings?.themeDark ?? defaultSettings.readerSettings.themeDark,
 			themeMode: data.reader_settings?.themeMode as 'auto' | 'light' | 'dark' ?? defaultSettings.readerSettings.themeMode,
 			fontFamily: data.reader_settings?.fontFamily as 'system' | 'custom' ?? defaultSettings.readerSettings.fontFamily,
 			customFont: data.reader_settings?.customFont ?? defaultSettings.readerSettings.customFont,
@@ -229,7 +233,8 @@ export async function saveSettings(settings?: Partial<Settings>): Promise<void> 
 			fontSize: generalSettings.readerSettings.fontSize,
 			lineHeight: generalSettings.readerSettings.lineHeight,
 			maxWidth: generalSettings.readerSettings.maxWidth,
-			theme: generalSettings.readerSettings.theme,
+			themeLight: generalSettings.readerSettings.themeLight,
+			themeDark: generalSettings.readerSettings.themeDark,
 			themeMode: generalSettings.readerSettings.themeMode,
 			fontFamily: generalSettings.readerSettings.fontFamily,
 			customFont: generalSettings.readerSettings.customFont,
