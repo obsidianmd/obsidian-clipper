@@ -299,18 +299,15 @@
 						<div class="settings-section-header">
 							<h2 data-i18n="reader">Reader</h2>
 						</div>
-						<div class="usage-chart-header">
-						<div class="usage-chart-title">
-							<div data-i18n="preview">Preview</div>
-							<div class="setting-item-description" data-i18n="readerPreviewDescription">Additional typography settings can be found by opening a page in Reader mode.</div>
+						<div data-i18n="preview">Preview</div>
+						<div class="setting-item-description" data-i18n="readerPreviewDescription">Additional typography settings can be found by opening a page in Reader mode.</div>
+						<div id="reader-preview" class="obsidian-reader-active">
+							<p class="reader-preview-title">File over app</p>
+							<p class="reader-preview-meta">Steph Ango · July 1, 2023 · <a class="reader-preview-meta-link" href="https://stephango.com/file-over-app" target="_blank">stephango.com</a></p>
+							<p class="reader-preview-body"><em>File over app</em> is a philosophy: if you want to create <strong>digital artifacts that last</strong>, they must be files you can control, in formats that are easy to retrieve and read. Use tools that give you this <a class="reader-preview-link" href="https://stephango.com/file-over-app" target="_blank">freedom</a>.</p>
 						</div>
-					</div>
-					<div id="reader-preview" class="obsidian-reader-active">
-						<p class="reader-preview-title">File over app</p>
-						<p class="reader-preview-meta">Steph Ango · July 1, 2023 · <a class="reader-preview-meta-link" href="https://stephango.com/file-over-app" target="_blank">stephango.com</a></p>
-						<p class="reader-preview-body"><em>File over app</em> is a philosophy: if you want to create <strong>digital artifacts that last</strong>, they must be files you can control, in formats that are easy to retrieve and read. Use tools that give you this <a class="reader-preview-link" href="https://stephango.com/file-over-app" target="_blank">freedom</a>.</p>
-					</div>
-					<form id="reader-settings-form">
+						<form id="reader-settings-form">
+							<div><h3 data-i18n="readerTypography">Typography</h3>
 							<div class="setting-item mod-horizontal">
 								<div class="setting-item-info">
 									<label for="reader-font-family" data-i18n="readerFont">Font</label>
@@ -330,9 +327,11 @@
 								</div>
 								<div class="setting-item-control">
 									<input type="text" id="reader-custom-font" />
-								<span id="reader-custom-font-error" class="reader-font-error mod-warning" style="display:none" data-i18n="readerCustomFontError">Font not found</span>
+									<span id="reader-custom-font-error" class="reader-font-error mod-warning" style="display:none" data-i18n="readerCustomFontError">Font not found</span>
 								</div>
 							</div>
+							</div>
+							<div><h3 data-i18n="readerImages">Images</h3>
 							<div class="setting-item mod-horizontal">
 								<div class="setting-item-info">
 									<label for="reader-blend-images" data-i18n="readerBlendImages">Blend images</label>
@@ -344,6 +343,8 @@
 									</div>
 								</div>
 							</div>
+							</div>
+							<div><h3 data-i18n="readerThemeSection">Theme</h3>
 							<div class="setting-item mod-horizontal">
 								<div class="setting-item-info">
 									<label for="reader-theme-mode" data-i18n="readerThemeMode">Theme</label>
@@ -378,6 +379,7 @@
 							<div id="reader-color-scheme-dark-section">
 								<div id="reader-color-scheme-grid-dark" class="reader-color-scheme-grid"></div>
 							</div>
+						</div>
 						</form>
 					</div>
 

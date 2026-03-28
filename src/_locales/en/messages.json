@@ -735,6 +735,15 @@
 	"readerThemeMode": {
 		"message": "Theme"
 	},
+	"readerThemeSection": {
+		"message": "Theme"
+	},
+	"readerTypography": {
+		"message": "Typography"
+	},
+	"readerImages": {
+		"message": "Images"
+	},
 	"readerThemeModeAuto": {
 		"message": "Automatic"
 	},
