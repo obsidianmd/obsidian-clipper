@@ -290,6 +290,19 @@ export async function initializeReaderSettings() {
 		});
 	}
 
+	const customCssInput = document.getElementById('reader-custom-css') as HTMLTextAreaElement;
+	if (customCssInput) {
+		customCssInput.value = generalSettings.readerSettings.customCss ?? '';
+		customCssInput.addEventListener('input', debounce(() => {
+			saveSettings({ ...generalSettings, readerSettings: { ...generalSettings.readerSettings, customCss: customCssInput.value } });
+		}, 500));
+	}
+
+	window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+		rebuildGrids(lightGrid, darkGrid);
+		updatePreview();
+	});
+
 	rebuildGrids(lightGrid, darkGrid);
 	updatePreview();
 	updateCustomFontError(generalSettings.readerSettings.fontFamily, generalSettings.readerSettings.customFont);

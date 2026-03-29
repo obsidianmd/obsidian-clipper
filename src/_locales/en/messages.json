@@ -8,9 +8,6 @@
 	"readerCustomFontError": {
 		"message": "Font not found"
 	},
-	"readerPreviewDescription": {
-		"message": "Additional typography settings can be found by opening a page in Reader mode."
-	},
 	"addModel": {
 		"message": "+ Add model"
 	},
@@ -713,6 +710,12 @@
 	},
 	"readerColorSchemeSolarized": {
 		"message": "Solarized"
+	},
+	"readerCustomCss": {
+		"message": "Custom CSS"
+	},
+	"readerCustomCssDescription": {
+		"message": "CSS applied automatically in reading view."
 	},
 	"readerCustomFont": {
 		"message": "Custom font"

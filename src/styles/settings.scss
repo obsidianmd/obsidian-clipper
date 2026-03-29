@@ -149,6 +149,16 @@
 	background-color: var(--background-primary-alt);
 	border-radius: var(--radius-m);
 	padding: 0.75rem 1.5rem;
+
+	> .setting-item:not(.mod-horizontal):not(.setting-item-heading) {
+		border-bottom: 1px solid var(--background-modifier-border);
+		padding-bottom: 1.5rem;
+		margin-bottom: 0;
+		&:last-child {
+			border-bottom: none;
+			padding-bottom: 0;
+		}
+	}
 }
 
 .setting-item {
@@ -156,10 +166,6 @@
 
 	&.setting-item-heading {
 		margin: 2rem 0 0.5rem;
-	}
-
-	&:last-child {
-		border-bottom: none;
 	}
 
 	&.mod-horizontal {
@@ -171,6 +177,10 @@
 		border-bottom: 1px solid var(--background-modifier-border);
 		padding: 0.75rem 0 0.75rem;
 		margin: 0;
+		&:last-child,
+		&:has(+ #reader-theme-dark-section[style*="display: none"]) {
+			border-bottom: none;
+		}
 		+ .setting-item {
 			margin-top: 0;
 		}
@@ -199,9 +209,6 @@
 			color: var(--text-muted);
 			min-width: 2.5rem;
 			text-align: right;
-		}
-		&:last-child {
-			border-bottom: none;
 		}
 	}
 }

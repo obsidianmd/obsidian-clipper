@@ -62,6 +62,7 @@ export interface ReaderSettings {
 	fontFamily: 'system' | 'custom';
 	customFont: string;
 	blendImages: boolean;
+	customCss: string;
 }
 
 export interface Settings {

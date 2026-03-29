@@ -77,6 +77,7 @@ interface StorageData {
 		fontFamily?: 'system' | 'custom';
 		customFont?: string;
 		blendImages?: boolean;
+		customCss?: string;
 	};
 	interpreter_settings?: {
 		interpreterModel?: string;
@@ -131,7 +132,8 @@ export async function loadSettings(): Promise<Settings> {
 			appearance: 'auto',
 			fontFamily: 'system',
 			customFont: '',
-			blendImages: true
+			blendImages: true,
+			customCss: ''
 		},
 		stats: {
 			addToObsidian: 0,
@@ -238,7 +240,8 @@ export async function saveSettings(settings?: Partial<Settings>): Promise<void> 
 			appearance: generalSettings.readerSettings.appearance,
 			fontFamily: generalSettings.readerSettings.fontFamily,
 			customFont: generalSettings.readerSettings.customFont,
-			blendImages: generalSettings.readerSettings.blendImages
+			blendImages: generalSettings.readerSettings.blendImages,
+			customCss: generalSettings.readerSettings.customCss
 		},
 		stats: generalSettings.stats
 	});

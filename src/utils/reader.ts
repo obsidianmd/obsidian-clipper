@@ -22,6 +22,7 @@ interface ReaderSettings {
 	fontFamily: 'system' | 'custom';
 	customFont: string;
 	blendImages: boolean;
+	customCss: string;
 }
 
 export class Reader {
@@ -94,7 +95,8 @@ export class Reader {
 		appearance: 'auto',
 		fontFamily: 'system',
 		customFont: '',
-		blendImages: true
+		blendImages: true,
+		customCss: ''
 	};
 
 	private static async loadSettings(): Promise<void> {
@@ -1334,6 +1336,13 @@ export class Reader {
 			doc.documentElement.style.setProperty('--obsidian-reader-line-width', `${this.settings.maxWidth}em`);
 			this.applyFontFamily(doc, this.settings.fontFamily, this.settings.customFont);
 			this.applyBlendImages(doc, this.settings.blendImages);
+
+			if (this.settings.customCss) {
+				const styleEl = doc.createElement('style');
+				styleEl.id = 'obsidian-reader-custom-css';
+				styleEl.textContent = this.settings.customCss;
+				doc.head.appendChild(styleEl);
+			}
 
 			// Add settings bar
 			this.injectSettingsBar(doc);
