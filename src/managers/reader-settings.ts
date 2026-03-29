@@ -16,9 +16,9 @@ const THEME_DISPLAY_NAMES: Record<string, string> = {
 	solarized: 'Solarized',
 };
 
-function getIsDark(themeMode: string): boolean {
-	if (themeMode === 'dark') return true;
-	if (themeMode === 'auto') return window.matchMedia('(prefers-color-scheme: dark)').matches;
+function getIsDark(appearance: string): boolean {
+	if (appearance === 'dark') return true;
+	if (appearance === 'auto') return window.matchMedia('(prefers-color-scheme: dark)').matches;
 	return false;
 }
 
@@ -32,7 +32,7 @@ function applyThemeClasses(el: HTMLElement, themeId: string, isDark: boolean): v
 	el.classList.toggle('theme-light', !isDark);
 }
 
-function buildColorSchemeGrid(
+function buildThemeGrid(
 	container: HTMLElement,
 	selectedTheme: string,
 	isDark: boolean,
@@ -43,7 +43,7 @@ function buildColorSchemeGrid(
 
 	for (const themeId of THEME_ORDER) {
 		const option = document.createElement('div');
-		option.className = 'reader-scheme-option obsidian-reader-active' + (themeId === selectedTheme ? ' is-active' : '');
+		option.className = 'reader-theme-option obsidian-reader-active' + (themeId === selectedTheme ? ' is-active' : '');
 		option.dataset.scheme = themeId;
 		option.setAttribute('role', 'button');
 		option.setAttribute('tabindex', '0');
@@ -51,24 +51,24 @@ function buildColorSchemeGrid(
 		applyThemeClasses(option, themeId, isDark);
 
 		const swatch = document.createElement('div');
-		swatch.className = 'reader-scheme-swatch';
+		swatch.className = 'reader-theme-swatch';
 
 		const inner = document.createElement('div');
-		inner.className = 'reader-scheme-inner';
+		inner.className = 'reader-theme-inner';
 		if (customFontValue) {
 			option.style.setProperty('--obsidian-reader-font-family', customFontValue);
 		}
 
 		const title = document.createElement('div');
-		title.className = 'reader-scheme-inner-title';
+		title.className = 'reader-theme-inner-title';
 		title.textContent = THEME_DISPLAY_NAMES[themeId] ?? themeId;
 
 		const meta = document.createElement('div');
-		meta.className = 'reader-scheme-inner-meta';
+		meta.className = 'reader-theme-inner-meta';
 		meta.textContent = new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
 
 		const body = document.createElement('div');
-		body.className = 'reader-scheme-inner-body';
+		body.className = 'reader-theme-inner-body';
 		body.textContent = 'File over app is a philosophy: if you want to create digital artifacts that last, they must be files you can control, in formats that are easy to retrieve and read.';
 
 		inner.appendChild(title);
@@ -80,7 +80,7 @@ function buildColorSchemeGrid(
 		container.appendChild(option);
 
 		option.addEventListener('click', () => {
-			container.querySelectorAll('.reader-scheme-option').forEach(el => el.classList.remove('is-active'));
+			container.querySelectorAll('.reader-theme-option').forEach(el => el.classList.remove('is-active'));
 			option.classList.add('is-active');
 			onSelect(themeId);
 		});
@@ -123,9 +123,9 @@ function updatePreview() {
 	const preview = document.getElementById('reader-preview');
 	if (!preview) return;
 
-	const { themeLight, themeDark, themeMode, fontFamily, customFont, fontSize, lineHeight } = generalSettings.readerSettings;
-	const isDark = getIsDark(themeMode);
-	const effectiveTheme = isDark && themeDark !== 'same' ? themeDark : themeLight;
+	const { lightTheme, darkTheme, appearance, fontFamily, customFont, fontSize, lineHeight } = generalSettings.readerSettings;
+	const isDark = getIsDark(appearance);
+	const effectiveTheme = isDark && darkTheme !== 'same' ? darkTheme : lightTheme;
 
 	applyThemeClasses(preview, effectiveTheme, isDark);
 
@@ -141,21 +141,21 @@ function updatePreview() {
 }
 
 function rebuildGrids(lightGrid: HTMLElement | null, darkGrid: HTMLElement | null) {
-	const { themeLight, themeDark, themeMode } = generalSettings.readerSettings;
-	const isDarkMode = getIsDark(themeMode);
+	const { lightTheme, darkTheme, appearance } = generalSettings.readerSettings;
+	const isDarkMode = getIsDark(appearance);
 	const customFontValue = getCustomFontValue();
 
 	if (lightGrid) {
-		buildColorSchemeGrid(lightGrid, themeLight, isDarkMode, customFontValue, (themeId) => {
-			saveSettings({ ...generalSettings, readerSettings: { ...generalSettings.readerSettings, themeLight: themeId } });
+		buildThemeGrid(lightGrid, lightTheme, isDarkMode, customFontValue, (themeId) => {
+			saveSettings({ ...generalSettings, readerSettings: { ...generalSettings.readerSettings, lightTheme: themeId } });
 			updatePreview();
 		});
 	}
 
 	if (darkGrid) {
-		const effectiveDark = themeDark === 'same' ? themeLight : themeDark;
-		buildColorSchemeGrid(darkGrid, effectiveDark, true, customFontValue, (themeId) => {
-			saveSettings({ ...generalSettings, readerSettings: { ...generalSettings.readerSettings, themeDark: themeId } });
+		const effectiveDark = darkTheme === 'same' ? lightTheme : darkTheme;
+		buildThemeGrid(darkGrid, effectiveDark, true, customFontValue, (themeId) => {
+			saveSettings({ ...generalSettings, readerSettings: { ...generalSettings.readerSettings, darkTheme: themeId } });
 			updatePreview();
 		});
 	}
@@ -170,10 +170,10 @@ export async function initializeReaderSettings() {
 	const fontFamilySelect = document.getElementById('reader-font-family') as HTMLSelectElement;
 	const customFontSetting = document.getElementById('reader-custom-font-setting') as HTMLElement;
 	const customFontInput = document.getElementById('reader-custom-font') as HTMLInputElement;
-	const lightGrid = document.getElementById('reader-color-scheme-grid-light') as HTMLElement;
-	const darkGrid = document.getElementById('reader-color-scheme-grid-dark') as HTMLElement;
-	const darkSection = document.getElementById('reader-color-scheme-dark-section') as HTMLElement;
-	const darkSchemeToggle = document.getElementById('reader-dark-same-as-light') as HTMLInputElement;
+	const lightGrid = document.getElementById('reader-theme-grid-light') as HTMLElement;
+	const darkGrid = document.getElementById('reader-theme-grid-dark') as HTMLElement;
+	const darkSection = document.getElementById('reader-theme-dark-section') as HTMLElement;
+	const darkSchemeToggle = document.getElementById('reader-separate-dark-theme') as HTMLInputElement;
 
 	function updateCustomFontVisibility(fontFamily: string) {
 		customFontSetting.style.display = fontFamily === 'custom' ? '' : 'none';
@@ -263,18 +263,18 @@ export async function initializeReaderSettings() {
 		saveSettings({ ...generalSettings, readerSettings: { ...generalSettings.readerSettings, blendImages: checked } });
 	});
 
-	const themeModeSelect = document.getElementById('reader-theme-mode') as HTMLSelectElement;
+	const themeModeSelect = document.getElementById('reader-appearance') as HTMLSelectElement;
 	if (themeModeSelect) {
-		themeModeSelect.value = generalSettings.readerSettings.themeMode;
+		themeModeSelect.value = generalSettings.readerSettings.appearance;
 		themeModeSelect.addEventListener('change', () => {
-			saveSettings({ ...generalSettings, readerSettings: { ...generalSettings.readerSettings, themeMode: themeModeSelect.value as 'auto' | 'light' | 'dark' } });
+			saveSettings({ ...generalSettings, readerSettings: { ...generalSettings.readerSettings, appearance: themeModeSelect.value as 'auto' | 'light' | 'dark' } });
 			updatePreview();
 			rebuildGrids(lightGrid, darkGrid);
 		});
 	}
 
 	if (darkSchemeToggle) {
-		const hasDarkScheme = generalSettings.readerSettings.themeDark !== 'same';
+		const hasDarkScheme = generalSettings.readerSettings.darkTheme !== 'same';
 		darkSchemeToggle.checked = hasDarkScheme;
 		darkSchemeToggle.closest('.checkbox-container')?.classList.toggle('is-enabled', hasDarkScheme);
 		if (darkSection) darkSection.style.display = hasDarkScheme ? '' : 'none';
@@ -283,8 +283,8 @@ export async function initializeReaderSettings() {
 			const checked = darkSchemeToggle.checked;
 			darkSchemeToggle.closest('.checkbox-container')?.classList.toggle('is-enabled', checked);
 			if (darkSection) darkSection.style.display = checked ? '' : 'none';
-			const newDark = checked ? generalSettings.readerSettings.themeLight : 'same';
-			saveSettings({ ...generalSettings, readerSettings: { ...generalSettings.readerSettings, themeDark: newDark } });
+			const newDark = checked ? generalSettings.readerSettings.lightTheme : 'same';
+			saveSettings({ ...generalSettings, readerSettings: { ...generalSettings.readerSettings, darkTheme: newDark } });
 			updatePreview();
 			if (checked && darkGrid) rebuildGrids(null, darkGrid);
 		});

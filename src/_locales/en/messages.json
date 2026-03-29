@@ -672,8 +672,8 @@
 	"readerBlendImagesDescription": {
 		"message": "Blend images with the page background."
 	},
-	"readerColorScheme": {
-		"message": "Color scheme"
+	"readerTheme": {
+		"message": "Theme"
 	},
 	"readerColorSchemeAyu": {
 		"message": "Ayu"
@@ -684,14 +684,14 @@
 	"readerColorSchemeDefault": {
 		"message": "Default"
 	},
-	"readerColorSchemeDescription": {
-		"message": "Choose the color scheme."
+	"readerThemeDescription": {
+		"message": "Choose the theme."
 	},
-	"readerDarkColorScheme": {
-		"message": "Dark mode color scheme"
+	"readerDarkTheme": {
+		"message": "Dark mode theme"
 	},
-	"readerDarkColorSchemeDescription": {
-		"message": "Use a different color scheme in dark mode."
+	"readerDarkThemeDescription": {
+		"message": "Use a different theme in dark mode."
 	},
 	"readerColorSchemeDracula": {
 		"message": "Dracula"
@@ -750,8 +750,8 @@
 	"readerFontSystem": {
 		"message": "System"
 	},
-	"readerThemeMode": {
-		"message": "Theme"
+	"readerAppearance": {
+		"message": "Appearance"
 	},
 	"readerThemeSection": {
 		"message": "Theme"
@@ -762,16 +762,16 @@
 	"readerImages": {
 		"message": "Images"
 	},
-	"readerThemeModeAuto": {
+	"readerAppearanceAuto": {
 		"message": "Automatic"
 	},
-	"readerThemeModeDark": {
+	"readerAppearanceDark": {
 		"message": "Dark"
 	},
-	"readerThemeModeDescription": {
-		"message": "Choose the light or dark theme."
+	"readerAppearanceDescription": {
+		"message": "Choose the light or dark appearance."
 	},
-	"readerThemeModeLight": {
+	"readerAppearanceLight": {
 		"message": "Light"
 	},
 	"recommended": {

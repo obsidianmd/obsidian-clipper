@@ -16,9 +16,9 @@ interface ReaderSettings {
 	fontSize: number;
 	lineHeight: number;
 	maxWidth: number;
-	themeLight: string;
-	themeDark: string;
-	themeMode: 'auto' | 'light' | 'dark';
+	lightTheme: string;
+	darkTheme: string;
+	appearance: 'auto' | 'light' | 'dark';
 	fontFamily: 'system' | 'custom';
 	customFont: string;
 	blendImages: boolean;
@@ -89,9 +89,9 @@ export class Reader {
 		fontSize: 16,
 		lineHeight: 1.6,
 		maxWidth: 38,
-		themeLight: 'default',
-		themeDark: 'same',
-		themeMode: 'auto',
+		lightTheme: 'default',
+		darkTheme: 'same',
+		appearance: 'auto',
 		fontFamily: 'system',
 		customFont: '',
 		blendImages: true
@@ -251,15 +251,15 @@ export class Reader {
 
 		const autoModeOption = doc.createElement('option');
 		autoModeOption.value = 'auto';
-		autoModeOption.textContent = getMessage('readerThemeModeAuto');
+		autoModeOption.textContent = getMessage('readerAppearanceAuto');
 
 		const lightModeOption = doc.createElement('option');
 		lightModeOption.value = 'light';
-		lightModeOption.textContent = getMessage('readerThemeModeLight');
+		lightModeOption.textContent = getMessage('readerAppearanceLight');
 
 		const darkModeOption = doc.createElement('option');
 		darkModeOption.value = 'dark';
-		darkModeOption.textContent = getMessage('readerThemeModeDark');
+		darkModeOption.textContent = getMessage('readerAppearanceDark');
 
 		themeModeSelect.appendChild(autoModeOption);
 		themeModeSelect.appendChild(lightModeOption);
@@ -352,7 +352,7 @@ export class Reader {
 		});
 
 		// Add theme mode select event listener
-		themeModeSelect.value = this.settings.themeMode;
+		themeModeSelect.value = this.settings.appearance;
 		themeModeSelect.addEventListener('change', () => {
 			this.updateThemeMode(doc, themeModeSelect.value as 'auto' | 'light' | 'dark');
 		});
@@ -390,9 +390,9 @@ export class Reader {
 	}
 
 	private static getEffectiveTheme(): string {
-		const { themeLight, themeDark, themeMode } = this.settings;
-		const isDark = themeMode === 'dark' || (themeMode === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-		return isDark && themeDark !== 'same' ? themeDark : themeLight;
+		const { lightTheme, darkTheme, appearance } = this.settings;
+		const isDark = appearance === 'dark' || (appearance === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+		return isDark && darkTheme !== 'same' ? darkTheme : lightTheme;
 	}
 
 	private static applyTheme(doc: Document): void {
@@ -407,9 +407,9 @@ export class Reader {
 	private static updateTheme(doc: Document, theme: string): void {
 		const isDark = doc.documentElement.classList.contains('theme-dark');
 		if (isDark) {
-			this.settings.themeDark = theme;
+			this.settings.darkTheme = theme;
 		} else {
-			this.settings.themeLight = theme;
+			this.settings.lightTheme = theme;
 		}
 		this.applyTheme(doc);
 		this.saveSettings();
@@ -426,7 +426,7 @@ export class Reader {
 			html.classList.add(`theme-${mode}`);
 		}
 
-		this.settings.themeMode = mode;
+		this.settings.appearance = mode;
 		this.applyTheme(doc);
 		this.saveSettings();
 	}
@@ -456,7 +456,7 @@ export class Reader {
 	}
 
 	private static handleColorSchemeChange(e: MediaQueryListEvent, doc: Document): void {
-		if (this.settings.themeMode === 'auto') {
+		if (this.settings.appearance === 'auto') {
 			doc.documentElement.classList.remove('theme-light', 'theme-dark');
 			doc.documentElement.classList.add(e.matches ? 'theme-dark' : 'theme-light');
 			this.applyTheme(doc);
@@ -1326,7 +1326,7 @@ export class Reader {
 			doc.documentElement.classList.add('obsidian-reader-active');
 
 			// Apply theme mode (sets theme-light/dark), then effective theme
-			this.updateThemeMode(doc, this.settings.themeMode);
+			this.updateThemeMode(doc, this.settings.appearance);
 
 			// Initialize settings from local storage
 			doc.documentElement.style.setProperty('--obsidian-reader-font-size', `${this.settings.fontSize}px`);

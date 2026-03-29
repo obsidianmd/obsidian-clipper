@@ -26,9 +26,9 @@ export let generalSettings: Settings = {
 		fontSize: 16,
 		lineHeight: 1.6,
 		maxWidth: 38,
-		themeLight: 'default',
-		themeDark: 'same',
-		themeMode: 'auto',
+		lightTheme: 'default',
+		darkTheme: 'same',
+		appearance: 'auto',
 		fontFamily: 'system',
 		customFont: '',
 		blendImages: true
@@ -71,9 +71,9 @@ interface StorageData {
 		fontSize?: number;
 		lineHeight?: number;
 		maxWidth?: number;
-		themeLight?: string;
-		themeDark?: string;
-		themeMode?: 'auto' | 'light' | 'dark';
+		lightTheme?: string;
+		darkTheme?: string;
+		appearance?: 'auto' | 'light' | 'dark';
 		fontFamily?: 'system' | 'custom';
 		customFont?: string;
 		blendImages?: boolean;
@@ -126,9 +126,9 @@ export async function loadSettings(): Promise<Settings> {
 			fontSize: 16,
 			lineHeight: 1.6,
 			maxWidth: 38,
-			themeLight: 'default',
-			themeDark: 'same',
-			themeMode: 'auto',
+			lightTheme: 'default',
+			darkTheme: 'same',
+			appearance: 'auto',
 			fontFamily: 'system',
 			customFont: '',
 			blendImages: true
@@ -182,9 +182,9 @@ export async function loadSettings(): Promise<Settings> {
 			fontSize: data.reader_settings?.fontSize ?? defaultSettings.readerSettings.fontSize,
 			lineHeight: data.reader_settings?.lineHeight ?? defaultSettings.readerSettings.lineHeight,
 			maxWidth: data.reader_settings?.maxWidth ?? defaultSettings.readerSettings.maxWidth,
-			themeLight: data.reader_settings?.themeLight ?? defaultSettings.readerSettings.themeLight,
-			themeDark: data.reader_settings?.themeDark ?? defaultSettings.readerSettings.themeDark,
-			themeMode: data.reader_settings?.themeMode as 'auto' | 'light' | 'dark' ?? defaultSettings.readerSettings.themeMode,
+			lightTheme: data.reader_settings?.lightTheme ?? defaultSettings.readerSettings.lightTheme,
+			darkTheme: data.reader_settings?.darkTheme ?? defaultSettings.readerSettings.darkTheme,
+			appearance: data.reader_settings?.appearance as 'auto' | 'light' | 'dark' ?? defaultSettings.readerSettings.appearance,
 			fontFamily: data.reader_settings?.fontFamily as 'system' | 'custom' ?? defaultSettings.readerSettings.fontFamily,
 			customFont: data.reader_settings?.customFont ?? defaultSettings.readerSettings.customFont,
 			blendImages: data.reader_settings?.blendImages ?? defaultSettings.readerSettings.blendImages
@@ -233,9 +233,9 @@ export async function saveSettings(settings?: Partial<Settings>): Promise<void> 
 			fontSize: generalSettings.readerSettings.fontSize,
 			lineHeight: generalSettings.readerSettings.lineHeight,
 			maxWidth: generalSettings.readerSettings.maxWidth,
-			themeLight: generalSettings.readerSettings.themeLight,
-			themeDark: generalSettings.readerSettings.themeDark,
-			themeMode: generalSettings.readerSettings.themeMode,
+			lightTheme: generalSettings.readerSettings.lightTheme,
+			darkTheme: generalSettings.readerSettings.darkTheme,
+			appearance: generalSettings.readerSettings.appearance,
 			fontFamily: generalSettings.readerSettings.fontFamily,
 			customFont: generalSettings.readerSettings.customFont,
 			blendImages: generalSettings.readerSettings.blendImages

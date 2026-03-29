@@ -56,9 +56,9 @@ export interface ReaderSettings {
 	fontSize: number;
 	lineHeight: number;
 	maxWidth: number;
-	themeLight: string;
-	themeDark: string;
-	themeMode: 'auto' | 'light' | 'dark';
+	lightTheme: string;
+	darkTheme: string;
+	appearance: 'auto' | 'light' | 'dark';
 	fontFamily: 'system' | 'custom';
 	customFont: string;
 	blendImages: boolean;
