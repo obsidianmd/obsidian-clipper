@@ -723,6 +723,24 @@
 	"readerFont": {
 		"message": "Font"
 	},
+	"readerFontSize": {
+		"message": "Font size"
+	},
+	"readerFontSizeDescription": {
+		"message": "Font size in pixels (12–24)."
+	},
+	"readerLineHeight": {
+		"message": "Line height"
+	},
+	"readerLineHeightDescription": {
+		"message": "Line height multiplier (1.2–2.0)."
+	},
+	"readerLineWidth": {
+		"message": "Line width"
+	},
+	"readerLineWidthDescription": {
+		"message": "Maximum line width in em units (30–60)."
+	},
 	"readerFontCustom": {
 		"message": "Custom"
 	},

@@ -190,6 +190,16 @@
 		button {
 			min-width: 4.5rem;
 		}
+		input[type="range"] {
+			flex: 1;
+			min-width: 0;
+		}
+		.slider-value {
+			font-size: var(--font-ui-smaller);
+			color: var(--text-muted);
+			min-width: 2.5rem;
+			text-align: right;
+		}
 		&:last-child {
 			border-bottom: none;
 		}
@@ -456,6 +466,7 @@
 	background: var(--obsidian-reader-background-primary, #fff);
 	color: var(--obsidian-reader-text-primary, #222);
 	font-family: var(--obsidian-reader-font-family, system-ui, -apple-system, sans-serif);
+	font-size: var(--obsidian-reader-font-size, 16px);
 	transition: background 0.2s, color 0.2s;
 
 	* {
@@ -490,7 +501,7 @@
 
 	.reader-preview-body {
 		font-size: 0.95em;
-		line-height: 1.65;
+		line-height: var(--obsidian-reader-line-height, 1.65);
 		margin: 0;
 		color: var(--obsidian-reader-text-primary, #222);
 	}

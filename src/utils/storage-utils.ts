@@ -23,7 +23,7 @@ export let generalSettings: Settings = {
 	defaultPromptContext: '',
 	propertyTypes: [],
 	readerSettings: {
-		fontSize: 1.5,
+		fontSize: 16,
 		lineHeight: 1.6,
 		maxWidth: 38,
 		themeLight: 'default',
@@ -123,7 +123,7 @@ export async function loadSettings(): Promise<Settings> {
 		propertyTypes: [],
 		saveBehavior: 'addToObsidian',
 		readerSettings: {
-			fontSize: 1.5,
+			fontSize: 16,
 			lineHeight: 1.6,
 			maxWidth: 38,
 			themeLight: 'default',

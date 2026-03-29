@@ -123,7 +123,7 @@ function updatePreview() {
 	const preview = document.getElementById('reader-preview');
 	if (!preview) return;
 
-	const { themeLight, themeDark, themeMode, fontFamily, customFont } = generalSettings.readerSettings;
+	const { themeLight, themeDark, themeMode, fontFamily, customFont, fontSize, lineHeight } = generalSettings.readerSettings;
 	const isDark = getIsDark(themeMode);
 	const effectiveTheme = isDark && themeDark !== 'same' ? themeDark : themeLight;
 
@@ -135,6 +135,9 @@ function updatePreview() {
 	} else {
 		preview.style.removeProperty('--obsidian-reader-font-family');
 	}
+
+	preview.style.setProperty('--obsidian-reader-font-size', `${fontSize}px`);
+	preview.style.setProperty('--obsidian-reader-line-height', String(lineHeight));
 }
 
 function rebuildGrids(lightGrid: HTMLElement | null, darkGrid: HTMLElement | null) {
@@ -199,6 +202,61 @@ export async function initializeReaderSettings() {
 			updateCustomFontError(fontFamilySelect?.value ?? 'custom', customFontInput.value);
 			rebuildGrids(lightGrid, darkGrid);
 		}, 500));
+	}
+
+	const fontSizeInput = document.getElementById('reader-font-size') as HTMLInputElement;
+	const fontSizeDisplay = document.getElementById('reader-font-size-display');
+	if (fontSizeInput) {
+		fontSizeInput.value = String(generalSettings.readerSettings.fontSize);
+		if (fontSizeDisplay) fontSizeDisplay.textContent = fontSizeInput.value;
+		fontSizeInput.addEventListener('input', () => {
+			if (fontSizeDisplay) fontSizeDisplay.textContent = fontSizeInput.value;
+			const val = parseFloat(fontSizeInput.value);
+			if (!isNaN(val)) {
+				generalSettings.readerSettings.fontSize = val;
+				updatePreview();
+			}
+		});
+		fontSizeInput.addEventListener('change', () => {
+			const val = parseFloat(fontSizeInput.value);
+			if (isNaN(val)) return;
+			saveSettings({ ...generalSettings, readerSettings: { ...generalSettings.readerSettings, fontSize: val } });
+		});
+	}
+
+	const lineHeightInput = document.getElementById('reader-line-height') as HTMLInputElement;
+	const lineHeightDisplay = document.getElementById('reader-line-height-display');
+	if (lineHeightInput) {
+		lineHeightInput.value = String(generalSettings.readerSettings.lineHeight);
+		if (lineHeightDisplay) lineHeightDisplay.textContent = parseFloat(lineHeightInput.value).toFixed(1);
+		lineHeightInput.addEventListener('input', () => {
+			if (lineHeightDisplay) lineHeightDisplay.textContent = parseFloat(lineHeightInput.value).toFixed(1);
+			const val = parseFloat(lineHeightInput.value);
+			if (!isNaN(val)) {
+				generalSettings.readerSettings.lineHeight = val;
+				updatePreview();
+			}
+		});
+		lineHeightInput.addEventListener('change', () => {
+			const val = parseFloat(lineHeightInput.value);
+			if (isNaN(val)) return;
+			saveSettings({ ...generalSettings, readerSettings: { ...generalSettings.readerSettings, lineHeight: val } });
+		});
+	}
+
+	const maxWidthInput = document.getElementById('reader-max-width') as HTMLInputElement;
+	const maxWidthDisplay = document.getElementById('reader-max-width-display');
+	if (maxWidthInput) {
+		maxWidthInput.value = String(generalSettings.readerSettings.maxWidth);
+		if (maxWidthDisplay) maxWidthDisplay.textContent = maxWidthInput.value;
+		maxWidthInput.addEventListener('input', () => {
+			if (maxWidthDisplay) maxWidthDisplay.textContent = maxWidthInput.value;
+		});
+		maxWidthInput.addEventListener('change', () => {
+			const val = parseFloat(maxWidthInput.value);
+			if (isNaN(val)) return;
+			saveSettings({ ...generalSettings, readerSettings: { ...generalSettings.readerSettings, maxWidth: val } });
+		});
 	}
 
 	initializeSettingToggle('reader-blend-images', generalSettings.readerSettings.blendImages, (checked) => {
