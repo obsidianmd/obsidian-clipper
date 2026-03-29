@@ -369,7 +369,7 @@ export class Reader {
 	}
 
 	private static updateFontSize(doc: Document, size: number) {
-		size = Math.max(12, Math.min(24, size));
+		size = Math.max(9, Math.min(24, size));
 		doc.documentElement.style.setProperty('--obsidian-reader-font-size', `${size}px`);
 		this.settings.fontSize = size;
 		this.saveSettings();
@@ -383,7 +383,7 @@ export class Reader {
 	}
 
 	private static updateLineHeight(doc: Document, height: number) {
-		height = Math.max(1.2, Math.min(2, Math.round(height * 10) / 10));
+		height = Math.max(1.1, Math.min(2, Math.round(height * 10) / 10));
 		doc.documentElement.style.setProperty('--obsidian-reader-line-height', height.toString());
 		this.settings.lineHeight = height;
 		this.saveSettings();
