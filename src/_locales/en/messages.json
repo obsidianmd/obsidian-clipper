@@ -897,6 +897,12 @@
 	"templateTriggers": {
 		"message": "Template triggers"
 	},
+	"templateGroupLocation": {
+		"message": "Location"
+	},
+	"templateGroupContent": {
+		"message": "Content"
+	},
 	"templateTriggersDescription": {
 		"message": "Define rules to automatically select this template if it matches a URL pattern or contains schema.org data. One rule per line."
 	},

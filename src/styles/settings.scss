@@ -123,12 +123,6 @@
 	&.active {
 		display: block;
 	}
-
-	form {
-		> div {
-			margin-bottom: 3rem;
-		}
-	}
 }
 
 @media (min-width: 769px) {
@@ -151,8 +145,23 @@
 	gap: 8px;
 }
 
+.setting-items {
+	background-color: var(--background-primary-alt);
+	border-radius: var(--radius-m);
+	padding: 0.75rem 1.5rem;
+}
+
 .setting-item {
 	margin: 1.5rem 0;
+
+	&.setting-item-heading {
+		margin: 2rem 0 0.5rem;
+	}
+
+	&:last-child {
+		border-bottom: none;
+	}
+
 	&.mod-horizontal {
 		display: flex;
 		flex-direction: row;
@@ -206,7 +215,6 @@
 }
 
 #sidebar {
-	background-color: var(--background-secondary);
 	width: 25%;
 	overflow: scroll;
 	min-width: 200px;
@@ -346,6 +354,9 @@
 			padding: 0.125rem 0.5rem;
 			border-radius: var(--radius-s);
 			font-size: var(--font-ui-smaller);
+		}
+		&:last-child {
+			border-bottom: none;
 		}
 	}
 }

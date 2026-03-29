@@ -60,7 +60,8 @@
 							<div id="usage-chart" class="usage-chart"></div>
 						</div>
 						<form id="general-settings-form">
-							<div>
+							<div class="setting-group">
+								<div class="setting-items">
 								<div class="setting-item mod-horizontal is-hidden" id="rate-extension">
 									<div class="setting-item-info">
 										<label data-i18n="feedback">Feedback</label>
@@ -120,21 +121,27 @@
 										<a href="https://help.obsidian.md/web-clipper" id="help-open-btn" class="btn" target="_blank" data-i18n="open">Open</a>
 									</div>
 								</div>
+								</div>
 							</div>
-							<div>
-								<h3 data-i18n="vaults">Vaults</h3>
+							<div class="setting-group">
+								<div class="setting-item setting-item-heading"><h3 data-i18n="vaults">Vaults</h3></div>
+								<div class="setting-items">
 								<div class="setting-item-description" data-i18n="vaultsDescription">By default, clipped notes are saved to the currently open vault. You can add vaults here if you want the option to save to different vaults. Vault names must exactly match the name of the Obsidian vault. Press <strong>enter</strong> to add a&nbsp;vault.</div>
 								<input type="text" id="vault-input" data-i18n="addVaultPlaceholder" placeholder="Press enter to add a vault" autocomplete="off" spellcheck="false" />
 								<ul id="vault-list"></ul>
+								</div>
 							</div>
-							<div id="hotkeys-subsection">
-								<h3 data-i18n="hotkeys">Hotkeys</h3>
+							<div class="setting-group" id="hotkeys-subsection">
+								<div class="setting-item setting-item-heading"><h3 data-i18n="hotkeys">Hotkeys</h3></div>
+								<div class="setting-items">
 								<div class="setting-item-description shortcut-instructions">
 								</div>
 								<div id="keyboard-shortcuts-list"></div>
+								</div>
 							</div>
-							<div>
-								<h3 data-i18n="advanced">Advanced</h3>
+							<div class="setting-group">
+								<div class="setting-item setting-item-heading"><h3 data-i18n="advanced">Advanced</h3></div>
+								<div class="setting-items">
 								<div class="setting-item mod-horizontal" style="display: none;">
 									<div class="setting-item-info">
 										<label for="beta-features-toggle" data-i18n="earlyAccessFeatures">Early access features</label>
@@ -230,6 +237,7 @@
 										<button type="button" id="import-all-settings-btn" data-i18n="import">Import</button>
 									</div>
 								</div>
+								</div>
 							</div>
 						</form>
 					</div>
@@ -239,7 +247,9 @@
 							<h2 data-i18n="highlighterSettings">Highlighter</h2>
 						</div>
 						<form id="highlighter-settings-form">
-							<div class="setting-item mod-horizontal" style="display: none;">
+							<div class="setting-group">
+								<div class="setting-items">
+								<div class="setting-item mod-horizontal" style="display: none;">
 								<div class="setting-item-info">
 									<label for="highlighter-toggle" data-i18n="enableHighlighter">Enable highlighter</label>
 									<div class="setting-item-description" data-i18n="enableHighlighterDescription">
@@ -292,6 +302,8 @@
 									</select>
 								</div>
 							</div>
+								</div>
+							</div>
 						</form>
 					</div>
 
@@ -307,7 +319,9 @@
 							<p class="reader-preview-body"><em>File over app</em> is a philosophy: if you want to create <strong>digital artifacts that last</strong>, they must be files you can control, in formats that are easy to retrieve and read. Use tools that give you this <a class="reader-preview-link" href="https://stephango.com/file-over-app" target="_blank">freedom</a>.</p>
 						</div>
 						<form id="reader-settings-form">
-							<div><h3 data-i18n="readerTypography">Typography</h3>
+							<div class="setting-group">
+								<div class="setting-item setting-item-heading"><h3 data-i18n="readerTypography">Typography</h3></div>
+								<div class="setting-items">
 							<div class="setting-item mod-horizontal">
 								<div class="setting-item-info">
 									<label for="reader-font-family" data-i18n="readerFont">Font</label>
@@ -330,8 +344,11 @@
 									<span id="reader-custom-font-error" class="reader-font-error mod-warning" style="display:none" data-i18n="readerCustomFontError">Font not found</span>
 								</div>
 							</div>
+								</div>
 							</div>
-							<div><h3 data-i18n="readerImages">Images</h3>
+							<div class="setting-group">
+								<div class="setting-item setting-item-heading"><h3 data-i18n="readerImages">Images</h3></div>
+								<div class="setting-items">
 							<div class="setting-item mod-horizontal">
 								<div class="setting-item-info">
 									<label for="reader-blend-images" data-i18n="readerBlendImages">Blend images</label>
@@ -343,8 +360,11 @@
 									</div>
 								</div>
 							</div>
+								</div>
 							</div>
-							<div><h3 data-i18n="readerThemeSection">Theme</h3>
+							<div class="setting-group">
+								<div class="setting-item setting-item-heading"><h3 data-i18n="readerThemeSection">Theme</h3></div>
+								<div class="setting-items">
 							<div class="setting-item mod-horizontal">
 								<div class="setting-item-info">
 									<label for="reader-theme-mode" data-i18n="readerThemeMode">Theme</label>
@@ -379,6 +399,7 @@
 							<div id="reader-color-scheme-dark-section">
 								<div id="reader-color-scheme-grid-dark" class="reader-color-scheme-grid"></div>
 							</div>
+								</div>
 						</div>
 						</form>
 					</div>
@@ -388,7 +409,8 @@
 							<h2 data-i18n="interpreter">Interpreter</h2>
 						</div>
 						<form id="interpreter-settings-form">
-							<div class="setting-item-group">
+							<div class="setting-group setting-item-group">
+								<div class="setting-items">
 								<div class="setting-item mod-horizontal">
 									<div class="setting-item-info">
 										<label for="interpreter-toggle" data-i18n="enableInterpreter">Enable interpreter</label>
@@ -402,9 +424,11 @@
 										</div>
 									</div>
 								</div>
+								</div>
 							</div>
-							<div>
-								<h3 data-i18n="behavior">Behavior</h3>
+							<div class="setting-group">
+								<div class="setting-item setting-item-heading"><h3 data-i18n="behavior">Behavior</h3></div>
+								<div class="setting-items">
 								<div class="setting-item mod-horizontal">
 									<div class="setting-item-info">
 										<label for="interpreter-auto-run-toggle" data-i18n="autoRunInterpreter">Automatically run</label>
@@ -416,41 +440,50 @@
 										</div>
 									</div>
 								</div>
+								</div>
 							</div>
-							<div>
-								<h3 data-i18n="providers">Providers</h3>
-								<div id="api-keys-warning-container" class="warning-container" style="margin-bottom: 0.5rem;">
-									<div class="warning-icon">
-										<i data-lucide="alert-triangle"></i>
-									</div>
-									<div class="warning-text" data-i18n="apiKeysWarning">
-										By using an external provider you agree to their terms and privacy policy. Interpreter requests are sent directly to the provider you choose. Obsidian does not gather or store any data about your requests.
+							<div class="setting-group">
+								<div class="setting-item setting-item-heading">
+									<h3 data-i18n="providers">Providers</h3>
+									<div id="api-keys-warning-container" class="warning-container">
+										<div class="warning-icon">
+											<i data-lucide="alert-triangle"></i>
+										</div>
+										<div class="warning-text" data-i18n="apiKeysWarning">
+											By using an external provider you agree to their terms and privacy policy. Interpreter requests are sent directly to the provider you choose. Obsidian does not gather or store any data about your requests.
+										</div>
 									</div>
 								</div>
+								<div class="setting-items">
 								<div class="provider-list-container">
 									<div id="provider-list"></div>
 									<div class="add-btn">
 										<a id="add-provider-btn" data-i18n="addProvider">+ Add provider</a>
 									</div>
 								</div>
+								</div>
 							</div>
-							<div>
-								<h3 data-i18n="models">Models</h3>
+							<div class="setting-group">
+								<div class="setting-item setting-item-heading"><h3 data-i18n="models">Models</h3></div>
+								<div class="setting-items">
 								<div class="model-list-container">
 									<div id="model-list"></div>
 									<div class="add-btn">
 										<a id="add-model-btn" data-i18n="addModel">+ Add model</a>
 									</div>
 								</div>
+								</div>
 							</div>
-							<div>
-								<h3 data-i18n="advanced">Advanced</h3>
+							<div class="setting-group">
+								<div class="setting-item setting-item-heading"><h3 data-i18n="advanced">Advanced</h3></div>
+								<div class="setting-items">
 								<div class="setting-item">
 									<label for="default-prompt-context" style="font-weight: 400;" data-i18n="defaultInterpreterContext">Default interpreter context</label>
 									<div class="setting-item-description" data-i18n="defaultInterpreterContextDescription">Override the context used to interpret prompt variables. Variables can be used here.</div>
 									<textarea id="default-prompt-context" rows="4" placeholder="{{fullHtml}}" spellcheck="false"></textarea>
 								</div>
 								
+								</div>
 							</div>
 						</form>
 					</div>
@@ -460,7 +493,8 @@
 							<h2 data-i18n="propertiesSettings">Properties</h2>
 						</div>
 						<form id="property-types-form">
-							<div>
+							<div class="setting-group">
+								<div class="setting-items">
 								<div class="setting-item mod-horizontal">
 									<div class="setting-item-info">
 										<label for="import-types-btn" data-i18n="importProperties">Import properties</label>
@@ -494,13 +528,16 @@
 										<button type="button" id="delete-unused-properties-btn" data-i18n="remove">Remove</button>
 									</div>
 								</div>
+								</div>
 							</div>
-							<div>
-								<h3 data-i18n="allProperties">All properties</h3>
+							<div class="setting-group">
+								<div class="setting-item setting-item-heading"><h3 data-i18n="allProperties">All properties</h3></div>
+								<div class="setting-items">
 								<div class="add-btn" style="display: none;">
 									<a id="add-property-type-btn">+ Add property</a>
 								</div>
 								<div id="property-types-list" class="properties-list"></div>
+								</div>
 							</div>
 							
 						</form>
@@ -561,60 +598,79 @@
 						</div>
 						<form id="template-settings-form">
 							<div id="template-editor">
-								<div class="setting-item">
-									<label for="template-name" data-i18n="templateName">Template name</label>
-									<input type="text" id="template-name" data-i18n="templateName" placeholder="Template name" />
-								</div>
-								<div class="setting-item">
-									<label for="template-behavior" data-i18n="behavior">Behavior</label>
-									<select id="template-behavior">
-										<option value="create" data-i18n="createNewNote">Create new note</option>
-										<option value="append-specific" data-i18n="appendToExisting">Add to an existing note, at the bottom</option>
-										<option value="prepend-specific" data-i18n="prependToExisting">Add to an existing note, at the top</option>
-										<option value="append-daily" data-i18n="appendToDaily">Add to daily note, at the bottom</option>
-										<option value="prepend-daily" data-i18n="prependToDaily">Add to daily note, at the top</option>
-										<option value="overwrite" data-i18n="overwriteNote">Overwrite note</option>
-									</select>
-								</div>
-								<div class="setting-item" id="note-name-format-container" style="display: none;">
-									<label for="note-name-format" data-i18n="noteNameFormat">Note name</label>
-									<div class="setting-item-description" data-i18n="noteNameFormatDescription">Format for the file name of the note. You can use variables like {{title}}, {{date}}, and {{published}} to pre-populate data from the page.</div>
-									<input type="text" id="note-name-format" placeholder="{{title}}" />
-								</div>
-								<div class="setting-item" id="path-name-container" style="display: none;">
-									<label for="template-path-name" data-i18n="noteLocation">Note location</label>
-									<div class="setting-item-description" data-i18n="noteLocationDescription">The folder or path of the note.</div>
-									<input type="text" id="template-path-name" placeholder="Clippings" />
-								</div>
-								<div class="setting-item">
-									<label for="template-vault" data-i18n="vault">Vault</label>
-									<div class="setting-item-description" data-i18n="vaultDescription">Select the default vault for this template. Go to general settings to add or remove vaults.</div>
-									<select id="template-vault">
-										<option value="" data-i18n="lastUsed">Last used</option>
-									</select>
-								</div>
-								<div class="setting-item">
-									<label for="url-patterns" data-i18n="templateTriggers">Template triggers</label>
-									<div class="setting-item-description" data-i18n="templateTriggersDescription">Define rules to automatically select this template if it matches a URL pattern or contains schema.org data. One rule per line.</div>
-									<textarea id="url-patterns" placeholder="https://example.com/" rows="2" spellcheck="false"></textarea>
-								</div>
-								<div id="properties-container">
-									<label data-i18n="templateProperties">Properties</label>
-									<div class="setting-item-description" data-i18n="templatePropertiesDescription">Properties to add to the top of the clipped note. Use variables to pre-populate data from the page.</div>
-									<div id="template-properties" class="properties-list"></div>
-									<div class="add-btn metadata-add-btn">
-										<a id="add-property-btn" data-i18n="addProperty">+ Add property</a>
+								<div class="setting-group">
+									<div class="setting-items">
+										<div class="setting-item">
+											<label for="template-name" data-i18n="templateName">Template name</label>
+											<input type="text" id="template-name" data-i18n="templateName" placeholder="Template name" />
+										</div>
 									</div>
 								</div>
-								<div class="setting-item">
-									<label for="note-content-format" data-i18n="noteContent">Note content</label>
-									<div class="setting-item-description" data-i18n="noteContentDescription">Customize the content of the note. Use variables to pre-populate data from the page.</div>
-									<textarea id="note-content-format" rows="6" placeholder="{{content}}"></textarea>
+								<div class="setting-group">
+									<div class="setting-item setting-item-heading"><h3 data-i18n="templateGroupLocation">Location</h3></div>
+									<div class="setting-items">
+										<div class="setting-item">
+											<label for="template-behavior" data-i18n="behavior">Behavior</label>
+											<select id="template-behavior">
+												<option value="create" data-i18n="createNewNote">Create new note</option>
+												<option value="append-specific" data-i18n="appendToExisting">Add to an existing note, at the bottom</option>
+												<option value="prepend-specific" data-i18n="prependToExisting">Add to an existing note, at the top</option>
+												<option value="append-daily" data-i18n="appendToDaily">Add to daily note, at the bottom</option>
+												<option value="prepend-daily" data-i18n="prependToDaily">Add to daily note, at the top</option>
+												<option value="overwrite" data-i18n="overwriteNote">Overwrite note</option>
+											</select>
+										</div>
+										<div class="setting-item" id="note-name-format-container" style="display: none;">
+											<label for="note-name-format" data-i18n="noteNameFormat">Note name</label>
+											<div class="setting-item-description" data-i18n="noteNameFormatDescription">Format for the file name of the note. You can use variables like {{title}}, {{date}}, and {{published}} to pre-populate data from the page.</div>
+											<input type="text" id="note-name-format" placeholder="{{title}}" />
+										</div>
+										<div class="setting-item" id="path-name-container" style="display: none;">
+											<label for="template-path-name" data-i18n="noteLocation">Note location</label>
+											<div class="setting-item-description" data-i18n="noteLocationDescription">The folder or path of the note.</div>
+											<input type="text" id="template-path-name" placeholder="Clippings" />
+										</div>
+										<div class="setting-item">
+											<label for="template-vault" data-i18n="vault">Vault</label>
+											<div class="setting-item-description" data-i18n="vaultDescription">Select the default vault for this template. Go to general settings to add or remove vaults.</div>
+											<select id="template-vault">
+												<option value="" data-i18n="lastUsed">Last used</option>
+											</select>
+										</div>
+									</div>
 								</div>
-								<div class="setting-item" id="prompt-context-container">
-									<label for="prompt-context" data-i18n="interpreterContext">Interpreter context</label>
-									<div class="setting-item-description" data-i18n="interpreterContextDescription">The context used to interpret prompt variables. Overrides the default context defined in Interpreter settings. Variables can be used here.</div>
-									<textarea id="prompt-context" rows="4" spellcheck="false"></textarea>
+								<div class="setting-group">
+									<div class="setting-item setting-item-heading"><h3 data-i18n="templateGroupContent">Content</h3></div>
+									<div class="setting-items">
+										<div id="properties-container">
+											<label data-i18n="templateProperties">Properties</label>
+											<div class="setting-item-description" data-i18n="templatePropertiesDescription">Properties to add to the top of the clipped note. Use variables to pre-populate data from the page.</div>
+											<div id="template-properties" class="properties-list"></div>
+											<div class="add-btn metadata-add-btn">
+												<a id="add-property-btn" data-i18n="addProperty">+ Add property</a>
+											</div>
+										</div>
+										<div class="setting-item">
+											<label for="note-content-format" data-i18n="noteContent">Note content</label>
+											<div class="setting-item-description" data-i18n="noteContentDescription">Customize the content of the note. Use variables to pre-populate data from the page.</div>
+											<textarea id="note-content-format" rows="6" placeholder="{{content}}"></textarea>
+										</div>
+									</div>
+								</div>
+								<div class="setting-group">
+									<div class="setting-item setting-item-heading"><h3 data-i18n="advanced">Advanced</h3></div>
+									<div class="setting-items">
+										<div class="setting-item">
+											<label for="url-patterns" data-i18n="templateTriggers">Template triggers</label>
+											<div class="setting-item-description" data-i18n="templateTriggersDescription">Define rules to automatically select this template if it matches a URL pattern or contains schema.org data. One rule per line.</div>
+											<textarea id="url-patterns" placeholder="https://example.com/" rows="2" spellcheck="false"></textarea>
+										</div>
+										<div class="setting-item" id="prompt-context-container">
+											<label for="prompt-context" data-i18n="interpreterContext">Interpreter context</label>
+											<div class="setting-item-description" data-i18n="interpreterContextDescription">The context used to interpret prompt variables. Overrides the default context defined in Interpreter settings. Variables can be used here.</div>
+											<textarea id="prompt-context" rows="4" spellcheck="false"></textarea>
+										</div>
+									</div>
 								</div>
 							</div>
 						</form>
