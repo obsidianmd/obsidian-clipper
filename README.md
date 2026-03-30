@@ -2,7 +2,7 @@
 
 <h1 align="center" style="border-bottom: none">Clipper for AppFlowy</h1>
 
-<p align="center"><a rel="noreferrer noopener" href=""><img alt="Chrome Web Store" src="https://img.shields.io/badge/Chrome-141e24.svg?&style=for-the-badge&logo=google-chrome&logoColor=white"></a>  <a rel="noreferrer noopener" href="https://addons.mozilla.org/fr/firefox/addon/clipper-for-appflowy/"><img alt="Firefox Add-ons" src="https://img.shields.io/badge/Firefox-141e24.svg?&style=for-the-badge&logo=firefox-browser&logoColor=white"></a>
+<p align="center"><a rel="noreferrer noopener" href="https://chromewebstore.google.com/detail/ngjmhmikhoegpfakpfofaafagoikejln?utm_source=item-share-cb"><img alt="Chrome Web Store" src="https://img.shields.io/badge/Chrome-141e24.svg?&style=for-the-badge&logo=google-chrome&logoColor=white"></a>  <a rel="noreferrer noopener" href="https://addons.mozilla.org/fr/firefox/addon/clipper-for-appflowy/"><img alt="Firefox Add-ons" src="https://img.shields.io/badge/Firefox-141e24.svg?&style=for-the-badge&logo=firefox-browser&logoColor=white"></a>
 </p>
 
 **A community fork of [obsidian-clipper](https://github.com/obsidianmd/obsidian-clipper), adapted for [AppFlowy](https://github.com/AppFlowy-IO/AppFlowy)**
@@ -15,7 +15,7 @@ Download the latest release for your browser:
 
 | Browser           | Download                                                                                                             |
 | ----------------- | -------------------------------------------------------------------------------------------------------------------- |
-| Chrome / Chromium | [clipper-for-appflowy-0.1.0-chrome.zip](https://github.com/alexrosepizant/clipper-for-appflowy/releases/tag/v0.1.0)  |
+| Chrome / Chromium | [Chrome Web Store](https://chromewebstore.google.com/detail/ngjmhmikhoegpfakpfofaafagoikejln?utm_source=item-share-cb)  |
 | Firefox           | [Firefox Add-Ons](https://addons.mozilla.org/fr/firefox/addon/clipper-for-appflowy/) |
 | Safari            | [clipper-for-appflowy-0.1.0-safari.zip](https://github.com/alexrosepizant/clipper-for-appflowy/releases/tag/v0.1.0)  |
 
