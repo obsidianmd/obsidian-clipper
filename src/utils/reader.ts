@@ -505,8 +505,9 @@ export class Reader {
 		const outline = doc.querySelector('.obsidian-reader-outline') as HTMLElement;
 		if (!outline) return null;
 
-		// Find all headings h2-h6
-		const headings = article.querySelectorAll('h2, h3, h4, h5, h6');
+		// Find all headings h2-h6, excluding those inside blockquotes
+		const headings = Array.from(article.querySelectorAll('h2, h3, h4, h5, h6'))
+			.filter(h => !h.closest('blockquote'));
 
 		// Only show outline if there are 2 or more headings
 		if (headings.length < 2) {
