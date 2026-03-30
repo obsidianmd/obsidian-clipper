@@ -46,7 +46,7 @@ textarea {
 label {
 	display: block;
 	margin: 0.75rem 0 0.25rem;
-	font-weight: 600;
+	font-weight: 400;
 	font-size: var(--font-ui-medium);
 	.optional {
 		font-size: var(--font-ui-smaller);
@@ -141,7 +141,7 @@ input[type=checkbox] {
 		align-items: center;
 		gap: 8px;
 		cursor: pointer;
-		font-weight: 400;
+		font-weight: 500;
 		margin: 0;
 		font-size: var(--font-ui-smaller);
 	}

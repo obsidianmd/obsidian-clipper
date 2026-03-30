@@ -40,87 +40,87 @@
 						<div class="settings-section-header">
 							<h2 data-i18n="generalSettings">General settings</h2>
 						</div>
-						<div id="usage-chart-container">
-							<div class="usage-chart-header">
-								<div class="usage-chart-title">
-									<div data-i18n="activity">Activity</div>
-									<div class="setting-item-description"></div>
-								</div>
-								<div class="usage-chart-controls">
-									<select id="usage-period-select" class="dropdown">
-										<option value="30d" data-i18n="last30Days">Last 30 days</option>
-										<option value="all" data-i18n="allTime">All time</option>
-									</select>
-									<select id="usage-aggregation-select" class="dropdown">
-										<option value="day" selected data-i18n="byDay">Days</option>
-										<option value="week" data-i18n="byWeek">Weeks</option>
-									</select>
-								</div>
-							</div>
-							<div id="usage-chart" class="usage-chart"></div>
-						</div>
 						<form id="general-settings-form">
 							<div class="setting-group">
 								<div class="setting-items">
-								<div class="setting-item mod-horizontal is-hidden" id="rate-extension">
-									<div class="setting-item-info">
-										<label data-i18n="feedback">Feedback</label>
-										<div class="setting-item-description" data-i18n="rateExtensionDescription">
-											Are you enjoying Web Clipper? Help us by giving it a rating.
+									<div id="usage-chart-container">
+										<div class="usage-chart-header">
+											<div class="usage-chart-title">
+												<div data-i18n="activity">Activity</div>
+												<div class="setting-item-description"></div>
+											</div>
+											<div class="usage-chart-controls">
+												<select id="usage-period-select" class="dropdown">
+													<option value="30d" data-i18n="last30Days">Last 30 days</option>
+													<option value="all" data-i18n="allTime">All time</option>
+												</select>
+												<select id="usage-aggregation-select" class="dropdown">
+													<option value="day" selected data-i18n="byDay">Days</option>
+													<option value="week" data-i18n="byWeek">Weeks</option>
+												</select>
+											</div>
+										</div>
+										<div id="usage-chart" class="usage-chart"></div>
+									</div>
+									<div class="setting-item mod-horizontal is-hidden" id="rate-extension">
+										<div class="setting-item-info">
+											<label data-i18n="feedback">Feedback</label>
+											<div class="setting-item-description" data-i18n="rateExtensionDescription">
+												Are you enjoying Web Clipper? Help us by giving it a rating.
+											</div>
+										</div>
+										<div class="setting-item-control">
+											<div class="star-rating">
+												<span class="star" data-rating="1">★</span>
+												<span class="star" data-rating="2">★</span>
+												<span class="star" data-rating="3">★</span>
+												<span class="star" data-rating="4">★</span>
+												<span class="star" data-rating="5">★</span>
+											</div>
 										</div>
 									</div>
-									<div class="setting-item-control">
-										<div class="star-rating">
-											<span class="star" data-rating="1">★</span>
-											<span class="star" data-rating="2">★</span>
-											<span class="star" data-rating="3">★</span>
-											<span class="star" data-rating="4">★</span>
-											<span class="star" data-rating="5">★</span>
+									<div class="setting-item mod-horizontal">
+										<div class="setting-item-info">
+											<label for="language-select" data-i18n="language">Language</label>
+											<div class="setting-item-description" data-i18n="languageDescription">
+												Choose the display language for the extension interface.
+											</div>
+										</div>
+										<div class="setting-item-control">
+											<select id="language-select">
+												<option value="" data-i18n="systemDefault">System default</option>
+												<option value="en">English</option>
+											</select>
 										</div>
 									</div>
-								</div>
-								<div class="setting-item mod-horizontal">
-									<div class="setting-item-info">
-										<label for="language-select" data-i18n="language">Language</label>
-										<div class="setting-item-description" data-i18n="languageDescription">
-											Choose the display language for the extension interface.
+									<div class="setting-item mod-horizontal">
+										<div class="setting-item-info">
+											<label for="version">
+													<span data-i18n="version">Version</span> <span id="version-number" class="version-tag"></span>
+											</label>
+											<div class="setting-item-description">
+												<span id="using-latest-version" data-i18n="usingLatestVersion">
+													You are using the latest version.
+												</span>
+												<span id="update-available" class="text-warning" style="display: none;" data-i18n="updateAvailable">
+													An update is available.
+												</span>
+											</div>
+										</div>
+										<div class="setting-item-control">
+											<a href="https://github.com/obsidianmd/obsidian-clipper/releases" id="changelog-link" data-i18n="changelog" class="btn" target="_blank">Changelog</a>
 										</div>
 									</div>
-									<div class="setting-item-control">
-										<select id="language-select">
-											<option value="" data-i18n="systemDefault">System default</option>
-											<option value="en">English</option>
-										</select>
-									</div>
-								</div>
-								<div class="setting-item mod-horizontal">
-									<div class="setting-item-info">
-										<label for="version">
-												<span data-i18n="version">Version</span> <span id="version-number" class="version-tag"></span>
-										</label>
-										<div class="setting-item-description">
-											<span id="using-latest-version" data-i18n="usingLatestVersion">
-												You are using the latest version.
-											</span>
-											<span id="update-available" class="text-warning" style="display: none;" data-i18n="updateAvailable">
-												An update is available.
-											</span>
+									
+									<div class="setting-item mod-horizontal">
+										<div class="setting-item-info">
+											<label for="help-open-btn" data-i18n="help">Help</label>
+											<div class="setting-item-description" data-i18n="helpDescription">Learn how to use Web Clipper and get help troubleshooting.</div>
+										</div>
+										<div class="setting-item-control">
+											<a href="https://help.obsidian.md/web-clipper" id="help-open-btn" class="btn" target="_blank" data-i18n="open">Open</a>
 										</div>
 									</div>
-									<div class="setting-item-control">
-										<a href="https://github.com/obsidianmd/obsidian-clipper/releases" id="changelog-link" data-i18n="changelog" class="btn" target="_blank">Changelog</a>
-									</div>
-								</div>
-								
-								<div class="setting-item mod-horizontal">
-									<div class="setting-item-info">
-										<label for="help-open-btn" data-i18n="help">Help</label>
-										<div class="setting-item-description" data-i18n="helpDescription">Learn how to use Web Clipper and get help troubleshooting.</div>
-									</div>
-									<div class="setting-item-control">
-										<a href="https://help.obsidian.md/web-clipper" id="help-open-btn" class="btn" target="_blank" data-i18n="open">Open</a>
-									</div>
-								</div>
 								</div>
 							</div>
 							<div class="setting-group">
@@ -140,103 +140,106 @@
 								</div>
 							</div>
 							<div class="setting-group">
+								<div class="setting-item setting-item-heading"><h3 data-i18n="behavior">Behavior</h3></div>
+								<div class="setting-items">
+									<div class="setting-item mh mod-horizontal">
+										<div class="setting-item-info">
+											<label for="open-behavior-dropdown" data-i18n="openBehaviorTitle">Default open behavior</label>
+											<div class="setting-item-description" data-i18n="openBehaviorDescription">
+												Choose how Web Clipper opens by default.
+											</div>
+										</div>
+										<div class="setting-item-control">
+											<select id="open-behavior-dropdown">
+												<option value="popup" selected data-i18n="popup">Popup</option>
+												<option value="embedded" data-i18n="embedded">Embedded</option>
+											</select>
+										</div>
+									</div>
+									<div class="setting-item mod-horizontal">
+										<div class="setting-item-info">
+											<label for="save-behavior-dropdown" data-i18n="saveBehaviorLabel">Save behavior</label>
+											<div class="setting-item-description" data-i18n="saveBehaviorDescription">
+												Choose the default option for saving pages. Alternate options appear in the dropdown menu next to the main button.
+											</div>
+										</div>
+										<div class="setting-item-control">
+											<select id="save-behavior-dropdown">
+												<option value="addToObsidian" selected data-i18n="addToObsidian">Add to Obsidian</option>
+												<option value="copyToClipboard" data-i18n="copyToClipboard">Copy to clipboard</option>
+												<option value="saveFile" data-i18n="saveFile">Save file</option>
+											</select>
+										</div>
+									</div>
+									<div class="setting-item mod-horizontal">
+										<div class="setting-item-info">
+											<label for="silent-open-toggle" data-i18n="silentOpen">Save clipped note without opening&nbsp;it</label>
+											<div class="setting-item-description" data-i18n="silentOpenDescription">
+												Clipped notes will be saved but will not open as a new tab. Obsidian will still be brought to the foreground.
+											</div>
+										</div>
+										<div class="setting-item-control">
+											<div class="checkbox-container">
+												<input type="checkbox" id="silent-open-toggle" />
+											</div>
+										</div>
+									</div>
+									<div class="setting-item mod-horizontal">
+										<div class="setting-item-info">
+											<label for="legacy-mode-toggle" data-i18n="legacyMode">Legacy&nbsp;mode</label>
+											<div class="setting-item-description" data-i18n="legacyModeDescription">
+												Uses the URI clipping method compatible with Obsidian 1.6.7 or earlier. Note that the length of the content you can clip is limited by your browser and OS. Some pages may fail without any errors.
+											</div>
+										</div>
+										<div class="setting-item-control">
+											<div class="checkbox-container">
+												<input type="checkbox" id="legacy-mode-toggle" />
+											</div>
+										</div>
+									</div>
+								</div>
 								<div class="setting-item setting-item-heading"><h3 data-i18n="advanced">Advanced</h3></div>
 								<div class="setting-items">
-								<div class="setting-item mod-horizontal" style="display: none;">
-									<div class="setting-item-info">
-										<label for="beta-features-toggle" data-i18n="earlyAccessFeatures">Early access features</label>
-										<div class="setting-item-description" data-i18n="earlyAccessDescription">
-											Use features that require the latest <a href="https://help.obsidian.md/Obsidian/Early+access+versions" target="_blank">early access version</a> of Obsidian. Currently requires Obsidian 1.7.2 or later.
+									<div class="setting-item mod-horizontal">
+										<div class="setting-item-info">
+											<label for="reset-default-template-btn" data-i18n="resetDefaultTemplate">Reset default template</label>
+											<div class="setting-item-description" data-i18n="resetDefaultTemplateDescription">Remove any changes you've made to the default&nbsp;template.</div>
+										</div>
+										<div class="setting-item-control">
+											<button type="button" id="reset-default-template-btn" class="mod-warning" data-i18n="reset">Reset</button>
 										</div>
 									</div>
-									<div class="setting-item-control">
-										<div class="checkbox-container">
-											<input type="checkbox" id="beta-features-toggle" />
+									<div class="setting-item mod-horizontal" style="display: none;">
+										<div class="setting-item-info">
+											<label for="beta-features-toggle" data-i18n="earlyAccessFeatures">Early access features</label>
+											<div class="setting-item-description" data-i18n="earlyAccessDescription">
+												Use features that require the latest <a href="https://help.obsidian.md/Obsidian/Early+access+versions" target="_blank">early access version</a> of Obsidian. Currently requires Obsidian 1.7.2 or later.
+											</div>
+										</div>
+										<div class="setting-item-control">
+											<div class="checkbox-container">
+												<input type="checkbox" id="beta-features-toggle" />
+											</div>
 										</div>
 									</div>
-								</div>
-								<div class="setting-item mh">
-									<div class="setting-item-info">
-										<label for="open-behavior-dropdown" data-i18n="openBehaviorTitle">Default open behavior</label>
-										<div class="setting-item-description" data-i18n="openBehaviorDescription">
-											Choose how Web Clipper opens by default.
+									<div class="setting-item mod-horizontal">
+										<div class="setting-item-info">
+											<label for="export-all-settings-btn" data-i18n="exportAllSettings">Export all settings</label>
+											<div class="setting-item-description" data-i18n="exportAllSettingsDescription">Export all settings including templates and properties.</div>
+										</div>
+										<div class="setting-item-control">
+											<button type="button" id="export-all-settings-btn" data-i18n="export">Export</button>
 										</div>
 									</div>
-									<div class="setting-item-control">
-										<select id="open-behavior-dropdown">
-											<option value="popup" selected data-i18n="popup">Popup</option>
-											<option value="embedded" data-i18n="embedded">Embedded</option>
-										</select>
-									</div>
-								</div>
-								<div class="setting-item">
-									<div class="setting-item-info">
-										<label for="save-behavior-dropdown" data-i18n="saveBehaviorLabel">Save behavior</label>
-										<div class="setting-item-description" data-i18n="saveBehaviorDescription">
-											Choose the default option for saving pages. Alternate options appear in the dropdown menu next to the main button.
+									<div class="setting-item mod-horizontal">
+										<div class="setting-item-info">
+											<label for="import-all-settings-btn" data-i18n="importAllSettings">Import all settings</label>
+											<div class="setting-item-description" data-i18n="importAllSettingsDescription">Import all settings including templates and properties. This will replace your current configuration.</div>
+										</div>
+										<div class="setting-item-control">
+											<button type="button" id="import-all-settings-btn" data-i18n="import">Import</button>
 										</div>
 									</div>
-									<div class="setting-item-control">
-										<select id="save-behavior-dropdown">
-											<option value="addToObsidian" selected data-i18n="addToObsidian">Add to Obsidian</option>
-											<option value="copyToClipboard" data-i18n="copyToClipboard">Copy to clipboard</option>
-											<option value="saveFile" data-i18n="saveFile">Save file</option>
-										</select>
-									</div>
-								</div>
-								<div class="setting-item mod-horizontal">
-									<div class="setting-item-info">
-										<label for="silent-open-toggle" data-i18n="silentOpen">Save clipped note without opening&nbsp;it</label>
-										<div class="setting-item-description" data-i18n="silentOpenDescription">
-											Clipped notes will be saved but will not open as a new tab. Obsidian will still be brought to the foreground.
-										</div>
-									</div>
-									<div class="setting-item-control">
-										<div class="checkbox-container">
-											<input type="checkbox" id="silent-open-toggle" />
-										</div>
-									</div>
-								</div>
-								<div class="setting-item mod-horizontal">
-									<div class="setting-item-info">
-										<label for="legacy-mode-toggle" data-i18n="legacyMode">Legacy&nbsp;mode</label>
-										<div class="setting-item-description" data-i18n="legacyModeDescription">
-											Uses the URI clipping method compatible with Obsidian 1.6.7 or earlier. Note that the length of the content you can clip is limited by your browser and OS. Some pages may fail without any errors.
-										</div>
-									</div>
-									<div class="setting-item-control">
-										<div class="checkbox-container">
-											<input type="checkbox" id="legacy-mode-toggle" />
-										</div>
-									</div>
-								</div>
-								<div class="setting-item mod-horizontal">
-									<div class="setting-item-info">
-										<label for="reset-default-template-btn" data-i18n="resetDefaultTemplate">Reset default template</label>
-										<div class="setting-item-description" data-i18n="resetDefaultTemplateDescription">Remove any changes you've made to the default&nbsp;template.</div>
-									</div>
-									<div class="setting-item-control">
-										<button type="button" id="reset-default-template-btn" class="mod-warning" data-i18n="reset">Reset</button>
-									</div>
-								</div>
-								<div class="setting-item mod-horizontal">
-									<div class="setting-item-info">
-										<label for="export-all-settings-btn" data-i18n="exportAllSettings">Export all settings</label>
-										<div class="setting-item-description" data-i18n="exportAllSettingsDescription">Export all settings including templates and properties.</div>
-									</div>
-									<div class="setting-item-control">
-										<button type="button" id="export-all-settings-btn" data-i18n="export">Export</button>
-									</div>
-								</div>
-								<div class="setting-item mod-horizontal">
-									<div class="setting-item-info">
-										<label for="import-all-settings-btn" data-i18n="importAllSettings">Import all settings</label>
-										<div class="setting-item-description" data-i18n="importAllSettingsDescription">Import all settings including templates and properties. This will replace your current configuration.</div>
-									</div>
-									<div class="setting-item-control">
-										<button type="button" id="import-all-settings-btn" data-i18n="import">Import</button>
-									</div>
-								</div>
 								</div>
 							</div>
 						</form>
@@ -249,59 +252,47 @@
 						<form id="highlighter-settings-form">
 							<div class="setting-group">
 								<div class="setting-items">
-								<div class="setting-item mod-horizontal" style="display: none;">
-								<div class="setting-item-info">
-									<label for="highlighter-toggle" data-i18n="enableHighlighter">Enable highlighter</label>
-									<div class="setting-item-description" data-i18n="enableHighlighterDescription">
-										Highlight content on web pages that you can save to Obsidian.
+									<div class="setting-item mod-horizontal">
+										<div class="setting-item-info">
+											<label for="highlighter-visibility" data-i18n="alwaysShowHighlights">Always show highlights</label>
+											<div class="setting-item-description" data-i18n="alwaysShowHighlightsDescription">
+												Display your saved highlights when you load a page. Turn off to only display highlights when highlighter mode is activated.
+											</div>
+										</div>
+										<div class="setting-item-control">
+											<div class="checkbox-container is-enabled">
+												<input type="checkbox" id="highlighter-visibility" checked/>
+											</div>
+										</div>
 									</div>
-								</div>
-								<div class="setting-item-control">
-									<div class="checkbox-container">
-										<input type="checkbox" id="highlighter-toggle" />
+									
+									<div class="setting-item mod-horizontal">
+										<div class="setting-item-info">
+											<label for="highlighter-behavior" data-i18n="clipBehavior">Clip behavior</label>
+											<div class="setting-item-description" data-i18n="clipBehaviorDescription">
+												Choose how highlighted content is saved to Obsidian. Defines the <strong>{{content}}</strong> variable.
+											</div>
+										</div>
+										<div class="setting-item-control">
+											<select id="highlighter-behavior">
+												<option value="highlight-inline" data-i18n="highlightInline">Highlight inline</option>
+												<option value="replace-content" data-i18n="replaceContent">Replace the page content</option>
+												<option value="no-highlights" data-i18n="noHighlights">Do nothing</option>
+											</select>
+										</div>
 									</div>
-								</div>
-							</div>
-							<div class="setting-item mod-horizontal">
-								<div class="setting-item-info">
-									<label for="export-highlights" data-i18n="exportHighlights">Export highlights</label>
-									<div class="setting-item-description" data-i18n="exportHighlightsDescription">
-										Export your highlights to a file.
+
+									<div class="setting-item mod-horizontal">
+										<div class="setting-item-info">
+											<label for="export-highlights" data-i18n="exportHighlights">Export highlights</label>
+											<div class="setting-item-description" data-i18n="exportHighlightsDescription">
+												Export your highlights to a file.
+											</div>
+										</div>
+										<div class="setting-item-control">
+											<button type="button" id="export-highlights" data-i18n="export">Export</button>
+										</div>
 									</div>
-								</div>
-								<div class="setting-item-control">
-									<button type="button" id="export-highlights" data-i18n="export">Export</button>
-								</div>
-							</div>
-							<div class="setting-item mod-horizontal">
-								<div class="setting-item-info">
-									<label for="highlighter-visibility" data-i18n="alwaysShowHighlights">Always show highlights</label>
-									<div class="setting-item-description" data-i18n="alwaysShowHighlightsDescription">
-										Display your saved highlights when you load a page. Turn off to only display highlights when highlighter mode is activated.
-									</div>
-								</div>
-								<div class="setting-item-control">
-									<div class="checkbox-container is-enabled">
-										<input type="checkbox" id="highlighter-visibility" checked/>
-									</div>
-								</div>
-							</div>
-							
-							<div class="setting-item">
-								<div class="setting-item-info">
-									<label for="highlighter-behavior" style="font-weight: 400;" data-i18n="clipBehavior">Clip behavior</label>
-									<div class="setting-item-description" data-i18n="clipBehaviorDescription">
-										Choose how highlighted content is saved to Obsidian. Defines the <strong>{{content}}</strong> variable.
-									</div>
-								</div>
-								<div class="setting-item-control">
-									<select id="highlighter-behavior">
-										<option value="highlight-inline" data-i18n="highlightInline">Highlight inline</option>
-										<option value="replace-content" data-i18n="replaceContent">Replace the page content</option>
-										<option value="no-highlights" data-i18n="noHighlights">Do nothing</option>
-									</select>
-								</div>
-							</div>
 								</div>
 							</div>
 						</form>
@@ -311,7 +302,6 @@
 						<div class="settings-section-header">
 							<h2 data-i18n="reader">Reader</h2>
 						</div>
-						<div data-i18n="preview">Preview</div>
 						<div id="reader-preview" class="obsidian-reader-active">
 							<p class="reader-preview-title">File over app</p>
 							<p class="reader-preview-meta">Steph Ango · July 1, 2023 · <a class="reader-preview-meta-link" href="https://stephango.com/file-over-app" target="_blank">stephango.com</a></p>
@@ -450,37 +440,32 @@
 							<h2 data-i18n="interpreter">Interpreter</h2>
 						</div>
 						<form id="interpreter-settings-form">
-							<div class="setting-group setting-item-group">
-								<div class="setting-items">
-								<div class="setting-item mod-horizontal">
-									<div class="setting-item-info">
-										<label for="interpreter-toggle" data-i18n="enableInterpreter">Enable interpreter</label>
-										<div class="setting-item-description" data-i18n="enableInterpreterDescription">
-											Use natural language to extract data from pages. For example, you can use the template syntax <strong>{{"a summary of the page"}}</strong>. Requires an API key or custom model configured below. <a href="https://help.obsidian.md/web-clipper/interpreter" target="_blank">Learn more</a>.
-										</div>
-									</div>
-									<div class="setting-item-control">
-										<div class="checkbox-container">
-											<input type="checkbox" id="interpreter-toggle" />
-										</div>
-									</div>
-								</div>
-								</div>
-							</div>
 							<div class="setting-group">
-								<div class="setting-item setting-item-heading"><h3 data-i18n="behavior">Behavior</h3></div>
 								<div class="setting-items">
-								<div class="setting-item mod-horizontal">
-									<div class="setting-item-info">
-										<label for="interpreter-auto-run-toggle" data-i18n="autoRunInterpreter">Automatically run</label>
-										<div class="setting-item-description" data-i18n="autoRunInterpreterDescription">Run prompt variables immediately if the template contains any. This will consume API credits with your model provider. Turn off if you only want to run interpreter manually.</div>
-									</div>
-									<div class="setting-item-control">
-										<div class="checkbox-container">
-											<input type="checkbox" id="interpreter-auto-run-toggle" />
+									<div class="setting-item mod-horizontal">
+										<div class="setting-item-info">
+											<label for="interpreter-toggle" data-i18n="enableInterpreter">Enable interpreter</label>
+											<div class="setting-item-description" data-i18n="enableInterpreterDescription">
+												Use natural language to extract data from pages. For example, you can use the template syntax <strong>{{"a summary of the page"}}</strong>. Requires an API key or custom model configured below. <a href="https://help.obsidian.md/web-clipper/interpreter" target="_blank">Learn more</a>.
+											</div>
+										</div>
+										<div class="setting-item-control">
+											<div class="checkbox-container">
+												<input type="checkbox" id="interpreter-toggle" />
+											</div>
 										</div>
 									</div>
-								</div>
+									<div class="setting-item mod-horizontal">
+										<div class="setting-item-info">
+											<label for="interpreter-auto-run-toggle" data-i18n="autoRunInterpreter">Automatically run</label>
+											<div class="setting-item-description" data-i18n="autoRunInterpreterDescription">Run prompt variables immediately if the template contains any. This will consume API credits with your model provider. Turn off if you only want to run interpreter manually.</div>
+										</div>
+										<div class="setting-item-control">
+											<div class="checkbox-container">
+												<input type="checkbox" id="interpreter-auto-run-toggle" />
+											</div>
+										</div>
+									</div>
 								</div>
 							</div>
 							<div class="setting-group">
@@ -519,7 +504,7 @@
 								<div class="setting-item setting-item-heading"><h3 data-i18n="advanced">Advanced</h3></div>
 								<div class="setting-items">
 								<div class="setting-item">
-									<label for="default-prompt-context" style="font-weight: 400;" data-i18n="defaultInterpreterContext">Default interpreter context</label>
+									<label for="default-prompt-context" data-i18n="defaultInterpreterContext">Default interpreter context</label>
 									<div class="setting-item-description" data-i18n="defaultInterpreterContextDescription">Override the context used to interpret prompt variables. Variables can be used here.</div>
 									<textarea id="default-prompt-context" rows="4" placeholder="{{fullHtml}}" spellcheck="false"></textarea>
 								</div>
@@ -640,10 +625,16 @@
 						<form id="template-settings-form">
 							<div id="template-editor">
 								<div class="setting-group">
+									<div class="setting-item setting-item-heading"><h3 data-i18n="template">Template</h3></div>
 									<div class="setting-items">
 										<div class="setting-item">
 											<label for="template-name" data-i18n="templateName">Template name</label>
 											<input type="text" id="template-name" data-i18n="templateName" placeholder="Template name" />
+										</div>
+										<div class="setting-item">
+											<label for="url-patterns" data-i18n="templateTriggers">Template triggers</label>
+											<div class="setting-item-description" data-i18n="templateTriggersDescription">Define rules to automatically select this template if it matches a URL pattern or contains schema.org data. One rule per line.</div>
+											<textarea id="url-patterns" placeholder="https://example.com/" rows="2" spellcheck="false"></textarea>
 										</div>
 									</div>
 								</div>
@@ -701,11 +692,6 @@
 								<div class="setting-group">
 									<div class="setting-item setting-item-heading"><h3 data-i18n="advanced">Advanced</h3></div>
 									<div class="setting-items">
-										<div class="setting-item">
-											<label for="url-patterns" data-i18n="templateTriggers">Template triggers</label>
-											<div class="setting-item-description" data-i18n="templateTriggersDescription">Define rules to automatically select this template if it matches a URL pattern or contains schema.org data. One rule per line.</div>
-											<textarea id="url-patterns" placeholder="https://example.com/" rows="2" spellcheck="false"></textarea>
-										</div>
 										<div class="setting-item" id="prompt-context-container">
 											<label for="prompt-context" data-i18n="interpreterContext">Interpreter context</label>
 											<div class="setting-item-description" data-i18n="interpreterContextDescription">The context used to interpret prompt variables. Overrides the default context defined in Interpreter settings. Variables can be used here.</div>

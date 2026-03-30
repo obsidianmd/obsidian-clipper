@@ -31,7 +31,8 @@ export let generalSettings: Settings = {
 		appearance: 'auto',
 		fontFamily: 'system',
 		customFont: '',
-		blendImages: true
+		blendImages: true,
+		customCss: ''
 	},
 	stats: {
 		addToObsidian: 0,
@@ -189,7 +190,8 @@ export async function loadSettings(): Promise<Settings> {
 			appearance: data.reader_settings?.appearance as 'auto' | 'light' | 'dark' ?? defaultSettings.readerSettings.appearance,
 			fontFamily: data.reader_settings?.fontFamily as 'system' | 'custom' ?? defaultSettings.readerSettings.fontFamily,
 			customFont: data.reader_settings?.customFont ?? defaultSettings.readerSettings.customFont,
-			blendImages: data.reader_settings?.blendImages ?? defaultSettings.readerSettings.blendImages
+			blendImages: data.reader_settings?.blendImages ?? defaultSettings.readerSettings.blendImages,
+			customCss: data.reader_settings?.customCss ?? defaultSettings.readerSettings.customCss
 		},
 		stats: data.stats || defaultSettings.stats,
 		history: data.history || defaultSettings.history,

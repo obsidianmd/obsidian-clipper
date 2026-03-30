@@ -906,6 +906,9 @@
 	"templateErrorsCount": {
 		"message": "There are $1 errors in your template."
 	},
+	"template": {
+		"message": "Template"
+	},
 	"templateName": {
 		"message": "Template name"
 	},
