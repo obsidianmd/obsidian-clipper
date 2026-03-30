@@ -149,6 +149,18 @@
 	--text-highlight-bg-rgb: 255, 208, 0;
 	--text-highlight-bg: rgba(var(--text-highlight-bg-rgb), .4);
 
+	/* Sliders */
+	--slider-thumb-border-width: 1px;
+	--slider-thumb-border-color: var(--background-modifier-border-hover);
+	--slider-thumb-height: 18px;
+	--slider-thumb-width: 18px;
+	--slider-thumb-y: -6px;
+	--slider-thumb-radius: var(--slider-thumb-height);
+	--slider-s-thumb-size: 15px;
+	--slider-s-thumb-position: -5px;
+	--slider-track-background: var(--background-modifier-border);
+	--slider-track-height: 3px;
+
 	/* Toggles */
 	--toggle-border-width: 2px;
 	--toggle-width: 40px;
@@ -160,6 +172,39 @@
 
 	--star-color: var(--color-yellow);
 }
+
+// macOS26+ styles
+.is-macos {
+	--slider-thumb-width: 30px;
+
+	--toggle-width: 44px;
+	--toggle-radius: 24px;
+	--toggle-thumb-radius: 24px;
+	--toggle-thumb-height: 16px;
+	--toggle-thumb-width: 26px;
+	--toggle-thumb-opacity-active: 0.6;
+
+	--toggle-s-width: 36px;
+	--toggle-s-thumb-height: 12px;
+	--toggle-s-thumb-width: 20px;
+}
+
+.is-ios {
+	// iOS 26 wide sliders and toggles
+	--slider-thumb-width: 36px;
+
+	--toggle-width: 62px;
+	--toggle-radius: 24px;
+	--toggle-thumb-radius: 24px;
+	--toggle-thumb-height: 24px;
+	--toggle-thumb-width: 36px;
+	--toggle-thumb-opacity-active: 0.6;
+
+	--toggle-s-width: 48px;
+	--toggle-s-thumb-height: 15px;
+	--toggle-s-thumb-width: 28px;
+}
+
 
 @media (prefers-color-scheme: light) {
 	:root {

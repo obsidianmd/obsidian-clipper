@@ -136,6 +136,7 @@ export async function loadSettings(): Promise<Settings> {
 			fontFamily: 'system',
 			customFont: '',
 			blendImages: true,
+			colorLinks: false,
 			customCss: ''
 		},
 		stats: {
