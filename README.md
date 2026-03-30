@@ -1,25 +1,13 @@
-<p align="center">
-  <img src="assets/logo.svg" width="64" height="64" alt="Clipper for AppFlowy">
+
+
+<h1 align="center" style="border-bottom: none">Clipper for AppFlowy</h1>
+
+<p align="center"><a rel="noreferrer noopener" href=""><img alt="Chrome Web Store" src="https://img.shields.io/badge/Chrome-141e24.svg?&style=for-the-badge&logo=google-chrome&logoColor=white"></a>  <a rel="noreferrer noopener" href="https://addons.mozilla.org/fr/firefox/addon/clipper-for-appflowy/"><img alt="Firefox Add-ons" src="https://img.shields.io/badge/Firefox-141e24.svg?&style=for-the-badge&logo=firefox-browser&logoColor=white"></a>
 </p>
 
-# Clipper for AppFlowy
-
-> A community fork of [obsidian-clipper](https://github.com/obsidianmd/obsidian-clipper), adapted for [AppFlowy](https://github.com/AppFlowy-IO/AppFlowy).
+**A community fork of [obsidian-clipper](https://github.com/obsidianmd/obsidian-clipper), adapted for [AppFlowy](https://github.com/AppFlowy-IO/AppFlowy)**
 
 > ⚠️ This is an unofficial community project, not affiliated with or endorsed by the AppFlowy team.
-
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-
-## Screenshots
-
-<p align="center">
-  <img src="assets/screenshot-clip.png" width="49%" alt="Clip an article" />
-  <img src="assets/screenshot-highlights.png" width="49%" alt="Clip with highlights" />
-</p>
-<p align="center">
-  <img src="assets/screenshot-appflowy.png" width="49%" alt="Result in AppFlowy" />
-  <img src="assets/screenshot-settings.png" width="49%" alt="Settings & configuration" />
-</p>
 
 ## Get started
 
@@ -28,20 +16,25 @@ Download the latest release for your browser:
 | Browser           | Download                                                                                                             |
 | ----------------- | -------------------------------------------------------------------------------------------------------------------- |
 | Chrome / Chromium | [clipper-for-appflowy-0.1.0-chrome.zip](https://github.com/alexrosepizant/clipper-for-appflowy/releases/tag/v0.1.0)  |
-| Firefox           | [clipper-for-appflowy-0.1.0-firefox.zip](https://github.com/alexrosepizant/clipper-for-appflowy/releases/tag/v0.1.0) |
+| Firefox           | [Firefox Add-Ons](https://addons.mozilla.org/fr/firefox/addon/clipper-for-appflowy/) |
 | Safari            | [clipper-for-appflowy-0.1.0-safari.zip](https://github.com/alexrosepizant/clipper-for-appflowy/releases/tag/v0.1.0)  |
 
-Once downloaded, install it locally by following the [developer instructions](#install-the-extension-locally) below.
+## Screenshots
+
+<p align="center">
+  <img src="assets/screenshot-clip.png" alt="Clip an article" />
+  <img src="assets/screenshot-highlights.png" alt="Clip with highlights" />
+</p>
+<p align="center">
+  <img src="assets/screenshot-appflowy.png" alt="Result in AppFlowy" />
+  <img src="assets/screenshot-settings.png" alt="Settings & configuration" />
+</p>
 
 ## Use the extension
 
 Documentation is available in the [`docs/`](./docs) folder, covering how to use [highlighting](./docs/Highlight%20web%20pages.md), [templates](./docs/Templates.md), [variables](./docs/Variables.md), [filters](./docs/Filters.md), and more.
 
 ## Contribute
-
-### Translations
-
-You can help translate Clipper for AppFlowy into your language. Submit your translation via pull request using the format found in the [/\_locales](/src/_locales) folder.
 
 ### Features and bug fixes
 
