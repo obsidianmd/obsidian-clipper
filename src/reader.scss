@@ -92,6 +92,9 @@
 			}
 		}
 	}
+	&.color-links a {
+		color: var(--obsidian-reader-text-accent-hover);
+	}
 }
 
 .obsidian-reader-active	body {
@@ -128,15 +131,11 @@
 	}
 	h1 {
 		margin: 0 0 0.5em 0;
-		line-height: calc(var(--obsidian-reader-line-height) * 0.75);
-	}
-
-	h1 { 
 		font-weight: 700;
 		font-size: 1.6em;
 		letter-spacing: -0.02em;
 		line-height: calc(var(--obsidian-reader-line-height) * 0.75);
-		margin-bottom: 0.5em;
+		text-wrap-style: pretty;
 	}
 	h2 {
 		font-weight: 700;
@@ -145,11 +144,13 @@
 		margin-top: 1.8em;
 		margin-bottom: 0.5em;
 		line-height: calc(var(--obsidian-reader-line-height) * 0.85);
+		text-wrap-style: pretty;
 	}
 	h3 { 
 		font-weight: 700;
 		font-size: 1.225em;
 		line-height: calc(var(--obsidian-reader-line-height) * 0.85);
+		text-wrap-style: pretty;
 		margin-top: 2em;
 		margin-bottom: 0.5em;
 	}
@@ -157,18 +158,21 @@
 		font-size: 1.15em;
 		font-weight: 700;
 		line-height: calc(var(--obsidian-reader-line-height) * 0.85);
+		text-wrap-style: pretty;
 		margin-top: 2em;
 		margin-bottom: 0;
 	}
 	h5 {
 		font-weight: 700;
 		line-height: calc(var(--obsidian-reader-line-height) * 0.85);
+		text-wrap-style: pretty;
 		margin-bottom: 1em;
 		font-size: 1em;
 	}
 	h6 {
 		font-weight: 700;
 		line-height: calc(var(--obsidian-reader-line-height) * 0.85);
+		text-wrap-style: pretty;
 		text-transform: uppercase;
 		margin-bottom: 1em;
 		letter-spacing: 0.05em;
@@ -221,10 +225,10 @@
 		overflow-x: auto;
 	}
 	a {
-		color: var(--obsidian-reader-text-accent);
-		&:hover {
-			color: var(--obsidian-reader-text-accent-hover);
-		}
+		color: var(--obsidian-reader-text-primary);
+	}
+	a:hover {
+		color: var(--obsidian-reader-text-accent-hover);
 	}
 	audio {
 		max-width: 100%;

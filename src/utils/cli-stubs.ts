@@ -33,6 +33,7 @@ export const generalSettings: Settings = {
 		fontFamily: 'system',
 		customFont: '',
 		blendImages: true,
+		colorLinks: false,
 		customCss: '',
 	},
 	stats: {

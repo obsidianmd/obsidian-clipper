@@ -123,7 +123,7 @@ function updatePreview() {
 	const preview = document.getElementById('reader-preview');
 	if (!preview) return;
 
-	const { lightTheme, darkTheme, appearance, fontFamily, customFont, fontSize, lineHeight } = generalSettings.readerSettings;
+	const { lightTheme, darkTheme, appearance, fontFamily, customFont, fontSize, lineHeight, colorLinks } = generalSettings.readerSettings;
 	const isDark = getIsDark(appearance);
 	const effectiveTheme = isDark && darkTheme !== 'same' ? darkTheme : lightTheme;
 
@@ -138,6 +138,7 @@ function updatePreview() {
 
 	preview.style.setProperty('--obsidian-reader-font-size', `${fontSize}px`);
 	preview.style.setProperty('--obsidian-reader-line-height', String(lineHeight));
+	preview.classList.toggle('color-links', colorLinks);
 }
 
 function rebuildGrids(lightGrid: HTMLElement | null, darkGrid: HTMLElement | null) {
@@ -261,6 +262,12 @@ export async function initializeReaderSettings() {
 
 	initializeSettingToggle('reader-blend-images', generalSettings.readerSettings.blendImages, (checked) => {
 		saveSettings({ ...generalSettings, readerSettings: { ...generalSettings.readerSettings, blendImages: checked } });
+	});
+
+	initializeSettingToggle('reader-color-links', generalSettings.readerSettings.colorLinks, (checked) => {
+		generalSettings.readerSettings.colorLinks = checked;
+		saveSettings({ ...generalSettings, readerSettings: { ...generalSettings.readerSettings, colorLinks: checked } });
+		updatePreview();
 	});
 
 	const themeModeSelect = document.getElementById('reader-appearance') as HTMLSelectElement;

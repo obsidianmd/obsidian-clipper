@@ -669,6 +669,12 @@
 	"readerBlendImagesDescription": {
 		"message": "Blend images with the page background."
 	},
+	"readerColorLinks": {
+		"message": "Color links"
+	},
+	"readerColorLinksDescription": {
+		"message": "Use the theme accent color for links."
+	},
 	"readerTheme": {
 		"message": "Theme"
 	},

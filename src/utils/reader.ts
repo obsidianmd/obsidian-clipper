@@ -22,6 +22,7 @@ interface ReaderSettings {
 	fontFamily: 'system' | 'custom';
 	customFont: string;
 	blendImages: boolean;
+	colorLinks: boolean;
 	customCss: string;
 }
 
@@ -96,6 +97,7 @@ export class Reader {
 		fontFamily: 'system',
 		customFont: '',
 		blendImages: true,
+		colorLinks: false,
 		customCss: ''
 	};
 
@@ -455,6 +457,10 @@ export class Reader {
 
 	private static applyBlendImages(doc: Document, blend: boolean): void {
 		doc.documentElement.classList.toggle('no-blend-images', !blend);
+	}
+
+	private static applyColorLinks(doc: Document, colorLinks: boolean): void {
+		doc.documentElement.classList.toggle('color-links', colorLinks);
 	}
 
 	private static handleColorSchemeChange(e: MediaQueryListEvent, doc: Document): void {
@@ -1336,6 +1342,7 @@ export class Reader {
 			doc.documentElement.style.setProperty('--obsidian-reader-line-width', `${this.settings.maxWidth}em`);
 			this.applyFontFamily(doc, this.settings.fontFamily, this.settings.customFont);
 			this.applyBlendImages(doc, this.settings.blendImages);
+			this.applyColorLinks(doc, this.settings.colorLinks);
 
 			if (this.settings.customCss) {
 				const styleEl = doc.createElement('style');

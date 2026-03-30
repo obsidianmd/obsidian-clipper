@@ -361,6 +361,9 @@
 				margin-left: auto;
 				width: auto;
 			}
+			&:last-child {
+				border-bottom: none;
+			}
 		}
 	}
 	.shortcut-item {
@@ -520,11 +523,12 @@
 	}
 
 	.reader-preview-link {
-		color: var(--obsidian-reader-text-accent, #222);
+		color: var(--obsidian-reader-text-primary, #222);
 		text-decoration: underline;
-		&:hover {
-			color: var(--obsidian-reader-text-accent-hover, #8a5cf5);
-		}
+	}
+
+	&.color-links .reader-preview-link {
+		color: var(--obsidian-reader-text-accent-hover, #8a5cf5);
 	}
 }
 

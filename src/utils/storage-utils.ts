@@ -32,6 +32,7 @@ export let generalSettings: Settings = {
 		fontFamily: 'system',
 		customFont: '',
 		blendImages: true,
+		colorLinks: false,
 		customCss: ''
 	},
 	stats: {
@@ -78,6 +79,7 @@ interface StorageData {
 		fontFamily?: 'system' | 'custom';
 		customFont?: string;
 		blendImages?: boolean;
+		colorLinks?: boolean;
 		customCss?: string;
 	};
 	interpreter_settings?: {
@@ -191,6 +193,7 @@ export async function loadSettings(): Promise<Settings> {
 			fontFamily: data.reader_settings?.fontFamily as 'system' | 'custom' ?? defaultSettings.readerSettings.fontFamily,
 			customFont: data.reader_settings?.customFont ?? defaultSettings.readerSettings.customFont,
 			blendImages: data.reader_settings?.blendImages ?? defaultSettings.readerSettings.blendImages,
+			colorLinks: data.reader_settings?.colorLinks ?? defaultSettings.readerSettings.colorLinks,
 			customCss: data.reader_settings?.customCss ?? defaultSettings.readerSettings.customCss
 		},
 		stats: data.stats || defaultSettings.stats,
@@ -243,6 +246,7 @@ export async function saveSettings(settings?: Partial<Settings>): Promise<void> 
 			fontFamily: generalSettings.readerSettings.fontFamily,
 			customFont: generalSettings.readerSettings.customFont,
 			blendImages: generalSettings.readerSettings.blendImages,
+			colorLinks: generalSettings.readerSettings.colorLinks,
 			customCss: generalSettings.readerSettings.customCss
 		},
 		stats: generalSettings.stats
