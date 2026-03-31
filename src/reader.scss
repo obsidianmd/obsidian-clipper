@@ -449,17 +449,29 @@
 	}
 
 	.comments {
+		font-size: 0.925em;
+
 		// Spacing between top-level comment groups
 		> blockquote + blockquote {
 			margin-top: 1.5em;
 		}
 
 		blockquote {
+			border: none;
+			padding: 0;
+			margin: 2em 0;
+		}
+
+		blockquote blockquote {
 			position: relative;
 			border-left: 1px solid var(--obsidian-reader-border);
 			padding-inline-start: calc(1.5em - 1px);
 			margin: 0;
 			transition: border-color 0.15s ease;
+
+			.comment:last-child {
+				margin-bottom: 3em;
+			}
 
 			&:hover  {
 				border-color: var(--obsidian-reader-text-faint);
@@ -518,7 +530,7 @@
 		.comment-metadata {
 			color: var(--obsidian-reader-text-muted);
 			font-size: 0.9em;
-			margin-bottom: 1em;
+			margin-bottom: .5em;
 			.comment-author strong {
 				color: var(--obsidian-reader-text-primary);
 			}
@@ -532,7 +544,7 @@
 			}
 		}
 		.comment-content {
-			margin-bottom: 2.5em;
+			margin-bottom: 1.5em;
 
 			// Restore normal blockquote styles for quoted text inside comments.
 			blockquote {
