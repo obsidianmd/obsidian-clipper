@@ -978,6 +978,7 @@ export class Reader {
 		'--obsidian-reader-color-blue',
 		'--obsidian-reader-color-purple',
 		'--obsidian-reader-color-pink',
+		'--obsidian-reader-text-muted',
 	];
 
 	private static usernameToColor(username: string): string {
@@ -996,29 +997,90 @@ export class Reader {
 		commentsEl.querySelectorAll<HTMLElement>('.comment-author').forEach((authorEl) => {
 			const username = authorEl.querySelector('strong')?.textContent?.trim() || '';
 			if (!username) return;
-			authorEl.style.backgroundColor = `color-mix(in srgb, var(${this.usernameToColor(username)}) 15%, transparent)`;
+			authorEl.style.backgroundColor = `color-mix(in srgb, var(${this.usernameToColor(username)}) 20%, transparent)`;
 		});
 
-		// Only thread blockquotes (those with a direct .comment child) get collapse behavior.
-		// Content blockquotes (quoted text inside .comment-content) are excluded.
-		commentsEl.querySelectorAll<HTMLElement>('blockquote:has(> .comment)').forEach((blockquote) => {
-			blockquote.addEventListener('click', (e: MouseEvent) => {
-				const rect = blockquote.getBoundingClientRect();
-				const padding = parseFloat(getComputedStyle(blockquote).paddingInlineStart);
-				if (e.clientX - rect.left <= padding) {
-					e.stopPropagation();
-					blockquote.classList.toggle('collapsed');
+		// Add collapse/expand button to each comment
+		commentsEl.querySelectorAll<HTMLElement>('.comment').forEach((comment) => {
+			const metadata = comment.querySelector('.comment-metadata');
+			if (!metadata) return;
+
+			const btn = doc.createElement('button');
+			btn.className = 'comment-collapse-btn';
+			btn.setAttribute('aria-label', 'Collapse comment');
+
+			const chevron = this.createSVG({
+				width: '16',
+				height: '16',
+				viewBox: '0 0 24 24',
+				paths: ['m6 9 6 6 6-6'],
+			});
+			chevron.classList.add('comment-collapse-chevron');
+			btn.appendChild(chevron);
+
+			const countSpan = doc.createElement('span');
+			countSpan.className = 'comment-collapse-count';
+			btn.appendChild(countSpan);
+
+			metadata.appendChild(btn);
+
+			const isTopLevel = comment.parentElement?.matches?.('.comments > blockquote');
+
+			// Get sibling elements that should be hidden when this comment is collapsed.
+			// - Blockquotes (reply branches) are always hidden
+			// - Stop at the next .comment (a separate reply at the same level)
+			// - Top-level: hide everything (comments + blockquotes)
+			const getCollapsibleSiblings = (): HTMLElement[] => {
+				const siblings: HTMLElement[] = [];
+				let sibling = comment.nextElementSibling;
+				while (sibling) {
+					if (sibling.classList.contains('comment')) {
+						if (isTopLevel) {
+							siblings.push(sibling as HTMLElement);
+						} else {
+							break;
+						}
+					} else if (sibling.tagName === 'BLOCKQUOTE') {
+						siblings.push(sibling as HTMLElement);
+					}
+					sibling = sibling.nextElementSibling;
 				}
-			});
+				return siblings;
+			};
 
-			blockquote.addEventListener('mousemove', (e: MouseEvent) => {
-				const rect = blockquote.getBoundingClientRect();
-				const padding = parseFloat(getComputedStyle(blockquote).paddingInlineStart);
-				blockquote.style.cursor = (e.clientX - rect.left) <= padding ? 'pointer' : '';
-			});
+			const countHidden = (siblings: HTMLElement[]): number => {
+				let count = 0;
+				for (const el of siblings) {
+					if (el.classList.contains('comment')) count++;
+					else count += el.querySelectorAll('.comment').length;
+				}
+				return count;
+			};
 
-			blockquote.addEventListener('mouseleave', () => {
-				blockquote.style.cursor = '';
+			const updateBtn = () => {
+				const isCollapsed = comment.classList.contains('collapsed');
+				const siblings = getCollapsibleSiblings();
+
+				for (const el of siblings) {
+					el.style.display = isCollapsed ? 'none' : '';
+				}
+
+				if (isCollapsed) {
+					const hidden = countHidden(siblings);
+					countSpan.textContent = hidden > 0 ? `${hidden}` : '';
+					btn.classList.add('is-collapsed');
+					btn.setAttribute('aria-label', `Expand${hidden > 0 ? ` ${hidden} more` : ''}`);
+				} else {
+					countSpan.textContent = '';
+					btn.classList.remove('is-collapsed');
+					btn.setAttribute('aria-label', 'Collapse comment');
+				}
+			};
+
+			btn.addEventListener('click', (e) => {
+				e.stopPropagation();
+				comment.classList.toggle('collapsed');
+				updateBtn();
 			});
 		});
 

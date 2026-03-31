@@ -494,6 +494,10 @@
 			}
 		}
 
+		.comment.collapsed .comment-metadata {
+			margin-bottom: 2em;
+		}
+
 		> blockquote > blockquote + blockquote {
 			margin-top: -2em;
 			padding-top: 3em;
@@ -535,6 +539,8 @@
 		}
 
 		.comment-metadata {
+			position: relative;
+			z-index: 10;
 			color: var(--obsidian-reader-text-muted);
 			font-size: 0.9em;
 			margin-bottom: 0.5em;
@@ -552,6 +558,43 @@
 					color: var(--obsidian-reader-text-accent-hover);
 					text-decoration: underline;
 				}
+			}
+			.comment-collapse-btn {
+				user-select: none;
+				background: none;
+				border: none;
+				color: var(--obsidian-reader-text-muted);
+				cursor: pointer;
+				margin-top: -2px;
+				padding: 2px 2px;
+				border-radius: 3px;
+				font-family: var(--obsidian-reader-font-family);
+				display: inline-flex;
+				align-items: center;
+				gap: 2px;
+				vertical-align: middle;
+				&:hover {
+					color: var(--obsidian-reader-text-primary);
+					background: var(--obsidian-reader-background-primary-alt);
+				}
+				.comment-collapse-count {
+					padding-inline-end: 4px;
+					&:empty {
+						display: none;
+					}
+				}
+				.comment-collapse-chevron {
+					transition: transform 0.15s ease;
+				}
+				&.is-collapsed .comment-collapse-chevron {
+					transform: rotate(-90deg);
+				}
+			}
+		}
+
+		.comment.collapsed {
+			> .comment-content {
+				display: none;
 			}
 		}
 		.comment-content {
