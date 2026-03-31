@@ -410,7 +410,7 @@ export class Reader {
 
 	private static updateTheme(doc: Document, theme: string): void {
 		const isDark = doc.documentElement.classList.contains('theme-dark');
-		if (isDark) {
+		if (isDark && this.settings.darkTheme !== 'same') {
 			this.settings.darkTheme = theme;
 		} else {
 			this.settings.lightTheme = theme;
@@ -1544,14 +1544,17 @@ export class Reader {
 				doc.body.appendChild(clipperIframeContainer);
 			}
 
-			// Toggle dark mode with D key
+			// Toggle dark mode with D key (visual only, doesn't change appearance setting)
 			doc.addEventListener('keydown', (e) => {
 				if (!this.isActive) return;
 				if ((e.key !== 'd' && e.key !== 'D') || e.ctrlKey || e.metaKey) return;
 				const tag = (document.activeElement as HTMLElement)?.tagName;
 				if (tag === 'INPUT' || tag === 'TEXTAREA') return;
-				const newMode = doc.documentElement.classList.contains('theme-dark') ? 'light' : 'dark';
-				this.updateThemeMode(doc, newMode);
+				const html = doc.documentElement;
+				const isDark = html.classList.contains('theme-dark');
+				html.classList.remove('theme-light', 'theme-dark');
+				html.classList.add(isDark ? 'theme-light' : 'theme-dark');
+				this.applyTheme(doc);
 			});
 
 			// Set up color scheme media query listener

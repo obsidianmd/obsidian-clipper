@@ -46,7 +46,7 @@
 	--obsidian-reader-text-muted: #8c8fa1;
 	--obsidian-reader-text-faint: #acb0be;
 	--obsidian-reader-text-accent: #4c4f69;
-	--obsidian-reader-text-accent-hover: #1e66f5;
+	--obsidian-reader-text-accent-hover: #dd7878;
 	--obsidian-reader-border: #dce0e8;
 	--obsidian-reader-text-selection: rgba(172, 176, 190, 0.3);
 	--obsidian-reader-color-red: #E64553;
@@ -60,14 +60,14 @@
 
 	&.theme-dark,
 	.theme-dark {
-		--obsidian-reader-background-primary: #303446;
-		--obsidian-reader-background-primary-alt: #292c3c;
+		--obsidian-reader-background-primary: #242634;
+		--obsidian-reader-background-primary-alt: #303446;
 		--obsidian-reader-text-primary: #c6d0f5;
-		--obsidian-reader-text-muted: #838ba7;
-		--obsidian-reader-text-faint: #626880;
+		--obsidian-reader-text-muted: #A6ADCE;
+		--obsidian-reader-text-faint: #848BA7;
 		--obsidian-reader-text-accent: #c6d0f5;
-		--obsidian-reader-text-accent-hover: #8caaee;
-		--obsidian-reader-border: #414559;
+		--obsidian-reader-text-accent-hover: #EFA076;
+		--obsidian-reader-border: #41455A;
 		--obsidian-reader-text-selection: rgba(98, 104, 128, 0.5);
 		--obsidian-reader-color-red: #EB999C;
 		--obsidian-reader-color-orange: #EFA076;
@@ -216,8 +216,8 @@
 	--obsidian-reader-color-red: #b4637a;
 	--obsidian-reader-color-orange: #d7827e;
 	--obsidian-reader-color-yellow: #ea9d34;
-	--obsidian-reader-color-green: #286983;
-	--obsidian-reader-color-cyan: #56949f;
+	--obsidian-reader-color-green: #56949f;
+	--obsidian-reader-color-cyan: #d7827e;
 	--obsidian-reader-color-blue: #286983;
 	--obsidian-reader-color-purple: #907aa9;
 	--obsidian-reader-color-pink: #ebbcba;
@@ -236,8 +236,8 @@
 		--obsidian-reader-color-red: #eb6f92;
 		--obsidian-reader-color-orange: #ea9a97;
 		--obsidian-reader-color-yellow: #f6c177;
-		--obsidian-reader-color-green: #3e8fb0;
-		--obsidian-reader-color-cyan: #9ccfd8;
+		--obsidian-reader-color-green: #9ccfd8;
+		--obsidian-reader-color-cyan: #ea9a97;
 		--obsidian-reader-color-blue: #3e8fb0;
 		--obsidian-reader-color-purple: #c4a7e7;
 		--obsidian-reader-color-pink: #ebbcba;
@@ -287,13 +287,13 @@
 
 .obsidian-reader-active[data-reader-theme="solarized"] {
 	--obsidian-reader-background-primary: #fdf6e3;
-	--obsidian-reader-background-primary-alt: #f5eedb;
+	--obsidian-reader-background-primary-alt: #eee8d5;
 	--obsidian-reader-text-primary: #073642;
-	--obsidian-reader-text-muted: #93a1a1;
-	--obsidian-reader-text-faint: #c4baa0;
+	--obsidian-reader-text-muted: #586e75;
+	--obsidian-reader-text-faint: #ABB2AC;
 	--obsidian-reader-text-accent: #073642;
 	--obsidian-reader-text-accent-hover: #268bd2;
-	--obsidian-reader-border: #e5deca;
+	--obsidian-reader-border: #e9e1c8;
 	--obsidian-reader-text-selection: rgba(202, 197, 182, 0.3);
 	--obsidian-reader-color-red: #dc322f;
 	--obsidian-reader-color-orange: #cb4b16;
@@ -307,13 +307,13 @@
 	&.theme-dark,
 	.theme-dark {
 		--obsidian-reader-background-primary: #002b36;
-		--obsidian-reader-background-primary-alt: #003847;
+		--obsidian-reader-background-primary-alt: #073642;
 		--obsidian-reader-text-primary: #839496;
 		--obsidian-reader-text-muted: #586e75;
 		--obsidian-reader-text-faint: #31535b;
 		--obsidian-reader-text-accent: #839496;
 		--obsidian-reader-text-accent-hover: #268bd2;
-		--obsidian-reader-border: #073642;
+		--obsidian-reader-border: #19414B;
 		--obsidian-reader-text-selection: rgba(15, 81, 98, 0.3);
 		--obsidian-reader-color-red: #dc322f;
 		--obsidian-reader-color-orange: #cb4b16;
