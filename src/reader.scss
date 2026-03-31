@@ -449,7 +449,12 @@
 	}
 
 	.comments {
+		--obsidian-reader-comment-border-width: 1.5px;
 		font-size: 0.925em;
+
+		> blockquote + blockquote {
+			padding-top: 1.5em;
+		}
 
 		// Spacing between top-level comment groups
 		> blockquote + blockquote {
@@ -464,14 +469,11 @@
 
 		blockquote blockquote {
 			position: relative;
-			border-left: 1px solid var(--obsidian-reader-border);
-			padding-inline-start: calc(1.5em - 1px);
+			border-left: var(--obsidian-reader-comment-border-width) solid var(--obsidian-reader-border);
+			padding-inline-start: calc(1.5em - var(--obsidian-reader-comment-border-width));
 			margin: 0;
 			transition: border-color 0.15s ease;
 
-			.comment:last-child {
-				margin-bottom: 3em;
-			}
 
 			&:hover  {
 				border-color: var(--obsidian-reader-text-faint);
@@ -492,17 +494,22 @@
 			}
 		}
 
+		> blockquote > blockquote + blockquote {
+			margin-top: -2em;
+			padding-top: 3em;
+		}
+	
 		// Arm connector: extends from parent's border-left to this blockquote's border-left.
-		blockquote > blockquote {
+		blockquote > blockquote > blockquote {
 			&::before {
 				content: '';
 				position: absolute;
 				left: calc(-1.5em);
 				top: 0;
 				width: 1.5em;
-				height: 1px;
+				height: var(--obsidian-reader-comment-border-width);
 				box-sizing: border-box;
-				border-bottom: 1px solid var(--obsidian-reader-border);
+				border-bottom: var(--obsidian-reader-comment-border-width) solid var(--obsidian-reader-border);
 				pointer-events: none;
 				transition: border-color 0.15s ease;
 				z-index: 5;
@@ -516,11 +523,11 @@
 
 		// Last child: mask parent's border-left below the arm so the
 		// thread line stops at the last branch instead of continuing.
-		blockquote > blockquote:last-child::after {
+		blockquote > blockquote > blockquote > blockquote:last-child::after {
 			content: '';
 			position: absolute;
-			left: calc(-1.5em - 1px);
-			top: calc(1px);
+			left: calc(-1.5em - var(--obsidian-reader-comment-border-width));
+			top: calc(var(--obsidian-reader-comment-border-width));
 			bottom: 0;
 			width: 3px;
 			background: var(--obsidian-reader-background-primary);
@@ -530,9 +537,13 @@
 		.comment-metadata {
 			color: var(--obsidian-reader-text-muted);
 			font-size: 0.9em;
-			margin-bottom: .5em;
-			.comment-author strong {
-				color: var(--obsidian-reader-text-primary);
+			margin-bottom: 0.5em;
+			.comment-author {
+				padding: 1px 3px;
+				border-radius: 3px;
+				strong {
+					color: var(--obsidian-reader-text-primary);
+				}
 			}
 			a {
 				color: var(--obsidian-reader-text-muted);
@@ -544,7 +555,7 @@
 			}
 		}
 		.comment-content {
-			margin-bottom: 1.5em;
+			margin-bottom: 2em;
 
 			// Restore normal blockquote styles for quoted text inside comments.
 			blockquote {

@@ -969,9 +969,35 @@ export class Reader {
 		});
 	}
 
+	private static readonly COMMENT_COLORS = [
+		'--obsidian-reader-color-red',
+		'--obsidian-reader-color-orange',
+		'--obsidian-reader-color-yellow',
+		'--obsidian-reader-color-green',
+		'--obsidian-reader-color-cyan',
+		'--obsidian-reader-color-blue',
+		'--obsidian-reader-color-purple',
+		'--obsidian-reader-color-pink',
+	];
+
+	private static usernameToColor(username: string): string {
+		let hash = 0;
+		for (let i = 0; i < username.length; i++) {
+			hash = ((hash << 5) - hash + username.charCodeAt(i)) | 0;
+		}
+		return this.COMMENT_COLORS[Math.abs(hash) % this.COMMENT_COLORS.length];
+	}
+
 	private static initializeComments(doc: Document) {
 		const commentsEl = doc.querySelector<HTMLElement>('.comments');
 		if (!commentsEl) return;
+
+		// Add background color to comment author names for easy thread following
+		commentsEl.querySelectorAll<HTMLElement>('.comment-author').forEach((authorEl) => {
+			const username = authorEl.querySelector('strong')?.textContent?.trim() || '';
+			if (!username) return;
+			authorEl.style.backgroundColor = `color-mix(in srgb, var(${this.usernameToColor(username)}) 15%, transparent)`;
+		});
 
 		// Only thread blockquotes (those with a direct .comment child) get collapse behavior.
 		// Content blockquotes (quoted text inside .comment-content) are excluded.
@@ -1039,9 +1065,24 @@ export class Reader {
 			parent = child.parentElement;
 			while (parent && parent.tagName === 'BLOCKQUOTE' && !parent.closest('.comment-content')) {
 				const armHeight = parseFloat(getComputedStyle(child).fontSize);
-				parent.style.setProperty('--highlight-height', `${child.offsetTop + armHeight}px`);
+				parent.style.setProperty('--highlight-height', `${child.offsetTop + 2}px`);
 				parent.classList.add('child-hovered');
 				highlightedAncestors.push(parent);
+
+				// If parent is a top-level blockquote (its parent is .comments),
+				// highlight all previous sibling blockquotes of `child` to trace
+				// the thread line back up to the top-level comment.
+				if (parent.parentElement?.matches?.('.comments')) {
+					let sibling = child.previousElementSibling;
+					while (sibling) {
+						if (sibling.tagName === 'BLOCKQUOTE') {
+							(sibling as HTMLElement).classList.add('child-hovered');
+							highlightedAncestors.push(sibling as HTMLElement);
+						}
+						sibling = sibling.previousElementSibling;
+					}
+				}
+
 				child = parent;
 				parent = child.parentElement;
 			}
