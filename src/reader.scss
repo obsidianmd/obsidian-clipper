@@ -448,6 +448,107 @@
 		}
 	}
 
+	.comments {
+		// Spacing between top-level comment groups
+		> blockquote + blockquote {
+			margin-top: 1.5em;
+		}
+
+		blockquote {
+			position: relative;
+			border-left: 1px solid var(--obsidian-reader-border);
+			padding-inline-start: calc(1.5em - 1px);
+			margin: 0;
+			transition: border-color 0.15s ease;
+
+			&:hover  {
+				border-color: var(--obsidian-reader-text-faint);
+			}
+
+			&.child-hovered {
+				border-image: linear-gradient(
+					to bottom,
+					var(--obsidian-reader-text-faint) var(--highlight-height, 100%),
+					var(--obsidian-reader-border) var(--highlight-height, 100%)
+				) 1;
+			}
+
+			&.collapsed {
+				border-left-color: var(--obsidian-reader-text-faint);
+				> blockquote { display: none; }
+				> .comment > .comment-content { display: none; }
+			}
+		}
+
+		// Arm connector: extends from parent's border-left to this blockquote's border-left.
+		blockquote > blockquote {
+			&::before {
+				content: '';
+				position: absolute;
+				left: calc(-1.5em);
+				top: 0;
+				width: 1.5em;
+				height: 1px;
+				box-sizing: border-box;
+				border-bottom: 1px solid var(--obsidian-reader-border);
+				pointer-events: none;
+				transition: border-color 0.15s ease;
+				z-index: 5;
+			}
+
+			&:hover::before,
+			&.collapsed::before {
+				border-color: var(--obsidian-reader-text-faint);
+			}
+		}
+
+		// Last child: mask parent's border-left below the arm so the
+		// thread line stops at the last branch instead of continuing.
+		blockquote > blockquote:last-child::after {
+			content: '';
+			position: absolute;
+			left: calc(-1.5em - 1px);
+			top: calc(1px);
+			bottom: 0;
+			width: 3px;
+			background: var(--obsidian-reader-background-primary);
+			pointer-events: none;
+		}
+
+		.comment-metadata {
+			color: var(--obsidian-reader-text-muted);
+			font-size: 0.9em;
+			margin-bottom: 1em;
+			.comment-author strong {
+				color: var(--obsidian-reader-text-primary);
+			}
+			a {
+				color: var(--obsidian-reader-text-muted);
+				text-decoration: none;
+				&:hover {
+					color: var(--obsidian-reader-text-accent-hover);
+					text-decoration: underline;
+				}
+			}
+		}
+		.comment-content {
+			margin-bottom: 2.5em;
+
+			// Restore normal blockquote styles for quoted text inside comments.
+			blockquote {
+				border-inline-start: 2px solid var(--obsidian-reader-text-faint);
+				padding-inline-start: 1.5em;
+				margin: 2em 0;
+
+				// No arm or mask on content blockquotes
+				&::after,
+				&::before {
+					display: none;
+				}
+			}
+		}
+	}
+
 	.footnote-popover {
 		position: fixed;
 		z-index: 9999999999;

@@ -969,6 +969,87 @@ export class Reader {
 		});
 	}
 
+	private static initializeComments(doc: Document) {
+		const commentsEl = doc.querySelector<HTMLElement>('.comments');
+		if (!commentsEl) return;
+
+		// Only thread blockquotes (those with a direct .comment child) get collapse behavior.
+		// Content blockquotes (quoted text inside .comment-content) are excluded.
+		commentsEl.querySelectorAll<HTMLElement>('blockquote:has(> .comment)').forEach((blockquote) => {
+			blockquote.addEventListener('click', (e: MouseEvent) => {
+				const rect = blockquote.getBoundingClientRect();
+				const padding = parseFloat(getComputedStyle(blockquote).paddingInlineStart);
+				if (e.clientX - rect.left <= padding) {
+					e.stopPropagation();
+					blockquote.classList.toggle('collapsed');
+				}
+			});
+
+			blockquote.addEventListener('mousemove', (e: MouseEvent) => {
+				const rect = blockquote.getBoundingClientRect();
+				const padding = parseFloat(getComputedStyle(blockquote).paddingInlineStart);
+				blockquote.style.cursor = (e.clientX - rect.left) <= padding ? 'pointer' : '';
+			});
+
+			blockquote.addEventListener('mouseleave', () => {
+				blockquote.style.cursor = '';
+			});
+		});
+
+		// Highlight ancestor thread lines up to the hovered child's arm
+		let highlightedAncestors: HTMLElement[] = [];
+
+		const clearHighlight = () => {
+			for (const el of highlightedAncestors) {
+				el.classList.remove('child-hovered');
+				el.style.removeProperty('--highlight-height');
+			}
+			highlightedAncestors = [];
+		};
+
+		commentsEl.addEventListener('mouseover', (e) => {
+			const target = e.target as HTMLElement;
+			const bq = target.closest('blockquote') as HTMLElement;
+			if (!bq || bq.closest('.comment-content')) {
+				clearHighlight();
+				return;
+			}
+
+			// Walk up the chain: for each ancestor blockquote, highlight
+			// its border-left up to the child branch that leads to the hovered element.
+			const newAncestors: HTMLElement[] = [];
+			let child = bq;
+			let parent = child.parentElement;
+			while (parent && parent.tagName === 'BLOCKQUOTE' && !parent.closest('.comment-content')) {
+				newAncestors.push(parent);
+				child = parent;
+				parent = child.parentElement;
+			}
+
+			// Skip update if same set of ancestors
+			if (newAncestors.length === highlightedAncestors.length &&
+				newAncestors.every((el, i) => el === highlightedAncestors[i])) {
+				return;
+			}
+
+			clearHighlight();
+
+			// Re-walk to set --highlight-height on each ancestor
+			child = bq;
+			parent = child.parentElement;
+			while (parent && parent.tagName === 'BLOCKQUOTE' && !parent.closest('.comment-content')) {
+				const armHeight = parseFloat(getComputedStyle(child).fontSize);
+				parent.style.setProperty('--highlight-height', `${child.offsetTop + armHeight}px`);
+				parent.classList.add('child-hovered');
+				highlightedAncestors.push(parent);
+				child = parent;
+				parent = child.parentElement;
+			}
+		});
+
+		commentsEl.addEventListener('mouseleave', clearHighlight);
+	}
+
 	private static initializeLightbox(doc: Document) {
 		// Create lightbox container
 		this.lightbox = doc.createElement('div');
@@ -1528,6 +1609,7 @@ export class Reader {
 			this.initializeCodeHighlighting(doc);
 			this.initializeCopyButtons(doc);
 			this.initializeLightbox(doc);
+			this.initializeComments(doc);
 
 			applyHighlights();
 
