@@ -989,6 +989,55 @@ export class Reader {
 		return this.COMMENT_COLORS[Math.abs(hash) % this.COMMENT_COLORS.length];
 	}
 
+	private static linkifyTextUrls(doc: Document): void {
+		const article = doc.querySelector('article');
+		if (!article) return;
+
+		const urlPattern = /\bhttps?:\/\/[^\s<>\[\]()'"]+/g;
+		const walker = doc.createTreeWalker(article, NodeFilter.SHOW_TEXT, {
+			acceptNode(node) {
+				// Skip text inside <a>, <pre>, <code>, <script>, <style>
+				const parent = node.parentElement;
+				if (parent?.closest('a, pre, code, script, style')) {
+					return NodeFilter.FILTER_REJECT;
+				}
+				return urlPattern.test(node.textContent || '') ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+			}
+		});
+
+		const textNodes: Text[] = [];
+		while (walker.nextNode()) {
+			textNodes.push(walker.currentNode as Text);
+		}
+
+		for (const textNode of textNodes) {
+			const text = textNode.textContent || '';
+			urlPattern.lastIndex = 0;
+			const fragment = doc.createDocumentFragment();
+			let lastIndex = 0;
+			let match;
+
+			while ((match = urlPattern.exec(text)) !== null) {
+				if (match.index > lastIndex) {
+					fragment.appendChild(doc.createTextNode(text.slice(lastIndex, match.index)));
+				}
+				const link = doc.createElement('a');
+				link.href = match[0];
+				link.textContent = match[0];
+				link.target = '_blank';
+				link.rel = 'noopener noreferrer';
+				fragment.appendChild(link);
+				lastIndex = urlPattern.lastIndex;
+			}
+
+			if (lastIndex < text.length) {
+				fragment.appendChild(doc.createTextNode(text.slice(lastIndex)));
+			}
+
+			textNode.parentNode?.replaceChild(fragment, textNode);
+		}
+	}
+
 	private static initializeComments(doc: Document) {
 		const commentsEl = doc.querySelector<HTMLElement>('.comments');
 		if (!commentsEl) return;
@@ -1715,6 +1764,7 @@ export class Reader {
 			this.initializeCodeHighlighting(doc);
 			this.initializeCopyButtons(doc);
 			this.initializeLightbox(doc);
+			this.linkifyTextUrls(doc);
 			this.initializeComments(doc);
 
 			applyHighlights();
