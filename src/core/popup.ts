@@ -1623,10 +1623,14 @@ async function toggleReaderMode(tabId: number) {
 
 export async function copyToClipboard(content: string) {
 	try {
-		await browser.runtime.sendMessage({
-			action: "copy-to-clipboard",
-			text: content,
-		});
+		try {
+			await navigator.clipboard.writeText(content);
+		} catch {
+			await browser.runtime.sendMessage({
+				action: "copy-to-clipboard",
+				text: content,
+			});
+		}
 
 		const pathField = document.getElementById(
 			"path-name-field",

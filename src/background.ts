@@ -62,6 +62,38 @@ let hasHighlights = false;
 let isContextMenuCreating = false;
 let popupPorts: { [tabId: number]: browser.Runtime.Port } = {};
 
+async function injectContentScript(tabId: number): Promise<void> {
+	if (browser.scripting) {
+		console.log('[Obsidian Clipper] Using scripting API');
+		await browser.scripting.executeScript({
+			target: { tabId },
+			files: ['content.js']
+		});
+	} else {
+		console.log('[Obsidian Clipper] Using tabs.executeScript fallback');
+		await browser.tabs.executeScript(tabId, { file: 'content.js' });
+	}
+	console.log('[Obsidian Clipper] Injection completed, waiting for init...');
+
+	// Poll until the content script responds, rather than a fixed delay.
+	// Try immediately after injection, then back off with 50ms sleeps.
+	let ready = false;
+	for (let i = 0; i < 8; i++) {
+		try {
+			await browser.tabs.sendMessage(tabId, { action: "ping" });
+			ready = true;
+			break;
+		} catch {
+			// Not ready yet
+		}
+		await new Promise(resolve => setTimeout(resolve, 50));
+	}
+	if (!ready) {
+		throw new Error('Content script did not respond after injection');
+	}
+	console.log('[Obsidian Clipper] Post-injection ping succeeded');
+}
+
 async function ensureContentScriptLoadedInBackground(tabId: number): Promise<void> {
 	try {
 		// First, get the tab information
@@ -84,43 +116,7 @@ async function ensureContentScriptLoadedInBackground(tabId: number): Promise<voi
 
 		// If the message fails, the content script is not loaded, so inject it
 		console.log('[Obsidian Clipper] Ping failed, injecting content script...', error);
-		try {
-			// Try using the scripting API (Chrome)
-			if (browser.scripting) {
-				console.log('[Obsidian Clipper] Using scripting API');
-				await browser.scripting.executeScript({
-					target: { tabId: tabId },
-					files: ['content.js']
-				});
-			} else {
-				console.log('[Obsidian Clipper] Using tabs.executeScript fallback');
-				// Fallback to tabs.executeScript (Firefox)
-				await browser.tabs.executeScript(tabId, {
-					file: 'content.js'
-				});
-			}
-			console.log('[Obsidian Clipper] Injection completed, waiting for init...');
-
-			// Poll until the content script responds, rather than a fixed delay
-			let ready = false;
-			for (let i = 0; i < 8; i++) {
-				await new Promise(resolve => setTimeout(resolve, 50));
-				try {
-					await browser.tabs.sendMessage(tabId, { action: "ping" });
-					ready = true;
-					break;
-				} catch {
-					// Not ready yet
-				}
-			}
-			if (!ready) {
-				throw new Error('Content script did not respond after injection');
-			}
-			console.log('[Obsidian Clipper] Post-injection ping succeeded');
-		} catch (injectError) {
-			console.error('[Obsidian Clipper] Injection or post-injection ping failed:', injectError);
-			throw injectError;
-		}
+		await injectContentScript(tabId);
 	}
 }
 
@@ -398,6 +394,22 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 				});
 			});
 			return true;
+		}
+
+		if (typedRequest.action === "forceInjectContentScript") {
+			const tabId = typedRequest.tabId;
+			if (tabId) {
+				injectContentScript(tabId)
+					.then(() => sendResponse({ success: true }))
+					.catch((error) => {
+						console.error('[Obsidian Clipper] forceInjectContentScript failed:', error);
+						sendResponse({ success: false, error: error instanceof Error ? error.message : String(error) });
+					});
+				return true;
+			} else {
+				sendResponse({ success: false, error: 'Missing tabId' });
+				return true;
+			}
 		}
 
 		if (typedRequest.action === "sendMessageToTab") {
