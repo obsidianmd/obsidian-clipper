@@ -13,19 +13,7 @@ import { getFontCss } from './font-utils';
 // Mobile viewport settings
 const VIEWPORT = 'width=device-width, initial-scale=1, maximum-scale=1';
 
-interface ReaderSettings {
-	fontSize: number;
-	lineHeight: number;
-	maxWidth: number;
-	lightTheme: string;
-	darkTheme: string;
-	appearance: 'auto' | 'light' | 'dark';
-	fonts: string[];
-	defaultFont: string;
-	blendImages: boolean;
-	colorLinks: boolean;
-	customCss: string;
-}
+import { ReaderSettings } from '../types/types';
 
 export class Reader {
 	private static originalHTML: string | null = null;
@@ -203,51 +191,24 @@ export class Reader {
 		themeSelect.className = 'obsidian-reader-settings-select';
 		themeSelect.dataset.action = 'change-theme';
 
-		const defaultThemeOption = doc.createElement('option');
-		defaultThemeOption.value = 'default';
-		defaultThemeOption.textContent = getMessage('readerColorSchemeDefault');
+		const themeOptions: Array<[string, string]> = [
+			['default', 'readerColorSchemeDefault'],
+			['flexoki', 'readerColorSchemeFlexoki'],
+			['ayu', 'readerColorSchemeAyu'],
+			['catppuccin', 'readerColorSchemeCatppuccin'],
+			['everforest', 'readerColorSchemeEverforest'],
+			['gruvbox', 'readerColorSchemeGruvbox'],
+			['nord', 'readerColorSchemeNord'],
+			['rose-pine', 'readerColorSchemeRosePine'],
+			['solarized', 'readerColorSchemeSolarized'],
+		];
 
-		const flexokiThemeOption = doc.createElement('option');
-		flexokiThemeOption.value = 'flexoki';
-		flexokiThemeOption.textContent = getMessage('readerColorSchemeFlexoki');
-
-		const ayuThemeOption = doc.createElement('option');
-		ayuThemeOption.value = 'ayu';
-		ayuThemeOption.textContent = getMessage('readerColorSchemeAyu');
-
-		const catppuccinThemeOption = doc.createElement('option');
-		catppuccinThemeOption.value = 'catppuccin';
-		catppuccinThemeOption.textContent = getMessage('readerColorSchemeCatppuccin');
-
-		const everforestThemeOption = doc.createElement('option');
-		everforestThemeOption.value = 'everforest';
-		everforestThemeOption.textContent = getMessage('readerColorSchemeEverforest');
-
-		const gruvboxThemeOption = doc.createElement('option');
-		gruvboxThemeOption.value = 'gruvbox';
-		gruvboxThemeOption.textContent = getMessage('readerColorSchemeGruvbox');
-
-		const nordThemeOption = doc.createElement('option');
-		nordThemeOption.value = 'nord';
-		nordThemeOption.textContent = getMessage('readerColorSchemeNord');
-
-		const rosePineThemeOption = doc.createElement('option');
-		rosePineThemeOption.value = 'rose-pine';
-		rosePineThemeOption.textContent = getMessage('readerColorSchemeRosePine');
-
-		const solarizedThemeOption = doc.createElement('option');
-		solarizedThemeOption.value = 'solarized';
-		solarizedThemeOption.textContent = getMessage('readerColorSchemeSolarized');
-
-		themeSelect.appendChild(defaultThemeOption);
-		themeSelect.appendChild(flexokiThemeOption);
-		themeSelect.appendChild(ayuThemeOption);
-		themeSelect.appendChild(catppuccinThemeOption);
-		themeSelect.appendChild(everforestThemeOption);
-		themeSelect.appendChild(gruvboxThemeOption);
-		themeSelect.appendChild(nordThemeOption);
-		themeSelect.appendChild(rosePineThemeOption);
-		themeSelect.appendChild(solarizedThemeOption);
+		for (const [value, messageKey] of themeOptions) {
+			const option = doc.createElement('option');
+			option.value = value;
+			option.textContent = getMessage(messageKey);
+			themeSelect.appendChild(option);
+		}
 
 		// Theme mode select
 		const themeModeSelect = doc.createElement('select');

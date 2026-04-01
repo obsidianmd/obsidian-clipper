@@ -6,19 +6,17 @@ import { debounce } from '../utils/debounce';
 import { getMessage } from '../utils/i18n';
 import { getFontCss, SANS_STACK, SERIF_STACK } from '../utils/font-utils';
 
-const THEME_ORDER = ['default', 'flexoki', 'ayu', 'catppuccin', 'everforest', 'gruvbox', 'nord', 'rose-pine', 'solarized'];
-
-const THEME_DISPLAY_NAMES: Record<string, string> = {
-	default: 'Default',
-	flexoki: 'Flexoki',
-	ayu: 'Ayu',
-	catppuccin: 'Catppuccin',
-	everforest: 'Everforest',
-	gruvbox: 'Gruvbox',
-	'rose-pine': 'Rosé Pine',
-	nord: 'Nord',
-	solarized: 'Solarized',
-};
+const THEMES: Array<{ id: string; messageKey: string }> = [
+	{ id: 'default', messageKey: 'readerColorSchemeDefault' },
+	{ id: 'flexoki', messageKey: 'readerColorSchemeFlexoki' },
+	{ id: 'ayu', messageKey: 'readerColorSchemeAyu' },
+	{ id: 'catppuccin', messageKey: 'readerColorSchemeCatppuccin' },
+	{ id: 'everforest', messageKey: 'readerColorSchemeEverforest' },
+	{ id: 'gruvbox', messageKey: 'readerColorSchemeGruvbox' },
+	{ id: 'nord', messageKey: 'readerColorSchemeNord' },
+	{ id: 'rose-pine', messageKey: 'readerColorSchemeRosePine' },
+	{ id: 'solarized', messageKey: 'readerColorSchemeSolarized' },
+];
 
 function getIsDark(appearance: string): boolean {
 	if (appearance === 'dark') return true;
@@ -45,7 +43,9 @@ function buildThemeGrid(
 ): void {
 	container.innerHTML = '';
 
-	for (const themeId of THEME_ORDER) {
+	const dateStr = new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+
+	for (const { id: themeId, messageKey } of THEMES) {
 		const option = document.createElement('div');
 		option.className = 'reader-theme-option obsidian-reader-active' + (themeId === selectedTheme ? ' is-active' : '');
 		option.dataset.scheme = themeId;
@@ -65,11 +65,11 @@ function buildThemeGrid(
 
 		const title = document.createElement('div');
 		title.className = 'reader-theme-inner-title';
-		title.textContent = THEME_DISPLAY_NAMES[themeId] ?? themeId;
+		title.textContent = getMessage(messageKey);
 
 		const meta = document.createElement('div');
 		meta.className = 'reader-theme-inner-meta';
-		meta.textContent = new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+		meta.textContent = dateStr;
 
 		const body = document.createElement('div');
 		body.className = 'reader-theme-inner-body';
@@ -98,15 +98,16 @@ function buildThemeGrid(
 	}
 }
 
+const fontCheckCanvas = document.createElement('canvas');
+const fontCheckCtx = fontCheckCanvas.getContext('2d');
+const fontCheckText = 'abcdefghijklmnopqrstuvwxyz0123456789';
+
 function isFontAvailable(fontName: string): boolean {
-	const canvas = document.createElement('canvas');
-	const ctx = canvas.getContext('2d');
-	if (!ctx) return true;
-	const text = 'abcdefghijklmnopqrstuvwxyz0123456789';
-	ctx.font = '16px monospace';
-	const baseWidth = ctx.measureText(text).width;
-	ctx.font = `16px "${fontName}", monospace`;
-	return ctx.measureText(text).width !== baseWidth;
+	if (!fontCheckCtx) return true;
+	fontCheckCtx.font = '16px monospace';
+	const baseWidth = fontCheckCtx.measureText(fontCheckText).width;
+	fontCheckCtx.font = `16px "${fontName}", monospace`;
+	return fontCheckCtx.measureText(fontCheckText).width !== baseWidth;
 }
 
 

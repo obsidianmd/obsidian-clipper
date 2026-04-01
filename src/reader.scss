@@ -451,12 +451,9 @@
 		--comment-border-width: 1.5px;
 		font-size: 0.925em;
 
-		> blockquote + blockquote {
-			padding-top: 1.5em;
-		}
-
 		// Spacing between top-level comment groups
 		> blockquote + blockquote {
+			padding-top: 1.5em;
 			margin-top: 1.5em;
 		}
 
