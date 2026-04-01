@@ -42,7 +42,14 @@ jobs:
                     cat "$CHANGELOG_FILE" >> $GITHUB_OUTPUT
                     echo "EOF" >> $GITHUB_OUTPUT
                   else
-                    echo "BODY=Release ${{ github.ref_name }}" >> $GITHUB_OUTPUT
+                    TAG_BODY=$(git tag -l --format='%(contents)' "${{ github.ref_name }}")
+                    if [ -n "$TAG_BODY" ]; then
+                      echo "BODY<<EOF" >> $GITHUB_OUTPUT
+                      echo "$TAG_BODY" >> $GITHUB_OUTPUT
+                      echo "EOF" >> $GITHUB_OUTPUT
+                    else
+                      echo "BODY=Release ${{ github.ref_name }}" >> $GITHUB_OUTPUT
+                    fi
                   fi
 
             - name: Create GitHub Release
