@@ -1,6 +1,6 @@
 {
 	"name": "clipper-for-appflowy",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"description": "Unofficial community web clipper browser extension for AppFlowy",
 	"bin": {
 		"clipper-for-appflowy": "./dist/cli.cjs"
