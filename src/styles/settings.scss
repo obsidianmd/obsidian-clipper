@@ -516,18 +516,18 @@
 	border: 1px solid var(--background-modifier-border);
 	padding: 24px 28px;
 	margin-bottom: 0.75rem;
-	background: var(--obsidian-reader-background-primary, #fff);
-	color: var(--obsidian-reader-text-primary, #222);
-	font-family: var(--obsidian-reader-font-family, system-ui, -apple-system, sans-serif);
-	font-size: calc(var(--obsidian-reader-font-size, 16px) + 0.25vw);
+	background: var(--background-primary, #fff);
+	color: var(--text-normal, #222);
+	font-family: var(--font-text, system-ui, -apple-system, sans-serif);
+	font-size: calc(var(--font-text-size, 16px) + 0.25vw);
 	transition: background 0.2s, color 0.2s;
 
 	* {
-		font-family: var(--obsidian-reader-font-family, system-ui, -apple-system, sans-serif);
+		font-family: var(--font-text, system-ui, -apple-system, sans-serif);
 	}
 
 	::selection {
-		background: var(--obsidian-reader-text-selection);
+		background: var(--text-selection);
 	}
 
 	.reader-preview-title {
@@ -535,13 +535,13 @@
 		font-weight: 700;
 		margin: 0 0 8px;
 		line-height: 1.3;
-		color: var(--obsidian-reader-text-primary, #222);
+		color: var(--text-normal, #222);
 	}
 
 	.reader-preview-meta {
 		font-size: 0.85em;
 		margin: 0 0 16px;
-		color: var(--obsidian-reader-text-muted, #5c5c5c);
+		color: var(--text-muted, #5c5c5c);
 
 		.reader-preview-meta-link {
 			color: inherit;
@@ -554,18 +554,18 @@
 
 	.reader-preview-body {
 		font-size: 0.95em;
-		line-height: var(--obsidian-reader-line-height, 1.65);
+		line-height: var(--line-height-normal, 1.65);
 		margin: 0;
-		color: var(--obsidian-reader-text-primary, #222);
+		color: var(--text-normal, #222);
 	}
 
 	.reader-preview-link {
-		color: var(--obsidian-reader-text-primary, #222);
+		color: var(--text-normal, #222);
 		text-decoration: underline;
 	}
 
 	&.color-links .reader-preview-link {
-		color: var(--obsidian-reader-text-accent-hover, #8a5cf5);
+		color: var(--text-accent-hover, #8a5cf5);
 	}
 }
 
@@ -646,7 +646,7 @@
 	border: 1px solid var(--background-modifier-border);
 	overflow: hidden;
 	transition: border-color 0.15s, box-shadow 0.15s;
-	background: var(--obsidian-reader-background-primary, #fff);
+	background: var(--background-primary, #fff);
 }
 
 .reader-theme-inner {
@@ -654,7 +654,7 @@
 	padding: 1em 1.1em;
 	pointer-events: none;
 	user-select: none;
-	font-family: var(--obsidian-reader-font-family, system-ui, -apple-system, sans-serif);
+	font-family: var(--font-text, system-ui, -apple-system, sans-serif);
 }
 
 .reader-theme-inner-title {
@@ -662,19 +662,19 @@
 	font-weight: 700;
 	margin: 0 0 0.5em;
 	line-height: 1.2;
-	color: var(--obsidian-reader-text-primary, #222);
+	color: var(--text-normal, #222);
 }
 
 .reader-theme-inner-meta {
 	font-size: 1em;
 	margin: 0 0 0.7em;
 	line-height: 1.3;
-	color: var(--obsidian-reader-text-muted, #5c5c5c);
+	color: var(--text-muted, #5c5c5c);
 }
 
 .reader-theme-inner-body {
 	font-size: 1em;
 	line-height: 1.5;
 	margin: 0;
-	color: var(--obsidian-reader-text-primary, #222);
+	color: var(--text-normal, #222);
 }

@@ -759,8 +759,11 @@
 	"readerFontSystem": {
 		"message": "System"
 	},
-	"readerFontSystemFont": {
-		"message": "System font"
+	"readerFontSystemSans": {
+		"message": "Sans-serif"
+	},
+	"readerFontSystemSerif": {
+		"message": "Serif"
 	},
 	"readerFontDefault": {
 		"message": "Default"

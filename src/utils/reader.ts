@@ -8,6 +8,7 @@ import { getDomain } from './string-utils';
 import { applyHighlights } from './highlighter';
 import { copyToClipboard } from './clipboard-utils';
 import { getMessage } from './i18n';
+import { getFontCss } from './font-utils';
 
 // Mobile viewport settings
 const VIEWPORT = 'width=device-width, initial-scale=1, maximum-scale=1';
@@ -304,10 +305,15 @@ export class Reader {
 		const fontSelect = doc.createElement('select');
 		fontSelect.className = 'obsidian-reader-settings-select';
 
-		const systemOption = doc.createElement('option');
-		systemOption.value = '';
-		systemOption.textContent = getMessage('readerFontSystem');
-		fontSelect.appendChild(systemOption);
+		const sansOption = doc.createElement('option');
+		sansOption.value = '';
+		sansOption.textContent = getMessage('readerFontSystemSans');
+		fontSelect.appendChild(sansOption);
+
+		const serifOption = doc.createElement('option');
+		serifOption.value = '__serif__';
+		serifOption.textContent = getMessage('readerFontSystemSerif');
+		fontSelect.appendChild(serifOption);
 
 		for (const font of [...this.settings.fonts].sort((a, b) => a.localeCompare(b))) {
 			const option = doc.createElement('option');
@@ -331,9 +337,9 @@ export class Reader {
 		this.settingsBar = settingsBar;
 
 		// Initialize values from settings
-		this.updateFontSize(doc, parseInt(getComputedStyle(doc.documentElement).getPropertyValue('--obsidian-reader-font-size')));
-		this.updateWidth(doc, parseInt(getComputedStyle(doc.documentElement).getPropertyValue('--obsidian-reader-line-width')));
-		this.updateLineHeight(doc, parseFloat(getComputedStyle(doc.documentElement).getPropertyValue('--obsidian-reader-line-height')));
+		this.updateFontSize(doc, parseInt(getComputedStyle(doc.documentElement).getPropertyValue('--font-text-size')));
+		this.updateWidth(doc, parseInt(getComputedStyle(doc.documentElement).getPropertyValue('--line-width')));
+		this.updateLineHeight(doc, parseFloat(getComputedStyle(doc.documentElement).getPropertyValue('--line-height-normal')));
 
 		settingsBar.addEventListener('click', (e) => {
 			const target = e.target as HTMLElement;
@@ -346,22 +352,22 @@ export class Reader {
 
 			switch (action) {
 				case 'decrease-font':
-					this.updateFontSize(doc, parseInt(style.getPropertyValue('--obsidian-reader-font-size')) - 1);
+					this.updateFontSize(doc, parseInt(style.getPropertyValue('--font-text-size')) - 1);
 					break;
 				case 'increase-font':
-					this.updateFontSize(doc, parseInt(style.getPropertyValue('--obsidian-reader-font-size')) + 1);
+					this.updateFontSize(doc, parseInt(style.getPropertyValue('--font-text-size')) + 1);
 					break;
 				case 'decrease-width':
-					this.updateWidth(doc, parseInt(style.getPropertyValue('--obsidian-reader-line-width')) - 1);
+					this.updateWidth(doc, parseInt(style.getPropertyValue('--line-width')) - 1);
 					break;
 				case 'increase-width':
-					this.updateWidth(doc, parseInt(style.getPropertyValue('--obsidian-reader-line-width')) + 1);
+					this.updateWidth(doc, parseInt(style.getPropertyValue('--line-width')) + 1);
 					break;
 				case 'decrease-line-height':
-					this.updateLineHeight(doc, parseFloat(style.getPropertyValue('--obsidian-reader-line-height')) - 0.1);
+					this.updateLineHeight(doc, parseFloat(style.getPropertyValue('--line-height-normal')) - 0.1);
 					break;
 				case 'increase-line-height':
-					this.updateLineHeight(doc, parseFloat(style.getPropertyValue('--obsidian-reader-line-height')) + 0.1);
+					this.updateLineHeight(doc, parseFloat(style.getPropertyValue('--line-height-normal')) + 0.1);
 					break;
 			}
 		});
@@ -382,11 +388,7 @@ export class Reader {
 		fontSelect.value = this.settings.defaultFont;
 		fontSelect.addEventListener('change', () => {
 			this.settings.defaultFont = fontSelect.value;
-			if (fontSelect.value) {
-				this.applyFonts(doc, [fontSelect.value]);
-			} else {
-				this.applyFonts(doc, []);
-			}
+			this.applyFont(doc, fontSelect.value);
 			this.saveSettings();
 		});
 
@@ -397,21 +399,21 @@ export class Reader {
 
 	private static updateFontSize(doc: Document, size: number) {
 		size = Math.max(9, Math.min(24, size));
-		doc.documentElement.style.setProperty('--obsidian-reader-font-size', `${size}px`);
+		doc.documentElement.style.setProperty('--font-text-size', `${size}px`);
 		this.settings.fontSize = size;
 		this.saveSettings();
 	}
 
 	private static updateWidth(doc: Document, width: number) {
 		width = Math.max(30, Math.min(60, width));
-		doc.documentElement.style.setProperty('--obsidian-reader-line-width', `${width}em`);
+		doc.documentElement.style.setProperty('--line-width', `${width}em`);
 		this.settings.maxWidth = width;
 		this.saveSettings();
 	}
 
 	private static updateLineHeight(doc: Document, height: number) {
 		height = Math.max(1.1, Math.min(2, Math.round(height * 10) / 10));
-		doc.documentElement.style.setProperty('--obsidian-reader-line-height', height.toString());
+		doc.documentElement.style.setProperty('--line-height-normal', height.toString());
 		this.settings.lineHeight = height;
 		this.saveSettings();
 	}
@@ -458,12 +460,12 @@ export class Reader {
 		this.saveSettings();
 	}
 
-	private static applyFonts(doc: Document, fonts: string[]): void {
-		if (fonts.length > 0) {
-			const stack = fonts.map(f => `"${f}"`).join(', ') + ', system-ui, -apple-system, sans-serif';
-			doc.body.style.setProperty('--obsidian-reader-font-family', stack);
+	private static applyFont(doc: Document, defaultFont: string): void {
+		const css = getFontCss(defaultFont);
+		if (css) {
+			doc.body.style.setProperty('--font-text', css);
 		} else {
-			doc.body.style.removeProperty('--obsidian-reader-font-family');
+			doc.body.style.removeProperty('--font-text');
 		}
 	}
 
@@ -988,15 +990,15 @@ export class Reader {
 	}
 
 	private static readonly COMMENT_COLORS = [
-		'--obsidian-reader-color-red',
-		'--obsidian-reader-color-orange',
-		'--obsidian-reader-color-yellow',
-		'--obsidian-reader-color-green',
-		'--obsidian-reader-color-cyan',
-		'--obsidian-reader-color-blue',
-		'--obsidian-reader-color-purple',
-		'--obsidian-reader-color-pink',
-		'--obsidian-reader-text-muted',
+		'--color-red',
+		'--color-orange',
+		'--color-yellow',
+		'--color-green',
+		'--color-cyan',
+		'--color-blue',
+		'--color-purple',
+		'--color-pink',
+		'--text-muted',
 	];
 
 	private static usernameToColor(username: string): string {
@@ -1589,10 +1591,10 @@ export class Reader {
 			this.updateThemeMode(doc, this.settings.appearance);
 
 			// Initialize settings from local storage
-			doc.documentElement.style.setProperty('--obsidian-reader-font-size', `${this.settings.fontSize}px`);
-			doc.documentElement.style.setProperty('--obsidian-reader-line-height', this.settings.lineHeight.toString());
-			doc.documentElement.style.setProperty('--obsidian-reader-line-width', `${this.settings.maxWidth}em`);
-			this.applyFonts(doc, this.settings.defaultFont ? [this.settings.defaultFont] : []);
+			doc.documentElement.style.setProperty('--font-text-size', `${this.settings.fontSize}px`);
+			doc.documentElement.style.setProperty('--line-height-normal', this.settings.lineHeight.toString());
+			doc.documentElement.style.setProperty('--line-width', `${this.settings.maxWidth}em`);
+			this.applyFont(doc, this.settings.defaultFont);
 			this.applyBlendImages(doc, this.settings.blendImages);
 			this.applyColorLinks(doc, this.settings.colorLinks);
 

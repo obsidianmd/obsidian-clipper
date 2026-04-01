@@ -5,65 +5,65 @@
 	// Highlight.js theme
 	// https://highlightjs.readthedocs.io/en/latest/css-classes-reference.html
 	.hljs {
-		color: var(--obsidian-reader-text-primary);
-		color: var(--obsidian-reader-text-primary);
+		color: var(--text-normal);
+		color: var(--text-normal);
 	}
 
-	.hljs-operator { color: var(--obsidian-reader-text-muted); }
-	.hljs-punctuation { color: var(--obsidian-reader-text-muted); }
-	.hljs-comment { color: var(--obsidian-reader-text-muted); }
+	.hljs-operator { color: var(--text-muted); }
+	.hljs-punctuation { color: var(--text-muted); }
+	.hljs-comment { color: var(--text-muted); }
 	
-	.hljs-params { color: var(--obsidian-reader-text-primary); }
+	.hljs-params { color: var(--text-normal); }
 	
-	.hljs-link { color: var(--obsidian-reader-color-blue); }
+	.hljs-link { color: var(--color-blue); }
 
-	.hljs-keyword { color: var(--obsidian-reader-color-cyan); }
+	.hljs-keyword { color: var(--color-cyan); }
 
-	.hljs-name { color: var(--obsidian-reader-color-pink); }
+	.hljs-name { color: var(--color-pink); }
 
-	.hljs-variable.language_ { color: var(--obsidian-reader-color-purple); }
-	.hljs-selector-attr { color: var(--obsidian-reader-color-pink); }
-	.hljs-number { color: var(--obsidian-reader-color-purple); }
+	.hljs-variable.language_ { color: var(--color-purple); }
+	.hljs-selector-attr { color: var(--color-pink); }
+	.hljs-number { color: var(--color-purple); }
 
-	.hljs-type { color: var(--obsidian-reader-color-yellow); }
-	.hljs-title.class_ { color: var(--obsidian-reader-color-yellow); }
+	.hljs-type { color: var(--color-yellow); }
+	.hljs-title.class_ { color: var(--color-yellow); }
 
-	.hljs-selector-tag { color: var(--obsidian-reader-color-yellow); }
+	.hljs-selector-tag { color: var(--color-yellow); }
 	
-	.hljs-literal { color: var(--obsidian-reader-color-orange); }
-	.hljs-variable { color: var(--obsidian-reader-color-orange); }
-	.hljs-variable.constant_ { color: var(--obsidian-reader-color-orange); }
-	.hljs-meta { color: var(--obsidian-reader-color-orange); }
+	.hljs-literal { color: var(--color-orange); }
+	.hljs-variable { color: var(--color-orange); }
+	.hljs-variable.constant_ { color: var(--color-orange); }
+	.hljs-meta { color: var(--color-orange); }
 	
-	.hljs-title { color: var(--obsidian-reader-color-blue); }
-	.hljs-title.function_ { color: var(--obsidian-reader-color-blue); }
-	.hljs-section { color: var(--obsidian-reader-color-blue); }
-	.hljs-attr { color: var(--obsidian-reader-color-blue); }
-	.hljs-selector-id { color: var(--obsidian-reader-color-blue); }
+	.hljs-title { color: var(--color-blue); }
+	.hljs-title.function_ { color: var(--color-blue); }
+	.hljs-section { color: var(--color-blue); }
+	.hljs-attr { color: var(--color-blue); }
+	.hljs-selector-id { color: var(--color-blue); }
 	
-	.hljs-property { color: var(--obsidian-reader-color-cyan); }
-	.hljs-tag { color: var(--obsidian-reader-color-cyan); }
-	.hljs-bullet { color: var(--obsidian-reader-color-cyan); }
-	.hljs-formula { color: var(--obsidian-reader-color-cyan); }
-	.hljs-selector-class { color: var(--obsidian-reader-color-cyan); }
-	.hljs-selector-pseudo { color: var(--obsidian-reader-color-cyan); }
+	.hljs-property { color: var(--color-cyan); }
+	.hljs-tag { color: var(--color-cyan); }
+	.hljs-bullet { color: var(--color-cyan); }
+	.hljs-formula { color: var(--color-cyan); }
+	.hljs-selector-class { color: var(--color-cyan); }
+	.hljs-selector-pseudo { color: var(--color-cyan); }
 	
-	.hljs-string { color: var(--obsidian-reader-color-green); }
-	.hljs-char.escape_ { color: var(--obsidian-reader-color-green); }
-	.hljs-attribute { color: var(--obsidian-reader-color-green); }
-	.hljs-code { color: var(--obsidian-reader-color-green); }
-	.hljs-quote { color: var(--obsidian-reader-color-green); }
-	.hljs-addition { color: var(--obsidian-reader-color-green); }
+	.hljs-string { color: var(--color-green); }
+	.hljs-char.escape_ { color: var(--color-green); }
+	.hljs-attribute { color: var(--color-green); }
+	.hljs-code { color: var(--color-green); }
+	.hljs-quote { color: var(--color-green); }
+	.hljs-addition { color: var(--color-green); }
 	
-	.hljs-built_in { color: var(--obsidian-reader-color-red); }
-	.hljs-regexp { color: var(--obsidian-reader-color-red); }
-	.hljs-symbol { color: var(--obsidian-reader-color-red); }
-	.hljs-doctag { color: var(--obsidian-reader-color-red); }
-	.hljs-emphasis { color: var(--obsidian-reader-color-red); }
-	.hljs-strong { color: var(--obsidian-reader-color-red); }
-	.hljs-template-tag { color: var(--obsidian-reader-color-red); }
-	.hljs-template-variable { color: var(--obsidian-reader-color-red); }
-	.hljs-deletion { color: var(--obsidian-reader-color-red); }
+	.hljs-built_in { color: var(--color-red); }
+	.hljs-regexp { color: var(--color-red); }
+	.hljs-symbol { color: var(--color-red); }
+	.hljs-doctag { color: var(--color-red); }
+	.hljs-emphasis { color: var(--color-red); }
+	.hljs-strong { color: var(--color-red); }
+	.hljs-template-tag { color: var(--color-red); }
+	.hljs-template-variable { color: var(--color-red); }
+	.hljs-deletion { color: var(--color-red); }
 
 	.hljs-emphasis {
 		font-style: italic;
@@ -74,7 +74,7 @@
 }
 
 .obsidian-reader-active {
-	background-color: var(--obsidian-reader-background-primary) !important;
+	background-color: var(--background-primary) !important;
 
 	&.theme-light:not(.no-blend-images) {
 		img, svg {
@@ -93,32 +93,32 @@
 		}
 	}
 	&.color-links a {
-		color: var(--obsidian-reader-text-accent-hover);
+		color: var(--text-accent-hover);
 	}
 }
 
 .obsidian-reader-active	body {
-	--obsidian-reader-font-family: system-ui, -apple-system, sans-serif;
-	--obsidian-reader-dynamic-font-size: calc(var(--obsidian-reader-font-size) + 0.25vw);
-	--obsidian-reader-sidebar-width: 240px;
+	--font-text: system-ui, -apple-system, sans-serif;
+	--dynamic-font-size: calc(var(--font-text-size) + 0.25vw);
+	--sidebar-width: 240px;
 
-	background: var(--obsidian-reader-background-primary) !important;
+	background: var(--background-primary) !important;
 	margin: 0 !important;
 	padding: 0 !important;
-	color: var(--obsidian-reader-text-primary) !important;
-	font-size: var(--obsidian-reader-dynamic-font-size) !important;
-	line-height: var(--obsidian-reader-line-height) !important;
-	font-family: var(--obsidian-reader-font-family) !important;
+	color: var(--text-normal) !important;
+	font-size: var(--dynamic-font-size) !important;
+	line-height: var(--line-height-normal) !important;
+	font-family: var(--font-text) !important;
 	-webkit-font-smoothing: antialiased !important;
 
 	::selection {
-		background-color: var(--obsidian-reader-text-selection);
+		background-color: var(--text-selection);
 	}
 
 	.obsidian-reader-content {
 		padding: max(4rem, 4vh) 0 0 !important;	
-		width: var(--obsidian-reader-line-width);
-		max-width: calc(100vw - var(--obsidian-reader-sidebar-width));
+		width: var(--line-width);
+		max-width: calc(100vw - var(--sidebar-width));
 		overflow: hidden;
 		> article {
 			margin: 0 auto;
@@ -127,14 +127,14 @@
 	}
 	.obsidian-left-sidebar,
 	.obsidian-right-sidebar {
-		max-width: var(--obsidian-reader-sidebar-width);
+		max-width: var(--sidebar-width);
 	}
 	h1 {
 		margin: 0 0 0.5em 0;
 		font-weight: 700;
 		font-size: 1.6em;
 		letter-spacing: -0.02em;
-		line-height: calc(var(--obsidian-reader-line-height) * 0.75);
+		line-height: calc(var(--line-height-normal) * 0.75);
 		text-wrap-style: pretty;
 	}
 	h2 {
@@ -143,13 +143,13 @@
 		letter-spacing: -0.015em;
 		margin-top: 1.8em;
 		margin-bottom: 0.5em;
-		line-height: calc(var(--obsidian-reader-line-height) * 0.85);
+		line-height: calc(var(--line-height-normal) * 0.85);
 		text-wrap-style: pretty;
 	}
 	h3 { 
 		font-weight: 700;
 		font-size: 1.225em;
-		line-height: calc(var(--obsidian-reader-line-height) * 0.85);
+		line-height: calc(var(--line-height-normal) * 0.85);
 		text-wrap-style: pretty;
 		margin-top: 2em;
 		margin-bottom: 0.5em;
@@ -157,21 +157,21 @@
 	h4 { 
 		font-size: 1.15em;
 		font-weight: 700;
-		line-height: calc(var(--obsidian-reader-line-height) * 0.85);
+		line-height: calc(var(--line-height-normal) * 0.85);
 		text-wrap-style: pretty;
 		margin-top: 2em;
 		margin-bottom: 0;
 	}
 	h5 {
 		font-weight: 700;
-		line-height: calc(var(--obsidian-reader-line-height) * 0.85);
+		line-height: calc(var(--line-height-normal) * 0.85);
 		text-wrap-style: pretty;
 		margin-bottom: 1em;
 		font-size: 1em;
 	}
 	h6 {
 		font-weight: 700;
-		line-height: calc(var(--obsidian-reader-line-height) * 0.85);
+		line-height: calc(var(--line-height-normal) * 0.85);
 		text-wrap-style: pretty;
 		text-transform: uppercase;
 		margin-bottom: 1em;
@@ -190,13 +190,13 @@
 		margin-bottom: max(2rem, 3vh);
 	}
 	.metadata-details {
-		color: var(--obsidian-reader-text-muted);
+		color: var(--text-muted);
 		font-size: 0.9em;
 
 		a {
 			color: inherit;
 			text-decoration: none;
-			color: var(--obsidian-reader-text-muted);
+			color: var(--text-muted);
 		}
 		a:hover {
 			text-decoration: underline;
@@ -225,10 +225,10 @@
 		overflow-x: auto;
 	}
 	a {
-		color: var(--obsidian-reader-text-primary);
+		color: var(--text-normal);
 	}
 	a:hover {
-		color: var(--obsidian-reader-text-accent-hover);
+		color: var(--text-accent-hover);
 	}
 	audio {
 		max-width: 100%;
@@ -236,43 +236,43 @@
 		width: 100%;
 		height: 42px;
 		&::-webkit-media-controls {
-			color: var(--obsidian-reader-text-primary);
+			color: var(--text-normal);
 		}
 		&::-webkit-media-controls-enclosure {
 			border-radius: 8px;
-			border: 1px solid var(--obsidian-reader-border);
-			background-color: var(--obsidian-reader-background-primary-alt);
+			border: 1px solid var(--background-modifier-border);
+			background-color: var(--background-primary-alt);
 		}
 		&::-webkit-media-controls-current-time-display,
 		&::-webkit-media-controls-time-remaining-display {
-			font-family: var(--obsidian-reader-font-family);
+			font-family: var(--font-text);
 		}
 	}
 	blockquote {
 		padding-left: 1.5em;
 		margin: 1.5em 0;
-		border-left: 2px solid var(--obsidian-reader-text-faint);
+		border-left: 2px solid var(--text-faint);
 	}
 	small[class*="caption"],
 	figcaption,
 	caption {
-		color: var(--obsidian-reader-text-muted);
+		color: var(--text-muted);
 		font-size: 85%;
 		margin-top: 0.5em;
 		margin-bottom: 1em;
-		line-height: calc(var(--obsidian-reader-line-height) * 0.9);
+		line-height: calc(var(--line-height-normal) * 0.9);
 		a {
-			color: var(--obsidian-reader-text-muted);
+			color: var(--text-muted);
 		}
 	}
 	sup {
 		a {
 			text-decoration: none;
-			color: var(--obsidian-reader-text-muted);
+			color: var(--text-muted);
 		}
 	}
 	hr {
-		background-color: var(--obsidian-reader-border);
+		background-color: var(--background-modifier-border);
 		width: 100%;
 		border: 0;
 		height: 1px;
@@ -280,7 +280,7 @@
 	}
 	// Maybe confusing but conflicts with user highlights 
 	mark {
-		color: var(--obsidian-reader-text-primary);
+		color: var(--text-normal);
 		background-color: transparent;
 	}
 	ul > li {
@@ -294,7 +294,7 @@
 	ul > li {
 		padding: 0.15rem 0;
 		&::marker {
-			color: var(--obsidian-reader-text-faint);
+			color: var(--text-faint);
 		}
 		p,
 		> div p {
@@ -308,9 +308,9 @@
 		}
 	}
 	pre, code, kbd, tt {
-		background-color: var(--obsidian-reader-background-primary-alt);
+		background-color: var(--background-primary-alt);
 		border-radius: 6px;
-		border: 1px solid var(--obsidian-reader-border);
+		border: 1px solid var(--background-modifier-border);
 		font-size: 0.8em;
 	}
 	code, kbd, tt {
@@ -337,10 +337,10 @@
 			width: auto;
 			height: auto;
 			padding: 6px;
-			background-color: var(--obsidian-reader-background-primary-alt);
+			background-color: var(--background-primary-alt);
 			border: none;
 			border-radius: 4px;
-			color: var(--obsidian-reader-text-faint);
+			color: var(--text-faint);
 			display: flex;
 			align-items: center;
 			justify-content: center;
@@ -351,12 +351,12 @@
 				height: 16px;
 			}
 			&:hover {
-				background: var(--obsidian-reader-border);
-				color: var(--obsidian-reader-text-primary);
+				background: var(--background-modifier-border);
+				color: var(--text-normal);
 			}
 
 			&.copied {
-				color: var(--obsidian-reader-color-green);
+				color: var(--color-green);
 			}
 		}
 
@@ -366,7 +366,7 @@
 	}
 	code[class*="language-"],
 	pre[class*="language-"] {
-		color: var(--obsidian-reader-text-primary);
+		color: var(--text-normal);
 		word-wrap: break-word;
 		white-space: pre-wrap;
 		word-break: normal;
@@ -377,12 +377,12 @@
 	table {
 		overflow-x: auto;
 		font-size: 0.9em;
-		line-height: calc(var(--obsidian-reader-line-height) * 0.9);
+		line-height: calc(var(--line-height-normal) * 0.9);
 		border-collapse: collapse !important;
 		tr {
 			td, th {
 				padding: 0.25em 0.5em !important;
-				border: 1px solid var(--obsidian-reader-border) !important;
+				border: 1px solid var(--background-modifier-border) !important;
 			}
 		}
 	}
@@ -393,7 +393,7 @@
 	#footnotes {
 		margin-top: 4em;
 		font-size: 0.85em;
-		color: var(--obsidian-reader-text-muted);
+		color: var(--text-muted);
 
 		ol {
 			padding-left: 1.5em;
@@ -403,13 +403,13 @@
 				margin: 0.25em 0;
 			}
 			a {
-				color: var(--obsidian-reader-text-muted);
+				color: var(--text-muted);
 			}
 			a.footnote-backref {
 				text-decoration: none;
-				color: var(--obsidian-reader-text-faint);
+				color: var(--text-faint);
 				&:hover {
-					color: var(--obsidian-reader-text-accent-hover);
+					color: var(--text-accent-hover);
 				}
 			}
 		}
@@ -425,8 +425,8 @@
 			height: 1.4em;
 			padding: 0 0.5em;
 			border-radius: 1em;
-			background: var(--obsidian-reader-background-primary-alt);
-			color: var(--obsidian-reader-text-muted);
+			background: var(--background-primary-alt);
+			color: var(--text-muted);
 			text-decoration: none;
 			font-size: 0.75em;
 			font-weight: 500;
@@ -436,20 +436,20 @@
 			-webkit-user-select: none;
 
 			&:hover {
-				background: var(--obsidian-reader-border);
-				color: var(--obsidian-reader-text-primary);
+				background: var(--background-modifier-border);
+				color: var(--text-normal);
 			}
 
 			&.active {
-				background: var(--obsidian-reader-text-accent);
-				border-color: var(--obsidian-reader-text-accent);
-				color: var(--obsidian-reader-background-primary);
+				background: var(--text-accent);
+				border-color: var(--text-accent);
+				color: var(--background-primary);
 			}
 		}
 	}
 
 	.comments {
-		--obsidian-reader-comment-border-width: 1.5px;
+		--comment-border-width: 1.5px;
 		font-size: 0.925em;
 
 		> blockquote + blockquote {
@@ -469,26 +469,26 @@
 
 		blockquote blockquote {
 			position: relative;
-			border-left: var(--obsidian-reader-comment-border-width) solid var(--obsidian-reader-border);
-			padding-inline-start: calc(1.5em - var(--obsidian-reader-comment-border-width));
+			border-left: var(--comment-border-width) solid var(--background-modifier-border);
+			padding-inline-start: calc(1.5em - var(--comment-border-width));
 			margin: 0;
 			transition: border-color 0.15s ease;
 
 
 			&:hover  {
-				border-color: var(--obsidian-reader-text-faint);
+				border-color: var(--text-faint);
 			}
 
 			&.child-hovered {
 				border-image: linear-gradient(
 					to bottom,
-					var(--obsidian-reader-text-faint) var(--highlight-height, 100%),
-					var(--obsidian-reader-border) var(--highlight-height, 100%)
+					var(--text-faint) var(--highlight-height, 100%),
+					var(--background-modifier-border) var(--highlight-height, 100%)
 				) 1;
 			}
 
 			&.collapsed {
-				border-left-color: var(--obsidian-reader-text-faint);
+				border-left-color: var(--text-faint);
 				> blockquote { display: none; }
 				> .comment > .comment-content { display: none; }
 			}
@@ -511,9 +511,9 @@
 				left: calc(-1.5em);
 				top: 0;
 				width: 1.5em;
-				height: var(--obsidian-reader-comment-border-width);
+				height: var(--comment-border-width);
 				box-sizing: border-box;
-				border-bottom: var(--obsidian-reader-comment-border-width) solid var(--obsidian-reader-border);
+				border-bottom: var(--comment-border-width) solid var(--background-modifier-border);
 				pointer-events: none;
 				transition: border-color 0.15s ease;
 				z-index: 5;
@@ -521,7 +521,7 @@
 
 			&:hover::before,
 			&.collapsed::before {
-				border-color: var(--obsidian-reader-text-faint);
+				border-color: var(--text-faint);
 			}
 		}
 
@@ -530,32 +530,32 @@
 		blockquote > blockquote > blockquote > blockquote:last-child::after {
 			content: '';
 			position: absolute;
-			left: calc(-1.5em - var(--obsidian-reader-comment-border-width));
-			top: calc(var(--obsidian-reader-comment-border-width));
+			left: calc(-1.5em - var(--comment-border-width));
+			top: calc(var(--comment-border-width));
 			bottom: 0;
 			width: 3px;
-			background: var(--obsidian-reader-background-primary);
+			background: var(--background-primary);
 			pointer-events: none;
 		}
 
 		.comment-metadata {
 			position: relative;
 			z-index: 10;
-			color: var(--obsidian-reader-text-muted);
+			color: var(--text-muted);
 			font-size: 0.9em;
 			margin-bottom: 0.5em;
 			.comment-author {
 				padding: 1px 3px;
 				border-radius: 3px;
 				strong {
-					color: var(--obsidian-reader-text-primary);
+					color: var(--text-normal);
 				}
 			}
 			a {
-				color: var(--obsidian-reader-text-muted);
+				color: var(--text-muted);
 				text-decoration: none;
 				&:hover {
-					color: var(--obsidian-reader-text-accent-hover);
+					color: var(--text-accent-hover);
 					text-decoration: underline;
 				}
 			}
@@ -563,19 +563,19 @@
 				user-select: none;
 				background: none;
 				border: none;
-				color: var(--obsidian-reader-text-muted);
+				color: var(--text-muted);
 				cursor: pointer;
 				margin-top: -2px;
 				padding: 2px 2px;
 				border-radius: 3px;
-				font-family: var(--obsidian-reader-font-family);
+				font-family: var(--font-text);
 				display: inline-flex;
 				align-items: center;
 				gap: 2px;
 				vertical-align: middle;
 				&:hover {
-					color: var(--obsidian-reader-text-primary);
-					background: var(--obsidian-reader-background-primary-alt);
+					color: var(--text-normal);
+					background: var(--background-primary-alt);
 				}
 				.comment-collapse-count {
 					padding-inline-end: 4px;
@@ -602,7 +602,7 @@
 
 			// Restore normal blockquote styles for quoted text inside comments.
 			blockquote {
-				border-inline-start: 2px solid var(--obsidian-reader-text-faint);
+				border-inline-start: 2px solid var(--text-faint);
 				padding-inline-start: 1.5em;
 				margin: 2em 0;
 
@@ -621,8 +621,8 @@
 		max-width: min(calc(100vw - 40px), 400px);
 		max-height: 80vh;
 		padding: 12px 16px;
-		background: var(--obsidian-reader-footnote-popover-background);
-		border: 1px solid var(--obsidian-reader-border);
+		background: var(--footnote-popover-background);
+		border: 1px solid var(--background-modifier-border);
 		border-radius: 8px;
 		box-shadow: var(--shadow-s);
 		font-size: 0.80em;
@@ -666,11 +666,11 @@
 		&[data-position="bottom"] {
 			&::before {
 				top: -16px;
-				border-bottom-color: var(--obsidian-reader-border);
+				border-bottom-color: var(--background-modifier-border);
 			}
 			&::after {
 				top: -14px;
-				border-bottom-color: var(--obsidian-reader-background-primary);
+				border-bottom-color: var(--background-primary);
 			}
 		}
 
@@ -678,11 +678,11 @@
 		&[data-position="top"] {
 			&::before {
 				bottom: -16px;
-				border-top-color: var(--obsidian-reader-border);
+				border-top-color: var(--background-modifier-border);
 			}
 			&::after {
 				bottom: -14px;
-				border-top-color: var(--obsidian-reader-background-primary);
+				border-top-color: var(--background-primary);
 			}
 		}
 
@@ -732,15 +732,15 @@
 		content: '';
 		width: 20px;
 		height: 20px;
-		border: 2px solid var(--obsidian-reader-border);
-		border-top-color: var(--obsidian-reader-text-muted);
+		border: 2px solid var(--background-modifier-border);
+		border-top-color: var(--text-muted);
 		border-radius: 50%;
 		animation: obsidian-reader-spin 0.6s linear infinite;
 	}
 }
 
 .obsidian-reader-loading-text {
-	color: var(--obsidian-reader-text-faint);
+	color: var(--text-faint);
 	font-size: 0.8em;
 }
 
@@ -749,22 +749,22 @@
 }
 
 .obsidian-reader-footer {
-	color: var(--obsidian-reader-text-faint);
+	color: var(--text-faint);
 	font-size: 0.7em;
 	margin-top: 36vh;
 	padding: 1rem 0 2rem 0;
-	border-top: 1px solid var(--obsidian-reader-border);
+	border-top: 1px solid var(--background-modifier-border);
 }
 
 .obsidian-reader-settings {
 	position: fixed;
 	top: 0;
 	right: 0;
-	background: var(--obsidian-reader-background-primary);
+	background: var(--background-primary);
 	padding: 20px;
 	opacity: 0;
 	z-index: 999999999;
-	font-family: var(--obsidian-reader-font-family);
+	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
 	user-select: none;
 	-webkit-user-select: none;
 }
@@ -782,14 +782,14 @@
 .obsidian-reader-settings-controls-group {
 	display: flex;
 	align-items: center;
-	border: 1px solid var(--obsidian-reader-border);
+	border: 1px solid var(--background-modifier-border);
 	border-radius: 6px;
 	overflow: hidden;
 	> .obsidian-reader-settings-button {
 		flex: 1;
 		border-radius: 0;
 		&:not(:first-child) {
-			border-left: 1px solid var(--obsidian-reader-border);
+			border-left: 1px solid var(--background-modifier-border);
 		}
 	}
 }
@@ -804,22 +804,22 @@
 	background: transparent;
 	border-radius: 12px;
 	height: 26px;
-	color: var(--obsidian-reader-text-muted);
+	color: var(--text-muted);
 	cursor: pointer;
 	padding: 0;
 }
 .obsidian-reader-settings-button:hover {
-	background: var(--obsidian-reader-background-primary-alt);
-	color: var(--obsidian-reader-text-primary);
+	background: var(--background-primary-alt);
+	color: var(--text-normal);
 }
 .obsidian-reader-settings-select {
 	-webkit-appearance: none;
 	-moz-appearance: none;
 	appearance: none;
 	background-color: transparent;
-	border: 1px solid var(--obsidian-reader-border);
-	color: var(--obsidian-reader-text-muted);
-	font-family: var(--obsidian-reader-font-family);
+	border: 1px solid var(--background-modifier-border);
+	color: var(--text-muted);
+	font-family: inherit;
 	font-size: 13px;
 	height: 28px;
 	padding: 4px 30px 4px 8px;
@@ -827,22 +827,22 @@
 	cursor: pointer;
 	background-repeat: no-repeat, repeat;
 	/* arrow icon position (1em from the right, 50% vertical) , then gradient position*/
-	background-position: var(--obsidian-reader-dropdown-background-position);
+	background-position: var(--dropdown-background-position);
 	/* icon size, then gradient */
-	background-size: var(--obsidian-reader-dropdown-background-size);
+	background-size: var(--dropdown-background-size);
 	background-blend-mode: hard-light;
 	& {
 		background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23000' opacity='0.9' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' %3E%3Cpath d='m7 15 5 5 5-5'/%3E%3Cpath d='m7 9 5-5 5 5'/%3E%3C/svg%3E");
 	}
 
 	&:hover {
-		background-color: var(--obsidian-reader-background-primary-alt);
-		color: var(--obsidian-reader-text-primary);
+		background-color: var(--background-primary-alt);
+		color: var(--text-normal);
 	}
 	&:focus {
 		outline: none;
-		background-color: var(--obsidian-reader-background-primary-alt);
-		color: var(--obsidian-reader-text-primary);
+		background-color: var(--background-primary-alt);
+		color: var(--text-normal);
 	}
 }
 .theme-dark .obsidian-reader-settings-select {
@@ -857,7 +857,7 @@
 }
 .obsidian-reader-outline {
 	box-sizing: border-box;
-	background: var(--obsidian-reader-background-primary);
+	background: var(--background-primary);
 	position: sticky;
 	top: 0;
 	height: 100vh;
@@ -872,7 +872,7 @@
 	}
 }
 .obsidian-reader-outline-item {
-	color: var(--obsidian-reader-text-muted);
+	color: var(--text-muted);
 	cursor: pointer;
 	padding: 6px 8px;
 	border-radius: 4px;
@@ -896,18 +896,18 @@
 	}
 }
 .obsidian-reader-outline-item:hover {
-	color: var(--obsidian-reader-text-primary);
-	background-color: var(--obsidian-reader-background-primary-alt);
+	color: var(--text-normal);
+	background-color: var(--background-primary-alt);
 }
 .obsidian-reader-outline-item.active {
-	color: var(--obsidian-reader-text-primary);
-	background-color: var(--obsidian-reader-background-primary-alt);
+	color: var(--text-normal);
+	background-color: var(--background-primary-alt);
 }
 .obsidian-reader-outline-item.faint {
-	color: var(--obsidian-reader-text-faint);
+	color: var(--text-faint);
 }
 .obsidian-reader-outline-item.faint:hover {
-	color: var(--obsidian-reader-text-muted);
+	color: var(--text-muted);
 }
 
 @media (max-width: 768px) {
@@ -932,7 +932,7 @@
 	left: 0;
 	width: 100%;
 	height: 100%;
-	background: var(--obsidian-reader-background-primary);
+	background: var(--background-primary);
 	z-index: 9999999999;
 	display: none;
 	align-items: center;
@@ -980,7 +980,7 @@
 		width: 800px;
 		max-width: 90vw;
 		margin-top: 10px;
-		color: var(--obsidian-reader-text-muted);
+		color: var(--text-muted);
 		font-size: 0.8em;
 		line-height: 1.4;
 		text-align: center;
@@ -996,7 +996,7 @@
 		border: none;
 		padding: 0;
 		background: transparent;
-		color: var(--obsidian-reader-text-muted);
+		color: var(--text-muted);
 		cursor: pointer;
 		display: flex;
 		align-items: center;
@@ -1034,9 +1034,9 @@
 			height: 24px;
 			padding: 0;
 			border: none;
-			background: var(--obsidian-reader-text-primary);
+			background: var(--text-normal);
 			border-radius: 4px;
-			color: var(--obsidian-reader-background-primary);
+			color: var(--background-primary);
 			cursor: pointer;
 			display: flex;
 			align-items: center;

@@ -4,6 +4,7 @@ import { createElementWithClass, createElementWithHTML } from '../utils/dom-util
 import { initializeIcons } from '../icons/icons';
 import { debounce } from '../utils/debounce';
 import { getMessage } from '../utils/i18n';
+import { getFontCss, SANS_STACK, SERIF_STACK } from '../utils/font-utils';
 
 const THEME_ORDER = ['default', 'flexoki', 'ayu', 'catppuccin', 'everforest', 'gruvbox', 'nord', 'rose-pine', 'solarized'];
 
@@ -59,7 +60,7 @@ function buildThemeGrid(
 		const inner = document.createElement('div');
 		inner.className = 'reader-theme-inner';
 		if (customFontValue) {
-			option.style.setProperty('--obsidian-reader-font-family', customFontValue);
+			option.style.setProperty('--font-text', customFontValue);
 		}
 
 		const title = document.createElement('div');
@@ -108,10 +109,6 @@ function isFontAvailable(fontName: string): boolean {
 	return ctx.measureText(text).width !== baseWidth;
 }
 
-function getFontStackCss(fonts: string[]): string | null {
-	if (fonts.length === 0) return null;
-	return fonts.map(f => `"${f}"`).join(', ') + ', system-ui, -apple-system, sans-serif';
-}
 
 function updatePreview() {
 	const preview = document.getElementById('reader-preview');
@@ -123,22 +120,22 @@ function updatePreview() {
 
 	applyThemeClasses(preview, effectiveTheme, isDark);
 
-	const fontStack = defaultFont ? getFontStackCss([defaultFont]) : null;
+	const fontStack = defaultFont ? getFontCss(defaultFont) : null;
 	if (fontStack) {
-		preview.style.setProperty('--obsidian-reader-font-family', fontStack);
+		preview.style.setProperty('--font-text', fontStack);
 	} else {
-		preview.style.removeProperty('--obsidian-reader-font-family');
+		preview.style.removeProperty('--font-text');
 	}
 
-	preview.style.setProperty('--obsidian-reader-font-size', `${fontSize}px`);
-	preview.style.setProperty('--obsidian-reader-line-height', String(lineHeight));
+	preview.style.setProperty('--font-text-size', `${fontSize}px`);
+	preview.style.setProperty('--line-height-normal', String(lineHeight));
 	preview.classList.toggle('color-links', colorLinks);
 }
 
 function rebuildGrids(lightGrid: HTMLElement | null, darkGrid: HTMLElement | null) {
 	const { lightTheme, darkTheme, appearance, defaultFont } = generalSettings.readerSettings;
 	const isDarkMode = getIsDark(appearance);
-	const fontStack = defaultFont ? getFontStackCss([defaultFont]) : null;
+	const fontStack = defaultFont ? getFontCss(defaultFont) : null;
 
 	if (lightGrid) {
 		buildThemeGrid(lightGrid, lightTheme, isDarkMode, fontStack, (themeId) => {
@@ -196,23 +193,31 @@ export function updateFontList(): void {
 		return tag;
 	};
 
-	// System font entry (non-removable)
-	const systemLi = document.createElement('li');
+	// Built-in font entries (non-removable)
+	const builtinFonts = [
+		{ value: '', label: getMessage('readerFontSystemSans'), fontFamily: SANS_STACK },
+		{ value: '__serif__', label: getMessage('readerFontSystemSerif'), fontFamily: SERIF_STACK },
+	];
 
-	const systemSpan = document.createElement('span');
-	systemSpan.textContent = getMessage('readerFontSystemFont');
-	systemLi.appendChild(systemSpan);
+	for (const builtin of builtinFonts) {
+		const li = document.createElement('li');
 
-	systemLi.appendChild(createDefaultTag('', generalSettings.readerSettings.defaultFont === ''));
+		const span = document.createElement('span');
+		span.textContent = builtin.label;
+		span.style.fontFamily = builtin.fontFamily;
+		li.appendChild(span);
 
-	const systemRemoveBtn = createElementWithClass('button', 'setting-item-list-remove clickable-icon');
-	systemRemoveBtn.setAttribute('type', 'button');
-	(systemRemoveBtn as HTMLButtonElement).disabled = true;
-	(systemRemoveBtn as HTMLButtonElement).style.opacity = '0';
-	systemRemoveBtn.appendChild(createElementWithHTML('i', '', { 'data-lucide': 'trash-2' }));
-	systemLi.appendChild(systemRemoveBtn);
+		li.appendChild(createDefaultTag(builtin.value, generalSettings.readerSettings.defaultFont === builtin.value));
 
-	fontList.appendChild(systemLi);
+		const removeBtn = createElementWithClass('button', 'setting-item-list-remove clickable-icon');
+		removeBtn.setAttribute('type', 'button');
+		(removeBtn as HTMLButtonElement).disabled = true;
+		(removeBtn as HTMLButtonElement).style.opacity = '0';
+		removeBtn.appendChild(createElementWithHTML('i', '', { 'data-lucide': 'trash-2' }));
+		li.appendChild(removeBtn);
+
+		fontList.appendChild(li);
+	}
 
 	// Custom font entries (alphabetized)
 	const sortedFonts = [...generalSettings.readerSettings.fonts].sort((a, b) => a.localeCompare(b));
@@ -221,6 +226,7 @@ export function updateFontList(): void {
 
 		const span = document.createElement('span');
 		span.textContent = font;
+		span.style.fontFamily = `"${font}", sans-serif`;
 		li.appendChild(span);
 
 		if (!isFontAvailable(font)) {
