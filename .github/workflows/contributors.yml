@@ -1,0 +1,16 @@
+name: Contributors
+
+on:
+    issue_comment:
+        types: [created]
+
+jobs:
+    add-contributors:
+        runs-on: ubuntu-latest
+        if: contains(github.event.comment.body, '@all-contributors')
+        steps:
+            - uses: actions/checkout@v4
+            - uses: all-contributors/action@v1
+              with:
+                  repo-token: ${{ secrets.GITHUB_TOKEN }}
+                  commit-convention: angular

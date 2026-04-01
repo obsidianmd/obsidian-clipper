@@ -105,9 +105,22 @@ npm run test:watch
 - [lucide](https://github.com/lucide-icons/lucide) for icons
 - [dompurify](https://github.com/cure53/DOMPurify) for sanitizing HTML
 
-## License
+## Contributors
 
-MIT License — see [LICENSE](./LICENSE).
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+  <tbody>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/alexrosepizant"><img src="https://avatars.githubusercontent.com/u/9919730?v=4?s=100" width="100px;" alt="Alexandre Rose-Pizant"/><br /><sub><b>Alexandre Rose-Pizant</b></sub></a><br /><a href="https://github.com/alexrosepizant/clipper-for-appflowy/commits?author=alexrosepizant" title="Code">💻</a> <a href="https://github.com/alexrosepizant/clipper-for-appflowy/commits?author=alexrosepizant" title="Documentation">📖</a></td>
+    </tr>
+  </tbody>
+</table>
 
-Original work Copyright (c) 2024 Obsidian ([obsidian-clipper](https://github.com/obsidianmd/obsidian-clipper)).
-Modifications Copyright (c) 2026 clipper-for-appflowy contributors.
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
+This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!

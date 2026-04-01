@@ -1,0 +1,24 @@
+{
+	"projectName": "clipper-for-appflowy",
+	"projectOwner": "alexrosepizant",
+	"repoType": "github",
+	"repoHost": "https://github.com",
+	"files": [
+		"README.md"
+	],
+	"imageSize": 100,
+	"commit": false,
+	"contributorsPerLine": 7,
+	"contributors": [
+		{
+			"login": "alexrosepizant",
+			"name": "Alexandre Rose-Pizant",
+			"avatar_url": "https://avatars.githubusercontent.com/u/9919730?v=4",
+			"profile": "https://github.com/alexrosepizant",
+			"contributions": [
+				"code",
+				"doc"
+			]
+		}
+	]
+}

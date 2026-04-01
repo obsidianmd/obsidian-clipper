@@ -30,7 +30,10 @@
 		"update-locales": "ts-node --project scripts/tsconfig.json scripts/update-locales.ts",
 		"check-strings": "ts-node --project scripts/tsconfig.json scripts/check-unused-strings.ts",
 		"add-locale": "ts-node --project scripts/tsconfig.json scripts/add-locale.ts",
-		"prepublishOnly": "npm run build:cli && npm run build:api"
+		"prepublishOnly": "npm run build:cli && npm run build:api",
+		"contributors:add": "all-contributors add",
+		"contributors:generate": "all-contributors generate",
+		"contributors:check": "all-contributors check"
 	},
 	"devDependencies": {
 		"@types/chrome": "^0.0.270",
@@ -38,6 +41,7 @@
 		"@types/node": "^25.4.0",
 		"@types/webextension-polyfill": "^0.12.1",
 		"@types/webpack-env": "^1.18.5",
+		"all-contributors-cli": "^6.26.1",
 		"copy-webpack-plugin": "^14.0.0",
 		"css-loader": "^7.1.2",
 		"dotenv": "^16.4.1",
