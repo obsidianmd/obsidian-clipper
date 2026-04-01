@@ -87,7 +87,7 @@ const memoizedCompileTemplate = memoizeWithExpiration(
 		tabId: number,
 		template: string,
 		variables: { [key: string]: string },
-		currentUrl: string,
+		currentUrl: string
 	) => {
 		return compileTemplate(tabId, template, variables, currentUrl);
 	},
@@ -97,9 +97,9 @@ const memoizedCompileTemplate = memoizeWithExpiration(
 			tabId: number,
 			template: string,
 			variables: { [key: string]: string },
-			currentUrl: string,
+			currentUrl: string
 		) => `${tabId}-${template}-${currentUrl}`,
-	},
+	}
 );
 
 // Memoize generateFrontmatter with a longer expiration
@@ -107,12 +107,12 @@ const memoizedGenerateFrontmatter = memoizeWithExpiration(
 	async (properties: Property[]) => {
 		return generateFrontmatter(properties);
 	},
-	{ expirationMs: 5000 },
+	{ expirationMs: 5000 }
 );
 
 function getPropertiesFromDOM(): Property[] {
 	return Array.from(
-		document.querySelectorAll(".metadata-property input"),
+		document.querySelectorAll(".metadata-property input")
 	).map((input) => {
 		const inputElement = input as HTMLInputElement;
 		return {
@@ -140,7 +140,7 @@ async function getTabInfo(tabId: number): Promise<{ id: number; url: string }> {
 	};
 	if (!response || !response.success || !response.tab) {
 		throw new Error(
-			(response && response.error) || "Failed to get tab info",
+			(response && response.error) || "Failed to get tab info"
 		);
 	}
 	return response.tab;
@@ -178,7 +178,7 @@ const memoizedExtractPageContent = memoizeWithExpiration(
 			const tab = await getTabInfo(tabId);
 			return `${tabId}-${tab.url}`;
 		},
-	},
+	}
 );
 
 // Width is used to update the note name field height
@@ -198,7 +198,7 @@ function setPopupDimensions() {
 	// Set the --popup-height CSS variable to the final height
 	document.documentElement.style.setProperty(
 		"--chromium-popup-height",
-		`${finalHeight}px`,
+		`${finalHeight}px`
 	);
 
 	// Check if the width has changed
@@ -207,7 +207,7 @@ function setPopupDimensions() {
 
 		// Adjust the note name field height
 		const noteNameField = document.getElementById(
-			"note-name-field",
+			"note-name-field"
 		) as HTMLTextAreaElement;
 		if (noteNameField) {
 			adjustNoteNameHeight(noteNameField);
@@ -232,7 +232,7 @@ async function initializeExtension(tabId: number) {
 		// This is necessary for browsers that allow scaling the popup via page zoom
 		document.documentElement.style.setProperty(
 			"--chromium-popup-height",
-			"2000px",
+			"2000px"
 		);
 
 		// Use setTimeout to ensure the DOM has updated before we measure
@@ -296,7 +296,7 @@ function setupMessageListeners() {
 		(
 			request: any,
 			sender: browser.Runtime.MessageSender,
-			sendResponse: (response?: any) => void,
+			sendResponse: (response?: any) => void
 		) => {
 			if (request.action === "triggerQuickClip") {
 				handleClipObsidian()
@@ -340,7 +340,7 @@ function setupMessageListeners() {
 			} else if (request.action === "highlighterModeChanged") {
 				// This message is now handled by checkHighlighterModeState
 			}
-		},
+		}
 	);
 }
 
@@ -505,7 +505,7 @@ function initializePopupAuthScreen(): void {
 	if (popupHeader) popupHeader.style.display = "none";
 
 	const btn = document.getElementById(
-		"auth-open-settings-btn",
+		"auth-open-settings-btn"
 	) as HTMLButtonElement;
 	if (btn) {
 		btn.addEventListener("click", async () => {
@@ -523,23 +523,23 @@ function initializePopupAuthScreen(): void {
 
 function setupEventListeners(tabId: number) {
 	const templateDropdown = document.getElementById(
-		"template-select",
+		"template-select"
 	) as HTMLSelectElement;
 	if (templateDropdown) {
 		templateDropdown.addEventListener(
 			"change",
 			function (this: HTMLSelectElement) {
 				handleTemplateChange(this.value);
-			},
+			}
 		);
 	}
 
 	const noteNameField = document.getElementById(
-		"note-name-field",
+		"note-name-field"
 	) as HTMLTextAreaElement;
 	if (noteNameField) {
 		noteNameField.addEventListener("input", () =>
-			adjustNoteNameHeight(noteNameField),
+			adjustNoteNameHeight(noteNameField)
 		);
 		noteNameField.addEventListener("keydown", function (e) {
 			if (e.key === "Enter" && !e.shiftKey) {
@@ -551,7 +551,7 @@ function setupEventListeners(tabId: number) {
 	const highlighterModeButton = document.getElementById("highlighter-mode");
 	if (highlighterModeButton) {
 		highlighterModeButton.addEventListener("click", () =>
-			toggleHighlighterMode(tabId),
+			toggleHighlighterMode(tabId)
 		);
 	}
 
@@ -594,7 +594,7 @@ function setupEventListeners(tabId: number) {
 			const properties = getPropertiesFromDOM();
 
 			const noteContentField = document.getElementById(
-				"note-content-field",
+				"note-content-field"
 			) as HTMLTextAreaElement;
 			const frontmatter = await generateFrontmatter(properties);
 			const fileContent = frontmatter + noteContentField.value;
@@ -615,7 +615,7 @@ function setupEventListeners(tabId: number) {
 				const properties = getPropertiesFromDOM();
 
 				const noteContentField = document.getElementById(
-					"note-content-field",
+					"note-content-field"
 				) as HTMLTextAreaElement;
 
 				// Use Promise.all to prepare the data
@@ -627,7 +627,7 @@ function setupEventListeners(tabId: number) {
 
 					// Call share directly from the click handler
 					const noteNameField = document.getElementById(
-						"note-name-field",
+						"note-name-field"
 					) as HTMLInputElement;
 					let fileName = noteNameField?.value || "untitled";
 					fileName = sanitizeFileName(fileName);
@@ -650,10 +650,10 @@ function setupEventListeners(tabId: number) {
 
 						if (navigator.canShare(shareData)) {
 							const pathField = document.getElementById(
-								"path-name-field",
+								"path-name-field"
 							) as HTMLInputElement;
 							const vaultDropdown = document.getElementById(
-								"vault-select",
+								"vault-select"
 							) as HTMLSelectElement;
 							const path = pathField?.value || "";
 							const vault = vaultDropdown?.value || "";
@@ -667,11 +667,11 @@ function setupEventListeners(tabId: number) {
 										vault,
 										path,
 										tabInfo.url,
-										tabInfo.title,
+										tabInfo.title
 									);
 									const moreDropdown =
 										document.getElementById(
-											"more-dropdown",
+											"more-dropdown"
 										);
 									if (moreDropdown) {
 										moreDropdown.classList.remove("show");
@@ -698,7 +698,7 @@ function setupEventListeners(tabId: number) {
 			if (!isSafariBrowser || !navigator.share || !navigator.canShare) {
 				shareButtonElements.forEach((button) => {
 					const parentElement = button.closest(
-						".share-btn, .menu-item",
+						".share-btn, .menu-item"
 					) as HTMLElement;
 					if (parentElement) {
 						parentElement.style.display = "none";
@@ -713,7 +713,7 @@ function setupEventListeners(tabId: number) {
 				if (!navigator.canShare(testShare)) {
 					shareButtonElements.forEach((button) => {
 						const parentElement = button.closest(
-							".share-btn, .menu-item",
+							".share-btn, .menu-item"
 						) as HTMLElement;
 						if (parentElement) {
 							parentElement.style.display = "none";
@@ -727,7 +727,7 @@ function setupEventListeners(tabId: number) {
 	const readerModeButton = document.getElementById("reader-mode");
 	if (readerModeButton) {
 		readerModeButton.addEventListener("click", () =>
-			toggleReaderMode(tabId),
+			toggleReaderMode(tabId)
 		);
 	}
 }
@@ -741,7 +741,7 @@ async function initializeUI() {
 	}
 
 	const showMoreActionsButton = document.getElementById(
-		"show-variables",
+		"show-variables"
 	) as HTMLElement;
 	const variablesPanel = document.createElement("div");
 	variablesPanel.className = "variables-panel";
@@ -754,7 +754,7 @@ async function initializeUI() {
 			initializeVariablesPanel(
 				variablesPanel,
 				currentTemplate,
-				currentVariables,
+				currentVariables
 			);
 			await showVariables();
 		});
@@ -774,7 +774,7 @@ function showError(messageKey: string): void {
 }
 function showErrorText(text: string): void {
 	const errorMessage = document.querySelector(
-		".error-message",
+		".error-message"
 	) as HTMLElement;
 	const clipper = document.querySelector(".clipper") as HTMLElement;
 
@@ -788,7 +788,7 @@ function showErrorText(text: string): void {
 }
 function clearError(): void {
 	const errorMessage = document.querySelector(
-		".error-message",
+		".error-message"
 	) as HTMLElement;
 	const clipper = document.querySelector(".clipper") as HTMLElement;
 
@@ -806,7 +806,7 @@ function logError(message: string, error?: any): void {
 }
 
 async function waitForInterpreter(
-	interpretBtn: HTMLButtonElement,
+	interpretBtn: HTMLButtonElement
 ): Promise<void> {
 	return new Promise((resolve, reject) => {
 		const checkProcessing = () => {
@@ -828,7 +828,7 @@ async function waitForInterpreter(
 
 async function refreshFields(
 	tabId: number,
-	checkTemplateTriggers: boolean = true,
+	checkTemplateTriggers: boolean = true
 ) {
 	if (templates.length === 0) {
 		console.warn("No templates available");
@@ -859,7 +859,7 @@ async function refreshFields(
 
 			const matchedTemplate = await findMatchingTemplate(
 				tab.url,
-				getSchemaOrgData,
+				getSchemaOrgData
 			);
 			if (matchedTemplate) {
 				console.log("Matched template:", matchedTemplate);
@@ -893,7 +893,7 @@ async function refreshFields(
 				extractedData.site,
 				extractedData.wordCount,
 				extractedData.language || "",
-				extractedData.metaTags,
+				extractedData.metaTags
 			);
 			if (initializedContent) {
 				currentVariables = initializedContent.currentVariables;
@@ -902,7 +902,7 @@ async function refreshFields(
 					tabId,
 					currentTemplate,
 					initializedContent.currentVariables,
-					extractedData.schemaOrgData,
+					extractedData.schemaOrgData
 				);
 
 				// Update variables panel if it's open
@@ -925,7 +925,7 @@ async function refreshFields(
 
 function updateTemplateDropdown() {
 	const templateDropdown = document.getElementById(
-		"template-select",
+		"template-select"
 	) as HTMLSelectElement;
 	if (templateDropdown && currentTemplate) {
 		templateDropdown.value = currentTemplate.id;
@@ -934,7 +934,7 @@ function updateTemplateDropdown() {
 
 function populateTemplateDropdown() {
 	const templateDropdown = document.getElementById(
-		"template-select",
+		"template-select"
 	) as HTMLSelectElement;
 	if (templateDropdown && currentTemplate) {
 		// Clear existing options
@@ -954,7 +954,7 @@ function buildTemplateFieldsSkeleton(template: Template | null) {
 
 	// Handle vault selection
 	const vaultDropdown = document.getElementById(
-		"vault-select",
+		"vault-select"
 	) as HTMLSelectElement;
 	if (vaultDropdown) {
 		if (template.vault) {
@@ -965,23 +965,23 @@ function buildTemplateFieldsSkeleton(template: Template | null) {
 	}
 
 	const existingTemplateProperties = document.querySelector(
-		".metadata-properties",
+		".metadata-properties"
 	) as HTMLElement;
 
 	const newTemplateProperties = createElementWithClass(
 		"div",
-		"metadata-properties",
+		"metadata-properties"
 	);
 
 	if (Array.isArray(template.properties)) {
 		for (const property of template.properties) {
 			const propertyDiv = createElementWithClass(
 				"div",
-				"metadata-property",
+				"metadata-property"
 			);
 			const propertyType =
 				generalSettings.propertyTypes.find(
-					(p) => p.name === property.name,
+					(p) => p.name === property.name
 				)?.type || "text";
 
 			// Create metadata property key container
@@ -993,7 +993,7 @@ function buildTemplateFieldsSkeleton(template: Template | null) {
 			const iconElement = document.createElement("i");
 			iconElement.setAttribute(
 				"data-lucide",
-				getPropertyTypeIcon(propertyType),
+				getPropertyTypeIcon(propertyType)
 			);
 			propertyIconSpan.appendChild(iconElement);
 
@@ -1027,7 +1027,7 @@ function buildTemplateFieldsSkeleton(template: Template | null) {
 	if (existingTemplateProperties && existingTemplateProperties.parentNode) {
 		existingTemplateProperties.parentNode.replaceChild(
 			newTemplateProperties,
-			existingTemplateProperties,
+			existingTemplateProperties
 		);
 		existingTemplateProperties.remove();
 	}
@@ -1036,20 +1036,20 @@ function buildTemplateFieldsSkeleton(template: Template | null) {
 
 	// Set up note name and path fields with template values
 	const noteNameField = document.getElementById(
-		"note-name-field",
+		"note-name-field"
 	) as HTMLTextAreaElement;
 	if (noteNameField) {
 		noteNameField.setAttribute(
 			"data-template-value",
-			template.noteNameFormat,
+			template.noteNameFormat
 		);
 	}
 
 	const pathField = document.getElementById(
-		"path-name-field",
+		"path-name-field"
 	) as HTMLInputElement;
 	const pathContainer = document.querySelector(
-		".vault-path-container",
+		".vault-path-container"
 	) as HTMLElement;
 	if (pathField && pathContainer) {
 		const isDailyNote =
@@ -1064,12 +1064,12 @@ function buildTemplateFieldsSkeleton(template: Template | null) {
 	}
 
 	const noteContentField = document.getElementById(
-		"note-content-field",
+		"note-content-field"
 	) as HTMLTextAreaElement;
 	if (noteContentField) {
 		noteContentField.setAttribute(
 			"data-template-value",
-			template.noteContentFormat || "",
+			template.noteContentFormat || ""
 		);
 	}
 
@@ -1087,11 +1087,11 @@ function buildTemplateFieldsSkeleton(template: Template | null) {
 	// Populate model dropdown immediately (only needs generalSettings)
 	if (hasPromptVars) {
 		const modelSelect = document.getElementById(
-			"model-select",
+			"model-select"
 		) as HTMLSelectElement;
 		if (modelSelect) {
 			const enabledModels = generalSettings.models.filter(
-				(model) => model.enabled,
+				(model) => model.enabled
 			);
 			modelSelect.textContent = "";
 			enabledModels.forEach((model) => {
@@ -1112,7 +1112,7 @@ async function fillTemplateFieldValues(
 	currentTabId: number,
 	template: Template | null,
 	variables: { [key: string]: string },
-	schemaOrgData?: any,
+	schemaOrgData?: any
 ) {
 	if (!template) return;
 
@@ -1137,29 +1137,29 @@ async function fillTemplateFieldValues(
 					currentTabId!,
 					unescapeValue(property.value),
 					variables,
-					currentUrl,
-				),
-			),
+					currentUrl
+				)
+			)
 		),
 		memoizedCompileTemplate(
 			currentTabId!,
 			template.noteNameFormat,
 			variables,
-			currentUrl,
+			currentUrl
 		),
 		memoizedCompileTemplate(
 			currentTabId!,
 			template.path,
 			variables,
-			currentUrl,
+			currentUrl
 		),
 		template.noteContentFormat
 			? memoizedCompileTemplate(
 					currentTabId!,
 					template.noteContentFormat,
 					variables,
-					currentUrl,
-				)
+					currentUrl
+			  )
 			: Promise.resolve(""),
 	]);
 
@@ -1167,7 +1167,7 @@ async function fillTemplateFieldValues(
 	for (let i = 0; i < template.properties.length; i++) {
 		const property = template.properties[i];
 		const inputElement = document.getElementById(
-			property.name,
+			property.name
 		) as HTMLInputElement;
 		if (!inputElement) continue;
 
@@ -1185,7 +1185,7 @@ async function fillTemplateFieldValues(
 	}
 
 	const noteNameField = document.getElementById(
-		"note-name-field",
+		"note-name-field"
 	) as HTMLTextAreaElement;
 	if (noteNameField) {
 		noteNameField.value = formattedNoteName.trim();
@@ -1193,14 +1193,14 @@ async function fillTemplateFieldValues(
 	}
 
 	const pathField = document.getElementById(
-		"path-name-field",
+		"path-name-field"
 	) as HTMLInputElement;
 	if (pathField) {
 		pathField.value = formattedPath;
 	}
 
 	const noteContentField = document.getElementById(
-		"note-content-field",
+		"note-content-field"
 	) as HTMLTextAreaElement;
 	if (noteContentField) {
 		noteContentField.value = template.noteContentFormat
@@ -1213,7 +1213,7 @@ async function fillTemplateFieldValues(
 			template,
 			variables,
 			currentTabId!,
-			currentUrl,
+			currentUrl
 		);
 
 		const promptVariables = collectPromptVariables(template);
@@ -1221,19 +1221,19 @@ async function fillTemplateFieldValues(
 		if (generalSettings.interpreterAutoRun && promptVariables.length > 0) {
 			try {
 				const interpretBtn = document.getElementById(
-					"interpret-btn",
+					"interpret-btn"
 				) as HTMLButtonElement;
 				const modelSelect = document.getElementById(
-					"model-select",
+					"model-select"
 				) as HTMLSelectElement;
 				const selectedModelId =
 					modelSelect?.value || generalSettings.interpreterModel;
 				const modelConfig = generalSettings.models.find(
-					(m) => m.id === selectedModelId,
+					(m) => m.id === selectedModelId
 				);
 				if (!modelConfig) {
 					throw new Error(
-						`Model configuration not found for ${selectedModelId}`,
+						`Model configuration not found for ${selectedModelId}`
 					);
 				}
 				await handleInterpreterUI(
@@ -1241,7 +1241,7 @@ async function fillTemplateFieldValues(
 					variables,
 					currentTabId!,
 					currentUrl,
-					modelConfig,
+					modelConfig
 				);
 
 				if (interpretBtn) {
@@ -1251,7 +1251,7 @@ async function fillTemplateFieldValues(
 			} catch (error) {
 				console.error("Error auto-processing with interpreter:", error);
 				const interpretBtn = document.getElementById(
-					"interpret-btn",
+					"interpret-btn"
 				) as HTMLButtonElement;
 				if (interpretBtn) {
 					interpretBtn.classList.add("error");
@@ -1264,21 +1264,21 @@ async function fillTemplateFieldValues(
 		template,
 		variables,
 		currentTabId!,
-		currentUrl,
+		currentUrl
 	);
 	debugLog(
 		"Variables",
 		"Current template with replaced variables:",
-		JSON.stringify(replacedTemplate, null, 2),
+		JSON.stringify(replacedTemplate, null, 2)
 	);
 }
 
 function setupMetadataToggle() {
 	const metadataHeader = document.querySelector(
-		".metadata-properties-header",
+		".metadata-properties-header"
 	) as HTMLElement;
 	const metadataProperties = document.querySelector(
-		".metadata-properties",
+		".metadata-properties"
 	) as HTMLElement;
 
 	if (metadataHeader && metadataProperties) {
@@ -1299,10 +1299,10 @@ function setupMetadataToggle() {
 
 function toggleMetadataProperties() {
 	const metadataProperties = document.querySelector(
-		".metadata-properties",
+		".metadata-properties"
 	) as HTMLElement;
 	const metadataHeader = document.querySelector(
-		".metadata-properties-header",
+		".metadata-properties-header"
 	) as HTMLElement;
 
 	if (metadataProperties && metadataHeader) {
@@ -1314,10 +1314,10 @@ function toggleMetadataProperties() {
 
 function updateMetadataToggleState(isCollapsed: boolean) {
 	const metadataProperties = document.querySelector(
-		".metadata-properties",
+		".metadata-properties"
 	) as HTMLElement;
 	const metadataHeader = document.querySelector(
-		".metadata-properties-header",
+		".metadata-properties-header"
 	) as HTMLElement;
 
 	if (metadataProperties && metadataHeader) {
@@ -1335,7 +1335,7 @@ async function getReplacedTemplate(
 	template: Template,
 	variables: { [key: string]: string },
 	tabId: number,
-	currentUrl: string,
+	currentUrl: string
 ): Promise<any> {
 	const replacedTemplate: any = {
 		schemaVersion: "0.1.0",
@@ -1345,14 +1345,14 @@ async function getReplacedTemplate(
 			tabId,
 			template.noteNameFormat,
 			variables,
-			currentUrl,
+			currentUrl
 		),
 		path: template.path,
 		noteContentFormat: await compileTemplate(
 			tabId,
 			template.noteContentFormat,
 			variables,
-			currentUrl,
+			currentUrl
 		),
 		properties: [],
 		triggers: template.triggers,
@@ -1363,7 +1363,7 @@ async function getReplacedTemplate(
 			tabId,
 			template.context,
 			variables,
-			currentUrl,
+			currentUrl
 		);
 	}
 
@@ -1375,7 +1375,7 @@ async function getReplacedTemplate(
 				tabId,
 				prop.value,
 				variables,
-				currentUrl,
+				currentUrl
 			),
 		};
 		replacedTemplate.properties.push(replacedProp);
@@ -1387,10 +1387,10 @@ async function getReplacedTemplate(
 function updateSpaceDropdown(settings: Settings) {
 	const spaceContainer = document.getElementById("space-container");
 	const spaceDropdown = document.getElementById(
-		"space-select",
+		"space-select"
 	) as HTMLSelectElement | null;
 	const pathField = document.getElementById(
-		"path-name-field",
+		"path-name-field"
 	) as HTMLInputElement | null;
 
 	if (!spaceDropdown || !spaceContainer) return;
@@ -1441,7 +1441,7 @@ function updateSpaceDropdown(settings: Settings) {
 function updateFolderDropdown(settings: Settings, spaceId: string) {
 	const folderContainer = document.getElementById("folder-container");
 	const folderDropdown = document.getElementById(
-		"folder-select",
+		"folder-select"
 	) as HTMLSelectElement | null;
 
 	if (!folderDropdown || !folderContainer) return;
@@ -1466,7 +1466,7 @@ function updateFolderDropdown(settings: Settings, spaceId: string) {
 			});
 			if (lastSelectedFolder) {
 				const exists = Array.from(folderDropdown.options).some(
-					(o) => o.value === lastSelectedFolder,
+					(o) => o.value === lastSelectedFolder
 				);
 				if (exists) folderDropdown.value = lastSelectedFolder;
 			}
@@ -1483,7 +1483,7 @@ function updateFolderDropdown(settings: Settings, spaceId: string) {
 
 function updateVaultDropdown(vaults: string[]) {
 	const vaultDropdown = document.getElementById(
-		"vault-select",
+		"vault-select"
 	) as HTMLSelectElement | null;
 	const vaultContainer = document.getElementById("vault-container");
 
@@ -1564,7 +1564,7 @@ async function toggleHighlighterMode(tabId: number) {
 			}
 		} else {
 			throw new Error(
-				response.error || "Failed to toggle highlighter mode.",
+				response.error || "Failed to toggle highlighter mode."
 			);
 		}
 	} catch (error) {
@@ -1581,7 +1581,7 @@ function updateHighlighterModeUI(isActive: boolean) {
 			highlighterModeButton.classList.toggle("active", isActive);
 			highlighterModeButton.setAttribute(
 				"aria-pressed",
-				isActive.toString(),
+				isActive.toString()
 			);
 			highlighterModeButton.title = isActive
 				? getMessage("disableHighlighter")
@@ -1633,10 +1633,10 @@ export async function copyToClipboard(content: string) {
 		}
 
 		const pathField = document.getElementById(
-			"path-name-field",
+			"path-name-field"
 		) as HTMLInputElement;
 		const vaultDropdown = document.getElementById(
-			"vault-select",
+			"vault-select"
 		) as HTMLSelectElement;
 		const path = pathField?.value || "";
 		const vault = vaultDropdown?.value || "";
@@ -1647,7 +1647,7 @@ export async function copyToClipboard(content: string) {
 			vault,
 			path,
 			tabInfo.url,
-			tabInfo.title,
+			tabInfo.title
 		);
 
 		// Change the main button text temporarily
@@ -1671,13 +1671,13 @@ export async function copyToClipboard(content: string) {
 async function handleSaveToDownloads() {
 	try {
 		const noteNameField = document.getElementById(
-			"note-name-field",
+			"note-name-field"
 		) as HTMLInputElement;
 		const pathField = document.getElementById(
-			"path-name-field",
+			"path-name-field"
 		) as HTMLInputElement;
 		const vaultDropdown = document.getElementById(
-			"vault-select",
+			"vault-select"
 		) as HTMLSelectElement;
 
 		let fileName = noteNameField?.value || "untitled";
@@ -1687,7 +1687,7 @@ async function handleSaveToDownloads() {
 		const properties = getPropertiesFromDOM();
 
 		const noteContentField = document.getElementById(
-			"note-content-field",
+			"note-content-field"
 		) as HTMLTextAreaElement;
 		const frontmatter = await generateFrontmatter(properties);
 		const fileContent = frontmatter + noteContentField.value;
@@ -1706,7 +1706,7 @@ async function handleSaveToDownloads() {
 			vault,
 			path,
 			tabInfo.url,
-			tabInfo.title,
+			tabInfo.title
 		);
 
 		const moreDropdown = document.getElementById("more-dropdown");
@@ -1734,24 +1734,24 @@ function determineMainAction() {
 			mainButton.textContent = getMessage("copyToClipboard");
 			mainButton.onclick = () => copyContent();
 			addSecondaryAction(secondaryActions, "addToAppFlowy", () =>
-				handleClipAppFlowy(),
+				handleClipAppFlowy()
 			);
 			addSecondaryAction(
 				secondaryActions,
 				"saveFile",
-				handleSaveToDownloads,
+				handleSaveToDownloads
 			);
 			break;
 		case "saveFile":
 			mainButton.textContent = getMessage("saveFile");
 			mainButton.onclick = () => handleSaveToDownloads();
 			addSecondaryAction(secondaryActions, "addToAppFlowy", () =>
-				handleClipAppFlowy(),
+				handleClipAppFlowy()
 			);
 			addSecondaryAction(
 				secondaryActions,
 				"copyToClipboard",
-				copyContent,
+				copyContent
 			);
 			break;
 		default: // 'addToAppFlowy'
@@ -1760,12 +1760,12 @@ function determineMainAction() {
 			addSecondaryAction(
 				secondaryActions,
 				"copyToClipboard",
-				copyContent,
+				copyContent
 			);
 			addSecondaryAction(
 				secondaryActions,
 				"saveFile",
-				handleSaveToDownloads,
+				handleSaveToDownloads
 			);
 	}
 }
@@ -1774,24 +1774,24 @@ async function handleClipObsidian(): Promise<void> {
 	if (!currentTemplate) return;
 
 	const vaultDropdown = document.getElementById(
-		"vault-select",
+		"vault-select"
 	) as HTMLSelectElement;
 	const noteContentField = document.getElementById(
-		"note-content-field",
+		"note-content-field"
 	) as HTMLTextAreaElement;
 	const noteNameField = document.getElementById(
-		"note-name-field",
+		"note-name-field"
 	) as HTMLInputElement;
 	const pathField = document.getElementById(
-		"path-name-field",
+		"path-name-field"
 	) as HTMLInputElement;
 	const interpretBtn = document.getElementById(
-		"interpret-btn",
+		"interpret-btn"
 	) as HTMLButtonElement;
 
 	if (!vaultDropdown || !noteContentField) {
 		showError(
-			"Some required fields are missing. Please try reloading the extension.",
+			"Some required fields are missing. Please try reloading the extension."
 		);
 		return;
 	}
@@ -1830,7 +1830,7 @@ async function handleClipObsidian(): Promise<void> {
 			noteName,
 			path,
 			selectedVault,
-			currentTemplate.behavior,
+			currentTemplate.behavior
 		);
 		const tabInfo = await getCurrentTabInfo();
 		await incrementStat(
@@ -1838,7 +1838,7 @@ async function handleClipObsidian(): Promise<void> {
 			selectedVault,
 			path,
 			tabInfo.url,
-			tabInfo.title,
+			tabInfo.title
 		);
 
 		if (!currentTemplate.vault) {
@@ -1860,18 +1860,18 @@ async function handleClipAppFlowy(): Promise<void> {
 	if (!currentTemplate) return;
 
 	const noteContentField = document.getElementById(
-		"note-content-field",
+		"note-content-field"
 	) as HTMLTextAreaElement;
 	const noteNameField = document.getElementById(
-		"note-name-field",
+		"note-name-field"
 	) as HTMLInputElement;
 	const interpretBtn = document.getElementById(
-		"interpret-btn",
+		"interpret-btn"
 	) as HTMLButtonElement;
 
 	if (!noteContentField) {
 		showError(
-			"Some required fields are missing. Please try reloading the extension.",
+			"Some required fields are missing. Please try reloading the extension."
 		);
 		return;
 	}
@@ -1908,10 +1908,10 @@ async function handleClipAppFlowy(): Promise<void> {
 
 		// Use selected folder as parentViewId, falling back to space, then config
 		const spaceDropdown = document.getElementById(
-			"space-select",
+			"space-select"
 		) as HTMLSelectElement | null;
 		const folderDropdown = document.getElementById(
-			"folder-select",
+			"folder-select"
 		) as HTMLSelectElement | null;
 		const selectedParent =
 			folderDropdown?.value ||
@@ -1936,7 +1936,7 @@ async function handleClipAppFlowy(): Promise<void> {
 			"",
 			"",
 			tabInfo.url,
-			tabInfo.title,
+			tabInfo.title
 		);
 
 		if (!isSidePanel) {
@@ -1951,7 +1951,7 @@ async function handleClipAppFlowy(): Promise<void> {
 function addSecondaryAction(
 	container: Element,
 	actionType: string,
-	handler: () => void,
+	handler: () => void
 ) {
 	const menuItem = document.createElement("div");
 	menuItem.className = "menu-item";
@@ -1998,7 +1998,7 @@ async function copyContent() {
 	const properties = getPropertiesFromDOM();
 
 	const noteContentField = document.getElementById(
-		"note-content-field",
+		"note-content-field"
 	) as HTMLTextAreaElement;
 	const frontmatter = await generateFrontmatter(properties);
 	const fileContent = frontmatter + noteContentField.value;
