@@ -696,9 +696,6 @@
 	"readerDarkThemeDescription": {
 		"message": "Use a different theme in dark mode."
 	},
-	"readerColorSchemeDracula": {
-		"message": "Dracula"
-	},
 	"readerColorSchemeEverforest": {
 		"message": "Everforest"
 	},

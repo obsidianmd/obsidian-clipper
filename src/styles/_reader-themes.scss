@@ -80,47 +80,6 @@
 	}
 }
 
-.obsidian-reader-active[data-reader-theme="dracula"] {
-	--background-primary: #282a36;
-	--background-primary-alt: #21222c;
-	--text-normal: #f8f8f2;
-	--text-muted: #949fbe;
-	--text-faint: #6272a4;
-	--text-accent: #f8f8f2;
-	--text-accent-hover: #bd93f9;
-	--background-modifier-border: #44475a;
-	--text-selection: rgba(134, 140, 170, 0.3);
-	--color-red: #ff5555;
-	--color-orange: #ffb86c;
-	--color-yellow: #f1fa8c;
-	--color-green: #50fa7b;
-	--color-cyan: #8be9fd;
-	--color-blue: #6272a4;
-	--color-purple: #bd93f9;
-	--color-pink: #ff79c6;
-
-	&.theme-dark,
-	.theme-dark {
-		--background-primary: #282a36;
-		--background-primary-alt: #21222c;
-		--text-normal: #f8f8f2;
-		--text-muted: #949fbe;
-		--text-faint: #6272a4;
-		--text-accent: #f8f8f2;
-		--text-accent-hover: #bd93f9;
-		--background-modifier-border: #44475a;
-		--text-selection: rgba(134, 140, 170, 0.3);
-		--color-red: #ff5555;
-		--color-orange: #ffb86c;
-		--color-yellow: #f1fa8c;
-		--color-green: #50fa7b;
-		--color-cyan: #8be9fd;
-		--color-blue: #6272a4;
-		--color-purple: #bd93f9;
-		--color-pink: #ff79c6;
-	}
-}
-
 .obsidian-reader-active[data-reader-theme="everforest"] {
 	--background-primary: #fdf6e3;
 	--background-primary-alt: #f4f0d9;

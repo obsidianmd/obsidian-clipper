@@ -1195,7 +1195,6 @@ export class Reader {
 			child = bq;
 			parent = child.parentElement;
 			while (parent && parent.tagName === 'BLOCKQUOTE' && !parent.closest('.comment-content')) {
-				const armHeight = parseFloat(getComputedStyle(child).fontSize);
 				parent.style.setProperty('--highlight-height', `${child.offsetTop + 2}px`);
 				parent.classList.add('child-hovered');
 				highlightedAncestors.push(parent);

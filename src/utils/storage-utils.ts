@@ -134,7 +134,7 @@ export async function loadSettings(): Promise<Settings> {
 			darkTheme: 'same',
 			appearance: 'auto',
 			fonts: [],
-		defaultFont: '',
+			defaultFont: '',
 			blendImages: true,
 			colorLinks: false,
 			customCss: ''
