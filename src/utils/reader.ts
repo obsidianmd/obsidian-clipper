@@ -27,7 +27,9 @@ export class Reader {
 		height?: string;
 		viewBox?: string;
 		className?: string;
+		strokeWidth?: string;
 		paths?: string[];
+		circles?: Array<{cx: string, cy: string, r: string, fill?: string}>;
 		rects?: Array<{x: string, y: string, width: string, height: string, rx?: string, ry?: string}>;
 	}): SVGElement {
 		const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -41,7 +43,7 @@ export class Reader {
 		// Default attributes for all SVGs
 		svg.setAttribute('fill', 'none');
 		svg.setAttribute('stroke', 'currentColor');
-		svg.setAttribute('stroke-width', '1.5');
+		svg.setAttribute('stroke-width', config.strokeWidth || '1.5');
 		svg.setAttribute('stroke-linecap', 'round');
 		svg.setAttribute('stroke-linejoin', 'round');
 		
@@ -54,6 +56,18 @@ export class Reader {
 			});
 		}
 		
+		// Add circles
+		if (config.circles) {
+			config.circles.forEach(circleData => {
+				const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+				circle.setAttribute('cx', circleData.cx);
+				circle.setAttribute('cy', circleData.cy);
+				circle.setAttribute('r', circleData.r);
+				if (circleData.fill) circle.setAttribute('fill', circleData.fill);
+				svg.appendChild(circle);
+			});
+		}
+
 		// Add rects
 		if (config.rects) {
 			config.rects.forEach(rectData => {
@@ -109,6 +123,124 @@ export class Reader {
 		// Create settings bar
 		const settingsBar = doc.createElement('div');
 		settingsBar.className = 'obsidian-reader-settings';
+
+		// Trigger button (always visible)
+		const trigger = doc.createElement('button');
+		trigger.className = 'obsidian-reader-settings-trigger nav-btn';
+		trigger.setAttribute('aria-label', getMessage('settings'));
+		trigger.appendChild(this.createSVG({
+			width: '18', height: '18', viewBox: '0 0 24 24', strokeWidth: '1.75',
+			circles: [{ cx: '18.5', cy: '12.5', r: '3.5' }],
+			paths: ['m2 16 4.039-9.69a.5.5 0 0 1 .923 0L11 16', 'M22 9v7', 'M3.304 13h6.392'],
+		}));
+		trigger.addEventListener('click', (e) => {
+			e.stopPropagation();
+			settingsBar.classList.toggle('is-open');
+		});
+
+		// Close when clicking outside
+		doc.addEventListener('click', (e) => {
+			if (!settingsBar.contains(e.target as Node)) {
+				settingsBar.classList.remove('is-open');
+			}
+		});
+
+		// Clip button with dropdown
+		const clipButton = doc.createElement('button');
+		clipButton.className = 'obsidian-reader-settings-trigger nav-btn';
+		clipButton.setAttribute('aria-label', getMessage('addToObsidian'));
+		clipButton.appendChild(this.createSVG({
+			width: '18', height: '18', viewBox: '0 0 24 24', strokeWidth: '1.75',
+			paths: ['m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48'],
+		}));
+
+		const clipDropdown = doc.createElement('div');
+		clipDropdown.className = 'obsidian-reader-clip-dropdown';
+
+		const clipActions: Array<{ action: string; paths: string[] }> = [
+			{ action: 'addToObsidian', paths: ['M12 20h9', 'm16.5 3.5 2.12 2.12a2.828 2.828 0 0 1 0 4L7 21.5 2 22l.5-5L14 5.5a2.828 2.828 0 0 1 4 0z'] },
+			{ action: 'copyToClipboard', paths: ['M20 8H10a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2z', 'M4 16a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2'] },
+			{ action: 'saveFile', paths: ['M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z', 'M14 2v4a2 2 0 0 0 2 2h4', 'M12 18v-6', 'm9 15 3 3 3-3'] },
+		];
+
+		for (const { action, paths } of clipActions) {
+			const item = doc.createElement('div');
+			item.className = 'obsidian-reader-clip-item';
+
+			const itemIcon = this.createSVG({
+				width: '16', height: '16', viewBox: '0 0 24 24', strokeWidth: '1.75',
+				paths,
+			});
+			item.appendChild(itemIcon);
+
+			const itemLabel = doc.createElement('span');
+			itemLabel.textContent = getMessage(action);
+			item.appendChild(itemLabel);
+
+			item.addEventListener('click', async () => {
+				if (action === 'addToObsidian') {
+					clipDropdown.classList.remove('is-open');
+					browser.runtime.sendMessage({ action: 'openPopup' });
+				} else if (action === 'copyToClipboard') {
+					const originalText = itemLabel.textContent;
+					browser.runtime.sendMessage({ action: 'copyMarkdownToClipboard' });
+					itemLabel.textContent = getMessage('copied');
+					setTimeout(() => { itemLabel.textContent = originalText; }, 2000);
+				} else if (action === 'saveFile') {
+					clipDropdown.classList.remove('is-open');
+					browser.runtime.sendMessage({ action: 'saveMarkdownToFile' });
+				}
+			});
+
+			clipDropdown.appendChild(item);
+		}
+
+		clipButton.addEventListener('click', (e) => {
+			e.stopPropagation();
+			settingsBar.classList.remove('is-open');
+			clipDropdown.classList.toggle('is-open');
+		});
+
+		doc.addEventListener('click', (e) => {
+			if (!clipButton.contains(e.target as Node) && !clipDropdown.contains(e.target as Node)) {
+				clipDropdown.classList.remove('is-open');
+			}
+		});
+
+		const triggerGroup = doc.createElement('div');
+		triggerGroup.className = 'obsidian-reader-nav';
+		triggerGroup.appendChild(clipButton);
+		triggerGroup.appendChild(trigger);
+		settingsBar.appendChild(triggerGroup);
+		settingsBar.appendChild(clipDropdown);
+
+		// Hide buttons on scroll down, show on scroll up or hover
+		let lastScrollY = window.scrollY;
+		let scrollHidden = false;
+
+		const showButtons = () => {
+			if (scrollHidden) {
+				triggerGroup.style.opacity = '';
+				scrollHidden = false;
+			}
+		};
+
+		window.addEventListener('scroll', () => {
+			if (settingsBar.classList.contains('is-open') || clipDropdown.classList.contains('is-open')) return;
+			const currentY = window.scrollY;
+			if (currentY > lastScrollY && currentY > 50) {
+				if (!scrollHidden) {
+					triggerGroup.style.opacity = '0';
+					scrollHidden = true;
+				}
+			} else {
+				showButtons();
+			}
+			lastScrollY = currentY;
+		}, { passive: true });
+
+		triggerGroup.addEventListener('mouseenter', showButtons);
+
 		// Create settings controls container
 		const controlsContainer = doc.createElement('div');
 		controlsContainer.className = 'obsidian-reader-settings-controls';
@@ -187,6 +319,18 @@ export class Reader {
 		lineHeightGroup.appendChild(increaseLineHeightBtn);
 
 		// Theme select
+		const themeWrapper = doc.createElement('div');
+		themeWrapper.className = 'obsidian-reader-settings-select-wrapper';
+		themeWrapper.appendChild(this.createSVG({
+			width: '18', height: '18', viewBox: '0 0 24 24', strokeWidth: '1.75',
+			circles: [
+				{ cx: '13.5', cy: '6.5', r: '.5', fill: 'currentColor' },
+				{ cx: '17.5', cy: '10.5', r: '.5', fill: 'currentColor' },
+				{ cx: '8.5', cy: '7.5', r: '.5', fill: 'currentColor' },
+				{ cx: '6.5', cy: '12.5', r: '.5', fill: 'currentColor' },
+			],
+			paths: ['M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z'],
+		}));
 		const themeSelect = doc.createElement('select');
 		themeSelect.className = 'obsidian-reader-settings-select';
 		themeSelect.dataset.action = 'change-theme';
@@ -209,27 +353,54 @@ export class Reader {
 			option.textContent = getMessage(messageKey);
 			themeSelect.appendChild(option);
 		}
+		themeWrapper.appendChild(themeSelect);
 
 		// Theme mode select
+		const themeModeWrapper = doc.createElement('div');
+		themeModeWrapper.className = 'obsidian-reader-settings-select-wrapper';
+
+		const sunIcon = this.createSVG({
+			width: '18', height: '18', viewBox: '0 0 24 24', strokeWidth: '1.75',
+			circles: [{ cx: '12', cy: '12', r: '4' }],
+			paths: ['M12 2v2', 'M12 20v2', 'm4.93 4.93 1.41 1.41', 'm17.66 17.66 1.41 1.41', 'M2 12h2', 'M20 12h2', 'm6.34 17.66-1.41 1.41', 'm19.07 4.93-1.41 1.41'],
+		});
+		const moonIcon = this.createSVG({
+			width: '18', height: '18', viewBox: '0 0 24 24', strokeWidth: '1.75',
+			paths: ['M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z'],
+		});
+
+		const updateModeIcon = () => {
+			const isDark = doc.documentElement.classList.contains('theme-dark');
+			sunIcon.style.display = isDark ? 'none' : '';
+			moonIcon.style.display = isDark ? '' : 'none';
+		};
+
+		themeModeWrapper.appendChild(sunIcon);
+		themeModeWrapper.appendChild(moonIcon);
+		updateModeIcon();
+
+		// Watch for theme-light/theme-dark class changes (D key, OS preference, etc.)
+		new MutationObserver(updateModeIcon).observe(doc.documentElement, {
+			attributes: true,
+			attributeFilter: ['class'],
+		});
+
 		const themeModeSelect = doc.createElement('select');
 		themeModeSelect.className = 'obsidian-reader-settings-select';
-		themeModeSelect.dataset.action = 'change-theme-mode';
 
-		const autoModeOption = doc.createElement('option');
-		autoModeOption.value = 'auto';
-		autoModeOption.textContent = getMessage('readerAppearanceAuto');
+		const modeOptions: Array<[string, string]> = [
+			['auto', 'readerAppearanceAuto'],
+			['light', 'readerAppearanceLight'],
+			['dark', 'readerAppearanceDark'],
+		];
 
-		const lightModeOption = doc.createElement('option');
-		lightModeOption.value = 'light';
-		lightModeOption.textContent = getMessage('readerAppearanceLight');
-
-		const darkModeOption = doc.createElement('option');
-		darkModeOption.value = 'dark';
-		darkModeOption.textContent = getMessage('readerAppearanceDark');
-
-		themeModeSelect.appendChild(autoModeOption);
-		themeModeSelect.appendChild(lightModeOption);
-		themeModeSelect.appendChild(darkModeOption);
+		for (const [value, messageKey] of modeOptions) {
+			const option = doc.createElement('option');
+			option.value = value;
+			option.textContent = getMessage(messageKey);
+			themeModeSelect.appendChild(option);
+		}
+		themeModeWrapper.appendChild(themeModeSelect);
 
 
 		// Highlighter controls group
@@ -249,20 +420,33 @@ export class Reader {
 
 		// Settings button
 		const settingsBtn = doc.createElement('button');
-		settingsBtn.className = 'obsidian-reader-settings-button';
+		settingsBtn.className = 'obsidian-reader-settings-link-button';
 		settingsBtn.setAttribute('aria-label', 'Reader settings');
 		settingsBtn.appendChild(this.createSVG({
-			width: '20', height: '20', viewBox: '0 0 24 24',
+			width: '18', height: '18', viewBox: '0 0 24 24', strokeWidth: '1.75',
+			circles: [{ cx: '12', cy: '12', r: '3' }],
 			paths: [
 				'M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z',
-				'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z'
 			]
 		}));
+		const settingsLabel = doc.createElement('span');
+		settingsLabel.textContent = getMessage('settings');
+		settingsBtn.appendChild(settingsLabel);
 		settingsBtn.addEventListener('click', () => {
 			browser.runtime.sendMessage({ action: 'openSettings', section: 'reader' });
 		});
 
 		// Font select
+		const fontWrapper = doc.createElement('div');
+		fontWrapper.className = 'obsidian-reader-settings-select-wrapper';
+		fontWrapper.appendChild(this.createSVG({
+			width: '18', height: '18', viewBox: '0 0 24 24', strokeWidth: '1.75',
+			paths: [
+				'M4 7V4h16v3',
+				'M9 20h6',
+				'M12 4v16',
+			],
+		}));
 		const fontSelect = doc.createElement('select');
 		fontSelect.className = 'obsidian-reader-settings-select';
 
@@ -282,14 +466,28 @@ export class Reader {
 			option.textContent = font;
 			fontSelect.appendChild(option);
 		}
+		fontWrapper.appendChild(fontSelect);
 
 		// Assemble everything
 		controlsContainer.appendChild(fontGroup);
 		controlsContainer.appendChild(widthGroup);
 		controlsContainer.appendChild(lineHeightGroup);
-		controlsContainer.appendChild(themeSelect);
-		controlsContainer.appendChild(themeModeSelect);
-		controlsContainer.appendChild(fontSelect);
+
+		const spacer = doc.createElement('div');
+		spacer.className = 'obsidian-reader-settings-spacer';
+		controlsContainer.appendChild(spacer);
+
+		const dropdownGroup = doc.createElement('div');
+		dropdownGroup.className = 'obsidian-reader-settings-dropdown-group';
+		dropdownGroup.appendChild(themeModeWrapper);
+		dropdownGroup.appendChild(themeWrapper);
+		dropdownGroup.appendChild(fontWrapper);
+		controlsContainer.appendChild(dropdownGroup);
+
+		const spacer2 = doc.createElement('div');
+		spacer2.className = 'obsidian-reader-settings-spacer';
+		controlsContainer.appendChild(spacer2);
+
 		controlsContainer.appendChild(settingsBtn);
 
 		settingsBar.appendChild(controlsContainer);

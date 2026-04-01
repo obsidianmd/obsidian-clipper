@@ -101,8 +101,7 @@ async function ensureContentScriptLoadedInBackground(tabId: number): Promise<voi
 
 		// Check if the URL is valid before proceeding
 		if (!tab.url || !isValidUrl(tab.url)) {
-			console.log(`Skipping content script injection for invalid URL: ${tab.url}`);
-			throw new Error(`Cannot inject content script into invalid URL: ${tab.url}`);
+			throw new Error('Invalid URL for content script injection');
 		}
 
 		// Attempt to send a message to the content script
@@ -389,6 +388,31 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 				sendResponse({success: false, error: error instanceof Error ? error.message : String(error)});
 			}
 			return true;
+		}
+
+		if (typedRequest.action === "openPopup") {
+			try {
+				browser.action.openPopup();
+				sendResponse({success: true});
+			} catch (error) {
+				sendResponse({success: false, error: error instanceof Error ? error.message : String(error)});
+			}
+			return true;
+		}
+
+		if (typedRequest.action === "copyMarkdownToClipboard" || typedRequest.action === "saveMarkdownToFile") {
+			if (sender.tab?.id) {
+				(async () => {
+					try {
+						await ensureContentScriptLoadedInBackground(sender.tab!.id!);
+						await browser.tabs.sendMessage(sender.tab!.id!, { action: typedRequest.action });
+						sendResponse({success: true});
+					} catch (error) {
+						sendResponse({success: false, error: error instanceof Error ? error.message : String(error)});
+					}
+				})();
+				return true;
+			}
 		}
 
 		if (typedRequest.action === "getTabInfo") {

@@ -38,10 +38,18 @@ window.rebuildTemplateList = rebuildTemplateList;
 document.addEventListener('DOMContentLoaded', async () => {
 	const newTemplateBtn = document.getElementById('new-template-btn') as HTMLButtonElement;
 
+	// Apply section from URL params immediately to avoid flash (DOM only, no side effects)
+	const { section: initialSection } = getUrlParameters();
+	const targetSection = (initialSection === 'general' || initialSection === 'interpreter' || initialSection === 'properties' || initialSection === 'highlighter' || initialSection === 'reader') ? initialSection : 'general';
+	document.querySelectorAll('.settings-section').forEach(s => s.classList.remove('active'));
+	document.querySelectorAll('#sidebar li[data-section]').forEach(i => i.classList.remove('active'));
+	document.getElementById(`${targetSection}-section`)?.classList.add('active');
+	document.querySelector(`#sidebar li[data-section="${targetSection}"]`)?.classList.add('active');
+
 	async function initializeSettings(): Promise<void> {
 		try {
 			await translatePage();
-			
+
 			await initializeGeneralSettings();
 			await initializeReaderSettings();
 			
