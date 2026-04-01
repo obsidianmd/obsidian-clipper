@@ -453,6 +453,23 @@ export class Reader {
 	}
 
 
+	private static scrollTo(targetY: number, duration = 200): void {
+		const startY = window.pageYOffset;
+		const distance = targetY - startY;
+		if (Math.abs(distance) < 1) return;
+		const startTime = performance.now();
+
+		const step = (now: number) => {
+			const elapsed = now - startTime;
+			const t = Math.min(elapsed / duration, 1);
+			const ease = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+			window.scrollTo(0, startY + distance * ease);
+			if (t < 1) requestAnimationFrame(step);
+		};
+
+		requestAnimationFrame(step);
+	}
+
 	private static async extractContent(doc: Document): Promise<{
 		content: string;
 		title?: string;
@@ -547,12 +564,8 @@ export class Reader {
 			
 			item.addEventListener('click', () => {
 				const rect = heading.getBoundingClientRect();
-				const scrollTop = window.pageYOffset || doc.documentElement.scrollTop;
-				const targetY = scrollTop + rect.top - window.innerHeight * 0.05;
-				window.scrollTo({
-					top: targetY,
-					behavior: 'smooth'
-				});
+				const targetY = (window.pageYOffset || doc.documentElement.scrollTop) + rect.top - window.innerHeight * 0.05;
+				this.scrollTo(targetY);
 			});
 
 			outline.appendChild(item);
@@ -609,12 +622,8 @@ export class Reader {
 			
 			item.addEventListener('click', () => {
 				const rect = footnotes.getBoundingClientRect();
-				const scrollTop = window.pageYOffset || doc.documentElement.scrollTop;
-				const targetY = scrollTop + rect.top - window.innerHeight * 0.05;
-				window.scrollTo({
-					top: targetY,
-					behavior: 'smooth'
-				});
+				const targetY = (window.pageYOffset || doc.documentElement.scrollTop) + rect.top - window.innerHeight * 0.05;
+				this.scrollTo(targetY);
 			});
 
 			outline.appendChild(item);
@@ -669,7 +678,9 @@ export class Reader {
 				const refId = href.substring(hashIndex + 1);
 				const refElement = doc.getElementById(refId);
 				if (refElement) {
-					refElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+					const rect = refElement.getBoundingClientRect();
+					const targetY = (window.pageYOffset || doc.documentElement.scrollTop) + rect.top - window.innerHeight * 0.4;
+					this.scrollTo(targetY);
 				}
 				return;
 			}
