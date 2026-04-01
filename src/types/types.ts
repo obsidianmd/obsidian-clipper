@@ -59,8 +59,8 @@ export interface ReaderSettings {
 	lightTheme: string;
 	darkTheme: string;
 	appearance: 'auto' | 'light' | 'dark';
-	fontFamily: 'system' | 'custom';
-	customFont: string;
+	fonts: string[];
+	defaultFont: string;
 	blendImages: boolean;
 	colorLinks: boolean;
 	customCss: string;

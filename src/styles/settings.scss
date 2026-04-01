@@ -212,7 +212,6 @@
 		}
 		.slider-value {
 			font-size: var(--font-ui-smaller);
-			color: var(--text-muted);
 			min-width: 1.5rem;
 			text-align: right;
 			font-variant: tabular-nums;
@@ -350,6 +349,53 @@
 	}
 }
 
+.setting-item-list {
+	display: flex;
+	flex-direction: column;
+	margin: 0.5rem 0 0.5rem;
+	padding: 0;
+	li {
+		user-select: none;
+		-webkit-user-select: none;
+		display: flex;
+		flex-direction: row;
+		gap: 0.25rem;
+		padding: 2px 0;
+		align-items: center;
+		font-size: var(--font-ui-small);
+		border-bottom: 1px solid var(--background-modifier-border);
+		button {
+			width: auto;
+		}
+		.setting-item-error {
+			font-size: var(--font-ui-smallest);
+			color: var(--text-warning);
+		}
+		.setting-item-default-btn {
+			margin-inline-start: auto;
+			font-size: var(--font-ui-smallest);
+			color: var(--text-faint);
+			background: none;
+			border-radius: var(--radius-s);
+			padding: 1px 6px;
+			cursor: pointer;
+			white-space: nowrap;
+			&:hover {
+				color: var(--text-normal);
+				border-color: var(--text-faint);
+			}
+			&.is-active {
+				color: var(--text-normal);
+				border-color: transparent;
+				cursor: default;
+			}
+		}
+		&:last-child {
+			border-bottom: none;
+		}
+	}
+}
+
 #general-settings-form {
 	#keyboard-shortcuts-list {
 		display: flex;
@@ -357,30 +403,6 @@
 		margin-top: 0.5rem;
 	}
 
-	#vault-list {
-		display: flex;
-		flex-direction: column;
-		margin: 0.5rem 0 0.5rem;
-		padding: 0;
-		li {
-			user-select: none;
-			-webkit-user-select: none;
-			display: flex;
-			flex-direction: row;
-			gap: 0.25rem;
-			padding: 2px 0;
-			align-items: center;
-			font-size: var(--font-ui-small);
-			border-bottom: 1px solid var(--background-modifier-border);
-			button {
-				margin-left: auto;
-				width: auto;
-			}
-			&:last-child {
-				border-bottom: none;
-			}
-		}
-	}
 	.shortcut-item {
 		display: flex;
 		justify-content: space-between;

@@ -1,6 +1,9 @@
 import { generalSettings, loadSettings, saveSettings } from '../utils/storage-utils';
 import { initializeSettingToggle } from '../utils/ui-utils';
+import { createElementWithClass, createElementWithHTML } from '../utils/dom-utils';
+import { initializeIcons } from '../icons/icons';
 import { debounce } from '../utils/debounce';
+import { getMessage } from '../utils/i18n';
 
 const THEME_ORDER = ['default', 'flexoki', 'ayu', 'catppuccin', 'everforest', 'gruvbox', 'nord', 'rose-pine', 'solarized'];
 
@@ -105,33 +108,24 @@ function isFontAvailable(fontName: string): boolean {
 	return ctx.measureText(text).width !== baseWidth;
 }
 
-function updateCustomFontError(fontFamily: string, customFont: string) {
-	const error = document.getElementById('reader-custom-font-error') as HTMLElement;
-	if (!error) return;
-	const rawFont = customFont.replace(/^["']|["']$/g, '').trim();
-	const show = fontFamily === 'custom' && rawFont.length > 0 && !isFontAvailable(rawFont);
-	error.style.display = show ? '' : 'none';
-}
-
-function getCustomFontValue(): string | null {
-	const { fontFamily, customFont } = generalSettings.readerSettings;
-	const rawFont = customFont.replace(/^["']|["']$/g, '').trim();
-	return fontFamily === 'custom' && rawFont ? `"${rawFont}", system-ui, -apple-system, sans-serif` : null;
+function getFontStackCss(fonts: string[]): string | null {
+	if (fonts.length === 0) return null;
+	return fonts.map(f => `"${f}"`).join(', ') + ', system-ui, -apple-system, sans-serif';
 }
 
 function updatePreview() {
 	const preview = document.getElementById('reader-preview');
 	if (!preview) return;
 
-	const { lightTheme, darkTheme, appearance, fontFamily, customFont, fontSize, lineHeight, colorLinks } = generalSettings.readerSettings;
+	const { lightTheme, darkTheme, appearance, defaultFont, fontSize, lineHeight, colorLinks } = generalSettings.readerSettings;
 	const isDark = getIsDark(appearance);
 	const effectiveTheme = isDark && darkTheme !== 'same' ? darkTheme : lightTheme;
 
 	applyThemeClasses(preview, effectiveTheme, isDark);
 
-	const rawFont = customFont.replace(/^["']|["']$/g, '').trim();
-	if (fontFamily === 'custom' && rawFont) {
-		preview.style.setProperty('--obsidian-reader-font-family', `"${rawFont}", system-ui, -apple-system, sans-serif`);
+	const fontStack = defaultFont ? getFontStackCss([defaultFont]) : null;
+	if (fontStack) {
+		preview.style.setProperty('--obsidian-reader-font-family', fontStack);
 	} else {
 		preview.style.removeProperty('--obsidian-reader-font-family');
 	}
@@ -142,12 +136,12 @@ function updatePreview() {
 }
 
 function rebuildGrids(lightGrid: HTMLElement | null, darkGrid: HTMLElement | null) {
-	const { lightTheme, darkTheme, appearance } = generalSettings.readerSettings;
+	const { lightTheme, darkTheme, appearance, defaultFont } = generalSettings.readerSettings;
 	const isDarkMode = getIsDark(appearance);
-	const customFontValue = getCustomFontValue();
+	const fontStack = defaultFont ? getFontStackCss([defaultFont]) : null;
 
 	if (lightGrid) {
-		buildThemeGrid(lightGrid, lightTheme, isDarkMode, customFontValue, (themeId) => {
+		buildThemeGrid(lightGrid, lightTheme, isDarkMode, fontStack, (themeId) => {
 			saveSettings({ ...generalSettings, readerSettings: { ...generalSettings.readerSettings, lightTheme: themeId } });
 			updatePreview();
 		});
@@ -155,11 +149,110 @@ function rebuildGrids(lightGrid: HTMLElement | null, darkGrid: HTMLElement | nul
 
 	if (darkGrid) {
 		const effectiveDark = darkTheme === 'same' ? lightTheme : darkTheme;
-		buildThemeGrid(darkGrid, effectiveDark, true, customFontValue, (themeId) => {
+		buildThemeGrid(darkGrid, effectiveDark, true, fontStack, (themeId) => {
 			saveSettings({ ...generalSettings, readerSettings: { ...generalSettings.readerSettings, darkTheme: themeId } });
 			updatePreview();
 		});
 	}
+}
+
+export function refreshReaderPreview(): void {
+	updatePreview();
+	updateFontList();
+	const lightGrid = document.getElementById('reader-theme-grid-light') as HTMLElement;
+	const darkGrid = document.getElementById('reader-theme-grid-dark') as HTMLElement;
+	rebuildGrids(lightGrid, darkGrid);
+}
+
+export function updateFontList(): void {
+	const fontList = document.getElementById('reader-font-list') as HTMLUListElement;
+	if (!fontList) return;
+
+	fontList.textContent = '';
+
+	const setDefault = (fontValue: string) => {
+		generalSettings.readerSettings.defaultFont = fontValue;
+		saveSettings({ ...generalSettings });
+		updateFontList();
+		updatePreview();
+		const lightGrid = document.getElementById('reader-theme-grid-light') as HTMLElement;
+		const darkGrid = document.getElementById('reader-theme-grid-dark') as HTMLElement;
+		rebuildGrids(lightGrid, darkGrid);
+	};
+
+	const createDefaultTag = (fontValue: string, isDefault: boolean): HTMLDivElement => {
+		const tag = document.createElement('div');
+		if (isDefault) {
+			tag.className = 'setting-item-default-btn is-active';
+			tag.textContent = getMessage('readerFontDefault');
+		} else {
+			tag.className = 'setting-item-default-btn';
+			tag.textContent = getMessage('readerFontSetDefault');
+			tag.addEventListener('click', (e) => {
+				e.stopPropagation();
+				setDefault(fontValue);
+			});
+		}
+		return tag;
+	};
+
+	// System font entry (non-removable)
+	const systemLi = document.createElement('li');
+
+	const systemSpan = document.createElement('span');
+	systemSpan.textContent = getMessage('readerFontSystemFont');
+	systemLi.appendChild(systemSpan);
+
+	systemLi.appendChild(createDefaultTag('', generalSettings.readerSettings.defaultFont === ''));
+
+	const systemRemoveBtn = createElementWithClass('button', 'setting-item-list-remove clickable-icon');
+	systemRemoveBtn.setAttribute('type', 'button');
+	(systemRemoveBtn as HTMLButtonElement).disabled = true;
+	(systemRemoveBtn as HTMLButtonElement).style.opacity = '0';
+	systemRemoveBtn.appendChild(createElementWithHTML('i', '', { 'data-lucide': 'trash-2' }));
+	systemLi.appendChild(systemRemoveBtn);
+
+	fontList.appendChild(systemLi);
+
+	// Custom font entries (alphabetized)
+	const sortedFonts = [...generalSettings.readerSettings.fonts].sort((a, b) => a.localeCompare(b));
+	for (const font of sortedFonts) {
+		const li = document.createElement('li');
+
+		const span = document.createElement('span');
+		span.textContent = font;
+		li.appendChild(span);
+
+		if (!isFontAvailable(font)) {
+			const error = createElementWithClass('span', 'setting-item-error mod-warning');
+			error.textContent = getMessage('readerFontNotFound');
+			li.appendChild(error);
+		}
+
+		li.appendChild(createDefaultTag(font, generalSettings.readerSettings.defaultFont === font));
+
+		const removeBtn = createElementWithClass('button', 'setting-item-list-remove clickable-icon');
+		removeBtn.setAttribute('type', 'button');
+		removeBtn.setAttribute('aria-label', 'Remove font');
+		removeBtn.appendChild(createElementWithHTML('i', '', { 'data-lucide': 'trash-2' }));
+		li.appendChild(removeBtn);
+
+		removeBtn.addEventListener('click', (e) => {
+			e.stopPropagation();
+			const idx = generalSettings.readerSettings.fonts.indexOf(font);
+			if (idx !== -1) generalSettings.readerSettings.fonts.splice(idx, 1);
+			if (generalSettings.readerSettings.defaultFont === font) {
+				generalSettings.readerSettings.defaultFont = '';
+			}
+			saveSettings({ ...generalSettings });
+			updateFontList();
+			updatePreview();
+		});
+
+		fontList.appendChild(li);
+	}
+
+	initializeIcons(fontList);
 }
 
 export async function initializeReaderSettings() {
@@ -168,42 +261,33 @@ export async function initializeReaderSettings() {
 
 	await loadSettings();
 
-	const fontFamilySelect = document.getElementById('reader-font-family') as HTMLSelectElement;
-	const customFontSetting = document.getElementById('reader-custom-font-setting') as HTMLElement;
-	const customFontInput = document.getElementById('reader-custom-font') as HTMLInputElement;
 	const lightGrid = document.getElementById('reader-theme-grid-light') as HTMLElement;
 	const darkGrid = document.getElementById('reader-theme-grid-dark') as HTMLElement;
 	const darkSection = document.getElementById('reader-theme-dark-section') as HTMLElement;
 	const darkSchemeToggle = document.getElementById('reader-separate-dark-theme') as HTMLInputElement;
 
-	function updateCustomFontVisibility(fontFamily: string) {
-		customFontSetting.style.display = fontFamily === 'custom' ? '' : 'none';
-	}
+	// Font list management
+	const fontInput = document.getElementById('reader-font-input') as HTMLInputElement;
 
-	if (fontFamilySelect) {
-		fontFamilySelect.value = generalSettings.readerSettings.fontFamily;
-		updateCustomFontVisibility(fontFamilySelect.value);
-		fontFamilySelect.addEventListener('change', () => {
-			updateCustomFontVisibility(fontFamilySelect.value);
-			saveSettings({ ...generalSettings, readerSettings: { ...generalSettings.readerSettings, fontFamily: fontFamilySelect.value as 'system' | 'custom', customFont: customFontInput?.value ?? generalSettings.readerSettings.customFont } });
-			updatePreview();
-			updateCustomFontError(fontFamilySelect.value, customFontInput?.value ?? '');
-			rebuildGrids(lightGrid, darkGrid);
+	if (fontInput) {
+		fontInput.addEventListener('keydown', (e) => {
+			if (e.key === 'Enter') {
+				e.preventDefault();
+				const font = fontInput.value.trim();
+				if (font && !generalSettings.readerSettings.fonts.includes(font)) {
+					generalSettings.readerSettings.fonts.push(font);
+					saveSettings({ ...generalSettings });
+					fontInput.value = '';
+					updateFontList();
+		
+					updatePreview();
+					rebuildGrids(lightGrid, darkGrid);
+				}
+			}
 		});
 	}
 
-	if (customFontInput) {
-		customFontInput.value = generalSettings.readerSettings.customFont;
-		customFontInput.addEventListener('keydown', (e) => {
-			if (e.key === 'Enter') e.preventDefault();
-		});
-		customFontInput.addEventListener('input', debounce(() => {
-			saveSettings({ ...generalSettings, readerSettings: { ...generalSettings.readerSettings, customFont: customFontInput.value } });
-			updatePreview();
-			updateCustomFontError(fontFamilySelect?.value ?? 'custom', customFontInput.value);
-			rebuildGrids(lightGrid, darkGrid);
-		}, 500));
-	}
+	updateFontList();
 
 	const fontSizeInput = document.getElementById('reader-font-size') as HTMLInputElement;
 	const fontSizeDisplay = document.getElementById('reader-font-size-display');
@@ -312,5 +396,4 @@ export async function initializeReaderSettings() {
 
 	rebuildGrids(lightGrid, darkGrid);
 	updatePreview();
-	updateCustomFontError(generalSettings.readerSettings.fontFamily, generalSettings.readerSettings.customFont);
 }

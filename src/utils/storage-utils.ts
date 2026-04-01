@@ -29,8 +29,8 @@ export let generalSettings: Settings = {
 		lightTheme: 'default',
 		darkTheme: 'same',
 		appearance: 'auto',
-		fontFamily: 'system',
-		customFont: '',
+		fonts: [],
+		defaultFont: '',
 		blendImages: true,
 		colorLinks: false,
 		customCss: ''
@@ -76,8 +76,8 @@ interface StorageData {
 		lightTheme?: string;
 		darkTheme?: string;
 		appearance?: 'auto' | 'light' | 'dark';
-		fontFamily?: 'system' | 'custom';
-		customFont?: string;
+		fonts?: string[];
+		defaultFont?: string;
 		blendImages?: boolean;
 		colorLinks?: boolean;
 		customCss?: string;
@@ -133,8 +133,8 @@ export async function loadSettings(): Promise<Settings> {
 			lightTheme: 'default',
 			darkTheme: 'same',
 			appearance: 'auto',
-			fontFamily: 'system',
-			customFont: '',
+			fonts: [],
+		defaultFont: '',
 			blendImages: true,
 			colorLinks: false,
 			customCss: ''
@@ -191,8 +191,8 @@ export async function loadSettings(): Promise<Settings> {
 			lightTheme: data.reader_settings?.lightTheme ?? defaultSettings.readerSettings.lightTheme,
 			darkTheme: data.reader_settings?.darkTheme ?? defaultSettings.readerSettings.darkTheme,
 			appearance: data.reader_settings?.appearance as 'auto' | 'light' | 'dark' ?? defaultSettings.readerSettings.appearance,
-			fontFamily: data.reader_settings?.fontFamily as 'system' | 'custom' ?? defaultSettings.readerSettings.fontFamily,
-			customFont: data.reader_settings?.customFont ?? defaultSettings.readerSettings.customFont,
+			fonts: data.reader_settings?.fonts ?? defaultSettings.readerSettings.fonts,
+			defaultFont: data.reader_settings?.defaultFont ?? defaultSettings.readerSettings.defaultFont,
 			blendImages: data.reader_settings?.blendImages ?? defaultSettings.readerSettings.blendImages,
 			colorLinks: data.reader_settings?.colorLinks ?? defaultSettings.readerSettings.colorLinks,
 			customCss: data.reader_settings?.customCss ?? defaultSettings.readerSettings.customCss
@@ -244,8 +244,8 @@ export async function saveSettings(settings?: Partial<Settings>): Promise<void> 
 			lightTheme: generalSettings.readerSettings.lightTheme,
 			darkTheme: generalSettings.readerSettings.darkTheme,
 			appearance: generalSettings.readerSettings.appearance,
-			fontFamily: generalSettings.readerSettings.fontFamily,
-			customFont: generalSettings.readerSettings.customFont,
+			fonts: generalSettings.readerSettings.fonts,
+			defaultFont: generalSettings.readerSettings.defaultFont,
 			blendImages: generalSettings.readerSettings.blendImages,
 			colorLinks: generalSettings.readerSettings.colorLinks,
 			customCss: generalSettings.readerSettings.customCss

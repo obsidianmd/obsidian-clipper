@@ -19,8 +19,8 @@ interface ReaderSettings {
 	lightTheme: string;
 	darkTheme: string;
 	appearance: 'auto' | 'light' | 'dark';
-	fontFamily: 'system' | 'custom';
-	customFont: string;
+	fonts: string[];
+	defaultFont: string;
 	blendImages: boolean;
 	colorLinks: boolean;
 	customCss: string;
@@ -94,8 +94,8 @@ export class Reader {
 		lightTheme: 'default',
 		darkTheme: 'same',
 		appearance: 'auto',
-		fontFamily: 'system',
-		customFont: '',
+		fonts: [],
+		defaultFont: '',
 		blendImages: true,
 		colorLinks: false,
 		customCss: ''
@@ -269,21 +269,6 @@ export class Reader {
 		themeModeSelect.appendChild(lightModeOption);
 		themeModeSelect.appendChild(darkModeOption);
 
-		// Font family select
-		const fontFamilySelect = doc.createElement('select');
-		fontFamilySelect.className = 'obsidian-reader-settings-select';
-		fontFamilySelect.dataset.action = 'change-font-family';
-
-		const systemFontOption = doc.createElement('option');
-		systemFontOption.value = 'system';
-		systemFontOption.textContent = getMessage('readerFontSystem');
-
-		const customFontOption = doc.createElement('option');
-		customFontOption.value = 'custom';
-		customFontOption.textContent = getMessage('readerFontCustom');
-
-		fontFamilySelect.appendChild(systemFontOption);
-		fontFamilySelect.appendChild(customFontOption);
 
 		// Highlighter controls group
 		const highlighterGroup = doc.createElement('div');
@@ -300,13 +285,45 @@ export class Reader {
 
 		highlighterGroup.appendChild(highlighterBtn);
 
+		// Settings button
+		const settingsBtn = doc.createElement('button');
+		settingsBtn.className = 'obsidian-reader-settings-button';
+		settingsBtn.setAttribute('aria-label', 'Reader settings');
+		settingsBtn.appendChild(this.createSVG({
+			width: '20', height: '20', viewBox: '0 0 24 24',
+			paths: [
+				'M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z',
+				'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z'
+			]
+		}));
+		settingsBtn.addEventListener('click', () => {
+			browser.runtime.sendMessage({ action: 'openSettings', section: 'reader' });
+		});
+
+		// Font select
+		const fontSelect = doc.createElement('select');
+		fontSelect.className = 'obsidian-reader-settings-select';
+
+		const systemOption = doc.createElement('option');
+		systemOption.value = '';
+		systemOption.textContent = getMessage('readerFontSystem');
+		fontSelect.appendChild(systemOption);
+
+		for (const font of [...this.settings.fonts].sort((a, b) => a.localeCompare(b))) {
+			const option = doc.createElement('option');
+			option.value = font;
+			option.textContent = font;
+			fontSelect.appendChild(option);
+		}
+
 		// Assemble everything
 		controlsContainer.appendChild(fontGroup);
 		controlsContainer.appendChild(widthGroup);
 		controlsContainer.appendChild(lineHeightGroup);
 		controlsContainer.appendChild(themeSelect);
 		controlsContainer.appendChild(themeModeSelect);
-		controlsContainer.appendChild(fontFamilySelect);
+		controlsContainer.appendChild(fontSelect);
+		controlsContainer.appendChild(settingsBtn);
 
 		settingsBar.appendChild(controlsContainer);
 
@@ -361,10 +378,16 @@ export class Reader {
 			this.updateThemeMode(doc, themeModeSelect.value as 'auto' | 'light' | 'dark');
 		});
 
-		// Add font family select event listener
-		fontFamilySelect.value = this.settings.fontFamily;
-		fontFamilySelect.addEventListener('change', () => {
-			this.updateFontFamily(doc, fontFamilySelect.value as 'system' | 'custom');
+		// Add font select event listener
+		fontSelect.value = this.settings.defaultFont;
+		fontSelect.addEventListener('change', () => {
+			this.settings.defaultFont = fontSelect.value;
+			if (fontSelect.value) {
+				this.applyFonts(doc, [fontSelect.value]);
+			} else {
+				this.applyFonts(doc, []);
+			}
+			this.saveSettings();
 		});
 
 		// Notify content script to listen for highlighter button
@@ -435,15 +458,10 @@ export class Reader {
 		this.saveSettings();
 	}
 
-	private static updateFontFamily(doc: Document, fontFamily: 'system' | 'custom'): void {
-		this.settings.fontFamily = fontFamily;
-		this.applyFontFamily(doc, fontFamily, this.settings.customFont);
-		this.saveSettings();
-	}
-
-	private static applyFontFamily(doc: Document, fontFamily: 'system' | 'custom', customFont: string): void {
-		if (fontFamily === 'custom' && customFont) {
-			doc.body.style.setProperty('--obsidian-reader-font-family', customFont);
+	private static applyFonts(doc: Document, fonts: string[]): void {
+		if (fonts.length > 0) {
+			const stack = fonts.map(f => `"${f}"`).join(', ') + ', system-ui, -apple-system, sans-serif';
+			doc.body.style.setProperty('--obsidian-reader-font-family', stack);
 		} else {
 			doc.body.style.removeProperty('--obsidian-reader-font-family');
 		}
@@ -1574,7 +1592,7 @@ export class Reader {
 			doc.documentElement.style.setProperty('--obsidian-reader-font-size', `${this.settings.fontSize}px`);
 			doc.documentElement.style.setProperty('--obsidian-reader-line-height', this.settings.lineHeight.toString());
 			doc.documentElement.style.setProperty('--obsidian-reader-line-width', `${this.settings.maxWidth}em`);
-			this.applyFontFamily(doc, this.settings.fontFamily, this.settings.customFont);
+			this.applyFonts(doc, this.settings.defaultFont ? [this.settings.defaultFont] : []);
 			this.applyBlendImages(doc, this.settings.blendImages);
 			this.applyColorLinks(doc, this.settings.colorLinks);
 

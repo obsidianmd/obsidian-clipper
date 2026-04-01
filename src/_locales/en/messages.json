@@ -759,6 +759,18 @@
 	"readerFontSystem": {
 		"message": "System"
 	},
+	"readerFontSystemFont": {
+		"message": "System font"
+	},
+	"readerFontDefault": {
+		"message": "Default"
+	},
+	"readerFontSetDefault": {
+		"message": "Set default"
+	},
+	"readerFontNotFound": {
+		"message": "Not found"
+	},
 	"readerAppearance": {
 		"message": "Appearance"
 	},

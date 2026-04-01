@@ -173,7 +173,7 @@ async function sendMessageToPopup(tabId: number, message: any): Promise<void> {
 
 browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime.MessageSender, sendResponse: (response?: any) => void): true | undefined => {
 	if (typeof request === 'object' && request !== null) {
-		const typedRequest = request as { action: string; isActive?: boolean; hasHighlights?: boolean; tabId?: number; text?: string };
+		const typedRequest = request as { action: string; isActive?: boolean; hasHighlights?: boolean; tabId?: number; text?: string; section?: string };
 		
 		if (typedRequest.action === 'copy-to-clipboard' && typedRequest.text) {
 			// Use content script to copy to clipboard
@@ -372,6 +372,20 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 				sendResponse({success: true});
 			} catch (error) {
 				console.error('Error opening options page:', error);
+				sendResponse({success: false, error: error instanceof Error ? error.message : String(error)});
+			}
+			return true;
+		}
+
+		if (typedRequest.action === "openSettings") {
+			try {
+				const section = typedRequest.section ? `?section=${typedRequest.section}` : '';
+				browser.tabs.create({
+					url: browser.runtime.getURL(`settings.html${section}`)
+				});
+				sendResponse({success: true});
+			} catch (error) {
+				console.error('Error opening settings:', error);
 				sendResponse({success: false, error: error instanceof Error ? error.message : String(error)});
 			}
 			return true;

@@ -5,6 +5,7 @@ import { updateVaultList } from '../managers/general-settings';
 import { generalSettings, saveSettings } from './storage-utils';
 import { initializeModelList } from '../managers/interpreter-settings';
 import { initializeIcons } from '../icons/icons';
+import { updateFontList } from '../managers/reader-settings';
 
 let draggedElement: HTMLElement | null = null;
 
@@ -13,7 +14,8 @@ export function initializeDragAndDrop(): void {
 		document.getElementById('template-list'),
 		document.getElementById('template-properties'),
 		document.getElementById('vault-list'),
-		document.getElementById('model-list')
+		document.getElementById('model-list'),
+		document.getElementById('reader-font-list')
 	];
 
 	draggableLists.forEach(list => {
@@ -71,6 +73,8 @@ export function handleDrop(e: DragEvent): void {
 			handlePropertyReorder(draggedItemId, newIndex);
 		} else if (list.id === 'vault-list') {
 			handleVaultReorder(newIndex);
+		} else if (list.id === 'reader-font-list') {
+			handleFontReorder(newIndex);
 		} else if (list.id === 'model-list') {
 			handleModelReorder(newIndex);
 		}
@@ -158,6 +162,17 @@ function handleVaultReorder(newIndex: number): void {
 		generalSettings.vaults.splice(newIndex, 0, movedVault);
 		saveSettings();
 		updateVaultList();
+	}
+}
+
+function handleFontReorder(newIndex: number): void {
+	if (!draggedElement) return;
+	const oldIndex = parseInt(draggedElement.dataset.index || '-1');
+	if (oldIndex !== -1 && oldIndex !== newIndex) {
+		const [movedFont] = generalSettings.readerSettings.fonts.splice(oldIndex, 1);
+		generalSettings.readerSettings.fonts.splice(newIndex, 0, movedFont);
+		saveSettings();
+		updateFontList();
 	}
 }
 

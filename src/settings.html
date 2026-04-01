@@ -128,7 +128,7 @@
 								<div class="setting-items">
 								<div class="setting-item-description" data-i18n="vaultsDescription">By default, clipped notes are saved to the currently open vault. You can add vaults here if you want the option to save to different vaults. Vault names must exactly match the name of the Obsidian vault. Press <strong>enter</strong> to add a&nbsp;vault.</div>
 								<input type="text" id="vault-input" data-i18n="addVaultPlaceholder" placeholder="Press enter to add a vault" autocomplete="off" spellcheck="false" />
-								<ul id="vault-list"></ul>
+								<ul id="vault-list" class="setting-item-list"></ul>
 								</div>
 							</div>
 							<div class="setting-group" id="hotkeys-subsection">
@@ -322,138 +322,129 @@
 						</div>
 						<form id="reader-settings-form">
 							<div class="setting-group">
-								<div class="setting-item setting-item-heading"><h3 data-i18n="readerTypography">Typography</h3></div>
+								<div class="setting-item setting-item-heading"><h3>Fonts</h3></div>
 								<div class="setting-items">
-							<div class="setting-item mod-horizontal">
-								<div class="setting-item-info">
-									<label for="reader-font-family" data-i18n="readerFont">Font</label>
-									<div class="setting-item-description" data-i18n="readerFontDescription">Choose the font used in reader mode.</div>
-								</div>
-								<div class="setting-item-control">
-									<select id="reader-font-family">
-										<option value="system" data-i18n="readerFontSystem">System</option>
-										<option value="custom" data-i18n="readerFontCustom">Custom</option>
-									</select>
-								</div>
-							</div>
-							<div class="setting-item mod-horizontal" id="reader-custom-font-setting">
-								<div class="setting-item-info">
-									<label for="reader-custom-font" data-i18n="readerCustomFont">Custom font</label>
-									<div class="setting-item-description" data-i18n="readerCustomFontDescription">Enter a font name installed on your system.</div>
-								</div>
-								<div class="setting-item-control">
-									<input type="text" id="reader-custom-font" />
-									<span id="reader-custom-font-error" class="reader-font-error mod-warning" style="display:none" data-i18n="readerCustomFontError">Font not found</span>
-								</div>
-							</div>
-							<div class="setting-item mod-horizontal">
-								<div class="setting-item-info">
-									<label for="reader-font-size" data-i18n="readerFontSize">Base font size</label>
-									<div class="setting-item-description" data-i18n="readerFontSizeDescription">Font size in pixels.</div>
-								</div>
-								<div class="setting-item-control">
-									<input type="range" id="reader-font-size" min="9" max="24" step="1" />
-									<span id="reader-font-size-display" class="slider-value"></span>
-								</div>
-							</div>
-							<div class="setting-item mod-horizontal">
-								<div class="setting-item-info">
-									<label for="reader-line-height" data-i18n="readerLineHeight">Line height</label>
-									<div class="setting-item-description" data-i18n="readerLineHeightDescription">Line height multiplier.</div>
-								</div>
-								<div class="setting-item-control">
-									<input type="range" id="reader-line-height" min="1.1" max="2" step="0.1" />
-									<span id="reader-line-height-display" class="slider-value"></span>
-								</div>
-							</div>
-							<div class="setting-item mod-horizontal">
-								<div class="setting-item-info">
-									<label for="reader-max-width" data-i18n="readerLineWidth">Line width</label>
-									<div class="setting-item-description" data-i18n="readerLineWidthDescription">Maximum line width in em units.</div>
-								</div>
-								<div class="setting-item-control">
-									<input type="range" id="reader-max-width" min="30" max="60" step="1" />
-									<span id="reader-max-width-display" class="slider-value"></span>
-								</div>
-							</div>
-							<div class="setting-item mod-horizontal">
-								<div class="setting-item-info">
-									<label for="reader-color-links" data-i18n="readerColorLinks">Color links</label>
-									<div class="setting-item-description" data-i18n="readerColorLinksDescription">Use the theme accent color for links.</div>
-								</div>
-								<div class="setting-item-control">
-									<div class="checkbox-container">
-										<input type="checkbox" id="reader-color-links" />
+									<div class="setting-item">
+										<div class="setting-item-info">
+											<label>Font options</label>
+											<div class="setting-item-description">Add fonts installed on your system. Press <strong>enter</strong> to add a font.</div>
+										</div>
+										<input type="text" id="reader-font-input" placeholder="Press enter to add a font" autocomplete="off" spellcheck="false" />
+										<ul id="reader-font-list" class="setting-item-list"></ul>
 									</div>
-								</div>
-							</div>
 								</div>
 							</div>
 							<div class="setting-group">
-								<div class="setting-item setting-item-heading"><h3 data-i18n="readerImages">Images</h3></div>
+								<div class="setting-item setting-item-heading"><h3 data-i18n="readerTypography">Typography</h3></div>
 								<div class="setting-items">
-							<div class="setting-item mod-horizontal">
-								<div class="setting-item-info">
-									<label for="reader-blend-images" data-i18n="readerBlendImages">Blend images</label>
-									<div class="setting-item-description" data-i18n="readerBlendImagesDescription">Blend images with the page background in reader mode.</div>
-								</div>
-								<div class="setting-item-control">
-									<div class="checkbox-container">
-										<input type="checkbox" id="reader-blend-images" checked />
+									<div class="setting-item mod-horizontal">
+										<div class="setting-item-info">
+											<label for="reader-font-size" data-i18n="readerFontSize">Base font size</label>
+											<div class="setting-item-description" data-i18n="readerFontSizeDescription">Font size in pixels.</div>
+										</div>
+										<div class="setting-item-control">
+											<input type="range" id="reader-font-size" min="9" max="24" step="1" />
+											<span id="reader-font-size-display" class="slider-value"></span>
+										</div>
 									</div>
-								</div>
-							</div>
+									<div class="setting-item mod-horizontal">
+										<div class="setting-item-info">
+											<label for="reader-line-height" data-i18n="readerLineHeight">Line height</label>
+											<div class="setting-item-description" data-i18n="readerLineHeightDescription">Line height multiplier.</div>
+										</div>
+										<div class="setting-item-control">
+											<input type="range" id="reader-line-height" min="1.1" max="2" step="0.1" />
+											<span id="reader-line-height-display" class="slider-value"></span>
+										</div>
+									</div>
+									<div class="setting-item mod-horizontal">
+										<div class="setting-item-info">
+											<label for="reader-max-width" data-i18n="readerLineWidth">Line width</label>
+											<div class="setting-item-description" data-i18n="readerLineWidthDescription">Maximum line width in em units.</div>
+										</div>
+										<div class="setting-item-control">
+											<input type="range" id="reader-max-width" min="30" max="60" step="1" />
+											<span id="reader-max-width-display" class="slider-value"></span>
+										</div>
+									</div>
+									<div class="setting-item mod-horizontal">
+										<div class="setting-item-info">
+											<label for="reader-color-links" data-i18n="readerColorLinks">Color links</label>
+											<div class="setting-item-description" data-i18n="readerColorLinksDescription">Use the theme accent color for links.</div>
+										</div>
+										<div class="setting-item-control">
+											<div class="checkbox-container">
+												<input type="checkbox" id="reader-color-links" />
+											</div>
+										</div>
+									</div>
+										</div>
+									</div>
+									<div class="setting-group">
+										<div class="setting-item setting-item-heading"><h3 data-i18n="readerImages">Images</h3></div>
+										<div class="setting-items">
+									<div class="setting-item mod-horizontal">
+										<div class="setting-item-info">
+											<label for="reader-blend-images" data-i18n="readerBlendImages">Blend images</label>
+											<div class="setting-item-description" data-i18n="readerBlendImagesDescription">Blend images with the page background in reader mode.</div>
+										</div>
+										<div class="setting-item-control">
+											<div class="checkbox-container">
+												<input type="checkbox" id="reader-blend-images" checked />
+											</div>
+										</div>
+									</div>
 								</div>
 							</div>
 							<div class="setting-group">
 								<div class="setting-item setting-item-heading"><h3 data-i18n="readerThemeSection">Theme</h3></div>
 								<div class="setting-items">
-							<div class="setting-item mod-horizontal">
-								<div class="setting-item-info">
-									<label for="reader-appearance" data-i18n="readerAppearance">Theme</label>
-									<div class="setting-item-description" data-i18n="readerAppearanceDescription">Choose the light or dark theme for reader mode.</div>
-								</div>
-								<div class="setting-item-control">
-									<select id="reader-appearance">
-										<option value="auto" data-i18n="readerAppearanceAuto">Automatic</option>
-										<option value="light" data-i18n="readerAppearanceLight">Light</option>
-										<option value="dark" data-i18n="readerAppearanceDark">Dark</option>
-									</select>
-								</div>
-							</div>
-							<div class="setting-item setting-item-stacked">
-								<div class="setting-item-info">
-									<div data-i18n="readerTheme">Color scheme</div>
-									<div class="setting-item-description" data-i18n="readerThemeDescription">Choose the color scheme for reader mode.</div>
-								</div>
-								<div id="reader-theme-grid-light" class="reader-theme-grid"></div>
-							</div>
-							<div class="setting-item mod-horizontal">
-								<div class="setting-item-info">
-									<label for="reader-separate-dark-theme" data-i18n="readerDarkTheme">Dark mode color scheme</label>
-									<div class="setting-item-description" data-i18n="readerDarkThemeDescription">Use a different color scheme in dark mode.</div>
-								</div>
-								<div class="setting-item-control">
-									<div class="checkbox-container">
-										<input type="checkbox" id="reader-separate-dark-theme" />
+									<div class="setting-item mod-horizontal">
+										<div class="setting-item-info">
+											<label for="reader-appearance" data-i18n="readerAppearance">Theme</label>
+											<div class="setting-item-description" data-i18n="readerAppearanceDescription">Choose the light or dark theme for reader mode.</div>
+										</div>
+										<div class="setting-item-control">
+											<select id="reader-appearance">
+												<option value="auto" data-i18n="readerAppearanceAuto">Automatic</option>
+												<option value="light" data-i18n="readerAppearanceLight">Light</option>
+												<option value="dark" data-i18n="readerAppearanceDark">Dark</option>
+											</select>
+										</div>
 									</div>
-								</div>
-							</div>
-							<div id="reader-theme-dark-section">
-								<div id="reader-theme-grid-dark" class="reader-theme-grid"></div>
-							</div>
+									<div class="setting-item setting-item-stacked">
+										<div class="setting-item-info">
+											<div data-i18n="readerTheme">Color scheme</div>
+											<div class="setting-item-description" data-i18n="readerThemeDescription">Choose the color scheme for reader mode.</div>
+										</div>
+										<div id="reader-theme-grid-light" class="reader-theme-grid"></div>
+									</div>
+									<div class="setting-item mod-horizontal">
+										<div class="setting-item-info">
+											<label for="reader-separate-dark-theme" data-i18n="readerDarkTheme">Dark mode color scheme</label>
+											<div class="setting-item-description" data-i18n="readerDarkThemeDescription">Use a different color scheme in dark mode.</div>
+										</div>
+										<div class="setting-item-control">
+											<div class="checkbox-container">
+												<input type="checkbox" id="reader-separate-dark-theme" />
+											</div>
+										</div>
+									</div>
+									<div id="reader-theme-dark-section">
+										<div id="reader-theme-grid-dark" class="reader-theme-grid"></div>
+									</div>
 								</div>
 							</div>
 							<div class="setting-group">
 								<div class="setting-item setting-item-heading"><h3 data-i18n="advanced">Advanced</h3></div>
 								<div class="setting-items">
-							<div class="setting-item">
-								<div class="setting-item-info">
-									<label for="reader-custom-css" data-i18n="readerCustomCss">Custom CSS</label>
-									<div class="setting-item-description" data-i18n="readerCustomCssDescription">CSS applied automatically in reading view.</div>
-								</div>
-								<textarea id="reader-custom-css" rows="6" spellcheck="false"></textarea>
-							</div>
+									<div class="setting-item">
+										<div class="setting-item-info">
+											<label for="reader-custom-css" data-i18n="readerCustomCss">Custom CSS</label>
+											<div class="setting-item-description" data-i18n="readerCustomCssDescription">CSS applied automatically in reading view.</div>
+										</div>
+										<textarea id="reader-custom-css" rows="6" spellcheck="false"></textarea>
+									</div>
 								</div>
 							</div>
 						</form>
