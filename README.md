@@ -17,7 +17,7 @@ Download the latest release for your browser:
 | ----------------- | -------------------------------------------------------------------------------------------------------------------- |
 | Chrome / Chromium | [Chrome Web Store](https://chromewebstore.google.com/detail/ngjmhmikhoegpfakpfofaafagoikejln?utm_source=item-share-cb)  |
 | Firefox           | [Firefox Add-Ons](https://addons.mozilla.org/fr/firefox/addon/clipper-for-appflowy/) |
-| Safari            | [clipper-for-appflowy-0.1.0-safari.zip](https://github.com/alexrosepizant/clipper-for-appflowy/releases/tag/v0.1.0)  |
+| Safari            | [clipper-for-appflowy-0.1.1-safari.zip](https://github.com/alexrosepizant/clipper-for-appflowy/releases/tag/v0.1.1)  |
 
 ## Screenshots
 
