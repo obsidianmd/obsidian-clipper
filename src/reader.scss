@@ -3,6 +3,10 @@
 .obsidian-reader-active {
 	background-color: var(--background-primary) !important;
 
+	.obsidian-highlighter-menu {
+		display: none !important;
+	}
+
 	&.theme-light:not(.no-blend-images) {
 		img, svg {
 			mix-blend-mode: multiply;
@@ -797,7 +801,6 @@
 		border: none;
 		cursor: pointer;
 		transition: color 0.15s ease, opacity 0.15s ease, transform 0.15s ease;
-		border: 1px solid var(--background-modifier-border);
 		background: var(--background-primary);
 		color: var(--text-muted);
 		&:hover {
@@ -805,6 +808,7 @@
 		}
 	}
 }
+
 .obsidian-reader-clip-dropdown {
 	display: none;
 	position: absolute;
@@ -813,9 +817,9 @@
 	background: var(--background-primary);
 	border: var(--border-width) solid var(--background-modifier-border);
 	border-radius: var(--radius-m);
-	padding: var(--size-2-3) 0;
-	min-width: 180px;
+	padding: var(--size-2-3);
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+	z-index: 9999999999;
 	&.is-open {
 		display: block;
 	}
@@ -824,8 +828,10 @@
 	display: flex;
 	align-items: center;
 	gap: var(--size-4-2);
-	padding: var(--size-2-3) var(--size-4-3);
+	padding: var(--size-2-2) var(--size-4-2);
+	border-radius: var(--radius-s);
 	color: var(--text-normal);
+	white-space: nowrap;
 	cursor: pointer;
 	font-size: var(--font-ui-small);
 	&:hover {
@@ -836,11 +842,12 @@
 		color: var(--text-muted);
 	}
 }
+
 .obsidian-reader-settings-controls {
 	display: none;
 	background: var(--background-primary);
 	padding: var(--size-4-5);
-	padding-top: 48px;
+	padding-top: 56px;
 }
 .obsidian-reader-settings.is-open {
 	.obsidian-reader-settings-trigger {
@@ -856,7 +863,7 @@
 	gap: var(--size-2-3);
 }
 .obsidian-reader-settings-spacer {
-	margin: 4px 0;
+	margin: 3px 0;
 }
 .obsidian-reader-settings-controls {
 	align-items: center;
@@ -869,7 +876,7 @@
 	display: flex;
 	align-items: center;
 	border: 1px solid var(--background-modifier-border);
-	border-radius: var(--radius-s);
+	border-radius: var(--radius-m);
 	overflow: hidden;
 	> .obsidian-reader-settings-button {
 		flex: 1;
@@ -909,7 +916,7 @@
 	font-size: var(--font-ui-small);
 	height: 28px;
 	padding: 4px 30px 4px 8px;
-	border-radius: var(--radius-s);
+	border-radius: var(--radius-m);
 	cursor: pointer;
 	background-repeat: no-repeat, repeat;
 	/* arrow icon position (1em from the right, 50% vertical) , then gradient position*/
@@ -957,12 +964,12 @@
 	display: flex;
 	align-items: center;
 	justify-content: flex-start;
-	gap: 4px;
+	gap: 8px;
 	border: 1px solid var(--background-modifier-border);
 	background: transparent;
-	border-radius: var(--radius-s);
+	border-radius: var(--radius-m);
 	height: 28px;
-	padding: 0 10px;
+	padding: 0 6px;
 	color: var(--text-muted);
 	cursor: pointer;
 	font-family: inherit;

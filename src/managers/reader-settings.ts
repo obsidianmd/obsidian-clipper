@@ -6,16 +6,16 @@ import { debounce } from '../utils/debounce';
 import { getMessage } from '../utils/i18n';
 import { getFontCss, SANS_STACK, SERIF_STACK } from '../utils/font-utils';
 
-const THEMES: Array<{ id: string; messageKey: string }> = [
-	{ id: 'default', messageKey: 'readerColorSchemeDefault' },
-	{ id: 'flexoki', messageKey: 'readerColorSchemeFlexoki' },
-	{ id: 'ayu', messageKey: 'readerColorSchemeAyu' },
-	{ id: 'catppuccin', messageKey: 'readerColorSchemeCatppuccin' },
-	{ id: 'everforest', messageKey: 'readerColorSchemeEverforest' },
-	{ id: 'gruvbox', messageKey: 'readerColorSchemeGruvbox' },
-	{ id: 'nord', messageKey: 'readerColorSchemeNord' },
-	{ id: 'rose-pine', messageKey: 'readerColorSchemeRosePine' },
-	{ id: 'solarized', messageKey: 'readerColorSchemeSolarized' },
+const THEMES: Array<{ id: string; name: string }> = [
+	{ id: 'default', name: '' },
+	{ id: 'flexoki', name: 'Flexoki' },
+	{ id: 'ayu', name: 'Ayu' },
+	{ id: 'catppuccin', name: 'Catppuccin' },
+	{ id: 'everforest', name: 'Everforest' },
+	{ id: 'gruvbox', name: 'Gruvbox' },
+	{ id: 'nord', name: 'Nord' },
+	{ id: 'rose-pine', name: 'Rosé Pine' },
+	{ id: 'solarized', name: 'Solarized' },
 ];
 
 function getIsDark(appearance: string): boolean {
@@ -45,7 +45,7 @@ function buildThemeGrid(
 
 	const dateStr = new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
 
-	for (const { id: themeId, messageKey } of THEMES) {
+	for (const { id: themeId, name: themeName } of THEMES) {
 		const option = document.createElement('div');
 		option.className = 'reader-theme-option obsidian-reader-active' + (themeId === selectedTheme ? ' is-active' : '');
 		option.dataset.scheme = themeId;
@@ -65,7 +65,7 @@ function buildThemeGrid(
 
 		const title = document.createElement('div');
 		title.className = 'reader-theme-inner-title';
-		title.textContent = getMessage(messageKey);
+		title.textContent = themeName || getMessage('readerColorSchemeDefault');
 
 		const meta = document.createElement('div');
 		meta.className = 'reader-theme-inner-meta';

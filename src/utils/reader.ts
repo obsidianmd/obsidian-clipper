@@ -5,7 +5,7 @@ import { flattenShadowDom as flattenShadowDomUtil } from './flatten-shadow-dom';
 import { getLocalStorage, setLocalStorage } from './storage-utils';
 import hljs from 'highlight.js';
 import { getDomain } from './string-utils';
-import { applyHighlights } from './highlighter';
+import { applyHighlights, invalidateHighlightCache, loadHighlights } from './highlighter';
 import { copyToClipboard } from './clipboard-utils';
 import { getMessage } from './i18n';
 import { getFontCss } from './font-utils';
@@ -135,6 +135,7 @@ export class Reader {
 		}));
 		trigger.addEventListener('click', (e) => {
 			e.stopPropagation();
+			clipDropdown.classList.remove('is-open');
 			settingsBar.classList.toggle('is-open');
 		});
 
@@ -142,6 +143,23 @@ export class Reader {
 		doc.addEventListener('click', (e) => {
 			if (!settingsBar.contains(e.target as Node)) {
 				settingsBar.classList.remove('is-open');
+			}
+		});
+
+		// Highlighter button
+		const highlighterBtn = doc.createElement('button');
+		highlighterBtn.className = 'obsidian-reader-settings-trigger nav-btn';
+		highlighterBtn.setAttribute('aria-label', getMessage('highlighter'));
+		highlighterBtn.appendChild(this.createSVG({
+			width: '18', height: '18', viewBox: '0 0 24 24', strokeWidth: '1.75',
+			paths: ['m9 11-6 6v3h9l3-3', 'm22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4'],
+		}));
+		highlighterBtn.addEventListener('click', async () => {
+			clipDropdown.classList.remove('is-open');
+			settingsBar.classList.remove('is-open');
+			const response = await browser.runtime.sendMessage({ action: 'getActiveTab' }) as { tabId?: number };
+			if (response.tabId) {
+				browser.runtime.sendMessage({ action: 'toggleHighlighterMode', tabId: response.tabId });
 			}
 		});
 
@@ -209,6 +227,7 @@ export class Reader {
 
 		const triggerGroup = doc.createElement('div');
 		triggerGroup.className = 'obsidian-reader-nav';
+		triggerGroup.appendChild(highlighterBtn);
 		triggerGroup.appendChild(clipButton);
 		triggerGroup.appendChild(trigger);
 		settingsBar.appendChild(triggerGroup);
@@ -336,21 +355,21 @@ export class Reader {
 		themeSelect.dataset.action = 'change-theme';
 
 		const themeOptions: Array<[string, string]> = [
-			['default', 'readerColorSchemeDefault'],
-			['flexoki', 'readerColorSchemeFlexoki'],
-			['ayu', 'readerColorSchemeAyu'],
-			['catppuccin', 'readerColorSchemeCatppuccin'],
-			['everforest', 'readerColorSchemeEverforest'],
-			['gruvbox', 'readerColorSchemeGruvbox'],
-			['nord', 'readerColorSchemeNord'],
-			['rose-pine', 'readerColorSchemeRosePine'],
-			['solarized', 'readerColorSchemeSolarized'],
+			['default', ''],
+			['flexoki', 'Flexoki'],
+			['ayu', 'Ayu'],
+			['catppuccin', 'Catppuccin'],
+			['everforest', 'Everforest'],
+			['gruvbox', 'Gruvbox'],
+			['nord', 'Nord'],
+			['rose-pine', 'Rosé Pine'],
+			['solarized', 'Solarized'],
 		];
 
-		for (const [value, messageKey] of themeOptions) {
+		for (const [value, name] of themeOptions) {
 			const option = doc.createElement('option');
 			option.value = value;
-			option.textContent = getMessage(messageKey);
+			option.textContent = name || getMessage('readerColorSchemeDefault');
 			themeSelect.appendChild(option);
 		}
 		themeWrapper.appendChild(themeSelect);
@@ -403,25 +422,11 @@ export class Reader {
 		themeModeWrapper.appendChild(themeModeSelect);
 
 
-		// Highlighter controls group
-		const highlighterGroup = doc.createElement('div');
-		highlighterGroup.className = 'obsidian-reader-settings-controls-group';
-
-		const highlighterBtn = doc.createElement('button');
-		highlighterBtn.className = 'obsidian-reader-settings-button';
-		highlighterBtn.dataset.action = 'toggle-highlighter';
-		highlighterBtn.appendChild(this.createSVG({
-			width: '20', height: '20', viewBox: '0 0 24 24',
-			className: 'lucide lucide-highlighter-icon lucide-highlighter',
-			paths: ['m9 11-6 6v3h9l3-3', 'm22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4']
-		}));
-
-		highlighterGroup.appendChild(highlighterBtn);
 
 		// Settings button
 		const settingsBtn = doc.createElement('button');
 		settingsBtn.className = 'obsidian-reader-settings-link-button';
-		settingsBtn.setAttribute('aria-label', 'Reader settings');
+		settingsBtn.setAttribute('aria-label', getMessage('readerSettings'));
 		settingsBtn.appendChild(this.createSVG({
 			width: '18', height: '18', viewBox: '0 0 24 24', strokeWidth: '1.75',
 			circles: [{ cx: '12', cy: '12', r: '3' }],
@@ -816,7 +821,7 @@ export class Reader {
 			const item = doc.createElement('div');
 			item.className = 'obsidian-reader-outline-item';
 			item.setAttribute('data-depth', '0');
-			item.textContent = 'Footnotes';
+			item.textContent = getMessage('readerFootnotes');
 			
 			item.addEventListener('click', () => {
 				const rect = footnotes.getBoundingClientRect();
@@ -1246,7 +1251,7 @@ export class Reader {
 
 			const btn = doc.createElement('button');
 			btn.className = 'comment-collapse-btn';
-			btn.setAttribute('aria-label', 'Collapse comment');
+			btn.setAttribute('aria-label', getMessage('readerCollapseComment'));
 
 			const chevron = this.createSVG({
 				width: '16',
@@ -1312,7 +1317,7 @@ export class Reader {
 				} else {
 					countSpan.textContent = '';
 					btn.classList.remove('is-collapsed');
-					btn.setAttribute('aria-label', 'Collapse comment');
+					btn.setAttribute('aria-label', getMessage('readerCollapseComment'));
 				}
 			};
 
@@ -1400,7 +1405,7 @@ export class Reader {
 		// Create lightbox
 		const closeButton = doc.createElement('button');
 		closeButton.className = 'lightbox-close';
-		closeButton.setAttribute('aria-label', 'Close image viewer');
+		closeButton.setAttribute('aria-label', getMessage('readerCloseImageViewer'));
 		
 		// Create close button SVG
 		const closeSvg = this.createSVG({
@@ -1478,7 +1483,7 @@ export class Reader {
 
 					const expandButton = doc.createElement('button');
 					expandButton.className = 'image-expand-button';
-					expandButton.setAttribute('aria-label', 'View full size');
+					expandButton.setAttribute('aria-label', getMessage('readerViewFullSize'));
 					
 					// Create expand SVG
 					const expandSvg = this.createSVG({
@@ -1505,7 +1510,7 @@ export class Reader {
 
 					const expandButton = doc.createElement('button');
 					expandButton.className = 'image-expand-button';
-					expandButton.setAttribute('aria-label', 'View full size');
+					expandButton.setAttribute('aria-label', getMessage('readerViewFullSize'));
 					
 					// Create expand SVG
 					const expandSvg = this.createSVG({
@@ -1730,7 +1735,7 @@ export class Reader {
 			spinner.className = 'obsidian-reader-loading';
 			const spinnerText = doc.createElement('div');
 			spinnerText.className = 'obsidian-reader-loading-text';
-			spinnerText.textContent = 'Defuddling\u2026';
+			spinnerText.textContent = getMessage('readerLoading');
 			spinner.appendChild(spinnerText);
 			article.appendChild(spinner);
 			main.appendChild(article);
@@ -1812,7 +1817,7 @@ export class Reader {
 
 			if (!content) {
 				console.log('Reader', 'Failed to extract content');
-				article.textContent = 'Failed to extract content.';
+				article.textContent = getMessage('readerError');
 				return;
 			}
 
@@ -1956,6 +1961,8 @@ export class Reader {
 			this.linkifyTextUrls(doc);
 			this.initializeComments(doc);
 
+			invalidateHighlightCache();
+			await loadHighlights();
 			applyHighlights();
 
 		} catch (e) {

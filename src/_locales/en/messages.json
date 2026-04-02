@@ -5,9 +5,6 @@
 	"preview": {
 		"message": "Preview"
 	},
-	"readerCustomFontError": {
-		"message": "Font not found"
-	},
 	"addModel": {
 		"message": "+ Add model"
 	},
@@ -127,10 +124,10 @@
 		"message": "Quick clip"
 	},
 	"commandToggleHighlighter": {
-		"message": "Toggle highlighter mode"
+		"message": "Toggle highlighter"
 	},
 	"commandToggleReader": {
-		"message": "Toggle reading view"
+		"message": "Toggle reader"
 	},
 	"confirmDeleteTemplate": {
 		"message": "Are you sure you want to delete the template \"$1\"?"
@@ -178,7 +175,7 @@
 		"message": "Disable highlighter"
 	},
 	"disableReader": {
-		"message": "Disable reading view"
+		"message": "Disable reader"
 	},
 	"done": {
 		"message": "Done"
@@ -672,23 +669,14 @@
 	"readerColorLinks": {
 		"message": "Color links"
 	},
-	"readerColorLinksDescription": {
-		"message": "Use the theme accent color for links."
-	},
 	"readerTheme": {
 		"message": "Theme"
-	},
-	"readerColorSchemeAyu": {
-		"message": "Ayu"
-	},
-	"readerColorSchemeCatppuccin": {
-		"message": "Catppuccin"
 	},
 	"readerColorSchemeDefault": {
 		"message": "Default"
 	},
 	"readerThemeDescription": {
-		"message": "Choose the theme."
+		"message": "Choose the colors used in reading view."
 	},
 	"readerDarkTheme": {
 		"message": "Dark mode theme"
@@ -696,62 +684,32 @@
 	"readerDarkThemeDescription": {
 		"message": "Use a different theme in dark mode."
 	},
-	"readerColorSchemeEverforest": {
-		"message": "Everforest"
-	},
-	"readerColorSchemeFlexoki": {
-		"message": "Flexoki"
-	},
-	"readerColorSchemeGruvbox": {
-		"message": "Gruvbox"
-	},
-	"readerColorSchemeNord": {
-		"message": "Nord"
-	},
-	"readerColorSchemeRosePine": {
-		"message": "Rosé Pine"
-	},
-	"readerColorSchemeSolarized": {
-		"message": "Solarized"
-	},
 	"readerCustomCss": {
 		"message": "Custom CSS"
 	},
 	"readerCustomCssDescription": {
 		"message": "CSS applied automatically in reading view."
 	},
-	"readerCustomFont": {
-		"message": "Custom font"
-	},
-	"readerCustomFontDescription": {
-		"message": "Enter a font name installed on your system."
+	"readerFonts": {
+		"message": "Fonts"
 	},
 	"readerFont": {
-		"message": "Font"
+		"message": "Font options"
 	},
 	"readerFontSize": {
 		"message": "Base font size"
 	},
-	"readerFontSizeDescription": {
-		"message": "Font size in pixels."
-	},
 	"readerLineHeight": {
 		"message": "Line height"
-	},
-	"readerLineHeightDescription": {
-		"message": "Line height multiplier."
 	},
 	"readerLineWidth": {
 		"message": "Line width"
 	},
-	"readerLineWidthDescription": {
-		"message": "Maximum line width in em units."
-	},
-	"readerFontCustom": {
-		"message": "Custom"
-	},
 	"readerFontDescription": {
-		"message": "Choose the font."
+		"message": "Add fonts installed on your system. Press enter to add a font."
+	},
+	"readerFontPlaceholder": {
+		"message": "Press enter to add a font"
 	},
 	"readerFontSystem": {
 		"message": "System"
@@ -771,6 +729,27 @@
 	"readerFontNotFound": {
 		"message": "Not found"
 	},
+	"readerFootnotes": {
+		"message": "Footnotes"
+	},
+	"readerLoading": {
+		"message": "Defuddling\u2026"
+	},
+	"readerError": {
+		"message": "Failed to extract content."
+	},
+	"readerCollapseComment": {
+		"message": "Collapse comment"
+	},
+	"readerCloseImageViewer": {
+		"message": "Close image viewer"
+	},
+	"readerViewFullSize": {
+		"message": "View full size"
+	},
+	"readerSettings": {
+		"message": "Reader settings"
+	},
 	"readerAppearance": {
 		"message": "Appearance"
 	},
@@ -784,13 +763,13 @@
 		"message": "Images"
 	},
 	"readerAppearanceAuto": {
-		"message": "Automatic"
+		"message": "Auto"
 	},
 	"readerAppearanceDark": {
 		"message": "Dark"
 	},
 	"readerAppearanceDescription": {
-		"message": "Choose the light or dark appearance."
+		"message": "Choose light or dark appearance."
 	},
 	"readerAppearanceLight": {
 		"message": "Light"

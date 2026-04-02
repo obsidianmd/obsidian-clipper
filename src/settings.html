@@ -322,14 +322,14 @@
 						</div>
 						<form id="reader-settings-form">
 							<div class="setting-group">
-								<div class="setting-item setting-item-heading"><h3>Fonts</h3></div>
+								<div class="setting-item setting-item-heading"><h3 data-i18n="readerFonts">Fonts</h3></div>
 								<div class="setting-items">
 									<div class="setting-item">
 										<div class="setting-item-info">
-											<label>Font options</label>
-											<div class="setting-item-description">Add fonts installed on your system. Press <strong>enter</strong> to add a font.</div>
+											<label data-i18n="readerFont">Font options</label>
+											<div class="setting-item-description" data-i18n="readerFontDescription">Add fonts installed on your system. Press enter to add a font.</div>
 										</div>
-										<input type="text" id="reader-font-input" placeholder="Press enter to add a font" autocomplete="off" spellcheck="false" />
+										<input type="text" id="reader-font-input" data-i18n="readerFontPlaceholder" placeholder="Press enter to add a font" autocomplete="off" spellcheck="false" />
 										<ul id="reader-font-list" class="setting-item-list"></ul>
 									</div>
 								</div>
@@ -340,8 +340,7 @@
 									<div class="setting-item mod-horizontal">
 										<div class="setting-item-info">
 											<label for="reader-font-size" data-i18n="readerFontSize">Base font size</label>
-											<div class="setting-item-description" data-i18n="readerFontSizeDescription">Font size in pixels.</div>
-										</div>
+											</div>
 										<div class="setting-item-control">
 											<input type="range" id="reader-font-size" min="9" max="24" step="1" />
 											<span id="reader-font-size-display" class="slider-value"></span>
@@ -350,8 +349,7 @@
 									<div class="setting-item mod-horizontal">
 										<div class="setting-item-info">
 											<label for="reader-line-height" data-i18n="readerLineHeight">Line height</label>
-											<div class="setting-item-description" data-i18n="readerLineHeightDescription">Line height multiplier.</div>
-										</div>
+											</div>
 										<div class="setting-item-control">
 											<input type="range" id="reader-line-height" min="1.1" max="2" step="0.1" />
 											<span id="reader-line-height-display" class="slider-value"></span>
@@ -360,8 +358,7 @@
 									<div class="setting-item mod-horizontal">
 										<div class="setting-item-info">
 											<label for="reader-max-width" data-i18n="readerLineWidth">Line width</label>
-											<div class="setting-item-description" data-i18n="readerLineWidthDescription">Maximum line width in em units.</div>
-										</div>
+											</div>
 										<div class="setting-item-control">
 											<input type="range" id="reader-max-width" min="30" max="60" step="1" />
 											<span id="reader-max-width-display" class="slider-value"></span>
@@ -370,8 +367,7 @@
 									<div class="setting-item mod-horizontal">
 										<div class="setting-item-info">
 											<label for="reader-color-links" data-i18n="readerColorLinks">Color links</label>
-											<div class="setting-item-description" data-i18n="readerColorLinksDescription">Use the theme accent color for links.</div>
-										</div>
+											</div>
 										<div class="setting-item-control">
 											<div class="checkbox-container">
 												<input type="checkbox" id="reader-color-links" />
