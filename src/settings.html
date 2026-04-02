@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" style="height: 100%; overflow: hidden;">
+<html lang="en" id="settings-page" style="height: 100%; overflow: hidden;">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -46,7 +46,7 @@
 									<div id="usage-chart-container">
 										<div class="usage-chart-header">
 											<div class="usage-chart-title">
-												<div data-i18n="activity">Activity</div>
+												<div class="usage-chart-name" data-i18n="activity">Activity</div>
 												<div class="setting-item-description"></div>
 											</div>
 											<div class="usage-chart-controls">
@@ -142,20 +142,6 @@
 							<div class="setting-group">
 								<div class="setting-item setting-item-heading"><h3 data-i18n="behavior">Behavior</h3></div>
 								<div class="setting-items">
-									<div class="setting-item mh mod-horizontal">
-										<div class="setting-item-info">
-											<label for="open-behavior-dropdown" data-i18n="openBehaviorTitle">Default open behavior</label>
-											<div class="setting-item-description" data-i18n="openBehaviorDescription">
-												Choose how Web Clipper opens by default.
-											</div>
-										</div>
-										<div class="setting-item-control">
-											<select id="open-behavior-dropdown">
-												<option value="popup" selected data-i18n="popup">Popup</option>
-												<option value="embedded" data-i18n="embedded">Embedded</option>
-											</select>
-										</div>
-									</div>
 									<div class="setting-item mod-horizontal">
 										<div class="setting-item-info">
 											<label for="save-behavior-dropdown" data-i18n="saveBehaviorLabel">Save behavior</label>
@@ -171,7 +157,21 @@
 											</select>
 										</div>
 									</div>
-									<div class="setting-item mod-horizontal">
+									<div class="setting-item mh mod-horizontal">
+										<div class="setting-item-info">
+											<label for="open-behavior-dropdown" data-i18n="openBehaviorTitle">Default open behavior</label>
+											<div class="setting-item-description" data-i18n="openBehaviorDescription">
+												Choose how Web Clipper opens by default.
+											</div>
+										</div>
+										<div class="setting-item-control">
+											<select id="open-behavior-dropdown">
+												<option value="popup" selected data-i18n="popup">Popup</option>
+												<option value="embedded" data-i18n="embedded">Embedded</option>
+											</select>
+										</div>
+									</div>
+									<div class="setting-item mod-horizontal mod-toggle">
 										<div class="setting-item-info">
 											<label for="silent-open-toggle" data-i18n="silentOpen">Save clipped note without opening&nbsp;it</label>
 											<div class="setting-item-description" data-i18n="silentOpenDescription">
@@ -184,7 +184,7 @@
 											</div>
 										</div>
 									</div>
-									<div class="setting-item mod-horizontal">
+									<div class="setting-item mod-horizontal mod-toggle">
 										<div class="setting-item-info">
 											<label for="legacy-mode-toggle" data-i18n="legacyMode">Legacy&nbsp;mode</label>
 											<div class="setting-item-description" data-i18n="legacyModeDescription">
@@ -209,7 +209,7 @@
 											<button type="button" id="reset-default-template-btn" class="mod-warning" data-i18n="reset">Reset</button>
 										</div>
 									</div>
-									<div class="setting-item mod-horizontal" style="display: none;">
+									<div class="setting-item mod-horizontal mod-toggle" style="display: none;">
 										<div class="setting-item-info">
 											<label for="beta-features-toggle" data-i18n="earlyAccessFeatures">Early access features</label>
 											<div class="setting-item-description" data-i18n="earlyAccessDescription">
@@ -252,7 +252,7 @@
 						<form id="highlighter-settings-form">
 							<div class="setting-group">
 								<div class="setting-items">
-									<div class="setting-item mod-horizontal">
+									<!-- <div class="setting-item mod-horizontal mod-toggle">
 										<div class="setting-item-info">
 											<label for="highlighter-toggle" data-i18n="enableHighlighter">Enable highlighter</label>
 											<div class="setting-item-description" data-i18n="enableHighlighterDescription">
@@ -264,8 +264,8 @@
 												<input type="checkbox" id="highlighter-toggle" checked/>
 											</div>
 										</div>
-									</div>
-									<div class="setting-item mod-horizontal">
+									</div> -->
+									<div class="setting-item mod-horizontal mod-toggle">
 										<div class="setting-item-info">
 											<label for="highlighter-visibility" data-i18n="alwaysShowHighlights">Always show highlights</label>
 											<div class="setting-item-description" data-i18n="alwaysShowHighlightsDescription">
@@ -364,7 +364,7 @@
 											<span id="reader-max-width-display" class="slider-value"></span>
 										</div>
 									</div>
-									<div class="setting-item mod-horizontal">
+									<div class="setting-item mod-horizontal mod-toggle">
 										<div class="setting-item-info">
 											<label for="reader-color-links" data-i18n="readerColorLinks">Color links</label>
 											</div>
@@ -379,7 +379,7 @@
 							<div class="setting-group">
 								<div class="setting-item setting-item-heading"><h3 data-i18n="readerImages">Images</h3></div>
 								<div class="setting-items">
-									<div class="setting-item mod-horizontal">
+									<div class="setting-item mod-horizontal mod-toggle">
 										<div class="setting-item-info">
 											<label for="reader-blend-images" data-i18n="readerBlendImages">Blend images</label>
 											<div class="setting-item-description" data-i18n="readerBlendImagesDescription">Blend images with the page background in reader mode.</div>
@@ -397,8 +397,8 @@
 								<div class="setting-items">
 									<div class="setting-item mod-horizontal">
 										<div class="setting-item-info">
-											<label for="reader-appearance" data-i18n="readerAppearance">Theme</label>
-											<div class="setting-item-description" data-i18n="readerAppearanceDescription">Choose the light or dark theme for reader mode.</div>
+											<label for="reader-appearance" data-i18n="readerAppearance">Appearance</label>
+											<div class="setting-item-description" data-i18n="readerAppearanceDescription">Choose light or dark appearance.</div>
 										</div>
 										<div class="setting-item-control">
 											<select id="reader-appearance">
@@ -410,8 +410,8 @@
 									</div>
 									<div class="setting-item setting-item-stacked">
 										<div class="setting-item-info">
-											<div data-i18n="readerTheme">Color scheme</div>
-											<div class="setting-item-description" data-i18n="readerThemeDescription">Choose the color scheme for reader mode.</div>
+											<label data-i18n="readerTheme">Theme</label>
+											<div class="setting-item-description" data-i18n="readerThemeDescription">Choose the colors used in reading view.</div>
 										</div>
 										<div id="reader-theme-grid-light" class="reader-theme-grid"></div>
 									</div>
@@ -453,7 +453,7 @@
 						<form id="interpreter-settings-form">
 							<div class="setting-group">
 								<div class="setting-items">
-									<div class="setting-item mod-horizontal">
+									<div class="setting-item mod-horizontal mod-toggle">
 										<div class="setting-item-info">
 											<label for="interpreter-toggle" data-i18n="enableInterpreter">Enable interpreter</label>
 											<div class="setting-item-description" data-i18n="enableInterpreterDescription">
@@ -466,7 +466,7 @@
 											</div>
 										</div>
 									</div>
-									<div class="setting-item mod-horizontal">
+									<div class="setting-item mod-horizontal mod-toggle">
 										<div class="setting-item-info">
 											<label for="interpreter-auto-run-toggle" data-i18n="autoRunInterpreter">Automatically run</label>
 											<div class="setting-item-description" data-i18n="autoRunInterpreterDescription">Run prompt variables immediately if the template contains any. This will consume API credits with your model provider. Turn off if you only want to run interpreter manually.</div>

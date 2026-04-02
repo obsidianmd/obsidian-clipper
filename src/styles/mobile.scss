@@ -54,6 +54,7 @@
 	a, button, label, input, textarea, select {
 		-webkit-tap-highlight-color: transparent;
 	}	
+	a.btn,
 	button {
 		font-weight: 600;
 		--input-height: 2.5rem;
@@ -81,6 +82,26 @@
 	--toggle-thumb-height: 1.5rem;
 	--toggle-thumb-width: 1.5rem;
 
+	&.is-ios {
+		--corner-shape: superellipse(1.33);
+		--radius-s: 0.5rem;
+		--radius-m: 0.75rem;
+	
+		// iOS 26 wide sliders and toggles
+		--slider-thumb-width: 36px;
+	
+		--toggle-width: 62px;
+		--toggle-radius: 24px;
+		--toggle-thumb-radius: 24px;
+		--toggle-thumb-height: 24px;
+		--toggle-thumb-width: 36px;
+		--toggle-thumb-opacity-active: 0.6;
+	
+		--toggle-s-width: 48px;
+		--toggle-s-thumb-height: 15px;
+		--toggle-s-thumb-width: 28px;
+	}
+
 	.clipper {
 		max-height: 100dvh;
 		width: 100%;
@@ -102,6 +123,9 @@
 		display: none;
 	}
 }
+
+
+
 .resizing { 
 	.clipper .clipper-footer {
 		opacity: 0;

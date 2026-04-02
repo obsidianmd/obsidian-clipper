@@ -195,23 +195,6 @@
 	--toggle-s-thumb-width: 20px;
 }
 
-.is-ios {
-	// iOS 26 wide sliders and toggles
-	--slider-thumb-width: 36px;
-
-	--toggle-width: 62px;
-	--toggle-radius: 24px;
-	--toggle-thumb-radius: 24px;
-	--toggle-thumb-height: 24px;
-	--toggle-thumb-width: 36px;
-	--toggle-thumb-opacity-active: 0.6;
-
-	--toggle-s-width: 48px;
-	--toggle-s-thumb-height: 15px;
-	--toggle-s-thumb-width: 28px;
-}
-
-
 @media (prefers-color-scheme: light) {
 	:root {
 		--background-modifier-cover: rgba(220, 220, 220, 0.4);
