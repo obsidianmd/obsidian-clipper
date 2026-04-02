@@ -28,6 +28,8 @@ async function tryClipboardWrite(fileContent: string, obsidianUrl: string): Prom
 	const success = await copyToClipboard(fileContent);
 	
 	if (success) {
+		// &clipboard tells Obsidian to read data from clipboard instead of the content param.
+		// content is a fallback shown only if Obsidian can't access the clipboard (e.g. on Linux).
 		obsidianUrl += `&clipboard&content=${encodeURIComponent(getMessage('clipboardError', 'https://help.obsidian.md/web-clipper/troubleshoot'))}`;
 		openObsidianUrl(obsidianUrl);
 		console.log('Obsidian URL:', obsidianUrl);
