@@ -7,7 +7,7 @@ import hljs from 'highlight.js';
 import { getDomain } from './string-utils';
 import { applyHighlights, invalidateHighlightCache, loadHighlights } from './highlighter';
 import { copyToClipboard } from './clipboard-utils';
-import { getMessage } from './i18n';
+import { getMessage, initializeI18n } from './i18n';
 import { getFontCss } from './font-utils';
 
 // Mobile viewport settings
@@ -698,7 +698,7 @@ export class Reader {
 		};
 	}
 
-	private static generateOutline(doc: Document) {
+	private static generateOutline(doc: Document, title?: string) {
 		const article = doc.querySelector('article');
 		if (!article) return null;
 
@@ -727,6 +727,20 @@ export class Reader {
 
 		// Create outline items and store references
 		const outlineItems = new Map();
+
+		// Add title as first outline item
+		const titleHeading = doc.querySelector('.obsidian-reader-content h1');
+		if (title && titleHeading) {
+			const titleItem = doc.createElement('div');
+			titleItem.className = 'obsidian-reader-outline-item obsidian-reader-outline-h1';
+			titleItem.setAttribute('data-depth', '0');
+			titleItem.textContent = title;
+			titleItem.addEventListener('click', () => {
+				this.scrollTo(0);
+			});
+			outline.appendChild(titleItem);
+			outlineItems.set(titleHeading, titleItem);
+		}
 
 		// Keep track of the last heading at each level and their depths
 		const lastHeadingAtLevel: { [key: number]: { element: Element; depth: number } } = {};
@@ -811,6 +825,9 @@ export class Reader {
 			threshold: 0
 		});
 
+		if (titleHeading) {
+			observer.observe(titleHeading);
+		}
 		headings.forEach(heading => {
 			observer.observe(heading);
 		});
@@ -1625,6 +1642,8 @@ export class Reader {
 
 	static async apply(doc: Document) {
 		try {
+			await initializeI18n();
+
 			// Store original HTML for restoration
 			this.originalHTML = doc.documentElement.outerHTML;
 
@@ -1953,7 +1972,7 @@ export class Reader {
 			footer.style.display = '';
 
 			// Initialize content-dependent features
-			this.observer = this.generateOutline(doc);
+			this.observer = this.generateOutline(doc, title);
 			this.initializeFootnotes(doc);
 			this.initializeCodeHighlighting(doc);
 			this.initializeCopyButtons(doc);
