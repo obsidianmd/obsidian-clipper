@@ -14,7 +14,7 @@
 	--background-primary-alt: var(--color-base-10);
 	--background-secondary: var(--color-base-20);
 
-	--background-modifier-border: var(--color-base-30);
+	--background-modifier-border: var(--color-base-25);
 	--background-modifier-border-hover: var(--color-base-35);
 	--background-modifier-border-focus: var(--color-base-40);
 
@@ -38,6 +38,8 @@
 	--checkbox-color-hover: var(--interactive-accent-hover);
 	--checkbox-border-color: var(--text-faint);
 	--checkbox-border-color-hover: var(--text-muted);
+	
+	--corner-shape: round;
 
 	--clickable-icon-size: 1.75rem;
 
@@ -60,6 +62,7 @@
 
 	--duration-fast: 0.15s;
 
+	--font-ui-smallest: 0.75rem;
 	--font-ui-smaller: 0.8125rem;
 	--font-ui-small: 0.875rem;
 	--font-ui-medium: 0.9375rem;
@@ -129,8 +132,8 @@
 	--popup-padding: 0.75rem;
 	--popup-properties-padding: 2px 0.5rem 0.5rem;
 
-	--radius-s: 0.25rem;
-	--radius-m: 0.5rem;
+	--radius-s: 4px;
+	--radius-m: 8px;
 	--radius-l: 1rem;
 
 	--text-error: hsl(var(--color-red-hsl));
@@ -148,6 +151,18 @@
 	--text-highlight-bg-rgb: 255, 208, 0;
 	--text-highlight-bg: rgba(var(--text-highlight-bg-rgb), .4);
 
+	/* Sliders */
+	--slider-thumb-border-width: 1px;
+	--slider-thumb-border-color: var(--background-modifier-border-hover);
+	--slider-thumb-height: 18px;
+	--slider-thumb-width: 18px;
+	--slider-thumb-y: -6px;
+	--slider-thumb-radius: var(--slider-thumb-height);
+	--slider-s-thumb-size: 15px;
+	--slider-s-thumb-position: -5px;
+	--slider-track-background: var(--background-modifier-border);
+	--slider-track-height: 3px;
+
 	/* Toggles */
 	--toggle-border-width: 2px;
 	--toggle-width: 40px;
@@ -159,6 +174,43 @@
 
 	--star-color: var(--color-yellow);
 }
+
+// macOS26+ styles
+.is-macos {
+	--corner-shape: superellipse(1.33);
+	--radius-s: 0.5rem;
+	--radius-m: 0.75rem;
+
+	--slider-thumb-width: 30px;
+
+	--toggle-width: 44px;
+	--toggle-radius: 24px;
+	--toggle-thumb-radius: 24px;
+	--toggle-thumb-height: 16px;
+	--toggle-thumb-width: 26px;
+	--toggle-thumb-opacity-active: 0.6;
+
+	--toggle-s-width: 36px;
+	--toggle-s-thumb-height: 12px;
+	--toggle-s-thumb-width: 20px;
+}
+
+.is-ios {
+	// iOS 26 wide sliders and toggles
+	--slider-thumb-width: 36px;
+
+	--toggle-width: 62px;
+	--toggle-radius: 24px;
+	--toggle-thumb-radius: 24px;
+	--toggle-thumb-height: 24px;
+	--toggle-thumb-width: 36px;
+	--toggle-thumb-opacity-active: 0.6;
+
+	--toggle-s-width: 48px;
+	--toggle-s-thumb-height: 15px;
+	--toggle-s-thumb-width: 28px;
+}
+
 
 @media (prefers-color-scheme: light) {
 	:root {

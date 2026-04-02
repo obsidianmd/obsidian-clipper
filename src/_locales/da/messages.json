@@ -568,6 +568,9 @@
 	"prependToExisting": {
 		"message": "Tilføj til eksisterende note, i starten"
 	},
+	"preview": {
+		"message": "Forhåndsvisning"
+	},
 	"processing": {
 		"message": "behandler"
 	},
@@ -648,6 +651,120 @@
 	},
 	"reader": {
 		"message": "Læser"
+	},
+	"readerAppearance": {
+		"message": "Udseende"
+	},
+	"readerAppearanceAuto": {
+		"message": "Automatisk"
+	},
+	"readerAppearanceDark": {
+		"message": "Mørk"
+	},
+	"readerAppearanceDescription": {
+		"message": "Vælg lyst eller mørkt udseende."
+	},
+	"readerAppearanceLight": {
+		"message": "Lys"
+	},
+	"readerBlendImages": {
+		"message": "Bland billeder"
+	},
+	"readerBlendImagesDescription": {
+		"message": "Bland billeder med sidens baggrund."
+	},
+	"readerCloseImageViewer": {
+		"message": "Luk billedfremviser"
+	},
+	"readerCollapseComment": {
+		"message": "Skjul kommentar"
+	},
+	"readerColorLinks": {
+		"message": "Farvelæg links"
+	},
+	"readerColorSchemeDefault": {
+		"message": "Standard"
+	},
+	"readerCustomCss": {
+		"message": "Brugerdefineret CSS"
+	},
+	"readerCustomCssDescription": {
+		"message": "CSS anvendes automatisk i læsevisning."
+	},
+	"readerDarkTheme": {
+		"message": "Tema til mørk tilstand"
+	},
+	"readerDarkThemeDescription": {
+		"message": "Brug et andet tema i mørk tilstand."
+	},
+	"readerError": {
+		"message": "Kunne ikke udtrække indhold."
+	},
+	"readerFont": {
+		"message": "Skrifttypeindstillinger"
+	},
+	"readerFontDefault": {
+		"message": "Standard"
+	},
+	"readerFontDescription": {
+		"message": "Tilføj skrifttyper installeret på dit system. Tryk på Enter for at tilføje en skrifttype."
+	},
+	"readerFontNotFound": {
+		"message": "Ikke fundet"
+	},
+	"readerFontPlaceholder": {
+		"message": "Tryk på Enter for at tilføje en skrifttype"
+	},
+	"readerFontSetDefault": {
+		"message": "Angiv som standard"
+	},
+	"readerFontSize": {
+		"message": "Grundskriftstørrelse"
+	},
+	"readerFontSystem": {
+		"message": "System"
+	},
+	"readerFontSystemSans": {
+		"message": "Sans-serif"
+	},
+	"readerFontSystemSerif": {
+		"message": "Serif"
+	},
+	"readerFonts": {
+		"message": "Skrifttyper"
+	},
+	"readerFootnotes": {
+		"message": "Fodnoter"
+	},
+	"readerImages": {
+		"message": "Billeder"
+	},
+	"readerLineHeight": {
+		"message": "Linjehøjde"
+	},
+	"readerLineWidth": {
+		"message": "Linjebredde"
+	},
+	"readerLoading": {
+		"message": "Fjerner støj…"
+	},
+	"readerSettings": {
+		"message": "Læserindstillinger"
+	},
+	"readerTheme": {
+		"message": "Tema"
+	},
+	"readerThemeDescription": {
+		"message": "Vælg de farver, der bruges i læsevisning."
+	},
+	"readerThemeSection": {
+		"message": "Tema"
+	},
+	"readerTypography": {
+		"message": "Typografi"
+	},
+	"readerViewFullSize": {
+		"message": "Vis i fuld størrelse"
 	},
 	"recommended": {
 		"message": "anbefalet"
@@ -766,6 +883,9 @@
 	"systemDefault": {
 		"message": "Systemstandard"
 	},
+	"template": {
+		"message": "Skabelon"
+	},
 	"templateCopied": {
 		"message": "Skabelon-JSON kopieret til udklipsholder"
 	},
@@ -777,6 +897,12 @@
 	},
 	"templateErrorsCount": {
 		"message": "Der er $1 fejl i din skabelon."
+	},
+	"templateGroupContent": {
+		"message": "Indhold"
+	},
+	"templateGroupLocation": {
+		"message": "Placering"
 	},
 	"templateName": {
 		"message": "Skabelonnavn"

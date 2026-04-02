@@ -56,8 +56,14 @@ export interface ReaderSettings {
 	fontSize: number;
 	lineHeight: number;
 	maxWidth: number;
-	theme: 'default' | 'flexoki';
-	themeMode: 'auto' | 'light' | 'dark';
+	lightTheme: string;
+	darkTheme: string;
+	appearance: 'auto' | 'light' | 'dark';
+	fonts: string[];
+	defaultFont: string;
+	blendImages: boolean;
+	colorLinks: boolean;
+	customCss: string;
 }
 
 export interface Settings {

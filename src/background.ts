@@ -101,8 +101,7 @@ async function ensureContentScriptLoadedInBackground(tabId: number): Promise<voi
 
 		// Check if the URL is valid before proceeding
 		if (!tab.url || !isValidUrl(tab.url)) {
-			console.log(`Skipping content script injection for invalid URL: ${tab.url}`);
-			throw new Error(`Cannot inject content script into invalid URL: ${tab.url}`);
+			throw new Error('Invalid URL for content script injection');
 		}
 
 		// Attempt to send a message to the content script
@@ -173,7 +172,7 @@ async function sendMessageToPopup(tabId: number, message: any): Promise<void> {
 
 browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime.MessageSender, sendResponse: (response?: any) => void): true | undefined => {
 	if (typeof request === 'object' && request !== null) {
-		const typedRequest = request as { action: string; isActive?: boolean; hasHighlights?: boolean; tabId?: number; text?: string };
+		const typedRequest = request as { action: string; isActive?: boolean; hasHighlights?: boolean; tabId?: number; text?: string; section?: string };
 		
 		if (typedRequest.action === 'copy-to-clipboard' && typedRequest.text) {
 			// Use content script to copy to clipboard
@@ -375,6 +374,45 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 				sendResponse({success: false, error: error instanceof Error ? error.message : String(error)});
 			}
 			return true;
+		}
+
+		if (typedRequest.action === "openSettings") {
+			try {
+				const section = typedRequest.section ? `?section=${typedRequest.section}` : '';
+				browser.tabs.create({
+					url: browser.runtime.getURL(`settings.html${section}`)
+				});
+				sendResponse({success: true});
+			} catch (error) {
+				console.error('Error opening settings:', error);
+				sendResponse({success: false, error: error instanceof Error ? error.message : String(error)});
+			}
+			return true;
+		}
+
+		if (typedRequest.action === "openPopup") {
+			try {
+				browser.action.openPopup();
+				sendResponse({success: true});
+			} catch (error) {
+				sendResponse({success: false, error: error instanceof Error ? error.message : String(error)});
+			}
+			return true;
+		}
+
+		if (typedRequest.action === "copyMarkdownToClipboard" || typedRequest.action === "saveMarkdownToFile") {
+			if (sender.tab?.id) {
+				(async () => {
+					try {
+						await ensureContentScriptLoadedInBackground(sender.tab!.id!);
+						await browser.tabs.sendMessage(sender.tab!.id!, { action: typedRequest.action });
+						sendResponse({success: true});
+					} catch (error) {
+						sendResponse({success: false, error: error instanceof Error ? error.message : String(error)});
+					}
+				})();
+				return true;
+			}
 		}
 
 		if (typedRequest.action === "getTabInfo") {

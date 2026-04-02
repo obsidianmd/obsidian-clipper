@@ -23,11 +23,17 @@ export let generalSettings: Settings = {
 	defaultPromptContext: '',
 	propertyTypes: [],
 	readerSettings: {
-		fontSize: 1.5,
+		fontSize: 16,
 		lineHeight: 1.6,
 		maxWidth: 38,
-		theme: 'default',
-		themeMode: 'auto'
+		lightTheme: 'default',
+		darkTheme: 'same',
+		appearance: 'auto',
+		fonts: [],
+		defaultFont: '',
+		blendImages: true,
+		colorLinks: false,
+		customCss: ''
 	},
 	stats: {
 		addToObsidian: 0,
@@ -67,8 +73,14 @@ interface StorageData {
 		fontSize?: number;
 		lineHeight?: number;
 		maxWidth?: number;
-		theme?: 'default' | 'flexoki';
-		themeMode?: 'auto' | 'light' | 'dark';
+		lightTheme?: string;
+		darkTheme?: string;
+		appearance?: 'auto' | 'light' | 'dark';
+		fonts?: string[];
+		defaultFont?: string;
+		blendImages?: boolean;
+		colorLinks?: boolean;
+		customCss?: string;
 	};
 	interpreter_settings?: {
 		interpreterModel?: string;
@@ -115,11 +127,17 @@ export async function loadSettings(): Promise<Settings> {
 		propertyTypes: [],
 		saveBehavior: 'addToObsidian',
 		readerSettings: {
-			fontSize: 1.5,
+			fontSize: 16,
 			lineHeight: 1.6,
 			maxWidth: 38,
-			theme: 'default',
-			themeMode: 'auto'
+			lightTheme: 'default',
+			darkTheme: 'same',
+			appearance: 'auto',
+			fonts: [],
+			defaultFont: '',
+			blendImages: true,
+			colorLinks: false,
+			customCss: ''
 		},
 		stats: {
 			addToObsidian: 0,
@@ -170,8 +188,14 @@ export async function loadSettings(): Promise<Settings> {
 			fontSize: data.reader_settings?.fontSize ?? defaultSettings.readerSettings.fontSize,
 			lineHeight: data.reader_settings?.lineHeight ?? defaultSettings.readerSettings.lineHeight,
 			maxWidth: data.reader_settings?.maxWidth ?? defaultSettings.readerSettings.maxWidth,
-			theme: data.reader_settings?.theme as 'default' | 'flexoki' ?? defaultSettings.readerSettings.theme,
-			themeMode: data.reader_settings?.themeMode as 'auto' | 'light' | 'dark' ?? defaultSettings.readerSettings.themeMode
+			lightTheme: data.reader_settings?.lightTheme ?? defaultSettings.readerSettings.lightTheme,
+			darkTheme: data.reader_settings?.darkTheme ?? defaultSettings.readerSettings.darkTheme,
+			appearance: data.reader_settings?.appearance as 'auto' | 'light' | 'dark' ?? defaultSettings.readerSettings.appearance,
+			fonts: data.reader_settings?.fonts ?? defaultSettings.readerSettings.fonts,
+			defaultFont: data.reader_settings?.defaultFont ?? defaultSettings.readerSettings.defaultFont,
+			blendImages: data.reader_settings?.blendImages ?? defaultSettings.readerSettings.blendImages,
+			colorLinks: data.reader_settings?.colorLinks ?? defaultSettings.readerSettings.colorLinks,
+			customCss: data.reader_settings?.customCss ?? defaultSettings.readerSettings.customCss
 		},
 		stats: data.stats || defaultSettings.stats,
 		history: data.history || defaultSettings.history,
@@ -217,8 +241,14 @@ export async function saveSettings(settings?: Partial<Settings>): Promise<void> 
 			fontSize: generalSettings.readerSettings.fontSize,
 			lineHeight: generalSettings.readerSettings.lineHeight,
 			maxWidth: generalSettings.readerSettings.maxWidth,
-			theme: generalSettings.readerSettings.theme,
-			themeMode: generalSettings.readerSettings.themeMode
+			lightTheme: generalSettings.readerSettings.lightTheme,
+			darkTheme: generalSettings.readerSettings.darkTheme,
+			appearance: generalSettings.readerSettings.appearance,
+			fonts: generalSettings.readerSettings.fonts,
+			defaultFont: generalSettings.readerSettings.defaultFont,
+			blendImages: generalSettings.readerSettings.blendImages,
+			colorLinks: generalSettings.readerSettings.colorLinks,
+			customCss: generalSettings.readerSettings.customCss
 		},
 		stats: generalSettings.stats
 	});

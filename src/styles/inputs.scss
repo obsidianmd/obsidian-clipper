@@ -21,6 +21,7 @@ textarea {
 	color: var(--text-normal);
 	font-family: inherit;
 	border-radius: var(--radius-s);
+	corner-shape: var(--corner-shape);
 	outline: none;
 	width: 100%;
 	margin: 0;
@@ -46,11 +47,62 @@ textarea {
 label {
 	display: block;
 	margin: 0.75rem 0 0.25rem;
-	font-weight: 600;
+	font-weight: 400;
 	font-size: var(--font-ui-medium);
 	.optional {
 		font-size: var(--font-ui-smaller);
 		color: var(--text-faint);
+	}
+}
+
+input[type='range'] {
+	width: 100px;
+	-webkit-appearance: none;
+	background-color: var(--slider-track-background);
+	border-radius: var(--slider-track-height);
+	height: var(--slider-track-height);
+ 	padding: 0;
+ 	outline: none;
+	&::-webkit-slider-runnable-track {
+		height: 6px;
+		-webkit-appearance: none;
+	}
+	&::-webkit-slider-thumb {
+		-webkit-appearance: none;
+		height: var(--slider-thumb-height);
+		width: var(--slider-thumb-width);
+		border-radius: var(--slider-thumb-radius);
+		cursor: default;
+		background: #FFF;
+		border: var(--slider-thumb-border-width) solid var(--slider-thumb-border-color);
+		position: relative;
+		top: var(--slider-thumb-y);
+		transition:all 0.1s linear;
+		box-shadow:
+			0 1px 1px 0px rgba(0,0,0,0.05),
+			0 2px 2px 0px rgba(0,0,0,0.1);
+	}
+	&::-webkit-slider-thumb:hover,
+	&::-webkit-slider-thumb:active {
+		background: white;
+		border-color: var(--background-modifier-border-focus);
+		box-shadow:
+			0 1px 2px 0px rgba(0,0,0,0.1),
+			0 2px 3px 0px rgba(0,0,0,0.2);
+		transition: all 0.1s linear;
+	}
+}
+
+body:not(.is-mobile) {
+	input[type=range]:focus {
+		box-shadow:none;
+	}
+	input[type=range]:focus::-webkit-slider-thumb {
+		box-shadow: 0 1px 2px 0px rgba(0,0,0,0.05), 0 2px 3px 0px rgba(0,0,0,0.2);
+	}
+	input[type=range]:focus-visible::-webkit-slider-thumb {
+		border-color: var(--background-modifier-border-focus);
+		box-shadow: 0 1px 2px 0px rgba(0,0,0,0.05), 0 2px 3px 0px rgba(0,0,0,0.2), 0 0 0px 2px var(--background-modifier-border-focus);
 	}
 }
 
@@ -141,7 +193,7 @@ input[type=checkbox] {
 		align-items: center;
 		gap: 8px;
 		cursor: pointer;
-		font-weight: 400;
+		font-weight: 500;
 		margin: 0;
 		font-size: var(--font-ui-smaller);
 	}

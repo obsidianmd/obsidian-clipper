@@ -79,7 +79,7 @@
 				"default": "Alt+Shift+R",
 				"mac": "Alt+Shift+R"
 			},
-			"description": "Toggle reader mode"
+			"description": "Toggle reading view"
 		}
 	}
 }

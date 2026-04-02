@@ -47,7 +47,7 @@ export function updateVaultList(): void {
 		span.textContent = vault;
 		li.appendChild(span);
 
-		const removeBtn = createElementWithClass('button', 'remove-vault-btn clickable-icon');
+		const removeBtn = createElementWithClass('button', 'setting-item-list-remove clickable-icon');
 		removeBtn.setAttribute('type', 'button');
 		removeBtn.setAttribute('aria-label', getMessage('removeVault'));
 		removeBtn.appendChild(createElementWithHTML('i', '', { 'data-lucide': 'trash-2' }));

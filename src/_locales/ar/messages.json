@@ -576,6 +576,9 @@
 	"prependToExisting": {
 		"message": "إضافة إلى ملاحظة موجودة، في البداية"
 	},
+	"preview": {
+		"message": "معاينة"
+	},
 	"processing": {
 		"message": "جاري المعالجة"
 	},
@@ -656,6 +659,120 @@
 	},
 	"reader": {
 		"message": "القارئ"
+	},
+	"readerAppearance": {
+		"message": "المظهر"
+	},
+	"readerAppearanceAuto": {
+		"message": "تلقائي"
+	},
+	"readerAppearanceDark": {
+		"message": "داكن"
+	},
+	"readerAppearanceDescription": {
+		"message": "اختر المظهر الفاتح أو الداكن."
+	},
+	"readerAppearanceLight": {
+		"message": "فاتح"
+	},
+	"readerBlendImages": {
+		"message": "دمج الصور"
+	},
+	"readerBlendImagesDescription": {
+		"message": "ادمج الصور مع خلفية الصفحة."
+	},
+	"readerCloseImageViewer": {
+		"message": "إغلاق عارض الصور"
+	},
+	"readerCollapseComment": {
+		"message": "طيّ التعليق"
+	},
+	"readerColorLinks": {
+		"message": "تلوين الروابط"
+	},
+	"readerColorSchemeDefault": {
+		"message": "افتراضي"
+	},
+	"readerCustomCss": {
+		"message": "CSS مخصص"
+	},
+	"readerCustomCssDescription": {
+		"message": "يتم تطبيق CSS تلقائيًا في عرض القراءة."
+	},
+	"readerDarkTheme": {
+		"message": "سمة الوضع الداكن"
+	},
+	"readerDarkThemeDescription": {
+		"message": "استخدم سمة مختلفة في الوضع الداكن."
+	},
+	"readerError": {
+		"message": "فشل استخراج المحتوى."
+	},
+	"readerFont": {
+		"message": "خيارات الخط"
+	},
+	"readerFontDefault": {
+		"message": "افتراضي"
+	},
+	"readerFontDescription": {
+		"message": "أضف الخطوط المثبتة على نظامك. اضغط Enter لإضافة خط."
+	},
+	"readerFontNotFound": {
+		"message": "غير موجود"
+	},
+	"readerFontPlaceholder": {
+		"message": "اضغط Enter لإضافة خط"
+	},
+	"readerFontSetDefault": {
+		"message": "تعيين كافتراضي"
+	},
+	"readerFontSize": {
+		"message": "حجم الخط الأساسي"
+	},
+	"readerFontSystem": {
+		"message": "النظام"
+	},
+	"readerFontSystemSans": {
+		"message": "Sans-serif"
+	},
+	"readerFontSystemSerif": {
+		"message": "Serif"
+	},
+	"readerFonts": {
+		"message": "الخطوط"
+	},
+	"readerFootnotes": {
+		"message": "الحواشي"
+	},
+	"readerImages": {
+		"message": "الصور"
+	},
+	"readerLineHeight": {
+		"message": "ارتفاع السطر"
+	},
+	"readerLineWidth": {
+		"message": "عرض السطر"
+	},
+	"readerLoading": {
+		"message": "إزالة التشويش…"
+	},
+	"readerSettings": {
+		"message": "إعدادات القارئ"
+	},
+	"readerTheme": {
+		"message": "السمة"
+	},
+	"readerThemeDescription": {
+		"message": "اختر الألوان المستخدمة في عرض القراءة."
+	},
+	"readerThemeSection": {
+		"message": "السمة"
+	},
+	"readerTypography": {
+		"message": "الطباعة"
+	},
+	"readerViewFullSize": {
+		"message": "عرض بالحجم الكامل"
 	},
 	"recommended": {
 		"message": "موصى به"
@@ -774,6 +891,9 @@
 	"systemDefault": {
 		"message": "النظام"
 	},
+	"template": {
+		"message": "القالب"
+	},
 	"templateCopied": {
 		"message": "تم نسخ قالب JSON إلى الحافظة"
 	},
@@ -785,6 +905,12 @@
 	},
 	"templateErrorsCount": {
 		"message": "يوجد $1 أخطاء في قالبك."
+	},
+	"templateGroupContent": {
+		"message": "المحتوى"
+	},
+	"templateGroupLocation": {
+		"message": "الموقع"
 	},
 	"templateName": {
 		"message": "اسم القالب"

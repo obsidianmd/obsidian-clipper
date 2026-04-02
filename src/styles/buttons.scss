@@ -8,6 +8,8 @@ button,
 	color: var(--text-normal);
 	background-color: var(--background-primary);
 	border-radius: var(--radius-s);
+	corner-shape: var(--corner-shape);
+	font-family: var(--font-default);
 	box-shadow: 0 0 0 1px var(--background-modifier-border);
 	font-size: var(--font-ui-smaller);
 	height: var(--input-height);
@@ -88,16 +90,17 @@ button.clickable-icon {
 
 .add-btn {
 	padding: 2px 0 8px;
-	margin-inline-start: -2px;
 	font-weight: 500;
 	color: var(--text-normal);
 	font-size: var(--font-ui-small);
+	corner-shape: var(--corner-shape);
 	user-select: none;
 	-webkit-user-select: none;
 	white-space: nowrap;
 	a {
 		cursor: pointer;
 		border-radius: var(--radius-s);
+		corner-shape: var(--corner-shape);
 		padding: 6px 8px;
 		@media (hover: hover) {
 			&:hover {
