@@ -159,9 +159,15 @@ export class Reader {
 			settingsBar.classList.remove('is-open');
 			const response = await browser.runtime.sendMessage({ action: 'getActiveTab' }) as { tabId?: number };
 			if (response.tabId) {
-				browser.runtime.sendMessage({ action: 'toggleHighlighterMode', tabId: response.tabId });
+				await browser.runtime.sendMessage({ action: 'toggleHighlighterMode', tabId: response.tabId });
+				highlighterBtn.classList.toggle('is-active');
 			}
 		});
+
+		// Sync active state with highlighter mode
+		if (doc.body.classList.contains('obsidian-highlighter-active')) {
+			highlighterBtn.classList.add('is-active');
+		}
 
 		// Clip button with dropdown
 		const clipButton = doc.createElement('button');
@@ -175,21 +181,23 @@ export class Reader {
 		const clipDropdown = doc.createElement('div');
 		clipDropdown.className = 'obsidian-reader-clip-dropdown';
 
-		const clipActions: Array<{ action: string; paths: string[] }> = [
-			{ action: 'addToObsidian', paths: ['M12 20h9', 'm16.5 3.5 2.12 2.12a2.828 2.828 0 0 1 0 4L7 21.5 2 22l.5-5L14 5.5a2.828 2.828 0 0 1 4 0z'] },
-			{ action: 'copyToClipboard', paths: ['M20 8H10a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2z', 'M4 16a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2'] },
-			{ action: 'saveFile', paths: ['M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z', 'M14 2v4a2 2 0 0 0 2 2h4', 'M12 18v-6', 'm9 15 3 3 3-3'] },
+		const obsidianIcon = doc.createElementNS('http://www.w3.org/2000/svg', 'svg');
+		obsidianIcon.setAttribute('width', '16');
+		obsidianIcon.setAttribute('height', '16');
+		obsidianIcon.setAttribute('viewBox', '0 0 256 256');
+		obsidianIcon.setAttribute('fill', 'currentColor');
+		obsidianIcon.innerHTML = '<path d="M94.82 149.44c6.53-1.94 17.13-4.9 29.26-5.71a102.97 102.97 0 0 1-7.64-48.84c1.63-16.51 7.54-30.38 13.25-42.1l3.47-7.14 4.48-9.18c2.35-5 4.08-9.38 4.9-13.56.81-4.07.81-7.64-.2-11.11-1.03-3.47-3.07-7.14-7.15-11.21a17.02 17.02 0 0 0-15.8 3.77l-52.81 47.5a17.12 17.12 0 0 0-5.5 10.2l-4.5 30.18a149.26 149.26 0 0 1 38.24 57.2ZM54.45 106l-1.02 3.06-27.94 62.2a17.33 17.33 0 0 0 3.27 18.96l43.94 45.16a88.7 88.7 0 0 0 8.97-88.5A139.47 139.47 0 0 0 54.45 106Z"/><path d="m82.9 240.79 2.34.2c8.26.2 22.33 1.02 33.64 3.06 9.28 1.73 27.73 6.83 42.82 11.21 11.52 3.47 23.45-5.8 25.08-17.73 1.23-8.67 3.57-18.46 7.75-27.53a94.81 94.81 0 0 0-25.9-40.99 56.48 56.48 0 0 0-29.56-13.35 96.55 96.55 0 0 0-40.99 4.79 98.89 98.89 0 0 1-15.29 80.34h.1Z"/><path d="M201.87 197.76a574.87 574.87 0 0 0 19.78-31.6 8.67 8.67 0 0 0-.61-9.48 185.58 185.58 0 0 1-21.82-35.9c-5.91-14.16-6.73-36.08-6.83-46.69 0-4.07-1.22-8.05-3.77-11.21l-34.16-43.33c0 1.94-.4 3.87-.81 5.81a76.42 76.42 0 0 1-5.71 15.9l-4.7 9.8-3.36 6.72a111.95 111.95 0 0 0-12.03 38.23 93.9 93.9 0 0 0 8.67 47.92 67.9 67.9 0 0 1 39.56 16.52 99.4 99.4 0 0 1 25.8 37.31Z"/>';
+
+		const clipActions: Array<{ action: string; icon: SVGElement }> = [
+			{ action: 'copyToClipboard', icon: this.createSVG({ width: '16', height: '16', viewBox: '0 0 24 24', strokeWidth: '1.75', paths: ['M20 8H10a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2z', 'M4 16a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2'] }) },
+			{ action: 'saveFile', icon: this.createSVG({ width: '16', height: '16', viewBox: '0 0 24 24', strokeWidth: '1.75', paths: ['M12 17V3', 'm6 11 6 6 6-6', 'M19 21H5'] }) },
+			{ action: 'addToObsidian', icon: obsidianIcon },
 		];
 
-		for (const { action, paths } of clipActions) {
+		for (const { action, icon } of clipActions) {
 			const item = doc.createElement('div');
 			item.className = 'obsidian-reader-clip-item';
-
-			const itemIcon = this.createSVG({
-				width: '16', height: '16', viewBox: '0 0 24 24', strokeWidth: '1.75',
-				paths,
-			});
-			item.appendChild(itemIcon);
+			item.appendChild(icon);
 
 			const itemLabel = doc.createElement('span');
 			itemLabel.textContent = getMessage(action);

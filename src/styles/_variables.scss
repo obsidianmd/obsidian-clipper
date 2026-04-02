@@ -38,6 +38,8 @@
 	--checkbox-color-hover: var(--interactive-accent-hover);
 	--checkbox-border-color: var(--text-faint);
 	--checkbox-border-color-hover: var(--text-muted);
+	
+	--corner-shape: round;
 
 	--clickable-icon-size: 1.75rem;
 
@@ -130,8 +132,8 @@
 	--popup-padding: 0.75rem;
 	--popup-properties-padding: 2px 0.5rem 0.5rem;
 
-	--radius-s: 0.25rem;
-	--radius-m: 0.5rem;
+	--radius-s: 4px;
+	--radius-m: 8px;
 	--radius-l: 1rem;
 
 	--text-error: hsl(var(--color-red-hsl));
@@ -175,6 +177,10 @@
 
 // macOS26+ styles
 .is-macos {
+	--corner-shape: superellipse(1.33);
+	--radius-s: 0.5rem;
+	--radius-m: 0.75rem;
+
 	--slider-thumb-width: 30px;
 
 	--toggle-width: 44px;

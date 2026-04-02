@@ -149,9 +149,6 @@ export function toggleHighlighterMenu(isActive: boolean) {
 		enableLinkClicks();
 		removeHighlighterMenu();
 		browser.runtime.sendMessage({ action: "highlighterModeChanged", isActive: false });
-		if (!generalSettings.alwaysShowHighlights) {
-			removeExistingHighlights();
-		}
 	}
 	updateHighlightListeners();
 }

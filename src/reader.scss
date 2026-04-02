@@ -71,13 +71,15 @@
 	--size-4-6: 24px;
 
 	// Radius
-	--radius-s: 4px;
-	--radius-m: 8px;
+	--radius-s: 0.6rem;
+	--radius-m: 0.75rem;
 	--radius-l: 12px;
 
 	// Icons
 	--icon-s: 16px;
 	--icon-m: 18px;
+
+	--corner-shape: superellipse(1.33);
 
 	// Code
 	--code-size: 0.8em;
@@ -216,7 +218,7 @@
 			text-decoration: underline;
 		}
 	}
-	img, video, figure, svg {
+	img, video, figure {
 		max-width: 100%;
 		height: auto;
 		border-radius: var(--radius-s);
@@ -639,6 +641,7 @@
 		background: var(--footnote-popover-background);
 		border: 1px solid var(--background-modifier-border);
 		border-radius: var(--radius-m);
+		corner-shape: var(--corner-shape);
 		box-shadow: var(--shadow-s);
 		font-size: 0.80em;
 		line-height: 1.5;
@@ -786,12 +789,18 @@
 	position: absolute;
 	top: var(--size-4-3);
 	right: var(--size-4-5);
+	background: var(--background-primary);
+	box-shadow: 5px -10px 20px 20px var(--background-primary);
+	border-radius: var(--radius-m);
+	
+	corner-shape: var(--corner-shape);
 	display: flex;
 	align-items: center;
 	gap: 4px;
 	transition: opacity 0.15s ease;
 	.nav-btn {
 		border-radius: var(--radius-m);
+		corner-shape: var(--corner-shape);
 		width: 30px;
 		height: 30px;
 		padding: 0;
@@ -802,9 +811,16 @@
 		cursor: pointer;
 		transition: color 0.15s ease, opacity 0.15s ease, transform 0.15s ease;
 		background: var(--background-primary);
+		border: 1px solid var(--background-modifier-border);
 		color: var(--text-muted);
+		outline: none;
 		&:hover {
 			color: var(--text-normal);
+			background: var(--background-primary-alt);
+		}
+		&.is-active {
+			color: var(--text-normal);
+			background: var(--background-primary-alt);
 		}
 	}
 }
@@ -817,6 +833,7 @@
 	background: var(--background-primary);
 	border: var(--border-width) solid var(--background-modifier-border);
 	border-radius: var(--radius-m);
+	corner-shape: var(--corner-shape);
 	padding: var(--size-2-3);
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
 	z-index: 9999999999;
@@ -830,6 +847,7 @@
 	gap: var(--size-4-2);
 	padding: var(--size-2-2) var(--size-4-2);
 	border-radius: var(--radius-s);
+	corner-shape: var(--corner-shape);
 	color: var(--text-normal);
 	white-space: nowrap;
 	cursor: pointer;
@@ -877,6 +895,7 @@
 	align-items: center;
 	border: 1px solid var(--background-modifier-border);
 	border-radius: var(--radius-m);
+	corner-shape: var(--corner-shape);
 	overflow: hidden;
 	> .obsidian-reader-settings-button {
 		flex: 1;
@@ -917,6 +936,7 @@
 	height: 28px;
 	padding: 4px 30px 4px 8px;
 	border-radius: var(--radius-m);
+	corner-shape: var(--corner-shape);
 	cursor: pointer;
 	background-repeat: no-repeat, repeat;
 	/* arrow icon position (1em from the right, 50% vertical) , then gradient position*/
@@ -968,6 +988,7 @@
 	border: 1px solid var(--background-modifier-border);
 	background: transparent;
 	border-radius: var(--radius-m);
+	corner-shape: var(--corner-shape);
 	height: 28px;
 	padding: 0 6px;
 	color: var(--text-muted);
@@ -1005,7 +1026,7 @@
 .obsidian-reader-outline-item {
 	color: var(--text-muted);
 	cursor: pointer;
-	padding: var(--size-2-3);
+	padding: 5px var(--size-4-2);
 	border-radius: var(--radius-s);
 	line-height: 1.15;
 
