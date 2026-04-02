@@ -576,6 +576,9 @@
 	"prependToExisting": {
 		"message": "Zapisz na początku istniejącej notatki"
 	},
+	"preview": {
+		"message": "Podgląd"
+	},
 	"processing": {
 		"message": "przetwarzanie"
 	},
@@ -656,6 +659,120 @@
 	},
 	"reader": {
 		"message": "Czytnik"
+	},
+	"readerAppearance": {
+		"message": "Wygląd"
+	},
+	"readerAppearanceAuto": {
+		"message": "Automatycznie"
+	},
+	"readerAppearanceDark": {
+		"message": "Ciemny"
+	},
+	"readerAppearanceDescription": {
+		"message": "Wybierz jasny lub ciemny wygląd."
+	},
+	"readerAppearanceLight": {
+		"message": "Jasny"
+	},
+	"readerBlendImages": {
+		"message": "Wtapiaj obrazy"
+	},
+	"readerBlendImagesDescription": {
+		"message": "Wtapiaj obrazy w tło strony."
+	},
+	"readerCloseImageViewer": {
+		"message": "Zamknij przeglądarkę obrazów"
+	},
+	"readerCollapseComment": {
+		"message": "Zwiń komentarz"
+	},
+	"readerColorLinks": {
+		"message": "Koloruj linki"
+	},
+	"readerColorSchemeDefault": {
+		"message": "Domyślny"
+	},
+	"readerCustomCss": {
+		"message": "Własny CSS"
+	},
+	"readerCustomCssDescription": {
+		"message": "CSS stosowany automatycznie w widoku czytania."
+	},
+	"readerDarkTheme": {
+		"message": "Motyw trybu ciemnego"
+	},
+	"readerDarkThemeDescription": {
+		"message": "Użyj innego motywu w trybie ciemnym."
+	},
+	"readerError": {
+		"message": "Nie udało się wyodrębnić treści."
+	},
+	"readerFont": {
+		"message": "Opcje czcionek"
+	},
+	"readerFontDefault": {
+		"message": "Domyślna"
+	},
+	"readerFontDescription": {
+		"message": "Dodaj czcionki zainstalowane w systemie. Naciśnij Enter, aby dodać czcionkę."
+	},
+	"readerFontNotFound": {
+		"message": "Nie znaleziono"
+	},
+	"readerFontPlaceholder": {
+		"message": "Naciśnij Enter, aby dodać czcionkę"
+	},
+	"readerFontSetDefault": {
+		"message": "Ustaw jako domyślną"
+	},
+	"readerFontSize": {
+		"message": "Podstawowy rozmiar czcionki"
+	},
+	"readerFontSystem": {
+		"message": "Systemowa"
+	},
+	"readerFontSystemSans": {
+		"message": "Bezszeryfowa"
+	},
+	"readerFontSystemSerif": {
+		"message": "Szeryfowa"
+	},
+	"readerFonts": {
+		"message": "Czcionki"
+	},
+	"readerFootnotes": {
+		"message": "Przypisy"
+	},
+	"readerImages": {
+		"message": "Obrazy"
+	},
+	"readerLineHeight": {
+		"message": "Interlinia"
+	},
+	"readerLineWidth": {
+		"message": "Szerokość wiersza"
+	},
+	"readerLoading": {
+		"message": "Upraszczanie…"
+	},
+	"readerSettings": {
+		"message": "Ustawienia czytnika"
+	},
+	"readerTheme": {
+		"message": "Motyw"
+	},
+	"readerThemeDescription": {
+		"message": "Wybierz kolory używane w widoku czytania."
+	},
+	"readerThemeSection": {
+		"message": "Motyw"
+	},
+	"readerTypography": {
+		"message": "Typografia"
+	},
+	"readerViewFullSize": {
+		"message": "Wyświetl w pełnym rozmiarze"
 	},
 	"recommended": {
 		"message": "rekomendowane"
@@ -774,6 +891,9 @@
 	"systemDefault": {
 		"message": "System"
 	},
+	"template": {
+		"message": "Szablon"
+	},
 	"templateCopied": {
 		"message": "Skopiowano szablon JSON do schowka"
 	},
@@ -785,6 +905,12 @@
 	},
 	"templateErrorsCount": {
 		"message": "W Twoim szablonie występuje $1 błędów."
+	},
+	"templateGroupContent": {
+		"message": "Treść"
+	},
+	"templateGroupLocation": {
+		"message": "Lokalizacja"
 	},
 	"templateName": {
 		"message": "Nazwa szablonu"

@@ -576,6 +576,9 @@
 	"prependToExisting": {
 		"message": "Lisää olemassa olevaan muistiinpanoon, yläosaan"
 	},
+	"preview": {
+		"message": "Esikatselu"
+	},
 	"processing": {
 		"message": "käsittely"
 	},
@@ -664,6 +667,120 @@
 	},
 	"reader": {
 		"message": "Lukija"
+	},
+	"readerAppearance": {
+		"message": "Ulkoasu"
+	},
+	"readerAppearanceAuto": {
+		"message": "Automaattinen"
+	},
+	"readerAppearanceDark": {
+		"message": "Tumma"
+	},
+	"readerAppearanceDescription": {
+		"message": "Valitse vaalea tai tumma ulkoasu."
+	},
+	"readerAppearanceLight": {
+		"message": "Vaalea"
+	},
+	"readerBlendImages": {
+		"message": "Sulauta kuvat"
+	},
+	"readerBlendImagesDescription": {
+		"message": "Sulauta kuvat sivun taustaan."
+	},
+	"readerCloseImageViewer": {
+		"message": "Sulje kuvankatselin"
+	},
+	"readerCollapseComment": {
+		"message": "Kutista kommentti"
+	},
+	"readerColorLinks": {
+		"message": "Väritä linkit"
+	},
+	"readerColorSchemeDefault": {
+		"message": "Oletus"
+	},
+	"readerCustomCss": {
+		"message": "Mukautettu CSS"
+	},
+	"readerCustomCssDescription": {
+		"message": "Lukunäkymässä automaattisesti käytettävä CSS."
+	},
+	"readerDarkTheme": {
+		"message": "Tumman tilan teema"
+	},
+	"readerDarkThemeDescription": {
+		"message": "Käytä eri teemaa tummassa tilassa."
+	},
+	"readerError": {
+		"message": "Sisällön poiminta epäonnistui."
+	},
+	"readerFont": {
+		"message": "Fonttiasetukset"
+	},
+	"readerFontDefault": {
+		"message": "Oletus"
+	},
+	"readerFontDescription": {
+		"message": "Lisää järjestelmääsi asennettuja fontteja. Lisää fontti painamalla Enteriä."
+	},
+	"readerFontNotFound": {
+		"message": "Ei löytynyt"
+	},
+	"readerFontPlaceholder": {
+		"message": "Lisää fontti painamalla Enteriä"
+	},
+	"readerFontSetDefault": {
+		"message": "Aseta oletukseksi"
+	},
+	"readerFontSize": {
+		"message": "Perusfonttikoko"
+	},
+	"readerFontSystem": {
+		"message": "Järjestelmä"
+	},
+	"readerFontSystemSans": {
+		"message": "Sans-serif"
+	},
+	"readerFontSystemSerif": {
+		"message": "Serif"
+	},
+	"readerFonts": {
+		"message": "Fontit"
+	},
+	"readerFootnotes": {
+		"message": "Alaviitteet"
+	},
+	"readerImages": {
+		"message": "Kuvat"
+	},
+	"readerLineHeight": {
+		"message": "Riviväli"
+	},
+	"readerLineWidth": {
+		"message": "Rivileveys"
+	},
+	"readerLoading": {
+		"message": "Selkeytetään…"
+	},
+	"readerSettings": {
+		"message": "Lukijan asetukset"
+	},
+	"readerTheme": {
+		"message": "Teema"
+	},
+	"readerThemeDescription": {
+		"message": "Valitse lukunäkymässä käytettävät värit."
+	},
+	"readerThemeSection": {
+		"message": "Teema"
+	},
+	"readerTypography": {
+		"message": "Typografia"
+	},
+	"readerViewFullSize": {
+		"message": "Näytä täysikokoisena"
 	},
 	"recommended": {
 		"message": "suositeltu"
@@ -782,6 +899,9 @@
 	"systemDefault": {
 		"message": "Järjestelmän oletus"
 	},
+	"template": {
+		"message": "Malli"
+	},
 	"templateCopied": {
 		"message": "Mallin JSON kopioitu leikepöydälle"
 	},
@@ -793,6 +913,12 @@
 	},
 	"templateErrorsCount": {
 		"message": "Mallissasi on $1 virhettä."
+	},
+	"templateGroupContent": {
+		"message": "Sisältö"
+	},
+	"templateGroupLocation": {
+		"message": "Sijainti"
 	},
 	"templateName": {
 		"message": "Mallin nimi"

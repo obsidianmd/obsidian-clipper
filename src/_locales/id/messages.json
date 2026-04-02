@@ -576,6 +576,9 @@
 	"prependToExisting": {
 		"message": "Tambah ke catatan yang telah ada, di bagian awal"
 	},
+	"preview": {
+		"message": "Pratinjau"
+	},
 	"processing": {
 		"message": "memproses"
 	},
@@ -656,6 +659,120 @@
 	},
 	"reader": {
 		"message": "Pembaca"
+	},
+	"readerAppearance": {
+		"message": "Tampilan"
+	},
+	"readerAppearanceAuto": {
+		"message": "Otomatis"
+	},
+	"readerAppearanceDark": {
+		"message": "Gelap"
+	},
+	"readerAppearanceDescription": {
+		"message": "Pilih tampilan terang atau gelap."
+	},
+	"readerAppearanceLight": {
+		"message": "Terang"
+	},
+	"readerBlendImages": {
+		"message": "Padukan gambar"
+	},
+	"readerBlendImagesDescription": {
+		"message": "Padukan gambar dengan latar belakang halaman."
+	},
+	"readerCloseImageViewer": {
+		"message": "Tutup penampil gambar"
+	},
+	"readerCollapseComment": {
+		"message": "Ciutkan komentar"
+	},
+	"readerColorLinks": {
+		"message": "Warnai tautan"
+	},
+	"readerColorSchemeDefault": {
+		"message": "Default"
+	},
+	"readerCustomCss": {
+		"message": "CSS kustom"
+	},
+	"readerCustomCssDescription": {
+		"message": "CSS diterapkan secara otomatis dalam tampilan baca."
+	},
+	"readerDarkTheme": {
+		"message": "Tema mode gelap"
+	},
+	"readerDarkThemeDescription": {
+		"message": "Gunakan tema yang berbeda dalam mode gelap."
+	},
+	"readerError": {
+		"message": "Gagal mengekstrak konten."
+	},
+	"readerFont": {
+		"message": "Opsi font"
+	},
+	"readerFontDefault": {
+		"message": "Default"
+	},
+	"readerFontDescription": {
+		"message": "Tambahkan font yang terinstal di sistem Anda. Tekan Enter untuk menambahkan font."
+	},
+	"readerFontNotFound": {
+		"message": "Tidak ditemukan"
+	},
+	"readerFontPlaceholder": {
+		"message": "Tekan Enter untuk menambahkan font"
+	},
+	"readerFontSetDefault": {
+		"message": "Jadikan default"
+	},
+	"readerFontSize": {
+		"message": "Ukuran font dasar"
+	},
+	"readerFontSystem": {
+		"message": "Sistem"
+	},
+	"readerFontSystemSans": {
+		"message": "Sans-serif"
+	},
+	"readerFontSystemSerif": {
+		"message": "Serif"
+	},
+	"readerFonts": {
+		"message": "Font"
+	},
+	"readerFootnotes": {
+		"message": "Catatan kaki"
+	},
+	"readerImages": {
+		"message": "Gambar"
+	},
+	"readerLineHeight": {
+		"message": "Tinggi baris"
+	},
+	"readerLineWidth": {
+		"message": "Lebar baris"
+	},
+	"readerLoading": {
+		"message": "Mengurai…"
+	},
+	"readerSettings": {
+		"message": "Pengaturan pembaca"
+	},
+	"readerTheme": {
+		"message": "Tema"
+	},
+	"readerThemeDescription": {
+		"message": "Pilih warna yang digunakan dalam tampilan baca."
+	},
+	"readerThemeSection": {
+		"message": "Tema"
+	},
+	"readerTypography": {
+		"message": "Tipografi"
+	},
+	"readerViewFullSize": {
+		"message": "Lihat ukuran penuh"
 	},
 	"recommended": {
 		"message": "direkomendasikan"
@@ -774,6 +891,9 @@
 	"systemDefault": {
 		"message": "Sistem"
 	},
+	"template": {
+		"message": "Templat"
+	},
 	"templateCopied": {
 		"message": "Template JSON telah disalin ke papan klip"
 	},
@@ -785,6 +905,12 @@
 	},
 	"templateErrorsCount": {
 		"message": "Ada $1 kesalahan dalam template Anda."
+	},
+	"templateGroupContent": {
+		"message": "Konten"
+	},
+	"templateGroupLocation": {
+		"message": "Lokasi"
 	},
 	"templateName": {
 		"message": "Nama template"

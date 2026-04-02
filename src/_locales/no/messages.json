@@ -568,6 +568,9 @@
 	"prependToExisting": {
 		"message": "Legg til i et eksisterende notat, øverst"
 	},
+	"preview": {
+		"message": "Forhåndsvisning"
+	},
 	"processing": {
 		"message": "behandler"
 	},
@@ -648,6 +651,120 @@
 	},
 	"reader": {
 		"message": "Lesevisning"
+	},
+	"readerAppearance": {
+		"message": "Utseende"
+	},
+	"readerAppearanceAuto": {
+		"message": "Automatisk"
+	},
+	"readerAppearanceDark": {
+		"message": "Mørk"
+	},
+	"readerAppearanceDescription": {
+		"message": "Velg lyst eller mørkt utseende."
+	},
+	"readerAppearanceLight": {
+		"message": "Lys"
+	},
+	"readerBlendImages": {
+		"message": "Bland bilder"
+	},
+	"readerBlendImagesDescription": {
+		"message": "Bland bilder med sidebakgrunnen."
+	},
+	"readerCloseImageViewer": {
+		"message": "Lukk bildevisning"
+	},
+	"readerCollapseComment": {
+		"message": "Skjul kommentar"
+	},
+	"readerColorLinks": {
+		"message": "Fargelegg lenker"
+	},
+	"readerColorSchemeDefault": {
+		"message": "Standard"
+	},
+	"readerCustomCss": {
+		"message": "Egendefinert CSS"
+	},
+	"readerCustomCssDescription": {
+		"message": "CSS som brukes automatisk i lesevisning."
+	},
+	"readerDarkTheme": {
+		"message": "Tema for mørk modus"
+	},
+	"readerDarkThemeDescription": {
+		"message": "Bruk et annet tema i mørk modus."
+	},
+	"readerError": {
+		"message": "Kunne ikke hente ut innhold."
+	},
+	"readerFont": {
+		"message": "Skriftalternativer"
+	},
+	"readerFontDefault": {
+		"message": "Standard"
+	},
+	"readerFontDescription": {
+		"message": "Legg til skrifter som er installert på systemet ditt. Trykk Enter for å legge til en skrift."
+	},
+	"readerFontNotFound": {
+		"message": "Ikke funnet"
+	},
+	"readerFontPlaceholder": {
+		"message": "Trykk Enter for å legge til en skrift"
+	},
+	"readerFontSetDefault": {
+		"message": "Angi som standard"
+	},
+	"readerFontSize": {
+		"message": "Grunnleggende skriftstørrelse"
+	},
+	"readerFontSystem": {
+		"message": "System"
+	},
+	"readerFontSystemSans": {
+		"message": "Sans-serif"
+	},
+	"readerFontSystemSerif": {
+		"message": "Serif"
+	},
+	"readerFonts": {
+		"message": "Skrifter"
+	},
+	"readerFootnotes": {
+		"message": "Fotnoter"
+	},
+	"readerImages": {
+		"message": "Bilder"
+	},
+	"readerLineHeight": {
+		"message": "Linjehøyde"
+	},
+	"readerLineWidth": {
+		"message": "Linjebredde"
+	},
+	"readerLoading": {
+		"message": "Fjerner støy…"
+	},
+	"readerSettings": {
+		"message": "Leserinnstillinger"
+	},
+	"readerTheme": {
+		"message": "Tema"
+	},
+	"readerThemeDescription": {
+		"message": "Velg fargene som brukes i lesevisning."
+	},
+	"readerThemeSection": {
+		"message": "Tema"
+	},
+	"readerTypography": {
+		"message": "Typografi"
+	},
+	"readerViewFullSize": {
+		"message": "Vis i full størrelse"
 	},
 	"recommended": {
 		"message": "anbefalt"
@@ -766,6 +883,9 @@
 	"systemDefault": {
 		"message": "Systemstandard"
 	},
+	"template": {
+		"message": "Mal"
+	},
 	"templateCopied": {
 		"message": "Mal-JSON kopiert til utklippstavlen"
 	},
@@ -777,6 +897,12 @@
 	},
 	"templateErrorsCount": {
 		"message": "Det er $1 feil i malen din."
+	},
+	"templateGroupContent": {
+		"message": "Innhold"
+	},
+	"templateGroupLocation": {
+		"message": "Plassering"
 	},
 	"templateName": {
 		"message": "Malnavn"

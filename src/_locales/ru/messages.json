@@ -576,6 +576,9 @@
 	"prependToExisting": {
 		"message": "Добавить в начало существующей заметки"
 	},
+	"preview": {
+		"message": "Предпросмотр"
+	},
 	"processing": {
 		"message": "обработка"
 	},
@@ -656,6 +659,120 @@
 	},
 	"reader": {
 		"message": "Читатель"
+	},
+	"readerAppearance": {
+		"message": "Оформление"
+	},
+	"readerAppearanceAuto": {
+		"message": "Авто"
+	},
+	"readerAppearanceDark": {
+		"message": "Тёмное"
+	},
+	"readerAppearanceDescription": {
+		"message": "Выберите светлое или тёмное оформление."
+	},
+	"readerAppearanceLight": {
+		"message": "Светлое"
+	},
+	"readerBlendImages": {
+		"message": "Смешивать изображения"
+	},
+	"readerBlendImagesDescription": {
+		"message": "Смешивать изображения с фоном страницы."
+	},
+	"readerCloseImageViewer": {
+		"message": "Закрыть просмотр изображений"
+	},
+	"readerCollapseComment": {
+		"message": "Свернуть комментарий"
+	},
+	"readerColorLinks": {
+		"message": "Окрашивать ссылки"
+	},
+	"readerColorSchemeDefault": {
+		"message": "По умолчанию"
+	},
+	"readerCustomCss": {
+		"message": "Пользовательский CSS"
+	},
+	"readerCustomCssDescription": {
+		"message": "CSS, автоматически применяемый в режиме чтения."
+	},
+	"readerDarkTheme": {
+		"message": "Тема тёмного режима"
+	},
+	"readerDarkThemeDescription": {
+		"message": "Использовать другую тему в тёмном режиме."
+	},
+	"readerError": {
+		"message": "Не удалось извлечь содержимое."
+	},
+	"readerFont": {
+		"message": "Параметры шрифта"
+	},
+	"readerFontDefault": {
+		"message": "По умолчанию"
+	},
+	"readerFontDescription": {
+		"message": "Добавьте шрифты, установленные в вашей системе. Нажмите Enter, чтобы добавить шрифт."
+	},
+	"readerFontNotFound": {
+		"message": "Не найдено"
+	},
+	"readerFontPlaceholder": {
+		"message": "Нажмите Enter, чтобы добавить шрифт"
+	},
+	"readerFontSetDefault": {
+		"message": "Сделать по умолчанию"
+	},
+	"readerFontSize": {
+		"message": "Базовый размер шрифта"
+	},
+	"readerFontSystem": {
+		"message": "Системный"
+	},
+	"readerFontSystemSans": {
+		"message": "Без засечек"
+	},
+	"readerFontSystemSerif": {
+		"message": "С засечками"
+	},
+	"readerFonts": {
+		"message": "Шрифты"
+	},
+	"readerFootnotes": {
+		"message": "Сноски"
+	},
+	"readerImages": {
+		"message": "Изображения"
+	},
+	"readerLineHeight": {
+		"message": "Межстрочный интервал"
+	},
+	"readerLineWidth": {
+		"message": "Ширина строки"
+	},
+	"readerLoading": {
+		"message": "Упрощение…"
+	},
+	"readerSettings": {
+		"message": "Настройки режима чтения"
+	},
+	"readerTheme": {
+		"message": "Тема"
+	},
+	"readerThemeDescription": {
+		"message": "Выберите цвета, используемые в режиме чтения."
+	},
+	"readerThemeSection": {
+		"message": "Тема"
+	},
+	"readerTypography": {
+		"message": "Типографика"
+	},
+	"readerViewFullSize": {
+		"message": "Открыть в полном размере"
 	},
 	"recommended": {
 		"message": "рекомендуется"
@@ -774,6 +891,9 @@
 	"systemDefault": {
 		"message": "Системный"
 	},
+	"template": {
+		"message": "Шаблон"
+	},
 	"templateCopied": {
 		"message": "Шаблон JSON скопирован в буфер обмена"
 	},
@@ -785,6 +905,12 @@
 	},
 	"templateErrorsCount": {
 		"message": "В вашем шаблоне есть $1 ошибок."
+	},
+	"templateGroupContent": {
+		"message": "Содержимое"
+	},
+	"templateGroupLocation": {
+		"message": "Расположение"
 	},
 	"templateName": {
 		"message": "Название шаблона"

@@ -576,6 +576,9 @@
 	"prependToExisting": {
 		"message": "Lägg till i befintlig anteckning, i början"
 	},
+	"preview": {
+		"message": "Förhandsgranskning"
+	},
 	"processing": {
 		"message": "bearbetar"
 	},
@@ -656,6 +659,120 @@
 	},
 	"reader": {
 		"message": "Läsare"
+	},
+	"readerAppearance": {
+		"message": "Utseende"
+	},
+	"readerAppearanceAuto": {
+		"message": "Automatiskt"
+	},
+	"readerAppearanceDark": {
+		"message": "Mörkt"
+	},
+	"readerAppearanceDescription": {
+		"message": "Välj ljust eller mörkt utseende."
+	},
+	"readerAppearanceLight": {
+		"message": "Ljust"
+	},
+	"readerBlendImages": {
+		"message": "Blanda in bilder"
+	},
+	"readerBlendImagesDescription": {
+		"message": "Blanda in bilder med sidans bakgrund."
+	},
+	"readerCloseImageViewer": {
+		"message": "Stäng bildvisaren"
+	},
+	"readerCollapseComment": {
+		"message": "Fäll ihop kommentar"
+	},
+	"readerColorLinks": {
+		"message": "Färga länkar"
+	},
+	"readerColorSchemeDefault": {
+		"message": "Standard"
+	},
+	"readerCustomCss": {
+		"message": "Anpassad CSS"
+	},
+	"readerCustomCssDescription": {
+		"message": "CSS som tillämpas automatiskt i läsvyn."
+	},
+	"readerDarkTheme": {
+		"message": "Tema för mörkt läge"
+	},
+	"readerDarkThemeDescription": {
+		"message": "Använd ett annat tema i mörkt läge."
+	},
+	"readerError": {
+		"message": "Det gick inte att extrahera innehåll."
+	},
+	"readerFont": {
+		"message": "Teckensnittsalternativ"
+	},
+	"readerFontDefault": {
+		"message": "Standard"
+	},
+	"readerFontDescription": {
+		"message": "Lägg till teckensnitt som är installerade på ditt system. Tryck på Enter för att lägga till ett teckensnitt."
+	},
+	"readerFontNotFound": {
+		"message": "Hittades inte"
+	},
+	"readerFontPlaceholder": {
+		"message": "Tryck på Enter för att lägga till ett teckensnitt"
+	},
+	"readerFontSetDefault": {
+		"message": "Ange som standard"
+	},
+	"readerFontSize": {
+		"message": "Grundläggande teckenstorlek"
+	},
+	"readerFontSystem": {
+		"message": "System"
+	},
+	"readerFontSystemSans": {
+		"message": "Sans-serif"
+	},
+	"readerFontSystemSerif": {
+		"message": "Serif"
+	},
+	"readerFonts": {
+		"message": "Teckensnitt"
+	},
+	"readerFootnotes": {
+		"message": "Fotnoter"
+	},
+	"readerImages": {
+		"message": "Bilder"
+	},
+	"readerLineHeight": {
+		"message": "Radhöjd"
+	},
+	"readerLineWidth": {
+		"message": "Radbredd"
+	},
+	"readerLoading": {
+		"message": "Rensar…"
+	},
+	"readerSettings": {
+		"message": "Läsarinställningar"
+	},
+	"readerTheme": {
+		"message": "Tema"
+	},
+	"readerThemeDescription": {
+		"message": "Välj färgerna som används i läsvyn."
+	},
+	"readerThemeSection": {
+		"message": "Tema"
+	},
+	"readerTypography": {
+		"message": "Typografi"
+	},
+	"readerViewFullSize": {
+		"message": "Visa i full storlek"
 	},
 	"recommended": {
 		"message": "rekommenderad"
@@ -774,6 +891,9 @@
 	"systemDefault": {
 		"message": "System"
 	},
+	"template": {
+		"message": "Mall"
+	},
 	"templateCopied": {
 		"message": "Mall-JSON kopierad till urklipp"
 	},
@@ -785,6 +905,12 @@
 	},
 	"templateErrorsCount": {
 		"message": "Det finns $1 fel i din mall."
+	},
+	"templateGroupContent": {
+		"message": "Innehåll"
+	},
+	"templateGroupLocation": {
+		"message": "Plats"
 	},
 	"templateName": {
 		"message": "Mallnamn"

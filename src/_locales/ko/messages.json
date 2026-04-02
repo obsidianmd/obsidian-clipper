@@ -576,6 +576,9 @@
 	"prependToExisting": {
 		"message": "기존에 있는 노트 맨 위에 추가"
 	},
+	"preview": {
+		"message": "미리보기"
+	},
 	"processing": {
 		"message": "처리 중"
 	},
@@ -656,6 +659,120 @@
 	},
 	"reader": {
 		"message": "리더"
+	},
+	"readerAppearance": {
+		"message": "모양"
+	},
+	"readerAppearanceAuto": {
+		"message": "자동"
+	},
+	"readerAppearanceDark": {
+		"message": "어둡게"
+	},
+	"readerAppearanceDescription": {
+		"message": "밝은 모양 또는 어두운 모양을 선택하세요."
+	},
+	"readerAppearanceLight": {
+		"message": "밝게"
+	},
+	"readerBlendImages": {
+		"message": "이미지 블렌딩"
+	},
+	"readerBlendImagesDescription": {
+		"message": "이미지를 페이지 배경과 블렌딩합니다."
+	},
+	"readerCloseImageViewer": {
+		"message": "이미지 뷰어 닫기"
+	},
+	"readerCollapseComment": {
+		"message": "댓글 접기"
+	},
+	"readerColorLinks": {
+		"message": "링크 색상"
+	},
+	"readerColorSchemeDefault": {
+		"message": "기본값"
+	},
+	"readerCustomCss": {
+		"message": "사용자 지정 CSS"
+	},
+	"readerCustomCssDescription": {
+		"message": "읽기 보기에서 자동으로 적용되는 CSS입니다."
+	},
+	"readerDarkTheme": {
+		"message": "다크 모드 테마"
+	},
+	"readerDarkThemeDescription": {
+		"message": "다크 모드에서 다른 테마를 사용합니다."
+	},
+	"readerError": {
+		"message": "콘텐츠를 추출하지 못했습니다."
+	},
+	"readerFont": {
+		"message": "글꼴 옵션"
+	},
+	"readerFontDefault": {
+		"message": "기본값"
+	},
+	"readerFontDescription": {
+		"message": "시스템에 설치된 글꼴을 추가하세요. Enter를 눌러 글꼴을 추가합니다."
+	},
+	"readerFontNotFound": {
+		"message": "찾을 수 없음"
+	},
+	"readerFontPlaceholder": {
+		"message": "Enter를 눌러 글꼴을 추가하세요"
+	},
+	"readerFontSetDefault": {
+		"message": "기본값으로 설정"
+	},
+	"readerFontSize": {
+		"message": "기본 글꼴 크기"
+	},
+	"readerFontSystem": {
+		"message": "시스템"
+	},
+	"readerFontSystemSans": {
+		"message": "산세리프"
+	},
+	"readerFontSystemSerif": {
+		"message": "세리프"
+	},
+	"readerFonts": {
+		"message": "글꼴"
+	},
+	"readerFootnotes": {
+		"message": "각주"
+	},
+	"readerImages": {
+		"message": "이미지"
+	},
+	"readerLineHeight": {
+		"message": "줄 높이"
+	},
+	"readerLineWidth": {
+		"message": "줄 너비"
+	},
+	"readerLoading": {
+		"message": "정리 중…"
+	},
+	"readerSettings": {
+		"message": "리더 설정"
+	},
+	"readerTheme": {
+		"message": "테마"
+	},
+	"readerThemeDescription": {
+		"message": "읽기 보기에서 사용할 색상을 선택하세요."
+	},
+	"readerThemeSection": {
+		"message": "테마"
+	},
+	"readerTypography": {
+		"message": "타이포그래피"
+	},
+	"readerViewFullSize": {
+		"message": "원본 크기로 보기"
 	},
 	"recommended": {
 		"message": "추천"
@@ -774,6 +891,9 @@
 	"systemDefault": {
 		"message": "시스템 기본값"
 	},
+	"template": {
+		"message": "템플릿"
+	},
 	"templateCopied": {
 		"message": "클립보드에 템플릿 JSON을 복사했습니다."
 	},
@@ -785,6 +905,12 @@
 	},
 	"templateErrorsCount": {
 		"message": "템플릿에 오류가 $1개 있습니다."
+	},
+	"templateGroupContent": {
+		"message": "콘텐츠"
+	},
+	"templateGroupLocation": {
+		"message": "위치"
 	},
 	"templateName": {
 		"message": "템플릿 이름"

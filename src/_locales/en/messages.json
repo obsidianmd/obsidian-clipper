@@ -2,9 +2,6 @@
 	"activity": {
 		"message": "Activity"
 	},
-	"preview": {
-		"message": "Preview"
-	},
 	"addModel": {
 		"message": "+ Add model"
 	},
@@ -579,6 +576,9 @@
 	"prependToExisting": {
 		"message": "Add to an existing note, at the top"
 	},
+	"preview": {
+		"message": "Preview"
+	},
 	"processing": {
 		"message": "processing"
 	},
@@ -660,107 +660,8 @@
 	"reader": {
 		"message": "Reader"
 	},
-	"readerBlendImages": {
-		"message": "Blend images"
-	},
-	"readerBlendImagesDescription": {
-		"message": "Blend images with the page background."
-	},
-	"readerColorLinks": {
-		"message": "Color links"
-	},
-	"readerTheme": {
-		"message": "Theme"
-	},
-	"readerColorSchemeDefault": {
-		"message": "Default"
-	},
-	"readerThemeDescription": {
-		"message": "Choose the colors used in reading view."
-	},
-	"readerDarkTheme": {
-		"message": "Dark mode theme"
-	},
-	"readerDarkThemeDescription": {
-		"message": "Use a different theme in dark mode."
-	},
-	"readerCustomCss": {
-		"message": "Custom CSS"
-	},
-	"readerCustomCssDescription": {
-		"message": "CSS applied automatically in reading view."
-	},
-	"readerFonts": {
-		"message": "Fonts"
-	},
-	"readerFont": {
-		"message": "Font options"
-	},
-	"readerFontSize": {
-		"message": "Base font size"
-	},
-	"readerLineHeight": {
-		"message": "Line height"
-	},
-	"readerLineWidth": {
-		"message": "Line width"
-	},
-	"readerFontDescription": {
-		"message": "Add fonts installed on your system. Press enter to add a font."
-	},
-	"readerFontPlaceholder": {
-		"message": "Press enter to add a font"
-	},
-	"readerFontSystem": {
-		"message": "System"
-	},
-	"readerFontSystemSans": {
-		"message": "Sans-serif"
-	},
-	"readerFontSystemSerif": {
-		"message": "Serif"
-	},
-	"readerFontDefault": {
-		"message": "Default"
-	},
-	"readerFontSetDefault": {
-		"message": "Set default"
-	},
-	"readerFontNotFound": {
-		"message": "Not found"
-	},
-	"readerFootnotes": {
-		"message": "Footnotes"
-	},
-	"readerLoading": {
-		"message": "Defuddling\u2026"
-	},
-	"readerError": {
-		"message": "Failed to extract content."
-	},
-	"readerCollapseComment": {
-		"message": "Collapse comment"
-	},
-	"readerCloseImageViewer": {
-		"message": "Close image viewer"
-	},
-	"readerViewFullSize": {
-		"message": "View full size"
-	},
-	"readerSettings": {
-		"message": "Reader settings"
-	},
 	"readerAppearance": {
 		"message": "Appearance"
-	},
-	"readerThemeSection": {
-		"message": "Theme"
-	},
-	"readerTypography": {
-		"message": "Typography"
-	},
-	"readerImages": {
-		"message": "Images"
 	},
 	"readerAppearanceAuto": {
 		"message": "Auto"
@@ -773,6 +674,105 @@
 	},
 	"readerAppearanceLight": {
 		"message": "Light"
+	},
+	"readerBlendImages": {
+		"message": "Blend images"
+	},
+	"readerBlendImagesDescription": {
+		"message": "Blend images with the page background."
+	},
+	"readerCloseImageViewer": {
+		"message": "Close image viewer"
+	},
+	"readerCollapseComment": {
+		"message": "Collapse comment"
+	},
+	"readerColorLinks": {
+		"message": "Color links"
+	},
+	"readerColorSchemeDefault": {
+		"message": "Default"
+	},
+	"readerCustomCss": {
+		"message": "Custom CSS"
+	},
+	"readerCustomCssDescription": {
+		"message": "CSS applied automatically in reading view."
+	},
+	"readerDarkTheme": {
+		"message": "Dark mode theme"
+	},
+	"readerDarkThemeDescription": {
+		"message": "Use a different theme in dark mode."
+	},
+	"readerError": {
+		"message": "Failed to extract content."
+	},
+	"readerFont": {
+		"message": "Font options"
+	},
+	"readerFontDefault": {
+		"message": "Default"
+	},
+	"readerFontDescription": {
+		"message": "Add fonts installed on your system. Press enter to add a font."
+	},
+	"readerFontNotFound": {
+		"message": "Not found"
+	},
+	"readerFontPlaceholder": {
+		"message": "Press enter to add a font"
+	},
+	"readerFontSetDefault": {
+		"message": "Set default"
+	},
+	"readerFontSize": {
+		"message": "Base font size"
+	},
+	"readerFontSystem": {
+		"message": "System"
+	},
+	"readerFontSystemSans": {
+		"message": "Sans-serif"
+	},
+	"readerFontSystemSerif": {
+		"message": "Serif"
+	},
+	"readerFonts": {
+		"message": "Fonts"
+	},
+	"readerFootnotes": {
+		"message": "Footnotes"
+	},
+	"readerImages": {
+		"message": "Images"
+	},
+	"readerLineHeight": {
+		"message": "Line height"
+	},
+	"readerLineWidth": {
+		"message": "Line width"
+	},
+	"readerLoading": {
+		"message": "Defuddling…"
+	},
+	"readerSettings": {
+		"message": "Reader settings"
+	},
+	"readerTheme": {
+		"message": "Theme"
+	},
+	"readerThemeDescription": {
+		"message": "Choose the colors used in reading view."
+	},
+	"readerThemeSection": {
+		"message": "Theme"
+	},
+	"readerTypography": {
+		"message": "Typography"
+	},
+	"readerViewFullSize": {
+		"message": "View full size"
 	},
 	"recommended": {
 		"message": "recommended"
@@ -891,6 +891,9 @@
 	"systemDefault": {
 		"message": "System"
 	},
+	"template": {
+		"message": "Template"
+	},
 	"templateCopied": {
 		"message": "Copied template JSON to clipboard"
 	},
@@ -903,8 +906,11 @@
 	"templateErrorsCount": {
 		"message": "There are $1 errors in your template."
 	},
-	"template": {
-		"message": "Template"
+	"templateGroupContent": {
+		"message": "Content"
+	},
+	"templateGroupLocation": {
+		"message": "Location"
 	},
 	"templateName": {
 		"message": "Template name"
@@ -917,12 +923,6 @@
 	},
 	"templateTriggers": {
 		"message": "Template triggers"
-	},
-	"templateGroupLocation": {
-		"message": "Location"
-	},
-	"templateGroupContent": {
-		"message": "Content"
 	},
 	"templateTriggersDescription": {
 		"message": "Define rules to automatically select this template if it matches a URL pattern or contains schema.org data. One rule per line."

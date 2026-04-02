@@ -576,6 +576,9 @@
 	"prependToExisting": {
 		"message": "既存のノートの先頭に追加"
 	},
+	"preview": {
+		"message": "プレビュー"
+	},
 	"processing": {
 		"message": "処理中"
 	},
@@ -656,6 +659,120 @@
 	},
 	"reader": {
 		"message": "リーダー"
+	},
+	"readerAppearance": {
+		"message": "外観"
+	},
+	"readerAppearanceAuto": {
+		"message": "自動"
+	},
+	"readerAppearanceDark": {
+		"message": "ダーク"
+	},
+	"readerAppearanceDescription": {
+		"message": "ライトまたはダークの外観を選択します。"
+	},
+	"readerAppearanceLight": {
+		"message": "ライト"
+	},
+	"readerBlendImages": {
+		"message": "画像を背景になじませる"
+	},
+	"readerBlendImagesDescription": {
+		"message": "画像をページの背景に溶け込ませます。"
+	},
+	"readerCloseImageViewer": {
+		"message": "画像ビューアを閉じる"
+	},
+	"readerCollapseComment": {
+		"message": "コメントを折りたたむ"
+	},
+	"readerColorLinks": {
+		"message": "リンクに色を付ける"
+	},
+	"readerColorSchemeDefault": {
+		"message": "デフォルト"
+	},
+	"readerCustomCss": {
+		"message": "カスタムCSS"
+	},
+	"readerCustomCssDescription": {
+		"message": "読み取りビューで自動的に適用されるCSSです。"
+	},
+	"readerDarkTheme": {
+		"message": "ダークモードのテーマ"
+	},
+	"readerDarkThemeDescription": {
+		"message": "ダークモードで別のテーマを使用します。"
+	},
+	"readerError": {
+		"message": "コンテンツの抽出に失敗しました。"
+	},
+	"readerFont": {
+		"message": "フォントオプション"
+	},
+	"readerFontDefault": {
+		"message": "デフォルト"
+	},
+	"readerFontDescription": {
+		"message": "システムにインストールされているフォントを追加します。Enterキーを押してフォントを追加します。"
+	},
+	"readerFontNotFound": {
+		"message": "見つかりません"
+	},
+	"readerFontPlaceholder": {
+		"message": "Enterキーを押してフォントを追加"
+	},
+	"readerFontSetDefault": {
+		"message": "デフォルトに設定"
+	},
+	"readerFontSize": {
+		"message": "基本フォントサイズ"
+	},
+	"readerFontSystem": {
+		"message": "システム"
+	},
+	"readerFontSystemSans": {
+		"message": "サンセリフ"
+	},
+	"readerFontSystemSerif": {
+		"message": "セリフ"
+	},
+	"readerFonts": {
+		"message": "フォント"
+	},
+	"readerFootnotes": {
+		"message": "脚注"
+	},
+	"readerImages": {
+		"message": "画像"
+	},
+	"readerLineHeight": {
+		"message": "行間"
+	},
+	"readerLineWidth": {
+		"message": "行幅"
+	},
+	"readerLoading": {
+		"message": "読みやすくしています…"
+	},
+	"readerSettings": {
+		"message": "リーダー設定"
+	},
+	"readerTheme": {
+		"message": "テーマ"
+	},
+	"readerThemeDescription": {
+		"message": "読み取りビューで使用する色を選択します。"
+	},
+	"readerThemeSection": {
+		"message": "テーマ"
+	},
+	"readerTypography": {
+		"message": "タイポグラフィ"
+	},
+	"readerViewFullSize": {
+		"message": "フルサイズで表示"
 	},
 	"recommended": {
 		"message": "推奨"
@@ -774,6 +891,9 @@
 	"systemDefault": {
 		"message": "システム"
 	},
+	"template": {
+		"message": "テンプレート"
+	},
 	"templateCopied": {
 		"message": "テンプレートのJSONをクリップボードにコピーしました"
 	},
@@ -785,6 +905,12 @@
 	},
 	"templateErrorsCount": {
 		"message": "テンプレートに$1件のエラーがあります。"
+	},
+	"templateGroupContent": {
+		"message": "コンテンツ"
+	},
+	"templateGroupLocation": {
+		"message": "場所"
 	},
 	"templateName": {
 		"message": "テンプレート名"

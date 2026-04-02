@@ -568,6 +568,9 @@
 	"prependToExisting": {
 		"message": "Adaugă la nota existentă, la început"
 	},
+	"preview": {
+		"message": "Previzualizare"
+	},
 	"processing": {
 		"message": "Se procesează"
 	},
@@ -648,6 +651,120 @@
 	},
 	"reader": {
 		"message": "Cititor"
+	},
+	"readerAppearance": {
+		"message": "Aspect"
+	},
+	"readerAppearanceAuto": {
+		"message": "Automat"
+	},
+	"readerAppearanceDark": {
+		"message": "Întunecat"
+	},
+	"readerAppearanceDescription": {
+		"message": "Alege aspectul deschis sau întunecat."
+	},
+	"readerAppearanceLight": {
+		"message": "Deschis"
+	},
+	"readerBlendImages": {
+		"message": "Îmbină imaginile"
+	},
+	"readerBlendImagesDescription": {
+		"message": "Îmbină imaginile cu fundalul paginii."
+	},
+	"readerCloseImageViewer": {
+		"message": "Închide vizualizatorul de imagini"
+	},
+	"readerCollapseComment": {
+		"message": "Restrânge comentariul"
+	},
+	"readerColorLinks": {
+		"message": "Colorează linkurile"
+	},
+	"readerColorSchemeDefault": {
+		"message": "Implicit"
+	},
+	"readerCustomCss": {
+		"message": "CSS personalizat"
+	},
+	"readerCustomCssDescription": {
+		"message": "CSS aplicat automat în vizualizarea de citire."
+	},
+	"readerDarkTheme": {
+		"message": "Temă pentru modul întunecat"
+	},
+	"readerDarkThemeDescription": {
+		"message": "Folosește o temă diferită în modul întunecat."
+	},
+	"readerError": {
+		"message": "Extragerea conținutului a eșuat."
+	},
+	"readerFont": {
+		"message": "Opțiuni de font"
+	},
+	"readerFontDefault": {
+		"message": "Implicit"
+	},
+	"readerFontDescription": {
+		"message": "Adaugă fonturi instalate pe sistemul tău. Apasă Enter pentru a adăuga un font."
+	},
+	"readerFontNotFound": {
+		"message": "Nu a fost găsit"
+	},
+	"readerFontPlaceholder": {
+		"message": "Apasă Enter pentru a adăuga un font"
+	},
+	"readerFontSetDefault": {
+		"message": "Setează ca implicit"
+	},
+	"readerFontSize": {
+		"message": "Dimensiunea de bază a fontului"
+	},
+	"readerFontSystem": {
+		"message": "Sistem"
+	},
+	"readerFontSystemSans": {
+		"message": "Sans-serif"
+	},
+	"readerFontSystemSerif": {
+		"message": "Serif"
+	},
+	"readerFonts": {
+		"message": "Fonturi"
+	},
+	"readerFootnotes": {
+		"message": "Note de subsol"
+	},
+	"readerImages": {
+		"message": "Imagini"
+	},
+	"readerLineHeight": {
+		"message": "Înălțimea liniei"
+	},
+	"readerLineWidth": {
+		"message": "Lățimea liniei"
+	},
+	"readerLoading": {
+		"message": "Se clarifică…"
+	},
+	"readerSettings": {
+		"message": "Setări cititor"
+	},
+	"readerTheme": {
+		"message": "Temă"
+	},
+	"readerThemeDescription": {
+		"message": "Alege culorile folosite în vizualizarea de citire."
+	},
+	"readerThemeSection": {
+		"message": "Temă"
+	},
+	"readerTypography": {
+		"message": "Tipografie"
+	},
+	"readerViewFullSize": {
+		"message": "Vezi la dimensiune completă"
 	},
 	"recommended": {
 		"message": "recomandat"
@@ -766,6 +883,9 @@
 	"systemDefault": {
 		"message": "Implicit sistem"
 	},
+	"template": {
+		"message": "Șablon"
+	},
 	"templateCopied": {
 		"message": "JSON-ul șablonului a fost copiat în clipboard"
 	},
@@ -777,6 +897,12 @@
 	},
 	"templateErrorsCount": {
 		"message": "Există $1 erori în șablonul tău."
+	},
+	"templateGroupContent": {
+		"message": "Conținut"
+	},
+	"templateGroupLocation": {
+		"message": "Locație"
 	},
 	"templateName": {
 		"message": "Nume șablon"
