@@ -201,7 +201,7 @@ async function initializeExtension(tabId: number) {
 			return;
 		}
 		if (isRestrictedUrl(tab.url)) {
-			showError('restrictedPage');
+			showError('pageCannotBeClipped');
 			return;
 		}
 
@@ -239,15 +239,15 @@ function setupMessageListeners() {
 			if (!isIframe) {
 				currentTabId = request.tabId;
 				if (request.isRestrictedUrl) {
-					showError(getMessage('restrictedPage'));
+					showError('pageCannotBeClipped');
 				} else if (request.isValidUrl) {
 					if (currentTabId !== undefined) {
 						refreshFields(currentTabId); // Force template check when URL changes
 					}
 				} else if (request.isBlankPage) {
-					showError(getMessage('pageCannotBeClipped'));
+					showError('pageCannotBeClipped');
 				} else {
-					showError(getMessage('onlyHttpSupported'));
+					showError('onlyHttpSupported');
 				}
 			}
 		} else if (request.action === "highlightsUpdated") {
@@ -628,7 +628,7 @@ async function refreshFields(tabId: number, checkTemplateTriggers: boolean = tru
 			return;
 		}
 		if (isRestrictedUrl(tab.url)) {
-			showError('restrictedPage');
+			showError('pageCannotBeClipped');
 			return;
 		}
 

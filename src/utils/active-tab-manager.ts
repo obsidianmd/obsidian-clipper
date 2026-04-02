@@ -29,7 +29,6 @@ export function isBlankPage(url: string): boolean {
 	return url === 'about:blank' || url === 'chrome://newtab/' || url === 'edge://newtab/';
 }
 
-// Check if the URL is a browser-protected page that extensions cannot access
 export function isRestrictedUrl(url: string): boolean {
 	try {
 		const urlObj = new URL(url);
@@ -44,7 +43,7 @@ export function isRestrictedUrl(url: string): boolean {
 		
 		// Edge Add-ons
 		if (hostname === 'microsoftedge.microsoft.com' && urlObj.pathname.startsWith('/addons')) return true;
-		
+
 		return false;
 	} catch {
 		return false;
