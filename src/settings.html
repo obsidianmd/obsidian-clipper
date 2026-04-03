@@ -50,7 +50,7 @@
 											<label data-i18n="appflowySignInWithEmail">Sign in with email code</label>
 											<div class="setting-item-description" data-i18n="appflowySignInWithEmailDescription">Enter your AppFlowy account email. AppFlowy will send a 6-digit code to that address.</div>
 										</div>
-										<div class="setting-item-control">
+										<div class="setting-item-control" style="flex-direction: column; align-items: stretch;">
 											<input type="email" id="appflowy-email-input" placeholder="your@email.com" autocomplete="off" spellcheck="false" style="width: 100%;" />
 											<button type="button" id="appflowy-send-otp-btn" class="btn mod-cta" style="width: 100%; margin-top: 0.5rem;" data-i18n="appflowySendCode">Send code</button>
 										</div>
@@ -60,7 +60,7 @@
 											<label data-i18n="appflowyVerificationCode">Verification code</label>
 											<div class="setting-item-description" data-i18n="appflowyVerificationCodeDescription">Enter the 6-digit code sent to your email, then click Verify.</div>
 										</div>
-										<div class="setting-item-control">
+										<div class="setting-item-control" style="flex-direction: column; align-items: stretch;">
 											<input type="text" id="appflowy-otp-code" placeholder="123456" maxlength="6" autocomplete="off" spellcheck="false" style="width: 100%;" />
 											<button type="button" id="appflowy-verify-otp-btn" class="btn mod-cta" style="width: 100%; margin-top: 0.5rem;" data-i18n="appflowyVerifyAndConnect">Verify &amp; connect</button>
 										</div>
@@ -74,7 +74,7 @@
 											<input type="url" id="appflowy-server-url" placeholder="https://beta.appflowy.cloud" autocomplete="off" spellcheck="false" />
 										</div>
 									</div>
-									<div class="setting-item mod-horizontal">
+									<div class="setting-item mod-horizontal" style="display: none;">
 										<div class="setting-item-info">
 											<label for="appflowy-api-token" data-i18n="appflowyApiToken">API Token</label>
 											<div class="setting-item-description" data-i18n="appflowyApiTokenDescription">Your AppFlowy API token. Find it in AppFlowy Settings → Account.</div>
@@ -177,7 +177,7 @@
 									</div>
 								</div>
 							</div>
-							<div class="setting-group">
+					<div class="setting-group" style="display: none;">
 								<div class="setting-item setting-item-heading"><h3 data-i18n="vaults">Vaults</h3></div>
 								<div class="setting-items">
 								<div class="setting-item-description" data-i18n="vaultsDescription">Add vaults here if you also save to Obsidian and want the option to save to different vaults. Press <strong>enter</strong> to add a&nbsp;vault.</div>
@@ -727,7 +727,7 @@
 											<div class="setting-item-description" data-i18n="noteLocationDescription">The folder or path of the note.</div>
 											<input type="text" id="template-path-name" placeholder="Clippings" />
 										</div>
-										<div class="setting-item">
+									<div class="setting-item" style="display: none;">
 											<label for="template-vault" data-i18n="vault">Vault</label>
 											<div class="setting-item-description" data-i18n="vaultDescription">Select the default vault for this template. Go to general settings to add or remove vaults.</div>
 											<select id="template-vault">

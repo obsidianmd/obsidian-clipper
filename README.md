@@ -5,7 +5,7 @@
 <p align="center">
   <a rel="noreferrer noopener" href="https://chromewebstore.google.com/detail/ngjmhmikhoegpfakpfofaafagoikejln?utm_source=item-share-cb"><img alt="Chrome Web Store" src="https://img.shields.io/badge/Chrome-141e24.svg?&style=for-the-badge&logo=google-chrome&logoColor=white"></a>
   <a rel="noreferrer noopener" href="https://addons.mozilla.org/fr/firefox/addon/clipper-for-appflowy/"><img alt="Firefox Add-ons" src="https://img.shields.io/badge/Firefox-141e24.svg?&style=for-the-badge&logo=firefox-browser&logoColor=white"></a>
-  <a rel="noreferrer noopener" href="https://github.com/alexrosepizant/clipper-for-appflowy/releases/tag/v0.1.1"><img alt="Safari" src="https://img.shields.io/badge/Safari-141e24.svg?&style=for-the-badge&logo=safari&logoColor=white"></a>
+  <a rel="noreferrer noopener" href="https://github.com/alexrosepizant/clipper-for-appflowy/releases/tag/v0.1.2"><img alt="Safari" src="https://img.shields.io/badge/Safari-141e24.svg?&style=for-the-badge&logo=safari&logoColor=white"></a>
   <a href="#contributors"><img alt="All Contributors" src="https://img.shields.io/badge/all_contributors-1-orange.svg?style=for-the-badge"></a>
 </p>
 
@@ -33,7 +33,7 @@ Please refer to the [documentation](./docs) for details on how to install and us
 | ----------------- | -------- |
 | Chrome / Chromium | [Chrome Web Store](https://chromewebstore.google.com/detail/ngjmhmikhoegpfakpfofaafagoikejln?utm_source=item-share-cb) |
 | Firefox           | [Firefox Add-Ons](https://addons.mozilla.org/fr/firefox/addon/clipper-for-appflowy/) |
-| Safari            | [GitHub Releases](https://github.com/alexrosepizant/clipper-for-appflowy/releases/tag/v0.1.1) |
+| Safari            | [GitHub Releases](https://github.com/alexrosepizant/clipper-for-appflowy/releases/tag/v0.1.2) |
 
 ## Screenshots
 
