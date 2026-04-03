@@ -229,7 +229,8 @@
 	iframe {
 		max-width: 100%;
 		width: 100%;
-		border-radius: var(--radius-s);
+		border-radius: var(--radius-m);
+		corner-shape: var(--corner-shape);
 		overflow: hidden;
 		border: none;
 		&[src*="youtube.com"] {
@@ -240,7 +241,7 @@
 			position: sticky;
 			top: 8px;
 			z-index: 1;
-			box-shadow: 
+			box-shadow:
 				0 -8px 24px 24px var(--background-primary);
 		}
 	}
@@ -255,7 +256,8 @@
 		> strong {
 			font-family: var(--font-ui);
 			color: var(--text-muted);
-			font-size: 0.9em;
+			margin-top: 0.15em;
+			font-size: 0.85em;
 			font-weight: 400;
 			flex-shrink: 0;
 			width: var(--timestamp-width);

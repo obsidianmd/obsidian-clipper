@@ -18,6 +18,7 @@ import { ReaderSettings } from '../types/types';
 export class Reader {
 	private static originalHTML: string | null = null;
 	private static isActive: boolean = false;
+	private static programmaticScroll: boolean = false;
 
 	/**
 	 * Helper function to create SVG elements
@@ -674,13 +675,18 @@ export class Reader {
 		const distance = targetY - startY;
 		if (Math.abs(distance) < 1) return;
 		const startTime = performance.now();
+		this.programmaticScroll = true;
 
 		const step = (now: number) => {
 			const elapsed = now - startTime;
 			const t = Math.min(elapsed / duration, 1);
 			const ease = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
 			window.scrollTo(0, startY + distance * ease);
-			if (t < 1) requestAnimationFrame(step);
+			if (t < 1) {
+				requestAnimationFrame(step);
+			} else {
+				setTimeout(() => { ReaderView.programmaticScroll = false; }, 50);
+			}
 		};
 
 		requestAnimationFrame(step);
@@ -794,7 +800,8 @@ export class Reader {
 			
 			item.addEventListener('click', () => {
 				const rect = heading.getBoundingClientRect();
-				const targetY = (window.pageYOffset || doc.documentElement.scrollTop) + rect.top - window.innerHeight * 0.05 - this.getStickyOffset();
+				const stickyOffset = this.getStickyOffset();
+						const targetY = (window.pageYOffset || doc.documentElement.scrollTop) + rect.top - (stickyOffset > 0 ? stickyOffset + window.innerHeight * 0.02 : window.innerHeight * 0.05);
 				this.scrollTo(targetY);
 			});
 
@@ -875,7 +882,8 @@ export class Reader {
 			
 			item.addEventListener('click', () => {
 				const rect = footnotes.getBoundingClientRect();
-				const targetY = (window.pageYOffset || doc.documentElement.scrollTop) + rect.top - window.innerHeight * 0.05 - this.getStickyOffset();
+				const stickyOffset = this.getStickyOffset();
+						const targetY = (window.pageYOffset || doc.documentElement.scrollTop) + rect.top - (stickyOffset > 0 ? stickyOffset + window.innerHeight * 0.02 : window.innerHeight * 0.05);
 				this.scrollTo(targetY);
 			});
 
@@ -2071,6 +2079,14 @@ export class Reader {
 					// Track active segment based on video current time
 					let activeSegment: HTMLElement | null = null;
 					let activeIndex = -1;
+					let autoScroll = true;
+					let suppressScroll = false;
+					let lastUserScroll = 0;
+
+					window.addEventListener('scroll', () => {
+						if (ReaderView.programmaticScroll || scrubbing) return;
+						lastUserScroll = Date.now();
+					}, { passive: true });
 
 					const updateActiveSegment = (currentTime: number) => {
 						let newIndex = -1;
@@ -2081,9 +2097,21 @@ export class Reader {
 							}
 						}
 						if (newIndex !== activeIndex) {
+							// Resume auto-scroll once segment changes after scrub ends
+							if (suppressScroll && !scrubbing) {
+								suppressScroll = false;
+							}
 							activeSegment?.classList.remove('is-active');
 							if (newIndex >= 0) {
 								segments[newIndex].classList.add('is-active');
+								// Auto-scroll to keep active segment visible
+								if (autoScroll && !suppressScroll && Date.now() - lastUserScroll > 2000) {
+									const rect = segments[newIndex].getBoundingClientRect();
+									const stickyOffset = this.getStickyOffset();
+									const targetY = (window.pageYOffset || doc.documentElement.scrollTop)
+										+ rect.top - stickyOffset - 20;
+									this.scrollTo(targetY);
+								}
 							}
 							activeSegment = newIndex >= 0 ? segments[newIndex] : null;
 							activeIndex = newIndex;
@@ -2184,6 +2212,7 @@ export class Reader {
 
 					scrubTrack.addEventListener('mousedown', (e) => {
 						scrubbing = true;
+						suppressScroll = true;
 						seekTo(getTimeFromY(e.clientY));
 						e.preventDefault();
 					});
