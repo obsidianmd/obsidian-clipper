@@ -2028,6 +2028,16 @@ export class Reader {
 						seg.appendChild(strong);
 						seg.appendChild(textWrapper);
 					});
+					// Set timestamp column width to the widest timestamp
+					let maxWidth = 0;
+					segments.forEach(seg => {
+						const strong = seg.querySelector('strong');
+						if (strong) {
+							maxWidth = Math.max(maxWidth, strong.getBoundingClientRect().width);
+						}
+					});
+					transcript.style.setProperty('--timestamp-width', Math.ceil(maxWidth) + 'px');
+
 					const segmentTimes = segments.map(seg => {
 						const ts = seg.querySelector('.timestamp');
 						return parseFloat(ts?.getAttribute('data-timestamp') || '0');
@@ -2047,21 +2057,24 @@ export class Reader {
 						}
 						if (newIndex !== activeIndex) {
 							activeSegment?.classList.remove('is-active');
-							activeSegment?.style.removeProperty('--progress');
 							if (newIndex >= 0) {
 								segments[newIndex].classList.add('is-active');
 							}
 							activeSegment = newIndex >= 0 ? segments[newIndex] : null;
 							activeIndex = newIndex;
 						}
-						// Update progress within the active segment
+						// Update progress line on the scrub track
 						if (activeSegment && activeIndex >= 0) {
+							const segRect = activeSegment.getBoundingClientRect();
+							const trackRect = scrubTrack.getBoundingClientRect();
 							const start = segmentTimes[activeIndex];
 							const end = activeIndex < segmentTimes.length - 1
 								? segmentTimes[activeIndex + 1]
-								: start + 30; // estimate last segment duration
-							const progress = Math.min(1, Math.max(0, (currentTime - start) / (end - start)));
-							activeSegment.style.setProperty('--progress', String(progress));
+								: start + 30;
+							const segProgress = Math.min(1, Math.max(0, (currentTime - start) / (end - start)));
+							const yInTrack = (segRect.top - trackRect.top) + segProgress * segRect.height;
+							const trackProgress = yInTrack / trackRect.height;
+							scrubTrack.style.setProperty('--track-progress', (trackProgress * 100) + '%');
 						}
 					};
 
@@ -2091,7 +2104,7 @@ export class Reader {
 						}), '*');
 					}, 500);
 
-					// Scrub video by clicking/dragging within a segment
+					// Scrub video via a track behind the timestamps
 					const seekTo = (seconds: number) => {
 						if (!iframe.contentWindow) return;
 						iframe.contentWindow.postMessage(JSON.stringify({
@@ -2101,47 +2114,54 @@ export class Reader {
 						}), '*');
 					};
 
-					const getSeekTime = (e: MouseEvent, seg: HTMLElement, idx: number): number => {
-						const rect = seg.getBoundingClientRect();
-						const progress = Math.min(1, Math.max(0, (e.clientY - rect.top) / rect.height));
-						const start = segmentTimes[idx];
-						const end = idx < segmentTimes.length - 1
-							? segmentTimes[idx + 1]
-							: start + 30;
-						return start + progress * (end - start);
+					// Add a scrub track behind the timestamps
+					const scrubTrack = doc.createElement('div');
+					scrubTrack.className = 'transcript-scrub-track';
+					transcript.style.position = 'relative';
+					transcript.appendChild(scrubTrack);
+					// Position from first segment to bottom
+					const positionTrack = () => {
+						const transcriptRect = transcript.getBoundingClientRect();
+						const firstSegRect = segments[0].getBoundingClientRect();
+						scrubTrack.style.top = (firstSegRect.top - transcriptRect.top) + 'px';
+					};
+					positionTrack();
+
+					const getTimeFromY = (clientY: number): number => {
+						// Find which segment the Y position falls within
+						for (let i = segments.length - 1; i >= 0; i--) {
+							const rect = segments[i].getBoundingClientRect();
+							if (clientY >= rect.top) {
+								const progress = Math.min(1, (clientY - rect.top) / rect.height);
+								const start = segmentTimes[i];
+								const end = i < segmentTimes.length - 1
+									? segmentTimes[i + 1]
+									: start + 30;
+								return start + progress * (end - start);
+							}
+						}
+						return segmentTimes[0] || 0;
 					};
 
 					let scrubbing = false;
-					let scrubSegment: HTMLElement | null = null;
-					let scrubIndex = -1;
+					let lastScrub = 0;
 
-					transcript.addEventListener('mousedown', (e) => {
-						const target = e.target as HTMLElement;
-						if (!target.closest('.timestamp') && !target.querySelector('.timestamp')) return;
-						const seg = target.closest('.transcript-segment') as HTMLElement | null;
-						if (!seg) return;
-						const idx = segments.indexOf(seg);
-						if (idx < 0) return;
+					scrubTrack.addEventListener('mousedown', (e) => {
 						scrubbing = true;
-						scrubSegment = seg;
-						scrubIndex = idx;
-						seekTo(getSeekTime(e as MouseEvent, seg, idx));
+						seekTo(getTimeFromY(e.clientY));
 						e.preventDefault();
 					});
 
-					let lastScrub = 0;
 					window.addEventListener('mousemove', (e) => {
-						if (!scrubbing || !scrubSegment) return;
+						if (!scrubbing) return;
 						const now = Date.now();
 						if (now - lastScrub < 100) return;
 						lastScrub = now;
-						seekTo(getSeekTime(e, scrubSegment, scrubIndex));
+						seekTo(getTimeFromY(e.clientY));
 					});
 
 					window.addEventListener('mouseup', () => {
 						scrubbing = false;
-						scrubSegment = null;
-						scrubIndex = -1;
 					});
 				}
 			}
