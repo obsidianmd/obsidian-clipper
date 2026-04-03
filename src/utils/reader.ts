@@ -1054,6 +1054,13 @@ export class Reader {
 
 	private static cleanupScripts(doc: Document) {
 		try {
+			// Polyfill requestIdleCallback for WebKit-based browsers (e.g. Orion)
+			// that don't support it — page scripts may reference it in disconnectedCallback
+			if (typeof window !== 'undefined' && typeof window.requestIdleCallback === 'undefined') {
+				(window as any).requestIdleCallback = (cb: Function) => setTimeout(cb, 1);
+				(window as any).cancelIdleCallback = (id: number) => clearTimeout(id);
+			}
+
 			// Only attempt to clear timeouts if we have access to these methods
 			if (typeof window !== 'undefined' && window.clearTimeout && window.clearInterval) {
 				const nativeClearTimeout = window.clearTimeout.bind(window);
@@ -1715,6 +1722,16 @@ export class Reader {
 					el.remove();
 				}
 			});
+
+			// Re-add reader CSS as a link element after cleanup
+			// The CSS injected by insertCSS lacks the protected id and gets removed above
+			if (!doc.getElementById('obsidian-reader-styles')) {
+				const readerLink = doc.createElement('link');
+				readerLink.id = 'obsidian-reader-styles';
+				readerLink.rel = 'stylesheet';
+				readerLink.href = browser.runtime.getURL('reader.css');
+				doc.head.appendChild(readerLink);
+			}
 
 			// Ensure we have our required meta tags
 			const existingViewport = head.querySelector('meta[name="viewport"]');

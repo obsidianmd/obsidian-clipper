@@ -529,25 +529,29 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 });
 
 browser.commands.onCommand.addListener(async (command, tab) => {
-	if (command === 'quick_clip') {
-		browser.tabs.query({active: true, currentWindow: true}).then((tabs) => {
-			if (tabs[0]?.id) {
-				browser.action.openPopup();
-				setTimeout(() => {
-					browser.runtime.sendMessage({action: "triggerQuickClip"})
-						.catch(error => console.error("Failed to send quick clip message:", error));
-				}, 500);
-			}
-		});
+	// Some browsers (e.g. Orion) don't pass the tab parameter, so fall back to querying
+	if (!tab?.id) {
+		const tabs = await browser.tabs.query({active: true, currentWindow: true});
+		tab = tabs[0];
 	}
-	if (command === "toggle_highlighter" && tab && tab.id) {
+
+	if (command === 'quick_clip') {
+		if (tab?.id) {
+			browser.action.openPopup();
+			setTimeout(() => {
+				browser.runtime.sendMessage({action: "triggerQuickClip"})
+					.catch(error => console.error("Failed to send quick clip message:", error));
+			}, 500);
+		}
+	}
+	if (command === "toggle_highlighter" && tab?.id) {
 		await ensureContentScriptLoadedInBackground(tab.id);
 		toggleHighlighterMode(tab.id);
 	}
-	if (command === "copy_to_clipboard" && tab && tab.id) {
+	if (command === "copy_to_clipboard" && tab?.id) {
 		await browser.tabs.sendMessage(tab.id, { action: "copyToClipboard" });
 	}
-	if (command === "toggle_reader" && tab && tab.id) {
+	if (command === "toggle_reader" && tab?.id) {
 		await ensureContentScriptLoadedInBackground(tab.id);
 		await injectReaderScript(tab.id);
 		await browser.tabs.sendMessage(tab.id, { action: "toggleReaderMode" });

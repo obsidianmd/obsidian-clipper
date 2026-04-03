@@ -7,6 +7,7 @@ import { extractContentBySelector as extractContentBySelectorShared } from './ut
 import { createMarkdownContent } from 'defuddle/full';
 import { flattenShadowDom } from './utils/flatten-shadow-dom';
 import { saveFile } from './utils/file-utils';
+import { debugLog } from './utils/debug';
 
 declare global {
 	interface Window {
@@ -23,7 +24,7 @@ declare global {
 	window.obsidianClipperGeneration = (window.obsidianClipperGeneration ?? 0) + 1;
 	const myGeneration = window.obsidianClipperGeneration;
 
-	console.log('[Obsidian Clipper] Initializing content script, generation', myGeneration);
+	debugLog('Clipper', 'Initializing content script, generation', myGeneration);
 
 	let isHighlighterMode = false;
 	const iframeId = 'obsidian-clipper-iframe';
