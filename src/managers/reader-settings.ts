@@ -103,6 +103,11 @@ const fontCheckCtx = fontCheckCanvas.getContext('2d');
 const fontCheckText = 'abcdefghijklmnopqrstuvwxyz0123456789';
 
 function isFontAvailable(fontName: string): boolean {
+	// Safari and Firefox block canvas font detection as an anti-fingerprinting measure
+	const html = document.documentElement;
+	if (html.classList.contains('is-safari') || html.classList.contains('is-firefox')) {
+		return document.fonts.check(`16px "${fontName}"`);
+	}
 	if (!fontCheckCtx) return true;
 	fontCheckCtx.font = '16px monospace';
 	const baseWidth = fontCheckCtx.measureText(fontCheckText).width;
