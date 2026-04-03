@@ -133,6 +133,7 @@
 	flex-direction: column;
 	gap: 8px;
 	margin: 24px max(6%, 24px) 72px max(6%, 24px);
+	max-width: 600px;
 
 	&.active {
 		display: block;
