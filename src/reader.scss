@@ -346,6 +346,20 @@
 				var(--color-red) calc(var(--track-progress, 0%) + 2px),
 				transparent calc(var(--track-progress, 0%) + 2px)
 			) no-repeat left / calc(var(--timestamp-width) - 0.5em) 100%;
+		.transcript-scrub-hover {
+			position: absolute;
+			left: 0;
+			width: calc(100% - 0.5em);
+			height: 2px;
+			background: var(--background-primary-alt);
+			pointer-events: none;
+			opacity: 0;
+			transition: opacity 0.1s;
+			mix-blend-mode: multiply;
+		}
+	}
+	.youtube.transcript:hover .transcript-scrub-hover {
+		opacity: 1;
 	}
 	figure {
 		margin-inline-start: 0;

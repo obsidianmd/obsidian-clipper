@@ -719,6 +719,11 @@ export class Reader {
 	}
 
 
+	private static getStickyOffset(): number {
+		const player = document.querySelector('iframe.sticky-player') as HTMLElement | null;
+		return player ? player.getBoundingClientRect().height + 16 : 0;
+	}
+
 	private static scrollTo(targetY: number, duration = 200): void {
 		const startY = window.pageYOffset;
 		const distance = targetY - startY;
@@ -844,7 +849,7 @@ export class Reader {
 			
 			item.addEventListener('click', () => {
 				const rect = heading.getBoundingClientRect();
-				const targetY = (window.pageYOffset || doc.documentElement.scrollTop) + rect.top - window.innerHeight * 0.05;
+				const targetY = (window.pageYOffset || doc.documentElement.scrollTop) + rect.top - window.innerHeight * 0.05 - this.getStickyOffset();
 				this.scrollTo(targetY);
 			});
 
@@ -883,10 +888,30 @@ export class Reader {
 			});
 		};
 
-		const observer = new IntersectionObserver(observerCallback, {
-			rootMargin: '-5% 0px -85% 0px', // Triggers when heading is in top 20% of viewport
-			threshold: 0
-		});
+		const createOutlineObserver = () => {
+			const stickyOffset = this.getStickyOffset();
+			const topMargin = stickyOffset > 0
+				? `-${Math.round(stickyOffset / window.innerHeight * 100 + 5)}%`
+				: '-5%';
+			return new IntersectionObserver(observerCallback, {
+				rootMargin: `${topMargin} 0px -85% 0px`,
+				threshold: 0
+			});
+		};
+
+		let observer = createOutlineObserver();
+
+		// Recreate observer when sticky player appears/resizes
+		const stickyPlayer = doc.querySelector('iframe.sticky-player');
+		if (stickyPlayer) {
+			const resizeObserver = new ResizeObserver(() => {
+				observer.disconnect();
+				observer = createOutlineObserver();
+				if (titleHeading) observer.observe(titleHeading);
+				headings.forEach(heading => observer.observe(heading));
+			});
+			resizeObserver.observe(stickyPlayer);
+		}
 
 		if (titleHeading) {
 			observer.observe(titleHeading);
@@ -905,7 +930,7 @@ export class Reader {
 			
 			item.addEventListener('click', () => {
 				const rect = footnotes.getBoundingClientRect();
-				const targetY = (window.pageYOffset || doc.documentElement.scrollTop) + rect.top - window.innerHeight * 0.05;
+				const targetY = (window.pageYOffset || doc.documentElement.scrollTop) + rect.top - window.innerHeight * 0.05 - this.getStickyOffset();
 				this.scrollTo(targetY);
 			});
 
@@ -1009,7 +1034,7 @@ export class Reader {
 				const refElement = doc.getElementById(refId);
 				if (refElement) {
 					const rect = refElement.getBoundingClientRect();
-					const targetY = (window.pageYOffset || doc.documentElement.scrollTop) + rect.top - window.innerHeight * 0.4;
+					const targetY = (window.pageYOffset || doc.documentElement.scrollTop) + rect.top - window.innerHeight * 0.4 - this.getStickyOffset();
 					this.scrollTo(targetY);
 				}
 				return;
@@ -2247,8 +2272,19 @@ export class Reader {
 					// Add a scrub track behind the timestamps
 					const scrubTrack = doc.createElement('div');
 					scrubTrack.className = 'transcript-scrub-track';
+					const scrubHover = doc.createElement('div');
+					scrubHover.className = 'transcript-scrub-hover';
+					scrubTrack.appendChild(scrubHover);
 					transcript.style.position = 'relative';
 					transcript.appendChild(scrubTrack);
+
+					transcript.addEventListener('mousemove', (e) => {
+						const rect = scrubTrack.getBoundingClientRect();
+						scrubHover.style.top = (e.clientY - rect.top) + 'px';
+					});
+					transcript.addEventListener('mouseleave', () => {
+						scrubHover.style.top = '';
+					});
 					// Position from first segment to bottom
 					const positionTrack = () => {
 						const transcriptRect = transcript.getBoundingClientRect();
