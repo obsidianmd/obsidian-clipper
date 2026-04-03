@@ -132,10 +132,10 @@
 	}
 
 	.obsidian-reader-content {
-		padding: max(4rem, 4vh) 0 0 !important;	
+		padding: max(4rem, 4vh) 1rem 0 !important;	
 		width: var(--line-width);
 		max-width: calc(100vw - var(--sidebar-width));
-		overflow: hidden;
+		overflow: clip;
 		> article {
 			margin: 0 auto;
 			max-width: 100%;
@@ -234,6 +234,54 @@
 			aspect-ratio: 16 / 9;
 			height: auto;
 		}
+		&.sticky-player {
+			position: sticky;
+			top: 0;
+			z-index: 1;
+		}
+	}
+	.transcript-segment {
+		border-radius: var(--radius-s);
+		corner-shape: var(--corner-shape);
+	}
+	.transcript-segment {
+		display: flex;
+		gap: 0.75em;
+		> strong {
+			flex-shrink: 0;
+			padding-inline-end: 0.25em;
+			cursor: ns-resize;
+			font-variant: tabular-nums;
+			&:hover .timestamp {
+				color: var(--text-normal);
+			}
+		}
+		&.is-active {
+			> strong {
+				background:
+					linear-gradient(
+						to bottom,
+						transparent 0,
+						transparent calc(var(--progress, 0) * 100%),
+						var(--color-red) calc(var(--progress, 0) * 100%),
+						var(--color-red) calc(var(--progress, 0) * 100% + 2px),
+						transparent calc(var(--progress, 0) * 100%)
+					) no-repeat;
+			}
+		}
+		.transcript-segment-text {
+			flex: 1;
+			min-width: 0;
+			border-radius: var(--radius-s);
+			padding: 0 0.5em;
+		}
+	}
+	.transcript-segment.is-active {
+		.transcript-segment-text {
+			background: var(--background-primary-alt);
+			box-shadow: 0 0 0 0.25em var(--background-primary-alt);
+		}
+
 	}
 	figure {
 		margin-inline-start: 0;

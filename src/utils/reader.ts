@@ -1982,6 +1982,170 @@ export class Reader {
 				article.appendChild(contentBody.firstChild);
 			}
 
+			// Make YouTube iframe sticky when a transcript follows,
+			// and wire up timestamp clicks to seek the video
+			const transcript = article.querySelector('.youtube.transcript');
+			if (transcript) {
+				const iframe = article.querySelector('iframe[src*="youtube.com/embed/"]') as HTMLIFrameElement | null;
+				if (iframe) {
+					iframe.classList.add('sticky-player');
+
+					// Enable JS API on the embed
+					const src = new URL(iframe.src);
+					src.searchParams.set('enablejsapi', '1');
+					src.searchParams.set('origin', window.location.origin);
+					iframe.src = src.toString();
+
+					// Initialize postMessage connection once iframe loads
+					iframe.addEventListener('load', () => {
+						if (iframe.contentWindow) {
+							iframe.contentWindow.postMessage(JSON.stringify({
+								event: 'listening'
+							}), '*');
+						}
+					});
+
+					// Build a sorted list of segments with their start times
+					const segments = Array.from(transcript.querySelectorAll('.transcript-segment')) as HTMLElement[];
+					segments.forEach(seg => {
+						// Pull the timestamp out into its own element
+						// and wrap remaining text in a span
+						const strong = seg.querySelector('strong');
+						if (!strong) return;
+
+						// Remove " · " separator
+						if (strong.nextSibling?.nodeType === Node.TEXT_NODE) {
+							strong.nextSibling.textContent = strong.nextSibling.textContent!.replace(/^\s*·\s*/, '');
+						}
+
+						// Move timestamp strong out, wrap the rest in a div
+						const textWrapper = doc.createElement('div');
+						textWrapper.className = 'transcript-segment-text';
+						strong.remove();
+						while (seg.firstChild) {
+							textWrapper.appendChild(seg.firstChild);
+						}
+						seg.appendChild(strong);
+						seg.appendChild(textWrapper);
+					});
+					const segmentTimes = segments.map(seg => {
+						const ts = seg.querySelector('.timestamp');
+						return parseFloat(ts?.getAttribute('data-timestamp') || '0');
+					});
+
+					// Track active segment based on video current time
+					let activeSegment: HTMLElement | null = null;
+					let activeIndex = -1;
+
+					const updateActiveSegment = (currentTime: number) => {
+						let newIndex = -1;
+						for (let i = segmentTimes.length - 1; i >= 0; i--) {
+							if (currentTime >= segmentTimes[i]) {
+								newIndex = i;
+								break;
+							}
+						}
+						if (newIndex !== activeIndex) {
+							activeSegment?.classList.remove('is-active');
+							activeSegment?.style.removeProperty('--progress');
+							if (newIndex >= 0) {
+								segments[newIndex].classList.add('is-active');
+							}
+							activeSegment = newIndex >= 0 ? segments[newIndex] : null;
+							activeIndex = newIndex;
+						}
+						// Update progress within the active segment
+						if (activeSegment && activeIndex >= 0) {
+							const start = segmentTimes[activeIndex];
+							const end = activeIndex < segmentTimes.length - 1
+								? segmentTimes[activeIndex + 1]
+								: start + 30; // estimate last segment duration
+							const progress = Math.min(1, Math.max(0, (currentTime - start) / (end - start)));
+							activeSegment.style.setProperty('--progress', String(progress));
+						}
+					};
+
+					// Listen for time updates from the iframe
+					const onMessage = (e: MessageEvent) => {
+						if (e.source !== iframe.contentWindow) return;
+						try {
+							const data = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
+							if (data?.info?.currentTime !== undefined) {
+								updateActiveSegment(data.info.currentTime);
+							}
+						} catch {}
+					};
+					window.addEventListener('message', onMessage);
+
+					// Poll current time while iframe is on the page
+					const poll = setInterval(() => {
+						if (!iframe.contentWindow || !doc.contains(iframe)) {
+							clearInterval(poll);
+							window.removeEventListener('message', onMessage);
+							return;
+						}
+						iframe.contentWindow.postMessage(JSON.stringify({
+							event: 'command',
+							func: 'getCurrentTime',
+							args: []
+						}), '*');
+					}, 500);
+
+					// Scrub video by clicking/dragging within a segment
+					const seekTo = (seconds: number) => {
+						if (!iframe.contentWindow) return;
+						iframe.contentWindow.postMessage(JSON.stringify({
+							event: 'command',
+							func: 'seekTo',
+							args: [seconds, true]
+						}), '*');
+					};
+
+					const getSeekTime = (e: MouseEvent, seg: HTMLElement, idx: number): number => {
+						const rect = seg.getBoundingClientRect();
+						const progress = Math.min(1, Math.max(0, (e.clientY - rect.top) / rect.height));
+						const start = segmentTimes[idx];
+						const end = idx < segmentTimes.length - 1
+							? segmentTimes[idx + 1]
+							: start + 30;
+						return start + progress * (end - start);
+					};
+
+					let scrubbing = false;
+					let scrubSegment: HTMLElement | null = null;
+					let scrubIndex = -1;
+
+					transcript.addEventListener('mousedown', (e) => {
+						const target = e.target as HTMLElement;
+						if (!target.closest('.timestamp') && !target.querySelector('.timestamp')) return;
+						const seg = target.closest('.transcript-segment') as HTMLElement | null;
+						if (!seg) return;
+						const idx = segments.indexOf(seg);
+						if (idx < 0) return;
+						scrubbing = true;
+						scrubSegment = seg;
+						scrubIndex = idx;
+						seekTo(getSeekTime(e as MouseEvent, seg, idx));
+						e.preventDefault();
+					});
+
+					let lastScrub = 0;
+					window.addEventListener('mousemove', (e) => {
+						if (!scrubbing || !scrubSegment) return;
+						const now = Date.now();
+						if (now - lastScrub < 100) return;
+						lastScrub = now;
+						seekTo(getSeekTime(e, scrubSegment, scrubIndex));
+					});
+
+					window.addEventListener('mouseup', () => {
+						scrubbing = false;
+						scrubSegment = null;
+						scrubIndex = -1;
+					});
+				}
+			}
+
 			// Set extractor type
 			if (extractorType) {
 				doc.documentElement.setAttribute('data-reader-extractor', extractorType);
