@@ -34,6 +34,7 @@
 	--safe-area-inset-left: env(safe-area-inset-left);
 	--safe-area-inset-right: env(safe-area-inset-right);
 	--preferred-text-scale: env(preferred-text-scale);
+	--font-ui: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
 
 	--font-text: system-ui, -apple-system, sans-serif;
 	--dynamic-font-size: calc(var(--font-text-size) + 0.25vw);
@@ -251,6 +252,7 @@
 		margin-bottom: max(2rem, 3vh);
 	}
 	.metadata-details {
+		font-family: var(--font-ui);
 		color: var(--text-muted);
 		font-size: 0.9em;
 
@@ -288,8 +290,10 @@
 		}
 		&.sticky-player {
 			position: sticky;
-			top: 0;
+			top: 8px;
 			z-index: 1;
+			box-shadow: 
+				0 -8px 24px 24px var(--background-primary);
 		}
 	}
 	.transcript-segment {
@@ -298,28 +302,17 @@
 	}
 	.transcript-segment {
 		display: flex;
-		gap: 0.75em;
+		gap: 1em;
+		position: relative;
 		> strong {
+			font-family: var(--font-ui);
+			color: var(--text-muted);
+			font-size: 0.9em;
+			font-weight: 400;
 			flex-shrink: 0;
-			padding-inline-end: 0.25em;
-			cursor: ns-resize;
+			width: var(--timestamp-width);
 			font-variant: tabular-nums;
-			&:hover .timestamp {
-				color: var(--text-normal);
-			}
-		}
-		&.is-active {
-			> strong {
-				background:
-					linear-gradient(
-						to bottom,
-						transparent 0,
-						transparent calc(var(--progress, 0) * 100%),
-						var(--color-red) calc(var(--progress, 0) * 100%),
-						var(--color-red) calc(var(--progress, 0) * 100% + 2px),
-						transparent calc(var(--progress, 0) * 100%)
-					) no-repeat;
-			}
+			position: relative;
 		}
 		.transcript-segment-text {
 			flex: 1;
@@ -333,7 +326,26 @@
 			background: var(--background-primary-alt);
 			box-shadow: 0 0 0 0.25em var(--background-primary-alt);
 		}
-
+		.timestamp {
+			color: var(--text-normal);
+		}
+	}
+	.transcript-scrub-track {
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		width: var(--timestamp-width);
+		cursor: ns-resize;
+		mix-blend-mode: multiply;
+		background:
+			linear-gradient(
+				to bottom,
+				transparent 0,
+				transparent var(--track-progress, 0%),
+				var(--color-red) var(--track-progress, 0%),
+				var(--color-red) calc(var(--track-progress, 0%) + 2px),
+				transparent calc(var(--track-progress, 0%) + 2px)
+			) no-repeat left / calc(var(--timestamp-width) - 0.5em) 100%;
 	}
 	figure {
 		margin-inline-start: 0;
@@ -1023,7 +1035,7 @@
 	top: 0;
 	right: 0;
 	z-index: var(--layer-menu);
-	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+	font-family: var(--font-ui);
 	user-select: none;
 	-webkit-user-select: none;
 }
@@ -1333,6 +1345,7 @@
 	margin: 0 auto;
 }
 .obsidian-reader-outline {
+	font-family: var(--font-ui);
 	box-sizing: border-box;
 	background: var(--background-primary);
 	position: sticky;
