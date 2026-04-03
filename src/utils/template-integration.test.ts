@@ -7,6 +7,7 @@ import { createMarkdownContent } from 'defuddle/full';
 import { buildVariables, generateFrontmatter, formatPropertyValue } from './shared';
 import { compileTemplate } from './template-compiler';
 import { createAsyncResolver, createSelectorProcessor } from '../api';
+import { resolvePageMetadata } from './page-metadata';
 
 // ---------------------------------------------------------------------------
 // Freeze time so {{date}} is deterministic in expected output
@@ -33,12 +34,20 @@ async function runFixture(html: string, url: string, template: FixtureTemplate):
 	// Run defuddle — same as CLI
 	const defuddle = new DefuddleClass(document as unknown as Document, { url });
 	const defuddleResult = defuddle.parse();
+	const resolvedMetadata = resolvePageMetadata({
+		url,
+		document: document as unknown as Document,
+		title: defuddleResult.title,
+		author: defuddleResult.author,
+		metaTags: defuddleResult.metaTags,
+	});
 	const markdownContent = createMarkdownContent(defuddleResult.content, url);
 
 	// Build variables from defuddle output — same as CLI
 	const variables = buildVariables({
-		title: defuddleResult.title,
-		author: defuddleResult.author,
+		title: resolvedMetadata.title,
+		author: resolvedMetadata.author,
+		authorUrl: resolvedMetadata.authorUrl,
 		content: markdownContent,
 		contentHtml: defuddleResult.content,
 		url,

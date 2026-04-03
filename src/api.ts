@@ -8,6 +8,7 @@ import { compileTemplate, SelectorProcessor } from './utils/template-compiler';
 import { AsyncResolver, RenderContext } from './utils/renderer';
 import { applyFilters } from './utils/filters';
 import { buildVariables, generateFrontmatter, extractContentBySelector, selectorContentToString, formatPropertyValue } from './utils/shared';
+import { resolvePageMetadata } from './utils/page-metadata';
 import { sanitizeFileName } from './utils/string-utils';
 import { Template, Property } from './types/types';
 
@@ -184,14 +185,22 @@ export async function clip(options: ClipOptions): Promise<ClipResult> {
 	// Cast through unknown: linkedom's Document is structurally compatible but not nominally typed as DOM Document
 	const defuddle = new DefuddleClass(documentElement as unknown as Document, { url });
 	const defuddleResult = defuddle.parse();
+	const resolvedMetadata = resolvePageMetadata({
+		url,
+		document: doc as unknown as Document,
+		title: defuddleResult.title,
+		author: defuddleResult.author,
+		metaTags: defuddleResult.metaTags,
+	});
 
 	// Convert to markdown
 	const markdownContent = createMarkdownContent(defuddleResult.content, url);
 
 	// Build template variables
 	const variables = buildVariables({
-		title: defuddleResult.title,
-		author: defuddleResult.author,
+		title: resolvedMetadata.title,
+		author: resolvedMetadata.author,
+		authorUrl: resolvedMetadata.authorUrl,
 		content: markdownContent,
 		contentHtml: defuddleResult.content,
 		url,

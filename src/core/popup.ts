@@ -675,7 +675,8 @@ async function refreshFields(tabId: number, checkTemplateTriggers: boolean = tru
 				extractedData.site,
 				extractedData.wordCount,
 				extractedData.language || '',
-				extractedData.metaTags
+				extractedData.metaTags,
+				extractedData.authorUrl
 			);
 			if (initializedContent) {
 				currentVariables = initializedContent.currentVariables;

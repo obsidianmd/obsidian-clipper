@@ -111,6 +111,8 @@ async function prepareTemplateForSave(template: Template): Promise<[string[], st
 }
 
 export function createDefaultTemplate(): Template {
+	const authorDefaultValue = '{% if authorLink %}{{authorLink}}{% else %}{{author|split:", "|wikilink|join}}{% endif %}';
+
 	return {
 		id: Date.now().toString() + Math.random().toString(36).slice(2, 11),
 		name: getMessage('defaultTemplateName'),
@@ -122,7 +124,7 @@ export function createDefaultTemplate(): Template {
 		properties: [
 			{ id: Date.now().toString() + Math.random().toString(36).slice(2, 11), name: 'title', value: '{{title}}' },
 			{ id: Date.now().toString() + Math.random().toString(36).slice(2, 11), name: 'source', value: '{{url}}' },
-			{ id: Date.now().toString() + Math.random().toString(36).slice(2, 11), name: 'author', value: '{{author|split:", "|wikilink|join}}' },
+			{ id: Date.now().toString() + Math.random().toString(36).slice(2, 11), name: 'author', value: authorDefaultValue },
 			{ id: Date.now().toString() + Math.random().toString(36).slice(2, 11), name: 'published', value: '{{published}}' },
 			{ id: Date.now().toString() + Math.random().toString(36).slice(2, 11), name: 'created', value: '{{date}}' },
 			{ id: Date.now().toString() + Math.random().toString(36).slice(2, 11), name: 'description', value: '{{description}}' },
@@ -212,7 +214,7 @@ async function updateGlobalPropertyTypes(templates: Template[]): Promise<void> {
 	const defaultTypes: { [key: string]: { type: string, defaultValue: string } } = {
 		'title': { type: 'text', defaultValue: '{{title}}' },
 		'source': { type: 'text', defaultValue: '{{url}}' },
-		'author': { type: 'multitext', defaultValue: '{{author|split:", "|wikilink|join}}' },
+		'author': { type: 'multitext', defaultValue: '{% if authorLink %}{{authorLink}}{% else %}{{author|split:", "|wikilink|join}}{% endif %}' },
 		'published': { type: 'date', defaultValue: '{{published}}' },
 		'created': { type: 'date', defaultValue: '{{date}}' },
 		'description': { type: 'text', defaultValue: '{{description}}' },

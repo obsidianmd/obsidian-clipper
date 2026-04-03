@@ -7,6 +7,7 @@ import { extractContentBySelector as extractContentBySelectorShared } from './ut
 import { createMarkdownContent } from 'defuddle/full';
 import { flattenShadowDom } from './utils/flatten-shadow-dom';
 import { saveFile } from './utils/file-utils';
+import { resolvePageMetadata } from './utils/page-metadata';
 
 declare global {
 	interface Window {
@@ -170,6 +171,7 @@ declare global {
 		parseTime: number;
 		published: string;
 		author: string;
+		authorUrl: string;
 		site: string;
 		wordCount: number;
 		language: string;
@@ -288,6 +290,13 @@ declare global {
 				);
 				const defuddled = await Promise.race([defuddle.parseAsync(), parseTimeout])
 					.catch(() => defuddle.parse());
+				const resolvedMetadata = resolvePageMetadata({
+					url: document.URL,
+					document,
+					title: defuddled.title,
+					author: defuddled.author,
+					metaTags: defuddled.metaTags,
+				});
 				const extractedContent: { [key: string]: string } = {
 					...defuddled.variables,
 				};
@@ -335,7 +344,8 @@ declare global {
 				const cleanedHtml = doc.documentElement.outerHTML;
 
 				const response: ContentResponse = {
-					author: defuddled.author,
+					author: resolvedMetadata.author,
+					authorUrl: resolvedMetadata.authorUrl,
 					content: defuddled.content,
 					description: defuddled.description,
 					domain: getDomain(document.URL),
@@ -350,7 +360,7 @@ declare global {
 					schemaOrgData: defuddled.schemaOrgData,
 					selectedHtml: selectedHtml,
 					site: defuddled.site,
-					title: defuddled.title,
+					title: resolvedMetadata.title,
 					wordCount: defuddled.wordCount,
 					metaTags: defuddled.metaTags || []
 				};

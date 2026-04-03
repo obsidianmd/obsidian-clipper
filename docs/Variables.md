@@ -20,6 +20,9 @@ The main content variable is `{{content}}`, which contains the article content, 
 | Variable            | Description                                                                            |
 | ------------------- | -------------------------------------------------------------------------------------- |
 | `{{author}}`        | Author of the page                                                                     |
+| `{{authorHandle}}`  | Author name formatted for the page, e.g. `@name` on Weibo                              |
+| `{{authorLink}}`    | Author as a Markdown link when the page exposes a profile URL                          |
+| `{{authorUrl}}`     | Author profile URL when it can be extracted                                            |
 | `{{content}}`       | Article content, [[Highlight web pages\|highlights]], or selection, in Markdown format |
 | `{{contentHtml}}`   | Article content, [[Highlight web pages\|highlights]], or selection, in HTML format     |
 | `{{date}}`          | Current date, can be formatted using the `date` filter                                 |
@@ -117,4 +120,3 @@ Nested properties and array access work as well, both with and without the schem
 - `{{schema:author.name}}` will find the first `author` property and then access its `name` sub-property.
 - `{{schema:author[0].name}}` will access the `name` of the first author in an array of authors.
 - `{{schema:author[*].name}}` will return an array of all author names.
-

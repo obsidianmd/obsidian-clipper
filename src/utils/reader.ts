@@ -9,6 +9,7 @@ import { applyHighlights, invalidateHighlightCache, loadHighlights } from './hig
 import { copyToClipboard } from './clipboard-utils';
 import { getMessage, initializeI18n } from './i18n';
 import { getFontCss } from './font-utils';
+import { resolvePageMetadata } from './page-metadata';
 
 // Mobile viewport settings
 const VIEWPORT = 'width=device-width, initial-scale=1, maximum-scale=1';
@@ -694,11 +695,18 @@ export class Reader {
 
 		const defuddle = new Defuddle(doc, { url: doc.URL });
 		const defuddled = await defuddle.parseAsync();
+		const resolvedMetadata = resolvePageMetadata({
+			url: doc.URL,
+			document: doc,
+			title: defuddled.title,
+			author: defuddled.author,
+			metaTags: defuddled.metaTags,
+		});
 
 		return {
 			content: defuddled.content,
-			title: defuddled.title,
-			author: defuddled.author,
+			title: resolvedMetadata.title,
+			author: resolvedMetadata.author,
 			published: defuddled.published,
 			domain: getDomain(doc.URL),
 			wordCount: defuddled.wordCount,

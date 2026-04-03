@@ -48,6 +48,7 @@ interface ContentResponse {
 	highlights: AnyHighlightData[];
 	title: string;
 	author: string;
+	authorUrl: string;
 	description: string;
 	domain: string;
 	favicon: string;
@@ -137,7 +138,8 @@ export async function initializePageContent(
 	site: string,
 	wordCount: number,
 	language: string,
-	metaTags: { name?: string | null; property?: string | null; content: string | null }[]
+	metaTags: { name?: string | null; property?: string | null; content: string | null }[],
+	authorUrl: string
 ) {
 	try {
 		currentUrl = currentUrl.replace(/#:~:text=[^&]+(&|$)/, '');
@@ -178,6 +180,7 @@ export async function initializePageContent(
 		const currentVariables = buildVariables({
 			title,
 			author,
+			authorUrl,
 			content: markdownBody,
 			contentHtml: content,
 			url: currentUrl,

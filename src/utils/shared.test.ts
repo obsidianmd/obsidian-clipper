@@ -39,6 +39,9 @@ describe('buildVariables', () => {
 		const vars = buildVariables(makeParams());
 		expect(vars['{{title}}']).toBe('Test Title');
 		expect(vars['{{author}}']).toBe('Test Author');
+		expect(vars['{{authorHandle}}']).toBe('');
+		expect(vars['{{authorLink}}']).toBe('');
+		expect(vars['{{authorUrl}}']).toBe('');
 		expect(vars['{{content}}']).toBe('markdown body');
 		expect(vars['{{contentHtml}}']).toBe('<p>html body</p>');
 		expect(vars['{{url}}']).toBe('https://example.com/page');
@@ -72,6 +75,18 @@ describe('buildVariables', () => {
 		}));
 		expect(vars['{{title}}']).toBe('padded title');
 		expect(vars['{{author}}']).toBe('padded author');
+	});
+
+	test('builds weibo author link variables when author URL is provided', () => {
+		const vars = buildVariables(makeParams({
+			url: 'https://weibo.com/1234567890/AbCdEf',
+			author: '三体观察员',
+			authorUrl: 'https://weibo.com/u/1234567890',
+		}));
+		expect(vars['{{author}}']).toBe('三体观察员');
+		expect(vars['{{authorHandle}}']).toBe('@三体观察员');
+		expect(vars['{{authorUrl}}']).toBe('https://weibo.com/u/1234567890');
+		expect(vars['{{authorLink}}']).toBe('[@三体观察员](https://weibo.com/u/1234567890)');
 	});
 
 	test('handles empty/falsy values', () => {

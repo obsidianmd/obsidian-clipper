@@ -14,6 +14,7 @@ import dayjs from 'dayjs';
 export interface BuildVariablesParams {
 	title: string;
 	author: string;
+	authorUrl?: string;
 	content: string;
 	contentHtml: string;
 	url: string;
@@ -40,10 +41,27 @@ export interface BuildVariablesParams {
 export function buildVariables(params: BuildVariablesParams): Record<string, string> {
 	const currentUrl = params.url.replace(/#:~:text=[^&]+(&|$)/, '');
 	const noteName = sanitizeFileName(params.title);
+	let isWeiboAuthor = false;
+	try {
+		isWeiboAuthor = /(^|\.)weibo\.com$|^m\.weibo\.cn$|^weibo\.cn$/i.test(new URL(currentUrl).hostname);
+	} catch (error) {
+		isWeiboAuthor = false;
+	}
+	const author = (params.author || '').trim();
+	const authorUrl = (params.authorUrl || '').trim();
+	const authorHandle = author
+		? (isWeiboAuthor ? (author.startsWith('@') ? author : `@${author}`) : '')
+		: '';
+	const authorLink = authorUrl
+		? `[${authorHandle || author}](${authorUrl})`
+		: '';
 
 	const timestamp = dayjs().format('YYYY-MM-DDTHH:mm:ssZ');
 	const variables: Record<string, string> = {
-		'{{author}}': (params.author || '').trim(),
+		'{{author}}': author,
+		'{{authorHandle}}': authorHandle,
+		'{{authorLink}}': authorLink,
+		'{{authorUrl}}': authorUrl,
 		'{{content}}': (params.content || '').trim(),
 		'{{contentHtml}}': (params.contentHtml || '').trim(),
 		'{{selection}}': (params.selection || '').trim(),
