@@ -56,11 +56,13 @@
 #property-types-list.properties-list {
 	.property-editor {
 		border-radius: var(--radius-s);
+		corner-shape: var(--corner-shape);
 		.tree-item-flair {
 			min-width: 1.5rem;
 			text-align: center;
 			padding: 0.25rem;
 			border-radius: var(--radius-s);
+			corner-shape: var(--corner-shape);
 			color: var(--text-faint);
 			margin-left: auto;
 			justify-self: flex-end;
@@ -141,10 +143,10 @@
 	align-items: flex-start;
 	gap: 0.5rem;
 	border-radius: var(--radius-s);
+	corner-shape: var(--corner-shape);
 	font-size: var(--font-ui-smaller);
 	margin-top: 0.5rem;
 	padding: 12px;
-	border-radius: var(--radius-s);
 
 	svg {
 		width: 16px;

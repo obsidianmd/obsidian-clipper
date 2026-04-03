@@ -568,6 +568,9 @@
 	"prependToExisting": {
 		"message": "Προσθήκη στην αρχή υπάρχουσας σημείωσης"
 	},
+	"preview": {
+		"message": "Προεπισκόπηση"
+	},
 	"processing": {
 		"message": "επεξεργασία"
 	},
@@ -648,6 +651,120 @@
 	},
 	"reader": {
 		"message": "Αναγνώστης"
+	},
+	"readerAppearance": {
+		"message": "Εμφάνιση"
+	},
+	"readerAppearanceAuto": {
+		"message": "Αυτόματο"
+	},
+	"readerAppearanceDark": {
+		"message": "Σκούρο"
+	},
+	"readerAppearanceDescription": {
+		"message": "Επιλέξτε φωτεινή ή σκούρα εμφάνιση."
+	},
+	"readerAppearanceLight": {
+		"message": "Φωτεινό"
+	},
+	"readerBlendImages": {
+		"message": "Ανάμειξη εικόνων"
+	},
+	"readerBlendImagesDescription": {
+		"message": "Αναμείξτε τις εικόνες με το φόντο της σελίδας."
+	},
+	"readerCloseImageViewer": {
+		"message": "Κλείσιμο προβολέα εικόνων"
+	},
+	"readerCollapseComment": {
+		"message": "Σύμπτυξη σχολίου"
+	},
+	"readerColorLinks": {
+		"message": "Χρωματισμός συνδέσμων"
+	},
+	"readerColorSchemeDefault": {
+		"message": "Προεπιλογή"
+	},
+	"readerCustomCss": {
+		"message": "Προσαρμοσμένο CSS"
+	},
+	"readerCustomCssDescription": {
+		"message": "CSS που εφαρμόζεται αυτόματα στην προβολή ανάγνωσης."
+	},
+	"readerDarkTheme": {
+		"message": "Θέμα σκοτεινής λειτουργίας"
+	},
+	"readerDarkThemeDescription": {
+		"message": "Χρησιμοποιήστε διαφορετικό θέμα στη σκοτεινή λειτουργία."
+	},
+	"readerError": {
+		"message": "Αποτυχία εξαγωγής περιεχομένου."
+	},
+	"readerFont": {
+		"message": "Επιλογές γραμματοσειράς"
+	},
+	"readerFontDefault": {
+		"message": "Προεπιλογή"
+	},
+	"readerFontDescription": {
+		"message": "Προσθέστε γραμματοσειρές που είναι εγκατεστημένες στο σύστημά σας. Πατήστε Enter για να προσθέσετε μια γραμματοσειρά."
+	},
+	"readerFontNotFound": {
+		"message": "Δεν βρέθηκε"
+	},
+	"readerFontPlaceholder": {
+		"message": "Πατήστε Enter για να προσθέσετε μια γραμματοσειρά"
+	},
+	"readerFontSetDefault": {
+		"message": "Ορισμός ως προεπιλογή"
+	},
+	"readerFontSize": {
+		"message": "Βασικό μέγεθος γραμματοσειράς"
+	},
+	"readerFontSystem": {
+		"message": "Σύστημα"
+	},
+	"readerFontSystemSans": {
+		"message": "Sans-serif"
+	},
+	"readerFontSystemSerif": {
+		"message": "Serif"
+	},
+	"readerFonts": {
+		"message": "Γραμματοσειρές"
+	},
+	"readerFootnotes": {
+		"message": "Υποσημειώσεις"
+	},
+	"readerImages": {
+		"message": "Εικόνες"
+	},
+	"readerLineHeight": {
+		"message": "Ύψος γραμμής"
+	},
+	"readerLineWidth": {
+		"message": "Πλάτος γραμμής"
+	},
+	"readerLoading": {
+		"message": "Αποθόλωση…"
+	},
+	"readerSettings": {
+		"message": "Ρυθμίσεις αναγνώστη"
+	},
+	"readerTheme": {
+		"message": "Θέμα"
+	},
+	"readerThemeDescription": {
+		"message": "Επιλέξτε τα χρώματα που χρησιμοποιούνται στην προβολή ανάγνωσης."
+	},
+	"readerThemeSection": {
+		"message": "Θέμα"
+	},
+	"readerTypography": {
+		"message": "Τυπογραφία"
+	},
+	"readerViewFullSize": {
+		"message": "Προβολή σε πλήρες μέγεθος"
 	},
 	"recommended": {
 		"message": "προτεινόμενο"
@@ -766,6 +883,9 @@
 	"systemDefault": {
 		"message": "Προεπιλογή συστήματος"
 	},
+	"template": {
+		"message": "Πρότυπο"
+	},
 	"templateCopied": {
 		"message": "Το JSON προτύπου αντιγράφηκε στο πρόχειρο"
 	},
@@ -777,6 +897,12 @@
 	},
 	"templateErrorsCount": {
 		"message": "Υπάρχουν $1 σφάλματα στο πρότυπό σας."
+	},
+	"templateGroupContent": {
+		"message": "Περιεχόμενο"
+	},
+	"templateGroupLocation": {
+		"message": "Τοποθεσία"
 	},
 	"templateName": {
 		"message": "Όνομα προτύπου"

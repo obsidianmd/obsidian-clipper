@@ -149,9 +149,6 @@ export function toggleHighlighterMenu(isActive: boolean) {
 		enableLinkClicks();
 		removeHighlighterMenu();
 		browser.runtime.sendMessage({ action: "highlighterModeChanged", isActive: false });
-		if (!generalSettings.alwaysShowHighlights) {
-			removeExistingHighlights();
-		}
 	}
 	updateHighlightListeners();
 }
@@ -917,6 +914,10 @@ export function saveHighlights() {
 }
 
 // Apply all highlights to the page
+export function invalidateHighlightCache() {
+	lastAppliedHighlights = '';
+}
+
 export function applyHighlights() {
 	if (highlights.length === 0) {
 		return; // Don't do anything if there are no highlights

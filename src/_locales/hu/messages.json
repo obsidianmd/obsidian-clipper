@@ -1,0 +1,979 @@
+{
+	"activity": {
+		"message": "Tevékenység"
+	},
+	"addModel": {
+		"message": "+ Modell hozzáadása"
+	},
+	"addModelTitle": {
+		"message": "Modell hozzáadása"
+	},
+	"addProperty": {
+		"message": "+ Tulajdonság hozzáadása"
+	},
+	"addProvider": {
+		"message": "+ Szolgáltató hozzáadása"
+	},
+	"addProviderTitle": {
+		"message": "Szolgáltató hozzáadása"
+	},
+	"addToObsidian": {
+		"message": "Hozzáadás az Obsidianhoz"
+	},
+	"addVaultPlaceholder": {
+		"message": "Nyomd meg az Entert egy vault hozzáadásához"
+	},
+	"advanced": {
+		"message": "Speciális"
+	},
+	"allProperties": {
+		"message": "Összes tulajdonság"
+	},
+	"allTime": {
+		"message": "Összes idő"
+	},
+	"alwaysShowHighlights": {
+		"message": "Kiemelések mindig megjelenítése"
+	},
+	"alwaysShowHighlightsDescription": {
+		"message": "A mentett kiemelések megjelenítése az oldal betöltésekor. Kapcsold ki, ha csak akkor szeretnéd megjeleníteni a kiemeléseket, amikor a kiemelő mód aktiválva van."
+	},
+	"apiKeyMissing": {
+		"message": "Nincs API-kulcs"
+	},
+	"apiKeysWarning": {
+		"message": "Külső szolgáltató használatával elfogadod annak feltételeit és adatvédelmi irányelveit. Az interpreter kérései közvetlenül a választott szolgáltatóhoz kerülnek elküldésre. Az Obsidian nem gyűjt és nem tárol semmilyen adatot a kéréseidről."
+	},
+	"appendToDaily": {
+		"message": "Hozzáadás a napi jegyzethez, alul"
+	},
+	"appendToExisting": {
+		"message": "Hozzáadás egy meglévő jegyzethez, alul"
+	},
+	"autoRunInterpreter": {
+		"message": "Automatikus futtatás"
+	},
+	"autoRunInterpreterDescription": {
+		"message": "A promptváltozók azonnali futtatása, ha a sablon tartalmaz ilyet. Ez API-krediteket fog felhasználni a modellszolgáltatódnál. Kapcsold ki, ha csak kézzel szeretnéd futtatni az interpretert."
+	},
+	"behavior": {
+		"message": "Viselkedés"
+	},
+	"byDay": {
+		"message": "Napok"
+	},
+	"byMonth": {
+		"message": "Hónapok"
+	},
+	"byWeek": {
+		"message": "Hetek"
+	},
+	"cancel": {
+		"message": "Mégse"
+	},
+	"cannotDeleteProvider": {
+		"message": "Nem lehet törölni a(z) „$1” szolgáltatót, mert $2 modell használja."
+	},
+	"changelog": {
+		"message": "Változásnapló"
+	},
+	"chooseFile": {
+		"message": "Fájl kiválasztása"
+	},
+	"choosePropertiesFile": {
+		"message": "Tulajdonságfájl kiválasztása"
+	},
+	"chooseSettingsFile": {
+		"message": "Beállításfájl kiválasztása"
+	},
+	"chooseTemplateFile": {
+		"message": "Sablonfájl kiválasztása"
+	},
+	"clipBehavior": {
+		"message": "Klip viselkedése"
+	},
+	"clipBehaviorDescription": {
+		"message": "Válaszd ki, hogyan legyen a kiemelt tartalom mentve az Obsidianba. Meghatározza a $strong_start${{content}}$strong_end$ változót.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"clipboardError": {
+		"message": "Az Obsidian nem tud hozzáférni a vágólapodhoz. Próbáld ki az itt található hibaelhárítási útmutatót: $1",
+		"placeholders": {
+			"1": {
+				"content": "$1"
+			}
+		}
+	},
+	"close": {
+		"message": "Bezárás"
+	},
+	"commandOpenClipper": {
+		"message": "Obsidian Clipper megnyitása"
+	},
+	"commandQuickClip": {
+		"message": "Gyors klip"
+	},
+	"commandToggleHighlighter": {
+		"message": "Kiemelő be/ki"
+	},
+	"commandToggleReader": {
+		"message": "Olvasó mód be/ki"
+	},
+	"confirmDeleteTemplate": {
+		"message": "Biztosan törölni szeretnéd a(z) „$1” sablont?"
+	},
+	"confirmReplaceSettings": {
+		"message": "Ez lecseréli az összes jelenlegi beállításodat, beleértve a sablonokat és a tulajdonságokat is. Biztosan folytatni szeretnéd?"
+	},
+	"copied": {
+		"message": "Másolva!"
+	},
+	"copyAsJson": {
+		"message": "Másolás JSON-ként"
+	},
+	"copyToClipboard": {
+		"message": "Másolás a vágólapra"
+	},
+	"createNewNote": {
+		"message": "Új jegyzet létrehozása"
+	},
+	"custom": {
+		"message": "Egyéni"
+	},
+	"dailyNoteFormat": {
+		"message": "Napi jegyzet formátuma (pl. YYYY-MM-DD)"
+	},
+	"defaultInterpreterContext": {
+		"message": "Alapértelmezett interpreter kontextus"
+	},
+	"defaultInterpreterContextDescription": {
+		"message": "A promptváltozók értelmezéséhez használt kontextus felülbírálása. Itt is használhatók változók."
+	},
+	"defaultTemplateName": {
+		"message": "Alapértelmezett"
+	},
+	"delete": {
+		"message": "Törlés"
+	},
+	"deleteModelConfirm": {
+		"message": "Biztosan törölni szeretnéd ezt a modellt?"
+	},
+	"deleteProviderConfirm": {
+		"message": "Biztosan törölni szeretnéd ezt a szolgáltatót?"
+	},
+	"disableHighlighter": {
+		"message": "Kiemelő kikapcsolása"
+	},
+	"disableReader": {
+		"message": "Olvasó mód kikapcsolása"
+	},
+	"done": {
+		"message": "Kész"
+	},
+	"dragAndDropFile": {
+		"message": "Húzd ide a fájlt"
+	},
+	"duplicate": {
+		"message": "Duplikálás"
+	},
+	"earlyAccessDescription": {
+		"message": "Használd azokat a funkciókat, amelyekhez az Obsidian legfrissebb $link_start$korai hozzáférésű verziója$link_end$ szükséges. Jelenleg az Obsidian 1.7.2 vagy újabb verziója szükséges.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/Obsidian/Early+access+versions\" target=\"_blank\">"
+			}
+		}
+	},
+	"earlyAccessFeatures": {
+		"message": "Korai hozzáférésű funkciók"
+	},
+	"editModel": {
+		"message": "Modell szerkesztése"
+	},
+	"editProvider": {
+		"message": "Szolgáltató szerkesztése"
+	},
+	"editTemplate": {
+		"message": "Sablon szerkesztése"
+	},
+	"embedded": {
+		"message": "Beágyazott"
+	},
+	"enableHighlighter": {
+		"message": "Kiemelő engedélyezése"
+	},
+	"enableHighlighterDescription": {
+		"message": "Kiemelheted a weboldalakon a tartalmat, amit elmenthetsz az Obsidianba."
+	},
+	"enableInterpreter": {
+		"message": "Interpreter engedélyezése"
+	},
+	"enableInterpreterDescription": {
+		"message": "Használj természetes nyelvet az oldalakból való adatkinyeréshez. Például használhatod a sablonszintaxist: $strong_start${{\"a summary of the page\"}}$strong_end$. Ehhez API-kulcs vagy egy alább beállított egyéni modell szükséges. $link_start$További információ$link_end$.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/interpreter\" target=\"_blank\">"
+			},
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"enableReader": {
+		"message": "Olvasó nézet megnyitása"
+	},
+	"error": {
+		"message": "Hiba"
+	},
+	"export": {
+		"message": "Exportálás"
+	},
+	"exportAllSettings": {
+		"message": "Összes beállítás exportálása"
+	},
+	"exportAllSettingsDescription": {
+		"message": "Az összes beállítás exportálása, beleértve a sablonokat és a tulajdonságokat is."
+	},
+	"exportHighlights": {
+		"message": "Kiemelések exportálása"
+	},
+	"exportHighlightsDescription": {
+		"message": "A kiemeléseid exportálása fájlba."
+	},
+	"exportProperties": {
+		"message": "Tulajdonságok exportálása"
+	},
+	"exportPropertiesDescription": {
+		"message": "A Web Clipper tulajdonságainak mentése egy $strong_start$types.json$strong_end$ fájlba, amely importálható az Obsidian vaultodba, vagy a Web Clipperbe más eszközökön.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"extensionDescription": {
+		"message": "Ments tartalmat a webről privát és tartós formátumban, amelyet offline is elérhetsz. Az Obsidian hivatalos böngészőbővítménye."
+	},
+	"extensionName": {
+		"message": "Obsidian Web Clipper"
+	},
+	"failedToCopyText": {
+		"message": "Nem sikerült a szöveg másolása"
+	},
+	"failedToDeleteTemplate": {
+		"message": "Nem sikerült törölni a sablont. Kérjük, próbáld újra."
+	},
+	"failedToDuplicateTemplate": {
+		"message": "Nem sikerült duplikálni a sablont. Kérjük, próbáld újra."
+	},
+	"failedToExportHighlights": {
+		"message": "Nem sikerült exportálni a kiemeléseket. További részletekért ellenőrizd a konzolt."
+	},
+	"failedToExportSettings": {
+		"message": "Nem sikerült exportálni a beállításokat. További részletekért ellenőrizd a konzolt."
+	},
+	"failedToExtractContent": {
+		"message": "Nem sikerült kinyerni az oldal tartalmát."
+	},
+	"failedToImportTemplate": {
+		"message": "Hiba a sablon importálásakor. Ellenőrizd a fájlt, és próbáld újra."
+	},
+	"failedToInitialize": {
+		"message": "Próbáld meg újratölteni a bővítményt."
+	},
+	"failedToInitializeContent": {
+		"message": "Nem sikerült inicializálni az oldal tartalmát."
+	},
+	"failedToProcessInterpreter": {
+		"message": "Az interpreter feldolgozása sikertelen. Kérjük, próbáld újra."
+	},
+	"failedToResetProviders": {
+		"message": "Nem sikerült visszaállítani a szolgáltatókat és modelleket"
+	},
+	"failedToResetTemplate": {
+		"message": "Nem sikerült visszaállítani az alapértelmezett sablont. Kérjük, próbáld újra."
+	},
+	"failedToSave": {
+		"message": "Nem sikerült menteni a fájlt"
+	},
+	"failedToSaveFile": {
+		"message": "Nem sikerült menteni a fájlt"
+	},
+	"failedToSaveProvider": {
+		"message": "Nem sikerült menteni a szolgáltatót. Kérjük, próbáld újra."
+	},
+	"feedback": {
+		"message": "Visszajelzés"
+	},
+	"feedbackDescription": {
+		"message": "Hogyan tehetnénk jobbá a Web Clippert? Kérjük, látogasd meg a súgóoldalunkat, ahol hibákat jelenthetsz, funkciókat javasolhatsz, és segítséget kaphatsz a gyakori problémákhoz."
+	},
+	"feedbackTitle": {
+		"message": "Köszönjük a visszajelzésed"
+	},
+	"folder": {
+		"message": "Mappa"
+	},
+	"general": {
+		"message": "Általános"
+	},
+	"generalSettings": {
+		"message": "Általános beállítások"
+	},
+	"getApiKeyHere": {
+		"message": "A(z) $1 API-kulcsodat itt szerezheted be."
+	},
+	"help": {
+		"message": "Súgó"
+	},
+	"helpDescription": {
+		"message": "Ismerd meg a Web Clipper használatát, és kapj segítséget a hibaelhárításhoz."
+	},
+	"highlightInline": {
+		"message": "Az oldal tartalmának kiemelése"
+	},
+	"highlightPage": {
+		"message": "Oldal kiemelése"
+	},
+	"highlighter": {
+		"message": "Kiemelő"
+	},
+	"highlighterSettings": {
+		"message": "Kiemelő"
+	},
+	"history": {
+		"message": "Előzmények"
+	},
+	"hotkeys": {
+		"message": "Gyorsbillentyűk"
+	},
+	"import": {
+		"message": "Importálás"
+	},
+	"importAllSettings": {
+		"message": "Összes beállítás importálása"
+	},
+	"importAllSettingsDescription": {
+		"message": "Az összes beállítás importálása, beleértve a sablonokat és a tulajdonságokat is. Ez lecseréli a jelenlegi konfigurációdat."
+	},
+	"importFailed": {
+		"message": "Az importálás sikertelen. További részletekért ellenőrizd a konzolt."
+	},
+	"importModalTitle": {
+		"message": "Importálás"
+	},
+	"importProperties": {
+		"message": "Tulajdonságok importálása"
+	},
+	"importPropertiesDescription": {
+		"message": "A tulajdonságaid Obsidianból történő importálásához keresd meg a $strong_1_start$types.json$strong_1_end$ fájlt a vaultodon belüli $strong_2_start$.obsidian$strong_2_end$ mappában. Vedd figyelembe, hogy ez a mappa a legtöbb operációs rendszeren alapértelmezetten rejtett.",
+		"placeholders": {
+			"strong_1_end": {
+				"content": "</strong>"
+			},
+			"strong_1_start": {
+				"content": "<strong>"
+			},
+			"strong_2_end": {
+				"content": "</strong>"
+			},
+			"strong_2_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"importSettings": {
+		"message": "Beállítások importálása"
+	},
+	"importTemplate": {
+		"message": "Sablon importálása"
+	},
+	"interpret": {
+		"message": "értelmezés"
+	},
+	"interpreter": {
+		"message": "Interpreter"
+	},
+	"interpreterContext": {
+		"message": "Interpreter kontextus"
+	},
+	"interpreterContextDescription": {
+		"message": "A promptváltozók értelmezéséhez használt kontextus. Felülírja a $link_start$Interpreter beállítások$link_end$ alatt megadott alapértelmezett kontextust. Itt is használhatók változók.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=interpreter\">"
+			}
+		}
+	},
+	"language": {
+		"message": "Nyelv"
+	},
+	"languageDescription": {
+		"message": "Válaszd ki a bővítmény felületének megjelenítési nyelvét."
+	},
+	"last30Days": {
+		"message": "Elmúlt 30 nap"
+	},
+	"lastUsed": {
+		"message": "Utoljára használva"
+	},
+	"legacyMode": {
+		"message": "Örökölt mód"
+	},
+	"legacyModeDescription": {
+		"message": "Az Obsidian 1.6.7-es vagy korábbi verziójával kompatibilis URI-alapú klipelési módszert használja. Vedd figyelembe, hogy a klipelhető tartalom hossza a böngésződ és az operációs rendszered korlátaitól függ. Egyes oldalak hibajelzés nélkül is meghiúsulhatnak."
+	},
+	"modelName": {
+		"message": "Megjelenített név"
+	},
+	"modelNameDescription": {
+		"message": "A modell neve, amelyet a felületen szeretnél megjeleníteni."
+	},
+	"modelProvider": {
+		"message": "Szolgáltató"
+	},
+	"modelProviderDescription": {
+		"message": "Válaszd ki a szolgáltatót ehhez a modellhez."
+	},
+	"modelProviderPlaceholder": {
+		"message": "Szolgáltató"
+	},
+	"modelRequiredFields": {
+		"message": "A modell neve, a szolgáltató és a modellazonosító megadása kötelező."
+	},
+	"models": {
+		"message": "Modellek"
+	},
+	"modelsListFor": {
+		"message": "Modellek listája ehhez: $1"
+	},
+	"more": {
+		"message": "Továbbiak"
+	},
+	"newTemplate": {
+		"message": "Új sablon"
+	},
+	"noHighlights": {
+		"message": "Ne csináljon semmit"
+	},
+	"noTemplates": {
+		"message": "Nincsenek elérhető sablonok. Kérjük, adj hozzá egy sablont a beállításokban."
+	},
+	"noUnusedProperties": {
+		"message": "Nem találhatók nem használt tulajdonságok."
+	},
+	"noteContent": {
+		"message": "Jegyzet tartalma"
+	},
+	"noteContentDescription": {
+		"message": "A jegyzet tartalmának testreszabása. Használj változókat az oldal adataival való előkitöltéshez."
+	},
+	"noteLocation": {
+		"message": "Jegyzet helye"
+	},
+	"noteLocationDescription": {
+		"message": "A jegyzet mappája vagy elérési útja."
+	},
+	"noteName": {
+		"message": "Jegyzet neve"
+	},
+	"noteNameFormat": {
+		"message": "Jegyzet neve"
+	},
+	"noteNameFormatDescription": {
+		"message": "A jegyzet fájlnevének formátuma. Használhatsz olyan változókat, mint a {{title}}, {{date}} és {{published}}, hogy az oldal adataival előre kitöltsd. $link_start$További információ$link_end$.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/variables\" target=\"_blank\">"
+			}
+		}
+	},
+	"notesAboutPage": {
+		"message": "Jegyzetek erről az oldalról..."
+	},
+	"onlyHttpSupported": {
+		"message": "Ez az oldal nem klipelhető. Csak a http és https URL-ek támogatottak."
+	},
+	"open": {
+		"message": "Megnyitás"
+	},
+	"openBehaviorDescription": {
+		"message": "Válaszd ki, hogyan nyíljon meg alapértelmezetten a Web Clipper."
+	},
+	"openBehaviorTitle": {
+		"message": "Megnyitási viselkedés"
+	},
+	"openEmbedded": {
+		"message": "Megnyitás az oldalon"
+	},
+	"openSidePanel": {
+		"message": "Oldalsáv megnyitása"
+	},
+	"optional": {
+		"message": "(opcionális)"
+	},
+	"orPasteBelow": {
+		"message": "Vagy illeszd be a tartalmat alább"
+	},
+	"overwriteNote": {
+		"message": "Jegyzet felülírása"
+	},
+	"pageCannotBeClipped": {
+		"message": "Ez az oldal nem klipelhető."
+	},
+	"pageVariables": {
+		"message": "Oldalváltozók"
+	},
+	"pagesSaved": {
+		"message": "oldal mentve"
+	},
+	"pagesSavedPlural": {
+		"message": "oldal mentve"
+	},
+	"pasteJsonHere": {
+		"message": "Illeszd be ide a JSON-t"
+	},
+	"pleaseReload": {
+		"message": "Kérjük, próbáld meg újratölteni az oldalt."
+	},
+	"popularModels": {
+		"message": "Népszerű modellek"
+	},
+	"popularModelsDescription": {
+		"message": "Válassz a gyakran használt modellek közül, vagy add meg egy egyéni modell adatait."
+	},
+	"popup": {
+		"message": "Felugró ablak"
+	},
+	"prependToDaily": {
+		"message": "Hozzáadás a napi jegyzethez, felül"
+	},
+	"prependToExisting": {
+		"message": "Hozzáadás egy meglévő jegyzethez, felül"
+	},
+	"preview": {
+		"message": "Előnézet"
+	},
+	"processing": {
+		"message": "feldolgozás"
+	},
+	"properties": {
+		"message": "Tulajdonságok"
+	},
+	"propertiesSettings": {
+		"message": "Tulajdonságok"
+	},
+	"propertyName": {
+		"message": "Tulajdonság neve"
+	},
+	"propertyTypeCheckbox": {
+		"message": "Jelölőnégyzet"
+	},
+	"propertyTypeDate": {
+		"message": "Dátum"
+	},
+	"propertyTypeDatetime": {
+		"message": "Dátum és idő"
+	},
+	"propertyTypeMultitext": {
+		"message": "Lista"
+	},
+	"propertyTypeNumber": {
+		"message": "Szám"
+	},
+	"propertyTypeText": {
+		"message": "Szöveg"
+	},
+	"propertyValue": {
+		"message": "Tulajdonság értéke"
+	},
+	"provider": {
+		"message": "Szolgáltató"
+	},
+	"providerApiKey": {
+		"message": "API-kulcs"
+	},
+	"providerApiKeyDescription": {
+		"message": "Az API-kulcsod ehhez a szolgáltatóhoz."
+	},
+	"providerBaseUrl": {
+		"message": "Alap URL"
+	},
+	"providerBaseUrlDescription": {
+		"message": "A szolgáltató API-végpontjának URL-je."
+	},
+	"providerModelId": {
+		"message": "Modellazonosító"
+	},
+	"providerModelIdDescription": {
+		"message": "A szolgáltatódnál lévő modell azonosítója. Általában egy rövid, szóközök nélküli név."
+	},
+	"providerModelIdPlaceholder": {
+		"message": "Modellazonosító"
+	},
+	"providerName": {
+		"message": "Szolgáltató neve"
+	},
+	"providerNameDescription": {
+		"message": "A szolgáltató megjelenített neve."
+	},
+	"providerPreset": {
+		"message": "Előbeállítás"
+	},
+	"providerPresetDescription": {
+		"message": "Válassz egy szolgáltatót, vagy hozz létre egy egyénit."
+	},
+	"providerRequiredFields": {
+		"message": "A szolgáltató neve és az alap URL megadása kötelező."
+	},
+	"providers": {
+		"message": "Szolgáltatók"
+	},
+	"rateExtensionDescription": {
+		"message": "Tetszik a Web Clipper? Segíts nekünk azzal, hogy értékeled."
+	},
+	"reader": {
+		"message": "Olvasó"
+	},
+	"readerAppearance": {
+		"message": "Megjelenés"
+	},
+	"readerAppearanceAuto": {
+		"message": "Automatikus"
+	},
+	"readerAppearanceDark": {
+		"message": "Sötét"
+	},
+	"readerAppearanceDescription": {
+		"message": "Válassz világos vagy sötét megjelenést."
+	},
+	"readerAppearanceLight": {
+		"message": "Világos"
+	},
+	"readerBlendImages": {
+		"message": "Képek beleolvasztása"
+	},
+	"readerBlendImagesDescription": {
+		"message": "A képek beleolvasztása az oldal háttérébe."
+	},
+	"readerCloseImageViewer": {
+		"message": "Képnézegető bezárása"
+	},
+	"readerCollapseComment": {
+		"message": "Megjegyzés összecsukása"
+	},
+	"readerColorLinks": {
+		"message": "Hivatkozások színezése"
+	},
+	"readerColorSchemeDefault": {
+		"message": "Alapértelmezett"
+	},
+	"readerCustomCss": {
+		"message": "Egyéni CSS"
+	},
+	"readerCustomCssDescription": {
+		"message": "Az olvasó nézetben automatikusan alkalmazott CSS."
+	},
+	"readerDarkTheme": {
+		"message": "Sötét mód témája"
+	},
+	"readerDarkThemeDescription": {
+		"message": "Másik téma használata sötét módban."
+	},
+	"readerError": {
+		"message": "Nem sikerült kinyerni a tartalmat."
+	},
+	"readerFont": {
+		"message": "Betűtípus-beállítások"
+	},
+	"readerFontDefault": {
+		"message": "Alapértelmezett"
+	},
+	"readerFontDescription": {
+		"message": "Adj hozzá a rendszereden telepített betűtípusokat. Nyomd meg az Entert egy betűtípus hozzáadásához."
+	},
+	"readerFontNotFound": {
+		"message": "Nem található"
+	},
+	"readerFontPlaceholder": {
+		"message": "Nyomd meg az Entert egy betűtípus hozzáadásához"
+	},
+	"readerFontSetDefault": {
+		"message": "Beállítás alapértelmezettként"
+	},
+	"readerFontSize": {
+		"message": "Alap betűméret"
+	},
+	"readerFontSystem": {
+		"message": "Rendszer"
+	},
+	"readerFontSystemSans": {
+		"message": "Sans-serif"
+	},
+	"readerFontSystemSerif": {
+		"message": "Serif"
+	},
+	"readerFonts": {
+		"message": "Betűtípusok"
+	},
+	"readerFootnotes": {
+		"message": "Lábjegyzetek"
+	},
+	"readerImages": {
+		"message": "Képek"
+	},
+	"readerLineHeight": {
+		"message": "Sormagasság"
+	},
+	"readerLineWidth": {
+		"message": "Sorszélesség"
+	},
+	"readerLoading": {
+		"message": "Tisztítás…"
+	},
+	"readerSettings": {
+		"message": "Olvasó beállításai"
+	},
+	"readerTheme": {
+		"message": "Téma"
+	},
+	"readerThemeDescription": {
+		"message": "Válaszd ki az olvasó nézetben használt színeket."
+	},
+	"readerThemeSection": {
+		"message": "Téma"
+	},
+	"readerTypography": {
+		"message": "Tipográfia"
+	},
+	"readerViewFullSize": {
+		"message": "Megtekintés teljes méretben"
+	},
+	"recommended": {
+		"message": "ajánlott"
+	},
+	"refresh": {
+		"message": "Frissítés"
+	},
+	"remove": {
+		"message": "Eltávolítás"
+	},
+	"removeProperty": {
+		"message": "Tulajdonság eltávolítása"
+	},
+	"removeUnusedProperties": {
+		"message": "Nem használt tulajdonságok eltávolítása"
+	},
+	"removeUnusedPropertiesDescription": {
+		"message": "Az összes olyan tulajdonság eltávolítása, amelyet egyetlen sablon sem használ."
+	},
+	"removeVault": {
+		"message": "Vault eltávolítása"
+	},
+	"replaceContent": {
+		"message": "Az oldal tartalmának lecserélése"
+	},
+	"reset": {
+		"message": "Visszaállítás"
+	},
+	"resetDefaultTemplate": {
+		"message": "Alapértelmezett sablon visszaállítása"
+	},
+	"resetDefaultTemplateDescription": {
+		"message": "Az alapértelmezett sablonon végzett módosításaid eltávolítása."
+	},
+	"resetProvidersAndModels": {
+		"message": "Alapértelmezett modellek visszaállítása"
+	},
+	"resetProvidersAndModelsDescription": {
+		"message": "A szolgáltatók és modellek visszaállítása az alapértelmezett beállításokra."
+	},
+	"save": {
+		"message": "Mentés"
+	},
+	"saveBehaviorDescription": {
+		"message": "Válaszd ki az oldalak mentésének alapértelmezett módját. Az alternatív lehetőségek a fő gomb melletti legördülő menüben jelennek meg."
+	},
+	"saveBehaviorLabel": {
+		"message": "Mentési viselkedés"
+	},
+	"saveFile": {
+		"message": "Fájl mentése..."
+	},
+	"searchVariables": {
+		"message": "Változók keresése..."
+	},
+	"selectProvider": {
+		"message": "Szolgáltató kiválasztása"
+	},
+	"selectTemplateToExport": {
+		"message": "Kérjük, válassz ki egy exportálandó sablont."
+	},
+	"settings": {
+		"message": "Beállítások"
+	},
+	"settingsHeading": {
+		"message": "Beállítások"
+	},
+	"settingsImportSuccess": {
+		"message": "Az összes beállítás sikeresen importálva. Kérjük, frissítsd az oldalt a változások megtekintéséhez."
+	},
+	"share": {
+		"message": "Megosztás..."
+	},
+	"shortcutInstructionsBrave": {
+		"message": "A billentyűkiosztás módosításához menj ide: $1"
+	},
+	"shortcutInstructionsChrome": {
+		"message": "A billentyűkiosztás módosításához menj ide: $1"
+	},
+	"shortcutInstructionsDefault": {
+		"message": "A billentyűkiosztás módosításához nézd meg a böngésződ bővítménybeállításait."
+	},
+	"shortcutInstructionsEdge": {
+		"message": "A billentyűkiosztás módosításához menj ide: $1"
+	},
+	"shortcutInstructionsFirefox": {
+		"message": "A billentyűkiosztás módosításához menj ide: $1, kattints a fogaskerék ikonra, és válaszd a „Bővítmény gyorsbillentyűinek kezelése” lehetőséget."
+	},
+	"shortcutInstructionsIntro": {
+		"message": "A billentyűparancsok gyors hozzáférést biztosítanak a klipelő funkcióihoz."
+	},
+	"shortcutInstructionsSafari": {
+		"message": "A billentyűparancsok Safariban nem testreszabhatók."
+	},
+	"shortcutNotSet": {
+		"message": "Nincs beállítva"
+	},
+	"showActionsButton": {
+		"message": "Műveletek gomb megjelenítése"
+	},
+	"showActionsDescription": {
+		"message": "Lehetővé teszi az oldalváltozók megtekintését a klipelő menüjéből. Hasznos, ha látni szeretnéd, milyen változók érhetők el a sablonokban."
+	},
+	"showPageVariables": {
+		"message": "Oldalváltozók megjelenítése"
+	},
+	"silentOpen": {
+		"message": "A klipelt jegyzet mentése megnyitás nélkül"
+	},
+	"silentOpenDescription": {
+		"message": "A klipelt jegyzetek mentésre kerülnek, de nem nyílnak meg új lapon. Az Obsidian továbbra is előtérbe kerül."
+	},
+	"specificNoteName": {
+		"message": "Megadott jegyzetnév"
+	},
+	"systemDefault": {
+		"message": "Rendszer"
+	},
+	"template": {
+		"message": "Sablon"
+	},
+	"templateCopied": {
+		"message": "A sablon JSON-ja a vágólapra másolva"
+	},
+	"templateCopyError": {
+		"message": "Nem sikerült a sablon JSON-ját a vágólapra másolni"
+	},
+	"templateErrorCount": {
+		"message": "Hiba van a sablonodban."
+	},
+	"templateErrorsCount": {
+		"message": "$1 hiba van a sablonodban."
+	},
+	"templateGroupContent": {
+		"message": "Tartalom"
+	},
+	"templateGroupLocation": {
+		"message": "Hely"
+	},
+	"templateName": {
+		"message": "Sablon neve"
+	},
+	"templateProperties": {
+		"message": "Tulajdonságok"
+	},
+	"templatePropertiesDescription": {
+		"message": "A klipelt jegyzet tetejére hozzáadandó tulajdonságok. Használj változókat az oldal adataival való előkitöltéshez."
+	},
+	"templateTriggers": {
+		"message": "Sablonindítók"
+	},
+	"templateTriggersDescription": {
+		"message": "Szabályok megadása, hogy ez a sablon automatikusan kiválasztásra kerüljön, ha illeszkedik egy URL-mintára vagy schema.org adatokat tartalmaz. Soronként egy szabály."
+	},
+	"templateValid": {
+		"message": "A sablonszintaxis érvényes"
+	},
+	"templatesHeading": {
+		"message": "Sablonok"
+	},
+	"thinking": {
+		"message": "gondolkodás"
+	},
+	"unknownProvider": {
+		"message": "Ismeretlen szolgáltató"
+	},
+	"updateAvailable": {
+		"message": "Frissítés érhető el."
+	},
+	"usingLatestVersion": {
+		"message": "A legfrissebb verziót használod."
+	},
+	"vault": {
+		"message": "Vault"
+	},
+	"vaultDescription": {
+		"message": "Válaszd ki az alapértelmezett vaultot ehhez a sablonhoz. Vaultok hozzáadásához vagy eltávolításához menj az $link_start$általános beállítások$link_end$hoz.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=general\">"
+			}
+		}
+	},
+	"vaults": {
+		"message": "Vaultok"
+	},
+	"vaultsDescription": {
+		"message": "Alapértelmezés szerint a klipelt jegyzetek az éppen megnyitott vaultba kerülnek mentésre. Itt hozzáadhatsz vaultokat, ha szeretnéd a lehetőséget, hogy különböző vaultokba ments. A vaultneveknek pontosan meg kell egyezniük az Obsidian vault nevével. Vault hozzáadásához nyomd meg az $strong_start$Enter$strong_end$ billentyűt.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"version": {
+		"message": "Verzió"
+	}
+}

@@ -576,6 +576,9 @@
 	"prependToExisting": {
 		"message": "新增到現有筆記頂部"
 	},
+	"preview": {
+		"message": "預覽"
+	},
 	"processing": {
 		"message": "處理中"
 	},
@@ -656,6 +659,120 @@
 	},
 	"reader": {
 		"message": "閱讀器"
+	},
+	"readerAppearance": {
+		"message": "外觀"
+	},
+	"readerAppearanceAuto": {
+		"message": "自動"
+	},
+	"readerAppearanceDark": {
+		"message": "深色"
+	},
+	"readerAppearanceDescription": {
+		"message": "選擇淺色或深色外觀。"
+	},
+	"readerAppearanceLight": {
+		"message": "淺色"
+	},
+	"readerBlendImages": {
+		"message": "融合圖片"
+	},
+	"readerBlendImagesDescription": {
+		"message": "將圖片與頁面背景融合。"
+	},
+	"readerCloseImageViewer": {
+		"message": "關閉圖片檢視器"
+	},
+	"readerCollapseComment": {
+		"message": "摺疊留言"
+	},
+	"readerColorLinks": {
+		"message": "連結著色"
+	},
+	"readerColorSchemeDefault": {
+		"message": "預設"
+	},
+	"readerCustomCss": {
+		"message": "自訂 CSS"
+	},
+	"readerCustomCssDescription": {
+		"message": "在閱讀檢視中自動套用的 CSS。"
+	},
+	"readerDarkTheme": {
+		"message": "深色模式主題"
+	},
+	"readerDarkThemeDescription": {
+		"message": "在深色模式中使用不同的主題。"
+	},
+	"readerError": {
+		"message": "無法擷取內容。"
+	},
+	"readerFont": {
+		"message": "字型選項"
+	},
+	"readerFontDefault": {
+		"message": "預設"
+	},
+	"readerFontDescription": {
+		"message": "新增系統已安裝的字型。按 Enter 以新增字型。"
+	},
+	"readerFontNotFound": {
+		"message": "找不到"
+	},
+	"readerFontPlaceholder": {
+		"message": "按 Enter 以新增字型"
+	},
+	"readerFontSetDefault": {
+		"message": "設為預設"
+	},
+	"readerFontSize": {
+		"message": "基礎字型大小"
+	},
+	"readerFontSystem": {
+		"message": "系統"
+	},
+	"readerFontSystemSans": {
+		"message": "無襯線"
+	},
+	"readerFontSystemSerif": {
+		"message": "襯線"
+	},
+	"readerFonts": {
+		"message": "字型"
+	},
+	"readerFootnotes": {
+		"message": "註腳"
+	},
+	"readerImages": {
+		"message": "圖片"
+	},
+	"readerLineHeight": {
+		"message": "行高"
+	},
+	"readerLineWidth": {
+		"message": "行寬"
+	},
+	"readerLoading": {
+		"message": "正在去除雜訊…"
+	},
+	"readerSettings": {
+		"message": "閱讀器設定"
+	},
+	"readerTheme": {
+		"message": "主題"
+	},
+	"readerThemeDescription": {
+		"message": "選擇閱讀檢視中使用的顏色。"
+	},
+	"readerThemeSection": {
+		"message": "主題"
+	},
+	"readerTypography": {
+		"message": "排版"
+	},
+	"readerViewFullSize": {
+		"message": "檢視原始大小"
 	},
 	"recommended": {
 		"message": "推薦"
@@ -774,6 +891,9 @@
 	"systemDefault": {
 		"message": "系統"
 	},
+	"template": {
+		"message": "範本"
+	},
 	"templateCopied": {
 		"message": "已將模板 JSON 複製到剪貼簿"
 	},
@@ -785,6 +905,12 @@
 	},
 	"templateErrorsCount": {
 		"message": "您的範本中有 $1 個錯誤。"
+	},
+	"templateGroupContent": {
+		"message": "內容"
+	},
+	"templateGroupLocation": {
+		"message": "位置"
 	},
 	"templateName": {
 		"message": "範本名稱"

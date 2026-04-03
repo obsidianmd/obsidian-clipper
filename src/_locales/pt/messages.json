@@ -1,0 +1,979 @@
+{
+	"activity": {
+		"message": "Atividade"
+	},
+	"addModel": {
+		"message": "+ Adicionar modelo"
+	},
+	"addModelTitle": {
+		"message": "Adicionar modelo"
+	},
+	"addProperty": {
+		"message": "+ Adicionar propriedade"
+	},
+	"addProvider": {
+		"message": "+ Adicionar fornecedor"
+	},
+	"addProviderTitle": {
+		"message": "Adicionar fornecedor"
+	},
+	"addToObsidian": {
+		"message": "Adicionar ao Obsidian"
+	},
+	"addVaultPlaceholder": {
+		"message": "Prima Enter para adicionar um cofre"
+	},
+	"advanced": {
+		"message": "Avançado"
+	},
+	"allProperties": {
+		"message": "Todas as propriedades"
+	},
+	"allTime": {
+		"message": "Todo o período"
+	},
+	"alwaysShowHighlights": {
+		"message": "Mostrar sempre os destaques"
+	},
+	"alwaysShowHighlightsDescription": {
+		"message": "Mostre os seus destaques guardados ao carregar uma página. Desative para mostrar os destaques apenas quando o modo de realce estiver ativado."
+	},
+	"apiKeyMissing": {
+		"message": "Sem chave de API"
+	},
+	"apiKeysWarning": {
+		"message": "Ao utilizar um fornecedor externo, concorda com os respetivos termos e política de privacidade. Os pedidos do intérprete são enviados diretamente para o fornecedor que escolher. O Obsidian não recolhe nem armazena quaisquer dados sobre os seus pedidos."
+	},
+	"appendToDaily": {
+		"message": "Adicionar à nota diária, no fim"
+	},
+	"appendToExisting": {
+		"message": "Adicionar a uma nota existente, no fim"
+	},
+	"autoRunInterpreter": {
+		"message": "Executar automaticamente"
+	},
+	"autoRunInterpreterDescription": {
+		"message": "Execute imediatamente as variáveis do prompt se o modelo contiver alguma. Isto consumirá créditos de API junto do seu fornecedor de modelos. Desative se quiser executar o intérprete apenas manualmente."
+	},
+	"behavior": {
+		"message": "Comportamento"
+	},
+	"byDay": {
+		"message": "Dias"
+	},
+	"byMonth": {
+		"message": "Meses"
+	},
+	"byWeek": {
+		"message": "Semanas"
+	},
+	"cancel": {
+		"message": "Cancelar"
+	},
+	"cannotDeleteProvider": {
+		"message": "Não é possível eliminar o fornecedor \"$1\" porque está a ser utilizado por $2 modelo(s)."
+	},
+	"changelog": {
+		"message": "Registo de alterações"
+	},
+	"chooseFile": {
+		"message": "Escolher um ficheiro"
+	},
+	"choosePropertiesFile": {
+		"message": "Escolher ficheiro de propriedades"
+	},
+	"chooseSettingsFile": {
+		"message": "Escolher ficheiro de definições"
+	},
+	"chooseTemplateFile": {
+		"message": "Escolher ficheiro de modelo"
+	},
+	"clipBehavior": {
+		"message": "Comportamento do recorte"
+	},
+	"clipBehaviorDescription": {
+		"message": "Escolha como o conteúdo realçado é guardado no Obsidian. Define a variável $strong_start${{content}}$strong_end$.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"clipboardError": {
+		"message": "O Obsidian não consegue aceder à sua área de transferência. Experimente as instruções de resolução de problemas aqui: $1",
+		"placeholders": {
+			"1": {
+				"content": "$1"
+			}
+		}
+	},
+	"close": {
+		"message": "Fechar"
+	},
+	"commandOpenClipper": {
+		"message": "Abrir Obsidian Clipper"
+	},
+	"commandQuickClip": {
+		"message": "Recorte rápido"
+	},
+	"commandToggleHighlighter": {
+		"message": "Alternar realçador"
+	},
+	"commandToggleReader": {
+		"message": "Alternar leitor"
+	},
+	"confirmDeleteTemplate": {
+		"message": "Tem a certeza de que pretende eliminar o modelo \"$1\"?"
+	},
+	"confirmReplaceSettings": {
+		"message": "Isto irá substituir todas as suas definições atuais, incluindo modelos e propriedades. Tem a certeza de que pretende continuar?"
+	},
+	"copied": {
+		"message": "Copiado!"
+	},
+	"copyAsJson": {
+		"message": "Copiar como JSON"
+	},
+	"copyToClipboard": {
+		"message": "Copiar para a área de transferência"
+	},
+	"createNewNote": {
+		"message": "Criar nova nota"
+	},
+	"custom": {
+		"message": "Personalizado"
+	},
+	"dailyNoteFormat": {
+		"message": "Formato da nota diária (por ex., YYYY-MM-DD)"
+	},
+	"defaultInterpreterContext": {
+		"message": "Contexto predefinido do intérprete"
+	},
+	"defaultInterpreterContextDescription": {
+		"message": "Substitua o contexto utilizado para interpretar variáveis do prompt. As variáveis podem ser usadas aqui."
+	},
+	"defaultTemplateName": {
+		"message": "Predefinido"
+	},
+	"delete": {
+		"message": "Eliminar"
+	},
+	"deleteModelConfirm": {
+		"message": "Tem a certeza de que pretende eliminar este modelo?"
+	},
+	"deleteProviderConfirm": {
+		"message": "Tem a certeza de que pretende eliminar este fornecedor?"
+	},
+	"disableHighlighter": {
+		"message": "Desativar realçador"
+	},
+	"disableReader": {
+		"message": "Desativar leitor"
+	},
+	"done": {
+		"message": "Concluído"
+	},
+	"dragAndDropFile": {
+		"message": "Arraste e largue o ficheiro aqui"
+	},
+	"duplicate": {
+		"message": "Duplicar"
+	},
+	"earlyAccessDescription": {
+		"message": "Utilize funcionalidades que requerem a versão $link_start$de acesso antecipado$link_end$ mais recente do Obsidian. Atualmente requer o Obsidian 1.7.2 ou posterior.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/Obsidian/Early+access+versions\" target=\"_blank\">"
+			}
+		}
+	},
+	"earlyAccessFeatures": {
+		"message": "Funcionalidades de acesso antecipado"
+	},
+	"editModel": {
+		"message": "Editar modelo"
+	},
+	"editProvider": {
+		"message": "Editar fornecedor"
+	},
+	"editTemplate": {
+		"message": "Editar modelo"
+	},
+	"embedded": {
+		"message": "Incorporado"
+	},
+	"enableHighlighter": {
+		"message": "Ativar realçador"
+	},
+	"enableHighlighterDescription": {
+		"message": "Realce conteúdo em páginas web que pode guardar no Obsidian."
+	},
+	"enableInterpreter": {
+		"message": "Ativar intérprete"
+	},
+	"enableInterpreterDescription": {
+		"message": "Use linguagem natural para extrair dados das páginas. Por exemplo, pode usar a sintaxe de modelo $strong_start${{\"a summary of the page\"}}$strong_end$. Requer uma chave de API ou um modelo personalizado configurado abaixo. $link_start$Saiba mais$link_end$.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/interpreter\" target=\"_blank\">"
+			},
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"enableReader": {
+		"message": "Abrir vista de leitura"
+	},
+	"error": {
+		"message": "Erro"
+	},
+	"export": {
+		"message": "Exportar"
+	},
+	"exportAllSettings": {
+		"message": "Exportar todas as definições"
+	},
+	"exportAllSettingsDescription": {
+		"message": "Exporte todas as definições, incluindo modelos e propriedades."
+	},
+	"exportHighlights": {
+		"message": "Exportar destaques"
+	},
+	"exportHighlightsDescription": {
+		"message": "Exporte os seus destaques para um ficheiro."
+	},
+	"exportProperties": {
+		"message": "Exportar propriedades"
+	},
+	"exportPropertiesDescription": {
+		"message": "Guarde as propriedades do Web Clipper num ficheiro $strong_start$types.json$strong_end$ que pode ser importado para o seu cofre do Obsidian ou para o Web Clipper noutros dispositivos.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"extensionDescription": {
+		"message": "Guarde conteúdo da web num formato privado e duradouro ao qual pode aceder offline. A extensão oficial do navegador para o Obsidian."
+	},
+	"extensionName": {
+		"message": "Obsidian Web Clipper"
+	},
+	"failedToCopyText": {
+		"message": "Falha ao copiar texto"
+	},
+	"failedToDeleteTemplate": {
+		"message": "Falha ao eliminar o modelo. Tente novamente."
+	},
+	"failedToDuplicateTemplate": {
+		"message": "Falha ao duplicar o modelo. Tente novamente."
+	},
+	"failedToExportHighlights": {
+		"message": "Falha ao exportar os destaques. Consulte a consola para mais detalhes."
+	},
+	"failedToExportSettings": {
+		"message": "Falha ao exportar as definições. Consulte a consola para mais detalhes."
+	},
+	"failedToExtractContent": {
+		"message": "Não foi possível extrair o conteúdo da página."
+	},
+	"failedToImportTemplate": {
+		"message": "Erro ao importar o modelo. Verifique o ficheiro e tente novamente."
+	},
+	"failedToInitialize": {
+		"message": "Tente recarregar a extensão."
+	},
+	"failedToInitializeContent": {
+		"message": "Não foi possível inicializar o conteúdo da página."
+	},
+	"failedToProcessInterpreter": {
+		"message": "Falha no processamento do intérprete. Tente novamente."
+	},
+	"failedToResetProviders": {
+		"message": "Falha ao repor fornecedores e modelos"
+	},
+	"failedToResetTemplate": {
+		"message": "Falha ao repor o modelo predefinido. Tente novamente."
+	},
+	"failedToSave": {
+		"message": "Falha ao guardar o ficheiro"
+	},
+	"failedToSaveFile": {
+		"message": "Falha ao guardar o ficheiro"
+	},
+	"failedToSaveProvider": {
+		"message": "Falha ao guardar o fornecedor. Tente novamente."
+	},
+	"feedback": {
+		"message": "Feedback"
+	},
+	"feedbackDescription": {
+		"message": "Como podemos melhorar o Web Clipper? Visite a nossa página de ajuda, onde pode reportar erros, sugerir funcionalidades e obter ajuda com problemas comuns."
+	},
+	"feedbackTitle": {
+		"message": "Obrigado pelo seu feedback"
+	},
+	"folder": {
+		"message": "Pasta"
+	},
+	"general": {
+		"message": "Geral"
+	},
+	"generalSettings": {
+		"message": "Definições gerais"
+	},
+	"getApiKeyHere": {
+		"message": "Obtenha a sua chave de API do $1 aqui."
+	},
+	"help": {
+		"message": "Ajuda"
+	},
+	"helpDescription": {
+		"message": "Saiba como usar o Web Clipper e obtenha ajuda na resolução de problemas."
+	},
+	"highlightInline": {
+		"message": "Realçar o conteúdo da página"
+	},
+	"highlightPage": {
+		"message": "Realçar página"
+	},
+	"highlighter": {
+		"message": "Realçador"
+	},
+	"highlighterSettings": {
+		"message": "Realçador"
+	},
+	"history": {
+		"message": "Histórico"
+	},
+	"hotkeys": {
+		"message": "Teclas de atalho"
+	},
+	"import": {
+		"message": "Importar"
+	},
+	"importAllSettings": {
+		"message": "Importar todas as definições"
+	},
+	"importAllSettingsDescription": {
+		"message": "Importe todas as definições, incluindo modelos e propriedades. Isto irá substituir a sua configuração atual."
+	},
+	"importFailed": {
+		"message": "Falha na importação. Consulte a consola para mais detalhes."
+	},
+	"importModalTitle": {
+		"message": "Importar"
+	},
+	"importProperties": {
+		"message": "Importar propriedades"
+	},
+	"importPropertiesDescription": {
+		"message": "Para importar as suas propriedades do Obsidian, localize o ficheiro $strong_1_start$types.json$strong_1_end$ na pasta $strong_2_start$.obsidian$strong_2_end$ dentro do seu cofre. Note que esta pasta está oculta por predefinição na maioria dos sistemas operativos.",
+		"placeholders": {
+			"strong_1_end": {
+				"content": "</strong>"
+			},
+			"strong_1_start": {
+				"content": "<strong>"
+			},
+			"strong_2_end": {
+				"content": "</strong>"
+			},
+			"strong_2_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"importSettings": {
+		"message": "Importar definições"
+	},
+	"importTemplate": {
+		"message": "Importar modelo"
+	},
+	"interpret": {
+		"message": "interpretar"
+	},
+	"interpreter": {
+		"message": "Intérprete"
+	},
+	"interpreterContext": {
+		"message": "Contexto do intérprete"
+	},
+	"interpreterContextDescription": {
+		"message": "O contexto utilizado para interpretar variáveis do prompt. Substitui o contexto predefinido definido em $link_start$Definições do intérprete$link_end$. As variáveis podem ser usadas aqui.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=interpreter\">"
+			}
+		}
+	},
+	"language": {
+		"message": "Idioma"
+	},
+	"languageDescription": {
+		"message": "Escolha o idioma de apresentação da interface da extensão."
+	},
+	"last30Days": {
+		"message": "Últimos 30 dias"
+	},
+	"lastUsed": {
+		"message": "Última utilização"
+	},
+	"legacyMode": {
+		"message": "Modo legado"
+	},
+	"legacyModeDescription": {
+		"message": "Utiliza o método de recorte por URI compatível com o Obsidian 1.6.7 ou anterior. Note que o tamanho do conteúdo que pode recortar é limitado pelo seu navegador e sistema operativo. Algumas páginas podem falhar sem qualquer erro."
+	},
+	"modelName": {
+		"message": "Nome de apresentação"
+	},
+	"modelNameDescription": {
+		"message": "O nome do modelo que pretende apresentar na interface."
+	},
+	"modelProvider": {
+		"message": "Fornecedor"
+	},
+	"modelProviderDescription": {
+		"message": "Selecione o fornecedor para este modelo."
+	},
+	"modelProviderPlaceholder": {
+		"message": "Fornecedor"
+	},
+	"modelRequiredFields": {
+		"message": "O nome do modelo, o fornecedor e o ID do modelo são obrigatórios."
+	},
+	"models": {
+		"message": "Modelos"
+	},
+	"modelsListFor": {
+		"message": "Lista de modelos para $1"
+	},
+	"more": {
+		"message": "Mais"
+	},
+	"newTemplate": {
+		"message": "Novo modelo"
+	},
+	"noHighlights": {
+		"message": "Não fazer nada"
+	},
+	"noTemplates": {
+		"message": "Não há modelos disponíveis. Adicione um modelo nas definições."
+	},
+	"noUnusedProperties": {
+		"message": "Não foram encontradas propriedades não utilizadas."
+	},
+	"noteContent": {
+		"message": "Conteúdo da nota"
+	},
+	"noteContentDescription": {
+		"message": "Personalize o conteúdo da nota. Use variáveis para pré-preencher dados da página."
+	},
+	"noteLocation": {
+		"message": "Localização da nota"
+	},
+	"noteLocationDescription": {
+		"message": "A pasta ou o caminho da nota."
+	},
+	"noteName": {
+		"message": "Nome da nota"
+	},
+	"noteNameFormat": {
+		"message": "Nome da nota"
+	},
+	"noteNameFormatDescription": {
+		"message": "Formato do nome do ficheiro da nota. Pode usar variáveis como {{title}}, {{date}} e {{published}} para pré-preencher dados da página. $link_start$Saiba mais$link_end$.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/variables\" target=\"_blank\">"
+			}
+		}
+	},
+	"notesAboutPage": {
+		"message": "Notas sobre esta página..."
+	},
+	"onlyHttpSupported": {
+		"message": "Esta página não pode ser recortada. Apenas são suportados URLs http e https."
+	},
+	"open": {
+		"message": "Abrir"
+	},
+	"openBehaviorDescription": {
+		"message": "Escolha como o Web Clipper abre por predefinição."
+	},
+	"openBehaviorTitle": {
+		"message": "Comportamento de abertura"
+	},
+	"openEmbedded": {
+		"message": "Abrir na página"
+	},
+	"openSidePanel": {
+		"message": "Abrir painel lateral"
+	},
+	"optional": {
+		"message": "(opcional)"
+	},
+	"orPasteBelow": {
+		"message": "Ou cole o conteúdo abaixo"
+	},
+	"overwriteNote": {
+		"message": "Substituir nota"
+	},
+	"pageCannotBeClipped": {
+		"message": "Esta página não pode ser recortada."
+	},
+	"pageVariables": {
+		"message": "Variáveis da página"
+	},
+	"pagesSaved": {
+		"message": "página guardada"
+	},
+	"pagesSavedPlural": {
+		"message": "páginas guardadas"
+	},
+	"pasteJsonHere": {
+		"message": "Cole JSON aqui"
+	},
+	"pleaseReload": {
+		"message": "Tente recarregar a página."
+	},
+	"popularModels": {
+		"message": "Modelos populares"
+	},
+	"popularModelsDescription": {
+		"message": "Escolha entre modelos usados frequentemente ou introduza detalhes de um modelo personalizado."
+	},
+	"popup": {
+		"message": "Pop-up"
+	},
+	"prependToDaily": {
+		"message": "Adicionar à nota diária, no início"
+	},
+	"prependToExisting": {
+		"message": "Adicionar a uma nota existente, no início"
+	},
+	"preview": {
+		"message": "Pré-visualização"
+	},
+	"processing": {
+		"message": "a processar"
+	},
+	"properties": {
+		"message": "Propriedades"
+	},
+	"propertiesSettings": {
+		"message": "Propriedades"
+	},
+	"propertyName": {
+		"message": "Nome da propriedade"
+	},
+	"propertyTypeCheckbox": {
+		"message": "Caixa de seleção"
+	},
+	"propertyTypeDate": {
+		"message": "Data"
+	},
+	"propertyTypeDatetime": {
+		"message": "Data e hora"
+	},
+	"propertyTypeMultitext": {
+		"message": "Lista"
+	},
+	"propertyTypeNumber": {
+		"message": "Número"
+	},
+	"propertyTypeText": {
+		"message": "Texto"
+	},
+	"propertyValue": {
+		"message": "Valor da propriedade"
+	},
+	"provider": {
+		"message": "Fornecedor"
+	},
+	"providerApiKey": {
+		"message": "Chave de API"
+	},
+	"providerApiKeyDescription": {
+		"message": "A sua chave de API para este fornecedor."
+	},
+	"providerBaseUrl": {
+		"message": "URL base"
+	},
+	"providerBaseUrlDescription": {
+		"message": "O URL do endpoint da API para este fornecedor."
+	},
+	"providerModelId": {
+		"message": "ID do modelo"
+	},
+	"providerModelIdDescription": {
+		"message": "O identificador do modelo do seu fornecedor. Normalmente um nome curto sem espaços."
+	},
+	"providerModelIdPlaceholder": {
+		"message": "ID do modelo"
+	},
+	"providerName": {
+		"message": "Nome do fornecedor"
+	},
+	"providerNameDescription": {
+		"message": "Nome de apresentação para este fornecedor."
+	},
+	"providerPreset": {
+		"message": "Predefinição"
+	},
+	"providerPresetDescription": {
+		"message": "Escolha um fornecedor ou crie um personalizado."
+	},
+	"providerRequiredFields": {
+		"message": "O nome do fornecedor e o URL base são obrigatórios."
+	},
+	"providers": {
+		"message": "Fornecedores"
+	},
+	"rateExtensionDescription": {
+		"message": "Está a gostar do Web Clipper? Ajude-nos atribuindo uma classificação."
+	},
+	"reader": {
+		"message": "Leitor"
+	},
+	"readerAppearance": {
+		"message": "Aspeto"
+	},
+	"readerAppearanceAuto": {
+		"message": "Automático"
+	},
+	"readerAppearanceDark": {
+		"message": "Escuro"
+	},
+	"readerAppearanceDescription": {
+		"message": "Escolha o aspeto claro ou escuro."
+	},
+	"readerAppearanceLight": {
+		"message": "Claro"
+	},
+	"readerBlendImages": {
+		"message": "Misturar imagens"
+	},
+	"readerBlendImagesDescription": {
+		"message": "Misture as imagens com o fundo da página."
+	},
+	"readerCloseImageViewer": {
+		"message": "Fechar visualizador de imagens"
+	},
+	"readerCollapseComment": {
+		"message": "Recolher comentário"
+	},
+	"readerColorLinks": {
+		"message": "Colorir ligações"
+	},
+	"readerColorSchemeDefault": {
+		"message": "Predefinido"
+	},
+	"readerCustomCss": {
+		"message": "CSS personalizado"
+	},
+	"readerCustomCssDescription": {
+		"message": "CSS aplicado automaticamente na vista de leitura."
+	},
+	"readerDarkTheme": {
+		"message": "Tema do modo escuro"
+	},
+	"readerDarkThemeDescription": {
+		"message": "Use um tema diferente no modo escuro."
+	},
+	"readerError": {
+		"message": "Falha ao extrair conteúdo."
+	},
+	"readerFont": {
+		"message": "Opções de tipo de letra"
+	},
+	"readerFontDefault": {
+		"message": "Predefinido"
+	},
+	"readerFontDescription": {
+		"message": "Adicione tipos de letra instalados no seu sistema. Prima Enter para adicionar um tipo de letra."
+	},
+	"readerFontNotFound": {
+		"message": "Não encontrado"
+	},
+	"readerFontPlaceholder": {
+		"message": "Prima Enter para adicionar um tipo de letra"
+	},
+	"readerFontSetDefault": {
+		"message": "Definir como predefinido"
+	},
+	"readerFontSize": {
+		"message": "Tamanho base do tipo de letra"
+	},
+	"readerFontSystem": {
+		"message": "Sistema"
+	},
+	"readerFontSystemSans": {
+		"message": "Sans-serif"
+	},
+	"readerFontSystemSerif": {
+		"message": "Serif"
+	},
+	"readerFonts": {
+		"message": "Tipos de letra"
+	},
+	"readerFootnotes": {
+		"message": "Notas de rodapé"
+	},
+	"readerImages": {
+		"message": "Imagens"
+	},
+	"readerLineHeight": {
+		"message": "Altura da linha"
+	},
+	"readerLineWidth": {
+		"message": "Largura da linha"
+	},
+	"readerLoading": {
+		"message": "A simplificar…"
+	},
+	"readerSettings": {
+		"message": "Definições do leitor"
+	},
+	"readerTheme": {
+		"message": "Tema"
+	},
+	"readerThemeDescription": {
+		"message": "Escolha as cores usadas na vista de leitura."
+	},
+	"readerThemeSection": {
+		"message": "Tema"
+	},
+	"readerTypography": {
+		"message": "Tipografia"
+	},
+	"readerViewFullSize": {
+		"message": "Ver em tamanho real"
+	},
+	"recommended": {
+		"message": "recomendado"
+	},
+	"refresh": {
+		"message": "Atualizar"
+	},
+	"remove": {
+		"message": "Remover"
+	},
+	"removeProperty": {
+		"message": "Remover propriedade"
+	},
+	"removeUnusedProperties": {
+		"message": "Remover propriedades não utilizadas"
+	},
+	"removeUnusedPropertiesDescription": {
+		"message": "Remova todas as propriedades que não são usadas em nenhum modelo."
+	},
+	"removeVault": {
+		"message": "Remover cofre"
+	},
+	"replaceContent": {
+		"message": "Substituir o conteúdo da página"
+	},
+	"reset": {
+		"message": "Repor"
+	},
+	"resetDefaultTemplate": {
+		"message": "Repor modelo predefinido"
+	},
+	"resetDefaultTemplateDescription": {
+		"message": "Remova quaisquer alterações que tenha feito ao modelo predefinido."
+	},
+	"resetProvidersAndModels": {
+		"message": "Repor modelos predefinidos"
+	},
+	"resetProvidersAndModelsDescription": {
+		"message": "Reponha fornecedores e modelos para as definições predefinidas."
+	},
+	"save": {
+		"message": "Guardar"
+	},
+	"saveBehaviorDescription": {
+		"message": "Escolha a opção predefinida para guardar páginas. As opções alternativas aparecem no menu suspenso ao lado do botão principal."
+	},
+	"saveBehaviorLabel": {
+		"message": "Comportamento de guardar"
+	},
+	"saveFile": {
+		"message": "Guardar ficheiro..."
+	},
+	"searchVariables": {
+		"message": "Pesquisar variáveis..."
+	},
+	"selectProvider": {
+		"message": "Selecionar um fornecedor"
+	},
+	"selectTemplateToExport": {
+		"message": "Selecione um modelo para exportar."
+	},
+	"settings": {
+		"message": "Definições"
+	},
+	"settingsHeading": {
+		"message": "Definições"
+	},
+	"settingsImportSuccess": {
+		"message": "Todas as definições foram importadas com sucesso. Atualize a página para ver as alterações."
+	},
+	"share": {
+		"message": "Partilhar..."
+	},
+	"shortcutInstructionsBrave": {
+		"message": "Para alterar as atribuições de teclas, vá a $1"
+	},
+	"shortcutInstructionsChrome": {
+		"message": "Para alterar as atribuições de teclas, vá a $1"
+	},
+	"shortcutInstructionsDefault": {
+		"message": "Para alterar as atribuições de teclas, consulte as definições de extensões do seu navegador."
+	},
+	"shortcutInstructionsEdge": {
+		"message": "Para alterar as atribuições de teclas, vá a $1"
+	},
+	"shortcutInstructionsFirefox": {
+		"message": "Para alterar as atribuições de teclas, vá a $1, clique no ícone de engrenagem e selecione \"Gerir atalhos de extensões\"."
+	},
+	"shortcutInstructionsIntro": {
+		"message": "Os atalhos de teclado dão-lhe acesso rápido às funcionalidades do clipper."
+	},
+	"shortcutInstructionsSafari": {
+		"message": "Os atalhos de teclado não são personalizáveis no Safari."
+	},
+	"shortcutNotSet": {
+		"message": "Não definido"
+	},
+	"showActionsButton": {
+		"message": "Mostrar botão de ações"
+	},
+	"showActionsDescription": {
+		"message": "Permite-lhe inspecionar as variáveis da página a partir do menu do clipper. Útil para ver as variáveis disponíveis para usar em modelos."
+	},
+	"showPageVariables": {
+		"message": "Mostrar variáveis da página"
+	},
+	"silentOpen": {
+		"message": "Guardar a nota recortada sem a abrir"
+	},
+	"silentOpenDescription": {
+		"message": "As notas recortadas serão guardadas, mas não serão abertas como um novo separador. O Obsidian continuará a ser trazido para primeiro plano."
+	},
+	"specificNoteName": {
+		"message": "Nome específico da nota"
+	},
+	"systemDefault": {
+		"message": "Sistema"
+	},
+	"template": {
+		"message": "Modelo"
+	},
+	"templateCopied": {
+		"message": "JSON do modelo copiado para a área de transferência"
+	},
+	"templateCopyError": {
+		"message": "Falha ao copiar o JSON do modelo para a área de transferência"
+	},
+	"templateErrorCount": {
+		"message": "Há um erro no seu modelo."
+	},
+	"templateErrorsCount": {
+		"message": "Há $1 erros no seu modelo."
+	},
+	"templateGroupContent": {
+		"message": "Conteúdo"
+	},
+	"templateGroupLocation": {
+		"message": "Localização"
+	},
+	"templateName": {
+		"message": "Nome do modelo"
+	},
+	"templateProperties": {
+		"message": "Propriedades"
+	},
+	"templatePropertiesDescription": {
+		"message": "Propriedades a adicionar no topo da nota recortada. Use variáveis para pré-preencher dados da página."
+	},
+	"templateTriggers": {
+		"message": "Acionadores do modelo"
+	},
+	"templateTriggersDescription": {
+		"message": "Defina regras para selecionar automaticamente este modelo se corresponder a um padrão de URL ou contiver dados schema.org. Uma regra por linha."
+	},
+	"templateValid": {
+		"message": "A sintaxe do modelo é válida"
+	},
+	"templatesHeading": {
+		"message": "Modelos"
+	},
+	"thinking": {
+		"message": "a pensar"
+	},
+	"unknownProvider": {
+		"message": "Fornecedor desconhecido"
+	},
+	"updateAvailable": {
+		"message": "Está disponível uma atualização."
+	},
+	"usingLatestVersion": {
+		"message": "Está a usar a versão mais recente."
+	},
+	"vault": {
+		"message": "Cofre"
+	},
+	"vaultDescription": {
+		"message": "Selecione o cofre predefinido para este modelo. Vá a $link_start$definições gerais$link_end$ para adicionar ou remover cofres.",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=general\">"
+			}
+		}
+	},
+	"vaults": {
+		"message": "Cofres"
+	},
+	"vaultsDescription": {
+		"message": "Por predefinição, as notas recortadas são guardadas no cofre atualmente aberto. Pode adicionar cofres aqui se quiser a opção de guardar em cofres diferentes. Os nomes dos cofres têm de corresponder exatamente ao nome do cofre do Obsidian. Prima $strong_start$Enter$strong_end$ para adicionar um cofre.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"version": {
+		"message": "Versão"
+	}
+}

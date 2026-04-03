@@ -20,6 +20,7 @@
 		padding: 0.25rem;
 		margin: 0.25rem 0 0 0;
 		border-radius: var(--radius-s);
+		corner-shape: var(--corner-shape);
 		user-select: none;
 		-webkit-user-select: none;
 	}
@@ -37,6 +38,7 @@
 	padding: 0.25rem 0.5rem;
 	font-size: var(--font-ui-smaller);
 	border-radius: var(--radius-s);
+	corner-shape: var(--corner-shape);
 	white-space: nowrap;
 
 	&:hover {

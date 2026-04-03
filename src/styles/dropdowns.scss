@@ -48,6 +48,11 @@ select {
 }
 
 #settings {
+	.mod-horizontal {
+		select {
+			width: auto;
+		}
+	}
 	select {
 		border: none;
 		&:not(.clickable-icon) {

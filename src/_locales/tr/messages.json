@@ -576,6 +576,9 @@
 	"prependToExisting": {
 		"message": "Mevcut nota, başa ekle"
 	},
+	"preview": {
+		"message": "Önizleme"
+	},
 	"processing": {
 		"message": "İşleniyor"
 	},
@@ -656,6 +659,120 @@
 	},
 	"reader": {
 		"message": "Okuyucu"
+	},
+	"readerAppearance": {
+		"message": "Görünüm"
+	},
+	"readerAppearanceAuto": {
+		"message": "Otomatik"
+	},
+	"readerAppearanceDark": {
+		"message": "Koyu"
+	},
+	"readerAppearanceDescription": {
+		"message": "Açık veya koyu görünümü seçin."
+	},
+	"readerAppearanceLight": {
+		"message": "Açık"
+	},
+	"readerBlendImages": {
+		"message": "Görselleri harmanla"
+	},
+	"readerBlendImagesDescription": {
+		"message": "Görselleri sayfa arka planıyla harmanlayın."
+	},
+	"readerCloseImageViewer": {
+		"message": "Görsel görüntüleyiciyi kapat"
+	},
+	"readerCollapseComment": {
+		"message": "Yorumu daralt"
+	},
+	"readerColorLinks": {
+		"message": "Bağlantıları renklendir"
+	},
+	"readerColorSchemeDefault": {
+		"message": "Varsayılan"
+	},
+	"readerCustomCss": {
+		"message": "Özel CSS"
+	},
+	"readerCustomCssDescription": {
+		"message": "Okuma görünümünde otomatik olarak uygulanan CSS."
+	},
+	"readerDarkTheme": {
+		"message": "Koyu mod teması"
+	},
+	"readerDarkThemeDescription": {
+		"message": "Koyu modda farklı bir tema kullanın."
+	},
+	"readerError": {
+		"message": "İçerik çıkarılamadı."
+	},
+	"readerFont": {
+		"message": "Yazı tipi seçenekleri"
+	},
+	"readerFontDefault": {
+		"message": "Varsayılan"
+	},
+	"readerFontDescription": {
+		"message": "Sisteminizde yüklü yazı tiplerini ekleyin. Bir yazı tipi eklemek için Enter'a basın."
+	},
+	"readerFontNotFound": {
+		"message": "Bulunamadı"
+	},
+	"readerFontPlaceholder": {
+		"message": "Bir yazı tipi eklemek için Enter'a basın"
+	},
+	"readerFontSetDefault": {
+		"message": "Varsayılan olarak ayarla"
+	},
+	"readerFontSize": {
+		"message": "Temel yazı tipi boyutu"
+	},
+	"readerFontSystem": {
+		"message": "Sistem"
+	},
+	"readerFontSystemSans": {
+		"message": "Sans-serif"
+	},
+	"readerFontSystemSerif": {
+		"message": "Serif"
+	},
+	"readerFonts": {
+		"message": "Yazı tipleri"
+	},
+	"readerFootnotes": {
+		"message": "Dipnotlar"
+	},
+	"readerImages": {
+		"message": "Görseller"
+	},
+	"readerLineHeight": {
+		"message": "Satır yüksekliği"
+	},
+	"readerLineWidth": {
+		"message": "Satır genişliği"
+	},
+	"readerLoading": {
+		"message": "Sadeleştiriliyor…"
+	},
+	"readerSettings": {
+		"message": "Okuyucu ayarları"
+	},
+	"readerTheme": {
+		"message": "Tema"
+	},
+	"readerThemeDescription": {
+		"message": "Okuma görünümünde kullanılan renkleri seçin."
+	},
+	"readerThemeSection": {
+		"message": "Tema"
+	},
+	"readerTypography": {
+		"message": "Tipografi"
+	},
+	"readerViewFullSize": {
+		"message": "Tam boyutta görüntüle"
 	},
 	"recommended": {
 		"message": "önerilen"
@@ -774,6 +891,9 @@
 	"systemDefault": {
 		"message": "Sistem"
 	},
+	"template": {
+		"message": "Şablon"
+	},
 	"templateCopied": {
 		"message": "Şablon JSON'u panoya kopyalandı"
 	},
@@ -785,6 +905,12 @@
 	},
 	"templateErrorsCount": {
 		"message": "Şablonunuzda $1 hata var."
+	},
+	"templateGroupContent": {
+		"message": "İçerik"
+	},
+	"templateGroupLocation": {
+		"message": "Konum"
 	},
 	"templateName": {
 		"message": "Şablon adı"

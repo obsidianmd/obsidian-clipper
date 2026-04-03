@@ -576,6 +576,9 @@
 	"prependToExisting": {
 		"message": "Agregar a una nota existente, al principio"
 	},
+	"preview": {
+		"message": "Vista previa"
+	},
 	"processing": {
 		"message": "procesando"
 	},
@@ -656,6 +659,120 @@
 	},
 	"reader": {
 		"message": "Lector"
+	},
+	"readerAppearance": {
+		"message": "Apariencia"
+	},
+	"readerAppearanceAuto": {
+		"message": "Automático"
+	},
+	"readerAppearanceDark": {
+		"message": "Oscuro"
+	},
+	"readerAppearanceDescription": {
+		"message": "Elige apariencia clara u oscura."
+	},
+	"readerAppearanceLight": {
+		"message": "Claro"
+	},
+	"readerBlendImages": {
+		"message": "Mezclar imágenes"
+	},
+	"readerBlendImagesDescription": {
+		"message": "Mezcla las imágenes con el fondo de la página."
+	},
+	"readerCloseImageViewer": {
+		"message": "Cerrar visor de imágenes"
+	},
+	"readerCollapseComment": {
+		"message": "Contraer comentario"
+	},
+	"readerColorLinks": {
+		"message": "Colorear enlaces"
+	},
+	"readerColorSchemeDefault": {
+		"message": "Predeterminado"
+	},
+	"readerCustomCss": {
+		"message": "CSS personalizado"
+	},
+	"readerCustomCssDescription": {
+		"message": "CSS aplicado automáticamente en la vista de lectura."
+	},
+	"readerDarkTheme": {
+		"message": "Tema del modo oscuro"
+	},
+	"readerDarkThemeDescription": {
+		"message": "Usa un tema diferente en el modo oscuro."
+	},
+	"readerError": {
+		"message": "No se pudo extraer el contenido."
+	},
+	"readerFont": {
+		"message": "Opciones de fuente"
+	},
+	"readerFontDefault": {
+		"message": "Predeterminado"
+	},
+	"readerFontDescription": {
+		"message": "Añade fuentes instaladas en tu sistema. Pulsa Intro para añadir una fuente."
+	},
+	"readerFontNotFound": {
+		"message": "No encontrado"
+	},
+	"readerFontPlaceholder": {
+		"message": "Pulsa Intro para añadir una fuente"
+	},
+	"readerFontSetDefault": {
+		"message": "Establecer como predeterminado"
+	},
+	"readerFontSize": {
+		"message": "Tamaño de fuente base"
+	},
+	"readerFontSystem": {
+		"message": "Sistema"
+	},
+	"readerFontSystemSans": {
+		"message": "Sans-serif"
+	},
+	"readerFontSystemSerif": {
+		"message": "Serif"
+	},
+	"readerFonts": {
+		"message": "Fuentes"
+	},
+	"readerFootnotes": {
+		"message": "Notas al pie"
+	},
+	"readerImages": {
+		"message": "Imágenes"
+	},
+	"readerLineHeight": {
+		"message": "Altura de línea"
+	},
+	"readerLineWidth": {
+		"message": "Ancho de línea"
+	},
+	"readerLoading": {
+		"message": "Simplificando…"
+	},
+	"readerSettings": {
+		"message": "Ajustes del lector"
+	},
+	"readerTheme": {
+		"message": "Tema"
+	},
+	"readerThemeDescription": {
+		"message": "Elige los colores usados en la vista de lectura."
+	},
+	"readerThemeSection": {
+		"message": "Tema"
+	},
+	"readerTypography": {
+		"message": "Tipografía"
+	},
+	"readerViewFullSize": {
+		"message": "Ver a tamaño completo"
 	},
 	"recommended": {
 		"message": "recomendado"
@@ -774,6 +891,9 @@
 	"systemDefault": {
 		"message": "Sistema"
 	},
+	"template": {
+		"message": "Plantilla"
+	},
 	"templateCopied": {
 		"message": "Se copió el JSON de la plantilla al portapapeles"
 	},
@@ -785,6 +905,12 @@
 	},
 	"templateErrorsCount": {
 		"message": "Hay $1 errores en tu plantilla."
+	},
+	"templateGroupContent": {
+		"message": "Contenido"
+	},
+	"templateGroupLocation": {
+		"message": "Ubicación"
 	},
 	"templateName": {
 		"message": "Nombre de la plantilla"

@@ -568,6 +568,9 @@
 	"prependToExisting": {
 		"message": "הוסף להערה קיימת, בחלק העליון"
 	},
+	"preview": {
+		"message": "תצוגה מקדימה"
+	},
 	"processing": {
 		"message": "מעבד"
 	},
@@ -648,6 +651,120 @@
 	},
 	"reader": {
 		"message": "קורא"
+	},
+	"readerAppearance": {
+		"message": "מראה"
+	},
+	"readerAppearanceAuto": {
+		"message": "אוטומטי"
+	},
+	"readerAppearanceDark": {
+		"message": "כהה"
+	},
+	"readerAppearanceDescription": {
+		"message": "בחרו מראה בהיר או כהה."
+	},
+	"readerAppearanceLight": {
+		"message": "בהיר"
+	},
+	"readerBlendImages": {
+		"message": "מיזוג תמונות"
+	},
+	"readerBlendImagesDescription": {
+		"message": "מזג תמונות עם רקע הדף."
+	},
+	"readerCloseImageViewer": {
+		"message": "סגור מציג תמונות"
+	},
+	"readerCollapseComment": {
+		"message": "כווץ תגובה"
+	},
+	"readerColorLinks": {
+		"message": "צבע קישורים"
+	},
+	"readerColorSchemeDefault": {
+		"message": "ברירת מחדל"
+	},
+	"readerCustomCss": {
+		"message": "CSS מותאם אישית"
+	},
+	"readerCustomCssDescription": {
+		"message": "CSS מוחל אוטומטית בתצוגת קריאה."
+	},
+	"readerDarkTheme": {
+		"message": "ערכת נושא למצב כהה"
+	},
+	"readerDarkThemeDescription": {
+		"message": "השתמשו בערכת נושא שונה במצב כהה."
+	},
+	"readerError": {
+		"message": "חילוץ התוכן נכשל."
+	},
+	"readerFont": {
+		"message": "אפשרויות גופן"
+	},
+	"readerFontDefault": {
+		"message": "ברירת מחדל"
+	},
+	"readerFontDescription": {
+		"message": "הוסיפו גופנים המותקנים במערכת שלכם. לחצו Enter כדי להוסיף גופן."
+	},
+	"readerFontNotFound": {
+		"message": "לא נמצא"
+	},
+	"readerFontPlaceholder": {
+		"message": "לחצו Enter כדי להוסיף גופן"
+	},
+	"readerFontSetDefault": {
+		"message": "הגדר כברירת מחדל"
+	},
+	"readerFontSize": {
+		"message": "גודל גופן בסיסי"
+	},
+	"readerFontSystem": {
+		"message": "מערכת"
+	},
+	"readerFontSystemSans": {
+		"message": "ללא תגים"
+	},
+	"readerFontSystemSerif": {
+		"message": "עם תגים"
+	},
+	"readerFonts": {
+		"message": "גופנים"
+	},
+	"readerFootnotes": {
+		"message": "הערות שוליים"
+	},
+	"readerImages": {
+		"message": "תמונות"
+	},
+	"readerLineHeight": {
+		"message": "גובה שורה"
+	},
+	"readerLineWidth": {
+		"message": "רוחב שורה"
+	},
+	"readerLoading": {
+		"message": "מפענח…"
+	},
+	"readerSettings": {
+		"message": "הגדרות קורא"
+	},
+	"readerTheme": {
+		"message": "ערכת נושא"
+	},
+	"readerThemeDescription": {
+		"message": "בחרו את הצבעים המשמשים בתצוגת קריאה."
+	},
+	"readerThemeSection": {
+		"message": "ערכת נושא"
+	},
+	"readerTypography": {
+		"message": "טיפוגרפיה"
+	},
+	"readerViewFullSize": {
+		"message": "הצג בגודל מלא"
 	},
 	"recommended": {
 		"message": "מומלץ"
@@ -766,6 +883,9 @@
 	"systemDefault": {
 		"message": "ברירת מחדל של המערכת"
 	},
+	"template": {
+		"message": "תבנית"
+	},
 	"templateCopied": {
 		"message": "ה-JSON של התבנית הועתק ללוח"
 	},
@@ -777,6 +897,12 @@
 	},
 	"templateErrorsCount": {
 		"message": "יש $1 שגיאות בתבנית שלך."
+	},
+	"templateGroupContent": {
+		"message": "תוכן"
+	},
+	"templateGroupLocation": {
+		"message": "מיקום"
 	},
 	"templateName": {
 		"message": "שם התבנית"

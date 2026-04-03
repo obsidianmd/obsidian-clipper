@@ -71,7 +71,7 @@ export function updateVaultList(): void {
 
 		const dragHandle = createElementWithClass("div", "drag-handle");
 		dragHandle.appendChild(
-			createElementWithHTML("i", "", { "data-lucide": "grip-vertical" }),
+			createElementWithHTML("i", "", { "data-lucide": "grip-vertical" })
 		);
 		li.appendChild(dragHandle);
 
@@ -81,12 +81,12 @@ export function updateVaultList(): void {
 
 		const removeBtn = createElementWithClass(
 			"button",
-			"remove-vault-btn clickable-icon",
+			"setting-item-list-remove clickable-icon"
 		);
 		removeBtn.setAttribute("type", "button");
 		removeBtn.setAttribute("aria-label", getMessage("removeVault"));
 		removeBtn.appendChild(
-			createElementWithHTML("i", "", { "data-lucide": "trash-2" }),
+			createElementWithHTML("i", "", { "data-lucide": "trash-2" })
 		);
 		li.appendChild(removeBtn);
 
@@ -118,7 +118,7 @@ export function removeVault(index: number): void {
 
 export async function setShortcutInstructions() {
 	const shortcutInstructionsElement = document.querySelector(
-		".shortcut-instructions",
+		".shortcut-instructions"
 	);
 	if (shortcutInstructionsElement) {
 		const browser = await detectBrowser();
@@ -126,8 +126,8 @@ export async function setShortcutInstructions() {
 		shortcutInstructionsElement.textContent = "";
 		shortcutInstructionsElement.appendChild(
 			document.createTextNode(
-				getMessage("shortcutInstructionsIntro") + " ",
-			),
+				getMessage("shortcutInstructionsIntro") + " "
+			)
 		);
 
 		// Browser-specific instructions
@@ -172,7 +172,7 @@ export async function setShortcutInstructions() {
 			const parts = instructionsText.split("$URL");
 			if (parts.length === 2) {
 				shortcutInstructionsElement.appendChild(
-					document.createTextNode(parts[0]),
+					document.createTextNode(parts[0])
 				);
 
 				const strongElement = document.createElement("strong");
@@ -180,18 +180,18 @@ export async function setShortcutInstructions() {
 				shortcutInstructionsElement.appendChild(strongElement);
 
 				shortcutInstructionsElement.appendChild(
-					document.createTextNode(parts[1]),
+					document.createTextNode(parts[1])
 				);
 			} else {
 				// Fallback if no placeholder found
 				shortcutInstructionsElement.appendChild(
-					document.createTextNode(instructionsText),
+					document.createTextNode(instructionsText)
 				);
 			}
 		} else {
 			// Safari and default cases (no URL needed)
 			shortcutInstructionsElement.appendChild(
-				document.createTextNode(instructionsText),
+				document.createTextNode(instructionsText)
 			);
 		}
 	}
@@ -236,7 +236,7 @@ export function initializeGeneralSettings(): void {
 	loadSettings()
 		.then(async () => {
 			console.log(
-				"[AppFlowy] loadSettings done, calling initializeAppflowySettings soon",
+				"[AppFlowy] loadSettings done, calling initializeAppflowySettings soon"
 			);
 			await setupLanguageAndDirection();
 
@@ -266,12 +266,12 @@ export function initializeGeneralSettings(): void {
 					stars.forEach((star) => {
 						star.addEventListener("click", async () => {
 							const rating = parseInt(
-								star.getAttribute("data-rating") || "0",
+								star.getAttribute("data-rating") || "0"
 							);
 							stars.forEach((s) => {
 								if (
 									parseInt(
-										s.getAttribute("data-rating") || "0",
+										s.getAttribute("data-rating") || "0"
 									) <= rating
 								) {
 									s.classList.add("is-active");
@@ -312,11 +312,11 @@ export function initializeGeneralSettings(): void {
 			// Initialize feedback modal close button
 			const feedbackModal = document.getElementById("feedback-modal");
 			const feedbackCloseBtn = feedbackModal?.querySelector(
-				".feedback-close-btn",
+				".feedback-close-btn"
 			);
 			if (feedbackCloseBtn) {
 				feedbackCloseBtn.addEventListener("click", () =>
-					hideModal(feedbackModal),
+					hideModal(feedbackModal)
 				);
 			}
 		})
@@ -327,58 +327,58 @@ export function initializeGeneralSettings(): void {
 
 function initializeAutoSave(): void {
 	const generalSettingsForm = document.getElementById(
-		"general-settings-form",
+		"general-settings-form"
 	);
 	if (generalSettingsForm) {
 		// Listen for both input and change events
 		generalSettingsForm.addEventListener(
 			"input",
-			debounce(saveSettingsFromForm, 500),
+			debounce(saveSettingsFromForm, 500)
 		);
 		generalSettingsForm.addEventListener(
 			"change",
-			debounce(saveSettingsFromForm, 500),
+			debounce(saveSettingsFromForm, 500)
 		);
 	}
 }
 
 function saveSettingsFromForm(): void {
 	const openBehaviorDropdown = document.getElementById(
-		"open-behavior-dropdown",
+		"open-behavior-dropdown"
 	) as HTMLSelectElement;
 	const showMoreActionsToggle = document.getElementById(
-		"show-more-actions-toggle",
+		"show-more-actions-toggle"
 	) as HTMLInputElement;
 	const betaFeaturesToggle = document.getElementById(
-		"beta-features-toggle",
+		"beta-features-toggle"
 	) as HTMLInputElement;
 	const legacyModeToggle = document.getElementById(
-		"legacy-mode-toggle",
+		"legacy-mode-toggle"
 	) as HTMLInputElement;
 	const silentOpenToggle = document.getElementById(
-		"silent-open-toggle",
+		"silent-open-toggle"
 	) as HTMLInputElement;
 	const highlighterToggle = document.getElementById(
-		"highlighter-toggle",
+		"highlighter-toggle"
 	) as HTMLInputElement;
 	const alwaysShowHighlightsToggle = document.getElementById(
-		"highlighter-visibility",
+		"highlighter-visibility"
 	) as HTMLInputElement;
 	const highlightBehaviorSelect = document.getElementById(
-		"highlighter-behavior",
+		"highlighter-behavior"
 	) as HTMLSelectElement;
 
 	const appflowyServerUrlInput = document.getElementById(
-		"appflowy-server-url",
+		"appflowy-server-url"
 	) as HTMLInputElement;
 	const appflowyApiTokenInput = document.getElementById(
-		"appflowy-api-token",
+		"appflowy-api-token"
 	) as HTMLInputElement;
 	const appflowyWorkspaceIdInput = document.getElementById(
-		"appflowy-workspace-id",
+		"appflowy-workspace-id"
 	) as HTMLInputElement;
 	const appflowyParentViewIdInput = document.getElementById(
-		"appflowy-parent-view-id",
+		"appflowy-parent-view-id"
 	) as HTMLInputElement;
 
 	const updatedSettings = {
@@ -428,13 +428,13 @@ function initializeShowMoreActionsToggle(): void {
 				...generalSettings,
 				showMoreActionsButton: checked,
 			});
-		},
+		}
 	);
 }
 
 function initializeVaultInput(): void {
 	const vaultInput = document.getElementById(
-		"vault-input",
+		"vault-input"
 	) as HTMLInputElement;
 	if (vaultInput) {
 		vaultInput.addEventListener("keypress", (e) => {
@@ -468,7 +468,7 @@ async function initializeKeyboardShortcuts(): Promise<void> {
 			commands.forEach((command) => {
 				const shortcutItem = createElementWithClass(
 					"div",
-					"shortcut-item",
+					"shortcut-item"
 				);
 
 				const descriptionSpan = document.createElement("span");
@@ -477,7 +477,7 @@ async function initializeKeyboardShortcuts(): Promise<void> {
 
 				const hotkeySpan = createElementWithClass(
 					"span",
-					"setting-hotkey",
+					"setting-hotkey"
 				);
 				hotkeySpan.textContent =
 					command.shortcut || getMessage("shortcutNotSet");
@@ -495,7 +495,7 @@ function initializeBetaFeaturesToggle(): void {
 		generalSettings.betaFeatures,
 		(checked) => {
 			saveSettings({ ...generalSettings, betaFeatures: checked });
-		},
+		}
 	);
 }
 
@@ -505,7 +505,7 @@ function initializeLegacyModeToggle(): void {
 		generalSettings.legacyMode,
 		(checked) => {
 			saveSettings({ ...generalSettings, legacyMode: checked });
-		},
+		}
 	);
 }
 
@@ -515,7 +515,7 @@ function initializeSilentOpenToggle(): void {
 		generalSettings.silentOpen,
 		(checked) => {
 			saveSettings({ ...generalSettings, silentOpen: checked });
-		},
+		}
 	);
 }
 
@@ -528,13 +528,13 @@ function initializeOpenBehaviorDropdown(): void {
 				...generalSettings,
 				openBehavior: value as "popup" | "embedded",
 			});
-		},
+		}
 	);
 }
 
 function initializeResetDefaultTemplateButton(): void {
 	const resetDefaultTemplateBtn = document.getElementById(
-		"reset-default-template-btn",
+		"reset-default-template-btn"
 	);
 	if (resetDefaultTemplateBtn) {
 		resetDefaultTemplateBtn.addEventListener("click", resetDefaultTemplate);
@@ -543,7 +543,7 @@ function initializeResetDefaultTemplateButton(): void {
 
 function initializeSaveBehaviorDropdown(): void {
 	const dropdown = document.getElementById(
-		"save-behavior-dropdown",
+		"save-behavior-dropdown"
 	) as HTMLSelectElement;
 	if (!dropdown) return;
 
@@ -559,34 +559,34 @@ function initializeSaveBehaviorDropdown(): void {
 
 function initializeAppflowySettings(): void {
 	const serverUrlInput = document.getElementById(
-		"appflowy-server-url",
+		"appflowy-server-url"
 	) as HTMLInputElement;
 	const apiTokenInput = document.getElementById(
-		"appflowy-api-token",
+		"appflowy-api-token"
 	) as HTMLInputElement;
 	const workspaceIdInput = document.getElementById(
-		"appflowy-workspace-id",
+		"appflowy-workspace-id"
 	) as HTMLInputElement;
 	const spaceSelect = document.getElementById(
-		"appflowy-space-select",
+		"appflowy-space-select"
 	) as HTMLSelectElement;
 	const sendOtpBtn = document.getElementById(
-		"appflowy-send-otp-btn",
+		"appflowy-send-otp-btn"
 	) as HTMLButtonElement;
 	const emailInput = document.getElementById(
-		"appflowy-email-input",
+		"appflowy-email-input"
 	) as HTMLInputElement;
 	const otpRow = document.getElementById(
-		"appflowy-otp-row",
+		"appflowy-otp-row"
 	) as HTMLDivElement;
 	const otpCodeInput = document.getElementById(
-		"appflowy-otp-code",
+		"appflowy-otp-code"
 	) as HTMLInputElement;
 	const verifyOtpBtn = document.getElementById(
-		"appflowy-verify-otp-btn",
+		"appflowy-verify-otp-btn"
 	) as HTMLButtonElement;
 	const fetchBtn = document.getElementById(
-		"appflowy-fetch-workspaces-btn",
+		"appflowy-fetch-workspaces-btn"
 	) as HTMLButtonElement;
 
 	if (serverUrlInput)
@@ -633,7 +633,7 @@ function initializeAppflowySettings(): void {
 				console.error("[AppFlowy] Send OTP error:", err);
 				alert(
 					"Failed to send code: " +
-						(err instanceof Error ? err.message : String(err)),
+						(err instanceof Error ? err.message : String(err))
 				);
 				sendOtpBtn.textContent = originalText;
 			} finally {
@@ -699,7 +699,7 @@ function initializeAppflowySettings(): void {
 				try {
 					const workspaces = await fetchAppflowyWorkspaces(
 						serverUrl,
-						accessToken,
+						accessToken
 					);
 					if (workspaces.length > 0 && workspaceIdInput) {
 						workspaceIdInput.value = workspaces[0].workspace_id;
@@ -707,7 +707,7 @@ function initializeAppflowySettings(): void {
 				} catch (e) {
 					console.warn(
 						"[AppFlowy] Could not auto-fetch workspace:",
-						e,
+						e
 					);
 				}
 
@@ -722,7 +722,7 @@ function initializeAppflowySettings(): void {
 				console.error("[AppFlowy] Verify OTP error:", err);
 				alert(
 					"Verification failed: " +
-						(err instanceof Error ? err.message : String(err)),
+						(err instanceof Error ? err.message : String(err))
 				);
 				verifyOtpBtn.textContent = originalText;
 			} finally {
@@ -778,7 +778,7 @@ function initializeAppflowySettings(): void {
 			try {
 				const workspaces = await fetchAppflowyWorkspaces(
 					serverUrl,
-					apiToken,
+					apiToken
 				);
 				if (workspaces.length === 0) {
 					alert(getMessage("appflowyNoWorkspaces"));
@@ -787,7 +787,7 @@ function initializeAppflowySettings(): void {
 						workspaceIdInput.value = workspaces[0].workspace_id;
 					await saveAppflowyConfigNow();
 					alert(
-						`Workspace: ${workspaces[0].workspace_name} (${workspaces[0].workspace_id})`,
+						`Workspace: ${workspaces[0].workspace_name} (${workspaces[0].workspace_id})`
 					);
 				} else {
 					// Multiple workspaces - show list and let user copy the ID
@@ -795,7 +795,7 @@ function initializeAppflowySettings(): void {
 						.map((w) => `${w.workspace_name}: ${w.workspace_id}`)
 						.join("\n");
 					const selected = prompt(
-						getMessage("appflowySelectWorkspace") + "\n\n" + list,
+						getMessage("appflowySelectWorkspace") + "\n\n" + list
 					);
 					if (selected && workspaceIdInput) {
 						workspaceIdInput.value = selected.trim();
@@ -818,7 +818,7 @@ export function resetDefaultTemplate(): void {
 	const defaultTemplate = createDefaultTemplate();
 	const currentTemplates = getTemplates();
 	const defaultIndex = currentTemplates.findIndex(
-		(t: Template) => t.name === getMessage("defaultTemplateName"),
+		(t: Template) => t.name === getMessage("defaultTemplateName")
 	);
 
 	if (defaultIndex !== -1) {
@@ -840,14 +840,14 @@ export function resetDefaultTemplate(): void {
 
 function initializeExportImportAllSettingsButtons(): void {
 	const exportAllSettingsBtn = document.getElementById(
-		"export-all-settings-btn",
+		"export-all-settings-btn"
 	);
 	if (exportAllSettingsBtn) {
 		exportAllSettingsBtn.addEventListener("click", exportAllSettings);
 	}
 
 	const importAllSettingsBtn = document.getElementById(
-		"import-all-settings-btn",
+		"import-all-settings-btn"
 	);
 	if (importAllSettingsBtn) {
 		importAllSettingsBtn.addEventListener("click", importAllSettings);
@@ -867,7 +867,7 @@ function initializeHighlighterSettings(): void {
 		generalSettings.highlighterEnabled,
 		(checked) => {
 			saveSettings({ ...generalSettings, highlighterEnabled: checked });
-		},
+		}
 	);
 
 	initializeSettingToggle(
@@ -875,11 +875,11 @@ function initializeHighlighterSettings(): void {
 		generalSettings.alwaysShowHighlights,
 		(checked) => {
 			saveSettings({ ...generalSettings, alwaysShowHighlights: checked });
-		},
+		}
 	);
 
 	const highlightBehaviorSelect = document.getElementById(
-		"highlighter-behavior",
+		"highlighter-behavior"
 	) as HTMLSelectElement;
 	if (highlightBehaviorSelect) {
 		highlightBehaviorSelect.value = generalSettings.highlightBehavior;
@@ -895,10 +895,10 @@ function initializeHighlighterSettings(): void {
 async function initializeUsageChart(): Promise<void> {
 	const chartContainer = document.getElementById("usage-chart");
 	const periodSelect = document.getElementById(
-		"usage-period-select",
+		"usage-period-select"
 	) as HTMLSelectElement;
 	const aggregationSelect = document.getElementById(
-		"usage-aggregation-select",
+		"usage-aggregation-select"
 	) as HTMLSelectElement;
 	if (!chartContainer || !periodSelect || !aggregationSelect) return;
 
@@ -971,7 +971,7 @@ async function handleRating(rating: number) {
 function initializeSettingDropdown(
 	elementId: string,
 	defaultValue: string,
-	onChange: (newValue: string) => void,
+	onChange: (newValue: string) => void
 ): void {
 	const dropdown = document.getElementById(elementId) as HTMLSelectElement;
 	if (!dropdown) return;

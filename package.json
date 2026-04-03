@@ -1,6 +1,6 @@
 {
 	"name": "clipper-for-appflowy",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"description": "Unofficial community web clipper browser extension for AppFlowy",
 	"bin": {
 		"clipper-for-appflowy": "./dist/cli.cjs"
@@ -61,7 +61,7 @@
 	"dependencies": {
 		"@types/safari-extension": "^0.0.33",
 		"dayjs": "^1.11.13",
-		"defuddle": "^0.14.0",
+		"defuddle": "^0.15.0",
 		"dompurify": "^3.0.9",
 		"highlight.js": "^11.11.1",
 		"linkedom": "^0.18.0",

@@ -6,6 +6,7 @@ import { getDomain } from './utils/string-utils';
 import { extractContentBySelector as extractContentBySelectorShared } from './utils/shared';
 import { createMarkdownContent } from 'defuddle/full';
 import { flattenShadowDom } from './utils/flatten-shadow-dom';
+import { saveFile } from './utils/file-utils';
 
 declare global {
 	interface Window {
@@ -237,6 +238,27 @@ declare global {
 					sendResponse({ success: true });
 				} catch (err) {
 					console.error('Failed to copy markdown to clipboard:', err);
+					sendResponse({ success: false, error: (err as Error).message });
+				}
+			});
+			return true;
+		}
+
+		if (request.action === "saveMarkdownToFile") {
+			flattenShadowDom(document).then(async () => {
+				try {
+					const defuddled = new Defuddle(document, { url: document.URL }).parse();
+					const markdown = createMarkdownContent(defuddled.content, document.URL);
+					const title = defuddled.title || document.title || 'Untitled';
+					const fileName = title.replace(/[/\\?%*:|"<>]/g, '-');
+					await saveFile({
+						content: markdown,
+						fileName,
+						mimeType: 'text/markdown',
+					});
+					sendResponse({ success: true });
+				} catch (err) {
+					console.error('Failed to save markdown file:', err);
 					sendResponse({ success: false, error: (err as Error).message });
 				}
 			});

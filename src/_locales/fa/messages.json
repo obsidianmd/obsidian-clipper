@@ -576,6 +576,9 @@
 	"prependToExisting": {
 		"message": "به یادداشت موجود، از اول اضافه کنید"
 	},
+	"preview": {
+		"message": "پیش‌نمایش"
+	},
 	"processing": {
 		"message": "در حال پردازش"
 	},
@@ -656,6 +659,120 @@
 	},
 	"reader": {
 		"message": "خواننده"
+	},
+	"readerAppearance": {
+		"message": "ظاهر"
+	},
+	"readerAppearanceAuto": {
+		"message": "خودکار"
+	},
+	"readerAppearanceDark": {
+		"message": "تیره"
+	},
+	"readerAppearanceDescription": {
+		"message": "ظاهر روشن یا تیره را انتخاب کنید."
+	},
+	"readerAppearanceLight": {
+		"message": "روشن"
+	},
+	"readerBlendImages": {
+		"message": "ترکیب تصاویر"
+	},
+	"readerBlendImagesDescription": {
+		"message": "تصاویر را با پس‌زمینهٔ صفحه ترکیب کنید."
+	},
+	"readerCloseImageViewer": {
+		"message": "بستن نمایشگر تصویر"
+	},
+	"readerCollapseComment": {
+		"message": "جمع کردن نظر"
+	},
+	"readerColorLinks": {
+		"message": "رنگی کردن پیوندها"
+	},
+	"readerColorSchemeDefault": {
+		"message": "پیش‌فرض"
+	},
+	"readerCustomCss": {
+		"message": "CSS سفارشی"
+	},
+	"readerCustomCssDescription": {
+		"message": "CSS که به‌طور خودکار در نمای خواندن اعمال می‌شود."
+	},
+	"readerDarkTheme": {
+		"message": "پوستهٔ حالت تیره"
+	},
+	"readerDarkThemeDescription": {
+		"message": "در حالت تیره از پوستهٔ دیگری استفاده کنید."
+	},
+	"readerError": {
+		"message": "استخراج محتوا ناموفق بود."
+	},
+	"readerFont": {
+		"message": "گزینه‌های فونت"
+	},
+	"readerFontDefault": {
+		"message": "پیش‌فرض"
+	},
+	"readerFontDescription": {
+		"message": "فونت‌های نصب‌شده روی سیستم خود را اضافه کنید. برای افزودن فونت، Enter را بزنید."
+	},
+	"readerFontNotFound": {
+		"message": "یافت نشد"
+	},
+	"readerFontPlaceholder": {
+		"message": "برای افزودن فونت، Enter را بزنید"
+	},
+	"readerFontSetDefault": {
+		"message": "تنظیم به‌عنوان پیش‌فرض"
+	},
+	"readerFontSize": {
+		"message": "اندازهٔ پایهٔ فونت"
+	},
+	"readerFontSystem": {
+		"message": "سیستم"
+	},
+	"readerFontSystemSans": {
+		"message": "Sans-serif"
+	},
+	"readerFontSystemSerif": {
+		"message": "Serif"
+	},
+	"readerFonts": {
+		"message": "فونت‌ها"
+	},
+	"readerFootnotes": {
+		"message": "پانویس‌ها"
+	},
+	"readerImages": {
+		"message": "تصاویر"
+	},
+	"readerLineHeight": {
+		"message": "ارتفاع خط"
+	},
+	"readerLineWidth": {
+		"message": "عرض خط"
+	},
+	"readerLoading": {
+		"message": "در حال ساده‌سازی…"
+	},
+	"readerSettings": {
+		"message": "تنظیمات خواننده"
+	},
+	"readerTheme": {
+		"message": "پوسته"
+	},
+	"readerThemeDescription": {
+		"message": "رنگ‌های استفاده‌شده در نمای خواندن را انتخاب کنید."
+	},
+	"readerThemeSection": {
+		"message": "پوسته"
+	},
+	"readerTypography": {
+		"message": "تایپوگرافی"
+	},
+	"readerViewFullSize": {
+		"message": "نمایش در اندازهٔ کامل"
 	},
 	"recommended": {
 		"message": "توصیه شده"
@@ -774,6 +891,9 @@
 	"systemDefault": {
 		"message": "سیستم"
 	},
+	"template": {
+		"message": "قالب"
+	},
 	"templateCopied": {
 		"message": "قالب JSON به کلیپ بورد کپی شد"
 	},
@@ -785,6 +905,12 @@
 	},
 	"templateErrorsCount": {
 		"message": "$1 خطا در قالب شما وجود دارد."
+	},
+	"templateGroupContent": {
+		"message": "محتوا"
+	},
+	"templateGroupLocation": {
+		"message": "مکان"
 	},
 	"templateName": {
 		"message": "نام قالب"

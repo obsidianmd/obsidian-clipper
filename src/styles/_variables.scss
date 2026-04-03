@@ -14,7 +14,7 @@
 	--background-primary-alt: var(--color-base-10);
 	--background-secondary: var(--color-base-20);
 
-	--background-modifier-border: var(--color-base-30);
+	--background-modifier-border: var(--color-base-25);
 	--background-modifier-border-hover: var(--color-base-35);
 	--background-modifier-border-focus: var(--color-base-40);
 
@@ -39,6 +39,8 @@
 	--checkbox-border-color: var(--text-faint);
 	--checkbox-border-color-hover: var(--text-muted);
 
+	--corner-shape: round;
+
 	--clickable-icon-size: 1.75rem;
 
 	--clipper-select-font-weight: 500;
@@ -60,7 +62,8 @@
 
 	--duration-fast: 0.15s;
 
-	--font-ui-smaller: 0.75rem;
+	--font-ui-smallest: 0.75rem;
+	--font-ui-smaller: 0.8125rem;
 	--font-ui-small: 0.875rem;
 	--font-ui-medium: 0.9375rem;
 	--font-ui-large: 1.125rem;
@@ -68,15 +71,13 @@
 	--font-smaller: var(--font-ui-smaller);
 	--font-small: var(--font-ui-small);
 
-	--font-default:
-		"Inter", ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI",
-		Roboto, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
-		sans-serif;
+	--font-default: "Inter", ui-sans-serif, -apple-system, BlinkMacSystemFont,
+		"Segoe UI", Roboto, "Apple Color Emoji", "Segoe UI Emoji",
+		"Segoe UI Symbol", sans-serif;
 	--font-display: "Poppins", "Inter", ui-sans-serif, sans-serif;
-	--font-monospace-default:
-		ui-monospace, SFMono-Regular, "Cascadia Mono", "Roboto Mono",
-		"DejaVu Sans Mono", "Liberation Mono", Menlo, Monaco, "Consolas",
-		"Source Code Pro", monospace;
+	--font-monospace-default: ui-monospace, SFMono-Regular, "Cascadia Mono",
+		"Roboto Mono", "DejaVu Sans Mono", "Liberation Mono", Menlo, Monaco,
+		"Consolas", "Source Code Pro", monospace;
 
 	--interactive-accent: var(--color-accent-1);
 	--interactive-accent-hover: var(--color-accent-2);
@@ -158,6 +159,18 @@
 	--text-highlight-bg-rgb: 255, 208, 0;
 	--text-highlight-bg: rgba(var(--text-highlight-bg-rgb), 0.4);
 
+	/* Sliders */
+	--slider-thumb-border-width: 1px;
+	--slider-thumb-border-color: var(--background-modifier-border-hover);
+	--slider-thumb-height: 18px;
+	--slider-thumb-width: 18px;
+	--slider-thumb-y: -6px;
+	--slider-thumb-radius: var(--slider-thumb-height);
+	--slider-s-thumb-size: 15px;
+	--slider-s-thumb-position: -5px;
+	--slider-track-background: var(--background-modifier-border);
+	--slider-track-height: 3px;
+
 	/* Toggles */
 	--toggle-border-width: 2px;
 	--toggle-width: 40px;
@@ -168,6 +181,26 @@
 	--toggle-thumb-width: 18px;
 
 	--star-color: var(--color-yellow);
+}
+
+// macOS26+ styles
+.is-macos {
+	--corner-shape: superellipse(1.33);
+	--radius-s: 0.5rem;
+	--radius-m: 0.75rem;
+
+	--slider-thumb-width: 30px;
+
+	--toggle-width: 44px;
+	--toggle-radius: 24px;
+	--toggle-thumb-radius: 24px;
+	--toggle-thumb-height: 16px;
+	--toggle-thumb-width: 26px;
+	--toggle-thumb-opacity-active: 0.6;
+
+	--toggle-s-width: 36px;
+	--toggle-s-thumb-height: 12px;
+	--toggle-s-thumb-width: 20px;
 }
 
 @media (prefers-color-scheme: light) {
@@ -226,25 +259,21 @@
 		--mono-rgb-100: 0, 0, 0;
 
 		--text-selection: hsla(var(--color-accent-hsl), 0.2);
-		--input-shadow:
-			inset 0 0 0 1px rgba(0, 0, 0, 0.12),
+		--input-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12),
 			0 2px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 1.5px 0 rgba(0, 0, 0, 0.03),
 			0 1px 2px 0 rgba(0, 0, 0, 0.04), 0 0 0 0 transparent;
 
-		--input-shadow-hover:
-			inset 0 0 0 1px rgba(0, 0, 0, 0.17), 0 2px 3px 0 rgba(0, 0, 0, 0.1),
-			0 1px 1.5px 0 rgba(0, 0, 0, 0.03), 0 1px 2px 0 rgba(0, 0, 0, 0.04),
-			0 0 0 0 transparent;
+		--input-shadow-hover: inset 0 0 0 1px rgba(0, 0, 0, 0.17),
+			0 2px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 1.5px 0 rgba(0, 0, 0, 0.03),
+			0 1px 2px 0 rgba(0, 0, 0, 0.04), 0 0 0 0 transparent;
 
 		--interactive-normal: var(--color-base-00);
 		--interactive-hover: var(--color-base-10);
 
-		--shadow-s:
-			0px 1px 2px rgba(0, 0, 0, 0.028),
+		--shadow-s: 0px 1px 2px rgba(0, 0, 0, 0.028),
 			0px 3.4px 6.7px rgba(0, 0, 0, 0.042),
 			0px 15px 30px rgba(0, 0, 0, 0.07);
-		--shadow-l:
-			0px 1.8px 7.3px rgba(0, 0, 0, 0.071),
+		--shadow-l: 0px 1.8px 7.3px rgba(0, 0, 0, 0.071),
 			0px 6.3px 24.7px rgba(0, 0, 0, 0.112),
 			0px 30px 90px rgba(0, 0, 0, 0.2);
 	}
@@ -303,13 +332,11 @@
 		--interactive-accent: var(--color-accent);
 		--interactive-accent-hover: var(--color-accent-1);
 
-		--input-shadow:
-			inset 0 0.5px 0.5px 0.5px rgba(255, 255, 255, 0.09),
+		--input-shadow: inset 0 0.5px 0.5px 0.5px rgba(255, 255, 255, 0.09),
 			0 2px 4px 0 rgba(0, 0, 0, 0.15), 0 1px 1.5px 0 rgba(0, 0, 0, 0.1),
 			0 1px 2px 0 rgba(0, 0, 0, 0.2), 0 0 0 0 transparent;
 
-		--input-shadow-hover:
-			inset 0 0.5px 1px 0.5px rgba(255, 255, 255, 0.16),
+		--input-shadow-hover: inset 0 0.5px 1px 0.5px rgba(255, 255, 255, 0.16),
 			0 2px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 1.5px 0 rgba(0, 0, 0, 0.2),
 			0 1px 2px 0 rgba(0, 0, 0, 0.4), 0 0 0 0 transparent;
 
@@ -322,12 +349,10 @@
 		--interactive-normal: var(--color-base-30);
 		--interactive-hover: var(--color-base-35);
 
-		--shadow-s:
-			0px 1px 2px rgba(0, 0, 0, 0.121),
+		--shadow-s: 0px 1px 2px rgba(0, 0, 0, 0.121),
 			0px 3.4px 6.7px rgba(0, 0, 0, 0.179),
 			0px 15px 30px rgba(0, 0, 0, 0.3);
-		--shadow-l:
-			0px 1.8px 7.3px rgba(0, 0, 0, 0.071),
+		--shadow-l: 0px 1.8px 7.3px rgba(0, 0, 0, 0.071),
 			0px 6.3px 24.7px rgba(0, 0, 0, 0.112),
 			0px 30px 90px rgba(0, 0, 0, 0.2);
 	}

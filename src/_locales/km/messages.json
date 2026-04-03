@@ -1,0 +1,979 @@
+{
+	"activity": {
+		"message": "សកម្មភាព"
+	},
+	"addModel": {
+		"message": "+ បន្ថែមម៉ូដែល"
+	},
+	"addModelTitle": {
+		"message": "បន្ថែមម៉ូដែល"
+	},
+	"addProperty": {
+		"message": "+ បន្ថែមលក្ខណៈសម្បត្តិ"
+	},
+	"addProvider": {
+		"message": "+ បន្ថែមអ្នកផ្តល់សេវា"
+	},
+	"addProviderTitle": {
+		"message": "បន្ថែមអ្នកផ្តល់សេវា"
+	},
+	"addToObsidian": {
+		"message": "បន្ថែមទៅ Obsidian"
+	},
+	"addVaultPlaceholder": {
+		"message": "ចុច Enter ដើម្បីបន្ថែម Vault"
+	},
+	"advanced": {
+		"message": "កម្រិតខ្ពស់"
+	},
+	"allProperties": {
+		"message": "លក្ខណៈសម្បត្តិទាំងអស់"
+	},
+	"allTime": {
+		"message": "គ្រប់ពេល"
+	},
+	"alwaysShowHighlights": {
+		"message": "បង្ហាញការរំលេចជានិច្ច"
+	},
+	"alwaysShowHighlightsDescription": {
+		"message": "បង្ហាញការរំលេចដែលអ្នកបានរក្សាទុក នៅពេលអ្នកផ្ទុកទំព័រ។ បិទវា ដើម្បីបង្ហាញការរំលេចតែពេលរបៀបរំលេចត្រូវបានបើក។"
+	},
+	"apiKeyMissing": {
+		"message": "គ្មានសោ API"
+	},
+	"apiKeysWarning": {
+		"message": "ដោយប្រើអ្នកផ្តល់សេវាខាងក្រៅ អ្នកយល់ព្រមតាមលក្ខខណ្ឌ និងគោលការណ៍ឯកជនភាពរបស់ពួកគេ។ សំណើ Interpreter ត្រូវបានផ្ញើដោយផ្ទាល់ទៅកាន់អ្នកផ្តល់សេវាដែលអ្នកជ្រើសរើស។ Obsidian មិនប្រមូល ឬរក្សាទុកទិន្នន័យណាមួយអំពីសំណើរបស់អ្នកទេ។"
+	},
+	"appendToDaily": {
+		"message": "បន្ថែមទៅកំណត់ត្រាប្រចាំថ្ងៃ នៅខាងក្រោម"
+	},
+	"appendToExisting": {
+		"message": "បន្ថែមទៅកំណត់ត្រាដែលមានស្រាប់ នៅខាងក្រោម"
+	},
+	"autoRunInterpreter": {
+		"message": "ដំណើរការដោយស្វ័យប្រវត្តិ"
+	},
+	"autoRunInterpreterDescription": {
+		"message": "ដំណើរការអថេរ prompt ភ្លាមៗ ប្រសិនបើគំរូមានអថេរណាមួយ។ វានឹងប្រើឥណទាន API ជាមួយអ្នកផ្តល់ម៉ូដែលរបស់អ្នក។ បិទវា ប្រសិនបើអ្នកចង់ដំណើរការ Interpreter ដោយដៃតែប៉ុណ្ណោះ។"
+	},
+	"behavior": {
+		"message": "ឥរិយាបថ"
+	},
+	"byDay": {
+		"message": "ថ្ងៃ"
+	},
+	"byMonth": {
+		"message": "ខែ"
+	},
+	"byWeek": {
+		"message": "សប្ដាហ៍"
+	},
+	"cancel": {
+		"message": "បោះបង់"
+	},
+	"cannotDeleteProvider": {
+		"message": "មិនអាចលុបអ្នកផ្តល់សេវា \"$1\" បានទេ ព្រោះវាកំពុងត្រូវបានប្រើដោយម៉ូដែល $2។"
+	},
+	"changelog": {
+		"message": "កំណត់ហេតុការផ្លាស់ប្តូរ"
+	},
+	"chooseFile": {
+		"message": "ជ្រើសរើសឯកសារ"
+	},
+	"choosePropertiesFile": {
+		"message": "ជ្រើសរើសឯកសារលក្ខណៈសម្បត្តិ"
+	},
+	"chooseSettingsFile": {
+		"message": "ជ្រើសរើសឯកសារការកំណត់"
+	},
+	"chooseTemplateFile": {
+		"message": "ជ្រើសរើសឯកសារគំរូ"
+	},
+	"clipBehavior": {
+		"message": "ឥរិយាបថការកាត់យក"
+	},
+	"clipBehaviorDescription": {
+		"message": "ជ្រើសរើសរបៀបដែលមាតិកាដែលបានរំលេចត្រូវបានរក្សាទុកទៅ Obsidian។ កំណត់អថេរ $strong_start${{content}}$strong_end$។",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"clipboardError": {
+		"message": "Obsidian មិនអាចចូលប្រើក្តារតម្បៀតខ្ទាស់របស់អ្នកបានទេ។ សាកល្បងការណែនាំដោះស្រាយបញ្ហានៅទីនេះ៖ $1",
+		"placeholders": {
+			"1": {
+				"content": "$1"
+			}
+		}
+	},
+	"close": {
+		"message": "បិទ"
+	},
+	"commandOpenClipper": {
+		"message": "បើក Obsidian Clipper"
+	},
+	"commandQuickClip": {
+		"message": "កាត់យករហ័ស"
+	},
+	"commandToggleHighlighter": {
+		"message": "បិទ/បើក របៀបរំលេច"
+	},
+	"commandToggleReader": {
+		"message": "បិទ/បើក របៀបអាន"
+	},
+	"confirmDeleteTemplate": {
+		"message": "តើអ្នកប្រាកដថាចង់លុបគំរូ \"$1\" មែនទេ?"
+	},
+	"confirmReplaceSettings": {
+		"message": "វានឹងជំនួសការកំណត់បច្ចុប្បន្នរបស់អ្នកទាំងអស់ រួមទាំងគំរូ និងលក្ខណៈសម្បត្តិ។ តើអ្នកប្រាកដថាចង់បន្តមែនទេ?"
+	},
+	"copied": {
+		"message": "បានចម្លង!"
+	},
+	"copyAsJson": {
+		"message": "ចម្លងជា JSON"
+	},
+	"copyToClipboard": {
+		"message": "ចម្លងទៅក្តារតម្បៀតខ្ទាស់"
+	},
+	"createNewNote": {
+		"message": "បង្កើតកំណត់ត្រាថ្មី"
+	},
+	"custom": {
+		"message": "ផ្ទាល់ខ្លួន"
+	},
+	"dailyNoteFormat": {
+		"message": "ទម្រង់កំណត់ត្រាប្រចាំថ្ងៃ (ឧ. YYYY-MM-DD)"
+	},
+	"defaultInterpreterContext": {
+		"message": "បរិបទ Interpreter លំនាំដើម"
+	},
+	"defaultInterpreterContextDescription": {
+		"message": "ជំនួសបរិបទដែលប្រើសម្រាប់បកស្រាយអថេរ prompt។ អថេរអាចត្រូវបានប្រើនៅទីនេះ។"
+	},
+	"defaultTemplateName": {
+		"message": "លំនាំដើម"
+	},
+	"delete": {
+		"message": "លុប"
+	},
+	"deleteModelConfirm": {
+		"message": "តើអ្នកប្រាកដថាចង់លុបម៉ូដែលនេះមែនទេ?"
+	},
+	"deleteProviderConfirm": {
+		"message": "តើអ្នកប្រាកដថាចង់លុបអ្នកផ្តល់សេវានេះមែនទេ?"
+	},
+	"disableHighlighter": {
+		"message": "បិទការរំលេច"
+	},
+	"disableReader": {
+		"message": "បិទរបៀបអាន"
+	},
+	"done": {
+		"message": "រួចរាល់"
+	},
+	"dragAndDropFile": {
+		"message": "អូស និងទម្លាក់ឯកសារនៅទីនេះ"
+	},
+	"duplicate": {
+		"message": "ចម្លងទ្វេ"
+	},
+	"earlyAccessDescription": {
+		"message": "ប្រើមុខងារដែលត្រូវការកំណែ $link_start$early access version$link_end$ ចុងក្រោយបំផុតរបស់ Obsidian។ បច្ចុប្បន្នត្រូវការ Obsidian 1.7.2 ឬថ្មីជាងនេះ។",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/Obsidian/Early+access+versions\" target=\"_blank\">"
+			}
+		}
+	},
+	"earlyAccessFeatures": {
+		"message": "មុខងារ Early access"
+	},
+	"editModel": {
+		"message": "កែសម្រួលម៉ូដែល"
+	},
+	"editProvider": {
+		"message": "កែសម្រួលអ្នកផ្តល់សេវា"
+	},
+	"editTemplate": {
+		"message": "កែសម្រួលគំរូ"
+	},
+	"embedded": {
+		"message": "បង្កប់"
+	},
+	"enableHighlighter": {
+		"message": "បើកការរំលេច"
+	},
+	"enableHighlighterDescription": {
+		"message": "រំលេចមាតិកានៅលើទំព័របណ្ដាញ ដែលអ្នកអាចរក្សាទុកទៅ Obsidian។"
+	},
+	"enableInterpreter": {
+		"message": "បើក Interpreter"
+	},
+	"enableInterpreterDescription": {
+		"message": "ប្រើភាសាធម្មជាតិដើម្បីស្រង់ទិន្នន័យពីទំព័រ។ ឧទាហរណ៍ អ្នកអាចប្រើវាក្យសម្ព័ន្ធគំរូ $strong_start${{\"a summary of the page\"}}$strong_end$។ ត្រូវការសោ API ឬម៉ូដែលផ្ទាល់ខ្លួនដែលបានកំណត់រចនាសម្ព័ន្ធខាងក្រោម។ $link_start$ស្វែងយល់បន្ថែម$link_end$។",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/interpreter\" target=\"_blank\">"
+			},
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"enableReader": {
+		"message": "បើកទិដ្ឋភាពអាន"
+	},
+	"error": {
+		"message": "កំហុស"
+	},
+	"export": {
+		"message": "នាំចេញ"
+	},
+	"exportAllSettings": {
+		"message": "នាំចេញការកំណត់ទាំងអស់"
+	},
+	"exportAllSettingsDescription": {
+		"message": "នាំចេញការកំណត់ទាំងអស់ រួមទាំងគំរូ និងលក្ខណៈសម្បត្តិ។"
+	},
+	"exportHighlights": {
+		"message": "នាំចេញការរំលេច"
+	},
+	"exportHighlightsDescription": {
+		"message": "នាំចេញការរំលេចរបស់អ្នកទៅឯកសារ។"
+	},
+	"exportProperties": {
+		"message": "នាំចេញលក្ខណៈសម្បត្តិ"
+	},
+	"exportPropertiesDescription": {
+		"message": "រក្សាទុកលក្ខណៈសម្បត្តិ Web Clipper ទៅឯកសារ $strong_start$types.json$strong_end$ ដែលអាចនាំចូលទៅក្នុង vault របស់ Obsidian របស់អ្នក ឬទៅក្នុង Web Clipper លើឧបករណ៍ផ្សេងៗ។",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"extensionDescription": {
+		"message": "រក្សាទុកមាតិកាពីបណ្ដាញក្នុងទម្រង់ឯកជន និងប្រើបានយូរ ដែលអ្នកអាចចូលប្រើក្រៅបណ្ដាញបាន។ ផ្នែកបន្ថែមកម្មវិធីរុករកផ្លូវការរបស់ Obsidian។"
+	},
+	"extensionName": {
+		"message": "Obsidian Web Clipper"
+	},
+	"failedToCopyText": {
+		"message": "បានបរាជ័យក្នុងការចម្លងអត្ថបទ"
+	},
+	"failedToDeleteTemplate": {
+		"message": "បានបរាជ័យក្នុងការលុបគំរូ។ សូមព្យាយាមម្តងទៀត។"
+	},
+	"failedToDuplicateTemplate": {
+		"message": "បានបរាជ័យក្នុងការចម្លងទ្វេគំរូ។ សូមព្យាយាមម្តងទៀត។"
+	},
+	"failedToExportHighlights": {
+		"message": "បានបរាជ័យក្នុងការនាំចេញការរំលេច។ សូមពិនិត្យ console សម្រាប់ព័ត៌មានលម្អិតបន្ថែម។"
+	},
+	"failedToExportSettings": {
+		"message": "បានបរាជ័យក្នុងការនាំចេញការកំណត់។ សូមពិនិត្យ console សម្រាប់ព័ត៌មានលម្អិតបន្ថែម។"
+	},
+	"failedToExtractContent": {
+		"message": "មិនអាចស្រង់មាតិកាទំព័របានទេ។"
+	},
+	"failedToImportTemplate": {
+		"message": "កំហុសក្នុងការនាំចូលគំរូ។ សូមពិនិត្យឯកសារ ហើយព្យាយាមម្តងទៀត។"
+	},
+	"failedToInitialize": {
+		"message": "សូមព្យាយាមផ្ទុកផ្នែកបន្ថែមឡើងវិញ។"
+	},
+	"failedToInitializeContent": {
+		"message": "មិនអាចចាប់ផ្តើមមាតិកាទំព័របានទេ។"
+	},
+	"failedToProcessInterpreter": {
+		"message": "ការដំណើរការ Interpreter បានបរាជ័យ។ សូមព្យាយាមម្តងទៀត។"
+	},
+	"failedToResetProviders": {
+		"message": "បានបរាជ័យក្នុងការកំណត់អ្នកផ្តល់សេវា និងម៉ូដែលឡើងវិញ"
+	},
+	"failedToResetTemplate": {
+		"message": "បានបរាជ័យក្នុងការកំណត់គំរូលំនាំដើមឡើងវិញ។ សូមព្យាយាមម្តងទៀត។"
+	},
+	"failedToSave": {
+		"message": "បានបរាជ័យក្នុងការរក្សាទុកឯកសារ"
+	},
+	"failedToSaveFile": {
+		"message": "បានបរាជ័យក្នុងការរក្សាទុកឯកសារ"
+	},
+	"failedToSaveProvider": {
+		"message": "បានបរាជ័យក្នុងការរក្សាទុកអ្នកផ្តល់សេវា។ សូមព្យាយាមម្តងទៀត។"
+	},
+	"feedback": {
+		"message": "មតិយោបល់"
+	},
+	"feedbackDescription": {
+		"message": "តើយើងអាចកែលម្អ Web Clipper ដោយរបៀបណា? សូមចូលទៅទំព័រជំនួយរបស់យើង ដែលអ្នកអាចរាយការណ៍កំហុស ស្នើមុខងារ និងទទួលជំនួយសម្រាប់បញ្ហាទូទៅ។"
+	},
+	"feedbackTitle": {
+		"message": "អរគុណសម្រាប់មតិយោបល់របស់អ្នក"
+	},
+	"folder": {
+		"message": "ថត"
+	},
+	"general": {
+		"message": "ទូទៅ"
+	},
+	"generalSettings": {
+		"message": "ការកំណត់ទូទៅ"
+	},
+	"getApiKeyHere": {
+		"message": "ទទួលសោ API $1 របស់អ្នកនៅទីនេះ។"
+	},
+	"help": {
+		"message": "ជំនួយ"
+	},
+	"helpDescription": {
+		"message": "ស្វែងយល់ពីរបៀបប្រើ Web Clipper និងទទួលជំនួយដោះស្រាយបញ្ហា។"
+	},
+	"highlightInline": {
+		"message": "រំលេចមាតិកាទំព័រ"
+	},
+	"highlightPage": {
+		"message": "រំលេចទំព័រ"
+	},
+	"highlighter": {
+		"message": "ឧបករណ៍រំលេច"
+	},
+	"highlighterSettings": {
+		"message": "ឧបករណ៍រំលេច"
+	},
+	"history": {
+		"message": "ប្រវត្តិ"
+	},
+	"hotkeys": {
+		"message": "គ្រាប់ចុចផ្លូវកាត់"
+	},
+	"import": {
+		"message": "នាំចូល"
+	},
+	"importAllSettings": {
+		"message": "នាំចូលការកំណត់ទាំងអស់"
+	},
+	"importAllSettingsDescription": {
+		"message": "នាំចូលការកំណត់ទាំងអស់ រួមទាំងគំរូ និងលក្ខណៈសម្បត្តិ។ វានឹងជំនួសការកំណត់រចនាសម្ព័ន្ធបច្ចុប្បន្នរបស់អ្នក។"
+	},
+	"importFailed": {
+		"message": "ការនាំចូលបានបរាជ័យ។ សូមពិនិត្យ console សម្រាប់ព័ត៌មានលម្អិតបន្ថែម។"
+	},
+	"importModalTitle": {
+		"message": "នាំចូល"
+	},
+	"importProperties": {
+		"message": "នាំចូលលក្ខណៈសម្បត្តិ"
+	},
+	"importPropertiesDescription": {
+		"message": "ដើម្បីនាំចូលលក្ខណៈសម្បត្តិរបស់អ្នកពី Obsidian សូមស្វែងរកឯកសារ $strong_1_start$types.json$strong_1_end$ នៅក្នុងថត $strong_2_start$.obsidian$strong_2_end$ ខាងក្នុង vault របស់អ្នក។ សូមចំណាំថា ថតនេះត្រូវបានលាក់ជាលំនាំដើមលើប្រព័ន្ធប្រតិបត្តិការភាគច្រើន។",
+		"placeholders": {
+			"strong_1_end": {
+				"content": "</strong>"
+			},
+			"strong_1_start": {
+				"content": "<strong>"
+			},
+			"strong_2_end": {
+				"content": "</strong>"
+			},
+			"strong_2_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"importSettings": {
+		"message": "នាំចូលការកំណត់"
+	},
+	"importTemplate": {
+		"message": "នាំចូលគំរូ"
+	},
+	"interpret": {
+		"message": "បកស្រាយ"
+	},
+	"interpreter": {
+		"message": "Interpreter"
+	},
+	"interpreterContext": {
+		"message": "បរិបទ Interpreter"
+	},
+	"interpreterContextDescription": {
+		"message": "បរិបទដែលប្រើសម្រាប់បកស្រាយអថេរ prompt។ វាជំនួសបរិបទលំនាំដើមដែលបានកំណត់នៅក្នុង $link_start$ការកំណត់ Interpreter$link_end$។ អថេរអាចត្រូវបានប្រើនៅទីនេះ។",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=interpreter\">"
+			}
+		}
+	},
+	"language": {
+		"message": "ភាសា"
+	},
+	"languageDescription": {
+		"message": "ជ្រើសរើសភាសាបង្ហាញសម្រាប់ចំណុចប្រទាក់ផ្នែកបន្ថែម។"
+	},
+	"last30Days": {
+		"message": "30 ថ្ងៃចុងក្រោយ"
+	},
+	"lastUsed": {
+		"message": "បានប្រើចុងក្រោយ"
+	},
+	"legacyMode": {
+		"message": "របៀបចាស់"
+	},
+	"legacyModeDescription": {
+		"message": "ប្រើវិធីកាត់យកតាម URI ដែលឆបគ្នាជាមួយ Obsidian 1.6.7 ឬចាស់ជាងនេះ។ សូមចំណាំថា ប្រវែងមាតិកាដែលអ្នកអាចកាត់យកបាន ត្រូវបានកំណត់ដោយកម្មវិធីរុករក និងប្រព័ន្ធប្រតិបត្តិការរបស់អ្នក។ ទំព័រខ្លះអាចបរាជ័យដោយគ្មានកំហុសណាមួយ។"
+	},
+	"modelName": {
+		"message": "ឈ្មោះបង្ហាញ"
+	},
+	"modelNameDescription": {
+		"message": "ឈ្មោះម៉ូដែលដែលអ្នកចង់បង្ហាញក្នុងចំណុចប្រទាក់។"
+	},
+	"modelProvider": {
+		"message": "អ្នកផ្តល់សេវា"
+	},
+	"modelProviderDescription": {
+		"message": "ជ្រើសរើសអ្នកផ្តល់សេវាសម្រាប់ម៉ូដែលនេះ។"
+	},
+	"modelProviderPlaceholder": {
+		"message": "អ្នកផ្តល់សេវា"
+	},
+	"modelRequiredFields": {
+		"message": "ត្រូវការឈ្មោះម៉ូដែល អ្នកផ្តល់សេវា និង Model ID។"
+	},
+	"models": {
+		"message": "ម៉ូដែល"
+	},
+	"modelsListFor": {
+		"message": "បញ្ជីម៉ូដែលសម្រាប់ $1"
+	},
+	"more": {
+		"message": "បន្ថែម"
+	},
+	"newTemplate": {
+		"message": "គំរូថ្មី"
+	},
+	"noHighlights": {
+		"message": "មិនធ្វើអ្វីទេ"
+	},
+	"noTemplates": {
+		"message": "មិនមានគំរូទេ។ សូមបន្ថែមគំរូនៅក្នុងការកំណត់។"
+	},
+	"noUnusedProperties": {
+		"message": "រកមិនឃើញលក្ខណៈសម្បត្តិដែលមិនបានប្រើទេ។"
+	},
+	"noteContent": {
+		"message": "មាតិកាកំណត់ត្រា"
+	},
+	"noteContentDescription": {
+		"message": "ប្ដូរតាមបំណងមាតិកាកំណត់ត្រា។ ប្រើអថេរដើម្បីបំពេញទិន្នន័យពីទំព័រជាមុន។"
+	},
+	"noteLocation": {
+		"message": "ទីតាំងកំណត់ត្រា"
+	},
+	"noteLocationDescription": {
+		"message": "ថត ឬផ្លូវរបស់កំណត់ត្រា។"
+	},
+	"noteName": {
+		"message": "ឈ្មោះកំណត់ត្រា"
+	},
+	"noteNameFormat": {
+		"message": "ឈ្មោះកំណត់ត្រា"
+	},
+	"noteNameFormatDescription": {
+		"message": "ទម្រង់សម្រាប់ឈ្មោះឯកសាររបស់កំណត់ត្រា។ អ្នកអាចប្រើអថេរដូចជា {{title}}, {{date}}, និង {{published}} ដើម្បីបំពេញទិន្នន័យពីទំព័រជាមុន។ $link_start$ស្វែងយល់បន្ថែម$link_end$។",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"https://help.obsidian.md/web-clipper/variables\" target=\"_blank\">"
+			}
+		}
+	},
+	"notesAboutPage": {
+		"message": "កំណត់ត្រាអំពីទំព័រនេះ..."
+	},
+	"onlyHttpSupported": {
+		"message": "មិនអាចកាត់យកទំព័រនេះបានទេ។ គាំទ្រតែ URL http និង https ប៉ុណ្ណោះ។"
+	},
+	"open": {
+		"message": "បើក"
+	},
+	"openBehaviorDescription": {
+		"message": "ជ្រើសរើសរបៀបដែល Web Clipper បើកជាលំនាំដើម។"
+	},
+	"openBehaviorTitle": {
+		"message": "ឥរិយាបថការបើក"
+	},
+	"openEmbedded": {
+		"message": "បើកក្នុងទំព័រ"
+	},
+	"openSidePanel": {
+		"message": "បើកផ្ទាំងចំហៀង"
+	},
+	"optional": {
+		"message": "(ជាជម្រើស)"
+	},
+	"orPasteBelow": {
+		"message": "ឬបិទភ្ជាប់មាតិកាខាងក្រោម"
+	},
+	"overwriteNote": {
+		"message": "សរសេរជាន់លើកំណត់ត្រា"
+	},
+	"pageCannotBeClipped": {
+		"message": "មិនអាចកាត់យកទំព័រនេះបានទេ។"
+	},
+	"pageVariables": {
+		"message": "អថេរទំព័រ"
+	},
+	"pagesSaved": {
+		"message": "បានរក្សាទុកទំព័រ"
+	},
+	"pagesSavedPlural": {
+		"message": "បានរក្សាទុកទំព័រ"
+	},
+	"pasteJsonHere": {
+		"message": "បិទភ្ជាប់ JSON នៅទីនេះ"
+	},
+	"pleaseReload": {
+		"message": "សូមព្យាយាមផ្ទុកទំព័រឡើងវិញ។"
+	},
+	"popularModels": {
+		"message": "ម៉ូដែលពេញនិយម"
+	},
+	"popularModelsDescription": {
+		"message": "ជ្រើសរើសពីម៉ូដែលដែលប្រើជាញឹកញាប់ ឬបញ្ចូលព័ត៌មានលម្អិតម៉ូដែលផ្ទាល់ខ្លួន។"
+	},
+	"popup": {
+		"message": "ផ្ទាំងលេចឡើង"
+	},
+	"prependToDaily": {
+		"message": "បន្ថែមទៅកំណត់ត្រាប្រចាំថ្ងៃ នៅខាងលើ"
+	},
+	"prependToExisting": {
+		"message": "បន្ថែមទៅកំណត់ត្រាដែលមានស្រាប់ នៅខាងលើ"
+	},
+	"preview": {
+		"message": "មើលជាមុន"
+	},
+	"processing": {
+		"message": "កំពុងដំណើរការ"
+	},
+	"properties": {
+		"message": "លក្ខណៈសម្បត្តិ"
+	},
+	"propertiesSettings": {
+		"message": "លក្ខណៈសម្បត្តិ"
+	},
+	"propertyName": {
+		"message": "ឈ្មោះលក្ខណៈសម្បត្តិ"
+	},
+	"propertyTypeCheckbox": {
+		"message": "ប្រអប់ធីក"
+	},
+	"propertyTypeDate": {
+		"message": "កាលបរិច្ឆេទ"
+	},
+	"propertyTypeDatetime": {
+		"message": "កាលបរិច្ឆេទ និងម៉ោង"
+	},
+	"propertyTypeMultitext": {
+		"message": "បញ្ជី"
+	},
+	"propertyTypeNumber": {
+		"message": "លេខ"
+	},
+	"propertyTypeText": {
+		"message": "អត្ថបទ"
+	},
+	"propertyValue": {
+		"message": "តម្លៃលក្ខណៈសម្បត្តិ"
+	},
+	"provider": {
+		"message": "អ្នកផ្តល់សេវា"
+	},
+	"providerApiKey": {
+		"message": "សោ API"
+	},
+	"providerApiKeyDescription": {
+		"message": "សោ API របស់អ្នកសម្រាប់អ្នកផ្តល់សេវានេះ។"
+	},
+	"providerBaseUrl": {
+		"message": "URL មូលដ្ឋាន"
+	},
+	"providerBaseUrlDescription": {
+		"message": "URL ចំណុចបញ្ចប់ API សម្រាប់អ្នកផ្តល់សេវានេះ។"
+	},
+	"providerModelId": {
+		"message": "Model ID"
+	},
+	"providerModelIdDescription": {
+		"message": "អត្តសញ្ញាណរបស់ម៉ូដែលពីអ្នកផ្តល់សេវារបស់អ្នក។ ជាទូទៅជាឈ្មោះខ្លីដោយគ្មានដកឃ្លា។"
+	},
+	"providerModelIdPlaceholder": {
+		"message": "Model ID"
+	},
+	"providerName": {
+		"message": "ឈ្មោះអ្នកផ្តល់សេវា"
+	},
+	"providerNameDescription": {
+		"message": "ឈ្មោះបង្ហាញសម្រាប់អ្នកផ្តល់សេវានេះ។"
+	},
+	"providerPreset": {
+		"message": "ការកំណត់ជាមុន"
+	},
+	"providerPresetDescription": {
+		"message": "ជ្រើសរើសអ្នកផ្តល់សេវា ឬបង្កើតមួយផ្ទាល់ខ្លួន។"
+	},
+	"providerRequiredFields": {
+		"message": "ត្រូវការឈ្មោះអ្នកផ្តល់សេវា និង URL មូលដ្ឋាន។"
+	},
+	"providers": {
+		"message": "អ្នកផ្តល់សេវា"
+	},
+	"rateExtensionDescription": {
+		"message": "តើអ្នកកំពុងរីករាយជាមួយ Web Clipper មែនទេ? ជួយយើងដោយផ្តល់ការវាយតម្លៃ។"
+	},
+	"reader": {
+		"message": "របៀបអាន"
+	},
+	"readerAppearance": {
+		"message": "រូបរាង"
+	},
+	"readerAppearanceAuto": {
+		"message": "ស្វ័យប្រវត្តិ"
+	},
+	"readerAppearanceDark": {
+		"message": "ងងឹត"
+	},
+	"readerAppearanceDescription": {
+		"message": "ជ្រើសរើសរូបរាងភ្លឺ ឬងងឹត។"
+	},
+	"readerAppearanceLight": {
+		"message": "ភ្លឺ"
+	},
+	"readerBlendImages": {
+		"message": "បញ្ចូលរូបភាពឲ្យស្របគ្នា"
+	},
+	"readerBlendImagesDescription": {
+		"message": "បញ្ចូលរូបភាពឲ្យស្របគ្នាជាមួយផ្ទៃខាងក្រោយទំព័រ។"
+	},
+	"readerCloseImageViewer": {
+		"message": "បិទកម្មវិធីមើលរូបភាព"
+	},
+	"readerCollapseComment": {
+		"message": "បង្រួមមតិយោបល់"
+	},
+	"readerColorLinks": {
+		"message": "ដាក់ពណ៌តំណភ្ជាប់"
+	},
+	"readerColorSchemeDefault": {
+		"message": "លំនាំដើម"
+	},
+	"readerCustomCss": {
+		"message": "CSS ផ្ទាល់ខ្លួន"
+	},
+	"readerCustomCssDescription": {
+		"message": "CSS ដែលអនុវត្តដោយស្វ័យប្រវត្តិក្នុងទិដ្ឋភាពអាន។"
+	},
+	"readerDarkTheme": {
+		"message": "ស្បែករបៀបងងឹត"
+	},
+	"readerDarkThemeDescription": {
+		"message": "ប្រើស្បែកផ្សេងនៅក្នុងរបៀបងងឹត។"
+	},
+	"readerError": {
+		"message": "បានបរាជ័យក្នុងការស្រង់មាតិកា។"
+	},
+	"readerFont": {
+		"message": "ជម្រើសពុម្ពអក្សរ"
+	},
+	"readerFontDefault": {
+		"message": "លំនាំដើម"
+	},
+	"readerFontDescription": {
+		"message": "បន្ថែមពុម្ពអក្សរដែលបានដំឡើងលើប្រព័ន្ធរបស់អ្នក។ ចុច Enter ដើម្បីបន្ថែមពុម្ពអក្សរ។"
+	},
+	"readerFontNotFound": {
+		"message": "រកមិនឃើញ"
+	},
+	"readerFontPlaceholder": {
+		"message": "ចុច Enter ដើម្បីបន្ថែមពុម្ពអក្សរ"
+	},
+	"readerFontSetDefault": {
+		"message": "កំណត់ជាលំនាំដើម"
+	},
+	"readerFontSize": {
+		"message": "ទំហំពុម្ពអក្សរមូលដ្ឋាន"
+	},
+	"readerFontSystem": {
+		"message": "ប្រព័ន្ធ"
+	},
+	"readerFontSystemSans": {
+		"message": "Sans-serif"
+	},
+	"readerFontSystemSerif": {
+		"message": "Serif"
+	},
+	"readerFonts": {
+		"message": "ពុម្ពអក្សរ"
+	},
+	"readerFootnotes": {
+		"message": "កំណត់សម្គាល់ជើងទំព័រ"
+	},
+	"readerImages": {
+		"message": "រូបភាព"
+	},
+	"readerLineHeight": {
+		"message": "កម្ពស់បន្ទាត់"
+	},
+	"readerLineWidth": {
+		"message": "ទទឹងបន្ទាត់"
+	},
+	"readerLoading": {
+		"message": "កំពុងសម្រួល…"
+	},
+	"readerSettings": {
+		"message": "ការកំណត់របៀបអាន"
+	},
+	"readerTheme": {
+		"message": "ស្បែក"
+	},
+	"readerThemeDescription": {
+		"message": "ជ្រើសរើសពណ៌ដែលប្រើក្នុងទិដ្ឋភាពអាន។"
+	},
+	"readerThemeSection": {
+		"message": "ស្បែក"
+	},
+	"readerTypography": {
+		"message": "អក្សរសាស្ត្រ"
+	},
+	"readerViewFullSize": {
+		"message": "មើលទំហំពេញ"
+	},
+	"recommended": {
+		"message": "បានណែនាំ"
+	},
+	"refresh": {
+		"message": "ធ្វើឲ្យស្រស់"
+	},
+	"remove": {
+		"message": "ដកចេញ"
+	},
+	"removeProperty": {
+		"message": "ដកលក្ខណៈសម្បត្តិចេញ"
+	},
+	"removeUnusedProperties": {
+		"message": "ដកលក្ខណៈសម្បត្តិដែលមិនបានប្រើចេញ"
+	},
+	"removeUnusedPropertiesDescription": {
+		"message": "ដកលក្ខណៈសម្បត្តិទាំងអស់ដែលមិនត្រូវបានប្រើក្នុងគំរូណាមួយចេញ។"
+	},
+	"removeVault": {
+		"message": "ដក Vault ចេញ"
+	},
+	"replaceContent": {
+		"message": "ជំនួសមាតិកាទំព័រ"
+	},
+	"reset": {
+		"message": "កំណត់ឡើងវិញ"
+	},
+	"resetDefaultTemplate": {
+		"message": "កំណត់គំរូលំនាំដើមឡើងវិញ"
+	},
+	"resetDefaultTemplateDescription": {
+		"message": "លុបការផ្លាស់ប្តូរណាមួយដែលអ្នកបានធ្វើលើគំរូលំនាំដើម។"
+	},
+	"resetProvidersAndModels": {
+		"message": "កំណត់ម៉ូដែលលំនាំដើមឡើងវិញ"
+	},
+	"resetProvidersAndModelsDescription": {
+		"message": "កំណត់អ្នកផ្តល់សេវា និងម៉ូដែលទៅការកំណត់លំនាំដើមឡើងវិញ។"
+	},
+	"save": {
+		"message": "រក្សាទុក"
+	},
+	"saveBehaviorDescription": {
+		"message": "ជ្រើសរើសជម្រើសលំនាំដើមសម្រាប់រក្សាទុកទំព័រ។ ជម្រើសផ្សេងៗនឹងបង្ហាញនៅក្នុងម៉ឺនុយទម្លាក់ចុះជាប់នឹងប៊ូតុងមេ។"
+	},
+	"saveBehaviorLabel": {
+		"message": "ឥរិយាបថការរក្សាទុក"
+	},
+	"saveFile": {
+		"message": "រក្សាទុកឯកសារ..."
+	},
+	"searchVariables": {
+		"message": "ស្វែងរកអថេរ..."
+	},
+	"selectProvider": {
+		"message": "ជ្រើសរើសអ្នកផ្តល់សេវា"
+	},
+	"selectTemplateToExport": {
+		"message": "សូមជ្រើសរើសគំរូមួយដើម្បីនាំចេញ។"
+	},
+	"settings": {
+		"message": "ការកំណត់"
+	},
+	"settingsHeading": {
+		"message": "ការកំណត់"
+	},
+	"settingsImportSuccess": {
+		"message": "បាននាំចូលការកំណត់ទាំងអស់ដោយជោគជ័យ។ សូមធ្វើឲ្យទំព័រស្រស់ ដើម្បីឃើញការផ្លាស់ប្តូរ។"
+	},
+	"share": {
+		"message": "ចែករំលែក..."
+	},
+	"shortcutInstructionsBrave": {
+		"message": "ដើម្បីប្តូរការកំណត់គ្រាប់ចុច សូមទៅកាន់ $1"
+	},
+	"shortcutInstructionsChrome": {
+		"message": "ដើម្បីប្តូរការកំណត់គ្រាប់ចុច សូមទៅកាន់ $1"
+	},
+	"shortcutInstructionsDefault": {
+		"message": "ដើម្បីប្តូរការកំណត់គ្រាប់ចុច សូមមើលការកំណត់ផ្នែកបន្ថែមរបស់កម្មវិធីរុករករបស់អ្នក។"
+	},
+	"shortcutInstructionsEdge": {
+		"message": "ដើម្បីប្តូរការកំណត់គ្រាប់ចុច សូមទៅកាន់ $1"
+	},
+	"shortcutInstructionsFirefox": {
+		"message": "ដើម្បីប្តូរការកំណត់គ្រាប់ចុច សូមទៅកាន់ $1 ចុចរូបតំណាងស្ពឺ ហើយជ្រើស \"គ្រប់គ្រងផ្លូវកាត់ផ្នែកបន្ថែម\"។"
+	},
+	"shortcutInstructionsIntro": {
+		"message": "ផ្លូវកាត់ក្តារចុចផ្តល់ឲ្យអ្នកនូវការចូលប្រើរហ័សទៅមុខងារ clipper។"
+	},
+	"shortcutInstructionsSafari": {
+		"message": "ផ្លូវកាត់ក្តារចុចមិនអាចប្ដូរតាមបំណងបានទេនៅលើ Safari។"
+	},
+	"shortcutNotSet": {
+		"message": "មិនបានកំណត់"
+	},
+	"showActionsButton": {
+		"message": "បង្ហាញប៊ូតុងសកម្មភាព"
+	},
+	"showActionsDescription": {
+		"message": "អនុញ្ញាតឲ្យអ្នកពិនិត្យអថេរទំព័រពីម៉ឺនុយ clipper។ មានប្រយោជន៍សម្រាប់មើលអថេរដែលអាចប្រើក្នុងគំរូបាន។"
+	},
+	"showPageVariables": {
+		"message": "បង្ហាញអថេរទំព័រ"
+	},
+	"silentOpen": {
+		"message": "រក្សាទុកកំណត់ត្រាដែលបានកាត់យក ដោយមិនបើកវា"
+	},
+	"silentOpenDescription": {
+		"message": "កំណត់ត្រាដែលបានកាត់យកនឹងត្រូវបានរក្សាទុក ប៉ុន្តែមិនបើកជាផ្ទាំងថ្មីទេ។ Obsidian នឹងត្រូវបាននាំមកខាងមុខនៅតែដដែល។"
+	},
+	"specificNoteName": {
+		"message": "ឈ្មោះកំណត់ត្រាជាក់លាក់"
+	},
+	"systemDefault": {
+		"message": "ប្រព័ន្ធ"
+	},
+	"template": {
+		"message": "គំរូ"
+	},
+	"templateCopied": {
+		"message": "បានចម្លង JSON គំរូទៅក្តារតម្បៀតខ្ទាស់"
+	},
+	"templateCopyError": {
+		"message": "បានបរាជ័យក្នុងការចម្លង JSON គំរូទៅក្តារតម្បៀតខ្ទាស់"
+	},
+	"templateErrorCount": {
+		"message": "មានកំហុសមួយនៅក្នុងគំរូរបស់អ្នក។"
+	},
+	"templateErrorsCount": {
+		"message": "មានកំហុស $1 នៅក្នុងគំរូរបស់អ្នក។"
+	},
+	"templateGroupContent": {
+		"message": "មាតិកា"
+	},
+	"templateGroupLocation": {
+		"message": "ទីតាំង"
+	},
+	"templateName": {
+		"message": "ឈ្មោះគំរូ"
+	},
+	"templateProperties": {
+		"message": "លក្ខណៈសម្បត្តិ"
+	},
+	"templatePropertiesDescription": {
+		"message": "លក្ខណៈសម្បត្តិដែលត្រូវបន្ថែមនៅខាងលើកំណត់ត្រាដែលបានកាត់យក។ ប្រើអថេរដើម្បីបំពេញទិន្នន័យពីទំព័រជាមុន។"
+	},
+	"templateTriggers": {
+		"message": "កត្តាបង្កគំរូ"
+	},
+	"templateTriggersDescription": {
+		"message": "កំណត់ច្បាប់ដើម្បីជ្រើសរើសគំរូនេះដោយស្វ័យប្រវត្តិ ប្រសិនបើវាត្រូវនឹងលំនាំ URL ឬមានទិន្នន័យ schema.org។ មួយច្បាប់ក្នុងមួយបន្ទាត់។"
+	},
+	"templateValid": {
+		"message": "វាក្យសម្ព័ន្ធគំរូត្រឹមត្រូវ"
+	},
+	"templatesHeading": {
+		"message": "គំរូ"
+	},
+	"thinking": {
+		"message": "កំពុងគិត"
+	},
+	"unknownProvider": {
+		"message": "អ្នកផ្តល់សេវាមិនស្គាល់"
+	},
+	"updateAvailable": {
+		"message": "មានបច្ចុប្បន្នភាពថ្មី។"
+	},
+	"usingLatestVersion": {
+		"message": "អ្នកកំពុងប្រើកំណែចុងក្រោយបំផុត។"
+	},
+	"vault": {
+		"message": "Vault"
+	},
+	"vaultDescription": {
+		"message": "ជ្រើសរើស vault លំនាំដើមសម្រាប់គំរូនេះ។ ទៅកាន់ $link_start$ការកំណត់ទូទៅ$link_end$ ដើម្បីបន្ថែម ឬដក vault ចេញ។",
+		"placeholders": {
+			"link_end": {
+				"content": "</a>"
+			},
+			"link_start": {
+				"content": "<a href=\"?section=general\">"
+			}
+		}
+	},
+	"vaults": {
+		"message": "Vaults"
+	},
+	"vaultsDescription": {
+		"message": "តាមលំនាំដើម កំណត់ត្រាដែលបានកាត់យកនឹងត្រូវបានរក្សាទុកទៅ vault ដែលកំពុងបើក។ អ្នកអាចបន្ថែម vault នៅទីនេះ ប្រសិនបើអ្នកចង់មានជម្រើសរក្សាទុកទៅ vault ផ្សេងៗ។ ឈ្មោះ vault ត្រូវតែត្រូវគ្នាពិតប្រាកដជាមួយឈ្មោះ vault របស់ Obsidian។ ចុច $strong_start$enter$strong_end$ ដើម្បីបន្ថែម vault។",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
+	},
+	"version": {
+		"message": "កំណែ"
+	}
+}

@@ -568,6 +568,9 @@
 	"prependToExisting": {
 		"message": "Додати до існуючої нотатки, на початок"
 	},
+	"preview": {
+		"message": "Попередній перегляд"
+	},
 	"processing": {
 		"message": "обробка"
 	},
@@ -648,6 +651,120 @@
 	},
 	"reader": {
 		"message": "Читач"
+	},
+	"readerAppearance": {
+		"message": "Вигляд"
+	},
+	"readerAppearanceAuto": {
+		"message": "Авто"
+	},
+	"readerAppearanceDark": {
+		"message": "Темний"
+	},
+	"readerAppearanceDescription": {
+		"message": "Виберіть світлий або темний вигляд."
+	},
+	"readerAppearanceLight": {
+		"message": "Світлий"
+	},
+	"readerBlendImages": {
+		"message": "Змішувати зображення"
+	},
+	"readerBlendImagesDescription": {
+		"message": "Змішувати зображення з фоном сторінки."
+	},
+	"readerCloseImageViewer": {
+		"message": "Закрити переглядач зображень"
+	},
+	"readerCollapseComment": {
+		"message": "Згорнути коментар"
+	},
+	"readerColorLinks": {
+		"message": "Розфарбовувати посилання"
+	},
+	"readerColorSchemeDefault": {
+		"message": "За замовчуванням"
+	},
+	"readerCustomCss": {
+		"message": "Власний CSS"
+	},
+	"readerCustomCssDescription": {
+		"message": "CSS, що застосовується автоматично в режимі читання."
+	},
+	"readerDarkTheme": {
+		"message": "Тема темного режиму"
+	},
+	"readerDarkThemeDescription": {
+		"message": "Використовувати іншу тему в темному режимі."
+	},
+	"readerError": {
+		"message": "Не вдалося витягти вміст."
+	},
+	"readerFont": {
+		"message": "Параметри шрифтів"
+	},
+	"readerFontDefault": {
+		"message": "За замовчуванням"
+	},
+	"readerFontDescription": {
+		"message": "Додайте шрифти, встановлені у вашій системі. Натисніть Enter, щоб додати шрифт."
+	},
+	"readerFontNotFound": {
+		"message": "Не знайдено"
+	},
+	"readerFontPlaceholder": {
+		"message": "Натисніть Enter, щоб додати шрифт"
+	},
+	"readerFontSetDefault": {
+		"message": "Встановити за замовчуванням"
+	},
+	"readerFontSize": {
+		"message": "Базовий розмір шрифту"
+	},
+	"readerFontSystem": {
+		"message": "Системний"
+	},
+	"readerFontSystemSans": {
+		"message": "Без засічок"
+	},
+	"readerFontSystemSerif": {
+		"message": "Із засічками"
+	},
+	"readerFonts": {
+		"message": "Шрифти"
+	},
+	"readerFootnotes": {
+		"message": "Виноски"
+	},
+	"readerImages": {
+		"message": "Зображення"
+	},
+	"readerLineHeight": {
+		"message": "Висота рядка"
+	},
+	"readerLineWidth": {
+		"message": "Ширина рядка"
+	},
+	"readerLoading": {
+		"message": "Очищення…"
+	},
+	"readerSettings": {
+		"message": "Налаштування режиму читання"
+	},
+	"readerTheme": {
+		"message": "Тема"
+	},
+	"readerThemeDescription": {
+		"message": "Виберіть кольори, що використовуються в режимі читання."
+	},
+	"readerThemeSection": {
+		"message": "Тема"
+	},
+	"readerTypography": {
+		"message": "Типографіка"
+	},
+	"readerViewFullSize": {
+		"message": "Переглянути в повному розмірі"
 	},
 	"recommended": {
 		"message": "рекомендовано"
@@ -766,6 +883,9 @@
 	"systemDefault": {
 		"message": "Системна за замовчуванням"
 	},
+	"template": {
+		"message": "Шаблон"
+	},
 	"templateCopied": {
 		"message": "JSON шаблону скопійовано в буфер обміну"
 	},
@@ -777,6 +897,12 @@
 	},
 	"templateErrorsCount": {
 		"message": "У вашому шаблоні є $1 помилок."
+	},
+	"templateGroupContent": {
+		"message": "Вміст"
+	},
+	"templateGroupLocation": {
+		"message": "Розташування"
 	},
 	"templateName": {
 		"message": "Назва шаблону"

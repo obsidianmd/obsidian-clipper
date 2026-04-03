@@ -576,6 +576,9 @@
 	"prependToExisting": {
 		"message": "添加到现有笔记开头"
 	},
+	"preview": {
+		"message": "预览"
+	},
 	"processing": {
 		"message": "处理中"
 	},
@@ -656,6 +659,120 @@
 	},
 	"reader": {
 		"message": "阅读器"
+	},
+	"readerAppearance": {
+		"message": "外观"
+	},
+	"readerAppearanceAuto": {
+		"message": "自动"
+	},
+	"readerAppearanceDark": {
+		"message": "深色"
+	},
+	"readerAppearanceDescription": {
+		"message": "选择浅色或深色外观。"
+	},
+	"readerAppearanceLight": {
+		"message": "浅色"
+	},
+	"readerBlendImages": {
+		"message": "融合图片"
+	},
+	"readerBlendImagesDescription": {
+		"message": "将图片与页面背景融合。"
+	},
+	"readerCloseImageViewer": {
+		"message": "关闭图片查看器"
+	},
+	"readerCollapseComment": {
+		"message": "折叠评论"
+	},
+	"readerColorLinks": {
+		"message": "链接着色"
+	},
+	"readerColorSchemeDefault": {
+		"message": "默认"
+	},
+	"readerCustomCss": {
+		"message": "自定义 CSS"
+	},
+	"readerCustomCssDescription": {
+		"message": "在阅读视图中自动应用的 CSS。"
+	},
+	"readerDarkTheme": {
+		"message": "深色模式主题"
+	},
+	"readerDarkThemeDescription": {
+		"message": "在深色模式下使用不同的主题。"
+	},
+	"readerError": {
+		"message": "内容提取失败。"
+	},
+	"readerFont": {
+		"message": "字体选项"
+	},
+	"readerFontDefault": {
+		"message": "默认"
+	},
+	"readerFontDescription": {
+		"message": "添加系统中已安装的字体。按 Enter 添加字体。"
+	},
+	"readerFontNotFound": {
+		"message": "未找到"
+	},
+	"readerFontPlaceholder": {
+		"message": "按 Enter 添加字体"
+	},
+	"readerFontSetDefault": {
+		"message": "设为默认"
+	},
+	"readerFontSize": {
+		"message": "基础字号"
+	},
+	"readerFontSystem": {
+		"message": "系统"
+	},
+	"readerFontSystemSans": {
+		"message": "无衬线"
+	},
+	"readerFontSystemSerif": {
+		"message": "衬线"
+	},
+	"readerFonts": {
+		"message": "字体"
+	},
+	"readerFootnotes": {
+		"message": "脚注"
+	},
+	"readerImages": {
+		"message": "图片"
+	},
+	"readerLineHeight": {
+		"message": "行高"
+	},
+	"readerLineWidth": {
+		"message": "行宽"
+	},
+	"readerLoading": {
+		"message": "正在净化…"
+	},
+	"readerSettings": {
+		"message": "阅读器设置"
+	},
+	"readerTheme": {
+		"message": "主题"
+	},
+	"readerThemeDescription": {
+		"message": "选择阅读视图中使用的颜色。"
+	},
+	"readerThemeSection": {
+		"message": "主题"
+	},
+	"readerTypography": {
+		"message": "排版"
+	},
+	"readerViewFullSize": {
+		"message": "查看原始大小"
 	},
 	"recommended": {
 		"message": "推荐"
@@ -774,6 +891,9 @@
 	"systemDefault": {
 		"message": "系统默认"
 	},
+	"template": {
+		"message": "模板"
+	},
 	"templateCopied": {
 		"message": "已将模板 JSON 复制到剪贴板"
 	},
@@ -785,6 +905,12 @@
 	},
 	"templateErrorsCount": {
 		"message": "你的模板中有 $1 个错误。"
+	},
+	"templateGroupContent": {
+		"message": "内容"
+	},
+	"templateGroupLocation": {
+		"message": "位置"
 	},
 	"templateName": {
 		"message": "模板名称"

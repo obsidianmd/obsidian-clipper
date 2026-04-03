@@ -576,6 +576,9 @@
 	"prependToExisting": {
 		"message": "Agregar a una nota existent, al principi"
 	},
+	"preview": {
+		"message": "Previsualització"
+	},
 	"processing": {
 		"message": "processant"
 	},
@@ -656,6 +659,120 @@
 	},
 	"reader": {
 		"message": "Lector"
+	},
+	"readerAppearance": {
+		"message": "Aparença"
+	},
+	"readerAppearanceAuto": {
+		"message": "Automàtic"
+	},
+	"readerAppearanceDark": {
+		"message": "Fosc"
+	},
+	"readerAppearanceDescription": {
+		"message": "Tria una aparença clara o fosca."
+	},
+	"readerAppearanceLight": {
+		"message": "Clar"
+	},
+	"readerBlendImages": {
+		"message": "Fusiona les imatges"
+	},
+	"readerBlendImagesDescription": {
+		"message": "Fusiona les imatges amb el fons de la pàgina."
+	},
+	"readerCloseImageViewer": {
+		"message": "Tanca el visor d'imatges"
+	},
+	"readerCollapseComment": {
+		"message": "Replega el comentari"
+	},
+	"readerColorLinks": {
+		"message": "Coloreja els enllaços"
+	},
+	"readerColorSchemeDefault": {
+		"message": "Per defecte"
+	},
+	"readerCustomCss": {
+		"message": "CSS personalitzat"
+	},
+	"readerCustomCssDescription": {
+		"message": "CSS aplicat automàticament a la vista de lectura."
+	},
+	"readerDarkTheme": {
+		"message": "Tema del mode fosc"
+	},
+	"readerDarkThemeDescription": {
+		"message": "Utilitza un tema diferent en mode fosc."
+	},
+	"readerError": {
+		"message": "No s'ha pogut extreure el contingut."
+	},
+	"readerFont": {
+		"message": "Opcions de lletra"
+	},
+	"readerFontDefault": {
+		"message": "Per defecte"
+	},
+	"readerFontDescription": {
+		"message": "Afegeix les lletres instal·lades al teu sistema. Prem Retorn per afegir una lletra."
+	},
+	"readerFontNotFound": {
+		"message": "No s'ha trobat"
+	},
+	"readerFontPlaceholder": {
+		"message": "Prem Retorn per afegir una lletra"
+	},
+	"readerFontSetDefault": {
+		"message": "Estableix com a predeterminat"
+	},
+	"readerFontSize": {
+		"message": "Mida base de la lletra"
+	},
+	"readerFontSystem": {
+		"message": "Sistema"
+	},
+	"readerFontSystemSans": {
+		"message": "Sans-serif"
+	},
+	"readerFontSystemSerif": {
+		"message": "Serif"
+	},
+	"readerFonts": {
+		"message": "Lletres"
+	},
+	"readerFootnotes": {
+		"message": "Notes a peu de pàgina"
+	},
+	"readerImages": {
+		"message": "Imatges"
+	},
+	"readerLineHeight": {
+		"message": "Alçada de línia"
+	},
+	"readerLineWidth": {
+		"message": "Amplada de línia"
+	},
+	"readerLoading": {
+		"message": "S'està simplificant…"
+	},
+	"readerSettings": {
+		"message": "Configuració del lector"
+	},
+	"readerTheme": {
+		"message": "Tema"
+	},
+	"readerThemeDescription": {
+		"message": "Tria els colors que s'utilitzen a la vista de lectura."
+	},
+	"readerThemeSection": {
+		"message": "Tema"
+	},
+	"readerTypography": {
+		"message": "Tipografia"
+	},
+	"readerViewFullSize": {
+		"message": "Mostra a mida completa"
 	},
 	"recommended": {
 		"message": "recomanat"
@@ -774,6 +891,9 @@
 	"systemDefault": {
 		"message": "Sistema"
 	},
+	"template": {
+		"message": "Plantilla"
+	},
 	"templateCopied": {
 		"message": "El JSON de la plantilla s'ha copiat al porta-retalls"
 	},
@@ -785,6 +905,12 @@
 	},
 	"templateErrorsCount": {
 		"message": "Hi ha $1 errors a la teva plantilla."
+	},
+	"templateGroupContent": {
+		"message": "Contingut"
+	},
+	"templateGroupLocation": {
+		"message": "Ubicació"
 	},
 	"templateName": {
 		"message": "Nom de la plantilla"

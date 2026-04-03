@@ -576,6 +576,9 @@
 	"prependToExisting": {
 		"message": "Thêm vào ghi chú hiện có, ở đầu"
 	},
+	"preview": {
+		"message": "Xem trước"
+	},
 	"processing": {
 		"message": "đang xử lý"
 	},
@@ -656,6 +659,120 @@
 	},
 	"reader": {
 		"message": "Đọc"
+	},
+	"readerAppearance": {
+		"message": "Giao diện"
+	},
+	"readerAppearanceAuto": {
+		"message": "Tự động"
+	},
+	"readerAppearanceDark": {
+		"message": "Tối"
+	},
+	"readerAppearanceDescription": {
+		"message": "Chọn giao diện sáng hoặc tối."
+	},
+	"readerAppearanceLight": {
+		"message": "Sáng"
+	},
+	"readerBlendImages": {
+		"message": "Hòa trộn hình ảnh"
+	},
+	"readerBlendImagesDescription": {
+		"message": "Hòa trộn hình ảnh với nền của trang."
+	},
+	"readerCloseImageViewer": {
+		"message": "Đóng trình xem hình ảnh"
+	},
+	"readerCollapseComment": {
+		"message": "Thu gọn bình luận"
+	},
+	"readerColorLinks": {
+		"message": "Tô màu liên kết"
+	},
+	"readerColorSchemeDefault": {
+		"message": "Mặc định"
+	},
+	"readerCustomCss": {
+		"message": "CSS tùy chỉnh"
+	},
+	"readerCustomCssDescription": {
+		"message": "CSS được tự động áp dụng trong chế độ đọc."
+	},
+	"readerDarkTheme": {
+		"message": "Chủ đề chế độ tối"
+	},
+	"readerDarkThemeDescription": {
+		"message": "Dùng một chủ đề khác trong chế độ tối."
+	},
+	"readerError": {
+		"message": "Không thể trích xuất nội dung."
+	},
+	"readerFont": {
+		"message": "Tùy chọn phông chữ"
+	},
+	"readerFontDefault": {
+		"message": "Mặc định"
+	},
+	"readerFontDescription": {
+		"message": "Thêm các phông chữ đã cài trên hệ thống của bạn. Nhấn Enter để thêm một phông chữ."
+	},
+	"readerFontNotFound": {
+		"message": "Không tìm thấy"
+	},
+	"readerFontPlaceholder": {
+		"message": "Nhấn Enter để thêm một phông chữ"
+	},
+	"readerFontSetDefault": {
+		"message": "Đặt làm mặc định"
+	},
+	"readerFontSize": {
+		"message": "Cỡ chữ cơ bản"
+	},
+	"readerFontSystem": {
+		"message": "Hệ thống"
+	},
+	"readerFontSystemSans": {
+		"message": "Sans-serif"
+	},
+	"readerFontSystemSerif": {
+		"message": "Serif"
+	},
+	"readerFonts": {
+		"message": "Phông chữ"
+	},
+	"readerFootnotes": {
+		"message": "Chú thích"
+	},
+	"readerImages": {
+		"message": "Hình ảnh"
+	},
+	"readerLineHeight": {
+		"message": "Chiều cao dòng"
+	},
+	"readerLineWidth": {
+		"message": "Độ rộng dòng"
+	},
+	"readerLoading": {
+		"message": "Đang làm rõ…"
+	},
+	"readerSettings": {
+		"message": "Cài đặt chế độ đọc"
+	},
+	"readerTheme": {
+		"message": "Chủ đề"
+	},
+	"readerThemeDescription": {
+		"message": "Chọn màu sắc dùng trong chế độ đọc."
+	},
+	"readerThemeSection": {
+		"message": "Chủ đề"
+	},
+	"readerTypography": {
+		"message": "Kiểu chữ"
+	},
+	"readerViewFullSize": {
+		"message": "Xem kích thước đầy đủ"
 	},
 	"recommended": {
 		"message": "được đề xuất"
@@ -774,6 +891,9 @@
 	"systemDefault": {
 		"message": "Mặc định hệ thống"
 	},
+	"template": {
+		"message": "Mẫu"
+	},
 	"templateCopied": {
 		"message": "Đã sao chép JSON mẫu vào bộ nhớ tạm"
 	},
@@ -785,6 +905,12 @@
 	},
 	"templateErrorsCount": {
 		"message": "Có $1 lỗi trong mẫu của bạn."
+	},
+	"templateGroupContent": {
+		"message": "Nội dung"
+	},
+	"templateGroupLocation": {
+		"message": "Vị trí"
 	},
 	"templateName": {
 		"message": "Tên mẫu"

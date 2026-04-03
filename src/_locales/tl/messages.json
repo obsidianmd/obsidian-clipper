@@ -568,6 +568,9 @@
 	"prependToExisting": {
 		"message": "Idagdag sa umiiral na note, sa simula"
 	},
+	"preview": {
+		"message": "Preview"
+	},
 	"processing": {
 		"message": "pinoproseso"
 	},
@@ -648,6 +651,120 @@
 	},
 	"reader": {
 		"message": "Tagabasa"
+	},
+	"readerAppearance": {
+		"message": "Hitsura"
+	},
+	"readerAppearanceAuto": {
+		"message": "Awtomatiko"
+	},
+	"readerAppearanceDark": {
+		"message": "Madilim"
+	},
+	"readerAppearanceDescription": {
+		"message": "Pumili ng maliwanag o madilim na hitsura."
+	},
+	"readerAppearanceLight": {
+		"message": "Maliwanag"
+	},
+	"readerBlendImages": {
+		"message": "Ihalo ang mga larawan"
+	},
+	"readerBlendImagesDescription": {
+		"message": "Ihalo ang mga larawan sa background ng pahina."
+	},
+	"readerCloseImageViewer": {
+		"message": "Isara ang viewer ng larawan"
+	},
+	"readerCollapseComment": {
+		"message": "I-collapse ang komento"
+	},
+	"readerColorLinks": {
+		"message": "Kulayan ang mga link"
+	},
+	"readerColorSchemeDefault": {
+		"message": "Default"
+	},
+	"readerCustomCss": {
+		"message": "Custom CSS"
+	},
+	"readerCustomCssDescription": {
+		"message": "Awtomatikong inilalapat ang CSS sa reading view."
+	},
+	"readerDarkTheme": {
+		"message": "Tema ng dark mode"
+	},
+	"readerDarkThemeDescription": {
+		"message": "Gumamit ng ibang tema sa dark mode."
+	},
+	"readerError": {
+		"message": "Nabigong i-extract ang nilalaman."
+	},
+	"readerFont": {
+		"message": "Mga opsyon sa font"
+	},
+	"readerFontDefault": {
+		"message": "Default"
+	},
+	"readerFontDescription": {
+		"message": "Magdagdag ng mga font na naka-install sa iyong system. Pindutin ang Enter para magdagdag ng font."
+	},
+	"readerFontNotFound": {
+		"message": "Hindi nahanap"
+	},
+	"readerFontPlaceholder": {
+		"message": "Pindutin ang Enter para magdagdag ng font"
+	},
+	"readerFontSetDefault": {
+		"message": "Itakda bilang default"
+	},
+	"readerFontSize": {
+		"message": "Base na laki ng font"
+	},
+	"readerFontSystem": {
+		"message": "System"
+	},
+	"readerFontSystemSans": {
+		"message": "Sans-serif"
+	},
+	"readerFontSystemSerif": {
+		"message": "Serif"
+	},
+	"readerFonts": {
+		"message": "Mga font"
+	},
+	"readerFootnotes": {
+		"message": "Mga talababa"
+	},
+	"readerImages": {
+		"message": "Mga larawan"
+	},
+	"readerLineHeight": {
+		"message": "Taas ng linya"
+	},
+	"readerLineWidth": {
+		"message": "Lapad ng linya"
+	},
+	"readerLoading": {
+		"message": "Inaayos ang kalabuan…"
+	},
+	"readerSettings": {
+		"message": "Mga setting ng reader"
+	},
+	"readerTheme": {
+		"message": "Tema"
+	},
+	"readerThemeDescription": {
+		"message": "Piliin ang mga kulay na gagamitin sa reading view."
+	},
+	"readerThemeSection": {
+		"message": "Tema"
+	},
+	"readerTypography": {
+		"message": "Tipograpiya"
+	},
+	"readerViewFullSize": {
+		"message": "Tingnan sa buong laki"
 	},
 	"recommended": {
 		"message": "inirerekomenda"
@@ -766,6 +883,9 @@
 	"systemDefault": {
 		"message": "System default"
 	},
+	"template": {
+		"message": "Template"
+	},
 	"templateCopied": {
 		"message": "Na-copy na ang template JSON sa clipboard"
 	},
@@ -777,6 +897,12 @@
 	},
 	"templateErrorsCount": {
 		"message": "May $1 error sa template mo."
+	},
+	"templateGroupContent": {
+		"message": "Nilalaman"
+	},
+	"templateGroupLocation": {
+		"message": "Lokasyon"
 	},
 	"templateName": {
 		"message": "Pangalan ng template"

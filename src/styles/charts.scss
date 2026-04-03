@@ -4,18 +4,11 @@
 	justify-content: space-between;
 	align-items: flex-start;
 	padding-top: 0.75rem;
-	margin-bottom: 1rem;
+	margin-bottom: 0.75rem;
 
 	.usage-chart-title {
-		h3 {
-			margin-top: 0;
-			margin-bottom: 4px;
-			padding-bottom: 0;
-			border-bottom: none;
-		}
-
 		.setting-item-description {
-			margin-top: 0;
+			margin-top: 0.25rem;
 		}
 	}
 
@@ -30,9 +23,8 @@
 }
 
 .usage-chart {
-	margin: 0;
-	padding: 1rem 0 2rem;
-	border-bottom: 1px solid var(--background-modifier-border);
+	margin: 0 0 1rem;
+	padding: 1rem 1rem 2rem;
 
 	.chart-line {
 		position: relative;

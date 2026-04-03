@@ -576,6 +576,9 @@
 	"prependToExisting": {
 		"message": "বিদ্যমান নোটের উপরের দিকে যোগ করুন"
 	},
+	"preview": {
+		"message": "পূর্বরূপ"
+	},
 	"processing": {
 		"message": "প্রসেসিং"
 	},
@@ -656,6 +659,120 @@
 	},
 	"reader": {
 		"message": "পাঠক"
+	},
+	"readerAppearance": {
+		"message": "চেহারা"
+	},
+	"readerAppearanceAuto": {
+		"message": "স্বয়ংক্রিয়"
+	},
+	"readerAppearanceDark": {
+		"message": "ডার্ক"
+	},
+	"readerAppearanceDescription": {
+		"message": "লাইট বা ডার্ক চেহারা বেছে নিন।"
+	},
+	"readerAppearanceLight": {
+		"message": "লাইট"
+	},
+	"readerBlendImages": {
+		"message": "ছবি মিশিয়ে দিন"
+	},
+	"readerBlendImagesDescription": {
+		"message": "পৃষ্ঠার ব্যাকগ্রাউন্ডের সাথে ছবি মিশিয়ে দিন।"
+	},
+	"readerCloseImageViewer": {
+		"message": "ছবি ভিউয়ার বন্ধ করুন"
+	},
+	"readerCollapseComment": {
+		"message": "মন্তব্য সংকুচিত করুন"
+	},
+	"readerColorLinks": {
+		"message": "লিংকের রঙ"
+	},
+	"readerColorSchemeDefault": {
+		"message": "ডিফল্ট"
+	},
+	"readerCustomCss": {
+		"message": "কাস্টম CSS"
+	},
+	"readerCustomCssDescription": {
+		"message": "রিডিং ভিউতে স্বয়ংক্রিয়ভাবে প্রয়োগ হওয়া CSS।"
+	},
+	"readerDarkTheme": {
+		"message": "ডার্ক মোড থিম"
+	},
+	"readerDarkThemeDescription": {
+		"message": "ডার্ক মোডে ভিন্ন থিম ব্যবহার করুন।"
+	},
+	"readerError": {
+		"message": "কনটেন্ট বের করতে ব্যর্থ হয়েছে।"
+	},
+	"readerFont": {
+		"message": "ফন্ট অপশন"
+	},
+	"readerFontDefault": {
+		"message": "ডিফল্ট"
+	},
+	"readerFontDescription": {
+		"message": "আপনার সিস্টেমে ইনস্টল করা ফন্ট যোগ করুন। ফন্ট যোগ করতে এন্টার চাপুন।"
+	},
+	"readerFontNotFound": {
+		"message": "পাওয়া যায়নি"
+	},
+	"readerFontPlaceholder": {
+		"message": "ফন্ট যোগ করতে এন্টার চাপুন"
+	},
+	"readerFontSetDefault": {
+		"message": "ডিফল্ট সেট করুন"
+	},
+	"readerFontSize": {
+		"message": "বেস ফন্ট সাইজ"
+	},
+	"readerFontSystem": {
+		"message": "সিস্টেম"
+	},
+	"readerFontSystemSans": {
+		"message": "স্যান্স-সেরিফ"
+	},
+	"readerFontSystemSerif": {
+		"message": "সেরিফ"
+	},
+	"readerFonts": {
+		"message": "ফন্ট"
+	},
+	"readerFootnotes": {
+		"message": "পাদটীকা"
+	},
+	"readerImages": {
+		"message": "ছবি"
+	},
+	"readerLineHeight": {
+		"message": "লাইন উচ্চতা"
+	},
+	"readerLineWidth": {
+		"message": "লাইন প্রস্থ"
+	},
+	"readerLoading": {
+		"message": "পরিষ্কার করা হচ্ছে…"
+	},
+	"readerSettings": {
+		"message": "রিডার সেটিংস"
+	},
+	"readerTheme": {
+		"message": "থিম"
+	},
+	"readerThemeDescription": {
+		"message": "রিডিং ভিউতে ব্যবহৃত রঙ বেছে নিন।"
+	},
+	"readerThemeSection": {
+		"message": "থিম"
+	},
+	"readerTypography": {
+		"message": "টাইপোগ্রাফি"
+	},
+	"readerViewFullSize": {
+		"message": "পূর্ণ আকারে দেখুন"
 	},
 	"recommended": {
 		"message": "প্রস্তাবিত"
@@ -774,6 +891,9 @@
 	"systemDefault": {
 		"message": "সিস্টেম"
 	},
+	"template": {
+		"message": "টেমপ্লেট"
+	},
 	"templateCopied": {
 		"message": "টেমপ্লেট JSON ক্লিপবোর্ডে কপি করা হয়েছে"
 	},
@@ -785,6 +905,12 @@
 	},
 	"templateErrorsCount": {
 		"message": "আপনার টেমপ্লেটে $1টি ত্রুটি আছে।"
+	},
+	"templateGroupContent": {
+		"message": "কনটেন্ট"
+	},
+	"templateGroupLocation": {
+		"message": "অবস্থান"
 	},
 	"templateName": {
 		"message": "টেমপ্লেটের নাম"

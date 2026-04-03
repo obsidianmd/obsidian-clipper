@@ -54,6 +54,7 @@ const LANGUAGE_NAMES: { [key: string]: string } = {
 	'nb': 'Norsk Bokmål',
 	'nl': 'Nederlands',
 	'pl': 'Polski',
+	'pt': 'Português',
 	'pt_PT': 'Português',
 	'pt_BR': 'Português (Brasil)',
 	'ro': 'Română',
@@ -90,7 +91,7 @@ async function addLocale(locale: string) {
 	}
 
 	// Get native language name
-	const nativeName = LANGUAGE_NAMES[locale];
+	const nativeName = LANGUAGE_NAMES[locale] || LANGUAGE_NAMES[locale.replace('-', '_')];
 	if (!nativeName) {
 		throw new Error(`Native name not found for locale ${locale}. Please add it to LANGUAGE_NAMES`);
 	}

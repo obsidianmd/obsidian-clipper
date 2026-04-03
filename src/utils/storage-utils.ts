@@ -37,11 +37,17 @@ export let generalSettings: Settings = {
 	defaultPromptContext: "",
 	propertyTypes: [],
 	readerSettings: {
-		fontSize: 1.5,
+		fontSize: 16,
 		lineHeight: 1.6,
 		maxWidth: 38,
-		theme: "default",
-		themeMode: "auto",
+		lightTheme: "default",
+		darkTheme: "same",
+		appearance: "auto",
+		fonts: [],
+		defaultFont: "",
+		blendImages: true,
+		colorLinks: false,
+		customCss: "",
 	},
 	stats: {
 		addToObsidian: 0,
@@ -94,8 +100,14 @@ interface StorageData {
 		fontSize?: number;
 		lineHeight?: number;
 		maxWidth?: number;
-		theme?: "default" | "flexoki";
-		themeMode?: "auto" | "light" | "dark";
+		lightTheme?: string;
+		darkTheme?: string;
+		appearance?: "auto" | "light" | "dark";
+		fonts?: string[];
+		defaultFont?: string;
+		blendImages?: boolean;
+		colorLinks?: boolean;
+		customCss?: string;
 	};
 	interpreter_settings?: {
 		interpreterModel?: string;
@@ -155,11 +167,17 @@ export async function loadSettings(): Promise<Settings> {
 			parentViewId: "",
 		},
 		readerSettings: {
-			fontSize: 1.5,
+			fontSize: 16,
 			lineHeight: 1.6,
 			maxWidth: 38,
-			theme: "default",
-			themeMode: "auto",
+			lightTheme: "default",
+			darkTheme: "same",
+			appearance: "auto",
+			fonts: [],
+			defaultFont: "",
+			blendImages: true,
+			colorLinks: false,
+			customCss: "",
 		},
 		stats: {
 			addToObsidian: 0,
@@ -182,7 +200,7 @@ export async function loadSettings(): Promise<Settings> {
 		});
 		debugLog(
 			"Settings",
-			`Updated migration version to ${CURRENT_MIGRATION_VERSION}`,
+			`Updated migration version to ${CURRENT_MIGRATION_VERSION}`
 		);
 	}
 
@@ -192,15 +210,15 @@ export async function loadSettings(): Promise<Settings> {
 		: [];
 	const sanitizedModels = Array.isArray(data.interpreter_settings?.models)
 		? data.interpreter_settings.models.filter(
-				(m) => m && typeof m === "object" && typeof m.id === "string",
-			)
+				(m) => m && typeof m === "object" && typeof m.id === "string"
+		  )
 		: [];
 	const sanitizedProviders = Array.isArray(
-		data.interpreter_settings?.providers,
+		data.interpreter_settings?.providers
 	)
 		? data.interpreter_settings.providers.filter(
-				(p) => p && typeof p === "object" && typeof p.id === "string",
-			)
+				(p) => p && typeof p === "object" && typeof p.id === "string"
+		  )
 		: [];
 
 	// Load user settings
@@ -223,8 +241,8 @@ export async function loadSettings(): Promise<Settings> {
 				? data.general_settings.openBehavior
 					? "embedded"
 					: "popup"
-				: (data.general_settings?.openBehavior ??
-					defaultSettings.openBehavior),
+				: data.general_settings?.openBehavior ??
+				  defaultSettings.openBehavior,
 		highlighterEnabled:
 			data.highlighter_settings?.highlighterEnabled ??
 			defaultSettings.highlighterEnabled,
@@ -259,14 +277,32 @@ export async function loadSettings(): Promise<Settings> {
 			maxWidth:
 				data.reader_settings?.maxWidth ??
 				defaultSettings.readerSettings.maxWidth,
-			theme:
-				(data.reader_settings?.theme as "default" | "flexoki") ??
-				defaultSettings.readerSettings.theme,
-			themeMode:
-				(data.reader_settings?.themeMode as
+			lightTheme:
+				data.reader_settings?.lightTheme ??
+				defaultSettings.readerSettings.lightTheme,
+			darkTheme:
+				data.reader_settings?.darkTheme ??
+				defaultSettings.readerSettings.darkTheme,
+			appearance:
+				(data.reader_settings?.appearance as
 					| "auto"
 					| "light"
-					| "dark") ?? defaultSettings.readerSettings.themeMode,
+					| "dark") ?? defaultSettings.readerSettings.appearance,
+			fonts:
+				data.reader_settings?.fonts ??
+				defaultSettings.readerSettings.fonts,
+			defaultFont:
+				data.reader_settings?.defaultFont ??
+				defaultSettings.readerSettings.defaultFont,
+			blendImages:
+				data.reader_settings?.blendImages ??
+				defaultSettings.readerSettings.blendImages,
+			colorLinks:
+				data.reader_settings?.colorLinks ??
+				defaultSettings.readerSettings.colorLinks,
+			customCss:
+				data.reader_settings?.customCss ??
+				defaultSettings.readerSettings.customCss,
 		},
 		stats: data.stats || defaultSettings.stats,
 		history: data.history || defaultSettings.history,
@@ -275,8 +311,8 @@ export async function loadSettings(): Promise<Settings> {
 			// Migrate any existing "addToObsidian" to AppFlowy
 			data.general_settings?.saveBehavior === "addToObsidian"
 				? "addToAppFlowy"
-				: (data.general_settings?.saveBehavior ??
-					defaultSettings.saveBehavior),
+				: data.general_settings?.saveBehavior ??
+				  defaultSettings.saveBehavior,
 		appflowyConfig: {
 			serverUrl:
 				data.appflowy_config?.serverUrl ??
@@ -299,7 +335,7 @@ export async function loadSettings(): Promise<Settings> {
 }
 
 export async function saveSettings(
-	settings?: Partial<Settings>,
+	settings?: Partial<Settings>
 ): Promise<void> {
 	if (settings) {
 		generalSettings = { ...generalSettings, ...settings };
@@ -333,8 +369,14 @@ export async function saveSettings(
 			fontSize: generalSettings.readerSettings.fontSize,
 			lineHeight: generalSettings.readerSettings.lineHeight,
 			maxWidth: generalSettings.readerSettings.maxWidth,
-			theme: generalSettings.readerSettings.theme,
-			themeMode: generalSettings.readerSettings.themeMode,
+			lightTheme: generalSettings.readerSettings.lightTheme,
+			darkTheme: generalSettings.readerSettings.darkTheme,
+			appearance: generalSettings.readerSettings.appearance,
+			fonts: generalSettings.readerSettings.fonts,
+			defaultFont: generalSettings.readerSettings.defaultFont,
+			blendImages: generalSettings.readerSettings.blendImages,
+			colorLinks: generalSettings.readerSettings.colorLinks,
+			customCss: generalSettings.readerSettings.customCss,
 		},
 		stats: generalSettings.stats,
 		appflowy_config: {
@@ -356,7 +398,7 @@ export async function incrementStat(
 	vault?: string,
 	path?: string,
 	url?: string,
-	title?: string,
+	title?: string
 ): Promise<void> {
 	const settings = await loadSettings();
 	settings.stats[action]++;
@@ -373,7 +415,7 @@ export async function addHistoryEntry(
 	url: string,
 	title?: string,
 	vault?: string,
-	path?: string,
+	path?: string
 ): Promise<void> {
 	const entry: HistoryEntry = {
 		datetime: new Date().toISOString(),

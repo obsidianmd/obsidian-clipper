@@ -2,7 +2,7 @@
 	"manifest_version": 3,
 	"name": "Clipper for AppFlowy",
 	"homepage_url": "https://github.com/alexrosepizant/clipper-for-appflowy",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"description": "Unofficial community web clipper browser extension for AppFlowy",
 	"permissions": [
 		"activeTab",
@@ -82,7 +82,7 @@
 				"default": "Alt+Shift+R",
 				"mac": "Alt+Shift+R"
 			},
-			"description": "Toggle reader mode"
+			"description": "Toggle reading view"
 		}
 	}
 }

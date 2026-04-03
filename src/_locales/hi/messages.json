@@ -576,6 +576,9 @@
 	"prependToExisting": {
 		"message": "Existing note mein, shuruat mein add karein"
 	},
+	"preview": {
+		"message": "पूर्वावलोकन"
+	},
 	"processing": {
 		"message": "Processing"
 	},
@@ -656,6 +659,120 @@
 	},
 	"reader": {
 		"message": "पाठक"
+	},
+	"readerAppearance": {
+		"message": "दिखावट"
+	},
+	"readerAppearanceAuto": {
+		"message": "स्वचालित"
+	},
+	"readerAppearanceDark": {
+		"message": "डार्क"
+	},
+	"readerAppearanceDescription": {
+		"message": "लाइट या डार्क दिखावट चुनें।"
+	},
+	"readerAppearanceLight": {
+		"message": "लाइट"
+	},
+	"readerBlendImages": {
+		"message": "छवियाँ मिलाएँ"
+	},
+	"readerBlendImagesDescription": {
+		"message": "छवियों को पेज की पृष्ठभूमि के साथ मिलाएँ।"
+	},
+	"readerCloseImageViewer": {
+		"message": "छवि दर्शक बंद करें"
+	},
+	"readerCollapseComment": {
+		"message": "टिप्पणी संक्षिप्त करें"
+	},
+	"readerColorLinks": {
+		"message": "लिंक रंगीन करें"
+	},
+	"readerColorSchemeDefault": {
+		"message": "डिफ़ॉल्ट"
+	},
+	"readerCustomCss": {
+		"message": "कस्टम CSS"
+	},
+	"readerCustomCssDescription": {
+		"message": "रीडिंग व्यू में अपने-आप लागू होने वाला CSS।"
+	},
+	"readerDarkTheme": {
+		"message": "डार्क मोड थीम"
+	},
+	"readerDarkThemeDescription": {
+		"message": "डार्क मोड में अलग थीम का उपयोग करें।"
+	},
+	"readerError": {
+		"message": "सामग्री निकालने में विफल।"
+	},
+	"readerFont": {
+		"message": "फ़ॉन्ट विकल्प"
+	},
+	"readerFontDefault": {
+		"message": "डिफ़ॉल्ट"
+	},
+	"readerFontDescription": {
+		"message": "अपने सिस्टम में इंस्टॉल किए गए फ़ॉन्ट जोड़ें। फ़ॉन्ट जोड़ने के लिए Enter दबाएँ।"
+	},
+	"readerFontNotFound": {
+		"message": "नहीं मिला"
+	},
+	"readerFontPlaceholder": {
+		"message": "फ़ॉन्ट जोड़ने के लिए Enter दबाएँ"
+	},
+	"readerFontSetDefault": {
+		"message": "डिफ़ॉल्ट सेट करें"
+	},
+	"readerFontSize": {
+		"message": "आधार फ़ॉन्ट आकार"
+	},
+	"readerFontSystem": {
+		"message": "सिस्टम"
+	},
+	"readerFontSystemSans": {
+		"message": "सैंस-सेरिफ़"
+	},
+	"readerFontSystemSerif": {
+		"message": "सेरिफ़"
+	},
+	"readerFonts": {
+		"message": "फ़ॉन्ट"
+	},
+	"readerFootnotes": {
+		"message": "पादटिप्पणियाँ"
+	},
+	"readerImages": {
+		"message": "छवियाँ"
+	},
+	"readerLineHeight": {
+		"message": "पंक्ति ऊँचाई"
+	},
+	"readerLineWidth": {
+		"message": "पंक्ति चौड़ाई"
+	},
+	"readerLoading": {
+		"message": "सरल किया जा रहा है…"
+	},
+	"readerSettings": {
+		"message": "रीडर सेटिंग्स"
+	},
+	"readerTheme": {
+		"message": "थीम"
+	},
+	"readerThemeDescription": {
+		"message": "रीडिंग व्यू में उपयोग होने वाले रंग चुनें।"
+	},
+	"readerThemeSection": {
+		"message": "थीम"
+	},
+	"readerTypography": {
+		"message": "टाइपोग्राफी"
+	},
+	"readerViewFullSize": {
+		"message": "पूर्ण आकार में देखें"
 	},
 	"recommended": {
 		"message": "सिफारिश की गई"
@@ -774,6 +891,9 @@
 	"systemDefault": {
 		"message": "System"
 	},
+	"template": {
+		"message": "टेम्पलेट"
+	},
 	"templateCopied": {
 		"message": "Template JSON clipboard par copy ho gaya"
 	},
@@ -785,6 +905,12 @@
 	},
 	"templateErrorsCount": {
 		"message": "आपके टेम्पलेट में $1 त्रुटियाँ हैं।"
+	},
+	"templateGroupContent": {
+		"message": "सामग्री"
+	},
+	"templateGroupLocation": {
+		"message": "स्थान"
 	},
 	"templateName": {
 		"message": "Template name"

@@ -5,19 +5,15 @@ import { flattenShadowDom as flattenShadowDomUtil } from './flatten-shadow-dom';
 import { getLocalStorage, setLocalStorage } from './storage-utils';
 import hljs from 'highlight.js';
 import { getDomain } from './string-utils';
-import { applyHighlights } from './highlighter';
+import { applyHighlights, invalidateHighlightCache, loadHighlights } from './highlighter';
 import { copyToClipboard } from './clipboard-utils';
+import { getMessage, initializeI18n } from './i18n';
+import { getFontCss } from './font-utils';
 
 // Mobile viewport settings
 const VIEWPORT = 'width=device-width, initial-scale=1, maximum-scale=1';
 
-interface ReaderSettings {
-	fontSize: number;
-	lineHeight: number;
-	maxWidth: number;
-	theme: string;
-	themeMode: 'auto' | 'light' | 'dark';
-}
+import { ReaderSettings } from '../types/types';
 
 export class Reader {
 	private static originalHTML: string | null = null;
@@ -31,7 +27,9 @@ export class Reader {
 		height?: string;
 		viewBox?: string;
 		className?: string;
+		strokeWidth?: string;
 		paths?: string[];
+		circles?: Array<{cx: string, cy: string, r: string, fill?: string}>;
 		rects?: Array<{x: string, y: string, width: string, height: string, rx?: string, ry?: string}>;
 	}): SVGElement {
 		const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
@@ -45,7 +43,7 @@ export class Reader {
 		// Default attributes for all SVGs
 		svg.setAttribute('fill', 'none');
 		svg.setAttribute('stroke', 'currentColor');
-		svg.setAttribute('stroke-width', '1.5');
+		svg.setAttribute('stroke-width', config.strokeWidth || '1.5');
 		svg.setAttribute('stroke-linecap', 'round');
 		svg.setAttribute('stroke-linejoin', 'round');
 		
@@ -58,6 +56,18 @@ export class Reader {
 			});
 		}
 		
+		// Add circles
+		if (config.circles) {
+			config.circles.forEach(circleData => {
+				const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+				circle.setAttribute('cx', circleData.cx);
+				circle.setAttribute('cy', circleData.cy);
+				circle.setAttribute('r', circleData.r);
+				if (circleData.fill) circle.setAttribute('fill', circleData.fill);
+				svg.appendChild(circle);
+			});
+		}
+
 		// Add rects
 		if (config.rects) {
 			config.rects.forEach(rectData => {
@@ -84,12 +94,19 @@ export class Reader {
 		fontSize: 16,
 		lineHeight: 1.6,
 		maxWidth: 38,
-		theme: 'default',
-		themeMode: 'auto'
+		lightTheme: 'default',
+		darkTheme: 'same',
+		appearance: 'auto',
+		fonts: [],
+		defaultFont: '',
+		blendImages: true,
+		colorLinks: false,
+		customCss: ''
 	};
 
 	private static async loadSettings(): Promise<void> {
-		const savedSettings = await getLocalStorage('reader_settings');
+		const savedSettings = await browser.storage.sync.get('reader_settings')
+			.then((data: Record<string, any>) => data['reader_settings']);
 		if (savedSettings) {
 			this.settings = {
 				...this.settings,
@@ -99,13 +116,158 @@ export class Reader {
 	}
 
 	private static async saveSettings(): Promise<void> {
-		await setLocalStorage('reader_settings', this.settings);
+		await browser.storage.sync.set({ reader_settings: this.settings });
 	}
 
 	private static injectSettingsBar(doc: Document) {
 		// Create settings bar
 		const settingsBar = doc.createElement('div');
 		settingsBar.className = 'obsidian-reader-settings';
+
+		// Trigger button (always visible)
+		const trigger = doc.createElement('button');
+		trigger.className = 'obsidian-reader-settings-trigger nav-btn';
+		trigger.setAttribute('aria-label', getMessage('settings'));
+		trigger.appendChild(this.createSVG({
+			width: '18', height: '18', viewBox: '0 0 24 24', strokeWidth: '1.75',
+			circles: [{ cx: '18.5', cy: '12.5', r: '3.5' }],
+			paths: ['m2 16 4.039-9.69a.5.5 0 0 1 .923 0L11 16', 'M22 9v7', 'M3.304 13h6.392'],
+		}));
+		trigger.addEventListener('click', (e) => {
+			e.stopPropagation();
+			clipDropdown.classList.remove('is-open');
+			settingsBar.classList.toggle('is-open');
+		});
+
+		// Close when clicking outside
+		doc.addEventListener('click', (e) => {
+			if (!settingsBar.contains(e.target as Node)) {
+				settingsBar.classList.remove('is-open');
+			}
+		});
+
+		// Highlighter button
+		const highlighterBtn = doc.createElement('button');
+		highlighterBtn.className = 'obsidian-reader-settings-trigger nav-btn';
+		highlighterBtn.setAttribute('aria-label', getMessage('highlighter'));
+		highlighterBtn.appendChild(this.createSVG({
+			width: '18', height: '18', viewBox: '0 0 24 24', strokeWidth: '1.75',
+			paths: ['m9 11-6 6v3h9l3-3', 'm22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4'],
+		}));
+		highlighterBtn.addEventListener('click', async () => {
+			clipDropdown.classList.remove('is-open');
+			settingsBar.classList.remove('is-open');
+			const response = await browser.runtime.sendMessage({ action: 'getActiveTab' }) as { tabId?: number };
+			if (response.tabId) {
+				await browser.runtime.sendMessage({ action: 'toggleHighlighterMode', tabId: response.tabId });
+				highlighterBtn.classList.toggle('is-active');
+			}
+		});
+
+		// Sync active state with highlighter mode
+		if (doc.body.classList.contains('obsidian-highlighter-active')) {
+			highlighterBtn.classList.add('is-active');
+		}
+
+		// Clip button with dropdown
+		const clipButton = doc.createElement('button');
+		clipButton.className = 'obsidian-reader-settings-trigger nav-btn';
+		clipButton.setAttribute('aria-label', getMessage('addToObsidian'));
+		clipButton.appendChild(this.createSVG({
+			width: '18', height: '18', viewBox: '0 0 24 24', strokeWidth: '1.75',
+			paths: ['m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48'],
+		}));
+
+		const clipDropdown = doc.createElement('div');
+		clipDropdown.className = 'obsidian-reader-clip-dropdown';
+
+		const obsidianIcon = doc.createElementNS('http://www.w3.org/2000/svg', 'svg');
+		obsidianIcon.setAttribute('width', '16');
+		obsidianIcon.setAttribute('height', '16');
+		obsidianIcon.setAttribute('viewBox', '0 0 256 256');
+		obsidianIcon.setAttribute('fill', 'currentColor');
+		obsidianIcon.innerHTML = '<path d="M94.82 149.44c6.53-1.94 17.13-4.9 29.26-5.71a102.97 102.97 0 0 1-7.64-48.84c1.63-16.51 7.54-30.38 13.25-42.1l3.47-7.14 4.48-9.18c2.35-5 4.08-9.38 4.9-13.56.81-4.07.81-7.64-.2-11.11-1.03-3.47-3.07-7.14-7.15-11.21a17.02 17.02 0 0 0-15.8 3.77l-52.81 47.5a17.12 17.12 0 0 0-5.5 10.2l-4.5 30.18a149.26 149.26 0 0 1 38.24 57.2ZM54.45 106l-1.02 3.06-27.94 62.2a17.33 17.33 0 0 0 3.27 18.96l43.94 45.16a88.7 88.7 0 0 0 8.97-88.5A139.47 139.47 0 0 0 54.45 106Z"/><path d="m82.9 240.79 2.34.2c8.26.2 22.33 1.02 33.64 3.06 9.28 1.73 27.73 6.83 42.82 11.21 11.52 3.47 23.45-5.8 25.08-17.73 1.23-8.67 3.57-18.46 7.75-27.53a94.81 94.81 0 0 0-25.9-40.99 56.48 56.48 0 0 0-29.56-13.35 96.55 96.55 0 0 0-40.99 4.79 98.89 98.89 0 0 1-15.29 80.34h.1Z"/><path d="M201.87 197.76a574.87 574.87 0 0 0 19.78-31.6 8.67 8.67 0 0 0-.61-9.48 185.58 185.58 0 0 1-21.82-35.9c-5.91-14.16-6.73-36.08-6.83-46.69 0-4.07-1.22-8.05-3.77-11.21l-34.16-43.33c0 1.94-.4 3.87-.81 5.81a76.42 76.42 0 0 1-5.71 15.9l-4.7 9.8-3.36 6.72a111.95 111.95 0 0 0-12.03 38.23 93.9 93.9 0 0 0 8.67 47.92 67.9 67.9 0 0 1 39.56 16.52 99.4 99.4 0 0 1 25.8 37.31Z"/>';
+
+		const clipActions: Array<{ action: string; icon: SVGElement }> = [
+			{ action: 'copyToClipboard', icon: this.createSVG({ width: '16', height: '16', viewBox: '0 0 24 24', strokeWidth: '1.75', paths: ['M20 8H10a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2z', 'M4 16a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2'] }) },
+			{ action: 'saveFile', icon: this.createSVG({ width: '16', height: '16', viewBox: '0 0 24 24', strokeWidth: '1.75', paths: ['M12 17V3', 'm6 11 6 6 6-6', 'M19 21H5'] }) },
+			{ action: 'addToObsidian', icon: obsidianIcon },
+		];
+
+		for (const { action, icon } of clipActions) {
+			const item = doc.createElement('div');
+			item.className = 'obsidian-reader-clip-item';
+			item.appendChild(icon);
+
+			const itemLabel = doc.createElement('span');
+			itemLabel.textContent = getMessage(action);
+			item.appendChild(itemLabel);
+
+			item.addEventListener('click', async () => {
+				if (action === 'addToObsidian') {
+					clipDropdown.classList.remove('is-open');
+					browser.runtime.sendMessage({ action: 'openPopup' });
+				} else if (action === 'copyToClipboard') {
+					const originalText = itemLabel.textContent;
+					browser.runtime.sendMessage({ action: 'copyMarkdownToClipboard' });
+					itemLabel.textContent = getMessage('copied');
+					setTimeout(() => { itemLabel.textContent = originalText; }, 2000);
+				} else if (action === 'saveFile') {
+					clipDropdown.classList.remove('is-open');
+					browser.runtime.sendMessage({ action: 'saveMarkdownToFile' });
+				}
+			});
+
+			clipDropdown.appendChild(item);
+		}
+
+		clipButton.addEventListener('click', (e) => {
+			e.stopPropagation();
+			settingsBar.classList.remove('is-open');
+			clipDropdown.classList.toggle('is-open');
+		});
+
+		doc.addEventListener('click', (e) => {
+			if (!clipButton.contains(e.target as Node) && !clipDropdown.contains(e.target as Node)) {
+				clipDropdown.classList.remove('is-open');
+			}
+		});
+
+		const triggerGroup = doc.createElement('div');
+		triggerGroup.className = 'obsidian-reader-nav';
+		triggerGroup.appendChild(highlighterBtn);
+		triggerGroup.appendChild(clipButton);
+		triggerGroup.appendChild(trigger);
+		settingsBar.appendChild(triggerGroup);
+		settingsBar.appendChild(clipDropdown);
+
+		// Hide buttons on scroll down, show on scroll up or hover
+		let lastScrollY = window.scrollY;
+		let scrollHidden = false;
+
+		const showButtons = () => {
+			if (scrollHidden) {
+				triggerGroup.style.opacity = '';
+				scrollHidden = false;
+			}
+		};
+
+		window.addEventListener('scroll', () => {
+			if (settingsBar.classList.contains('is-open') || clipDropdown.classList.contains('is-open')) return;
+			const currentY = window.scrollY;
+			if (currentY > lastScrollY && currentY > 50) {
+				if (!scrollHidden) {
+					triggerGroup.style.opacity = '0';
+					scrollHidden = true;
+				}
+			} else {
+				showButtons();
+			}
+			lastScrollY = currentY;
+		}, { passive: true });
+
+		triggerGroup.addEventListener('mouseenter', showButtons);
+
 		// Create settings controls container
 		const controlsContainer = doc.createElement('div');
 		controlsContainer.className = 'obsidian-reader-settings-controls';
@@ -184,63 +346,162 @@ export class Reader {
 		lineHeightGroup.appendChild(increaseLineHeightBtn);
 
 		// Theme select
+		const themeWrapper = doc.createElement('div');
+		themeWrapper.className = 'obsidian-reader-settings-select-wrapper';
+		themeWrapper.appendChild(this.createSVG({
+			width: '18', height: '18', viewBox: '0 0 24 24', strokeWidth: '1.75',
+			circles: [
+				{ cx: '13.5', cy: '6.5', r: '.5', fill: 'currentColor' },
+				{ cx: '17.5', cy: '10.5', r: '.5', fill: 'currentColor' },
+				{ cx: '8.5', cy: '7.5', r: '.5', fill: 'currentColor' },
+				{ cx: '6.5', cy: '12.5', r: '.5', fill: 'currentColor' },
+			],
+			paths: ['M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z'],
+		}));
 		const themeSelect = doc.createElement('select');
 		themeSelect.className = 'obsidian-reader-settings-select';
 		themeSelect.dataset.action = 'change-theme';
 
-		const defaultThemeOption = doc.createElement('option');
-		defaultThemeOption.value = 'default';
-		defaultThemeOption.textContent = 'Default';
+		const themeOptions: Array<[string, string]> = [
+			['default', ''],
+			['flexoki', 'Flexoki'],
+			['ayu', 'Ayu'],
+			['catppuccin', 'Catppuccin'],
+			['everforest', 'Everforest'],
+			['gruvbox', 'Gruvbox'],
+			['nord', 'Nord'],
+			['rose-pine', 'Rosé Pine'],
+			['solarized', 'Solarized'],
+		];
 
-		const flexokiThemeOption = doc.createElement('option');
-		flexokiThemeOption.value = 'flexoki';
-		flexokiThemeOption.textContent = 'Flexoki';
-
-		themeSelect.appendChild(defaultThemeOption);
-		themeSelect.appendChild(flexokiThemeOption);
+		for (const [value, name] of themeOptions) {
+			const option = doc.createElement('option');
+			option.value = value;
+			option.textContent = name || getMessage('readerColorSchemeDefault');
+			themeSelect.appendChild(option);
+		}
+		themeWrapper.appendChild(themeSelect);
 
 		// Theme mode select
+		const themeModeWrapper = doc.createElement('div');
+		themeModeWrapper.className = 'obsidian-reader-settings-select-wrapper';
+
+		const sunIcon = this.createSVG({
+			width: '18', height: '18', viewBox: '0 0 24 24', strokeWidth: '1.75',
+			circles: [{ cx: '12', cy: '12', r: '4' }],
+			paths: ['M12 2v2', 'M12 20v2', 'm4.93 4.93 1.41 1.41', 'm17.66 17.66 1.41 1.41', 'M2 12h2', 'M20 12h2', 'm6.34 17.66-1.41 1.41', 'm19.07 4.93-1.41 1.41'],
+		});
+		const moonIcon = this.createSVG({
+			width: '18', height: '18', viewBox: '0 0 24 24', strokeWidth: '1.75',
+			paths: ['M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z'],
+		});
+
+		const updateModeIcon = () => {
+			const isDark = doc.documentElement.classList.contains('theme-dark');
+			sunIcon.style.display = isDark ? 'none' : '';
+			moonIcon.style.display = isDark ? '' : 'none';
+		};
+
+		themeModeWrapper.appendChild(sunIcon);
+		themeModeWrapper.appendChild(moonIcon);
+		updateModeIcon();
+
+		// Watch for theme-light/theme-dark class changes (D key, OS preference, etc.)
+		new MutationObserver(updateModeIcon).observe(doc.documentElement, {
+			attributes: true,
+			attributeFilter: ['class'],
+		});
+
 		const themeModeSelect = doc.createElement('select');
 		themeModeSelect.className = 'obsidian-reader-settings-select';
-		themeModeSelect.dataset.action = 'change-theme-mode';
 
-		const autoModeOption = doc.createElement('option');
-		autoModeOption.value = 'auto';
-		autoModeOption.textContent = 'Automatic';
+		const modeOptions: Array<[string, string]> = [
+			['auto', 'readerAppearanceAuto'],
+			['light', 'readerAppearanceLight'],
+			['dark', 'readerAppearanceDark'],
+		];
 
-		const lightModeOption = doc.createElement('option');
-		lightModeOption.value = 'light';
-		lightModeOption.textContent = 'Light';
+		for (const [value, messageKey] of modeOptions) {
+			const option = doc.createElement('option');
+			option.value = value;
+			option.textContent = getMessage(messageKey);
+			themeModeSelect.appendChild(option);
+		}
+		themeModeWrapper.appendChild(themeModeSelect);
 
-		const darkModeOption = doc.createElement('option');
-		darkModeOption.value = 'dark';
-		darkModeOption.textContent = 'Dark';
 
-		themeModeSelect.appendChild(autoModeOption);
-		themeModeSelect.appendChild(lightModeOption);
-		themeModeSelect.appendChild(darkModeOption);
 
-		// Highlighter controls group
-		const highlighterGroup = doc.createElement('div');
-		highlighterGroup.className = 'obsidian-reader-settings-controls-group';
-
-		const highlighterBtn = doc.createElement('button');
-		highlighterBtn.className = 'obsidian-reader-settings-button';
-		highlighterBtn.dataset.action = 'toggle-highlighter';
-		highlighterBtn.appendChild(this.createSVG({
-			width: '20', height: '20', viewBox: '0 0 24 24',
-			className: 'lucide lucide-highlighter-icon lucide-highlighter',
-			paths: ['m9 11-6 6v3h9l3-3', 'm22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4']
+		// Settings button
+		const settingsBtn = doc.createElement('button');
+		settingsBtn.className = 'obsidian-reader-settings-link-button';
+		settingsBtn.setAttribute('aria-label', getMessage('readerSettings'));
+		settingsBtn.appendChild(this.createSVG({
+			width: '18', height: '18', viewBox: '0 0 24 24', strokeWidth: '1.75',
+			circles: [{ cx: '12', cy: '12', r: '3' }],
+			paths: [
+				'M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z',
+			]
 		}));
+		const settingsLabel = doc.createElement('span');
+		settingsLabel.textContent = getMessage('settings');
+		settingsBtn.appendChild(settingsLabel);
+		settingsBtn.addEventListener('click', () => {
+			browser.runtime.sendMessage({ action: 'openSettings', section: 'reader' });
+		});
 
-		highlighterGroup.appendChild(highlighterBtn);
+		// Font select
+		const fontWrapper = doc.createElement('div');
+		fontWrapper.className = 'obsidian-reader-settings-select-wrapper';
+		fontWrapper.appendChild(this.createSVG({
+			width: '18', height: '18', viewBox: '0 0 24 24', strokeWidth: '1.75',
+			paths: [
+				'M4 7V4h16v3',
+				'M9 20h6',
+				'M12 4v16',
+			],
+		}));
+		const fontSelect = doc.createElement('select');
+		fontSelect.className = 'obsidian-reader-settings-select';
+
+		const sansOption = doc.createElement('option');
+		sansOption.value = '';
+		sansOption.textContent = getMessage('readerFontSystemSans');
+		fontSelect.appendChild(sansOption);
+
+		const serifOption = doc.createElement('option');
+		serifOption.value = '__serif__';
+		serifOption.textContent = getMessage('readerFontSystemSerif');
+		fontSelect.appendChild(serifOption);
+
+		for (const font of [...this.settings.fonts].sort((a, b) => a.localeCompare(b))) {
+			const option = doc.createElement('option');
+			option.value = font;
+			option.textContent = font;
+			fontSelect.appendChild(option);
+		}
+		fontWrapper.appendChild(fontSelect);
 
 		// Assemble everything
 		controlsContainer.appendChild(fontGroup);
 		controlsContainer.appendChild(widthGroup);
 		controlsContainer.appendChild(lineHeightGroup);
-		controlsContainer.appendChild(themeSelect);
-		controlsContainer.appendChild(themeModeSelect);
+
+		const spacer = doc.createElement('div');
+		spacer.className = 'obsidian-reader-settings-spacer';
+		controlsContainer.appendChild(spacer);
+
+		const dropdownGroup = doc.createElement('div');
+		dropdownGroup.className = 'obsidian-reader-settings-dropdown-group';
+		dropdownGroup.appendChild(themeModeWrapper);
+		dropdownGroup.appendChild(themeWrapper);
+		dropdownGroup.appendChild(fontWrapper);
+		controlsContainer.appendChild(dropdownGroup);
+
+		const spacer2 = doc.createElement('div');
+		spacer2.className = 'obsidian-reader-settings-spacer';
+		controlsContainer.appendChild(spacer2);
+
+		controlsContainer.appendChild(settingsBtn);
 
 		settingsBar.appendChild(controlsContainer);
 
@@ -248,9 +509,9 @@ export class Reader {
 		this.settingsBar = settingsBar;
 
 		// Initialize values from settings
-		this.updateFontSize(doc, parseInt(getComputedStyle(doc.documentElement).getPropertyValue('--obsidian-reader-font-size')));
-		this.updateWidth(doc, parseInt(getComputedStyle(doc.documentElement).getPropertyValue('--obsidian-reader-line-width')));
-		this.updateLineHeight(doc, parseFloat(getComputedStyle(doc.documentElement).getPropertyValue('--obsidian-reader-line-height')));
+		this.updateFontSize(doc, parseInt(getComputedStyle(doc.documentElement).getPropertyValue('--font-text-size')));
+		this.updateWidth(doc, parseInt(getComputedStyle(doc.documentElement).getPropertyValue('--line-width')));
+		this.updateLineHeight(doc, parseFloat(getComputedStyle(doc.documentElement).getPropertyValue('--line-height-normal')));
 
 		settingsBar.addEventListener('click', (e) => {
 			const target = e.target as HTMLElement;
@@ -263,36 +524,44 @@ export class Reader {
 
 			switch (action) {
 				case 'decrease-font':
-					this.updateFontSize(doc, parseInt(style.getPropertyValue('--obsidian-reader-font-size')) - 1);
+					this.updateFontSize(doc, parseInt(style.getPropertyValue('--font-text-size')) - 1);
 					break;
 				case 'increase-font':
-					this.updateFontSize(doc, parseInt(style.getPropertyValue('--obsidian-reader-font-size')) + 1);
+					this.updateFontSize(doc, parseInt(style.getPropertyValue('--font-text-size')) + 1);
 					break;
 				case 'decrease-width':
-					this.updateWidth(doc, parseInt(style.getPropertyValue('--obsidian-reader-line-width')) - 1);
+					this.updateWidth(doc, parseInt(style.getPropertyValue('--line-width')) - 1);
 					break;
 				case 'increase-width':
-					this.updateWidth(doc, parseInt(style.getPropertyValue('--obsidian-reader-line-width')) + 1);
+					this.updateWidth(doc, parseInt(style.getPropertyValue('--line-width')) + 1);
 					break;
 				case 'decrease-line-height':
-					this.updateLineHeight(doc, parseFloat(style.getPropertyValue('--obsidian-reader-line-height')) - 0.1);
+					this.updateLineHeight(doc, parseFloat(style.getPropertyValue('--line-height-normal')) - 0.1);
 					break;
 				case 'increase-line-height':
-					this.updateLineHeight(doc, parseFloat(style.getPropertyValue('--obsidian-reader-line-height')) + 0.1);
+					this.updateLineHeight(doc, parseFloat(style.getPropertyValue('--line-height-normal')) + 0.1);
 					break;
 			}
 		});
 
 		// Add theme select event listener
-		themeSelect.value = this.settings.theme;
+		themeSelect.value = this.getEffectiveTheme();
 		themeSelect.addEventListener('change', () => {
-			this.updateTheme(doc, themeSelect.value as 'default' | 'flexoki');
+			this.updateTheme(doc, themeSelect.value);
 		});
 
 		// Add theme mode select event listener
-		themeModeSelect.value = this.settings.themeMode;
+		themeModeSelect.value = this.settings.appearance;
 		themeModeSelect.addEventListener('change', () => {
 			this.updateThemeMode(doc, themeModeSelect.value as 'auto' | 'light' | 'dark');
+		});
+
+		// Add font select event listener
+		fontSelect.value = this.settings.defaultFont;
+		fontSelect.addEventListener('change', () => {
+			this.settings.defaultFont = fontSelect.value;
+			this.applyFont(doc, fontSelect.value);
+			this.saveSettings();
 		});
 
 		// Notify content script to listen for highlighter button
@@ -301,29 +570,49 @@ export class Reader {
 	}
 
 	private static updateFontSize(doc: Document, size: number) {
-		size = Math.max(12, Math.min(24, size));
-		doc.documentElement.style.setProperty('--obsidian-reader-font-size', `${size}px`);
+		size = Math.max(9, Math.min(24, size));
+		doc.documentElement.style.setProperty('--font-text-size', `${size}px`);
 		this.settings.fontSize = size;
 		this.saveSettings();
 	}
 
 	private static updateWidth(doc: Document, width: number) {
 		width = Math.max(30, Math.min(60, width));
-		doc.documentElement.style.setProperty('--obsidian-reader-line-width', `${width}em`);
+		doc.documentElement.style.setProperty('--line-width', `${width}em`);
 		this.settings.maxWidth = width;
 		this.saveSettings();
 	}
 
 	private static updateLineHeight(doc: Document, height: number) {
-		height = Math.max(1.2, Math.min(2, Math.round(height * 10) / 10));
-		doc.documentElement.style.setProperty('--obsidian-reader-line-height', height.toString());
+		height = Math.max(1.1, Math.min(2, Math.round(height * 10) / 10));
+		doc.documentElement.style.setProperty('--line-height-normal', height.toString());
 		this.settings.lineHeight = height;
 		this.saveSettings();
 	}
 
-	private static updateTheme(doc: Document, theme: 'default' | 'flexoki'): void {
-		doc.documentElement.setAttribute('data-reader-theme', theme);
-		this.settings.theme = theme;
+	private static getEffectiveTheme(): string {
+		const { lightTheme, darkTheme, appearance } = this.settings;
+		const isDark = appearance === 'dark' || (appearance === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+		return isDark && darkTheme !== 'same' ? darkTheme : lightTheme;
+	}
+
+	private static applyTheme(doc: Document): void {
+		const theme = this.getEffectiveTheme();
+		if (theme === 'default') {
+			doc.documentElement.removeAttribute('data-reader-theme');
+		} else {
+			doc.documentElement.setAttribute('data-reader-theme', theme);
+		}
+	}
+
+	private static updateTheme(doc: Document, theme: string): void {
+		const isDark = doc.documentElement.classList.contains('theme-dark');
+		if (isDark && this.settings.darkTheme !== 'same') {
+			this.settings.darkTheme = theme;
+		} else {
+			this.settings.lightTheme = theme;
+		}
+		this.applyTheme(doc);
 		this.saveSettings();
 	}
 
@@ -338,17 +627,59 @@ export class Reader {
 			html.classList.add(`theme-${mode}`);
 		}
 
-		this.settings.themeMode = mode;
+		this.settings.appearance = mode;
+		this.applyTheme(doc);
 		this.saveSettings();
 	}
 
-	private static handleColorSchemeChange(e: MediaQueryListEvent, doc: Document): void {
-		if (this.settings.themeMode === 'auto') {
-			doc.documentElement.classList.remove('theme-light', 'theme-dark');
-			doc.documentElement.classList.add(e.matches ? 'theme-dark' : 'theme-light');
+	private static applyFont(doc: Document, defaultFont: string): void {
+		const css = getFontCss(defaultFont);
+		if (css) {
+			doc.body.style.setProperty('--font-text', css);
+		} else {
+			doc.body.style.removeProperty('--font-text');
 		}
 	}
 
+	private static updateBlendImages(doc: Document, blend: boolean): void {
+		this.settings.blendImages = blend;
+		this.applyBlendImages(doc, blend);
+		this.saveSettings();
+	}
+
+	private static applyBlendImages(doc: Document, blend: boolean): void {
+		doc.documentElement.classList.toggle('no-blend-images', !blend);
+	}
+
+	private static applyColorLinks(doc: Document, colorLinks: boolean): void {
+		doc.documentElement.classList.toggle('color-links', colorLinks);
+	}
+
+	private static handleColorSchemeChange(e: MediaQueryListEvent, doc: Document): void {
+		if (this.settings.appearance === 'auto') {
+			doc.documentElement.classList.remove('theme-light', 'theme-dark');
+			doc.documentElement.classList.add(e.matches ? 'theme-dark' : 'theme-light');
+			this.applyTheme(doc);
+		}
+	}
+
+
+	private static scrollTo(targetY: number, duration = 200): void {
+		const startY = window.pageYOffset;
+		const distance = targetY - startY;
+		if (Math.abs(distance) < 1) return;
+		const startTime = performance.now();
+
+		const step = (now: number) => {
+			const elapsed = now - startTime;
+			const t = Math.min(elapsed / duration, 1);
+			const ease = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+			window.scrollTo(0, startY + distance * ease);
+			if (t < 1) requestAnimationFrame(step);
+		};
+
+		requestAnimationFrame(step);
+	}
 
 	private static async extractContent(doc: Document): Promise<{
 		content: string;
@@ -375,7 +706,7 @@ export class Reader {
 		};
 	}
 
-	private static generateOutline(doc: Document) {
+	private static generateOutline(doc: Document, title?: string) {
 		const article = doc.querySelector('article');
 		if (!article) return null;
 
@@ -383,8 +714,9 @@ export class Reader {
 		const outline = doc.querySelector('.obsidian-reader-outline') as HTMLElement;
 		if (!outline) return null;
 
-		// Find all headings h2-h6
-		const headings = article.querySelectorAll('h2, h3, h4, h5, h6');
+		// Find all headings h2-h6, excluding those inside blockquotes
+		const headings = Array.from(article.querySelectorAll('h2, h3, h4, h5, h6'))
+			.filter(h => !h.closest('blockquote'));
 
 		// Only show outline if there are 2 or more headings
 		if (headings.length < 2) {
@@ -403,6 +735,20 @@ export class Reader {
 
 		// Create outline items and store references
 		const outlineItems = new Map();
+
+		// Add title as first outline item
+		const titleHeading = doc.querySelector('.obsidian-reader-content h1');
+		if (title && titleHeading) {
+			const titleItem = doc.createElement('div');
+			titleItem.className = 'obsidian-reader-outline-item obsidian-reader-outline-h1';
+			titleItem.setAttribute('data-depth', '0');
+			titleItem.textContent = title;
+			titleItem.addEventListener('click', () => {
+				this.scrollTo(0);
+			});
+			outline.appendChild(titleItem);
+			outlineItems.set(titleHeading, titleItem);
+		}
 
 		// Keep track of the last heading at each level and their depths
 		const lastHeadingAtLevel: { [key: number]: { element: Element; depth: number } } = {};
@@ -443,12 +789,8 @@ export class Reader {
 			
 			item.addEventListener('click', () => {
 				const rect = heading.getBoundingClientRect();
-				const scrollTop = window.pageYOffset || doc.documentElement.scrollTop;
-				const targetY = scrollTop + rect.top - window.innerHeight * 0.05;
-				window.scrollTo({
-					top: targetY,
-					behavior: 'smooth'
-				});
+				const targetY = (window.pageYOffset || doc.documentElement.scrollTop) + rect.top - window.innerHeight * 0.05;
+				this.scrollTo(targetY);
 			});
 
 			outline.appendChild(item);
@@ -491,6 +833,9 @@ export class Reader {
 			threshold: 0
 		});
 
+		if (titleHeading) {
+			observer.observe(titleHeading);
+		}
 		headings.forEach(heading => {
 			observer.observe(heading);
 		});
@@ -501,16 +846,12 @@ export class Reader {
 			const item = doc.createElement('div');
 			item.className = 'obsidian-reader-outline-item';
 			item.setAttribute('data-depth', '0');
-			item.textContent = 'Footnotes';
+			item.textContent = getMessage('readerFootnotes');
 			
 			item.addEventListener('click', () => {
 				const rect = footnotes.getBoundingClientRect();
-				const scrollTop = window.pageYOffset || doc.documentElement.scrollTop;
-				const targetY = scrollTop + rect.top - window.innerHeight * 0.05;
-				window.scrollTo({
-					top: targetY,
-					behavior: 'smooth'
-				});
+				const targetY = (window.pageYOffset || doc.documentElement.scrollTop) + rect.top - window.innerHeight * 0.05;
+				this.scrollTo(targetY);
 			});
 
 			outline.appendChild(item);
@@ -565,7 +906,9 @@ export class Reader {
 				const refId = href.substring(hashIndex + 1);
 				const refElement = doc.getElementById(refId);
 				if (refElement) {
-					refElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+					const rect = refElement.getBoundingClientRect();
+					const targetY = (window.pageYOffset || doc.documentElement.scrollTop) + rect.top - window.innerHeight * 0.4;
+					this.scrollTo(targetY);
 				}
 				return;
 			}
@@ -846,6 +1189,238 @@ export class Reader {
 		});
 	}
 
+	private static readonly COMMENT_COLORS = [
+		'--color-red',
+		'--color-orange',
+		'--color-yellow',
+		'--color-green',
+		'--color-cyan',
+		'--color-blue',
+		'--color-purple',
+		'--color-pink',
+		'--text-muted',
+	];
+
+	private static usernameToColor(username: string): string {
+		let hash = 0;
+		for (let i = 0; i < username.length; i++) {
+			hash = ((hash << 5) - hash + username.charCodeAt(i)) | 0;
+		}
+		return this.COMMENT_COLORS[Math.abs(hash) % this.COMMENT_COLORS.length];
+	}
+
+	private static linkifyTextUrls(doc: Document): void {
+		const article = doc.querySelector('article');
+		if (!article) return;
+
+		const urlPattern = /\bhttps?:\/\/[^\s<>\[\]()'"]+/g;
+		const walker = doc.createTreeWalker(article, NodeFilter.SHOW_TEXT, {
+			acceptNode(node) {
+				// Skip text inside <a>, <pre>, <code>, <script>, <style>
+				const parent = node.parentElement;
+				if (parent?.closest('a, pre, code, script, style')) {
+					return NodeFilter.FILTER_REJECT;
+				}
+				return urlPattern.test(node.textContent || '') ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+			}
+		});
+
+		const textNodes: Text[] = [];
+		while (walker.nextNode()) {
+			textNodes.push(walker.currentNode as Text);
+		}
+
+		for (const textNode of textNodes) {
+			const text = textNode.textContent || '';
+			urlPattern.lastIndex = 0;
+			const fragment = doc.createDocumentFragment();
+			let lastIndex = 0;
+			let match;
+
+			while ((match = urlPattern.exec(text)) !== null) {
+				if (match.index > lastIndex) {
+					fragment.appendChild(doc.createTextNode(text.slice(lastIndex, match.index)));
+				}
+				const link = doc.createElement('a');
+				link.href = match[0];
+				link.textContent = match[0];
+				link.target = '_blank';
+				link.rel = 'noopener noreferrer';
+				fragment.appendChild(link);
+				lastIndex = urlPattern.lastIndex;
+			}
+
+			if (lastIndex < text.length) {
+				fragment.appendChild(doc.createTextNode(text.slice(lastIndex)));
+			}
+
+			textNode.parentNode?.replaceChild(fragment, textNode);
+		}
+	}
+
+	private static initializeComments(doc: Document) {
+		const commentsEl = doc.querySelector<HTMLElement>('.comments');
+		if (!commentsEl) return;
+
+		// Add background color to comment author names for easy thread following
+		commentsEl.querySelectorAll<HTMLElement>('.comment-author').forEach((authorEl) => {
+			const username = authorEl.querySelector('strong')?.textContent?.trim() || '';
+			if (!username) return;
+			authorEl.style.backgroundColor = `color-mix(in srgb, var(${this.usernameToColor(username)}) 20%, transparent)`;
+		});
+
+		// Add collapse/expand button to each comment
+		commentsEl.querySelectorAll<HTMLElement>('.comment').forEach((comment) => {
+			const metadata = comment.querySelector('.comment-metadata');
+			if (!metadata) return;
+
+			const btn = doc.createElement('button');
+			btn.className = 'comment-collapse-btn';
+			btn.setAttribute('aria-label', getMessage('readerCollapseComment'));
+
+			const chevron = this.createSVG({
+				width: '16',
+				height: '16',
+				viewBox: '0 0 24 24',
+				paths: ['m6 9 6 6 6-6'],
+			});
+			chevron.classList.add('comment-collapse-chevron');
+			btn.appendChild(chevron);
+
+			const countSpan = doc.createElement('span');
+			countSpan.className = 'comment-collapse-count';
+			btn.appendChild(countSpan);
+
+			metadata.appendChild(btn);
+
+			const isTopLevel = comment.parentElement?.matches?.('.comments > blockquote');
+
+			// Get sibling elements that should be hidden when this comment is collapsed.
+			// - Blockquotes (reply branches) are always hidden
+			// - Stop at the next .comment (a separate reply at the same level)
+			// - Top-level: hide everything (comments + blockquotes)
+			const getCollapsibleSiblings = (): HTMLElement[] => {
+				const siblings: HTMLElement[] = [];
+				let sibling = comment.nextElementSibling;
+				while (sibling) {
+					if (sibling.classList.contains('comment')) {
+						if (isTopLevel) {
+							siblings.push(sibling as HTMLElement);
+						} else {
+							break;
+						}
+					} else if (sibling.tagName === 'BLOCKQUOTE') {
+						siblings.push(sibling as HTMLElement);
+					}
+					sibling = sibling.nextElementSibling;
+				}
+				return siblings;
+			};
+
+			const countHidden = (siblings: HTMLElement[]): number => {
+				let count = 0;
+				for (const el of siblings) {
+					if (el.classList.contains('comment')) count++;
+					else count += el.querySelectorAll('.comment').length;
+				}
+				return count;
+			};
+
+			const updateBtn = () => {
+				const isCollapsed = comment.classList.contains('collapsed');
+				const siblings = getCollapsibleSiblings();
+
+				for (const el of siblings) {
+					el.style.display = isCollapsed ? 'none' : '';
+				}
+
+				if (isCollapsed) {
+					const hidden = countHidden(siblings);
+					countSpan.textContent = hidden > 0 ? `${hidden}` : '';
+					btn.classList.add('is-collapsed');
+					btn.setAttribute('aria-label', `Expand${hidden > 0 ? ` ${hidden} more` : ''}`);
+				} else {
+					countSpan.textContent = '';
+					btn.classList.remove('is-collapsed');
+					btn.setAttribute('aria-label', getMessage('readerCollapseComment'));
+				}
+			};
+
+			btn.addEventListener('click', (e) => {
+				e.stopPropagation();
+				comment.classList.toggle('collapsed');
+				updateBtn();
+			});
+		});
+
+		// Highlight ancestor thread lines up to the hovered child's arm
+		let highlightedAncestors: HTMLElement[] = [];
+
+		const clearHighlight = () => {
+			for (const el of highlightedAncestors) {
+				el.classList.remove('child-hovered');
+				el.style.removeProperty('--highlight-height');
+			}
+			highlightedAncestors = [];
+		};
+
+		commentsEl.addEventListener('mouseover', (e) => {
+			const target = e.target as HTMLElement;
+			const bq = target.closest('blockquote') as HTMLElement;
+			if (!bq || bq.closest('.comment-content')) {
+				clearHighlight();
+				return;
+			}
+
+			// Walk up the chain: for each ancestor blockquote, highlight
+			// its border-left up to the child branch that leads to the hovered element.
+			const newAncestors: HTMLElement[] = [];
+			let child = bq;
+			let parent = child.parentElement;
+			while (parent && parent.tagName === 'BLOCKQUOTE' && !parent.closest('.comment-content')) {
+				newAncestors.push(parent);
+				child = parent;
+				parent = child.parentElement;
+			}
+
+			// Skip update if same set of ancestors
+			if (newAncestors.length === highlightedAncestors.length &&
+				newAncestors.every((el, i) => el === highlightedAncestors[i])) {
+				return;
+			}
+
+			clearHighlight();
+
+			// Re-walk to set --highlight-height on each ancestor
+			child = bq;
+			parent = child.parentElement;
+			while (parent && parent.tagName === 'BLOCKQUOTE' && !parent.closest('.comment-content')) {
+				parent.style.setProperty('--highlight-height', `${child.offsetTop + 2}px`);
+				parent.classList.add('child-hovered');
+				highlightedAncestors.push(parent);
+
+				// If parent is a top-level blockquote (its parent is .comments),
+				// highlight all previous sibling blockquotes of `child` to trace
+				// the thread line back up to the top-level comment.
+				if (parent.parentElement?.matches?.('.comments')) {
+					let sibling = child.previousElementSibling;
+					while (sibling) {
+						if (sibling.tagName === 'BLOCKQUOTE') {
+							(sibling as HTMLElement).classList.add('child-hovered');
+							highlightedAncestors.push(sibling as HTMLElement);
+						}
+						sibling = sibling.previousElementSibling;
+					}
+				}
+
+				child = parent;
+				parent = child.parentElement;
+			}
+		});
+
+		commentsEl.addEventListener('mouseleave', clearHighlight);
+	}
+
 	private static initializeLightbox(doc: Document) {
 		// Create lightbox container
 		this.lightbox = doc.createElement('div');
@@ -855,7 +1430,7 @@ export class Reader {
 		// Create lightbox
 		const closeButton = doc.createElement('button');
 		closeButton.className = 'lightbox-close';
-		closeButton.setAttribute('aria-label', 'Close image viewer');
+		closeButton.setAttribute('aria-label', getMessage('readerCloseImageViewer'));
 		
 		// Create close button SVG
 		const closeSvg = this.createSVG({
@@ -933,7 +1508,7 @@ export class Reader {
 
 					const expandButton = doc.createElement('button');
 					expandButton.className = 'image-expand-button';
-					expandButton.setAttribute('aria-label', 'View full size');
+					expandButton.setAttribute('aria-label', getMessage('readerViewFullSize'));
 					
 					// Create expand SVG
 					const expandSvg = this.createSVG({
@@ -960,7 +1535,7 @@ export class Reader {
 
 					const expandButton = doc.createElement('button');
 					expandButton.className = 'image-expand-button';
-					expandButton.setAttribute('aria-label', 'View full size');
+					expandButton.setAttribute('aria-label', getMessage('readerViewFullSize'));
 					
 					// Create expand SVG
 					const expandSvg = this.createSVG({
@@ -1075,6 +1650,8 @@ export class Reader {
 
 	static async apply(doc: Document) {
 		try {
+			await initializeI18n();
+
 			// Store original HTML for restoration
 			this.originalHTML = doc.documentElement.outerHTML;
 
@@ -1185,7 +1762,7 @@ export class Reader {
 			spinner.className = 'obsidian-reader-loading';
 			const spinnerText = doc.createElement('div');
 			spinnerText.className = 'obsidian-reader-loading-text';
-			spinnerText.textContent = 'Defuddling\u2026';
+			spinnerText.textContent = getMessage('readerLoading');
 			spinner.appendChild(spinnerText);
 			article.appendChild(spinner);
 			main.appendChild(article);
@@ -1210,15 +1787,24 @@ export class Reader {
 
 			// Add reader classes and attributes
 			doc.documentElement.classList.add('obsidian-reader-active');
-			doc.documentElement.setAttribute('data-reader-theme', this.settings.theme);
 
-			// Apply theme mode
-			this.updateThemeMode(doc, this.settings.themeMode);
+			// Apply theme mode (sets theme-light/dark), then effective theme
+			this.updateThemeMode(doc, this.settings.appearance);
 
 			// Initialize settings from local storage
-			doc.documentElement.style.setProperty('--obsidian-reader-font-size', `${this.settings.fontSize}px`);
-			doc.documentElement.style.setProperty('--obsidian-reader-line-height', this.settings.lineHeight.toString());
-			doc.documentElement.style.setProperty('--obsidian-reader-line-width', `${this.settings.maxWidth}em`);
+			doc.documentElement.style.setProperty('--font-text-size', `${this.settings.fontSize}px`);
+			doc.documentElement.style.setProperty('--line-height-normal', this.settings.lineHeight.toString());
+			doc.documentElement.style.setProperty('--line-width', `${this.settings.maxWidth}em`);
+			this.applyFont(doc, this.settings.defaultFont);
+			this.applyBlendImages(doc, this.settings.blendImages);
+			this.applyColorLinks(doc, this.settings.colorLinks);
+
+			if (this.settings.customCss) {
+				const styleEl = doc.createElement('style');
+				styleEl.id = 'obsidian-reader-custom-css';
+				styleEl.textContent = this.settings.customCss;
+				doc.head.appendChild(styleEl);
+			}
 
 			// Add settings bar
 			this.injectSettingsBar(doc);
@@ -1227,6 +1813,19 @@ export class Reader {
 			if (clipperIframeContainer) {
 				doc.body.appendChild(clipperIframeContainer);
 			}
+
+			// Toggle dark mode with D key (visual only, doesn't change appearance setting)
+			doc.addEventListener('keydown', (e) => {
+				if (!this.isActive) return;
+				if ((e.key !== 'd' && e.key !== 'D') || e.ctrlKey || e.metaKey) return;
+				const tag = (document.activeElement as HTMLElement)?.tagName;
+				if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+				const html = doc.documentElement;
+				const isDark = html.classList.contains('theme-dark');
+				html.classList.remove('theme-light', 'theme-dark');
+				html.classList.add(isDark ? 'theme-light' : 'theme-dark');
+				this.applyTheme(doc);
+			});
 
 			// Set up color scheme media query listener
 			this.colorSchemeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
@@ -1245,7 +1844,7 @@ export class Reader {
 
 			if (!content) {
 				console.log('Reader', 'Failed to extract content');
-				article.textContent = 'Failed to extract content.';
+				article.textContent = getMessage('readerError');
 				return;
 			}
 
@@ -1381,12 +1980,16 @@ export class Reader {
 			footer.style.display = '';
 
 			// Initialize content-dependent features
-			this.observer = this.generateOutline(doc);
+			this.observer = this.generateOutline(doc, title);
 			this.initializeFootnotes(doc);
 			this.initializeCodeHighlighting(doc);
 			this.initializeCopyButtons(doc);
 			this.initializeLightbox(doc);
+			this.linkifyTextUrls(doc);
+			this.initializeComments(doc);
 
+			invalidateHighlightCache();
+			await loadHighlights();
 			applyHighlights();
 
 		} catch (e) {

@@ -576,6 +576,9 @@
 	"prependToExisting": {
 		"message": "Zu bestehender Notiz am Anfang hinzufügen"
 	},
+	"preview": {
+		"message": "Vorschau"
+	},
 	"processing": {
 		"message": "Verarbeite"
 	},
@@ -656,6 +659,120 @@
 	},
 	"reader": {
 		"message": "Leser"
+	},
+	"readerAppearance": {
+		"message": "Erscheinungsbild"
+	},
+	"readerAppearanceAuto": {
+		"message": "Automatisch"
+	},
+	"readerAppearanceDark": {
+		"message": "Dunkel"
+	},
+	"readerAppearanceDescription": {
+		"message": "Helles oder dunkles Erscheinungsbild auswählen."
+	},
+	"readerAppearanceLight": {
+		"message": "Hell"
+	},
+	"readerBlendImages": {
+		"message": "Bilder einblenden"
+	},
+	"readerBlendImagesDescription": {
+		"message": "Bilder mit dem Seitenhintergrund verschmelzen."
+	},
+	"readerCloseImageViewer": {
+		"message": "Bildbetrachter schließen"
+	},
+	"readerCollapseComment": {
+		"message": "Kommentar einklappen"
+	},
+	"readerColorLinks": {
+		"message": "Links einfärben"
+	},
+	"readerColorSchemeDefault": {
+		"message": "Standard"
+	},
+	"readerCustomCss": {
+		"message": "Benutzerdefiniertes CSS"
+	},
+	"readerCustomCssDescription": {
+		"message": "CSS, das in der Leseansicht automatisch angewendet wird."
+	},
+	"readerDarkTheme": {
+		"message": "Design für den Dunkelmodus"
+	},
+	"readerDarkThemeDescription": {
+		"message": "Im Dunkelmodus ein anderes Design verwenden."
+	},
+	"readerError": {
+		"message": "Inhalt konnte nicht extrahiert werden."
+	},
+	"readerFont": {
+		"message": "Schriftartoptionen"
+	},
+	"readerFontDefault": {
+		"message": "Standard"
+	},
+	"readerFontDescription": {
+		"message": "Fügen Sie auf Ihrem System installierte Schriftarten hinzu. Drücken Sie die Eingabetaste, um eine Schriftart hinzuzufügen."
+	},
+	"readerFontNotFound": {
+		"message": "Nicht gefunden"
+	},
+	"readerFontPlaceholder": {
+		"message": "Eingabetaste drücken, um eine Schriftart hinzuzufügen"
+	},
+	"readerFontSetDefault": {
+		"message": "Als Standard festlegen"
+	},
+	"readerFontSize": {
+		"message": "Basis-Schriftgröße"
+	},
+	"readerFontSystem": {
+		"message": "System"
+	},
+	"readerFontSystemSans": {
+		"message": "Sans-Serif"
+	},
+	"readerFontSystemSerif": {
+		"message": "Serif"
+	},
+	"readerFonts": {
+		"message": "Schriftarten"
+	},
+	"readerFootnotes": {
+		"message": "Fußnoten"
+	},
+	"readerImages": {
+		"message": "Bilder"
+	},
+	"readerLineHeight": {
+		"message": "Zeilenhöhe"
+	},
+	"readerLineWidth": {
+		"message": "Zeilenbreite"
+	},
+	"readerLoading": {
+		"message": "Wird bereinigt…"
+	},
+	"readerSettings": {
+		"message": "Reader-Einstellungen"
+	},
+	"readerTheme": {
+		"message": "Design"
+	},
+	"readerThemeDescription": {
+		"message": "Wählen Sie die Farben für die Leseansicht."
+	},
+	"readerThemeSection": {
+		"message": "Design"
+	},
+	"readerTypography": {
+		"message": "Typografie"
+	},
+	"readerViewFullSize": {
+		"message": "In voller Größe anzeigen"
 	},
 	"recommended": {
 		"message": "empfohlen"
@@ -774,6 +891,9 @@
 	"systemDefault": {
 		"message": "System"
 	},
+	"template": {
+		"message": "Vorlage"
+	},
 	"templateCopied": {
 		"message": "Vorlagen-JSON in Zwischenablage kopiert"
 	},
@@ -785,6 +905,12 @@
 	},
 	"templateErrorsCount": {
 		"message": "In deiner Vorlage sind $1 Fehler."
+	},
+	"templateGroupContent": {
+		"message": "Inhalt"
+	},
+	"templateGroupLocation": {
+		"message": "Speicherort"
 	},
 	"templateName": {
 		"message": "Vorlagenname"

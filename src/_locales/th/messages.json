@@ -576,6 +576,9 @@
 	"prependToExisting": {
 		"message": "เพิ่มไปยังบันทึกที่มีอยู่ ที่ต้น"
 	},
+	"preview": {
+		"message": "ดูตัวอย่าง"
+	},
 	"processing": {
 		"message": "กำลังประมวลผล"
 	},
@@ -656,6 +659,120 @@
 	},
 	"reader": {
 		"message": "อ่าน"
+	},
+	"readerAppearance": {
+		"message": "ลักษณะการแสดงผล"
+	},
+	"readerAppearanceAuto": {
+		"message": "อัตโนมัติ"
+	},
+	"readerAppearanceDark": {
+		"message": "มืด"
+	},
+	"readerAppearanceDescription": {
+		"message": "เลือกลักษณะการแสดงผลแบบสว่างหรือมืด"
+	},
+	"readerAppearanceLight": {
+		"message": "สว่าง"
+	},
+	"readerBlendImages": {
+		"message": "ผสานรูปภาพ"
+	},
+	"readerBlendImagesDescription": {
+		"message": "ผสานรูปภาพเข้ากับพื้นหลังของหน้า"
+	},
+	"readerCloseImageViewer": {
+		"message": "ปิดตัวดูรูปภาพ"
+	},
+	"readerCollapseComment": {
+		"message": "ยุบความคิดเห็น"
+	},
+	"readerColorLinks": {
+		"message": "ใส่สีให้ลิงก์"
+	},
+	"readerColorSchemeDefault": {
+		"message": "ค่าเริ่มต้น"
+	},
+	"readerCustomCss": {
+		"message": "CSS กำหนดเอง"
+	},
+	"readerCustomCssDescription": {
+		"message": "CSS ที่นำไปใช้โดยอัตโนมัติในมุมมองการอ่าน"
+	},
+	"readerDarkTheme": {
+		"message": "ธีมโหมดมืด"
+	},
+	"readerDarkThemeDescription": {
+		"message": "ใช้ธีมอื่นในโหมดมืด"
+	},
+	"readerError": {
+		"message": "ไม่สามารถดึงเนื้อหาได้"
+	},
+	"readerFont": {
+		"message": "ตัวเลือกแบบอักษร"
+	},
+	"readerFontDefault": {
+		"message": "ค่าเริ่มต้น"
+	},
+	"readerFontDescription": {
+		"message": "เพิ่มแบบอักษรที่ติดตั้งบนระบบของคุณ กด Enter เพื่อเพิ่มแบบอักษร"
+	},
+	"readerFontNotFound": {
+		"message": "ไม่พบ"
+	},
+	"readerFontPlaceholder": {
+		"message": "กด Enter เพื่อเพิ่มแบบอักษร"
+	},
+	"readerFontSetDefault": {
+		"message": "ตั้งเป็นค่าเริ่มต้น"
+	},
+	"readerFontSize": {
+		"message": "ขนาดแบบอักษรพื้นฐาน"
+	},
+	"readerFontSystem": {
+		"message": "ระบบ"
+	},
+	"readerFontSystemSans": {
+		"message": "Sans-serif"
+	},
+	"readerFontSystemSerif": {
+		"message": "Serif"
+	},
+	"readerFonts": {
+		"message": "แบบอักษร"
+	},
+	"readerFootnotes": {
+		"message": "เชิงอรรถ"
+	},
+	"readerImages": {
+		"message": "รูปภาพ"
+	},
+	"readerLineHeight": {
+		"message": "ความสูงบรรทัด"
+	},
+	"readerLineWidth": {
+		"message": "ความกว้างบรรทัด"
+	},
+	"readerLoading": {
+		"message": "กำลังทำให้เข้าใจง่าย…"
+	},
+	"readerSettings": {
+		"message": "การตั้งค่าโหมดอ่าน"
+	},
+	"readerTheme": {
+		"message": "ธีม"
+	},
+	"readerThemeDescription": {
+		"message": "เลือกสีที่ใช้ในมุมมองการอ่าน"
+	},
+	"readerThemeSection": {
+		"message": "ธีม"
+	},
+	"readerTypography": {
+		"message": "การจัดตัวพิมพ์"
+	},
+	"readerViewFullSize": {
+		"message": "ดูขนาดเต็ม"
 	},
 	"recommended": {
 		"message": "แนะนำ"
@@ -774,6 +891,9 @@
 	"systemDefault": {
 		"message": "ค่าเริ่มต้นของระบบ"
 	},
+	"template": {
+		"message": "เทมเพลต"
+	},
 	"templateCopied": {
 		"message": "คัดลอก JSON เทมเพลตไปยังคลิปบอร์ดแล้ว"
 	},
@@ -785,6 +905,12 @@
 	},
 	"templateErrorsCount": {
 		"message": "มีข้อผิดพลาด $1 รายการในเทมเพลตของคุณ"
+	},
+	"templateGroupContent": {
+		"message": "เนื้อหา"
+	},
+	"templateGroupLocation": {
+		"message": "ตำแหน่ง"
 	},
 	"templateName": {
 		"message": "ชื่อเทมเพลต"
