@@ -1,16 +1,9 @@
-<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="64" height="64" rx="16" fill="url(#g)"/>
-  <defs>
-    <linearGradient id="g" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#8427E0"/>
-      <stop offset="100%" stop-color="#a44dff"/>
-    </linearGradient>
-  </defs>
-  <circle cx="32" cy="21" r="5" fill="#00C8FF"/>
-  <circle cx="43" cy="28" r="5" fill="#FFCE00"/>
-  <circle cx="43" cy="41" r="5" fill="#FB006D"/>
-  <circle cx="32" cy="47" r="5" fill="#66CF80"/>
-  <circle cx="21" cy="41" r="5" fill="#F7931E"/>
-  <circle cx="21" cy="28" r="5" fill="#ffffff" fill-opacity="0.9"/>
-  <circle cx="32" cy="34" r="6" fill="white"/>
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <rect width="128" height="128" rx="28" fill="#f4f0ff"/>
+  <path d="M52 32 L82 20 L98 52 L82 84 L52 96 L36 64 Z" fill="#7C3AED"/>
+  <path d="M58 42 L76 34 L88 56 L76 78 L58 86 L46 64 Z" fill="#9B59F5"/>
+  <circle cx="68" cy="46" r="5.5" fill="#00C8FF"/>
+  <circle cx="80" cy="58" r="5" fill="#FB006D"/>
+  <circle cx="68" cy="72" r="5.5" fill="#66CF80"/>
+  <circle cx="56" cy="58" r="5" fill="#F7931E"/>
 </svg>

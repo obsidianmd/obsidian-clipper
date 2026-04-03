@@ -1,23 +1,39 @@
 
 
-<h1 align="center" style="border-bottom: none">Clipper for AppFlowy</h1>
+<h1 align="center">Clipper for AppFlowy</h1>
 
-<p align="center"><a rel="noreferrer noopener" href="https://chromewebstore.google.com/detail/ngjmhmikhoegpfakpfofaafagoikejln?utm_source=item-share-cb"><img alt="Chrome Web Store" src="https://img.shields.io/badge/Chrome-141e24.svg?&style=for-the-badge&logo=google-chrome&logoColor=white"></a>  <a rel="noreferrer noopener" href="https://addons.mozilla.org/fr/firefox/addon/clipper-for-appflowy/"><img alt="Firefox Add-ons" src="https://img.shields.io/badge/Firefox-141e24.svg?&style=for-the-badge&logo=firefox-browser&logoColor=white"></a>
+<p align="center">
+  <a rel="noreferrer noopener" href="https://chromewebstore.google.com/detail/ngjmhmikhoegpfakpfofaafagoikejln?utm_source=item-share-cb"><img alt="Chrome Web Store" src="https://img.shields.io/badge/Chrome-141e24.svg?&style=for-the-badge&logo=google-chrome&logoColor=white"></a>
+  <a rel="noreferrer noopener" href="https://addons.mozilla.org/fr/firefox/addon/clipper-for-appflowy/"><img alt="Firefox Add-ons" src="https://img.shields.io/badge/Firefox-141e24.svg?&style=for-the-badge&logo=firefox-browser&logoColor=white"></a>
+  <a rel="noreferrer noopener" href="https://github.com/alexrosepizant/clipper-for-appflowy/releases/tag/v0.1.1"><img alt="Safari" src="https://img.shields.io/badge/Safari-141e24.svg?&style=for-the-badge&logo=safari&logoColor=white"></a>
+  <a href="#contributors"><img alt="All Contributors" src="https://img.shields.io/badge/all_contributors-1-orange.svg?style=for-the-badge"></a>
 </p>
 
-**A community fork of [obsidian-clipper](https://github.com/obsidianmd/obsidian-clipper), adapted for [AppFlowy](https://github.com/AppFlowy-IO/AppFlowy)**
+## What is it?
 
-> ⚠️ This is an unofficial community project, not affiliated with or endorsed by the AppFlowy team.
+An unofficial browser extension that lets you save web pages, articles, and highlights directly to your [AppFlowy](https://github.com/AppFlowy-IO/AppFlowy) workspace — with one click.
 
-## Get started
+<table align="center" border="0" cellpadding="8" cellspacing="0" style="border: none; border-collapse: collapse;">
+  <tr>
+    <td align="center" style="border: none;"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/2023_Obsidian_logo.svg/1280px-2023_Obsidian_logo.svg.png" alt="Obsidian Clipper" width="70" /></td>
+    <td align="center" style="border: none;">&nbsp;&nbsp;＋&nbsp;&nbsp;</td>
+    <td align="center" style="border: none;"><img src="https://avatars.githubusercontent.com/u/86002201?s=80&v=4" alt="AppFlowy" width="80" /></td>
+    <td align="center" style="border: none;">&nbsp;&nbsp;→&nbsp;&nbsp;</td>
+    <td align="center" style="border: none;"><img src="assets/logo.svg" alt="Clipper for AppFlowy" width="80" /></td>
+  </tr>
+</table>
 
-Download the latest release for your browser:
+> This is a community fork of [obsidian-clipper](https://github.com/obsidianmd/obsidian-clipper), ported to AppFlowy. Not affiliated with or endorsed by the AppFlowy team.
 
-| Browser           | Download                                                                                                             |
-| ----------------- | -------------------------------------------------------------------------------------------------------------------- |
-| Chrome / Chromium | [Chrome Web Store](https://chromewebstore.google.com/detail/ngjmhmikhoegpfakpfofaafagoikejln?utm_source=item-share-cb)  |
+Please refer to the [documentation](./docs) for details on how to install and use this extension.
+
+## Install
+
+| Browser           | Download |
+| ----------------- | -------- |
+| Chrome / Chromium | [Chrome Web Store](https://chromewebstore.google.com/detail/ngjmhmikhoegpfakpfofaafagoikejln?utm_source=item-share-cb) |
 | Firefox           | [Firefox Add-Ons](https://addons.mozilla.org/fr/firefox/addon/clipper-for-appflowy/) |
-| Safari            | [clipper-for-appflowy-0.1.1-safari.zip](https://github.com/alexrosepizant/clipper-for-appflowy/releases/tag/v0.1.1)  |
+| Safari            | [GitHub Releases](https://github.com/alexrosepizant/clipper-for-appflowy/releases/tag/v0.1.1) |
 
 ## Screenshots
 
@@ -30,80 +46,32 @@ Download the latest release for your browser:
   <img src="assets/screenshot-settings.png" alt="Settings & configuration" />
 </p>
 
-## Use the extension
+## Documentation
 
-Documentation is available in the [`docs/`](./docs) folder, covering how to use [highlighting](./docs/Highlight%20web%20pages.md), [templates](./docs/Templates.md), [variables](./docs/Variables.md), [filters](./docs/Filters.md), and more.
+The [`docs/`](./docs) folder covers everything: [highlighting](./docs/Highlight%20web%20pages.md), [templates](./docs/Templates.md), [variables](./docs/Variables.md), [filters](./docs/Filters.md), and more.
 
-## Contribute
+## Contributing
 
-### Features and bug fixes
+Contributions are welcome! See the [open issues](https://github.com/alexrosepizant/clipper-for-appflowy/issues) or feel free to [report a bug or request a feature](https://github.com/alexrosepizant/clipper-for-appflowy/issues/new).
 
-See the [issues](https://github.com/alexrosepizant/clipper-for-appflowy/issues) for open tasks where contributions are welcome. Feel free to **[report a bug or request a feature](https://github.com/alexrosepizant/clipper-for-appflowy/issues)** as well.
+## Development
 
-## Developers
-
-To build the extension:
-
-```
+```sh
 npm run build
 ```
 
-This will create three directories:
+Builds into three directories: `dist/` (Chromium), `dist_firefox/` (Firefox), `dist_safari/` (Safari).
 
-- `dist/` for the Chromium version
-- `dist_firefox/` for the Firefox version
-- `dist_safari/` for the Safari version
+**Load locally:**
 
-### Install the extension locally
+- **Chrome/Arc/Brave/Edge:** `chrome://extensions` → Enable Developer mode → Load unpacked → select `dist/`
+- **Firefox:** `about:debugging` → Load Temporary Add-on → select `dist_firefox/manifest.json`
+- **Safari (iOS Simulator):** build, open `xcode/Clipper for AppFlowy/Clipper for AppFlowy.xcodeproj` in Xcode, run on simulator
 
-For Chromium browsers, such as Chrome, Brave, Edge, and Arc:
-
-1. Open your browser and navigate to `chrome://extensions`
-2. Enable **Developer mode**
-3. Click **Load unpacked** and select the `dist` directory
-
-For Firefox:
-
-1. Open Firefox and navigate to `about:debugging#/runtime/this-firefox`
-2. Click **Load Temporary Add-on**
-3. Navigate to the `dist_firefox` directory and select the `manifest.json` file
-
-If you want to run the extension permanently you can do so with the Nightly or Developer versions of Firefox.
-
-1. Type `about:config` in the URL bar
-2. In the Search box type `xpinstall.signatures.required`
-3. Double-click the preference, or right-click and select "Toggle", to set it to `false`.
-4. Go to `about:addons` > gear icon > **Install Add-on From File…**
-
-For iOS Simulator testing on macOS:
-
-1. Run `npm run build` to build the extension
-2. Open `xcode/Clipper for AppFlowy/Clipper for AppFlowy.xcodeproj` in Xcode
-3. Select the **Clipper for AppFlowy (iOS)** scheme from the scheme selector
-4. Choose an iOS Simulator device and click **Run** to build and launch the app
-5. Once the app is running on the simulator, open **Safari**
-6. Navigate to a webpage and tap the **Extensions** button in Safari to access the extension
-
-### Run tests
-
+```sh
+npm test          # run tests
+npm run test:watch  # watch mode
 ```
-npm test
-```
-
-Or run in watch mode during development:
-
-```
-npm run test:watch
-```
-
-## Third-party libraries
-
-- [webextension-polyfill](https://github.com/mozilla/webextension-polyfill) for browser compatibility
-- [defuddle](https://github.com/kepano/defuddle) for content extraction and Markdown conversion
-- [dayjs](https://github.com/iamkun/dayjs) for date parsing and formatting
-- [lz-string](https://github.com/pieroxy/lz-string) to compress templates to reduce storage space
-- [lucide](https://github.com/lucide-icons/lucide) for icons
-- [dompurify](https://github.com/cure53/DOMPurify) for sanitizing HTML
 
 ## Contributors
 
