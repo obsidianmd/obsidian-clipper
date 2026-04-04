@@ -700,6 +700,7 @@ export class Reader {
 			document: doc,
 			title: defuddled.title,
 			author: defuddled.author,
+			published: defuddled.published,
 			contentHtml: defuddled.content,
 			metaTags: defuddled.metaTags,
 		});
@@ -708,7 +709,7 @@ export class Reader {
 			content: defuddled.content,
 			title: resolvedMetadata.title,
 			author: resolvedMetadata.author,
-			published: defuddled.published,
+			published: resolvedMetadata.published,
 			domain: getDomain(doc.URL),
 			wordCount: defuddled.wordCount,
 			parseTime: defuddled.parseTime

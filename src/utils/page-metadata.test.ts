@@ -16,6 +16,7 @@ describe('resolvePageMetadata', () => {
 			title: 'Example title',
 			author: 'Example author',
 			authorUrl: '',
+			published: '',
 		});
 	});
 
@@ -50,6 +51,7 @@ describe('resolvePageMetadata', () => {
 			title: '创业之前，你想过怎么给你的产品起名吗？',
 			author: '李老师好文',
 			authorUrl: 'https://weibo.com/u/1234567890',
+			published: '',
 		});
 	});
 
@@ -76,6 +78,7 @@ describe('resolvePageMetadata', () => {
 			title: '微博',
 			author: '科技圈观察员',
 			authorUrl: 'https://weibo.com/u/99887766',
+			published: '',
 		});
 	});
 
@@ -85,6 +88,7 @@ describe('resolvePageMetadata', () => {
 				<head><title>微博</title></head>
 				<body>
 					<article>
+						<p>公开</p>
 						<p>这是微博正文的第一行，而且确实比三十个字符更长一些用来验证截断规则。</p>
 						<p>这是第二行。</p>
 					</article>
@@ -98,15 +102,17 @@ describe('resolvePageMetadata', () => {
 			title: '微博',
 			author: '',
 			contentHtml: `
+				<p>公开</p>
 				<p>这是微博正文的第一行，而且确实比三十个字符更长一些用来验证截断规则。</p>
 				<p>这是第二行。</p>
 			`,
 		});
 
 		expect(metadata).toEqual({
-			title: '这是微博正文的第一行，而且确实比三十个字符更长一些用来验证截',
+			title: '这是微博正文的第一行，而且确实比三十个字符更长一些用来验证截断规则。',
 			author: '',
 			authorUrl: '',
+			published: '',
 		});
 	});
 
@@ -130,5 +136,26 @@ describe('resolvePageMetadata', () => {
 		});
 
 		expect(metadata.title).toBe('余弦发了一个短视频，快来看呀。');
+	});
+
+	test('extracts published time from script created_at', () => {
+		const { document } = parseHTML(`
+			<html>
+				<head><title>微博正文 - 微博</title></head>
+				<body>
+					<script>
+						window.__INITIAL_STATE__ = {"status":{"created_at":"Fri Apr 04 09:15:00 +0800 2026"}};
+					</script>
+				</body>
+			</html>
+		`);
+
+		const metadata = resolvePageMetadata({
+			url: 'https://weibo.com/2194035935/QugQQpcVa',
+			document: document as unknown as Document,
+			title: '微博正文 - 微博',
+		});
+
+		expect(metadata.published).toBe('2026-04-04 09:15');
 	});
 });

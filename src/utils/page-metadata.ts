@@ -9,6 +9,7 @@ interface ResolvePageMetadataParams {
 	document?: Document;
 	title?: string;
 	author?: string;
+	published?: string;
 	contentHtml?: string;
 	metaTags?: MetaTag[];
 }
@@ -17,12 +18,14 @@ interface WeiboMetadata {
 	title?: string;
 	author?: string;
 	authorUrl?: string;
+	published?: string;
 }
 
 export interface ResolvedPageMetadata {
 	title: string;
 	author: string;
 	authorUrl: string;
+	published: string;
 }
 
 const GENERIC_WEIBO_TITLES = new Set([
@@ -31,15 +34,27 @@ const GENERIC_WEIBO_TITLES = new Set([
 	'Sina Visitor System',
 ]);
 
+const GENERIC_WEIBO_CONTENT_LINES = new Set([
+	'公开',
+	'仅自己可见',
+	'好友圈',
+	'粉丝可见',
+	'置顶',
+	'置顶微博',
+	'已编辑',
+]);
+
 export function resolvePageMetadata(params: ResolvePageMetadataParams): ResolvedPageMetadata {
 	const title = normalizeWhitespace(params.title);
 	const author = normalizeWhitespace(params.author);
+	const published = normalizeWhitespace(params.published);
 
 	if (!isWeiboUrl(params.url)) {
 		return {
 			title,
 			author,
 			authorUrl: '',
+			published,
 		};
 	}
 
@@ -47,11 +62,13 @@ export function resolvePageMetadata(params: ResolvePageMetadataParams): Resolved
 	const fallbackTitle = extractWeiboTitleFromContentHtml(params.contentHtml);
 	const resolvedTitle = shouldReplaceWeiboTitle(title) ? weiboMetadata.title : title;
 	const resolvedAuthor = author || weiboMetadata.author || '';
+	const resolvedPublished = weiboMetadata.published || published;
 
 	return {
 		title: resolvedTitle || fallbackTitle || title,
 		author: resolvedAuthor,
 		authorUrl: weiboMetadata.authorUrl || '',
+		published: resolvedPublished,
 	};
 }
 
@@ -59,11 +76,13 @@ function extractWeiboMetadata(document: Document | undefined, pageUrl: string, m
 	const metaTitle = extractWeiboTitleFromMeta(metaTags);
 	const documentTitle = extractWeiboTitleFromDocument(document);
 	const { author, authorUrl } = extractWeiboAuthor(document, pageUrl, metaTags);
+	const published = extractWeiboPublished(document, pageUrl, metaTags);
 
 	return {
 		title: metaTitle || documentTitle,
 		author,
 		authorUrl,
+		published,
 	};
 }
 
@@ -120,21 +139,127 @@ function extractWeiboTitleFromContentHtml(contentHtml: string | undefined): stri
 		return '';
 	}
 
-	const firstLine = normalizeWhitespace(
-		contentHtml
-			.replace(/<(p|div|h1|h2|h3|li|blockquote|br)\b[^>]*>/gi, '\n')
-			.replace(/<\/(p|div|h1|h2|h3|li|blockquote)>/gi, '\n')
-			.replace(/<[^>]+>/g, ' ')
-			.split('\n')
-			.map(line => normalizeWhitespace(line))
-			.find(Boolean)
-	);
+	const firstLine = contentHtml
+		.replace(/<(p|div|h1|h2|h3|li|blockquote|br)\b[^>]*>/gi, '\n')
+		.replace(/<\/(p|div|h1|h2|h3|li|blockquote)>/gi, '\n')
+		.replace(/<[^>]+>/g, ' ')
+		.split('\n')
+		.map(line => normalizeWhitespace(line))
+		.find(line => line && !isGenericWeiboContentLine(line));
 
 	if (!firstLine) {
 		return '';
 	}
 
-	return firstLine.length > 30 ? firstLine.slice(0, 30) : firstLine;
+	return firstLine.length > 50 ? firstLine.slice(0, 50) : firstLine;
+}
+
+function extractWeiboPublished(document: Document | undefined, pageUrl: string, metaTags: MetaTag[] | undefined): string {
+	const metaPublished = extractWeiboPublishedFromMeta(metaTags);
+	if (metaPublished) {
+		return metaPublished;
+	}
+
+	const documentPublished = extractWeiboPublishedFromDocument(document, pageUrl);
+	if (documentPublished) {
+		return documentPublished;
+	}
+
+	return extractWeiboPublishedFromScripts(document);
+}
+
+function extractWeiboPublishedFromMeta(metaTags: MetaTag[] | undefined): string {
+	if (!metaTags?.length) {
+		return '';
+	}
+
+	const preferredKeys = new Set([
+		'article:published_time',
+		'og:published_time',
+		'publication_date',
+		'pubdate',
+	]);
+
+	for (const meta of metaTags) {
+		const key = (meta.property || meta.name || '').trim().toLowerCase();
+		if (!preferredKeys.has(key)) {
+			continue;
+		}
+
+		const published = normalizeWeiboPublished(meta.content);
+		if (published) {
+			return published;
+		}
+	}
+
+	return '';
+}
+
+function extractWeiboPublishedFromDocument(document: Document | undefined, pageUrl: string): string {
+	if (!document) {
+		return '';
+	}
+
+	const selectors = [
+		'time[datetime]',
+		'a[node-type="feed_list_item_date"][title]',
+		'[node-type="feed_list_item_date"][title]',
+		'a[href*="/status/"][title]',
+		'a[href*="/detail/"][title]',
+	];
+
+	for (const selector of selectors) {
+		const element = document.querySelector(selector);
+		if (!element) {
+			continue;
+		}
+
+		const candidate = normalizeWeiboPublished(
+			element.getAttribute('datetime')
+			|| element.getAttribute('title')
+			|| element.textContent
+		);
+
+		if (candidate) {
+			return candidate;
+		}
+	}
+
+	const anchors = Array.from(document.querySelectorAll('a[href]'))
+		.filter(anchor => !normalizeWeiboProfileUrl(anchor.getAttribute('href') || '', pageUrl));
+
+	for (const anchor of anchors) {
+		const candidate = normalizeWeiboPublished(anchor.getAttribute('title') || anchor.textContent);
+		if (candidate) {
+			return candidate;
+		}
+	}
+
+	return '';
+}
+
+function extractWeiboPublishedFromScripts(document: Document | undefined): string {
+	if (!document) {
+		return '';
+	}
+
+	const scripts = Array.from(document.querySelectorAll('script'))
+		.map(script => script.textContent || '')
+		.filter(Boolean);
+
+	for (const scriptText of scripts) {
+		const match = scriptText.match(/"created_at"\s*:\s*"([^"]+)"/);
+		if (!match) {
+			continue;
+		}
+
+		const published = normalizeWeiboPublished(decodeEscapedString(match[1]));
+		if (published) {
+			return published;
+		}
+	}
+
+	return '';
 }
 
 function extractWeiboAuthor(document: Document | undefined, pageUrl: string, metaTags: MetaTag[] | undefined): { author: string; authorUrl: string } {
@@ -360,6 +485,10 @@ function isGenericWeiboTitle(title: string): boolean {
 	return /^(微博正文)(\s*[-|｜_]\s*微博.*)?$/i.test(title);
 }
 
+function isGenericWeiboContentLine(line: string): boolean {
+	return GENERIC_WEIBO_CONTENT_LINES.has(line);
+}
+
 function isWeiboUrl(url: string): boolean {
 	try {
 		const hostname = new URL(url).hostname.toLowerCase();
@@ -400,4 +529,39 @@ function decodeEscapedString(value: string): string {
 		.replace(/\\"/g, '"')
 		.replace(/\\\//g, '/')
 		.replace(/\\u([\dA-Fa-f]{4})/g, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
+}
+
+function normalizeWeiboPublished(value: string | null | undefined): string {
+	const normalized = normalizeWhitespace(value)
+		.replace(/\s*来自.*$/i, '')
+		.replace(/\s*发布于.*$/i, '')
+		.trim();
+
+	if (!normalized || /^(公开|微博|全文|网页链接|已编辑)$/i.test(normalized)) {
+		return '';
+	}
+
+	if (/^\d{4}-\d{1,2}-\d{1,2}\s+\d{1,2}:\d{2}$/.test(normalized)) {
+		return normalized;
+	}
+
+	if (/^\d{2}-\d{1,2}-\d{1,2}\s+\d{1,2}:\d{2}$/.test(normalized)) {
+		return `20${normalized}`;
+	}
+
+	if (/^\d{4}-\d{1,2}-\d{1,2}$/.test(normalized)) {
+		return normalized;
+	}
+
+	const parsed = new Date(normalized);
+	if (!Number.isNaN(parsed.getTime())) {
+		const year = parsed.getFullYear();
+		const month = `${parsed.getMonth() + 1}`.padStart(2, '0');
+		const day = `${parsed.getDate()}`.padStart(2, '0');
+		const hour = `${parsed.getHours()}`.padStart(2, '0');
+		const minute = `${parsed.getMinutes()}`.padStart(2, '0');
+		return `${year}-${month}-${day} ${hour}:${minute}`;
+	}
+
+	return '';
 }

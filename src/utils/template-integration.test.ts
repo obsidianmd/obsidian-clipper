@@ -39,6 +39,7 @@ async function runFixture(html: string, url: string, template: FixtureTemplate):
 		document: document as unknown as Document,
 		title: defuddleResult.title,
 		author: defuddleResult.author,
+		published: defuddleResult.published,
 		contentHtml: defuddleResult.content,
 		metaTags: defuddleResult.metaTags,
 	});
@@ -56,7 +57,7 @@ async function runFixture(html: string, url: string, template: FixtureTemplate):
 		description: defuddleResult.description,
 		favicon: defuddleResult.favicon,
 		image: defuddleResult.image,
-		published: defuddleResult.published,
+		published: resolvedMetadata.published,
 		site: defuddleResult.site,
 		language: defuddleResult.language,
 		wordCount: defuddleResult.wordCount,

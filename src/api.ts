@@ -190,6 +190,7 @@ export async function clip(options: ClipOptions): Promise<ClipResult> {
 		document: doc as unknown as Document,
 		title: defuddleResult.title,
 		author: defuddleResult.author,
+		published: defuddleResult.published,
 		contentHtml: defuddleResult.content,
 		metaTags: defuddleResult.metaTags,
 	});
@@ -209,7 +210,7 @@ export async function clip(options: ClipOptions): Promise<ClipResult> {
 		description: defuddleResult.description,
 		favicon: defuddleResult.favicon,
 		image: defuddleResult.image,
-		published: defuddleResult.published,
+		published: resolvedMetadata.published,
 		site: defuddleResult.site,
 		language: defuddleResult.language,
 		wordCount: defuddleResult.wordCount,

@@ -295,6 +295,7 @@ declare global {
 					document,
 					title: defuddled.title,
 					author: defuddled.author,
+					published: defuddled.published,
 					contentHtml: defuddled.content,
 					metaTags: defuddled.metaTags,
 				});
@@ -357,7 +358,7 @@ declare global {
 					image: defuddled.image,
 					language: defuddled.language || '',
 					parseTime: defuddled.parseTime,
-					published: defuddled.published,
+					published: resolvedMetadata.published,
 					schemaOrgData: defuddled.schemaOrgData,
 					selectedHtml: selectedHtml,
 					site: defuddled.site,
