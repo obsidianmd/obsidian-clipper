@@ -109,4 +109,26 @@ describe('resolvePageMetadata', () => {
 			authorUrl: '',
 		});
 	});
+
+	test('treats 微博正文 - 微博 as a generic title and falls back to content', () => {
+		const { document } = parseHTML(`
+			<html>
+				<head><title>微博正文 - 微博</title></head>
+				<body>
+					<article>
+						<p>余弦发了一个短视频，快来看呀。</p>
+					</article>
+				</body>
+			</html>
+		`);
+
+		const metadata = resolvePageMetadata({
+			url: 'https://weibo.com/2194035935/QugQQpcVa',
+			document: document as unknown as Document,
+			title: '微博正文 - 微博',
+			contentHtml: '<p>余弦发了一个短视频，快来看呀。</p>',
+		});
+
+		expect(metadata.title).toBe('余弦发了一个短视频，快来看呀。');
+	});
 });

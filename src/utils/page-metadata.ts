@@ -263,7 +263,7 @@ function extractWeiboAuthorFromScripts(document: Document | undefined, pageUrl: 
 
 function normalizeWeiboTitle(value: string | null | undefined): string {
 	const normalized = normalizeWhitespace(value);
-	if (!normalized || GENERIC_WEIBO_TITLES.has(normalized)) {
+	if (!normalized || isGenericWeiboTitle(normalized)) {
 		return '';
 	}
 
@@ -272,10 +272,12 @@ function normalizeWeiboTitle(value: string | null | undefined): string {
 		return normalizeWhitespace(quotedMatch[1]);
 	}
 
-	return normalized
+	const cleaned = normalized
 		.replace(/\s*[-|｜_]\s*微博.*$/i, '')
 		.replace(/\s*-\s*Sina Visitor System$/i, '')
 		.trim();
+
+	return isGenericWeiboTitle(cleaned) ? '' : cleaned;
 }
 
 function normalizeWeiboProfileUrl(rawUrl: string, pageUrl: string): string {
@@ -343,7 +345,19 @@ function scoreWeiboAuthorAnchor(anchor: Element): number {
 }
 
 function shouldReplaceWeiboTitle(title: string): boolean {
-	return !title || GENERIC_WEIBO_TITLES.has(title);
+	return !title || isGenericWeiboTitle(title);
+}
+
+function isGenericWeiboTitle(title: string): boolean {
+	if (!title) {
+		return true;
+	}
+
+	if (GENERIC_WEIBO_TITLES.has(title)) {
+		return true;
+	}
+
+	return /^(微博正文)(\s*[-|｜_]\s*微博.*)?$/i.test(title);
 }
 
 function isWeiboUrl(url: string): boolean {
