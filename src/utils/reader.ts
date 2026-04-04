@@ -700,6 +700,7 @@ export class Reader {
 			document: doc,
 			title: defuddled.title,
 			author: defuddled.author,
+			contentHtml: defuddled.content,
 			metaTags: defuddled.metaTags,
 		});
 

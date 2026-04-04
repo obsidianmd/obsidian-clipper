@@ -295,6 +295,7 @@ declare global {
 					document,
 					title: defuddled.title,
 					author: defuddled.author,
+					contentHtml: defuddled.content,
 					metaTags: defuddled.metaTags,
 				});
 				const extractedContent: { [key: string]: string } = {

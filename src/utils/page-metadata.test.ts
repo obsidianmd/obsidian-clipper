@@ -78,4 +78,35 @@ describe('resolvePageMetadata', () => {
 			authorUrl: 'https://weibo.com/u/99887766',
 		});
 	});
+
+	test('falls back to the first line of weibo content when no title is available', () => {
+		const { document } = parseHTML(`
+			<html>
+				<head><title>微博</title></head>
+				<body>
+					<article>
+						<p>这是微博正文的第一行，而且确实比三十个字符更长一些用来验证截断规则。</p>
+						<p>这是第二行。</p>
+					</article>
+				</body>
+			</html>
+		`);
+
+		const metadata = resolvePageMetadata({
+			url: 'https://weibo.com/1234567890/AbCdEf',
+			document: document as unknown as Document,
+			title: '微博',
+			author: '',
+			contentHtml: `
+				<p>这是微博正文的第一行，而且确实比三十个字符更长一些用来验证截断规则。</p>
+				<p>这是第二行。</p>
+			`,
+		});
+
+		expect(metadata).toEqual({
+			title: '这是微博正文的第一行，而且确实比三十个字符更长一些用来验证截',
+			author: '',
+			authorUrl: '',
+		});
+	});
 });

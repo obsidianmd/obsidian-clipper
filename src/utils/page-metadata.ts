@@ -9,6 +9,7 @@ interface ResolvePageMetadataParams {
 	document?: Document;
 	title?: string;
 	author?: string;
+	contentHtml?: string;
 	metaTags?: MetaTag[];
 }
 
@@ -43,11 +44,12 @@ export function resolvePageMetadata(params: ResolvePageMetadataParams): Resolved
 	}
 
 	const weiboMetadata = extractWeiboMetadata(params.document, params.url, params.metaTags);
-	const resolvedTitle = shouldReplaceWeiboTitle(title) ? (weiboMetadata.title || title) : title;
+	const fallbackTitle = extractWeiboTitleFromContentHtml(params.contentHtml);
+	const resolvedTitle = shouldReplaceWeiboTitle(title) ? weiboMetadata.title : title;
 	const resolvedAuthor = author || weiboMetadata.author || '';
 
 	return {
-		title: resolvedTitle,
+		title: resolvedTitle || fallbackTitle || title,
 		author: resolvedAuthor,
 		authorUrl: weiboMetadata.authorUrl || '',
 	};
@@ -111,6 +113,28 @@ function extractWeiboTitleFromDocument(document: Document | undefined): string {
 	}
 
 	return '';
+}
+
+function extractWeiboTitleFromContentHtml(contentHtml: string | undefined): string {
+	if (!contentHtml) {
+		return '';
+	}
+
+	const firstLine = normalizeWhitespace(
+		contentHtml
+			.replace(/<(p|div|h1|h2|h3|li|blockquote|br)\b[^>]*>/gi, '\n')
+			.replace(/<\/(p|div|h1|h2|h3|li|blockquote)>/gi, '\n')
+			.replace(/<[^>]+>/g, ' ')
+			.split('\n')
+			.map(line => normalizeWhitespace(line))
+			.find(Boolean)
+	);
+
+	if (!firstLine) {
+		return '';
+	}
+
+	return firstLine.length > 30 ? firstLine.slice(0, 30) : firstLine;
 }
 
 function extractWeiboAuthor(document: Document | undefined, pageUrl: string, metaTags: MetaTag[] | undefined): { author: string; authorUrl: string } {

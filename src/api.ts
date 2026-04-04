@@ -190,6 +190,7 @@ export async function clip(options: ClipOptions): Promise<ClipResult> {
 		document: doc as unknown as Document,
 		title: defuddleResult.title,
 		author: defuddleResult.author,
+		contentHtml: defuddleResult.content,
 		metaTags: defuddleResult.metaTags,
 	});
 

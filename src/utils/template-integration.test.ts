@@ -39,6 +39,7 @@ async function runFixture(html: string, url: string, template: FixtureTemplate):
 		document: document as unknown as Document,
 		title: defuddleResult.title,
 		author: defuddleResult.author,
+		contentHtml: defuddleResult.content,
 		metaTags: defuddleResult.metaTags,
 	});
 	const markdownContent = createMarkdownContent(defuddleResult.content, url);
