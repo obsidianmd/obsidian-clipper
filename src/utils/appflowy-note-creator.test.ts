@@ -33,7 +33,7 @@ function makeFetchError(status: number, body = "Server error") {
 async function getRequestBody(
 	content: string,
 	name = "Test",
-	config = BASE_CONFIG,
+	config = BASE_CONFIG
 ) {
 	global.fetch = makeFetchOk();
 	await saveToAppFlowy(content, name, config);
@@ -58,13 +58,13 @@ beforeEach(() => {
 describe("saveToAppFlowy", () => {
 	test("throws when serverUrl is missing", async () => {
 		await expect(
-			saveToAppFlowy("Hello", "Test", { ...BASE_CONFIG, serverUrl: "" }),
+			saveToAppFlowy("Hello", "Test", { ...BASE_CONFIG, serverUrl: "" })
 		).rejects.toThrow("Missing configuration");
 	});
 
 	test("throws when apiToken is missing", async () => {
 		await expect(
-			saveToAppFlowy("Hello", "Test", { ...BASE_CONFIG, apiToken: "" }),
+			saveToAppFlowy("Hello", "Test", { ...BASE_CONFIG, apiToken: "" })
 		).rejects.toThrow("Missing configuration");
 	});
 
@@ -73,7 +73,7 @@ describe("saveToAppFlowy", () => {
 			saveToAppFlowy("Hello", "Test", {
 				...BASE_CONFIG,
 				workspaceId: "",
-			}),
+			})
 		).rejects.toThrow("Missing configuration");
 	});
 
@@ -83,7 +83,7 @@ describe("saveToAppFlowy", () => {
 		const [url] = (global.fetch as ReturnType<typeof vi.fn>).mock
 			.calls[0] as [string];
 		expect(url).toBe(
-			"https://beta.appflowy.cloud/api/workspace/workspace-123/page-view",
+			"https://beta.appflowy.cloud/api/workspace/workspace-123/page-view"
 		);
 	});
 
@@ -96,7 +96,7 @@ describe("saveToAppFlowy", () => {
 		const [url] = (global.fetch as ReturnType<typeof vi.fn>).mock
 			.calls[0] as [string];
 		expect(url).toBe(
-			"https://beta.appflowy.cloud/api/workspace/workspace-123/page-view",
+			"https://beta.appflowy.cloud/api/workspace/workspace-123/page-view"
 		);
 	});
 
@@ -106,7 +106,7 @@ describe("saveToAppFlowy", () => {
 		const [, init] = (global.fetch as ReturnType<typeof vi.fn>).mock
 			.calls[0] as [string, RequestInit];
 		expect((init.headers as Record<string, string>)["Authorization"]).toBe(
-			"Bearer test-token",
+			"Bearer test-token"
 		);
 	});
 
@@ -156,14 +156,14 @@ describe("saveToAppFlowy", () => {
 	test("throws on API error response", async () => {
 		global.fetch = makeFetchError(401, "Unauthorized");
 		await expect(
-			saveToAppFlowy("Hello", "Test", BASE_CONFIG),
+			saveToAppFlowy("Hello", "Test", BASE_CONFIG)
 		).rejects.toThrow("Failed to create page (401)");
 	});
 
 	test("includes error status in thrown message", async () => {
 		global.fetch = makeFetchError(500, "Internal Server Error");
 		await expect(
-			saveToAppFlowy("Hello", "Test", BASE_CONFIG),
+			saveToAppFlowy("Hello", "Test", BASE_CONFIG)
 		).rejects.toThrow("500");
 	});
 });
@@ -174,7 +174,7 @@ describe("markdownToBlocks", () => {
 		expect(block.type).toBe("heading");
 		expect(block.data.level).toBe(1);
 		expect((block.data.delta as Array<{ insert: string }>)[0].insert).toBe(
-			"Title",
+			"Title"
 		);
 	});
 
@@ -196,7 +196,7 @@ describe("markdownToBlocks", () => {
 		expect(block.type).toBe("code");
 		expect(block.data.language).toBe("auto");
 		expect((block.data.delta as Array<{ insert: string }>)[0].insert).toBe(
-			"const x = 1;",
+			"const x = 1;"
 		);
 	});
 
@@ -206,7 +206,7 @@ describe("markdownToBlocks", () => {
 		expect(block.type).toBe("code");
 		expect(block.data.language).toBe("typescript");
 		expect((block.data.delta as Array<{ insert: string }>)[0].insert).toBe(
-			"const x: number = 1;",
+			"const x: number = 1;"
 		);
 	});
 
@@ -214,7 +214,7 @@ describe("markdownToBlocks", () => {
 		const md = "```\nline1\nline2\nline3\n```";
 		const [block] = await getBlocks(md);
 		expect((block.data.delta as Array<{ insert: string }>)[0].insert).toBe(
-			"line1\nline2\nline3",
+			"line1\nline2\nline3"
 		);
 	});
 
@@ -222,7 +222,7 @@ describe("markdownToBlocks", () => {
 		const [block] = await getBlocks("> Some quoted text");
 		expect(block.type).toBe("quote");
 		expect((block.data.delta as Array<{ insert: string }>)[0].insert).toBe(
-			"Some quoted text",
+			"Some quoted text"
 		);
 	});
 
@@ -230,7 +230,7 @@ describe("markdownToBlocks", () => {
 		const [block] = await getBlocks("- Item one");
 		expect(block.type).toBe("bulleted_list");
 		expect((block.data.delta as Array<{ insert: string }>)[0].insert).toBe(
-			"Item one",
+			"Item one"
 		);
 	});
 
@@ -248,7 +248,7 @@ describe("markdownToBlocks", () => {
 		const [block] = await getBlocks("1. First item");
 		expect(block.type).toBe("numbered_list");
 		expect((block.data.delta as Array<{ insert: string }>)[0].insert).toBe(
-			"First item",
+			"First item"
 		);
 	});
 
@@ -270,7 +270,7 @@ describe("markdownToBlocks", () => {
 
 	test("image", async () => {
 		const [block] = await getBlocks(
-			"![alt text](https://example.com/img.png)",
+			"![alt text](https://example.com/img.png)"
 		);
 		expect(block.type).toBe("image");
 		expect(block.data.url).toBe("https://example.com/img.png");
@@ -278,7 +278,7 @@ describe("markdownToBlocks", () => {
 
 	test("linked image extracts image src", async () => {
 		const [block] = await getBlocks(
-			"[![alt](https://img.com/photo.jpg)](https://link.com)",
+			"[![alt](https://img.com/photo.jpg)](https://link.com)"
 		);
 		expect(block.type).toBe("image");
 		expect(block.data.url).toBe("https://img.com/photo.jpg");
@@ -288,7 +288,7 @@ describe("markdownToBlocks", () => {
 		const [block] = await getBlocks("Hello world");
 		expect(block.type).toBe("paragraph");
 		expect((block.data.delta as Array<{ insert: string }>)[0].insert).toBe(
-			"Hello world",
+			"Hello world"
 		);
 	});
 
@@ -297,7 +297,7 @@ describe("markdownToBlocks", () => {
 		expect(blocks).toHaveLength(3);
 		expect(blocks[1].type).toBe("paragraph");
 		expect(
-			(blocks[1].data.delta as Array<{ insert: string }>)[0].insert,
+			(blocks[1].data.delta as Array<{ insert: string }>)[0].insert
 		).toBe("");
 	});
 
@@ -399,7 +399,7 @@ describe("fetchAppflowyWorkspaces", () => {
 		});
 		const result = await fetchAppflowyWorkspaces(
 			"https://beta.appflowy.cloud",
-			"token",
+			"token"
 		);
 		expect(result).toHaveLength(2);
 		expect(result[0].workspace_id).toBe("ws-1");
@@ -410,13 +410,13 @@ describe("fetchAppflowyWorkspaces", () => {
 		global.fetch = makeFetchOk({ data: [] });
 		await fetchAppflowyWorkspaces(
 			"https://beta.appflowy.cloud",
-			"my-token",
+			"my-token"
 		);
 		const [url, init] = (global.fetch as ReturnType<typeof vi.fn>).mock
 			.calls[0] as [string, RequestInit];
 		expect(url).toBe("https://beta.appflowy.cloud/api/workspace");
 		expect((init.headers as Record<string, string>)["Authorization"]).toBe(
-			"Bearer my-token",
+			"Bearer my-token"
 		);
 	});
 
@@ -432,7 +432,7 @@ describe("fetchAppflowyWorkspaces", () => {
 		global.fetch = makeFetchOk({});
 		const result = await fetchAppflowyWorkspaces(
 			"https://beta.appflowy.cloud",
-			"token",
+			"token"
 		);
 		expect(result).toEqual([]);
 	});
@@ -440,14 +440,14 @@ describe("fetchAppflowyWorkspaces", () => {
 	test("throws on HTTP error", async () => {
 		global.fetch = makeFetchError(401);
 		await expect(
-			fetchAppflowyWorkspaces("https://beta.appflowy.cloud", "bad-token"),
+			fetchAppflowyWorkspaces("https://beta.appflowy.cloud", "bad-token")
 		).rejects.toThrow("Failed to fetch workspaces (401)");
 	});
 
 	test("throws on 500 error", async () => {
 		global.fetch = makeFetchError(500);
 		await expect(
-			fetchAppflowyWorkspaces("https://beta.appflowy.cloud", "token"),
+			fetchAppflowyWorkspaces("https://beta.appflowy.cloud", "token")
 		).rejects.toThrow("500");
 	});
 });
@@ -465,7 +465,7 @@ describe("fetchAppflowySpaces", () => {
 		const result = await fetchAppflowySpaces(
 			"https://beta.appflowy.cloud",
 			"token",
-			"ws-1",
+			"ws-1"
 		);
 		expect(result).toHaveLength(2);
 		expect(result[0].view_id).toBe("space-1");
@@ -477,15 +477,15 @@ describe("fetchAppflowySpaces", () => {
 		await fetchAppflowySpaces(
 			"https://beta.appflowy.cloud",
 			"my-token",
-			"workspace-xyz",
+			"workspace-xyz"
 		);
 		const [url, init] = (global.fetch as ReturnType<typeof vi.fn>).mock
 			.calls[0] as [string, RequestInit];
 		expect(url).toBe(
-			"https://beta.appflowy.cloud/api/workspace/workspace-xyz/folder?depth=1",
+			"https://beta.appflowy.cloud/api/workspace/workspace-xyz/folder?depth=1"
 		);
 		expect((init.headers as Record<string, string>)["Authorization"]).toBe(
-			"Bearer my-token",
+			"Bearer my-token"
 		);
 	});
 
@@ -502,7 +502,7 @@ describe("fetchAppflowySpaces", () => {
 		const result = await fetchAppflowySpaces(
 			"https://beta.appflowy.cloud",
 			"token",
-			"ws-1",
+			"ws-1"
 		);
 		expect(result).toHaveLength(2);
 		expect(result.map((s) => s.view_id)).toEqual(["space-1", "space-3"]);
@@ -513,7 +513,7 @@ describe("fetchAppflowySpaces", () => {
 		const result = await fetchAppflowySpaces(
 			"https://beta.appflowy.cloud",
 			"token",
-			"ws-1",
+			"ws-1"
 		);
 		expect(result).toEqual([]);
 	});
@@ -523,7 +523,7 @@ describe("fetchAppflowySpaces", () => {
 		const result = await fetchAppflowySpaces(
 			"https://beta.appflowy.cloud",
 			"token",
-			"ws-1",
+			"ws-1"
 		);
 		expect(result).toEqual([]);
 	});
@@ -531,7 +531,7 @@ describe("fetchAppflowySpaces", () => {
 	test("throws on HTTP error", async () => {
 		global.fetch = makeFetchError(403, "Forbidden");
 		await expect(
-			fetchAppflowySpaces("https://beta.appflowy.cloud", "token", "ws-1"),
+			fetchAppflowySpaces("https://beta.appflowy.cloud", "token", "ws-1")
 		).rejects.toThrow("Failed to fetch spaces (403)");
 	});
 
@@ -540,7 +540,7 @@ describe("fetchAppflowySpaces", () => {
 		await fetchAppflowySpaces(
 			"https://beta.appflowy.cloud/",
 			"token",
-			"ws-1",
+			"ws-1"
 		);
 		const [url] = (global.fetch as ReturnType<typeof vi.fn>).mock
 			.calls[0] as [string];
