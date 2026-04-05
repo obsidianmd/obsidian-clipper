@@ -51,11 +51,11 @@ import {
 dayjs.extend(weekOfYear);
 
 const STORE_URLS = {
-	chrome: "https://chromewebstore.google.com/detail/obsidian-web-clipper/cnjifjpddelmedmihgijeibhnjfabmlf",
+	chrome: "https://chromewebstore.google.com/detail/ngjmhmikhoegpfakpfofaafagoikejln",
 	firefox:
-		"https://addons.mozilla.org/en-US/firefox/addon/web-clipper-obsidian/",
-	safari: "https://apps.apple.com/us/app/obsidian-web-clipper/id6720708363",
-	edge: "https://microsoftedge.microsoft.com/addons/detail/obsidian-web-clipper/eigdjhmgnaaeaonimdklocfekkaanfme",
+		"https://addons.mozilla.org/en-US/firefox/addon/clipper-for-appflowy/",
+	safari: "https://github.com/alexrosepizant/clipper-for-appflowy/releases",
+	edge: "https://chromewebstore.google.com/detail/ngjmhmikhoegpfakpfofaafagoikejln",
 };
 
 export function updateVaultList(): void {
