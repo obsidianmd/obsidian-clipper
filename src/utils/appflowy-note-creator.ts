@@ -47,9 +47,38 @@ function parseInlineMarkdown(text: string): DeltaOp[] {
 	return ops.length > 0 ? ops : [{ insert: text }];
 }
 
+function splitInlineImages(line: string): string[] {
+	const inlineImagePattern = /!\[([^\]]*)\]\(([^)]+)\)/g;
+	// If it's already a pure image line or a pure linked-image line, don't touch it
+	if (/^\s*!\[([^\]]*)\]\(([^)]+)\)\s*$/.test(line)) return [line];
+	if (/^\s*\[!\[([^\]]*)\]\(([^)]+)\)\]\([^)]+\)\s*$/.test(line))
+		return [line];
+	if (!inlineImagePattern.test(line)) return [line];
+
+	// Split the line into image parts and text parts
+	inlineImagePattern.lastIndex = 0;
+	const parts: string[] = [];
+	let lastIdx = 0;
+	let match: RegExpExecArray | null;
+	while ((match = inlineImagePattern.exec(line)) !== null) {
+		const textBefore = line.slice(lastIdx, match.index).trim();
+		if (textBefore) parts.push(textBefore);
+		parts.push(`![${match[1]}](${match[2]})`);
+		lastIdx = match.index + match[0].length;
+	}
+	const textAfter = line.slice(lastIdx).trim();
+	if (textAfter) parts.push(textAfter);
+	return parts.length > 0 ? parts : [line];
+}
+
 function markdownToBlocks(markdown: string): Block[] {
 	const blocks: Block[] = [];
-	const lines = markdown.split("\n");
+	const rawLines = markdown.split("\n");
+	// Pre-process: split lines that mix images with text into separate lines
+	const lines: string[] = [];
+	for (const rawLine of rawLines) {
+		lines.push(...splitInlineImages(rawLine));
+	}
 	let i = 0;
 
 	// Skip YAML frontmatter
