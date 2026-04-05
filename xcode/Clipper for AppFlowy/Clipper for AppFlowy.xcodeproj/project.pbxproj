@@ -703,7 +703,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 
-				CURRENT_PROJECT_VERSION = 44;
+				CURRENT_PROJECT_VERSION = 45;
 				DEVELOPMENT_TEAM = 4F8L8P35UR;
 				CURRENT_PROJECT_VERSION = 45;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -716,7 +716,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.3.0;
+				MARKETING_VERSION = 0.1.3;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -737,7 +737,7 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 
-				CURRENT_PROJECT_VERSION = 44;
+				CURRENT_PROJECT_VERSION = 45;
 				DEVELOPMENT_TEAM = 4F8L8P35UR;
 				CURRENT_PROJECT_VERSION = 45;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -750,7 +750,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.3.0;
+				MARKETING_VERSION = 0.1.3;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -775,7 +775,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
 
-				CURRENT_PROJECT_VERSION = 44;
+				CURRENT_PROJECT_VERSION = 45;
 				DEVELOPMENT_TEAM = 4F8L8P35UR;
 				CURRENT_PROJECT_VERSION = 45;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -792,7 +792,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.3.0;
+				MARKETING_VERSION = 0.1.3;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -816,7 +816,7 @@
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
 
-				CURRENT_PROJECT_VERSION = 44;
+				CURRENT_PROJECT_VERSION = 45;
 				DEVELOPMENT_TEAM = 4F8L8P35UR;
 				CURRENT_PROJECT_VERSION = 45;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -833,7 +833,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.3.0;
+				MARKETING_VERSION = 0.1.3;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -873,7 +873,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 1.3.0;
+				MARKETING_VERSION = 0.1.3;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -911,7 +911,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 1.3.0;
+				MARKETING_VERSION = 0.1.3;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -953,7 +953,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 1.3.0;
+				MARKETING_VERSION = 0.1.3;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -995,7 +995,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 1.3.0;
+				MARKETING_VERSION = 0.1.3;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
