@@ -3,6 +3,7 @@ export interface AppflowyConfig {
 	apiToken: string;
 	workspaceId: string;
 	parentViewId: string;
+	userEmail?: string;
 }
 
 interface DeltaOp {
@@ -156,7 +157,7 @@ function markdownToBlocks(markdown: string): Block[] {
 		// Image — standalone line with image markdown
 		// Also handles linked images: [![alt](src)](href) — extract src
 		const linkedImageMatch = line.match(
-			/^\s*\[!\[([^\]]*)\]\(([^)]+)\)\]\([^)]+\)\s*$/,
+			/^\s*\[!\[([^\]]*)\]\(([^)]+)\)\]\([^)]+\)\s*$/
 		);
 		if (linkedImageMatch) {
 			blocks.push({
@@ -197,13 +198,13 @@ function markdownToBlocks(markdown: string): Block[] {
 export async function saveToAppFlowy(
 	fileContent: string,
 	noteName: string,
-	config: AppflowyConfig,
+	config: AppflowyConfig
 ): Promise<void> {
 	const { serverUrl, apiToken, workspaceId, parentViewId } = config;
 
 	if (!serverUrl || !apiToken || !workspaceId) {
 		throw new Error(
-			"AppFlowy: Missing configuration (server URL, API token, or workspace ID)",
+			"AppFlowy: Missing configuration (server URL, API token, or workspace ID)"
 		);
 	}
 
@@ -236,20 +237,20 @@ export async function saveToAppFlowy(
 			method: "POST",
 			headers,
 			body: JSON.stringify(reqBody),
-		},
+		}
 	);
 
 	if (!createPageRes.ok) {
 		const err = await createPageRes.text();
 		throw new Error(
-			`AppFlowy: Failed to create page (${createPageRes.status}): ${err}`,
+			`AppFlowy: Failed to create page (${createPageRes.status}): ${err}`
 		);
 	}
 }
 
 export async function fetchAppflowyWorkspaces(
 	serverUrl: string,
-	apiToken: string,
+	apiToken: string
 ): Promise<Array<{ workspace_id: string; workspace_name: string }>> {
 	const baseUrl = serverUrl.replace(/\/$/, "");
 	const res = await fetch(`${baseUrl}/api/workspace`, {
@@ -271,14 +272,14 @@ export async function fetchAppflowyWorkspaces(
 export async function fetchAppflowySpaces(
 	serverUrl: string,
 	apiToken: string,
-	workspaceId: string,
+	workspaceId: string
 ): Promise<Array<{ view_id: string; name: string }>> {
 	const baseUrl = serverUrl.replace(/\/$/, "");
 	const res = await fetch(
 		`${baseUrl}/api/workspace/${workspaceId}/folder?depth=1`,
 		{
 			headers: { Authorization: `Bearer ${apiToken}` },
-		},
+		}
 	);
 
 	if (!res.ok) {
@@ -302,14 +303,14 @@ export async function fetchAppflowyFolders(
 	serverUrl: string,
 	apiToken: string,
 	workspaceId: string,
-	spaceViewId: string,
+	spaceViewId: string
 ): Promise<Array<{ view_id: string; name: string }>> {
 	const baseUrl = serverUrl.replace(/\/$/, "");
 	const res = await fetch(
 		`${baseUrl}/api/workspace/${workspaceId}/folder?depth=2`,
 		{
 			headers: { Authorization: `Bearer ${apiToken}` },
-		},
+		}
 	);
 
 	if (!res.ok) {

@@ -588,6 +588,34 @@ function initializeAppflowySettings(): void {
 	const fetchBtn = document.getElementById(
 		"appflowy-fetch-workspaces-btn"
 	) as HTMLButtonElement;
+	const connectedRow = document.getElementById(
+		"appflowy-connected-row"
+	) as HTMLDivElement;
+	const connectedEmailEl = document.getElementById(
+		"appflowy-connected-email"
+	) as HTMLDivElement;
+	const disconnectBtn = document.getElementById(
+		"appflowy-disconnect-btn"
+	) as HTMLButtonElement;
+
+	// The sign-in items to show/hide based on connected state
+	const signInItem = emailInput?.closest(
+		".setting-item"
+	) as HTMLElement | null;
+
+	const showConnectedState = (email: string) => {
+		if (signInItem) signInItem.style.display = "none";
+		if (otpRow) otpRow.style.display = "none";
+		if (connectedEmailEl) connectedEmailEl.textContent = email;
+		if (connectedRow) connectedRow.style.display = "";
+	};
+
+	const showSignInState = () => {
+		if (connectedRow) connectedRow.style.display = "none";
+		if (signInItem) signInItem.style.display = "";
+		if (otpRow) otpRow.style.display = "none";
+		if (emailInput) emailInput.value = "";
+	};
 
 	if (serverUrlInput)
 		serverUrlInput.value = generalSettings.appflowyConfig.serverUrl;
@@ -595,6 +623,11 @@ function initializeAppflowySettings(): void {
 		apiTokenInput.value = generalSettings.appflowyConfig.apiToken;
 	if (workspaceIdInput)
 		workspaceIdInput.value = generalSettings.appflowyConfig.workspaceId;
+
+	// Show connected state on load if already authenticated
+	if (generalSettings.appflowyConfig.apiToken) {
+		showConnectedState(generalSettings.appflowyConfig.userEmail || "");
+	}
 
 	// "Send OTP code" button — sends a 6-digit sign-in code to the user's email via GoTrue
 	if (sendOtpBtn) {
@@ -711,10 +744,13 @@ function initializeAppflowySettings(): void {
 					);
 				}
 
+				// Store email in config before saving
+				generalSettings.appflowyConfig.userEmail = email;
 				await saveAppflowyConfigNow();
 				verifyOtpBtn.textContent = "✓ Connected!";
 				if (otpRow) otpRow.style.display = "none";
 				if (otpCodeInput) otpCodeInput.value = "";
+				showConnectedState(email);
 				setTimeout(() => {
 					verifyOtpBtn.textContent = originalText;
 				}, 3000);
@@ -742,6 +778,7 @@ function initializeAppflowySettings(): void {
 				workspaceIdInput?.value ||
 				generalSettings.appflowyConfig.workspaceId,
 			parentViewId: generalSettings.appflowyConfig.parentViewId,
+			userEmail: generalSettings.appflowyConfig.userEmail,
 		};
 		try {
 			await browser.storage.sync.set({ appflowy_config: values });
@@ -751,6 +788,19 @@ function initializeAppflowySettings(): void {
 			console.error("[AppFlowy] Storage write FAILED:", err);
 		}
 	};
+
+	if (disconnectBtn) {
+		disconnectBtn.addEventListener("click", async () => {
+			generalSettings.appflowyConfig = {
+				...generalSettings.appflowyConfig,
+				apiToken: "",
+				userEmail: "",
+			};
+			if (apiTokenInput) apiTokenInput.value = "";
+			await saveAppflowyConfigNow();
+			showSignInState();
+		});
+	}
 
 	const saveAppflowyConfig = debounce(saveAppflowyConfigNow, 500);
 

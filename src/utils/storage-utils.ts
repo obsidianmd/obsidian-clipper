@@ -64,6 +64,7 @@ export let generalSettings: Settings = {
 		apiToken: "",
 		workspaceId: "",
 		parentViewId: "",
+		userEmail: "",
 	},
 };
 
@@ -133,6 +134,7 @@ interface StorageData {
 		apiToken?: string;
 		workspaceId?: string;
 		parentViewId?: string;
+		userEmail?: string;
 	};
 }
 
@@ -326,6 +328,9 @@ export async function loadSettings(): Promise<Settings> {
 			parentViewId:
 				data.appflowy_config?.parentViewId ??
 				defaultSettings.appflowyConfig.parentViewId,
+			userEmail:
+				data.appflowy_config?.userEmail ??
+				defaultSettings.appflowyConfig.userEmail,
 		},
 	};
 
@@ -384,6 +389,7 @@ export async function saveSettings(
 			apiToken: generalSettings.appflowyConfig.apiToken,
 			workspaceId: generalSettings.appflowyConfig.workspaceId,
 			parentViewId: generalSettings.appflowyConfig.parentViewId,
+			userEmail: generalSettings.appflowyConfig.userEmail,
 		},
 	});
 }

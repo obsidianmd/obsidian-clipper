@@ -67,6 +67,7 @@ export interface AppflowyConfig {
 	apiToken: string;
 	workspaceId: string;
 	parentViewId: string;
+	userEmail?: string;
 }
 
 export interface ReaderSettings {

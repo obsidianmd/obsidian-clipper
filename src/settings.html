@@ -65,6 +65,15 @@
 											<button type="button" id="appflowy-verify-otp-btn" class="btn mod-cta" style="width: 100%; margin-top: 0.5rem;" data-i18n="appflowyVerifyAndConnect">Verify &amp; connect</button>
 										</div>
 									</div>
+									<div class="setting-item mod-horizontal" id="appflowy-connected-row" style="display: none;">
+										<div class="setting-item-info">
+											<label>Connected as</label>
+											<div class="setting-item-description" id="appflowy-connected-email"></div>
+										</div>
+										<div class="setting-item-control">
+											<button type="button" id="appflowy-disconnect-btn" class="btn">Disconnect</button>
+										</div>
+									</div>
 									<div class="setting-item mod-horizontal" style="display: none;">
 										<div class="setting-item-info">
 											<label for="appflowy-server-url" data-i18n="appflowyServerUrl">Server URL</label>
@@ -83,7 +92,7 @@
 											<input type="password" id="appflowy-api-token" placeholder="••••••••" autocomplete="off" spellcheck="false" />
 										</div>
 									</div>
-									<div class="setting-item mod-horizontal">
+									<div class="setting-item mod-horizontal" style="display:none;">
 										<div class="setting-item-info">
 											<label for="appflowy-workspace-id" data-i18n="appflowyWorkspaceId">Workspace ID</label>
 											<div class="setting-item-description" data-i18n="appflowyWorkspaceIdDescription">The ID of your AppFlowy workspace where pages will be saved.</div>
