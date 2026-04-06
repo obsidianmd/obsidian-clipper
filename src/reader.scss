@@ -296,6 +296,14 @@
 				0 -8px 24px 24px var(--background-primary);
 		}
 	}
+	::highlight(transcript-playback) {
+		background-color: var(--text-selection);
+	}
+	::highlight(transcript-hover) {
+		text-decoration: underline;
+		text-decoration-color: var(--text-normal);
+		text-underline-offset: 2px;
+	}
 	.transcript-segment {
 		border-radius: var(--radius-s);
 		corner-shape: var(--corner-shape);
@@ -323,10 +331,7 @@
 		}
 	}
 	.transcript-segment.is-active {
-		.transcript-segment-text {
-			background: var(--background-primary-alt);
-			box-shadow: 0 0 0 0.25em var(--background-primary-alt);
-		}
+
 		.timestamp {
 			color: var(--text-normal);
 		}
@@ -359,7 +364,7 @@
 			mix-blend-mode: multiply;
 		}
 	}
-	.youtube.transcript:hover .transcript-scrub-hover {
+	.transcript-scrub-track:hover .transcript-scrub-hover {
 		opacity: 1;
 	}
 	figure {

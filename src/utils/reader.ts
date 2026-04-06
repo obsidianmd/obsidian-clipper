@@ -725,6 +725,14 @@ export class Reader {
 		return player ? player.getBoundingClientRect().height + 16 : 0;
 	}
 
+	private static scrollToElement(el: Element): void {
+		const rect = el.getBoundingClientRect();
+		const stickyOffset = this.getStickyOffset();
+		const gap = stickyOffset > 0 ? stickyOffset + window.innerHeight * 0.02 : window.innerHeight * 0.05;
+		const targetY = (window.pageYOffset || document.documentElement.scrollTop) + rect.top - gap;
+		this.scrollTo(targetY);
+	}
+
 	private static scrollTo(targetY: number, duration = 200): void {
 		const startY = window.pageYOffset;
 		const distance = targetY - startY;
@@ -740,7 +748,7 @@ export class Reader {
 			if (t < 1) {
 				requestAnimationFrame(step);
 			} else {
-				setTimeout(() => { ReaderView.programmaticScroll = false; }, 50);
+				setTimeout(() => { Reader.programmaticScroll = false; }, 50);
 			}
 		};
 
@@ -854,10 +862,7 @@ export class Reader {
 			item.textContent = heading.textContent;
 			
 			item.addEventListener('click', () => {
-				const rect = heading.getBoundingClientRect();
-				const stickyOffset = this.getStickyOffset();
-						const targetY = (window.pageYOffset || doc.documentElement.scrollTop) + rect.top - (stickyOffset > 0 ? stickyOffset + window.innerHeight * 0.02 : window.innerHeight * 0.05);
-				this.scrollTo(targetY);
+				this.scrollToElement(heading);
 			});
 
 			outline.appendChild(item);
@@ -936,10 +941,7 @@ export class Reader {
 			item.textContent = getMessage('readerFootnotes');
 			
 			item.addEventListener('click', () => {
-				const rect = footnotes.getBoundingClientRect();
-				const stickyOffset = this.getStickyOffset();
-						const targetY = (window.pageYOffset || doc.documentElement.scrollTop) + rect.top - (stickyOffset > 0 ? stickyOffset + window.innerHeight * 0.02 : window.innerHeight * 0.05);
-				this.scrollTo(targetY);
+				this.scrollToElement(footnotes);
 			});
 
 			outline.appendChild(item);
@@ -2147,7 +2149,7 @@ export class Reader {
 
 			// Make YouTube iframe sticky when a transcript follows,
 			// and wire up timestamp clicks to seek the video
-			const transcript = article.querySelector('.youtube.transcript');
+			const transcript = article.querySelector('.youtube.transcript') as HTMLElement | null;
 			if (transcript) {
 				const iframe = article.querySelector('iframe[src*="youtube.com/embed/"]') as HTMLIFrameElement | null;
 				if (iframe) {
@@ -2209,16 +2211,18 @@ export class Reader {
 					// Track active segment based on video current time
 					let activeSegment: HTMLElement | null = null;
 					let activeIndex = -1;
-					let autoScroll = true;
 					let suppressScroll = false;
 					let lastUserScroll = 0;
+					let lastCurrentTime = -1;
 
 					window.addEventListener('scroll', () => {
-						if (ReaderView.programmaticScroll || scrubbing) return;
+						if (Reader.programmaticScroll || scrubbing) return;
 						lastUserScroll = Date.now();
 					}, { passive: true });
 
 					const updateActiveSegment = (currentTime: number) => {
+						if (Math.abs(currentTime - lastCurrentTime) < 0.05) return;
+						lastCurrentTime = currentTime;
 						let newIndex = -1;
 						for (let i = segmentTimes.length - 1; i >= 0; i--) {
 							if (currentTime >= segmentTimes[i]) {
@@ -2235,7 +2239,7 @@ export class Reader {
 							if (newIndex >= 0) {
 								segments[newIndex].classList.add('is-active');
 								// Auto-scroll to keep active segment visible
-								if (autoScroll && !suppressScroll && Date.now() - lastUserScroll > 2000) {
+								if (!suppressScroll && Date.now() - lastUserScroll > 2000) {
 									const rect = segments[newIndex].getBoundingClientRect();
 									const stickyOffset = this.getStickyOffset();
 									const targetY = (window.pageYOffset || doc.documentElement.scrollTop)
@@ -2258,6 +2262,73 @@ export class Reader {
 							const yInTrack = (segRect.top - trackRect.top) + segProgress * segRect.height;
 							const trackProgress = yInTrack / trackRect.height;
 							scrubTrack.style.setProperty('--track-progress', (trackProgress * 100) + '%');
+
+							// Update playback highlight — underline the current line
+							if (playbackHighlight) {
+								playbackHighlight.clear();
+								const textEl = activeSegment.querySelector('.transcript-segment-text');
+								const textNode = textEl?.firstChild;
+								if (textNode && textNode.nodeType === Node.TEXT_NODE) {
+									const totalLen = (textNode.textContent || '').length;
+									const charPos = Math.min(totalLen - 1, Math.max(0, Math.round(segProgress * totalLen)));
+
+									// Find lines around the current position
+									const probe = doc.createRange();
+									const getLineY = (pos: number) => {
+										probe.setStart(textNode!, Math.min(pos, totalLen - 1));
+										probe.setEnd(textNode!, Math.min(pos + 1, totalLen));
+										return probe.getClientRects()[0]?.top;
+									};
+
+									const lineY = getLineY(charPos);
+									if (lineY === undefined) return;
+
+									// Scan backward to find start of current sentence
+									// but limit to ~2 lines back so run-ons don't over-highlight
+									const text = textNode.textContent || '';
+									let start = 0;
+									if (segProgress > 0.05) {
+										start = charPos;
+										let backLineChanges = 0;
+										let backLastY = lineY;
+										while (start > 0) {
+											if (/[.!?]/.test(text[start - 1]) && /\s/.test(text[start])) {
+												while (start < charPos && /\s/.test(text[start])) start++;
+												break;
+											}
+											const y = getLineY(start - 1);
+											if (y !== undefined && Math.abs(y - backLastY) > 2) {
+												backLineChanges++;
+												if (backLineChanges >= 2) break;
+												backLastY = y;
+											}
+											start--;
+										}
+									}
+
+									// Scan forward: up to 3 lines total, stop at sentence end or comma
+									let end = charPos + 1;
+									let fwdLines = 0;
+									let fwdLastY = lineY;
+									while (end < totalLen && fwdLines < 3) {
+										const y = getLineY(end);
+										if (y === undefined) break;
+										if (Math.abs(y - fwdLastY) > 2) {
+											fwdLines++;
+											if (fwdLines >= 3) break;
+											fwdLastY = y;
+										}
+										// After moving past the start, stop at sentence punctuation or comma
+										if (end > charPos + 1 && /[.!?,]/.test(text[end - 1]) && (end >= totalLen || /\s/.test(text[end]))) break;
+										end++;
+									}
+
+									const range = doc.createRange();
+									range.setStart(textNode, start);
+									range.setEnd(textNode, end);
+									playbackHighlight.add(range);
+								}
+							}
 						}
 					};
 
@@ -2306,12 +2377,91 @@ export class Reader {
 					transcript.style.position = 'relative';
 					transcript.appendChild(scrubTrack);
 
-					transcript.addEventListener('mousemove', (e) => {
+					// Word highlights using CSS Custom Highlight API
+					const hasHighlights = !!(CSS as any).highlights;
+					const playbackHighlight = hasHighlights ? new (window as any).Highlight() : null;
+					const hoverHighlight = hasHighlights ? new (window as any).Highlight() : null;
+					if (hasHighlights) {
+						(CSS as any).highlights.set('transcript-playback', playbackHighlight);
+						(CSS as any).highlights.set('transcript-hover', hoverHighlight);
+					}
+
+					const getCaretNode = (x: number, y: number): { node: Node; offset: number } | null => {
+						if ('caretPositionFromPoint' in doc) {
+							const pos = (doc as any).caretPositionFromPoint(x, y);
+							if (pos) return { node: pos.offsetNode, offset: pos.offset };
+						} else if ('caretRangeFromPoint' in doc) {
+							const range = (doc as any).caretRangeFromPoint(x, y) as Range | null;
+							if (range) return { node: range.startContainer, offset: range.startOffset };
+						}
+						return null;
+					};
+
+					const getHoverRange = (textNode: Node, offset: number): Range | null => {
+						const text = textNode.textContent || '';
+						const totalWords = 8;
+
+						// Forward first: up to 6 words, stop at sentence boundary
+						// Commas act as soft stops — prefer stopping at a comma if we have 4+ words
+						let end = offset;
+						let wordsForward = 0;
+						let lastComma = -1;
+						let wordsAtComma = 0;
+						while (end < text.length && wordsForward < 6) {
+							if (/[.!?]/.test(text[end - 1]) && (end >= text.length || /\s/.test(text[end]))) break;
+							if (text[end - 1] === ',' && wordsForward >= 3) {
+								lastComma = end;
+								wordsAtComma = wordsForward;
+							}
+							end++;
+							if (end < text.length && /\s/.test(text[end - 1]) && /\S/.test(text[end])) wordsForward++;
+						}
+						// Prefer comma stop if we went past it
+						if (lastComma > 0 && wordsForward > wordsAtComma) {
+							end = lastComma;
+							wordsForward = wordsAtComma;
+						}
+
+						// Backward: if forward hit punctuation, limit to 2 words back
+						const hitPunctuation = end < text.length && /[.!?]/.test(text[end - 1]);
+						const maxBack = hitPunctuation ? 2 : Math.max(1, totalWords - wordsForward);
+						let start = offset;
+						let wordsBack = 0;
+						while (start > 0 && wordsBack < maxBack) {
+							if (/[.!?]/.test(text[start - 1]) && /\s/.test(text[start])) break;
+							start--;
+							if (start > 0 && /\s/.test(text[start]) && /\S/.test(text[start - 1])) wordsBack++;
+						}
+
+						// Trim whitespace at edges
+						while (start < offset && /\s/.test(text[start])) start++;
+						while (end > offset && /\s/.test(text[end - 1])) end--;
+						if (start >= end) return null;
+						const range = doc.createRange();
+						range.setStart(textNode, start);
+						range.setEnd(textNode, end);
+						return range;
+					};
+
+					const updateHoverHighlight = (e: MouseEvent) => {
+						if (!hoverHighlight) return;
+						hoverHighlight.clear();
+						const seg = (e.target as HTMLElement).closest('.transcript-segment-text');
+						if (!seg) return;
+						const caret = getCaretNode(e.clientX, e.clientY);
+						if (!caret || caret.node.nodeType !== Node.TEXT_NODE || !seg.contains(caret.node)) return;
+						const range = getHoverRange(caret.node, caret.offset);
+						if (range) hoverHighlight.add(range);
+					};
+
+					transcript.addEventListener('mousemove', (e: MouseEvent) => {
 						const rect = scrubTrack.getBoundingClientRect();
 						scrubHover.style.top = (e.clientY - rect.top) + 'px';
+						updateHoverHighlight(e);
 					});
-					transcript.addEventListener('mouseleave', () => {
+					transcript.addEventListener('mouseleave', (e: MouseEvent) => {
 						scrubHover.style.top = '';
+						if (hoverHighlight) hoverHighlight.clear();
 					});
 					// Position from first segment to bottom
 					const positionTrack = () => {
@@ -2357,6 +2507,71 @@ export class Reader {
 
 					window.addEventListener('mouseup', () => {
 						scrubbing = false;
+					});
+
+					// Click anywhere in a segment to seek to that position
+					transcript.addEventListener('click', (e: MouseEvent) => {
+						// Don't seek if highlighter is active or user was selecting text
+						if (doc.body.classList.contains('obsidian-highlighter-active')) return;
+						const selection = window.getSelection();
+						if (selection && selection.toString().length > 0) return;
+
+						const seg = (e.target as HTMLElement).closest('.transcript-segment') as HTMLElement | null;
+						if (!seg) return;
+						const idx = segments.indexOf(seg);
+						if (idx < 0) return;
+
+						const start = segmentTimes[idx];
+						const end = idx < segmentTimes.length - 1
+							? segmentTimes[idx + 1]
+							: start + 30;
+
+						// Use caret position to estimate character-level progress
+						const textEl = seg.querySelector('.transcript-segment-text');
+						if (textEl) {
+							const totalLen = (textEl.textContent || '').length;
+							if (totalLen > 0) {
+								// Resolve caret position from click coordinates
+								let caretNode: Node | null = null;
+								let caretOffset = 0;
+								if ('caretPositionFromPoint' in doc) {
+									const pos = (doc as any).caretPositionFromPoint(e.clientX, e.clientY);
+									if (pos && textEl.contains(pos.offsetNode)) {
+										caretNode = pos.offsetNode;
+										caretOffset = pos.offset;
+									}
+								} else if ('caretRangeFromPoint' in doc) {
+									const range = (doc as any).caretRangeFromPoint(e.clientX, e.clientY) as Range | null;
+									if (range && textEl.contains(range.startContainer)) {
+										caretNode = range.startContainer;
+										caretOffset = range.startOffset;
+									}
+								}
+
+								let charOffset = totalLen;
+								if (caretNode) {
+									const walker = doc.createTreeWalker(textEl, NodeFilter.SHOW_TEXT);
+									charOffset = 0;
+									let node: Node | null;
+									while ((node = walker.nextNode())) {
+										if (node === caretNode) {
+											charOffset += caretOffset;
+											break;
+										}
+										charOffset += (node.textContent || '').length;
+									}
+								}
+
+								const progress = Math.min(1, Math.max(0, charOffset / totalLen));
+								seekTo(start + progress * (end - start));
+								return;
+							}
+						}
+
+						// Fallback to Y position
+						const rect = seg.getBoundingClientRect();
+						const progress = Math.min(1, Math.max(0, (e.clientY - rect.top) / rect.height));
+						seekTo(start + progress * (end - start));
 					});
 				}
 			}
