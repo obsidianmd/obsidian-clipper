@@ -134,7 +134,10 @@ async function initialize() {
 		
 		// Initialize context menu
 		await debouncedUpdateContextMenu(-1);
-		
+
+		// Set up action popup based on openBehavior setting
+		await updateActionPopup();
+
 		console.log('Background script initialized successfully');
 	} catch (error) {
 		console.error('Error initializing background script:', error);
@@ -293,7 +296,7 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 		}
 
 		if (typedRequest.action === "openPopup") {
-			browser.action.openPopup()
+			openPopup()
 				.then(() => {
 					sendResponse({ success: true });
 				})
@@ -335,6 +338,22 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 					sendResponse({success: false, error: 'No active tab found'});
 				}
 			});
+			return true;
+		}
+
+		if (typedRequest.action === "toggleIframe") {
+			const tab = sender.tab;
+			if (tab?.id && tab.url && isValidUrl(tab.url) && !isBlankPage(tab.url)) {
+				ensureContentScriptLoadedInBackground(tab.id)
+					.then(() => browser.tabs.sendMessage(tab.id!, { action: "toggle-iframe" }))
+					.then(() => sendResponse({ success: true }))
+					.catch((error) => {
+						console.error('Error toggling iframe:', error);
+						sendResponse({ success: false, error: error instanceof Error ? error.message : String(error) });
+					});
+			} else {
+				sendResponse({ success: false, error: 'Cannot open iframe on this page' });
+			}
 			return true;
 		}
 
@@ -391,12 +410,9 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 		}
 
 		if (typedRequest.action === "openPopup") {
-			try {
-				browser.action.openPopup();
-				sendResponse({success: true});
-			} catch (error) {
-				sendResponse({success: false, error: error instanceof Error ? error.message : String(error)});
-			}
+			openPopup()
+				.then(() => sendResponse({success: true}))
+				.catch((error) => sendResponse({success: false, error: error instanceof Error ? error.message : String(error)}));
 			return true;
 		}
 
@@ -537,7 +553,7 @@ browser.commands.onCommand.addListener(async (command, tab) => {
 
 	if (command === 'quick_clip') {
 		if (tab?.id) {
-			browser.action.openPopup();
+			openPopup();
 			setTimeout(() => {
 				browser.runtime.sendMessage({action: "triggerQuickClip"})
 					.catch(error => console.error("Failed to send quick clip message:", error));
@@ -640,7 +656,7 @@ const debouncedUpdateContextMenu = debounce(async (tabId: number) => {
 
 browser.contextMenus.onClicked.addListener(async (info, tab) => {
 	if (info.menuItemId === "open-obsidian-clipper") {
-		browser.action.openPopup();
+		openPopup();
 	} else if (info.menuItemId === "enter-highlighter" && tab && tab.id) {
 		await setHighlighterMode(tab.id, true);
 	} else if (info.menuItemId === "exit-highlighter" && tab && tab.id) {
@@ -818,6 +834,57 @@ async function injectReaderScript(tabId: number) {
 		return false;
 	}
 }
+
+// Update the browser action popup based on openBehavior setting.
+// When set to 'reader' or 'embedded', we clear the popup so action.onClicked fires
+// instead, allowing us to handle the action directly without briefly opening the popup.
+async function updateActionPopup(openBehavior?: string): Promise<void> {
+	if (!openBehavior) {
+		const data = await browser.storage.sync.get('general_settings');
+		openBehavior = (data.general_settings as Record<string, string>)?.openBehavior;
+	}
+	currentOpenBehavior = openBehavior;
+	if (openBehavior === 'reader' || openBehavior === 'embedded') {
+		await browser.action.setPopup({ popup: '' });
+	} else {
+		await browser.action.setPopup({ popup: 'popup.html' });
+	}
+}
+
+let currentOpenBehavior: string | undefined;
+
+// Opens the popup, or toggles the embedded iframe when in reader/embedded mode.
+async function openPopup(): Promise<void> {
+	if (currentOpenBehavior === 'reader' || currentOpenBehavior === 'embedded') {
+		const tabs = await browser.tabs.query({ active: true, currentWindow: true });
+		const tab = tabs[0];
+		if (tab?.id && tab.url && isValidUrl(tab.url) && !isBlankPage(tab.url)) {
+			await ensureContentScriptLoadedInBackground(tab.id);
+			await browser.tabs.sendMessage(tab.id, { action: "toggle-iframe" });
+		}
+		return;
+	}
+	await browser.action.openPopup();
+}
+
+browser.action.onClicked.addListener(async (tab) => {
+	if (!tab?.id || !tab.url || !isValidUrl(tab.url) || isBlankPage(tab.url)) return;
+
+	if (currentOpenBehavior === 'reader') {
+		await ensureContentScriptLoadedInBackground(tab.id);
+		await injectReaderScript(tab.id);
+		await browser.tabs.sendMessage(tab.id, { action: "toggleReaderMode" });
+	} else if (currentOpenBehavior === 'embedded') {
+		await ensureContentScriptLoadedInBackground(tab.id);
+		await browser.tabs.sendMessage(tab.id, { action: "toggle-iframe" });
+	}
+});
+
+browser.storage.onChanged.addListener((changes, area) => {
+	if (area === 'sync' && changes.general_settings) {
+		updateActionPopup((changes.general_settings.newValue as Record<string, string>)?.openBehavior);
+	}
+});
 
 // Initialize the extension
 initialize().catch(error => {

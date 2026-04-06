@@ -206,7 +206,7 @@ export class Reader {
 			item.addEventListener('click', async () => {
 				if (action === 'addToObsidian') {
 					clipDropdown.classList.remove('is-open');
-					browser.runtime.sendMessage({ action: 'openPopup' });
+					browser.runtime.sendMessage({ action: 'toggleIframe' });
 				} else if (action === 'copyToClipboard') {
 					const originalText = itemLabel.textContent;
 					browser.runtime.sendMessage({ action: 'copyMarkdownToClipboard' });

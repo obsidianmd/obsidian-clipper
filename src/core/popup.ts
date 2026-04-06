@@ -286,7 +286,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 		const currentBrowser = await detectBrowser();
 		const isMobile = currentBrowser === 'mobile-safari';
 
-		const openBehavior: Settings['openBehavior'] = isMobile ? 'popup' : loadedSettings.openBehavior;
+		const openBehavior: Settings['openBehavior'] = isMobile && loadedSettings.openBehavior !== 'reader' ? 'popup' : loadedSettings.openBehavior;
 
 		// Check if we should open in an iframe, but only if the URL is valid
 		if (isValidUrl(tab.url) && !isBlankPage(tab.url) && openBehavior === 'embedded' && !isIframe && !isSidePanel) {
@@ -301,6 +301,23 @@ document.addEventListener('DOMContentLoaded', async function() {
 				}
 			} catch (error) {
 				console.error('Error toggling iframe:', error);
+				// If there's an error, we'll fall through and open the normal popup.
+			}
+		}
+
+		// Check if we should open in reader mode
+		if (isValidUrl(tab.url) && !isBlankPage(tab.url) && openBehavior === 'reader' && !isIframe && !isSidePanel) {
+			try {
+				const response = await browser.runtime.sendMessage({
+					action: "toggleReaderMode",
+					tabId: currentTabId
+				}) as ReaderModeResponse;
+				if (response && response.success) {
+					window.close();
+					return;
+				}
+			} catch (error) {
+				console.error('Error toggling reader mode:', error);
 				// If there's an error, we'll fall through and open the normal popup.
 			}
 		}
