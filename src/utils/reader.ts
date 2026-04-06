@@ -2208,12 +2208,17 @@ export class Reader {
 						return parseFloat(ts?.getAttribute('data-timestamp') || '0');
 					});
 
+					const FALLBACK_SEGMENT_DURATION = 30;
+					const AUTO_SCROLL_COOLDOWN = 2000;
+
 					// Track active segment based on video current time
 					let activeSegment: HTMLElement | null = null;
 					let activeIndex = -1;
 					let suppressScroll = false;
 					let lastUserScroll = 0;
 					let lastCurrentTime = -1;
+					let scrubbing = false;
+					let lastScrub = 0;
 
 					window.addEventListener('scroll', () => {
 						if (Reader.programmaticScroll || scrubbing) return;
@@ -2239,7 +2244,7 @@ export class Reader {
 							if (newIndex >= 0) {
 								segments[newIndex].classList.add('is-active');
 								// Auto-scroll to keep active segment visible
-								if (!suppressScroll && Date.now() - lastUserScroll > 2000) {
+								if (!suppressScroll && Date.now() - lastUserScroll > AUTO_SCROLL_COOLDOWN) {
 									const rect = segments[newIndex].getBoundingClientRect();
 									const stickyOffset = this.getStickyOffset();
 									const targetY = (window.pageYOffset || doc.documentElement.scrollTop)
@@ -2257,7 +2262,7 @@ export class Reader {
 							const start = segmentTimes[activeIndex];
 							const end = activeIndex < segmentTimes.length - 1
 								? segmentTimes[activeIndex + 1]
-								: start + 30;
+								: start + FALLBACK_SEGMENT_DURATION;
 							const segProgress = Math.min(1, Math.max(0, (currentTime - start) / (end - start)));
 							const yInTrack = (segRect.top - trackRect.top) + segProgress * segRect.height;
 							const trackProgress = yInTrack / trackRect.height;
@@ -2296,11 +2301,14 @@ export class Reader {
 												while (start < charPos && /\s/.test(text[start])) start++;
 												break;
 											}
-											const y = getLineY(start - 1);
-											if (y !== undefined && Math.abs(y - backLastY) > 2) {
-												backLineChanges++;
-												if (backLineChanges >= 2) break;
-												backLastY = y;
+											// Check line changes in steps to reduce layout queries
+											if (start % 8 === 0 || start === 1) {
+												const y = getLineY(start - 1);
+												if (y !== undefined && Math.abs(y - backLastY) > 2) {
+													backLineChanges++;
+													if (backLineChanges >= 2) break;
+													backLastY = y;
+												}
 											}
 											start--;
 										}
@@ -2311,14 +2319,16 @@ export class Reader {
 									let fwdLines = 0;
 									let fwdLastY = lineY;
 									while (end < totalLen && fwdLines < 3) {
-										const y = getLineY(end);
-										if (y === undefined) break;
-										if (Math.abs(y - fwdLastY) > 2) {
-											fwdLines++;
-											if (fwdLines >= 3) break;
-											fwdLastY = y;
+										// Check line changes in steps
+										if (end % 8 === 0 || end === charPos + 1) {
+											const y = getLineY(end);
+											if (y === undefined) break;
+											if (Math.abs(y - fwdLastY) > 2) {
+												fwdLines++;
+												if (fwdLines >= 3) break;
+												fwdLastY = y;
+											}
 										}
-										// After moving past the start, stop at sentence punctuation or comma
 										if (end > charPos + 1 && /[.!?,]/.test(text[end - 1]) && (end >= totalLen || /\s/.test(text[end]))) break;
 										end++;
 									}
@@ -2459,7 +2469,7 @@ export class Reader {
 						scrubHover.style.top = (e.clientY - rect.top) + 'px';
 						updateHoverHighlight(e);
 					});
-					transcript.addEventListener('mouseleave', (e: MouseEvent) => {
+					transcript.addEventListener('mouseleave', () => {
 						scrubHover.style.top = '';
 						if (hoverHighlight) hoverHighlight.clear();
 					});
@@ -2480,15 +2490,12 @@ export class Reader {
 								const start = segmentTimes[i];
 								const end = i < segmentTimes.length - 1
 									? segmentTimes[i + 1]
-									: start + 30;
+									: start + FALLBACK_SEGMENT_DURATION;
 								return start + progress * (end - start);
 							}
 						}
 						return segmentTimes[0] || 0;
 					};
-
-					let scrubbing = false;
-					let lastScrub = 0;
 
 					scrubTrack.addEventListener('mousedown', (e) => {
 						scrubbing = true;
@@ -2524,44 +2531,18 @@ export class Reader {
 						const start = segmentTimes[idx];
 						const end = idx < segmentTimes.length - 1
 							? segmentTimes[idx + 1]
-							: start + 30;
+							: start + FALLBACK_SEGMENT_DURATION;
 
 						// Use caret position to estimate character-level progress
 						const textEl = seg.querySelector('.transcript-segment-text');
 						if (textEl) {
 							const totalLen = (textEl.textContent || '').length;
 							if (totalLen > 0) {
-								// Resolve caret position from click coordinates
-								let caretNode: Node | null = null;
-								let caretOffset = 0;
-								if ('caretPositionFromPoint' in doc) {
-									const pos = (doc as any).caretPositionFromPoint(e.clientX, e.clientY);
-									if (pos && textEl.contains(pos.offsetNode)) {
-										caretNode = pos.offsetNode;
-										caretOffset = pos.offset;
-									}
-								} else if ('caretRangeFromPoint' in doc) {
-									const range = (doc as any).caretRangeFromPoint(e.clientX, e.clientY) as Range | null;
-									if (range && textEl.contains(range.startContainer)) {
-										caretNode = range.startContainer;
-										caretOffset = range.startOffset;
-									}
-								}
-
+								const caret = getCaretNode(e.clientX, e.clientY);
 								let charOffset = totalLen;
-								if (caretNode) {
-									const walker = doc.createTreeWalker(textEl, NodeFilter.SHOW_TEXT);
-									charOffset = 0;
-									let node: Node | null;
-									while ((node = walker.nextNode())) {
-										if (node === caretNode) {
-											charOffset += caretOffset;
-											break;
-										}
-										charOffset += (node.textContent || '').length;
-									}
+								if (caret && caret.node.nodeType === Node.TEXT_NODE && textEl.contains(caret.node)) {
+									charOffset = caret.offset;
 								}
-
 								const progress = Math.min(1, Math.max(0, charOffset / totalLen));
 								seekTo(start + progress * (end - start));
 								return;
