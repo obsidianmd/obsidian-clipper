@@ -23,7 +23,7 @@ Please refer to the [documentation](./docs) for details on how to install and us
 | ----------------- | -------- |
 | Chrome / Chromium | [Chrome Web Store](https://chromewebstore.google.com/detail/ngjmhmikhoegpfakpfofaafagoikejln?utm_source=item-share-cb) |
 | Firefox           | [Firefox Add-Ons](https://addons.mozilla.org/fr/firefox/addon/clipper-for-appflowy/) |
-| Safari            | [GitHub Releases](https://github.com/alexrosepizant/clipper-for-appflowy/releases/tag/v0.1.2) |
+| Safari            | [GitHub Releases](https://github.com/alexrosepizant/clipper-for-appflowy/releases/tag/v0.1.4) |
 
 ## Screenshots
 
