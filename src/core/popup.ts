@@ -207,6 +207,7 @@ async function initializeExtension(tabId: number) {
 
 		// Setup message listeners
 		setupMessageListeners();
+		setupStorageListeners();
 
 		await checkHighlighterModeState(tabId);
 
@@ -216,6 +217,22 @@ async function initializeExtension(tabId: number) {
 		showError('failedToInitialize');
 		return false;
 	}
+}
+
+const debouncedHighlightRefresh = debounce(() => {
+	if (currentTabId !== undefined) {
+		memoizedExtractPageContent.clear();
+		memoizedCompileTemplate.clear();
+		refreshFields(currentTabId, false, false);
+	}
+}, 300);
+
+function setupStorageListeners() {
+	browser.storage.local.onChanged.addListener((changes) => {
+		if (changes.highlights) {
+			debouncedHighlightRefresh();
+		}
+	});
 }
 
 function setupMessageListeners() {
@@ -252,10 +269,7 @@ function setupMessageListeners() {
 			}
 		} else if (request.action === "highlightsUpdated") {
 			if (request.tabId === currentTabId) {
-				// Refresh fields when highlights are updated
-				if (currentTabId !== undefined) {
-					refreshFields(currentTabId);
-				}
+				debouncedHighlightRefresh();
 			}
 		} else if (request.action === "updatePopupHighlighterUI") {
 			// This message is now handled by checkHighlighterModeState
@@ -627,7 +641,7 @@ async function waitForInterpreter(interpretBtn: HTMLButtonElement): Promise<void
 	});
 }
 
-async function refreshFields(tabId: number, checkTemplateTriggers: boolean = true) {
+async function refreshFields(tabId: number, checkTemplateTriggers: boolean = true, rebuildSkeleton: boolean = true) {
 	if (templates.length === 0) {
 		console.warn('No templates available');
 		showError('noTemplates');
@@ -667,9 +681,10 @@ async function refreshFields(tabId: number, checkTemplateTriggers: boolean = tru
 			}
 		}
 
-		// Show template skeleton immediately
-		buildTemplateFieldsSkeleton(currentTemplate);
-		setupMetadataToggle();
+		if (rebuildSkeleton) {
+			buildTemplateFieldsSkeleton(currentTemplate);
+			setupMetadataToggle();
+		}
 
 		const extractedData = await extractionPromise;
 		if (extractedData) {

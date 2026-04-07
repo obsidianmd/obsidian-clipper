@@ -169,6 +169,7 @@ export function undo() {
 			highlights = [...lastAction.oldHighlights];
 			applyHighlights();
 			saveHighlights();
+			notifyHighlightsUpdated();
 			updateHighlighterMenu();
 			updateUndoRedoButtons();
 		}
@@ -183,6 +184,7 @@ export function redo() {
 			highlights = [...nextAction.newHighlights];
 			applyHighlights();
 			saveHighlights();
+			notifyHighlightsUpdated();
 			updateHighlighterMenu();
 			updateUndoRedoButtons();
 		}
@@ -484,10 +486,11 @@ export function handleTextSelection(selection: Selection, notes?: string[]) {
 			addToHistory('add', oldGlobalHighlights, highlights); 
 		}
 		
-		sortHighlights(); // Sort once after all additions
-		applyHighlights(); // Apply once
-		saveHighlights();  // Save once
-		updateHighlighterMenu(); // Update menu once
+		sortHighlights();
+		applyHighlights();
+		saveHighlights();
+		notifyHighlightsUpdated();
+		updateHighlighterMenu();
 	}
 	selection.removeAllRanges();
 }
@@ -723,6 +726,7 @@ function addHighlight(highlight: AnyHighlightData, notes?: string[]) {
 	sortHighlights();
 	applyHighlights();
 	saveHighlights();
+	notifyHighlightsUpdated();
 	updateHighlighterMenu();
 }
 
@@ -941,11 +945,10 @@ export function applyHighlights() {
 
 	lastAppliedHighlights = currentHighlightsState;
 	isApplyingHighlights = false;
-	notifyHighlightsUpdated();
 }
 
 // Notify that highlights have been updated
-async function notifyHighlightsUpdated() {
+export async function notifyHighlightsUpdated() {
 	const response = await browser.runtime.sendMessage({ action: "getActiveTab" }) as { tabId?: number; error?: string };
 	if (response.tabId) {
 		browser.runtime.sendMessage({ action: "highlightsUpdated", tabId: response.tabId });
