@@ -101,11 +101,15 @@ async function resolveSelectorVariable(selectorExpr: string, tabId?: number): Pr
 	const attribute = attrMatch ? attrMatch[2] : undefined;
 
 	try {
-		const response = await browser.tabs.sendMessage(tabId, {
-			action: "extractContent",
-			selector: selector.replace(/\\"/g, '"'),
-			attribute: attribute,
-			extractHtml: extractHtml
+		const response = await browser.runtime.sendMessage({
+			action: "sendMessageToTab",
+			tabId: tabId,
+			message: {
+				action: "extractContent",
+				selector: selector.replace(/\\"/g, '"'),
+				attribute: attribute,
+				extractHtml: extractHtml
+			}
 		}) as { content: string | string[] };
 
 		return response ? response.content : undefined;
