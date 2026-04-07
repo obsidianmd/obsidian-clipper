@@ -8,8 +8,7 @@ import {
 	applyHighlights,
 	saveHighlights,
 	updateHighlights,
-	updateHighlighterMenu,
-	notifyHighlightsUpdated
+	updateHighlighterMenu
 } from './highlighter';
 import { throttle } from './throttle';
 import { getElementByXPath, isDarkColor } from './dom-utils';
@@ -526,7 +525,6 @@ async function handleHighlightClick(event: Event) {
 		sortHighlights();
 		applyHighlights();
 		saveHighlights();
-		notifyHighlightsUpdated();
 		updateHighlighterMenu();
 	} catch (error) {
 		console.error('Error handling highlight click:', error);

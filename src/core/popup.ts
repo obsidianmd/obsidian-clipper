@@ -267,10 +267,6 @@ function setupMessageListeners() {
 					showError('onlyHttpSupported');
 				}
 			}
-		} else if (request.action === "highlightsUpdated") {
-			if (request.tabId === currentTabId) {
-				debouncedHighlightRefresh();
-			}
 		} else if (request.action === "updatePopupHighlighterUI") {
 			// This message is now handled by checkHighlighterModeState
 		} else if (request.action === "highlighterModeChanged") {

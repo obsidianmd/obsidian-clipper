@@ -167,10 +167,7 @@ export function undo() {
 		if (lastAction) {
 			redoHistory.push(lastAction);
 			highlights = [...lastAction.oldHighlights];
-			applyHighlights();
-			saveHighlights();
-			notifyHighlightsUpdated();
-			updateHighlighterMenu();
+			commitHighlightChanges();
 			updateUndoRedoButtons();
 		}
 	}
@@ -182,10 +179,7 @@ export function redo() {
 		if (nextAction) {
 			highlightHistory.push(nextAction);
 			highlights = [...nextAction.newHighlights];
-			applyHighlights();
-			saveHighlights();
-			notifyHighlightsUpdated();
-			updateHighlighterMenu();
+			commitHighlightChanges();
 			updateUndoRedoButtons();
 		}
 	}
@@ -487,10 +481,7 @@ export function handleTextSelection(selection: Selection, notes?: string[]) {
 		}
 		
 		sortHighlights();
-		applyHighlights();
-		saveHighlights();
-		notifyHighlightsUpdated();
-		updateHighlighterMenu();
+		commitHighlightChanges();
 	}
 	selection.removeAllRanges();
 }
@@ -724,10 +715,7 @@ function addHighlight(highlight: AnyHighlightData, notes?: string[]) {
 	highlights = mergedHighlights;
 	addToHistory('add', oldHighlights, mergedHighlights);
 	sortHighlights();
-	applyHighlights();
-	saveHighlights();
-	notifyHighlightsUpdated();
-	updateHighlighterMenu();
+	commitHighlightChanges();
 }
 
 // Sort highlights based on their vertical position
@@ -947,12 +935,12 @@ export function applyHighlights() {
 	isApplyingHighlights = false;
 }
 
-// Notify that highlights have been updated
-export async function notifyHighlightsUpdated() {
-	const response = await browser.runtime.sendMessage({ action: "getActiveTab" }) as { tabId?: number; error?: string };
-	if (response.tabId) {
-		browser.runtime.sendMessage({ action: "highlightsUpdated", tabId: response.tabId });
-	}
+// Apply, save, and update UI after highlight changes.
+// The popup/side-panel detects changes via storage.local.onChanged.
+function commitHighlightChanges() {
+	applyHighlights();
+	saveHighlights();
+	updateHighlighterMenu();
 }
 
 // Get all highlight contents
@@ -995,7 +983,6 @@ export function clearHighlights() {
 			removeExistingHighlights();
 			console.log('Highlights cleared for:', url);
 			browser.runtime.sendMessage({ action: "highlightsCleared" });
-			notifyHighlightsUpdated();
 			updateHighlighterMenu();
 			addToHistory('remove', oldHighlights, []);
 		});
