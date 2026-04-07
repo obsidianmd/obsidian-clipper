@@ -45,10 +45,13 @@ declare global {
 
 	function removeContainer(container: HTMLElement) {
 		container.classList.add('is-closing');
+		updateSidebarWidth(null);
 		container.addEventListener('animationend', () => {
 			container.remove();
-			updateSidebarWidth(null);
 		}, { once: true });
+		setTimeout(() => {
+			highlighter.repositionHighlights();
+		}, 200);
 	}
 
 	async function toggleIframe() {
@@ -93,6 +96,9 @@ declare global {
 
 		document.body.appendChild(container);
 		updateSidebarWidth(container);
+		container.addEventListener('animationend', () => {
+			highlighter.repositionHighlights();
+		}, { once: true });
 	}
 
 	function addResizeListener(container: HTMLElement, handle: HTMLElement, direction: string) {
@@ -163,6 +169,9 @@ declare global {
 				const newWidth = container.offsetWidth;
 				const newHeight = container.offsetHeight;
 				browser.storage.local.set({ clipperIframeWidth: newWidth, clipperIframeHeight: newHeight });
+
+				highlighter.invalidateHighlightCache();
+				highlighter.applyHighlights();
 
 				document.onmousemove = null;
 				document.onmouseup = null;

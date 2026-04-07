@@ -905,9 +905,14 @@ export function saveHighlights() {
 	}
 }
 
-// Apply all highlights to the page
 export function invalidateHighlightCache() {
 	lastAppliedHighlights = '';
+}
+
+// Force reposition of all highlight overlays after layout changes
+export function repositionHighlights() {
+	invalidateHighlightCache();
+	applyHighlights();
 }
 
 export function applyHighlights() {

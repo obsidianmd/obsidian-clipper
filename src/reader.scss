@@ -934,6 +934,10 @@
 	}
 }
 
+.obsidian-highlight-overlay {
+	z-index: 99;
+}
+
 .obsidian-reader-loading-text {
 	color: var(--text-faint);
 	font-size: 0.8em;
