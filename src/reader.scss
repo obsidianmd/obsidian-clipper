@@ -257,12 +257,14 @@
 		max-width: 100%;
 		height: auto;
 		border-radius: var(--radius-s);
+		corner-shape: var(--corner-shape);
 		vertical-align: bottom;
 	}
 	iframe {
 		max-width: 100%;
 		width: 100%;
 		border-radius: var(--radius-s);
+		corner-shape: var(--corner-shape);
 		overflow: hidden;
 		border: none;
 		&[src*="youtube.com"] {
@@ -1315,6 +1317,7 @@
 			border-radius: var(--radius-s);
 			mix-blend-mode: normal !important;
 			filter: none !important;
+			cursor: default;
 		}
 	}
 
@@ -1355,6 +1358,7 @@
 .obsidian-reader-active {
 	img:not(a img):not(figure img) {
 		position: relative;
+		cursor: zoom-in;
 		&:hover::after {
 			opacity: 1;
 		}
