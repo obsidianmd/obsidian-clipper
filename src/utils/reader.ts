@@ -250,11 +250,15 @@ export class Reader {
 		let lastScrollY = window.scrollY;
 		let scrollHidden = false;
 
+		const isMobile = window.matchMedia('(pointer: coarse)').matches;
+
 		const showButtons = () => {
 			if (scrollHidden) {
 				triggerGroup.style.opacity = '';
-				triggerGroup.style.visibility = '';
-				triggerGroup.style.pointerEvents = '';
+				if (isMobile) {
+					triggerGroup.style.visibility = '';
+					triggerGroup.style.pointerEvents = '';
+				}
 				scrollHidden = false;
 			}
 		};
@@ -265,8 +269,10 @@ export class Reader {
 			if (currentY > lastScrollY && currentY > 50) {
 				if (!scrollHidden) {
 					triggerGroup.style.opacity = '0';
-					triggerGroup.style.visibility = 'hidden';
-					triggerGroup.style.pointerEvents = 'none';
+					if (isMobile) {
+						triggerGroup.style.visibility = 'hidden';
+						triggerGroup.style.pointerEvents = 'none';
+					}
 					scrollHidden = true;
 				}
 			} else {
@@ -1907,11 +1913,12 @@ export class Reader {
 				}
 			}
 
-			const metadataItems = [
-				author ? author : '',
-				formattedDate || '',
-				domain ? domain : ''
-			].filter(Boolean);
+			const authors = author ? author.split(/,\s*/) : [];
+			const metadataItems: {text: string, type: string}[] = [
+				...authors.map(a => ({text: a, type: 'author'})),
+				formattedDate ? {text: formattedDate, type: 'date'} : null,
+				domain ? {text: domain, type: 'domain'} : null,
+			].filter((item): item is {text: string, type: string} => item !== null);
 
 			if (metadataItems.length > 0) {
 				const metadata = doc.createElement('div');
@@ -1927,13 +1934,16 @@ export class Reader {
 					}
 
 					const span = doc.createElement('span');
-					if (item === domain && domain) {
+					if (item.type === 'author') {
+						span.className = 'metadata-author';
+						span.textContent = item.text;
+					} else if (item.type === 'domain' && domain) {
 						const link = doc.createElement('a');
 						link.href = doc.URL;
 						link.textContent = domain;
 						span.appendChild(link);
 					} else {
-						span.textContent = item;
+						span.textContent = item.text;
 					}
 					metadataDetails.appendChild(span);
 				});

@@ -247,6 +247,11 @@
 		color: var(--text-muted);
 		font-size: 0.9em;
 
+		.metadata-author {
+			color: var(--text-normal);
+			font-weight: var(--font-medium);
+		}
+
 		a {
 			color: inherit;
 			text-decoration: none;
@@ -1316,7 +1321,7 @@
 		min-height: 0;
 
 		img {
-			max-width: 96vw;
+			max-width: 100vw;
 			max-height: calc(90vh - 100px);
 			height: 100%;
 			width: 100%;
