@@ -5,7 +5,7 @@ import { flattenShadowDom as flattenShadowDomUtil } from './flatten-shadow-dom';
 import { getLocalStorage, setLocalStorage } from './storage-utils';
 import hljs from 'highlight.js';
 import { getDomain } from './string-utils';
-import { applyHighlights, invalidateHighlightCache, loadHighlights } from './highlighter';
+import { applyHighlights, invalidateHighlightCache, loadHighlights, toggleHighlighterMenu } from './highlighter';
 import { copyToClipboard } from './clipboard-utils';
 import { getMessage, initializeI18n } from './i18n';
 import { getFontCss } from './font-utils';
@@ -160,14 +160,15 @@ export class Reader {
 			const response = await browser.runtime.sendMessage({ action: 'getActiveTab' }) as { tabId?: number };
 			if (response.tabId) {
 				await browser.runtime.sendMessage({ action: 'toggleHighlighterMode', tabId: response.tabId });
-				highlighterBtn.classList.toggle('is-active');
 			}
 		});
 
 		// Sync active state with highlighter mode
-		if (doc.body.classList.contains('obsidian-highlighter-active')) {
-			highlighterBtn.classList.add('is-active');
-		}
+		const syncHighlighterBtn = () => {
+			highlighterBtn.classList.toggle('is-active', doc.body.classList.contains('obsidian-highlighter-active'));
+		};
+		syncHighlighterBtn();
+		new MutationObserver(syncHighlighterBtn).observe(doc.body, { attributes: true, attributeFilter: ['class'] });
 
 		// Clip button with dropdown
 		const clipButton = doc.createElement('button');
@@ -1845,6 +1846,11 @@ export class Reader {
 
 			// Add settings bar
 			this.injectSettingsBar(doc);
+
+			// Re-activate highlighter if it was active before entering Reader
+			if (doc.body.classList.contains('obsidian-highlighter-active')) {
+				toggleHighlighterMenu(true);
+			}
 
 			// Re-attach the clipper iframe container if it exists
 			if (clipperIframeContainer) {
