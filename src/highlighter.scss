@@ -34,7 +34,7 @@
 	min-height: 320px;
 	height: calc(100% - 24px);
 	width: 350px;
-	z-index: 9999999999;
+	z-index: 999;
 	background-color: var(--obsidian-clipper-background-primary);
 	background-color: rgba(var(--obsidian-clipper-background-primary-rgb), var(--obsidian-clipper-background-opacity));
 	backdrop-filter: saturate(1.5) blur(32px);
