@@ -872,7 +872,6 @@ export class Reader {
 	}
 
 	private static observer: IntersectionObserver | null = null;
-	private static sidebarObserver: MutationObserver | null = null;
 	private static activePopover: HTMLElement | null = null;
 	private static activeFootnoteLink: HTMLAnchorElement | null = null;
 
@@ -1771,7 +1770,7 @@ export class Reader {
 
 			// Create left sidebar
 			const leftSidebar = doc.createElement('div');
-			leftSidebar.className = 'obsidian-left-sidebar';
+			leftSidebar.className = 'obsidian-reader-left-sidebar';
 			const outline = doc.createElement('div');
 			outline.className = 'obsidian-reader-outline';
 			leftSidebar.appendChild(outline);
@@ -1805,17 +1804,6 @@ export class Reader {
 			// Create right sidebar
 			const rightSidebar = doc.createElement('div');
 			rightSidebar.className = 'obsidian-reader-right-sidebar';
-
-			const clipperContainer = doc.getElementById('obsidian-clipper-container');
-			if (clipperContainer) {
-				rightSidebar.style.width = `${clipperContainer.offsetWidth + 24}px`;
-			}
-
-			this.sidebarObserver = new MutationObserver(() => {
-				const container = doc.getElementById('obsidian-clipper-container');
-				rightSidebar.style.width = container ? `${container.offsetWidth + 24}px` : '0px';
-			});
-			this.sidebarObserver.observe(doc.documentElement, { attributes: true, attributeFilter: ['style'] });
 
 			// Assemble and display the shell immediately
 			readerContainer.appendChild(leftSidebar);
@@ -2025,9 +2013,9 @@ export class Reader {
 			// Initialize content-dependent features
 			this.observer = this.generateOutline(doc, title);
 			if (!this.observer) {
-				const readerContent = doc.querySelector('.obsidian-reader-content') as HTMLElement;
-				if (readerContent) {
-					readerContent.style.setProperty('--sidebar-width', '30px');
+				const leftSidebar = doc.querySelector('.obsidian-reader-left-sidebar') as HTMLElement;
+				if (leftSidebar) {
+					leftSidebar.classList.add('is-empty');
 				}
 			}
 			this.initializeFootnotes(doc);
@@ -2053,11 +2041,7 @@ export class Reader {
 				this.observer.disconnect();
 				this.observer = null;
 			}
-			if (this.sidebarObserver) {
-				this.sidebarObserver.disconnect();
-				this.sidebarObserver = null;
-			}
-
+	
 			// Remove color scheme media query listener
 			if (this.colorSchemeMediaQuery) {
 				this.colorSchemeMediaQuery.removeEventListener('change', (e) => this.handleColorSchemeChange(e, doc));

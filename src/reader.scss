@@ -165,6 +165,13 @@
 		background-color: var(--text-selection);
 	}
 
+	.obsidian-reader-left-sidebar.is-empty ~ .obsidian-reader-content {
+		--sidebar-width: 30px;
+	}
+	.obsidian-reader-right-sidebar {
+		width: var(--clipper-sidebar-width, auto);
+	}
+
 	.obsidian-reader-content {
 		padding: max(4rem, 4vh) 0 0 !important;	
 		width: var(--line-width);
@@ -174,10 +181,6 @@
 			margin: 0 auto;
 			max-width: 100%;
 		}
-	}
-	.obsidian-left-sidebar,
-	.obsidian-right-sidebar {
-		max-width: var(--sidebar-width);
 	}
 
 	h1 {
@@ -1267,8 +1270,8 @@
 		width: 100%;
 		margin: 0 auto;
 	}
-	.obsidian-left-sidebar,
-	.obsidian-right-sidebar {
+	.obsidian-reader-left-sidebar,
+	.obsidian-reader-right-sidebar {
 		display: none;
 	}
 }
