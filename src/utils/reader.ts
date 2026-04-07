@@ -168,7 +168,8 @@ export class Reader {
 			highlighterBtn.classList.toggle('is-active', doc.body.classList.contains('obsidian-highlighter-active'));
 		};
 		syncHighlighterBtn();
-		new MutationObserver(syncHighlighterBtn).observe(doc.body, { attributes: true, attributeFilter: ['class'] });
+		this.highlighterObserver = new MutationObserver(syncHighlighterBtn);
+		this.highlighterObserver.observe(doc.body, { attributes: true, attributeFilter: ['class'] });
 
 		// Clip button with dropdown
 		const clipButton = doc.createElement('button');
@@ -878,6 +879,7 @@ export class Reader {
 	}
 
 	private static observer: IntersectionObserver | null = null;
+	private static highlighterObserver: MutationObserver | null = null;
 	private static activePopover: HTMLElement | null = null;
 	private static activeFootnoteLink: HTMLAnchorElement | null = null;
 
@@ -2050,6 +2052,10 @@ export class Reader {
 			if (this.observer) {
 				this.observer.disconnect();
 				this.observer = null;
+			}
+			if (this.highlighterObserver) {
+				this.highlighterObserver.disconnect();
+				this.highlighterObserver = null;
 			}
 	
 			// Remove color scheme media query listener

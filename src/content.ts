@@ -30,17 +30,17 @@ declare global {
 	const iframeId = 'obsidian-clipper-iframe';
 	const containerId = 'obsidian-clipper-container';
 
-	let sidebarWidthTimer: ReturnType<typeof setTimeout> | null = null;
+	let sidebarWidthRaf: number | null = null;
 
 	function updateSidebarWidth(container: HTMLElement | null) {
-		if (sidebarWidthTimer) clearTimeout(sidebarWidthTimer);
-		sidebarWidthTimer = setTimeout(() => {
+		if (sidebarWidthRaf) cancelAnimationFrame(sidebarWidthRaf);
+		sidebarWidthRaf = requestAnimationFrame(() => {
 			if (container && document.contains(container)) {
 				document.documentElement.style.setProperty('--clipper-sidebar-width', `${container.offsetWidth + 24}px`);
 			} else {
 				document.documentElement.style.removeProperty('--clipper-sidebar-width');
 			}
-		}, 1);
+		});
 	}
 
 	function removeContainer(container: HTMLElement) {

@@ -3,6 +3,7 @@ import { detectBrowser } from './utils/browser-detection';
 import { updateCurrentActiveTab, isValidUrl, isBlankPage } from './utils/active-tab-manager';
 import { TextHighlightData } from './utils/highlighter';
 import { debounce } from './utils/debounce';
+import { Settings } from './types/types';
 
 const YOUTUBE_EMBED_RULE_ID = 9001;
 
@@ -837,10 +838,13 @@ async function injectReaderScript(tabId: number) {
 
 // When set to 'reader' or 'embedded', clear the popup so action.onClicked fires
 // instead, handling the action directly without briefly opening the popup.
-async function updateActionPopup(openBehavior?: 'popup' | 'embedded' | 'reader'): Promise<void> {
+const validOpenBehaviors: Settings['openBehavior'][] = ['popup', 'embedded', 'reader'];
+
+async function updateActionPopup(openBehavior?: Settings['openBehavior']): Promise<void> {
 	if (!openBehavior) {
 		const data = await browser.storage.sync.get('general_settings');
-		openBehavior = (data.general_settings as Record<string, string>)?.openBehavior as typeof currentOpenBehavior;
+		const raw = (data.general_settings as Record<string, string>)?.openBehavior;
+		openBehavior = validOpenBehaviors.includes(raw as Settings['openBehavior']) ? raw as Settings['openBehavior'] : 'popup';
 	}
 	currentOpenBehavior = openBehavior;
 	if (openBehavior === 'reader' || openBehavior === 'embedded') {
@@ -850,7 +854,7 @@ async function updateActionPopup(openBehavior?: 'popup' | 'embedded' | 'reader')
 	}
 }
 
-let currentOpenBehavior: 'popup' | 'embedded' | 'reader' | undefined;
+let currentOpenBehavior: Settings['openBehavior'] = 'popup';
 
 // In reader/embedded mode, opens embedded iframe instead of popup.
 async function openPopup(): Promise<void> {
@@ -860,8 +864,9 @@ async function openPopup(): Promise<void> {
 		if (tab?.id && tab.url && isValidUrl(tab.url) && !isBlankPage(tab.url)) {
 			await ensureContentScriptLoadedInBackground(tab.id);
 			await browser.tabs.sendMessage(tab.id, { action: "toggle-iframe" });
+			return;
 		}
-		return;
+		// Fall through to popup if tab is invalid
 	}
 	await browser.action.openPopup();
 }
@@ -881,7 +886,8 @@ browser.action.onClicked.addListener(async (tab) => {
 
 browser.storage.onChanged.addListener((changes, area) => {
 	if (area === 'sync' && changes.general_settings) {
-		updateActionPopup((changes.general_settings.newValue as Record<string, string>)?.openBehavior as 'popup' | 'embedded' | 'reader');
+		const raw = (changes.general_settings.newValue as Record<string, string>)?.openBehavior;
+		updateActionPopup(validOpenBehaviors.includes(raw as Settings['openBehavior']) ? raw as Settings['openBehavior'] : 'popup');
 	}
 });
 
