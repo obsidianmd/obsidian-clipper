@@ -29,10 +29,12 @@ function isIgnoredElement(element: Element): boolean {
 		'MATH', 'FIGURE', 'UL', 'OL', 'TABLE', 'LI', 'TR', 'TD', 'TH', 'CODE', 'PRE', 'BLOCKQUOTE', 'EM', 'STRONG', 'A'
 	].includes(tagName);
 
-	return element.tagName.toLowerCase() === 'html' || 
-		element.tagName.toLowerCase() === 'body' || 
+	return element.tagName.toLowerCase() === 'html' ||
+		element.tagName.toLowerCase() === 'body' ||
 		element.classList.contains('obsidian-highlighter-menu') ||
 		element.closest('.obsidian-highlighter-menu') !== null ||
+		element.classList.contains('obsidian-reader-settings') ||
+		element.closest('.obsidian-reader-settings') !== null ||
 		isDisallowedTag;
 }
 
