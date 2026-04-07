@@ -863,6 +863,7 @@ export class Reader {
 	}
 
 	private static observer: IntersectionObserver | null = null;
+	private static sidebarObserver: MutationObserver | null = null;
 	private static activePopover: HTMLElement | null = null;
 	private static activeFootnoteLink: HTMLAnchorElement | null = null;
 
@@ -1796,6 +1797,17 @@ export class Reader {
 			const rightSidebar = doc.createElement('div');
 			rightSidebar.className = 'obsidian-reader-right-sidebar';
 
+			const clipperContainer = doc.getElementById('obsidian-clipper-container');
+			if (clipperContainer) {
+				rightSidebar.style.width = `${clipperContainer.offsetWidth + 24}px`;
+			}
+
+			this.sidebarObserver = new MutationObserver(() => {
+				const container = doc.getElementById('obsidian-clipper-container');
+				rightSidebar.style.width = container ? `${container.offsetWidth + 24}px` : '0px';
+			});
+			this.sidebarObserver.observe(doc.documentElement, { attributes: true, attributeFilter: ['style'] });
+
 			// Assemble and display the shell immediately
 			readerContainer.appendChild(leftSidebar);
 			readerContainer.appendChild(readerContent);
@@ -2016,10 +2028,14 @@ export class Reader {
 
 	static restore(doc: Document) {
 		if (this.originalHTML) {			
-			// Disconnect the observer if it exists
+			// Disconnect the observers if they exist
 			if (this.observer) {
 				this.observer.disconnect();
 				this.observer = null;
+			}
+			if (this.sidebarObserver) {
+				this.sidebarObserver.disconnect();
+				this.sidebarObserver = null;
 			}
 
 			// Remove color scheme media query listener

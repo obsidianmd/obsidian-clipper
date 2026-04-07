@@ -835,13 +835,12 @@ async function injectReaderScript(tabId: number) {
 	}
 }
 
-// Update the browser action popup based on openBehavior setting.
-// When set to 'reader' or 'embedded', we clear the popup so action.onClicked fires
-// instead, allowing us to handle the action directly without briefly opening the popup.
-async function updateActionPopup(openBehavior?: string): Promise<void> {
+// When set to 'reader' or 'embedded', clear the popup so action.onClicked fires
+// instead, handling the action directly without briefly opening the popup.
+async function updateActionPopup(openBehavior?: 'popup' | 'embedded' | 'reader'): Promise<void> {
 	if (!openBehavior) {
 		const data = await browser.storage.sync.get('general_settings');
-		openBehavior = (data.general_settings as Record<string, string>)?.openBehavior;
+		openBehavior = (data.general_settings as Record<string, string>)?.openBehavior as typeof currentOpenBehavior;
 	}
 	currentOpenBehavior = openBehavior;
 	if (openBehavior === 'reader' || openBehavior === 'embedded') {
@@ -851,9 +850,9 @@ async function updateActionPopup(openBehavior?: string): Promise<void> {
 	}
 }
 
-let currentOpenBehavior: string | undefined;
+let currentOpenBehavior: 'popup' | 'embedded' | 'reader' | undefined;
 
-// Opens the popup, or toggles the embedded iframe when in reader/embedded mode.
+// In reader/embedded mode, opens embedded iframe instead of popup.
 async function openPopup(): Promise<void> {
 	if (currentOpenBehavior === 'reader' || currentOpenBehavior === 'embedded') {
 		const tabs = await browser.tabs.query({ active: true, currentWindow: true });
@@ -882,7 +881,7 @@ browser.action.onClicked.addListener(async (tab) => {
 
 browser.storage.onChanged.addListener((changes, area) => {
 	if (area === 'sync' && changes.general_settings) {
-		updateActionPopup((changes.general_settings.newValue as Record<string, string>)?.openBehavior);
+		updateActionPopup((changes.general_settings.newValue as Record<string, string>)?.openBehavior as 'popup' | 'embedded' | 'reader');
 	}
 });
 

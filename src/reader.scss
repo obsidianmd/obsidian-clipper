@@ -29,6 +29,12 @@
 }
 
 .obsidian-reader-active	body {
+	--safe-area-inset-top: env(safe-area-inset-top);
+	--safe-area-inset-bottom: env(safe-area-inset-bottom);
+	--safe-area-inset-left: env(safe-area-inset-left);
+	--safe-area-inset-right: env(safe-area-inset-right);
+	--preferred-text-scale: env(preferred-text-scale);
+
 	--font-text: system-ui, -apple-system, sans-serif;
 	--dynamic-font-size: calc(var(--font-text-size) + 0.25vw);
 	--sidebar-width: 240px;
@@ -162,7 +168,7 @@
 	.obsidian-reader-content {
 		padding: max(4rem, 4vh) 0 0 !important;	
 		width: var(--line-width);
-		max-width: calc(100vw - var(--sidebar-width));
+		max-width: calc(100vw - var(--sidebar-width) - var(--clipper-sidebar-width, 0px));
 		overflow: hidden;
 		> article {
 			margin: 0 auto;
@@ -173,6 +179,7 @@
 	.obsidian-right-sidebar {
 		max-width: var(--sidebar-width);
 	}
+
 	h1 {
 		margin: 0 0 0.5em 0;
 		font-weight: var(--h1-weight);
@@ -960,7 +967,6 @@
 	background: var(--background-primary);
 	box-shadow: 5px -10px 20px 20px var(--background-primary);
 	border-radius: var(--radius-m);
-	
 	corner-shape: var(--corner-shape);
 	display: flex;
 	align-items: center;
@@ -992,6 +998,24 @@
 		}
 	}
 }
+
+@media (max-width: 768px) {
+	.obsidian-reader-nav {
+		position: fixed;
+		top: 0;
+		right: 0;
+		left: 0;
+		box-shadow: none;
+		width: calc(100vw - var(--size-4-3) * 2);
+		padding: calc(var(--safe-area-inset-top) + var(--size-4-2)) var(--size-4-3) var(--size-4-2);
+		justify-content: flex-end;
+		.nav-btn {
+			width: 40px;
+			height: 40px;
+		}
+	}
+}
+
 
 .obsidian-reader-clip-dropdown {
 	display: none;

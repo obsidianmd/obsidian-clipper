@@ -30,10 +30,24 @@ declare global {
 	const iframeId = 'obsidian-clipper-iframe';
 	const containerId = 'obsidian-clipper-container';
 
+	let sidebarWidthTimer: ReturnType<typeof setTimeout> | null = null;
+
+	function updateSidebarWidth(container: HTMLElement | null) {
+		if (sidebarWidthTimer) clearTimeout(sidebarWidthTimer);
+		sidebarWidthTimer = setTimeout(() => {
+			if (container && document.contains(container)) {
+				document.documentElement.style.setProperty('--clipper-sidebar-width', `${container.offsetWidth + 24}px`);
+			} else {
+				document.documentElement.style.removeProperty('--clipper-sidebar-width');
+			}
+		}, 1);
+	}
+
 	function removeContainer(container: HTMLElement) {
 		container.classList.add('is-closing');
 		container.addEventListener('animationend', () => {
 			container.remove();
+			updateSidebarWidth(null);
 		}, { once: true });
 	}
 
@@ -78,6 +92,7 @@ declare global {
 		addResizeListener(container, southWestHandle, 'sw');
 
 		document.body.appendChild(container);
+		updateSidebarWidth(container);
 	}
 
 	function addResizeListener(container: HTMLElement, handle: HTMLElement, direction: string) {
@@ -101,13 +116,13 @@ declare global {
 	
 			document.onmousemove = (moveEvent) => {
 				if (!isResizing) return;
-	
+
 				const dx = moveEvent.clientX - startX;
 				const dy = moveEvent.clientY - startY;
 
 				const minWidth = parseInt(container.style.minWidth) || 200;
 				const minHeight = parseInt(container.style.minHeight) || 200;
-	
+
 				if (direction.includes('e')) {
 					let newWidth = startWidth + dx;
 					if (newWidth < minWidth) newWidth = minWidth;
@@ -135,6 +150,8 @@ declare global {
 					container.style.height = `${newHeight}px`;
 					container.style.top = `${newTop}px`;
 				}
+
+				updateSidebarWidth(container);
 			};
 	
 			document.onmouseup = () => {
