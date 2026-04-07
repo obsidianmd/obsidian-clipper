@@ -223,7 +223,7 @@ const debouncedHighlightRefresh = debounce(() => {
 	if (currentTabId !== undefined) {
 		memoizedExtractPageContent.clear();
 		memoizedCompileTemplate.clear();
-		refreshFields(currentTabId, false, false);
+		refreshFields(currentTabId, { checkTemplateTriggers: false, rebuildSkeleton: false });
 	}
 }, 300);
 
@@ -637,7 +637,7 @@ async function waitForInterpreter(interpretBtn: HTMLButtonElement): Promise<void
 	});
 }
 
-async function refreshFields(tabId: number, checkTemplateTriggers: boolean = true, rebuildSkeleton: boolean = true) {
+async function refreshFields(tabId: number, { checkTemplateTriggers = true, rebuildSkeleton = true }: { checkTemplateTriggers?: boolean; rebuildSkeleton?: boolean } = {}) {
 	if (templates.length === 0) {
 		console.warn('No templates available');
 		showError('noTemplates');
@@ -1070,7 +1070,7 @@ function refreshPopup() {
 
 function handleTemplateChange(templateId: string) {
 	currentTemplate = templates.find(t => t.id === templateId) || templates[0];
-	refreshFields(currentTabId!, false);
+	refreshFields(currentTabId!, { checkTemplateTriggers: false });
 }
 
 async function checkHighlighterModeState(tabId: number) {

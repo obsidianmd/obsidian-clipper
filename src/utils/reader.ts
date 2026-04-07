@@ -423,7 +423,8 @@ export class Reader {
 		updateModeIcon();
 
 		// Watch for theme-light/theme-dark class changes (D key, OS preference, etc.)
-		new MutationObserver(updateModeIcon).observe(doc.documentElement, {
+		this.themeModeObserver = new MutationObserver(updateModeIcon);
+		this.themeModeObserver.observe(doc.documentElement, {
 			attributes: true,
 			attributeFilter: ['class'],
 		});
@@ -880,6 +881,7 @@ export class Reader {
 
 	private static observer: IntersectionObserver | null = null;
 	private static highlighterObserver: MutationObserver | null = null;
+	private static themeModeObserver: MutationObserver | null = null;
 	private static activePopover: HTMLElement | null = null;
 	private static activeFootnoteLink: HTMLAnchorElement | null = null;
 
@@ -2056,6 +2058,10 @@ export class Reader {
 			if (this.highlighterObserver) {
 				this.highlighterObserver.disconnect();
 				this.highlighterObserver = null;
+			}
+			if (this.themeModeObserver) {
+				this.themeModeObserver.disconnect();
+				this.themeModeObserver = null;
 			}
 	
 			// Remove color scheme media query listener

@@ -8,7 +8,7 @@ import { debugLog } from '../debug';
  * avoiding direct use of browser.tabs which may be unavailable in
  * Firefox iframe/side-panel contexts.
  */
-async function sendExtractContent(tabId: number, selector: string, attribute: string | undefined, extractHtml: boolean): Promise<{ content: string | string[] } | undefined> {
+export async function sendExtractContent(tabId: number, selector: string, attribute: string | undefined, extractHtml: boolean): Promise<{ content: string | string[] } | undefined> {
 	const response = await browser.runtime.sendMessage({
 		action: "sendMessageToTab",
 		tabId: tabId,

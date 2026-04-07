@@ -4,6 +4,7 @@
 // This module provides consistent lookup across all template processing
 
 import browser from './browser-polyfill';
+import { sendExtractContent } from './variables/selector';
 
 /**
  * Context for variable resolution, including optional tabId for selector support
@@ -101,17 +102,7 @@ async function resolveSelectorVariable(selectorExpr: string, tabId?: number): Pr
 	const attribute = attrMatch ? attrMatch[2] : undefined;
 
 	try {
-		const response = await browser.runtime.sendMessage({
-			action: "sendMessageToTab",
-			tabId: tabId,
-			message: {
-				action: "extractContent",
-				selector: selector.replace(/\\"/g, '"'),
-				attribute: attribute,
-				extractHtml: extractHtml
-			}
-		}) as { content: string | string[] };
-
+		const response = await sendExtractContent(tabId, selector.replace(/\\"/g, '"'), attribute, extractHtml);
 		return response ? response.content : undefined;
 	} catch (error) {
 		console.error('Error extracting content by selector:', error, { selector, attribute, extractHtml });

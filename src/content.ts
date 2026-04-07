@@ -48,10 +48,8 @@ declare global {
 		updateSidebarWidth(null);
 		container.addEventListener('animationend', () => {
 			container.remove();
-		}, { once: true });
-		setTimeout(() => {
 			highlighter.repositionHighlights();
-		}, 200);
+		}, { once: true });
 	}
 
 	async function toggleIframe() {
