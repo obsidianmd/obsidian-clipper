@@ -475,15 +475,6 @@ declare global {
 					sendResponse({ isActive: false });
 				});
 			return true;
-		} else if (request.action === "toggleReaderMode") {
-			// Forward the request to the background script to inject reader mode if needed
-			browser.runtime.sendMessage({ action: "toggleReaderMode", tabId: sender.tab?.id })
-				.then(sendResponse)
-				.catch(error => {
-					console.error("Error toggling reader mode:", error);
-					sendResponse({ success: false, error: error instanceof Error ? error.message : 'Unknown error' });
-				});
-			return true;
 		}
 		return true;
 	});
