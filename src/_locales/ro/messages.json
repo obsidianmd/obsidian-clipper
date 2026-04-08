@@ -115,7 +115,7 @@
 		"message": "Închide"
 	},
 	"commandOpenClipper": {
-		"message": "Deschide Obsidian Clipper"
+		"message": "Deschide Clipper for AppFlowy"
 	},
 	"commandQuickClip": {
 		"message": "Decupare rapidă"

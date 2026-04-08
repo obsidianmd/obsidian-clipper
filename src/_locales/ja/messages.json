@@ -115,7 +115,7 @@
 		"message": "閉じる"
 	},
 	"commandOpenClipper": {
-		"message": "Obsidian Clipperを開く"
+		"message": "Clipper for AppFlowyを開く"
 	},
 	"commandQuickClip": {
 		"message": "クイッククリップ"

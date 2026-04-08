@@ -115,7 +115,7 @@
 		"message": "Fechar"
 	},
 	"commandOpenClipper": {
-		"message": "Abrir Obsidian Clipper"
+		"message": "Abrir Clipper for AppFlowy"
 	},
 	"commandQuickClip": {
 		"message": "Recorte rápido"

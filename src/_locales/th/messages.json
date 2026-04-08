@@ -115,7 +115,7 @@
 		"message": "ปิด"
 	},
 	"commandOpenClipper": {
-		"message": "เปิด Obsidian Clipper"
+		"message": "เปิด Clipper for AppFlowy"
 	},
 	"commandQuickClip": {
 		"message": "คลิปด่วน"

@@ -115,7 +115,7 @@
 		"message": "Đóng"
 	},
 	"commandOpenClipper": {
-		"message": "Mở Obsidian Clipper"
+		"message": "Mở Clipper for AppFlowy"
 	},
 	"commandQuickClip": {
 		"message": "Lưu nhanh"

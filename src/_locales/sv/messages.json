@@ -115,7 +115,7 @@
 		"message": "Stäng"
 	},
 	"commandOpenClipper": {
-		"message": "Öppna Obsidian Clipper"
+		"message": "Öppna Clipper for AppFlowy"
 	},
 	"commandQuickClip": {
 		"message": "Snabbklipp"

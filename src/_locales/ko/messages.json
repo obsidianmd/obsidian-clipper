@@ -115,7 +115,7 @@
 		"message": "닫기"
 	},
 	"commandOpenClipper": {
-		"message": "Obsidian Clipper 열기"
+		"message": "Clipper for AppFlowy 열기"
 	},
 	"commandQuickClip": {
 		"message": "퀵 클립"

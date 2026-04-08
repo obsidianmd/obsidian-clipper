@@ -115,7 +115,7 @@
 		"message": "關閉"
 	},
 	"commandOpenClipper": {
-		"message": "開啟 Obsidian Clipper"
+		"message": "開啟 Clipper for AppFlowy"
 	},
 	"commandQuickClip": {
 		"message": "快速擷取"
