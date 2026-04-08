@@ -303,6 +303,16 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 			return true;
 		}
 
+		if (typedRequest.action === "getReaderMode") {
+			const tabId = typedRequest.tabId || sender.tab?.id;
+			if (tabId) {
+				sendResponse({ isActive: getReaderModeForTab(tabId) });
+			} else {
+				sendResponse({ isActive: false });
+			}
+			return true;
+		}
+
 		if (typedRequest.action === "toggleHighlighterMode" && typedRequest.tabId) {
 			toggleHighlighterMode(typedRequest.tabId)
 				.then(newMode => sendResponse({ success: true, isActive: newMode }))

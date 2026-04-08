@@ -555,6 +555,7 @@ function setupEventListeners(tabId: number) {
 	const readerModeButton = document.getElementById('reader-mode');
 	if (readerModeButton) {
 		readerModeButton.addEventListener('click', () => toggleReaderMode(tabId));
+		checkReaderModeState(tabId);
 	}
 }
 
@@ -1071,6 +1072,22 @@ function refreshPopup() {
 function handleTemplateChange(templateId: string) {
 	currentTemplate = templates.find(t => t.id === templateId) || templates[0];
 	refreshFields(currentTabId!, { checkTemplateTriggers: false });
+}
+
+async function checkReaderModeState(tabId: number) {
+	try {
+		const response = await browser.runtime.sendMessage({
+			action: "getReaderMode",
+			tabId: tabId
+		}) as { isActive: boolean };
+
+		const readerButton = document.getElementById('reader-mode');
+		if (readerButton) {
+			readerButton.classList.toggle('active', response.isActive);
+		}
+	} catch (error) {
+		console.error('Error checking reader mode state:', error);
+	}
 }
 
 async function checkHighlighterModeState(tabId: number) {
