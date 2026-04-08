@@ -2073,7 +2073,7 @@ export class Reader {
 
 			// Remember if the embedded clipper was open so we can reopen after reload
 			if (doc.getElementById('obsidian-clipper-container')) {
-				sessionStorage.setItem('obsidian-reopen-clipper', '1');
+				browser.runtime.sendMessage({ action: 'reopenClipperAfterReload' }).catch(() => {});
 			}
 
 			this.originalHTML = null;
