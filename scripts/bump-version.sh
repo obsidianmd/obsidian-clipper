@@ -26,7 +26,10 @@ JSON_FILES=(
 	"dev/manifest.json"
 )
 
-PBXPROJ="xcode/Obsidian Web Clipper/Obsidian Web Clipper.xcodeproj/project.pbxproj"
+LANDING="landing/index.html"
+PACKAGE_LOCK="package-lock.json"
+
+PBXPROJ="xcode/Clipper for AppFlowy/Clipper for AppFlowy.xcodeproj/project.pbxproj"
 
 echo "Bumping version to $NEW_VERSION"
 echo ""
@@ -52,6 +55,20 @@ new_build=$((old_build + 1))
 sed -i '' "s/CURRENT_PROJECT_VERSION = $old_build;/CURRENT_PROJECT_VERSION = $new_build;/g" "$pbxpath"
 build_count=$(grep -c "CURRENT_PROJECT_VERSION = $new_build;" "$pbxpath")
 echo "Updated project.pbxproj CURRENT_PROJECT_VERSION: $old_build -> $new_build ($build_count occurrences)"
+
+# Update landing page version
+landingpath="$ROOT_DIR/$LANDING"
+old_landing=$(grep -o 'v[0-9]*\.[0-9]*\.[0-9]*' "$landingpath" | head -1 | sed 's/v//')
+sed -i '' "s/v$old_landing/v$NEW_VERSION/g" "$landingpath"
+echo "Updated $LANDING: $old_landing -> $NEW_VERSION"
+
+# Update package-lock.json (top-level and root package entry only)
+lockpath="$ROOT_DIR/$PACKAGE_LOCK"
+old_lock=$(grep -o '"version": "[^"]*"' "$lockpath" | head -1 | sed 's/"version": "//;s/"//')
+# Only replace the first two occurrences (top-level and "" package entry)
+awk -v old="\"version\": \"$old_lock\"" -v new="\"version\": \"$NEW_VERSION\"" \
+	'count<2 && index($0,old){sub(old,new); count++} {print}' "$lockpath" > "$lockpath.tmp" && mv "$lockpath.tmp" "$lockpath"
+echo "Updated $PACKAGE_LOCK: $old_lock -> $NEW_VERSION"
 
 echo ""
 echo "Done!"
