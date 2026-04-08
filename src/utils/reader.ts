@@ -721,7 +721,7 @@ export class Reader {
 
 
 	private static getStickyOffset(): number {
-		const player = document.querySelector('iframe.sticky-player') as HTMLElement | null;
+		const player = document.querySelector('.sticky-player') as HTMLElement | null;
 		return player ? player.getBoundingClientRect().height + 16 : 0;
 	}
 
@@ -914,7 +914,7 @@ export class Reader {
 		let observer = createOutlineObserver();
 
 		// Recreate observer when sticky player appears/resizes
-		const stickyPlayer = doc.querySelector('iframe.sticky-player');
+		const stickyPlayer = doc.querySelector('.sticky-player');
 		if (stickyPlayer) {
 			const resizeObserver = new ResizeObserver(() => {
 				observer.disconnect();
@@ -2153,7 +2153,55 @@ export class Reader {
 			if (transcript) {
 				const iframe = article.querySelector('iframe[src*="youtube.com/embed/"]') as HTMLIFrameElement | null;
 				if (iframe) {
-					iframe.classList.add('sticky-player');
+					// Wrap iframe in a container with toggle controls
+					const playerContainer = doc.createElement('div');
+					playerContainer.className = 'youtube-player-container sticky-player';
+					iframe.parentNode!.insertBefore(playerContainer, iframe);
+					playerContainer.appendChild(iframe);
+
+					let stickyEnabled = true;
+					let autoScrollEnabled = true;
+
+					const toggleBar = doc.createElement('div');
+					toggleBar.className = 'youtube-player-toggles';
+
+					const createToggle = (label: string, onChange: (on: boolean) => void) => {
+						const button = doc.createElement('button');
+						button.className = 'youtube-player-toggle is-active';
+						button.textContent = label;
+						button.addEventListener('click', () => {
+							const isActive = button.classList.toggle('is-active');
+							onChange(isActive);
+						});
+						return button;
+					};
+
+					const stickyToggle = createToggle('Sticky player', (on) => {
+						stickyEnabled = on;
+						if (on) {
+							playerContainer.classList.add('sticky-player');
+						} else {
+							playerContainer.classList.remove('sticky-player');
+						}
+					});
+
+					const autoScrollToggle = createToggle('Auto-scroll', (on) => {
+						autoScrollEnabled = on;
+					});
+
+					let highlightEnabled = true;
+					const highlightToggle = createToggle('Highlight active line', (on) => {
+						highlightEnabled = on;
+						if (!on) {
+							const ph = (CSS as any).highlights?.get('transcript-playback');
+							if (ph) ph.clear();
+						}
+					});
+
+					toggleBar.appendChild(stickyToggle);
+					toggleBar.appendChild(autoScrollToggle);
+					toggleBar.appendChild(highlightToggle);
+					playerContainer.appendChild(toggleBar);
 
 					// Enable JS API on the embed
 					const src = new URL(iframe.src);
@@ -2244,7 +2292,7 @@ export class Reader {
 							if (newIndex >= 0) {
 								segments[newIndex].classList.add('is-active');
 								// Auto-scroll to keep active segment visible
-								if (!suppressScroll && Date.now() - lastUserScroll > AUTO_SCROLL_COOLDOWN) {
+								if (autoScrollEnabled && !suppressScroll && Date.now() - lastUserScroll > AUTO_SCROLL_COOLDOWN) {
 									const rect = segments[newIndex].getBoundingClientRect();
 									const stickyOffset = this.getStickyOffset();
 									const targetY = (window.pageYOffset || doc.documentElement.scrollTop)
@@ -2269,7 +2317,7 @@ export class Reader {
 							scrubTrack.style.setProperty('--track-progress', (trackProgress * 100) + '%');
 
 							// Update playback highlight — underline the current line
-							if (playbackHighlight) {
+							if (playbackHighlight && highlightEnabled) {
 								playbackHighlight.clear();
 								const textEl = activeSegment.querySelector('.transcript-segment-text');
 								const textNode = textEl?.firstChild;

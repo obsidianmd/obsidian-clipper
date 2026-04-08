@@ -288,12 +288,42 @@
 			aspect-ratio: 16 / 9;
 			height: auto;
 		}
+	}
+	.youtube-player-container {
+		padding-top: 8px;
+		background: var(--background-primary);
 		&.sticky-player {
 			position: sticky;
 			top: 8px;
 			z-index: 1;
-			box-shadow:
-				0 -8px 24px 24px var(--background-primary);
+			box-shadow: 0 0 24px 24px var(--background-primary);
+		}
+		iframe {
+			box-shadow: none;
+		}
+	}
+	.youtube-player-toggles {
+		display: flex;
+		gap: 4px;
+		padding: 3px 0;
+		box-shadow: 0 8px 24px 24px var(--background-primary);
+	}
+	.youtube-player-toggle {
+		font-family: var(--font-ui);
+		font-size: var(--font-ui-small);
+		padding: 4px 6px;
+		border-radius: var(--radius-s);
+		corner-shape: var(--corner-shape);
+		border: 1px solid var(--background-modifier-border);
+		background: transparent;
+		color: var(--text-muted);
+		cursor: pointer;
+		&.is-active {
+			color: var(--text-normal);
+			font-weight: 500;
+		}
+		&:hover {
+			color: var(--text-normal);
 		}
 	}
 	::highlight(transcript-playback) {
