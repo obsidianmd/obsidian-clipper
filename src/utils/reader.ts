@@ -2079,6 +2079,11 @@ export class Reader {
 			this.originalHTML = null;
 			this.isActive = false;
 
+			// Notify background that reader mode is off before reloading,
+			// since the never-resolving promise in toggle() prevents
+			// reader-script from sending this message
+			browser.runtime.sendMessage({ action: 'readerModeChanged', isActive: false }).catch(() => {});
+
 			window.location.reload();
 		}
 	}

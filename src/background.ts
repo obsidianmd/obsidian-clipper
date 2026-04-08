@@ -341,6 +341,10 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 							debouncedUpdateContextMenu(typedRequest.tabId!);
 						}
 						sendResponse(response);
+					})
+					.catch(() => {
+						// Page may have reloaded before responding (reader restore)
+						sendResponse({ success: true, isActive: false });
 					});
 			});
 			return true;
