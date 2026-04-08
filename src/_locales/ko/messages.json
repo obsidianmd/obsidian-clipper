@@ -209,9 +209,6 @@
 	"embedded": {
 		"message": "임베디드"
 	},
-	"enableHighlighter": {
-		"message": "하이라이터 켜기"
-	},
 	"enableHighlighterDescription": {
 		"message": "하이라이트한 웹페이지 내용을 Obsidian에 저장합니다."
 	},
@@ -355,6 +352,9 @@
 		"message": "페이지 하이라이트"
 	},
 	"highlighter": {
+		"message": "하이라이터"
+	},
+	"highlighterOn": {
 		"message": "하이라이터"
 	},
 	"highlighterSettings": {
@@ -755,6 +755,9 @@
 	},
 	"readerLoading": {
 		"message": "정리 중…"
+	},
+	"readerOn": {
+		"message": "리더"
 	},
 	"readerSettings": {
 		"message": "리더 설정"

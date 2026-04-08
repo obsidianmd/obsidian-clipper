@@ -209,9 +209,6 @@
 	"embedded": {
 		"message": "Indlejret"
 	},
-	"enableHighlighter": {
-		"message": "Aktivér fremhævning"
-	},
 	"enableHighlighterDescription": {
 		"message": "Fremhæv indhold på websider for at gemme i Obsidian"
 	},
@@ -356,6 +353,9 @@
 	},
 	"highlighter": {
 		"message": "Fremhævning"
+	},
+	"highlighterOn": {
+		"message": "Overstregning"
 	},
 	"highlighterSettings": {
 		"message": "Fremhævning"
@@ -747,6 +747,9 @@
 	},
 	"readerLoading": {
 		"message": "Fjerner støj…"
+	},
+	"readerOn": {
+		"message": "Læser"
 	},
 	"readerSettings": {
 		"message": "Læserindstillinger"

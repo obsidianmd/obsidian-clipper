@@ -209,9 +209,6 @@
 	"embedded": {
 		"message": "បង្កប់"
 	},
-	"enableHighlighter": {
-		"message": "បើកការរំលេច"
-	},
 	"enableHighlighterDescription": {
 		"message": "រំលេចមាតិកានៅលើទំព័របណ្ដាញ ដែលអ្នកអាចរក្សាទុកទៅ Obsidian។"
 	},
@@ -356,6 +353,9 @@
 	},
 	"highlighter": {
 		"message": "ឧបករណ៍រំលេច"
+	},
+	"highlighterOn": {
+		"message": "ឧបករណ៍បន្លិច"
 	},
 	"highlighterSettings": {
 		"message": "ឧបករណ៍រំលេច"
@@ -755,6 +755,9 @@
 	},
 	"readerLoading": {
 		"message": "កំពុងសម្រួល…"
+	},
+	"readerOn": {
+		"message": "របៀបអាន"
 	},
 	"readerSettings": {
 		"message": "ការកំណត់របៀបអាន"

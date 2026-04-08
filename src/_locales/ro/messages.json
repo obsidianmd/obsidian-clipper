@@ -209,9 +209,6 @@
 	"embedded": {
 		"message": "Încorporat"
 	},
-	"enableHighlighter": {
-		"message": "Activează evidențiatorul"
-	},
 	"enableHighlighterDescription": {
 		"message": "Evidențiază conținut pe pagini web pentru a-l salva în Obsidian"
 	},
@@ -355,6 +352,9 @@
 		"message": "Evidențiază pagina"
 	},
 	"highlighter": {
+		"message": "Evidențiator"
+	},
+	"highlighterOn": {
 		"message": "Evidențiator"
 	},
 	"highlighterSettings": {
@@ -747,6 +747,9 @@
 	},
 	"readerLoading": {
 		"message": "Se clarifică…"
+	},
+	"readerOn": {
+		"message": "Mod de citire"
 	},
 	"readerSettings": {
 		"message": "Setări cititor"

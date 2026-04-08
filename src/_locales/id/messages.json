@@ -209,9 +209,6 @@
 	"embedded": {
 		"message": "Tersemat"
 	},
-	"enableHighlighter": {
-		"message": "Aktifkan sorotan"
-	},
 	"enableHighlighterDescription": {
 		"message": "Sorot konten di laman web yang dapat disimpan ke Obsidian."
 	},
@@ -355,6 +352,9 @@
 		"message": "Sorot laman web"
 	},
 	"highlighter": {
+		"message": "Penyorot"
+	},
+	"highlighterOn": {
 		"message": "Penyorot"
 	},
 	"highlighterSettings": {
@@ -755,6 +755,9 @@
 	},
 	"readerLoading": {
 		"message": "Mengurai…"
+	},
+	"readerOn": {
+		"message": "Mode pembaca"
 	},
 	"readerSettings": {
 		"message": "Pengaturan pembaca"

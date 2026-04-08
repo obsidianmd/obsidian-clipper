@@ -209,9 +209,6 @@
 	"embedded": {
 		"message": "Вбудований"
 	},
-	"enableHighlighter": {
-		"message": "Увімкнути виділення"
-	},
 	"enableHighlighterDescription": {
 		"message": "Виділяйте вміст на веб-сторінках для збереження в Obsidian"
 	},
@@ -356,6 +353,9 @@
 	},
 	"highlighter": {
 		"message": "Виділення"
+	},
+	"highlighterOn": {
+		"message": "Маркер"
 	},
 	"highlighterSettings": {
 		"message": "Виділення"
@@ -747,6 +747,9 @@
 	},
 	"readerLoading": {
 		"message": "Очищення…"
+	},
+	"readerOn": {
+		"message": "Режим читання"
 	},
 	"readerSettings": {
 		"message": "Налаштування режиму читання"

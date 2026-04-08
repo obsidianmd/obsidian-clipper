@@ -209,9 +209,6 @@
 	"embedded": {
 		"message": "درون خطی"
 	},
-	"enableHighlighter": {
-		"message": "مارکر جملات روشن را فعال کن"
-	},
 	"enableHighlighterDescription": {
 		"message": "محتوایی را که می‌خواهید در ابسیدین ذخیره کنید را برجسته کنید"
 	},
@@ -356,6 +353,9 @@
 	},
 	"highlighter": {
 		"message": "مارکر"
+	},
+	"highlighterOn": {
+		"message": "هایلایتر"
 	},
 	"highlighterSettings": {
 		"message": "مارکر"
@@ -755,6 +755,9 @@
 	},
 	"readerLoading": {
 		"message": "در حال ساده‌سازی…"
+	},
+	"readerOn": {
+		"message": "حالت مطالعه"
 	},
 	"readerSettings": {
 		"message": "تنظیمات خواننده"

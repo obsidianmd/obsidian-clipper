@@ -209,9 +209,6 @@
 	"embedded": {
 		"message": "משולב"
 	},
-	"enableHighlighter": {
-		"message": "הפעל מסמן"
-	},
 	"enableHighlighterDescription": {
 		"message": "סמן תוכן בדפי אינטרנט שניתן לשמור ב-Obsidian"
 	},
@@ -356,6 +353,9 @@
 	},
 	"highlighter": {
 		"message": "מסמן"
+	},
+	"highlighterOn": {
+		"message": "כלי הדגשה"
 	},
 	"highlighterSettings": {
 		"message": "הגדרות מסמן"
@@ -747,6 +747,9 @@
 	},
 	"readerLoading": {
 		"message": "מפענח…"
+	},
+	"readerOn": {
+		"message": "מצב קריאה"
 	},
 	"readerSettings": {
 		"message": "הגדרות קורא"

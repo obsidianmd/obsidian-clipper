@@ -209,9 +209,6 @@
 	"embedded": {
 		"message": "Embutido"
 	},
-	"enableHighlighter": {
-		"message": "Ativar marcador"
-	},
 	"enableHighlighterDescription": {
 		"message": "Demarque o conteúdo de páginas da internet para que possa salvar no Obsidian."
 	},
@@ -356,6 +353,9 @@
 	},
 	"highlighter": {
 		"message": "Marcador"
+	},
+	"highlighterOn": {
+		"message": "Marca-texto"
 	},
 	"highlighterSettings": {
 		"message": "Marcador"
@@ -755,6 +755,9 @@
 	},
 	"readerLoading": {
 		"message": "Simplificando…"
+	},
+	"readerOn": {
+		"message": "Leitor"
 	},
 	"readerSettings": {
 		"message": "Configurações do leitor"

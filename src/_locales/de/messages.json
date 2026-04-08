@@ -209,9 +209,6 @@
 	"embedded": {
 		"message": "Eingebettet"
 	},
-	"enableHighlighter": {
-		"message": "Marker aktivieren"
-	},
 	"enableHighlighterDescription": {
 		"message": "Hebe Inhalte auf Webseiten hervor, die Du in Obsidian speichern möchtest."
 	},
@@ -356,6 +353,9 @@
 	},
 	"highlighter": {
 		"message": "Marker"
+	},
+	"highlighterOn": {
+		"message": "Textmarker"
 	},
 	"highlighterSettings": {
 		"message": "Marker"
@@ -755,6 +755,9 @@
 	},
 	"readerLoading": {
 		"message": "Wird bereinigt…"
+	},
+	"readerOn": {
+		"message": "Lesemodus"
 	},
 	"readerSettings": {
 		"message": "Reader-Einstellungen"

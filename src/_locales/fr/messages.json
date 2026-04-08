@@ -209,9 +209,6 @@
 	"embedded": {
 		"message": "Intégré"
 	},
-	"enableHighlighter": {
-		"message": "Activer le surligneur"
-	},
 	"enableHighlighterDescription": {
 		"message": "Surlignez du contenu sur les pages web que vous pouvez enrengistrer dans Obsidian."
 	},
@@ -355,6 +352,9 @@
 		"message": "Surligner la page"
 	},
 	"highlighter": {
+		"message": "Surligneur"
+	},
+	"highlighterOn": {
 		"message": "Surligneur"
 	},
 	"highlighterSettings": {
@@ -755,6 +755,9 @@
 	},
 	"readerLoading": {
 		"message": "Simplification…"
+	},
+	"readerOn": {
+		"message": "Mode lecture"
 	},
 	"readerSettings": {
 		"message": "Paramètres du lecteur"

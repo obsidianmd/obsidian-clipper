@@ -625,12 +625,12 @@ const debouncedUpdateContextMenu = debounce(async (tabId: number) => {
 				},
 				{
 					id: isReaderMode ? "exit-reader" : "enter-reader",
-					title: isReaderMode ? browser.i18n.getMessage('readerOff') : browser.i18n.getMessage('readerOn'),
+					title: isReaderMode ? browser.i18n.getMessage('disableReader') : browser.i18n.getMessage('readerOn'),
 					contexts: ["page", "selection"]
 				},
 				{
 					id: isHighlighterMode ? "exit-highlighter" : "enter-highlighter",
-					title: isHighlighterMode ? browser.i18n.getMessage('highlighterOff') : browser.i18n.getMessage('highlighterOn'),
+					title: isHighlighterMode ? browser.i18n.getMessage('disableHighlighter') : browser.i18n.getMessage('highlighterOn'),
 					contexts: ["page","image", "video", "audio"]
 				},
 				{

@@ -209,9 +209,6 @@
 	"embedded": {
 		"message": "ฝัง"
 	},
-	"enableHighlighter": {
-		"message": "เปิดใช้งานไฮไลต์"
-	},
 	"enableHighlighterDescription": {
 		"message": "ไฮไลต์เนื้อหาบนหน้าเว็บที่คุณสามารถบันทึกไปยัง Obsidian"
 	},
@@ -356,6 +353,9 @@
 	},
 	"highlighter": {
 		"message": "ตัวไฮไลต์"
+	},
+	"highlighterOn": {
+		"message": "ไฮไลต์"
 	},
 	"highlighterSettings": {
 		"message": "ตัวไฮไลต์"
@@ -755,6 +755,9 @@
 	},
 	"readerLoading": {
 		"message": "กำลังทำให้เข้าใจง่าย…"
+	},
+	"readerOn": {
+		"message": "โหมดอ่าน"
 	},
 	"readerSettings": {
 		"message": "การตั้งค่าโหมดอ่าน"

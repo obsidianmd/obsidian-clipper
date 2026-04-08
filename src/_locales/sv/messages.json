@@ -209,9 +209,6 @@
 	"embedded": {
 		"message": "Inbäddad"
 	},
-	"enableHighlighter": {
-		"message": "Aktivera markering"
-	},
 	"enableHighlighterDescription": {
 		"message": "Markera innehåll på webbsidor som du kan spara till Obsidian."
 	},
@@ -356,6 +353,9 @@
 	},
 	"highlighter": {
 		"message": "Markering"
+	},
+	"highlighterOn": {
+		"message": "Överstrykningspenna"
 	},
 	"highlighterSettings": {
 		"message": "Markering"
@@ -755,6 +755,9 @@
 	},
 	"readerLoading": {
 		"message": "Rensar…"
+	},
+	"readerOn": {
+		"message": "Läsläge"
 	},
 	"readerSettings": {
 		"message": "Läsarinställningar"

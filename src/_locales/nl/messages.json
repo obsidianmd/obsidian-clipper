@@ -209,9 +209,6 @@
 	"embedded": {
 		"message": "Ingesloten"
 	},
-	"enableHighlighter": {
-		"message": "Markeerder inschakelen"
-	},
 	"enableHighlighterDescription": {
 		"message": "Markeer inhoud op webpagina's die je kunt opslaan in Obsidian."
 	},
@@ -356,6 +353,9 @@
 	},
 	"highlighter": {
 		"message": "Markeerder"
+	},
+	"highlighterOn": {
+		"message": "Markeerstift"
 	},
 	"highlighterSettings": {
 		"message": "Markeerder"
@@ -755,6 +755,9 @@
 	},
 	"readerLoading": {
 		"message": "Bezig met ontrommelen…"
+	},
+	"readerOn": {
+		"message": "Leesmodus"
 	},
 	"readerSettings": {
 		"message": "Lezerinstellingen"

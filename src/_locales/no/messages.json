@@ -209,9 +209,6 @@
 	"embedded": {
 		"message": "Innebygd"
 	},
-	"enableHighlighter": {
-		"message": "Aktiver uthever"
-	},
 	"enableHighlighterDescription": {
 		"message": "Uthev innhold på nettsider for å lagre i Obsidian"
 	},
@@ -355,6 +352,9 @@
 		"message": "Uthev side"
 	},
 	"highlighter": {
+		"message": "Uthever"
+	},
+	"highlighterOn": {
 		"message": "Uthever"
 	},
 	"highlighterSettings": {
@@ -747,6 +747,9 @@
 	},
 	"readerLoading": {
 		"message": "Fjerner støy…"
+	},
+	"readerOn": {
+		"message": "Lesemodus"
 	},
 	"readerSettings": {
 		"message": "Leserinnstillinger"

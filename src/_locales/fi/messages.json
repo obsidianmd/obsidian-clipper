@@ -209,9 +209,6 @@
 	"embedded": {
 		"message": "Upotettu"
 	},
-	"enableHighlighter": {
-		"message": "Ota korostustyökalu käyttöön"
-	},
 	"enableHighlighterDescription": {
 		"message": "Korosta verkkosivujen sisältöä, jonka voit tallentaa Obsidianiin"
 	},
@@ -356,6 +353,9 @@
 	},
 	"highlighter": {
 		"message": "Korostustyökalu"
+	},
+	"highlighterOn": {
+		"message": "Korostus"
 	},
 	"highlighterSettings": {
 		"message": "Korostustyökalu"
@@ -763,6 +763,9 @@
 	},
 	"readerLoading": {
 		"message": "Selkeytetään…"
+	},
+	"readerOn": {
+		"message": "Lukutila"
 	},
 	"readerSettings": {
 		"message": "Lukijan asetukset"

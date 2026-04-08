@@ -209,9 +209,6 @@
 	"embedded": {
 		"message": "Ενσωματωμένο"
 	},
-	"enableHighlighter": {
-		"message": "Ενεργοποίηση επισημαντή"
-	},
 	"enableHighlighterDescription": {
 		"message": "Επισημάνετε περιεχόμενο σε ιστοσελίδες που μπορείτε να αποθηκεύσετε στο Obsidian"
 	},
@@ -355,6 +352,9 @@
 		"message": "Επισήμανση σελίδας"
 	},
 	"highlighter": {
+		"message": "Επισημαντής"
+	},
+	"highlighterOn": {
 		"message": "Επισημαντής"
 	},
 	"highlighterSettings": {
@@ -747,6 +747,9 @@
 	},
 	"readerLoading": {
 		"message": "Αποθόλωση…"
+	},
+	"readerOn": {
+		"message": "Λειτουργία ανάγνωσης"
 	},
 	"readerSettings": {
 		"message": "Ρυθμίσεις αναγνώστη"

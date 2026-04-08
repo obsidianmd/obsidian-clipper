@@ -1123,7 +1123,7 @@ function updateHighlighterModeUI(isActive: boolean) {
 			highlighterModeButton.style.display = 'flex';
 			highlighterModeButton.classList.toggle('active', isActive);
 			highlighterModeButton.setAttribute('aria-pressed', isActive.toString());
-			highlighterModeButton.title = isActive ? getMessage('disableHighlighter') : getMessage('enableHighlighter');
+			highlighterModeButton.title = isActive ? getMessage('disableHighlighter') : getMessage('highlighterOn');
 		} else {
 			highlighterModeButton.style.display = 'none';
 		}
