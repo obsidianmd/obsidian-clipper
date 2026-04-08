@@ -1164,8 +1164,8 @@ async function toggleReaderMode(tabId: number) {
 			}
 		}
 
-		// Close the popup if not in side panel
-		if (!isSidePanel) {
+		// Close the popup if not in side panel or iframe
+		if (!isSidePanel && !isIframe) {
 			window.close();
 		}
 	} catch (error) {

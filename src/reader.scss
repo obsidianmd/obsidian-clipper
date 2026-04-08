@@ -1367,6 +1367,10 @@
 }
 
 .obsidian-reader-active {
+	#obsidian-clipper-container {
+		z-index: 999;
+	}
+
 	img:not(a img):not(figure img) {
 		position: relative;
 		cursor: zoom-in;

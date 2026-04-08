@@ -505,6 +505,12 @@ declare global {
 	// Call updateHasHighlights when the page loads
 	window.addEventListener('load', updateHasHighlights);
 
+	// Reopen embedded clipper if it was open before exiting reader mode
+	if (sessionStorage.getItem('obsidian-reopen-clipper')) {
+		sessionStorage.removeItem('obsidian-reopen-clipper');
+		toggleIframe();
+	}
+
 	// Deactivate highlighter mode on unload
 	function handlePageUnload() {
 		if (isHighlighterMode) {

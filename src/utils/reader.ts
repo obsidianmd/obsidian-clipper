@@ -1102,11 +1102,15 @@ export class Reader {
 			const scripts = doc.querySelectorAll('script:not([type="application/ld+json"])');
 			scripts.forEach(el => el.remove());
 
-			// Replace body with a clone to remove all event listeners
-			const newBody = doc.body.cloneNode(true);
-			doc.body.parentNode?.replaceChild(newBody, doc.body);
+			// Replace body with a clone to remove all event listeners.
+			// Skip when the clipper iframe is present — cloning creates a
+			// new iframe element which reloads and loses user edits.
+			if (!doc.getElementById('obsidian-clipper-container')) {
+				const newBody = doc.body.cloneNode(true);
+				doc.body.parentNode?.replaceChild(newBody, doc.body);
+			}
 
-			// Block common ad/tracking domains
+			// Block inline event handlers and dynamic scripts
 			const meta = doc.createElement('meta');
 			meta.httpEquiv = 'Content-Security-Policy';
 			meta.content = "script-src 'none'; object-src 'none';";
@@ -1678,8 +1682,7 @@ export class Reader {
 		try {
 			await initializeI18n();
 
-			// Store original HTML for restoration
-			this.originalHTML = doc.documentElement.outerHTML;
+			this.originalHTML = 'active';
 
 			// Clipper iframe container
 			const clipperIframeContainer = doc.getElementById('obsidian-clipper-container');
@@ -1734,12 +1737,13 @@ export class Reader {
 			const baseTags = head.querySelectorAll('base');
 			baseTags.forEach(el => el.remove());
 
-			// Remove stylesheet links and style tags, except reader styles
+			// Remove stylesheet links and style tags, except reader and extension styles
 			const styleElements = head.querySelectorAll('link[rel="stylesheet"], link[as="style"], style');
 			styleElements.forEach(el => {
-				if (el.id !== 'obsidian-reader-styles') {
-					el.remove();
-				}
+				if (el.id === 'obsidian-reader-styles') return;
+				// Preserve extension-injected styles (clipper, highlighter)
+				if (el instanceof HTMLStyleElement && el.textContent?.includes('obsidian-clipper')) return;
+				el.remove();
 			});
 
 			// Re-add reader CSS as a link element after cleanup
@@ -1772,7 +1776,17 @@ export class Reader {
 				head.insertBefore(charset, head.firstChild);
 			}
 
-			doc.body.textContent = '';
+			// Clear body children, preserving the clipper iframe container
+			if (clipperIframeContainer) {
+				for (let i = doc.body.childNodes.length - 1; i >= 0; i--) {
+					const child = doc.body.childNodes[i];
+					if (child !== clipperIframeContainer) {
+						doc.body.removeChild(child);
+					}
+				}
+			} else {
+				doc.body.textContent = '';
+			}
 
 			// Create main container
 			const readerContainer = doc.createElement('div');
@@ -1850,8 +1864,9 @@ export class Reader {
 				toggleHighlighterMenu(true);
 			}
 
-			// Re-attach the clipper iframe container if it exists
-			if (clipperIframeContainer) {
+			// Re-attach the clipper iframe container only if it was
+			// detached (not present when body clone was skipped)
+			if (clipperIframeContainer && !doc.body.contains(clipperIframeContainer)) {
 				doc.body.appendChild(clipperIframeContainer);
 			}
 
@@ -2049,74 +2064,32 @@ export class Reader {
 	}
 
 	static restore(doc: Document) {
-		if (this.originalHTML) {			
-			// Disconnect the observers if they exist
-			if (this.observer) {
-				this.observer.disconnect();
-				this.observer = null;
-			}
-			if (this.highlighterObserver) {
-				this.highlighterObserver.disconnect();
-				this.highlighterObserver = null;
-			}
-			if (this.themeModeObserver) {
-				this.themeModeObserver.disconnect();
-				this.themeModeObserver = null;
-			}
-	
-			// Remove color scheme media query listener
-			if (this.colorSchemeMediaQuery) {
-				this.colorSchemeMediaQuery.removeEventListener('change', (e) => this.handleColorSchemeChange(e, doc));
-				this.colorSchemeMediaQuery = null;
-			}
-
-			// Hide any active footnote popover
-			this.hideFootnotePopover();
-
-			// Clean up YouTube embed referer rule if it was enabled
+		if (this.originalHTML) {
+			// Clean up YouTube embed referer rule before reload
 			const host = doc.URL ? new URL(doc.URL).hostname : '';
 			if (host.includes('youtube.com') || host.includes('youtu.be')) {
 				browser.runtime.sendMessage({ action: 'disableYouTubeEmbedRule' }).catch(() => {});
 			}
 
-			// Remove lightbox
-			if (this.lightbox) {
-				this.lightbox.remove();
-				this.lightbox = null;
+			// Remember if the embedded clipper was open so we can reopen after reload
+			if (doc.getElementById('obsidian-clipper-container')) {
+				sessionStorage.setItem('obsidian-reopen-clipper', '1');
 			}
 
-			// Remove reader styles
-			if (this.readerStyles) {
-				this.readerStyles.remove();
-				this.readerStyles = null;
-			}
-
-			const parser = new DOMParser();
-			const newDoc = parser.parseFromString(this.originalHTML, 'text/html');
-			doc.replaceChild(
-				newDoc.documentElement,
-				doc.documentElement
-			);
-			
 			this.originalHTML = null;
-			this.settingsBar = null;
-			const outline = doc.querySelector('.obsidian-reader-outline');
-			if (outline) {
-				outline.remove();
-			}
 			this.isActive = false;
 
-			// Reapply highlights after restoring original content
-			if (typeof window !== 'undefined' && window.hasOwnProperty('applyHighlights')) {
-				(window as any).applyHighlights();
-			}
+			window.location.reload();
 		}
 	}
 
 	static async toggle(doc: Document): Promise<boolean> {
 		if (this.isActive) {
 			this.restore(doc);
-			return false;
+			// restore() triggers a page reload — return a promise that
+			// never resolves to prevent further DOM changes (like
+			// removing reader classes) that would flash before reload
+			return new Promise(() => {});
 		} else {
 			await this.apply(doc);
 			return true;
