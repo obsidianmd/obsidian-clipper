@@ -997,17 +997,23 @@
 		justify-content: center;
 		border: none;
 		cursor: pointer;
+		-webkit-tap-highlight-color: transparent;
 		transition: color 0.15s ease, opacity 0.15s ease, transform 0.15s ease;
 		background: var(--background-primary);
 		color: var(--text-muted);
 		outline: none;
-		&:hover {
-			color: var(--text-normal);
-			background: var(--background-primary-alt);
+		@media (hover: hover) {
+			&:hover {
+				color: var(--text-normal);
+				background: var(--background-primary-alt);
+			}
 		}
 		&.is-active {
 			color: var(--text-normal);
 			background: var(--background-primary-alt);
+			@media (hover: none) {
+				transition: none;
+			}
 		}
 	}
 }
