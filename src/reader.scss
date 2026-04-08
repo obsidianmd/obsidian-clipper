@@ -28,6 +28,13 @@
 	}
 }
 
+.theme-light {
+	--mix-blend-mode: multiply;
+}
+.theme-dark {
+	--mix-blend-mode: screen;
+}
+
 .obsidian-reader-active	body {
 	--safe-area-inset-top: env(safe-area-inset-top);
 	--safe-area-inset-bottom: env(safe-area-inset-bottom);
@@ -370,7 +377,7 @@
 		left: 0;
 		width: var(--timestamp-width);
 		cursor: ns-resize;
-		mix-blend-mode: multiply;
+		mix-blend-mode: var(--mix-blend-mode);
 		background:
 			linear-gradient(
 				to bottom,
@@ -389,7 +396,7 @@
 			pointer-events: none;
 			opacity: 0;
 			transition: opacity 0.1s;
-			mix-blend-mode: multiply;
+			mix-blend-mode: var(--mix-blend-mode);
 		}
 	}
 	.transcript-scrub-track:hover .transcript-scrub-hover {
