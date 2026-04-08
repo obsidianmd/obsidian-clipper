@@ -209,9 +209,6 @@
 	"embedded": {
 		"message": "Naka-embed"
 	},
-	"enableHighlighter": {
-		"message": "I-enable ang highlighter"
-	},
 	"enableHighlighterDescription": {
 		"message": "Mag-highlight ng content sa mga webpage para i-save sa Obsidian"
 	},
@@ -355,6 +352,9 @@
 		"message": "I-highlight ang pahina"
 	},
 	"highlighter": {
+		"message": "Highlighter"
+	},
+	"highlighterOn": {
 		"message": "Highlighter"
 	},
 	"highlighterSettings": {
@@ -747,6 +747,9 @@
 	},
 	"readerLoading": {
 		"message": "Inaayos ang kalabuan…"
+	},
+	"readerOn": {
+		"message": "Reader"
 	},
 	"readerSettings": {
 		"message": "Mga setting ng reader"

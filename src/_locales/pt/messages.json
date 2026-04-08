@@ -209,9 +209,6 @@
 	"embedded": {
 		"message": "Incorporado"
 	},
-	"enableHighlighter": {
-		"message": "Ativar realçador"
-	},
 	"enableHighlighterDescription": {
 		"message": "Realce conteúdo em páginas web que pode guardar no Obsidian."
 	},
@@ -356,6 +353,9 @@
 	},
 	"highlighter": {
 		"message": "Realçador"
+	},
+	"highlighterOn": {
+		"message": "Marcador"
 	},
 	"highlighterSettings": {
 		"message": "Realçador"
@@ -755,6 +755,9 @@
 	},
 	"readerLoading": {
 		"message": "A simplificar…"
+	},
+	"readerOn": {
+		"message": "Leitor"
 	},
 	"readerSettings": {
 		"message": "Definições do leitor"

@@ -209,9 +209,6 @@
 	"embedded": {
 		"message": "嵌入式"
 	},
-	"enableHighlighter": {
-		"message": "啟用標記"
-	},
 	"enableHighlighterDescription": {
 		"message": "在網頁上標記內容，您可以將其儲存到 Obsidian。"
 	},
@@ -356,6 +353,9 @@
 	},
 	"highlighter": {
 		"message": "標記工具"
+	},
+	"highlighterOn": {
+		"message": "螢光筆"
 	},
 	"highlighterSettings": {
 		"message": "標記工具設定"
@@ -755,6 +755,9 @@
 	},
 	"readerLoading": {
 		"message": "正在去除雜訊…"
+	},
+	"readerOn": {
+		"message": "閱讀模式"
 	},
 	"readerSettings": {
 		"message": "閱讀器設定"

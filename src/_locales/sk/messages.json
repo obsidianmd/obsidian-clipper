@@ -209,9 +209,6 @@
 	"embedded": {
 		"message": "Vložené"
 	},
-	"enableHighlighter": {
-		"message": "Zapnúť zvýrazňovač"
-	},
 	"enableHighlighterDescription": {
 		"message": "Zvýrazňujte obsah na webových stránkach, ktorý môžete uložiť do Obsidianu."
 	},
@@ -355,6 +352,9 @@
 		"message": "Zvýrazniť stránku"
 	},
 	"highlighter": {
+		"message": "Zvýrazňovač"
+	},
+	"highlighterOn": {
 		"message": "Zvýrazňovač"
 	},
 	"highlighterSettings": {
@@ -755,6 +755,9 @@
 	},
 	"readerLoading": {
 		"message": "Odstraňovanie balastu…"
+	},
+	"readerOn": {
+		"message": "Režim čítania"
 	},
 	"readerSettings": {
 		"message": "Nastavenia čítačky"

@@ -209,9 +209,6 @@
 	"embedded": {
 		"message": "सम्मिलित"
 	},
-	"enableHighlighter": {
-		"message": "Highlighter chalu karein"
-	},
 	"enableHighlighterDescription": {
 		"message": "Web page par content highlight karein jise aap Obsidian mein save kar sakte hain."
 	},
@@ -356,6 +353,9 @@
 	},
 	"highlighter": {
 		"message": "Highlighter"
+	},
+	"highlighterOn": {
+		"message": "हाइलाइटर"
 	},
 	"highlighterSettings": {
 		"message": "Highlighter"
@@ -755,6 +755,9 @@
 	},
 	"readerLoading": {
 		"message": "सरल किया जा रहा है…"
+	},
+	"readerOn": {
+		"message": "रीडर"
 	},
 	"readerSettings": {
 		"message": "रीडर सेटिंग्स"

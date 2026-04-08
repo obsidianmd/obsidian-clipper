@@ -5,7 +5,7 @@ import { flattenShadowDom as flattenShadowDomUtil } from './flatten-shadow-dom';
 import { getLocalStorage, setLocalStorage } from './storage-utils';
 import hljs from 'highlight.js';
 import { getDomain } from './string-utils';
-import { applyHighlights, invalidateHighlightCache, loadHighlights } from './highlighter';
+import { applyHighlights, invalidateHighlightCache, loadHighlights, toggleHighlighterMenu } from './highlighter';
 import { copyToClipboard } from './clipboard-utils';
 import { getMessage, initializeI18n } from './i18n';
 import { getFontCss } from './font-utils';
@@ -16,7 +16,7 @@ const VIEWPORT = 'width=device-width, initial-scale=1, maximum-scale=1';
 import { ReaderSettings } from '../types/types';
 
 export class Reader {
-	private static originalHTML: string | null = null;
+	private static hasApplied: boolean = false;
 	private static isActive: boolean = false;
 
 	/**
@@ -160,14 +160,16 @@ export class Reader {
 			const response = await browser.runtime.sendMessage({ action: 'getActiveTab' }) as { tabId?: number };
 			if (response.tabId) {
 				await browser.runtime.sendMessage({ action: 'toggleHighlighterMode', tabId: response.tabId });
-				highlighterBtn.classList.toggle('is-active');
 			}
 		});
 
 		// Sync active state with highlighter mode
-		if (doc.body.classList.contains('obsidian-highlighter-active')) {
-			highlighterBtn.classList.add('is-active');
-		}
+		const syncHighlighterBtn = () => {
+			highlighterBtn.classList.toggle('is-active', doc.body.classList.contains('obsidian-highlighter-active'));
+		};
+		syncHighlighterBtn();
+		this.highlighterObserver = new MutationObserver(syncHighlighterBtn);
+		this.highlighterObserver.observe(doc.body, { attributes: true, attributeFilter: ['class'] });
 
 		// Clip button with dropdown
 		const clipButton = doc.createElement('button');
@@ -178,20 +180,26 @@ export class Reader {
 			paths: ['m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48'],
 		}));
 
-		const clipDropdown = doc.createElement('div');
-		clipDropdown.className = 'obsidian-reader-clip-dropdown';
-
+		const addToObsidianBtn = doc.createElement('button');
+		addToObsidianBtn.className = 'nav-btn';
+		addToObsidianBtn.setAttribute('aria-label', getMessage('addToObsidian'));
 		const obsidianIcon = doc.createElementNS('http://www.w3.org/2000/svg', 'svg');
-		obsidianIcon.setAttribute('width', '16');
-		obsidianIcon.setAttribute('height', '16');
+		obsidianIcon.setAttribute('width', '18');
+		obsidianIcon.setAttribute('height', '18');
 		obsidianIcon.setAttribute('viewBox', '0 0 256 256');
 		obsidianIcon.setAttribute('fill', 'currentColor');
 		obsidianIcon.innerHTML = '<path d="M94.82 149.44c6.53-1.94 17.13-4.9 29.26-5.71a102.97 102.97 0 0 1-7.64-48.84c1.63-16.51 7.54-30.38 13.25-42.1l3.47-7.14 4.48-9.18c2.35-5 4.08-9.38 4.9-13.56.81-4.07.81-7.64-.2-11.11-1.03-3.47-3.07-7.14-7.15-11.21a17.02 17.02 0 0 0-15.8 3.77l-52.81 47.5a17.12 17.12 0 0 0-5.5 10.2l-4.5 30.18a149.26 149.26 0 0 1 38.24 57.2ZM54.45 106l-1.02 3.06-27.94 62.2a17.33 17.33 0 0 0 3.27 18.96l43.94 45.16a88.7 88.7 0 0 0 8.97-88.5A139.47 139.47 0 0 0 54.45 106Z"/><path d="m82.9 240.79 2.34.2c8.26.2 22.33 1.02 33.64 3.06 9.28 1.73 27.73 6.83 42.82 11.21 11.52 3.47 23.45-5.8 25.08-17.73 1.23-8.67 3.57-18.46 7.75-27.53a94.81 94.81 0 0 0-25.9-40.99 56.48 56.48 0 0 0-29.56-13.35 96.55 96.55 0 0 0-40.99 4.79 98.89 98.89 0 0 1-15.29 80.34h.1Z"/><path d="M201.87 197.76a574.87 574.87 0 0 0 19.78-31.6 8.67 8.67 0 0 0-.61-9.48 185.58 185.58 0 0 1-21.82-35.9c-5.91-14.16-6.73-36.08-6.83-46.69 0-4.07-1.22-8.05-3.77-11.21l-34.16-43.33c0 1.94-.4 3.87-.81 5.81a76.42 76.42 0 0 1-5.71 15.9l-4.7 9.8-3.36 6.72a111.95 111.95 0 0 0-12.03 38.23 93.9 93.9 0 0 0 8.67 47.92 67.9 67.9 0 0 1 39.56 16.52 99.4 99.4 0 0 1 25.8 37.31Z"/>';
+		addToObsidianBtn.appendChild(obsidianIcon);
+		addToObsidianBtn.addEventListener('click', () => {
+			browser.runtime.sendMessage({ action: 'toggleIframe' });
+		});
+
+		const clipDropdown = doc.createElement('div');
+		clipDropdown.className = 'obsidian-reader-clip-dropdown';
 
 		const clipActions: Array<{ action: string; icon: SVGElement }> = [
 			{ action: 'copyToClipboard', icon: this.createSVG({ width: '16', height: '16', viewBox: '0 0 24 24', strokeWidth: '1.75', paths: ['M20 8H10a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2z', 'M4 16a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2'] }) },
 			{ action: 'saveFile', icon: this.createSVG({ width: '16', height: '16', viewBox: '0 0 24 24', strokeWidth: '1.75', paths: ['M12 17V3', 'm6 11 6 6 6-6', 'M19 21H5'] }) },
-			{ action: 'addToObsidian', icon: obsidianIcon },
 		];
 
 		for (const { action, icon } of clipActions) {
@@ -204,10 +212,7 @@ export class Reader {
 			item.appendChild(itemLabel);
 
 			item.addEventListener('click', async () => {
-				if (action === 'addToObsidian') {
-					clipDropdown.classList.remove('is-open');
-					browser.runtime.sendMessage({ action: 'openPopup' });
-				} else if (action === 'copyToClipboard') {
+				if (action === 'copyToClipboard') {
 					const originalText = itemLabel.textContent;
 					browser.runtime.sendMessage({ action: 'copyMarkdownToClipboard' });
 					itemLabel.textContent = getMessage('copied');
@@ -238,6 +243,7 @@ export class Reader {
 		triggerGroup.appendChild(highlighterBtn);
 		triggerGroup.appendChild(clipButton);
 		triggerGroup.appendChild(trigger);
+		triggerGroup.appendChild(addToObsidianBtn);
 		settingsBar.appendChild(triggerGroup);
 		settingsBar.appendChild(clipDropdown);
 
@@ -245,9 +251,15 @@ export class Reader {
 		let lastScrollY = window.scrollY;
 		let scrollHidden = false;
 
+		const isMobile = window.matchMedia('(pointer: coarse)').matches;
+
 		const showButtons = () => {
 			if (scrollHidden) {
 				triggerGroup.style.opacity = '';
+				if (isMobile) {
+					triggerGroup.style.visibility = '';
+					triggerGroup.style.pointerEvents = '';
+				}
 				scrollHidden = false;
 			}
 		};
@@ -258,6 +270,10 @@ export class Reader {
 			if (currentY > lastScrollY && currentY > 50) {
 				if (!scrollHidden) {
 					triggerGroup.style.opacity = '0';
+					if (isMobile) {
+						triggerGroup.style.visibility = 'hidden';
+						triggerGroup.style.pointerEvents = 'none';
+					}
 					scrollHidden = true;
 				}
 			} else {
@@ -407,7 +423,8 @@ export class Reader {
 		updateModeIcon();
 
 		// Watch for theme-light/theme-dark class changes (D key, OS preference, etc.)
-		new MutationObserver(updateModeIcon).observe(doc.documentElement, {
+		this.themeModeObserver = new MutationObserver(updateModeIcon);
+		this.themeModeObserver.observe(doc.documentElement, {
 			attributes: true,
 			attributeFilter: ['class'],
 		});
@@ -863,6 +880,8 @@ export class Reader {
 	}
 
 	private static observer: IntersectionObserver | null = null;
+	private static highlighterObserver: MutationObserver | null = null;
+	private static themeModeObserver: MutationObserver | null = null;
 	private static activePopover: HTMLElement | null = null;
 	private static activeFootnoteLink: HTMLAnchorElement | null = null;
 
@@ -1083,11 +1102,15 @@ export class Reader {
 			const scripts = doc.querySelectorAll('script:not([type="application/ld+json"])');
 			scripts.forEach(el => el.remove());
 
-			// Replace body with a clone to remove all event listeners
-			const newBody = doc.body.cloneNode(true);
-			doc.body.parentNode?.replaceChild(newBody, doc.body);
+			// Replace body with a clone to remove all event listeners.
+			// Skip when the clipper iframe is present — cloning creates a
+			// new iframe element which reloads and loses user edits.
+			if (!doc.getElementById('obsidian-clipper-container')) {
+				const newBody = doc.body.cloneNode(true);
+				doc.body.parentNode?.replaceChild(newBody, doc.body);
+			}
 
-			// Block common ad/tracking domains
+			// Block inline event handlers and dynamic scripts
 			const meta = doc.createElement('meta');
 			meta.httpEquiv = 'Content-Security-Policy';
 			meta.content = "script-src 'none'; object-src 'none';";
@@ -1659,8 +1682,7 @@ export class Reader {
 		try {
 			await initializeI18n();
 
-			// Store original HTML for restoration
-			this.originalHTML = doc.documentElement.outerHTML;
+			this.hasApplied = true;
 
 			// Clipper iframe container
 			const clipperIframeContainer = doc.getElementById('obsidian-clipper-container');
@@ -1703,6 +1725,9 @@ export class Reader {
 			
 			// Clone document for Defuddle before we clear the body
 			const docClone = doc.cloneNode(true) as Document;
+			// Remove the clipper container from the clone so Defuddle
+			// doesn't extract it as page content
+			docClone.getElementById('obsidian-clipper-container')?.remove();
 			// Preserve the URL for Defuddle's extractors
 			Object.defineProperty(docClone, 'URL', { value: doc.URL, configurable: true });
 			// Start content extraction on the clone (don't await yet)
@@ -1715,12 +1740,13 @@ export class Reader {
 			const baseTags = head.querySelectorAll('base');
 			baseTags.forEach(el => el.remove());
 
-			// Remove stylesheet links and style tags, except reader styles
+			// Remove stylesheet links and style tags, except reader and extension styles
 			const styleElements = head.querySelectorAll('link[rel="stylesheet"], link[as="style"], style');
 			styleElements.forEach(el => {
-				if (el.id !== 'obsidian-reader-styles') {
-					el.remove();
-				}
+				if (el.id === 'obsidian-reader-styles') return;
+				// Preserve extension-injected styles (clipper, highlighter)
+				if (el instanceof HTMLStyleElement && el.textContent?.includes('obsidian-clipper')) return;
+				el.remove();
 			});
 
 			// Re-add reader CSS as a link element after cleanup
@@ -1753,7 +1779,17 @@ export class Reader {
 				head.insertBefore(charset, head.firstChild);
 			}
 
-			doc.body.textContent = '';
+			// Clear body children, preserving the clipper iframe container
+			if (clipperIframeContainer) {
+				for (let i = doc.body.childNodes.length - 1; i >= 0; i--) {
+					const child = doc.body.childNodes[i];
+					if (child !== clipperIframeContainer) {
+						doc.body.removeChild(child);
+					}
+				}
+			} else {
+				doc.body.textContent = '';
+			}
 
 			// Create main container
 			const readerContainer = doc.createElement('div');
@@ -1761,7 +1797,7 @@ export class Reader {
 
 			// Create left sidebar
 			const leftSidebar = doc.createElement('div');
-			leftSidebar.className = 'obsidian-left-sidebar';
+			leftSidebar.className = 'obsidian-reader-left-sidebar';
 			const outline = doc.createElement('div');
 			outline.className = 'obsidian-reader-outline';
 			leftSidebar.appendChild(outline);
@@ -1826,8 +1862,14 @@ export class Reader {
 			// Add settings bar
 			this.injectSettingsBar(doc);
 
-			// Re-attach the clipper iframe container if it exists
-			if (clipperIframeContainer) {
+			// Re-activate highlighter if it was active before entering Reader
+			if (doc.body.classList.contains('obsidian-highlighter-active')) {
+				toggleHighlighterMenu(true);
+			}
+
+			// Re-attach the clipper iframe container only if it was
+			// detached (not present when body clone was skipped)
+			if (clipperIframeContainer && !doc.body.contains(clipperIframeContainer)) {
 				doc.body.appendChild(clipperIframeContainer);
 			}
 
@@ -1893,11 +1935,12 @@ export class Reader {
 				}
 			}
 
-			const metadataItems = [
-				author ? author : '',
-				formattedDate || '',
-				domain ? domain : ''
-			].filter(Boolean);
+			const authors = author ? author.split(/,\s*/) : [];
+			const metadataItems: {text: string, type: string}[] = [
+				...authors.map(a => ({text: a, type: 'author'})),
+				formattedDate ? {text: formattedDate, type: 'date'} : null,
+				domain ? {text: domain, type: 'domain'} : null,
+			].filter((item): item is {text: string, type: string} => item !== null);
 
 			if (metadataItems.length > 0) {
 				const metadata = doc.createElement('div');
@@ -1913,13 +1956,16 @@ export class Reader {
 					}
 
 					const span = doc.createElement('span');
-					if (item === domain && domain) {
+					if (item.type === 'author') {
+						span.className = 'metadata-author';
+						span.textContent = item.text;
+					} else if (item.type === 'domain' && domain) {
 						const link = doc.createElement('a');
 						link.href = doc.URL;
 						link.textContent = domain;
 						span.appendChild(link);
 					} else {
-						span.textContent = item;
+						span.textContent = item.text;
 					}
 					metadataDetails.appendChild(span);
 				});
@@ -1998,6 +2044,12 @@ export class Reader {
 
 			// Initialize content-dependent features
 			this.observer = this.generateOutline(doc, title);
+			if (!this.observer) {
+				const leftSidebar = doc.querySelector('.obsidian-reader-left-sidebar') as HTMLElement;
+				if (leftSidebar) {
+					leftSidebar.classList.add('is-empty');
+				}
+			}
 			this.initializeFootnotes(doc);
 			this.initializeCodeHighlighting(doc);
 			this.initializeCopyButtons(doc);
@@ -2014,67 +2066,33 @@ export class Reader {
 		}
 	}
 
-	static restore(doc: Document) {
-		if (this.originalHTML) {			
-			// Disconnect the observer if it exists
-			if (this.observer) {
-				this.observer.disconnect();
-				this.observer = null;
-			}
-
-			// Remove color scheme media query listener
-			if (this.colorSchemeMediaQuery) {
-				this.colorSchemeMediaQuery.removeEventListener('change', (e) => this.handleColorSchemeChange(e, doc));
-				this.colorSchemeMediaQuery = null;
-			}
-
-			// Hide any active footnote popover
-			this.hideFootnotePopover();
-
-			// Clean up YouTube embed referer rule if it was enabled
-			const host = doc.URL ? new URL(doc.URL).hostname : '';
-			if (host.includes('youtube.com') || host.includes('youtu.be')) {
-				browser.runtime.sendMessage({ action: 'disableYouTubeEmbedRule' }).catch(() => {});
-			}
-
-			// Remove lightbox
-			if (this.lightbox) {
-				this.lightbox.remove();
-				this.lightbox = null;
-			}
-
-			// Remove reader styles
-			if (this.readerStyles) {
-				this.readerStyles.remove();
-				this.readerStyles = null;
-			}
-
-			const parser = new DOMParser();
-			const newDoc = parser.parseFromString(this.originalHTML, 'text/html');
-			doc.replaceChild(
-				newDoc.documentElement,
-				doc.documentElement
-			);
-			
-			this.originalHTML = null;
-			this.settingsBar = null;
-			const outline = doc.querySelector('.obsidian-reader-outline');
-			if (outline) {
-				outline.remove();
-			}
+	static async restore(doc: Document) {
+		if (this.hasApplied) {
+			this.hasApplied = false;
 			this.isActive = false;
 
-			// Reapply highlights after restoring original content
-			if (typeof window !== 'undefined' && window.hasOwnProperty('applyHighlights')) {
-				(window as any).applyHighlights();
+			// Send all messages to background before reloading
+			const messages: Promise<any>[] = [
+				browser.runtime.sendMessage({ action: 'readerModeChanged', isActive: false }).catch(() => {}),
+			];
+
+			const host = doc.URL ? new URL(doc.URL).hostname : '';
+			if (host.includes('youtube.com') || host.includes('youtu.be')) {
+				messages.push(browser.runtime.sendMessage({ action: 'disableYouTubeEmbedRule' }).catch(() => {}));
 			}
+
+			await Promise.all(messages);
+			window.location.reload();
 		}
 	}
 
 	static async toggle(doc: Document): Promise<boolean> {
 		if (this.isActive) {
-			this.restore(doc);
-			return false;
+			await this.restore(doc);
+			// restore() triggers a page reload — return a promise that
+			// never resolves to prevent further DOM changes (like
+			// removing reader classes) that would flash before reload
+			return new Promise(() => {});
 		} else {
 			await this.apply(doc);
 			return true;

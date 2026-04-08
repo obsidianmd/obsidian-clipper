@@ -209,9 +209,6 @@
 	"embedded": {
 		"message": "嵌入式"
 	},
-	"enableHighlighter": {
-		"message": "启用高亮"
-	},
 	"enableHighlighterDescription": {
 		"message": "在网页上高亮内容并保存到 Obsidian。"
 	},
@@ -355,6 +352,9 @@
 		"message": "高亮页面"
 	},
 	"highlighter": {
+		"message": "高亮"
+	},
+	"highlighterOn": {
 		"message": "高亮"
 	},
 	"highlighterSettings": {
@@ -755,6 +755,9 @@
 	},
 	"readerLoading": {
 		"message": "正在净化…"
+	},
+	"readerOn": {
+		"message": "阅读器"
 	},
 	"readerSettings": {
 		"message": "阅读器设置"

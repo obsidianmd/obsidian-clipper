@@ -209,9 +209,6 @@
 	"embedded": {
 		"message": "Osadzone"
 	},
-	"enableHighlighter": {
-		"message": "Włącz zakreślacz"
-	},
 	"enableHighlighterDescription": {
 		"message": "Wyróżniaj treści na stronach, które możesz zapisać w Obsidian."
 	},
@@ -355,6 +352,9 @@
 		"message": "Wyróżnij stronę"
 	},
 	"highlighter": {
+		"message": "Zakreślacz"
+	},
+	"highlighterOn": {
 		"message": "Zakreślacz"
 	},
 	"highlighterSettings": {
@@ -755,6 +755,9 @@
 	},
 	"readerLoading": {
 		"message": "Upraszczanie…"
+	},
+	"readerOn": {
+		"message": "Tryb czytania"
 	},
 	"readerSettings": {
 		"message": "Ustawienia czytnika"

@@ -3,6 +3,7 @@ import { detectBrowser } from './utils/browser-detection';
 import { updateCurrentActiveTab, isValidUrl, isBlankPage } from './utils/active-tab-manager';
 import { TextHighlightData } from './utils/highlighter';
 import { debounce } from './utils/debounce';
+import { Settings } from './types/types';
 
 const YOUTUBE_EMBED_RULE_ID = 9001;
 
@@ -58,6 +59,7 @@ async function disableYouTubeEmbedRule(): Promise<void> {
 
 let sidePanelOpenWindows: Set<number> = new Set();
 let highlighterModeState: { [tabId: number]: boolean } = {};
+let readerModeState: { [tabId: number]: boolean } = {};
 let hasHighlights = false;
 let isContextMenuCreating = false;
 let popupPorts: { [tabId: number]: browser.Runtime.Port } = {};
@@ -123,6 +125,10 @@ function getHighlighterModeForTab(tabId: number): boolean {
 	return highlighterModeState[tabId] ?? false;
 }
 
+function getReaderModeForTab(tabId: number): boolean {
+	return readerModeState[tabId] ?? false;
+}
+
 async function initialize() {
 	try {
 		// Set up tab listeners
@@ -130,11 +136,15 @@ async function initialize() {
 
 		browser.tabs.onRemoved.addListener((tabId) => {
 			delete highlighterModeState[tabId];
+			delete readerModeState[tabId];
 		});
 		
 		// Initialize context menu
 		await debouncedUpdateContextMenu(-1);
-		
+
+		// Set up action popup based on openBehavior setting
+		await updateActionPopup();
+
 		console.log('Background script initialized successfully');
 	} catch (error) {
 		console.error('Error initializing background script:', error);
@@ -265,6 +275,14 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 			}
 		}
 
+		if (typedRequest.action === "readerModeChanged" && sender.tab && typedRequest.isActive !== undefined) {
+			const tabId = sender.tab.id;
+			if (tabId) {
+				readerModeState[tabId] = typedRequest.isActive;
+				debouncedUpdateContextMenu(tabId);
+			}
+		}
+
 		if (typedRequest.action === "highlightsCleared" && sender.tab) {
 			hasHighlights = false;
 			debouncedUpdateContextMenu(sender.tab.id!);
@@ -285,6 +303,16 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 			return true;
 		}
 
+		if (typedRequest.action === "getReaderMode") {
+			const tabId = typedRequest.tabId || sender.tab?.id;
+			if (tabId) {
+				sendResponse({ isActive: getReaderModeForTab(tabId) });
+			} else {
+				sendResponse({ isActive: false });
+			}
+			return true;
+		}
+
 		if (typedRequest.action === "toggleHighlighterMode" && typedRequest.tabId) {
 			toggleHighlighterMode(typedRequest.tabId)
 				.then(newMode => sendResponse({ success: true, isActive: newMode }))
@@ -293,7 +321,7 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 		}
 
 		if (typedRequest.action === "openPopup") {
-			browser.action.openPopup()
+			openPopup()
 				.then(() => {
 					sendResponse({ success: true });
 				})
@@ -307,7 +335,17 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 		if (typedRequest.action === "toggleReaderMode" && typedRequest.tabId) {
 			injectReaderScript(typedRequest.tabId).then(() => {
 				browser.tabs.sendMessage(typedRequest.tabId!, { action: "toggleReaderMode" })
-					.then(sendResponse);
+					.then((response: any) => {
+						if (response?.success) {
+							readerModeState[typedRequest.tabId!] = response.isActive ?? false;
+							debouncedUpdateContextMenu(typedRequest.tabId!);
+						}
+						sendResponse(response);
+					})
+					.catch(() => {
+						// Page may have reloaded before responding (reader restore)
+						sendResponse({ success: true, isActive: false });
+					});
 			});
 			return true;
 		}
@@ -335,6 +373,22 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 					sendResponse({success: false, error: 'No active tab found'});
 				}
 			});
+			return true;
+		}
+
+		if (typedRequest.action === "toggleIframe") {
+			const tab = sender.tab;
+			if (tab?.id && tab.url && isValidUrl(tab.url) && !isBlankPage(tab.url)) {
+				ensureContentScriptLoadedInBackground(tab.id)
+					.then(() => browser.tabs.sendMessage(tab.id!, { action: "toggle-iframe" }))
+					.then(() => sendResponse({ success: true }))
+					.catch((error) => {
+						console.error('Error toggling iframe:', error);
+						sendResponse({ success: false, error: error instanceof Error ? error.message : String(error) });
+					});
+			} else {
+				sendResponse({ success: false, error: 'Cannot open iframe on this page' });
+			}
 			return true;
 		}
 
@@ -385,16 +439,6 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 				sendResponse({success: true});
 			} catch (error) {
 				console.error('Error opening settings:', error);
-				sendResponse({success: false, error: error instanceof Error ? error.message : String(error)});
-			}
-			return true;
-		}
-
-		if (typedRequest.action === "openPopup") {
-			try {
-				browser.action.openPopup();
-				sendResponse({success: true});
-			} catch (error) {
 				sendResponse({success: false, error: error instanceof Error ? error.message : String(error)});
 			}
 			return true;
@@ -537,7 +581,7 @@ browser.commands.onCommand.addListener(async (command, tab) => {
 
 	if (command === 'quick_clip') {
 		if (tab?.id) {
-			browser.action.openPopup();
+			openPopup();
 			setTimeout(() => {
 				browser.runtime.sendMessage({action: "triggerQuickClip"})
 					.catch(error => console.error("Failed to send quick clip message:", error));
@@ -576,6 +620,7 @@ const debouncedUpdateContextMenu = debounce(async (tabId: number) => {
 		}
 
 		const isHighlighterMode = getHighlighterModeForTab(currentTabId);
+		const isReaderMode = getReaderModeForTab(currentTabId);
 
 		const menuItems: {
 			id: string;
@@ -593,13 +638,13 @@ const debouncedUpdateContextMenu = debounce(async (tabId: number) => {
 					contexts: ["page", "selection"]
 				},
 				{
-					id: "toggle-reader",
-					title: browser.i18n.getMessage('commandToggleReader'),
+					id: isReaderMode ? "exit-reader" : "enter-reader",
+					title: isReaderMode ? browser.i18n.getMessage('disableReader') : browser.i18n.getMessage('readerOn'),
 					contexts: ["page", "selection"]
 				},
 				{
 					id: isHighlighterMode ? "exit-highlighter" : "enter-highlighter",
-					title: isHighlighterMode ? "Exit highlighter" : "Highlight this page",
+					title: isHighlighterMode ? browser.i18n.getMessage('disableHighlighter') : browser.i18n.getMessage('highlighterOn'),
 					contexts: ["page","image", "video", "audio"]
 				},
 				{
@@ -640,7 +685,7 @@ const debouncedUpdateContextMenu = debounce(async (tabId: number) => {
 
 browser.contextMenus.onClicked.addListener(async (info, tab) => {
 	if (info.menuItemId === "open-obsidian-clipper") {
-		browser.action.openPopup();
+		openPopup();
 	} else if (info.menuItemId === "enter-highlighter" && tab && tab.id) {
 		await setHighlighterMode(tab.id, true);
 	} else if (info.menuItemId === "exit-highlighter" && tab && tab.id) {
@@ -649,10 +694,14 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
 		await highlightSelection(tab.id, info);
 	} else if (info.menuItemId === "highlight-element" && tab && tab.id) {
 		await highlightElement(tab.id, info);
-	} else if (info.menuItemId === "toggle-reader" && tab && tab.id) {
+	} else if ((info.menuItemId === "enter-reader" || info.menuItemId === "exit-reader") && tab && tab.id) {
 		await ensureContentScriptLoadedInBackground(tab.id);
 		await injectReaderScript(tab.id);
-		await browser.tabs.sendMessage(tab.id, { action: "toggleReaderMode" });
+		const response = await browser.tabs.sendMessage(tab.id, { action: "toggleReaderMode" }) as { success?: boolean; isActive?: boolean };
+		if (response?.success) {
+			readerModeState[tab.id] = response.isActive ?? false;
+			debouncedUpdateContextMenu(tab.id);
+		}
 	} else if (info.menuItemId === 'open-embedded' && tab && tab.id) {
 		await ensureContentScriptLoadedInBackground(tab.id);
 		await browser.tabs.sendMessage(tab.id, { action: "toggle-iframe" });
@@ -818,6 +867,67 @@ async function injectReaderScript(tabId: number) {
 		return false;
 	}
 }
+
+// When set to 'reader' or 'embedded', clear the popup so action.onClicked fires
+// instead, handling the action directly without briefly opening the popup.
+const validOpenBehaviors: Settings['openBehavior'][] = ['popup', 'embedded', 'reader'];
+
+function parseOpenBehavior(raw: string | undefined): Settings['openBehavior'] {
+	return validOpenBehaviors.includes(raw as Settings['openBehavior']) ? raw as Settings['openBehavior'] : 'popup';
+}
+
+async function updateActionPopup(openBehavior?: Settings['openBehavior']): Promise<void> {
+	if (!openBehavior) {
+		const data = await browser.storage.sync.get('general_settings');
+		openBehavior = parseOpenBehavior((data.general_settings as Record<string, string>)?.openBehavior);
+	}
+	currentOpenBehavior = openBehavior;
+	if (openBehavior === 'reader' || openBehavior === 'embedded') {
+		await browser.action.setPopup({ popup: '' });
+	} else {
+		await browser.action.setPopup({ popup: 'popup.html' });
+	}
+}
+
+let currentOpenBehavior: Settings['openBehavior'] = 'popup';
+
+// In reader/embedded mode, opens embedded iframe instead of popup.
+async function openPopup(): Promise<void> {
+	if (currentOpenBehavior === 'reader' || currentOpenBehavior === 'embedded') {
+		const tabs = await browser.tabs.query({ active: true, currentWindow: true });
+		const tab = tabs[0];
+		if (tab?.id && tab.url && isValidUrl(tab.url) && !isBlankPage(tab.url)) {
+			await ensureContentScriptLoadedInBackground(tab.id);
+			await browser.tabs.sendMessage(tab.id, { action: "toggle-iframe" });
+			return;
+		}
+		// Fall through to popup if tab is invalid
+	}
+	await browser.action.openPopup();
+}
+
+browser.action.onClicked.addListener(async (tab) => {
+	if (!tab?.id || !tab.url || !isValidUrl(tab.url) || isBlankPage(tab.url)) return;
+
+	if (currentOpenBehavior === 'reader') {
+		await ensureContentScriptLoadedInBackground(tab.id);
+		await injectReaderScript(tab.id);
+		const response = await browser.tabs.sendMessage(tab.id, { action: "toggleReaderMode" }) as { success?: boolean; isActive?: boolean };
+		if (response?.success) {
+			readerModeState[tab.id] = response.isActive ?? false;
+			debouncedUpdateContextMenu(tab.id);
+		}
+	} else if (currentOpenBehavior === 'embedded') {
+		await ensureContentScriptLoadedInBackground(tab.id);
+		await browser.tabs.sendMessage(tab.id, { action: "toggle-iframe" });
+	}
+});
+
+browser.storage.onChanged.addListener((changes, area) => {
+	if (area === 'sync' && changes.general_settings) {
+		updateActionPopup(parseOpenBehavior((changes.general_settings.newValue as Record<string, string>)?.openBehavior));
+	}
+});
 
 // Initialize the extension
 initialize().catch(error => {

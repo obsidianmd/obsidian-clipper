@@ -209,9 +209,6 @@
 	"embedded": {
 		"message": "Incrustat"
 	},
-	"enableHighlighter": {
-		"message": "Activar ressaltador"
-	},
 	"enableHighlighterDescription": {
 		"message": "Ressalti contingut en pàgines web que pot guardar a Obsidian."
 	},
@@ -355,6 +352,9 @@
 		"message": "Ressaltar pàgina"
 	},
 	"highlighter": {
+		"message": "Ressaltador"
+	},
+	"highlighterOn": {
 		"message": "Ressaltador"
 	},
 	"highlighterSettings": {
@@ -755,6 +755,9 @@
 	},
 	"readerLoading": {
 		"message": "S'està simplificant…"
+	},
+	"readerOn": {
+		"message": "Mode lectura"
 	},
 	"readerSettings": {
 		"message": "Configuració del lector"

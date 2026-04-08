@@ -209,9 +209,6 @@
 	"embedded": {
 		"message": "مضمن"
 	},
-	"enableHighlighter": {
-		"message": "تفعيل المظلل"
-	},
 	"enableHighlighterDescription": {
 		"message": "قم بتظليل المحتوى على صفحات الويب الذي تريد حفظه في أوبسيديان."
 	},
@@ -356,6 +353,9 @@
 	},
 	"highlighter": {
 		"message": "المظلل"
+	},
+	"highlighterOn": {
+		"message": "أداة التمييز"
 	},
 	"highlighterSettings": {
 		"message": "المظلل"
@@ -755,6 +755,9 @@
 	},
 	"readerLoading": {
 		"message": "إزالة التشويش…"
+	},
+	"readerOn": {
+		"message": "وضع القارئ"
 	},
 	"readerSettings": {
 		"message": "إعدادات القارئ"

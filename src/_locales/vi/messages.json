@@ -209,9 +209,6 @@
 	"embedded": {
 		"message": "Được nhúng"
 	},
-	"enableHighlighter": {
-		"message": "Bật đánh dấu"
-	},
 	"enableHighlighterDescription": {
 		"message": "Đánh dấu nội dung trên trang web mà bạn có thể lưu vào Obsidian."
 	},
@@ -356,6 +353,9 @@
 	},
 	"highlighter": {
 		"message": "Đánh dấu"
+	},
+	"highlighterOn": {
+		"message": "Bút đánh dấu"
 	},
 	"highlighterSettings": {
 		"message": "Đánh dấu"
@@ -755,6 +755,9 @@
 	},
 	"readerLoading": {
 		"message": "Đang làm rõ…"
+	},
+	"readerOn": {
+		"message": "Chế độ đọc"
 	},
 	"readerSettings": {
 		"message": "Cài đặt chế độ đọc"

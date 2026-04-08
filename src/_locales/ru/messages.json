@@ -209,9 +209,6 @@
 	"embedded": {
 		"message": "Встроенный"
 	},
-	"enableHighlighter": {
-		"message": "Включить маркер"
-	},
 	"enableHighlighterDescription": {
 		"message": "Выделите содержимое веб-страниц, которое хотите сохранить в Obsidian."
 	},
@@ -356,6 +353,9 @@
 	},
 	"highlighter": {
 		"message": "Маркер"
+	},
+	"highlighterOn": {
+		"message": "Выделение"
 	},
 	"highlighterSettings": {
 		"message": "Маркер"
@@ -755,6 +755,9 @@
 	},
 	"readerLoading": {
 		"message": "Упрощение…"
+	},
+	"readerOn": {
+		"message": "Режим чтения"
 	},
 	"readerSettings": {
 		"message": "Настройки режима чтения"

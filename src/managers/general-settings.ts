@@ -8,7 +8,7 @@ import { createElementWithClass, createElementWithHTML } from '../utils/dom-util
 import { createDefaultTemplate, getTemplates, saveTemplateSettings } from '../managers/template-manager';
 import { updateTemplateList, showTemplateEditor } from '../managers/template-ui';
 import { exportAllSettings, importAllSettings } from '../utils/import-export';
-import { Template } from '../types/types';
+import { Settings, Template } from '../types/types';
 import { exportHighlights } from './highlights-manager';
 import { getMessage, setupLanguageAndDirection } from '../utils/i18n';
 import { debounce } from '../utils/debounce';
@@ -259,7 +259,7 @@ function saveSettingsFromForm(): void {
 
 	const updatedSettings = {
 		...generalSettings, // Keep existing settings
-		openBehavior: (openBehaviorDropdown?.value as 'popup' | 'embedded') ?? generalSettings.openBehavior,
+		openBehavior: (openBehaviorDropdown?.value as Settings['openBehavior']) ?? generalSettings.openBehavior,
 		showMoreActionsButton: showMoreActionsToggle?.checked ?? generalSettings.showMoreActionsButton,
 		betaFeatures: betaFeaturesToggle?.checked ?? generalSettings.betaFeatures,
 		legacyMode: legacyModeToggle?.checked ?? generalSettings.legacyMode,
@@ -349,7 +349,7 @@ function initializeOpenBehaviorDropdown(): void {
 		'open-behavior-dropdown',
 		generalSettings.openBehavior,
 		(value) => {
-			saveSettings({ ...generalSettings, openBehavior: value as 'popup' | 'embedded' });
+			saveSettings({ ...generalSettings, openBehavior: value as Settings['openBehavior'] });
 		}
 	);
 }

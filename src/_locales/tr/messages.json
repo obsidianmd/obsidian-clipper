@@ -209,9 +209,6 @@
 	"embedded": {
 		"message": "Gömülü"
 	},
-	"enableHighlighter": {
-		"message": "Vurgulayıcıyı etkinleştir"
-	},
 	"enableHighlighterDescription": {
 		"message": "Web sayfalarındaki Obsidian'a kaydedebileceğiniz içeriği vurgulayın."
 	},
@@ -355,6 +352,9 @@
 		"message": "Sayfayı vurgula"
 	},
 	"highlighter": {
+		"message": "Vurgulayıcı"
+	},
+	"highlighterOn": {
 		"message": "Vurgulayıcı"
 	},
 	"highlighterSettings": {
@@ -755,6 +755,9 @@
 	},
 	"readerLoading": {
 		"message": "Sadeleştiriliyor…"
+	},
+	"readerOn": {
+		"message": "Okuyucu"
 	},
 	"readerSettings": {
 		"message": "Okuyucu ayarları"

@@ -209,9 +209,6 @@
 	"embedded": {
 		"message": "Beágyazott"
 	},
-	"enableHighlighter": {
-		"message": "Kiemelő engedélyezése"
-	},
 	"enableHighlighterDescription": {
 		"message": "Kiemelheted a weboldalakon a tartalmat, amit elmenthetsz az Obsidianba."
 	},
@@ -355,6 +352,9 @@
 		"message": "Oldal kiemelése"
 	},
 	"highlighter": {
+		"message": "Kiemelő"
+	},
+	"highlighterOn": {
 		"message": "Kiemelő"
 	},
 	"highlighterSettings": {
@@ -755,6 +755,9 @@
 	},
 	"readerLoading": {
 		"message": "Tisztítás…"
+	},
+	"readerOn": {
+		"message": "Olvasó mód"
 	},
 	"readerSettings": {
 		"message": "Olvasó beállításai"

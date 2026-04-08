@@ -29,6 +29,12 @@
 }
 
 .obsidian-reader-active	body {
+	--safe-area-inset-top: env(safe-area-inset-top);
+	--safe-area-inset-bottom: env(safe-area-inset-bottom);
+	--safe-area-inset-left: env(safe-area-inset-left);
+	--safe-area-inset-right: env(safe-area-inset-right);
+	--preferred-text-scale: env(preferred-text-scale);
+
 	--font-text: system-ui, -apple-system, sans-serif;
 	--dynamic-font-size: calc(var(--font-text-size) + 0.25vw);
 	--sidebar-width: 240px;
@@ -159,20 +165,24 @@
 		background-color: var(--text-selection);
 	}
 
+	.obsidian-reader-left-sidebar.is-empty ~ .obsidian-reader-content {
+		--sidebar-width: 30px;
+	}
+	.obsidian-reader-right-sidebar {
+		width: var(--clipper-sidebar-width, auto);
+	}
+
 	.obsidian-reader-content {
 		padding: max(4rem, 4vh) 0 0 !important;	
 		width: var(--line-width);
-		max-width: calc(100vw - var(--sidebar-width));
+		max-width: calc(100vw - var(--sidebar-width) - var(--clipper-sidebar-width, 0px));
 		overflow: hidden;
 		> article {
 			margin: 0 auto;
 			max-width: 100%;
 		}
 	}
-	.obsidian-left-sidebar,
-	.obsidian-right-sidebar {
-		max-width: var(--sidebar-width);
-	}
+
 	h1 {
 		margin: 0 0 0.5em 0;
 		font-weight: var(--h1-weight);
@@ -237,6 +247,11 @@
 		color: var(--text-muted);
 		font-size: 0.9em;
 
+		.metadata-author {
+			color: var(--text-normal);
+			font-weight: var(--font-medium);
+		}
+
 		a {
 			color: inherit;
 			text-decoration: none;
@@ -250,12 +265,14 @@
 		max-width: 100%;
 		height: auto;
 		border-radius: var(--radius-s);
+		corner-shape: var(--corner-shape);
 		vertical-align: bottom;
 	}
 	iframe {
 		max-width: 100%;
 		width: 100%;
 		border-radius: var(--radius-s);
+		corner-shape: var(--corner-shape);
 		overflow: hidden;
 		border: none;
 		&[src*="youtube.com"] {
@@ -925,6 +942,10 @@
 	}
 }
 
+.obsidian-highlight-overlay {
+	z-index: 99;
+}
+
 .obsidian-reader-loading-text {
 	color: var(--text-faint);
 	font-size: 0.8em;
@@ -946,7 +967,7 @@
 	position: fixed;
 	top: 0;
 	right: 0;
-	z-index: 999999999;
+	z-index: 99;
 	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
 	user-select: none;
 	-webkit-user-select: none;
@@ -960,12 +981,11 @@
 	background: var(--background-primary);
 	box-shadow: 5px -10px 20px 20px var(--background-primary);
 	border-radius: var(--radius-m);
-	
 	corner-shape: var(--corner-shape);
 	display: flex;
 	align-items: center;
 	gap: 4px;
-	transition: opacity 0.15s ease;
+	transition: opacity 0.15s ease, visibility 0.15s ease;
 	.nav-btn {
 		border-radius: var(--radius-m);
 		corner-shape: var(--corner-shape);
@@ -979,7 +999,6 @@
 		cursor: pointer;
 		transition: color 0.15s ease, opacity 0.15s ease, transform 0.15s ease;
 		background: var(--background-primary);
-		border: 1px solid var(--background-modifier-border);
 		color: var(--text-muted);
 		outline: none;
 		&:hover {
@@ -989,6 +1008,23 @@
 		&.is-active {
 			color: var(--text-normal);
 			background: var(--background-primary-alt);
+		}
+	}
+}
+
+@media (max-width: 768px) {
+	.obsidian-reader-nav {
+		position: fixed;
+		top: 0;
+		right: 0;
+		left: 0;
+		box-shadow: none;
+		width: calc(100vw - var(--size-4-3) * 2);
+		padding: calc(var(--safe-area-inset-top) + var(--size-4-2)) var(--size-4-3) var(--size-4-2);
+		justify-content: flex-end;
+		.nav-btn {
+			width: 40px;
+			height: 40px;
 		}
 	}
 }
@@ -1238,8 +1274,8 @@
 		width: 100%;
 		margin: 0 auto;
 	}
-	.obsidian-left-sidebar,
-	.obsidian-right-sidebar {
+	.obsidian-reader-left-sidebar,
+	.obsidian-reader-right-sidebar {
 		display: none;
 	}
 }
@@ -1284,7 +1320,7 @@
 		min-height: 0;
 
 		img {
-			max-width: 96vw;
+			max-width: 100vw;
 			max-height: calc(90vh - 100px);
 			height: 100%;
 			width: 100%;
@@ -1292,6 +1328,7 @@
 			border-radius: var(--radius-s);
 			mix-blend-mode: normal !important;
 			filter: none !important;
+			cursor: default;
 		}
 	}
 
@@ -1330,10 +1367,18 @@
 }
 
 .obsidian-reader-active {
+	#obsidian-clipper-container {
+		z-index: 999;
+	}
+
 	img:not(a img):not(figure img) {
 		position: relative;
+		cursor: zoom-in;
 		&:hover::after {
 			opacity: 1;
+		}
+		+ img {
+			margin-top: 0.5em;
 		}
 	}
 

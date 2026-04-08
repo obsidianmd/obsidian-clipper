@@ -209,9 +209,6 @@
 	"embedded": {
 		"message": "Vložené"
 	},
-	"enableHighlighter": {
-		"message": "Aktivovat zvýrazňovač"
-	},
 	"enableHighlighterDescription": {
 		"message": "Zvýrazněte obsah na webových stránkách, který můžete uložit do Obsidian."
 	},
@@ -355,6 +352,9 @@
 		"message": "Zvýraznit stránku"
 	},
 	"highlighter": {
+		"message": "Zvýrazňovač"
+	},
+	"highlighterOn": {
 		"message": "Zvýrazňovač"
 	},
 	"highlighterSettings": {
@@ -747,6 +747,9 @@
 	},
 	"readerLoading": {
 		"message": "Zjednodušování…"
+	},
+	"readerOn": {
+		"message": "Čtečka"
 	},
 	"readerSettings": {
 		"message": "Nastavení čtečky"

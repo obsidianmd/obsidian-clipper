@@ -4,6 +4,25 @@ import { selectorContentToString } from '../shared';
 import { debugLog } from '../debug';
 
 /**
+ * Send an extractContent message to a tab via the background script,
+ * avoiding direct use of browser.tabs which may be unavailable in
+ * Firefox iframe/side-panel contexts.
+ */
+export async function sendExtractContent(tabId: number, selector: string, attribute: string | undefined, extractHtml: boolean): Promise<{ content: string | string[] } | undefined> {
+	const response = await browser.runtime.sendMessage({
+		action: "sendMessageToTab",
+		tabId: tabId,
+		message: {
+			action: "extractContent",
+			selector: selector,
+			attribute: attribute,
+			extractHtml: extractHtml
+		}
+	}) as { content: string | string[] };
+	return response || undefined;
+}
+
+/**
  * Resolve a selector and return the raw content (array or string).
  * Used by the renderer for for loops and conditionals.
  */
@@ -25,12 +44,7 @@ export async function resolveSelector(tabId: number, selectorExpr: string): Prom
 	const selector = rawSelector.replace(/\\"/g, '"').replace(/\s+/g, ' ').trim();
 
 	try {
-		const response = await browser.tabs.sendMessage(tabId, {
-			action: "extractContent",
-			selector: selector,
-			attribute: attribute,
-			extractHtml: extractHtml
-		}) as { content: string | string[] };
+		const response = await sendExtractContent(tabId, selector, attribute, extractHtml);
 
 		// Return the raw content (could be array or string)
 		return response ? response.content : undefined;
@@ -55,20 +69,15 @@ export async function processSelector(tabId: number, match: string, currentUrl: 
 	const selector = rawSelector.replace(/\\"/g, '"').replace(/\s+/g, ' ').trim();
 
 	try {
-		const response = await browser.tabs.sendMessage(tabId, { 
-			action: "extractContent", 
-			selector: selector,
-			attribute: attribute,
-			extractHtml: extractHtml
-		}) as { content: string };
+		const response = await sendExtractContent(tabId, selector, attribute, extractHtml);
 
 		let content = response ? response.content : '';
-	
+
 		const contentString = selectorContentToString(content);
-	
+
 		debugLog('ContentExtractor', 'Applying filters:', { selector, filterString: filtersString });
 		const filteredContent = applyFilters(contentString, filtersString, currentUrl);
-	
+
 		return filteredContent;
 	} catch (error) {
 		console.error('Error extracting content by selector:', error, { selector, attribute, extractHtml });

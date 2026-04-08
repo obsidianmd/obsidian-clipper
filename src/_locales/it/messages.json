@@ -209,9 +209,6 @@
 	"embedded": {
 		"message": "Incorporato"
 	},
-	"enableHighlighter": {
-		"message": "Abilita evidenziatore"
-	},
 	"enableHighlighterDescription": {
 		"message": "Evidenzia il contenuto sulle pagine web che puoi salvare in Obsidian."
 	},
@@ -355,6 +352,9 @@
 		"message": "Evidenzia pagina"
 	},
 	"highlighter": {
+		"message": "Evidenziatore"
+	},
+	"highlighterOn": {
 		"message": "Evidenziatore"
 	},
 	"highlighterSettings": {
@@ -755,6 +755,9 @@
 	},
 	"readerLoading": {
 		"message": "Semplificazione…"
+	},
+	"readerOn": {
+		"message": "Modalità lettura"
 	},
 	"readerSettings": {
 		"message": "Impostazioni lettore"

@@ -30,10 +30,25 @@ declare global {
 	const iframeId = 'obsidian-clipper-iframe';
 	const containerId = 'obsidian-clipper-container';
 
+	let sidebarWidthRaf: number | null = null;
+
+	function updateSidebarWidth(container: HTMLElement | null) {
+		if (sidebarWidthRaf) cancelAnimationFrame(sidebarWidthRaf);
+		sidebarWidthRaf = requestAnimationFrame(() => {
+			if (container && document.contains(container)) {
+				document.documentElement.style.setProperty('--clipper-sidebar-width', `${container.offsetWidth + 24}px`);
+			} else {
+				document.documentElement.style.removeProperty('--clipper-sidebar-width');
+			}
+		});
+	}
+
 	function removeContainer(container: HTMLElement) {
 		container.classList.add('is-closing');
+		updateSidebarWidth(null);
 		container.addEventListener('animationend', () => {
 			container.remove();
+			highlighter.repositionHighlights();
 		}, { once: true });
 	}
 
@@ -78,6 +93,10 @@ declare global {
 		addResizeListener(container, southWestHandle, 'sw');
 
 		document.body.appendChild(container);
+		updateSidebarWidth(container);
+		container.addEventListener('animationend', () => {
+			highlighter.repositionHighlights();
+		}, { once: true });
 	}
 
 	function addResizeListener(container: HTMLElement, handle: HTMLElement, direction: string) {
@@ -101,13 +120,13 @@ declare global {
 	
 			document.onmousemove = (moveEvent) => {
 				if (!isResizing) return;
-	
+
 				const dx = moveEvent.clientX - startX;
 				const dy = moveEvent.clientY - startY;
 
 				const minWidth = parseInt(container.style.minWidth) || 200;
 				const minHeight = parseInt(container.style.minHeight) || 200;
-	
+
 				if (direction.includes('e')) {
 					let newWidth = startWidth + dx;
 					if (newWidth < minWidth) newWidth = minWidth;
@@ -135,6 +154,8 @@ declare global {
 					container.style.height = `${newHeight}px`;
 					container.style.top = `${newTop}px`;
 				}
+
+				updateSidebarWidth(container);
 			};
 	
 			document.onmouseup = () => {
@@ -146,6 +167,8 @@ declare global {
 				const newWidth = container.offsetWidth;
 				const newHeight = container.offsetHeight;
 				browser.storage.local.set({ clipperIframeWidth: newWidth, clipperIframeHeight: newHeight });
+
+				highlighter.repositionHighlights();
 
 				document.onmousemove = null;
 				document.onmouseup = null;
@@ -452,14 +475,8 @@ declare global {
 					sendResponse({ isActive: false });
 				});
 			return true;
-		} else if (request.action === "toggleReaderMode") {
-			// Forward the request to the background script to inject reader mode if needed
-			browser.runtime.sendMessage({ action: "toggleReaderMode", tabId: sender.tab?.id })
-				.then(sendResponse)
-				.catch(error => {
-					console.error("Error toggling reader mode:", error);
-					sendResponse({ success: false, error: error instanceof Error ? error.message : 'Unknown error' });
-				});
+		} else if (request.action === "getReaderModeState") {
+			sendResponse({ isActive: document.documentElement.classList.contains('obsidian-reader-active') });
 			return true;
 		}
 		return true;

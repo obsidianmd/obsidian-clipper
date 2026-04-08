@@ -209,9 +209,6 @@
 	"embedded": {
 		"message": "埋め込み"
 	},
-	"enableHighlighter": {
-		"message": "ハイライトを有効化"
-	},
 	"enableHighlighterDescription": {
 		"message": "WebページのコンテンツをハイライトしてObsidianに保存できます。"
 	},
@@ -355,6 +352,9 @@
 		"message": "ページをハイライト"
 	},
 	"highlighter": {
+		"message": "ハイライト"
+	},
+	"highlighterOn": {
 		"message": "ハイライト"
 	},
 	"highlighterSettings": {
@@ -755,6 +755,9 @@
 	},
 	"readerLoading": {
 		"message": "読みやすくしています…"
+	},
+	"readerOn": {
+		"message": "リーダー"
 	},
 	"readerSettings": {
 		"message": "リーダー設定"

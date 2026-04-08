@@ -209,9 +209,6 @@
 	"embedded": {
 		"message": "এম্বেডেড"
 	},
-	"enableHighlighter": {
-		"message": "হাইলাইটার সক্রিয় করুন"
-	},
 	"enableHighlighterDescription": {
 		"message": "ওয়েব পেজ থেকে বিষয়বস্তু হাইলাইট করে Obsidian এ সংরক্ষণ করুন।"
 	},
@@ -355,6 +352,9 @@
 		"message": "পেজ হাইলাইট করুন"
 	},
 	"highlighter": {
+		"message": "হাইলাইটার"
+	},
+	"highlighterOn": {
 		"message": "হাইলাইটার"
 	},
 	"highlighterSettings": {
@@ -755,6 +755,9 @@
 	},
 	"readerLoading": {
 		"message": "পরিষ্কার করা হচ্ছে…"
+	},
+	"readerOn": {
+		"message": "রিডার"
 	},
 	"readerSettings": {
 		"message": "রিডার সেটিংস"
