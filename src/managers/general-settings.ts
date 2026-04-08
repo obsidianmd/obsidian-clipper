@@ -46,6 +46,7 @@ import { showModal, hideModal } from "../utils/modal-utils";
 import {
 	fetchAppflowyWorkspaces,
 	fetchAppflowySpaces,
+	fetchAppflowyUserEmail,
 } from "../utils/appflowy-note-creator";
 
 dayjs.extend(weekOfYear);
@@ -626,7 +627,27 @@ function initializeAppflowySettings(): void {
 
 	// Show connected state on load if already authenticated
 	if (generalSettings.appflowyConfig.apiToken) {
-		showConnectedState(generalSettings.appflowyConfig.userEmail || "");
+		const email = generalSettings.appflowyConfig.userEmail || "";
+		if (email) {
+			showConnectedState(email);
+		} else {
+			// Email missing (e.g. migrated from older version) — fetch from API
+			const serverUrl = (
+				generalSettings.appflowyConfig.serverUrl ||
+				"https://beta.appflowy.cloud"
+			).replace(/\/$/, "");
+			showConnectedState("");
+			fetchAppflowyUserEmail(
+				serverUrl,
+				generalSettings.appflowyConfig.apiToken
+			).then(async (fetchedEmail) => {
+				if (fetchedEmail) {
+					generalSettings.appflowyConfig.userEmail = fetchedEmail;
+					await saveAppflowyConfigNow();
+					showConnectedState(fetchedEmail);
+				}
+			});
+		}
 	}
 
 	// "Send OTP code" button — sends a 6-digit sign-in code to the user's email via GoTrue

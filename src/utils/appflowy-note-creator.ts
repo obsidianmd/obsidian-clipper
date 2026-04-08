@@ -277,6 +277,23 @@ export async function saveToAppFlowy(
 	}
 }
 
+export async function fetchAppflowyUserEmail(
+	serverUrl: string,
+	apiToken: string
+): Promise<string | null> {
+	const baseUrl = serverUrl.replace(/\/$/, "");
+	try {
+		const res = await fetch(`${baseUrl}/gotrue/user`, {
+			headers: { Authorization: `Bearer ${apiToken}` },
+		});
+		if (!res.ok) return null;
+		const data = (await res.json()) as { email?: string };
+		return data?.email || null;
+	} catch {
+		return null;
+	}
+}
+
 export async function fetchAppflowyWorkspaces(
 	serverUrl: string,
 	apiToken: string
