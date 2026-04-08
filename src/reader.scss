@@ -1029,7 +1029,6 @@
 	}
 }
 
-
 .obsidian-reader-clip-dropdown {
 	display: none;
 	position: absolute;
@@ -1373,6 +1372,9 @@
 		cursor: zoom-in;
 		&:hover::after {
 			opacity: 1;
+		}
+		+ img {
+			margin-top: 0.5em;
 		}
 	}
 
