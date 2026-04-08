@@ -250,6 +250,7 @@ export class Reader {
 		// Hide buttons on scroll down, show on scroll up or hover
 		let lastScrollY = window.scrollY;
 		let scrollHidden = false;
+		const scrollThreshold = 8;
 
 		const isMobile = window.matchMedia('(pointer: coarse)').matches;
 
@@ -267,7 +268,9 @@ export class Reader {
 		window.addEventListener('scroll', () => {
 			if (settingsBar.classList.contains('is-open') || clipDropdown.classList.contains('is-open')) return;
 			const currentY = window.scrollY;
-			if (currentY > lastScrollY && currentY > 50) {
+			const delta = currentY - lastScrollY;
+			if (Math.abs(delta) < scrollThreshold) return;
+			if (delta > 0 && currentY > 50) {
 				if (!scrollHidden) {
 					triggerGroup.style.opacity = '0';
 					if (isMobile) {
@@ -276,7 +279,7 @@ export class Reader {
 					}
 					scrollHidden = true;
 				}
-			} else {
+			} else if (delta < 0) {
 				showButtons();
 			}
 			lastScrollY = currentY;
@@ -1009,7 +1012,8 @@ export class Reader {
 
 	private static positionPopover(popover: HTMLElement, link: HTMLAnchorElement) {
 		const ARROW_HEIGHT = 16; // Height of the arrow
-		const VIEWPORT_PADDING = 20; // Minimum distance from viewport edges
+		const isMobile = window.matchMedia('(pointer: coarse)').matches;
+		const VIEWPORT_PADDING = isMobile ? 40 : 20; // Minimum distance from viewport edges
 		const VERTICAL_SPACING = 8; // Space between popover and link
 
 		const linkRect = link.getBoundingClientRect();

@@ -820,7 +820,7 @@
 	.footnote-popover {
 		position: fixed;
 		z-index: 9999999999;
-		max-width: min(calc(100vw - 40px), 400px);
+		max-width: min(80vw, 400px);
 		max-height: 80vh;
 		padding: var(--size-4-3) var(--size-4-4);
 		background: var(--footnote-popover-background);
@@ -1018,13 +1018,36 @@
 		top: 0;
 		right: 0;
 		left: 0;
+		background: none;
 		box-shadow: none;
 		width: calc(100vw - var(--size-4-3) * 2);
 		padding: calc(var(--safe-area-inset-top) + var(--size-4-2)) var(--size-4-3) var(--size-4-2);
 		justify-content: flex-end;
+		&::before {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background: linear-gradient(to bottom, var(--background-primary) 25%, transparent);
+			pointer-events: none;
+			height: 200%;
+			z-index: -1;
+		}
 		.nav-btn {
 			width: 40px;
 			height: 40px;
+			background: transparent;
+			svg {
+				width: 22px;
+				height: 22px;
+			}
+		}
+	}
+	.obsidian-reader-active body {
+		h1 {
+			margin-top: 1em;
 		}
 	}
 }
