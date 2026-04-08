@@ -16,7 +16,7 @@ const VIEWPORT = 'width=device-width, initial-scale=1, maximum-scale=1';
 import { ReaderSettings } from '../types/types';
 
 export class Reader {
-	private static originalHTML: string | null = null;
+	private static hasApplied: boolean = false;
 	private static isActive: boolean = false;
 
 	/**
@@ -1682,7 +1682,7 @@ export class Reader {
 		try {
 			await initializeI18n();
 
-			this.originalHTML = 'active';
+			this.hasApplied = true;
 
 			// Clipper iframe container
 			const clipperIframeContainer = doc.getElementById('obsidian-clipper-container');
@@ -1725,6 +1725,9 @@ export class Reader {
 			
 			// Clone document for Defuddle before we clear the body
 			const docClone = doc.cloneNode(true) as Document;
+			// Remove the clipper container from the clone so Defuddle
+			// doesn't extract it as page content
+			docClone.getElementById('obsidian-clipper-container')?.remove();
 			// Preserve the URL for Defuddle's extractors
 			Object.defineProperty(docClone, 'URL', { value: doc.URL, configurable: true });
 			// Start content extraction on the clone (don't await yet)
@@ -2063,34 +2066,29 @@ export class Reader {
 		}
 	}
 
-	static restore(doc: Document) {
-		if (this.originalHTML) {
-			// Clean up YouTube embed referer rule before reload
-			const host = doc.URL ? new URL(doc.URL).hostname : '';
-			if (host.includes('youtube.com') || host.includes('youtu.be')) {
-				browser.runtime.sendMessage({ action: 'disableYouTubeEmbedRule' }).catch(() => {});
-			}
-
-			// Remember if the embedded clipper was open so we can reopen after reload
-			if (doc.getElementById('obsidian-clipper-container')) {
-				browser.runtime.sendMessage({ action: 'reopenClipperAfterReload' }).catch(() => {});
-			}
-
-			this.originalHTML = null;
+	static async restore(doc: Document) {
+		if (this.hasApplied) {
+			this.hasApplied = false;
 			this.isActive = false;
 
-			// Notify background that reader mode is off before reloading,
-			// since the never-resolving promise in toggle() prevents
-			// reader-script from sending this message
-			browser.runtime.sendMessage({ action: 'readerModeChanged', isActive: false }).catch(() => {});
+			// Send all messages to background before reloading
+			const messages: Promise<any>[] = [
+				browser.runtime.sendMessage({ action: 'readerModeChanged', isActive: false }).catch(() => {}),
+			];
 
+			const host = doc.URL ? new URL(doc.URL).hostname : '';
+			if (host.includes('youtube.com') || host.includes('youtu.be')) {
+				messages.push(browser.runtime.sendMessage({ action: 'disableYouTubeEmbedRule' }).catch(() => {}));
+			}
+
+			await Promise.all(messages);
 			window.location.reload();
 		}
 	}
 
 	static async toggle(doc: Document): Promise<boolean> {
 		if (this.isActive) {
-			this.restore(doc);
+			await this.restore(doc);
 			// restore() triggers a page reload — return a promise that
 			// never resolves to prevent further DOM changes (like
 			// removing reader classes) that would flash before reload

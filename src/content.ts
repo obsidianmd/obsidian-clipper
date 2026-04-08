@@ -475,6 +475,9 @@ declare global {
 					sendResponse({ isActive: false });
 				});
 			return true;
+		} else if (request.action === "getReaderModeState") {
+			sendResponse({ isActive: document.documentElement.classList.contains('obsidian-reader-active') });
+			return true;
 		}
 		return true;
 	});
@@ -504,7 +507,6 @@ declare global {
 
 	// Call updateHasHighlights when the page loads
 	window.addEventListener('load', updateHasHighlights);
-
 
 	// Deactivate highlighter mode on unload
 	function handlePageUnload() {

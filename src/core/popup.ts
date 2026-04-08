@@ -338,11 +338,15 @@ document.addEventListener('DOMContentLoaded', async function() {
 		// Setup event listeners for popup buttons
 		const refreshButton = document.getElementById('refresh-pane');
 		if (refreshButton) {
-			refreshButton.addEventListener('click', (e) => {
-				e.preventDefault();
-				refreshPopup();
-				initializeIcons(refreshButton);
-			});
+			if (isIframe) {
+				refreshButton.style.display = 'none';
+			} else {
+				refreshButton.addEventListener('click', (e) => {
+					e.preventDefault();
+					refreshPopup();
+					initializeIcons(refreshButton);
+				});
+			}
 		}
 		const settingsButton = document.getElementById('open-settings');
 		if (settingsButton) {
@@ -1076,16 +1080,20 @@ function handleTemplateChange(templateId: string) {
 
 async function checkReaderModeState(tabId: number) {
 	try {
+		// Query the actual page DOM via content script rather than
+		// relying on background state, which can be stale across tabs
 		const response = await browser.runtime.sendMessage({
-			action: "getReaderMode",
-			tabId: tabId
-		}) as { isActive: boolean };
+			action: "sendMessageToTab",
+			tabId: tabId,
+			message: { action: "getReaderModeState" }
+		}) as { isActive: boolean } | undefined;
 
 		const readerButton = document.getElementById('reader-mode');
 		if (readerButton) {
-			readerButton.classList.toggle('active', response.isActive);
+			readerButton.classList.toggle('active', response?.isActive ?? false);
 		}
 	} catch (error) {
+		// Tab may not have content script loaded yet
 		console.error('Error checking reader mode state:', error);
 	}
 }

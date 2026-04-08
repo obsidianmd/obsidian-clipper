@@ -283,19 +283,6 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 			}
 		}
 
-		if (typedRequest.action === "reopenClipperAfterReload" && sender.tab?.id) {
-			const tabId = sender.tab.id;
-			const onUpdated = (updatedTabId: number, changeInfo: browser.Tabs.OnUpdatedChangeInfoType) => {
-				if (updatedTabId === tabId && changeInfo.status === 'complete') {
-					browser.tabs.onUpdated.removeListener(onUpdated);
-					ensureContentScriptLoadedInBackground(tabId).then(() => {
-						browser.tabs.sendMessage(tabId, { action: "toggle-iframe" }).catch(() => {});
-					});
-				}
-			};
-			browser.tabs.onUpdated.addListener(onUpdated);
-		}
-
 		if (typedRequest.action === "highlightsCleared" && sender.tab) {
 			hasHighlights = false;
 			debouncedUpdateContextMenu(sender.tab.id!);
