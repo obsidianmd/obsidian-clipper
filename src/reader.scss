@@ -142,6 +142,13 @@
 	--link-external-decoration: underline;
 	--link-external-decoration-hover: underline;
 
+	--layer-reader: 5;
+	--layer-highlights: 20;
+	--layer-footnote: 20;
+	--layer-popover: 30;
+	--layer-menu: 50;
+	--layer-clipper: 60;
+
 	// Lists
 	--list-marker-color: var(--text-faint);
 	--list-spacing: 0.15rem;
@@ -819,7 +826,7 @@
 
 	.footnote-popover {
 		position: fixed;
-		z-index: 9999999999;
+		z-index: var(--layer-footnote);
 		max-width: min(80vw, 400px);
 		max-height: 80vh;
 		padding: var(--size-4-3) var(--size-4-4);
@@ -943,7 +950,7 @@
 }
 
 .obsidian-highlight-overlay {
-	z-index: 99;
+	z-index: var(--layer-highlights);
 }
 
 .obsidian-reader-loading-text {
@@ -967,7 +974,7 @@
 	position: fixed;
 	top: 0;
 	right: 0;
-	z-index: 99;
+	z-index: var(--layer-menu);
 	font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
 	user-select: none;
 	-webkit-user-select: none;
@@ -997,6 +1004,7 @@
 		justify-content: center;
 		border: none;
 		cursor: pointer;
+		font-size: 16px;
 		-webkit-tap-highlight-color: transparent;
 		transition: color 0.15s ease, opacity 0.15s ease, transform 0.15s ease;
 		background: var(--background-primary);
@@ -1053,7 +1061,37 @@
 	}
 	.obsidian-reader-active body {
 		h1 {
-			margin-top: 1em;
+			margin-top: 1.5em;
+		}
+	}
+	.obsidian-reader-settings.is-open .obsidian-reader-settings-controls {
+		width: 90%;
+		position: fixed;
+		background-color: var(--background-primary-alt);
+		left: 0;
+		right: 0;
+		bottom: 0;
+		margin: 0 auto;
+		padding: 5% 5% 6px;
+		border-radius: 8% 8% 0 0;
+		box-shadow: 0 0 0 1px var(--background-modifier-border);
+		.obsidian-reader-settings-link-button,
+		.obsidian-reader-settings-select-wrapper >.obsidian-reader-settings-select,
+		.obsidian-reader-settings-controls-group {
+			border-radius: 40px;
+		}
+		.obsidian-reader-settings-typography-group {
+			flex-direction: row;
+		}
+		.obsidian-reader-settings-link-button,
+		.obsidian-reader-settings-button,
+		.obsidian-reader-settings-select-wrapper >.obsidian-reader-settings-select {
+			height: 40px;
+			background-color: var(--background-modifier-border);
+			font-size: max(var(--font-ui-small), 16px);
+			&:hover, &:active, &:focus { 
+				background-color: var(--background-modifier-border);
+			}
 		}
 	}
 }
@@ -1108,6 +1146,11 @@
 		display: grid;
 	}
 }
+.obsidian-reader-settings-typography-group {
+	display: flex;
+	gap: var(--size-2-3);
+	flex-direction: column;
+}
 .obsidian-reader-settings-dropdown-group {
 	display: flex;
 	flex-direction: column;
@@ -1126,6 +1169,7 @@
 .obsidian-reader-settings-controls-group {
 	display: flex;
 	align-items: center;
+	flex-grow: 1;
 	border: 1px solid var(--background-modifier-border);
 	border-radius: var(--radius-m);
 	corner-shape: var(--corner-shape);
@@ -1294,7 +1338,45 @@
 	color: var(--text-muted);
 }
 
+// Mobile outline overlay
+.nav-btn-outline {
+	display: none !important;
+	&.is-hidden {
+		display: none !important;
+	}
+}
+.obsidian-reader-outline-overlay {
+	display: none;
+}
+
 @media (max-width: 768px) {
+	.nav-btn-outline:not(.is-hidden) {
+		display: flex !important;
+		margin-inline-end: auto;
+	}
+	.obsidian-reader-outline-overlay {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: var(--background-primary);
+		z-index: var(--layer-popover);
+		padding: calc(var(--safe-area-inset-top) + 80px) var(--size-4-5) var(--size-4-5);
+		overflow-y: auto;
+		-webkit-overflow-scrolling: touch;
+		display: none;
+		&.is-open {
+			display: block;
+		}
+		.obsidian-reader-outline-item {
+			padding-block: 10px;
+			font-size: 0.95em;
+			&.active {
+				font-weight: 600;
+			}
+		}
+	}
 	.obsidian-reader-container {
 		grid-template-columns: 1fr;
 	}
@@ -1397,7 +1479,7 @@
 
 .obsidian-reader-active {
 	#obsidian-clipper-container {
-		z-index: 999;
+		z-index: var(--layer-clipper);
 	}
 
 	img:not(a img):not(figure img) {

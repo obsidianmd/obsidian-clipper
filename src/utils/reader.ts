@@ -238,8 +238,34 @@ export class Reader {
 			}
 		});
 
+		// Outline button (mobile only, hidden until outline is generated)
+		const outlineBtn = doc.createElement('button');
+		outlineBtn.className = 'obsidian-reader-settings-trigger nav-btn nav-btn-outline';
+		outlineBtn.setAttribute('aria-label', 'Outline');
+		outlineBtn.classList.add('is-hidden');
+		outlineBtn.appendChild(this.createSVG({
+			width: '18', height: '18', viewBox: '0 0 24 24', strokeWidth: '1.75',
+			paths: ['M3 5h.01', 'M3 12h.01', 'M3 19h.01', 'M8 5h13', 'M8 12h13', 'M8 19h13'],
+		}));
+
+		// Create mobile outline overlay
+		const outlineOverlay = doc.createElement('div');
+		outlineOverlay.className = 'obsidian-reader-outline-overlay';
+
+		outlineBtn.addEventListener('click', (e) => {
+			e.stopPropagation();
+			clipDropdown.classList.remove('is-open');
+			settingsBar.classList.remove('is-open');
+			const isOpen = outlineOverlay.classList.toggle('is-open');
+			outlineBtn.classList.toggle('is-active', isOpen);
+			doc.body.style.overflow = isOpen ? 'hidden' : '';
+		});
+
+		doc.body.appendChild(outlineOverlay);
+
 		const triggerGroup = doc.createElement('div');
 		triggerGroup.className = 'obsidian-reader-nav';
+		triggerGroup.appendChild(outlineBtn);
 		triggerGroup.appendChild(highlighterBtn);
 		triggerGroup.appendChild(clipButton);
 		triggerGroup.appendChild(trigger);
@@ -265,8 +291,14 @@ export class Reader {
 			}
 		};
 
+		// Allow other code to force-show the nav
+		window.addEventListener('reader-show-nav', () => {
+			showButtons();
+			lastScrollY = window.scrollY;
+		});
+
 		window.addEventListener('scroll', () => {
-			if (settingsBar.classList.contains('is-open') || clipDropdown.classList.contains('is-open')) return;
+			if (settingsBar.classList.contains('is-open') || clipDropdown.classList.contains('is-open') || outlineOverlay.classList.contains('is-open')) return;
 			const currentY = window.scrollY;
 			const delta = currentY - lastScrollY;
 			if (Math.abs(delta) < scrollThreshold) return;
@@ -502,9 +534,12 @@ export class Reader {
 		fontWrapper.appendChild(fontSelect);
 
 		// Assemble everything
-		controlsContainer.appendChild(fontGroup);
-		controlsContainer.appendChild(widthGroup);
-		controlsContainer.appendChild(lineHeightGroup);
+		const typographyGroup = doc.createElement('div');
+		typographyGroup.className = 'obsidian-reader-settings-typography-group';
+		typographyGroup.appendChild(fontGroup);
+		typographyGroup.appendChild(widthGroup);
+		typographyGroup.appendChild(lineHeightGroup);
+		controlsContainer.appendChild(typographyGroup);
 
 		const spacer = doc.createElement('div');
 		spacer.className = 'obsidian-reader-settings-spacer';
@@ -877,6 +912,51 @@ export class Reader {
 			outline.appendChild(item);
 			outlineItems.set(footnotes, item);
 			observer.observe(footnotes);
+		}
+
+		// Populate mobile outline overlay
+		const outlineOverlay = doc.querySelector('.obsidian-reader-outline-overlay') as HTMLElement;
+		const outlineBtn = doc.querySelector('.nav-btn-outline') as HTMLElement;
+		if (outlineOverlay && outlineBtn) {
+			outlineBtn.classList.remove('is-hidden');
+			outlineOverlay.textContent = '';
+
+			const closeOutline = () => {
+				outlineOverlay.classList.remove('is-open');
+				outlineBtn.classList.remove('is-active');
+				doc.body.style.overflow = '';
+			};
+
+			const outlineItemsList = outline.querySelectorAll('.obsidian-reader-outline-item');
+			const headingEntries = Array.from(outlineItems.entries());
+
+			outlineItemsList.forEach((item, index) => {
+				const clone = item.cloneNode(true) as HTMLElement;
+				clone.addEventListener('click', () => {
+					closeOutline();
+
+					// Find the heading element for this outline item
+					const entry = headingEntries[index];
+					if (entry) {
+						const [heading] = entry;
+						const rect = heading.getBoundingClientRect();
+						const navOffset = 80;
+						const targetY = (window.pageYOffset || doc.documentElement.scrollTop) + rect.top - navOffset;
+						this.scrollTo(Math.max(0, targetY));
+
+						// Keep nav visible after scrolling
+						setTimeout(() => {
+							window.dispatchEvent(new Event('reader-show-nav'));
+						}, 250);
+					}
+				});
+				outlineOverlay.appendChild(clone);
+
+				// Sync active/faint classes from sidebar outline to overlay clone
+				new MutationObserver(() => {
+					clone.className = (item as HTMLElement).className;
+				}).observe(item, { attributes: true, attributeFilter: ['class'] });
+			});
 		}
 
 		return observer;

@@ -9,6 +9,11 @@
 		bottom: 25px !important;
 	}
 }
+@media (max-width: 500px) {
+	#obsidian-clipper-container {
+		width: 100%;
+	}
+}
 
 #obsidian-clipper-iframe {
 	color-scheme: light dark;
