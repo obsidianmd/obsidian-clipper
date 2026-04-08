@@ -18,6 +18,7 @@ import browser from './utils/browser-polyfill';
 				try {
 					const isActive = await Reader.toggle(document);
 					document.documentElement.classList.toggle('obsidian-reader-active', isActive);
+					browser.runtime.sendMessage({ action: "readerModeChanged", isActive });
 					sendResponse({ success: true, isActive });
 				} catch (error: unknown) {
 					console.error('Error toggling reader mode:', error);

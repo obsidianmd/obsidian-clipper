@@ -126,6 +126,18 @@
 	"commandToggleReader": {
 		"message": "Toggle reader"
 	},
+	"readerOn": {
+		"message": "Reader"
+	},
+	"readerOff": {
+		"message": "Turn off reader"
+	},
+	"highlighterOn": {
+		"message": "Highlighter"
+	},
+	"highlighterOff": {
+		"message": "Turn off highlighter"
+	},
 	"confirmDeleteTemplate": {
 		"message": "Are you sure you want to delete the template \"$1\"?"
 	},

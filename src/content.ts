@@ -168,8 +168,7 @@ declare global {
 				const newHeight = container.offsetHeight;
 				browser.storage.local.set({ clipperIframeWidth: newWidth, clipperIframeHeight: newHeight });
 
-				highlighter.invalidateHighlightCache();
-				highlighter.applyHighlights();
+				highlighter.repositionHighlights();
 
 				document.onmousemove = null;
 				document.onmouseup = null;
