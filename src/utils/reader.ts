@@ -729,7 +729,7 @@ export class Reader {
 		const player = document.querySelector('.pin-player') as HTMLElement | null;
 		if (player) return player.getBoundingClientRect().height + 16;
 		// When pin-player is off, the toggles bar is sticky independently
-		const toggles = document.querySelector('article > .youtube-player-toggles') as HTMLElement | null;
+		const toggles = document.querySelector('article > .player-toggles') as HTMLElement | null;
 		if (toggles) return toggles.getBoundingClientRect().height + 32;
 		return 0;
 	}

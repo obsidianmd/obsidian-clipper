@@ -32,7 +32,7 @@ export function wireTranscript(
 	const pinDefault = settings.pinPlayer;
 	const autoScrollDefault = settings.autoScroll;
 	const highlightDefault = settings.highlightActiveLine;
-	playerContainer.className = 'youtube-player-container' + (pinDefault ? ' pin-player' : '');
+	playerContainer.className = 'player-container' + (pinDefault ? ' pin-player' : '');
 	playerEl.parentNode!.insertBefore(playerContainer, playerEl);
 	playerContainer.appendChild(playerEl);
 
@@ -40,14 +40,14 @@ export function wireTranscript(
 	let highlightEnabled = highlightDefault;
 
 	const toggleBar = doc.createElement('div');
-	toggleBar.className = 'youtube-player-toggles';
+	toggleBar.className = 'player-toggles';
 
 	const createToggle = (label: string, defaultOn: boolean, onChange: (on: boolean) => void) => {
 		const wrapper = doc.createElement('label');
-		wrapper.className = 'youtube-player-toggle' + (defaultOn ? ' is-enabled' : '');
+		wrapper.className = 'player-toggle' + (defaultOn ? ' is-enabled' : '');
 
 		const toggle = doc.createElement('div');
-		toggle.className = 'youtube-player-toggle-switch';
+		toggle.className = 'player-toggle-switch';
 		const input = doc.createElement('input');
 		input.type = 'checkbox';
 		input.checked = defaultOn;
@@ -92,14 +92,21 @@ export function wireTranscript(
 		}
 	});
 
+	// Floating "current position" button — appended to body,
+	// shown only when the active segment is scrolled out of view
 	const currentPosButton = doc.createElement('button');
-	currentPosButton.className = 'youtube-player-button';
+	currentPosButton.className = 'player-current-pos';
 	currentPosButton.textContent = getMessage('readerCurrentPosition');
+	transcript.style.position = 'relative';
+	transcript.appendChild(currentPosButton);
 
-	toggleBar.appendChild(pinToggle);
-	toggleBar.appendChild(autoScrollToggle);
-	toggleBar.appendChild(highlightToggle);
-	toggleBar.appendChild(currentPosButton);
+	const toggleGroup = doc.createElement('div');
+	toggleGroup.className = 'player-toggle-group is-open';
+	toggleGroup.appendChild(pinToggle);
+	toggleGroup.appendChild(autoScrollToggle);
+	toggleGroup.appendChild(highlightToggle);
+
+	toggleBar.appendChild(toggleGroup);
 
 	playerContainer.appendChild(toggleBar);
 
@@ -244,6 +251,15 @@ export function wireTranscript(
 				}
 				activeChapter = chapter;
 			}
+		}
+		// Show floating button when active segment is out of view
+		if (activeSegment) {
+			const rect = activeSegment.getBoundingClientRect();
+			const stickyOffset = scroll.getStickyOffset();
+			const isVisible = rect.bottom > stickyOffset && rect.top < window.innerHeight;
+			currentPosButton.classList.toggle('is-visible', !isVisible);
+		} else {
+			currentPosButton.classList.remove('is-visible');
 		}
 		// Update progress line on the scrub track
 		if (activeSegment && activeIndex >= 0) {

@@ -310,7 +310,7 @@
 			height: auto;
 		}
 	}
-	.youtube-player-container {
+	.player-container {
 		padding-top: 12px;
 		background: var(--background-primary);
 		line-height: 0;
@@ -324,32 +324,32 @@
 			border-radius: 4px;
 		}
 	}
-	.youtube-player-toggles {
+	.player-toggles {
 		line-height: 0;
 		white-space: nowrap;
 		display: flex;
-		gap: 12px;
+		gap: 4px;
 		padding: 12px 0 8px;
 		user-select: none;
 		&:after {
 			pointer-events: none;
 			content: '';
 			position: absolute;
-			bottom: -48px;
+			bottom: -36px;
 			left: 0;
 			right: 0;
 			width: 100%;
-			height: 48px;
+			height: 36px;
 			background: linear-gradient(to bottom, var(--background-primary), transparent);
 		}
 	}
-	article > .youtube-player-toggles {
+	article > .player-toggles {
 		position: sticky;
 		top: 0;
 		z-index: var(--layer-popover);
 		background: var(--background-primary);
 	}
-	.youtube-player-toggle {
+	.player-toggle {
 		font-family: var(--font-ui);
 		font-size: var(--font-ui-small);
 		display: flex;
@@ -362,7 +362,7 @@
 			color: var(--text-muted);
 		}
 	}
-	.youtube-player-toggle-switch {
+	.player-toggle-switch {
 		--toggle-width: 26px;
 		--toggle-height: 14px;
 		--toggle-thumb-size: 10px;
@@ -388,26 +388,45 @@
 			box-shadow: 0 1px 2px rgba(0,0,0,0.15);
 		}
 	}
-	.youtube-player-toggle.is-enabled {
+	.player-toggle.is-enabled {
 		color: var(--text-muted);
-		.youtube-player-toggle-switch {
+		.player-toggle-switch {
 			background: var(--text-faint);
 			&::after {
 				transform: translateX(calc(var(--toggle-width) - var(--toggle-thumb-size) - var(--toggle-border) * 2));
 			}
 		}
 	}
-	.youtube-player-button {
+	.player-toggle-group {
+		display: flex;
+		gap: 12px;
+	}
+.player-current-pos {
+		user-select: none;
+		position: sticky;
+		bottom: 24px;
+		left: 50%;
+		transform: translateX(-50%) translateY(20px);
+		width: fit-content;
 		font-family: var(--font-ui);
 		font-size: var(--font-ui-small);
-		padding: 2px 6px;
-		border-radius: var(--radius-s);
+		padding: 6px 8px;
+		border-radius: var(--radius-m);
 		corner-shape: var(--corner-shape);
 		border: 1px solid var(--background-modifier-border);
-		background: transparent;
+		background: var(--background-primary);
 		color: var(--text-muted);
 		cursor: pointer;
-		margin-left: auto;
+		z-index: var(--layer-popover);
+		box-shadow: var(--shadow-s);
+		opacity: 0;
+		pointer-events: none;
+		transition: opacity 0.2s, transform 0.2s;
+		&.is-visible {
+			opacity: 1;
+			pointer-events: auto;
+			transform: translateX(-50%) translateY(0);
+		}
 		&:hover {
 			color: var(--text-normal);
 		}
