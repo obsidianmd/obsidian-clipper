@@ -319,6 +319,7 @@
 			position: sticky;
 			z-index: var(--layer-popover);
 		}
+		.reader-video-wrapper,
 		iframe {
 			border-radius: 4px;
 			box-shadow: 0 0 24px 24px var(--background-primary);
@@ -1519,6 +1520,7 @@
 	height: 100vh;
 	min-width: 180px;
 	padding: max(4rem, 4vh) var(--size-4-5) var(--size-4-5) var(--size-4-5);
+	padding-inline-end: var(--size-4-2);
 	overflow-y: auto;
 	font-size: var(--font-ui-small);
 	user-select: none;

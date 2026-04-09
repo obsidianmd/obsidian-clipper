@@ -361,6 +361,10 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 			const tab = sender.tab;
 			if (tab?.id && tab.url && isValidUrl(tab.url) && !isBlankPage(tab.url)) {
 				ensureContentScriptLoadedInBackground(tab.id)
+					.then(() => browser.scripting.insertCSS({
+						target: { tabId: tab.id! },
+						files: ['highlighter.css']
+					}).catch(() => {}))
 					.then(() => browser.tabs.sendMessage(tab.id!, { action: "toggle-iframe" }))
 					.then(() => sendResponse({ success: true }))
 					.catch((error) => {
@@ -685,6 +689,7 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
 		}
 	} else if (info.menuItemId === 'open-embedded' && tab && tab.id) {
 		await ensureContentScriptLoadedInBackground(tab.id);
+		await browser.scripting.insertCSS({ target: { tabId: tab.id }, files: ['highlighter.css'] }).catch(() => {});
 		await browser.tabs.sendMessage(tab.id, { action: "toggle-iframe" });
 	} else if (info.menuItemId === 'open-side-panel' && tab && tab.id && tab.windowId) {
 		chrome.sidePanel.open({ tabId: tab.id });

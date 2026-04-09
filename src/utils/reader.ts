@@ -1898,13 +1898,10 @@ export class Reader {
 
 			// Remove stylesheet links and style tags, except reader and extension styles
 			const styleElements = head.querySelectorAll('link[rel="stylesheet"], link[as="style"], style');
-			const extUrl = browser.runtime.getURL('');
 			styleElements.forEach(el => {
 				if (el.id === 'obsidian-reader-styles') return;
 				// Preserve extension-injected styles (clipper, highlighter)
 				if (el instanceof HTMLStyleElement && el.textContent?.includes('obsidian-clipper')) return;
-				// Preserve extension stylesheet links (e.g. highlighter.css)
-				if (el instanceof HTMLLinkElement && el.href?.startsWith(extUrl)) return;
 				el.remove();
 			});
 
