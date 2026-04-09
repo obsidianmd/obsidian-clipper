@@ -313,6 +313,7 @@
 	.youtube-player-container {
 		padding-top: 12px;
 		background: var(--background-primary);
+		line-height: 0;
 		&.pin-player {
 			top: 0;
 			position: sticky;
@@ -326,9 +327,16 @@
 	.youtube-player-toggles {
 		display: flex;
 		gap: 4px;
-		padding: 0 0 4px;
+		padding: 12px 0 4px;
 		box-shadow: 0 0 8px 0px var(--background-primary);
 		user-select: none;
+	}
+	article > .youtube-player-toggles {
+		position: sticky;
+		top: 0;
+		z-index: 1;
+		background: var(--background-primary);
+		box-shadow: 0 0 24px 24px var(--background-primary);
 	}
 	.youtube-player-toggle {
 		font-family: var(--font-ui);

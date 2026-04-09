@@ -762,6 +762,13 @@ export class Reader {
 
 		const pinToggle = createToggle(getMessage('readerPinPlayer'), pinDefault, (on) => {
 			playerContainer.classList.toggle('pin-player', on);
+			if (on) {
+				// Move toggles back inside the container
+				playerContainer.appendChild(toggleBar);
+			} else {
+				// Move toggles after the container so they can stick independently
+				playerContainer.after(toggleBar);
+			}
 		});
 
 		const autoScrollToggle = createToggle(getMessage('readerAutoScroll'), autoScrollDefault, (on) => {
@@ -1237,7 +1244,11 @@ export class Reader {
 	}
 	private static getStickyOffset(): number {
 		const player = document.querySelector('.pin-player') as HTMLElement | null;
-		return player ? player.getBoundingClientRect().height + 16 : 0;
+		if (player) return player.getBoundingClientRect().height + 16;
+		// When pin-player is off, the toggles bar is sticky independently
+		const toggles = document.querySelector('article > .youtube-player-toggles') as HTMLElement | null;
+		if (toggles) return toggles.getBoundingClientRect().height + 32;
+		return 0;
 	}
 
 	private static scrollToElement(el: Element): void {
