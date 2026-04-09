@@ -362,10 +362,9 @@ export function wireTranscript(
 		videoEl.addEventListener('timeupdate', () => {
 			updateActiveSegment(videoEl.currentTime);
 		});
-		// Prevent native video controls from handling keyboard shortcuts
-		// (they'd fight with our handlers, e.g. Space pauses then unpauses)
+		// Prevent native video controls from handling seek shortcuts
 		videoEl.addEventListener('keydown', (e) => {
-			if (e.code === 'Space' || e.code === 'KeyK' || e.code === 'ArrowLeft' || e.code === 'ArrowRight' || e.code === 'KeyJ' || e.code === 'KeyL') {
+			if (e.code === 'ArrowLeft' || e.code === 'ArrowRight' || e.code === 'KeyJ' || e.code === 'KeyL') {
 				e.preventDefault();
 			}
 		});
@@ -438,8 +437,12 @@ export function wireTranscript(
 		switch (e.code) {
 			case 'Space':
 			case 'KeyK':
-				e.preventDefault();
-				togglePlayPause();
+				// Only handle play/pause for iframe embeds — native video
+				// controls handle Space/K themselves and would double-toggle
+				if (!videoEl) {
+					e.preventDefault();
+					togglePlayPause();
+				}
 				break;
 			case 'ArrowLeft':
 				e.preventDefault();
