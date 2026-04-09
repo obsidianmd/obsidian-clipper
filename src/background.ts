@@ -361,10 +361,6 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 			const tab = sender.tab;
 			if (tab?.id && tab.url && isValidUrl(tab.url) && !isBlankPage(tab.url)) {
 				ensureContentScriptLoadedInBackground(tab.id)
-					.then(() => browser.scripting.insertCSS({
-						target: { tabId: tab.id! },
-						files: ['highlighter.css']
-					}).catch(() => {}))
 					.then(() => browser.tabs.sendMessage(tab.id!, { action: "toggle-iframe" }))
 					.then(() => sendResponse({ success: true }))
 					.catch((error) => {
@@ -545,15 +541,6 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 			}
 		}
 
-		if (typedRequest.action === "injectHighlighterCSS") {
-			const tabId = sender.tab?.id;
-			if (tabId) {
-				browser.scripting.insertCSS({ target: { tabId }, files: ['highlighter.css'] }).catch(() => {});
-			}
-			sendResponse({ success: true });
-			return true;
-		}
-
 		// For other actions that use sendResponse
 		if (typedRequest.action === "extractContent" ||
 			typedRequest.action === "ensureContentScriptLoaded" ||
@@ -698,7 +685,6 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
 		}
 	} else if (info.menuItemId === 'open-embedded' && tab && tab.id) {
 		await ensureContentScriptLoadedInBackground(tab.id);
-		await browser.scripting.insertCSS({ target: { tabId: tab.id }, files: ['highlighter.css'] }).catch(() => {});
 		await browser.tabs.sendMessage(tab.id, { action: "toggle-iframe" });
 	} else if (info.menuItemId === 'open-side-panel' && tab && tab.id && tab.windowId) {
 		chrome.sidePanel.open({ tabId: tab.id });
@@ -845,6 +831,10 @@ async function injectReaderScript(tabId: number) {
 			target: { tabId },
 			files: ['reader.css']
 		});
+		await browser.scripting.insertCSS({
+			target: { tabId },
+			files: ['highlighter.css']
+		}).catch(() => {});
 
 		// Inject scripts in sequence for all browsers
 		await browser.scripting.executeScript({

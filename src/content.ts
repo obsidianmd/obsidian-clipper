@@ -24,7 +24,6 @@ declare global {
 	window.obsidianClipperGeneration = (window.obsidianClipperGeneration ?? 0) + 1;
 	const myGeneration = window.obsidianClipperGeneration;
 
-	console.log('[Clipper Debug] Content script loaded, generation', myGeneration);
 	debugLog('Clipper', 'Initializing content script, generation', myGeneration);
 
 	// In Reader mode, extract from the article's original HTML (before
@@ -73,6 +72,8 @@ declare global {
 			removeContainer(existingContainer);
 			return;
 		}
+
+		await ensureHighlighterCSS();
 
 		const container = document.createElement('div');
 		container.id = containerId;
@@ -516,7 +517,6 @@ declare global {
 		return new Promise<void>((resolve) => {
 			const link = document.createElement('link');
 			link.rel = 'stylesheet';
-			link.id = 'obsidian-highlighter-styles';
 			link.href = browser.runtime.getURL('highlighter.css');
 			link.onload = () => resolve();
 			link.onerror = () => resolve();
@@ -525,28 +525,17 @@ declare global {
 	}
 
 	async function initializeHighlighter() {
-		console.log('[Clipper Debug] initializeHighlighter start');
 		await loadSettings();
-		console.log('[Clipper Debug] alwaysShowHighlights:', generalSettings.alwaysShowHighlights);
 
 		if (generalSettings.alwaysShowHighlights) {
 			const result = await browser.storage.local.get('highlights');
 			const allHighlights = (result.highlights || {}) as Record<string, unknown>;
-			const hasHighlightsForUrl = !!allHighlights[window.location.href];
-			console.log('[Clipper Debug] hasHighlightsForUrl:', hasHighlightsForUrl, 'url:', window.location.href);
-			if (hasHighlightsForUrl) {
-				console.log('[Clipper Debug] ensureHighlighterCSS start');
+			if (allHighlights[window.location.href]) {
 				await ensureHighlighterCSS();
-				console.log('[Clipper Debug] ensureHighlighterCSS done');
 			}
 		}
 
-		console.log('[Clipper Debug] loadHighlights start');
 		await highlighter.loadHighlights();
-		console.log('[Clipper Debug] loadHighlights done, count:', highlighter.getHighlights().length);
-		console.log('[Clipper Debug] body classes:', document.body?.className);
-		console.log('[Clipper Debug] overlays in DOM:', document.querySelectorAll('.obsidian-highlight-overlay').length);
-		console.log('[Clipper Debug] CSS link in DOM:', !!document.getElementById('obsidian-highlighter-styles'));
 		updateHasHighlights();
 	}
 
