@@ -545,8 +545,17 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 			}
 		}
 
+		if (typedRequest.action === "injectHighlighterCSS") {
+			const tabId = sender.tab?.id;
+			if (tabId) {
+				browser.scripting.insertCSS({ target: { tabId }, files: ['highlighter.css'] }).catch(() => {});
+			}
+			sendResponse({ success: true });
+			return true;
+		}
+
 		// For other actions that use sendResponse
-		if (typedRequest.action === "extractContent" || 
+		if (typedRequest.action === "extractContent" ||
 			typedRequest.action === "ensureContentScriptLoaded" ||
 			typedRequest.action === "getHighlighterMode" ||
 			typedRequest.action === "toggleHighlighterMode" ||

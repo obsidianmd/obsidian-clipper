@@ -542,9 +542,13 @@ function setupEventListeners(tabId: number) {
 				});
 			} else {
 				// Test if we can share files (only on Safari)
-				const testFile = new File(["test"], "test.txt", { type: "text/plain" });
-				const testShare = { files: [testFile] };
-				if (!navigator.canShare(testShare)) {
+				try {
+					const testFile = new File(["test"], "test.txt", { type: "text/plain" });
+					const testShare = { files: [testFile] };
+					if (!navigator.canShare(testShare)) {
+						throw new Error('canShare returned false');
+					}
+				} catch {
 					shareButtonElements.forEach(button => {
 						const parentElement = button.closest('.share-btn, .menu-item') as HTMLElement;
 						if (parentElement) {

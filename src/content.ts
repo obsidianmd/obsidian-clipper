@@ -24,6 +24,7 @@ declare global {
 	window.obsidianClipperGeneration = (window.obsidianClipperGeneration ?? 0) + 1;
 	const myGeneration = window.obsidianClipperGeneration;
 
+	console.log('[Clipper Debug] Content script loaded, generation', myGeneration);
 	debugLog('Clipper', 'Initializing content script, generation', myGeneration);
 
 	// In Reader mode, extract from the article's original HTML (before
@@ -401,7 +402,7 @@ declare global {
 			const content = extractContentBySelector(request.selector, request.attribute, request.extractHtml);
 			sendResponse({ content: content });
 		} else if (request.action === "paintHighlights") {
-			highlighter.loadHighlights().then(() => {
+			ensureHighlighterCSS().then(() => highlighter.loadHighlights()).then(() => {
 				if (generalSettings.alwaysShowHighlights) {
 					highlighter.applyHighlights();
 				}
@@ -410,6 +411,7 @@ declare global {
 			return true;
 		} else if (request.action === "setHighlighterMode") {
 			isHighlighterMode = request.isActive;
+			ensureHighlighterCSS();
 			highlighter.toggleHighlighterMenu(isHighlighterMode);
 			updateHasHighlights();
 			sendResponse({ success: true });
@@ -418,10 +420,12 @@ declare global {
 			browser.runtime.sendMessage({ action: "getHighlighterMode" }).then(sendResponse);
 			return true;
 		} else if (request.action === "toggleHighlighter") {
+			ensureHighlighterCSS();
 			highlighter.toggleHighlighterMenu(request.isActive);
 			updateHasHighlights();
 			sendResponse({ success: true });
 		} else if (request.action === "highlightSelection") {
+			ensureHighlighterCSS();
 			highlighter.toggleHighlighterMenu(request.isActive);
 			const selection = window.getSelection();
 			if (selection && !selection.isCollapsed) {
@@ -430,6 +434,7 @@ declare global {
 			updateHasHighlights();
 			sendResponse({ success: true });
 		} else if (request.action === "highlightElement") {
+			ensureHighlighterCSS();
 			highlighter.toggleHighlighterMenu(request.isActive);
 			if (request.targetElementInfo) {
 				const { mediaType, srcUrl, pageUrl } = request.targetElementInfo;
@@ -504,14 +509,44 @@ declare global {
 		browser.runtime.sendMessage({ action: "updateHasHighlights", hasHighlights });
 	}
 
+	let highlighterCSSInjected = false;
+	function ensureHighlighterCSS(): Promise<void> {
+		if (highlighterCSSInjected) return Promise.resolve();
+		highlighterCSSInjected = true;
+		return new Promise<void>((resolve) => {
+			const link = document.createElement('link');
+			link.rel = 'stylesheet';
+			link.id = 'obsidian-highlighter-styles';
+			link.href = browser.runtime.getURL('highlighter.css');
+			link.onload = () => resolve();
+			link.onerror = () => resolve();
+			(document.head || document.documentElement).appendChild(link);
+		});
+	}
+
 	async function initializeHighlighter() {
+		console.log('[Clipper Debug] initializeHighlighter start');
 		await loadSettings();
-		await highlighter.loadHighlights();
-		
+		console.log('[Clipper Debug] alwaysShowHighlights:', generalSettings.alwaysShowHighlights);
+
 		if (generalSettings.alwaysShowHighlights) {
-			highlighter.applyHighlights();
+			const result = await browser.storage.local.get('highlights');
+			const allHighlights = (result.highlights || {}) as Record<string, unknown>;
+			const hasHighlightsForUrl = !!allHighlights[window.location.href];
+			console.log('[Clipper Debug] hasHighlightsForUrl:', hasHighlightsForUrl, 'url:', window.location.href);
+			if (hasHighlightsForUrl) {
+				console.log('[Clipper Debug] ensureHighlighterCSS start');
+				await ensureHighlighterCSS();
+				console.log('[Clipper Debug] ensureHighlighterCSS done');
+			}
 		}
-		
+
+		console.log('[Clipper Debug] loadHighlights start');
+		await highlighter.loadHighlights();
+		console.log('[Clipper Debug] loadHighlights done, count:', highlighter.getHighlights().length);
+		console.log('[Clipper Debug] body classes:', document.body?.className);
+		console.log('[Clipper Debug] overlays in DOM:', document.querySelectorAll('.obsidian-highlight-overlay').length);
+		console.log('[Clipper Debug] CSS link in DOM:', !!document.getElementById('obsidian-highlighter-styles'));
 		updateHasHighlights();
 	}
 

@@ -52,6 +52,7 @@ module.exports = (env, argv) => {
 			path: path.resolve(__dirname, outputDir),
 			filename: '[name].js',
 			module: false,
+			clean: true,
 		},
 		devtool: isProduction ? false : 'source-map',
 		optimization: {
