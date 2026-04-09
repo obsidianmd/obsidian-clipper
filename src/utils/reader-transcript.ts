@@ -16,7 +16,8 @@ export function wireTranscript(
 	doc: Document,
 	article: HTMLElement,
 	settings: TranscriptSettings,
-	scroll: ScrollHelper
+	scroll: ScrollHelper,
+	onSettingChange?: (key: keyof TranscriptSettings, value: boolean) => void
 ): void {
 	const transcript = article.querySelector('.youtube.transcript') as HTMLElement | null;
 	if (!transcript) return;
@@ -72,16 +73,18 @@ export function wireTranscript(
 	const pinToggle = createToggle(getMessage('readerPinPlayer'), pinDefault, (on) => {
 		playerContainer.classList.toggle('pin-player', on);
 		if (on) {
-			// Move toggles back inside the container
 			playerContainer.appendChild(toggleBar);
 		} else {
-			// Move toggles after the container so they can stick independently
 			playerContainer.after(toggleBar);
 		}
+		// Reset nav scroll tracking so hide-on-scroll-down works immediately
+		window.dispatchEvent(new CustomEvent('reader-show-nav'));
+		onSettingChange?.('pinPlayer', on);
 	});
 
 	const autoScrollToggle = createToggle(getMessage('readerAutoScroll'), autoScrollDefault, (on) => {
 		autoScrollEnabled = on;
+		onSettingChange?.('autoScroll', on);
 	});
 
 	const highlightToggle = createToggle(getMessage('readerHighlightActiveLine'), highlightDefault, (on) => {
@@ -90,6 +93,7 @@ export function wireTranscript(
 			const ph = (CSS as any).highlights?.get('transcript-playback');
 			if (ph) ph.clear();
 		}
+		onSettingChange?.('highlightActiveLine', on);
 	});
 
 	// Floating "current position" button — appended to body,

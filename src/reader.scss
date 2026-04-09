@@ -348,6 +348,10 @@
 		top: 0;
 		z-index: var(--layer-popover);
 		background: var(--background-primary);
+		transition: opacity 0.15s ease;
+		&:hover {
+			opacity: 1 !important;
+		}
 	}
 	.player-toggle {
 		font-family: var(--font-ui);
@@ -410,9 +414,8 @@
 		width: fit-content;
 		font-family: var(--font-ui);
 		font-size: var(--font-ui-small);
-		padding: 6px 8px;
-		border-radius: var(--radius-m);
-		corner-shape: var(--corner-shape);
+		padding: 6px 10px;
+		border-radius: 40px;
 		border: 1px solid var(--background-modifier-border);
 		background: var(--background-primary);
 		color: var(--text-muted);

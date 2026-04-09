@@ -285,12 +285,18 @@ export class Reader {
 
 		const isMobile = window.matchMedia('(pointer: coarse)').matches;
 
+		const getFloatingToggles = () => doc.querySelector('article > .player-toggles') as HTMLElement | null;
+
 		const showButtons = () => {
 			if (scrollHidden) {
 				triggerGroup.style.opacity = '';
 				if (isMobile) {
 					triggerGroup.style.visibility = '';
 					triggerGroup.style.pointerEvents = '';
+				}
+				const floatingToggles = getFloatingToggles();
+				if (floatingToggles) {
+					floatingToggles.style.opacity = '';
 				}
 				scrollHidden = false;
 			}
@@ -313,6 +319,10 @@ export class Reader {
 					if (isMobile) {
 						triggerGroup.style.visibility = 'hidden';
 						triggerGroup.style.pointerEvents = 'none';
+					}
+					const floatingToggles = getFloatingToggles();
+					if (floatingToggles) {
+						floatingToggles.style.opacity = '0';
 					}
 					scrollHidden = true;
 				}
@@ -2212,6 +2222,9 @@ export class Reader {
 				getStickyOffset: () => this.getStickyOffset(),
 				scrollTo: (y) => this.scrollTo(y),
 				programmaticScroll: () => this.programmaticScroll,
+			}, (key, value) => {
+				(this.settings as any)[key] = value;
+				this.saveSettings();
 			});
 
 			// Set extractor type
