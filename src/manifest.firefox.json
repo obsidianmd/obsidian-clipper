@@ -40,13 +40,12 @@
 	"content_scripts": [
 		{
 			"matches": ["http://*/*", "https://*/*"],
-			"js": ["browser-polyfill.min.js", "content.js"],
-			"css": ["highlighter.css"]
+			"js": ["browser-polyfill.min.js", "content.js"]
 		}
 	],
 	"web_accessible_resources": [
 		{
-			"resources": ["reader.css", "reader-script.js", "browser-polyfill.min.js", "style.css", "side-panel.html", "flatten-shadow-dom.js"],
+			"resources": ["reader.css", "reader-script.js", "browser-polyfill.min.js", "style.css", "side-panel.html", "flatten-shadow-dom.js", "highlighter.css"],
 			"extension_ids": ["*"],
    			"matches": [ "*://*/*" ]
 		}

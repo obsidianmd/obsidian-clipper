@@ -73,6 +73,8 @@ declare global {
 			return;
 		}
 
+		await ensureHighlighterCSS();
+
 		const container = document.createElement('div');
 		container.id = containerId;
 		container.classList.add('is-open');
@@ -401,7 +403,7 @@ declare global {
 			const content = extractContentBySelector(request.selector, request.attribute, request.extractHtml);
 			sendResponse({ content: content });
 		} else if (request.action === "paintHighlights") {
-			highlighter.loadHighlights().then(() => {
+			ensureHighlighterCSS().then(() => highlighter.loadHighlights()).then(() => {
 				if (generalSettings.alwaysShowHighlights) {
 					highlighter.applyHighlights();
 				}
@@ -410,6 +412,7 @@ declare global {
 			return true;
 		} else if (request.action === "setHighlighterMode") {
 			isHighlighterMode = request.isActive;
+			ensureHighlighterCSS();
 			highlighter.toggleHighlighterMenu(isHighlighterMode);
 			updateHasHighlights();
 			sendResponse({ success: true });
@@ -418,10 +421,12 @@ declare global {
 			browser.runtime.sendMessage({ action: "getHighlighterMode" }).then(sendResponse);
 			return true;
 		} else if (request.action === "toggleHighlighter") {
+			ensureHighlighterCSS();
 			highlighter.toggleHighlighterMenu(request.isActive);
 			updateHasHighlights();
 			sendResponse({ success: true });
 		} else if (request.action === "highlightSelection") {
+			ensureHighlighterCSS();
 			highlighter.toggleHighlighterMenu(request.isActive);
 			const selection = window.getSelection();
 			if (selection && !selection.isCollapsed) {
@@ -430,6 +435,7 @@ declare global {
 			updateHasHighlights();
 			sendResponse({ success: true });
 		} else if (request.action === "highlightElement") {
+			ensureHighlighterCSS();
 			highlighter.toggleHighlighterMenu(request.isActive);
 			if (request.targetElementInfo) {
 				const { mediaType, srcUrl, pageUrl } = request.targetElementInfo;
@@ -504,14 +510,33 @@ declare global {
 		browser.runtime.sendMessage({ action: "updateHasHighlights", hasHighlights });
 	}
 
+	let highlighterCSSPromise: Promise<void> | null = null;
+	function ensureHighlighterCSS(): Promise<void> {
+		if (!highlighterCSSPromise) {
+			highlighterCSSPromise = new Promise<void>((resolve) => {
+				const link = document.createElement('link');
+				link.rel = 'stylesheet';
+				link.href = browser.runtime.getURL('highlighter.css');
+				link.onload = () => resolve();
+				link.onerror = () => resolve();
+				(document.head || document.documentElement).appendChild(link);
+			});
+		}
+		return highlighterCSSPromise;
+	}
+
 	async function initializeHighlighter() {
 		await loadSettings();
-		await highlighter.loadHighlights();
-		
+
 		if (generalSettings.alwaysShowHighlights) {
-			highlighter.applyHighlights();
+			const result = await browser.storage.local.get('highlights');
+			const allHighlights = (result.highlights || {}) as Record<string, unknown>;
+			if (allHighlights[window.location.href]) {
+				await ensureHighlighterCSS();
+			}
 		}
-		
+
+		await highlighter.loadHighlights();
 		updateHasHighlights();
 	}
 
