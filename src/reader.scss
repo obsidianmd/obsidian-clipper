@@ -311,8 +311,8 @@
 		}
 	}
 	.player-container {
-		padding-top: 12px;
-		background: var(--background-primary);
+		border-top: 12px solid var(--background-primary);
+		background: transparent;
 		line-height: 0;
 		&.pin-player {
 			top: 0;
@@ -320,8 +320,8 @@
 			z-index: var(--layer-popover);
 		}
 		iframe {
-			box-shadow: none;
 			border-radius: 4px;
+			box-shadow: 0 0 24px 24px var(--background-primary);
 		}
 	}
 	.player-toggles {
@@ -331,6 +331,11 @@
 		gap: 4px;
 		padding: 12px 0 8px;
 		user-select: none;
+		transition: opacity 0.15s ease;
+		background: var(--background-primary);
+		&:hover {
+			opacity: 1 !important;
+		}
 		&:after {
 			pointer-events: none;
 			content: '';
@@ -348,10 +353,6 @@
 		top: 0;
 		z-index: var(--layer-popover);
 		background: var(--background-primary);
-		transition: opacity 0.15s ease;
-		&:hover {
-			opacity: 1 !important;
-		}
 	}
 	.player-toggle {
 		font-family: var(--font-ui);
@@ -1516,7 +1517,7 @@
 	position: sticky;
 	top: 0;
 	height: 100vh;
-	min-width: 200px;
+	min-width: 180px;
 	padding: max(4rem, 4vh) var(--size-4-5) var(--size-4-5) var(--size-4-5);
 	overflow-y: auto;
 	font-size: var(--font-ui-small);

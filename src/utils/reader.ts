@@ -285,7 +285,7 @@ export class Reader {
 
 		const isMobile = window.matchMedia('(pointer: coarse)').matches;
 
-		const getFloatingToggles = () => doc.querySelector('article > .player-toggles') as HTMLElement | null;
+		const getPlayerToggles = () => doc.querySelector('.player-toggles') as HTMLElement | null;
 
 		const showButtons = () => {
 			if (scrollHidden) {
@@ -294,7 +294,7 @@ export class Reader {
 					triggerGroup.style.visibility = '';
 					triggerGroup.style.pointerEvents = '';
 				}
-				const floatingToggles = getFloatingToggles();
+				const floatingToggles = getPlayerToggles();
 				if (floatingToggles) {
 					floatingToggles.style.opacity = '';
 				}
@@ -320,7 +320,7 @@ export class Reader {
 						triggerGroup.style.visibility = 'hidden';
 						triggerGroup.style.pointerEvents = 'none';
 					}
-					const floatingToggles = getFloatingToggles();
+					const floatingToggles = getPlayerToggles();
 					if (floatingToggles) {
 						floatingToggles.style.opacity = '0';
 					}
