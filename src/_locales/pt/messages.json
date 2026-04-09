@@ -675,6 +675,12 @@
 	"readerAppearanceLight": {
 		"message": "Claro"
 	},
+	"readerAutoScroll": {
+		"message": "Deslocamento automático"
+	},
+	"readerAutoScrollDescription": {
+		"message": "Desloca automaticamente a transcrição para acompanhar a reprodução."
+	},
 	"readerBlendImages": {
 		"message": "Misturar imagens"
 	},
@@ -692,6 +698,9 @@
 	},
 	"readerColorSchemeDefault": {
 		"message": "Predefinido"
+	},
+	"readerCurrentPosition": {
+		"message": "Posição atual"
 	},
 	"readerCustomCss": {
 		"message": "CSS personalizado"
@@ -744,6 +753,12 @@
 	"readerFootnotes": {
 		"message": "Notas de rodapé"
 	},
+	"readerHighlightActiveLine": {
+		"message": "Realçar linha ativa"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "Realça a frase atual na transcrição durante a reprodução."
+	},
 	"readerImages": {
 		"message": "Imagens"
 	},
@@ -759,6 +774,12 @@
 	"readerOn": {
 		"message": "Leitor"
 	},
+	"readerPinPlayer": {
+		"message": "Fixar leitor"
+	},
+	"readerPinPlayerDescription": {
+		"message": "Mantém o leitor de vídeo visível ao deslocar a transcrição."
+	},
 	"readerSettings": {
 		"message": "Definições do leitor"
 	},
@@ -770,6 +791,9 @@
 	},
 	"readerThemeSection": {
 		"message": "Tema"
+	},
+	"readerTranscripts": {
+		"message": "Transcrições"
 	},
 	"readerTypography": {
 		"message": "Tipografia"

@@ -675,6 +675,12 @@
 	"readerAppearanceLight": {
 		"message": "ភ្លឺ"
 	},
+	"readerAutoScroll": {
+		"message": "រមូរស្វ័យប្រវត្តិ"
+	},
+	"readerAutoScrollDescription": {
+		"message": "រមូរអត្ថបទបកស្រាយដោយស្វ័យប្រវត្តិ ដើម្បីតាមដានការចាក់។"
+	},
 	"readerBlendImages": {
 		"message": "បញ្ចូលរូបភាពឲ្យស្របគ្នា"
 	},
@@ -692,6 +698,9 @@
 	},
 	"readerColorSchemeDefault": {
 		"message": "លំនាំដើម"
+	},
+	"readerCurrentPosition": {
+		"message": "ទីតាំងបច្ចុប្បន្ន"
 	},
 	"readerCustomCss": {
 		"message": "CSS ផ្ទាល់ខ្លួន"
@@ -744,6 +753,12 @@
 	"readerFootnotes": {
 		"message": "កំណត់សម្គាល់ជើងទំព័រ"
 	},
+	"readerHighlightActiveLine": {
+		"message": "រំលេចបន្ទាត់សកម្ម"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "រំលេចប្រយោគបច្ចុប្បន្ននៅក្នុងអត្ថបទបកស្រាយ ខណៈពេលកំពុងចាក់។"
+	},
 	"readerImages": {
 		"message": "រូបភាព"
 	},
@@ -759,6 +774,12 @@
 	"readerOn": {
 		"message": "របៀបអាន"
 	},
+	"readerPinPlayer": {
+		"message": "ខ្ទាស់កម្មវិធីចាក់"
+	},
+	"readerPinPlayerDescription": {
+		"message": "រក្សាឲ្យកម្មវិធីចាក់វីដេអូមើលឃើញជានិច្ច ខណៈពេលរមូរតាមអត្ថបទបកស្រាយ។"
+	},
 	"readerSettings": {
 		"message": "ការកំណត់របៀបអាន"
 	},
@@ -770,6 +791,9 @@
 	},
 	"readerThemeSection": {
 		"message": "ស្បែក"
+	},
+	"readerTranscripts": {
+		"message": "អត្ថបទបកស្រាយ"
 	},
 	"readerTypography": {
 		"message": "អក្សរសាស្ត្រ"

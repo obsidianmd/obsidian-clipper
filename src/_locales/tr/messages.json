@@ -675,6 +675,12 @@
 	"readerAppearanceLight": {
 		"message": "Açık"
 	},
+	"readerAutoScroll": {
+		"message": "Otomatik kaydırma"
+	},
+	"readerAutoScrollDescription": {
+		"message": "Oynatmayı takip etmek için transkripti otomatik olarak kaydırır."
+	},
 	"readerBlendImages": {
 		"message": "Görselleri harmanla"
 	},
@@ -692,6 +698,9 @@
 	},
 	"readerColorSchemeDefault": {
 		"message": "Varsayılan"
+	},
+	"readerCurrentPosition": {
+		"message": "Geçerli konum"
 	},
 	"readerCustomCss": {
 		"message": "Özel CSS"
@@ -744,6 +753,12 @@
 	"readerFootnotes": {
 		"message": "Dipnotlar"
 	},
+	"readerHighlightActiveLine": {
+		"message": "Etkin satırı vurgula"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "Oynatma sırasında transkriptteki geçerli cümleyi vurgular."
+	},
 	"readerImages": {
 		"message": "Görseller"
 	},
@@ -759,6 +774,12 @@
 	"readerOn": {
 		"message": "Okuyucu"
 	},
+	"readerPinPlayer": {
+		"message": "Oynatıcıyı sabitle"
+	},
+	"readerPinPlayerDescription": {
+		"message": "Transkriptte kaydırma yaparken video oynatıcısını görünür tutar."
+	},
 	"readerSettings": {
 		"message": "Okuyucu ayarları"
 	},
@@ -770,6 +791,9 @@
 	},
 	"readerThemeSection": {
 		"message": "Tema"
+	},
+	"readerTranscripts": {
+		"message": "Transkriptler"
 	},
 	"readerTypography": {
 		"message": "Tipografi"

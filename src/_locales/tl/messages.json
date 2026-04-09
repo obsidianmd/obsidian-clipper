@@ -667,6 +667,12 @@
 	"readerAppearanceLight": {
 		"message": "Maliwanag"
 	},
+	"readerAutoScroll": {
+		"message": "Awtomatikong pag-scroll"
+	},
+	"readerAutoScrollDescription": {
+		"message": "Awtomatikong i-scroll ang transcript upang sumunod sa pag-playback."
+	},
 	"readerBlendImages": {
 		"message": "Ihalo ang mga larawan"
 	},
@@ -684,6 +690,9 @@
 	},
 	"readerColorSchemeDefault": {
 		"message": "Default"
+	},
+	"readerCurrentPosition": {
+		"message": "Kasalukuyang posisyon"
 	},
 	"readerCustomCss": {
 		"message": "Custom CSS"
@@ -736,6 +745,12 @@
 	"readerFootnotes": {
 		"message": "Mga talababa"
 	},
+	"readerHighlightActiveLine": {
+		"message": "I-highlight ang aktibong linya"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "I-highlight ang kasalukuyang pangungusap sa transcript habang nagpe-playback."
+	},
 	"readerImages": {
 		"message": "Mga larawan"
 	},
@@ -751,6 +766,12 @@
 	"readerOn": {
 		"message": "Reader"
 	},
+	"readerPinPlayer": {
+		"message": "I-pin ang player"
+	},
+	"readerPinPlayerDescription": {
+		"message": "Panatilihing nakikita ang video player habang nag-i-scroll sa transcript."
+	},
 	"readerSettings": {
 		"message": "Mga setting ng reader"
 	},
@@ -762,6 +783,9 @@
 	},
 	"readerThemeSection": {
 		"message": "Tema"
+	},
+	"readerTranscripts": {
+		"message": "Mga transcript"
 	},
 	"readerTypography": {
 		"message": "Tipograpiya"

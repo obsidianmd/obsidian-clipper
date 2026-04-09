@@ -667,6 +667,12 @@
 	"readerAppearanceLight": {
 		"message": "Světlý"
 	},
+	"readerAutoScroll": {
+		"message": "Automatické posouvání"
+	},
+	"readerAutoScrollDescription": {
+		"message": "Automaticky posouvat přepis tak, aby sledoval přehrávání."
+	},
 	"readerBlendImages": {
 		"message": "Prolnout obrázky"
 	},
@@ -684,6 +690,9 @@
 	},
 	"readerColorSchemeDefault": {
 		"message": "Výchozí"
+	},
+	"readerCurrentPosition": {
+		"message": "Aktuální pozice"
 	},
 	"readerCustomCss": {
 		"message": "Vlastní CSS"
@@ -736,6 +745,12 @@
 	"readerFootnotes": {
 		"message": "Poznámky pod čarou"
 	},
+	"readerHighlightActiveLine": {
+		"message": "Zvýraznit aktivní řádek"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "Během přehrávání zvýraznit aktuální větu v přepisu."
+	},
 	"readerImages": {
 		"message": "Obrázky"
 	},
@@ -751,6 +766,12 @@
 	"readerOn": {
 		"message": "Čtečka"
 	},
+	"readerPinPlayer": {
+		"message": "Připnout přehrávač"
+	},
+	"readerPinPlayerDescription": {
+		"message": "Ponechat video přehrávač viditelný při posouvání přepisu."
+	},
 	"readerSettings": {
 		"message": "Nastavení čtečky"
 	},
@@ -762,6 +783,9 @@
 	},
 	"readerThemeSection": {
 		"message": "Motiv"
+	},
+	"readerTranscripts": {
+		"message": "Přepisy"
 	},
 	"readerTypography": {
 		"message": "Typografie"

@@ -667,6 +667,12 @@
 	"readerAppearanceLight": {
 		"message": "Світлий"
 	},
+	"readerAutoScroll": {
+		"message": "Автопрокрутка"
+	},
+	"readerAutoScrollDescription": {
+		"message": "Автоматично прокручувати транскрипт, щоб він слідував за відтворенням."
+	},
 	"readerBlendImages": {
 		"message": "Змішувати зображення"
 	},
@@ -684,6 +690,9 @@
 	},
 	"readerColorSchemeDefault": {
 		"message": "За замовчуванням"
+	},
+	"readerCurrentPosition": {
+		"message": "Поточна позиція"
 	},
 	"readerCustomCss": {
 		"message": "Власний CSS"
@@ -736,6 +745,12 @@
 	"readerFootnotes": {
 		"message": "Виноски"
 	},
+	"readerHighlightActiveLine": {
+		"message": "Підсвічувати активний рядок"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "Підсвічувати поточне речення в транскрипті під час відтворення."
+	},
 	"readerImages": {
 		"message": "Зображення"
 	},
@@ -751,6 +766,12 @@
 	"readerOn": {
 		"message": "Режим читання"
 	},
+	"readerPinPlayer": {
+		"message": "Закріпити плеєр"
+	},
+	"readerPinPlayerDescription": {
+		"message": "Залишати відеоплеєр видимим під час прокручування транскрипту."
+	},
 	"readerSettings": {
 		"message": "Налаштування режиму читання"
 	},
@@ -762,6 +783,9 @@
 	},
 	"readerThemeSection": {
 		"message": "Тема"
+	},
+	"readerTranscripts": {
+		"message": "Транскрипти"
 	},
 	"readerTypography": {
 		"message": "Типографіка"

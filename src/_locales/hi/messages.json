@@ -675,6 +675,12 @@
 	"readerAppearanceLight": {
 		"message": "लाइट"
 	},
+	"readerAutoScroll": {
+		"message": "स्वचालित स्क्रॉल"
+	},
+	"readerAutoScrollDescription": {
+		"message": "प्लेबैक के साथ ट्रांसक्रिप्ट को अपने-आप स्क्रॉल करें।"
+	},
 	"readerBlendImages": {
 		"message": "छवियाँ मिलाएँ"
 	},
@@ -692,6 +698,9 @@
 	},
 	"readerColorSchemeDefault": {
 		"message": "डिफ़ॉल्ट"
+	},
+	"readerCurrentPosition": {
+		"message": "वर्तमान स्थिति"
 	},
 	"readerCustomCss": {
 		"message": "कस्टम CSS"
@@ -744,6 +753,12 @@
 	"readerFootnotes": {
 		"message": "पादटिप्पणियाँ"
 	},
+	"readerHighlightActiveLine": {
+		"message": "सक्रिय पंक्ति हाइलाइट करें"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "प्लेबैक के दौरान ट्रांसक्रिप्ट में वर्तमान वाक्य को हाइलाइट करें।"
+	},
 	"readerImages": {
 		"message": "छवियाँ"
 	},
@@ -759,6 +774,12 @@
 	"readerOn": {
 		"message": "रीडर"
 	},
+	"readerPinPlayer": {
+		"message": "प्लेयर पिन करें"
+	},
+	"readerPinPlayerDescription": {
+		"message": "ट्रांसक्रिप्ट स्क्रॉल करते समय वीडियो प्लेयर को दिखाई देता रखें।"
+	},
 	"readerSettings": {
 		"message": "रीडर सेटिंग्स"
 	},
@@ -770,6 +791,9 @@
 	},
 	"readerThemeSection": {
 		"message": "थीम"
+	},
+	"readerTranscripts": {
+		"message": "ट्रांसक्रिप्ट"
 	},
 	"readerTypography": {
 		"message": "टाइपोग्राफी"

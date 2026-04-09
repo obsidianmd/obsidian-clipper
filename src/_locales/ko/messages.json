@@ -675,6 +675,12 @@
 	"readerAppearanceLight": {
 		"message": "밝게"
 	},
+	"readerAutoScroll": {
+		"message": "자동 스크롤"
+	},
+	"readerAutoScrollDescription": {
+		"message": "재생을 따라가도록 스크립트를 자동으로 스크롤합니다."
+	},
 	"readerBlendImages": {
 		"message": "이미지 블렌딩"
 	},
@@ -692,6 +698,9 @@
 	},
 	"readerColorSchemeDefault": {
 		"message": "기본값"
+	},
+	"readerCurrentPosition": {
+		"message": "현재 위치"
 	},
 	"readerCustomCss": {
 		"message": "사용자 지정 CSS"
@@ -744,6 +753,12 @@
 	"readerFootnotes": {
 		"message": "각주"
 	},
+	"readerHighlightActiveLine": {
+		"message": "활성 줄 강조"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "재생 중 스크립트에서 현재 문장을 강조 표시합니다."
+	},
 	"readerImages": {
 		"message": "이미지"
 	},
@@ -759,6 +774,12 @@
 	"readerOn": {
 		"message": "리더"
 	},
+	"readerPinPlayer": {
+		"message": "플레이어 고정"
+	},
+	"readerPinPlayerDescription": {
+		"message": "스크립트를 스크롤하는 동안에도 비디오 플레이어를 계속 표시합니다."
+	},
 	"readerSettings": {
 		"message": "리더 설정"
 	},
@@ -770,6 +791,9 @@
 	},
 	"readerThemeSection": {
 		"message": "테마"
+	},
+	"readerTranscripts": {
+		"message": "스크립트"
 	},
 	"readerTypography": {
 		"message": "타이포그래피"

@@ -675,6 +675,12 @@
 	"readerAppearanceLight": {
 		"message": "Light"
 	},
+	"readerAutoScroll": {
+		"message": "Auto-scroll"
+	},
+	"readerAutoScrollDescription": {
+		"message": "Automatically scroll the transcript to follow playback."
+	},
 	"readerBlendImages": {
 		"message": "Blend images"
 	},
@@ -692,6 +698,9 @@
 	},
 	"readerColorSchemeDefault": {
 		"message": "Default"
+	},
+	"readerCurrentPosition": {
+		"message": "Current position"
 	},
 	"readerCustomCss": {
 		"message": "Custom CSS"
@@ -744,6 +753,12 @@
 	"readerFootnotes": {
 		"message": "Footnotes"
 	},
+	"readerHighlightActiveLine": {
+		"message": "Highlight active line"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "Highlight the current sentence in the transcript during playback."
+	},
 	"readerImages": {
 		"message": "Images"
 	},
@@ -753,23 +768,11 @@
 	"readerLineWidth": {
 		"message": "Line width"
 	},
-	"readerCurrentPosition": {
-		"message": "Current position"
-	},
-	"readerHighlightActiveLine": {
-		"message": "Highlight active line"
-	},
-	"readerHighlightActiveLineDescription": {
-		"message": "Highlight the current sentence in the transcript during playback."
-	},
 	"readerLoading": {
 		"message": "Defuddling…"
 	},
 	"readerOn": {
 		"message": "Reader"
-	},
-	"readerSettings": {
-		"message": "Reader settings"
 	},
 	"readerPinPlayer": {
 		"message": "Pin player"
@@ -777,11 +780,8 @@
 	"readerPinPlayerDescription": {
 		"message": "Keep the video player visible while scrolling through the transcript."
 	},
-	"readerAutoScroll": {
-		"message": "Auto-scroll"
-	},
-	"readerAutoScrollDescription": {
-		"message": "Automatically scroll the transcript to follow playback."
+	"readerSettings": {
+		"message": "Reader settings"
 	},
 	"readerTheme": {
 		"message": "Theme"
