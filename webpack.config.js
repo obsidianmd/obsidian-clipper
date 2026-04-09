@@ -143,7 +143,7 @@ module.exports = (env, argv) => {
 					},
 					{ from: "src/popup.html", to: "popup.html" },
 					{ from: "src/side-panel.html", to: "side-panel.html" },
-					{ from: "src/settings.html", to: "settings.html" },
+						{ from: "src/settings.html", to: "settings.html" },
 					{ from: "src/icons", to: "icons" },
 					{ from: "node_modules/webextension-polyfill/dist/browser-polyfill.min.js", to: "browser-polyfill.min.js" },
 					{ from: "src/flatten-shadow-dom.js", to: "flatten-shadow-dom.js" },

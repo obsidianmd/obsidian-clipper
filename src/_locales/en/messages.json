@@ -753,6 +753,12 @@
 	"readerLineWidth": {
 		"message": "Line width"
 	},
+	"readerHighlightActiveLine": {
+		"message": "Highlight active line"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "Highlight the current sentence in the transcript during playback."
+	},
 	"readerLoading": {
 		"message": "Defuddling…"
 	},
@@ -762,6 +768,18 @@
 	"readerSettings": {
 		"message": "Reader settings"
 	},
+	"readerStickyPlayer": {
+		"message": "Sticky player"
+	},
+	"readerStickyPlayerDescription": {
+		"message": "Keep the video player visible while scrolling through the transcript."
+	},
+	"readerAutoScroll": {
+		"message": "Auto-scroll"
+	},
+	"readerAutoScrollDescription": {
+		"message": "Automatically scroll the transcript to follow playback."
+	},
 	"readerTheme": {
 		"message": "Theme"
 	},
@@ -770,6 +788,9 @@
 	},
 	"readerThemeSection": {
 		"message": "Theme"
+	},
+	"readerTranscripts": {
+		"message": "Transcripts"
 	},
 	"readerTypography": {
 		"message": "Typography"

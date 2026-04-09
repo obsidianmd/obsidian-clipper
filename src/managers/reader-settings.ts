@@ -356,6 +356,18 @@ export async function initializeReaderSettings() {
 		});
 	}
 
+	initializeSettingToggle('reader-sticky-player', generalSettings.readerSettings.stickyPlayer ?? true, (checked) => {
+		saveSettings({ ...generalSettings, readerSettings: { ...generalSettings.readerSettings, stickyPlayer: checked } });
+	});
+
+	initializeSettingToggle('reader-auto-scroll', generalSettings.readerSettings.autoScroll ?? true, (checked) => {
+		saveSettings({ ...generalSettings, readerSettings: { ...generalSettings.readerSettings, autoScroll: checked } });
+	});
+
+	initializeSettingToggle('reader-highlight-active-line', generalSettings.readerSettings.highlightActiveLine ?? true, (checked) => {
+		saveSettings({ ...generalSettings, readerSettings: { ...generalSettings.readerSettings, highlightActiveLine: checked } });
+	});
+
 	initializeSettingToggle('reader-blend-images', generalSettings.readerSettings.blendImages, (checked) => {
 		saveSettings({ ...generalSettings, readerSettings: { ...generalSettings.readerSettings, blendImages: checked } });
 	});

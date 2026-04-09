@@ -34,6 +34,9 @@ export const generalSettings: Settings = {
 		defaultFont: '',
 		blendImages: true,
 		colorLinks: false,
+		stickyPlayer: true,
+		autoScroll: true,
+		highlightActiveLine: true,
 		customCss: '',
 	},
 	stats: {

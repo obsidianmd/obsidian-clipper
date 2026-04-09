@@ -102,6 +102,9 @@ export class Reader {
 		defaultFont: '',
 		blendImages: true,
 		colorLinks: false,
+		stickyPlayer: true,
+		autoScroll: true,
+		highlightActiveLine: true,
 		customCss: ''
 	};
 
@@ -1203,7 +1206,7 @@ export class Reader {
 			if (typeof window !== 'undefined' && window.clearTimeout && window.clearInterval) {
 				const nativeClearTimeout = window.clearTimeout.bind(window);
 				const nativeClearInterval = window.clearInterval.bind(window);
-				
+
 				// Clear all timeouts and intervals
 				let id = window.setTimeout(() => {}, 0);
 				while (id--) {
@@ -1229,7 +1232,7 @@ export class Reader {
 				doc.body.parentNode?.replaceChild(newBody, doc.body);
 			}
 
-			// Block inline event handlers and dynamic scripts
+				// Block inline event handlers and dynamic scripts
 			const meta = doc.createElement('meta');
 			meta.httpEquiv = 'Content-Security-Policy';
 			meta.content = "script-src 'none'; object-src 'none';";
@@ -1812,13 +1815,26 @@ export class Reader {
 			// Capture YouTube video state before cleanup destroys the player
 			let videoTimestamp = 0;
 			let videoWasPlaying = false;
+			let youtubeVideoElement: HTMLVideoElement | null = null;
 			const host = doc.URL ? new URL(doc.URL).hostname : '';
 			const isYouTube = host.includes('youtube.com') || host.includes('youtu.be');
+			const browserType = await detectBrowser();
+			// Chrome's iframe embed works via declarativeNetRequest.
+			// Safari/Firefox can't modify headers, so we preserve the
+			// native video element instead.
+			const useNativeVideo = isYouTube && !['chrome'].includes(browserType);
 			if (isYouTube) {
 				const videoElement = doc.querySelector('video');
 				if (videoElement) {
 					videoTimestamp = Math.floor(videoElement.currentTime);
 					videoWasPlaying = !videoElement.paused;
+					if (useNativeVideo) {
+						// Detach the video element so it survives DOM cleanup.
+						// The blob: MediaSource connection stays alive as long
+						// as the element exists.
+						youtubeVideoElement = videoElement;
+						videoElement.remove();
+					}
 				}
 			}
 
@@ -1861,10 +1877,13 @@ export class Reader {
 
 			// Remove stylesheet links and style tags, except reader and extension styles
 			const styleElements = head.querySelectorAll('link[rel="stylesheet"], link[as="style"], style');
+			const extUrl = browser.runtime.getURL('');
 			styleElements.forEach(el => {
 				if (el.id === 'obsidian-reader-styles') return;
 				// Preserve extension-injected styles (clipper, highlighter)
 				if (el instanceof HTMLStyleElement && el.textContent?.includes('obsidian-clipper')) return;
+				// Preserve extension stylesheet links (e.g. highlighter.css)
+				if (el instanceof HTMLLinkElement && el.href?.startsWith(extUrl)) return;
 				el.remove();
 			});
 
@@ -2098,18 +2117,41 @@ export class Reader {
 			const contentDoc = parser.parseFromString(content, 'text/html');
 			const contentBody = contentDoc.body;
 
-			// On YouTube, fix embed self-referrer blocking and resume playback state
+			// On YouTube, replace the Defuddle-generated iframe with the
+			// preserved native video element, or fall back to embed
 			if (isYouTube) {
 				const iframe = contentBody.querySelector('iframe[src*="youtube.com/embed/"]') as HTMLIFrameElement;
-				if (iframe) {
+				if (iframe && youtubeVideoElement) {
+					// Use the original video element instead of an iframe
+					youtubeVideoElement.className = 'reader-video-player';
+					youtubeVideoElement.removeAttribute('style');
+					youtubeVideoElement.setAttribute('controls', '');
+					// YouTube's JS may keep resetting attributes —
+					// use a MutationObserver to enforce our settings
+					const videoObs = new MutationObserver(() => {
+						if (!youtubeVideoElement!.hasAttribute('controls')) {
+							youtubeVideoElement!.setAttribute('controls', '');
+						}
+						if (youtubeVideoElement!.className !== 'reader-video-player') {
+							youtubeVideoElement!.className = 'reader-video-player';
+						}
+					});
+					videoObs.observe(youtubeVideoElement, {
+						attributes: true,
+						attributeFilter: ['controls', 'class', 'style']
+					});
+					const videoWrapper = doc.createElement('div');
+					videoWrapper.className = 'reader-video-wrapper';
+					videoWrapper.appendChild(youtubeVideoElement);
+					iframe.replaceWith(videoWrapper);
+				} else if (iframe) {
+					// Fallback: use embed with header modification (Chrome)
+					// or thumbnail (Safari)
 					const embedUrl = new URL(iframe.src);
 					const videoId = embedUrl.pathname.split('/').pop();
-					const browserType = await detectBrowser();
 					const isSafari = ['safari', 'mobile-safari', 'ipad-os'].includes(browserType);
 
 					if (isSafari && videoId) {
-						// Safari can't modify request headers, so YouTube blocks
-						// self-referrer embeds. Show a clickable thumbnail instead.
 						const watchUrl = 'https://www.youtube.com/watch?v=' + videoId
 							+ (videoTimestamp > 0 ? '&t=' + videoTimestamp : '');
 						const thumbnail = doc.createElement('a');
@@ -2124,7 +2166,6 @@ export class Reader {
 							+ '<path d="M45 24L27 14v20" fill="white"/></svg>';
 						iframe.replaceWith(thumbnail);
 					} else {
-						// Chrome/Firefox: use direct embed with header modification
 						await browser.runtime.sendMessage({
 							action: 'enableYouTubeEmbedRule'
 						}).catch(() => {});
@@ -2147,27 +2188,34 @@ export class Reader {
 				article.appendChild(contentBody.firstChild);
 			}
 
-			// Make YouTube iframe sticky when a transcript follows,
+			// Make YouTube player sticky when a transcript follows,
 			// and wire up timestamp clicks to seek the video
 			const transcript = article.querySelector('.youtube.transcript') as HTMLElement | null;
 			if (transcript) {
 				const iframe = article.querySelector('iframe[src*="youtube.com/embed/"]') as HTMLIFrameElement | null;
-				if (iframe) {
-					// Wrap iframe in a container with toggle controls
+				const videoWrapper = article.querySelector('.reader-video-wrapper') as HTMLElement | null;
+				const videoEl = videoWrapper?.querySelector('video.reader-video-player') as HTMLVideoElement | null;
+				const playerEl = (videoWrapper || iframe) as HTMLElement | null;
+				if (playerEl) {
+					// Wrap player in a container with toggle controls
 					const playerContainer = doc.createElement('div');
-					playerContainer.className = 'youtube-player-container sticky-player';
-					iframe.parentNode!.insertBefore(playerContainer, iframe);
-					playerContainer.appendChild(iframe);
+					const stickyDefault = this.settings.stickyPlayer ?? true;
+					const autoScrollDefault = this.settings.autoScroll ?? true;
+					const highlightDefault = this.settings.highlightActiveLine ?? true;
+					playerContainer.className = 'youtube-player-container' + (stickyDefault ? ' sticky-player' : '');
+					playerEl.parentNode!.insertBefore(playerContainer, playerEl);
+					playerContainer.appendChild(playerEl);
 
-					let stickyEnabled = true;
-					let autoScrollEnabled = true;
+					let stickyEnabled = stickyDefault;
+					let autoScrollEnabled = autoScrollDefault;
+					let highlightEnabled = highlightDefault;
 
 					const toggleBar = doc.createElement('div');
 					toggleBar.className = 'youtube-player-toggles';
 
-					const createToggle = (label: string, onChange: (on: boolean) => void) => {
+					const createToggle = (label: string, defaultOn: boolean, onChange: (on: boolean) => void) => {
 						const button = doc.createElement('button');
-						button.className = 'youtube-player-toggle is-active';
+						button.className = 'youtube-player-toggle' + (defaultOn ? ' is-active' : '');
 						button.textContent = label;
 						button.addEventListener('click', () => {
 							const isActive = button.classList.toggle('is-active');
@@ -2176,7 +2224,7 @@ export class Reader {
 						return button;
 					};
 
-					const stickyToggle = createToggle('Sticky player', (on) => {
+					const stickyToggle = createToggle(getMessage('readerStickyPlayer'), stickyDefault, (on) => {
 						stickyEnabled = on;
 						if (on) {
 							playerContainer.classList.add('sticky-player');
@@ -2185,12 +2233,11 @@ export class Reader {
 						}
 					});
 
-					const autoScrollToggle = createToggle('Auto-scroll', (on) => {
+					const autoScrollToggle = createToggle(getMessage('readerAutoScroll'), autoScrollDefault, (on) => {
 						autoScrollEnabled = on;
 					});
 
-					let highlightEnabled = true;
-					const highlightToggle = createToggle('Highlight active line', (on) => {
+					const highlightToggle = createToggle(getMessage('readerHighlightActiveLine'), highlightDefault, (on) => {
 						highlightEnabled = on;
 						if (!on) {
 							const ph = (CSS as any).highlights?.get('transcript-playback');
@@ -2201,22 +2248,25 @@ export class Reader {
 					toggleBar.appendChild(stickyToggle);
 					toggleBar.appendChild(autoScrollToggle);
 					toggleBar.appendChild(highlightToggle);
+
 					playerContainer.appendChild(toggleBar);
 
-					// Enable JS API on the embed
-					const src = new URL(iframe.src);
-					src.searchParams.set('enablejsapi', '1');
-					src.searchParams.set('origin', window.location.origin);
-					iframe.src = src.toString();
+					if (iframe) {
+						// Enable JS API on the embed
+						const src = new URL(iframe.src);
+						src.searchParams.set('enablejsapi', '1');
+						src.searchParams.set('origin', window.location.origin);
+						iframe.src = src.toString();
 
-					// Initialize postMessage connection once iframe loads
-					iframe.addEventListener('load', () => {
-						if (iframe.contentWindow) {
-							iframe.contentWindow.postMessage(JSON.stringify({
-								event: 'listening'
-							}), '*');
-						}
-					});
+						// Initialize postMessage connection once iframe loads
+						iframe.addEventListener('load', () => {
+							if (iframe.contentWindow) {
+								iframe.contentWindow.postMessage(JSON.stringify({
+									event: 'listening'
+								}), '*');
+							}
+						});
+					}
 
 					// Build a sorted list of segments with their start times
 					const segments = Array.from(transcript.querySelectorAll('.transcript-segment')) as HTMLElement[];
@@ -2390,41 +2440,54 @@ export class Reader {
 						}
 					};
 
-					// Listen for time updates from the iframe
-					const onMessage = (e: MessageEvent) => {
-						if (e.source !== iframe.contentWindow) return;
-						try {
-							const data = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
-							if (data?.info?.currentTime !== undefined) {
-								updateActiveSegment(data.info.currentTime);
+					// Set up time tracking and seeking based on player type
+					let seekTo: (seconds: number) => void;
+
+					if (videoEl) {
+						// Native video element: use HTML5 API directly
+						seekTo = (seconds: number) => {
+							videoEl.currentTime = seconds;
+						};
+						videoEl.addEventListener('timeupdate', () => {
+							updateActiveSegment(videoEl.currentTime);
+						});
+					} else if (iframe) {
+						// Iframe embed: use postMessage API
+						seekTo = (seconds: number) => {
+							if (!iframe.contentWindow) return;
+							iframe.contentWindow.postMessage(JSON.stringify({
+								event: 'command',
+								func: 'seekTo',
+								args: [seconds, true]
+							}), '*');
+						};
+
+						const onMessage = (e: MessageEvent) => {
+							if (e.source !== iframe.contentWindow) return;
+							try {
+								const data = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
+								if (data?.info?.currentTime !== undefined) {
+									updateActiveSegment(data.info.currentTime);
+								}
+							} catch {}
+						};
+						window.addEventListener('message', onMessage);
+
+						const poll = setInterval(() => {
+							if (!iframe.contentWindow || !doc.contains(iframe)) {
+								clearInterval(poll);
+								window.removeEventListener('message', onMessage);
+								return;
 							}
-						} catch {}
-					};
-					window.addEventListener('message', onMessage);
-
-					// Poll current time while iframe is on the page
-					const poll = setInterval(() => {
-						if (!iframe.contentWindow || !doc.contains(iframe)) {
-							clearInterval(poll);
-							window.removeEventListener('message', onMessage);
-							return;
-						}
-						iframe.contentWindow.postMessage(JSON.stringify({
-							event: 'command',
-							func: 'getCurrentTime',
-							args: []
-						}), '*');
-					}, 500);
-
-					// Scrub video via a track behind the timestamps
-					const seekTo = (seconds: number) => {
-						if (!iframe.contentWindow) return;
-						iframe.contentWindow.postMessage(JSON.stringify({
-							event: 'command',
-							func: 'seekTo',
-							args: [seconds, true]
-						}), '*');
-					};
+							iframe.contentWindow.postMessage(JSON.stringify({
+								event: 'command',
+								func: 'getCurrentTime',
+								args: []
+							}), '*');
+						}, 500);
+					} else {
+						seekTo = () => {};
+					}
 
 					// Add a scrub track behind the timestamps
 					const scrubTrack = doc.createElement('div');

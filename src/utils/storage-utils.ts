@@ -33,6 +33,9 @@ export let generalSettings: Settings = {
 		defaultFont: '',
 		blendImages: true,
 		colorLinks: false,
+		stickyPlayer: true,
+		autoScroll: true,
+		highlightActiveLine: true,
 		customCss: ''
 	},
 	stats: {
@@ -80,6 +83,9 @@ interface StorageData {
 		defaultFont?: string;
 		blendImages?: boolean;
 		colorLinks?: boolean;
+		stickyPlayer?: boolean;
+		autoScroll?: boolean;
+		highlightActiveLine?: boolean;
 		customCss?: string;
 	};
 	interpreter_settings?: {
@@ -137,6 +143,9 @@ export async function loadSettings(): Promise<Settings> {
 			defaultFont: '',
 			blendImages: true,
 			colorLinks: false,
+			stickyPlayer: true,
+			autoScroll: true,
+			highlightActiveLine: true,
 			customCss: ''
 		},
 		stats: {
@@ -195,6 +204,9 @@ export async function loadSettings(): Promise<Settings> {
 			defaultFont: data.reader_settings?.defaultFont ?? defaultSettings.readerSettings.defaultFont,
 			blendImages: data.reader_settings?.blendImages ?? defaultSettings.readerSettings.blendImages,
 			colorLinks: data.reader_settings?.colorLinks ?? defaultSettings.readerSettings.colorLinks,
+			stickyPlayer: data.reader_settings?.stickyPlayer ?? defaultSettings.readerSettings.stickyPlayer,
+			autoScroll: data.reader_settings?.autoScroll ?? defaultSettings.readerSettings.autoScroll,
+			highlightActiveLine: data.reader_settings?.highlightActiveLine ?? defaultSettings.readerSettings.highlightActiveLine,
 			customCss: data.reader_settings?.customCss ?? defaultSettings.readerSettings.customCss
 		},
 		stats: data.stats || defaultSettings.stats,
@@ -248,6 +260,9 @@ export async function saveSettings(settings?: Partial<Settings>): Promise<void> 
 			defaultFont: generalSettings.readerSettings.defaultFont,
 			blendImages: generalSettings.readerSettings.blendImages,
 			colorLinks: generalSettings.readerSettings.colorLinks,
+			stickyPlayer: generalSettings.readerSettings.stickyPlayer,
+			autoScroll: generalSettings.readerSettings.autoScroll,
+			highlightActiveLine: generalSettings.readerSettings.highlightActiveLine,
 			customCss: generalSettings.readerSettings.customCss
 		},
 		stats: generalSettings.stats
