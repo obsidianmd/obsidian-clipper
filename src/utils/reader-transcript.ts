@@ -326,6 +326,13 @@ export function wireTranscript(
 		videoEl.addEventListener('timeupdate', () => {
 			updateActiveSegment(videoEl.currentTime);
 		});
+		// Prevent native video controls from handling keyboard shortcuts
+		// (they'd fight with our handlers, e.g. Space pauses then unpauses)
+		videoEl.addEventListener('keydown', (e) => {
+			if (e.code === 'Space' || e.code === 'KeyK' || e.code === 'ArrowLeft' || e.code === 'ArrowRight' || e.code === 'KeyJ' || e.code === 'KeyL') {
+				e.preventDefault();
+			}
+		});
 	} else if (iframe) {
 		// Iframe embed: use postMessage API
 		seekTo = (seconds: number) => {
