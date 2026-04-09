@@ -43,14 +43,30 @@ export function wireTranscript(
 	toggleBar.className = 'youtube-player-toggles';
 
 	const createToggle = (label: string, defaultOn: boolean, onChange: (on: boolean) => void) => {
-		const button = doc.createElement('button');
-		button.className = 'youtube-player-toggle' + (defaultOn ? ' is-active' : '');
-		button.textContent = label;
-		button.addEventListener('click', () => {
-			const isActive = button.classList.toggle('is-active');
-			onChange(isActive);
+		const wrapper = doc.createElement('label');
+		wrapper.className = 'youtube-player-toggle' + (defaultOn ? ' is-enabled' : '');
+
+		const toggle = doc.createElement('div');
+		toggle.className = 'youtube-player-toggle-switch';
+		const input = doc.createElement('input');
+		input.type = 'checkbox';
+		input.checked = defaultOn;
+		toggle.appendChild(input);
+
+		const text = doc.createElement('span');
+		text.textContent = label;
+
+		wrapper.appendChild(text);
+		wrapper.appendChild(toggle);
+
+		wrapper.addEventListener('click', (e) => {
+			e.preventDefault();
+			input.checked = !input.checked;
+			wrapper.classList.toggle('is-enabled', input.checked);
+			onChange(input.checked);
 		});
-		return button;
+
+		return wrapper;
 	};
 
 	const pinToggle = createToggle(getMessage('readerPinPlayer'), pinDefault, (on) => {
@@ -77,7 +93,7 @@ export function wireTranscript(
 	});
 
 	const currentPosButton = doc.createElement('button');
-	currentPosButton.className = 'youtube-player-toggle';
+	currentPosButton.className = 'youtube-player-button';
 	currentPosButton.textContent = getMessage('readerCurrentPosition');
 
 	toggleBar.appendChild(pinToggle);
