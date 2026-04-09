@@ -1375,11 +1375,12 @@ export class Reader {
 
 		const createOutlineObserver = () => {
 			const stickyOffset = this.getStickyOffset();
-			const topMargin = stickyOffset > 0
-				? `-${Math.round(stickyOffset / window.innerHeight * 100 + 5)}%`
-				: '-5%';
+			const topPercent = stickyOffset > 0
+				? Math.round(stickyOffset / window.innerHeight * 100 + 5)
+				: 5;
+			const bottomPercent = 100 - topPercent - 10;
 			return new IntersectionObserver(observerCallback, {
-				rootMargin: `${topMargin} 0px -85% 0px`,
+				rootMargin: `-${topPercent}% 0px -${bottomPercent}% 0px`,
 				threshold: 0
 			});
 		};
