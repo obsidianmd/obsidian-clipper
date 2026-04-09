@@ -675,6 +675,12 @@
 	"readerAppearanceLight": {
 		"message": "Clar"
 	},
+	"readerAutoScroll": {
+		"message": "Desplaçament automàtic"
+	},
+	"readerAutoScrollDescription": {
+		"message": "Desplaça automàticament la transcripció per seguir la reproducció."
+	},
 	"readerBlendImages": {
 		"message": "Fusiona les imatges"
 	},
@@ -692,6 +698,9 @@
 	},
 	"readerColorSchemeDefault": {
 		"message": "Per defecte"
+	},
+	"readerCurrentPosition": {
+		"message": "Posició actual"
 	},
 	"readerCustomCss": {
 		"message": "CSS personalitzat"
@@ -744,6 +753,12 @@
 	"readerFootnotes": {
 		"message": "Notes a peu de pàgina"
 	},
+	"readerHighlightActiveLine": {
+		"message": "Ressalta la línia activa"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "Ressalta la frase actual a la transcripció durant la reproducció."
+	},
 	"readerImages": {
 		"message": "Imatges"
 	},
@@ -759,6 +774,12 @@
 	"readerOn": {
 		"message": "Mode lectura"
 	},
+	"readerPinPlayer": {
+		"message": "Fixa el reproductor"
+	},
+	"readerPinPlayerDescription": {
+		"message": "Mantén el reproductor de vídeo visible mentre et desplaces per la transcripció."
+	},
 	"readerSettings": {
 		"message": "Configuració del lector"
 	},
@@ -770,6 +791,9 @@
 	},
 	"readerThemeSection": {
 		"message": "Tema"
+	},
+	"readerTranscripts": {
+		"message": "Transcripcions"
 	},
 	"readerTypography": {
 		"message": "Tipografia"

@@ -7,27 +7,8 @@ import { Settings } from './types/types';
 
 const YOUTUBE_EMBED_RULE_ID = 9001;
 
-// Firefox: always-active webRequest listener to rewrite Referer on YouTube embeds.
-// Chrome MV3 doesn't support blocking webRequest, so this is a no-op there.
-// Safari can't modify headers at all; reader.ts shows a thumbnail fallback instead.
-if (browser.webRequest?.onBeforeSendHeaders) {
-	browser.webRequest.onBeforeSendHeaders.addListener(
-		(details) => {
-			const headers = (details.requestHeaders || []).filter(
-				h => h.name.toLowerCase() !== 'referer'
-			);
-			headers.push({ name: 'Referer', value: 'https://obsidian.md/' });
-			return { requestHeaders: headers };
-		},
-		{
-			urls: ['*://*.youtube.com/embed/*'],
-			types: ['sub_frame' as browser.WebRequest.ResourceType]
-		},
-		['blocking', 'requestHeaders']
-	);
-}
-
 // Chrome: declarativeNetRequest to rewrite Referer on YouTube embeds.
+// Safari/Firefox use the native video element instead (see reader.ts).
 async function enableYouTubeEmbedRule(tabId: number): Promise<void> {
 	await chrome.declarativeNetRequest.updateSessionRules({
 		removeRuleIds: [YOUTUBE_EMBED_RULE_ID],
@@ -380,6 +361,10 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 			const tab = sender.tab;
 			if (tab?.id && tab.url && isValidUrl(tab.url) && !isBlankPage(tab.url)) {
 				ensureContentScriptLoadedInBackground(tab.id)
+					.then(() => browser.scripting.insertCSS({
+						target: { tabId: tab.id! },
+						files: ['highlighter.css']
+					}).catch(() => {}))
 					.then(() => browser.tabs.sendMessage(tab.id!, { action: "toggle-iframe" }))
 					.then(() => sendResponse({ success: true }))
 					.catch((error) => {
@@ -704,6 +689,7 @@ browser.contextMenus.onClicked.addListener(async (info, tab) => {
 		}
 	} else if (info.menuItemId === 'open-embedded' && tab && tab.id) {
 		await ensureContentScriptLoadedInBackground(tab.id);
+		await browser.scripting.insertCSS({ target: { tabId: tab.id }, files: ['highlighter.css'] }).catch(() => {});
 		await browser.tabs.sendMessage(tab.id, { action: "toggle-iframe" });
 	} else if (info.menuItemId === 'open-side-panel' && tab && tab.id && tab.windowId) {
 		chrome.sidePanel.open({ tabId: tab.id });

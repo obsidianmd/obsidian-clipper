@@ -675,6 +675,12 @@
 	"readerAppearanceLight": {
 		"message": "Licht"
 	},
+	"readerAutoScroll": {
+		"message": "Automatisch scrollen"
+	},
+	"readerAutoScrollDescription": {
+		"message": "Scroll de transcriptie automatisch mee om de weergave te volgen."
+	},
 	"readerBlendImages": {
 		"message": "Afbeeldingen mengen"
 	},
@@ -692,6 +698,9 @@
 	},
 	"readerColorSchemeDefault": {
 		"message": "Standaard"
+	},
+	"readerCurrentPosition": {
+		"message": "Huidige positie"
 	},
 	"readerCustomCss": {
 		"message": "Aangepaste CSS"
@@ -744,6 +753,12 @@
 	"readerFootnotes": {
 		"message": "Voetnoten"
 	},
+	"readerHighlightActiveLine": {
+		"message": "Actieve regel markeren"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "Markeer tijdens het afspelen de huidige zin in de transcriptie."
+	},
 	"readerImages": {
 		"message": "Afbeeldingen"
 	},
@@ -759,6 +774,12 @@
 	"readerOn": {
 		"message": "Leesmodus"
 	},
+	"readerPinPlayer": {
+		"message": "Speler vastzetten"
+	},
+	"readerPinPlayerDescription": {
+		"message": "Houd de videospeler zichtbaar terwijl je door de transcriptie scrolt."
+	},
 	"readerSettings": {
 		"message": "Lezerinstellingen"
 	},
@@ -770,6 +791,9 @@
 	},
 	"readerThemeSection": {
 		"message": "Thema"
+	},
+	"readerTranscripts": {
+		"message": "Transcripties"
 	},
 	"readerTypography": {
 		"message": "Typografie"

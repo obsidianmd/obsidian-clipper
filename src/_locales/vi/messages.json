@@ -675,6 +675,12 @@
 	"readerAppearanceLight": {
 		"message": "Sáng"
 	},
+	"readerAutoScroll": {
+		"message": "Tự động cuộn"
+	},
+	"readerAutoScrollDescription": {
+		"message": "Tự động cuộn bản chép lời để theo dõi khi phát."
+	},
 	"readerBlendImages": {
 		"message": "Hòa trộn hình ảnh"
 	},
@@ -692,6 +698,9 @@
 	},
 	"readerColorSchemeDefault": {
 		"message": "Mặc định"
+	},
+	"readerCurrentPosition": {
+		"message": "Vị trí hiện tại"
 	},
 	"readerCustomCss": {
 		"message": "CSS tùy chỉnh"
@@ -744,6 +753,12 @@
 	"readerFootnotes": {
 		"message": "Chú thích"
 	},
+	"readerHighlightActiveLine": {
+		"message": "Tô sáng dòng đang phát"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "Tô sáng câu hiện tại trong bản chép lời khi phát."
+	},
 	"readerImages": {
 		"message": "Hình ảnh"
 	},
@@ -759,6 +774,12 @@
 	"readerOn": {
 		"message": "Chế độ đọc"
 	},
+	"readerPinPlayer": {
+		"message": "Ghim trình phát"
+	},
+	"readerPinPlayerDescription": {
+		"message": "Giữ trình phát video luôn hiển thị khi cuộn qua bản chép lời."
+	},
 	"readerSettings": {
 		"message": "Cài đặt chế độ đọc"
 	},
@@ -770,6 +791,9 @@
 	},
 	"readerThemeSection": {
 		"message": "Chủ đề"
+	},
+	"readerTranscripts": {
+		"message": "Bản chép lời"
 	},
 	"readerTypography": {
 		"message": "Kiểu chữ"

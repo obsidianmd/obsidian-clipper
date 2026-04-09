@@ -667,6 +667,12 @@
 	"readerAppearanceLight": {
 		"message": "Deschis"
 	},
+	"readerAutoScroll": {
+		"message": "Derulare automată"
+	},
+	"readerAutoScrollDescription": {
+		"message": "Derulează automat transcrierea pentru a urmări redarea."
+	},
 	"readerBlendImages": {
 		"message": "Îmbină imaginile"
 	},
@@ -684,6 +690,9 @@
 	},
 	"readerColorSchemeDefault": {
 		"message": "Implicit"
+	},
+	"readerCurrentPosition": {
+		"message": "Poziția curentă"
 	},
 	"readerCustomCss": {
 		"message": "CSS personalizat"
@@ -736,6 +745,12 @@
 	"readerFootnotes": {
 		"message": "Note de subsol"
 	},
+	"readerHighlightActiveLine": {
+		"message": "Evidențiază linia activă"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "Evidențiază propoziția curentă în transcriere în timpul redării."
+	},
 	"readerImages": {
 		"message": "Imagini"
 	},
@@ -751,6 +766,12 @@
 	"readerOn": {
 		"message": "Mod de citire"
 	},
+	"readerPinPlayer": {
+		"message": "Fixează playerul"
+	},
+	"readerPinPlayerDescription": {
+		"message": "Păstrează playerul video vizibil în timp ce derulezi prin transcriere."
+	},
 	"readerSettings": {
 		"message": "Setări cititor"
 	},
@@ -762,6 +783,9 @@
 	},
 	"readerThemeSection": {
 		"message": "Temă"
+	},
+	"readerTranscripts": {
+		"message": "Transcrieri"
 	},
 	"readerTypography": {
 		"message": "Tipografie"

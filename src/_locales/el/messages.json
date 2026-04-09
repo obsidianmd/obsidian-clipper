@@ -667,6 +667,12 @@
 	"readerAppearanceLight": {
 		"message": "Φωτεινό"
 	},
+	"readerAutoScroll": {
+		"message": "Αυτόματη κύλιση"
+	},
+	"readerAutoScrollDescription": {
+		"message": "Κυλίει αυτόματα τη μεταγραφή ώστε να ακολουθεί την αναπαραγωγή."
+	},
 	"readerBlendImages": {
 		"message": "Ανάμειξη εικόνων"
 	},
@@ -684,6 +690,9 @@
 	},
 	"readerColorSchemeDefault": {
 		"message": "Προεπιλογή"
+	},
+	"readerCurrentPosition": {
+		"message": "Τρέχουσα θέση"
 	},
 	"readerCustomCss": {
 		"message": "Προσαρμοσμένο CSS"
@@ -736,6 +745,12 @@
 	"readerFootnotes": {
 		"message": "Υποσημειώσεις"
 	},
+	"readerHighlightActiveLine": {
+		"message": "Επισήμανση ενεργής γραμμής"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "Επισημαίνει την τρέχουσα πρόταση στη μεταγραφή κατά την αναπαραγωγή."
+	},
 	"readerImages": {
 		"message": "Εικόνες"
 	},
@@ -751,6 +766,12 @@
 	"readerOn": {
 		"message": "Λειτουργία ανάγνωσης"
 	},
+	"readerPinPlayer": {
+		"message": "Καρφίτσωμα προγράμματος αναπαραγωγής"
+	},
+	"readerPinPlayerDescription": {
+		"message": "Διατηρεί το πρόγραμμα αναπαραγωγής βίντεο ορατό ενώ κάνετε κύλιση στη μεταγραφή."
+	},
 	"readerSettings": {
 		"message": "Ρυθμίσεις αναγνώστη"
 	},
@@ -762,6 +783,9 @@
 	},
 	"readerThemeSection": {
 		"message": "Θέμα"
+	},
+	"readerTranscripts": {
+		"message": "Μεταγραφές"
 	},
 	"readerTypography": {
 		"message": "Τυπογραφία"

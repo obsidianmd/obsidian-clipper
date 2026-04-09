@@ -26,6 +26,20 @@ declare global {
 
 	debugLog('Clipper', 'Initializing content script, generation', myGeneration);
 
+	// In Reader mode, extract from the article's original HTML (before
+	// wireTranscript restructures it) with a neutral URL so site-specific
+	// extractors don't re-fetch content (e.g. YouTube)
+	function parseForClip(doc: Document) {
+		const readerArticle = doc.querySelector('.obsidian-reader-active .obsidian-reader-content article');
+		if (readerArticle) {
+			const readerDoc = doc.implementation.createHTMLDocument();
+			const originalHtml = readerArticle.getAttribute('data-original-html');
+			readerDoc.body.innerHTML = originalHtml || readerArticle.innerHTML;
+			return new Defuddle(readerDoc, { url: '' }).parse();
+		}
+		return new Defuddle(doc, { url: doc.URL }).parse();
+	}
+
 	let isHighlighterMode = false;
 	const iframeId = 'obsidian-clipper-iframe';
 	const containerId = 'obsidian-clipper-container';
@@ -245,8 +259,7 @@ declare global {
 		if (request.action === "copyMarkdownToClipboard") {
 			flattenShadowDom(document).then(() => {
 				try {
-					// Extract page content using Defuddle
-					const defuddled = new Defuddle(document, { url: document.URL }).parse();
+					const defuddled = parseForClip(document);
 
 					// Convert HTML content to markdown
 					const markdown = createMarkdownContent(defuddled.content, document.URL);
@@ -271,7 +284,7 @@ declare global {
 		if (request.action === "saveMarkdownToFile") {
 			flattenShadowDom(document).then(async () => {
 				try {
-					const defuddled = new Defuddle(document, { url: document.URL }).parse();
+					const defuddled = parseForClip(document);
 					const markdown = createMarkdownContent(defuddled.content, document.URL);
 					const title = defuddled.title || document.title || 'Untitled';
 					const fileName = title.replace(/[/\\?%*:|"<>]/g, '-');

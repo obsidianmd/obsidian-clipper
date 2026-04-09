@@ -675,6 +675,12 @@
 	"readerAppearanceLight": {
 		"message": "淺色"
 	},
+	"readerAutoScroll": {
+		"message": "自動捲動"
+	},
+	"readerAutoScrollDescription": {
+		"message": "自動捲動逐字稿以跟隨播放進度。"
+	},
 	"readerBlendImages": {
 		"message": "融合圖片"
 	},
@@ -692,6 +698,9 @@
 	},
 	"readerColorSchemeDefault": {
 		"message": "預設"
+	},
+	"readerCurrentPosition": {
+		"message": "目前位置"
 	},
 	"readerCustomCss": {
 		"message": "自訂 CSS"
@@ -744,6 +753,12 @@
 	"readerFootnotes": {
 		"message": "註腳"
 	},
+	"readerHighlightActiveLine": {
+		"message": "醒目標示目前行"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "播放時在逐字稿中醒目標示目前句子。"
+	},
 	"readerImages": {
 		"message": "圖片"
 	},
@@ -759,6 +774,12 @@
 	"readerOn": {
 		"message": "閱讀模式"
 	},
+	"readerPinPlayer": {
+		"message": "釘選播放器"
+	},
+	"readerPinPlayerDescription": {
+		"message": "捲動逐字稿時保持影片播放器可見。"
+	},
 	"readerSettings": {
 		"message": "閱讀器設定"
 	},
@@ -770,6 +791,9 @@
 	},
 	"readerThemeSection": {
 		"message": "主題"
+	},
+	"readerTranscripts": {
+		"message": "逐字稿"
 	},
 	"readerTypography": {
 		"message": "排版"

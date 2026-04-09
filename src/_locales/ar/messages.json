@@ -675,6 +675,12 @@
 	"readerAppearanceLight": {
 		"message": "فاتح"
 	},
+	"readerAutoScroll": {
+		"message": "التمرير التلقائي"
+	},
+	"readerAutoScrollDescription": {
+		"message": "مرّر النص تلقائيًا لمتابعة التشغيل."
+	},
 	"readerBlendImages": {
 		"message": "دمج الصور"
 	},
@@ -692,6 +698,9 @@
 	},
 	"readerColorSchemeDefault": {
 		"message": "افتراضي"
+	},
+	"readerCurrentPosition": {
+		"message": "الموضع الحالي"
 	},
 	"readerCustomCss": {
 		"message": "CSS مخصص"
@@ -744,6 +753,12 @@
 	"readerFootnotes": {
 		"message": "الحواشي"
 	},
+	"readerHighlightActiveLine": {
+		"message": "تمييز السطر النشط"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "ميّز الجملة الحالية في النص أثناء التشغيل."
+	},
 	"readerImages": {
 		"message": "الصور"
 	},
@@ -759,6 +774,12 @@
 	"readerOn": {
 		"message": "وضع القارئ"
 	},
+	"readerPinPlayer": {
+		"message": "تثبيت المشغّل"
+	},
+	"readerPinPlayerDescription": {
+		"message": "أبقِ مشغّل الفيديو مرئيًا أثناء التمرير عبر النص."
+	},
 	"readerSettings": {
 		"message": "إعدادات القارئ"
 	},
@@ -770,6 +791,9 @@
 	},
 	"readerThemeSection": {
 		"message": "السمة"
+	},
+	"readerTranscripts": {
+		"message": "النصوص"
 	},
 	"readerTypography": {
 		"message": "الطباعة"

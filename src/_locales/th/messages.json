@@ -675,6 +675,12 @@
 	"readerAppearanceLight": {
 		"message": "สว่าง"
 	},
+	"readerAutoScroll": {
+		"message": "เลื่อนอัตโนมัติ"
+	},
+	"readerAutoScrollDescription": {
+		"message": "เลื่อนบทถอดเสียงอัตโนมัติเพื่อติดตามการเล่น"
+	},
 	"readerBlendImages": {
 		"message": "ผสานรูปภาพ"
 	},
@@ -692,6 +698,9 @@
 	},
 	"readerColorSchemeDefault": {
 		"message": "ค่าเริ่มต้น"
+	},
+	"readerCurrentPosition": {
+		"message": "ตำแหน่งปัจจุบัน"
 	},
 	"readerCustomCss": {
 		"message": "CSS กำหนดเอง"
@@ -744,6 +753,12 @@
 	"readerFootnotes": {
 		"message": "เชิงอรรถ"
 	},
+	"readerHighlightActiveLine": {
+		"message": "ไฮไลต์บรรทัดที่กำลังเล่น"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "ไฮไลต์ประโยคปัจจุบันในบทถอดเสียงระหว่างการเล่น"
+	},
 	"readerImages": {
 		"message": "รูปภาพ"
 	},
@@ -759,6 +774,12 @@
 	"readerOn": {
 		"message": "โหมดอ่าน"
 	},
+	"readerPinPlayer": {
+		"message": "ปักหมุดเครื่องเล่น"
+	},
+	"readerPinPlayerDescription": {
+		"message": "ให้เครื่องเล่นวิดีโอยังคงแสดงอยู่ขณะเลื่อนดูบทถอดเสียง"
+	},
 	"readerSettings": {
 		"message": "การตั้งค่าโหมดอ่าน"
 	},
@@ -770,6 +791,9 @@
 	},
 	"readerThemeSection": {
 		"message": "ธีม"
+	},
+	"readerTranscripts": {
+		"message": "บทถอดเสียง"
 	},
 	"readerTypography": {
 		"message": "การจัดตัวพิมพ์"

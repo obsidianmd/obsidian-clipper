@@ -675,6 +675,12 @@
 	"readerAppearanceLight": {
 		"message": "লাইট"
 	},
+	"readerAutoScroll": {
+		"message": "স্বয়ংক্রিয় স্ক্রল"
+	},
+	"readerAutoScrollDescription": {
+		"message": "প্লেব্যাক অনুসরণ করতে ট্রান্সক্রিপ্ট স্বয়ংক্রিয়ভাবে স্ক্রল করুন।"
+	},
 	"readerBlendImages": {
 		"message": "ছবি মিশিয়ে দিন"
 	},
@@ -692,6 +698,9 @@
 	},
 	"readerColorSchemeDefault": {
 		"message": "ডিফল্ট"
+	},
+	"readerCurrentPosition": {
+		"message": "বর্তমান অবস্থান"
 	},
 	"readerCustomCss": {
 		"message": "কাস্টম CSS"
@@ -744,6 +753,12 @@
 	"readerFootnotes": {
 		"message": "পাদটীকা"
 	},
+	"readerHighlightActiveLine": {
+		"message": "সক্রিয় লাইন হাইলাইট করুন"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "প্লেব্যাক চলাকালীন ট্রান্সক্রিপ্টে বর্তমান বাক্যটি হাইলাইট করুন।"
+	},
 	"readerImages": {
 		"message": "ছবি"
 	},
@@ -759,6 +774,12 @@
 	"readerOn": {
 		"message": "রিডার"
 	},
+	"readerPinPlayer": {
+		"message": "প্লেয়ার পিন করুন"
+	},
+	"readerPinPlayerDescription": {
+		"message": "ট্রান্সক্রিপ্ট স্ক্রল করার সময় ভিডিও প্লেয়ার দৃশ্যমান রাখুন।"
+	},
 	"readerSettings": {
 		"message": "রিডার সেটিংস"
 	},
@@ -770,6 +791,9 @@
 	},
 	"readerThemeSection": {
 		"message": "থিম"
+	},
+	"readerTranscripts": {
+		"message": "ট্রান্সক্রিপ্ট"
 	},
 	"readerTypography": {
 		"message": "টাইপোগ্রাফি"

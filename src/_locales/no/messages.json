@@ -667,6 +667,12 @@
 	"readerAppearanceLight": {
 		"message": "Lys"
 	},
+	"readerAutoScroll": {
+		"message": "Automatisk rulling"
+	},
+	"readerAutoScrollDescription": {
+		"message": "Rull automatisk i transkripsjonen for å følge avspillingen."
+	},
 	"readerBlendImages": {
 		"message": "Bland bilder"
 	},
@@ -684,6 +690,9 @@
 	},
 	"readerColorSchemeDefault": {
 		"message": "Standard"
+	},
+	"readerCurrentPosition": {
+		"message": "Gjeldende posisjon"
 	},
 	"readerCustomCss": {
 		"message": "Egendefinert CSS"
@@ -736,6 +745,12 @@
 	"readerFootnotes": {
 		"message": "Fotnoter"
 	},
+	"readerHighlightActiveLine": {
+		"message": "Uthev aktiv linje"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "Uthev gjeldende setning i transkripsjonen under avspilling."
+	},
 	"readerImages": {
 		"message": "Bilder"
 	},
@@ -751,6 +766,12 @@
 	"readerOn": {
 		"message": "Lesemodus"
 	},
+	"readerPinPlayer": {
+		"message": "Fest avspiller"
+	},
+	"readerPinPlayerDescription": {
+		"message": "Hold videoavspilleren synlig mens du ruller gjennom transkripsjonen."
+	},
 	"readerSettings": {
 		"message": "Leserinnstillinger"
 	},
@@ -762,6 +783,9 @@
 	},
 	"readerThemeSection": {
 		"message": "Tema"
+	},
+	"readerTranscripts": {
+		"message": "Transkripsjoner"
 	},
 	"readerTypography": {
 		"message": "Typografi"

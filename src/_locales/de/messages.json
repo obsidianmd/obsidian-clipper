@@ -675,6 +675,12 @@
 	"readerAppearanceLight": {
 		"message": "Hell"
 	},
+	"readerAutoScroll": {
+		"message": "Automatisch scrollen"
+	},
+	"readerAutoScrollDescription": {
+		"message": "Scrollt das Transkript automatisch, um der Wiedergabe zu folgen."
+	},
 	"readerBlendImages": {
 		"message": "Bilder einblenden"
 	},
@@ -692,6 +698,9 @@
 	},
 	"readerColorSchemeDefault": {
 		"message": "Standard"
+	},
+	"readerCurrentPosition": {
+		"message": "Aktuelle Position"
 	},
 	"readerCustomCss": {
 		"message": "Benutzerdefiniertes CSS"
@@ -744,6 +753,12 @@
 	"readerFootnotes": {
 		"message": "Fußnoten"
 	},
+	"readerHighlightActiveLine": {
+		"message": "Aktive Zeile hervorheben"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "Hebt während der Wiedergabe den aktuellen Satz im Transkript hervor."
+	},
 	"readerImages": {
 		"message": "Bilder"
 	},
@@ -759,6 +774,12 @@
 	"readerOn": {
 		"message": "Lesemodus"
 	},
+	"readerPinPlayer": {
+		"message": "Player anheften"
+	},
+	"readerPinPlayerDescription": {
+		"message": "Hält den Videoplayer sichtbar, während du durch das Transkript scrollst."
+	},
 	"readerSettings": {
 		"message": "Reader-Einstellungen"
 	},
@@ -770,6 +791,9 @@
 	},
 	"readerThemeSection": {
 		"message": "Design"
+	},
+	"readerTranscripts": {
+		"message": "Transkripte"
 	},
 	"readerTypography": {
 		"message": "Typografie"

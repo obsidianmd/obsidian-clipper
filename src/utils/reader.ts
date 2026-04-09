@@ -14,10 +14,12 @@ import { getFontCss } from './font-utils';
 const VIEWPORT = 'width=device-width, initial-scale=1, maximum-scale=1';
 
 import { ReaderSettings } from '../types/types';
+import { wireTranscript } from './reader-transcript';
 
 export class Reader {
 	private static hasApplied: boolean = false;
 	private static isActive: boolean = false;
+	private static programmaticScroll: boolean = false;
 
 	/**
 	 * Helper function to create SVG elements
@@ -101,6 +103,9 @@ export class Reader {
 		defaultFont: '',
 		blendImages: true,
 		colorLinks: false,
+		pinPlayer: true,
+		autoScroll: true,
+		highlightActiveLine: true,
 		customCss: ''
 	};
 
@@ -280,12 +285,18 @@ export class Reader {
 
 		const isMobile = window.matchMedia('(pointer: coarse)').matches;
 
+		const getPlayerToggles = () => doc.querySelector('.player-toggles') as HTMLElement | null;
+
 		const showButtons = () => {
 			if (scrollHidden) {
 				triggerGroup.style.opacity = '';
 				if (isMobile) {
 					triggerGroup.style.visibility = '';
 					triggerGroup.style.pointerEvents = '';
+				}
+				const floatingToggles = getPlayerToggles();
+				if (floatingToggles) {
+					floatingToggles.style.opacity = '';
 				}
 				scrollHidden = false;
 			}
@@ -308,6 +319,10 @@ export class Reader {
 					if (isMobile) {
 						triggerGroup.style.visibility = 'hidden';
 						triggerGroup.style.pointerEvents = 'none';
+					}
+					const floatingToggles = getPlayerToggles();
+					if (floatingToggles) {
+						floatingToggles.style.opacity = '0';
 					}
 					scrollHidden = true;
 				}
@@ -719,18 +734,41 @@ export class Reader {
 	}
 
 
+
+	private static getStickyOffset(): number {
+		const player = document.querySelector('.pin-player') as HTMLElement | null;
+		if (player) return player.getBoundingClientRect().height + 16;
+		// When pin-player is off, the toggles bar is sticky independently
+		const toggles = document.querySelector('article > .player-toggles') as HTMLElement | null;
+		if (toggles) return toggles.getBoundingClientRect().height + 32;
+		return 0;
+	}
+
+	private static scrollToElement(el: Element): void {
+		const rect = el.getBoundingClientRect();
+		const stickyOffset = this.getStickyOffset();
+		const gap = stickyOffset > 0 ? stickyOffset + window.innerHeight * 0.02 : window.innerHeight * 0.05;
+		const targetY = (window.pageYOffset || document.documentElement.scrollTop) + rect.top - gap;
+		this.scrollTo(targetY);
+	}
+
 	private static scrollTo(targetY: number, duration = 200): void {
 		const startY = window.pageYOffset;
 		const distance = targetY - startY;
 		if (Math.abs(distance) < 1) return;
 		const startTime = performance.now();
+		this.programmaticScroll = true;
 
 		const step = (now: number) => {
 			const elapsed = now - startTime;
 			const t = Math.min(elapsed / duration, 1);
 			const ease = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
 			window.scrollTo(0, startY + distance * ease);
-			if (t < 1) requestAnimationFrame(step);
+			if (t < 1) {
+				requestAnimationFrame(step);
+			} else {
+				setTimeout(() => { Reader.programmaticScroll = false; }, 50);
+			}
 		};
 
 		requestAnimationFrame(step);
@@ -840,12 +878,11 @@ export class Reader {
 			const item = doc.createElement('div');
 			item.className = `obsidian-reader-outline-item obsidian-reader-outline-${heading.tagName.toLowerCase()}`;
 			item.setAttribute('data-depth', depth.toString());
+			item.setAttribute('data-heading-id', heading.id);
 			item.textContent = heading.textContent;
 			
 			item.addEventListener('click', () => {
-				const rect = heading.getBoundingClientRect();
-				const targetY = (window.pageYOffset || doc.documentElement.scrollTop) + rect.top - window.innerHeight * 0.05;
-				this.scrollTo(targetY);
+				this.scrollToElement(heading);
 			});
 
 			outline.appendChild(item);
@@ -855,38 +892,65 @@ export class Reader {
 			lastHeadingAtLevel[level] = { element: heading, depth };
 		});
 
-		// Set up intersection observer for headings
-		const observerCallback = (entries: IntersectionObserverEntry[]) => {
-			entries.forEach(entry => {
-				const heading = entry.target;
-				const item = outlineItems.get(heading);
-				
-				if (entry.isIntersecting) {
-					// Remove active state from all items
-					outlineItems.forEach((outlineItem) => {
-						outlineItem.classList.remove('active');
-					});
-					item?.classList.add('active');
-					
-					// Update faint state for all items
-					outlineItems.forEach((outlineItem, itemHeading) => {
-						const headingRect = itemHeading.getBoundingClientRect();
-						const currentHeadingRect = heading.getBoundingClientRect();
-						
-						if (headingRect.top < currentHeadingRect.top) {
-							outlineItem.classList.add('faint');
-						} else {
-							outlineItem.classList.remove('faint');
-						}
-					});
+		const setActiveOutlineItem = (heading: Element) => {
+			const item = outlineItems.get(heading);
+			if (!item) return;
+			outlineItems.forEach((outlineItem) => {
+				outlineItem.classList.remove('active');
+			});
+			item.classList.add('active');
+			const currentHeadingTop = heading.getBoundingClientRect().top;
+			outlineItems.forEach((outlineItem, itemHeading) => {
+				if (itemHeading.getBoundingClientRect().top < currentHeadingTop) {
+					outlineItem.classList.add('faint');
+				} else {
+					outlineItem.classList.remove('faint');
 				}
 			});
 		};
 
-		const observer = new IntersectionObserver(observerCallback, {
-			rootMargin: '-5% 0px -85% 0px', // Triggers when heading is in top 20% of viewport
-			threshold: 0
-		});
+		// Set up intersection observer for headings
+		const allHeadings = [titleHeading, ...headings].filter(Boolean) as Element[];
+		const observerCallback = (entries: IntersectionObserverEntry[]) => {
+			entries.forEach(entry => {
+				if (entry.isIntersecting) {
+					setActiveOutlineItem(entry.target);
+				} else if (entry.rootBounds && entry.boundingClientRect.top > entry.rootBounds.bottom) {
+					// Heading exited the zone going down (user scrolling up)
+					// Activate the heading above it
+					const idx = allHeadings.indexOf(entry.target);
+					if (idx > 0) {
+						setActiveOutlineItem(allHeadings[idx - 1]);
+					}
+				}
+			});
+		};
+
+		const createOutlineObserver = () => {
+			const stickyOffset = this.getStickyOffset();
+			const topPercent = stickyOffset > 0
+				? Math.round(stickyOffset / window.innerHeight * 100 + 2)
+				: 5;
+			const bottomPercent = 100 - topPercent - 15;
+			return new IntersectionObserver(observerCallback, {
+				rootMargin: `-${topPercent}% 0px -${bottomPercent}% 0px`,
+				threshold: 0
+			});
+		};
+
+		let observer = createOutlineObserver();
+
+		// Recreate observer when sticky player appears/resizes
+		const pinPlayer = doc.querySelector('.pin-player');
+		if (pinPlayer) {
+			const resizeObserver = new ResizeObserver(() => {
+				observer.disconnect();
+				observer = createOutlineObserver();
+				if (titleHeading) observer.observe(titleHeading);
+				headings.forEach(heading => observer.observe(heading));
+			});
+			resizeObserver.observe(pinPlayer);
+		}
 
 		if (titleHeading) {
 			observer.observe(titleHeading);
@@ -904,9 +968,7 @@ export class Reader {
 			item.textContent = getMessage('readerFootnotes');
 			
 			item.addEventListener('click', () => {
-				const rect = footnotes.getBoundingClientRect();
-				const targetY = (window.pageYOffset || doc.documentElement.scrollTop) + rect.top - window.innerHeight * 0.05;
-				this.scrollTo(targetY);
+				this.scrollToElement(footnotes);
 			});
 
 			outline.appendChild(item);
@@ -1009,7 +1071,7 @@ export class Reader {
 				const refElement = doc.getElementById(refId);
 				if (refElement) {
 					const rect = refElement.getBoundingClientRect();
-					const targetY = (window.pageYOffset || doc.documentElement.scrollTop) + rect.top - window.innerHeight * 0.4;
+					const targetY = (window.pageYOffset || doc.documentElement.scrollTop) + rect.top - window.innerHeight * 0.4 - this.getStickyOffset();
 					this.scrollTo(targetY);
 				}
 				return;
@@ -1168,7 +1230,7 @@ export class Reader {
 			if (typeof window !== 'undefined' && window.clearTimeout && window.clearInterval) {
 				const nativeClearTimeout = window.clearTimeout.bind(window);
 				const nativeClearInterval = window.clearInterval.bind(window);
-				
+
 				// Clear all timeouts and intervals
 				let id = window.setTimeout(() => {}, 0);
 				while (id--) {
@@ -1777,13 +1839,23 @@ export class Reader {
 			// Capture YouTube video state before cleanup destroys the player
 			let videoTimestamp = 0;
 			let videoWasPlaying = false;
+			let youtubeVideoElement: HTMLVideoElement | null = null;
 			const host = doc.URL ? new URL(doc.URL).hostname : '';
 			const isYouTube = host.includes('youtube.com') || host.includes('youtu.be');
+			// Browser type is only needed for YouTube-specific behavior
+			const browserType = isYouTube ? await detectBrowser() : '';
 			if (isYouTube) {
 				const videoElement = doc.querySelector('video');
 				if (videoElement) {
 					videoTimestamp = Math.floor(videoElement.currentTime);
 					videoWasPlaying = !videoElement.paused;
+					// Chrome's iframe embed works via declarativeNetRequest.
+					// Safari/Firefox can't modify headers, so we preserve
+					// the native video element instead.
+					if (browserType !== 'chrome') {
+						youtubeVideoElement = videoElement;
+						videoElement.remove();
+					}
 				}
 			}
 
@@ -2063,18 +2135,41 @@ export class Reader {
 			const contentDoc = parser.parseFromString(content, 'text/html');
 			const contentBody = contentDoc.body;
 
-			// On YouTube, fix embed self-referrer blocking and resume playback state
+			// On YouTube, replace the Defuddle-generated iframe with the
+			// preserved native video element, or fall back to embed
 			if (isYouTube) {
 				const iframe = contentBody.querySelector('iframe[src*="youtube.com/embed/"]') as HTMLIFrameElement;
-				if (iframe) {
+				if (iframe && youtubeVideoElement) {
+					// Use the original video element instead of an iframe
+					youtubeVideoElement.className = 'reader-video-player';
+					youtubeVideoElement.removeAttribute('style');
+					youtubeVideoElement.setAttribute('controls', '');
+					// YouTube's JS may keep resetting attributes —
+					// use a MutationObserver to enforce our settings
+					const videoObs = new MutationObserver(() => {
+						if (!youtubeVideoElement!.hasAttribute('controls')) {
+							youtubeVideoElement!.setAttribute('controls', '');
+						}
+						if (youtubeVideoElement!.className !== 'reader-video-player') {
+							youtubeVideoElement!.className = 'reader-video-player';
+						}
+					});
+					videoObs.observe(youtubeVideoElement, {
+						attributes: true,
+						attributeFilter: ['controls', 'class', 'style']
+					});
+					const videoWrapper = doc.createElement('div');
+					videoWrapper.className = 'reader-video-wrapper';
+					videoWrapper.appendChild(youtubeVideoElement);
+					iframe.replaceWith(videoWrapper);
+				} else if (iframe) {
+					// Fallback: use embed with header modification (Chrome)
+					// or thumbnail (Safari)
 					const embedUrl = new URL(iframe.src);
 					const videoId = embedUrl.pathname.split('/').pop();
-					const browserType = await detectBrowser();
 					const isSafari = ['safari', 'mobile-safari', 'ipad-os'].includes(browserType);
 
 					if (isSafari && videoId) {
-						// Safari can't modify request headers, so YouTube blocks
-						// self-referrer embeds. Show a clickable thumbnail instead.
 						const watchUrl = 'https://www.youtube.com/watch?v=' + videoId
 							+ (videoTimestamp > 0 ? '&t=' + videoTimestamp : '');
 						const thumbnail = doc.createElement('a');
@@ -2089,7 +2184,6 @@ export class Reader {
 							+ '<path d="M45 24L27 14v20" fill="white"/></svg>';
 						iframe.replaceWith(thumbnail);
 					} else {
-						// Chrome/Firefox: use direct embed with header modification
 						await browser.runtime.sendMessage({
 							action: 'enableYouTubeEmbedRule'
 						}).catch(() => {});
@@ -2111,6 +2205,24 @@ export class Reader {
 			while (contentBody.firstChild) {
 				article.appendChild(contentBody.firstChild);
 			}
+
+			// Store original article HTML before wireTranscript modifies
+			// the DOM (moves timestamps, wraps text, adds scrub track).
+			// Unwrap <span class="timestamp"> so Defuddle's markdown
+			// converter keeps the timestamp text inside <strong>.
+			const originalHtml = article.innerHTML.replace(
+				/<span class="timestamp"[^>]*>([^<]*)<\/span>/g, '$1'
+			);
+			article.setAttribute('data-original-html', originalHtml);
+
+			wireTranscript(doc, article, this.settings, {
+				getStickyOffset: () => this.getStickyOffset(),
+				scrollTo: (y) => this.scrollTo(y),
+				programmaticScroll: () => this.programmaticScroll,
+			}, (key, value) => {
+				(this.settings as any)[key] = value;
+				this.saveSettings();
+			});
 
 			// Set extractor type
 			if (extractorType) {

@@ -675,6 +675,12 @@
 	"readerAppearanceLight": {
 		"message": "Jasny"
 	},
+	"readerAutoScroll": {
+		"message": "Automatyczne przewijanie"
+	},
+	"readerAutoScrollDescription": {
+		"message": "Automatycznie przewijaj transkrypcję, aby podążała za odtwarzaniem."
+	},
 	"readerBlendImages": {
 		"message": "Wtapiaj obrazy"
 	},
@@ -692,6 +698,9 @@
 	},
 	"readerColorSchemeDefault": {
 		"message": "Domyślny"
+	},
+	"readerCurrentPosition": {
+		"message": "Bieżąca pozycja"
 	},
 	"readerCustomCss": {
 		"message": "Własny CSS"
@@ -744,6 +753,12 @@
 	"readerFootnotes": {
 		"message": "Przypisy"
 	},
+	"readerHighlightActiveLine": {
+		"message": "Podświetl aktywną linię"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "Podświetlaj bieżące zdanie w transkrypcji podczas odtwarzania."
+	},
 	"readerImages": {
 		"message": "Obrazy"
 	},
@@ -759,6 +774,12 @@
 	"readerOn": {
 		"message": "Tryb czytania"
 	},
+	"readerPinPlayer": {
+		"message": "Przypnij odtwarzacz"
+	},
+	"readerPinPlayerDescription": {
+		"message": "Zachowaj widoczność odtwarzacza wideo podczas przewijania transkrypcji."
+	},
 	"readerSettings": {
 		"message": "Ustawienia czytnika"
 	},
@@ -770,6 +791,9 @@
 	},
 	"readerThemeSection": {
 		"message": "Motyw"
+	},
+	"readerTranscripts": {
+		"message": "Transkrypcje"
 	},
 	"readerTypography": {
 		"message": "Typografia"
