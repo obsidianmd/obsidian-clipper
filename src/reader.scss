@@ -322,6 +322,7 @@
 		}
 		iframe {
 			box-shadow: none;
+			border-radius: 4px;
 		}
 	}
 	.youtube-player-toggles {
@@ -1444,6 +1445,7 @@
 	padding: 5px var(--size-4-2);
 	border-radius: var(--radius-s);
 	line-height: 1.15;
+	max-width: 220px;
 
 	// Depth-based indentation
 	&[data-depth="0"] {

@@ -1022,6 +1022,7 @@ export class Reader {
 
 		// Set up time tracking and seeking based on player type
 		let seekTo: (seconds: number) => void;
+		let iframePlaying = false;
 
 		if (videoEl) {
 			// Native video element: use HTML5 API directly
@@ -1049,6 +1050,9 @@ export class Reader {
 					if (data?.info?.currentTime !== undefined) {
 						updateActiveSegment(data.info.currentTime);
 					}
+					if (data?.info?.playerState !== undefined) {
+						iframePlaying = data.info.playerState === 1;
+					}
 				} catch {} // Ignore non-YouTube postMessage events
 			};
 			window.addEventListener('message', onMessage);
@@ -1068,6 +1072,56 @@ export class Reader {
 		} else {
 			seekTo = () => {};
 		}
+
+		// Keyboard shortcuts for video playback
+		const togglePlayPause = () => {
+			if (videoEl) {
+				videoEl.paused ? videoEl.play() : videoEl.pause();
+			} else if (iframe?.contentWindow) {
+				iframe.contentWindow.postMessage(JSON.stringify({
+					event: 'command',
+					func: iframePlaying ? 'pauseVideo' : 'playVideo',
+					args: []
+				}), '*');
+			}
+		};
+
+		const seekRelative = (delta: number) => {
+			if (videoEl) {
+				videoEl.currentTime = Math.max(0, videoEl.currentTime + delta);
+			} else if (iframe?.contentWindow) {
+				seekTo(Math.max(0, lastCurrentTime + delta));
+			}
+		};
+
+		doc.addEventListener('keydown', (e: KeyboardEvent) => {
+			const tag = (e.target as HTMLElement).tagName;
+			if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+
+			switch (e.code) {
+				case 'Space':
+				case 'KeyK':
+					e.preventDefault();
+					togglePlayPause();
+					break;
+				case 'ArrowLeft':
+					e.preventDefault();
+					seekRelative(-5);
+					break;
+				case 'ArrowRight':
+					e.preventDefault();
+					seekRelative(5);
+					break;
+				case 'KeyJ':
+					e.preventDefault();
+					seekRelative(-10);
+					break;
+				case 'KeyL':
+					e.preventDefault();
+					seekRelative(10);
+					break;
+			}
+		});
 
 		// Add a scrub track behind the timestamps
 		const scrubTrack = doc.createElement('div');
