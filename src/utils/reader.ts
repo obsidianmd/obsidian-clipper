@@ -842,6 +842,19 @@ export class Reader {
 		const getSegmentEnd = (i: number) =>
 			i < segmentTimes.length - 1 ? segmentTimes[i + 1] : segmentTimes[i] + FALLBACK_SEGMENT_DURATION;
 
+		// Map each segment to its preceding chapter heading for outline tracking
+		const segmentChapters: (Element | null)[] = [];
+		let currentChapter: Element | null = null;
+		const transcriptChildren = Array.from(transcript.children);
+		for (const child of transcriptChildren) {
+			if (/^H[2-6]$/.test(child.tagName)) {
+				currentChapter = child;
+			} else if (child.classList.contains('transcript-segment')) {
+				segmentChapters[segments.indexOf(child as HTMLElement)] = currentChapter;
+			}
+		}
+		let activeChapter: Element | null = null;
+
 		// Track active segment based on video current time
 		let activeSegment: HTMLElement | null = null;
 		let activeIndex = -1;
@@ -885,6 +898,20 @@ export class Reader {
 				}
 				activeSegment = newIndex >= 0 ? segments[newIndex] : null;
 				activeIndex = newIndex;
+
+				// Update in-progress chapter in outline
+				const chapter = newIndex >= 0 ? segmentChapters[newIndex] : null;
+				if (chapter !== activeChapter) {
+					if (activeChapter?.id) {
+						doc.querySelector(`.obsidian-reader-outline-item[data-heading-id="${activeChapter.id}"]`)
+							?.classList.remove('in-progress');
+					}
+					if (chapter?.id) {
+						doc.querySelector(`.obsidian-reader-outline-item[data-heading-id="${chapter.id}"]`)
+							?.classList.add('in-progress');
+					}
+					activeChapter = chapter;
+				}
 			}
 			// Update progress line on the scrub track
 			if (activeSegment && activeIndex >= 0) {
@@ -1332,6 +1359,7 @@ export class Reader {
 			const item = doc.createElement('div');
 			item.className = `obsidian-reader-outline-item obsidian-reader-outline-${heading.tagName.toLowerCase()}`;
 			item.setAttribute('data-depth', depth.toString());
+			item.setAttribute('data-heading-id', heading.id);
 			item.textContent = heading.textContent;
 			
 			item.addEventListener('click', () => {
@@ -1345,30 +1373,37 @@ export class Reader {
 			lastHeadingAtLevel[level] = { element: heading, depth };
 		});
 
+		const setActiveOutlineItem = (heading: Element) => {
+			const item = outlineItems.get(heading);
+			if (!item) return;
+			outlineItems.forEach((outlineItem) => {
+				outlineItem.classList.remove('active');
+			});
+			item.classList.add('active');
+			outlineItems.forEach((outlineItem, itemHeading) => {
+				const headingRect = itemHeading.getBoundingClientRect();
+				const currentHeadingRect = heading.getBoundingClientRect();
+				if (headingRect.top < currentHeadingRect.top) {
+					outlineItem.classList.add('faint');
+				} else {
+					outlineItem.classList.remove('faint');
+				}
+			});
+		};
+
 		// Set up intersection observer for headings
+		const allHeadings = [titleHeading, ...headings].filter(Boolean) as Element[];
 		const observerCallback = (entries: IntersectionObserverEntry[]) => {
 			entries.forEach(entry => {
-				const heading = entry.target;
-				const item = outlineItems.get(heading);
-				
 				if (entry.isIntersecting) {
-					// Remove active state from all items
-					outlineItems.forEach((outlineItem) => {
-						outlineItem.classList.remove('active');
-					});
-					item?.classList.add('active');
-					
-					// Update faint state for all items
-					outlineItems.forEach((outlineItem, itemHeading) => {
-						const headingRect = itemHeading.getBoundingClientRect();
-						const currentHeadingRect = heading.getBoundingClientRect();
-						
-						if (headingRect.top < currentHeadingRect.top) {
-							outlineItem.classList.add('faint');
-						} else {
-							outlineItem.classList.remove('faint');
-						}
-					});
+					setActiveOutlineItem(entry.target);
+				} else if (entry.rootBounds && entry.boundingClientRect.top > entry.rootBounds.bottom) {
+					// Heading exited the zone going down (user scrolling up)
+					// Activate the heading above it
+					const idx = allHeadings.indexOf(entry.target);
+					if (idx > 0) {
+						setActiveOutlineItem(allHeadings[idx - 1]);
+					}
 				}
 			});
 		};
@@ -1376,9 +1411,9 @@ export class Reader {
 		const createOutlineObserver = () => {
 			const stickyOffset = this.getStickyOffset();
 			const topPercent = stickyOffset > 0
-				? Math.round(stickyOffset / window.innerHeight * 100 + 5)
+				? Math.round(stickyOffset / window.innerHeight * 100 + 2)
 				: 5;
-			const bottomPercent = 100 - topPercent - 10;
+			const bottomPercent = 100 - topPercent - 15;
 			return new IntersectionObserver(observerCallback, {
 				rootMargin: `-${topPercent}% 0px -${bottomPercent}% 0px`,
 				threshold: 0
