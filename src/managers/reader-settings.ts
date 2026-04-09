@@ -356,15 +356,15 @@ export async function initializeReaderSettings() {
 		});
 	}
 
-	initializeSettingToggle('reader-pin-player', generalSettings.readerSettings.pinPlayer ?? true, (checked) => {
+	initializeSettingToggle('reader-pin-player', generalSettings.readerSettings.pinPlayer , (checked) => {
 		saveSettings({ ...generalSettings, readerSettings: { ...generalSettings.readerSettings, pinPlayer: checked } });
 	});
 
-	initializeSettingToggle('reader-auto-scroll', generalSettings.readerSettings.autoScroll ?? true, (checked) => {
+	initializeSettingToggle('reader-auto-scroll', generalSettings.readerSettings.autoScroll , (checked) => {
 		saveSettings({ ...generalSettings, readerSettings: { ...generalSettings.readerSettings, autoScroll: checked } });
 	});
 
-	initializeSettingToggle('reader-highlight-active-line', generalSettings.readerSettings.highlightActiveLine ?? true, (checked) => {
+	initializeSettingToggle('reader-highlight-active-line', generalSettings.readerSettings.highlightActiveLine , (checked) => {
 		saveSettings({ ...generalSettings, readerSettings: { ...generalSettings.readerSettings, highlightActiveLine: checked } });
 	});
 

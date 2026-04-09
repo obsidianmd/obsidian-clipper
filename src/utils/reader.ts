@@ -736,9 +736,9 @@ export class Reader {
 
 		// Wrap player in a container with toggle controls
 		const playerContainer = doc.createElement('div');
-		const pinDefault = this.settings.pinPlayer ?? true;
-		const autoScrollDefault = this.settings.autoScroll ?? true;
-		const highlightDefault = this.settings.highlightActiveLine ?? true;
+		const pinDefault = this.settings.pinPlayer;
+		const autoScrollDefault = this.settings.autoScroll;
+		const highlightDefault = this.settings.highlightActiveLine;
 		playerContainer.className = 'youtube-player-container' + (pinDefault ? ' pin-player' : '');
 		playerEl.parentNode!.insertBefore(playerContainer, playerEl);
 		playerContainer.appendChild(playerEl);
@@ -819,7 +819,6 @@ export class Reader {
 			const strong = seg.querySelector('strong');
 			if (!strong) return;
 
-			// Remove " · " separator
 			if (strong.nextSibling?.nodeType === Node.TEXT_NODE) {
 				strong.nextSibling.textContent = strong.nextSibling.textContent!.replace(/^\s*·\s*/, '');
 			}
@@ -856,13 +855,15 @@ export class Reader {
 
 		// Map each segment to its preceding chapter heading for outline tracking
 		const segmentChapters: (Element | null)[] = [];
+		const segmentIndexMap = new Map(segments.map((s, i) => [s, i]));
 		let currentChapter: Element | null = null;
 		const transcriptChildren = Array.from(transcript.children);
 		for (const child of transcriptChildren) {
 			if (/^H[2-6]$/.test(child.tagName)) {
 				currentChapter = child;
 			} else if (child.classList.contains('transcript-segment')) {
-				segmentChapters[segments.indexOf(child as HTMLElement)] = currentChapter;
+				const idx = segmentIndexMap.get(child as HTMLElement);
+				if (idx !== undefined) segmentChapters[idx] = currentChapter;
 			}
 		}
 		let activeChapter: Element | null = null;
@@ -1460,10 +1461,9 @@ export class Reader {
 				outlineItem.classList.remove('active');
 			});
 			item.classList.add('active');
+			const currentHeadingTop = heading.getBoundingClientRect().top;
 			outlineItems.forEach((outlineItem, itemHeading) => {
-				const headingRect = itemHeading.getBoundingClientRect();
-				const currentHeadingRect = heading.getBoundingClientRect();
-				if (headingRect.top < currentHeadingRect.top) {
+				if (itemHeading.getBoundingClientRect().top < currentHeadingTop) {
 					outlineItem.classList.add('faint');
 				} else {
 					outlineItem.classList.remove('faint');
@@ -2770,6 +2770,15 @@ export class Reader {
 			while (contentBody.firstChild) {
 				article.appendChild(contentBody.firstChild);
 			}
+
+			// Store original article HTML before wireTranscript modifies
+			// the DOM (moves timestamps, wraps text, adds scrub track).
+			// Unwrap <span class="timestamp"> so Defuddle's markdown
+			// converter keeps the timestamp text inside <strong>.
+			const originalHtml = article.innerHTML.replace(
+				/<span class="timestamp"[^>]*>([^<]*)<\/span>/g, '$1'
+			);
+			article.setAttribute('data-original-html', originalHtml);
 
 			this.wireTranscript(doc, article);
 
