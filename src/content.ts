@@ -510,18 +510,19 @@ declare global {
 		browser.runtime.sendMessage({ action: "updateHasHighlights", hasHighlights });
 	}
 
-	let highlighterCSSInjected = false;
+	let highlighterCSSPromise: Promise<void> | null = null;
 	function ensureHighlighterCSS(): Promise<void> {
-		if (highlighterCSSInjected) return Promise.resolve();
-		highlighterCSSInjected = true;
-		return new Promise<void>((resolve) => {
-			const link = document.createElement('link');
-			link.rel = 'stylesheet';
-			link.href = browser.runtime.getURL('highlighter.css');
-			link.onload = () => resolve();
-			link.onerror = () => resolve();
-			(document.head || document.documentElement).appendChild(link);
-		});
+		if (!highlighterCSSPromise) {
+			highlighterCSSPromise = new Promise<void>((resolve) => {
+				const link = document.createElement('link');
+				link.rel = 'stylesheet';
+				link.href = browser.runtime.getURL('highlighter.css');
+				link.onload = () => resolve();
+				link.onerror = () => resolve();
+				(document.head || document.documentElement).appendChild(link);
+			});
+		}
+		return highlighterCSSPromise;
 	}
 
 	async function initializeHighlighter() {
