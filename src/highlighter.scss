@@ -31,12 +31,18 @@
 #obsidian-clipper-container {
 	--obsidian-clipper-background-primary: #fff;
 	--obsidian-clipper-background-primary-rgb: 255, 255, 255;
-	--obsidian-clipper-background-opacity: 0.95;
+	--obsidian-clipper-background-opacity: 0.97;
 	--obsidian-clipper-text-muted: #5c5c5c;
+	--obsidian-clipper-box-shadow: 0 0 0 1px rgba(0,0,0,0.1),
+			0px 16px 28px -4px rgba(0, 0, 0, 0.15),
+			0px 8px 16px -4px rgba(0, 0, 0, 0.06);
 
 	@media (prefers-color-scheme: dark) {
 		--obsidian-clipper-background-primary: #1e1e1e;
-		--obsidian-clipper-background-primary-rgb: 12, 12, 12;
+		--obsidian-clipper-background-primary-rgb: 26, 26, 26;
+		--obsidian-clipper-box-shadow: 0 0 0 1px rgba(255,255,255,0.1),
+			0px 16px 28px -4px rgba(0, 0, 0, 0.15),
+			0px 8px 16px -4px rgba(0, 0, 0, 0.06);
 	}
 
 	color-scheme: light dark;
@@ -54,9 +60,7 @@
 	background-color: rgba(var(--obsidian-clipper-background-primary-rgb), var(--obsidian-clipper-background-opacity));
 	backdrop-filter: saturate(1.5) blur(32px);
 	border-radius: 12px;
-	box-shadow: 0 0 0 1px rgba(0,0,0,0.1),
-		0px 16px 28px -4px rgba(0, 0, 0, 0.15),
-		0px 8px 16px -4px rgba(0, 0, 0, 0.06);
+	box-shadow: var(--obsidian-clipper-box-shadow);
 	display: flex;
 	flex-direction: column;
 	user-select: none;
