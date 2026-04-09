@@ -776,9 +776,14 @@ export class Reader {
 			}
 		});
 
+		const currentPosButton = doc.createElement('button');
+		currentPosButton.className = 'youtube-player-toggle';
+		currentPosButton.textContent = getMessage('readerCurrentPosition');
+
 		toggleBar.appendChild(pinToggle);
 		toggleBar.appendChild(autoScrollToggle);
 		toggleBar.appendChild(highlightToggle);
+		toggleBar.appendChild(currentPosButton);
 
 		playerContainer.appendChild(toggleBar);
 
@@ -857,6 +862,16 @@ export class Reader {
 
 		// Track active segment based on video current time
 		let activeSegment: HTMLElement | null = null;
+
+		currentPosButton.addEventListener('click', () => {
+			if (activeSegment) {
+				const rect = activeSegment.getBoundingClientRect();
+				const stickyOffset = Reader.getStickyOffset();
+				const targetY = (window.pageYOffset || doc.documentElement.scrollTop)
+					+ rect.top - stickyOffset - 20;
+				Reader.scrollTo(targetY);
+			}
+		});
 		let activeIndex = -1;
 		let suppressScroll = false;
 		let lastUserScroll = 0;

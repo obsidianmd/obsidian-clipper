@@ -753,6 +753,9 @@
 	"readerLineWidth": {
 		"message": "Line width"
 	},
+	"readerCurrentPosition": {
+		"message": "Current position"
+	},
 	"readerHighlightActiveLine": {
 		"message": "Highlight active line"
 	},
