@@ -768,10 +768,10 @@
 	"readerSettings": {
 		"message": "Reader settings"
 	},
-	"readerStickyPlayer": {
-		"message": "Sticky player"
+	"readerPinPlayer": {
+		"message": "Pin player"
 	},
-	"readerStickyPlayerDescription": {
+	"readerPinPlayerDescription": {
 		"message": "Keep the video player visible while scrolling through the transcript."
 	},
 	"readerAutoScroll": {

@@ -102,7 +102,7 @@ export class Reader {
 		defaultFont: '',
 		blendImages: true,
 		colorLinks: false,
-		stickyPlayer: true,
+		pinPlayer: true,
 		autoScroll: true,
 		highlightActiveLine: true,
 		customCss: ''
@@ -723,8 +723,478 @@ export class Reader {
 	}
 
 
+
+	private static wireTranscript(doc: Document, article: HTMLElement): void {
+		const transcript = article.querySelector('.youtube.transcript') as HTMLElement | null;
+		if (!transcript) return;
+
+		const iframe = article.querySelector('iframe[src*="youtube.com/embed/"]') as HTMLIFrameElement | null;
+		const videoWrapper = article.querySelector('.reader-video-wrapper') as HTMLElement | null;
+		const videoEl = videoWrapper?.querySelector('video.reader-video-player') as HTMLVideoElement | null;
+		const playerEl = (videoWrapper || iframe) as HTMLElement | null;
+		if (!playerEl) return;
+
+		// Wrap player in a container with toggle controls
+		const playerContainer = doc.createElement('div');
+		const pinDefault = this.settings.pinPlayer ?? true;
+		const autoScrollDefault = this.settings.autoScroll ?? true;
+		const highlightDefault = this.settings.highlightActiveLine ?? true;
+		playerContainer.className = 'youtube-player-container' + (pinDefault ? ' pin-player' : '');
+		playerEl.parentNode!.insertBefore(playerContainer, playerEl);
+		playerContainer.appendChild(playerEl);
+
+		let autoScrollEnabled = autoScrollDefault;
+		let highlightEnabled = highlightDefault;
+
+		const toggleBar = doc.createElement('div');
+		toggleBar.className = 'youtube-player-toggles';
+
+		const createToggle = (label: string, defaultOn: boolean, onChange: (on: boolean) => void) => {
+			const button = doc.createElement('button');
+			button.className = 'youtube-player-toggle' + (defaultOn ? ' is-active' : '');
+			button.textContent = label;
+			button.addEventListener('click', () => {
+				const isActive = button.classList.toggle('is-active');
+				onChange(isActive);
+			});
+			return button;
+		};
+
+		const pinToggle = createToggle(getMessage('readerPinPlayer'), pinDefault, (on) => {
+			playerContainer.classList.toggle('pin-player', on);
+		});
+
+		const autoScrollToggle = createToggle(getMessage('readerAutoScroll'), autoScrollDefault, (on) => {
+			autoScrollEnabled = on;
+		});
+
+		const highlightToggle = createToggle(getMessage('readerHighlightActiveLine'), highlightDefault, (on) => {
+			highlightEnabled = on;
+			if (!on) {
+				const ph = (CSS as any).highlights?.get('transcript-playback');
+				if (ph) ph.clear();
+			}
+		});
+
+		toggleBar.appendChild(pinToggle);
+		toggleBar.appendChild(autoScrollToggle);
+		toggleBar.appendChild(highlightToggle);
+
+		playerContainer.appendChild(toggleBar);
+
+		if (iframe) {
+			// Enable JS API on the embed
+			const src = new URL(iframe.src);
+			src.searchParams.set('enablejsapi', '1');
+			src.searchParams.set('origin', window.location.origin);
+			iframe.src = src.toString();
+
+			// Initialize postMessage connection once iframe loads
+			iframe.addEventListener('load', () => {
+				if (iframe.contentWindow) {
+					iframe.contentWindow.postMessage(JSON.stringify({
+						event: 'listening'
+					}), '*');
+				}
+			});
+		}
+
+		// Build a sorted list of segments with their start times
+		const segments = Array.from(transcript.querySelectorAll('.transcript-segment')) as HTMLElement[];
+		segments.forEach(seg => {
+			// Pull the timestamp out into its own element
+			// and wrap remaining text in a span
+			const strong = seg.querySelector('strong');
+			if (!strong) return;
+
+			// Remove " · " separator
+			if (strong.nextSibling?.nodeType === Node.TEXT_NODE) {
+				strong.nextSibling.textContent = strong.nextSibling.textContent!.replace(/^\s*·\s*/, '');
+			}
+
+			// Move timestamp strong out, wrap the rest in a div
+			const textWrapper = doc.createElement('div');
+			textWrapper.className = 'transcript-segment-text';
+			strong.remove();
+			while (seg.firstChild) {
+				textWrapper.appendChild(seg.firstChild);
+			}
+			seg.appendChild(strong);
+			seg.appendChild(textWrapper);
+		});
+		// Set timestamp column width to the widest timestamp
+		let maxWidth = 0;
+		segments.forEach(seg => {
+			const strong = seg.querySelector('strong');
+			if (strong) {
+				maxWidth = Math.max(maxWidth, strong.getBoundingClientRect().width);
+			}
+		});
+		transcript.style.setProperty('--timestamp-width', Math.ceil(maxWidth) + 'px');
+
+		const segmentTimes = segments.map(seg => {
+			const ts = seg.querySelector('.timestamp');
+			return parseFloat(ts?.getAttribute('data-timestamp') || '0');
+		});
+
+		const FALLBACK_SEGMENT_DURATION = 30;
+		const AUTO_SCROLL_COOLDOWN = 2000;
+		const getSegmentEnd = (i: number) =>
+			i < segmentTimes.length - 1 ? segmentTimes[i + 1] : segmentTimes[i] + FALLBACK_SEGMENT_DURATION;
+
+		// Track active segment based on video current time
+		let activeSegment: HTMLElement | null = null;
+		let activeIndex = -1;
+		let suppressScroll = false;
+		let lastUserScroll = 0;
+		let lastCurrentTime = -1;
+		let scrubbing = false;
+		let lastScrub = 0;
+
+		window.addEventListener('scroll', () => {
+			if (Reader.programmaticScroll || scrubbing) return;
+			lastUserScroll = Date.now();
+		}, { passive: true });
+
+		const updateActiveSegment = (currentTime: number) => {
+			if (Math.abs(currentTime - lastCurrentTime) < 0.05) return;
+			lastCurrentTime = currentTime;
+			let newIndex = -1;
+			for (let i = segmentTimes.length - 1; i >= 0; i--) {
+				if (currentTime >= segmentTimes[i]) {
+					newIndex = i;
+					break;
+				}
+			}
+			if (newIndex !== activeIndex) {
+				// Resume auto-scroll once segment changes after scrub ends
+				if (suppressScroll && !scrubbing) {
+					suppressScroll = false;
+				}
+				activeSegment?.classList.remove('is-active');
+				if (newIndex >= 0) {
+					segments[newIndex].classList.add('is-active');
+					// Auto-scroll to keep active segment visible
+					if (autoScrollEnabled && !suppressScroll && Date.now() - lastUserScroll > AUTO_SCROLL_COOLDOWN) {
+						const rect = segments[newIndex].getBoundingClientRect();
+						const stickyOffset = this.getStickyOffset();
+						const targetY = (window.pageYOffset || doc.documentElement.scrollTop)
+							+ rect.top - stickyOffset - 20;
+						this.scrollTo(targetY);
+					}
+				}
+				activeSegment = newIndex >= 0 ? segments[newIndex] : null;
+				activeIndex = newIndex;
+			}
+			// Update progress line on the scrub track
+			if (activeSegment && activeIndex >= 0) {
+				const segRect = activeSegment.getBoundingClientRect();
+				const trackRect = scrubTrack.getBoundingClientRect();
+				const start = segmentTimes[activeIndex];
+				const end = getSegmentEnd(activeIndex);
+				const segProgress = Math.min(1, Math.max(0, (currentTime - start) / (end - start)));
+				const yInTrack = (segRect.top - trackRect.top) + segProgress * segRect.height;
+				const trackProgress = yInTrack / trackRect.height;
+				scrubTrack.style.setProperty('--track-progress', (trackProgress * 100) + '%');
+
+				// Update playback highlight — underline the current line
+				if (playbackHighlight && highlightEnabled) {
+					playbackHighlight.clear();
+					const textEl = activeSegment.querySelector('.transcript-segment-text');
+					const textNode = textEl?.firstChild;
+					if (textNode && textNode.nodeType === Node.TEXT_NODE) {
+						const totalLen = (textNode.textContent || '').length;
+						const charPos = Math.min(totalLen - 1, Math.max(0, Math.round(segProgress * totalLen)));
+
+						// Find lines around the current position
+						const probe = doc.createRange();
+						const getLineY = (pos: number) => {
+							probe.setStart(textNode!, Math.min(pos, totalLen - 1));
+							probe.setEnd(textNode!, Math.min(pos + 1, totalLen));
+							return probe.getClientRects()[0]?.top;
+						};
+
+						const lineY = getLineY(charPos);
+						if (lineY === undefined) return;
+
+						// Scan backward to find start of current sentence
+						// but limit to ~2 lines back so run-ons don't over-highlight
+						const text = textNode.textContent || '';
+						let start = 0;
+						if (segProgress > 0.05) {
+							start = charPos;
+							let backLineChanges = 0;
+							let backLastY = lineY;
+							while (start > 0) {
+								if (/[.!?]/.test(text[start - 1]) && /\s/.test(text[start])) {
+									while (start < charPos && /\s/.test(text[start])) start++;
+									break;
+								}
+								// Check line changes in steps to reduce layout queries
+								if (start % 8 === 0 || start === 1) {
+									const y = getLineY(start - 1);
+									if (y !== undefined && Math.abs(y - backLastY) > 2) {
+										backLineChanges++;
+										if (backLineChanges >= 2) break;
+										backLastY = y;
+									}
+								}
+								start--;
+							}
+						}
+
+						// Scan forward: up to 3 lines total, stop at sentence end or comma
+						let end = charPos + 1;
+						let fwdLines = 0;
+						let fwdLastY = lineY;
+						while (end < totalLen && fwdLines < 3) {
+							// Check line changes in steps
+							if (end % 8 === 0 || end === charPos + 1) {
+								const y = getLineY(end);
+								if (y === undefined) break;
+								if (Math.abs(y - fwdLastY) > 2) {
+									fwdLines++;
+									if (fwdLines >= 3) break;
+									fwdLastY = y;
+								}
+							}
+							if (end > charPos + 1 && /[.!?,]/.test(text[end - 1]) && (end >= totalLen || /\s/.test(text[end]))) break;
+							end++;
+						}
+
+						const range = doc.createRange();
+						range.setStart(textNode, start);
+						range.setEnd(textNode, end);
+						playbackHighlight.add(range);
+					}
+				}
+			}
+		};
+
+		// Set up time tracking and seeking based on player type
+		let seekTo: (seconds: number) => void;
+
+		if (videoEl) {
+			// Native video element: use HTML5 API directly
+			seekTo = (seconds: number) => {
+				videoEl.currentTime = seconds;
+			};
+			videoEl.addEventListener('timeupdate', () => {
+				updateActiveSegment(videoEl.currentTime);
+			});
+		} else if (iframe) {
+			// Iframe embed: use postMessage API
+			seekTo = (seconds: number) => {
+				if (!iframe.contentWindow) return;
+				iframe.contentWindow.postMessage(JSON.stringify({
+					event: 'command',
+					func: 'seekTo',
+					args: [seconds, true]
+				}), '*');
+			};
+
+			const onMessage = (e: MessageEvent) => {
+				if (e.source !== iframe.contentWindow) return;
+				try {
+					const data = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
+					if (data?.info?.currentTime !== undefined) {
+						updateActiveSegment(data.info.currentTime);
+					}
+				} catch {}
+			};
+			window.addEventListener('message', onMessage);
+
+			const poll = setInterval(() => {
+				if (!iframe.contentWindow || !doc.contains(iframe)) {
+					clearInterval(poll);
+					window.removeEventListener('message', onMessage);
+					return;
+				}
+				iframe.contentWindow.postMessage(JSON.stringify({
+					event: 'command',
+					func: 'getCurrentTime',
+					args: []
+				}), '*');
+			}, 500);
+		} else {
+			seekTo = () => {};
+		}
+
+		// Add a scrub track behind the timestamps
+		const scrubTrack = doc.createElement('div');
+		scrubTrack.className = 'transcript-scrub-track';
+		const scrubHover = doc.createElement('div');
+		scrubHover.className = 'transcript-scrub-hover';
+		scrubTrack.appendChild(scrubHover);
+		transcript.style.position = 'relative';
+		transcript.appendChild(scrubTrack);
+
+		// Word highlights using CSS Custom Highlight API
+		const hasHighlights = !!(CSS as any).highlights;
+		const playbackHighlight = hasHighlights ? new (window as any).Highlight() : null;
+		const hoverHighlight = hasHighlights ? new (window as any).Highlight() : null;
+		if (hasHighlights) {
+			(CSS as any).highlights.set('transcript-playback', playbackHighlight);
+			(CSS as any).highlights.set('transcript-hover', hoverHighlight);
+		}
+
+		const getCaretNode = (x: number, y: number): { node: Node; offset: number } | null => {
+			if ('caretPositionFromPoint' in doc) {
+				const pos = (doc as any).caretPositionFromPoint(x, y);
+				if (pos) return { node: pos.offsetNode, offset: pos.offset };
+			} else if ('caretRangeFromPoint' in doc) {
+				const range = (doc as any).caretRangeFromPoint(x, y) as Range | null;
+				if (range) return { node: range.startContainer, offset: range.startOffset };
+			}
+			return null;
+		};
+
+		const getHoverRange = (textNode: Node, offset: number): Range | null => {
+			const text = textNode.textContent || '';
+			const totalWords = 8;
+
+			// Forward first: up to 6 words, stop at sentence boundary
+			// Commas act as soft stops — prefer stopping at a comma if we have 4+ words
+			let end = offset;
+			let wordsForward = 0;
+			let lastComma = -1;
+			let wordsAtComma = 0;
+			while (end < text.length && wordsForward < 6) {
+				if (/[.!?]/.test(text[end - 1]) && (end >= text.length || /\s/.test(text[end]))) break;
+				if (text[end - 1] === ',' && wordsForward >= 3) {
+					lastComma = end;
+					wordsAtComma = wordsForward;
+				}
+				end++;
+				if (end < text.length && /\s/.test(text[end - 1]) && /\S/.test(text[end])) wordsForward++;
+			}
+			// Prefer comma stop if we went past it
+			if (lastComma > 0 && wordsForward > wordsAtComma) {
+				end = lastComma;
+				wordsForward = wordsAtComma;
+			}
+
+			// Backward: if forward hit punctuation, limit to 2 words back
+			const hitPunctuation = end < text.length && /[.!?]/.test(text[end - 1]);
+			const maxBack = hitPunctuation ? 2 : Math.max(1, totalWords - wordsForward);
+			let start = offset;
+			let wordsBack = 0;
+			while (start > 0 && wordsBack < maxBack) {
+				if (/[.!?]/.test(text[start - 1]) && /\s/.test(text[start])) break;
+				start--;
+				if (start > 0 && /\s/.test(text[start]) && /\S/.test(text[start - 1])) wordsBack++;
+			}
+
+			// Trim whitespace at edges
+			while (start < offset && /\s/.test(text[start])) start++;
+			while (end > offset && /\s/.test(text[end - 1])) end--;
+			if (start >= end) return null;
+			const range = doc.createRange();
+			range.setStart(textNode, start);
+			range.setEnd(textNode, end);
+			return range;
+		};
+
+		const updateHoverHighlight = (e: MouseEvent) => {
+			if (!hoverHighlight) return;
+			hoverHighlight.clear();
+			const seg = (e.target as HTMLElement).closest('.transcript-segment-text');
+			if (!seg) return;
+			const caret = getCaretNode(e.clientX, e.clientY);
+			if (!caret || caret.node.nodeType !== Node.TEXT_NODE || !seg.contains(caret.node)) return;
+			const range = getHoverRange(caret.node, caret.offset);
+			if (range) hoverHighlight.add(range);
+		};
+
+		transcript.addEventListener('mousemove', (e: MouseEvent) => {
+			const rect = scrubTrack.getBoundingClientRect();
+			scrubHover.style.top = (e.clientY - rect.top) + 'px';
+			updateHoverHighlight(e);
+		});
+		transcript.addEventListener('mouseleave', () => {
+			scrubHover.style.top = '';
+			if (hoverHighlight) hoverHighlight.clear();
+		});
+		// Position from first segment to bottom
+		const positionTrack = () => {
+			const transcriptRect = transcript.getBoundingClientRect();
+			const firstSegRect = segments[0].getBoundingClientRect();
+			scrubTrack.style.top = (firstSegRect.top - transcriptRect.top) + 'px';
+		};
+		positionTrack();
+
+		const getTimeFromY = (clientY: number): number => {
+			// Find which segment the Y position falls within
+			for (let i = segments.length - 1; i >= 0; i--) {
+				const rect = segments[i].getBoundingClientRect();
+				if (clientY >= rect.top) {
+					const progress = Math.min(1, (clientY - rect.top) / rect.height);
+					const start = segmentTimes[i];
+					const end = getSegmentEnd(i);
+					return start + progress * (end - start);
+				}
+			}
+			return segmentTimes[0] || 0;
+		};
+
+		scrubTrack.addEventListener('mousedown', (e) => {
+			scrubbing = true;
+			suppressScroll = true;
+			seekTo(getTimeFromY(e.clientY));
+			e.preventDefault();
+		});
+
+		window.addEventListener('mousemove', (e) => {
+			if (!scrubbing) return;
+			const now = Date.now();
+			if (now - lastScrub < 100) return;
+			lastScrub = now;
+			seekTo(getTimeFromY(e.clientY));
+		});
+
+		window.addEventListener('mouseup', () => {
+			scrubbing = false;
+		});
+
+		// Click anywhere in a segment to seek to that position
+		transcript.addEventListener('click', (e: MouseEvent) => {
+			// Don't seek if highlighter is active or user was selecting text
+			if (doc.body.classList.contains('obsidian-highlighter-active')) return;
+			const selection = window.getSelection();
+			if (selection && selection.toString().length > 0) return;
+
+			const seg = (e.target as HTMLElement).closest('.transcript-segment') as HTMLElement | null;
+			if (!seg) return;
+			const idx = segments.indexOf(seg);
+			if (idx < 0) return;
+
+			const start = segmentTimes[idx];
+			const end = getSegmentEnd(idx);
+
+			// Use caret position to estimate character-level progress
+			const textEl = seg.querySelector('.transcript-segment-text');
+			if (textEl) {
+				const totalLen = (textEl.textContent || '').length;
+				if (totalLen > 0) {
+					const caret = getCaretNode(e.clientX, e.clientY);
+					let charOffset = totalLen;
+					if (caret && caret.node.nodeType === Node.TEXT_NODE && textEl.contains(caret.node)) {
+						charOffset = caret.offset;
+					}
+					const progress = Math.min(1, Math.max(0, charOffset / totalLen));
+					seekTo(start + progress * (end - start));
+					return;
+				}
+			}
+
+			// Fallback to Y position
+			const rect = seg.getBoundingClientRect();
+			const progress = Math.min(1, Math.max(0, (e.clientY - rect.top) / rect.height));
+			seekTo(start + progress * (end - start));
+		});
+	}
 	private static getStickyOffset(): number {
-		const player = document.querySelector('.sticky-player') as HTMLElement | null;
+		const player = document.querySelector('.pin-player') as HTMLElement | null;
 		return player ? player.getBoundingClientRect().height + 16 : 0;
 	}
 
@@ -917,15 +1387,15 @@ export class Reader {
 		let observer = createOutlineObserver();
 
 		// Recreate observer when sticky player appears/resizes
-		const stickyPlayer = doc.querySelector('.sticky-player');
-		if (stickyPlayer) {
+		const pinPlayer = doc.querySelector('.pin-player');
+		if (pinPlayer) {
 			const resizeObserver = new ResizeObserver(() => {
 				observer.disconnect();
 				observer = createOutlineObserver();
 				if (titleHeading) observer.observe(titleHeading);
 				headings.forEach(heading => observer.observe(heading));
 			});
-			resizeObserver.observe(stickyPlayer);
+			resizeObserver.observe(pinPlayer);
 		}
 
 		if (titleHeading) {
@@ -1232,7 +1702,7 @@ export class Reader {
 				doc.body.parentNode?.replaceChild(newBody, doc.body);
 			}
 
-				// Block inline event handlers and dynamic scripts
+			// Block inline event handlers and dynamic scripts
 			const meta = doc.createElement('meta');
 			meta.httpEquiv = 'Content-Security-Policy';
 			meta.content = "script-src 'none'; object-src 'none';";
@@ -1818,20 +2288,17 @@ export class Reader {
 			let youtubeVideoElement: HTMLVideoElement | null = null;
 			const host = doc.URL ? new URL(doc.URL).hostname : '';
 			const isYouTube = host.includes('youtube.com') || host.includes('youtu.be');
-			const browserType = await detectBrowser();
-			// Chrome's iframe embed works via declarativeNetRequest.
-			// Safari/Firefox can't modify headers, so we preserve the
-			// native video element instead.
-			const useNativeVideo = isYouTube && !['chrome'].includes(browserType);
+			// Browser type is only needed for YouTube-specific behavior
+			const browserType = isYouTube ? await detectBrowser() : '';
 			if (isYouTube) {
 				const videoElement = doc.querySelector('video');
 				if (videoElement) {
 					videoTimestamp = Math.floor(videoElement.currentTime);
 					videoWasPlaying = !videoElement.paused;
-					if (useNativeVideo) {
-						// Detach the video element so it survives DOM cleanup.
-						// The blob: MediaSource connection stays alive as long
-						// as the element exists.
+					// Chrome's iframe embed works via declarativeNetRequest.
+					// Safari/Firefox can't modify headers, so we preserve
+					// the native video element instead.
+					if (browserType !== 'chrome') {
 						youtubeVideoElement = videoElement;
 						videoElement.remove();
 					}
@@ -2188,485 +2655,7 @@ export class Reader {
 				article.appendChild(contentBody.firstChild);
 			}
 
-			// Make YouTube player sticky when a transcript follows,
-			// and wire up timestamp clicks to seek the video
-			const transcript = article.querySelector('.youtube.transcript') as HTMLElement | null;
-			if (transcript) {
-				const iframe = article.querySelector('iframe[src*="youtube.com/embed/"]') as HTMLIFrameElement | null;
-				const videoWrapper = article.querySelector('.reader-video-wrapper') as HTMLElement | null;
-				const videoEl = videoWrapper?.querySelector('video.reader-video-player') as HTMLVideoElement | null;
-				const playerEl = (videoWrapper || iframe) as HTMLElement | null;
-				if (playerEl) {
-					// Wrap player in a container with toggle controls
-					const playerContainer = doc.createElement('div');
-					const stickyDefault = this.settings.stickyPlayer ?? true;
-					const autoScrollDefault = this.settings.autoScroll ?? true;
-					const highlightDefault = this.settings.highlightActiveLine ?? true;
-					playerContainer.className = 'youtube-player-container' + (stickyDefault ? ' sticky-player' : '');
-					playerEl.parentNode!.insertBefore(playerContainer, playerEl);
-					playerContainer.appendChild(playerEl);
-
-					let stickyEnabled = stickyDefault;
-					let autoScrollEnabled = autoScrollDefault;
-					let highlightEnabled = highlightDefault;
-
-					const toggleBar = doc.createElement('div');
-					toggleBar.className = 'youtube-player-toggles';
-
-					const createToggle = (label: string, defaultOn: boolean, onChange: (on: boolean) => void) => {
-						const button = doc.createElement('button');
-						button.className = 'youtube-player-toggle' + (defaultOn ? ' is-active' : '');
-						button.textContent = label;
-						button.addEventListener('click', () => {
-							const isActive = button.classList.toggle('is-active');
-							onChange(isActive);
-						});
-						return button;
-					};
-
-					const stickyToggle = createToggle(getMessage('readerStickyPlayer'), stickyDefault, (on) => {
-						stickyEnabled = on;
-						if (on) {
-							playerContainer.classList.add('sticky-player');
-						} else {
-							playerContainer.classList.remove('sticky-player');
-						}
-					});
-
-					const autoScrollToggle = createToggle(getMessage('readerAutoScroll'), autoScrollDefault, (on) => {
-						autoScrollEnabled = on;
-					});
-
-					const highlightToggle = createToggle(getMessage('readerHighlightActiveLine'), highlightDefault, (on) => {
-						highlightEnabled = on;
-						if (!on) {
-							const ph = (CSS as any).highlights?.get('transcript-playback');
-							if (ph) ph.clear();
-						}
-					});
-
-					toggleBar.appendChild(stickyToggle);
-					toggleBar.appendChild(autoScrollToggle);
-					toggleBar.appendChild(highlightToggle);
-
-					playerContainer.appendChild(toggleBar);
-
-					if (iframe) {
-						// Enable JS API on the embed
-						const src = new URL(iframe.src);
-						src.searchParams.set('enablejsapi', '1');
-						src.searchParams.set('origin', window.location.origin);
-						iframe.src = src.toString();
-
-						// Initialize postMessage connection once iframe loads
-						iframe.addEventListener('load', () => {
-							if (iframe.contentWindow) {
-								iframe.contentWindow.postMessage(JSON.stringify({
-									event: 'listening'
-								}), '*');
-							}
-						});
-					}
-
-					// Build a sorted list of segments with their start times
-					const segments = Array.from(transcript.querySelectorAll('.transcript-segment')) as HTMLElement[];
-					segments.forEach(seg => {
-						// Pull the timestamp out into its own element
-						// and wrap remaining text in a span
-						const strong = seg.querySelector('strong');
-						if (!strong) return;
-
-						// Remove " · " separator
-						if (strong.nextSibling?.nodeType === Node.TEXT_NODE) {
-							strong.nextSibling.textContent = strong.nextSibling.textContent!.replace(/^\s*·\s*/, '');
-						}
-
-						// Move timestamp strong out, wrap the rest in a div
-						const textWrapper = doc.createElement('div');
-						textWrapper.className = 'transcript-segment-text';
-						strong.remove();
-						while (seg.firstChild) {
-							textWrapper.appendChild(seg.firstChild);
-						}
-						seg.appendChild(strong);
-						seg.appendChild(textWrapper);
-					});
-					// Set timestamp column width to the widest timestamp
-					let maxWidth = 0;
-					segments.forEach(seg => {
-						const strong = seg.querySelector('strong');
-						if (strong) {
-							maxWidth = Math.max(maxWidth, strong.getBoundingClientRect().width);
-						}
-					});
-					transcript.style.setProperty('--timestamp-width', Math.ceil(maxWidth) + 'px');
-
-					const segmentTimes = segments.map(seg => {
-						const ts = seg.querySelector('.timestamp');
-						return parseFloat(ts?.getAttribute('data-timestamp') || '0');
-					});
-
-					const FALLBACK_SEGMENT_DURATION = 30;
-					const AUTO_SCROLL_COOLDOWN = 2000;
-
-					// Track active segment based on video current time
-					let activeSegment: HTMLElement | null = null;
-					let activeIndex = -1;
-					let suppressScroll = false;
-					let lastUserScroll = 0;
-					let lastCurrentTime = -1;
-					let scrubbing = false;
-					let lastScrub = 0;
-
-					window.addEventListener('scroll', () => {
-						if (Reader.programmaticScroll || scrubbing) return;
-						lastUserScroll = Date.now();
-					}, { passive: true });
-
-					const updateActiveSegment = (currentTime: number) => {
-						if (Math.abs(currentTime - lastCurrentTime) < 0.05) return;
-						lastCurrentTime = currentTime;
-						let newIndex = -1;
-						for (let i = segmentTimes.length - 1; i >= 0; i--) {
-							if (currentTime >= segmentTimes[i]) {
-								newIndex = i;
-								break;
-							}
-						}
-						if (newIndex !== activeIndex) {
-							// Resume auto-scroll once segment changes after scrub ends
-							if (suppressScroll && !scrubbing) {
-								suppressScroll = false;
-							}
-							activeSegment?.classList.remove('is-active');
-							if (newIndex >= 0) {
-								segments[newIndex].classList.add('is-active');
-								// Auto-scroll to keep active segment visible
-								if (autoScrollEnabled && !suppressScroll && Date.now() - lastUserScroll > AUTO_SCROLL_COOLDOWN) {
-									const rect = segments[newIndex].getBoundingClientRect();
-									const stickyOffset = this.getStickyOffset();
-									const targetY = (window.pageYOffset || doc.documentElement.scrollTop)
-										+ rect.top - stickyOffset - 20;
-									this.scrollTo(targetY);
-								}
-							}
-							activeSegment = newIndex >= 0 ? segments[newIndex] : null;
-							activeIndex = newIndex;
-						}
-						// Update progress line on the scrub track
-						if (activeSegment && activeIndex >= 0) {
-							const segRect = activeSegment.getBoundingClientRect();
-							const trackRect = scrubTrack.getBoundingClientRect();
-							const start = segmentTimes[activeIndex];
-							const end = activeIndex < segmentTimes.length - 1
-								? segmentTimes[activeIndex + 1]
-								: start + FALLBACK_SEGMENT_DURATION;
-							const segProgress = Math.min(1, Math.max(0, (currentTime - start) / (end - start)));
-							const yInTrack = (segRect.top - trackRect.top) + segProgress * segRect.height;
-							const trackProgress = yInTrack / trackRect.height;
-							scrubTrack.style.setProperty('--track-progress', (trackProgress * 100) + '%');
-
-							// Update playback highlight — underline the current line
-							if (playbackHighlight && highlightEnabled) {
-								playbackHighlight.clear();
-								const textEl = activeSegment.querySelector('.transcript-segment-text');
-								const textNode = textEl?.firstChild;
-								if (textNode && textNode.nodeType === Node.TEXT_NODE) {
-									const totalLen = (textNode.textContent || '').length;
-									const charPos = Math.min(totalLen - 1, Math.max(0, Math.round(segProgress * totalLen)));
-
-									// Find lines around the current position
-									const probe = doc.createRange();
-									const getLineY = (pos: number) => {
-										probe.setStart(textNode!, Math.min(pos, totalLen - 1));
-										probe.setEnd(textNode!, Math.min(pos + 1, totalLen));
-										return probe.getClientRects()[0]?.top;
-									};
-
-									const lineY = getLineY(charPos);
-									if (lineY === undefined) return;
-
-									// Scan backward to find start of current sentence
-									// but limit to ~2 lines back so run-ons don't over-highlight
-									const text = textNode.textContent || '';
-									let start = 0;
-									if (segProgress > 0.05) {
-										start = charPos;
-										let backLineChanges = 0;
-										let backLastY = lineY;
-										while (start > 0) {
-											if (/[.!?]/.test(text[start - 1]) && /\s/.test(text[start])) {
-												while (start < charPos && /\s/.test(text[start])) start++;
-												break;
-											}
-											// Check line changes in steps to reduce layout queries
-											if (start % 8 === 0 || start === 1) {
-												const y = getLineY(start - 1);
-												if (y !== undefined && Math.abs(y - backLastY) > 2) {
-													backLineChanges++;
-													if (backLineChanges >= 2) break;
-													backLastY = y;
-												}
-											}
-											start--;
-										}
-									}
-
-									// Scan forward: up to 3 lines total, stop at sentence end or comma
-									let end = charPos + 1;
-									let fwdLines = 0;
-									let fwdLastY = lineY;
-									while (end < totalLen && fwdLines < 3) {
-										// Check line changes in steps
-										if (end % 8 === 0 || end === charPos + 1) {
-											const y = getLineY(end);
-											if (y === undefined) break;
-											if (Math.abs(y - fwdLastY) > 2) {
-												fwdLines++;
-												if (fwdLines >= 3) break;
-												fwdLastY = y;
-											}
-										}
-										if (end > charPos + 1 && /[.!?,]/.test(text[end - 1]) && (end >= totalLen || /\s/.test(text[end]))) break;
-										end++;
-									}
-
-									const range = doc.createRange();
-									range.setStart(textNode, start);
-									range.setEnd(textNode, end);
-									playbackHighlight.add(range);
-								}
-							}
-						}
-					};
-
-					// Set up time tracking and seeking based on player type
-					let seekTo: (seconds: number) => void;
-
-					if (videoEl) {
-						// Native video element: use HTML5 API directly
-						seekTo = (seconds: number) => {
-							videoEl.currentTime = seconds;
-						};
-						videoEl.addEventListener('timeupdate', () => {
-							updateActiveSegment(videoEl.currentTime);
-						});
-					} else if (iframe) {
-						// Iframe embed: use postMessage API
-						seekTo = (seconds: number) => {
-							if (!iframe.contentWindow) return;
-							iframe.contentWindow.postMessage(JSON.stringify({
-								event: 'command',
-								func: 'seekTo',
-								args: [seconds, true]
-							}), '*');
-						};
-
-						const onMessage = (e: MessageEvent) => {
-							if (e.source !== iframe.contentWindow) return;
-							try {
-								const data = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
-								if (data?.info?.currentTime !== undefined) {
-									updateActiveSegment(data.info.currentTime);
-								}
-							} catch {}
-						};
-						window.addEventListener('message', onMessage);
-
-						const poll = setInterval(() => {
-							if (!iframe.contentWindow || !doc.contains(iframe)) {
-								clearInterval(poll);
-								window.removeEventListener('message', onMessage);
-								return;
-							}
-							iframe.contentWindow.postMessage(JSON.stringify({
-								event: 'command',
-								func: 'getCurrentTime',
-								args: []
-							}), '*');
-						}, 500);
-					} else {
-						seekTo = () => {};
-					}
-
-					// Add a scrub track behind the timestamps
-					const scrubTrack = doc.createElement('div');
-					scrubTrack.className = 'transcript-scrub-track';
-					const scrubHover = doc.createElement('div');
-					scrubHover.className = 'transcript-scrub-hover';
-					scrubTrack.appendChild(scrubHover);
-					transcript.style.position = 'relative';
-					transcript.appendChild(scrubTrack);
-
-					// Word highlights using CSS Custom Highlight API
-					const hasHighlights = !!(CSS as any).highlights;
-					const playbackHighlight = hasHighlights ? new (window as any).Highlight() : null;
-					const hoverHighlight = hasHighlights ? new (window as any).Highlight() : null;
-					if (hasHighlights) {
-						(CSS as any).highlights.set('transcript-playback', playbackHighlight);
-						(CSS as any).highlights.set('transcript-hover', hoverHighlight);
-					}
-
-					const getCaretNode = (x: number, y: number): { node: Node; offset: number } | null => {
-						if ('caretPositionFromPoint' in doc) {
-							const pos = (doc as any).caretPositionFromPoint(x, y);
-							if (pos) return { node: pos.offsetNode, offset: pos.offset };
-						} else if ('caretRangeFromPoint' in doc) {
-							const range = (doc as any).caretRangeFromPoint(x, y) as Range | null;
-							if (range) return { node: range.startContainer, offset: range.startOffset };
-						}
-						return null;
-					};
-
-					const getHoverRange = (textNode: Node, offset: number): Range | null => {
-						const text = textNode.textContent || '';
-						const totalWords = 8;
-
-						// Forward first: up to 6 words, stop at sentence boundary
-						// Commas act as soft stops — prefer stopping at a comma if we have 4+ words
-						let end = offset;
-						let wordsForward = 0;
-						let lastComma = -1;
-						let wordsAtComma = 0;
-						while (end < text.length && wordsForward < 6) {
-							if (/[.!?]/.test(text[end - 1]) && (end >= text.length || /\s/.test(text[end]))) break;
-							if (text[end - 1] === ',' && wordsForward >= 3) {
-								lastComma = end;
-								wordsAtComma = wordsForward;
-							}
-							end++;
-							if (end < text.length && /\s/.test(text[end - 1]) && /\S/.test(text[end])) wordsForward++;
-						}
-						// Prefer comma stop if we went past it
-						if (lastComma > 0 && wordsForward > wordsAtComma) {
-							end = lastComma;
-							wordsForward = wordsAtComma;
-						}
-
-						// Backward: if forward hit punctuation, limit to 2 words back
-						const hitPunctuation = end < text.length && /[.!?]/.test(text[end - 1]);
-						const maxBack = hitPunctuation ? 2 : Math.max(1, totalWords - wordsForward);
-						let start = offset;
-						let wordsBack = 0;
-						while (start > 0 && wordsBack < maxBack) {
-							if (/[.!?]/.test(text[start - 1]) && /\s/.test(text[start])) break;
-							start--;
-							if (start > 0 && /\s/.test(text[start]) && /\S/.test(text[start - 1])) wordsBack++;
-						}
-
-						// Trim whitespace at edges
-						while (start < offset && /\s/.test(text[start])) start++;
-						while (end > offset && /\s/.test(text[end - 1])) end--;
-						if (start >= end) return null;
-						const range = doc.createRange();
-						range.setStart(textNode, start);
-						range.setEnd(textNode, end);
-						return range;
-					};
-
-					const updateHoverHighlight = (e: MouseEvent) => {
-						if (!hoverHighlight) return;
-						hoverHighlight.clear();
-						const seg = (e.target as HTMLElement).closest('.transcript-segment-text');
-						if (!seg) return;
-						const caret = getCaretNode(e.clientX, e.clientY);
-						if (!caret || caret.node.nodeType !== Node.TEXT_NODE || !seg.contains(caret.node)) return;
-						const range = getHoverRange(caret.node, caret.offset);
-						if (range) hoverHighlight.add(range);
-					};
-
-					transcript.addEventListener('mousemove', (e: MouseEvent) => {
-						const rect = scrubTrack.getBoundingClientRect();
-						scrubHover.style.top = (e.clientY - rect.top) + 'px';
-						updateHoverHighlight(e);
-					});
-					transcript.addEventListener('mouseleave', () => {
-						scrubHover.style.top = '';
-						if (hoverHighlight) hoverHighlight.clear();
-					});
-					// Position from first segment to bottom
-					const positionTrack = () => {
-						const transcriptRect = transcript.getBoundingClientRect();
-						const firstSegRect = segments[0].getBoundingClientRect();
-						scrubTrack.style.top = (firstSegRect.top - transcriptRect.top) + 'px';
-					};
-					positionTrack();
-
-					const getTimeFromY = (clientY: number): number => {
-						// Find which segment the Y position falls within
-						for (let i = segments.length - 1; i >= 0; i--) {
-							const rect = segments[i].getBoundingClientRect();
-							if (clientY >= rect.top) {
-								const progress = Math.min(1, (clientY - rect.top) / rect.height);
-								const start = segmentTimes[i];
-								const end = i < segmentTimes.length - 1
-									? segmentTimes[i + 1]
-									: start + FALLBACK_SEGMENT_DURATION;
-								return start + progress * (end - start);
-							}
-						}
-						return segmentTimes[0] || 0;
-					};
-
-					scrubTrack.addEventListener('mousedown', (e) => {
-						scrubbing = true;
-						suppressScroll = true;
-						seekTo(getTimeFromY(e.clientY));
-						e.preventDefault();
-					});
-
-					window.addEventListener('mousemove', (e) => {
-						if (!scrubbing) return;
-						const now = Date.now();
-						if (now - lastScrub < 100) return;
-						lastScrub = now;
-						seekTo(getTimeFromY(e.clientY));
-					});
-
-					window.addEventListener('mouseup', () => {
-						scrubbing = false;
-					});
-
-					// Click anywhere in a segment to seek to that position
-					transcript.addEventListener('click', (e: MouseEvent) => {
-						// Don't seek if highlighter is active or user was selecting text
-						if (doc.body.classList.contains('obsidian-highlighter-active')) return;
-						const selection = window.getSelection();
-						if (selection && selection.toString().length > 0) return;
-
-						const seg = (e.target as HTMLElement).closest('.transcript-segment') as HTMLElement | null;
-						if (!seg) return;
-						const idx = segments.indexOf(seg);
-						if (idx < 0) return;
-
-						const start = segmentTimes[idx];
-						const end = idx < segmentTimes.length - 1
-							? segmentTimes[idx + 1]
-							: start + FALLBACK_SEGMENT_DURATION;
-
-						// Use caret position to estimate character-level progress
-						const textEl = seg.querySelector('.transcript-segment-text');
-						if (textEl) {
-							const totalLen = (textEl.textContent || '').length;
-							if (totalLen > 0) {
-								const caret = getCaretNode(e.clientX, e.clientY);
-								let charOffset = totalLen;
-								if (caret && caret.node.nodeType === Node.TEXT_NODE && textEl.contains(caret.node)) {
-									charOffset = caret.offset;
-								}
-								const progress = Math.min(1, Math.max(0, charOffset / totalLen));
-								seekTo(start + progress * (end - start));
-								return;
-							}
-						}
-
-						// Fallback to Y position
-						const rect = seg.getBoundingClientRect();
-						const progress = Math.min(1, Math.max(0, (e.clientY - rect.top) / rect.height));
-						seekTo(start + progress * (end - start));
-					});
-				}
-			}
+			this.wireTranscript(doc, article);
 
 			// Set extractor type
 			if (extractorType) {

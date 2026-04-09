@@ -313,7 +313,7 @@
 	.youtube-player-container {
 		padding-top: 8px;
 		background: var(--background-primary);
-		&.sticky-player {
+		&.pin-player {
 			top: 0;
 			position: sticky;
 			z-index: 1;

@@ -33,7 +33,7 @@ export let generalSettings: Settings = {
 		defaultFont: '',
 		blendImages: true,
 		colorLinks: false,
-		stickyPlayer: true,
+		pinPlayer: true,
 		autoScroll: true,
 		highlightActiveLine: true,
 		customCss: ''
@@ -83,7 +83,7 @@ interface StorageData {
 		defaultFont?: string;
 		blendImages?: boolean;
 		colorLinks?: boolean;
-		stickyPlayer?: boolean;
+		pinPlayer?: boolean;
 		autoScroll?: boolean;
 		highlightActiveLine?: boolean;
 		customCss?: string;
@@ -143,7 +143,7 @@ export async function loadSettings(): Promise<Settings> {
 			defaultFont: '',
 			blendImages: true,
 			colorLinks: false,
-			stickyPlayer: true,
+			pinPlayer: true,
 			autoScroll: true,
 			highlightActiveLine: true,
 			customCss: ''
@@ -204,7 +204,7 @@ export async function loadSettings(): Promise<Settings> {
 			defaultFont: data.reader_settings?.defaultFont ?? defaultSettings.readerSettings.defaultFont,
 			blendImages: data.reader_settings?.blendImages ?? defaultSettings.readerSettings.blendImages,
 			colorLinks: data.reader_settings?.colorLinks ?? defaultSettings.readerSettings.colorLinks,
-			stickyPlayer: data.reader_settings?.stickyPlayer ?? defaultSettings.readerSettings.stickyPlayer,
+			pinPlayer: data.reader_settings?.pinPlayer ?? defaultSettings.readerSettings.pinPlayer,
 			autoScroll: data.reader_settings?.autoScroll ?? defaultSettings.readerSettings.autoScroll,
 			highlightActiveLine: data.reader_settings?.highlightActiveLine ?? defaultSettings.readerSettings.highlightActiveLine,
 			customCss: data.reader_settings?.customCss ?? defaultSettings.readerSettings.customCss
@@ -260,7 +260,7 @@ export async function saveSettings(settings?: Partial<Settings>): Promise<void> 
 			defaultFont: generalSettings.readerSettings.defaultFont,
 			blendImages: generalSettings.readerSettings.blendImages,
 			colorLinks: generalSettings.readerSettings.colorLinks,
-			stickyPlayer: generalSettings.readerSettings.stickyPlayer,
+			pinPlayer: generalSettings.readerSettings.pinPlayer,
 			autoScroll: generalSettings.readerSettings.autoScroll,
 			highlightActiveLine: generalSettings.readerSettings.highlightActiveLine,
 			customCss: generalSettings.readerSettings.customCss

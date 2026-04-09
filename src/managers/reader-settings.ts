@@ -356,8 +356,8 @@ export async function initializeReaderSettings() {
 		});
 	}
 
-	initializeSettingToggle('reader-sticky-player', generalSettings.readerSettings.stickyPlayer ?? true, (checked) => {
-		saveSettings({ ...generalSettings, readerSettings: { ...generalSettings.readerSettings, stickyPlayer: checked } });
+	initializeSettingToggle('reader-pin-player', generalSettings.readerSettings.pinPlayer ?? true, (checked) => {
+		saveSettings({ ...generalSettings, readerSettings: { ...generalSettings.readerSettings, pinPlayer: checked } });
 	});
 
 	initializeSettingToggle('reader-auto-scroll', generalSettings.readerSettings.autoScroll ?? true, (checked) => {
