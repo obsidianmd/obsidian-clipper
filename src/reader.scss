@@ -1148,10 +1148,16 @@
 		background: var(--background-primary);
 		color: var(--text-muted);
 		outline: none;
+		svg {
+			opacity: 0.85;
+		}
 		@media (hover: hover) {
 			&:hover {
 				color: var(--text-normal);
 				background: var(--background-primary-alt);
+				svg {
+					opacity: 0.85;
+				}
 			}
 		}
 		&.is-active {
@@ -1442,6 +1448,7 @@
 .obsidian-reader-outline-item {
 	color: var(--text-muted);
 	cursor: pointer;
+	text-wrap-style: pretty;
 	padding: 5px var(--size-4-2);
 	border-radius: var(--radius-s);
 	line-height: 1.15;
