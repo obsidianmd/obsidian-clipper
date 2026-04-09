@@ -920,37 +920,37 @@ export class Reader {
 						// Scan backward to find start of current sentence
 						// but limit to ~2 lines back so run-ons don't over-highlight
 						const text = textNode.textContent || '';
-						let start = 0;
+						let hlStart = 0;
 						if (segProgress > 0.05) {
-							start = charPos;
+							hlStart = charPos;
 							let backLineChanges = 0;
 							let backLastY = lineY;
-							while (start > 0) {
-								if (/[.!?]/.test(text[start - 1]) && /\s/.test(text[start])) {
-									while (start < charPos && /\s/.test(text[start])) start++;
+							while (hlStart > 0) {
+								if (/[.!?]/.test(text[hlStart - 1]) && /\s/.test(text[hlStart])) {
+									while (hlStart < charPos && /\s/.test(text[hlStart])) hlStart++;
 									break;
 								}
 								// Check line changes in steps to reduce layout queries
-								if (start % 8 === 0 || start === 1) {
-									const y = getLineY(start - 1);
+								if (hlStart % 8 === 0 || hlStart === 1) {
+									const y = getLineY(hlStart - 1);
 									if (y !== undefined && Math.abs(y - backLastY) > 2) {
 										backLineChanges++;
 										if (backLineChanges >= 2) break;
 										backLastY = y;
 									}
 								}
-								start--;
+								hlStart--;
 							}
 						}
 
 						// Scan forward: up to 3 lines total, stop at sentence end or comma
-						let end = charPos + 1;
+						let hlEnd = charPos + 1;
 						let fwdLines = 0;
 						let fwdLastY = lineY;
-						while (end < totalLen && fwdLines < 3) {
+						while (hlEnd < totalLen && fwdLines < 3) {
 							// Check line changes in steps
-							if (end % 8 === 0 || end === charPos + 1) {
-								const y = getLineY(end);
+							if (hlEnd % 8 === 0 || hlEnd === charPos + 1) {
+								const y = getLineY(hlEnd);
 								if (y === undefined) break;
 								if (Math.abs(y - fwdLastY) > 2) {
 									fwdLines++;
@@ -958,13 +958,13 @@ export class Reader {
 									fwdLastY = y;
 								}
 							}
-							if (end > charPos + 1 && /[.!?,]/.test(text[end - 1]) && (end >= totalLen || /\s/.test(text[end]))) break;
-							end++;
+							if (hlEnd > charPos + 1 && /[.!?,]/.test(text[hlEnd - 1]) && (hlEnd >= totalLen || /\s/.test(text[hlEnd]))) break;
+							hlEnd++;
 						}
 
 						const range = doc.createRange();
-						range.setStart(textNode, start);
-						range.setEnd(textNode, end);
+						range.setStart(textNode, hlStart);
+						range.setEnd(textNode, hlEnd);
 						playbackHighlight.add(range);
 					}
 				}
@@ -1000,7 +1000,7 @@ export class Reader {
 					if (data?.info?.currentTime !== undefined) {
 						updateActiveSegment(data.info.currentTime);
 					}
-				} catch {}
+				} catch {} // Ignore non-YouTube postMessage events
 			};
 			window.addEventListener('message', onMessage);
 
