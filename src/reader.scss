@@ -1249,6 +1249,9 @@
 }
 
 @media (max-width: 768px) {
+	.player-toggles {
+		display: none !important;
+	}
 	.obsidian-reader-nav {
 		position: fixed;
 		top: 0;
