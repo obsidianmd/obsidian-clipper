@@ -305,9 +305,12 @@ declare global {
 		}
 
 		if (request.action === "getPageContent") {
-			// Flatten shadow DOM before extraction (async, needs main world)
-			const flattenTimeout = new Promise<void>(resolve => setTimeout(resolve, 3000));
-			Promise.race([flattenShadowDom(document), flattenTimeout]).then(async () => {
+			// Snapshot the page into an isolated document so Defuddle and its
+			// async extractors never operate on the live DOM. Passing the live
+			// document caused Defuddle's flattenShadowRoots (and site-specific
+			// extractors) to interact with shadow-host elements, triggering
+			// MutationObservers that reset dynamic component styles.
+			Promise.resolve().then(async () => {
 				let selectedHtml = '';
 				const selection = window.getSelection();
 
@@ -319,9 +322,24 @@ declare global {
 					selectedHtml = div.innerHTML;
 				}
 
+				const rawHtml = document.documentElement.outerHTML;
+				const snapshot = new DOMParser().parseFromString(rawHtml, 'text/html');
+				Object.defineProperty(snapshot, 'URL', { value: document.URL, configurable: true });
+				// Copy open shadow-root content into the snapshot (read-only on
+				// the live side — no live DOM mutation).
+				if (document.body && snapshot.body) {
+					const liveEls = Array.from(document.body.querySelectorAll('*'));
+					const snapEls = Array.from(snapshot.body.querySelectorAll('*'));
+					const len = Math.min(liveEls.length, snapEls.length);
+					for (let i = 0; i < len; i++) {
+						const sr = liveEls[i].shadowRoot;
+						if (sr?.innerHTML) snapEls[i].insertAdjacentHTML('beforeend', sr.innerHTML);
+					}
+				}
+
 				// Use parseAsync to ensure async variables like {{transcript}} are available.
 				// If it hangs (e.g. another extension has corrupted fetch), fall back to sync parse.
-				const defuddle = new Defuddle(document, { url: document.URL });
+				const defuddle = new Defuddle(snapshot, { url: document.URL });
 				const parseTimeout = new Promise<never>((_, reject) =>
 					setTimeout(() => reject(new Error('parseAsync timeout')), 8000)
 				);
@@ -334,7 +352,7 @@ declare global {
 				// Create a new DOMParser
 				const parser = new DOMParser();
 				// Parse the document's HTML
-				const doc = parser.parseFromString(document.documentElement.outerHTML, 'text/html');
+				const doc = parser.parseFromString(rawHtml, 'text/html');
 
 				// Remove all script and style elements
 				doc.querySelectorAll('script, style').forEach(el => el.remove());
