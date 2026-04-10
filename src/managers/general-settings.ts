@@ -227,6 +227,7 @@ export function initializeGeneralSettings(): void {
 		initializeHighlighterSettings();
 		initializeExportHighlightsButton();
 		initializeSaveBehaviorDropdown();
+		initializeImageSettings();
 		await initializeUsageChart();
 
 		// Initialize feedback modal close button
@@ -256,6 +257,11 @@ function saveSettingsFromForm(): void {
 	const highlighterToggle = document.getElementById('highlighter-toggle') as HTMLInputElement;
 	const alwaysShowHighlightsToggle = document.getElementById('highlighter-visibility') as HTMLInputElement;
 	const highlightBehaviorSelect = document.getElementById('highlighter-behavior') as HTMLSelectElement;
+	const downloadImagesToggle = document.getElementById('download-images-toggle') as HTMLInputElement;
+	const imageSaveModeSelect = document.getElementById('image-save-mode') as HTMLSelectElement;
+	const obsidianApiPort = document.getElementById('obsidian-api-port') as HTMLInputElement;
+	const obsidianApiKey = document.getElementById('obsidian-api-key') as HTMLInputElement;
+	const obsidianAttachmentFolder = document.getElementById('obsidian-image-saved-folder') as HTMLInputElement;
 
 	const updatedSettings = {
 		...generalSettings, // Keep existing settings
@@ -266,7 +272,14 @@ function saveSettingsFromForm(): void {
 		silentOpen: silentOpenToggle?.checked ?? generalSettings.silentOpen,
 		highlighterEnabled: highlighterToggle?.checked ?? generalSettings.highlighterEnabled,
 		alwaysShowHighlights: alwaysShowHighlightsToggle?.checked ?? generalSettings.alwaysShowHighlights,
-		highlightBehavior: highlightBehaviorSelect?.value ?? generalSettings.highlightBehavior
+		highlightBehavior: highlightBehaviorSelect?.value ?? generalSettings.highlightBehavior,
+		downloadImages: downloadImagesToggle?.checked ?? generalSettings.downloadImages,
+		imageSaveMode: (imageSaveModeSelect?.value as 'embed' | 'local-rest-api') ?? generalSettings.imageSaveMode,
+		obsidianApiConfig: {
+			port: obsidianApiPort?.value ?? generalSettings.obsidianApiConfig.port,
+			apiKey: obsidianApiKey?.value ?? generalSettings.obsidianApiConfig.apiKey,
+			imageSavedFolder: obsidianAttachmentFolder?.value ?? generalSettings.obsidianApiConfig.imageSavedFolder
+		}
 	};
 
 	saveSettings(updatedSettings);
@@ -370,6 +383,50 @@ function initializeSaveBehaviorDropdown(): void {
         const newValue = dropdown.value as 'addToObsidian' | 'copyToClipboard' | 'saveFile';
         saveSettings({ saveBehavior: newValue });
     });
+}
+
+function initializeImageSettings(): void {
+	initializeSettingToggle('download-images-toggle', generalSettings.downloadImages, (checked) => {
+		saveSettings({ ...generalSettings, downloadImages: checked });
+	});
+
+	const imageSaveModeSelect = document.getElementById('image-save-mode') as HTMLSelectElement;
+	const obsidianApiConfig = document.getElementById('obsidian-api-config') as HTMLElement;
+
+	const updateImageModeVisibility = (mode: string) => {
+		if (obsidianApiConfig) {
+			obsidianApiConfig.style.display = mode === 'local-rest-api' ? 'block' : 'none';
+		}
+	};
+
+	if (imageSaveModeSelect) {
+		imageSaveModeSelect.value = generalSettings.imageSaveMode;
+		updateImageModeVisibility(generalSettings.imageSaveMode);
+		imageSaveModeSelect.addEventListener('change', () => {
+			const newMode = imageSaveModeSelect.value as 'embed' | 'local-rest-api';
+			updateImageModeVisibility(newMode);
+			saveSettings({ ...generalSettings, imageSaveMode: newMode });
+		});
+	}
+
+	const saveObsidianApiConfig = debounce(() => {
+		const port = (document.getElementById('obsidian-api-port') as HTMLInputElement)?.value ?? generalSettings.obsidianApiConfig.port;
+		const apiKey = (document.getElementById('obsidian-api-key') as HTMLInputElement)?.value ?? generalSettings.obsidianApiConfig.apiKey;
+		const imageSavedFolder = (document.getElementById('obsidian-image-saved-folder') as HTMLInputElement)?.value ?? generalSettings.obsidianApiConfig.imageSavedFolder;
+		saveSettings({ ...generalSettings, obsidianApiConfig: { port, apiKey, imageSavedFolder } });
+	}, 500);
+
+	const initObsidianInput = (id: string, defaultValue: string) => {
+		const input = document.getElementById(id) as HTMLInputElement;
+		if (input) {
+			input.value = defaultValue;
+			input.addEventListener('input', saveObsidianApiConfig);
+		}
+	};
+
+	initObsidianInput('obsidian-api-port', generalSettings.obsidianApiConfig.port);
+	initObsidianInput('obsidian-api-key', generalSettings.obsidianApiConfig.apiKey);
+	initObsidianInput('obsidian-image-saved-folder', generalSettings.obsidianApiConfig.imageSavedFolder);
 }
 
 export function resetDefaultTemplate(): void {

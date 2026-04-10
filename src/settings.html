@@ -199,6 +199,66 @@
 										</div>
 									</div>
 								</div>
+								<div class="setting-item setting-item-heading"><h3 data-i18n="images">Images</h3></div>
+								<div class="setting-items">
+									<div class="setting-item mod-horizontal mod-toggle">
+										<div class="setting-item-info">
+											<label for="download-images-toggle" data-i18n="downloadImages">Download images</label>
+											<div class="setting-item-description" data-i18n="downloadImagesDescription">Images are only downloaded when clicking Add to Obsidian</div>
+										</div>
+										<div class="setting-item-control">
+											<div class="checkbox-container">
+												<input type="checkbox" id="download-images-toggle" />
+											</div>
+										</div>
+									</div>
+									<div class="setting-item mod-horizontal">
+										<div class="setting-item-info">
+											<label for="image-save-mode" data-i18n="imageSaveMode">Image save mode</label>
+										</div>
+										<div class="setting-item-control">
+											<select id="image-save-mode">
+												<option value="embed" data-i18n="imageSaveModeVault">Embed as Base64</option>
+												<option value="local-rest-api" data-i18n="imageSaveModeVaultApi">Download to vault</option>
+											</select>
+										</div>
+									</div>
+									<div id="obsidian-api-config" style="display:none;">
+										<div class="setting-item mod-horizontal">
+											<div class="setting-item-info">
+												<label data-i18n="imageSaveModeVaultApi">Download to vault</label>
+												<div class="setting-item-description" data-i18n="imageSaveModeVaultApiDescription">Requires the Obsidian Local REST API plugin. In the plugin settings, enable Allow non-encrypted (HTTP) requests and copy the API key below.</div>
+												<div class="setting-item-description"><a href="https://github.com/coddingtonbear/obsidian-local-rest-api" target="_blank">https://github.com/coddingtonbear/obsidian-local-rest-api</a></div>
+											</div>
+										</div>
+										<div class="setting-item mod-horizontal">
+											<div class="setting-item-info">
+												<label for="obsidian-api-port" data-i18n="obsidianApiPort">Obsidian Local REST API HTTP Port</label>
+												<div class="setting-item-description" data-i18n="obsidianApiPortDescription">HTTP port only (default: 27123). Extensions cannot connect to self-signed HTTPS certificates.</div>
+											</div>
+											<div class="setting-item-control">
+												<input type="number" id="obsidian-api-port" placeholder="27123" min="1" max="65535" />
+											</div>
+										</div>
+										<div class="setting-item mod-horizontal">
+											<div class="setting-item-info">
+												<label for="obsidian-api-key" data-i18n="obsidianApiKey">API key</label>
+											</div>
+											<div class="setting-item-control">
+												<input type="text" id="obsidian-api-key" />
+											</div>
+										</div>
+										<div class="setting-item mod-horizontal">
+											<div class="setting-item-info">
+												<label for="obsidian-image-saved-folder" data-i18n="obsidianImageSavedFolder">Image saved folder</label>
+												<div class="setting-item-description" data-i18n="obsidianImageSavedFolderDescription">Subfolder under the note's location where images are saved (e.g. NoteLocation/Images)</div>
+											</div>
+											<div class="setting-item-control">
+												<input type="text" id="obsidian-image-saved-folder" placeholder="Images" />
+											</div>
+										</div>
+									</div>
+								</div>
 								<div class="setting-item setting-item-heading"><h3 data-i18n="advanced">Advanced</h3></div>
 								<div class="setting-items">
 									<div class="setting-item mod-horizontal">

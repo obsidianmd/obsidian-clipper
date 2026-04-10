@@ -23,6 +23,7 @@ import { sanitizeFileName } from '../utils/string-utils';
 import { saveFile } from '../utils/file-utils';
 import { translatePage, getMessage, setupLanguageAndDirection } from '../utils/i18n';
 import { formatPropertyValue } from '../utils/shared';
+import { processImages } from '../utils/image-processor';
 
 interface ReaderModeResponse {
 	success: boolean;
@@ -457,13 +458,7 @@ function setupEventListeners(tabId: number) {
 
 	if (copyContentButton) {
 		copyContentButton.addEventListener('click', async () => {
-			const properties = getPropertiesFromDOM();
-
-			const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
-			const frontmatter = await generateFrontmatter(properties);
-			const fileContent = frontmatter + noteContentField.value;
-			
-			await copyToClipboard(fileContent);
+			await copyContent();
 		});
 	}
 
@@ -1236,7 +1231,12 @@ async function handleSaveToDownloads() {
 
 		const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
 		const frontmatter = await generateFrontmatter(properties);
-		const fileContent = frontmatter + noteContentField.value;
+		let fileContent = frontmatter + noteContentField.value;
+
+		// Process images in embed (base64) mode only — local-rest-api is not applicable for file save
+		if (loadedSettings.downloadImages && loadedSettings.imageSaveMode === 'embed' && currentTabId) {
+			fileContent = await processImages(fileContent, currentTabId, { ...loadedSettings, imageSaveMode: 'embed' });
+		}
 
 		await saveFile({
 			content: fileContent,
@@ -1301,6 +1301,7 @@ async function handleClipObsidian(): Promise<void> {
 	const noteNameField = document.getElementById('note-name-field') as HTMLInputElement;
 	const pathField = document.getElementById('path-name-field') as HTMLInputElement;
 	const interpretBtn = document.getElementById('interpret-btn') as HTMLButtonElement;
+	const clipBtn = document.getElementById('clip-btn') as HTMLButtonElement;
 
 	if (!vaultDropdown || !noteContentField) {
 		showError('Some required fields are missing. Please try reloading the extension.');
@@ -1322,13 +1323,32 @@ async function handleClipObsidian(): Promise<void> {
 		const properties = getPropertiesFromDOM();
 
 		const frontmatter = await generateFrontmatter(properties);
-		const fileContent = frontmatter + noteContentField.value;
+		let fileContent = frontmatter + noteContentField.value;
 
 		// Save to Obsidian
 		const selectedVault = currentTemplate.vault || vaultDropdown.value;
 		const isDailyNote = currentTemplate.behavior === 'append-daily' || currentTemplate.behavior === 'prepend-daily';
 		const noteName = isDailyNote ? '' : noteNameField?.value || '';
 		const path = isDailyNote ? '' : pathField?.value || '';
+
+		// Process images if enabled in settings
+		if (loadedSettings.downloadImages && currentTabId) {
+			const originalBtnText = clipBtn?.textContent ?? '';
+			if (clipBtn) {
+				clipBtn.classList.add('processing');
+				clipBtn.disabled = true;
+				clipBtn.textContent = getMessage('downloadingImages');
+			}
+			try {
+				fileContent = await processImages(fileContent, currentTabId, loadedSettings, path, noteName);
+			} finally {
+				if (clipBtn) {
+					clipBtn.classList.remove('processing');
+					clipBtn.disabled = false;
+					clipBtn.textContent = originalBtnText;
+				}
+			}
+		}
 
 		await saveToObsidian(fileContent, noteName, path, selectedVault, currentTemplate.behavior);
 		const tabInfo = await getCurrentTabInfo();
@@ -1390,7 +1410,13 @@ async function copyContent() {
 
 	const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
 	const frontmatter = await generateFrontmatter(properties);
-	const fileContent = frontmatter + noteContentField.value;
+	let fileContent = frontmatter + noteContentField.value;
+
+	// Process images in embed (base64) mode only — local-rest-api is not applicable for clipboard
+	if (loadedSettings.downloadImages && loadedSettings.imageSaveMode === 'embed' && currentTabId) {
+		fileContent = await processImages(fileContent, currentTabId, { ...loadedSettings, imageSaveMode: 'embed' });
+	}
+
 	await copyToClipboard(fileContent);
 }
 

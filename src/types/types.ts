@@ -96,6 +96,13 @@ export interface Settings {
 	history: HistoryEntry[];
 	ratings: Rating[];
 	saveBehavior: 'addToObsidian' | 'saveFile' | 'copyToClipboard';
+	downloadImages: boolean;
+	imageSaveMode: 'embed' | 'local-rest-api';
+	obsidianApiConfig: {
+		port: string;
+		apiKey: string;
+		imageSavedFolder: string;
+	};
 }
 
 export interface ModelConfig {

@@ -48,6 +48,13 @@ export const generalSettings: Settings = {
 	history: [],
 	ratings: [],
 	saveBehavior: 'addToObsidian',
+	downloadImages: false,
+	imageSaveMode: 'embed',
+	obsidianApiConfig: {
+		port: '27123',
+		apiKey: '',
+		imageSavedFolder: 'Images',
+	},
 };
 
 export const loadSettings = async () => {};

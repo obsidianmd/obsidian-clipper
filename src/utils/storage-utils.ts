@@ -46,7 +46,14 @@ export let generalSettings: Settings = {
 	},
 	history: [],
 	ratings: [],
-	saveBehavior: 'addToObsidian'
+	saveBehavior: 'addToObsidian',
+	downloadImages: false,
+	imageSaveMode: 'embed',
+	obsidianApiConfig: {
+		port: '27123',
+		apiKey: '',
+		imageSavedFolder: 'Images'
+	}
 };
 
 export function setLocalStorage(key: string, value: any): Promise<void> {
@@ -106,6 +113,15 @@ interface StorageData {
 	history?: HistoryEntry[];
 	ratings?: Rating[];
 	migrationVersion?: number;
+	image_settings?: {
+		downloadImages?: boolean;
+		imageSaveMode?: 'embed' | 'local-rest-api';
+		obsidianApiConfig?: {
+			port?: string;
+			apiKey?: string;
+			imageSavedFolder?: string;
+		};
+	};
 }
 
 const CURRENT_MIGRATION_VERSION = 1;
@@ -156,6 +172,13 @@ export async function loadSettings(): Promise<Settings> {
 		},
 		history: [],
 		ratings: [],
+		downloadImages: false,
+		imageSaveMode: 'embed',
+		obsidianApiConfig: {
+			port: '27123',
+			apiKey: '',
+			imageSavedFolder: 'Images'
+		}
 	};
 
 	// Update migration version if needed
@@ -212,7 +235,14 @@ export async function loadSettings(): Promise<Settings> {
 		stats: data.stats || defaultSettings.stats,
 		history: data.history || defaultSettings.history,
 		ratings: data.ratings || defaultSettings.ratings,
-		saveBehavior: data.general_settings?.saveBehavior ?? defaultSettings.saveBehavior
+		saveBehavior: data.general_settings?.saveBehavior ?? defaultSettings.saveBehavior,
+		downloadImages: data.image_settings?.downloadImages ?? defaultSettings.downloadImages,
+		imageSaveMode: data.image_settings?.imageSaveMode ?? defaultSettings.imageSaveMode,
+		obsidianApiConfig: {
+			port: data.image_settings?.obsidianApiConfig?.port ?? defaultSettings.obsidianApiConfig.port,
+			apiKey: data.image_settings?.obsidianApiConfig?.apiKey ?? defaultSettings.obsidianApiConfig.apiKey,
+			imageSavedFolder: data.image_settings?.obsidianApiConfig?.imageSavedFolder ?? defaultSettings.obsidianApiConfig.imageSavedFolder
+		}
 	};
 
 	generalSettings = loadedSettings;
@@ -265,7 +295,16 @@ export async function saveSettings(settings?: Partial<Settings>): Promise<void> 
 			highlightActiveLine: generalSettings.readerSettings.highlightActiveLine,
 			customCss: generalSettings.readerSettings.customCss
 		},
-		stats: generalSettings.stats
+		stats: generalSettings.stats,
+		image_settings: {
+			downloadImages: generalSettings.downloadImages,
+			imageSaveMode: generalSettings.imageSaveMode,
+			obsidianApiConfig: {
+				port: generalSettings.obsidianApiConfig.port,
+				apiKey: generalSettings.obsidianApiConfig.apiKey,
+				imageSavedFolder: generalSettings.obsidianApiConfig.imageSavedFolder
+			}
+		}
 	});
 }
 

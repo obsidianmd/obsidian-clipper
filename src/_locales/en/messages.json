@@ -1002,5 +1002,44 @@
 	},
 	"version": {
 		"message": "Version"
+	},
+	"images": {
+		"message": "Images"
+	},
+	"downloadImages": {
+		"message": "Download images"
+	},
+	"downloadImagesDescription": {
+		"message": "Images are only downloaded when clicking Add to Obsidian"
+	},
+	"imageSaveMode": {
+		"message": "Image save mode"
+	},
+	"imageSaveModeVault": {
+		"message": "Embed as Base64"
+	},
+	"imageSaveModeVaultApi": {
+		"message": "Download to vault"
+	},
+	"imageSaveModeVaultApiDescription": {
+		"message": "Requires the Obsidian Local REST API plugin. In the plugin settings, enable Allow non-encrypted (HTTP) requests and copy the API key below."
+	},
+	"obsidianApiPort": {
+		"message": "Obsidian Local REST API HTTP Port"
+	},
+	"obsidianApiPortDescription": {
+		"message": "HTTP port only (default: 27123). Extensions cannot connect to self-signed HTTPS certificates."
+	},
+	"obsidianApiKey": {
+		"message": "API key"
+	},
+	"obsidianImageSavedFolder": {
+		"message": "Image saved folder"
+	},
+	"obsidianImageSavedFolderDescription": {
+		"message": "Subfolder under the note's location where images are saved (e.g. NoteLocation/Images)"
+	},
+	"downloadingImages": {
+		"message": "Downloading images..."
 	}
 }

@@ -497,6 +497,53 @@ declare global {
 		} else if (request.action === "getReaderModeState") {
 			sendResponse({ isActive: document.documentElement.classList.contains('obsidian-reader-active') });
 			return true;
+		} else if (request.action === "fetchImage") {
+			// Fetch an image in page context to bypass CORS restrictions
+			(async () => {
+				try {
+					const response = await fetch(request.url as string);
+					const buffer = await response.arrayBuffer();
+					const contentType = response.headers.get('content-type') || 'image/png';
+					sendResponse({
+						buffer: Array.from(new Uint8Array(buffer)),
+						contentType,
+					});
+				} catch (error) {
+					sendResponse({
+						error: error instanceof Error ? error.message : 'Unknown error',
+					});
+				}
+			})();
+			return true;
+		} else if (request.action === "getImageInitiatorMap") {
+			// Build a URL resolution map using PerformanceResourceTiming + DOM img elements
+			(async () => {
+				try {
+					// Performance-tracked final URLs for image resources
+					const entries = performance.getEntriesByType('resource') as PerformanceResourceTiming[];
+					const map: Record<string, string> = {};
+					entries
+						.filter(e => e.initiatorType === 'img')
+						.forEach(e => {
+							map[e.name] = e.name;
+						});
+
+					// DOM-based map: original src attribute → resolved currentSrc
+					const domMap: Record<string, string> = {};
+					document.querySelectorAll('img').forEach(img => {
+						const src = img.getAttribute('src') || '';
+						const currentSrc = img.currentSrc || src;
+						if (src && currentSrc && currentSrc !== src) {
+							domMap[src] = currentSrc;
+						}
+					});
+
+					sendResponse({ map, domMap });
+				} catch (error) {
+					sendResponse({ map: {}, domMap: {} });
+				}
+			})();
+			return true;
 		}
 		return true;
 	});
