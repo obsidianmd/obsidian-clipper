@@ -1862,11 +1862,20 @@ export class Reader {
 				}
 			}
 
-			let contentPromise: Promise<ReaderContent>;
 			let spinner: HTMLElement;
 			let article: HTMLElement;
 			let main: HTMLElement;
 			let footer: HTMLElement;
+
+			// Flatten shadow DOM before cloning (cloneNode doesn't copy shadow DOM)
+			await flattenShadowDomUtil(doc);
+
+			// Clone document and start Defuddle before the view transition
+			// so content extraction runs during the crossfade animation
+			const docClone = doc.cloneNode(true) as Document;
+			docClone.getElementById('obsidian-clipper-container')?.remove();
+			Object.defineProperty(docClone, 'URL', { value: doc.URL, configurable: true });
+			const contentPromise = this.extractContent(docClone);
 
 			// Use view transition for smooth crossfade into reader mode
 			if ('startViewTransition' in document) {
@@ -1884,9 +1893,6 @@ export class Reader {
 				});
 			}
 
-			// Flatten shadow DOM content before cleanup removes scripts
-			await flattenShadowDomUtil(doc);
-
 			// Remove page scripts and their effects
 			this.cleanupScripts(doc);
 
@@ -1894,25 +1900,15 @@ export class Reader {
 			while (doc.body.attributes.length > 0) {
 				doc.body.removeAttribute(doc.body.attributes[0].name);
 			}
-			
+
 			// Clean the html element but preserve lang and dir attributes
 			const htmlElement = doc.documentElement;
 			const lang = htmlElement.getAttribute('lang');
 			const dir = htmlElement.getAttribute('dir');
-			
+
 			// Restore lang and dir if they existed
 			if (lang) htmlElement.setAttribute('lang', lang);
 			if (dir) htmlElement.setAttribute('dir', dir);
-			
-			// Clone document for Defuddle before we clear the body
-			const docClone = doc.cloneNode(true) as Document;
-			// Remove the clipper container from the clone so Defuddle
-			// doesn't extract it as page content
-			docClone.getElementById('obsidian-clipper-container')?.remove();
-			// Preserve the URL for Defuddle's extractors
-			Object.defineProperty(docClone, 'URL', { value: doc.URL, configurable: true });
-			// Start content extraction on the clone (don't await yet)
-			contentPromise = this.extractContent(docClone);
 
 			// Clean up head - remove unwanted elements but keep meta tags and non-stylesheet links
 			const head = doc.head;
