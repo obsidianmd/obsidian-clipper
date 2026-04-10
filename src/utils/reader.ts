@@ -16,6 +16,17 @@ const VIEWPORT = 'width=device-width, initial-scale=1, maximum-scale=1';
 import { ReaderSettings } from '../types/types';
 import { wireTranscript } from './reader-transcript';
 
+interface ReaderContent {
+	content: string;
+	title?: string;
+	author?: string;
+	published?: string;
+	domain?: string;
+	wordCount?: number;
+	parseTime?: number;
+	extractorType?: string;
+}
+
 export class Reader {
 	private static hasApplied: boolean = false;
 	private static isActive: boolean = false;
@@ -774,16 +785,7 @@ export class Reader {
 		requestAnimationFrame(step);
 	}
 
-	private static async extractContent(doc: Document): Promise<{
-		content: string;
-		title?: string;
-		author?: string;
-		published?: string;
-		domain?: string;
-		wordCount?: number;
-		parseTime?: number;
-		extractorType?: string;
-	}> {
+	private static async extractContent(doc: Document): Promise<ReaderContent> {
 
 		const defuddle = new Defuddle(doc, { url: doc.URL });
 		const defuddled = await defuddle.parseAsync();
@@ -1825,6 +1827,7 @@ export class Reader {
 	}
 
 	static async apply(doc: Document) {
+		let resolveViewTransition: (() => void) | undefined;
 		try {
 			await initializeI18n();
 
@@ -1859,6 +1862,28 @@ export class Reader {
 				}
 			}
 
+			let contentPromise: Promise<ReaderContent>;
+			let spinner: HTMLElement;
+			let article: HTMLElement;
+			let main: HTMLElement;
+			let footer: HTMLElement;
+
+			// Use view transition for smooth crossfade into reader mode
+			if ('startViewTransition' in document) {
+				await new Promise<void>(resolve => {
+					try {
+						const vt = (document as any).startViewTransition(() => {
+							resolve();
+							return new Promise<void>(r => { resolveViewTransition = r; });
+						});
+						vt.ready.catch(() => {});
+						vt.finished.catch(() => {});
+					} catch {
+						resolve();
+					}
+				});
+			}
+
 			// Flatten shadow DOM content before cleanup removes scripts
 			await flattenShadowDomUtil(doc);
 
@@ -1887,7 +1912,7 @@ export class Reader {
 			// Preserve the URL for Defuddle's extractors
 			Object.defineProperty(docClone, 'URL', { value: doc.URL, configurable: true });
 			// Start content extraction on the clone (don't await yet)
-			const contentPromise = this.extractContent(docClone);
+			contentPromise = this.extractContent(docClone);
 
 			// Clean up head - remove unwanted elements but keep meta tags and non-stylesheet links
 			const head = doc.head;
@@ -1963,11 +1988,11 @@ export class Reader {
 			readerContent.className = 'obsidian-reader-content';
 
 			// Create main element
-			const main = doc.createElement('main');
+			main = doc.createElement('main');
 
 			// Create article placeholder with loading spinner
-			const article = doc.createElement('article');
-			const spinner = doc.createElement('div');
+			article = doc.createElement('article');
+			spinner = doc.createElement('div');
 			spinner.className = 'obsidian-reader-loading';
 			const spinnerText = doc.createElement('div');
 			spinnerText.className = 'obsidian-reader-loading-text';
@@ -1979,7 +2004,7 @@ export class Reader {
 			readerContent.appendChild(main);
 
 			// Create footer (hidden until content loads)
-			const footer = doc.createElement('div');
+			footer = doc.createElement('div');
 			footer.className = 'obsidian-reader-footer';
 			footer.style.display = 'none';
 			readerContent.appendChild(footer);
@@ -2047,6 +2072,11 @@ export class Reader {
 			this.colorSchemeMediaQuery.addEventListener('change', (e) => this.handleColorSchemeChange(e, doc));
 
 			this.isActive = true;
+
+			// Signal view transition that DOM update is complete
+			if (resolveViewTransition) {
+				resolveViewTransition();
+			}
 
 			// Now await content extraction and populate the page
 			const { content, title, author, published, domain, extractorType, wordCount, parseTime } = await contentPromise;
@@ -2259,6 +2289,7 @@ export class Reader {
 
 		} catch (e) {
 			console.error('Reader', 'Error during apply:', e);
+			if (resolveViewTransition) resolveViewTransition();
 		}
 	}
 

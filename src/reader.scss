@@ -1,5 +1,11 @@
 @import 'styles/reader-themes';
 
+::view-transition-old(root),
+::view-transition-new(root) {
+	animation-duration: 0.1s;
+	animation-timing-function: ease-out;
+}
+
 .obsidian-reader-active {
 	background-color: var(--background-primary) !important;
 
