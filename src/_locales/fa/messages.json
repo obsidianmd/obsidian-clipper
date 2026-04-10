@@ -209,9 +209,6 @@
 	"embedded": {
 		"message": "درون خطی"
 	},
-	"enableHighlighter": {
-		"message": "مارکر جملات روشن را فعال کن"
-	},
 	"enableHighlighterDescription": {
 		"message": "محتوایی را که می‌خواهید در ابسیدین ذخیره کنید را برجسته کنید"
 	},
@@ -356,6 +353,9 @@
 	},
 	"highlighter": {
 		"message": "مارکر"
+	},
+	"highlighterOn": {
+		"message": "هایلایتر"
 	},
 	"highlighterSettings": {
 		"message": "مارکر"
@@ -675,6 +675,12 @@
 	"readerAppearanceLight": {
 		"message": "روشن"
 	},
+	"readerAutoScroll": {
+		"message": "پیمایش خودکار"
+	},
+	"readerAutoScrollDescription": {
+		"message": "رونوشت را به‌صورت خودکار پیمایش می‌کند تا با پخش هماهنگ باشد."
+	},
 	"readerBlendImages": {
 		"message": "ترکیب تصاویر"
 	},
@@ -692,6 +698,9 @@
 	},
 	"readerColorSchemeDefault": {
 		"message": "پیش‌فرض"
+	},
+	"readerCurrentPosition": {
+		"message": "موقعیت فعلی"
 	},
 	"readerCustomCss": {
 		"message": "CSS سفارشی"
@@ -744,6 +753,12 @@
 	"readerFootnotes": {
 		"message": "پانویس‌ها"
 	},
+	"readerHighlightActiveLine": {
+		"message": "برجسته‌سازی خط فعال"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "در هنگام پخش، جملهٔ فعلی را در رونوشت برجسته می‌کند."
+	},
 	"readerImages": {
 		"message": "تصاویر"
 	},
@@ -756,6 +771,15 @@
 	"readerLoading": {
 		"message": "در حال ساده‌سازی…"
 	},
+	"readerOn": {
+		"message": "حالت مطالعه"
+	},
+	"readerPinPlayer": {
+		"message": "سنجاق کردن پخش‌کننده"
+	},
+	"readerPinPlayerDescription": {
+		"message": "هنگام پیمایش در رونوشت، پخش‌کنندهٔ ویدیو را قابل مشاهده نگه می‌دارد."
+	},
 	"readerSettings": {
 		"message": "تنظیمات خواننده"
 	},
@@ -767,6 +791,9 @@
 	},
 	"readerThemeSection": {
 		"message": "پوسته"
+	},
+	"readerTranscripts": {
+		"message": "رونوشت‌ها"
 	},
 	"readerTypography": {
 		"message": "تایپوگرافی"

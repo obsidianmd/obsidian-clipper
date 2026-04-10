@@ -81,6 +81,9 @@ export interface ReaderSettings {
 	defaultFont: string;
 	blendImages: boolean;
 	colorLinks: boolean;
+	pinPlayer: boolean;
+	autoScroll: boolean;
+	highlightActiveLine: boolean;
 	customCss: string;
 }
 
@@ -90,7 +93,7 @@ export interface Settings {
 	betaFeatures: boolean;
 	legacyMode: boolean;
 	silentOpen: boolean;
-	openBehavior: "popup" | "embedded";
+	openBehavior: "popup" | "embedded" | "reader";
 	highlighterEnabled: boolean;
 	alwaysShowHighlights: boolean;
 	highlightBehavior: string;

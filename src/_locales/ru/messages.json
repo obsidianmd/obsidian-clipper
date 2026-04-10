@@ -209,9 +209,6 @@
 	"embedded": {
 		"message": "Встроенный"
 	},
-	"enableHighlighter": {
-		"message": "Включить маркер"
-	},
 	"enableHighlighterDescription": {
 		"message": "Выделите содержимое веб-страниц, которое хотите сохранить в Obsidian."
 	},
@@ -356,6 +353,9 @@
 	},
 	"highlighter": {
 		"message": "Маркер"
+	},
+	"highlighterOn": {
+		"message": "Выделение"
 	},
 	"highlighterSettings": {
 		"message": "Маркер"
@@ -675,6 +675,12 @@
 	"readerAppearanceLight": {
 		"message": "Светлое"
 	},
+	"readerAutoScroll": {
+		"message": "Автопрокрутка"
+	},
+	"readerAutoScrollDescription": {
+		"message": "Автоматически прокручивать расшифровку, следуя воспроизведению."
+	},
 	"readerBlendImages": {
 		"message": "Смешивать изображения"
 	},
@@ -692,6 +698,9 @@
 	},
 	"readerColorSchemeDefault": {
 		"message": "По умолчанию"
+	},
+	"readerCurrentPosition": {
+		"message": "Текущая позиция"
 	},
 	"readerCustomCss": {
 		"message": "Пользовательский CSS"
@@ -744,6 +753,12 @@
 	"readerFootnotes": {
 		"message": "Сноски"
 	},
+	"readerHighlightActiveLine": {
+		"message": "Подсвечивать активную строку"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "Подсвечивать текущее предложение в расшифровке во время воспроизведения."
+	},
 	"readerImages": {
 		"message": "Изображения"
 	},
@@ -756,6 +771,15 @@
 	"readerLoading": {
 		"message": "Упрощение…"
 	},
+	"readerOn": {
+		"message": "Режим чтения"
+	},
+	"readerPinPlayer": {
+		"message": "Закрепить плеер"
+	},
+	"readerPinPlayerDescription": {
+		"message": "Оставлять видеоплеер видимым при прокрутке расшифровки."
+	},
 	"readerSettings": {
 		"message": "Настройки режима чтения"
 	},
@@ -767,6 +791,9 @@
 	},
 	"readerThemeSection": {
 		"message": "Тема"
+	},
+	"readerTranscripts": {
+		"message": "Расшифровки"
 	},
 	"readerTypography": {
 		"message": "Типографика"

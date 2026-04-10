@@ -220,7 +220,7 @@
 											</select>
 										</div>
 									</div>
-									<div class="setting-item mh mod-horizontal">
+									<div class="setting-item mod-horizontal">
 										<div class="setting-item-info">
 											<label for="open-behavior-dropdown" data-i18n="openBehaviorTitle">Default open behavior</label>
 											<div class="setting-item-description" data-i18n="openBehaviorDescription">
@@ -231,6 +231,7 @@
 											<select id="open-behavior-dropdown">
 												<option value="popup" selected data-i18n="popup">Popup</option>
 												<option value="embedded" data-i18n="embedded">Embedded</option>
+												<option value="reader" data-i18n="reader">Reader</option>
 											</select>
 										</div>
 									</div>
@@ -315,19 +316,6 @@
 						<form id="highlighter-settings-form">
 							<div class="setting-group">
 								<div class="setting-items">
-									<!-- <div class="setting-item mod-horizontal mod-toggle">
-										<div class="setting-item-info">
-											<label for="highlighter-toggle" data-i18n="enableHighlighter">Enable highlighter</label>
-											<div class="setting-item-description" data-i18n="enableHighlighterDescription">
-												Enable the highlighter tool.
-											</div>
-										</div>
-										<div class="setting-item-control">
-											<div class="checkbox-container">
-												<input type="checkbox" id="highlighter-toggle" checked/>
-											</div>
-										</div>
-									</div> -->
 									<div class="setting-item mod-horizontal mod-toggle">
 										<div class="setting-item-info">
 											<label for="highlighter-visibility" data-i18n="alwaysShowHighlights">Always show highlights</label>
@@ -440,22 +428,6 @@
 								</div>
 							</div>
 							<div class="setting-group">
-								<div class="setting-item setting-item-heading"><h3 data-i18n="readerImages">Images</h3></div>
-								<div class="setting-items">
-									<div class="setting-item mod-horizontal mod-toggle">
-										<div class="setting-item-info">
-											<label for="reader-blend-images" data-i18n="readerBlendImages">Blend images</label>
-											<div class="setting-item-description" data-i18n="readerBlendImagesDescription">Blend images with the page background in reader mode.</div>
-										</div>
-										<div class="setting-item-control">
-											<div class="checkbox-container">
-												<input type="checkbox" id="reader-blend-images" checked />
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="setting-group">
 								<div class="setting-item setting-item-heading"><h3 data-i18n="readerThemeSection">Theme</h3></div>
 								<div class="setting-items">
 									<div class="setting-item mod-horizontal">
@@ -491,6 +463,60 @@
 									</div>
 									<div id="reader-theme-dark-section">
 										<div id="reader-theme-grid-dark" class="reader-theme-grid"></div>
+									</div>
+								</div>
+							</div>
+							<div class="setting-group">
+								<div class="setting-item setting-item-heading"><h3 data-i18n="readerImages">Images</h3></div>
+								<div class="setting-items">
+									<div class="setting-item mod-horizontal mod-toggle">
+										<div class="setting-item-info">
+											<label for="reader-blend-images" data-i18n="readerBlendImages">Blend images</label>
+											<div class="setting-item-description" data-i18n="readerBlendImagesDescription">Blend images with the page background in reader mode.</div>
+										</div>
+										<div class="setting-item-control">
+											<div class="checkbox-container">
+												<input type="checkbox" id="reader-blend-images" checked />
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="setting-group">
+								<div class="setting-item setting-item-heading"><h3 data-i18n="readerTranscripts">Transcripts</h3></div>
+								<div class="setting-items">
+									<div class="setting-item mod-horizontal mod-toggle">
+										<div class="setting-item-info">
+											<label for="reader-pin-player" data-i18n="readerPinPlayer">Pin player</label>
+											<div class="setting-item-description" data-i18n="readerPinPlayerDescription">Keep the video player visible while scrolling through the transcript.</div>
+										</div>
+										<div class="setting-item-control">
+											<div class="checkbox-container">
+												<input type="checkbox" id="reader-pin-player" checked />
+											</div>
+										</div>
+									</div>
+									<div class="setting-item mod-horizontal mod-toggle">
+										<div class="setting-item-info">
+											<label for="reader-auto-scroll" data-i18n="readerAutoScroll">Auto-scroll</label>
+											<div class="setting-item-description" data-i18n="readerAutoScrollDescription">Automatically scroll the transcript to follow playback.</div>
+										</div>
+										<div class="setting-item-control">
+											<div class="checkbox-container">
+												<input type="checkbox" id="reader-auto-scroll" checked />
+											</div>
+										</div>
+									</div>
+									<div class="setting-item mod-horizontal mod-toggle">
+										<div class="setting-item-info">
+											<label for="reader-highlight-active-line" data-i18n="readerHighlightActiveLine">Highlight active line</label>
+											<div class="setting-item-description" data-i18n="readerHighlightActiveLineDescription">Highlight the current sentence in the transcript during playback.</div>
+										</div>
+										<div class="setting-item-control">
+											<div class="checkbox-container">
+												<input type="checkbox" id="reader-highlight-active-line" checked />
+											</div>
+										</div>
 									</div>
 								</div>
 							</div>

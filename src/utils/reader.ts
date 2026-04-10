@@ -9,6 +9,7 @@ import {
 	applyHighlights,
 	invalidateHighlightCache,
 	loadHighlights,
+	toggleHighlighterMenu,
 } from "./highlighter";
 import { copyToClipboard } from "./clipboard-utils";
 import { getMessage, initializeI18n } from "./i18n";
@@ -18,10 +19,23 @@ import { getFontCss } from "./font-utils";
 const VIEWPORT = "width=device-width, initial-scale=1, maximum-scale=1";
 
 import { ReaderSettings } from "../types/types";
+import { wireTranscript } from "./reader-transcript";
+
+interface ReaderContent {
+	content: string;
+	title?: string;
+	author?: string;
+	published?: string;
+	domain?: string;
+	wordCount?: number;
+	parseTime?: number;
+	extractorType?: string;
+}
 
 export class Reader {
-	private static originalHTML: string | null = null;
+	private static hasApplied: boolean = false;
 	private static isActive: boolean = false;
+	private static programmaticScroll: boolean = false;
 
 	/**
 	 * Helper function to create SVG elements
@@ -125,6 +139,9 @@ export class Reader {
 		defaultFont: "",
 		blendImages: true,
 		colorLinks: false,
+		pinPlayer: true,
+		autoScroll: true,
+		highlightActiveLine: true,
 		customCss: "",
 	};
 
@@ -207,14 +224,20 @@ export class Reader {
 					action: "toggleHighlighterMode",
 					tabId: response.tabId,
 				});
-				highlighterBtn.classList.toggle("is-active");
 			}
 		});
-
-		// Sync active state with highlighter mode
-		if (doc.body.classList.contains("obsidian-highlighter-active")) {
-			highlighterBtn.classList.add("is-active");
-		}
+		const syncHighlighterBtn = () => {
+			highlighterBtn.classList.toggle(
+				"is-active",
+				doc.body.classList.contains("obsidian-highlighter-active")
+			);
+		};
+		syncHighlighterBtn();
+		this.highlighterObserver = new MutationObserver(syncHighlighterBtn);
+		this.highlighterObserver.observe(doc.body, {
+			attributes: true,
+			attributeFilter: ["class"],
+		});
 
 		// Clip button with dropdown
 		const clipButton = doc.createElement("button");
@@ -232,25 +255,31 @@ export class Reader {
 			})
 		);
 
-		const clipDropdown = doc.createElement("div");
-		clipDropdown.className = "obsidian-reader-clip-dropdown";
-
+		const addToObsidianBtn = doc.createElement("button");
+		addToObsidianBtn.className = "nav-btn";
+		addToObsidianBtn.setAttribute(
+			"aria-label",
+			getMessage("addToAppFlowy")
+		);
 		const obsidianIcon = doc.createElementNS(
 			"http://www.w3.org/2000/svg",
 			"svg"
 		);
-		obsidianIcon.setAttribute("width", "16");
-		obsidianIcon.setAttribute("height", "16");
+		obsidianIcon.setAttribute("width", "18");
+		obsidianIcon.setAttribute("height", "18");
 		obsidianIcon.setAttribute("viewBox", "0 0 256 256");
 		obsidianIcon.setAttribute("fill", "currentColor");
 		obsidianIcon.innerHTML =
 			'<path d="M94.82 149.44c6.53-1.94 17.13-4.9 29.26-5.71a102.97 102.97 0 0 1-7.64-48.84c1.63-16.51 7.54-30.38 13.25-42.1l3.47-7.14 4.48-9.18c2.35-5 4.08-9.38 4.9-13.56.81-4.07.81-7.64-.2-11.11-1.03-3.47-3.07-7.14-7.15-11.21a17.02 17.02 0 0 0-15.8 3.77l-52.81 47.5a17.12 17.12 0 0 0-5.5 10.2l-4.5 30.18a149.26 149.26 0 0 1 38.24 57.2ZM54.45 106l-1.02 3.06-27.94 62.2a17.33 17.33 0 0 0 3.27 18.96l43.94 45.16a88.7 88.7 0 0 0 8.97-88.5A139.47 139.47 0 0 0 54.45 106Z"/><path d="m82.9 240.79 2.34.2c8.26.2 22.33 1.02 33.64 3.06 9.28 1.73 27.73 6.83 42.82 11.21 11.52 3.47 23.45-5.8 25.08-17.73 1.23-8.67 3.57-18.46 7.75-27.53a94.81 94.81 0 0 0-25.9-40.99 56.48 56.48 0 0 0-29.56-13.35 96.55 96.55 0 0 0-40.99 4.79 98.89 98.89 0 0 1-15.29 80.34h.1Z"/><path d="M201.87 197.76a574.87 574.87 0 0 0 19.78-31.6 8.67 8.67 0 0 0-.61-9.48 185.58 185.58 0 0 1-21.82-35.9c-5.91-14.16-6.73-36.08-6.83-46.69 0-4.07-1.22-8.05-3.77-11.21l-34.16-43.33c0 1.94-.4 3.87-.81 5.81a76.42 76.42 0 0 1-5.71 15.9l-4.7 9.8-3.36 6.72a111.95 111.95 0 0 0-12.03 38.23 93.9 93.9 0 0 0 8.67 47.92 67.9 67.9 0 0 1 39.56 16.52 99.4 99.4 0 0 1 25.8 37.31Z"/>';
+		addToObsidianBtn.appendChild(obsidianIcon);
+		addToObsidianBtn.addEventListener("click", () => {
+			browser.runtime.sendMessage({ action: "openPopup" });
+		});
 
-		const clipActions: Array<{
-			action: string;
-			label?: string;
-			icon: SVGElement;
-		}> = [
+		const clipDropdown = doc.createElement("div");
+		clipDropdown.className = "obsidian-reader-clip-dropdown";
+
+		const clipActions: Array<{ action: string; icon: SVGElement }> = [
 			{
 				action: "copyToClipboard",
 				icon: this.createSVG({
@@ -274,27 +303,19 @@ export class Reader {
 					paths: ["M12 17V3", "m6 11 6 6 6-6", "M19 21H5"],
 				}),
 			},
-			{
-				action: "addToObsidian",
-				label: "addToAppFlowy",
-				icon: obsidianIcon,
-			},
 		];
 
-		for (const { action, label, icon } of clipActions) {
+		for (const { action, icon } of clipActions) {
 			const item = doc.createElement("div");
 			item.className = "obsidian-reader-clip-item";
 			item.appendChild(icon);
 
 			const itemLabel = doc.createElement("span");
-			itemLabel.textContent = getMessage(label ?? action);
+			itemLabel.textContent = getMessage(action);
 			item.appendChild(itemLabel);
 
 			item.addEventListener("click", async () => {
-				if (action === "addToObsidian") {
-					clipDropdown.classList.remove("is-open");
-					browser.runtime.sendMessage({ action: "openPopup" });
-				} else if (action === "copyToClipboard") {
+				if (action === "copyToClipboard") {
 					const originalText = itemLabel.textContent;
 					browser.runtime.sendMessage({
 						action: "copyMarkdownToClipboard",
@@ -329,40 +350,111 @@ export class Reader {
 			}
 		});
 
+		// Outline button (mobile only, hidden until outline is generated)
+		const outlineBtn = doc.createElement("button");
+		outlineBtn.className =
+			"obsidian-reader-settings-trigger nav-btn nav-btn-outline";
+		outlineBtn.setAttribute("aria-label", "Outline");
+		outlineBtn.classList.add("is-hidden");
+		outlineBtn.appendChild(
+			this.createSVG({
+				width: "18",
+				height: "18",
+				viewBox: "0 0 24 24",
+				strokeWidth: "1.75",
+				paths: [
+					"M3 5h.01",
+					"M3 12h.01",
+					"M3 19h.01",
+					"M8 5h13",
+					"M8 12h13",
+					"M8 19h13",
+				],
+			})
+		);
+
+		// Create mobile outline overlay
+		const outlineOverlay = doc.createElement("div");
+		outlineOverlay.className = "obsidian-reader-outline-overlay";
+
+		outlineBtn.addEventListener("click", (e) => {
+			e.stopPropagation();
+			clipDropdown.classList.remove("is-open");
+			settingsBar.classList.remove("is-open");
+			const isOpen = outlineOverlay.classList.toggle("is-open");
+			outlineBtn.classList.toggle("is-active", isOpen);
+			doc.body.style.overflow = isOpen ? "hidden" : "";
+		});
+
+		doc.body.appendChild(outlineOverlay);
+
 		const triggerGroup = doc.createElement("div");
 		triggerGroup.className = "obsidian-reader-nav";
+		triggerGroup.appendChild(outlineBtn);
 		triggerGroup.appendChild(highlighterBtn);
 		triggerGroup.appendChild(clipButton);
 		triggerGroup.appendChild(trigger);
+		triggerGroup.appendChild(addToObsidianBtn);
 		settingsBar.appendChild(triggerGroup);
 		settingsBar.appendChild(clipDropdown);
 
 		// Hide buttons on scroll down, show on scroll up or hover
 		let lastScrollY = window.scrollY;
 		let scrollHidden = false;
+		const scrollThreshold = 8;
+
+		const isMobile = window.matchMedia("(pointer: coarse)").matches;
+
+		const getPlayerToggles = () =>
+			doc.querySelector(".player-toggles") as HTMLElement | null;
 
 		const showButtons = () => {
 			if (scrollHidden) {
 				triggerGroup.style.opacity = "";
+				if (isMobile) {
+					triggerGroup.style.visibility = "";
+					triggerGroup.style.pointerEvents = "";
+				}
+				const floatingToggles = getPlayerToggles();
+				if (floatingToggles) {
+					floatingToggles.style.opacity = "";
+				}
 				scrollHidden = false;
 			}
 		};
+
+		// Allow other code to force-show the nav
+		window.addEventListener("reader-show-nav", () => {
+			showButtons();
+			lastScrollY = window.scrollY;
+		});
 
 		window.addEventListener(
 			"scroll",
 			() => {
 				if (
 					settingsBar.classList.contains("is-open") ||
-					clipDropdown.classList.contains("is-open")
+					clipDropdown.classList.contains("is-open") ||
+					outlineOverlay.classList.contains("is-open")
 				)
 					return;
 				const currentY = window.scrollY;
-				if (currentY > lastScrollY && currentY > 50) {
+				const delta = currentY - lastScrollY;
+				if (Math.abs(delta) < scrollThreshold) return;
+				if (delta > 0 && currentY > 50) {
 					if (!scrollHidden) {
 						triggerGroup.style.opacity = "0";
+						if (isMobile) {
+							triggerGroup.style.visibility = "hidden";
+							triggerGroup.style.pointerEvents = "none";
+						}
+						const floatingToggles = getPlayerToggles();
+						if (floatingToggles) {
+							floatingToggles.style.opacity = "0";
+						}
 						scrollHidden = true;
 					}
-				} else {
+				} else if (delta < 0) {
 					showButtons();
 				}
 				lastScrollY = currentY;
@@ -563,7 +655,8 @@ export class Reader {
 		updateModeIcon();
 
 		// Watch for theme-light/theme-dark class changes (D key, OS preference, etc.)
-		new MutationObserver(updateModeIcon).observe(doc.documentElement, {
+		this.themeModeObserver = new MutationObserver(updateModeIcon);
+		this.themeModeObserver.observe(doc.documentElement, {
 			attributes: true,
 			attributeFilter: ["class"],
 		});
@@ -647,9 +740,12 @@ export class Reader {
 		fontWrapper.appendChild(fontSelect);
 
 		// Assemble everything
-		controlsContainer.appendChild(fontGroup);
-		controlsContainer.appendChild(widthGroup);
-		controlsContainer.appendChild(lineHeightGroup);
+		const typographyGroup = doc.createElement("div");
+		typographyGroup.className = "obsidian-reader-settings-typography-group";
+		typographyGroup.appendChild(fontGroup);
+		typographyGroup.appendChild(widthGroup);
+		typographyGroup.appendChild(lineHeightGroup);
+		controlsContainer.appendChild(typographyGroup);
 
 		const spacer = doc.createElement("div");
 		spacer.className = "obsidian-reader-settings-spacer";
@@ -891,33 +987,58 @@ export class Reader {
 		}
 	}
 
+	private static getStickyOffset(): number {
+		const player = document.querySelector(
+			".pin-player"
+		) as HTMLElement | null;
+		if (player) return player.getBoundingClientRect().height + 16;
+		// When pin-player is off, the toggles bar is sticky independently
+		const toggles = document.querySelector(
+			"article > .player-toggles"
+		) as HTMLElement | null;
+		if (toggles) return toggles.getBoundingClientRect().height + 32;
+		return 0;
+	}
+
+	private static scrollToElement(el: Element): void {
+		const rect = el.getBoundingClientRect();
+		const stickyOffset = this.getStickyOffset();
+		const gap =
+			stickyOffset > 0
+				? stickyOffset + window.innerHeight * 0.02
+				: window.innerHeight * 0.05;
+		const targetY =
+			(window.pageYOffset || document.documentElement.scrollTop) +
+			rect.top -
+			gap;
+		this.scrollTo(targetY);
+	}
+
 	private static scrollTo(targetY: number, duration = 200): void {
 		const startY = window.pageYOffset;
 		const distance = targetY - startY;
 		if (Math.abs(distance) < 1) return;
 		const startTime = performance.now();
+		this.programmaticScroll = true;
 
 		const step = (now: number) => {
 			const elapsed = now - startTime;
 			const t = Math.min(elapsed / duration, 1);
 			const ease = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
 			window.scrollTo(0, startY + distance * ease);
-			if (t < 1) requestAnimationFrame(step);
+			if (t < 1) {
+				requestAnimationFrame(step);
+			} else {
+				setTimeout(() => {
+					Reader.programmaticScroll = false;
+				}, 50);
+			}
 		};
 
 		requestAnimationFrame(step);
 	}
 
-	private static async extractContent(doc: Document): Promise<{
-		content: string;
-		title?: string;
-		author?: string;
-		published?: string;
-		domain?: string;
-		wordCount?: number;
-		parseTime?: number;
-		extractorType?: string;
-	}> {
+	private static async extractContent(doc: Document): Promise<ReaderContent> {
 		const defuddle = new Defuddle(doc, { url: doc.URL });
 		const defuddled = await defuddle.parseAsync();
 
@@ -1019,15 +1140,11 @@ export class Reader {
 			const item = doc.createElement("div");
 			item.className = `obsidian-reader-outline-item obsidian-reader-outline-${heading.tagName.toLowerCase()}`;
 			item.setAttribute("data-depth", depth.toString());
+			item.setAttribute("data-heading-id", heading.id);
 			item.textContent = heading.textContent;
 
 			item.addEventListener("click", () => {
-				const rect = heading.getBoundingClientRect();
-				const targetY =
-					(window.pageYOffset || doc.documentElement.scrollTop) +
-					rect.top -
-					window.innerHeight * 0.05;
-				this.scrollTo(targetY);
+				this.scrollToElement(heading);
 			});
 
 			outline.appendChild(item);
@@ -1037,39 +1154,73 @@ export class Reader {
 			lastHeadingAtLevel[level] = { element: heading, depth };
 		});
 
-		// Set up intersection observer for headings
-		const observerCallback = (entries: IntersectionObserverEntry[]) => {
-			entries.forEach((entry) => {
-				const heading = entry.target;
-				const item = outlineItems.get(heading);
-
-				if (entry.isIntersecting) {
-					// Remove active state from all items
-					outlineItems.forEach((outlineItem) => {
-						outlineItem.classList.remove("active");
-					});
-					item?.classList.add("active");
-
-					// Update faint state for all items
-					outlineItems.forEach((outlineItem, itemHeading) => {
-						const headingRect = itemHeading.getBoundingClientRect();
-						const currentHeadingRect =
-							heading.getBoundingClientRect();
-
-						if (headingRect.top < currentHeadingRect.top) {
-							outlineItem.classList.add("faint");
-						} else {
-							outlineItem.classList.remove("faint");
-						}
-					});
+		const setActiveOutlineItem = (heading: Element) => {
+			const item = outlineItems.get(heading);
+			if (!item) return;
+			outlineItems.forEach((outlineItem) => {
+				outlineItem.classList.remove("active");
+			});
+			item.classList.add("active");
+			const currentHeadingTop = heading.getBoundingClientRect().top;
+			outlineItems.forEach((outlineItem, itemHeading) => {
+				if (
+					itemHeading.getBoundingClientRect().top < currentHeadingTop
+				) {
+					outlineItem.classList.add("faint");
+				} else {
+					outlineItem.classList.remove("faint");
 				}
 			});
 		};
 
-		const observer = new IntersectionObserver(observerCallback, {
-			rootMargin: "-5% 0px -85% 0px", // Triggers when heading is in top 20% of viewport
-			threshold: 0,
-		});
+		// Set up intersection observer for headings
+		const allHeadings = [titleHeading, ...headings].filter(
+			Boolean
+		) as Element[];
+		const observerCallback = (entries: IntersectionObserverEntry[]) => {
+			entries.forEach((entry) => {
+				if (entry.isIntersecting) {
+					setActiveOutlineItem(entry.target);
+				} else if (
+					entry.rootBounds &&
+					entry.boundingClientRect.top > entry.rootBounds.bottom
+				) {
+					// Heading exited the zone going down (user scrolling up)
+					// Activate the heading above it
+					const idx = allHeadings.indexOf(entry.target);
+					if (idx > 0) {
+						setActiveOutlineItem(allHeadings[idx - 1]);
+					}
+				}
+			});
+		};
+
+		const createOutlineObserver = () => {
+			const stickyOffset = this.getStickyOffset();
+			const topPercent =
+				stickyOffset > 0
+					? Math.round((stickyOffset / window.innerHeight) * 100 + 2)
+					: 5;
+			const bottomPercent = 100 - topPercent - 15;
+			return new IntersectionObserver(observerCallback, {
+				rootMargin: `-${topPercent}% 0px -${bottomPercent}% 0px`,
+				threshold: 0,
+			});
+		};
+
+		let observer = createOutlineObserver();
+
+		// Recreate observer when sticky player appears/resizes
+		const pinPlayer = doc.querySelector(".pin-player");
+		if (pinPlayer) {
+			const resizeObserver = new ResizeObserver(() => {
+				observer.disconnect();
+				observer = createOutlineObserver();
+				if (titleHeading) observer.observe(titleHeading);
+				headings.forEach((heading) => observer.observe(heading));
+			});
+			resizeObserver.observe(pinPlayer);
+		}
 
 		if (titleHeading) {
 			observer.observe(titleHeading);
@@ -1087,12 +1238,7 @@ export class Reader {
 			item.textContent = getMessage("readerFootnotes");
 
 			item.addEventListener("click", () => {
-				const rect = footnotes.getBoundingClientRect();
-				const targetY =
-					(window.pageYOffset || doc.documentElement.scrollTop) +
-					rect.top -
-					window.innerHeight * 0.05;
-				this.scrollTo(targetY);
+				this.scrollToElement(footnotes);
 			});
 
 			outline.appendChild(item);
@@ -1100,10 +1246,68 @@ export class Reader {
 			observer.observe(footnotes);
 		}
 
+		// Populate mobile outline overlay
+		const outlineOverlay = doc.querySelector(
+			".obsidian-reader-outline-overlay"
+		) as HTMLElement;
+		const outlineBtn = doc.querySelector(".nav-btn-outline") as HTMLElement;
+		if (outlineOverlay && outlineBtn) {
+			outlineBtn.classList.remove("is-hidden");
+			outlineOverlay.textContent = "";
+
+			const closeOutline = () => {
+				outlineOverlay.classList.remove("is-open");
+				outlineBtn.classList.remove("is-active");
+				doc.body.style.overflow = "";
+			};
+
+			const outlineItemsList = outline.querySelectorAll(
+				".obsidian-reader-outline-item"
+			);
+			const headingEntries = Array.from(outlineItems.entries());
+
+			outlineItemsList.forEach((item, index) => {
+				const clone = item.cloneNode(true) as HTMLElement;
+				clone.addEventListener("click", () => {
+					closeOutline();
+
+					// Find the heading element for this outline item
+					const entry = headingEntries[index];
+					if (entry) {
+						const [heading] = entry;
+						const rect = heading.getBoundingClientRect();
+						const navOffset = 80;
+						const targetY =
+							(window.pageYOffset ||
+								doc.documentElement.scrollTop) +
+							rect.top -
+							navOffset;
+						this.scrollTo(Math.max(0, targetY));
+
+						// Keep nav visible after scrolling
+						setTimeout(() => {
+							window.dispatchEvent(new Event("reader-show-nav"));
+						}, 250);
+					}
+				});
+				outlineOverlay.appendChild(clone);
+
+				// Sync active/faint classes from sidebar outline to overlay clone
+				new MutationObserver(() => {
+					clone.className = (item as HTMLElement).className;
+				}).observe(item, {
+					attributes: true,
+					attributeFilter: ["class"],
+				});
+			});
+		}
+
 		return observer;
 	}
 
 	private static observer: IntersectionObserver | null = null;
+	private static highlighterObserver: MutationObserver | null = null;
+	private static themeModeObserver: MutationObserver | null = null;
 	private static activePopover: HTMLElement | null = null;
 	private static activeFootnoteLink: HTMLAnchorElement | null = null;
 
@@ -1155,7 +1359,8 @@ export class Reader {
 					const targetY =
 						(window.pageYOffset || doc.documentElement.scrollTop) +
 						rect.top -
-						window.innerHeight * 0.4;
+						window.innerHeight * 0.4 -
+						this.getStickyOffset();
 					this.scrollTo(targetY);
 				}
 				return;
@@ -1255,7 +1460,8 @@ export class Reader {
 		link: HTMLAnchorElement
 	) {
 		const ARROW_HEIGHT = 16; // Height of the arrow
-		const VIEWPORT_PADDING = 20; // Minimum distance from viewport edges
+		const isMobile = window.matchMedia("(pointer: coarse)").matches;
+		const VIEWPORT_PADDING = isMobile ? 40 : 20; // Minimum distance from viewport edges
 		const VERTICAL_SPACING = 8; // Space between popover and link
 
 		const linkRect = link.getBoundingClientRect();
@@ -1379,11 +1585,15 @@ export class Reader {
 			);
 			scripts.forEach((el) => el.remove());
 
-			// Replace body with a clone to remove all event listeners
-			const newBody = doc.body.cloneNode(true);
-			doc.body.parentNode?.replaceChild(newBody, doc.body);
+			// Replace body with a clone to remove all event listeners.
+			// Skip when the clipper iframe is present — cloning creates a
+			// new iframe element which reloads and loses user edits.
+			if (!doc.getElementById("obsidian-clipper-container")) {
+				const newBody = doc.body.cloneNode(true);
+				doc.body.parentNode?.replaceChild(newBody, doc.body);
+			}
 
-			// Block common ad/tracking domains
+			// Block inline event handlers and dynamic scripts
 			const meta = doc.createElement("meta");
 			meta.httpEquiv = "Content-Security-Policy";
 			meta.content = "script-src 'none'; object-src 'none';";
@@ -2054,11 +2264,11 @@ export class Reader {
 	}
 
 	static async apply(doc: Document) {
+		let resolveViewTransition: (() => void) | undefined;
 		try {
 			await initializeI18n();
 
-			// Store original HTML for restoration
-			this.originalHTML = doc.documentElement.outerHTML;
+			this.hasApplied = true;
 
 			// Clipper iframe container
 			const clipperIframeContainer = doc.getElementById(
@@ -2071,19 +2281,62 @@ export class Reader {
 			// Capture YouTube video state before cleanup destroys the player
 			let videoTimestamp = 0;
 			let videoWasPlaying = false;
+			let youtubeVideoElement: HTMLVideoElement | null = null;
 			const host = doc.URL ? new URL(doc.URL).hostname : "";
 			const isYouTube =
 				host.includes("youtube.com") || host.includes("youtu.be");
+			// Browser type is only needed for YouTube-specific behavior
+			const browserType = isYouTube ? await detectBrowser() : "";
 			if (isYouTube) {
 				const videoElement = doc.querySelector("video");
 				if (videoElement) {
 					videoTimestamp = Math.floor(videoElement.currentTime);
 					videoWasPlaying = !videoElement.paused;
+					// Chrome's iframe embed works via declarativeNetRequest.
+					// Safari/Firefox can't modify headers, so we preserve
+					// the native video element instead.
+					if (browserType !== "chrome") {
+						youtubeVideoElement = videoElement;
+						videoElement.remove();
+					}
 				}
 			}
 
-			// Flatten shadow DOM content before cleanup removes scripts
+			let spinner: HTMLElement;
+			let article: HTMLElement;
+			let main: HTMLElement;
+			let footer: HTMLElement;
+
+			// Flatten shadow DOM before cloning (cloneNode doesn't copy shadow DOM)
 			await flattenShadowDomUtil(doc);
+
+			// Clone document and start Defuddle before the view transition
+			// so content extraction runs during the crossfade animation
+			const docClone = doc.cloneNode(true) as Document;
+			docClone.getElementById("obsidian-clipper-container")?.remove();
+			Object.defineProperty(docClone, "URL", {
+				value: doc.URL,
+				configurable: true,
+			});
+			const contentPromise = this.extractContent(docClone);
+
+			// Use view transition for smooth crossfade into reader mode
+			if ("startViewTransition" in document) {
+				await new Promise<void>((resolve) => {
+					try {
+						const vt = (document as any).startViewTransition(() => {
+							resolve();
+							return new Promise<void>((r) => {
+								resolveViewTransition = r;
+							});
+						});
+						vt.ready.catch(() => {});
+						vt.finished.catch(() => {});
+					} catch {
+						resolve();
+					}
+				});
+			}
 
 			// Remove page scripts and their effects
 			this.cleanupScripts(doc);
@@ -2102,16 +2355,6 @@ export class Reader {
 			if (lang) htmlElement.setAttribute("lang", lang);
 			if (dir) htmlElement.setAttribute("dir", dir);
 
-			// Clone document for Defuddle before we clear the body
-			const docClone = doc.cloneNode(true) as Document;
-			// Preserve the URL for Defuddle's extractors
-			Object.defineProperty(docClone, "URL", {
-				value: doc.URL,
-				configurable: true,
-			});
-			// Start content extraction on the clone (don't await yet)
-			const contentPromise = this.extractContent(docClone);
-
 			// Clean up head - remove unwanted elements but keep meta tags and non-stylesheet links
 			const head = doc.head;
 
@@ -2119,14 +2362,19 @@ export class Reader {
 			const baseTags = head.querySelectorAll("base");
 			baseTags.forEach((el) => el.remove());
 
-			// Remove stylesheet links and style tags, except reader styles
+			// Remove stylesheet links and style tags, except reader and extension styles
 			const styleElements = head.querySelectorAll(
 				'link[rel="stylesheet"], link[as="style"], style'
 			);
 			styleElements.forEach((el) => {
-				if (el.id !== "obsidian-reader-styles") {
-					el.remove();
-				}
+				if (el.id === "obsidian-reader-styles") return;
+				// Preserve extension-injected styles (clipper, highlighter)
+				if (
+					el instanceof HTMLStyleElement &&
+					el.textContent?.includes("obsidian-clipper")
+				)
+					return;
+				el.remove();
 			});
 
 			// Re-add reader CSS as a link element after cleanup
@@ -2161,7 +2409,17 @@ export class Reader {
 				head.insertBefore(charset, head.firstChild);
 			}
 
-			doc.body.textContent = "";
+			// Clear body children, preserving the clipper iframe container
+			if (clipperIframeContainer) {
+				for (let i = doc.body.childNodes.length - 1; i >= 0; i--) {
+					const child = doc.body.childNodes[i];
+					if (child !== clipperIframeContainer) {
+						doc.body.removeChild(child);
+					}
+				}
+			} else {
+				doc.body.textContent = "";
+			}
 
 			// Create main container
 			const readerContainer = doc.createElement("div");
@@ -2169,7 +2427,7 @@ export class Reader {
 
 			// Create left sidebar
 			const leftSidebar = doc.createElement("div");
-			leftSidebar.className = "obsidian-left-sidebar";
+			leftSidebar.className = "obsidian-reader-left-sidebar";
 			const outline = doc.createElement("div");
 			outline.className = "obsidian-reader-outline";
 			leftSidebar.appendChild(outline);
@@ -2179,11 +2437,11 @@ export class Reader {
 			readerContent.className = "obsidian-reader-content";
 
 			// Create main element
-			const main = doc.createElement("main");
+			main = doc.createElement("main");
 
 			// Create article placeholder with loading spinner
-			const article = doc.createElement("article");
-			const spinner = doc.createElement("div");
+			article = doc.createElement("article");
+			spinner = doc.createElement("div");
 			spinner.className = "obsidian-reader-loading";
 			const spinnerText = doc.createElement("div");
 			spinnerText.className = "obsidian-reader-loading-text";
@@ -2195,7 +2453,7 @@ export class Reader {
 			readerContent.appendChild(main);
 
 			// Create footer (hidden until content loads)
-			const footer = doc.createElement("div");
+			footer = doc.createElement("div");
 			footer.className = "obsidian-reader-footer";
 			footer.style.display = "none";
 			readerContent.appendChild(footer);
@@ -2243,8 +2501,17 @@ export class Reader {
 			// Add settings bar
 			this.injectSettingsBar(doc);
 
-			// Re-attach the clipper iframe container if it exists
-			if (clipperIframeContainer) {
+			// Re-activate highlighter if it was active before entering Reader
+			if (doc.body.classList.contains("obsidian-highlighter-active")) {
+				toggleHighlighterMenu(true);
+			}
+
+			// Re-attach the clipper iframe container only if it was
+			// detached (not present when body clone was skipped)
+			if (
+				clipperIframeContainer &&
+				!doc.body.contains(clipperIframeContainer)
+			) {
 				doc.body.appendChild(clipperIframeContainer);
 			}
 
@@ -2271,6 +2538,11 @@ export class Reader {
 			);
 
 			this.isActive = true;
+
+			// Signal view transition that DOM update is complete
+			if (resolveViewTransition) {
+				resolveViewTransition();
+			}
 
 			// Now await content extraction and populate the page
 			const {
@@ -2324,11 +2596,14 @@ export class Reader {
 				}
 			}
 
-			const metadataItems = [
-				author ? author : "",
-				formattedDate || "",
-				domain ? domain : "",
-			].filter(Boolean);
+			const authors = author ? author.split(/,\s*/) : [];
+			const metadataItems: { text: string; type: string }[] = [
+				...authors.map((a) => ({ text: a, type: "author" })),
+				formattedDate ? { text: formattedDate, type: "date" } : null,
+				domain ? { text: domain, type: "domain" } : null,
+			].filter(
+				(item): item is { text: string; type: string } => item !== null
+			);
 
 			if (metadataItems.length > 0) {
 				const metadata = doc.createElement("div");
@@ -2344,13 +2619,16 @@ export class Reader {
 					}
 
 					const span = doc.createElement("span");
-					if (item === domain && domain) {
+					if (item.type === "author") {
+						span.className = "metadata-author";
+						span.textContent = item.text;
+					} else if (item.type === "domain" && domain) {
 						const link = doc.createElement("a");
 						link.href = doc.URL;
 						link.textContent = domain;
 						span.appendChild(link);
 					} else {
-						span.textContent = item;
+						span.textContent = item.text;
 					}
 					metadataDetails.appendChild(span);
 				});
@@ -2364,15 +2642,44 @@ export class Reader {
 			const contentDoc = parser.parseFromString(content, "text/html");
 			const contentBody = contentDoc.body;
 
-			// On YouTube, fix embed self-referrer blocking and resume playback state
+			// On YouTube, replace the Defuddle-generated iframe with the
+			// preserved native video element, or fall back to embed
 			if (isYouTube) {
 				const iframe = contentBody.querySelector(
 					'iframe[src*="youtube.com/embed/"]'
 				) as HTMLIFrameElement;
-				if (iframe) {
+				if (iframe && youtubeVideoElement) {
+					// Use the original video element instead of an iframe
+					youtubeVideoElement.className = "reader-video-player";
+					youtubeVideoElement.removeAttribute("style");
+					youtubeVideoElement.setAttribute("controls", "");
+					// YouTube's JS may keep resetting attributes —
+					// use a MutationObserver to enforce our settings
+					const videoObs = new MutationObserver(() => {
+						if (!youtubeVideoElement!.hasAttribute("controls")) {
+							youtubeVideoElement!.setAttribute("controls", "");
+						}
+						if (
+							youtubeVideoElement!.className !==
+							"reader-video-player"
+						) {
+							youtubeVideoElement!.className =
+								"reader-video-player";
+						}
+					});
+					videoObs.observe(youtubeVideoElement, {
+						attributes: true,
+						attributeFilter: ["controls", "class", "style"],
+					});
+					const videoWrapper = doc.createElement("div");
+					videoWrapper.className = "reader-video-wrapper";
+					videoWrapper.appendChild(youtubeVideoElement);
+					iframe.replaceWith(videoWrapper);
+				} else if (iframe) {
+					// Fallback: use embed with header modification (Chrome)
+					// or thumbnail (Safari)
 					const embedUrl = new URL(iframe.src);
 					const videoId = embedUrl.pathname.split("/").pop();
-					const browserType = await detectBrowser();
 					const isSafari = [
 						"safari",
 						"mobile-safari",
@@ -2380,8 +2687,6 @@ export class Reader {
 					].includes(browserType);
 
 					if (isSafari && videoId) {
-						// Safari can't modify request headers, so YouTube blocks
-						// self-referrer embeds. Show a clickable thumbnail instead.
 						const watchUrl =
 							"https://www.youtube.com/watch?v=" +
 							videoId +
@@ -2401,7 +2706,6 @@ export class Reader {
 							'<path d="M45 24L27 14v20" fill="white"/></svg>';
 						iframe.replaceWith(thumbnail);
 					} else {
-						// Chrome/Firefox: use direct embed with header modification
 						await browser.runtime
 							.sendMessage({
 								action: "enableYouTubeEmbedRule",
@@ -2429,6 +2733,31 @@ export class Reader {
 				article.appendChild(contentBody.firstChild);
 			}
 
+			// Store original article HTML before wireTranscript modifies
+			// the DOM (moves timestamps, wraps text, adds scrub track).
+			// Unwrap <span class="timestamp"> so Defuddle's markdown
+			// converter keeps the timestamp text inside <strong>.
+			const originalHtml = article.innerHTML.replace(
+				/<span class="timestamp"[^>]*>([^<]*)<\/span>/g,
+				"$1"
+			);
+			article.setAttribute("data-original-html", originalHtml);
+
+			wireTranscript(
+				doc,
+				article,
+				this.settings,
+				{
+					getStickyOffset: () => this.getStickyOffset(),
+					scrollTo: (y) => this.scrollTo(y),
+					programmaticScroll: () => this.programmaticScroll,
+				},
+				(key, value) => {
+					(this.settings as any)[key] = value;
+					this.saveSettings();
+				}
+			);
+
 			// Set extractor type
 			if (extractorType) {
 				doc.documentElement.setAttribute(
@@ -2454,6 +2783,14 @@ export class Reader {
 
 			// Initialize content-dependent features
 			this.observer = this.generateOutline(doc, title);
+			if (!this.observer) {
+				const leftSidebar = doc.querySelector(
+					".obsidian-reader-left-sidebar"
+				) as HTMLElement;
+				if (leftSidebar) {
+					leftSidebar.classList.add("is-empty");
+				}
+			}
 			this.initializeFootnotes(doc);
 			this.initializeCodeHighlighting(doc);
 			this.initializeCopyButtons(doc);
@@ -2466,77 +2803,46 @@ export class Reader {
 			applyHighlights();
 		} catch (e) {
 			console.error("Reader", "Error during apply:", e);
+			if (resolveViewTransition) resolveViewTransition();
 		}
 	}
 
-	static restore(doc: Document) {
-		if (this.originalHTML) {
-			// Disconnect the observer if it exists
-			if (this.observer) {
-				this.observer.disconnect();
-				this.observer = null;
-			}
-
-			// Remove color scheme media query listener
-			if (this.colorSchemeMediaQuery) {
-				this.colorSchemeMediaQuery.removeEventListener("change", (e) =>
-					this.handleColorSchemeChange(e, doc)
-				);
-				this.colorSchemeMediaQuery = null;
-			}
-
-			// Hide any active footnote popover
-			this.hideFootnotePopover();
-
-			// Clean up YouTube embed referer rule if it was enabled
-			const host = doc.URL ? new URL(doc.URL).hostname : "";
-			if (host.includes("youtube.com") || host.includes("youtu.be")) {
-				browser.runtime
-					.sendMessage({ action: "disableYouTubeEmbedRule" })
-					.catch(() => {});
-			}
-
-			// Remove lightbox
-			if (this.lightbox) {
-				this.lightbox.remove();
-				this.lightbox = null;
-			}
-
-			// Remove reader styles
-			if (this.readerStyles) {
-				this.readerStyles.remove();
-				this.readerStyles = null;
-			}
-
-			const parser = new DOMParser();
-			const newDoc = parser.parseFromString(
-				this.originalHTML,
-				"text/html"
-			);
-			doc.replaceChild(newDoc.documentElement, doc.documentElement);
-
-			this.originalHTML = null;
-			this.settingsBar = null;
-			const outline = doc.querySelector(".obsidian-reader-outline");
-			if (outline) {
-				outline.remove();
-			}
+	static async restore(doc: Document) {
+		if (this.hasApplied) {
+			this.hasApplied = false;
 			this.isActive = false;
 
-			// Reapply highlights after restoring original content
-			if (
-				typeof window !== "undefined" &&
-				window.hasOwnProperty("applyHighlights")
-			) {
-				(window as any).applyHighlights();
+			// Send all messages to background before reloading
+			const messages: Promise<any>[] = [
+				browser.runtime
+					.sendMessage({
+						action: "readerModeChanged",
+						isActive: false,
+					})
+					.catch(() => {}),
+			];
+
+			const host = doc.URL ? new URL(doc.URL).hostname : "";
+			if (host.includes("youtube.com") || host.includes("youtu.be")) {
+				messages.push(
+					browser.runtime
+						.sendMessage({ action: "disableYouTubeEmbedRule" })
+						.catch(() => {})
+				);
 			}
+
+			await Promise.all(messages);
+			window.location.reload();
 		}
 	}
 
 	static async toggle(doc: Document): Promise<boolean> {
 		if (this.isActive) {
-			this.restore(doc);
-			return false;
+			await this.restore(doc);
+			// restore() triggers a page reload — return a promise that
+			// never resolves to prevent further DOM changes (like
+			// removing reader classes) that would flash before reload
+			return new Promise(() => {});
 		} else {
 			await this.apply(doc);
 			return true;

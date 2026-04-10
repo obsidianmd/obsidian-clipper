@@ -288,6 +288,7 @@ async function initializeExtension(tabId: number) {
 
 		// Setup message listeners
 		setupMessageListeners();
+		setupStorageListeners();
 
 		await checkHighlighterModeState(tabId);
 
@@ -297,6 +298,22 @@ async function initializeExtension(tabId: number) {
 		showError("failedToInitialize");
 		return false;
 	}
+}
+
+const debouncedHighlightRefresh = debounce(() => {
+	if (currentTabId !== undefined) {
+		memoizedExtractPageContent.clear();
+		memoizedCompileTemplate.clear();
+		refreshFields(currentTabId, { checkTemplateTriggers: false, rebuildSkeleton: false });
+	}
+}, 300);
+
+function setupStorageListeners() {
+	browser.storage.local.onChanged.addListener((changes) => {
+		if (changes.highlights) {
+			debouncedHighlightRefresh();
+		}
+	});
 }
 
 function setupMessageListeners() {
@@ -406,9 +423,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 		const currentBrowser = await detectBrowser();
 		const isMobile = currentBrowser === "mobile-safari";
 
-		const openBehavior: Settings["openBehavior"] = isMobile
-			? "popup"
-			: loadedSettings.openBehavior;
+		const openBehavior: Settings['openBehavior'] = isMobile && loadedSettings.openBehavior !== 'reader' ? 'popup' : loadedSettings.openBehavior;
 
 		// Check if we should open in an iframe, but only if the URL is valid
 		if (
@@ -435,17 +450,38 @@ document.addEventListener("DOMContentLoaded", async function () {
 			}
 		}
 
+		// Check if we should open in reader mode
+		if (isValidUrl(tab.url) && !isBlankPage(tab.url) && openBehavior === 'reader' && !isIframe && !isSidePanel) {
+			try {
+				const response = await browser.runtime.sendMessage({
+					action: "toggleReaderMode",
+					tabId: currentTabId
+				}) as ReaderModeResponse;
+				if (response && response.success) {
+					window.close();
+					return;
+				}
+			} catch (error) {
+				console.error('Error toggling reader mode:', error);
+				// If there's an error, we'll fall through and open the normal popup.
+			}
+		}
+
 		// Connect to the background script for communication
 		browser.runtime.connect({ name: "popup" });
 
 		// Setup event listeners for popup buttons
 		const refreshButton = document.getElementById("refresh-pane");
 		if (refreshButton) {
-			refreshButton.addEventListener("click", (e) => {
-				e.preventDefault();
-				refreshPopup();
-				initializeIcons(refreshButton);
-			});
+			if (isIframe) {
+				refreshButton.style.display = 'none';
+			} else {
+				refreshButton.addEventListener('click', (e) => {
+					e.preventDefault();
+					refreshPopup();
+					initializeIcons(refreshButton);
+				});
+			}
 		}
 		const settingsButton = document.getElementById("open-settings");
 		if (settingsButton) {
@@ -716,11 +752,13 @@ function setupEventListeners(tabId: number) {
 				});
 			} else {
 				// Test if we can share files (only on Safari)
-				const testFile = new File(["test"], "test.txt", {
-					type: "text/plain",
-				});
-				const testShare = { files: [testFile] };
-				if (!navigator.canShare(testShare)) {
+				try {
+					const testFile = new File(["test"], "test.txt", { type: "text/plain" });
+					const testShare = { files: [testFile] };
+					if (!navigator.canShare(testShare)) {
+						throw new Error('canShare returned false');
+					}
+				} catch {
 					shareButtonElements.forEach((button) => {
 						const parentElement = button.closest(
 							".share-btn, .menu-item"
@@ -736,9 +774,8 @@ function setupEventListeners(tabId: number) {
 
 	const readerModeButton = document.getElementById("reader-mode");
 	if (readerModeButton) {
-		readerModeButton.addEventListener("click", () =>
-			toggleReaderMode(tabId)
-		);
+		readerModeButton.addEventListener('click', () => toggleReaderMode(tabId));
+		checkReaderModeState(tabId);
 	}
 }
 
@@ -836,10 +873,7 @@ async function waitForInterpreter(
 	});
 }
 
-async function refreshFields(
-	tabId: number,
-	checkTemplateTriggers: boolean = true
-) {
+async function refreshFields(tabId: number, { checkTemplateTriggers = true, rebuildSkeleton = true }: { checkTemplateTriggers?: boolean; rebuildSkeleton?: boolean } = {}) {
 	if (templates.length === 0) {
 		console.warn("No templates available");
 		showError("noTemplates");
@@ -882,9 +916,10 @@ async function refreshFields(
 			}
 		}
 
-		// Show template skeleton immediately
-		buildTemplateFieldsSkeleton(currentTemplate);
-		setupMetadataToggle();
+		if (rebuildSkeleton) {
+			buildTemplateFieldsSkeleton(currentTemplate);
+			setupMetadataToggle();
+		}
 
 		const extractedData = await extractionPromise;
 		if (extractedData) {
@@ -1537,9 +1572,28 @@ function refreshPopup() {
 }
 
 function handleTemplateChange(templateId: string) {
-	currentTemplate =
-		templates.find((t) => t.id === templateId) || templates[0];
-	refreshFields(currentTabId!, false);
+	currentTemplate = templates.find(t => t.id === templateId) || templates[0];
+	refreshFields(currentTabId!, { checkTemplateTriggers: false });
+}
+
+async function checkReaderModeState(tabId: number) {
+	try {
+		// Query the actual page DOM via content script rather than
+		// relying on background state, which can be stale across tabs
+		const response = await browser.runtime.sendMessage({
+			action: "sendMessageToTab",
+			tabId: tabId,
+			message: { action: "getReaderModeState" }
+		}) as { isActive: boolean } | undefined;
+
+		const readerButton = document.getElementById('reader-mode');
+		if (readerButton) {
+			readerButton.classList.toggle('active', response?.isActive ?? false);
+		}
+	} catch (error) {
+		// Tab may not have content script loaded yet
+		console.error('Error checking reader mode state:', error);
+	}
 }
 
 async function checkHighlighterModeState(tabId: number) {
@@ -1591,15 +1645,10 @@ function updateHighlighterModeUI(isActive: boolean) {
 	const highlighterModeButton = document.getElementById("highlighter-mode");
 	if (highlighterModeButton) {
 		if (generalSettings.highlighterEnabled) {
-			highlighterModeButton.style.display = "flex";
-			highlighterModeButton.classList.toggle("active", isActive);
-			highlighterModeButton.setAttribute(
-				"aria-pressed",
-				isActive.toString()
-			);
-			highlighterModeButton.title = isActive
-				? getMessage("disableHighlighter")
-				: getMessage("enableHighlighter");
+			highlighterModeButton.style.display = 'flex';
+			highlighterModeButton.classList.toggle('active', isActive);
+			highlighterModeButton.setAttribute('aria-pressed', isActive.toString());
+			highlighterModeButton.title = isActive ? getMessage('disableHighlighter') : getMessage('highlighterOn');
 		} else {
 			highlighterModeButton.style.display = "none";
 		}
@@ -1625,8 +1674,8 @@ async function toggleReaderMode(tabId: number) {
 			}
 		}
 
-		// Close the popup if not in side panel
-		if (!isSidePanel) {
+		// Close the popup if not in side panel or iframe
+		if (!isSidePanel && !isIframe) {
 			window.close();
 		}
 	} catch (error) {

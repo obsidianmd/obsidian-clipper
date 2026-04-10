@@ -253,10 +253,10 @@
 		"message": "Are you sure you want to delete this provider?"
 	},
 	"disableHighlighter": {
-		"message": "Disable highlighter"
+		"message": "Turn off highlighter"
 	},
 	"disableReader": {
-		"message": "Disable reader"
+		"message": "Turn off reader"
 	},
 	"done": {
 		"message": "Done"
@@ -292,9 +292,6 @@
 	},
 	"embedded": {
 		"message": "Embedded"
-	},
-	"enableHighlighter": {
-		"message": "Enable highlighter"
 	},
 	"enableHighlighterDescription": {
 		"message": "Highlight content on web pages that you can save to Obsidian."
@@ -439,6 +436,9 @@
 		"message": "Highlight page"
 	},
 	"highlighter": {
+		"message": "Highlighter"
+	},
+	"highlighterOn": {
 		"message": "Highlighter"
 	},
 	"highlighterSettings": {
@@ -759,6 +759,12 @@
 	"readerAppearanceLight": {
 		"message": "Light"
 	},
+	"readerAutoScroll": {
+		"message": "Auto-scroll"
+	},
+	"readerAutoScrollDescription": {
+		"message": "Automatically scroll the transcript to follow playback."
+	},
 	"readerBlendImages": {
 		"message": "Blend images"
 	},
@@ -776,6 +782,9 @@
 	},
 	"readerColorSchemeDefault": {
 		"message": "Default"
+	},
+	"readerCurrentPosition": {
+		"message": "Current position"
 	},
 	"readerCustomCss": {
 		"message": "Custom CSS"
@@ -828,6 +837,12 @@
 	"readerFootnotes": {
 		"message": "Footnotes"
 	},
+	"readerHighlightActiveLine": {
+		"message": "Highlight active line"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "Highlight the current sentence in the transcript during playback."
+	},
 	"readerImages": {
 		"message": "Images"
 	},
@@ -840,6 +855,15 @@
 	"readerLoading": {
 		"message": "Defuddling…"
 	},
+	"readerOn": {
+		"message": "Reader"
+	},
+	"readerPinPlayer": {
+		"message": "Pin player"
+	},
+	"readerPinPlayerDescription": {
+		"message": "Keep the video player visible while scrolling through the transcript."
+	},
 	"readerSettings": {
 		"message": "Reader settings"
 	},
@@ -851,6 +875,9 @@
 	},
 	"readerThemeSection": {
 		"message": "Theme"
+	},
+	"readerTranscripts": {
+		"message": "Transcripts"
 	},
 	"readerTypography": {
 		"message": "Typography"

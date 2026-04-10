@@ -209,9 +209,6 @@
 	"embedded": {
 		"message": "嵌入式"
 	},
-	"enableHighlighter": {
-		"message": "启用高亮"
-	},
 	"enableHighlighterDescription": {
 		"message": "在网页上高亮内容并保存到 Obsidian。"
 	},
@@ -355,6 +352,9 @@
 		"message": "高亮页面"
 	},
 	"highlighter": {
+		"message": "高亮"
+	},
+	"highlighterOn": {
 		"message": "高亮"
 	},
 	"highlighterSettings": {
@@ -675,6 +675,12 @@
 	"readerAppearanceLight": {
 		"message": "浅色"
 	},
+	"readerAutoScroll": {
+		"message": "自动滚动"
+	},
+	"readerAutoScrollDescription": {
+		"message": "自动滚动字幕稿以跟随播放进度。"
+	},
 	"readerBlendImages": {
 		"message": "融合图片"
 	},
@@ -692,6 +698,9 @@
 	},
 	"readerColorSchemeDefault": {
 		"message": "默认"
+	},
+	"readerCurrentPosition": {
+		"message": "当前位置"
 	},
 	"readerCustomCss": {
 		"message": "自定义 CSS"
@@ -744,6 +753,12 @@
 	"readerFootnotes": {
 		"message": "脚注"
 	},
+	"readerHighlightActiveLine": {
+		"message": "高亮当前行"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "播放时在字幕稿中高亮当前句子。"
+	},
 	"readerImages": {
 		"message": "图片"
 	},
@@ -756,6 +771,15 @@
 	"readerLoading": {
 		"message": "正在净化…"
 	},
+	"readerOn": {
+		"message": "阅读器"
+	},
+	"readerPinPlayer": {
+		"message": "固定播放器"
+	},
+	"readerPinPlayerDescription": {
+		"message": "滚动字幕稿时保持视频播放器可见。"
+	},
 	"readerSettings": {
 		"message": "阅读器设置"
 	},
@@ -767,6 +791,9 @@
 	},
 	"readerThemeSection": {
 		"message": "主题"
+	},
+	"readerTranscripts": {
+		"message": "字幕稿"
 	},
 	"readerTypography": {
 		"message": "排版"

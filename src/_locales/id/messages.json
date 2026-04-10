@@ -209,9 +209,6 @@
 	"embedded": {
 		"message": "Tersemat"
 	},
-	"enableHighlighter": {
-		"message": "Aktifkan sorotan"
-	},
 	"enableHighlighterDescription": {
 		"message": "Sorot konten di laman web yang dapat disimpan ke Obsidian."
 	},
@@ -355,6 +352,9 @@
 		"message": "Sorot laman web"
 	},
 	"highlighter": {
+		"message": "Penyorot"
+	},
+	"highlighterOn": {
 		"message": "Penyorot"
 	},
 	"highlighterSettings": {
@@ -675,6 +675,12 @@
 	"readerAppearanceLight": {
 		"message": "Terang"
 	},
+	"readerAutoScroll": {
+		"message": "Gulir otomatis"
+	},
+	"readerAutoScrollDescription": {
+		"message": "Gulir transkrip secara otomatis untuk mengikuti pemutaran."
+	},
 	"readerBlendImages": {
 		"message": "Padukan gambar"
 	},
@@ -692,6 +698,9 @@
 	},
 	"readerColorSchemeDefault": {
 		"message": "Default"
+	},
+	"readerCurrentPosition": {
+		"message": "Posisi saat ini"
 	},
 	"readerCustomCss": {
 		"message": "CSS kustom"
@@ -744,6 +753,12 @@
 	"readerFootnotes": {
 		"message": "Catatan kaki"
 	},
+	"readerHighlightActiveLine": {
+		"message": "Sorot baris aktif"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "Sorot kalimat saat ini di transkrip selama pemutaran."
+	},
 	"readerImages": {
 		"message": "Gambar"
 	},
@@ -756,6 +771,15 @@
 	"readerLoading": {
 		"message": "Mengurai…"
 	},
+	"readerOn": {
+		"message": "Mode pembaca"
+	},
+	"readerPinPlayer": {
+		"message": "Sematkan pemutar"
+	},
+	"readerPinPlayerDescription": {
+		"message": "Tetap tampilkan pemutar video saat menggulir transkrip."
+	},
 	"readerSettings": {
 		"message": "Pengaturan pembaca"
 	},
@@ -767,6 +791,9 @@
 	},
 	"readerThemeSection": {
 		"message": "Tema"
+	},
+	"readerTranscripts": {
+		"message": "Transkrip"
 	},
 	"readerTypography": {
 		"message": "Tipografi"

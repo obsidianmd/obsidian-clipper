@@ -209,9 +209,6 @@
 	"embedded": {
 		"message": "Vložené"
 	},
-	"enableHighlighter": {
-		"message": "Zapnúť zvýrazňovač"
-	},
 	"enableHighlighterDescription": {
 		"message": "Zvýrazňujte obsah na webových stránkach, ktorý môžete uložiť do Obsidianu."
 	},
@@ -355,6 +352,9 @@
 		"message": "Zvýrazniť stránku"
 	},
 	"highlighter": {
+		"message": "Zvýrazňovač"
+	},
+	"highlighterOn": {
 		"message": "Zvýrazňovač"
 	},
 	"highlighterSettings": {
@@ -675,6 +675,12 @@
 	"readerAppearanceLight": {
 		"message": "Svetlý"
 	},
+	"readerAutoScroll": {
+		"message": "Automatické posúvanie"
+	},
+	"readerAutoScrollDescription": {
+		"message": "Automaticky posúvať prepis tak, aby sledoval prehrávanie."
+	},
 	"readerBlendImages": {
 		"message": "Zlúčiť obrázky"
 	},
@@ -692,6 +698,9 @@
 	},
 	"readerColorSchemeDefault": {
 		"message": "Predvolené"
+	},
+	"readerCurrentPosition": {
+		"message": "Aktuálna pozícia"
 	},
 	"readerCustomCss": {
 		"message": "Vlastné CSS"
@@ -744,6 +753,12 @@
 	"readerFootnotes": {
 		"message": "Poznámky pod čiarou"
 	},
+	"readerHighlightActiveLine": {
+		"message": "Zvýrazniť aktívny riadok"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "Počas prehrávania zvýrazniť aktuálnu vetu v prepise."
+	},
 	"readerImages": {
 		"message": "Obrázky"
 	},
@@ -756,6 +771,15 @@
 	"readerLoading": {
 		"message": "Odstraňovanie balastu…"
 	},
+	"readerOn": {
+		"message": "Režim čítania"
+	},
+	"readerPinPlayer": {
+		"message": "Pripnúť prehrávač"
+	},
+	"readerPinPlayerDescription": {
+		"message": "Ponechať prehrávač videa viditeľný pri posúvaní prepisu."
+	},
 	"readerSettings": {
 		"message": "Nastavenia čítačky"
 	},
@@ -767,6 +791,9 @@
 	},
 	"readerThemeSection": {
 		"message": "Téma"
+	},
+	"readerTranscripts": {
+		"message": "Prepisy"
 	},
 	"readerTypography": {
 		"message": "Typografia"

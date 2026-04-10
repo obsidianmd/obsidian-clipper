@@ -209,9 +209,6 @@
 	"embedded": {
 		"message": "Inbäddad"
 	},
-	"enableHighlighter": {
-		"message": "Aktivera markering"
-	},
 	"enableHighlighterDescription": {
 		"message": "Markera innehåll på webbsidor som du kan spara till Obsidian."
 	},
@@ -356,6 +353,9 @@
 	},
 	"highlighter": {
 		"message": "Markering"
+	},
+	"highlighterOn": {
+		"message": "Överstrykningspenna"
 	},
 	"highlighterSettings": {
 		"message": "Markering"
@@ -675,6 +675,12 @@
 	"readerAppearanceLight": {
 		"message": "Ljust"
 	},
+	"readerAutoScroll": {
+		"message": "Automatisk rullning"
+	},
+	"readerAutoScrollDescription": {
+		"message": "Rulla automatiskt transkriptionen för att följa uppspelningen."
+	},
 	"readerBlendImages": {
 		"message": "Blanda in bilder"
 	},
@@ -692,6 +698,9 @@
 	},
 	"readerColorSchemeDefault": {
 		"message": "Standard"
+	},
+	"readerCurrentPosition": {
+		"message": "Aktuell position"
 	},
 	"readerCustomCss": {
 		"message": "Anpassad CSS"
@@ -744,6 +753,12 @@
 	"readerFootnotes": {
 		"message": "Fotnoter"
 	},
+	"readerHighlightActiveLine": {
+		"message": "Markera aktiv rad"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "Markera den aktuella meningen i transkriptionen under uppspelning."
+	},
 	"readerImages": {
 		"message": "Bilder"
 	},
@@ -756,6 +771,15 @@
 	"readerLoading": {
 		"message": "Rensar…"
 	},
+	"readerOn": {
+		"message": "Läsläge"
+	},
+	"readerPinPlayer": {
+		"message": "Fäst spelaren"
+	},
+	"readerPinPlayerDescription": {
+		"message": "Håll videospelaren synlig medan du rullar genom transkriptionen."
+	},
 	"readerSettings": {
 		"message": "Läsarinställningar"
 	},
@@ -767,6 +791,9 @@
 	},
 	"readerThemeSection": {
 		"message": "Tema"
+	},
+	"readerTranscripts": {
+		"message": "Transkriptioner"
 	},
 	"readerTypography": {
 		"message": "Typografi"

@@ -209,9 +209,6 @@
 	"embedded": {
 		"message": "埋め込み"
 	},
-	"enableHighlighter": {
-		"message": "ハイライトを有効化"
-	},
 	"enableHighlighterDescription": {
 		"message": "WebページのコンテンツをハイライトしてObsidianに保存できます。"
 	},
@@ -355,6 +352,9 @@
 		"message": "ページをハイライト"
 	},
 	"highlighter": {
+		"message": "ハイライト"
+	},
+	"highlighterOn": {
 		"message": "ハイライト"
 	},
 	"highlighterSettings": {
@@ -675,6 +675,12 @@
 	"readerAppearanceLight": {
 		"message": "ライト"
 	},
+	"readerAutoScroll": {
+		"message": "自動スクロール"
+	},
+	"readerAutoScrollDescription": {
+		"message": "再生に合わせて文字起こしを自動的にスクロールします。"
+	},
 	"readerBlendImages": {
 		"message": "画像を背景になじませる"
 	},
@@ -692,6 +698,9 @@
 	},
 	"readerColorSchemeDefault": {
 		"message": "デフォルト"
+	},
+	"readerCurrentPosition": {
+		"message": "現在位置"
 	},
 	"readerCustomCss": {
 		"message": "カスタムCSS"
@@ -744,6 +753,12 @@
 	"readerFootnotes": {
 		"message": "脚注"
 	},
+	"readerHighlightActiveLine": {
+		"message": "アクティブ行をハイライト"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "再生中に文字起こし内の現在の文をハイライトします。"
+	},
 	"readerImages": {
 		"message": "画像"
 	},
@@ -756,6 +771,15 @@
 	"readerLoading": {
 		"message": "読みやすくしています…"
 	},
+	"readerOn": {
+		"message": "リーダー"
+	},
+	"readerPinPlayer": {
+		"message": "プレーヤーを固定"
+	},
+	"readerPinPlayerDescription": {
+		"message": "文字起こしをスクロールしている間も動画プレーヤーを表示したままにします。"
+	},
 	"readerSettings": {
 		"message": "リーダー設定"
 	},
@@ -767,6 +791,9 @@
 	},
 	"readerThemeSection": {
 		"message": "テーマ"
+	},
+	"readerTranscripts": {
+		"message": "文字起こし"
 	},
 	"readerTypography": {
 		"message": "タイポグラフィ"

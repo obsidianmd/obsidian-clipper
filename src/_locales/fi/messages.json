@@ -209,9 +209,6 @@
 	"embedded": {
 		"message": "Upotettu"
 	},
-	"enableHighlighter": {
-		"message": "Ota korostustyökalu käyttöön"
-	},
 	"enableHighlighterDescription": {
 		"message": "Korosta verkkosivujen sisältöä, jonka voit tallentaa Obsidianiin"
 	},
@@ -356,6 +353,9 @@
 	},
 	"highlighter": {
 		"message": "Korostustyökalu"
+	},
+	"highlighterOn": {
+		"message": "Korostus"
 	},
 	"highlighterSettings": {
 		"message": "Korostustyökalu"
@@ -683,6 +683,12 @@
 	"readerAppearanceLight": {
 		"message": "Vaalea"
 	},
+	"readerAutoScroll": {
+		"message": "Automaattinen vieritys"
+	},
+	"readerAutoScrollDescription": {
+		"message": "Vieritä litterointia automaattisesti toiston mukana."
+	},
 	"readerBlendImages": {
 		"message": "Sulauta kuvat"
 	},
@@ -700,6 +706,9 @@
 	},
 	"readerColorSchemeDefault": {
 		"message": "Oletus"
+	},
+	"readerCurrentPosition": {
+		"message": "Nykyinen sijainti"
 	},
 	"readerCustomCss": {
 		"message": "Mukautettu CSS"
@@ -752,6 +761,12 @@
 	"readerFootnotes": {
 		"message": "Alaviitteet"
 	},
+	"readerHighlightActiveLine": {
+		"message": "Korosta aktiivinen rivi"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "Korosta litteroinnista nykyinen lause toiston aikana."
+	},
 	"readerImages": {
 		"message": "Kuvat"
 	},
@@ -764,6 +779,15 @@
 	"readerLoading": {
 		"message": "Selkeytetään…"
 	},
+	"readerOn": {
+		"message": "Lukutila"
+	},
+	"readerPinPlayer": {
+		"message": "Kiinnitä soitin"
+	},
+	"readerPinPlayerDescription": {
+		"message": "Pidä videosoitin näkyvissä, kun vierität litterointia."
+	},
 	"readerSettings": {
 		"message": "Lukijan asetukset"
 	},
@@ -775,6 +799,9 @@
 	},
 	"readerThemeSection": {
 		"message": "Teema"
+	},
+	"readerTranscripts": {
+		"message": "Litteroinnit"
 	},
 	"readerTypography": {
 		"message": "Typografia"

@@ -209,9 +209,6 @@
 	"embedded": {
 		"message": "Indlejret"
 	},
-	"enableHighlighter": {
-		"message": "Aktivér fremhævning"
-	},
 	"enableHighlighterDescription": {
 		"message": "Fremhæv indhold på websider for at gemme i Obsidian"
 	},
@@ -356,6 +353,9 @@
 	},
 	"highlighter": {
 		"message": "Fremhævning"
+	},
+	"highlighterOn": {
+		"message": "Overstregning"
 	},
 	"highlighterSettings": {
 		"message": "Fremhævning"
@@ -667,6 +667,12 @@
 	"readerAppearanceLight": {
 		"message": "Lys"
 	},
+	"readerAutoScroll": {
+		"message": "Automatisk rulning"
+	},
+	"readerAutoScrollDescription": {
+		"message": "Rul automatisk i transskriptionen for at følge afspilningen."
+	},
 	"readerBlendImages": {
 		"message": "Bland billeder"
 	},
@@ -684,6 +690,9 @@
 	},
 	"readerColorSchemeDefault": {
 		"message": "Standard"
+	},
+	"readerCurrentPosition": {
+		"message": "Nuværende position"
 	},
 	"readerCustomCss": {
 		"message": "Brugerdefineret CSS"
@@ -736,6 +745,12 @@
 	"readerFootnotes": {
 		"message": "Fodnoter"
 	},
+	"readerHighlightActiveLine": {
+		"message": "Fremhæv aktiv linje"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "Fremhæv den aktuelle sætning i transskriptionen under afspilning."
+	},
 	"readerImages": {
 		"message": "Billeder"
 	},
@@ -748,6 +763,15 @@
 	"readerLoading": {
 		"message": "Fjerner støj…"
 	},
+	"readerOn": {
+		"message": "Læser"
+	},
+	"readerPinPlayer": {
+		"message": "Fastgør afspiller"
+	},
+	"readerPinPlayerDescription": {
+		"message": "Hold videoafspilleren synlig, mens du ruller gennem transskriptionen."
+	},
 	"readerSettings": {
 		"message": "Læserindstillinger"
 	},
@@ -759,6 +783,9 @@
 	},
 	"readerThemeSection": {
 		"message": "Tema"
+	},
+	"readerTranscripts": {
+		"message": "Transskriptioner"
 	},
 	"readerTypography": {
 		"message": "Typografi"

@@ -209,9 +209,6 @@
 	"embedded": {
 		"message": "משולב"
 	},
-	"enableHighlighter": {
-		"message": "הפעל מסמן"
-	},
 	"enableHighlighterDescription": {
 		"message": "סמן תוכן בדפי אינטרנט שניתן לשמור ב-Obsidian"
 	},
@@ -356,6 +353,9 @@
 	},
 	"highlighter": {
 		"message": "מסמן"
+	},
+	"highlighterOn": {
+		"message": "כלי הדגשה"
 	},
 	"highlighterSettings": {
 		"message": "הגדרות מסמן"
@@ -667,6 +667,12 @@
 	"readerAppearanceLight": {
 		"message": "בהיר"
 	},
+	"readerAutoScroll": {
+		"message": "גלילה אוטומטית"
+	},
+	"readerAutoScrollDescription": {
+		"message": "גלול אוטומטית את התמלול כדי לעקוב אחר ההשמעה."
+	},
 	"readerBlendImages": {
 		"message": "מיזוג תמונות"
 	},
@@ -684,6 +690,9 @@
 	},
 	"readerColorSchemeDefault": {
 		"message": "ברירת מחדל"
+	},
+	"readerCurrentPosition": {
+		"message": "מיקום נוכחי"
 	},
 	"readerCustomCss": {
 		"message": "CSS מותאם אישית"
@@ -736,6 +745,12 @@
 	"readerFootnotes": {
 		"message": "הערות שוליים"
 	},
+	"readerHighlightActiveLine": {
+		"message": "הדגשת השורה הפעילה"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "הדגש את המשפט הנוכחי בתמלול במהלך ההשמעה."
+	},
 	"readerImages": {
 		"message": "תמונות"
 	},
@@ -748,6 +763,15 @@
 	"readerLoading": {
 		"message": "מפענח…"
 	},
+	"readerOn": {
+		"message": "מצב קריאה"
+	},
+	"readerPinPlayer": {
+		"message": "נעיצת הנגן"
+	},
+	"readerPinPlayerDescription": {
+		"message": "השאר את נגן הווידאו גלוי בזמן גלילה בתמלול."
+	},
 	"readerSettings": {
 		"message": "הגדרות קורא"
 	},
@@ -759,6 +783,9 @@
 	},
 	"readerThemeSection": {
 		"message": "ערכת נושא"
+	},
+	"readerTranscripts": {
+		"message": "תמלולים"
 	},
 	"readerTypography": {
 		"message": "טיפוגרפיה"

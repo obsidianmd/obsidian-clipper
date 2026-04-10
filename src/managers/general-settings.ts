@@ -33,7 +33,7 @@ import {
 	showTemplateEditor,
 } from "../managers/template-ui";
 import { exportAllSettings, importAllSettings } from "../utils/import-export";
-import { Template } from "../types/types";
+import { Settings, Template } from "../types/types";
 import { exportHighlights } from "./highlights-manager";
 import { getMessage, setupLanguageAndDirection } from "../utils/i18n";
 import { debounce } from "../utils/debounce";
@@ -385,7 +385,7 @@ function saveSettingsFromForm(): void {
 	const updatedSettings = {
 		...generalSettings, // Keep existing settings
 		openBehavior:
-			(openBehaviorDropdown?.value as "popup" | "embedded") ??
+			(openBehaviorDropdown?.value as Settings["openBehavior"]) ??
 			generalSettings.openBehavior,
 		showMoreActionsButton:
 			showMoreActionsToggle?.checked ??
@@ -527,7 +527,7 @@ function initializeOpenBehaviorDropdown(): void {
 		(value) => {
 			saveSettings({
 				...generalSettings,
-				openBehavior: value as "popup" | "embedded",
+				openBehavior: value as Settings["openBehavior"],
 			});
 		}
 	);

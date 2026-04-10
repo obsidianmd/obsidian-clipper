@@ -209,9 +209,6 @@
 	"embedded": {
 		"message": "Beágyazott"
 	},
-	"enableHighlighter": {
-		"message": "Kiemelő engedélyezése"
-	},
 	"enableHighlighterDescription": {
 		"message": "Kiemelheted a weboldalakon a tartalmat, amit elmenthetsz az Obsidianba."
 	},
@@ -355,6 +352,9 @@
 		"message": "Oldal kiemelése"
 	},
 	"highlighter": {
+		"message": "Kiemelő"
+	},
+	"highlighterOn": {
 		"message": "Kiemelő"
 	},
 	"highlighterSettings": {
@@ -675,6 +675,12 @@
 	"readerAppearanceLight": {
 		"message": "Világos"
 	},
+	"readerAutoScroll": {
+		"message": "Automatikus görgetés"
+	},
+	"readerAutoScrollDescription": {
+		"message": "A leirat automatikus görgetése a lejátszás követéséhez."
+	},
 	"readerBlendImages": {
 		"message": "Képek beleolvasztása"
 	},
@@ -692,6 +698,9 @@
 	},
 	"readerColorSchemeDefault": {
 		"message": "Alapértelmezett"
+	},
+	"readerCurrentPosition": {
+		"message": "Jelenlegi pozíció"
 	},
 	"readerCustomCss": {
 		"message": "Egyéni CSS"
@@ -744,6 +753,12 @@
 	"readerFootnotes": {
 		"message": "Lábjegyzetek"
 	},
+	"readerHighlightActiveLine": {
+		"message": "Aktív sor kiemelése"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "A lejátszás során kiemeli a leiratban az aktuális mondatot."
+	},
 	"readerImages": {
 		"message": "Képek"
 	},
@@ -756,6 +771,15 @@
 	"readerLoading": {
 		"message": "Tisztítás…"
 	},
+	"readerOn": {
+		"message": "Olvasó mód"
+	},
+	"readerPinPlayer": {
+		"message": "Lejátszó rögzítése"
+	},
+	"readerPinPlayerDescription": {
+		"message": "A leirat görgetése közben is látható marad a videólejátszó."
+	},
 	"readerSettings": {
 		"message": "Olvasó beállításai"
 	},
@@ -767,6 +791,9 @@
 	},
 	"readerThemeSection": {
 		"message": "Téma"
+	},
+	"readerTranscripts": {
+		"message": "Leiratok"
 	},
 	"readerTypography": {
 		"message": "Tipográfia"

@@ -106,7 +106,7 @@
 		max-height: 100dvh;
 		width: 100%;
 	}
-	.clipper .clipper-footer {
+	&:not(.is-embedded) .clipper .clipper-footer {
 		will-change: bottom;
 		position: absolute;
 		bottom: 0;
@@ -119,7 +119,7 @@
 			gap:calc(var(--popup-padding) / 2);
 		}
 	}
-	#embedded-mode {
+	&:not(.is-embedded) #embedded-mode {
 		display: none;
 	}
 }
