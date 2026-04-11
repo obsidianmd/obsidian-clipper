@@ -65,8 +65,57 @@ function createSVG(config: {
 
 export type AnyHighlightData = TextHighlightData | ElementHighlightData | ComplexHighlightData;
 
+const EPHEMERAL_PARAMS = new Set([
+	't',           // YouTube timestamp
+	'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', // UTM tracking
+	'ref', 'source', 'src',   // Referral
+	'fbclid', 'gclid', 'dclid', 'msclkid', 'twclid', // Ad click IDs
+	'mc_cid', 'mc_eid',       // Mailchimp
+	'_ga', '_gl',             // Google Analytics
+	'si',                     // YouTube share tracking
+]);
+
+export function normalizeUrl(url: string): string {
+	try {
+		const parsed = new URL(url);
+		const params = new URLSearchParams(parsed.search);
+		for (const key of [...params.keys()]) {
+			if (EPHEMERAL_PARAMS.has(key)) {
+				params.delete(key);
+			}
+		}
+		parsed.search = params.toString();
+		// Remove trailing ? if all params were stripped
+		return parsed.toString();
+	} catch {
+		return url;
+	}
+}
+
 export let highlights: AnyHighlightData[] = [];
 export let isApplyingHighlights = false;
+export let pageTitle: string = '';
+
+export function setPageTitle(title: string) {
+	pageTitle = title;
+}
+
+export function setPageSite(site: string) {
+	if (!site) return;
+	const hostname = window.location.hostname.replace(/^www\./, '');
+	browser.storage.local.get('domains').then((result: { domains?: Record<string, DomainSettings> }) => {
+		const domains = result.domains || {};
+		if (!domains[hostname]) {
+			domains[hostname] = {};
+		}
+		domains[hostname].site = site;
+		browser.storage.local.set({ domains });
+	});
+}
+
+export interface DomainSettings {
+	site?: string;
+}
 let lastAppliedHighlights: string = '';
 let originalLinkClickHandlers: WeakMap<HTMLElement, (event: MouseEvent) => void> = new WeakMap();
 
@@ -113,6 +162,7 @@ export interface ComplexHighlightData extends HighlightData {
 export interface StoredData {
 	highlights: AnyHighlightData[];
 	url: string;
+	title?: string;
 }
 
 type HighlightsStorage = Record<string, StoredData>;
@@ -887,19 +937,36 @@ function getParents(element: Element): Element[] {
 
 // Save highlights to browser storage
 export function saveHighlights() {
-	const url = window.location.href;
+	const url = normalizeUrl(window.location.href);
 	if (highlights.length > 0) {
-		const data: StoredData = { highlights, url };
+		const title = pageTitle || document.title || undefined;
+		const data: StoredData = { highlights, url, title };
 		browser.storage.local.get('highlights').then((result: { highlights?: HighlightsStorage }) => {
 			const allHighlights: HighlightsStorage = result.highlights || {};
 			allHighlights[url] = data;
 			browser.storage.local.set({ highlights: allHighlights });
 		});
+		// Auto-populate domain site name from og:site_name if not already set
+		const ogSiteName = document.querySelector('meta[property="og:site_name"]')?.getAttribute('content');
+		if (ogSiteName) {
+			const hostname = window.location.hostname.replace(/^www\./, '');
+			browser.storage.local.get('domains').then((result: { domains?: Record<string, DomainSettings> }) => {
+				const domains = result.domains || {};
+				if (!domains[hostname]?.site) {
+					if (!domains[hostname]) domains[hostname] = {};
+					domains[hostname].site = ogSiteName;
+					browser.storage.local.set({ domains });
+				}
+			});
+		}
 	} else {
 		// Remove the entry if there are no highlights
 		browser.storage.local.get('highlights').then((result: { highlights?: HighlightsStorage }) => {
 			const allHighlights: HighlightsStorage = result.highlights || {};
 			delete allHighlights[url];
+			// Also clean up any old non-normalized key
+			const rawUrl = window.location.href;
+			if (rawUrl !== url) delete allHighlights[rawUrl];
 			browser.storage.local.set({ highlights: allHighlights });
 		});
 	}
@@ -955,11 +1022,22 @@ export function getHighlights(): string[] {
 
 // Load highlights from browser storage
 export async function loadHighlights() {
-	const url = window.location.href;
+	const url = normalizeUrl(window.location.href);
+	const rawUrl = window.location.href;
 	const result = await browser.storage.local.get('highlights');
 	const allHighlights = (result.highlights || {}) as HighlightsStorage;
-	const storedData = allHighlights[url];
-	
+
+	// Check normalized key first, then fall back to raw URL for old entries
+	let storedData = allHighlights[url];
+	if (!storedData && rawUrl !== url && allHighlights[rawUrl]) {
+		// Migrate old entry to normalized key
+		storedData = allHighlights[rawUrl];
+		storedData.url = url;
+		allHighlights[url] = storedData;
+		delete allHighlights[rawUrl];
+		browser.storage.local.set({ highlights: allHighlights });
+	}
+
 	if (storedData && Array.isArray(storedData.highlights) && storedData.highlights.length > 0) {
 		highlights = storedData.highlights;
 		
@@ -978,7 +1056,7 @@ export async function loadHighlights() {
 
 // Clear all highlights from the page and storage
 export function clearHighlights() {
-	const url = window.location.href;
+	const url = normalizeUrl(window.location.href);
 	const oldHighlights = [...highlights];
 	browser.storage.local.get('highlights').then((result: { highlights?: HighlightsStorage }) => {
 		const allHighlights: HighlightsStorage = result.highlights || {};

@@ -206,6 +206,9 @@
 	"editProvider": {
 		"message": "Edit provider"
 	},
+	"edit": {
+		"message": "Edit"
+	},
 	"editTemplate": {
 		"message": "Edit template"
 	},
@@ -279,6 +282,18 @@
 	},
 	"noHighlightsYet": {
 		"message": "No highlights yet"
+	},
+	"sortAZ": {
+		"message": "A to Z"
+	},
+	"sortZA": {
+		"message": "Z to A"
+	},
+	"sortNewOld": {
+		"message": "New to old"
+	},
+	"sortOldNew": {
+		"message": "Old to new"
 	},
 	"exportProperties": {
 		"message": "Export properties"

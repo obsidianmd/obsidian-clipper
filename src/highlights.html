@@ -5,6 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 	<title>Highlights — Obsidian Web Clipper</title>
 	<link rel="stylesheet" href="style.css">
+	<link rel="stylesheet" href="reader.css">
 	<script src="browser-polyfill.min.js"></script>
 </head>
 <body style="height: 100%; overflow: hidden;">
@@ -21,6 +22,14 @@
 						<span class="nav-count" id="nav-count-all"></span>
 					</li>
 				</ul>
+				<div class="highlights-sort-container">
+					<select id="highlights-sort">
+						<option value="az" data-i18n="sortAZ">A to Z</option>
+						<option value="za" data-i18n="sortZA">Z to A</option>
+						<option value="new" data-i18n="sortNewOld">New to old</option>
+						<option value="old" data-i18n="sortOldNew">Old to new</option>
+					</select>
+				</div>
 				<ul id="highlights-domain-list"></ul>
 			</div>
 			<div id="highlights-main">

@@ -393,7 +393,13 @@ declare global {
 					wordCount: defuddled.wordCount,
 					metaTags: defuddled.metaTags || []
 				};
-				sendResponse(response);
+				if (defuddled.title) {
+						highlighter.setPageTitle(defuddled.title);
+					}
+					if (defuddled.site) {
+						highlighter.setPageSite(defuddled.site);
+					}
+					sendResponse(response);
 			}).catch((error: unknown) => {
 				console.error('[Obsidian Clipper] getPageContent error:', error);
 				sendResponse({ success: false, error: error instanceof Error ? error.message : String(error) });
@@ -537,6 +543,7 @@ declare global {
 		}
 
 		await highlighter.loadHighlights();
+		highlighter.setPageTitle(document.title);
 		updateHasHighlights();
 	}
 

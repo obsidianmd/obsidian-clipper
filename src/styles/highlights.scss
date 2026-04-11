@@ -27,6 +27,7 @@
 	background-color: var(--settings-background);
 	border-inline-end: 1px solid var(--background-modifier-border);
 	padding: 16px;
+	font-family: var(--font-default);
 
 	.highlights-search-container {
 		margin-bottom: 12px;
@@ -89,6 +90,10 @@
 	margin-bottom: 8px;
 	padding-bottom: 8px;
 	border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.highlights-sort-container {
+	margin-bottom: 8px;
 }
 
 .nav-domain {
@@ -170,6 +175,7 @@
 	display: flex;
 	align-items: center;
 	gap: 6px;
+	font-family: var(--font-default);
 	font-size: var(--font-ui-small);
 	min-width: 0;
 	overflow: hidden;
@@ -212,6 +218,32 @@
 	padding: 48px 0;
 	color: var(--text-muted);
 	font-size: var(--font-ui-small);
+}
+
+// --- Page title (single page view) ---
+
+.highlight-page-title {
+	font-size: var(--font-ui-large);
+	font-weight: 600;
+	margin: 8px 0 4px;
+	line-height: 1.4;
+}
+
+.highlight-page-title-url {
+	font-size: var(--font-ui-smallest);
+	color: var(--text-faint);
+	text-decoration: none;
+	display: block;
+	margin-bottom: 12px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+
+	@media (hover: hover) {
+		&:hover {
+			color: var(--text-accent);
+		}
+	}
 }
 
 // --- Page headers in main content ---
@@ -257,6 +289,50 @@
 	}
 }
 
+.highlight-sync-btn {
+	opacity: 0;
+	flex-shrink: 0;
+	width: auto;
+	padding: 2px;
+	margin: -2px;
+	color: var(--text-faint);
+	box-shadow: none;
+	background: none;
+	border: none;
+
+	svg {
+		width: 12px;
+		height: 12px;
+	}
+
+	.highlight-page-header:hover & {
+		opacity: 0.7;
+	}
+
+	@media (hover: hover) {
+		&:hover {
+			color: var(--text-normal);
+			opacity: 1;
+		}
+	}
+
+	&.highlight-sync-btn-visible {
+		opacity: 0.5;
+	}
+
+	&.is-syncing {
+		opacity: 1;
+		svg {
+			animation: spin 0.8s linear infinite;
+		}
+	}
+}
+
+@keyframes spin {
+	from { transform: rotate(0deg); }
+	to { transform: rotate(360deg); }
+}
+
 // --- Highlight items ---
 
 .highlight-item {
@@ -268,8 +344,9 @@
 }
 
 .highlight-item-content {
-	font-size: var(--font-ui-small);
-	line-height: 1.5;
+	font-family: var(--font-text, var(--font-default));
+	font-size: var(--font-text-size, var(--font-ui-small));
+	line-height: var(--line-height-normal, 1.5);
 	color: var(--text-normal);
 	white-space: pre-wrap;
 	word-break: break-word;
