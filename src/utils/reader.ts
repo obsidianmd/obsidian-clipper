@@ -1852,10 +1852,10 @@ export class Reader {
 				if (videoElement) {
 					videoTimestamp = Math.floor(videoElement.currentTime);
 					videoWasPlaying = !videoElement.paused;
-					// Chrome's iframe embed works via declarativeNetRequest.
+					// Chromium's iframe embed works via declarativeNetRequest.
 					// Safari/Firefox can't modify headers, so we preserve
 					// the native video element instead.
-					if (browserType !== 'chrome') {
+					if (!['chrome', 'brave', 'edge'].includes(browserType)) {
 						youtubeVideoElement = videoElement;
 						videoElement.remove();
 					}
