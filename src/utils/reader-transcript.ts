@@ -1,5 +1,34 @@
 import { getMessage } from './i18n';
 
+// CJK-aware text boundary helpers
+const SENT_END = /[.!?。！？]/;
+const SOFT_STOP = /[,、，]/;
+const CJK_SENT_END = /[。！？]/;
+const CJK_PUNCT = /[。！？、，]/;
+const CJK_CHAR = /[\u3040-\u309F\u30A0-\u30FF\u3400-\u4DBF\u4E00-\u9FFF\uAC00-\uD7AF\uF900-\uFAFF]/;
+
+// CJK punctuation doesn't require trailing whitespace
+function isSentBoundary(text: string, punctPos: number, nextPos: number): boolean {
+	const ch = text[punctPos];
+	if (CJK_SENT_END.test(ch)) return true;
+	if (/[.!?]/.test(ch)) return nextPos >= text.length || /\s/.test(text[nextPos]);
+	return false;
+}
+
+function isSentOrSoftBoundary(text: string, punctPos: number, nextPos: number): boolean {
+	const ch = text[punctPos];
+	if (CJK_PUNCT.test(ch)) return true;
+	if (/[.!?,]/.test(ch)) return nextPos >= text.length || /\s/.test(text[nextPos]);
+	return false;
+}
+
+// In CJK text each character acts as its own word
+function isWordStep(text: string, pos: number): boolean {
+	if (CJK_CHAR.test(text[pos])) return true;
+	if (pos > 0 && CJK_CHAR.test(text[pos - 1]) && !CJK_CHAR.test(text[pos]) && /\S/.test(text[pos])) return true;
+	return false;
+}
+
 interface TranscriptSettings {
 	pinPlayer: boolean;
 	autoScroll: boolean;
@@ -305,7 +334,7 @@ export function wireTranscript(
 						let backLineChanges = 0;
 						let backLastY = lineY;
 						while (hlStart > 0) {
-							if (/[.!?]/.test(text[hlStart - 1]) && /\s/.test(text[hlStart])) {
+							if (isSentBoundary(text, hlStart - 1, hlStart)) {
 								while (hlStart < charPos && /\s/.test(text[hlStart])) hlStart++;
 								break;
 							}
@@ -337,7 +366,7 @@ export function wireTranscript(
 								fwdLastY = y;
 							}
 						}
-						if (hlEnd > charPos + 1 && /[.!?,]/.test(text[hlEnd - 1]) && (hlEnd >= totalLen || /\s/.test(text[hlEnd]))) break;
+						if (hlEnd > charPos + 1 && isSentOrSoftBoundary(text, hlEnd - 1, hlEnd)) break;
 						hlEnd++;
 					}
 
@@ -525,13 +554,13 @@ export function wireTranscript(
 		let lastComma = -1;
 		let wordsAtComma = 0;
 		while (end < text.length && wordsForward < 6) {
-			if (/[.!?]/.test(text[end - 1]) && (end >= text.length || /\s/.test(text[end]))) break;
-			if (text[end - 1] === ',' && wordsForward >= 3) {
+			if (isSentBoundary(text, end - 1, end)) break;
+			if (SOFT_STOP.test(text[end - 1]) && wordsForward >= 3) {
 				lastComma = end;
 				wordsAtComma = wordsForward;
 			}
 			end++;
-			if (end < text.length && /\s/.test(text[end - 1]) && /\S/.test(text[end])) wordsForward++;
+			if (end < text.length && ((/\s/.test(text[end - 1]) && /\S/.test(text[end])) || isWordStep(text, end))) wordsForward++;
 		}
 		// Prefer comma stop if we went past it
 		if (lastComma > 0 && wordsForward > wordsAtComma) {
@@ -540,14 +569,14 @@ export function wireTranscript(
 		}
 
 		// Backward: if forward hit punctuation, limit to 2 words back
-		const hitPunctuation = end < text.length && /[.!?]/.test(text[end - 1]);
+		const hitPunctuation = end < text.length && SENT_END.test(text[end - 1]);
 		const maxBack = hitPunctuation ? 2 : Math.max(1, totalWords - wordsForward);
 		let start = offset;
 		let wordsBack = 0;
 		while (start > 0 && wordsBack < maxBack) {
-			if (/[.!?]/.test(text[start - 1]) && /\s/.test(text[start])) break;
+			if (isSentBoundary(text, start - 1, start)) break;
 			start--;
-			if (start > 0 && /\s/.test(text[start]) && /\S/.test(text[start - 1])) wordsBack++;
+			if (start > 0 && ((/\s/.test(text[start]) && /\S/.test(text[start - 1])) || isWordStep(text, start))) wordsBack++;
 		}
 
 		// Trim whitespace at edges
