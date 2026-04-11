@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" id="highlights-page" style="height: 100%; overflow: hidden;">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+	<title>Highlights — Obsidian Web Clipper</title>
+	<link rel="stylesheet" href="style.css">
+	<script src="browser-polyfill.min.js"></script>
+</head>
+<body style="height: 100%; overflow: hidden;">
+	<div id="highlights">
+		<div id="highlights-container">
+			<div id="highlights-sidebar">
+				<div class="highlights-search-container">
+					<input type="text" id="highlights-search" data-i18n="searchHighlightsPlaceholder" placeholder="Search highlights…" autocomplete="off" spellcheck="false" />
+				</div>
+				<ul id="highlights-nav">
+					<li data-nav="all" class="active">
+						<i data-lucide="highlighter"></i>
+						<span data-i18n="allHighlights">All highlights</span>
+						<span class="nav-count" id="nav-count-all"></span>
+					</li>
+				</ul>
+				<ul id="highlights-domain-list"></ul>
+			</div>
+			<div id="highlights-main">
+				<div id="highlights-navbar">
+					<div id="highlights-navbar-title">
+						<span data-i18n="highlights">Highlights</span>
+					</div>
+					<button id="highlights-hamburger" class="hamburger-menu">
+						<span class="hamburger-icon"></span>
+					</button>
+				</div>
+				<div id="highlights-main-header">
+					<div id="highlights-breadcrumb"></div>
+					<div class="highlights-main-actions">
+						<button type="button" id="export-context-btn" data-i18n="export">Export</button>
+						<button type="button" id="delete-context-btn" class="mod-warning" data-i18n="deleteAll">Delete all</button>
+					</div>
+				</div>
+				<div id="highlights-scroll">
+					<div id="highlights-list"></div>
+					<div id="highlights-empty" class="highlights-empty" style="display:none;">
+						<p data-i18n="noHighlightsYet">No highlights yet</p>
+					</div>
+					<div id="highlights-sentinel"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script type="module" src="highlights.js"></script>
+</body>
+</html>

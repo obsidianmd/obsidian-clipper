@@ -5,6 +5,9 @@
 	"addModel": {
 		"message": "+ Add model"
 	},
+	"allHighlights": {
+		"message": "All highlights"
+	},
 	"addModelTitle": {
 		"message": "Add model"
 	},
@@ -252,6 +255,30 @@
 	},
 	"exportHighlightsDescription": {
 		"message": "Export your highlights to a file."
+	},
+	"viewHighlights": {
+		"message": "View highlights"
+	},
+	"viewHighlightsDescription": {
+		"message": "Browse and manage all your saved highlights."
+	},
+	"highlights": {
+		"message": "Highlights"
+	},
+	"searchHighlightsPlaceholder": {
+		"message": "Search highlights…"
+	},
+	"deleteAll": {
+		"message": "Delete all"
+	},
+	"deleteAllHighlightsConfirm": {
+		"message": "Are you sure you want to delete all highlights?"
+	},
+	"deleteHighlightsForDomain": {
+		"message": "Delete all highlights for this domain?"
+	},
+	"noHighlightsYet": {
+		"message": "No highlights yet"
 	},
 	"exportProperties": {
 		"message": "Export properties"
