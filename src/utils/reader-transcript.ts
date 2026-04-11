@@ -430,38 +430,60 @@ export function wireTranscript(
 		}
 	};
 
+	// Use capture phase so we intercept before YouTube's own keyboard
+	// handlers on the page — the original page scripts are still running
 	doc.addEventListener('keydown', (e: KeyboardEvent) => {
 		const tag = (e.target as HTMLElement).tagName;
 		if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
 
 		switch (e.code) {
 			case 'Space':
-			case 'KeyK':
-				// Only handle play/pause for iframe embeds — native video
-				// controls handle Space/K themselves and would double-toggle
+				// Only handle Space for iframe embeds — native video
+				// controls handle Space themselves and would double-toggle
 				if (!videoEl) {
 					e.preventDefault();
+					e.stopImmediatePropagation();
 					togglePlayPause();
 				}
 				break;
+			case 'KeyK':
+				// K is not a native video shortcut, so handle it for both
+				e.preventDefault();
+				e.stopImmediatePropagation();
+				togglePlayPause();
+				break;
 			case 'ArrowLeft':
 				e.preventDefault();
+				e.stopImmediatePropagation();
 				seekRelative(-5);
 				break;
 			case 'ArrowRight':
 				e.preventDefault();
+				e.stopImmediatePropagation();
 				seekRelative(5);
 				break;
 			case 'KeyJ':
 				e.preventDefault();
+				e.stopImmediatePropagation();
 				seekRelative(-10);
 				break;
 			case 'KeyL':
 				e.preventDefault();
+				e.stopImmediatePropagation();
 				seekRelative(10);
 				break;
 		}
-	});
+	}, { capture: true });
+
+	// YouTube handles Space on keyup — block that too
+	doc.addEventListener('keyup', (e: KeyboardEvent) => {
+		if (e.code === 'Space' && !videoEl) {
+			const tag = (e.target as HTMLElement).tagName;
+			if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+			e.preventDefault();
+			e.stopImmediatePropagation();
+		}
+	}, { capture: true });
 
 	// Add a scrub track behind the timestamps
 	const scrubTrack = doc.createElement('div');
