@@ -631,6 +631,19 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 			}
 		}
 
+		if (typedRequest.action === "openReaderPage") {
+			const articleUrl = (typedRequest as any).url;
+			if (articleUrl && sender.tab?.id) {
+				const readerUrl = browser.runtime.getURL('reader.html?url=' + encodeURIComponent(articleUrl));
+				browser.tabs.update(sender.tab.id, { url: readerUrl })
+					.then(() => sendResponse({ success: true }))
+					.catch((error) => sendResponse({ success: false, error: error instanceof Error ? error.message : String(error) }));
+			} else {
+				sendResponse({ success: false, error: 'Missing URL or tab' });
+			}
+			return true;
+		}
+
 		if (typedRequest.action === "openObsidianUrl") {
 			const url = (typedRequest as any).url;
 			if (url) {

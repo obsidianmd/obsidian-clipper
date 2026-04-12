@@ -34,6 +34,7 @@ export const generalSettings: Settings = {
 		defaultFont: '',
 		blendImages: true,
 		colorLinks: false,
+		followLinks: true,
 		pinPlayer: true,
 		autoScroll: true,
 		highlightActiveLine: true,

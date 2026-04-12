@@ -132,6 +132,7 @@ export class Reader {
 		defaultFont: '',
 		blendImages: true,
 		colorLinks: false,
+		followLinks: true,
 		pinPlayer: true,
 		autoScroll: true,
 		highlightActiveLine: true,
@@ -2318,6 +2319,7 @@ export class Reader {
 			this.initializeLightbox(doc);
 			this.linkifyTextUrls(doc);
 			this.initializeComments(doc);
+			this.initializeFollowLinks(doc);
 
 			invalidateHighlightCache();
 			await loadHighlights();
@@ -2360,6 +2362,35 @@ export class Reader {
 			await this.apply(doc);
 			return true;
 		}
+	}
+
+	private static initializeFollowLinks(doc: Document): void {
+		if (!this.settings.followLinks) return;
+
+		const article = doc.querySelector('.obsidian-reader-content article');
+		if (!article) return;
+
+		article.addEventListener('click', (e: Event) => {
+			const link = (e.target as Element).closest('a[href]') as HTMLAnchorElement | null;
+			if (!link) return;
+
+			const href = link.href;
+			if (!href || href.startsWith('#') || href.startsWith('javascript:')) return;
+			// Skip footnote links (handled separately)
+			if (link.getAttribute('href')?.startsWith('#')) return;
+
+			e.preventDefault();
+
+			if (this.isReaderPage) {
+				window.location.href = browser.runtime.getURL('reader.html?url=' + encodeURIComponent(href));
+			} else {
+				// Content scripts can't navigate to extension URLs directly
+				browser.runtime.sendMessage({
+					action: 'openReaderPage',
+					url: href
+				});
+			}
+		});
 	}
 
 	// --- Reader page helpers (extension page context) ---
