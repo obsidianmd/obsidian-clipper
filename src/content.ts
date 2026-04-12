@@ -8,6 +8,7 @@ import { createMarkdownContent } from 'defuddle/full';
 import { flattenShadowDom } from './utils/flatten-shadow-dom';
 import { saveFile } from './utils/file-utils';
 import { debugLog } from './utils/debug';
+import { extractBilibiliStructuredContent, isBilibiliVideoUrl } from './utils/bilibili-extractor';
 
 declare global {
 	interface Window {
@@ -327,9 +328,25 @@ declare global {
 				);
 				const defuddled = await Promise.race([defuddle.parseAsync(), parseTimeout])
 					.catch(() => defuddle.parse());
+				const bilibiliContent = isBilibiliVideoUrl(document.URL)
+					? await extractBilibiliStructuredContent(document).catch((error) => {
+						console.warn('Failed to extract Bilibili structured content:', error);
+						return null;
+					})
+					: null;
 				const extractedContent: { [key: string]: string } = {
 					...defuddled.variables,
 				};
+
+				if (bilibiliContent) {
+					extractedContent.transcript = bilibiliContent.transcriptMarkdown;
+					extractedContent.transcriptMarkdown = bilibiliContent.transcriptMarkdown;
+					extractedContent.transcriptText = bilibiliContent.transcriptText;
+					extractedContent.chapters = bilibiliContent.chaptersMarkdown;
+					extractedContent.bvid = bilibiliContent.bvid;
+					extractedContent.cid = String(bilibiliContent.cid);
+					extractedContent.page = String(bilibiliContent.page);
+				}
 
 				// Create a new DOMParser
 				const parser = new DOMParser();
@@ -374,23 +391,23 @@ declare global {
 				const cleanedHtml = doc.documentElement.outerHTML;
 
 				const response: ContentResponse = {
-					author: defuddled.author,
-					content: defuddled.content,
-					description: defuddled.description,
+					author: bilibiliContent?.author || defuddled.author,
+					content: bilibiliContent?.structuredHtml || defuddled.content,
+					description: bilibiliContent?.description || defuddled.description,
 					domain: getDomain(document.URL),
 					extractedContent: extractedContent,
 					favicon: defuddled.favicon,
 					fullHtml: cleanedHtml,
 					highlights: highlighter.getHighlights(),
-					image: defuddled.image,
+					image: bilibiliContent?.image || defuddled.image,
 					language: defuddled.language || '',
 					parseTime: defuddled.parseTime,
-					published: defuddled.published,
+					published: bilibiliContent?.published || defuddled.published,
 					schemaOrgData: defuddled.schemaOrgData,
 					selectedHtml: selectedHtml,
-					site: defuddled.site,
-					title: defuddled.title,
-					wordCount: defuddled.wordCount,
+					site: bilibiliContent ? 'Bilibili' : defuddled.site,
+					title: bilibiliContent?.title || defuddled.title,
+					wordCount: bilibiliContent?.wordCount || defuddled.wordCount,
 					metaTags: defuddled.metaTags || []
 				};
 				sendResponse(response);

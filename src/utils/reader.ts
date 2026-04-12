@@ -9,6 +9,7 @@ import { applyHighlights, invalidateHighlightCache, loadHighlights, toggleHighli
 import { copyToClipboard } from './clipboard-utils';
 import { getMessage, initializeI18n } from './i18n';
 import { getFontCss } from './font-utils';
+import { extractBilibiliStructuredContent, isBilibiliVideoUrl } from './bilibili-extractor';
 
 // Mobile viewport settings
 const VIEWPORT = 'width=device-width, initial-scale=1, maximum-scale=1';
@@ -786,6 +787,25 @@ export class Reader {
 	}
 
 	private static async extractContent(doc: Document): Promise<ReaderContent> {
+		if (isBilibiliVideoUrl(doc.URL)) {
+			const startTime = performance.now();
+			const bilibiliContent = await extractBilibiliStructuredContent(doc).catch((error) => {
+				console.warn('Reader', 'Failed to extract Bilibili structured content:', error);
+				return null;
+			});
+			if (bilibiliContent) {
+				return {
+					content: bilibiliContent.structuredHtml,
+					title: bilibiliContent.title,
+					author: bilibiliContent.author,
+					published: bilibiliContent.published,
+					domain: getDomain(doc.URL),
+					wordCount: bilibiliContent.wordCount,
+					parseTime: Math.round(performance.now() - startTime),
+					extractorType: 'bilibili'
+				};
+			}
+		}
 
 		const defuddle = new Defuddle(doc, { url: doc.URL });
 		const defuddled = await defuddle.parseAsync();
@@ -1768,6 +1788,39 @@ export class Reader {
 		});
 	}
 
+	/**
+	 * 初始化 Bilibili 字幕时间戳点击跳转功能。
+	 */
+	private static initializeBilibiliTimestamps(doc: Document) {
+		const iframe = doc.querySelector('iframe[src*="player.bilibili.com"]') as HTMLIFrameElement | null;
+		if (!iframe) return;
+
+		const timestamps = doc.querySelectorAll('.bilibili-timestamp[data-time]');
+		timestamps.forEach((el) => {
+			el.addEventListener('click', (e) => {
+				e.preventDefault();
+				e.stopPropagation();
+				const target = e.currentTarget as HTMLElement;
+				const seconds = parseInt(target.dataset.time || '0', 10);
+				if (!Number.isFinite(seconds)) return;
+
+				const currentSrc = new URL(iframe.src);
+				currentSrc.searchParams.set('t', String(seconds));
+				currentSrc.searchParams.set('autoplay', '1');
+				iframe.src = currentSrc.toString();
+
+				doc.querySelectorAll('.bilibili-active-cue').forEach((el) => {
+					el.classList.remove('bilibili-active-cue');
+				});
+				const parentLi = target.closest('li');
+				if (parentLi) {
+					parentLi.classList.add('bilibili-active-cue');
+					parentLi.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+				}
+			});
+		});
+	}
+
 	private static showLightbox(index: number) {
 		if (!this.lightbox || !this.images[index]) return;
 
@@ -1860,6 +1913,23 @@ export class Reader {
 						videoElement.remove();
 					}
 				}
+			}
+
+			// Capture Bilibili video state before cleanup destroys the player
+			const isBilibili = host.includes('bilibili.com');
+			let bilibiliVideoId = '';
+			let bilibiliPage = '1';
+			let bilibiliTimestamp = 0;
+			let bilibiliThumbnail = '';
+			if (isBilibili) {
+				const urlMatch = doc.URL.match(/\/video\/(BV[\w]+|av\d+)/i);
+				if (urlMatch) bilibiliVideoId = urlMatch[1];
+				const pageMatch = doc.URL.match(/[?&]p=(\d+)/);
+				if (pageMatch) bilibiliPage = pageMatch[1];
+				const videoEl = doc.querySelector('video');
+				if (videoEl) bilibiliTimestamp = Math.floor(videoEl.currentTime);
+				const ogImg = doc.querySelector('meta[property="og:image"]') as HTMLMetaElement;
+				if (ogImg?.content) bilibiliThumbnail = ogImg.content;
 			}
 
 			let spinner: HTMLElement;
@@ -2228,6 +2298,48 @@ export class Reader {
 				}
 			}
 
+			// Bilibili: inject embed player since Defuddle does not extract the JS-based video player
+			if (isBilibili && bilibiliVideoId) {
+				const isBvid = /^BV/i.test(bilibiliVideoId);
+				const idKey = isBvid ? 'bvid' : 'aid';
+				const idVal = isBvid ? bilibiliVideoId : bilibiliVideoId.slice(2);
+				const params = new URLSearchParams({
+					[idKey]: idVal,
+					page: bilibiliPage,
+					high_quality: '1',
+					danmaku: '0',
+					...(bilibiliTimestamp > 0 ? { t: String(bilibiliTimestamp) } : {})
+				});
+				const embedUrl = 'https://player.bilibili.com/player.html?' + params.toString();
+
+				const bBrowserType = browserType || await detectBrowser();
+				const isSafari = ['safari', 'mobile-safari', 'ipad-os'].includes(bBrowserType);
+
+				if (isSafari) {
+					const watchUrl = doc.URL;
+					const thumbnail = doc.createElement('a');
+					thumbnail.href = watchUrl;
+					thumbnail.target = '_blank';
+					thumbnail.rel = 'noopener';
+					thumbnail.className = 'reader-video-wrapper';
+					const imgSrc = bilibiliThumbnail || '';
+					thumbnail.innerHTML =
+						'<img src="' + imgSrc + '" style="width:100%;height:100%;object-fit:cover;mix-blend-mode:normal!important;">'
+						+ '<svg style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:68px;height:48px;mix-blend-mode:normal!important;" viewBox="0 0 68 48">'
+						+ '<path d="M66.52 7.74c-.78-2.93-2.49-5.41-5.42-6.19C55.79.13 34 0 34 0S12.21.13 6.9 1.55c-2.93.78-4.63 3.26-5.42 6.19C.06 13.05 0 24 0 24s.06 10.95 1.48 16.26c.78 2.93 2.49 5.41 5.42 6.19C12.21 47.87 34 48 34 48s21.79-.13 27.1-1.55c2.93-.78 4.64-3.26 5.42-6.19C67.94 34.95 68 24 68 24s-.06-10.95-1.48-16.26z" fill="#00a1d6"/>'
+						+ '<path d="M45 24L27 14v20" fill="white"/></svg>';
+					contentBody.insertBefore(thumbnail, contentBody.firstChild);
+				} else {
+					const iframe = doc.createElement('iframe');
+					iframe.src = embedUrl;
+					iframe.setAttribute('allowfullscreen', '');
+					iframe.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture');
+					iframe.setAttribute('scrolling', 'no');
+					contentBody.insertBefore(iframe, contentBody.firstChild);
+					await browser.runtime.sendMessage({ action: 'enableBilibiliEmbedRule' }).catch(() => {});
+				}
+			}
+
 			while (contentBody.firstChild) {
 				article.appendChild(contentBody.firstChild);
 			}
@@ -2249,6 +2361,10 @@ export class Reader {
 				(this.settings as any)[key] = value;
 				this.saveSettings();
 			});
+
+			if (isBilibili) {
+				this.initializeBilibiliTimestamps(doc);
+			}
 
 			// Set extractor type
 			if (extractorType) {
@@ -2302,6 +2418,9 @@ export class Reader {
 			const host = doc.URL ? new URL(doc.URL).hostname : '';
 			if (host.includes('youtube.com') || host.includes('youtu.be')) {
 				messages.push(browser.runtime.sendMessage({ action: 'disableYouTubeEmbedRule' }).catch(() => {}));
+			}
+			if (host.includes('bilibili.com')) {
+				messages.push(browser.runtime.sendMessage({ action: 'disableBilibiliEmbedRule' }).catch(() => {}));
 			}
 
 			await Promise.all(messages);

@@ -6,6 +6,7 @@ import { debounce } from './utils/debounce';
 import { Settings } from './types/types';
 
 const YOUTUBE_EMBED_RULE_ID = 9001;
+const BILIBILI_EMBED_RULE_ID = 9002;
 
 // Chrome: declarativeNetRequest to rewrite Referer on YouTube embeds.
 // Safari/Firefox use the native video element instead (see reader.ts).
@@ -36,6 +37,93 @@ async function disableYouTubeEmbedRule(): Promise<void> {
 	await chrome.declarativeNetRequest.updateSessionRules({
 		removeRuleIds: [YOUTUBE_EMBED_RULE_ID]
 	});
+}
+
+// Firefox: webRequest listener to rewrite Referer on Bilibili embeds.
+if (browser.webRequest?.onBeforeSendHeaders) {
+	browser.webRequest.onBeforeSendHeaders.addListener(
+		(details) => {
+			const headers = (details.requestHeaders || []).filter(
+				h => h.name.toLowerCase() !== 'referer'
+			);
+			headers.push({ name: 'Referer', value: 'https://www.bilibili.com/' });
+			return { requestHeaders: headers };
+		},
+		{
+			urls: ['*://player.bilibili.com/*'],
+			types: ['sub_frame' as browser.WebRequest.ResourceType]
+		},
+		['blocking', 'requestHeaders']
+	);
+}
+
+async function enableBilibiliEmbedRule(tabId: number): Promise<void> {
+	await chrome.declarativeNetRequest.updateSessionRules({
+		removeRuleIds: [BILIBILI_EMBED_RULE_ID],
+		addRules: [{
+			id: BILIBILI_EMBED_RULE_ID,
+			priority: 1,
+			action: {
+				type: 'modifyHeaders' as any,
+				requestHeaders: [{
+					header: 'Referer',
+					operation: 'set' as any,
+					value: 'https://www.bilibili.com/'
+				}]
+			},
+			condition: {
+				urlFilter: '||player.bilibili.com/',
+				resourceTypes: ['sub_frame' as any],
+				tabIds: [tabId]
+			}
+		}]
+	});
+}
+
+async function disableBilibiliEmbedRule(): Promise<void> {
+	await chrome.declarativeNetRequest.updateSessionRules({
+		removeRuleIds: [BILIBILI_EMBED_RULE_ID]
+	});
+}
+
+/**
+ * 判断是否允许通过后台代理抓取 B 站接口。
+ */
+function isAllowedBilibiliFetchUrl(url: string): boolean {
+	try {
+		const parsedUrl = new URL(url);
+		return parsedUrl.protocol === 'https:'
+			&& (
+				parsedUrl.hostname === 'api.bilibili.com'
+				|| parsedUrl.hostname.endsWith('.hdslb.com')
+			);
+	} catch {
+		return false;
+	}
+}
+
+/**
+ * 通过后台统一抓取 B 站 JSON，复用登录态并补全 Referer。
+ */
+async function fetchBilibiliJson(url: string): Promise<any> {
+	if (!isAllowedBilibiliFetchUrl(url)) {
+		throw new Error('Blocked Bilibili fetch URL');
+	}
+
+	const response = await fetch(url, {
+		method: 'GET',
+		credentials: 'include',
+		cache: 'no-store',
+		headers: {
+			Referer: 'https://www.bilibili.com/'
+		}
+	});
+
+	if (!response.ok) {
+		throw new Error(`Bilibili fetch failed with status ${response.status}`);
+	}
+
+	return response.json();
 }
 
 let sidePanelOpenWindows: Set<number> = new Set();
@@ -163,7 +251,7 @@ async function sendMessageToPopup(tabId: number, message: any): Promise<void> {
 
 browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime.MessageSender, sendResponse: (response?: any) => void): true | undefined => {
 	if (typeof request === 'object' && request !== null) {
-		const typedRequest = request as { action: string; isActive?: boolean; hasHighlights?: boolean; tabId?: number; text?: string; section?: string };
+		const typedRequest = request as { action: string; isActive?: boolean; hasHighlights?: boolean; tabId?: number; text?: string; section?: string; url?: string };
 		
 		if (typedRequest.action === 'copy-to-clipboard' && typedRequest.text) {
 			// Use content script to copy to clipboard
@@ -230,6 +318,41 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 				sendResponse({ success: true });
 			}).catch(() => {
 				sendResponse({ success: true });
+			});
+			return true;
+		}
+
+		if (typedRequest.action === "enableBilibiliEmbedRule") {
+			const tabId = sender.tab?.id;
+			if (tabId) {
+				enableBilibiliEmbedRule(tabId).then(() => {
+					sendResponse({ success: true });
+				}).catch(() => {
+					sendResponse({ success: true });
+				});
+			} else {
+				sendResponse({ success: true });
+			}
+			return true;
+		}
+
+		if (typedRequest.action === "disableBilibiliEmbedRule") {
+			disableBilibiliEmbedRule().then(() => {
+				sendResponse({ success: true });
+			}).catch(() => {
+				sendResponse({ success: true });
+			});
+			return true;
+		}
+
+		if (typedRequest.action === 'fetchBilibiliJson' && typedRequest.url) {
+			fetchBilibiliJson(typedRequest.url).then((data) => {
+				sendResponse({ success: true, data });
+			}).catch((error) => {
+				sendResponse({
+					success: false,
+					error: error instanceof Error ? error.message : String(error)
+				});
 			});
 			return true;
 		}
@@ -546,7 +669,8 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 			typedRequest.action === "ensureContentScriptLoaded" ||
 			typedRequest.action === "getHighlighterMode" ||
 			typedRequest.action === "toggleHighlighterMode" ||
-			typedRequest.action === "openObsidianUrl") {
+			typedRequest.action === "openObsidianUrl" ||
+			typedRequest.action === 'fetchBilibiliJson') {
 			return true;
 		}
 	}

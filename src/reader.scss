@@ -315,6 +315,68 @@
 			aspect-ratio: 16 / 9;
 			height: auto;
 		}
+		&[src*="player.bilibili.com"] {
+			aspect-ratio: 16 / 9;
+			height: auto;
+		}
+	}
+	.bilibili-structured-content {
+		display: grid;
+		gap: 1.5rem;
+	}
+	.bilibili-section {
+		display: grid;
+		gap: 0.5rem;
+	}
+	.bilibili-chapters,
+	.bilibili-transcript {
+		ol,
+		ul {
+			margin: 0;
+			padding-left: 0;
+			list-style: none;
+		}
+
+		li {
+			display: grid;
+			grid-template-columns: auto 1fr;
+			gap: 0.5rem;
+			align-items: baseline;
+			padding: 0.25rem 0.35rem;
+			border-radius: 4px;
+			transition: background-color 0.15s ease;
+
+			&:hover {
+				background-color: var(--background-primary-alt);
+			}
+
+			&.bilibili-active-cue {
+				background-color: var(--background-primary-alt);
+
+				.bilibili-timestamp {
+					color: var(--text-accent-hover);
+				}
+			}
+		}
+	}
+	.bilibili-timestamp {
+		font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+		font-size: 0.8em;
+		color: var(--text-muted);
+		white-space: nowrap;
+		cursor: pointer;
+		line-height: inherit;
+
+		&:hover {
+			color: var(--text-accent-hover);
+		}
+	}
+	.bilibili-chapter-title,
+	.bilibili-transcript-text {
+		min-width: 0;
+		overflow-wrap: anywhere;
+		font-size: 0.9em;
+		line-height: calc(var(--line-height-normal) * 0.9);
 	}
 	.player-container {
 		border-top: 12px solid var(--background-primary);
