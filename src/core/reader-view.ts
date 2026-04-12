@@ -4,6 +4,9 @@ import { initializeI18n, getMessage } from '../utils/i18n';
 import { ReaderSettings } from '../types/types';
 import { getFontCss } from '../utils/font-utils';
 import { getDomain } from '../utils/string-utils';
+import { extractContentBySelector as extractContentBySelectorShared } from '../utils/shared';
+import { setPageUrl, setPageTitle, getHighlights } from '../utils/highlighter';
+import { loadSettings } from '../utils/storage-utils';
 import Defuddle from 'defuddle';
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -49,6 +52,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 			parseTime: result.parseTime,
 		};
 
+		// Mark as reader page so button handlers work directly
+		Reader.isReaderPage = true;
+
+		// Set the article URL for the highlighter so highlights are
+		// stored under the real URL, not the extension page URL
+		setPageUrl(url);
+
 		// Build document for Reader.apply
 		document.body.style.visibility = 'hidden';
 		document.body.textContent = '';
@@ -68,11 +78,26 @@ document.addEventListener('DOMContentLoaded', async () => {
 		// code highlighting, etc.) using our pre-extracted content
 		await Reader.apply(document);
 
+		// Load highlighter CSS after Reader.apply, which strips
+		// unrecognized stylesheets from <head> during cleanup
+		const highlighterLink = document.createElement('link');
+		highlighterLink.rel = 'stylesheet';
+		highlighterLink.href = browser.runtime.getURL('highlighter.css');
+		document.head.appendChild(highlighterLink);
+
+		// Ensure general settings are loaded for the highlighter
+		await loadSettings();
+
 		if (result.title) {
 			document.title = result.title;
+			setPageTitle(result.title);
 		}
 
 		document.body.style.visibility = '';
+
+		// Set up message listener so the clipper iframe (side panel)
+		// can communicate with this page via the background script
+		setupReaderPageMessageHandler(url, result);
 
 	} catch (error) {
 		console.error('Failed to load page:', error);
@@ -160,4 +185,80 @@ async function applyReaderTheme() {
 			window.matchMedia('(prefers-color-scheme: dark)').matches ? 'theme-dark' : 'theme-light'
 		);
 	}
+}
+
+// --- Reader page message handler ---
+// On the reader page (extension page), the content script is not loaded.
+// The background forwards messages via runtime.sendMessage with the
+// 'extensionPageMessage' action so the clipper iframe can communicate.
+
+async function setupReaderPageMessageHandler(articleUrl: string, defuddleResult: any) {
+	const currentTab = await browser.tabs.getCurrent();
+	const myTabId = currentTab?.id;
+
+	browser.runtime.onMessage.addListener((request: any, _sender: any, sendResponse: (response?: any) => void): true | undefined => {
+		if (request.action !== 'extensionPageMessage' || request.targetTabId !== myTabId) {
+			return undefined;
+		}
+
+		const message = request.message;
+
+		if (message.action === 'ping') {
+			sendResponse({});
+			return true;
+		}
+
+		if (message.action === 'getPageContent') {
+			const readerArticle = document.querySelector('.obsidian-reader-active .obsidian-reader-content article');
+			if (readerArticle) {
+				const readerDoc = document.implementation.createHTMLDocument();
+				const originalHtml = readerArticle.getAttribute('data-original-html');
+				readerDoc.body.innerHTML = originalHtml || readerArticle.innerHTML;
+				const defuddled = new Defuddle(readerDoc, { url: articleUrl }).parse();
+
+				sendResponse({
+					content: defuddled.content,
+					title: defuddled.title || defuddleResult.title || '',
+					author: defuddled.author || defuddleResult.author || '',
+					description: defuddled.description || defuddleResult.description || '',
+					domain: getDomain(articleUrl),
+					extractedContent: defuddled.variables || {},
+					favicon: defuddled.favicon || defuddleResult.favicon || '',
+					fullHtml: readerArticle.innerHTML,
+					highlights: getHighlights(),
+					image: defuddled.image || defuddleResult.image || '',
+					language: defuddled.language || defuddleResult.language || '',
+					parseTime: defuddled.parseTime || 0,
+					published: defuddled.published || defuddleResult.published || '',
+					schemaOrgData: defuddled.schemaOrgData || defuddleResult.schemaOrgData || {},
+					selectedHtml: '',
+					site: defuddled.site || defuddleResult.site || '',
+					wordCount: defuddled.wordCount || defuddleResult.wordCount || 0,
+					metaTags: defuddled.metaTags || defuddleResult.metaTags || [],
+				});
+			} else {
+				sendResponse({ success: false, error: 'No reader content found' });
+			}
+			return true;
+		}
+
+		if (message.action === 'extractContent') {
+			const content = extractContentBySelectorShared(document, message.selector, message.attribute, message.extractHtml);
+			sendResponse({ content });
+			return true;
+		}
+
+		if (message.action === 'toggle-iframe') {
+			Reader.toggleReaderPageIframe(document);
+			sendResponse({ success: true });
+			return true;
+		}
+
+		if (message.action === 'getReaderModeState') {
+			sendResponse({ isActive: true });
+			return true;
+		}
+
+		return undefined;
+	});
 }

@@ -5,10 +5,12 @@ import { flattenShadowDom as flattenShadowDomUtil } from './flatten-shadow-dom';
 import { getLocalStorage, setLocalStorage } from './storage-utils';
 import hljs from 'highlight.js';
 import { getDomain } from './string-utils';
-import { applyHighlights, invalidateHighlightCache, loadHighlights, toggleHighlighterMenu } from './highlighter';
+import { applyHighlights, invalidateHighlightCache, loadHighlights, toggleHighlighterMenu, getHighlights } from './highlighter';
 import { copyToClipboard } from './clipboard-utils';
 import { getMessage, initializeI18n } from './i18n';
 import { getFontCss } from './font-utils';
+import { createMarkdownContent } from 'defuddle/full';
+import { saveFile } from './file-utils';
 
 // Mobile viewport settings
 const VIEWPORT = 'width=device-width, initial-scale=1, maximum-scale=1';
@@ -31,6 +33,9 @@ export class Reader {
 	private static hasApplied: boolean = false;
 	private static isActive: boolean = false;
 	private static programmaticScroll: boolean = false;
+
+	// When true, button handlers work directly instead of via background/content script.
+	static isReaderPage: boolean = false;
 
 	// Pre-extracted content to skip Defuddle re-extraction in Reader.apply.
 	// Set this before calling apply() to use already-extracted content.
@@ -186,9 +191,13 @@ export class Reader {
 		highlighterBtn.addEventListener('click', async () => {
 			clipDropdown.classList.remove('is-open');
 			settingsBar.classList.remove('is-open');
-			const response = await browser.runtime.sendMessage({ action: 'getActiveTab' }) as { tabId?: number };
-			if (response.tabId) {
-				await browser.runtime.sendMessage({ action: 'toggleHighlighterMode', tabId: response.tabId });
+			if (Reader.isReaderPage) {
+				toggleHighlighterMenu(!doc.body.classList.contains('obsidian-highlighter-active'));
+			} else {
+				const response = await browser.runtime.sendMessage({ action: 'getActiveTab' }) as { tabId?: number };
+				if (response.tabId) {
+					await browser.runtime.sendMessage({ action: 'toggleHighlighterMode', tabId: response.tabId });
+				}
 			}
 		});
 
@@ -220,7 +229,11 @@ export class Reader {
 		obsidianIcon.innerHTML = '<path d="M94.82 149.44c6.53-1.94 17.13-4.9 29.26-5.71a102.97 102.97 0 0 1-7.64-48.84c1.63-16.51 7.54-30.38 13.25-42.1l3.47-7.14 4.48-9.18c2.35-5 4.08-9.38 4.9-13.56.81-4.07.81-7.64-.2-11.11-1.03-3.47-3.07-7.14-7.15-11.21a17.02 17.02 0 0 0-15.8 3.77l-52.81 47.5a17.12 17.12 0 0 0-5.5 10.2l-4.5 30.18a149.26 149.26 0 0 1 38.24 57.2ZM54.45 106l-1.02 3.06-27.94 62.2a17.33 17.33 0 0 0 3.27 18.96l43.94 45.16a88.7 88.7 0 0 0 8.97-88.5A139.47 139.47 0 0 0 54.45 106Z"/><path d="m82.9 240.79 2.34.2c8.26.2 22.33 1.02 33.64 3.06 9.28 1.73 27.73 6.83 42.82 11.21 11.52 3.47 23.45-5.8 25.08-17.73 1.23-8.67 3.57-18.46 7.75-27.53a94.81 94.81 0 0 0-25.9-40.99 56.48 56.48 0 0 0-29.56-13.35 96.55 96.55 0 0 0-40.99 4.79 98.89 98.89 0 0 1-15.29 80.34h.1Z"/><path d="M201.87 197.76a574.87 574.87 0 0 0 19.78-31.6 8.67 8.67 0 0 0-.61-9.48 185.58 185.58 0 0 1-21.82-35.9c-5.91-14.16-6.73-36.08-6.83-46.69 0-4.07-1.22-8.05-3.77-11.21l-34.16-43.33c0 1.94-.4 3.87-.81 5.81a76.42 76.42 0 0 1-5.71 15.9l-4.7 9.8-3.36 6.72a111.95 111.95 0 0 0-12.03 38.23 93.9 93.9 0 0 0 8.67 47.92 67.9 67.9 0 0 1 39.56 16.52 99.4 99.4 0 0 1 25.8 37.31Z"/>';
 		addToObsidianBtn.appendChild(obsidianIcon);
 		addToObsidianBtn.addEventListener('click', () => {
-			browser.runtime.sendMessage({ action: 'toggleIframe' });
+			if (Reader.isReaderPage) {
+				Reader.toggleReaderPageIframe(doc);
+			} else {
+				browser.runtime.sendMessage({ action: 'toggleIframe' });
+			}
 		});
 
 		const clipDropdown = doc.createElement('div');
@@ -243,12 +256,20 @@ export class Reader {
 			item.addEventListener('click', async () => {
 				if (action === 'copyToClipboard') {
 					const originalText = itemLabel.textContent;
-					browser.runtime.sendMessage({ action: 'copyMarkdownToClipboard' });
+					if (Reader.isReaderPage) {
+						Reader.copyMarkdownOnReaderPage(doc);
+					} else {
+						browser.runtime.sendMessage({ action: 'copyMarkdownToClipboard' });
+					}
 					itemLabel.textContent = getMessage('copied');
 					setTimeout(() => { itemLabel.textContent = originalText; }, 2000);
 				} else if (action === 'saveFile') {
 					clipDropdown.classList.remove('is-open');
-					browser.runtime.sendMessage({ action: 'saveMarkdownToFile' });
+					if (Reader.isReaderPage) {
+						Reader.saveMarkdownOnReaderPage(doc);
+					} else {
+						browser.runtime.sendMessage({ action: 'saveMarkdownToFile' });
+					}
 				}
 			});
 
@@ -2338,6 +2359,78 @@ export class Reader {
 		} else {
 			await this.apply(doc);
 			return true;
+		}
+	}
+
+	// --- Reader page helpers (extension page context) ---
+
+	private static parseForClip(doc: Document) {
+		const readerArticle = doc.querySelector('.obsidian-reader-active .obsidian-reader-content article');
+		if (readerArticle) {
+			const readerDoc = doc.implementation.createHTMLDocument();
+			const originalHtml = readerArticle.getAttribute('data-original-html');
+			readerDoc.body.innerHTML = originalHtml || readerArticle.innerHTML;
+			return new Defuddle(readerDoc, { url: '' }).parse();
+		}
+		return new Defuddle(doc, { url: doc.URL }).parse();
+	}
+
+	static toggleReaderPageIframe(doc: Document): void {
+		const containerId = 'obsidian-clipper-container';
+		const iframeId = 'obsidian-clipper-iframe';
+
+		const existing = doc.getElementById(containerId);
+		if (existing) {
+			existing.classList.add('is-closing');
+			existing.addEventListener('animationend', () => existing.remove(), { once: true });
+			return;
+		}
+
+		const container = doc.createElement('div');
+		container.id = containerId;
+		container.classList.add('is-open');
+
+		const iframe = doc.createElement('iframe');
+		iframe.id = iframeId;
+		// Pass the article URL so the side panel can identify the page
+		// (tabs.get() can't see extension page URLs without the tabs permission)
+		iframe.src = browser.runtime.getURL('side-panel.html?context=iframe&readerUrl=' + encodeURIComponent(doc.URL));
+		container.appendChild(iframe);
+
+		// Resize handle (left side)
+		const handle = doc.createElement('div');
+		handle.className = 'obsidian-clipper-resize-handle obsidian-clipper-resize-handle-w';
+		container.appendChild(handle);
+
+		doc.body.appendChild(container);
+	}
+
+	static copyMarkdownOnReaderPage(doc: Document): void {
+		try {
+			const defuddled = Reader.parseForClip(doc);
+			const markdown = createMarkdownContent(defuddled.content, doc.URL);
+			navigator.clipboard.writeText(markdown).catch(() => {
+				const textArea = doc.createElement('textarea');
+				textArea.value = markdown;
+				doc.body.appendChild(textArea);
+				textArea.select();
+				doc.execCommand('copy');
+				doc.body.removeChild(textArea);
+			});
+		} catch (err) {
+			console.error('Failed to copy markdown:', err);
+		}
+	}
+
+	static async saveMarkdownOnReaderPage(doc: Document): Promise<void> {
+		try {
+			const defuddled = Reader.parseForClip(doc);
+			const markdown = createMarkdownContent(defuddled.content, doc.URL);
+			const title = defuddled.title || doc.title || 'Untitled';
+			const fileName = title.replace(/[/\\?%*:|"<>]/g, '-');
+			await saveFile({ content: markdown, fileName, mimeType: 'text/markdown' });
+		} catch (err) {
+			console.error('Failed to save markdown:', err);
 		}
 	}
 }

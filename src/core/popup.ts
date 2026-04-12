@@ -77,6 +77,16 @@ async function getTabInfo(tabId: number): Promise<{ id: number; url: string }> {
 	if (!response || !response.success || !response.tab) {
 		throw new Error((response && response.error) || 'Failed to get tab info');
 	}
+	// On the reader page, tabs.get() can't see the extension page URL
+	// without the tabs permission. Fall back to the readerUrl param
+	// passed through the iframe src.
+	if (!response.tab.url) {
+		const params = new URLSearchParams(window.location.search);
+		const readerUrl = params.get('readerUrl');
+		if (readerUrl) {
+			response.tab.url = readerUrl;
+		}
+	}
 	return response.tab;
 }
 

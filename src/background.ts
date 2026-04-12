@@ -457,15 +457,18 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 				const currentTab = tabs[0];
 				if (currentTab && currentTab.id) {
 					try {
-						// Check if the URL is valid before trying to inject content script
-						if (!currentTab.url || !isValidUrl(currentTab.url) || isBlankPage(currentTab.url)) {
-							sendResponse({success: false, error: 'Cannot open iframe on this page'});
-							return;
+						if (currentTab.url && isValidUrl(currentTab.url) && !isBlankPage(currentTab.url)) {
+							// Normal page
+							await ensureContentScriptLoadedInBackground(currentTab.id);
+							await browser.tabs.sendMessage(currentTab.id, { action: "toggle-iframe" });
+						} else {
+							// Extension page (reader page) or unknown URL
+							await browser.runtime.sendMessage({
+								action: 'extensionPageMessage',
+								targetTabId: currentTab.id,
+								message: { action: "toggle-iframe" }
+							});
 						}
-
-						// Ensure content script is loaded first
-						await ensureContentScriptLoadedInBackground(currentTab.id);
-						await browser.tabs.sendMessage(currentTab.id, { action: "toggle-iframe" });
 						sendResponse({success: true});
 					} catch (error) {
 						console.error('Error sending toggle-iframe message:', error);
@@ -563,11 +566,22 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 
 		if (typedRequest.action === "getTabInfo") {
 			browser.tabs.get(typedRequest.tabId as number).then((tab) => {
+				let url = tab.url;
+				// For reader page tabs, return the article URL so the
+				// clipper treats it as a normal web page
+				if (url) {
+					try {
+						const parsed = new URL(url);
+						if (parsed.pathname.endsWith('/reader.html') && parsed.searchParams.has('url')) {
+							url = parsed.searchParams.get('url')!;
+						}
+					} catch {}
+				}
 				sendResponse({
 					success: true,
 					tab: {
 						id: tab.id,
-						url: tab.url
+						url: url
 					}
 				});
 			}).catch((error) => {
@@ -600,13 +614,26 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 			const tabId = (typedRequest as any).tabId;
 			const message = (typedRequest as any).message;
 			if (tabId && message) {
-				// Ensure content script is loaded before sending message
-				ensureContentScriptLoadedInBackground(tabId).then(() => {
-					console.log('[Obsidian Clipper] Sending message to tab:', message.action);
-					return browser.tabs.sendMessage(tabId, message);
-				}).then((response) => {
-					console.log('[Obsidian Clipper] Tab response:', response ? 'has content=' + !!((response as any).content) : response);
-					sendResponse(response);
+				browser.tabs.get(tabId).then(async (tab) => {
+					// Extension pages (reader page) can't receive tabs.sendMessage.
+					// tab.url may be undefined without the tabs permission, so treat
+					// unknown URLs as potential extension pages too.
+					const isNormalPage = tab.url && isValidUrl(tab.url);
+
+					if (isNormalPage) {
+						// Normal page — inject content script and use tabs.sendMessage
+						await ensureContentScriptLoadedInBackground(tabId);
+						const response = await browser.tabs.sendMessage(tabId, message);
+						sendResponse(response);
+					} else {
+						// Extension page or unknown — forward via runtime.sendMessage
+						const response = await browser.runtime.sendMessage({
+							action: 'extensionPageMessage',
+							targetTabId: tabId,
+							message
+						});
+						sendResponse(response);
+					}
 				}).catch((error) => {
 					console.error('[Obsidian Clipper] Error sending message to tab:', error);
 					sendResponse({

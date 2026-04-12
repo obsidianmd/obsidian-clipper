@@ -19,9 +19,10 @@ export async function updateCurrentActiveTab(windowId: number) {
 	}
 }
 
-export function isValidUrl(url: string): boolean {
-	return url.startsWith('http://') || 
-		   url.startsWith('https://') || 
+export function isValidUrl(url: string | undefined): boolean {
+	if (!url) return false;
+	return url.startsWith('http://') ||
+		   url.startsWith('https://') ||
 		   url.startsWith('file:///');
 }
 
