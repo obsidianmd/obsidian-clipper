@@ -1,6 +1,6 @@
 import browser from 'webextension-polyfill';
 import { detectBrowser } from './utils/browser-detection';
-import { updateCurrentActiveTab, isValidUrl, isBlankPage } from './utils/active-tab-manager';
+import { updateCurrentActiveTab, isValidUrl, isBlankPage, isNormalPageUrl } from './utils/active-tab-manager';
 import { TextHighlightData } from './utils/highlighter';
 import { debounce } from './utils/debounce';
 import { Settings } from './types/types';
@@ -168,6 +168,22 @@ async function ensureContentScriptLoadedInBackground(tabId: number): Promise<voi
 		// If the message fails, the content script is not loaded, so inject it
 		console.log('[Obsidian Clipper] Ping failed, injecting content script...', error);
 		await injectContentScript(tabId);
+	}
+}
+
+// Route a message to a tab, handling both normal pages (via content script)
+// and extension pages like the reader page (via runtime.sendMessage forwarding).
+async function routeMessageToTab(tabId: number, message: any): Promise<any> {
+	const tab = await browser.tabs.get(tabId);
+	if (isNormalPageUrl(tab.url)) {
+		await ensureContentScriptLoadedInBackground(tabId);
+		return browser.tabs.sendMessage(tabId, message);
+	} else {
+		return browser.runtime.sendMessage({
+			action: 'extensionPageMessage',
+			targetTabId: tabId,
+			message
+		});
 	}
 }
 
@@ -457,18 +473,7 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 				const currentTab = tabs[0];
 				if (currentTab && currentTab.id) {
 					try {
-						if (currentTab.url && isValidUrl(currentTab.url) && !isBlankPage(currentTab.url)) {
-							// Normal page
-							await ensureContentScriptLoadedInBackground(currentTab.id);
-							await browser.tabs.sendMessage(currentTab.id, { action: "toggle-iframe" });
-						} else {
-							// Extension page (reader page) or unknown URL
-							await browser.runtime.sendMessage({
-								action: 'extensionPageMessage',
-								targetTabId: currentTab.id,
-								message: { action: "toggle-iframe" }
-							});
-						}
+						await routeMessageToTab(currentTab.id, { action: "toggle-iframe" });
 						sendResponse({success: true});
 					} catch (error) {
 						console.error('Error sending toggle-iframe message:', error);
@@ -483,9 +488,8 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 
 		if (typedRequest.action === "toggleIframe") {
 			const tab = sender.tab;
-			if (tab?.id && tab.url && isValidUrl(tab.url) && !isBlankPage(tab.url)) {
-				ensureContentScriptLoadedInBackground(tab.id)
-					.then(() => browser.tabs.sendMessage(tab.id!, { action: "toggle-iframe" }))
+			if (tab?.id) {
+				routeMessageToTab(tab.id, { action: "toggle-iframe" })
 					.then(() => sendResponse({ success: true }))
 					.catch((error) => {
 						console.error('Error toggling iframe:', error);
@@ -551,15 +555,9 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 
 		if (typedRequest.action === "copyMarkdownToClipboard" || typedRequest.action === "saveMarkdownToFile") {
 			if (sender.tab?.id) {
-				(async () => {
-					try {
-						await ensureContentScriptLoadedInBackground(sender.tab!.id!);
-						await browser.tabs.sendMessage(sender.tab!.id!, { action: typedRequest.action });
-						sendResponse({success: true});
-					} catch (error) {
-						sendResponse({success: false, error: error instanceof Error ? error.message : String(error)});
-					}
-				})();
+				routeMessageToTab(sender.tab.id, { action: typedRequest.action })
+					.then(() => sendResponse({success: true}))
+					.catch((error) => sendResponse({success: false, error: error instanceof Error ? error.message : String(error)}));
 				return true;
 			}
 		}
@@ -614,26 +612,8 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 			const tabId = (typedRequest as any).tabId;
 			const message = (typedRequest as any).message;
 			if (tabId && message) {
-				browser.tabs.get(tabId).then(async (tab) => {
-					// Extension pages (reader page) can't receive tabs.sendMessage.
-					// tab.url may be undefined without the tabs permission, so treat
-					// unknown URLs as potential extension pages too.
-					const isNormalPage = tab.url && isValidUrl(tab.url);
-
-					if (isNormalPage) {
-						// Normal page — inject content script and use tabs.sendMessage
-						await ensureContentScriptLoadedInBackground(tabId);
-						const response = await browser.tabs.sendMessage(tabId, message);
-						sendResponse(response);
-					} else {
-						// Extension page or unknown — forward via runtime.sendMessage
-						const response = await browser.runtime.sendMessage({
-							action: 'extensionPageMessage',
-							targetTabId: tabId,
-							message
-						});
-						sendResponse(response);
-					}
+				routeMessageToTab(tabId, message).then((response) => {
+					sendResponse(response);
 				}).catch((error) => {
 					console.error('[Obsidian Clipper] Error sending message to tab:', error);
 					sendResponse({

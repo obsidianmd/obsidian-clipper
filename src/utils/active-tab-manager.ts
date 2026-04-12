@@ -30,6 +30,12 @@ export function isBlankPage(url: string): boolean {
 	return url === 'about:blank' || url === 'chrome://newtab/' || url === 'edge://newtab/';
 }
 
+// Returns true for tabs where content scripts can be injected.
+// False for extension pages, restricted URLs, or tabs with unknown URLs.
+export function isNormalPageUrl(url: string | undefined): boolean {
+	return !!url && isValidUrl(url) && !isBlankPage(url);
+}
+
 export function isRestrictedUrl(url: string): boolean {
 	try {
 		const urlObj = new URL(url);

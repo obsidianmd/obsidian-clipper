@@ -11,6 +11,7 @@ import { getMessage, initializeI18n } from './i18n';
 import { getFontCss } from './font-utils';
 import { createMarkdownContent } from 'defuddle/full';
 import { saveFile } from './file-utils';
+import { parseForClip } from './clip-utils';
 
 // Mobile viewport settings
 const VIEWPORT = 'width=device-width, initial-scale=1, maximum-scale=1';
@@ -34,7 +35,6 @@ export class Reader {
 	private static isActive: boolean = false;
 	private static programmaticScroll: boolean = false;
 
-	// When true, button handlers work directly instead of via background/content script.
 	static isReaderPage: boolean = false;
 
 	// Pre-extracted content to skip Defuddle re-extraction in Reader.apply.
@@ -2364,17 +2364,6 @@ export class Reader {
 
 	// --- Reader page helpers (extension page context) ---
 
-	private static parseForClip(doc: Document) {
-		const readerArticle = doc.querySelector('.obsidian-reader-active .obsidian-reader-content article');
-		if (readerArticle) {
-			const readerDoc = doc.implementation.createHTMLDocument();
-			const originalHtml = readerArticle.getAttribute('data-original-html');
-			readerDoc.body.innerHTML = originalHtml || readerArticle.innerHTML;
-			return new Defuddle(readerDoc, { url: '' }).parse();
-		}
-		return new Defuddle(doc, { url: doc.URL }).parse();
-	}
-
 	static toggleReaderPageIframe(doc: Document): void {
 		const containerId = 'obsidian-clipper-container';
 		const iframeId = 'obsidian-clipper-iframe';
@@ -2407,7 +2396,7 @@ export class Reader {
 
 	static copyMarkdownOnReaderPage(doc: Document): void {
 		try {
-			const defuddled = Reader.parseForClip(doc);
+			const defuddled = parseForClip(doc);
 			const markdown = createMarkdownContent(defuddled.content, doc.URL);
 			navigator.clipboard.writeText(markdown).catch(() => {
 				const textArea = doc.createElement('textarea');
@@ -2424,7 +2413,7 @@ export class Reader {
 
 	static async saveMarkdownOnReaderPage(doc: Document): Promise<void> {
 		try {
-			const defuddled = Reader.parseForClip(doc);
+			const defuddled = parseForClip(doc);
 			const markdown = createMarkdownContent(defuddled.content, doc.URL);
 			const title = defuddled.title || doc.title || 'Untitled';
 			const fileName = title.replace(/[/\\?%*:|"<>]/g, '-');

@@ -949,7 +949,8 @@ function getParents(element: Element): Element[] {
 
 // Save highlights to browser storage
 export function saveHighlights() {
-	const url = normalizeUrl(getPageUrl());
+	const rawUrl = getPageUrl();
+	const url = normalizeUrl(rawUrl);
 	if (highlights.length > 0) {
 		const title = pageTitle || document.title || undefined;
 		const data: StoredData = { highlights, url, title };
@@ -958,10 +959,9 @@ export function saveHighlights() {
 			allHighlights[url] = data;
 			browser.storage.local.set({ highlights: allHighlights });
 		});
-		// Auto-populate domain site name from og:site_name if not already set
 		const ogSiteName = document.querySelector('meta[property="og:site_name"]')?.getAttribute('content');
 		if (ogSiteName) {
-			const hostname = new URL(getPageUrl()).hostname.replace(/^www\./, '');
+			const hostname = new URL(rawUrl).hostname.replace(/^www\./, '');
 			browser.storage.local.get('domains').then((result: { domains?: Record<string, DomainSettings> }) => {
 				const domains = result.domains || {};
 				if (!domains[hostname]?.site) {
@@ -972,12 +972,9 @@ export function saveHighlights() {
 			});
 		}
 	} else {
-		// Remove the entry if there are no highlights
 		browser.storage.local.get('highlights').then((result: { highlights?: HighlightsStorage }) => {
 			const allHighlights: HighlightsStorage = result.highlights || {};
 			delete allHighlights[url];
-			// Also clean up any old non-normalized key
-			const rawUrl = getPageUrl();
 			if (rawUrl !== url) delete allHighlights[rawUrl];
 			browser.storage.local.set({ highlights: allHighlights });
 		});

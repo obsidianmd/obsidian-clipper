@@ -21,19 +21,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 		return;
 	}
 
-	// Show loading spinner
 	document.body.innerHTML = `<div class="obsidian-reader-loading"><div class="obsidian-reader-loading-text">${getMessage('readerLoading')}</div></div>`;
 
 	try {
-		// Fetch page HTML via background proxy
 		const html = await proxyFetch(url);
 
-		// Parse with DOMParser — scripts never execute
 		const parser = new DOMParser();
 		const parsedDoc = parser.parseFromString(html, 'text/html');
 		Object.defineProperty(parsedDoc, 'URL', { value: url, configurable: true });
 
-		// Run Defuddle once with proxied fetch
 		const defuddle = new Defuddle(parsedDoc, { url, fetch: proxyFetchAsResponse });
 		const result = await defuddle.parseAsync();
 
@@ -41,7 +37,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 			throw new Error('Could not extract article content');
 		}
 
-		// Set pre-extracted content so Reader.apply skips re-extraction
 		Reader.preExtractedContent = {
 			content: result.content,
 			title: result.title,
@@ -52,21 +47,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 			parseTime: result.parseTime,
 		};
 
-		// Mark as reader page so button handlers work directly
 		Reader.isReaderPage = true;
-
-		// Set the article URL for the highlighter so highlights are
-		// stored under the real URL, not the extension page URL
+		// Use the article URL for highlights, not the extension page URL
 		setPageUrl(url);
 
-		// Build document for Reader.apply
 		document.body.style.visibility = 'hidden';
 		document.body.textContent = '';
 
 		Object.defineProperty(document, 'URL', { value: url, configurable: true });
 		document.title = result.title || url;
 
-		// Set base URL for relative resources
 		let baseEl = document.querySelector('base');
 		if (!baseEl) {
 			baseEl = document.createElement('base');
@@ -74,18 +64,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 		}
 		baseEl.href = url;
 
-		// Reader.apply builds the full UI (outline, settings bar, transcript,
-		// code highlighting, etc.) using our pre-extracted content
 		await Reader.apply(document);
 
-		// Load highlighter CSS after Reader.apply, which strips
-		// unrecognized stylesheets from <head> during cleanup
+		// Load after Reader.apply which strips unrecognized stylesheets
 		const highlighterLink = document.createElement('link');
 		highlighterLink.rel = 'stylesheet';
 		highlighterLink.href = browser.runtime.getURL('highlighter.css');
 		document.head.appendChild(highlighterLink);
 
-		// Ensure general settings are loaded for the highlighter
 		await loadSettings();
 
 		if (result.title) {
@@ -95,8 +81,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 		document.body.style.visibility = '';
 
-		// Set up message listener so the clipper iframe (side panel)
-		// can communicate with this page via the background script
 		setupReaderPageMessageHandler(url, result);
 
 	} catch (error) {
@@ -187,14 +171,31 @@ async function applyReaderTheme() {
 	}
 }
 
-// --- Reader page message handler ---
-// On the reader page (extension page), the content script is not loaded.
-// The background forwards messages via runtime.sendMessage with the
-// 'extensionPageMessage' action so the clipper iframe can communicate.
-
+// Handle messages from the clipper iframe via the background's
+// extensionPageMessage forwarding (content scripts can't run on extension pages).
 async function setupReaderPageMessageHandler(articleUrl: string, defuddleResult: any) {
 	const currentTab = await browser.tabs.getCurrent();
 	const myTabId = currentTab?.id;
+
+	const cachedContent = {
+		content: defuddleResult.content || '',
+		title: defuddleResult.title || '',
+		author: defuddleResult.author || '',
+		description: defuddleResult.description || '',
+		domain: getDomain(articleUrl),
+		extractedContent: defuddleResult.variables || {},
+		favicon: defuddleResult.favicon || '',
+		fullHtml: defuddleResult.content || '',
+		image: defuddleResult.image || '',
+		language: defuddleResult.language || '',
+		parseTime: defuddleResult.parseTime || 0,
+		published: defuddleResult.published || '',
+		schemaOrgData: defuddleResult.schemaOrgData || {},
+		selectedHtml: '',
+		site: defuddleResult.site || '',
+		wordCount: defuddleResult.wordCount || 0,
+		metaTags: defuddleResult.metaTags || [],
+	};
 
 	browser.runtime.onMessage.addListener((request: any, _sender: any, sendResponse: (response?: any) => void): true | undefined => {
 		if (request.action !== 'extensionPageMessage' || request.targetTabId !== myTabId) {
@@ -209,36 +210,7 @@ async function setupReaderPageMessageHandler(articleUrl: string, defuddleResult:
 		}
 
 		if (message.action === 'getPageContent') {
-			const readerArticle = document.querySelector('.obsidian-reader-active .obsidian-reader-content article');
-			if (readerArticle) {
-				const readerDoc = document.implementation.createHTMLDocument();
-				const originalHtml = readerArticle.getAttribute('data-original-html');
-				readerDoc.body.innerHTML = originalHtml || readerArticle.innerHTML;
-				const defuddled = new Defuddle(readerDoc, { url: articleUrl }).parse();
-
-				sendResponse({
-					content: defuddled.content,
-					title: defuddled.title || defuddleResult.title || '',
-					author: defuddled.author || defuddleResult.author || '',
-					description: defuddled.description || defuddleResult.description || '',
-					domain: getDomain(articleUrl),
-					extractedContent: defuddled.variables || {},
-					favicon: defuddled.favicon || defuddleResult.favicon || '',
-					fullHtml: readerArticle.innerHTML,
-					highlights: getHighlights(),
-					image: defuddled.image || defuddleResult.image || '',
-					language: defuddled.language || defuddleResult.language || '',
-					parseTime: defuddled.parseTime || 0,
-					published: defuddled.published || defuddleResult.published || '',
-					schemaOrgData: defuddled.schemaOrgData || defuddleResult.schemaOrgData || {},
-					selectedHtml: '',
-					site: defuddled.site || defuddleResult.site || '',
-					wordCount: defuddled.wordCount || defuddleResult.wordCount || 0,
-					metaTags: defuddled.metaTags || defuddleResult.metaTags || [],
-				});
-			} else {
-				sendResponse({ success: false, error: 'No reader content found' });
-			}
+			sendResponse({ ...cachedContent, highlights: getHighlights() });
 			return true;
 		}
 

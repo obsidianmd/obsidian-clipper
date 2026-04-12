@@ -1,13 +1,14 @@
 import browser from './utils/browser-polyfill';
 import * as highlighter from './utils/highlighter';
 import { loadSettings, generalSettings } from './utils/storage-utils';
-import Defuddle from 'defuddle';
 import { getDomain } from './utils/string-utils';
 import { extractContentBySelector as extractContentBySelectorShared } from './utils/shared';
+import Defuddle from 'defuddle';
 import { createMarkdownContent } from 'defuddle/full';
 import { flattenShadowDom } from './utils/flatten-shadow-dom';
 import { saveFile } from './utils/file-utils';
 import { debugLog } from './utils/debug';
+import { parseForClip } from './utils/clip-utils';
 
 declare global {
 	interface Window {
@@ -25,20 +26,6 @@ declare global {
 	const myGeneration = window.obsidianClipperGeneration;
 
 	debugLog('Clipper', 'Initializing content script, generation', myGeneration);
-
-	// In Reader mode, extract from the article's original HTML (before
-	// wireTranscript restructures it) with a neutral URL so site-specific
-	// extractors don't re-fetch content (e.g. YouTube)
-	function parseForClip(doc: Document) {
-		const readerArticle = doc.querySelector('.obsidian-reader-active .obsidian-reader-content article');
-		if (readerArticle) {
-			const readerDoc = doc.implementation.createHTMLDocument();
-			const originalHtml = readerArticle.getAttribute('data-original-html');
-			readerDoc.body.innerHTML = originalHtml || readerArticle.innerHTML;
-			return new Defuddle(readerDoc, { url: '' }).parse();
-		}
-		return new Defuddle(doc, { url: doc.URL }).parse();
-	}
 
 	let isHighlighterMode = false;
 	const iframeId = 'obsidian-clipper-iframe';
