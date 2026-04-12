@@ -390,7 +390,18 @@ function renderSidebar() {
 		li.appendChild(chevronWrap);
 
 		const normalized = group.domain.replace(/^www\./, '');
-		const siteName = domainSettingsMap[normalized]?.site;
+		const domainSettings = domainSettingsMap[normalized];
+		const siteName = domainSettings?.site;
+
+		if (domainSettings?.favicon) {
+			const favicon = document.createElement('img');
+			favicon.className = 'nav-domain-favicon';
+			favicon.src = domainSettings.favicon;
+			favicon.width = 16;
+			favicon.height = 16;
+			favicon.onerror = () => favicon.remove();
+			li.appendChild(favicon);
+		}
 
 		const name = document.createElement('span');
 		name.className = 'nav-domain-name';
@@ -807,6 +818,7 @@ async function fetchDefuddled(url: string): Promise<DefuddleResult | null> {
 
 		const title = defuddled.title || undefined;
 		const site = defuddled.site || undefined;
+		const favicon = defuddled.favicon || undefined;
 		const content = defuddled.content || undefined;
 
 		// Save title to highlights storage
@@ -819,8 +831,8 @@ async function fetchDefuddled(url: string): Promise<DefuddleResult | null> {
 			}
 		}
 
-		// Save site to domains storage
-		if (site) {
+		// Save site and favicon to domains storage
+		if (site || favicon) {
 			let hostname: string;
 			try {
 				hostname = new URL(url).hostname.replace(/^www\./, '');
@@ -830,8 +842,20 @@ async function fetchDefuddled(url: string): Promise<DefuddleResult | null> {
 			const domResult = await browser.storage.local.get('domains');
 			const domains = (domResult.domains || {}) as Record<string, DomainSettings>;
 			if (!domains[hostname]) domains[hostname] = {};
-			if (!domains[hostname].site) {
+			let changed = false;
+			if (site && !domains[hostname].site) {
 				domains[hostname].site = site;
+				changed = true;
+			}
+			if (favicon && !domains[hostname].favicon) {
+				try {
+					domains[hostname].favicon = new URL(favicon, url).href;
+				} catch {
+					domains[hostname].favicon = favicon;
+				}
+				changed = true;
+			}
+			if (changed) {
 				domainSettingsMap[hostname] = domains[hostname];
 				await browser.storage.local.set({ domains });
 				renderSidebar();

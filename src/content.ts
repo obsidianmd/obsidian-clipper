@@ -383,9 +383,7 @@ declare global {
 				if (defuddled.title) {
 					highlighter.setPageTitle(defuddled.title);
 				}
-				if (defuddled.site) {
-					highlighter.setPageSite(defuddled.site);
-				}
+				highlighter.updatePageDomainSettings({ site: defuddled.site, favicon: defuddled.favicon });
 				sendResponse(response);
 			}).catch((error: unknown) => {
 				console.error('[Obsidian Clipper] getPageContent error:', error);

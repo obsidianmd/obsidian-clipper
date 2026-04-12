@@ -5,7 +5,7 @@ import { ReaderSettings } from '../types/types';
 import { getFontCss } from '../utils/font-utils';
 import { getDomain } from '../utils/string-utils';
 import { extractContentBySelector as extractContentBySelectorShared } from '../utils/shared';
-import { setPageUrl, setPageTitle, setPageSite, getHighlights } from '../utils/highlighter';
+import { setPageUrl, setPageTitle, updatePageDomainSettings, getHighlights } from '../utils/highlighter';
 import { loadSettings } from '../utils/storage-utils';
 import Defuddle from 'defuddle';
 
@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 			document.title = result.title;
 			setPageTitle(result.title);
 		}
-		if (result.site) setPageSite(result.site);
+		updatePageDomainSettings({ site: result.site, favicon: result.favicon });
 		if (result.favicon) setFavicon(result.favicon, url);
 
 		setupReaderPageMessageHandler(url, result);
@@ -170,7 +170,7 @@ async function loadArticle(newUrl: string) {
 
 		setPageUrl(newUrl);
 		if (result.title) setPageTitle(result.title);
-		if (result.site) setPageSite(result.site);
+		updatePageDomainSettings({ site: result.site, favicon: result.favicon });
 		if (result.favicon) setFavicon(result.favicon, newUrl);
 
 		await Reader.updateReaderContent(document, {

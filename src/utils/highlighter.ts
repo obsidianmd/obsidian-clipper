@@ -112,21 +112,32 @@ export function setPageTitle(title: string) {
 	pageTitle = title;
 }
 
-export function setPageSite(site: string) {
-	if (!site) return;
-	const hostname = new URL(getPageUrl()).hostname.replace(/^www\./, '');
+export function updatePageDomainSettings(settings: { site?: string; favicon?: string }) {
+	const pageUrl = getPageUrl();
+	const hostname = new URL(pageUrl).hostname.replace(/^www\./, '');
+	const resolved: Partial<DomainSettings> = {};
+	if (settings.site) resolved.site = settings.site;
+	if (settings.favicon) {
+		try {
+			resolved.favicon = new URL(settings.favicon, pageUrl).href;
+		} catch {
+			resolved.favicon = settings.favicon;
+		}
+	}
+	if (!resolved.site && !resolved.favicon) return;
 	browser.storage.local.get('domains').then((result: { domains?: Record<string, DomainSettings> }) => {
 		const domains = result.domains || {};
 		if (!domains[hostname]) {
 			domains[hostname] = {};
 		}
-		domains[hostname].site = site;
+		Object.assign(domains[hostname], resolved);
 		browser.storage.local.set({ domains });
 	});
 }
 
 export interface DomainSettings {
 	site?: string;
+	favicon?: string;
 }
 let lastAppliedHighlights: string = '';
 let originalLinkClickHandlers: WeakMap<HTMLElement, (event: MouseEvent) => void> = new WeakMap();
