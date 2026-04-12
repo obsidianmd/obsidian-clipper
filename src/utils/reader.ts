@@ -1790,33 +1790,48 @@ export class Reader {
 
 	/**
 	 * 初始化 Bilibili 字幕时间戳点击跳转功能。
+	 * 点击时间戳或字幕文本行均可跳转到对应时间点。
 	 */
 	private static initializeBilibiliTimestamps(doc: Document) {
 		const iframe = doc.querySelector('iframe[src*="player.bilibili.com"]') as HTMLIFrameElement | null;
 		if (!iframe) return;
 
-		const timestamps = doc.querySelectorAll('.bilibili-timestamp[data-time]');
-		timestamps.forEach((el) => {
-			el.addEventListener('click', (e) => {
-				e.preventDefault();
-				e.stopPropagation();
-				const target = e.currentTarget as HTMLElement;
-				const seconds = parseInt(target.dataset.time || '0', 10);
+		const seekBilibili = (seconds: number) => {
+			const currentSrc = new URL(iframe.src);
+			currentSrc.searchParams.set('t', String(seconds));
+			currentSrc.searchParams.set('autoplay', '1');
+			iframe.src = currentSrc.toString();
+		};
+
+		const setActiveCue = (li: HTMLElement | null) => {
+			doc.querySelectorAll('.bilibili-active-cue').forEach((el) => {
+				el.classList.remove('bilibili-active-cue');
+			});
+			if (li) {
+				li.classList.add('bilibili-active-cue');
+			}
+		};
+
+		// 为字幕和章节区域的每一行绑定点击事件
+		const transcriptSection = doc.querySelector('.bilibili-transcript');
+		const chaptersSection = doc.querySelector('.bilibili-chapters');
+
+		[transcriptSection, chaptersSection].forEach((section) => {
+			if (!section) return;
+			section.addEventListener('click', (e) => {
+				const target = e.target as HTMLElement;
+				const li = target.closest('li') as HTMLElement | null;
+				if (!li) return;
+
+				const timestamp = li.querySelector('.bilibili-timestamp[data-time]') as HTMLElement | null;
+				if (!timestamp) return;
+
+				const seconds = parseInt(timestamp.dataset.time || '0', 10);
 				if (!Number.isFinite(seconds)) return;
 
-				const currentSrc = new URL(iframe.src);
-				currentSrc.searchParams.set('t', String(seconds));
-				currentSrc.searchParams.set('autoplay', '1');
-				iframe.src = currentSrc.toString();
-
-				doc.querySelectorAll('.bilibili-active-cue').forEach((el) => {
-					el.classList.remove('bilibili-active-cue');
-				});
-				const parentLi = target.closest('li');
-				if (parentLi) {
-					parentLi.classList.add('bilibili-active-cue');
-					parentLi.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-				}
+				e.preventDefault();
+				seekBilibili(seconds);
+				setActiveCue(li);
 			});
 		});
 	}
@@ -2298,7 +2313,7 @@ export class Reader {
 				}
 			}
 
-			// Bilibili: inject embed player since Defuddle does not extract the JS-based video player
+			// Bilibili: inject embed player with pin-player container
 			if (isBilibili && bilibiliVideoId) {
 				const isBvid = /^BV/i.test(bilibiliVideoId);
 				const idKey = isBvid ? 'bvid' : 'aid';
@@ -2315,6 +2330,9 @@ export class Reader {
 				const bBrowserType = browserType || await detectBrowser();
 				const isSafari = ['safari', 'mobile-safari', 'ipad-os'].includes(bBrowserType);
 
+				const playerContainer = doc.createElement('div');
+				playerContainer.className = 'player-container' + (this.settings.pinPlayer ? ' pin-player' : '');
+
 				if (isSafari) {
 					const watchUrl = doc.URL;
 					const thumbnail = doc.createElement('a');
@@ -2328,16 +2346,61 @@ export class Reader {
 						+ '<svg style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:68px;height:48px;mix-blend-mode:normal!important;" viewBox="0 0 68 48">'
 						+ '<path d="M66.52 7.74c-.78-2.93-2.49-5.41-5.42-6.19C55.79.13 34 0 34 0S12.21.13 6.9 1.55c-2.93.78-4.63 3.26-5.42 6.19C.06 13.05 0 24 0 24s.06 10.95 1.48 16.26c.78 2.93 2.49 5.41 5.42 6.19C12.21 47.87 34 48 34 48s21.79-.13 27.1-1.55c2.93-.78 4.64-3.26 5.42-6.19C67.94 34.95 68 24 68 24s-.06-10.95-1.48-16.26z" fill="#00a1d6"/>'
 						+ '<path d="M45 24L27 14v20" fill="white"/></svg>';
-					contentBody.insertBefore(thumbnail, contentBody.firstChild);
+					playerContainer.appendChild(thumbnail);
 				} else {
 					const iframe = doc.createElement('iframe');
 					iframe.src = embedUrl;
 					iframe.setAttribute('allowfullscreen', '');
 					iframe.setAttribute('allow', 'autoplay; encrypted-media; picture-in-picture');
 					iframe.setAttribute('scrolling', 'no');
-					contentBody.insertBefore(iframe, contentBody.firstChild);
+					playerContainer.appendChild(iframe);
 					await browser.runtime.sendMessage({ action: 'enableBilibiliEmbedRule' }).catch(() => {});
 				}
+
+				// Toggle bar with pin-player control
+				const toggleBar = doc.createElement('div');
+				toggleBar.className = 'player-toggles';
+				const toggleGroup = doc.createElement('div');
+				toggleGroup.className = 'player-toggle-group is-open';
+
+				const createBilibiliToggle = (label: string, defaultOn: boolean, onChange: (on: boolean) => void) => {
+					const wrapper = doc.createElement('label');
+					wrapper.className = 'player-toggle' + (defaultOn ? ' is-enabled' : '');
+					const toggle = doc.createElement('div');
+					toggle.className = 'player-toggle-switch';
+					const input = doc.createElement('input');
+					input.type = 'checkbox';
+					input.checked = defaultOn;
+					toggle.appendChild(input);
+					const text = doc.createElement('span');
+					text.textContent = label;
+					wrapper.appendChild(text);
+					wrapper.appendChild(toggle);
+					wrapper.addEventListener('click', (e) => {
+						e.preventDefault();
+						input.checked = !input.checked;
+						wrapper.classList.toggle('is-enabled', input.checked);
+						onChange(input.checked);
+					});
+					return wrapper;
+				};
+
+				toggleGroup.appendChild(createBilibiliToggle(getMessage('readerPinPlayer'), this.settings.pinPlayer, (on) => {
+					playerContainer.classList.toggle('pin-player', on);
+					if (on) {
+						playerContainer.appendChild(toggleBar);
+					} else {
+						playerContainer.after(toggleBar);
+					}
+					window.dispatchEvent(new CustomEvent('reader-show-nav'));
+					this.settings.pinPlayer = on;
+					this.saveSettings();
+				}));
+
+				toggleBar.appendChild(toggleGroup);
+				playerContainer.appendChild(toggleBar);
+
+				contentBody.insertBefore(playerContainer, contentBody.firstChild);
 			}
 
 			while (contentBody.firstChild) {
