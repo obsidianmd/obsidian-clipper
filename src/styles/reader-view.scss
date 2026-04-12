@@ -1,0 +1,44 @@
+#reader-page {
+	body {
+		background: var(--background-primary);
+		color: var(--text-normal);
+		font-size: var(--dynamic-font-size, 16px);
+		line-height: var(--line-height-normal, 1.6);
+		font-family: var(--font-text, system-ui, -apple-system, sans-serif);
+		-webkit-font-smoothing: antialiased;
+		margin: 0;
+		padding: 0;
+	}
+}
+
+#reader-view {
+	min-height: 100vh;
+}
+
+.reader-view-content {
+	padding: max(4rem, 4vh) 1rem 4rem;
+	width: var(--line-width, 40em);
+	max-width: calc(100vw - 2rem);
+	margin: 0 auto;
+
+	> main {
+		max-width: 100%;
+	}
+}
+
+.reader-view-error {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	color: var(--text-muted);
+	font-family: var(--font-default);
+	font-size: var(--font-ui-small);
+}
+
+mark.reader-view-highlight {
+	background-color: hsla(60, 100%, 50%, 0.35) !important;
+	color: var(--text-normal) !important;
+	border-radius: 2px;
+	padding: 1px 0;
+}

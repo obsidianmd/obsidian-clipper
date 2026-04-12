@@ -375,6 +375,15 @@
 	"general": {
 		"message": "General"
 	},
+	"highlightsNotFound": {
+		"message": "Highlights not found in article"
+	},
+	"loadArticle": {
+		"message": "Read article"
+	},
+	"loading": {
+		"message": "Loading…"
+	},
 	"generalSettings": {
 		"message": "General settings"
 	},

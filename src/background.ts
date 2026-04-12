@@ -161,6 +161,28 @@ async function sendMessageToPopup(tabId: number, message: any): Promise<void> {
 
 
 
+// Fetch proxy for extension pages (reader, highlights).
+// Returns a Promise for the webextension-polyfill.
+// On Firefox MV3, host_permissions require explicit user grant —
+// callers detect CORS_PERMISSION_NEEDED and prompt via permissions.request().
+browser.runtime.onMessage.addListener((request: unknown) => {
+	if (typeof request !== 'object' || request === null) return;
+	if ((request as any).action !== 'fetchProxy') return;
+	const { url, options } = request as { url: string; options?: any };
+	const fetchOptions: RequestInit = {};
+	if (options?.method) fetchOptions.method = options.method;
+	if (options?.headers) fetchOptions.headers = options.headers;
+	if (options?.body) fetchOptions.body = options.body;
+	return fetch(url, fetchOptions)
+		.then(async (resp) => {
+			const text = await resp.text();
+			return { ok: resp.ok, status: resp.status, text };
+		})
+		.catch(() => {
+			return { ok: false, status: 0, text: '', error: 'CORS_PERMISSION_NEEDED' };
+		});
+});
+
 browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime.MessageSender, sendResponse: (response?: any) => void): true | undefined => {
 	if (typeof request === 'object' && request !== null) {
 		const typedRequest = request as { action: string; isActive?: boolean; hasHighlights?: boolean; tabId?: number; text?: string; section?: string };
@@ -189,6 +211,8 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 			});
 			return true;
 		}
+
+		// fetchProxy is handled by a separate listener below
 
 		if (typedRequest.action === "extractContent" && sender.tab && sender.tab.id) {
 			browser.tabs.sendMessage(sender.tab.id, request).then(sendResponse);

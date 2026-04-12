@@ -246,6 +246,22 @@
 	}
 }
 
+.highlight-load-article-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	width: auto;
+	font-family: var(--font-default);
+	font-size: var(--font-ui-smaller);
+	margin: 8px 0 16px;
+	color: var(--text-muted);
+
+	svg {
+		width: 14px;
+		height: 14px;
+	}
+}
+
 // --- Page headers in main content ---
 
 .highlight-page-header {

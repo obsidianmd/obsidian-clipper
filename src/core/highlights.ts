@@ -533,25 +533,21 @@ function renderMain() {
 		listEl.appendChild(titleEl);
 		listEl.appendChild(pageLink);
 
-		// Show sync button if no title
-		if (!pageGroup?.title) {
-			const syncBtn = document.createElement('button');
-			syncBtn.className = 'highlight-sync-btn clickable-icon highlight-sync-btn-visible';
-			const syncIcon = document.createElement('i');
-			syncIcon.setAttribute('data-lucide', 'rotate-cw');
-			syncBtn.appendChild(syncIcon);
-			syncBtn.addEventListener('click', async () => {
-				syncBtn.classList.add('is-syncing');
-				const meta = await fetchPageMetadata(nav.url);
-				syncBtn.classList.remove('is-syncing');
-				if (meta?.title) {
-					titleEl.textContent = meta.title;
-					syncBtn.style.display = 'none';
-				}
-			});
-			titleEl.appendChild(document.createTextNode(' '));
-			titleEl.appendChild(syncBtn);
-		}
+		// "Read article" link
+		const readArticleLink = document.createElement('a');
+		readArticleLink.className = 'highlight-load-article-btn';
+		readArticleLink.href = `reader.html?url=${encodeURIComponent(nav.url)}`;
+		readArticleLink.target = '_blank';
+		readArticleLink.textContent = getMessage('loadArticle') || 'Read article';
+		const loadIcon = document.createElement('i');
+		loadIcon.setAttribute('data-lucide', 'book-open');
+		readArticleLink.prepend(loadIcon);
+		listEl.appendChild(readArticleLink);
+
+		// Show highlights as normal list by default
+		renderNextBatch();
+		createIcons({ icons });
+		return;
 	}
 
 	renderNextBatch();
@@ -741,11 +737,13 @@ function createPageHeader(url: string, domain: string, title?: string): HTMLElem
 
 	const link = document.createElement('a');
 	link.className = 'highlight-page-url';
-	link.href = url;
-	link.target = '_blank';
-	link.rel = 'noopener';
+	link.href = '#';
 	link.title = url;
 	link.textContent = titleText;
+	link.addEventListener('click', (e) => {
+		e.preventDefault();
+		navigate({ type: 'page', domain, url });
+	});
 	header.appendChild(link);
 
 	// Only show sync button if page has no title yet
@@ -759,7 +757,7 @@ function createPageHeader(url: string, domain: string, title?: string): HTMLElem
 			e.stopPropagation();
 			e.preventDefault();
 			syncBtn.classList.add('is-syncing');
-			const meta = await fetchPageMetadata(url);
+			const meta = await fetchDefuddled(url);
 			syncBtn.classList.remove('is-syncing');
 			if (meta) {
 				if (meta.title) link.textContent = meta.title;
@@ -772,10 +770,30 @@ function createPageHeader(url: string, domain: string, title?: string): HTMLElem
 	return header;
 }
 
-async function fetchPageMetadata(url: string): Promise<{ title?: string; site?: string } | null> {
+interface DefuddleResult {
+	title?: string;
+	site?: string;
+	content?: string;
+}
+
+async function fetchDefuddled(url: string): Promise<DefuddleResult | null> {
 	try {
-		const response = await fetch(url);
-		const html = await response.text();
+		let html: string;
+		const fetchResult = await browser.runtime.sendMessage({
+			action: 'fetchProxy', url, options: {},
+		}) as { ok: boolean; status: number; text: string; error?: string };
+		if (fetchResult?.error === 'CORS_PERMISSION_NEEDED') {
+			await browser.permissions.request({ origins: ['<all_urls>'] });
+			const retry = await browser.runtime.sendMessage({
+				action: 'fetchProxy', url, options: {},
+			}) as { ok: boolean; status: number; text: string; error?: string };
+			if (!retry?.ok) throw new Error(retry?.error || 'Permission not granted');
+			html = retry.text;
+		} else if (!fetchResult?.ok) {
+			throw new Error(fetchResult?.error || `HTTP ${fetchResult?.status}`);
+		} else {
+			html = fetchResult.text;
+		}
 		const parser = new DOMParser();
 		const doc = parser.parseFromString(html, 'text/html');
 
@@ -788,6 +806,7 @@ async function fetchPageMetadata(url: string): Promise<{ title?: string; site?: 
 
 		const title = defuddled.title || undefined;
 		const site = defuddled.site || undefined;
+		const content = defuddled.content || undefined;
 
 		// Save title to highlights storage
 		if (title) {
@@ -805,7 +824,7 @@ async function fetchPageMetadata(url: string): Promise<{ title?: string; site?: 
 			try {
 				hostname = new URL(url).hostname.replace(/^www\./, '');
 			} catch {
-				return { title, site };
+				return { title, site, content };
 			}
 			const domResult = await browser.storage.local.get('domains');
 			const domains = (domResult.domains || {}) as Record<string, DomainSettings>;
@@ -814,15 +833,14 @@ async function fetchPageMetadata(url: string): Promise<{ title?: string; site?: 
 				domains[hostname].site = site;
 				domainSettingsMap[hostname] = domains[hostname];
 				await browser.storage.local.set({ domains });
-				// Re-render sidebar to show site name
 				renderSidebar();
 				createIcons({ icons });
 			}
 		}
 
-		return { title, site };
+		return { title, site, content };
 	} catch (error) {
-		console.error('Failed to fetch metadata for:', url, error);
+		console.error('Failed to fetch page:', url, error);
 		return null;
 	}
 }
@@ -923,6 +941,12 @@ function highlightTextNodes(root: HTMLElement, query: string) {
 		// matched is already in the DOM after mark
 		void matched;
 	}
+}
+
+function htmlToText(html: string): string {
+	const div = document.createElement('div');
+	div.innerHTML = html;
+	return div.textContent || '';
 }
 
 function displayDomain(domain: string): string {
