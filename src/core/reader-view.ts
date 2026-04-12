@@ -9,7 +9,8 @@ import { setPageUrl, setPageTitle, setPageSite, getHighlights } from '../utils/h
 import { loadSettings } from '../utils/storage-utils';
 import Defuddle from 'defuddle';
 
-let readerPageMessageListener: ((request: any, sender: any, sendResponse: (response?: any) => void) => true | undefined) | null = null;
+type MessageListener = (request: any, sender: any, sendResponse: (response?: any) => void) => true | undefined;
+let readerPageMessageListener: MessageListener | null = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
 	await applyReaderTheme();
@@ -82,6 +83,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 			setPageTitle(result.title);
 		}
 		if (result.site) setPageSite(result.site);
+		if (result.favicon) setFavicon(result.favicon, url);
 
 		setupReaderPageMessageHandler(url, result);
 
@@ -169,6 +171,7 @@ async function loadArticle(newUrl: string) {
 		setPageUrl(newUrl);
 		if (result.title) setPageTitle(result.title);
 		if (result.site) setPageSite(result.site);
+		if (result.favicon) setFavicon(result.favicon, newUrl);
 
 		await Reader.updateReaderContent(document, {
 			content: result.content,
@@ -183,6 +186,20 @@ async function loadArticle(newUrl: string) {
 		setupReaderPageMessageHandler(newUrl, result);
 	} catch (error) {
 		console.error('Failed to navigate:', error);
+	}
+}
+
+function setFavicon(faviconUrl: string, pageUrl: string) {
+	let link = document.querySelector('link[rel="icon"]') as HTMLLinkElement | null;
+	if (!link) {
+		link = document.createElement('link');
+		link.rel = 'icon';
+		document.head.appendChild(link);
+	}
+	try {
+		link.href = new URL(faviconUrl, pageUrl).href;
+	} catch {
+		link.href = faviconUrl;
 	}
 }
 

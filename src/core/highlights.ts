@@ -944,7 +944,6 @@ function highlightTextNodes(root: HTMLElement, query: string) {
 	}
 }
 
-
 function displayDomain(domain: string): string {
 	return domain.replace(/^www\./, '');
 }
