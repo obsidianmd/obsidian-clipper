@@ -367,6 +367,12 @@
 	}
 }
 
+#directory-list {
+	.setting-item-list-remove {
+		margin-inline-start: auto;
+	}
+}
+
 .setting-item-list {
 	display: flex;
 	flex-direction: column;

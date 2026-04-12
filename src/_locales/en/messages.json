@@ -23,6 +23,9 @@
 	"addVaultPlaceholder": {
 		"message": "Press enter to add a vault"
 	},
+	"addDirectoryPlaceholder": {
+		"message": "Press enter to add a directory"
+	},
 	"advanced": {
 		"message": "Advanced"
 	},
@@ -173,6 +176,20 @@
 	},
 	"disableReader": {
 		"message": "Turn off reader"
+	},
+	"directories": {
+		"message": "Directories"
+	},
+	"directoriesDescription": {
+		"message": "Add folder presets for clipped notes. These presets appear in the clipper so you can quickly choose where to save each clip. Press $strong_start$enter$strong_end$ to add a directory.",
+		"placeholders": {
+			"strong_end": {
+				"content": "</strong>"
+			},
+			"strong_start": {
+				"content": "<strong>"
+			}
+		}
 	},
 	"done": {
 		"message": "Done"
@@ -821,6 +838,9 @@
 	},
 	"removeVault": {
 		"message": "Remove vault"
+	},
+	"removeDirectory": {
+		"message": "Remove directory"
 	},
 	"replaceContent": {
 		"message": "Replace the page content"

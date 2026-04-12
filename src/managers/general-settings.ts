@@ -67,6 +67,44 @@ export function updateVaultList(): void {
 	initializeIcons(vaultList);
 }
 
+export function updateDirectoryList(): void {
+	const directoryList = document.getElementById('directory-list') as HTMLUListElement;
+	if (!directoryList) return;
+
+	directoryList.textContent = '';
+	generalSettings.clipDirectories.forEach((directory, index) => {
+		const li = document.createElement('li');
+		li.dataset.index = index.toString();
+		li.draggable = true;
+
+		const dragHandle = createElementWithClass('div', 'drag-handle');
+		dragHandle.appendChild(createElementWithHTML('i', '', { 'data-lucide': 'grip-vertical' }));
+		li.appendChild(dragHandle);
+
+		const span = document.createElement('span');
+		span.textContent = directory;
+		li.appendChild(span);
+
+		const removeBtn = createElementWithClass('button', 'setting-item-list-remove clickable-icon');
+		removeBtn.setAttribute('type', 'button');
+		removeBtn.setAttribute('aria-label', getMessage('removeDirectory'));
+		removeBtn.appendChild(createElementWithHTML('i', '', { 'data-lucide': 'trash-2' }));
+		li.appendChild(removeBtn);
+
+		li.addEventListener('dragstart', handleDragStart);
+		li.addEventListener('dragover', handleDragOver);
+		li.addEventListener('drop', handleDrop);
+		li.addEventListener('dragend', handleDragEnd);
+		removeBtn.addEventListener('click', (e) => {
+			e.stopPropagation();
+			removeDirectory(index);
+		});
+		directoryList.appendChild(li);
+	});
+
+	initializeIcons(directoryList);
+}
+
 export function addVault(vault: string): void {
 	generalSettings.vaults.push(vault);
 	saveSettings();
@@ -77,6 +115,18 @@ export function removeVault(index: number): void {
 	generalSettings.vaults.splice(index, 1);
 	saveSettings();
 	updateVaultList();
+}
+
+export function addDirectory(directory: string): void {
+	generalSettings.clipDirectories.push(directory);
+	saveSettings();
+	updateDirectoryList();
+}
+
+export function removeDirectory(index: number): void {
+	generalSettings.clipDirectories.splice(index, 1);
+	saveSettings();
+	updateDirectoryList();
 }
 
 export async function setShortcutInstructions() {
@@ -212,11 +262,13 @@ export function initializeGeneralSettings(): void {
 		}
 
 		updateVaultList();
+		updateDirectoryList();
 		initializeShowMoreActionsToggle();
 		initializeBetaFeaturesToggle();
 		initializeLegacyModeToggle();
 		initializeSilentOpenToggle();
 		initializeVaultInput();
+		initializeDirectoryInput();
 		initializeOpenBehaviorDropdown();
 		initializeKeyboardShortcuts();
 		initializeToggles();
@@ -288,6 +340,22 @@ function initializeVaultInput(): void {
 				if (newVault) {
 					addVault(newVault);
 					vaultInput.value = '';
+				}
+			}
+		});
+	}
+}
+
+function initializeDirectoryInput(): void {
+	const directoryInput = document.getElementById('directory-input') as HTMLInputElement;
+	if (directoryInput) {
+		directoryInput.addEventListener('keypress', (e) => {
+			if (e.key === 'Enter') {
+				e.preventDefault();
+				const newDirectory = directoryInput.value.trim();
+				if (newDirectory) {
+					addDirectory(newDirectory);
+					directoryInput.value = '';
 				}
 			}
 		});

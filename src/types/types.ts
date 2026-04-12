@@ -71,6 +71,7 @@ export interface ReaderSettings {
 
 export interface Settings {
 	vaults: string[];
+	clipDirectories: string[];
 	showMoreActionsButton: boolean;
 	betaFeatures: boolean;
 	legacyMode: boolean;

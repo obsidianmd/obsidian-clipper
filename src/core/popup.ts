@@ -35,6 +35,7 @@ let templates: Template[] = [];
 let currentVariables: { [key: string]: string } = {};
 let currentTabId: number | undefined;
 let lastSelectedVault: string | null = null;
+let lastSelectedDirectory: string | null = null;
 
 const isSidePanel = window.location.pathname.includes('side-panel.html');
 const urlParams = new URLSearchParams(window.location.search);
@@ -189,7 +190,14 @@ async function initializeExtension(tabId: number) {
 		}
 		debugLog('Vaults', 'Last selected vault:', lastSelectedVault);
 
+		lastSelectedDirectory = await getLocalStorage('lastSelectedDirectory');
+		if (!lastSelectedDirectory && loadedSettings.clipDirectories.length > 0) {
+			lastSelectedDirectory = loadedSettings.clipDirectories[0];
+		}
+		debugLog('Directories', 'Last selected directory:', lastSelectedDirectory);
+
 		updateVaultDropdown(loadedSettings.vaults);
+		updateDirectoryDropdown(loadedSettings.clipDirectories);
 
 		const tab = await getTabInfo(tabId);
 		if (!tab.url || isBlankPage(tab.url)) {
@@ -834,13 +842,19 @@ function buildTemplateFieldsSkeleton(template: Template | null) {
 
 	const pathField = document.getElementById('path-name-field') as HTMLInputElement;
 	const pathContainer = document.querySelector('.vault-path-container') as HTMLElement;
+	const directoryContainer = document.getElementById('directory-container');
 	if (pathField && pathContainer) {
 		const isDailyNote = template.behavior === 'append-daily' || template.behavior === 'prepend-daily';
 		if (isDailyNote) {
 			pathField.style.display = 'none';
+			if (directoryContainer) {
+				directoryContainer.style.display = 'none';
+			}
 		} else {
 			pathContainer.style.display = 'flex';
+			pathField.style.display = 'block';
 			pathField.setAttribute('data-template-value', template.path);
+			updateDirectoryDropdown(loadedSettings.clipDirectories);
 		}
 	}
 
@@ -923,6 +937,7 @@ async function fillTemplateFieldValues(currentTabId: number, template: Template 
 	const pathField = document.getElementById('path-name-field') as HTMLInputElement;
 	if (pathField) {
 		pathField.value = formattedPath;
+		syncDirectoryDropdownWithPath(formattedPath);
 	}
 
 	const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
@@ -1066,11 +1081,62 @@ function updateVaultDropdown(vaults: string[]) {
 		vaultContainer.style.display = 'none';
 	}
 
-	// Add event listener to update lastSelectedVault when changed
-	vaultDropdown.addEventListener('change', () => {
+	// Update last selected vault when changed
+	vaultDropdown.onchange = () => {
 		lastSelectedVault = vaultDropdown.value;
 		setLocalStorage('lastSelectedVault', lastSelectedVault);
+	};
+}
+
+function updateDirectoryDropdown(directories: string[]) {
+	const directoryDropdown = document.getElementById('directory-select') as HTMLSelectElement | null;
+	const directoryContainer = document.getElementById('directory-container');
+	const pathField = document.getElementById('path-name-field') as HTMLInputElement | null;
+
+	if (!directoryDropdown || !directoryContainer) return;
+
+	directoryDropdown.textContent = '';
+
+	directories.forEach(directory => {
+		const option = document.createElement('option');
+		option.value = directory;
+		option.textContent = directory;
+		directoryDropdown.appendChild(option);
 	});
+
+	if (directories.length > 0) {
+		directoryContainer.style.display = 'block';
+
+		const preferredDirectory = pathField?.value || lastSelectedDirectory;
+		if (preferredDirectory && directories.includes(preferredDirectory)) {
+			directoryDropdown.value = preferredDirectory;
+		} else {
+			directoryDropdown.value = directories[0];
+		}
+	} else {
+		directoryContainer.style.display = 'none';
+	}
+
+	directoryDropdown.onchange = () => {
+		const selectedDirectory = directoryDropdown.value;
+		lastSelectedDirectory = selectedDirectory;
+		setLocalStorage('lastSelectedDirectory', selectedDirectory);
+		if (pathField) {
+			pathField.value = selectedDirectory;
+		}
+	};
+}
+
+function syncDirectoryDropdownWithPath(pathValue: string) {
+	const directoryDropdown = document.getElementById('directory-select') as HTMLSelectElement | null;
+	if (!directoryDropdown || directoryDropdown.options.length === 0) return;
+
+	const hasMatch = Array.from(directoryDropdown.options).some(option => option.value === pathValue);
+	if (hasMatch) {
+		directoryDropdown.value = pathValue;
+		lastSelectedDirectory = pathValue;
+		setLocalStorage('lastSelectedDirectory', pathValue);
+	}
 }
 
 function refreshPopup() {
@@ -1337,6 +1403,11 @@ async function handleClipObsidian(): Promise<void> {
 		if (!currentTemplate.vault) {
 			lastSelectedVault = selectedVault;
 			await setLocalStorage('lastSelectedVault', lastSelectedVault);
+		}
+
+		if (path) {
+			lastSelectedDirectory = path;
+			await setLocalStorage('lastSelectedDirectory', lastSelectedDirectory);
 		}
 
 		if (!isSidePanel) {
