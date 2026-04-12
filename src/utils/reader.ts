@@ -1789,13 +1789,177 @@ export class Reader {
 	}
 
 	/**
-	 * 初始化 Bilibili 字幕时间戳点击跳转功能。
-	 * 点击时间戳或字幕文本行均可跳转到对应时间点。
+	 * 初始化 Bilibili 字幕交互功能：
+	 * 点击跳转、基于计时器的播放追踪、自动滚动、高亮当前行。
+	 *
+	 * Bilibili 的嵌入播放器没有 postMessage API，
+	 * 因此使用系统时钟估算当前播放进度来驱动 auto-scroll 和 highlight。
 	 */
 	private static initializeBilibiliTimestamps(doc: Document) {
 		const iframe = doc.querySelector('iframe[src*="player.bilibili.com"]') as HTMLIFrameElement | null;
 		if (!iframe) return;
 
+		const transcriptSection = doc.querySelector('.bilibili-transcript') as HTMLElement | null;
+		const chaptersSection = doc.querySelector('.bilibili-chapters') as HTMLElement | null;
+
+		const cues: { el: HTMLElement; time: number }[] = [];
+		if (transcriptSection) {
+			transcriptSection.querySelectorAll('li').forEach(li => {
+				const ts = li.querySelector('.bilibili-timestamp[data-time]') as HTMLElement;
+				if (ts) cues.push({ el: li as HTMLElement, time: parseInt(ts.dataset.time || '0', 10) });
+			});
+		}
+
+		const chapterItems: { el: HTMLElement; time: number }[] = [];
+		if (chaptersSection) {
+			chaptersSection.querySelectorAll('li').forEach(li => {
+				const ts = li.querySelector('.bilibili-timestamp[data-time]') as HTMLElement;
+				if (ts) chapterItems.push({ el: li as HTMLElement, time: parseInt(ts.dataset.time || '0', 10) });
+			});
+		}
+
+		if (cues.length === 0 && chapterItems.length === 0) return;
+
+		// --- 计时器播放追踪 ---
+		let playbackOriginSystem = Date.now();
+		let playbackOriginVideo = 0;
+		let tracking = false;
+
+		try {
+			const url = new URL(iframe.src);
+			playbackOriginVideo = parseInt(url.searchParams.get('t') || '0', 10);
+		} catch {}
+
+		const startTracking = (videoTime: number) => {
+			playbackOriginVideo = videoTime;
+			playbackOriginSystem = Date.now();
+			tracking = true;
+		};
+
+		const getEstimatedTime = (): number => {
+			if (!tracking) return playbackOriginVideo;
+			return playbackOriginVideo + (Date.now() - playbackOriginSystem) / 1000;
+		};
+
+		// iframe 加载完成后开始追踪
+		iframe.addEventListener('load', () => {
+			try {
+				const url = new URL(iframe.src);
+				const t = parseInt(url.searchParams.get('t') || '0', 10);
+				startTracking(t);
+			} catch {
+				startTracking(0);
+			}
+		});
+
+		// --- 活跃段落追踪 ---
+		const AUTO_SCROLL_COOLDOWN = 2000;
+		let activeIndex = -1;
+		let activeCue: HTMLElement | null = null;
+		let activeChapterIndex = -1;
+		let lastUserScroll = 0;
+
+		window.addEventListener('scroll', () => {
+			if (this.programmaticScroll) return;
+			lastUserScroll = Date.now();
+		}, { passive: true });
+
+		// "当前位置" 浮动按钮
+		let currentPosButton: HTMLButtonElement | null = null;
+		if (transcriptSection) {
+			currentPosButton = doc.createElement('button');
+			currentPosButton.className = 'player-current-pos';
+			currentPosButton.textContent = getMessage('readerCurrentPosition');
+			transcriptSection.style.position = 'relative';
+			transcriptSection.appendChild(currentPosButton);
+
+			currentPosButton.addEventListener('click', () => {
+				if (activeCue) {
+					const rect = activeCue.getBoundingClientRect();
+					const stickyOffset = this.getStickyOffset();
+					const targetY = (window.pageYOffset || doc.documentElement.scrollTop)
+						+ rect.top - stickyOffset - 20;
+					this.scrollTo(targetY);
+				}
+			});
+		}
+
+		const updateActiveSegment = (currentTime: number) => {
+			// 更新字幕活跃行
+			if (cues.length > 0) {
+				let newIndex = -1;
+				for (let i = cues.length - 1; i >= 0; i--) {
+					if (currentTime >= cues[i].time) {
+						newIndex = i;
+						break;
+					}
+				}
+
+				if (newIndex !== activeIndex) {
+					activeCue?.classList.remove('bilibili-active-cue');
+
+					if (newIndex >= 0 && this.settings.highlightActiveLine) {
+						cues[newIndex].el.classList.add('bilibili-active-cue');
+					}
+
+					// 自动滚动
+					if (newIndex >= 0 && this.settings.autoScroll
+						&& Date.now() - lastUserScroll > AUTO_SCROLL_COOLDOWN) {
+						const rect = cues[newIndex].el.getBoundingClientRect();
+						const stickyOffset = this.getStickyOffset();
+						const targetY = (window.pageYOffset || doc.documentElement.scrollTop)
+							+ rect.top - stickyOffset - 20;
+						this.scrollTo(targetY);
+					}
+
+					activeCue = newIndex >= 0 ? cues[newIndex].el : null;
+					activeIndex = newIndex;
+				}
+
+				// 浮动按钮可见性
+				if (currentPosButton && activeCue) {
+					const rect = activeCue.getBoundingClientRect();
+					const stickyOffset = this.getStickyOffset();
+					const isVisible = rect.bottom > stickyOffset && rect.top < window.innerHeight;
+					currentPosButton.classList.toggle('is-visible', !isVisible);
+				} else if (currentPosButton) {
+					currentPosButton.classList.remove('is-visible');
+				}
+			}
+
+			// 更新章节活跃项
+			if (chapterItems.length > 0) {
+				let newChapterIndex = -1;
+				for (let i = chapterItems.length - 1; i >= 0; i--) {
+					if (currentTime >= chapterItems[i].time) {
+						newChapterIndex = i;
+						break;
+					}
+				}
+				if (newChapterIndex !== activeChapterIndex) {
+					if (activeChapterIndex >= 0) {
+						chapterItems[activeChapterIndex].el.classList.remove('bilibili-active-cue');
+					}
+					if (newChapterIndex >= 0 && this.settings.highlightActiveLine) {
+						chapterItems[newChapterIndex].el.classList.add('bilibili-active-cue');
+					}
+					activeChapterIndex = newChapterIndex;
+				}
+			}
+		};
+
+		// 定时轮询更新播放进度（500ms 间隔，与 YouTube 一致）
+		const pollInterval = setInterval(() => {
+			if (!doc.contains(iframe)) {
+				clearInterval(pollInterval);
+				return;
+			}
+			if (tracking) {
+				updateActiveSegment(getEstimatedTime());
+			}
+		}, 500);
+
+		// --- 点击跳转 ---
 		const seekBilibili = (seconds: number) => {
 			const currentSrc = new URL(iframe.src);
 			currentSrc.searchParams.set('t', String(seconds));
@@ -1803,36 +1967,24 @@ export class Reader {
 			iframe.src = currentSrc.toString();
 		};
 
-		const setActiveCue = (li: HTMLElement | null) => {
-			doc.querySelectorAll('.bilibili-active-cue').forEach((el) => {
-				el.classList.remove('bilibili-active-cue');
-			});
-			if (li) {
-				li.classList.add('bilibili-active-cue');
-			}
-		};
+		const handleSectionClick = (e: Event) => {
+			const target = e.target as HTMLElement;
+			const li = target.closest('li') as HTMLElement | null;
+			if (!li) return;
 
-		// 为字幕和章节区域的每一行绑定点击事件
-		const transcriptSection = doc.querySelector('.bilibili-transcript');
-		const chaptersSection = doc.querySelector('.bilibili-chapters');
+			const timestamp = li.querySelector('.bilibili-timestamp[data-time]') as HTMLElement | null;
+			if (!timestamp) return;
+
+			const seconds = parseInt(timestamp.dataset.time || '0', 10);
+			if (!Number.isFinite(seconds)) return;
+
+			e.preventDefault();
+			seekBilibili(seconds);
+		};
 
 		[transcriptSection, chaptersSection].forEach((section) => {
 			if (!section) return;
-			section.addEventListener('click', (e) => {
-				const target = e.target as HTMLElement;
-				const li = target.closest('li') as HTMLElement | null;
-				if (!li) return;
-
-				const timestamp = li.querySelector('.bilibili-timestamp[data-time]') as HTMLElement | null;
-				if (!timestamp) return;
-
-				const seconds = parseInt(timestamp.dataset.time || '0', 10);
-				if (!Number.isFinite(seconds)) return;
-
-				e.preventDefault();
-				seekBilibili(seconds);
-				setActiveCue(li);
-			});
+			section.addEventListener('click', handleSectionClick);
 		});
 	}
 
@@ -2385,20 +2537,33 @@ export class Reader {
 					return wrapper;
 				};
 
-				toggleGroup.appendChild(createBilibiliToggle(getMessage('readerPinPlayer'), this.settings.pinPlayer, (on) => {
-					playerContainer.classList.toggle('pin-player', on);
-					if (on) {
-						playerContainer.appendChild(toggleBar);
-					} else {
-						playerContainer.after(toggleBar);
-					}
-					window.dispatchEvent(new CustomEvent('reader-show-nav'));
-					this.settings.pinPlayer = on;
-					this.saveSettings();
-				}));
+			toggleGroup.appendChild(createBilibiliToggle(getMessage('readerPinPlayer'), this.settings.pinPlayer, (on) => {
+				playerContainer.classList.toggle('pin-player', on);
+				if (on) {
+					playerContainer.appendChild(toggleBar);
+				} else {
+					playerContainer.after(toggleBar);
+				}
+				window.dispatchEvent(new CustomEvent('reader-show-nav'));
+				this.settings.pinPlayer = on;
+				this.saveSettings();
+			}));
 
-				toggleBar.appendChild(toggleGroup);
-				playerContainer.appendChild(toggleBar);
+			toggleGroup.appendChild(createBilibiliToggle(getMessage('readerAutoScroll'), this.settings.autoScroll, (on) => {
+				this.settings.autoScroll = on;
+				this.saveSettings();
+			}));
+
+			toggleGroup.appendChild(createBilibiliToggle(getMessage('readerHighlightActiveLine'), this.settings.highlightActiveLine, (on) => {
+				this.settings.highlightActiveLine = on;
+				if (!on) {
+					doc.querySelectorAll('.bilibili-active-cue').forEach(el => el.classList.remove('bilibili-active-cue'));
+				}
+				this.saveSettings();
+			}));
+
+			toggleBar.appendChild(toggleGroup);
+			playerContainer.appendChild(toggleBar);
 
 				contentBody.insertBefore(playerContainer, contentBody.firstChild);
 			}
