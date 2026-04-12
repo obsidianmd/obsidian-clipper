@@ -9,6 +9,8 @@ import { setPageUrl, setPageTitle, setPageSite, getHighlights } from '../utils/h
 import { loadSettings } from '../utils/storage-utils';
 import Defuddle from 'defuddle';
 
+let readerPageMessageListener: ((request: any, sender: any, sendResponse: (response?: any) => void) => true | undefined) | null = null;
+
 document.addEventListener('DOMContentLoaded', async () => {
 	await applyReaderTheme();
 	await initializeI18n();
@@ -251,7 +253,11 @@ async function setupReaderPageMessageHandler(articleUrl: string, defuddleResult:
 		metaTags: defuddleResult.metaTags || [],
 	};
 
-	browser.runtime.onMessage.addListener((request: any, _sender: any, sendResponse: (response?: any) => void): true | undefined => {
+	if (readerPageMessageListener) {
+		browser.runtime.onMessage.removeListener(readerPageMessageListener);
+	}
+
+	readerPageMessageListener = (request: any, _sender: any, sendResponse: (response?: any) => void): true | undefined => {
 		if (request.action !== 'extensionPageMessage' || request.targetTabId !== myTabId) {
 			return undefined;
 		}
@@ -286,5 +292,7 @@ async function setupReaderPageMessageHandler(articleUrl: string, defuddleResult:
 		}
 
 		return undefined;
-	});
+	};
+
+	browser.runtime.onMessage.addListener(readerPageMessageListener);
 }

@@ -280,6 +280,15 @@
 	"deleteHighlightsForDomain": {
 		"message": "Delete all highlights for this domain?"
 	},
+	"deleteHighlightsForPage": {
+		"message": "Delete all highlights for this page?"
+	},
+	"deleteDomain": {
+		"message": "Delete domain"
+	},
+	"deletePage": {
+		"message": "Delete page"
+	},
 	"noHighlightsYet": {
 		"message": "No highlights yet"
 	},

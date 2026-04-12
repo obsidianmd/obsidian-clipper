@@ -381,12 +381,12 @@ declare global {
 					metaTags: defuddled.metaTags || []
 				};
 				if (defuddled.title) {
-						highlighter.setPageTitle(defuddled.title);
-					}
-					if (defuddled.site) {
-						highlighter.setPageSite(defuddled.site);
-					}
-					sendResponse(response);
+					highlighter.setPageTitle(defuddled.title);
+				}
+				if (defuddled.site) {
+					highlighter.setPageSite(defuddled.site);
+				}
+				sendResponse(response);
 			}).catch((error: unknown) => {
 				console.error('[Obsidian Clipper] getPageContent error:', error);
 				sendResponse({ success: false, error: error instanceof Error ? error.message : String(error) });

@@ -635,9 +635,9 @@ function updateDeleteButton() {
 	if (currentNav.type === 'all') {
 		deleteBtn.textContent = getMessage('deleteAll');
 	} else if (currentNav.type === 'domain') {
-		deleteBtn.textContent = getMessage('deleteAll');
+		deleteBtn.textContent = getMessage('deleteDomain');
 	} else {
-		deleteBtn.textContent = getMessage('deleteAll');
+		deleteBtn.textContent = getMessage('deletePage');
 	}
 }
 
@@ -651,6 +651,7 @@ async function deleteCurrentContext() {
 		const group = allDomainGroups.find(g => g.domain === nav.domain);
 		if (group) await deleteHighlightsForDomain(group);
 	} else if (nav.type === 'page') {
+		if (!confirm(getMessage('deleteHighlightsForPage'))) return;
 		await deleteHighlightsForUrl(nav.url);
 	}
 }
@@ -943,11 +944,6 @@ function highlightTextNodes(root: HTMLElement, query: string) {
 	}
 }
 
-function htmlToText(html: string): string {
-	const div = document.createElement('div');
-	div.innerHTML = html;
-	return div.textContent || '';
-}
 
 function displayDomain(domain: string): string {
 	return domain.replace(/^www\./, '');
