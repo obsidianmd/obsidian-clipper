@@ -5,7 +5,7 @@ import { flattenShadowDom as flattenShadowDomUtil } from './flatten-shadow-dom';
 import { getLocalStorage, setLocalStorage } from './storage-utils';
 import hljs from 'highlight.js';
 import { getDomain } from './string-utils';
-import { applyHighlights, invalidateHighlightCache, loadHighlights, toggleHighlighterMenu, getHighlights } from './highlighter';
+import { applyHighlights, invalidateHighlightCache, loadHighlights, toggleHighlighterMenu, getHighlights, repositionHighlights } from './highlighter';
 import { removeExistingHighlights } from './highlighter-overlays';
 import { copyToClipboard } from './clipboard-utils';
 import { getMessage, initializeI18n } from './i18n';
@@ -2474,7 +2474,10 @@ export class Reader {
 			existing.classList.add('is-closing');
 			updateSidebarWidth(doc, null);
 			cleanupResizeHandlers(doc);
-			existing.addEventListener('animationend', () => existing.remove(), { once: true });
+			existing.addEventListener('animationend', () => {
+				existing.remove();
+				repositionHighlights();
+			}, { once: true });
 			return;
 		}
 
@@ -2493,12 +2496,17 @@ export class Reader {
 		iframe.src = browser.runtime.getURL('side-panel.html?context=iframe&readerUrl=' + encodeURIComponent(doc.URL));
 		container.appendChild(iframe);
 
-		addResizeHandle(doc, container, 'w');
-		addResizeHandle(doc, container, 's');
-		addResizeHandle(doc, container, 'sw');
+		const resizeCallbacks = {
+			onResize: () => repositionHighlights(),
+			onResizeEnd: () => repositionHighlights(),
+		};
+		addResizeHandle(doc, container, 'w', resizeCallbacks);
+		addResizeHandle(doc, container, 's', resizeCallbacks);
+		addResizeHandle(doc, container, 'sw', resizeCallbacks);
 
 		doc.body.appendChild(container);
 		updateSidebarWidth(doc, container);
+		container.addEventListener('animationend', () => repositionHighlights(), { once: true });
 	}
 
 	static copyMarkdownOnReaderPage(doc: Document): void {

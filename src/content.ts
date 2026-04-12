@@ -68,14 +68,17 @@ declare global {
 		iframe.src = browser.runtime.getURL('side-panel.html?context=iframe');
 		container.appendChild(iframe);
 
-		const onResizeEnd = () => highlighter.repositionHighlights();
-		addResizeHandle(document, container, 'w', onResizeEnd);
-		addResizeHandle(document, container, 's', onResizeEnd);
-		addResizeHandle(document, container, 'sw', onResizeEnd);
+		const resizeCallbacks = {
+			onResize: () => highlighter.repositionHighlights(),
+			onResizeEnd: () => highlighter.repositionHighlights(),
+		};
+		addResizeHandle(document, container, 'w', resizeCallbacks);
+		addResizeHandle(document, container, 's', resizeCallbacks);
+		addResizeHandle(document, container, 'sw', resizeCallbacks);
 
 		document.body.appendChild(container);
 		updateSidebarWidth(document, container);
-		container.addEventListener('animationend', onResizeEnd, { once: true });
+		container.addEventListener('animationend', () => highlighter.repositionHighlights(), { once: true });
 	}
 
 	// Firefox

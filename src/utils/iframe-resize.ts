@@ -1,4 +1,5 @@
 import browser from './browser-polyfill';
+import { throttle } from './throttle';
 
 const IFRAME_ID = 'obsidian-clipper-iframe';
 const MIN_SIZE = 200;
@@ -16,12 +17,18 @@ export function updateSidebarWidth(doc: Document, container: HTMLElement | null)
 	});
 }
 
-export function addResizeHandle(doc: Document, container: HTMLElement, direction: string, onResizeEnd?: () => void): void {
+interface ResizeCallbacks {
+	onResize?: () => void;
+	onResizeEnd?: () => void;
+}
+
+export function addResizeHandle(doc: Document, container: HTMLElement, direction: string, callbacks?: ResizeCallbacks): void {
 	const handle = doc.createElement('div');
 	handle.className = `obsidian-clipper-resize-handle obsidian-clipper-resize-handle-${direction}`;
 	container.appendChild(handle);
 
 	let startX: number, startY: number, startWidth: number, startHeight: number, startTop: number;
+	const throttledOnResize = callbacks?.onResize ? throttle(callbacks.onResize, 100) : null;
 
 	handle.onmousedown = (e) => {
 		e.stopPropagation();
@@ -56,6 +63,7 @@ export function addResizeHandle(doc: Document, container: HTMLElement, direction
 			}
 
 			updateSidebarWidth(doc, container);
+			throttledOnResize?.();
 		};
 
 		doc.onmouseup = () => {
@@ -71,7 +79,7 @@ export function addResizeHandle(doc: Document, container: HTMLElement, direction
 			doc.onmousemove = null;
 			doc.onmouseup = null;
 
-			onResizeEnd?.();
+			callbacks?.onResizeEnd?.();
 		};
 	};
 }

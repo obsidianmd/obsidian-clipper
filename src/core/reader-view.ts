@@ -5,7 +5,8 @@ import { ReaderSettings } from '../types/types';
 import { getFontCss } from '../utils/font-utils';
 import { getDomain } from '../utils/string-utils';
 import { extractContentBySelector as extractContentBySelectorShared } from '../utils/shared';
-import { setPageUrl, setPageTitle, updatePageDomainSettings, getHighlights } from '../utils/highlighter';
+import { setPageUrl, setPageTitle, updatePageDomainSettings, getHighlights, repositionHighlights } from '../utils/highlighter';
+import { throttle } from '../utils/throttle';
 import { loadSettings } from '../utils/storage-utils';
 import Defuddle from 'defuddle';
 
@@ -86,6 +87,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 		if (result.favicon) setFavicon(result.favicon, url);
 
 		setupReaderPageMessageHandler(url, result);
+
+		window.addEventListener('resize', throttle(() => repositionHighlights(), 100));
 
 	} catch (error) {
 		console.error('Failed to load page:', error);
