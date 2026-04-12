@@ -13,6 +13,7 @@ import { getFontCss } from './font-utils';
 import { createMarkdownContent } from 'defuddle/full';
 import { saveFile } from './file-utils';
 import { parseForClip } from './clip-utils';
+import { updateSidebarWidth, addResizeHandle, cleanupResizeHandlers } from './iframe-resize';
 
 // Mobile viewport settings
 const VIEWPORT = 'width=device-width, initial-scale=1, maximum-scale=1';
@@ -2464,13 +2465,15 @@ export class Reader {
 
 	// --- Reader page helpers (extension page context) ---
 
-	static toggleReaderPageIframe(doc: Document): void {
+	static async toggleReaderPageIframe(doc: Document): Promise<void> {
 		const containerId = 'obsidian-clipper-container';
 		const iframeId = 'obsidian-clipper-iframe';
 
 		const existing = doc.getElementById(containerId);
 		if (existing) {
 			existing.classList.add('is-closing');
+			updateSidebarWidth(doc, null);
+			cleanupResizeHandlers(doc);
 			existing.addEventListener('animationend', () => existing.remove(), { once: true });
 			return;
 		}
@@ -2479,6 +2482,10 @@ export class Reader {
 		container.id = containerId;
 		container.classList.add('is-open');
 
+		const { clipperIframeWidth, clipperIframeHeight } = await browser.storage.local.get(['clipperIframeWidth', 'clipperIframeHeight']);
+		if (clipperIframeWidth) container.style.width = `${clipperIframeWidth}px`;
+		if (clipperIframeHeight) container.style.height = `${clipperIframeHeight}px`;
+
 		const iframe = doc.createElement('iframe');
 		iframe.id = iframeId;
 		// Pass the article URL so the side panel can identify the page
@@ -2486,12 +2493,12 @@ export class Reader {
 		iframe.src = browser.runtime.getURL('side-panel.html?context=iframe&readerUrl=' + encodeURIComponent(doc.URL));
 		container.appendChild(iframe);
 
-		// Resize handle (left side)
-		const handle = doc.createElement('div');
-		handle.className = 'obsidian-clipper-resize-handle obsidian-clipper-resize-handle-w';
-		container.appendChild(handle);
+		addResizeHandle(doc, container, 'w');
+		addResizeHandle(doc, container, 's');
+		addResizeHandle(doc, container, 'sw');
 
 		doc.body.appendChild(container);
+		updateSidebarWidth(doc, container);
 	}
 
 	static copyMarkdownOnReaderPage(doc: Document): void {
