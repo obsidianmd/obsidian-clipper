@@ -2,11 +2,12 @@ import browser from '../utils/browser-polyfill';
 import { Reader } from '../utils/reader';
 import { initializeI18n, getMessage } from '../utils/i18n';
 import { ReaderSettings } from '../types/types';
+import { getFontCss } from '../utils/font-utils';
+import { getDomain } from '../utils/string-utils';
 import Defuddle from 'defuddle';
-import DOMPurify from 'dompurify';
 
 document.addEventListener('DOMContentLoaded', async () => {
-	await applyThemeEarly();
+	await applyReaderTheme();
 	await initializeI18n();
 
 	const params = new URLSearchParams(window.location.search);
@@ -21,16 +22,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 	document.body.innerHTML = `<div class="obsidian-reader-loading"><div class="obsidian-reader-loading-text">${getMessage('readerLoading')}</div></div>`;
 
 	try {
-		// Fetch page HTML via background proxy (works cross-browser)
+		// Fetch page HTML via background proxy
 		const html = await proxyFetch(url);
 
-		// Parse with DOMParser — scripts never execute in this context
+		// Parse with DOMParser — scripts never execute
 		const parser = new DOMParser();
 		const parsedDoc = parser.parseFromString(html, 'text/html');
 		Object.defineProperty(parsedDoc, 'URL', { value: url, configurable: true });
 
-		// Run Defuddle locally on the parsed document, with fetch proxied
-		// through the background script to avoid CORS/header restrictions
+		// Run Defuddle once with proxied fetch
 		const defuddle = new Defuddle(parsedDoc, { url, fetch: proxyFetchAsResponse });
 		const result = await defuddle.parseAsync();
 
@@ -38,44 +38,34 @@ document.addEventListener('DOMContentLoaded', async () => {
 			throw new Error('Could not extract article content');
 		}
 
-		// Build a clean document with just the Defuddle output
+		// Set pre-extracted content so Reader.apply skips re-extraction
+		Reader.preExtractedContent = {
+			content: result.content,
+			title: result.title,
+			author: result.author,
+			published: result.published,
+			domain: getDomain(url),
+			wordCount: result.wordCount,
+			parseTime: result.parseTime,
+		};
+
+		// Build document for Reader.apply
 		document.body.style.visibility = 'hidden';
 		document.body.textContent = '';
 
 		Object.defineProperty(document, 'URL', { value: url, configurable: true });
 		document.title = result.title || url;
 
-		// Add metadata for Reader
-		if (result.title) {
-			const meta = document.createElement('meta');
-			meta.setAttribute('property', 'og:title');
-			meta.setAttribute('content', result.title);
-			document.head.appendChild(meta);
-		}
-		if (result.author) {
-			const meta = document.createElement('meta');
-			meta.setAttribute('name', 'author');
-			meta.setAttribute('content', result.author);
-			document.head.appendChild(meta);
-		}
-		if (result.published) {
-			const meta = document.createElement('meta');
-			meta.setAttribute('property', 'article:published_time');
-			meta.setAttribute('content', result.published);
-			document.head.appendChild(meta);
-		}
-
 		// Set base URL for relative resources
-		const baseEl = document.createElement('base');
+		let baseEl = document.querySelector('base');
+		if (!baseEl) {
+			baseEl = document.createElement('base');
+			document.head.prepend(baseEl);
+		}
 		baseEl.href = url;
-		document.head.prepend(baseEl);
 
-		// Insert sanitized content
-		const article = document.createElement('article');
-		article.innerHTML = DOMPurify.sanitize(result.content);
-		document.body.appendChild(article);
-
-		// Let Reader build the full UI
+		// Reader.apply builds the full UI (outline, settings bar, transcript,
+		// code highlighting, etc.) using our pre-extracted content
 		await Reader.apply(document);
 
 		if (result.title) {
@@ -91,8 +81,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 	}
 });
 
-// fetch() API-compatible proxy through the background script.
-// Supports custom headers (e.g. User-Agent for YouTube innertube).
+// --- Fetch helpers ---
+
 async function proxyFetchAsResponse(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
 	const url = typeof input === 'string' ? input
 		: input instanceof URL ? input.toString()
@@ -128,24 +118,24 @@ async function proxyFetch(url: string): Promise<string> {
 	}) as { ok: boolean; status: number; text: string; error?: string };
 
 	if (result?.error === 'CORS_PERMISSION_NEEDED') {
-		// Firefox MV3: host permissions need explicit user grant
 		const granted = await browser.permissions.request({ origins: ['<all_urls>'] });
 		if (granted) {
-			// Retry after permission granted
 			const retry = await browser.runtime.sendMessage({
 				action: 'fetchProxy', url, options: {},
 			}) as { ok: boolean; status: number; text: string; error?: string };
 			if (retry?.ok) return retry.text;
 			throw new Error(retry?.error || `HTTP ${retry?.status}`);
 		}
-		throw new Error('Permission not granted. Please allow access to all websites in the extension settings.');
+		throw new Error('Permission not granted.');
 	}
 
 	if (!result?.ok) throw new Error(result?.error || `HTTP ${result?.status}`);
 	return result.text;
 }
 
-async function applyThemeEarly() {
+// --- Reader theme ---
+
+async function applyReaderTheme() {
 	try {
 		const data = await browser.storage.sync.get('reader_settings');
 		const settings = data.reader_settings as ReaderSettings | undefined;

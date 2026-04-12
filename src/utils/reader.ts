@@ -32,6 +32,19 @@ export class Reader {
 	private static isActive: boolean = false;
 	private static programmaticScroll: boolean = false;
 
+	// Pre-extracted content to skip Defuddle re-extraction in Reader.apply.
+	// Set this before calling apply() to use already-extracted content.
+	static preExtractedContent: {
+		content: string;
+		title?: string;
+		author?: string;
+		published?: string;
+		domain?: string;
+		wordCount?: number;
+		parseTime?: number;
+		extractorType?: string;
+	} | null = null;
+
 	/**
 	 * Helper function to create SVG elements
 	 */
@@ -786,6 +799,12 @@ export class Reader {
 	}
 
 	private static async extractContent(doc: Document): Promise<ReaderContent> {
+		// Use pre-extracted content if available (set by reader-view.ts)
+		if (this.preExtractedContent) {
+			const pre = this.preExtractedContent;
+			this.preExtractedContent = null;
+			return pre;
+		}
 
 		const defuddle = new Defuddle(doc, { url: doc.URL });
 		const defuddled = await defuddle.parseAsync();

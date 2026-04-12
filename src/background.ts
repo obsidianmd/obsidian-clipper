@@ -61,10 +61,11 @@ async function enableYouTubeInnertubeRule(): Promise<void> {
 				condition: {
 					urlFilter: '||youtube.com/youtubei/',
 					resourceTypes: ['xmlhttprequest' as any],
+					initiatorDomains: [chrome?.runtime?.id || ''].filter(Boolean),
 				}
 			}]
 		});
-	} catch (e) { console.log('[innertube rule] declarativeNetRequest failed:', e); }
+	} catch { /* Firefox/Safari use webRequest or native messaging instead */ }
 }
 
 // Firefox/Safari: use webRequest.onBeforeSendHeaders to set Origin/Referer on
@@ -232,6 +233,23 @@ async function sendMessageToPopup(tabId: number, message: any): Promise<void> {
 
 
 
+// Safari: route fetch through native messaging (URLSession in Swift).
+// Called from the background script where sendNativeMessage works reliably.
+async function nativeFetch(url: string, options?: any): Promise<{ ok: boolean; status: number; text: string; error?: string }> {
+	try {
+		const result = await browser.runtime.sendNativeMessage('application.id', {
+			type: 'fetchRequest',
+			url,
+			method: options?.method || 'GET',
+			headers: options?.headers || {},
+			body: options?.body || null,
+		}) as { ok: boolean; status: number; text: string; error?: string };
+		return result || { ok: false, status: 0, text: '', error: 'Empty native response' };
+	} catch (err) {
+		return { ok: false, status: 0, text: '', error: (err as Error).message };
+	}
+}
+
 // Fetch proxy for extension pages (reader, highlights).
 // Returns a Promise for the webextension-polyfill.
 // On Firefox MV3, host_permissions require explicit user grant —
@@ -247,9 +265,17 @@ browser.runtime.onMessage.addListener((request: unknown) => {
 	return fetch(url, fetchOptions)
 		.then(async (resp) => {
 			const text = await resp.text();
+			// If YouTube returns bot-detection HTML, try native messaging (Safari)
+			if (!resp.ok && (text.includes('Sorry') || text.includes('<html')) && typeof browser.runtime.sendNativeMessage === 'function') {
+				return nativeFetch(url, options);
+			}
 			return { ok: resp.ok, status: resp.status, text };
 		})
-		.catch(() => {
+		.catch(async () => {
+			// CORS failure — try native messaging (Safari), else report permission needed
+			if (typeof browser.runtime.sendNativeMessage === 'function') {
+				return nativeFetch(url, options);
+			}
 			return { ok: false, status: 0, text: '', error: 'CORS_PERMISSION_NEEDED' };
 		});
 });

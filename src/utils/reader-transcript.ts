@@ -54,7 +54,8 @@ export function wireTranscript(
 	const iframe = article.querySelector('iframe[src*="youtube.com/embed/"]') as HTMLIFrameElement | null;
 	const videoWrapper = article.querySelector('.reader-video-wrapper') as HTMLElement | null;
 	const videoEl = videoWrapper?.querySelector('video.reader-video-player') as HTMLVideoElement | null;
-	const playerEl = (videoWrapper || iframe) as HTMLElement | null;
+	const thumbnailLink = article.querySelector('a[href*="youtube.com/watch"]') as HTMLAnchorElement | null;
+	const playerEl = (videoWrapper || iframe || thumbnailLink) as HTMLElement | null;
 	if (!playerEl) return;
 
 	// Wrap player in a container with toggle controls
