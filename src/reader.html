@@ -4,7 +4,12 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Reader — Obsidian Web Clipper</title>
-	<link rel="stylesheet" href="reader.css">
+	<style>
+		/* Prevent white flash before CSS loads */
+		html { background-color: #fff; }
+		@media (prefers-color-scheme: dark) { html { background-color: #1e1e1e; } }
+	</style>
+	<link rel="stylesheet" href="reader.css" id="obsidian-reader-styles">
 	<script src="browser-polyfill.min.js"></script>
 </head>
 <body>

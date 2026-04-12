@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 		return;
 	}
 
+	// Show loading spinner with themed background while fetching
 	document.body.innerHTML = `<div class="obsidian-reader-loading"><div class="obsidian-reader-loading-text">${getMessage('readerLoading')}</div></div>`;
 
 	try {
@@ -48,10 +49,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 		};
 
 		Reader.isReaderPage = true;
-		// Use the article URL for highlights, not the extension page URL
+		Reader.onNavigate = navigateInReader;
 		setPageUrl(url);
 
-		document.body.style.visibility = 'hidden';
+		// Build content behind the loading overlay
 		document.body.textContent = '';
 
 		Object.defineProperty(document, 'URL', { value: url, configurable: true });
@@ -79,13 +80,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 			setPageTitle(result.title);
 		}
 
-		document.body.style.visibility = '';
-
 		setupReaderPageMessageHandler(url, result);
 
 	} catch (error) {
 		console.error('Failed to load page:', error);
-		document.body.style.visibility = '';
 		document.body.innerHTML = `<div class="obsidian-reader-loading"><div class="obsidian-reader-loading-text">Failed to load article</div></div>`;
 	}
 });
@@ -141,6 +139,60 @@ async function proxyFetch(url: string): Promise<string> {
 	if (!result?.ok) throw new Error(result?.error || `HTTP ${result?.status}`);
 	return result.text;
 }
+
+// --- SPA navigation ---
+
+async function loadArticle(newUrl: string) {
+	window.scrollTo(0, 0);
+
+	try {
+		const html = await proxyFetch(newUrl);
+		const parser = new DOMParser();
+		const parsedDoc = parser.parseFromString(html, 'text/html');
+		Object.defineProperty(parsedDoc, 'URL', { value: newUrl, configurable: true });
+
+		const defuddle = new Defuddle(parsedDoc, { url: newUrl, fetch: proxyFetchAsResponse });
+		const result = await defuddle.parseAsync();
+
+		if (!result.content) {
+			throw new Error('Could not extract article content');
+		}
+
+		Object.defineProperty(document, 'URL', { value: newUrl, configurable: true });
+		document.title = result.title || newUrl;
+		const baseEl = document.querySelector('base');
+		if (baseEl) baseEl.href = newUrl;
+
+		setPageUrl(newUrl);
+		if (result.title) setPageTitle(result.title);
+
+		await Reader.updateReaderContent(document, {
+			content: result.content,
+			title: result.title,
+			author: result.author,
+			published: result.published,
+			domain: getDomain(newUrl),
+			wordCount: result.wordCount,
+			parseTime: result.parseTime,
+		});
+
+		setupReaderPageMessageHandler(newUrl, result);
+	} catch (error) {
+		console.error('Failed to navigate:', error);
+	}
+}
+
+function navigateInReader(newUrl: string) {
+	const readerUrl = browser.runtime.getURL('reader.html?url=' + encodeURIComponent(newUrl));
+	history.pushState(null, '', readerUrl);
+	loadArticle(newUrl);
+}
+
+window.addEventListener('popstate', () => {
+	const params = new URLSearchParams(window.location.search);
+	const url = params.get('url');
+	if (url) loadArticle(url);
+});
 
 // --- Reader theme ---
 
