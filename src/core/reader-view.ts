@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 	await initializeI18n();
 
 	const params = new URLSearchParams(window.location.search);
-	const url = params.get('url');
+	let url = params.get('url');
 
 	if (!url) {
 		showUrlInput();
@@ -29,7 +29,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 	document.body.innerHTML = `<div class="obsidian-reader-loading"><div class="obsidian-reader-loading-text">${getMessage('readerLoading')}</div></div>`;
 
 	try {
-		const html = await proxyFetch(url);
+		const originalUrl = url;
+		const { html, finalUrl } = await fetchWithRedirects(url);
+		url = finalUrl;
+		if (url !== originalUrl) {
+			const readerUrl = browser.runtime.getURL('reader.html?url=' + encodeURIComponent(url));
+			history.replaceState(null, '', readerUrl);
+		}
 
 		const parser = new DOMParser();
 		const parsedDoc = parser.parseFromString(html, 'text/html');
@@ -127,67 +133,74 @@ async function proxyFetchAsResponse(input: RequestInfo | URL, init?: RequestInit
 	});
 }
 
-async function proxyFetch(url: string): Promise<string> {
+async function proxyFetch(url: string): Promise<{ text: string; finalUrl: string }> {
 	const result = await browser.runtime.sendMessage({
 		action: 'fetchProxy', url, options: {},
-	}) as { ok: boolean; status: number; text: string; error?: string };
+	}) as { ok: boolean; status: number; text: string; finalUrl?: string; error?: string };
 
 	if (result?.error === 'CORS_PERMISSION_NEEDED') {
 		const granted = await browser.permissions.request({ origins: ['<all_urls>'] });
 		if (granted) {
 			const retry = await browser.runtime.sendMessage({
 				action: 'fetchProxy', url, options: {},
-			}) as { ok: boolean; status: number; text: string; error?: string };
-			if (retry?.ok) return retry.text;
+			}) as { ok: boolean; status: number; text: string; finalUrl?: string; error?: string };
+			if (retry?.ok) return { text: retry.text, finalUrl: retry.finalUrl || url };
 			throw new Error(retry?.error || `HTTP ${retry?.status}`);
 		}
 		throw new Error('Permission not granted.');
 	}
 
 	if (!result?.ok) throw new Error(result?.error || `HTTP ${result?.status}`);
-	return result.text;
+	return { text: result.text, finalUrl: result.finalUrl || url };
+}
+
+// --- Redirect helpers ---
+
+// Detect redirect URL from small HTML pages (meta refresh or JS redirect)
+function detectHtmlRedirect(html: string): string | null {
+	if (html.length > 10000) return null;
+	const metaMatch = html.match(/<meta[^>]+http-equiv\s*=\s*["']?refresh["']?[^>]+content\s*=\s*["'][^"']*url\s*=\s*([^"'\s>]+)/i);
+	if (metaMatch) return metaMatch[1];
+	const jsMatch = html.match(/window\.location(?:\.href)?\s*=\s*["']([^"']+)["']/i);
+	if (jsMatch) return jsMatch[1];
+	return null;
+}
+
+// Fetch a URL, following both HTTP redirects and HTML meta-refresh/JS redirects
+async function fetchWithRedirects(url: string): Promise<{ html: string; finalUrl: string }> {
+	let { text: html, finalUrl } = await proxyFetch(url);
+	url = finalUrl;
+	const redirectUrl = detectHtmlRedirect(html);
+	if (redirectUrl) {
+		const resolved = new URL(redirectUrl, url).href;
+		if (resolved !== url) {
+			const result = await proxyFetch(resolved);
+			html = result.text;
+			url = result.finalUrl;
+		}
+	}
+	return { html, finalUrl: url };
 }
 
 // --- SPA navigation ---
 
 async function loadArticle(newUrl: string) {
+	const originalUrl = newUrl;
 	window.scrollTo(0, 0);
 
 	try {
-		const html = await proxyFetch(newUrl);
+		const { html, finalUrl } = await fetchWithRedirects(newUrl);
+		newUrl = finalUrl;
+		if (newUrl !== originalUrl) {
+			const readerUrl = browser.runtime.getURL('reader.html?url=' + encodeURIComponent(newUrl));
+			history.replaceState(null, '', readerUrl);
+		}
 		const parser = new DOMParser();
 		const parsedDoc = parser.parseFromString(html, 'text/html');
 		Object.defineProperty(parsedDoc, 'URL', { value: newUrl, configurable: true });
 
-		// Debug: log image elements in fetched HTML
-		const imgs = parsedDoc.querySelectorAll('img');
-		console.log(`Found ${imgs.length} <img> elements in fetched HTML:`);
-		imgs.forEach((img, i) => {
-			console.log(`  img[${i}]:`, {
-				src: img.getAttribute('src'),
-				srcset: img.getAttribute('srcset'),
-				dataSrc: img.getAttribute('data-src'),
-				alt: img.getAttribute('alt'),
-				loading: img.getAttribute('loading'),
-			});
-		});
-
-		const defuddle = new Defuddle(parsedDoc, { url: newUrl, fetch: proxyFetchAsResponse, debug: true });
+		const defuddle = new Defuddle(parsedDoc, { url: newUrl, fetch: proxyFetchAsResponse });
 		const result = await defuddle.parseAsync();
-
-		// Debug: check figures in fetched HTML
-		const contentEl = parsedDoc.querySelector('article#story');
-		if (contentEl) {
-			const figures = contentEl.querySelectorAll('figure');
-			const allImgs = contentEl.querySelectorAll('img');
-			console.log(`article#story: ${figures.length} figures, ${allImgs.length} images`);
-			figures.forEach((f: Element, i: number) => {
-				const imgs = f.querySelectorAll('img');
-				const caption = f.querySelector('figcaption')?.textContent?.substring(0, 80);
-				console.log(`  figure[${i}]: ${imgs.length} imgs, caption: ${caption || '(none)'}`);
-			});
-		}
-		console.log('Defuddle content images:', result.content.match(/<img[^>]*>/g));
 
 		if (!result.content) {
 			throw new Error('Could not extract article content');

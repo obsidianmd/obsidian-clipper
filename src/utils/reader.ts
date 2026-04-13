@@ -2493,7 +2493,32 @@ export class Reader {
 		main.appendChild(article);
 
 		this.populateArticle(doc, main, article, content);
-		article.setAttribute('data-original-html', article.innerHTML);
+
+		const host = doc.URL ? new URL(doc.URL).hostname : '';
+		if (host.includes('youtube.com') || host.includes('youtu.be')) {
+			const iframe = article.querySelector('iframe[src*="youtube.com/embed/"]') as HTMLIFrameElement;
+			if (iframe) {
+				await browser.runtime.sendMessage({
+					action: 'enableYouTubeEmbedRule'
+				}).catch(() => {});
+				iframe.src = iframe.src;
+			}
+		}
+
+		// Unwrap timestamp spans so markdown conversion keeps the text inside <strong>
+		const originalHtml = article.innerHTML.replace(
+			/<span class="timestamp"[^>]*>([^<]*)<\/span>/g, '$1'
+		);
+		article.setAttribute('data-original-html', originalHtml);
+
+		wireTranscript(doc, article, this.settings, {
+			getStickyOffset: () => this.getStickyOffset(),
+			scrollTo: (y) => this.scrollTo(y),
+			programmaticScroll: () => this.programmaticScroll,
+		}, (key, value) => {
+			(this.settings as any)[key] = value;
+			this.saveSettings();
+		});
 
 		await this.initializeContentFeatures(doc, content.title);
 	}

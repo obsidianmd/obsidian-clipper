@@ -285,7 +285,7 @@ browser.runtime.onMessage.addListener((request: unknown) => {
 			if (!resp.ok && (text.includes('Sorry') || text.includes('<html')) && typeof browser.runtime.sendNativeMessage === 'function') {
 				return nativeFetch(url, options);
 			}
-			return { ok: resp.ok, status: resp.status, text };
+			return { ok: resp.ok, status: resp.status, text, finalUrl: resp.url };
 		})
 		.catch(async () => {
 			// CORS failure — try native messaging (Safari), else report permission needed
