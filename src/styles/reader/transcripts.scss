@@ -192,3 +192,9 @@ article > .player-toggles {
 .transcript-scrub-track:hover .transcript-scrub-hover {
 	opacity: 1;
 }
+
+@media (max-width: 768px) {
+	.player-toggles {
+		display: none !important;
+	}
+}

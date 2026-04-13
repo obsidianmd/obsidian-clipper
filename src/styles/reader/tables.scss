@@ -3,6 +3,8 @@ table {
 	font-size: var(--table-text-size);
 	line-height: var(--table-line-height);
 	border-collapse: collapse !important;
+	max-width: 100%;
+    width: auto;
 	tr {
 		td, th {
 			padding: 0.25em 0.5em !important;

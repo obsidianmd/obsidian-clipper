@@ -3,6 +3,7 @@
 @import 'styles/reader/lightbox';
 @import 'styles/reader/transcripts';
 @import 'styles/reader/comments';
+@import 'styles/reader/outline';
 
 ::view-transition-old(root),
 ::view-transition-new(root) {
@@ -179,106 +180,6 @@
 		}
 	}
 
-	.footnote-popover {
-		position: fixed;
-		z-index: var(--layer-footnote);
-		max-width: min(80vw, 400px);
-		max-height: 80vh;
-		padding: var(--size-4-3) var(--size-4-4);
-		background: var(--footnote-popover-background);
-		border: 1px solid var(--background-modifier-border);
-		border-radius: var(--radius-m);
-		corner-shape: var(--corner-shape);
-		box-shadow: var(--shadow-s);
-		font-size: 0.80em;
-		line-height: 1.5;
-		opacity: 0;
-		visibility: hidden;
-		transform: translateY(8px);
-		transition:
-			opacity 0.15s ease,
-			transform 0.15s ease,
-			visibility 0s linear 0.15s;
-		overflow-y: auto;
-
-		// Arrow
-		&::before,
-		&::after {
-			content: '';
-			position: absolute;
-			left: var(--arrow-offset, 50%);
-			transform: translateX(-50%);
-			width: 0;
-			height: 0;
-			pointer-events: none;
-		}
-
-		// Arrow border
-		&::before {
-			border: 8px solid transparent;
-		}
-
-		// Arrow background
-		&::after {
-			border: 7px solid transparent;
-		}
-
-		li {
-			list-style: none;
-		}
-
-		// Top arrow (when popover is below)
-		&[data-position="bottom"] {
-			&::before {
-				top: -16px;
-				border-bottom-color: var(--background-modifier-border);
-			}
-			&::after {
-				top: -14px;
-				border-bottom-color: var(--background-primary);
-			}
-		}
-
-		// Bottom arrow (when popover is above)
-		&[data-position="top"] {
-			&::before {
-				bottom: -16px;
-				border-top-color: var(--background-modifier-border);
-			}
-			&::after {
-				bottom: -14px;
-				border-top-color: var(--background-primary);
-			}
-		}
-
-		.footnote-backref {
-			display: none;
-		}
-
-		&.active {
-			opacity: 1;
-			visibility: visible;
-			transform: translateY(0);
-			transition:
-				opacity 0.15s ease,
-				transform 0.15s ease;
-		}
-
-		p {
-			margin: 0.5em 0;
-			&:first-child {
-				margin-top: 0;
-			}
-			&:last-child {
-				margin-bottom: 0;
-			}
-		}
-
-		.footnote-backref {
-			display: none;
-		}
-	}
-
 	.obsidian-highlight-overlay {
 		z-index: var(--layer-highlights);
 	}
@@ -438,9 +339,6 @@
 }
 
 @media (max-width: 768px) {
-	.player-toggles {
-		display: none !important;
-	}
 	.obsidian-reader-nav {
 		position: fixed;
 		top: 0;
@@ -698,76 +596,6 @@
 	width: 100%;
 	margin: 0 auto;
 }
-.obsidian-reader-outline {
-	font-family: var(--font-ui);
-	box-sizing: border-box;
-	background: var(--background-primary);
-	position: sticky;
-	top: 0;
-	height: 100vh;
-	min-width: 180px;
-	padding: max(4rem, 4vh) var(--size-4-5) var(--size-4-5) var(--size-4-5);
-	padding-inline-end: var(--size-4-2);
-	overflow-y: auto;
-	font-size: var(--font-ui-small);
-	user-select: none;
-	-webkit-user-select: none;
-	&:empty {
-		display: none;
-	}
-}
-.obsidian-reader-outline-item {
-	color: var(--text-muted);
-	cursor: pointer;
-	text-wrap-style: pretty;
-	padding: 5px var(--size-4-2);
-	border-radius: var(--radius-s);
-	line-height: 1.15;
-	max-width: 220px;
-
-	// Depth-based indentation
-	&[data-depth="0"] {
-		padding-left: 8px;
-	}
-	&[data-depth="1"] {
-		padding-left: 24px;
-	}
-	&[data-depth="2"] {
-		padding-left: 40px;
-	}
-	&[data-depth="3"] {
-		padding-left: 56px;
-	}
-	&[data-depth="4"] {
-		padding-left: 72px;
-	}
-}
-.obsidian-reader-outline-item:hover {
-	color: var(--text-normal);
-}
-.obsidian-reader-outline-item.active {
-	color: var(--text-normal);
-	transition: color 0.1s ease;
-}
-.obsidian-reader-outline-item.in-progress {
-	position: relative;
-	&::before {
-		content: '';
-		position: absolute;
-		left: 4px;
-		top: calc(5px + 0.575em - 1px);
-		width: 12px;
-		height: 2px;
-		background: var(--color-red);
-		mix-blend-mode: var(--mix-blend-mode);
-	}
-}
-.obsidian-reader-outline-item.faint {
-	color: var(--text-faint);
-}
-.obsidian-reader-outline-item.faint:hover {
-	color: var(--text-muted);
-}
 
 // Mobile outline overlay
 .nav-btn-outline {
@@ -776,37 +604,11 @@
 		display: none !important;
 	}
 }
-.obsidian-reader-outline-overlay {
-	display: none;
-}
 
 @media (max-width: 768px) {
 	.nav-btn-outline:not(.is-hidden) {
 		display: flex !important;
 		margin-inline-end: auto;
-	}
-	.obsidian-reader-outline-overlay {
-		position: fixed;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		background: var(--background-primary);
-		z-index: var(--layer-popover);
-		padding: calc(var(--safe-area-inset-top) + 80px) var(--size-4-5) var(--size-4-5);
-		overflow-y: auto;
-		-webkit-overflow-scrolling: touch;
-		display: none;
-		&.is-open {
-			display: block;
-		}
-		.obsidian-reader-outline-item {
-			padding-block: 10px;
-			font-size: 0.95em;
-			&.active {
-				font-weight: 600;
-			}
-		}
 	}
 	.obsidian-reader-container {
 		grid-template-columns: 1fr;
