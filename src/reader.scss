@@ -1154,6 +1154,56 @@
 	
 }
 
+.reader-nav {
+	position: fixed;
+	top: 0;
+	inset-inline-start: 0;
+	padding: 16px 20px;
+}
+
+.reader-nav-link {
+	--link-external-color: var(--text-faint);
+	--link-external-color-hover: var(--text-normal);
+	--link-external-decoration: none;
+	--link-external-decoration-hover: none;
+	text-decoration: none;
+	font-size: var(--font-ui-small);
+	font-family: var(--font-ui);
+
+}
+
+.reader-url-input-wrapper {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 100%;
+	max-width: 500px;
+	padding: 0 24px;
+	box-sizing: border-box;
+}
+
+.reader-url-input {
+	width: 100%;
+	padding: 12px 16px;
+	font-size: 16px;
+	font-family: var(--font-ui, system-ui, -apple-system, sans-serif);
+	color: var(--text-normal, #111);
+	background: var(--background-primary, #fff);
+	border: 1px solid var(--background-modifier-border, #e0e0e0);
+	border-radius: var(--radius-m, 8px);
+	outline: none;
+	box-sizing: border-box;
+
+	&::placeholder {
+		color: var(--text-faint, #aaa);
+	}
+
+	&:focus {
+		border-color: var(--background-modifier-border, #888);
+	}
+}
+
 .obsidian-reader-loading {
 	position: fixed;
 	top: 50%;
@@ -1186,6 +1236,7 @@
 
 .obsidian-reader-footer {
 	color: var(--text-faint);
+	font-family: var(--font-ui);
 	font-size: 0.7em;
 	margin-top: 36vh;
 	padding: 1rem 0 2rem 0;

@@ -289,8 +289,8 @@
 	"deletePage": {
 		"message": "Delete page"
 	},
-	"noHighlightsYet": {
-		"message": "No highlights yet"
+	"noResults": {
+		"message": "No results found"
 	},
 	"sortAZ": {
 		"message": "A to Z"
@@ -299,10 +299,10 @@
 		"message": "Z to A"
 	},
 	"sortNewOld": {
-		"message": "New to old"
+		"message": "Newest first"
 	},
 	"sortOldNew": {
-		"message": "Old to new"
+		"message": "Oldest first"
 	},
 	"exportProperties": {
 		"message": "Export properties"
@@ -830,6 +830,9 @@
 	},
 	"readerLoading": {
 		"message": "Defuddling…"
+	},
+	"readerUrlPlaceholder": {
+		"message": "Paste a URL to read…"
 	},
 	"readerOn": {
 		"message": "Reader"

@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 	const url = params.get('url');
 
 	if (!url) {
-		document.body.textContent = 'No URL provided';
+		showUrlInput();
 		return;
 	}
 
@@ -159,8 +159,35 @@ async function loadArticle(newUrl: string) {
 		const parsedDoc = parser.parseFromString(html, 'text/html');
 		Object.defineProperty(parsedDoc, 'URL', { value: newUrl, configurable: true });
 
-		const defuddle = new Defuddle(parsedDoc, { url: newUrl, fetch: proxyFetchAsResponse });
+		// Debug: log image elements in fetched HTML
+		const imgs = parsedDoc.querySelectorAll('img');
+		console.log(`Found ${imgs.length} <img> elements in fetched HTML:`);
+		imgs.forEach((img, i) => {
+			console.log(`  img[${i}]:`, {
+				src: img.getAttribute('src'),
+				srcset: img.getAttribute('srcset'),
+				dataSrc: img.getAttribute('data-src'),
+				alt: img.getAttribute('alt'),
+				loading: img.getAttribute('loading'),
+			});
+		});
+
+		const defuddle = new Defuddle(parsedDoc, { url: newUrl, fetch: proxyFetchAsResponse, debug: true });
 		const result = await defuddle.parseAsync();
+
+		// Debug: check figures in fetched HTML
+		const contentEl = parsedDoc.querySelector('article#story');
+		if (contentEl) {
+			const figures = contentEl.querySelectorAll('figure');
+			const allImgs = contentEl.querySelectorAll('img');
+			console.log(`article#story: ${figures.length} figures, ${allImgs.length} images`);
+			figures.forEach((f: Element, i: number) => {
+				const imgs = f.querySelectorAll('img');
+				const caption = f.querySelector('figcaption')?.textContent?.substring(0, 80);
+				console.log(`  figure[${i}]: ${imgs.length} imgs, caption: ${caption || '(none)'}`);
+			});
+		}
+		console.log('Defuddle content images:', result.content.match(/<img[^>]*>/g));
 
 		if (!result.content) {
 			throw new Error('Could not extract article content');
@@ -217,6 +244,45 @@ window.addEventListener('popstate', () => {
 	const url = params.get('url');
 	if (url) loadArticle(url);
 });
+
+function showUrlInput() {
+	document.body.innerHTML = '';
+
+	const nav = document.createElement('nav');
+	nav.className = 'reader-nav';
+	const highlightsLink = document.createElement('a');
+	highlightsLink.className = 'reader-nav-link';
+	highlightsLink.href = browser.runtime.getURL('highlights.html');
+	highlightsLink.textContent = getMessage('highlights') || 'Highlights';
+	nav.appendChild(highlightsLink);
+	document.body.appendChild(nav);
+
+	const wrapper = document.createElement('div');
+	wrapper.className = 'reader-url-input-wrapper';
+
+	const input = document.createElement('input');
+	input.type = 'url';
+	input.className = 'reader-url-input';
+	input.placeholder = getMessage('readerUrlPlaceholder') || 'Paste a URL to read…';
+	input.autofocus = true;
+
+	input.addEventListener('keydown', (e) => {
+		if (e.key === 'Enter') {
+			const value = input.value.trim();
+			if (value) {
+				let url = value;
+				if (!/^https?:\/\//i.test(url)) {
+					url = 'https://' + url;
+				}
+				window.location.href = browser.runtime.getURL('reader.html?url=' + encodeURIComponent(url));
+			}
+		}
+	});
+
+	wrapper.appendChild(input);
+	document.body.appendChild(wrapper);
+	input.focus();
+}
 
 // --- Reader theme ---
 
