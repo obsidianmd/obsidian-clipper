@@ -1,0 +1,161 @@
+.comments {
+	--comment-border-width: 1.5px;
+	font-size: 0.925em;
+
+	// Spacing between top-level comment groups
+	> blockquote + blockquote {
+		padding-top: 1.5em;
+		margin-top: 1.5em;
+	}
+
+	blockquote {
+		border: none;
+		padding: 0;
+		margin: 2em 0;
+	}
+
+	blockquote blockquote {
+		position: relative;
+		border-left: var(--comment-border-width) solid var(--background-modifier-border);
+		padding-inline-start: calc(1.5em - var(--comment-border-width));
+		margin: 0;
+		transition: border-color 0.15s ease;
+
+		&:hover  {
+			border-color: var(--text-faint);
+		}
+
+		&.child-hovered {
+			border-image: linear-gradient(
+				to bottom,
+				var(--text-faint) var(--highlight-height, 100%),
+				var(--background-modifier-border) var(--highlight-height, 100%)
+			) 1;
+		}
+
+		&.collapsed {
+			border-left-color: var(--text-faint);
+			> blockquote { display: none; }
+			> .comment > .comment-content { display: none; }
+		}
+	}
+
+	.comment.collapsed .comment-metadata {
+		margin-bottom: 2em;
+	}
+
+	> blockquote > blockquote + blockquote {
+		margin-top: -2em;
+		padding-top: 3em;
+	}
+
+	// Arm connector
+	blockquote > blockquote > blockquote {
+		&::before {
+			content: '';
+			position: absolute;
+			left: calc(-1.5em);
+			top: 0;
+			width: 1.5em;
+			height: var(--comment-border-width);
+			box-sizing: border-box;
+			border-bottom: var(--comment-border-width) solid var(--background-modifier-border);
+			pointer-events: none;
+			transition: border-color 0.15s ease;
+			z-index: 5;
+		}
+
+		&:hover::before,
+		&.collapsed::before {
+			border-color: var(--text-faint);
+		}
+	}
+
+	// Last child mask
+	blockquote > blockquote > blockquote > blockquote:last-child::after {
+		content: '';
+		position: absolute;
+		left: calc(-1.5em - var(--comment-border-width));
+		top: calc(var(--comment-border-width));
+		bottom: 0;
+		width: 3px;
+		background: var(--background-primary);
+		pointer-events: none;
+	}
+
+	.comment-metadata {
+		position: relative;
+		z-index: 10;
+		color: var(--text-muted);
+		font-family: var(--font-ui);
+		font-size: 0.9em;
+		margin-bottom: 0.5em;
+		.comment-author {
+			padding: 1px 3px;
+			border-radius: 3px;
+			strong {
+				color: var(--text-normal);
+			}
+		}
+		a {
+			color: var(--text-muted);
+			text-decoration: none;
+			&:hover {
+				color: var(--text-accent-hover);
+				text-decoration: underline;
+			}
+		}
+		.comment-collapse-btn {
+			user-select: none;
+			background: none;
+			border: none;
+			color: var(--text-muted);
+			cursor: pointer;
+			margin-top: -2px;
+			padding: 2px 2px;
+			border-radius: 3px;
+			font-family: var(--font-text);
+			display: inline-flex;
+			align-items: center;
+			gap: 2px;
+			vertical-align: middle;
+			&:hover {
+				color: var(--text-normal);
+				background: var(--background-primary-alt);
+			}
+			.comment-collapse-count {
+				padding-inline-end: 4px;
+				&:empty {
+					display: none;
+				}
+			}
+			.comment-collapse-chevron {
+				transition: transform 0.15s ease;
+			}
+			&.is-collapsed .comment-collapse-chevron {
+				transform: rotate(-90deg);
+			}
+		}
+	}
+
+	.comment.collapsed {
+		> .comment-content {
+			display: none;
+		}
+	}
+	.comment-content {
+		margin-bottom: 2em;
+
+		// Restore normal blockquote styles for quoted text inside comments
+		blockquote {
+			border-inline-start: 2px solid var(--text-faint);
+			padding-inline-start: 1.5em;
+			margin: 2em 0;
+
+			&::after,
+			&::before {
+				display: none;
+			}
+		}
+	}
+}
