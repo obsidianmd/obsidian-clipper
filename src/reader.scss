@@ -19,7 +19,7 @@
 	}
 
 	&.theme-light:not(.no-blend-images) {
-		img, svg:not(.image-expand-button) {
+		img, svg {
 			mix-blend-mode: multiply;
 		}
 	}
@@ -614,7 +614,7 @@
 		grid-template-columns: 1fr;
 	}
 	.obsidian-reader-active body .obsidian-reader-content {
-		max-width: 90%;
+		max-width: 90vw;
 		width: 100%;
 		margin: 0 auto;
 	}
