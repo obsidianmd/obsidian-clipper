@@ -1,5 +1,6 @@
 @import 'reader-themes';
 @import 'reader-content';
+@import 'sidebar';
 
 #highlights-page {
 	--settings-background: var(--background-primary);
@@ -22,13 +23,7 @@
 // --- Sidebar ---
 
 #highlights-sidebar {
-	width: 25%;
-	min-width: 200px;
-	max-width: 300px;
-	flex-shrink: 0;
-	overflow-y: auto;
-	background-color: var(--settings-background);
-	border-inline-end: 1px solid var(--background-modifier-border);
+	@extend .sidebar;
 	padding: 16px;
 	font-family: var(--font-default);
 
@@ -39,54 +34,7 @@
 
 #highlights-nav,
 #highlights-domain-list {
-	font-size: var(--font-ui-small);
-	list-style: none;
-	padding: 0;
-	margin: 0;
-	display: flex;
-	flex-direction: column;
-	gap: 2px;
-
-	li {
-		display: flex;
-		align-items: center;
-		gap: 6px;
-		cursor: pointer;
-		padding: 0.25rem 0.425rem;
-		border-radius: var(--radius-s);
-		corner-shape: var(--corner-shape);
-		user-select: none;
-		-webkit-user-select: none;
-
-		svg {
-			width: 16px;
-			height: 16px;
-			flex-shrink: 0;
-			color: var(--text-muted);
-		}
-
-		span {
-			flex-grow: 1;
-			min-width: 0;
-			overflow: hidden;
-			text-overflow: ellipsis;
-			white-space: nowrap;
-		}
-
-		@media (hover: hover) {
-			&:hover {
-				background-color: var(--background-modifier-hover);
-			}
-		}
-
-		&.active {
-			background-color: var(--background-modifier-hover);
-			color: var(--text-normal);
-			svg {
-				color: var(--text-normal);
-			}
-		}
-	}
+	@extend .nav-list;
 }
 
 #highlights-nav {
@@ -415,6 +363,10 @@ h1.highlight-page-title {
 	font-size: calc(var(--dynamic-font-size) * 0.95);
 	line-height: var(--line-height-normal, 1.5);
 	-webkit-font-smoothing: antialiased;
+
+	::selection {
+		background-color: var(--text-selection);
+	}
 }
 
 // --- Highlight items ---
@@ -535,30 +487,6 @@ h1.highlight-page-title {
 			font-weight: 600;
 			font-size: var(--font-ui-medium);
 		}
-
-		.hamburger-menu {
-			display: block;
-		}
-	}
-
-	#highlights-sidebar {
-		width: 100%;
-		max-width: 100%;
-		display: none;
-		position: absolute;
-		top: 3rem;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		z-index: 10;
-
-		li {
-			padding: 0.5rem 0.625rem;
-		}
-	}
-
-	#highlights.sidebar-open #highlights-sidebar {
-		display: block;
 	}
 
 	#highlights-main-header {
