@@ -4,6 +4,7 @@ import { translatePage, getMessage, setupLanguageAndDirection } from '../utils/i
 import { addBrowserClassToHtml, detectBrowser } from '../utils/browser-detection';
 import DOMPurify from 'dompurify';
 import Defuddle from 'defuddle';
+import { createMarkdownContent } from 'defuddle/full';
 import { getFontCss } from '../utils/font-utils';
 import { ReaderSettings } from '../types/types';
 import dayjs from 'dayjs';
@@ -1021,7 +1022,8 @@ function createHighlightItem(entry: HighlightEntry): HTMLElement {
 	copyIcon.setAttribute('data-lucide', 'copy');
 	copyBtn.appendChild(copyIcon);
 	copyBtn.addEventListener('click', async () => {
-		await navigator.clipboard.writeText(entry.data.content || '');
+		const markdown = createMarkdownContent(entry.data.content || '', entry.url);
+		await navigator.clipboard.writeText(markdown);
 		copyBtn.classList.add('is-copied');
 		setButtonIcon(copyBtn, 'check');
 		setTimeout(() => {
