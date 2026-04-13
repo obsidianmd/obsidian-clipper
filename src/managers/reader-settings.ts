@@ -378,10 +378,6 @@ export async function initializeReaderSettings() {
 		updatePreview();
 	});
 
-	initializeSettingToggle('reader-follow-links', generalSettings.readerSettings.followLinks, (checked) => {
-		saveSettings({ ...generalSettings, readerSettings: { ...generalSettings.readerSettings, followLinks: checked } });
-	});
-
 	const themeModeSelect = document.getElementById('reader-appearance') as HTMLSelectElement;
 	if (themeModeSelect) {
 		themeModeSelect.value = generalSettings.readerSettings.appearance;
