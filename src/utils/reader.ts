@@ -2390,10 +2390,30 @@ export class Reader {
 					span.className = 'metadata-author';
 					span.textContent = item.text;
 				} else if (item.type === 'domain' && content.domain) {
+					const domain = content.domain;
 					const link = doc.createElement('a');
 					link.href = doc.URL;
-					link.textContent = content.domain;
+					link.textContent = domain;
 					span.appendChild(link);
+
+					// Async: append highlight count after domain if any exist
+					this.getHighlightCountForDomain(domain).then(count => {
+						if (count > 0) {
+							const sep = doc.createElement('span');
+							sep.textContent = ' · ';
+							metadataDetails.appendChild(sep);
+
+							const countLink = doc.createElement('a');
+							countLink.href = '#';
+							countLink.className = 'metadata-highlights';
+							countLink.textContent = `${count} highlight${count === 1 ? '' : 's'}`;
+							countLink.addEventListener('click', (e) => {
+								e.preventDefault();
+								browser.runtime.sendMessage({ action: 'openHighlights', domain });
+							});
+							metadataDetails.appendChild(countLink);
+						}
+					});
 				} else {
 					span.textContent = item.text;
 				}
@@ -2444,6 +2464,21 @@ export class Reader {
 		invalidateHighlightCache();
 		await loadHighlights();
 		applyHighlights();
+	}
+
+	private static async getHighlightCountForDomain(domain: string): Promise<number> {
+		const result = await browser.storage.local.get('highlights');
+		const allHighlights = (result.highlights || {}) as Record<string, { highlights: any[]; url: string }>;
+		let count = 0;
+		for (const stored of Object.values(allHighlights)) {
+			try {
+				const hostname = new URL(stored.url).hostname.replace(/^www\./, '');
+				if (hostname === domain.replace(/^www\./, '')) {
+					count += stored.highlights.length;
+				}
+			} catch { /* skip invalid URLs */ }
+		}
+		return count;
 	}
 
 	// Replace article content in-place for SPA navigation on the reader page.

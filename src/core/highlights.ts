@@ -200,7 +200,7 @@ async function loadData() {
 		let path: string;
 		try {
 			const parsed = new URL(stored.url);
-			domain = parsed.hostname;
+			domain = parsed.hostname.replace(/^www\./, '');
 			path = parsed.pathname + parsed.search;
 		} catch {
 			domain = stored.url;
@@ -350,7 +350,7 @@ function updateUrlFromNav() {
 
 function readNavFromUrl(): NavSelection {
 	const params = new URLSearchParams(window.location.search);
-	const domain = params.get('domain');
+	const domain = params.get('domain')?.replace(/^www\./, '');
 	const url = params.get('url');
 	if (url && domain) {
 		return { type: 'page', domain, url };

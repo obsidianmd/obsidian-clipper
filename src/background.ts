@@ -539,6 +539,14 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 			return true;
 		}
 
+		if (typedRequest.action === "openHighlights") {
+			const domain = (typedRequest as any).domain;
+			const query = domain ? `?domain=${encodeURIComponent(domain)}` : '';
+			browser.tabs.create({ url: browser.runtime.getURL(`highlights.html${query}`) });
+			sendResponse({ success: true });
+			return true;
+		}
+
 		if (typedRequest.action === "openSettings") {
 			try {
 				const section = typedRequest.section ? `?section=${typedRequest.section}` : '';
