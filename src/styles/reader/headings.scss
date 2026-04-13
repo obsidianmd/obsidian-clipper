@@ -1,0 +1,56 @@
+h1 {
+	margin: 0 0 0.5em 0;
+	font-weight: var(--h1-weight);
+	font-size: var(--h1-size);
+	letter-spacing: var(--h1-letter-spacing);
+	line-height: var(--h1-line-height);
+	text-wrap-style: pretty;
+}
+h2 {
+	font-weight: var(--h2-weight);
+	font-size: var(--h2-size);
+	letter-spacing: var(--h2-letter-spacing);
+	margin-top: 1.8em;
+	margin-bottom: 0.5em;
+	line-height: var(--h2-line-height);
+	text-wrap-style: pretty;
+}
+h3 {
+	font-weight: var(--h3-weight);
+	font-size: var(--h3-size);
+	line-height: var(--h3-line-height);
+	text-wrap-style: pretty;
+	margin-top: 2em;
+	margin-bottom: 0.5em;
+}
+h4 {
+	font-size: var(--h4-size);
+	font-weight: var(--h4-weight);
+	line-height: var(--h4-line-height);
+	text-wrap-style: pretty;
+	margin-top: 2em;
+	margin-bottom: 0;
+}
+h5 {
+	font-weight: var(--h5-weight);
+	line-height: var(--h5-line-height);
+	text-wrap-style: pretty;
+	margin-bottom: 1em;
+	font-size: var(--h5-size);
+}
+h6 {
+	font-weight: var(--h6-weight);
+	line-height: var(--h6-line-height);
+	text-wrap-style: pretty;
+	text-transform: uppercase;
+	margin-bottom: 1em;
+	letter-spacing: var(--h6-letter-spacing);
+	font-size: var(--h6-size);
+}
+
+h1 + h2,
+h2 + h2,
+h2 + h3,
+h3 + h4 {
+	margin-top: 0em;
+}

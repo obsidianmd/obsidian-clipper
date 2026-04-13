@@ -1,0 +1,57 @@
+#footnotes {
+	margin-top: 4em;
+	font-size: 0.85em;
+	color: var(--text-muted);
+
+	ol {
+		padding-left: 1.5em;
+	}
+	li {
+		p {
+			margin: 0.25em 0;
+		}
+		a {
+			color: var(--text-muted);
+		}
+		a.footnote-backref {
+			text-decoration: none;
+			color: var(--text-faint);
+			&:hover {
+				color: var(--text-accent-hover);
+			}
+		}
+	}
+}
+
+sup[id^="fnref"] {
+	margin: 0 0.1em 0 0;
+
+	a {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		height: 1.4em;
+		padding: 0 0.5em;
+		border-radius: 1em;
+		background: var(--background-primary-alt);
+		color: var(--text-muted);
+		text-decoration: none;
+		font-size: 0.75em;
+		font-weight: var(--font-medium);
+		line-height: 1;
+		cursor: pointer;
+		user-select: none;
+		-webkit-user-select: none;
+
+		&:hover {
+			background: var(--background-modifier-border);
+			color: var(--text-normal);
+		}
+
+		&.active {
+			background: var(--text-accent);
+			border-color: var(--text-accent);
+			color: var(--background-primary);
+		}
+	}
+}

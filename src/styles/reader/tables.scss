@@ -1,0 +1,16 @@
+table {
+	overflow-x: auto;
+	font-size: var(--table-text-size);
+	line-height: var(--table-line-height);
+	border-collapse: collapse !important;
+	tr {
+		td, th {
+			padding: 0.25em 0.5em !important;
+			border: var(--table-border-width) solid var(--table-border-color) !important;
+		}
+	}
+}
+
+math[display="block"] {
+	margin: 1em 0;
+}

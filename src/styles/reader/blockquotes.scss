@@ -1,0 +1,25 @@
+blockquote {
+	padding-inline-start: var(--size-4-6);
+	margin: var(--p-spacing) 0;
+	border-left: var(--blockquote-border-thickness) solid var(--blockquote-border-color);
+}
+
+small[class*="caption"],
+figcaption,
+caption {
+	color: var(--text-muted);
+	font-size: 85%;
+	margin-top: 0.5em;
+	margin-bottom: 1em;
+	line-height: calc(var(--line-height-normal) * 0.9);
+	a {
+		color: var(--text-muted);
+	}
+}
+
+sup {
+	a {
+		text-decoration: none;
+		color: var(--text-muted);
+	}
+}

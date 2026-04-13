@@ -1,0 +1,26 @@
+ul > li {
+	list-style: disc;
+}
+ol, ul {
+	padding: 0.5rem 0 1rem 0;
+	padding-inline-start: 1em;
+	margin: 0;
+	margin-inline-start: 0.5em;
+}
+ol > li,
+ul > li {
+	padding: var(--list-spacing) 0;
+	&::marker {
+		color: var(--list-marker-color);
+	}
+	p,
+	> div p {
+		margin-bottom: 0;
+		margin-top: 0;
+	}
+}
+ul > li {
+	&::marker {
+		font-size: 95%;
+	}
+}

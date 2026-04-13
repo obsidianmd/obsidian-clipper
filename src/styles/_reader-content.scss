@@ -1,0 +1,130 @@
+// Shared content styles for reader and highlights views.
+// These apply inside any element with .obsidian-reader-active.
+// Individual content type files are in the reader/ directory.
+
+.obsidian-reader-active {
+	--dynamic-font-size: calc(var(--font-text-size) + 0.25vw);
+
+	// Headings
+	--h1-size: 1.6em;
+	--h1-weight: 700;
+	--h1-letter-spacing: -0.02em;
+	--h1-line-height: 1.2;
+	--h2-size: 1.3em;
+	--h2-weight: 700;
+	--h2-letter-spacing: -0.015em;
+	--h2-line-height: 1.2;
+	--h3-size: 1.225em;
+	--h3-weight: 700;
+	--h3-line-height: 1.3;
+	--h4-size: 1.15em;
+	--h4-weight: 700;
+	--h4-line-height: 1.4;
+	--h5-size: 1em;
+	--h5-weight: 700;
+	--h5-line-height: var(--line-height-normal);
+	--h6-size: 1em;
+	--h6-weight: 700;
+	--h6-line-height: var(--line-height-normal);
+	--h6-letter-spacing: 0.05em;
+
+	// Font
+	--font-smaller: 0.875em;
+	--font-medium: 500;
+
+	// Spacing
+	--p-spacing: 1rem;
+	--size-2-2: 4px;
+	--size-2-3: 6px;
+	--size-4-2: 8px;
+	--size-4-3: 12px;
+	--size-4-4: 16px;
+	--size-4-5: 20px;
+	--size-4-6: 24px;
+
+	// Radius
+	--radius-s: 0.6rem;
+	--radius-m: 0.75rem;
+	--radius-l: 12px;
+
+	// Icons
+	--icon-s: 16px;
+	--icon-m: 18px;
+
+	// Corner shape
+	--corner-shape: superellipse(1.33);
+
+	// Callouts
+	--callout-border-width: 1px;
+	--callout-border-opacity: 25%;
+	--callout-padding: 1em 1.5em;
+	--callout-radius: var(--radius-s);
+	--callout-blend-mode: var(--highlight-mix-blend-mode);
+	--callout-title-color: inherit;
+	--callout-title-padding: 0;
+	--callout-title-size: inherit;
+	--callout-title-weight: 600;
+	--callout-content-padding: 0;
+	--callout-content-background: transparent;
+
+	--callout-bug: var(--color-red);
+	--callout-default: var(--color-blue);
+	--callout-error: var(--color-red);
+	--callout-example: var(--color-purple);
+	--callout-fail: var(--color-red);
+	--callout-important: var(--color-cyan);
+	--callout-info: var(--color-blue);
+	--callout-question: var(--color-orange);
+	--callout-success: var(--color-green);
+	--callout-summary: var(--color-cyan);
+	--callout-tip: var(--color-cyan);
+	--callout-todo: var(--color-blue);
+	--callout-warning: var(--color-orange);
+	--callout-quote: 158, 158, 158;
+
+	// Code
+	--code-size: 0.8em;
+	--code-background: var(--background-primary-alt);
+	--code-radius: 4px;
+	--code-border-width: var(--border-width);
+	--code-border-color: var(--background-modifier-border);
+
+	// Blockquotes
+	--blockquote-border-thickness: 2px;
+	--blockquote-border-color: var(--text-faint);
+
+	// Tables
+	--table-border-width: 1px;
+	--table-border-color: var(--background-modifier-border);
+	--table-line-height: calc(var(--line-height-normal) * 0.9);
+	--table-text-size: 0.9em;
+
+	// HR
+	--hr-color: var(--background-modifier-border);
+	--hr-thickness: 1px;
+
+	// Links
+	--link-external-color: var(--text-accent);
+	--link-external-color-hover: var(--text-accent-hover);
+	--link-external-decoration: underline;
+	--link-external-decoration-hover: underline;
+
+	// Lists
+	--list-marker-color: var(--text-faint);
+	--list-spacing: 0.15rem;
+
+	// Borders
+	--border-width: 1px;
+
+	// Content styles
+	@import 'reader/headings';
+	@import 'reader/links';
+	@import 'reader/blockquotes';
+	@import 'reader/hr';
+	@import 'reader/lists';
+	@import 'reader/code-blocks';
+	@import 'reader/code-highlighting';
+	@import 'reader/tables';
+	@import 'reader/footnotes';
+	@import 'reader/callouts';
+}
