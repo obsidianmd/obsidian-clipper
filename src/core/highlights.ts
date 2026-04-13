@@ -50,6 +50,7 @@ let sortOrder: SortOrder = 'az';
 const BATCH_SIZE = 50;
 let flatEntries: { entry: HighlightEntry; pageUrl: string; domain: string; title?: string }[] = [];
 let renderedCount = 0;
+let currentPageGroup: HTMLElement | null = null;
 let observer: IntersectionObserver | null = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -121,34 +122,43 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // --- Reader theme ---
 
+let highlightThemeClasses: string[] = [];
+let highlightThemeAttr: { name: string; value: string } | null = null;
+
 async function applyReaderTheme() {
 	const data = await browser.storage.sync.get('reader_settings');
 	const settings = data.reader_settings as ReaderSettings | undefined;
-	if (!settings) return;
 
-	const html = document.documentElement;
+	const isDark = settings
+		? settings.appearance === 'dark' || (settings.appearance === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+		: window.matchMedia('(prefers-color-scheme: dark)').matches;
 
-	// Add reader class so theme CSS variables activate
-	html.classList.add('obsidian-reader-active');
+	highlightThemeClasses = ['obsidian-reader-active', isDark ? 'theme-dark' : 'theme-light'];
 
-	// Determine light/dark
-	const isDark = settings.appearance === 'dark' ||
-		(settings.appearance === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-	html.classList.add(isDark ? 'theme-dark' : 'theme-light');
+	if (settings) {
+		const effectiveTheme = isDark && settings.darkTheme !== 'same' ? settings.darkTheme : settings.lightTheme;
+		if (effectiveTheme && effectiveTheme !== 'default') {
+			highlightThemeAttr = { name: 'data-reader-theme', value: effectiveTheme };
+		}
 
-	// Apply theme
-	const effectiveTheme = isDark && settings.darkTheme !== 'same' ? settings.darkTheme : settings.lightTheme;
-	if (effectiveTheme && effectiveTheme !== 'default') {
-		html.setAttribute('data-reader-theme', effectiveTheme);
+		// Font settings apply globally
+		const html = document.documentElement;
+		html.style.setProperty('--font-text-size', `${settings.fontSize}px`);
+		html.style.setProperty('--line-height-normal', settings.lineHeight.toString());
+
+		const fontCss = getFontCss(settings.defaultFont);
+		if (fontCss) {
+			document.body.style.setProperty('--font-text', fontCss);
+		}
 	}
+}
 
-	// Apply font settings
-	html.style.setProperty('--font-text-size', `${settings.fontSize}px`);
-	html.style.setProperty('--line-height-normal', settings.lineHeight.toString());
-
-	const fontCss = getFontCss(settings.defaultFont);
-	if (fontCss) {
-		document.body.style.setProperty('--font-text', fontCss);
+function applyThemeToElement(el: HTMLElement) {
+	for (const cls of highlightThemeClasses) {
+		el.classList.add(cls);
+	}
+	if (highlightThemeAttr) {
+		el.setAttribute(highlightThemeAttr.name, highlightThemeAttr.value);
 	}
 }
 
@@ -325,7 +335,7 @@ function sortGroups(groups: DomainGroup[]): DomainGroup[] {
 function navigate(nav: NavSelection) {
 	currentNav = nav;
 	updateUrlFromNav();
-	renderSidebar();
+	updateSidebarActiveState();
 	renderMain();
 
 	// Close mobile sidebar
@@ -333,6 +343,21 @@ function navigate(nav: NavSelection) {
 	const hamburger = document.getElementById('highlights-hamburger');
 	container?.classList.remove('sidebar-open');
 	hamburger?.classList.remove('is-active');
+}
+
+function updateSidebarActiveState() {
+	const allNavItem = document.querySelector('#highlights-nav li[data-nav="all"]')!;
+	allNavItem.classList.toggle('active', currentNav.type === 'all');
+
+	const domainListEl = document.getElementById('highlights-domain-list')!;
+	domainListEl.querySelectorAll('.nav-domain').forEach(li => {
+		const domain = li.getAttribute('data-domain');
+		li.classList.toggle('active', currentNav.type === 'domain' && currentNav.domain === domain);
+	});
+	domainListEl.querySelectorAll('.nav-page').forEach(li => {
+		const url = li.getAttribute('data-url');
+		li.classList.toggle('active', currentNav.type === 'page' && (currentNav as { url: string }).url === url);
+	});
 }
 
 function updateUrlFromNav() {
@@ -360,6 +385,38 @@ function readNavFromUrl(): NavSelection {
 	return { type: 'all' };
 }
 
+function createPageSubItems(group: DomainGroup): HTMLElement[] {
+	const items: HTMLElement[] = [];
+	for (const page of group.pages) {
+		const isPageActive = currentNav.type === 'page'
+			&& (currentNav as { domain: string; url: string }).domain === group.domain
+			&& (currentNav as { url: string }).url === page.url;
+
+		const pageLi = document.createElement('li');
+		pageLi.className = 'nav-page' + (isPageActive ? ' active' : '');
+		pageLi.setAttribute('data-url', page.url);
+
+		const pageName = document.createElement('span');
+		pageName.className = 'nav-page-name';
+		pageName.textContent = page.title || displayPath(page.path);
+		pageName.title = page.url;
+		pageLi.appendChild(pageName);
+
+		const pageCount = document.createElement('span');
+		pageCount.className = 'nav-count';
+		pageCount.textContent = String(page.highlights.length);
+		pageLi.appendChild(pageCount);
+
+		pageLi.addEventListener('click', (e) => {
+			e.stopPropagation();
+			navigate({ type: 'page', domain: group.domain, url: page.url });
+		});
+
+		items.push(pageLi);
+	}
+	return items;
+}
+
 function renderSidebar() {
 	const domainListEl = document.getElementById('highlights-domain-list')!;
 	const allNavItem = document.querySelector('#highlights-nav li[data-nav="all"]')!;
@@ -381,6 +438,7 @@ function renderSidebar() {
 
 		const li = document.createElement('li');
 		li.className = 'nav-domain' + (isDomainActive ? ' active' : '');
+		li.setAttribute('data-domain', group.domain);
 
 		const chevronWrap = document.createElement('div');
 		chevronWrap.className = 'nav-chevron-wrap' + (isExpanded ? ' is-expanded' : '');
@@ -417,13 +475,29 @@ function renderSidebar() {
 		// Click chevron to expand/collapse, click name to navigate
 		chevronWrap.addEventListener('click', (e) => {
 			e.stopPropagation();
-			if (expandedSidebarDomains.has(group.domain)) {
+			const wasExpanded = expandedSidebarDomains.has(group.domain);
+			if (wasExpanded) {
 				expandedSidebarDomains.delete(group.domain);
+				chevronWrap.classList.remove('is-expanded');
+				// Remove page sub-items
+				let next = li.nextElementSibling;
+				while (next && next.classList.contains('nav-page')) {
+					const toRemove = next;
+					next = next.nextElementSibling;
+					toRemove.remove();
+				}
 			} else {
 				expandedSidebarDomains.add(group.domain);
+				chevronWrap.classList.add('is-expanded');
+				// Insert page sub-items after this domain li
+				const pageItems = createPageSubItems(group);
+				let insertAfter: Element = li;
+				for (const pageLi of pageItems) {
+					insertAfter.after(pageLi);
+					insertAfter = pageLi;
+				}
+				createIcons({ icons });
 			}
-			renderSidebar();
-			createIcons({ icons });
 		});
 
 		li.addEventListener('click', () => {
@@ -434,30 +508,8 @@ function renderSidebar() {
 
 		// Page sub-items
 		if (isExpanded) {
-			for (const page of group.pages) {
-				const isPageActive = currentNav.type === 'page'
-					&& (currentNav as { domain: string; url: string }).domain === group.domain
-					&& (currentNav as { url: string }).url === page.url;
-
-				const pageLi = document.createElement('li');
-				pageLi.className = 'nav-page' + (isPageActive ? ' active' : '');
-
-				const pageName = document.createElement('span');
-				pageName.className = 'nav-page-name';
-				pageName.textContent = page.title || displayPath(page.path);
-				pageName.title = page.url;
-				pageLi.appendChild(pageName);
-
-				const pageCount = document.createElement('span');
-				pageCount.className = 'nav-count';
-				pageCount.textContent = String(page.highlights.length);
-				pageLi.appendChild(pageCount);
-
-				pageLi.addEventListener('click', (e) => {
-					e.stopPropagation();
-					navigate({ type: 'page', domain: group.domain, url: page.url });
-				});
-
+			const pageItems = createPageSubItems(group);
+			for (const pageLi of pageItems) {
 				domainListEl.appendChild(pageLi);
 			}
 		}
@@ -497,6 +549,7 @@ function renderMain() {
 
 	listEl.textContent = '';
 	renderedCount = 0;
+	currentPageGroup = null;
 
 	flatEntries = getVisibleEntries();
 
@@ -521,39 +574,48 @@ function renderMain() {
 	// Show page title as h1 when viewing a single page
 	const nav = currentNav;
 	if (nav.type === 'page') {
+		currentPageGroup = createPageGroupWrapper();
+		listEl.appendChild(currentPageGroup);
+
 		const pageGroup = allDomainGroups
 			.find(g => g.domain === nav.domain)?.pages
 			.find(p => p.url === nav.url);
 
-		const titleEl = document.createElement('h1');
-		titleEl.className = 'highlight-page-title';
+		const titleLink = document.createElement('a');
+		titleLink.className = 'highlight-page-title';
+		titleLink.href = `reader.html?url=${encodeURIComponent(nav.url)}`;
+		titleLink.target = '_blank';
 
 		const titleText = pageGroup?.title || (() => {
 			try { return displayPath(new URL(nav.url).pathname + new URL(nav.url).search); }
 			catch { return nav.url; }
 		})();
-		titleEl.textContent = titleText;
+		titleLink.textContent = titleText;
 
-		const pageLink = document.createElement('a');
-		pageLink.className = 'highlight-page-title-url';
-		pageLink.href = nav.url;
-		pageLink.target = '_blank';
-		pageLink.rel = 'noopener';
-		pageLink.textContent = nav.url;
+		const metaLine = document.createElement('div');
+		metaLine.className = 'highlight-page-meta';
 
-		listEl.appendChild(titleEl);
-		listEl.appendChild(pageLink);
+		const siteSpan = document.createElement('a');
+		siteSpan.className = 'highlight-page-site';
+		siteSpan.href = '#';
+		siteSpan.textContent = siteNameOrDomain(nav.domain);
+		siteSpan.addEventListener('click', (e) => {
+			e.preventDefault();
+			navigate({ type: 'domain', domain: nav.domain });
+		});
+		metaLine.appendChild(siteSpan);
 
-		// "Read article" link
-		const readArticleLink = document.createElement('a');
-		readArticleLink.className = 'highlight-load-article-btn';
-		readArticleLink.href = `reader.html?url=${encodeURIComponent(nav.url)}`;
-		readArticleLink.target = '_blank';
-		readArticleLink.textContent = getMessage('loadArticle') || 'Read article';
-		const loadIcon = document.createElement('i');
-		loadIcon.setAttribute('data-lucide', 'book-open');
-		readArticleLink.prepend(loadIcon);
-		listEl.appendChild(readArticleLink);
+		const latestTime = getLatestTimestamp(nav.url);
+		if (latestTime) {
+			const timeSpan = document.createElement('span');
+			timeSpan.className = 'highlight-page-time';
+			timeSpan.textContent = latestTime.fromNow();
+			timeSpan.title = latestTime.format('YYYY-MM-DD HH:mm');
+			metaLine.appendChild(timeSpan);
+		}
+
+		currentPageGroup.appendChild(titleLink);
+		currentPageGroup.appendChild(metaLine);
 
 		// Show highlights as normal list by default
 		renderNextBatch();
@@ -562,6 +624,13 @@ function renderMain() {
 	}
 
 	renderNextBatch();
+}
+
+function createPageGroupWrapper(): HTMLElement {
+	const wrapper = document.createElement('div');
+	wrapper.className = 'highlight-page-group';
+	applyThemeToElement(wrapper);
+	return wrapper;
 }
 
 function renderNextBatch() {
@@ -573,17 +642,25 @@ function renderNextBatch() {
 	// Track which page group we're in to insert page headers
 	let lastPageUrl = renderedCount > 0 ? flatEntries[renderedCount - 1].pageUrl : null;
 
+	// For single-page view, ensure we have a group wrapper
+	if (currentNav.type === 'page' && !currentPageGroup) {
+		currentPageGroup = createPageGroupWrapper();
+		listEl.appendChild(currentPageGroup);
+	}
+
 	for (let i = renderedCount; i < end; i++) {
 		const { entry, pageUrl, domain, title } = flatEntries[i];
 
 		// Insert a page header when the URL changes (in all/domain views)
 		if (currentNav.type !== 'page' && pageUrl !== lastPageUrl) {
+			currentPageGroup = createPageGroupWrapper();
+			listEl.appendChild(currentPageGroup);
 			const pageHeader = createPageHeader(pageUrl, domain, title);
-			listEl.appendChild(pageHeader);
+			currentPageGroup.appendChild(pageHeader);
 			lastPageUrl = pageUrl;
 		}
 
-		listEl.appendChild(createHighlightItem(entry));
+		(currentPageGroup || listEl).appendChild(createHighlightItem(entry));
 	}
 
 	renderedCount = end;
@@ -719,24 +796,24 @@ async function exportCurrentContext() {
 	URL.revokeObjectURL(blobUrl);
 }
 
+function getLatestTimestamp(url: string): dayjs.Dayjs | null {
+	const group = allDomainGroups.find(g => g.pages.some(p => p.url === url));
+	const page = group?.pages.find(p => p.url === url);
+	if (!page || page.highlights.length === 0) return null;
+	let latest = 0;
+	for (const h of page.highlights) {
+		const t = parseInt(h.data.id);
+		if (t > latest) latest = t;
+	}
+	const time = dayjs(latest);
+	return time.isValid() ? time : null;
+}
+
 // --- Page headers in main content ---
 
 function createPageHeader(url: string, domain: string, title?: string): HTMLElement {
 	const header = document.createElement('div');
 	header.className = 'highlight-page-header';
-
-	// Show domain in "all" view, just path in domain view
-	if (currentNav.type === 'all') {
-		const domainSpan = document.createElement('a');
-		domainSpan.className = 'highlight-page-domain';
-		domainSpan.href = '#';
-		domainSpan.textContent = siteNameOrDomain(domain);
-		domainSpan.addEventListener('click', (e) => {
-			e.preventDefault();
-			navigate({ type: 'domain', domain });
-		});
-		header.appendChild(domainSpan);
-	}
 
 	const titleText = title || (() => {
 		try {
@@ -747,16 +824,41 @@ function createPageHeader(url: string, domain: string, title?: string): HTMLElem
 		}
 	})();
 
-	const link = document.createElement('a');
-	link.className = 'highlight-page-url';
-	link.href = '#';
-	link.title = url;
-	link.textContent = titleText;
-	link.addEventListener('click', (e) => {
+	const titleLink = document.createElement('a');
+	titleLink.className = 'highlight-page-title';
+	titleLink.href = '#';
+	titleLink.title = url;
+	titleLink.textContent = titleText;
+	titleLink.addEventListener('click', (e) => {
 		e.preventDefault();
 		navigate({ type: 'page', domain, url });
 	});
-	header.appendChild(link);
+	header.appendChild(titleLink);
+
+	// Site name and latest timestamp
+	const metaLine = document.createElement('div');
+	metaLine.className = 'highlight-page-meta';
+
+	const siteSpan = document.createElement('a');
+	siteSpan.className = 'highlight-page-site';
+	siteSpan.href = '#';
+	siteSpan.textContent = siteNameOrDomain(domain);
+	siteSpan.addEventListener('click', (e) => {
+		e.preventDefault();
+		navigate({ type: 'domain', domain });
+	});
+	metaLine.appendChild(siteSpan);
+
+	const latestTime = getLatestTimestamp(url);
+	if (latestTime) {
+		const timeSpan = document.createElement('span');
+		timeSpan.className = 'highlight-page-time';
+		timeSpan.textContent = latestTime.fromNow();
+		timeSpan.title = latestTime.format('YYYY-MM-DD HH:mm');
+		metaLine.appendChild(timeSpan);
+	}
+
+	header.appendChild(metaLine);
 
 	// Only show sync button if page has no title yet
 	if (!title) {
@@ -772,7 +874,7 @@ function createPageHeader(url: string, domain: string, title?: string): HTMLElem
 			const meta = await fetchDefuddled(url);
 			syncBtn.classList.remove('is-syncing');
 			if (meta) {
-				if (meta.title) link.textContent = meta.title;
+				if (meta.title) titleLink.textContent = meta.title;
 				if (meta.title || meta.site) syncBtn.style.display = 'none';
 			}
 		});
@@ -897,13 +999,6 @@ function createHighlightItem(entry: HighlightEntry): HTMLElement {
 
 	const footer = document.createElement('div');
 	footer.className = 'highlight-item-footer';
-
-	const timestamp = document.createElement('span');
-	timestamp.className = 'highlight-item-time';
-	const time = dayjs(parseInt(entry.data.id));
-	timestamp.textContent = time.isValid() ? time.fromNow() : '';
-	timestamp.title = time.isValid() ? time.format('YYYY-MM-DD HH:mm') : '';
-	footer.appendChild(timestamp);
 
 	const actions = document.createElement('div');
 	actions.className = 'highlight-item-actions';
