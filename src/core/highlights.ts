@@ -976,6 +976,7 @@ async function fetchDefuddled(url: string): Promise<DefuddleResult | null> {
 	}
 }
 
+
 // --- Individual highlight items ---
 
 function setButtonIcon(btn: HTMLElement, iconName: string) {

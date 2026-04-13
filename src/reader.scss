@@ -19,7 +19,7 @@
 	}
 
 	&.theme-light:not(.no-blend-images) {
-		img, svg {
+		img, svg:not(.image-expand-button) {
 			mix-blend-mode: multiply;
 		}
 	}
