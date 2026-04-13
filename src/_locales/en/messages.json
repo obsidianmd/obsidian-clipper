@@ -271,9 +271,6 @@
 	"searchHighlightsPlaceholder": {
 		"message": "Search highlights…"
 	},
-	"deleteAll": {
-		"message": "Delete all"
-	},
 	"deleteAllHighlightsConfirm": {
 		"message": "Are you sure you want to delete all highlights?"
 	},
@@ -282,12 +279,6 @@
 	},
 	"deleteHighlightsForPage": {
 		"message": "Delete all highlights for this page?"
-	},
-	"deleteDomain": {
-		"message": "Delete domain"
-	},
-	"deletePage": {
-		"message": "Delete page"
 	},
 	"noResults": {
 		"message": "No results found"

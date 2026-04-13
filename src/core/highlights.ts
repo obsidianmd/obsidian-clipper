@@ -506,7 +506,31 @@ function renderSidebar() {
 		});
 
 		li.addEventListener('click', () => {
-			navigate({ type: 'domain', domain: group.domain });
+			const isActive = currentNav.type === 'domain' && currentNav.domain === group.domain;
+			if (isActive) {
+				// Already selected — toggle expand/collapse
+				if (expandedSidebarDomains.has(group.domain)) {
+					expandedSidebarDomains.delete(group.domain);
+					chevronWrap.classList.remove('is-expanded');
+					let next = li.nextElementSibling;
+					while (next && next.classList.contains('nav-page')) {
+						const toRemove = next;
+						next = next.nextElementSibling;
+						toRemove.remove();
+					}
+				} else {
+					expandedSidebarDomains.add(group.domain);
+					chevronWrap.classList.add('is-expanded');
+					let insertAfter: Element = li;
+					for (const pageLi of createPageSubItems(group)) {
+						insertAfter.after(pageLi);
+						insertAfter = pageLi;
+					}
+					createIcons({ icons });
+				}
+			} else {
+				navigate({ type: 'domain', domain: group.domain });
+			}
 		});
 
 		domainListEl.appendChild(li);
@@ -690,13 +714,7 @@ function createBreadcrumbSeparator(): HTMLElement {
 function updateDeleteButton() {
 	const deleteBtn = document.getElementById('delete-context-btn')!;
 
-	if (currentNav.type === 'all') {
-		deleteBtn.textContent = getMessage('deleteAll');
-	} else if (currentNav.type === 'domain') {
-		deleteBtn.textContent = getMessage('deleteDomain');
-	} else {
-		deleteBtn.textContent = getMessage('deletePage');
-	}
+	deleteBtn.textContent = getMessage('delete');
 }
 
 async function deleteCurrentContext() {
