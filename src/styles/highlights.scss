@@ -247,9 +247,10 @@ h1.highlight-page-title {
 }
 
 .highlight-reader-btn {
+	--link-external-color: var(--text-muted);
+	--link-external-color-hover: var(--text-normal);
 	align-self: start;
 	flex-shrink: 0;
-	color: var(--text-faint);
 	margin-inline-start: auto;
 	border-radius: var(--radius-s);
 	corner-shape: var(--corner-shape);
