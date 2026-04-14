@@ -2,7 +2,9 @@ a {
 	color: var(--link-external-color);
 	text-decoration: var(--link-external-decoration);
 }
-a:hover {
-	color: var(--link-external-color-hover);
-	text-decoration: var(--link-external-decoration-hover);
+@media (hover: hover) {
+	a:hover {
+		color: var(--link-external-color-hover);
+		text-decoration: var(--link-external-decoration-hover);
+	}
 }
