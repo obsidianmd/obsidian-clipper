@@ -819,6 +819,9 @@
 	"readerLineWidth": {
 		"message": "Line width"
 	},
+	"readerLoadFailed": {
+		"message": "Failed to load. The page may be blocked by your browser."
+	},
 	"readerLoading": {
 		"message": "Defuddling…"
 	},

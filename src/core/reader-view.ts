@@ -98,7 +98,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 	} catch (error) {
 		console.error('Failed to load page:', error);
-		document.body.innerHTML = `<div class="obsidian-reader-loading"><div class="obsidian-reader-loading-text">Failed to load article</div></div>`;
+		document.body.textContent = '';
+		const container = document.createElement('div');
+		container.className = 'obsidian-reader-error';
+		const text = document.createElement('div');
+		text.className = 'obsidian-reader-error-text';
+		text.textContent = getMessage('readerLoadFailed');
+		container.appendChild(text);
+		if (url) {
+			const link = document.createElement('a');
+			link.className = 'obsidian-reader-error-link';
+			link.href = url;
+			link.textContent = getMessage('disableReader');
+			container.appendChild(link);
+		}
+		document.body.appendChild(container);
 	}
 });
 
