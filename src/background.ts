@@ -195,6 +195,40 @@ function getReaderModeForTab(tabId: number): boolean {
 	return readerModeState[tabId] ?? false;
 }
 
+function isReaderPageUrl(url: string | undefined): string | null {
+	if (!url) return null;
+	const readerPagePrefix = browser.runtime.getURL('reader.html');
+	if (url.startsWith(readerPagePrefix)) {
+		try {
+			const parsed = new URL(url);
+			return parsed.searchParams.get('url');
+		} catch {}
+	}
+	return null;
+}
+
+async function exitReaderPageIfNeeded(tabId: number, readerUrl?: string): Promise<boolean> {
+	let originalUrl: string | null = null;
+	try {
+		const tab = await browser.tabs.get(tabId);
+		originalUrl = isReaderPageUrl(tab.url);
+	} catch {}
+
+	// Fallback: the embedded clipper passes the reader URL when
+	// tabs.get() can't access the extension page URL
+	if (!originalUrl && readerUrl) {
+		originalUrl = isReaderPageUrl(readerUrl);
+	}
+
+	if (originalUrl) {
+		await browser.tabs.update(tabId, { url: originalUrl });
+		readerModeState[tabId] = false;
+		debouncedUpdateContextMenu(tabId);
+		return true;
+	}
+	return false;
+}
+
 async function initialize() {
 	try {
 		// Set up tab listeners
@@ -298,7 +332,7 @@ browser.runtime.onMessage.addListener((request: unknown) => {
 
 browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime.MessageSender, sendResponse: (response?: any) => void): true | undefined => {
 	if (typeof request === 'object' && request !== null) {
-		const typedRequest = request as { action: string; isActive?: boolean; hasHighlights?: boolean; tabId?: number; text?: string; section?: string };
+		const typedRequest = request as { action: string; isActive?: boolean; hasHighlights?: boolean; tabId?: number; text?: string; section?: string; readerUrl?: string };
 		
 		if (typedRequest.action === 'copy-to-clipboard' && typedRequest.text) {
 			// Use content script to copy to clipboard
@@ -451,19 +485,27 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 		}
 
 		if (typedRequest.action === "toggleReaderMode" && typedRequest.tabId) {
-			injectReaderScript(typedRequest.tabId).then(() => {
-				browser.tabs.sendMessage(typedRequest.tabId!, { action: "toggleReaderMode" })
-					.then((response: any) => {
-						if (response?.success) {
-							readerModeState[typedRequest.tabId!] = response.isActive ?? false;
-							debouncedUpdateContextMenu(typedRequest.tabId!);
-						}
-						sendResponse(response);
-					})
-					.catch(() => {
-						// Page may have reloaded before responding (reader restore)
-						sendResponse({ success: true, isActive: false });
-					});
+			const tabId = typedRequest.tabId;
+			// Check if the tab is on the extension's reader.html page
+			exitReaderPageIfNeeded(tabId, typedRequest.readerUrl).then((wasReaderPage) => {
+				if (wasReaderPage) {
+					sendResponse({ success: true, isActive: false });
+					return;
+				}
+				injectReaderScript(tabId).then(() => {
+					browser.tabs.sendMessage(tabId, { action: "toggleReaderMode" })
+						.then((response: any) => {
+							if (response?.success) {
+								readerModeState[tabId] = response.isActive ?? false;
+								debouncedUpdateContextMenu(tabId);
+							}
+							sendResponse(response);
+						})
+						.catch(() => {
+							// Page may have reloaded before responding (reader restore)
+							sendResponse({ success: true, isActive: false });
+						});
+				});
 			});
 			return true;
 		}
@@ -572,17 +614,9 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 
 		if (typedRequest.action === "getTabInfo") {
 			browser.tabs.get(typedRequest.tabId as number).then((tab) => {
-				let url = tab.url;
 				// For reader page tabs, return the article URL so the
 				// clipper treats it as a normal web page
-				if (url) {
-					try {
-						const parsed = new URL(url);
-						if (parsed.pathname.endsWith('/reader.html') && parsed.searchParams.has('url')) {
-							url = parsed.searchParams.get('url')!;
-						}
-					} catch {}
-				}
+				const url = isReaderPageUrl(tab.url) ?? tab.url;
 				sendResponse({
 					success: true,
 					tab: {

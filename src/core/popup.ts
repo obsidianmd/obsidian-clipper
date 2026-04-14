@@ -81,8 +81,7 @@ async function getTabInfo(tabId: number): Promise<{ id: number; url: string }> {
 	// without the tabs permission. Fall back to the readerUrl param
 	// passed through the iframe src.
 	if (!response.tab.url) {
-		const params = new URLSearchParams(window.location.search);
-		const readerUrl = params.get('readerUrl');
+		const readerUrl = urlParams.get('readerUrl');
 		if (readerUrl) {
 			response.tab.url = readerUrl;
 		}
@@ -1092,8 +1091,23 @@ function handleTemplateChange(templateId: string) {
 	refreshFields(currentTabId!, { checkTemplateTriggers: false });
 }
 
+function setReaderButtonState(isActive: boolean) {
+	const readerButton = document.getElementById('reader-mode');
+	if (readerButton) {
+		readerButton.classList.toggle('active', isActive);
+		readerButton.setAttribute('aria-pressed', isActive.toString());
+		readerButton.title = isActive ? getMessage('disableReader') : getMessage('enableReader');
+	}
+}
+
 async function checkReaderModeState(tabId: number) {
 	try {
+		// When embedded in a reader.html page, we know reader mode is active
+		if (urlParams.get('readerUrl')) {
+			setReaderButtonState(true);
+			return;
+		}
+
 		// Query the actual page DOM via content script rather than
 		// relying on background state, which can be stale across tabs
 		const response = await browser.runtime.sendMessage({
@@ -1102,10 +1116,7 @@ async function checkReaderModeState(tabId: number) {
 			message: { action: "getReaderModeState" }
 		}) as { isActive: boolean } | undefined;
 
-		const readerButton = document.getElementById('reader-mode');
-		if (readerButton) {
-			readerButton.classList.toggle('active', response?.isActive ?? false);
-		}
+		setReaderButtonState(response?.isActive ?? false);
 	} catch (error) {
 		// Tab may not have content script loaded yet
 		console.error('Error checking reader mode state:', error);
@@ -1171,19 +1182,16 @@ function updateHighlighterModeUI(isActive: boolean) {
 
 async function toggleReaderMode(tabId: number) {
 	try {
-		const response = await browser.runtime.sendMessage({ 
+		// When embedded in a reader.html page, pass the reader URL
+		// so the background can navigate away even without tab URL access
+		const response = await browser.runtime.sendMessage({
 			action: "toggleReaderMode",
-			tabId: tabId
+			tabId: tabId,
+			readerUrl: urlParams.get('readerUrl') || undefined
 		}) as ReaderModeResponse;
 
 		if (response && response.success) {
-			const readerButton = document.getElementById('reader-mode');
-			if (readerButton) {
-				const isActive = response.isActive ?? false;
-				readerButton.classList.toggle('active', isActive);
-				readerButton.setAttribute('aria-pressed', isActive.toString());
-				readerButton.title = isActive ? getMessage('disableReader') : getMessage('enableReader');
-			}
+			setReaderButtonState(response.isActive ?? false);
 		}
 
 		// Close the popup if not in side panel or iframe
