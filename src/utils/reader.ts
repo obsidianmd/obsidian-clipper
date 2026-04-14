@@ -2445,6 +2445,19 @@ export class Reader {
 		}
 	}
 
+	// Wrap each <table> in a scroll container so wide tables can scroll
+	// horizontally on mobile without blowing out the article width.
+	private static wrapTables(doc: Document) {
+		const tables = doc.querySelectorAll('article table');
+		tables.forEach(table => {
+			if (table.parentElement?.classList.contains('table-wrapper')) return;
+			const wrapper = doc.createElement('div');
+			wrapper.className = 'table-wrapper';
+			table.parentNode?.insertBefore(wrapper, table);
+			wrapper.appendChild(table);
+		});
+	}
+
 	// Run all content-dependent feature initializations.
 	// Shared between apply() and updateReaderContent().
 	private static async initializeContentFeatures(doc: Document, title?: string): Promise<void> {
@@ -2457,6 +2470,7 @@ export class Reader {
 		this.initializeCodeHighlighting(doc);
 		this.initializeCopyButtons(doc);
 		this.initializeLightbox(doc);
+		this.wrapTables(doc);
 		this.linkifyTextUrls(doc);
 		this.initializeComments(doc);
 		this.initializeFollowLinks(doc);
