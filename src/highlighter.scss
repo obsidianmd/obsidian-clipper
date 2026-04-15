@@ -37,14 +37,6 @@
 			0px 16px 28px -4px rgba(0, 0, 0, 0.15),
 			0px 8px 16px -4px rgba(0, 0, 0, 0.06);
 
-	@media (prefers-color-scheme: dark) {
-		--obsidian-clipper-background-primary: #1e1e1e;
-		--obsidian-clipper-background-primary-rgb: 26, 26, 26;
-		--obsidian-clipper-box-shadow: 0 0 0 1px rgba(255,255,255,0.1),
-			0px 16px 28px -4px rgba(0, 0, 0, 0.15),
-			0px 8px 16px -4px rgba(0, 0, 0, 0.06);
-	}
-
 	color-scheme: light dark;
 	position: fixed;
 	top: 12px;
@@ -68,6 +60,14 @@
 	transform-origin: right top;
 	opacity: 0;
 	transform: scale(0.95);
+
+	@media (prefers-color-scheme: dark) {
+		--obsidian-clipper-background-primary: #1e1e1e;
+		--obsidian-clipper-background-primary-rgb: 26, 26, 26;
+		--obsidian-clipper-box-shadow: 0 0 0 1px rgba(255,255,255,0.1),
+			0px 16px 28px -4px rgba(0, 0, 0, 0.15),
+			0px 8px 16px -4px rgba(0, 0, 0, 0.06);
+	}
 
 	&.is-open {
 		animation: 80ms ease 60ms 1 normal forwards running clipperOpenAnimation;
