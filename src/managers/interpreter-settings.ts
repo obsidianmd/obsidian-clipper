@@ -165,10 +165,15 @@ export async function getPresetProviders(): Promise<Record<string, PresetProvide
 export function updatePromptContextVisibility(): void {
 	const interpreterToggle = document.getElementById('interpreter-toggle') as HTMLInputElement;
 	const promptContextContainer = document.getElementById('prompt-context-container');
+	const templateAdvancedSection = document.getElementById('template-advanced-section');
 	const interpreterSection = document.getElementById('interpreter-section');
 
 	if (promptContextContainer) {
 		promptContextContainer.style.display = interpreterToggle.checked ? 'block' : 'none';
+	}
+
+	if (templateAdvancedSection) {
+		templateAdvancedSection.style.display = interpreterToggle.checked ? 'block' : 'none';
 	}
 
 	if (interpreterSection) {
