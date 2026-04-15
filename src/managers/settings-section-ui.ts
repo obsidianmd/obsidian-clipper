@@ -59,6 +59,13 @@ export function initializeSidebar(): void {
 	const settingsContainer = document.getElementById('settings');
 	const templateList = document.getElementById('template-list');
 	const hamburgerMenu = document.getElementById('hamburger-menu');
+	const sidebarTitle = document.getElementById('settings-sidebar-title');
+
+	if (sidebarTitle) {
+		sidebarTitle.addEventListener('click', () => {
+			showSettingsSection('general');
+		});
+	}
 
 	if (sidebar) {
 		sidebar.addEventListener('click', (event) => {

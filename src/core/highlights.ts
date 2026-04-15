@@ -11,6 +11,7 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { createIcons } from 'lucide';
 import { icons } from '../icons/icons';
+import { initializeMenu } from '../managers/menu';
 
 dayjs.extend(relativeTime);
 
@@ -83,12 +84,28 @@ document.addEventListener('DOMContentLoaded', async () => {
 	const exportBtn = document.getElementById('export-context-btn') as HTMLButtonElement;
 	exportBtn.addEventListener('click', exportCurrentContext);
 
-	const sortSelect = document.getElementById('highlights-sort') as HTMLSelectElement;
-	sortSelect.addEventListener('change', () => {
-		sortOrder = sortSelect.value as SortOrder;
-		renderSidebar();
-		renderMain();
+	initializeMenu('highlights-sort-btn', 'highlights-sort-menu');
+	const sortMenu = document.getElementById('highlights-sort-menu')!;
+	sortMenu.querySelectorAll<HTMLElement>('.menu-item[data-sort]').forEach(item => {
+		item.addEventListener('click', () => {
+			const value = item.dataset.sort as SortOrder;
+			if (value === sortOrder) return;
+			sortOrder = value;
+			updateSortMenuActiveState();
+			renderSidebar();
+			renderMain();
+		});
 	});
+	updateSortMenuActiveState();
+
+	const sidebarTitle = document.getElementById('highlights-sidebar-title');
+	sidebarTitle?.addEventListener('click', () => navigate({ type: 'all' }));
+
+	const settingsLink = document.getElementById('highlights-settings-link');
+	settingsLink?.addEventListener('click', (e) => e.stopPropagation());
+
+	const navbarTitle = document.getElementById('highlights-navbar-title');
+	navbarTitle?.addEventListener('click', () => navigate({ type: 'all' }));
 
 	// Mobile hamburger
 	const hamburger = document.getElementById('highlights-hamburger');
@@ -347,10 +364,15 @@ function navigate(nav: NavSelection) {
 	hamburger?.classList.remove('is-active');
 }
 
-function updateSidebarActiveState() {
-	const allNavItem = document.querySelector('#highlights-nav li[data-nav="all"]')!;
-	allNavItem.classList.toggle('active', currentNav.type === 'all');
+function updateSortMenuActiveState() {
+	const menu = document.getElementById('highlights-sort-menu');
+	if (!menu) return;
+	menu.querySelectorAll<HTMLElement>('.menu-item[data-sort]').forEach(item => {
+		item.classList.toggle('is-active', item.dataset.sort === sortOrder);
+	});
+}
 
+function updateSidebarActiveState() {
 	const domainListEl = document.getElementById('highlights-domain-list')!;
 	domainListEl.querySelectorAll('.nav-domain').forEach(li => {
 		const domain = li.getAttribute('data-domain');
@@ -421,16 +443,7 @@ function createPageSubItems(group: DomainGroup): HTMLElement[] {
 
 function renderSidebar() {
 	const domainListEl = document.getElementById('highlights-domain-list')!;
-	const allNavItem = document.querySelector('#highlights-nav li[data-nav="all"]')!;
-	const allCountEl = document.getElementById('nav-count-all')!;
-
 	const filtered = getFilteredGroups();
-	const totalCount = filtered.reduce((sum, g) => sum + g.totalHighlights, 0);
-	allCountEl.textContent = totalCount > 0 ? String(totalCount) : '';
-
-	// Update "All" active state
-	allNavItem.classList.toggle('active', currentNav.type === 'all');
-	allNavItem.addEventListener('click', () => navigate({ type: 'all' }), { once: true });
 
 	domainListEl.textContent = '';
 

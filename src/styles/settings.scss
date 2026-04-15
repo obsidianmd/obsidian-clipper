@@ -198,10 +198,33 @@ label {
 
 #sidebar {
 	overflow: scroll;
-	padding: 0 16px 24px 16px;
+	padding: 16px 16px 24px 16px;
 
 	.is-mobile & {
 		background-color: var(--settings-background);
+	}
+
+	#settings-sidebar-title {
+		display: flex;
+		align-items: center;
+		height: 28px;
+		gap: 6px;
+		font-weight: 600;
+		font-size: var(--font-ui-medium);
+		margin-bottom: 16px;
+		padding: 0 0 0 0.425rem;
+		cursor: pointer;
+		user-select: none;
+		-webkit-user-select: none;
+		.logo {
+			height: 20px;
+		}
+	}
+
+	@media (max-width: 768px) {
+		#settings-sidebar-title {
+			display: none;
+		}
 	}
 
 	.sidebar-heading {
@@ -222,6 +245,11 @@ label {
 		li {
 			justify-content: space-between;
 		}
+	}
+
+	.nav-item-icon {
+		width: 16px;
+		height: 16px;
 	}
 
 	#new-template-btn {

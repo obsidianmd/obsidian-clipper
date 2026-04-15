@@ -277,6 +277,11 @@ function showUrlInput() {
 
 	const nav = document.createElement('nav');
 	nav.className = 'reader-nav';
+	const settingsLink = document.createElement('a');
+	settingsLink.className = 'reader-nav-link';
+	settingsLink.href = browser.runtime.getURL('settings.html');
+	settingsLink.textContent = getMessage('settings') || 'Settings';
+	nav.appendChild(settingsLink);
 	const highlightsLink = document.createElement('a');
 	highlightsLink.className = 'reader-nav-link';
 	highlightsLink.href = browser.runtime.getURL('highlights.html');
