@@ -9,7 +9,7 @@
 	.menu {
 		display: none;
 		position: absolute;
-		right: 0;
+		inset-inline-end: 0;
 		border: 1px solid var(--background-modifier-border-hover);
 		background-color: var(--background-secondary);
 		flex-direction: column;
@@ -50,6 +50,10 @@
 	flex: 0 1 auto;
 	display: flex;
 	color: var(--text-muted);
+	svg {
+		height: 14px;
+		width: 14px;
+	}
 }
 
 .is-mobile {

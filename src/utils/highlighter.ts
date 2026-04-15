@@ -703,14 +703,17 @@ function sanitizeAndPreserveFormatting(html: string): string {
 	// Use DOMParser for safer HTML parsing
 	const parser = new DOMParser();
 	const doc = parser.parseFromString(html, 'text/html');
-	
+
 	// Remove any script tags
 	doc.querySelectorAll('script').forEach(el => el.remove());
+
+	// Strip inline style attributes — highlights should store semantic HTML, not presentation
+	doc.querySelectorAll('[style]').forEach(el => el.removeAttribute('style'));
 
 	// Get the body content and serialize it back
 	const serializer = new XMLSerializer();
 	let result = '';
-	
+
 	// Serialize all child nodes of the body
 	Array.from(doc.body.childNodes).forEach(node => {
 		if (node.nodeType === Node.ELEMENT_NODE) {
@@ -719,7 +722,7 @@ function sanitizeAndPreserveFormatting(html: string): string {
 			result += node.textContent;
 		}
 	});
-	
+
 	// Close any unclosed tags
 	return balanceTags(result);
 }

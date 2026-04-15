@@ -66,8 +66,14 @@
 }
 
 #highlights-sort-menu {
-	.menu-item:not(.is-active) .menu-item-icon {
-		visibility: hidden;
+	.menu-item {
+		gap: 1.5rem;
+		.menu-item-icon {
+			margin-inline-start: auto;
+		}
+		&:not(.is-active) .menu-item-icon {
+			visibility: hidden;
+		}
 	}
 }
 
