@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Geavanceerd"
 	},
+	"allHighlights": {
+		"message": "Alle markeringen"
+	},
 	"allProperties": {
 		"message": "Alle eigenschappen"
 	},
@@ -162,6 +165,15 @@
 	"delete": {
 		"message": "Verwijderen"
 	},
+	"deleteAllHighlightsConfirm": {
+		"message": "Weet je zeker dat je alle markeringen wilt verwijderen?"
+	},
+	"deleteHighlightsForDomain": {
+		"message": "Alle markeringen voor dit domein verwijderen?"
+	},
+	"deleteHighlightsForPage": {
+		"message": "Alle markeringen voor deze pagina verwijderen?"
+	},
 	"deleteModelConfirm": {
 		"message": "Weet je zeker dat je dit model wilt verwijderen?"
 	},
@@ -196,6 +208,9 @@
 	},
 	"earlyAccessFeatures": {
 		"message": "Early access functies"
+	},
+	"edit": {
+		"message": "Bewerken"
 	},
 	"editModel": {
 		"message": "Model bewerken"
@@ -360,6 +375,12 @@
 	"highlighterSettings": {
 		"message": "Markeerder"
 	},
+	"highlights": {
+		"message": "Markeringen"
+	},
+	"highlightsNotFound": {
+		"message": "Geen markeringen gevonden in artikel"
+	},
 	"history": {
 		"message": "Geschiedenis"
 	},
@@ -445,6 +466,12 @@
 	"legacyModeDescription": {
 		"message": "Gebruikt de URI-clipmethode die compatibel is met Obsidian 1.6.7 of eerder. De lengte van de inhoud die je kunt knippen wordt beperkt door je browser en besturingssysteem. Sommige pagina's kunnen zonder foutmelding mislukken."
 	},
+	"loadArticle": {
+		"message": "Artikel lezen"
+	},
+	"loading": {
+		"message": "Laden…"
+	},
 	"modelName": {
 		"message": "Modelnaam"
 	},
@@ -477,6 +504,9 @@
 	},
 	"noHighlights": {
 		"message": "Niets doen"
+	},
+	"noResults": {
+		"message": "Geen resultaten gevonden"
 	},
 	"noTemplates": {
 		"message": "Geen sjablonen beschikbaar. Voeg een sjabloon toe in de instellingen."
@@ -530,6 +560,12 @@
 	},
 	"openEmbedded": {
 		"message": "Open in pagina"
+	},
+	"openHighlights": {
+		"message": "Markeringen openen"
+	},
+	"openReader": {
+		"message": "Reader openen"
 	},
 	"openSidePanel": {
 		"message": "Open zijpaneel"
@@ -768,6 +804,9 @@
 	"readerLineWidth": {
 		"message": "Regelbreedte"
 	},
+	"readerLoadFailed": {
+		"message": "Laden mislukt. De pagina wordt mogelijk geblokkeerd door je browser."
+	},
 	"readerLoading": {
 		"message": "Bezig met ontrommelen…"
 	},
@@ -797,6 +836,9 @@
 	},
 	"readerTypography": {
 		"message": "Typografie"
+	},
+	"readerUrlPlaceholder": {
+		"message": "Plak een URL om te lezen…"
 	},
 	"readerViewFullSize": {
 		"message": "Op volledige grootte bekijken"
@@ -851,6 +893,9 @@
 	},
 	"saveFile": {
 		"message": "Bestand opslaan..."
+	},
+	"searchHighlightsPlaceholder": {
+		"message": "Markeringen zoeken…"
 	},
 	"searchVariables": {
 		"message": "Zoek variabelen..."
@@ -911,6 +956,21 @@
 	},
 	"silentOpenDescription": {
 		"message": "Geknipte notities worden opgeslagen maar niet geopend in een nieuw tabblad. Obsidian wordt nog steeds naar de voorgrond gebracht."
+	},
+	"sort": {
+		"message": "Sorteren"
+	},
+	"sortAZ": {
+		"message": "A tot Z"
+	},
+	"sortNewOld": {
+		"message": "Nieuwste eerst"
+	},
+	"sortOldNew": {
+		"message": "Oudste eerst"
+	},
+	"sortZA": {
+		"message": "Z tot A"
 	},
 	"specificNoteName": {
 		"message": "Specifieke notitienaam"

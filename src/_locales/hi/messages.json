@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Advanced"
 	},
+	"allHighlights": {
+		"message": "सभी हाइलाइट्स"
+	},
 	"allProperties": {
 		"message": "Sabhi properties"
 	},
@@ -162,6 +165,15 @@
 	"delete": {
 		"message": "Delete"
 	},
+	"deleteAllHighlightsConfirm": {
+		"message": "क्या आप वाकई सभी हाइलाइट्स हटाना चाहते हैं?"
+	},
+	"deleteHighlightsForDomain": {
+		"message": "इस डोमेन के लिए सभी हाइलाइट्स हटाएँ?"
+	},
+	"deleteHighlightsForPage": {
+		"message": "इस पेज के लिए सभी हाइलाइट्स हटाएँ?"
+	},
 	"deleteModelConfirm": {
 		"message": "Kya aap is model ko hatana chahte hain?"
 	},
@@ -196,6 +208,9 @@
 	},
 	"earlyAccessFeatures": {
 		"message": "Early access features"
+	},
+	"edit": {
+		"message": "संपादित करें"
 	},
 	"editModel": {
 		"message": "Model edit karein"
@@ -360,6 +375,12 @@
 	"highlighterSettings": {
 		"message": "Highlighter"
 	},
+	"highlights": {
+		"message": "हाइलाइट्स"
+	},
+	"highlightsNotFound": {
+		"message": "लेख में हाइलाइट्स नहीं मिले"
+	},
 	"history": {
 		"message": "इतिहास"
 	},
@@ -445,6 +466,12 @@
 	"legacyModeDescription": {
 		"message": "Obsidian 1.6.7 ya purane version ke saath compatible URI clipping method ka upyog karta hai. Note karein ki aap kitna content clip kar sakte hain woh aapke browser aur OS dwara limited hai. Kuch pages bina kisi errors ke fail ho sakte hain."
 	},
+	"loadArticle": {
+		"message": "लेख पढ़ें"
+	},
+	"loading": {
+		"message": "लोड हो रहा है…"
+	},
 	"modelName": {
 		"message": "Display name"
 	},
@@ -477,6 +504,9 @@
 	},
 	"noHighlights": {
 		"message": "Kuch nahi karein"
+	},
+	"noResults": {
+		"message": "कोई परिणाम नहीं मिला"
 	},
 	"noTemplates": {
 		"message": "Koi templates available nahi hain. Kripya settings mein template add karein."
@@ -530,6 +560,12 @@
 	},
 	"openEmbedded": {
 		"message": "पृष्ठ में खोलें"
+	},
+	"openHighlights": {
+		"message": "हाइलाइट्स खोलें"
+	},
+	"openReader": {
+		"message": "रीडर खोलें"
 	},
 	"openSidePanel": {
 		"message": "साइड पैनल खोलें"
@@ -768,6 +804,9 @@
 	"readerLineWidth": {
 		"message": "पंक्ति चौड़ाई"
 	},
+	"readerLoadFailed": {
+		"message": "लोड करने में विफल। हो सकता है यह पेज आपके ब्राउज़र द्वारा ब्लॉक किया गया हो।"
+	},
 	"readerLoading": {
 		"message": "सरल किया जा रहा है…"
 	},
@@ -797,6 +836,9 @@
 	},
 	"readerTypography": {
 		"message": "टाइपोग्राफी"
+	},
+	"readerUrlPlaceholder": {
+		"message": "पढ़ने के लिए URL पेस्ट करें…"
 	},
 	"readerViewFullSize": {
 		"message": "पूर्ण आकार में देखें"
@@ -851,6 +893,9 @@
 	},
 	"saveFile": {
 		"message": "File save karein..."
+	},
+	"searchHighlightsPlaceholder": {
+		"message": "हाइलाइट्स खोजें…"
 	},
 	"searchVariables": {
 		"message": "Variables search karein..."
@@ -911,6 +956,21 @@
 	},
 	"silentOpenDescription": {
 		"message": "Clipped notes save ho jayengi lekin naye tab mein nahi khulengi. Obsidian abhi bhi foreground mein layega."
+	},
+	"sort": {
+		"message": "क्रमबद्ध करें"
+	},
+	"sortAZ": {
+		"message": "A से Z"
+	},
+	"sortNewOld": {
+		"message": "नवीनतम पहले"
+	},
+	"sortOldNew": {
+		"message": "सबसे पुराने पहले"
+	},
+	"sortZA": {
+		"message": "Z से A"
 	},
 	"specificNoteName": {
 		"message": "Specific note name"

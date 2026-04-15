@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Avancé"
 	},
+	"allHighlights": {
+		"message": "Tous les surlignages"
+	},
 	"allProperties": {
 		"message": "Toutes les propriétés"
 	},
@@ -162,6 +165,15 @@
 	"delete": {
 		"message": "Supprimer"
 	},
+	"deleteAllHighlightsConfirm": {
+		"message": "Êtes-vous sûr de vouloir supprimer tous les surlignages ?"
+	},
+	"deleteHighlightsForDomain": {
+		"message": "Supprimer tous les surlignages pour ce domaine ?"
+	},
+	"deleteHighlightsForPage": {
+		"message": "Supprimer tous les surlignages pour cette page ?"
+	},
 	"deleteModelConfirm": {
 		"message": "Êtes-vous sûr de vouloir supprimer ce modèle ?"
 	},
@@ -196,6 +208,9 @@
 	},
 	"earlyAccessFeatures": {
 		"message": "Fonctionnalités d'accès anticipé"
+	},
+	"edit": {
+		"message": "Modifier"
 	},
 	"editModel": {
 		"message": "Modifier le modèle de langage"
@@ -360,6 +375,12 @@
 	"highlighterSettings": {
 		"message": "Surligneur"
 	},
+	"highlights": {
+		"message": "Surlignages"
+	},
+	"highlightsNotFound": {
+		"message": "Surlignages introuvables dans l’article"
+	},
 	"history": {
 		"message": "Historique"
 	},
@@ -445,6 +466,12 @@
 	"legacyModeDescription": {
 		"message": "Utilise la méthode d'enregistrement URI compatible avec Obsidian 1.6.7 ou antérieur. Notez que la longueur du contenu que vous pouvez enregistrer est limitée par votre navigateur et votre système d'exploitation. Certaines pages peuvent échouer sans erreur."
 	},
+	"loadArticle": {
+		"message": "Lire l’article"
+	},
+	"loading": {
+		"message": "Chargement…"
+	},
 	"modelName": {
 		"message": "Nom du modèle de langage"
 	},
@@ -477,6 +504,9 @@
 	},
 	"noHighlights": {
 		"message": "Ne rien faire"
+	},
+	"noResults": {
+		"message": "Aucun résultat trouvé"
 	},
 	"noTemplates": {
 		"message": "Aucun modèle disponible. Veuillez ajouter un modèle dans les paramètres."
@@ -530,6 +560,12 @@
 	},
 	"openEmbedded": {
 		"message": "Ouvrir dans la page"
+	},
+	"openHighlights": {
+		"message": "Ouvrir les surlignages"
+	},
+	"openReader": {
+		"message": "Ouvrir le lecteur"
 	},
 	"openSidePanel": {
 		"message": "Ouvrir le panneau latéral"
@@ -768,6 +804,9 @@
 	"readerLineWidth": {
 		"message": "Largeur de ligne"
 	},
+	"readerLoadFailed": {
+		"message": "Échec du chargement. La page est peut-être bloquée par votre navigateur."
+	},
 	"readerLoading": {
 		"message": "Simplification…"
 	},
@@ -797,6 +836,9 @@
 	},
 	"readerTypography": {
 		"message": "Typographie"
+	},
+	"readerUrlPlaceholder": {
+		"message": "Collez une URL à lire…"
 	},
 	"readerViewFullSize": {
 		"message": "Voir en taille réelle"
@@ -851,6 +893,9 @@
 	},
 	"saveFile": {
 		"message": "Enregistrer le fichier..."
+	},
+	"searchHighlightsPlaceholder": {
+		"message": "Rechercher des surlignages…"
 	},
 	"searchVariables": {
 		"message": "Rechercher des variables..."
@@ -911,6 +956,21 @@
 	},
 	"silentOpenDescription": {
 		"message": "Les notes seront enregistrées mais ne s'ouvriront pas dans un nouvel onglet. Obsidian sera toujours amené au premier plan."
+	},
+	"sort": {
+		"message": "Trier"
+	},
+	"sortAZ": {
+		"message": "De A à Z"
+	},
+	"sortNewOld": {
+		"message": "Les plus récents d’abord"
+	},
+	"sortOldNew": {
+		"message": "Les plus anciens d’abord"
+	},
+	"sortZA": {
+		"message": "De Z à A"
 	},
 	"specificNoteName": {
 		"message": "Nom spécifique de la note"

@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "پیشرفته"
 	},
+	"allHighlights": {
+		"message": "همهٔ هایلایت‌ها"
+	},
 	"allProperties": {
 		"message": "همه خواص"
 	},
@@ -162,6 +165,15 @@
 	"delete": {
 		"message": "حذف کن"
 	},
+	"deleteAllHighlightsConfirm": {
+		"message": "آیا مطمئن هستید که می‌خواهید همهٔ هایلایت‌ها را حذف کنید؟"
+	},
+	"deleteHighlightsForDomain": {
+		"message": "همهٔ هایلایت‌های این دامنه حذف شوند؟"
+	},
+	"deleteHighlightsForPage": {
+		"message": "همهٔ هایلایت‌های این صفحه حذف شوند؟"
+	},
 	"deleteModelConfirm": {
 		"message": "آیا مطمئن هستید که می‌خواهید این مدل را حذف کنید؟"
 	},
@@ -196,6 +208,9 @@
 	},
 	"earlyAccessFeatures": {
 		"message": "ویژگی‌های نسخه زودرس"
+	},
+	"edit": {
+		"message": "ویرایش"
 	},
 	"editModel": {
 		"message": "ویرایش مدل"
@@ -360,6 +375,12 @@
 	"highlighterSettings": {
 		"message": "مارکر"
 	},
+	"highlights": {
+		"message": "هایلایت‌ها"
+	},
+	"highlightsNotFound": {
+		"message": "هایلایت‌ها در مقاله پیدا نشدند"
+	},
 	"history": {
 		"message": "تاریخچه"
 	},
@@ -445,6 +466,12 @@
 	"legacyModeDescription": {
 		"message": "از روش برش URI سازگار با ابسیدین ۱.۶.۷ یا نسخه قبلی استفاده می کند. توجه داشته باشید که طول محتوایی که می توانید کلیپ کنید توسط مرورگر و سیستم عامل شما محدود است. برخی از صفحات ممکن است بدون هیچ خطایی از کار بیفتند."
 	},
+	"loadArticle": {
+		"message": "خواندن مقاله"
+	},
+	"loading": {
+		"message": "در حال بارگذاری…"
+	},
 	"modelName": {
 		"message": "نام مدل"
 	},
@@ -477,6 +504,9 @@
 	},
 	"noHighlights": {
 		"message": "هیچ کاری نکن"
+	},
+	"noResults": {
+		"message": "نتیجه‌ای یافت نشد"
 	},
 	"noTemplates": {
 		"message": "هیچ قالبی در دسترس نیست لطفا یک قالب در تنظیمات اضافه کنید."
@@ -530,6 +560,12 @@
 	},
 	"openEmbedded": {
 		"message": "باز کردن در صفحه"
+	},
+	"openHighlights": {
+		"message": "باز کردن هایلایت‌ها"
+	},
+	"openReader": {
+		"message": "باز کردن حالت مطالعه"
 	},
 	"openSidePanel": {
 		"message": "باز کردن پنل کناری"
@@ -768,6 +804,9 @@
 	"readerLineWidth": {
 		"message": "عرض خط"
 	},
+	"readerLoadFailed": {
+		"message": "بارگذاری ناموفق بود. ممکن است صفحه توسط مرورگر شما مسدود شده باشد."
+	},
 	"readerLoading": {
 		"message": "در حال ساده‌سازی…"
 	},
@@ -797,6 +836,9 @@
 	},
 	"readerTypography": {
 		"message": "تایپوگرافی"
+	},
+	"readerUrlPlaceholder": {
+		"message": "برای خواندن، یک URL را جای‌گذاری کنید…"
 	},
 	"readerViewFullSize": {
 		"message": "نمایش در اندازهٔ کامل"
@@ -851,6 +893,9 @@
 	},
 	"saveFile": {
 		"message": "ذخیره فایل..."
+	},
+	"searchHighlightsPlaceholder": {
+		"message": "جستجوی هایلایت‌ها…"
 	},
 	"searchVariables": {
 		"message": "جستجوی متغیرها..."
@@ -911,6 +956,21 @@
 	},
 	"silentOpenDescription": {
 		"message": "یادداشت های بریده شده ذخیره می شوند اما به عنوان یک برگه جدید باز نمی شوند. ابسیدین همچنان در پیش زمینه قرار خواهد گرفت."
+	},
+	"sort": {
+		"message": "مرتب‌سازی"
+	},
+	"sortAZ": {
+		"message": "از A تا Z"
+	},
+	"sortNewOld": {
+		"message": "جدیدترین‌ها اول"
+	},
+	"sortOldNew": {
+		"message": "قدیمی‌ترین‌ها اول"
+	},
+	"sortZA": {
+		"message": "از Z تا A"
 	},
 	"specificNoteName": {
 		"message": "نام یادداشت خاص"

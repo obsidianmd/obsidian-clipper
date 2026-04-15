@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Speciális"
 	},
+	"allHighlights": {
+		"message": "Összes kiemelés"
+	},
 	"allProperties": {
 		"message": "Összes tulajdonság"
 	},
@@ -162,6 +165,15 @@
 	"delete": {
 		"message": "Törlés"
 	},
+	"deleteAllHighlightsConfirm": {
+		"message": "Biztosan törölni szeretnéd az összes kiemelést?"
+	},
+	"deleteHighlightsForDomain": {
+		"message": "Törlöd az összes kiemelést ehhez a domainhez?"
+	},
+	"deleteHighlightsForPage": {
+		"message": "Törlöd az összes kiemelést ehhez az oldalhoz?"
+	},
 	"deleteModelConfirm": {
 		"message": "Biztosan törölni szeretnéd ezt a modellt?"
 	},
@@ -196,6 +208,9 @@
 	},
 	"earlyAccessFeatures": {
 		"message": "Korai hozzáférésű funkciók"
+	},
+	"edit": {
+		"message": "Szerkesztés"
 	},
 	"editModel": {
 		"message": "Modell szerkesztése"
@@ -360,6 +375,12 @@
 	"highlighterSettings": {
 		"message": "Kiemelő"
 	},
+	"highlights": {
+		"message": "Kiemelések"
+	},
+	"highlightsNotFound": {
+		"message": "Nem találhatók kiemelések a cikkben"
+	},
 	"history": {
 		"message": "Előzmények"
 	},
@@ -445,6 +466,12 @@
 	"legacyModeDescription": {
 		"message": "Az Obsidian 1.6.7-es vagy korábbi verziójával kompatibilis URI-alapú klipelési módszert használja. Vedd figyelembe, hogy a klipelhető tartalom hossza a böngésződ és az operációs rendszered korlátaitól függ. Egyes oldalak hibajelzés nélkül is meghiúsulhatnak."
 	},
+	"loadArticle": {
+		"message": "Cikk olvasása"
+	},
+	"loading": {
+		"message": "Betöltés…"
+	},
 	"modelName": {
 		"message": "Megjelenített név"
 	},
@@ -477,6 +504,9 @@
 	},
 	"noHighlights": {
 		"message": "Ne csináljon semmit"
+	},
+	"noResults": {
+		"message": "Nincs találat"
 	},
 	"noTemplates": {
 		"message": "Nincsenek elérhető sablonok. Kérjük, adj hozzá egy sablont a beállításokban."
@@ -530,6 +560,12 @@
 	},
 	"openEmbedded": {
 		"message": "Megnyitás az oldalon"
+	},
+	"openHighlights": {
+		"message": "Kiemelések megnyitása"
+	},
+	"openReader": {
+		"message": "Olvasó megnyitása"
 	},
 	"openSidePanel": {
 		"message": "Oldalsáv megnyitása"
@@ -768,6 +804,9 @@
 	"readerLineWidth": {
 		"message": "Sorszélesség"
 	},
+	"readerLoadFailed": {
+		"message": "Nem sikerült betölteni. Lehet, hogy az oldalt a böngésződ blokkolja."
+	},
 	"readerLoading": {
 		"message": "Tisztítás…"
 	},
@@ -797,6 +836,9 @@
 	},
 	"readerTypography": {
 		"message": "Tipográfia"
+	},
+	"readerUrlPlaceholder": {
+		"message": "Illessz be egy URL-t az olvasáshoz…"
 	},
 	"readerViewFullSize": {
 		"message": "Megtekintés teljes méretben"
@@ -851,6 +893,9 @@
 	},
 	"saveFile": {
 		"message": "Fájl mentése..."
+	},
+	"searchHighlightsPlaceholder": {
+		"message": "Kiemelések keresése…"
 	},
 	"searchVariables": {
 		"message": "Változók keresése..."
@@ -911,6 +956,21 @@
 	},
 	"silentOpenDescription": {
 		"message": "A klipelt jegyzetek mentésre kerülnek, de nem nyílnak meg új lapon. Az Obsidian továbbra is előtérbe kerül."
+	},
+	"sort": {
+		"message": "Rendezés"
+	},
+	"sortAZ": {
+		"message": "A-tól Z-ig"
+	},
+	"sortNewOld": {
+		"message": "Legújabb elöl"
+	},
+	"sortOldNew": {
+		"message": "Legrégebbi elöl"
+	},
+	"sortZA": {
+		"message": "Z-től A-ig"
 	},
 	"specificNoteName": {
 		"message": "Megadott jegyzetnév"

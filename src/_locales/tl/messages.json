@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Advanced"
 	},
+	"allHighlights": {
+		"message": "Lahat ng highlight"
+	},
 	"allProperties": {
 		"message": "Lahat ng katangian"
 	},
@@ -162,6 +165,15 @@
 	"delete": {
 		"message": "Tanggalin"
 	},
+	"deleteAllHighlightsConfirm": {
+		"message": "Sigurado ka bang gusto mong burahin ang lahat ng highlight?"
+	},
+	"deleteHighlightsForDomain": {
+		"message": "Burahin ang lahat ng highlight para sa domain na ito?"
+	},
+	"deleteHighlightsForPage": {
+		"message": "Burahin ang lahat ng highlight para sa pahinang ito?"
+	},
 	"deleteModelConfirm": {
 		"message": "Sigurado ka bang gusto mong tanggalin ang modelong ito?"
 	},
@@ -196,6 +208,9 @@
 	},
 	"earlyAccessFeatures": {
 		"message": "Mga early access na feature"
+	},
+	"edit": {
+		"message": "I-edit"
 	},
 	"editModel": {
 		"message": "I-edit ang modelo"
@@ -360,6 +375,12 @@
 	"highlighterSettings": {
 		"message": "Highlighter"
 	},
+	"highlights": {
+		"message": "Mga highlight"
+	},
+	"highlightsNotFound": {
+		"message": "Walang nakitang mga highlight sa artikulo"
+	},
 	"history": {
 		"message": "Kasaysayan"
 	},
@@ -445,6 +466,12 @@
 	"legacyModeDescription": {
 		"message": "Gumagamit ng URI capture method na compatible sa Obsidian 1.6.7 at mas luma. Tandaan na ang haba ng na-capture na content ay limitado ng browser at operating system. Ang ilang pahina ay maaaring mabigo nang walang error message."
 	},
+	"loadArticle": {
+		"message": "Basahin ang artikulo"
+	},
+	"loading": {
+		"message": "Naglo-load…"
+	},
 	"modelName": {
 		"message": "Pangalan ng model"
 	},
@@ -477,6 +504,9 @@
 	},
 	"noHighlights": {
 		"message": "Walang mga highlight"
+	},
+	"noResults": {
+		"message": "Walang nakitang resulta"
 	},
 	"noTemplates": {
 		"message": "Walang available na mga template. Magdagdag ng template sa settings."
@@ -522,6 +552,12 @@
 	},
 	"openEmbedded": {
 		"message": "Bukas sa pahina"
+	},
+	"openHighlights": {
+		"message": "Buksan ang mga highlight"
+	},
+	"openReader": {
+		"message": "Buksan ang Reader"
 	},
 	"openSidePanel": {
 		"message": "Bukas na panel sa gilid"
@@ -760,6 +796,9 @@
 	"readerLineWidth": {
 		"message": "Lapad ng linya"
 	},
+	"readerLoadFailed": {
+		"message": "Hindi na-load. Maaaring naka-block ang pahina ng iyong browser."
+	},
 	"readerLoading": {
 		"message": "Inaayos ang kalabuan…"
 	},
@@ -789,6 +828,9 @@
 	},
 	"readerTypography": {
 		"message": "Tipograpiya"
+	},
+	"readerUrlPlaceholder": {
+		"message": "Mag-paste ng URL para basahin…"
 	},
 	"readerViewFullSize": {
 		"message": "Tingnan sa buong laki"
@@ -843,6 +885,9 @@
 	},
 	"saveFile": {
 		"message": "I-save ang file..."
+	},
+	"searchHighlightsPlaceholder": {
+		"message": "Maghanap ng mga highlight…"
 	},
 	"searchVariables": {
 		"message": "Maghanap sa mga variable..."
@@ -903,6 +948,21 @@
 	},
 	"silentOpenDescription": {
 		"message": "Ang mga na-clip na note ay mase-save pero hindi bubuksan sa bagong tab. Ang Obsidian ay dadalhin pa rin sa foreground."
+	},
+	"sort": {
+		"message": "Ayusin"
+	},
+	"sortAZ": {
+		"message": "A hanggang Z"
+	},
+	"sortNewOld": {
+		"message": "Pinakabago muna"
+	},
+	"sortOldNew": {
+		"message": "Pinakaluma muna"
+	},
+	"sortZA": {
+		"message": "Z hanggang A"
 	},
 	"specificNoteName": {
 		"message": "Tiyak na pangalan ng note"

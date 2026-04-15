@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Avançat"
 	},
+	"allHighlights": {
+		"message": "Tots els ressaltats"
+	},
 	"allProperties": {
 		"message": "Totes les propietats"
 	},
@@ -162,6 +165,15 @@
 	"delete": {
 		"message": "Eliminar"
 	},
+	"deleteAllHighlightsConfirm": {
+		"message": "Segur que vols suprimir tots els ressaltats?"
+	},
+	"deleteHighlightsForDomain": {
+		"message": "Vols suprimir tots els ressaltats d'aquest domini?"
+	},
+	"deleteHighlightsForPage": {
+		"message": "Vols suprimir tots els ressaltats d'aquesta pàgina?"
+	},
 	"deleteModelConfirm": {
 		"message": "N'està segur, de voler eliminar aquest model?"
 	},
@@ -196,6 +208,9 @@
 	},
 	"earlyAccessFeatures": {
 		"message": "Funcions d'accés anticipat"
+	},
+	"edit": {
+		"message": "Edita"
 	},
 	"editModel": {
 		"message": "Editar model"
@@ -360,6 +375,12 @@
 	"highlighterSettings": {
 		"message": "Configuració del ressaltador"
 	},
+	"highlights": {
+		"message": "Ressaltats"
+	},
+	"highlightsNotFound": {
+		"message": "No s'han trobat ressaltats a l'article"
+	},
 	"history": {
 		"message": "Històric"
 	},
@@ -445,6 +466,12 @@
 	"legacyModeDescription": {
 		"message": "Utilitzi el mètode de retall d'URI compatible amb Obsidian 1.6.7 o anterior. Tingui en compte que la longitud del contingut que pot guardar està limitada pel seu navegador i el seu sistema operatiu. Algunes pàgines poden fallar sense mostrar errors."
 	},
+	"loadArticle": {
+		"message": "Llegeix l'article"
+	},
+	"loading": {
+		"message": "S'està carregant…"
+	},
 	"modelName": {
 		"message": "Nom del model"
 	},
@@ -477,6 +504,9 @@
 	},
 	"noHighlights": {
 		"message": "No fer res"
+	},
+	"noResults": {
+		"message": "No s'han trobat resultats"
 	},
 	"noTemplates": {
 		"message": "No hi ha plantilles disponibles. Si us plau, afegeixi una plantilla a la configuració."
@@ -530,6 +560,12 @@
 	},
 	"openEmbedded": {
 		"message": "Obre a la pàgina"
+	},
+	"openHighlights": {
+		"message": "Obre els ressaltats"
+	},
+	"openReader": {
+		"message": "Obre el lector"
 	},
 	"openSidePanel": {
 		"message": "Obre el plafó lateral"
@@ -768,6 +804,9 @@
 	"readerLineWidth": {
 		"message": "Amplada de línia"
 	},
+	"readerLoadFailed": {
+		"message": "No s'ha pogut carregar. És possible que el navegador bloquegi la pàgina."
+	},
 	"readerLoading": {
 		"message": "S'està simplificant…"
 	},
@@ -797,6 +836,9 @@
 	},
 	"readerTypography": {
 		"message": "Tipografia"
+	},
+	"readerUrlPlaceholder": {
+		"message": "Enganxa un URL per llegir…"
 	},
 	"readerViewFullSize": {
 		"message": "Mostra a mida completa"
@@ -851,6 +893,9 @@
 	},
 	"saveFile": {
 		"message": "Guardar fitxer..."
+	},
+	"searchHighlightsPlaceholder": {
+		"message": "Cerca ressaltats…"
 	},
 	"searchVariables": {
 		"message": "Buscar variables..."
@@ -911,6 +956,21 @@
 	},
 	"silentOpenDescription": {
 		"message": "Les notes retallades es guardaran, però no s'obriran en una nova pestanya. Obsidian encara es posarà en primer pla."
+	},
+	"sort": {
+		"message": "Ordena"
+	},
+	"sortAZ": {
+		"message": "De l'A a la Z"
+	},
+	"sortNewOld": {
+		"message": "Els més recents primer"
+	},
+	"sortOldNew": {
+		"message": "Els més antics primer"
+	},
+	"sortZA": {
+		"message": "De la Z a l'A"
 	},
 	"specificNoteName": {
 		"message": "Nom específic de la nota"

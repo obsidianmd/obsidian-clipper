@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Lisäasetukset"
 	},
+	"allHighlights": {
+		"message": "Kaikki korostukset"
+	},
 	"allProperties": {
 		"message": "Kaikki ominaisuudet"
 	},
@@ -162,6 +165,15 @@
 	"delete": {
 		"message": "Poista"
 	},
+	"deleteAllHighlightsConfirm": {
+		"message": "Haluatko varmasti poistaa kaikki korostukset?"
+	},
+	"deleteHighlightsForDomain": {
+		"message": "Poistetaanko kaikki tämän verkkotunnuksen korostukset?"
+	},
+	"deleteHighlightsForPage": {
+		"message": "Poistetaanko kaikki tämän sivun korostukset?"
+	},
 	"deleteModelConfirm": {
 		"message": "Haluatko varmasti poistaa tämän mallin?"
 	},
@@ -196,6 +208,9 @@
 	},
 	"earlyAccessFeatures": {
 		"message": "Early access -ominaisuudet"
+	},
+	"edit": {
+		"message": "Muokkaa"
 	},
 	"editModel": {
 		"message": "Muokkaa mallia"
@@ -360,6 +375,12 @@
 	"highlighterSettings": {
 		"message": "Korostustyökalu"
 	},
+	"highlights": {
+		"message": "Korostukset"
+	},
+	"highlightsNotFound": {
+		"message": "Artikkelista ei löytynyt korostuksia"
+	},
 	"history": {
 		"message": "Historia"
 	},
@@ -445,6 +466,12 @@
 	"legacyModeDescription": {
 		"message": "Käyttää URI-leikkausmenetelmää, joka on yhteensopiva Obsidian 1.6.7:n tai sitä aikaisempien versioiden kanssa. Huomaa, että selaimen ja käyttöjärjestelmän rajoittama leikattavan sisällön pituus. Jotkin sivut saattavat epäonnistua ilman virheitä."
 	},
+	"loadArticle": {
+		"message": "Lue artikkeli"
+	},
+	"loading": {
+		"message": "Ladataan…"
+	},
 	"modelName": {
 		"message": "Mallin nimi"
 	},
@@ -477,6 +504,9 @@
 	},
 	"noHighlights": {
 		"message": "Ei korostuksia"
+	},
+	"noResults": {
+		"message": "Tuloksia ei löytynyt"
 	},
 	"noTemplates": {
 		"message": "Malleja ei ole saatavilla. Lisää malli asetuksiin."
@@ -530,6 +560,12 @@
 	},
 	"openEmbedded": {
 		"message": "Avaa sivulla"
+	},
+	"openHighlights": {
+		"message": "Avaa korostukset"
+	},
+	"openReader": {
+		"message": "Avaa lukutila"
 	},
 	"openSidePanel": {
 		"message": "Avaa sivupaneeli"
@@ -776,6 +812,9 @@
 	"readerLineWidth": {
 		"message": "Rivileveys"
 	},
+	"readerLoadFailed": {
+		"message": "Lataaminen epäonnistui. Sivu saattaa olla selaimesi estämä."
+	},
 	"readerLoading": {
 		"message": "Selkeytetään…"
 	},
@@ -805,6 +844,9 @@
 	},
 	"readerTypography": {
 		"message": "Typografia"
+	},
+	"readerUrlPlaceholder": {
+		"message": "Liitä luettava URL…"
 	},
 	"readerViewFullSize": {
 		"message": "Näytä täysikokoisena"
@@ -859,6 +901,9 @@
 	},
 	"saveFile": {
 		"message": "Tallenna tiedosto..."
+	},
+	"searchHighlightsPlaceholder": {
+		"message": "Hae korostuksista…"
 	},
 	"searchVariables": {
 		"message": "Etsi muuttujia..."
@@ -919,6 +964,21 @@
 	},
 	"silentOpenDescription": {
 		"message": "Leikatut muistiinpanot tallennetaan mutta niitä ei avata uudessa välilehdessä. Obsidian tuodaan silti etualalle."
+	},
+	"sort": {
+		"message": "Lajittele"
+	},
+	"sortAZ": {
+		"message": "A–Ö"
+	},
+	"sortNewOld": {
+		"message": "Uusimmat ensin"
+	},
+	"sortOldNew": {
+		"message": "Vanhimmat ensin"
+	},
+	"sortZA": {
+		"message": "Ö–A"
 	},
 	"specificNoteName": {
 		"message": "Tietty muistiinpanon nimi"

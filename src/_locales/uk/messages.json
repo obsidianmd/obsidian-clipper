@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Розширені"
 	},
+	"allHighlights": {
+		"message": "Усі виділення"
+	},
 	"allProperties": {
 		"message": "Усі властивості"
 	},
@@ -162,6 +165,15 @@
 	"delete": {
 		"message": "Видалити"
 	},
+	"deleteAllHighlightsConfirm": {
+		"message": "Ви впевнені, що хочете видалити всі виділення?"
+	},
+	"deleteHighlightsForDomain": {
+		"message": "Видалити всі виділення для цього домену?"
+	},
+	"deleteHighlightsForPage": {
+		"message": "Видалити всі виділення для цієї сторінки?"
+	},
 	"deleteModelConfirm": {
 		"message": "Ви впевнені, що хочете видалити цю модель?"
 	},
@@ -196,6 +208,9 @@
 	},
 	"earlyAccessFeatures": {
 		"message": "Функції раннього доступу"
+	},
+	"edit": {
+		"message": "Редагувати"
 	},
 	"editModel": {
 		"message": "Редагувати модель"
@@ -360,6 +375,12 @@
 	"highlighterSettings": {
 		"message": "Виділення"
 	},
+	"highlights": {
+		"message": "Виділення"
+	},
+	"highlightsNotFound": {
+		"message": "У статті не знайдено виділень"
+	},
 	"history": {
 		"message": "Історія"
 	},
@@ -445,6 +466,12 @@
 	"legacyModeDescription": {
 		"message": "Використовує метод захоплення URI, сумісний з Obsidian 1.6.7 та старішими версіями. Зауважте, що довжина захопленого вмісту обмежена браузером та операційною системою. Деякі сторінки можуть не вдатися без повідомлення про помилку."
 	},
+	"loadArticle": {
+		"message": "Читати статтю"
+	},
+	"loading": {
+		"message": "Завантаження…"
+	},
 	"modelName": {
 		"message": "Назва моделі"
 	},
@@ -477,6 +504,9 @@
 	},
 	"noHighlights": {
 		"message": "Немає виділень"
+	},
+	"noResults": {
+		"message": "Результатів не знайдено"
 	},
 	"noTemplates": {
 		"message": "Немає доступних шаблонів. Додайте шаблон у налаштуваннях."
@@ -522,6 +552,12 @@
 	},
 	"openEmbedded": {
 		"message": "Відкрити на сторінці"
+	},
+	"openHighlights": {
+		"message": "Відкрити виділення"
+	},
+	"openReader": {
+		"message": "Відкрити режим читання"
 	},
 	"openSidePanel": {
 		"message": "Відкрити бічну панель"
@@ -760,6 +796,9 @@
 	"readerLineWidth": {
 		"message": "Ширина рядка"
 	},
+	"readerLoadFailed": {
+		"message": "Не вдалося завантажити. Можливо, сторінку заблоковано вашим браузером."
+	},
 	"readerLoading": {
 		"message": "Очищення…"
 	},
@@ -789,6 +828,9 @@
 	},
 	"readerTypography": {
 		"message": "Типографіка"
+	},
+	"readerUrlPlaceholder": {
+		"message": "Вставте URL, щоб прочитати…"
 	},
 	"readerViewFullSize": {
 		"message": "Переглянути в повному розмірі"
@@ -843,6 +885,9 @@
 	},
 	"saveFile": {
 		"message": "Зберегти файл..."
+	},
+	"searchHighlightsPlaceholder": {
+		"message": "Шукати виділення…"
 	},
 	"searchVariables": {
 		"message": "Пошук змінних..."
@@ -903,6 +948,21 @@
 	},
 	"silentOpenDescription": {
 		"message": "Вирізані нотатки будуть збережені, але не відкриті в новій вкладці. Obsidian все одно буде виведений на передній план."
+	},
+	"sort": {
+		"message": "Сортувати"
+	},
+	"sortAZ": {
+		"message": "Від А до Я"
+	},
+	"sortNewOld": {
+		"message": "Спочатку найновіші"
+	},
+	"sortOldNew": {
+		"message": "Спочатку найстаріші"
+	},
+	"sortZA": {
+		"message": "Від Я до А"
 	},
 	"specificNoteName": {
 		"message": "Конкретна назва нотатки"

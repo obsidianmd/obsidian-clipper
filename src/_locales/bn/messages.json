@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "অ্যাডভান্সড"
 	},
+	"allHighlights": {
+		"message": "সব হাইলাইট"
+	},
 	"allProperties": {
 		"message": "সমস্ত প্রপার্টি"
 	},
@@ -162,6 +165,15 @@
 	"delete": {
 		"message": "মুছে ফেলুন"
 	},
+	"deleteAllHighlightsConfirm": {
+		"message": "আপনি কি নিশ্চিত যে আপনি সব হাইলাইট মুছে ফেলতে চান?"
+	},
+	"deleteHighlightsForDomain": {
+		"message": "এই ডোমেইনের সব হাইলাইট মুছবেন?"
+	},
+	"deleteHighlightsForPage": {
+		"message": "এই পৃষ্ঠার সব হাইলাইট মুছবেন?"
+	},
 	"deleteModelConfirm": {
 		"message": "আপনি কি নিশ্চিতভাবে এই মডেলটি মুছে ফেলতে চান?"
 	},
@@ -196,6 +208,9 @@
 	},
 	"earlyAccessFeatures": {
 		"message": "আর্লি অ্যাক্সেসের ফিচারগুলো"
+	},
+	"edit": {
+		"message": "সম্পাদনা"
 	},
 	"editModel": {
 		"message": "মডেল সম্পাদনা করুন"
@@ -360,6 +375,12 @@
 	"highlighterSettings": {
 		"message": "হাইলাইটার"
 	},
+	"highlights": {
+		"message": "হাইলাইট"
+	},
+	"highlightsNotFound": {
+		"message": "আর্টিকেলে হাইলাইট পাওয়া যায়নি"
+	},
 	"history": {
 		"message": "ইতিহাস"
 	},
@@ -445,6 +466,12 @@
 	"legacyModeDescription": {
 		"message": "এটি Obsidian 1.6.7 বা তার আগের সংস্করণের সাথে সামঞ্জস্যপূর্ণ URI ক্লিপিং পদ্ধতি ব্যবহার করে। মনে রাখবেন, আপনার ব্রাউজার এবং অপারেটিং সিস্টেমের সীমাবদ্ধতার কারণে পেজের বিষয়বস্তু ক্লিপ করার পরিমাণ সীমিত থাকতে পারে। কিছু পেজ কোনো ত্রুটি বার্তা ছাড়াই ব্যর্থ হতে পারে।"
 	},
+	"loadArticle": {
+		"message": "আর্টিকেল পড়ুন"
+	},
+	"loading": {
+		"message": "লোড হচ্ছে…"
+	},
 	"modelName": {
 		"message": "প্রদর্শিত নাম"
 	},
@@ -477,6 +504,9 @@
 	},
 	"noHighlights": {
 		"message": "কিছুই করবেন না"
+	},
+	"noResults": {
+		"message": "কোনো ফলাফল পাওয়া যায়নি"
 	},
 	"noTemplates": {
 		"message": "কোনো টেমপ্লেট পাওয়া যায়নি। সেটিংসে একটি টেমপ্লেট যোগ করুন।"
@@ -530,6 +560,12 @@
 	},
 	"openEmbedded": {
 		"message": "পৃষ্ঠায় খুলুন"
+	},
+	"openHighlights": {
+		"message": "হাইলাইট খুলুন"
+	},
+	"openReader": {
+		"message": "রিডার খুলুন"
 	},
 	"openSidePanel": {
 		"message": "পাশের প্যানেল খুলুন"
@@ -768,6 +804,9 @@
 	"readerLineWidth": {
 		"message": "লাইন প্রস্থ"
 	},
+	"readerLoadFailed": {
+		"message": "লোড করতে ব্যর্থ। পৃষ্ঠাটি আপনার ব্রাউজার দ্বারা ব্লক করা থাকতে পারে।"
+	},
 	"readerLoading": {
 		"message": "পরিষ্কার করা হচ্ছে…"
 	},
@@ -797,6 +836,9 @@
 	},
 	"readerTypography": {
 		"message": "টাইপোগ্রাফি"
+	},
+	"readerUrlPlaceholder": {
+		"message": "পড়ার জন্য একটি URL পেস্ট করুন…"
 	},
 	"readerViewFullSize": {
 		"message": "পূর্ণ আকারে দেখুন"
@@ -851,6 +893,9 @@
 	},
 	"saveFile": {
 		"message": "ফাইল সংরক্ষণ করুন..."
+	},
+	"searchHighlightsPlaceholder": {
+		"message": "হাইলাইট খুঁজুন…"
 	},
 	"searchVariables": {
 		"message": "ভেরিয়েবল অনুসন্ধান করুন..."
@@ -911,6 +956,21 @@
 	},
 	"silentOpenDescription": {
 		"message": "ক্লিপ করা নোট সংরক্ষণ হবে, তবে এটি নতুন ট্যাবে খুলবে না। Obsidian অ্যাপটি সামনে প্রদর্শিত হবে।"
+	},
+	"sort": {
+		"message": "সাজান"
+	},
+	"sortAZ": {
+		"message": "A থেকে Z"
+	},
+	"sortNewOld": {
+		"message": "নতুনগুলো আগে"
+	},
+	"sortOldNew": {
+		"message": "পুরোনোগুলো আগে"
+	},
+	"sortZA": {
+		"message": "Z থেকে A"
 	},
 	"specificNoteName": {
 		"message": "নির্দিষ্ট নোটের নাম"

@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Zaawansowane"
 	},
+	"allHighlights": {
+		"message": "Wszystkie wyróżnienia"
+	},
 	"allProperties": {
 		"message": "Wszystkie atrybuty"
 	},
@@ -162,6 +165,15 @@
 	"delete": {
 		"message": "Usuń"
 	},
+	"deleteAllHighlightsConfirm": {
+		"message": "Czy na pewno chcesz usunąć wszystkie wyróżnienia?"
+	},
+	"deleteHighlightsForDomain": {
+		"message": "Usunąć wszystkie wyróżnienia dla tej domeny?"
+	},
+	"deleteHighlightsForPage": {
+		"message": "Usunąć wszystkie wyróżnienia dla tej strony?"
+	},
 	"deleteModelConfirm": {
 		"message": "Czy na pewno chcesz usunąć ten model?"
 	},
@@ -196,6 +208,9 @@
 	},
 	"earlyAccessFeatures": {
 		"message": "Funkcje wczesnego dostępu"
+	},
+	"edit": {
+		"message": "Edytuj"
 	},
 	"editModel": {
 		"message": "Edytuj model"
@@ -360,6 +375,12 @@
 	"highlighterSettings": {
 		"message": "Zakreślacz"
 	},
+	"highlights": {
+		"message": "Wyróżnienia"
+	},
+	"highlightsNotFound": {
+		"message": "Nie znaleziono wyróżnień w artykule"
+	},
 	"history": {
 		"message": "Historia"
 	},
@@ -445,6 +466,12 @@
 	"legacyModeDescription": {
 		"message": "Używa URI jako sposobu wyodrębniania treści, który jest kompatybilny z Obsidian w wersji 1.6.7 lub starszej. Należy pamiętać, że długość treści, którą można wyodrębnić, jest ograniczona przez przeglądarkę i system operacyjny. Część stron może nie działać pomimo braku błędów."
 	},
+	"loadArticle": {
+		"message": "Czytaj artykuł"
+	},
+	"loading": {
+		"message": "Ładowanie…"
+	},
 	"modelName": {
 		"message": "Nazwa modelu"
 	},
@@ -477,6 +504,9 @@
 	},
 	"noHighlights": {
 		"message": "Nic nie rób"
+	},
+	"noResults": {
+		"message": "Nie znaleziono wyników"
 	},
 	"noTemplates": {
 		"message": "Brak dostępnych szablonów. Dodaj szablon w ustawieniach."
@@ -530,6 +560,12 @@
 	},
 	"openEmbedded": {
 		"message": "Otwórz na stronie"
+	},
+	"openHighlights": {
+		"message": "Otwórz wyróżnienia"
+	},
+	"openReader": {
+		"message": "Otwórz czytnik"
 	},
 	"openSidePanel": {
 		"message": "Otwórz panel boczny"
@@ -768,6 +804,9 @@
 	"readerLineWidth": {
 		"message": "Szerokość wiersza"
 	},
+	"readerLoadFailed": {
+		"message": "Nie udało się załadować. Strona może być blokowana przez Twoją przeglądarkę."
+	},
 	"readerLoading": {
 		"message": "Upraszczanie…"
 	},
@@ -797,6 +836,9 @@
 	},
 	"readerTypography": {
 		"message": "Typografia"
+	},
+	"readerUrlPlaceholder": {
+		"message": "Wklej adres URL do czytania…"
 	},
 	"readerViewFullSize": {
 		"message": "Wyświetl w pełnym rozmiarze"
@@ -851,6 +893,9 @@
 	},
 	"saveFile": {
 		"message": "Zapisz plik..."
+	},
+	"searchHighlightsPlaceholder": {
+		"message": "Szukaj wyróżnień…"
 	},
 	"searchVariables": {
 		"message": "Szukaj zmiennych..."
@@ -911,6 +956,21 @@
 	},
 	"silentOpenDescription": {
 		"message": "Notatki będą zapisywane bez otwierania ich w nowej karcie. Obsidian nadal będzie umieszczany na wierzchu."
+	},
+	"sort": {
+		"message": "Sortuj"
+	},
+	"sortAZ": {
+		"message": "A do Z"
+	},
+	"sortNewOld": {
+		"message": "Od najnowszych"
+	},
+	"sortOldNew": {
+		"message": "Od najstarszych"
+	},
+	"sortZA": {
+		"message": "Z do A"
 	},
 	"specificNoteName": {
 		"message": "Nazwa konkretnej notatki"

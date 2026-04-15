@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Avansat"
 	},
+	"allHighlights": {
+		"message": "Toate evidențierile"
+	},
 	"allProperties": {
 		"message": "Toate proprietățile"
 	},
@@ -162,6 +165,15 @@
 	"delete": {
 		"message": "Șterge"
 	},
+	"deleteAllHighlightsConfirm": {
+		"message": "Sigur doriți să ștergeți toate evidențierile?"
+	},
+	"deleteHighlightsForDomain": {
+		"message": "Ștergeți toate evidențierile pentru acest domeniu?"
+	},
+	"deleteHighlightsForPage": {
+		"message": "Ștergeți toate evidențierile pentru această pagină?"
+	},
 	"deleteModelConfirm": {
 		"message": "Ești sigur că vrei să ștergi acest model?"
 	},
@@ -196,6 +208,9 @@
 	},
 	"earlyAccessFeatures": {
 		"message": "Funcții cu acces anticipat"
+	},
+	"edit": {
+		"message": "Editează"
 	},
 	"editModel": {
 		"message": "Editează model"
@@ -360,6 +375,12 @@
 	"highlighterSettings": {
 		"message": "Evidențiator"
 	},
+	"highlights": {
+		"message": "Evidențieri"
+	},
+	"highlightsNotFound": {
+		"message": "Evidențierile nu au fost găsite în articol"
+	},
 	"history": {
 		"message": "Istoric"
 	},
@@ -445,6 +466,12 @@
 	"legacyModeDescription": {
 		"message": "Folosește metoda de captură URI compatibilă cu Obsidian 1.6.7 sau mai vechi. Reține că lungimea conținutului capturat este limitată de browser și sistemul de operare. Unele pagini pot eșua fără mesaj de eroare."
 	},
+	"loadArticle": {
+		"message": "Citește articolul"
+	},
+	"loading": {
+		"message": "Se încarcă…"
+	},
 	"modelName": {
 		"message": "Nume model"
 	},
@@ -477,6 +504,9 @@
 	},
 	"noHighlights": {
 		"message": "Nu face nimic"
+	},
+	"noResults": {
+		"message": "Nu s-au găsit rezultate"
 	},
 	"noTemplates": {
 		"message": "Nu există șabloane disponibile. Te rugăm să adaugi un șablon în setări."
@@ -522,6 +552,12 @@
 	},
 	"openEmbedded": {
 		"message": "Deschide în pagină"
+	},
+	"openHighlights": {
+		"message": "Deschide evidențierile"
+	},
+	"openReader": {
+		"message": "Deschide Reader"
 	},
 	"openSidePanel": {
 		"message": "Deschide panoul lateral"
@@ -760,6 +796,9 @@
 	"readerLineWidth": {
 		"message": "Lățimea liniei"
 	},
+	"readerLoadFailed": {
+		"message": "Încărcarea a eșuat. Pagina poate fi blocată de browserul dvs."
+	},
 	"readerLoading": {
 		"message": "Se clarifică…"
 	},
@@ -789,6 +828,9 @@
 	},
 	"readerTypography": {
 		"message": "Tipografie"
+	},
+	"readerUrlPlaceholder": {
+		"message": "Lipește un URL pentru a citi…"
 	},
 	"readerViewFullSize": {
 		"message": "Vezi la dimensiune completă"
@@ -843,6 +885,9 @@
 	},
 	"saveFile": {
 		"message": "Salvează fișier..."
+	},
+	"searchHighlightsPlaceholder": {
+		"message": "Caută evidențieri…"
 	},
 	"searchVariables": {
 		"message": "Caută variabile..."
@@ -903,6 +948,21 @@
 	},
 	"silentOpenDescription": {
 		"message": "Notele decupate vor fi salvate dar nu vor fi deschise într-o filă nouă. Obsidian va fi totuși adus în prim-plan."
+	},
+	"sort": {
+		"message": "Sortează"
+	},
+	"sortAZ": {
+		"message": "A la Z"
+	},
+	"sortNewOld": {
+		"message": "Cele mai noi primele"
+	},
+	"sortOldNew": {
+		"message": "Cele mai vechi primele"
+	},
+	"sortZA": {
+		"message": "Z la A"
 	},
 	"specificNoteName": {
 		"message": "Nume specific notă"
