@@ -5,7 +5,7 @@ import { flattenShadowDom as flattenShadowDomUtil } from './flatten-shadow-dom';
 import { getLocalStorage, setLocalStorage } from './storage-utils';
 import hljs from 'highlight.js';
 import { getDomain } from './string-utils';
-import { applyHighlights, invalidateHighlightCache, loadHighlights, toggleHighlighterMenu, getHighlights, repositionHighlights } from './highlighter';
+import { applyHighlights, handleTextSelection, invalidateHighlightCache, loadHighlights, toggleHighlighterMenu, getHighlights, repositionHighlights } from './highlighter';
 import { removeExistingHighlights } from './highlighter-overlays';
 import { copyToClipboard } from './clipboard-utils';
 import { getMessage, initializeI18n } from './i18n';
@@ -198,14 +198,7 @@ export class Reader {
 		highlighterBtn.addEventListener('click', async () => {
 			clipDropdown.classList.remove('is-open');
 			settingsBar.classList.remove('is-open');
-			if (Reader.isReaderPage) {
-				toggleHighlighterMenu(!doc.body.classList.contains('obsidian-highlighter-active'));
-			} else {
-				const response = await browser.runtime.sendMessage({ action: 'getActiveTab' }) as { tabId?: number };
-				if (response.tabId) {
-					await browser.runtime.sendMessage({ action: 'toggleHighlighterMode', tabId: response.tabId });
-				}
-			}
+			await Reader.toggleHighlighter(doc);
 		});
 
 		// Sync active state with highlighter mode
@@ -2148,18 +2141,22 @@ export class Reader {
 				doc.body.appendChild(clipperIframeContainer);
 			}
 
-			// Toggle dark mode with D key (visual only, doesn't change appearance setting)
-			doc.addEventListener('keydown', (e) => {
-				if (!this.isActive) return;
-				if ((e.key !== 'd' && e.key !== 'D') || e.ctrlKey || e.metaKey) return;
-				const tag = (document.activeElement as HTMLElement)?.tagName;
-				if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+			// D: toggle dark mode (visual only, doesn't change appearance setting)
+			Reader.registerHotkey(doc, 'd', () => {
 				const html = doc.documentElement;
 				const isDark = html.classList.contains('theme-dark');
 				html.classList.remove('theme-light', 'theme-dark');
 				html.classList.add(isDark ? 'theme-light' : 'theme-dark');
 				this.applyTheme(doc);
 			});
+
+			// H: toggle highlighter
+			Reader.registerHotkey(doc, 'h', () => Reader.toggleHighlighter(doc));
+
+			// Selection → highlight affordance. When highlighter is OFF and the
+			// user makes a normal text selection inside the article, surface a
+			// floating button that converts the selection into a highlight.
+			Reader.registerSelectionToHighlightButton(doc);
 
 			// Set up color scheme media query listener
 			this.colorSchemeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
@@ -2303,6 +2300,92 @@ export class Reader {
 
 			await Promise.all(messages);
 			window.location.reload();
+		}
+	}
+
+	// Floating "Highlight" button that appears on text selection while
+	// highlighter is OFF, and converts the selection into a highlight. When
+	// highlighter is ON, the usual mouseup path in highlighter-overlays.ts
+	// handles selections directly, so we stay out of its way.
+	private static registerSelectionToHighlightButton(doc: Document) {
+		const btn = doc.createElement('button');
+		btn.type = 'button';
+		btn.className = 'obsidian-selection-action';
+		btn.setAttribute('aria-label', 'Highlight selection');
+		btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg><span>Highlight</span>';
+		btn.style.display = 'none';
+		// Preserve the selection when the pointer goes down on the button —
+		// otherwise the browser clears it before click handlers run.
+		btn.addEventListener('mousedown', e => e.preventDefault());
+		btn.addEventListener('click', (e) => {
+			e.preventDefault();
+			e.stopPropagation();
+			const sel = doc.getSelection();
+			if (!sel || sel.isCollapsed || sel.rangeCount === 0) return;
+			// Create the highlight without entering highlighter mode — the
+			// user's intent is a single edit, not a session. handleTextSelection
+			// reads the live selection and clears it on return.
+			handleTextSelection(sel);
+			hide();
+		});
+		doc.body.appendChild(btn);
+
+		const hide = () => { btn.style.display = 'none'; };
+
+		const update = () => {
+			if (!this.isActive) return hide();
+			if (doc.body.classList.contains('obsidian-highlighter-active')) return hide();
+			const sel = doc.getSelection();
+			if (!sel || sel.isCollapsed || sel.rangeCount === 0) return hide();
+			const range = sel.getRangeAt(0);
+			const article = doc.querySelector('.obsidian-reader-content article');
+			if (!article || !article.contains(range.commonAncestorContainer)) return hide();
+			const rects = range.getClientRects();
+			if (rects.length === 0) return hide();
+			const last = rects[rects.length - 1];
+			btn.style.display = 'flex';
+			btn.style.left = `${last.right + window.scrollX + 6}px`;
+			btn.style.top = `${last.bottom + window.scrollY + 4}px`;
+		};
+
+		// mouseup / keyup catch the end of a drag-select or shift-arrow select;
+		// selectionchange catches collapse-by-click so we can hide promptly.
+		doc.addEventListener('mouseup', () => setTimeout(update, 0));
+		doc.addEventListener('keyup', (e) => {
+			if (e.shiftKey || e.key === 'Shift') setTimeout(update, 0);
+		});
+		doc.addEventListener('selectionchange', () => {
+			const sel = doc.getSelection();
+			if (!sel || sel.isCollapsed) hide();
+		});
+	}
+
+	// Single-key hotkey wired to the reader document. Ignores presses while
+	// reader is inactive, while modifier keys are held, or while the user is
+	// typing in an input.
+	private static registerHotkey(doc: Document, key: string, handler: () => void) {
+		const lowerKey = key.toLowerCase();
+		doc.addEventListener('keydown', (e) => {
+			if (!this.isActive) return;
+			if (e.ctrlKey || e.metaKey || e.altKey) return;
+			if (e.key.toLowerCase() !== lowerKey) return;
+			const tag = (document.activeElement as HTMLElement)?.tagName;
+			if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+			handler();
+		});
+	}
+
+	// Standalone reader page toggles directly; a regular page in reader mode
+	// round-trips through the background so the content script's highlighter
+	// state stays in sync with the DOM class.
+	static async toggleHighlighter(doc: Document): Promise<void> {
+		if (Reader.isReaderPage) {
+			toggleHighlighterMenu(!doc.body.classList.contains('obsidian-highlighter-active'));
+			return;
+		}
+		const response = await browser.runtime.sendMessage({ action: 'getActiveTab' }) as { tabId?: number };
+		if (response.tabId) {
+			await browser.runtime.sendMessage({ action: 'toggleHighlighterMode', tabId: response.tabId });
 		}
 	}
 

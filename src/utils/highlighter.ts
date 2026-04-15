@@ -3,12 +3,11 @@ import { getElementXPath, getElementByXPath } from './dom-utils';
 import {
 	handleMouseUp,
 	handleMouseMove,
-	removeHoverOverlay,
-	updateHighlightListeners,
 	planHighlightOverlayRects,
 	removeExistingHighlights,
 	handleTouchStart,
-	handleTouchMove
+	handleTouchMove,
+	syncHoverListener,
 } from './highlighter-overlays';
 import { detectBrowser, addBrowserClassToHtml } from './browser-detection';
 import { generalSettings, loadSettings } from './storage-utils';
@@ -63,7 +62,7 @@ function createSVG(config: {
 	return svg;
 }
 
-export type AnyHighlightData = TextHighlightData | ElementHighlightData | ComplexHighlightData;
+export type AnyHighlightData = TextHighlightData | ElementHighlightData;
 
 const EPHEMERAL_PARAMS = new Set([
 	't',           // YouTube timestamp
@@ -152,13 +151,16 @@ let highlightHistory: HistoryAction[] = [];
 let redoHistory: HistoryAction[] = [];
 const MAX_HISTORY_LENGTH = 30;
 
-const ALLOWED_HIGHLIGHT_TAGS = [
-	'SPAN', 'P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6',
-	'MATH', 'FIGURE', 'UL', 'OL', 'TABLE', 'LI', 'CODE', 'PRE', 'BLOCKQUOTE', 'EM', 'STRONG', 'A'
-];
+// Block elements highlighted as a whole unit rather than as the text inside
+// them. Click one (in highlighter mode) to highlight the whole block; when a
+// selection fully contains one, it becomes a single element highlight instead
+// of being split into per-child text highlights.
+export const BLOCK_HIGHLIGHT_TAGS = new Set(['FIGURE', 'PICTURE', 'IMG', 'TABLE', 'PRE']);
 
-const BLOCK_LEVEL_TAGS_FOR_SPLIT = [
-	'P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'LI', 'PRE', 'BLOCKQUOTE', 'FIGURE', 'TABLE'
+// Block containers the text-splitting logic uses to split a multi-block
+// selection into one TextHighlightData per paragraph-ish block.
+const TEXT_BLOCK_SPLIT_TAGS = [
+	'P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'LI', 'BLOCKQUOTE', 'FIGCAPTION'
 ];
 
 export interface HighlightData {
@@ -166,6 +168,9 @@ export interface HighlightData {
 	xpath: string;
 	content: string;
 	notes?: string[]; // Annotations
+	// When one selection crosses multiple blocks, all resulting highlights
+	// share a groupId so they delete, clip, and visually associate together.
+	groupId?: string;
 }
 
 export interface TextHighlightData extends HighlightData {
@@ -176,10 +181,6 @@ export interface TextHighlightData extends HighlightData {
 
 export interface ElementHighlightData extends HighlightData {
 	type: 'element';
-}
-
-export interface ComplexHighlightData extends HighlightData {
-	type: 'complex';
 }
 
 export interface StoredData {
@@ -196,12 +197,15 @@ export function updateHighlights(newHighlights: AnyHighlightData[]) {
 	addToHistory('add', oldHighlights, newHighlights);
 }
 
-// Toggle highlighter mode on or off
+// Toggle highlighter mode. When active: mouse/touch listeners that create
+// highlights from selections and block-clicks are attached, and the floating
+// menu appears. When inactive: creation is off, but the hover-delete affordance
+// stays available as long as any highlights exist (managed independently via
+// syncHoverListener, which checks highlights.length).
 export function toggleHighlighterMenu(isActive: boolean) {
 	document.body.classList.toggle('obsidian-highlighter-active', isActive);
 	if (isActive) {
 		document.addEventListener('mouseup', handleMouseUp);
-		document.addEventListener('mousemove', handleMouseMove);
 		document.addEventListener('touchstart', handleTouchStart);
 		document.addEventListener('touchmove', handleTouchMove);
 		document.addEventListener('touchend', handleMouseUp);
@@ -213,17 +217,15 @@ export function toggleHighlighterMenu(isActive: boolean) {
 		applyHighlights();
 	} else {
 		document.removeEventListener('mouseup', handleMouseUp);
-		document.removeEventListener('mousemove', handleMouseMove);
 		document.removeEventListener('touchstart', handleTouchStart);
 		document.removeEventListener('touchmove', handleTouchMove);
 		document.removeEventListener('touchend', handleMouseUp);
 		document.removeEventListener('keydown', handleKeyDown);
-		removeHoverOverlay();
 		enableLinkClicks();
 		removeHighlighterMenu();
 		browser.runtime.sendMessage({ action: "highlighterModeChanged", isActive: false });
 	}
-	updateHighlightListeners();
+	syncHoverListener();
 }
 
 export function canUndo(): boolean {
@@ -460,7 +462,6 @@ function removeHighlighterMenu() {
 	}
 }
 
-// Disable clicking on links when highlighter is active
 function disableLinkClicks() {
 	document.querySelectorAll('a').forEach((link: HTMLElement) => {
 		const existingHandler = link.onclick;
@@ -474,7 +475,6 @@ function disableLinkClicks() {
 	});
 }
 
-// Restore original link click functionality
 function enableLinkClicks() {
 	document.querySelectorAll('a').forEach((link: HTMLElement) => {
 		const originalHandler = originalLinkClickHandlers.get(link);
@@ -487,46 +487,16 @@ function enableLinkClicks() {
 	});
 }
 
-// Highlight an entire element
+// Click-to-highlight a block element (figure, picture, img, table, pre).
+// Text-containing blocks (paragraphs, headings, etc.) are not highlightable
+// by click — those go through selection → TextHighlightData instead.
 export function highlightElement(element: Element, notes?: string[]) {
-	let targetElement = element;
-	const originalTagName = element.tagName.toUpperCase();
-
-	// If a table cell or row is targeted, try to highlight the parent table instead
-	if (['TD', 'TH', 'TR'].includes(originalTagName)) {
-		const parentTable = element.closest('table');
-		if (parentTable) {
-			targetElement = parentTable;
-		} else {
-			// If a cell/row is not within a table, do not highlight.
-			console.log('Table cell/row targeted, but no parent table found. Not highlighting:', originalTagName);
-			return;
-		}
-	}
-
-	// Now, check if the determined targetElement (which could be the original element or a table) is allowed.
-	const finalTagName = targetElement.tagName.toUpperCase();
-	if (!ALLOWED_HIGHLIGHT_TAGS.includes(finalTagName)) {
-		// If the targetElement itself is not allowed, try its parent.
-		// This primarily applies to cases where the original element was not a table cell/row.
-		if (targetElement.parentElement && ALLOWED_HIGHLIGHT_TAGS.includes(targetElement.parentElement.tagName.toUpperCase())) {
-			targetElement = targetElement.parentElement;
-		} else {
-			console.log('Element type not allowed for highlighting:', finalTagName);
-			return;
-		}
-	}
-
-	const xpath = getElementXPath(targetElement);
-	const content = targetElement.outerHTML;
-	const isBlockElement = window.getComputedStyle(targetElement).display === 'block';
-	addHighlight({ 
-		xpath, 
-		content, 
-		type: isBlockElement ? 'element' : 'text', 
+	if (!BLOCK_HIGHLIGHT_TAGS.has(element.tagName.toUpperCase())) return;
+	addHighlight({
+		xpath: getElementXPath(element),
+		content: element.outerHTML,
+		type: 'element',
 		id: Date.now().toString(),
-		startOffset: 0,
-		endOffset: targetElement.textContent?.length || 0
 	}, notes);
 }
 
@@ -559,33 +529,77 @@ export function handleTextSelection(selection: Selection, notes?: string[]) {
 	selection.removeAllRanges();
 }
 
-// Get highlight ranges for a given text selection
-function getHighlightRanges(range: Range): TextHighlightData[] {
-	const newHighlights: TextHighlightData[] = [];
+// Split a user selection into one highlight per block it crosses.
+// A selection can produce:
+//   - TextHighlightData per enclosing paragraph-ish block (P, H1-6, LI, etc.)
+//   - ElementHighlightData per block-whitelist element (figure, img, table,
+//     pre, picture) fully inside the selection.
+// Partial selections of a block-whitelist element fall through to text
+// highlights for the text inside it (e.g. text inside a <pre> is still text).
+function getHighlightRanges(range: Range): AnyHighlightData[] {
+	const newHighlights: AnyHighlightData[] = [];
 	if (range.collapsed) return newHighlights;
+	// Assigned below if the selection produces more than one highlight. All
+	// pieces of a multi-block selection share this so they act as a single
+	// logical highlight for delete/clip/hover.
+	const groupId = `grp_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
 
+	// Pass 1: collect block-whitelist elements fully contained in the selection.
+	const blockElements: Element[] = [];
+	const elementIterator = document.createNodeIterator(
+		range.commonAncestorContainer,
+		NodeFilter.SHOW_ELEMENT,
+		{
+			acceptNode: (node) => {
+				const el = node as Element;
+				if (!BLOCK_HIGHLIGHT_TAGS.has(el.tagName.toUpperCase())) return NodeFilter.FILTER_SKIP;
+				return rangeFullyContainsElement(range, el)
+					? NodeFilter.FILTER_ACCEPT
+					: NodeFilter.FILTER_SKIP;
+			}
+		}
+	);
+	let el: Node | null;
+	while ((el = elementIterator.nextNode())) {
+		const element = el as Element;
+		// Skip if already captured as an ancestor.
+		if (blockElements.some(e => e.contains(element) && e !== element)) continue;
+		blockElements.push(element);
+	}
+
+	const timestamp = Date.now().toString();
+	for (let i = 0; i < blockElements.length; i++) {
+		const element = blockElements[i];
+		newHighlights.push({
+			xpath: getElementXPath(element),
+			content: element.outerHTML,
+			type: 'element',
+			id: `${timestamp}_el_${i}`,
+		});
+	}
+
+	// Pass 2: group text nodes by their enclosing text block, skipping any
+	// text inside a captured block-whitelist element (already represented).
 	const uniqueParentBlocks = new Set<Element>();
 	const textNodeIterator = document.createNodeIterator(
 		range.commonAncestorContainer,
 		NodeFilter.SHOW_TEXT,
 		{
 			acceptNode: (node) => {
-				return range.intersectsNode(node) && node.nodeValue && node.nodeValue.trim().length > 0
-					? NodeFilter.FILTER_ACCEPT
-					: NodeFilter.FILTER_REJECT;
+				if (!range.intersectsNode(node)) return NodeFilter.FILTER_REJECT;
+				if (!node.nodeValue || node.nodeValue.trim().length === 0) return NodeFilter.FILTER_REJECT;
+				if (blockElements.some(e => e.contains(node))) return NodeFilter.FILTER_REJECT;
+				return NodeFilter.FILTER_ACCEPT;
 			}
 		}
 	);
 
 	let currentTextNode;
 	while ((currentTextNode = textNodeIterator.nextNode())) {
-		const block = getClosestAllowedBlock(currentTextNode);
-		if (block) {
-			uniqueParentBlocks.add(block);
-		}
+		const block = getClosestTextBlock(currentTextNode);
+		if (block) uniqueParentBlocks.add(block);
 	}
 
-	// Sort the blocks in document order to process them correctly
 	const sortedBlocks = Array.from(uniqueParentBlocks).sort((a, b) => {
 		const pos = a.compareDocumentPosition(b);
 		if (pos & Node.DOCUMENT_POSITION_FOLLOWING) return -1;
@@ -595,107 +609,90 @@ function getHighlightRanges(range: Range): TextHighlightData[] {
 
 	for (let i = 0; i < sortedBlocks.length; i++) {
 		const blockElement = sortedBlocks[i];
-		const currentBlockSelectionRange = document.createRange();
+		const blockRange = document.createRange();
 
-		// Determine the portion of the selection that is within this blockElement
 		let startContainer = range.startContainer;
 		let startOffset = range.startOffset;
 		let endContainer = range.endContainer;
 		let endOffset = range.endOffset;
 
-		// Clip start to the current block if selection starts before it
-		if (!blockElement.contains(startContainer) && !(blockElement === startContainer)) {
+		if (!blockElement.contains(startContainer) && blockElement !== startContainer) {
 			const firstText = findFirstTextNode(blockElement);
-			if (firstText) {
-				startContainer = firstText;
-				startOffset = 0;
-			} else continue; // No text in this block to highlight
+			if (!firstText) continue;
+			startContainer = firstText;
+			startOffset = 0;
 		}
-
-		// Clip end to the current block if selection ends after it
-		if (!blockElement.contains(endContainer) && !(blockElement === endContainer)) {
+		if (!blockElement.contains(endContainer) && blockElement !== endContainer) {
 			const lastText = findLastTextNode(blockElement);
-			if (lastText) {
-				endContainer = lastText;
-				endOffset = lastText.textContent?.length || 0;
-			} else continue; // No text in this block
+			if (!lastText) continue;
+			endContainer = lastText;
+			endOffset = lastText.textContent?.length || 0;
 		}
 
 		try {
-			currentBlockSelectionRange.setStart(startContainer, startOffset);
-			currentBlockSelectionRange.setEnd(endContainer, endOffset);
+			blockRange.setStart(startContainer, startOffset);
+			blockRange.setEnd(endContainer, endOffset);
+			if (blockRange.collapsed) continue;
+			if (!blockElement.contains(blockRange.commonAncestorContainer) && blockElement !== blockRange.commonAncestorContainer) continue;
 
-			// Final check: ensure the created range is actually within the current blockElement
-			// and not collapsed.
-			if (!currentBlockSelectionRange.collapsed && 
-				(blockElement.contains(currentBlockSelectionRange.commonAncestorContainer) || blockElement === currentBlockSelectionRange.commonAncestorContainer)) {
-				
-				const contentFragment = currentBlockSelectionRange.cloneContents();
-				const tempDivForBlock = document.createElement('div');
-				tempDivForBlock.appendChild(contentFragment);
+			// When the clipped range covers the whole block, store the block's
+			// outerHTML so the wrapping tag (e.g. <li>) survives — grouped
+			// display in highlights.html relies on this to reconstruct lists.
+			const firstText = findFirstTextNode(blockElement);
+			const lastTextNode = findLastTextNode(blockElement);
+			const isFullBlock = !!firstText && !!lastTextNode
+				&& blockRange.startContainer === firstText && blockRange.startOffset === 0
+				&& blockRange.endContainer === lastTextNode
+				&& blockRange.endOffset === (lastTextNode.textContent?.length ?? 0);
+			const htmlContent = isFullBlock
+				? blockElement.outerHTML
+				: sanitizeAndPreserveFormatting(serializeRangeContents(blockRange));
+			if (htmlContent.trim() === '') continue;
 
-				const serializer = new XMLSerializer();
-				let htmlContent = '';
-				Array.from(tempDivForBlock.childNodes).forEach(node => {
-					if (node.nodeType === Node.ELEMENT_NODE) {
-						htmlContent += serializer.serializeToString(node);
-					} else if (node.nodeType === Node.TEXT_NODE) {
-						htmlContent += node.textContent;
-					}
-				});
-				const selectedTextContent = sanitizeAndPreserveFormatting(htmlContent);
-
-				if (selectedTextContent.trim() === "") continue; // Skip empty highlights
-
-				newHighlights.push({
-					xpath: getElementXPath(blockElement),
-					content: selectedTextContent,
-					type: 'text',
-					id: Date.now().toString() + "_" + i, // Unique ID for the batch
-					startOffset: getTextOffset(blockElement, currentBlockSelectionRange.startContainer, currentBlockSelectionRange.startOffset),
-					endOffset: getTextOffset(blockElement, currentBlockSelectionRange.endContainer, currentBlockSelectionRange.endOffset)
-				});
-			}
-		} catch (e) {
-			console.warn("Error creating range for block element:", blockElement, e);
-		}
-	}
-
-	// Fallback: If no block-level highlights were created but there was a selection,
-	// try to create a single highlight based on the closest highlightable parent.
-	if (newHighlights.length === 0 && !range.collapsed) {
-		console.warn("Splitting selection by block failed or no suitable blocks found, falling back to single highlight for selection.");
-		const parentElement = getHighlightableParent(range.commonAncestorContainer);
-		if (ALLOWED_HIGHLIGHT_TAGS.includes(parentElement.tagName.toUpperCase())) {
-			const tempDivSingle = document.createElement('div');
-			tempDivSingle.appendChild(range.cloneContents());
-
-			const serializer = new XMLSerializer();
-			let htmlContent = '';
-			Array.from(tempDivSingle.childNodes).forEach(node => {
-				if (node.nodeType === Node.ELEMENT_NODE) {
-					htmlContent += serializer.serializeToString(node);
-				} else if (node.nodeType === Node.TEXT_NODE) {
-					htmlContent += node.textContent;
-				}
+			newHighlights.push({
+				xpath: getElementXPath(blockElement),
+				content: htmlContent,
+				type: 'text',
+				id: `${timestamp}_tx_${i}`,
+				startOffset: getTextOffset(blockElement, blockRange.startContainer, blockRange.startOffset),
+				endOffset: getTextOffset(blockElement, blockRange.endContainer, blockRange.endOffset),
 			});
-			const content = sanitizeAndPreserveFormatting(htmlContent);
-			if (content.trim() !== "") {
-				newHighlights.push({
-					xpath: getElementXPath(parentElement),
-					content: content,
-					type: 'text',
-					id: Date.now().toString(),
-					startOffset: getTextOffset(parentElement, range.startContainer, range.startOffset),
-					endOffset: getTextOffset(parentElement, range.endContainer, range.endOffset)
-				});
-			}
-		} else {
-			console.log("Fallback highlight's parent is not in ALLOWED_HIGHLIGHT_TAGS, skipping highlight:", parentElement.tagName);
+		} catch (e) {
+			console.warn('Error creating text highlight for block:', blockElement, e);
 		}
 	}
 
+	// Only stamp groupId when there's more than one piece; single-block
+	// selections stay plain so they don't acquire a group they don't need.
+	if (newHighlights.length > 1) {
+		for (const h of newHighlights) h.groupId = groupId;
+	}
 	return newHighlights;
+}
+
+function serializeRangeContents(range: Range): string {
+	const temp = document.createElement('div');
+	temp.appendChild(range.cloneContents());
+	const serializer = new XMLSerializer();
+	let html = '';
+	for (const node of Array.from(temp.childNodes)) {
+		if (node.nodeType === Node.ELEMENT_NODE) html += serializer.serializeToString(node);
+		else if (node.nodeType === Node.TEXT_NODE) html += node.textContent;
+	}
+	return html;
+}
+
+function rangeFullyContainsElement(range: Range, element: Element): boolean {
+	const elRange = document.createRange();
+	try {
+		elRange.selectNode(element);
+		return range.compareBoundaryPoints(Range.START_TO_START, elRange) <= 0 &&
+			range.compareBoundaryPoints(Range.END_TO_END, elRange) >= 0;
+	} catch {
+		return false;
+	} finally {
+		elRange.detach();
+	}
 }
 
 // Sanitize HTML content while preserving formatting
@@ -757,29 +754,20 @@ function balanceTags(html: string): string {
 	return balancedHtml;
 }
 
-// Find the nearest highlightable parent element
-function getHighlightableParent(node: Node): Element {
-	let current: Node | null = node;
-	while (current && current.nodeType !== Node.ELEMENT_NODE) {
-		current = current.parentNode;
-	}
-	return current as Element;
-}
-
 // Calculate the text offset within a container element
 function getTextOffset(container: Element, targetNode: Node, targetOffset: number): number {
-	let offset = 0;
+	// TreeWalker.currentNode initially points at the root element (the filter
+	// only affects traversal, not the starting position). Advance past it so
+	// we only sum actual text nodes — otherwise we add the whole container's
+	// textContent.length at the start and overshoot every offset.
 	const treeWalker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
-	
-	let node: Node | null = treeWalker.currentNode;
+	let offset = 0;
+	let node: Node | null = treeWalker.nextNode();
 	while (node) {
-		if (node === targetNode) {
-			return offset + targetOffset;
-		}
-		offset += (node.textContent?.length || 0);
+		if (node === targetNode) return offset + targetOffset;
+		offset += node.textContent?.length || 0;
 		node = treeWalker.nextNode();
 	}
-	
 	return offset;
 }
 
@@ -794,56 +782,54 @@ function addHighlight(highlight: AnyHighlightData, notes?: string[]) {
 	commitHighlightChanges();
 }
 
-// Sort highlights based on their vertical position
 export function sortHighlights() {
-	highlights.sort((a, b) => {
-		const elementA = getElementByXPath(a.xpath);
-		const elementB = getElementByXPath(b.xpath);
-		if (elementA && elementB) {
-			const verticalDiff = getElementVerticalPosition(elementA) - getElementVerticalPosition(elementB);
-			
-			// If elements are at the same vertical position (same paragraph)
-			if (verticalDiff === 0) {
-				// If both are text highlights in the same element, sort by offset
-				if (a.type === 'text' && b.type === 'text' && a.xpath === b.xpath) {
-					return a.startOffset - b.startOffset;
-				}
-				// Otherwise, sort by horizontal position
-				return elementA.getBoundingClientRect().left - elementB.getBoundingClientRect().left;
-			}
-			
-			return verticalDiff;
+	// Precompute positions once. The previous implementation called
+	// getElementByXPath and getBoundingClientRect inside the comparator, which
+	// forced synchronous layout O(n log n) times per sort.
+	const positions = new Map<AnyHighlightData, { top: number; left: number; resolved: boolean }>();
+	for (const h of highlights) {
+		const el = getElementByXPath(h.xpath);
+		if (el) {
+			const rect = el.getBoundingClientRect();
+			positions.set(h, { top: rect.top + window.scrollY, left: rect.left, resolved: true });
+		} else {
+			positions.set(h, { top: 0, left: 0, resolved: false });
 		}
-		return 0;
+	}
+	highlights.sort((a, b) => {
+		const pa = positions.get(a)!;
+		const pb = positions.get(b)!;
+		if (!pa.resolved || !pb.resolved) return 0;
+		const dy = pa.top - pb.top;
+		if (dy !== 0) return dy;
+		if (a.type === 'text' && b.type === 'text' && a.xpath === b.xpath) {
+			return a.startOffset - b.startOffset;
+		}
+		return pa.left - pb.left;
 	});
 }
 
-// Get the vertical position of an element
-function getElementVerticalPosition(element: Element): number {
-	return element.getBoundingClientRect().top + window.scrollY;
-}
-
-// Check if two highlights overlap
 function doHighlightsOverlap(highlight1: AnyHighlightData, highlight2: AnyHighlightData): boolean {
+	// Same xpath means the same element by construction — short-circuit before
+	// the DOM lookup, which can fail for namespaced elements (MathML, SVG)
+	// because document.evaluate() doesn't resolve unprefixed names outside
+	// the HTML namespace. Without this, re-clicking a <math> produces duplicates.
+	if (highlight1.xpath === highlight2.xpath) {
+		if (highlight1.type === 'text' && highlight2.type === 'text') {
+			return highlight1.startOffset < highlight2.endOffset && highlight2.startOffset < highlight1.endOffset;
+		}
+		return true;
+	}
+
 	const element1 = getElementByXPath(highlight1.xpath);
 	const element2 = getElementByXPath(highlight2.xpath);
 
 	if (!element1 || !element2) return false;
 
-	if (element1 === element2) {
-		// For text highlights in the same element, check for overlap
-		if (highlight1.type === 'text' && highlight2.type === 'text') {
-			return (highlight1.startOffset < highlight2.endOffset && highlight2.startOffset < highlight1.endOffset);
-		}
-		// For other types, consider them overlapping if they're in the same element
-		return true;
-	}
-
 	// Check if one element contains the other
 	return element1.contains(element2) || element2.contains(element1);
 }
 
-// Check if two highlights are adjacent
 function areHighlightsAdjacent(highlight1: AnyHighlightData, highlight2: AnyHighlightData): boolean {
 	if (highlight1.type === 'text' && highlight2.type === 'text' && highlight1.xpath === highlight2.xpath) {
 		return highlight1.endOffset === highlight2.startOffset || highlight2.endOffset === highlight1.startOffset;
@@ -851,7 +837,6 @@ function areHighlightsAdjacent(highlight1: AnyHighlightData, highlight2: AnyHigh
 	return false;
 }
 
-// Merge overlapping highlights
 function mergeOverlappingHighlights(existingHighlights: AnyHighlightData[], newHighlight: AnyHighlightData): AnyHighlightData[] {
 	let mergedHighlights: AnyHighlightData[] = [];
 	let merged = false;
@@ -876,89 +861,40 @@ function mergeOverlappingHighlights(existingHighlights: AnyHighlightData[], newH
 	return mergedHighlights;
 }
 
-// Merge two highlights into one
-function mergeHighlights(highlight1: AnyHighlightData, highlight2: AnyHighlightData): AnyHighlightData {
-	const element1 = getElementByXPath(highlight1.xpath);
-	const element2 = getElementByXPath(highlight2.xpath);
+function mergeHighlights(h1: AnyHighlightData, h2: AnyHighlightData): AnyHighlightData {
+	// Element + text on the same region: the element wins (covers the whole block).
+	if (h1.type === 'element' && h2.type === 'text') return h1;
+	if (h2.type === 'element' && h1.type === 'text') return h2;
 
-	if (!element1 || !element2) {
-		throw new Error("Cannot merge highlights: elements not found");
-	}
-
-	// If one highlight is an element and the other is text, prioritize the element highlight
-	if (highlight1.type === 'element' && highlight2.type === 'text') {
-		return highlight1;
-	} else if (highlight2.type === 'element' && highlight1.type === 'text') {
-		return highlight2;
-	}
-
-	let mergedElement: Element;
-	if (element1.contains(element2)) {
-		mergedElement = element1;
-	} else if (element2.contains(element1)) {
-		mergedElement = element2;
-	} else {
-		mergedElement = findCommonAncestor(element1, element2);
-	}
-
-	// If the merged element is different from both original elements, or if either highlight is complex, create a complex highlight
-	if (mergedElement !== element1 || mergedElement !== element2 || highlight1.type === 'complex' || highlight2.type === 'complex') {
-		return {
-			xpath: getElementXPath(mergedElement),
-			content: mergedElement.outerHTML,
-			type: 'complex',
-			id: Date.now().toString()
-		};
-	}
-
-	// If both highlights are text and in the same element, merge them as text
-	if (highlight1.type === 'text' && highlight2.type === 'text' && highlight1.xpath === highlight2.xpath) {
-		return {
-			xpath: highlight1.xpath,
-			content: mergedElement.textContent?.slice(Math.min(highlight1.startOffset, highlight2.startOffset), 
-													  Math.max(highlight1.endOffset, highlight2.endOffset)) || '',
-			type: 'text',
-			id: Date.now().toString(),
-			startOffset: Math.min(highlight1.startOffset, highlight2.startOffset),
-			endOffset: Math.max(highlight1.endOffset, highlight2.endOffset)
-		};
-	}
-
-	// If we get here, treat it as a complex highlight
-	return {
-		xpath: getElementXPath(mergedElement),
-		content: mergedElement.outerHTML,
-		type: 'complex',
-		id: Date.now().toString()
-	};
-}
-
-// Find the common ancestor of two elements
-function findCommonAncestor(element1: Element, element2: Element): Element {
-	const parents1 = getParents(element1);
-	const parents2 = getParents(element2);
-
-	for (const parent of parents1) {
-		if (parents2.includes(parent)) {
-			return parent;
+	// Same xpath = same element. Merge text offsets; dedupe element highlights.
+	// Done without DOM resolution so this works for MathML/SVG (document.evaluate
+	// can't find namespaced nodes in HTML docs).
+	if (h1.xpath === h2.xpath) {
+		if (h1.type === 'text' && h2.type === 'text') {
+			const startOffset = Math.min(h1.startOffset, h2.startOffset);
+			const endOffset = Math.max(h1.endOffset, h2.endOffset);
+			const el = getElementByXPath(h1.xpath);
+			return {
+				xpath: h1.xpath,
+				content: el?.textContent?.slice(startOffset, endOffset) ?? '',
+				type: 'text',
+				id: Date.now().toString(),
+				startOffset,
+				endOffset,
+			};
 		}
+		return h1;
 	}
 
-	return document.body; // Fallback to body if no common ancestor found
-}
-
-// Get all parent elements of a given element
-function getParents(element: Element): Element[] {
-	const parents: Element[] = [];
-	let currentElement: Element | null = element;
-
-	while (currentElement && currentElement !== document.body) {
-		parents.unshift(currentElement);
-		currentElement = currentElement.parentElement;
+	// Different xpaths — reachable when one contains the other (caller only
+	// merges overlapping highlights). Outer wins; inner is absorbed.
+	const el1 = getElementByXPath(h1.xpath);
+	const el2 = getElementByXPath(h2.xpath);
+	if (el1 && el2) {
+		if (el1.contains(el2)) return h1;
+		if (el2.contains(el1)) return h2;
 	}
-
-	parents.unshift(document.body);
-	return parents;
+	return h1;
 }
 
 // Save highlights to browser storage
@@ -1018,16 +954,17 @@ export function applyHighlights() {
 	isApplyingHighlights = true;
 
 	removeExistingHighlights();
-	
-	highlights.forEach((highlight, index) => {
+
+	highlights.forEach((highlight) => {
 		const container = getElementByXPath(highlight.xpath);
 		if (container) {
-			planHighlightOverlayRects(container, highlight, index);
+			planHighlightOverlayRects(container, highlight);
 		}
 	});
 
 	lastAppliedHighlights = currentHighlightsState;
 	isApplyingHighlights = false;
+	syncHoverListener();
 }
 
 // Apply, save, and update UI after highlight changes.
@@ -1041,6 +978,29 @@ function commitHighlightChanges() {
 // Get all highlight contents
 export function getHighlights(): string[] {
 	return highlights.map(h => h.content);
+}
+
+// Group highlights that share a groupId (produced by a single multi-block
+// selection) so export/display treats them as one logical highlight. Ungrouped
+// highlights pass through as single-element arrays. Order is preserved.
+export function groupHighlights(highlights: AnyHighlightData[]): AnyHighlightData[][] {
+	const groups: AnyHighlightData[][] = [];
+	const byGroupId = new Map<string, AnyHighlightData[]>();
+	for (const h of highlights) {
+		if (h.groupId) {
+			const existing = byGroupId.get(h.groupId);
+			if (existing) {
+				existing.push(h);
+				continue;
+			}
+			const arr: AnyHighlightData[] = [h];
+			byGroupId.set(h.groupId, arr);
+			groups.push(arr);
+		} else {
+			groups.push([h]);
+		}
+	}
+	return groups;
 }
 
 // Load highlights from browser storage
@@ -1063,12 +1023,13 @@ export async function loadHighlights() {
 
 	if (storedData && Array.isArray(storedData.highlights) && storedData.highlights.length > 0) {
 		highlights = storedData.highlights;
-		
-		// Load settings to check if "Always show highlights" is enabled
 		await loadSettings();
-		
+		// Always render stored highlights so the hover-delete affordance works
+		// regardless of highlighter mode. The alwaysShowHighlights setting is
+		// retained as a body-class marker for any external stylesheets that
+		// still gate on it.
+		applyHighlights();
 		if (generalSettings.alwaysShowHighlights) {
-			applyHighlights();
 			document.body.classList.add('obsidian-highlighter-always-show');
 		}
 	} else {
@@ -1087,6 +1048,7 @@ export function clearHighlights() {
 		browser.storage.local.set({ highlights: allHighlights }).then(() => {
 			highlights = [];
 			removeExistingHighlights();
+			syncHoverListener();
 			console.log('Highlights cleared for:', url);
 			browser.runtime.sendMessage({ action: "highlightsCleared" });
 			updateHighlighterMenu();
@@ -1134,30 +1096,26 @@ function addToHistory(type: 'add' | 'remove', oldHighlights: AnyHighlightData[],
 	updateUndoRedoButtons();
 }
 
-function isConsideredBlockElement(element: Element): boolean {
-	if (!element || typeof element.tagName !== 'string') return false;
-	const tagName = element.tagName.toUpperCase();
-	// Element must be an allowed highlight target AND a block tag we split by.
-	return ALLOWED_HIGHLIGHT_TAGS.includes(tagName) && BLOCK_LEVEL_TAGS_FOR_SPLIT.includes(tagName);
-}
-
-// Helper to find the closest ancestor that is an allowed highlightable block
-function getClosestAllowedBlock(node: Node | null): Element | null {
+// Nearest ancestor block that wraps a text selection fragment (the unit by
+// which a multi-block selection is split into separate highlights).
+function getClosestTextBlock(node: Node | null): Element | null {
 	let current: Node | null = node;
 	while (current) {
 		if (current.nodeType === Node.ELEMENT_NODE) {
 			const el = current as Element;
-			// Transcript handling: the timestamp <strong> must not produce a
-			// highlight block (otherwise a cross-segment selection walks up
-			// past it and snaps to the outer <p>, pulling the timestamp
-			// column into the highlight). The sibling text wrapper acts as
-			// the block instead, scoping highlights to the text portion.
+			// Transcript timestamp <strong> must not act as a block — otherwise
+			// a cross-segment selection walks up past it and snaps to the outer
+			// <p>, pulling the timestamp column into the highlight.
 			if (el.parentElement?.classList.contains('transcript-segment')) {
 				if (el.tagName === 'STRONG') return null;
 				if (el.classList.contains('transcript-segment-text')) return el;
 			}
-			// Check if it's an allowed tag overall and if it's a block element we use for splitting text selections.
-			if (ALLOWED_HIGHLIGHT_TAGS.includes(el.tagName.toUpperCase()) && isConsideredBlockElement(el)) {
+			const tag = el.tagName.toUpperCase();
+			if (TEXT_BLOCK_SPLIT_TAGS.includes(tag)) {
+				// A <p> wrapped in an <li> is common list markup; prefer the <li>
+				// so the stored content carries the list structure and renders
+				// correctly when regrouped in highlights.html.
+				if (tag === 'P' && el.parentElement?.tagName === 'LI') return el.parentElement;
 				return el;
 			}
 		}
