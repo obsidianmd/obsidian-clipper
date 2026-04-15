@@ -19,14 +19,21 @@ export async function updateCurrentActiveTab(windowId: number) {
 	}
 }
 
-export function isValidUrl(url: string): boolean {
-	return url.startsWith('http://') || 
-		   url.startsWith('https://') || 
+export function isValidUrl(url: string | undefined): boolean {
+	if (!url) return false;
+	return url.startsWith('http://') ||
+		   url.startsWith('https://') ||
 		   url.startsWith('file:///');
 }
 
 export function isBlankPage(url: string): boolean {
 	return url === 'about:blank' || url === 'chrome://newtab/' || url === 'edge://newtab/';
+}
+
+// Returns true for tabs where content scripts can be injected.
+// False for extension pages, restricted URLs, or tabs with unknown URLs.
+export function isNormalPageUrl(url: string | undefined): boolean {
+	return !!url && isValidUrl(url) && !isBlankPage(url);
 }
 
 export function isRestrictedUrl(url: string): boolean {

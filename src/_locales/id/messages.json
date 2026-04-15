@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Pengaturan Lanjutan"
 	},
+	"allHighlights": {
+		"message": "Semua sorotan"
+	},
 	"allProperties": {
 		"message": "Semua properti"
 	},
@@ -162,6 +165,15 @@
 	"delete": {
 		"message": "Hapus"
 	},
+	"deleteAllHighlightsConfirm": {
+		"message": "Yakin ingin menghapus semua sorotan?"
+	},
+	"deleteHighlightsForDomain": {
+		"message": "Hapus semua sorotan untuk domain ini?"
+	},
+	"deleteHighlightsForPage": {
+		"message": "Hapus semua sorotan untuk halaman ini?"
+	},
 	"deleteModelConfirm": {
 		"message": "Apakah Anda yakin ingin menghapus model ini?"
 	},
@@ -196,6 +208,9 @@
 	},
 	"earlyAccessFeatures": {
 		"message": "Fitur early access"
+	},
+	"edit": {
+		"message": "Edit"
 	},
 	"editModel": {
 		"message": "Edit model"
@@ -360,6 +375,12 @@
 	"highlighterSettings": {
 		"message": "Penyorot"
 	},
+	"highlights": {
+		"message": "Sorotan"
+	},
+	"highlightsNotFound": {
+		"message": "Sorotan tidak ditemukan dalam artikel"
+	},
 	"history": {
 		"message": "Riwayat"
 	},
@@ -445,6 +466,12 @@
 	"legacyModeDescription": {
 		"message": "Menggunakan metode klip URI yang kompatibel dengan Obsidian 1.6.7 atau yang lebih lama. Perhatikan bahwa panjang konten yang dapat Anda klip dibatasi oleh browser dan sistem operasi Anda. Beberapa laman web bisa saja gagal tanpa ada pesan error yang tampil."
 	},
+	"loadArticle": {
+		"message": "Baca artikel"
+	},
+	"loading": {
+		"message": "Memuat…"
+	},
 	"modelName": {
 		"message": "Nama model"
 	},
@@ -477,6 +504,9 @@
 	},
 	"noHighlights": {
 		"message": "Tidak melakukan apa-apa"
+	},
+	"noResults": {
+		"message": "Tidak ada hasil yang ditemukan"
 	},
 	"noTemplates": {
 		"message": "Tidak ada template yang tersedia. Silakan tambahkan template di pengaturan."
@@ -530,6 +560,12 @@
 	},
 	"openEmbedded": {
 		"message": "Buka di halaman"
+	},
+	"openHighlights": {
+		"message": "Buka sorotan"
+	},
+	"openReader": {
+		"message": "Buka Pembaca"
 	},
 	"openSidePanel": {
 		"message": "Buka panel samping"
@@ -768,6 +804,9 @@
 	"readerLineWidth": {
 		"message": "Lebar baris"
 	},
+	"readerLoadFailed": {
+		"message": "Gagal memuat. Halaman mungkin diblokir oleh browser Anda."
+	},
 	"readerLoading": {
 		"message": "Mengurai…"
 	},
@@ -797,6 +836,9 @@
 	},
 	"readerTypography": {
 		"message": "Tipografi"
+	},
+	"readerUrlPlaceholder": {
+		"message": "Tempel URL untuk dibaca…"
 	},
 	"readerViewFullSize": {
 		"message": "Lihat ukuran penuh"
@@ -851,6 +893,9 @@
 	},
 	"saveFile": {
 		"message": "Simpan file..."
+	},
+	"searchHighlightsPlaceholder": {
+		"message": "Cari sorotan…"
 	},
 	"searchVariables": {
 		"message": "Cari variabel..."
@@ -911,6 +956,21 @@
 	},
 	"silentOpenDescription": {
 		"message": "Catatan yang diklip akan disimpan, tetapi tidak akan dibuka di dalam tab baru. Obsidian tetap akan diangkat ke latar depan."
+	},
+	"sort": {
+		"message": "Urutkan"
+	},
+	"sortAZ": {
+		"message": "A ke Z"
+	},
+	"sortNewOld": {
+		"message": "Terbaru dulu"
+	},
+	"sortOldNew": {
+		"message": "Terlama dulu"
+	},
+	"sortZA": {
+		"message": "Z ke A"
 	},
 	"specificNoteName": {
 		"message": "Nama catatan spesifik"

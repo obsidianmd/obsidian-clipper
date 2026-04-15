@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "កម្រិតខ្ពស់"
 	},
+	"allHighlights": {
+		"message": "ការរំលេចទាំងអស់"
+	},
 	"allProperties": {
 		"message": "លក្ខណៈសម្បត្តិទាំងអស់"
 	},
@@ -162,6 +165,15 @@
 	"delete": {
 		"message": "លុប"
 	},
+	"deleteAllHighlightsConfirm": {
+		"message": "តើអ្នកប្រាកដថាចង់លុបការរំលេចទាំងអស់មែនទេ?"
+	},
+	"deleteHighlightsForDomain": {
+		"message": "លុបការរំលេចទាំងអស់សម្រាប់ដូម៉ែននេះ?"
+	},
+	"deleteHighlightsForPage": {
+		"message": "លុបការរំលេចទាំងអស់សម្រាប់ទំព័រនេះ?"
+	},
 	"deleteModelConfirm": {
 		"message": "តើអ្នកប្រាកដថាចង់លុបម៉ូដែលនេះមែនទេ?"
 	},
@@ -196,6 +208,9 @@
 	},
 	"earlyAccessFeatures": {
 		"message": "មុខងារ Early access"
+	},
+	"edit": {
+		"message": "កែសម្រួល"
 	},
 	"editModel": {
 		"message": "កែសម្រួលម៉ូដែល"
@@ -360,6 +375,12 @@
 	"highlighterSettings": {
 		"message": "ឧបករណ៍រំលេច"
 	},
+	"highlights": {
+		"message": "ការរំលេច"
+	},
+	"highlightsNotFound": {
+		"message": "រកមិនឃើញការរំលេចនៅក្នុងអត្ថបទ"
+	},
 	"history": {
 		"message": "ប្រវត្តិ"
 	},
@@ -445,6 +466,12 @@
 	"legacyModeDescription": {
 		"message": "ប្រើវិធីកាត់យកតាម URI ដែលឆបគ្នាជាមួយ Obsidian 1.6.7 ឬចាស់ជាងនេះ។ សូមចំណាំថា ប្រវែងមាតិកាដែលអ្នកអាចកាត់យកបាន ត្រូវបានកំណត់ដោយកម្មវិធីរុករក និងប្រព័ន្ធប្រតិបត្តិការរបស់អ្នក។ ទំព័រខ្លះអាចបរាជ័យដោយគ្មានកំហុសណាមួយ។"
 	},
+	"loadArticle": {
+		"message": "អានអត្ថបទ"
+	},
+	"loading": {
+		"message": "កំពុងផ្ទុក…"
+	},
 	"modelName": {
 		"message": "ឈ្មោះបង្ហាញ"
 	},
@@ -477,6 +504,9 @@
 	},
 	"noHighlights": {
 		"message": "មិនធ្វើអ្វីទេ"
+	},
+	"noResults": {
+		"message": "រកមិនឃើញលទ្ធផល"
 	},
 	"noTemplates": {
 		"message": "មិនមានគំរូទេ។ សូមបន្ថែមគំរូនៅក្នុងការកំណត់។"
@@ -530,6 +560,12 @@
 	},
 	"openEmbedded": {
 		"message": "បើកក្នុងទំព័រ"
+	},
+	"openHighlights": {
+		"message": "បើកការរំលេច"
+	},
+	"openReader": {
+		"message": "បើកកម្មវិធីអាន"
 	},
 	"openSidePanel": {
 		"message": "បើកផ្ទាំងចំហៀង"
@@ -768,6 +804,9 @@
 	"readerLineWidth": {
 		"message": "ទទឹងបន្ទាត់"
 	},
+	"readerLoadFailed": {
+		"message": "ផ្ទុកបរាជ័យ។ ទំព័រនេះអាចត្រូវបានទប់ស្កាត់ដោយកម្មវិធីរុករករបស់អ្នក។"
+	},
 	"readerLoading": {
 		"message": "កំពុងសម្រួល…"
 	},
@@ -797,6 +836,9 @@
 	},
 	"readerTypography": {
 		"message": "អក្សរសាស្ត្រ"
+	},
+	"readerUrlPlaceholder": {
+		"message": "បិទភ្ជាប់ URL ដើម្បីអាន…"
 	},
 	"readerViewFullSize": {
 		"message": "មើលទំហំពេញ"
@@ -851,6 +893,9 @@
 	},
 	"saveFile": {
 		"message": "រក្សាទុកឯកសារ..."
+	},
+	"searchHighlightsPlaceholder": {
+		"message": "ស្វែងរកការរំលេច…"
 	},
 	"searchVariables": {
 		"message": "ស្វែងរកអថេរ..."
@@ -911,6 +956,21 @@
 	},
 	"silentOpenDescription": {
 		"message": "កំណត់ត្រាដែលបានកាត់យកនឹងត្រូវបានរក្សាទុក ប៉ុន្តែមិនបើកជាផ្ទាំងថ្មីទេ។ Obsidian នឹងត្រូវបាននាំមកខាងមុខនៅតែដដែល។"
+	},
+	"sort": {
+		"message": "តម្រៀប"
+	},
+	"sortAZ": {
+		"message": "A ទៅ Z"
+	},
+	"sortNewOld": {
+		"message": "ថ្មីបំផុតមុន"
+	},
+	"sortOldNew": {
+		"message": "ចាស់បំផុតមុន"
+	},
+	"sortZA": {
+		"message": "Z ទៅ A"
 	},
 	"specificNoteName": {
 		"message": "ឈ្មោះកំណត់ត្រាជាក់លាក់"

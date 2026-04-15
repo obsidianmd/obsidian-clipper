@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Nâng cao"
 	},
+	"allHighlights": {
+		"message": "Tất cả đoạn tô sáng"
+	},
 	"allProperties": {
 		"message": "Tất cả thuộc tính"
 	},
@@ -162,6 +165,15 @@
 	"delete": {
 		"message": "Xóa"
 	},
+	"deleteAllHighlightsConfirm": {
+		"message": "Bạn có chắc muốn xóa tất cả đoạn tô sáng không?"
+	},
+	"deleteHighlightsForDomain": {
+		"message": "Xóa tất cả đoạn tô sáng cho tên miền này?"
+	},
+	"deleteHighlightsForPage": {
+		"message": "Xóa tất cả đoạn tô sáng cho trang này?"
+	},
 	"deleteModelConfirm": {
 		"message": "Bạn có chắc chắn muốn xóa mô hình này?"
 	},
@@ -196,6 +208,9 @@
 	},
 	"earlyAccessFeatures": {
 		"message": "Tính năng truy cập sớm"
+	},
+	"edit": {
+		"message": "Chỉnh sửa"
 	},
 	"editModel": {
 		"message": "Chỉnh sửa mô hình"
@@ -360,6 +375,12 @@
 	"highlighterSettings": {
 		"message": "Đánh dấu"
 	},
+	"highlights": {
+		"message": "Đoạn tô sáng"
+	},
+	"highlightsNotFound": {
+		"message": "Không tìm thấy đoạn tô sáng trong bài viết"
+	},
 	"history": {
 		"message": "Lịch sử"
 	},
@@ -445,6 +466,12 @@
 	"legacyModeDescription": {
 		"message": "Sử dụng phương thức lưu URI tương thích với Obsidian 1.6.7 hoặc cũ hơn. Lưu ý rằng độ dài nội dung bạn có thể lưu bị giới hạn bởi trình duyệt và hệ điều hành của bạn. Một số trang có thể thất bại mà không có thông báo lỗi."
 	},
+	"loadArticle": {
+		"message": "Đọc bài viết"
+	},
+	"loading": {
+		"message": "Đang tải…"
+	},
 	"modelName": {
 		"message": "Tên hiển thị"
 	},
@@ -477,6 +504,9 @@
 	},
 	"noHighlights": {
 		"message": "Không làm gì"
+	},
+	"noResults": {
+		"message": "Không tìm thấy kết quả"
 	},
 	"noTemplates": {
 		"message": "Không có mẫu khả dụng. Vui lòng thêm mẫu trong cài đặt."
@@ -530,6 +560,12 @@
 	},
 	"openEmbedded": {
 		"message": "Mở trong trang"
+	},
+	"openHighlights": {
+		"message": "Mở đoạn tô sáng"
+	},
+	"openReader": {
+		"message": "Mở Trình đọc"
 	},
 	"openSidePanel": {
 		"message": "Mở bảng bên"
@@ -768,6 +804,9 @@
 	"readerLineWidth": {
 		"message": "Độ rộng dòng"
 	},
+	"readerLoadFailed": {
+		"message": "Không thể tải. Trang có thể bị trình duyệt của bạn chặn."
+	},
 	"readerLoading": {
 		"message": "Đang làm rõ…"
 	},
@@ -797,6 +836,9 @@
 	},
 	"readerTypography": {
 		"message": "Kiểu chữ"
+	},
+	"readerUrlPlaceholder": {
+		"message": "Dán URL để đọc…"
 	},
 	"readerViewFullSize": {
 		"message": "Xem kích thước đầy đủ"
@@ -851,6 +893,9 @@
 	},
 	"saveFile": {
 		"message": "Lưu tệp..."
+	},
+	"searchHighlightsPlaceholder": {
+		"message": "Tìm kiếm đoạn tô sáng…"
 	},
 	"searchVariables": {
 		"message": "Tìm kiếm biến..."
@@ -911,6 +956,21 @@
 	},
 	"silentOpenDescription": {
 		"message": "Ghi chú đã lưu sẽ được lưu nhưng không mở trong tab mới. Obsidian vẫn sẽ được đưa lên phía trước."
+	},
+	"sort": {
+		"message": "Sắp xếp"
+	},
+	"sortAZ": {
+		"message": "A đến Z"
+	},
+	"sortNewOld": {
+		"message": "Mới nhất trước"
+	},
+	"sortOldNew": {
+		"message": "Cũ nhất trước"
+	},
+	"sortZA": {
+		"message": "Z đến A"
 	},
 	"specificNoteName": {
 		"message": "Tên ghi chú cụ thể"

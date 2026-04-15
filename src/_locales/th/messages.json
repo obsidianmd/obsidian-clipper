@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "ขั้นสูง"
 	},
+	"allHighlights": {
+		"message": "ไฮไลต์ทั้งหมด"
+	},
 	"allProperties": {
 		"message": "คุณสมบัติทั้งหมด"
 	},
@@ -162,6 +165,15 @@
 	"delete": {
 		"message": "ลบ"
 	},
+	"deleteAllHighlightsConfirm": {
+		"message": "คุณแน่ใจหรือไม่ว่าต้องการลบไฮไลต์ทั้งหมด?"
+	},
+	"deleteHighlightsForDomain": {
+		"message": "ลบไฮไลต์ทั้งหมดสำหรับโดเมนนี้?"
+	},
+	"deleteHighlightsForPage": {
+		"message": "ลบไฮไลต์ทั้งหมดสำหรับหน้านี้?"
+	},
 	"deleteModelConfirm": {
 		"message": "คุณแน่ใจหรือไม่ว่าต้องการลบโมเดลนี้?"
 	},
@@ -196,6 +208,9 @@
 	},
 	"earlyAccessFeatures": {
 		"message": "คุณสมบัติ Early Access"
+	},
+	"edit": {
+		"message": "แก้ไข"
 	},
 	"editModel": {
 		"message": "แก้ไขโมเดล"
@@ -360,6 +375,12 @@
 	"highlighterSettings": {
 		"message": "ตัวไฮไลต์"
 	},
+	"highlights": {
+		"message": "ไฮไลต์"
+	},
+	"highlightsNotFound": {
+		"message": "ไม่พบไฮไลต์ในบทความ"
+	},
 	"history": {
 		"message": "ประวัติ"
 	},
@@ -445,6 +466,12 @@
 	"legacyModeDescription": {
 		"message": "ใช้วิธีการคลิป URI ที่เข้ากันได้กับ Obsidian 1.6.7 หรือเก่ากว่า โปรดทราบว่าความยาวของเนื้อหาที่คุณสามารถคลิปได้ถูกจำกัดโดยเบราว์เซอร์และระบบปฏิบัติการของคุณ บางหน้าอาจล้มเหลวโดยไม่มีข้อความแสดงข้อผิดพลาด"
 	},
+	"loadArticle": {
+		"message": "อ่านบทความ"
+	},
+	"loading": {
+		"message": "กำลังโหลด…"
+	},
 	"modelName": {
 		"message": "ชื่อที่แสดง"
 	},
@@ -477,6 +504,9 @@
 	},
 	"noHighlights": {
 		"message": "ไม่ทำอะไร"
+	},
+	"noResults": {
+		"message": "ไม่พบผลลัพธ์"
 	},
 	"noTemplates": {
 		"message": "ไม่มีเทมเพลตที่ใช้ได้ เพิ่มเทมเพลตในการตั้งค่า"
@@ -530,6 +560,12 @@
 	},
 	"openEmbedded": {
 		"message": "เปิดในหน้า"
+	},
+	"openHighlights": {
+		"message": "เปิดไฮไลต์"
+	},
+	"openReader": {
+		"message": "เปิดโหมดอ่าน"
 	},
 	"openSidePanel": {
 		"message": "เปิดแผงด้านข้าง"
@@ -768,6 +804,9 @@
 	"readerLineWidth": {
 		"message": "ความกว้างบรรทัด"
 	},
+	"readerLoadFailed": {
+		"message": "โหลดไม่สำเร็จ หน้านี้อาจถูกบล็อกโดยเบราว์เซอร์ของคุณ"
+	},
 	"readerLoading": {
 		"message": "กำลังทำให้เข้าใจง่าย…"
 	},
@@ -797,6 +836,9 @@
 	},
 	"readerTypography": {
 		"message": "การจัดตัวพิมพ์"
+	},
+	"readerUrlPlaceholder": {
+		"message": "วาง URL เพื่ออ่าน…"
 	},
 	"readerViewFullSize": {
 		"message": "ดูขนาดเต็ม"
@@ -851,6 +893,9 @@
 	},
 	"saveFile": {
 		"message": "บันทึกไฟล์..."
+	},
+	"searchHighlightsPlaceholder": {
+		"message": "ค้นหาไฮไลต์…"
 	},
 	"searchVariables": {
 		"message": "ค้นหาตัวแปร..."
@@ -911,6 +956,21 @@
 	},
 	"silentOpenDescription": {
 		"message": "บันทึกที่คลิปจะถูกบันทึกแต่ไม่เปิดเป็นแท็บใหม่ Obsidian จะยังคงถูกนำมาไว้ด้านหน้า"
+	},
+	"sort": {
+		"message": "จัดเรียง"
+	},
+	"sortAZ": {
+		"message": "A ถึง Z"
+	},
+	"sortNewOld": {
+		"message": "ใหม่สุดก่อน"
+	},
+	"sortOldNew": {
+		"message": "เก่าสุดก่อน"
+	},
+	"sortZA": {
+		"message": "Z ถึง A"
 	},
 	"specificNoteName": {
 		"message": "ชื่อบันทึกเฉพาะ"

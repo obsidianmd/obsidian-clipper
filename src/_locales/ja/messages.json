@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "詳細設定"
 	},
+	"allHighlights": {
+		"message": "すべてのハイライト"
+	},
 	"allProperties": {
 		"message": "すべてのプロパティ"
 	},
@@ -162,6 +165,15 @@
 	"delete": {
 		"message": "削除"
 	},
+	"deleteAllHighlightsConfirm": {
+		"message": "すべてのハイライトを削除してもよろしいですか？"
+	},
+	"deleteHighlightsForDomain": {
+		"message": "このドメインのハイライトをすべて削除しますか？"
+	},
+	"deleteHighlightsForPage": {
+		"message": "このページのハイライトをすべて削除しますか？"
+	},
 	"deleteModelConfirm": {
 		"message": "このモデルを削除してもよろしいですか？"
 	},
@@ -196,6 +208,9 @@
 	},
 	"earlyAccessFeatures": {
 		"message": "アーリーアクセス機能"
+	},
+	"edit": {
+		"message": "編集"
 	},
 	"editModel": {
 		"message": "モデルを編集"
@@ -360,6 +375,12 @@
 	"highlighterSettings": {
 		"message": "ハイライト"
 	},
+	"highlights": {
+		"message": "ハイライト"
+	},
+	"highlightsNotFound": {
+		"message": "記事内にハイライトが見つかりません"
+	},
 	"history": {
 		"message": "履歴"
 	},
@@ -445,6 +466,12 @@
 	"legacyModeDescription": {
 		"message": "Obsidian 1.6.7以前と互換性のあるURIクリップ方式を使用します。クリップできるコンテンツの長さはブラウザとOSによって制限されます。エラーなしに失敗する場合があります。"
 	},
+	"loadArticle": {
+		"message": "記事を読む"
+	},
+	"loading": {
+		"message": "読み込み中…"
+	},
 	"modelName": {
 		"message": "モデル名"
 	},
@@ -477,6 +504,9 @@
 	},
 	"noHighlights": {
 		"message": "何もしない"
+	},
+	"noResults": {
+		"message": "結果が見つかりません"
 	},
 	"noTemplates": {
 		"message": "テンプレートがありません。設定でテンプレートを追加してください。"
@@ -530,6 +560,12 @@
 	},
 	"openEmbedded": {
 		"message": "ページ内で開く"
+	},
+	"openHighlights": {
+		"message": "ハイライトを開く"
+	},
+	"openReader": {
+		"message": "リーダーを開く"
 	},
 	"openSidePanel": {
 		"message": "サイドパネルを開く"
@@ -768,6 +804,9 @@
 	"readerLineWidth": {
 		"message": "行幅"
 	},
+	"readerLoadFailed": {
+		"message": "読み込みに失敗しました。ページがブラウザによってブロックされている可能性があります。"
+	},
 	"readerLoading": {
 		"message": "読みやすくしています…"
 	},
@@ -797,6 +836,9 @@
 	},
 	"readerTypography": {
 		"message": "タイポグラフィ"
+	},
+	"readerUrlPlaceholder": {
+		"message": "読むURLを貼り付け…"
 	},
 	"readerViewFullSize": {
 		"message": "フルサイズで表示"
@@ -851,6 +893,9 @@
 	},
 	"saveFile": {
 		"message": "ファイルを保存..."
+	},
+	"searchHighlightsPlaceholder": {
+		"message": "ハイライトを検索…"
 	},
 	"searchVariables": {
 		"message": "変数を検索..."
@@ -911,6 +956,21 @@
 	},
 	"silentOpenDescription": {
 		"message": "クリップしたノートは保存されますが、新しいタブで開きません。Obsidianは引き続き前面に表示されます。"
+	},
+	"sort": {
+		"message": "並べ替え"
+	},
+	"sortAZ": {
+		"message": "A→Z"
+	},
+	"sortNewOld": {
+		"message": "新しい順"
+	},
+	"sortOldNew": {
+		"message": "古い順"
+	},
+	"sortZA": {
+		"message": "Z→A"
 	},
 	"specificNoteName": {
 		"message": "特定のノート名"

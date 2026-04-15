@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "고급 설정"
 	},
+	"allHighlights": {
+		"message": "모든 하이라이트"
+	},
 	"allProperties": {
 		"message": "모든 속성"
 	},
@@ -162,6 +165,15 @@
 	"delete": {
 		"message": "삭제"
 	},
+	"deleteAllHighlightsConfirm": {
+		"message": "모든 하이라이트를 삭제하시겠습니까?"
+	},
+	"deleteHighlightsForDomain": {
+		"message": "이 도메인의 모든 하이라이트를 삭제하시겠습니까?"
+	},
+	"deleteHighlightsForPage": {
+		"message": "이 페이지의 모든 하이라이트를 삭제하시겠습니까?"
+	},
 	"deleteModelConfirm": {
 		"message": "이 모델을 삭제하시겠습니까?"
 	},
@@ -196,6 +208,9 @@
 	},
 	"earlyAccessFeatures": {
 		"message": "얼리 액세스 기능"
+	},
+	"edit": {
+		"message": "편집"
 	},
 	"editModel": {
 		"message": "모델 편집"
@@ -360,6 +375,12 @@
 	"highlighterSettings": {
 		"message": "하이라이터 설정"
 	},
+	"highlights": {
+		"message": "하이라이트"
+	},
+	"highlightsNotFound": {
+		"message": "문서에서 하이라이트를 찾을 수 없습니다"
+	},
 	"history": {
 		"message": "기록"
 	},
@@ -445,6 +466,12 @@
 	"legacyModeDescription": {
 		"message": "Obsidian 1.6.7 이하 버전과 호환되는 URI 클리핑 방법을 사용합니다. 클립할 수 있는 내용량은 브라우저와 OS에 따라 제한됩니다. 일부 페이지는 오류 없이 실패할 수 있습니다."
 	},
+	"loadArticle": {
+		"message": "문서 읽기"
+	},
+	"loading": {
+		"message": "로딩 중…"
+	},
 	"modelName": {
 		"message": "모델 이름"
 	},
@@ -477,6 +504,9 @@
 	},
 	"noHighlights": {
 		"message": "하이라이트 없음"
+	},
+	"noResults": {
+		"message": "결과가 없습니다"
 	},
 	"noTemplates": {
 		"message": "템플릿 없음. 설정에서 템플릿을 추가하세요."
@@ -530,6 +560,12 @@
 	},
 	"openEmbedded": {
 		"message": "페이지에서 열기"
+	},
+	"openHighlights": {
+		"message": "하이라이트 열기"
+	},
+	"openReader": {
+		"message": "리더 열기"
 	},
 	"openSidePanel": {
 		"message": "사이드 패널 열기"
@@ -768,6 +804,9 @@
 	"readerLineWidth": {
 		"message": "줄 너비"
 	},
+	"readerLoadFailed": {
+		"message": "불러오지 못했습니다. 브라우저에서 이 페이지가 차단되었을 수 있습니다."
+	},
 	"readerLoading": {
 		"message": "정리 중…"
 	},
@@ -797,6 +836,9 @@
 	},
 	"readerTypography": {
 		"message": "타이포그래피"
+	},
+	"readerUrlPlaceholder": {
+		"message": "읽을 URL을 붙여넣기…"
 	},
 	"readerViewFullSize": {
 		"message": "원본 크기로 보기"
@@ -851,6 +893,9 @@
 	},
 	"saveFile": {
 		"message": "파일 저장..."
+	},
+	"searchHighlightsPlaceholder": {
+		"message": "하이라이트 검색…"
 	},
 	"searchVariables": {
 		"message": "변수 검색..."
@@ -911,6 +956,21 @@
 	},
 	"silentOpenDescription": {
 		"message": "클립된 노트는 저장되지만 새 탭으로 열리지 않습니다. Obsidian은 포그라운드에서 실행됩니다."
+	},
+	"sort": {
+		"message": "정렬"
+	},
+	"sortAZ": {
+		"message": "A→Z"
+	},
+	"sortNewOld": {
+		"message": "최신순"
+	},
+	"sortOldNew": {
+		"message": "오래된 순"
+	},
+	"sortZA": {
+		"message": "Z→A"
 	},
 	"specificNoteName": {
 		"message": "특정 노트 이름"

@@ -8,6 +8,7 @@
 		"activeTab",
 		"clipboardWrite",
 		"contextMenus",
+		"nativeMessaging",
 		"storage",
 		"scripting"
 	],

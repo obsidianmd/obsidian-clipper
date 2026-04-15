@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "進階"
 	},
+	"allHighlights": {
+		"message": "所有螢光標記"
+	},
 	"allProperties": {
 		"message": "所有屬性"
 	},
@@ -162,6 +165,15 @@
 	"delete": {
 		"message": "刪除"
 	},
+	"deleteAllHighlightsConfirm": {
+		"message": "確定要刪除所有螢光標記嗎？"
+	},
+	"deleteHighlightsForDomain": {
+		"message": "要刪除此網域的所有螢光標記嗎？"
+	},
+	"deleteHighlightsForPage": {
+		"message": "要刪除此頁面的所有螢光標記嗎？"
+	},
 	"deleteModelConfirm": {
 		"message": "您確定要刪除此模型嗎？"
 	},
@@ -196,6 +208,9 @@
 	},
 	"earlyAccessFeatures": {
 		"message": "早期訪問功能"
+	},
+	"edit": {
+		"message": "編輯"
 	},
 	"editModel": {
 		"message": "編輯模型"
@@ -360,6 +375,12 @@
 	"highlighterSettings": {
 		"message": "標記工具設定"
 	},
+	"highlights": {
+		"message": "螢光標記"
+	},
+	"highlightsNotFound": {
+		"message": "文章中找不到螢光標記"
+	},
 	"history": {
 		"message": "歷史"
 	},
@@ -445,6 +466,12 @@
 	"legacyModeDescription": {
 		"message": "使用與 Obsidian 1.6.7 或更早版本相容的 URI 擷取方法。請注意，您可以擷取的內容長度受限於您的瀏覽器和作業系統。有些頁面可能會在沒有任何錯誤的情況下失敗。"
 	},
+	"loadArticle": {
+		"message": "閱讀文章"
+	},
+	"loading": {
+		"message": "載入中…"
+	},
 	"modelName": {
 		"message": "模型名稱"
 	},
@@ -477,6 +504,9 @@
 	},
 	"noHighlights": {
 		"message": "不執行任何操作"
+	},
+	"noResults": {
+		"message": "找不到結果"
 	},
 	"noTemplates": {
 		"message": "沒有可用的範本。請在設定中新增範本。"
@@ -530,6 +560,12 @@
 	},
 	"openEmbedded": {
 		"message": "在頁面中開啟"
+	},
+	"openHighlights": {
+		"message": "開啟螢光標記"
+	},
+	"openReader": {
+		"message": "開啟閱讀器"
 	},
 	"openSidePanel": {
 		"message": "開啟側邊面板"
@@ -768,6 +804,9 @@
 	"readerLineWidth": {
 		"message": "行寬"
 	},
+	"readerLoadFailed": {
+		"message": "載入失敗。此頁面可能被您的瀏覽器封鎖。"
+	},
 	"readerLoading": {
 		"message": "正在去除雜訊…"
 	},
@@ -797,6 +836,9 @@
 	},
 	"readerTypography": {
 		"message": "排版"
+	},
+	"readerUrlPlaceholder": {
+		"message": "貼上要閱讀的 URL…"
 	},
 	"readerViewFullSize": {
 		"message": "檢視原始大小"
@@ -851,6 +893,9 @@
 	},
 	"saveFile": {
 		"message": "儲存檔案..."
+	},
+	"searchHighlightsPlaceholder": {
+		"message": "搜尋螢光標記…"
 	},
 	"searchVariables": {
 		"message": "搜尋變數..."
@@ -911,6 +956,21 @@
 	},
 	"silentOpenDescription": {
 		"message": "擷取的筆記將被儲存但不會開啟為新標籤。Obsidian 仍會被提到上層。"
+	},
+	"sort": {
+		"message": "排序"
+	},
+	"sortAZ": {
+		"message": "A 到 Z"
+	},
+	"sortNewOld": {
+		"message": "最新優先"
+	},
+	"sortOldNew": {
+		"message": "最舊優先"
+	},
+	"sortZA": {
+		"message": "Z 到 A"
 	},
 	"specificNoteName": {
 		"message": "特定筆記名稱"

@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Avancerat"
 	},
+	"allHighlights": {
+		"message": "Alla markeringar"
+	},
 	"allProperties": {
 		"message": "Alla egenskaper"
 	},
@@ -162,6 +165,15 @@
 	"delete": {
 		"message": "Ta bort"
 	},
+	"deleteAllHighlightsConfirm": {
+		"message": "Är du säker på att du vill ta bort alla markeringar?"
+	},
+	"deleteHighlightsForDomain": {
+		"message": "Ta bort alla markeringar för den här domänen?"
+	},
+	"deleteHighlightsForPage": {
+		"message": "Ta bort alla markeringar för den här sidan?"
+	},
 	"deleteModelConfirm": {
 		"message": "Är du säker på att du vill ta bort denna modell?"
 	},
@@ -196,6 +208,9 @@
 	},
 	"earlyAccessFeatures": {
 		"message": "Early access-funktioner"
+	},
+	"edit": {
+		"message": "Redigera"
 	},
 	"editModel": {
 		"message": "Redigera modell"
@@ -360,6 +375,12 @@
 	"highlighterSettings": {
 		"message": "Markering"
 	},
+	"highlights": {
+		"message": "Markeringar"
+	},
+	"highlightsNotFound": {
+		"message": "Inga markeringar hittades i artikeln"
+	},
 	"history": {
 		"message": "Historik"
 	},
@@ -445,6 +466,12 @@
 	"legacyModeDescription": {
 		"message": "Använder URI-klippmetoden som är kompatibel med Obsidian 1.6.7 eller tidigare. Observera att längden på innehållet du kan klippa är begränsad av din webbläsare och operativsystem. Vissa sidor kan misslyckas utan felmeddelanden."
 	},
+	"loadArticle": {
+		"message": "Läs artikel"
+	},
+	"loading": {
+		"message": "Läser in…"
+	},
 	"modelName": {
 		"message": "Visningsnamn"
 	},
@@ -477,6 +504,9 @@
 	},
 	"noHighlights": {
 		"message": "Gör ingenting"
+	},
+	"noResults": {
+		"message": "Inga resultat hittades"
 	},
 	"noTemplates": {
 		"message": "Inga mallar tillgängliga. Lägg till en mall i inställningarna."
@@ -530,6 +560,12 @@
 	},
 	"openEmbedded": {
 		"message": "Öppna på sidan"
+	},
+	"openHighlights": {
+		"message": "Öppna markeringar"
+	},
+	"openReader": {
+		"message": "Öppna läsläge"
 	},
 	"openSidePanel": {
 		"message": "Öppna sidopanel"
@@ -768,6 +804,9 @@
 	"readerLineWidth": {
 		"message": "Radbredd"
 	},
+	"readerLoadFailed": {
+		"message": "Det gick inte att läsa in. Sidan kan vara blockerad av din webbläsare."
+	},
 	"readerLoading": {
 		"message": "Rensar…"
 	},
@@ -797,6 +836,9 @@
 	},
 	"readerTypography": {
 		"message": "Typografi"
+	},
+	"readerUrlPlaceholder": {
+		"message": "Klistra in en URL att läsa…"
 	},
 	"readerViewFullSize": {
 		"message": "Visa i full storlek"
@@ -851,6 +893,9 @@
 	},
 	"saveFile": {
 		"message": "Spara fil..."
+	},
+	"searchHighlightsPlaceholder": {
+		"message": "Sök markeringar…"
 	},
 	"searchVariables": {
 		"message": "Sök variabler..."
@@ -911,6 +956,21 @@
 	},
 	"silentOpenDescription": {
 		"message": "Klippta anteckningar kommer att sparas men inte öppnas som en ny flik. Obsidian kommer fortfarande att flyttas till förgrunden."
+	},
+	"sort": {
+		"message": "Sortera"
+	},
+	"sortAZ": {
+		"message": "A till Ö"
+	},
+	"sortNewOld": {
+		"message": "Nyaste först"
+	},
+	"sortOldNew": {
+		"message": "Äldsta först"
+	},
+	"sortZA": {
+		"message": "Ö till A"
 	},
 	"specificNoteName": {
 		"message": "Specifikt anteckningsnamn"

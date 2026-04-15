@@ -35,6 +35,7 @@ function isIgnoredElement(element: Element): boolean {
 		element.closest('.obsidian-highlighter-menu') !== null ||
 		element.classList.contains('obsidian-reader-settings') ||
 		element.closest('.obsidian-reader-settings') !== null ||
+		element.closest('.transcript-segment > strong') !== null ||
 		isDisallowedTag;
 }
 

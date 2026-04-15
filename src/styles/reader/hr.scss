@@ -1,0 +1,12 @@
+hr {
+	background-color: var(--hr-color);
+	width: 100%;
+	border: 0;
+	height: var(--hr-thickness);
+	margin: 1.5em 0;
+}
+
+mark {
+	color: var(--text-normal);
+	background-color: transparent;
+}

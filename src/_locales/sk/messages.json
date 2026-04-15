@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Pokročilé"
 	},
+	"allHighlights": {
+		"message": "Všetky zvýraznenia"
+	},
 	"allProperties": {
 		"message": "Všetky vlastnosti"
 	},
@@ -162,6 +165,15 @@
 	"delete": {
 		"message": "Odstrániť"
 	},
+	"deleteAllHighlightsConfirm": {
+		"message": "Naozaj chcete odstrániť všetky zvýraznenia?"
+	},
+	"deleteHighlightsForDomain": {
+		"message": "Odstrániť všetky zvýraznenia pre túto doménu?"
+	},
+	"deleteHighlightsForPage": {
+		"message": "Odstrániť všetky zvýraznenia pre túto stránku?"
+	},
 	"deleteModelConfirm": {
 		"message": "Naozaj chcete odstrániť tento model?"
 	},
@@ -196,6 +208,9 @@
 	},
 	"earlyAccessFeatures": {
 		"message": "Funkcie predbežného prístupu"
+	},
+	"edit": {
+		"message": "Upraviť"
 	},
 	"editModel": {
 		"message": "Upraviť model"
@@ -360,6 +375,12 @@
 	"highlighterSettings": {
 		"message": "Zvýrazňovač"
 	},
+	"highlights": {
+		"message": "Zvýraznenia"
+	},
+	"highlightsNotFound": {
+		"message": "V článku sa nenašli zvýraznenia"
+	},
 	"history": {
 		"message": "História"
 	},
@@ -445,6 +466,12 @@
 	"legacyModeDescription": {
 		"message": "Používa metódu orezávania cez URI kompatibilnú s Obsidianom 1.6.7 alebo starším. Upozorňujeme, že dĺžka obsahu, ktorý môžete uložiť, je obmedzená vaším prehliadačom a OS. Niektoré stránky môžu zlyhať bez akýchkoľvek chýb."
 	},
+	"loadArticle": {
+		"message": "Čítať článok"
+	},
+	"loading": {
+		"message": "Načítava sa…"
+	},
 	"modelName": {
 		"message": "Zobrazovaný názov"
 	},
@@ -477,6 +504,9 @@
 	},
 	"noHighlights": {
 		"message": "Nerobiť nič"
+	},
+	"noResults": {
+		"message": "Nenašli sa žiadne výsledky"
 	},
 	"noTemplates": {
 		"message": "Nie sú dostupné žiadne šablóny. Pridajte šablónu v nastaveniach."
@@ -530,6 +560,12 @@
 	},
 	"openEmbedded": {
 		"message": "Otvoriť na stránke"
+	},
+	"openHighlights": {
+		"message": "Otvoriť zvýraznenia"
+	},
+	"openReader": {
+		"message": "Otvoriť čítačku"
 	},
 	"openSidePanel": {
 		"message": "Otvoriť bočný panel"
@@ -768,6 +804,9 @@
 	"readerLineWidth": {
 		"message": "Šírka riadku"
 	},
+	"readerLoadFailed": {
+		"message": "Nepodarilo sa načítať. Stránka môže byť blokovaná vaším prehliadačom."
+	},
 	"readerLoading": {
 		"message": "Odstraňovanie balastu…"
 	},
@@ -797,6 +836,9 @@
 	},
 	"readerTypography": {
 		"message": "Typografia"
+	},
+	"readerUrlPlaceholder": {
+		"message": "Vložte URL na čítanie…"
 	},
 	"readerViewFullSize": {
 		"message": "Zobraziť v plnej veľkosti"
@@ -851,6 +893,9 @@
 	},
 	"saveFile": {
 		"message": "Uložiť súbor..."
+	},
+	"searchHighlightsPlaceholder": {
+		"message": "Hľadať zvýraznenia…"
 	},
 	"searchVariables": {
 		"message": "Hľadať premenné..."
@@ -911,6 +956,21 @@
 	},
 	"silentOpenDescription": {
 		"message": "Výstrižky sa uložia, ale neotvoria sa v novej karte. Obsidian sa aj tak presunie do popredia."
+	},
+	"sort": {
+		"message": "Zoradiť"
+	},
+	"sortAZ": {
+		"message": "A až Z"
+	},
+	"sortNewOld": {
+		"message": "Najnovšie najprv"
+	},
+	"sortOldNew": {
+		"message": "Najstaršie najprv"
+	},
+	"sortZA": {
+		"message": "Z až A"
 	},
 	"specificNoteName": {
 		"message": "Konkrétny názov poznámky"

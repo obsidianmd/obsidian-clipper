@@ -1,0 +1,158 @@
+#footnotes {
+	margin-top: 4em;
+	font-size: 0.85em;
+	color: var(--text-muted);
+
+	ol {
+		padding-left: 1.5em;
+	}
+	li {
+		p {
+			margin: 0.25em 0;
+		}
+		a {
+			color: var(--text-muted);
+		}
+		a.footnote-backref {
+			text-decoration: none;
+			color: var(--text-faint);
+			&:hover {
+				color: var(--text-accent-hover);
+			}
+		}
+	}
+}
+
+
+.footnote-popover {
+	position: fixed;
+	z-index: var(--layer-footnote);
+	max-width: min(80vw, 400px);
+	max-height: 80vh;
+	padding: var(--size-4-3) var(--size-4-4);
+	background: var(--footnote-popover-background);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-m);
+	corner-shape: var(--corner-shape);
+	box-shadow: var(--shadow-s);
+	font-size: 0.80em;
+	line-height: 1.5;
+	opacity: 0;
+	visibility: hidden;
+	transform: translateY(8px);
+	transition:
+		opacity 0.15s ease,
+		transform 0.15s ease,
+		visibility 0s linear 0.15s;
+	overflow-y: auto;
+
+	// Arrow
+	&::before,
+	&::after {
+		content: '';
+		position: absolute;
+		left: var(--arrow-offset, 50%);
+		transform: translateX(-50%);
+		width: 0;
+		height: 0;
+		pointer-events: none;
+	}
+
+	// Arrow border
+	&::before {
+		border: 8px solid transparent;
+	}
+
+	// Arrow background
+	&::after {
+		border: 7px solid transparent;
+	}
+
+	li {
+		list-style: none;
+	}
+
+	// Top arrow (when popover is below)
+	&[data-position="bottom"] {
+		&::before {
+			top: -16px;
+			border-bottom-color: var(--background-modifier-border);
+		}
+		&::after {
+			top: -14px;
+			border-bottom-color: var(--background-primary);
+		}
+	}
+
+	// Bottom arrow (when popover is above)
+	&[data-position="top"] {
+		&::before {
+			bottom: -16px;
+			border-top-color: var(--background-modifier-border);
+		}
+		&::after {
+			bottom: -14px;
+			border-top-color: var(--background-primary);
+		}
+	}
+
+	.footnote-backref {
+		display: none;
+	}
+
+	&.active {
+		opacity: 1;
+		visibility: visible;
+		transform: translateY(0);
+		transition:
+			opacity 0.15s ease,
+			transform 0.15s ease;
+	}
+
+	p {
+		margin: 0.5em 0;
+		&:first-child {
+			margin-top: 0;
+		}
+		&:last-child {
+			margin-bottom: 0;
+		}
+	}
+
+	.footnote-backref {
+		display: none;
+	}
+}
+
+sup[id^="fnref"] {
+	margin: 0 0.1em 0 0;
+
+	a {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		height: 1.4em;
+		padding: 0 0.5em;
+		border-radius: 1em;
+		background: var(--background-primary-alt);
+		color: var(--text-muted);
+		text-decoration: none;
+		font-size: 0.75em;
+		font-weight: var(--font-medium);
+		line-height: 1;
+		cursor: pointer;
+		user-select: none;
+		-webkit-user-select: none;
+
+		&:hover {
+			background: var(--background-modifier-border);
+			color: var(--text-normal);
+		}
+
+		&.active {
+			background: var(--text-accent);
+			border-color: var(--text-accent);
+			color: var(--background-primary);
+		}
+	}
+}

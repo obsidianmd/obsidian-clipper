@@ -10,12 +10,17 @@
 		"clipboardWrite",
 		"contextMenus",
 		"storage",
-		"scripting"
+		"scripting",
+		"webRequest",
+		"webRequestBlocking"
 	],
 	"host_permissions": [
 		"<all_urls>",
 		"http://*/*",
 		"https://*/*"
+	],
+	"optional_host_permissions": [
+		"<all_urls>"
 	],
 	"action": {
 		"default_popup": "popup.html",

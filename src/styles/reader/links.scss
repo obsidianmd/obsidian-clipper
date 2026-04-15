@@ -1,0 +1,10 @@
+a {
+	color: var(--link-external-color);
+	text-decoration: var(--link-external-decoration);
+}
+@media (hover: hover) {
+	a:hover {
+		color: var(--link-external-color-hover);
+		text-decoration: var(--link-external-decoration-hover);
+	}
+}

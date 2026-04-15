@@ -1,0 +1,64 @@
+// Highlight.js theme
+
+.hljs {
+	color: var(--text-normal);
+}
+
+.hljs-operator { color: var(--text-muted); }
+.hljs-punctuation { color: var(--text-muted); }
+.hljs-comment { color: var(--text-muted); }
+
+.hljs-params { color: var(--text-normal); }
+.hljs-link { color: var(--color-blue); }
+.hljs-keyword { color: var(--color-cyan); }
+.hljs-name { color: var(--color-pink); }
+
+.hljs-variable.language_ { color: var(--color-purple); }
+.hljs-selector-attr { color: var(--color-pink); }
+.hljs-number { color: var(--color-purple); }
+
+.hljs-type { color: var(--color-yellow); }
+.hljs-title.class_ { color: var(--color-yellow); }
+.hljs-selector-tag { color: var(--color-yellow); }
+
+.hljs-literal { color: var(--color-orange); }
+.hljs-variable { color: var(--color-orange); }
+.hljs-variable.constant_ { color: var(--color-orange); }
+.hljs-meta { color: var(--color-orange); }
+
+.hljs-title { color: var(--color-blue); }
+.hljs-title.function_ { color: var(--color-blue); }
+.hljs-section { color: var(--color-blue); }
+.hljs-attr { color: var(--color-blue); }
+.hljs-selector-id { color: var(--color-blue); }
+
+.hljs-property { color: var(--color-cyan); }
+.hljs-tag { color: var(--color-cyan); }
+.hljs-bullet { color: var(--color-cyan); }
+.hljs-formula { color: var(--color-cyan); }
+.hljs-selector-class { color: var(--color-cyan); }
+.hljs-selector-pseudo { color: var(--color-cyan); }
+
+.hljs-string { color: var(--color-green); }
+.hljs-char.escape_ { color: var(--color-green); }
+.hljs-attribute { color: var(--color-green); }
+.hljs-code { color: var(--color-green); }
+.hljs-quote { color: var(--color-green); }
+.hljs-addition { color: var(--color-green); }
+
+.hljs-built_in { color: var(--color-red); }
+.hljs-regexp { color: var(--color-red); }
+.hljs-symbol { color: var(--color-red); }
+.hljs-doctag { color: var(--color-red); }
+.hljs-emphasis { color: var(--color-red); }
+.hljs-strong { color: var(--color-red); }
+.hljs-template-tag { color: var(--color-red); }
+.hljs-template-variable { color: var(--color-red); }
+.hljs-deletion { color: var(--color-red); }
+
+.hljs-emphasis {
+	font-style: italic;
+}
+.hljs-strong {
+	font-weight: bold;
+}

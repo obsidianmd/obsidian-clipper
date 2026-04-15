@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Erweitert"
 	},
+	"allHighlights": {
+		"message": "Alle Hervorhebungen"
+	},
 	"allProperties": {
 		"message": "Alle Eigenschaften"
 	},
@@ -162,6 +165,15 @@
 	"delete": {
 		"message": "Löschen"
 	},
+	"deleteAllHighlightsConfirm": {
+		"message": "Möchten Sie wirklich alle Hervorhebungen löschen?"
+	},
+	"deleteHighlightsForDomain": {
+		"message": "Alle Hervorhebungen für diese Domain löschen?"
+	},
+	"deleteHighlightsForPage": {
+		"message": "Alle Hervorhebungen für diese Seite löschen?"
+	},
 	"deleteModelConfirm": {
 		"message": "Bist Du sicher, dass Du dieses Modell löschen möchtest?"
 	},
@@ -196,6 +208,9 @@
 	},
 	"earlyAccessFeatures": {
 		"message": "Early Access Funktionen"
+	},
+	"edit": {
+		"message": "Bearbeiten"
 	},
 	"editModel": {
 		"message": "Modell bearbeiten"
@@ -360,6 +375,12 @@
 	"highlighterSettings": {
 		"message": "Marker"
 	},
+	"highlights": {
+		"message": "Hervorhebungen"
+	},
+	"highlightsNotFound": {
+		"message": "Keine Hervorhebungen im Artikel gefunden"
+	},
 	"history": {
 		"message": "Verlauf"
 	},
@@ -445,6 +466,12 @@
 	"legacyModeDescription": {
 		"message": "Verwendet die URI-Ausschneidemethode, die mit Obsidian 1.6.7 oder älter kompatibel ist. Beachte, dass die Länge des Inhalts, den Du ausschneiden kannst, durch Deinen Browser und das Betriebssystem begrenzt ist. Einige Seiten können ohne Fehlermeldungen fehlschlagen."
 	},
+	"loadArticle": {
+		"message": "Artikel lesen"
+	},
+	"loading": {
+		"message": "Wird geladen…"
+	},
 	"modelName": {
 		"message": "Modellname"
 	},
@@ -477,6 +504,9 @@
 	},
 	"noHighlights": {
 		"message": "Nichts tun"
+	},
+	"noResults": {
+		"message": "Keine Ergebnisse gefunden"
 	},
 	"noTemplates": {
 		"message": "Keine Vorlagen verfügbar. Bitte füge eine Vorlage in den Einstellungen hinzu."
@@ -530,6 +560,12 @@
 	},
 	"openEmbedded": {
 		"message": "In Seite öffnen"
+	},
+	"openHighlights": {
+		"message": "Hervorhebungen öffnen"
+	},
+	"openReader": {
+		"message": "Reader öffnen"
 	},
 	"openSidePanel": {
 		"message": "Seitenleiste öffnen"
@@ -768,6 +804,9 @@
 	"readerLineWidth": {
 		"message": "Zeilenbreite"
 	},
+	"readerLoadFailed": {
+		"message": "Laden fehlgeschlagen. Die Seite wird möglicherweise von Ihrem Browser blockiert."
+	},
 	"readerLoading": {
 		"message": "Wird bereinigt…"
 	},
@@ -797,6 +836,9 @@
 	},
 	"readerTypography": {
 		"message": "Typografie"
+	},
+	"readerUrlPlaceholder": {
+		"message": "URL zum Lesen einfügen…"
 	},
 	"readerViewFullSize": {
 		"message": "In voller Größe anzeigen"
@@ -851,6 +893,9 @@
 	},
 	"saveFile": {
 		"message": "Datei speichern..."
+	},
+	"searchHighlightsPlaceholder": {
+		"message": "Hervorhebungen durchsuchen…"
 	},
 	"searchVariables": {
 		"message": "Variablen suchen..."
@@ -911,6 +956,21 @@
 	},
 	"silentOpenDescription": {
 		"message": "Ausgeschnittene Notizen werden gespeichert, aber nicht in einem neuen Tab geöffnet. Obsidian wird trotzdem in den Vordergrund gebracht."
+	},
+	"sort": {
+		"message": "Sortieren"
+	},
+	"sortAZ": {
+		"message": "A bis Z"
+	},
+	"sortNewOld": {
+		"message": "Neueste zuerst"
+	},
+	"sortOldNew": {
+		"message": "Älteste zuerst"
+	},
+	"sortZA": {
+		"message": "Z bis A"
 	},
 	"specificNoteName": {
 		"message": "Spezifischer Notizname"

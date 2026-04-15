@@ -1,0 +1,202 @@
+.player-container {
+	border-top: 12px solid var(--background-primary);
+	background: transparent;
+	line-height: 0;
+	&.pin-player {
+		top: 0;
+		position: sticky;
+		z-index: var(--layer-popover);
+	}
+	.reader-video-wrapper,
+	iframe {
+		border-radius: 4px;
+		box-shadow: 0 0 24px 24px var(--background-primary);
+	}
+}
+.player-toggles {
+	line-height: 0;
+	white-space: nowrap;
+	display: flex;
+	gap: 4px;
+	padding: 12px 0 8px;
+	user-select: none;
+	transition: opacity 0.15s ease;
+	background: var(--background-primary);
+	&:hover {
+		opacity: 1 !important;
+	}
+	&:after {
+		pointer-events: none;
+		content: '';
+		position: absolute;
+		bottom: -36px;
+		left: 0;
+		right: 0;
+		width: 100%;
+		height: 36px;
+		background: linear-gradient(to bottom, var(--background-primary), transparent);
+	}
+}
+article > .player-toggles {
+	position: sticky;
+	top: 0;
+	z-index: var(--layer-popover);
+	background: var(--background-primary);
+}
+.player-toggle {
+	font-family: var(--font-ui);
+	font-size: var(--font-ui-small);
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	color: var(--text-faint);
+	cursor: pointer;
+	padding: 2px 0;
+	&:hover {
+		color: var(--text-muted);
+	}
+}
+.player-toggle-switch {
+	--toggle-width: 26px;
+	--toggle-height: 14px;
+	--toggle-thumb-size: 10px;
+	--toggle-border: 2px;
+	width: var(--toggle-width);
+	height: var(--toggle-height);
+	border-radius: var(--toggle-height);
+	background: var(--background-modifier-border);
+	position: relative;
+	flex-shrink: 0;
+	transition: background 0.15s;
+	input { display: none; }
+	&::after {
+		content: '';
+		position: absolute;
+		width: var(--toggle-thumb-size);
+		height: var(--toggle-thumb-size);
+		border-radius: 50%;
+		background: white;
+		top: var(--toggle-border);
+		left: var(--toggle-border);
+		transition: transform 0.15s;
+		box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+	}
+}
+.player-toggle.is-enabled {
+	color: var(--text-muted);
+	.player-toggle-switch {
+		background: var(--text-faint);
+		&::after {
+			transform: translateX(calc(var(--toggle-width) - var(--toggle-thumb-size) - var(--toggle-border) * 2));
+		}
+	}
+}
+.player-toggle-group {
+	display: flex;
+	gap: 12px;
+}
+.player-current-pos {
+	user-select: none;
+	position: sticky;
+	bottom: 24px;
+	left: 50%;
+	transform: translateX(-50%) translateY(20px);
+	width: fit-content;
+	font-family: var(--font-ui);
+	font-size: var(--font-ui-small);
+	padding: 6px 10px;
+	border-radius: 40px;
+	border: 1px solid var(--background-modifier-border);
+	background: var(--background-primary);
+	color: var(--text-muted);
+	cursor: pointer;
+	z-index: var(--layer-popover);
+	box-shadow: var(--shadow-s);
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 0.2s, transform 0.2s;
+	&.is-visible {
+		opacity: 1;
+		pointer-events: auto;
+		transform: translateX(-50%) translateY(0);
+	}
+	&:hover {
+		color: var(--text-normal);
+	}
+}
+::highlight(transcript-playback) {
+	background-color: var(--text-selection);
+}
+::highlight(transcript-hover) {
+	text-decoration: underline;
+	text-decoration-color: var(--text-normal);
+	text-underline-offset: 2px;
+}
+.transcript-segment {
+	border-radius: var(--radius-s);
+	corner-shape: var(--corner-shape);
+	display: flex;
+	gap: 1em;
+	position: relative;
+	> strong {
+		font-family: var(--font-ui);
+		color: var(--text-muted);
+		margin-top: 0.15em;
+		font-size: 0.85em;
+		font-weight: 400;
+		flex-shrink: 0;
+		width: var(--timestamp-width);
+		font-variant: tabular-nums;
+		position: relative;
+		user-select: none;
+		-webkit-user-select: none;
+	}
+	.transcript-segment-text {
+		flex: 1;
+		min-width: 0;
+		border-radius: var(--radius-s);
+		padding: 0 0.5em;
+	}
+}
+.transcript-segment.is-active {
+	.timestamp {
+		color: var(--text-normal);
+	}
+}
+.transcript-scrub-track {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: var(--timestamp-width);
+	cursor: ns-resize;
+	mix-blend-mode: var(--mix-blend-mode);
+	background:
+		linear-gradient(
+			to bottom,
+			transparent 0,
+			transparent var(--track-progress, 0%),
+			var(--color-red) var(--track-progress, 0%),
+			var(--color-red) calc(var(--track-progress, 0%) + 2px),
+			transparent calc(var(--track-progress, 0%) + 2px)
+		) no-repeat left / calc(var(--timestamp-width) - 0.5em) 100%;
+	.transcript-scrub-hover {
+		position: absolute;
+		left: 0;
+		width: calc(100% - 0.5em);
+		height: 2px;
+		background: var(--background-primary-alt);
+		pointer-events: none;
+		opacity: 0;
+		transition: opacity 0.1s;
+		mix-blend-mode: var(--mix-blend-mode);
+	}
+}
+.transcript-scrub-track:hover .transcript-scrub-hover {
+	opacity: 1;
+}
+
+@media (max-width: 768px) {
+	.player-toggles {
+		display: none !important;
+	}
+}

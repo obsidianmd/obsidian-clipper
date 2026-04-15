@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Προχωρημένα"
 	},
+	"allHighlights": {
+		"message": "Όλες οι επισημάνσεις"
+	},
 	"allProperties": {
 		"message": "Όλες οι ιδιότητες"
 	},
@@ -162,6 +165,15 @@
 	"delete": {
 		"message": "Διαγραφή"
 	},
+	"deleteAllHighlightsConfirm": {
+		"message": "Είστε σίγουροι ότι θέλετε να διαγράψετε όλες τις επισημάνσεις;"
+	},
+	"deleteHighlightsForDomain": {
+		"message": "Διαγραφή όλων των επισημάνσεων για αυτόν τον τομέα;"
+	},
+	"deleteHighlightsForPage": {
+		"message": "Διαγραφή όλων των επισημάνσεων για αυτήν τη σελίδα;"
+	},
 	"deleteModelConfirm": {
 		"message": "Είστε βέβαιοι ότι θέλετε να διαγράψετε αυτό το μοντέλο;"
 	},
@@ -196,6 +208,9 @@
 	},
 	"earlyAccessFeatures": {
 		"message": "Λειτουργίες πρώιμης πρόσβασης"
+	},
+	"edit": {
+		"message": "Επεξεργασία"
 	},
 	"editModel": {
 		"message": "Επεξεργασία μοντέλου"
@@ -360,6 +375,12 @@
 	"highlighterSettings": {
 		"message": "Επισημαντής"
 	},
+	"highlights": {
+		"message": "Επισημάνσεις"
+	},
+	"highlightsNotFound": {
+		"message": "Δεν βρέθηκαν επισημάνσεις στο άρθρο"
+	},
 	"history": {
 		"message": "Ιστορικό"
 	},
@@ -445,6 +466,12 @@
 	"legacyModeDescription": {
 		"message": "Χρησιμοποιεί τη μέθοδο αποκοπής URI που είναι συμβατή με το Obsidian 1.6.7 ή παλαιότερο. Σημειώστε ότι το μέγεθος του περιεχομένου που μπορεί να αποκοπεί περιορίζεται από τον περιηγητή και το λειτουργικό σύστημα. Ορισμένες σελίδες ενδέχεται να αποτύχουν χωρίς μήνυμα σφάλματος."
 	},
+	"loadArticle": {
+		"message": "Ανάγνωση άρθρου"
+	},
+	"loading": {
+		"message": "Φόρτωση…"
+	},
 	"modelName": {
 		"message": "Όνομα μοντέλου"
 	},
@@ -477,6 +504,9 @@
 	},
 	"noHighlights": {
 		"message": "Καμία ενέργεια"
+	},
+	"noResults": {
+		"message": "Δεν βρέθηκαν αποτελέσματα"
 	},
 	"noTemplates": {
 		"message": "Δεν υπάρχουν διαθέσιμα πρότυπα. Παρακαλώ προσθέστε ένα πρότυπο στις ρυθμίσεις."
@@ -522,6 +552,12 @@
 	},
 	"openEmbedded": {
 		"message": "Άνοιγμα στη σελίδα"
+	},
+	"openHighlights": {
+		"message": "Άνοιγμα επισημάνσεων"
+	},
+	"openReader": {
+		"message": "Άνοιγμα Αναγνώστη"
 	},
 	"openSidePanel": {
 		"message": "Άνοιγμα πλευρικού πίνακα"
@@ -760,6 +796,9 @@
 	"readerLineWidth": {
 		"message": "Πλάτος γραμμής"
 	},
+	"readerLoadFailed": {
+		"message": "Αποτυχία φόρτωσης. Η σελίδα ενδέχεται να είναι αποκλεισμένη από το πρόγραμμα περιήγησής σας."
+	},
 	"readerLoading": {
 		"message": "Αποθόλωση…"
 	},
@@ -789,6 +828,9 @@
 	},
 	"readerTypography": {
 		"message": "Τυπογραφία"
+	},
+	"readerUrlPlaceholder": {
+		"message": "Επικολλήστε ένα URL για ανάγνωση…"
 	},
 	"readerViewFullSize": {
 		"message": "Προβολή σε πλήρες μέγεθος"
@@ -843,6 +885,9 @@
 	},
 	"saveFile": {
 		"message": "Αποθήκευση αρχείου..."
+	},
+	"searchHighlightsPlaceholder": {
+		"message": "Αναζήτηση επισημάνσεων…"
 	},
 	"searchVariables": {
 		"message": "Αναζήτηση μεταβλητών..."
@@ -903,6 +948,21 @@
 	},
 	"silentOpenDescription": {
 		"message": "Οι αποκομμένες σημειώσεις θα αποθηκευτούν αλλά δεν θα ανοίξουν σε νέα καρτέλα. Το Obsidian θα εξακολουθεί να έρχεται στο προσκήνιο."
+	},
+	"sort": {
+		"message": "Ταξινόμηση"
+	},
+	"sortAZ": {
+		"message": "Α έως Ω"
+	},
+	"sortNewOld": {
+		"message": "Πρώτα τα νεότερα"
+	},
+	"sortOldNew": {
+		"message": "Πρώτα τα παλαιότερα"
+	},
+	"sortZA": {
+		"message": "Ω έως Α"
 	},
 	"specificNoteName": {
 		"message": "Συγκεκριμένο όνομα σημείωσης"

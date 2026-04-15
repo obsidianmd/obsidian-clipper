@@ -65,8 +65,80 @@ function createSVG(config: {
 
 export type AnyHighlightData = TextHighlightData | ElementHighlightData | ComplexHighlightData;
 
+const EPHEMERAL_PARAMS = new Set([
+	't',           // YouTube timestamp
+	'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', // UTM tracking
+	'ref', 'source', 'src',   // Referral
+	'fbclid', 'gclid', 'dclid', 'msclkid', 'twclid', // Ad click IDs
+	'mc_cid', 'mc_eid',       // Mailchimp
+	'_ga', '_gl',             // Google Analytics
+	'si',                     // YouTube share tracking
+]);
+
+export function normalizeUrl(url: string): string {
+	try {
+		const parsed = new URL(url);
+		const params = new URLSearchParams(parsed.search);
+		for (const key of [...params.keys()]) {
+			if (EPHEMERAL_PARAMS.has(key)) {
+				params.delete(key);
+			}
+		}
+		parsed.search = params.toString();
+		// Remove trailing ? if all params were stripped
+		return parsed.toString();
+	} catch {
+		return url;
+	}
+}
+
 export let highlights: AnyHighlightData[] = [];
 export let isApplyingHighlights = false;
+export let pageTitle: string = '';
+
+// URL override for extension pages (e.g. reader page) where
+// window.location.href is the extension URL, not the article URL.
+let pageUrlOverride: string | null = null;
+
+export function setPageUrl(url: string) {
+	pageUrlOverride = url;
+}
+
+function getPageUrl(): string {
+	return pageUrlOverride || window.location.href;
+}
+
+export function setPageTitle(title: string) {
+	pageTitle = title;
+}
+
+export function updatePageDomainSettings(settings: { site?: string; favicon?: string }) {
+	const pageUrl = getPageUrl();
+	const hostname = new URL(pageUrl).hostname.replace(/^www\./, '');
+	const resolved: Partial<DomainSettings> = {};
+	if (settings.site) resolved.site = settings.site;
+	if (settings.favicon) {
+		try {
+			resolved.favicon = new URL(settings.favicon, pageUrl).href;
+		} catch {
+			resolved.favicon = settings.favicon;
+		}
+	}
+	if (!resolved.site && !resolved.favicon) return;
+	browser.storage.local.get('domains').then((result: { domains?: Record<string, DomainSettings> }) => {
+		const domains = result.domains || {};
+		if (!domains[hostname]) {
+			domains[hostname] = {};
+		}
+		Object.assign(domains[hostname], resolved);
+		browser.storage.local.set({ domains });
+	});
+}
+
+export interface DomainSettings {
+	site?: string;
+	favicon?: string;
+}
 let lastAppliedHighlights: string = '';
 let originalLinkClickHandlers: WeakMap<HTMLElement, (event: MouseEvent) => void> = new WeakMap();
 
@@ -113,6 +185,7 @@ export interface ComplexHighlightData extends HighlightData {
 export interface StoredData {
 	highlights: AnyHighlightData[];
 	url: string;
+	title?: string;
 }
 
 type HighlightsStorage = Record<string, StoredData>;
@@ -630,14 +703,17 @@ function sanitizeAndPreserveFormatting(html: string): string {
 	// Use DOMParser for safer HTML parsing
 	const parser = new DOMParser();
 	const doc = parser.parseFromString(html, 'text/html');
-	
+
 	// Remove any script tags
 	doc.querySelectorAll('script').forEach(el => el.remove());
+
+	// Strip inline style attributes — highlights should store semantic HTML, not presentation
+	doc.querySelectorAll('[style]').forEach(el => el.removeAttribute('style'));
 
 	// Get the body content and serialize it back
 	const serializer = new XMLSerializer();
 	let result = '';
-	
+
 	// Serialize all child nodes of the body
 	Array.from(doc.body.childNodes).forEach(node => {
 		if (node.nodeType === Node.ELEMENT_NODE) {
@@ -646,7 +722,7 @@ function sanitizeAndPreserveFormatting(html: string): string {
 			result += node.textContent;
 		}
 	});
-	
+
 	// Close any unclosed tags
 	return balanceTags(result);
 }
@@ -887,19 +963,33 @@ function getParents(element: Element): Element[] {
 
 // Save highlights to browser storage
 export function saveHighlights() {
-	const url = window.location.href;
+	const rawUrl = getPageUrl();
+	const url = normalizeUrl(rawUrl);
 	if (highlights.length > 0) {
-		const data: StoredData = { highlights, url };
+		const title = pageTitle || document.title || undefined;
+		const data: StoredData = { highlights, url, title };
 		browser.storage.local.get('highlights').then((result: { highlights?: HighlightsStorage }) => {
 			const allHighlights: HighlightsStorage = result.highlights || {};
 			allHighlights[url] = data;
 			browser.storage.local.set({ highlights: allHighlights });
 		});
+		const ogSiteName = document.querySelector('meta[property="og:site_name"]')?.getAttribute('content');
+		if (ogSiteName) {
+			const hostname = new URL(rawUrl).hostname.replace(/^www\./, '');
+			browser.storage.local.get('domains').then((result: { domains?: Record<string, DomainSettings> }) => {
+				const domains = result.domains || {};
+				if (!domains[hostname]?.site) {
+					if (!domains[hostname]) domains[hostname] = {};
+					domains[hostname].site = ogSiteName;
+					browser.storage.local.set({ domains });
+				}
+			});
+		}
 	} else {
-		// Remove the entry if there are no highlights
 		browser.storage.local.get('highlights').then((result: { highlights?: HighlightsStorage }) => {
 			const allHighlights: HighlightsStorage = result.highlights || {};
 			delete allHighlights[url];
+			if (rawUrl !== url) delete allHighlights[rawUrl];
 			browser.storage.local.set({ highlights: allHighlights });
 		});
 	}
@@ -955,11 +1045,22 @@ export function getHighlights(): string[] {
 
 // Load highlights from browser storage
 export async function loadHighlights() {
-	const url = window.location.href;
+	const url = normalizeUrl(getPageUrl());
+	const rawUrl = getPageUrl();
 	const result = await browser.storage.local.get('highlights');
 	const allHighlights = (result.highlights || {}) as HighlightsStorage;
-	const storedData = allHighlights[url];
-	
+
+	// Check normalized key first, then fall back to raw URL for old entries
+	let storedData = allHighlights[url];
+	if (!storedData && rawUrl !== url && allHighlights[rawUrl]) {
+		// Migrate old entry to normalized key
+		storedData = allHighlights[rawUrl];
+		storedData.url = url;
+		allHighlights[url] = storedData;
+		delete allHighlights[rawUrl];
+		browser.storage.local.set({ highlights: allHighlights });
+	}
+
 	if (storedData && Array.isArray(storedData.highlights) && storedData.highlights.length > 0) {
 		highlights = storedData.highlights;
 		
@@ -978,7 +1079,7 @@ export async function loadHighlights() {
 
 // Clear all highlights from the page and storage
 export function clearHighlights() {
-	const url = window.location.href;
+	const url = normalizeUrl(getPageUrl());
 	const oldHighlights = [...highlights];
 	browser.storage.local.get('highlights').then((result: { highlights?: HighlightsStorage }) => {
 		const allHighlights: HighlightsStorage = result.highlights || {};
@@ -1046,6 +1147,15 @@ function getClosestAllowedBlock(node: Node | null): Element | null {
 	while (current) {
 		if (current.nodeType === Node.ELEMENT_NODE) {
 			const el = current as Element;
+			// Transcript handling: the timestamp <strong> must not produce a
+			// highlight block (otherwise a cross-segment selection walks up
+			// past it and snaps to the outer <p>, pulling the timestamp
+			// column into the highlight). The sibling text wrapper acts as
+			// the block instead, scoping highlights to the text portion.
+			if (el.parentElement?.classList.contains('transcript-segment')) {
+				if (el.tagName === 'STRONG') return null;
+				if (el.classList.contains('transcript-segment-text')) return el;
+			}
 			// Check if it's an allowed tag overall and if it's a block element we use for splitting text selections.
 			if (ALLOWED_HIGHLIGHT_TAGS.includes(el.tagName.toUpperCase()) && isConsideredBlockElement(el)) {
 				return el;

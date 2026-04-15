@@ -67,6 +67,8 @@ button.clickable-icon {
 	height: var(--clickable-icon-size);
 	display: flex;
 	padding: 0 0.25rem;
+	border-radius: var(--radius-m);
+	corner-shape: var(--corner-shape);
 	background-color: transparent;
 	color: var(--text-muted);
 	opacity: 0.85;
@@ -85,6 +87,10 @@ button.clickable-icon {
 	&[disabled] {
 		opacity: 0.5;
 		cursor: not-allowed;
+	}
+	svg {
+		width: 18px;
+		height: 18px;
 	}
 }
 

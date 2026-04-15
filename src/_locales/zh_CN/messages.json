@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "高级"
 	},
+	"allHighlights": {
+		"message": "所有高亮"
+	},
 	"allProperties": {
 		"message": "所有属性"
 	},
@@ -162,6 +165,15 @@
 	"delete": {
 		"message": "删除"
 	},
+	"deleteAllHighlightsConfirm": {
+		"message": "确定要删除所有高亮吗？"
+	},
+	"deleteHighlightsForDomain": {
+		"message": "删除此域名下的所有高亮？"
+	},
+	"deleteHighlightsForPage": {
+		"message": "删除此页面的所有高亮？"
+	},
 	"deleteModelConfirm": {
 		"message": "您确定要删除此模型吗？"
 	},
@@ -196,6 +208,9 @@
 	},
 	"earlyAccessFeatures": {
 		"message": "早期访问功能"
+	},
+	"edit": {
+		"message": "编辑"
 	},
 	"editModel": {
 		"message": "编辑模型"
@@ -360,6 +375,12 @@
 	"highlighterSettings": {
 		"message": "高亮"
 	},
+	"highlights": {
+		"message": "高亮"
+	},
+	"highlightsNotFound": {
+		"message": "文章中未找到高亮"
+	},
 	"history": {
 		"message": "历史"
 	},
@@ -445,6 +466,12 @@
 	"legacyModeDescription": {
 		"message": "使用与 Obsidian 1.6.7 或更早版本兼容的 URI 剪藏方法。请注意，您可以剪藏的内容长度受浏览器和操作系统限制。某些页面可能会静默失败。"
 	},
+	"loadArticle": {
+		"message": "阅读文章"
+	},
+	"loading": {
+		"message": "正在加载…"
+	},
 	"modelName": {
 		"message": "模型名称"
 	},
@@ -477,6 +504,9 @@
 	},
 	"noHighlights": {
 		"message": "不执行任何操作"
+	},
+	"noResults": {
+		"message": "未找到结果"
 	},
 	"noTemplates": {
 		"message": "没有可用的模板。请在设置中添加模板。"
@@ -530,6 +560,12 @@
 	},
 	"openEmbedded": {
 		"message": "在页面中打开"
+	},
+	"openHighlights": {
+		"message": "打开高亮"
+	},
+	"openReader": {
+		"message": "打开阅读器"
 	},
 	"openSidePanel": {
 		"message": "打开侧面板"
@@ -768,6 +804,9 @@
 	"readerLineWidth": {
 		"message": "行宽"
 	},
+	"readerLoadFailed": {
+		"message": "加载失败。该页面可能被浏览器阻止。"
+	},
 	"readerLoading": {
 		"message": "正在净化…"
 	},
@@ -797,6 +836,9 @@
 	},
 	"readerTypography": {
 		"message": "排版"
+	},
+	"readerUrlPlaceholder": {
+		"message": "粘贴要阅读的 URL…"
 	},
 	"readerViewFullSize": {
 		"message": "查看原始大小"
@@ -851,6 +893,9 @@
 	},
 	"saveFile": {
 		"message": "保存文件..."
+	},
+	"searchHighlightsPlaceholder": {
+		"message": "搜索高亮…"
 	},
 	"searchVariables": {
 		"message": "搜索变量..."
@@ -911,6 +956,21 @@
 	},
 	"silentOpenDescription": {
 		"message": "剪藏的笔记将被保存但不会在新标签页中打开。Obsidian 仍会被置于前台。"
+	},
+	"sort": {
+		"message": "排序"
+	},
+	"sortAZ": {
+		"message": "A 到 Z"
+	},
+	"sortNewOld": {
+		"message": "最新优先"
+	},
+	"sortOldNew": {
+		"message": "最早优先"
+	},
+	"sortZA": {
+		"message": "Z 到 A"
 	},
 	"specificNoteName": {
 		"message": "特定笔记名称"

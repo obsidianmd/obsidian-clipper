@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "متقدم"
 	},
+	"allHighlights": {
+		"message": "كل التمييزات"
+	},
 	"allProperties": {
 		"message": "جميع الخصائص"
 	},
@@ -162,6 +165,15 @@
 	"delete": {
 		"message": "حذف"
 	},
+	"deleteAllHighlightsConfirm": {
+		"message": "هل أنت متأكد أنك تريد حذف جميع التمييزات؟"
+	},
+	"deleteHighlightsForDomain": {
+		"message": "حذف جميع التمييزات لهذا النطاق؟"
+	},
+	"deleteHighlightsForPage": {
+		"message": "حذف جميع التمييزات لهذه الصفحة؟"
+	},
 	"deleteModelConfirm": {
 		"message": "هل أنت متأكد من أنك تريد حذف هذا النموذج؟"
 	},
@@ -196,6 +208,9 @@
 	},
 	"earlyAccessFeatures": {
 		"message": "ميزات الوصول المبكر"
+	},
+	"edit": {
+		"message": "تحرير"
 	},
 	"editModel": {
 		"message": "تعديل النموذج"
@@ -360,6 +375,12 @@
 	"highlighterSettings": {
 		"message": "المظلل"
 	},
+	"highlights": {
+		"message": "التمييزات"
+	},
+	"highlightsNotFound": {
+		"message": "لم يتم العثور على تمييزات في المقالة"
+	},
 	"history": {
 		"message": "التاريخ"
 	},
@@ -445,6 +466,12 @@
 	"legacyModeDescription": {
 		"message": "يستخدم طريقة قص URI المتوافقة مع أوبسيديان 1.6.7 أو أقدم. لاحظ أن طول المحتوى الذي يمكنك قصه محدود بواسطة متصفحك ونظام التشغيل. قد تفشل بعض الصفحات بدون أي أخطاء."
 	},
+	"loadArticle": {
+		"message": "قراءة المقالة"
+	},
+	"loading": {
+		"message": "جارٍ التحميل…"
+	},
 	"modelName": {
 		"message": "اسم النموذج"
 	},
@@ -477,6 +504,9 @@
 	},
 	"noHighlights": {
 		"message": "لا تفعل شيئاً"
+	},
+	"noResults": {
+		"message": "لم يتم العثور على نتائج"
 	},
 	"noTemplates": {
 		"message": "لا توجد قوالب متاحة. يرجى إضافة قالب في الإعدادات."
@@ -530,6 +560,12 @@
 	},
 	"openEmbedded": {
 		"message": "افتح في الصفحة"
+	},
+	"openHighlights": {
+		"message": "فتح التمييزات"
+	},
+	"openReader": {
+		"message": "فتح القارئ"
 	},
 	"openSidePanel": {
 		"message": "افتح اللوحة الجانبية"
@@ -768,6 +804,9 @@
 	"readerLineWidth": {
 		"message": "عرض السطر"
 	},
+	"readerLoadFailed": {
+		"message": "فشل التحميل. قد تكون الصفحة محظورة بواسطة متصفحك."
+	},
 	"readerLoading": {
 		"message": "إزالة التشويش…"
 	},
@@ -797,6 +836,9 @@
 	},
 	"readerTypography": {
 		"message": "الطباعة"
+	},
+	"readerUrlPlaceholder": {
+		"message": "الصق عنوان URL للقراءة…"
 	},
 	"readerViewFullSize": {
 		"message": "عرض بالحجم الكامل"
@@ -851,6 +893,9 @@
 	},
 	"saveFile": {
 		"message": "حفظ الملف..."
+	},
+	"searchHighlightsPlaceholder": {
+		"message": "ابحث في التمييزات…"
 	},
 	"searchVariables": {
 		"message": "البحث عن المتغيرات..."
@@ -911,6 +956,21 @@
 	},
 	"silentOpenDescription": {
 		"message": "سيتم حفظ الملاحظات المقصوصة ولكن لن يتم فتحها كتبويب جديد. سيظل أوبسيديان يُجلب إلى المقدمة."
+	},
+	"sort": {
+		"message": "فرز"
+	},
+	"sortAZ": {
+		"message": "من A إلى Z"
+	},
+	"sortNewOld": {
+		"message": "الأحدث أولاً"
+	},
+	"sortOldNew": {
+		"message": "الأقدم أولاً"
+	},
+	"sortZA": {
+		"message": "من Z إلى A"
 	},
 	"specificNoteName": {
 		"message": "اسم ملاحظة محدد"

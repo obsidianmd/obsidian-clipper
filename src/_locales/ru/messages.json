@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Расширенные настройки"
 	},
+	"allHighlights": {
+		"message": "Все выделения"
+	},
 	"allProperties": {
 		"message": "Все свойства"
 	},
@@ -162,6 +165,15 @@
 	"delete": {
 		"message": "Удалить"
 	},
+	"deleteAllHighlightsConfirm": {
+		"message": "Вы уверены, что хотите удалить все выделения?"
+	},
+	"deleteHighlightsForDomain": {
+		"message": "Удалить все выделения для этого домена?"
+	},
+	"deleteHighlightsForPage": {
+		"message": "Удалить все выделения для этой страницы?"
+	},
 	"deleteModelConfirm": {
 		"message": "Вы уверены, что хотите удалить эту модель?"
 	},
@@ -196,6 +208,9 @@
 	},
 	"earlyAccessFeatures": {
 		"message": "Функции раннего доступа"
+	},
+	"edit": {
+		"message": "Редактировать"
 	},
 	"editModel": {
 		"message": "Редактировать модель"
@@ -360,6 +375,12 @@
 	"highlighterSettings": {
 		"message": "Маркер"
 	},
+	"highlights": {
+		"message": "Выделения"
+	},
+	"highlightsNotFound": {
+		"message": "В статье не найдены выделения"
+	},
 	"history": {
 		"message": "История"
 	},
@@ -445,6 +466,12 @@
 	"legacyModeDescription": {
 		"message": "Использует метод обработки URI, совместимый с Obsidian 1.6.7 или более ранней версией. Обратите внимание, что длина контента, который вы можете вырезать, ограничена вашим браузером и ОС. Некоторые страницы могут не открыться без ошибок."
 	},
+	"loadArticle": {
+		"message": "Читать статью"
+	},
+	"loading": {
+		"message": "Загрузка…"
+	},
 	"modelName": {
 		"message": "Название модели"
 	},
@@ -477,6 +504,9 @@
 	},
 	"noHighlights": {
 		"message": "Ничего не делать"
+	},
+	"noResults": {
+		"message": "Ничего не найдено"
 	},
 	"noTemplates": {
 		"message": "Нет доступных шаблонов. Пожалуйста, добавьте шаблон в настройках."
@@ -530,6 +560,12 @@
 	},
 	"openEmbedded": {
 		"message": "Открыть на странице"
+	},
+	"openHighlights": {
+		"message": "Открыть выделения"
+	},
+	"openReader": {
+		"message": "Открыть режим чтения"
 	},
 	"openSidePanel": {
 		"message": "Открыть боковую панель"
@@ -768,6 +804,9 @@
 	"readerLineWidth": {
 		"message": "Ширина строки"
 	},
+	"readerLoadFailed": {
+		"message": "Не удалось загрузить. Возможно, страница заблокирована вашим браузером."
+	},
 	"readerLoading": {
 		"message": "Упрощение…"
 	},
@@ -797,6 +836,9 @@
 	},
 	"readerTypography": {
 		"message": "Типографика"
+	},
+	"readerUrlPlaceholder": {
+		"message": "Вставьте URL, чтобы прочитать…"
 	},
 	"readerViewFullSize": {
 		"message": "Открыть в полном размере"
@@ -851,6 +893,9 @@
 	},
 	"saveFile": {
 		"message": "Сохранить файл..."
+	},
+	"searchHighlightsPlaceholder": {
+		"message": "Поиск по выделениям…"
 	},
 	"searchVariables": {
 		"message": "Поиск переменных..."
@@ -911,6 +956,21 @@
 	},
 	"silentOpenDescription": {
 		"message": "Заметки будут сохранены, но не откроются в новой вкладке. Obsidian по-прежнему будет выводиться на передний план."
+	},
+	"sort": {
+		"message": "Сортировать"
+	},
+	"sortAZ": {
+		"message": "От А до Я"
+	},
+	"sortNewOld": {
+		"message": "Сначала новые"
+	},
+	"sortOldNew": {
+		"message": "Сначала старые"
+	},
+	"sortZA": {
+		"message": "От Я до А"
 	},
 	"specificNoteName": {
 		"message": "Особое название заметки"

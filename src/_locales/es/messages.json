@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Avanzado"
 	},
+	"allHighlights": {
+		"message": "Todos los resaltados"
+	},
 	"allProperties": {
 		"message": "Todas las propiedades"
 	},
@@ -162,6 +165,15 @@
 	"delete": {
 		"message": "Eliminar"
 	},
+	"deleteAllHighlightsConfirm": {
+		"message": "¿Seguro que quieres eliminar todos los resaltados?"
+	},
+	"deleteHighlightsForDomain": {
+		"message": "¿Eliminar todos los resaltados de este dominio?"
+	},
+	"deleteHighlightsForPage": {
+		"message": "¿Eliminar todos los resaltados de esta página?"
+	},
 	"deleteModelConfirm": {
 		"message": "¿Estás seguro de que quieres eliminar este modelo?"
 	},
@@ -196,6 +208,9 @@
 	},
 	"earlyAccessFeatures": {
 		"message": "Funciones de acceso anticipado"
+	},
+	"edit": {
+		"message": "Editar"
 	},
 	"editModel": {
 		"message": "Editar modelo"
@@ -360,6 +375,12 @@
 	"highlighterSettings": {
 		"message": "Resaltador"
 	},
+	"highlights": {
+		"message": "Resaltados"
+	},
+	"highlightsNotFound": {
+		"message": "No se encontraron resaltados en el artículo"
+	},
 	"history": {
 		"message": "Historial"
 	},
@@ -445,6 +466,12 @@
 	"legacyModeDescription": {
 		"message": "Usa el método de guardado URI compatible con Obsidian 1.6.7 o anterior. Ten en cuenta que la longitud del contenido que puedes guardar está limitada por tu navegador y sistema operativo. Algunas páginas pueden fallar sin mostrar errores."
 	},
+	"loadArticle": {
+		"message": "Leer artículo"
+	},
+	"loading": {
+		"message": "Cargando…"
+	},
 	"modelName": {
 		"message": "Nombre del modelo"
 	},
@@ -477,6 +504,9 @@
 	},
 	"noHighlights": {
 		"message": "No hacer nada"
+	},
+	"noResults": {
+		"message": "No se encontraron resultados"
 	},
 	"noTemplates": {
 		"message": "No hay plantillas disponibles. Por favor, añade una plantilla en los ajustes."
@@ -530,6 +560,12 @@
 	},
 	"openEmbedded": {
 		"message": "Abrir en página"
+	},
+	"openHighlights": {
+		"message": "Abrir resaltados"
+	},
+	"openReader": {
+		"message": "Abrir lector"
 	},
 	"openSidePanel": {
 		"message": "Abrir panel lateral"
@@ -768,6 +804,9 @@
 	"readerLineWidth": {
 		"message": "Ancho de línea"
 	},
+	"readerLoadFailed": {
+		"message": "No se pudo cargar. Es posible que tu navegador bloquee la página."
+	},
 	"readerLoading": {
 		"message": "Simplificando…"
 	},
@@ -797,6 +836,9 @@
 	},
 	"readerTypography": {
 		"message": "Tipografía"
+	},
+	"readerUrlPlaceholder": {
+		"message": "Pega una URL para leer…"
 	},
 	"readerViewFullSize": {
 		"message": "Ver a tamaño completo"
@@ -851,6 +893,9 @@
 	},
 	"saveFile": {
 		"message": "Guardar archivo..."
+	},
+	"searchHighlightsPlaceholder": {
+		"message": "Buscar resaltados…"
 	},
 	"searchVariables": {
 		"message": "Buscar variables..."
@@ -911,6 +956,21 @@
 	},
 	"silentOpenDescription": {
 		"message": "Las notas se guardarán pero no se abrirán en una nueva pestaña. Obsidian seguirá siendo traído al primer plano."
+	},
+	"sort": {
+		"message": "Ordenar"
+	},
+	"sortAZ": {
+		"message": "A a Z"
+	},
+	"sortNewOld": {
+		"message": "Más recientes primero"
+	},
+	"sortOldNew": {
+		"message": "Más antiguos primero"
+	},
+	"sortZA": {
+		"message": "Z a A"
 	},
 	"specificNoteName": {
 		"message": "Nombre específico de la nota"

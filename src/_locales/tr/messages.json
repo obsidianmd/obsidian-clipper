@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Gelişmiş"
 	},
+	"allHighlights": {
+		"message": "Tüm vurgular"
+	},
 	"allProperties": {
 		"message": "Tüm özellikler"
 	},
@@ -162,6 +165,15 @@
 	"delete": {
 		"message": "Sil"
 	},
+	"deleteAllHighlightsConfirm": {
+		"message": "Tüm vurguları silmek istediğinizden emin misiniz?"
+	},
+	"deleteHighlightsForDomain": {
+		"message": "Bu alan adı için tüm vurgular silinsin mi?"
+	},
+	"deleteHighlightsForPage": {
+		"message": "Bu sayfa için tüm vurgular silinsin mi?"
+	},
 	"deleteModelConfirm": {
 		"message": "Bu modeli silmek istediğinizden emin misiniz?"
 	},
@@ -196,6 +208,9 @@
 	},
 	"earlyAccessFeatures": {
 		"message": "Erken erişim özellikleri"
+	},
+	"edit": {
+		"message": "Düzenle"
 	},
 	"editModel": {
 		"message": "Modeli düzenle"
@@ -360,6 +375,12 @@
 	"highlighterSettings": {
 		"message": "Vurgulayıcı"
 	},
+	"highlights": {
+		"message": "Vurgular"
+	},
+	"highlightsNotFound": {
+		"message": "Makalede vurgular bulunamadı"
+	},
 	"history": {
 		"message": "Geçmiş"
 	},
@@ -445,6 +466,12 @@
 	"legacyModeDescription": {
 		"message": "Obsidian 1.6.7 veya daha eski sürümlerle uyumlu URI kırpma yöntemini kullanır. Kırpabileceğiniz içerik uzunluğunun tarayıcınız ve işletim sisteminiz tarafından sınırlandırıldığını unutmayın. Bazı sayfalar hata vermeden başarısız olabilir."
 	},
+	"loadArticle": {
+		"message": "Makaleyi oku"
+	},
+	"loading": {
+		"message": "Yükleniyor…"
+	},
 	"modelName": {
 		"message": "Görünen ad"
 	},
@@ -477,6 +504,9 @@
 	},
 	"noHighlights": {
 		"message": "Hiçbir şey yapma"
+	},
+	"noResults": {
+		"message": "Sonuç bulunamadı"
 	},
 	"noTemplates": {
 		"message": "Kullanılabilir şablon yok. Lütfen ayarlarda bir şablon ekleyin."
@@ -530,6 +560,12 @@
 	},
 	"openEmbedded": {
 		"message": "Sayfada aç"
+	},
+	"openHighlights": {
+		"message": "Vurguları aç"
+	},
+	"openReader": {
+		"message": "Okuyucuyu aç"
 	},
 	"openSidePanel": {
 		"message": "Yan paneli aç"
@@ -768,6 +804,9 @@
 	"readerLineWidth": {
 		"message": "Satır genişliği"
 	},
+	"readerLoadFailed": {
+		"message": "Yüklenemedi. Sayfa tarayıcınız tarafından engellenmiş olabilir."
+	},
 	"readerLoading": {
 		"message": "Sadeleştiriliyor…"
 	},
@@ -797,6 +836,9 @@
 	},
 	"readerTypography": {
 		"message": "Tipografi"
+	},
+	"readerUrlPlaceholder": {
+		"message": "Okumak için bir URL yapıştırın…"
 	},
 	"readerViewFullSize": {
 		"message": "Tam boyutta görüntüle"
@@ -851,6 +893,9 @@
 	},
 	"saveFile": {
 		"message": "Dosyayı kaydet..."
+	},
+	"searchHighlightsPlaceholder": {
+		"message": "Vurgularda ara…"
 	},
 	"searchVariables": {
 		"message": "Değişkenleri ara..."
@@ -911,6 +956,21 @@
 	},
 	"silentOpenDescription": {
 		"message": "Notlar kaydedilir ama yeni sekmede açılmaz. Obsidian yine de öne gelir."
+	},
+	"sort": {
+		"message": "Sırala"
+	},
+	"sortAZ": {
+		"message": "A'dan Z'ye"
+	},
+	"sortNewOld": {
+		"message": "En yeniler önce"
+	},
+	"sortOldNew": {
+		"message": "En eskiler önce"
+	},
+	"sortZA": {
+		"message": "Z'den A'ya"
 	},
 	"specificNoteName": {
 		"message": "Belirli not adı"

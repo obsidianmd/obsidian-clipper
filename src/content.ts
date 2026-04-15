@@ -1,13 +1,15 @@
 import browser from './utils/browser-polyfill';
 import * as highlighter from './utils/highlighter';
 import { loadSettings, generalSettings } from './utils/storage-utils';
-import Defuddle from 'defuddle';
 import { getDomain } from './utils/string-utils';
 import { extractContentBySelector as extractContentBySelectorShared } from './utils/shared';
+import Defuddle from 'defuddle';
 import { createMarkdownContent } from 'defuddle/full';
 import { flattenShadowDom } from './utils/flatten-shadow-dom';
 import { saveFile } from './utils/file-utils';
 import { debugLog } from './utils/debug';
+import { updateSidebarWidth, addResizeHandle, cleanupResizeHandlers } from './utils/iframe-resize';
+import { parseForClip } from './utils/clip-utils';
 
 declare global {
 	interface Window {
@@ -26,40 +28,14 @@ declare global {
 
 	debugLog('Clipper', 'Initializing content script, generation', myGeneration);
 
-	// In Reader mode, extract from the article's original HTML (before
-	// wireTranscript restructures it) with a neutral URL so site-specific
-	// extractors don't re-fetch content (e.g. YouTube)
-	function parseForClip(doc: Document) {
-		const readerArticle = doc.querySelector('.obsidian-reader-active .obsidian-reader-content article');
-		if (readerArticle) {
-			const readerDoc = doc.implementation.createHTMLDocument();
-			const originalHtml = readerArticle.getAttribute('data-original-html');
-			readerDoc.body.innerHTML = originalHtml || readerArticle.innerHTML;
-			return new Defuddle(readerDoc, { url: '' }).parse();
-		}
-		return new Defuddle(doc, { url: doc.URL }).parse();
-	}
-
 	let isHighlighterMode = false;
 	const iframeId = 'obsidian-clipper-iframe';
 	const containerId = 'obsidian-clipper-container';
 
-	let sidebarWidthRaf: number | null = null;
-
-	function updateSidebarWidth(container: HTMLElement | null) {
-		if (sidebarWidthRaf) cancelAnimationFrame(sidebarWidthRaf);
-		sidebarWidthRaf = requestAnimationFrame(() => {
-			if (container && document.contains(container)) {
-				document.documentElement.style.setProperty('--clipper-sidebar-width', `${container.offsetWidth + 24}px`);
-			} else {
-				document.documentElement.style.removeProperty('--clipper-sidebar-width');
-			}
-		});
-	}
-
 	function removeContainer(container: HTMLElement) {
 		container.classList.add('is-closing');
-		updateSidebarWidth(null);
+		updateSidebarWidth(document, null);
+		cleanupResizeHandlers(document);
 		container.addEventListener('animationend', () => {
 			container.remove();
 			highlighter.repositionHighlights();
@@ -92,104 +68,17 @@ declare global {
 		iframe.src = browser.runtime.getURL('side-panel.html?context=iframe');
 		container.appendChild(iframe);
 
-		// Add resize handle (left side only)
-		const handle = document.createElement('div');
-		handle.className = `obsidian-clipper-resize-handle obsidian-clipper-resize-handle-w`;
-		container.appendChild(handle);
-		addResizeListener(container, handle, 'w');
-
-		const southHandle = document.createElement('div');
-		southHandle.className = `obsidian-clipper-resize-handle obsidian-clipper-resize-handle-s`;
-		container.appendChild(southHandle);
-		addResizeListener(container, southHandle, 's');
-
-		const southWestHandle = document.createElement('div');
-		southWestHandle.className = 'obsidian-clipper-resize-handle obsidian-clipper-resize-handle-sw';
-		container.appendChild(southWestHandle);
-		addResizeListener(container, southWestHandle, 'sw');
+		const resizeCallbacks = {
+			onResize: () => highlighter.repositionHighlights(),
+			onResizeEnd: () => highlighter.repositionHighlights(),
+		};
+		addResizeHandle(document, container, 'w', resizeCallbacks);
+		addResizeHandle(document, container, 's', resizeCallbacks);
+		addResizeHandle(document, container, 'sw', resizeCallbacks);
 
 		document.body.appendChild(container);
-		updateSidebarWidth(container);
-		container.addEventListener('animationend', () => {
-			highlighter.repositionHighlights();
-		}, { once: true });
-	}
-
-	function addResizeListener(container: HTMLElement, handle: HTMLElement, direction: string) {
-		let isResizing = false;
-		let startX: number, startY: number, startWidth: number, startHeight: number, startLeft: number, startTop: number;
-	
-		handle.onmousedown = (e) => {
-			e.stopPropagation();
-			isResizing = true;
-			startX = e.clientX;
-			startY = e.clientY;
-			startWidth = container.offsetWidth;
-			startHeight = container.offsetHeight;
-			startLeft = container.offsetLeft;
-			startTop = container.offsetTop;
-
-			document.body.style.cursor = window.getComputedStyle(handle).cursor;
-	
-			const iframe = container.querySelector('#obsidian-clipper-iframe');
-			if (iframe) iframe.classList.add('is-resizing');
-	
-			document.onmousemove = (moveEvent) => {
-				if (!isResizing) return;
-
-				const dx = moveEvent.clientX - startX;
-				const dy = moveEvent.clientY - startY;
-
-				const minWidth = parseInt(container.style.minWidth) || 200;
-				const minHeight = parseInt(container.style.minHeight) || 200;
-
-				if (direction.includes('e')) {
-					let newWidth = startWidth + dx;
-					if (newWidth < minWidth) newWidth = minWidth;
-					container.style.width = `${newWidth}px`;
-				}
-				if (direction.includes('w')) {
-					let newWidth = startWidth - dx;
-					if (newWidth < minWidth) {
-						newWidth = minWidth;
-					}
-					container.style.width = `${newWidth}px`;
-				}
-				if (direction.includes('s')) {
-					let newHeight = startHeight + dy;
-					if (newHeight < minHeight) newHeight = minHeight;
-					container.style.height = `${newHeight}px`;
-				}
-				if (direction.includes('n')) {
-					let newHeight = startHeight - dy;
-					let newTop = startTop + dy;
-					if (newHeight < minHeight) {
-						newHeight = minHeight;
-						newTop = startTop + startHeight - minHeight;
-					}
-					container.style.height = `${newHeight}px`;
-					container.style.top = `${newTop}px`;
-				}
-
-				updateSidebarWidth(container);
-			};
-	
-			document.onmouseup = () => {
-				isResizing = false;
-				const iframe = container.querySelector('#obsidian-clipper-iframe');
-				if (iframe) iframe.classList.remove('is-resizing');
-				document.body.style.cursor = '';
-				
-				const newWidth = container.offsetWidth;
-				const newHeight = container.offsetHeight;
-				browser.storage.local.set({ clipperIframeWidth: newWidth, clipperIframeHeight: newHeight });
-
-				highlighter.repositionHighlights();
-
-				document.onmousemove = null;
-				document.onmouseup = null;
-			};
-		};
+		updateSidebarWidth(document, container);
+		container.addEventListener('animationend', () => highlighter.repositionHighlights(), { once: true });
 	}
 
 	// Firefox
@@ -393,6 +282,10 @@ declare global {
 					wordCount: defuddled.wordCount,
 					metaTags: defuddled.metaTags || []
 				};
+				if (defuddled.title) {
+					highlighter.setPageTitle(defuddled.title);
+				}
+				highlighter.updatePageDomainSettings({ site: defuddled.site, favicon: defuddled.favicon });
 				sendResponse(response);
 			}).catch((error: unknown) => {
 				console.error('[Obsidian Clipper] getPageContent error:', error);
@@ -537,6 +430,7 @@ declare global {
 		}
 
 		await highlighter.loadHighlights();
+		highlighter.setPageTitle(document.title);
 		updateHasHighlights();
 	}
 

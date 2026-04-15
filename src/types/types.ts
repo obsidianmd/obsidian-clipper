@@ -63,6 +63,7 @@ export interface ReaderSettings {
 	defaultFont: string;
 	blendImages: boolean;
 	colorLinks: boolean;
+	followLinks: boolean;
 	pinPlayer: boolean;
 	autoScroll: boolean;
 	highlightActiveLine: boolean;
