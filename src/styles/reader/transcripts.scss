@@ -148,6 +148,8 @@ article > .player-toggles {
 		width: var(--timestamp-width);
 		font-variant: tabular-nums;
 		position: relative;
+		user-select: none;
+		-webkit-user-select: none;
 	}
 	.transcript-segment-text {
 		flex: 1;

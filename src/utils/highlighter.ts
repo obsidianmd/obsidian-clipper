@@ -1144,6 +1144,15 @@ function getClosestAllowedBlock(node: Node | null): Element | null {
 	while (current) {
 		if (current.nodeType === Node.ELEMENT_NODE) {
 			const el = current as Element;
+			// Transcript handling: the timestamp <strong> must not produce a
+			// highlight block (otherwise a cross-segment selection walks up
+			// past it and snaps to the outer <p>, pulling the timestamp
+			// column into the highlight). The sibling text wrapper acts as
+			// the block instead, scoping highlights to the text portion.
+			if (el.parentElement?.classList.contains('transcript-segment')) {
+				if (el.tagName === 'STRONG') return null;
+				if (el.classList.contains('transcript-segment-text')) return el;
+			}
 			// Check if it's an allowed tag overall and if it's a block element we use for splitting text selections.
 			if (ALLOWED_HIGHLIGHT_TAGS.includes(el.tagName.toUpperCase()) && isConsideredBlockElement(el)) {
 				return el;
