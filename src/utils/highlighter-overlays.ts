@@ -21,37 +21,43 @@ let lastHoverTarget: Element | null = null;
 
 const LINE_BY_LINE_OVERLAY_TAGS = ['P'];
 
-// Check if an element should be ignored for highlighting
-function isIgnoredElement(element: Element): boolean {
-	const tagName = element.tagName.toUpperCase();
-	const isDisallowedTag = ![
-		'SPAN', 'P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6',
-		'MATH', 'FIGURE', 'UL', 'OL', 'TABLE', 'LI', 'TR', 'TD', 'TH', 'CODE', 'PRE', 'BLOCKQUOTE', 'EM', 'STRONG', 'A'
-	].includes(tagName);
+const HIGHLIGHTABLE_TAGS = new Set([
+	'SPAN', 'P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6',
+	'MATH', 'FIGURE', 'UL', 'OL', 'TABLE', 'LI', 'TR', 'TD', 'TH',
+	'CODE', 'PRE', 'BLOCKQUOTE', 'EM', 'STRONG', 'A',
+]);
 
-	return element.tagName.toLowerCase() === 'html' ||
-		element.tagName.toLowerCase() === 'body' ||
-		element.classList.contains('obsidian-highlighter-menu') ||
-		element.closest('.obsidian-highlighter-menu') !== null ||
-		element.classList.contains('obsidian-reader-settings') ||
-		element.closest('.obsidian-reader-settings') !== null ||
-		element.closest('.transcript-segment > strong') !== null ||
-		isDisallowedTag;
+const IGNORED_BOUNDARY_SELECTOR =
+	'.obsidian-highlighter-menu, .obsidian-reader-settings, .transcript-segment > strong';
+
+// Nearest highlightable ancestor, or null. Walks past wrappers like
+// <img>/<picture>/<div> to find the enclosing <figure>.
+function findHighlightableAncestor(target: Element | null): Element | null {
+	if (!target || target.closest(IGNORED_BOUNDARY_SELECTOR)) return null;
+	let current: Element | null = target;
+	while (current) {
+		if (HIGHLIGHTABLE_TAGS.has(current.tagName.toUpperCase())) {
+			return current;
+		}
+		current = current.parentElement;
+	}
+	return null;
 }
 
 // Handles mouse move events for hover effects
 export function handleMouseMove(event: MouseEvent | TouchEvent) {
-	let target: Element;
+	let target: Element | null;
 	if (event instanceof MouseEvent) {
 		target = event.target as Element;
 	} else {
 		// Touch event
 		const touch = event.changedTouches[0];
-		target = document.elementFromPoint(touch.clientX, touch.clientY) as Element;
+		target = document.elementFromPoint(touch.clientX, touch.clientY);
 	}
 
-	if (!isIgnoredElement(target)) {
-		createOrUpdateHoverOverlay(target);
+	const highlightable = findHighlightableAncestor(target);
+	if (highlightable) {
+		createOrUpdateHoverOverlay(highlightable);
 	} else {
 		removeHoverOverlay();
 	}
@@ -79,33 +85,9 @@ export function handleMouseUp(event: MouseEvent | TouchEvent) {
 		if (target.classList.contains('obsidian-highlight-overlay')) {
 			handleHighlightClick(event);
 		} else {
-			let elementToProcess: Element | null = target;
-			const targetTagName = target.tagName.toUpperCase();
-
-			if (['TD', 'TH', 'TR'].includes(targetTagName)) {
-				elementToProcess = target.closest('table');
-				if (!elementToProcess) {
-					// Clicked table cell/row not in a table, so do nothing.
-					return; 
-				}
-				// If a table is found, elementToProcess is now the table.
-				// highlightElement will verify if 'TABLE' is an allowed tag.
-			} else {
-				// Original target was not a table cell/row.
-				// isIgnoredElement returns true if element is NOT allowed.
-				if (isIgnoredElement(target)) {
-					// If target is ignored, check its parent.
-					if (target.parentElement && !isIgnoredElement(target.parentElement)) {
-						elementToProcess = target.parentElement;
-					} else {
-						// Target is ignored, and parent is also ignored or doesn't exist.
-						return;
-					}
-				}
-				// If target was not ignored, elementToProcess remains target.
-			}
-
+			const elementToProcess = findHighlightableAncestor(target);
 			if (elementToProcess) {
+				// highlightElement handles TD/TH/TR → closest('table') itself.
 				highlightElement(elementToProcess);
 			}
 		}
@@ -418,34 +400,17 @@ function createOrUpdateHoverOverlay(target: Element) {
 	if (target === lastHoverTarget) return;
 	lastHoverTarget = target;
 
-	let elementForHoverRect: Element | null = target;
-	const eventTargetTagName = target.tagName.toUpperCase();
-
-	if (['TD', 'TH', 'TR'].includes(eventTargetTagName)) {
-		elementForHoverRect = target.closest('table');
-	}
-
-	// Now, elementForHoverRect is either the table, the original target, or null.
-	// Check if this elementForHoverRect itself is valid (i.e., not ignored).
-	// isIgnoredElement returns true if the element's tag is NOT in the allowed list for hover
-	// (or if it's html, body etc.).
-	if (elementForHoverRect && !isIgnoredElement(elementForHoverRect)) {
-		// This is a valid element to get bounds from.
-	} else if (target.parentElement && !isIgnoredElement(target.parentElement) && !['TD', 'TH', 'TR'].includes(eventTargetTagName)) {
-		// If the primary elementForHoverRect (table or original target) was not valid (null or ignored),
-		// AND the original event target was not a table cell (because for cells, we only care about the table's validity),
-		// THEN consider the original event target's parent as the element for the hover rectangle.
-		elementForHoverRect = target.parentElement;
-	} else {
-		// Otherwise (no valid candidate found after checking primary and parent (for non-cells))
-		removeHoverOverlay();
-		return;
-	}
-
-	// If, after all logic, elementForHoverRect is null (e.g. a TD not in a table, or other unhandled cases), remove overlay.
-	if (!elementForHoverRect) {
-		removeHoverOverlay();
-		return;
+	// For table cells/rows, the hover outline spans the whole table to match
+	// what clicking will actually highlight.
+	let elementForHoverRect: Element = target;
+	const tagName = target.tagName.toUpperCase();
+	if (tagName === 'TD' || tagName === 'TH' || tagName === 'TR') {
+		const table = target.closest('table');
+		if (!table) {
+			removeHoverOverlay();
+			return;
+		}
+		elementForHoverRect = table;
 	}
 
 	if (!hoverOverlay) {

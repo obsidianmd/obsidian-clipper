@@ -408,7 +408,10 @@ h1.highlight-page-title {
 	position: relative;
 	padding: 1.5em 0;
 	margin: 0;
-	.highlight-item-content > p {
+	.image-expand-button {
+		display: none !important;
+	}
+	.highlight-item-content > :is(img, p, figure, blockquote) {
 		&:first-child {
 			margin-top: 0;
 		}
