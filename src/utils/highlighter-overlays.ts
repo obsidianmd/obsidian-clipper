@@ -295,6 +295,20 @@ export function handleMouseUp(event: MouseEvent | TouchEvent) {
 
 	const selection = window.getSelection();
 	if (selection && !selection.isCollapsed) {
+		// When the user drags past the left/right edge of the content area,
+		// browsers extend the selection vertically (up for left, down for
+		// right), often selecting the entire article. Detect this by checking
+		// whether mouseup landed outside the text column — if so, discard.
+		if (event instanceof MouseEvent) {
+			const readerContent = document.querySelector('.obsidian-reader-content');
+			if (readerContent) {
+				const bounds = readerContent.getBoundingClientRect();
+				if (event.clientX < bounds.left || event.clientX > bounds.right) {
+					selection.removeAllRanges();
+					return;
+				}
+			}
+		}
 		handleTextSelection(selection);
 		return;
 	}
