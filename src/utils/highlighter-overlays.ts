@@ -385,6 +385,10 @@ const throttledUpdateHighlights = throttle(() => {
 window.addEventListener('resize', throttledUpdateHighlights);
 window.addEventListener('scroll', throttledUpdateHighlights);
 
+// Mutation observer re-positions element overlays when the page reflows.
+// Lazily connected — observing document.body on every page the extension
+// runs on (before any highlights exist) is wasted work, especially on busy
+// SPAs. syncHoverListener connects/disconnects based on need.
 const observer = new MutationObserver((mutations) => {
 	if (isApplyingHighlights) return;
 	const shouldUpdate = mutations.some(m => {
@@ -394,28 +398,35 @@ const observer = new MutationObserver((mutations) => {
 	});
 	if (shouldUpdate) throttledUpdateHighlights();
 });
-observer.observe(document.body, {
-	childList: true,
-	subtree: true,
-	attributes: true,
-	attributeFilter: ['style', 'class'],
-	characterData: false,
-});
 
-// The hover-delete button works regardless of highlighter mode, but only when
-// there are highlights to hover over. Attach mousemove lazily to avoid paying
-// the event-handler cost on every page the extension runs on.
+// Mousemove + mutation observer + scroll/resize listeners all pay a
+// per-event cost on every page load. Tie them to the single condition that
+// makes them useful: highlights exist on this page OR highlighter is active.
 let mouseMoveAttached = false;
+let observerAttached = false;
 export function syncHoverListener(): void {
 	const isActive = document.body.classList.contains('obsidian-highlighter-active');
-	const needsListener = highlights.length > 0 || isActive;
-	if (needsListener && !mouseMoveAttached) {
+	const needed = highlights.length > 0 || isActive;
+	if (needed && !mouseMoveAttached) {
 		document.addEventListener('mousemove', handleMouseMove);
 		mouseMoveAttached = true;
-	} else if (!needsListener && mouseMoveAttached) {
+	} else if (!needed && mouseMoveAttached) {
 		document.removeEventListener('mousemove', handleMouseMove);
 		mouseMoveAttached = false;
 		hideHighlightDeleteButton();
+	}
+	if (needed && !observerAttached) {
+		observer.observe(document.body, {
+			childList: true,
+			subtree: true,
+			attributes: true,
+			attributeFilter: ['style', 'class'],
+			characterData: false,
+		});
+		observerAttached = true;
+	} else if (!needed && observerAttached) {
+		observer.disconnect();
+		observerAttached = false;
 	}
 }
 

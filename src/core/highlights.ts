@@ -1,5 +1,5 @@
 import browser from '../utils/browser-polyfill';
-import { AnyHighlightData, StoredData, DomainSettings, groupHighlights, normalizeUrl } from '../utils/highlighter';
+import { AnyHighlightData, StoredData, DomainSettings, collapseGroupsForExport, normalizeUrl } from '../utils/highlighter';
 import { translatePage, getMessage, setupLanguageAndDirection } from '../utils/i18n';
 import { addBrowserClassToHtml, detectBrowser } from '../utils/browser-detection';
 import DOMPurify from 'dompurify';
@@ -790,12 +790,7 @@ async function exportCurrentContext() {
 
 	const exportData = Array.from(byUrl.entries()).map(([url, highlights]) => ({
 		url,
-		// Coalesce group members into a single export entry so a multi-block
-		// selection appears as one highlight, not N.
-		highlights: groupHighlights(highlights.map(h => h.data)).map(group => ({
-			text: group.map(h => h.content).join('\n\n'),
-			timestamp: dayjs(parseInt(group[0].id)).toISOString(),
-		})),
+		highlights: collapseGroupsForExport(highlights.map(h => h.data)),
 	}));
 
 	const jsonContent = JSON.stringify(exportData, null, 2);

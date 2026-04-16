@@ -5,7 +5,7 @@ import { buildVariables, addSchemaOrgDataToVariables } from './shared';
 import browser from './browser-polyfill';
 import { debugLog } from './debug';
 import dayjs from 'dayjs';
-import { AnyHighlightData, TextHighlightData, HighlightData, groupHighlights } from './highlighter';
+import { AnyHighlightData, TextHighlightData, HighlightData, collapseGroupsForExport } from './highlighter';
 import { generalSettings } from './storage-utils';
 import {
 	getElementByXPath,
@@ -155,21 +155,7 @@ export async function initializePageContent(
 
 		const markdownBody = createMarkdownContent(content, currentUrl);
 
-		// Coalesce group members (from a single multi-block selection) into one
-		// highlight entry; merge their notes.
-		const highlightsData = groupHighlights(highlights).map(group => {
-			const entry: {
-				text: string;
-				timestamp: string;
-				notes?: string[];
-			} = {
-				text: group.map(h => createMarkdownContent(h.content, currentUrl)).join('\n\n'),
-				timestamp: dayjs(parseInt(group[0].id)).toISOString(),
-			};
-			const mergedNotes = group.flatMap(h => h.notes ?? []);
-			if (mergedNotes.length > 0) entry.notes = mergedNotes;
-			return entry;
-		});
+		const highlightsData = collapseGroupsForExport(highlights, c => createMarkdownContent(c, currentUrl));
 
 		const noteName = sanitizeFileName(title);
 

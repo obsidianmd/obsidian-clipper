@@ -138,7 +138,12 @@ export interface DomainSettings {
 	site?: string;
 	favicon?: string;
 }
-let lastAppliedHighlights: string = '';
+// Monotonic version counter bumped on any mutation to `highlights`. Cheaper
+// dirty-flag than JSON.stringify on the render hot path (every reposition,
+// every storage-change sync for long articles ran two full serializations).
+let highlightsVersion = 0;
+let lastAppliedVersion = -1;
+function bumpHighlightsVersion() { highlightsVersion++; }
 let originalLinkClickHandlers: WeakMap<HTMLElement, (event: MouseEvent) => void> = new WeakMap();
 
 interface HistoryAction {
@@ -194,6 +199,7 @@ type HighlightsStorage = Record<string, StoredData>;
 export function updateHighlights(newHighlights: AnyHighlightData[]) {
 	const oldHighlights = [...highlights];
 	highlights = newHighlights;
+	bumpHighlightsVersion();
 	addToHistory('add', oldHighlights, newHighlights);
 }
 
@@ -242,6 +248,7 @@ export function undo() {
 		if (lastAction) {
 			redoHistory.push(lastAction);
 			highlights = [...lastAction.oldHighlights];
+			bumpHighlightsVersion();
 			commitHighlightChanges();
 			updateUndoRedoButtons();
 		}
@@ -254,6 +261,7 @@ export function redo() {
 		if (nextAction) {
 			highlightHistory.push(nextAction);
 			highlights = [...nextAction.newHighlights];
+			bumpHighlightsVersion();
 			commitHighlightChanges();
 			updateUndoRedoButtons();
 		}
@@ -516,11 +524,12 @@ export function handleTextSelection(selection: Selection, notes?: string[]) {
 			currentBatchHighlights = mergeOverlappingHighlights(currentBatchHighlights, newHighlightWithNotes);
 		}
 		
-		highlights = currentBatchHighlights; // Update global highlights with the final merged result
-		
+		highlights = currentBatchHighlights;
+		bumpHighlightsVersion();
+
 		// Only add to history if something actually changed from the initial global state
 		if (JSON.stringify(oldGlobalHighlights) !== JSON.stringify(highlights)) {
-			addToHistory('add', oldGlobalHighlights, highlights); 
+			addToHistory('add', oldGlobalHighlights, highlights);
 		}
 		
 		sortHighlights();
@@ -667,18 +676,6 @@ function getHighlightRanges(range: Range): AnyHighlightData[] {
 	return newHighlights;
 }
 
-function serializeRangeContents(range: Range): string {
-	const temp = document.createElement('div');
-	temp.appendChild(range.cloneContents());
-	const serializer = new XMLSerializer();
-	let html = '';
-	for (const node of Array.from(temp.childNodes)) {
-		if (node.nodeType === Node.ELEMENT_NODE) html += serializer.serializeToString(node);
-		else if (node.nodeType === Node.TEXT_NODE) html += node.textContent;
-	}
-	return html;
-}
-
 // Clone the range contents, then re-wrap in any inline ancestors that live
 // between the range and the block boundary. Range.cloneContents() only
 // includes ancestors the range actually crosses, so a selection entirely
@@ -800,12 +797,12 @@ function getTextOffset(container: Element, targetNode: Node, targetOffset: numbe
 	return offset;
 }
 
-// Add a new highlight to the page
 function addHighlight(highlight: AnyHighlightData, notes?: string[]) {
 	const oldHighlights = [...highlights];
 	const newHighlight = { ...highlight, notes: notes || [] };
 	const mergedHighlights = mergeOverlappingHighlights(highlights, newHighlight);
 	highlights = mergedHighlights;
+	bumpHighlightsVersion();
 	addToHistory('add', oldHighlights, mergedHighlights);
 	sortHighlights();
 	commitHighlightChanges();
@@ -903,6 +900,10 @@ function mergeHighlights(h1: AnyHighlightData, h2: AnyHighlightData): AnyHighlig
 			const startOffset = Math.min(h1.startOffset, h2.startOffset);
 			const endOffset = Math.max(h1.endOffset, h2.endOffset);
 			const el = getElementByXPath(h1.xpath);
+			const notes = [...(h1.notes ?? []), ...(h2.notes ?? [])];
+			// Preserve groupId so a merged highlight keeps its multi-block
+			// delete/export association. Prefer whichever side already has one.
+			const groupId = h1.groupId ?? h2.groupId;
 			return {
 				xpath: h1.xpath,
 				content: el?.textContent?.slice(startOffset, endOffset) ?? '',
@@ -910,6 +911,8 @@ function mergeHighlights(h1: AnyHighlightData, h2: AnyHighlightData): AnyHighlig
 				id: Date.now().toString(),
 				startOffset,
 				endOffset,
+				...(notes.length > 0 ? { notes } : {}),
+				...(groupId ? { groupId } : {}),
 			};
 		}
 		return h1;
@@ -926,7 +929,6 @@ function mergeHighlights(h1: AnyHighlightData, h2: AnyHighlightData): AnyHighlig
 	return h1;
 }
 
-// Save highlights to browser storage
 export function saveHighlights() {
 	const rawUrl = getPageUrl();
 	const url = normalizeUrl(rawUrl);
@@ -961,10 +963,9 @@ export function saveHighlights() {
 }
 
 export function invalidateHighlightCache() {
-	lastAppliedHighlights = '';
+	lastAppliedVersion = -1;
 }
 
-// Force reposition of all highlight overlays after layout changes
 export function repositionHighlights() {
 	invalidateHighlightCache();
 	applyHighlights();
@@ -972,9 +973,7 @@ export function repositionHighlights() {
 
 export function applyHighlights() {
 	if (isApplyingHighlights) return;
-
-	const currentHighlightsState = JSON.stringify(highlights);
-	if (currentHighlightsState === lastAppliedHighlights) return;
+	if (highlightsVersion === lastAppliedVersion) return;
 
 	isApplyingHighlights = true;
 
@@ -989,7 +988,7 @@ export function applyHighlights() {
 		}
 	});
 
-	lastAppliedHighlights = currentHighlightsState;
+	lastAppliedVersion = highlightsVersion;
 	isApplyingHighlights = false;
 	syncHoverListener();
 }
@@ -1002,7 +1001,6 @@ function commitHighlightChanges() {
 	updateHighlighterMenu();
 }
 
-// Get all highlight contents
 export function getHighlights(): string[] {
 	return highlights.map(h => h.content);
 }
@@ -1030,6 +1028,35 @@ export function groupHighlights(highlights: AnyHighlightData[]): AnyHighlightDat
 	return groups;
 }
 
+export interface ExportedHighlight {
+	text: string;
+	timestamp: string;
+	notes?: string[];
+}
+
+// Export shape used by every highlight-export surface (highlights.html,
+// options-page export, clip-to-Obsidian content-extractor). Coalesces group
+// members into one entry, joining content with blank lines; merges notes.
+// `transformContent` lets the clipper path run its content through
+// createMarkdownContent while the JSON exports pass it through verbatim.
+export function collapseGroupsForExport(
+	highlights: AnyHighlightData[],
+	transformContent?: (content: string) => string,
+): ExportedHighlight[] {
+	return groupHighlights(highlights).map(group => {
+		const parts = transformContent
+			? group.map(h => transformContent(h.content))
+			: group.map(h => h.content);
+		const mergedNotes = group.flatMap(h => h.notes ?? []);
+		const entry: ExportedHighlight = {
+			text: parts.join('\n\n'),
+			timestamp: new Date(parseInt(group[0].id)).toISOString(),
+		};
+		if (mergedNotes.length > 0) entry.notes = mergedNotes;
+		return entry;
+	});
+}
+
 // Which execution context this module instance belongs to. Bundles that
 // render live highlights (content.js, reader-script.js, reader-page.js) call
 // setRenderContext at load. Other bundles that import this module only for
@@ -1055,6 +1082,7 @@ browser.storage.onChanged.addListener((changes, area) => {
 	const newForUrl = newAll[url]?.highlights ?? [];
 	if (JSON.stringify(newForUrl) === JSON.stringify(highlights)) return;
 	highlights = newForUrl;
+	bumpHighlightsVersion();
 	invalidateHighlightCache();
 	const readerActive = document.documentElement.classList.contains('obsidian-reader-active');
 	const liveContext = readerActive ? 'reader-script' : 'content';
@@ -1064,7 +1092,6 @@ browser.storage.onChanged.addListener((changes, area) => {
 	}
 });
 
-// Load highlights from browser storage
 export async function loadHighlights() {
 	const url = normalizeUrl(getPageUrl());
 	const rawUrl = getPageUrl();
@@ -1084,6 +1111,7 @@ export async function loadHighlights() {
 
 	if (storedData && Array.isArray(storedData.highlights) && storedData.highlights.length > 0) {
 		highlights = storedData.highlights;
+		bumpHighlightsVersion();
 		await loadSettings();
 		// Always render stored highlights so the hover-delete affordance works
 		// regardless of highlighter mode. The alwaysShowHighlights setting is
@@ -1095,11 +1123,11 @@ export async function loadHighlights() {
 		}
 	} else {
 		highlights = [];
+		bumpHighlightsVersion();
 	}
-	lastAppliedHighlights = JSON.stringify(highlights);
+	lastAppliedVersion = highlightsVersion;
 }
 
-// Clear all highlights from the page and storage
 export function clearHighlights() {
 	const url = normalizeUrl(getPageUrl());
 	const oldHighlights = [...highlights];
@@ -1108,6 +1136,7 @@ export function clearHighlights() {
 		delete allHighlights[url];
 		browser.storage.local.set({ highlights: allHighlights }).then(() => {
 			highlights = [];
+			bumpHighlightsVersion();
 			removeExistingHighlights();
 			syncHoverListener();
 			console.log('Highlights cleared for:', url);
@@ -1206,4 +1235,3 @@ function findLastTextNode(element: Element): Text | null {
 	return lastNode as Text | null;
 }
 
-export { getElementXPath } from './dom-utils';

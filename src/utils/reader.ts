@@ -2323,6 +2323,10 @@ export class Reader {
 	// highlighter is ON, the usual mouseup path in highlighter-overlays.ts
 	// handles selections directly, so we stay out of its way.
 	private static registerSelectionToHighlightButton(doc: Document) {
+		// Idempotent: if Reader.apply runs again without a page reload (e.g.
+		// SPA navigation where we re-enter reader), don't stack a second
+		// button + three more listeners on the same document.
+		if (doc.querySelector('.obsidian-selection-action')) return;
 		const btn = doc.createElement('button');
 		btn.type = 'button';
 		btn.className = 'obsidian-selection-action';

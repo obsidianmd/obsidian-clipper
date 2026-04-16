@@ -1,6 +1,6 @@
 import browser from '../utils/browser-polyfill';
 import { detectBrowser } from '../utils/browser-detection';
-import { AnyHighlightData, groupHighlights } from '../utils/highlighter';
+import { AnyHighlightData, collapseGroupsForExport } from '../utils/highlighter';
 import dayjs from 'dayjs';
 import { getMessage } from '../utils/i18n';
 
@@ -11,11 +11,7 @@ export async function exportHighlights(): Promise<void> {
 
 		const exportData = Object.entries(allHighlights).map(([url, data]) => ({
 			url,
-			// Coalesce group members so a multi-block selection exports as one.
-			highlights: groupHighlights(data.highlights as AnyHighlightData[]).map(group => ({
-				text: group.map(h => h.content).join('\n\n'),
-				timestamp: dayjs(parseInt(group[0].id)).toISOString(),
-			})),
+			highlights: collapseGroupsForExport(data.highlights as AnyHighlightData[]),
 		}));
 
 		const jsonContent = JSON.stringify(exportData, null, 2);
