@@ -5,8 +5,24 @@ import { flattenShadowDom as flattenShadowDomUtil } from './flatten-shadow-dom';
 import { getLocalStorage, setLocalStorage } from './storage-utils';
 import hljs from 'highlight.js';
 import { getDomain } from './string-utils';
-import { applyHighlights, handleTextSelection, invalidateHighlightCache, loadHighlights, toggleHighlighterMenu, getHighlights, repositionHighlights } from './highlighter';
-import { removeExistingHighlights } from './highlighter-overlays';
+import type { HighlighterAPI } from './highlighter';
+import * as localHighlighter from './highlighter';
+import { removeExistingHighlights as localRemoveExistingHighlights } from './highlighter-overlays';
+
+// Bridge: on a live page with reader mode (case 2), content.js already loaded
+// and owns the highlighter module. reader-script.js delegates to it via this
+// window global to avoid two independent `highlights[]` arrays on the same
+// tab. On the standalone reader.html (case 3), no content.js exists — the
+// direct import is the only copy and serves as the fallback. Cached after
+// first resolution so the fallback spread doesn't re-allocate per call.
+let _hl: HighlighterAPI;
+function hl(): HighlighterAPI {
+	return _hl ??= window.__obsidianHighlighter ?? {
+		...localHighlighter,
+		removeExistingHighlights: localRemoveExistingHighlights,
+		ensureHighlighterCSS: () => Reader.ensureHighlighterCSS(document),
+	};
+}
 import { copyToClipboard } from './clipboard-utils';
 import { getMessage, initializeI18n } from './i18n';
 import { getFontCss } from './font-utils';
@@ -1119,7 +1135,7 @@ export class Reader {
 		doc.querySelector('.obsidian-reader-lightbox')?.remove();
 
 		// Highlights
-		removeExistingHighlights();
+		hl().removeExistingHighlights();
 	}
 
 	private static initializeFootnotes(doc: Document) {
@@ -2109,20 +2125,10 @@ export class Reader {
 			// Add reader classes and attributes
 			doc.documentElement.classList.add('obsidian-reader-active');
 
-			// Reader-script owns highlighter rendering while reader is active
-			// (content.js short-circuits in isReaderActive()), so we must load
-			// the highlighter stylesheet ourselves. Idempotent across reloads.
-			Reader.ensureHighlighterCSS(doc);
-
-			// Toolbar / popup mode toggles arrive at content.js via background
-			// messaging; content.js forwards them here through a document
-			// event so reader-script stays the single source of live state.
-			doc.addEventListener('obsidian-set-highlighter-mode', (e) => {
-				const { isActive } = (e as CustomEvent).detail;
-				const alreadyActive = doc.body.classList.contains('obsidian-highlighter-active');
-				if (alreadyActive === isActive) return; // avoid double-toggle when we originated the change
-				toggleHighlighterMenu(isActive);
-			});
+			// Load the highlighter stylesheet. On a live page (case 2), this
+			// goes through content.js's bridge. On reader.html (case 3), the
+			// local implementation injects the <link> tag directly.
+			hl().ensureHighlighterCSS();
 
 			// Apply theme mode (sets theme-light/dark), then effective theme
 			this.updateThemeMode(doc, this.settings.appearance);
@@ -2147,7 +2153,7 @@ export class Reader {
 
 			// Re-activate highlighter if it was active before entering Reader
 			if (doc.body.classList.contains('obsidian-highlighter-active')) {
-				toggleHighlighterMenu(true);
+				hl().toggleHighlighterMenu(true);
 			}
 
 			// Re-attach the clipper iframe container only if it was
@@ -2344,7 +2350,7 @@ export class Reader {
 			// Create the highlight without entering highlighter mode — the
 			// user's intent is a single edit, not a session. handleTextSelection
 			// reads the live selection and clears it on return.
-			handleTextSelection(sel);
+			hl().handleTextSelection(sel);
 			hide();
 		});
 		doc.body.appendChild(btn);
@@ -2394,11 +2400,10 @@ export class Reader {
 		});
 	}
 
-	// Inject the runtime-generated highlighter.css once per document. Mirrors
-	// content.js's ensureHighlighterCSS — needed here because content.js stays
-	// inert while reader is active, but highlight rendering still requires
-	// the stylesheet.
-	private static ensureHighlighterCSS(doc: Document): void {
+	// Inject highlighter.css for the standalone reader.html (case 3, no
+	// content.js). On live pages (case 2), hl() routes to content.js's
+	// Promise-cached version instead.
+	static ensureHighlighterCSS(doc: Document): void {
 		if (doc.getElementById('obsidian-highlighter-stylesheet')) return;
 		const link = doc.createElement('link');
 		link.id = 'obsidian-highlighter-stylesheet';
@@ -2407,15 +2412,9 @@ export class Reader {
 		(doc.head || doc.documentElement).appendChild(link);
 	}
 
-	// Reader-script owns the live highlighter state while reader is active.
-	// toggleHighlighterMenu itself posts `highlighterModeChanged` to background,
-	// which updates the popup UI, badge, and context menu — no additional
-	// message needed here. (Sending toggleHighlighterMode would make background
-	// flip its state a second time and bounce the toggle back through the
-	// obsidian-set-highlighter-mode event, canceling the local toggle.)
 	static toggleHighlighter(doc: Document): void {
 		const willBeActive = !doc.body.classList.contains('obsidian-highlighter-active');
-		toggleHighlighterMenu(willBeActive);
+		hl().toggleHighlighterMenu(willBeActive);
 	}
 
 	static async toggle(doc: Document): Promise<boolean> {
@@ -2587,9 +2586,9 @@ export class Reader {
 		this.initializeComments(doc);
 		this.initializeFollowLinks(doc);
 
-		invalidateHighlightCache();
-		await loadHighlights();
-		applyHighlights();
+		hl().invalidateHighlightCache();
+		await hl().loadHighlights();
+		hl().applyHighlights();
 	}
 
 	private static async getHighlightCountForDomain(domain: string): Promise<number> {
@@ -2662,7 +2661,7 @@ export class Reader {
 			cleanupResizeHandlers(doc);
 			existing.addEventListener('animationend', () => {
 				existing.remove();
-				repositionHighlights();
+				hl().repositionHighlights();
 			}, { once: true });
 			return;
 		}
@@ -2683,8 +2682,8 @@ export class Reader {
 		container.appendChild(iframe);
 
 		const resizeCallbacks = {
-			onResize: () => repositionHighlights(),
-			onResizeEnd: () => repositionHighlights(),
+			onResize: () => hl().repositionHighlights(),
+			onResizeEnd: () => hl().repositionHighlights(),
 		};
 		addResizeHandle(doc, container, 'w', resizeCallbacks);
 		addResizeHandle(doc, container, 's', resizeCallbacks);
@@ -2692,7 +2691,7 @@ export class Reader {
 
 		doc.body.appendChild(container);
 		updateSidebarWidth(doc, container);
-		container.addEventListener('animationend', () => repositionHighlights(), { once: true });
+		container.addEventListener('animationend', () => hl().repositionHighlights(), { once: true });
 	}
 
 	static copyMarkdownOnReaderPage(doc: Document): void {

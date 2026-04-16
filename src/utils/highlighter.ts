@@ -95,6 +95,33 @@ export let highlights: AnyHighlightData[] = [];
 export let isApplyingHighlights = false;
 export let pageTitle: string = '';
 
+// The bridge interface: every highlighter function that reader-script needs.
+// content.js exposes an object of this shape on window.__obsidianHighlighter;
+// reader.ts's hl() helper returns it when present (case 2: live page + reader),
+// or falls back to the direct local import (case 3: standalone reader.html).
+declare global {
+	interface Window { __obsidianHighlighter?: HighlighterAPI }
+}
+
+export interface HighlighterAPI {
+	toggleHighlighterMenu: typeof toggleHighlighterMenu;
+	handleTextSelection: typeof handleTextSelection;
+	highlightElement: typeof highlightElement;
+	applyHighlights: typeof applyHighlights;
+	loadHighlights: typeof loadHighlights;
+	invalidateHighlightCache: typeof invalidateHighlightCache;
+	repositionHighlights: typeof repositionHighlights;
+	getHighlights: typeof getHighlights;
+	setPageUrl: typeof setPageUrl;
+	setPageTitle: typeof setPageTitle;
+	updatePageDomainSettings: typeof updatePageDomainSettings;
+	clearHighlights: typeof clearHighlights;
+	saveHighlights: typeof saveHighlights;
+	updateHighlighterMenu: typeof updateHighlighterMenu;
+	removeExistingHighlights: () => void;
+	ensureHighlighterCSS: () => void;
+}
+
 // URL override for extension pages (e.g. reader page) where
 // window.location.href is the extension URL, not the article URL.
 let pageUrlOverride: string | null = null;
@@ -518,12 +545,32 @@ export function handleTextSelection(selection: Selection, notes?: string[]) {
 		const oldGlobalHighlights = [...highlights]; // Save global state BEFORE this operation
 		let currentBatchHighlights = [...highlights]; // Start with global state for merging
 
+		const batchGroupId = newHighlightDatas.length > 1 ? newHighlightDatas[0].groupId : undefined;
+		let absorbedIntoGroupId: string | undefined;
+
 		for (const highlightData of newHighlightDatas) {
+			const beforeCount = currentBatchHighlights.length;
 			const newHighlightWithNotes = { ...highlightData, notes: notes || [] };
-			// Merge current new highlight with the accumulating batch from this selection + pre-existing ones
 			currentBatchHighlights = mergeOverlappingHighlights(currentBatchHighlights, newHighlightWithNotes);
+			// If the array didn't grow, a merge happened — the new piece was
+			// absorbed into an existing highlight whose groupId we should adopt
+			// for the rest of this batch, so the two selections become one group.
+			if (!absorbedIntoGroupId && batchGroupId && currentBatchHighlights.length === beforeCount) {
+				absorbedIntoGroupId = currentBatchHighlights.find(
+					h => h.groupId && h.groupId !== batchGroupId
+				)?.groupId;
+			}
 		}
-		
+
+		// If the new batch merged into an existing group, unify: adopt the
+		// existing groupId for all remaining pieces that still carry the
+		// batch's original groupId, so the export treats them as one unit.
+		if (absorbedIntoGroupId && batchGroupId) {
+			for (const h of currentBatchHighlights) {
+				if (h.groupId === batchGroupId) h.groupId = absorbedIntoGroupId;
+			}
+		}
+
 		highlights = currentBatchHighlights;
 		bumpHighlightsVersion();
 
@@ -1057,24 +1104,17 @@ export function collapseGroupsForExport(
 	});
 }
 
-// Which execution context this module instance belongs to. Bundles that
-// render live highlights (content.js, reader-script.js, reader-page.js) call
-// setRenderContext at load. Other bundles that import this module only for
-// types/helpers (highlights.html, popup, etc.) stay 'inert' — their storage
-// listener syncs in-memory state but skips rendering, so they don't inject
-// overlays into pages where overlays don't belong.
-let renderContext: 'content' | 'reader-script' | 'inert' = 'inert';
-export function setRenderContext(ctx: 'content' | 'reader-script') {
-	renderContext = ctx;
-}
-
-// Keep in-memory `highlights` in sync when another tab/context writes to
-// storage (e.g. highlights.html deleting a highlight for this URL, or the
-// reader-script context creating one from a cross-context chain). Both
-// content.js and reader-script.js own separate module instances of this
-// file — each has its own `highlights` array. The listener in both:
-//   - syncs the local array
-//   - re-renders iff this is the live context for the current tab state
+// Cross-tab sync: when another tab/extension page (e.g. highlights.html)
+// deletes or modifies highlights for this URL, pick up the change. With the
+// bridge pattern, only one module instance per tab is active — reader-script
+// delegates to content.js's instance via window.__obsidianHighlighter, so
+// there's no cross-bundle coordination needed. We always re-render since
+// this is the single owner.
+// Safety: this listener also fires in bundles that import highlighter.ts for
+// types only (highlights.html, popup). Those contexts have no stored
+// highlights matching their extension-page URL, so getPageUrl() produces a
+// non-matching key → JSON equality check passes → early return. No overlays
+// or menus are injected into those pages.
 browser.storage.onChanged.addListener((changes, area) => {
 	if (area !== 'local' || !changes.highlights) return;
 	const url = normalizeUrl(getPageUrl());
@@ -1084,12 +1124,8 @@ browser.storage.onChanged.addListener((changes, area) => {
 	highlights = newForUrl;
 	bumpHighlightsVersion();
 	invalidateHighlightCache();
-	const readerActive = document.documentElement.classList.contains('obsidian-reader-active');
-	const liveContext = readerActive ? 'reader-script' : 'content';
-	if (renderContext === liveContext) {
-		applyHighlights();
-		updateHighlighterMenu();
-	}
+	applyHighlights();
+	updateHighlighterMenu();
 });
 
 export async function loadHighlights() {

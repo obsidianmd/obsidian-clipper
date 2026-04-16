@@ -1,10 +1,6 @@
 import browser from './utils/browser-polyfill';
 import * as highlighter from './utils/highlighter';
-
-// Identify this bundle as the live renderer for non-reader tabs. Reader-script
-// and reader-view override to 'reader-script' at their own load; the listener
-// in highlighter.ts uses this to avoid cross-context overlay races.
-highlighter.setRenderContext('content');
+import { removeExistingHighlights } from './utils/highlighter-overlays';
 import { loadSettings, generalSettings } from './utils/storage-utils';
 import { getDomain } from './utils/string-utils';
 import { extractContentBySelector as extractContentBySelectorShared } from './utils/shared';
@@ -301,8 +297,6 @@ declare global {
 			const content = extractContentBySelector(request.selector, request.attribute, request.extractHtml);
 			sendResponse({ content: content });
 		} else if (request.action === "paintHighlights") {
-			// In reader mode, reader-script owns rendering — stay out of it.
-			if (isReaderActive()) { sendResponse({ success: true }); return true; }
 			ensureHighlighterCSS().then(() => highlighter.loadHighlights()).then(() => {
 				if (generalSettings.alwaysShowHighlights) {
 					highlighter.applyHighlights();
@@ -312,17 +306,6 @@ declare global {
 			return true;
 		} else if (request.action === "setHighlighterMode") {
 			isHighlighterMode = request.isActive;
-			// Reader-script is the live owner while reader is active. Forward
-			// the state change to it via a document event (cheap same-document
-			// IPC), sync the badge here, and stay out of rendering/listeners.
-			if (isReaderActive()) {
-				document.dispatchEvent(new CustomEvent('obsidian-set-highlighter-mode', {
-					detail: { isActive: request.isActive },
-				}));
-				updateHasHighlights();
-				sendResponse({ success: true });
-				return true;
-			}
 			ensureHighlighterCSS();
 			highlighter.toggleHighlighterMenu(isHighlighterMode);
 			updateHasHighlights();
@@ -332,13 +315,11 @@ declare global {
 			browser.runtime.sendMessage({ action: "getHighlighterMode" }).then(sendResponse);
 			return true;
 		} else if (request.action === "toggleHighlighter") {
-			if (isReaderActive()) { sendResponse({ success: true }); return; }
 			ensureHighlighterCSS();
 			highlighter.toggleHighlighterMenu(request.isActive);
 			updateHasHighlights();
 			sendResponse({ success: true });
 		} else if (request.action === "highlightSelection") {
-			if (isReaderActive()) { sendResponse({ success: true }); return; }
 			ensureHighlighterCSS();
 			highlighter.toggleHighlighterMenu(request.isActive);
 			const selection = window.getSelection();
@@ -348,7 +329,6 @@ declare global {
 			updateHasHighlights();
 			sendResponse({ success: true });
 		} else if (request.action === "highlightElement") {
-			if (isReaderActive()) { sendResponse({ success: true }); return; }
 			ensureHighlighterCSS();
 			highlighter.toggleHighlighterMenu(request.isActive);
 			if (request.targetElementInfo) {
@@ -423,14 +403,6 @@ declare global {
 		browser.runtime.sendMessage({ action: "updateHasHighlights", hasHighlights });
 	}
 
-	// When reader mode is active on this tab, the injected reader-script.js
-	// owns the highlighter's live state (in its own module-scope `highlights`
-	// array). content.js must stay out of rendering/toggling to avoid the two
-	// contexts racing on storage writes.
-	function isReaderActive(): boolean {
-		return document.documentElement.classList.contains('obsidian-reader-active');
-	}
-
 	let highlighterCSSPromise: Promise<void> | null = null;
 	function ensureHighlighterCSS(): Promise<void> {
 		if (!highlighterCSSPromise) {
@@ -464,6 +436,30 @@ declare global {
 
 	// Initialize highlighter
 	initializeHighlighter();
+
+	// Expose highlighter API on window so reader-script.js (a separate
+	// webpack bundle injected when reader mode activates) can delegate
+	// all state operations to this single module instance. Without this,
+	// both bundles own a copy of highlighter.ts with independent mutable
+	// state — the bridge ensures one source of truth per tab.
+	window.__obsidianHighlighter = {
+		toggleHighlighterMenu: highlighter.toggleHighlighterMenu,
+		handleTextSelection: highlighter.handleTextSelection,
+		highlightElement: highlighter.highlightElement,
+		applyHighlights: highlighter.applyHighlights,
+		loadHighlights: highlighter.loadHighlights,
+		invalidateHighlightCache: highlighter.invalidateHighlightCache,
+		repositionHighlights: highlighter.repositionHighlights,
+		getHighlights: highlighter.getHighlights,
+		setPageUrl: highlighter.setPageUrl,
+		setPageTitle: highlighter.setPageTitle,
+		updatePageDomainSettings: highlighter.updatePageDomainSettings,
+		clearHighlights: highlighter.clearHighlights,
+		saveHighlights: highlighter.saveHighlights,
+		updateHighlighterMenu: highlighter.updateHighlighterMenu,
+		removeExistingHighlights,
+		ensureHighlighterCSS: () => { ensureHighlighterCSS(); },
+	} satisfies highlighter.HighlighterAPI;
 
 	// Call updateHasHighlights when the page loads
 	window.addEventListener('load', updateHasHighlights);
