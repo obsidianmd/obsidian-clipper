@@ -7,6 +7,9 @@ import { createMarkdownContent } from 'defuddle/full';
 import { buildVariables, generateFrontmatter, formatPropertyValue } from './shared';
 import { compileTemplate } from './template-compiler';
 import { createAsyncResolver, createSelectorProcessor } from '../api';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+dayjs.extend(utc);
 
 // ---------------------------------------------------------------------------
 // Freeze time so {{date}} is deterministic in expected output
@@ -16,6 +19,14 @@ const FROZEN_DATE = new Date('2025-01-15T12:00:00Z');
 
 beforeAll(() => { vi.useFakeTimers({ now: FROZEN_DATE }); });
 afterAll(() => { vi.useRealTimers(); });
+
+// Normalize timezone-aware timestamps to UTC for cross-timezone comparison
+function normalizeTimestamps(text: string): string {
+    return text.replace(
+        /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}([+-]\d{2}:\d{2}|Z)/g,
+        (match) => dayjs(match).utc().format('YYYY-MM-DDTHH:mm:ss[Z]')
+    );
+}
 
 // ---------------------------------------------------------------------------
 // Fixture types
@@ -150,6 +161,6 @@ describe('Template fixtures', () => {
 			);
 		}
 
-		expect(result.trim()).toEqual(expected.trim());
+		expect(normalizeTimestamps(result.trim())).toEqual(normalizeTimestamps(expected.trim()));
 	});
 });
