@@ -127,6 +127,9 @@ body.obsidian-highlighter-active {
 
 	// Disable pinch zoom on mobile
 	touch-action: pan-x pan-y;
+	figure, picture, img, a, table, pre {
+		cursor: crosshair !important;
+	}
 	*::selection {
 		background-color: rgba(255, 235, 0, 0.35) !important;
 	}

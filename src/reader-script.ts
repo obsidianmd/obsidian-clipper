@@ -1,5 +1,11 @@
 import { Reader } from './utils/reader';
+import { setRenderContext } from './utils/highlighter';
 import browser from './utils/browser-polyfill';
+
+// Identify this bundle's highlighter module instance as the reader-script
+// context, so its storage-change listener owns live rendering while reader
+// mode is active (content.js's instance stays 'content' by default).
+setRenderContext('reader-script');
 
 // Initialize reader mode
 (function() {

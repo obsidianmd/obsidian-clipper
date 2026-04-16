@@ -126,6 +126,7 @@
 
 sup[id^="fnref"] {
 	margin: 0 0.1em 0 0;
+	vertical-align: top;
 
 	a {
 		display: inline-flex;
@@ -137,7 +138,7 @@ sup[id^="fnref"] {
 		background: var(--background-primary-alt);
 		color: var(--text-muted);
 		text-decoration: none;
-		font-size: 0.75em;
+		font-size: 0.76em;
 		font-weight: var(--font-medium);
 		line-height: 1;
 		cursor: pointer;

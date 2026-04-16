@@ -2109,6 +2109,21 @@ export class Reader {
 			// Add reader classes and attributes
 			doc.documentElement.classList.add('obsidian-reader-active');
 
+			// Reader-script owns highlighter rendering while reader is active
+			// (content.js short-circuits in isReaderActive()), so we must load
+			// the highlighter stylesheet ourselves. Idempotent across reloads.
+			Reader.ensureHighlighterCSS(doc);
+
+			// Toolbar / popup mode toggles arrive at content.js via background
+			// messaging; content.js forwards them here through a document
+			// event so reader-script stays the single source of live state.
+			doc.addEventListener('obsidian-set-highlighter-mode', (e) => {
+				const { isActive } = (e as CustomEvent).detail;
+				const alreadyActive = doc.body.classList.contains('obsidian-highlighter-active');
+				if (alreadyActive === isActive) return; // avoid double-toggle when we originated the change
+				toggleHighlighterMenu(isActive);
+			});
+
 			// Apply theme mode (sets theme-light/dark), then effective theme
 			this.updateThemeMode(doc, this.settings.appearance);
 
@@ -2375,18 +2390,28 @@ export class Reader {
 		});
 	}
 
-	// Standalone reader page toggles directly; a regular page in reader mode
-	// round-trips through the background so the content script's highlighter
-	// state stays in sync with the DOM class.
-	static async toggleHighlighter(doc: Document): Promise<void> {
-		if (Reader.isReaderPage) {
-			toggleHighlighterMenu(!doc.body.classList.contains('obsidian-highlighter-active'));
-			return;
-		}
-		const response = await browser.runtime.sendMessage({ action: 'getActiveTab' }) as { tabId?: number };
-		if (response.tabId) {
-			await browser.runtime.sendMessage({ action: 'toggleHighlighterMode', tabId: response.tabId });
-		}
+	// Inject the runtime-generated highlighter.css once per document. Mirrors
+	// content.js's ensureHighlighterCSS — needed here because content.js stays
+	// inert while reader is active, but highlight rendering still requires
+	// the stylesheet.
+	private static ensureHighlighterCSS(doc: Document): void {
+		if (doc.getElementById('obsidian-highlighter-stylesheet')) return;
+		const link = doc.createElement('link');
+		link.id = 'obsidian-highlighter-stylesheet';
+		link.rel = 'stylesheet';
+		link.href = browser.runtime.getURL('highlighter.css');
+		(doc.head || doc.documentElement).appendChild(link);
+	}
+
+	// Reader-script owns the live highlighter state while reader is active.
+	// toggleHighlighterMenu itself posts `highlighterModeChanged` to background,
+	// which updates the popup UI, badge, and context menu — no additional
+	// message needed here. (Sending toggleHighlighterMode would make background
+	// flip its state a second time and bounce the toggle back through the
+	// obsidian-set-highlighter-mode event, canceling the local toggle.)
+	static toggleHighlighter(doc: Document): void {
+		const willBeActive = !doc.body.classList.contains('obsidian-highlighter-active');
+		toggleHighlighterMenu(willBeActive);
 	}
 
 	static async toggle(doc: Document): Promise<boolean> {

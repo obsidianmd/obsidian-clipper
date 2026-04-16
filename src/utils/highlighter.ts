@@ -635,19 +635,16 @@ function getHighlightRanges(range: Range): AnyHighlightData[] {
 			if (blockRange.collapsed) continue;
 			if (!blockElement.contains(blockRange.commonAncestorContainer) && blockElement !== blockRange.commonAncestorContainer) continue;
 
-			// When the clipped range covers the whole block, store the block's
-			// outerHTML so the wrapping tag (e.g. <li>) survives — grouped
-			// display in highlights.html relies on this to reconstruct lists.
-			const firstText = findFirstTextNode(blockElement);
-			const lastTextNode = findLastTextNode(blockElement);
-			const isFullBlock = !!firstText && !!lastTextNode
-				&& blockRange.startContainer === firstText && blockRange.startOffset === 0
-				&& blockRange.endContainer === lastTextNode
-				&& blockRange.endOffset === (lastTextNode.textContent?.length ?? 0);
-			const htmlContent = isFullBlock
-				? blockElement.outerHTML
-				: sanitizeAndPreserveFormatting(serializeRangeContents(blockRange));
-			if (htmlContent.trim() === '') continue;
+			// Wrap the selection fragment in a shallow clone of the block so
+			// each piece keeps its own <p>/<li>/etc. Range.cloneContents()
+			// strips inline ancestors (<em>, <strong>, <a>, …) when the range
+			// is entirely inside them, so we walk up from the range's common
+			// ancestor and re-wrap in each one up to (not including) the block.
+			const innerHtml = sanitizeAndPreserveFormatting(serializeRangePreservingAncestors(blockRange, blockElement));
+			if (innerHtml.trim() === '') continue;
+			const wrapper = blockElement.cloneNode(false) as Element;
+			wrapper.innerHTML = innerHtml;
+			const htmlContent = wrapper.outerHTML;
 
 			newHighlights.push({
 				xpath: getElementXPath(blockElement),
@@ -673,6 +670,38 @@ function getHighlightRanges(range: Range): AnyHighlightData[] {
 function serializeRangeContents(range: Range): string {
 	const temp = document.createElement('div');
 	temp.appendChild(range.cloneContents());
+	const serializer = new XMLSerializer();
+	let html = '';
+	for (const node of Array.from(temp.childNodes)) {
+		if (node.nodeType === Node.ELEMENT_NODE) html += serializer.serializeToString(node);
+		else if (node.nodeType === Node.TEXT_NODE) html += node.textContent;
+	}
+	return html;
+}
+
+// Clone the range contents, then re-wrap in any inline ancestors that live
+// between the range and the block boundary. Range.cloneContents() only
+// includes ancestors the range actually crosses, so a selection entirely
+// inside a chain like <p><em><a>text</a></em></p> would otherwise lose the
+// <em> and <a>. Walking from the range's commonAncestor back up to (not
+// including) the block lets us restore them.
+function serializeRangePreservingAncestors(range: Range, block: Element): string {
+	const fragment = range.cloneContents();
+	let ancestor: Node | null = range.commonAncestorContainer;
+	if (ancestor?.nodeType === Node.TEXT_NODE) ancestor = ancestor.parentElement;
+	const wrappers: Element[] = [];
+	while (ancestor && ancestor !== block && ancestor.nodeType === Node.ELEMENT_NODE) {
+		wrappers.push(ancestor as Element);
+		ancestor = (ancestor as Element).parentElement;
+	}
+	let wrapped: Node = fragment;
+	for (const w of wrappers) {
+		const clone = w.cloneNode(false) as Element;
+		clone.appendChild(wrapped);
+		wrapped = clone;
+	}
+	const temp = document.createElement('div');
+	temp.appendChild(wrapped);
 	const serializer = new XMLSerializer();
 	let html = '';
 	for (const node of Array.from(temp.childNodes)) {
@@ -942,17 +971,15 @@ export function repositionHighlights() {
 }
 
 export function applyHighlights() {
-	if (highlights.length === 0) {
-		return; // Don't do anything if there are no highlights
-	}
-
 	if (isApplyingHighlights) return;
-	
+
 	const currentHighlightsState = JSON.stringify(highlights);
 	if (currentHighlightsState === lastAppliedHighlights) return;
-	
+
 	isApplyingHighlights = true;
 
+	// Always clear — deleting the last highlight must also tear down its
+	// overlay, so we can't early-return on highlights.length === 0.
 	removeExistingHighlights();
 
 	highlights.forEach((highlight) => {
@@ -1002,6 +1029,40 @@ export function groupHighlights(highlights: AnyHighlightData[]): AnyHighlightDat
 	}
 	return groups;
 }
+
+// Which execution context this module instance belongs to. Bundles that
+// render live highlights (content.js, reader-script.js, reader-page.js) call
+// setRenderContext at load. Other bundles that import this module only for
+// types/helpers (highlights.html, popup, etc.) stay 'inert' — their storage
+// listener syncs in-memory state but skips rendering, so they don't inject
+// overlays into pages where overlays don't belong.
+let renderContext: 'content' | 'reader-script' | 'inert' = 'inert';
+export function setRenderContext(ctx: 'content' | 'reader-script') {
+	renderContext = ctx;
+}
+
+// Keep in-memory `highlights` in sync when another tab/context writes to
+// storage (e.g. highlights.html deleting a highlight for this URL, or the
+// reader-script context creating one from a cross-context chain). Both
+// content.js and reader-script.js own separate module instances of this
+// file — each has its own `highlights` array. The listener in both:
+//   - syncs the local array
+//   - re-renders iff this is the live context for the current tab state
+browser.storage.onChanged.addListener((changes, area) => {
+	if (area !== 'local' || !changes.highlights) return;
+	const url = normalizeUrl(getPageUrl());
+	const newAll = (changes.highlights.newValue || {}) as HighlightsStorage;
+	const newForUrl = newAll[url]?.highlights ?? [];
+	if (JSON.stringify(newForUrl) === JSON.stringify(highlights)) return;
+	highlights = newForUrl;
+	invalidateHighlightCache();
+	const readerActive = document.documentElement.classList.contains('obsidian-reader-active');
+	const liveContext = readerActive ? 'reader-script' : 'content';
+	if (renderContext === liveContext) {
+		applyHighlights();
+		updateHighlighterMenu();
+	}
+});
 
 // Load highlights from browser storage
 export async function loadHighlights() {
@@ -1112,10 +1173,16 @@ function getClosestTextBlock(node: Node | null): Element | null {
 			}
 			const tag = el.tagName.toUpperCase();
 			if (TEXT_BLOCK_SPLIT_TAGS.includes(tag)) {
-				// A <p> wrapped in an <li> is common list markup; prefer the <li>
-				// so the stored content carries the list structure and renders
-				// correctly when regrouped in highlights.html.
-				if (tag === 'P' && el.parentElement?.tagName === 'LI') return el.parentElement;
+				// A <p> wrapped in a semantic container (LI, BLOCKQUOTE,
+				// FIGCAPTION) is common markup; prefer the container so the
+				// stored content carries the wrapper and renders with its
+				// styling in highlights.html.
+				if (tag === 'P') {
+					const parentTag = el.parentElement?.tagName.toUpperCase();
+					if (parentTag === 'LI' || parentTag === 'BLOCKQUOTE' || parentTag === 'FIGCAPTION') {
+						return el.parentElement!;
+					}
+				}
 				return el;
 			}
 		}

@@ -196,8 +196,13 @@ function positionDeleteButton(id: string, anchorRight: number, anchorTop: number
 	const btn = ensureHighlightDeleteButton();
 	currentDeleteTargetId = id;
 	btn.style.display = 'flex';
-	btn.style.left = `${anchorRight + window.scrollX - 24}px`;
-	btn.style.top = `${anchorTop + window.scrollY - 24}px`;
+	// Sit flush above the top-right corner of the highlight — no gap. A gap
+	// would be a dead zone where neither the highlight nor the button is
+	// under the cursor, causing the button to hide as the user reaches for it.
+	// Button is 22×22 (20 + 1px border each side); overlap the anchor by 1px
+	// so the hover region is continuous with the highlight.
+	btn.style.left = `${anchorRight + window.scrollX - 22}px`;
+	btn.style.top = `${anchorTop + window.scrollY - 21}px`;
 }
 
 export function hideHighlightDeleteButton(): void {

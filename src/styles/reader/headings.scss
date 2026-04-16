@@ -5,6 +5,7 @@ h1 {
 	letter-spacing: var(--h1-letter-spacing);
 	line-height: var(--h1-line-height);
 	text-wrap-style: pretty;
+	padding: 0;
 }
 h2 {
 	font-weight: var(--h2-weight);
@@ -14,6 +15,7 @@ h2 {
 	margin-bottom: 0.5em;
 	line-height: var(--h2-line-height);
 	text-wrap-style: pretty;
+	padding: 0;
 }
 h3 {
 	font-weight: var(--h3-weight);
@@ -22,6 +24,7 @@ h3 {
 	text-wrap-style: pretty;
 	margin-top: 2em;
 	margin-bottom: 0.5em;
+	padding: 0;
 }
 h4 {
 	font-size: var(--h4-size);
@@ -30,6 +33,7 @@ h4 {
 	text-wrap-style: pretty;
 	margin-top: 2em;
 	margin-bottom: 0;
+	padding: 0;
 }
 h5 {
 	font-weight: var(--h5-weight);
@@ -37,6 +41,7 @@ h5 {
 	text-wrap-style: pretty;
 	margin-bottom: 1em;
 	font-size: var(--h5-size);
+	padding: 0;
 }
 h6 {
 	font-weight: var(--h6-weight);
@@ -46,6 +51,7 @@ h6 {
 	margin-bottom: 1em;
 	letter-spacing: var(--h6-letter-spacing);
 	font-size: var(--h6-size);
+	padding: 0;
 }
 
 h1 + h2,
