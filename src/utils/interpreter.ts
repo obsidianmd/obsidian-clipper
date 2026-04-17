@@ -134,6 +134,23 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 				temperature: 0.5,
 				stream: false
 			};
+		} else if (provider.name.toLowerCase().includes('gemini')) {
+			requestUrl = provider.baseUrl.replace('{model-id}', model.providerModelId);
+			requestBody = {
+				system_instruction: {
+					parts: [{ text: systemContent }]
+				},
+				contents: [{
+					parts: [
+						{ text: `${promptContext}` },
+						{ text: `${JSON.stringify(promptContent)}` }
+					]
+				}]
+			};
+			headers = {
+				...headers,
+				'x-goog-api-key': `${provider.apiKey}`
+			};
 		} else {
 			// Default request format
 			requestUrl = provider.baseUrl;
@@ -215,6 +232,18 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 					llmResponseContent = JSON.stringify(parsed);
 				} catch {
 					llmResponseContent = messageContent;
+				}
+			} else {
+				llmResponseContent = JSON.stringify(data);
+			}
+		} else if (provider.name.toLowerCase().includes('gemini')) {
+			const textContent = data.candidates?.[0].content.parts.find((p: any) => !p.thought)?.text;
+			if (textContent) {
+				try {
+					const parsed = JSON.parse(textContent);
+					llmResponseContent = JSON.stringify(parsed);
+				} catch {
+					llmResponseContent = textContent;
 				}
 			} else {
 				llmResponseContent = JSON.stringify(data);
