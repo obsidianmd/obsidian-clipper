@@ -2004,6 +2004,11 @@ export class Reader {
 			const lang = htmlElement.getAttribute('lang');
 			const dir = htmlElement.getAttribute('dir');
 
+			// Clear all html element attributes (e.g. scroll-locking classes/styles from the original page)
+			while (htmlElement.attributes.length > 0) {
+				htmlElement.removeAttribute(htmlElement.attributes[0].name);
+			}
+
 			// Restore lang and dir if they existed
 			if (lang) htmlElement.setAttribute('lang', lang);
 			if (dir) htmlElement.setAttribute('dir', dir);

@@ -13,6 +13,8 @@
 
 .obsidian-reader-active {
 	background-color: var(--background-primary) !important;
+	overflow: auto !important;
+	height: auto !important;
 
 	.obsidian-highlighter-menu {
 		display: none !important;
