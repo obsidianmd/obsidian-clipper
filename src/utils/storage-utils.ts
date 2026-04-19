@@ -7,6 +7,7 @@ export type { Settings, ModelConfig, PropertyType, HistoryEntry, Provider, Ratin
 
 export let generalSettings: Settings = {
 	vaults: [],
+	clipDirectories: [],
 	betaFeatures: false,
 	legacyMode: false,
 	silentOpen: false,
@@ -68,6 +69,7 @@ interface StorageData {
 		saveBehavior?: 'addToObsidian' | 'copyToClipboard' | 'saveFile';
 	};
 	vaults?: string[];
+	clip_directories?: string[];
 	highlighter_settings?: {
 		highlighterEnabled?: boolean;
 		alwaysShowHighlights?: boolean;
@@ -118,6 +120,7 @@ export async function loadSettings(): Promise<Settings> {
 	// Load default settings first
 	const defaultSettings: Settings = {
 		vaults: [],
+		clipDirectories: [],
 		showMoreActionsButton: false,
 		betaFeatures: false,
 		legacyMode: false,
@@ -169,6 +172,7 @@ export async function loadSettings(): Promise<Settings> {
 
 	// Validate and sanitize data to prevent corruption
 	const sanitizedVaults = Array.isArray(data.vaults) ? data.vaults.filter(v => typeof v === 'string') : [];
+	const sanitizedClipDirectories = Array.isArray(data.clip_directories) ? data.clip_directories.filter(v => typeof v === 'string') : [];
 	const sanitizedModels = Array.isArray(data.interpreter_settings?.models) 
 		? data.interpreter_settings.models.filter(m => m && typeof m === 'object' && typeof m.id === 'string') 
 		: [];
@@ -179,6 +183,7 @@ export async function loadSettings(): Promise<Settings> {
 	// Load user settings
 	const loadedSettings: Settings = {
 		vaults: sanitizedVaults.length > 0 ? sanitizedVaults : defaultSettings.vaults,
+		clipDirectories: sanitizedClipDirectories.length > 0 ? sanitizedClipDirectories : defaultSettings.clipDirectories,
 		showMoreActionsButton: data.general_settings?.showMoreActionsButton ?? defaultSettings.showMoreActionsButton,
 		betaFeatures: data.general_settings?.betaFeatures ?? defaultSettings.betaFeatures,
 		legacyMode: data.general_settings?.legacyMode ?? defaultSettings.legacyMode,
@@ -231,6 +236,7 @@ export async function saveSettings(settings?: Partial<Settings>): Promise<void> 
 
 	await browser.storage.sync.set({
 		vaults: generalSettings.vaults,
+		clip_directories: generalSettings.clipDirectories,
 		general_settings: {
 			showMoreActionsButton: generalSettings.showMoreActionsButton,
 			betaFeatures: generalSettings.betaFeatures,

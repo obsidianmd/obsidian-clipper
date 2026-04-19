@@ -8,6 +8,7 @@ export default {} as any;
 
 export const generalSettings: Settings = {
 	vaults: [],
+	clipDirectories: [],
 	betaFeatures: false,
 	legacyMode: false,
 	silentOpen: false,

@@ -161,9 +161,17 @@
 		#vault-container {
 			flex-grow: 1;
 		}
+		#directory-container {
+			flex-grow: 1;
+		}
 		#vault-select {
 			font-weight: var(--clipper-select-font-weight);
 			min-width: 100px;
+			cursor: default;
+		}
+		#directory-select {
+			font-weight: var(--clipper-select-font-weight);
+			min-width: 130px;
 			cursor: default;
 		}
 	}
