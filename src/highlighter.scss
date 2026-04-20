@@ -1,3 +1,5 @@
+@import './styles/highlighter-icon-reset';
+
 @media (max-width: 769px) {
 	.obsidian-highlighter-menu {
 		--obsidian-highlighter-menu-font-size: 15px;
@@ -217,10 +219,9 @@ body.obsidian-highlighter-active {
 		box-shadow: var(--obsidian-highlighter-button-border) !important;
 		-webkit-font-smoothing: antialiased !important;
 		svg {
+			@include highlighter-svg-icon-reset;
 			mix-blend-mode: normal !important;
-			color: #bebebe;
-			width: 16px;
-			height: 16px;
+			color: #bebebe !important;
 			path, line {
 				color: #bebebe;
 			}
