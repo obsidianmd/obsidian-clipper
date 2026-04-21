@@ -217,6 +217,7 @@ body.obsidian-highlighter-active {
 		-webkit-font-smoothing: antialiased !important;
 		svg {
 			mix-blend-mode: normal !important;
+			margin: 0;
 			color: #bebebe;
 			width: 16px;
 			height: 16px;
@@ -298,6 +299,7 @@ body.obsidian-highlighter-active {
 	svg {
 		width: 12px;
 		height: 12px;
+		margin: 0 !important;
 	}
 
 	@media (hover: hover) {
