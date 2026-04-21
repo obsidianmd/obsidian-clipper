@@ -2337,7 +2337,7 @@ export class Reader {
 		btn.type = 'button';
 		btn.className = 'obsidian-selection-action';
 		btn.setAttribute('aria-label', 'Highlight selection');
-		btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg><span>Highlight</span>';
+		btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg><span>${getMessage('highlightSelection')}</span>`;
 		btn.style.display = 'none';
 		// Preserve the selection when the pointer goes down on the button —
 		// otherwise the browser clears it before click handlers run.
@@ -2369,8 +2369,8 @@ export class Reader {
 			if (rects.length === 0) return hide();
 			const last = rects[rects.length - 1];
 			btn.style.display = 'flex';
-			btn.style.left = `${last.right + window.scrollX + 6}px`;
-			btn.style.top = `${last.bottom + window.scrollY + 4}px`;
+			btn.style.left = `${last.right + window.scrollX + 2}px`;
+			btn.style.top = `${last.bottom + window.scrollY - 6}px`;
 		};
 
 		// mouseup / keyup catch the end of a drag-select or shift-arrow select;

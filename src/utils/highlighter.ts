@@ -2,12 +2,12 @@ import browser from './browser-polyfill';
 import { getElementXPath, getElementByXPath } from './dom-utils';
 import {
 	handleMouseUp,
-	handleMouseMove,
 	planHighlightOverlayRects,
 	removeExistingHighlights,
 	handleTouchStart,
 	handleTouchMove,
 	syncHoverListener,
+	markHighlightJustCreated,
 } from './highlighter-overlays';
 import { detectBrowser, addBrowserClassToHtml } from './browser-detection';
 import { generalSettings, loadSettings } from './storage-utils';
@@ -533,6 +533,7 @@ export function highlightElement(element: Element, notes?: string[]) {
 		type: 'element',
 		id: Date.now().toString(),
 	}, notes);
+	markHighlightJustCreated();
 }
 
 // Handle text selection for highlighting
@@ -581,6 +582,7 @@ export function handleTextSelection(selection: Selection, notes?: string[]) {
 		
 		sortHighlights();
 		commitHighlightChanges();
+		markHighlightJustCreated();
 	}
 	selection.removeAllRanges();
 }
@@ -1105,18 +1107,16 @@ export function collapseGroupsForExport(
 }
 
 // Cross-tab sync: when another tab/extension page (e.g. highlights.html)
-// deletes or modifies highlights for this URL, pick up the change. With the
-// bridge pattern, only one module instance per tab is active — reader-script
-// delegates to content.js's instance via window.__obsidianHighlighter, so
-// there's no cross-bundle coordination needed. We always re-render since
-// this is the single owner.
-// Safety: this listener also fires in bundles that import highlighter.ts for
-// types only (highlights.html, popup). Those contexts have no stored
-// highlights matching their extension-page URL, so getPageUrl() produces a
-// non-matching key → JSON equality check passes → early return. No overlays
-// or menus are injected into those pages.
+// deletes or modifies highlights for this URL, pick up the change.
+// The bridge check ensures only the owning module instance acts: if the
+// bridge exists and points to a DIFFERENT copy of applyHighlights (i.e.,
+// we're reader-script but content.js owns the bridge), we skip — content.js's
+// listener will handle it. Without this, both bundles render and you get
+// duplicate overlays / delete buttons.
 browser.storage.onChanged.addListener((changes, area) => {
 	if (area !== 'local' || !changes.highlights) return;
+	const bridge = window.__obsidianHighlighter;
+	if (bridge && bridge.applyHighlights !== applyHighlights) return;
 	const url = normalizeUrl(getPageUrl());
 	const newAll = (changes.highlights.newValue || {}) as HighlightsStorage;
 	const newForUrl = newAll[url]?.highlights ?? [];

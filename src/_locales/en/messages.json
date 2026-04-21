@@ -375,6 +375,9 @@
 	"highlighterSettings": {
 		"message": "Highlighter"
 	},
+	"highlightSelection": {
+		"message": "Highlight"
+	},
 	"highlights": {
 		"message": "Highlights"
 	},

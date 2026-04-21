@@ -279,32 +279,8 @@ body.obsidian-highlighter-active {
 	background-color: rgba(255, 235, 0, 0.35);
 }
 
-.obsidian-highlight-delete {
-	position: absolute;
-	display: none;
-	align-items: center;
-	justify-content: center;
-	padding: 4px;
-	background: #353535;
-	color: #f0f0f0;
-	border: 1px solid #424242;
-	border-radius: 12px;
-	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
-	cursor: pointer;
-	z-index: 999999999;
-	pointer-events: auto;
-
-	svg {
-		width: 14px;
-		height: 14px;
-		margin: 0 !important;
-		mix-blend-mode: normal !important;
-	}
-
-}
-
-// Floating button that appears on text selection when highlighter is off.
-// Clicking it converts the current selection into a highlight.
+// Shared base for floating action buttons (Remove highlight, Highlight selection).
+.obsidian-highlight-delete,
 .obsidian-selection-action {
 	position: absolute;
 	display: none;

@@ -13,6 +13,7 @@ import {
 } from './highlighter';
 import { throttle } from './throttle';
 import { getElementByXPath, isDarkColor } from './dom-utils';
+import { getMessage } from './i18n';
 
 let touchStartX: number = 0;
 let touchStartY: number = 0;
@@ -132,12 +133,16 @@ function findOverlayAtPoint(x: number, y: number): HTMLElement | null {
 }
 
 function findTextHighlightAtPoint(x: number, y: number): string | null {
+	// Expand rects vertically to cover inter-line gaps (line-height spacing
+	// between adjacent line rects). Without this, hovering between lines
+	// alternates hit/miss, making the delete button flicker.
+	const PAD = 4;
 	for (const [id, ranges] of textHighlightRanges) {
 		for (const range of ranges) {
 			const rects = range.getClientRects();
 			for (let i = 0; i < rects.length; i++) {
 				const rect = rects[i];
-				if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
+				if (x >= rect.left && x <= rect.right && y >= rect.top - PAD && y <= rect.bottom + PAD) {
 					return id;
 				}
 			}
@@ -146,14 +151,14 @@ function findTextHighlightAtPoint(x: number, y: number): string | null {
 	return null;
 }
 
-// --- Floating delete button for hovered text highlights ---
+// --- Floating remove button ---
 //
-// Text highlights have no overlay element to click; this floating button
-// gives users a visible affordance for removing them. Shown on hover over
-// a ranged highlight; positioned above the end of the highlighted text.
+// Shown on click/tap on any highlight, or on Alt+hover (desktop shortcut).
+// Positioned center-top above the highlight's bounding box.
 
 let highlightDeleteButton: HTMLButtonElement | null = null;
 let currentDeleteTargetId: string | null = null;
+let deleteButtonShownViaAlt = false;
 
 function ensureHighlightDeleteButton(): HTMLButtonElement {
 	if (highlightDeleteButton) return highlightDeleteButton;
@@ -161,7 +166,7 @@ function ensureHighlightDeleteButton(): HTMLButtonElement {
 	btn.type = 'button';
 	btn.className = 'obsidian-highlight-delete';
 	btn.setAttribute('aria-label', 'Remove highlight');
-	btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>';
+	btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg><span>${getMessage('remove')}</span>`;
 	btn.style.display = 'none';
 	btn.addEventListener('mousedown', e => e.stopPropagation());
 	btn.addEventListener('click', (e) => {
@@ -181,28 +186,32 @@ function showHighlightDeleteButtonForText(id: string): void {
 	if (!ranges || ranges.length === 0) return;
 	const rects = ranges[0].getClientRects();
 	if (rects.length === 0) return;
-	const anchor = rects[rects.length - 1];
-	positionDeleteButton(id, anchor.right, anchor.top);
+	// Compute bounding box across all line rects for center-top positioning.
+	let left = Infinity, right = -Infinity, top = Infinity;
+	for (let i = 0; i < rects.length; i++) {
+		if (rects[i].left < left) left = rects[i].left;
+		if (rects[i].right > right) right = rects[i].right;
+		if (rects[i].top < top) top = rects[i].top;
+	}
+	positionDeleteButton(id, (left + right) / 2, top);
 }
 
 function showHighlightDeleteButtonForOverlay(overlay: HTMLElement): void {
 	const id = overlay.dataset.highlightId;
 	if (!id) return;
 	const rect = overlay.getBoundingClientRect();
-	positionDeleteButton(id, rect.right, rect.top);
+	positionDeleteButton(id, (rect.left + rect.right) / 2, rect.top);
 }
 
-function positionDeleteButton(id: string, anchorRight: number, anchorTop: number): void {
+function positionDeleteButton(id: string, centerX: number, top: number): void {
 	const btn = ensureHighlightDeleteButton();
 	currentDeleteTargetId = id;
 	btn.style.display = 'flex';
-	// Sit flush above the top-right corner of the highlight — no gap. A gap
-	// would be a dead zone where neither the highlight nor the button is
-	// under the cursor, causing the button to hide as the user reaches for it.
-	// Button is 22×22 (20 + 1px border each side); overlap the anchor by 1px
-	// so the hover region is continuous with the highlight.
-	btn.style.left = `${anchorRight + window.scrollX - 22}px`;
-	btn.style.top = `${anchorTop + window.scrollY - 21}px`;
+	// Center horizontally above the highlight. Use the rendered width so
+	// centering adapts to the label text.
+	const btnWidth = btn.offsetWidth || 80;
+	btn.style.left = `${centerX + window.scrollX - btnWidth / 2}px`;
+	btn.style.top = `${top + window.scrollY - 28}px`;
 }
 
 export function hideHighlightDeleteButton(): void {
@@ -239,36 +248,34 @@ function findBlockToHighlight(target: Element | null): Element | null {
 		?? target.closest('img') as Element | null;
 }
 
-// Handles mouse move events — only the hover-delete-button affordance.
-// Fires while highlighter is active OR while any highlights exist on the page.
-export function handleMouseMove(event: MouseEvent | TouchEvent) {
-	let target: Element | null;
-	let clientX: number;
-	let clientY: number;
-	if (event instanceof MouseEvent) {
-		target = event.target as Element;
-		clientX = event.clientX;
-		clientY = event.clientY;
-	} else {
-		const touch = event.changedTouches[0];
-		target = document.elementFromPoint(touch.clientX, touch.clientY);
-		clientX = touch.clientX;
-		clientY = touch.clientY;
-	}
+// Show/hide the remove button on click/tap rather than hover, so it works
+// on mobile (no hover). Clicking highlighted text shows the button;
+// clicking elsewhere (or a different highlight) hides/repositions it.
+let lastHighlightCreatedAt = 0;
+export function markHighlightJustCreated(): void {
+	lastHighlightCreatedAt = Date.now();
+}
 
-	// Keep the button visible while the cursor is on it — otherwise the
-	// pixels between text and button would hide it before the user arrives.
-	if (target && target.closest('.obsidian-highlight-delete')) return;
+function handleHighlightClick(event: MouseEvent) {
+	const target = event.target as Element | null;
 
-	// Text highlight (Custom Highlight API): hit-test stored Ranges.
+	// Clicking the remove button, selection button, or a link — let native behavior run.
+	if (target?.closest('.obsidian-highlight-delete, .obsidian-selection-action, a[href]')) return;
+
+	// Don't show the remove button immediately after creating a highlight —
+	// the click that ends a drag-selection shouldn't also surface "Remove".
+	if (Date.now() - lastHighlightCreatedAt < 300) return;
+
+	const { clientX, clientY } = event;
+
+	// Text highlight: hit-test stored Ranges.
 	const textId = findTextHighlightAtPoint(clientX, clientY);
 	if (textId) {
 		showHighlightDeleteButtonForText(textId);
 		return;
 	}
 
-	// Element highlight: overlays have pointer-events:none, so target won't be
-	// the overlay itself — iterate and hit-test their bounding rects instead.
+	// Element highlight overlay.
 	const overlay = findOverlayAtPoint(clientX, clientY);
 	if (overlay) {
 		showHighlightDeleteButtonForOverlay(overlay);
@@ -329,17 +336,13 @@ export function handleTouchStart(event: TouchEvent) {
 	isTouchMoved = false;
 }
 
-// Add touch move handler
 export function handleTouchMove(event: TouchEvent) {
 	const touch = event.touches[0];
-	const moveThreshold = 10; // pixels
-
+	const moveThreshold = 10;
 	if (Math.abs(touch.clientX - touchStartX) > moveThreshold ||
 		Math.abs(touch.clientY - touchStartY) > moveThreshold) {
 		isTouchMoved = true;
 	}
-
-	handleMouseMove(event);
 }
 
 // Render one highlight. Text highlights go through the CSS Custom Highlight
@@ -413,20 +416,53 @@ const observer = new MutationObserver((mutations) => {
 	if (shouldUpdate) throttledUpdateHighlights();
 });
 
-// Mousemove + mutation observer + scroll/resize listeners all pay a
-// per-event cost on every page load. Tie them to the single condition that
-// makes them useful: highlights exist on this page OR highlighter is active.
-let mouseMoveAttached = false;
+// cursor:pointer on highlight hover + Alt+hover to surface the Remove
+// button. Gated by rAF to avoid redundant hit-tests within the same frame.
+let hoverRafPending = false;
+let lastCursor = '';
+function handleHighlightHover(event: MouseEvent) {
+	if (hoverRafPending) return;
+	// Capture values synchronously — the event object is reused.
+	const { clientX, clientY, altKey } = event;
+	const target = event.target as Element | null;
+	hoverRafPending = true;
+	requestAnimationFrame(() => {
+		hoverRafPending = false;
+		const textId = findTextHighlightAtPoint(clientX, clientY);
+		const overlay = !textId ? findOverlayAtPoint(clientX, clientY) : null;
+		const onHighlight = !!textId || !!overlay;
+		const cursor = onHighlight ? 'pointer' : '';
+		if (cursor !== lastCursor) { document.body.style.cursor = cursor; lastCursor = cursor; }
+
+		const onButton = !!target?.closest('.obsidian-highlight-delete');
+
+		if (altKey && (onHighlight || onButton)) {
+			if (textId) showHighlightDeleteButtonForText(textId);
+			else if (overlay) showHighlightDeleteButtonForOverlay(overlay);
+			deleteButtonShownViaAlt = true;
+		} else if (deleteButtonShownViaAlt) {
+			hideHighlightDeleteButton();
+			deleteButtonShownViaAlt = false;
+		}
+	});
+}
+
+// Click + mousemove + mutation observer attached lazily — only when
+// highlights exist on this page OR highlighter is active.
+let listenersAttached = false;
 let observerAttached = false;
 export function syncHoverListener(): void {
 	const isActive = document.body.classList.contains('obsidian-highlighter-active');
 	const needed = highlights.length > 0 || isActive;
-	if (needed && !mouseMoveAttached) {
-		document.addEventListener('mousemove', handleMouseMove);
-		mouseMoveAttached = true;
-	} else if (!needed && mouseMoveAttached) {
-		document.removeEventListener('mousemove', handleMouseMove);
-		mouseMoveAttached = false;
+	if (needed && !listenersAttached) {
+		document.addEventListener('click', handleHighlightClick);
+		document.addEventListener('mousemove', handleHighlightHover);
+		listenersAttached = true;
+	} else if (!needed && listenersAttached) {
+		document.removeEventListener('click', handleHighlightClick);
+		document.removeEventListener('mousemove', handleHighlightHover);
+		document.body.style.cursor = '';
+		listenersAttached = false;
 		hideHighlightDeleteButton();
 	}
 	if (needed && !observerAttached) {
