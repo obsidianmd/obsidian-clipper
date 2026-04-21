@@ -131,6 +131,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 				}
 			});
 		}
+		if (area === 'sync' && changes.reader_settings) {
+			applyReaderTheme().then(() => {
+				reapplyThemeToPageGroups();
+			});
+		}
 	});
 
 	// Set up sentinel observer for infinite scroll
@@ -162,9 +167,9 @@ async function applyReaderTheme() {
 
 	if (settings) {
 		const effectiveTheme = isDark && settings.darkTheme !== 'same' ? settings.darkTheme : settings.lightTheme;
-		if (effectiveTheme && effectiveTheme !== 'default') {
-			highlightThemeAttr = { name: 'data-reader-theme', value: effectiveTheme };
-		}
+		highlightThemeAttr = effectiveTheme && effectiveTheme !== 'default'
+			? { name: 'data-reader-theme', value: effectiveTheme }
+			: null;
 
 		// Font settings apply globally
 		const html = document.documentElement;
@@ -179,12 +184,19 @@ async function applyReaderTheme() {
 }
 
 function applyThemeToElement(el: HTMLElement) {
+	el.classList.remove('theme-dark', 'theme-light');
+	el.removeAttribute('data-reader-theme');
 	for (const cls of highlightThemeClasses) {
 		el.classList.add(cls);
 	}
 	if (highlightThemeAttr) {
 		el.setAttribute(highlightThemeAttr.name, highlightThemeAttr.value);
 	}
+}
+
+function reapplyThemeToPageGroups() {
+	const groups = document.querySelectorAll<HTMLElement>('.highlight-page-group');
+	groups.forEach(el => applyThemeToElement(el));
 }
 
 // --- Data loading ---
@@ -459,16 +471,16 @@ function updateSidebarCounts(): boolean {
 		for (const p of g.pages) pageCountMap.set(p.url, p.highlights.length);
 	}
 
+	// Check that rendered domains match filtered domains
 	const domainItems = Array.from(domainListEl.querySelectorAll<HTMLElement>('.nav-domain'));
 	if (domainItems.length !== filtered.length) return false;
-	for (let i = 0; i < domainItems.length; i++) {
-		const domain = domainItems[i].getAttribute('data-domain') || '';
-		const group = groupMap.get(domain);
-		if (!group) return false;
-		const countEl = domainItems[i].querySelector('.nav-count');
-		if (countEl) countEl.textContent = String(group.totalHighlights);
+	for (const group of filtered) {
+		const cached = sidebarNodeCache.get(group.domain);
+		if (!cached) return false;
+		cached.countEl.textContent = String(group.totalHighlights);
 	}
 
+	// Page sub-items aren't cached, so query the DOM
 	const pageItems = Array.from(domainListEl.querySelectorAll<HTMLElement>('.nav-page'));
 	for (let i = 0; i < pageItems.length; i++) {
 		const count = pageCountMap.get(pageItems[i].getAttribute('data-url')!);
@@ -481,136 +493,148 @@ function updateSidebarCounts(): boolean {
 	return true;
 }
 
+interface CachedDomainNode {
+	li: HTMLElement;
+	countEl: Element;
+	chevronWrap: Element;
+}
+const sidebarNodeCache = new Map<string, CachedDomainNode>();
+
 function renderSidebar() {
 	const domainListEl = document.getElementById('highlights-domain-list')!;
 	const filtered = getFilteredGroups();
 
-	domainListEl.textContent = '';
+	// Detach children without destroying cached nodes
+	domainListEl.replaceChildren();
+
+	// Prune cache entries for domains no longer in data
+	const activeDomains = new Set(allDomainGroups.map(g => g.domain));
+	for (const domain of sidebarNodeCache.keys()) {
+		if (!activeDomains.has(domain)) sidebarNodeCache.delete(domain);
+	}
+
+	let needsIcons = false;
 
 	for (const group of filtered) {
-		const isExpanded = expandedSidebarDomains.has(group.domain);
-		const isDomainActive = currentNav.type === 'domain' && currentNav.domain === group.domain;
-
-		const li = document.createElement('li');
-		li.className = 'nav-domain' + (isDomainActive ? ' active' : '');
-		li.setAttribute('data-domain', group.domain);
-
-		const chevronWrap = document.createElement('div');
-		chevronWrap.className = 'nav-chevron-wrap' + (isExpanded ? ' is-expanded' : '');
-		const chevronIcon = document.createElement('i');
-		chevronIcon.setAttribute('data-lucide', 'chevron-right');
-		chevronWrap.appendChild(chevronIcon);
-		li.appendChild(chevronWrap);
-
-		const normalized = group.domain.replace(/^www\./, '');
-		const domainSettings = domainSettingsMap[normalized];
-		const siteName = domainSettings?.site;
-
-		if (domainSettings?.favicon) {
-			let favicon = faviconCache.get(normalized);
-			if (!favicon) {
-				favicon = document.createElement('img');
-				favicon.className = 'nav-domain-favicon';
-				favicon.src = domainSettings.favicon;
-				favicon.width = 16;
-				favicon.height = 16;
-				// On load failure, swap the <img> for a globe icon placeholder.
-				favicon.onerror = () => {
-					const globe = document.createElement('i');
-					globe.className = 'nav-domain-favicon';
-					globe.setAttribute('data-lucide', 'globe');
-					favicon!.replaceWith(globe);
-					createIcons({ icons });
-				};
-				faviconCache.set(normalized, favicon);
-			}
-			li.appendChild(favicon.cloneNode(true));
-		} else {
-			const globe = document.createElement('i');
-			globe.className = 'nav-domain-favicon';
-			globe.setAttribute('data-lucide', 'globe');
-			li.appendChild(globe);
+		let cached = sidebarNodeCache.get(group.domain);
+		if (!cached) {
+			cached = createDomainNode(group.domain);
+			sidebarNodeCache.set(group.domain, cached);
+			needsIcons = true;
 		}
 
-		const name = document.createElement('span');
-		name.className = 'nav-domain-name';
-		name.textContent = siteName || displayDomain(group.domain);
-		if (siteName) name.title = displayDomain(group.domain);
-		li.appendChild(name);
+		const isDomainActive = currentNav.type === 'domain' && currentNav.domain === group.domain;
+		cached.li.classList.toggle('active', isDomainActive);
+		cached.countEl.textContent = String(group.totalHighlights);
+		const isExpanded = expandedSidebarDomains.has(group.domain);
+		cached.chevronWrap.classList.toggle('is-expanded', isExpanded);
 
-		const count = document.createElement('span');
-		count.className = 'nav-count';
-		count.textContent = String(group.totalHighlights);
-		li.appendChild(count);
+		domainListEl.appendChild(cached.li);
 
-		// Click chevron to expand/collapse, click name to navigate
-		chevronWrap.addEventListener('click', (e) => {
-			e.stopPropagation();
-			const wasExpanded = expandedSidebarDomains.has(group.domain);
-			if (wasExpanded) {
-				expandedSidebarDomains.delete(group.domain);
-				chevronWrap.classList.remove('is-expanded');
-				// Remove page sub-items
-				let next = li.nextElementSibling;
-				while (next && next.classList.contains('nav-page')) {
-					const toRemove = next;
-					next = next.nextElementSibling;
-					toRemove.remove();
-				}
-			} else {
-				expandedSidebarDomains.add(group.domain);
-				chevronWrap.classList.add('is-expanded');
-				// Insert page sub-items after this domain li
-				const pageItems = createPageSubItems(group);
-				let insertAfter: Element = li;
-				for (const pageLi of pageItems) {
-					insertAfter.after(pageLi);
-					insertAfter = pageLi;
-				}
-				createIcons({ icons });
-			}
-		});
-
-		li.addEventListener('click', () => {
-			const isActive = currentNav.type === 'domain' && currentNav.domain === group.domain;
-			if (isActive) {
-				// Already selected — toggle expand/collapse
-				if (expandedSidebarDomains.has(group.domain)) {
-					expandedSidebarDomains.delete(group.domain);
-					chevronWrap.classList.remove('is-expanded');
-					let next = li.nextElementSibling;
-					while (next && next.classList.contains('nav-page')) {
-						const toRemove = next;
-						next = next.nextElementSibling;
-						toRemove.remove();
-					}
-				} else {
-					expandedSidebarDomains.add(group.domain);
-					chevronWrap.classList.add('is-expanded');
-					let insertAfter: Element = li;
-					for (const pageLi of createPageSubItems(group)) {
-						insertAfter.after(pageLi);
-						insertAfter = pageLi;
-					}
-					createIcons({ icons });
-				}
-			} else {
-				navigate({ type: 'domain', domain: group.domain });
-			}
-		});
-
-		domainListEl.appendChild(li);
-
-		// Page sub-items
 		if (isExpanded) {
-			const pageItems = createPageSubItems(group);
-			for (const pageLi of pageItems) {
+			for (const pageLi of createPageSubItems(group)) {
 				domainListEl.appendChild(pageLi);
 			}
 		}
 	}
 
-	createIcons({ icons });
+	if (needsIcons) createIcons({ icons });
+}
+
+function createDomainNode(domain: string): CachedDomainNode {
+	const li = document.createElement('li');
+	li.className = 'nav-domain';
+	li.setAttribute('data-domain', domain);
+
+	const chevronWrap = document.createElement('div');
+	chevronWrap.className = 'nav-chevron-wrap';
+	const chevronIcon = document.createElement('i');
+	chevronIcon.setAttribute('data-lucide', 'chevron-right');
+	chevronWrap.appendChild(chevronIcon);
+	li.appendChild(chevronWrap);
+
+	const normalized = domain.replace(/^www\./, '');
+	const domainSettings = domainSettingsMap[normalized];
+	const siteName = domainSettings?.site;
+
+	if (domainSettings?.favicon) {
+		let favicon = faviconCache.get(normalized);
+		if (!favicon) {
+			favicon = document.createElement('img');
+			favicon.className = 'nav-domain-favicon';
+			favicon.src = domainSettings.favicon;
+			favicon.width = 16;
+			favicon.height = 16;
+			favicon.onerror = () => {
+				const globe = document.createElement('i');
+				globe.className = 'nav-domain-favicon';
+				globe.setAttribute('data-lucide', 'globe');
+				favicon!.replaceWith(globe);
+				createIcons({ icons });
+			};
+			faviconCache.set(normalized, favicon);
+		}
+		li.appendChild(favicon.cloneNode(true));
+	} else {
+		const globe = document.createElement('i');
+		globe.className = 'nav-domain-favicon';
+		globe.setAttribute('data-lucide', 'globe');
+		li.appendChild(globe);
+	}
+
+	const name = document.createElement('span');
+	name.className = 'nav-domain-name';
+	name.textContent = siteName || displayDomain(domain);
+	if (siteName) name.title = displayDomain(domain);
+	li.appendChild(name);
+
+	const count = document.createElement('span');
+	count.className = 'nav-count';
+	li.appendChild(count);
+
+	chevronWrap.addEventListener('click', (e) => {
+		e.stopPropagation();
+		toggleDomainExpand(domain);
+	});
+
+	li.addEventListener('click', () => {
+		const isActive = currentNav.type === 'domain' && currentNav.domain === domain;
+		if (isActive) {
+			toggleDomainExpand(domain);
+		} else {
+			navigate({ type: 'domain', domain });
+		}
+	});
+
+	return { li, countEl: count, chevronWrap };
+}
+
+function toggleDomainExpand(domain: string) {
+	const cached = sidebarNodeCache.get(domain);
+	if (!cached) return;
+	const { li, chevronWrap } = cached;
+	if (expandedSidebarDomains.has(domain)) {
+		expandedSidebarDomains.delete(domain);
+		chevronWrap.classList.remove('is-expanded');
+		let next = li.nextElementSibling;
+		while (next && next.classList.contains('nav-page')) {
+			const toRemove = next;
+			next = next.nextElementSibling;
+			toRemove.remove();
+		}
+	} else {
+		expandedSidebarDomains.add(domain);
+		chevronWrap.classList.add('is-expanded');
+		const group = getFilteredGroups().find(g => g.domain === domain);
+		if (group) {
+			let insertAfter: Element = li;
+			for (const pageLi of createPageSubItems(group)) {
+				insertAfter.after(pageLi);
+				insertAfter = pageLi;
+			}
+			createIcons({ icons });
+		}
+	}
 }
 
 // --- Main content ---
@@ -1294,6 +1318,7 @@ function highlightTextNodes(root: HTMLElement, query: string) {
 		const after = textNode.splitText(index);
 		const matched = after.splitText(length);
 		const mark = document.createElement('mark');
+		mark.className = 'search-match';
 		mark.textContent = after.textContent;
 		after.parentNode!.replaceChild(mark, after);
 		// matched is already in the DOM after mark
