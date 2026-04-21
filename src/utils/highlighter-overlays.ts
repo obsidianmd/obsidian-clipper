@@ -207,10 +207,10 @@ function positionDeleteButton(id: string, centerX: number, top: number): void {
 	const btn = ensureHighlightDeleteButton();
 	currentDeleteTargetId = id;
 	btn.style.display = 'flex';
-	// Center horizontally above the highlight. Use the rendered width so
-	// centering adapts to the label text.
 	const btnWidth = btn.offsetWidth || 80;
-	btn.style.left = `${centerX + window.scrollX - btnWidth / 2}px`;
+	const idealLeft = centerX - btnWidth / 2;
+	const clampedLeft = Math.max(4, Math.min(idealLeft, window.innerWidth - btnWidth - 4));
+	btn.style.left = `${clampedLeft + window.scrollX}px`;
 	btn.style.top = `${top + window.scrollY - 28}px`;
 }
 
@@ -399,7 +399,7 @@ const throttledUpdateHighlights = throttle(() => {
 	if (!isApplyingHighlights) updateHighlightOverlayPositions();
 }, 100);
 
-window.addEventListener('resize', throttledUpdateHighlights);
+window.addEventListener('resize', () => { throttledUpdateHighlights(); hideHighlightDeleteButton(); });
 window.addEventListener('scroll', throttledUpdateHighlights);
 
 // Mutation observer re-positions element overlays when the page reflows.

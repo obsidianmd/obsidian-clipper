@@ -2369,7 +2369,11 @@ export class Reader {
 			if (rects.length === 0) return hide();
 			const last = rects[rects.length - 1];
 			btn.style.display = 'flex';
-			btn.style.left = `${last.right + window.scrollX + 2}px`;
+			// Ensure the button stays within the viewport.
+			const btnWidth = btn.offsetWidth || 90;
+			const idealLeft = last.right + 2;
+			const clampedLeft = Math.min(idealLeft, window.innerWidth - btnWidth - 4);
+			btn.style.left = `${Math.max(4, clampedLeft) + window.scrollX}px`;
 			btn.style.top = `${last.bottom + window.scrollY - 6}px`;
 		};
 
@@ -2383,6 +2387,7 @@ export class Reader {
 			const sel = doc.getSelection();
 			if (!sel || sel.isCollapsed) hide();
 		});
+		window.addEventListener('resize', hide);
 	}
 
 	// Single-key hotkey wired to the reader document. Ignores presses while
