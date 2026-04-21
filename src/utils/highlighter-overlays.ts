@@ -14,6 +14,7 @@ import {
 import { throttle } from './throttle';
 import { getElementByXPath, isDarkColor } from './dom-utils';
 import { getMessage } from './i18n';
+import { debugLog } from './debug';
 
 let touchStartX: number = 0;
 let touchStartY: number = 0;
@@ -64,7 +65,7 @@ function ensureUserHighlight(): HighlightInstance | null {
 	const HighlightCtor = (window as unknown as { Highlight?: new () => HighlightInstance }).Highlight;
 	if (!registry || !HighlightCtor) {
 		if (!highlightApiWarned) {
-			console.info('[Obsidian Clipper] CSS Custom Highlight API not available — text highlights will not render. Requires Chrome 105+, Safari 17.2+, or Firefox 140+.');
+			debugLog('Clipper', 'CSS Custom Highlight API not available — text highlights will not render. Requires Chrome 105+, Safari 17.2+, or Firefox 140+.');
 			highlightApiWarned = true;
 		}
 		return null;

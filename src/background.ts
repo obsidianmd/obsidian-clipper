@@ -4,6 +4,7 @@ import { updateCurrentActiveTab, isValidUrl, isBlankPage, isNormalPageUrl } from
 import { TextHighlightData } from './utils/highlighter';
 import { debounce } from './utils/debounce';
 import { Settings } from './types/types';
+import { debugLog } from './utils/debug';
 
 const YOUTUBE_EMBED_RULE_ID = 9001;
 const YOUTUBE_INNERTUBE_RULE_ID = 9002;
@@ -116,16 +117,16 @@ let popupPorts: { [tabId: number]: browser.Runtime.Port } = {};
 
 async function injectContentScript(tabId: number): Promise<void> {
 	if (browser.scripting) {
-		console.log('[Obsidian Clipper] Using scripting API');
+		debugLog('Clipper', 'Using scripting API');
 		await browser.scripting.executeScript({
 			target: { tabId },
 			files: ['content.js']
 		});
 	} else {
-		console.log('[Obsidian Clipper] Using tabs.executeScript fallback');
+		debugLog('Clipper', 'Using tabs.executeScript fallback');
 		await browser.tabs.executeScript(tabId, { file: 'content.js' });
 	}
-	console.log('[Obsidian Clipper] Injection completed, waiting for init...');
+	debugLog('Clipper', 'Injection completed, waiting for init...');
 
 	// Poll until the content script responds, rather than a fixed delay.
 	// Try immediately after injection, then back off with 50ms sleeps.
@@ -143,7 +144,7 @@ async function injectContentScript(tabId: number): Promise<void> {
 	if (!ready) {
 		throw new Error('Content script did not respond after injection');
 	}
-	console.log('[Obsidian Clipper] Post-injection ping succeeded');
+	debugLog('Clipper', 'Post-injection ping succeeded');
 }
 
 async function ensureContentScriptLoadedInBackground(tabId: number): Promise<void> {
@@ -158,7 +159,7 @@ async function ensureContentScriptLoadedInBackground(tabId: number): Promise<voi
 
 		// Attempt to send a message to the content script
 		await browser.tabs.sendMessage(tabId, { action: "ping" });
-		console.log('[Obsidian Clipper] Content script ping succeeded');
+		debugLog('Clipper', 'Content script ping succeeded');
 	} catch (error) {
 		// If the error is about invalid URL, re-throw it
 		if (error instanceof Error && error.message.includes('invalid URL')) {
@@ -166,7 +167,7 @@ async function ensureContentScriptLoadedInBackground(tabId: number): Promise<voi
 		}
 
 		// If the message fails, the content script is not loaded, so inject it
-		console.log('[Obsidian Clipper] Ping failed, injecting content script...', error);
+		debugLog('Clipper', 'Ping failed, injecting content script...', error);
 		await injectContentScript(tabId);
 	}
 }
@@ -248,7 +249,7 @@ async function initialize() {
 		// Set up action popup based on openBehavior setting
 		await updateActionPopup();
 
-		console.log('Background script initialized successfully');
+		debugLog('Clipper', 'Background script initialized successfully');
 	} catch (error) {
 		console.error('Error initializing background script:', error);
 	}

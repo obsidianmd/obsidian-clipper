@@ -109,7 +109,7 @@ export async function extractPageContent(tabId: number): Promise<ContentResponse
 		// extension update when a zombie content script (runtime invalidated)
 		// responded to ping, preventing re-injection. Force a fresh injection
 		// so the new generation's listener takes over, then retry.
-		console.log('[Obsidian Clipper] First extraction attempt failed, retrying...', firstError);
+		debugLog('Clipper', 'First extraction attempt failed, retrying...', firstError);
 		try {
 			await browser.runtime.sendMessage({ action: "forceInjectContentScript", tabId });
 		} catch {
