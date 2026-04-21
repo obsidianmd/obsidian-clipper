@@ -6,17 +6,41 @@ export function createElementWithClass(tagName: string, className: string): HTML
 
 export function createElementWithHTML(tagName: string, htmlContent: string, attributes: Record<string, string> = {}): HTMLElement {
 	const element = document.createElement(tagName);
-
-	const parser = new DOMParser();
-	const doc = parser.parseFromString(htmlContent, 'text/html');
-	
-	// Move all child nodes from parsed content to the element
-	Array.from(doc.body.childNodes).forEach(node => {
-		element.appendChild(node.cloneNode(true));
-	});
-	
+	if (htmlContent) {
+		setElementHTML(element, htmlContent);
+	}
 	Object.entries(attributes).forEach(([key, value]) => element.setAttribute(key, value));
 	return element;
+}
+
+export function setElementHTML(element: Element, html: string): void {
+	const parsed = new DOMParser().parseFromString(html, 'text/html');
+	element.replaceChildren(...Array.from(parsed.body.childNodes));
+}
+
+export function setSVGChildren(svgElement: Element, markup: string): void {
+	const doc = new DOMParser()
+		.parseFromString(`<svg xmlns="http://www.w3.org/2000/svg">${markup}</svg>`, 'image/svg+xml');
+	const tempSvg = doc.documentElement;
+	svgElement.replaceChildren(
+		...Array.from(tempSvg.childNodes).map(n => svgElement.ownerDocument.importNode(n, true))
+	);
+}
+
+export function serializeChildren(element: Element): string {
+	return Array.from(element.childNodes).map(node => {
+		if (node.nodeType === Node.ELEMENT_NODE) return (node as Element).outerHTML;
+		if (node.nodeType === Node.TEXT_NODE) {
+			return (node.textContent ?? '')
+				.replace(/&/g, '&amp;')
+				.replace(/</g, '&lt;')
+				.replace(/>/g, '&gt;');
+		}
+		if (node.nodeType === Node.COMMENT_NODE) {
+			return `<!--${node.textContent ?? ''}-->`;
+		}
+		return '';
+	}).join('');
 }
 
 export function createOption(value: string, text: string): HTMLOptionElement {

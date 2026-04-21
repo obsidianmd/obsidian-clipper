@@ -41,7 +41,7 @@ function buildThemeGrid(
 	customFontValue: string | null,
 	onSelect: (themeId: string) => void,
 ): void {
-	container.innerHTML = '';
+	container.replaceChildren();
 
 	const dateStr = new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
 

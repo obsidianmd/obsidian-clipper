@@ -1048,7 +1048,7 @@ function createHighlightItem(entries: HighlightEntry[], pageUrl: string): HTMLEl
 	content.className = 'highlight-item-content';
 
 	const joined = entries.map(e => e.data.content || '').join('\n');
-	content.innerHTML = DOMPurify.sanitize(joined);
+	content.replaceChildren(DOMPurify.sanitize(joined, { RETURN_DOM_FRAGMENT: true }));
 	// A grouped selection may include stored <li> fragments; wrap consecutive
 	// orphan <li>s in a <ul> so the list renders with its bullets intact.
 	wrapOrphanListItems(content);

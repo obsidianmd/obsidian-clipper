@@ -26,7 +26,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 	}
 
 	// Show loading spinner with themed background while fetching
-	document.body.innerHTML = `<div class="obsidian-reader-loading"><div class="obsidian-reader-loading-text">${getMessage('readerLoading')}</div></div>`;
+	const loadingDiv = document.createElement('div');
+	loadingDiv.className = 'obsidian-reader-loading';
+	const loadingText = document.createElement('div');
+	loadingText.className = 'obsidian-reader-loading-text';
+	loadingText.textContent = getMessage('readerLoading');
+	loadingDiv.appendChild(loadingText);
+	document.body.replaceChildren(loadingDiv);
 
 	try {
 		const originalUrl = url;
@@ -273,7 +279,7 @@ window.addEventListener('popstate', () => {
 });
 
 function showUrlInput() {
-	document.body.innerHTML = '';
+	document.body.replaceChildren();
 
 	const nav = document.createElement('nav');
 	nav.className = 'reader-nav';

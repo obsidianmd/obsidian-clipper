@@ -1,5 +1,5 @@
 import browser from './browser-polyfill';
-import { getElementXPath, getElementByXPath } from './dom-utils';
+import { getElementXPath, getElementByXPath, setElementHTML } from './dom-utils';
 import {
 	handleMouseUp,
 	planHighlightOverlayRects,
@@ -706,7 +706,7 @@ function getHighlightRanges(range: Range): AnyHighlightData[] {
 			const innerHtml = sanitizeAndPreserveFormatting(serializeRangePreservingAncestors(blockRange, blockElement));
 			if (innerHtml.trim() === '') continue;
 			const wrapper = blockElement.cloneNode(false) as Element;
-			wrapper.innerHTML = innerHtml;
+			setElementHTML(wrapper, innerHtml);
 			const htmlContent = wrapper.outerHTML;
 
 			newHighlights.push({

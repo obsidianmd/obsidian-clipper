@@ -218,7 +218,7 @@ export async function translatePage() {
 				element.placeholder = translation;
 			} else {
 				// Sanitize HTML content before inserting
-				element.innerHTML = DOMPurify.sanitize(translation);
+				element.replaceChildren(DOMPurify.sanitize(translation, { RETURN_DOM_FRAGMENT: true }));
 			}
 		}
 	});

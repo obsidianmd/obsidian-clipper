@@ -7,6 +7,7 @@ import { extractContentBySelector as extractContentBySelectorShared } from './ut
 import Defuddle from 'defuddle';
 import { createMarkdownContent } from 'defuddle/full';
 import { flattenShadowDom } from './utils/flatten-shadow-dom';
+import { serializeChildren } from './utils/dom-utils';
 import { saveFile } from './utils/file-utils';
 import { debugLog } from './utils/debug';
 import { updateSidebarWidth, addResizeHandle, cleanupResizeHandlers } from './utils/iframe-resize';
@@ -206,7 +207,7 @@ declare global {
 					const clonedSelection = range.cloneContents();
 					const div = document.createElement('div');
 					div.appendChild(clonedSelection);
-					selectedHtml = div.innerHTML;
+					selectedHtml = serializeChildren(div);
 				}
 
 				// Use parseAsync to ensure async variables like {{transcript}} are available.
