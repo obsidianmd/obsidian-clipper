@@ -37,5 +37,5 @@ export const isDebugMode = () => DEBUG_MODE && debugMode;
 
 // Expose toggleDebug to the global scope only in debug mode
 if (DEBUG_MODE) {
-	(window as any).toggleDebug = toggleDebug;
+	(globalThis as any).toggleDebug = toggleDebug;
 }
