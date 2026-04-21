@@ -1095,6 +1095,9 @@ function createHighlightItem(entries: HighlightEntry[], pageUrl: string): HTMLEl
 // Wrap consecutive orphan <li> elements (not already inside a <ul>/<ol>) in
 // a <ul>. Used when rendering grouped highlights — stored <li> fragments
 // don't carry their original list parent, so we synthesize one.
+// TODO: always wraps in <ul>. Ordered list content (<ol>) loses its
+// numbering. To fix, store the parent list type (ul vs ol) alongside each
+// <li> highlight at creation time.
 function wrapOrphanListItems(root: HTMLElement): void {
 	const children = Array.from(root.children);
 	let i = 0;

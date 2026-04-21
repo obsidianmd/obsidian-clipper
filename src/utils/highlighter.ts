@@ -10,6 +10,7 @@ import {
 	markHighlightJustCreated,
 } from './highlighter-overlays';
 import { detectBrowser, addBrowserClassToHtml } from './browser-detection';
+import dayjs from 'dayjs';
 import { generalSettings, loadSettings } from './storage-utils';
 
 /**
@@ -574,11 +575,7 @@ export function handleTextSelection(selection: Selection, notes?: string[]) {
 
 		highlights = currentBatchHighlights;
 		bumpHighlightsVersion();
-
-		// Only add to history if something actually changed from the initial global state
-		if (JSON.stringify(oldGlobalHighlights) !== JSON.stringify(highlights)) {
-			addToHistory('add', oldGlobalHighlights, highlights);
-		}
+		addToHistory('add', oldGlobalHighlights, highlights);
 		
 		sortHighlights();
 		commitHighlightChanges();
@@ -1099,7 +1096,7 @@ export function collapseGroupsForExport(
 		const mergedNotes = group.flatMap(h => h.notes ?? []);
 		const entry: ExportedHighlight = {
 			text: parts.join('\n\n'),
-			timestamp: new Date(parseInt(group[0].id)).toISOString(),
+			timestamp: dayjs(parseInt(group[0].id)).toISOString(),
 		};
 		if (mergedNotes.length > 0) entry.notes = mergedNotes;
 		return entry;
@@ -1147,21 +1144,57 @@ export async function loadHighlights() {
 
 	if (storedData && Array.isArray(storedData.highlights) && storedData.highlights.length > 0) {
 		highlights = storedData.highlights;
+		const migrated = migrateStoredHighlights();
 		bumpHighlightsVersion();
 		await loadSettings();
-		// Always render stored highlights so the hover-delete affordance works
-		// regardless of highlighter mode. The alwaysShowHighlights setting is
-		// retained as a body-class marker for any external stylesheets that
-		// still gate on it.
+		// Always render so the click-to-remove affordance works regardless
+		// of highlighter mode.
 		applyHighlights();
 		if (generalSettings.alwaysShowHighlights) {
 			document.body.classList.add('obsidian-highlighter-always-show');
 		}
+		if (migrated) saveHighlights();
 	} else {
 		highlights = [];
 		bumpHighlightsVersion();
 	}
 	lastAppliedVersion = highlightsVersion;
+}
+
+// One-time migration for highlights saved before the Highlighter 2.0 refactor.
+// Returns true if any data was changed (caller should persist).
+function migrateStoredHighlights(): boolean {
+	let changed = false;
+	for (let i = highlights.length - 1; i >= 0; i--) {
+		const h = highlights[i];
+
+		// 1. Convert removed 'complex' type → 'element' (renders as overlay).
+		if ((h as any).type === 'complex') {
+			(h as any).type = 'element';
+			delete (h as any).startOffset;
+			delete (h as any).endOffset;
+			changed = true;
+		}
+
+		// 2. Fix inflated text offsets. Old getTextOffset/findTextNodeAtOffset
+		//    both included the root element's textContent.length on the first
+		//    TreeWalker iteration (a bug that canceled at render time). After
+		//    the fix, offsets are natural character positions. Detect old format
+		//    by checking startOffset >= textContent.length — in new format,
+		//    startOffset is always < textContent.length.
+		if (h.type === 'text') {
+			const el = getElementByXPath(h.xpath);
+			if (el) {
+				const len = el.textContent?.length ?? 0;
+				if (len > 0 && h.startOffset >= len) {
+					h.startOffset -= len;
+					h.endOffset -= len;
+					changed = true;
+				}
+			}
+		}
+	}
+	return changed;
 }
 
 export function clearHighlights() {

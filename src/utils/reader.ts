@@ -2207,6 +2207,10 @@ export class Reader {
 
 			this.populateArticle(doc, main, article, { content, title, author, published, domain, wordCount, parseTime });
 
+			// Use the Defuddle-extracted title (article title only) instead of
+			// document.title (which often includes the site name suffix).
+			if (title) hl().setPageTitle(title);
+
 			// On YouTube, replace the Defuddle-generated iframe with the
 			// preserved native video element, or fall back to embed
 			if (isYouTube) {
@@ -2336,7 +2340,7 @@ export class Reader {
 		const btn = doc.createElement('button');
 		btn.type = 'button';
 		btn.className = 'obsidian-selection-action';
-		btn.setAttribute('aria-label', 'Highlight selection');
+		btn.setAttribute('aria-label', getMessage('highlightSelection'));
 		btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg><span>${getMessage('highlightSelection')}</span>`;
 		btn.style.display = 'none';
 		// Preserve the selection when the pointer goes down on the button —

@@ -57,11 +57,18 @@ function getHighlightRegistry(): CSSHighlightsRegistry | null {
 	return registry ?? null;
 }
 
+let highlightApiWarned = false;
 function ensureUserHighlight(): HighlightInstance | null {
 	if (userHighlight) return userHighlight;
 	const registry = getHighlightRegistry();
 	const HighlightCtor = (window as unknown as { Highlight?: new () => HighlightInstance }).Highlight;
-	if (!registry || !HighlightCtor) return null;
+	if (!registry || !HighlightCtor) {
+		if (!highlightApiWarned) {
+			console.info('[Obsidian Clipper] CSS Custom Highlight API not available — text highlights will not render. Requires Chrome 105+, Safari 17.2+, or Firefox 140+.');
+			highlightApiWarned = true;
+		}
+		return null;
+	}
 	userHighlight = new HighlightCtor();
 	userHighlight.priority = USER_HIGHLIGHT_PRIORITY;
 	registry.set(USER_HIGHLIGHT_NAME, userHighlight);
@@ -132,10 +139,14 @@ function findOverlayAtPoint(x: number, y: number): HTMLElement | null {
 	return null;
 }
 
+// TODO: O(N × rects) per call. For pages with 50+ highlights, consider
+// spatial indexing (e.g., a grid or interval tree) to reduce hit-test cost.
 function findTextHighlightAtPoint(x: number, y: number): string | null {
 	// Expand rects vertically to cover inter-line gaps (line-height spacing
-	// between adjacent line rects). Without this, hovering between lines
-	// alternates hit/miss, making the delete button flicker.
+	// between adjacent line rects). Without this, clicking between lines
+	// of the same highlight wouldn't register.
+	// NOTE: 4px padding could merge hover zones of highlights <8px apart
+	// vertically. Unlikely in practice (line-height is usually 20px+).
 	const PAD = 4;
 	for (const [id, ranges] of textHighlightRanges) {
 		for (const range of ranges) {
@@ -165,7 +176,7 @@ function ensureHighlightDeleteButton(): HTMLButtonElement {
 	const btn = document.createElement('button');
 	btn.type = 'button';
 	btn.className = 'obsidian-highlight-delete';
-	btn.setAttribute('aria-label', 'Remove highlight');
+	btn.setAttribute('aria-label', getMessage('remove'));
 	btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg><span>${getMessage('remove')}</span>`;
 	btn.style.display = 'none';
 	btn.addEventListener('mousedown', e => e.stopPropagation());
@@ -306,6 +317,8 @@ export function handleMouseUp(event: MouseEvent | TouchEvent) {
 		// browsers extend the selection vertically (up for left, down for
 		// right), often selecting the entire article. Detect this by checking
 		// whether mouseup landed outside the text column — if so, discard.
+		// NOTE: only works in reader mode (.obsidian-reader-content). On live
+		// pages the content container isn't known, so this guard is a no-op.
 		if (event instanceof MouseEvent) {
 			const readerContent = document.querySelector('.obsidian-reader-content');
 			if (readerContent) {
