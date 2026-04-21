@@ -195,7 +195,7 @@ export const BLOCK_HIGHLIGHT_TAGS = new Set(['FIGURE', 'PICTURE', 'IMG', 'TABLE'
 // Block containers the text-splitting logic uses to split a multi-block
 // selection into one TextHighlightData per paragraph-ish block.
 const TEXT_BLOCK_SPLIT_TAGS = [
-	'P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'LI', 'BLOCKQUOTE', 'FIGCAPTION'
+	'P', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'LI', 'BLOCKQUOTE', 'FIGCAPTION', 'TD', 'TH'
 ];
 
 export interface HighlightData {

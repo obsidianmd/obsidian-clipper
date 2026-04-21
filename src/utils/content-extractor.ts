@@ -39,6 +39,10 @@ function stripHtml(html: string): string {
 	return doc.body.textContent || '';
 }
 
+function normalizeText(html: string): string {
+	return stripHtml(html).replace(/\s+/g, ' ').trim();
+}
+
 interface ContentResponse {
 	content: string;
 	selectedHtml: string;
@@ -289,16 +293,20 @@ function processXPathHighlight(highlight: TextHighlightData | ElementHighlightDa
 		null
 	).singleNodeValue as Element;
 
-	if (!element) {
-		debugLog('Highlights', 'Could not find element for xpath:', highlight.xpath);
+	if (element) {
+		if (highlight.type === 'element') {
+			wrapElementWithMark(element);
+		} else {
+			wrapTextWithMark(element, highlight as TextHighlightData);
+		}
 		return;
 	}
 
-	if (highlight.type === 'element') {
-		wrapElementWithMark(element);
-	} else {
-		wrapTextWithMark(element, highlight as TextHighlightData);
-	}
+	// Xpath didn't resolve (common when the highlight was created in a
+	// different mode — reader vs live — with a different DOM structure).
+	// Fall back to finding the highlight's text in the article content.
+	debugLog('Highlights', 'Xpath not found, falling back to text search:', highlight.xpath);
+	processContentBasedHighlight(highlight, tempDiv);
 }
 
 function processContentBasedHighlight(highlight: TextHighlightData | ElementHighlightData, tempDiv: HTMLDivElement) {
@@ -309,7 +317,7 @@ function processContentBasedHighlight(highlight: TextHighlightData | ElementHigh
 	// Serialize the inner content
 	const serializer = new XMLSerializer();
 	let innerContent = '';
-	
+
 	if (contentDiv.children.length === 1 && contentDiv.firstElementChild?.tagName === 'DIV') {
 		Array.from(contentDiv.firstElementChild.childNodes).forEach(node => {
 			if (node.nodeType === Node.ELEMENT_NODE) {
@@ -331,9 +339,31 @@ function processContentBasedHighlight(highlight: TextHighlightData | ElementHigh
 	const paragraphs = Array.from(contentDiv.querySelectorAll('p'));
 	if (paragraphs.length) {
 		processContentParagraphs(paragraphs, tempDiv);
-	} else {
-		processInlineContent(innerContent, tempDiv);
+		return;
 	}
+
+	// For non-paragraph blocks (td, li, blockquote, etc.), match by
+	// element type to avoid false positives when the same text appears
+	// in a different element (e.g., "iPhone 16e" in a <p> AND a <td>).
+	const sourceRoot = contentDiv.firstElementChild;
+	const sourceTag = sourceRoot?.tagName?.toLowerCase();
+	if (sourceTag && sourceTag !== 'p') {
+		const searchText = normalizeText(highlight.content);
+		const candidates = Array.from(tempDiv.querySelectorAll(sourceTag));
+		for (const candidate of candidates) {
+			const candidateText = (candidate.textContent || '').replace(/\s+/g, ' ').trim();
+			if (candidateText === searchText) {
+				wrapElementWithMark(candidate);
+				return;
+			}
+			if (candidateText.includes(searchText)) {
+				processInlineContent(searchText, candidate as HTMLElement);
+				return;
+			}
+		}
+	}
+
+	processInlineContent(innerContent, tempDiv);
 }
 
 function processContentParagraphs(sourceParagraphs: Element[], tempDiv: HTMLDivElement) {
@@ -354,7 +384,7 @@ function processContentParagraphs(sourceParagraphs: Element[], tempDiv: HTMLDivE
 	});
 }
 
-function processInlineContent(content: string, tempDiv: HTMLDivElement) {
+function processInlineContent(content: string, tempDiv: HTMLElement) {
 	const searchText = stripHtml(content).trim();
 	debugLog('Highlights', 'Searching for text:', searchText);
 	
