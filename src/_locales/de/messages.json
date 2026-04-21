@@ -443,6 +443,12 @@
 			"link_end": {
 				"content": "</a>"
 			},
+	"interpreterSystemPrompt": {
+		"message": "System-Prompt des Interpreters"
+	},
+	"interpreterSystemPromptDescription": {
+		"message": "Überschreibe den System-Prompt, der beim Interpretieren von Variablen an das LLM gesendet wird. Leer lassen, um den Standard zu verwenden."
+	},
 			"link_start": {
 				"content": "<a href=\"?section=interpreter\">"
 			}

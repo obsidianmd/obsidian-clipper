@@ -443,6 +443,12 @@
 			"link_end": {
 				"content": "</a>"
 			},
+	"interpreterSystemPrompt": {
+		"message": "موجه النظام للمترجم"
+	},
+	"interpreterSystemPromptDescription": {
+		"message": "تجاوز موجه النظام المرسل إلى نموذج اللغة عند تفسير المتغيرات. اتركه فارغًا لاستخدام الافتراضي."
+	},
 			"link_start": {
 				"content": "<a href=\"?section=interpreter\">"
 			}

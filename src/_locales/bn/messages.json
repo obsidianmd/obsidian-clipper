@@ -443,6 +443,12 @@
 			"link_end": {
 				"content": "</a>"
 			},
+	"interpreterSystemPrompt": {
+		"message": "ইন্টারপ্রেটার সিস্টেম প্রম্পট"
+	},
+	"interpreterSystemPromptDescription": {
+		"message": "ভেরিয়েবল ব্যাখ্যা করার সময় LLM-এ পাঠানো সিস্টেম প্রম্পট ওভাররাইড করুন। ডিফল্ট ব্যবহার করতে খালি রাখুন।"
+	},
 			"link_start": {
 				"content": "<a href=\"?section=interpreter\">"
 			}

@@ -443,6 +443,12 @@
 			"link_end": {
 				"content": "</a>"
 			},
+	"interpreterSystemPrompt": {
+		"message": "Tolkarens systemprompt"
+	},
+	"interpreterSystemPromptDescription": {
+		"message": "Åsidosätt systemprompt som skickas till LLM vid tolkning av variabler. Lämna tomt för att använda standard."
+	},
 			"link_start": {
 				"content": "<a href=\"?section=interpreter\">"
 			}

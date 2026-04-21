@@ -443,6 +443,12 @@
 			"link_end": {
 				"content": "</a>"
 			},
+	"interpreterSystemPrompt": {
+		"message": "Системный промпт интерпретатора"
+	},
+	"interpreterSystemPromptDescription": {
+		"message": "Переопределяет системный промпт, отправляемый в LLM при интерпретации переменных. Оставьте пустым для использования по умолчанию."
+	},
 			"link_start": {
 				"content": "<a href=\"?section=interpreter\">"
 			}

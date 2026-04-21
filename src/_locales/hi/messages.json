@@ -443,6 +443,12 @@
 			"link_end": {
 				"content": "</a>"
 			},
+	"interpreterSystemPrompt": {
+		"message": "इंटरप्रेटर सिस्टम प्रॉम्प्ट"
+	},
+	"interpreterSystemPromptDescription": {
+		"message": "वेरिएबल की व्याख्या करते समय LLM को भेजे गए सिस्टम प्रॉम्प्ट को ओवरराइड करें। डिफ़ॉल्ट उपयोग करने के लिए खाली छोड़ें।"
+	},
 			"link_start": {
 				"content": "<a href=\"?section=interpreter\">"
 			}

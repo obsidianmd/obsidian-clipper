@@ -443,6 +443,12 @@
 			"link_end": {
 				"content": "</a>"
 			},
+	"interpreterSystemPrompt": {
+		"message": "הנחיית מערכת של המפרש"
+	},
+	"interpreterSystemPromptDescription": {
+		"message": "עקוף את הנחיית המערכת הנשלחת ל-LLM בעת פירוש משתנים. השאר ריק לשימוש בברירת המחדל."
+	},
 			"link_start": {
 				"content": "<a href=\"?section=interpreter\">"
 			}

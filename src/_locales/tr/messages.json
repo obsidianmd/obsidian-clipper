@@ -443,6 +443,12 @@
 			"link_end": {
 				"content": "</a>"
 			},
+	"interpreterSystemPrompt": {
+		"message": "Yorumlayıcı sistem istemi"
+	},
+	"interpreterSystemPromptDescription": {
+		"message": "Değişkenler yorumlanırken LLM'ye gönderilen sistem istemini geçersiz kılar. Varsayılanı kullanmak için boş bırakın."
+	},
 			"link_start": {
 				"content": "<a href=\"?section=interpreter\">"
 			}

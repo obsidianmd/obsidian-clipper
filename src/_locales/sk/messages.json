@@ -443,6 +443,12 @@
 			"link_end": {
 				"content": "</a>"
 			},
+	"interpreterSystemPrompt": {
+		"message": "Systémová výzva interpreta"
+	},
+	"interpreterSystemPromptDescription": {
+		"message": "Prepíše systémovú výzvu odoslanú do LLM pri interpretácii premenných. Nechajte prázdne pre použitie predvoleného nastavenia."
+	},
 			"link_start": {
 				"content": "<a href=\"?section=interpreter\">"
 			}

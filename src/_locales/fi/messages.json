@@ -443,6 +443,12 @@
 			"link_end": {
 				"content": "</a>"
 			},
+	"interpreterSystemPrompt": {
+		"message": "Tulkin järjestelmäkehote"
+	},
+	"interpreterSystemPromptDescription": {
+		"message": "Korvaa järjestelmäkehote, joka lähetetään LLM:lle muuttujia tulkittaessa. Jätä tyhjäksi käyttääksesi oletusarvoa."
+	},
 			"link_start": {
 				"content": "<a href=\"?section=interpreter\">"
 			}

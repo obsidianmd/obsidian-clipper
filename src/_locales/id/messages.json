@@ -443,6 +443,12 @@
 			"link_end": {
 				"content": "</a>"
 			},
+	"interpreterSystemPrompt": {
+		"message": "Prompt sistem interpreter"
+	},
+	"interpreterSystemPromptDescription": {
+		"message": "Timpa prompt sistem yang dikirim ke LLM saat menginterpretasi variabel. Biarkan kosong untuk menggunakan default."
+	},
 			"link_start": {
 				"content": "<a href=\"?section=interpreter\">"
 			}

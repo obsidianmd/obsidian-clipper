@@ -443,6 +443,12 @@
 			"link_end": {
 				"content": "</a>"
 			},
+	"interpreterSystemPrompt": {
+		"message": "解释器系统提示词"
+	},
+	"interpreterSystemPromptDescription": {
+		"message": "覆盖解释变量时发送给 LLM 的系统提示词。留空则使用默认值。"
+	},
 			"link_start": {
 				"content": "<a href=\"?section=interpreter\">"
 			}

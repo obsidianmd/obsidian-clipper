@@ -443,6 +443,12 @@
 			"link_end": {
 				"content": "</a>"
 			},
+	"interpreterSystemPrompt": {
+		"message": "دستور سیستم مترجم"
+	},
+	"interpreterSystemPromptDescription": {
+		"message": "دستور سیستم ارسال‌شده به LLM هنگام تفسیر متغیرها را جایگزین کنید. برای استفاده از پیش‌فرض خالی بگذارید."
+	},
 			"link_start": {
 				"content": "<a href=\"?section=interpreter\">"
 			}

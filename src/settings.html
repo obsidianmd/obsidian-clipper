@@ -555,7 +555,12 @@
 									<div class="setting-item-description" data-i18n="defaultInterpreterContextDescription">Override the context used to interpret prompt variables. Variables can be used here.</div>
 									<textarea id="default-prompt-context" rows="4" placeholder="{{fullHtml}}" spellcheck="false"></textarea>
 								</div>
-								
+								<div class="setting-item">
+									<label for="interpreter-system-prompt" data-i18n="interpreterSystemPrompt">Interpreter system prompt</label>
+									<div class="setting-item-description" data-i18n="interpreterSystemPromptDescription">Override the system prompt sent to the LLM when interpreting variables. Leave blank to use the default.</div>
+									<textarea id="interpreter-system-prompt" rows="4" spellcheck="false"></textarea>
+								</div>
+
 								</div>
 							</div>
 						</form>

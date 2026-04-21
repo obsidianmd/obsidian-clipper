@@ -443,6 +443,12 @@
 			"link_end": {
 				"content": "</a>"
 			},
+	"interpreterSystemPrompt": {
+		"message": "Tolkens systemprompt"
+	},
+	"interpreterSystemPromptDescription": {
+		"message": "Overstyr systemprompt sendt til LLM ved tolking av variabler. La stå tomt for å bruke standard."
+	},
 			"link_start": {
 				"content": "<a href=\"?section=interpreter\">"
 			}

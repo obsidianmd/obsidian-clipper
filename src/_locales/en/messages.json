@@ -448,6 +448,12 @@
 			}
 		}
 	},
+	"interpreterSystemPrompt": {
+		"message": "Interpreter system prompt"
+	},
+	"interpreterSystemPromptDescription": {
+		"message": "Override the system prompt sent to the LLM when interpreting variables. Leave blank to use the default."
+	},
 	"language": {
 		"message": "Language"
 	},

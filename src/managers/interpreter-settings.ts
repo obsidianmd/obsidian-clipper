@@ -1,6 +1,7 @@
 import { initializeToggles, initializeSettingToggle } from '../utils/ui-utils';
 import { ModelConfig, Provider } from '../types/types';
 import { generalSettings, loadSettings, saveSettings, getLocalStorage, setLocalStorage } from '../utils/storage-utils';
+import { DEFAULT_SYSTEM_PROMPT } from '../utils/interpreter';
 import { initializeIcons } from '../icons/icons';
 import { showModal, hideModal } from '../utils/modal-utils';
 import { getMessage, translatePage } from '../utils/i18n';
@@ -224,6 +225,12 @@ export async function initializeInterpreterSettings(): Promise<void> {
 		const defaultPromptContextInput = document.getElementById('default-prompt-context') as HTMLTextAreaElement;
 		if (defaultPromptContextInput) {
 			defaultPromptContextInput.value = generalSettings.defaultPromptContext;
+		}
+
+		const interpreterSystemPromptInput = document.getElementById('interpreter-system-prompt') as HTMLTextAreaElement;
+		if (interpreterSystemPromptInput) {
+			interpreterSystemPromptInput.value = generalSettings.interpreterSystemPrompt;
+			interpreterSystemPromptInput.placeholder = DEFAULT_SYSTEM_PROMPT;
 		}
 
 		updatePromptContextVisibility();
@@ -1097,6 +1104,11 @@ function saveInterpreterSettingsFromForm(): void {
 	}
 	if (defaultPromptContextInput) {
 		updatedSettings.defaultPromptContext = defaultPromptContextInput.value;
+	}
+
+	const interpreterSystemPromptInput = document.getElementById('interpreter-system-prompt') as HTMLTextAreaElement;
+	if (interpreterSystemPromptInput) {
+		updatedSettings.interpreterSystemPrompt = interpreterSystemPromptInput.value;
 	}
 
 	if (Object.keys(updatedSettings).length > 0) {

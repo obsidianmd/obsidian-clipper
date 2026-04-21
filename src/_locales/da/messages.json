@@ -443,6 +443,12 @@
 			"link_end": {
 				"content": "</a>"
 			},
+	"interpreterSystemPrompt": {
+		"message": "Fortolkerens systemprompt"
+	},
+	"interpreterSystemPromptDescription": {
+		"message": "Tilsidesæt systemprompt sendt til LLM ved fortolkning af variabler. Lad stå tomt for at bruge standardværdien."
+	},
 			"link_start": {
 				"content": "<a href=\"?section=interpreter\">"
 			}

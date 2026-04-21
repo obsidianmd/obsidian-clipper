@@ -443,6 +443,12 @@
 			"link_end": {
 				"content": "</a>"
 			},
+	"interpreterSystemPrompt": {
+		"message": "인터프리터 시스템 프롬프트"
+	},
+	"interpreterSystemPromptDescription": {
+		"message": "변수를 해석할 때 LLM에 전송되는 시스템 프롬프트를 재정의합니다. 기본값을 사용하려면 비워 두세요."
+	},
 			"link_start": {
 				"content": "<a href=\"?section=interpreter\">"
 			}

@@ -443,6 +443,12 @@
 			"link_end": {
 				"content": "</a>"
 			},
+	"interpreterSystemPrompt": {
+		"message": "Εντολή συστήματος ερμηνευτή"
+	},
+	"interpreterSystemPromptDescription": {
+		"message": "Παρακάμψτε την εντολή συστήματος που αποστέλλεται στο LLM κατά την ερμηνεία μεταβλητών. Αφήστε κενό για χρήση της προεπιλογής."
+	},
 			"link_start": {
 				"content": "<a href=\"?section=interpreter\">"
 			}

@@ -443,6 +443,12 @@
 			"link_end": {
 				"content": "</a>"
 			},
+	"interpreterSystemPrompt": {
+		"message": "Értelmező rendszerprompt"
+	},
+	"interpreterSystemPromptDescription": {
+		"message": "Felülírja a változók értelmezésekor az LLM-nek küldött rendszerpromptet. Hagyja üresen az alapértelmezett használatához."
+	},
 			"link_start": {
 				"content": "<a href=\"?section=interpreter\">"
 			}

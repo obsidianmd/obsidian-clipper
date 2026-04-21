@@ -443,6 +443,12 @@
 			"link_end": {
 				"content": "</a>"
 			},
+	"interpreterSystemPrompt": {
+		"message": "Systeemprompt van de interpreter"
+	},
+	"interpreterSystemPromptDescription": {
+		"message": "Overschrijf de systeemprompt die naar de LLM wordt verzonden bij het interpreteren van variabelen. Laat leeg om de standaard te gebruiken."
+	},
 			"link_start": {
 				"content": "<a href=\"?section=interpreter\">"
 			}

@@ -443,6 +443,12 @@
 			"link_end": {
 				"content": "</a>"
 			},
+	"interpreterSystemPrompt": {
+		"message": "ប្រអប់ជំរុញប្រព័ន្ធអ្នកបកប្រែ"
+	},
+	"interpreterSystemPromptDescription": {
+		"message": "បដិសេធប្រអប់ជំរុញប្រព័ន្ធដែលបញ្ជូនទៅ LLM នៅពេលបកប្រែអថេរ។ ទុកឱ្យទទេដើម្បីប្រើលំនាំដើម។"
+	},
 			"link_start": {
 				"content": "<a href=\"?section=interpreter\">"
 			}

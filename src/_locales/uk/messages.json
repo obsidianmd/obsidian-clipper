@@ -443,6 +443,12 @@
 			"link_end": {
 				"content": "</a>"
 			},
+	"interpreterSystemPrompt": {
+		"message": "Системний запит інтерпретатора"
+	},
+	"interpreterSystemPromptDescription": {
+		"message": "Замінює системний запит, що надсилається до LLM під час інтерпретації змінних. Залиште порожнім для використання стандартного."
+	},
 			"link_start": {
 				"content": "<a href=\"?section=interpreter\">"
 			}

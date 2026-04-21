@@ -443,6 +443,12 @@
 			"link_end": {
 				"content": "</a>"
 			},
+	"interpreterSystemPrompt": {
+		"message": "พรอมต์ระบบของตัวแปล"
+	},
+	"interpreterSystemPromptDescription": {
+		"message": "แทนที่พรอมต์ระบบที่ส่งไปยัง LLM เมื่อตีความตัวแปร ปล่อยว่างเพื่อใช้ค่าเริ่มต้น"
+	},
 			"link_start": {
 				"content": "<a href=\"?section=interpreter\">"
 			}

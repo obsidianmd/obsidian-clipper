@@ -443,6 +443,12 @@
 			"link_end": {
 				"content": "</a>"
 			},
+	"interpreterSystemPrompt": {
+		"message": "Systémový pokyn interpreta"
+	},
+	"interpreterSystemPromptDescription": {
+		"message": "Přepište systémový pokyn odeslaný do LLM při interpretaci proměnných. Nechte prázdné pro použití výchozího."
+	},
 			"link_start": {
 				"content": "<a href=\"?section=interpreter\">"
 			}

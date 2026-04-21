@@ -443,6 +443,12 @@
 			"link_end": {
 				"content": "</a>"
 			},
+	"interpreterSystemPrompt": {
+		"message": "Indicación del sistema del intérprete"
+	},
+	"interpreterSystemPromptDescription": {
+		"message": "Anula la indicación del sistema enviada al LLM al interpretar variables. Déjalo en blanco para usar el valor predeterminado."
+	},
 			"link_start": {
 				"content": "<a href=\"?section=interpreter\">"
 			}

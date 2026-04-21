@@ -21,6 +21,7 @@ export let generalSettings: Settings = {
 	interpreterEnabled: false,
 	interpreterAutoRun: false,
 	defaultPromptContext: '',
+	interpreterSystemPrompt: '',
 	propertyTypes: [],
 	readerSettings: {
 		fontSize: 16,
@@ -97,6 +98,7 @@ interface StorageData {
 		interpreterEnabled?: boolean;
 		interpreterAutoRun?: boolean;
 		defaultPromptContext?: string;
+		interpreterSystemPrompt?: string;
 	};
 	property_types?: PropertyType[];
 	stats?: {
@@ -132,6 +134,7 @@ export async function loadSettings(): Promise<Settings> {
 		interpreterEnabled: false,
 		interpreterAutoRun: false,
 		defaultPromptContext: '',
+		interpreterSystemPrompt: '',
 		propertyTypes: [],
 		saveBehavior: 'addToObsidian',
 		readerSettings: {
@@ -195,6 +198,7 @@ export async function loadSettings(): Promise<Settings> {
 		interpreterEnabled: data.interpreter_settings?.interpreterEnabled ?? defaultSettings.interpreterEnabled,
 		interpreterAutoRun: data.interpreter_settings?.interpreterAutoRun ?? defaultSettings.interpreterAutoRun,
 		defaultPromptContext: data.interpreter_settings?.defaultPromptContext || defaultSettings.defaultPromptContext,
+		interpreterSystemPrompt: data.interpreter_settings?.interpreterSystemPrompt || defaultSettings.interpreterSystemPrompt,
 		propertyTypes: data.property_types || defaultSettings.propertyTypes,
 		readerSettings: {
 			fontSize: data.reader_settings?.fontSize ?? defaultSettings.readerSettings.fontSize,
@@ -250,7 +254,8 @@ export async function saveSettings(settings?: Partial<Settings>): Promise<void> 
 			providers: generalSettings.providers,
 			interpreterEnabled: generalSettings.interpreterEnabled,
 			interpreterAutoRun: generalSettings.interpreterAutoRun,
-			defaultPromptContext: generalSettings.defaultPromptContext
+			defaultPromptContext: generalSettings.defaultPromptContext,
+			interpreterSystemPrompt: generalSettings.interpreterSystemPrompt
 		},
 		property_types: generalSettings.propertyTypes,
 		reader_settings: {

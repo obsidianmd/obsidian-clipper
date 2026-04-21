@@ -443,6 +443,12 @@
 			"link_end": {
 				"content": "</a>"
 			},
+	"interpreterSystemPrompt": {
+		"message": "Monit systemowy interpretera"
+	},
+	"interpreterSystemPromptDescription": {
+		"message": "Zastąp monit systemowy wysyłany do LLM podczas interpretowania zmiennych. Pozostaw puste, aby użyć domyślnego."
+	},
 			"link_start": {
 				"content": "<a href=\"?section=interpreter\">"
 			}

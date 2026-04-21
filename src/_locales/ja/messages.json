@@ -443,6 +443,12 @@
 			"link_end": {
 				"content": "</a>"
 			},
+	"interpreterSystemPrompt": {
+		"message": "インタープリターのシステムプロンプト"
+	},
+	"interpreterSystemPromptDescription": {
+		"message": "変数を解釈する際にLLMに送信されるシステムプロンプトを上書きします。デフォルトを使用するには空白のままにしてください。"
+	},
 			"link_start": {
 				"content": "<a href=\"?section=interpreter\">"
 			}

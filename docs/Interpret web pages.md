@@ -58,6 +58,12 @@ To define a more targeted context use [[Variables#Selector variables|selector va
 
  This would only run Interpreter on the `#main` element of a web page, if it exists. [[Filters#HTML processing|HTML processing filters]] like `remove_html`, `strip_tags` and `strip_attr` can be useful to further reduce the context length and speed up processing.
 
+### System prompt
+
+By default, Interpreter instructs the model to return data in a structured JSON format. You can override this instruction in Interpreter **Advanced settings** with a custom system prompt. Leave the field blank to use the default system prompt.
+
+> [!warning] Custom system prompts must preserve the JSON response format (`{"prompts_responses": {...}}`) for Interpreter to work correctly.
+
 ## Models
 
 > [!warning] Privacy

@@ -443,6 +443,12 @@
 			"link_end": {
 				"content": "</a>"
 			},
+	"interpreterSystemPrompt": {
+		"message": "Prompt di sistema dell'interprete"
+	},
+	"interpreterSystemPromptDescription": {
+		"message": "Sostituisce il prompt di sistema inviato all'LLM durante l'interpretazione delle variabili. Lascia vuoto per usare il valore predefinito."
+	},
 			"link_start": {
 				"content": "<a href=\"?section=interpreter\">"
 			}

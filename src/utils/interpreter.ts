@@ -9,6 +9,8 @@ import { getMessage } from './i18n';
 import { updateTokenCount } from './token-counter';
 
 const RATE_LIMIT_RESET_TIME = 60000; // 1 minute in milliseconds
+
+export const DEFAULT_SYSTEM_PROMPT = `You are a helpful assistant. Please respond with one JSON object named \`prompts_responses\` — no explanatory text before or after. Use the keys provided, e.g. \`prompt_1\`, \`prompt_2\`, and fill in the values. Values should be Markdown strings unless otherwise specified. Make your responses concise. For example, your response should look like: {"prompts_responses":{"prompt_1":"tag1, tag2, tag3","prompt_2":"- bullet1\n- bullet 2\n- bullet3"}}`;
 let lastRequestTime = 0;
 
 // Store event listeners for cleanup
@@ -34,8 +36,7 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 	}
 
 	try {
-		const systemContent = 
-			`You are a helpful assistant. Please respond with one JSON object named \`prompts_responses\` — no explanatory text before or after. Use the keys provided, e.g. \`prompt_1\`, \`prompt_2\`, and fill in the values. Values should be Markdown strings unless otherwise specified. Make your responses concise. For example, your response should look like: {"prompts_responses":{"prompt_1":"tag1, tag2, tag3","prompt_2":"- bullet1\n- bullet 2\n- bullet3"}}`;
+		const systemContent = generalSettings.interpreterSystemPrompt.trim() || DEFAULT_SYSTEM_PROMPT;
 		
 		const promptContent = {	
 			prompts: promptVariables.reduce((acc, { key, prompt }) => {

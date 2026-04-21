@@ -22,6 +22,7 @@ export const generalSettings: Settings = {
 	interpreterEnabled: false,
 	interpreterAutoRun: false,
 	defaultPromptContext: '',
+	interpreterSystemPrompt: '',
 	propertyTypes: [],
 	readerSettings: {
 		fontSize: 16,

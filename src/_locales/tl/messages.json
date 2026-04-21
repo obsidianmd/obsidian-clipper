@@ -443,6 +443,12 @@
 			"link_end": {
 				"content": "</a>"
 			},
+	"interpreterSystemPrompt": {
+		"message": "Prompt ng sistema ng interpreter"
+	},
+	"interpreterSystemPromptDescription": {
+		"message": "I-override ang prompt ng sistema na ipinapadala sa LLM kapag nag-iinterpret ng mga variable. Iwanang blangko para gamitin ang default."
+	},
 			"link_start": {
 				"content": "<a href=\"?section=interpreter\">"
 			}

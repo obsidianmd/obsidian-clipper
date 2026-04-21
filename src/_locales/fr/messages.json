@@ -443,6 +443,12 @@
 			"link_end": {
 				"content": "</a>"
 			},
+	"interpreterSystemPrompt": {
+		"message": "Invite système de l'interpréteur"
+	},
+	"interpreterSystemPromptDescription": {
+		"message": "Remplace l'invite système envoyée au LLM lors de l'interprétation des variables. Laisser vide pour utiliser la valeur par défaut."
+	},
 			"link_start": {
 				"content": "<a href=\"?section=interpreter\">"
 			}

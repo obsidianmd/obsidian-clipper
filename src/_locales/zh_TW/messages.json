@@ -443,6 +443,12 @@
 			"link_end": {
 				"content": "</a>"
 			},
+	"interpreterSystemPrompt": {
+		"message": "解譯器系統提示詞"
+	},
+	"interpreterSystemPromptDescription": {
+		"message": "覆寫解譯變數時傳送給 LLM 的系統提示詞。留空則使用預設值。"
+	},
 			"link_start": {
 				"content": "<a href=\"https://help.obsidian.md/web-clipper/variables\" target=\"_blank\">"
 			}

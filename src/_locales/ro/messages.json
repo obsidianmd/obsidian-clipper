@@ -443,6 +443,12 @@
 			"link_end": {
 				"content": "</a>"
 			},
+	"interpreterSystemPrompt": {
+		"message": "Promptul de sistem al interpretorului"
+	},
+	"interpreterSystemPromptDescription": {
+		"message": "Suprascrie promptul de sistem trimis către LLM la interpretarea variabilelor. Lasă gol pentru a folosi valoarea implicită."
+	},
 			"link_start": {
 				"content": "<a href=\"?section=interpreter\">"
 			}

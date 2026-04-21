@@ -443,6 +443,12 @@
 			"link_end": {
 				"content": "</a>"
 			},
+	"interpreterSystemPrompt": {
+		"message": "Lời nhắc hệ thống của trình thông dịch"
+	},
+	"interpreterSystemPromptDescription": {
+		"message": "Ghi đè lời nhắc hệ thống được gửi đến LLM khi diễn giải biến. Để trống để sử dụng mặc định."
+	},
 			"link_start": {
 				"content": "<a href=\"?section=interpreter\">"
 			}

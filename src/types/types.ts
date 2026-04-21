@@ -86,6 +86,7 @@ export interface Settings {
 	interpreterEnabled: boolean;
 	interpreterAutoRun: boolean;
 	defaultPromptContext: string;
+	interpreterSystemPrompt: string;
 	propertyTypes: PropertyType[];
 	readerSettings: ReaderSettings;
 	stats: {
