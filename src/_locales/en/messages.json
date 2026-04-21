@@ -366,6 +366,9 @@
 	"highlightPage": {
 		"message": "Highlight page"
 	},
+	"highlightSelection": {
+		"message": "Highlight"
+	},
 	"highlighter": {
 		"message": "Highlighter"
 	},
@@ -374,9 +377,6 @@
 	},
 	"highlighterSettings": {
 		"message": "Highlighter"
-	},
-	"highlightSelection": {
-		"message": "Highlight"
 	},
 	"highlights": {
 		"message": "Highlights"

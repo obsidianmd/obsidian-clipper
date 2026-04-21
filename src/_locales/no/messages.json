@@ -366,6 +366,9 @@
 	"highlightPage": {
 		"message": "Uthev side"
 	},
+	"highlightSelection": {
+		"message": "Uthev"
+	},
 	"highlighter": {
 		"message": "Uthever"
 	},

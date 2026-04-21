@@ -366,6 +366,9 @@
 	"highlightPage": {
 		"message": "Zvýraznit stránku"
 	},
+	"highlightSelection": {
+		"message": "Zvýraznit"
+	},
 	"highlighter": {
 		"message": "Zvýrazňovač"
 	},

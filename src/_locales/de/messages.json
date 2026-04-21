@@ -366,6 +366,9 @@
 	"highlightPage": {
 		"message": "Seite markieren"
 	},
+	"highlightSelection": {
+		"message": "Markieren"
+	},
 	"highlighter": {
 		"message": "Marker"
 	},

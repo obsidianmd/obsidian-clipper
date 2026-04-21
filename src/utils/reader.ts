@@ -2383,9 +2383,19 @@ export class Reader {
 		doc.addEventListener('keyup', (e) => {
 			if (e.shiftKey || e.key === 'Shift') setTimeout(update, 0);
 		});
+		// selectionchange covers mobile (long-press + handles, no mouseup)
+		// and desktop keyboard selection (Ctrl+A, Shift+arrows). Debounced
+		// to avoid repositioning the button mid-drag on desktop.
+		let selChangeTimer: ReturnType<typeof setTimeout> | null = null;
 		doc.addEventListener('selectionchange', () => {
 			const sel = doc.getSelection();
-			if (!sel || sel.isCollapsed) hide();
+			if (!sel || sel.isCollapsed) {
+				if (selChangeTimer) { clearTimeout(selChangeTimer); selChangeTimer = null; }
+				hide();
+			} else {
+				if (selChangeTimer) clearTimeout(selChangeTimer);
+				selChangeTimer = setTimeout(update, 200);
+			}
 		});
 		window.addEventListener('resize', hide);
 	}

@@ -366,6 +366,9 @@
 	"highlightPage": {
 		"message": "পেজ হাইলাইট করুন"
 	},
+	"highlightSelection": {
+		"message": "হাইলাইট"
+	},
 	"highlighter": {
 		"message": "হাইলাইটার"
 	},

@@ -366,6 +366,9 @@
 	"highlightPage": {
 		"message": "Виділити сторінку"
 	},
+	"highlightSelection": {
+		"message": "Виділити"
+	},
 	"highlighter": {
 		"message": "Виділення"
 	},

@@ -366,6 +366,9 @@
 	"highlightPage": {
 		"message": "ไฮไลต์หน้า"
 	},
+	"highlightSelection": {
+		"message": "ไฮไลต์"
+	},
 	"highlighter": {
 		"message": "ตัวไฮไลต์"
 	},

@@ -366,6 +366,9 @@
 	"highlightPage": {
 		"message": "Wyróżnij stronę"
 	},
+	"highlightSelection": {
+		"message": "Podświetl"
+	},
 	"highlighter": {
 		"message": "Zakreślacz"
 	},

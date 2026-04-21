@@ -366,6 +366,9 @@
 	"highlightPage": {
 		"message": "Resaltar página"
 	},
+	"highlightSelection": {
+		"message": "Resaltar"
+	},
 	"highlighter": {
 		"message": "Resaltador"
 	},
