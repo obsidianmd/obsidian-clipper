@@ -78,6 +78,9 @@ const EPHEMERAL_PARAMS = new Set([
 export function normalizeUrl(url: string): string {
 	try {
 		const parsed = new URL(url);
+		// Strip fragment identifiers — highlights on /page#section should
+		// match /page (fixes #652).
+		parsed.hash = '';
 		const params = new URLSearchParams(parsed.search);
 		for (const key of [...params.keys()]) {
 			if (EPHEMERAL_PARAMS.has(key)) {
@@ -85,7 +88,6 @@ export function normalizeUrl(url: string): string {
 			}
 		}
 		parsed.search = params.toString();
-		// Remove trailing ? if all params were stripped
 		return parsed.toString();
 	} catch {
 		return url;
@@ -1218,7 +1220,9 @@ export function clearHighlights() {
 
 export function updateHighlighterMenu() {
 	removeHighlighterMenu();
-	createHighlighterMenu();
+	if (document.body.classList.contains('obsidian-highlighter-active')) {
+		createHighlighterMenu();
+	}
 }
 
 function handleKeyDown(event: KeyboardEvent) {

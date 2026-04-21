@@ -477,10 +477,22 @@ function renderSidebar() {
 				favicon.src = domainSettings.favicon;
 				favicon.width = 16;
 				favicon.height = 16;
-				favicon.onerror = () => favicon!.remove();
+				// On load failure, swap the <img> for a globe icon placeholder.
+				favicon.onerror = () => {
+					const globe = document.createElement('i');
+					globe.className = 'nav-domain-favicon';
+					globe.setAttribute('data-lucide', 'globe');
+					favicon!.replaceWith(globe);
+					createIcons({ icons });
+				};
 				faviconCache.set(normalized, favicon);
 			}
-			li.appendChild(favicon);
+			li.appendChild(favicon.cloneNode(true));
+		} else {
+			const globe = document.createElement('i');
+			globe.className = 'nav-domain-favicon';
+			globe.setAttribute('data-lucide', 'globe');
+			li.appendChild(globe);
 		}
 
 		const name = document.createElement('span');
