@@ -468,11 +468,14 @@ export function syncHoverListener(): void {
 	const isActive = document.body.classList.contains('obsidian-highlighter-active');
 	const needed = highlights.length > 0 || isActive;
 	if (needed && !listenersAttached) {
-		document.addEventListener('click', handleHighlightClick);
+		// Capture phase so the click fires before disableLinkClicks()'s
+		// stopPropagation on <a> elements — otherwise clicking highlighted
+		// text inside or near a link never reaches a bubbling handler.
+		document.addEventListener('click', handleHighlightClick, true);
 		document.addEventListener('mousemove', handleHighlightHover);
 		listenersAttached = true;
 	} else if (!needed && listenersAttached) {
-		document.removeEventListener('click', handleHighlightClick);
+		document.removeEventListener('click', handleHighlightClick, true);
 		document.removeEventListener('mousemove', handleHighlightHover);
 		document.body.style.cursor = '';
 		listenersAttached = false;

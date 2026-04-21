@@ -251,6 +251,12 @@ export function toggleHighlighterMenu(isActive: boolean) {
 		addBrowserClassToHtml();
 		browser.runtime.sendMessage({ action: "highlighterModeChanged", isActive: true });
 		applyHighlights();
+		// If the user had an active text selection before toggling on,
+		// convert it into a highlight immediately.
+		const selection = document.getSelection();
+		if (selection && !selection.isCollapsed) {
+			handleTextSelection(selection);
+		}
 	} else {
 		document.removeEventListener('mouseup', handleMouseUp);
 		document.removeEventListener('touchstart', handleTouchStart);
