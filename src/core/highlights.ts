@@ -96,7 +96,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 			sortOrder = value;
 			updateSortMenuActiveState();
 			renderSidebar();
-			renderMain();
 		});
 	});
 	updateSortMenuActiveState();
@@ -124,8 +123,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 	browser.storage.onChanged.addListener((changes, area) => {
 		if (area === 'local' && changes.highlights) {
 			loadData().then(() => {
-				renderSidebar();
-				renderMain();
+				if (!updateSidebarCounts()) {
+					renderSidebar();
+				}
+				if (!updateMainIncremental()) {
+					renderMain();
+				}
 			});
 		}
 	});
@@ -444,6 +447,40 @@ function createPageSubItems(group: DomainGroup): HTMLElement[] {
 	return items;
 }
 
+// Update sidebar counts in-place without a full rebuild.
+// Returns true if successful, false if a full renderSidebar() is needed.
+function updateSidebarCounts(): boolean {
+	const domainListEl = document.getElementById('highlights-domain-list')!;
+	const filtered = getFilteredGroups();
+	const groupMap = new Map<string, DomainGroup>();
+	const pageCountMap = new Map<string, number>();
+	for (const g of filtered) {
+		groupMap.set(g.domain, g);
+		for (const p of g.pages) pageCountMap.set(p.url, p.highlights.length);
+	}
+
+	const domainItems = Array.from(domainListEl.querySelectorAll<HTMLElement>('.nav-domain'));
+	if (domainItems.length !== filtered.length) return false;
+	for (let i = 0; i < domainItems.length; i++) {
+		const domain = domainItems[i].getAttribute('data-domain') || '';
+		const group = groupMap.get(domain);
+		if (!group) return false;
+		const countEl = domainItems[i].querySelector('.nav-count');
+		if (countEl) countEl.textContent = String(group.totalHighlights);
+	}
+
+	const pageItems = Array.from(domainListEl.querySelectorAll<HTMLElement>('.nav-page'));
+	for (let i = 0; i < pageItems.length; i++) {
+		const count = pageCountMap.get(pageItems[i].getAttribute('data-url')!);
+		if (count !== undefined) {
+			const countEl = pageItems[i].querySelector('.nav-count');
+			if (countEl) countEl.textContent = String(count);
+		}
+	}
+
+	return true;
+}
+
 function renderSidebar() {
 	const domainListEl = document.getElementById('highlights-domain-list')!;
 	const filtered = getFilteredGroups();
@@ -623,7 +660,107 @@ function getVisibleEntries(): { entry: HighlightEntry; pageUrl: string; domain: 
 		}
 	}
 
+	// Page groups newest first; within-page order preserved (stable sort)
+	const pageNewest = new Map<string, number>();
+	for (const e of entries) {
+		const t = parseInt(e.entry.data.id) || 0;
+		pageNewest.set(e.pageUrl, Math.max(pageNewest.get(e.pageUrl) || 0, t));
+	}
+	entries.sort((a, b) => {
+		if (a.pageUrl === b.pageUrl) return 0;
+		return (pageNewest.get(b.pageUrl) || 0) - (pageNewest.get(a.pageUrl) || 0);
+	});
+
 	return entries;
+}
+
+// Patch the main content in-place instead of tearing down and rebuilding.
+// Returns true if the incremental update succeeded, false to fall back to renderMain().
+function updateMainIncremental(): boolean {
+	const listEl = document.getElementById('highlights-list')!;
+	const newFlatEntries = collapseGroupsForRender(getVisibleEntries());
+
+	const oldKeys = new Set<string>();
+	for (let i = 0; i < renderedCount; i++) {
+		oldKeys.add(unitKey(flatEntries[i].entries));
+	}
+
+	// Compute keys once for new entries, then derive added/removed
+	const newKeyList: string[] = [];
+	const newKeySet = new Set<string>();
+	for (const unit of newFlatEntries) {
+		const key = unitKey(unit.entries);
+		newKeyList.push(key);
+		newKeySet.add(key);
+	}
+
+	const addedKeySet = new Set<string>();
+	const added: RenderUnit[] = [];
+	for (let i = 0; i < newFlatEntries.length; i++) {
+		if (!oldKeys.has(newKeyList[i])) {
+			addedKeySet.add(newKeyList[i]);
+			added.push(newFlatEntries[i]);
+		}
+	}
+	const removedKeys: string[] = [];
+	for (const key of oldKeys) {
+		if (!newKeySet.has(key)) removedKeys.push(key);
+	}
+
+	if (added.length === 0 && removedKeys.length === 0) {
+		flatEntries = newFlatEntries;
+		return true;
+	}
+
+	for (const key of removedKeys) {
+		const el = listEl.querySelector<HTMLElement>(`.highlight-item[data-unit-key="${CSS.escape(key)}"]`);
+		if (!el) return false;
+		const group = el.closest<HTMLElement>('.highlight-page-group');
+		el.remove();
+		if (group && !group.querySelector('.highlight-item')) {
+			group.remove();
+		}
+	}
+
+	// Insert new highlights in correct DOM-position order
+	const pagesWithAdds = new Set(added.map(u => u.pageUrl));
+
+	for (const pageUrl of pagesWithAdds) {
+		let group = listEl.querySelector<HTMLElement>(`.highlight-page-group[data-page-url="${CSS.escape(pageUrl)}"]`);
+		if (!group) {
+			const sample = added.find(u => u.pageUrl === pageUrl)!;
+			group = createPageGroupWrapper(pageUrl);
+			const header = createPageHeader(pageUrl, sample.domain, sample.title);
+			group.appendChild(header);
+			listEl.insertBefore(group, listEl.firstChild);
+		}
+
+		// Walk desired order and insert before the next existing sibling
+		const pageUnits = newFlatEntries.filter(u => u.pageUrl === pageUrl);
+		for (let i = 0; i < pageUnits.length; i++) {
+			const key = unitKey(pageUnits[i].entries);
+			if (!addedKeySet.has(key)) continue;
+
+			let refEl: HTMLElement | null = null;
+			for (let j = i + 1; j < pageUnits.length; j++) {
+				const sibKey = unitKey(pageUnits[j].entries);
+				if (!addedKeySet.has(sibKey)) {
+					refEl = group.querySelector<HTMLElement>(`.highlight-item[data-unit-key="${CSS.escape(sibKey)}"]`);
+					if (refEl) break;
+				}
+			}
+
+			const card = createHighlightItem(pageUnits[i].entries, pageUrl);
+			group.insertBefore(card, refEl);
+		}
+	}
+
+	flatEntries = newFlatEntries;
+	renderedCount = Math.min(renderedCount + added.length - removedKeys.length, flatEntries.length);
+	if (renderedCount < 0) renderedCount = 0;
+
+	createIcons({ icons });
+	return true;
 }
 
 function renderMain() {
@@ -663,7 +800,7 @@ function renderMain() {
 			.find(g => g.domain === nav.domain)?.pages
 			.find(p => p.url === nav.url);
 
-		currentPageGroup = createPageGroupWrapper();
+		currentPageGroup = createPageGroupWrapper(nav.url);
 		listEl.appendChild(currentPageGroup);
 		const pageHeader = createPageHeader(nav.url, nav.domain, pageGroup?.title);
 		currentPageGroup.appendChild(pageHeader);
@@ -676,9 +813,10 @@ function renderMain() {
 	renderNextBatch();
 }
 
-function createPageGroupWrapper(): HTMLElement {
+function createPageGroupWrapper(pageUrl: string): HTMLElement {
 	const wrapper = document.createElement('div');
 	wrapper.className = 'highlight-page-group';
+	wrapper.setAttribute('data-page-url', pageUrl);
 	applyThemeToElement(wrapper);
 	return wrapper;
 }
@@ -694,7 +832,8 @@ function renderNextBatch() {
 
 	// For single-page view, ensure we have a group wrapper
 	if (currentNav.type === 'page' && !currentPageGroup) {
-		currentPageGroup = createPageGroupWrapper();
+		const url = flatEntries[renderedCount]?.pageUrl || '';
+		currentPageGroup = createPageGroupWrapper(url);
 		listEl.appendChild(currentPageGroup);
 	}
 
@@ -704,7 +843,7 @@ function renderNextBatch() {
 
 		// Insert a page header when the URL changes (in all/domain views)
 		if (currentNav.type !== 'page' && pageUrl !== lastPageUrl) {
-			currentPageGroup = createPageGroupWrapper();
+			currentPageGroup = createPageGroupWrapper(pageUrl);
 			listEl.appendChild(currentPageGroup);
 			const pageHeader = createPageHeader(pageUrl, domain, title);
 			currentPageGroup.appendChild(pageHeader);
@@ -1040,9 +1179,14 @@ function setButtonIcon(btn: HTMLElement, iconName: string) {
 	createIcons({ icons });
 }
 
+function unitKey(entries: HighlightEntry[]): string {
+	return entries.map(e => e.data.id).join(',');
+}
+
 function createHighlightItem(entries: HighlightEntry[], pageUrl: string): HTMLElement {
 	const item = document.createElement('div');
 	item.className = 'highlight-item';
+	item.setAttribute('data-unit-key', unitKey(entries));
 
 	const content = document.createElement('div');
 	content.className = 'highlight-item-content';
