@@ -970,7 +970,23 @@ export class Reader {
 
 		// Set up intersection observer for headings
 		const allHeadings = [titleHeading, ...headings].filter(Boolean) as Element[];
+
+		// Suppress observer until user scrolls — on initial load images
+		// haven't rendered yet so headings below the fold appear in-view.
+		let outlineReady = !!window.location.hash || window.scrollY > 0;
+		if (!outlineReady) {
+			if (allHeadings[0]) setActiveOutlineItem(allHeadings[0]);
+			const onFirstScroll = () => {
+				outlineReady = true;
+				window.removeEventListener('scroll', onFirstScroll);
+				Reader.outlineScrollHandler = null;
+			};
+			window.addEventListener('scroll', onFirstScroll, { passive: true });
+			Reader.outlineScrollHandler = onFirstScroll;
+		}
+
 		const observerCallback = (entries: IntersectionObserverEntry[]) => {
+			if (!outlineReady) return;
 			entries.forEach(entry => {
 				if (entry.isIntersecting) {
 					setActiveOutlineItem(entry.target);
@@ -1094,6 +1110,7 @@ export class Reader {
 	private static footnoteScrollHandler: (() => void) | null = null;
 	private static footnoteResizeHandler: (() => void) | null = null;
 	private static lightboxKeyHandler: ((e: KeyboardEvent) => void) | null = null;
+	private static outlineScrollHandler: (() => void) | null = null;
 	private static outlineMutationObservers: MutationObserver[] = [];
 
 	// Clean up event listeners and DOM elements from the previous page.
@@ -1103,6 +1120,10 @@ export class Reader {
 		if (this.observer) {
 			this.observer.disconnect();
 			this.observer = null;
+		}
+		if (this.outlineScrollHandler) {
+			window.removeEventListener('scroll', this.outlineScrollHandler);
+			this.outlineScrollHandler = null;
 		}
 		for (const obs of this.outlineMutationObservers) obs.disconnect();
 		this.outlineMutationObservers = [];
