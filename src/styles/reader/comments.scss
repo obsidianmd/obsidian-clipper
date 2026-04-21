@@ -124,6 +124,7 @@
 				background: var(--background-primary-alt);
 			}
 			.comment-collapse-count {
+				font-family: var(--font-ui);
 				padding-inline-end: 4px;
 				&:empty {
 					display: none;
