@@ -366,6 +366,9 @@
 	"highlightPage": {
 		"message": "Επισήμανση σελίδας"
 	},
+	"highlightSelection": {
+		"message": "Επισήμανση"
+	},
 	"highlighter": {
 		"message": "Επισημαντής"
 	},

@@ -366,6 +366,9 @@
 	"highlightPage": {
 		"message": "페이지 하이라이트"
 	},
+	"highlightSelection": {
+		"message": "하이라이트"
+	},
 	"highlighter": {
 		"message": "하이라이터"
 	},

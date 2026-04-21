@@ -366,6 +366,9 @@
 	"highlightPage": {
 		"message": "高亮页面"
 	},
+	"highlightSelection": {
+		"message": "高亮"
+	},
 	"highlighter": {
 		"message": "高亮"
 	},

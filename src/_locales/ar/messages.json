@@ -366,6 +366,9 @@
 	"highlightPage": {
 		"message": "تظليل الصفحة"
 	},
+	"highlightSelection": {
+		"message": "تمييز"
+	},
 	"highlighter": {
 		"message": "المظلل"
 	},

@@ -366,6 +366,9 @@
 	"highlightPage": {
 		"message": "Korosta sivu"
 	},
+	"highlightSelection": {
+		"message": "Korosta"
+	},
 	"highlighter": {
 		"message": "Korostustyökalu"
 	},

@@ -366,6 +366,9 @@
 	"highlightPage": {
 		"message": "標記頁面"
 	},
+	"highlightSelection": {
+		"message": "螢光標記"
+	},
 	"highlighter": {
 		"message": "標記工具"
 	},

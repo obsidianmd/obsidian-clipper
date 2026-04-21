@@ -366,6 +366,9 @@
 	"highlightPage": {
 		"message": "صحفه را برجسته کن"
 	},
+	"highlightSelection": {
+		"message": "هایلایت"
+	},
 	"highlighter": {
 		"message": "مارکر"
 	},

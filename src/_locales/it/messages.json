@@ -366,6 +366,9 @@
 	"highlightPage": {
 		"message": "Evidenzia pagina"
 	},
+	"highlightSelection": {
+		"message": "Evidenzia"
+	},
 	"highlighter": {
 		"message": "Evidenziatore"
 	},

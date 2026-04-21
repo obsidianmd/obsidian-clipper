@@ -366,6 +366,9 @@
 	"highlightPage": {
 		"message": "Surligner la page"
 	},
+	"highlightSelection": {
+		"message": "Surligner"
+	},
 	"highlighter": {
 		"message": "Surligneur"
 	},

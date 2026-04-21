@@ -366,6 +366,9 @@
 	"highlightPage": {
 		"message": "Выделить страницу"
 	},
+	"highlightSelection": {
+		"message": "Выделить"
+	},
 	"highlighter": {
 		"message": "Маркер"
 	},

@@ -1,5 +1,5 @@
 import browser from '../utils/browser-polyfill';
-import { AnyHighlightData, StoredData, DomainSettings, normalizeUrl } from '../utils/highlighter';
+import { AnyHighlightData, StoredData, DomainSettings, collapseGroupsForExport, normalizeUrl } from '../utils/highlighter';
 import { translatePage, getMessage, setupLanguageAndDirection } from '../utils/i18n';
 import { addBrowserClassToHtml, detectBrowser } from '../utils/browser-detection';
 import DOMPurify from 'dompurify';
@@ -51,7 +51,10 @@ const faviconCache = new Map<string, HTMLImageElement>();
 
 // Batched rendering
 const BATCH_SIZE = 50;
-let flatEntries: { entry: HighlightEntry; pageUrl: string; domain: string; title?: string }[] = [];
+// Each entry in flatEntries is one render unit — a single highlight, or a
+// group of highlights sharing a groupId that should render as one card.
+interface RenderUnit { entries: HighlightEntry[]; pageUrl: string; domain: string; title?: string }
+let flatEntries: RenderUnit[] = [];
 let renderedCount = 0;
 let currentPageGroup: HTMLElement | null = null;
 let observer: IntersectionObserver | null = null;
@@ -474,10 +477,22 @@ function renderSidebar() {
 				favicon.src = domainSettings.favicon;
 				favicon.width = 16;
 				favicon.height = 16;
-				favicon.onerror = () => favicon!.remove();
+				// On load failure, swap the <img> for a globe icon placeholder.
+				favicon.onerror = () => {
+					const globe = document.createElement('i');
+					globe.className = 'nav-domain-favicon';
+					globe.setAttribute('data-lucide', 'globe');
+					favicon!.replaceWith(globe);
+					createIcons({ icons });
+				};
 				faviconCache.set(normalized, favicon);
 			}
-			li.appendChild(favicon);
+			li.appendChild(favicon.cloneNode(true));
+		} else {
+			const globe = document.createElement('i');
+			globe.className = 'nav-domain-favicon';
+			globe.setAttribute('data-lucide', 'globe');
+			li.appendChild(globe);
 		}
 
 		const name = document.createElement('span');
@@ -563,6 +578,33 @@ function renderSidebar() {
 
 // --- Main content ---
 
+// Collapse group members (from a multi-block selection) into a single render
+// unit so the highlights page shows them as one card. Preserves order and
+// groups across the page the selection originated in.
+function collapseGroupsForRender(
+	entries: { entry: HighlightEntry; pageUrl: string; domain: string; title?: string }[]
+): RenderUnit[] {
+	const units: RenderUnit[] = [];
+	const byKey = new Map<string, RenderUnit>(); // pageUrl::groupId → unit
+	for (const e of entries) {
+		const gid = e.entry.data.groupId;
+		if (gid) {
+			const key = `${e.pageUrl}::${gid}`;
+			const existing = byKey.get(key);
+			if (existing) {
+				existing.entries.push(e.entry);
+				continue;
+			}
+			const unit: RenderUnit = { entries: [e.entry], pageUrl: e.pageUrl, domain: e.domain, title: e.title };
+			byKey.set(key, unit);
+			units.push(unit);
+		} else {
+			units.push({ entries: [e.entry], pageUrl: e.pageUrl, domain: e.domain, title: e.title });
+		}
+	}
+	return units;
+}
+
 function getVisibleEntries(): { entry: HighlightEntry; pageUrl: string; domain: string; title?: string }[] {
 	const filtered = getFilteredGroups();
 	const nav = currentNav;
@@ -594,7 +636,7 @@ function renderMain() {
 	renderedCount = 0;
 	currentPageGroup = null;
 
-	flatEntries = getVisibleEntries();
+	flatEntries = collapseGroupsForRender(getVisibleEntries());
 
 	// Breadcrumb
 	renderBreadcrumb();
@@ -657,7 +699,8 @@ function renderNextBatch() {
 	}
 
 	for (let i = renderedCount; i < end; i++) {
-		const { entry, pageUrl, domain, title } = flatEntries[i];
+		const unit = flatEntries[i];
+		const { entries, pageUrl, domain, title } = unit;
 
 		// Insert a page header when the URL changes (in all/domain views)
 		if (currentNav.type !== 'page' && pageUrl !== lastPageUrl) {
@@ -668,7 +711,7 @@ function renderNextBatch() {
 			lastPageUrl = pageUrl;
 		}
 
-		(currentPageGroup || listEl).appendChild(createHighlightItem(entry));
+		(currentPageGroup || listEl).appendChild(createHighlightItem(entries, pageUrl));
 	}
 
 	renderedCount = end;
@@ -759,10 +802,7 @@ async function exportCurrentContext() {
 
 	const exportData = Array.from(byUrl.entries()).map(([url, highlights]) => ({
 		url,
-		highlights: highlights.map(h => ({
-			text: h.data.content,
-			timestamp: dayjs(parseInt(h.data.id)).toISOString()
-		}))
+		highlights: collapseGroupsForExport(highlights.map(h => h.data)),
 	}));
 
 	const jsonContent = JSON.stringify(exportData, null, 2);
@@ -1000,27 +1040,27 @@ function setButtonIcon(btn: HTMLElement, iconName: string) {
 	createIcons({ icons });
 }
 
-function createHighlightItem(entry: HighlightEntry): HTMLElement {
+function createHighlightItem(entries: HighlightEntry[], pageUrl: string): HTMLElement {
 	const item = document.createElement('div');
 	item.className = 'highlight-item';
 
 	const content = document.createElement('div');
 	content.className = 'highlight-item-content';
 
-	const sanitized = DOMPurify.sanitize(entry.data.content || '');
-	content.innerHTML = sanitized;
-	if (searchQuery) {
-		highlightTextNodes(content, searchQuery);
-	}
+	const joined = entries.map(e => e.data.content || '').join('\n');
+	content.innerHTML = DOMPurify.sanitize(joined);
+	// A grouped selection may include stored <li> fragments; wrap consecutive
+	// orphan <li>s in a <ul> so the list renders with its bullets intact.
+	wrapOrphanListItems(content);
+	if (searchQuery) highlightTextNodes(content, searchQuery);
 	item.appendChild(content);
 
-	if (entry.data.notes && entry.data.notes.length > 0) {
-		for (const note of entry.data.notes) {
-			const noteEl = document.createElement('div');
-			noteEl.className = 'highlight-item-note';
-			noteEl.textContent = note;
-			item.appendChild(noteEl);
-		}
+	const mergedNotes = entries.flatMap(e => e.data.notes ?? []);
+	for (const note of mergedNotes) {
+		const noteEl = document.createElement('div');
+		noteEl.className = 'highlight-item-note';
+		noteEl.textContent = note;
+		item.appendChild(noteEl);
 	}
 
 	const footer = document.createElement('div');
@@ -1036,7 +1076,7 @@ function createHighlightItem(entry: HighlightEntry): HTMLElement {
 	copyIcon.setAttribute('data-lucide', 'copy');
 	copyBtn.appendChild(copyIcon);
 	copyBtn.addEventListener('click', async () => {
-		const markdown = createMarkdownContent(entry.data.content || '', entry.url);
+		const markdown = entries.map(e => createMarkdownContent(e.data.content || '', pageUrl)).join('\n\n');
 		await navigator.clipboard.writeText(markdown);
 		copyBtn.classList.add('is-copied');
 		setButtonIcon(copyBtn, 'check');
@@ -1054,7 +1094,7 @@ function createHighlightItem(entry: HighlightEntry): HTMLElement {
 	deleteItemIcon.setAttribute('data-lucide', 'trash-2');
 	deleteBtn.appendChild(deleteItemIcon);
 	deleteBtn.addEventListener('click', async () => {
-		await deleteHighlight(entry.url, entry.data.id);
+		for (const e of entries) await deleteHighlight(pageUrl, e.data.id);
 	});
 	actions.appendChild(deleteBtn);
 
@@ -1062,6 +1102,29 @@ function createHighlightItem(entry: HighlightEntry): HTMLElement {
 	item.appendChild(footer);
 
 	return item;
+}
+
+// Wrap consecutive orphan <li> elements (not already inside a <ul>/<ol>) in
+// a <ul>. Used when rendering grouped highlights — stored <li> fragments
+// don't carry their original list parent, so we synthesize one.
+// TODO: always wraps in <ul>. Ordered list content (<ol>) loses its
+// numbering. To fix, store the parent list type (ul vs ol) alongside each
+// <li> highlight at creation time.
+function wrapOrphanListItems(root: HTMLElement): void {
+	const children = Array.from(root.children);
+	let i = 0;
+	while (i < children.length) {
+		if (children[i].tagName === 'LI') {
+			let j = i;
+			while (j < children.length && children[j].tagName === 'LI') j++;
+			const ul = document.createElement('ul');
+			root.insertBefore(ul, children[i]);
+			for (let k = i; k < j; k++) ul.appendChild(children[k]);
+			i = j;
+		} else {
+			i++;
+		}
+	}
 }
 
 // --- Helpers ---

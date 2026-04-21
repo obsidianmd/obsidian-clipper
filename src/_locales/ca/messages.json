@@ -366,6 +366,9 @@
 	"highlightPage": {
 		"message": "Ressaltar pàgina"
 	},
+	"highlightSelection": {
+		"message": "Ressalta"
+	},
 	"highlighter": {
 		"message": "Ressaltador"
 	},

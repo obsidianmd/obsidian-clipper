@@ -366,6 +366,9 @@
 	"highlightPage": {
 		"message": "Evidențiază pagina"
 	},
+	"highlightSelection": {
+		"message": "Evidențiază"
+	},
 	"highlighter": {
 		"message": "Evidențiator"
 	},
