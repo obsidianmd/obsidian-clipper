@@ -10,6 +10,7 @@ import { saveFile } from './utils/file-utils';
 import { debugLog } from './utils/debug';
 import { updateSidebarWidth, addResizeHandle, cleanupResizeHandlers } from './utils/iframe-resize';
 import { parseForClip } from './utils/clip-utils';
+import { boss_decrypt } from './utils/filters/boss_decrypt';
 
 declare global {
 	interface Window {
@@ -219,6 +220,15 @@ declare global {
 				const extractedContent: { [key: string]: string } = {
 					...defuddled.variables,
 				};
+
+                                // Auto-decrypt for BOSS Zhipin (Option A)
+                                if (document.URL.includes("zhipin.com")) {
+                                        Object.keys(extractedContent).forEach(key => {
+                                                extractedContent[key] = boss_decrypt(extractedContent[key]) as string;
+                                        });
+                                        if (defuddled.title) defuddled.title = boss_decrypt(defuddled.title) as string;
+                                        if (defuddled.content) defuddled.content = boss_decrypt(defuddled.content) as string;
+                                }
 
 				// Create a new DOMParser
 				const parser = new DOMParser();
