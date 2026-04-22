@@ -380,3 +380,10 @@ Removes duplicate values from arrays and objects.
 - For arrays of objects: `[{"a":1},{"b":2},{"a":1}]|unique` returns `[{"a":1},{"b":2}]`.
 - For objects it removes properties with duplicate values, keeping the last occurrence's key.
 - For strings it returns the input unchanged.
+
+### `boss_decrypt`
+
+Decrypts obfuscated text on BOSS Zhipin (mainly salary data). It converts specific icon-font characters back to numbers.
+
+- `"\ue033\ue034K"|boss_decrypt` returns `"23K"`.
+- Supports mixed text and arrays of strings.

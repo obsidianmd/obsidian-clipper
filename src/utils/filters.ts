@@ -3,6 +3,7 @@ import { debugLog } from './debug';
 import { createParserState, processCharacter } from './parser-utils';
 
 import { blockquote } from './filters/blockquote';
+import { boss_decrypt } from './filters/boss_decrypt';
 import { calc, validateCalcParams } from './filters/calc';
 import { callout } from './filters/callout';
 import { camel } from './filters/camel';
@@ -80,6 +81,7 @@ export const filterMetadata: Record<string, FilterMetadata> = {
 	template: { example: 'template:"${name}"', validateParams: validateTemplateParams },
 
 	// Filters with optional parameters (examples for documentation)
+        boss_decrypt: {},
 	blockquote: {},
 	callout: { example: 'callout:info' },
 	camel: {},
@@ -132,6 +134,7 @@ export const validFilterNames = new Set(Object.keys(filterMetadata));
 
 export const filters: { [key: string]: FilterFunction } = {
 	blockquote,
+        boss_decrypt,
 	calc,
 	callout,
 	camel,
