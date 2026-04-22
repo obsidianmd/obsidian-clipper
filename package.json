@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-clipper",
-	"version": "1.6.0",
+	"version": "1.6.1",
 	"description": "Official web clipper for Obsidian.",
 	"bin": {
 		"obsidian-clipper": "./dist/cli.cjs"
@@ -57,7 +57,7 @@
 	"dependencies": {
 		"@types/safari-extension": "^0.0.33",
 		"dayjs": "^1.11.13",
-		"defuddle": "^0.18.0",
+		"defuddle": "^0.18.1",
 		"dompurify": "^3.0.9",
 		"highlight.js": "^11.11.1",
 		"linkedom": "^0.18.0",
