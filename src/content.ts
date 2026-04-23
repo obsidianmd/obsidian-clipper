@@ -67,6 +67,7 @@ declare global {
 
 		const iframe = document.createElement('iframe');
 		iframe.id = iframeId;
+		iframe.allow = 'clipboard-write; web-share';
 		iframe.src = browser.runtime.getURL('side-panel.html?context=iframe');
 		container.appendChild(iframe);
 

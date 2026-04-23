@@ -1,14 +1,5 @@
 import browser from './browser-polyfill';
 
-function isInIframe(): boolean {
-	try {
-		return window.self !== window.top;
-	} catch (e) {
-		// If we can't access window.top due to cross-origin restrictions, we're likely in an iframe
-		return true;
-	}
-}
-
 /**
  * Attempts to copy text to clipboard using multiple fallback methods.
  * This is particularly useful in iframe contexts where the standard Clipboard API may be blocked.
@@ -17,16 +8,11 @@ function isInIframe(): boolean {
  * @returns Promise that resolves to true if successful, false otherwise
  */
 export async function copyToClipboard(text: string): Promise<boolean> {
-	// Skip the standard Clipboard API in iframes — the browser logs a
-	// permissions-policy violation to the console just by calling it,
-	// even before the promise rejects.
-	if (!isInIframe()) {
-		try {
-			await navigator.clipboard.writeText(text);
-			return true;
-		} catch {
-			// Fall through to content script fallback
-		}
+	try {
+		await navigator.clipboard.writeText(text);
+		return true;
+	} catch {
+		// Fall through to content script fallback
 	}
 
 	try {
