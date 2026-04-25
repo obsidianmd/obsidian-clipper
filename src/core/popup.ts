@@ -359,10 +359,17 @@ document.addEventListener('DOMContentLoaded', async function() {
 		if (settingsButton) {
 			settingsButton.addEventListener('click', async function() {
 				try {
-					await browser.runtime.sendMessage({ action: "openOptionsPage" });
-					setTimeout(() => window.close(), 50);
+					const response = await browser.runtime.sendMessage({ action: "openOptionsPage" }) as { success?: boolean; settingsUrl?: string; error?: string } | undefined;
+					if (response && response.success) {
+						setTimeout(() => window.close(), 50);
+					} else {
+						const url = response?.settingsUrl || browser.runtime.getURL('settings.html');
+						window.open(url, '_blank');
+						setTimeout(() => window.close(), 50);
+					}
 				} catch (error) {
 					console.error('Error opening options page:', error);
+					window.open(browser.runtime.getURL('settings.html'), '_blank');
 				}
 			});
 			initializeIcons(settingsButton);
