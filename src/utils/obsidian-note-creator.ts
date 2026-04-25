@@ -1,7 +1,7 @@
 import browser from './browser-polyfill';
 import { sanitizeFileName } from '../utils/string-utils';
 import { generateFrontmatter as generateFrontmatterCore } from './shared';
-import { Template, Property } from '../types/types';
+import { Template, Property, SavedNoteInfo } from '../types/types';
 import { generalSettings, incrementStat } from './storage-utils';
 import { copyToClipboard } from './clipboard-utils';
 import { getMessage } from './i18n';
@@ -49,8 +49,10 @@ export async function saveToObsidian(
 	path: string,
 	vault: string,
 	behavior: Template['behavior'],
-): Promise<void> {
+): Promise<SavedNoteInfo> {
 	let obsidianUrl: string;
+	let savedNoteName = '';
+	let savedNotePath = '';
 
 	const isDailyNote = behavior === 'append-daily' || behavior === 'prepend-daily';
 
@@ -63,7 +65,9 @@ export async function saveToObsidian(
 		}
 
 		const formattedNoteName = sanitizeFileName(noteName);
-		obsidianUrl = `obsidian://new?file=${encodeURIComponent(path + formattedNoteName)}`;
+		savedNoteName = formattedNoteName;
+		savedNotePath = `${path}${formattedNoteName}`;
+		obsidianUrl = `obsidian://new?file=${encodeURIComponent(savedNotePath)}`;
 	}
 
 	if (behavior.startsWith('append')) {
@@ -91,4 +95,11 @@ export async function saveToObsidian(
 		// Try to copy to clipboard with fallback mechanisms
 		await tryClipboardWrite(fileContent, obsidianUrl);
 	}
+
+	return {
+		noteName: savedNoteName,
+		notePath: savedNotePath,
+		vault,
+		obsidianUrl,
+	};
 }

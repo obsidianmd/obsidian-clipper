@@ -168,6 +168,38 @@ describe('buildVariables', () => {
 		}));
 		expect(vars['{{schema:@Article:headline}}']).toBe('Test');
 	});
+
+	test('includes parent link context variables when provided', () => {
+		const vars = buildVariables(makeParams({
+			parentContext: {
+				parentUrl: 'https://example.com/original',
+				parentTitle: 'Original Page',
+				parentNoteName: 'Original Note',
+				parentNotePath: 'clips/Original Note',
+				parentNoteLink: '[[clips/Original Note]]',
+			},
+		}));
+		expect(vars['{{parentUrl}}']).toBe('https://example.com/original');
+		expect(vars['{{parentTitle}}']).toBe('Original Page');
+		expect(vars['{{parentNoteName}}']).toBe('Original Note');
+		expect(vars['{{parentNotePath}}']).toBe('clips/Original Note');
+		expect(vars['{{parentNoteLink}}']).toBe('[[clips/Original Note]]');
+		expect(vars['{{url}}']).toBe('https://example.com/page');
+	});
+
+	test('defaults parent note variables to empty strings', () => {
+		const vars = buildVariables(makeParams({
+			parentContext: {
+				parentUrl: 'https://example.com/original',
+				parentTitle: 'Original Page',
+			},
+		}));
+		expect(vars['{{parentUrl}}']).toBe('https://example.com/original');
+		expect(vars['{{parentTitle}}']).toBe('Original Page');
+		expect(vars['{{parentNoteName}}']).toBe('');
+		expect(vars['{{parentNotePath}}']).toBe('');
+		expect(vars['{{parentNoteLink}}']).toBe('');
+	});
 });
 
 // ---------------------------------------------------------------------------

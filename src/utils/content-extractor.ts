@@ -1,4 +1,4 @@
-import { ExtractedContent } from '../types/types';
+import { ExtractedContent, ParentLinkContext } from '../types/types';
 import { createMarkdownContent } from 'defuddle/full';
 import { sanitizeFileName } from './string-utils';
 import { buildVariables, addSchemaOrgDataToVariables } from './shared';
@@ -141,7 +141,8 @@ export async function initializePageContent(
 	site: string,
 	wordCount: number,
 	language: string,
-	metaTags: { name?: string | null; property?: string | null; content: string | null }[]
+	metaTags: { name?: string | null; property?: string | null; content: string | null }[],
+	parentContext?: ParentLinkContext | null
 ) {
 	try {
 		currentUrl = currentUrl.replace(/#:~:text=[^&]+(&|$)/, '');
@@ -183,6 +184,7 @@ export async function initializePageContent(
 			schemaOrgData,
 			metaTags,
 			extractedContent,
+			parentContext,
 		});
 
 		debugLog('Variables', 'Available variables:', currentVariables);

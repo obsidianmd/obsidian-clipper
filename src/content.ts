@@ -34,6 +34,65 @@ declare global {
 	const iframeId = 'obsidian-clipper-iframe';
 	const containerId = 'obsidian-clipper-container';
 
+	function isEditableTarget(target: EventTarget | null): boolean {
+		if (!(target instanceof Element)) return false;
+		const editableAncestor = target.closest('input, textarea, select, option, button, [contenteditable=""], [contenteditable="true"], [contenteditable="plaintext-only"]');
+		return !!editableAncestor || (target as HTMLElement).isContentEditable;
+	}
+
+	function getEligibleAltClickLink(event: MouseEvent): HTMLAnchorElement | null {
+		if (event.button !== 0) return null;
+		if (!event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return null;
+		if (!(event.target instanceof Element)) return null;
+		if (event.defaultPrevented) return null;
+		if (isEditableTarget(event.target)) return null;
+		if (event.target.closest(`#${containerId}`)) return null;
+
+		const link = event.target.closest('a[href]') as HTMLAnchorElement | null;
+		if (!link) return null;
+		if (link.closest(`#${containerId}`)) return null;
+		if (link.hasAttribute('download')) return null;
+
+		const rawHref = link.getAttribute('href')?.trim();
+		if (!rawHref || rawHref.startsWith('#') || rawHref.toLowerCase().startsWith('javascript:')) return null;
+
+		try {
+			const resolvedUrl = new URL(link.href, document.baseURI);
+			if (!['http:', 'https:'].includes(resolvedUrl.protocol)) return null;
+			return link;
+		} catch {
+			return null;
+		}
+	}
+
+	async function handleAltClickLinkHandoff(event: MouseEvent): Promise<void> {
+		const link = getEligibleAltClickLink(event);
+		if (!link) return;
+
+		const targetUrl = new URL(link.href, document.baseURI).href;
+		const parentUrl = window.location.href.replace(/#:~:text=[^&]+(&|$)/, '');
+		const parentTitle = document.title || '';
+
+		event.preventDefault();
+		event.stopPropagation();
+
+		try {
+			const response = await browser.runtime.sendMessage({
+				action: 'openLinkInClipper',
+				targetUrl,
+				parentUrl,
+				parentTitle,
+			}) as { success?: boolean; error?: string };
+
+			if (!response?.success) {
+				window.location.href = targetUrl;
+			}
+		} catch (error) {
+			console.error('[Obsidian Clipper] Failed to hand off link click:', error);
+			window.location.href = targetUrl;
+		}
+	}
+
 	function removeContainer(container: HTMLElement) {
 		container.classList.add('is-closing');
 		updateSidebarWidth(document, null);
@@ -438,6 +497,11 @@ declare global {
 
 	// Initialize highlighter
 	initializeHighlighter();
+	document.addEventListener('click', (event) => {
+		handleAltClickLinkHandoff(event).catch((error) => {
+			console.error('[Obsidian Clipper] Alt+Click handoff failed:', error);
+		});
+	}, true);
 
 	// Expose highlighter API on window so reader-script.js (a separate
 	// webpack bundle injected when reader mode activates) can delegate

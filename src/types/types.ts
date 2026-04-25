@@ -114,6 +114,24 @@ export interface HistoryEntry {
 	title?: string;
 	vault?: string;
 	path?: string;
+	noteName?: string;
+	notePath?: string;
+	noteLink?: string;
+}
+
+export interface ParentLinkContext {
+	parentUrl: string;
+	parentTitle: string;
+	parentNoteName?: string;
+	parentNotePath?: string;
+	parentNoteLink?: string;
+}
+
+export interface SavedNoteInfo {
+	noteName: string;
+	notePath: string;
+	vault: string;
+	obsidianUrl: string;
 }
 
 export interface ConversationMessage {
