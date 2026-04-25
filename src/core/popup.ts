@@ -1,6 +1,5 @@
-import dayjs from 'dayjs';
-import { Template, Property, PromptVariable } from '../types/types';
-import { incrementStat, addHistoryEntry, getClipHistory } from '../utils/storage-utils';
+import { Template, Property, ParentLinkContext } from '../types/types';
+import { incrementStat, createNoteLink } from '../utils/storage-utils';
 import { generateFrontmatter, saveToObsidian } from '../utils/obsidian-note-creator';
 import { extractPageContent, initializePageContent } from '../utils/content-extractor';
 import { compileTemplate } from '../utils/template-compiler';
@@ -35,6 +34,7 @@ let templates: Template[] = [];
 let currentVariables: { [key: string]: string } = {};
 let currentTabId: number | undefined;
 let lastSelectedVault: string | null = null;
+let currentParentContext: ParentLinkContext | null = null;
 
 const isSidePanel = window.location.pathname.includes('side-panel.html');
 const urlParams = new URLSearchParams(window.location.search);
@@ -107,6 +107,24 @@ async function getCurrentTabInfo(): Promise<{ url: string; title?: string }> {
 		console.warn('Failed to get current tab info for stats:', error);
 		return { url: '' };
 	}
+}
+
+async function getParentLinkContext(tabId: number, currentUrl: string): Promise<ParentLinkContext | null> {
+	try {
+		const response = await browser.runtime.sendMessage({
+			action: 'getLinkHandoffContext',
+			tabId,
+			url: currentUrl
+		}) as { success?: boolean; context?: ParentLinkContext | null };
+
+		if (response?.success) {
+			return response.context || null;
+		}
+	} catch (error) {
+		console.warn('Failed to get link handoff context:', error);
+	}
+
+	return null;
 }
 
 // Memoize extractPageContent with URL-sensitive key
@@ -701,6 +719,7 @@ async function refreshFields(tabId: number, { checkTemplateTriggers = true, rebu
 		const extractedData = await extractionPromise;
 		if (extractedData) {
 			const currentUrl = tab.url;
+			currentParentContext = await getParentLinkContext(tabId, currentUrl);
 
 			const initializedContent = await initializePageContent(
 				extractedData.content,
@@ -719,7 +738,8 @@ async function refreshFields(tabId: number, { checkTemplateTriggers = true, rebu
 				extractedData.site,
 				extractedData.wordCount,
 				extractedData.language || '',
-				extractedData.metaTags
+				extractedData.metaTags,
+				currentParentContext
 			);
 			if (initializedContent) {
 				currentVariables = initializedContent.currentVariables;
@@ -1346,9 +1366,14 @@ async function handleClipObsidian(): Promise<void> {
 		const noteName = isDailyNote ? '' : noteNameField?.value || '';
 		const path = isDailyNote ? '' : pathField?.value || '';
 
-		await saveToObsidian(fileContent, noteName, path, selectedVault, currentTemplate.behavior);
+		const savedNoteInfo = await saveToObsidian(fileContent, noteName, path, selectedVault, currentTemplate.behavior);
 		const tabInfo = await getCurrentTabInfo();
-		await incrementStat('addToObsidian', selectedVault, path, tabInfo.url, tabInfo.title);
+		const noteLink = createNoteLink(savedNoteInfo.notePath);
+		await incrementStat('addToObsidian', selectedVault, path, tabInfo.url, tabInfo.title, {
+			noteName: savedNoteInfo.noteName,
+			notePath: savedNoteInfo.notePath,
+			noteLink,
+		});
 
 		lastSelectedVault = selectedVault;
 		await setLocalStorage('lastSelectedVault', lastSelectedVault);

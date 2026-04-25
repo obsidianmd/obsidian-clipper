@@ -3,7 +3,7 @@ import { detectBrowser } from './utils/browser-detection';
 import { updateCurrentActiveTab, isValidUrl, isBlankPage, isNormalPageUrl } from './utils/active-tab-manager';
 import { TextHighlightData } from './utils/highlighter';
 import { debounce } from './utils/debounce';
-import { Settings } from './types/types';
+import { Settings, HistoryEntry, ParentLinkContext } from './types/types';
 import { debugLog } from './utils/debug';
 
 const YOUTUBE_EMBED_RULE_ID = 9001;
@@ -114,6 +114,84 @@ let readerModeState: { [tabId: number]: boolean } = {};
 let hasHighlights = false;
 let isContextMenuCreating = false;
 let popupPorts: { [tabId: number]: browser.Runtime.Port } = {};
+let linkHandoffContextByTab: Record<number, ParentLinkContext & { targetUrl: string }> = {};
+let pendingEmbeddedHandoffTabs: Set<number> = new Set();
+
+function createNoteLink(notePath?: string): string {
+	return notePath ? `[[${notePath}]]` : '';
+}
+
+async function getLatestClipContextForUrl(url: string): Promise<ParentLinkContext | null> {
+	if (!url) return null;
+
+	const result = await browser.storage.local.get('history');
+	const history = (result.history || []) as HistoryEntry[];
+	const latestEntry = history.find((entry) => entry.url === url && entry.action === 'addToObsidian');
+	if (!latestEntry) return null;
+
+	return {
+		parentUrl: latestEntry.url,
+		parentTitle: latestEntry.title || '',
+		parentNoteName: latestEntry.noteName || '',
+		parentNotePath: latestEntry.notePath || '',
+		parentNoteLink: latestEntry.noteLink || createNoteLink(latestEntry.notePath),
+	};
+}
+
+async function storeLinkHandoffContext(tabId: number, targetUrl: string, parentUrl: string, parentTitle: string): Promise<void> {
+	const latestClip = await getLatestClipContextForUrl(parentUrl);
+	linkHandoffContextByTab[tabId] = {
+		targetUrl,
+		parentUrl,
+		parentTitle,
+		parentNoteName: latestClip?.parentNoteName || '',
+		parentNotePath: latestClip?.parentNotePath || '',
+		parentNoteLink: latestClip?.parentNoteLink || '',
+	};
+}
+
+function getLinkHandoffContext(tabId: number, url?: string): ParentLinkContext | null {
+	const context = linkHandoffContextByTab[tabId];
+	if (!context) return null;
+	if (url && context.targetUrl !== url) return null;
+
+	return {
+		parentUrl: context.parentUrl,
+		parentTitle: context.parentTitle,
+		parentNoteName: context.parentNoteName || '',
+		parentNotePath: context.parentNotePath || '',
+		parentNoteLink: context.parentNoteLink || '',
+	};
+}
+
+async function openLinkInClipper(sourceTab: browser.Tabs.Tab, targetUrl: string, parentUrl: string, parentTitle: string): Promise<void> {
+	const sourceTabId = sourceTab.id;
+	if (!sourceTabId) {
+		throw new Error('Missing source tab ID');
+	}
+
+	const createdTab = await browser.tabs.create({
+		url: currentOpenBehavior === 'reader'
+			? browser.runtime.getURL('reader.html?url=' + encodeURIComponent(targetUrl))
+			: targetUrl,
+		active: true,
+		index: typeof sourceTab.index === 'number' ? sourceTab.index + 1 : undefined,
+	});
+
+	if (!createdTab.id) {
+		throw new Error('Failed to create destination tab');
+	}
+
+	await storeLinkHandoffContext(createdTab.id, targetUrl, parentUrl, parentTitle);
+
+	if (currentOpenBehavior === 'reader') {
+		return;
+	}
+
+	if (currentOpenBehavior === 'embedded') {
+		pendingEmbeddedHandoffTabs.add(createdTab.id);
+	}
+}
 
 async function injectContentScript(tabId: number): Promise<void> {
 	if (browser.scripting) {
@@ -238,6 +316,8 @@ async function initialize() {
 		browser.tabs.onRemoved.addListener((tabId) => {
 			delete highlighterModeState[tabId];
 			delete readerModeState[tabId];
+			delete linkHandoffContextByTab[tabId];
+			pendingEmbeddedHandoffTabs.delete(tabId);
 		});
 		
 		// Initialize context menu
@@ -482,6 +562,38 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 					console.error('Error opening popup in background script:', error);
 					sendResponse({ success: false, error: error instanceof Error ? error.message : String(error) });
 				});
+			return true;
+		}
+
+		if (typedRequest.action === "openLinkInClipper") {
+			const targetUrl = (typedRequest as any).targetUrl;
+			const parentUrl = (typedRequest as any).parentUrl || '';
+			const parentTitle = (typedRequest as any).parentTitle || '';
+			const sourceTab = sender.tab;
+
+			if (!sourceTab?.id || !targetUrl) {
+				sendResponse({ success: false, error: 'Missing tab or target URL' });
+				return true;
+			}
+
+			openLinkInClipper(sourceTab, targetUrl, parentUrl, parentTitle)
+				.then(() => sendResponse({ success: true }))
+				.catch((error) => sendResponse({ success: false, error: error instanceof Error ? error.message : String(error) }));
+			return true;
+		}
+
+		if (typedRequest.action === 'getLinkHandoffContext') {
+			const tabId = typedRequest.tabId || sender.tab?.id;
+			const url = (typedRequest as any).url;
+			if (!tabId) {
+				sendResponse({ success: false, error: 'No tab ID provided' });
+				return true;
+			}
+
+			sendResponse({
+				success: true,
+				context: getLinkHandoffContext(tabId, url)
+			});
 			return true;
 		}
 
@@ -898,6 +1010,20 @@ async function setupTabListeners() {
 			}
 		});
 	}
+
+	browser.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+		if (changeInfo.status === 'complete' && pendingEmbeddedHandoffTabs.has(tabId)) {
+			pendingEmbeddedHandoffTabs.delete(tabId);
+			ensureContentScriptLoadedInBackground(tabId)
+				.then(() => browser.tabs.sendMessage(tabId, { action: "toggle-iframe" }))
+				.catch((error) => console.error('Error opening embedded handoff iframe:', error));
+		}
+
+		const context = linkHandoffContextByTab[tabId];
+		if (changeInfo.status === 'complete' && context && tab.url && !tab.url.startsWith(browser.runtime.getURL('reader.html')) && tab.url !== context.targetUrl) {
+			delete linkHandoffContextByTab[tabId];
+		}
+	});
 }
 
 const debouncedPaintHighlights = debounce(async (tabId: number) => {
