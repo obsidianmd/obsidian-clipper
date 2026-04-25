@@ -116,6 +116,7 @@ let isContextMenuCreating = false;
 let popupPorts: { [tabId: number]: browser.Runtime.Port } = {};
 let linkHandoffContextByTab: Record<number, ParentLinkContext & { targetUrl: string }> = {};
 let pendingEmbeddedHandoffTabs: Set<number> = new Set();
+const LINK_HANDOFF_STORAGE_KEY = 'linkHandoffContextByTab';
 
 function createNoteLink(notePath?: string): string {
 	return notePath ? `[[${notePath}]]` : '';
@@ -140,7 +141,7 @@ async function getLatestClipContextForUrl(url: string): Promise<ParentLinkContex
 
 async function storeLinkHandoffContext(tabId: number, targetUrl: string, parentUrl: string, parentTitle: string): Promise<void> {
 	const latestClip = await getLatestClipContextForUrl(parentUrl);
-	linkHandoffContextByTab[tabId] = {
+	const context = {
 		targetUrl,
 		parentUrl,
 		parentTitle,
@@ -148,12 +149,25 @@ async function storeLinkHandoffContext(tabId: number, targetUrl: string, parentU
 		parentNotePath: latestClip?.parentNotePath || '',
 		parentNoteLink: latestClip?.parentNoteLink || '',
 	};
+	linkHandoffContextByTab[tabId] = context;
+
+	const persisted = await browser.storage.local.get(LINK_HANDOFF_STORAGE_KEY);
+	const persistedContexts = (persisted[LINK_HANDOFF_STORAGE_KEY] || {}) as Record<number, ParentLinkContext & { targetUrl: string }>;
+	persistedContexts[tabId] = context;
+	await browser.storage.local.set({ [LINK_HANDOFF_STORAGE_KEY]: persistedContexts });
 }
 
-function getLinkHandoffContext(tabId: number, url?: string): ParentLinkContext | null {
-	const context = linkHandoffContextByTab[tabId];
+async function getLinkHandoffContext(tabId: number): Promise<ParentLinkContext | null> {
+	let context = linkHandoffContextByTab[tabId];
+	if (!context) {
+		const persisted = await browser.storage.local.get(LINK_HANDOFF_STORAGE_KEY);
+		const persistedContexts = (persisted[LINK_HANDOFF_STORAGE_KEY] || {}) as Record<number, ParentLinkContext & { targetUrl: string }>;
+		context = persistedContexts[tabId];
+		if (context) {
+			linkHandoffContextByTab[tabId] = context;
+		}
+	}
 	if (!context) return null;
-	if (url && context.targetUrl !== url) return null;
 
 	return {
 		parentUrl: context.parentUrl,
@@ -162,6 +176,19 @@ function getLinkHandoffContext(tabId: number, url?: string): ParentLinkContext |
 		parentNotePath: context.parentNotePath || '',
 		parentNoteLink: context.parentNoteLink || '',
 	};
+}
+
+async function takeLinkHandoffContext(tabId: number): Promise<ParentLinkContext | null> {
+	const context = await getLinkHandoffContext(tabId);
+	delete linkHandoffContextByTab[tabId];
+
+	const persisted = await browser.storage.local.get(LINK_HANDOFF_STORAGE_KEY);
+	const persistedContexts = (persisted[LINK_HANDOFF_STORAGE_KEY] || {}) as Record<number, ParentLinkContext & { targetUrl: string }>;
+	if (persistedContexts[tabId]) {
+		delete persistedContexts[tabId];
+		await browser.storage.local.set({ [LINK_HANDOFF_STORAGE_KEY]: persistedContexts });
+	}
+	return context;
 }
 
 async function openLinkInClipper(sourceTab: browser.Tabs.Tab, targetUrl: string, parentUrl: string, parentTitle: string): Promise<void> {
@@ -318,6 +345,14 @@ async function initialize() {
 			delete readerModeState[tabId];
 			delete linkHandoffContextByTab[tabId];
 			pendingEmbeddedHandoffTabs.delete(tabId);
+			browser.storage.local.get(LINK_HANDOFF_STORAGE_KEY).then((persisted) => {
+				const persistedContexts = (persisted[LINK_HANDOFF_STORAGE_KEY] || {}) as Record<number, ParentLinkContext & { targetUrl: string }>;
+				if (!persistedContexts[tabId]) return;
+				delete persistedContexts[tabId];
+				return browser.storage.local.set({ [LINK_HANDOFF_STORAGE_KEY]: persistedContexts });
+			}).catch((error) => {
+				console.warn('Failed to clean up persisted link handoff context:', error);
+			});
 		});
 		
 		// Initialize context menu
@@ -584,16 +619,24 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 
 		if (typedRequest.action === 'getLinkHandoffContext') {
 			const tabId = typedRequest.tabId || sender.tab?.id;
-			const url = (typedRequest as any).url;
 			if (!tabId) {
 				sendResponse({ success: false, error: 'No tab ID provided' });
 				return true;
 			}
 
-			sendResponse({
-				success: true,
-				context: getLinkHandoffContext(tabId, url)
-			});
+			takeLinkHandoffContext(tabId)
+				.then((context) => {
+					sendResponse({
+						success: true,
+						context
+					});
+				})
+				.catch((error) => {
+					sendResponse({
+						success: false,
+						error: error instanceof Error ? error.message : String(error)
+					});
+				});
 			return true;
 		}
 
@@ -1019,10 +1062,6 @@ async function setupTabListeners() {
 				.catch((error) => console.error('Error opening embedded handoff iframe:', error));
 		}
 
-		const context = linkHandoffContextByTab[tabId];
-		if (changeInfo.status === 'complete' && context && tab.url && !tab.url.startsWith(browser.runtime.getURL('reader.html')) && tab.url !== context.targetUrl) {
-			delete linkHandoffContextByTab[tabId];
-		}
 	});
 }
 
