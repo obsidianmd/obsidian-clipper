@@ -1,5 +1,5 @@
 import browser from './browser-polyfill';
-import { Settings, ModelConfig, PropertyType, HistoryEntry, Provider, Rating } from '../types/types';
+import { Settings, ModelConfig, PropertyType, HistoryEntry, Provider, Rating, ParentLinkContext } from '../types/types';
 import { debugLog } from './debug';
 import { copyToClipboard } from 'core/popup';
 
@@ -284,7 +284,8 @@ export async function incrementStat(
 	vault?: string,
 	path?: string,
 	url?: string,
-	title?: string
+	title?: string,
+	historyOptions?: Partial<HistoryEntry>
 ): Promise<void> {
 	const settings = await loadSettings();
 	settings.stats[action]++;
@@ -292,7 +293,7 @@ export async function incrementStat(
 
 	// Add history entry if URL is provided
 	if (url) {
-		await addHistoryEntry(action, url, title, vault, path);
+		await addHistoryEntry(action, url, title, vault, path, historyOptions);
 	}
 }
 
@@ -301,7 +302,8 @@ export async function addHistoryEntry(
 	url: string, 
 	title?: string,
 	vault?: string,
-	path?: string
+	path?: string,
+	historyOptions?: Partial<HistoryEntry>
 ): Promise<void> {
 	const entry: HistoryEntry = {
 		datetime: new Date().toISOString(),
@@ -309,7 +311,10 @@ export async function addHistoryEntry(
 		action,
 		title,
 		vault,
-		path
+		path,
+		noteName: historyOptions?.noteName,
+		notePath: historyOptions?.notePath,
+		noteLink: historyOptions?.noteLink,
 	};
 
 	// Get existing history from local storage
@@ -329,6 +334,27 @@ export async function addHistoryEntry(
 export async function getClipHistory(): Promise<HistoryEntry[]> {
 	const result = await browser.storage.local.get('history');
 	return (result.history || []) as HistoryEntry[];
+}
+
+export function createNoteLink(notePath?: string): string {
+	if (!notePath) return '';
+	return `[[${notePath}]]`;
+}
+
+export async function getLatestClipForUrl(url: string): Promise<ParentLinkContext | null> {
+	if (!url) return null;
+
+	const history = await getClipHistory();
+	const latestEntry = history.find((entry) => entry.url === url && entry.action === 'addToObsidian');
+	if (!latestEntry) return null;
+
+	return {
+		parentUrl: latestEntry.url,
+		parentTitle: latestEntry.title || '',
+		parentNoteName: latestEntry.noteName || '',
+		parentNotePath: latestEntry.notePath || '',
+		parentNoteLink: latestEntry.noteLink || createNoteLink(latestEntry.notePath),
+	};
 }
 
 declare global {
