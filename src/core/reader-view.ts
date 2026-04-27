@@ -9,6 +9,7 @@ import { setPageUrl, setPageTitle, updatePageDomainSettings, getHighlights, repo
 import { throttle } from '../utils/throttle';
 import { loadSettings } from '../utils/storage-utils';
 import Defuddle from 'defuddle';
+import { extractBilibiliContent } from '../utils/bilibili';
 
 type MessageListener = (request: any, sender: any, sendResponse: (response?: any) => void) => true | undefined;
 let readerPageMessageListener: MessageListener | null = null;
@@ -47,8 +48,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 		const parsedDoc = parser.parseFromString(html, 'text/html');
 		Object.defineProperty(parsedDoc, 'URL', { value: url, configurable: true });
 
-		const defuddle = new Defuddle(parsedDoc, { url, fetch: proxyFetchAsResponse });
-		const result = await defuddle.parseAsync();
+		const result = await extractPageContent(parsedDoc, url);
 
 		if (!result.content) {
 			throw new Error('Could not extract article content');
@@ -132,6 +132,7 @@ async function proxyFetchAsResponse(input: RequestInfo | URL, init?: RequestInit
 	const options: Record<string, unknown> = {};
 	if (init?.method) options.method = init.method;
 	if (init?.body && typeof init.body === 'string') options.body = init.body;
+	if (init?.credentials) options.credentials = init.credentials;
 	if (init?.headers) {
 		if (init.headers instanceof Headers) {
 			options.headers = Object.fromEntries((init.headers as any).entries());
@@ -151,6 +152,31 @@ async function proxyFetchAsResponse(input: RequestInfo | URL, init?: RequestInit
 		statusText: result.ok ? 'OK' : '',
 		headers: { 'Content-Type': 'text/plain' },
 	});
+}
+
+async function extractPageContent(parsedDoc: Document, url: string): Promise<any> {
+	const bilibiliContent = await extractBilibiliContent(parsedDoc, proxyFetchAsResponse)
+		.catch(() => null);
+	if (bilibiliContent) {
+		return {
+			content: bilibiliContent.content,
+			title: bilibiliContent.title,
+			author: bilibiliContent.author,
+			published: bilibiliContent.published,
+			domain: bilibiliContent.domain,
+			wordCount: bilibiliContent.wordCount,
+			parseTime: bilibiliContent.parseTime,
+			site: bilibiliContent.site,
+			favicon: bilibiliContent.favicon,
+			image: bilibiliContent.image,
+			description: bilibiliContent.description,
+			language: bilibiliContent.language,
+			variables: bilibiliContent.variables,
+		};
+	}
+
+	const defuddle = new Defuddle(parsedDoc, { url, fetch: proxyFetchAsResponse });
+	return defuddle.parseAsync();
 }
 
 async function proxyFetch(url: string): Promise<{ text: string; finalUrl: string }> {
@@ -219,8 +245,7 @@ async function loadArticle(newUrl: string) {
 		const parsedDoc = parser.parseFromString(html, 'text/html');
 		Object.defineProperty(parsedDoc, 'URL', { value: newUrl, configurable: true });
 
-		const defuddle = new Defuddle(parsedDoc, { url: newUrl, fetch: proxyFetchAsResponse });
-		const result = await defuddle.parseAsync();
+		const result = await extractPageContent(parsedDoc, newUrl);
 
 		if (!result.content) {
 			throw new Error('Could not extract article content');

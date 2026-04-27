@@ -146,6 +146,10 @@
 			aspect-ratio: 16 / 9;
 			height: auto;
 		}
+		&[src*="player.bilibili.com"] {
+			aspect-ratio: 16 / 9;
+			height: auto;
+		}
 	}
 
 	figure {

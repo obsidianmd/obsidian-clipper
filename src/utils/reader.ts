@@ -31,6 +31,7 @@ import { saveFile } from './file-utils';
 import { parseForClip } from './clip-utils';
 import { updateSidebarWidth, addResizeHandle, cleanupResizeHandlers } from './iframe-resize';
 import { setElementHTML, setSVGChildren, serializeChildren } from './dom-utils';
+import { extractBilibiliContent, isBilibiliVideoUrl } from './bilibili';
 
 // Mobile viewport settings
 const VIEWPORT = 'width=device-width, initial-scale=1, maximum-scale=1';
@@ -844,6 +845,12 @@ export class Reader {
 			return pre;
 		}
 
+		const bilibiliContent = await extractBilibiliContent(doc, this.proxyFetchAsResponse)
+			.catch(() => null);
+		if (bilibiliContent) {
+			return bilibiliContent;
+		}
+
 		const defuddle = new Defuddle(doc, { url: doc.URL });
 		const defuddled = await defuddle.parseAsync();
 
@@ -856,6 +863,36 @@ export class Reader {
 			wordCount: defuddled.wordCount,
 			parseTime: defuddled.parseTime
 		};
+	}
+
+	private static async proxyFetchAsResponse(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+		const url = typeof input === 'string' ? input
+			: input instanceof URL ? input.toString()
+			: input.url;
+
+		const options: Record<string, unknown> = {};
+		if (init?.method) options.method = init.method;
+		if (init?.body && typeof init.body === 'string') options.body = init.body;
+		if (init?.credentials) options.credentials = init.credentials;
+		if (init?.headers) {
+			if (init.headers instanceof Headers) {
+				options.headers = Object.fromEntries((init.headers as any).entries());
+			} else if (typeof init.headers === 'object') {
+				options.headers = { ...(init.headers as Record<string, string>) };
+			}
+		}
+
+		const result = await browser.runtime.sendMessage({
+			action: 'fetchProxy', url, options,
+		}) as { ok: boolean; status: number; text: string; error?: string };
+
+		if (result?.error) throw new Error(result.error);
+
+		return new Response(result.text, {
+			status: result.status,
+			statusText: result.ok ? 'OK' : '',
+			headers: { 'Content-Type': 'text/plain' },
+		});
 	}
 
 	private static generateOutline(doc: Document, title?: string) {
@@ -1967,12 +2004,14 @@ export class Reader {
 			// Load saved settings
 			await this.loadSettings();
 
-			// Capture YouTube video state before cleanup destroys the player
+			// Capture video state before cleanup destroys platform players
 			let videoTimestamp = 0;
 			let videoWasPlaying = false;
 			let youtubeVideoElement: HTMLVideoElement | null = null;
+			let bilibiliVideoElement: HTMLVideoElement | null = null;
 			const host = doc.URL ? new URL(doc.URL).hostname : '';
 			const isYouTube = host.includes('youtube.com') || host.includes('youtu.be');
+			const isBilibili = isBilibiliVideoUrl(doc.URL);
 			// Browser type is only needed for YouTube-specific behavior
 			const browserType = isYouTube ? await detectBrowser() : '';
 			if (isYouTube) {
@@ -1987,6 +2026,14 @@ export class Reader {
 						youtubeVideoElement = videoElement;
 						videoElement.remove();
 					}
+				}
+			} else if (isBilibili) {
+				const videoElement = doc.querySelector('video');
+				if (videoElement) {
+					videoTimestamp = Math.floor(videoElement.currentTime);
+					videoWasPlaying = !videoElement.paused;
+					bilibiliVideoElement = videoElement;
+					videoElement.remove();
 				}
 			}
 
@@ -2307,6 +2354,43 @@ export class Reader {
 							iframe.src = src.toString();
 						}
 					}
+				}
+			}
+
+			// On Bilibili, prefer the native video element when Reader is
+			// opened on the video page, and fall back to Bilibili's iframe
+			// player when rendering fetched reader pages.
+			if (isBilibili) {
+				const iframe = article.querySelector('iframe[src*="player.bilibili.com/player.html"]') as HTMLIFrameElement;
+				if (iframe && bilibiliVideoElement) {
+					bilibiliVideoElement.className = 'reader-video-player';
+					bilibiliVideoElement.removeAttribute('style');
+					bilibiliVideoElement.setAttribute('controls', '');
+					const videoObs = new MutationObserver(() => {
+						if (!bilibiliVideoElement!.hasAttribute('controls')) {
+							bilibiliVideoElement!.setAttribute('controls', '');
+						}
+						if (bilibiliVideoElement!.className !== 'reader-video-player') {
+							bilibiliVideoElement!.className = 'reader-video-player';
+						}
+					});
+					videoObs.observe(bilibiliVideoElement, {
+						attributes: true,
+						attributeFilter: ['controls', 'class', 'style']
+					});
+					const videoWrapper = doc.createElement('div');
+					videoWrapper.className = 'reader-video-wrapper';
+					videoWrapper.appendChild(bilibiliVideoElement);
+					iframe.replaceWith(videoWrapper);
+				} else if (iframe && (videoTimestamp > 0 || videoWasPlaying)) {
+					const src = new URL(iframe.src);
+					if (videoTimestamp > 0) {
+						src.searchParams.set('t', String(videoTimestamp));
+					}
+					if (videoWasPlaying) {
+						src.searchParams.set('autoplay', '1');
+					}
+					iframe.src = src.toString();
 				}
 			}
 

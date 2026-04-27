@@ -48,14 +48,19 @@ export function wireTranscript(
 	scroll: ScrollHelper,
 	onSettingChange?: (key: keyof TranscriptSettings, value: boolean) => void
 ): void {
-	const transcript = article.querySelector('.youtube.transcript') as HTMLElement | null;
+	const transcript = article.querySelector('.youtube.transcript, .bilibili.transcript') as HTMLElement | null;
 	if (!transcript) return;
 
-	const iframe = article.querySelector('iframe[src*="youtube.com/embed/"]') as HTMLIFrameElement | null;
+	const isYouTube = transcript.classList.contains('youtube');
+	const isBilibili = transcript.classList.contains('bilibili');
+	const iframeSelector = isYouTube
+		? 'iframe[src*="youtube.com/embed/"]'
+		: 'iframe[src*="player.bilibili.com/player.html"]';
+	const iframe = article.querySelector(iframeSelector) as HTMLIFrameElement | null;
 	const videoWrapper = article.querySelector('.reader-video-wrapper') as HTMLElement | null;
 	const videoEl = videoWrapper?.querySelector('video.reader-video-player') as HTMLVideoElement | null;
 	const thumbnailLink = article.querySelector('a[href*="youtube.com/watch"]') as HTMLAnchorElement | null;
-	const playerEl = (videoWrapper || iframe || thumbnailLink) as HTMLElement | null;
+	const playerEl = (videoWrapper || iframe || (isYouTube ? thumbnailLink : null)) as HTMLElement | null;
 	if (!playerEl) return;
 
 	// Wrap player in a container with toggle controls
@@ -144,7 +149,7 @@ export function wireTranscript(
 
 	playerContainer.appendChild(toggleBar);
 
-	if (iframe) {
+	if (iframe && isYouTube) {
 		// Enable JS API on the embed
 		const src = new URL(iframe.src);
 		src.searchParams.set('enablejsapi', '1');
@@ -236,6 +241,7 @@ export function wireTranscript(
 	let lastCurrentTime = -1;
 	let scrubbing = false;
 	let lastScrub = 0;
+	let pendingScrubTime: number | null = null;
 
 	window.addEventListener('scroll', () => {
 		if (scroll.programmaticScroll() || scrubbing) return;
@@ -383,6 +389,7 @@ export function wireTranscript(
 	// Set up time tracking and seeking based on player type
 	let seekTo: (seconds: number) => void;
 	let iframePlaying = false;
+	const reloadsIframeOnSeek = !!(iframe && isBilibili && !videoEl);
 
 	if (videoEl) {
 		// Native video element: use HTML5 API directly
@@ -398,8 +405,8 @@ export function wireTranscript(
 				e.preventDefault();
 			}
 		});
-	} else if (iframe) {
-		// Iframe embed: use postMessage API
+	} else if (iframe && isYouTube) {
+		// YouTube iframe embed: use postMessage API
 		seekTo = (seconds: number) => {
 			if (!iframe.contentWindow) return;
 			iframe.contentWindow.postMessage(JSON.stringify({
@@ -435,15 +442,34 @@ export function wireTranscript(
 				args: []
 			}), '*');
 		}, 500);
+	} else if (iframe && isBilibili) {
+		// Bilibili's embed player supports a start-time query parameter,
+		// but does not expose a stable public time API. Seeking reloads
+		// the iframe at the requested timestamp.
+		seekTo = (seconds: number) => {
+			const src = new URL(iframe.src);
+			const safeSeconds = Math.max(0, Math.floor(seconds));
+			src.searchParams.set('t', String(safeSeconds));
+			src.searchParams.set('autoplay', '1');
+			iframe.src = src.toString();
+			updateActiveSegment(safeSeconds);
+		};
+		const initialTime = parseFloat(new URL(iframe.src).searchParams.get('t') || '0');
+		if (initialTime > 0) {
+			updateActiveSegment(initialTime);
+		}
 	} else {
 		seekTo = () => {};
 	}
 
 	// Keyboard shortcuts for video playback
+	const canControlPlayback = !!videoEl || !!(iframe && isYouTube);
+	const canSeek = canControlPlayback || !!(iframe && isBilibili);
+
 	const togglePlayPause = () => {
 		if (videoEl) {
 			videoEl.paused ? videoEl.play() : videoEl.pause();
-		} else if (iframe?.contentWindow) {
+		} else if (iframe?.contentWindow && isYouTube) {
 			iframe.contentWindow.postMessage(JSON.stringify({
 				event: 'command',
 				func: iframePlaying ? 'pauseVideo' : 'playVideo',
@@ -455,7 +481,9 @@ export function wireTranscript(
 	const seekRelative = (delta: number) => {
 		if (videoEl) {
 			videoEl.currentTime = Math.max(0, videoEl.currentTime + delta);
-		} else if (iframe?.contentWindow) {
+		} else if (iframe?.contentWindow && isYouTube) {
+			seekTo(Math.max(0, lastCurrentTime + delta));
+		} else if (iframe && isBilibili) {
 			seekTo(Math.max(0, lastCurrentTime + delta));
 		}
 	};
@@ -470,7 +498,7 @@ export function wireTranscript(
 			case 'Space':
 				// Only handle Space for iframe embeds — native video
 				// controls handle Space themselves and would double-toggle
-				if (!videoEl) {
+				if (!videoEl && canControlPlayback) {
 					e.preventDefault();
 					e.stopImmediatePropagation();
 					togglePlayPause();
@@ -478,26 +506,31 @@ export function wireTranscript(
 				break;
 			case 'KeyK':
 				// K is not a native video shortcut, so handle it for both
+				if (!canControlPlayback) return;
 				e.preventDefault();
 				e.stopImmediatePropagation();
 				togglePlayPause();
 				break;
 			case 'ArrowLeft':
+				if (!canSeek) return;
 				e.preventDefault();
 				e.stopImmediatePropagation();
 				seekRelative(-5);
 				break;
 			case 'ArrowRight':
+				if (!canSeek) return;
 				e.preventDefault();
 				e.stopImmediatePropagation();
 				seekRelative(5);
 				break;
 			case 'KeyJ':
+				if (!canSeek) return;
 				e.preventDefault();
 				e.stopImmediatePropagation();
 				seekRelative(-10);
 				break;
 			case 'KeyL':
+				if (!canSeek) return;
 				e.preventDefault();
 				e.stopImmediatePropagation();
 				seekRelative(10);
@@ -507,7 +540,7 @@ export function wireTranscript(
 
 	// YouTube handles Space on keyup — block that too
 	doc.addEventListener('keyup', (e: KeyboardEvent) => {
-		if (e.code === 'Space' && !videoEl) {
+		if (e.code === 'Space' && !videoEl && isYouTube) {
 			const tag = (e.target as HTMLElement).tagName;
 			if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
 			e.preventDefault();
@@ -635,12 +668,23 @@ export function wireTranscript(
 	scrubTrack.addEventListener('mousedown', (e) => {
 		scrubbing = true;
 		suppressScroll = true;
-		seekTo(getTimeFromY(e.clientY));
+		const time = getTimeFromY(e.clientY);
+		if (reloadsIframeOnSeek) {
+			pendingScrubTime = time;
+			updateActiveSegment(time);
+		} else {
+			seekTo(time);
+		}
 		e.preventDefault();
 	});
 
 	window.addEventListener('mousemove', (e) => {
 		if (!scrubbing) return;
+		if (reloadsIframeOnSeek) {
+			pendingScrubTime = getTimeFromY(e.clientY);
+			updateActiveSegment(pendingScrubTime);
+			return;
+		}
 		const now = Date.now();
 		if (now - lastScrub < 100) return;
 		lastScrub = now;
@@ -648,6 +692,10 @@ export function wireTranscript(
 	});
 
 	window.addEventListener('mouseup', () => {
+		if (scrubbing && reloadsIframeOnSeek && pendingScrubTime !== null) {
+			seekTo(pendingScrubTime);
+			pendingScrubTime = null;
+		}
 		scrubbing = false;
 	});
 
