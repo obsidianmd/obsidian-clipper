@@ -115,6 +115,13 @@ let hasHighlights = false;
 let isContextMenuCreating = false;
 let popupPorts: { [tabId: number]: browser.Runtime.Port } = {};
 
+async function openSettingsPage(section?: string): Promise<void> {
+	const query = section ? `?section=${encodeURIComponent(section)}` : '';
+	await browser.tabs.create({
+		url: browser.runtime.getURL(`settings.html${query}`)
+	});
+}
+
 async function injectContentScript(tabId: number): Promise<void> {
 	if (browser.scripting) {
 		debugLog('Clipper', 'Using scripting API');
@@ -564,21 +571,12 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 		}
 
 		if (typedRequest.action === "openOptionsPage") {
-			try {
-				if (typeof browser.runtime.openOptionsPage === 'function') {
-					// Chrome way
-					browser.runtime.openOptionsPage();
-				} else {
-					// Firefox way
-					browser.tabs.create({
-						url: browser.runtime.getURL('settings.html')
-					});
-				}
-				sendResponse({success: true});
-			} catch (error) {
-				console.error('Error opening options page:', error);
-				sendResponse({success: false, error: error instanceof Error ? error.message : String(error)});
-			}
+			openSettingsPage('general')
+				.then(() => sendResponse({success: true}))
+				.catch((error) => {
+					console.error('Error opening options page:', error);
+					sendResponse({success: false, error: error instanceof Error ? error.message : String(error)});
+				});
 			return true;
 		}
 
@@ -591,16 +589,12 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 		}
 
 		if (typedRequest.action === "openSettings") {
-			try {
-				const section = typedRequest.section ? `?section=${typedRequest.section}` : '';
-				browser.tabs.create({
-					url: browser.runtime.getURL(`settings.html${section}`)
+			openSettingsPage(typedRequest.section)
+				.then(() => sendResponse({success: true}))
+				.catch((error) => {
+					console.error('Error opening settings:', error);
+					sendResponse({success: false, error: error instanceof Error ? error.message : String(error)});
 				});
-				sendResponse({success: true});
-			} catch (error) {
-				console.error('Error opening settings:', error);
-				sendResponse({success: false, error: error instanceof Error ? error.message : String(error)});
-			}
 			return true;
 		}
 

@@ -357,12 +357,13 @@ document.addEventListener('DOMContentLoaded', async function() {
 		}
 		const settingsButton = document.getElementById('open-settings');
 		if (settingsButton) {
-			settingsButton.addEventListener('click', async function() {
+			settingsButton.addEventListener('click', async function(e) {
+				e.preventDefault();
 				try {
-					await browser.runtime.sendMessage({ action: "openOptionsPage" });
+					await browser.runtime.sendMessage({ action: "openSettings", section: "general" });
 					setTimeout(() => window.close(), 50);
 				} catch (error) {
-					console.error('Error opening options page:', error);
+					console.error('Error opening settings page:', error);
 				}
 			});
 			initializeIcons(settingsButton);
