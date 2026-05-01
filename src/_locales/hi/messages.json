@@ -3,46 +3,46 @@
 		"message": "गतिविधि"
 	},
 	"addModel": {
-		"message": "+ Model jodein"
+		"message": "मॉडल जोड़ें"
 	},
 	"addModelTitle": {
-		"message": "Model jodein"
+		"message": "मॉडल का शीर्षक जोड़ें"
 	},
 	"addProperty": {
-		"message": "+ Property jodein"
+		"message": "नई विशेषता जोड़ें"
 	},
 	"addProvider": {
-		"message": "+ Provider jodein"
+		"message": "प्रदाता जोड़ें"
 	},
 	"addProviderTitle": {
-		"message": "Provider jodein"
+		"message": "प्रदाता का शीर्षक जोड़ें"
 	},
 	"addToObsidian": {
-		"message": "Obsidian me save karein"
+		"message": "Obsidian में जोड़ें"
 	},
 	"addVaultPlaceholder": {
-		"message": "Vault jodne ke liye enter dabaein"
+		"message": "वॉल्ट प्लेसहोल्डर में जोड़ें"
 	},
 	"advanced": {
-		"message": "Advanced"
+		"message": "अतिरिक्त"
 	},
 	"allHighlights": {
 		"message": "सभी हाइलाइट्स"
 	},
 	"allProperties": {
-		"message": "Sabhi properties"
+		"message": "सभी विशेषताएँ"
 	},
 	"allTime": {
-		"message": "सभी समय"
+		"message": "अब तक"
 	},
 	"alwaysShowHighlights": {
-		"message": "Hamesha highlights dikhayein"
+		"message": "हमेशा हाइलाइट्स दिखाएं"
 	},
 	"alwaysShowHighlightsDescription": {
-		"message": "Page load hone par aapke save kiye gaye highlights dikhayein. Highlighter mode active hone par hi highlights dikhane ke liye band karein."
+		"message": "हाइलाइट के विवरण हमेशा दिखाएं"
 	},
 	"apiKeyMissing": {
-		"message": "API key nahi hai"
+		"message": "API key उपलब्ध नहीं है"
 	},
 	"apiKeysWarning": {
 		"message": "External provider ka use karte samay, aap unki terms aur privacy policy se agree karte hain..."
@@ -940,25 +940,25 @@
 		"message": "Keyboard shortcuts aapko clipper features tak quick access dete hain."
 	},
 	"shortcutInstructionsSafari": {
-		"message": "Safari par keyboard shortcuts customize nahi kiye ja sakte."
+		"message": "Safari में कीबोर्ड शॉर्टकट्स को कस्टमाइज़ नहीं किया जा सकता।"
 	},
 	"shortcutNotSet": {
-		"message": "Set nahi hai"
+		"message": "सेट नहीं है"
 	},
 	"showActionsButton": {
-		"message": "Actions button dikhayein"
+		"message": "एक्शन बटन दिखाएँ"
 	},
 	"showActionsDescription": {
-		"message": "Clipper menu se page variables inspect karne ki permission deta hai. Templates mein use ke liye available variables dekhne mein helpful."
+		"message": "यह आपको क्लिपर मेनू से पेज वेरिएबल्स देखने की सुविधा देता है। इससे आप उन वेरिएबल्स को देख सकते हैं जिन्हें टेम्पलेट्स में उपयोग किया जा सकता है।"
 	},
 	"showPageVariables": {
-		"message": "Page variables dikhayein"
+		"message": "पेज वेरिएबल्स दिखाएँ"
 	},
 	"silentOpen": {
-		"message": "Clipped note ko bina open kiye save karein"
+		"message": "क्लिप किए गए नोट को खोले बिना सहेजें"
 	},
 	"silentOpenDescription": {
-		"message": "Clipped notes save ho jayengi lekin naye tab mein nahi khulengi. Obsidian abhi bhi foreground mein layega."
+		"message": "क्लिप किए गए नोट सहेजे जाएंगे, लेकिन नए टैब में नहीं खुलेंगे। Obsidian फिर भी सामने (foreground) में आ जाएगा।"
 	},
 	"sort": {
 		"message": "क्रमबद्ध करें"
@@ -976,19 +976,19 @@
 		"message": "Z से A"
 	},
 	"specificNoteName": {
-		"message": "Specific note name"
+		"message": "नोट का विशेष नाम"
 	},
 	"systemDefault": {
-		"message": "System"
+		"message": "सिस्टम"
 	},
 	"template": {
 		"message": "टेम्पलेट"
 	},
 	"templateCopied": {
-		"message": "Template JSON clipboard par copy ho gaya"
+		"message": "टेम्पलेट JSON क्लिपबोर्ड में कॉपी कर दिया गया है।"
 	},
 	"templateCopyError": {
-		"message": "Template JSON ko clipboard par copy karne mein fail"
+		"message": "टेम्पलेट JSON को क्लिपबोर्ड में कॉपी नहीं किया जा सका।"
 	},
 	"templateErrorCount": {
 		"message": "आपके टेम्पलेट में एक त्रुटि है।"
@@ -1003,43 +1003,43 @@
 		"message": "स्थान"
 	},
 	"templateName": {
-		"message": "Template name"
+		"message": "टेम्पलेट का नाम"
 	},
 	"templateProperties": {
-		"message": "Properties"
+		"message": "प्रॉपर्टीज़"
 	},
 	"templatePropertiesDescription": {
-		"message": "Clipped note ke top par add karne ke liye properties. Page se data pre-populate karne ke liye variables ka upyog karein."
+		"message": "क्लिप किए गए नोट के शीर्ष पर जोड़ने के लिए प्रॉपर्टीज़। पेज से डेटा पहले से भरने के लिए वेरिएबल्स का उपयोग करें।"
 	},
 	"templateTriggers": {
-		"message": "Template triggers"
+		"message": "टेम्पलेट ट्रिगर्स"
 	},
 	"templateTriggersDescription": {
-		"message": "URL pattern se match hone ya schema.org data hone par is template ko automatically select karne ke liye rules define karein. Ek line mein ek rule."
+		"message": "ऐसे नियम निर्धारित करें जिनके आधार पर, यदि कोई URL पैटर्न मेल खाता हो या schema.org डेटा मौजूद हो, तो यह टेम्पलेट अपने आप चुना जाए। प्रत्येक पंक्ति में एक नियम लिखें।"
 	},
 	"templateValid": {
 		"message": "टेम्पलेट सिंटैक्स मान्य है"
 	},
 	"templatesHeading": {
-		"message": "Templates"
+		"message": "टेम्पलेट्स"
 	},
 	"thinking": {
-		"message": "Soch raha hai"
+		"message": "सोच रहा है"
 	},
 	"unknownProvider": {
-		"message": "Unknown provider"
+		"message": "अज्ञात प्रदाता"
 	},
 	"updateAvailable": {
-		"message": "Update available hai."
+		"message": "एक अपडेट उपलब्ध है।"
 	},
 	"usingLatestVersion": {
-		"message": "Aap latest version use kar rahe hain."
+		"message": "आप लेटेस्ट वर्ज़न इस्तेमाल कर रहे हैं।"
 	},
 	"vault": {
-		"message": "Vault"
+		"message": "वॉल्ट"
 	},
 	"vaultDescription": {
-		"message": "Is template ke liye default vault select karein. Vaults add ya remove karne ke liye $link_start$general settings$link_end$ par jayein.",
+		"message": "इस टेम्पलेट के लिए डिफ़ॉल्ट वॉल्ट चुनें। वॉल्ट जोड़ने या हटाने के लिए $link_start$सामान्य सेटिंग्स$link_end$ पर जाएँ।.",
 		"placeholders": {
 			"link_end": {
 				"content": "</a>"
@@ -1050,10 +1050,10 @@
 		}
 	},
 	"vaults": {
-		"message": "Vaults"
+		"message": "वॉल्ट्स"
 	},
 	"vaultsDescription": {
-		"message": "By default, clipped notes currently open vault mein save hoti hain. Agar aap different vaults mein save karne ka option chahte hain to aap yahan vaults add kar sakte hain. Vault names Obsidian vault ke name se exactly match karne chahiye. Vault add karne ke liye $strong_start$enter$strong_end$ dabaein.",
+		"message": "डिफ़ॉल्ट रूप से, क्लिप किए गए नोट वर्तमान में खुले वॉल्ट में सहेजे जाते हैं। यदि आप अलग-अलग वॉल्ट में सहेजने का विकल्प चाहते हैं, तो यहाँ वॉल्ट जोड़ सकते हैं। वॉल्ट का नाम Obsidian वॉल्ट के नाम से बिल्कुल मेल खाना चाहिए। वॉल्ट जोड़ने के लिए $strong_start$Enter$strong_end$ दबाएँ।",
 		"placeholders": {
 			"strong_end": {
 				"content": "</strong>"
@@ -1064,6 +1064,6 @@
 		}
 	},
 	"version": {
-		"message": "Version"
+		"message": "वर्ज़न"
 	}
 }
