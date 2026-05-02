@@ -733,6 +733,21 @@ async function refreshFields(tabId: number, { checkTemplateTriggers = true, rebu
 
 				// Update variables panel if it's open
 				updateVariablesPanel(currentTemplate, currentVariables);
+
+				// Fetch Bilibili transcript asynchronously if on a Bilibili page
+				if (tab.url && tab.url.includes('bilibili.com') && !currentVariables['{{transcript}}']) {
+					browser.runtime.sendMessage({
+						action: 'sendMessageToTab',
+						tabId,
+						message: { action: 'fetchBilibiliTranscriptAction' }
+					}).then((raw: unknown) => {
+						const biliData = raw as { transcriptText?: string; content?: string } | undefined;
+						if (biliData?.transcriptText) {
+							currentVariables['{{transcript}}'] = biliData.transcriptText;
+							fillTemplateFieldValues(tabId, currentTemplate, currentVariables, extractedData.schemaOrgData);
+						}
+					}).catch(() => {});
+				}
 			} else {
 				throw new Error('Unable to initialize page content.');
 			}

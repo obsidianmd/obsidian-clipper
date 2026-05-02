@@ -313,6 +313,10 @@ browser.runtime.onMessage.addListener((request: unknown) => {
 	if (options?.method) fetchOptions.method = options.method;
 	if (options?.headers) fetchOptions.headers = options.headers;
 	if (options?.body) fetchOptions.body = options.body;
+	if (options?.credentials) fetchOptions.credentials = options.credentials;
+	if (options?.cache) fetchOptions.cache = options.cache;
+	if (options?.referrer) fetchOptions.referrer = options.referrer;
+	if (options?.referrerPolicy) fetchOptions.referrerPolicy = options.referrerPolicy;
 	return fetch(url, fetchOptions)
 		.then(async (resp) => {
 			const text = await resp.text();
