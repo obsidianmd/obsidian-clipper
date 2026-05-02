@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Pokročilé"
 	},
+	"allHighlights": {
+		"message": "Všechny zvýrazněné pasáže"
+	},
 	"allProperties": {
 		"message": "Všechny vlastnosti"
 	},
@@ -58,9 +61,6 @@
 	},
 	"behavior": {
 		"message": "Chování"
-	},
-	"behaviorWarning": {
-		"message": "Připojování k existující nebo denní poznámce vyžaduje Obsidian 1.7.2 nebo novější."
 	},
 	"byDay": {
 		"message": "Den"
@@ -103,6 +103,14 @@
 			},
 			"strong_start": {
 				"content": "<strong>"
+			}
+		}
+	},
+	"clipboardError": {
+		"message": "Obsidian nemá přístup k vaší schránce. Zkuste pokyny k řešení problémů zde: $1",
+		"placeholders": {
+			"1": {
+				"content": "$1"
 			}
 		}
 	},
@@ -157,6 +165,15 @@
 	"delete": {
 		"message": "Smazat"
 	},
+	"deleteAllHighlightsConfirm": {
+		"message": "Opravdu chcete smazat všechny zvýrazněné pasáže?"
+	},
+	"deleteHighlightsForDomain": {
+		"message": "Smazat všechny zvýrazněné pasáže pro tuto doménu?"
+	},
+	"deleteHighlightsForPage": {
+		"message": "Smazat všechny zvýrazněné pasáže pro tuto stránku?"
+	},
 	"deleteModelConfirm": {
 		"message": "Opravdu chcete smazat tento model?"
 	},
@@ -192,6 +209,9 @@
 	"earlyAccessFeatures": {
 		"message": "Funkce pro předčasný přístup"
 	},
+	"edit": {
+		"message": "Upravit"
+	},
 	"editModel": {
 		"message": "Upravit model"
 	},
@@ -201,8 +221,8 @@
 	"editTemplate": {
 		"message": "Upravit šablonu"
 	},
-	"enableHighlighter": {
-		"message": "Aktivovat zvýrazňovač"
+	"embedded": {
+		"message": "Vložené"
 	},
 	"enableHighlighterDescription": {
 		"message": "Zvýrazněte obsah na webových stránkách, který můžete uložit do Obsidian."
@@ -346,11 +366,23 @@
 	"highlightPage": {
 		"message": "Zvýraznit stránku"
 	},
+	"highlightSelection": {
+		"message": "Zvýraznit"
+	},
 	"highlighter": {
+		"message": "Zvýrazňovač"
+	},
+	"highlighterOn": {
 		"message": "Zvýrazňovač"
 	},
 	"highlighterSettings": {
 		"message": "Zvýrazňovač"
+	},
+	"highlights": {
+		"message": "Zvýrazněné pasáže"
+	},
+	"highlightsNotFound": {
+		"message": "V článku nebyly nalezeny žádné zvýrazněné pasáže"
 	},
 	"history": {
 		"message": "Historie"
@@ -437,6 +469,12 @@
 	"legacyModeDescription": {
 		"message": "Používá metodu zachycení URI, která je kompatibilní s Obsidian 1.6.7 nebo starší. Vezměte na vědomí, že délka zachyceného obsahu je omezena prohlížečem a operačním systémem. Některé stránky mohou selhat bez chybové zprávy."
 	},
+	"loadArticle": {
+		"message": "Přečíst článek"
+	},
+	"loading": {
+		"message": "Načítání…"
+	},
 	"modelName": {
 		"message": "Název modelu"
 	},
@@ -469,6 +507,9 @@
 	},
 	"noHighlights": {
 		"message": "Nedělat nic"
+	},
+	"noResults": {
+		"message": "Nebyly nalezeny žádné výsledky"
 	},
 	"noTemplates": {
 		"message": "Nejsou k dispozici žádné šablony. Přidejte prosím šablonu v nastavení."
@@ -506,6 +547,24 @@
 	"open": {
 		"message": "Otevřít"
 	},
+	"openBehaviorDescription": {
+		"message": "Vyberte, jak se Web Clipper otevírá jako výchozí."
+	},
+	"openBehaviorTitle": {
+		"message": "Chování při otevírání"
+	},
+	"openEmbedded": {
+		"message": "Otevřít na stránce"
+	},
+	"openHighlights": {
+		"message": "Otevřít zvýrazněné pasáže"
+	},
+	"openReader": {
+		"message": "Otevřít čtečku"
+	},
+	"openSidePanel": {
+		"message": "Otevřít postranní panel"
+	},
 	"optional": {
 		"message": "(volitelné)"
 	},
@@ -539,11 +598,17 @@
 	"popularModelsDescription": {
 		"message": "Vyberte z běžně používaných modelů nebo zadejte detaily vlastního modelu."
 	},
+	"popup": {
+		"message": "Vyskakovací okno"
+	},
 	"prependToDaily": {
 		"message": "Přidat na vrchol denní poznámky"
 	},
 	"prependToExisting": {
 		"message": "Přidat na vrchol existující poznámky"
+	},
+	"preview": {
+		"message": "Náhled"
 	},
 	"processing": {
 		"message": "zpracovávám"
@@ -556,6 +621,24 @@
 	},
 	"propertyName": {
 		"message": "Název vlastnosti"
+	},
+	"propertyTypeCheckbox": {
+		"message": "Zaškrtávací políčko"
+	},
+	"propertyTypeDate": {
+		"message": "Datum"
+	},
+	"propertyTypeDatetime": {
+		"message": "Datum a čas"
+	},
+	"propertyTypeMultitext": {
+		"message": "Seznam"
+	},
+	"propertyTypeNumber": {
+		"message": "Číslo"
+	},
+	"propertyTypeText": {
+		"message": "Text"
 	},
 	"propertyValue": {
 		"message": "Hodnota vlastnosti"
@@ -608,6 +691,153 @@
 	"reader": {
 		"message": "Čtečka"
 	},
+	"readerAppearance": {
+		"message": "Vzhled"
+	},
+	"readerAppearanceAuto": {
+		"message": "Automaticky"
+	},
+	"readerAppearanceDark": {
+		"message": "Tmavý"
+	},
+	"readerAppearanceDescription": {
+		"message": "Vyberte světlý nebo tmavý vzhled."
+	},
+	"readerAppearanceLight": {
+		"message": "Světlý"
+	},
+	"readerAutoScroll": {
+		"message": "Automatické posouvání"
+	},
+	"readerAutoScrollDescription": {
+		"message": "Automaticky posouvat přepis tak, aby sledoval přehrávání."
+	},
+	"readerBlendImages": {
+		"message": "Prolnout obrázky"
+	},
+	"readerBlendImagesDescription": {
+		"message": "Prolnout obrázky s pozadím stránky."
+	},
+	"readerCloseImageViewer": {
+		"message": "Zavřít prohlížeč obrázků"
+	},
+	"readerCollapseComment": {
+		"message": "Sbalit komentář"
+	},
+	"readerColorLinks": {
+		"message": "Barevné odkazy"
+	},
+	"readerColorSchemeDefault": {
+		"message": "Výchozí"
+	},
+	"readerCurrentPosition": {
+		"message": "Aktuální pozice"
+	},
+	"readerCustomCss": {
+		"message": "Vlastní CSS"
+	},
+	"readerCustomCssDescription": {
+		"message": "CSS automaticky použité v režimu čtení."
+	},
+	"readerDarkTheme": {
+		"message": "Motiv tmavého režimu"
+	},
+	"readerDarkThemeDescription": {
+		"message": "Použít jiný motiv v tmavém režimu."
+	},
+	"readerError": {
+		"message": "Nepodařilo se extrahovat obsah."
+	},
+	"readerFont": {
+		"message": "Možnosti písma"
+	},
+	"readerFontDefault": {
+		"message": "Výchozí"
+	},
+	"readerFontDescription": {
+		"message": "Přidejte písma nainstalovaná ve vašem systému. Stisknutím Enter přidáte písmo."
+	},
+	"readerFontNotFound": {
+		"message": "Nenalezeno"
+	},
+	"readerFontPlaceholder": {
+		"message": "Stisknutím Enter přidáte písmo"
+	},
+	"readerFontSetDefault": {
+		"message": "Nastavit jako výchozí"
+	},
+	"readerFontSize": {
+		"message": "Základní velikost písma"
+	},
+	"readerFontSystem": {
+		"message": "Systémové"
+	},
+	"readerFontSystemSans": {
+		"message": "Bezpatkové"
+	},
+	"readerFontSystemSerif": {
+		"message": "Patkové"
+	},
+	"readerFonts": {
+		"message": "Písma"
+	},
+	"readerFootnotes": {
+		"message": "Poznámky pod čarou"
+	},
+	"readerHighlightActiveLine": {
+		"message": "Zvýraznit aktivní řádek"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "Během přehrávání zvýraznit aktuální větu v přepisu."
+	},
+	"readerImages": {
+		"message": "Obrázky"
+	},
+	"readerLineHeight": {
+		"message": "Výška řádku"
+	},
+	"readerLineWidth": {
+		"message": "Šířka řádku"
+	},
+	"readerLoadFailed": {
+		"message": "Nepodařilo se načíst. Stránka může být blokována vaším prohlížečem."
+	},
+	"readerLoading": {
+		"message": "Zjednodušování…"
+	},
+	"readerOn": {
+		"message": "Čtečka"
+	},
+	"readerPinPlayer": {
+		"message": "Připnout přehrávač"
+	},
+	"readerPinPlayerDescription": {
+		"message": "Ponechat video přehrávač viditelný při posouvání přepisu."
+	},
+	"readerSettings": {
+		"message": "Nastavení čtečky"
+	},
+	"readerTheme": {
+		"message": "Motiv"
+	},
+	"readerThemeDescription": {
+		"message": "Vyberte barvy používané v režimu čtení."
+	},
+	"readerThemeSection": {
+		"message": "Motiv"
+	},
+	"readerTranscripts": {
+		"message": "Přepisy"
+	},
+	"readerTypography": {
+		"message": "Typografie"
+	},
+	"readerUrlPlaceholder": {
+		"message": "Vložte URL ke čtení…"
+	},
+	"readerViewFullSize": {
+		"message": "Zobrazit v plné velikosti"
+	},
 	"recommended": {
 		"message": "doporučeno"
 	},
@@ -658,6 +888,9 @@
 	},
 	"saveFile": {
 		"message": "Uložit soubor..."
+	},
+	"searchHighlightsPlaceholder": {
+		"message": "Hledat ve zvýrazněných pasážích…"
 	},
 	"searchVariables": {
 		"message": "Hledat proměnné..."
@@ -719,17 +952,47 @@
 	"silentOpenDescription": {
 		"message": "Zachycené poznámky budou uloženy, ale neotevřou se v nové kartě. Obsidian bude stále přesunut do popředí."
 	},
+	"sort": {
+		"message": "Seřadit"
+	},
+	"sortAZ": {
+		"message": "A až Z"
+	},
+	"sortNewOld": {
+		"message": "Nejnovější první"
+	},
+	"sortOldNew": {
+		"message": "Nejstarší první"
+	},
+	"sortZA": {
+		"message": "Z až A"
+	},
 	"specificNoteName": {
 		"message": "Konkrétní název poznámky"
 	},
 	"systemDefault": {
 		"message": "Výchozí systémové nastavení"
 	},
+	"template": {
+		"message": "Šablona"
+	},
 	"templateCopied": {
 		"message": "Šablona JSON zkopírována do schránky"
 	},
 	"templateCopyError": {
 		"message": "Nepodařilo se zkopírovat šablonu JSON do schránky"
+	},
+	"templateErrorCount": {
+		"message": "Ve vaší šabloně je chyba."
+	},
+	"templateErrorsCount": {
+		"message": "Ve vaší šabloně jsou $1 chyby."
+	},
+	"templateGroupContent": {
+		"message": "Obsah"
+	},
+	"templateGroupLocation": {
+		"message": "Umístění"
 	},
 	"templateName": {
 		"message": "Název šablony"
@@ -745,6 +1008,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "Definujte pravidla pro automatický výběr této šablony, pokud odpovídá vzoru URL nebo obsahuje data schema.org. Jedno pravidlo na řádek."
+	},
+	"templateValid": {
+		"message": "Syntaxe šablony je platná"
 	},
 	"templatesHeading": {
 		"message": "Šablony"

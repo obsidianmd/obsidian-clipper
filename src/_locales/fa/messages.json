@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "پیشرفته"
 	},
+	"allHighlights": {
+		"message": "همهٔ هایلایت‌ها"
+	},
 	"allProperties": {
 		"message": "همه خواص"
 	},
@@ -58,9 +61,6 @@
 	},
 	"behavior": {
 		"message": "رفتار"
-	},
-	"behaviorWarning": {
-		"message": "افزودن به یادداشت موجود یا یادداشت روزانه به ابسیدین  ورژن ۱.۷.۲ یا بالاتر نیاز دارد"
 	},
 	"byDay": {
 		"message": "روزها"
@@ -103,6 +103,14 @@
 			},
 			"strong_start": {
 				"content": "<strong>"
+			}
+		}
+	},
+	"clipboardError": {
+		"message": "اوبسیدین نمی‌تواند به کلیپ‌بورد شما دسترسی پیدا کند. دستورالعمل‌های عیب‌یابی را اینجا امتحان کنید: $1",
+		"placeholders": {
+			"1": {
+				"content": "$1"
 			}
 		}
 	},
@@ -157,6 +165,15 @@
 	"delete": {
 		"message": "حذف کن"
 	},
+	"deleteAllHighlightsConfirm": {
+		"message": "آیا مطمئن هستید که می‌خواهید همهٔ هایلایت‌ها را حذف کنید؟"
+	},
+	"deleteHighlightsForDomain": {
+		"message": "همهٔ هایلایت‌های این دامنه حذف شوند؟"
+	},
+	"deleteHighlightsForPage": {
+		"message": "همهٔ هایلایت‌های این صفحه حذف شوند؟"
+	},
 	"deleteModelConfirm": {
 		"message": "آیا مطمئن هستید که می‌خواهید این مدل را حذف کنید؟"
 	},
@@ -192,6 +209,9 @@
 	"earlyAccessFeatures": {
 		"message": "ویژگی‌های نسخه زودرس"
 	},
+	"edit": {
+		"message": "ویرایش"
+	},
 	"editModel": {
 		"message": "ویرایش مدل"
 	},
@@ -201,8 +221,8 @@
 	"editTemplate": {
 		"message": "ویرایش قالب"
 	},
-	"enableHighlighter": {
-		"message": "مارکر جملات روشن را فعال کن"
+	"embedded": {
+		"message": "درون خطی"
 	},
 	"enableHighlighterDescription": {
 		"message": "محتوایی را که می‌خواهید در ابسیدین ذخیره کنید را برجسته کنید"
@@ -346,11 +366,23 @@
 	"highlightPage": {
 		"message": "صحفه را برجسته کن"
 	},
+	"highlightSelection": {
+		"message": "هایلایت"
+	},
 	"highlighter": {
 		"message": "مارکر"
 	},
+	"highlighterOn": {
+		"message": "هایلایتر"
+	},
 	"highlighterSettings": {
 		"message": "مارکر"
+	},
+	"highlights": {
+		"message": "هایلایت‌ها"
+	},
+	"highlightsNotFound": {
+		"message": "هایلایت‌ها در مقاله پیدا نشدند"
 	},
 	"history": {
 		"message": "تاریخچه"
@@ -437,6 +469,12 @@
 	"legacyModeDescription": {
 		"message": "از روش برش URI سازگار با ابسیدین ۱.۶.۷ یا نسخه قبلی استفاده می کند. توجه داشته باشید که طول محتوایی که می توانید کلیپ کنید توسط مرورگر و سیستم عامل شما محدود است. برخی از صفحات ممکن است بدون هیچ خطایی از کار بیفتند."
 	},
+	"loadArticle": {
+		"message": "خواندن مقاله"
+	},
+	"loading": {
+		"message": "در حال بارگذاری…"
+	},
 	"modelName": {
 		"message": "نام مدل"
 	},
@@ -469,6 +507,9 @@
 	},
 	"noHighlights": {
 		"message": "هیچ کاری نکن"
+	},
+	"noResults": {
+		"message": "نتیجه‌ای یافت نشد"
 	},
 	"noTemplates": {
 		"message": "هیچ قالبی در دسترس نیست لطفا یک قالب در تنظیمات اضافه کنید."
@@ -514,6 +555,24 @@
 	"open": {
 		"message": "باز کردن"
 	},
+	"openBehaviorDescription": {
+		"message": "انتخاب کنید که وب کلیپر به طور پیش فرض چگونه باز می شود."
+	},
+	"openBehaviorTitle": {
+		"message": "رفتار باز کردن"
+	},
+	"openEmbedded": {
+		"message": "باز کردن در صفحه"
+	},
+	"openHighlights": {
+		"message": "باز کردن هایلایت‌ها"
+	},
+	"openReader": {
+		"message": "باز کردن حالت مطالعه"
+	},
+	"openSidePanel": {
+		"message": "باز کردن پنل کناری"
+	},
 	"optional": {
 		"message": "(اختیاری)"
 	},
@@ -547,11 +606,17 @@
 	"popularModelsDescription": {
 		"message": "از مدل‌هایی که بیشتر استفاده می‌شوند انتخاب کنید یا جزئیات مدل سفارشی را وارد کنید."
 	},
+	"popup": {
+		"message": "پاپ آپ"
+	},
 	"prependToDaily": {
 		"message": "به یادداشت روزانه، از اول اضافه کنید"
 	},
 	"prependToExisting": {
 		"message": "به یادداشت موجود، از اول اضافه کنید"
+	},
+	"preview": {
+		"message": "پیش‌نمایش"
 	},
 	"processing": {
 		"message": "در حال پردازش"
@@ -564,6 +629,24 @@
 	},
 	"propertyName": {
 		"message": "نام خاص"
+	},
+	"propertyTypeCheckbox": {
+		"message": "چک‌باکس"
+	},
+	"propertyTypeDate": {
+		"message": "تاریخ"
+	},
+	"propertyTypeDatetime": {
+		"message": "تاریخ و زمان"
+	},
+	"propertyTypeMultitext": {
+		"message": "لیست"
+	},
+	"propertyTypeNumber": {
+		"message": "عدد"
+	},
+	"propertyTypeText": {
+		"message": "متن"
 	},
 	"propertyValue": {
 		"message": "مقدار خاص"
@@ -616,6 +699,153 @@
 	"reader": {
 		"message": "خواننده"
 	},
+	"readerAppearance": {
+		"message": "ظاهر"
+	},
+	"readerAppearanceAuto": {
+		"message": "خودکار"
+	},
+	"readerAppearanceDark": {
+		"message": "تیره"
+	},
+	"readerAppearanceDescription": {
+		"message": "ظاهر روشن یا تیره را انتخاب کنید."
+	},
+	"readerAppearanceLight": {
+		"message": "روشن"
+	},
+	"readerAutoScroll": {
+		"message": "پیمایش خودکار"
+	},
+	"readerAutoScrollDescription": {
+		"message": "رونوشت را به‌صورت خودکار پیمایش می‌کند تا با پخش هماهنگ باشد."
+	},
+	"readerBlendImages": {
+		"message": "ترکیب تصاویر"
+	},
+	"readerBlendImagesDescription": {
+		"message": "تصاویر را با پس‌زمینهٔ صفحه ترکیب کنید."
+	},
+	"readerCloseImageViewer": {
+		"message": "بستن نمایشگر تصویر"
+	},
+	"readerCollapseComment": {
+		"message": "جمع کردن نظر"
+	},
+	"readerColorLinks": {
+		"message": "رنگی کردن پیوندها"
+	},
+	"readerColorSchemeDefault": {
+		"message": "پیش‌فرض"
+	},
+	"readerCurrentPosition": {
+		"message": "موقعیت فعلی"
+	},
+	"readerCustomCss": {
+		"message": "CSS سفارشی"
+	},
+	"readerCustomCssDescription": {
+		"message": "CSS که به‌طور خودکار در نمای خواندن اعمال می‌شود."
+	},
+	"readerDarkTheme": {
+		"message": "پوستهٔ حالت تیره"
+	},
+	"readerDarkThemeDescription": {
+		"message": "در حالت تیره از پوستهٔ دیگری استفاده کنید."
+	},
+	"readerError": {
+		"message": "استخراج محتوا ناموفق بود."
+	},
+	"readerFont": {
+		"message": "گزینه‌های فونت"
+	},
+	"readerFontDefault": {
+		"message": "پیش‌فرض"
+	},
+	"readerFontDescription": {
+		"message": "فونت‌های نصب‌شده روی سیستم خود را اضافه کنید. برای افزودن فونت، Enter را بزنید."
+	},
+	"readerFontNotFound": {
+		"message": "یافت نشد"
+	},
+	"readerFontPlaceholder": {
+		"message": "برای افزودن فونت، Enter را بزنید"
+	},
+	"readerFontSetDefault": {
+		"message": "تنظیم به‌عنوان پیش‌فرض"
+	},
+	"readerFontSize": {
+		"message": "اندازهٔ پایهٔ فونت"
+	},
+	"readerFontSystem": {
+		"message": "سیستم"
+	},
+	"readerFontSystemSans": {
+		"message": "Sans-serif"
+	},
+	"readerFontSystemSerif": {
+		"message": "Serif"
+	},
+	"readerFonts": {
+		"message": "فونت‌ها"
+	},
+	"readerFootnotes": {
+		"message": "پانویس‌ها"
+	},
+	"readerHighlightActiveLine": {
+		"message": "برجسته‌سازی خط فعال"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "در هنگام پخش، جملهٔ فعلی را در رونوشت برجسته می‌کند."
+	},
+	"readerImages": {
+		"message": "تصاویر"
+	},
+	"readerLineHeight": {
+		"message": "ارتفاع خط"
+	},
+	"readerLineWidth": {
+		"message": "عرض خط"
+	},
+	"readerLoadFailed": {
+		"message": "بارگذاری ناموفق بود. ممکن است صفحه توسط مرورگر شما مسدود شده باشد."
+	},
+	"readerLoading": {
+		"message": "در حال ساده‌سازی…"
+	},
+	"readerOn": {
+		"message": "حالت مطالعه"
+	},
+	"readerPinPlayer": {
+		"message": "سنجاق کردن پخش‌کننده"
+	},
+	"readerPinPlayerDescription": {
+		"message": "هنگام پیمایش در رونوشت، پخش‌کنندهٔ ویدیو را قابل مشاهده نگه می‌دارد."
+	},
+	"readerSettings": {
+		"message": "تنظیمات خواننده"
+	},
+	"readerTheme": {
+		"message": "پوسته"
+	},
+	"readerThemeDescription": {
+		"message": "رنگ‌های استفاده‌شده در نمای خواندن را انتخاب کنید."
+	},
+	"readerThemeSection": {
+		"message": "پوسته"
+	},
+	"readerTranscripts": {
+		"message": "رونوشت‌ها"
+	},
+	"readerTypography": {
+		"message": "تایپوگرافی"
+	},
+	"readerUrlPlaceholder": {
+		"message": "برای خواندن، یک URL را جای‌گذاری کنید…"
+	},
+	"readerViewFullSize": {
+		"message": "نمایش در اندازهٔ کامل"
+	},
 	"recommended": {
 		"message": "توصیه شده"
 	},
@@ -666,6 +896,9 @@
 	},
 	"saveFile": {
 		"message": "ذخیره فایل..."
+	},
+	"searchHighlightsPlaceholder": {
+		"message": "جستجوی هایلایت‌ها…"
 	},
 	"searchVariables": {
 		"message": "جستجوی متغیرها..."
@@ -727,17 +960,47 @@
 	"silentOpenDescription": {
 		"message": "یادداشت های بریده شده ذخیره می شوند اما به عنوان یک برگه جدید باز نمی شوند. ابسیدین همچنان در پیش زمینه قرار خواهد گرفت."
 	},
+	"sort": {
+		"message": "مرتب‌سازی"
+	},
+	"sortAZ": {
+		"message": "از A تا Z"
+	},
+	"sortNewOld": {
+		"message": "جدیدترین‌ها اول"
+	},
+	"sortOldNew": {
+		"message": "قدیمی‌ترین‌ها اول"
+	},
+	"sortZA": {
+		"message": "از Z تا A"
+	},
 	"specificNoteName": {
 		"message": "نام یادداشت خاص"
 	},
 	"systemDefault": {
 		"message": "سیستم"
 	},
+	"template": {
+		"message": "قالب"
+	},
 	"templateCopied": {
 		"message": "قالب JSON به کلیپ بورد کپی شد"
 	},
 	"templateCopyError": {
 		"message": "کپی کردن قالب JSON به کلیپ بورد با شکست مواجه شد"
+	},
+	"templateErrorCount": {
+		"message": "یک خطا در قالب شما وجود دارد."
+	},
+	"templateErrorsCount": {
+		"message": "$1 خطا در قالب شما وجود دارد."
+	},
+	"templateGroupContent": {
+		"message": "محتوا"
+	},
+	"templateGroupLocation": {
+		"message": "مکان"
 	},
 	"templateName": {
 		"message": "نام قالب"
@@ -753,6 +1016,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "قوانینی را تعریف کنید که وقتی URL با آن مطابق باشد این قالب انتخاب شود. فقط یک قانون در هر خط."
+	},
+	"templateValid": {
+		"message": "نحو قالب معتبر است"
 	},
 	"templatesHeading": {
 		"message": "قالب‌ها"

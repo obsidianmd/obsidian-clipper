@@ -1,0 +1,102 @@
+
+.obsidian-reader-outline {
+	font-family: var(--font-ui);
+	box-sizing: border-box;
+	background: var(--background-primary);
+	position: sticky;
+	top: 0;
+	height: 100vh;
+	min-width: 180px;
+	padding: max(4rem, 4vh) var(--size-4-5) var(--size-4-5) var(--size-4-5);
+	padding-inline-end: var(--size-4-2);
+	overflow-y: auto;
+	font-size: var(--font-ui-small);
+	user-select: none;
+	-webkit-user-select: none;
+	&:empty {
+		display: none;
+	}
+}
+.obsidian-reader-outline-item {
+	color: var(--text-muted);
+	cursor: pointer;
+	text-wrap-style: pretty;
+	padding: 5px var(--size-4-2);
+	border-radius: var(--radius-s);
+	line-height: 1.15;
+	max-width: 220px;
+
+	// Depth-based indentation
+	&[data-depth="0"] {
+		padding-left: 8px;
+	}
+	&[data-depth="1"] {
+		padding-left: 24px;
+	}
+	&[data-depth="2"] {
+		padding-left: 40px;
+	}
+	&[data-depth="3"] {
+		padding-left: 56px;
+	}
+	&[data-depth="4"] {
+		padding-left: 72px;
+	}
+}
+.obsidian-reader-outline-item:hover {
+	color: var(--text-normal);
+}
+.obsidian-reader-outline-item.active {
+	color: var(--text-normal);
+	transition: color 0.1s ease;
+}
+.obsidian-reader-outline-item.in-progress {
+	position: relative;
+	&::before {
+		content: '';
+		position: absolute;
+		left: 4px;
+		top: calc(5px + 0.575em - 1px);
+		width: 12px;
+		height: 2px;
+		background: var(--color-red);
+		mix-blend-mode: var(--mix-blend-mode);
+	}
+}
+.obsidian-reader-outline-item.faint {
+	color: var(--text-faint);
+}
+.obsidian-reader-outline-item.faint:hover {
+	color: var(--text-muted);
+}
+
+.obsidian-reader-outline-overlay {
+	display: none;
+}
+
+@media (max-width: 768px) {
+	.obsidian-reader-outline-overlay {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: var(--background-primary);
+		z-index: var(--layer-popover);
+		padding: calc(var(--safe-area-inset-top) + 80px) var(--size-4-5) var(--size-4-5);
+		overflow-y: auto;
+		-webkit-overflow-scrolling: touch;
+		display: none;
+		&.is-open {
+			display: block;
+		}
+		.obsidian-reader-outline-item {
+			padding-block: 10px;
+			font-size: 0.95em;
+            max-width: 100%;
+			&.active {
+				font-weight: 600;
+			}
+		}
+	}
+}

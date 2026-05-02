@@ -2,7 +2,6 @@
 
 * {
 	box-sizing: border-box;
-	font-family: var(--font-default);
 }
 
 html {
@@ -15,6 +14,7 @@ body {
 	background-color: var(--background-primary);
 	color: var(--text-normal);
 	line-height: 1.4;
+	font-family: var(--font-default);
 	font-size: var(--font-ui-medium);
 }
 
@@ -34,7 +34,11 @@ body {
 @import 'styles/properties';
 @import 'styles/rtl';
 @import 'styles/safari';
+@import 'styles/reader-themes';
+@import 'styles/highlights';
+@import 'styles/reader-view';
 @import 'styles/settings';
+@import 'styles/hoardersettings';
 @import 'styles/side-panel';
 @import 'styles/templates';
 @import 'styles/tree-items';
@@ -65,10 +69,7 @@ h2 {
 h3 {
 	font-size: 1rem;
 	font-weight: 600;
-	margin-top: 1.5rem;
-	margin-bottom: 8px;
-	border-bottom: 1px solid var(--background-modifier-border);
-	padding-bottom: 0.5rem;
+	padding-inline: 1rem;
 }
 h4 {
 	font-size: var(--font-ui-medium);

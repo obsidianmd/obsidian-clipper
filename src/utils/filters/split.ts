@@ -7,7 +7,7 @@ export const split = (str: string, param?: string): string => {
 	// Remove outer parentheses if present
 	param = param.replace(/^\((.*)\)$/, '$1');
 	// Remove surrounding quotes (both single and double)
-	param = param.replace(/^(['"])(.*)\1$/, '$2');
+	param = param.replace(/^(['"])([\s\S]*)\1$/, '$2');
 
 	// If param is a single character, use it directly
 	const separator = param.length === 1 ? param : new RegExp(param);

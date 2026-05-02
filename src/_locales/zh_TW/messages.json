@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "進階"
 	},
+	"allHighlights": {
+		"message": "所有螢光標記"
+	},
 	"allProperties": {
 		"message": "所有屬性"
 	},
@@ -58,9 +61,6 @@
 	},
 	"behavior": {
 		"message": "行為"
-	},
-	"behaviorWarning": {
-		"message": "新增到現有筆記或每日筆記需要 Obsidian 1.7.2 或更高版本。"
 	},
 	"byDay": {
 		"message": "天"
@@ -103,6 +103,14 @@
 			},
 			"strong_start": {
 				"content": "<strong>"
+			}
+		}
+	},
+	"clipboardError": {
+		"message": "Obsidian 無法存取您的剪貼簿。請嘗試依照此處的疑難排解指示操作：$1",
+		"placeholders": {
+			"1": {
+				"content": "$1"
 			}
 		}
 	},
@@ -157,6 +165,15 @@
 	"delete": {
 		"message": "刪除"
 	},
+	"deleteAllHighlightsConfirm": {
+		"message": "確定要刪除所有螢光標記嗎？"
+	},
+	"deleteHighlightsForDomain": {
+		"message": "要刪除此網域的所有螢光標記嗎？"
+	},
+	"deleteHighlightsForPage": {
+		"message": "要刪除此頁面的所有螢光標記嗎？"
+	},
 	"deleteModelConfirm": {
 		"message": "您確定要刪除此模型嗎？"
 	},
@@ -192,6 +209,9 @@
 	"earlyAccessFeatures": {
 		"message": "早期訪問功能"
 	},
+	"edit": {
+		"message": "編輯"
+	},
 	"editModel": {
 		"message": "編輯模型"
 	},
@@ -201,8 +221,8 @@
 	"editTemplate": {
 		"message": "編輯範本"
 	},
-	"enableHighlighter": {
-		"message": "啟用標記"
+	"embedded": {
+		"message": "嵌入式"
 	},
 	"enableHighlighterDescription": {
 		"message": "在網頁上標記內容，您可以將其儲存到 Obsidian。"
@@ -346,11 +366,23 @@
 	"highlightPage": {
 		"message": "標記頁面"
 	},
+	"highlightSelection": {
+		"message": "螢光標記"
+	},
 	"highlighter": {
 		"message": "標記工具"
 	},
+	"highlighterOn": {
+		"message": "螢光筆"
+	},
 	"highlighterSettings": {
 		"message": "標記工具設定"
+	},
+	"highlights": {
+		"message": "螢光標記"
+	},
+	"highlightsNotFound": {
+		"message": "文章中找不到螢光標記"
 	},
 	"history": {
 		"message": "歷史"
@@ -437,6 +469,12 @@
 	"legacyModeDescription": {
 		"message": "使用與 Obsidian 1.6.7 或更早版本相容的 URI 擷取方法。請注意，您可以擷取的內容長度受限於您的瀏覽器和作業系統。有些頁面可能會在沒有任何錯誤的情況下失敗。"
 	},
+	"loadArticle": {
+		"message": "閱讀文章"
+	},
+	"loading": {
+		"message": "載入中…"
+	},
 	"modelName": {
 		"message": "模型名稱"
 	},
@@ -469,6 +507,9 @@
 	},
 	"noHighlights": {
 		"message": "不執行任何操作"
+	},
+	"noResults": {
+		"message": "找不到結果"
 	},
 	"noTemplates": {
 		"message": "沒有可用的範本。請在設定中新增範本。"
@@ -514,6 +555,24 @@
 	"open": {
 		"message": "開啟"
 	},
+	"openBehaviorDescription": {
+		"message": "選擇 Web Clipper 預設的開啟方式。"
+	},
+	"openBehaviorTitle": {
+		"message": "開啟行為"
+	},
+	"openEmbedded": {
+		"message": "在頁面中開啟"
+	},
+	"openHighlights": {
+		"message": "開啟螢光標記"
+	},
+	"openReader": {
+		"message": "開啟閱讀器"
+	},
+	"openSidePanel": {
+		"message": "開啟側邊面板"
+	},
 	"optional": {
 		"message": "（選填）"
 	},
@@ -547,11 +606,17 @@
 	"popularModelsDescription": {
 		"message": "選擇常用模型或輸入自定義模型詳情。"
 	},
+	"popup": {
+		"message": "彈出視窗"
+	},
 	"prependToDaily": {
 		"message": "新增到每日筆記頂部"
 	},
 	"prependToExisting": {
 		"message": "新增到現有筆記頂部"
+	},
+	"preview": {
+		"message": "預覽"
 	},
 	"processing": {
 		"message": "處理中"
@@ -564,6 +629,24 @@
 	},
 	"propertyName": {
 		"message": "屬性名稱"
+	},
+	"propertyTypeCheckbox": {
+		"message": "複選框"
+	},
+	"propertyTypeDate": {
+		"message": "日期"
+	},
+	"propertyTypeDatetime": {
+		"message": "日期與時間"
+	},
+	"propertyTypeMultitext": {
+		"message": "列表"
+	},
+	"propertyTypeNumber": {
+		"message": "數字"
+	},
+	"propertyTypeText": {
+		"message": "文字"
 	},
 	"propertyValue": {
 		"message": "屬性值"
@@ -616,6 +699,153 @@
 	"reader": {
 		"message": "閱讀器"
 	},
+	"readerAppearance": {
+		"message": "外觀"
+	},
+	"readerAppearanceAuto": {
+		"message": "自動"
+	},
+	"readerAppearanceDark": {
+		"message": "深色"
+	},
+	"readerAppearanceDescription": {
+		"message": "選擇淺色或深色外觀。"
+	},
+	"readerAppearanceLight": {
+		"message": "淺色"
+	},
+	"readerAutoScroll": {
+		"message": "自動捲動"
+	},
+	"readerAutoScrollDescription": {
+		"message": "自動捲動逐字稿以跟隨播放進度。"
+	},
+	"readerBlendImages": {
+		"message": "融合圖片"
+	},
+	"readerBlendImagesDescription": {
+		"message": "將圖片與頁面背景融合。"
+	},
+	"readerCloseImageViewer": {
+		"message": "關閉圖片檢視器"
+	},
+	"readerCollapseComment": {
+		"message": "摺疊留言"
+	},
+	"readerColorLinks": {
+		"message": "連結著色"
+	},
+	"readerColorSchemeDefault": {
+		"message": "預設"
+	},
+	"readerCurrentPosition": {
+		"message": "目前位置"
+	},
+	"readerCustomCss": {
+		"message": "自訂 CSS"
+	},
+	"readerCustomCssDescription": {
+		"message": "在閱讀檢視中自動套用的 CSS。"
+	},
+	"readerDarkTheme": {
+		"message": "深色模式主題"
+	},
+	"readerDarkThemeDescription": {
+		"message": "在深色模式中使用不同的主題。"
+	},
+	"readerError": {
+		"message": "無法擷取內容。"
+	},
+	"readerFont": {
+		"message": "字型選項"
+	},
+	"readerFontDefault": {
+		"message": "預設"
+	},
+	"readerFontDescription": {
+		"message": "新增系統已安裝的字型。按 Enter 以新增字型。"
+	},
+	"readerFontNotFound": {
+		"message": "找不到"
+	},
+	"readerFontPlaceholder": {
+		"message": "按 Enter 以新增字型"
+	},
+	"readerFontSetDefault": {
+		"message": "設為預設"
+	},
+	"readerFontSize": {
+		"message": "基礎字型大小"
+	},
+	"readerFontSystem": {
+		"message": "系統"
+	},
+	"readerFontSystemSans": {
+		"message": "無襯線"
+	},
+	"readerFontSystemSerif": {
+		"message": "襯線"
+	},
+	"readerFonts": {
+		"message": "字型"
+	},
+	"readerFootnotes": {
+		"message": "註腳"
+	},
+	"readerHighlightActiveLine": {
+		"message": "醒目標示目前行"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "播放時在逐字稿中醒目標示目前句子。"
+	},
+	"readerImages": {
+		"message": "圖片"
+	},
+	"readerLineHeight": {
+		"message": "行高"
+	},
+	"readerLineWidth": {
+		"message": "行寬"
+	},
+	"readerLoadFailed": {
+		"message": "載入失敗。此頁面可能被您的瀏覽器封鎖。"
+	},
+	"readerLoading": {
+		"message": "正在去除雜訊…"
+	},
+	"readerOn": {
+		"message": "閱讀模式"
+	},
+	"readerPinPlayer": {
+		"message": "釘選播放器"
+	},
+	"readerPinPlayerDescription": {
+		"message": "捲動逐字稿時保持影片播放器可見。"
+	},
+	"readerSettings": {
+		"message": "閱讀器設定"
+	},
+	"readerTheme": {
+		"message": "主題"
+	},
+	"readerThemeDescription": {
+		"message": "選擇閱讀檢視中使用的顏色。"
+	},
+	"readerThemeSection": {
+		"message": "主題"
+	},
+	"readerTranscripts": {
+		"message": "逐字稿"
+	},
+	"readerTypography": {
+		"message": "排版"
+	},
+	"readerUrlPlaceholder": {
+		"message": "貼上要閱讀的 URL…"
+	},
+	"readerViewFullSize": {
+		"message": "檢視原始大小"
+	},
 	"recommended": {
 		"message": "推薦"
 	},
@@ -666,6 +896,9 @@
 	},
 	"saveFile": {
 		"message": "儲存檔案..."
+	},
+	"searchHighlightsPlaceholder": {
+		"message": "搜尋螢光標記…"
 	},
 	"searchVariables": {
 		"message": "搜尋變數..."
@@ -727,17 +960,47 @@
 	"silentOpenDescription": {
 		"message": "擷取的筆記將被儲存但不會開啟為新標籤。Obsidian 仍會被提到上層。"
 	},
+	"sort": {
+		"message": "排序"
+	},
+	"sortAZ": {
+		"message": "A 到 Z"
+	},
+	"sortNewOld": {
+		"message": "最新優先"
+	},
+	"sortOldNew": {
+		"message": "最舊優先"
+	},
+	"sortZA": {
+		"message": "Z 到 A"
+	},
 	"specificNoteName": {
 		"message": "特定筆記名稱"
 	},
 	"systemDefault": {
 		"message": "系統"
 	},
+	"template": {
+		"message": "範本"
+	},
 	"templateCopied": {
 		"message": "已將模板 JSON 複製到剪貼簿"
 	},
 	"templateCopyError": {
 		"message": "無法將模板 JSON 複製到剪貼簿"
+	},
+	"templateErrorCount": {
+		"message": "您的範本中有一個錯誤。"
+	},
+	"templateErrorsCount": {
+		"message": "您的範本中有 $1 個錯誤。"
+	},
+	"templateGroupContent": {
+		"message": "內容"
+	},
+	"templateGroupLocation": {
+		"message": "位置"
 	},
 	"templateName": {
 		"message": "範本名稱"
@@ -753,6 +1016,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "定義規則以自動選擇此範本，如果它符合 URL 模式或包含 schema.org 資料。每行一個規則。"
+	},
+	"templateValid": {
+		"message": "範本語法有效"
 	},
 	"templatesHeading": {
 		"message": "範本"

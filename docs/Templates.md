@@ -10,13 +10,13 @@ To **create** a template go to Web Clipper settings and click the **New template
 
 To **edit** a template choose a template from the sidebar. Your changes will be saved automatically.
 
-Templates make use of [[Variables]] and [[Filters]], which allow you to tailor how content will be saved.
+Templates make use of [[Variables]], [[Filters]], and [[Logic]], which allow you to tailor how content will be saved.
 
 ## Import and export Web Clipper templates
 
 To import a template:
 
-1. Open the extension and click the **Settings** cog icon.
+1. Open the extension and click the **[[Settings]]** cog icon.
 2. Go to any template in the list.
 3. Click **Import** in the top right or drag and drop your `.json` template file(s) anywhere in the template area.
 
@@ -62,4 +62,4 @@ Schema.org values can also be used to [[Variables#Schema.org variables|pre-popul
 
 ### Interpreter context
 
-When [[Interpret web pages|Interpreter]] is enabled, you can use [[Variables#Prompt variables|prompt variables]] to extract page content with natural language. For each template you can define the [[Interpret web pages#Context|context]] that Interpreter has access too. 
+When [[Interpret web pages|Interpreter]] is enabled, you can use [[Variables#Prompt variables|prompt variables]] to extract page content with natural language. For each template you can define the [[Interpret web pages#Context|context]] that Interpreter has access too.

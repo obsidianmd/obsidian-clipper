@@ -36,7 +36,7 @@ Interpreter works with almost any language model provider, including options tha
 
 ## How it works
 
-When Interpreter is enabled *and* your template contains prompt variables, a new Interpreter section is displayed in the extension window, above the **Add to Obsidian** button. This section allows you to select a model and run Interpreter for the current page.
+When Interpreter is enabled *and* your template contains [[Variables#Prompt variables|prompt variables]], a new Interpreter section is displayed in the extension window, above the **Add to Obsidian** button. This section lets you select a model and run Interpreter for the current page.
 
 When you click **interpret**, Interpreter sends the page context to your selected model, along with *all* the prompts in your template in one request. Depending on the model provider you choose, this can be an external call or local to your device. The model evaluates your prompts against the page context, and returns its responses. Interpreter then replaces the prompt variables with the response data.
 
@@ -74,9 +74,12 @@ Interpreter includes several preset providers. To use these providers you need a
 | DeepSeek           | [API key](https://platform.deepseek.com/api_keys)           | [Models](https://api-docs.deepseek.com/quick_start/pricing)                          |
 | Google&nbsp;Gemini | [API&nbsp;key](https://aistudio.google.com/apikey)          | [Models](https://ai.google.dev/gemini-api/docs/models/gemini)                        |
 | Hugging Face       | [API key](https://huggingface.co/settings/tokens)           | [Models](https://huggingface.co/models?pipeline_tag=text-generation&sort=trending)   |
+| Meta               | [API key](https://llama.developer.meta.com)                 | [Models](https://llama.developer.meta.com/docs/models)                               |
 | Ollama             | n/a                                                         | [Models](https://ollama.com/search)                                                  |
 | OpenAI             | [API&nbsp;key](https://platform.openai.com/api-keys)        | [Models](https://platform.openai.com/docs/models)                                    |
 | OpenRouter         | [API&nbsp;key](https://openrouter.ai/settings/keys)         | [Models](https://openrouter.ai/models)                                               |
+| Perplexity         | [API key](https://www.perplexity.ai/settings/api)           | [Models](https://docs.perplexity.ai/guides/model-cards)                              |
+| xAI Grok           | [API key](https://console.x.ai/team/default/api-keys)       | [Models](https://docs.x.ai/docs/models)                                              |
 
 ### Choosing a model
 
@@ -84,7 +87,7 @@ In general we recommend using small models with Web Clipper because they are fas
 
 ### Custom providers and models
 
-To add a custom provider and/or model go to Web Clipper **Settings** → **Interpreter**:
+To add a custom provider and/or model go to Web Clipper **[[Settings]]** → **Interpreter**:
 
 - **Add provider** to configure preset and custom providers.
 - **Add model** to configure preset and custom models.
@@ -97,7 +100,7 @@ Interpreter can use local models which offer greater privacy and offline compati
 
 #### Ollama
 
-[Ollama](https://ollama.com/) allows you to run language models locally and privately on your device. 
+[Ollama](https://ollama.com/) lets you run language models locally and privately on your device. 
 
 Once you have downloaded and installed Ollama, add Ollama using **Add provider** in Interpreter settings. Ollama does not require an API key. Then choose a model from the [model list](https://ollama.com/search). For example if you want to use [Llama 3.2](https://ollama.com/library/llama3.2), click **Add model**, then:
 
@@ -121,3 +124,9 @@ Then run your model with Ollama the normal way, e.g.
 ollama run llama3.2
 ```
 
+**Context length**
+
+Ollama's context window defaults to 2048 tokens. This is the maximum number of tokens for the message and response. When clipping a long web page you can easily exceed this limit. Ollama will silently fail and return irrelevant results. Some options:
+
+- Increase Ollama's `num_ctx` parameter. Be mindful that longer context requires more memory.
+- Use the [[#Context]] field in your template to provide a more targeted section of the page, or trim the context using a [[Filters|filter]] e.g. `{{content|slice:0,1000}}`.

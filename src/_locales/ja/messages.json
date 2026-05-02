@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "詳細設定"
 	},
+	"allHighlights": {
+		"message": "すべてのハイライト"
+	},
 	"allProperties": {
 		"message": "すべてのプロパティ"
 	},
@@ -58,9 +61,6 @@
 	},
 	"behavior": {
 		"message": "動作"
-	},
-	"behaviorWarning": {
-		"message": "既存のノートやデイリーノートへの追加にはObsidian 1.7.2以降が必要です。"
 	},
 	"byDay": {
 		"message": "日別"
@@ -103,6 +103,14 @@
 			},
 			"strong_start": {
 				"content": "<strong>"
+			}
+		}
+	},
+	"clipboardError": {
+		"message": "Obsidian がクリップボードにアクセスできません。こちらのトラブルシューティング手順をお試しください: $1",
+		"placeholders": {
+			"1": {
+				"content": "$1"
 			}
 		}
 	},
@@ -157,6 +165,15 @@
 	"delete": {
 		"message": "削除"
 	},
+	"deleteAllHighlightsConfirm": {
+		"message": "すべてのハイライトを削除してもよろしいですか？"
+	},
+	"deleteHighlightsForDomain": {
+		"message": "このドメインのハイライトをすべて削除しますか？"
+	},
+	"deleteHighlightsForPage": {
+		"message": "このページのハイライトをすべて削除しますか？"
+	},
 	"deleteModelConfirm": {
 		"message": "このモデルを削除してもよろしいですか？"
 	},
@@ -192,6 +209,9 @@
 	"earlyAccessFeatures": {
 		"message": "アーリーアクセス機能"
 	},
+	"edit": {
+		"message": "編集"
+	},
 	"editModel": {
 		"message": "モデルを編集"
 	},
@@ -201,8 +221,8 @@
 	"editTemplate": {
 		"message": "テンプレートを編集"
 	},
-	"enableHighlighter": {
-		"message": "ハイライトを有効化"
+	"embedded": {
+		"message": "埋め込み"
 	},
 	"enableHighlighterDescription": {
 		"message": "WebページのコンテンツをハイライトしてObsidianに保存できます。"
@@ -341,16 +361,28 @@
 		"message": "Web Clipperの使い方とトラブルシューティングのヘルプを参照してください。"
 	},
 	"highlightInline": {
-		"message": "ページ内容を高亮表示"
+		"message": "ページ内容をハイライトする"
 	},
 	"highlightPage": {
 		"message": "ページをハイライト"
 	},
+	"highlightSelection": {
+		"message": "ハイライト"
+	},
 	"highlighter": {
+		"message": "ハイライト"
+	},
+	"highlighterOn": {
 		"message": "ハイライト"
 	},
 	"highlighterSettings": {
 		"message": "ハイライト"
+	},
+	"highlights": {
+		"message": "ハイライト"
+	},
+	"highlightsNotFound": {
+		"message": "記事内にハイライトが見つかりません"
 	},
 	"history": {
 		"message": "履歴"
@@ -437,6 +469,12 @@
 	"legacyModeDescription": {
 		"message": "Obsidian 1.6.7以前と互換性のあるURIクリップ方式を使用します。クリップできるコンテンツの長さはブラウザとOSによって制限されます。エラーなしに失敗する場合があります。"
 	},
+	"loadArticle": {
+		"message": "記事を読む"
+	},
+	"loading": {
+		"message": "読み込み中…"
+	},
 	"modelName": {
 		"message": "モデル名"
 	},
@@ -469,6 +507,9 @@
 	},
 	"noHighlights": {
 		"message": "何もしない"
+	},
+	"noResults": {
+		"message": "結果が見つかりません"
 	},
 	"noTemplates": {
 		"message": "テンプレートがありません。設定でテンプレートを追加してください。"
@@ -514,6 +555,24 @@
 	"open": {
 		"message": "開く"
 	},
+	"openBehaviorDescription": {
+		"message": "Web Clipperがデフォルトでどのように開くかを選択します。"
+	},
+	"openBehaviorTitle": {
+		"message": "開く動作"
+	},
+	"openEmbedded": {
+		"message": "ページ内で開く"
+	},
+	"openHighlights": {
+		"message": "ハイライトを開く"
+	},
+	"openReader": {
+		"message": "リーダーを開く"
+	},
+	"openSidePanel": {
+		"message": "サイドパネルを開く"
+	},
 	"optional": {
 		"message": "(オプション)"
 	},
@@ -547,11 +606,17 @@
 	"popularModelsDescription": {
 		"message": "よく使用されるモデルから選択するか、カスタムモデルの詳細を入力してください。"
 	},
+	"popup": {
+		"message": "ポップアップ"
+	},
 	"prependToDaily": {
 		"message": "デイリーノートの先頭に追加"
 	},
 	"prependToExisting": {
 		"message": "既存のノートの先頭に追加"
+	},
+	"preview": {
+		"message": "プレビュー"
 	},
 	"processing": {
 		"message": "処理中"
@@ -564,6 +629,24 @@
 	},
 	"propertyName": {
 		"message": "プロパティ名"
+	},
+	"propertyTypeCheckbox": {
+		"message": "チェックボックス"
+	},
+	"propertyTypeDate": {
+		"message": "日付"
+	},
+	"propertyTypeDatetime": {
+		"message": "日付＆時間"
+	},
+	"propertyTypeMultitext": {
+		"message": "リスト"
+	},
+	"propertyTypeNumber": {
+		"message": "番号"
+	},
+	"propertyTypeText": {
+		"message": "テキスト"
 	},
 	"propertyValue": {
 		"message": "プロパティ値"
@@ -616,6 +699,153 @@
 	"reader": {
 		"message": "リーダー"
 	},
+	"readerAppearance": {
+		"message": "外観"
+	},
+	"readerAppearanceAuto": {
+		"message": "自動"
+	},
+	"readerAppearanceDark": {
+		"message": "ダーク"
+	},
+	"readerAppearanceDescription": {
+		"message": "ライトまたはダークの外観を選択します。"
+	},
+	"readerAppearanceLight": {
+		"message": "ライト"
+	},
+	"readerAutoScroll": {
+		"message": "自動スクロール"
+	},
+	"readerAutoScrollDescription": {
+		"message": "再生に合わせて文字起こしを自動的にスクロールします。"
+	},
+	"readerBlendImages": {
+		"message": "画像を背景になじませる"
+	},
+	"readerBlendImagesDescription": {
+		"message": "画像をページの背景に溶け込ませます。"
+	},
+	"readerCloseImageViewer": {
+		"message": "画像ビューアを閉じる"
+	},
+	"readerCollapseComment": {
+		"message": "コメントを折りたたむ"
+	},
+	"readerColorLinks": {
+		"message": "リンクに色を付ける"
+	},
+	"readerColorSchemeDefault": {
+		"message": "デフォルト"
+	},
+	"readerCurrentPosition": {
+		"message": "現在位置"
+	},
+	"readerCustomCss": {
+		"message": "カスタムCSS"
+	},
+	"readerCustomCssDescription": {
+		"message": "読み取りビューで自動的に適用されるCSSです。"
+	},
+	"readerDarkTheme": {
+		"message": "ダークモードのテーマ"
+	},
+	"readerDarkThemeDescription": {
+		"message": "ダークモードで別のテーマを使用します。"
+	},
+	"readerError": {
+		"message": "コンテンツの抽出に失敗しました。"
+	},
+	"readerFont": {
+		"message": "フォントオプション"
+	},
+	"readerFontDefault": {
+		"message": "デフォルト"
+	},
+	"readerFontDescription": {
+		"message": "システムにインストールされているフォントを追加します。Enterキーを押してフォントを追加します。"
+	},
+	"readerFontNotFound": {
+		"message": "見つかりません"
+	},
+	"readerFontPlaceholder": {
+		"message": "Enterキーを押してフォントを追加"
+	},
+	"readerFontSetDefault": {
+		"message": "デフォルトに設定"
+	},
+	"readerFontSize": {
+		"message": "基本フォントサイズ"
+	},
+	"readerFontSystem": {
+		"message": "システム"
+	},
+	"readerFontSystemSans": {
+		"message": "サンセリフ"
+	},
+	"readerFontSystemSerif": {
+		"message": "セリフ"
+	},
+	"readerFonts": {
+		"message": "フォント"
+	},
+	"readerFootnotes": {
+		"message": "脚注"
+	},
+	"readerHighlightActiveLine": {
+		"message": "アクティブ行をハイライト"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "再生中に文字起こし内の現在の文をハイライトします。"
+	},
+	"readerImages": {
+		"message": "画像"
+	},
+	"readerLineHeight": {
+		"message": "行間"
+	},
+	"readerLineWidth": {
+		"message": "行幅"
+	},
+	"readerLoadFailed": {
+		"message": "読み込みに失敗しました。ページがブラウザによってブロックされている可能性があります。"
+	},
+	"readerLoading": {
+		"message": "読みやすくしています…"
+	},
+	"readerOn": {
+		"message": "リーダー"
+	},
+	"readerPinPlayer": {
+		"message": "プレーヤーを固定"
+	},
+	"readerPinPlayerDescription": {
+		"message": "文字起こしをスクロールしている間も動画プレーヤーを表示したままにします。"
+	},
+	"readerSettings": {
+		"message": "リーダー設定"
+	},
+	"readerTheme": {
+		"message": "テーマ"
+	},
+	"readerThemeDescription": {
+		"message": "読み取りビューで使用する色を選択します。"
+	},
+	"readerThemeSection": {
+		"message": "テーマ"
+	},
+	"readerTranscripts": {
+		"message": "文字起こし"
+	},
+	"readerTypography": {
+		"message": "タイポグラフィ"
+	},
+	"readerUrlPlaceholder": {
+		"message": "読むURLを貼り付け…"
+	},
+	"readerViewFullSize": {
+		"message": "フルサイズで表示"
+	},
 	"recommended": {
 		"message": "推奨"
 	},
@@ -666,6 +896,9 @@
 	},
 	"saveFile": {
 		"message": "ファイルを保存..."
+	},
+	"searchHighlightsPlaceholder": {
+		"message": "ハイライトを検索…"
 	},
 	"searchVariables": {
 		"message": "変数を検索..."
@@ -727,17 +960,47 @@
 	"silentOpenDescription": {
 		"message": "クリップしたノートは保存されますが、新しいタブで開きません。Obsidianは引き続き前面に表示されます。"
 	},
+	"sort": {
+		"message": "並べ替え"
+	},
+	"sortAZ": {
+		"message": "A→Z"
+	},
+	"sortNewOld": {
+		"message": "新しい順"
+	},
+	"sortOldNew": {
+		"message": "古い順"
+	},
+	"sortZA": {
+		"message": "Z→A"
+	},
 	"specificNoteName": {
 		"message": "特定のノート名"
 	},
 	"systemDefault": {
 		"message": "システム"
 	},
+	"template": {
+		"message": "テンプレート"
+	},
 	"templateCopied": {
 		"message": "テンプレートのJSONをクリップボードにコピーしました"
 	},
 	"templateCopyError": {
 		"message": "テンプレートのJSONのクリップボードへのコピーに失敗しました"
+	},
+	"templateErrorCount": {
+		"message": "テンプレートにエラーがあります。"
+	},
+	"templateErrorsCount": {
+		"message": "テンプレートに$1件のエラーがあります。"
+	},
+	"templateGroupContent": {
+		"message": "コンテンツ"
+	},
+	"templateGroupLocation": {
+		"message": "場所"
 	},
 	"templateName": {
 		"message": "テンプレート名"
@@ -753,6 +1016,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "URLパターンやschema.orgデータに一致する場合に、このテンプレートを自動的に択するルールを定義します。1行に1つのルールを述してください。"
+	},
+	"templateValid": {
+		"message": "テンプレート構文は有効です"
 	},
 	"templatesHeading": {
 		"message": "テンプレート"

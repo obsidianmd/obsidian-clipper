@@ -4,11 +4,43 @@ export function createElementWithClass(tagName: string, className: string): HTML
 	return element;
 }
 
-export function createElementWithHTML(tagName: string, innerHTML: string, attributes: Record<string, string> = {}): HTMLElement {
+export function createElementWithHTML(tagName: string, htmlContent: string, attributes: Record<string, string> = {}): HTMLElement {
 	const element = document.createElement(tagName);
-	element.innerHTML = innerHTML;
+	if (htmlContent) {
+		setElementHTML(element, htmlContent);
+	}
 	Object.entries(attributes).forEach(([key, value]) => element.setAttribute(key, value));
 	return element;
+}
+
+export function setElementHTML(element: Element, html: string): void {
+	const parsed = new DOMParser().parseFromString(html, 'text/html');
+	element.replaceChildren(...Array.from(parsed.body.childNodes));
+}
+
+export function setSVGChildren(svgElement: Element, markup: string): void {
+	const doc = new DOMParser()
+		.parseFromString(`<svg xmlns="http://www.w3.org/2000/svg">${markup}</svg>`, 'image/svg+xml');
+	const tempSvg = doc.documentElement;
+	svgElement.replaceChildren(
+		...Array.from(tempSvg.childNodes).map(n => svgElement.ownerDocument.importNode(n, true))
+	);
+}
+
+export function serializeChildren(element: Element): string {
+	return Array.from(element.childNodes).map(node => {
+		if (node.nodeType === Node.ELEMENT_NODE) return (node as Element).outerHTML;
+		if (node.nodeType === Node.TEXT_NODE) {
+			return (node.textContent ?? '')
+				.replace(/&/g, '&amp;')
+				.replace(/</g, '&lt;')
+				.replace(/>/g, '&gt;');
+		}
+		if (node.nodeType === Node.COMMENT_NODE) {
+			return `<!--${node.textContent ?? ''}-->`;
+		}
+		return '';
+	}).join('');
 }
 
 export function createOption(value: string, text: string): HTMLOptionElement {
@@ -56,8 +88,11 @@ export function isDarkColor(color: string): boolean {
 
 export function wrapElementWithMark(element: Element): void {
 	const mark = document.createElement('mark');
-	mark.innerHTML = element.innerHTML;
-	element.innerHTML = '';
+
+	while (element.firstChild) {
+		mark.appendChild(element.firstChild);
+	}
+	
 	element.appendChild(mark);
 }
 

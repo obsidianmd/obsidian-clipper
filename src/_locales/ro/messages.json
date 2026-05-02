@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Avansat"
 	},
+	"allHighlights": {
+		"message": "Toate evidențierile"
+	},
 	"allProperties": {
 		"message": "Toate proprietățile"
 	},
@@ -58,9 +61,6 @@
 	},
 	"behavior": {
 		"message": "Comportament"
-	},
-	"behaviorWarning": {
-		"message": "Adăugarea la o notă existentă sau zilnică necesită Obsidian 1.7.2 sau mai nou."
 	},
 	"byDay": {
 		"message": "Zi"
@@ -103,6 +103,14 @@
 			},
 			"strong_start": {
 				"content": "<strong>"
+			}
+		}
+	},
+	"clipboardError": {
+		"message": "Obsidian nu poate accesa clipboardul tău. Încearcă instrucțiunile de depanare de aici: $1",
+		"placeholders": {
+			"1": {
+				"content": "$1"
 			}
 		}
 	},
@@ -157,6 +165,15 @@
 	"delete": {
 		"message": "Șterge"
 	},
+	"deleteAllHighlightsConfirm": {
+		"message": "Sigur doriți să ștergeți toate evidențierile?"
+	},
+	"deleteHighlightsForDomain": {
+		"message": "Ștergeți toate evidențierile pentru acest domeniu?"
+	},
+	"deleteHighlightsForPage": {
+		"message": "Ștergeți toate evidențierile pentru această pagină?"
+	},
 	"deleteModelConfirm": {
 		"message": "Ești sigur că vrei să ștergi acest model?"
 	},
@@ -192,6 +209,9 @@
 	"earlyAccessFeatures": {
 		"message": "Funcții cu acces anticipat"
 	},
+	"edit": {
+		"message": "Editează"
+	},
 	"editModel": {
 		"message": "Editează model"
 	},
@@ -201,8 +221,8 @@
 	"editTemplate": {
 		"message": "Editează șablon"
 	},
-	"enableHighlighter": {
-		"message": "Activează evidențiatorul"
+	"embedded": {
+		"message": "Încorporat"
 	},
 	"enableHighlighterDescription": {
 		"message": "Evidențiază conținut pe pagini web pentru a-l salva în Obsidian"
@@ -346,11 +366,23 @@
 	"highlightPage": {
 		"message": "Evidențiază pagina"
 	},
+	"highlightSelection": {
+		"message": "Evidențiază"
+	},
 	"highlighter": {
+		"message": "Evidențiator"
+	},
+	"highlighterOn": {
 		"message": "Evidențiator"
 	},
 	"highlighterSettings": {
 		"message": "Evidențiator"
+	},
+	"highlights": {
+		"message": "Evidențieri"
+	},
+	"highlightsNotFound": {
+		"message": "Evidențierile nu au fost găsite în articol"
 	},
 	"history": {
 		"message": "Istoric"
@@ -437,6 +469,12 @@
 	"legacyModeDescription": {
 		"message": "Folosește metoda de captură URI compatibilă cu Obsidian 1.6.7 sau mai vechi. Reține că lungimea conținutului capturat este limitată de browser și sistemul de operare. Unele pagini pot eșua fără mesaj de eroare."
 	},
+	"loadArticle": {
+		"message": "Citește articolul"
+	},
+	"loading": {
+		"message": "Se încarcă…"
+	},
 	"modelName": {
 		"message": "Nume model"
 	},
@@ -469,6 +507,9 @@
 	},
 	"noHighlights": {
 		"message": "Nu face nimic"
+	},
+	"noResults": {
+		"message": "Nu s-au găsit rezultate"
 	},
 	"noTemplates": {
 		"message": "Nu există șabloane disponibile. Te rugăm să adaugi un șablon în setări."
@@ -506,6 +547,24 @@
 	"open": {
 		"message": "Deschide"
 	},
+	"openBehaviorDescription": {
+		"message": "Alegeți modul în care Web Clipper se deschide în mod implicit."
+	},
+	"openBehaviorTitle": {
+		"message": "Comportament la deschidere"
+	},
+	"openEmbedded": {
+		"message": "Deschide în pagină"
+	},
+	"openHighlights": {
+		"message": "Deschide evidențierile"
+	},
+	"openReader": {
+		"message": "Deschide Reader"
+	},
+	"openSidePanel": {
+		"message": "Deschide panoul lateral"
+	},
 	"optional": {
 		"message": "(opțional)"
 	},
@@ -539,11 +598,17 @@
 	"popularModelsDescription": {
 		"message": "Alege dintre modelele folosite frecvent sau introdu detaliile unui model personalizat."
 	},
+	"popup": {
+		"message": "Fereastră pop-up"
+	},
 	"prependToDaily": {
 		"message": "Adaugă la nota zilnică, la început"
 	},
 	"prependToExisting": {
 		"message": "Adaugă la nota existentă, la început"
+	},
+	"preview": {
+		"message": "Previzualizare"
 	},
 	"processing": {
 		"message": "Se procesează"
@@ -556,6 +621,24 @@
 	},
 	"propertyName": {
 		"message": "Nume proprietate"
+	},
+	"propertyTypeCheckbox": {
+		"message": "Caseta de selectare"
+	},
+	"propertyTypeDate": {
+		"message": "Data"
+	},
+	"propertyTypeDatetime": {
+		"message": "Data & ora"
+	},
+	"propertyTypeMultitext": {
+		"message": "Lista"
+	},
+	"propertyTypeNumber": {
+		"message": "Număr"
+	},
+	"propertyTypeText": {
+		"message": "Text"
 	},
 	"propertyValue": {
 		"message": "Valoare proprietate"
@@ -608,6 +691,153 @@
 	"reader": {
 		"message": "Cititor"
 	},
+	"readerAppearance": {
+		"message": "Aspect"
+	},
+	"readerAppearanceAuto": {
+		"message": "Automat"
+	},
+	"readerAppearanceDark": {
+		"message": "Întunecat"
+	},
+	"readerAppearanceDescription": {
+		"message": "Alege aspectul deschis sau întunecat."
+	},
+	"readerAppearanceLight": {
+		"message": "Deschis"
+	},
+	"readerAutoScroll": {
+		"message": "Derulare automată"
+	},
+	"readerAutoScrollDescription": {
+		"message": "Derulează automat transcrierea pentru a urmări redarea."
+	},
+	"readerBlendImages": {
+		"message": "Îmbină imaginile"
+	},
+	"readerBlendImagesDescription": {
+		"message": "Îmbină imaginile cu fundalul paginii."
+	},
+	"readerCloseImageViewer": {
+		"message": "Închide vizualizatorul de imagini"
+	},
+	"readerCollapseComment": {
+		"message": "Restrânge comentariul"
+	},
+	"readerColorLinks": {
+		"message": "Colorează linkurile"
+	},
+	"readerColorSchemeDefault": {
+		"message": "Implicit"
+	},
+	"readerCurrentPosition": {
+		"message": "Poziția curentă"
+	},
+	"readerCustomCss": {
+		"message": "CSS personalizat"
+	},
+	"readerCustomCssDescription": {
+		"message": "CSS aplicat automat în vizualizarea de citire."
+	},
+	"readerDarkTheme": {
+		"message": "Temă pentru modul întunecat"
+	},
+	"readerDarkThemeDescription": {
+		"message": "Folosește o temă diferită în modul întunecat."
+	},
+	"readerError": {
+		"message": "Extragerea conținutului a eșuat."
+	},
+	"readerFont": {
+		"message": "Opțiuni de font"
+	},
+	"readerFontDefault": {
+		"message": "Implicit"
+	},
+	"readerFontDescription": {
+		"message": "Adaugă fonturi instalate pe sistemul tău. Apasă Enter pentru a adăuga un font."
+	},
+	"readerFontNotFound": {
+		"message": "Nu a fost găsit"
+	},
+	"readerFontPlaceholder": {
+		"message": "Apasă Enter pentru a adăuga un font"
+	},
+	"readerFontSetDefault": {
+		"message": "Setează ca implicit"
+	},
+	"readerFontSize": {
+		"message": "Dimensiunea de bază a fontului"
+	},
+	"readerFontSystem": {
+		"message": "Sistem"
+	},
+	"readerFontSystemSans": {
+		"message": "Sans-serif"
+	},
+	"readerFontSystemSerif": {
+		"message": "Serif"
+	},
+	"readerFonts": {
+		"message": "Fonturi"
+	},
+	"readerFootnotes": {
+		"message": "Note de subsol"
+	},
+	"readerHighlightActiveLine": {
+		"message": "Evidențiază linia activă"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "Evidențiază propoziția curentă în transcriere în timpul redării."
+	},
+	"readerImages": {
+		"message": "Imagini"
+	},
+	"readerLineHeight": {
+		"message": "Înălțimea liniei"
+	},
+	"readerLineWidth": {
+		"message": "Lățimea liniei"
+	},
+	"readerLoadFailed": {
+		"message": "Încărcarea a eșuat. Pagina poate fi blocată de browserul dvs."
+	},
+	"readerLoading": {
+		"message": "Se clarifică…"
+	},
+	"readerOn": {
+		"message": "Mod de citire"
+	},
+	"readerPinPlayer": {
+		"message": "Fixează playerul"
+	},
+	"readerPinPlayerDescription": {
+		"message": "Păstrează playerul video vizibil în timp ce derulezi prin transcriere."
+	},
+	"readerSettings": {
+		"message": "Setări cititor"
+	},
+	"readerTheme": {
+		"message": "Temă"
+	},
+	"readerThemeDescription": {
+		"message": "Alege culorile folosite în vizualizarea de citire."
+	},
+	"readerThemeSection": {
+		"message": "Temă"
+	},
+	"readerTranscripts": {
+		"message": "Transcrieri"
+	},
+	"readerTypography": {
+		"message": "Tipografie"
+	},
+	"readerUrlPlaceholder": {
+		"message": "Lipește un URL pentru a citi…"
+	},
+	"readerViewFullSize": {
+		"message": "Vezi la dimensiune completă"
+	},
 	"recommended": {
 		"message": "recomandat"
 	},
@@ -658,6 +888,9 @@
 	},
 	"saveFile": {
 		"message": "Salvează fișier..."
+	},
+	"searchHighlightsPlaceholder": {
+		"message": "Caută evidențieri…"
 	},
 	"searchVariables": {
 		"message": "Caută variabile..."
@@ -719,17 +952,47 @@
 	"silentOpenDescription": {
 		"message": "Notele decupate vor fi salvate dar nu vor fi deschise într-o filă nouă. Obsidian va fi totuși adus în prim-plan."
 	},
+	"sort": {
+		"message": "Sortează"
+	},
+	"sortAZ": {
+		"message": "A la Z"
+	},
+	"sortNewOld": {
+		"message": "Cele mai noi primele"
+	},
+	"sortOldNew": {
+		"message": "Cele mai vechi primele"
+	},
+	"sortZA": {
+		"message": "Z la A"
+	},
 	"specificNoteName": {
 		"message": "Nume specific notă"
 	},
 	"systemDefault": {
 		"message": "Implicit sistem"
 	},
+	"template": {
+		"message": "Șablon"
+	},
 	"templateCopied": {
 		"message": "JSON-ul șablonului a fost copiat în clipboard"
 	},
 	"templateCopyError": {
 		"message": "Nu s-a putut copia JSON-ul șablonului în clipboard"
+	},
+	"templateErrorCount": {
+		"message": "Există o eroare în șablonul tău."
+	},
+	"templateErrorsCount": {
+		"message": "Există $1 erori în șablonul tău."
+	},
+	"templateGroupContent": {
+		"message": "Conținut"
+	},
+	"templateGroupLocation": {
+		"message": "Locație"
 	},
 	"templateName": {
 		"message": "Nume șablon"
@@ -745,6 +1008,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "Definește reguli pentru selectarea automată a acestui șablon dacă se potrivește cu modelul URL sau conține date schema.org. O regulă pe linie."
+	},
+	"templateValid": {
+		"message": "Sintaxa șablonului este validă"
 	},
 	"templatesHeading": {
 		"message": "Șabloane"

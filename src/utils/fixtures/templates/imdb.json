@@ -1,0 +1,13 @@
+{
+	"noteNameFormat": "{{schema:@Movie:name}}",
+	"noteContentFormat": "{{schema:@Movie:description}}",
+	"properties": [
+		{ "name": "title", "value": "{{schema:@Movie:name}}", "type": "text" },
+		{ "name": "genre", "value": "{{schema:@Movie:genre|wikilink|join}}", "type": "multitext" },
+		{ "name": "director", "value": "{{selector:[data-testid=\"title-pc-principal-credit\"]:first-child a|unique|wikilink|join}}", "type": "multitext" },
+		{ "name": "cast", "value": "{{selector:[data-testid=\"title-pc-principal-credit\"]:nth-child(3) a|unique|wikilink|join}}", "type": "multitext" },
+		{ "name": "rating", "value": "{{selector:[data-testid=\"hero-rating-bar__user-rating__score\"] span}}", "type": "number" },
+		{ "name": "year", "value": "{{schema:@Movie:datePublished|split:\"-\"|slice:0,1}}", "type": "number" },
+		{ "name": "image", "value": "{{schema:@Movie:image}}", "type": "text" }
+	]
+}

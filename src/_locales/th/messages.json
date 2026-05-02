@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "ขั้นสูง"
 	},
+	"allHighlights": {
+		"message": "ไฮไลต์ทั้งหมด"
+	},
 	"allProperties": {
 		"message": "คุณสมบัติทั้งหมด"
 	},
@@ -58,9 +61,6 @@
 	},
 	"behavior": {
 		"message": "พฤติกรรม"
-	},
-	"behaviorWarning": {
-		"message": "การเพิ่มไปยังบันทึกที่มีอยู่หรือบันทึกประจำวันต้องใช้ Obsidian 1.7.2 หรือใหม่กว่า"
 	},
 	"byDay": {
 		"message": "วัน"
@@ -103,6 +103,14 @@
 			},
 			"strong_start": {
 				"content": "<strong>"
+			}
+		}
+	},
+	"clipboardError": {
+		"message": "Obsidian ไม่สามารถเข้าถึงคลิปบอร์ดของคุณได้ ลองทำตามคำแนะนำการแก้ไขปัญหาที่นี่: $1",
+		"placeholders": {
+			"1": {
+				"content": "$1"
 			}
 		}
 	},
@@ -157,6 +165,15 @@
 	"delete": {
 		"message": "ลบ"
 	},
+	"deleteAllHighlightsConfirm": {
+		"message": "คุณแน่ใจหรือไม่ว่าต้องการลบไฮไลต์ทั้งหมด?"
+	},
+	"deleteHighlightsForDomain": {
+		"message": "ลบไฮไลต์ทั้งหมดสำหรับโดเมนนี้?"
+	},
+	"deleteHighlightsForPage": {
+		"message": "ลบไฮไลต์ทั้งหมดสำหรับหน้านี้?"
+	},
 	"deleteModelConfirm": {
 		"message": "คุณแน่ใจหรือไม่ว่าต้องการลบโมเดลนี้?"
 	},
@@ -192,6 +209,9 @@
 	"earlyAccessFeatures": {
 		"message": "คุณสมบัติ Early Access"
 	},
+	"edit": {
+		"message": "แก้ไข"
+	},
 	"editModel": {
 		"message": "แก้ไขโมเดล"
 	},
@@ -201,8 +221,8 @@
 	"editTemplate": {
 		"message": "แก้ไขเทมเพลต"
 	},
-	"enableHighlighter": {
-		"message": "เปิดใช้งานไฮไลต์"
+	"embedded": {
+		"message": "ฝัง"
 	},
 	"enableHighlighterDescription": {
 		"message": "ไฮไลต์เนื้อหาบนหน้าเว็บที่คุณสามารถบันทึกไปยัง Obsidian"
@@ -346,11 +366,23 @@
 	"highlightPage": {
 		"message": "ไฮไลต์หน้า"
 	},
+	"highlightSelection": {
+		"message": "ไฮไลต์"
+	},
 	"highlighter": {
 		"message": "ตัวไฮไลต์"
 	},
+	"highlighterOn": {
+		"message": "ไฮไลต์"
+	},
 	"highlighterSettings": {
 		"message": "ตัวไฮไลต์"
+	},
+	"highlights": {
+		"message": "ไฮไลต์"
+	},
+	"highlightsNotFound": {
+		"message": "ไม่พบไฮไลต์ในบทความ"
 	},
 	"history": {
 		"message": "ประวัติ"
@@ -437,6 +469,12 @@
 	"legacyModeDescription": {
 		"message": "ใช้วิธีการคลิป URI ที่เข้ากันได้กับ Obsidian 1.6.7 หรือเก่ากว่า โปรดทราบว่าความยาวของเนื้อหาที่คุณสามารถคลิปได้ถูกจำกัดโดยเบราว์เซอร์และระบบปฏิบัติการของคุณ บางหน้าอาจล้มเหลวโดยไม่มีข้อความแสดงข้อผิดพลาด"
 	},
+	"loadArticle": {
+		"message": "อ่านบทความ"
+	},
+	"loading": {
+		"message": "กำลังโหลด…"
+	},
 	"modelName": {
 		"message": "ชื่อที่แสดง"
 	},
@@ -469,6 +507,9 @@
 	},
 	"noHighlights": {
 		"message": "ไม่ทำอะไร"
+	},
+	"noResults": {
+		"message": "ไม่พบผลลัพธ์"
 	},
 	"noTemplates": {
 		"message": "ไม่มีเทมเพลตที่ใช้ได้ เพิ่มเทมเพลตในการตั้งค่า"
@@ -514,6 +555,24 @@
 	"open": {
 		"message": "เปิด"
 	},
+	"openBehaviorDescription": {
+		"message": "เลือกวิธีการเปิด Web Clipper โดยค่าเริ่มต้น"
+	},
+	"openBehaviorTitle": {
+		"message": "พฤติกรรมการเปิด"
+	},
+	"openEmbedded": {
+		"message": "เปิดในหน้า"
+	},
+	"openHighlights": {
+		"message": "เปิดไฮไลต์"
+	},
+	"openReader": {
+		"message": "เปิดโหมดอ่าน"
+	},
+	"openSidePanel": {
+		"message": "เปิดแผงด้านข้าง"
+	},
 	"optional": {
 		"message": "(ไม่บังคับ)"
 	},
@@ -547,11 +606,17 @@
 	"popularModelsDescription": {
 		"message": "เลือกจากโมเดลที่ใช้บ่อยหรือป้อนรายละเอียดโมเดลที่กำหนดเอง"
 	},
+	"popup": {
+		"message": "ป๊อปอัป"
+	},
 	"prependToDaily": {
 		"message": "เพิ่มไปยังบันทึกประจำวัน ที่ต้น"
 	},
 	"prependToExisting": {
 		"message": "เพิ่มไปยังบันทึกที่มีอยู่ ที่ต้น"
+	},
+	"preview": {
+		"message": "ดูตัวอย่าง"
 	},
 	"processing": {
 		"message": "กำลังประมวลผล"
@@ -564,6 +629,24 @@
 	},
 	"propertyName": {
 		"message": "ชื่อคุณสมบัติ"
+	},
+	"propertyTypeCheckbox": {
+		"message": "ช่องทำเครื่องหมาย"
+	},
+	"propertyTypeDate": {
+		"message": "วันที่"
+	},
+	"propertyTypeDatetime": {
+		"message": "วันที่ & เวลา"
+	},
+	"propertyTypeMultitext": {
+		"message": "รายการ"
+	},
+	"propertyTypeNumber": {
+		"message": "จำนวน"
+	},
+	"propertyTypeText": {
+		"message": "ข้อความ"
 	},
 	"propertyValue": {
 		"message": "ค่าคุณสมบัติ"
@@ -616,6 +699,153 @@
 	"reader": {
 		"message": "อ่าน"
 	},
+	"readerAppearance": {
+		"message": "ลักษณะการแสดงผล"
+	},
+	"readerAppearanceAuto": {
+		"message": "อัตโนมัติ"
+	},
+	"readerAppearanceDark": {
+		"message": "มืด"
+	},
+	"readerAppearanceDescription": {
+		"message": "เลือกลักษณะการแสดงผลแบบสว่างหรือมืด"
+	},
+	"readerAppearanceLight": {
+		"message": "สว่าง"
+	},
+	"readerAutoScroll": {
+		"message": "เลื่อนอัตโนมัติ"
+	},
+	"readerAutoScrollDescription": {
+		"message": "เลื่อนบทถอดเสียงอัตโนมัติเพื่อติดตามการเล่น"
+	},
+	"readerBlendImages": {
+		"message": "ผสานรูปภาพ"
+	},
+	"readerBlendImagesDescription": {
+		"message": "ผสานรูปภาพเข้ากับพื้นหลังของหน้า"
+	},
+	"readerCloseImageViewer": {
+		"message": "ปิดตัวดูรูปภาพ"
+	},
+	"readerCollapseComment": {
+		"message": "ยุบความคิดเห็น"
+	},
+	"readerColorLinks": {
+		"message": "ใส่สีให้ลิงก์"
+	},
+	"readerColorSchemeDefault": {
+		"message": "ค่าเริ่มต้น"
+	},
+	"readerCurrentPosition": {
+		"message": "ตำแหน่งปัจจุบัน"
+	},
+	"readerCustomCss": {
+		"message": "CSS กำหนดเอง"
+	},
+	"readerCustomCssDescription": {
+		"message": "CSS ที่นำไปใช้โดยอัตโนมัติในมุมมองการอ่าน"
+	},
+	"readerDarkTheme": {
+		"message": "ธีมโหมดมืด"
+	},
+	"readerDarkThemeDescription": {
+		"message": "ใช้ธีมอื่นในโหมดมืด"
+	},
+	"readerError": {
+		"message": "ไม่สามารถดึงเนื้อหาได้"
+	},
+	"readerFont": {
+		"message": "ตัวเลือกแบบอักษร"
+	},
+	"readerFontDefault": {
+		"message": "ค่าเริ่มต้น"
+	},
+	"readerFontDescription": {
+		"message": "เพิ่มแบบอักษรที่ติดตั้งบนระบบของคุณ กด Enter เพื่อเพิ่มแบบอักษร"
+	},
+	"readerFontNotFound": {
+		"message": "ไม่พบ"
+	},
+	"readerFontPlaceholder": {
+		"message": "กด Enter เพื่อเพิ่มแบบอักษร"
+	},
+	"readerFontSetDefault": {
+		"message": "ตั้งเป็นค่าเริ่มต้น"
+	},
+	"readerFontSize": {
+		"message": "ขนาดแบบอักษรพื้นฐาน"
+	},
+	"readerFontSystem": {
+		"message": "ระบบ"
+	},
+	"readerFontSystemSans": {
+		"message": "Sans-serif"
+	},
+	"readerFontSystemSerif": {
+		"message": "Serif"
+	},
+	"readerFonts": {
+		"message": "แบบอักษร"
+	},
+	"readerFootnotes": {
+		"message": "เชิงอรรถ"
+	},
+	"readerHighlightActiveLine": {
+		"message": "ไฮไลต์บรรทัดที่กำลังเล่น"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "ไฮไลต์ประโยคปัจจุบันในบทถอดเสียงระหว่างการเล่น"
+	},
+	"readerImages": {
+		"message": "รูปภาพ"
+	},
+	"readerLineHeight": {
+		"message": "ความสูงบรรทัด"
+	},
+	"readerLineWidth": {
+		"message": "ความกว้างบรรทัด"
+	},
+	"readerLoadFailed": {
+		"message": "โหลดไม่สำเร็จ หน้านี้อาจถูกบล็อกโดยเบราว์เซอร์ของคุณ"
+	},
+	"readerLoading": {
+		"message": "กำลังทำให้เข้าใจง่าย…"
+	},
+	"readerOn": {
+		"message": "โหมดอ่าน"
+	},
+	"readerPinPlayer": {
+		"message": "ปักหมุดเครื่องเล่น"
+	},
+	"readerPinPlayerDescription": {
+		"message": "ให้เครื่องเล่นวิดีโอยังคงแสดงอยู่ขณะเลื่อนดูบทถอดเสียง"
+	},
+	"readerSettings": {
+		"message": "การตั้งค่าโหมดอ่าน"
+	},
+	"readerTheme": {
+		"message": "ธีม"
+	},
+	"readerThemeDescription": {
+		"message": "เลือกสีที่ใช้ในมุมมองการอ่าน"
+	},
+	"readerThemeSection": {
+		"message": "ธีม"
+	},
+	"readerTranscripts": {
+		"message": "บทถอดเสียง"
+	},
+	"readerTypography": {
+		"message": "การจัดตัวพิมพ์"
+	},
+	"readerUrlPlaceholder": {
+		"message": "วาง URL เพื่ออ่าน…"
+	},
+	"readerViewFullSize": {
+		"message": "ดูขนาดเต็ม"
+	},
 	"recommended": {
 		"message": "แนะนำ"
 	},
@@ -666,6 +896,9 @@
 	},
 	"saveFile": {
 		"message": "บันทึกไฟล์..."
+	},
+	"searchHighlightsPlaceholder": {
+		"message": "ค้นหาไฮไลต์…"
 	},
 	"searchVariables": {
 		"message": "ค้นหาตัวแปร..."
@@ -727,17 +960,47 @@
 	"silentOpenDescription": {
 		"message": "บันทึกที่คลิปจะถูกบันทึกแต่ไม่เปิดเป็นแท็บใหม่ Obsidian จะยังคงถูกนำมาไว้ด้านหน้า"
 	},
+	"sort": {
+		"message": "จัดเรียง"
+	},
+	"sortAZ": {
+		"message": "A ถึง Z"
+	},
+	"sortNewOld": {
+		"message": "ใหม่สุดก่อน"
+	},
+	"sortOldNew": {
+		"message": "เก่าสุดก่อน"
+	},
+	"sortZA": {
+		"message": "Z ถึง A"
+	},
 	"specificNoteName": {
 		"message": "ชื่อบันทึกเฉพาะ"
 	},
 	"systemDefault": {
 		"message": "ค่าเริ่มต้นของระบบ"
 	},
+	"template": {
+		"message": "เทมเพลต"
+	},
 	"templateCopied": {
 		"message": "คัดลอก JSON เทมเพลตไปยังคลิปบอร์ดแล้ว"
 	},
 	"templateCopyError": {
 		"message": "ไม่สามารถคัดลอก JSON เทมเพลตไปยังคลิปบอร์ด"
+	},
+	"templateErrorCount": {
+		"message": "มีข้อผิดพลาดในเทมเพลตของคุณ"
+	},
+	"templateErrorsCount": {
+		"message": "มีข้อผิดพลาด $1 รายการในเทมเพลตของคุณ"
+	},
+	"templateGroupContent": {
+		"message": "เนื้อหา"
+	},
+	"templateGroupLocation": {
+		"message": "ตำแหน่ง"
 	},
 	"templateName": {
 		"message": "ชื่อเทมเพลต"
@@ -753,6 +1016,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "กำหนดกฎเพื่อเลือกเทมเพลตนี้โดยอัตโนมัติถ้าตรงกับรูปแบบ URL หรือมีข้อมูล schema.org หนึ่งกฎต่อบรรทัด"
+	},
+	"templateValid": {
+		"message": "ไวยากรณ์เทมเพลตถูกต้อง"
 	},
 	"templatesHeading": {
 		"message": "เทมเพลต"

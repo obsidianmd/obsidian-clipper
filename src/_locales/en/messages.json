@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Advanced"
 	},
+	"allHighlights": {
+		"message": "All highlights"
+	},
 	"allProperties": {
 		"message": "All properties"
 	},
@@ -58,9 +61,6 @@
 	},
 	"behavior": {
 		"message": "Behavior"
-	},
-	"behaviorWarning": {
-		"message": "Adding to an existing note or daily note requires Obsidian 1.7.2 or later."
 	},
 	"byDay": {
 		"message": "Days"
@@ -106,6 +106,14 @@
 			}
 		}
 	},
+	"clipboardError": {
+		"message": "Obsidian is not able to access your clipboard. Try the troubleshooting instructions here: $1",
+		"placeholders": {
+			"1": {
+				"content": "$1"
+			}
+		}
+	},
 	"close": {
 		"message": "Close"
 	},
@@ -116,10 +124,10 @@
 		"message": "Quick clip"
 	},
 	"commandToggleHighlighter": {
-		"message": "Toggle highlighter mode"
+		"message": "Toggle highlighter"
 	},
 	"commandToggleReader": {
-		"message": "Toggle reading view"
+		"message": "Toggle reader"
 	},
 	"confirmDeleteTemplate": {
 		"message": "Are you sure you want to delete the template \"$1\"?"
@@ -157,6 +165,15 @@
 	"delete": {
 		"message": "Delete"
 	},
+	"deleteAllHighlightsConfirm": {
+		"message": "Are you sure you want to delete all highlights?"
+	},
+	"deleteHighlightsForDomain": {
+		"message": "Delete all highlights for this domain?"
+	},
+	"deleteHighlightsForPage": {
+		"message": "Delete all highlights for this page?"
+	},
 	"deleteModelConfirm": {
 		"message": "Are you sure you want to delete this model?"
 	},
@@ -164,10 +181,10 @@
 		"message": "Are you sure you want to delete this provider?"
 	},
 	"disableHighlighter": {
-		"message": "Disable highlighter"
+		"message": "Turn off highlighter"
 	},
 	"disableReader": {
-		"message": "Disable reading view"
+		"message": "Turn off reader"
 	},
 	"done": {
 		"message": "Done"
@@ -192,6 +209,9 @@
 	"earlyAccessFeatures": {
 		"message": "Early access features"
 	},
+	"edit": {
+		"message": "Edit"
+	},
 	"editModel": {
 		"message": "Edit model"
 	},
@@ -201,8 +221,8 @@
 	"editTemplate": {
 		"message": "Edit template"
 	},
-	"enableHighlighter": {
-		"message": "Enable highlighter"
+	"embedded": {
+		"message": "Embedded"
 	},
 	"enableHighlighterDescription": {
 		"message": "Highlight content on web pages that you can save to Obsidian."
@@ -346,11 +366,23 @@
 	"highlightPage": {
 		"message": "Highlight page"
 	},
+	"highlightSelection": {
+		"message": "Highlight"
+	},
 	"highlighter": {
+		"message": "Highlighter"
+	},
+	"highlighterOn": {
 		"message": "Highlighter"
 	},
 	"highlighterSettings": {
 		"message": "Highlighter"
+	},
+	"highlights": {
+		"message": "Highlights"
+	},
+	"highlightsNotFound": {
+		"message": "Highlights not found in article"
 	},
 	"history": {
 		"message": "History"
@@ -437,6 +469,12 @@
 	"legacyModeDescription": {
 		"message": "Uses the URI clipping method compatible with Obsidian 1.6.7 or earlier. Note that the length of the content you can clip is limited by your browser and OS. Some pages may fail without any errors."
 	},
+	"loadArticle": {
+		"message": "Read article"
+	},
+	"loading": {
+		"message": "Loading…"
+	},
 	"modelName": {
 		"message": "Display name"
 	},
@@ -469,6 +507,9 @@
 	},
 	"noHighlights": {
 		"message": "Do nothing"
+	},
+	"noResults": {
+		"message": "No results found"
 	},
 	"noTemplates": {
 		"message": "No templates available. Please add a template in the settings."
@@ -514,6 +555,24 @@
 	"open": {
 		"message": "Open"
 	},
+	"openBehaviorDescription": {
+		"message": "Choose how Web Clipper opens by default."
+	},
+	"openBehaviorTitle": {
+		"message": "Open behavior"
+	},
+	"openEmbedded": {
+		"message": "Open in page"
+	},
+	"openHighlights": {
+		"message": "Open highlights"
+	},
+	"openReader": {
+		"message": "Open Reader"
+	},
+	"openSidePanel": {
+		"message": "Open side panel"
+	},
 	"optional": {
 		"message": "(optional)"
 	},
@@ -547,11 +606,17 @@
 	"popularModelsDescription": {
 		"message": "Choose from commonly used models or enter custom model details."
 	},
+	"popup": {
+		"message": "Popup"
+	},
 	"prependToDaily": {
 		"message": "Add to daily note, at the top"
 	},
 	"prependToExisting": {
 		"message": "Add to an existing note, at the top"
+	},
+	"preview": {
+		"message": "Preview"
 	},
 	"processing": {
 		"message": "processing"
@@ -564,6 +629,24 @@
 	},
 	"propertyName": {
 		"message": "Property name"
+	},
+	"propertyTypeCheckbox": {
+		"message": "Checkbox"
+	},
+	"propertyTypeDate": {
+		"message": "Date"
+	},
+	"propertyTypeDatetime": {
+		"message": "Date & time"
+	},
+	"propertyTypeMultitext": {
+		"message": "List"
+	},
+	"propertyTypeNumber": {
+		"message": "Number"
+	},
+	"propertyTypeText": {
+		"message": "Text"
 	},
 	"propertyValue": {
 		"message": "Property value"
@@ -616,6 +699,153 @@
 	"reader": {
 		"message": "Reader"
 	},
+	"readerAppearance": {
+		"message": "Appearance"
+	},
+	"readerAppearanceAuto": {
+		"message": "Auto"
+	},
+	"readerAppearanceDark": {
+		"message": "Dark"
+	},
+	"readerAppearanceDescription": {
+		"message": "Choose light or dark appearance."
+	},
+	"readerAppearanceLight": {
+		"message": "Light"
+	},
+	"readerAutoScroll": {
+		"message": "Auto-scroll"
+	},
+	"readerAutoScrollDescription": {
+		"message": "Automatically scroll the transcript to follow playback."
+	},
+	"readerBlendImages": {
+		"message": "Blend images"
+	},
+	"readerBlendImagesDescription": {
+		"message": "Blend images with the page background."
+	},
+	"readerCloseImageViewer": {
+		"message": "Close image viewer"
+	},
+	"readerCollapseComment": {
+		"message": "Collapse comment"
+	},
+	"readerColorLinks": {
+		"message": "Color links"
+	},
+	"readerColorSchemeDefault": {
+		"message": "Default"
+	},
+	"readerCurrentPosition": {
+		"message": "Current position"
+	},
+	"readerCustomCss": {
+		"message": "Custom CSS"
+	},
+	"readerCustomCssDescription": {
+		"message": "CSS applied automatically in reading view."
+	},
+	"readerDarkTheme": {
+		"message": "Dark mode theme"
+	},
+	"readerDarkThemeDescription": {
+		"message": "Use a different theme in dark mode."
+	},
+	"readerError": {
+		"message": "Failed to extract content."
+	},
+	"readerFont": {
+		"message": "Font options"
+	},
+	"readerFontDefault": {
+		"message": "Default"
+	},
+	"readerFontDescription": {
+		"message": "Add fonts installed on your system. Press enter to add a font."
+	},
+	"readerFontNotFound": {
+		"message": "Not found"
+	},
+	"readerFontPlaceholder": {
+		"message": "Press enter to add a font"
+	},
+	"readerFontSetDefault": {
+		"message": "Set default"
+	},
+	"readerFontSize": {
+		"message": "Base font size"
+	},
+	"readerFontSystem": {
+		"message": "System"
+	},
+	"readerFontSystemSans": {
+		"message": "Sans-serif"
+	},
+	"readerFontSystemSerif": {
+		"message": "Serif"
+	},
+	"readerFonts": {
+		"message": "Fonts"
+	},
+	"readerFootnotes": {
+		"message": "Footnotes"
+	},
+	"readerHighlightActiveLine": {
+		"message": "Highlight active line"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "Highlight the current sentence in the transcript during playback."
+	},
+	"readerImages": {
+		"message": "Images"
+	},
+	"readerLineHeight": {
+		"message": "Line height"
+	},
+	"readerLineWidth": {
+		"message": "Line width"
+	},
+	"readerLoadFailed": {
+		"message": "Failed to load. The page may be blocked by your browser."
+	},
+	"readerLoading": {
+		"message": "Defuddling…"
+	},
+	"readerOn": {
+		"message": "Reader"
+	},
+	"readerPinPlayer": {
+		"message": "Pin player"
+	},
+	"readerPinPlayerDescription": {
+		"message": "Keep the video player visible while scrolling through the transcript."
+	},
+	"readerSettings": {
+		"message": "Reader settings"
+	},
+	"readerTheme": {
+		"message": "Theme"
+	},
+	"readerThemeDescription": {
+		"message": "Choose the colors used in reading view."
+	},
+	"readerThemeSection": {
+		"message": "Theme"
+	},
+	"readerTranscripts": {
+		"message": "Transcripts"
+	},
+	"readerTypography": {
+		"message": "Typography"
+	},
+	"readerUrlPlaceholder": {
+		"message": "Paste a URL to read…"
+	},
+	"readerViewFullSize": {
+		"message": "View full size"
+	},
 	"recommended": {
 		"message": "recommended"
 	},
@@ -666,6 +896,9 @@
 	},
 	"saveFile": {
 		"message": "Save file..."
+	},
+	"searchHighlightsPlaceholder": {
+		"message": "Search highlights…"
 	},
 	"searchVariables": {
 		"message": "Search variables..."
@@ -727,17 +960,47 @@
 	"silentOpenDescription": {
 		"message": "Clipped notes will be saved but will not open as a new tab. Obsidian will still be brought to the foreground."
 	},
+	"sort": {
+		"message": "Sort"
+	},
+	"sortAZ": {
+		"message": "A to Z"
+	},
+	"sortNewOld": {
+		"message": "Newest first"
+	},
+	"sortOldNew": {
+		"message": "Oldest first"
+	},
+	"sortZA": {
+		"message": "Z to A"
+	},
 	"specificNoteName": {
 		"message": "Specific note name"
 	},
 	"systemDefault": {
 		"message": "System"
 	},
+	"template": {
+		"message": "Template"
+	},
 	"templateCopied": {
 		"message": "Copied template JSON to clipboard"
 	},
 	"templateCopyError": {
 		"message": "Failed to copy template JSON to clipboard"
+	},
+	"templateErrorCount": {
+		"message": "There is an error in your template."
+	},
+	"templateErrorsCount": {
+		"message": "There are $1 errors in your template."
+	},
+	"templateGroupContent": {
+		"message": "Content"
+	},
+	"templateGroupLocation": {
+		"message": "Location"
 	},
 	"templateName": {
 		"message": "Template name"
@@ -753,6 +1016,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "Define rules to automatically select this template if it matches a URL pattern or contains schema.org data. One rule per line."
+	},
+	"templateValid": {
+		"message": "Template syntax is valid"
 	},
 	"templatesHeading": {
 		"message": "Templates"

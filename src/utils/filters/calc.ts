@@ -1,3 +1,34 @@
+import type { ParamValidationResult } from '../filters';
+
+export const validateCalcParams = (param: string | undefined): ParamValidationResult => {
+	if (!param) {
+		return { valid: false, error: 'requires an operation (e.g., calc:"+10", calc:"*2")' };
+	}
+
+	// Remove outer quotes if present
+	const operation = param.replace(/^['"](.*)['"]$/, '$1').trim();
+
+	if (!operation) {
+		return { valid: false, error: 'operation cannot be empty' };
+	}
+
+	// Check for valid operator
+	const validOperators = ['+', '-', '*', '/', '^', '**'];
+	const operator = operation.slice(0, 2) === '**' ? '**' : operation.charAt(0);
+
+	if (!validOperators.includes(operator)) {
+		return { valid: false, error: `invalid operator "${operator}". Use +, -, *, /, ^ or **` };
+	}
+
+	// Check that there's a number after the operator
+	const valueStr = operation.slice(operator === '**' ? 2 : 1);
+	if (!valueStr || isNaN(Number(valueStr))) {
+		return { valid: false, error: 'requires a number after the operator (e.g., "+10")' };
+	}
+
+	return { valid: true };
+};
+
 export const calc = (str: string, param?: string): string => {
 	if (!param) {
 		return str;

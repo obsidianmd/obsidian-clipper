@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Nâng cao"
 	},
+	"allHighlights": {
+		"message": "Tất cả đoạn tô sáng"
+	},
 	"allProperties": {
 		"message": "Tất cả thuộc tính"
 	},
@@ -58,9 +61,6 @@
 	},
 	"behavior": {
 		"message": "Hành vi"
-	},
-	"behaviorWarning": {
-		"message": "Thêm vào ghi chú hiện có hoặc ghi chú hàng ngày yêu cầu Obsidian 1.7.2 trở lên."
 	},
 	"byDay": {
 		"message": "Ngày"
@@ -103,6 +103,14 @@
 			},
 			"strong_start": {
 				"content": "<strong>"
+			}
+		}
+	},
+	"clipboardError": {
+		"message": "Obsidian không thể truy cập bảng tạm của bạn. Hãy thử làm theo hướng dẫn khắc phục sự cố tại đây: $1",
+		"placeholders": {
+			"1": {
+				"content": "$1"
 			}
 		}
 	},
@@ -157,6 +165,15 @@
 	"delete": {
 		"message": "Xóa"
 	},
+	"deleteAllHighlightsConfirm": {
+		"message": "Bạn có chắc muốn xóa tất cả đoạn tô sáng không?"
+	},
+	"deleteHighlightsForDomain": {
+		"message": "Xóa tất cả đoạn tô sáng cho tên miền này?"
+	},
+	"deleteHighlightsForPage": {
+		"message": "Xóa tất cả đoạn tô sáng cho trang này?"
+	},
 	"deleteModelConfirm": {
 		"message": "Bạn có chắc chắn muốn xóa mô hình này?"
 	},
@@ -192,6 +209,9 @@
 	"earlyAccessFeatures": {
 		"message": "Tính năng truy cập sớm"
 	},
+	"edit": {
+		"message": "Chỉnh sửa"
+	},
 	"editModel": {
 		"message": "Chỉnh sửa mô hình"
 	},
@@ -201,8 +221,8 @@
 	"editTemplate": {
 		"message": "Chỉnh sửa mẫu"
 	},
-	"enableHighlighter": {
-		"message": "Bật đánh dấu"
+	"embedded": {
+		"message": "Được nhúng"
 	},
 	"enableHighlighterDescription": {
 		"message": "Đánh dấu nội dung trên trang web mà bạn có thể lưu vào Obsidian."
@@ -346,11 +366,23 @@
 	"highlightPage": {
 		"message": "Đánh dấu trang"
 	},
+	"highlightSelection": {
+		"message": "Tô sáng"
+	},
 	"highlighter": {
 		"message": "Đánh dấu"
 	},
+	"highlighterOn": {
+		"message": "Bút đánh dấu"
+	},
 	"highlighterSettings": {
 		"message": "Đánh dấu"
+	},
+	"highlights": {
+		"message": "Đoạn tô sáng"
+	},
+	"highlightsNotFound": {
+		"message": "Không tìm thấy đoạn tô sáng trong bài viết"
 	},
 	"history": {
 		"message": "Lịch sử"
@@ -437,6 +469,12 @@
 	"legacyModeDescription": {
 		"message": "Sử dụng phương thức lưu URI tương thích với Obsidian 1.6.7 hoặc cũ hơn. Lưu ý rằng độ dài nội dung bạn có thể lưu bị giới hạn bởi trình duyệt và hệ điều hành của bạn. Một số trang có thể thất bại mà không có thông báo lỗi."
 	},
+	"loadArticle": {
+		"message": "Đọc bài viết"
+	},
+	"loading": {
+		"message": "Đang tải…"
+	},
 	"modelName": {
 		"message": "Tên hiển thị"
 	},
@@ -469,6 +507,9 @@
 	},
 	"noHighlights": {
 		"message": "Không làm gì"
+	},
+	"noResults": {
+		"message": "Không tìm thấy kết quả"
 	},
 	"noTemplates": {
 		"message": "Không có mẫu khả dụng. Vui lòng thêm mẫu trong cài đặt."
@@ -514,6 +555,24 @@
 	"open": {
 		"message": "Mở"
 	},
+	"openBehaviorDescription": {
+		"message": "Chọn cách mở Web Clipper mặc định."
+	},
+	"openBehaviorTitle": {
+		"message": "Hành vi mở"
+	},
+	"openEmbedded": {
+		"message": "Mở trong trang"
+	},
+	"openHighlights": {
+		"message": "Mở đoạn tô sáng"
+	},
+	"openReader": {
+		"message": "Mở Trình đọc"
+	},
+	"openSidePanel": {
+		"message": "Mở bảng bên"
+	},
 	"optional": {
 		"message": "(tùy chọn)"
 	},
@@ -547,11 +606,17 @@
 	"popularModelsDescription": {
 		"message": "Chọn từ các mô hình thường được sử dụng hoặc nhập chi tiết mô hình tùy chỉnh."
 	},
+	"popup": {
+		"message": "Popup"
+	},
 	"prependToDaily": {
 		"message": "Thêm vào ghi chú hàng ngày, ở đầu"
 	},
 	"prependToExisting": {
 		"message": "Thêm vào ghi chú hiện có, ở đầu"
+	},
+	"preview": {
+		"message": "Xem trước"
 	},
 	"processing": {
 		"message": "đang xử lý"
@@ -564,6 +629,24 @@
 	},
 	"propertyName": {
 		"message": "Tên thuộc tính"
+	},
+	"propertyTypeCheckbox": {
+		"message": "Hộp kiểm"
+	},
+	"propertyTypeDate": {
+		"message": "Ngày"
+	},
+	"propertyTypeDatetime": {
+		"message": "Ngày & giờ"
+	},
+	"propertyTypeMultitext": {
+		"message": "Danh sách"
+	},
+	"propertyTypeNumber": {
+		"message": "Số"
+	},
+	"propertyTypeText": {
+		"message": "Văn bản"
 	},
 	"propertyValue": {
 		"message": "Giá trị thuộc tính"
@@ -616,6 +699,153 @@
 	"reader": {
 		"message": "Đọc"
 	},
+	"readerAppearance": {
+		"message": "Giao diện"
+	},
+	"readerAppearanceAuto": {
+		"message": "Tự động"
+	},
+	"readerAppearanceDark": {
+		"message": "Tối"
+	},
+	"readerAppearanceDescription": {
+		"message": "Chọn giao diện sáng hoặc tối."
+	},
+	"readerAppearanceLight": {
+		"message": "Sáng"
+	},
+	"readerAutoScroll": {
+		"message": "Tự động cuộn"
+	},
+	"readerAutoScrollDescription": {
+		"message": "Tự động cuộn bản chép lời để theo dõi khi phát."
+	},
+	"readerBlendImages": {
+		"message": "Hòa trộn hình ảnh"
+	},
+	"readerBlendImagesDescription": {
+		"message": "Hòa trộn hình ảnh với nền của trang."
+	},
+	"readerCloseImageViewer": {
+		"message": "Đóng trình xem hình ảnh"
+	},
+	"readerCollapseComment": {
+		"message": "Thu gọn bình luận"
+	},
+	"readerColorLinks": {
+		"message": "Tô màu liên kết"
+	},
+	"readerColorSchemeDefault": {
+		"message": "Mặc định"
+	},
+	"readerCurrentPosition": {
+		"message": "Vị trí hiện tại"
+	},
+	"readerCustomCss": {
+		"message": "CSS tùy chỉnh"
+	},
+	"readerCustomCssDescription": {
+		"message": "CSS được tự động áp dụng trong chế độ đọc."
+	},
+	"readerDarkTheme": {
+		"message": "Chủ đề chế độ tối"
+	},
+	"readerDarkThemeDescription": {
+		"message": "Dùng một chủ đề khác trong chế độ tối."
+	},
+	"readerError": {
+		"message": "Không thể trích xuất nội dung."
+	},
+	"readerFont": {
+		"message": "Tùy chọn phông chữ"
+	},
+	"readerFontDefault": {
+		"message": "Mặc định"
+	},
+	"readerFontDescription": {
+		"message": "Thêm các phông chữ đã cài trên hệ thống của bạn. Nhấn Enter để thêm một phông chữ."
+	},
+	"readerFontNotFound": {
+		"message": "Không tìm thấy"
+	},
+	"readerFontPlaceholder": {
+		"message": "Nhấn Enter để thêm một phông chữ"
+	},
+	"readerFontSetDefault": {
+		"message": "Đặt làm mặc định"
+	},
+	"readerFontSize": {
+		"message": "Cỡ chữ cơ bản"
+	},
+	"readerFontSystem": {
+		"message": "Hệ thống"
+	},
+	"readerFontSystemSans": {
+		"message": "Sans-serif"
+	},
+	"readerFontSystemSerif": {
+		"message": "Serif"
+	},
+	"readerFonts": {
+		"message": "Phông chữ"
+	},
+	"readerFootnotes": {
+		"message": "Chú thích"
+	},
+	"readerHighlightActiveLine": {
+		"message": "Tô sáng dòng đang phát"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "Tô sáng câu hiện tại trong bản chép lời khi phát."
+	},
+	"readerImages": {
+		"message": "Hình ảnh"
+	},
+	"readerLineHeight": {
+		"message": "Chiều cao dòng"
+	},
+	"readerLineWidth": {
+		"message": "Độ rộng dòng"
+	},
+	"readerLoadFailed": {
+		"message": "Không thể tải. Trang có thể bị trình duyệt của bạn chặn."
+	},
+	"readerLoading": {
+		"message": "Đang làm rõ…"
+	},
+	"readerOn": {
+		"message": "Chế độ đọc"
+	},
+	"readerPinPlayer": {
+		"message": "Ghim trình phát"
+	},
+	"readerPinPlayerDescription": {
+		"message": "Giữ trình phát video luôn hiển thị khi cuộn qua bản chép lời."
+	},
+	"readerSettings": {
+		"message": "Cài đặt chế độ đọc"
+	},
+	"readerTheme": {
+		"message": "Chủ đề"
+	},
+	"readerThemeDescription": {
+		"message": "Chọn màu sắc dùng trong chế độ đọc."
+	},
+	"readerThemeSection": {
+		"message": "Chủ đề"
+	},
+	"readerTranscripts": {
+		"message": "Bản chép lời"
+	},
+	"readerTypography": {
+		"message": "Kiểu chữ"
+	},
+	"readerUrlPlaceholder": {
+		"message": "Dán URL để đọc…"
+	},
+	"readerViewFullSize": {
+		"message": "Xem kích thước đầy đủ"
+	},
 	"recommended": {
 		"message": "được đề xuất"
 	},
@@ -666,6 +896,9 @@
 	},
 	"saveFile": {
 		"message": "Lưu tệp..."
+	},
+	"searchHighlightsPlaceholder": {
+		"message": "Tìm kiếm đoạn tô sáng…"
 	},
 	"searchVariables": {
 		"message": "Tìm kiếm biến..."
@@ -727,17 +960,47 @@
 	"silentOpenDescription": {
 		"message": "Ghi chú đã lưu sẽ được lưu nhưng không mở trong tab mới. Obsidian vẫn sẽ được đưa lên phía trước."
 	},
+	"sort": {
+		"message": "Sắp xếp"
+	},
+	"sortAZ": {
+		"message": "A đến Z"
+	},
+	"sortNewOld": {
+		"message": "Mới nhất trước"
+	},
+	"sortOldNew": {
+		"message": "Cũ nhất trước"
+	},
+	"sortZA": {
+		"message": "Z đến A"
+	},
 	"specificNoteName": {
 		"message": "Tên ghi chú cụ thể"
 	},
 	"systemDefault": {
 		"message": "Mặc định hệ thống"
 	},
+	"template": {
+		"message": "Mẫu"
+	},
 	"templateCopied": {
 		"message": "Đã sao chép JSON mẫu vào bộ nhớ tạm"
 	},
 	"templateCopyError": {
 		"message": "Không thể sao chép JSON mẫu vào bộ nhớ tạm"
+	},
+	"templateErrorCount": {
+		"message": "Có lỗi trong mẫu của bạn."
+	},
+	"templateErrorsCount": {
+		"message": "Có $1 lỗi trong mẫu của bạn."
+	},
+	"templateGroupContent": {
+		"message": "Nội dung"
+	},
+	"templateGroupLocation": {
+		"message": "Vị trí"
 	},
 	"templateName": {
 		"message": "Tên mẫu"
@@ -753,6 +1016,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "Xác định quy tắc để tự động chọn mẫu này nếu nó khớp với mẫu URL hoặc chứa dữ liệu schema.org. Một quy tắc mỗi dòng."
+	},
+	"templateValid": {
+		"message": "Cú pháp mẫu hợp lệ"
 	},
 	"templatesHeading": {
 		"message": "Mẫu"

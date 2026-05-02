@@ -1,0 +1,67 @@
+pre, code, kbd, tt {
+	background-color: var(--code-background);
+	border-radius: var(--code-radius);
+	border: var(--code-border-width) solid var(--code-border-color);
+	font-size: var(--code-size);
+}
+code, kbd, tt {
+	padding: 0.1em 0.25em;
+}
+pre {
+	white-space: pre;
+	max-width: 100%;
+	overflow-x: auto;
+	padding: var(--size-4-3) var(--size-4-4);
+	position: relative;
+	pre,
+	code {
+		font-size: inherit;
+		border: none;
+		background-color: transparent;
+		padding: 0 !important;
+	}
+
+	.copy-button {
+		position: absolute;
+		top: var(--size-4-2);
+		right: var(--size-4-2);
+		width: auto;
+		height: auto;
+		padding: var(--size-2-3);
+		background-color: var(--background-primary-alt);
+		border: none;
+		border-radius: var(--radius-s);
+		color: var(--text-faint);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		opacity: 0;
+
+		svg {
+			width: var(--icon-s);
+			height: var(--icon-s);
+		}
+		&:hover {
+			background: var(--background-modifier-border);
+			color: var(--text-normal);
+		}
+
+		&.copied {
+			color: var(--color-green);
+		}
+	}
+
+	&:hover .copy-button {
+		opacity: 1;
+	}
+}
+code[class*="language-"],
+pre[class*="language-"] {
+	color: var(--text-normal);
+	word-wrap: break-word;
+	white-space: pre-wrap;
+	word-break: normal;
+	word-spacing: normal;
+	-webkit-hyphens: none;
+	hyphens: none;
+}

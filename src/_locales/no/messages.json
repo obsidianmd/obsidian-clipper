@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Avansert"
 	},
+	"allHighlights": {
+		"message": "Alle uthevinger"
+	},
 	"allProperties": {
 		"message": "Alle egenskaper"
 	},
@@ -58,9 +61,6 @@
 	},
 	"behavior": {
 		"message": "Oppførsel"
-	},
-	"behaviorWarning": {
-		"message": "Å legge til i eksisterende eller daglig notat krever Obsidian 1.7.2 eller nyere."
 	},
 	"byDay": {
 		"message": "Dag"
@@ -103,6 +103,14 @@
 			},
 			"strong_start": {
 				"content": "<strong>"
+			}
+		}
+	},
+	"clipboardError": {
+		"message": "Obsidian har ikke tilgang til utklippstavlen din. Prøv feilsøkingsinstruksjonene her: $1",
+		"placeholders": {
+			"1": {
+				"content": "$1"
 			}
 		}
 	},
@@ -157,6 +165,15 @@
 	"delete": {
 		"message": "Slett"
 	},
+	"deleteAllHighlightsConfirm": {
+		"message": "Er du sikker på at du vil slette alle uthevinger?"
+	},
+	"deleteHighlightsForDomain": {
+		"message": "Slette alle uthevinger for dette domenet?"
+	},
+	"deleteHighlightsForPage": {
+		"message": "Slette alle uthevinger for denne siden?"
+	},
 	"deleteModelConfirm": {
 		"message": "Er du sikker på at du vil slette denne modellen?"
 	},
@@ -192,6 +209,9 @@
 	"earlyAccessFeatures": {
 		"message": "Tidlig tilgang-funksjoner"
 	},
+	"edit": {
+		"message": "Rediger"
+	},
 	"editModel": {
 		"message": "Rediger modell"
 	},
@@ -201,8 +221,8 @@
 	"editTemplate": {
 		"message": "Rediger mal"
 	},
-	"enableHighlighter": {
-		"message": "Aktiver uthever"
+	"embedded": {
+		"message": "Innebygd"
 	},
 	"enableHighlighterDescription": {
 		"message": "Uthev innhold på nettsider for å lagre i Obsidian"
@@ -346,11 +366,23 @@
 	"highlightPage": {
 		"message": "Uthev side"
 	},
+	"highlightSelection": {
+		"message": "Uthev"
+	},
 	"highlighter": {
+		"message": "Uthever"
+	},
+	"highlighterOn": {
 		"message": "Uthever"
 	},
 	"highlighterSettings": {
 		"message": "Uthever"
+	},
+	"highlights": {
+		"message": "Uthevinger"
+	},
+	"highlightsNotFound": {
+		"message": "Fant ingen uthevinger i artikkelen"
 	},
 	"history": {
 		"message": "Historikk"
@@ -437,6 +469,12 @@
 	"legacyModeDescription": {
 		"message": "Bruker URI-fangstmetoden som er kompatibel med Obsidian 1.6.7 og eldre. Merk at lengden på fanget innhold er begrenset av nettleseren og operativsystemet. Noen sider kan mislykkes uten feilmelding."
 	},
+	"loadArticle": {
+		"message": "Les artikkel"
+	},
+	"loading": {
+		"message": "Laster…"
+	},
 	"modelName": {
 		"message": "Modellnavn"
 	},
@@ -469,6 +507,9 @@
 	},
 	"noHighlights": {
 		"message": "Ingen uthevinger"
+	},
+	"noResults": {
+		"message": "Ingen resultater funnet"
 	},
 	"noTemplates": {
 		"message": "Ingen tilgjengelige maler. Legg til en mal i innstillingene."
@@ -506,6 +547,24 @@
 	"open": {
 		"message": "Åpne"
 	},
+	"openBehaviorDescription": {
+		"message": "Velg hvordan Web Clipper åpnes som standard."
+	},
+	"openBehaviorTitle": {
+		"message": "Åpne oppførsel"
+	},
+	"openEmbedded": {
+		"message": "Åpne i side"
+	},
+	"openHighlights": {
+		"message": "Åpne uthevinger"
+	},
+	"openReader": {
+		"message": "Åpne leser"
+	},
+	"openSidePanel": {
+		"message": "Åpne sidepanel"
+	},
 	"optional": {
 		"message": "(valgfritt)"
 	},
@@ -539,11 +598,17 @@
 	"popularModelsDescription": {
 		"message": "Velg fra ofte brukte modeller eller skriv inn detaljer om tilpasset modell."
 	},
+	"popup": {
+		"message": "Popup"
+	},
 	"prependToDaily": {
 		"message": "Legg til i daglig notat, øverst"
 	},
 	"prependToExisting": {
 		"message": "Legg til i et eksisterende notat, øverst"
+	},
+	"preview": {
+		"message": "Forhåndsvisning"
 	},
 	"processing": {
 		"message": "behandler"
@@ -556,6 +621,24 @@
 	},
 	"propertyName": {
 		"message": "Egenskapsnavn"
+	},
+	"propertyTypeCheckbox": {
+		"message": "Avkrysningsboks"
+	},
+	"propertyTypeDate": {
+		"message": "Dato"
+	},
+	"propertyTypeDatetime": {
+		"message": "Dato & tid"
+	},
+	"propertyTypeMultitext": {
+		"message": "Liste"
+	},
+	"propertyTypeNumber": {
+		"message": "Nummer"
+	},
+	"propertyTypeText": {
+		"message": "Tekst"
 	},
 	"propertyValue": {
 		"message": "Egenskapsverdi"
@@ -608,6 +691,153 @@
 	"reader": {
 		"message": "Lesevisning"
 	},
+	"readerAppearance": {
+		"message": "Utseende"
+	},
+	"readerAppearanceAuto": {
+		"message": "Automatisk"
+	},
+	"readerAppearanceDark": {
+		"message": "Mørk"
+	},
+	"readerAppearanceDescription": {
+		"message": "Velg lyst eller mørkt utseende."
+	},
+	"readerAppearanceLight": {
+		"message": "Lys"
+	},
+	"readerAutoScroll": {
+		"message": "Automatisk rulling"
+	},
+	"readerAutoScrollDescription": {
+		"message": "Rull automatisk i transkripsjonen for å følge avspillingen."
+	},
+	"readerBlendImages": {
+		"message": "Bland bilder"
+	},
+	"readerBlendImagesDescription": {
+		"message": "Bland bilder med sidebakgrunnen."
+	},
+	"readerCloseImageViewer": {
+		"message": "Lukk bildevisning"
+	},
+	"readerCollapseComment": {
+		"message": "Skjul kommentar"
+	},
+	"readerColorLinks": {
+		"message": "Fargelegg lenker"
+	},
+	"readerColorSchemeDefault": {
+		"message": "Standard"
+	},
+	"readerCurrentPosition": {
+		"message": "Gjeldende posisjon"
+	},
+	"readerCustomCss": {
+		"message": "Egendefinert CSS"
+	},
+	"readerCustomCssDescription": {
+		"message": "CSS som brukes automatisk i lesevisning."
+	},
+	"readerDarkTheme": {
+		"message": "Tema for mørk modus"
+	},
+	"readerDarkThemeDescription": {
+		"message": "Bruk et annet tema i mørk modus."
+	},
+	"readerError": {
+		"message": "Kunne ikke hente ut innhold."
+	},
+	"readerFont": {
+		"message": "Skriftalternativer"
+	},
+	"readerFontDefault": {
+		"message": "Standard"
+	},
+	"readerFontDescription": {
+		"message": "Legg til skrifter som er installert på systemet ditt. Trykk Enter for å legge til en skrift."
+	},
+	"readerFontNotFound": {
+		"message": "Ikke funnet"
+	},
+	"readerFontPlaceholder": {
+		"message": "Trykk Enter for å legge til en skrift"
+	},
+	"readerFontSetDefault": {
+		"message": "Angi som standard"
+	},
+	"readerFontSize": {
+		"message": "Grunnleggende skriftstørrelse"
+	},
+	"readerFontSystem": {
+		"message": "System"
+	},
+	"readerFontSystemSans": {
+		"message": "Sans-serif"
+	},
+	"readerFontSystemSerif": {
+		"message": "Serif"
+	},
+	"readerFonts": {
+		"message": "Skrifter"
+	},
+	"readerFootnotes": {
+		"message": "Fotnoter"
+	},
+	"readerHighlightActiveLine": {
+		"message": "Uthev aktiv linje"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "Uthev gjeldende setning i transkripsjonen under avspilling."
+	},
+	"readerImages": {
+		"message": "Bilder"
+	},
+	"readerLineHeight": {
+		"message": "Linjehøyde"
+	},
+	"readerLineWidth": {
+		"message": "Linjebredde"
+	},
+	"readerLoadFailed": {
+		"message": "Kunne ikke laste inn. Siden kan være blokkert av nettleseren din."
+	},
+	"readerLoading": {
+		"message": "Fjerner støy…"
+	},
+	"readerOn": {
+		"message": "Lesemodus"
+	},
+	"readerPinPlayer": {
+		"message": "Fest avspiller"
+	},
+	"readerPinPlayerDescription": {
+		"message": "Hold videoavspilleren synlig mens du ruller gjennom transkripsjonen."
+	},
+	"readerSettings": {
+		"message": "Leserinnstillinger"
+	},
+	"readerTheme": {
+		"message": "Tema"
+	},
+	"readerThemeDescription": {
+		"message": "Velg fargene som brukes i lesevisning."
+	},
+	"readerThemeSection": {
+		"message": "Tema"
+	},
+	"readerTranscripts": {
+		"message": "Transkripsjoner"
+	},
+	"readerTypography": {
+		"message": "Typografi"
+	},
+	"readerUrlPlaceholder": {
+		"message": "Lim inn en URL for å lese…"
+	},
+	"readerViewFullSize": {
+		"message": "Vis i full størrelse"
+	},
 	"recommended": {
 		"message": "anbefalt"
 	},
@@ -658,6 +888,9 @@
 	},
 	"saveFile": {
 		"message": "Lagre fil..."
+	},
+	"searchHighlightsPlaceholder": {
+		"message": "Søk i uthevinger…"
 	},
 	"searchVariables": {
 		"message": "Søk i variabler..."
@@ -719,17 +952,47 @@
 	"silentOpenDescription": {
 		"message": "Klippede notater vil bli lagret men ikke åpnet i en ny fane. Obsidian vil fortsatt bli brakt til forgrunnen."
 	},
+	"sort": {
+		"message": "Sorter"
+	},
+	"sortAZ": {
+		"message": "A til Å"
+	},
+	"sortNewOld": {
+		"message": "Nyeste først"
+	},
+	"sortOldNew": {
+		"message": "Eldste først"
+	},
+	"sortZA": {
+		"message": "Å til A"
+	},
 	"specificNoteName": {
 		"message": "Spesifikt notatnavn"
 	},
 	"systemDefault": {
 		"message": "Systemstandard"
 	},
+	"template": {
+		"message": "Mal"
+	},
 	"templateCopied": {
 		"message": "Mal-JSON kopiert til utklippstavlen"
 	},
 	"templateCopyError": {
 		"message": "Kunne ikke kopiere mal-JSON til utklippstavlen"
+	},
+	"templateErrorCount": {
+		"message": "Det er en feil i malen din."
+	},
+	"templateErrorsCount": {
+		"message": "Det er $1 feil i malen din."
+	},
+	"templateGroupContent": {
+		"message": "Innhold"
+	},
+	"templateGroupLocation": {
+		"message": "Plassering"
 	},
 	"templateName": {
 		"message": "Malnavn"
@@ -745,6 +1008,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "Definer regler for automatisk valg av denne malen hvis den matcher URL-mønsteret eller inneholder schema.org-data. Én regel per linje."
+	},
+	"templateValid": {
+		"message": "Malsyntaksen er gyldig"
 	},
 	"templatesHeading": {
 		"message": "Maler"

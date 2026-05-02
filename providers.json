@@ -1,16 +1,18 @@
 {
-	"version": "2025.05.01",
+	"version": "2026.12.08",
 	"anthropic": {
 		"id": "anthropic",
 		"name": "Anthropic",
 		"apiKeyUrl": "https://console.anthropic.com/settings/keys",
 		"apiKeyRequired": true,
-		"modelsList": "https://docs.anthropic.com/en/docs/about-claude/models",
+		"modelsList": "https://platform.claude.com/docs/en/about-claude/models/overview",
 		"baseUrl": "https://api.anthropic.com/v1/messages",
 		"popularModels": [
 			{ "id": "claude-3-5-haiku-latest", "name": "Claude 3.5 Haiku" },
-			{ "id": "claude-3-5-sonnet-latest", "name": "Claude 3.5 Sonnet" },
-			{ "id": "claude-3-7-sonnet-latest", "name": "Claude 3.7 Sonnet" }
+			{ "id": "claude-haiku-4-5", "name": "Claude 4.5 Haiku" },
+			{ "id": "claude-sonnet-4-0", "name": "Claude 4.0 Sonnet" },
+			{ "id": "claude-sonnet-4-5", "name": "Claude 4.5 Sonnet" },
+			{ "id": "claude-opus-4-5", "name": "Claude 4.5 Opus" }
 		]
 	},
 	"azure-openai": {
@@ -45,8 +47,10 @@
 		"modelsList": "https://ai.google.dev/gemini-api/docs/models",
 		"baseUrl": "https://generativelanguage.googleapis.com/v1beta/chat/completions",
 		"popularModels": [
-			{ "id": "gemini-2.0-flash", "name": "Gemini 2.0 Flash" },
-			{ "id": "gemini-2.5-flash-preview-04-17", "name": "Gemini 2.5 Flash Preview" }
+			{ "id": "gemini-2.5-flash", "name": "Gemini 2.5 Flash" },
+			{ "id": "gemini-2.5-flash-lite", "name": "Gemini 2.5 Flash Lite" },
+			{ "id": "gemini-2.5-pro", "name": "Gemini 2.5 Pro" },
+			{ "id": "gemini-3-pro-preview", "name": "Gemini 3 Pro Preview" }
 		]
 	},
 	"huggingface": {
@@ -74,6 +78,7 @@
 		"modelsList": "https://ollama.com/models",
 		"baseUrl": "http://127.0.0.1:11434/api/chat",
 		"popularModels": [
+			{ "id": "gpt-oss:20b", "name": "GPT OSS 20B" },
 			{ "id": "llama3.2:1b", "name": "Llama 3.2 1B" },
 			{ "id": "llama3.2", "name": "Llama 3.2 3B" },
 			{ "id": "llama3.3", "name": "Llama 3.3 70B" }
@@ -89,9 +94,9 @@
 		"popularModels": [
 			{ "id": "gpt-4o-mini", "name": "GPT-4o Mini" },
 			{ "id": "gpt-4o", "name": "GPT-4o" },
-			{ "id": "o1-2024-12-17", "name": "o1" },
-			{ "id": "o1-mini-2024-09-12", "name": "o1 Mini" },
-			{ "id": "o3-mini-2025-01-31", "name": "o3 Mini" }
+			{ "id": "gpt-5", "name": "GPT 5" },
+			{ "id": "gpt-5-mini", "name": "GPT 5 Mini" },
+			{ "id": "gpt-5-nano", "name": "GPT 5 Nano" }
 		]
 	},
 	"openrouter": {
@@ -111,7 +116,7 @@
 		"name": "Perplexity",
 		"apiKeyUrl": "https://www.perplexity.ai/settings/api",
 		"apiKeyRequired": true,
-		"modelsList": "https://docs.perplexity.ai/guides/model-cards",
+		"modelsList": "https://docs.perplexity.ai/getting-started/models",
 		"baseUrl": "https://api.perplexity.ai/chat/completions",
 		"popularModels": [
 			{ "id": "sonar", "name": "Sonar" },
@@ -129,10 +134,10 @@
 		"modelsList": "https://docs.x.ai/docs/models",
 		"baseUrl": "https://api.x.ai/v1/chat/completions",
 		"popularModels": [
-			{ "id": "grok-3-latest", "name": "Grok 3" },
-			{ "id": "grok-3-fast-latest", "name": "Grok 3 Fast" },
-			{ "id": "grok-3-mini-latest", "name": "Grok 3 Mini" },
-			{ "id": "grok-3-mini-fast-latest", "name": "Grok 3 Mini Fast" }
+			{ "id": "grok-4-fast-non-reasoning", "name": "Grok 4 Fast" },
+			{ "id": "grok-4", "name": "Grok 4" },
+			{ "id": "grok-3", "name": "Grok 3" },
+			{ "id": "grok-3-mini", "name": "Grok 3 Mini" }
 		]
 	}
 }

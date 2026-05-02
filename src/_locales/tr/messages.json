@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Gelişmiş"
 	},
+	"allHighlights": {
+		"message": "Tüm vurgular"
+	},
 	"allProperties": {
 		"message": "Tüm özellikler"
 	},
@@ -58,9 +61,6 @@
 	},
 	"behavior": {
 		"message": "Davranış"
-	},
-	"behaviorWarning": {
-		"message": "Mevcut nota veya günlük nota ekleme için Obsidian 1.7.2 veya daha yeni sürüm gereklidir."
 	},
 	"byDay": {
 		"message": "Günler"
@@ -103,6 +103,14 @@
 			},
 			"strong_start": {
 				"content": "<strong>"
+			}
+		}
+	},
+	"clipboardError": {
+		"message": "Obsidian panonuza erişemiyor. Şuradaki sorun giderme talimatlarını deneyin: $1",
+		"placeholders": {
+			"1": {
+				"content": "$1"
 			}
 		}
 	},
@@ -157,6 +165,15 @@
 	"delete": {
 		"message": "Sil"
 	},
+	"deleteAllHighlightsConfirm": {
+		"message": "Tüm vurguları silmek istediğinizden emin misiniz?"
+	},
+	"deleteHighlightsForDomain": {
+		"message": "Bu alan adı için tüm vurgular silinsin mi?"
+	},
+	"deleteHighlightsForPage": {
+		"message": "Bu sayfa için tüm vurgular silinsin mi?"
+	},
 	"deleteModelConfirm": {
 		"message": "Bu modeli silmek istediğinizden emin misiniz?"
 	},
@@ -192,6 +209,9 @@
 	"earlyAccessFeatures": {
 		"message": "Erken erişim özellikleri"
 	},
+	"edit": {
+		"message": "Düzenle"
+	},
 	"editModel": {
 		"message": "Modeli düzenle"
 	},
@@ -201,8 +221,8 @@
 	"editTemplate": {
 		"message": "Şablonu düzenle"
 	},
-	"enableHighlighter": {
-		"message": "Vurgulayıcıyı etkinleştir"
+	"embedded": {
+		"message": "Gömülü"
 	},
 	"enableHighlighterDescription": {
 		"message": "Web sayfalarındaki Obsidian'a kaydedebileceğiniz içeriği vurgulayın."
@@ -346,11 +366,23 @@
 	"highlightPage": {
 		"message": "Sayfayı vurgula"
 	},
+	"highlightSelection": {
+		"message": "Vurgula"
+	},
 	"highlighter": {
+		"message": "Vurgulayıcı"
+	},
+	"highlighterOn": {
 		"message": "Vurgulayıcı"
 	},
 	"highlighterSettings": {
 		"message": "Vurgulayıcı"
+	},
+	"highlights": {
+		"message": "Vurgular"
+	},
+	"highlightsNotFound": {
+		"message": "Makalede vurgular bulunamadı"
 	},
 	"history": {
 		"message": "Geçmiş"
@@ -437,6 +469,12 @@
 	"legacyModeDescription": {
 		"message": "Obsidian 1.6.7 veya daha eski sürümlerle uyumlu URI kırpma yöntemini kullanır. Kırpabileceğiniz içerik uzunluğunun tarayıcınız ve işletim sisteminiz tarafından sınırlandırıldığını unutmayın. Bazı sayfalar hata vermeden başarısız olabilir."
 	},
+	"loadArticle": {
+		"message": "Makaleyi oku"
+	},
+	"loading": {
+		"message": "Yükleniyor…"
+	},
 	"modelName": {
 		"message": "Görünen ad"
 	},
@@ -469,6 +507,9 @@
 	},
 	"noHighlights": {
 		"message": "Hiçbir şey yapma"
+	},
+	"noResults": {
+		"message": "Sonuç bulunamadı"
 	},
 	"noTemplates": {
 		"message": "Kullanılabilir şablon yok. Lütfen ayarlarda bir şablon ekleyin."
@@ -514,6 +555,24 @@
 	"open": {
 		"message": "Aç"
 	},
+	"openBehaviorDescription": {
+		"message": "Web Clipper'ın varsayılan olarak nasıl açılacağını seçin."
+	},
+	"openBehaviorTitle": {
+		"message": "Açma davranışı"
+	},
+	"openEmbedded": {
+		"message": "Sayfada aç"
+	},
+	"openHighlights": {
+		"message": "Vurguları aç"
+	},
+	"openReader": {
+		"message": "Okuyucuyu aç"
+	},
+	"openSidePanel": {
+		"message": "Yan paneli aç"
+	},
 	"optional": {
 		"message": "(isteğe bağlı)"
 	},
@@ -547,11 +606,17 @@
 	"popularModelsDescription": {
 		"message": "Sık kullanılan modellerden seçin veya özel model detaylarını girin."
 	},
+	"popup": {
+		"message": "Açılır Pencere"
+	},
 	"prependToDaily": {
 		"message": "Günlük nota, başa ekle"
 	},
 	"prependToExisting": {
 		"message": "Mevcut nota, başa ekle"
+	},
+	"preview": {
+		"message": "Önizleme"
 	},
 	"processing": {
 		"message": "İşleniyor"
@@ -564,6 +629,24 @@
 	},
 	"propertyName": {
 		"message": "Özellik adı"
+	},
+	"propertyTypeCheckbox": {
+		"message": "Onay Kutusu"
+	},
+	"propertyTypeDate": {
+		"message": "Tarih"
+	},
+	"propertyTypeDatetime": {
+		"message": "Tarih & Saat"
+	},
+	"propertyTypeMultitext": {
+		"message": "Liste"
+	},
+	"propertyTypeNumber": {
+		"message": "Numara"
+	},
+	"propertyTypeText": {
+		"message": "Metin"
 	},
 	"propertyValue": {
 		"message": "Özellik değeri"
@@ -616,6 +699,153 @@
 	"reader": {
 		"message": "Okuyucu"
 	},
+	"readerAppearance": {
+		"message": "Görünüm"
+	},
+	"readerAppearanceAuto": {
+		"message": "Otomatik"
+	},
+	"readerAppearanceDark": {
+		"message": "Koyu"
+	},
+	"readerAppearanceDescription": {
+		"message": "Açık veya koyu görünümü seçin."
+	},
+	"readerAppearanceLight": {
+		"message": "Açık"
+	},
+	"readerAutoScroll": {
+		"message": "Otomatik kaydırma"
+	},
+	"readerAutoScrollDescription": {
+		"message": "Oynatmayı takip etmek için transkripti otomatik olarak kaydırır."
+	},
+	"readerBlendImages": {
+		"message": "Görselleri harmanla"
+	},
+	"readerBlendImagesDescription": {
+		"message": "Görselleri sayfa arka planıyla harmanlayın."
+	},
+	"readerCloseImageViewer": {
+		"message": "Görsel görüntüleyiciyi kapat"
+	},
+	"readerCollapseComment": {
+		"message": "Yorumu daralt"
+	},
+	"readerColorLinks": {
+		"message": "Bağlantıları renklendir"
+	},
+	"readerColorSchemeDefault": {
+		"message": "Varsayılan"
+	},
+	"readerCurrentPosition": {
+		"message": "Geçerli konum"
+	},
+	"readerCustomCss": {
+		"message": "Özel CSS"
+	},
+	"readerCustomCssDescription": {
+		"message": "Okuma görünümünde otomatik olarak uygulanan CSS."
+	},
+	"readerDarkTheme": {
+		"message": "Koyu mod teması"
+	},
+	"readerDarkThemeDescription": {
+		"message": "Koyu modda farklı bir tema kullanın."
+	},
+	"readerError": {
+		"message": "İçerik çıkarılamadı."
+	},
+	"readerFont": {
+		"message": "Yazı tipi seçenekleri"
+	},
+	"readerFontDefault": {
+		"message": "Varsayılan"
+	},
+	"readerFontDescription": {
+		"message": "Sisteminizde yüklü yazı tiplerini ekleyin. Bir yazı tipi eklemek için Enter'a basın."
+	},
+	"readerFontNotFound": {
+		"message": "Bulunamadı"
+	},
+	"readerFontPlaceholder": {
+		"message": "Bir yazı tipi eklemek için Enter'a basın"
+	},
+	"readerFontSetDefault": {
+		"message": "Varsayılan olarak ayarla"
+	},
+	"readerFontSize": {
+		"message": "Temel yazı tipi boyutu"
+	},
+	"readerFontSystem": {
+		"message": "Sistem"
+	},
+	"readerFontSystemSans": {
+		"message": "Sans-serif"
+	},
+	"readerFontSystemSerif": {
+		"message": "Serif"
+	},
+	"readerFonts": {
+		"message": "Yazı tipleri"
+	},
+	"readerFootnotes": {
+		"message": "Dipnotlar"
+	},
+	"readerHighlightActiveLine": {
+		"message": "Etkin satırı vurgula"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "Oynatma sırasında transkriptteki geçerli cümleyi vurgular."
+	},
+	"readerImages": {
+		"message": "Görseller"
+	},
+	"readerLineHeight": {
+		"message": "Satır yüksekliği"
+	},
+	"readerLineWidth": {
+		"message": "Satır genişliği"
+	},
+	"readerLoadFailed": {
+		"message": "Yüklenemedi. Sayfa tarayıcınız tarafından engellenmiş olabilir."
+	},
+	"readerLoading": {
+		"message": "Sadeleştiriliyor…"
+	},
+	"readerOn": {
+		"message": "Okuyucu"
+	},
+	"readerPinPlayer": {
+		"message": "Oynatıcıyı sabitle"
+	},
+	"readerPinPlayerDescription": {
+		"message": "Transkriptte kaydırma yaparken video oynatıcısını görünür tutar."
+	},
+	"readerSettings": {
+		"message": "Okuyucu ayarları"
+	},
+	"readerTheme": {
+		"message": "Tema"
+	},
+	"readerThemeDescription": {
+		"message": "Okuma görünümünde kullanılan renkleri seçin."
+	},
+	"readerThemeSection": {
+		"message": "Tema"
+	},
+	"readerTranscripts": {
+		"message": "Transkriptler"
+	},
+	"readerTypography": {
+		"message": "Tipografi"
+	},
+	"readerUrlPlaceholder": {
+		"message": "Okumak için bir URL yapıştırın…"
+	},
+	"readerViewFullSize": {
+		"message": "Tam boyutta görüntüle"
+	},
 	"recommended": {
 		"message": "önerilen"
 	},
@@ -666,6 +896,9 @@
 	},
 	"saveFile": {
 		"message": "Dosyayı kaydet..."
+	},
+	"searchHighlightsPlaceholder": {
+		"message": "Vurgularda ara…"
 	},
 	"searchVariables": {
 		"message": "Değişkenleri ara..."
@@ -727,17 +960,47 @@
 	"silentOpenDescription": {
 		"message": "Notlar kaydedilir ama yeni sekmede açılmaz. Obsidian yine de öne gelir."
 	},
+	"sort": {
+		"message": "Sırala"
+	},
+	"sortAZ": {
+		"message": "A'dan Z'ye"
+	},
+	"sortNewOld": {
+		"message": "En yeniler önce"
+	},
+	"sortOldNew": {
+		"message": "En eskiler önce"
+	},
+	"sortZA": {
+		"message": "Z'den A'ya"
+	},
 	"specificNoteName": {
 		"message": "Belirli not adı"
 	},
 	"systemDefault": {
 		"message": "Sistem"
 	},
+	"template": {
+		"message": "Şablon"
+	},
 	"templateCopied": {
 		"message": "Şablon JSON'u panoya kopyalandı"
 	},
 	"templateCopyError": {
 		"message": "Şablon JSON'u panoya kopyalanamadı"
+	},
+	"templateErrorCount": {
+		"message": "Şablonunuzda bir hata var."
+	},
+	"templateErrorsCount": {
+		"message": "Şablonunuzda $1 hata var."
+	},
+	"templateGroupContent": {
+		"message": "İçerik"
+	},
+	"templateGroupLocation": {
+		"message": "Konum"
 	},
 	"templateName": {
 		"message": "Şablon adı"
@@ -753,6 +1016,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "URL deseni eşleştiğinde veya schema.org verisi içerdiğinde bu şablonu otomatik olarak seçmek için kurallar tanımlayın. Her satıra bir kural."
+	},
+	"templateValid": {
+		"message": "Şablon sözdizimi geçerli"
 	},
 	"templatesHeading": {
 		"message": "Şablonlar"

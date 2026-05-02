@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "高级"
 	},
+	"allHighlights": {
+		"message": "所有高亮"
+	},
 	"allProperties": {
 		"message": "所有属性"
 	},
@@ -58,9 +61,6 @@
 	},
 	"behavior": {
 		"message": "行为"
-	},
-	"behaviorWarning": {
-		"message": "添加到现有笔记或日记需要 Obsidian 1.7.2 或更高版本。"
 	},
 	"byDay": {
 		"message": "天"
@@ -103,6 +103,14 @@
 			},
 			"strong_start": {
 				"content": "<strong>"
+			}
+		}
+	},
+	"clipboardError": {
+		"message": "Obsidian 无法访问你的剪贴板。请尝试此处的故障排除说明：$1",
+		"placeholders": {
+			"1": {
+				"content": "$1"
 			}
 		}
 	},
@@ -157,6 +165,15 @@
 	"delete": {
 		"message": "删除"
 	},
+	"deleteAllHighlightsConfirm": {
+		"message": "确定要删除所有高亮吗？"
+	},
+	"deleteHighlightsForDomain": {
+		"message": "删除此域名下的所有高亮？"
+	},
+	"deleteHighlightsForPage": {
+		"message": "删除此页面的所有高亮？"
+	},
 	"deleteModelConfirm": {
 		"message": "您确定要删除此模型吗？"
 	},
@@ -192,6 +209,9 @@
 	"earlyAccessFeatures": {
 		"message": "早期访问功能"
 	},
+	"edit": {
+		"message": "编辑"
+	},
 	"editModel": {
 		"message": "编辑模型"
 	},
@@ -201,8 +221,8 @@
 	"editTemplate": {
 		"message": "编辑模板"
 	},
-	"enableHighlighter": {
-		"message": "启用高亮"
+	"embedded": {
+		"message": "嵌入式"
 	},
 	"enableHighlighterDescription": {
 		"message": "在网页上高亮内容并保存到 Obsidian。"
@@ -346,11 +366,23 @@
 	"highlightPage": {
 		"message": "高亮页面"
 	},
+	"highlightSelection": {
+		"message": "高亮"
+	},
 	"highlighter": {
+		"message": "高亮"
+	},
+	"highlighterOn": {
 		"message": "高亮"
 	},
 	"highlighterSettings": {
 		"message": "高亮"
+	},
+	"highlights": {
+		"message": "高亮"
+	},
+	"highlightsNotFound": {
+		"message": "文章中未找到高亮"
 	},
 	"history": {
 		"message": "历史"
@@ -437,6 +469,12 @@
 	"legacyModeDescription": {
 		"message": "使用与 Obsidian 1.6.7 或更早版本兼容的 URI 剪藏方法。请注意，您可以剪藏的内容长度受浏览器和操作系统限制。某些页面可能会静默失败。"
 	},
+	"loadArticle": {
+		"message": "阅读文章"
+	},
+	"loading": {
+		"message": "正在加载…"
+	},
 	"modelName": {
 		"message": "模型名称"
 	},
@@ -469,6 +507,9 @@
 	},
 	"noHighlights": {
 		"message": "不执行任何操作"
+	},
+	"noResults": {
+		"message": "未找到结果"
 	},
 	"noTemplates": {
 		"message": "没有可用的模板。请在设置中添加模板。"
@@ -514,6 +555,24 @@
 	"open": {
 		"message": "打开"
 	},
+	"openBehaviorDescription": {
+		"message": "选择Web Clipper默认的打开方式。"
+	},
+	"openBehaviorTitle": {
+		"message": "打开行为"
+	},
+	"openEmbedded": {
+		"message": "在页面中打开"
+	},
+	"openHighlights": {
+		"message": "打开高亮"
+	},
+	"openReader": {
+		"message": "打开阅读器"
+	},
+	"openSidePanel": {
+		"message": "打开侧面板"
+	},
 	"optional": {
 		"message": "(可选)"
 	},
@@ -547,11 +606,17 @@
 	"popularModelsDescription": {
 		"message": "从常用模型中选择，或输入自定义模型详细信息。"
 	},
+	"popup": {
+		"message": "弹出窗口"
+	},
 	"prependToDaily": {
 		"message": "添加到日记开头"
 	},
 	"prependToExisting": {
 		"message": "添加到现有笔记开头"
+	},
+	"preview": {
+		"message": "预览"
 	},
 	"processing": {
 		"message": "处理中"
@@ -564,6 +629,24 @@
 	},
 	"propertyName": {
 		"message": "属性名称"
+	},
+	"propertyTypeCheckbox": {
+		"message": "复选框"
+	},
+	"propertyTypeDate": {
+		"message": "日期"
+	},
+	"propertyTypeDatetime": {
+		"message": "日期和时间"
+	},
+	"propertyTypeMultitext": {
+		"message": "列表"
+	},
+	"propertyTypeNumber": {
+		"message": "数字"
+	},
+	"propertyTypeText": {
+		"message": "文本"
 	},
 	"propertyValue": {
 		"message": "属性值"
@@ -616,6 +699,153 @@
 	"reader": {
 		"message": "阅读器"
 	},
+	"readerAppearance": {
+		"message": "外观"
+	},
+	"readerAppearanceAuto": {
+		"message": "自动"
+	},
+	"readerAppearanceDark": {
+		"message": "深色"
+	},
+	"readerAppearanceDescription": {
+		"message": "选择浅色或深色外观。"
+	},
+	"readerAppearanceLight": {
+		"message": "浅色"
+	},
+	"readerAutoScroll": {
+		"message": "自动滚动"
+	},
+	"readerAutoScrollDescription": {
+		"message": "自动滚动字幕稿以跟随播放进度。"
+	},
+	"readerBlendImages": {
+		"message": "融合图片"
+	},
+	"readerBlendImagesDescription": {
+		"message": "将图片与页面背景融合。"
+	},
+	"readerCloseImageViewer": {
+		"message": "关闭图片查看器"
+	},
+	"readerCollapseComment": {
+		"message": "折叠评论"
+	},
+	"readerColorLinks": {
+		"message": "链接着色"
+	},
+	"readerColorSchemeDefault": {
+		"message": "默认"
+	},
+	"readerCurrentPosition": {
+		"message": "当前位置"
+	},
+	"readerCustomCss": {
+		"message": "自定义 CSS"
+	},
+	"readerCustomCssDescription": {
+		"message": "在阅读视图中自动应用的 CSS。"
+	},
+	"readerDarkTheme": {
+		"message": "深色模式主题"
+	},
+	"readerDarkThemeDescription": {
+		"message": "在深色模式下使用不同的主题。"
+	},
+	"readerError": {
+		"message": "内容提取失败。"
+	},
+	"readerFont": {
+		"message": "字体选项"
+	},
+	"readerFontDefault": {
+		"message": "默认"
+	},
+	"readerFontDescription": {
+		"message": "添加系统中已安装的字体。按 Enter 添加字体。"
+	},
+	"readerFontNotFound": {
+		"message": "未找到"
+	},
+	"readerFontPlaceholder": {
+		"message": "按 Enter 添加字体"
+	},
+	"readerFontSetDefault": {
+		"message": "设为默认"
+	},
+	"readerFontSize": {
+		"message": "基础字号"
+	},
+	"readerFontSystem": {
+		"message": "系统"
+	},
+	"readerFontSystemSans": {
+		"message": "无衬线"
+	},
+	"readerFontSystemSerif": {
+		"message": "衬线"
+	},
+	"readerFonts": {
+		"message": "字体"
+	},
+	"readerFootnotes": {
+		"message": "脚注"
+	},
+	"readerHighlightActiveLine": {
+		"message": "高亮当前行"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "播放时在字幕稿中高亮当前句子。"
+	},
+	"readerImages": {
+		"message": "图片"
+	},
+	"readerLineHeight": {
+		"message": "行高"
+	},
+	"readerLineWidth": {
+		"message": "行宽"
+	},
+	"readerLoadFailed": {
+		"message": "加载失败。该页面可能被浏览器阻止。"
+	},
+	"readerLoading": {
+		"message": "正在净化…"
+	},
+	"readerOn": {
+		"message": "阅读器"
+	},
+	"readerPinPlayer": {
+		"message": "固定播放器"
+	},
+	"readerPinPlayerDescription": {
+		"message": "滚动字幕稿时保持视频播放器可见。"
+	},
+	"readerSettings": {
+		"message": "阅读器设置"
+	},
+	"readerTheme": {
+		"message": "主题"
+	},
+	"readerThemeDescription": {
+		"message": "选择阅读视图中使用的颜色。"
+	},
+	"readerThemeSection": {
+		"message": "主题"
+	},
+	"readerTranscripts": {
+		"message": "字幕稿"
+	},
+	"readerTypography": {
+		"message": "排版"
+	},
+	"readerUrlPlaceholder": {
+		"message": "粘贴要阅读的 URL…"
+	},
+	"readerViewFullSize": {
+		"message": "查看原始大小"
+	},
 	"recommended": {
 		"message": "推荐"
 	},
@@ -666,6 +896,9 @@
 	},
 	"saveFile": {
 		"message": "保存文件..."
+	},
+	"searchHighlightsPlaceholder": {
+		"message": "搜索高亮…"
 	},
 	"searchVariables": {
 		"message": "搜索变量..."
@@ -727,17 +960,47 @@
 	"silentOpenDescription": {
 		"message": "剪藏的笔记将被保存但不会在新标签页中打开。Obsidian 仍会被置于前台。"
 	},
+	"sort": {
+		"message": "排序"
+	},
+	"sortAZ": {
+		"message": "A 到 Z"
+	},
+	"sortNewOld": {
+		"message": "最新优先"
+	},
+	"sortOldNew": {
+		"message": "最早优先"
+	},
+	"sortZA": {
+		"message": "Z 到 A"
+	},
 	"specificNoteName": {
 		"message": "特定笔记名称"
 	},
 	"systemDefault": {
 		"message": "系统默认"
 	},
+	"template": {
+		"message": "模板"
+	},
 	"templateCopied": {
 		"message": "已将模板 JSON 复制到剪贴板"
 	},
 	"templateCopyError": {
 		"message": "无法将模板 JSON 复制到剪贴板"
+	},
+	"templateErrorCount": {
+		"message": "你的模板中有一个错误。"
+	},
+	"templateErrorsCount": {
+		"message": "你的模板中有 $1 个错误。"
+	},
+	"templateGroupContent": {
+		"message": "内容"
+	},
+	"templateGroupLocation": {
+		"message": "位置"
 	},
 	"templateName": {
 		"message": "模板名称"
@@ -753,6 +1016,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "定义规则以在匹配 URL 模式或包含 schema.org 数据时自动选择此模板。每行一个规则。"
+	},
+	"templateValid": {
+		"message": "模板语法有效"
 	},
 	"templatesHeading": {
 		"message": "模板"

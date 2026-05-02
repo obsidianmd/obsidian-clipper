@@ -1,0 +1,13 @@
+{
+	"noteNameFormat": "{{schema:author}} – {{schema:name}}",
+	"noteContentFormat": "![{{schema:name}}]({{url}})",
+	"properties": [
+		{ "name": "title", "value": "{{schema:name}}", "type": "text" },
+		{ "name": "author", "value": "{{schema:author|wikilink}}", "type": "multitext" },
+		{ "name": "published", "value": "{{schema:uploadDate|date:YYYY-MM-DD}}", "type": "date" },
+		{ "name": "source", "value": "{{url}}", "type": "text" },
+		{ "name": "image", "value": "{{schema:thumbnailUrl|slice:0}}", "type": "text" },
+		{ "name": "created", "value": "{{date}}", "type": "text" },
+		{ "name": "tags", "value": "videos", "type": "text" }
+	]
+}

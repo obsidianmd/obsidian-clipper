@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "অ্যাডভান্সড"
 	},
+	"allHighlights": {
+		"message": "সব হাইলাইট"
+	},
 	"allProperties": {
 		"message": "সমস্ত প্রপার্টি"
 	},
@@ -58,9 +61,6 @@
 	},
 	"behavior": {
 		"message": "আচরণ"
-	},
-	"behaviorWarning": {
-		"message": "বিদ্যমান নোট বা ডেইলি নোটে যোগ করতে হলে Obsidian 1.7.2 বা তার পরের সংস্করণ প্রয়োজন।"
 	},
 	"byDay": {
 		"message": "দিন"
@@ -103,6 +103,14 @@
 			},
 			"strong_start": {
 				"content": "<strong>"
+			}
+		}
+	},
+	"clipboardError": {
+		"message": "Obsidian আপনার ক্লিপবোর্ডে অ্যাক্সেস করতে পারছে না। এখানে ট্রাবলশুটিং নির্দেশনা দেখুন: $1",
+		"placeholders": {
+			"1": {
+				"content": "$1"
 			}
 		}
 	},
@@ -157,6 +165,15 @@
 	"delete": {
 		"message": "মুছে ফেলুন"
 	},
+	"deleteAllHighlightsConfirm": {
+		"message": "আপনি কি নিশ্চিত যে আপনি সব হাইলাইট মুছে ফেলতে চান?"
+	},
+	"deleteHighlightsForDomain": {
+		"message": "এই ডোমেইনের সব হাইলাইট মুছবেন?"
+	},
+	"deleteHighlightsForPage": {
+		"message": "এই পৃষ্ঠার সব হাইলাইট মুছবেন?"
+	},
 	"deleteModelConfirm": {
 		"message": "আপনি কি নিশ্চিতভাবে এই মডেলটি মুছে ফেলতে চান?"
 	},
@@ -192,6 +209,9 @@
 	"earlyAccessFeatures": {
 		"message": "আর্লি অ্যাক্সেসের ফিচারগুলো"
 	},
+	"edit": {
+		"message": "সম্পাদনা"
+	},
 	"editModel": {
 		"message": "মডেল সম্পাদনা করুন"
 	},
@@ -201,8 +221,8 @@
 	"editTemplate": {
 		"message": "টেমপ্লেট সম্পাদনা করুন"
 	},
-	"enableHighlighter": {
-		"message": "হাইলাইটার সক্রিয় করুন"
+	"embedded": {
+		"message": "এম্বেডেড"
 	},
 	"enableHighlighterDescription": {
 		"message": "ওয়েব পেজ থেকে বিষয়বস্তু হাইলাইট করে Obsidian এ সংরক্ষণ করুন।"
@@ -346,11 +366,23 @@
 	"highlightPage": {
 		"message": "পেজ হাইলাইট করুন"
 	},
+	"highlightSelection": {
+		"message": "হাইলাইট"
+	},
 	"highlighter": {
+		"message": "হাইলাইটার"
+	},
+	"highlighterOn": {
 		"message": "হাইলাইটার"
 	},
 	"highlighterSettings": {
 		"message": "হাইলাইটার"
+	},
+	"highlights": {
+		"message": "হাইলাইট"
+	},
+	"highlightsNotFound": {
+		"message": "আর্টিকেলে হাইলাইট পাওয়া যায়নি"
 	},
 	"history": {
 		"message": "ইতিহাস"
@@ -437,6 +469,12 @@
 	"legacyModeDescription": {
 		"message": "এটি Obsidian 1.6.7 বা তার আগের সংস্করণের সাথে সামঞ্জস্যপূর্ণ URI ক্লিপিং পদ্ধতি ব্যবহার করে। মনে রাখবেন, আপনার ব্রাউজার এবং অপারেটিং সিস্টেমের সীমাবদ্ধতার কারণে পেজের বিষয়বস্তু ক্লিপ করার পরিমাণ সীমিত থাকতে পারে। কিছু পেজ কোনো ত্রুটি বার্তা ছাড়াই ব্যর্থ হতে পারে।"
 	},
+	"loadArticle": {
+		"message": "আর্টিকেল পড়ুন"
+	},
+	"loading": {
+		"message": "লোড হচ্ছে…"
+	},
 	"modelName": {
 		"message": "প্রদর্শিত নাম"
 	},
@@ -469,6 +507,9 @@
 	},
 	"noHighlights": {
 		"message": "কিছুই করবেন না"
+	},
+	"noResults": {
+		"message": "কোনো ফলাফল পাওয়া যায়নি"
 	},
 	"noTemplates": {
 		"message": "কোনো টেমপ্লেট পাওয়া যায়নি। সেটিংসে একটি টেমপ্লেট যোগ করুন।"
@@ -514,6 +555,24 @@
 	"open": {
 		"message": "খুলুন"
 	},
+	"openBehaviorDescription": {
+		"message": "ডিফল্ট হিসেবে ওয়েব ক্লিপার কীভাবে খুলবে তা নির্বাচন করুন।"
+	},
+	"openBehaviorTitle": {
+		"message": "খোলার আচরণ"
+	},
+	"openEmbedded": {
+		"message": "পৃষ্ঠায় খুলুন"
+	},
+	"openHighlights": {
+		"message": "হাইলাইট খুলুন"
+	},
+	"openReader": {
+		"message": "রিডার খুলুন"
+	},
+	"openSidePanel": {
+		"message": "পাশের প্যানেল খুলুন"
+	},
 	"optional": {
 		"message": "(ঐচ্ছিক)"
 	},
@@ -547,11 +606,17 @@
 	"popularModelsDescription": {
 		"message": "সাধারণত ব্যবহৃত মডেলগুলি থেকে চয়ন করুন বা কাস্টম মডেলের বিশদ লিখুন।"
 	},
+	"popup": {
+		"message": "পপআপ"
+	},
 	"prependToDaily": {
 		"message": "ডেইলি নোটে উপরের দিকে যোগ করুন"
 	},
 	"prependToExisting": {
 		"message": "বিদ্যমান নোটের উপরের দিকে যোগ করুন"
+	},
+	"preview": {
+		"message": "পূর্বরূপ"
 	},
 	"processing": {
 		"message": "প্রসেসিং"
@@ -564,6 +629,24 @@
 	},
 	"propertyName": {
 		"message": "প্রোপার্টির নাম"
+	},
+	"propertyTypeCheckbox": {
+		"message": "চেকবক্স"
+	},
+	"propertyTypeDate": {
+		"message": "তারিখ"
+	},
+	"propertyTypeDatetime": {
+		"message": "তারিখ এবং সময়"
+	},
+	"propertyTypeMultitext": {
+		"message": "তালিকা"
+	},
+	"propertyTypeNumber": {
+		"message": "সংখ্যা"
+	},
+	"propertyTypeText": {
+		"message": "পাঠ্য"
 	},
 	"propertyValue": {
 		"message": "প্রোপার্টির মান"
@@ -616,6 +699,153 @@
 	"reader": {
 		"message": "পাঠক"
 	},
+	"readerAppearance": {
+		"message": "চেহারা"
+	},
+	"readerAppearanceAuto": {
+		"message": "স্বয়ংক্রিয়"
+	},
+	"readerAppearanceDark": {
+		"message": "ডার্ক"
+	},
+	"readerAppearanceDescription": {
+		"message": "লাইট বা ডার্ক চেহারা বেছে নিন।"
+	},
+	"readerAppearanceLight": {
+		"message": "লাইট"
+	},
+	"readerAutoScroll": {
+		"message": "স্বয়ংক্রিয় স্ক্রল"
+	},
+	"readerAutoScrollDescription": {
+		"message": "প্লেব্যাক অনুসরণ করতে ট্রান্সক্রিপ্ট স্বয়ংক্রিয়ভাবে স্ক্রল করুন।"
+	},
+	"readerBlendImages": {
+		"message": "ছবি মিশিয়ে দিন"
+	},
+	"readerBlendImagesDescription": {
+		"message": "পৃষ্ঠার ব্যাকগ্রাউন্ডের সাথে ছবি মিশিয়ে দিন।"
+	},
+	"readerCloseImageViewer": {
+		"message": "ছবি ভিউয়ার বন্ধ করুন"
+	},
+	"readerCollapseComment": {
+		"message": "মন্তব্য সংকুচিত করুন"
+	},
+	"readerColorLinks": {
+		"message": "লিংকের রঙ"
+	},
+	"readerColorSchemeDefault": {
+		"message": "ডিফল্ট"
+	},
+	"readerCurrentPosition": {
+		"message": "বর্তমান অবস্থান"
+	},
+	"readerCustomCss": {
+		"message": "কাস্টম CSS"
+	},
+	"readerCustomCssDescription": {
+		"message": "রিডিং ভিউতে স্বয়ংক্রিয়ভাবে প্রয়োগ হওয়া CSS।"
+	},
+	"readerDarkTheme": {
+		"message": "ডার্ক মোড থিম"
+	},
+	"readerDarkThemeDescription": {
+		"message": "ডার্ক মোডে ভিন্ন থিম ব্যবহার করুন।"
+	},
+	"readerError": {
+		"message": "কনটেন্ট বের করতে ব্যর্থ হয়েছে।"
+	},
+	"readerFont": {
+		"message": "ফন্ট অপশন"
+	},
+	"readerFontDefault": {
+		"message": "ডিফল্ট"
+	},
+	"readerFontDescription": {
+		"message": "আপনার সিস্টেমে ইনস্টল করা ফন্ট যোগ করুন। ফন্ট যোগ করতে এন্টার চাপুন।"
+	},
+	"readerFontNotFound": {
+		"message": "পাওয়া যায়নি"
+	},
+	"readerFontPlaceholder": {
+		"message": "ফন্ট যোগ করতে এন্টার চাপুন"
+	},
+	"readerFontSetDefault": {
+		"message": "ডিফল্ট সেট করুন"
+	},
+	"readerFontSize": {
+		"message": "বেস ফন্ট সাইজ"
+	},
+	"readerFontSystem": {
+		"message": "সিস্টেম"
+	},
+	"readerFontSystemSans": {
+		"message": "স্যান্স-সেরিফ"
+	},
+	"readerFontSystemSerif": {
+		"message": "সেরিফ"
+	},
+	"readerFonts": {
+		"message": "ফন্ট"
+	},
+	"readerFootnotes": {
+		"message": "পাদটীকা"
+	},
+	"readerHighlightActiveLine": {
+		"message": "সক্রিয় লাইন হাইলাইট করুন"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "প্লেব্যাক চলাকালীন ট্রান্সক্রিপ্টে বর্তমান বাক্যটি হাইলাইট করুন।"
+	},
+	"readerImages": {
+		"message": "ছবি"
+	},
+	"readerLineHeight": {
+		"message": "লাইন উচ্চতা"
+	},
+	"readerLineWidth": {
+		"message": "লাইন প্রস্থ"
+	},
+	"readerLoadFailed": {
+		"message": "লোড করতে ব্যর্থ। পৃষ্ঠাটি আপনার ব্রাউজার দ্বারা ব্লক করা থাকতে পারে।"
+	},
+	"readerLoading": {
+		"message": "পরিষ্কার করা হচ্ছে…"
+	},
+	"readerOn": {
+		"message": "রিডার"
+	},
+	"readerPinPlayer": {
+		"message": "প্লেয়ার পিন করুন"
+	},
+	"readerPinPlayerDescription": {
+		"message": "ট্রান্সক্রিপ্ট স্ক্রল করার সময় ভিডিও প্লেয়ার দৃশ্যমান রাখুন।"
+	},
+	"readerSettings": {
+		"message": "রিডার সেটিংস"
+	},
+	"readerTheme": {
+		"message": "থিম"
+	},
+	"readerThemeDescription": {
+		"message": "রিডিং ভিউতে ব্যবহৃত রঙ বেছে নিন।"
+	},
+	"readerThemeSection": {
+		"message": "থিম"
+	},
+	"readerTranscripts": {
+		"message": "ট্রান্সক্রিপ্ট"
+	},
+	"readerTypography": {
+		"message": "টাইপোগ্রাফি"
+	},
+	"readerUrlPlaceholder": {
+		"message": "পড়ার জন্য একটি URL পেস্ট করুন…"
+	},
+	"readerViewFullSize": {
+		"message": "পূর্ণ আকারে দেখুন"
+	},
 	"recommended": {
 		"message": "প্রস্তাবিত"
 	},
@@ -666,6 +896,9 @@
 	},
 	"saveFile": {
 		"message": "ফাইল সংরক্ষণ করুন..."
+	},
+	"searchHighlightsPlaceholder": {
+		"message": "হাইলাইট খুঁজুন…"
 	},
 	"searchVariables": {
 		"message": "ভেরিয়েবল অনুসন্ধান করুন..."
@@ -727,17 +960,47 @@
 	"silentOpenDescription": {
 		"message": "ক্লিপ করা নোট সংরক্ষণ হবে, তবে এটি নতুন ট্যাবে খুলবে না। Obsidian অ্যাপটি সামনে প্রদর্শিত হবে।"
 	},
+	"sort": {
+		"message": "সাজান"
+	},
+	"sortAZ": {
+		"message": "A থেকে Z"
+	},
+	"sortNewOld": {
+		"message": "নতুনগুলো আগে"
+	},
+	"sortOldNew": {
+		"message": "পুরোনোগুলো আগে"
+	},
+	"sortZA": {
+		"message": "Z থেকে A"
+	},
 	"specificNoteName": {
 		"message": "নির্দিষ্ট নোটের নাম"
 	},
 	"systemDefault": {
 		"message": "সিস্টেম"
 	},
+	"template": {
+		"message": "টেমপ্লেট"
+	},
 	"templateCopied": {
 		"message": "টেমপ্লেট JSON ক্লিপবোর্ডে কপি করা হয়েছে"
 	},
 	"templateCopyError": {
 		"message": "টেমপ্লেট JSON ক্লিপবোর্ডে কপি করতে ব্যর্থ হয়েছে"
+	},
+	"templateErrorCount": {
+		"message": "আপনার টেমপ্লেটে একটি ত্রুটি আছে।"
+	},
+	"templateErrorsCount": {
+		"message": "আপনার টেমপ্লেটে $1টি ত্রুটি আছে।"
+	},
+	"templateGroupContent": {
+		"message": "কনটেন্ট"
+	},
+	"templateGroupLocation": {
+		"message": "অবস্থান"
 	},
 	"templateName": {
 		"message": "টেমপ্লেটের নাম"
@@ -753,6 +1016,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "যদি কোনো URL প্যাটার্নের সাথে মেলে অথবা schema.org এর ডেটা থাকে, তবে এই টেমপ্লেটটি স্বয়ংক্রিয়ভাবে নির্বাচন করার জন্য নিয়ম তৈরি করুন। প্রতিটি নিয়ম এক লাইনে লিখুন।"
+	},
+	"templateValid": {
+		"message": "টেমপ্লেট সিনট্যাক্স বৈধ"
 	},
 	"templatesHeading": {
 		"message": "টেমপ্লেটস"

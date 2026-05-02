@@ -1,7 +1,17 @@
 {
 	"name": "obsidian-clipper",
-	"version": "0.11.8",
+	"version": "1.6.2",
 	"description": "Official web clipper for Obsidian.",
+	"bin": {
+		"obsidian-clipper": "./dist/cli.cjs"
+	},
+	"files": [
+		"dist"
+	],
+	"exports": {
+		".": "./dist/cli.cjs",
+		"./api": "./dist/api.mjs"
+	},
 	"scripts": {
 		"defuddle-dev": "node scripts/set-defuddle-dev.js",
 		"defuddle-prod": "node scripts/set-defuddle-prod.js",
@@ -12,27 +22,33 @@
 		"build:firefox": "webpack --env BROWSER=firefox --mode production",
 		"build:safari": "webpack --env BROWSER=safari --mode production",
 		"build": "npm run build:chrome && npm run build:firefox && npm run build:safari",
+		"build:cli": "node scripts/build-cli.mjs",
+		"build:api": "node scripts/build-api.mjs",
 		"dev": "npm run dev:chrome",
+		"test": "vitest run",
+		"test:watch": "vitest",
 		"update-locales": "ts-node --project scripts/tsconfig.json scripts/update-locales.ts",
 		"check-strings": "ts-node --project scripts/tsconfig.json scripts/check-unused-strings.ts",
-		"add-locale": "ts-node --project scripts/tsconfig.json scripts/add-locale.ts"
+		"add-locale": "ts-node --project scripts/tsconfig.json scripts/add-locale.ts",
+		"prepublishOnly": "npm run build:cli && npm run build:api"
 	},
 	"devDependencies": {
 		"@types/chrome": "^0.0.270",
 		"@types/dompurify": "^3.0.5",
-		"@types/node": "^22.5.4",
-		"@types/turndown": "^5.0.5",
+		"@types/node": "^25.4.0",
 		"@types/webextension-polyfill": "^0.12.1",
 		"@types/webpack-env": "^1.18.5",
-		"copy-webpack-plugin": "^12.0.2",
+		"copy-webpack-plugin": "^14.0.0",
 		"css-loader": "^7.1.2",
 		"dotenv": "^16.4.1",
+		"esbuild": "^0.25.0",
 		"mini-css-extract-plugin": "^2.9.1",
 		"sass": "^1.77.8",
 		"sass-loader": "^16.0.1",
 		"ts-loader": "^9.5.1",
 		"ts-node": "^10.9.2",
 		"typescript": "^5.5.4",
+		"vitest": "^4.0.18",
 		"webextension-polyfill": "^0.12.0",
 		"webpack": "^5.97.1",
 		"webpack-cli": "^5.1.4",
@@ -41,13 +57,11 @@
 	"dependencies": {
 		"@types/safari-extension": "^0.0.33",
 		"dayjs": "^1.11.13",
-		"defuddle": "^0.6.4",
+		"defuddle": "^0.18.1",
 		"dompurify": "^3.0.9",
 		"highlight.js": "^11.11.1",
+		"linkedom": "^0.18.0",
 		"lucide": "^0.359.0",
-		"lz-string": "^1.5.0",
-		"mathml-to-latex": "^1.4.1",
-		"turndown": "^7.2.0",
-		"turndown-plugin-gfm": "^1.0.2"
+		"lz-string": "^1.5.0"
 	}
 }

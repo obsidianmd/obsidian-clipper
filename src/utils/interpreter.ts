@@ -75,7 +75,6 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 					{ role: 'user', content: `${promptContext}` },
 					{ role: 'user', content: `${JSON.stringify(promptContent)}` }
 				],
-				temperature: 0.5,
 				max_tokens: 1600,
 				stream: false
 			};
@@ -144,8 +143,7 @@ export async function sendToLLM(promptContext: string, content: string, promptVa
 					{ role: 'system', content: systemContent },
 					{ role: 'user', content: `${promptContext}` },
 					{ role: 'user', content: `${JSON.stringify(promptContent)}` }
-				],
-				temperature: 0.7
+				]
 			};
 			headers = {
 				...headers,
@@ -360,7 +358,7 @@ function parseLLMResponse(responseContent: string, promptVariables: PromptVariab
 
 export function collectPromptVariables(template: Template | null): PromptVariable[] {
 	const promptMap = new Map<string, PromptVariable>();
-	const promptRegex = /{{(?:prompt:)?"(.*?)"(\|.*?)?}}/g;
+	const promptRegex = /{{(?:prompt:)?"([\s\S]*?)"(\|.*?)?}}/g;
 	let match;
 
 	function addPrompt(prompt: string, filters: string) {
@@ -481,25 +479,29 @@ export async function initializeInterpreter(template: Template, variables: { [ke
 			storeListener(modelSelect, 'change', changeListener);
 
 			modelSelect.style.display = 'inline-block';
-			
-			// Filter enabled models
-			const enabledModels = generalSettings.models.filter(model => model.enabled);
-			
-			modelSelect.innerHTML = enabledModels
-				.map(model => 
-					`<option value="${model.id}">${model.name}</option>`
-				).join('');
 
-			// Check if last selected model exists and is enabled
-			const lastSelectedModel = enabledModels.find(model => model.id === generalSettings.interpreterModel);
-			
-			if (!lastSelectedModel && enabledModels.length > 0) {
-				// If last selected model is not available/enabled, use first enabled model
-				generalSettings.interpreterModel = enabledModels[0].id;
-				await saveSettings();
+			// Only repopulate if the skeleton hasn't already done it
+			if (modelSelect.options.length === 0) {
+				const enabledModels = generalSettings.models.filter(model => model.enabled);
+				modelSelect.textContent = '';
+				enabledModels.forEach(model => {
+					const option = document.createElement('option');
+					option.value = model.id;
+					option.textContent = model.name;
+					modelSelect.appendChild(option);
+				});
+				modelSelect.value = generalSettings.interpreterModel || (enabledModels[0]?.id ?? '');
 			}
 
-			modelSelect.value = generalSettings.interpreterModel || (enabledModels[0]?.id ?? '');
+			// Validate that the selected model is still enabled
+			const enabledModels = generalSettings.models.filter(model => model.enabled);
+			const lastSelectedModel = enabledModels.find(model => model.id === generalSettings.interpreterModel);
+
+			if (!lastSelectedModel && enabledModels.length > 0) {
+				generalSettings.interpreterModel = enabledModels[0].id;
+				await saveSettings();
+				modelSelect.value = generalSettings.interpreterModel;
+			}
 		}
 	}
 }
@@ -636,7 +638,7 @@ export function replacePromptVariables(promptVariables: PromptVariable[], prompt
 	const allInputs = document.querySelectorAll('input, textarea');
 	allInputs.forEach((input) => {
 		if (input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement) {
-			input.value = input.value.replace(/{{(?:prompt:)?"(.*?)"(\|.*?)?}}/g, (match, promptText, filters) => {
+			input.value = input.value.replace(/{{(?:prompt:)?"([\s\S]*?)"(\|[\s\S]*?)?}}/g, (match, promptText, filters) => {
 				const variable = promptVariables.find(v => v.prompt === promptText);
 				if (!variable) return match;
 

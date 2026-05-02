@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Advanced"
 	},
+	"allHighlights": {
+		"message": "सभी हाइलाइट्स"
+	},
 	"allProperties": {
 		"message": "Sabhi properties"
 	},
@@ -58,9 +61,6 @@
 	},
 	"behavior": {
 		"message": "Behavior"
-	},
-	"behaviorWarning": {
-		"message": "Maujuda note ya daily note mein jodne ke liye Obsidian 1.7.2 ya usse naya version chahiye."
 	},
 	"byDay": {
 		"message": "दिनों"
@@ -103,6 +103,14 @@
 			},
 			"strong_start": {
 				"content": "<strong>"
+			}
+		}
+	},
+	"clipboardError": {
+		"message": "Obsidian आपके क्लिपबोर्ड तक पहुँच नहीं पा रहा है। यहाँ दिए गए समस्या-निवारण निर्देश आज़माएँ: $1",
+		"placeholders": {
+			"1": {
+				"content": "$1"
 			}
 		}
 	},
@@ -157,6 +165,15 @@
 	"delete": {
 		"message": "Delete"
 	},
+	"deleteAllHighlightsConfirm": {
+		"message": "क्या आप वाकई सभी हाइलाइट्स हटाना चाहते हैं?"
+	},
+	"deleteHighlightsForDomain": {
+		"message": "इस डोमेन के लिए सभी हाइलाइट्स हटाएँ?"
+	},
+	"deleteHighlightsForPage": {
+		"message": "इस पेज के लिए सभी हाइलाइट्स हटाएँ?"
+	},
 	"deleteModelConfirm": {
 		"message": "Kya aap is model ko hatana chahte hain?"
 	},
@@ -192,6 +209,9 @@
 	"earlyAccessFeatures": {
 		"message": "Early access features"
 	},
+	"edit": {
+		"message": "संपादित करें"
+	},
 	"editModel": {
 		"message": "Model edit karein"
 	},
@@ -201,8 +221,8 @@
 	"editTemplate": {
 		"message": "Template edit karein"
 	},
-	"enableHighlighter": {
-		"message": "Highlighter chalu karein"
+	"embedded": {
+		"message": "सम्मिलित"
 	},
 	"enableHighlighterDescription": {
 		"message": "Web page par content highlight karein jise aap Obsidian mein save kar sakte hain."
@@ -346,11 +366,23 @@
 	"highlightPage": {
 		"message": "Page highlight karein"
 	},
+	"highlightSelection": {
+		"message": "हाइलाइट"
+	},
 	"highlighter": {
 		"message": "Highlighter"
 	},
+	"highlighterOn": {
+		"message": "हाइलाइटर"
+	},
 	"highlighterSettings": {
 		"message": "Highlighter"
+	},
+	"highlights": {
+		"message": "हाइलाइट्स"
+	},
+	"highlightsNotFound": {
+		"message": "लेख में हाइलाइट्स नहीं मिले"
 	},
 	"history": {
 		"message": "इतिहास"
@@ -437,6 +469,12 @@
 	"legacyModeDescription": {
 		"message": "Obsidian 1.6.7 ya purane version ke saath compatible URI clipping method ka upyog karta hai. Note karein ki aap kitna content clip kar sakte hain woh aapke browser aur OS dwara limited hai. Kuch pages bina kisi errors ke fail ho sakte hain."
 	},
+	"loadArticle": {
+		"message": "लेख पढ़ें"
+	},
+	"loading": {
+		"message": "लोड हो रहा है…"
+	},
 	"modelName": {
 		"message": "Display name"
 	},
@@ -469,6 +507,9 @@
 	},
 	"noHighlights": {
 		"message": "Kuch nahi karein"
+	},
+	"noResults": {
+		"message": "कोई परिणाम नहीं मिला"
 	},
 	"noTemplates": {
 		"message": "Koi templates available nahi hain. Kripya settings mein template add karein."
@@ -514,6 +555,24 @@
 	"open": {
 		"message": "Open"
 	},
+	"openBehaviorDescription": {
+		"message": "चुनें कि वेब क्लिपर डिफ़ॉल्ट रूप से कैसे खुलता है।"
+	},
+	"openBehaviorTitle": {
+		"message": "खुलने का व्यवहार"
+	},
+	"openEmbedded": {
+		"message": "पृष्ठ में खोलें"
+	},
+	"openHighlights": {
+		"message": "हाइलाइट्स खोलें"
+	},
+	"openReader": {
+		"message": "रीडर खोलें"
+	},
+	"openSidePanel": {
+		"message": "साइड पैनल खोलें"
+	},
 	"optional": {
 		"message": "(optional)"
 	},
@@ -547,11 +606,17 @@
 	"popularModelsDescription": {
 		"message": "सामान्य रूप से प्रयुक्त मॉडलों में से चुनें या कस्टम मॉडल विवरण दर्ज करें।"
 	},
+	"popup": {
+		"message": "पॉपअप"
+	},
 	"prependToDaily": {
 		"message": "Daily note mein, shuruat mein add karein"
 	},
 	"prependToExisting": {
 		"message": "Existing note mein, shuruat mein add karein"
+	},
+	"preview": {
+		"message": "पूर्वावलोकन"
 	},
 	"processing": {
 		"message": "Processing"
@@ -564,6 +629,24 @@
 	},
 	"propertyName": {
 		"message": "Property name"
+	},
+	"propertyTypeCheckbox": {
+		"message": "चेकबॉक्स"
+	},
+	"propertyTypeDate": {
+		"message": "तारीख"
+	},
+	"propertyTypeDatetime": {
+		"message": "तारीख और समय"
+	},
+	"propertyTypeMultitext": {
+		"message": "सूची"
+	},
+	"propertyTypeNumber": {
+		"message": "संख्या"
+	},
+	"propertyTypeText": {
+		"message": "पाठ"
 	},
 	"propertyValue": {
 		"message": "Property value"
@@ -616,6 +699,153 @@
 	"reader": {
 		"message": "पाठक"
 	},
+	"readerAppearance": {
+		"message": "दिखावट"
+	},
+	"readerAppearanceAuto": {
+		"message": "स्वचालित"
+	},
+	"readerAppearanceDark": {
+		"message": "डार्क"
+	},
+	"readerAppearanceDescription": {
+		"message": "लाइट या डार्क दिखावट चुनें।"
+	},
+	"readerAppearanceLight": {
+		"message": "लाइट"
+	},
+	"readerAutoScroll": {
+		"message": "स्वचालित स्क्रॉल"
+	},
+	"readerAutoScrollDescription": {
+		"message": "प्लेबैक के साथ ट्रांसक्रिप्ट को अपने-आप स्क्रॉल करें।"
+	},
+	"readerBlendImages": {
+		"message": "छवियाँ मिलाएँ"
+	},
+	"readerBlendImagesDescription": {
+		"message": "छवियों को पेज की पृष्ठभूमि के साथ मिलाएँ।"
+	},
+	"readerCloseImageViewer": {
+		"message": "छवि दर्शक बंद करें"
+	},
+	"readerCollapseComment": {
+		"message": "टिप्पणी संक्षिप्त करें"
+	},
+	"readerColorLinks": {
+		"message": "लिंक रंगीन करें"
+	},
+	"readerColorSchemeDefault": {
+		"message": "डिफ़ॉल्ट"
+	},
+	"readerCurrentPosition": {
+		"message": "वर्तमान स्थिति"
+	},
+	"readerCustomCss": {
+		"message": "कस्टम CSS"
+	},
+	"readerCustomCssDescription": {
+		"message": "रीडिंग व्यू में अपने-आप लागू होने वाला CSS।"
+	},
+	"readerDarkTheme": {
+		"message": "डार्क मोड थीम"
+	},
+	"readerDarkThemeDescription": {
+		"message": "डार्क मोड में अलग थीम का उपयोग करें।"
+	},
+	"readerError": {
+		"message": "सामग्री निकालने में विफल।"
+	},
+	"readerFont": {
+		"message": "फ़ॉन्ट विकल्प"
+	},
+	"readerFontDefault": {
+		"message": "डिफ़ॉल्ट"
+	},
+	"readerFontDescription": {
+		"message": "अपने सिस्टम में इंस्टॉल किए गए फ़ॉन्ट जोड़ें। फ़ॉन्ट जोड़ने के लिए Enter दबाएँ।"
+	},
+	"readerFontNotFound": {
+		"message": "नहीं मिला"
+	},
+	"readerFontPlaceholder": {
+		"message": "फ़ॉन्ट जोड़ने के लिए Enter दबाएँ"
+	},
+	"readerFontSetDefault": {
+		"message": "डिफ़ॉल्ट सेट करें"
+	},
+	"readerFontSize": {
+		"message": "आधार फ़ॉन्ट आकार"
+	},
+	"readerFontSystem": {
+		"message": "सिस्टम"
+	},
+	"readerFontSystemSans": {
+		"message": "सैंस-सेरिफ़"
+	},
+	"readerFontSystemSerif": {
+		"message": "सेरिफ़"
+	},
+	"readerFonts": {
+		"message": "फ़ॉन्ट"
+	},
+	"readerFootnotes": {
+		"message": "पादटिप्पणियाँ"
+	},
+	"readerHighlightActiveLine": {
+		"message": "सक्रिय पंक्ति हाइलाइट करें"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "प्लेबैक के दौरान ट्रांसक्रिप्ट में वर्तमान वाक्य को हाइलाइट करें।"
+	},
+	"readerImages": {
+		"message": "छवियाँ"
+	},
+	"readerLineHeight": {
+		"message": "पंक्ति ऊँचाई"
+	},
+	"readerLineWidth": {
+		"message": "पंक्ति चौड़ाई"
+	},
+	"readerLoadFailed": {
+		"message": "लोड करने में विफल। हो सकता है यह पेज आपके ब्राउज़र द्वारा ब्लॉक किया गया हो।"
+	},
+	"readerLoading": {
+		"message": "सरल किया जा रहा है…"
+	},
+	"readerOn": {
+		"message": "रीडर"
+	},
+	"readerPinPlayer": {
+		"message": "प्लेयर पिन करें"
+	},
+	"readerPinPlayerDescription": {
+		"message": "ट्रांसक्रिप्ट स्क्रॉल करते समय वीडियो प्लेयर को दिखाई देता रखें।"
+	},
+	"readerSettings": {
+		"message": "रीडर सेटिंग्स"
+	},
+	"readerTheme": {
+		"message": "थीम"
+	},
+	"readerThemeDescription": {
+		"message": "रीडिंग व्यू में उपयोग होने वाले रंग चुनें।"
+	},
+	"readerThemeSection": {
+		"message": "थीम"
+	},
+	"readerTranscripts": {
+		"message": "ट्रांसक्रिप्ट"
+	},
+	"readerTypography": {
+		"message": "टाइपोग्राफी"
+	},
+	"readerUrlPlaceholder": {
+		"message": "पढ़ने के लिए URL पेस्ट करें…"
+	},
+	"readerViewFullSize": {
+		"message": "पूर्ण आकार में देखें"
+	},
 	"recommended": {
 		"message": "सिफारिश की गई"
 	},
@@ -666,6 +896,9 @@
 	},
 	"saveFile": {
 		"message": "File save karein..."
+	},
+	"searchHighlightsPlaceholder": {
+		"message": "हाइलाइट्स खोजें…"
 	},
 	"searchVariables": {
 		"message": "Variables search karein..."
@@ -727,17 +960,47 @@
 	"silentOpenDescription": {
 		"message": "Clipped notes save ho jayengi lekin naye tab mein nahi khulengi. Obsidian abhi bhi foreground mein layega."
 	},
+	"sort": {
+		"message": "क्रमबद्ध करें"
+	},
+	"sortAZ": {
+		"message": "A से Z"
+	},
+	"sortNewOld": {
+		"message": "नवीनतम पहले"
+	},
+	"sortOldNew": {
+		"message": "सबसे पुराने पहले"
+	},
+	"sortZA": {
+		"message": "Z से A"
+	},
 	"specificNoteName": {
 		"message": "Specific note name"
 	},
 	"systemDefault": {
 		"message": "System"
 	},
+	"template": {
+		"message": "टेम्पलेट"
+	},
 	"templateCopied": {
 		"message": "Template JSON clipboard par copy ho gaya"
 	},
 	"templateCopyError": {
 		"message": "Template JSON ko clipboard par copy karne mein fail"
+	},
+	"templateErrorCount": {
+		"message": "आपके टेम्पलेट में एक त्रुटि है।"
+	},
+	"templateErrorsCount": {
+		"message": "आपके टेम्पलेट में $1 त्रुटियाँ हैं।"
+	},
+	"templateGroupContent": {
+		"message": "सामग्री"
+	},
+	"templateGroupLocation": {
+		"message": "स्थान"
 	},
 	"templateName": {
 		"message": "Template name"
@@ -753,6 +1016,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "URL pattern se match hone ya schema.org data hone par is template ko automatically select karne ke liye rules define karein. Ek line mein ek rule."
+	},
+	"templateValid": {
+		"message": "टेम्पलेट सिंटैक्स मान्य है"
 	},
 	"templatesHeading": {
 		"message": "Templates"

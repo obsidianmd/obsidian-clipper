@@ -62,6 +62,17 @@ function isIPad(): boolean {
 		(navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 }
 
+function detectOS(): 'ios' | 'macos' | 'windows' | 'android' | 'linux' | 'other' {
+	const platform = ((navigator as any).userAgentData?.platform || navigator.platform || '').toLowerCase();
+	const ua = navigator.userAgent.toLowerCase();
+	if (/iphone|ipad|ipod/.test(ua) || (/mac/.test(platform) && navigator.maxTouchPoints > 1)) return 'ios';
+	if (/mac/.test(platform) || /macintosh/.test(ua)) return 'macos';
+	if (/win/.test(platform)) return 'windows';
+	if (/android/.test(ua)) return 'android';
+	if (/linux/.test(platform)) return 'linux';
+	return 'other';
+}
+
 export async function addBrowserClassToHtml() {
 	const browser = await detectBrowser();
 	const htmlElement = document.documentElement;
@@ -79,6 +90,10 @@ export async function addBrowserClassToHtml() {
 		'is-ipad-os',
 		'is-orion'
 	);
+
+	const os = detectOS();
+	if (os === 'macos') htmlElement.classList.add('is-macos');
+	else if (os === 'ios') htmlElement.classList.add('is-ios');
 
 	// Add the appropriate class based on the detected browser
 	switch (browser) {
@@ -101,7 +116,7 @@ export async function addBrowserClassToHtml() {
 			htmlElement.classList.add('is-safari');
 			break;
 		case 'mobile-safari':
-			htmlElement.classList.add('is-mobile', 'is-mobile-safari', 'is-safari', 'is-ios');
+			htmlElement.classList.add('is-mobile', 'is-mobile-safari', 'is-safari');
 			break;
 		case 'ipad-os':
 			htmlElement.classList.add('is-tablet', 'is-ipad-os', 'is-safari');

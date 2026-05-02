@@ -1,0 +1,11 @@
+{
+	"noteNameFormat": "{{title}}",
+	"noteContentFormat": "Title: {{title}} ({{words}} words)\n\n{{content}}",
+	"properties": [
+		{ "name": "title", "value": "{{title}}", "type": "text" },
+		{ "name": "empty_selector", "value": "{{selector:.nonexistent}}", "type": "text" },
+		{ "name": "filtered_empty", "value": "{{selector:.nonexistent|wikilink|join}}", "type": "text" },
+		{ "name": "static", "value": "[[Books]]", "type": "text" },
+		{ "name": "words", "value": "{{words}}", "type": "number" }
+	]
+}

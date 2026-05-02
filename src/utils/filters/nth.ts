@@ -1,3 +1,46 @@
+import type { ParamValidationResult } from '../filters';
+
+export const validateNthParams = (param: string | undefined): ParamValidationResult => {
+	// Param is optional - no param means return all items
+	if (!param) {
+		return { valid: true };
+	}
+
+	// Check for basis pattern (e.g., "1,2,3:7")
+	if (param.includes(':')) {
+		const [positions, basis] = param.split(':').map(p => p.trim());
+		const nthValues = positions.split(',').map(n => parseInt(n.trim(), 10));
+		const basisSize = parseInt(basis, 10);
+
+		if (nthValues.some(n => isNaN(n) || n < 1)) {
+			return { valid: false, error: 'positions must be positive numbers (e.g., nth:1,2,3:7)' };
+		}
+		if (isNaN(basisSize) || basisSize < 1) {
+			return { valid: false, error: 'basis must be a positive number (e.g., nth:1,2,3:7)' };
+		}
+		return { valid: true };
+	}
+
+	const expr = param.trim();
+
+	// Simple number (e.g., "7")
+	if (/^\d+$/.test(expr)) {
+		return { valid: true };
+	}
+
+	// "n" multiplier (e.g., "5n")
+	if (/^\d+n$/.test(expr)) {
+		return { valid: true };
+	}
+
+	// "n+b" format (e.g., "n+7")
+	if (/^n\+\d+$/.test(expr)) {
+		return { valid: true };
+	}
+
+	return { valid: false, error: 'invalid syntax. Use number (2), multiplier (5n), offset (n+7), or basis (1,2:5)' };
+};
+
 export const nth = (str: string, params?: string): string => {
 	// Handle empty or invalid input
 	if (!str || str === 'undefined' || str === 'null') {

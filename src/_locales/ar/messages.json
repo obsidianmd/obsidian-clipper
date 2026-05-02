@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "متقدم"
 	},
+	"allHighlights": {
+		"message": "كل التمييزات"
+	},
 	"allProperties": {
 		"message": "جميع الخصائص"
 	},
@@ -58,9 +61,6 @@
 	},
 	"behavior": {
 		"message": "السلوك"
-	},
-	"behaviorWarning": {
-		"message": "الإضافة إلى ملاحظة موجودة أو ملاحظة يومية تتطلب أوبسيديان 1.7.2 أو أحدث."
 	},
 	"byDay": {
 		"message": "أيام"
@@ -103,6 +103,14 @@
 			},
 			"strong_start": {
 				"content": "<strong>"
+			}
+		}
+	},
+	"clipboardError": {
+		"message": "لا يستطيع Obsidian الوصول إلى الحافظة لديك. جرّب إرشادات استكشاف الأخطاء وإصلاحها هنا: $1",
+		"placeholders": {
+			"1": {
+				"content": "$1"
 			}
 		}
 	},
@@ -157,6 +165,15 @@
 	"delete": {
 		"message": "حذف"
 	},
+	"deleteAllHighlightsConfirm": {
+		"message": "هل أنت متأكد أنك تريد حذف جميع التمييزات؟"
+	},
+	"deleteHighlightsForDomain": {
+		"message": "حذف جميع التمييزات لهذا النطاق؟"
+	},
+	"deleteHighlightsForPage": {
+		"message": "حذف جميع التمييزات لهذه الصفحة؟"
+	},
 	"deleteModelConfirm": {
 		"message": "هل أنت متأكد من أنك تريد حذف هذا النموذج؟"
 	},
@@ -192,6 +209,9 @@
 	"earlyAccessFeatures": {
 		"message": "ميزات الوصول المبكر"
 	},
+	"edit": {
+		"message": "تحرير"
+	},
 	"editModel": {
 		"message": "تعديل النموذج"
 	},
@@ -201,8 +221,8 @@
 	"editTemplate": {
 		"message": "تعديل القالب"
 	},
-	"enableHighlighter": {
-		"message": "تفعيل المظلل"
+	"embedded": {
+		"message": "مضمن"
 	},
 	"enableHighlighterDescription": {
 		"message": "قم بتظليل المحتوى على صفحات الويب الذي تريد حفظه في أوبسيديان."
@@ -346,11 +366,23 @@
 	"highlightPage": {
 		"message": "تظليل الصفحة"
 	},
+	"highlightSelection": {
+		"message": "تمييز"
+	},
 	"highlighter": {
 		"message": "المظلل"
 	},
+	"highlighterOn": {
+		"message": "أداة التمييز"
+	},
 	"highlighterSettings": {
 		"message": "المظلل"
+	},
+	"highlights": {
+		"message": "التمييزات"
+	},
+	"highlightsNotFound": {
+		"message": "لم يتم العثور على تمييزات في المقالة"
 	},
 	"history": {
 		"message": "التاريخ"
@@ -437,6 +469,12 @@
 	"legacyModeDescription": {
 		"message": "يستخدم طريقة قص URI المتوافقة مع أوبسيديان 1.6.7 أو أقدم. لاحظ أن طول المحتوى الذي يمكنك قصه محدود بواسطة متصفحك ونظام التشغيل. قد تفشل بعض الصفحات بدون أي أخطاء."
 	},
+	"loadArticle": {
+		"message": "قراءة المقالة"
+	},
+	"loading": {
+		"message": "جارٍ التحميل…"
+	},
 	"modelName": {
 		"message": "اسم النموذج"
 	},
@@ -469,6 +507,9 @@
 	},
 	"noHighlights": {
 		"message": "لا تفعل شيئاً"
+	},
+	"noResults": {
+		"message": "لم يتم العثور على نتائج"
 	},
 	"noTemplates": {
 		"message": "لا توجد قوالب متاحة. يرجى إضافة قالب في الإعدادات."
@@ -514,6 +555,24 @@
 	"open": {
 		"message": "فتح"
 	},
+	"openBehaviorDescription": {
+		"message": "اختر كيف يفتح Web Clipper بشكل افتراضي."
+	},
+	"openBehaviorTitle": {
+		"message": "سلوك الفتح"
+	},
+	"openEmbedded": {
+		"message": "افتح في الصفحة"
+	},
+	"openHighlights": {
+		"message": "فتح التمييزات"
+	},
+	"openReader": {
+		"message": "فتح القارئ"
+	},
+	"openSidePanel": {
+		"message": "افتح اللوحة الجانبية"
+	},
 	"optional": {
 		"message": "(اختياري)"
 	},
@@ -547,11 +606,17 @@
 	"popularModelsDescription": {
 		"message": "اختر من النماذج المستخدمة بشكل شائع أو أدخل تفاصيل النموذج المخصص."
 	},
+	"popup": {
+		"message": "القائمة المنبثقة"
+	},
 	"prependToDaily": {
 		"message": "إضافة إلى الملاحظة اليومية، في البداية"
 	},
 	"prependToExisting": {
 		"message": "إضافة إلى ملاحظة موجودة، في البداية"
+	},
+	"preview": {
+		"message": "معاينة"
 	},
 	"processing": {
 		"message": "جاري المعالجة"
@@ -564,6 +629,24 @@
 	},
 	"propertyName": {
 		"message": "اسم الخاصية"
+	},
+	"propertyTypeCheckbox": {
+		"message": "مربع الاختيار"
+	},
+	"propertyTypeDate": {
+		"message": "تاريخ"
+	},
+	"propertyTypeDatetime": {
+		"message": "التاريخ والوقت"
+	},
+	"propertyTypeMultitext": {
+		"message": "قائمة"
+	},
+	"propertyTypeNumber": {
+		"message": "رقم"
+	},
+	"propertyTypeText": {
+		"message": "نص"
 	},
 	"propertyValue": {
 		"message": "قيمة الخاصية"
@@ -616,6 +699,153 @@
 	"reader": {
 		"message": "القارئ"
 	},
+	"readerAppearance": {
+		"message": "المظهر"
+	},
+	"readerAppearanceAuto": {
+		"message": "تلقائي"
+	},
+	"readerAppearanceDark": {
+		"message": "داكن"
+	},
+	"readerAppearanceDescription": {
+		"message": "اختر المظهر الفاتح أو الداكن."
+	},
+	"readerAppearanceLight": {
+		"message": "فاتح"
+	},
+	"readerAutoScroll": {
+		"message": "التمرير التلقائي"
+	},
+	"readerAutoScrollDescription": {
+		"message": "مرّر النص تلقائيًا لمتابعة التشغيل."
+	},
+	"readerBlendImages": {
+		"message": "دمج الصور"
+	},
+	"readerBlendImagesDescription": {
+		"message": "ادمج الصور مع خلفية الصفحة."
+	},
+	"readerCloseImageViewer": {
+		"message": "إغلاق عارض الصور"
+	},
+	"readerCollapseComment": {
+		"message": "طيّ التعليق"
+	},
+	"readerColorLinks": {
+		"message": "تلوين الروابط"
+	},
+	"readerColorSchemeDefault": {
+		"message": "افتراضي"
+	},
+	"readerCurrentPosition": {
+		"message": "الموضع الحالي"
+	},
+	"readerCustomCss": {
+		"message": "CSS مخصص"
+	},
+	"readerCustomCssDescription": {
+		"message": "يتم تطبيق CSS تلقائيًا في عرض القراءة."
+	},
+	"readerDarkTheme": {
+		"message": "سمة الوضع الداكن"
+	},
+	"readerDarkThemeDescription": {
+		"message": "استخدم سمة مختلفة في الوضع الداكن."
+	},
+	"readerError": {
+		"message": "فشل استخراج المحتوى."
+	},
+	"readerFont": {
+		"message": "خيارات الخط"
+	},
+	"readerFontDefault": {
+		"message": "افتراضي"
+	},
+	"readerFontDescription": {
+		"message": "أضف الخطوط المثبتة على نظامك. اضغط Enter لإضافة خط."
+	},
+	"readerFontNotFound": {
+		"message": "غير موجود"
+	},
+	"readerFontPlaceholder": {
+		"message": "اضغط Enter لإضافة خط"
+	},
+	"readerFontSetDefault": {
+		"message": "تعيين كافتراضي"
+	},
+	"readerFontSize": {
+		"message": "حجم الخط الأساسي"
+	},
+	"readerFontSystem": {
+		"message": "النظام"
+	},
+	"readerFontSystemSans": {
+		"message": "Sans-serif"
+	},
+	"readerFontSystemSerif": {
+		"message": "Serif"
+	},
+	"readerFonts": {
+		"message": "الخطوط"
+	},
+	"readerFootnotes": {
+		"message": "الحواشي"
+	},
+	"readerHighlightActiveLine": {
+		"message": "تمييز السطر النشط"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "ميّز الجملة الحالية في النص أثناء التشغيل."
+	},
+	"readerImages": {
+		"message": "الصور"
+	},
+	"readerLineHeight": {
+		"message": "ارتفاع السطر"
+	},
+	"readerLineWidth": {
+		"message": "عرض السطر"
+	},
+	"readerLoadFailed": {
+		"message": "فشل التحميل. قد تكون الصفحة محظورة بواسطة متصفحك."
+	},
+	"readerLoading": {
+		"message": "إزالة التشويش…"
+	},
+	"readerOn": {
+		"message": "وضع القارئ"
+	},
+	"readerPinPlayer": {
+		"message": "تثبيت المشغّل"
+	},
+	"readerPinPlayerDescription": {
+		"message": "أبقِ مشغّل الفيديو مرئيًا أثناء التمرير عبر النص."
+	},
+	"readerSettings": {
+		"message": "إعدادات القارئ"
+	},
+	"readerTheme": {
+		"message": "السمة"
+	},
+	"readerThemeDescription": {
+		"message": "اختر الألوان المستخدمة في عرض القراءة."
+	},
+	"readerThemeSection": {
+		"message": "السمة"
+	},
+	"readerTranscripts": {
+		"message": "النصوص"
+	},
+	"readerTypography": {
+		"message": "الطباعة"
+	},
+	"readerUrlPlaceholder": {
+		"message": "الصق عنوان URL للقراءة…"
+	},
+	"readerViewFullSize": {
+		"message": "عرض بالحجم الكامل"
+	},
 	"recommended": {
 		"message": "موصى به"
 	},
@@ -666,6 +896,9 @@
 	},
 	"saveFile": {
 		"message": "حفظ الملف..."
+	},
+	"searchHighlightsPlaceholder": {
+		"message": "ابحث في التمييزات…"
 	},
 	"searchVariables": {
 		"message": "البحث عن المتغيرات..."
@@ -727,17 +960,47 @@
 	"silentOpenDescription": {
 		"message": "سيتم حفظ الملاحظات المقصوصة ولكن لن يتم فتحها كتبويب جديد. سيظل أوبسيديان يُجلب إلى المقدمة."
 	},
+	"sort": {
+		"message": "فرز"
+	},
+	"sortAZ": {
+		"message": "من A إلى Z"
+	},
+	"sortNewOld": {
+		"message": "الأحدث أولاً"
+	},
+	"sortOldNew": {
+		"message": "الأقدم أولاً"
+	},
+	"sortZA": {
+		"message": "من Z إلى A"
+	},
 	"specificNoteName": {
 		"message": "اسم ملاحظة محدد"
 	},
 	"systemDefault": {
 		"message": "النظام"
 	},
+	"template": {
+		"message": "القالب"
+	},
 	"templateCopied": {
 		"message": "تم نسخ قالب JSON إلى الحافظة"
 	},
 	"templateCopyError": {
 		"message": "فشل في نسخ قالب JSON إلى الحافظة"
+	},
+	"templateErrorCount": {
+		"message": "يوجد خطأ في قالبك."
+	},
+	"templateErrorsCount": {
+		"message": "يوجد $1 أخطاء في قالبك."
+	},
+	"templateGroupContent": {
+		"message": "المحتوى"
+	},
+	"templateGroupLocation": {
+		"message": "الموقع"
 	},
 	"templateName": {
 		"message": "اسم القالب"
@@ -753,6 +1016,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "تحديد قواعد لاختيار هذا القالب تلقائياً إذا كان يتطابق مع نمط URL أو يحتوي على بيانات schema.org. قاعدة واحدة لكل سطر."
+	},
+	"templateValid": {
+		"message": "صياغة القالب صحيحة"
 	},
 	"templatesHeading": {
 		"message": "القوالب"

@@ -1,11 +1,9 @@
 import { updateUrl } from '../utils/routing';
 import { generalSettings } from '../utils/storage-utils';
-import { updatePromptContextVisibility, initializeInterpreterSettings } from './interpreter-settings';
+import { updatePromptContextVisibility } from './interpreter-settings';
 import { initializePropertyTypesManager } from './property-types-manager';
 
 export type SettingsSection = 'general' | 'properties' | 'highlighter' | 'interpreter' | 'reader' | 'templates' | 'hoarder';
-
-let interpreterSettingsInitialized = false;
 
 export function showSettingsSection(section: SettingsSection, templateId?: string): void {
 	const sections = document.querySelectorAll('.settings-section');
@@ -25,13 +23,6 @@ export function showSettingsSection(section: SettingsSection, templateId?: strin
 	}
 
 	updateUrl(section, templateId);
-
-	if (section === 'interpreter') {
-		if (!interpreterSettingsInitialized) {
-			initializeInterpreterSettings();
-			interpreterSettingsInitialized = true;
-		}
-	}
 
 	if (section === 'properties') {
 		initializePropertyTypesManager();
@@ -68,17 +59,26 @@ export function initializeSidebar(): void {
 	const settingsContainer = document.getElementById('settings');
 	const templateList = document.getElementById('template-list');
 	const hamburgerMenu = document.getElementById('hamburger-menu');
+	const sidebarTitle = document.getElementById('settings-sidebar-title');
+
+	if (sidebarTitle) {
+		sidebarTitle.addEventListener('click', () => {
+			showSettingsSection('general');
+		});
+	}
 
 	if (sidebar) {
-		sidebar.addEventListener('click', (event) => {	
+		sidebar.addEventListener('click', (event) => {
 			const target = event.target as HTMLElement;
-			if (target.dataset.section === 'general'
-				|| target.dataset.section === 'properties'
-				|| target.dataset.section === 'highlighter'
-				|| target.dataset.section === 'interpreter'
-				|| target.dataset.section === 'reader'
-				|| target.dataset.section === 'hoarder') {
-				showSettingsSection(target.dataset.section as SettingsSection);
+			const li = target.closest('li[data-section]') as HTMLElement | null;
+			const section = li?.dataset.section;
+			if (section === 'general'
+				|| section === 'properties'
+				|| section === 'highlighter'
+				|| section === 'interpreter'
+				|| section === 'reader'
+				|| section === 'hoarder') {
+				showSettingsSection(section as SettingsSection);
 			}
 			if (settingsContainer) {
 				settingsContainer.classList.remove('sidebar-open');

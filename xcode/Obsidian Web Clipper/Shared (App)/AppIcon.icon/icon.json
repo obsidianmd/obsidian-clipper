@@ -1,0 +1,98 @@
+{
+  "fill" : {
+    "automatic-gradient" : "srgb:0.48627,0.22745,0.92941,1.00000"
+  },
+  "groups" : [
+    {
+      "layers" : [
+        {
+          "image-name" : "AppIcon-Tint.png",
+          "name" : "AppIcon-Tint",
+          "opacity-specializations" : [
+            {
+              "value" : 0
+            },
+            {
+              "appearance" : "tinted",
+              "value" : 1
+            }
+          ]
+        }
+      ],
+      "shadow" : {
+        "kind" : "none",
+        "opacity" : 0.5
+      },
+      "specular" : false,
+      "translucency" : {
+        "enabled" : false,
+        "value" : 0.5
+      }
+    },
+    {
+      "layers" : [
+        {
+          "image-name" : "AppIcon-Dark.png",
+          "name" : "AppIcon-Dark",
+          "opacity-specializations" : [
+            {
+              "value" : 0
+            },
+            {
+              "appearance" : "dark",
+              "value" : 1
+            },
+            {
+              "appearance" : "tinted",
+              "value" : 0
+            }
+          ]
+        }
+      ],
+      "shadow" : {
+        "kind" : "none",
+        "opacity" : 0.5
+      },
+      "specular" : false,
+      "translucency" : {
+        "enabled" : false,
+        "value" : 0.5
+      }
+    },
+    {
+      "hidden" : false,
+      "layers" : [
+        {
+          "image-name" : "AppIcon.png",
+          "name" : "AppIcon",
+          "opacity-specializations" : [
+            {
+              "appearance" : "dark",
+              "value" : 0
+            },
+            {
+              "appearance" : "tinted",
+              "value" : 0
+            }
+          ]
+        }
+      ],
+      "lighting" : "individual",
+      "shadow" : {
+        "kind" : "none",
+        "opacity" : 0.5
+      },
+      "specular" : false,
+      "translucency" : {
+        "enabled" : false,
+        "value" : 0.5
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "circles" : [
+      "watchOS"
+    ],
+    "squares" : "shared"
+  }
+}

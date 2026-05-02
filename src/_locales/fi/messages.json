@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Lisäasetukset"
 	},
+	"allHighlights": {
+		"message": "Kaikki korostukset"
+	},
 	"allProperties": {
 		"message": "Kaikki ominaisuudet"
 	},
@@ -58,9 +61,6 @@
 	},
 	"behavior": {
 		"message": "Käyttäytyminen"
-	},
-	"behaviorWarning": {
-		"message": "Olemassa olevaan muistiinpanoon tai päivittäiseen muistiinpanoon lisääminen vaatii Obsidian 1.7.2 tai uudemman version."
 	},
 	"byDay": {
 		"message": "Päivät"
@@ -103,6 +103,14 @@
 			},
 			"strong_start": {
 				"content": "<strong>"
+			}
+		}
+	},
+	"clipboardError": {
+		"message": "Obsidian ei voi käyttää leikepöytääsi. Kokeile vianmääritysohjeita täällä: $1",
+		"placeholders": {
+			"1": {
+				"content": "$1"
 			}
 		}
 	},
@@ -157,6 +165,15 @@
 	"delete": {
 		"message": "Poista"
 	},
+	"deleteAllHighlightsConfirm": {
+		"message": "Haluatko varmasti poistaa kaikki korostukset?"
+	},
+	"deleteHighlightsForDomain": {
+		"message": "Poistetaanko kaikki tämän verkkotunnuksen korostukset?"
+	},
+	"deleteHighlightsForPage": {
+		"message": "Poistetaanko kaikki tämän sivun korostukset?"
+	},
 	"deleteModelConfirm": {
 		"message": "Haluatko varmasti poistaa tämän mallin?"
 	},
@@ -192,6 +209,9 @@
 	"earlyAccessFeatures": {
 		"message": "Early access -ominaisuudet"
 	},
+	"edit": {
+		"message": "Muokkaa"
+	},
 	"editModel": {
 		"message": "Muokkaa mallia"
 	},
@@ -201,8 +221,8 @@
 	"editTemplate": {
 		"message": "Muokkaa mallia"
 	},
-	"enableHighlighter": {
-		"message": "Ota korostustyökalu käyttöön"
+	"embedded": {
+		"message": "Upotettu"
 	},
 	"enableHighlighterDescription": {
 		"message": "Korosta verkkosivujen sisältöä, jonka voit tallentaa Obsidianiin"
@@ -346,11 +366,23 @@
 	"highlightPage": {
 		"message": "Korosta sivu"
 	},
+	"highlightSelection": {
+		"message": "Korosta"
+	},
 	"highlighter": {
 		"message": "Korostustyökalu"
 	},
+	"highlighterOn": {
+		"message": "Korostus"
+	},
 	"highlighterSettings": {
 		"message": "Korostustyökalu"
+	},
+	"highlights": {
+		"message": "Korostukset"
+	},
+	"highlightsNotFound": {
+		"message": "Artikkelista ei löytynyt korostuksia"
 	},
 	"history": {
 		"message": "Historia"
@@ -437,6 +469,12 @@
 	"legacyModeDescription": {
 		"message": "Käyttää URI-leikkausmenetelmää, joka on yhteensopiva Obsidian 1.6.7:n tai sitä aikaisempien versioiden kanssa. Huomaa, että selaimen ja käyttöjärjestelmän rajoittama leikattavan sisällön pituus. Jotkin sivut saattavat epäonnistua ilman virheitä."
 	},
+	"loadArticle": {
+		"message": "Lue artikkeli"
+	},
+	"loading": {
+		"message": "Ladataan…"
+	},
 	"modelName": {
 		"message": "Mallin nimi"
 	},
@@ -469,6 +507,9 @@
 	},
 	"noHighlights": {
 		"message": "Ei korostuksia"
+	},
+	"noResults": {
+		"message": "Tuloksia ei löytynyt"
 	},
 	"noTemplates": {
 		"message": "Malleja ei ole saatavilla. Lisää malli asetuksiin."
@@ -514,6 +555,24 @@
 	"open": {
 		"message": "Avaa"
 	},
+	"openBehaviorDescription": {
+		"message": "Valitse, miten Web Clipper avautuu oletuksena."
+	},
+	"openBehaviorTitle": {
+		"message": "Avautumiskäyttäytyminen"
+	},
+	"openEmbedded": {
+		"message": "Avaa sivulla"
+	},
+	"openHighlights": {
+		"message": "Avaa korostukset"
+	},
+	"openReader": {
+		"message": "Avaa lukutila"
+	},
+	"openSidePanel": {
+		"message": "Avaa sivupaneeli"
+	},
 	"optional": {
 		"message": "(valinnainen)"
 	},
@@ -547,11 +606,17 @@
 	"popularModelsDescription": {
 		"message": "Valitse yleisesti käytettyjä malleja tai syötä mukautetut mallin tiedot."
 	},
+	"popup": {
+		"message": "Ponnahdusikkuna"
+	},
 	"prependToDaily": {
 		"message": "Lisää päivittäiseen muistiinpanoon, yläosaan"
 	},
 	"prependToExisting": {
 		"message": "Lisää olemassa olevaan muistiinpanoon, yläosaan"
+	},
+	"preview": {
+		"message": "Esikatselu"
 	},
 	"processing": {
 		"message": "käsittely"
@@ -564,6 +629,24 @@
 	},
 	"propertyName": {
 		"message": "Ominaisuuden nimi"
+	},
+	"propertyTypeCheckbox": {
+		"message": "Valintaruutu"
+	},
+	"propertyTypeDate": {
+		"message": "Päivämäärä"
+	},
+	"propertyTypeDatetime": {
+		"message": "Päivämäärä & aika"
+	},
+	"propertyTypeMultitext": {
+		"message": "Lista"
+	},
+	"propertyTypeNumber": {
+		"message": "Numero"
+	},
+	"propertyTypeText": {
+		"message": "Teksti"
 	},
 	"propertyValue": {
 		"message": "Ominaisuuden arvo"
@@ -624,6 +707,153 @@
 	"reader": {
 		"message": "Lukija"
 	},
+	"readerAppearance": {
+		"message": "Ulkoasu"
+	},
+	"readerAppearanceAuto": {
+		"message": "Automaattinen"
+	},
+	"readerAppearanceDark": {
+		"message": "Tumma"
+	},
+	"readerAppearanceDescription": {
+		"message": "Valitse vaalea tai tumma ulkoasu."
+	},
+	"readerAppearanceLight": {
+		"message": "Vaalea"
+	},
+	"readerAutoScroll": {
+		"message": "Automaattinen vieritys"
+	},
+	"readerAutoScrollDescription": {
+		"message": "Vieritä litterointia automaattisesti toiston mukana."
+	},
+	"readerBlendImages": {
+		"message": "Sulauta kuvat"
+	},
+	"readerBlendImagesDescription": {
+		"message": "Sulauta kuvat sivun taustaan."
+	},
+	"readerCloseImageViewer": {
+		"message": "Sulje kuvankatselin"
+	},
+	"readerCollapseComment": {
+		"message": "Kutista kommentti"
+	},
+	"readerColorLinks": {
+		"message": "Väritä linkit"
+	},
+	"readerColorSchemeDefault": {
+		"message": "Oletus"
+	},
+	"readerCurrentPosition": {
+		"message": "Nykyinen sijainti"
+	},
+	"readerCustomCss": {
+		"message": "Mukautettu CSS"
+	},
+	"readerCustomCssDescription": {
+		"message": "Lukunäkymässä automaattisesti käytettävä CSS."
+	},
+	"readerDarkTheme": {
+		"message": "Tumman tilan teema"
+	},
+	"readerDarkThemeDescription": {
+		"message": "Käytä eri teemaa tummassa tilassa."
+	},
+	"readerError": {
+		"message": "Sisällön poiminta epäonnistui."
+	},
+	"readerFont": {
+		"message": "Fonttiasetukset"
+	},
+	"readerFontDefault": {
+		"message": "Oletus"
+	},
+	"readerFontDescription": {
+		"message": "Lisää järjestelmääsi asennettuja fontteja. Lisää fontti painamalla Enteriä."
+	},
+	"readerFontNotFound": {
+		"message": "Ei löytynyt"
+	},
+	"readerFontPlaceholder": {
+		"message": "Lisää fontti painamalla Enteriä"
+	},
+	"readerFontSetDefault": {
+		"message": "Aseta oletukseksi"
+	},
+	"readerFontSize": {
+		"message": "Perusfonttikoko"
+	},
+	"readerFontSystem": {
+		"message": "Järjestelmä"
+	},
+	"readerFontSystemSans": {
+		"message": "Sans-serif"
+	},
+	"readerFontSystemSerif": {
+		"message": "Serif"
+	},
+	"readerFonts": {
+		"message": "Fontit"
+	},
+	"readerFootnotes": {
+		"message": "Alaviitteet"
+	},
+	"readerHighlightActiveLine": {
+		"message": "Korosta aktiivinen rivi"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "Korosta litteroinnista nykyinen lause toiston aikana."
+	},
+	"readerImages": {
+		"message": "Kuvat"
+	},
+	"readerLineHeight": {
+		"message": "Riviväli"
+	},
+	"readerLineWidth": {
+		"message": "Rivileveys"
+	},
+	"readerLoadFailed": {
+		"message": "Lataaminen epäonnistui. Sivu saattaa olla selaimesi estämä."
+	},
+	"readerLoading": {
+		"message": "Selkeytetään…"
+	},
+	"readerOn": {
+		"message": "Lukutila"
+	},
+	"readerPinPlayer": {
+		"message": "Kiinnitä soitin"
+	},
+	"readerPinPlayerDescription": {
+		"message": "Pidä videosoitin näkyvissä, kun vierität litterointia."
+	},
+	"readerSettings": {
+		"message": "Lukijan asetukset"
+	},
+	"readerTheme": {
+		"message": "Teema"
+	},
+	"readerThemeDescription": {
+		"message": "Valitse lukunäkymässä käytettävät värit."
+	},
+	"readerThemeSection": {
+		"message": "Teema"
+	},
+	"readerTranscripts": {
+		"message": "Litteroinnit"
+	},
+	"readerTypography": {
+		"message": "Typografia"
+	},
+	"readerUrlPlaceholder": {
+		"message": "Liitä luettava URL…"
+	},
+	"readerViewFullSize": {
+		"message": "Näytä täysikokoisena"
+	},
 	"recommended": {
 		"message": "suositeltu"
 	},
@@ -674,6 +904,9 @@
 	},
 	"saveFile": {
 		"message": "Tallenna tiedosto..."
+	},
+	"searchHighlightsPlaceholder": {
+		"message": "Hae korostuksista…"
 	},
 	"searchVariables": {
 		"message": "Etsi muuttujia..."
@@ -735,17 +968,47 @@
 	"silentOpenDescription": {
 		"message": "Leikatut muistiinpanot tallennetaan mutta niitä ei avata uudessa välilehdessä. Obsidian tuodaan silti etualalle."
 	},
+	"sort": {
+		"message": "Lajittele"
+	},
+	"sortAZ": {
+		"message": "A–Ö"
+	},
+	"sortNewOld": {
+		"message": "Uusimmat ensin"
+	},
+	"sortOldNew": {
+		"message": "Vanhimmat ensin"
+	},
+	"sortZA": {
+		"message": "Ö–A"
+	},
 	"specificNoteName": {
 		"message": "Tietty muistiinpanon nimi"
 	},
 	"systemDefault": {
 		"message": "Järjestelmän oletus"
 	},
+	"template": {
+		"message": "Malli"
+	},
 	"templateCopied": {
 		"message": "Mallin JSON kopioitu leikepöydälle"
 	},
 	"templateCopyError": {
 		"message": "Mallin JSON:n kopiointi leikepöydälle epäonnistui"
+	},
+	"templateErrorCount": {
+		"message": "Mallissasi on virhe."
+	},
+	"templateErrorsCount": {
+		"message": "Mallissasi on $1 virhettä."
+	},
+	"templateGroupContent": {
+		"message": "Sisältö"
+	},
+	"templateGroupLocation": {
+		"message": "Sijainti"
 	},
 	"templateName": {
 		"message": "Mallin nimi"
@@ -761,6 +1024,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "Määritä säännöt tämän mallin automaattiselle valinnalle, jos se vastaa URL-kaavaa tai sisältää schema.org-tietoja. Yksi sääntö per rivi."
+	},
+	"templateValid": {
+		"message": "Mallin syntaksi on kelvollinen"
 	},
 	"templatesHeading": {
 		"message": "Mallit"

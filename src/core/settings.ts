@@ -9,8 +9,9 @@ import {
 	cleanupTemplateStorage,
 	rebuildTemplateList
 } from '../managers/template-manager';
-import { updateTemplateList, showTemplateEditor, initializeAddPropertyButton } from '../managers/template-ui';
+import { updateTemplateList, showTemplateEditor, initializeAddPropertyButton, initializeTemplateValidation } from '../managers/template-ui';
 import { initializeGeneralSettings } from '../managers/general-settings';
+import { initializeInterpreterSettings } from '../managers/interpreter-settings';
 import { showSettingsSection, initializeSidebar } from '../managers/settings-section-ui';
 import { initializeReaderSettings } from '../managers/reader-settings';
 import { initializeAutoSave } from '../utils/auto-save';
@@ -39,25 +40,79 @@ window.rebuildTemplateList = rebuildTemplateList;
 document.addEventListener('DOMContentLoaded', async () => {
 	const newTemplateBtn = document.getElementById('new-template-btn') as HTMLButtonElement;
 
+	// Apply section from URL params immediately to avoid flash (DOM only, no side effects)
+	const { section: initialSection } = getUrlParameters();
+	const targetSection = (initialSection === 'general' || initialSection === 'interpreter' || initialSection === 'properties' || initialSection === 'highlighter' || initialSection === 'reader' || initialSection === 'hoarder') ? initialSection : 'general';
+	document.querySelectorAll('.settings-section').forEach(s => s.classList.remove('active'));
+	document.querySelectorAll('#sidebar li[data-section]').forEach(i => i.classList.remove('active'));
+	document.getElementById(`${targetSection}-section`)?.classList.add('active');
+	document.querySelector(`#sidebar li[data-section="${targetSection}"]`)?.classList.add('active');
+
 	async function initializeSettings(): Promise<void> {
-		await translatePage();
-		
-		await initializeGeneralSettings();
-		await initializeReaderSettings();
-		const loadedTemplates = await loadTemplates();
-		updateTemplateList(loadedTemplates);
-		initializeTemplateListeners();
-		await handleUrlParameters();
-		initializeSidebar();
-		initializeAutoSave();
-		initializeMenu('more-actions-btn', 'template-actions-menu');
+		try {
+			await translatePage();
 
-		createIcons({ icons });
+			await initializeGeneralSettings();
+			await initializeReaderSettings();
+			
+			// Initialize interpreter settings with error handling
+			try {
+				await initializeInterpreterSettings();
+			} catch (error) {
+				console.error('Error initializing interpreter settings, continuing with defaults:', error);
+			}
+			
+			// Load templates with error handling
+			let loadedTemplates;
+			try {
+				loadedTemplates = await loadTemplates();
+				updateTemplateList(loadedTemplates);
+			} catch (error) {
+				console.error('Error loading templates:', error);
+				// Continue with empty template list
+				updateTemplateList([]);
+			}
+			initializeTemplateListeners();
+			await handleUrlParameters();
+			initializeSidebar();
+			initializeAutoSave();
+			initializeMenu('more-actions-btn', 'template-actions-menu');
 
-		// Initialize language selector
-		const languageSelect = document.getElementById('language-select') as HTMLSelectElement;
-		if (languageSelect) {
-			await initializeLanguageSelector(languageSelect);
+			createIcons({ icons });
+
+			// Initialize language selector
+			const languageSelect = document.getElementById('language-select') as HTMLSelectElement;
+			if (languageSelect) {
+				await initializeLanguageSelector(languageSelect);
+			}
+		} catch (error) {
+			console.error('Error during settings initialization:', error);
+			// Show a basic error message but continue with minimal functionality
+			const errorContainer = document.querySelector('#content');
+			if (errorContainer) {
+				errorContainer.textContent = '';
+
+				const errorDiv = document.createElement('div');
+				errorDiv.style.padding = '20px';
+				errorDiv.style.textAlign = 'center';
+				
+				const heading = document.createElement('h2');
+				heading.textContent = 'Settings error';
+				errorDiv.appendChild(heading);
+				
+				const message = document.createElement('p');
+				message.textContent = 'There was an error loading your settings. This may be due to corrupted data.';
+				errorDiv.appendChild(message);
+				
+				errorContainer.appendChild(errorDiv);
+			}
+			
+			// Try to initialize at least the sidebar for navigation
+			try {
+				initializeSidebar();
+			} catch (sidebarError) {
+				console.error('Failed to initialize sidebar:', sidebarError);
+			}
 		}
 
 		// Hoarder settings
@@ -143,10 +198,19 @@ document.addEventListener('DOMContentLoaded', async () => {
 			const languages = getAvailableLanguages();
 			const currentLanguage = await getCurrentLanguage();
 			
-			languageSelect.innerHTML = languages.map((lang: { code: string; name: string }) => {
-				const displayName = lang.code === '' ? getMessage('systemDefault') : lang.name;
-				return `<option value="${lang.code}" ${lang.code === currentLanguage ? 'selected' : ''}>${displayName}</option>`;
-			}).join('');
+			// Clear existing options
+			languageSelect.textContent = '';
+			
+			// Add language options
+			languages.forEach((lang: { code: string; name: string }) => {
+				const option = document.createElement('option');
+				option.value = lang.code;
+				option.textContent = lang.code === '' ? getMessage('systemDefault') : lang.name;
+				if (lang.code === currentLanguage) {
+					option.selected = true;
+				}
+				languageSelect.appendChild(option);
+			});
 
 			// Add change listener
 			languageSelect.addEventListener('change', async () => {
@@ -217,7 +281,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 	async function handleUrlParameters(): Promise<void> {
 		const { section, templateId } = getUrlParameters();
 
-		if (section === 'general' || section === 'interpreter' || section === 'properties' || section === 'highlighter' || section === 'reader') {
+		if (section === 'general' || section === 'interpreter' || section === 'properties' || section === 'highlighter' || section === 'reader' || section === 'hoarder') {
 			showSettingsSection(section);
 		} else if (templateId) {
 			const template = findTemplateById(templateId);
@@ -243,6 +307,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 	const templateForm = document.getElementById('template-settings-form');
 	if (templateForm) {
 		initializeAddPropertyButton();
+		initializeTemplateValidation();
 		initializeDragAndDrop();
 		handleTemplateDrag();
 	}

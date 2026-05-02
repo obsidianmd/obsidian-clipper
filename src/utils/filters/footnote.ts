@@ -1,4 +1,9 @@
 export const footnote = (str: string): string => {
+	// Return empty string as-is without attempting to parse
+	if (str === '') {
+		return str;
+	}
+
 	try {
 		const data = JSON.parse(str);
 		if (Array.isArray(data)) {

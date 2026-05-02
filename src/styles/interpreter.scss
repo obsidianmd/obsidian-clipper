@@ -11,8 +11,8 @@
 		border: 1px solid var(--interpreter-border-color);
 
 		&.done {
-			--interpreter-background-color: hsla(var(--color-green-hsl), 0.1);
-			--interpreter-border-color: hsla(var(--color-green-hsl), 0.15);
+			--interpreter-background-color: var(--background-modifier-success);
+			--interpreter-border-color: var(--background-modifier-success-border);
 			--interpreter-text-color: var(--text-success);
 			#model-select {
 				opacity: 1;
@@ -20,8 +20,8 @@
 		}
 
 		&.error {
-			--interpreter-background-color: hsla(var(--color-red-hsl), 0.1);
-			--interpreter-border-color: hsla(var(--color-red-hsl), 0.15);
+			--interpreter-background-color: var(--background-modifier-error);
+			--interpreter-border-color: var(--background-modifier-error-border);
 			--interpreter-text-color: var(--text-error);
 			#model-select {
 				opacity: 1;
@@ -174,7 +174,7 @@
 	}
 
 	#interpreter-error {
-		border-top: 1px solid  hsla(var(--color-red-hsl), 0.15);
+		border-top: 1px solid var(--background-modifier-error-border);
 		padding: 0.5rem;
 		font-size: var(--font-ui-smaller);
 		color: var(--text-error);
@@ -214,6 +214,7 @@
 	}
 
 	.setting-item-control {
+		display: block;
 		input {
 			width: 100%;
 		}
@@ -227,7 +228,6 @@
 }
 
 .model-list-container {
-	margin-bottom: 24px;
 	overflow-x: scroll;
 }
 
@@ -352,7 +352,7 @@
 	}
 }
 .provider-icon-container {
-	background-color: var(--background-secondary);
+	background-color: var(--background-primary);
 	border: 1px solid var(--background-modifier-border);
 	border-radius: 50%;
 	display: inline-block;

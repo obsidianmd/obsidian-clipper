@@ -7,13 +7,14 @@ export type { Settings, ModelConfig, PropertyType, HistoryEntry, Provider, Ratin
 
 export let generalSettings: Settings = {
 	vaults: [],
-	showMoreActionsButton: false,
 	betaFeatures: false,
 	legacyMode: false,
 	silentOpen: false,
+	openBehavior: 'popup',
 	highlighterEnabled: true,
-	alwaysShowHighlights: true,
-	highlightBehavior: 'no-highlights',
+	alwaysShowHighlights: false,
+	highlightBehavior: 'highlight-inline',
+	showMoreActionsButton: false,
 	interpreterModel: '',
 	models: [],
 	providers: [],
@@ -24,9 +25,19 @@ export let generalSettings: Settings = {
 	readerSettings: {
 		fontSize: 16,
 		lineHeight: 1.6,
-		maxWidth: 800,
-		theme: 'default',
-		themeMode: 'auto'
+		maxWidth: 38,
+		lightTheme: 'default',
+		darkTheme: 'same',
+		appearance: 'auto',
+		fonts: [],
+		defaultFont: '',
+		blendImages: true,
+		colorLinks: false,
+		followLinks: true,
+		pinPlayer: true,
+		autoScroll: true,
+		highlightActiveLine: true,
+		customCss: ''
 	},
 	stats: {
 		addToObsidian: 0,
@@ -57,6 +68,7 @@ interface StorageData {
 		betaFeatures?: boolean;
 		legacyMode?: boolean;
 		silentOpen?: boolean;
+		openBehavior?: boolean | 'popup' | 'embedded' | 'reader';
 		saveBehavior?: SaveBehavior;
 		hoarderEnabled?: boolean;
 		hoarderServerUrl?: string;
@@ -72,8 +84,18 @@ interface StorageData {
 		fontSize?: number;
 		lineHeight?: number;
 		maxWidth?: number;
-		theme?: 'default' | 'flexoki';
-		themeMode?: 'auto' | 'light' | 'dark';
+		lightTheme?: string;
+		darkTheme?: string;
+		appearance?: 'auto' | 'light' | 'dark';
+		fonts?: string[];
+		defaultFont?: string;
+		blendImages?: boolean;
+		colorLinks?: boolean;
+		followLinks?: boolean;
+		pinPlayer?: boolean;
+		autoScroll?: boolean;
+		highlightActiveLine?: boolean;
+		customCss?: string;
 	};
 	interpreter_settings?: {
 		interpreterModel?: string;
@@ -108,9 +130,10 @@ export async function loadSettings(): Promise<Settings> {
 		betaFeatures: false,
 		legacyMode: false,
 		silentOpen: false,
+		openBehavior: 'popup',
 		highlighterEnabled: true,
 		alwaysShowHighlights: true,
-		highlightBehavior: 'no-highlights',
+		highlightBehavior: 'highlight-inline',
 		interpreterModel: '',
 		models: [],
 		providers: [],
@@ -122,9 +145,19 @@ export async function loadSettings(): Promise<Settings> {
 		readerSettings: {
 			fontSize: 16,
 			lineHeight: 1.6,
-			maxWidth: 800,
-			theme: 'default',
-			themeMode: 'auto'
+			maxWidth: 38,
+			lightTheme: 'default',
+			darkTheme: 'same',
+			appearance: 'auto',
+			fonts: [],
+			defaultFont: '',
+			blendImages: true,
+			colorLinks: false,
+			followLinks: true,
+			pinPlayer: true,
+			autoScroll: true,
+			highlightActiveLine: true,
+			customCss: ''
 		},
 		stats: {
 			addToObsidian: 0,
@@ -146,19 +179,31 @@ export async function loadSettings(): Promise<Settings> {
 		debugLog('Settings', `Updated migration version to ${CURRENT_MIGRATION_VERSION}`);
 	}
 
+	// Validate and sanitize data to prevent corruption
+	const sanitizedVaults = Array.isArray(data.vaults) ? data.vaults.filter(v => typeof v === 'string') : [];
+	const sanitizedModels = Array.isArray(data.interpreter_settings?.models) 
+		? data.interpreter_settings.models.filter(m => m && typeof m === 'object' && typeof m.id === 'string') 
+		: [];
+	const sanitizedProviders = Array.isArray(data.interpreter_settings?.providers) 
+		? data.interpreter_settings.providers.filter(p => p && typeof p === 'object' && typeof p.id === 'string') 
+		: [];
+
 	// Load user settings
 	const loadedSettings: Settings = {
-		vaults: data.vaults || defaultSettings.vaults,
+		vaults: sanitizedVaults.length > 0 ? sanitizedVaults : defaultSettings.vaults,
 		showMoreActionsButton: data.general_settings?.showMoreActionsButton ?? defaultSettings.showMoreActionsButton,
 		betaFeatures: data.general_settings?.betaFeatures ?? defaultSettings.betaFeatures,
 		legacyMode: data.general_settings?.legacyMode ?? defaultSettings.legacyMode,
 		silentOpen: data.general_settings?.silentOpen ?? defaultSettings.silentOpen,
+		openBehavior: typeof data.general_settings?.openBehavior === 'boolean' 
+			? (data.general_settings.openBehavior ? 'embedded' : 'popup') 
+			: (data.general_settings?.openBehavior ?? defaultSettings.openBehavior),
 		highlighterEnabled: data.highlighter_settings?.highlighterEnabled ?? defaultSettings.highlighterEnabled,
 		alwaysShowHighlights: data.highlighter_settings?.alwaysShowHighlights ?? defaultSettings.alwaysShowHighlights,
 		highlightBehavior: data.highlighter_settings?.highlightBehavior ?? defaultSettings.highlightBehavior,
 		interpreterModel: data.interpreter_settings?.interpreterModel || defaultSettings.interpreterModel,
-		models: data.interpreter_settings?.models || defaultSettings.models,
-		providers: data.interpreter_settings?.providers || defaultSettings.providers,
+		models: sanitizedModels,
+		providers: sanitizedProviders,
 		interpreterEnabled: data.interpreter_settings?.interpreterEnabled ?? defaultSettings.interpreterEnabled,
 		interpreterAutoRun: data.interpreter_settings?.interpreterAutoRun ?? defaultSettings.interpreterAutoRun,
 		defaultPromptContext: data.interpreter_settings?.defaultPromptContext || defaultSettings.defaultPromptContext,
@@ -167,8 +212,18 @@ export async function loadSettings(): Promise<Settings> {
 			fontSize: data.reader_settings?.fontSize ?? defaultSettings.readerSettings.fontSize,
 			lineHeight: data.reader_settings?.lineHeight ?? defaultSettings.readerSettings.lineHeight,
 			maxWidth: data.reader_settings?.maxWidth ?? defaultSettings.readerSettings.maxWidth,
-			theme: data.reader_settings?.theme as 'default' | 'flexoki' ?? defaultSettings.readerSettings.theme,
-			themeMode: data.reader_settings?.themeMode as 'auto' | 'light' | 'dark' ?? defaultSettings.readerSettings.themeMode
+			lightTheme: data.reader_settings?.lightTheme ?? defaultSettings.readerSettings.lightTheme,
+			darkTheme: data.reader_settings?.darkTheme ?? defaultSettings.readerSettings.darkTheme,
+			appearance: data.reader_settings?.appearance as 'auto' | 'light' | 'dark' ?? defaultSettings.readerSettings.appearance,
+			fonts: data.reader_settings?.fonts ?? defaultSettings.readerSettings.fonts,
+			defaultFont: data.reader_settings?.defaultFont ?? defaultSettings.readerSettings.defaultFont,
+			blendImages: data.reader_settings?.blendImages ?? defaultSettings.readerSettings.blendImages,
+			colorLinks: data.reader_settings?.colorLinks ?? defaultSettings.readerSettings.colorLinks,
+			followLinks: data.reader_settings?.followLinks ?? defaultSettings.readerSettings.followLinks,
+			pinPlayer: data.reader_settings?.pinPlayer ?? defaultSettings.readerSettings.pinPlayer,
+			autoScroll: data.reader_settings?.autoScroll ?? defaultSettings.readerSettings.autoScroll,
+			highlightActiveLine: data.reader_settings?.highlightActiveLine ?? defaultSettings.readerSettings.highlightActiveLine,
+			customCss: data.reader_settings?.customCss ?? defaultSettings.readerSettings.customCss
 		},
 		stats: data.stats || defaultSettings.stats,
 		history: data.history || defaultSettings.history,
@@ -196,10 +251,11 @@ export async function saveSettings(settings?: Partial<Settings>): Promise<void> 
 			betaFeatures: generalSettings.betaFeatures,
 			legacyMode: generalSettings.legacyMode,
 			silentOpen: generalSettings.silentOpen,
+			openBehavior: generalSettings.openBehavior,
 			saveBehavior: generalSettings.saveBehavior,
 			hoarderEnabled: generalSettings.hoarderEnabled,
 			hoarderServerUrl: generalSettings.hoarderServerUrl,
-			hoarderApiKey: generalSettings.hoarderApiKey
+			hoarderApiKey: generalSettings.hoarderApiKey,
 		},
 		highlighter_settings: {
 			highlighterEnabled: generalSettings.highlighterEnabled,
@@ -219,8 +275,18 @@ export async function saveSettings(settings?: Partial<Settings>): Promise<void> 
 			fontSize: generalSettings.readerSettings.fontSize,
 			lineHeight: generalSettings.readerSettings.lineHeight,
 			maxWidth: generalSettings.readerSettings.maxWidth,
-			theme: generalSettings.readerSettings.theme,
-			themeMode: generalSettings.readerSettings.themeMode
+			lightTheme: generalSettings.readerSettings.lightTheme,
+			darkTheme: generalSettings.readerSettings.darkTheme,
+			appearance: generalSettings.readerSettings.appearance,
+			fonts: generalSettings.readerSettings.fonts,
+			defaultFont: generalSettings.readerSettings.defaultFont,
+			blendImages: generalSettings.readerSettings.blendImages,
+			colorLinks: generalSettings.readerSettings.colorLinks,
+			followLinks: generalSettings.readerSettings.followLinks,
+			pinPlayer: generalSettings.readerSettings.pinPlayer,
+			autoScroll: generalSettings.readerSettings.autoScroll,
+			highlightActiveLine: generalSettings.readerSettings.highlightActiveLine,
+			customCss: generalSettings.readerSettings.customCss
 		},
 		stats: generalSettings.stats
 	});
@@ -234,16 +300,17 @@ export async function setLegacyMode(enabled: boolean): Promise<void> {
 export async function incrementStat(
 	action: keyof Settings['stats'],
 	vault?: string,
-	path?: string
+	path?: string,
+	url?: string,
+	title?: string
 ): Promise<void> {
 	const settings = await loadSettings();
 	settings.stats[action]++;
 	await saveSettings(settings);
 
-	// Get the current tab's URL and title
-	const tabs = await browser.tabs.query({ active: true, currentWindow: true });
-	if (tabs[0]?.url) {
-		await addHistoryEntry(action, tabs[0].url, tabs[0].title, vault, path);
+	// Add history entry if URL is provided
+	if (url) {
+		await addHistoryEntry(action, url, title, vault, path);
 	}
 }
 
@@ -289,15 +356,17 @@ declare global {
 }
 
 // Make storage accessible from console — use `window.debugStorage()` to see all sync storage, or `window.debugStorage(key)` to see a specific key
-window.debugStorage = (key?: string) => {
-	if (key) {
-		return browser.storage.sync.get(key).then(data => {
-			console.log(`Sync storage contents for key "${key}":`, data);
+if (typeof window !== 'undefined') {
+	window.debugStorage = (key?: string) => {
+		if (key) {
+			return browser.storage.sync.get(key).then(data => {
+				console.log(`Sync storage contents for key "${key}":`, data);
+				return data;
+			});
+		}
+		return browser.storage.sync.get(null).then(data => {
+			console.log('Sync storage contents:', data);
 			return data;
 		});
-	}
-	return browser.storage.sync.get(null).then(data => {
-		console.log('Sync storage contents:', data);
-		return data;
-	});
-};
+	};
+}

@@ -13,6 +13,8 @@
 		7A64805A2D820A9800A5924D /* reader.css in Resources */ = {isa = PBXBuildFile; fileRef = 7A6480582D820A9800A5924D /* reader.css */; };
 		7A6535C92D8B530300DDF54C /* reader-script.js in Resources */ = {isa = PBXBuildFile; fileRef = 7A6535C82D8B530300DDF54C /* reader-script.js */; };
 		7A6535CA2D8B530300DDF54C /* reader-script.js in Resources */ = {isa = PBXBuildFile; fileRef = 7A6535C82D8B530300DDF54C /* reader-script.js */; };
+		7AC138872E4B9C8E00B6F4CF /* side-panel.html in Resources */ = {isa = PBXBuildFile; fileRef = 7AC138862E4B9C8E00B6F4CF /* side-panel.html */; };
+		7AC138882E4B9C8F00B6F4CF /* side-panel.html in Resources */ = {isa = PBXBuildFile; fileRef = 7AC138862E4B9C8E00B6F4CF /* side-panel.html */; };
 		7AEF057F2CA0F50D005FFBC2 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AEF057E2CA0F50D005FFBC2 /* AppDelegate.swift */; };
 		7AEF05812CA0F50D005FFBC2 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AEF05802CA0F50D005FFBC2 /* SceneDelegate.swift */; };
 		7AEF05842CA0F50D005FFBC2 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05832CA0F50D005FFBC2 /* Base */; };
@@ -55,6 +57,20 @@
 		7AEF05F22CA0F50D005FFBC2 /* content.js in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05D62CA0F50D005FFBC2 /* content.js */; };
 		7AEF05F32CA0F50D005FFBC2 /* settings.html in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05D82CA0F50D005FFBC2 /* settings.html */; };
 		7AEF05F52CA0F50D005FFBC2 /* settings.js in Resources */ = {isa = PBXBuildFile; fileRef = 7AEF05DA2CA0F50D005FFBC2 /* settings.js */; };
+		AF3D6D452F8B297F004F2D8D /* highlights.html in Resources */ = {isa = PBXBuildFile; fileRef = AF3D6D412F8B297F004F2D8D /* highlights.html */; };
+		AF3D6D462F8B297F004F2D8D /* highlights.js in Resources */ = {isa = PBXBuildFile; fileRef = AF3D6D422F8B297F004F2D8D /* highlights.js */; };
+		AF3D6D472F8B297F004F2D8D /* reader-page.js in Resources */ = {isa = PBXBuildFile; fileRef = AF3D6D442F8B297F004F2D8D /* reader-page.js */; };
+		AF3D6D482F8B297F004F2D8D /* reader.html in Resources */ = {isa = PBXBuildFile; fileRef = AF3D6D432F8B297F004F2D8D /* reader.html */; };
+		AF3D6D492F8B297F004F2D8D /* highlights.html in Resources */ = {isa = PBXBuildFile; fileRef = AF3D6D412F8B297F004F2D8D /* highlights.html */; };
+		AF3D6D4A2F8B297F004F2D8D /* highlights.js in Resources */ = {isa = PBXBuildFile; fileRef = AF3D6D422F8B297F004F2D8D /* highlights.js */; };
+		AF3D6D4B2F8B297F004F2D8D /* reader-page.js in Resources */ = {isa = PBXBuildFile; fileRef = AF3D6D442F8B297F004F2D8D /* reader-page.js */; };
+		AF3D6D4C2F8B297F004F2D8D /* reader.html in Resources */ = {isa = PBXBuildFile; fileRef = AF3D6D432F8B297F004F2D8D /* reader.html */; };
+		AF4F759B2F9C1AD80072BA9B /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = AF4F759A2F9C1AD80072BA9B /* AppIcon.icon */; };
+		AF4F759C2F9C1AD80072BA9B /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = AF4F759A2F9C1AD80072BA9B /* AppIcon.icon */; };
+		AFA233A52F63522E00F39577 /* flatten-shadow-dom.js in Resources */ = {isa = PBXBuildFile; fileRef = AFA233A42F63522E00F39577 /* flatten-shadow-dom.js */; };
+		AFA233A62F63522E00F39577 /* flatten-shadow-dom.js in Resources */ = {isa = PBXBuildFile; fileRef = AFA233A42F63522E00F39577 /* flatten-shadow-dom.js */; };
+		AFA233A72F63522E00F39577 /* flatten-shadow-dom.js in Resources */ = {isa = PBXBuildFile; fileRef = AFA233A42F63522E00F39577 /* flatten-shadow-dom.js */; };
+		AFA233A82F63522E00F39577 /* flatten-shadow-dom.js in Resources */ = {isa = PBXBuildFile; fileRef = AFA233A42F63522E00F39577 /* flatten-shadow-dom.js */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -103,6 +119,7 @@
 		7A15D46F2CB5D97B00BC4F99 /* highlighter.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; name = highlighter.css; path = ../../../dist_safari/highlighter.css; sourceTree = "<group>"; };
 		7A6480582D820A9800A5924D /* reader.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; name = reader.css; path = ../../../dist_safari/reader.css; sourceTree = "<group>"; };
 		7A6535C82D8B530300DDF54C /* reader-script.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = "reader-script.js"; path = "../../../dist_safari/reader-script.js"; sourceTree = "<group>"; };
+		7AC138862E4B9C8E00B6F4CF /* side-panel.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = "side-panel.html"; path = "../../../dist_safari/side-panel.html"; sourceTree = "<group>"; };
 		7AEF056F2CA0F50D005FFBC2 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = ../Base.lproj/Main.html; sourceTree = "<group>"; };
 		7AEF05702CA0F50D005FFBC2 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
 		7AEF05712CA0F50D005FFBC2 /* Style.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = Style.css; sourceTree = "<group>"; };
@@ -136,6 +153,12 @@
 		7AEF05D62CA0F50D005FFBC2 /* content.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = content.js; path = ../../../dist_safari/content.js; sourceTree = "<group>"; };
 		7AEF05D82CA0F50D005FFBC2 /* settings.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = settings.html; path = ../../../dist_safari/settings.html; sourceTree = "<group>"; };
 		7AEF05DA2CA0F50D005FFBC2 /* settings.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = settings.js; path = ../../../dist_safari/settings.js; sourceTree = "<group>"; };
+		AF3D6D412F8B297F004F2D8D /* highlights.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = highlights.html; path = ../../../dist_safari/highlights.html; sourceTree = "<group>"; };
+		AF3D6D422F8B297F004F2D8D /* highlights.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = highlights.js; path = ../../../dist_safari/highlights.js; sourceTree = "<group>"; };
+		AF3D6D432F8B297F004F2D8D /* reader.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = reader.html; path = ../../../dist_safari/reader.html; sourceTree = "<group>"; };
+		AF3D6D442F8B297F004F2D8D /* reader-page.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = "reader-page.js"; path = "../../../dist_safari/reader-page.js"; sourceTree = "<group>"; };
+		AF4F759A2F9C1AD80072BA9B /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIcon.icon; sourceTree = "<group>"; };
+		AFA233A42F63522E00F39577 /* flatten-shadow-dom.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = "flatten-shadow-dom.js"; path = "../../../dist_safari/flatten-shadow-dom.js"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -187,6 +210,7 @@
 			isa = PBXGroup;
 			children = (
 				7AEF05732CA0F50D005FFBC2 /* ViewController.swift */,
+				AF4F759A2F9C1AD80072BA9B /* AppIcon.icon */,
 				7AEF05742CA0F50D005FFBC2 /* Assets.xcassets */,
 				7AEF056D2CA0F50D005FFBC2 /* Resources */,
 			);
@@ -270,6 +294,7 @@
 				7AEF05CB2CA0F50D005FFBC2 /* background.js */,
 				7AEF05CC2CA0F50D005FFBC2 /* popup.js */,
 				7A15D46F2CB5D97B00BC4F99 /* highlighter.css */,
+				7AC138862E4B9C8E00B6F4CF /* side-panel.html */,
 				7AEF05CF2CA0F50D005FFBC2 /* popup.html */,
 				7AEF05D02CA0F50D005FFBC2 /* browser-polyfill.min.js */,
 				7AEF05D32CA0F50D005FFBC2 /* icons */,
@@ -280,6 +305,11 @@
 				7AEF05D82CA0F50D005FFBC2 /* settings.html */,
 				7A6535C82D8B530300DDF54C /* reader-script.js */,
 				7AEF05DA2CA0F50D005FFBC2 /* settings.js */,
+				AFA233A42F63522E00F39577 /* flatten-shadow-dom.js */,
+				AF3D6D412F8B297F004F2D8D /* highlights.html */,
+				AF3D6D422F8B297F004F2D8D /* highlights.js */,
+				AF3D6D432F8B297F004F2D8D /* reader.html */,
+				AF3D6D442F8B297F004F2D8D /* reader-page.js */,
 			);
 			name = Resources;
 			path = "Shared (Extension)";
@@ -368,7 +398,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1540;
-				LastUpgradeCheck = 1600;
+				LastUpgradeCheck = 2600;
 				TargetAttributes = {
 					7AEF057A2CA0F50D005FFBC2 = {
 						CreatedOnToolsVersion = 15.4;
@@ -412,10 +442,12 @@
 			files = (
 				7AEF05AD2CA0F50D005FFBC2 /* Icon.png in Resources */,
 				7AEF05842CA0F50D005FFBC2 /* Base in Resources */,
+				AF4F759B2F9C1AD80072BA9B /* AppIcon.icon in Resources */,
 				7AEF05AB2CA0F50D005FFBC2 /* Base in Resources */,
 				7AEF05B12CA0F50D005FFBC2 /* Script.js in Resources */,
 				7AEF05B52CA0F50D005FFBC2 /* Assets.xcassets in Resources */,
 				7AEF05872CA0F50D005FFBC2 /* Base in Resources */,
+				AFA233A52F63522E00F39577 /* flatten-shadow-dom.js in Resources */,
 				7AEF05AF2CA0F50D005FFBC2 /* Style.css in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -427,7 +459,9 @@
 				7AEF05AE2CA0F50D005FFBC2 /* Icon.png in Resources */,
 				7AEF05B02CA0F50D005FFBC2 /* Style.css in Resources */,
 				7AEF05932CA0F50D005FFBC2 /* Base in Resources */,
+				AFA233A72F63522E00F39577 /* flatten-shadow-dom.js in Resources */,
 				7AEF05B22CA0F50D005FFBC2 /* Script.js in Resources */,
+				AF4F759C2F9C1AD80072BA9B /* AppIcon.icon in Resources */,
 				7AEF05B62CA0F50D005FFBC2 /* Assets.xcassets in Resources */,
 				7AEF05AC2CA0F50D005FFBC2 /* Base in Resources */,
 			);
@@ -437,17 +471,23 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7AC138872E4B9C8E00B6F4CF /* side-panel.html in Resources */,
 				7A6535C92D8B530300DDF54C /* reader-script.js in Resources */,
 				7AEF05F32CA0F50D005FFBC2 /* settings.html in Resources */,
 				7A15D4712CB5D97B00BC4F99 /* highlighter.css in Resources */,
 				7AEF05EA2CA0F50D005FFBC2 /* background.js in Resources */,
 				7AEF05F02CA0F50D005FFBC2 /* style.css in Resources */,
 				7AEF05ED2CA0F50D005FFBC2 /* popup.html in Resources */,
+				AF3D6D492F8B297F004F2D8D /* highlights.html in Resources */,
+				AF3D6D4A2F8B297F004F2D8D /* highlights.js in Resources */,
+				AF3D6D4B2F8B297F004F2D8D /* reader-page.js in Resources */,
+				AF3D6D4C2F8B297F004F2D8D /* reader.html in Resources */,
 				7AEF05EE2CA0F50D005FFBC2 /* browser-polyfill.min.js in Resources */,
 				7AEF05F22CA0F50D005FFBC2 /* content.js in Resources */,
 				7AEF05F12CA0F50D005FFBC2 /* manifest.json in Resources */,
 				7AEF05EB2CA0F50D005FFBC2 /* popup.js in Resources */,
 				7A64805A2D820A9800A5924D /* reader.css in Resources */,
+				AFA233A82F63522E00F39577 /* flatten-shadow-dom.js in Resources */,
 				7AEF05EF2CA0F50D005FFBC2 /* icons in Resources */,
 				7AEF05F52CA0F50D005FFBC2 /* settings.js in Resources */,
 			);
@@ -457,17 +497,23 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7AC138882E4B9C8F00B6F4CF /* side-panel.html in Resources */,
 				7A6535CA2D8B530300DDF54C /* reader-script.js in Resources */,
 				7AEF05E62CA0F50D005FFBC2 /* settings.html in Resources */,
 				7A15D4702CB5D97B00BC4F99 /* highlighter.css in Resources */,
 				7AEF05DD2CA0F50D005FFBC2 /* background.js in Resources */,
 				7AEF05E32CA0F50D005FFBC2 /* style.css in Resources */,
 				7AEF05E02CA0F50D005FFBC2 /* popup.html in Resources */,
+				AF3D6D452F8B297F004F2D8D /* highlights.html in Resources */,
+				AF3D6D462F8B297F004F2D8D /* highlights.js in Resources */,
+				AF3D6D472F8B297F004F2D8D /* reader-page.js in Resources */,
+				AF3D6D482F8B297F004F2D8D /* reader.html in Resources */,
 				7AEF05E12CA0F50D005FFBC2 /* browser-polyfill.min.js in Resources */,
 				7AEF05E52CA0F50D005FFBC2 /* content.js in Resources */,
 				7AEF05E42CA0F50D005FFBC2 /* manifest.json in Resources */,
 				7AEF05DE2CA0F50D005FFBC2 /* popup.js in Resources */,
 				7A6480592D820A9800A5924D /* reader.css in Resources */,
+				AFA233A62F63522E00F39577 /* flatten-shadow-dom.js in Resources */,
 				7AEF05E22CA0F50D005FFBC2 /* icons in Resources */,
 				7AEF05E82CA0F50D005FFBC2 /* settings.js in Resources */,
 			);
@@ -598,6 +644,7 @@
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 6JSW4SJWN9;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -619,6 +666,7 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -660,6 +708,7 @@
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 6JSW4SJWN9;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = YES;
@@ -674,6 +723,7 @@
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 			};
 			name = Release;
@@ -682,8 +732,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 36;
-				DEVELOPMENT_TEAM = 6JSW4SJWN9;
+				CURRENT_PROJECT_VERSION = 51;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "iOS (Extension)/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Obsidian Web Clipper Extension";
@@ -694,7 +743,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 0.11.8;
+				MARKETING_VERSION = 1.6.2;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -713,8 +762,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 36;
-				DEVELOPMENT_TEAM = 6JSW4SJWN9;
+				CURRENT_PROJECT_VERSION = 51;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "iOS (Extension)/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Obsidian Web Clipper Extension";
@@ -725,7 +773,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 0.11.8;
+				MARKETING_VERSION = 1.6.2;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -748,11 +796,10 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 36;
-				DEVELOPMENT_TEAM = 6JSW4SJWN9;
+				CURRENT_PROJECT_VERSION = 51;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "iOS (App)/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "Obsidian Web Clipper";
+				INFOPLIST_KEY_CFBundleDisplayName = "Web Clipper";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
@@ -764,7 +811,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.11.8;
+				MARKETING_VERSION = 1.6.2;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -787,11 +834,10 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 36;
-				DEVELOPMENT_TEAM = 6JSW4SJWN9;
+				CURRENT_PROJECT_VERSION = 51;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "iOS (App)/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "Obsidian Web Clipper";
+				INFOPLIST_KEY_CFBundleDisplayName = "Web Clipper";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
@@ -803,7 +849,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.11.8;
+				MARKETING_VERSION = 1.6.2;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -826,11 +872,12 @@
 				CODE_SIGN_ENTITLEMENTS = "macOS (Extension)/Obsidian Web Clipper.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 36;
+				CURRENT_PROJECT_VERSION = 51;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "Shared\\ (App)/Assets.xcassets";
-				DEVELOPMENT_TEAM = 6JSW4SJWN9;
+				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "macOS (Extension)/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Obsidian Web Clipper Extension";
@@ -841,7 +888,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 0.11.8;
+				MARKETING_VERSION = 1.6.2;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -861,11 +908,12 @@
 				CODE_SIGN_ENTITLEMENTS = "macOS (Extension)/Obsidian Web Clipper.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 36;
+				CURRENT_PROJECT_VERSION = 51;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "Shared\\ (App)/Assets.xcassets";
-				DEVELOPMENT_TEAM = 6JSW4SJWN9;
+				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "macOS (Extension)/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Obsidian Web Clipper Extension";
@@ -876,7 +924,7 @@
 					"@executable_path/../../../../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 0.11.8;
+				MARKETING_VERSION = 1.6.2;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -899,10 +947,12 @@
 				CODE_SIGN_ENTITLEMENTS = "macOS (App)/Obsidian Web Clipper.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 36;
+				CURRENT_PROJECT_VERSION = 51;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = 6JSW4SJWN9;
+				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "macOS (App)/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Obsidian Web Clipper";
@@ -914,7 +964,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 0.11.8;
+				MARKETING_VERSION = 1.6.2;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -938,10 +988,12 @@
 				CODE_SIGN_ENTITLEMENTS = "macOS (App)/Obsidian Web Clipper.entitlements";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 36;
+				CURRENT_PROJECT_VERSION = 51;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = 6JSW4SJWN9;
+				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "macOS (App)/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Obsidian Web Clipper";
@@ -953,7 +1005,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 0.11.8;
+				MARKETING_VERSION = 1.6.2;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,

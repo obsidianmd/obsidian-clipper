@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Розширені"
 	},
+	"allHighlights": {
+		"message": "Усі виділення"
+	},
 	"allProperties": {
 		"message": "Усі властивості"
 	},
@@ -58,9 +61,6 @@
 	},
 	"behavior": {
 		"message": "Поведінка"
-	},
-	"behaviorWarning": {
-		"message": "Додавання до існуючої або щоденної нотатки потребує Obsidian 1.7.2 або новішої версії."
 	},
 	"byDay": {
 		"message": "За день"
@@ -103,6 +103,14 @@
 			},
 			"strong_start": {
 				"content": "<strong>"
+			}
+		}
+	},
+	"clipboardError": {
+		"message": "Obsidian не може отримати доступ до вашого буфера обміну. Спробуйте інструкції з усунення несправностей тут: $1",
+		"placeholders": {
+			"1": {
+				"content": "$1"
 			}
 		}
 	},
@@ -157,6 +165,15 @@
 	"delete": {
 		"message": "Видалити"
 	},
+	"deleteAllHighlightsConfirm": {
+		"message": "Ви впевнені, що хочете видалити всі виділення?"
+	},
+	"deleteHighlightsForDomain": {
+		"message": "Видалити всі виділення для цього домену?"
+	},
+	"deleteHighlightsForPage": {
+		"message": "Видалити всі виділення для цієї сторінки?"
+	},
 	"deleteModelConfirm": {
 		"message": "Ви впевнені, що хочете видалити цю модель?"
 	},
@@ -192,6 +209,9 @@
 	"earlyAccessFeatures": {
 		"message": "Функції раннього доступу"
 	},
+	"edit": {
+		"message": "Редагувати"
+	},
 	"editModel": {
 		"message": "Редагувати модель"
 	},
@@ -201,8 +221,8 @@
 	"editTemplate": {
 		"message": "Редагувати шаблон"
 	},
-	"enableHighlighter": {
-		"message": "Увімкнути виділення"
+	"embedded": {
+		"message": "Вбудований"
 	},
 	"enableHighlighterDescription": {
 		"message": "Виділяйте вміст на веб-сторінках для збереження в Obsidian"
@@ -346,11 +366,23 @@
 	"highlightPage": {
 		"message": "Виділити сторінку"
 	},
+	"highlightSelection": {
+		"message": "Виділити"
+	},
 	"highlighter": {
 		"message": "Виділення"
 	},
+	"highlighterOn": {
+		"message": "Маркер"
+	},
 	"highlighterSettings": {
 		"message": "Виділення"
+	},
+	"highlights": {
+		"message": "Виділення"
+	},
+	"highlightsNotFound": {
+		"message": "У статті не знайдено виділень"
 	},
 	"history": {
 		"message": "Історія"
@@ -437,6 +469,12 @@
 	"legacyModeDescription": {
 		"message": "Використовує метод захоплення URI, сумісний з Obsidian 1.6.7 та старішими версіями. Зауважте, що довжина захопленого вмісту обмежена браузером та операційною системою. Деякі сторінки можуть не вдатися без повідомлення про помилку."
 	},
+	"loadArticle": {
+		"message": "Читати статтю"
+	},
+	"loading": {
+		"message": "Завантаження…"
+	},
 	"modelName": {
 		"message": "Назва моделі"
 	},
@@ -469,6 +507,9 @@
 	},
 	"noHighlights": {
 		"message": "Немає виділень"
+	},
+	"noResults": {
+		"message": "Результатів не знайдено"
 	},
 	"noTemplates": {
 		"message": "Немає доступних шаблонів. Додайте шаблон у налаштуваннях."
@@ -506,6 +547,24 @@
 	"open": {
 		"message": "Відкрити"
 	},
+	"openBehaviorDescription": {
+		"message": "Виберіть, як за замовчуванням відкривається Web Clipper."
+	},
+	"openBehaviorTitle": {
+		"message": "Поведінка при відкритті"
+	},
+	"openEmbedded": {
+		"message": "Відкрити на сторінці"
+	},
+	"openHighlights": {
+		"message": "Відкрити виділення"
+	},
+	"openReader": {
+		"message": "Відкрити режим читання"
+	},
+	"openSidePanel": {
+		"message": "Відкрити бічну панель"
+	},
 	"optional": {
 		"message": "(необов'язково)"
 	},
@@ -539,11 +598,17 @@
 	"popularModelsDescription": {
 		"message": "Виберіть з часто використовуваних моделей або введіть деталі власної моделі."
 	},
+	"popup": {
+		"message": "Спливаюче вікно"
+	},
 	"prependToDaily": {
 		"message": "Додати до щоденної нотатки, на початок"
 	},
 	"prependToExisting": {
 		"message": "Додати до існуючої нотатки, на початок"
+	},
+	"preview": {
+		"message": "Попередній перегляд"
 	},
 	"processing": {
 		"message": "обробка"
@@ -556,6 +621,24 @@
 	},
 	"propertyName": {
 		"message": "Назва властивості"
+	},
+	"propertyTypeCheckbox": {
+		"message": "Прапорець"
+	},
+	"propertyTypeDate": {
+		"message": "Дата"
+	},
+	"propertyTypeDatetime": {
+		"message": "Дата та час"
+	},
+	"propertyTypeMultitext": {
+		"message": "Список"
+	},
+	"propertyTypeNumber": {
+		"message": "Номер"
+	},
+	"propertyTypeText": {
+		"message": "Текст"
 	},
 	"propertyValue": {
 		"message": "Значення властивості"
@@ -608,6 +691,153 @@
 	"reader": {
 		"message": "Читач"
 	},
+	"readerAppearance": {
+		"message": "Вигляд"
+	},
+	"readerAppearanceAuto": {
+		"message": "Авто"
+	},
+	"readerAppearanceDark": {
+		"message": "Темний"
+	},
+	"readerAppearanceDescription": {
+		"message": "Виберіть світлий або темний вигляд."
+	},
+	"readerAppearanceLight": {
+		"message": "Світлий"
+	},
+	"readerAutoScroll": {
+		"message": "Автопрокрутка"
+	},
+	"readerAutoScrollDescription": {
+		"message": "Автоматично прокручувати транскрипт, щоб він слідував за відтворенням."
+	},
+	"readerBlendImages": {
+		"message": "Змішувати зображення"
+	},
+	"readerBlendImagesDescription": {
+		"message": "Змішувати зображення з фоном сторінки."
+	},
+	"readerCloseImageViewer": {
+		"message": "Закрити переглядач зображень"
+	},
+	"readerCollapseComment": {
+		"message": "Згорнути коментар"
+	},
+	"readerColorLinks": {
+		"message": "Розфарбовувати посилання"
+	},
+	"readerColorSchemeDefault": {
+		"message": "За замовчуванням"
+	},
+	"readerCurrentPosition": {
+		"message": "Поточна позиція"
+	},
+	"readerCustomCss": {
+		"message": "Власний CSS"
+	},
+	"readerCustomCssDescription": {
+		"message": "CSS, що застосовується автоматично в режимі читання."
+	},
+	"readerDarkTheme": {
+		"message": "Тема темного режиму"
+	},
+	"readerDarkThemeDescription": {
+		"message": "Використовувати іншу тему в темному режимі."
+	},
+	"readerError": {
+		"message": "Не вдалося витягти вміст."
+	},
+	"readerFont": {
+		"message": "Параметри шрифтів"
+	},
+	"readerFontDefault": {
+		"message": "За замовчуванням"
+	},
+	"readerFontDescription": {
+		"message": "Додайте шрифти, встановлені у вашій системі. Натисніть Enter, щоб додати шрифт."
+	},
+	"readerFontNotFound": {
+		"message": "Не знайдено"
+	},
+	"readerFontPlaceholder": {
+		"message": "Натисніть Enter, щоб додати шрифт"
+	},
+	"readerFontSetDefault": {
+		"message": "Встановити за замовчуванням"
+	},
+	"readerFontSize": {
+		"message": "Базовий розмір шрифту"
+	},
+	"readerFontSystem": {
+		"message": "Системний"
+	},
+	"readerFontSystemSans": {
+		"message": "Без засічок"
+	},
+	"readerFontSystemSerif": {
+		"message": "Із засічками"
+	},
+	"readerFonts": {
+		"message": "Шрифти"
+	},
+	"readerFootnotes": {
+		"message": "Виноски"
+	},
+	"readerHighlightActiveLine": {
+		"message": "Підсвічувати активний рядок"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "Підсвічувати поточне речення в транскрипті під час відтворення."
+	},
+	"readerImages": {
+		"message": "Зображення"
+	},
+	"readerLineHeight": {
+		"message": "Висота рядка"
+	},
+	"readerLineWidth": {
+		"message": "Ширина рядка"
+	},
+	"readerLoadFailed": {
+		"message": "Не вдалося завантажити. Можливо, сторінку заблоковано вашим браузером."
+	},
+	"readerLoading": {
+		"message": "Очищення…"
+	},
+	"readerOn": {
+		"message": "Режим читання"
+	},
+	"readerPinPlayer": {
+		"message": "Закріпити плеєр"
+	},
+	"readerPinPlayerDescription": {
+		"message": "Залишати відеоплеєр видимим під час прокручування транскрипту."
+	},
+	"readerSettings": {
+		"message": "Налаштування режиму читання"
+	},
+	"readerTheme": {
+		"message": "Тема"
+	},
+	"readerThemeDescription": {
+		"message": "Виберіть кольори, що використовуються в режимі читання."
+	},
+	"readerThemeSection": {
+		"message": "Тема"
+	},
+	"readerTranscripts": {
+		"message": "Транскрипти"
+	},
+	"readerTypography": {
+		"message": "Типографіка"
+	},
+	"readerUrlPlaceholder": {
+		"message": "Вставте URL, щоб прочитати…"
+	},
+	"readerViewFullSize": {
+		"message": "Переглянути в повному розмірі"
+	},
 	"recommended": {
 		"message": "рекомендовано"
 	},
@@ -658,6 +888,9 @@
 	},
 	"saveFile": {
 		"message": "Зберегти файл..."
+	},
+	"searchHighlightsPlaceholder": {
+		"message": "Шукати виділення…"
 	},
 	"searchVariables": {
 		"message": "Пошук змінних..."
@@ -719,17 +952,47 @@
 	"silentOpenDescription": {
 		"message": "Вирізані нотатки будуть збережені, але не відкриті в новій вкладці. Obsidian все одно буде виведений на передній план."
 	},
+	"sort": {
+		"message": "Сортувати"
+	},
+	"sortAZ": {
+		"message": "Від А до Я"
+	},
+	"sortNewOld": {
+		"message": "Спочатку найновіші"
+	},
+	"sortOldNew": {
+		"message": "Спочатку найстаріші"
+	},
+	"sortZA": {
+		"message": "Від Я до А"
+	},
 	"specificNoteName": {
 		"message": "Конкретна назва нотатки"
 	},
 	"systemDefault": {
 		"message": "Системна за замовчуванням"
 	},
+	"template": {
+		"message": "Шаблон"
+	},
 	"templateCopied": {
 		"message": "JSON шаблону скопійовано в буфер обміну"
 	},
 	"templateCopyError": {
 		"message": "Не вдалося скопіювати JSON шаблону в буфер обміну"
+	},
+	"templateErrorCount": {
+		"message": "У вашому шаблоні є помилка."
+	},
+	"templateErrorsCount": {
+		"message": "У вашому шаблоні є $1 помилок."
+	},
+	"templateGroupContent": {
+		"message": "Вміст"
+	},
+	"templateGroupLocation": {
+		"message": "Розташування"
 	},
 	"templateName": {
 		"message": "Назва шаблону"
@@ -745,6 +1008,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "Визначте правила для автоматичного вибору цього шаблону, якщо він відповідає шаблону URL або містить дані schema.org. По одному правилу на рядок."
+	},
+	"templateValid": {
+		"message": "Синтаксис шаблону правильний"
 	},
 	"templatesHeading": {
 		"message": "Шаблони"

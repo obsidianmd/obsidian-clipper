@@ -20,12 +20,14 @@ export function memoize<T extends (...args: any[]) => any>(
 	}) as T;
 }
 
+type MemoizedFn<T> = T & { clear: () => void };
+
 export function memoizeWithExpiration<T extends (...args: any[]) => any>(
 	fn: T,
 	options: MemoizeOptions<T>
-): T {
+): MemoizedFn<T> {
 	const cache = new Map<string, { value: ReturnType<T>; timestamp: number }>();
-	return (async (...args: Parameters<T>): Promise<ReturnType<T>> => {
+	const memoized = (async (...args: Parameters<T>): Promise<ReturnType<T>> => {
 		const key = options.keyFn ? await options.keyFn(...args) : JSON.stringify(args);
 		const now = Date.now();
 		if (cache.has(key)) {
@@ -37,5 +39,7 @@ export function memoizeWithExpiration<T extends (...args: any[]) => any>(
 		const result = await fn(...args);
 		cache.set(key, { value: result, timestamp: now });
 		return result;
-	}) as unknown as T;
+	}) as unknown as MemoizedFn<T>;
+	memoized.clear = () => cache.clear();
+	return memoized;
 }

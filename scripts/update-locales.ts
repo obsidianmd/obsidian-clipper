@@ -5,7 +5,7 @@ import I18nAutomation from '../src/utils/i18n-automation';
 // Load environment variables from .env file
 dotenv.config();
 
-const LOCALES_DIR = path.join(__dirname, '../src/locales');
+const LOCALES_DIR = path.join(__dirname, '../src/_locales');
 const SRC_DIR = path.join(__dirname, '../src');
 
 async function main() {

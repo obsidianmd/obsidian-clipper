@@ -21,10 +21,13 @@
 		"message": "Zapisz w Obsidian"
 	},
 	"addVaultPlaceholder": {
-		"message": "Kliknij Enter, aby dodać sejf"
+		"message": "Kliknij enter, aby dodać sejf"
 	},
 	"advanced": {
 		"message": "Zaawansowane"
+	},
+	"allHighlights": {
+		"message": "Wszystkie wyróżnienia"
 	},
 	"allProperties": {
 		"message": "Wszystkie atrybuty"
@@ -45,10 +48,10 @@
 		"message": "Korzystając z usług zewnętrznego operatora, użytkownik akceptuje jego regulamin i politykę prywatności. Zapytania użytkowników wysyłane są bezpośrednio do wybranego operatora. Obsidian nie gromadzi ani nie przechowuje żadnych danych dotyczących zapytań."
 	},
 	"appendToDaily": {
-		"message": "Zapisz na dole codziennej notatki"
+		"message": "Zapisz na końcu w dzienniku"
 	},
 	"appendToExisting": {
-		"message": "Zapisz na dole istniejącej notatki"
+		"message": "Zapisz na końcu istniejącej notatki"
 	},
 	"autoRunInterpreter": {
 		"message": "Uruchom automatycznie"
@@ -58,9 +61,6 @@
 	},
 	"behavior": {
 		"message": "Sposób działania"
-	},
-	"behaviorWarning": {
-		"message": "Aby zapisać w istniejącej lub codziennej notatce wymagany jest Obsidian w wersji 1.7.2 lub nowszej."
 	},
 	"byDay": {
 		"message": "Dni"
@@ -75,7 +75,7 @@
 		"message": "Anuluj"
 	},
 	"cannotDeleteProvider": {
-		"message": "Nie można usunąć dostawcy \"$1\", ponieważ jest używany przez $2 model(e)."
+		"message": "Nie można usunąć operatora \"$1\", ponieważ jest używany przez $2 model(e)."
 	},
 	"changelog": {
 		"message": "Dziennik zmian"
@@ -106,6 +106,14 @@
 			}
 		}
 	},
+	"clipboardError": {
+		"message": "Obsidian nie ma dostępu do Twojego schowka. Wypróbuj instrukcje rozwiązywania problemów tutaj: $1",
+		"placeholders": {
+			"1": {
+				"content": "$1"
+			}
+		}
+	},
 	"close": {
 		"message": "Zamknij"
 	},
@@ -119,7 +127,7 @@
 		"message": "Tryb zakreślacza"
 	},
 	"commandToggleReader": {
-		"message": "Przełącz widok czytnika"
+		"message": "Włącz lub wyłącz czytnik"
 	},
 	"confirmDeleteTemplate": {
 		"message": "Czy na pewno chcesz usunąć szablon \"$1\"?"
@@ -128,7 +136,7 @@
 		"message": "Spowoduje to zastąpienie wszystkich bieżących ustawień, w tym szablonów i atrybutów. Czy na pewno chcesz kontynuować?"
 	},
 	"copied": {
-		"message": "Skopiowane!"
+		"message": "Skopiowano!"
 	},
 	"copyAsJson": {
 		"message": "Skopiuj jako JSON"
@@ -137,13 +145,13 @@
 		"message": "Skopiuj do schowka"
 	},
 	"createNewNote": {
-		"message": "Utwórz nową notatkę"
+		"message": "Stwórz nową notatkę"
 	},
 	"custom": {
 		"message": "Niestandardowe"
 	},
 	"dailyNoteFormat": {
-		"message": "Format codziennej notatki (np. YYYY-MM-DD)"
+		"message": "Format dziennika (np. YYYY-MM-DD)"
 	},
 	"defaultInterpreterContext": {
 		"message": "Domyślny kontekst zapytania"
@@ -157,6 +165,15 @@
 	"delete": {
 		"message": "Usuń"
 	},
+	"deleteAllHighlightsConfirm": {
+		"message": "Czy na pewno chcesz usunąć wszystkie wyróżnienia?"
+	},
+	"deleteHighlightsForDomain": {
+		"message": "Usunąć wszystkie wyróżnienia dla tej domeny?"
+	},
+	"deleteHighlightsForPage": {
+		"message": "Usunąć wszystkie wyróżnienia dla tej strony?"
+	},
 	"deleteModelConfirm": {
 		"message": "Czy na pewno chcesz usunąć ten model?"
 	},
@@ -167,7 +184,7 @@
 		"message": "Wyłącz zakreślacz"
 	},
 	"disableReader": {
-		"message": "Wyłącz widok czytnika"
+		"message": "Wyłącz czytnik"
 	},
 	"done": {
 		"message": "Gotowe"
@@ -192,6 +209,9 @@
 	"earlyAccessFeatures": {
 		"message": "Funkcje wczesnego dostępu"
 	},
+	"edit": {
+		"message": "Edytuj"
+	},
 	"editModel": {
 		"message": "Edytuj model"
 	},
@@ -201,17 +221,17 @@
 	"editTemplate": {
 		"message": "Edytuj szablon"
 	},
-	"enableHighlighter": {
-		"message": "Włącz zakreślacz"
+	"embedded": {
+		"message": "Osadzone"
 	},
 	"enableHighlighterDescription": {
 		"message": "Wyróżniaj treści na stronach, które możesz zapisać w Obsidian."
 	},
 	"enableInterpreter": {
-		"message": "Włącz interpreter"
+		"message": "Włącz tłumacza"
 	},
 	"enableInterpreterDescription": {
-		"message": "Użyj języka naturalnego, aby wyodrębnić dane ze stron. Można na przykład użyć szablonu $strong_start${{\"a summary of the page\"}}$strong_end$. Wymaga klucza API lub niestandardowego modelu skonfigurowanego poniżej. $link_start$Dowiedz się więcej$link_end$.",
+		"message": "Użyj języka naturalnego, aby wyodrębnić dane ze stron. Można na przykład użyć szablonu $strong_start${{\"podsumowanie strony\"}}$strong_end$. Wymaga klucza API lub niestandardowego modelu skonfigurowanego poniżej. $link_start$Dowiedz się więcej$link_end$.",
 		"placeholders": {
 			"link_end": {
 				"content": "</a>"
@@ -228,7 +248,7 @@
 		}
 	},
 	"enableReader": {
-		"message": "Otwórz widok czytnika"
+		"message": "Włącz czytnik"
 	},
 	"error": {
 		"message": "Błąd"
@@ -299,7 +319,7 @@
 		"message": "Przetwarzanie zapytania nie powiodło się. Spróbuj ponownie."
 	},
 	"failedToResetProviders": {
-		"message": "Nie udało się zresetować dostawców i modeli"
+		"message": "Nie udało się zresetować operatorów i modeli"
 	},
 	"failedToResetTemplate": {
 		"message": "Nie udało się zresetować domyślnego szablonu. Spróbuj ponownie."
@@ -346,11 +366,23 @@
 	"highlightPage": {
 		"message": "Wyróżnij stronę"
 	},
+	"highlightSelection": {
+		"message": "Podświetl"
+	},
 	"highlighter": {
+		"message": "Zakreślacz"
+	},
+	"highlighterOn": {
 		"message": "Zakreślacz"
 	},
 	"highlighterSettings": {
 		"message": "Zakreślacz"
+	},
+	"highlights": {
+		"message": "Wyróżnienia"
+	},
+	"highlightsNotFound": {
+		"message": "Nie znaleziono wyróżnień w artykule"
 	},
 	"history": {
 		"message": "Historia"
@@ -365,7 +397,7 @@
 		"message": "Importuj wszystkie ustawienia"
 	},
 	"importAllSettingsDescription": {
-		"message": "Zaimportuj wszystkie ustawienia, w tym szablony i atrybuty. Zastąpi to obecną konfigurację."
+		"message": "Importuj wszystkie ustawienia, w tym szablony i atrybuty. Zastąpi to obecną konfigurację."
 	},
 	"importFailed": {
 		"message": "Import nie powiódł się. Sprawdź konsolę, aby uzyskać więcej informacji."
@@ -403,13 +435,13 @@
 		"message": "wyślij zapytanie"
 	},
 	"interpreter": {
-		"message": "Interpreter"
+		"message": "Tłumacz"
 	},
 	"interpreterContext": {
 		"message": "Kontekst zapytania"
 	},
 	"interpreterContextDescription": {
-		"message": "Kontekst używany do przetwarzania zapytań. Zastępuje domyślny kontekst zdefiniowany w $link_start$ustawieniach interpretera$link_end$. Można tu używać zmiennych.",
+		"message": "Kontekst używany do przetwarzania zapytań. Zastępuje domyślny kontekst zdefiniowany w $link_start$ustawieniach tłumacza$link_end$. Można tu używać zmiennych.",
 		"placeholders": {
 			"link_end": {
 				"content": "</a>"
@@ -437,6 +469,12 @@
 	"legacyModeDescription": {
 		"message": "Używa URI jako sposobu wyodrębniania treści, który jest kompatybilny z Obsidian w wersji 1.6.7 lub starszej. Należy pamiętać, że długość treści, którą można wyodrębnić, jest ograniczona przez przeglądarkę i system operacyjny. Część stron może nie działać pomimo braku błędów."
 	},
+	"loadArticle": {
+		"message": "Czytaj artykuł"
+	},
+	"loading": {
+		"message": "Ładowanie…"
+	},
 	"modelName": {
 		"message": "Nazwa modelu"
 	},
@@ -447,13 +485,13 @@
 		"message": "Operator"
 	},
 	"modelProviderDescription": {
-		"message": "Operator modelu, na przykład Ollama, OpenRouter, Google, itp."
+		"message": "Wybierz operatora tego modelu."
 	},
 	"modelProviderPlaceholder": {
 		"message": "Operator"
 	},
 	"modelRequiredFields": {
-		"message": "Nazwa modelu, Dostawca i ID modelu są wymagane."
+		"message": "Nazwa modelu, operator i ID modelu są wymagane."
 	},
 	"models": {
 		"message": "Modele"
@@ -469,6 +507,9 @@
 	},
 	"noHighlights": {
 		"message": "Nic nie rób"
+	},
+	"noResults": {
+		"message": "Nie znaleziono wyników"
 	},
 	"noTemplates": {
 		"message": "Brak dostępnych szablonów. Dodaj szablon w ustawieniach."
@@ -486,7 +527,7 @@
 		"message": "Lokalizacja notatki"
 	},
 	"noteLocationDescription": {
-		"message": "Folder lub ścieżka do notatki."
+		"message": "Folder lub ścieżka notatki."
 	},
 	"noteName": {
 		"message": "Nazwa notatki"
@@ -513,6 +554,24 @@
 	},
 	"open": {
 		"message": "Otwórz"
+	},
+	"openBehaviorDescription": {
+		"message": "Wybierz, jak domyślnie otwiera się Web Clipper."
+	},
+	"openBehaviorTitle": {
+		"message": "Zachowanie przy otwieraniu"
+	},
+	"openEmbedded": {
+		"message": "Otwórz na stronie"
+	},
+	"openHighlights": {
+		"message": "Otwórz wyróżnienia"
+	},
+	"openReader": {
+		"message": "Otwórz czytnik"
+	},
+	"openSidePanel": {
+		"message": "Otwórz panel boczny"
 	},
 	"optional": {
 		"message": "(opcjonalne)"
@@ -547,11 +606,17 @@
 	"popularModelsDescription": {
 		"message": "Wybierz spośród często używanych modeli lub wprowadź szczegóły niestandardowego modelu."
 	},
+	"popup": {
+		"message": "Wyskakujące okienko"
+	},
 	"prependToDaily": {
-		"message": "Zapisz na górze codziennej notatki"
+		"message": "Zapisz na początku w dzienniku"
 	},
 	"prependToExisting": {
-		"message": "Zapisz na górze istniejącej notatki"
+		"message": "Zapisz na początku istniejącej notatki"
+	},
+	"preview": {
+		"message": "Podgląd"
 	},
 	"processing": {
 		"message": "przetwarzanie"
@@ -564,6 +629,24 @@
 	},
 	"propertyName": {
 		"message": "Nazwa atrybutu"
+	},
+	"propertyTypeCheckbox": {
+		"message": "Pole wyboru"
+	},
+	"propertyTypeDate": {
+		"message": "Data"
+	},
+	"propertyTypeDatetime": {
+		"message": "Data i czas"
+	},
+	"propertyTypeMultitext": {
+		"message": "Lista"
+	},
+	"propertyTypeNumber": {
+		"message": "Numer"
+	},
+	"propertyTypeText": {
+		"message": "Tekst"
 	},
 	"propertyValue": {
 		"message": "Wartość atrybutu"
@@ -602,7 +685,7 @@
 		"message": "Ustawienie wstępne"
 	},
 	"providerPresetDescription": {
-		"message": "Wybierz operatora lub utwórz niestandardowego."
+		"message": "Wybierz operatora lub stwórz niestandardowego."
 	},
 	"providerRequiredFields": {
 		"message": "Nazwa operatora i adres URL są wymagane."
@@ -615,6 +698,153 @@
 	},
 	"reader": {
 		"message": "Czytnik"
+	},
+	"readerAppearance": {
+		"message": "Wygląd"
+	},
+	"readerAppearanceAuto": {
+		"message": "Automatycznie"
+	},
+	"readerAppearanceDark": {
+		"message": "Ciemny"
+	},
+	"readerAppearanceDescription": {
+		"message": "Wybierz jasny lub ciemny wygląd."
+	},
+	"readerAppearanceLight": {
+		"message": "Jasny"
+	},
+	"readerAutoScroll": {
+		"message": "Automatyczne przewijanie"
+	},
+	"readerAutoScrollDescription": {
+		"message": "Automatycznie przewijaj transkrypcję, aby podążała za odtwarzaniem."
+	},
+	"readerBlendImages": {
+		"message": "Wtapiaj obrazy"
+	},
+	"readerBlendImagesDescription": {
+		"message": "Wtapiaj obrazy w tło strony."
+	},
+	"readerCloseImageViewer": {
+		"message": "Zamknij przeglądarkę obrazów"
+	},
+	"readerCollapseComment": {
+		"message": "Zwiń komentarz"
+	},
+	"readerColorLinks": {
+		"message": "Koloruj linki"
+	},
+	"readerColorSchemeDefault": {
+		"message": "Domyślny"
+	},
+	"readerCurrentPosition": {
+		"message": "Bieżąca pozycja"
+	},
+	"readerCustomCss": {
+		"message": "Własny CSS"
+	},
+	"readerCustomCssDescription": {
+		"message": "CSS stosowany automatycznie w widoku czytania."
+	},
+	"readerDarkTheme": {
+		"message": "Motyw trybu ciemnego"
+	},
+	"readerDarkThemeDescription": {
+		"message": "Użyj innego motywu w trybie ciemnym."
+	},
+	"readerError": {
+		"message": "Nie udało się wyodrębnić treści."
+	},
+	"readerFont": {
+		"message": "Opcje czcionek"
+	},
+	"readerFontDefault": {
+		"message": "Domyślna"
+	},
+	"readerFontDescription": {
+		"message": "Dodaj czcionki zainstalowane w systemie. Naciśnij Enter, aby dodać czcionkę."
+	},
+	"readerFontNotFound": {
+		"message": "Nie znaleziono"
+	},
+	"readerFontPlaceholder": {
+		"message": "Naciśnij Enter, aby dodać czcionkę"
+	},
+	"readerFontSetDefault": {
+		"message": "Ustaw jako domyślną"
+	},
+	"readerFontSize": {
+		"message": "Podstawowy rozmiar czcionki"
+	},
+	"readerFontSystem": {
+		"message": "Systemowa"
+	},
+	"readerFontSystemSans": {
+		"message": "Bezszeryfowa"
+	},
+	"readerFontSystemSerif": {
+		"message": "Szeryfowa"
+	},
+	"readerFonts": {
+		"message": "Czcionki"
+	},
+	"readerFootnotes": {
+		"message": "Przypisy"
+	},
+	"readerHighlightActiveLine": {
+		"message": "Podświetl aktywną linię"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "Podświetlaj bieżące zdanie w transkrypcji podczas odtwarzania."
+	},
+	"readerImages": {
+		"message": "Obrazy"
+	},
+	"readerLineHeight": {
+		"message": "Interlinia"
+	},
+	"readerLineWidth": {
+		"message": "Szerokość wiersza"
+	},
+	"readerLoadFailed": {
+		"message": "Nie udało się załadować. Strona może być blokowana przez Twoją przeglądarkę."
+	},
+	"readerLoading": {
+		"message": "Upraszczanie…"
+	},
+	"readerOn": {
+		"message": "Tryb czytania"
+	},
+	"readerPinPlayer": {
+		"message": "Przypnij odtwarzacz"
+	},
+	"readerPinPlayerDescription": {
+		"message": "Zachowaj widoczność odtwarzacza wideo podczas przewijania transkrypcji."
+	},
+	"readerSettings": {
+		"message": "Ustawienia czytnika"
+	},
+	"readerTheme": {
+		"message": "Motyw"
+	},
+	"readerThemeDescription": {
+		"message": "Wybierz kolory używane w widoku czytania."
+	},
+	"readerThemeSection": {
+		"message": "Motyw"
+	},
+	"readerTranscripts": {
+		"message": "Transkrypcje"
+	},
+	"readerTypography": {
+		"message": "Typografia"
+	},
+	"readerUrlPlaceholder": {
+		"message": "Wklej adres URL do czytania…"
+	},
+	"readerViewFullSize": {
+		"message": "Wyświetl w pełnym rozmiarze"
 	},
 	"recommended": {
 		"message": "rekomendowane"
@@ -653,7 +883,7 @@
 		"message": "Zresetuj domyślne modele"
 	},
 	"resetProvidersAndModelsDescription": {
-		"message": "Zresetuj dostawców i modele do ustawień domyślnych."
+		"message": "Zresetuj operatorów i modele do ustawień domyślnych."
 	},
 	"save": {
 		"message": "Zapisz"
@@ -666,6 +896,9 @@
 	},
 	"saveFile": {
 		"message": "Zapisz plik..."
+	},
+	"searchHighlightsPlaceholder": {
+		"message": "Szukaj wyróżnień…"
 	},
 	"searchVariables": {
 		"message": "Szukaj zmiennych..."
@@ -727,17 +960,47 @@
 	"silentOpenDescription": {
 		"message": "Notatki będą zapisywane bez otwierania ich w nowej karcie. Obsidian nadal będzie umieszczany na wierzchu."
 	},
+	"sort": {
+		"message": "Sortuj"
+	},
+	"sortAZ": {
+		"message": "A do Z"
+	},
+	"sortNewOld": {
+		"message": "Od najnowszych"
+	},
+	"sortOldNew": {
+		"message": "Od najstarszych"
+	},
+	"sortZA": {
+		"message": "Z do A"
+	},
 	"specificNoteName": {
 		"message": "Nazwa konkretnej notatki"
 	},
 	"systemDefault": {
 		"message": "System"
 	},
+	"template": {
+		"message": "Szablon"
+	},
 	"templateCopied": {
 		"message": "Skopiowano szablon JSON do schowka"
 	},
 	"templateCopyError": {
 		"message": "Nie udało się skopiować szablonu JSON do schowka"
+	},
+	"templateErrorCount": {
+		"message": "W Twoim szablonie występuje błąd."
+	},
+	"templateErrorsCount": {
+		"message": "W Twoim szablonie występuje $1 błędów."
+	},
+	"templateGroupContent": {
+		"message": "Treść"
+	},
+	"templateGroupLocation": {
+		"message": "Lokalizacja"
 	},
 	"templateName": {
 		"message": "Nazwa szablonu"
@@ -753,6 +1016,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "Zdefiniuj reguły umożliwiające automatyczne wybieranie tego szablonu, jeśli pasuje on do wzorca adresu URL lub zawiera dane schema.org. Jedna reguła na linię."
+	},
+	"templateValid": {
+		"message": "Składnia szablonu jest poprawna"
 	},
 	"templatesHeading": {
 		"message": "Szablony"
@@ -787,7 +1053,7 @@
 		"message": "Sejfy"
 	},
 	"vaultsDescription": {
-		"message": "Domyślnie notatki są zapisywane w obecnie otwartym sejfie. Jeśli chcesz mieć możliwość zapisywania w różnych sejfach, możesz je dodawać w tym miejscu. Nazwy sejfów muszą dokładnie odpowiadać tym w Obsidian. Kliknij $strong_start$Enter$strong_end$, aby dodać sejf.",
+		"message": "Domyślnie notatki są zapisywane w obecnie otwartym sejfie. Jeśli chcesz mieć możliwość zapisywania w różnych sejfach, możesz je dodawać w tym miejscu. Nazwy sejfów muszą dokładnie odpowiadać tym w Obsidian. Kliknij $strong_start$enter$strong_end$, aby dodać sejf.",
 		"placeholders": {
 			"strong_end": {
 				"content": "</strong>"

@@ -26,6 +26,9 @@
 	"advanced": {
 		"message": "Расширенные настройки"
 	},
+	"allHighlights": {
+		"message": "Все выделения"
+	},
 	"allProperties": {
 		"message": "Все свойства"
 	},
@@ -58,9 +61,6 @@
 	},
 	"behavior": {
 		"message": "Поведение"
-	},
-	"behaviorWarning": {
-		"message": "Для добавления в существующую заметку или ежедневную заметку требуется Obsidian 1.7.2 или более поздняя версия."
 	},
 	"byDay": {
 		"message": "Дни"
@@ -103,6 +103,14 @@
 			},
 			"strong_start": {
 				"content": "<strong>"
+			}
+		}
+	},
+	"clipboardError": {
+		"message": "Obsidian не может получить доступ к вашему буферу обмена. Попробуйте инструкции по устранению неполадок здесь: $1",
+		"placeholders": {
+			"1": {
+				"content": "$1"
 			}
 		}
 	},
@@ -157,6 +165,15 @@
 	"delete": {
 		"message": "Удалить"
 	},
+	"deleteAllHighlightsConfirm": {
+		"message": "Вы уверены, что хотите удалить все выделения?"
+	},
+	"deleteHighlightsForDomain": {
+		"message": "Удалить все выделения для этого домена?"
+	},
+	"deleteHighlightsForPage": {
+		"message": "Удалить все выделения для этой страницы?"
+	},
 	"deleteModelConfirm": {
 		"message": "Вы уверены, что хотите удалить эту модель?"
 	},
@@ -192,6 +209,9 @@
 	"earlyAccessFeatures": {
 		"message": "Функции раннего доступа"
 	},
+	"edit": {
+		"message": "Редактировать"
+	},
 	"editModel": {
 		"message": "Редактировать модель"
 	},
@@ -201,8 +221,8 @@
 	"editTemplate": {
 		"message": "Изменить шаблон"
 	},
-	"enableHighlighter": {
-		"message": "Включить маркер"
+	"embedded": {
+		"message": "Встроенный"
 	},
 	"enableHighlighterDescription": {
 		"message": "Выделите содержимое веб-страниц, которое хотите сохранить в Obsidian."
@@ -346,11 +366,23 @@
 	"highlightPage": {
 		"message": "Выделить страницу"
 	},
+	"highlightSelection": {
+		"message": "Выделить"
+	},
 	"highlighter": {
 		"message": "Маркер"
 	},
+	"highlighterOn": {
+		"message": "Выделение"
+	},
 	"highlighterSettings": {
 		"message": "Маркер"
+	},
+	"highlights": {
+		"message": "Выделения"
+	},
+	"highlightsNotFound": {
+		"message": "В статье не найдены выделения"
 	},
 	"history": {
 		"message": "История"
@@ -437,6 +469,12 @@
 	"legacyModeDescription": {
 		"message": "Использует метод обработки URI, совместимый с Obsidian 1.6.7 или более ранней версией. Обратите внимание, что длина контента, который вы можете вырезать, ограничена вашим браузером и ОС. Некоторые страницы могут не открыться без ошибок."
 	},
+	"loadArticle": {
+		"message": "Читать статью"
+	},
+	"loading": {
+		"message": "Загрузка…"
+	},
 	"modelName": {
 		"message": "Название модели"
 	},
@@ -469,6 +507,9 @@
 	},
 	"noHighlights": {
 		"message": "Ничего не делать"
+	},
+	"noResults": {
+		"message": "Ничего не найдено"
 	},
 	"noTemplates": {
 		"message": "Нет доступных шаблонов. Пожалуйста, добавьте шаблон в настройках."
@@ -514,6 +555,24 @@
 	"open": {
 		"message": "Открыть"
 	},
+	"openBehaviorDescription": {
+		"message": "Выберите, как по умолчанию открывается Web Clipper."
+	},
+	"openBehaviorTitle": {
+		"message": "Поведение при открытии"
+	},
+	"openEmbedded": {
+		"message": "Открыть на странице"
+	},
+	"openHighlights": {
+		"message": "Открыть выделения"
+	},
+	"openReader": {
+		"message": "Открыть режим чтения"
+	},
+	"openSidePanel": {
+		"message": "Открыть боковую панель"
+	},
 	"optional": {
 		"message": "(необязательно)"
 	},
@@ -547,11 +606,17 @@
 	"popularModelsDescription": {
 		"message": "Выберите из часто используемых моделей или введите данные пользовательской модели."
 	},
+	"popup": {
+		"message": "Всплывающее окно"
+	},
 	"prependToDaily": {
 		"message": "Добавить в начало ежедневной заметки"
 	},
 	"prependToExisting": {
 		"message": "Добавить в начало существующей заметки"
+	},
+	"preview": {
+		"message": "Предпросмотр"
 	},
 	"processing": {
 		"message": "обработка"
@@ -564,6 +629,24 @@
 	},
 	"propertyName": {
 		"message": "Название свойства"
+	},
+	"propertyTypeCheckbox": {
+		"message": "Флажок"
+	},
+	"propertyTypeDate": {
+		"message": "Дата"
+	},
+	"propertyTypeDatetime": {
+		"message": "Дата и время"
+	},
+	"propertyTypeMultitext": {
+		"message": "Список"
+	},
+	"propertyTypeNumber": {
+		"message": "Число"
+	},
+	"propertyTypeText": {
+		"message": "Текст"
 	},
 	"propertyValue": {
 		"message": "Значение свойства"
@@ -616,6 +699,153 @@
 	"reader": {
 		"message": "Читатель"
 	},
+	"readerAppearance": {
+		"message": "Оформление"
+	},
+	"readerAppearanceAuto": {
+		"message": "Авто"
+	},
+	"readerAppearanceDark": {
+		"message": "Тёмное"
+	},
+	"readerAppearanceDescription": {
+		"message": "Выберите светлое или тёмное оформление."
+	},
+	"readerAppearanceLight": {
+		"message": "Светлое"
+	},
+	"readerAutoScroll": {
+		"message": "Автопрокрутка"
+	},
+	"readerAutoScrollDescription": {
+		"message": "Автоматически прокручивать расшифровку, следуя воспроизведению."
+	},
+	"readerBlendImages": {
+		"message": "Смешивать изображения"
+	},
+	"readerBlendImagesDescription": {
+		"message": "Смешивать изображения с фоном страницы."
+	},
+	"readerCloseImageViewer": {
+		"message": "Закрыть просмотр изображений"
+	},
+	"readerCollapseComment": {
+		"message": "Свернуть комментарий"
+	},
+	"readerColorLinks": {
+		"message": "Окрашивать ссылки"
+	},
+	"readerColorSchemeDefault": {
+		"message": "По умолчанию"
+	},
+	"readerCurrentPosition": {
+		"message": "Текущая позиция"
+	},
+	"readerCustomCss": {
+		"message": "Пользовательский CSS"
+	},
+	"readerCustomCssDescription": {
+		"message": "CSS, автоматически применяемый в режиме чтения."
+	},
+	"readerDarkTheme": {
+		"message": "Тема тёмного режима"
+	},
+	"readerDarkThemeDescription": {
+		"message": "Использовать другую тему в тёмном режиме."
+	},
+	"readerError": {
+		"message": "Не удалось извлечь содержимое."
+	},
+	"readerFont": {
+		"message": "Параметры шрифта"
+	},
+	"readerFontDefault": {
+		"message": "По умолчанию"
+	},
+	"readerFontDescription": {
+		"message": "Добавьте шрифты, установленные в вашей системе. Нажмите Enter, чтобы добавить шрифт."
+	},
+	"readerFontNotFound": {
+		"message": "Не найдено"
+	},
+	"readerFontPlaceholder": {
+		"message": "Нажмите Enter, чтобы добавить шрифт"
+	},
+	"readerFontSetDefault": {
+		"message": "Сделать по умолчанию"
+	},
+	"readerFontSize": {
+		"message": "Базовый размер шрифта"
+	},
+	"readerFontSystem": {
+		"message": "Системный"
+	},
+	"readerFontSystemSans": {
+		"message": "Без засечек"
+	},
+	"readerFontSystemSerif": {
+		"message": "С засечками"
+	},
+	"readerFonts": {
+		"message": "Шрифты"
+	},
+	"readerFootnotes": {
+		"message": "Сноски"
+	},
+	"readerHighlightActiveLine": {
+		"message": "Подсвечивать активную строку"
+	},
+	"readerHighlightActiveLineDescription": {
+		"message": "Подсвечивать текущее предложение в расшифровке во время воспроизведения."
+	},
+	"readerImages": {
+		"message": "Изображения"
+	},
+	"readerLineHeight": {
+		"message": "Межстрочный интервал"
+	},
+	"readerLineWidth": {
+		"message": "Ширина строки"
+	},
+	"readerLoadFailed": {
+		"message": "Не удалось загрузить. Возможно, страница заблокирована вашим браузером."
+	},
+	"readerLoading": {
+		"message": "Упрощение…"
+	},
+	"readerOn": {
+		"message": "Режим чтения"
+	},
+	"readerPinPlayer": {
+		"message": "Закрепить плеер"
+	},
+	"readerPinPlayerDescription": {
+		"message": "Оставлять видеоплеер видимым при прокрутке расшифровки."
+	},
+	"readerSettings": {
+		"message": "Настройки режима чтения"
+	},
+	"readerTheme": {
+		"message": "Тема"
+	},
+	"readerThemeDescription": {
+		"message": "Выберите цвета, используемые в режиме чтения."
+	},
+	"readerThemeSection": {
+		"message": "Тема"
+	},
+	"readerTranscripts": {
+		"message": "Расшифровки"
+	},
+	"readerTypography": {
+		"message": "Типографика"
+	},
+	"readerUrlPlaceholder": {
+		"message": "Вставьте URL, чтобы прочитать…"
+	},
+	"readerViewFullSize": {
+		"message": "Открыть в полном размере"
+	},
 	"recommended": {
 		"message": "рекомендуется"
 	},
@@ -666,6 +896,9 @@
 	},
 	"saveFile": {
 		"message": "Сохранить файл..."
+	},
+	"searchHighlightsPlaceholder": {
+		"message": "Поиск по выделениям…"
 	},
 	"searchVariables": {
 		"message": "Поиск переменных..."
@@ -727,17 +960,47 @@
 	"silentOpenDescription": {
 		"message": "Заметки будут сохранены, но не откроются в новой вкладке. Obsidian по-прежнему будет выводиться на передний план."
 	},
+	"sort": {
+		"message": "Сортировать"
+	},
+	"sortAZ": {
+		"message": "От А до Я"
+	},
+	"sortNewOld": {
+		"message": "Сначала новые"
+	},
+	"sortOldNew": {
+		"message": "Сначала старые"
+	},
+	"sortZA": {
+		"message": "От Я до А"
+	},
 	"specificNoteName": {
 		"message": "Особое название заметки"
 	},
 	"systemDefault": {
 		"message": "Системный"
 	},
+	"template": {
+		"message": "Шаблон"
+	},
 	"templateCopied": {
 		"message": "Шаблон JSON скопирован в буфер обмена"
 	},
 	"templateCopyError": {
 		"message": "Не удалось скопировать шаблон JSON в буфер обмена"
+	},
+	"templateErrorCount": {
+		"message": "В вашем шаблоне есть ошибка."
+	},
+	"templateErrorsCount": {
+		"message": "В вашем шаблоне есть $1 ошибок."
+	},
+	"templateGroupContent": {
+		"message": "Содержимое"
+	},
+	"templateGroupLocation": {
+		"message": "Расположение"
 	},
 	"templateName": {
 		"message": "Название шаблона"
@@ -753,6 +1016,9 @@
 	},
 	"templateTriggersDescription": {
 		"message": "Определите правила для автоматического выбора этого шаблона, если он соответствует шаблону URL или содержит данные schema.org. По одному правилу на строку."
+	},
+	"templateValid": {
+		"message": "Синтаксис шаблона корректен"
 	},
 	"templatesHeading": {
 		"message": "Шаблоны"

@@ -3,7 +3,7 @@
 	"default_locale": "en",
 	"name": "Obsidian Web Clipper",
 	"homepage_url": "https://obsidian.md/",
-	"version": "0.11.8",
+	"version": "1.6.2",
 	"description": "Save and highlight web pages in a private and durable format that you can access offline. The official extension for Obsidian.",
 	"permissions": [
 		"activeTab",
@@ -12,7 +12,8 @@
 		"contextMenus",
 		"sidePanel",
 		"storage",
-		"scripting"
+		"scripting",
+		"declarativeNetRequest"
 	],
 	"host_permissions": [
 		"<all_urls>",
@@ -40,13 +41,12 @@
 	"content_scripts": [
 		{
 			"matches": ["http://*/*", "https://*/*"],
-			"js": ["browser-polyfill.min.js", "content.js"],
-			"css": ["highlighter.css"]
+			"js": ["browser-polyfill.min.js", "content.js"]
 		}
 	],
 	"web_accessible_resources": [
 		{
-			"resources": ["reader.css", "reader-script.js", "browser-polyfill.min.js"],
+			"resources": ["reader.css", "reader-script.js", "browser-polyfill.min.js", "style.css", "side-panel.html", "flatten-shadow-dom.js", "highlighter.css"],
 			"extension_ids": ["*"],
 			"matches": [ "*://*/*" ]
 		}

@@ -1,0 +1,16 @@
+{
+	"noteNameFormat": "{{selector:.BookPageTitleSection__title h1}}",
+	"noteContentFormat": "{{selector:.BookPageMetadataSection__description}}",
+	"properties": [
+		{ "name": "categories", "value": "[[Books]]", "type": "multitext" },
+		{ "name": "title", "value": "{{selector:.BookPageTitleSection__title h1}}", "type": "text" },
+		{ "name": "author", "value": "{{selector:.ContributorLink__name|unique|wikilink|join}}", "type": "multitext" },
+		{ "name": "genre", "value": "{{selector:.BookPageMetadataSection__genres .BookPageMetadataSection__genreButton|wikilink|join}}", "type": "multitext" },
+		{ "name": "pages", "value": "{{selector:p[data-testid='pagesFormat']|split:\", \"|slice:0|split:\" \"|slice:0}}", "type": "number" },
+		{ "name": "year", "value": "{{selector:p[data-testid='publicationInfo']|split:\" \"|last}}", "type": "number" },
+		{ "name": "scoreGr", "value": "{{selector:.RatingStatistics__rating|first|round:2}}", "type": "number" },
+		{ "name": "cover", "value": "{{selector:.BookCover__image img?src|first}}", "type": "text" },
+		{ "name": "created", "value": "{{date}}", "type": "date" },
+		{ "name": "tags", "value": "books, to-read", "type": "multitext" }
+	]
+}

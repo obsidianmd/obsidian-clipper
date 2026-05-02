@@ -1,0 +1,158 @@
+// Shared sidebar container and nav list styles
+
+.sidebar {
+	width: 25%;
+	min-width: 200px;
+	max-width: 300px;
+	flex-shrink: 0;
+	overflow-y: auto;
+	background-color: var(--settings-background);
+	border-inline-end: 1px solid var(--background-modifier-border);
+}
+
+.nav-list {
+	font-size: var(--font-ui-small);
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+
+	li {
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		cursor: pointer;
+		padding: 0.25rem 0.425rem;
+		border-radius: var(--radius-s);
+		corner-shape: var(--corner-shape);
+		user-select: none;
+		-webkit-user-select: none;
+
+		svg {
+			width: 16px;
+			height: 16px;
+			flex-shrink: 0;
+			color: var(--text-muted);
+		}
+
+		span {
+			flex-grow: 1;
+			min-width: 0;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+
+		@media (hover: hover) {
+			&:hover {
+				background-color: var(--background-modifier-hover);
+			}
+		}
+
+		&.active {
+			background-color: var(--background-modifier-hover);
+			color: var(--text-normal);
+			svg {
+				color: var(--text-normal);
+			}
+		}
+	}
+}
+
+.hamburger-menu {
+	display: none;
+	background: none;
+	border: none;
+	cursor: pointer;
+	padding: 0;
+	margin-left: auto;
+	width: auto;
+	box-shadow: none;
+}
+
+.hamburger-icon {
+	display: block;
+	width: 20px;
+	height: 2px;
+	background-color: var(--text-muted);
+	position: relative;
+
+	&::before,
+	&::after {
+		content: '';
+		left: 0;
+		position: absolute;
+		width: 20px;
+		height: 2px;
+		background-color: var(--text-muted);
+		transition: transform var(--duration-fast) ease, top var(--duration-fast) ease;
+	}
+	&::before {
+		top: -6px;
+	}
+	&::after {
+		bottom: -6px;
+	}
+}
+
+.hamburger-menu.is-active {
+	.hamburger-icon {
+		background-color: transparent;
+
+		&::before,
+		&::after {
+			top: 0;
+		}
+		&::before {
+			transform: rotate(45deg);
+		}
+		&::after {
+			transform: rotate(-45deg);
+		}
+	}
+}
+
+@media (max-width: 768px) {
+	.sidebar {
+		width: 100%;
+		max-width: 100%;
+		display: none;
+		position: absolute;
+		top: 3rem;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		z-index: 10;
+		ul li {
+			padding: 0.5rem 0.625rem; 
+		}
+	}
+	.hamburger-menu {
+		display: block;
+	}
+
+	.sidebar-open .sidebar {
+		display: block;
+	}
+
+	.sidebar-open .hamburger-menu {
+		-webkit-tap-highlight-color: transparent;
+		.hamburger-icon {
+			background-color: transparent;
+
+			&::before,
+			&::after {
+				top: 0;
+			}
+			&::before {
+				transform: rotate(45deg);
+			}
+			&::after {
+				transform: rotate(-45deg);
+			}
+		}
+	}
+
+}

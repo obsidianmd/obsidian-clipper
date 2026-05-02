@@ -17,24 +17,26 @@ Preset variables are automatically generated based on the page content. These ty
 
 The main content variable is `{{content}}`, which contains the article content, or the [[Highlight web pages|highlights]], or the selection if there is any selected text on the page. Note that `{{content}}` attempts to extract the main content of the page, which may not always be what you want. In that case, you can use other preset variables or selector variables to extract the content you need.
 
-| Variable          | Description                                                                            |
-| ----------------- | -------------------------------------------------------------------------------------- |
-| `{{author}}`      | Author of the page                                                                     |
-| `{{content}}`     | Article content, [[Highlight web pages\|highlights]], or selection, in Markdown format |
-| `{{contentHtml}}` | Article content, [[Highlight web pages\|highlights]], or selection, in HTML format     |
-| `{{date}}`        | Current date, can be formatted using the `date` filter                                 |
-| `{{description}}` | Description or excerpt                                                                 |
-| `{{domain}}`      | Domain                                                                                 |
-| `{{favicon}}`     | Favicon URL                                                                            |
-| `{{fullHtml}}`    | Unprocessed HTML for the full page content                                             |
-| `{{highlights}}`  | [[Highlight web pages\|Highlights]] with text and timestamps                           |
-| `{{image}}`       | Social share image URL                                                                 |
-| `{{published}}`   | Published date, can be formatted using the `date` filter                               |
-| `{{site}}`        | Site name or publisher                                                                 |
-| `{{title}}`       | Title of the page                                                                      |
-| `{{time}}`        | Current date and time                                                                  |
-| `{{url}}`         | Current URL                                                                            |
-| `{{words}}`       | Word count                                                                             |
+| Variable            | Description                                                                            |
+| ------------------- | -------------------------------------------------------------------------------------- |
+| `{{author}}`        | Author of the page                                                                     |
+| `{{content}}`       | Article content, [[Highlight web pages\|highlights]], or selection, in Markdown format |
+| `{{contentHtml}}`   | Article content, [[Highlight web pages\|highlights]], or selection, in HTML format     |
+| `{{date}}`          | Current date, can be formatted using the `date` filter                                 |
+| `{{description}}`   | Description or excerpt                                                                 |
+| `{{domain}}`        | Domain                                                                                 |
+| `{{favicon}}`       | Favicon URL                                                                            |
+| `{{fullHtml}}`      | Unprocessed HTML for the full page content                                             |
+| `{{highlights}}`    | [[Highlight web pages\|Highlights]] with text and timestamps                           |
+| `{{image}}`         | Social share image URL                                                                 |
+| `{{published}}`     | Published date, can be formatted using the `date` filter                               |
+| `{{selection}}`     | Selection in Markdown format                                                           |
+| `{{selectionHtml}}` | Selection in HTML format                                                               |
+| `{{site}}`          | Site name or publisher                                                                 |
+| `{{title}}`         | Title of the page                                                                      |
+| `{{time}}`          | Current date and time                                                                  |
+| `{{url}}`           | Current URL                                                                            |
+| `{{words}}`         | Word count                                                                             |
 
 ## Prompt variables
 
@@ -79,13 +81,19 @@ Selector variables allow you to extract text content from elements on the page u
 
 The syntax is `{{selector:cssSelector?attribute}}`, where `?attribute` is optional. If no attribute is specified, the text content of the element is returned. You can also use `{{selectorHtml:cssSelector}}` to get the HTML content of the element. Selector variables tend to work best on a specific website or set of websites that have consistent HTML structure.
 
-- `{{selector:h1}}` returns text content of the first `h1` element on the page.
-- `{{selector:.author}}` returns text content of the first `.author` element on the page.
-- `{{selector:img.hero?src}}` returns the `src` attribute of the first image with class `hero`.
-- `{{selector:a.main-link?href}}` returns the `href` attribute of the first anchor tag with class `main-link`.
+- `{{selector:h1}}` returns text content of any `h1` elements on the page.
+- `{{selector:.author}}` returns text content of any `.author` elements on the page.
+- `{{selector:img.hero?src}}` returns the `src` attribute of the image with class `hero`.
+- `{{selector:a.main-link?href}}` returns the `href` attribute of the anchor tag with class `main-link`.
 - `{{selectorHtml:body|markdown}}` returns the entire HTML of the `body` element, converted to Markdown using the `markdown` [[Filters#HTML processing|filter]].
 - Nested CSS selectors and combinators are supported if you need more specificity.
 - If multiple elements match the selector, an array is returned, which you can process with [[Filters#Arrays and objects|array and object filters]] like `join` or `map`.
+
+Selector variables can also be used directly in [[Templates#Template logic|template logic]]:
+
+- In loops: `{% for comment in selector:.comment %}...{% endfor %}`
+- In conditionals: `{% if selector:.premium-badge %}...{% endif %}`
+- In variable assignment: `{% set items = selector:.list-item %}`
 
 ## Schema.org variables
 

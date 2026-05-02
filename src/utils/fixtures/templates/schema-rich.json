@@ -1,0 +1,14 @@
+{
+	"noteNameFormat": "{{schema:name}}",
+	"noteContentFormat": "## Ingredients\n\n{{selector:.ingredients li|list}}",
+	"properties": [
+		{ "name": "title", "value": "{{schema:name}}", "type": "text" },
+		{ "name": "author", "value": "{{schema:author.name|wikilink}}", "type": "text" },
+		{ "name": "prep_time", "value": "{{schema:prepTime}}", "type": "text" },
+		{ "name": "cook_time", "value": "{{schema:cookTime}}", "type": "text" },
+		{ "name": "servings", "value": "{{schema:recipeYield}}", "type": "text" },
+		{ "name": "category", "value": "{{schema:recipeCategory}}", "type": "text" },
+		{ "name": "rating", "value": "{{schema:aggregateRating.ratingValue}}", "type": "number" },
+		{ "name": "image", "value": "{{meta:property:og:image}}", "type": "text" }
+	]
+}

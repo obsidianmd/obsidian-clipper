@@ -1,0 +1,9 @@
+{
+	"noteNameFormat": "{{title}}",
+	"noteContentFormat": "{{content}}",
+	"properties": [
+		{ "name": "title", "value": "{{title}}", "type": "text" },
+		{ "name": "source", "value": "{{url}}", "type": "text" },
+		{ "name": "domain", "value": "{{domain}}", "type": "text" }
+	]
+}

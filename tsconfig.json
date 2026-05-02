@@ -22,8 +22,7 @@
 		"lib": ["es2017", "dom"]
 	},
 	"include": [
-		"src/**/*",
-		"turndown-plugin-gfm.d.ts"
+		"src/**/*"
 	],
 	"exclude": ["node_modules", "dist"]
 }
