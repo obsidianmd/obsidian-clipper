@@ -10,6 +10,7 @@ import {
 	saveHighlights,
 	updateHighlights,
 	updateHighlighterMenu,
+	deleteHighlightsFromHoarder,
 } from './highlighter';
 import { throttle } from './throttle';
 import { getElementByXPath, isDarkColor, setElementHTML } from './dom-utils';
@@ -236,10 +237,14 @@ async function deleteHighlightById(id: string): Promise<void> {
 	if (!target) return;
 	// If the highlight is part of a group (multi-block selection), remove the
 	// whole group so the user's single selection acts as one logical delete.
+	const deleted = target.groupId
+		? highlights.filter((h: AnyHighlightData) => h.groupId === target.groupId)
+		: [target];
 	const next = target.groupId
 		? highlights.filter((h: AnyHighlightData) => h.groupId !== target.groupId)
 		: highlights.filter((h: AnyHighlightData) => h.id !== id);
 	if (next.length === highlights.length) return;
+	void deleteHighlightsFromHoarder(deleted);
 	updateHighlights(next);
 	hideHighlightDeleteButton();
 	sortHighlights();

@@ -12,6 +12,7 @@ import {
 import { detectBrowser, addBrowserClassToHtml } from './browser-detection';
 import dayjs from 'dayjs';
 import { generalSettings, loadSettings } from './storage-utils';
+import { createHoarderHighlight, deleteHoarderHighlight, getHoarderBookmarkHtmlContent, getHoarderBookmarkIdByUrl } from './hoarder-api';
 
 /**
  * Helper function to create SVG elements
@@ -203,6 +204,7 @@ export interface HighlightData {
 	xpath: string;
 	content: string;
 	notes?: string[]; // Annotations
+	hoarderHighlightId?: string;
 	// When one selection crosses multiple blocks, all resulting highlights
 	// share a groupId so they delete, clip, and visually associate together.
 	groupId?: string;
@@ -1052,7 +1054,123 @@ export function applyHighlights() {
 function commitHighlightChanges() {
 	applyHighlights();
 	saveHighlights();
+	syncHighlightsToHoarder();
 	updateHighlighterMenu();
+}
+
+export async function deleteHighlightsFromHoarder(deletedHighlights: AnyHighlightData[]) {
+	if (!generalSettings.hoarderEnabled || deletedHighlights.length === 0) return;
+
+	await Promise.all(deletedHighlights
+		.map(highlight => highlight.hoarderHighlightId)
+		.filter((id): id is string => Boolean(id))
+		.map(async id => {
+			try {
+				await deleteHoarderHighlight(id);
+			} catch (error) {
+				console.error('Failed to delete Hoarder highlight:', error);
+			}
+		})
+	);
+}
+
+async function syncHighlightsToHoarder() {
+	if (!generalSettings.hoarderEnabled || highlights.length === 0) return;
+
+	try {
+		const bookmarkId = await getHoarderBookmarkIdByUrl(getPageUrl());
+		if (!bookmarkId) return;
+
+		const hoarderText = await getHoarderBookmarkPlainText(bookmarkId);
+		const article = document.querySelector('.obsidian-reader-content article') || document.body;
+		let changed = false;
+		for (const highlight of highlights) {
+			if (highlight.hoarderHighlightId) continue;
+			try {
+				const text = getHighlightText(highlight);
+				if (!text) continue;
+				const localRange = getHighlightAbsoluteRange(article, highlight);
+				const range = getHoarderHighlightRange(hoarderText, highlight, localRange, article.textContent || '');
+				const id = await createHoarderHighlight({
+					bookmarkId,
+					text,
+					note: highlight.notes?.join('\n'),
+					startOffset: range.startOffset,
+					endOffset: range.endOffset
+				});
+				if (id) {
+					highlight.hoarderHighlightId = id;
+					changed = true;
+				}
+			} catch (error) {
+				console.error('Failed to sync highlight to Hoarder:', error);
+			}
+		}
+		if (changed) saveHighlights();
+	} catch (error) {
+		console.error('Failed to sync highlights to Hoarder:', error);
+	}
+}
+
+async function getHoarderBookmarkPlainText(bookmarkId: string): Promise<string> {
+	const html = await getHoarderBookmarkHtmlContent(bookmarkId);
+	if (!html) return '';
+	const doc = new DOMParser().parseFromString(html, 'text/html');
+	return doc.body.textContent || '';
+}
+
+function getHoarderHighlightRange(
+	hoarderText: string,
+	highlight: AnyHighlightData,
+	localRange: { startOffset: number; endOffset: number },
+	localText: string
+) {
+	const text = getHighlightText(highlight);
+	if (!hoarderText || !text) return localRange;
+
+	const matches = findAllTextMatches(hoarderText, text);
+	if (matches.length === 0) return localRange;
+	if (matches.length === 1 || !localText) {
+		return { startOffset: matches[0], endOffset: matches[0] + text.length };
+	}
+
+	const ratio = localRange.startOffset / Math.max(localText.length, 1);
+	const estimated = ratio * hoarderText.length;
+	const startOffset = matches.reduce((closest, current) =>
+		Math.abs(current - estimated) < Math.abs(closest - estimated) ? current : closest
+	);
+	return { startOffset, endOffset: startOffset + text.length };
+}
+
+function findAllTextMatches(haystack: string, needle: string): number[] {
+	const matches: number[] = [];
+	let index = haystack.indexOf(needle);
+	while (index !== -1) {
+		matches.push(index);
+		index = haystack.indexOf(needle, index + 1);
+	}
+	return matches;
+}
+
+function getHighlightAbsoluteRange(root: Element, highlight: AnyHighlightData) {
+	const element = getElementByXPath(highlight.xpath);
+	const rootText = root.textContent || '';
+	const text = getHighlightText(highlight);
+	if (!element) return { startOffset: 0, endOffset: text.length };
+
+	const beforeRange = document.createRange();
+	beforeRange.setStart(root, 0);
+	beforeRange.setEndBefore(element);
+	const base = beforeRange.toString().length;
+	const startOffset = highlight.type === 'text' ? base + highlight.startOffset : rootText.indexOf(text, base);
+	const safeStart = startOffset >= 0 ? startOffset : base;
+	return { startOffset: safeStart, endOffset: safeStart + text.length };
+}
+
+function getHighlightText(highlight: AnyHighlightData): string {
+	const parser = new DOMParser();
+	const doc = parser.parseFromString(highlight.content, 'text/html');
+	return (doc.body.textContent || highlight.content).trim();
 }
 
 export function getHighlights(): string[] {
@@ -1208,6 +1326,7 @@ function migrateStoredHighlights(): boolean {
 export function clearHighlights() {
 	const url = normalizeUrl(getPageUrl());
 	const oldHighlights = [...highlights];
+	deleteHighlightsFromHoarder(oldHighlights);
 	browser.storage.local.get('highlights').then((result: { highlights?: HighlightsStorage }) => {
 		const allHighlights: HighlightsStorage = result.highlights || {};
 		delete allHighlights[url];

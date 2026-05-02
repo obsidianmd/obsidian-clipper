@@ -1,6 +1,6 @@
 This is a fork of https://github.com/obsidianmd/obsidian-clipper.
 
-It adds support for clipping and saving pages to [karakeep-app/karakeep](https://github.com/karakeep-app/karakeep) via Hoarder-compatible settings.
+It adds support for highlight and saving pages to [karakeep-app/karakeep](https://github.com/karakeep-app/karakeep) via Hoarder-compatible settings.
 
 Obsidian Web Clipper helps you highlight and capture the web in your favorite browser. Anything you save is stored as durable Markdown files that you can read offline, and preserve for the long term.
 
