@@ -41,10 +41,10 @@
 	"alwaysShowHighlightsDescription": {
 		"message": "हाइलाइट के विवरण हमेशा दिखाएं"
 	},
-	"apiKeyMissing": {
-		"message": "API key उपलब्ध नहीं है"
+	"apiकुंजीMissing": {
+		"message": "API कुंजी उपलब्ध नहीं है"
 	},
-	"apiKeysWarning": {
+	"apiकुंजीsWarning": {
 		"message": "किसी बाहरी प्रदाता का उपयोग करने पर आप उसकी शर्तों और गोपनीयता नीति से सहमत होते हैं। इंटरप्रेटर अनुरोध सीधे आपके चुने गए प्रदाता को भेजे जाते हैं। Obsidian आपके अनुरोधों से संबंधित कोई डेटा एकत्र या संग्रहीत नहीं करता।"
 	},
 	"appendToDaily": {
@@ -351,7 +351,7 @@
 	"generalSettings": {
 		"message": "सामान्य सेटिंग्स"
 	},
-	"getApiKeyHere": {
+	"getApiकुंजीHere": {
 		"message": "अपनी $1 API कुंजी यहाँ प्राप्त करें।"
 	},
 	"help": {
@@ -387,7 +387,7 @@
 	"history": {
 		"message": "इतिहास"
 	},
-	"hotkeys": {
+	"hotकुंजीs": {
 		"message": "शॉर्टकट कुंजियाँ"
 	},
 	"import": {
@@ -654,11 +654,11 @@
 	"provider": {
 		"message": "प्रदाता"
 	},
-	"providerApiKey": {
-		"message": "API key"
+	"providerApiकुंजी": {
+		"message": "API कुंजी"
 	},
-	"providerApiKeyDescription": {
-		"message": "इस प्रदाता के लिए आपकी API key."
+	"providerApiकुंजीDescription": {
+		"message": "इस प्रदाता के लिए आपकी API कुंजी."
 	},
 	"providerBaseUrl": {
 		"message": "बेस URL"
@@ -922,19 +922,19 @@
 		"message": "शेयर करें..."
 	},
 	"shortcutInstructionsBrave": {
-		"message": "Key असाइनमेंट बदलने के लिए $1 पर जाएँ"
+		"message": "कुंजी असाइनमेंट बदलने के लिए $1 पर जाएँ"
 	},
 	"shortcutInstructionsChrome": {
-		"message": "Key असाइनमेंट बदलने के लिए $1 पर जाएँ"
+		"message": "कुंजी असाइनमेंट बदलने के लिए $1 पर जाएँ"
 	},
 	"shortcutInstructionsDefault": {
-		"message": "Key असाइनमेंट बदलने के लिए, कृपया अपने ब्राउज़र की एक्सटेंशन सेटिंग्स देखें।"
+		"message": "कुंजी असाइनमेंट बदलने के लिए, कृपया अपने ब्राउज़र की एक्सटेंशन सेटिंग्स देखें।"
 	},
 	"shortcutInstructionsEdge": {
-		"message": "Key असाइनमेंट बदलने के लिए $1 पर जाएँ।"
+		"message": "कुंजी असाइनमेंट बदलने के लिए $1 पर जाएँ।"
 	},
 	"shortcutInstructionsFirefox": {
-		"message": "Key असाइनमेंट बदलने के लिए $1 पर जाएँ, गियर आइकन पर क्लिक करें और \"Manage Extension Shortcuts\" चुनें।"
+		"message": "कुंजी असाइनमेंट बदलने के लिए $1 पर जाएँ, गियर आइकन पर क्लिक करें और \"Manage Extension Shortcuts\" चुनें।"
 	},
 	"shortcutInstructionsIntro": {
 		"message": "कीबोर्ड शॉर्टकट्स आपको क्लिपर फीचर्स तक तेज़ी से पहुँचने की सुविधा देते हैं।"
