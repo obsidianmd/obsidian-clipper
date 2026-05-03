@@ -64,17 +64,28 @@ declare global {
 
 	// Cached Douyin enrichment result
 	let cachedDouyinResult: DouyinTranscriptResult | null = null;
+	let douyinFetchPromise: Promise<DouyinTranscriptResult | null> | null = null;
 
-	function getDouyinResult(): DouyinTranscriptResult | null {
-		if (!isDouyinUrl(document.URL)) return null;
-		if (!cachedDouyinResult) {
-			try {
-				cachedDouyinResult = fetchDouyinTranscript(document.URL);
-			} catch (e) {
-				debugLog('Clipper', 'Douyin parse failed:', e);
-			}
+	function ensureDouyinResult(): Promise<DouyinTranscriptResult | null> {
+		if (!isDouyinUrl(document.URL)) {
+			return Promise.resolve(null);
 		}
-		return cachedDouyinResult;
+		if (cachedDouyinResult) {
+			return Promise.resolve(cachedDouyinResult);
+		}
+		if (!douyinFetchPromise) {
+			douyinFetchPromise = fetchDouyinTranscript(document.URL)
+				.then(result => {
+					cachedDouyinResult = result;
+					return result;
+				})
+				.catch(error => {
+					debugLog('Clipper', 'Douyin parse failed:', error);
+					douyinFetchPromise = null;
+					return null;
+				});
+		}
+		return douyinFetchPromise;
 	}
 
 	function removeContainer(container: HTMLElement) {
@@ -197,7 +208,7 @@ declare global {
 			flattenShadowDom(document).then(async () => {
 				try {
 					const bilibiliResult = await ensureBilibiliResult();
-					const douyinResult = getDouyinResult();
+					const douyinResult = await ensureDouyinResult();
 					const defuddled = parseForClip(document);
 					const clipContent = bilibiliResult?.content || douyinResult?.content || defuddled.content;
 					const markdown = createMarkdownContent(clipContent, document.URL);
@@ -222,7 +233,7 @@ declare global {
 			flattenShadowDom(document).then(async () => {
 				try {
 					const bilibiliResult = await ensureBilibiliResult();
-					const douyinResult = getDouyinResult();
+					const douyinResult = await ensureDouyinResult();
 					const defuddled = parseForClip(document);
 					const clipContent = bilibiliResult?.content || douyinResult?.content || defuddled.content;
 					const markdown = createMarkdownContent(clipContent, document.URL);
@@ -292,7 +303,7 @@ declare global {
 
 				// For Douyin video pages, use page-embedded data
 				if (isDouyinUrl(document.URL)) {
-					const douyinResult = getDouyinResult();
+					const douyinResult = await ensureDouyinResult();
 					if (douyinResult) {
 						contentHtml = douyinResult.content;
 						if (douyinResult.transcriptText) {
@@ -406,14 +417,18 @@ declare global {
 				sendResponse({ transcriptText: '', content: '' });
 			}
 		} else if (request.action === "fetchDouyinTranscriptAction") {
-			const douyinResult = getDouyinResult();
-			if (douyinResult) {
-				sendResponse({
-					transcriptText: douyinResult.transcriptText,
-					content: douyinResult.content,
-				});
-			} else {
+			if (!isDouyinUrl(document.URL)) {
 				sendResponse({ transcriptText: '', content: '' });
+			} else {
+				ensureDouyinResult().then(douyinResult => {
+					sendResponse({
+						transcriptText: douyinResult?.transcriptText || '',
+						content: douyinResult?.content || '',
+					});
+				}).catch(() => {
+					sendResponse({ transcriptText: '', content: '' });
+				});
+				return true;
 			}
 		} else if (request.action === "extractContent") {
 			const content = extractContentBySelector(request.selector, request.attribute, request.extractHtml);

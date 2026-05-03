@@ -1,3 +1,5 @@
+import browser from './browser-polyfill';
+
 interface DouyinChapter {
 	title: string;
 	detail: string;
@@ -41,6 +43,13 @@ export interface DouyinTranscriptResult {
 	subtitleLang: string;
 	coverUrl: string;
 	videoUrl: string;
+}
+
+interface FetchProxyResponse {
+	ok?: boolean;
+	status?: number;
+	text?: string;
+	error?: string;
 }
 
 export function isDouyinUrl(url: string): boolean {
@@ -163,7 +172,7 @@ function findVideoDetail(data: any, expectedAwemeId: string): any {
 function isVideoDetail(value: any, expectedAwemeId: string): boolean {
 	if (!value || typeof value !== 'object') return false;
 	const awemeId = String(value.aweme_id || value.awemeId || value.groupId || '');
-	if (expectedAwemeId && awemeId && awemeId !== expectedAwemeId) return false;
+	if (expectedAwemeId && awemeId !== expectedAwemeId) return false;
 	return Boolean(awemeId && (value.video || value.desc || value.caption));
 }
 
@@ -506,6 +515,10 @@ function buildEmbedHtml(info: DouyinVideoInfo): string {
 
 export function parseDouyinTranscriptFromDocument(doc: Document, url: string): DouyinTranscriptResult | null {
 	const pageData = parsePageData(doc);
+	return parseDouyinTranscriptFromData(pageData, url);
+}
+
+function parseDouyinTranscriptFromData(pageData: any, url: string): DouyinTranscriptResult | null {
 	if (!pageData) return null;
 
 	const info = extractVideoInfo(pageData, url);
@@ -528,8 +541,41 @@ export function parseDouyinTranscriptFromDocument(doc: Document, url: string): D
 	};
 }
 
-export function fetchDouyinTranscript(url: string): DouyinTranscriptResult | null {
+function parseDouyinTranscriptFromHtml(html: string, url: string): DouyinTranscriptResult | null {
+	if (!html) return null;
+
+	const parser = new DOMParser();
+	const doc = parser.parseFromString(html, 'text/html');
+	return parseDouyinTranscriptFromDocument(doc, url);
+}
+
+async function fetchDouyinPageData(awemeId: string): Promise<any> {
+	const response: FetchProxyResponse = await browser.runtime.sendMessage({
+		action: 'fetchProxy',
+		url: `https://www.douyin.com/video/${encodeURIComponent(awemeId)}`,
+		options: {
+			credentials: 'include',
+			cache: 'no-store',
+			referrer: 'https://www.douyin.com/',
+			referrerPolicy: 'strict-origin-when-cross-origin',
+			headers: {
+				'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+				'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
+				'Cache-Control': 'no-cache',
+				'Pragma': 'no-cache',
+				'Referer': 'https://www.douyin.com/',
+			},
+		},
+	});
+
+	if (!response?.ok || !response.text) return null;
+	return parseDouyinTranscriptFromHtml(response.text, `https://www.douyin.com/video/${awemeId}`);
+}
+
+export async function fetchDouyinTranscript(url: string): Promise<DouyinTranscriptResult | null> {
 	const awemeId = extractAwemeId(url);
 	if (!awemeId || typeof document === 'undefined') return null;
-	return parseDouyinTranscriptFromDocument(document, url);
+	const currentPageResult = parseDouyinTranscriptFromDocument(document, url);
+	if (currentPageResult) return currentPageResult;
+	return fetchDouyinPageData(awemeId);
 }

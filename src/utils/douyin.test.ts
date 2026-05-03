@@ -56,6 +56,28 @@ describe('Douyin transcript extraction', () => {
 		expect(result?.content).toContain('<code>00:10</code> 小龙虾自我介绍');
 	});
 
+	test('does not pick the first search result when modal_id points to another video', () => {
+		const { document } = parseHTML(`<html><body><script id="RENDER_DATA" type="application/json">${encodeURIComponent(JSON.stringify({
+			app: {
+				searchData: {
+					items: [{
+						awemeId: '1111111111111111111',
+						desc: '搜索页第一个结果，不应该被保存',
+						video: { duration: 1000 },
+						chapterInfo: { list: [{ timestamp: 0, desc: '错误结果', detail: '这不是弹窗视频。' }] },
+					}],
+				},
+			},
+		}))}</script></body></html>`);
+
+		const result = parseDouyinTranscriptFromDocument(
+			document as unknown as Document,
+			'https://www.douyin.com/jingxuan/search/github?modal_id=7630065336796089650&type=general'
+		);
+
+		expect(result).toBeNull();
+	});
+
 	test('prefers embedded subtitle segments when present', () => {
 		const result = parseDouyinTranscriptFromDocument(buildDocument({
 			awemeId: '7615143235619800697',
