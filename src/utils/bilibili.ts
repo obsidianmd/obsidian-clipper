@@ -29,6 +29,7 @@ interface BilibiliVideoInfo {
 	author: string;
 	description: string;
 	uploadDate: string;
+	publishTime: string;
 	duration: number;
 	page: number;
 	subtitles: BilibiliSubtitleTrack[];
@@ -53,6 +54,7 @@ export interface BilibiliTranscriptResult {
 	author: string;
 	description: string;
 	uploadDate: string;
+	publishTime: string;
 	subtitleLang: string;
 }
 
@@ -252,7 +254,11 @@ async function fetchBilibiliVideoInfo(bvid: string, pageUrl: string): Promise<Bi
 
 	const data = metaPayload.data || {};
 	const pubdate = Number(data.pubdate || 0);
-	const uploadDate = pubdate > 0 ? new Date(pubdate * 1000).toISOString().slice(0, 10) : '';
+	const ctime = Number(data.ctime || 0);
+	// Use pubdate if available, otherwise fall back to ctime
+	const timestamp = pubdate > 0 ? pubdate : (ctime > 0 ? ctime : 0);
+	const uploadDate = timestamp > 0 ? new Date(timestamp * 1000).toISOString().slice(0, 10) : '';
+	const publishTime = timestamp > 0 ? new Date(timestamp * 1000).toISOString().replace('T', ' ').slice(0, 19) : '';
 	const aid = String(data.aid || '');
 	const page = extractPageIndex(pageUrl);
 	const pages = normalizePages(data.pages);
@@ -270,6 +276,7 @@ async function fetchBilibiliVideoInfo(bvid: string, pageUrl: string): Promise<Bi
 		author: String(data.owner?.name || ''),
 		description: String(data.desc || ''),
 		uploadDate,
+		publishTime,
 		duration,
 		page,
 		subtitles: subtitleBundle.tracks,
@@ -527,6 +534,7 @@ export async function fetchBilibiliTranscript(url: string): Promise<BilibiliTran
 		author: info.author,
 		description: info.description,
 		uploadDate: info.uploadDate,
+		publishTime: info.publishTime,
 		subtitleLang: track?.lanDoc || track?.lan || '',
 	};
 }
