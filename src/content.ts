@@ -13,7 +13,6 @@ import { debugLog } from './utils/debug';
 import { updateSidebarWidth, addResizeHandle, cleanupResizeHandlers } from './utils/iframe-resize';
 import { parseForClip } from './utils/clip-utils';
 import { isBilibiliUrl, fetchBilibiliTranscript, type BilibiliTranscriptResult } from './utils/bilibili';
-import { isDouyinUrl, fetchDouyinTranscript, buildDouyinUnavailableResult, type DouyinTranscriptResult } from './utils/douyin';
 
 declare global {
 	interface Window {
@@ -60,32 +59,6 @@ declare global {
 				});
 		}
 		return bilibiliFetchPromise;
-	}
-
-	// Cached Douyin enrichment result
-	let cachedDouyinResult: DouyinTranscriptResult | null = null;
-	let douyinFetchPromise: Promise<DouyinTranscriptResult | null> | null = null;
-
-	function ensureDouyinResult(): Promise<DouyinTranscriptResult | null> {
-		if (!isDouyinUrl(document.URL)) {
-			return Promise.resolve(null);
-		}
-		if (cachedDouyinResult) {
-			return Promise.resolve(cachedDouyinResult);
-		}
-		if (!douyinFetchPromise) {
-			douyinFetchPromise = fetchDouyinTranscript(document.URL)
-				.then(result => {
-					cachedDouyinResult = result || buildDouyinUnavailableResult(document.URL);
-					return cachedDouyinResult;
-				})
-				.catch(error => {
-					debugLog('Clipper', 'Douyin parse failed:', error);
-					cachedDouyinResult = buildDouyinUnavailableResult(document.URL);
-					return cachedDouyinResult;
-				});
-		}
-		return douyinFetchPromise;
 	}
 
 	function removeContainer(container: HTMLElement) {
@@ -208,9 +181,8 @@ declare global {
 			flattenShadowDom(document).then(async () => {
 				try {
 					const bilibiliResult = await ensureBilibiliResult();
-					const douyinResult = await ensureDouyinResult();
 					const defuddled = parseForClip(document);
-					const clipContent = douyinResult?.content || bilibiliResult?.content || defuddled.content;
+					const clipContent = bilibiliResult?.content || defuddled.content;
 					const markdown = createMarkdownContent(clipContent, document.URL);
 
 					const textArea = document.createElement("textarea");
@@ -233,11 +205,10 @@ declare global {
 			flattenShadowDom(document).then(async () => {
 				try {
 					const bilibiliResult = await ensureBilibiliResult();
-					const douyinResult = await ensureDouyinResult();
 					const defuddled = parseForClip(document);
-					const clipContent = douyinResult?.content || bilibiliResult?.content || defuddled.content;
+					const clipContent = bilibiliResult?.content || defuddled.content;
 					const markdown = createMarkdownContent(clipContent, document.URL);
-					const title = douyinResult?.title || defuddled.title || document.title || 'Untitled';
+					const title = defuddled.title || document.title || 'Untitled';
 					const fileName = title.replace(/[/\\?%*:|"<>]/g, '-');
 					await saveFile({
 						content: markdown,
@@ -303,29 +274,6 @@ declare global {
 							extractedContent['published'] = bilibiliResult.publishTime;
 							extractedContent['created'] = bilibiliResult.publishTime;
 						}
-					}
-				}
-
-				// For Douyin video pages, use page-embedded data
-				if (isDouyinUrl(document.URL)) {
-					const douyinResult = await ensureDouyinResult();
-					if (douyinResult) {
-						contentHtml = douyinResult.content;
-						extractedContent['transcript'] = douyinResult.transcriptText;
-						extractedContent['subtitle_lang'] = douyinResult.subtitleLang;
-						if (douyinResult.uploadDate) {
-							extractedContent['upload_date'] = douyinResult.uploadDate;
-							extractedContent['published'] = douyinResult.uploadDate;
-						}
-						if (douyinResult.publishTime) {
-							extractedContent['publish_time'] = douyinResult.publishTime;
-							extractedContent['created'] = douyinResult.publishTime;
-						}
-						responseAuthor = douyinResult.author;
-						responseDescription = douyinResult.description;
-						responseImage = '';
-						responsePublished = douyinResult.publishTime || douyinResult.uploadDate;
-						responseTitle = douyinResult.title;
 					}
 				}
 
@@ -421,20 +369,6 @@ declare global {
 				return true;
 			} else {
 				sendResponse({ transcriptText: '', content: '' });
-			}
-		} else if (request.action === "fetchDouyinTranscriptAction") {
-			if (!isDouyinUrl(document.URL)) {
-				sendResponse({ transcriptText: '', content: '' });
-			} else {
-				ensureDouyinResult().then(douyinResult => {
-					sendResponse({
-						transcriptText: douyinResult?.transcriptText || '',
-						content: douyinResult?.content || '',
-					});
-				}).catch(() => {
-					sendResponse({ transcriptText: '', content: '' });
-				});
-				return true;
 			}
 		} else if (request.action === "extractContent") {
 			const content = extractContentBySelector(request.selector, request.attribute, request.extractHtml);

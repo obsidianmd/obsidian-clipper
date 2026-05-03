@@ -674,7 +674,6 @@ async function refreshFields(tabId: number, { checkTemplateTriggers = true, rebu
 			showError('pageCannotBeClipped');
 			return;
 		}
-
 		// Start content extraction (don't await yet)
 		const extractionPromise = memoizedExtractPageContent(tabId);
 
@@ -744,21 +743,6 @@ async function refreshFields(tabId: number, { checkTemplateTriggers = true, rebu
 						const biliData = raw as { transcriptText?: string; content?: string } | undefined;
 						if (biliData?.transcriptText) {
 							currentVariables['{{transcript}}'] = biliData.transcriptText;
-							fillTemplateFieldValues(tabId, currentTemplate, currentVariables, extractedData.schemaOrgData);
-						}
-					}).catch(() => {});
-				}
-
-				// Fetch Douyin transcript asynchronously if on a Douyin page
-				if (tab.url && tab.url.includes('douyin.com') && !currentVariables['{{transcript}}']) {
-					browser.runtime.sendMessage({
-						action: 'sendMessageToTab',
-						tabId,
-						message: { action: 'fetchDouyinTranscriptAction' }
-					}).then((raw: unknown) => {
-						const douyinData = raw as { transcriptText?: string; content?: string } | undefined;
-						if (douyinData?.transcriptText) {
-							currentVariables['{{transcript}}'] = douyinData.transcriptText;
 							fillTemplateFieldValues(tabId, currentTemplate, currentVariables, extractedData.schemaOrgData);
 						}
 					}).catch(() => {});
