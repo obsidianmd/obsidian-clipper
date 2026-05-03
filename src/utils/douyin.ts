@@ -52,6 +52,8 @@ interface FetchProxyResponse {
 	error?: string;
 }
 
+const NO_TRANSCRIPT_MESSAGE = '未获取到逐句字幕';
+
 export function isDouyinUrl(url: string): boolean {
 	try {
 		const hostname = new URL(url).hostname;
@@ -267,7 +269,7 @@ function extractVideoInfo(data: any, url: string): DouyinVideoInfo | null {
 		duration,
 		chapters: extractChapters(detail, duration),
 		subtitleSegments,
-		subtitleLang: subtitleSegments.length > 0 ? '中文 [AI]' : '章节摘要',
+		subtitleLang: subtitleSegments.length > 0 ? '中文 [AI]' : '',
 	};
 }
 
@@ -375,18 +377,19 @@ function buildDouyinContent(info: DouyinVideoInfo): string {
 
 	parts.push(buildEmbedHtml(info));
 
-	const intro: string[] = [];
-	if (info.description) intro.push(info.description);
-	if (info.summary && info.summary !== info.description) intro.push(info.summary);
-	if (intro.length > 0) {
-		parts.push(`<h2>简介</h2>${intro.map(textToParagraphHtml).join('')}`);
+	const intro = info.summary || info.description;
+	if (intro) {
+		parts.push(`<h2>简介</h2>${textToParagraphHtml(intro)}`);
 	}
 
 	const transcriptBody = info.subtitleSegments.length > 0
 		? buildMarkdownTranscriptHtml(info.subtitleSegments, info.chapters)
-		: buildChapterTranscriptHtml(info.chapters);
-	if (transcriptBody) {
-		parts.push(`<h2>字幕</h2>${transcriptBody}`);
+		: `<p>${NO_TRANSCRIPT_MESSAGE}</p>`;
+	parts.push(`<h2>Transcript</h2>${transcriptBody}`);
+
+	const chapterBody = buildChapterSectionHtml(info.chapters);
+	if (chapterBody) {
+		parts.push(`<h2>章节</h2>${chapterBody}`);
 	}
 
 	return parts.join('');
@@ -451,12 +454,12 @@ function formatMarkdownTranscriptLine(segment: DouyinSubtitleSegment): string {
 	return `<code>${formatDouyinTimestamp(segment.from)}</code> ${escapeHtml(segment.content.trim())}`;
 }
 
-function buildChapterTranscriptHtml(chapters: DouyinChapter[]): string {
+function buildChapterSectionHtml(chapters: DouyinChapter[]): string {
 	if (!chapters.length) return '';
 
 	return chapters.map(chapter => {
-		const detail = chapter.detail ? `<p><code>${formatDouyinTimestamp(chapter.startTime)}</code> ${escapeHtml(chapter.detail)}</p>` : '';
-		return `<h3>${escapeHtml(chapter.title)}</h3>${detail}`;
+		const detail = chapter.detail ? `<p>${escapeHtml(chapter.detail)}</p>` : '';
+		return `<h3>${escapeHtml(chapter.title)}</h3><p><code>${formatDouyinTimestamp(chapter.startTime)}</code></p>${detail}`;
 	}).join('');
 }
 
@@ -473,19 +476,6 @@ function buildTranscriptHtml(segments: DouyinSubtitleSegment[]): string {
 	return `<div class="youtube transcript">${lines.join('')}</div>`;
 }
 
-function buildChapterReaderTranscriptHtml(chapters: DouyinChapter[]): string {
-	if (!chapters.length) return '';
-
-	const lines = chapters.map(chapter => {
-		const text = [chapter.title, chapter.detail].filter(Boolean).join('：');
-		if (!text) return '';
-		const seconds = Math.floor(chapter.startTime / 1000);
-		return `<div class="transcript-segment"><strong class="timestamp" data-timestamp="${seconds}">${formatDouyinTimestamp(chapter.startTime)}</strong> ${escapeHtml(text)}</div>`;
-	}).filter(Boolean);
-
-	return lines.length > 0 ? `<div class="youtube transcript">${lines.join('')}</div>` : '';
-}
-
 function buildTranscriptText(info: DouyinVideoInfo): string {
 	if (info.subtitleSegments.length > 0) {
 		return info.subtitleSegments
@@ -494,10 +484,7 @@ function buildTranscriptText(info: DouyinVideoInfo): string {
 			.join('\n');
 	}
 
-	return info.chapters
-		.map(chapter => [chapter.title, chapter.detail].filter(Boolean).join('：'))
-		.filter(Boolean)
-		.join('\n');
+	return NO_TRANSCRIPT_MESSAGE;
 }
 
 function buildEmbedHtml(info: DouyinVideoInfo): string {
@@ -505,12 +492,39 @@ function buildEmbedHtml(info: DouyinVideoInfo): string {
 	const parts = [`<p><a href="${link}">在抖音打开视频</a></p>`];
 
 	if (info.videoUrl) {
-		parts.push(`<video controls src="${escapeHtml(info.videoUrl)}"${info.coverUrl ? ` poster="${escapeHtml(info.coverUrl)}"` : ''} style="width:100%;max-height:70vh;"></video>`);
-	} else if (info.coverUrl) {
-		parts.push(`<a href="${link}"><img src="${escapeHtml(info.coverUrl)}" alt="${escapeHtml(info.title || '抖音视频')}" /></a>`);
+		parts.push(`<video controls src="${escapeHtml(info.videoUrl)}" style="width:100%;max-height:70vh;"></video>`);
 	}
 
 	return parts.join('');
+}
+
+export function buildDouyinUnavailableResult(url: string): DouyinTranscriptResult {
+	const awemeId = extractAwemeId(url);
+	const link = awemeId
+		? `https://www.douyin.com/video/${encodeURIComponent(awemeId)}`
+		: url;
+	const safeLink = escapeHtml(link);
+	const content = [
+		`<p><a href="${safeLink}">在抖音打开视频</a></p>`,
+		'<h2>简介</h2><p>未能获取当前抖音视频信息。</p>',
+		`<h2>Transcript</h2><p>${NO_TRANSCRIPT_MESSAGE}</p>`,
+	].join('');
+
+	return {
+		content,
+		transcriptHtml: `<div class="youtube transcript"><p>${NO_TRANSCRIPT_MESSAGE}</p></div>`,
+		transcriptText: NO_TRANSCRIPT_MESSAGE,
+		embedHtml: `<p><a href="${safeLink}">在抖音打开视频</a></p>`,
+		awemeId,
+		title: awemeId ? `抖音视频 ${awemeId}` : '抖音视频',
+		author: '',
+		description: '未能获取当前抖音视频信息。',
+		uploadDate: '',
+		publishTime: '',
+		subtitleLang: '',
+		coverUrl: '',
+		videoUrl: '',
+	};
 }
 
 export function parseDouyinTranscriptFromDocument(doc: Document, url: string): DouyinTranscriptResult | null {
@@ -526,7 +540,7 @@ function parseDouyinTranscriptFromData(pageData: any, url: string): DouyinTransc
 
 	return {
 		content: buildDouyinContent(info),
-		transcriptHtml: buildTranscriptHtml(info.subtitleSegments) || buildChapterReaderTranscriptHtml(info.chapters),
+		transcriptHtml: buildTranscriptHtml(info.subtitleSegments) || `<div class="youtube transcript"><p>${NO_TRANSCRIPT_MESSAGE}</p></div>`,
 		transcriptText: buildTranscriptText(info),
 		embedHtml: buildEmbedHtml(info),
 		awemeId: info.awemeId,

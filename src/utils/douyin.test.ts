@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest';
 import { parseHTML } from 'linkedom';
 import {
+	buildDouyinUnavailableResult,
 	extractAwemeId,
 	parseDouyinTranscriptFromDocument,
 } from './douyin';
@@ -20,7 +21,7 @@ describe('Douyin transcript extraction', () => {
 		expect(extractAwemeId('https://www.douyin.com/share/video/7615143235619800697')).toBe('7615143235619800697');
 	});
 
-	test('uses chapterInfo.list as subtitle fallback when full subtitles are unavailable', () => {
+	test('keeps chapters separate and reports missing transcript when full subtitles are unavailable', () => {
 		const result = parseDouyinTranscriptFromDocument(buildDocument({
 			awemeId: '7615143235619800697',
 			desc: '小米龙虾首发上手体验，手机内置贾维斯的时代可能真快来了！',
@@ -45,15 +46,20 @@ describe('Douyin transcript extraction', () => {
 		expect(result).not.toBeNull();
 		expect(result?.author).toBe('张大头同学');
 		expect(result?.videoUrl).toBe('https://example.com/video.mp4');
-		expect(result?.subtitleLang).toBe('章节摘要');
-		expect(result?.transcriptText).toContain('自我介绍：小龙虾自我介绍');
-		expect(result?.transcriptHtml).toContain('data-timestamp="10"');
+		expect(result?.subtitleLang).toBe('');
+		expect(result?.transcriptText).toBe('未获取到逐句字幕');
+		expect(result?.transcriptHtml).toContain('未获取到逐句字幕');
 
 		expect(result?.content).toContain('<a href="https://www.douyin.com/video/7615143235619800697">在抖音打开视频</a>');
+		expect(result?.content).toContain('<video controls src="https://example.com/video.mp4"');
+		expect(result?.content).not.toContain('<img');
 		expect(result?.content).toContain('<h2>简介</h2>');
-		expect(result?.content).toContain('<h2>字幕</h2>');
+		expect(result?.content).toContain('小米龙虾智能体 miclaw 的上手体验分享。');
+		expect(result?.content).toContain('<h2>Transcript</h2>');
+		expect(result?.content).toContain('未获取到逐句字幕');
+		expect(result?.content).toContain('<h2>章节</h2>');
 		expect(result?.content).toContain('<h3>自我介绍</h3>');
-		expect(result?.content).toContain('<code>00:10</code> 小龙虾自我介绍');
+		expect(result?.content).toContain('小龙虾自我介绍，有记忆，回答简洁明了。');
 	});
 
 	test('does not pick the first search result when modal_id points to another video', () => {
@@ -100,5 +106,37 @@ describe('Douyin transcript extraction', () => {
 		expect(result?.transcriptText).toBe('第一句字幕\n第二句字幕');
 		expect(result?.content).toContain('<code>00:01</code> 第一句字幕');
 		expect(result?.transcriptHtml).toContain('data-timestamp="1"');
+		expect(result?.content).toContain('<h2>章节</h2>');
+		expect(result?.content).toContain('章节摘要不应替代真实字幕。');
+	});
+
+	test('does not output cover images when video url is unavailable', () => {
+		const result = parseDouyinTranscriptFromDocument(buildDocument({
+			awemeId: '7615143235619800697',
+			desc: '只有封面，没有视频直链',
+			video: {
+				duration: 12000,
+				cover: 'https://example.com/cover.jpg',
+			},
+			subtitles: [
+				{ start: 1000, end: 2000, text: '真实字幕' },
+			],
+		}), DOUYIN_URL);
+
+		expect(result?.videoUrl).toBe('');
+		expect(result?.content).toContain('在抖音打开视频');
+		expect(result?.content).not.toContain('<img');
+		expect(result?.content).not.toContain('cover.jpg');
+	});
+
+	test('unavailable fallback does not include unrelated page content or screenshots', () => {
+		const result = buildDouyinUnavailableResult('https://www.douyin.com/user/self?showTab=like');
+
+		expect(result.content).toContain('未能获取当前抖音视频信息。');
+		expect(result.content).toContain('未获取到逐句字幕');
+		expect(result.content).not.toContain('我的喜欢');
+		expect(result.content).not.toContain('默认收藏列表');
+		expect(result.content).not.toContain('<img');
+		expect(result.coverUrl).toBe('');
 	});
 });

@@ -13,7 +13,7 @@ import { debugLog } from './utils/debug';
 import { updateSidebarWidth, addResizeHandle, cleanupResizeHandlers } from './utils/iframe-resize';
 import { parseForClip } from './utils/clip-utils';
 import { isBilibiliUrl, fetchBilibiliTranscript, type BilibiliTranscriptResult } from './utils/bilibili';
-import { isDouyinUrl, fetchDouyinTranscript, type DouyinTranscriptResult } from './utils/douyin';
+import { isDouyinUrl, fetchDouyinTranscript, buildDouyinUnavailableResult, type DouyinTranscriptResult } from './utils/douyin';
 
 declare global {
 	interface Window {
@@ -76,13 +76,13 @@ declare global {
 		if (!douyinFetchPromise) {
 			douyinFetchPromise = fetchDouyinTranscript(document.URL)
 				.then(result => {
-					cachedDouyinResult = result;
-					return result;
+					cachedDouyinResult = result || buildDouyinUnavailableResult(document.URL);
+					return cachedDouyinResult;
 				})
 				.catch(error => {
 					debugLog('Clipper', 'Douyin parse failed:', error);
-					douyinFetchPromise = null;
-					return null;
+					cachedDouyinResult = buildDouyinUnavailableResult(document.URL);
+					return cachedDouyinResult;
 				});
 		}
 		return douyinFetchPromise;
@@ -210,7 +210,7 @@ declare global {
 					const bilibiliResult = await ensureBilibiliResult();
 					const douyinResult = await ensureDouyinResult();
 					const defuddled = parseForClip(document);
-					const clipContent = bilibiliResult?.content || douyinResult?.content || defuddled.content;
+					const clipContent = douyinResult?.content || bilibiliResult?.content || defuddled.content;
 					const markdown = createMarkdownContent(clipContent, document.URL);
 
 					const textArea = document.createElement("textarea");
@@ -235,9 +235,9 @@ declare global {
 					const bilibiliResult = await ensureBilibiliResult();
 					const douyinResult = await ensureDouyinResult();
 					const defuddled = parseForClip(document);
-					const clipContent = bilibiliResult?.content || douyinResult?.content || defuddled.content;
+					const clipContent = douyinResult?.content || bilibiliResult?.content || defuddled.content;
 					const markdown = createMarkdownContent(clipContent, document.URL);
-					const title = defuddled.title || document.title || 'Untitled';
+					const title = douyinResult?.title || defuddled.title || document.title || 'Untitled';
 					const fileName = title.replace(/[/\\?%*:|"<>]/g, '-');
 					await saveFile({
 						content: markdown,
@@ -281,6 +281,11 @@ declare global {
 				};
 
 				let contentHtml = defuddled.content;
+				let responseAuthor = defuddled.author;
+				let responseDescription = defuddled.description;
+				let responseImage = defuddled.image;
+				let responsePublished = defuddled.published;
+				let responseTitle = defuddled.title;
 
 				// For Bilibili video pages, use cached enrichment or start background fetch
 				if (isBilibiliUrl(document.URL)) {
@@ -306,12 +311,8 @@ declare global {
 					const douyinResult = await ensureDouyinResult();
 					if (douyinResult) {
 						contentHtml = douyinResult.content;
-						if (douyinResult.transcriptText) {
-							extractedContent['transcript'] = douyinResult.transcriptText;
-						}
-						if (douyinResult.subtitleLang) {
-							extractedContent['subtitle_lang'] = douyinResult.subtitleLang;
-						}
+						extractedContent['transcript'] = douyinResult.transcriptText;
+						extractedContent['subtitle_lang'] = douyinResult.subtitleLang;
 						if (douyinResult.uploadDate) {
 							extractedContent['upload_date'] = douyinResult.uploadDate;
 							extractedContent['published'] = douyinResult.uploadDate;
@@ -320,6 +321,11 @@ declare global {
 							extractedContent['publish_time'] = douyinResult.publishTime;
 							extractedContent['created'] = douyinResult.publishTime;
 						}
+						responseAuthor = douyinResult.author;
+						responseDescription = douyinResult.description;
+						responseImage = '';
+						responsePublished = douyinResult.publishTime || douyinResult.uploadDate;
+						responseTitle = douyinResult.title;
 					}
 				}
 
@@ -366,22 +372,22 @@ declare global {
 				const cleanedHtml = doc.documentElement.outerHTML;
 
 				const response: ContentResponse = {
-					author: defuddled.author,
+					author: responseAuthor,
 					content: contentHtml,
-					description: defuddled.description,
+					description: responseDescription,
 					domain: getDomain(document.URL),
 					extractedContent: extractedContent,
 					favicon: defuddled.favicon,
 					fullHtml: cleanedHtml,
 					highlights: highlighter.getHighlights(),
-					image: defuddled.image,
+					image: responseImage,
 					language: defuddled.language || '',
 					parseTime: defuddled.parseTime,
-					published: defuddled.published,
+					published: responsePublished,
 					schemaOrgData: defuddled.schemaOrgData,
 					selectedHtml: selectedHtml,
 					site: defuddled.site,
-					title: defuddled.title,
+					title: responseTitle,
 					wordCount: defuddled.wordCount,
 					metaTags: defuddled.metaTags || []
 				};
