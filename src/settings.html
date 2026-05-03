@@ -203,6 +203,77 @@
 										</div>
 									</div>
 								</div>
+								<div class="setting-item setting-item-heading"><h3>ASR 转录</h3></div>
+								<div class="setting-items">
+									<div class="setting-item mod-horizontal">
+										<div class="setting-item-info">
+											<label for="asr-provider">云端模型转录方式</label>
+											<div class="setting-item-description">当前仅支持豆包。后续适配更多服务商时再开放更多选项。</div>
+										</div>
+										<div class="setting-item-control">
+											<select id="asr-provider">
+												<option value="doubao">豆包</option>
+											</select>
+										</div>
+									</div>
+									<div class="setting-item mod-horizontal">
+										<div class="setting-item-info">
+											<label for="asr-base-url">豆包 ASR URL</label>
+											<div class="setting-item-description">火山引擎豆包 ASR 接口地址。</div>
+										</div>
+										<div class="setting-item-control">
+											<input type="text" id="asr-base-url" autocomplete="off" spellcheck="false" />
+										</div>
+									</div>
+									<div class="setting-item mod-horizontal">
+										<div class="setting-item-info">
+											<label for="asr-app-id">豆包 App ID</label>
+											<div class="setting-item-description">用于调用豆包 ASR 的 App ID。</div>
+										</div>
+										<div class="setting-item-control">
+											<input type="text" id="asr-app-id" autocomplete="off" spellcheck="false" />
+										</div>
+									</div>
+									<div class="setting-item mod-horizontal">
+										<div class="setting-item-info">
+											<label for="asr-access-token">豆包 Access Token</label>
+											<div class="setting-item-description">仅保存在扩展设置中，不会写入构建产物。</div>
+										</div>
+										<div class="setting-item-control">
+											<input type="password" id="asr-access-token" autocomplete="off" spellcheck="false" />
+										</div>
+									</div>
+									<div class="setting-item mod-horizontal">
+										<div class="setting-item-info">
+											<label for="asr-cluster">豆包 Cluster</label>
+											<div class="setting-item-description">默认值为 volc.bigasr.auc。若你的火山账号已开通豆包录音文件识别模型 2.0，可改为 volc.seedasr.auc。</div>
+										</div>
+										<div class="setting-item-control">
+											<input type="text" id="asr-cluster" autocomplete="off" spellcheck="false" />
+										</div>
+									</div>
+									<div class="setting-item mod-horizontal">
+										<div class="setting-item-info">
+											<label for="asr-download-dir">视频下载保存目录</label>
+											<div class="setting-item-description">留空则使用系统临时目录。填写绝对路径可保留到指定目录。</div>
+										</div>
+										<div class="setting-item-control setting-item-control-with-button">
+											<input type="text" id="asr-download-dir" placeholder="/Users/you/Downloads/clipper-asr" autocomplete="off" spellcheck="false" />
+											<button type="button" id="asr-choose-download-dir">选择</button>
+										</div>
+									</div>
+									<div class="setting-item mod-horizontal mod-toggle">
+										<div class="setting-item-info">
+											<label for="asr-delete-after-toggle">转录完成后自动删除视频</label>
+											<div class="setting-item-description">开启后转录成功或失败都会清理下载的视频和临时音频。</div>
+										</div>
+										<div class="setting-item-control">
+											<div class="checkbox-container">
+												<input type="checkbox" id="asr-delete-after-toggle" />
+											</div>
+										</div>
+									</div>
+								</div>
 								<div class="setting-item setting-item-heading"><h3 data-i18n="advanced">Advanced</h3></div>
 								<div class="setting-items">
 									<div class="setting-item mod-horizontal">

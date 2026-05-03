@@ -149,6 +149,17 @@ module.exports = (env, argv) => {
 					{ from: "src/highlights.html", to: "highlights.html" },
 					{ from: "src/reader.html", to: "reader.html" },
 					{ from: "src/icons", to: "icons" },
+					{
+						from: "native-host",
+						to: "native-host",
+						globOptions: {
+							ignore: [
+								"**/.env",
+								"**/__pycache__/**",
+								"**/*.pyc"
+							]
+						}
+					},
 					{ from: "node_modules/webextension-polyfill/dist/browser-polyfill.min.js", to: "browser-polyfill.min.js" },
 					{ from: "src/flatten-shadow-dom.js", to: "flatten-shadow-dom.js" },
 					{

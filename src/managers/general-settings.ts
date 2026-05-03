@@ -227,6 +227,7 @@ export function initializeGeneralSettings(): void {
 		initializeHighlighterSettings();
 		initializeExportHighlightsButton();
 		initializeSaveBehaviorDropdown();
+		initializeAsrSettings();
 		await initializeUsageChart();
 
 		// Initialize feedback modal close button
@@ -256,6 +257,13 @@ function saveSettingsFromForm(): void {
 	const highlighterToggle = document.getElementById('highlighter-toggle') as HTMLInputElement;
 	const alwaysShowHighlightsToggle = document.getElementById('highlighter-visibility') as HTMLInputElement;
 	const highlightBehaviorSelect = document.getElementById('highlighter-behavior') as HTMLSelectElement;
+	const asrProvider = document.getElementById('asr-provider') as HTMLSelectElement;
+	const asrBaseUrl = document.getElementById('asr-base-url') as HTMLInputElement;
+	const asrAppId = document.getElementById('asr-app-id') as HTMLInputElement;
+	const asrAccessToken = document.getElementById('asr-access-token') as HTMLInputElement;
+	const asrCluster = document.getElementById('asr-cluster') as HTMLInputElement;
+	const asrDownloadDir = document.getElementById('asr-download-dir') as HTMLInputElement;
+	const asrDeleteAfterToggle = document.getElementById('asr-delete-after-toggle') as HTMLInputElement;
 
 	const updatedSettings = {
 		...generalSettings, // Keep existing settings
@@ -266,7 +274,17 @@ function saveSettingsFromForm(): void {
 		silentOpen: silentOpenToggle?.checked ?? generalSettings.silentOpen,
 		highlighterEnabled: highlighterToggle?.checked ?? generalSettings.highlighterEnabled,
 		alwaysShowHighlights: alwaysShowHighlightsToggle?.checked ?? generalSettings.alwaysShowHighlights,
-		highlightBehavior: highlightBehaviorSelect?.value ?? generalSettings.highlightBehavior
+		highlightBehavior: highlightBehaviorSelect?.value ?? generalSettings.highlightBehavior,
+		asrSettings: {
+			...generalSettings.asrSettings,
+			provider: (asrProvider?.value as 'doubao') || generalSettings.asrSettings.provider,
+			baseUrl: asrBaseUrl?.value.trim() || generalSettings.asrSettings.baseUrl,
+			appId: asrAppId?.value.trim() ?? generalSettings.asrSettings.appId,
+			accessToken: asrAccessToken?.value.trim() ?? generalSettings.asrSettings.accessToken,
+			cluster: asrCluster?.value.trim() || generalSettings.asrSettings.cluster,
+			downloadDir: asrDownloadDir?.value.trim() ?? generalSettings.asrSettings.downloadDir,
+			deleteAfterTranscription: asrDeleteAfterToggle?.checked ?? generalSettings.asrSettings.deleteAfterTranscription,
+		}
 	};
 
 	saveSettings(updatedSettings);
@@ -370,6 +388,42 @@ function initializeSaveBehaviorDropdown(): void {
         const newValue = dropdown.value as 'addToObsidian' | 'copyToClipboard' | 'saveFile';
         saveSettings({ saveBehavior: newValue });
     });
+}
+
+function initializeAsrSettings(): void {
+	const settings = generalSettings.asrSettings;
+	const provider = document.getElementById('asr-provider') as HTMLSelectElement;
+	const baseUrl = document.getElementById('asr-base-url') as HTMLInputElement;
+	const appId = document.getElementById('asr-app-id') as HTMLInputElement;
+	const accessToken = document.getElementById('asr-access-token') as HTMLInputElement;
+	const cluster = document.getElementById('asr-cluster') as HTMLInputElement;
+	const downloadDir = document.getElementById('asr-download-dir') as HTMLInputElement;
+	const chooseDownloadDir = document.getElementById('asr-choose-download-dir') as HTMLButtonElement;
+	const deleteAfter = document.getElementById('asr-delete-after-toggle') as HTMLInputElement;
+
+	if (provider) provider.value = settings.provider;
+	if (baseUrl) baseUrl.value = settings.baseUrl;
+	if (appId) appId.value = settings.appId;
+	if (accessToken) accessToken.value = settings.accessToken;
+	if (cluster) cluster.value = settings.cluster;
+	if (downloadDir) downloadDir.value = settings.downloadDir;
+	if (deleteAfter) deleteAfter.checked = settings.deleteAfterTranscription;
+	if (chooseDownloadDir && downloadDir) {
+		chooseDownloadDir.addEventListener('click', async () => {
+			chooseDownloadDir.disabled = true;
+			try {
+				const response = await browser.runtime.sendMessage({ action: 'chooseAsrDownloadDir' }) as { ok?: boolean; path?: string; error?: string };
+				if (response?.ok && response.path) {
+					downloadDir.value = response.path;
+					saveSettingsFromForm();
+				} else if (response?.error) {
+					console.error(response.error);
+				}
+			} finally {
+				chooseDownloadDir.disabled = false;
+			}
+		});
+	}
 }
 
 export function resetDefaultTemplate(): void {

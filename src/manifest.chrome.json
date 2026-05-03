@@ -13,7 +13,8 @@
 		"sidePanel",
 		"storage",
 		"scripting",
-		"declarativeNetRequest"
+		"declarativeNetRequest",
+		"nativeMessaging"
 	],
 	"host_permissions": [
 		"<all_urls>",

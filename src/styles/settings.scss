@@ -106,6 +106,19 @@ label {
 .setting-item-control {
 	display: flex;
 	align-items: center;
+
+	&.setting-item-control-with-button {
+		gap: 0.5rem;
+
+		input {
+			min-width: 0;
+		}
+
+		button {
+			width: auto;
+			flex: 0 0 auto;
+		}
+	}
 }
 
 .setting-items {
