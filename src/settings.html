@@ -255,22 +255,11 @@
 									<div class="setting-item mod-horizontal">
 										<div class="setting-item-info">
 											<label for="asr-download-dir">视频下载保存目录</label>
-											<div class="setting-item-description">留空则使用系统临时目录。填写绝对路径可保留到指定目录。</div>
+											<div class="setting-item-description">留空则使用系统临时目录。转录结束后会自动删除下载的视频和临时音频。</div>
 										</div>
 										<div class="setting-item-control setting-item-control-with-button">
 											<input type="text" id="asr-download-dir" placeholder="/Users/you/Downloads/clipper-asr" autocomplete="off" spellcheck="false" />
 											<button type="button" id="asr-choose-download-dir">选择</button>
-										</div>
-									</div>
-									<div class="setting-item mod-horizontal mod-toggle">
-										<div class="setting-item-info">
-											<label for="asr-delete-after-toggle">转录完成后自动删除视频</label>
-											<div class="setting-item-description">开启后转录成功或失败都会清理下载的视频和临时音频。</div>
-										</div>
-										<div class="setting-item-control">
-											<div class="checkbox-container">
-												<input type="checkbox" id="asr-delete-after-toggle" />
-											</div>
 										</div>
 									</div>
 								</div>

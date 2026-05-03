@@ -76,7 +76,6 @@ def get_asr_settings(request: Dict[str, Any]) -> Dict[str, Any]:
 		"accessToken": settings.get("accessToken") or os.getenv("bean.record.asr.access-token") or "",
 		"cluster": settings.get("cluster") or os.getenv("bean.record.asr.cluster") or DEFAULT_ASR_CLUSTER,
 		"downloadDir": settings.get("downloadDir") or "",
-		"deleteAfterTranscription": settings.get("deleteAfterTranscription", True),
 	}
 
 
@@ -399,7 +398,6 @@ def transcribe_video(request: Dict[str, Any]) -> Dict[str, Any]:
 	request_title = request.get("title") or ""
 	load_env()
 	asr_settings = get_asr_settings(request)
-	delete_after = bool(asr_settings.get("deleteAfterTranscription", True))
 	download_dir = str(asr_settings.get("downloadDir") or "").strip()
 	base_dir = Path(download_dir).expanduser() if download_dir else Path(tempfile.gettempdir()) / "obsidian-clipper-video-asr"
 	output_dir = base_dir / str(platform or "video")
@@ -442,12 +440,11 @@ def transcribe_video(request: Dict[str, Any]) -> Dict[str, Any]:
 		}
 	finally:
 		shutil.rmtree(audio_dir, ignore_errors=True)
-		if delete_after:
-			if media_path and media_path.exists():
-				try:
-					media_path.unlink()
-				except OSError:
-					pass
+		if media_path and media_path.exists():
+			try:
+				media_path.unlink()
+			except OSError:
+				pass
 
 
 def main() -> None:

@@ -12,7 +12,6 @@ const DEFAULT_ASR_SETTINGS: AsrSettings = {
 	accessToken: '',
 	cluster: 'volc.bigasr.auc',
 	downloadDir: '',
-	deleteAfterTranscription: true,
 };
 const LEGACY_DEFAULT_ASR_CLUSTER = 'volc.seedasr.auc';
 
@@ -234,7 +233,6 @@ export async function loadSettings(): Promise<Settings> {
 			cluster: data.asr_settings?.cluster === LEGACY_DEFAULT_ASR_CLUSTER
 				? defaultSettings.asrSettings.cluster
 				: data.asr_settings?.cluster || defaultSettings.asrSettings.cluster,
-			deleteAfterTranscription: data.asr_settings?.deleteAfterTranscription ?? defaultSettings.asrSettings.deleteAfterTranscription,
 		},
 		stats: data.stats || defaultSettings.stats,
 		history: data.history || defaultSettings.history,
@@ -300,7 +298,6 @@ export async function saveSettings(settings?: Partial<Settings>): Promise<void> 
 			accessToken: generalSettings.asrSettings.accessToken,
 			cluster: generalSettings.asrSettings.cluster,
 			downloadDir: generalSettings.asrSettings.downloadDir,
-			deleteAfterTranscription: generalSettings.asrSettings.deleteAfterTranscription,
 		},
 		stats: generalSettings.stats
 	});

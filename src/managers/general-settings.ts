@@ -263,7 +263,6 @@ function saveSettingsFromForm(): void {
 	const asrAccessToken = document.getElementById('asr-access-token') as HTMLInputElement;
 	const asrCluster = document.getElementById('asr-cluster') as HTMLInputElement;
 	const asrDownloadDir = document.getElementById('asr-download-dir') as HTMLInputElement;
-	const asrDeleteAfterToggle = document.getElementById('asr-delete-after-toggle') as HTMLInputElement;
 
 	const updatedSettings = {
 		...generalSettings, // Keep existing settings
@@ -283,7 +282,6 @@ function saveSettingsFromForm(): void {
 			accessToken: asrAccessToken?.value.trim() ?? generalSettings.asrSettings.accessToken,
 			cluster: asrCluster?.value.trim() || generalSettings.asrSettings.cluster,
 			downloadDir: asrDownloadDir?.value.trim() ?? generalSettings.asrSettings.downloadDir,
-			deleteAfterTranscription: asrDeleteAfterToggle?.checked ?? generalSettings.asrSettings.deleteAfterTranscription,
 		}
 	};
 
@@ -399,7 +397,6 @@ function initializeAsrSettings(): void {
 	const cluster = document.getElementById('asr-cluster') as HTMLInputElement;
 	const downloadDir = document.getElementById('asr-download-dir') as HTMLInputElement;
 	const chooseDownloadDir = document.getElementById('asr-choose-download-dir') as HTMLButtonElement;
-	const deleteAfter = document.getElementById('asr-delete-after-toggle') as HTMLInputElement;
 
 	if (provider) provider.value = settings.provider;
 	if (baseUrl) baseUrl.value = settings.baseUrl;
@@ -407,7 +404,6 @@ function initializeAsrSettings(): void {
 	if (accessToken) accessToken.value = settings.accessToken;
 	if (cluster) cluster.value = settings.cluster;
 	if (downloadDir) downloadDir.value = settings.downloadDir;
-	if (deleteAfter) deleteAfter.checked = settings.deleteAfterTranscription;
 	if (chooseDownloadDir && downloadDir) {
 		chooseDownloadDir.addEventListener('click', async () => {
 			chooseDownloadDir.disabled = true;

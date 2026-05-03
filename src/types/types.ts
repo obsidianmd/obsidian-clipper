@@ -77,7 +77,6 @@ export interface AsrSettings {
 	accessToken: string;
 	cluster: string;
 	downloadDir: string;
-	deleteAfterTranscription: boolean;
 }
 
 export interface Settings {

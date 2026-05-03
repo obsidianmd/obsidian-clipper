@@ -47,7 +47,6 @@ export const generalSettings: Settings = {
 		accessToken: '',
 		cluster: 'volc.bigasr.auc',
 		downloadDir: '',
-		deleteAfterTranscription: true,
 	},
 	stats: {
 		addToObsidian: 0,
