@@ -13,6 +13,7 @@ import { debugLog } from './utils/debug';
 import { updateSidebarWidth, addResizeHandle, cleanupResizeHandlers } from './utils/iframe-resize';
 import { parseForClip } from './utils/clip-utils';
 import { isBilibiliUrl, fetchBilibiliTranscript, type BilibiliTranscriptResult } from './utils/bilibili';
+import { isDouyinUrl, fetchDouyinTranscript, type DouyinTranscriptResult } from './utils/douyin';
 
 declare global {
 	interface Window {
@@ -59,6 +60,21 @@ declare global {
 				});
 		}
 		return bilibiliFetchPromise;
+	}
+
+	// Cached Douyin enrichment result
+	let cachedDouyinResult: DouyinTranscriptResult | null = null;
+
+	function getDouyinResult(): DouyinTranscriptResult | null {
+		if (!isDouyinUrl(document.URL)) return null;
+		if (!cachedDouyinResult) {
+			try {
+				cachedDouyinResult = fetchDouyinTranscript(document.URL);
+			} catch (e) {
+				debugLog('Clipper', 'Douyin parse failed:', e);
+			}
+		}
+		return cachedDouyinResult;
 	}
 
 	function removeContainer(container: HTMLElement) {
@@ -181,8 +197,9 @@ declare global {
 			flattenShadowDom(document).then(async () => {
 				try {
 					const bilibiliResult = await ensureBilibiliResult();
+					const douyinResult = getDouyinResult();
 					const defuddled = parseForClip(document);
-					const clipContent = bilibiliResult?.content || defuddled.content;
+					const clipContent = bilibiliResult?.content || douyinResult?.content || defuddled.content;
 					const markdown = createMarkdownContent(clipContent, document.URL);
 
 					const textArea = document.createElement("textarea");
@@ -205,8 +222,9 @@ declare global {
 			flattenShadowDom(document).then(async () => {
 				try {
 					const bilibiliResult = await ensureBilibiliResult();
+					const douyinResult = getDouyinResult();
 					const defuddled = parseForClip(document);
-					const clipContent = bilibiliResult?.content || defuddled.content;
+					const clipContent = bilibiliResult?.content || douyinResult?.content || defuddled.content;
 					const markdown = createMarkdownContent(clipContent, document.URL);
 					const title = defuddled.title || document.title || 'Untitled';
 					const fileName = title.replace(/[/\\?%*:|"<>]/g, '-');
@@ -263,6 +281,33 @@ declare global {
 						}
 						if (bilibiliResult.subtitleLang) {
 							extractedContent['subtitle_lang'] = bilibiliResult.subtitleLang;
+						}
+						// Map to standard published/created variables
+						if (bilibiliResult.publishTime) {
+							extractedContent['published'] = bilibiliResult.publishTime;
+							extractedContent['created'] = bilibiliResult.publishTime;
+						}
+					}
+				}
+
+				// For Douyin video pages, use page-embedded data
+				if (isDouyinUrl(document.URL)) {
+					const douyinResult = getDouyinResult();
+					if (douyinResult) {
+						contentHtml = douyinResult.content;
+						if (douyinResult.transcriptText) {
+							extractedContent['transcript'] = douyinResult.transcriptText;
+						}
+						if (douyinResult.subtitleLang) {
+							extractedContent['subtitle_lang'] = douyinResult.subtitleLang;
+						}
+						if (douyinResult.uploadDate) {
+							extractedContent['upload_date'] = douyinResult.uploadDate;
+							extractedContent['published'] = douyinResult.uploadDate;
+						}
+						if (douyinResult.publishTime) {
+							extractedContent['publish_time'] = douyinResult.publishTime;
+							extractedContent['created'] = douyinResult.publishTime;
 						}
 					}
 				}
@@ -357,6 +402,16 @@ declare global {
 					sendResponse({ transcriptText: '', content: '' });
 				});
 				return true;
+			} else {
+				sendResponse({ transcriptText: '', content: '' });
+			}
+		} else if (request.action === "fetchDouyinTranscriptAction") {
+			const douyinResult = getDouyinResult();
+			if (douyinResult) {
+				sendResponse({
+					transcriptText: douyinResult.transcriptText,
+					content: douyinResult.content,
+				});
 			} else {
 				sendResponse({ transcriptText: '', content: '' });
 			}

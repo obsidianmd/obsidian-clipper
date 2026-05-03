@@ -748,6 +748,21 @@ async function refreshFields(tabId: number, { checkTemplateTriggers = true, rebu
 						}
 					}).catch(() => {});
 				}
+
+				// Fetch Douyin transcript asynchronously if on a Douyin page
+				if (tab.url && tab.url.includes('douyin.com') && !currentVariables['{{transcript}}']) {
+					browser.runtime.sendMessage({
+						action: 'sendMessageToTab',
+						tabId,
+						message: { action: 'fetchDouyinTranscriptAction' }
+					}).then((raw: unknown) => {
+						const douyinData = raw as { transcriptText?: string; content?: string } | undefined;
+						if (douyinData?.transcriptText) {
+							currentVariables['{{transcript}}'] = douyinData.transcriptText;
+							fillTemplateFieldValues(tabId, currentTemplate, currentVariables, extractedData.schemaOrgData);
+						}
+					}).catch(() => {});
+				}
 			} else {
 				throw new Error('Unable to initialize page content.');
 			}

@@ -38,6 +38,7 @@ const VIEWPORT = 'width=device-width, initial-scale=1, maximum-scale=1';
 import { ReaderSettings } from '../types/types';
 import { wireTranscript } from './reader-transcript';
 import { isBilibiliUrl, fetchBilibiliTranscript } from './bilibili';
+import { isDouyinUrl, parseDouyinTranscriptFromDocument } from './douyin';
 
 interface ReaderContent {
 	content: string;
@@ -2334,6 +2335,27 @@ export class Reader {
 				}
 			}
 
+			// On Douyin, inject video and transcript into article
+			if (isDouyinUrl(doc.URL)) {
+				try {
+					const douyinResult = parseDouyinTranscriptFromDocument(doc, doc.URL);
+					if (douyinResult) {
+						const embedContainer = doc.createElement('div');
+						embedContainer.className = 'reader-video-wrapper';
+						setElementHTML(embedContainer, douyinResult.embedHtml);
+						article.insertBefore(embedContainer, article.firstChild);
+
+						if (douyinResult.transcriptHtml) {
+							const transcriptContainer = doc.createElement('div');
+							setElementHTML(transcriptContainer, douyinResult.transcriptHtml);
+							article.appendChild(transcriptContainer);
+						}
+					}
+				} catch (e) {
+					console.error('Reader', 'Failed to fetch Douyin transcript:', e);
+				}
+			}
+
 			// Store original article HTML before wireTranscript modifies
 			// the DOM (moves timestamps, wraps text, adds scrub track).
 			this.storeOriginalHtml(article);
@@ -2726,6 +2748,27 @@ export class Reader {
 				}
 			} catch (e) {
 				console.error('Reader', 'Failed to fetch Bilibili transcript:', e);
+			}
+		}
+
+		// On Douyin, inject video and transcript into article
+		if (isDouyinUrl(doc.URL)) {
+			try {
+			const douyinResult = parseDouyinTranscriptFromDocument(doc, doc.URL);
+				if (douyinResult) {
+					const embedContainer = doc.createElement('div');
+					embedContainer.className = 'reader-video-wrapper';
+					setElementHTML(embedContainer, douyinResult.embedHtml);
+					article.insertBefore(embedContainer, article.firstChild);
+
+					if (douyinResult.transcriptHtml) {
+						const transcriptContainer = doc.createElement('div');
+						setElementHTML(transcriptContainer, douyinResult.transcriptHtml);
+						article.appendChild(transcriptContainer);
+					}
+				}
+			} catch (e) {
+				console.error('Reader', 'Failed to fetch Douyin transcript:', e);
 			}
 		}
 
