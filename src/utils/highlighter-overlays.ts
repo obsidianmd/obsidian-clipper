@@ -103,31 +103,217 @@ function findTextNodeAtOffset(element: Element, offset: number): { node: Node, o
 	return null;
 }
 
-export function renderTextHighlight(highlight: { id: string; xpath: string; startOffset: number; endOffset: number }): void {
-	const hl = ensureUserHighlight();
-	if (!hl) return;
+function getHighlightExactText(highlight: {
+	textQuote?: { exact: string; prefix: string; suffix: string };
+	content: string;
+}): string {
+	return normalizeQuoteText(highlight.textQuote?.exact || htmlToText(highlight.content));
+}
+
+function rangeMatchesHighlight(range: Range, highlight: {
+	textQuote?: { exact: string; prefix: string; suffix: string };
+	content: string;
+}): boolean {
+	const exact = getHighlightExactText(highlight);
+	if (!exact) return true;
+	return normalizeQuoteText(range.toString()) === exact;
+}
+
+function rangeFromElementOffsets(highlight: {
+	xpath: string;
+	startOffset: number;
+	endOffset: number;
+	content: string;
+	textQuote?: { exact: string; prefix: string; suffix: string };
+}): Range | null {
 	const container = getElementByXPath(highlight.xpath);
-	if (!container) return;
+	if (!container) return null;
 	const start = findTextNodeAtOffset(container, highlight.startOffset);
 	const end = findTextNodeAtOffset(container, highlight.endOffset);
-	if (!start || !end) return;
+	if (!start || !end) return null;
 	try {
 		const range = document.createRange();
 		range.setStart(start.node, start.offset);
 		range.setEnd(end.node, end.offset);
-		if (range.collapsed) return;
-		hl.add(range);
-		const existing = textHighlightRanges.get(highlight.id);
-		if (existing) existing.push(range);
-		else textHighlightRanges.set(highlight.id, [range]);
+		if (range.collapsed || !rangeMatchesHighlight(range, highlight)) return null;
+		return range;
 	} catch (e) {
-		console.warn('Failed to build Range for text highlight', highlight.id, e);
+		console.warn('Failed to build Range for text highlight', e);
+		return null;
 	}
+}
+
+interface TextPosition {
+	node: Node;
+	startOffset: number;
+	endOffset: number;
+}
+
+interface NormalizedTextIndex {
+	text: string;
+	positions: TextPosition[];
+}
+
+let normalizedTextIndexCache: NormalizedTextIndex | null = null;
+let normalizedTextIndexRoot: Element | null = null;
+
+function getTextSearchRoot(): Element {
+	return document.querySelector('.obsidian-reader-content article')
+		|| document.querySelector('article')
+		|| document.body;
+}
+
+function isIgnoredTextNode(node: Node): boolean {
+	const parent = node.parentElement;
+	if (!parent) return true;
+	return Boolean(parent.closest('script, style, noscript, .obsidian-highlighter-menu, .obsidian-reader-settings, .obsidian-highlight-delete, .obsidian-selection-action'));
+}
+
+function buildNormalizedTextIndex(root: Element): NormalizedTextIndex {
+	const positions: TextPosition[] = [];
+	let text = '';
+	let previousWasWhitespace = true;
+	const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+		acceptNode: (node) => {
+			if (!node.textContent || !node.textContent.trim() || isIgnoredTextNode(node)) {
+				return NodeFilter.FILTER_REJECT;
+			}
+			return NodeFilter.FILTER_ACCEPT;
+		},
+	});
+
+	let node: Node | null = walker.nextNode();
+	while (node) {
+		const value = node.textContent || '';
+		for (let i = 0; i < value.length; i++) {
+			const char = value[i];
+			if (/\s/.test(char)) {
+				if (!previousWasWhitespace) {
+					text += ' ';
+					positions.push({ node, startOffset: i, endOffset: i + 1 });
+					previousWasWhitespace = true;
+				}
+			} else {
+				text += char;
+				positions.push({ node, startOffset: i, endOffset: i + 1 });
+				previousWasWhitespace = false;
+			}
+		}
+		node = walker.nextNode();
+	}
+
+	if (text.endsWith(' ')) {
+		text = text.slice(0, -1);
+		positions.pop();
+	}
+	return { text, positions };
+}
+
+function getNormalizedTextIndex(): NormalizedTextIndex {
+	const root = getTextSearchRoot();
+	if (normalizedTextIndexCache && normalizedTextIndexRoot === root && root.isConnected) {
+		return normalizedTextIndexCache;
+	}
+	normalizedTextIndexRoot = root;
+	normalizedTextIndexCache = buildNormalizedTextIndex(root);
+	return normalizedTextIndexCache;
+}
+
+function normalizeQuoteText(text: string): string {
+	return text.replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+function htmlToText(html: string): string {
+	const parsed = new DOMParser().parseFromString(html, 'text/html');
+	return parsed.body.textContent || html;
+}
+
+function commonPrefixLength(a: string, b: string): number {
+	const max = Math.min(a.length, b.length);
+	let i = 0;
+	while (i < max && a[i] === b[i]) i++;
+	return i;
+}
+
+function commonSuffixLength(a: string, b: string): number {
+	const max = Math.min(a.length, b.length);
+	let i = 0;
+	while (i < max && a[a.length - 1 - i] === b[b.length - 1 - i]) i++;
+	return i;
+}
+
+function rangeFromNormalizedOffsets(index: NormalizedTextIndex, start: number, end: number): Range | null {
+	if (start < 0 || end <= start || end > index.positions.length) return null;
+	const startPos = index.positions[start];
+	const endPos = index.positions[end - 1];
+	if (!startPos || !endPos) return null;
+	try {
+		const range = document.createRange();
+		range.setStart(startPos.node, startPos.startOffset);
+		range.setEnd(endPos.node, endPos.endOffset);
+		return range.collapsed ? null : range;
+	} catch (e) {
+		console.warn('Failed to build Range from text quote', e);
+		return null;
+	}
+}
+
+function rangeFromTextQuote(highlight: {
+	textQuote?: { exact: string; prefix: string; suffix: string };
+	content: string;
+}): Range | null {
+	const exact = getHighlightExactText(highlight);
+	if (!exact) return null;
+
+	const index = getNormalizedTextIndex();
+	const prefix = normalizeQuoteText(highlight.textQuote?.prefix || '');
+	const suffix = normalizeQuoteText(highlight.textQuote?.suffix || '');
+
+	let bestStart = -1;
+	let bestScore = -1;
+	let searchFrom = 0;
+	while (searchFrom <= index.text.length) {
+		const start = index.text.indexOf(exact, searchFrom);
+		if (start === -1) break;
+
+		const before = index.text.slice(Math.max(0, start - prefix.length), start);
+		const after = index.text.slice(start + exact.length, start + exact.length + suffix.length);
+		const score = commonSuffixLength(before, prefix) + commonPrefixLength(after, suffix);
+
+		if (score > bestScore) {
+			bestScore = score;
+			bestStart = start;
+		}
+		searchFrom = start + Math.max(1, exact.length);
+	}
+
+	if (bestStart === -1) return null;
+	return rangeFromNormalizedOffsets(index, bestStart, bestStart + exact.length);
+}
+
+export function renderTextHighlight(highlight: {
+	id: string;
+	xpath: string;
+	startOffset: number;
+	endOffset: number;
+	content: string;
+	textQuote?: { exact: string; prefix: string; suffix: string };
+}): void {
+	const hl = ensureUserHighlight();
+	if (!hl) return;
+	const range = rangeFromElementOffsets(highlight) || rangeFromTextQuote(highlight);
+	if (!range) return;
+	hl.add(range);
+	const existing = textHighlightRanges.get(highlight.id);
+	if (existing) existing.push(range);
+	else textHighlightRanges.set(highlight.id, [range]);
 }
 
 export function clearTextHighlights(): void {
 	userHighlight?.clear();
 	textHighlightRanges.clear();
+	normalizedTextIndexCache = null;
+	normalizedTextIndexRoot = null;
 }
 
 function findOverlayAtPoint(x: number, y: number): HTMLElement | null {
@@ -362,11 +548,12 @@ export function handleTouchMove(event: TouchEvent) {
 // Render one highlight. Text highlights go through the CSS Custom Highlight
 // API; element highlights (figure, img, table, pre, picture) get one overlay
 // div positioned over the target element.
-export function planHighlightOverlayRects(target: Element, highlight: AnyHighlightData) {
+export function planHighlightOverlayRects(target: Element | null, highlight: AnyHighlightData) {
 	if (highlight.type === 'text') {
 		renderTextHighlight(highlight);
 		return;
 	}
+	if (!target) return;
 	const rect = target.getBoundingClientRect();
 	const overlay = document.createElement('div');
 	overlay.className = 'obsidian-highlight-overlay';

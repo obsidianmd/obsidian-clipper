@@ -208,10 +208,17 @@ export interface HighlightData {
 	groupId?: string;
 }
 
+export interface TextQuoteAnchor {
+	exact: string;
+	prefix: string;
+	suffix: string;
+}
+
 export interface TextHighlightData extends HighlightData {
 	type: 'text';
 	startOffset: number;
 	endOffset: number;
+	textQuote?: TextQuoteAnchor;
 }
 
 export interface ElementHighlightData extends HighlightData {
@@ -716,6 +723,7 @@ function getHighlightRanges(range: Range): AnyHighlightData[] {
 				id: `${timestamp}_tx_${i}`,
 				startOffset: getTextOffset(blockElement, blockRange.startContainer, blockRange.startOffset),
 				endOffset: getTextOffset(blockElement, blockRange.endContainer, blockRange.endOffset),
+				textQuote: createTextQuoteAnchor(blockElement, blockRange),
 			});
 		} catch (e) {
 			console.warn('Error creating text highlight for block:', blockElement, e);
@@ -851,6 +859,34 @@ function getTextOffset(container: Element, targetNode: Node, targetOffset: numbe
 	return offset;
 }
 
+const TEXT_QUOTE_CONTEXT_LENGTH = 64;
+
+function createTextQuoteAnchor(container: Element, range: Range): TextQuoteAnchor | undefined {
+	const exact = range.toString();
+	if (!exact.trim()) return undefined;
+
+	const startOffset = getTextOffset(container, range.startContainer, range.startOffset);
+	const endOffset = getTextOffset(container, range.endContainer, range.endOffset);
+	const containerText = container.textContent || '';
+
+	return {
+		exact,
+		prefix: containerText.slice(Math.max(0, startOffset - TEXT_QUOTE_CONTEXT_LENGTH), startOffset),
+		suffix: containerText.slice(endOffset, endOffset + TEXT_QUOTE_CONTEXT_LENGTH),
+	};
+}
+
+function createTextQuoteAnchorFromOffsets(container: Element, startOffset: number, endOffset: number): TextQuoteAnchor | undefined {
+	const containerText = container.textContent || '';
+	const exact = containerText.slice(startOffset, endOffset);
+	if (!exact.trim()) return undefined;
+	return {
+		exact,
+		prefix: containerText.slice(Math.max(0, startOffset - TEXT_QUOTE_CONTEXT_LENGTH), startOffset),
+		suffix: containerText.slice(endOffset, endOffset + TEXT_QUOTE_CONTEXT_LENGTH),
+	};
+}
+
 function addHighlight(highlight: AnyHighlightData, notes?: string[]) {
 	const oldHighlights = [...highlights];
 	const newHighlight = { ...highlight, notes: notes || [] };
@@ -965,6 +1001,7 @@ function mergeHighlights(h1: AnyHighlightData, h2: AnyHighlightData): AnyHighlig
 				id: Date.now().toString(),
 				startOffset,
 				endOffset,
+				...(el ? { textQuote: createTextQuoteAnchorFromOffsets(el, startOffset, endOffset) } : {}),
 				...(notes.length > 0 ? { notes } : {}),
 				...(groupId ? { groupId } : {}),
 			};
@@ -1037,7 +1074,7 @@ export function applyHighlights() {
 
 	highlights.forEach((highlight) => {
 		const container = getElementByXPath(highlight.xpath);
-		if (container) {
+		if (container || highlight.type === 'text') {
 			planHighlightOverlayRects(container, highlight);
 		}
 	});
@@ -1199,6 +1236,10 @@ function migrateStoredHighlights(): boolean {
 					h.endOffset -= len;
 					changed = true;
 				}
+				if (!h.textQuote) {
+					h.textQuote = createTextQuoteAnchorFromOffsets(el, h.startOffset, h.endOffset);
+					if (h.textQuote) changed = true;
+				}
 			}
 		}
 	}
@@ -1313,4 +1354,3 @@ function findLastTextNode(element: Element): Text | null {
 	}
 	return lastNode as Text | null;
 }
-
