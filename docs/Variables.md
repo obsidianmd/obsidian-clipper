@@ -35,8 +35,13 @@ The main content variable is `{{content}}`, which contains the article content, 
 | `{{site}}`          | Site name or publisher                                                                 |
 | `{{title}}`         | Title of the page                                                                      |
 | `{{time}}`          | Current date and time                                                                  |
+| `{{transcript}}`    | Transcript from supported video pages, when available or generated manually            |
 | `{{url}}`           | Current URL                                                                            |
 | `{{words}}`         | Word count                                                                             |
+
+### Video transcripts
+
+On supported video pages, Web Clipper can populate `{{transcript}}` automatically when page subtitles are available, or manually through the video transcription control in the clipper popup. Manual transcription currently supports Douyin, YouTube, and Bilibili. If a transcript is generated manually, Web Clipper also appends a **Transcript** section to `{{content}}`.
 
 ## Prompt variables
 
@@ -117,4 +122,3 @@ Nested properties and array access work as well, both with and without the schem
 - `{{schema:author.name}}` will find the first `author` property and then access its `name` sub-property.
 - `{{schema:author[0].name}}` will access the `name` of the first author in an array of authors.
 - `{{schema:author[*].name}}` will return an array of all author names.
-

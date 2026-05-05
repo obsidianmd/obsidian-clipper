@@ -94,6 +94,10 @@ Or run in watch mode during development:
 npm run test:watch
 ```
 
+### Local video transcription host
+
+The manual video transcription feature uses a native messaging host for local media download and audio extraction. See [`native-host/README.md`](native-host/README.md) for macOS setup, required dependencies, and Doubao ASR configuration.
+
 ## Third-party libraries
 
 - [webextension-polyfill](https://github.com/mozilla/webextension-polyfill) for browser compatibility
