@@ -8,6 +8,7 @@ import Defuddle from 'defuddle';
 import { createMarkdownContent } from 'defuddle/full';
 import { flattenShadowDom } from './utils/flatten-shadow-dom';
 import { serializeChildren } from './utils/dom-utils';
+import { applyHighlightsToDocument, unwrapHighlightMarks } from './utils/highlight-marker';
 import { saveFile } from './utils/file-utils';
 import { debugLog } from './utils/debug';
 import { updateSidebarWidth, addResizeHandle, cleanupResizeHandlers } from './utils/iframe-resize';
@@ -211,14 +212,31 @@ declare global {
 					selectedHtml = serializeChildren(div);
 				}
 
-				// Use parseAsync to ensure async variables like {{transcript}} are available.
-				// If it hangs (e.g. another extension has corrupted fetch), fall back to sync parse.
-				const defuddle = new Defuddle(document, { url: document.URL });
-				const parseTimeout = new Promise<never>((_, reject) =>
-					setTimeout(() => reject(new Error('parseAsync timeout')), 8000)
-				);
-				const defuddled = await Promise.race([defuddle.parseAsync(), parseTimeout])
-					.catch(() => defuddle.parse());
+				// Insert <mark> tags around stored highlights BEFORE Defuddle
+				// reads the DOM, so it carries them straight into the cleaned
+				// HTML. Defuddle converts <mark> to ==…== for the markdown
+				// output. We unwrap below so the live page is left untouched.
+				const shouldMarkHighlights =
+					generalSettings.highlighterEnabled &&
+					generalSettings.highlightBehavior === 'highlight-inline' &&
+					highlighter.highlights.length > 0;
+				const markInsertions = shouldMarkHighlights
+					? applyHighlightsToDocument(document, highlighter.highlights)
+					: [];
+
+				let defuddled;
+				try {
+					// Use parseAsync to ensure async variables like {{transcript}} are available.
+					// If it hangs (e.g. another extension has corrupted fetch), fall back to sync parse.
+					const defuddle = new Defuddle(document, { url: document.URL });
+					const parseTimeout = new Promise<never>((_, reject) =>
+						setTimeout(() => reject(new Error('parseAsync timeout')), 8000)
+					);
+					defuddled = await Promise.race([defuddle.parseAsync(), parseTimeout])
+						.catch(() => defuddle.parse());
+				} finally {
+					unwrapHighlightMarks(markInsertions);
+				}
 				const extractedContent: { [key: string]: string } = {
 					...defuddled.variables,
 				};
