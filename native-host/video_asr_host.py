@@ -303,17 +303,41 @@ def normalize_utterances(result: Dict[str, Any]) -> List[Dict[str, Any]]:
 	return []
 
 
+def get_utterance_speaker(item: Dict[str, Any]) -> str:
+	for key in ("speaker", "speaker_id", "speakerId"):
+		value = item.get(key)
+		if value is not None and str(value).strip() != "":
+			return str(value).strip()
+	speaker_info = item.get("speaker_info") or item.get("speakerInfo") or item.get("additions")
+	if isinstance(speaker_info, dict):
+		for key in ("speaker", "speaker_id", "speakerId", "id"):
+			value = speaker_info.get(key)
+			if value is not None and str(value).strip() != "":
+				return str(value).strip()
+	return ""
+
+
 def format_transcript(result: Dict[str, Any]) -> Tuple[str, List[Dict[str, Any]]]:
 	utterances = normalize_utterances(result)
 	if utterances:
 		segments = []
 		lines = []
+		speaker_labels: Dict[str, str] = {}
 		for item in utterances:
 			text = str(item.get("text") or "").strip()
 			start = int(item.get("start_time") or 0)
 			end = int(item.get("end_time") or start)
-			segments.append({"start": start / 1000, "end": end / 1000, "text": text})
-			lines.append(f"{format_timestamp(start)} · {text}")
+			raw_speaker = get_utterance_speaker(item)
+			speaker = ""
+			if raw_speaker:
+				speaker = speaker_labels.setdefault(raw_speaker, f"Speaker {len(speaker_labels) + 1}")
+			segment = {"start": start / 1000, "end": end / 1000, "text": text}
+			if speaker:
+				segment["speaker"] = speaker
+				lines.append(f"{format_timestamp(start)} · {speaker}: {text}")
+			else:
+				lines.append(f"{format_timestamp(start)} · {text}")
+			segments.append(segment)
 		return "\n".join(lines), segments
 
 	text = str(result.get("text") or "").strip()
@@ -353,7 +377,7 @@ def transcribe_audio(audio_path: Path, asr_settings: Dict[str, Any]) -> Tuple[st
 	payload = {
 		"user": {"uid": app_id},
 		"audio": {"data": audio_data, "format": audio_path.suffix.lstrip(".") or "mp3"},
-		"request": {"model_name": "bigmodel"},
+		"request": {"model_name": "bigmodel", "show_utterances": True, "enable_speaker_info": True},
 	}
 	response = requests.post(f"{api_base_url}/recognize/flash", json=payload, headers=headers, timeout=120)
 	if not response.ok:
