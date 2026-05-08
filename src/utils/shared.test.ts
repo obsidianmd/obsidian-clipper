@@ -120,12 +120,10 @@ describe('buildVariables', () => {
 		expect(vars['{{highlights}}']).toBe('[{"text":"highlight"}]');
 	});
 
-	test('produces date and time in ISO-like format', () => {
+	test('produces separate date and time variables', () => {
 		const vars = buildVariables(makeParams());
-		// Both should be identical timestamps
-		expect(vars['{{date}}']).toBe(vars['{{time}}']);
-		// Should match YYYY-MM-DDTHH:mm:ssZ pattern
-		expect(vars['{{date}}']).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/);
+		expect(vars['{{date}}']).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+		expect(vars['{{time}}']).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/);
 	});
 
 	test('adds extracted content as template variables', () => {
