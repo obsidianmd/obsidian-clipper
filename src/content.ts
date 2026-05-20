@@ -93,7 +93,7 @@ declare global {
 		extractedContent: { [key: string]: string };
 		schemaOrgData: any;
 		fullHtml: string;
-		highlights: string[];
+		highlights: string[] | highlighter.AnyHighlightData[];
 		title: string;
 		description: string;
 		domain: string;

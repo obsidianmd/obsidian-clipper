@@ -200,6 +200,7 @@ const TEXT_BLOCK_SPLIT_TAGS = [
 
 export interface HighlightData {
 	id: string;
+	// xpath from the original html DOM page that the highlight was created on
 	xpath: string;
 	content: string;
 	notes?: string[]; // Annotations
@@ -1055,8 +1056,8 @@ function commitHighlightChanges() {
 	updateHighlighterMenu();
 }
 
-export function getHighlights(): string[] {
-	return highlights.map(h => h.content);
+export function getHighlights(): string[] | AnyHighlightData[] {
+	return highlights;
 }
 
 // Group highlights that share a groupId (produced by a single multi-block

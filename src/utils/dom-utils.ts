@@ -86,8 +86,35 @@ export function isDarkColor(color: string): boolean {
 	return brightness < 128;
 }
 
+// Locate the text node containing a given character offset within an element.
+// Offsets are natural character positions in the element's concatenated text.
+// Returns null only if the element has no text descendants; otherwise clamps
+// to the last text node's end when the offset overruns.
+function findTextNodeAtOffset(element: Element, offset: number): { node: Node, offset: number } | null {
+	// Skip the root — TreeWalker.currentNode starts there and the loop would
+	// otherwise treat the whole element as a single text node (see the
+	// mirror-image comment on getTextOffset in highlighter.ts).
+	const treeWalker = element.ownerDocument.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+	let currentOffset = 0;
+	let lastTextNode: Node | null = null;
+	let node: Node | null = treeWalker.nextNode();
+	while (node) {
+		const nodeLength = node.textContent?.length || 0;
+		if (currentOffset + nodeLength >= offset) {
+			return { node, offset: Math.max(0, offset - currentOffset) };
+		}
+		lastTextNode = node;
+		currentOffset += nodeLength;
+		node = treeWalker.nextNode();
+	}
+	if (lastTextNode) {
+		return { node: lastTextNode, offset: lastTextNode.textContent?.length ?? 0 };
+	}
+	return null;
+}
+
 export function wrapElementWithMark(element: Element): void {
-	const mark = document.createElement('mark');
+	const mark = element.ownerDocument.createElement('mark');
 
 	while (element.firstChild) {
 		mark.appendChild(element.firstChild);
@@ -96,38 +123,32 @@ export function wrapElementWithMark(element: Element): void {
 	element.appendChild(mark);
 }
 
-export function wrapTextWithMark(element: Element, highlight: { startOffset: number; endOffset: number }): void {
-	const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
-	let currentOffset = 0;
-	let startNode = null;
-	let endNode = null;
-	let startOffset = 0;
-	let endOffset = 0;
-	
-	let node;
-	while (node = walker.nextNode() as Text) {
-		const length = node.length;
-		
-		if (!startNode && currentOffset + length > highlight.startOffset) {
-			startNode = node;
-			startOffset = highlight.startOffset - currentOffset;
-		}
-		
-		if (!endNode && currentOffset + length >= highlight.endOffset) {
-			endNode = node;
-			endOffset = highlight.endOffset - currentOffset;
-			break;
-		}
-		
-		currentOffset += length;
-	}
-	
-	if (startNode && endNode) {
-		const range = document.createRange();
-		range.setStart(startNode, startOffset);
-		range.setEnd(endNode, endOffset);
-		
-		const mark = document.createElement('mark');
-		range.surroundContents(mark);
+export function wrapTextWithMark(container: Element | null, highlight: { id: string; xpath: string; startOffset: number; endOffset: number }): void {
+	if (!container) return;
+
+	const start = findTextNodeAtOffset(container, highlight.startOffset);
+	const end = findTextNodeAtOffset(container, highlight.endOffset);
+	if (!start || !end) return;
+
+	try {
+		const range = container.ownerDocument.createRange();
+		range.setStart(start.node, start.offset);
+		range.setEnd(end.node, end.offset);
+		if (range.collapsed) return;
+
+		// 1. Create the <mark> element
+		const mark = container.ownerDocument.createElement('mark');
+
+		// 2. Extract the content of the range and place it inside the <mark> tag
+		// We use range.extractContents() instead of range.surroundContents(mark) 
+		// because surroundContents will crash if the selection crosses HTML boundaries 
+		// (e.g. wrapping across <i>, <strong>, <em>, or links).
+		const fragment = range.extractContents();
+		mark.appendChild(fragment);
+
+		// 3. Insert the wrapped mark element back into the DOM where the selection started
+		range.insertNode(mark);
+	} catch (e) {
+		console.warn('Failed to wrap <mark> tag for text highlight', highlight.id, e);
 	}
 }
