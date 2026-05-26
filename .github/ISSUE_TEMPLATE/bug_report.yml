@@ -7,10 +7,10 @@ body:
   - type: checkboxes
     id: content
     attributes:
-      label: Is this a content-related issue? (e.g. missing content)
-      description: Web Clipper uses [Defuddle](https://github.com/kepano/defuddle) to parse web pages. If the issue is related to missing content or incorrect content, please open the issue on the Defuddle repo.
+      label: Is this issue related to missing content or incorrect conversion to Markdown?
+      description: Web Clipper uses [Defuddle](https://github.com/kepano/defuddle) to convert web pages to Markdown. If the issue is related to missing content or incorrect content, please open the issue on the Defuddle repo, not Web Clipper.
       options:
-        - label: This is a Web Clipper bug.
+        - label: No. This is not a content issue.
           required: true
 
   - type: checkboxes
