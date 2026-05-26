@@ -37,6 +37,7 @@ const VIEWPORT = 'width=device-width, initial-scale=1, maximum-scale=1';
 
 import { ReaderSettings } from '../types/types';
 import { wireTranscript } from './reader-transcript';
+import { isBilibiliUrl, fetchBilibiliTranscript } from './bilibili';
 
 interface ReaderContent {
 	content: string;
@@ -2310,6 +2311,29 @@ export class Reader {
 				}
 			}
 
+			// On Bilibili, inject embed and transcript into article
+			if (isBilibiliUrl(doc.URL)) {
+				try {
+					const biliResult = await fetchBilibiliTranscript(doc.URL);
+					if (biliResult) {
+						// Add embed iframe
+						const embedContainer = doc.createElement('div');
+						embedContainer.className = 'reader-video-wrapper';
+						setElementHTML(embedContainer, biliResult.embedHtml);
+						article.insertBefore(embedContainer, article.firstChild);
+
+						// Add transcript if available
+						if (biliResult.transcriptHtml) {
+							const transcriptContainer = doc.createElement('div');
+							setElementHTML(transcriptContainer, biliResult.transcriptHtml);
+							article.appendChild(transcriptContainer);
+						}
+					}
+				} catch (e) {
+					console.error('Reader', 'Failed to fetch Bilibili transcript:', e);
+				}
+			}
+
 			// Store original article HTML before wireTranscript modifies
 			// the DOM (moves timestamps, wraps text, adds scrub track).
 			this.storeOriginalHtml(article);
@@ -2681,6 +2705,27 @@ export class Reader {
 					action: 'enableYouTubeEmbedRule'
 				}).catch(() => {});
 				iframe.src = iframe.src;
+			}
+		}
+
+		// On Bilibili, inject embed and transcript into article
+		if (isBilibiliUrl(doc.URL)) {
+			try {
+				const biliResult = await fetchBilibiliTranscript(doc.URL);
+				if (biliResult) {
+					const embedContainer = doc.createElement('div');
+					embedContainer.className = 'reader-video-wrapper';
+					setElementHTML(embedContainer, biliResult.embedHtml);
+					article.insertBefore(embedContainer, article.firstChild);
+
+					if (biliResult.transcriptHtml) {
+						const transcriptContainer = doc.createElement('div');
+						setElementHTML(transcriptContainer, biliResult.transcriptHtml);
+						article.appendChild(transcriptContainer);
+					}
+				}
+			} catch (e) {
+				console.error('Reader', 'Failed to fetch Bilibili transcript:', e);
 			}
 		}
 

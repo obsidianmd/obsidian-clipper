@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html id="popup">
 	<head>
+		<meta charset="UTF-8">
 		<title data-i18n="extensionName">Obsidian Web Clipper</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 		<link rel="stylesheet" href="style.css">
@@ -46,6 +47,12 @@
 			<div class="metadata-properties"></div>
 			<div id="note-content-container">
 				<textarea id="note-content-field" rows="4" data-i18n="notesAboutPage"></textarea>
+			</div>
+			<div id="video-asr" class="video-asr" style="display: none;">
+				<textarea id="video-asr-share-text" rows="2" placeholder="粘贴抖音分享链接"></textarea>
+				<button id="video-asr-btn" type="button">转录视频</button>
+				<div id="video-asr-status"></div>
+				<progress id="video-asr-progress" max="100" value="0" style="display: none;"></progress>
 			</div>
 			<div class="clipper-footer">
 				<div class="vault-path-container">

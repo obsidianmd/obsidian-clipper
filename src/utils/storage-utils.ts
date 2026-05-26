@@ -1,9 +1,19 @@
 import browser from './browser-polyfill';
-import { Settings, ModelConfig, PropertyType, HistoryEntry, Provider, Rating } from '../types/types';
+import { Settings, ModelConfig, PropertyType, HistoryEntry, Provider, Rating, AsrSettings } from '../types/types';
 import { debugLog } from './debug';
 import { copyToClipboard } from 'core/popup';
 
-export type { Settings, ModelConfig, PropertyType, HistoryEntry, Provider, Rating };
+export type { Settings, ModelConfig, PropertyType, HistoryEntry, Provider, Rating, AsrSettings };
+
+const DEFAULT_ASR_SETTINGS: AsrSettings = {
+	provider: 'doubao',
+	baseUrl: 'https://openspeech.bytedance.com/api/v3/auc/bigmodel',
+	appId: '',
+	accessToken: '',
+	cluster: 'volc.bigasr.auc',
+	downloadDir: '',
+};
+const LEGACY_DEFAULT_ASR_CLUSTER = 'volc.seedasr.auc';
 
 export let generalSettings: Settings = {
 	vaults: [],
@@ -39,6 +49,7 @@ export let generalSettings: Settings = {
 		highlightActiveLine: true,
 		customCss: ''
 	},
+	asrSettings: DEFAULT_ASR_SETTINGS,
 	stats: {
 		addToObsidian: 0,
 		saveFile: 0,
@@ -107,6 +118,7 @@ interface StorageData {
 	};
 	history?: HistoryEntry[];
 	ratings?: Rating[];
+	asr_settings?: Partial<AsrSettings>;
 	migrationVersion?: number;
 }
 
@@ -151,6 +163,7 @@ export async function loadSettings(): Promise<Settings> {
 			highlightActiveLine: true,
 			customCss: ''
 		},
+		asrSettings: DEFAULT_ASR_SETTINGS,
 		stats: {
 			addToObsidian: 0,
 			saveFile: 0,
@@ -213,6 +226,14 @@ export async function loadSettings(): Promise<Settings> {
 			highlightActiveLine: data.reader_settings?.highlightActiveLine ?? defaultSettings.readerSettings.highlightActiveLine,
 			customCss: data.reader_settings?.customCss ?? defaultSettings.readerSettings.customCss
 		},
+		asrSettings: {
+			...defaultSettings.asrSettings,
+			...(data.asr_settings || {}),
+			provider: 'doubao',
+			cluster: data.asr_settings?.cluster === LEGACY_DEFAULT_ASR_CLUSTER
+				? defaultSettings.asrSettings.cluster
+				: data.asr_settings?.cluster || defaultSettings.asrSettings.cluster,
+		},
 		stats: data.stats || defaultSettings.stats,
 		history: data.history || defaultSettings.history,
 		ratings: data.ratings || defaultSettings.ratings,
@@ -270,8 +291,20 @@ export async function saveSettings(settings?: Partial<Settings>): Promise<void> 
 			highlightActiveLine: generalSettings.readerSettings.highlightActiveLine,
 			customCss: generalSettings.readerSettings.customCss
 		},
+		asr_settings: {
+			provider: generalSettings.asrSettings.provider,
+			baseUrl: generalSettings.asrSettings.baseUrl,
+			appId: generalSettings.asrSettings.appId,
+			accessToken: generalSettings.asrSettings.accessToken,
+			cluster: generalSettings.asrSettings.cluster,
+			downloadDir: generalSettings.asrSettings.downloadDir,
+		},
 		stats: generalSettings.stats
 	});
+}
+
+export function getDefaultAsrSettings(): AsrSettings {
+	return { ...DEFAULT_ASR_SETTINGS };
 }
 
 export async function setLegacyMode(enabled: boolean): Promise<void> {

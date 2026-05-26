@@ -12,6 +12,7 @@ import { saveFile } from './utils/file-utils';
 import { debugLog } from './utils/debug';
 import { updateSidebarWidth, addResizeHandle, cleanupResizeHandlers } from './utils/iframe-resize';
 import { parseForClip } from './utils/clip-utils';
+import { isBilibiliUrl, fetchBilibiliTranscript, type BilibiliTranscriptResult } from './utils/bilibili';
 
 declare global {
 	interface Window {
@@ -33,6 +34,32 @@ declare global {
 	let isHighlighterMode = false;
 	const iframeId = 'obsidian-clipper-iframe';
 	const containerId = 'obsidian-clipper-container';
+
+	// Cached Bilibili enrichment result (fetched in background after getPageContent)
+	let cachedBilibiliResult: BilibiliTranscriptResult | null = null;
+	let bilibiliFetchPromise: Promise<BilibiliTranscriptResult | null> | null = null;
+
+	function ensureBilibiliResult(): Promise<BilibiliTranscriptResult | null> {
+		if (!isBilibiliUrl(document.URL)) {
+			return Promise.resolve(null);
+		}
+		if (cachedBilibiliResult) {
+			return Promise.resolve(cachedBilibiliResult);
+		}
+		if (!bilibiliFetchPromise) {
+			bilibiliFetchPromise = fetchBilibiliTranscript(document.URL)
+				.then(result => {
+					cachedBilibiliResult = result;
+					return result;
+				})
+				.catch(error => {
+					debugLog('Clipper', 'Bilibili fetch failed:', error);
+					bilibiliFetchPromise = null;
+					return null;
+				});
+		}
+		return bilibiliFetchPromise;
+	}
 
 	function removeContainer(container: HTMLElement) {
 		container.classList.add('is-closing');
@@ -151,14 +178,13 @@ declare global {
 		}
 
 		if (request.action === "copyMarkdownToClipboard") {
-			flattenShadowDom(document).then(() => {
+			flattenShadowDom(document).then(async () => {
 				try {
+					const bilibiliResult = await ensureBilibiliResult();
 					const defuddled = parseForClip(document);
+					const clipContent = bilibiliResult?.content || defuddled.content;
+					const markdown = createMarkdownContent(clipContent, document.URL);
 
-					// Convert HTML content to markdown
-					const markdown = createMarkdownContent(defuddled.content, document.URL);
-
-					// Copy to clipboard
 					const textArea = document.createElement("textarea");
 					textArea.value = markdown;
 					document.body.appendChild(textArea);
@@ -178,8 +204,10 @@ declare global {
 		if (request.action === "saveMarkdownToFile") {
 			flattenShadowDom(document).then(async () => {
 				try {
+					const bilibiliResult = await ensureBilibiliResult();
 					const defuddled = parseForClip(document);
-					const markdown = createMarkdownContent(defuddled.content, document.URL);
+					const clipContent = bilibiliResult?.content || defuddled.content;
+					const markdown = createMarkdownContent(clipContent, document.URL);
 					const title = defuddled.title || document.title || 'Untitled';
 					const fileName = title.replace(/[/\\?%*:|"<>]/g, '-');
 					await saveFile({
@@ -222,6 +250,32 @@ declare global {
 				const extractedContent: { [key: string]: string } = {
 					...defuddled.variables,
 				};
+
+				let contentHtml = defuddled.content;
+				let responseAuthor = defuddled.author;
+				let responseDescription = defuddled.description;
+				let responseImage = defuddled.image;
+				let responsePublished = defuddled.published;
+				let responseTitle = defuddled.title;
+
+				// For Bilibili video pages, use cached enrichment or start background fetch
+				if (isBilibiliUrl(document.URL)) {
+					const bilibiliResult = await ensureBilibiliResult();
+					if (bilibiliResult) {
+						contentHtml = bilibiliResult.content;
+						if (bilibiliResult.transcriptText) {
+							extractedContent['transcript'] = bilibiliResult.transcriptText;
+						}
+						if (bilibiliResult.subtitleLang) {
+							extractedContent['subtitle_lang'] = bilibiliResult.subtitleLang;
+						}
+						// Map to standard published/created variables
+						if (bilibiliResult.publishTime) {
+							extractedContent['published'] = bilibiliResult.publishTime;
+							extractedContent['created'] = bilibiliResult.publishTime;
+						}
+					}
+				}
 
 				// Create a new DOMParser
 				const parser = new DOMParser();
@@ -266,22 +320,22 @@ declare global {
 				const cleanedHtml = doc.documentElement.outerHTML;
 
 				const response: ContentResponse = {
-					author: defuddled.author,
-					content: defuddled.content,
-					description: defuddled.description,
+					author: responseAuthor,
+					content: contentHtml,
+					description: responseDescription,
 					domain: getDomain(document.URL),
 					extractedContent: extractedContent,
 					favicon: defuddled.favicon,
 					fullHtml: cleanedHtml,
 					highlights: highlighter.getHighlights(),
-					image: defuddled.image,
+					image: responseImage,
 					language: defuddled.language || '',
 					parseTime: defuddled.parseTime,
-					published: defuddled.published,
+					published: responsePublished,
 					schemaOrgData: defuddled.schemaOrgData,
 					selectedHtml: selectedHtml,
 					site: defuddled.site,
-					title: defuddled.title,
+					title: responseTitle,
 					wordCount: defuddled.wordCount,
 					metaTags: defuddled.metaTags || []
 				};
@@ -295,6 +349,27 @@ declare global {
 				sendResponse({ success: false, error: error instanceof Error ? error.message : String(error) });
 			});
 			return true;
+		} else if (request.action === "fetchBilibiliTranscriptAction") {
+			// Return cached Bilibili transcript if available
+			if (cachedBilibiliResult) {
+				sendResponse({
+					transcriptText: cachedBilibiliResult.transcriptText,
+					content: cachedBilibiliResult.content,
+				});
+			} else if (isBilibiliUrl(document.URL)) {
+				// Fetch on-demand if not cached yet
+				ensureBilibiliResult().then(result => {
+					sendResponse({
+						transcriptText: result?.transcriptText || '',
+						content: result?.content || '',
+					});
+				}).catch(() => {
+					sendResponse({ transcriptText: '', content: '' });
+				});
+				return true;
+			} else {
+				sendResponse({ transcriptText: '', content: '' });
+			}
 		} else if (request.action === "extractContent") {
 			const content = extractContentBySelector(request.selector, request.attribute, request.extractHtml);
 			sendResponse({ content: content });

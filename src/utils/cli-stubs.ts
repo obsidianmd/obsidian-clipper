@@ -40,6 +40,14 @@ export const generalSettings: Settings = {
 		highlightActiveLine: true,
 		customCss: '',
 	},
+	asrSettings: {
+		provider: 'doubao',
+		baseUrl: 'https://openspeech.bytedance.com/api/v3/auc/bigmodel',
+		appId: '',
+		accessToken: '',
+		cluster: 'volc.bigasr.auc',
+		downloadDir: '',
+	},
 	stats: {
 		addToObsidian: 0,
 		saveFile: 0,

@@ -1,5 +1,10 @@
 .DS_Store
 
+# Local tooling
+.idea/
+.gitnexus/
+.vscode/
+
 # NPM
 node_modules/
 
@@ -23,4 +28,11 @@ assets/shared
 .context
 .cursorrules
 .env
+.env.*
+!.env.example
+!**/.env.example
 context/
+
+# Python
+__pycache__/
+*.py[cod]

@@ -25,6 +25,16 @@ If you don't see any content in Obsidian when you click **Add to Obsidian**:
 - Check that your vault name in Web Clipper settings exactly matches your *vault name* in Obsidian *not the vault path*.
 - Check that the folder name is correctly formatted.
 
+### Video transcription does not start
+
+Manual video transcription requires the local native host to be installed and configured. If the popup shows an error when transcribing a video:
+
+- Check that `ffmpeg` is installed and available in your terminal.
+- For YouTube and Bilibili, check that `yt-dlp` is installed.
+- For Douyin, paste the share link into the popup before starting transcription.
+- Check Web Clipper settings for the Doubao ASR URL, App ID, Access Token, and Cluster.
+- If you are using a local development build, reinstall the native host after the extension ID changes.
+
 ## Linux
 
 #### Obsidian does not open

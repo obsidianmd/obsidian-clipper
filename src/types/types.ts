@@ -70,6 +70,15 @@ export interface ReaderSettings {
 	customCss: string;
 }
 
+export interface AsrSettings {
+	provider: 'doubao';
+	baseUrl: string;
+	appId: string;
+	accessToken: string;
+	cluster: string;
+	downloadDir: string;
+}
+
 export interface Settings {
 	vaults: string[];
 	showMoreActionsButton: boolean;
@@ -88,6 +97,7 @@ export interface Settings {
 	defaultPromptContext: string;
 	propertyTypes: PropertyType[];
 	readerSettings: ReaderSettings;
+	asrSettings: AsrSettings;
 	stats: {
 		addToObsidian: number;
 		saveFile: number;

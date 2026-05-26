@@ -8,6 +8,8 @@ import { debugLog } from './utils/debug';
 
 const YOUTUBE_EMBED_RULE_ID = 9001;
 const YOUTUBE_INNERTUBE_RULE_ID = 9002;
+const VIDEO_ASR_NATIVE_HOST = 'md.obsidian.clipper.video_asr';
+const VIDEO_ASR_TIMEOUT_MS = 10 * 60 * 1000;
 
 // Chrome: declarativeNetRequest to rewrite Referer on YouTube embeds.
 // Safari/Firefox use the native video element instead (see reader.ts).
@@ -230,29 +232,37 @@ async function exitReaderPageIfNeeded(tabId: number, readerUrl?: string): Promis
 	return false;
 }
 
-async function initialize() {
-	try {
-		// Set up tab listeners
-		await setupTabListeners();
+function isNoServiceWorkerError(error: unknown): boolean {
+	return error instanceof Error && error.message === 'No SW';
+}
 
+async function runBackgroundInitStep(name: string, step: () => Promise<void> | void): Promise<void> {
+	try {
+		await step();
+	} catch (error) {
+		if (isNoServiceWorkerError(error)) {
+			console.warn(`Skipping background initialization step "${name}" because the service worker is not ready yet.`);
+			return;
+		}
+		console.error(`Error initializing background step "${name}":`, error);
+	}
+}
+
+async function initialize() {
+	await runBackgroundInitStep('tab listeners', setupTabListeners);
+
+	await runBackgroundInitStep('tab cleanup listener', () => {
 		browser.tabs.onRemoved.addListener((tabId) => {
 			delete highlighterModeState[tabId];
 			delete readerModeState[tabId];
 		});
-		
-		// Initialize context menu
-		await debouncedUpdateContextMenu(-1);
+	});
 
-		// Enable Origin header for YouTube innertube API requests
-		await enableYouTubeInnertubeRule();
+	await runBackgroundInitStep('context menu', () => debouncedUpdateContextMenu(-1));
+	await runBackgroundInitStep('YouTube innertube headers', enableYouTubeInnertubeRule);
+	await runBackgroundInitStep('action popup', updateActionPopup);
 
-		// Set up action popup based on openBehavior setting
-		await updateActionPopup();
-
-		debugLog('Clipper', 'Background script initialized successfully');
-	} catch (error) {
-		console.error('Error initializing background script:', error);
-	}
+	debugLog('Clipper', 'Background script initialized successfully');
 }
 
 // Check if a popup is open for a given tab
@@ -301,6 +311,93 @@ async function nativeFetch(url: string, options?: any): Promise<{ ok: boolean; s
 	}
 }
 
+function runVideoAsrNativeHost(payload: any, requestId: string): Promise<any> {
+	return new Promise((resolve) => {
+		if (typeof browser.runtime.connectNative !== 'function') {
+			resolve({ ok: false, error: '当前浏览器不支持 Native Messaging。' });
+			return;
+		}
+
+		let settled = false;
+		let port: browser.Runtime.Port | null = null;
+		const timeoutId = setTimeout(() => {
+			finish({ ok: false, error: '视频转录超时。' });
+		}, VIDEO_ASR_TIMEOUT_MS);
+
+		const finish = (result: any) => {
+			if (settled) return;
+			settled = true;
+			clearTimeout(timeoutId);
+			try {
+				port?.disconnect();
+			} catch {}
+			resolve(result);
+		};
+
+		try {
+			port = browser.runtime.connectNative(VIDEO_ASR_NATIVE_HOST);
+		} catch (error) {
+			finish({
+				ok: false,
+				error: `未安装本地视频转录组件: ${error instanceof Error ? error.message : String(error)}`,
+			});
+			return;
+		}
+
+		port.onMessage.addListener((message: any) => {
+			if (message?.type === 'metadata') {
+				browser.runtime.sendMessage({
+					action: 'videoAsrMetadata',
+					requestId,
+					title: message.title || '',
+					author: message.author || '',
+					description: message.description || '',
+					published: message.published || '',
+					tags: message.tags || '',
+					sourceUrl: message.sourceUrl || '',
+				}).catch(() => {});
+				return;
+			}
+			if (message?.type === 'progress') {
+				browser.runtime.sendMessage({
+					action: 'videoAsrProgress',
+					requestId,
+					stage: message.stage || '',
+					message: message.message || '',
+					percent: message.percent,
+				}).catch(() => {});
+				return;
+			}
+			if (message?.type === 'result') {
+				finish(message);
+			}
+		});
+
+		port.onDisconnect.addListener(() => {
+			if (settled) return;
+			const lastError = browser.runtime.lastError?.message;
+			finish({
+				ok: false,
+				error: lastError ? `本地视频转录组件连接断开: ${lastError}` : '本地视频转录组件提前退出。',
+			});
+		});
+
+		if (payload.type === 'choose-download-dir') {
+			port.postMessage({ type: 'choose-download-dir' });
+			return;
+		}
+
+		port.postMessage({
+			type: 'transcribe-video',
+			platform: payload.platform,
+			url: payload.url,
+			shareText: payload.shareText,
+			title: payload.title,
+			asrSettings: payload.asrSettings,
+		});
+	});
+}
+
 // Fetch proxy for extension pages (reader, highlights).
 // Returns a Promise for the webextension-polyfill.
 // On Firefox MV3, host_permissions require explicit user grant —
@@ -313,6 +410,10 @@ browser.runtime.onMessage.addListener((request: unknown) => {
 	if (options?.method) fetchOptions.method = options.method;
 	if (options?.headers) fetchOptions.headers = options.headers;
 	if (options?.body) fetchOptions.body = options.body;
+	if (options?.credentials) fetchOptions.credentials = options.credentials;
+	if (options?.cache) fetchOptions.cache = options.cache;
+	if (options?.referrer) fetchOptions.referrer = options.referrer;
+	if (options?.referrerPolicy) fetchOptions.referrerPolicy = options.referrerPolicy;
 	return fetch(url, fetchOptions)
 		.then(async (resp) => {
 			const text = await resp.text();
@@ -333,7 +434,7 @@ browser.runtime.onMessage.addListener((request: unknown) => {
 
 browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime.MessageSender, sendResponse: (response?: any) => void): true | undefined => {
 	if (typeof request === 'object' && request !== null) {
-		const typedRequest = request as { action: string; isActive?: boolean; hasHighlights?: boolean; tabId?: number; text?: string; section?: string; readerUrl?: string };
+		const typedRequest = request as { action: string; isActive?: boolean; hasHighlights?: boolean; tabId?: number; text?: string; section?: string; readerUrl?: string; payload?: any; requestId?: string };
 		
 		if (typedRequest.action === 'copy-to-clipboard' && typedRequest.text) {
 			// Use content script to copy to clipboard
@@ -361,6 +462,26 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 		}
 
 		// fetchProxy is handled by a separate listener below
+
+		if (typedRequest.action === "nativeVideoAsr") {
+			runVideoAsrNativeHost(typedRequest.payload || {}, typedRequest.requestId || '')
+				.then(sendResponse)
+				.catch(error => sendResponse({
+					ok: false,
+					error: error instanceof Error ? error.message : String(error),
+				}));
+			return true;
+		}
+
+		if (typedRequest.action === "chooseAsrDownloadDir") {
+			runVideoAsrNativeHost({ type: 'choose-download-dir' }, typedRequest.requestId || '')
+				.then(sendResponse)
+				.catch(error => sendResponse({
+					ok: false,
+					error: error instanceof Error ? error.message : String(error),
+				}));
+			return true;
+		}
 
 		if (typedRequest.action === "extractContent" && sender.tab && sender.tab.id) {
 			browser.tabs.sendMessage(sender.tab.id, request).then(sendResponse);
@@ -1094,7 +1215,12 @@ browser.action.onClicked.addListener(async (tab) => {
 
 browser.storage.onChanged.addListener((changes, area) => {
 	if (area === 'sync' && changes.general_settings) {
-		updateActionPopup(parseOpenBehavior((changes.general_settings.newValue as Record<string, string>)?.openBehavior));
+		updateActionPopup(parseOpenBehavior((changes.general_settings.newValue as Record<string, string>)?.openBehavior))
+			.catch(error => {
+				if (!isNoServiceWorkerError(error)) {
+					console.error('Error updating action popup:', error);
+				}
+			});
 	}
 });
 

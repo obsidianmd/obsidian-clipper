@@ -23,6 +23,7 @@ import { sanitizeFileName } from '../utils/string-utils';
 import { saveFile } from '../utils/file-utils';
 import { translatePage, getMessage, setupLanguageAndDirection } from '../utils/i18n';
 import { formatPropertyValue } from '../utils/shared';
+import { applyVideoAsrTranscript, buildEmptyDouyinVariables, getVideoAsrTarget, hasTranscriptVariable, VideoAsrTarget } from '../utils/video-asr';
 
 interface ReaderModeResponse {
 	success: boolean;
@@ -35,6 +36,8 @@ let templates: Template[] = [];
 let currentVariables: { [key: string]: string } = {};
 let currentTabId: number | undefined;
 let lastSelectedVault: string | null = null;
+let currentVideoAsrTarget: VideoAsrTarget | null = null;
+let currentVideoAsrRequestId = '';
 
 const isSidePanel = window.location.pathname.includes('side-panel.html');
 const urlParams = new URLSearchParams(window.location.search);
@@ -278,6 +281,17 @@ function setupMessageListeners() {
 			// This message is now handled by checkHighlighterModeState
 		} else if (request.action === "highlighterModeChanged") {
 			// This message is now handled by checkHighlighterModeState
+		} else if (request.action === "videoAsrMetadata" && request.requestId === currentVideoAsrRequestId) {
+			applyVideoAsrMetadata({
+				title: request.title,
+				author: request.author,
+				description: request.description,
+				published: request.published,
+				tags: request.tags,
+				sourceUrl: request.sourceUrl,
+			});
+		} else if (request.action === "videoAsrProgress" && request.requestId === currentVideoAsrRequestId) {
+			setVideoAsrStatus(request.message || request.stage || '正在转录视频。', false, request.percent);
 		}
 	});
 }
@@ -572,6 +586,11 @@ function setupEventListeners(tabId: number) {
 		readerModeButton.addEventListener('click', () => toggleReaderMode(tabId));
 		checkReaderModeState(tabId);
 	}
+
+	const videoAsrButton = document.getElementById('video-asr-btn');
+	if (videoAsrButton) {
+		videoAsrButton.addEventListener('click', () => handleVideoAsr(tabId));
+	}
 }
 
 async function initializeUI() {
@@ -617,6 +636,205 @@ function showError(messageKey: string): void {
 		document.body.classList.add('has-error');
 	}
 }
+
+function updateVideoAsrControls(url: string): void {
+	const container = document.getElementById('video-asr') as HTMLElement;
+	const shareText = document.getElementById('video-asr-share-text') as HTMLTextAreaElement;
+	const button = document.getElementById('video-asr-btn') as HTMLButtonElement;
+	const progress = document.getElementById('video-asr-progress') as HTMLProgressElement;
+	if (!container || !shareText || !button || !progress) return;
+
+	currentVideoAsrTarget = getVideoAsrTarget(url);
+	const shouldShow = Boolean(currentVideoAsrTarget && !hasTranscriptVariable(currentVariables));
+	container.style.display = shouldShow ? 'flex' : 'none';
+	if (!shouldShow) {
+		setVideoAsrStatus('', false, undefined);
+		return;
+	}
+
+	const requiresShareText = Boolean(currentVideoAsrTarget?.requiresShareText);
+	shareText.style.display = requiresShareText ? 'block' : 'none';
+	shareText.required = requiresShareText;
+	button.disabled = false;
+	button.textContent = '转录视频';
+	progress.style.display = 'none';
+	progress.value = 0;
+	setVideoAsrStatus(
+		requiresShareText
+			? '当前抖音页面不读取页面内容，请粘贴抖音分享链接后转录。'
+			: '当前视频没有字幕，可手动转录。',
+		false,
+		undefined
+	);
+}
+
+async function initializeDouyinAsrDraft(tabId: number, url: string): Promise<void> {
+	currentVariables = buildEmptyDouyinVariables(url);
+	buildTemplateFieldsSkeleton(currentTemplate);
+	setupMetadataToggle();
+	await fillTemplateFieldValues(tabId, currentTemplate, currentVariables);
+	applyVideoAsrProperties({});
+	updateVariablesPanel(currentTemplate, currentVariables);
+	updateVideoAsrControls(url);
+}
+
+function setVideoAsrStatus(message: string, isError = false, percent?: number): void {
+	const status = document.getElementById('video-asr-status') as HTMLElement;
+	const progress = document.getElementById('video-asr-progress') as HTMLProgressElement;
+	if (status) {
+		status.textContent = message;
+		status.classList.toggle('error', isError);
+	}
+	if (progress) {
+		if (typeof percent === 'number') {
+			progress.style.display = 'block';
+			progress.value = Math.max(0, Math.min(100, percent));
+		} else if (!message) {
+			progress.style.display = 'none';
+			progress.value = 0;
+		}
+	}
+}
+
+async function handleVideoAsr(tabId: number): Promise<void> {
+	if (!currentVideoAsrTarget || !currentTemplate) return;
+
+	const shareText = document.getElementById('video-asr-share-text') as HTMLTextAreaElement;
+	const button = document.getElementById('video-asr-btn') as HTMLButtonElement;
+	const target = currentVideoAsrTarget;
+	const providedShareText = shareText?.value.trim() || '';
+	if (target.requiresShareText && !providedShareText) {
+		setVideoAsrStatus('请先粘贴抖音分享链接。', true);
+		return;
+	}
+
+	currentVideoAsrRequestId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+	if (button) {
+		button.disabled = true;
+		button.textContent = '转录中...';
+	}
+	setVideoAsrStatus('正在启动本地视频转录组件。', false, 1);
+
+	try {
+		const noteNameField = document.getElementById('note-name-field') as HTMLTextAreaElement;
+		const sourceUrl = providedShareText || target.url;
+		if (target.platform === 'douyin') {
+			const preflightUpdate = applyVideoAsrTranscript(currentVariables, currentVariables['{{transcript}}'] || '', {
+				platform: 'douyin',
+				sourceUrl,
+			});
+			currentVariables = preflightUpdate.variables;
+			await fillTemplateFieldValues(tabId, currentTemplate, currentVariables);
+			applyVideoAsrProperties({ sourceUrl });
+			updateVariablesPanel(currentTemplate, currentVariables);
+		}
+		const response = await browser.runtime.sendMessage({
+			action: 'nativeVideoAsr',
+			requestId: currentVideoAsrRequestId,
+			payload: {
+				platform: target.platform,
+				url: target.url,
+				shareText: providedShareText,
+				title: noteNameField?.value || '',
+				asrSettings: loadedSettings.asrSettings,
+			},
+		}) as {
+			ok?: boolean;
+			transcriptText?: string;
+			title?: string;
+			author?: string;
+			description?: string;
+			published?: string;
+			tags?: string;
+			sourceUrl?: string;
+			error?: string;
+		};
+
+		if (!response?.ok || !response.transcriptText?.trim()) {
+			throw new Error(response?.error || '转录完成，但没有返回字幕文本。');
+		}
+
+		const update = applyVideoAsrTranscript(currentVariables, response.transcriptText, {
+			platform: target.platform,
+			title: response.title || (target.platform === 'douyin' ? currentVariables['{{title}}'] : undefined),
+			author: response.author,
+			description: response.description,
+			published: response.published,
+			tags: response.tags,
+			sourceUrl: response.sourceUrl || sourceUrl,
+		});
+		currentVariables = update.variables;
+		if (response.title && noteNameField) {
+			noteNameField.value = response.title;
+			adjustNoteNameHeight(noteNameField);
+		}
+		await fillTemplateFieldValues(tabId, currentTemplate, currentVariables);
+		applyVideoAsrProperties(response);
+		updateVariablesPanel(currentTemplate, currentVariables);
+		setVideoAsrStatus('转录完成，字幕已回填到弹窗。', false, 100);
+		updateVideoAsrControls(target.url);
+	} catch (error) {
+		setVideoAsrStatus(error instanceof Error ? error.message : String(error), true);
+		if (button) {
+			button.disabled = false;
+			button.textContent = '转录视频';
+		}
+	}
+}
+
+function applyVideoAsrProperties(metadata: {
+	title?: string;
+	author?: string;
+	description?: string;
+	published?: string;
+	tags?: string;
+	sourceUrl?: string;
+}): void {
+	const updates: Record<string, string | undefined> = {
+		title: metadata.title || currentVariables['{{title}}'],
+		source: metadata.sourceUrl || currentVariables['{{url}}'],
+		author: metadata.author,
+		published: currentVariables['{{published}}'],
+		created: currentVariables['{{date}}'],
+		description: metadata.description,
+		tags: currentVariables['{{tags}}'],
+	};
+
+	for (const [name, value] of Object.entries(updates)) {
+		if (!value) continue;
+		const input = document.getElementById(name) as HTMLInputElement | null;
+		if (input) input.value = value;
+	}
+}
+
+function applyVideoAsrMetadata(metadata: {
+	title?: string;
+	author?: string;
+	description?: string;
+	published?: string;
+	tags?: string;
+	sourceUrl?: string;
+}): void {
+	const update = applyVideoAsrTranscript(currentVariables, currentVariables['{{transcript}}'] || '', {
+		platform: currentVideoAsrTarget?.platform,
+		title: metadata.title,
+		author: metadata.author,
+		description: metadata.description,
+		published: metadata.published,
+		tags: metadata.tags,
+		sourceUrl: metadata.sourceUrl,
+	});
+	currentVariables = update.variables;
+	applyVideoAsrProperties(metadata);
+
+	const noteNameField = document.getElementById('note-name-field') as HTMLTextAreaElement;
+	if (metadata.title && noteNameField) {
+		noteNameField.value = metadata.title;
+		adjustNoteNameHeight(noteNameField);
+	}
+	updateVariablesPanel(currentTemplate, currentVariables);
+}
+
 function clearError(): void {
 	const errorMessage = document.querySelector('.error-message') as HTMLElement;
 	const clipper = document.querySelector('.clipper') as HTMLElement;
@@ -672,6 +890,10 @@ async function refreshFields(tabId: number, { checkTemplateTriggers = true, rebu
 		}
 		if (isRestrictedUrl(tab.url)) {
 			showError('pageCannotBeClipped');
+			return;
+		}
+		if (new URL(tab.url).hostname.toLowerCase().endsWith('douyin.com')) {
+			await initializeDouyinAsrDraft(tabId, tab.url);
 			return;
 		}
 
@@ -733,6 +955,28 @@ async function refreshFields(tabId: number, { checkTemplateTriggers = true, rebu
 
 				// Update variables panel if it's open
 				updateVariablesPanel(currentTemplate, currentVariables);
+
+				// Fetch Bilibili transcript asynchronously if on a Bilibili page
+				if (tab.url && tab.url.includes('bilibili.com') && !currentVariables['{{transcript}}']) {
+					browser.runtime.sendMessage({
+						action: 'sendMessageToTab',
+						tabId,
+						message: { action: 'fetchBilibiliTranscriptAction' }
+					}).then((raw: unknown) => {
+						const biliData = raw as { transcriptText?: string; content?: string } | undefined;
+						if (biliData?.transcriptText) {
+							currentVariables['{{transcript}}'] = biliData.transcriptText;
+							fillTemplateFieldValues(tabId, currentTemplate, currentVariables, extractedData.schemaOrgData)
+								.then(() => updateVideoAsrControls(tab.url));
+						} else {
+							updateVideoAsrControls(tab.url);
+						}
+					}).catch(() => {
+						updateVideoAsrControls(tab.url);
+					});
+				} else {
+					updateVideoAsrControls(tab.url);
+				}
 			} else {
 				throw new Error('Unable to initialize page content.');
 			}
