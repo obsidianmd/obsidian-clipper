@@ -3,64 +3,64 @@
 		"message": "गतिविधि"
 	},
 	"addModel": {
-		"message": "+ Model jodein"
+		"message": "मॉडल जोड़ें"
 	},
 	"addModelTitle": {
-		"message": "Model jodein"
+		"message": "मॉडल का शीर्षक जोड़ें"
 	},
 	"addProperty": {
-		"message": "+ Property jodein"
+		"message": "प्रॉपर्टी जोड़ें"
 	},
 	"addProvider": {
-		"message": "+ Provider jodein"
+		"message": "प्रदाता जोड़ें"
 	},
 	"addProviderTitle": {
-		"message": "Provider jodein"
+		"message": "प्रदाता का शीर्षक जोड़ें"
 	},
 	"addToObsidian": {
-		"message": "Obsidian me save karein"
+		"message": "Obsidian में जोड़ें"
 	},
 	"addVaultPlaceholder": {
-		"message": "Vault jodne ke liye enter dabaein"
+		"message": "वॉल्ट जोड़ने के लिए Enter दबाएँ"
 	},
 	"advanced": {
-		"message": "Advanced"
+		"message": "अतिरिक्त"
 	},
 	"allHighlights": {
 		"message": "सभी हाइलाइट्स"
 	},
 	"allProperties": {
-		"message": "Sabhi properties"
+		"message": "सभी विशेषताएँ"
 	},
 	"allTime": {
-		"message": "सभी समय"
+		"message": "अब तक"
 	},
 	"alwaysShowHighlights": {
-		"message": "Hamesha highlights dikhayein"
+		"message": "हमेशा हाइलाइट्स दिखाएं"
 	},
 	"alwaysShowHighlightsDescription": {
-		"message": "Page load hone par aapke save kiye gaye highlights dikhayein. Highlighter mode active hone par hi highlights dikhane ke liye band karein."
+		"message": "हाइलाइट के विवरण हमेशा दिखाएं"
 	},
 	"apiKeyMissing": {
-		"message": "API key nahi hai"
+		"message": "API Key उपलब्ध नहीं है"
 	},
 	"apiKeysWarning": {
-		"message": "External provider ka use karte samay, aap unki terms aur privacy policy se agree karte hain..."
+		"message": "किसी बाहरी प्रदाता का उपयोग करने पर आप उसकी शर्तों और गोपनीयता नीति से सहमत होते हैं। इंटरप्रेटर अनुरोध सीधे आपके चुने गए प्रदाता को भेजे जाते हैं। Obsidian आपके अनुरोधों से संबंधित कोई डेटा एकत्र या संग्रहीत नहीं करता।"
 	},
 	"appendToDaily": {
-		"message": "Daily note mein, ant mein jodein"
+		"message": "डेली नोट के नीचे जोड़ें"
 	},
 	"appendToExisting": {
-		"message": "Maujuda note mein, ant mein jodein"
+		"message": "मौजूदा नोट के नीचे जोड़ें"
 	},
 	"autoRunInterpreter": {
-		"message": "Automatic chalayein"
+		"message": "अपने आप चलाएँ"
 	},
 	"autoRunInterpreterDescription": {
-		"message": "Template me prompt variables hone par turant chalega. Is se aapke model provider ke API credits kharch honge. Agar aap interpreter ko sirf manually chalana chahte hain to ise band kar dein."
+		"message": "यदि टेम्पलेट में प्रॉम्प्ट वेरिएबल्स हों, तो उन्हें तुरंत चलाएँ। इससे आपके मॉडल प्रदाता के API क्रेडिट खर्च होंगे। यदि आप इंटरप्रेटर को केवल मैन्युअल रूप से चलाना चाहते हैं, तो इसे बंद करें।"
 	},
 	"behavior": {
-		"message": "Behavior"
+		"message": "व्यवहार"
 	},
 	"byDay": {
 		"message": "दिनों"
@@ -72,31 +72,31 @@
 		"message": "सप्ताहों"
 	},
 	"cancel": {
-		"message": "Cancel"
+		"message": "रद्द करें"
 	},
 	"cannotDeleteProvider": {
-		"message": "Provider \"$1\" ko nahi hata sakte kyunki yeh $2 model(s) dwara upyog kiya ja raha hai."
+		"message": "प्रदाता \"$1\" को हटाया नहीं जा सकता क्योंकि इसका उपयोग $2 मॉडल(ों) द्वारा किया जा रहा है।"
 	},
 	"changelog": {
-		"message": "Changelog"
+		"message": "परिवर्तन सूची"
 	},
 	"chooseFile": {
-		"message": "File chunein"
+		"message": "फ़ाइल चुनें"
 	},
 	"choosePropertiesFile": {
-		"message": "Properties file chunein"
+		"message": "प्रॉपर्टी फ़ाइल चुनें"
 	},
 	"chooseSettingsFile": {
-		"message": "Settings file chunein"
+		"message": "सेटिंग्स फ़ाइल चुनें"
 	},
 	"chooseTemplateFile": {
-		"message": "Template file chunein"
+		"message": "टेम्पलेट फ़ाइल चुनें"
 	},
 	"clipBehavior": {
-		"message": "Save karne ka tarika"
+		"message": "क्लिप व्यवहार"
 	},
 	"clipBehaviorDescription": {
-		"message": "Chunein ki highlight ki gayi samagri ko Obsidian mein kaise save kiya jaye. $strong_start${{content}}$strong_end$ variable ko define karta hai.",
+		"message": "चुनें कि हाइलाइट की गई सामग्री Obsidian में कैसे सहेजी जाए। यह $strong_start${{content}}$strong_end$ वेरिएबल को परिभाषित करता है।.",
 		"placeholders": {
 			"strong_end": {
 				"content": "</strong>"
@@ -115,55 +115,55 @@
 		}
 	},
 	"close": {
-		"message": "Band karein"
+		"message": "बंद करें"
 	},
 	"commandOpenClipper": {
-		"message": "Obsidian Clipper kholein"
+		"message": "Obsidian क्लिपर खोलें"
 	},
 	"commandQuickClip": {
-		"message": "Quick clip"
+		"message": "जल्दी क्लिप करें"
 	},
 	"commandToggleHighlighter": {
-		"message": "Highlighter mode toggle karein"
+		"message": "हाइलाइटर टॉगल करें"
 	},
 	"commandToggleReader": {
 		"message": "पठन दृश्य टॉगल करें"
 	},
 	"confirmDeleteTemplate": {
-		"message": "Kya aap template \"$1\" ko hatana chahte hain?"
+		"message": "क्या आप वाकई \"$1\" टेम्पलेट हटाना चाहते हैं?"
 	},
 	"confirmReplaceSettings": {
-		"message": "Yeh aapki vartaman sabhi settings ko badal dega, jismein templates aur properties shamil hain. Kya aap jaari rakhna chahte hain?"
+		"message": "यह आपकी सभी वर्तमान सेटिंग्स, जिनमें टेम्पलेट्स और प्रॉपर्टीज़ शामिल हैं, को बदल देगा। क्या आप जारी रखना चाहते हैं?"
 	},
 	"copied": {
-		"message": "Copy ho gaya!"
+		"message": "कॉपी हो गया!"
 	},
 	"copyAsJson": {
-		"message": "JSON ke roop mein copy karein"
+		"message": "JSON के रूप में कॉपी करें"
 	},
 	"copyToClipboard": {
-		"message": "Clipboard par copy karein"
+		"message": "क्लिपबोर्ड में कॉपी करें"
 	},
 	"createNewNote": {
-		"message": "Naya note banayein"
+		"message": "नया नोट बनाएँ"
 	},
 	"custom": {
-		"message": "Custom"
+		"message": "अनुकूलित"
 	},
 	"dailyNoteFormat": {
-		"message": "Daily note format (jaise: YYYY-MM-DD)"
+		"message": "डेली नोट का प्रारूप (जैसे: YYYY-MM-DD)"
 	},
 	"defaultInterpreterContext": {
-		"message": "Default interpreter context"
+		"message": "डिफ़ॉल्ट इंटरप्रेटर संदर्भ"
 	},
 	"defaultInterpreterContextDescription": {
-		"message": "Prompt variables ki vyakhya ke liye upyog kiye jane wale context ko override karein. Yahan variables ka upyog kiya ja sakta hai."
+		"message": "प्रॉम्प्ट वेरिएबल्स की व्याख्या के लिए उपयोग किए जाने वाले संदर्भ को बदलें। यहाँ वेरिएबल्स का उपयोग किया जा सकता है।"
 	},
 	"defaultTemplateName": {
-		"message": "Default"
+		"message": "डिफ़ॉल्ट"
 	},
 	"delete": {
-		"message": "Delete"
+		"message": "हटाएँ"
 	},
 	"deleteAllHighlightsConfirm": {
 		"message": "क्या आप वाकई सभी हाइलाइट्स हटाना चाहते हैं?"
@@ -175,28 +175,28 @@
 		"message": "इस पेज के लिए सभी हाइलाइट्स हटाएँ?"
 	},
 	"deleteModelConfirm": {
-		"message": "Kya aap is model ko hatana chahte hain?"
+		"message": "क्या आप वाकई इस मॉडल को हटाना चाहते हैं?"
 	},
 	"deleteProviderConfirm": {
-		"message": "Kya aap is provider ko hatana chahte hain?"
+		"message": "क्या आप वाकई इस प्रदाता को हटाना चाहते हैं?"
 	},
 	"disableHighlighter": {
-		"message": "Highlighter band karein"
+		"message": "हाइलाइटर बंद करें"
 	},
 	"disableReader": {
-		"message": "पठन दृश्य अक्षम करें"
+		"message": "रीडर बंद करें"
 	},
 	"done": {
-		"message": "Ho gaya"
+		"message": "हो गया"
 	},
 	"dragAndDropFile": {
-		"message": "Yahan file drag aur drop karein"
+		"message": "यहाँ फ़ाइल खींचकर छोड़ें"
 	},
 	"duplicate": {
-		"message": "Duplicate"
+		"message": "डुप्लिकेट करें"
 	},
 	"earlyAccessDescription": {
-		"message": "Obsidian ke latest $link_start$early access version$link_end$ ki zarurat wali features ka upyog karein. Vartaman mein Obsidian 1.7.2 ya usse naya chahiye.",
+		"message": "ऐसी सुविधाओं का उपयोग करें जिनके लिए Obsidian के नवीनतम $link_start$अर्ली एक्सेस संस्करण$link_end$ की आवश्यकता होती है। वर्तमान में इसके लिए Obsidian 1.7.2 या उससे नया संस्करण चाहिए।",
 		"placeholders": {
 			"link_end": {
 				"content": "</a>"
@@ -207,31 +207,31 @@
 		}
 	},
 	"earlyAccessFeatures": {
-		"message": "Early access features"
+		"message": "अर्ली एक्सेस फीचर्स"
 	},
 	"edit": {
 		"message": "संपादित करें"
 	},
 	"editModel": {
-		"message": "Model edit karein"
+		"message": "मॉडल संपादित करें"
 	},
 	"editProvider": {
-		"message": "Provider edit karein"
+		"message": "प्रदाता संपादित करें"
 	},
 	"editTemplate": {
-		"message": "Template edit karein"
+		"message": "टेम्पलेट संपादित करें"
 	},
 	"embedded": {
 		"message": "सम्मिलित"
 	},
 	"enableHighlighterDescription": {
-		"message": "Web page par content highlight karein jise aap Obsidian mein save kar sakte hain."
+		"message": "वेब पेजों की सामग्री को हाइलाइट करें, जिसे आप Obsidian में सहेज सकते हैं।"
 	},
 	"enableInterpreter": {
-		"message": "Interpreter enable karein"
+		"message": "इंटरप्रेटर सक्षम करें"
 	},
 	"enableInterpreterDescription": {
-		"message": "Page se data nikalne ke liye natural language ka upyog karein. Udaharan ke liye, aap template syntax $strong_start${{\"page ka summary\"}}$strong_end$ ka upyog kar sakte hain. Niche configure kiye gaye API key ya custom model ki zarurat hai. $link_start$Aur janein$link_end$",
+		"message": "पेजों से डेटा निकालने के लिए प्राकृतिक भाषा का उपयोग करें। उदाहरण के लिए, आप टेम्पलेट सिंटैक्स $strong_start${{\"a summary of the page\"}}$strong_end$ का उपयोग कर सकते हैं। इसके लिए नीचे कॉन्फ़िगर किया गया API Key या कस्टम मॉडल आवश्यक है। $link_start$और जानें$link_end$।",
 		"placeholders": {
 			"link_end": {
 				"content": "</a>"
@@ -251,28 +251,28 @@
 		"message": "पठन दृश्य खोलें"
 	},
 	"error": {
-		"message": "Error"
+		"message": "त्रुटि"
 	},
 	"export": {
-		"message": "Export"
+		"message": "निर्यात करें"
 	},
 	"exportAllSettings": {
-		"message": "Sabhi settings export karein"
+		"message": "सभी सेटिंग्स निर्यात करें"
 	},
 	"exportAllSettingsDescription": {
-		"message": "Templates aur properties sahit sabhi settings export karein."
+		"message": "टेम्पलेट्स और प्रॉपर्टीज़ सहित सभी सेटिंग्स निर्यात करें।"
 	},
 	"exportHighlights": {
-		"message": "Highlights export karein"
+		"message": "हाइलाइट्स निर्यात करें"
 	},
 	"exportHighlightsDescription": {
-		"message": "Apne highlights ko file mein export karein."
+		"message": "अपने हाइलाइट्स को एक फ़ाइल में निर्यात करें।"
 	},
 	"exportProperties": {
-		"message": "Properties export karein"
+		"message": "प्रॉपर्टीज़ निर्यात करें"
 	},
 	"exportPropertiesDescription": {
-		"message": "Web Clipper properties ko $strong_start$types.json$strong_end$ file mein save karein jise aapke Obsidian vault mein, ya dusre devices par Web Clipper mein import kiya ja sakta hai.",
+		"message": "Web Clipper प्रॉपर्टीज़ को $strong_start$types.json$strong_end$ फ़ाइल में सहेजें, जिसे आपके Obsidian वॉल्ट या अन्य डिवाइस पर Web Clipper में आयात किया जा सकता है|",
 		"placeholders": {
 			"strong_end": {
 				"content": "</strong>"
@@ -283,55 +283,55 @@
 		}
 	},
 	"extensionDescription": {
-		"message": "Web se content ko ek private aur durable format mein save karein jise aap offline access kar sakte hain. Obsidian ka official browser extension."
+		"message": "वेब से सामग्री को निजी और सुरक्षित फ़ॉर्मेट में सहेजें, जिसे आप ऑफ़लाइन भी एक्सेस कर सकते हैं। यह Obsidian का आधिकारिक ब्राउज़र एक्सटेंशन है।"
 	},
 	"extensionName": {
-		"message": "Obsidian Web Clipper"
+		"message": "Obsidian वेब क्लिपर"
 	},
 	"failedToCopyText": {
-		"message": "Text copy karne mein fail"
+		"message": "टेक्स्ट कॉपी नहीं हो सका"
 	},
 	"failedToDeleteTemplate": {
-		"message": "Template delete karne mein fail. Kripya dobara koshish karein."
+		"message": "टेम्पलेट हटाने में विफल। कृपया पुनः प्रयास करें।"
 	},
 	"failedToDuplicateTemplate": {
-		"message": "Template duplicate karne mein fail. Kripya dobara koshish karein."
+		"message": "टेम्पलेट की प्रतिलिपि बनाने में विफल। कृपया पुनः प्रयास करें।."
 	},
 	"failedToExportHighlights": {
-		"message": "Highlights export karne mein fail. Details ke liye console check karein."
+		"message": "हाइलाइट्स निर्यात करने में विफल। अधिक जानकारी के लिए कंसोल देखें।"
 	},
 	"failedToExportSettings": {
-		"message": "Settings export karne mein fail. Details ke liye console check karein."
+		"message": "सेटिंग्स निर्यात करने में विफल। अधिक जानकारी के लिए कंसोल देखें।"
 	},
 	"failedToExtractContent": {
-		"message": "Page content extract karne mein asafal."
+		"message": "पेज की सामग्री निकालने में असमर्थ।"
 	},
 	"failedToImportTemplate": {
-		"message": "Template import karne mein error. File check karein aur dobara koshish karein."
+		"message": "टेम्पलेट आयात करने में त्रुटि। कृपया फ़ाइल जाँचें और पुनः प्रयास करें।"
 	},
 	"failedToInitialize": {
-		"message": "Kripya extension ko reload karne ki koshish karein."
+		"message": "कृपया एक्सटेंशन को पुनः लोड करें।"
 	},
 	"failedToInitializeContent": {
-		"message": "Page content initialize karne mein asafal."
+		"message": "पेज सामग्री प्रारंभ करने में असमर्थ।"
 	},
 	"failedToProcessInterpreter": {
-		"message": "Interpreter processing fail. Kripya dobara koshish karein."
+		"message": "इंटरप्रेटर प्रोसेसिंग विफल। कृपया पुनः प्रयास करें।"
 	},
 	"failedToResetProviders": {
-		"message": "Providers aur models reset karne mein fail"
+		"message": "प्रदाता और मॉडल्स रीसेट करने में विफल"
 	},
 	"failedToResetTemplate": {
-		"message": "Default template reset karne mein fail. Kripya dobara koshish karein."
+		"message": "डिफ़ॉल्ट टेम्पलेट रीसेट करने में विफल। कृपया पुनः प्रयास करें।"
 	},
 	"failedToSave": {
-		"message": "File save karne mein fail"
+		"message": "फ़ाइल सहेजने में विफल"
 	},
 	"failedToSaveFile": {
-		"message": "File save karne mein fail"
+		"message": "फ़ाइल सहेजने में विफल"
 	},
 	"failedToSaveProvider": {
-		"message": "Provider save karne mein fail. Kripya dobara koshish karein."
+		"message": "प्रदाता सहेजने में विफल। कृपया पुनः प्रयास करें।"
 	},
 	"feedback": {
 		"message": "प्रतिक्रिया"
@@ -343,40 +343,40 @@
 		"message": "आपकी प्रतिक्रिया के लिए धन्यवाद"
 	},
 	"folder": {
-		"message": "Folder"
+		"message": "फ़ोल्डर"
 	},
 	"general": {
-		"message": "General"
+		"message": "सामान्य"
 	},
 	"generalSettings": {
-		"message": "General settings"
+		"message": "सामान्य सेटिंग्स"
 	},
 	"getApiKeyHere": {
-		"message": "Apni $1 API key yahan se prapt karein."
+		"message": "अपनी $1 API Key यहाँ प्राप्त करें।"
 	},
 	"help": {
-		"message": "Help"
+		"message": "सहायता"
 	},
 	"helpDescription": {
-		"message": "Web Clipper ka upyog karna seekhein aur troubleshooting help prapt karein."
+		"message": "Web Clipper का उपयोग करना सीखें और समस्या-निवारण में सहायता प्राप्त करें।"
 	},
 	"highlightInline": {
-		"message": "Page content highlight karein"
+		"message": "पेज की सामग्री को हाइलाइट करें"
 	},
 	"highlightPage": {
-		"message": "Page highlight karein"
+		"message": "पेज हाइलाइट करें"
 	},
 	"highlightSelection": {
 		"message": "हाइलाइट"
 	},
 	"highlighter": {
-		"message": "Highlighter"
+		"message": "हाइलाइटर"
 	},
 	"highlighterOn": {
 		"message": "हाइलाइटर"
 	},
 	"highlighterSettings": {
-		"message": "Highlighter"
+		"message": "हाइलाइटर"
 	},
 	"highlights": {
 		"message": "हाइलाइट्स"
@@ -388,28 +388,28 @@
 		"message": "इतिहास"
 	},
 	"hotkeys": {
-		"message": "Hotkeys"
+		"message": "शॉर्टकट कुंजियाँ"
 	},
 	"import": {
-		"message": "Import"
+		"message": "आयात करें"
 	},
 	"importAllSettings": {
-		"message": "Sabhi settings import karein"
+		"message": "सभी सेटिंग्स आयात करें"
 	},
 	"importAllSettingsDescription": {
-		"message": "Templates aur properties sahit sabhi settings import karein. Yeh aapki vartaman configuration ko replace karega."
+		"message": "टेम्पलेट्स और प्रॉपर्टीज़ सहित सभी सेटिंग्स आयात करें। इससे आपकी वर्तमान कॉन्फ़िगरेशन बदल जाएगी।"
 	},
 	"importFailed": {
-		"message": "Import fail. Details ke liye console check karein."
+		"message": "आयात विफल हुआ। अधिक जानकारी के लिए कंसोल देखें।"
 	},
 	"importModalTitle": {
-		"message": "Import"
+		"message": "आयात करें"
 	},
 	"importProperties": {
-		"message": "Properties import karein"
+		"message": "प्रॉपर्टीज़ आयात करें"
 	},
 	"importPropertiesDescription": {
-		"message": "Obsidian se properties import karne ke liye, apne vault mein $strong_1_start$types.json$strong_1_end$ file ko $strong_2_start$.obsidian$strong_2_end$ folder mein dhundhein. Note karein ki yeh folder default roop se adhikansh operating systems mein hidden hota hai.",
+		"message": "Obsidian से अपनी प्रॉपर्टीज़ आयात करने के लिए, अपने वॉल्ट के $strong_2_start$.obsidian$strong_2_end$ फ़ोल्डर में $strong_1_start$types.json$strong_1_end$ फ़ाइल खोजें। ध्यान दें कि यह फ़ोल्डर अधिकांश ऑपरेटिंग सिस्टम में डिफ़ॉल्ट रूप से छिपा होता है।",
 		"placeholders": {
 			"strong_1_end": {
 				"content": "</strong>"
@@ -426,22 +426,22 @@
 		}
 	},
 	"importSettings": {
-		"message": "Settings import karein"
+		"message": "सेटिंग्स आयात करें"
 	},
 	"importTemplate": {
-		"message": "Template import karein"
+		"message": "टेम्पलेट आयात करें"
 	},
 	"interpret": {
-		"message": "Interpret"
+		"message": "व्याख्या करें"
 	},
 	"interpreter": {
-		"message": "Interpreter"
+		"message": "इंटरप्रेटर"
 	},
 	"interpreterContext": {
-		"message": "Interpreter context"
+		"message": "इंटरप्रेटर संदर्भ"
 	},
 	"interpreterContextDescription": {
-		"message": "Prompt variables ki interpretation ke liye upyog kiya jane wala context. $link_start$Interpreter settings$link_end$ mein define kiye gaye default context ko override karta hai. Yahan variables ka upyog kiya ja sakta hai.",
+		"message": "प्रॉम्प्ट वेरिएबल्स की व्याख्या के लिए उपयोग किया जाने वाला संदर्भ। यह $link_start$इंटरप्रेटर सेटिंग्स$link_end$ में निर्धारित डिफ़ॉल्ट संदर्भ को ओवरराइड करता है। यहाँ वेरिएबल्स का उपयोग किया जा सकता है।",
 		"placeholders": {
 			"link_end": {
 				"content": "</a>"
@@ -452,22 +452,22 @@
 		}
 	},
 	"language": {
-		"message": "Language"
+		"message": "भाषा"
 	},
 	"languageDescription": {
-		"message": "Extension interface ke liye display language chunein."
+		"message": "एक्सटेंशन इंटरफ़ेस के लिए प्रदर्शित भाषा चुनें।"
 	},
 	"last30Days": {
-		"message": "अंतिम 30 दिन"
+		"message": "पिछले 30 दिन"
 	},
 	"lastUsed": {
-		"message": "Last used"
+		"message": "अंतिम उपयोग"
 	},
 	"legacyMode": {
-		"message": "Legacy mode"
+		"message": "लेगेसी मोड"
 	},
 	"legacyModeDescription": {
-		"message": "Obsidian 1.6.7 ya purane version ke saath compatible URI clipping method ka upyog karta hai. Note karein ki aap kitna content clip kar sakte hain woh aapke browser aur OS dwara limited hai. Kuch pages bina kisi errors ke fail ho sakte hain."
+		"message": "यह URI क्लिपिंग विधि का उपयोग करता है जो Obsidian 1.6.7 या उससे पहले के संस्करणों के साथ संगत है। ध्यान दें कि क्लिप की जाने वाली सामग्री की लंबाई आपके ब्राउज़र और OS द्वारा सीमित हो सकती है। कुछ पेज बिना किसी त्रुटि के विफल हो सकते हैं।"
 	},
 	"loadArticle": {
 		"message": "लेख पढ़ें"
@@ -476,67 +476,67 @@
 		"message": "लोड हो रहा है…"
 	},
 	"modelName": {
-		"message": "Display name"
+		"message": "प्रदर्शित नाम"
 	},
 	"modelNameDescription": {
-		"message": "Interface mein display karne ke liye model ka naam."
+		"message": "उस मॉडल का नाम जिसे आप इंटरफ़ेस में दिखाना चाहते हैं।"
 	},
 	"modelProvider": {
-		"message": "Provider"
+		"message": "प्रदाता"
 	},
 	"modelProviderDescription": {
-		"message": "Model provider, jaise Ollama, OpenRouter, Google, etc."
+		"message": "इस मॉडल के लिए प्रदाता चुनें।"
 	},
 	"modelProviderPlaceholder": {
-		"message": "Provider"
+		"message": "प्रदाता"
 	},
 	"modelRequiredFields": {
-		"message": "Model name, Provider, aur Model ID jaruri hain."
+		"message": "मॉडल नाम, प्रदाता और मॉडल आईडी आवश्यक हैं।"
 	},
 	"models": {
-		"message": "Models"
+		"message": "मॉडल्स"
 	},
 	"modelsListFor": {
 		"message": "$1 के लिए मॉडल सूची"
 	},
 	"more": {
-		"message": "More"
+		"message": "और"
 	},
 	"newTemplate": {
-		"message": "Naya template"
+		"message": "नया टेम्पलेट"
 	},
 	"noHighlights": {
-		"message": "Kuch nahi karein"
+		"message": "कुछ न करें"
 	},
 	"noResults": {
 		"message": "कोई परिणाम नहीं मिला"
 	},
 	"noTemplates": {
-		"message": "Koi templates available nahi hain. Kripya settings mein template add karein."
+		"message": "कोई टेम्पलेट उपलब्ध नहीं है। कृपया सेटिंग्स में एक टेम्पलेट जोड़ें।"
 	},
 	"noUnusedProperties": {
-		"message": "Koi unused properties nahi mili."
+		"message": "कोई अनुपयोगी प्रॉपर्टी नहीं मिली।"
 	},
 	"noteContent": {
-		"message": "Note content"
+		"message": "नोट सामग्री"
 	},
 	"noteContentDescription": {
-		"message": "Note ka content customize karein. Page se data pre-populate karne ke liye variables ka upyog karein."
+		"message": "नोट की सामग्री को अनुकूलित करें। पेज से डेटा पहले से भरने के लिए वेरिएबल्स का उपयोग करें।"
 	},
 	"noteLocation": {
-		"message": "Note location"
+		"message": "नोट स्थान"
 	},
 	"noteLocationDescription": {
-		"message": "Note ka folder ya path."
+		"message": "नोट का फ़ोल्डर या पथ।"
 	},
 	"noteName": {
-		"message": "Note name"
+		"message": "नोट नाम"
 	},
 	"noteNameFormat": {
-		"message": "Note name"
+		"message": "नोट नाम"
 	},
 	"noteNameFormatDescription": {
-		"message": "Note ke file name ka format. Aap page se data pre-populate karne ke liye {{title}}, {{date}}, aur {{published}} jaise variables ka upyog kar sakte hain. $link_start$Aur janein$link_end$.",
+		"message": "नोट की फ़ाइल का नाम निर्धारित करने का प्रारूप। आप {{title}}, {{date}} और {{published}} जैसे वेरिएबल्स का उपयोग करके पेज से डेटा पहले से भर सकते हैं। $link_start$और जानें$link_end$।",
 		"placeholders": {
 			"link_end": {
 				"content": "</a>"
@@ -547,13 +547,13 @@
 		}
 	},
 	"notesAboutPage": {
-		"message": "Is page ke baare mein notes..."
+		"message": "इस पेज के बारे में नोट्स..."
 	},
 	"onlyHttpSupported": {
-		"message": "Is page ko clip nahi kiya ja sakta. Sirf http aur https URLs supported hain."
+		"message": "इस पेज को क्लिप नहीं किया जा सकता। केवल http और https URL ही समर्थित हैं।"
 	},
 	"open": {
-		"message": "Open"
+		"message": "खोलें"
 	},
 	"openBehaviorDescription": {
 		"message": "चुनें कि वेब क्लिपर डिफ़ॉल्ट रूप से कैसे खुलता है।"
@@ -574,19 +574,19 @@
 		"message": "साइड पैनल खोलें"
 	},
 	"optional": {
-		"message": "(optional)"
+		"message": "(वैकल्पिक)"
 	},
 	"orPasteBelow": {
-		"message": "Ya niche paste karein"
+		"message": "या नीचे पेस्ट करें"
 	},
 	"overwriteNote": {
 		"message": "नोट को अधिलेखित करें"
 	},
 	"pageCannotBeClipped": {
-		"message": "Is page ko clip nahi kiya ja sakta."
+		"message": "इस पेज को क्लिप नहीं किया जा सकता।"
 	},
 	"pageVariables": {
-		"message": "Page variables"
+		"message": "पृष्ठ वेरिएबल्स"
 	},
 	"pagesSaved": {
 		"message": "पृष्ठ सहेजा गया"
@@ -595,10 +595,10 @@
 		"message": "पृष्ठ सहेजे गए"
 	},
 	"pasteJsonHere": {
-		"message": "JSON yahan paste karein"
+		"message": "यहाँ JSON पेस्ट करें"
 	},
 	"pleaseReload": {
-		"message": "Kripya page reload karne ki koshish karein."
+		"message": "कृपया पृष्ठ को पुनः लोड करने का प्रयास करें।"
 	},
 	"popularModels": {
 		"message": "लोकप्रिय मॉडल"
@@ -610,25 +610,25 @@
 		"message": "पॉपअप"
 	},
 	"prependToDaily": {
-		"message": "Daily note mein, shuruat mein add karein"
+		"message": "डेली नोट के ऊपर जोड़ें"
 	},
 	"prependToExisting": {
-		"message": "Existing note mein, shuruat mein add karein"
+		"message": "मौजूदा नोट के ऊपर जोड़ें"
 	},
 	"preview": {
 		"message": "पूर्वावलोकन"
 	},
 	"processing": {
-		"message": "Processing"
+		"message": "प्रसंस्करण जारी है..."
 	},
 	"properties": {
-		"message": "Properties"
+		"message": "प्रॉपर्टीज़"
 	},
 	"propertiesSettings": {
-		"message": "Properties"
+		"message": "प्रॉपर्टीज़"
 	},
 	"propertyName": {
-		"message": "Property name"
+		"message": "प्रॉपर्टी का नाम"
 	},
 	"propertyTypeCheckbox": {
 		"message": "चेकबॉक्स"
@@ -649,49 +649,49 @@
 		"message": "पाठ"
 	},
 	"propertyValue": {
-		"message": "Property value"
+		"message": "प्रॉपर्टी का मान"
 	},
 	"provider": {
-		"message": "Provider"
+		"message": "प्रदाता"
 	},
 	"providerApiKey": {
-		"message": "API key"
+		"message": "API Key"
 	},
 	"providerApiKeyDescription": {
-		"message": "Is provider ke liye aapki API key."
+		"message": "इस प्रदाता के लिए आपकी API Key."
 	},
 	"providerBaseUrl": {
-		"message": "Base URL"
+		"message": "बेस URL"
 	},
 	"providerBaseUrlDescription": {
-		"message": "Is provider ke liye API endpoint URL."
+		"message": "इस प्रदाता के लिए API एंडपॉइंट URL।"
 	},
 	"providerModelId": {
-		"message": "Model ID"
+		"message": "मॉडल आईडी"
 	},
 	"providerModelIdDescription": {
-		"message": "Aapke provider se model ka identifier. Generally spaces ke bina ek short name."
+		"message": "आपके प्रदाता से मॉडल का पहचानकर्ता। सामान्यतः बिना spaces के एक छोटा नाम।"
 	},
 	"providerModelIdPlaceholder": {
-		"message": "Model ID"
+		"message": "मॉडल आईडी"
 	},
 	"providerName": {
-		"message": "Provider name"
+		"message": "प्रदाता का नाम"
 	},
 	"providerNameDescription": {
-		"message": "Is provider ke liye display name."
+		"message": "इस प्रदाता का प्रदर्शित नाम"
 	},
 	"providerPreset": {
-		"message": "Preset"
+		"message": "पूर्व-निर्धारित"
 	},
 	"providerPresetDescription": {
-		"message": "Ek provider chunein ya custom banayein."
+		"message": "एक प्रदाता चुनें या कस्टम बनाएँ।"
 	},
 	"providerRequiredFields": {
-		"message": "Provider name aur Base URL jaruri hain."
+		"message": "प्रदाता नाम और बेस URL आवश्यक हैं।"
 	},
 	"providers": {
-		"message": "Providers"
+		"message": "प्रदाता"
 	},
 	"rateExtensionDescription": {
 		"message": "क्या आप वेब क्लिपर का आनंद ले रहे हैं? हमारी मदद करें इसे रेटिंग देकर।"
@@ -850,43 +850,43 @@
 		"message": "सिफारिश की गई"
 	},
 	"refresh": {
-		"message": "Refresh"
+		"message": "रीफ्रेश करें"
 	},
 	"remove": {
-		"message": "Remove"
+		"message": "हटाएँ"
 	},
 	"removeProperty": {
-		"message": "Property remove karein"
+		"message": "प्रॉपर्टी हटाएँ"
 	},
 	"removeUnusedProperties": {
-		"message": "Unused properties remove karein"
+		"message": "अनुपयोगी प्रॉपर्टीज़ हटाएँ"
 	},
 	"removeUnusedPropertiesDescription": {
-		"message": "Sabhi properties remove karein jo kisi bhi template mein use nahi ki gayi hain."
+		"message": "उन सभी प्रॉपर्टीज़ को हटाएँ जो किसी भी टेम्पलेट में उपयोग नहीं की गई हैं।"
 	},
 	"removeVault": {
-		"message": "Vault remove karein"
+		"message": "वॉल्ट हटाएँ"
 	},
 	"replaceContent": {
-		"message": "Page content replace karein"
+		"message": "पेज की सामग्री बदलें"
 	},
 	"reset": {
-		"message": "Reset"
+		"message": "रीसेट करें"
 	},
 	"resetDefaultTemplate": {
-		"message": "Default template reset karein"
+		"message": "डिफ़ॉल्ट टेम्पलेट रीसेट करें"
 	},
 	"resetDefaultTemplateDescription": {
-		"message": "Default template mein kiye gaye sabhi changes ko remove karein."
+		"message": "डिफ़ॉल्ट टेम्पलेट में किए गए सभी बदलाव हटा दें।"
 	},
 	"resetProvidersAndModels": {
-		"message": "Default models reset karein"
+		"message": "डिफ़ॉल्ट मॉडल्स रीसेट करें"
 	},
 	"resetProvidersAndModelsDescription": {
-		"message": "Providers aur models ko default settings par reset karein."
+		"message": "प्रदाता और मॉडल्स को डिफ़ॉल्ट सेटिंग्स पर रीसेट करें।"
 	},
 	"save": {
-		"message": "Save"
+		"message": "सेव करें"
 	},
 	"saveBehaviorDescription": {
 		"message": "पेज सहेजने के लिए डिफ़ॉल्ट विकल्प चुनें। वैकल्पिक विकल्प मुख्य बटन के बगल में ड्रॉपडाउन मेनू में दिखाई देते हैं।"
@@ -895,70 +895,70 @@
 		"message": "सहेजने का व्यवहार"
 	},
 	"saveFile": {
-		"message": "File save karein..."
+		"message": "फ़ाइल सेव करें..."
 	},
 	"searchHighlightsPlaceholder": {
 		"message": "हाइलाइट्स खोजें…"
 	},
 	"searchVariables": {
-		"message": "Variables search karein..."
+		"message": "वेरिएबल्स खोजें..."
 	},
 	"selectProvider": {
-		"message": "Provider select karein"
+		"message": "प्रदाता चुनें"
 	},
 	"selectTemplateToExport": {
-		"message": "Kripya export karne ke liye ek template select karein."
+		"message": "कृपया निर्यात के लिए एक टेम्पलेट चुनें।"
 	},
 	"settings": {
-		"message": "Settings"
+		"message": "सेटिंग्स"
 	},
 	"settingsHeading": {
-		"message": "Settings"
+		"message": "सेटिंग्स"
 	},
 	"settingsImportSuccess": {
-		"message": "Sabhi settings successfully import ho gayi hain. Changes dekhne ke liye kripya page refresh karein."
+		"message": "सभी सेटिंग्स सफलतापूर्वक आयात हो गईं। बदलाव देखने के लिए पेज रीफ्रेश करें।"
 	},
 	"share": {
-		"message": "Share..."
+		"message": "शेयर करें..."
 	},
 	"shortcutInstructionsBrave": {
-		"message": "Key assignments change karne ke liye, $1 par jayein"
+		"message": "Key असाइनमेंट बदलने के लिए $1 पर जाएँ"
 	},
 	"shortcutInstructionsChrome": {
-		"message": "Key assignments change karne ke liye, $1 par jayein"
+		"message": "Key असाइनमेंट बदलने के लिए $1 पर जाएँ"
 	},
 	"shortcutInstructionsDefault": {
-		"message": "Key assignments change karne ke liye, kripya apne browser ki extension settings dekhein."
+		"message": "Key असाइनमेंट बदलने के लिए, कृपया अपने ब्राउज़र की एक्सटेंशन सेटिंग्स देखें।"
 	},
 	"shortcutInstructionsEdge": {
-		"message": "Key assignments change karne ke liye, $1 par jayein"
+		"message": "Key असाइनमेंट बदलने के लिए $1 पर जाएँ।"
 	},
 	"shortcutInstructionsFirefox": {
-		"message": "Key assignments change karne ke liye, $1 par jayein, gear icon par click karein, aur \"Manage Extension Shortcuts\" select karein"
+		"message": "Key असाइनमेंट बदलने के लिए $1 पर जाएँ, गियर आइकन पर क्लिक करें और \"Manage Extension Shortcuts\" चुनें।"
 	},
 	"shortcutInstructionsIntro": {
-		"message": "Keyboard shortcuts aapko clipper features tak quick access dete hain."
+		"message": "कीबोर्ड शॉर्टकट्स आपको क्लिपर फीचर्स तक तेज़ी से पहुँचने की सुविधा देते हैं।"
 	},
 	"shortcutInstructionsSafari": {
-		"message": "Safari par keyboard shortcuts customize nahi kiye ja sakte."
+		"message": "Safari में कीबोर्ड शॉर्टकट्स को कस्टमाइज़ नहीं किया जा सकता।"
 	},
 	"shortcutNotSet": {
-		"message": "Set nahi hai"
+		"message": "सेट नहीं है"
 	},
 	"showActionsButton": {
-		"message": "Actions button dikhayein"
+		"message": "एक्शन बटन दिखाएँ"
 	},
 	"showActionsDescription": {
-		"message": "Clipper menu se page variables inspect karne ki permission deta hai. Templates mein use ke liye available variables dekhne mein helpful."
+		"message": "यह आपको क्लिपर मेनू से पेज वेरिएबल्स देखने की सुविधा देता है। इससे आप उन वेरिएबल्स को देख सकते हैं जिन्हें टेम्पलेट्स में उपयोग किया जा सकता है।"
 	},
 	"showPageVariables": {
-		"message": "Page variables dikhayein"
+		"message": "पेज वेरिएबल्स दिखाएँ"
 	},
 	"silentOpen": {
-		"message": "Clipped note ko bina open kiye save karein"
+		"message": "क्लिप किए गए नोट को खोले बिना सहेजें"
 	},
 	"silentOpenDescription": {
-		"message": "Clipped notes save ho jayengi lekin naye tab mein nahi khulengi. Obsidian abhi bhi foreground mein layega."
+		"message": "क्लिप किए गए नोट सहेजे जाएंगे, लेकिन नए टैब में नहीं खुलेंगे। Obsidian फिर भी सामने (foreground) में आ जाएगा।"
 	},
 	"sort": {
 		"message": "क्रमबद्ध करें"
@@ -976,19 +976,19 @@
 		"message": "Z से A"
 	},
 	"specificNoteName": {
-		"message": "Specific note name"
+		"message": "नोट का विशेष नाम"
 	},
 	"systemDefault": {
-		"message": "System"
+		"message": "सिस्टम"
 	},
 	"template": {
 		"message": "टेम्पलेट"
 	},
 	"templateCopied": {
-		"message": "Template JSON clipboard par copy ho gaya"
+		"message": "टेम्पलेट JSON क्लिपबोर्ड में कॉपी कर दिया गया है।"
 	},
 	"templateCopyError": {
-		"message": "Template JSON ko clipboard par copy karne mein fail"
+		"message": "टेम्पलेट JSON को क्लिपबोर्ड में कॉपी नहीं किया जा सका।"
 	},
 	"templateErrorCount": {
 		"message": "आपके टेम्पलेट में एक त्रुटि है।"
@@ -1003,43 +1003,43 @@
 		"message": "स्थान"
 	},
 	"templateName": {
-		"message": "Template name"
+		"message": "टेम्पलेट का नाम"
 	},
 	"templateProperties": {
-		"message": "Properties"
+		"message": "प्रॉपर्टीज़"
 	},
 	"templatePropertiesDescription": {
-		"message": "Clipped note ke top par add karne ke liye properties. Page se data pre-populate karne ke liye variables ka upyog karein."
+		"message": "क्लिप किए गए नोट के शीर्ष पर जोड़ने के लिए प्रॉपर्टीज़। पेज से डेटा पहले से भरने के लिए वेरिएबल्स का उपयोग करें।"
 	},
 	"templateTriggers": {
-		"message": "Template triggers"
+		"message": "टेम्पलेट ट्रिगर्स"
 	},
 	"templateTriggersDescription": {
-		"message": "URL pattern se match hone ya schema.org data hone par is template ko automatically select karne ke liye rules define karein. Ek line mein ek rule."
+		"message": "ऐसे नियम निर्धारित करें जिनके आधार पर, यदि कोई URL पैटर्न मेल खाता हो या schema.org डेटा मौजूद हो, तो यह टेम्पलेट अपने आप चुना जाए। प्रत्येक पंक्ति में एक नियम लिखें।"
 	},
 	"templateValid": {
 		"message": "टेम्पलेट सिंटैक्स मान्य है"
 	},
 	"templatesHeading": {
-		"message": "Templates"
+		"message": "टेम्पलेट्स"
 	},
 	"thinking": {
-		"message": "Soch raha hai"
+		"message": "सोच रहा है"
 	},
 	"unknownProvider": {
-		"message": "Unknown provider"
+		"message": "अज्ञात प्रदाता"
 	},
 	"updateAvailable": {
-		"message": "Update available hai."
+		"message": "एक अपडेट उपलब्ध है।"
 	},
 	"usingLatestVersion": {
-		"message": "Aap latest version use kar rahe hain."
+		"message": "आप लेटेस्ट वर्ज़न इस्तेमाल कर रहे हैं।"
 	},
 	"vault": {
-		"message": "Vault"
+		"message": "वॉल्ट"
 	},
 	"vaultDescription": {
-		"message": "Is template ke liye default vault select karein. Vaults add ya remove karne ke liye $link_start$general settings$link_end$ par jayein.",
+		"message": "इस टेम्पलेट के लिए डिफ़ॉल्ट वॉल्ट चुनें। वॉल्ट जोड़ने या हटाने के लिए $link_start$सामान्य सेटिंग्स$link_end$ पर जाएँ।.",
 		"placeholders": {
 			"link_end": {
 				"content": "</a>"
@@ -1050,10 +1050,10 @@
 		}
 	},
 	"vaults": {
-		"message": "Vaults"
+		"message": "वॉल्ट्स"
 	},
 	"vaultsDescription": {
-		"message": "By default, clipped notes currently open vault mein save hoti hain. Agar aap different vaults mein save karne ka option chahte hain to aap yahan vaults add kar sakte hain. Vault names Obsidian vault ke name se exactly match karne chahiye. Vault add karne ke liye $strong_start$enter$strong_end$ dabaein.",
+		"message": "डिफ़ॉल्ट रूप से, क्लिप किए गए नोट वर्तमान में खुले वॉल्ट में सहेजे जाते हैं। यदि आप अलग-अलग वॉल्ट में सहेजने का विकल्प चाहते हैं, तो यहाँ वॉल्ट जोड़ सकते हैं। वॉल्ट का नाम Obsidian वॉल्ट के नाम से बिल्कुल मेल खाना चाहिए। वॉल्ट जोड़ने के लिए $strong_start$Enter$strong_end$ दबाएँ।",
 		"placeholders": {
 			"strong_end": {
 				"content": "</strong>"
@@ -1064,6 +1064,6 @@
 		}
 	},
 	"version": {
-		"message": "Version"
+		"message": "वर्ज़न"
 	}
 }
