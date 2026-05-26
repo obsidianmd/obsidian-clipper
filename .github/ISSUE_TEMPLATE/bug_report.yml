@@ -1,0 +1,96 @@
+name: Bug report
+description: Report a bug in Web Clipper. Please review troubleshooting steps before submitting.
+title: "BUG: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        If your issue is related to missing content on a page, please review the [Troubleshooting instructions](https://help.obsidian.md/web-clipper/troubleshoot) and open your issue on the [Defuddle repo](https://github.com/kepano/defuddle) instead.
+
+  - type: checkboxes
+    id: troubleshooting
+    attributes:
+      label: Troubleshooting
+      description: You must confirm the following before continuing. If you cannot, please close this form and follow the linked instructions.
+      options:
+        - label: I have reviewed the [Troubleshooting instructions](https://help.obsidian.md/web-clipper/troubleshoot) and confirmed this is a Web Clipper bug.
+          required: true
+
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+      placeholder: e.g. macOS 14.5, Windows 11
+    validations:
+      required: true
+
+  - type: input
+    id: browser
+    attributes:
+      label: Browser
+      placeholder: e.g. Chrome 124, Firefox 126, Safari 17
+    validations:
+      required: true
+
+  - type: input
+    id: clipper-version
+    attributes:
+      label: Web Clipper version
+      placeholder: e.g. 0.9.5
+    validations:
+      required: true
+
+  - type: input
+    id: obsidian-version
+    attributes:
+      label: Obsidian version
+      placeholder: e.g. 1.7.5
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the bug
+      description: A clear and concise description of the bug. If applicable, add screenshots to help explain the problem.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: urls
+    attributes:
+      label: URLs where the bug occurs
+      description: Any specific web pages where the bug can be replicated.
+    validations:
+      required: false
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: To reproduce
+      description: Steps to reproduce the behavior.
+      value: |
+        1. Go to '...'
+        2. Click on '...'
+        3. Scroll down to '...'
+        4. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: template
+    attributes:
+      label: Your template file
+      description: If you are using a custom template (i.e. not the Default template), go to Web Clipper settings and click **More** → **Copy as JSON**. Paste the JSON code below.
+      render: json
+    validations:
+      required: false
