@@ -3,18 +3,23 @@ description: Report a bug in Web Clipper. Please review troubleshooting steps be
 title: "BUG: "
 labels: ["bug"]
 body:
-  - type: markdown
+
+  - type: checkboxes
+    id: content
     attributes:
-      value: |
-        If your issue is related to missing content on a page, please review the [Troubleshooting instructions](https://help.obsidian.md/web-clipper/troubleshoot) and open your issue on the [Defuddle repo](https://github.com/kepano/defuddle) instead.
+      label: Is this a content-related issue? (e.g. missing content)
+      description: Web Clipper uses [Defuddle](https://github.com/kepano/defuddle) to parse web pages. If the issue is related to missing content or incorrect content, please open the issue on the Defuddle repo.
+      options:
+        - label: This is a Web Clipper bug.
+          required: true
 
   - type: checkboxes
     id: troubleshooting
     attributes:
-      label: Troubleshooting
-      description: You must confirm the following before continuing. If you cannot, please close this form and follow the linked instructions.
+      label: Have you reviewed the troubleshooting instructions?
+      description: Please review the [Troubleshooting instructions](https://help.obsidian.md/web-clipper/troubleshoot) instructions first.
       options:
-        - label: I have reviewed the [Troubleshooting instructions](https://help.obsidian.md/web-clipper/troubleshoot) and confirmed this is a Web Clipper bug.
+        - label: I have reviewed the [Troubleshooting instructions](https://help.obsidian.md/web-clipper/troubleshoot).
           required: true
 
   - type: input
@@ -23,7 +28,7 @@ body:
       label: Operating system
       placeholder: e.g. macOS 14.5, Windows 11
     validations:
-      required: true
+      required: false
 
   - type: input
     id: browser
