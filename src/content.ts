@@ -135,6 +135,21 @@ declare global {
 			return;
 		}
 
+		if (request.action === "open-protocol-url") {
+			try {
+				const a = document.createElement('a');
+				a.href = request.url;
+				a.style.display = 'none';
+				document.body.appendChild(a);
+				a.click();
+				document.body.removeChild(a);
+				sendResponse({ success: true });
+			} catch (err) {
+				sendResponse({ success: false, error: (err as Error).message });
+			}
+			return true;
+		}
+
 		if (request.action === "copy-text-to-clipboard") {
 			const textArea = document.createElement("textarea");
 			textArea.value = request.text;

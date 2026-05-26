@@ -564,21 +564,33 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 		}
 
 		if (typedRequest.action === "openOptionsPage") {
-			try {
-				if (typeof browser.runtime.openOptionsPage === 'function') {
-					// Chrome way
-					browser.runtime.openOptionsPage();
-				} else {
-					// Firefox way
-					browser.tabs.create({
-						url: browser.runtime.getURL('settings.html')
-					});
+			(async () => {
+				try {
+					if (typeof browser.runtime.openOptionsPage === 'function') {
+						await browser.runtime.openOptionsPage();
+					} else {
+						await browser.tabs.create({
+							url: browser.runtime.getURL('settings.html')
+						});
+					}
+					sendResponse({success: true});
+				} catch (primaryError) {
+					console.warn('Primary openOptionsPage failed, trying tabs.create fallback:', primaryError);
+					try {
+						await browser.tabs.create({
+							url: browser.runtime.getURL('settings.html')
+						});
+						sendResponse({success: true});
+					} catch (fallbackError) {
+						console.error('All methods to open options page failed:', fallbackError);
+						sendResponse({
+							success: false,
+							settingsUrl: browser.runtime.getURL('settings.html'),
+							error: fallbackError instanceof Error ? fallbackError.message : String(fallbackError)
+						});
+					}
 				}
-				sendResponse({success: true});
-			} catch (error) {
-				console.error('Error opening options page:', error);
-				sendResponse({success: false, error: error instanceof Error ? error.message : String(error)});
-			}
+			})();
 			return true;
 		}
 
@@ -690,31 +702,43 @@ browser.runtime.onMessage.addListener((request: unknown, sender: browser.Runtime
 		if (typedRequest.action === "openObsidianUrl") {
 			const url = (typedRequest as any).url;
 			if (url) {
-				browser.tabs.query({active: true, currentWindow: true}).then((tabs) => {
-					const currentTab = tabs[0];
-					if (currentTab && currentTab.id) {
-						browser.tabs.update(currentTab.id, { url: url }).then(() => {
+				(async () => {
+					try {
+						const tabs = await browser.tabs.query({active: true, currentWindow: true});
+						const currentTab = tabs[0];
+						if (currentTab && currentTab.id) {
+							// Try content-script <a> click first — this is the only
+							// reliable way to trigger custom protocol handlers on
+							// mobile browsers (Edge Android, Firefox Android, etc.)
+							try {
+								await ensureContentScriptLoadedInBackground(currentTab.id);
+								const csResponse = await browser.tabs.sendMessage(currentTab.id, {
+									action: 'open-protocol-url',
+									url: url
+								}) as { success?: boolean } | undefined;
+								if (csResponse && csResponse.success) {
+									sendResponse({ success: true });
+									return;
+								}
+							} catch (csError) {
+								console.warn('Content script protocol open failed, trying tabs.update:', csError);
+							}
+							// Fallback to tabs.update for desktop browsers
+							await browser.tabs.update(currentTab.id, { url: url });
 							sendResponse({ success: true });
-						}).catch((error) => {
-							console.error('Error opening Obsidian URL:', error);
-							sendResponse({
-								success: false,
-								error: error instanceof Error ? error.message : String(error)
-							});
-						});
-					} else {
+						} else {
+							await browser.tabs.create({ url: url });
+							sendResponse({ success: true });
+						}
+					} catch (tabError) {
+						console.warn('All background methods failed for Obsidian URL, returning URL for caller fallback:', tabError);
 						sendResponse({
 							success: false,
-							error: 'No active tab found'
+							fallbackUrl: url,
+							error: tabError instanceof Error ? tabError.message : String(tabError)
 						});
 					}
-				}).catch((error) => {
-					console.error('Error querying tabs:', error);
-					sendResponse({
-						success: false,
-						error: error instanceof Error ? error.message : String(error)
-					});
-				});
+				})();
 				return true;
 			} else {
 				sendResponse({

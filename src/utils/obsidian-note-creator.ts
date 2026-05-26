@@ -14,31 +14,54 @@ export async function generateFrontmatter(properties: Property[]): Promise<strin
 	return generateFrontmatterCore(properties, typeMap);
 }
 
-function openObsidianUrl(url: string): void {
-	browser.runtime.sendMessage({
-		action: "openObsidianUrl",
-		url: url
-	}).catch((error) => {
+function openViaAnchorClick(url: string): void {
+	const a = document.createElement('a');
+	a.href = url;
+	a.style.display = 'none';
+	document.body.appendChild(a);
+	a.click();
+	document.body.removeChild(a);
+}
+
+async function openObsidianUrl(url: string): Promise<void> {
+	try {
+		const response = await browser.runtime.sendMessage({
+			action: "openObsidianUrl",
+			url: url
+		}) as { success?: boolean; fallbackUrl?: string; error?: string } | undefined;
+
+		if (response && response.success) {
+			return;
+		}
+
+		console.warn('Background could not open Obsidian URL, trying local fallbacks:', response?.error);
+		const fallback = response?.fallbackUrl || url;
+		try {
+			openViaAnchorClick(fallback);
+		} catch {
+			window.open(fallback, '_blank');
+		}
+	} catch (error) {
 		console.error('Error opening Obsidian URL via background script:', error);
-		window.open(url, '_blank');
-	});
+		try {
+			openViaAnchorClick(url);
+		} catch {
+			window.open(url, '_blank');
+		}
+	}
 }
 
 async function tryClipboardWrite(fileContent: string, obsidianUrl: string): Promise<void> {
 	const success = await copyToClipboard(fileContent);
 	
 	if (success) {
-		// &clipboard tells Obsidian to read data from clipboard instead of the content param.
-		// content is a fallback shown only if Obsidian can't access the clipboard (e.g. on Linux).
 		obsidianUrl += `&clipboard&content=${encodeURIComponent(getMessage('clipboardError', 'https://help.obsidian.md/web-clipper/troubleshoot'))}`;
-		openObsidianUrl(obsidianUrl);
+		await openObsidianUrl(obsidianUrl);
 		console.log('Obsidian URL:', obsidianUrl);
 	} else {
 		console.error('All clipboard methods failed, falling back to URI method');
-		// Final fallback: use URI method with actual content (same as legacy mode)
-		// Note: We don't add &clipboard here since we're bypassing the clipboard entirely
 		obsidianUrl += `&content=${encodeURIComponent(fileContent)}`;
-		openObsidianUrl(obsidianUrl);
+		await openObsidianUrl(obsidianUrl);
 		console.log('Obsidian URL (URI fallback):', obsidianUrl);
 	}
 }
@@ -83,10 +106,9 @@ export async function saveToObsidian(
 	}
 
 	if (generalSettings.legacyMode) {
-		// Use the URI method
 		obsidianUrl += `&content=${encodeURIComponent(fileContent)}`;
 		console.log('Obsidian URL:', obsidianUrl);
-		openObsidianUrl(obsidianUrl);
+		await openObsidianUrl(obsidianUrl);
 	} else {
 		// Try to copy to clipboard with fallback mechanisms
 		await tryClipboardWrite(fileContent, obsidianUrl);
