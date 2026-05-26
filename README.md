@@ -31,10 +31,10 @@ See the [help wanted](https://github.com/obsidianmd/obsidian-clipper/issues?q=is
 
 In no particular order:
 
-- [ ] A separate icon for Web Clipper
 - [ ] Annotate highlights
 - [ ] Template directory
 - [ ] Sync settings across browsers
+- [x] A separate icon for Web Clipper
 - [x] Template validation
 - [x] Template logic (if/for)
 - [x] Save images locally, [added in Obsidian 1.8.0](https://obsidian.md/changelog/2024-12-18-desktop-v1.8.0/)
