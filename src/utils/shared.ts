@@ -4,7 +4,7 @@
 // via parameters.
 
 import { sanitizeFileName, getDomain, escapeDoubleQuotes } from './string-utils';
-import { Property } from '../types/types';
+import { ParentLinkContext, Property } from '../types/types';
 import dayjs from 'dayjs';
 
 // ---------------------------------------------------------------------------
@@ -31,6 +31,7 @@ export interface BuildVariablesParams {
 	schemaOrgData?: any;
 	metaTags?: { name?: string | null; property?: string | null; content: string | null }[];
 	extractedContent?: Record<string, string>;
+	parentContext?: ParentLinkContext | null;
 }
 
 /**
@@ -63,6 +64,11 @@ export function buildVariables(params: BuildVariablesParams): Record<string, str
 		'{{url}}': currentUrl.trim(),
 		'{{language}}': (params.language || '').trim(),
 		'{{words}}': (params.wordCount ?? 0).toString(),
+		'{{parentUrl}}': (params.parentContext?.parentUrl || '').trim(),
+		'{{parentTitle}}': (params.parentContext?.parentTitle || '').trim(),
+		'{{parentNoteName}}': (params.parentContext?.parentNoteName || '').trim(),
+		'{{parentNotePath}}': (params.parentContext?.parentNotePath || '').trim(),
+		'{{parentNoteLink}}': (params.parentContext?.parentNoteLink || '').trim(),
 	};
 
 	// Add extracted content (e.g. defuddle variables like transcript)
