@@ -1,47 +1,16 @@
 import { ExtractedContent } from '../types/types';
 import { createMarkdownContent } from 'defuddle/full';
+import Defuddle from 'defuddle';
 import { sanitizeFileName } from './string-utils';
-import { buildVariables, addSchemaOrgDataToVariables } from './shared';
+import { buildVariables } from './shared';
 import browser from './browser-polyfill';
 import { debugLog } from './debug';
-import dayjs from 'dayjs';
 import { AnyHighlightData, TextHighlightData, HighlightData, collapseGroupsForExport } from './highlighter';
 import { generalSettings } from './storage-utils';
 import {
-	getElementByXPath,
 	wrapElementWithMark,
 	wrapTextWithMark
 } from './dom-utils';
-
-// Define ElementHighlightData type inline since it's not exported from highlighter.ts
-interface ElementHighlightData extends HighlightData {
-	type: 'element';
-}
-
-function canHighlightElement(element: Element): boolean {
-	// List of elements that can't be nested inside mark
-	const unsupportedElements = ['img', 'video', 'audio', 'iframe', 'canvas', 'svg', 'math', 'table'];
-	
-	// Check if the element contains any unsupported elements
-	const hasUnsupportedElements = unsupportedElements.some(tag => 
-		element.getElementsByTagName(tag).length > 0
-	);
-	
-	// Check if the element itself is an unsupported type
-	const isUnsupportedType = unsupportedElements.includes(element.tagName.toLowerCase());
-	
-	return !hasUnsupportedElements && !isUnsupportedType;
-}
-
-function stripHtml(html: string): string {
-	const parser = new DOMParser();
-	const doc = parser.parseFromString(html, 'text/html');
-	return doc.body.textContent || '';
-}
-
-function normalizeText(html: string): string {
-	return stripHtml(html).replace(/\s+/g, ' ').trim();
-}
 
 interface ContentResponse {
 	content: string;
@@ -124,6 +93,27 @@ export async function extractPageContent(tabId: number): Promise<ContentResponse
 	}
 }
 
+/**
+ * Initialize variables for the popup window
+ * @param content defuddle html page
+ * @param selectedHtml selected part of the page that was highlighted by the user
+ * @param extractedContent defuddle extracted content
+ * @param currentUrl url of the page
+ * @param schemaOrgData schema org data
+ * @param fullHtml clean, non-defuddled html page
+ * @param highlights highlights that were made by the user
+ * @param title title of the page
+ * @param author author of the page
+ * @param description description of the page
+ * @param favicon favicon of the page
+ * @param image image of the page
+ * @param published publish date of the page
+ * @param site site name of the page
+ * @param wordCount word count of the page
+ * @param language language of the page
+ * @param metaTags meta tags of the page
+ * @returns Object containing note name and variables for the popup
+ */
 export async function initializePageContent(
 	content: string,
 	selectedHtml: string,
@@ -152,12 +142,31 @@ export async function initializePageContent(
 			selectedMarkdown = createMarkdownContent(selectedHtml, currentUrl);
 		}
 
+		let highlightedDocument: HTMLElement | null = null;
 		// Process highlights after getting the base content
 		if (generalSettings.highlighterEnabled && generalSettings.highlightBehavior !== 'no-highlights' && highlights && highlights.length > 0) {
-			content = processHighlights(content, highlights);
+			if (generalSettings.highlightBehavior === 'replace-content') {
+				content = highlights.map(highlight => highlight.content).join('');
+			} else {
+				highlightedDocument = processHighlights(fullHtml, highlights);
+				content = highlightedDocument.outerHTML;
+			}
 		}
 
-		const markdownBody = createMarkdownContent(content, currentUrl);
+		// use defuddle to create markdown content
+		if (highlightedDocument) {
+			const defuddle = new Defuddle(highlightedDocument.ownerDocument!, { url: highlightedDocument.ownerDocument!.URL });
+
+			const parseTimeout = new Promise<never>((_, reject) =>
+				setTimeout(() => reject(new Error('parseAsync timeout')), 8000)
+			);
+			const defuddled = await Promise.race([defuddle.parseAsync(), parseTimeout])
+				.catch(() => defuddle.parse());
+		
+			content = defuddled.content
+		}
+
+		const markdownBody = createMarkdownContent(content , currentUrl);
 
 		const highlightsData = collapseGroupsForExport(highlights, c => createMarkdownContent(c, currentUrl));
 
@@ -201,214 +210,60 @@ export async function initializePageContent(
 	}
 }
 
-function processHighlights(content: string, highlights: AnyHighlightData[]): string {
+/**
+ * Process highlights to be embedded in the original html page content
+ * @param fullHtml cleaned and not defuddled html page
+ * @param highlights array of highlights
+ * @returns 
+ * - html page element with highlights embedded in <mark> tags if highlightBehavior is 'highlight-inline'
+ * - only html page element if highlightBehavior is 'replace-content'
+ */
+function processHighlights(fullHtml: string, highlights: AnyHighlightData[]): HTMLElement {
+	debugLog('Highlights', 'Using content length:', fullHtml.length);
+	// 1. Initialize the DOMParser
+	const parser = new DOMParser();
+
+	// 2. Parse the string into a new HTML Document
+	const newParsedDoc = parser.parseFromString(fullHtml, 'text/html');
+
+	// 3. Extract the root Node (the <html> element)
+	const rootNode = newParsedDoc.documentElement;
+	
 	// First check if highlighter is enabled and we have highlights
 	if (!generalSettings.highlighterEnabled || !highlights?.length) {
-		return content;
+		return rootNode;
 	}
 
 	// Then check the behavior setting
 	if (generalSettings.highlightBehavior === 'no-highlights') {
-		return content;
-	}
-
-	if (generalSettings.highlightBehavior === 'replace-content') {
-		return highlights.map(highlight => highlight.content).join('');
+		return rootNode;
 	}
 
 	if (generalSettings.highlightBehavior === 'highlight-inline') {
-		debugLog('Highlights', 'Using content length:', content.length);
+		debugLog('Highlights', 'Processing highlights:', highlights.length);
 
-		const parser = new DOMParser();
-		const doc = parser.parseFromString(content, 'text/html');
-		const tempDiv = doc.body;
+		// Apply the exact same pipeline for drawing highlights on the webpage
 
-		const textHighlights = filterAndSortHighlights(highlights);
-		debugLog('Highlights', 'Processing highlights:', textHighlights.length);
+		highlights.forEach((highlight) => {
+			const container = rootNode.ownerDocument.evaluate(
+				highlight.xpath,
+				rootNode.ownerDocument,
+				null,
+				XPathResult.FIRST_ORDERED_NODE_TYPE,
+				null
+			).singleNodeValue as Element;
 
-		for (const highlight of textHighlights) {
-			processHighlight(highlight, tempDiv as HTMLDivElement);
-		}
-
-		// Serialize back to HTML
-		const serializer = new XMLSerializer();
-		let result = '';
-		Array.from(tempDiv.childNodes).forEach(node => {
-			if (node.nodeType === Node.ELEMENT_NODE) {
-				result += serializer.serializeToString(node);
-			} else if (node.nodeType === Node.TEXT_NODE) {
-				result += node.textContent;
+			if (container) {
+				if (highlight.type === 'element') {
+					wrapElementWithMark(container);
+				} else {
+					wrapTextWithMark(container, highlight as TextHighlightData);
+				}
 			}
 		});
-		
-		return result;
+		return rootNode;
 	}
 
 	// Default fallback
-	return content;
-}
-
-function filterAndSortHighlights(highlights: AnyHighlightData[]): (TextHighlightData | ElementHighlightData)[] {
-	return highlights
-		.filter((h): h is (TextHighlightData | ElementHighlightData) => {
-			if (h.type === 'text') {
-				return !!(h.xpath?.trim() || h.content?.trim());
-			}
-			if (h.type === 'element' && h.xpath?.trim()) {
-				const element = getElementByXPath(h.xpath);
-				return element ? canHighlightElement(element) : false;
-			}
-			return false;
-		})
-		.sort((a, b) => {
-			if (a.xpath && b.xpath) {
-				const elementA = getElementByXPath(a.xpath);
-				const elementB = getElementByXPath(b.xpath);
-				if (elementA === elementB && a.type === 'text' && b.type === 'text') {
-					return b.startOffset - a.startOffset;
-				}
-			}
-			return 0;
-		});
-}
-
-function processHighlight(highlight: TextHighlightData | ElementHighlightData, tempDiv: HTMLDivElement) {
-	try {
-		if (highlight.xpath) {
-			processXPathHighlight(highlight, tempDiv);
-		} else {
-			processContentBasedHighlight(highlight, tempDiv);
-		}
-	} catch (error) {
-		debugLog('Highlights', 'Error processing highlight:', error);
-	}
-}
-
-function processXPathHighlight(highlight: TextHighlightData | ElementHighlightData, tempDiv: HTMLDivElement) {
-	const element = document.evaluate(
-		highlight.xpath,
-		tempDiv,
-		null,
-		XPathResult.FIRST_ORDERED_NODE_TYPE,
-		null
-	).singleNodeValue as Element;
-
-	if (element) {
-		if (highlight.type === 'element') {
-			wrapElementWithMark(element);
-		} else {
-			wrapTextWithMark(element, highlight as TextHighlightData);
-		}
-		return;
-	}
-
-	// Xpath didn't resolve (common when the highlight was created in a
-	// different mode — reader vs live — with a different DOM structure).
-	// Fall back to finding the highlight's text in the article content.
-	debugLog('Highlights', 'Xpath not found, falling back to text search:', highlight.xpath);
-	processContentBasedHighlight(highlight, tempDiv);
-}
-
-function processContentBasedHighlight(highlight: TextHighlightData | ElementHighlightData, tempDiv: HTMLDivElement) {
-	const parser = new DOMParser();
-	const doc = parser.parseFromString(highlight.content, 'text/html');
-	const contentDiv = doc.body;
-
-	// Serialize the inner content
-	const serializer = new XMLSerializer();
-	let innerContent = '';
-
-	if (contentDiv.children.length === 1 && contentDiv.firstElementChild?.tagName === 'DIV') {
-		Array.from(contentDiv.firstElementChild.childNodes).forEach(node => {
-			if (node.nodeType === Node.ELEMENT_NODE) {
-				innerContent += serializer.serializeToString(node);
-			} else if (node.nodeType === Node.TEXT_NODE) {
-				innerContent += node.textContent;
-			}
-		});
-	} else {
-		Array.from(contentDiv.childNodes).forEach(node => {
-			if (node.nodeType === Node.ELEMENT_NODE) {
-				innerContent += serializer.serializeToString(node);
-			} else if (node.nodeType === Node.TEXT_NODE) {
-				innerContent += node.textContent;
-			}
-		});
-	}
-
-	const paragraphs = Array.from(contentDiv.querySelectorAll('p'));
-	if (paragraphs.length) {
-		processContentParagraphs(paragraphs, tempDiv);
-		return;
-	}
-
-	// For non-paragraph blocks (td, li, blockquote, etc.), match by
-	// element type to avoid false positives when the same text appears
-	// in a different element (e.g., "iPhone 16e" in a <p> AND a <td>).
-	const sourceRoot = contentDiv.firstElementChild;
-	const sourceTag = sourceRoot?.tagName?.toLowerCase();
-	if (sourceTag && sourceTag !== 'p') {
-		const searchText = normalizeText(highlight.content);
-		const candidates = Array.from(tempDiv.querySelectorAll(sourceTag));
-		for (const candidate of candidates) {
-			const candidateText = (candidate.textContent || '').replace(/\s+/g, ' ').trim();
-			if (candidateText === searchText) {
-				wrapElementWithMark(candidate);
-				return;
-			}
-			if (candidateText.includes(searchText)) {
-				processInlineContent(searchText, candidate as HTMLElement);
-				return;
-			}
-		}
-	}
-
-	processInlineContent(innerContent, tempDiv);
-}
-
-function processContentParagraphs(sourceParagraphs: Element[], tempDiv: HTMLDivElement) {
-	sourceParagraphs.forEach(sourceParagraph => {
-		const sourceText = stripHtml(sourceParagraph.outerHTML).trim();
-		debugLog('Highlights', 'Looking for paragraph:', sourceText);
-		
-		const paragraphs = Array.from(tempDiv.querySelectorAll('p'));
-		for (const targetParagraph of paragraphs) {
-			const targetText = stripHtml(targetParagraph.outerHTML).trim();
-			
-			if (targetText === sourceText) {
-				debugLog('Highlights', 'Found matching paragraph:', targetParagraph.outerHTML);
-				wrapElementWithMark(targetParagraph);
-				break;
-			}
-		}
-	});
-}
-
-function processInlineContent(content: string, tempDiv: HTMLElement) {
-	const searchText = stripHtml(content).trim();
-	debugLog('Highlights', 'Searching for text:', searchText);
-	
-	const walker = document.createTreeWalker(tempDiv, NodeFilter.SHOW_TEXT);
-	
-	let node;
-	while (node = walker.nextNode() as Text) {
-		const nodeText = node.textContent || '';
-		const index = nodeText.indexOf(searchText);
-		
-		if (index !== -1) {
-			debugLog('Highlights', 'Found matching text in node:', {
-				text: nodeText,
-				index: index
-			});
-			
-			const range = document.createRange();
-			range.setStart(node, index);
-			range.setEnd(node, index + searchText.length);
-			
-			const mark = document.createElement('mark');
-			range.surroundContents(mark);
-			debugLog('Highlights', 'Created mark element:', mark.outerHTML);
-			break;
-		}
-	}
+	return rootNode;
 }
