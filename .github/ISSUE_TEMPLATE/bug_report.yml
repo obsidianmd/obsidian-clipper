@@ -8,16 +8,15 @@ body:
     id: content
     attributes:
       label: Is this issue related to missing content or incorrect conversion to Markdown?
-      description: Web Clipper uses [Defuddle](https://github.com/kepano/defuddle) to convert web pages to Markdown. If the issue is related to missing content or incorrect content, please open the issue on the Defuddle repo, not Web Clipper.
+      description: Web Clipper uses [Defuddle](https://github.com/kepano/defuddle) to convert web pages to Markdown. If the issue is related to missing content or incorrect content, please open the issue on the [Defuddle](https://github.com/kepano/defuddle) repo, not here.
       options:
-        - label: No. This is not a content issue.
+        - label: No. This is definitely a Web Clipper bug.
           required: true
 
   - type: checkboxes
     id: troubleshooting
     attributes:
       label: Have you reviewed the troubleshooting instructions?
-      description: Please review the [Troubleshooting instructions](https://help.obsidian.md/web-clipper/troubleshoot) instructions first.
       options:
         - label: I have reviewed the [Troubleshooting instructions](https://help.obsidian.md/web-clipper/troubleshoot).
           required: true
@@ -28,7 +27,7 @@ body:
       label: Operating system
       placeholder: e.g. macOS 14.5, Windows 11
     validations:
-      required: false
+      required: true
 
   - type: input
     id: browser
