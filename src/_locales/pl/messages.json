@@ -12,16 +12,16 @@
 		"message": "+ Dodaj atrybut"
 	},
 	"addProvider": {
-		"message": "+ Dodaj operatora"
+		"message": "+ Dodaj dostawcę"
 	},
 	"addProviderTitle": {
-		"message": "Dodaj operatora"
+		"message": "Dodaj dostawcę"
 	},
 	"addToObsidian": {
 		"message": "Zapisz w Obsidian"
 	},
 	"addVaultPlaceholder": {
-		"message": "Kliknij enter, aby dodać sejf"
+		"message": "Kliknij Enter, aby dodać sejf"
 	},
 	"advanced": {
 		"message": "Zaawansowane"
@@ -45,19 +45,19 @@
 		"message": "Brak klucza API"
 	},
 	"apiKeysWarning": {
-		"message": "Korzystając z usług zewnętrznego operatora, użytkownik akceptuje jego regulamin i politykę prywatności. Zapytania użytkowników wysyłane są bezpośrednio do wybranego operatora. Obsidian nie gromadzi ani nie przechowuje żadnych danych dotyczących zapytań."
+		"message": "Korzystając z usług zewnętrznego dostawcy, użytkownik akceptuje jego regulamin i politykę prywatności. Zapytania użytkowników wysyłane są bezpośrednio do wybranego dostawcy. Obsidian nie gromadzi ani nie przechowuje żadnych danych dotyczących zapytań."
 	},
 	"appendToDaily": {
-		"message": "Zapisz na końcu w dzienniku"
+		"message": "Dodaj na końcu dziennika"
 	},
 	"appendToExisting": {
-		"message": "Zapisz na końcu istniejącej notatki"
+		"message": "Dodaj na końcu istniejącej notatki"
 	},
 	"autoRunInterpreter": {
 		"message": "Uruchom automatycznie"
 	},
 	"autoRunInterpreterDescription": {
-		"message": "Natychmiast wywołuje odpowiednie zapytania, jeśli szablon je zawiera. Spowoduje to zużycie kredytów API u operatora modelu. Wyłącz, jeśli chcesz uruchamiać skrypt ręcznie."
+		"message": "Natychmiast wywołuje odpowiednie zapytania, jeśli szablon je zawiera. Spowoduje to zużycie kredytów API u dostawcy modelu. Wyłącz, jeśli chcesz uruchamiać interpreter ręcznie."
 	},
 	"behavior": {
 		"message": "Sposób działania"
@@ -75,7 +75,7 @@
 		"message": "Anuluj"
 	},
 	"cannotDeleteProvider": {
-		"message": "Nie można usunąć operatora \"$1\", ponieważ jest używany przez $2 model(e)."
+		"message": "Nie można usunąć dostawcy \"$1\", ponieważ jest używany przez $2 model(e)."
 	},
 	"changelog": {
 		"message": "Dziennik zmian"
@@ -118,7 +118,7 @@
 		"message": "Zamknij"
 	},
 	"commandOpenClipper": {
-		"message": "Otwórz schowek Obsidian"
+		"message": "Otwórz Obsidian Web Clipper"
 	},
 	"commandQuickClip": {
 		"message": "Przechwyć"
@@ -178,7 +178,7 @@
 		"message": "Czy na pewno chcesz usunąć ten model?"
 	},
 	"deleteProviderConfirm": {
-		"message": "Czy na pewno chcesz usunąć tego operatora?"
+		"message": "Czy na pewno chcesz usunąć tego dostawcę?"
 	},
 	"disableHighlighter": {
 		"message": "Wyłącz zakreślacz"
@@ -216,7 +216,7 @@
 		"message": "Edytuj model"
 	},
 	"editProvider": {
-		"message": "Edytuj operatora"
+		"message": "Edytuj dostawcę"
 	},
 	"editTemplate": {
 		"message": "Edytuj szablon"
@@ -228,7 +228,7 @@
 		"message": "Wyróżniaj treści na stronach, które możesz zapisać w Obsidian."
 	},
 	"enableInterpreter": {
-		"message": "Włącz tłumacza"
+		"message": "Włącz Interpreter"
 	},
 	"enableInterpreterDescription": {
 		"message": "Użyj języka naturalnego, aby wyodrębnić dane ze stron. Można na przykład użyć szablonu $strong_start${{\"podsumowanie strony\"}}$strong_end$. Wymaga klucza API lub niestandardowego modelu skonfigurowanego poniżej. $link_start$Dowiedz się więcej$link_end$.",
@@ -310,7 +310,7 @@
 		"message": "Błąd podczas importowania szablonu. Sprawdź plik i spróbuj ponownie."
 	},
 	"failedToInitialize": {
-		"message": "Spróbuj odświeżyć rozszerzenie."
+		"message": "Nie udało się uruchomić. Spróbuj odświeżyć rozszerzenie."
 	},
 	"failedToInitializeContent": {
 		"message": "Nie udało się uruchomić zawartości strony."
@@ -319,19 +319,19 @@
 		"message": "Przetwarzanie zapytania nie powiodło się. Spróbuj ponownie."
 	},
 	"failedToResetProviders": {
-		"message": "Nie udało się zresetować operatorów i modeli"
+		"message": "Nie udało się zresetować dostawców i modeli."
 	},
 	"failedToResetTemplate": {
 		"message": "Nie udało się zresetować domyślnego szablonu. Spróbuj ponownie."
 	},
 	"failedToSave": {
-		"message": "Nie udało się zapisać pliku"
+		"message": "Nie udało się zapisać pliku."
 	},
 	"failedToSaveFile": {
-		"message": "Nie udało się zapisać pliku"
+		"message": "Nie udało się zapisać pliku."
 	},
 	"failedToSaveProvider": {
-		"message": "Nie udało się zapisać operatora. Spróbuj ponownie."
+		"message": "Nie udało się zapisać dostawcy. Spróbuj ponownie."
 	},
 	"feedback": {
 		"message": "Opinia"
@@ -367,7 +367,7 @@
 		"message": "Wyróżnij stronę"
 	},
 	"highlightSelection": {
-		"message": "Podświetl"
+		"message": "Wyróżnij"
 	},
 	"highlighter": {
 		"message": "Zakreślacz"
@@ -432,16 +432,16 @@
 		"message": "Importuj szablon"
 	},
 	"interpret": {
-		"message": "wyślij zapytanie"
+		"message": "Wyślij zapytanie"
 	},
 	"interpreter": {
-		"message": "Tłumacz"
+		"message": "Interpreter"
 	},
 	"interpreterContext": {
 		"message": "Kontekst zapytania"
 	},
 	"interpreterContextDescription": {
-		"message": "Kontekst używany do przetwarzania zapytań. Zastępuje domyślny kontekst zdefiniowany w $link_start$ustawieniach tłumacza$link_end$. Można tu używać zmiennych.",
+		"message": "Kontekst używany do przetwarzania zapytań. Zastępuje domyślny kontekst zdefiniowany w $link_start$ustawieniach Interpretera$link_end$. Można tu używać zmiennych.",
 		"placeholders": {
 			"link_end": {
 				"content": "</a>"
@@ -464,10 +464,10 @@
 		"message": "Ostatnio używane"
 	},
 	"legacyMode": {
-		"message": "Tryb klasyczny"
+		"message": "Tryb starszy"
 	},
 	"legacyModeDescription": {
-		"message": "Używa URI jako sposobu wyodrębniania treści, który jest kompatybilny z Obsidian w wersji 1.6.7 lub starszej. Należy pamiętać, że długość treści, którą można wyodrębnić, jest ograniczona przez przeglądarkę i system operacyjny. Część stron może nie działać pomimo braku błędów."
+		"message": "Używa URI jako sposobu wyodrębniania treści, który jest zgodny z Obsidian w wersji 1.6.7 lub starszej. Należy pamiętać, że długość treści, którą można wyodrębnić, jest ograniczona przez przeglądarkę i system operacyjny. Część stron może nie działać pomimo braku błędów."
 	},
 	"loadArticle": {
 		"message": "Czytaj artykuł"
@@ -482,16 +482,16 @@
 		"message": "Nazwa modelu wyświetlana w interfejsie."
 	},
 	"modelProvider": {
-		"message": "Operator"
+		"message": "Dostawca"
 	},
 	"modelProviderDescription": {
-		"message": "Wybierz operatora tego modelu."
+		"message": "Wybierz dostawcę tego modelu."
 	},
 	"modelProviderPlaceholder": {
-		"message": "Operator"
+		"message": "Dostawca"
 	},
 	"modelRequiredFields": {
-		"message": "Nazwa modelu, operator i ID modelu są wymagane."
+		"message": "Nazwa modelu, dostawca i ID modelu są wymagane."
 	},
 	"models": {
 		"message": "Modele"
@@ -610,16 +610,16 @@
 		"message": "Wyskakujące okienko"
 	},
 	"prependToDaily": {
-		"message": "Zapisz na początku w dzienniku"
+		"message": "Dodaj na początku dziennika"
 	},
 	"prependToExisting": {
-		"message": "Zapisz na początku istniejącej notatki"
+		"message": "Dodaj na początku istniejącej notatki"
 	},
 	"preview": {
 		"message": "Podgląd"
 	},
 	"processing": {
-		"message": "przetwarzanie"
+		"message": "Przetwarzanie"
 	},
 	"properties": {
 		"message": "Atrybuty"
@@ -643,7 +643,7 @@
 		"message": "Lista"
 	},
 	"propertyTypeNumber": {
-		"message": "Numer"
+		"message": "Liczba"
 	},
 	"propertyTypeText": {
 		"message": "Tekst"
@@ -652,46 +652,46 @@
 		"message": "Wartość atrybutu"
 	},
 	"provider": {
-		"message": "Operator"
+		"message": "Dostawca"
 	},
 	"providerApiKey": {
 		"message": "Klucz API"
 	},
 	"providerApiKeyDescription": {
-		"message": "Twój klucz API dla tego operatora."
+		"message": "Twój klucz API dla tego dostawcy."
 	},
 	"providerBaseUrl": {
 		"message": "Adres URL"
 	},
 	"providerBaseUrlDescription": {
-		"message": "URL punktu końcowego API dla tego operatora."
+		"message": "Adres URL punktu końcowego API dla tego dostawcy."
 	},
 	"providerModelId": {
 		"message": "ID modelu"
 	},
 	"providerModelIdDescription": {
-		"message": "Identyfikator modelu od twojego operatora. Zazwyczaj krótka nazwa bez spacji."
+		"message": "Identyfikator modelu od twojego dostawcy. Zazwyczaj krótka nazwa bez spacji."
 	},
 	"providerModelIdPlaceholder": {
 		"message": "ID modelu"
 	},
 	"providerName": {
-		"message": "Nazwa operatora"
+		"message": "Nazwa dostawcy"
 	},
 	"providerNameDescription": {
-		"message": "Nazwa wyświetlana dla tego operatora."
+		"message": "Nazwa wyświetlana dla tego dostawcy."
 	},
 	"providerPreset": {
 		"message": "Ustawienie wstępne"
 	},
 	"providerPresetDescription": {
-		"message": "Wybierz operatora lub stwórz niestandardowego."
+		"message": "Wybierz dostawcę lub stwórz niestandardowego."
 	},
 	"providerRequiredFields": {
-		"message": "Nazwa operatora i adres URL są wymagane."
+		"message": "Nazwa dostawcy i adres URL są wymagane."
 	},
 	"providers": {
-		"message": "Operatorzy"
+		"message": "Dostawcy"
 	},
 	"rateExtensionDescription": {
 		"message": "Czy podoba Ci się Web Clipper? Pomóż nam, oceniając go."
@@ -733,7 +733,7 @@
 		"message": "Zwiń komentarz"
 	},
 	"readerColorLinks": {
-		"message": "Koloruj linki"
+		"message": "Koloruj łącza"
 	},
 	"readerColorSchemeDefault": {
 		"message": "Domyślny"
@@ -847,7 +847,7 @@
 		"message": "Wyświetl w pełnym rozmiarze"
 	},
 	"recommended": {
-		"message": "rekomendowane"
+		"message": "Zalecane"
 	},
 	"refresh": {
 		"message": "Odśwież"
@@ -874,16 +874,16 @@
 		"message": "Resetuj"
 	},
 	"resetDefaultTemplate": {
-		"message": "Resetuj domyślny szablon"
+		"message": "Zresetuj domyślny szablon"
 	},
 	"resetDefaultTemplateDescription": {
 		"message": "Usuń wszelkie zmiany wprowadzone w domyślnym szablonie."
 	},
 	"resetProvidersAndModels": {
-		"message": "Zresetuj domyślne modele"
+		"message": "Zresetuj dostawców i modele"
 	},
 	"resetProvidersAndModelsDescription": {
-		"message": "Zresetuj operatorów i modele do ustawień domyślnych."
+		"message": "Zresetuj dostawców i modele do ustawień domyślnych."
 	},
 	"save": {
 		"message": "Zapisz"
@@ -904,7 +904,7 @@
 		"message": "Szukaj zmiennych..."
 	},
 	"selectProvider": {
-		"message": "Wybierz operatora"
+		"message": "Wybierz dostawcę"
 	},
 	"selectTemplateToExport": {
 		"message": "Wybierz szablon do eksportu."
@@ -921,20 +921,20 @@
 	"share": {
 		"message": "Udostępnij..."
 	},
-	"shortcutInstructionsBrave": {
-		"message": "Aby zmienić skróty klawiszowe przejdź do $1"
+	“shortcutInstructionsBrave”: {
+		“message”: “Aby zmienić skróty klawiszowe, przejdź do $1”
 	},
-	"shortcutInstructionsChrome": {
-		"message": "Aby zmienić skróty klawiszowe przejdź do $1"
+	“shortcutInstructionsChrome”: {
+		“message”: “Aby zmienić skróty klawiszowe, przejdź do $1”
 	},
-	"shortcutInstructionsDefault": {
-		"message": "Aby zmienić skróty klawiszowe użyj ustawień rozszerzeń przeglądarki."
+	“shortcutInstructionsDefault”: {
+		“message”: “Aby zmienić skróty klawiszowe, użyj ustawień rozszerzeń przeglądarki.”
 	},
-	"shortcutInstructionsEdge": {
-		"message": "Aby zmienić skróty klawiszowe przejdź do $1"
+	“shortcutInstructionsEdge”: {
+		“message”: “Aby zmienić skróty klawiszowe, przejdź do $1”
 	},
-	"shortcutInstructionsFirefox": {
-		"message": "Aby zmienić skróty klawiszowe przejdź do $1, kliknij ikonę koła zębatego i wybierz „Zarządzaj skrótami klawiszowymi”."
+	“shortcutInstructionsFirefox”: {
+		“message”: “Aby zmienić skróty klawiszowe, przejdź do $1, kliknij ikonę koła zębatego i wybierz „Zarządzaj skrótami klawiszowymi”.”
 	},
 	"shortcutInstructionsIntro": {
 		"message": "Skróty klawiszowe zapewniają szybki dostęp do funkcji rozszerzenia."
@@ -943,7 +943,7 @@
 		"message": "Nie można zmieniać skrótów klawiszowych w przeglądarce Safari."
 	},
 	"shortcutNotSet": {
-		"message": "Nie ustawione"
+		"message": "Nie ustawiono"
 	},
 	"showActionsButton": {
 		"message": "Pokaż przycisk akcji"
@@ -1015,7 +1015,7 @@
 		"message": "Wyzwalacze szablonu"
 	},
 	"templateTriggersDescription": {
-		"message": "Zdefiniuj reguły umożliwiające automatyczne wybieranie tego szablonu, jeśli pasuje on do wzorca adresu URL lub zawiera dane schema.org. Jedna reguła na linię."
+		"message": "Zdefiniuj reguły umożliwiające automatyczne wybieranie tego szablonu, jeśli pasuje on do wzorca adresu URL lub zawiera dane schema.org. Jedna reguła na wiersz."
 	},
 	"templateValid": {
 		"message": "Składnia szablonu jest poprawna"
@@ -1024,10 +1024,10 @@
 		"message": "Szablony"
 	},
 	"thinking": {
-		"message": "analizowanie"
+		"message": "Analizowanie"
 	},
 	"unknownProvider": {
-		"message": "Nieznany operator"
+		"message": "Nieznany dostawca"
 	},
 	"updateAvailable": {
 		"message": "Dostępna jest aktualizacja."
