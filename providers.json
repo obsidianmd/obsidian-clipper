@@ -84,6 +84,17 @@
 			{ "id": "llama3.3", "name": "Llama 3.3 70B" }
 		]
 	},
+	"codex-cli": {
+		"id": "codex-cli",
+		"name": "Codex CLI",
+		"apiKeyRequired": false,
+		"modelsList": "https://help.openai.com/en/articles/11096431",
+		"baseUrl": "native:com.obsidian_clipper.codex",
+		"popularModels": [
+			{ "id": "default", "name": "Codex CLI default", "recommended": true },
+			{ "id": "gpt-5.3-codex", "name": "GPT 5.3 Codex" }
+		]
+	},
 	"openai": {
 		"id": "openai",
 		"name": "OpenAI",

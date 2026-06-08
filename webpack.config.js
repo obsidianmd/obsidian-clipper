@@ -146,6 +146,7 @@ module.exports = (env, argv) => {
 					{ from: "src/popup.html", to: "popup.html" },
 					{ from: "src/side-panel.html", to: "side-panel.html" },
 					{ from: "src/settings.html", to: "settings.html" },
+					{ from: "providers.json", to: "providers.json" },
 					{ from: "src/highlights.html", to: "highlights.html" },
 					{ from: "src/reader.html", to: "reader.html" },
 					{ from: "src/icons", to: "icons" },
@@ -169,7 +170,8 @@ module.exports = (env, argv) => {
 			},
 			new webpack.DefinePlugin({
 				'process.env.NODE_ENV': JSON.stringify(argv.mode),
-				'DEBUG_MODE': JSON.stringify(!isProduction)
+				'DEBUG_MODE': JSON.stringify(!isProduction),
+				'CODEX_NATIVE_HOST_SCRIPT_DIR': JSON.stringify(process.env.CODEX_NATIVE_HOST_SCRIPT_DIR || '')
 			}),
 			...(isProduction ? [
 				new ZipPlugin({
