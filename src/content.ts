@@ -12,6 +12,7 @@ import { saveFile } from './utils/file-utils';
 import { debugLog } from './utils/debug';
 import { updateSidebarWidth, addResizeHandle, cleanupResizeHandlers } from './utils/iframe-resize';
 import { parseForClip } from './utils/clip-utils';
+import { cleanDocumentInPlace, cleanExtractedHtml } from './utils/ad-cleaner';
 
 declare global {
 	interface Window {
@@ -154,9 +155,10 @@ declare global {
 			flattenShadowDom(document).then(() => {
 				try {
 					const defuddled = parseForClip(document);
+					const cleanedContent = cleanExtractedHtml(defuddled.content, { url: document.URL });
 
 					// Convert HTML content to markdown
-					const markdown = createMarkdownContent(defuddled.content, document.URL);
+					const markdown = createMarkdownContent(cleanedContent, document.URL);
 
 					// Copy to clipboard
 					const textArea = document.createElement("textarea");
@@ -179,7 +181,8 @@ declare global {
 			flattenShadowDom(document).then(async () => {
 				try {
 					const defuddled = parseForClip(document);
-					const markdown = createMarkdownContent(defuddled.content, document.URL);
+					const cleanedContent = cleanExtractedHtml(defuddled.content, { url: document.URL });
+					const markdown = createMarkdownContent(cleanedContent, document.URL);
 					const title = defuddled.title || document.title || 'Untitled';
 					const fileName = title.replace(/[/\\?%*:|"<>]/g, '-');
 					await saveFile({
@@ -213,12 +216,15 @@ declare global {
 
 				// Use parseAsync to ensure async variables like {{transcript}} are available.
 				// If it hangs (e.g. another extension has corrupted fetch), fall back to sync parse.
-				const defuddle = new Defuddle(document, { url: document.URL });
+				const extractionDoc = new DOMParser().parseFromString(document.documentElement.outerHTML, 'text/html');
+				cleanDocumentInPlace(extractionDoc, { url: document.URL });
+				const defuddle = new Defuddle(extractionDoc, { url: document.URL });
 				const parseTimeout = new Promise<never>((_, reject) =>
 					setTimeout(() => reject(new Error('parseAsync timeout')), 8000)
 				);
 				const defuddled = await Promise.race([defuddle.parseAsync(), parseTimeout])
 					.catch(() => defuddle.parse());
+				const cleanedContent = cleanExtractedHtml(defuddled.content, { url: document.URL });
 				const extractedContent: { [key: string]: string } = {
 					...defuddled.variables,
 				};
@@ -262,12 +268,14 @@ declare global {
 					});
 				});
 
+				cleanDocumentInPlace(doc, { url: document.URL });
+
 				// Get the modified HTML without scripts, styles, and style attributes
 				const cleanedHtml = doc.documentElement.outerHTML;
 
 				const response: ContentResponse = {
 					author: defuddled.author,
-					content: defuddled.content,
+					content: cleanedContent,
 					description: defuddled.description,
 					domain: getDomain(document.URL),
 					extractedContent: extractedContent,

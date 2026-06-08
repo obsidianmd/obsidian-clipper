@@ -10,6 +10,7 @@ import { applyFilters } from './utils/filters';
 import { buildVariables, generateFrontmatter, extractContentBySelector, selectorContentToString, formatPropertyValue } from './utils/shared';
 import { sanitizeFileName } from './utils/string-utils';
 import { Template, Property } from './types/types';
+import { cleanDocumentInPlace, cleanExtractedHtml, cleanFullHtml } from './utils/ad-cleaner';
 
 // ---------------------------------------------------------------------------
 // Public types
@@ -81,6 +82,10 @@ export function createSelectorProcessor(doc: DocLike): SelectorProcessor {
 
 		return filtersString ? applyFilters(contentString, filtersString, currentUrl) : contentString;
 	};
+}
+
+function getDefuddleInput(doc: any): Document {
+	return (doc?.nodeType === 9 ? doc : (doc?.ownerDocument || doc)) as unknown as Document;
 }
 
 // ---------------------------------------------------------------------------
@@ -178,24 +183,26 @@ export async function clip(options: ClipOptions): Promise<ClipResult> {
 
 	// Use pre-parsed document if provided, otherwise parse
 	const doc = parsedDocument ?? documentParser.parseFromString(html, 'text/html');
-	const documentElement = doc.documentElement || doc;
+	cleanDocumentInPlace(getDefuddleInput(doc), { url });
 
 	// Extract content with defuddle
 	// Cast through unknown: linkedom's Document is structurally compatible but not nominally typed as DOM Document
-	const defuddle = new DefuddleClass(documentElement as unknown as Document, { url });
+	const defuddle = new DefuddleClass(getDefuddleInput(doc), { url });
 	const defuddleResult = defuddle.parse();
+	const cleanedContentHtml = cleanExtractedHtml(defuddleResult.content, { url, documentParser });
+	const cleanedFullHtml = cleanFullHtml(html, { url, documentParser });
 
 	// Convert to markdown
-	const markdownContent = createMarkdownContent(defuddleResult.content, url);
+	const markdownContent = createMarkdownContent(cleanedContentHtml, url);
 
 	// Build template variables
 	const variables = buildVariables({
 		title: defuddleResult.title,
 		author: defuddleResult.author,
 		content: markdownContent,
-		contentHtml: defuddleResult.content,
+		contentHtml: cleanedContentHtml,
 		url,
-		fullHtml: html,
+		fullHtml: cleanedFullHtml,
 		description: defuddleResult.description,
 		favicon: defuddleResult.favicon,
 		image: defuddleResult.image,
