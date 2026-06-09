@@ -921,20 +921,20 @@
 	"share": {
 		"message": "Udostępnij..."
 	},
-	“shortcutInstructionsBrave”: {
-		“message”: “Aby zmienić skróty klawiszowe, przejdź do $1”
+	"shortcutInstructionsBrave": {
+		"message": "Aby zmienić skróty klawiszowe, przejdź do $1"
 	},
-	“shortcutInstructionsChrome”: {
-		“message”: “Aby zmienić skróty klawiszowe, przejdź do $1”
+	"shortcutInstructionsChrome": {
+		"message": "Aby zmienić skróty klawiszowe, przejdź do $1"
 	},
-	“shortcutInstructionsDefault”: {
-		“message”: “Aby zmienić skróty klawiszowe, użyj ustawień rozszerzeń przeglądarki.”
+	"shortcutInstructionsDefault": {
+		"message": "Aby zmienić skróty klawiszowe, użyj ustawień rozszerzeń przeglądarki."
 	},
-	“shortcutInstructionsEdge”: {
-		“message”: “Aby zmienić skróty klawiszowe, przejdź do $1”
+	"shortcutInstructionsEdge": {
+		"message": "Aby zmienić skróty klawiszowe, przejdź do $1"
 	},
-	“shortcutInstructionsFirefox”: {
-		“message”: “Aby zmienić skróty klawiszowe, przejdź do $1, kliknij ikonę koła zębatego i wybierz „Zarządzaj skrótami klawiszowymi”.”
+	"shortcutInstructionsFirefox": {
+		"message": "Aby zmienić skróty klawiszowe, przejdź do $1, kliknij ikonę koła zębatego i wybierz \"Zarządzaj skrótami klawiszowymi\"."
 	},
 	"shortcutInstructionsIntro": {
 		"message": "Skróty klawiszowe zapewniają szybki dostęp do funkcji rozszerzenia."
