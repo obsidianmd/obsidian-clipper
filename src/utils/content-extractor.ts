@@ -10,8 +10,7 @@ import { generalSettings } from './storage-utils';
 import {
 	getElementByXPath,
 	wrapElementWithMark,
-	wrapTextWithMark,
-	findTextNodeContaining
+	wrapTextWithMark
 } from './dom-utils';
 
 // Define ElementHighlightData type inline since it's not exported from highlighter.ts
@@ -401,14 +400,22 @@ function processInlineContent(content: string, tempDiv: HTMLElement) {
 	const searchText = stripHtml(content).trim();
 	debugLog('Highlights', 'Searching for text:', searchText);
 
-	const match = findTextNodeContaining(tempDiv, searchText);
-	if (!match) return;
+	// Wrap the first text node containing the full text. surroundContents
+	// requires a single text node, which is why this doesn't span inline
+	// elements (sufficient for the partial-paragraph case it handles).
+	const walker = document.createTreeWalker(tempDiv, NodeFilter.SHOW_TEXT);
+	let node: Node | null;
+	while ((node = walker.nextNode())) {
+		const index = (node.textContent || '').indexOf(searchText);
+		if (index === -1) continue;
 
-	const range = document.createRange();
-	range.setStart(match.node, match.index);
-	range.setEnd(match.node, match.index + searchText.length);
+		const range = document.createRange();
+		range.setStart(node, index);
+		range.setEnd(node, index + searchText.length);
 
-	const mark = document.createElement('mark');
-	range.surroundContents(mark);
-	debugLog('Highlights', 'Created mark element:', mark.outerHTML);
+		const mark = document.createElement('mark');
+		range.surroundContents(mark);
+		debugLog('Highlights', 'Created mark element:', mark.outerHTML);
+		return;
+	}
 }

@@ -315,10 +315,26 @@ function buildNormalizedTextIndex(root: Element): NormalizedTextIndex {
 	return { text, segments };
 }
 
+// Segments are contiguous and sorted by normStart, so binary-search for the one
+// whose [normStart, normEnd) range owns the offset. Empty segments (no emitted
+// chars) are skipped naturally since offset >= normEnd moves the search right.
+function findSegmentForOffset(segments: TextNodeSegment[], offset: number): TextNodeSegment | null {
+	let lo = 0;
+	let hi = segments.length - 1;
+	while (lo <= hi) {
+		const mid = (lo + hi) >> 1;
+		const seg = segments[mid];
+		if (offset < seg.normStart) hi = mid - 1;
+		else if (offset >= seg.normEnd) lo = mid + 1;
+		else return seg;
+	}
+	return null;
+}
+
 // Map an offset in the normalized text back to a live (node, raw offset) by
 // finding the owning text-node segment and replaying its whitespace collapse.
 function domPositionForNormalizedOffset(index: NormalizedTextIndex, offset: number): { node: Text; offset: number } | null {
-	const seg = index.segments.find(s => offset >= s.normStart && offset < s.normEnd);
+	const seg = findSegmentForOffset(index.segments, offset);
 	if (!seg) return null;
 	const target = offset - seg.normStart;
 	const raw = seg.node.textContent || '';
