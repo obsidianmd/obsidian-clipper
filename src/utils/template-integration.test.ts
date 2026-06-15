@@ -1,3 +1,8 @@
+// @vitest-environment jsdom
+// createMarkdownContent() runs turndown, which needs a DOM (document/DOMParser) to
+// parse the HTML it converts — same as the extension and CLI provide at runtime.
+// Without it, {{content}} fixtures (minimal, edge-cases) get turndown's error
+// fallback instead of real markdown. jsdom supplies those globals for this file.
 import { describe, test, expect, vi, beforeAll, afterAll } from 'vitest';
 import { readdirSync, readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
 import { join, basename, extname } from 'path';
