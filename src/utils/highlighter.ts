@@ -208,10 +208,19 @@ export interface HighlightData {
 	groupId?: string;
 }
 
+// Surrounding text captured at creation, used to disambiguate which occurrence
+// of the highlighted text to re-anchor to when the XPath is stale (cross-DOM).
+// The highlighted text itself is derived from `content`, so it isn't stored here.
+export interface TextQuoteAnchor {
+	prefix: string;
+	suffix: string;
+}
+
 export interface TextHighlightData extends HighlightData {
 	type: 'text';
 	startOffset: number;
 	endOffset: number;
+	textQuote?: TextQuoteAnchor;
 }
 
 export interface ElementHighlightData extends HighlightData {
@@ -709,13 +718,16 @@ function getHighlightRanges(range: Range): AnyHighlightData[] {
 			setElementHTML(wrapper, innerHtml);
 			const htmlContent = wrapper.outerHTML;
 
+			const textStartOffset = getTextOffset(blockElement, blockRange.startContainer, blockRange.startOffset);
+			const textEndOffset = getTextOffset(blockElement, blockRange.endContainer, blockRange.endOffset);
 			newHighlights.push({
 				xpath: getElementXPath(blockElement),
 				content: htmlContent,
 				type: 'text',
 				id: `${timestamp}_tx_${i}`,
-				startOffset: getTextOffset(blockElement, blockRange.startContainer, blockRange.startOffset),
-				endOffset: getTextOffset(blockElement, blockRange.endContainer, blockRange.endOffset),
+				startOffset: textStartOffset,
+				endOffset: textEndOffset,
+				textQuote: createTextQuoteAnchor(blockElement, textStartOffset, textEndOffset),
 			});
 		} catch (e) {
 			console.warn('Error creating text highlight for block:', blockElement, e);
@@ -851,6 +863,19 @@ function getTextOffset(container: Element, targetNode: Node, targetOffset: numbe
 	return offset;
 }
 
+// Capture ~64 chars of text on each side of a highlight within its block, used
+// to pick the right occurrence when re-anchoring by text across DOMs.
+const TEXT_QUOTE_CONTEXT_LENGTH = 64;
+
+export function createTextQuoteAnchor(container: Element, startOffset: number, endOffset: number): TextQuoteAnchor | undefined {
+	const text = container.textContent || '';
+	if (!text.slice(startOffset, endOffset).trim()) return undefined;
+	return {
+		prefix: text.slice(Math.max(0, startOffset - TEXT_QUOTE_CONTEXT_LENGTH), startOffset),
+		suffix: text.slice(endOffset, endOffset + TEXT_QUOTE_CONTEXT_LENGTH),
+	};
+}
+
 function addHighlight(highlight: AnyHighlightData, notes?: string[]) {
 	const oldHighlights = [...highlights];
 	const newHighlight = { ...highlight, notes: notes || [] };
@@ -965,6 +990,7 @@ function mergeHighlights(h1: AnyHighlightData, h2: AnyHighlightData): AnyHighlig
 				id: Date.now().toString(),
 				startOffset,
 				endOffset,
+				...(el ? { textQuote: createTextQuoteAnchor(el, startOffset, endOffset) } : {}),
 				...(notes.length > 0 ? { notes } : {}),
 				...(groupId ? { groupId } : {}),
 			};
@@ -1036,10 +1062,12 @@ export function applyHighlights() {
 	removeExistingHighlights();
 
 	highlights.forEach((highlight) => {
+		// container may be null when the stored XPath doesn't resolve against the
+		// current DOM (e.g. highlight made in a different view — live vs reader,
+		// or a regenerated reader). planHighlightOverlayRects handles that: text
+		// highlights re-anchor by content, element highlights skip.
 		const container = getElementByXPath(highlight.xpath);
-		if (container) {
-			planHighlightOverlayRects(container, highlight);
-		}
+		planHighlightOverlayRects(container, highlight);
 	});
 
 	lastAppliedVersion = highlightsVersion;
@@ -1198,6 +1226,12 @@ function migrateStoredHighlights(): boolean {
 					h.startOffset -= len;
 					h.endOffset -= len;
 					changed = true;
+				}
+				// 3. Backfill the text-quote anchor for highlights saved before it
+				//    existed, so they can re-anchor across DOMs like new ones.
+				if (!h.textQuote) {
+					h.textQuote = createTextQuoteAnchor(el, h.startOffset, h.endOffset);
+					if (h.textQuote) changed = true;
 				}
 			}
 		}

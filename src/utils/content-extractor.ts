@@ -201,7 +201,7 @@ export async function initializePageContent(
 	}
 }
 
-function processHighlights(content: string, highlights: AnyHighlightData[]): string {
+export function processHighlights(content: string, highlights: AnyHighlightData[]): string {
 	// First check if highlighter is enabled and we have highlights
 	if (!generalSettings.highlighterEnabled || !highlights?.length) {
 		return content;
@@ -367,19 +367,31 @@ function processContentBasedHighlight(highlight: TextHighlightData | ElementHigh
 }
 
 function processContentParagraphs(sourceParagraphs: Element[], tempDiv: HTMLDivElement) {
+	// Strip each target paragraph's text once, reused across every source
+	// paragraph and both the exact and substring passes below.
+	const targets = Array.from(tempDiv.querySelectorAll('p'))
+		.map(p => ({ el: p, text: stripHtml(p.outerHTML).trim() }));
+
 	sourceParagraphs.forEach(sourceParagraph => {
 		const sourceText = stripHtml(sourceParagraph.outerHTML).trim();
+		if (!sourceText) return;
 		debugLog('Highlights', 'Looking for paragraph:', sourceText);
-		
-		const paragraphs = Array.from(tempDiv.querySelectorAll('p'));
-		for (const targetParagraph of paragraphs) {
-			const targetText = stripHtml(targetParagraph.outerHTML).trim();
-			
-			if (targetText === sourceText) {
-				debugLog('Highlights', 'Found matching paragraph:', targetParagraph.outerHTML);
-				wrapElementWithMark(targetParagraph);
-				break;
-			}
+
+		// Try an exact whole-paragraph match first.
+		const exact = targets.find(t => t.text === sourceText);
+		if (exact) {
+			debugLog('Highlights', 'Found matching paragraph:', exact.el.outerHTML);
+			wrapElementWithMark(exact.el);
+			return;
+		}
+
+		// A sentence highlighted within a paragraph is stored as that fragment
+		// wrapped in a shallow <p>, so it never equals the full paragraph. Mark
+		// the substring inside the containing paragraph (fixes #446 / #852).
+		const container = targets.find(t => t.text.includes(sourceText));
+		if (container) {
+			debugLog('Highlights', 'Found containing paragraph for partial highlight:', container.el.outerHTML);
+			processInlineContent(sourceParagraph.outerHTML, container.el);
 		}
 	});
 }
@@ -387,28 +399,23 @@ function processContentParagraphs(sourceParagraphs: Element[], tempDiv: HTMLDivE
 function processInlineContent(content: string, tempDiv: HTMLElement) {
 	const searchText = stripHtml(content).trim();
 	debugLog('Highlights', 'Searching for text:', searchText);
-	
+
+	// Wrap the first text node containing the full text. surroundContents
+	// requires a single text node, which is why this doesn't span inline
+	// elements (sufficient for the partial-paragraph case it handles).
 	const walker = document.createTreeWalker(tempDiv, NodeFilter.SHOW_TEXT);
-	
-	let node;
-	while (node = walker.nextNode() as Text) {
-		const nodeText = node.textContent || '';
-		const index = nodeText.indexOf(searchText);
-		
-		if (index !== -1) {
-			debugLog('Highlights', 'Found matching text in node:', {
-				text: nodeText,
-				index: index
-			});
-			
-			const range = document.createRange();
-			range.setStart(node, index);
-			range.setEnd(node, index + searchText.length);
-			
-			const mark = document.createElement('mark');
-			range.surroundContents(mark);
-			debugLog('Highlights', 'Created mark element:', mark.outerHTML);
-			break;
-		}
+	let node: Node | null;
+	while ((node = walker.nextNode())) {
+		const index = (node.textContent || '').indexOf(searchText);
+		if (index === -1) continue;
+
+		const range = document.createRange();
+		range.setStart(node, index);
+		range.setEnd(node, index + searchText.length);
+
+		const mark = document.createElement('mark');
+		range.surroundContents(mark);
+		debugLog('Highlights', 'Created mark element:', mark.outerHTML);
+		return;
 	}
 }

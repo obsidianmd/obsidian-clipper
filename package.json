@@ -42,6 +42,7 @@
 		"css-loader": "^7.1.2",
 		"dotenv": "^16.4.1",
 		"esbuild": "^0.28.1",
+		"jsdom": "^29.1.1",
 		"mini-css-extract-plugin": "^2.9.1",
 		"sass": "^1.77.8",
 		"sass-loader": "^16.0.1",
