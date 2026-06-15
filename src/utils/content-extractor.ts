@@ -10,7 +10,8 @@ import { generalSettings } from './storage-utils';
 import {
 	getElementByXPath,
 	wrapElementWithMark,
-	wrapTextWithMark
+	wrapTextWithMark,
+	findTextNodeContaining
 } from './dom-utils';
 
 // Define ElementHighlightData type inline since it's not exported from highlighter.ts
@@ -367,28 +368,31 @@ function processContentBasedHighlight(highlight: TextHighlightData | ElementHigh
 }
 
 function processContentParagraphs(sourceParagraphs: Element[], tempDiv: HTMLDivElement) {
+	// Strip each target paragraph's text once, reused across every source
+	// paragraph and both the exact and substring passes below.
+	const targets = Array.from(tempDiv.querySelectorAll('p'))
+		.map(p => ({ el: p, text: stripHtml(p.outerHTML).trim() }));
+
 	sourceParagraphs.forEach(sourceParagraph => {
 		const sourceText = stripHtml(sourceParagraph.outerHTML).trim();
 		if (!sourceText) return;
 		debugLog('Highlights', 'Looking for paragraph:', sourceText);
 
-		const paragraphs = Array.from(tempDiv.querySelectorAll('p'));
-
 		// Try an exact whole-paragraph match first.
-		const exact = paragraphs.find(p => stripHtml(p.outerHTML).trim() === sourceText);
+		const exact = targets.find(t => t.text === sourceText);
 		if (exact) {
-			debugLog('Highlights', 'Found matching paragraph:', exact.outerHTML);
-			wrapElementWithMark(exact);
+			debugLog('Highlights', 'Found matching paragraph:', exact.el.outerHTML);
+			wrapElementWithMark(exact.el);
 			return;
 		}
 
 		// A sentence highlighted within a paragraph is stored as that fragment
 		// wrapped in a shallow <p>, so it never equals the full paragraph. Mark
 		// the substring inside the containing paragraph (fixes #446 / #852).
-		const container = paragraphs.find(p => stripHtml(p.outerHTML).includes(sourceText));
+		const container = targets.find(t => t.text.includes(sourceText));
 		if (container) {
-			debugLog('Highlights', 'Found containing paragraph for partial highlight:', container.outerHTML);
-			processInlineContent(sourceParagraph.outerHTML, container);
+			debugLog('Highlights', 'Found containing paragraph for partial highlight:', container.el.outerHTML);
+			processInlineContent(sourceParagraph.outerHTML, container.el);
 		}
 	});
 }
@@ -396,28 +400,15 @@ function processContentParagraphs(sourceParagraphs: Element[], tempDiv: HTMLDivE
 function processInlineContent(content: string, tempDiv: HTMLElement) {
 	const searchText = stripHtml(content).trim();
 	debugLog('Highlights', 'Searching for text:', searchText);
-	
-	const walker = document.createTreeWalker(tempDiv, NodeFilter.SHOW_TEXT);
-	
-	let node;
-	while (node = walker.nextNode() as Text) {
-		const nodeText = node.textContent || '';
-		const index = nodeText.indexOf(searchText);
-		
-		if (index !== -1) {
-			debugLog('Highlights', 'Found matching text in node:', {
-				text: nodeText,
-				index: index
-			});
-			
-			const range = document.createRange();
-			range.setStart(node, index);
-			range.setEnd(node, index + searchText.length);
-			
-			const mark = document.createElement('mark');
-			range.surroundContents(mark);
-			debugLog('Highlights', 'Created mark element:', mark.outerHTML);
-			break;
-		}
-	}
+
+	const match = findTextNodeContaining(tempDiv, searchText);
+	if (!match) return;
+
+	const range = document.createRange();
+	range.setStart(match.node, match.index);
+	range.setEnd(match.node, match.index + searchText.length);
+
+	const mark = document.createElement('mark');
+	range.surroundContents(mark);
+	debugLog('Highlights', 'Created mark element:', mark.outerHTML);
 }

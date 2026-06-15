@@ -103,19 +103,33 @@ function findTextNodeAtOffset(element: Element, offset: number): { node: Node, o
 	return null;
 }
 
-export function renderTextHighlight(highlight: { id: string; xpath: string; startOffset: number; endOffset: number; content?: string }): void {
+interface TextQuoteAnchor {
+	prefix?: string;
+	suffix?: string;
+}
+
+type RenderableTextHighlight = {
+	id: string;
+	xpath: string;
+	startOffset: number;
+	endOffset: number;
+	content?: string;
+	textQuote?: TextQuoteAnchor;
+};
+
+export function renderTextHighlight(highlight: RenderableTextHighlight): void {
 	const hl = ensureUserHighlight();
 	if (!hl) return;
 
 	// Primary: resolve by stored XPath + character offsets.
 	let range = buildTextRangeFromXPath(highlight);
 
-	// Fallback: the XPath didn't resolve against the current DOM. This happens
-	// whenever the highlight was made against a different DOM than the one now
-	// showing — live vs reader, or a reader view regenerated on re-entry. Locate
-	// the highlighted text by its stored content instead so it still renders.
-	if (!range && highlight.content) {
-		range = buildTextRangeFromContent(highlight.content);
+	// Fallback: the XPath didn't resolve against the current DOM (or resolved to
+	// the wrong text). This happens whenever the highlight was made against a
+	// different DOM than the one now showing — live vs reader, or a reader view
+	// regenerated on re-entry. Re-anchor by the highlighted text instead.
+	if (!range) {
+		range = buildTextRangeFromQuote(highlight);
 	}
 
 	if (!range) return;
@@ -125,7 +139,7 @@ export function renderTextHighlight(highlight: { id: string; xpath: string; star
 	else textHighlightRanges.set(highlight.id, [range]);
 }
 
-function buildTextRangeFromXPath(highlight: { xpath: string; startOffset: number; endOffset: number }): Range | null {
+function buildTextRangeFromXPath(highlight: RenderableTextHighlight): Range | null {
 	const container = getElementByXPath(highlight.xpath);
 	if (!container) return null;
 	const start = findTextNodeAtOffset(container, highlight.startOffset);
@@ -135,39 +149,183 @@ function buildTextRangeFromXPath(highlight: { xpath: string; startOffset: number
 		const range = document.createRange();
 		range.setStart(start.node, start.offset);
 		range.setEnd(end.node, end.offset);
-		return range.collapsed ? null : range;
+		if (range.collapsed) return null;
+		// Guard against a stale XPath that resolves to a *different* element in
+		// the current DOM: if the resolved text doesn't match the stored
+		// content, reject it so the quote fallback can re-anchor by text.
+		const expected = highlightExactText(highlight);
+		if (expected && normalizeText(range.toString()) !== expected) return null;
+		return range;
 	} catch (e) {
 		console.warn('Failed to build Range from XPath for text highlight', highlight.xpath, e);
 		return null;
 	}
 }
 
-// Locate a highlight's text in the current document by its stored content.
-// Used when the XPath is stale (cross-DOM). Matches the first text node that
-// contains the full text, skipping the highlighter's own UI chrome.
-function buildTextRangeFromContent(content: string): Range | null {
-	const doc = new DOMParser().parseFromString(content, 'text/html');
-	const searchText = (doc.body.textContent || '').trim();
-	if (!searchText) return null;
+// Re-anchor a highlight by its text when the XPath is stale. Matching is done
+// in whitespace-normalized space (so the same prose matches across DOMs that
+// space it differently) and scoped to the article (so UI chrome isn't matched).
+// When the exact text occurs more than once, the stored prefix/suffix context
+// picks the right occurrence. The match maps back to live DOM nodes, so a
+// highlight spanning inline elements (a link mid-sentence) still resolves.
+function buildTextRangeFromQuote(highlight: RenderableTextHighlight): Range | null {
+	const exact = highlightExactText(highlight);
+	if (!exact) return null;
 
-	const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+	const index = getNormalizedTextIndex();
+	// Collapse internal whitespace but keep the edge adjacent to the exact text:
+	// commonSuffixLength/commonPrefixLength compare from that boundary, so the
+	// space between the context and the highlighted text must be preserved.
+	const prefix = collapseWhitespace(highlight.textQuote?.prefix || '');
+	const suffix = collapseWhitespace(highlight.textQuote?.suffix || '');
+
+	// Pick the occurrence whose surrounding text best matches the stored context.
+	let bestStart = -1;
+	let bestScore = -1;
+	for (let from = 0; from <= index.text.length;) {
+		const start = index.text.indexOf(exact, from);
+		if (start === -1) break;
+		const before = index.text.slice(Math.max(0, start - prefix.length), start);
+		const after = index.text.slice(start + exact.length, start + exact.length + suffix.length);
+		const score = commonSuffixLength(before, prefix) + commonPrefixLength(after, suffix);
+		if (score > bestScore) {
+			bestScore = score;
+			bestStart = start;
+		}
+		from = start + Math.max(1, exact.length);
+	}
+	if (bestStart === -1) return null;
+
+	const start = domPositionForNormalizedOffset(index, bestStart);
+	const end = domPositionForNormalizedOffset(index, bestStart + exact.length - 1);
+	if (!start || !end) return null;
+	try {
+		const range = document.createRange();
+		range.setStart(start.node, start.offset);
+		range.setEnd(end.node, end.offset + 1); // end is the last matched char; range ends after it
+		return range.collapsed ? null : range;
+	} catch (e) {
+		console.warn('Failed to build Range from text quote', e);
+		return null;
+	}
+}
+
+function highlightExactText(highlight: RenderableTextHighlight): string {
+	return highlight.content ? normalizeText(htmlToText(highlight.content)) : '';
+}
+
+// Prefer the article body so the fallback search ignores nav/chrome/furniture.
+function getTextSearchRoot(): Element {
+	return document.querySelector('.obsidian-reader-content article')
+		|| document.querySelector('article')
+		|| document.body;
+}
+
+function htmlToText(html: string): string {
+	const doc = new DOMParser().parseFromString(html, 'text/html');
+	return (doc.body.textContent || '').trim();
+}
+
+function normalizeText(text: string): string {
+	return collapseWhitespace(text).trim();
+}
+
+function collapseWhitespace(text: string): string {
+	return text.replace(/\s+/g, ' ');
+}
+
+function commonPrefixLength(a: string, b: string): number {
+	const max = Math.min(a.length, b.length);
+	let i = 0;
+	while (i < max && a[i] === b[i]) i++;
+	return i;
+}
+
+function commonSuffixLength(a: string, b: string): number {
+	const max = Math.min(a.length, b.length);
+	let i = 0;
+	while (i < max && a[a.length - 1 - i] === b[b.length - 1 - i]) i++;
+	return i;
+}
+
+// A whitespace-normalized view of the search root's text, plus per-text-node
+// segments so a normalized offset can be mapped back to a live (node, offset).
+// Node-granular (not per-character) to keep memory small; the raw offset within
+// the matched node is recomputed on demand. Built lazily and cached for the
+// duration of one render pass (cleared by clearTextHighlights).
+interface TextNodeSegment {
+	node: Text;
+	normStart: number;
+	normEnd: number;
+	prevWasSpace: boolean;
+}
+interface NormalizedTextIndex {
+	text: string;
+	segments: TextNodeSegment[];
+}
+
+let normalizedTextIndexCache: NormalizedTextIndex | null = null;
+let normalizedTextIndexRoot: Element | null = null;
+
+function getNormalizedTextIndex(): NormalizedTextIndex {
+	const root = getTextSearchRoot();
+	if (normalizedTextIndexCache && normalizedTextIndexRoot === root && root.isConnected) {
+		return normalizedTextIndexCache;
+	}
+	normalizedTextIndexRoot = root;
+	normalizedTextIndexCache = buildNormalizedTextIndex(root);
+	return normalizedTextIndexCache;
+}
+
+function buildNormalizedTextIndex(root: Element): NormalizedTextIndex {
+	const segments: TextNodeSegment[] = [];
+	let text = '';
+	let prevWasSpace = true; // treat the start as preceded by space so leading whitespace collapses away
+	const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
 		acceptNode: (node) =>
-			node.parentElement?.closest(IGNORED_BOUNDARY_SELECTOR)
+			node.parentElement?.closest('script, style, noscript, ' + IGNORED_BOUNDARY_SELECTOR)
 				? NodeFilter.FILTER_REJECT
 				: NodeFilter.FILTER_ACCEPT,
 	});
-
 	let node: Node | null;
 	while ((node = walker.nextNode())) {
-		const index = (node.textContent || '').indexOf(searchText);
-		if (index === -1) continue;
-		try {
-			const range = document.createRange();
-			range.setStart(node, index);
-			range.setEnd(node, index + searchText.length);
-			if (!range.collapsed) return range;
-		} catch {
-			// Try the next matching node.
+		const normStart = text.length;
+		const segPrevWasSpace = prevWasSpace;
+		const raw = node.textContent || '';
+		for (let i = 0; i < raw.length; i++) {
+			if (/\s/.test(raw[i])) {
+				if (!prevWasSpace) { text += ' '; prevWasSpace = true; }
+			} else {
+				text += raw[i];
+				prevWasSpace = false;
+			}
+		}
+		segments.push({ node: node as Text, normStart, normEnd: text.length, prevWasSpace: segPrevWasSpace });
+	}
+	return { text, segments };
+}
+
+// Map an offset in the normalized text back to a live (node, raw offset) by
+// finding the owning text-node segment and replaying its whitespace collapse.
+function domPositionForNormalizedOffset(index: NormalizedTextIndex, offset: number): { node: Text; offset: number } | null {
+	const seg = index.segments.find(s => offset >= s.normStart && offset < s.normEnd);
+	if (!seg) return null;
+	const target = offset - seg.normStart;
+	const raw = seg.node.textContent || '';
+	let emitted = 0;
+	let prevWasSpace = seg.prevWasSpace;
+	for (let i = 0; i < raw.length; i++) {
+		const isSpace = /\s/.test(raw[i]);
+		if (isSpace) {
+			if (!prevWasSpace) {
+				if (emitted === target) return { node: seg.node, offset: i };
+				emitted++;
+				prevWasSpace = true;
+			}
+		} else {
+			if (emitted === target) return { node: seg.node, offset: i };
+			emitted++;
+			prevWasSpace = false;
 		}
 	}
 	return null;
@@ -176,6 +334,8 @@ function buildTextRangeFromContent(content: string): Range | null {
 export function clearTextHighlights(): void {
 	userHighlight?.clear();
 	textHighlightRanges.clear();
+	normalizedTextIndexCache = null;
+	normalizedTextIndexRoot = null;
 }
 
 function findOverlayAtPoint(x: number, y: number): HTMLElement | null {
@@ -410,11 +570,16 @@ export function handleTouchMove(event: TouchEvent) {
 // Render one highlight. Text highlights go through the CSS Custom Highlight
 // API; element highlights (figure, img, table, pre, picture) get one overlay
 // div positioned over the target element.
-export function planHighlightOverlayRects(target: Element, highlight: AnyHighlightData) {
+export function planHighlightOverlayRects(target: Element | null, highlight: AnyHighlightData) {
 	if (highlight.type === 'text') {
+		// Text highlights re-anchor themselves (XPath, then content fallback),
+		// so they don't need a resolved target element.
 		renderTextHighlight(highlight);
 		return;
 	}
+	// Element highlights position an overlay over the target, so a stale XPath
+	// (null target) means there's nothing to draw.
+	if (!target) return;
 	const rect = target.getBoundingClientRect();
 	const overlay = document.createElement('div');
 	overlay.className = 'obsidian-highlight-overlay';

@@ -18,6 +18,29 @@ export function setElementHTML(element: Element, html: string): void {
 	element.replaceChildren(...Array.from(parsed.body.childNodes));
 }
 
+// Walk text nodes under `root` and return the first one containing `searchText`,
+// along with the offset where it starts. `skipSelector` excludes text inside
+// matching ancestors (e.g. UI chrome). Used to re-anchor a highlight by its
+// text when its stored XPath no longer resolves.
+export function findTextNodeContaining(
+	root: Node,
+	searchText: string,
+	skipSelector?: string
+): { node: Text; index: number } | null {
+	const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, skipSelector ? {
+		acceptNode: (node) =>
+			node.parentElement?.closest(skipSelector)
+				? NodeFilter.FILTER_REJECT
+				: NodeFilter.FILTER_ACCEPT,
+	} : null);
+	let node: Node | null;
+	while ((node = walker.nextNode())) {
+		const index = (node.textContent || '').indexOf(searchText);
+		if (index !== -1) return { node: node as Text, index };
+	}
+	return null;
+}
+
 export function setSVGChildren(svgElement: Element, markup: string): void {
 	const doc = new DOMParser()
 		.parseFromString(`<svg xmlns="http://www.w3.org/2000/svg">${markup}</svg>`, 'image/svg+xml');
