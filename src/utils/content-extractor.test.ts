@@ -32,4 +32,18 @@ describe('processHighlights — highlight-inline', () => {
 		expect(result).toContain('<mark>A seismic shift is rocking the healthcare industry.</mark>');
 		expect(result).toContain('Much like Uber once did.');
 	});
+
+	// A partial highlight crossing an inline element must still wrap (the range
+	// spans nodes, so it uses extractContents rather than surroundContents).
+	test('wraps a partial highlight that spans an inline element', () => {
+		const withLink = '<p>A <a href="#">seismic</a> shift is rocking the healthcare industry. Much like Uber.</p>';
+		const result = processHighlights(withLink, [
+			textHighlight('<p>A seismic shift is rocking the healthcare industry.</p>'),
+		]);
+		const mark = new DOMParser().parseFromString(result, 'text/html').querySelector('mark');
+		expect(mark).not.toBeNull();
+		expect(mark!.textContent?.replace(/\s+/g, ' ').trim()).toBe('A seismic shift is rocking the healthcare industry.');
+		// The link must survive inside the mark, proving the range crossed it.
+		expect(mark!.querySelector('a')).not.toBeNull();
+	});
 });

@@ -391,19 +391,57 @@ function processContentParagraphs(sourceParagraphs: Element[], tempDiv: HTMLDivE
 		const container = targets.find(t => t.text.includes(sourceText));
 		if (container) {
 			debugLog('Highlights', 'Found containing paragraph for partial highlight:', container.el.outerHTML);
-			processInlineContent(sourceParagraph.outerHTML, container.el);
+			processInlineContent(sourceParagraph.outerHTML, container.el, true);
 		}
 	});
 }
 
-function processInlineContent(content: string, tempDiv: HTMLElement) {
+// Locate the text node + offset for a character position within `root`'s
+// concatenated text. Used to build a range that may span multiple text nodes.
+function findTextNodeAtOffset(root: Node, offset: number): { node: Node; index: number } | null {
+	const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+	let consumed = 0;
+	let node: Node | null;
+	while ((node = walker.nextNode())) {
+		const length = node.textContent?.length || 0;
+		if (consumed + length >= offset) return { node, index: offset - consumed };
+		consumed += length;
+	}
+	return null;
+}
+
+// Wrap `searchText` in a <mark>. When `spanInline` is set the match is resolved
+// against the element's full text and may cross inline elements (a link/bold
+// mid-sentence), so it uses extractContents() — surroundContents() throws when
+// a range crosses element boundaries. Callers pass a scoped element in that
+// case; the whole-body fallback stays single-node so a range can't span blocks.
+function processInlineContent(content: string, root: HTMLElement, spanInline = false) {
 	const searchText = stripHtml(content).trim();
+	if (!searchText) return;
 	debugLog('Highlights', 'Searching for text:', searchText);
 
-	// Wrap the first text node containing the full text. surroundContents
-	// requires a single text node, which is why this doesn't span inline
-	// elements (sufficient for the partial-paragraph case it handles).
-	const walker = document.createTreeWalker(tempDiv, NodeFilter.SHOW_TEXT);
+	if (spanInline) {
+		const index = (root.textContent || '').indexOf(searchText);
+		if (index === -1) return;
+		const start = findTextNodeAtOffset(root, index);
+		const end = findTextNodeAtOffset(root, index + searchText.length);
+		if (!start || !end) return;
+
+		const range = document.createRange();
+		range.setStart(start.node, start.index);
+		range.setEnd(end.node, end.index);
+		if (range.collapsed) return;
+
+		const mark = document.createElement('mark');
+		mark.appendChild(range.extractContents());
+		range.insertNode(mark);
+		debugLog('Highlights', 'Created mark element:', mark.outerHTML);
+		return;
+	}
+
+	// Single text node match: safe for a whole-body search since the range
+	// can't span unrelated blocks.
+	const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
 	let node: Node | null;
 	while ((node = walker.nextNode())) {
 		const index = (node.textContent || '').indexOf(searchText);
