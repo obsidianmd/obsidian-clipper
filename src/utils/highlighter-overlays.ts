@@ -210,8 +210,18 @@ function buildTextRangeFromQuote(highlight: RenderableTextHighlight): Range | nu
 	}
 }
 
+// The highlighted text, derived from content (which is HTML). Cached by content
+// — it's immutable, so this never goes stale — to avoid re-parsing on every
+// render: applyHighlights re-runs on each resize/scroll reposition.
+const exactTextCache = new Map<string, string>();
 function highlightExactText(highlight: RenderableTextHighlight): string {
-	return highlight.content ? normalizeText(htmlToText(highlight.content)) : '';
+	if (!highlight.content) return '';
+	let exact = exactTextCache.get(highlight.content);
+	if (exact === undefined) {
+		exact = normalizeText(htmlToText(highlight.content));
+		exactTextCache.set(highlight.content, exact);
+	}
+	return exact;
 }
 
 // Prefer the article body so the fallback search ignores nav/chrome/furniture.

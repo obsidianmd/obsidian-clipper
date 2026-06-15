@@ -867,7 +867,7 @@ function getTextOffset(container: Element, targetNode: Node, targetOffset: numbe
 // to pick the right occurrence when re-anchoring by text across DOMs.
 const TEXT_QUOTE_CONTEXT_LENGTH = 64;
 
-function createTextQuoteAnchor(container: Element, startOffset: number, endOffset: number): TextQuoteAnchor | undefined {
+export function createTextQuoteAnchor(container: Element, startOffset: number, endOffset: number): TextQuoteAnchor | undefined {
 	const text = container.textContent || '';
 	if (!text.slice(startOffset, endOffset).trim()) return undefined;
 	return {
