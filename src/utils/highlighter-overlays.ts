@@ -103,26 +103,74 @@ function findTextNodeAtOffset(element: Element, offset: number): { node: Node, o
 	return null;
 }
 
-export function renderTextHighlight(highlight: { id: string; xpath: string; startOffset: number; endOffset: number }): void {
+export function renderTextHighlight(highlight: { id: string; xpath: string; startOffset: number; endOffset: number; content?: string }): void {
 	const hl = ensureUserHighlight();
 	if (!hl) return;
+
+	// Primary: resolve by stored XPath + character offsets.
+	let range = buildTextRangeFromXPath(highlight);
+
+	// Fallback: the XPath didn't resolve against the current DOM. This happens
+	// whenever the highlight was made against a different DOM than the one now
+	// showing — live vs reader, or a reader view regenerated on re-entry. Locate
+	// the highlighted text by its stored content instead so it still renders.
+	if (!range && highlight.content) {
+		range = buildTextRangeFromContent(highlight.content);
+	}
+
+	if (!range) return;
+	hl.add(range);
+	const existing = textHighlightRanges.get(highlight.id);
+	if (existing) existing.push(range);
+	else textHighlightRanges.set(highlight.id, [range]);
+}
+
+function buildTextRangeFromXPath(highlight: { xpath: string; startOffset: number; endOffset: number }): Range | null {
 	const container = getElementByXPath(highlight.xpath);
-	if (!container) return;
+	if (!container) return null;
 	const start = findTextNodeAtOffset(container, highlight.startOffset);
 	const end = findTextNodeAtOffset(container, highlight.endOffset);
-	if (!start || !end) return;
+	if (!start || !end) return null;
 	try {
 		const range = document.createRange();
 		range.setStart(start.node, start.offset);
 		range.setEnd(end.node, end.offset);
-		if (range.collapsed) return;
-		hl.add(range);
-		const existing = textHighlightRanges.get(highlight.id);
-		if (existing) existing.push(range);
-		else textHighlightRanges.set(highlight.id, [range]);
+		return range.collapsed ? null : range;
 	} catch (e) {
-		console.warn('Failed to build Range for text highlight', highlight.id, e);
+		console.warn('Failed to build Range from XPath for text highlight', highlight.xpath, e);
+		return null;
 	}
+}
+
+// Locate a highlight's text in the current document by its stored content.
+// Used when the XPath is stale (cross-DOM). Matches the first text node that
+// contains the full text, skipping the highlighter's own UI chrome.
+function buildTextRangeFromContent(content: string): Range | null {
+	const doc = new DOMParser().parseFromString(content, 'text/html');
+	const searchText = (doc.body.textContent || '').trim();
+	if (!searchText) return null;
+
+	const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+		acceptNode: (node) =>
+			node.parentElement?.closest(IGNORED_BOUNDARY_SELECTOR)
+				? NodeFilter.FILTER_REJECT
+				: NodeFilter.FILTER_ACCEPT,
+	});
+
+	let node: Node | null;
+	while ((node = walker.nextNode())) {
+		const index = (node.textContent || '').indexOf(searchText);
+		if (index === -1) continue;
+		try {
+			const range = document.createRange();
+			range.setStart(node, index);
+			range.setEnd(node, index + searchText.length);
+			if (!range.collapsed) return range;
+		} catch {
+			// Try the next matching node.
+		}
+	}
+	return null;
 }
 
 export function clearTextHighlights(): void {

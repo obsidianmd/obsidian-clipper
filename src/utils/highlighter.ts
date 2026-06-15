@@ -1039,6 +1039,12 @@ export function applyHighlights() {
 		const container = getElementByXPath(highlight.xpath);
 		if (container) {
 			planHighlightOverlayRects(container, highlight);
+		} else if (highlight.type === 'text') {
+			// XPath didn't resolve — the highlight was made against a different
+			// DOM (live vs reader, or a regenerated reader). Text highlights can
+			// still render: renderTextHighlight falls back to locating the text
+			// by content. The target arg is unused for text highlights.
+			planHighlightOverlayRects(document.body, highlight);
 		}
 	});
 
