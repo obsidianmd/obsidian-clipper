@@ -786,6 +786,9 @@
 	"readerFontSystemSerif": {
 		"message": "Serif"
 	},
+	"readerFontUnavailable": {
+		"message": "Aquesta lletra no està disponible aquí — el navegador podria estar bloquejant les lletres personalitzades."
+	},
 	"readerFonts": {
 		"message": "Lletres"
 	},

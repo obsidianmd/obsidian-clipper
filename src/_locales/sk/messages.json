@@ -786,6 +786,9 @@
 	"readerFontSystemSerif": {
 		"message": "Pätkové"
 	},
+	"readerFontUnavailable": {
+		"message": "Toto písmo tu nie je dostupné — váš prehliadač môže blokovať vlastné písma."
+	},
 	"readerFonts": {
 		"message": "Písma"
 	},

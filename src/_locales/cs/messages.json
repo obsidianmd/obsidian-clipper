@@ -778,6 +778,9 @@
 	"readerFontSystemSerif": {
 		"message": "Patkové"
 	},
+	"readerFontUnavailable": {
+		"message": "Toto písmo zde není dostupné — váš prohlížeč může blokovat vlastní písma."
+	},
 	"readerFonts": {
 		"message": "Písma"
 	},

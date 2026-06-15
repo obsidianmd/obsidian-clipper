@@ -778,6 +778,9 @@
 	"readerFontSystemSerif": {
 		"message": "Із засічками"
 	},
+	"readerFontUnavailable": {
+		"message": "Цей шрифт тут недоступний — можливо, ваш браузер блокує користувацькі шрифти."
+	},
 	"readerFonts": {
 		"message": "Шрифти"
 	},

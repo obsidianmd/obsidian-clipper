@@ -786,6 +786,9 @@
 	"readerFontSystemSerif": {
 		"message": "襯線"
 	},
+	"readerFontUnavailable": {
+		"message": "此字型在此處無法使用 — 您的瀏覽器可能封鎖了自訂字型。"
+	},
 	"readerFonts": {
 		"message": "字型"
 	},

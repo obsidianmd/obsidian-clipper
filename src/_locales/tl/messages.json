@@ -778,6 +778,9 @@
 	"readerFontSystemSerif": {
 		"message": "Serif"
 	},
+	"readerFontUnavailable": {
+		"message": "Hindi available ang font na ito rito — maaaring hinaharangan ng iyong browser ang mga custom na font."
+	},
 	"readerFonts": {
 		"message": "Mga font"
 	},

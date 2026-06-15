@@ -786,6 +786,9 @@
 	"readerFontSystemSerif": {
 		"message": "세리프"
 	},
+	"readerFontUnavailable": {
+		"message": "이 글꼴은 여기에서 사용할 수 없습니다. 브라우저가 사용자 지정 글꼴을 차단하고 있을 수 있습니다."
+	},
 	"readerFonts": {
 		"message": "글꼴"
 	},

@@ -786,6 +786,9 @@
 	"readerFontSystemSerif": {
 		"message": "Serif"
 	},
+	"readerFontUnavailable": {
+		"message": "Bu yazı tipi burada kullanılamıyor — tarayıcınız özel yazı tiplerini engelliyor olabilir."
+	},
 	"readerFonts": {
 		"message": "Yazı tipleri"
 	},

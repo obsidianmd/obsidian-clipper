@@ -786,6 +786,9 @@
 	"readerFontSystemSerif": {
 		"message": "Serif"
 	},
+	"readerFontUnavailable": {
+		"message": "هذا الخط غير متوفر هنا — قد يحظر متصفحك الخطوط المخصصة."
+	},
 	"readerFonts": {
 		"message": "الخطوط"
 	},

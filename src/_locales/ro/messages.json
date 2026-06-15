@@ -778,6 +778,9 @@
 	"readerFontSystemSerif": {
 		"message": "Serif"
 	},
+	"readerFontUnavailable": {
+		"message": "Acest font nu este disponibil aici — browserul tău ar putea bloca fonturile personalizate."
+	},
 	"readerFonts": {
 		"message": "Fonturi"
 	},

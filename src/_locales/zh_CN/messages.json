@@ -786,6 +786,9 @@
 	"readerFontSystemSerif": {
 		"message": "衬线"
 	},
+	"readerFontUnavailable": {
+		"message": "此字体在此处不可用 — 您的浏览器可能阻止了自定义字体。"
+	},
 	"readerFonts": {
 		"message": "字体"
 	},

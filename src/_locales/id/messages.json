@@ -786,6 +786,9 @@
 	"readerFontSystemSerif": {
 		"message": "Serif"
 	},
+	"readerFontUnavailable": {
+		"message": "Font ini tidak tersedia di sini — browser Anda mungkin memblokir font kustom."
+	},
 	"readerFonts": {
 		"message": "Font"
 	},

@@ -794,6 +794,9 @@
 	"readerFontSystemSerif": {
 		"message": "Serif"
 	},
+	"readerFontUnavailable": {
+		"message": "Tämä fontti ei ole käytettävissä täällä — selaimesi saattaa estää mukautetut fontit."
+	},
 	"readerFonts": {
 		"message": "Fontit"
 	},

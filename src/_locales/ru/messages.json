@@ -786,6 +786,9 @@
 	"readerFontSystemSerif": {
 		"message": "С засечками"
 	},
+	"readerFontUnavailable": {
+		"message": "Этот шрифт здесь недоступен — возможно, ваш браузер блокирует пользовательские шрифты."
+	},
 	"readerFonts": {
 		"message": "Шрифты"
 	},

@@ -25,7 +25,7 @@ function hl(): HighlighterAPI {
 }
 import { copyToClipboard } from './clipboard-utils';
 import { getMessage, initializeI18n } from './i18n';
-import { getFontCss } from './font-utils';
+import { getFontCss, isFontAvailable } from './font-utils';
 import { createMarkdownContent } from 'defuddle/full';
 import { saveFile } from './file-utils';
 import { parseForClip } from './clip-utils';
@@ -139,6 +139,10 @@ export class Reader {
 		return svg;
 	}
 	private static settingsBar: HTMLElement | null = null;
+	private static fontNotice: HTMLElement | null = null;
+	// Safari and Firefox farble canvas text metrics, so the canvas-based font
+	// probe is unreliable there; fall back to the Font Loading API instead.
+	private static fontProbeBlocked: boolean = false;
 	private static colorSchemeMediaQuery: MediaQueryList | null = null;
 	private static readerStyles: HTMLLinkElement | null = null;
 	private static lightbox: HTMLElement | null = null;
@@ -610,6 +614,12 @@ export class Reader {
 		}
 		fontWrapper.appendChild(fontSelect);
 
+		const fontNotice = doc.createElement('div');
+		fontNotice.className = 'obsidian-reader-font-notice';
+		fontNotice.textContent = getMessage('readerFontUnavailable');
+		fontNotice.style.display = 'none';
+		this.fontNotice = fontNotice;
+
 		// Assemble everything
 		const typographyGroup = doc.createElement('div');
 		typographyGroup.className = 'obsidian-reader-settings-typography-group';
@@ -627,6 +637,7 @@ export class Reader {
 		dropdownGroup.appendChild(themeModeWrapper);
 		dropdownGroup.appendChild(themeWrapper);
 		dropdownGroup.appendChild(fontWrapper);
+		dropdownGroup.appendChild(fontNotice);
 		controlsContainer.appendChild(dropdownGroup);
 
 		const spacer2 = doc.createElement('div');
@@ -695,6 +706,11 @@ export class Reader {
 			this.applyFont(doc, fontSelect.value);
 			this.saveSettings();
 		});
+
+		// Surface the notice now, and re-check once any web fonts finish loading
+		// so a still-loading font isn't briefly flagged as unavailable.
+		this.updateFontNotice(doc, this.settings.defaultFont);
+		doc.fonts?.ready?.then(() => this.updateFontNotice(doc, this.settings.defaultFont)).catch(() => {});
 
 		// Notify content script to listen for highlighter button
 		document.dispatchEvent(new CustomEvent('obsidian-reader-init'));
@@ -771,6 +787,17 @@ export class Reader {
 		} else {
 			doc.body.style.removeProperty('--font-text');
 		}
+		this.updateFontNotice(doc, defaultFont);
+	}
+
+	// Warn when the chosen font can't actually render on this page. The most
+	// common cause is a browser (e.g. Brave on web origins) restricting access
+	// to locally installed fonts, which otherwise fails silently to sans-serif.
+	private static updateFontNotice(doc: Document, defaultFont: string): void {
+		const notice = this.fontNotice;
+		if (!notice) return;
+		const available = isFontAvailable(defaultFont, { doc, blocksCanvasProbe: this.fontProbeBlocked });
+		notice.style.display = available ? 'none' : '';
 	}
 
 	private static updateBlendImages(doc: Document, blend: boolean): void {
@@ -1973,8 +2000,10 @@ export class Reader {
 			let youtubeVideoElement: HTMLVideoElement | null = null;
 			const host = doc.URL ? new URL(doc.URL).hostname : '';
 			const isYouTube = host.includes('youtube.com') || host.includes('youtu.be');
-			// Browser type is only needed for YouTube-specific behavior
-			const browserType = isYouTube ? await detectBrowser() : '';
+			const browserType = await detectBrowser();
+			// Safari/Firefox block canvas font metrics, so the font-availability
+			// probe must fall back to the Font Loading API on those browsers.
+			this.fontProbeBlocked = ['safari', 'mobile-safari', 'ipad-os', 'orion', 'firefox', 'firefox-mobile'].includes(browserType);
 			if (isYouTube) {
 				const videoElement = doc.querySelector('video');
 				if (videoElement) {

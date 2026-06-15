@@ -786,6 +786,9 @@
 	"readerFontSystemSerif": {
 		"message": "Serif"
 	},
+	"readerFontUnavailable": {
+		"message": "ฟอนต์นี้ไม่พร้อมใช้งานที่นี่ — เบราว์เซอร์ของคุณอาจบล็อกฟอนต์ที่กำหนดเอง"
+	},
 	"readerFonts": {
 		"message": "แบบอักษร"
 	},

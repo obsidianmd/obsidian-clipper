@@ -778,6 +778,9 @@
 	"readerFontSystemSerif": {
 		"message": "עם תגים"
 	},
+	"readerFontUnavailable": {
+		"message": "הגופן הזה אינו זמין כאן — ייתכן שהדפדפן שלך חוסם גופנים מותאמים אישית."
+	},
 	"readerFonts": {
 		"message": "גופנים"
 	},

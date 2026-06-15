@@ -786,6 +786,9 @@
 	"readerFontSystemSerif": {
 		"message": "セリフ"
 	},
+	"readerFontUnavailable": {
+		"message": "このフォントはここでは利用できません。ブラウザがカスタムフォントをブロックしている可能性があります。"
+	},
 	"readerFonts": {
 		"message": "フォント"
 	},

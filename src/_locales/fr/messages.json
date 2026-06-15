@@ -786,6 +786,9 @@
 	"readerFontSystemSerif": {
 		"message": "Serif"
 	},
+	"readerFontUnavailable": {
+		"message": "Cette police n’est pas disponible ici — votre navigateur bloque peut-être les polices personnalisées."
+	},
 	"readerFonts": {
 		"message": "Polices"
 	},

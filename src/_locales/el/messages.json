@@ -778,6 +778,9 @@
 	"readerFontSystemSerif": {
 		"message": "Serif"
 	},
+	"readerFontUnavailable": {
+		"message": "Αυτή η γραμματοσειρά δεν είναι διαθέσιμη εδώ — το πρόγραμμα περιήγησής σας ενδέχεται να αποκλείει προσαρμοσμένες γραμματοσειρές."
+	},
 	"readerFonts": {
 		"message": "Γραμματοσειρές"
 	},

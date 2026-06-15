@@ -786,6 +786,9 @@
 	"readerFontSystemSerif": {
 		"message": "Serif"
 	},
+	"readerFontUnavailable": {
+		"message": "این فونت اینجا در دسترس نیست — مرورگر شما ممکن است فونت‌های سفارشی را مسدود کند."
+	},
 	"readerFonts": {
 		"message": "فونت‌ها"
 	},

@@ -778,6 +778,9 @@
 	"readerFontSystemSerif": {
 		"message": "Serif"
 	},
+	"readerFontUnavailable": {
+		"message": "Denne skrifttype er ikke tilgængelig her — din browser blokerer muligvis brugerdefinerede skrifttyper."
+	},
 	"readerFonts": {
 		"message": "Skrifttyper"
 	},

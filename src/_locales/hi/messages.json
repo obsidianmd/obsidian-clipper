@@ -786,6 +786,9 @@
 	"readerFontSystemSerif": {
 		"message": "सेरिफ़"
 	},
+	"readerFontUnavailable": {
+		"message": "यह फ़ॉन्ट यहाँ उपलब्ध नहीं है — हो सकता है आपका ब्राउज़र कस्टम फ़ॉन्ट ब्लॉक कर रहा हो।"
+	},
 	"readerFonts": {
 		"message": "फ़ॉन्ट"
 	},

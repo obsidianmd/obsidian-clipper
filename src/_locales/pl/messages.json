@@ -786,6 +786,9 @@
 	"readerFontSystemSerif": {
 		"message": "Szeryfowa"
 	},
+	"readerFontUnavailable": {
+		"message": "Ta czcionka nie jest tutaj dostępna — Twoja przeglądarka może blokować czcionki niestandardowe."
+	},
 	"readerFonts": {
 		"message": "Czcionki"
 	},

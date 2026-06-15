@@ -786,6 +786,9 @@
 	"readerFontSystemSerif": {
 		"message": "Serif"
 	},
+	"readerFontUnavailable": {
+		"message": "Phông chữ này không khả dụng ở đây — trình duyệt của bạn có thể đang chặn phông chữ tùy chỉnh."
+	},
 	"readerFonts": {
 		"message": "Phông chữ"
 	},

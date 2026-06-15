@@ -786,6 +786,9 @@
 	"readerFontSystemSerif": {
 		"message": "সেরিফ"
 	},
+	"readerFontUnavailable": {
+		"message": "এই ফন্টটি এখানে উপলব্ধ নয় — আপনার ব্রাউজার কাস্টম ফন্ট ব্লক করতে পারে।"
+	},
 	"readerFonts": {
 		"message": "ফন্ট"
 	},

@@ -786,6 +786,9 @@
 	"readerFontSystemSerif": {
 		"message": "Serif"
 	},
+	"readerFontUnavailable": {
+		"message": "Det här teckensnittet är inte tillgängligt här — din webbläsare kan blockera anpassade teckensnitt."
+	},
 	"readerFonts": {
 		"message": "Teckensnitt"
 	},

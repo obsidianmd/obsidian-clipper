@@ -4,7 +4,7 @@ import { createElementWithClass, createElementWithHTML } from '../utils/dom-util
 import { initializeIcons } from '../icons/icons';
 import { debounce } from '../utils/debounce';
 import { getMessage } from '../utils/i18n';
-import { getFontCss, SANS_STACK, SERIF_STACK } from '../utils/font-utils';
+import { getFontCss, isFontAvailable as probeFontAvailable, sanitizeFontName, SANS_STACK, SERIF_STACK } from '../utils/font-utils';
 
 const THEMES: Array<{ id: string; name: string }> = [
 	{ id: 'default', name: '' },
@@ -98,21 +98,10 @@ function buildThemeGrid(
 	}
 }
 
-const fontCheckCanvas = document.createElement('canvas');
-const fontCheckCtx = fontCheckCanvas.getContext('2d');
-const fontCheckText = 'abcdefghijklmnopqrstuvwxyz0123456789';
-
 function isFontAvailable(fontName: string): boolean {
-	// Safari and Firefox block canvas font detection as an anti-fingerprinting measure
 	const html = document.documentElement;
-	if (html.classList.contains('is-safari') || html.classList.contains('is-firefox')) {
-		return document.fonts.check(`16px "${fontName}"`);
-	}
-	if (!fontCheckCtx) return true;
-	fontCheckCtx.font = '16px monospace';
-	const baseWidth = fontCheckCtx.measureText(fontCheckText).width;
-	fontCheckCtx.font = `16px "${fontName}", monospace`;
-	return fontCheckCtx.measureText(fontCheckText).width !== baseWidth;
+	const blocksCanvasProbe = html.classList.contains('is-safari') || html.classList.contains('is-firefox');
+	return probeFontAvailable(fontName, { blocksCanvasProbe });
 }
 
 
@@ -285,7 +274,7 @@ export async function initializeReaderSettings() {
 		fontInput.addEventListener('keydown', (e) => {
 			if (e.key === 'Enter') {
 				e.preventDefault();
-				const font = fontInput.value.trim();
+				const font = sanitizeFontName(fontInput.value);
 				if (font && !generalSettings.readerSettings.fonts.includes(font)) {
 					generalSettings.readerSettings.fonts.push(font);
 					saveSettings({ ...generalSettings });

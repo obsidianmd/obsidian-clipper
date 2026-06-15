@@ -786,6 +786,9 @@
 	"readerFontSystemSerif": {
 		"message": "Serif"
 	},
+	"readerFontUnavailable": {
+		"message": "Ez a betűtípus itt nem érhető el — előfordulhat, hogy a böngészője blokkolja az egyéni betűtípusokat."
+	},
 	"readerFonts": {
 		"message": "Betűtípusok"
 	},

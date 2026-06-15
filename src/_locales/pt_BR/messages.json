@@ -786,6 +786,9 @@
 	"readerFontSystemSerif": {
 		"message": "Com serifa"
 	},
+	"readerFontUnavailable": {
+		"message": "Esta fonte não está disponível aqui — seu navegador pode estar bloqueando fontes personalizadas."
+	},
 	"readerFonts": {
 		"message": "Fontes"
 	},
