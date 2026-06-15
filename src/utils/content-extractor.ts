@@ -201,7 +201,7 @@ export async function initializePageContent(
 	}
 }
 
-function processHighlights(content: string, highlights: AnyHighlightData[]): string {
+export function processHighlights(content: string, highlights: AnyHighlightData[]): string {
 	// First check if highlighter is enabled and we have highlights
 	if (!generalSettings.highlighterEnabled || !highlights?.length) {
 		return content;
@@ -369,17 +369,26 @@ function processContentBasedHighlight(highlight: TextHighlightData | ElementHigh
 function processContentParagraphs(sourceParagraphs: Element[], tempDiv: HTMLDivElement) {
 	sourceParagraphs.forEach(sourceParagraph => {
 		const sourceText = stripHtml(sourceParagraph.outerHTML).trim();
+		if (!sourceText) return;
 		debugLog('Highlights', 'Looking for paragraph:', sourceText);
-		
+
 		const paragraphs = Array.from(tempDiv.querySelectorAll('p'));
-		for (const targetParagraph of paragraphs) {
-			const targetText = stripHtml(targetParagraph.outerHTML).trim();
-			
-			if (targetText === sourceText) {
-				debugLog('Highlights', 'Found matching paragraph:', targetParagraph.outerHTML);
-				wrapElementWithMark(targetParagraph);
-				break;
-			}
+
+		// Try an exact whole-paragraph match first.
+		const exact = paragraphs.find(p => stripHtml(p.outerHTML).trim() === sourceText);
+		if (exact) {
+			debugLog('Highlights', 'Found matching paragraph:', exact.outerHTML);
+			wrapElementWithMark(exact);
+			return;
+		}
+
+		// A sentence highlighted within a paragraph is stored as that fragment
+		// wrapped in a shallow <p>, so it never equals the full paragraph. Mark
+		// the substring inside the containing paragraph (fixes #446 / #852).
+		const container = paragraphs.find(p => stripHtml(p.outerHTML).includes(sourceText));
+		if (container) {
+			debugLog('Highlights', 'Found containing paragraph for partial highlight:', container.outerHTML);
+			processInlineContent(sourceParagraph.outerHTML, container);
 		}
 	});
 }

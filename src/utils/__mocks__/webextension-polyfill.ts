@@ -17,6 +17,10 @@ export const storage = {
 		get: async () => ({}),
 		set: async () => {},
 	},
+	onChanged: {
+		addListener: () => {},
+		removeListener: () => {},
+	},
 };
 
 export const tabs = {
