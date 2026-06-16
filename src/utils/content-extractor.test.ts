@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { describe, test, expect } from 'vitest';
-import { processHighlights } from './content-extractor';
+import { initializePageContent, processHighlights } from './content-extractor';
 import { TextHighlightData } from './highlighter';
 
 // Default settings already use highlighterEnabled + 'highlight-inline', the
@@ -45,5 +45,32 @@ describe('processHighlights — highlight-inline', () => {
 		expect(mark!.textContent?.replace(/\s+/g, ' ').trim()).toBe('A seismic shift is rocking the healthcare industry.');
 		// The link must survive inside the mark, proving the range crossed it.
 		expect(mark!.querySelector('a')).not.toBeNull();
+	});
+});
+
+describe('initializePageContent — selected content', () => {
+	test('still applies popup highlight fallback when clone-inlined page content is bypassed by selected HTML', async () => {
+		const initialized = await initializePageContent(
+			'<p><mark>A seismic shift is rocking the healthcare industry.</mark> Much like Uber once did.</p>',
+			'<p>A seismic shift is rocking the healthcare industry. Much like Uber once did.</p>',
+			{},
+			'https://example.com/article',
+			{},
+			'',
+			[textHighlight('<p>A seismic shift is rocking the healthcare industry.</p>')],
+			'Example article',
+			'',
+			'',
+			'',
+			'',
+			'',
+			'Example',
+			100,
+			'en',
+			[],
+			true
+		);
+
+		expect(initialized.currentVariables['{{content}}']).toContain('==A seismic shift is rocking the healthcare industry.==');
 	});
 });

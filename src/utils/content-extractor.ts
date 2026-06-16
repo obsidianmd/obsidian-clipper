@@ -157,10 +157,13 @@ export async function initializePageContent(
 			selectedMarkdown = createMarkdownContent(selectedHtml, currentUrl);
 		}
 
+		const shouldSkipHighlightProcessing = highlightsInlined && !selectedHtml;
+
 		// Process highlights after getting the base content. Skip when the content
 		// script already inlined them onto a clone before extraction (the robust
-		// path); re-running here would double-mark or fail the text search.
-		if (!highlightsInlined && generalSettings.highlighterEnabled && generalSettings.highlightBehavior !== 'no-highlights' && highlights && highlights.length > 0) {
+		// path); re-running here would double-mark or fail the text search. Selected
+		// HTML still comes from the live DOM, so it needs the popup fallback.
+		if (!shouldSkipHighlightProcessing && generalSettings.highlighterEnabled && generalSettings.highlightBehavior !== 'no-highlights' && highlights && highlights.length > 0) {
 			content = processHighlights(content, highlights);
 		}
 
