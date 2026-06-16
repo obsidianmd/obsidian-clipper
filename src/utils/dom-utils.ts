@@ -74,6 +74,13 @@ export function getElementByXPath(xpath: string): Element | null {
 	return document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue as Element | null;
 }
 
+// Resolve an XPath within a specific document rather than the global one.
+// Used to re-anchor highlights inside a cloned document before extraction, so
+// the stored live-DOM xpath resolves against the matching clone structure.
+export function getElementByXPathInDoc(xpath: string, doc: Document): Element | null {
+	return doc.evaluate(xpath, doc, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue as Element | null;
+}
+
 export function isDarkColor(color: string): boolean {
 	// Convert the color to RGB
 	const rgb = color.match(/\d+/g);
@@ -87,47 +94,59 @@ export function isDarkColor(color: string): boolean {
 }
 
 export function wrapElementWithMark(element: Element): void {
-	const mark = document.createElement('mark');
+	// Use the element's own document so this works on a cloned/detached
+	// document, not just the global one.
+	const doc = element.ownerDocument || document;
+	const mark = doc.createElement('mark');
 
 	while (element.firstChild) {
 		mark.appendChild(element.firstChild);
 	}
-	
+
 	element.appendChild(mark);
 }
 
 export function wrapTextWithMark(element: Element, highlight: { startOffset: number; endOffset: number }): void {
-	const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+	const doc = element.ownerDocument || document;
+	const walker = doc.createTreeWalker(element, NodeFilter.SHOW_TEXT);
 	let currentOffset = 0;
 	let startNode = null;
 	let endNode = null;
 	let startOffset = 0;
 	let endOffset = 0;
-	
+
 	let node;
 	while (node = walker.nextNode() as Text) {
 		const length = node.length;
-		
+
 		if (!startNode && currentOffset + length > highlight.startOffset) {
 			startNode = node;
 			startOffset = highlight.startOffset - currentOffset;
 		}
-		
+
 		if (!endNode && currentOffset + length >= highlight.endOffset) {
 			endNode = node;
 			endOffset = highlight.endOffset - currentOffset;
 			break;
 		}
-		
+
 		currentOffset += length;
 	}
-	
+
 	if (startNode && endNode) {
-		const range = document.createRange();
+		const range = doc.createRange();
 		range.setStart(startNode, startOffset);
 		range.setEnd(endNode, endOffset);
-		
-		const mark = document.createElement('mark');
-		range.surroundContents(mark);
+
+		const mark = doc.createElement('mark');
+		// surroundContents() throws when the range crosses element boundaries
+		// (e.g. a link or <strong> sits mid-highlight). extractContents()
+		// handles that case; previously such highlights were silently dropped.
+		try {
+			range.surroundContents(mark);
+		} catch {
+			mark.appendChild(range.extractContents());
+			range.insertNode(mark);
+		}
 	}
 }

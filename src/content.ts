@@ -7,7 +7,7 @@ import { extractContentBySelector as extractContentBySelectorShared } from './ut
 import Defuddle from 'defuddle';
 import { createMarkdownContent } from 'defuddle/full';
 import { flattenShadowDom } from './utils/flatten-shadow-dom';
-import { serializeChildren } from './utils/dom-utils';
+import { serializeChildren, getElementByXPathInDoc, wrapElementWithMark, wrapTextWithMark } from './utils/dom-utils';
 import { saveFile } from './utils/file-utils';
 import { debugLog } from './utils/debug';
 import { updateSidebarWidth, addResizeHandle, cleanupResizeHandlers } from './utils/iframe-resize';
@@ -16,6 +16,53 @@ import { parseForClip } from './utils/clip-utils';
 declare global {
 	interface Window {
 		obsidianClipperGeneration?: number;
+	}
+}
+
+// Apply highlights as inline <mark> tags onto a clone of the live document
+// BEFORE Defuddle extracts it. The stored xpath + offsets are anchored to the
+// live DOM, so they resolve reliably against the clone — including partial /
+// fragment highlights that the post-extraction text-search path silently drops
+// on pages whose DOM Defuddle heavily restructures (e.g. WeChat #js_content,
+// Xiaohongshu). Defuddle then converts the <mark> tags to ==…== markdown.
+// Returns the marked clone, or null if nothing could be applied (caller falls
+// back to parsing the live document, preserving previous behavior).
+function buildHighlightedCloneForExtraction(highlightData: highlighter.AnyHighlightData[]): Document | null {
+	try {
+		const clone = document.cloneNode(true) as Document;
+
+		// Within a single element, apply marks back-to-front so an earlier
+		// insertion can't shift the offsets of a later highlight.
+		const sorted = highlightData
+			.filter(h => !!h.xpath?.trim())
+			.slice()
+			.sort((a, b) => {
+				if (a.xpath === b.xpath && a.type === 'text' && b.type === 'text') {
+					return (b as highlighter.TextHighlightData).startOffset - (a as highlighter.TextHighlightData).startOffset;
+				}
+				return 0;
+			});
+
+		let applied = 0;
+		for (const h of sorted) {
+			const el = getElementByXPathInDoc(h.xpath, clone);
+			if (!el) continue;
+			try {
+				if (h.type === 'element') {
+					wrapElementWithMark(el);
+				} else if (h.type === 'text') {
+					wrapTextWithMark(el, h as highlighter.TextHighlightData);
+				}
+				applied++;
+			} catch (e) {
+				debugLog('Highlights', 'Failed to inline a highlight onto clone:', e);
+			}
+		}
+
+		return applied > 0 ? clone : null;
+	} catch (e) {
+		debugLog('Highlights', 'Clone-based inline highlighting failed, falling back:', e);
+		return null;
 	}
 }
 
@@ -94,6 +141,7 @@ declare global {
 		schemaOrgData: any;
 		fullHtml: string;
 		highlights: string[];
+		highlightsInlined: boolean;
 		title: string;
 		description: string;
 		domain: string;
@@ -211,9 +259,27 @@ declare global {
 					selectedHtml = serializeChildren(div);
 				}
 
+				// When the user wants highlights inlined, mark a clone of the live
+				// DOM before extraction so partial/fragment highlights survive on
+				// DOM-heavy pages (WeChat, Xiaohongshu). Falls back to the live
+				// document when highlighting is off or nothing could be applied.
+				let parseTarget: Document = document;
+				let highlightsInlined = false;
+				if (generalSettings.highlighterEnabled
+					&& generalSettings.highlightBehavior === 'highlight-inline') {
+					const highlightData = highlighter.getHighlightData();
+					if (highlightData.length > 0) {
+						const markedClone = buildHighlightedCloneForExtraction(highlightData);
+						if (markedClone) {
+							parseTarget = markedClone;
+							highlightsInlined = true;
+						}
+					}
+				}
+
 				// Use parseAsync to ensure async variables like {{transcript}} are available.
 				// If it hangs (e.g. another extension has corrupted fetch), fall back to sync parse.
-				const defuddle = new Defuddle(document, { url: document.URL });
+				const defuddle = new Defuddle(parseTarget, { url: document.URL });
 				const parseTimeout = new Promise<never>((_, reject) =>
 					setTimeout(() => reject(new Error('parseAsync timeout')), 8000)
 				);
@@ -274,6 +340,7 @@ declare global {
 					favicon: defuddled.favicon,
 					fullHtml: cleanedHtml,
 					highlights: highlighter.getHighlights(),
+					highlightsInlined,
 					image: defuddled.image,
 					language: defuddled.language || '',
 					parseTime: defuddled.parseTime,

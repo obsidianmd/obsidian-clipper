@@ -1087,6 +1087,13 @@ export function getHighlights(): string[] {
 	return highlights.map(h => h.content);
 }
 
+// Raw highlight records, including the live-DOM xpath + offsets that
+// getHighlights() drops. Used by the content script to re-anchor highlights
+// onto a cloned document before extraction (inline-highlight injection).
+export function getHighlightData(): AnyHighlightData[] {
+	return highlights;
+}
+
 // Group highlights that share a groupId (produced by a single multi-block
 // selection) so export/display treats them as one logical highlight. Ungrouped
 // highlights pass through as single-element arrays. Order is preserved.

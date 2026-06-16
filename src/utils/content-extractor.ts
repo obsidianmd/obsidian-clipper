@@ -50,6 +50,10 @@ interface ContentResponse {
 	schemaOrgData: any;
 	fullHtml: string;
 	highlights: AnyHighlightData[];
+	// True when the content script already injected inline <mark> tags into the
+	// extracted content (before Defuddle). The popup then skips its own
+	// post-extraction highlight pass to avoid double-marking.
+	highlightsInlined?: boolean;
 	title: string;
 	author: string;
 	description: string;
@@ -141,7 +145,8 @@ export async function initializePageContent(
 	site: string,
 	wordCount: number,
 	language: string,
-	metaTags: { name?: string | null; property?: string | null; content: string | null }[]
+	metaTags: { name?: string | null; property?: string | null; content: string | null }[],
+	highlightsInlined: boolean = false
 ) {
 	try {
 		currentUrl = currentUrl.replace(/#:~:text=[^&]+(&|$)/, '');
@@ -152,8 +157,10 @@ export async function initializePageContent(
 			selectedMarkdown = createMarkdownContent(selectedHtml, currentUrl);
 		}
 
-		// Process highlights after getting the base content
-		if (generalSettings.highlighterEnabled && generalSettings.highlightBehavior !== 'no-highlights' && highlights && highlights.length > 0) {
+		// Process highlights after getting the base content. Skip when the content
+		// script already inlined them onto a clone before extraction (the robust
+		// path); re-running here would double-mark or fail the text search.
+		if (!highlightsInlined && generalSettings.highlighterEnabled && generalSettings.highlightBehavior !== 'no-highlights' && highlights && highlights.length > 0) {
 			content = processHighlights(content, highlights);
 		}
 
