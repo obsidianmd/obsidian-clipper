@@ -3,7 +3,7 @@ import { Template, Property, PromptVariable } from '../types/types';
 import { incrementStat, addHistoryEntry, getClipHistory } from '../utils/storage-utils';
 import { generateFrontmatter, saveToObsidian } from '../utils/obsidian-note-creator';
 import { extractPageContent, initializePageContent } from '../utils/content-extractor';
-import { compileTemplate } from '../utils/template-compiler';
+import { compileTemplate, restoreBraces } from '../utils/template-compiler';
 import { initializeIcons, getPropertyTypeIcon } from '../icons/icons';
 import { findMatchingTemplate, initializeTriggers } from '../utils/triggers';
 import { getLocalStorage, setLocalStorage, loadSettings, generalSettings, Settings } from '../utils/storage-utils';
@@ -469,8 +469,9 @@ function setupEventListeners(tabId: number) {
 			const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
 			const frontmatter = await generateFrontmatter(properties);
 			const fileContent = frontmatter + noteContentField.value;
+			const finalOutput = restoreBraces(fileContent);
 			
-			await copyToClipboard(fileContent);
+			await copyToClipboard(finalOutput);
 		});
 	}
 
@@ -493,6 +494,7 @@ function setupEventListeners(tabId: number) {
 					Promise.resolve(noteContentField.value)
 				]).then(([frontmatter, noteContent]) => {
 					const fileContent = frontmatter + noteContent;
+					const finalOutput = restoreBraces(fileContent);
 					
 					// Call share directly from the click handler
 					const noteNameField = document.getElementById('note-name-field') as HTMLInputElement;
@@ -503,7 +505,7 @@ function setupEventListeners(tabId: number) {
 					}
 
 					if (navigator.share && navigator.canShare) {
-						const blob = new Blob([fileContent], { type: 'text/markdown;charset=utf-8' });
+						const blob = new Blob([finalOutput], { type: 'text/markdown;charset=utf-8' });
 						const file = new File([blob], fileName, { type: 'text/markdown;charset=utf-8' });
 						
 						const shareData = {
@@ -1253,9 +1255,10 @@ async function handleSaveToDownloads() {
 		const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
 		const frontmatter = await generateFrontmatter(properties);
 		const fileContent = frontmatter + noteContentField.value;
+		const finalOutput = restoreBraces(fileContent);
 
 		await saveFile({
-			content: fileContent,
+			content: finalOutput,
 			fileName,
 			mimeType: 'text/markdown',
 			tabId: currentTabId,
@@ -1339,6 +1342,7 @@ async function handleClipObsidian(): Promise<void> {
 
 		const frontmatter = await generateFrontmatter(properties);
 		const fileContent = frontmatter + noteContentField.value;
+		const finalOutput = restoreBraces(fileContent);
 
 		// Save to Obsidian
 		const selectedVault = vaultDropdown.value || currentTemplate.vault || '';
@@ -1346,7 +1350,7 @@ async function handleClipObsidian(): Promise<void> {
 		const noteName = isDailyNote ? '' : noteNameField?.value || '';
 		const path = isDailyNote ? '' : pathField?.value || '';
 
-		await saveToObsidian(fileContent, noteName, path, selectedVault, currentTemplate.behavior);
+		await saveToObsidian(finalOutput, noteName, path, selectedVault, currentTemplate.behavior);
 		const tabInfo = await getCurrentTabInfo();
 		await incrementStat('addToObsidian', selectedVault, path, tabInfo.url, tabInfo.title);
 
@@ -1405,7 +1409,8 @@ async function copyContent() {
 	const noteContentField = document.getElementById('note-content-field') as HTMLTextAreaElement;
 	const frontmatter = await generateFrontmatter(properties);
 	const fileContent = frontmatter + noteContentField.value;
-	await copyToClipboard(fileContent);
+	const finalOutput = restoreBraces(fileContent);
+	await copyToClipboard(finalOutput);
 }
 
 // Update the resize event listener to use the debounced version

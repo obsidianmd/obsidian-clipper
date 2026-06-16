@@ -16,6 +16,39 @@ import { processPrompt } from './variables/prompt';
 export type SelectorProcessor = (match: string, currentUrl: string) => Promise<string>;
 
 /**
+ * Escapes template variables (e.g., {{variable}}) by injecting zero-width 
+ * spaces (\u200B) between the braces.
+ * * This prevents from accidentally parsing or evaluating the braces,
+ * while keeping the text visually identical for the user.
+ * * @param value - The input value. If it's not a string, it returns the value untouched.
+ * @returns The escaped string, or the original value if it wasn't a string.
+ */
+export function escapeBraces(value: any) {
+	const regex = /{{([\s\S]*?)}}/g;
+	if (typeof value === "string") {
+		return value.replace(
+			regex,
+			"\u200B{\u200B{\u200B$1\u200B}\u200B}\u200B",
+		);
+	} else {
+		return value;
+	}
+}
+
+/**
+ * Restores previously escaped template variables back to their original, 
+ * unescaped form ({{variable}}).
+ * * It specifically targets braces wrapped in the exact zero-width space (\u200B) 
+ * pattern injected by `escapeBraces`, leaving legitimate zero-width spaces alone.
+ * * @param value - The escaped string containing the invisible characters.
+ * @returns The cleaned string with standard {{...}} braces.
+ */
+export function restoreBraces(value: string) {
+	const regex = /\u200B{\u200B{\u200B([\s\S]*?)\u200B}\u200B}\u200B/g;
+	return value.replace(regex, "{{$1}}");
+}
+
+/**
  * Main function to compile a template with the given variables.
  *
  * @param tabId - Browser tab ID for selector resolution (0 if not applicable)
@@ -38,16 +71,36 @@ export async function compileTemplate(
 	currentUrl = currentUrl.replace(/#:~:text=[^&]+(&|$)/, '');
 
 	// Use provided resolver or default browser-based one
-	const asyncResolver = customAsyncResolver ?? (async (name: string, ctx: RenderContext): Promise<any> => {
+	const baseResolver = customAsyncResolver ?? (async (name: string, ctx: RenderContext): Promise<any> => {
 		if (name.startsWith('selector:') || name.startsWith('selectorHtml:')) {
 			return resolveSelector(ctx.tabId!, name);
 		}
 		return undefined;
 	});
 
+	// Wrap asyncResolver to intercept the result and escape the braces
+	const asyncResolver = async (
+		name: string,
+		ctx: RenderContext,
+	): Promise<any> => {
+		const result = await baseResolver(name, ctx);
+		if (Array.isArray(result)) {
+			return result.map((value) => {
+				return escapeBraces(value);
+			});
+		}
+		return escapeBraces(result);
+	};
+
+	// Disarm standard variables so literal {{}} don't pollute the output
+	const safeVariables: typeof variables = {};
+	Object.entries(variables).forEach(([key, value]) => {
+		safeVariables[key] = escapeBraces(value);
+	});
+
 	// Create render context with custom variable resolver
 	const context: RenderContext = {
-		variables,
+		variables: safeVariables,
 		currentUrl,
 		tabId,
 		applyFilterDirect,
